@@ -30,6 +30,12 @@ the surrounding. He also worked on various other systems in CS like the
 sequence manager. In addition he also fixed various bugs.
 
 @item
+Anders Reggestad (@email{anders@@pvv.ntnu.no})
+
+Anders fixed csGetTicks() to be MT safe and also made sure it no longer
+overflows.
+
+@item
 Rene Jager (@email{renej.frog@@yucom.be})
 
 Rene did some modifications for SWIG 1.3 support in the python plugin.

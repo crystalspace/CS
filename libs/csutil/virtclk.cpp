@@ -47,6 +47,12 @@ void csVirtualClock::Advance ()
   if (last == csTicks(-1))
     ElapsedTime = 0;
   else
-    ElapsedTime = CurrentTime - last;
+  {
+      if (CurrentTime < last)
+          // csTicks(-1) is the period for a unsigend value
+          ElapsedTime = CurrentTime + (csTicks(-1) - last) + 1;
+      else
+          ElapsedTime = CurrentTime - last;
+  }
 }
 

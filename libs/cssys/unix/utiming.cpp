@@ -21,20 +21,47 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 
+typedef long long csLongTicks;
 
-// This function should return milliseconds since some specific time
+// Static initializer, for the csGetTicks function. The csGetTicks
+// need to be called once before there are any chance that it will
+// be called from multiple threads to initialize static variables.
+class csInitGetTicks 
+{
+public:
+    csInitGetTicks()
+    {
+        csGetTicks();
+    }    
+};
+// Constructor called before main is invoke
+csInitGetTicks initGetTicks;
+
+// This function should return milliseconds since first invocation
+// time. With a 32bit integer there will be 49 days before this
+// counter overflow. When called once in a single thread this
+// function is MT safe. 
 csTicks csGetTicks ()
 {
+  struct tms buf;
+
   // We shouldn't cache 1000/CLK_TCK, because we loose accuracy
   // on platforms where CLK_TCK is 60. (16 != 16.66666...)
+  static csLongTicks Freq      = 0;
+  static csLongTicks FirstCount = 0;
+
+  if (Freq == 0)
+  {
 #ifdef _SC_CLK_TCK
-  static clock_t clktck = 0;
-  if (clktck == 0)
-    clktck = sysconf(_SC_CLK_TCK);
+    Freq = sysconf(_SC_CLK_TCK);
 #else
-#define clktck CLK_TCK
+    Freq = CLK_TCK;
 #endif
-  // NOTE: times() can return -1 on errors.  Yikes!
-  struct tms buf;
-  return (1000 * times (&buf)) / clktck;
+    // Start counting from first time this function is called. 
+    FirstCount = (csLongTicks)times (&buf);
+  } 
+
+  csLongTicks Count = (csLongTicks)times (&buf);
+  
+  return 1000*(Count-FirstCount)/Freq;
 }

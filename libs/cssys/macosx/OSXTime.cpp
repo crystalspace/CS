@@ -22,9 +22,27 @@
 #include <sys/time.h>
 
 //-----------------------------------------------------------------------------
+// Static initializer, for the csGetTicks function. The csGetTicks
+// need to be called once before there are any chance that it will
+// be called from multiple threads to initialize static variables.
+//-----------------------------------------------------------------------------
+class csInitGetTicks 
+{
+public:
+    csInitGetTicks()
+    {
+        csGetTicks();
+    }    
+};
+// Constructor called before main is invoke
+csInitGetTicks initGetTicks;
+
+//-----------------------------------------------------------------------------
 // csGetTicks
 //	Implement OSX-specific clock function.  Returns milliseconds since
-//	first invocation.
+//	first invocation time.With a 32bit integer there will be 49 days before this
+//      counter overflow. When called once in a single thread this
+//      function is MT safe.
 //-----------------------------------------------------------------------------
 csTicks csGetTicks()
 {

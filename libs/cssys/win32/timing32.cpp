@@ -23,9 +23,24 @@
 #include <sys/timeb.h>
 #include "cssys/sysfunc.h"
 
-// This function should return milliseconds since some specific
-// time. If you don't have milliseconds easily just rewrite by
-// using 'time (NULL)*1000' or something like that.
+// Static initializer, for the csGetTicks function. The csGetTicks
+// need to be called once before there are any chance that it will
+// be called from multiple threads to initialize static variables.
+class csInitGetTicks 
+{
+public:
+    csInitGetTicks()
+    {
+        csGetTicks();
+    }    
+};
+// Constructor called before main is invoke
+csInitGetTicks initGetTicks;
+
+// This function should return milliseconds since first invocation
+// time. With a 32bit integer there will be 49 days before this
+// counter overflow. When called once in a single thread this
+// function is MT safe.
 
 csTicks csGetTicks ()
 {
@@ -37,9 +52,7 @@ csTicks csGetTicks ()
 #endif
 
   static __int64 Freq      = 0;
-  static __int64 LastCount = 0;
-  static __int64 LastRest  = 0;
-  static long    LastTime  = 0;
+  static __int64 FirstCount = 0;
 
   //Freq was set to -1, if the current Hardware does not support
   //high resolution timers. We will use GetTickCount instead then.
@@ -58,21 +71,15 @@ csTicks csGetTicks ()
       Freq=-1;
       return csGetTicks();
     }
+    // Start counting from first time this function is called.
+    QueryPerformanceCounter((LARGE_INTEGER*)&FirstCount);
   }
 
   //retrieve current count
   __int64 Count = 0;
   QueryPerformanceCounter((LARGE_INTEGER*)&Count);
 
-  //calculate the time passed since last call, and add the rest of
-  //those tics that didn't make it into the last reported time.
-  __int64 Delta = 1000*(Count-LastCount)+LastRest;
-
-  LastTime += (long)(Delta/Freq); //save the new value
-  LastRest  = Delta%Freq;         //save those ticks not being counted
-  LastCount = Count;              //save last count
-
-  return LastTime; //return a high quality measurement of time.
+  return 1000*(Count-FirstCount)/Freq;
 }
 
 void csSleep (int SleepTime)
