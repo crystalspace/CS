@@ -1,0 +1,14 @@
+#!/bin/sh
+if test -z "$1"; then
+    echo "Don't call this script directly it's meant to use together with cs-cofig"
+    exit 1
+fi
+
+case $1 in
+    --libs) echo "$PYTH_LIBS";;
+    --deps) echo "$PYTH_DEPS";;
+    --cflags) echo "$PYTH_CFLAGS";;
+    --cxxflags) echo "$PYTH_CXXFLAGS";;
+    *) echo "Unknown option"; exit 1;;
+esac
+
