@@ -34,15 +34,15 @@
 groups = [
   {
     name => 'Source Files'
-    types => '\.(?i:c|cc|cpp|m|mm)$'
+    types => '\.(?i:c|cc|cpp|cxx|m|mm)$'
   },
   {
     name => 'Header Files'
-    types => '\.(?i:h|hh|hpp)$'
+    types => '\.(?i:h|hh|hpp|hxx)$'
   },
   {
     name => 'Resource Files'
-    types => '\.(?!(?i:h|hh|hpp|c|cc|cpp|m|mm)$)\w*$'
+    types => '\.(?!(?i:h|hh|hpp|hxx|c|cc|cpp|cxx|m|mm)$)\w*$'
   }
 ];
 

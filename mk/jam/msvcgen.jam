@@ -669,7 +669,7 @@ rule MsvcProject
   local i ;
   for i in $(sources)
   {
-    if [ IsElem $(i:S) : .h .hpp .H .c .cc .cpp .C .m .mm .M ]
+    if [ IsElem $(i:S) : .h .hpp .hxx .H .c .cc .cpp .cxx .C .m .mm .M ]
     {
       ResponseFile $(respfile) : "file|$(i:R=$(SEARCH_SOURCE))" : notfile :
 	$(respdir) ;
