@@ -524,7 +524,7 @@ awsMultiProctexCanvas::awsMultiProctexCanvas(int w, int h, iObjectRegistry* obje
   VertCanvases = DesiredCanvasHeight / MaxCanvasHeight;
   if (DesiredCanvasHeight % MaxCanvasHeight) VertCanvases++;
 
-  int v=0,h=0,i,count=GetFlatCanvasCount();
+  int vert=0,hor=0,i,count=GetFlatCanvasCount();
 
   // Initialize the canvas and rect list.
   canvas_list = new awsSimpleCanvas[HorzCanvases*VertCanvases];
@@ -544,15 +544,15 @@ awsMultiProctexCanvas::awsMultiProctexCanvas(int w, int h, iObjectRegistry* obje
     // Setup the rect that identifies where we are in screen coords.
     csRect *rect = GetFlatCanvasRect(i);
 
-    int sx = h*MaxCanvasWidth;
-    int sy = v*MaxCanvasHeight;
+    int sx = hor*MaxCanvasWidth;
+    int sy = vert*MaxCanvasHeight;
 
     rect->Set(sx,sy,sx+MaxCanvasWidth,sy+MaxCanvasHeight);
     
-    // Inc h and v counters
-    if (!(++h<HorzCanvases))
+    // Inc hor and vert counters
+    if (!(++hor<HorzCanvases))
     {
-      h=0; ++v;
+      hor=0; ++vert;
     }
   }
 
