@@ -56,6 +56,8 @@ chronological order.
 	      wchar_t, and wcslen(); and fakes up missing items as necessary.
 	    - Removed unportable `#include <wchar.h>' from csutil/util.cpp.
 	    - Replaced usage of csVector with csArray in OSXDynamicLibrary.cpp.
+	- Eric Sunshine elminated bogus `inline' from DEL2D_FUNC() macro in
+	  common/OSXDelegate2D.h which prompted compilation warning.
 31-Jul-2003
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'vTex' in OpenGL texture manager with

@@ -86,7 +86,7 @@
 
 #include <ApplicationServices/ApplicationServices.h>
 
-#define DEL2D_FUNC(ret, func) __private_extern__ "C" inline ret OSXDelegate2D_##func
+#define DEL2D_FUNC(ret, func) __private_extern__ "C" ret OSXDelegate2D_##func
 
 typedef void *OSXDelegate2D;
 typedef void *csGraphics2DHandle;
