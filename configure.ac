@@ -335,7 +335,8 @@ AC_DEFUN([CS_BUILD_IFELSE],
 	LDFLAGS="$cs_lflags_test $7 $cs_lflags_save"
 	LIBS="$cs_libs_test $8 $cs_libs_save"
 	AC_LINK_IFELSE(m4_default([$1], [AC_LANG_PROGRAM([],[])]),
-	    [cs_build_ok=yes break])
+	    [cs_build_ok=yes
+	    break])
     done
 
     CS_LANG_CFLAGS=$cs_cflags_save

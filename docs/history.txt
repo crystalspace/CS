@@ -1,5 +1,13 @@
-﻿The history order is reversed so that new features are at the top.
+The history order is reversed so that new features are at the top.
 
+02-March-2003
+	- Eric Sunshine worked around a problem in the configure script in
+	  which tests based upon CS_BUILD_IFELSE() (or its descendents) failed
+	  when run under Bash 1.14.  The culprit was the one-liner
+	  "cs_build_ok=yes break" which, although it works correctly with every
+	  other Bourne or compatible shell the world over, fails with Bash
+	  1.14.  In particular, Base 1.14 failed to set cs_build_ok to "yes"
+	  and instead left the old value ("no") in place.
 01-March-2003
 	- Philip Wyett updated MSVC project files and also notes next
 	  time we change csver.h for a release, update the MSVC project files
