@@ -98,14 +98,15 @@ class scfSharedLibrary
   csLibraryHandle LibraryHandle;
   // Number of references to this shared library
   int RefCount;
-  // Number of classes which have been initialized in this module.  The first
-  // class initialization function called should also initialize the module.
-  // The last finalization function called should also finalize the module.
-  unsigned int ActiveClasses;
+  // Base name used for composition of library intialize and shutdown
+  // functions.  All exported factory classes will implement initialize and
+  // shutdown functions, but we choose only a single pair to perform this work
+  // on behalf of the library.
+  char *FuncCoreName;
 
 public:
   /// Create a shared library and load it
-  scfSharedLibrary (const char *iLibraryName);
+  scfSharedLibrary (const char *iLibraryName, const char *iCoreName);
 
   /// Destroy a shared library object
   virtual ~scfSharedLibrary ();
@@ -138,24 +139,40 @@ public:
   }
 };
 
-scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
+scfSharedLibrary::scfSharedLibrary (const char *lib, const char *core)
 {
   LibraryRegistry->Push (this);
 
   RefCount = 0;
-  ActiveClasses = 0;
-  LibraryName = csStrNew (iLibraryName);
+  LibraryName = csStrNew (lib);
   LibraryHandle = csFindLoadLibrary (LibraryName);
+  FuncCoreName = csStrNew (core);
+
+  typedef void (*scfInitFunc)(iSCF*);
+  csString sym;
+  sym << FuncCoreName << "_scfInitialize";
+  scfInitFunc initfunc = (scfInitFunc)csGetLibrarySymbol(LibraryHandle, sym);
+  if (initfunc)
+    initfunc(PrivateSCF);
+  else
+    csPrintLibraryError(sym);
 }
 
 scfSharedLibrary::~scfSharedLibrary ()
 {
-  // @@@ FIXME: This assertion fails (at least in walktest; probably others)
-  // Investigate this.  It is disabled for now to avoid complaints from people
-  // using debug builds.
-  // CS_ASSERT(ActiveClasses == 0);
   if (LibraryHandle)
+  {
+    typedef void (*scfFinisFunc)();
+    csString sym;
+    sym << FuncCoreName << "_scfFinalize";
+    scfFinisFunc func = (scfFinisFunc)csGetLibrarySymbol(LibraryHandle, sym);
+    if (func)
+      func();
+    else
+      csPrintLibraryError(sym);
     csUnloadLibrary (LibraryHandle);
+  }
+  delete [] FuncCoreName;
   delete [] LibraryName;
 }
 
@@ -281,7 +298,7 @@ void scfFactory::IncRef ()
     if (libidx >= 0)
       Library = (scfSharedLibrary *)LibraryRegistry->Get (libidx);
     else
-      Library = new scfSharedLibrary (LibraryName);
+      Library = new scfSharedLibrary (LibraryName, FactoryClass);
 
     if (Library->ok ())
     {
@@ -291,19 +308,7 @@ void scfFactory::IncRef ()
 	sym << FactoryClass << "_Create";
 	CreateFunc =
 	  (scfFactoryFunc)csGetLibrarySymbol(Library->LibraryHandle, sym);
-	if (CreateFunc != 0)
-	{
-	  typedef void (*scfInitFunc)(bool, iSCF*);
-	  sym.Clear();
-	  sym << FactoryClass << "_scfInitialize";
-	  scfInitFunc initfunc =
-	    (scfInitFunc)csGetLibrarySymbol(Library->LibraryHandle, sym);
-	  if (initfunc)
-	    initfunc(Library->ActiveClasses++ == 0, PrivateSCF);
-	  else
-	    csPrintLibraryError(sym);
-	}
-	else
+	if (CreateFunc == 0)
 	  csPrintLibraryError(sym);
       }
     }
@@ -337,18 +342,6 @@ void scfFactory::DecRef ()
     // now we no longer need the library either
     if (Library)
     {
-      if (CreateFunc != 0)
-      {
-        typedef void (*scfFinisFunc)(bool);
-        csString sym;
-        sym << FactoryClass << "_scfFinalize";
-        scfFinisFunc func =
-          (scfFinisFunc)csGetLibrarySymbol(Library->LibraryHandle, sym);
-        if (func)
-          func(--Library->ActiveClasses == 0);
-        else
-          csPrintLibraryError(sym);
-      }
       Library->DecRef ();
       Library = 0;
     }

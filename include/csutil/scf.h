@@ -434,46 +434,39 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
   SCF_IMPLEMENT_IBASE_EXT_QUERY_END
 
 /**
- * The SCF_IMPLEMENT_FACTORY_INIT macro defines module initialization code for
- * a class within a module.  If init_module is true, then this is the first
- * class within the module to be initialized, so it should perform any
- * necessary module-based initialization in addition to performing class-based
- * initialization.  Module-based initialization probably includes setting up
- * the module-global iSCF::SCF reference.  Implementation note: There are some
- * rare instances where a particularly picky (and probably buggy) compiler does
- * not allow C++ expressions within a function declared `extern "C"'.  For this
- * reason, the iSCF::SCF variable is instead initialized in the
- * Class_scfUnitInitialize() function which is not qualified as `extern "C"'.
+ * The SCF_IMPLEMENT_FACTORY_INIT macro defines initialization code for a
+ * plugin module.  This function should set the plugin-global iSCF::SCF
+ * variable, and otherwise initialize the plugin module.  Although a version of
+ * this function will be created for each SCF factory exported by the plugin,
+ * SCF will call one, and only one, to perform the plugin initialization.  The
+ * choice of which function will be invoked to initialize the plugin is an SCF
+ * implementation detail.  You should not attempt to predict which
+ * class_scfInitialize() function will be used, nor should use try to sway
+ * SCF's choice.  Implementation note: There are some rare instances where a
+ * particularly picky (and probably buggy) compiler does not allow C++
+ * expressions within a function declared `extern "C"'.  For this reason, the
+ * iSCF::SCF variable is instead initialized in the Class_scfUnitInitialize()
+ * function which is not qualified as `extern "C"'.
  */
 #define SCF_IMPLEMENT_FACTORY_INIT(Class)				\
 static inline void Class ## _scfUnitInitialize(iSCF* SCF)		\
 { iSCF::SCF = SCF; }							\
 CS_EXPORTED_FUNCTION							\
-void CS_EXPORTED_NAME(Class,_scfInitialize)(bool init_module, iSCF* SCF)\
-{									\
-  if (init_module) { Class ## _scfUnitInitialize(SCF); } 		\
-}
+void CS_EXPORTED_NAME(Class,_scfInitialize)(iSCF* SCF)			\
+{ Class ## _scfUnitInitialize(SCF); }
 
 /**
- * The SCF_IMPLEMENT_FACTORY_FINIS macro defines module finalization code for a
- * class within a module.  If close_module is true, then this is the last class
- * within the module to be finalized before the module is unloaded, , so it
- * should perform any necessary module-based finalization in addition to
- * performing class-based finalization.
+ * The SCF_IMPLEMENT_FACTORY_FINIS macro defines finalization code for a plugin
+ * module.  As with SCF_IMPLEMENT_FACTORY_INIT, only one instance of this
+ * function will be invoked to finalize the module.
  */
 #define SCF_IMPLEMENT_FACTORY_FINIS(Class)				\
 CS_DECLARE_STATIC_VARIABLE_CLEANUP					\
 CS_EXPORTED_FUNCTION							\
-void CS_EXPORTED_NAME(Class,_scfFinalize)(bool close_module)		\
+void CS_EXPORTED_NAME(Class,_scfFinalize)()				\
 {									\
-  if (close_module)							\
-  {									\
-    /* @@@ FIXME: Module cleanup is requested more than once, thus */	\
-    /* destroying static variables multiple times.  Investigate */	\
-    /* solution. */							\
-    /* CS_STATIC_VARIABLE_CLEANUP */					\
-    /* iSCF::SCF = 0; */						\
-  }									\
+CS_STATIC_VARIABLE_CLEANUP						\
+iSCF::SCF = 0;								\
 }
 
 /**
@@ -735,9 +728,9 @@ struct iSCF : public iBase
 
   /**
    * Register a single dynamic class.  This function tells SCF kernel that a
-   * specific class is implemented within a specific module (typically a plugin
-   * module).  There can be multiple classes within a single module.  You also
-   * can provide an application-specific dependency list.
+   * specific class is implemented within a specific module (typically a static
+   * library, as opposed to a plugin module).  You also can provide an
+   * application-specific dependency list.
    */
   virtual bool RegisterClass (scfFactoryFunc, const char *iClassID,
 	const char *Description, const char *Dependencies = 0) = 0;

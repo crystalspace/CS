@@ -21,6 +21,19 @@ The history order is reversed so that new features are at the top.
 	  csString::FindLast(). Documentation for FindFirst/FindLast
 	  has been updated to include the not-found status return
 	  value. 
+	- Eric Sunshine fixed a problem where SCF potentially was initializing
+	  and finalizing plugin modules multiple times as classes exported by
+	  the plugin were instantiated and destroyed.  This caused serious
+	  havoc since the static variable cleanup code was being invoked
+	  multiple times on the same loaded plugin module.  To fix, instead of
+	  trying to keep track of class usage within the plugin in order to
+	  determine when to initialize and finalize, SCF simply now invokes
+	  one, and only one, set of initilaization/finalization functions which
+	  are present in a plugin module.  (One pair of functions is present
+	  for each exported factory.)  Initialization is now invoked only
+	  immediately after the plugin is loaded.  Finalization is now invoked
+	  only immediately before the plugin is unloaded.  This problem was
+	  introduced with Eric's large SCF changes on June 5, 2003.
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:
