@@ -67,7 +67,7 @@ chronological order.
 	  prevented 'clean' targets from being removed when 'distclean' was
 	  invoked.
 	- Eric Sunshine merged the csappframe library into cstool. Also updated
-	  out-of-date documentation csApplicationFramework documentation.
+	  out-of-date csApplicationFramework documentation.
 	- res added some more documentation to ivideo/rendermesh.h.
 	- Eric Sunshine fixed bugs in awsEmbeddedComponent::LinkAbove() and
 	  LinkBelow() where they were linking the embedded component into the
