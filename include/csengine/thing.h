@@ -619,7 +619,7 @@ public:
    * this thing can then be drawn using Z-fill instead of Z-buffer.
    * Also the c-buffer requires a tree of this kind.
    */
-  void BuildStaticTree (int mode = BSP_MINIMIZE_SPLITS);
+  void BuildStaticTree (const char* name, int mode = BSP_MINIMIZE_SPLITS);
 
   /// Register a visibility object with this culler.
   void RegisterVisObject (iVisibilityObject* visobj);
@@ -955,9 +955,9 @@ public:
   struct VisCull : public iVisibilityCuller
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual void Setup ()
+    virtual void Setup (const char* name)
     {
-      scfParent->BuildStaticTree (BSP_MINIMIZE_SPLITS);
+      scfParent->BuildStaticTree (name, BSP_MINIMIZE_SPLITS);
     }
     virtual void RegisterVisObject (iVisibilityObject* visobj)
     {

@@ -482,7 +482,7 @@ void csThing::CompressVertices ()
   if (bbox) CreateBoundingBox ();
 }
 
-void csThing::BuildStaticTree (int mode)
+void csThing::BuildStaticTree (const char* name, int mode)
 {
   //mode = BSP_BALANCE_AND_SPLITS;
   delete static_tree; static_tree = NULL;
@@ -493,7 +493,7 @@ void csThing::BuildStaticTree (int mode)
   static_tree = new csOctree (this, bbox.Min (), bbox.Max (), 150/*15*/, mode);
 
   csString str ("vis/octree_");
-  str += GetName ();
+  str += name;
   csEngine* w = csEngine::current_engine;
   bool recalc_octree = true;
   if (!csEngine::do_force_revis && w->VFS->Exists ((const char*)str))

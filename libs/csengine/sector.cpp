@@ -276,7 +276,9 @@ void csSector::UseCuller (const char* meshname)
   if (!culler_mesh) return;
   culler = SCF_QUERY_INTERFACE_FAST (culler_mesh->GetMeshObject (), iVisibilityCuller);
   if (!culler) return;
-  culler->Setup ();
+  char cachename[256];
+  sprintf (cachename, "%s_%s", GetName (), meshname);
+  culler->Setup (cachename);
 
   // Loop through all meshes and update their bounding box in the
   // polygon trees.

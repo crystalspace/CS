@@ -30,7 +30,7 @@ struct iShadowReceiver;
 struct iPolygon3D;
 class csBox3;
 
-SCF_VERSION (iVisibilityCuller, 0, 0, 3);
+SCF_VERSION (iVisibilityCuller, 0, 0, 4);
 
 /**
  * This interface represents a visibility culling system.
@@ -43,8 +43,9 @@ struct iVisibilityCuller : public iBase
   /**
    * Setup all data for this visibility culler. This needs
    * to be called before the culler is used for the first time.
+   * The given name will be used to cache the data.
    */
-  virtual void Setup () = 0;
+  virtual void Setup (const char* name) = 0;
   /**
    * Register a visibility object with this culler.
    * If this visibility object also supports iShadowCaster and
