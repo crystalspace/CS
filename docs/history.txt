@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Feb-2005
+	- Jorrit implemented sorting in csChainHull2D::SortXY.
+	- Jorrit worked a bit further on pvscalc.
 8-Feb-2005
 	- Jorrit added csVector2::IsLeft().
 	- Jorrit added a new csChainHull2D class which calculates the convex

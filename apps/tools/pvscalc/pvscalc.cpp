@@ -28,6 +28,14 @@ PVSCalcSector::PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
   PVSCalcSector::sector = sector;
   PVSCalcSector::pvs = pvs;
   pvstree = pvs->GetPVSTree ();
+
+  // @@@ Make dimension configurable?
+  plane.covbuf = new csTiledCoverageBuffer (512, 512);
+}
+
+PVSCalcSector::~PVSCalcSector ()
+{
+  delete plane.covbuf;
 }
 
 void PVSCalcSector::CountDistribution (
@@ -338,6 +346,19 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
   }
   return false;
 }
+
+bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
+	const csBox3& dest)
+{
+  if (!FindShadowPlane (source, dest, plane.axis, plane.where))
+    return false;
+  
+  // First calculate all projections ... @@@
+  // Calculate bounding hull ... @@@
+  // @@@
+  return true;
+}
+
 
 void PVSCalcSector::Calculate ()
 {

@@ -24,6 +24,25 @@
 class PVSCalc;
 
 /**
+ * All information related to the projection plane where all area
+ * shadows are projected on.
+ */
+struct PVSCalcProjectionPlane
+{
+  // The tiled coverage buffer.
+  csTiledCoverageBuffer* covbuf;
+
+  // Axis and location of plane.
+  int axis;
+  float where;
+
+  // After projection of a shadow on the plane it will be a 2D polygon.
+  // This 2D polygon needs to be scaled on the coverage buffer using
+  // the following scale and offset.
+  csVector2 scale, offset;
+};
+
+/**
  * The PVS calculator for one sector.
  */
 class PVSCalcSector
@@ -40,6 +59,9 @@ private:
   csArray<csPoly3D> polygons;
   // All world boxes for all objects. Will be used for calculating kdtree.
   csArray<csBox3> boxes;
+
+  // Projection plane information.
+  PVSCalcProjectionPlane plane;
 
   /**
    * Count distribution of boxes for the three axii.
@@ -74,8 +96,16 @@ private:
   bool FindShadowPlane (const csBox3& source, const csBox3& dest,
   	int& axis, float& where);
 
+  /**
+   * Setup the projection plane and coverage buffer for two boxes. This
+   * will call FindShadowPlane(). Returns false if the destination box
+   * is surely visible from the source box.
+   */
+  bool SetupProjectionPlane (const csBox3& source, const csBox3& dest);
+
 public:
   PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);
+  ~PVSCalcSector ();
 
   /**
    * Collect all geometry from this mesh if static.

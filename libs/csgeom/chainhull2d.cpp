@@ -30,8 +30,20 @@
 #include "cssysdef.h"
 #include "csgeom/chainhull2d.h"
 
+static int compare_points_on_xy (void const* p1, void const* p2)
+{
+  const csVector2* vp1 = (const csVector2*)p1;
+  const csVector2* vp2 = (const csVector2*)p2;
+  if (vp1->x < vp2->x) return -1;
+  else if (vp1->x > vp2->x) return 1;
+  else if (vp1->y < vp2->y) return -1;
+  else if (vp1->y > vp2->y) return 1;
+  else return 0;
+}
+
 void csChainHull2D::SortXY (csVector2* points, int n)
 {
+  qsort (points, n, sizeof (csVector2*), compare_points_on_xy);
 }
 
 int csChainHull2D::CalculatePresorted (csVector2* points, int n,
