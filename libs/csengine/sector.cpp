@@ -59,6 +59,7 @@ bool csSector::do_radiosity = false;
 //---------------------------------------------------------------------------
 
 IMPLEMENT_IBASE_EXT (csSector)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iReferencedObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSector)
   IMPLEMENTS_INTERFACE (csSector);
 IMPLEMENT_IBASE_EXT_END
@@ -67,9 +68,14 @@ IMPLEMENT_EMBEDDED_IBASE (csSector::eiSector)
   IMPLEMENTS_INTERFACE (iSector)
 IMPLEMENT_EMBEDDED_IBASE_END
 
+IMPLEMENT_EMBEDDED_IBASE (csSector::ReferencedObject)
+  IMPLEMENTS_INTERFACE (iReferencedObject)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csSector::csSector (csEngine* engine) : csObject ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSector);
+  CONSTRUCT_EMBEDDED_IBASE (scfiReferencedObject);
   csSector::engine = engine;
   culler_mesh = NULL;
   culler = NULL;
@@ -80,6 +86,10 @@ csSector::csSector (csEngine* engine) : csObject ()
 
 csSector::~csSector ()
 {
+  // The references to this sector MUST be cleaned up before this
+  // sector is destructed.
+  CS_ASSERT (references.Length () == 0);
+
   // Meshes and collections are not deleted by the calls below. They
   // belong to csEngine.
   collections.DeleteAll ();
@@ -96,6 +106,21 @@ csSector::~csSector ()
   lights.DeleteAll ();
   terrains.DeleteAll ();
   if (culler) culler->DecRef ();
+}
+
+void csSector::CleanupReferences ()
+{
+  int i;
+  while (references.Length () > 0)
+  {
+    iReference* ref = (iReference*)references[references.Length ()-1];
+#   if CS_DEBUG
+    // Sanity check.
+    iReferencedObject* refobj = ref->GetReferencedObject ();
+    CS_ASSERT (refobj == &scfiReferencedObject);
+#   endif
+    ref->SetReferencedObject (NULL);
+  }
 }
 
 //----------------------------------------------------------------------
@@ -1246,5 +1271,28 @@ iSector* csSector::eiSector::FollowSegment (csReversibleTransform& t,
   csSector* s = scfParent->FollowSegment (t, new_position, mirror);
   if (s) return &(s->scfiSector);
   else return NULL;
+}
+
+void csSector::ReferencedObject::AddReference (iReference* ref)
+{
+  scfParent->references.Push (ref);
+}
+
+void csSector::ReferencedObject::RemoveReference (iReference* ref)
+{
+  int i;
+  // We scan backwards because we know that the code to remove all
+  // refs to a sector will also scan backwards. So this is more efficient.
+  for (i = scfParent->references.Length ()-1 ; i >= 0 ; i--)
+  {
+    iReference* r = (iReference*)(scfParent->references[i]);
+    if (r == ref)
+    {
+      scfParent->references.Delete (i);
+      return;
+    }
+  }
+  // Hopefully we never come here.
+  CS_ASSERT (false);
 }
 

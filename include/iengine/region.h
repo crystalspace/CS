@@ -35,7 +35,7 @@ struct iCameraPosition;
 struct iObject;
 struct iCollection;
 
-SCF_VERSION (iRegion, 0, 1, 5);
+SCF_VERSION (iRegion, 0, 1, 6);
 
 /**
  * A region. A region is basically a collection of objects in the
@@ -43,6 +43,9 @@ SCF_VERSION (iRegion, 0, 1, 5);
  */
 struct iRegion : public iBase
 {
+  /// @@@ Ugly
+  virtual void* GetPrivateObject () = 0;
+
   /// Get the iObject for this region.
   virtual iObject *QueryObject() = 0;
 

@@ -523,48 +523,6 @@ void csLoader::heightgen_process (char* buf)
           gen->SetTexture (txt);
 	}
 	break;
-#if 0
-      case CS_TOKEN_HEIGHTMAP:
-        {
-	  char heightmap[255];
-	  float hscale, hshift;
-          csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
-	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
-	  data = new HeightMapData ();	// @@@ Memory leak!!!
-  	  data->im = img;
-  	  data->iw = img->GetWidth ();
-  	  data->ih = img->GetHeight ();
-  	  data->w = float (data->iw);
-  	  data->h = float (data->ih);
-  	  data->p = (csRGBpixel*)(img->GetImageData ());
-  	  data->hscale = hscale;
-  	  data->hshift = hshift;
-	  csGenerateTerrainImageValueFunc* vf =
-	  	new csGenerateTerrainImageValueFunc ();
-  	  vf->heightfunc = HeightMapFunc;
-	  vf->userdata = (void*)data;
-	  tb->valuefunc = vf;
-	}
-	break;
-      case CS_TOKEN_LAYER:
-        {
-	  float height;
-	  char imagename[255];
-	  csVector2 scale, offset;
-          csScanStr (params, "%f,%s,%f,%f,%f,%f",
-		&height, imagename, &scale.x, &scale.y,
-		&offset.x, &offset.y);
-	  iImage* img = LoadImage (imagename, CS_IMGFMT_TRUECOLOR);
-	  csGenerateTerrainImageTextureSingle* ts =
-	  	new csGenerateTerrainImageTextureSingle ();
-	  ts->SetImage (img);
-	  ts->scale = scale;
-	  ts->offset = offset;
-	  tb->AddLayer (height, ts);
-	  img->DecRef ();
-	}
-        break;
-#endif
       case CS_TOKEN_GENERATE:
         {
 	  int startx, starty;
@@ -659,6 +617,10 @@ void csLoader::ResolvePortalSectors (iThingState *th)
     {
       iPortal *portal = p->GetPortal ();
       iSector *stmp = portal->GetSector ();
+      // First we check if this sector already has some meshes.
+      // If so then this is not a sector we have to resolve.
+      // This test is here to make this code a little more robust.
+      if (stmp->GetMeshCount () > 0) continue;
       iSector *snew = Engine->FindSector (stmp->QueryObject ()->GetName (),
         ResolveOnlyRegion);
       if (!snew)
@@ -670,6 +632,9 @@ void csLoader::ResolvePortalSectors (iThingState *th)
         fatal_exit (0, false);
       }
       portal->SetSector (snew);
+      // This DecRef() is safe since we know this is supposed to be a dummy
+      // sector. So there will only be one reference to that sector (from
+      // this portal).
       stmp->DecRef();
     }
   }
@@ -755,7 +720,7 @@ bool csLoader::LoadMap (char* buf)
 	    if (*str)
 	      Engine->SelectRegion (str);
 	    else
-	      Engine->SelectRegion (NULL);
+	      Engine->SelectRegion ((iRegion*)NULL);
 	  }
 	  break;
         case CS_TOKEN_SECTOR:
@@ -1498,6 +1463,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
         {
 	  iMeshWrapper* sp = Engine->CreateMeshObject (name);
           LoadMeshObject (sp, params);
+	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->AddChild (sp);
         }
         break;
@@ -2999,6 +2965,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
         {
 	  iMeshWrapper* mesh = Engine->CreateMeshObject(name);
           LoadMeshObject (mesh, params);
+	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
         }

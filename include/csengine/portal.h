@@ -74,14 +74,20 @@ public:
 
   //---- misc. manipulation functions ---------------------------------------
 
+  /// For iReference.
+  virtual iReferencedObject* GetReferencedObject () const;
+
+  /// For iReference.
+  virtual void SetReferencedObject (iReferencedObject* b);
+
   /// Return the sector that this portal points too.
-  iSector* GetSector () const;
+  virtual iSector* GetSector () const;
 
   /**
    * Set the sector that this portal points too. To avoid circular
    * references, the sector is not IncRef'ed!
    */
-  void SetSector (iSector* s);
+  virtual void SetSector (iSector* s);
 
   /// Set portal flags (see CS_PORTAL_XXX values)
   csFlags& GetFlags ();

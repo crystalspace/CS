@@ -128,7 +128,7 @@ struct iKeyValuePair;
 typedef void (csDrawFunc) (iRenderView* rview, int type, void* entity);
 
 
-SCF_VERSION (iEngine, 0, 1, 29);
+SCF_VERSION (iEngine, 0, 1, 30);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -171,6 +171,11 @@ struct iEngine : public iPlugIn
    * region). All new objects will be marked as belonging to this region.
    */
   virtual void SelectRegion (const char* iName) = 0;
+  /**
+   * Create or select a new region (region can be NULL for the default main
+   * region). All new objects will be marked as belonging to this region.
+   */
+  virtual void SelectRegion (iRegion* region) = 0;
   /**
    * Get a reference to the current region (or NULL if the default main
    * region is selected).

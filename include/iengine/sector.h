@@ -177,3 +177,4 @@ struct iSector : public iBase
 };
 
 #endif // __IENGINE_SECTOR_H__
+

@@ -28,6 +28,7 @@
 #include "ivideo/graph3d.h"
 #include "iengine/mesh.h"
 #include "iengine/terrain.h"
+#include "iutil/objref.h"
 
 class csEngine;
 class csStatLight;
@@ -66,6 +67,7 @@ private:
    * of type csMeshWrapper*.
    */
   csVector meshes;
+
   /**
    * The same meshes above but each mesh in their own render priority
    * queue. This is a vector of vectors.
@@ -76,6 +78,11 @@ private:
    * List of collections in this sector.
    */
   csVector collections;
+
+  /**
+   * List of references (portals?) to this sector.
+   */
+  csVector references;
 
   /**
    * All static and pseudo-dynamic lights in this sector.
@@ -151,6 +158,12 @@ public:
    * could be in other sectors.
    */
   virtual ~csSector ();
+
+  /**
+   * This function MUST be called before the sector is deleted in order
+   * to make sure that all references to the sector are cleaned up.
+   */
+  void CleanupReferences ();
 
   //----------------------------------------------------------------------
   // Mesh manipulation functions
@@ -486,6 +499,15 @@ public:
   void DisableFog () { fog.enabled = false; }
 
   DECLARE_IBASE_EXT (csObject);
+
+  //-------------------- iReferencedObject interface --------------------------
+  struct ReferencedObject : public iReferencedObject
+  {
+    DECLARE_EMBEDDED_IBASE (csSector);
+    virtual void AddReference (iReference* ref);
+    virtual void RemoveReference (iReference* ref);
+  } scfiReferencedObject;
+  friend struct ReferencedObject;
 
   //------------------------- iSector interface -------------------------------
   struct eiSector : public iSector

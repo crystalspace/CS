@@ -100,9 +100,9 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = (iObject*)copy[i];
       iMeshWrapper* o = QUERY_INTERFACE_FAST (obj, iMeshWrapper);
       if (!o) continue;
-      scfParent->engine->RemoveMesh (o->GetPrivateObject ());
+      scfParent->engine->RemoveMesh (o);
       copy[i] = NULL;
-//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
+      o->DecRef ();
     }
 
   for (i = 0 ; i < copy.Length () ; i++)

@@ -20,6 +20,7 @@
 #define __IENGINE_PORTAL_H__
 
 #include "csutil/scf.h"
+#include "iutil/objref.h"
 
 /**
  * If this flag is set then this portal will clip all geometry in
@@ -81,7 +82,7 @@ struct iFrustumView;
 typedef bool (*csPortalSectorCallback) (iPortal* portal,
 	iBase* context, void* callbackData);
 
-SCF_VERSION (iPortal, 0, 0, 4);
+SCF_VERSION (iPortal, 0, 0, 5);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -90,7 +91,7 @@ SCF_VERSION (iPortal, 0, 0, 4);
  * how exactly the geometry behind portal is to be handled and
  * so on.
  */
-struct iPortal : public iBase
+struct iPortal : public iReference
 {
   //---- misc. manipulation functions ---------------------------------------
 

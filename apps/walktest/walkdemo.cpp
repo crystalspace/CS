@@ -1461,6 +1461,6 @@ void OpenPortal (iLoader *LevelLoader, csView* view, char* lev)
 
   if (!regionExists)
     Sys->InitCollDet (Sys->Engine, Sys->Engine->GetCurrentRegion ());
-  Sys->Engine->SelectRegion (NULL);
+  Sys->Engine->SelectRegion ((iRegion*)NULL);
 }
 

@@ -340,7 +340,12 @@ csPolygon3D::~csPolygon3D ()
 {
   if (txt_info) { txt_info->DecRef (); txt_info = NULL; }
   if (plane) { plane->DecRef (); plane = NULL; }
-  if (flags.Check (CS_POLY_DELETE_PORTAL)) { delete portal; portal = NULL; }
+  if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
+  {
+    portal->SetSector (NULL);
+    delete portal;
+    portal = NULL;
+  }
   while (light_info.lightpatches)
     csEngine::current_engine->lightpatch_pool->Free (light_info.lightpatches);
   VectorArray.DecRef ();

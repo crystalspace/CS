@@ -32,6 +32,7 @@
 #include "iengine/fview.h"
 
 IMPLEMENT_IBASE (csPortal)
+  IMPLEMENTS_INTERFACE (iReference)
   IMPLEMENTS_INTERFACE (iPortal)
 IMPLEMENT_IBASE_END
 
@@ -49,7 +50,33 @@ csPortal::csPortal ()
 
 csPortal::~csPortal ()
 {
+  // Before destruction the destination of the portal needs to be
+  // set to NULL.
+  CS_ASSERT (sector == NULL);
   if (filter_texture) filter_texture->DecRef ();
+}
+
+iReferencedObject* csPortal::GetReferencedObject () const
+{
+  if (!sector) return NULL;
+  iReferencedObject* refobj = QUERY_INTERFACE (sector, iReferencedObject);
+  refobj->DecRef ();
+  return refobj;
+}
+
+void csPortal::SetReferencedObject (iReferencedObject* b)
+{
+  if (b == NULL)
+  {
+    SetSector (NULL);
+  }
+  else
+  {
+    iSector* s = QUERY_INTERFACE (b, iSector);
+    CS_ASSERT (s != NULL);
+    SetSector (s);
+    s->DecRef ();
+  }
 }
 
 iSector* csPortal::GetSector () const
@@ -59,7 +86,26 @@ iSector* csPortal::GetSector () const
 
 void csPortal::SetSector (iSector* s)
 {
-  sector = s;
+  if (sector != s)
+  {
+    if (sector)
+    {
+      // First unlink from the previous sector.
+      iReferencedObject* refobj = QUERY_INTERFACE (sector, iReferencedObject);
+      CS_ASSERT (refobj != NULL);
+      refobj->RemoveReference (this);
+      refobj->DecRef ();
+    }
+    sector = s;
+    if (sector)
+    {
+      // Link to the new sector.
+      iReferencedObject* refobj = QUERY_INTERFACE (sector, iReferencedObject);
+      CS_ASSERT (refobj != NULL);
+      refobj->AddReference (this);
+      refobj->DecRef ();
+    }
+  }
 }
 
 csFlags& csPortal::GetFlags ()

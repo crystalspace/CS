@@ -1589,6 +1589,11 @@ void csEngine::SelectRegion (const char *iName)
   }
 }
 
+void csEngine::SelectRegion (iRegion* region)
+{
+  csEngine::region = (csRegion*)(region->GetPrivateObject ());
+}
+
 iRegion* csEngine::GetCurrentRegion () const
 {
   return region ? &region->scfiRegion : NULL;
@@ -1835,8 +1840,13 @@ iSector *csEngine::FindSector (const char *iName, bool regionOnly) const
 
 void csEngine::DeleteSector (iSector *Sector)
 {
-  int n = sectors.Find (Sector);
-  if (n >= 0) sectors.Delete (n);
+  int n = sectors.Find (Sector->GetPrivateObject ());
+  if (n >= 0)
+  {
+    csSector* s = (csSector*)sectors[n];
+    s->CleanupReferences ();
+    sectors.Delete (n);
+  }
 }
 
 iMeshWrapper *csEngine::FindMeshObject (const char *iName, bool regionOnly)

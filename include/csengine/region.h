@@ -71,6 +71,9 @@ public:
   {
     DECLARE_EMBEDDED_IBASE (csRegion);
 
+    /// @@@ Ugly
+    virtual void* GetPrivateObject () { return (void*)scfParent; }
+
     /// Query the iObject.
     virtual iObject *QueryObject()
     {

@@ -1,6 +1,30 @@
 The history order is reversed so that new features are at the top.
 
 20-Jun-2001
+	- Made the resolving of portals to sectors a bit more robust
+	  by not resolving portals that point to sectors that already
+	  contain geometry.
+	- The CS loader will now by default call DeferUpdateLighting()
+	  on all loaded meshes (except the ones loaded with
+	  LoadMeshObject(char*filename)) so that the lighting looks ok
+	  directly after loading.
+	- Added iEngine::SelectRegion() which accepts an iRegion as a
+	  parameter.
+	- Added iRegion::GetPrivateObject().
+	- Fixed region handling for mesh wrappers (calls DecRef() now).
+	- Added iReference and iReferencedObject.
+	  This is a general system to keep references (iReference) to any
+	  kind of object (iReferencedObject). If some object wants to keep
+	  track of all other objects which hold a reference to this object
+	  then it can implement iReferencedObject and the other objects can
+	  implement iReference. When the referenced object is deleted it
+	  will call SetReferencedObject(NULL) on all the references.
+	- iPortal now subclasses iReference.
+	- csSector now implements iReferencedObject.
+	- By implementing this it is now safe to delete a sector. All portals
+	  to that sector will be automatically set to NULL portals (i.e.
+	  closed). If the portal has a callback associated with it then
+	  this will be called the next time the engine needs that portal.
 	- Eric Sunshine fixed the following problems in win32gcc.txi:
 	    - Repaired some incorrect Texinfo mark-up.
 	    - Removed a redundant @noindent.
@@ -19,6 +43,8 @@ The history order is reversed so that new features are at the top.
 	  subsequent call to NextFrame(), etc.  This allows the frame rate to
 	  run as high as the hardware allows rather than artificially limiting
 	  it to a timer's fixed interval.
+	- Wouter Wijngaards fixed the bug where perftest incorrectly reported
+	  the fps when spacebar was pressed to advance to the next test.
 19-Jun-2001
 	- Removed verbose output of lightmap calculation if recalculation
 	  of lighting is not enabled. Now the progress bars are only
@@ -56,6 +82,10 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine updated the formatting of all Apple/NeXT-related source
 	  and header files to reflect the CS formatting guidelines.  This
 	  change involved some very simple whitespace transformations.
+	- Norman Kramer added non-const TYPE*& operator [] (int idx) to
+	  csVector.
+	- Philip Wyett added include "imesh/lighting.h" to bumptest.cpp.
+	- Robert Bate updated Macintosh project files.
 18-Jun-2001
 	- Fixed a bug in the region checking code from the loader.
 	- Renamed csCollider to csColliderWrapper and moved it from csengine

@@ -996,7 +996,10 @@ public:
 
   virtual csEngine *GetCsEngine () { return this; };
 
-  /// Query the format to load textures (usually this depends on texture manager)
+  /**
+   * Query the format to load textures
+   * (usually this depends on texture manager).
+   */
   virtual int GetTextureFormat () const;
 
   /**
@@ -1004,6 +1007,12 @@ public:
    * region). All new objects will be marked as belonging to this region.
    */
   virtual void SelectRegion (const char* iName);
+
+  /**
+   * Create or select a new region (region can be NULL for the default main
+   * region). All new objects will be marked as belonging to this region.
+   */
+  virtual void SelectRegion (iRegion* region);
 
   /**
    * Get a reference to the current region (or NULL if the default main
