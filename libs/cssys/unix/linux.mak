@@ -61,7 +61,8 @@ ifeq ($(MAKESECTION),defines)
 include mk/unix.mak
 
 # Extra libraries needed on this system.
-LIBS.EXE+=$(LFLAGS.l)dl $(LFLAGS.l)m $(LFLAGS.l)gcc
+LIBS.EXE+=$(LFLAGS.l)dl $(LFLAGS.l)m 
+#$(LFLAGS.l)gcc
 
 # Socket library
 LIBS.SOCKET.SYSTEM=
@@ -114,7 +115,7 @@ LFLAGS.profile=-pg
 
 # Flags for the linker which are used when building a shared library.
 #LFLAGS.DLL=-Wl,-shared -nostdlib $(LFLAGS.l)gcc
-LFLAGS.DLL=-Wl,-shared -Wl,-soname -Wl,$@ -nostdlib 
+LFLAGS.DLL=-Wl,-shared -Wl,-soname -Wl,$@
 
 # System-dependent flags to pass to NASM
 NASMFLAGS.SYSTEM=-f elf
