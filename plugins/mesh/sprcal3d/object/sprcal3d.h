@@ -929,12 +929,14 @@ public:
     {
 	return scfParent->GetAnimType(idx);
     }
-
+    virtual int FindAnim(const char* name)
+    {
+      return scfParent->FindAnim(name);
+    }
     virtual void ClearAllAnims()
     {
 	scfParent->ClearAllAnims();
     }
-
     virtual bool SetAnimCycle(const char *name, float weight)
     {
 	return scfParent->SetAnimCycle(name,weight);
@@ -950,6 +952,10 @@ public:
     bool AddAnimCycle(int idx, float weight, float delay)
     {
       return scfParent->AddAnimCycle(idx,weight,delay);
+    }
+    virtual void ClearAnimCycle(int idx, float delay)
+    {
+      return scfParent->ClearAnimCycle(idx,delay);
     }
     virtual bool ClearAnimCycle(const char *name, float delay)
     {

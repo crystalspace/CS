@@ -38,7 +38,7 @@ struct iVFS;
 class CalModel;
 class CalCoreModel;
 
-SCF_VERSION (iSpriteCal3DSocket, 0, 0, 1);
+SCF_VERSION (iSpriteCal3DSocket, 0, 0, 2);
 
 /**
  * A socket for specifying where sprites can plug into
@@ -348,6 +348,9 @@ struct iSpriteCal3DState : public iBase
   /// Returns the type from the enum above, as specified in the XML.
   virtual int  GetAnimType(int idx) = 0;
 
+  /// Find the index of the named animation. Returns -1 if not found.
+  virtual int FindAnim(const char* name) = 0;
+
   /// This resets all currently blended animations and stops the sprite.
   virtual void ClearAllAnims() = 0;
 
@@ -379,8 +382,15 @@ struct iSpriteCal3DState : public iBase
   virtual bool AddAnimCycle(int idx, float weight, float delay) = 0;
 
   /**
-   * This removes the specified anim from the current blend set over the period
-   * of time specifed by "delay" parm in seconds.
+   * This removes the animation at index `idx' from the current blend set over
+   * the period of time specifed by "delay" parm in seconds.
+   */
+  virtual void ClearAnimCycle(int idx, float delay) = 0;
+
+  /**
+   * This removes the named animation from the current blend set over the
+   * period of time specifed by "delay" parm in seconds. Returns true if the
+   * named animation was found; else false.
    */
   virtual bool ClearAnimCycle(const char *name, float delay) = 0;
 
