@@ -1,6 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
 21-Mar-2001:
+	- Martin Geisse did a big redesign and cleanup of the sound system:
+	    - Merged static and streamed sound data classes.
+	    - Sound data must now be registered before playing to get a
+	      sound handle -- just like textures.
+	    - When playing streamed sounds, all sound sources created from
+	      the same sound handle always play the same sequence at the
+	      same time.
+	    - Moved common stuff of all renderers together in
+	      plugins/sound/renderers/common.
 	- Removed a few unneeded includes to lview.h. As few things as
 	  possible should include that file since we're going to do
 	  that through SCF soon.
@@ -32,6 +41,10 @@ The history order has been reversed so that new features are at the top.
 	  `video/canvas' in the PLUGINS variable.  These items used to be
 	  specified in user.mak.  However, since they are not optional, it did
 	  not make sense to place them in a user-configurable file.
+	- Wouter Wijngaards added the following methods to the fire mesh API:
+	  GetNumberParticles, GetDropSize, GetOrigin, GetDirection,
+	  GetLighting, GetSwirl, GetColorScale and GetColorScale.
+	- Wouter added FireFactorySaver and FireSaver plugins.
 20-Mar-2001:
 	- Philip Wyett altered his email address in the docs.
 	- Wouter Wijngaards added the following methods to explosion
