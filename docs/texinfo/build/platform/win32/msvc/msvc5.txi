@@ -37,10 +37,10 @@ and install @file{winlibs}.  Winlibs is a package containing all
 third party header, pre-built library and dll files used by Crystal
 Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll} and
 @file{xmlparse.dll}.  The latest version of the winlibs package
-@file{winlibs0.19c.zip} can be downloaded from:
+@file{winlibs0.19e.zip} can be downloaded from:
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19c.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19e.zip}
 
 Once you have downloaded the winlbs package, extract it too your @file{CS\}
 root directory.
@@ -133,7 +133,44 @@ version i.e. 2.0.
 
 @subsubheading BisonFlex
 
-*** TODO ***
+To successfully build the Crystal Space Alternate Windowing System (AWS) plugin
+with Visual C++ requires you have @emph{BisonFlex} by @uref{http://www.fg-soup.com}
+installed on your system. To download the version of @emph{BisonFlex} for your
+@emph{Visual C++} version, use the corresponding link below.
+
+For Visual C++ 5:
+
+@uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/bfwizard-1.5.zip}
+
+For Visual C++ 6:
+
+@uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/bfwizard-1.6.zip}
+
+@subsubheading Setting up and building the AWS plugin
+
+Open @file{CS\mk\visualc\csall.dsw}.
+
+In the left hand @emph{Workspace} window click on the @emph{FileView} tab
+at he bottom, then in the window look for and find the project @emphplgaws}.
+
+Now expand the aws project in the tree and then the @emph{Resource Files} directory.
+
+Right click on @file{skinlang.flx} and click on @emph{Settings}.
+
+You will now be presented with the @emph{Project Settings} dialog for that file.
+
+Click on the @emph{Custom Build} tab. In the text box @emph{Commands} enter the following:
+
+@code{flex.exe -Plex_cpp -L -t ..\..\plugins\aws\skinlang.flx > ..\..\plugins\aws\sllex.cpp}
+
+Now in the @emph{Outputs} text box enter the following:
+
+@code{..\..\plugins\aws\sllex.cpp}
+
+Next click on the @emph{General} tab and check the box
+@emph{Always use the custom build step}
+
+Now just @emph{Ok} out of that dialog box and do a @emph{Save all} and re-build CS.
 
 You need not compile all parts of Crystal Space.  For example, if you don't
 want to use DirectX (DDRAW/D3D) for graphics or have Python scripting support,
