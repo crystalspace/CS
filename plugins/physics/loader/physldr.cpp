@@ -302,6 +302,7 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
   float f = node->GetAttributeValueAsFloat ("friction");
   float d = node->GetAttributeValueAsFloat ("density");
   float e = node->GetAttributeValueAsFloat ("elasticity");
+  float s = node->GetAttributeValueAsFloat ("softness");
    
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -316,7 +317,10 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
         if (child->GetContentsValue ()) {
           iMeshWrapper *m = engine->FindMeshObject (child->GetContentsValue ());
           if (m) {
-            body->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, d, e);
+            if( s > 0)
+              body->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, d, e, s);
+            else  //no softness parameter, so use default
+              body->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, d, e);
           } else {
             synldr->ReportError ("crystalspace.dynamics.loader",
               child, "Unable to find collider mesh in engine");
@@ -362,14 +366,19 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
   return true;
 }
 
-bool csPhysicsLoader::ParseSystemColliderMesh (iDocumentNode* node, iDynamicSystem* system)
+bool csPhysicsLoader::ParseSystemColliderMesh (
+  iDocumentNode* node, iDynamicSystem* system)
 {
   float f = node->GetAttributeValueAsFloat ("friction");
   float e = node->GetAttributeValueAsFloat ("elasticity");
+  float s = node->GetAttributeValueAsFloat ("softness");
   if (!node->GetContentsValue ()) { return false; }
   iMeshWrapper *m = engine->FindMeshObject (node->GetContentsValue ());
   if (m) {
-    system->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, e);
+    if( s > 0)
+      system->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, e, s);
+    else  //no softness parameter, so use default
+      system->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, e);
   } else {
     synldr->ReportError ("crystalspace.dynamics.loader",
       node, "Unable to find collider mesh in engine");
