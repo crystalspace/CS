@@ -8,7 +8,7 @@ DESCRIPTION.glx2d = Crystal Space GL/X 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make glx2d        Make the $(DESCRIPTION.glx2d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make glx2d        Make the $(DESCRIPTION.glx2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glx2d
 
-all drivers drivers2d: glx2d
+all plugins drivers drivers2d: glx2d
 
 glx2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -48,12 +48,12 @@ CFLAGS.GLX2D+=-I$(X11_PATH)/include
 ifeq ($(USE_SHARED_PLUGINS),yes)
   GLX2D=$(OUTDLL)glx2d$(DLL)
   LIBS.GLX2D=$(LIBS._GLX2D)
-  DEP.GLX2D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.GLX2D=$(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   GLX2D=$(OUT)$(LIB_PREFIX)glx2d$(LIB)
   DEP.EXE+=$(GLX2D)
   LIBS.EXE+=$(LIBS._GLX2D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_GLX2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLX2D
 endif
 DESCRIPTION.$(GLX2D) = $(DESCRIPTION.glx2d)
 SRC.GLX2D = $(wildcard libs/cs2d/openglx/*.cpp \

@@ -8,7 +8,7 @@ DESCRIPTION.glidex2d = Crystal Space Glide/X 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make glidex2d        Make the $(DESCRIPTION.glidex2d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make glidex2d        Make the $(DESCRIPTION.glidex2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glidex2d
 
-all drivers drivers2d: glidex2d
+all plugins drivers drivers2d: glidex2d
 
 glidex2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -41,7 +41,7 @@ else
   GLIDEX2D=$(OUT)$(LIB_PREFIX)glidex2d$(LIB)
   DEP.EXE+=$(GLIDEX2D)
   LIBS.EXE+=$(LIBS._GLIDEX2D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_GLIDEX2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDEX2D
 endif
 DESCRIPTION.$(GLIDEX2D) = $(DESCRIPTION.glidex2d)
 SRC.GLIDEX2D = $(wildcard libs/cs2d/unxglide2/*.cpp $(SRC.COMMON.DRV2D))
@@ -62,7 +62,7 @@ glidex2d: $(OUTDIRS) $(GLIDEX2D)
 $(OUT)%$O: libs/cs2d/unxglide2/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDEX2D)
  
-$(GLIDEX2D): $(OBJ.GLIDEX2D) $(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+$(GLIDEX2D): $(OBJ.GLIDEX2D) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 	$(DO.PLUGIN) $(LIBS.GLIDEX2D)
 
 glidexclean:

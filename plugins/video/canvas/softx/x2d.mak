@@ -8,7 +8,7 @@ DESCRIPTION.x2d = Crystal Space XLib 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make x2d          Make the $(DESCRIPTION.x2d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make x2d          Make the $(DESCRIPTION.x2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: x2d
 
-all drivers drivers2d: x2d
+all plugins drivers drivers2d: x2d
 
 x2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -37,12 +37,12 @@ LIBS.X2D+=-L$(X11_PATH)/lib -lXext -lX11
 ifeq ($(USE_SHARED_PLUGINS),yes)
   XLIB2D=$(OUTDLL)x2d$(DLL)
   LIBS.LOCAL.X2D=$(LIBS.X2D)
-  DEP.X2D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.X2D=$(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   XLIB2D=$(OUT)$(LIB_PREFIX)x2d$(LIB)
   DEP.EXE+=$(XLIB2D)
   LIBS.EXE+=$(LIBS.X2D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_X2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_X2D
 endif
 DESCRIPTION.$(XLIB2D) = $(DESCRIPTION.x2d)
 SRC.XLIB2D = $(wildcard libs/cs2d/softx/*.cpp $(SRC.COMMON.DRV2D))

@@ -8,7 +8,7 @@ DESCRIPTION.ggi2d = Crystal Space GGI 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make ggi2d        Make the $(DESCRIPTION.ggi2d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make ggi2d        Make the $(DESCRIPTION.ggi2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: ggi2d
 
-all drivers drivers2d: ggi2d
+all plugins drivers drivers2d: ggi2d
 
 ggi2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -35,12 +35,12 @@ LIBS._GGI2D = -lggi
 ifeq ($(USE_SHARED_PLUGINS),yes)
   GGI2D=$(OUTDLL)ggi2d$(DLL)
   LIBS.GGI2D+=$(LIBS._GGI2D)
-  DEP.GGI2D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.GGI2D=$(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   GGI2D=$(OUT)$(LIB_PREFIX)ggi2d$(LIB)
   DEP.EXE+=$(GGI2D)
   LIBS.EXE+=$(LIBS._GGI2D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_GGI2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GGI2D
 endif
 DESCRIPTION.$(GGI2D) = $(DESCRIPTION.ggi2d)
 SRC.GGI2D = $(wildcard libs/cs2d/ggi/*.cpp $(SRC.COMMON.DRV2D))

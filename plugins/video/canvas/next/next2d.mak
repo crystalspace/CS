@@ -8,7 +8,7 @@ DESCRIPTION.next2d = Crystal Space NeXT 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make next2d       Make the $(DESCRIPTION.next2d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make next2d       Make the $(DESCRIPTION.next2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: next2d
 
-all drivers drivers2d: next2d
+all plugins drivers drivers2d: next2d
 
 next2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -43,7 +43,7 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
 else
   NEXT2D=$(OUT)$(LIB_PREFIX)next2d$(LIB)
   DEP.EXE+=$(NEXT2D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_NEXT2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_NEXT2D
 endif
 DESCRIPTION.$(NEXT2D) = $(DESCRIPTION.next2d)
 SRC.NEXT2D = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_2D_PATHS)) \

@@ -8,7 +8,7 @@ DESCRIPTION.oss = Crystal Space OSS sound driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make oss          Make the $(DESCRIPTION.oss)$"
+PLUGINHELP += $(NEWLINE)echo $"  make oss          Make the $(DESCRIPTION.oss)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: oss
 
-all drivers snddrivers: oss
+all plugins drivers snddrivers: oss
 
 oss:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -34,11 +34,11 @@ vpath %.cpp libs/cssnddrv/oss
 # The OSS sound driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   SNDOSS=$(OUTDLL)SoundDriverOSS$(DLL)
-  DEP.OSS+=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.OSS+=$(CSUTIL.LIB) $(CSSYS.LIB)
 else
   SNDOSS=$(OUT)$(LIB_PREFIX)SoundDriverOSS.a
   DEP.EXE+=$(SNDOSS)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_SNDOSS
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDOSS
 endif
 DESCRIPTION.$(SNDOSS) = $(DESCRIPTION.oss)
 SRC.SNDOSS = $(wildcard libs/cssnddrv/oss/*.cpp)

@@ -8,7 +8,7 @@ DESCRIPTION.be2d = Crystal Space BeLib 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make be2d         Make the $(DESCRIPTION.be2d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make be2d         Make the $(DESCRIPTION.be2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: be2d
 
-all drivers drivers2d: be2d
+all plugins drivers drivers2d: be2d
 
 be2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -34,11 +34,11 @@ vpath %.cpp libs/cs2d/be
 # The 2D Belib driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   BE2D=$(OUTDLL)be2d$(DLL)
-  DEP.BE2D = $(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.BE2D = $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   BE2D=be2d.a
   DEP.EXE+=$(BE2D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_BE2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_BE2D
 endif
 DESCRIPTION.$(BE2D) = $(DESCRIPTION.be2d)
 SRC.BE2D = $(wildcard libs/cs2d/be/*.cpp $(SRC.COMMON.DRV2D))

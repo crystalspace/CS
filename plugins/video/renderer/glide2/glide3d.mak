@@ -8,7 +8,7 @@ DESCRIPTION.glide3d = Crystal Space Glide 3D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make glide3d      Make the $(DESCRIPTION.glide3d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make glide3d      Make the $(DESCRIPTION.glide3d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glide3d
 
-all drivers drivers3d: glide3d
+all plugins drivers drivers3d: glide3d
 
 glide3d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -36,12 +36,12 @@ LIBS._GLIDE3D+=-lglide2x
 ifeq ($(USE_SHARED_PLUGINS),yes)
   GLIDE3D=glide23d$(DLL)
   LIBS.GLIDE3D=$(LIBS._GLIDE3D)
-  DEP.GLIDE3D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.GLIDE3D=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   GLIDE3D=$(OUT)$(LIB_PREFIX)glide23d$(LIB)
   DEP.EXE+=$(GLIDE3D)
   LIBS.EXE+=$(LIBS._GLIDE3D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_GLIDE3D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDE3D
 endif
 DESCRIPTION.$(GLIDE3D) = $(DESCRIPTION.glide3d)
 SRC.GLIDE3D = $(wildcard libs/cs3d/common/texmem.cpp \

@@ -8,7 +8,7 @@ DESCRIPTION.gl3d = Crystal Space OpenGL 3D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make gl3d         Make the $(DESCRIPTION.gl3d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make gl3d         Make the $(DESCRIPTION.gl3d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: gl3d
 
-all drivers drivers3d: gl3d
+all plugins drivers drivers3d: gl3d
 
 gl3d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -52,12 +52,12 @@ endif # OPENGL.LIBS.DEFINED
 ifeq ($(USE_SHARED_PLUGINS),yes)
   GL3D=$(OUTDLL)gl3d$(DLL)
   LIBS.GL3D=$(LIBS.LOCAL.GL3D)
-  DEP.GL3D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.GL3D=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   GL3D=$(OUT)$(LIB_PREFIX)gl3d$(LIB)
   DEP.EXE+=$(GL3D)
   LIBS.EXE+=$(LIBS.LOCAL.GL3D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_OPENGL3D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OPENGL3D
 endif
 DESCRIPTION.$(GL3D) = $(DESCRIPTION.gl3d)
 SRC.GL3D = $(wildcard libs/cs3d/opengl/*.cpp) \

@@ -8,7 +8,7 @@ DESCRIPTION.sndrdrn = Crystal Space NULL sound renderer
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make sndrdrn      Make the $(DESCRIPTION.sndrdrn)$"
+PLUGINHELP += $(NEWLINE)echo $"  make sndrdrn      Make the $(DESCRIPTION.sndrdrn)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: sndrdrn
 
-all drivers snddrivers: sndrdrn
+all plugins drivers snddrivers: sndrdrn
 
 sndrdrn:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -34,11 +34,11 @@ vpath %.cpp libs/cssndrdr/null
 # The NULL Sound renderer
 ifeq ($(USE_SHARED_PLUGINS),yes)
   SNDRDRN=$(OUTDLL)sndrdrn$(DLL)
-  DEP.SNDRDRN=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.SNDRDRN=$(CSUTIL.LIB) $(CSSYS.LIB)
 else
   SNDRDRN=$(OUT)$(LIB_PREFIX)sndrdrn$(LIB)
   DEP.EXE+=$(SNDRDRN)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_SNDRDRN
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDRDRN
 endif
 DESCRIPTION.$(SNDRDRN) = $(DESCRIPTION.sndrdrn)
 SRC.SNDRDRN = $(wildcard libs/cssndrdr/null/*.cpp)

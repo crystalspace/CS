@@ -8,7 +8,7 @@ DESCRIPTION.glbe2d = Crystal Space GL/Be 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make glbe2d       Make the $(DESCRIPTION.glbe2d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make glbe2d       Make the $(DESCRIPTION.glbe2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glbe2d
 
-all drivers drivers2d: glbe2d
+all plugins drivers drivers2d: glbe2d
 
 glbe2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -35,12 +35,12 @@ CFLAGS.GLBE2D+=-I/boot/home/develop/headers/be/opengl
 # The 2D GLBe driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   GLBE2D=$(OUTDLL)glbe2d$(DLL)
-  DEP.BE2D = $(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.BE2D = $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.GLBE2D=-lGL
 else
   GLBE2D=$(OUT)$(LIB_PREFIX)glbe2d$(LIB)
   DEP.EXE+=$(GLBE2D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_GLBE2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLBE2D
   LIBS.EXE+=-lGL
 endif
 DESCRIPTION.$(GLBE2D) = $(DESCRIPTION.glbe2d)

@@ -2,13 +2,13 @@
 # to build the 3D software rendering driver -- soft
 
 # Driver description
-DESCRIPTION.soft = Crystal Space software renderer
+DESCRIPTION.soft = Crystal Space software 3D driver
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make soft         Make the $(DESCRIPTION.soft)$"
+PLUGINHELP += $(NEWLINE)echo $"  make soft         Make the $(DESCRIPTION.soft)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: soft
 
-all drivers drivers3d: soft
+all plugins drivers drivers3d: soft
 
 soft:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -33,11 +33,11 @@ vpath %.cpp libs/cs3d/software
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   SOFT3D=$(OUTDLL)soft3d$(DLL)
-  DEP.SOFT3D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.SOFT3D=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   SOFT3D=$(OUT)$(LIB_PREFIX)soft$(LIB)
   DEP.EXE+=$(SOFT3D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_SOFT3D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SOFT3D
 endif
 DESCRIPTION.$(SOFT3D) = $(DESCRIPTION.soft)
 SRC.SOFT3D = $(wildcard libs/cs3d/software/*.cpp) \

@@ -1,5 +1,5 @@
 # Library description
-DESCRIPTION.csterr = Landscape Engine
+DESCRIPTION.csterr = Landscape engine
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

@@ -8,7 +8,7 @@ DESCRIPTION.glos2 = Crystal Space OS/2 OpenGL 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make glos2        Make the $(DESCRIPTION.glos2)$"
+PLUGINHELP += $(NEWLINE)echo $"  make glos2        Make the $(DESCRIPTION.glos2)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -18,7 +18,7 @@ ifeq ($(MAKESECTION),roottargets)
 .PHONY: glos2
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-all drivers drivers2d: glos2
+all plugins drivers drivers2d: glos2
 endif
 
 glos2:
@@ -41,12 +41,12 @@ GLOS2.RES=$(OUTOS)libGL.res
 ifeq ($(USE_SHARED_PLUGINS),yes)
   GLOS2=glos2$(DLL)
   LIBS.LOCAL.GLOS2=$(LIBS.GLOS2)
-  DEP.GLOS2=$(GLOS2.RES) $(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.GLOS2=$(GLOS2.RES) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   GLOS2=$(OUT)$(LIB_PREFIX)glos2$(LIB)
   DEP.EXE+=$(GLOS2.RES) $(GLOS2) $(CSOS2.LIB)
   LIBS.EXE+=$(LIBS.GLOS2)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_GL2DOS2
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GL2DOS2
 endif
 DESCRIPTION.$(GLOS2)=$(DESCRIPTION.glos2)
 SRC.GLOS2 = $(wildcard libs/cs2d/openglos2/*.cpp \

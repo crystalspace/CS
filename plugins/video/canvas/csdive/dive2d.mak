@@ -8,7 +8,7 @@ DESCRIPTION.csdive = Crystal Space OS/2 DIVE driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make csdive       Make the $(DESCRIPTION.csdive)$"
+PLUGINHELP += $(NEWLINE)echo $"  make csdive       Make the $(DESCRIPTION.csdive)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csdive
 
-all drivers drivers2d: csdive
+all plugins drivers drivers2d: csdive
 
 csdive:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -38,11 +38,11 @@ CSOS2.LIB=$(OUT)$(LIB_PREFIX)csos2$(LIB)
 # The 2D OS/2 DIVE driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   CSDIVE=csdive$(DLL)
-  DEP.CSDIVE=$(DIVE2D.RES) $(CSOS2.LIB) $(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.CSDIVE=$(DIVE2D.RES) $(CSOS2.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   CSDIVE=$(OUT)$(LIB_PREFIX)csdive$(LIB)
   DEP.EXE+=$(DIVE2D.RES) $(CSDIVE) $(CSOS2.LIB)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_DIVE2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DIVE2D
 endif
 DESCRIPTION.$(CSDIVE)=$(DESCRIPTION.csdive)
 SRC.CSDIVE = $(wildcard libs/cs2d/csdive/*.cpp $(SRC.COMMON.DRV2D))

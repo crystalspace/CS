@@ -8,7 +8,7 @@ DESCRIPTION.ddraw = Crystal Space Windows DirectDraw 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make ddraw        Make the $(DESCRIPTION.ddraw)$"
+PLUGINHELP += $(NEWLINE)echo $"  make ddraw        Make the $(DESCRIPTION.ddraw)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: ddraw
 
-all drivers drivers2d: ddraw
+all plugins drivers drivers2d: ddraw
 
 ddraw:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -33,13 +33,13 @@ LIBS.DDRAW+=ddraw.lib
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   DDRAW=ddraw$(DLL)
-  DEP.DDRAW=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.DDRAW=$(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.LOCAL.DDRAW=$(LIBS.DDRAW)
 else
   DDRAW=$(OUT)$(LIB_PREFIX)ddraw$(LIB)
   DEP.EXE+=$(DDRAW)
   LIBS.EXE+=$(LIBS.DDRAW)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_DDRAW2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DDRAW2D
 endif
 DESCRIPTION.$(DDRAW)=$(DESCRIPTION.ddraw)
 SRC.DDRAW = $(wildcard libs/cs2d/ddraw/*.cpp $(SRC.COMMON.DRV2D)) \

@@ -8,7 +8,7 @@ DESCRIPTION.asciiart = Crystal Space Ascii Art driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make asciiart     Make the $(DESCRIPTION.asciiart)$"
+PLUGINHELP += $(NEWLINE)echo $"  make asciiart     Make the $(DESCRIPTION.asciiart)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: asciiart
 
-all drivers drivers2d: asciiart
+all plugins drivers drivers2d: asciiart
 
 asciiart:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -35,13 +35,13 @@ LIBS.ASCIIART+=$(LFLAGS.l)aa
 # The 2D Ascii Art driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   ASCIIART=asciiart$(DLL)
-  DEP.ASCIIART=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.ASCIIART=$(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.LOCAL.ASCIIART=$(LIBS.ASCIIART)
 else
   ASCIIART=$(OUT)$(LIB_PREFIX)asciiart$(LIB)
   DEP.EXE+=$(ASCIIART)
   LIBS.EXE+=$(LIBS.ASCIIART)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_ASCII2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ASCII2D
 endif
 DESCRIPTION.$(ASCIIART)=$(DESCRIPTION.asciiart)
 SRC.ASCIIART = $(wildcard libs/cs2d/asciiart/*.cpp $(SRC.COMMON.DRV2D))

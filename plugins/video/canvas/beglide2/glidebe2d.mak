@@ -10,7 +10,7 @@ include libs/cs2d/glide2common/glide2common2d.mak
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make glidebe2d    Make the $(DESCRIPTION.glidebe2d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make glidebe2d    Make the $(DESCRIPTION.glidebe2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -19,7 +19,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glidebe2d
 
-all drivers drivers2d: glidebe2d
+all plugins drivers drivers2d: glidebe2d
 
 glidebe2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -43,7 +43,7 @@ else
   GLIDEBE2D=$(OUT)$(LIB_PREFIX)glidebe2d$(LIB)
   DEP.EXE+=$(GLIDEBE2D)
   LIBS.EXE+=$(LIBS._GLIDEBE2D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_GLIDEBE2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDEBE2D
 endif
 DESCRIPTION.$(GLIDEBE2D) = $(DESCRIPTION.glidebe2d)
 SRC.GLIDEBE2D = $(wildcard libs/cs2d/beglide2/*.cpp \
@@ -65,7 +65,7 @@ glidebe2d: $(OUTDIRS) $(GLIDEBE2D)
 $(OUT)%$O: libs/cs2d/beglide2/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDEBE2D)
  
-$(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+$(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 	$(DO.PLUGIN) $(LIBS.GLIDEBE2D)
 
 glidebeclean:

@@ -8,7 +8,7 @@ DESCRIPTION.netdrvn = Crystal Space NULL network driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make netdrvn      Make the $(DESCRIPTION.netdrvn)$"
+PLUGINHELP += $(NEWLINE)echo $"  make netdrvn      Make the $(DESCRIPTION.netdrvn)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: netdrvn
 
-all drivers netdrivers: netdrvn
+all plugins drivers netdrivers: netdrvn
 
 netdrvn:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -34,11 +34,11 @@ vpath %.cpp libs/csnetdrv/null
 # The NULL Network driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   NETDRVN=$(OUTDLL)netdrvn$(DLL)
-  DEP.NETDRVN=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.NETDRVN=$(CSUTIL.LIB) $(CSSYS.LIB)
 else
   NETDRVN=$(OUT)$(LIB_PREFIX)netdrvn$(LIB)
   DEP.EXE+=$(NETDRVN)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_NETNULL
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_NETNULL
 endif
 DESCRIPTION.$(NETDRVN) = $(DESCRIPTION.netdrvn)
 SRC.NETDRVN = $(wildcard libs/csnetdrv/null/*.cpp)

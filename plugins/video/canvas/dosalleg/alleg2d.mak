@@ -8,7 +8,7 @@ DESCRIPTION.alleg2d = Crystal Space Allegro driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make alleg2d      Make the $(DESCRIPTION.alleg2d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make alleg2d      Make the $(DESCRIPTION.alleg2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: alleg2d
 
-all drivers drivers2d: alleg2d
+all plugins drivers drivers2d: alleg2d
 
 alleg2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -35,7 +35,7 @@ DEP.EXE+=$(ALLEG2D)
 DESCRIPTION.$(ALLEG2D) = $(DESCRIPTION.alleg2d)
 SRC.ALLEG2D=$(wildcard libs/cs2d/dosalleg/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.ALLEG2D = $(addprefix $(OUT),$(notdir $(SRC.ALLEG2D:.cpp=$O)))
-CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_ALLEG2D
+CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ALLEG2D
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

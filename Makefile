@@ -5,7 +5,7 @@
 ################################################################################
 
 .PHONY: help banner showplatforms showconfig platforms all doc api depend \
-  configure clean cleanlib cleandep distclean libs drivers drivers2d \
+  configure clean cleanlib cleandep distclean libs plugins drivers drivers2d \
   drivers3d snddrivers netdrivers html zips
 
 # The following two symbols are intended to be used in "echo" commands
@@ -21,8 +21,8 @@ include mk/common.mak
 SYSTARGETS=$(patsubst mk/system/%.mak,%,$(wildcard mk/system/*.mak))
 
 # The initial driver and application targets help text
-DRVHELP = \
-  echo $"The following Crystal Space drivers can be built:$"
+PLUGINHELP = \
+  echo $"The following Crystal Space plug-in modules can be built:$"
 APPHELP = \
   echo $"The following Crystal Space applications can be built:$"
 LIBHELP = \
@@ -58,7 +58,7 @@ else
 MAKESECTION=rootdefines
 include mk/subs.mak
 
-help: banner showconfig drvhelp libhelp apphelp pseudohelp
+help: banner showconfig pluginhelp libhelp apphelp pseudohelp
 
 depend:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
@@ -79,8 +79,8 @@ showconfig:
 	@echo $"  USE_SHARED_PLUGINS=$(USE_SHARED_PLUGINS) MODE=$(MODE) $(SYSMODIFIERS)$"
 	@echo $(SEPARATOR)
 
-drvhelp:
-	@$(DRVHELP)
+pluginhelp:
+	@$(PLUGINHELP)
 	@echo $(SEPARATOR)
 
 libhelp:
@@ -94,6 +94,7 @@ apphelp:
 pseudohelp:
 	@echo $"  make apps         Make all applications$"
 	@echo $"  make libs         Make all static libraries$"
+	@echo $"  make plugins      Make all plug-in modules including drivers$"
 	@echo $"  make drivers      Make all drivers$"
 	@echo $"  make drivers2d    Make all supported 2D graphics drivers$"
 	@echo $"  make drivers3d    Make all supported 3D graphics drivers (renderers)$"

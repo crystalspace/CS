@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.blks = Crystal Space Blocks game (unfinished)
+DESCRIPTION.blks = Crystal Space Blocks game
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -44,8 +44,8 @@ clean: blksclean
 
 $(BLOCKS.EXE): $(DEP.EXE) $(OBJ.BLOCKS) \
   $(CSPARSER.LIB) $(CSENGINE.LIB) $(CSTERR.LIB) $(CSSCRIPT.LIB)\
-  $(CSSFXLDR.LIB) $(CSGFXLDR.LIB)  $(CSCOM.LIB) $(CSSYS.LIB) \
-  $(CSGEOM.LIB) $(CSINPUT.LIB) $(CSOBJECT.LIB) $(CSUTIL.LIB) 
+  $(CSSFXLDR.LIB) $(CSGFXLDR.LIB) $(CSSYS.LIB) $(CSGEOM.LIB) $(CSINPUT.LIB) \
+  $(CSOBJECT.LIB) $(CSUTIL.LIB) 
 	$(DO.LINK.EXE)
 
 blksclean:

@@ -8,7 +8,7 @@ DESCRIPTION.netdrvs = Crystal Space socket network driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make netdrvs      Make the $(DESCRIPTION.netdrvs)$"
+PLUGINHELP += $(NEWLINE)echo $"  make netdrvs      Make the $(DESCRIPTION.netdrvs)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: netdrvs
 
-all drivers netdrivers: netdrvs
+all plugins drivers netdrivers: netdrvs
 
 netdrvs:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -37,12 +37,12 @@ endif
 ifeq ($(USE_SHARED_PLUGINS),yes)
   NETDRVS=$(OUTDLL)netdrvs$(DLL)
   LIBS.NETDRVS=$(LIBS.LOCAL.NETDRVS)
-  DEP.NETDRVS=$(CSCOM.LIB) $(CSSYS.LIB) $(CSUTIL.LIB)
+  DEP.NETDRVS=$(CSSYS.LIB) $(CSUTIL.LIB)
 else
   NETDRVS=$(OUT)$(LIB_PREFIX)netdrvs$(LIB)
   DEP.EXE+=$(NETDRVS)
   LIBS.EXE+=$(LIBS.LOCAL.NETDRVS)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_NETSOCKS
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_NETSOCKS
 endif
 DESCRIPTION.$(NETDRVS) = $(DESCRIPTION.netdrvs)
 SRC.NETDRVS = $(wildcard libs/csnetdrv/sockets/*.cpp)

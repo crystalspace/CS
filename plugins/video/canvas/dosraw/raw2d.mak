@@ -8,7 +8,7 @@ DESCRIPTION.raw2d = Crystal Space raw DOS SVGA driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make raw2d        Make the $(DESCRIPTION.raw2d)$"
+PLUGINHELP += $(NEWLINE)echo $"  make raw2d        Make the $(DESCRIPTION.raw2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: raw2d
 
-all drivers drivers2d: raw2d
+all plugins drivers drivers2d: raw2d
 
 raw2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -35,7 +35,7 @@ DEP.EXE+=$(RAW2D)
 DESCRIPTION.$(RAW2D) = $(DESCRIPTION.raw2d)
 SRC.RAW2D=$(wildcard libs/cs2d/dosraw/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.RAW2D = $(addprefix $(OUT),$(notdir $(SRC.RAW2D:.cpp=$O)))
-CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_RAW2D
+CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_RAW2D
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

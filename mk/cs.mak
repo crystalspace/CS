@@ -235,7 +235,7 @@ cleandoc:
 detex: cs-tut.txt cs-inst.txt csgeom.txt csengine.txt csobject.txt
 
 $(OUT)static$O: static.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.STATIC_COM)
+	$(DO.COMPILE.CPP) $(CFLAGS.STATIC_SCF)
 
 $(OUT)%$O: %.cpp
 	$(DO.COMPILE.CPP)
