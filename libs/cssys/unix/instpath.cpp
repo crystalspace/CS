@@ -22,14 +22,16 @@
 #include <unistd.h>
 
 #include "cssysdef.h"
-
 #include "csutil/util.h"
-
 #include "cssys/sysfunc.h"
 #include "cssys/syspath.h"
 
-// these defines should be set by the configure script
+// @@@ Re-enable recursive scanning after we rethink it.  Presently, many
+// developers run applications from within the source tree, and recursion
+// causes a lot of needless scanning. For now it is disabled.
+#define DO_SCAN_RECURSION false
 
+// These defines should be set by the configure script
 #ifndef CS_CONFIGDIR
 #define CS_CONFIGDIR "/usr/local/crystal"
 #endif
@@ -95,23 +97,28 @@ char* csGetConfigPath ()
 csPluginPaths* csGetPluginPaths (const char* argv0)
 {
   csPluginPaths* paths = new csPluginPaths;
+
+  char* appPath = csGetAppDir (argv0);
+  char* resPath = csGetResourceDir (argv0);
+  
+  if (resPath != 0)
+    paths->AddOnce (resPath, DO_SCAN_RECURSION, "app");
+  if (appPath != 0)
+    paths->AddOnce (appPath, DO_SCAN_RECURSION, "app");
+
+  delete[] appPath;
+  delete[] resPath;
+
   const char* crystal = getenv ("CRYSTAL");
- 
   if (!crystal)
+    paths->AddOnce (CS_PLUGINDIR, DO_SCAN_RECURSION, "plugins");
+  else 
   {
-    paths->AddOnce (CS_PLUGINDIR, true, "plugins");
-    paths->AddOnce (".", false, "this");
- 
-    return paths;
+    paths->AddOnce (crystal, false, "crystal");
+    char* temp = new char[1024];
+    strncpy (temp, crystal, 1000);
+    strcat (temp, "/lib");
+    paths->AddOnce (temp, DO_SCAN_RECURSION, "crystal");
   }
- 
-  paths->AddOnce (crystal, false, "crystal");
-  char* temp = new char[1024];
-  strncpy (temp, crystal, 1000);
-  strcat (temp, "/lib");
-  paths->AddOnce (temp, true, "crystal");
-  paths->AddOnce (".", "this");
- 
   return paths;
 }
-

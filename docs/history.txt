@@ -21,6 +21,9 @@ The history order is reversed so that new features are at the top.
 	    - Neglected to include swigpythgen and swigpythinst targets in
 	      "make help" output.
 	    - Neglected to install _cspace.so (_cspace.dll) via "make install".
+	- Eric Sunshine fixed csGetPluginPaths() for Unix so that it respects
+	  csGetAppDir() and csGetResourceDir() when composing the list of
+	  directories to scan for plugin modules.
 22-Jun-2003
 	- Luca did the following:
 	  - Fixed a bug in the label component of AWS: in fact the method
