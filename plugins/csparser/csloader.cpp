@@ -2605,9 +2605,11 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
     case XMLTOKEN_INVISIBLEMESH:
       TEST_MISSING_MESH
       if (recursive)
-        mesh->SetFlagsRecursive (CS_ENTITY_INVISIBLEMESH, CS_ENTITY_INVISIBLEMESH);
+        mesh->SetFlagsRecursive (CS_ENTITY_INVISIBLEMESH,
+		CS_ENTITY_INVISIBLEMESH);
       else
-        mesh->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH, CS_ENTITY_INVISIBLEMESH);
+        mesh->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH,
+		CS_ENTITY_INVISIBLEMESH);
       break;
     case XMLTOKEN_INVISIBLE:
       TEST_MISSING_MESH
@@ -2865,6 +2867,16 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
           mesh->CastHardwareShadow (true);
         else if (strcasecmp (child->GetAttributeValue ("enable"), "false") == 0)
           mesh->CastHardwareShadow (false);
+      }
+      break;
+    case XMLTOKEN_BOX:
+      TEST_MISSING_MESH
+      else
+      {
+	csBox3 b;
+	if (!SyntaxService->ParseBox (child, b))
+	  return false;
+        mesh->GetMeshObject ()->GetObjectModel ()->SetObjectBoundingBox (b);
       }
       break;
     default:

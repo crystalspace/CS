@@ -17,6 +17,9 @@ chronological order.
 	    - Fixed walktest to update the frame width & height on resize.
 	    - Changed the GL state cache to allow quick disabling at compile
 	      time.
+	- Jorrit added the ability to set bounding box for mesh objects
+	  in a world file. Uses the SetObjectBoundingBox() added yesterday.
+	  Uses <box min=... max=... /> syntax in <meshobj>.
 21-Jan-2005
 	- Jorrit continued work on the PVS. The PVS kdtree should now be
 	  working (not tested).
