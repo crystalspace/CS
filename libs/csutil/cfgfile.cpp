@@ -166,7 +166,7 @@ int csConfigNode::GetInt() const
 
 float csConfigNode::GetFloat() const
 {
-  return (Data ? atof(Data) : 0);
+  return (Data ? (float) atof(Data) : 0.0f);
 }
 
 bool csConfigNode::GetBool() const
