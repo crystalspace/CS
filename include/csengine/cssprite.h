@@ -90,7 +90,6 @@ public:
    * This has to be called after setting up the frame and before
    * using it.
    */
-  // void ComputeBoundingBox (int num_vertices);
   void SetBoundingBox (csBox3& b) { box = b; }
 
   /**
@@ -394,7 +393,13 @@ private:
    * This list is only valid if the sprite is connected directly
    * to the world (i.e. parent is a csWorld object).
    */
-  csNamedObjVector sectors;
+  csVector sectors;
+
+protected:
+  /**
+   * World->object transformation for this sprite.
+   */
+  csReversibleTransform obj;
 
 public:
   /// Constructor.
@@ -418,7 +423,7 @@ public:
    * directly to the world or else the list of sectors for the parent
    * object that contains this sprite.
    */
-  csNamedObjVector& GetSectors ();
+  csVector& GetSectors ();
 
   /**
    * Get the specified sector where this sprite lives.
@@ -599,13 +604,6 @@ public:
   static bool do_quality_lighting;
 
 private:
-  /// Object to world transformation.
-  csVector3 v_obj2world;
-  /// Object to world transformation.
-  csMatrix3 m_obj2world;
-  /// World to object transformation.
-  csMatrix3 m_world2obj;
-
   /**
    * A mesh which contains a number of triangles as generated
    * by the LOD algorithm. This is static since it will likely
@@ -754,7 +752,12 @@ public:
   /**
    * Get the position of the sprite.
    */
-  virtual const csVector3& GetPosition () const { return v_obj2world; }
+  virtual const csVector3& GetPosition () const { return obj.GetOrigin (); }
+
+  /**
+   * Get the transformation.
+   */
+  const csReversibleTransform& GetTransform () const { return obj; }
 
   /**
    * Relative move.
@@ -766,13 +769,6 @@ public:
    * orientation
    */
   void SetTransform (const csMatrix3& matrix);
-
-  /**
-   * Absolute move.
-   * This version of SetPosition tries to find the correct sector
-   * to move too.
-   */
-  bool SetPositionSector (const csVector3& v);
 
   /**
    * Relative transform.
@@ -879,14 +875,6 @@ public:
    * if you created the sprite on the fly (without 'load').
    */
   void InitSprite ();
-
-  /// Get world to local transformation matrix
-  inline csMatrix3 GetW2T () const { return m_world2obj; }
-  /// Get world to local translation
-  inline csVector3 GetW2TTranslation () const { return v_obj2world; }
-
-  /// Get sprite transform
-  inline const csMatrix3 &GetT2W () const { return m_obj2world; }
 
   /**
    * Get an array of object vertices which is valid for the given frame.

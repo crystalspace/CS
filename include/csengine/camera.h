@@ -260,7 +260,8 @@ public:
 
   /**
    * Have the camera look at the given (x,y,z) point, using up as
-   * the up-vector.
+   * the up-vector. 'v' should be given relative to the position
+   * of the camera.
    */
   void LookAt (const csVector3& v, const csVector3& up);
 

@@ -54,6 +54,7 @@ csThing::csThing (csWorld* world) : csPolygonSet (world), movable (),
 	tree_bbox (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiThing);
+  movable.scfParent = &scfiThing;
   center_idx = -1;
   ParentTemplate = NULL;
   tree_bbox.SetOwner (this);

@@ -26,7 +26,7 @@ class csMatrix3;
 class csThing;
 struct iSector;
 
-SCF_VERSION (iMovable, 0, 0, 1);
+SCF_VERSION (iMovable, 0, 0, 2);
 
 /**
  * This interface describes a movable entity. It is usually
@@ -74,6 +74,11 @@ struct iMovable : public iBase
    * some position.
    */
   virtual void SetPosition (iSector* home, const csVector3& v) = 0;
+
+  /**
+   * Get the current position.
+   */
+  virtual const csVector3& GetPosition () = 0;
 
   /**
    * Set the transformation matrix for this entity.

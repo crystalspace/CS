@@ -781,8 +781,6 @@ void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
   camera_cookie = cur_cookie;
 
   csTransform trans = camtrans * obj.GetInverse ();
-  //csTransform trans = camtrans * csTransform (m_obj2world,
-  	//m_world2obj * -v_obj2world);
   if (skeleton_state)
   {
     skeleton_state->ComputeBoundingBox (trans, camera_bbox);

@@ -106,6 +106,11 @@ public:
   void SetPosition (csSector* home, const csVector3& v);
 
   /**
+   * Get the current position.
+   */
+  const csVector3& GetPosition () { return obj.GetOrigin (); }
+
+  /**
    * Set the transformation matrix for this entity.
    */
   void SetTransform (const csMatrix3& matrix);
@@ -152,6 +157,10 @@ public:
       return scfParent->InSector ();
     }
     virtual void SetPosition (iSector* home, const csVector3& v);
+    virtual const csVector3& GetPosition ()
+    {
+      return scfParent->GetPosition ();
+    }
     virtual void SetTransform (const csMatrix3& matrix)
     {
       scfParent->SetTransform (matrix);
