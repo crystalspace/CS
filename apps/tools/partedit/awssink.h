@@ -86,6 +86,18 @@ class awsSink
   static awsSink *asink;
   csRef<iVFS> vfs;
 
+  struct st_FreeScrollData {
+    iAwsComponent *iawscomponent_FSWindow;
+    iAwsComponent *iawscomponent_FSLabel;
+    iAwsComponent *iawscomponent_FSTextBox;
+    iAwsComponent *iawscomponent_FSScrollBar;
+
+    iAwsComponent *iawscomponent_AssociatedTextBox;
+    bool floatval; // false if integer
+    bool *invalidate_pointer;
+    void *value_pointer;
+  } FreeScrollData;
+
   
   struct st_GraphicSelectionData {
     ///  The iAwsComponent interface to the to the window for selecting the graphics file.
@@ -957,6 +969,16 @@ private:
   static void AwsSetATCYTMax(void *sk, iAwsSource *source);
   static void AwsSetATCYTWeight(void *sk, iAwsSource *source);
 
+
+
+  static void RegisterFSWindow(void *sk, iAwsSource *source);
+  static void RegisterFSLabel(void *sk, iAwsSource *source);
+  static void RegisterFSTextBox(void *sk, iAwsSource *source);
+  static void RegisterFSScrollBar(void *sk, iAwsSource *source);
+  static void AwsSetFSTextBox(void *sk, iAwsSource *source);
+  static void AwsSetFSScrollBar(void *sk, iAwsSource *source);
+
+  static void FreeScrollSetComponent(bool floatval,void *value_pointer,iAwsComponent *associated,bool *invalidate_pointer);
 
 
 public:

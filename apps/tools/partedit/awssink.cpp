@@ -53,6 +53,7 @@ void awsSink::function(void *sk, iAwsSource *source) \
   } \
   else \
     asink->update(); \
+  FreeScrollSetComponent(true,&(asink->floatvar),source->GetComponent(),&(asink->invalidate_flag)); \
 }
 
 
@@ -70,6 +71,7 @@ void awsSink::function(void *sk, iAwsSource *source) \
   } \
   else \
     asink->update(); \
+  FreeScrollSetComponent(false,&(asink->intvar),source->GetComponent(),&(asink->invalidate_flag)); \
 }
 
 
@@ -122,6 +124,7 @@ void awsSink::function(void *sk, iAwsSource *source) \
 
 
 
+
 awsSink * awsSink::asink = NULL;
 
 awsSink::awsSink() : wmgr(0) 
@@ -153,6 +156,7 @@ awsSink::~awsSink()
 void awsSink::SetSink(iAwsSink *s)
 {
   sink = s;
+
 
   if (sink) 
   {
@@ -689,7 +693,16 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetATCYTWeight",&AwsSetATCYTWeight);
 
 
+    sink->RegisterTrigger("RegisterFSWindow",&RegisterFSWindow);
+    sink->RegisterTrigger("RegisterFSLabel",&RegisterFSLabel);
+    sink->RegisterTrigger("RegisterFSTextBox",&RegisterFSTextBox);
+    sink->RegisterTrigger("RegisterFSScrollBar",&RegisterFSScrollBar);
+    sink->RegisterTrigger("SetFSScrollBar",&AwsSetFSScrollBar);
+    sink->RegisterTrigger("SetFSTextBox",&AwsSetFSTextBox);
+
+
   }
+  FreeScrollData.iawscomponent_AssociatedTextBox=NULL;
 }
 
 void awsSink::SetWindowManager(iAws *_wmgr)
@@ -1160,7 +1173,7 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetRectangularWidth,
 IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetRectangularHeight,
 									 EmitterStateData.state.rect_h,EmitterStateData.settings_changed,
 									 UpdateEmitterStateDisplay)
-IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetRegularNumber,
+IMPLEMENT_COMPONENT_TEXTBOX_TO_INT(AwsSetRegularNumber,
 									 EmitterStateData.state.reg_number,EmitterStateData.settings_changed,
 									 UpdateEmitterStateDisplay)
 IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetRegularRadius,
@@ -2685,6 +2698,209 @@ void awsSink::UpdateAttractorStateDisplay()
 
 
 
+
+
+
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSWindow,FreeScrollData.iawscomponent_FSWindow)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSLabel,FreeScrollData.iawscomponent_FSLabel)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSTextBox,FreeScrollData.iawscomponent_FSTextBox)
+IMPLEMENT_REGISTER_FUNCTION(RegisterFSScrollBar,FreeScrollData.iawscomponent_FSScrollBar)
+
+
+////
+//  "Free Scroll" test
+////
+void awsSink::FreeScrollSetComponent(bool floatval,void *value_pointer,iAwsComponent *associated,bool *invalidate_pointer)
+{
+  csRef<iString> value;
+  asink->FreeScrollData.iawscomponent_AssociatedTextBox=associated;
+  asink->FreeScrollData.floatval=floatval;
+  asink->FreeScrollData.value_pointer=value_pointer;
+  asink->FreeScrollData.invalidate_pointer=invalidate_pointer;
+
+  if (asink->FreeScrollData.floatval)
+  {
+    float min,max,change,bigchange;
+    // Set textbox value
+    SET_TEXTBOX_FLOAT(asink->FreeScrollData.iawscomponent_FSTextBox,*((float *)(value_pointer)));
+    // Range guesswork.  We can take the current value and figure out a reasonable max
+    float fval=*((float *)(value_pointer));
+    if (fval<0)
+      fval=-fval;
+
+    min=0.0f;
+    if (min==0.0f && fval==0.0f)
+    {
+      // 0 is a hard case to determine
+      min=-100.0f;
+      change=0.1f;
+      bigchange=1;
+    }
+    if (min==0.0f && fval<=.0001)
+    {
+      min=-0.001f;
+      change=0.000001f;
+      bigchange=0.00001f;
+    }
+    if (min==0.0f && fval<=.001)
+    {
+      min=-0.01f;
+      change=0.00001f;
+      bigchange=0.0001f;
+    }
+    if (min==0.0f && fval<=.01)
+    {
+      min=-0.1f;
+      change=0.0001f;
+      bigchange=0.001f;
+    }
+    if (min==0.0f && fval<=.1)
+    {
+      min=-1.0f;
+      change=0.001f;
+      bigchange=0.01f;
+    }
+    if (min==0.0f && fval<=1)
+    {
+      min=-10.0f;
+      change=0.01f;
+      bigchange=0.1f;
+    }
+    if (min==0.0f && fval<=10)
+    {
+      min=-100.0f;
+      change=0.1f;
+      bigchange=1;
+    }
+    if (min==0.0f && fval<=500)
+    {
+      min=-1000.0f;
+      change=1;
+      bigchange=10;
+    }
+    if (min==0.0f && fval<=5000)
+    {
+      min=-10000.0f;
+      change=10;
+      bigchange=100;
+    }
+    if (min==0.0f)
+    {
+      min=-50000.0f;
+      change=50;
+      bigchange=500;
+    }
+    max=-min;
+
+
+    // Set range
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Min",&min);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Max",&max);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Change",&change);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("BigChange",&bigchange);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Value",&value_pointer);
+  }
+  else
+  {
+    float fvalue,min,max,change,bigchange;
+    // Set textbox value
+    SET_TEXTBOX_INT(asink->FreeScrollData.iawscomponent_FSTextBox,*((int *)(value_pointer)));
+    // Range guesswork.  We can take the current value and figure out a reasonable max
+    int ival=*((int *)(value_pointer));
+    if (ival<0)
+      ival=-ival;
+
+    min=0.0f;
+    if (min==0.0f && ival<500)
+    {
+      min=-1000.0f;
+      change=1;
+      bigchange=10;
+    }
+    if (min==0.0f && ival<5000)
+    {
+      min=-10000.0f;
+      change=10;
+      bigchange=100;
+    }
+    if (min==0.0f)
+    {
+      min=-50000.0f;
+      change=50;
+      bigchange=500;
+    }
+    max=-min;
+
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Min",&min);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Max",&max);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Change",&change);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("BigChange",&bigchange);
+    fvalue=(float)(*((int *)(value_pointer)));
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Value",&fvalue);
+  }
+}
+
+void awsSink::AwsSetFSScrollBar(void *sk, iAwsSource *source)
+{
+  csRef<iString> value;
+  float *value_as_float;
+  if (asink->FreeScrollData.iawscomponent_AssociatedTextBox==NULL)
+    return;
+
+  if (source->GetComponent()->GetProperty("Value",(void **)&value_as_float))
+  {
+    if (asink->FreeScrollData.floatval)
+    {
+      // This is a float
+      *((float *)(asink->FreeScrollData.value_pointer))=*value_as_float;
+      SET_TEXTBOX_FLOAT(asink->FreeScrollData.iawscomponent_FSTextBox,*value_as_float);
+      SET_TEXTBOX_FLOAT(asink->FreeScrollData.iawscomponent_AssociatedTextBox,*value_as_float);
+    }
+    else
+    {
+      // This is an int
+      *((int *)(asink->FreeScrollData.value_pointer))=(int)(*value_as_float);
+      SET_TEXTBOX_INT(asink->FreeScrollData.iawscomponent_FSTextBox,(int)(*value_as_float));
+      SET_TEXTBOX_INT(asink->FreeScrollData.iawscomponent_AssociatedTextBox,(int)(*value_as_float));
+    }
+    *(asink->FreeScrollData.invalidate_pointer)=true;
+
+  }
+
+
+
+}
+
+void awsSink::AwsSetFSTextBox(void *sk, iAwsSource *source)
+{
+  iString *textvalue;
+  csRef<iString> value;
+  float value_as_float;
+  if (asink->FreeScrollData.iawscomponent_AssociatedTextBox==NULL)
+    return;
+
+  if (source->GetComponent()->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
+  {
+    if (asink->FreeScrollData.floatval)
+    {
+      // This is a float
+      *((float *)(asink->FreeScrollData.value_pointer))=atof(textvalue->GetData());
+      value_as_float=*((float *)(asink->FreeScrollData.value_pointer));
+      SET_TEXTBOX_FLOAT(asink->FreeScrollData.iawscomponent_AssociatedTextBox,value_as_float);
+    }
+    else
+    {
+      // This is an int
+      *((int *)(asink->FreeScrollData.value_pointer))=strtol(textvalue->GetData(),NULL,10);
+      value_as_float=(float)(*((int *)(asink->FreeScrollData.value_pointer)));
+      SET_TEXTBOX_INT(asink->FreeScrollData.iawscomponent_AssociatedTextBox,(int)value_as_float);
+    }
+    *(asink->FreeScrollData.invalidate_pointer)=true;
+
+    // Update the scroll bar
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Value",&value_as_float);
+  }
+}
 
 
 void awsSink::SetVFS(csRef<iVFS> newvfs)

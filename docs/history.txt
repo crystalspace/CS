@@ -136,6 +136,15 @@ chronological order.
 	  internal values in the scrollbar have been floats for some time and
 	  the GetProperty() call has always presumed it was filling in a 
 	  float * .
+	- Rhad added some "experimental" UI to partedit.  Rather than adding a
+	  scrollbar for each element, there is currently one scroll bar in a 
+	  separate window.  Any text box containing a float or int value that
+	  gains focus will be controlled by the global scroll bar (and extra
+	  text box) until another float or int textbox component gains is
+	  selected.  This allows you to adjust a single value with minimal
+	  interface clogging up the screen.  The ranges still need work
+	  and the handling of value changing for emitters needs to be smoothed
+	  out so the system doesnt reset with every change if possible.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

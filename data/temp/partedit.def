@@ -438,6 +438,53 @@ window "EmitterState"
 }
 
 
+window "FreeScroll"
+{
+	Frame: (151,0) - (311,80)
+	Style: wfsNormal
+	Options: wfoTitle
+	Title: "Scroll Pad"
+	
+    connect
+    {
+      signalComponentCreated -> parteditSink::RegisterFSWindow
+    }
+	
+	component "FSLabel" is "Label"
+	{
+		Frame: (2,2) - (158,14)
+		Caption: ""
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSLabel
+		}
+	}
+	
+	component "FSTextBox" is "Text Box"
+	{
+		Frame: (2,16) - (158,28)
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSTextBox
+			signalTextBoxLostFocus -> parteditSink::SetFSTextBox
+		}
+	}
+	
+	component "FSScrollBar" is "Scroll Bar"
+	{
+		Frame: (2,30) - (158,45)
+		Orientation: sboHorizontal
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSScrollBar
+			signalScrollBarChanged -> parteditSink::SetFSScrollBar
+		}
+	}
+
+}
+
 
 window "InitialPosition"
 {

@@ -135,6 +135,22 @@ void PartEdit::SetupFrame ()
     if (s->EmitterStateChanged())
     {
       estate=s->GetEmitterState();
+      // Sanity checking to avoid some crashes
+      if (estate->particle_count<0)
+      {
+        estate->particle_count=0;
+        s->UpdateEmitterStateDisplay();
+      }
+      if (estate->reg_number<0)
+      {
+        estate->reg_number=0;
+        s->UpdateEmitterStateDisplay();
+      }
+      if (estate->particle_max_age<0)
+      {
+        estate->particle_max_age=0;
+        s->UpdateEmitterStateDisplay();
+      }
       memcpy(&state_emitter,estate,sizeof(EmitterState));
       s->ClearEmitterStateChanged();
       update=true;
@@ -244,6 +260,8 @@ bool PartEdit::EventHandler (iEvent& ev)
 
 csRef<iEmitGen3D> PartEdit::CreateGen3D(Emitter3DState *emitter_state)
 {
+  csRef<iEmitGen3D> rval;
+
   // We start out with no clear emitter to use
   Emitters use_emitter=EMITTER_NONE;
 
@@ -293,25 +311,25 @@ csRef<iEmitGen3D> PartEdit::CreateGen3D(Emitter3DState *emitter_state)
   switch (use_emitter)
   {
     case EMITTER_LINE:
-	 return e_lptr;
+      rval=e_lptr;
      break;
     case EMITTER_BOX:
-	 return e_bptr;
+      rval=e_bptr;
      break;
     case EMITTER_CYLINDER:
-	 return e_cyptr;
+      rval=e_cyptr;
      break;
     case EMITTER_CONE:
-     return e_coptr;
+     rval=e_coptr;
      break;
     case EMITTER_SPHERE:
-     return e_sptr;
+     rval=e_sptr;
      break;
     case EMITTER_SPHERETANGENT:
-     return e_stptr;
+     rval=e_stptr;
      break;
     case EMITTER_CYLINDERTANGENT:
-     return e_cytptr;
+     rval=e_cytptr;
      break;
     case EMITTER_MIX:
       {
@@ -332,17 +350,16 @@ csRef<iEmitGen3D> PartEdit::CreateGen3D(Emitter3DState *emitter_state)
           e_mptr->AddEmitter(emitter_state->spheretangent_weight,e_stptr);
         if (emitter_state->cylindertangent_weight>0)
           e_mptr->AddEmitter(emitter_state->cylindertangent_weight,e_cytptr);
-        return e_mptr;
+        rval=e_mptr;
       }
      break;
     case EMITTER_POINT:
     default:
-     return e_pptr;
+     rval=e_pptr;
      break;
   }
 
-  // Unreachable
-  return e_pptr;
+  return rval;
 }
 
 
@@ -686,6 +703,8 @@ bool PartEdit::Initialize ()
   iAwsWindow *iawswindow_Attractor = aws->CreateWindowFrom("Attractor");
   if (iawswindow_Attractor) iawswindow_Attractor->Hide();
 
+  iAwsWindow *iawswindow_FreeScroll = aws->CreateWindowFrom("FreeScroll");
+  if (iawswindow_FreeScroll) iawswindow_FreeScroll->Show();
 
 
   s->SetGraphicCWD("/lib/std/");
