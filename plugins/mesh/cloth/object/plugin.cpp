@@ -22,6 +22,7 @@
 #include "qsqrt.h"
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
+#include "csutil/virtclk.h"
 #include "iengine/rview.h"
 #include "iengine/movable.h"
 #include "ivideo/graph3d.h"
@@ -125,7 +126,7 @@ void csStuffObject::SetupMesh()
 	
 	float xindex=0.0;
 	float yindex=0.0;
-	time=0.0;
+	time=0;
 	int i;
 	int j;
 	int k;
@@ -233,6 +234,7 @@ printf("creator \n");
 factory = fact;
 vbuf=NULL;
 vbufmgr=NULL;
+
 SCF_CONSTRUCT_IBASE(fact);
 SCF_CONSTRUCT_EMBEDDED_IBASE(scfiVertexBufferManagerClient);
 SCF_CONSTRUCT_EMBEDDED_IBASE(scfiObjectModel);
@@ -339,9 +341,24 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
  };
  void csStuffObject::SetVisibleCallback(iMeshObjectDrawCallback *cb) { vis_cb=cb; };
  iMeshObjectDrawCallback* csStuffObject::GetVisibleCallback () const { return vis_cb; };
- void csStuffObject::NextFrame (unsigned int)
+ void csStuffObject::NextFrame (unsigned int ticks)
  {
-   Integrator->Compute();	 
+	// while(time<ticks) 
+	 //{
+	 if ( time!=0 ) 
+	 {
+	      while ( ticks>time ) 
+		  {		  
+	      Integrator->Compute();
+		  time+=5;
+		  };	 	 
+	 } else
+    {
+	time=ticks;  	
+	};	 
+		 //time++;
+	   //printf(" %u %u \n",time,ticks);
+	 //};
    //UpdateMesh();
  };
  bool csStuffObject::WantToDie () const { return false; };
