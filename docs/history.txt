@@ -20,6 +20,8 @@ chronological order.
 	  the future (after more testing and devs feedback) the symbol will
 	  be removed and the new source code will be the "default" one. This
 	  change has been tested successfully with OR and NR anyway.
+	- Luca modified the AWS manager so that when the focus belongs to a
+	  hidden component, the keyboard events are not forwarded to it.
 19-Jun-2004
 	- Rhad fixed a typo in the ode and simple physics plugins for particles
 	  that was swapping the green and blue components of constant colors.

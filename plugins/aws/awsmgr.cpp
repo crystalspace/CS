@@ -1143,14 +1143,25 @@ bool awsManager::HandleEvent (iEvent &Event)
 
           if(cmp)
             SetFocusedComponent(cmp);
-
+          
           return true;
         }
         if (cmp) ChangeKeyboardFocus(cmp, Event);
       }
+      
+      //
+      //If the focused component is not visible, dont pass it the event.      
 
-      if (keyb_focus) 
+      //Cycle till the parent of the window the compoennt belongs to.
+      cmp = keyb_focus;
+      while (cmp)
+        if (cmp->Parent ())
+          cmp = cmp->Parent ();
+        else break;
+      //If the component is not visible, do not pass it the keyboard event!
+      if (keyb_focus && !cmp->isHidden ())
         return keyb_focus->HandleEvent (Event);
+        
     }
     break;
 
@@ -1161,7 +1172,7 @@ bool awsManager::HandleEvent (iEvent &Event)
     }
     break;
   }
-
+  
   return false;
 }
 
