@@ -469,6 +469,14 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
   if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
 
   glColor3f (0., 0., 0.);
+#if 0
+  // @@@ Note from Jorrit. I would like to use the code below because
+  // it is considerably faster. However if I use this then the image
+  // is upside down. So we need to change coordinate system or else
+  // use a negative stride so we can go backwards.
+  glRasterPos2i (x, Height-y-h);
+  glDrawPixels (w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
+#else
   int j;
   for (j = y ; j < y+h ; j++)
   {
@@ -476,6 +484,7 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
     glDrawPixels (w, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
     data += 4*orig_w;
   }
+#endif
 
   if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
   if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
