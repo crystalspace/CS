@@ -1693,6 +1693,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_boolean (arg, &Sys->do_freelook, "freelook");
     if (Sys->do_freelook)
       Sys->myG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
+    Sys->myG2D->SetMouseCursor (Sys->do_freelook?csmcNone:csmcArrow);
   }
   else if (!strcasecmp (cmd, "stats"))
   {
