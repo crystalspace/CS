@@ -261,9 +261,10 @@ WORLD (
       )
     )
     MESHOBJ 'emit3' (
+      KEY ("entity_Rotate", "0,10,0,true")
       PLUGIN ('emit')
       ZTEST ()
-      MOVE (V (-10,0,30))
+      MOVE (V (-10,2.0,30))
       PARAMS (
 	FACTORY ('emitFact')
 	MIXMODE (ADD ())
@@ -272,7 +273,7 @@ WORLD (
 	RECTPARTICLES(0.1, 0.1)
 	LIGHTING (off)
 	TOTALTIME (4000)
-	STARTPOS (EMITSPHERE (0,2.0,0,  1.5,2))
+	STARTPOS (EMITSPHERE (0,0,0,  1.5,2))
 	STARTSPEED (EMITFIXED (0,0,0))
 	STARTACCEL (EMITFIXED (0,0,0))
 	;ATTRACTOR ()
