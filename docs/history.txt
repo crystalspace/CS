@@ -7,9 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 8-Nov-2003
-        - Andreas Busch added missing awstut.cfg
+	- Andreas Busch added missing awstut.cfg
 	- Wouter fixed a typo in csfxscr fullscreen header file, and 
-          added a new function that can do a dpfx for part of the screen.
+	  added a new function that can do a dpfx for part of the screen.
 	- res made the following (mostly NR-related) changes:
 	    - Rendermeshes now contain a shader var context.
 	    - Can now support up to 8 texture coordinate sets.
@@ -29,6 +29,8 @@ chronological order.
 	  object was used without localshadows and -relight.
 	- Eric Sunshine added missing SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS()
 	  invocations to render3d/software and render3d/opengl.
+	- Chris Matuszewski changed the AWS component transitions to use
+	  real time clicks instead of virtual ones.
 7-Nov-2003
 	- res reverted the behaviour of setting the alpha of keycolored pixels
 	  of textures in GL: just drop the alpha of KCed pixels to 0, but don't

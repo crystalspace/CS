@@ -44,14 +44,9 @@
 #include "awsMenu.h"
 #include "awsimgvw.h"
 #include "awsmled.h"
-
 #include "aws3dfrm.h"
-
-
-//#include "awscmpt.h"
 #include "awscscr.h"
 #include "awslayot.h"
-
 #include "awsntbk.h"
 #include "awswin.h"
 
@@ -309,7 +304,7 @@ void awsManager::CreateTransition(iAwsComponent *win, unsigned transition_type, 
   int w = G2D()->GetWidth();
   int h = G2D()->GetHeight();
   
-  t->morph=0.0;
+  t->start_time = 0;
   t->morph_duration=duration;
   t->transition_type=transition_type;
   t->win=win;
@@ -371,7 +366,7 @@ void awsManager::CreateTransitionEx(iAwsComponent *win, unsigned transition_type
 
   awsWindowTransition *t = new awsWindowTransition;
   
-  t->morph=0.0;
+  t->start_time = 0;
   t->morph_duration=duration;
   t->transition_type=transition_type;
   t->win=win;
@@ -431,26 +426,41 @@ bool awsManager::PerformTransition(iAwsComponent *win)
 
   float dx, dy;
   csRect interp(t->start);
+  csTicks current_time = csGetTicks();
 
-  if (t->morph==0.0)
+  // check if this is the start of transitioning
+  if (t->start_time == 0)
   {
     t->win->Move(t->start.xmin - t->win->Frame().xmin,
-	         t->start.ymin - t->win->Frame().ymin);
+	    t->start.ymin - t->win->Frame().ymin);
+	    
+	  t->start_time = current_time;
+  }
+  // else calculate the new position and move the window
+  else
+  {
+    dx = t->end.xmin - t->start.xmin;
+    dy = t->end.ymin - t->start.ymin;
+
+    // calculate the morph amount as a percentage
+    csTicks elapsed_time = current_time - t->start_time;
+    float morph_amount = (float)elapsed_time / t->morph_duration;
+    if (morph_amount > 1.0)
+      morph_amount = 1.0;
+
+    // calculate the morph amount in pixels
+    dx *= morph_amount;
+    dy *= morph_amount;
+  
+    interp.Move((int)dx, (int)dy);
+    t->win->Move(interp.xmin - t->win->Frame().xmin,
+  	       interp.ymin - t->win->Frame().ymin);
+  
+    t->win->Invalidate();
   }
 
-  dx=t->end.xmin - t->start.xmin;
-  dy=t->end.ymin - t->start.ymin;
-
-  dx*=t->morph;
-  dy*=t->morph;
-
-  interp.Move((int)dx, (int)dy);
-  t->win->Move(interp.xmin - t->win->Frame().xmin,
-	       interp.ymin - t->win->Frame().ymin);
-
-  t->win->Invalidate();
-
-  if (t->morph==1.0)
+  // check if we are finished with the transition
+  if (current_time - t->start_time >= t->morph_duration)
   {
     switch(t->transition_type)
     {
@@ -459,6 +469,7 @@ bool awsManager::PerformTransition(iAwsComponent *win)
     case AWS_TRANSITION_SLIDE_IN_UP:
     case AWS_TRANSITION_SLIDE_IN_DOWN:
     default:
+      // do nothing for these transition types
       break;
 
     case AWS_TRANSITION_SLIDE_OUT_LEFT:    
@@ -470,7 +481,7 @@ bool awsManager::PerformTransition(iAwsComponent *win)
 
       // Fix frame back to start
       t->win->Move(t->start.xmin-t->win->Frame().xmin,
-	           t->start.ymin-t->win->Frame().ymin);
+        t->start.ymin-t->win->Frame().ymin);
       
       break;
     }
@@ -479,17 +490,6 @@ bool awsManager::PerformTransition(iAwsComponent *win)
     delete t;
 
     return false;
-  }
-  else
-  {
-    // Get the elapsed time and calculate the transition progress
-    csTicks elapsed_time;
-    csRef<iVirtualClock> vc (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
-    elapsed_time = vc->GetElapsedTicks ();
-  
-    t->morph += ((float)elapsed_time / t->morph_duration);
-    if (t->morph>1.0)
-      t->morph=1.0;
   }
 
   return true;
@@ -1426,4 +1426,3 @@ unsigned int awsManager::GetFlags ()
 {
   return flags;
 }
-

@@ -52,10 +52,10 @@ struct awsWindowTransition
   /// The rect we end with
   csRect end;
 
-  /// Where we are
-  float morph;
+  /// The time when this transition began
+  csTicks start_time;
 
-  /// The size of steps to take
+  /// How long the transition is to take
   csTicks morph_duration;
 
   /// The window we're dealing with
