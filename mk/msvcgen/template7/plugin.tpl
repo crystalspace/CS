@@ -114,8 +114,8 @@ copy $(TargetPath)  csrelease\bin
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="TRUE"
-				AdditionalOptions="%libs%"
-				AdditionalDependencies="%lflags%"
+				AdditionalOptions="%lflags%"
+				AdditionalDependencies="%libs%"
 				OutputFile="csdebug\temp\%project%\%target%"
 				Version="1.0"
 				LinkIncremental="2"
