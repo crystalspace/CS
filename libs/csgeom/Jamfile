@@ -5,4 +5,5 @@ Library csgeom
 ;
 
 Help csgeom : "Crystal Space geometry library" ;
+LibDepends csgeom : csutil cssys ;
 

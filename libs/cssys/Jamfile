@@ -28,5 +28,6 @@ Library cssys :
 ;
 CFlags cssys : -DCS_CONFIGDIR='\"$(SYSCONFDIR)\"' -DCS_PLUGINDIR='\"$(PLUGINDIR)\"' ;
 
+LibDepends cssys : csutil ;
 Help cssys : "Crystal Space system library" ;
 

@@ -5,6 +5,7 @@ Library csutil
 ;
 
 Help csutil : "Crystal Space utility library" ;
+LibDepends csutil : cssys ;
 
 # don't install scf.cfg this is deprecated now
 InstallConfig mouse.cfg ;

@@ -32,7 +32,6 @@ include $(mkdir)/library.jam ;
 include $(mkdir)/static.jam ;
 include $(mkdir)/application.jam ;
 include $(mkdir)/plugin.jam ;
-include $(mkdir)/deps.jam ;
 include $(mkdir)/docs.jam ;
 
 include $(mkdir)/options.jam ;
