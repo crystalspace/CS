@@ -42,6 +42,8 @@ SRC.ISO = $(wildcard $(DIR.ISO)/*.cpp)
 OBJ.ISO = $(addprefix $(OUT.ISO)/,$(notdir $(SRC.ISO:.cpp=$O)))
 DEP.ISO = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
 
+OUTDIRS += $(OUT.ISO)
+
 MSVC.DSP += ISO
 DSP.ISO.NAME = iso
 DSP.ISO.TYPE = plugin
@@ -52,9 +54,9 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: iso isoclean isocleandep
 
-iso: $(OUTDLL) $(OUT.ISO) $(ISO)
+iso: $(OUTDIRS) $(ISO)
 
-$(OUT.ISO)/%$O: $(DIR.ISO)/%.cpp $(OUT.ISO)
+$(OUT.ISO)/%$O: $(DIR.ISO)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(ISO): $(OBJ.ISO) $(LIB.ISO)

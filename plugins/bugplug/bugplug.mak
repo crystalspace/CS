@@ -48,6 +48,8 @@ OBJ.BUGPLUG = $(addprefix $(OUT.BUGPLUG)/,$(notdir $(SRC.BUGPLUG:.cpp=$O)))
 DEP.BUGPLUG = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 CFG.BUGPLUG = data/config/bugplug.cfg
 
+OUTDIRS += $(OUT.BUGPLUG)
+
 TO_INSTALL.CONFIG += $(CFG.BUGPLUG)
 
 MSVC.DSP += BUGPLUG
@@ -61,9 +63,9 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: bugplug bugplugclean bugplugcleandep
 
-bugplug: $(OUTDLL) $(OUT.BUGPLUG) $(BUGPLUG)
+bugplug: $(OUTDIRS) $(BUGPLUG)
 
-$(OUT.BUGPLUG)/%$O: $(DIR.BUGPLUG)/%.cpp $(OUT.BUGPLUG)
+$(OUT.BUGPLUG)/%$O: $(DIR.BUGPLUG)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(BUGPLUG): $(OBJ.BUGPLUG) $(LIB.BUGPLUG)

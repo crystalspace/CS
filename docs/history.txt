@@ -1,17 +1,23 @@
 The history order is reversed so that new features are at the top.
 
 27-Mar-2003
-	- Several fixes to make CS compile again, at least on mingw.
-	- Andrew Craig made some more fixes to make CS compile again under windows.
+	- Several fixes to make CS compile again, at least on Mingw.
+	- Andrew Craig made some more fixes to make CS compile again under
+	  windows.
+	- Eric Sunshine fixed problem with 10-Mar-2003 patch to bugplug.mak and
+	  iso.mak which allowed them to create their output directories in a
+	  timely fashion when USE_PLUGINS=no.  Problem with that patch is that
+	  it caused all object files to be rebuilt each time "make bugplug" or
+	  "make iso" was invoked.  New solution augments $(OUTDIRS) to achieve
+	  proper behavior.
 26-Mar-2003
 	- Fixed a bug with the new OpenPortal() implementation in OpenGL
-	  renderer. It was not setting/restoring the stencil in all
-	  cases.
+	  renderer.  It was not setting/restoring the stencil in all cases.
 	- Fixed flarge so that the door now uses zuse. This is now possible
 	  due to the fix above.
-	- Matze fixed csgfx which was making the wrong assumption that
-	  uint32 is always unsigned long.
-	- Matze changed definition from uint32 and int32 from long to int
+	- Matze fixed csgfx which was making the wrong assumption that uint32
+	  is always unsigned long.
+	- Matze changed definition from uint32 and int32 from long to int.
 25-Mar-2003
 	- Changed API of OpenPortal() to accept a G3DPolygonDFP instead
 	  of a 2D polygon. I need z-information.
