@@ -21,7 +21,7 @@ rule Library
   _Options $(<) : $(3) ;
     
   # filter headers
-  local sources  = [ FGristFiles $(>) ] ;
+  local sources  = [ DoSourceGrist $(>) ] ;
 
   $(<)_type = library ;
   $(<)_target = [ FAppendSuffix lib$(<) : $(SUFLIB) ] ;
@@ -58,13 +58,16 @@ rule csLibraryFromObjects
   }
 
   # library depends on its member objects
-  if $(KEEPOBJS)
+  if ! $($(<)_INDEPENDANT)
   {
-    Depends obj : $(>) ;
-  }
-  else
-  {
-    Depends libs : $(target) ;
+    if $(KEEPOBJS)
+    {
+      Depends obj : $(>) ;
+    }
+    else
+    {
+      Depends libs : $(target) ;
+    }
   }
 
   # Set LOCATE for the library and its contents.  The bound
@@ -181,6 +184,11 @@ rule Option_shared
 }
 rule Option_static
 {
+}
+
+rule Option_independant
+{
+  $(<)_INDEPENDANT = yes ;
 }
 
 actions together Ranlib

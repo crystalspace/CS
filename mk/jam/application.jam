@@ -22,14 +22,7 @@ rule Application
   # check options
   _Options $(<) : $(3) ;
     
-  # filter headers
-  local sources = [ FGristFiles $(>) ] ;
-
-  if $(USE_PLUGINS) = "no"
-  {
-    BuildStaticFile ;
-    sources += $(STATICINITFILE:S=.o) ;
-  }
+  local sources = [ DoSourceGrist $(>) ] ;
 
   # Allow overriding of application suffix for gui/console (if defined).
   local suffix = $(SUFEXE) ;
@@ -55,12 +48,37 @@ rule Application
   ApplicationFromObjects $(<) : $($(<)_objects) ;
   CFlags $(<) : $(APPLICATION.CFLAGS) ;
   LFlags $(<) : $(LINKLIBS) $(APPLICATION.LFLAGS) ;
+}
 
-  if $(USE_PLUGINS) = "no"
+##  LinkStaticPlugins target : plugins
+rule LinkStaticPlugins
+{
+  LinkWith $(<) : $(>)_static ;
+  local staticfile = [ DoObjectGrist _registerstatic.cpp ] ;
+  local staticobject = [ CompileObject $(staticfile) ] ;
+  Depends $(<)_target : $(staticobject) ;
+
+  # construct flags
+  local deplibs i ;
+  for i in $(>)
   {
-    LinkWith $(<) : $(STATIC.PLUGINS) $(STATIC.LINKWITH) ;
-    LFlags $(<) : $(LFLAGS.STATIC) ;
+    deplibs += $($(i)_static.NEEDLIBS) ;
+    LFlags $(<) : $($(i)_static.LFLAGS) ;
   }
+  deplibs = [ CreateLibList $(deplibs) ] ;
+  Depends $($(<)_target) : $(deplibs) ;
+  NEEDLIBS on $($(<)_target) += $(deplibs) ;
+
+  # construct initialisation sourcefile
+  local staticobject = [ BuildStaticFile $(>) ] ;
+  ExtraObjects $(<) : $(staticobject) ;
+}
+
+rule ExtraObjects
+{
+  Depends $($(<)_target) : $(>) ;
+  EXTRAOBJECTS on $($(<)_target) += $(>) ;
+  Clean $(<)clean : $(>) ;
 }
 
 #----------------------------------------------------------------------------
@@ -85,7 +103,10 @@ rule ApplicationFromObjects
   }
 
   # make compiled sources a dependency of target
-  Depends apps : $(target) ;
+  if ! $($(<)_INDEPENDANT)
+  {
+    Depends apps : $(target) ;
+  }
   Depends $(target) : $(>) ;
 	
   MakeLocate $(target) : $(LOCATE.TARGETS) ;

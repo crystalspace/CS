@@ -7,7 +7,7 @@ if $(CMD.CC)
 
 rule CcRule
 {
-    local object = $(<:S=$(SUFOBJ)) ;
+    local object = [ DoObjectGrist $(<:S=$(SUFOBJ)) ] ;
     Cc $(object) : $(<) ;
     return $(object) ;
 }
@@ -27,14 +27,14 @@ actions Cc
 {
     $(CMD.CC) -c -o $(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
 }
-}
+} # end if $(CMD.CC)
 
 if $(CMD.C++)
 {
 
 rule C++Rule
 {
-    local object = $(<:S=$(SUFOBJ)) ;
+    local object = [ DoObjectGrist $(<:S=$(SUFOBJ)) ] ;
     C++ $(object) : $(<) ;
     return $(object) ;
 }
@@ -54,4 +54,5 @@ actions C++
 {
     $(CMD.C++) -c -o $(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
 }
-}
+} # end if $(CMD:C++)
+

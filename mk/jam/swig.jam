@@ -23,7 +23,7 @@ if $(CMD.SWIG)
 
   rule SimpleSwig
   {
-    local object = $(<:S=$(SUFOBJ)) ;
+    local object = [ DoObjectGrist $(<:S=$(SUFOBJ)) ] ;
     local cppfile = $(<:S=.cpp) ;
     
     C++ $(object) : $(cppfile) ;

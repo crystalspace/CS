@@ -38,7 +38,7 @@ mkdir = $(TOP)/mk/jam ;
 
 include $(mkdir)/subdir.jam ;
 
-include $(mkdir)/modus.jam ;
+include $(mkdir)/variant.jam ;
 include $(mkdir)/resource.jam ;
 
 include $(mkdir)/helper.jam ;

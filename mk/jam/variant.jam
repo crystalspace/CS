@@ -1,0 +1,63 @@
+#============================================================================
+# Setup of compiler/linker flags for debug/optimize mode
+#============================================================================
+
+if ! $(VARIANT)
+{
+  VARIANT = $(MODE) ;
+}
+
+if $(VARIANT) != "debug" && $(VARIANT) != "optimize" && $(VARIANT) != "profile"
+{
+  exit "Invalid modus set, please set VARIANT to debug, profile or optimize" ;
+}
+
+if $(USE_PLUGINS) = no
+{
+  exit "USE_PLUGINS is deprecated in jam. Just invoke the static targets direct (walktest_static)" ;
+}
+
+# Set modus related flags
+CCFLAGS += $(COMPILER.CFLAGS.$(VARIANT)) ;
+C++FLAGS += $(COMPILER.CFLAGS.$(VARIANT)) $(COMPILER.C++FLAGS.$(VARIANT)) ;
+LINKLIBS += $(COMPILER.LFLAGS) $(COMPILER.LFLAGS.$(VARIANT)) ;
+LOCATE.OBJECTS = $(LOCATE.OBJECTS)/$(VARIANT) ;
+
+# Configuration for debug/optimized mode
+if $(VARIANT) = "debug"
+{
+  CCFLAGS += -DCS_DEBUG ;
+  C++FLAGS += -DCS_DEBUG ;
+}
+
+if $(VARIANT) = "profile"
+{
+  CCFLAGS += -g3 -pg ;
+  C++FLAGS += -g3 -pg ;
+  LINKLIBS += -g3 -pg ;
+}
+
+##  SubVariant variantname
+##    Specify subvarianet which are placed in separate compilation directories.
+rule SubVariant
+{
+  SUBVARIANT = $(<) ;
+  if ! $(<)
+  {
+    SUBVARIANT = "" ;
+    if $(SAVED_LOCATE_TARGET)
+    {
+      LOCATE_TARGET = $(SAVED_LOCATE_TARGET) ;
+    }
+    SAVED_LOCATE_TARGET = ;
+  }
+  else
+  {
+    if ! $(SAVED_LOCATE_TARGET)
+    {
+      SAVED_LOCATE_TARGET = $(LOCATE_TARGET) ;
+    }
+    LOCATE_TARGET = $(LOCATE_TARGET)/$(SUBVARIANT) ;
+  }
+}
+

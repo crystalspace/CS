@@ -5,6 +5,18 @@ Application walktest
 ;
 LinkWith walktest : csengine csgeom csgfx cssys cstool csutil ;
 
+SubVariant static ;
+Application walktest_static
+	: [ Wildcard *.cpp *.h ]
+	: independant
+;
+LinkWith walktest_static : csengine csgeom csgfx cssys cstool csutil ;
+LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;
+# this is needed because walktest links and registers libcsengine by itself if
+# this flag isn't defined
+CFlags walktest_static : -DCS_STATIC_LINKED ;
+SubVariant ;
+
 Help walktest : "Crystal Space WalkTest demo" ;
 
 Win32Resource walktest : $(TOP)/libs/cssys/win32/rsrc/cs1.rc ;

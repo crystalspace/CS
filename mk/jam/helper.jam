@@ -133,3 +133,13 @@ rule Filter
 
   return $(result) ;
 }
+
+##  GetVar argument
+##    Simply returns the value of the variable with name argument.
+##    This is usefull to query on target variables:
+##       bla = [ on TARGET Ident CFlags ] ;
+rule GetVar
+{
+  return $($(<)) ;
+}
+

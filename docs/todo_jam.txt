@@ -4,6 +4,7 @@ H - High Prioriy (important showstopper)
 M - Medium Priority
 L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
+* - Done
 
 [M] We should try to get dependencies for system headers as well. Sometimes
     people update their system packages too (apt-get, ...) and this might
@@ -21,7 +22,7 @@ W - Wishlist (the build also works without this feature)
 [L] MacOSX rules should be aware of the struture of an application wrapper
     instead of using external shell scripts for generating them. Probably we
     also want some rules to add additional stuff into the application wrappers.
-[L] rework static plugin linking: This should not be a mode, and the
+[*] rework static plugin linking: This should not be a mode, and the
     intelligence should not be globally put into the Application and Plugin
     rules. Rather the Plugin rules should create a 2nd target where they
     compile into a static library instead of a dynamic plugin. For linking

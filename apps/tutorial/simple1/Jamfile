@@ -5,5 +5,17 @@ Application simple1
 ;
 LinkWith simple1 : csgeom csgfx cssys cstool csutil ;
 
+SubVariant static ;
+Application simple1_static
+	: [ Wildcard *.cpp *.h ]
+	: independant
+;
+LinkWith simple1_static : csgeom csgfx cssys cstool csutil ;
+LinkStaticPlugins simple1_static : $(STATIC.PLUGINLIST) ;
+# this is needed because walktest links and registers libcsengine by itself if
+# this flag isn't defined
+CFlags simple1_static : -DCS_STATIC_LINKED ;
+SubVariant ;
+
 Help simple1 : "Crystal Space tutorial part one" ;
 

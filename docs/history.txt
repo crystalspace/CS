@@ -24,6 +24,11 @@ The history order is reversed so that new features are at the top.
 	  possible NULL pointer accesses in glcommon.
 	- Matze added possibility to specify msvc version for the msvcgen.sh
 	  script shich is used to regenerate msvc-projectfiles on jam.
+	- Matze reworked static linking with jam. This stuff is not tied into
+	  the Application and plugin rules anymore. Now jam constructs an
+	  extra library target for each plugin and has some helper rules so
+	  that you can easily construct your static builds yourself. But there
+	  isn't a global static mode anymore in jam.
 21-May-2003
 	- Jorrit fixed the new csString::SubString() so that it is more
 	  efficient (no longer returns a new csString) and also documented

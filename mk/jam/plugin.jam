@@ -15,32 +15,30 @@
 ##    mention the subdirectory name again for the sourcefiles.
 rule Plugin
 {
-  if $(USE_PLUGINS) = "no"
-  {
-    Library $(<) : $(>) : $(3) ;
-    $(<)_type = plugin ;
-    RegisterStaticPlugin $(<) ;
-  }
-  else
-  {
-    # process options
-    _Options $(<) : $(3) ;
-      
-    # filter headers
-    local sources  = [ FGristFiles $(>) ] ;
+  # process options
+  _Options $(<) : $(3) ;
 
-    # rules for compiling the source files
-    $(<)_type = plugin ;
-    $(<)_target = [ FAppendSuffix $(<) : $(SUFPLUGIN) ] ;
-    $(<)_objects = [ CompileObjects $(sources) ] ;
-    CFlags $(<) : $(PLUGIN.CFLAGS) ;
-    # XXX: not sure why we have to mention LINKLIBS again, somehow the +=
-    # operator doesn't use the LINKLIBS var, while it seems doing so for
-    # CFLAGS ?!?
-    LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
-    
-    PluginFromObjects $(<) : $($(<)_objects) ;
-  }
+  # filter headers
+  local sources  = [ DoSourceGrist $(>) ] ;
+
+  # rules for compiling the source files
+  $(<)_type = plugin ;
+  $(<)_target = [ FAppendSuffix $(<) : $(SUFPLUGIN) ] ;
+  $(<)_objects = [ CompileObjects $(sources) ] ;
+  CFlags $(<) : $(PLUGIN.CFLAGS) ;
+  # XXX: not sure why we have to mention LINKLIBS again, somehow the +=
+  # operator doesn't use the LINKLIBS var, while it seems doing so for
+  # CFLAGS ?!?
+  LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
+
+  PluginFromObjects $(<) : $($(<)_objects) ;
+
+  # Create a target for eventual static linking
+  SubVariant static ;
+  Library $(<)_static : $(>) : $(3) independant ;
+  CFlags $(<)_static : -DCS_STATIC_LINKED ;
+  LFlags $(<)_static : $(LINKLIBS) ;
+  SubVariant ;
 }
 
 #----------------------------------------------------------------------------
@@ -59,7 +57,10 @@ rule PluginFromObjects
     NotFile $(<) ;
   }
 
-  Depends plugins : $(target) ;   
+  if ! $($(<)_INDEPENDANT)
+  {
+    Depends plugins : $(target) ;
+  }
   Depends $(target) : $(>) ;
 
   MakeLocate $(target) : $(LOCATE.TARGETS) ;
@@ -78,7 +79,6 @@ rule PluginFromObjects
   NAME on $(target) = $(<) ;
   LinkPlugin $(target) : $(>) ;
 }
-
 
 # Construct pseudo target plugins
 Depends exe : plugins ;

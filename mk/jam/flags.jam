@@ -13,10 +13,9 @@ rule LinkWith
   DEPENDS $($(<)_target) : $(deplibs) ;
   NEEDLIBS on $($(<)_target) += $(deplibs) ;
 
-  if $(USE_PLUGINS) = no && $($(<)_type) = plugin
-      && [ IsElem $(<) : $(STATIC.PLUGINLIST) ]
+  if $($(<)_type) = plugin
   {
-      STATIC.LINKWITH = [ _CreateLibList $(STATIC.LINKWITH) $(>) ] ;
+    $(<)_static.NEEDLIBS += $(>) ;
   }
 }
 
@@ -27,6 +26,11 @@ rule CFlags
 {
   CCFLAGS on $($(<)_objects) += $(>) ;
   C++FLAGS on $($(<)_objects) += $(>) ;
+
+  if $($(<)_type) = plugin
+  {
+    CFlags $(<)_static : $(>) ;
+  }
 }
 
 ##  LFlags target : flags
@@ -48,14 +52,10 @@ rule ExternalLibs
   {
     CFlags $(<) : $($(i).CFLAGS) ;
     LFlags $(<) : $($(i).LFLAGS) ;
-  }
 
-  if $(USE_PLUGINS) = no && $($(<)_type) = plugin 
-     && [ IsElem $(<) : $(STATIC.PLUGINLIST) ]
-  {
-    for i in $(>)
+    if $($(<)_type) = plugin
     {
-      LFLAGS.STATIC += $($(i).LFLAGS) ;
+      $(<)_static.LFLAGS += $($(i).LFLAGS) ;
     }
   }
 }

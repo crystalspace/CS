@@ -170,8 +170,8 @@ rule WrapFile
 ## LinkApplication exe : objects
 actions AppExe bind NEEDLIBS
 {
-  $(MACOSX.ENVIRON)
-  $(CMD.LINK) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+  $(MACOSX_ENVIRON)
+  $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
 ## AppPkgInfo file
