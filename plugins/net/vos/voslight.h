@@ -38,8 +38,10 @@ protected:
   csRef<iSector> sector;
   csRef<iLight> light;
 
-  bool alreadyLoaded; // light already created & listening to property updates
-  bool isStatic;  // True if this is a static light. Updates to subproperties will have no effect.
+  // light already created & listening to property updates
+  bool alreadyLoaded;
+  // True if a static light. Updates to subproperties will have no effect.
+  bool isStatic;
 public:
   csMetaLight(VOS::VobjectBase* superobject);
   virtual ~csMetaLight();
@@ -49,7 +51,8 @@ public:
   virtual void notifyPropertyChange(const VOS::PropertyEvent& event);
   virtual void doExcise();
 
-  static VOS::MetaObject* new_csMetaLight(VOS::VobjectBase* superobject, const std::string& type);
+  static VOS::MetaObject* new_csMetaLight(VOS::VobjectBase* superobject,
+  	const std::string& type);
 
   friend class ConstructLightTask;
 };

@@ -51,7 +51,8 @@ public:
   csRef<iSector> sector;
 
   ConstructModelTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
-                     vRef<Property> p, csMetaModel* m, std::string n, iSector *s);
+                     vRef<Property> p, csMetaModel* m, std::string n,
+		     iSector *s);
   virtual ~ConstructModelTask();
   virtual void doTask();
 };
@@ -59,7 +60,8 @@ public:
 ConstructModelTask::ConstructModelTask (iObjectRegistry *objreg,
                       vRef<csMetaMaterial> mat, vRef<Property> p,
                       csMetaModel* m, std::string n, iSector *s)
-  : object_reg(objreg), metamat(mat), property(p), model(m, true), name(n), sector(s)
+  : object_reg(objreg), metamat(mat), property(p), model(m, true),
+    name(n), sector(s)
 {
 }
 
@@ -134,7 +136,8 @@ void ConstructModelTask::doTask()
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   // Get the model converter and cross builder
-  csRef<iModelConverter> modconv = CS_QUERY_REGISTRY (object_reg, iModelConverter);
+  csRef<iModelConverter> modconv = CS_QUERY_REGISTRY (object_reg,
+  	iModelConverter);
   csRef<iCrossBuilder> xbuild = CS_QUERY_REGISTRY (object_reg, iCrossBuilder);
 
   // Check they were loaded
@@ -142,11 +145,12 @@ void ConstructModelTask::doTask()
   {
     LOG ("ConstructModelTask", 2, "Need model converter and cross builder, " <<
          "ignoring model (" << name << ")");
-  return;
+    return;
   }
 
   LOG ("ConstructModelTask", 2, "Loading into model converter");
-  csRef<iModelData> data = modconv->Load (databuf->GetUint8(), databuf->GetSize());
+  csRef<iModelData> data = modconv->Load (databuf->GetUint8(),
+  	databuf->GetSize());
   if (!data)
   {
     LOG ("ConstructModelTask", 2, "Could not load model using converter");
@@ -184,7 +188,8 @@ csMetaModel::csMetaModel(VobjectBase* superobject)
 {
 }
 
-MetaObject* csMetaModel::new_csMetaModel(VobjectBase* superobject, const std::string& type)
+MetaObject* csMetaModel::new_csMetaModel(VobjectBase* superobject,
+	const std::string& type)
 {
   return new csMetaModel(superobject);
 }

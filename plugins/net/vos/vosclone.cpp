@@ -47,7 +47,8 @@ public:
 };
 
 ConstructCloneTask::ConstructCloneTask(iObjectRegistry *objreg, 
-		  vRef<csMetaObject3D> obj, csMetaClone *c, std::string n, iSector *s)
+		  vRef<csMetaObject3D> obj, csMetaClone *c, std::string n,
+		  iSector *s)
   : object_reg(objreg), templ(obj), clone(c, true), name(n), sector(s)
 {
 }
@@ -76,7 +77,8 @@ csMetaClone::csMetaClone(VobjectBase* superobject)
 {
 }
 
-MetaObject* csMetaClone::new_csMetaClone(VobjectBase* superobject, const std::string& type)
+MetaObject* csMetaClone::new_csMetaClone(VobjectBase* superobject,
+	const std::string& type)
 {
   return new csMetaClone(superobject);
 }

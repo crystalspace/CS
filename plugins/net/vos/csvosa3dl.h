@@ -35,7 +35,8 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 
-class csVosA3DL : public iComponent, public iEventHandler, public iVosA3DL, public iVosApi
+class csVosA3DL : public iComponent, public iEventHandler,
+	public iVosA3DL, public iVosApi
 {
 private:
   csRef<iEventQueue> eventq;
@@ -55,9 +56,9 @@ public:
   virtual bool HandleEvent (iEvent &ev);
 
   csRef<iObjectRegistry> GetObjectRegistry()
-    {
-      return objreg;
-    }
+  {
+    return objreg;
+  }
 
   virtual VOS::vRef<VOS::Vobject> GetVobject();
 };

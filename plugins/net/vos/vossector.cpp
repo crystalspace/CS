@@ -111,31 +111,33 @@ void LoadSectorTask::doTask()
 {
   LOG("csVosSector", 2, "Starting task");
 
-  vRef<A3DL::Sector> sec = meta_cast<A3DL::Sector>(Vobject::findObjectFromRoot(url));
+  vRef<A3DL::Sector> sec = meta_cast<A3DL::Sector>(
+  	Vobject::findObjectFromRoot(url));
   sector->sectorvobj = sec;
 
   LOG("csVosSector", 2, "Iterating");
   for (ChildListIterator ci = sec->getChildren(); ci.hasMore(); ci++)
   {
-  LOG("csVosSector", 2, "Foo");
+    LOG("csVosSector", 2, "Foo");
     vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>((*ci)->getChild());
-    std::cout << "looking at " << (*ci)->getChild()->getURLstr() << " " << obj3d.isValid() << std::endl;
+    std::cout << "looking at " << (*ci)->getChild()->getURLstr()
+    	<< " " << obj3d.isValid() << std::endl;
 
     if(obj3d.isValid())
     {
       try
       {
-    csRef<iMeshWrapper> wrapper = obj3d->GetCSinterface()->GetMeshWrapper();
+	csRef<iMeshWrapper> wrapper = obj3d->GetCSinterface()->GetMeshWrapper();
         if (wrapper)
         {
-      if (wrapper->GetMovable()->GetSectors()->GetCount() == 0)
-      {
+	  if (wrapper->GetMovable()->GetSectors()->GetCount() == 0)
+	  {
             LOG("LoadSectorTask", 3, "Object already setup, setting sector");
             wrapper->GetMovable()->GetSectors()->Add(sector->GetSector());
-        wrapper->GetMovable()->UpdateMove();
-      }
-      else LOG("LoadSectorTask", 3, "Object already setup and in sector");
-        }
+	    wrapper->GetMovable()->UpdateMove();
+	  }
+	  else LOG("LoadSectorTask", 3, "Object already setup and in sector");
+	}
         else
           obj3d->Setup(vosa3dl, (csVosSector*)sector);
       }

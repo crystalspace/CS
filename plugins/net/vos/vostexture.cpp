@@ -35,23 +35,24 @@ using namespace VOS;
 class ConstructTextureTask : public Task
 {
 public:
-    iObjectRegistry *object_reg;
-    std::string texturename;
-    std::string texturedata;
-    std::string cachefilename;
-    vRef<csMetaTexture> metatxt;
+  iObjectRegistry *object_reg;
+  std::string texturename;
+  std::string texturedata;
+  std::string cachefilename;
+  vRef<csMetaTexture> metatxt;
 
-    ConstructTextureTask(iObjectRegistry *objreg, const std::string& name,
+  ConstructTextureTask(iObjectRegistry *objreg, const std::string& name,
                          const std::string& cache, csMetaTexture* mt);
-    virtual ~ConstructTextureTask();
-    virtual void doTask();
+  virtual ~ConstructTextureTask();
+  virtual void doTask();
 };
 
 ConstructTextureTask::ConstructTextureTask(iObjectRegistry *objreg,
                                            const std::string& name,
                                            const std::string& cache,
                                            csMetaTexture* mt)
-    : object_reg(objreg), texturename(name), cachefilename(cache), metatxt(mt, true)
+  : object_reg(objreg), texturename(name), cachefilename(cache),
+    metatxt(mt, true)
 {
 }
 
@@ -61,40 +62,46 @@ ConstructTextureTask::~ConstructTextureTask()
 
 void ConstructTextureTask::doTask()
 {
-    csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-    csRef<iTextureManager> txtmgr = g3d->GetTextureManager();
-    csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-    csRef<iVFS> VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iTextureManager> txtmgr = g3d->GetTextureManager();
+  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  csRef<iVFS> VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
 
-    if(! loader)
-    {
-        LOG("ConstructTextureTask", 1, "Error: Could not get the iLoader plugin from object registry!");
-        return;
-    }
-    if(!txtmgr)
-    {
-        LOG("ConstructTextureTask", 1, "No texture manager");
-        return;
-    }
+  if(! loader)
+  {
+    LOG("ConstructTextureTask", 1,
+	  "Error: Could not get the iLoader plugin from object registry!");
+    return;
+  }
+  if(!txtmgr)
+  {
+    LOG("ConstructTextureTask", 1, "No texture manager");
+    return;
+  }
 
-    if(! VFS->WriteFile (cachefilename.c_str(), texturedata.c_str(), texturedata.size()) )
-    {
-        LOG("ConstructTextureTask", 1, "Error writing " << cachefilename << "!");
-        return;
-    }
+  if(! VFS->WriteFile (cachefilename.c_str(), texturedata.c_str(),
+    	texturedata.size()) )
+  {
+    LOG("ConstructTextureTask", 1, "Error writing "
+		<< cachefilename << "!");
+    return;
+  }
 
-    csRef<iTextureWrapper> texture = loader->LoadTexture (texturename.c_str(), cachefilename.c_str());
+  csRef<iTextureWrapper> texture = loader->LoadTexture (
+    	texturename.c_str(), cachefilename.c_str());
 
-    if(!texture)
-    {
-        LOG("ConstructTextureTask", 1, "Error: could not load texture from cache file \"" << cachefilename << "\"!");
-        return;
-    }
+  if(!texture)
+  {
+    LOG("ConstructTextureTask", 1,
+	  "Error: could not load texture from cache file \""
+	  << cachefilename << "\"!");
+    return;
+  }
 
-    texture->Register (txtmgr);
-    texture->GetTextureHandle()->Prepare ();
+  texture->Register (txtmgr);
+  texture->GetTextureHandle()->Prepare ();
 
-    metatxt->texturewrapper = texture;
+  metatxt->texturewrapper = texture;
 }
 
 csMetaTexture::csMetaTexture(VobjectBase* superobject)
@@ -108,34 +115,33 @@ csMetaTexture::~csMetaTexture()
 
 void csMetaTexture::Setup(csVosA3DL* vosa3dl)
 {
-    if(alreadyLoaded) return;
+  if(alreadyLoaded) return;
 
-    vRef<Property> imagedata = getImage();
-    char cachefilename[256];
-    vRef<Site> site = imagedata->getSite();
-    /*snprintf(cachefilename, sizeof(cachefilename), "/csvosa3dl_cache/%s/%s",
-      site->getURL().getHost().c_str(),
-      imagedata->getSiteName().c_str());*/
-    snprintf(cachefilename, sizeof(cachefilename), "/tmp/%s_%s",
-             site->getURL().getHost().c_str(),
-             imagedata->getSiteName().c_str());
+  vRef<Property> imagedata = getImage();
+  char cachefilename[256];
+  vRef<Site> site = imagedata->getSite();
+  /*snprintf(cachefilename, sizeof(cachefilename), "/csvosa3dl_cache/%s/%s",
+    site->getURL().getHost().c_str(),
+    imagedata->getSiteName().c_str());*/
+  snprintf(cachefilename, sizeof(cachefilename), "/tmp/%s_%s",
+           site->getURL().getHost().c_str(),
+           imagedata->getSiteName().c_str());
 
-    // VFS uses ':' as a seperator
-    for (int i=0; cachefilename[i]; i++)
-    {
-        if ((cachefilename[i] == ':'))
-            cachefilename[i] = '_';
-    }
+  // VFS uses ':' as a seperator
+  for (int i=0; cachefilename[i]; i++)
+  {
+    if ((cachefilename[i] == ':'))
+        cachefilename[i] = '_';
+  }
 
-    ConstructTextureTask* ctt = new ConstructTextureTask(vosa3dl->GetObjectRegistry(),
-                                                         getURLstr(),
-                                                         cachefilename,
-                                                         this);
-    imagedata->read(ctt->texturedata);
-    vosa3dl->mainThreadTasks.push(ctt);
-    alreadyLoaded = true;
+  ConstructTextureTask* ctt = new ConstructTextureTask(
+  	vosa3dl->GetObjectRegistry(), getURLstr(),
+	cachefilename, this);
+  imagedata->read(ctt->texturedata);
+  vosa3dl->mainThreadTasks.push(ctt);
+  alreadyLoaded = true;
 
-    //addChildListener(this);
+  //addChildListener(this);
 
 #if 0    // this code will be replaced by code using the CrystalZilla (iMozilla) plugin for text (and html etc) rendering
     if(p->getDataType() == "text/plain") {
@@ -168,47 +174,48 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
         }
     } else
 #endif
-        }
+}
 
 void csMetaTexture::notifyPropertyChange(const PropertyEvent& event)
 {
-    try
+  try
+  {
+    vRef<ParentChildRelation> pcr = event.getProperty()->findParent(*this);
+    if(pcr->getContextualName() == "a3dl:image")
     {
-        vRef<ParentChildRelation> pcr = event.getProperty()->findParent(*this);
-        if(pcr->getContextualName() == "a3dl:image")
-        {
-            // XXX reload the image and stuff
-        }
+      // XXX reload the image and stuff
     }
-    catch(NoSuchObjectError) { }
-    catch(AccessControlError) { }
-    catch(RemoteError) { }
+  }
+  catch(NoSuchObjectError) { }
+  catch(AccessControlError) { }
+  catch(RemoteError) { }
 }
 
 csRef<iTextureWrapper> csMetaTexture::GetTextureWrapper()
 {
-    return texturewrapper;
+  return texturewrapper;
 }
 
 void csMetaTexture::notifyChildInserted(VobjectEvent& event)
 {
-    vRef<Property> p = meta_cast<Property>(event.getNewChild());
-    if(p.isValid()) p->addPropertyListener(this);
+  vRef<Property> p = meta_cast<Property>(event.getNewChild());
+  if(p.isValid()) p->addPropertyListener(this);
 }
 
 void csMetaTexture::notifyChildReplaced(VobjectEvent& event)
 {
-    notifyChildRemoved(event);
-    notifyChildInserted(event);
+  notifyChildRemoved(event);
+  notifyChildInserted(event);
 }
 
 void csMetaTexture::notifyChildRemoved(VobjectEvent& event)
 {
-    vRef<Property> p = meta_cast<Property>(event.getOldChild());
-    if(p.isValid()) p->removePropertyListener(this);
+  vRef<Property> p = meta_cast<Property>(event.getOldChild());
+  if(p.isValid()) p->removePropertyListener(this);
 }
 
-MetaObject* csMetaTexture::new_csMetaTexture(VobjectBase* superobject, const std::string& type)
+MetaObject* csMetaTexture::new_csMetaTexture(VobjectBase* superobject,
+	const std::string& type)
 {
-    return new csMetaTexture(superobject);
+  return new csMetaTexture(superobject);
 }

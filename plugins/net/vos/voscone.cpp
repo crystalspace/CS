@@ -160,7 +160,8 @@ csMetaCone::csMetaCone(VobjectBase* superobject)
 {
 }
 
-MetaObject* csMetaCone::new_csMetaCone(VobjectBase* superobject, const std::string& type)
+MetaObject* csMetaCone::new_csMetaCone(VobjectBase* superobject,
+	const std::string& type)
 {
   return new csMetaCone(superobject);
 }

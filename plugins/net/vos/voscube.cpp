@@ -93,7 +93,8 @@ csMetaCube::csMetaCube(VobjectBase* superobject)
 {
 }
 
-MetaObject* csMetaCube::new_csMetaCube(VobjectBase* superobject, const std::string& type)
+MetaObject* csMetaCube::new_csMetaCube(VobjectBase* superobject,
+	const std::string& type)
 {
   return new csMetaCube(superobject);
 }
@@ -105,8 +106,9 @@ void csMetaCube::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   LOG("csMetaCube", 3, "getting material " << mat.isValid());
   mat->Setup(vosa3dl);
   LOG("csMetaCube", 3, "setting up cube");
-  vosa3dl->mainThreadTasks.push(new ConstructCubeTask(vosa3dl->GetObjectRegistry(), mat,
-                                                      this, getURLstr(), sect->GetSector()));
+  vosa3dl->mainThreadTasks.push(new ConstructCubeTask(
+  	vosa3dl->GetObjectRegistry(), mat, this, getURLstr(),
+	sect->GetSector()));
 
   LOG("csMetaCube", 3, "calling csMetaObject3D::setup");
   csMetaObject3D::Setup(vosa3dl, sect);

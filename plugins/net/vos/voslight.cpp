@@ -141,8 +141,8 @@ void csMetaLight::Setup(csVosA3DL* vosa3dl, csVosSector* sector)
 {
   if(alreadyLoaded) return;
 
-  ConstructLightTask* clt = new ConstructLightTask(vosa3dl->GetObjectRegistry(),
-                                                   sector->GetSector(), getURLstr(), this);
+  ConstructLightTask* clt = new ConstructLightTask(
+  	vosa3dl->GetObjectRegistry(), sector->GetSector(), getURLstr(), this);
   double x, y, z;
   getPosition(x, y, z);
   clt->pos.Set(x, y, z);

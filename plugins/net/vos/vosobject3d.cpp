@@ -105,7 +105,8 @@ ConstructObject3DTask::~ConstructObject3DTask()
 void ConstructObject3DTask::doTask()
 {
   csRef<iMeshWrapper> mw = obj->GetCSinterface()->GetMeshWrapper();
-  LOG("vosobject3d", 2, "setting position of " << obj->getURLstr() << " to " << pos.x << " " << pos.y << " " << pos.z);
+  LOG("vosobject3d", 2, "setting position of " << obj->getURLstr()
+  	<< " to " << pos.x << " " << pos.y << " " << pos.z);
   if(mw.IsValid())
   {
     csReversibleTransform ht(hardtrans, hardpos);
@@ -303,7 +304,7 @@ void csMetaObject3D::notifyChildReplaced (VobjectEvent &event)
 
     try
     {
-    meta_cast<Property> (event.getNewChild())->addPropertyListener (this);
+      meta_cast<Property> (event.getNewChild())->addPropertyListener (this);
     }
     catch (...)
     {

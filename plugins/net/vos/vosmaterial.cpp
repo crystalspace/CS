@@ -73,7 +73,8 @@ void ConstructMaterialTask::doTask()
 
   csRef<iMaterial> imat;
 
-  if(base.isValid()) {
+  if(base.isValid())
+  {
     csRef<iTextureWrapper> basetw = base->GetTextureWrapper();
 
     if(layers.size() > 0)
@@ -217,7 +218,8 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
       for(int i = 0; txt.hasMore(); txt++, i++)
       {
         vRef<csMetaTexture> mt = meta_cast<csMetaTexture>(*txt);
-        if(mt.isValid()) {
+        if(mt.isValid())
+	{
           mt->Setup(vosa3dl);
           mt->acquire();
           cmt->layers.push_back(&mt);
@@ -233,32 +235,33 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
           cmt->coords[i].vscale = vscale;
           cmt->coords[i].ushift = ushift;
           cmt->coords[i].vshift = vshift;
-          switch(mt->getBlendMode()) {
-          case A3DL::Material::BLEND_NORMAL:
-            try
-            {
-              double alpha = mt->getAlpha();
-              if(alpha == 0.0)
-                cmt->coords[i].mode = CS_FX_TRANSPARENT;
-              else if(alpha == 1.0)
+          switch(mt->getBlendMode())
+	  {
+            case A3DL::Material::BLEND_NORMAL:
+              try
+              {
+                double alpha = mt->getAlpha();
+                if(alpha == 0.0)
+                  cmt->coords[i].mode = CS_FX_TRANSPARENT;
+                else if(alpha == 1.0)
+                  cmt->coords[i].mode = CS_FX_COPY;
+                else
+                  cmt->coords[i].mode = CS_FX_SETALPHA(alpha);
+              }
+              catch(...)
+              {
                 cmt->coords[i].mode = CS_FX_COPY;
-              else
-                cmt->coords[i].mode = CS_FX_SETALPHA(alpha);
-            }
-            catch(...)
-            {
-              cmt->coords[i].mode = CS_FX_COPY;
-            }
-            break;
-          case A3DL::Material::BLEND_ADD:
-            cmt->coords[i].mode = CS_FX_ADD;
-            break;
-          case A3DL::Material::BLEND_MULTIPLY:
-            cmt->coords[i].mode = CS_FX_MULTIPLY;
-            break;
-          case A3DL::Material::BLEND_DOUBLE_MULTIPLY:
-            cmt->coords[i].mode = CS_FX_MULTIPLY2;
-            break;
+              }
+              break;
+            case A3DL::Material::BLEND_ADD:
+              cmt->coords[i].mode = CS_FX_ADD;
+              break;
+            case A3DL::Material::BLEND_MULTIPLY:
+              cmt->coords[i].mode = CS_FX_MULTIPLY;
+              break;
+            case A3DL::Material::BLEND_DOUBLE_MULTIPLY:
+              cmt->coords[i].mode = CS_FX_MULTIPLY2;
+              break;
           }
           try
           {
@@ -271,7 +274,9 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
       }
     }
     cmt->iscolor = false;
-  } else {
+  }
+  else
+  {
     getColor(cmt->R, cmt->G, cmt->B);
     cmt->iscolor = true;
   }
@@ -342,7 +347,8 @@ void csMetaMaterial::notifyChildRemoved(VobjectEvent& event)
   if(p.isValid()) p->removePropertyListener(this);
 }
 
-MetaObject* csMetaMaterial::new_csMetaMaterial(VobjectBase* superobject, const std::string& type)
+MetaObject* csMetaMaterial::new_csMetaMaterial(VobjectBase* superobject,
+	const std::string& type)
 {
   return new csMetaMaterial(superobject);
 }

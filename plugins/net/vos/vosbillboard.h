@@ -29,12 +29,14 @@
 #include "csvosa3dl.h"
 #include "vosobject3d.h"
 
-class csMetaBillboard : public virtual csMetaObject3D, public virtual A3DL::Billboard
+class csMetaBillboard : public virtual csMetaObject3D,
+	public virtual A3DL::Billboard
 {
 public:
   csMetaBillboard(VOS::VobjectBase* superobject);
 
-  static VOS::MetaObject* new_csMetaBillboard(VOS::VobjectBase* superobject, const std::string& type);
+  static VOS::MetaObject* new_csMetaBillboard(VOS::VobjectBase* superobject,
+  	const std::string& type);
 
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
 };
