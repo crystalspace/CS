@@ -22,6 +22,8 @@ chronological order.
 	  build of ode.
 	- Matze fixed long standing bug in opengl renderer. It was incorrectly
 	  scaling the screen rectangle for pixmaps which aren't po2.
+	- Matze changed opengl texture manager to scale up instead of scaling
+	  down when fixing non-po2 textures.
 13-Aug-2003
 	- res renamed the rlloader, rlsstd and rlsstencil plugins to less
 	  cryptic rendloop_loader, rendstep_std and rendstep_stencil.
