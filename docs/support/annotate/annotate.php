@@ -4,7 +4,7 @@
 // Matthias Braun <matze@braunis.de>
 //-----------------------------------------------------------------------------
 
-$basedir="/home/groups/c/cr/crystal/htdocs/annotations";
+$basedir=".";
 
 $theme=preg_replace("\" \"","_",$theme);
 $theme=preg_replace("[^a-zA-Z0-9_]","",$theme);
@@ -33,30 +33,35 @@ if ($action=="") {
 	die ("<br><h2>Please give name or email!</h2>\n");
     $newentry->date=time();
     $newentry->text=nl2br($texttext);
-    $entries[] = $newentry;
-    $h= fopen ($file, "w");
-    if (!$h) {
-	die ("Couldn't write to disk!<br>\n");
-    }
-    writeXMLFile($h);
-    include ("mail.php");
-    foreach ($mail as $i) {
-	mail ($i, "CS documentation annotated by $authorname ($emailname)",
+    $last =count($entries)-1;
+    if (!($newentry->author == $entries[$last]->author &&
+	$newentry->email == $entries[$last]->email &&
+	$newentry->text == $entries[$last]->text)) {
+        $entries[] = $newentry;
+        $h= fopen ($file, "w");
+        if (!$h) {
+		die ("Couldn't write to disk!<br>\n");
+        }
+        writeXMLFile($h);
+        include ("mail.php");
+        foreach ($mail as $i) {
+	    mail ($i, "CS documentation annotated by $authorname ($emailname)",
 		"Author: $authorname\n".
 		"E-Mail: $emailname\n".
 		"Topic:  $theme\n".
 		"File:   $self\n".
-		"Time:   ".strftime("%a, %d %b %G (%H:%M)")." ($date)\n".
+		"Time:   ".strftime("%a, %d %b %G (%H:%M)",$newentry->date)." (".$newentry->date.")\n".
 		"Comment:\n".
 		"$texttext");
+        }
+        fclose($h);
+        chmod($file, 0666);
+        print "<h3>Comment added!</h3>\n";
+	unset($entries);
+	readXMLFile($file);
     }
-
-    fclose($h);
-    chmod($file, 0666);
-    print "<h3>Comment added!</h3>\n";
-    unset($entries);
-    readXMLFile($file);
     printEntries();
+    print "<a href=\"$self?action=showadd#comments\">Add a comment</a><br>\n";
 }   
 
 class entry
@@ -167,6 +172,8 @@ function writeXMLFile($h)
 function startElement($parser, $name, $attrs) {
     global $status;
     global $aentry;
+
+    $xmlglobdata="";
     switch ($status) {
 	case "global":
 	   if ($name == "COMMENT") {
@@ -231,6 +238,8 @@ function endElement($parser, $name) {
 
 function characterData($parser, $data) {
     global $xmlglobdata;
+    if ($data=="\n")
+	$data="";
     $xmlglobdata=$data;
 }
 
