@@ -167,7 +167,7 @@ ifneq ($(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)),)
 endif
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make win32vc      Prepare for building under and for $(DESCRIPTION.win32vc)$"
+  $(NEWLINE)echo $"  make win32vc      Prepare for building on $(DESCRIPTION.win32vc)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 

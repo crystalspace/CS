@@ -144,7 +144,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make djgpp        Prepare for building under and for $(DESCRIPTION.djgpp)$"
+  $(NEWLINE)echo $"  make djgpp        Prepare for building on $(DESCRIPTION.djgpp)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 

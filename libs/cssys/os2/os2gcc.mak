@@ -108,7 +108,7 @@ ifeq ($(USE_OMF),yes)
   O=.obj
   LIB=.lib
   define AR
-	@rm -f $@
+	rm -f $@
 	emxomfar
   endef
   ARFLAGS=-p32 cr
@@ -180,7 +180,7 @@ ifneq (,$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
 endif
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make os2gcc       Prepare for building under and for $(DESCRIPTION.os2gcc)$"
+  $(NEWLINE)echo $"  make os2gcc       Prepare for building on $(DESCRIPTION.os2gcc)$"
 
 # System-dependent help commands
 #  

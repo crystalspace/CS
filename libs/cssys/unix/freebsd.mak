@@ -100,7 +100,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make freebsd      Prepare for building under and for $(DESCRIPTION.freebsd)$"
+  $(NEWLINE)echo $"  make freebsd      Prepare for building on $(DESCRIPTION.freebsd)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 

@@ -219,7 +219,7 @@ else
   LFLAGS.GENERAL+= -static
 
 define AR
-  @rm -f $@
+  rm -f $@
   ar
 endef
 ARFLAGS=cr
@@ -264,7 +264,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make mingw        Prepare for building under and for $(DESCRIPTION.mingw)$"
+  $(NEWLINE)echo $"  make mingw        Prepare for building on $(DESCRIPTION.mingw)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 

@@ -111,7 +111,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make beos         Prepare for building under and for $(DESCRIPTION.beos)$"
+  $(NEWLINE)echo $"  make beos         Prepare for building on $(DESCRIPTION.beos)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 

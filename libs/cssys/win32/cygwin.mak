@@ -90,7 +90,7 @@ LFLAGS.DLL=
 # Typical extension for objects and static libraries
 LIB=.a
 define AR
-  @rm -f $@
+  rm -f $@
   ar
 endef
 ARFLAGS=cr
@@ -148,7 +148,7 @@ ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
 endif
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make cygwin       Prepare for building under and for $(DESCRIPTION.cygwin)$"
+  $(NEWLINE)echo $"  make cygwin       Prepare for building on $(DESCRIPTION.cygwin)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 

@@ -192,7 +192,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make os2wcc       Prepare for building under and for $(DESCRIPTION.os2wcc)$"
+  $(NEWLINE)echo $"  make os2wcc       Prepare for building on $(DESCRIPTION.os2wcc)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 

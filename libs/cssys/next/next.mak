@@ -197,7 +197,7 @@ NEXT.ARCHS.ALL :=
 endif # ALREADY_INCLUDED
 
 NEXT.SYSHELP += \
-  $(NEWLINE)echo $"  make $(NEXT.TARGET.DESCRIPTION)     Prepare for building under and for $(DESCRIPTION.$(NEXT.TARGET))$"
+  $(NEWLINE)echo $"  make $(NEXT.TARGET.DESCRIPTION)     Prepare for building on $(DESCRIPTION.$(NEXT.TARGET))$"
 NEXT.ARCHS.HELP += \
   $(NEWLINE)echo $"          $(NEXT.ARCHS)  [$(NEXT.DESCRIPTION)]$"
 NEXT.ARCHS.ALL += $(NEXT.ARCHS)

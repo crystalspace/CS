@@ -99,7 +99,7 @@ LFLAGS.DLL=
 # Typical extension for objects and static libraries
 LIB=.a
 define AR
-  @rm -f $@
+  rm -f $@
   ar
 endef
 ARFLAGS=cr
@@ -164,7 +164,7 @@ ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
 endif
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make win32gcc     Prepare for building under and for $(DESCRIPTION.win32gcc)$"
+  $(NEWLINE)echo $"  make win32gcc     Prepare for building on $(DESCRIPTION.win32gcc)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 

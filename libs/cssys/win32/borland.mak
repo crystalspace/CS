@@ -181,7 +181,7 @@ ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
 endif
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make borland      Prepare for building under and for $(DESCRIPTION.borland)$"
+  $(NEWLINE)echo $"  make borland      Prepare for building on $(DESCRIPTION.borland)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 

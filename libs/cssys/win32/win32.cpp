@@ -612,6 +612,7 @@ void WinKeyTrans (WPARAM wParam, bool down)
     case VK_MULTIPLY: key = CSKEY_PADMULT; chr = '*'; break;
     case VK_DIVIDE:   key = CSKEY_PADDIV; chr = '/'; break;
   }
+
   if (key)
     EventOutlet->Key (key, chr, down);
 }

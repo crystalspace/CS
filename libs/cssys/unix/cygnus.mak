@@ -140,7 +140,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make cygnus       Prepare for building under and for $(DESCRIPTION.cygnus)$"
+  $(NEWLINE)echo $"  make cygnus       Prepare for building on $(DESCRIPTION.cygnus)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 

@@ -100,7 +100,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make irix         Prepare for building under and for $(DESCRIPTION.irix)$"
+  $(NEWLINE)echo $"  make irix         Prepare for building on $(DESCRIPTION.irix)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
