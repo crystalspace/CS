@@ -45,6 +45,8 @@ struct iSkeletonLimb : public iBase
   virtual const char* GetName () const = 0;
   /// Get next sibling in list.
   virtual iSkeletonLimb* GetNextSibling () = 0;
+  /// Get first child limb
+  virtual iSkeletonLimb* GetChildren () const = 0;
 };
 
 SCF_VERSION (iSkeletonConnection, 0, 0, 1);

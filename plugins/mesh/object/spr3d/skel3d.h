@@ -82,6 +82,9 @@ public:
   /// Add a child limb.
   void AddChild (csSkelLimb* child);
 
+  /// Get first child.
+  iSkeletonLimb* GetChildren () const { return (iSkeletonLimb*)children; }
+
   /// Linked list.
   void SetNext (csSkelLimb* n) { next = n; }
   /// Linked list.

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,6 +21,7 @@
 #define _SPR3DLDR_H_
 
 #include "imap/reader.h"
+#include "imap/writer.h"
 
 struct iEngine;
 struct iSystem;
@@ -55,6 +57,35 @@ public:
 };
 
 /**
+ * Sprite3D factory saver.
+ */
+class csSprite3DFactorySaver : public iSaverPlugIn
+{
+private:
+  iSystem* sys;
+
+  // Save a skeleton.
+  void SaveSkeleton (iSkeletonLimb* limb, iStrVector *str);
+
+public:
+  /// Constructor.
+  csSprite3DFactorySaver (iBase*);
+
+  /// Destructor.
+  virtual ~csSprite3DFactorySaver ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+public:
+  //------------------------ iSaverPlugIn implementation --------------
+  DECLARE_IBASE;
+
+  /// Write down given object and add to string vector.
+  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+};
+
+/**
  * Sprite 3D loader.
  */
 class csSprite3DLoader : public iLoaderPlugIn
@@ -78,6 +109,32 @@ public:
 
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine);
+};
+
+/**
+ * Sprite3D saver.
+ */
+class csSprite3DSaver : public iSaverPlugIn
+{
+private:
+  iSystem* sys;
+
+public:
+  /// Constructor.
+  csSprite3DSaver (iBase*);
+
+  /// Destructor.
+  virtual ~csSprite3DSaver ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+public:
+  //------------------------ iSaverPlugIn implementation --------------
+  DECLARE_IBASE;
+  
+  /// Write down given object and add to string vector.
+  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 };
 
 #endif // _SPR3DLDR_H_

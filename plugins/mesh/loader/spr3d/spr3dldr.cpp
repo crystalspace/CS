@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,6 +32,11 @@
 #include "imesh/skeleton.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
+#include "iutil/strvec.h"
+#include "csutil/util.h"
+#include "iobject/object.h"
+#include "iengine/material.h"
+#include "csengine/material.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -72,19 +78,35 @@ IMPLEMENT_IBASE (csSprite3DFactoryLoader)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csSprite3DFactorySaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_IBASE (csSprite3DLoader)
   IMPLEMENTS_INTERFACE (iLoaderPlugIn)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csSprite3DSaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_FACTORY (csSprite3DFactoryLoader)
+IMPLEMENT_FACTORY (csSprite3DFactorySaver)
 IMPLEMENT_FACTORY (csSprite3DLoader)
+IMPLEMENT_FACTORY (csSprite3DSaver)
 
 EXPORT_CLASS_TABLE (spr3dldr)
   EXPORT_CLASS (csSprite3DFactoryLoader, "crystalspace.mesh.loader.factory.sprite.3d",
     "Crystal Space Sprite3D Mesh Factory Loader")
+  EXPORT_CLASS (csSprite3DFactorySaver, "crystalspace.mesh.saver.factory.sprite.3d",
+    "Crystal Space Sprite3D Mesh Factory Saver")
   EXPORT_CLASS (csSprite3DLoader, "crystalspace.mesh.loader.sprite.3d",
     "Crystal Space Sprite3D Mesh Loader")
+  EXPORT_CLASS (csSprite3DSaver, "crystalspace.mesh.saver.sprite.3d",
+    "Crystal Space Sprite3D Mesh Saver")
 EXPORT_CLASS_TABLE_END
 
 csSprite3DFactoryLoader::csSprite3DFactoryLoader (iBase* pParent)
@@ -583,6 +605,163 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 
 //---------------------------------------------------------------------------
 
+csSprite3DFactorySaver::csSprite3DFactorySaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csSprite3DFactorySaver::~csSprite3DFactorySaver ()
+{
+}
+
+bool csSprite3DFactorySaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+#define MAXLINE 100 /* max number of chars per line... */
+
+static void WriteMixmode(iStrVector *str, UInt mixmode)
+{
+  str->Push(strnew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  if(mixmode&CS_FX_ALPHA) {
+    char buf[MAXLINE];
+    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")"));
+}
+
+
+/// helper function to write a matrix
+static void WriteMatrix(const csMatrix3& m, iStrVector* str)
+{
+  char buf[MAXLINE];
+  sprintf(buf, "MATRIX (%g,%g,%g,%g,%g,%g,%g,%g,%g)", m.m11, m.m12, m.m13,
+    m.m21, m.m22, m.m23, m.m31, m.m32, m.m33);
+  str->Push(strnew(buf));
+}
+
+
+void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb, 
+  iStrVector* str)
+{
+  iSkeletonConnection* con = QUERY_INTERFACE (limb, iSkeletonConnection);
+  int i;
+  char buf[MAXLINE];
+  str->Push(strnew("VERTICES ("));
+  for(i=0; i<limb->GetNumVertices(); i++)
+  {
+    sprintf(buf, "%d%s", limb->GetVertices()[i], 
+      (i==limb->GetNumVertices()-1)?"":",");
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")\n"));
+
+  str->Push(strnew("TRANSFORM ("));
+  WriteMatrix(con->GetTransformation().GetO2T(), str);
+  sprintf(buf, " V(%g,%g,%g))", con->GetTransformation().GetO2TTranslation().x,
+    con->GetTransformation().GetO2TTranslation().y, 
+    con->GetTransformation().GetO2TTranslation().z);
+  str->Push(strnew(buf));
+
+  iSkeletonLimb *ch = limb->GetChildren();
+  while(ch)
+  {
+    sprintf(buf, "LIMB '%s' (", ch->GetName());
+    str->Push(strnew(buf));
+    SaveSkeleton(ch, str);
+    str->Push(strnew(")\n"));
+    ch = ch->GetNextSibling();
+  }
+
+  con->DecRef();
+}
+
+void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
+  iEngine* /*engine*/)
+{
+  iSprite3DFactoryState *state = QUERY_INTERFACE (obj, iSprite3DFactoryState);
+  char buf[MAXLINE];
+
+  sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
+    GetPrivateObject()->GetName());
+  str->Push(strnew(buf));
+
+  int i,j;
+  for(i=0; i<state->GetNumFrames(); i++)
+  {
+    iSpriteFrame* frame = state->GetFrame(i);
+    sprintf(buf, "FRAME '%s' (\n", frame->GetName());
+    str->Push(strnew(buf));
+    int anm_idx = frame->GetAnmIndex ();
+    int tex_idx = frame->GetTexIndex ();
+    for(j=0; j<state->GetNumTexels(); j++)
+    {
+      sprintf(buf, "  V(%g,%g,%g:%g,%g)\n", state->GetVertex(anm_idx, j).x,
+        state->GetVertex(anm_idx, j).y, state->GetVertex(anm_idx, j).z,
+	state->GetTexel(tex_idx, j).x, state->GetTexel(tex_idx, j).y);
+      str->Push(strnew(buf));
+    }
+    str->Push(strnew(")\n"));
+  }
+
+  for(i=0; i<state->GetNumActions(); i++)
+  {
+    iSpriteAction* action = state->GetAction(i);
+    sprintf(buf, "ACTION '%s' (", action->GetName());
+    str->Push(strnew(buf));
+    for(j=0; j<action->GetNumFrames(); j++)
+    {
+      sprintf(buf, " F(%s,%d)", action->GetFrame(j)->GetName(),
+        action->GetFrameDelay(j));
+      str->Push(strnew(buf));
+    }
+    str->Push(strnew(")\n"));
+  }
+
+  for(i=0; i<state->GetNumTriangles(); i++)
+  {
+    sprintf(buf, "TRIANGLE (%d,%d,%d)\n", state->GetTriangle(i).a,
+      state->GetTriangle(i).b, state->GetTriangle(i).c);
+    str->Push(strnew(buf));
+  }
+
+  iSkeleton *skeleton = state->GetSkeleton();
+  if(skeleton) 
+  {
+    iSkeletonLimb* skellimb = QUERY_INTERFACE (skeleton, iSkeletonLimb);
+    iSkeletonLimb* skelp = skellimb;
+    while(skelp) 
+    {
+      sprintf(buf, "SKELETON '%s' (\n", skelp->GetName());
+      str->Push(strnew(buf));
+      SaveSkeleton(skelp, str);
+      str->Push(strnew(")\n"));
+      skelp = skelp->GetNextSibling();
+    }
+    skellimb->DecRef();
+  }
+
+  /// @@@ Cannot retrieve smoothing information.
+  /// SMOOTH()
+  /// SMOOTH(baseframenr)
+  /// or a list of SMOOTH(basenr, framenr);
+
+  sprintf(buf, "TWEEN (%s)\n", state->IsTweeningEnabled()?"true":"false");
+  str->Push(strnew(buf));
+
+  state->DecRef();
+}
+
+//---------------------------------------------------------------------------
 csSprite3DLoader::csSprite3DLoader (iBase* pParent)
 {
   CONSTRUCT_IBASE (pParent);
@@ -681,3 +860,58 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine)
 
 //---------------------------------------------------------------------------
 
+csSprite3DSaver::csSprite3DSaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csSprite3DSaver::~csSprite3DSaver ()
+{
+}
+
+bool csSprite3DSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str,
+  iEngine* /*engine*/)
+{
+  iFactory *fact = QUERY_INTERFACE (this, iFactory);
+  iSprite3DState *state = QUERY_INTERFACE (obj, iSprite3DState);
+
+  iMeshObject *meshobj= QUERY_INTERFACE (obj, iMeshObject);
+  iSprite3DFactoryState *factstate = QUERY_INTERFACE (
+    meshobj->GetFactory(), iSprite3DFactoryState);
+  meshobj->DecRef();
+  char buf[MAXLINE];
+  char name[MAXLINE];
+
+  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
+  sprintf(buf, "FACTORY ('%s')\n", name);
+  str->Push(strnew(buf));
+
+  if(state->GetMixMode() != CS_FX_COPY)
+  {
+    WriteMixmode(str, state->GetMixMode());
+  }
+  if(state->GetMaterialWrapper() != factstate->GetMaterialWrapper())
+  {
+    sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
+      GetPrivateObject()->GetName());
+    str->Push(strnew(buf));
+  }
+  sprintf(buf, "TWEEN (%s)\n", state->IsTweeningEnabled()?"true":"false");
+  str->Push(strnew(buf));
+  if(state->GetCurAction())
+  {
+    sprintf(buf, "ACTION (%s)\n", state->GetCurAction()->GetName());
+    str->Push(strnew(buf));
+  }
+  fact->DecRef();
+  factstate->DecRef();
+  state->DecRef();
+}
+
+//---------------------------------------------------------------------------

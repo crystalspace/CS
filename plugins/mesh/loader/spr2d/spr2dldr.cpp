@@ -460,7 +460,7 @@ void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str,
   for(i=0; vs.Length(); i++)
   {
     sprintf(buf, "%g,%g%s", vs[i].pos.x, vs[i].pos.y,
-      (i==vs.Length())?"":", ");
+      (i==vs.Length()-1)?"":", ");
     str->Push(strnew(buf));
   }
   str->Push(strnew(")\n"));
@@ -468,7 +468,7 @@ void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str,
   str->Push(strnew("UV("));
   for(i=0; vs.Length(); i++)
   {
-    sprintf(buf, "%g,%g%s", vs[i].u, vs[i].v, (i==vs.Length())?"":", ");
+    sprintf(buf, "%g,%g%s", vs[i].u, vs[i].v, (i==vs.Length()-1)?"":", ");
     str->Push(strnew(buf));
   }
   str->Push(strnew(")\n"));
@@ -477,7 +477,7 @@ void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str,
   for(i=0; vs.Length(); i++)
   {
     sprintf(buf, "%g,%g,%g%s", vs[i].color_init.red, vs[i].color_init.green,
-      vs[i].color_init.blue, (i==vs.Length())?"":", ");
+      vs[i].color_init.blue, (i==vs.Length()-1)?"":", ");
     str->Push(strnew(buf));
   }
   str->Push(strnew(")\n"));
