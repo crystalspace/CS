@@ -58,6 +58,8 @@ SCF_IMPLEMENT_IBASE (OpStandard)
   SCF_IMPLEMENTS_INTERFACE (iSequenceOperation)
 SCF_IMPLEMENT_IBASE_END
 
+//---------------------------------------------------------------------------
+
 /**
  * Set fog operation.
  */
@@ -167,6 +169,97 @@ public:
 
 //---------------------------------------------------------------------------
 
+/**
+ * Set light operation.
+ */
+class OpSetLight : public OpStandard
+{
+private:
+  csRef<iLight> light;
+  csColor color;
+
+public:
+  OpSetLight (iLight* light, const csColor& color)
+  {
+    OpSetLight::light = light;
+    OpSetLight::color = color;
+  }
+
+  virtual void Do (csTicks dt)
+  {
+    light->SetColor (color);
+  }
+};
+
+/**
+ * Fade light timed operation.
+ */
+class TimedOpFadeLight : public iSequenceTimedOperation
+{
+private:
+  csRef<iLight> light;
+  csColor start_col, end_col;
+
+public:
+  TimedOpFadeLight (iLight* light,
+  	const csColor& start_col, const csColor& end_col)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    TimedOpFadeLight::light = light;
+    TimedOpFadeLight::start_col = start_col;
+    TimedOpFadeLight::end_col = end_col;
+  }
+  virtual ~TimedOpFadeLight () { }
+
+  SCF_DECLARE_IBASE;
+
+  virtual void Do (float time)
+  {
+    csColor color;
+    color.red = (1-time) * start_col.red + time * end_col.red;
+    color.green = (1-time) * start_col.green + time * end_col.green;
+    color.blue = (1-time) * start_col.blue + time * end_col.blue;
+    light->SetColor (color);
+  }
+};
+
+SCF_IMPLEMENT_IBASE (TimedOpFadeLight)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_END
+
+/**
+ * Fade light operation.
+ */
+class OpFadeLight : public OpStandard
+{
+private:
+  csRef<iLight> light;
+  csColor color;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
+
+public:
+  OpFadeLight (iLight* light, const csColor& color,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  {
+    OpFadeLight::light = light;
+    OpFadeLight::color = color;
+    OpFadeLight::duration = duration;
+    OpFadeLight::eseqmgr = eseqmgr;
+  }
+
+  virtual void Do (csTicks dt)
+  {
+    const csColor& start_col = light->GetColor ();
+    TimedOpFadeLight* timedop = new TimedOpFadeLight (
+    	light, start_col, color);
+    eseqmgr->FireTimedOperation (dt, duration, timedop);
+    timedop->DecRef ();
+  }
+};
+
+//---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE_EXT(csSequenceWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSequenceWrapper)
 SCF_IMPLEMENT_IBASE_EXT_END
@@ -187,14 +280,20 @@ csSequenceWrapper::~csSequenceWrapper ()
 {
 }
 
-void csSequenceWrapper::AddOperationSetLightColor (csTicks time,
+void csSequenceWrapper::AddOperationSetLight (csTicks time,
 	iLight* light, const csColor& color)
 {
+  OpSetLight* op = new OpSetLight (light, color);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
-void csSequenceWrapper::AddOperationFadeLightColor (csTicks time,
+void csSequenceWrapper::AddOperationFadeLight (csTicks time,
 	iLight* light, const csColor& color, csTicks duration)
 {
+  OpFadeLight* op = new OpFadeLight (light, color, duration, eseqmgr);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationSetFog (csTicks time,

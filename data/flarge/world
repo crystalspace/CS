@@ -6031,7 +6031,6 @@
             <radius>10</radius>
             <color red="0.7" green="0.7" blue="0.8" />
             <dynamic />
-            <key name="cmd_AnimateDynLight" value="" />
         </light>
         <light>
             <center x="-15" y="3" z="18" />
@@ -22634,16 +22633,36 @@
 	    <delay>1000</delay>
 	    <runsequence>fogloop</runsequence>
 	</sequence>
+
         <sequence name="fog">
 	    <setfog sector="kamer2l" red="0" green="0" blue="0" density="0" />
 	    <delay>1000</delay>
 	    <runsequence>fogloop</runsequence>
+	</sequence>
+
+	<sequence name="animlight">
+	    <fadelight light="l1" red="0" green="0" blue="0" duration="1000" />
+	    <delay>1000</delay>
+	    <fadelight light="l1" red="1" green="1" blue="1" duration="1000" />
+	    <delay>1000</delay>
+	    <fadelight light="l1" red="1" green="0" blue="0" duration="1000" />
+	    <delay>1000</delay>
+	    <fadelight light="l1" red="0" green="1" blue="0" duration="1000" />
+	    <delay>1000</delay>
+	    <fadelight light="l1" red="0" green="0" blue="1" duration="1000" />
+	    <delay>1000</delay>
+	    <runsequence>animlight</runsequence>
 	</sequence>
     </sequences>
     <triggers>
         <trigger name="setfog">
 	    <sectorvis>kamer2l</sectorvis>
 	    <fire delay=100>fog</fire>
+	</trigger>
+
+        <trigger name="animlight">
+	    <sectorvis>large</sectorvis>
+	    <fire delay=0>animlight</fire>
 	</trigger>
     </triggers>
 

@@ -26,6 +26,8 @@
 #include "iutil/objreg.h"
 #include "iengine/engine.h"
 #include "iengine/region.h"
+#include "iengine/light.h"
+#include "iengine/statlght.h"
 #include "ivaria/sequence.h"
 
 iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
@@ -157,6 +159,46 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	  cur_time += delay;
 	}
 	break;
+      case XMLTOKEN_FADELIGHT:
+        {
+	  const char* lightname = child->GetAttributeValue ("light");
+	  iStatLight* light = Engine->FindLight (lightname);
+	  if (!light)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find light '%s' in sequence '%s'!", lightname,
+		seqname);
+	    return NULL;
+	  }
+	  csColor col;
+	  col.red = child->GetAttributeValueAsFloat ("red");
+	  col.green = child->GetAttributeValueAsFloat ("green");
+	  col.blue = child->GetAttributeValueAsFloat ("blue");
+	  int duration = child->GetAttributeValueAsInt ("duration");
+	  sequence->AddOperationFadeLight (cur_time, light->QueryLight (), col,
+	  	duration);
+	}
+	break;
+      case XMLTOKEN_SETLIGHT:
+        {
+	  const char* lightname = child->GetAttributeValue ("light");
+	  iStatLight* light = Engine->FindLight (lightname);
+	  if (!light)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find light '%s' in sequence '%s'!", lightname,
+		seqname);
+	    return NULL;
+	  }
+	  csColor col;
+	  col.red = child->GetAttributeValueAsFloat ("red");
+	  col.green = child->GetAttributeValueAsFloat ("green");
+	  col.blue = child->GetAttributeValueAsFloat ("blue");
+	  sequence->AddOperationSetLight (cur_time, light->QueryLight (), col);
+	}
+        break;
       case XMLTOKEN_FADEFOG:
         {
 	  const char* sectname = child->GetAttributeValue ("sector");
@@ -199,6 +241,38 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	  float density;
 	  density = child->GetAttributeValueAsFloat ("density");
 	  sequence->AddOperationSetFog (cur_time, sector, col, density);
+	}
+        break;
+      case XMLTOKEN_ENABLETRIGGER:
+        {
+	  const char* trigname = child->GetContentsValue ();
+	  iSequenceTrigger* trigger = GetEngineSequenceManager ()
+	  	->FindTriggerByName (trigname);
+	  if (!trigger)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find trigger '%s' in sequence '%s'!", trigname,
+		seqname);
+	    return NULL;
+	  }
+	  trigger->SetEnabled (true);
+	}
+        break;
+      case XMLTOKEN_DISABLETRIGGER:
+        {
+	  const char* trigname = child->GetContentsValue ();
+	  iSequenceTrigger* trigger = GetEngineSequenceManager ()
+	  	->FindTriggerByName (trigname);
+	  if (!trigger)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find trigger '%s' in sequence '%s'!", trigname,
+		seqname);
+	    return NULL;
+	  }
+	  trigger->SetEnabled (false);
 	}
         break;
       default:

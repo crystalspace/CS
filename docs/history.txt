@@ -21,6 +21,11 @@ The history order is reversed so that new features are at the top.
 	  fog as soon as you first look at that corridor.
 	- Fixed a bug with metaballs which didn't work properly in fog
 	  (OpenGL only).
+	- Implemented 'setlight' and 'fadelight' in engine sequence
+	  manager and loader. Also added enabletrigger and disabletrigger
+	  commands.
+	- Modified the pseudo-dynamic light in flarge to work using
+	  the new sequence system instead of the Walktest specific stuff.
 22-Sep-2002
 	- Modified iMeshWrapper->SetDrawCallback() so that multiple
 	  callbacks are now supported. Added RemoveDrawCallback() and

@@ -57,13 +57,13 @@ struct iSequenceWrapper : public iBase
   /**
    * Operation: set a light color.
    */
-  virtual void AddOperationSetLightColor (csTicks time, iLight* light,
+  virtual void AddOperationSetLight (csTicks time, iLight* light,
 		  const csColor& color) = 0;
 
   /**
    * Operation: fade a light to some color during some time.
    */
-  virtual void AddOperationFadeLightColor (csTicks time, iLight* light,
+  virtual void AddOperationFadeLight (csTicks time, iLight* light,
 		  const csColor& color, csTicks duration) = 0;
 
   /**
@@ -196,6 +196,8 @@ SCF_VERSION (iSequenceTimedOperation, 0, 0, 1);
  * of time. The 'elapsed' value that needs to be implemented by
  * subclasses will go from 0 to 1. When the time expires (goes beyond
  * 1) then the operation will be deleted automatically.
+ * Timed operations are usually fired from within a sequence operation
+ * (iSequenceOperation).
  */
 struct iSequenceTimedOperation : public iBase
 {

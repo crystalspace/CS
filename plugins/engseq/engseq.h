@@ -45,9 +45,9 @@ public:
   virtual ~csSequenceWrapper ();
 
   iSequence* GetSequence () { return sequence; }
-  void AddOperationSetLightColor (csTicks time, iLight* light,
+  void AddOperationSetLight (csTicks time, iLight* light,
 		  const csColor& color);
-  void AddOperationFadeLightColor (csTicks time, iLight* light,
+  void AddOperationFadeLight (csTicks time, iLight* light,
 		  const csColor& color, csTicks duration);
   void AddOperationSetFog (csTicks time, iSector* sector,
 		  const csColor& color, float density);
@@ -78,15 +78,15 @@ public:
     {
       return scfParent->GetSequence ();
     }
-    virtual void AddOperationSetLightColor (csTicks time, iLight* light,
+    virtual void AddOperationSetLight (csTicks time, iLight* light,
 		  const csColor& color)
     {
-      scfParent->AddOperationSetLightColor (time, light, color);
+      scfParent->AddOperationSetLight (time, light, color);
     }
-    virtual void AddOperationFadeLightColor (csTicks time, iLight* light,
+    virtual void AddOperationFadeLight (csTicks time, iLight* light,
 		  const csColor& color, csTicks duration)
     {
-      scfParent->AddOperationFadeLightColor (time, light, color, duration);
+      scfParent->AddOperationFadeLight (time, light, color, duration);
     }
     virtual void AddOperationSetFog (csTicks time, iSector* sector,
 		  const csColor& color, float density)
