@@ -107,7 +107,7 @@ csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
 
 csExploMeshObject::~csExploMeshObject()
 {
-  //@@@TODO: if(has_light) RemoveLight();
+  if (has_light) RemoveLight();
 }
 
 

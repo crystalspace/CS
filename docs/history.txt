@@ -3,6 +3,9 @@ The history order is reversed so that new features are at the top.
 11-Feb-2002
 	- Added csMath3::SpherePosition() which calculates the position
 	  on a unit sphere given two angles.
+	- Matt Reda fixed a bug in the explosion plugin which would cause
+	  the dynamic light that is created by it not to be deleted at
+	  destruction time.
 8-Feb-2002
 	- Matt Reda added support for displaying on any monitor on OSX
 	  systems with more than one monitor.  Also added small
