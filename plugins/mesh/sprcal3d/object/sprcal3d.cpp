@@ -1177,9 +1177,10 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start, const csVe
 
 
 bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
-    const csVector3& end, csVector3& isect, float* pr, int*)
+    const csVector3& end, csVector3& isect, float* pr, int* polygon_idx)
 {
   // This routine is slow, but it is intended to be accurate.
+  if (polygon_idx) *polygon_idx = -1;
 
   csSegment3 seg (start, end);
   float dist, temp, max;
