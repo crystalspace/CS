@@ -44,3 +44,9 @@ you want to display something in your world you will have to know how to
 use them.  The tutorials and @sc{howto}s contain information about mesh
 objects but this section contains the complete documentation.
 
+If you want to know more about how to build optimal levels for Crystal Space
+then you should take a look at @ref{Level Building}. This section explains
+how you should partition your world in sectors, what kind of objects you
+can use, how to effectively use the visibility cullers and other techniques
+you should know when creating your levels for Crystal Space.
+

@@ -18,6 +18,8 @@ genmeshes are ideal for high detailed objects that don't require any animation.
 At this point in time genmeshes are limited to having only one material but
 that limitation may be removed in the future.
 
+There is also a howto on creating genmeshes (@pxref{HOWTO Create Genmesh}).
+
 @subsubheading Basic Structure
 
 The following @sc{scf} class names are used (for @code{CS_LOAD_PLUGIN()}):

@@ -28,6 +28,7 @@ Crystal Space supports.
 * Writing MeshObjects:: Writing Mesh Objects
 * MeshObject Spr2D:: Sprite2D Mesh Object
 * MeshObject Spr3D:: Sprite3D Mesh Object
+* MeshObject SprCal3D:: SpriteCal3D Mesh Object
 * MeshObject Genmesh:: Genmesh Mesh Object
 * MeshObject Ball:: Ball Mesh Object
 * MeshObject Emit:: Emitter Mesh Object
@@ -48,6 +49,7 @@ Crystal Space supports.
 @importss{plugins,meshobj,writing.txi}
 @importss{plugins,meshobj,spr2d.txi}
 @importss{plugins,meshobj,spr3d.txi}
+@importss{plugins,meshobj,sprcal3d.txi}
 @importss{plugins,meshobj,genmesh.txi}
 @importss{plugins,meshobj,ball.txi}
 @importss{plugins,meshobj,emit.txi}

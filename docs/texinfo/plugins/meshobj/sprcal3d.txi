@@ -1,0 +1,19 @@
+@c -*-texinfo-*-
+@node MeshObject SprCal3D, MeshObject Genmesh, MeshObject Spr2D, MeshObject
+@subsection SpriteCal3D Mesh Object
+@cindex MeshObject
+@cindex 3D Sprite
+@cindex cal3d
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iSkeletonConnectionState}
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+
+This is a 3D mesh that can do skeletal animation using the @samp{Cal3D}
+library.
+
+@@@ WRITE ME!
+

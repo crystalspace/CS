@@ -246,18 +246,21 @@ heavy-weight (use more memory). Their main advantage is the support of lightmaps
 which means that they can represent shadows even if they only have a few
 polygons. In contrast, an object that only supports vertex lighting can
 not have shadows on a single polygon or triangle (except if stencil based
-lighting is used).
+lighting is used) (@pxref{MeshObject Thing}).
 @item
 @samp{genmesh}: a @samp{genmesh} is a triangle mesh object with a single
 material. It only supports vertex or stencil based lighting and it is also
 not designed for internal animation (although it is possible to do so).
-Genmeshes are very efficient with regards to memory usage and rendering speed.
+Genmeshes are very efficient with regards to memory usage and rendering speed
+(@pxref{MeshObject Genmesh}).
 @item
 @samp{sprite3d}: a @samp{sprite3d} is similar to a @samp{genmesh} except
-that it also supports frame based animation.
+that it also supports frame based animation
+(@pxref{MeshObject Spr3D}).
 @item
 @samp{sprcal3d}: a @samp{sprcal3d} is similar to a @samp{sprite3d} except
 that skeletal or bone based animation is supported.
+(@pxref{MeshObject SprCal3D}).
 @end itemize
 
 Here are some guidelines on using these objects:

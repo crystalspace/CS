@@ -100,9 +100,10 @@ Tutorial}.
 
 @item
 The @file{sprcal3d} plugin is able to load Cal3D models.
+@xref{MeshObject SprCal3D}.
 
 @item
-Crystal Space native windowing system. @xref{AWS}, @xref{CSWS}.
+Crystal Space native windowing system(s). @xref{AWS}, @xref{CSWS}.
 
 @item
 2D canvases (OpenGL, DirectDraw, X11, CoreGraphics, Cocoa, null, memory)
@@ -153,7 +154,8 @@ Sound loaders (@sc{wav}, @sc{au}, @sc{iff}, @sc{aiff}, @sc{mod}, @sc{mp3},
 
 @item
 Thing and other mesh objects. @xref{MeshObject}, @xref{MeshObject Thing},
-@xref{HOWTO Create Thing}.
+@xref{HOWTO Create Thing}, @xref{MeshObject Genmesh},
+@xref{HOWTO Create Genmesh}.
 
 @item
 2D and 3D sprites. @xref{MeshObject Spr3D}, @xref{MeshObject Spr2D}.
@@ -194,7 +196,7 @@ Map file loader and converters. @xref{XML File Format},
 Scripting bindings (Python, Perl, Java). @xref{Scripting Languages}.
 
 @item
-Skeletal animation. @xref{MeshObject Spr3D}.
+Skeletal animation. @xref{MeshObject Spr3D}, @xref{MeshObject SprCal3D}.
 
 @item
 Object movement. @xref{HOWTO Mesh Movement}.
