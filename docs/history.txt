@@ -14,6 +14,9 @@ The history order is reversed so that new features are at the top.
 	  polytmap.h, portal.h, ptextype.h, and curve.h).
 	- Moved include/iengine/collider.h and polymesh.h to
 	  include/ivaria.
+	- Eric Sunshine repaired a problem with plugins/chapter.txi where it
+	  was referencing plugins/anim/anim.txi even though that file does not
+	  (yet) exist.
 17-Jun-2001
 	- Fixed a bug in 'facedown'/'faceup' commands (walktest). Reported
 	  by Thiago Ramon.

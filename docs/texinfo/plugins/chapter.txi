@@ -34,7 +34,6 @@ information you need in the introduction to the simple tutorial
 * MeshObject:: Mesh Object Plug-In System
 * Dungeon::
 * csPython::
-* Animation::
 @end menu
 
 @imports{plugins,overview.txi}
@@ -46,4 +45,3 @@ information you need in the introduction to the simple tutorial
 @importss{plugins,meshobj,meshobj.txi}
 @imports{plugins,dungeon.txi}
 @imports{plugins,python.txi}
-@importss{plugins,anim,anim.txi}
