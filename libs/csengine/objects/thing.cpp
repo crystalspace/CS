@@ -3052,6 +3052,7 @@ SCF_IMPLEMENT_IBASE(csThingObjectType)
   SCF_IMPLEMENTS_INTERFACE(iMeshObjectType)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingEnvironment)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iConfig)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiComponent)
@@ -3062,6 +3063,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiThingEnvironment)
   SCF_IMPLEMENTS_INTERFACE(iThingEnvironment)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiConfig)
+  SCF_IMPLEMENTS_INTERFACE(iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 SCF_IMPLEMENT_FACTORY (csThingObjectType)
 
 csThingObjectType::csThingObjectType (
@@ -3070,6 +3075,7 @@ csThingObjectType::csThingObjectType (
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingEnvironment);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   lightpatch_pool = NULL;
   render_pol2d_pool = NULL;
 }
@@ -3120,7 +3126,7 @@ csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
 
 csPtr<iPolyTxtPlane> csThingObjectType::CreatePolyTxtPlane (const char *name)
 {
-  csPolyTxtPlane *pl = new csPolyTxtPlane ();
+  csPolyTxtPlane *pl = new csPolyTxtPlane (this);
   planes.Push (pl);
   if (name) pl->SetName (name);
   pl->IncRef ();
@@ -3201,3 +3207,51 @@ void csThingObjectType::ClearCurveTemplates ()
 }
 
 //---------------------------------------------------------------------------
+
+static const csOptionDescription
+  config_options[] =
+{
+  { 0, "cosfact", "Cosinus factor for lighting", CSVAR_FLOAT }
+};
+const int NUM_OPTIONS =
+  (
+    sizeof (config_options) /
+    sizeof (config_options[0])
+  );
+
+bool csThingObjectType::eiConfig::SetOption (int id, csVariant *value)
+{
+  switch (id)
+  {
+    case 0:
+      csPolyTexture::cfg_cosinus_factor = value->GetFloat ();
+      break;
+    default:
+      return false;
+  }
+
+  return true;
+}
+
+bool csThingObjectType::eiConfig::GetOption (int id, csVariant *value)
+{
+  switch (id)
+  {
+    case 0:   value->SetFloat (csPolyTexture::cfg_cosinus_factor); break;
+    default:  return false;
+  }
+
+  return true;
+}
+
+bool csThingObjectType::eiConfig::GetOptionDescription (
+  int idx,
+  csOptionDescription *option)
+{
+  if (idx < 0 || idx >= NUM_OPTIONS) return false;
+  *option = config_options[idx];
+  return true;
+}
+
+//---------------------------------------------------------------------------
+

@@ -800,7 +800,7 @@ public:
   /**
    * Add an object to the current region.
    */
-  void AddToCurrentRegion (csObject* obj);
+  virtual void AddToCurrentRegion (iObject* obj);
 
   /// Register a new render priority.
   virtual void RegisterRenderPriority (const char* name, long priority,

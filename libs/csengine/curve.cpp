@@ -23,7 +23,6 @@
 #include "csengine/curve.h"
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
-#include "csengine/engine.h"
 #include "csengine/thing.h"
 #include "csengine/lppool.h"
 #include "ivideo/graph3d.h"
@@ -893,7 +892,7 @@ csCurveTemplate::csCurveTemplate (csThingObjectType* thing_type) :
   csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurveTemplate);
-  csEngine::current_engine->AddToCurrentRegion (this);
+  thing_type->engine->AddToCurrentRegion (this);
   csCurveTemplate::thing_type = thing_type;
 }
 

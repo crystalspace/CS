@@ -146,10 +146,10 @@ void csPolyTexLightMap::SetTxtPlane (csPolyTxtPlane *txt_pl)
   txt_plane = txt_pl;
 }
 
-void csPolyTexLightMap::NewTxtPlane ()
+void csPolyTexLightMap::NewTxtPlane (csThingObjectType* thing_type)
 {
   if (txt_plane) txt_plane->DecRef ();
-  txt_plane = new csPolyTxtPlane ();
+  txt_plane = new csPolyTxtPlane (thing_type);
 }
 
 //---------------------------------------------------------------------------
@@ -971,7 +971,7 @@ void csPolygon3D::SetTextureSpace (
     csPolyTexLightMap *lmi = GetLightMapInfo ();
     if (lmi)
     {
-      lmi->NewTxtPlane ();
+      lmi->NewTxtPlane (thing->thing_type);
       lmi->GetTxtPlane ()->SetTextureSpace (tx_matrix, tx_vector);
     }
   }
@@ -1068,7 +1068,7 @@ void csPolygon3D::SetTextureSpace (
     csPolyTexLightMap *lmi = GetLightMapInfo ();
     if (lmi)
     {
-      lmi->NewTxtPlane ();
+      lmi->NewTxtPlane (thing->thing_type);
       lmi->GetTxtPlane ()->SetTextureSpace (
           plane->GetObjectPlane (),
           xo,
@@ -1095,7 +1095,7 @@ void csPolygon3D::SetTextureSpace (
     csPolyTexLightMap *lmi = GetLightMapInfo ();
     if (lmi)
     {
-      lmi->NewTxtPlane ();
+      lmi->NewTxtPlane (thing->thing_type);
       lmi->GetTxtPlane ()->SetTextureSpace (v_orig, v1, len1, v2, len2);
     }
   }

@@ -383,7 +383,7 @@ public:
   /**
    * Create a new texture plane.
    */
-  void NewTxtPlane ();
+  void NewTxtPlane (csThingObjectType* thing_type);
 
   /**
    * Get the lightmap belonging with this polygon.

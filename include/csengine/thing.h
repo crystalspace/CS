@@ -41,6 +41,7 @@
 #include "imesh/lighting.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/config.h"
 
 class csThing;
 class csThingObjectType;
@@ -1371,6 +1372,15 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
+
+  /// iConfig implementation.
+  struct eiConfig : public iConfig
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
+    virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+    virtual bool SetOption (int id, csVariant* value);
+    virtual bool GetOption (int id, csVariant* value);
+  } scfiConfig;
 };
 
 #endif // __CS_THING_H__

@@ -23,6 +23,8 @@
 #include "csutil/csobject.h"
 #include "imesh/thing/polytmap.h"
 
+class csThingObjectType;
+
 
 SCF_VERSION (csPolyTxtPlane, 0, 0, 1);
 
@@ -54,7 +56,7 @@ private:
 
 public:
   /// Constructor. Reference count is initialized to 1.
-  csPolyTxtPlane ();
+  csPolyTxtPlane (csThingObjectType* thing_type);
 
   /**
    * Transform this plane from object space to world space using

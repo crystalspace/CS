@@ -17,7 +17,8 @@
 */
 #include "cssysdef.h"
 #include "csengine/polytmap.h"
-#include "csengine/engine.h"
+#include "csengine/thing.h"
+#include "iengine/engine.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/textrans.h"
 
@@ -31,11 +32,11 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csPolyTxtPlane::PolyTxtPlane)
   SCF_IMPLEMENTS_INTERFACE(iPolyTxtPlane)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csPolyTxtPlane::csPolyTxtPlane () :
+csPolyTxtPlane::csPolyTxtPlane (csThingObjectType* thing_type) :
   csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolyTxtPlane);
-  csEngine::current_engine->AddToCurrentRegion (this);
+  thing_type->engine->AddToCurrentRegion (this);
 }
 
 csPolyTxtPlane::~csPolyTxtPlane ()

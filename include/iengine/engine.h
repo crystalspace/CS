@@ -173,7 +173,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 10, 0);
+SCF_VERSION (iEngine, 0, 11, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -241,6 +241,11 @@ struct iEngine : public iBase
    * region is selected).
    */
   virtual iRegion* GetCurrentRegion () const = 0;
+  /**
+   * Add an object to the current region. Normally you don't need to
+   * call this function as CS objects already do this automatically.
+   */
+  virtual void AddToCurrentRegion (iObject* obj) = 0;
 
   /// Delete everything in the engine.
   virtual void DeleteAll () = 0;

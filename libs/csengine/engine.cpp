@@ -2171,7 +2171,7 @@ iRegion *csEngine::GetCurrentRegion () const
   return region;
 }
 
-void csEngine::AddToCurrentRegion (csObject *obj)
+void csEngine::AddToCurrentRegion (iObject *obj)
 {
   if (region)
   {
