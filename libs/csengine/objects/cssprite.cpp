@@ -210,6 +210,7 @@ csSprite3D* csSpriteTemplate::NewSprite ()
 
 void csSpriteTemplate::GenerateLOD ()
 {
+/*
   int i;
 
   //@@@ turn this into a parameter or member variable?
@@ -268,6 +269,7 @@ void csSpriteTemplate::GenerateLOD ()
   CHK (delete [] translate);
   CHK (delete verts);
   CHK (delete new_mesh);
+*/
 }
 
 void csSpriteTemplate::ComputeBoundingBox ()
