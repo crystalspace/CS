@@ -76,8 +76,10 @@ bool csVector::Delete (int n)
   {
     if (!FreeItem (root [n]))
       return false;
-    int ncount = count - 1;
-    memmove (&root [n], &root [n + 1], (ncount - n) * sizeof (csSome));
+    const int ncount = count - 1;
+    const int nmove = ncount - n;
+    if (nmove > 0)
+      memmove (&root [n], &root [n + 1], nmove * sizeof (csSome));
     SetLength (ncount);
     return true;
   }
