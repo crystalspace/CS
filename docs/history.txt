@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Sep-2004
+	- Eric Sunshine fixed bugs in walktest/Jamfile where it unconditionally
+	  attempted to add several optional modules to the "walkall" compile
+	  group even if those modules had not been detected/enabled by the
+	  configure script. Among other issues, this resulted in a failure by
+	  the configure script to set up the makefile emulation layer if some
+	  of those modules were absent.
 9-Sep-2004
 	- Jorrit fixed a potential bug in csLoader::LoadMeshObjectFactory()
 	  where it would destroy the wrong factory after unsuccessful
@@ -14,10 +21,10 @@ chronological order.
 	  time a factory with the same name already existed in memory.
 	- Jorrit fixed a bug in csLoader::LoadMeshObject() where it would fail
 	  to delete the created mesh object if the loading failed.
-	- Jorrit added a new iLoader::Load() function which is a smart
-	  function that can detect what kind of XML file it is trying to load
-	  and act accordingly. Currently it supports world files, library files,
-	  mesh factories, and objects.
+	- Jorrit added a new iLoader::Load() function which is a smart function
+	  that can detect what kind of XML file it is trying to load and act
+	  accordingly. Currently it supports world files, library files, mesh
+	  factories, and objects.
 	- Jorrit changed iMaterialWrapper->Register() and
 	  iTextureWrapper->Register() so that they no longer attempt to
 	  register again if they were already registered. That makes it

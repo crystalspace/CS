@@ -8,10 +8,16 @@ CompileGroups bugplug    : walkall ;
 CompileGroups csconin    : walkall ;
 CompileGroups csfont     : walkall ;
 CompileGroups csgifimg   : walkall ;
-CompileGroups csjpgimg   : walkall ;
+if $(JPEG.AVAILABLE) = "yes"
+{
+  CompileGroups csjpgimg : walkall ;
+}
 CompileGroups csddsimg   : walkall ;
 CompileGroups csparser   : walkall ;
-CompileGroups cspngimg   : walkall ;
+if $(PNG.AVAILABLE) = "yes"
+{
+  CompileGroups cspngimg : walkall ;
+}
 CompileGroups cssynldr   : walkall ; 
 CompileGroups dynavis    : walkall ;
 CompileGroups engine     : walkall ;
@@ -27,7 +33,10 @@ CompileGroups simpcon    : walkall ;
 CompileGroups softcanvas : walkall ;
 CompileGroups stdpt      : walkall ;
 CompileGroups stdrep     : walkall ;
-CompileGroups vfs        : walkall ;
+if $(ZLIB.AVAILABLE) = "yes"
+{
+  CompileGroups vfs      : walkall ;
+}
 CompileGroups walktest   : walkall ;
 CompileGroups xmlread    : walkall ;
 if $(GL.AVAILABLE) = "yes"
