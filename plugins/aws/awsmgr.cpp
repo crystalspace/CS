@@ -723,8 +723,10 @@ awsManager::HandleEvent(iEvent& Event)
       // If the mouse is locked into the top window, keep it there
       if (mouse_captured && mouse_focus)
       {
-        if (RecursiveBroadcastToChildren(mouse_focus, Event)) return true;
-        else return mouse_focus->HandleEvent(Event);
+        //        if (RecursiveBroadcastToChildren(mouse_focus, Event)) return true;
+        //        else return mouse_focus->HandleEvent(Event);
+        
+        return mouse_focus->HandleEvent(Event);
         
       } // end mouse captured
       else
