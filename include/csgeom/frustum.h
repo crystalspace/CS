@@ -59,15 +59,7 @@ struct csClipInfo
   };
 
   csClipInfo () : type (CS_CLIPINFO_ORIGINAL) { }
-  void Clear ()
-  {
-    if (type == CS_CLIPINFO_INSIDE)
-    {
-      delete inside.ci1;
-      delete inside.ci2;
-      type = CS_CLIPINFO_ORIGINAL;
-    }
-  }
+  void Clear ();
   ~csClipInfo () { Clear (); }
 
   /// Copy the information from another clipinfo instance to this one.

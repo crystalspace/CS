@@ -20,6 +20,19 @@
 #include "csgeom/frustum.h"
 #include "csgeom/transfrm.h"
 
+// OpenStep compiler generates corrupt assembly output (with unresolveable
+// symbols) when this method is defined inline in the interface, so it is
+// implemented here instead.
+void csClipInfo::Clear ()
+{
+  if (type == CS_CLIPINFO_INSIDE)
+  {
+    delete inside.ci1;
+    delete inside.ci2;
+    type = CS_CLIPINFO_ORIGINAL;
+  }
+}
+
 csFrustum::csFrustum (const csVector3& o, csVector3* verts, int num_verts,
   csPlane3* backp) : pool (&csDefaultVertexArrayPool::GetDefaultPool())
 {
