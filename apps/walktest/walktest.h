@@ -21,7 +21,9 @@
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
+#include "csgeom/math3d.h"
 #include "cssys/common/sysdriv.h"
+#include "csengine/colldet/collider.h"
 
 class Polygon3D;
 class WalkTest;
@@ -31,6 +33,7 @@ class InfiniteMaze;
 class csSoundBuffer;
 class csWorld;
 class csSprite2D;
+class PhysicsLibrary;
 
 ///
 struct csKeyMap
@@ -38,6 +41,7 @@ struct csKeyMap
   csKeyMap* next, * prev;
   int key, shift, alt, ctrl;
   char* cmd;
+  int need_status,is_on;
 };
 
 ///
@@ -48,6 +52,21 @@ public:
   static char world_file[100];
   /// A script to execute at startup.
   char* auto_script;
+
+  /// Player position, orientation, and velocity
+  csVector3 pos;
+  csMatrix3 orient;
+  csVector3 velocity;
+
+  /// Camera angles. X and Y are user controllable, Z is not.
+  float angle_x,angle_y,angle_z;
+
+  /// Colliders for "legs" and "body". Intersections are handled differently
+  csCollider *legs;
+  csCollider *body;
+
+  /// Was player already spawned?..
+  bool player_spawned;
 
   /**
    * If this flag is true we move in 3D (old system). Otherwise we move more like
@@ -74,6 +93,8 @@ public:
   csSoundBuffer* wMissile_boom;
   csSoundBuffer* wMissile_whoosh;
 
+  PhysicsLibrary *pl;
+
   /// Some flags.
   bool do_fps;
   bool do_stats;
@@ -84,9 +105,15 @@ public:
   bool do_infinite;
   bool do_cd;
   bool do_freelook;
+  bool do_gravity;
 
   /// Timing.
   float timeFPS;
+
+  bool pressed_walk;
+  bool pressed_strafe;
+  bool on_ground;
+  bool inverse_mouse;
 
 public:
   ///
@@ -109,21 +136,34 @@ public:
   /// Override DemoWrite for nice demo messaging
   virtual void DemoWrite (const char* msg);
 
-private:
+  /// Inits all the collision detection stuff
+  virtual void InitWorld(csWorld* world, csCamera* /*camera*/);
+
+  /// Destroys all the collision detection stuff
+  virtual void EndWorld(void);
+
+  /// Creates Colliders
+  virtual void CreateColliders(void);
+
+  void strafe(float speed,int keep_old);
+  void step(float speed,int keep_old);
+  void rotate(float speed,int keep_old);
+  void look(float speed,int keep_old);
+
   ///
-  static void handle_key_forward (float speed, bool shift, bool alt, bool ctrl);
+  void handle_key_forward (float speed, bool shift, bool alt, bool ctrl);
   ///
-  static void handle_key_backwards (float speed, bool shift, bool alt, bool ctrl);
+  void handle_key_backwards (float speed, bool shift, bool alt, bool ctrl);
   ///
-  static void handle_key_left (float speed, bool shift, bool alt, bool ctrl);
+  void handle_key_left (float speed, bool shift, bool alt, bool ctrl);
   ///
-  static void handle_key_right (float speed, bool shift, bool alt, bool ctrl);
+  void handle_key_right (float speed, bool shift, bool alt, bool ctrl);
   ///
-  static void handle_key_pgup (float, bool shift, bool alt, bool ctrl);
+  void handle_key_pgup (float, bool shift, bool alt, bool ctrl);
   ///
-  static void handle_key_pgdn (float, bool shift, bool alt, bool ctrl);
+  void handle_key_pgdn (float, bool shift, bool alt, bool ctrl);
   ///
-  static void eatkeypress (int key, bool shift, bool alt, bool ctrl);
+  void eatkeypress (int status, int key, bool shift, bool alt, bool ctrl);
 };
 
 extern csVector2 coord_check_vector;

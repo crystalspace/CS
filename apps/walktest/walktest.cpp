@@ -40,7 +40,12 @@
 #include "csengine/polygon/polytext.h"
 #include "csengine/scripts/csscript.h"
 #include "csengine/scripts/intscri.h"
-#include "csengine/colldet/being.h"
+
+// Being is no more
+//#include "csengine/colldet/being.h"
+#include "csengine/colldet/cdobj.h"
+#include "csengine/colldet/collider.h"
+
 #include "csengine/2d/csspr2d.h"
 #include "csutil/sparse3d.h"
 #include "csutil/inifile.h"
@@ -186,7 +191,7 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
       Gfx2D->Write(FRAME_WIDTH-24*8, FRAME_HEIGHT-10, scon->get_fg (), -1, buffer);
     }
     else if (do_cd)
-    {
+    {/*
       char buffer[200], names[30];
       sprintf (buffer,"CD %d cam pos %2.2f,%2.2f,%2.2f %c %c",
          collcount,
@@ -203,7 +208,7 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
 	}
       }
       Gfx2D->Write(8-1, FRAME_HEIGHT-21, 0, -1, buffer);
-      Gfx2D->Write(8, FRAME_HEIGHT-20, scon->get_fg (), -1, buffer);
+      Gfx2D->Write(8, FRAME_HEIGHT-20, scon->get_fg (), -1, buffer);*/
     } /* endif */
 
     if (cslogo)
@@ -224,11 +229,465 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
 int cnt = 1;
 time_t time0 = (time_t)-1;
 
+#define EPS 0.00001
+
+int FindIntersection(csVector3 *tri1,csVector3 *tri2,csVector3 line[2])
+{
+	int i,j;
+	csVector3 v1[3],v2[3];
+
+	for(i=0;i<3;i++)
+	{
+		j=(i+1)%3;
+		v1[i]=tri1[j]-tri1[i];
+		v2[i]=tri2[j]-tri2[i];
+	}
+
+	csVector3 n1=v1[0]%v1[1];
+	csVector3 n2=v2[0]%v2[1];
+
+	float d1=-n1*tri1[0],d2=-n2*tri2[0];
+
+	csVector3 d=n1%n2;
+
+	int index=0;
+	float max=fabs(d.x);
+	if(fabs(d.y)>max)
+		max=fabs(d.y), index=1;
+	if(fabs(d.z)>max)
+		max=fabs(d.z), index=2;
+
+	int m1=0,m2=0,n=0;
+	float t1[3],t2[3];
+	csVector3 p1[2],p2[2];
+	float isect1[2],isect2[2],isect[4];
+	csVector3 *idx[4];
+
+	for(i=0;i<3;i++)
+	{
+		float div1=n2*v1[i],div2=n1*v2[i];
+		float pr1=-(n2*tri1[i]+d2),pr2=-(n1*tri2[i]+d1);
+
+		if(fabs(div1)<EPS)
+		{
+			if(fabs(pr1)<EPS)
+			{
+				// line is in the plane of intersection
+				t1[i]=0;
+			}
+			else
+			{
+				// line is parallel to the plane of
+				// intersection, so we don't need it ;)
+				t1[i]=15.0;
+			}
+		}
+		else
+			t1[i]=pr1/div1;
+
+		if(fabs(div2)<EPS)
+		{
+			if(fabs(pr2)<EPS)
+			{
+				// line is in the plane of intersection
+				t2[i]=0;
+			}
+			else
+			{
+				// line is parallel to the plane of
+				// intersection, so we don't need it ;)
+				t2[i]=15.0;
+			}
+		}
+		else
+			t2[i]=pr2/div2;
+
+		if(t1[i]>=0.0&&t1[i]<=1.0&&m1!=2)
+		{
+			p1[m1]=tri1[i]+v1[i]*t1[i];
+			isect1[m1]=p1[m1][index];
+			idx[n]=p1+m1;
+			isect[n++]=isect1[m1++];
+		}
+		if(t2[i]>=0.0&&t2[i]<=1.0&&m2!=2)
+		{
+			p2[m2]=tri2[i]+v2[i]*t2[i];
+			isect2[m2]=p2[m2][index];
+			idx[n]=p2+m2;
+			isect[n++]=isect2[m2++];
+		}
+	}
+
+	if(n<4)
+	{
+		// triangles are not intersecting
+		return 0;
+	}
+
+	for(i=0;i<4;i++)
+	{
+		for(j=i+1;j<4;j++)
+		{
+			if(isect[i]>isect[j])
+			{
+				csVector3 *p=idx[j];
+				idx[j]=idx[i];
+				idx[i]=p;
+
+				float _=isect[i];
+				isect[i]=isect[j];
+				isect[j]=_;
+			}
+		}
+	}
+
+	line[0]=*idx[1];
+	line[1]=*idx[2];
+
+	return 1;
+}
+
+int FindIntersection(CDTriangle *t1,CDTriangle *t2,csVector3 line[2])
+{
+  csVector3 tri1[3]; tri1[0]=t1->p1; tri1[1]=t1->p2; tri1[2]=t1->p3;
+  csVector3 tri2[3]; tri2[0]=t2->p1; tri2[1]=t2->p2; tri2[2]=t2->p3;
+
+  return FindIntersection(tri1,tri2,line);
+}
+
+// Define the player bounding box.
+// The camera's lens or person's eye is assumed to be
+// at 0,0,0.  The height (DY), width (DX) and depth (DZ).
+// Is the size of the camera/person and the origin
+// coordinates (OX,OY,OZ) locate the bbox with respect to the eye.
+// This player is 1.8 metres tall (assuming 1cs unit = 1m) (6feet)
+#define DX    0.8
+#define DY    1.5
+#define DZ    0.8
+#define OY   (-0.8)
+
+#define DX_L  0.4
+#define DZ_L  0.4
+
+#define DX_2  (DX/2)
+#define DZ_2  (DZ/2)
+
+#define DX_2L (DX_L/2)
+#define DZ_2L (DZ_L/2)
+
+#define OYL  (-1.1)
+#define DYL  (OY-OYL)
+  
+void WalkTest::CreateColliders(void)
+{
+  csPolygon3D *p;
+  CHK (csPolygonSet *pb = new csPolygonSet());
+  csNameObject::AddName(*pb, "Player's Body");
+
+  pb->AddVertex(-DX_2, OY,    -DZ_2);
+  pb->AddVertex(-DX_2, OY,    DZ_2);
+  pb->AddVertex(-DX_2, OY+DY, DZ_2);
+  pb->AddVertex(-DX_2, OY+DY, -DZ_2);
+  pb->AddVertex(DX_2,  OY,    -DZ_2);
+  pb->AddVertex(DX_2,  OY,    DZ_2);
+  pb->AddVertex(DX_2,  OY+DY, DZ_2);
+  pb->AddVertex(DX_2,  OY+DY, -DZ_2);
+
+  // Left
+  p = pb->NewPolygon (0);
+
+  p->AddVertex (0); p->AddVertex (1); 
+  p->AddVertex (2); p->AddVertex (3); 
+
+  // Right
+  p = pb->NewPolygon (0);
+  p->AddVertex (4); p->AddVertex (5); 
+  p->AddVertex (6); p->AddVertex (7); 
+
+  // Bottom
+  p = pb->NewPolygon (0);
+  p->AddVertex (0); p->AddVertex (1); 
+  p->AddVertex (5); p->AddVertex (4); 
+
+  // Top
+  p = pb->NewPolygon (0);
+  p->AddVertex (3); p->AddVertex (2); 
+  p->AddVertex (6); p->AddVertex (7); 
+
+  // Front
+  p = pb->NewPolygon (0);
+  p->AddVertex (1); p->AddVertex (5); 
+  p->AddVertex (6); p->AddVertex (2); 
+
+  // Back
+  p = pb->NewPolygon (0);
+  p->AddVertex (0); p->AddVertex (4); 
+  p->AddVertex (7); p->AddVertex (3); 
+
+  this->body=new csCollider(pb);
+
+  CHK (csPolygonSet *pl = new csPolygonSet());
+
+  pl->AddVertex(-DX_2L, OYL,     -DZ_2L);
+  pl->AddVertex(-DX_2L, OYL,     DZ_2L);
+  pl->AddVertex(-DX_2L, OYL+DYL, DZ_2L);
+  pl->AddVertex(-DX_2L, OYL+DYL, -DZ_2L);
+  pl->AddVertex(DX_2L,  OYL,     -DZ_2L);
+  pl->AddVertex(DX_2L,  OYL,     DZ_2L);
+  pl->AddVertex(DX_2L,  OYL+DYL, DZ_2L);
+  pl->AddVertex(DX_2L,  OYL+DYL, -DZ_2L);
+
+  // Left
+  p = pl->NewPolygon (0);
+
+  p->AddVertex (0); p->AddVertex (1); 
+  p->AddVertex (2); p->AddVertex (3); 
+
+  // Right
+  p = pl->NewPolygon (0);
+  p->AddVertex (4); p->AddVertex (5); 
+  p->AddVertex (6); p->AddVertex (7); 
+
+  // Bottom
+  p = pl->NewPolygon (0);
+  p->AddVertex (0); p->AddVertex (1); 
+  p->AddVertex (5); p->AddVertex (4); 
+
+  // Top
+  p = pl->NewPolygon (0);
+  p->AddVertex (3); p->AddVertex (2); 
+  p->AddVertex (6); p->AddVertex (7); 
+
+  // Front
+  p = pl->NewPolygon (0);
+  p->AddVertex (1); p->AddVertex (5); 
+  p->AddVertex (6); p->AddVertex (2); 
+
+  // Back
+  p = pl->NewPolygon (0);
+  p->AddVertex (0); p->AddVertex (4); 
+  p->AddVertex (7); p->AddVertex (3); 
+
+  this->legs=new csCollider(pl);
+
+  if(!this->body||!this->legs)
+    do_cd=false;
+}
+
+#define MAXSECTORSOCCUPIED  20
+
+// No more than 1000 collisions ;)
+extern collision_pair *CD_contact;
+//collision_pair *our_cd_contact=0;
+static collision_pair our_cd_contact[1000];//=0;
+static int num_our_cd,alloced;
+
+int FindSectors(csVector3 v, csVector3 d, csSector *s, csSector **sa)
+{
+  sa[0] = s;
+  int i, c = 1;
+  float size = d.x * d.x + d.y * d.y + d.z * d.z;
+  for(i = 0;i < s->GetNumPolygons() && c < MAXSECTORSOCCUPIED; i++)
+  {
+    // Get the polygon of for this sector.
+    csPolygon3D* p = (csPolygon3D*) s->GetPolygon (i);
+    csPortal* portal = p->GetPortal ();
+    // Handle only portals.
+    if(portal != NULL && portal->PortalType () == PORTAL_CS)
+    {
+      csPortalCS *pcs = (csPortalCS*)portal;
+      if (p->GetPlane ()->SquaredDistance (v) < size)
+      {
+        sa[c] = pcs->GetSector ();
+        c++;
+      }
+//    sa[c] = pcs->GetSector();
+//    c++;
+    }
+  }
+  return c;
+}
+
+int CollisionDetect(csCollider *c,csSector* sp,csTransform *cdt)
+{
+  int hit = 0;
+
+  // Check collision with this sector.
+  csCollider::numHits=0;
+  csCollider::CollidePair(c,csColliderPointerObject::GetCollider(*sp),cdt);
+  hit += csCollider::numHits;
+  for(int i=0;i<csCollider::numHits;i++)
+    our_cd_contact[num_our_cd++]=CD_contact[i];
+
+  if(csCollider::firstHit&&hit)
+    return 1;
+
+  // Check collision of with the things in this sector.
+  csThing* tp = sp->GetFirstThing ();
+  while (tp)
+  {
+    // TODO, if and when Things can move, their transform must be passed in.
+    csCollider::numHits=0;
+    csCollider::CollidePair(c,csColliderPointerObject::GetCollider(*tp),cdt);
+    hit += csCollider::numHits;
+
+    for(int i=0;i<csCollider::numHits;i++)
+      our_cd_contact[num_our_cd++]=CD_contact[i];
+
+    if(csCollider::firstHit&&hit)
+      return 1;
+
+    tp = (csThing*)(tp->GetNext ());
+    // TODO, should test which one is the closest.
+  }
+
+  return hit;
+}
+
+template <class T> inline int sign(T p) {return p>0?1:p<0?-1:0;}
+
 void WalkTest::PrepareFrame (long elapsed_time, long current_time)
 {
   (void)elapsed_time; (void)current_time;
 
   CLights::LightIdle (); // SJI
+
+  if(do_cd)
+  {
+    if(!player_spawned)
+    {
+      CreateColliders();
+      player_spawned=true;
+    }
+
+    pos=view->GetCamera()->GetOrigin();
+
+    for(int repeats=0;repeats<((elapsed_time)/25.0+0.5);repeats++)
+    {
+      view->GetCamera()->SetT2O(csMatrix3());
+      view->GetCamera()->RotateWorld(csVector3(0,1,0),angle_y);
+
+      if(move_3d)
+        view->GetCamera()->RotateWorld(csVector3(1,0,0),angle_x);
+      else
+        if(!do_gravity)
+          view->GetCamera()->Rotate(csVector3(1,0,0),angle_x);
+
+      csVector3 vel=view->GetCamera()->GetT2O()*velocity;
+
+      csVector3 new_pos=pos+vel;
+      csOrthoTransform test(csMatrix3(),new_pos);
+
+      csSector *n[MAXSECTORSOCCUPIED];
+      int num_sectors=FindSectors(new_pos,4*body->GetBbox()->d,view->GetCamera()->GetSector(),n);
+
+      num_our_cd=0;
+      csCollider::firstHit=false;
+      int hits=0;
+
+      csCollider::CollideReset();
+
+      for(;num_sectors--;)
+        hits+=CollisionDetect(body,n[num_sectors],&test);
+
+      for(int j=0;j<hits;j++)
+      {
+        CDTriangle *wall=our_cd_contact[j].tr2;
+        csVector3 n=((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
+        if(n*vel<0)
+          continue;
+        vel=-(vel%n)%n;
+      }
+
+      // We now know our (possible) velocity. Let's try to move up or down, if possible
+      new_pos=pos+vel;
+      test=csOrthoTransform(csMatrix3(),new_pos);
+
+      num_sectors=FindSectors(new_pos,4*legs->GetBbox()->d,view->GetCamera()->GetSector(),n);
+
+      num_our_cd=0;
+      csCollider::firstHit=false;
+      csCollider::numHits=0;
+      int hit=0;
+
+      csCollider::CollideReset();
+
+      for(;num_sectors--;)
+        hit+=CollisionDetect(legs,n[num_sectors],&test);
+
+      if(!hit)
+      {
+        on_ground=false;
+        if(do_gravity&&!move_3d)
+          vel.y-=0.004;
+      }
+      else
+      {
+        float max_y=-1e10;
+
+        for(int j=0;j<hit;j++)
+        {
+          // я -- мудрак!.. я отлаживал сей кусок два дн€. ј надо было только
+          //  использовать не указатели, а значени€. ј впрочем... ¬ам не пон€ть ;) -- D.D.
+
+          CDTriangle first=*our_cd_contact[j].tr1;
+          CDTriangle second=*our_cd_contact[j].tr2;
+
+          csVector3 n=((second.p3-second.p2)%(second.p2-second.p1)).Unit();
+
+          if(n*csVector3(0,-1,0)<0.7)
+            continue;
+
+          csVector3 line[2];
+        
+          first.p1+=new_pos;
+          first.p2+=new_pos;
+          first.p3+=new_pos;
+
+          if(FindIntersection(&first,&second,line))
+          {
+            if(line[0].y>max_y)
+              max_y=line[0].y;
+            if(line[1].y>max_y)
+              max_y=line[1].y;
+          }
+        }
+
+        float p=new_pos.y-max_y+OYL+0.01;
+        if(fabs(p)<DYL-0.01)
+        {
+          if(max_y!=-1e10)
+            new_pos.y=max_y-OYL-0.01;
+
+          if(vel.y<0)
+            vel.y=0;
+        }
+        on_ground=true;
+      }
+
+      pos=new_pos;
+      new_pos-=view->GetCamera()->GetOrigin();
+      view->GetCamera()->MoveWorld(new_pos);
+
+      velocity=view->GetCamera()->GetO2T()*vel;
+
+      if(do_gravity&&!move_3d)
+        view->GetCamera()->Rotate(csVector3(1,0,0),angle_x);
+    }
+  }
+
+  if(!pressed_strafe)
+    velocity.x-=sign(velocity.x)*min(0.017,fabs(velocity.x));
+
+  if(!pressed_walk)
+    velocity.z-=sign(velocity.z)*min(0.017,fabs(velocity.z));
+
+  if(!do_gravity)
+    velocity.y-=sign(velocity.y)*min(0.017,fabs(velocity.y));
+
+//  pressed_strafe=pressed_walk=false;
+
+#if 0
   if (do_cd && csBeing::init)
   {
     // TODO ALEX: In future this should depend on whether the whole world
@@ -246,6 +705,8 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
     view->GetCamera ()->SetSector (csBeing::player->sector);
 
   }
+#endif
+
   if (cnt <= 0)
   {
     time_t time1 = SysGetTime ();
@@ -363,7 +824,7 @@ void cleanup ()
 {
   pprintf ("Cleaning up...\n");
   free_keymap ();
-  csBeing::EndWorld ();
+  /*csBeing::*/Sys->EndWorld ();
   CHK (delete Sys); Sys = NULL;
   pprintf_close();
 }
@@ -441,7 +902,35 @@ void stop_demo ()
   }
 }
 
+/*
+<<<<<<< walktest.cpp
 
+#if 0
+unsigned int _control87(unsigned int newcw, unsigned int mask)
+{
+  int oldcw;
+  asm
+  (
+        "       fclex                   \n"     // clear exceptions
+        "       fstcw   %0              \n"     // oldcw = FPU control word
+        "       movl    %2,%%eax        \n"     // eax = mask
+        "       notl    %%eax           \n"     // eax = ~eax
+        "       movzwl  %%ax,%%eax      \n"     // eax &= 0xffff
+        "       andl    %0,%%eax        \n"     // eax &= oldcw;
+        "       movl    %2,%%ecx        \n"     // ecx = mask
+        "       andl    %1,%%ecx        \n"     // ecx &= newcw
+        "       orl     %%ecx,%%eax     \n"     // eax |= ecx
+        "       movl    %%eax,%0        \n"     // oldcw = eax
+        "       fldcw   %0              \n"     // load FPU control word
+        : : "m" (oldcw), "g" (newcw), "g" (mask) : "eax", "ecx"
+  );
+  return oldcw;
+}
+#endif
+
+=======
+>>>>>>> 1.23
+*/
 #if 0
 
 void TestFrustrum ()
@@ -478,6 +967,48 @@ void TestFrustrum ()
 }
 
 #endif
+
+void WalkTest::EndWorld() {}
+
+void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
+{
+//  CsPrintf (MSG_INITIALIZATION, "Computing OBBs ...\n");
+
+  int sn = world->sectors.Length ();
+  while (sn > 0)
+  {
+    sn--;
+    csSector* sp = (csSector*)world->sectors[sn];
+    // Initialize the sector itself.
+    CHK(csCollider* pCollider = new csCollider(sp));
+    csColliderPointerObject::SetCollider(*sp, pCollider, true);
+    // Initialize the things in this sector.
+    csThing* tp = sp->GetFirstThing ();
+    while (tp)
+    {
+      CHK(csCollider* pCollider = new csCollider(tp));
+      csColliderPointerObject::SetCollider(*tp, pCollider, true);
+      tp = (csThing*)(tp->GetNext ());
+    }
+  }
+  // Initialize all sprites for collision detection.
+  csSprite3D* spp;
+  int i;
+  for (i = 0 ; i < world->sprites.Length () ; i++)
+  {
+    spp = (csSprite3D*)world->sprites[i];
+    
+    // TODO: Should create beings for these.
+    CHK(csCollider* pCollider = new csCollider(spp));
+    csColliderPointerObject::SetCollider(*spp, pCollider, true);
+  }
+
+  // Create a player object that follows the camera around.
+//  player = csBeing::PlayerSpawn("Player");
+
+//  init = true;
+//  CsPrintf (MSG_INITIALIZATION, "DONE\n");
+}
 
 /*---------------------------------------------------------------------*
  * Main function
@@ -708,7 +1239,8 @@ int main (int argc, char* argv[])
   }
 
   // Initialize collision detection system (even if disabled so that we can enable it later).
-  csBeing::InitWorld (Sys->world, Sys->view->GetCamera ());
+  Sys->InitWorld(Sys->world,Sys->view->GetCamera());
+//  csBeing::InitWorld (Sys->world, Sys->view->GetCamera ());
 
   Sys->Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
