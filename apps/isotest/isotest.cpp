@@ -28,6 +28,9 @@
 #include "imap/parser.h"
 #include "igraphic/imageio.h"
 #include "csgeom/box.h"
+#include "imesh/object.h"
+#include "imesh/cube.h"
+#include "imesh/sprite2d.h"
 
 
 IsoTest::IsoTest ()
@@ -244,6 +247,35 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   //res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(20,0,10));
   //printf("Hitbeam gave %d\n", (int)res);
 
+#if 0
+  /// create a mesh object
+  const char* classId = "crystalspace.mesh.object.cube";
+  //const char* classId = "crystalspace.mesh.object.sprite.2d";
+  iMeshObjectType *mesh_type = LOAD_PLUGIN( System, classId, 
+    "MeshObj", iMeshObjectType);
+  iMeshObjectFactory *mesh_fact = mesh_type->NewFactory();
+
+  iCubeFactoryState* cubelook = QUERY_INTERFACE(mesh_fact, iCubeFactoryState);
+  cubelook->SetMaterialWrapper(math2);
+  cubelook->SetSize(.5, .5, .5);
+  cubelook->SetMixMode (CS_FX_COPY);
+  cubelook->DecRef();
+  //iSprite2DFactoryState *fstate = QUERY_INTERFACE(mesh_fact, 
+    //iSprite2DFactoryState);
+  //fstate->SetMaterialWrapper(math2);
+  //fstate->SetMixMode(CS_FX_ADD);
+  //fstate->SetLighting(false);
+  //fstate->DecRef();
+  iMeshObject *mesh_obj = mesh_fact->NewInstance();
+
+  /// add a mesh object sprite
+  iIsoMeshSprite *meshspr = engine->CreateMeshSprite();
+  meshspr->SetMeshObject(mesh_obj);
+  //meshspr->SetZBufMode(CS_ZBUF_NONE);
+  meshspr->SetPosition( csVector3(12, 1, 4) );
+  world->AddSprite(meshspr);
+#endif // mesh object
+  
   txtmgr->PrepareTextures ();
   txtmgr->PrepareMaterials ();
   txtmgr->SetPalette ();

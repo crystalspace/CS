@@ -26,7 +26,9 @@
 #include "csgeom/csrect.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "ivideo/graph3d.h"
 
+class csMatrix3;
 struct iSystem;
 struct iEvent;
 struct iGraphics2D;
@@ -40,10 +42,13 @@ struct iIsoWorld;
 struct iIsoView;
 struct iIsoRenderView;
 struct iIsoSprite;
+struct iIsoMeshSprite;
 struct iIsoGrid;
 struct iIsoCell;
 struct iIsoLight;
 struct G3DPolygonDPFX;
+struct iMeshObject;
+struct iCamera;
 
 SCF_VERSION (iIsoEngine, 0, 0, 1);
 
@@ -72,6 +77,8 @@ struct iIsoEngine : public iPlugIn
   virtual iIsoLight* CreateLight() = 0;
   /// Create new sprite
   virtual iIsoSprite* CreateSprite() = 0;
+  /// Create a new mesh sprite
+  virtual iIsoMeshSprite* CreateMeshSprite() = 0;
   /// (convenience) create new floor/ceiling tile.
   virtual iIsoSprite* CreateFloorSprite(const csVector3& pos, float w, 
     float h) = 0;
@@ -258,6 +265,9 @@ SCF_VERSION (iIsoView, 0, 0, 1);
 */
 struct iIsoView : public iBase
 {
+  /// Get the iso engine this view belongs to.
+  virtual iIsoEngine *GetEngine() const = 0;
+
   /// Set world to use
   virtual void SetWorld(iIsoWorld* world) = 0;
   /// Get world shown in view
@@ -309,6 +319,13 @@ struct iIsoView : public iBase
    * Call this when in 3d mode (with the engine->getBeginDrawFlags passed)
    */
   virtual void Draw() = 0;
+
+  /**
+   * Return a fake iCamera implementation, that approximates isometric
+   * near the given position (in world space). The renderview is also used.
+   * This is a very partial implementation of iCamera. For Internal Use!
+   */
+  virtual iCamera* GetFakeCamera(const csVector3& center, iIsoRenderView *rview) = 0;
 };
 
 SCF_VERSION (iIsoRenderView, 0, 0, 1);
@@ -410,6 +427,31 @@ struct iIsoSprite : public iBase
   /// get the callback for when the sprite moves to another grid
   virtual void GetGridChangeCallback(GridChangeCallbackType&,
     void *&data) const = 0;
+};
+
+
+
+SCF_VERSION (iIsoMeshSprite, 0, 0, 1);
+
+/**
+ * This class wraps meshes (meant for the 3d engine) and adapts them for
+ * use by the isometric engine. It also implements the iIsoSprite interface.
+ */
+struct iIsoMeshSprite : iIsoSprite {
+  /// set the mesh object to use.
+  virtual void SetMeshObject(iMeshObject *mesh) = 0;
+  /// get the mesh object.
+  virtual iMeshObject* GetMeshObject() const = 0;
+
+  /// set the transformation matrix for this mesh.
+  virtual void SetTransform(const csMatrix3& transform) = 0;
+  /// get the transformation matrix used for this mesh.
+  virtual const csMatrix3& GetTransform() const = 0;
+
+  /// Set the zbuf mode for the mesh
+  virtual void SetZBufMode(csZBufMode mode) = 0;
+  /// Get the zbuf mode for the mesh
+  virtual csZBufMode GetZBufMode() const = 0;
 };
 
 

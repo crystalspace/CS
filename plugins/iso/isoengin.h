@@ -66,6 +66,7 @@ public:
   virtual iIsoView* CreateView(iIsoWorld *world);
   virtual iIsoLight* CreateLight();
   virtual iIsoSprite* CreateSprite();
+  virtual iIsoMeshSprite* CreateMeshSprite();
   virtual int GetBeginDrawFlags () const;
   virtual iIsoSprite* CreateFloorSprite(const csVector3& pos, float w, 
     float h);

@@ -48,11 +48,13 @@ csIsoView::csIsoView (iBase *iParent, iIsoEngine *eng, iIsoWorld *world)
 
   // prealloc a renderview
   rview = new csIsoRenderView(this);
+  fakecam = new csIsoFakeCamera();
 }
 
 csIsoView::~csIsoView ()
 {
   delete rview;
+  delete fakecam;
 }
 
 void csIsoView::W2S(const csVector3& world, csVector2& screen) const
@@ -170,3 +172,102 @@ void csIsoView::SetAxes(float xscale, float yscale, float zscale, float zskew,
   z_axis *= zscale;
   invx_axis_y = 1.0 / x_axis.y;
 }
+
+
+iCamera* csIsoView::GetFakeCamera(const csVector3& center,
+    iIsoRenderView *rview)
+{
+  fakecam->SetIsoView(scroll, x_axis, y_axis, z_axis);
+  fakecam->IsoReady(center, rview, scroll);
+  return fakecam;
+}
+
+
+//------------- csIsoFakeCamera -----------------------------------
+
+IMPLEMENT_IBASE (csIsoFakeCamera)
+  IMPLEMENTS_INTERFACE (iCamera)
+IMPLEMENT_IBASE_END
+
+
+csIsoFakeCamera::csIsoFakeCamera()
+{
+  view = 0;
+  mirror = false;
+  camnum = 0;
+}
+
+void csIsoFakeCamera::SetIsoView(const csVector2& scroll,
+  const csVector2& x_axis, const csVector2& y_axis, const csVector2& z_axis)
+{
+  mirror = false;
+  fovangle = 180.;
+  camnum ++;
+
+  //'other' is world space and 'this' is camera space.
+  csMatrix3 m;
+  // based on: (W2S)
+  //screen.x=scroll.x+ world.x*x_axis.x + world.z*z_axis.x;
+  //screen.y=scroll.y+ world.x*x_axis.y + world.y*y_axis.y + world.z*z_axis.y;
+  //screen.z= 1.0*world.z - 1.0*world.x;
+  m.Set(
+    x_axis.x, 0.0, z_axis.x,
+    x_axis.y, y_axis.y, z_axis.y,
+    -1.0, 0.0, 1.0
+  );
+  //printf("M (%7g %7g %7g)\n", m.m11, m.m12, m.m13);
+  //printf("M (%7g %7g %7g)\n", m.m21, m.m22, m.m23);
+  //printf("M (%7g %7g %7g)\n", m.m31, m.m32, m.m33);
+
+  //// testing m.
+  //csVector3 pos = csVector3(12, 1, 4) - csVector3(.25, .25, .25);
+  //csVector3 res = m * pos;
+  //printf("Scroll %g,%g  \n", scroll.x, scroll.y);
+  //printf("MTEST %g, %g, %g   ->  %g, %g, %g\n", pos.x, pos.y, pos.z,
+    //scroll.x + res.x, scroll.y + res.y, res.z);
+  //res.x=scroll.x+ pos.x*x_axis.x + pos.z*z_axis.x;
+  //res.y=scroll.y+ pos.x*x_axis.y + pos.y*y_axis.y + pos.z*z_axis.y;
+  //res.z= 1.0*pos.z - 1.0*pos.x;
+  //printf("MTEST %g, %g, %g   ->  %g, %g, %g\n", pos.x, pos.y, pos.z,
+    //res.x, res.y, res.z);
+
+  trans.SetO2T( m );
+  trans.SetO2TTranslation( csVector3(0, 0, 0) );
+  //res = trans * pos;
+  //printf("MTEST %g, %g, %g   ->  %g, %g, %g\n", pos.x, pos.y, pos.z,
+    //res.x + scroll.x, res.y + scroll.y, res.z);
+  shiftx = scroll.x;
+  shifty = scroll.y;
+}
+
+void csIsoFakeCamera::IsoReady(const csVector3& position, 
+  iIsoRenderView *rview, const csVector2& scroll)
+{
+  camnum++;
+  /// correct for position and renderview (minimum z bound)
+  float minz = rview->GetMinZ();
+  //// fov is an int!
+  fov = QInt(position.z - position.x - minz);
+  invfov = 1. / (position.z - position.x - minz);
+  //trans.SetO2TTranslation( csVector3(0, 0, -minz) );
+  //trans.SetO2TTranslation( trans.This2Other(csVector3(0, 0, -minz)) );
+  // shift Z by the zlowerbound
+  trans.SetO2TTranslation( csVector3(0,0, +minz) );
+  // compensate for the z shift in the x,y shift in screenspace.
+  shiftx = scroll.x + minz * trans.GetO2T().m13;
+  shifty = scroll.y + minz * trans.GetO2T().m23;
+
+  rview->GetG3D()->SetPerspectiveCenter(shiftx, shifty);
+  rview->GetG3D()->SetClipper( rview->GetClipper(), CS_CLIPPER_TOPLEVEL);
+
+  //csMatrix3 bb = trans.GetO2T();
+  //bb.Transpose();
+  //csVector3 b = bb * csVector3(0,0,-1);
+  //printf("diff is %g, %g, %g ?\n", b.x, b.y, b.z);
+  //printf("minz %g\n", minz);
+  //csVector3 pos = csVector3(12, 1, 4) - csVector3(.25, .25, .25);
+  //csVector3 res = trans * pos;
+  //printf("MTESTB %g, %g, %g  ->  %g, %g, %g\n", pos.x, pos.y, pos.z,
+    //res.x + shiftx, res.y + shifty, res.z);
+}
+

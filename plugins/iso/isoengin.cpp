@@ -21,6 +21,7 @@
 #include "isoworld.h"
 #include "isoview.h"
 #include "isospr.h"
+#include "isomesh.h"
 #include "isolight.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -140,6 +141,11 @@ iIsoView* csIsoEngine::CreateView(iIsoWorld *world)
 iIsoSprite* csIsoEngine::CreateSprite()
 {
   return new csIsoSprite(this);
+}
+
+iIsoMeshSprite* csIsoEngine::CreateMeshSprite()
+{
+  return new csIsoMeshSprite(this);
 }
 
 int csIsoEngine::GetBeginDrawFlags () const
