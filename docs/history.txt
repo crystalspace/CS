@@ -13,7 +13,11 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 24-Feb-2000
+	- Michael Dale Long did various fixes after Andrew's large change.
+	- Wyatt Miler did some fixes to Mac sound drivers.
 	- Martin Geisse contributed more updates to the Texinfo documentation.
+	- Robert Bate fixed up several compile warnings due to the large
+	  change from Andrew.
 23-Feb-2000
 	- Michael Dale Long did the following changes to Crystal Clear:
 	    - More csConsole bugfixes.
@@ -30,6 +34,109 @@ Short-term cleanups that need to be done:
 	    - Used new csString functionality to enhance cctest's console.
 	    - Fixed a minor compile bug in cspython that cropped up a while
 	      back.
+	- Andrew Zabolotny did a HUGE update to CVS:
+	    - Fully rewritten the texture manager and texture cache
+	      implementations. Also the interfaces and the way they work
+	      are slightly modified, the goal was to allow csws and
+	      engine live together. Also a side goal was to substantially
+	      simplify the texture manager, since it has grown
+	      stochastically, without future in the mind. It also contained
+	      some dead and semi-dead code, which was removed. Overall,
+	      the size of libs/cs3d shrinked by about 180K.
+	    - It is now possible to register textures dynamically after
+	      the world has loaded.
+	    - Texture cache has also been simplified (Glide and D3D are
+	      broken because of this). OpenGL and software should work.
+	    - The subtexture optimization is broken for now. I'll fix it
+	      in the future, but for a while you will notice a substantial
+	      slowdown with dynamic lights. Also you may notice instant
+	      "freezes" when some new lighted texture falls into your
+	      field of view. This is okay for a while and will be fixed.
+	      In fact, it is a primary todo (besides fixing bugs, of
+	      course :-)
+	    - Removed obsolete red_color, yellow_color etc from all 3D
+	      drivers.
+	    - Removed rendundant SetInCache() and IsCached() methods
+	      from iLightMap and iTextureHandle. It is simple to detect
+	      whenever a texture is in cache by just checking GetCacheData()
+	      for NULL.
+	    - Added screenshot capability to the OpenGL renderer.
+	      Unfortunately, the OpenGL renderer seems broken (at least
+	      I get very strange images with the OS/2 software renderer)
+	      but the screenshot seems to work.
+	      Attention OpenGL 2D drivers maintainers: please make sure
+	      your drivers use either 4 bytes or 1 byte pixel format.
+	      The 2 bytes per pixel is not supported by the screenshot
+	      generation routine. Since pixel format doesn't apply to
+	      anything other than screenshot, I don't see a single
+	      reason to use formats other than 4 bytes/pixel RGBA.
+	      This particularily applies to the Windows OpenGL 2D driver,
+	      BeOS OpenGL driver and to the MacOS OpenGL driver.
+	    - Added CS_IMGFMT_ANY image format. If you tell csImageLoader
+	      to load a image in this format, the image will be loaded
+	      in original image format, if possible (i.e. if the
+	      original image is 8bpp paletted or truecolor).
+	      Modified gfxtest to load images this way.
+	    - Removed memheap.* from cs3d/common. The only driver that
+	      was using it was software renderer, and it is using regular
+	      malloc()/free() scheme now. There is no much sense in a
+	      private heap, since the most costly operation when
+	      generating lightmaps is the proper lightmap generation,
+	      not the memory allocation, which is fast enough in any
+	      case. Besides, most OSes have much more optimized
+	      memory heap functions than the one in memheap.*.
+	    - Created a new class csBitSet. This is just an array
+	      of bits. You can set/reset individual bits, strips of bits,
+	      the entire array. You can AND/OR two arrays together. You
+	      can resize them.
+	    - Implemented the dirty matrix for lightmaps using csBitSet.
+	      This reduces memory requirements for dirty matrix eight
+	      times. Not that much savings but it's not something to
+	      completely ignore.
+	    - Fully implemented Gouraud and DrawPolygonFX for 8-bit modes.
+	      It doesn't look as bad as you could expect :-)
+	    - Implemented every missing scanline routine. Full support for
+	      32bpp. Implemented a couple of missing routines for 16bpp
+	      and 8bpp.
+	    - Found a bug in libs/csgfxldr/inv_cmap.cpp. However, I did
+	      not had time to find what exactly happens, so if someone
+	      (maybe the person who originally introduced the code into CS
+	      - G. C. Ewing) can understand how it works, see the comment
+	      in include/csgfxldr/inv_cmap.h. Thus I used as workaround
+	      5-5-5 inverse colormap in software renderer 8-bit modes (it
+	      doesn't look worse, and it's twice smaller (and somewhat
+	      faster)).
+	    - Changed csTextureList into a object derived from csObjVector.
+	      This both makes it simpler and faster (and smaller). To find
+	      a texture by name use csObjVector's FindByName (name), for
+	      getting a texture by index, use texlist->Get (index).
+	    - Textures with transparent colors are mipmapped now.
+	    - Tried to upgrade the OpenGL renderer's texture cache
+	      according to latest changes. It at least compiles now :-)
+	      I cannot check if it really works since from some time it
+	      does not work for me anymore. Only the CS logo shows in the
+	      top-right corner.
+	    - Removed the ugly inclusion of cs3d/opengl/*.cpp from all 2D
+	      OpenGL drivers. The textures are cached now during
+	      GetMipMapData (), and GetMipMapData () returns a texture
+	      handle ready for usage (the texture handle self-caches
+	      when GetMipMapData () is called).
+	    - Fixed a bug (???) in OpenGL renderer. The docs I have for
+	      reference says that third argument to glTexImage2D is the
+	      number of color components in passed image (i.e. 1, 2, 3
+	      or 4). However all over the place the third argument was
+	      either GL_RGB or GL_RGBA which is (from my GL/gl.h) either
+	      0x1907 or 0x1908. It is possible that some implementations
+	      clamp this value to 4, but the software OS/2 OpenGL just
+	      ignores the request. Browsing through Mesa sources also
+	      shows I am correct. I wonder how it managed to work
+	      before (?).
+	    - Replaced csGraphics2D::complete_pixel_format method with an
+	      inline method inside the csPixelFormat class. Instead of
+	      complete_pixel_format (), call pfmt.complete ().
+	    - Fixed two bugs in JPEG loaders: first was related to
+	      CS_IMGFMT_ANY and second was causing inability to load
+	      grayscale JPEGs.
 	- Gary Haussmann removed extraneous include of ext_w32.h in OpenGL.
 	- Eric Sunshine eliminated several compilation warnings from
 	  ogl_halo.cpp.
@@ -39,6 +146,9 @@ Short-term cleanups that need to be done:
 	  prevented application menu from displaying on MacOS/X Server.
 	- Fixed a memory leak in csVector::SetLength() reported by Denis
 	  Dmitriev.
+	- Seth Galbraith made a few fixes to the physics library after the
+	  large change from Andrew.
+	- Norman Kramer did a small fix to the quantize method in csgfxldr.
 22-Feb-2000
 	- Gary Haussmann fixed another mipmap bug in the OpenGL rasterizer.
 	  The problem was that the maximum mipmap level required is actually
