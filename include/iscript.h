@@ -21,6 +21,11 @@
 
 #include "csutil/scf.h"
 
+enum ResultType {
+	rtDouble=0,
+	rtPointer
+};
+
 struct iSystem;
 
 SCF_VERSION (iScript, 0, 0, 1);
@@ -32,6 +37,7 @@ struct iScript : public iBase
   virtual bool Initialize (iSystem *iSys) = 0;
   virtual bool RunText(const char *iStr)=0;
   virtual bool LoadModule(const char *iStr)=0;
+	virtual bool Store(const char* type, const char* name, void* data)=0;
 };
 
 #endif // __ISCRIPT_H__

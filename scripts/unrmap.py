@@ -53,11 +53,13 @@ class Brush(Actor):
 class Map(Actor):
 	"""A pickleable map"""
 	def Load(self):
-		loader=csLoader()
+#		loader=csLoader()
 		system=GetSystem()
-		world=system.Query_csWorld()
-		room=world.NewSector()
-		tm=loader.LoadTexture(world, 'stone', '/lib/std/stone4.gif')
+#		world=system.Query_csWorld()
+#		room=world.NewSector()
+		room=csSector(roomptr);
+#		tm=loader.LoadTexture(world, 'stone', '/lib/std/stone4.gif')
+		tm=csTextureHandle(tmptr)
 		for x in self.stack:
 			x.Load(room, tm)
 		g3d=system.Query_iGraphics3D()
@@ -156,11 +158,18 @@ class UnrealMap:
 			if(len(word)==2):
 				params[word[0]]=word[1]
 		return params
-		
-m=UnrealMap()
-m.Load('bluff.t3d')
-m.Save('bluff.pym')
 
-a=cPickle.load(open('bluff.pym','r'))
-a.Load()
-
+def Load(file):
+    	try:
+    		print 'Unrmap: Opening '+file+'.pym'
+		a=cPickle.load(open(file+'.pym','r'))
+	except:
+		print 'Unrmap: file not openable, attempting conversion of '+file+'.t3d'
+	 	m=UnrealMap()
+		m.Load(file+'.t3d')
+		m.Save(file+'.pym')
+		a=m.map
+	print 'Unrmap: Map loaded, creating...'
+	a.Load()
+				
+#Load('entry')

@@ -340,6 +340,22 @@ class iSystem(iSystemPtr):
 
 #-------------- FUNCTION WRAPPERS ------------------
 
+ptrcast = cspacec.ptrcast
+
+ptrvalue = cspacec.ptrvalue
+
+ptrset = cspacec.ptrset
+
+ptrcreate = cspacec.ptrcreate
+
+ptrfree = cspacec.ptrfree
+
+ptradd = cspacec.ptradd
+
+ptrmap = cspacec.ptrmap
+
+GetMyPtr = cspacec.GetMyPtr
+
 def GetSystem():
     val = cspacec.GetSystem()
     val = iSystemPtr(val)

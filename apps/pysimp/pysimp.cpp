@@ -93,18 +93,43 @@ bool PySimple::Initialize (int argc, char *argv[], const char *iConfigName)
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
 
+  csTextureHandle* tm = csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
+
   iScript* is = CREATE_INSTANCE("crystalspace.script.python", iScript);
   is->Initialize(this);
   is->RunText("import sys");
   is->RunText("sys.path.append('./scripts/');");
   is->RunText("import cshelper");
 
-  world->view=NULL;
-  
   if(!is->RunText("import unrmap"))
     return 0;
     
+	is->Store("csTextureHandle *", "unrmap.tmptr", tm);
+	is->Store("csSector *", "unrmap.roomptr", world->NewSector());
+
+  if(!is->RunText("unrmap.Load('data/entry')"))
+    return 0;
+    
+<<<<<<< pysimp.cpp
+/*  csStatLight* light;
+  light = new csStatLight (-3, 5, 0, 10, 1, 0, 0, false);
+  room->AddLight (light);
+  light = new csStatLight (3, 5, 0, 10, 0, 0, 1, false);
+  room->AddLight (light);
+  light = new csStatLight (0, 5, -3, 10, 0, 1, 0, false);
+  room->AddLight (light);*/
+
+  world->Prepare();
+
+  // Create a dynamic light.
+//  angle = 0;
+//  dynlight = new csDynLight (cos (angle)*3, 17, sin (angle)*3, 7, 1, 0, 0);
+//  world->AddDynLight (dynlight);
+//  dynlight->SetSector (room);
+//  dynlight->Setup ();
+=======
   world->Prepare ();
+>>>>>>> 1.2
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
