@@ -11,3 +11,4 @@ SubInclude TOP apps tests netmtst ;
 SubInclude TOP apps tests perl5tst ;
 SubInclude TOP apps tests picogui ;
 SubInclude TOP apps tests unittest ;
+SubInclude TOP apps tests vostest ;
