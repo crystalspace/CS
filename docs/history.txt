@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Apr-2005
+	- Eric Sunshine fixed some unportable uses of #warning directives in
+	  the public CS headers. (#warning is not part of the C++ standard)
 31-Mar-2005
 	- Marten fixed a few more places where a temporary return object was
 	  assigned to a reference.

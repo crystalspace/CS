@@ -73,7 +73,7 @@ typedef unsigned __int64 uint64;
 /// signed 64 bit integer
 typedef __int64 int64;
 #else
-#warning Do not know how to declare 64-bit integers
+#error Do not know how to declare 64-bit integers
 #endif // CS_COMPILER_GCC
 
 #else // CS_HAVE_STDINT_H
@@ -113,7 +113,7 @@ typedef int64_t int64;
 #define CONST_INT64(x)  x##i64
 #define CONST_UINT64(x) x##ui64
 #else
-#warning Do not know how to contruct 64-bit integer constants
+#error Do not know how to contruct 64-bit integer constants
 #endif // CS_COMPILER_GCC
 
 #endif // CS_HAVE_INT64_C
@@ -203,7 +203,7 @@ typedef uint64 ulonglong;
 typedef int_least64_t longlong;
 typedef uint_least64_t ulonglong;
 #else 
-#warning Do not know how to declare (u)longlong types
+#error Do not know how to declare (u)longlong types
 #endif 
 #endif 
 

@@ -1098,7 +1098,11 @@ class csPrintfFormatter
     scratch.WriteTo (writer, scratchOffs);
     scratch.Truncate (scratchOffs);
 #else
-  #warning Dont know how to hex-format floats for you
+  #if defined(CS_COMPILER_GCC)
+    #warning Do not know how to hex-format floats
+  #elif defined(CS_COMPILER_MSVC)
+    #pragma message("Do not know how to hex-format floats")
+  #endif
 #endif
   }
 public:

@@ -39,17 +39,29 @@
 #if !defined(CS_PLATFORM_NAME)
 /// Name of the platform CS is compiled for (i.e. Win32)
 #  define CS_PLATFORM_NAME "MysteryPlatform"
+#  if defined(CS_COMPILER_GCC)
 #  warning Unable to identify platform name using CS_PLATFORM_NAME.
+#  elif defined(CS_COMPILER_MSVC)
+#  pragma message("Unable to identify platform name using CS_PLATFORM_NAME.")
+#  endif
 #endif
 #if !defined(CS_PROCESSOR_NAME)
 /// Name of the processor CS is compiled for (i.e. X86)
 #  define CS_PROCESSOR_NAME "MysteryProcessor"
+#  if defined(CS_COMPILER_GCC)
 #  warning Unable to identify processor name using CS_PROCESSOR_NAME.
+#  elif defined(CS_COMPILER_MSVC)
+#  pragma message("Unable to identify processor name using CS_PROCESSOR_NAME.")
+#  endif
 #endif
 #if !defined(CS_COMPILER_NAME)
 /// Name of the compiler CS is compiled with (i.e. GCC)
 #  define CS_COMPILER_NAME "MysteryCompiler"
+#  if defined(CS_COMPILER_GCC)
 #  warning Unable to identify compiler name using CS_COMPILER_NAME.
+#  elif defined(CS_COMPILER_MSVC)
+#  pragma message("Unable to identify compiler name using CS_COMPILER_NAME.")
+#  endif
 #endif
 
 /// A complete version number
