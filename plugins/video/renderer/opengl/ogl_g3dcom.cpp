@@ -1273,7 +1273,6 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
   if (DrawMode & CSDRAW_3DGRAPHICS)
   {
     FlushDrawPolygon ();
-    lightmap_cache->Flush ();
   }
 
   // If we go to 2D mode then we do as if several modes are disabled.
@@ -1315,7 +1314,6 @@ void csGraphics3DOGLCommon::FinishDraw ()
   //if (DrawMode & CSDRAW_3DGRAPHICS)
   {
     FlushDrawPolygon ();
-    lightmap_cache->Flush ();
   }
 
   if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
@@ -1980,10 +1978,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     || (alpha != 1.0f ) );
 
   FlushDrawPolygon ();
-  if (flatlighting || ((poly.mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY))
-    lightmap_cache->Flush ();
-  else
-    lightmap_cache->FlushIfNeeded ();
 
   // The following attempt to speed up only hits for about 10% in flarge,
   // so maybe its prolly not woth it. However, for highly triangulized cases
@@ -2350,7 +2344,6 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
     return;
 
   FlushDrawPolygon ();
-  lightmap_cache->Flush ();
 
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
@@ -2457,7 +2450,6 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
       poly.use_fog != queue.use_fog)
   {
     FlushDrawPolygon ();
-    lightmap_cache->Flush ();
   }
 
   //========
@@ -3498,7 +3490,6 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   }
 
   FlushDrawPolygon ();        //@@@ Should do checks here since
-  lightmap_cache->Flush ();   //    flushes may be unnecessary
 
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
   int num_triangles = mesh.num_triangles;
@@ -4074,11 +4065,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
 
   FlushDrawPolygon ();
-  iTextureHandle *tex = mesh.mat_handle?mesh.mat_handle->GetTexture():NULL;
-  if (tex && tex->GetAlphaMap())
-    lightmap_cache->Flush ();
-  else
-    lightmap_cache->FlushIfNeeded ();
+  //iTextureHandle *tex = mesh.mat_handle?mesh.mat_handle->GetTexture():NULL;
 
   bool stencil_enabled = false;
   bool clip_planes_enabled = false;
@@ -4730,9 +4717,8 @@ void csGraphics3DOGLCommon::CacheTexture (iMaterialHandle *imat_handle)
   }
 }
 
-void csGraphics3DOGLCommon::RemoveFromCache (iPolygonTexture* poly_texture)
+void csGraphics3DOGLCommon::RemoveFromCache (iPolygonTexture* /*poly_texture*/)
 {
-  lightmap_cache->Uncache (poly_texture);
 }
 
 bool csGraphics3DOGLCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
@@ -4825,7 +4811,6 @@ void csGraphics3DOGLCommon::ClearCache ()
   // cleaned up individually when an iTextureHandle's RefCount reaches zero.
   if (!lightmap_cache) return;  // System is being destructed.
   FlushDrawPolygon ();
-  lightmap_cache->Flush ();
   lightmap_cache->Clear ();
 }
 
@@ -4837,7 +4822,6 @@ void csGraphics3DOGLCommon::DrawLine (const csVector3 & v1,
   const csVector3 & v2, float fov, int color)
 {
   FlushDrawPolygon ();
-  lightmap_cache->Flush ();
 
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;
@@ -4970,7 +4954,6 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha)
 {
   FlushDrawPolygon ();
-  lightmap_cache->Flush ();
 
   // If original dimensions are different from current dimensions (because
   // image has been scaled to conform to OpenGL texture size restrictions)

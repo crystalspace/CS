@@ -4,6 +4,7 @@ The history order is reversed so that new features are at the top.
 	- For some reason include/cssys/win32/csosdefs.h was full of
 	  ^M (carriage return) characters. This failed the compilation.
 	- Fixed other ^M chars in other thread related files.
+	- Greatly cleaned up OpenGL renderer again (super lightmap cache).
 	- Eric Sunshine made the following changes related to the CS threading
 	  API, implementation, and configuration:
 	    - Additional cleanup of the API.  Also added and updated comments.

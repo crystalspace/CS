@@ -35,68 +35,12 @@
 #define CS_NORMAL_LIGHT_LEVEL 128
 #endif
 
-//----------------------------------------------------------------------------//
-
-
-csLMCacheDataQueue::csLMCacheDataQueue()
-{
-  head = NULL;
-  tail = NULL;
-}
-
-void* csLMCacheDataQueue::Alloc(int w, int h, SourceData s, csSubRectangles* r,
-      GLuint Handle)
-{
-  csRect raux;
-  if(r->Alloc(w,h,raux))
-  {
-    //it fits in this superlightmap
-    //let's allocate it
-    csLMCacheData * clm = new csLMCacheData();
-    clm->Source = s.LMDataSource;
-    clm->Handle = Handle;
-    clm->super_lm_rect = raux;
-
-    if(head)
-    {
-      head->prev = clm;
-      clm->prev = NULL;
-      clm->next = head;
-    }
-    else
-    {
-      tail = clm;
-      clm->next = NULL;
-      clm->prev = NULL;
-    }
-    head = clm;
-    return clm;
-  }
-  return NULL;
-}
-
-
-void csLMCacheDataQueue::Clear()
-{
-  while (head)
-  {
-    iLightMap* lm = (iLightMap *)head->Source;
-    if (lm) lm->SetCacheData (NULL);
-    csLMCacheData* h = head->next;
-    delete head;
-    head = h;
-  }
-  tail = NULL;
-}
-
 //------------------------------------------------------------------------//
-void* csSLMCacheData::Alloc(int /*w*/, int /*h*/, SourceData s,
-  csSubRectangles* /*r*/, GLuint /*Handle*/)
+void csSLMCacheData::Alloc (csTrianglesPerSuperLightmap* s)
 {
-  source = s.superLMDataSource;
+  source = s;
   source->cacheData = this;
   isUnlit = source->isUnlit;
-  return s.superLMDataSource;
 }
 
 void csSLMCacheData::Clear()
@@ -288,190 +232,8 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
 //----------------------------------------------------------------------------//
 
-int csLightMapQueue::AddVertices (int num)
-{
-  num_vertices += num;
-  if (num_vertices > max_vertices)
-  {
-    GLfloat* new_ar;
-    int old_num = num_vertices-num;
-    max_vertices = num_vertices + 40;
-
-    new_ar = new GLfloat [max_vertices*4];
-    if (glverts) memcpy (new_ar, glverts, sizeof (GLfloat)*4*old_num);
-    delete[] glverts; glverts = new_ar;
-
-    new_ar = new GLfloat [max_vertices*2];
-    if (gltxt) memcpy (new_ar, gltxt, sizeof (GLfloat)*2*old_num);
-    delete[] gltxt; gltxt = new_ar;
-
-    new_ar = new GLfloat [max_vertices*2];
-    if (gltxt) memcpy (new_ar, gltxtFog, sizeof (GLfloat)*2*old_num);
-    delete[] gltxtFog; gltxtFog = new_ar;
-
-    new_ar = new GLfloat [max_vertices*3];
-    if (gltxt) memcpy (new_ar, glcolorsFog, sizeof (GLfloat)*3*old_num);
-    delete[] glcolorsFog; glcolorsFog = new_ar;
-  }
-  return num_vertices-num;
-}
-
-void csLightMapQueue::AddTriangle (int i1, int i2, int i3)
-{
-  int old_num = num_triangles;
-  num_triangles++;
-  if (num_triangles > max_triangles)
-  {
-    max_triangles += 20;
-    int* new_ar;
-    new_ar = new int [max_triangles*3];
-    if (tris) memcpy (new_ar, tris, sizeof (int) * 3 * old_num);
-    delete[] tris; tris = new_ar;
-  }
-  tris[old_num*3+0] = i1;
-  tris[old_num*3+1] = i2;
-  tris[old_num*3+2] = i3;
-}
-
-void csLightMapQueue::AddTrianglesArray(csTriangle* indices, int numTriangles)
-{
-   int old_num = num_triangles;
-   num_triangles += numTriangles;
-   if (num_triangles > max_triangles)
-   {
-     max_triangles = num_triangles + 50;
-     int* new_ar = new int [max_triangles*3];
-     if (tris) memcpy(new_ar, tris, sizeof(int)*3*old_num);
-     delete[] tris; tris = new_ar;
-   }
-
-   int* aux = tris + old_num*3;
-
-   memcpy(aux,(int*)indices,sizeof(int)*3*numTriangles);
-   //aux = (int*)indices;
-}
-
-void csLightMapQueue::AddTexelsArray(csVector2* uvs, int numUV)
-{
-  GLfloat* aux = gltxt + (num_vertices-numUV)*2;
-  //aux = (float*)uvs;
-  memcpy(aux,(float*)uvs,sizeof(GLfloat)*2*numUV);
-}
-
-void csLightMapQueue::AddTrianglesArrayFast(csTriangle* indices,
-  int numTriangles)
-{
-  tris = (int*)indices;
-  num_triangles = numTriangles;
-}
-
-void csLightMapQueue::AddTexelsArrayFast(csVector2* uvs)
-{
-  gltxt = (GLfloat*)uvs;
-}
-
-
-
-void csLightMapQueue::AddFogInfoArray(csColor* fogColors, int numColors)
-{
-  GLfloat* aux = glcolorsFog + (num_vertices-numColors)*3;
-  memcpy(aux,(float*)fogColors,sizeof(GLfloat)*3*numColors);
-}
-
-void csLightMapQueue::AddFogTexelsArray(csVector2* fogTexels, int numUV)
-{
-  GLfloat* aux = gltxtFog + (num_vertices-numUV)*2;
-  memcpy(aux,(float*)fogTexels,sizeof(GLfloat)*2*numUV);
-}
-
-
-void csLightMapQueue::AddFogInfoFast(csColor* work_verts)
-{
-  glcolorsFog = (GLfloat*)work_verts;
-}
-
-void csLightMapQueue::AddFogTexelsFast(csVector2* work_fog_texels)
-{
-  gltxtFog = (GLfloat*)work_fog_texels;
-}
-
-void csLightMapQueue::Flush (GLuint Handle)
-{
-  if (num_triangles <= 0 || num_vertices <= 0) return;
-  csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, Handle);
-  glVertexPointer (4, GL_FLOAT, 0, glverts);
-  glTexCoordPointer (2, GL_FLOAT, 0, gltxt);
-  glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, tris);
-}
-
-void csLightMapQueue::FlushFog (GLuint HandleFog)
-{
-  if (num_triangles <= 0 || num_vertices <= 0) return;
-
-  csGraphics3DOGLCommon::statecache->SetTexture(GL_TEXTURE_2D, HandleFog);
-  glVertexPointer (4, GL_FLOAT, 0, glverts);
-  glTexCoordPointer(2,GL_FLOAT,0,gltxtFog);
-  glColorPointer (3, GL_FLOAT, 0, glcolorsFog);
-  glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, tris);
-  Reset();
-}
-
-void csLightMapQueue::Reset()
-{
-  if (!ownsData)
-  {
-    gltxt = NULL;
-    glverts = NULL;
-    tris = NULL;
-    gltxtFog = NULL;
-    glcolorsFog = NULL;
-    max_triangles = 0;
-    max_vertices = 0;
-  }
-  num_triangles = 0;
-  num_vertices = 0;
-}
-
-void csLightMapQueue::SaveArrays()
-{
-  gltxtCached = gltxt;
-  glvertsCached = glverts;
-  max_trianglesCached = max_triangles;
-  max_verticesCached = max_vertices;
-  num_trianglesCached = num_triangles;
-  num_verticesCached = num_vertices;
-  trisCached = tris;
-  glcolorsFogCached = glcolorsFog;
-  gltxtFogCached = gltxtFog;
-  max_fog_colorsCached = max_fog_colors;
-  num_fog_colorsCached = num_fog_colors;
-}
-
-void csLightMapQueue::LoadArrays()
-{
-  gltxt = gltxtCached;
-  glverts = glvertsCached;
-  gltxtFog = gltxtFogCached;
-  glcolorsFog = glcolorsFogCached;
-  max_triangles = max_trianglesCached;
-  max_vertices = max_verticesCached;
-  max_fog_colors = max_fog_colorsCached;
-  //num_triangles = num_trianglesCached;
-  //num_vertices = num_verticesCached;
-  tris = trisCached;
-  gltxtCached = glvertsCached = NULL;
-  trisCached = NULL;
-  gltxtFogCached = NULL;
-  glcolorsFogCached = NULL;
-}
-
-//----------------------------------------------------------------------------//
-
 csSuperLightMap::csSuperLightMap ()
 {
-  region = new csSubRectangles (
-    csRect (0, 0, OpenGLLightmapCache::super_lm_size,
-  OpenGLLightmapCache::super_lm_size));
   cacheData = NULL;
 }
 
@@ -479,23 +241,20 @@ csSuperLightMap::~csSuperLightMap ()
 {
   Clear ();
   glDeleteTextures (1, &Handle);
-  delete region;
 }
 
-csLMCacheData* csSuperLightMap::Alloc (int w, int h, SourceData s)
+void csSuperLightMap::Alloc (csTrianglesPerSuperLightmap* s)
 {
-  return (csLMCacheData*)cacheData->Alloc(w, h, s, region, Handle);
+  cacheData->Alloc (s);
 }
 
 void csSuperLightMap::Clear ()
 {
-  region->Clear ();
-  if(cacheData)
+  if (cacheData)
   {
-    cacheData->Clear();
+    cacheData->Clear ();
     cacheData = NULL;
   }
-  queue.Reset ();
 }
 
 //----------------------------------------------------------------------------//
@@ -507,10 +266,8 @@ OpenGLLightmapCache::OpenGLLightmapCache (csGraphics3DOGLCommon* g3d)
 {
   suplm = new csSuperLightMap [super_lm_num];
   cur_lm = 0;
-  num_lm_processed = 0;
   initialized = false;
   OpenGLLightmapCache::g3d = g3d;
-  queue_zbuf_mode = CS_ZBUF_NONE;
 }
 
 OpenGLLightmapCache::~OpenGLLightmapCache ()
@@ -573,31 +330,12 @@ void OpenGLLightmapCache::Setup ()
 void OpenGLLightmapCache::Clear ()
 {
   cur_lm = 0;
-  num_lm_processed = 0;
   int i;
   for (i = 0 ; i < super_lm_num ; i++)
   {
     suplm[i].Clear ();
   }
 }
-
-void OpenGLLightmapCache::Uncache (iPolygonTexture *polytex)
-{
-  iLightMap* lm = polytex->GetLightMap ();
-  if (lm == NULL) return;
-  csLMCacheData* clm = (csLMCacheData *)lm->GetCacheData ();
-  if (!clm) return;
-  lm->SetCacheData (NULL);
-  csSuperLightMap* slm = &suplm[clm->super_lm_idx];
-  csLMCacheDataQueue* data = (csLMCacheDataQueue*)slm->cacheData;
-
-  if (clm->prev) clm->prev->next = clm->next;
-  else data->head = clm->next;
-  if (clm->next) clm->next->prev = clm->prev;
-  else data->tail = clm->prev;
-  delete clm;
-}
-
 
 int OpenGLLightmapCache::FindFreeSuperLightmap()
 {
@@ -620,6 +358,7 @@ int OpenGLLightmapCache::FindFreeSuperLightmap()
 void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
   bool* modified)
 {
+  Setup ();
   modified = false;
   //First: Try to find a free superlightmap
   //Check if the superLightmap is already in the cache
@@ -647,9 +386,10 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
           iLightMap* lm = lmArray[i]->GetLightMap();
           int lmwidth = lm->GetWidth();
           int lmheight = lm->GetHeight();
-         csRGBpixel* lm_data = lm->GetMapData();
+          csRGBpixel* lm_data = lm->GetMapData();
           csRect r = rectangleArray[i];
-          csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
+          csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D,
+	  	SLMHandle);
           glTexSubImage2D(GL_TEXTURE_2D, 0,r.xmin,r.ymin,
             lmwidth, lmheight,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
         }
@@ -665,22 +405,19 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
   int index = FindFreeSuperLightmap();
   if(index < 0)
   {
-    //Flush one lightmap
-    //Temporaly i will flush the following lightmap (it would be nice to
-    //implement a LRU algorithm here)
+    // Clear one lightmap
+    // Temporaly i will clear the following lightmap (it would be nice to
+    // implement a LRU algorithm here)
     cur_lm = (cur_lm + 1) % super_lm_num;
-    Flush(cur_lm);
     suplm[cur_lm].Clear();
     index = cur_lm;
   }
   s->initialized = false;
   //Fill the superLightmap
-  SourceData sd ;
-  sd.superLMDataSource = s;
-  suplm[index].cacheData = new csSLMCacheData();
+  suplm[index].cacheData = new csSLMCacheData ();
   //We're going to fill the whole super lightmap, so we don't give
   //width and height
-  suplm[index].Alloc(0,0,sd);
+  suplm[index].Alloc (s);
   csSLMCacheData* superLMData = (csSLMCacheData*) suplm[index].cacheData;
   superLMData->Handle = SLMHandle = suplm[index].Handle;
   s->slId = index;
@@ -698,88 +435,6 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
       lmwidth, lmheigth,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
   }
   s->initialized = true;
-}
-
-void OpenGLLightmapCache::Load (csLMCacheData *d)
-{
-  iLightMap* lightmap_info = d->Source;
-  int lmwidth = lightmap_info->GetWidth ();
-  int lmheight = lightmap_info->GetHeight ();
-  csRGBpixel* lm_data = lightmap_info->GetMapData ();
-
-  csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, d->Handle);
-  csRect& r = d->super_lm_rect;
-  glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
-    lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
-}
-
-void OpenGLLightmapCache::FlushIfNeeded ()
-{
-  Setup ();
-  if (!g3d->CompatibleZBufModes (g3d->z_buf_mode, queue_zbuf_mode))
-    Flush ();
-}
-
-void OpenGLLightmapCache::Flush ()
-{
-  Setup ();
-
-  int i;
-  bool flush_needed = false;
-  for (i = 0 ; i < super_lm_num ; i++)
-  {
-    csLightMapQueue& lm_queue = suplm[i].queue;
-    if (lm_queue.num_triangles > 0 && lm_queue.num_vertices > 0)
-    {
-      flush_needed = true;
-      break;
-    }
-  }
-  if (!flush_needed) return;
-  g3d->SetGLZBufferFlagsPass2 (queue_zbuf_mode, true);
-  csGraphics3DOGLCommon::statecache->EnableState (GL_TEXTURE_2D);
-  glColor4f (1, 1, 1, 0);
-  csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
-  csGraphics3DOGLCommon::SetClientStates (CS_CLIENTSTATE_VT);
-  for (i = 0 ; i < super_lm_num ; i++)
-  {
-    if(suplm[i].cacheData)
-      if(suplm[i].cacheData->IsUnlit()) continue;
-    suplm[i].queue.Flush (suplm[i].Handle);
-  }
-  csGraphics3DOGLCommon::SetupBlend (CS_FX_ALPHA, 0, false);
-  csGraphics3DOGLCommon::SetClientStates (CS_CLIENTSTATE_ALL);
-  glShadeModel (GL_SMOOTH);
-  for (i = 0; i < super_lm_num;i++)
-  {
-    if (!suplm[i].cacheData)
-    {
-      suplm[i].queue.Reset();
-      continue;
-    }
-    if (suplm[i].cacheData->HasFog())
-    {
-      csSLMCacheData* cacheData = (csSLMCacheData*) suplm[i].cacheData;
-      suplm[i].queue.FlushFog(cacheData->FogHandle);
-    }
-    else suplm[i].queue.Reset();
-  }
-}
-
-void OpenGLLightmapCache::Flush (int sup_idx)
-{
-  csLightMapQueue& lm_queue = suplm[sup_idx].queue;
-  if (lm_queue.num_triangles <= 0 || lm_queue.num_vertices <= 0) return;
-
-//@@@ We might want to add code here to save the state of OpenGL.
-//The problem is that this code can be called at unexpected places.
-//Luckily this is rare. It can only happen if one frame needs lightmaps
-//from ALL the super-lightmaps at once.
-  g3d->SetGLZBufferFlagsPass2 (queue_zbuf_mode, true);
-  csGraphics3DOGLCommon::statecache->EnableState (GL_TEXTURE_2D);
-  csGraphics3DOGLCommon::SetupBlend (CS_FX_SRCDST, 0, false);
-  csGraphics3DOGLCommon::SetClientStates (CS_CLIENTSTATE_VT);
-  lm_queue.Flush (suplm[sup_idx].Handle);
 }
 
 bool OpenGLLightmapCache::IsLightmapOK (iPolygonTexture *polytex)
