@@ -72,7 +72,9 @@ struct iObjectRegistry : public iBase
 
   /**
    * Get the registered object corresponding with the given tag and
-   * implementing the specified interface.
+   * implementing the specified interface. The iBase pointers returned
+   * by the iterator will be the requested interface itself so there is
+   * no need to do further QueryInterface().
    * This function will NOT increase the ref count of the returned object.
    */
   virtual iBase* Get (char const* tag, scfInterfaceID id, int version) = 0;

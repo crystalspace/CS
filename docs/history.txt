@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 	    the PerfStats loading problem, but doesnt fix the fact
 	    that the plugin was taking the name tag from the walktest
 	    config file.
+	- Updated comment on iObjectRegistry::Get(scfInterfaceID id, int)
+	  to say that it does return the pointer to the requested interface
+	  so there is no need to do QueryInterface().
 16-Oct-2001
 	- iObjectRegistry::Register() will now return false if something
 	  is registered with a duplicate tag (exception is the NULL tag).
