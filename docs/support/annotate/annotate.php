@@ -52,7 +52,7 @@ if ($action=="") {
 		"File:   $self\n".
 		"Time:   ".strftime("%a, %d %b %G (%H:%M)",$newentry->date)." (".$newentry->date.")\n".
 		"Comment:\n".
-		"$texttext");
+		stripslashes($texttext));
         }
         fclose($h);
         chmod($file, 0666);
@@ -103,10 +103,15 @@ function printEntries()
 	print "<table width=\"100%\" bgcolor=\"#88bbff\" celspacing=\"0\" celpadding=\"0\">\n";
 	print "<tr><td>\n";
 	if ($e->author != "") {
-		print $e->author." ";
-	} 
+		print $e->author;
+	}
 	if ($e->email != "") {
-		print "<a href=\"mailto:".$e->email."\">".$e->email."</a>";
+		$mail = str_replace("@","-<font color=red>at</font>-",$e->email);
+		$mail = str_replace(".","-<font color=red>dot</font>-",$mail);
+		if ($e->author != "")
+			print " ($mail)";
+		else
+			print $mail;
 	}
 	print "</td>\n";
 
@@ -118,7 +123,7 @@ function printEntries()
 	print "</b></td></tr>\n";
 	print "</table>\n";
 	print "<table width=\"100%\" bgcolor=\"#eeeeee\"><tr><td>";
-	print $e->text;
+	print stripslashes($e->text);
 	print "</td></tr></table>\n";
 	print "<br>\n";
     }
