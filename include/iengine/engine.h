@@ -161,6 +161,11 @@ struct iEngine : public iBase
    * the texture manager (the texture manager should have them
    * locally now). The optional progress meter will be used to
    * report progress.
+   * <p>
+   * The behaviour regarding cached lighting depends on the flag
+   * you can set with the SetLightingCacheMode() function. The default
+   * behaviour is to read the lightmap cache when present but don't
+   * calculate lighting if cache is not present.
    */
   virtual bool Prepare (iProgressMeter* meter = 0) = 0;
 

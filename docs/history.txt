@@ -12,6 +12,7 @@ The history order is reversed so that new features are at the top.
 	  where it was prefixing an extra $(SRCDIR) to items from SRC.SYS_CSSYS
 	  and INC.SYS_CSSYS which already mentioned SRCDIR.  Problem was
 	  pointed out by Frank Richter.
+	- Jorrit clarified a comment with iEngine->Prepare().
 12-Jun-2003
 	- Jorrit clarified a comment with csColliderWrapper telling people that
 	  you must DecRef() the new collider wrapper after creating it.
