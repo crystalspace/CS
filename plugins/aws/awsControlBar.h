@@ -1,27 +1,19 @@
 // awsControlBar.h: interface for the awsControlBar class.
 //
 //////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_AWSCONTROLBAR_H__610A57D1_4F71_4AF3_A31F_23D1445E4AB1__INCLUDED_)
-#define AFX_AWSCONTROLBAR_H__610A57D1_4F71_4AF3_A31F_23D1445E4AB1__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+#ifndef __AWSCONTROLBASE_H__
+#define __AWSCONTROLBASE_H__
 
 #include "awscomp.h"
 #include "awsPanel.h"
 
-
-/* This is the base class for a number of different component types. A control bar
-   is just a simple component that has any number of any type of component in it,
-   layed out in a row.
-*/
-
+/** This is the base class for a number of different component types. A
+ * control bar is just a simple component that has any number of any type
+ * of component in it, layed out in a row.
+ */
 class awsControlBar : public awsPanel
 {
 private:
-
   /// the components in the bar
   awsComponentVector comps;
 
@@ -48,15 +40,15 @@ private:
   // layout the child components and resize this component if necessary
   void DoLayout ();
 
- public:
-
+public:
   awsControlBar ();
   virtual ~awsControlBar ();
 
   virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
-  virtual char *Type (){return "Control Bar";}
+  virtual const char *Type ()
+  {return "Control Bar";}
 
-  bool Execute(char* action, iAwsParmList &parmlist);
+  bool Execute(const char* action, iAwsParmList &parmlist);
 
   /// Adds a component to the bar
   void AddChild(iAwsComponent *comp);
@@ -113,4 +105,5 @@ public:
   iAwsComponent* Create();
 };
 
-#endif // !defined(AFX_AWSCONTROLBAR_H__610A57D1_4F71_4AF3_A31F_23D1445E4AB1__INCLUDED_)
+#endif
+

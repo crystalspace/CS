@@ -7,13 +7,22 @@
 #include "awsprefs.h"
 #include "awsadler.h"
 
-awsKey *awsKeyContainer::Find (iString *n)
+awsKey* awsKeyContainer::Find (iString *n)
 {
   return Find (
       aws_adler32 (
         aws_adler32 (0, NULL, 0),
         (unsigned char *)n->GetData (),
         n->Length ()));
+}
+
+awsKey* awsKeyContainer::Find (const char* n)
+{
+  return Find (
+      aws_adler32 (
+	aws_adler32 (0, NULL, 0),
+	(unsigned char*) n,
+	strlen(n)));
 }
 
 awsKey *awsKeyContainer::Find (unsigned long idname)
@@ -38,6 +47,27 @@ awsKey *awsKeyContainer::Find (unsigned long idname)
   if (aws_debug) printf ("aws-debug: search failed.\n");
 
   return NULL;
+}
+
+void awsKeyContainer::Remove (iString* name)
+{
+  awsKey* key = Find(name);
+  
+  if (key)
+    Remove (key);
+}
+
+void awsKeyContainer::Remove (const char* name)
+{
+  awsKey* key = Find (name);
+
+  if (key)
+    Remove (key);
+}
+
+void awsKeyContainer::Remove (awsKey* key)
+{
+  children.Delete ((csSome) key);
 }
 
 void awsKeyContainer::Consume (awsKeyContainer *c)

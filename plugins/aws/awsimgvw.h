@@ -20,8 +20,7 @@
 *****************************************************************************/
 # include "awscomp.h"
 
-class awsImageView :
-  public awsComponent
+class awsImageView : public awsComponent
 {
   /// True when button is down, false if up
   bool is_down;

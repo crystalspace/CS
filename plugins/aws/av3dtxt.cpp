@@ -160,7 +160,7 @@ csTextureHandleNull::~csTextureHandleNull ()
   delete[] pal2glob8;
 }
 
-csTexture *csTextureHandleNull::NewTexture (iImage *Image, bool ismipmap)
+csTexture *csTextureHandleNull::NewTexture (iImage *Image, bool )
 {
   return new csTextureNull (this, Image);
 }

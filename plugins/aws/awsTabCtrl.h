@@ -1,19 +1,13 @@
 // awsTabCtrl.h: interface for the awsTabCtrl class.
 //
 //////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_AWSTABCTRL_H__B355C829_8B96_4601_B3C1_4022C9D7590E__INCLUDED_)
-#define AFX_AWSTABCTRL_H__B355C829_8B96_4601_B3C1_4022C9D7590E__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+#ifndef __AWSTABCTRL_H__
+#define __AWSTABCTRL_H__
 
 #include "awscomp.h"
 #include "awsscrbr.h"
 
-/* This class implements a basic tab button on a tab control.  */
-
+/** This class implements a basic tab button on a tab control. */
 class awsTab : public awsComponent
 {
  protected:
@@ -222,4 +216,5 @@ protected:
 
 };
 
-#endif // !defined(AFX_AWSTABCTRL_H__B355C829_8B96_4601_B3C1_4022C9D7590E__INCLUDED_)
+#endif
+

@@ -47,11 +47,11 @@ const int grip_size = 16;
 const bool DEBUG_WINDOW_EVENTS = false;
 
 awsWindow::awsWindow () :
-  sink(this),
   frame_options(foControl | foZoom | foClose | foTitle | foGrip | foRoundBorder),
   title(NULL),
   resizing_mode(false),
   moving_mode(false),
+  sink(this),
   is_minimized(false),
   popup(NULL),
   menu(NULL)
@@ -409,7 +409,7 @@ bool awsWindow::OnMouseDown (int button, int x, int y)
     return false;
 }
 
-bool awsWindow::OnMouseUp (int button, int x, int y)
+bool awsWindow::OnMouseUp (int button, int , int )
 {
   (void)button;
 
@@ -504,10 +504,10 @@ void awsWindow::OnDraw (csRect clip)
         scfString tmp (title->GetData ());
         tmp.Truncate (mcc);
 		
-		if(mcc < title->Length())
+		if(mcc < (int) title->Length())
 		{
 		  // set the last 3 characters to ...
-		  for(int i = MAX(0, (int)tmp.Length() - 3); i < tmp.Length(); i++)
+		  for(unsigned int i = MAX(0, (int)tmp.Length() - 3); i < tmp.Length(); i++)
 			  tmp.SetAt(i, '.');
 		}
         
@@ -624,12 +624,12 @@ bool awsWindow::IsMoving()
   return moving_mode;
 }
 
-void awsWindow::OnCloseClick(void *p, iAwsSource *source)
+void awsWindow::OnCloseClick(void *p, iAwsSource *)
 {
   ((iAwsComponent*)p)->Broadcast(sWindowClosed);
 }
 
-void awsWindow::OnZoomClick(void *p, iAwsSource *source)
+void awsWindow::OnZoomClick(void *p, iAwsSource *)
 {
   iAwsComponent* comp = (iAwsComponent*)p;
   if(comp->IsMaximized())
@@ -638,7 +638,7 @@ void awsWindow::OnZoomClick(void *p, iAwsSource *source)
     comp->Maximize();
 }
 
-void awsWindow::OnMinClick(void *p, iAwsSource *source)
+void awsWindow::OnMinClick(void *p, iAwsSource *)
 {
   ((iAwsComponent*)p)->Broadcast(sWindowMinimized);
 }

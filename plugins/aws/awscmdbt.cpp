@@ -32,7 +32,7 @@ awsCmdButton::~awsCmdButton ()
 {
 }
 
-char *awsCmdButton::Type ()
+const char *awsCmdButton::Type ()
 {
   return "Command Button";
 }
@@ -88,7 +88,7 @@ bool awsCmdButton::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsCmdButton::GetProperty (char *name, void **parm)
+bool awsCmdButton::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -111,7 +111,7 @@ bool awsCmdButton::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsCmdButton::SetProperty (char *name, void *parm)
+bool awsCmdButton::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 
@@ -212,12 +212,12 @@ void awsCmdButton::OnDraw (csRect /*clip*/)
   iGraphics3D *g3d = WindowManager ()->G3D ();
 
   int hi = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT);
-  int hi2 = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT2);
+  //int hi2 = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT2);
   int lo = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW);
-  int lo2 = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW2);
+  //int lo2 = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW2);
   int fill = WindowManager ()->GetPrefMgr ()->GetColor (AC_FILL);
-  int dfill = WindowManager ()->GetPrefMgr ()->GetColor (AC_DARKFILL);
-  int black = WindowManager ()->GetPrefMgr ()->GetColor (AC_BLACK);
+  //int dfill = WindowManager ()->GetPrefMgr ()->GetColor (AC_DARKFILL);
+  //int black = WindowManager ()->GetPrefMgr ()->GetColor (AC_BLACK);
 
   frame_drawer.SetBackgroundColor(fill);
 

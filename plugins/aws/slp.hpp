@@ -1,12 +1,15 @@
-#ifndef BISON_SLPARSE_HPP
-# define BISON_SLPARSE_HPP
+#ifndef BISON_PLUGINS_AWS_SLP_HPP
+# define BISON_PLUGINS_AWS_SLP_HPP
 
 #ifndef YYSTYPE
 typedef union {
-  char   *str;     /* For returning titles and handles to items. */
-  int     val;     /* For returning numbers                      */
-  csRect *rect;    /* For returning rectangular regions          */
-  awsKey *key;     /* For returning keys to various definition items */
+  char   *str;			/* For returning titles and handles to items. */
+  int     val;			/* For returning numbers                      */
+  csRect *rect;			/* For returning rectangular regions          */
+  awsKey *key;     		/* For returning keys to various definition items */
+  awsComponentNode *comp;	/* for returning windows		      */
+  awsKeyContainer *keycont;	/* for returning KeyContainers		      */
+  awsSkinNode *skin;		/* for returning skins			      */
 } yystype;
 # define YYSTYPE yystype
 # define YYSTYPE_IS_TRIVIAL 1
@@ -24,4 +27,4 @@ typedef union {
 # define	NEG	267
 
 
-#endif /* not BISON_SLPARSE_HPP */
+#endif /* not BISON_PLUGINS_AWS_SLP_HPP */

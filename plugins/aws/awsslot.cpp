@@ -7,7 +7,7 @@
 #define callRefMemberFunction(object, ptrToMember)  ((object).*(ptrToMember))
 #define callPtrMemberFunction(object, ptrToMember)  ((object)->*(ptrToMember))
 
-static unsigned long NameToId (char *n)
+static unsigned long NameToId (const char *n)
 {
   if (n)
   {
@@ -49,13 +49,13 @@ bool awsSinkManager::Initialize (iObjectRegistry *)
   return true;
 }
 
-void awsSinkManager::RegisterSink (char *name, iAwsSink *sink)
+void awsSinkManager::RegisterSink (const char *name, iAwsSink *sink)
 {
   sink->IncRef ();
   sinks.Push (new SinkMap (NameToId (name), sink));
 }
 
-iAwsSink *awsSinkManager::FindSink (char *_name)
+iAwsSink *awsSinkManager::FindSink (const char *_name)
 {
   int i;
   unsigned long name = NameToId (_name);
@@ -86,7 +86,7 @@ awsSink::~awsSink ()
 {
 }
 
-unsigned long awsSink::GetTriggerID (char *_name)
+unsigned long awsSink::GetTriggerID (const char *_name)
 {
   unsigned long name = NameToId (_name);
   int i;
@@ -119,8 +119,7 @@ void awsSink::HandleTrigger (int trigger, iAwsSource *source)
   (Trigger) (parm, source);
 }
 
-void awsSink::RegisterTrigger (
-  char *name,
+void awsSink::RegisterTrigger (const char *name,
   void (*Trigger) (void *, iAwsSource *))
 {
   sink_err = 0;

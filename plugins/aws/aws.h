@@ -34,19 +34,15 @@
 
 const int awsNumRectBuckets = 32;
 
-
 /**
  *
  *  This is the alternate windowing system plugin.  It defines a simple, lightweight alternative to the current CSWS
  * windowing system.  It supports simple skinning via the .skn defintions, and creation of windows from .win definitions.
  *
  */
-class awsManager :
-  public iAws
+class awsManager : public iAws
 {
-
 private:
-
   /// Handle to the preference manager.
   iAwsPrefManager *prefmgr;
 
@@ -171,13 +167,13 @@ public:
   /// Register a component factory
   virtual void RegisterComponentFactory (
                 iAwsComponentFactory *factory,
-                char *name);
+                const char *name);
 
   /// Find a component factory
-  virtual iAwsComponentFactory *FindComponentFactory (char *name);
+  virtual iAwsComponentFactory *FindComponentFactory (const char *name);
 
   /// Create an embeddable component from a component name.
-  virtual iAwsComponent *CreateEmbeddableComponentFrom(char *name);
+  virtual iAwsComponent *CreateEmbeddableComponentFrom (const char *name);
 
   /// Get the top window
   virtual iAwsComponent *GetTopComponent ();
@@ -271,7 +267,7 @@ protected:
 
 public:
   /// Instantiates a window based on a window definition.
-  virtual iAwsComponent *CreateWindowFrom (char *defname);
+  virtual iAwsComponent *CreateWindowFrom (const char *defname);
 
   /// Creates a new embeddable component
   virtual iAwsComponent *CreateEmbeddableComponent ();

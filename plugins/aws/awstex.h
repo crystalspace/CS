@@ -63,8 +63,8 @@ public:
    * If the texture has not been cached, and a filename is specified, the file is loaded.
    * If the file cannot be found, or no file was specified, NULL is returned. */
   iTextureHandle *GetTexture (
-                    char *name,
-                    char *filename = NULL,
+                    const char *name,
+                    const char *filename = NULL,
                     bool replace = false,
                     unsigned char key_r = 255,
                     unsigned char key_g = 0,
@@ -77,7 +77,7 @@ public:
     uses the id directly, in case you have it.  Mostly used internally by AWSPrefManager. */
   iTextureHandle *GetTexturebyID (
                     unsigned long id,
-                    char *filename = NULL,
+                    const char *filename = NULL,
                     bool replace = false,
                     unsigned char key_r = 255,
                     unsigned char key_g = 0,

@@ -337,7 +337,7 @@ void awsGridBagLayout::removeLayoutComponent (iAwsComponent *cmp)
 }
 
 awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo
-  (iAwsComponent * parent, int sizeflag)
+  (iAwsComponent *, int sizeflag)
 {
   GridBagLayoutInfo r;
   iAwsComponent *cmp;

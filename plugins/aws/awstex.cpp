@@ -15,7 +15,7 @@
 
 const bool DEBUG_GETTEX = false;
 
-static unsigned long NameToId (char *txt)
+static unsigned long NameToId (const char *txt)
 {
   return aws_adler32 (
       aws_adler32 (0, NULL, 0),
@@ -87,8 +87,8 @@ void awsTextureManager::Initialize (iObjectRegistry *obj_reg)
 }
 
 iTextureHandle *awsTextureManager::GetTexture (
-  char *name,
-  char *filename,
+  const char *name,
+  const char *filename,
   bool replace,
   unsigned char key_r,
   unsigned char key_g,
@@ -101,7 +101,7 @@ iTextureHandle *awsTextureManager::GetTexture (
 
 iTextureHandle *awsTextureManager::GetTexturebyID (
   unsigned long id,
-  char *filename,
+  const char *filename,
   bool replace,
   unsigned char key_r,
   unsigned char key_g,

@@ -1,39 +1,32 @@
 // awsMenu.h: interface for the awsMenu class.
 //
 //////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_AWSMENU_H__761C61C5_EA2D_42D0_BC4F_DC1EE62CE290__INCLUDED_)
-#define AFX_AWSMENU_H__761C61C5_EA2D_42D0_BC4F_DC1EE62CE290__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+#ifndef __AWSMENU_H__
+#define __AWSMENU_H__
 
 #include "aws/awsControlBar.h"
 #include "aws/awstimer.h"
 #include "csutil/scfstr.h"
 #include "aws/awscmdbt.h"
 
-/* You should be able to write your own class for menu entries as well if you
-   don't like these simple ones. A menu entry should support the following:
-   Properties:
-      Selected -- Determines if the menu entry is the selected one. 
-      PopupMenu -- Optional, but if present the popup it refers to will be shown
-                   when the menu entry is selected
-      Caption  -- The text you would generally show
-      UserParam -- Just a a holder for any void* piece of data the user wants to
-                   keep with this menu entry
-      CloseSignal -- a constant that should be the value of the close signal
-      SelectedSignal -- a constant that should be the value of the selected signal
-   Signals:
-      close    -- this should fire when te user has made some sort of choice from the
-                   menu and the menu should now close.
-      selected -- this should fire when the user selects/deselects a given entry
-                  usually by putting the mouse over it. Which will be determined
-                  by querying the selected property.
-
-  */
-
+/** You should be able to write your own class for menu entries as well if you
+ *  don't like these simple ones. A menu entry should support the following:
+ *  Properties:
+ *     Selected -- Determines if the menu entry is the selected one. 
+ *     PopupMenu -- Optional, but if present the popup it refers to will be shown
+ *                  when the menu entry is selected
+ *     Caption  -- The text you would generally show
+ *     UserParam -- Just a a holder for any void* piece of data the user wants to
+ *                  keep with this menu entry
+ *     CloseSignal -- a constant that should be the value of the close signal
+ *     SelectedSignal -- a constant that should be the value of the selected signal
+ *  Signals:
+ *     close    -- this should fire when te user has made some sort of choice from the
+ *                  menu and the menu should now close.
+ *     selected -- this should fire when the user selects/deselects a given entry
+ *                 usually by putting the mouse over it. Which will be determined
+ *                 by querying the selected property.
+ */
 class awsPopupMenu;
 
 class awsMenuEntry : public awsPanel
@@ -99,23 +92,20 @@ public:
   iAwsComponent* Create();
 };
 
-
-
 class awsMenuBarEntry : public awsCmdButton
 {
 private:
-	awsPopupMenu* popup;
-
+  awsPopupMenu* popup;
 
 public:
-	awsMenuBarEntry();
-	~awsMenuBarEntry();
+  awsMenuBarEntry();
+  ~awsMenuBarEntry();
 
   virtual bool Setup(iAws* wmgr, awsComponentNode* settings);
-	char* Type();
+  const char* Type();
 	
-	virtual bool GetProperty(char* name, void **parm);
-	virtual bool SetProperty(char* name, void *parm);
+  virtual bool GetProperty(const char* name, void **parm);
+  virtual bool SetProperty(const char* name, void *parm);
 
   virtual bool OnMouseEnter();
 
@@ -130,15 +120,11 @@ public:
   iAwsComponent* Create();
 };
 
-
-
-
 class awsMenu : public awsControlBar  
 {
 protected:
-
-	/// the currently selected component
-	iAwsComponent* select;
+  /// the currently selected component
+  iAwsComponent* select;
 
   /// the component currently showing it's child 
   iAwsComponent* popup_showing;
@@ -146,8 +132,8 @@ protected:
   /// the 'child' menu
   awsMenu* child_menu;
 
-	/// the 'parent' menu
-	awsMenu* parent_menu;
+  /// the 'parent' menu
+  awsMenu* parent_menu;
 
   /// The current position of the mouse
   csPoint mouse_pos;
@@ -171,20 +157,18 @@ protected:
   virtual void PositionPopupMenu(iAwsComponent* showing_entry, awsMenu* popup)=0;
   virtual iAwsComponent* GetNewDefaultEntry()=0;
 
-  
-
 public:
-	awsMenu();
-	virtual ~awsMenu();
+  awsMenu();
+  virtual ~awsMenu();
 
   virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
-  virtual bool GetProperty(char* name, void** parm);
+  virtual bool GetProperty(const char* name, void** parm);
 
   /// These can be used to add/remove any type of menu entry to the menu
   virtual void AddChild(iAwsComponent* comp);
 
   /// Adds a menu entry of the default type to the menu
-  virtual iAwsSource* AddChild(char* caption, iTextureHandle* image, awsPopupMenu* popup = NULL); 
+  virtual iAwsSource* AddChild(const char* caption, iTextureHandle* image, awsPopupMenu* popup = NULL); 
   
   /// Removes a menu entry from the component. If you created the entry by name and
   /// have not yet IncRef'ed the item it will be destroyed automatically
@@ -193,7 +177,7 @@ public:
   /// Removes a menu entry from the component by searching for the first which has this
   /// caption. If you created the entry by name and have not yet IncRef'ed the item
   /// it will be destroyed automatically
-  virtual void RemoveChild(char* caption);
+  virtual void RemoveChild(const char* caption);
 
   /// Removes a menu entry from the component associated with this source
   /// If you created the entry by name and have not yet IncRef'ed the item
@@ -227,16 +211,15 @@ public:
   // call this to when you show a popup so that the popup can properly react to
   // the mouse
   virtual void TrackMouse();
-
 };
 	
 class awsMenuBar : public awsMenu 
 {
 public:
-	awsMenuBar();
-	virtual ~awsMenuBar();
+  awsMenuBar();
+  virtual ~awsMenuBar();
 
-  virtual char* Type();
+  virtual const char* Type();
   virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
   virtual void StartPopupChange();
   virtual void PositionPopupMenu(iAwsComponent* showing_entry, awsMenu* popup);
@@ -250,7 +233,6 @@ public:
 class awsMenuBarFactory : public awsComponentFactory
 {
 public:
-
   awsMenuBarFactory(iAws* wmgr);
   ~awsMenuBarFactory();
 
@@ -261,21 +243,20 @@ public:
 class awsPopupMenu : public awsMenu 
 {
 private:
-
-	/// a timer for delaying the changing of popups
+  /// a timer for delaying the changing of popups
   awsTimer* timer;
 
   /// a slot for the timer
   awsSlot slot_timer;
 
 public:
-	awsPopupMenu();
-	virtual ~awsPopupMenu();
+  awsPopupMenu();
+  virtual ~awsPopupMenu();
 
   virtual bool Create(iAws *wmgr, iAwsComponent* parent, awsComponentNode* settings);
 
   virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
-  virtual char* Type();
+  virtual const char* Type();
 
   static void OnTimer(void* param, iAwsSource* src);
   virtual void StartPopupChange();
@@ -290,11 +271,11 @@ public:
 class awsPopupMenuFactory : public awsComponentFactory
 {
 public:
-
   awsPopupMenuFactory(iAws* wmgr);
   ~awsPopupMenuFactory();
 
   iAwsComponent* Create();
 };
 
-#endif // !defined(AFX_AWSMENU_H__761C61C5_EA2D_42D0_BC4F_DC1EE62CE290__INCLUDED_)
+#endif 
+

@@ -16,13 +16,13 @@ const int awsControlBar::alignCenter = 3;
 
 
 awsControlBar::awsControlBar() :
-size_to_fit_horz(true),
-size_to_fit_vert(true),
-hGap(0),
-vGap(0),
-vert_align(alignTop),
-vertical(false),
-stretch_items(false)
+  hGap(0),
+  vGap(0),
+  vert_align(alignTop),
+  size_to_fit_horz(true),
+  size_to_fit_vert(true),  
+  vertical(false),
+  stretch_items(false)
 {
 }
 
@@ -44,7 +44,7 @@ void awsControlBar::RemoveChild(iAwsComponent* comp)
   DoLayout();
 }
 
-bool awsControlBar::Execute(char* action, iAwsParmList &parmlist)
+bool awsControlBar::Execute(const char* action, iAwsParmList &parmlist)
 {
   if(strcmp(action, "AddComponent") == 0)
   {

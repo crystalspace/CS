@@ -1,9 +1,8 @@
 // awsEngineView.h: interface for the awsEngineView class.
 //
 //////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_AWSENGINEVIEW_H__6451E6E6_A559_4018_B48F_EBF7ECD35B84__INCLUDED_)
-#define AFX_AWSENGINEVIEW_H__6451E6E6_A559_4018_B48F_EBF7ECD35B84__INCLUDED_
+#ifndef __AWSENGINEVIEW_H__
+#define __AWSENGINEVIEW_H__
 
 #include "awscomp.h"
 
@@ -40,4 +39,5 @@ public:
 	iAwsComponent* Create();
 };
 
-#endif // !defined(AFX_AWSENGINEVIEW_H__6451E6E6_A559_4018_B48F_EBF7ECD35B84__INCLUDED_)
+#endif
+

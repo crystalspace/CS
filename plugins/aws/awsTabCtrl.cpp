@@ -321,9 +321,9 @@ awsTabCtrl::awsTabCtrl ():
   first(-1),
   active(-1),
   is_top(true),
+  sink(NULL),
   nextimg(NULL),
-  previmg(NULL),
-  sink(NULL)
+  previmg(NULL)
 {
 }
 

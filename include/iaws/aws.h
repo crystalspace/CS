@@ -90,7 +90,7 @@ const int AWSF_RaiseOnMouseOver = 4;
  * \addtogroup aws
  * @{ */
 
-SCF_VERSION (iAws, 0, 2, 0);
+SCF_VERSION (iAws, 0, 2, 1);
 
 /// Interface for the window manager.
 struct iAws : public iBase
@@ -106,10 +106,10 @@ public:
   virtual void             SetPrefMgr(iAwsPrefManager *pmgr)=0;
 
   /// Allows a component to register itself for dynamic template instatiation via definition files.
-  virtual void RegisterComponentFactory(iAwsComponentFactory *factory, char *name)=0;
+  virtual void RegisterComponentFactory(iAwsComponentFactory *factory, const char* name)=0;
 
   /// Find a component factory
-  virtual iAwsComponentFactory *FindComponentFactory (char *name)=0;
+  virtual iAwsComponentFactory *FindComponentFactory (const char* name)=0;
 
   /// Get the top component
   virtual iAwsComponent *GetTopComponent()=0;
@@ -173,7 +173,7 @@ public:
   virtual iGraphics3D *G3D()=0;
 
   /// Instantiates a window based on a window definition.
-  virtual iAwsComponent *CreateWindowFrom(char *defname)=0;
+  virtual iAwsComponent *CreateWindowFrom(const char* defname)=0;
 
   /// Creates a new embeddable component
   virtual iAwsComponent *CreateEmbeddableComponent()=0;
@@ -224,8 +224,7 @@ public:
 
 };
 
-
-SCF_VERSION (iAwsPrefManager, 0, 0, 1);
+SCF_VERSION (iAwsPrefManager, 0, 0, 2);
 
 /// Interface for the preferences manager (window manager needs one.)
 struct iAwsPrefManager : public iBase
@@ -238,55 +237,55 @@ public:
   virtual bool Load(const char *def_file)=0;
 
   /// Maps a name to an id
-  virtual unsigned long NameToId(char *name)=0;
+  virtual unsigned long NameToId (const char*name)=0;
 
   /// Select which skin is the default for components, the skin must be loaded.  True on success, false otherwise.
-  virtual bool SelectDefaultSkin(char *skin_name)=0;
+  virtual bool SelectDefaultSkin (const char* skin_name)=0;
 
   /// Lookup the value of an int key by name (from the skin def)
-  virtual bool LookupIntKey(char *name, int &val)=0;
+  virtual bool LookupIntKey (const char* name, int &val)=0;
 
   /// Lookup the value of an int key by id (from the skin def)
   virtual bool LookupIntKey(unsigned long id, int &val)=0;
 
   /// Lookup the value of a string key by name (from the skin def)
-  virtual bool LookupStringKey(char *name, iString *&val)=0;
+  virtual bool LookupStringKey(const char* name, iString *&val)=0;
 
   /// Lookup the value of a string key by id (from the skin def)
   virtual bool LookupStringKey(unsigned long id, iString *&val)=0;
 
   /// Lookup the value of a rect key by name (from the skin def)
-  virtual bool LookupRectKey(char *name, csRect &rect)=0;
+  virtual bool LookupRectKey(const char* name, csRect &rect)=0;
 
   /// Lookup the value of a rect key by id (from the skin def)
   virtual bool LookupRectKey(unsigned long id, csRect &rect)=0;
 
   /// Lookup the value of an RGB key by name (from the skin def)
-  virtual bool LookupRGBKey(char *name, unsigned char &red, unsigned char &green, unsigned char &blue)=0;
+  virtual bool LookupRGBKey(const char* name, unsigned char &red, unsigned char &green, unsigned char &blue)=0;
 
   /// Lookup the value of an RGB key by name (from the skin def)
   virtual bool LookupRGBKey(unsigned long id, unsigned char &red, unsigned char &green, unsigned char &blue)=0;
 
   /// Lookup the value of a point key by name (from the skin def)
-  virtual bool LookupPointKey(char *name, csPoint &point)=0;
+  virtual bool LookupPointKey(const char* name, csPoint &point)=0;
 
   /// Lookup the value of a point key by id (from the skin def)
   virtual bool LookupPointKey(unsigned long id, csPoint &point)=0;
 
   /// Get the an integer from a given component node
-  virtual bool GetInt(awsComponentNode *node, char *name, int &val)=0;
+  virtual bool GetInt(awsComponentNode *node, const char* name, int &val)=0;
 
   /// Get the a rect from a given component node
-  virtual bool GetRect(awsComponentNode *node, char *name, csRect &rect)=0;
+  virtual bool GetRect(awsComponentNode *node, const char* name, csRect &rect)=0;
 
   /// Get the value of an integer from a given component node
-  virtual bool GetString(awsComponentNode *node, char *name, iString *&val)=0;
+  virtual bool GetString(awsComponentNode *node, const char* name, iString *&val)=0;
 
   /// Get the a color from a given component node
-  virtual bool GetRGB(awsComponentNode *node, char *name, unsigned char& r, unsigned char& g, unsigned char& b)=0;
+  virtual bool GetRGB(awsComponentNode *node, const char* name, unsigned char& r, unsigned char& g, unsigned char& b)=0;
 
   /// Find window definition and return the component node holding it, Null otherwise
-  virtual awsComponentNode *FindWindowDef(char *name)=0;
+  virtual awsComponentNode *FindWindowDef(const char* name)=0;
 
   /// Sets the value of a color in the global AWS palette.
   virtual void SetColor(int index, int color)=0;
@@ -301,14 +300,14 @@ public:
   virtual iFont *GetDefaultFont()=0;
 
   /// Gets a font.  If it's not loaded, it will be.  Returns NULL on error.
-  virtual iFont *GetFont(char *filename)=0;
+  virtual iFont *GetFont(const char* filename)=0;
 
   /// Gets a texture from the global AWS cache
-  virtual iTextureHandle *GetTexture(char *name, char *filename=NULL)=0;
+  virtual iTextureHandle *GetTexture(const char* name, const char* filename=NULL)=0;
 
   /// Gets a texture from the global AWS cache, if its loaded for the first time then
   /// the keycolor (key_r,key_g,key_b) is set
-  virtual iTextureHandle *GetTexture (char *name, char *filename, 
+  virtual iTextureHandle *GetTexture (const char* name, const char* filename, 
                                       unsigned char key_r,
                                       unsigned char key_g,
                                       unsigned char key_b)=0;
@@ -330,48 +329,48 @@ public:
   virtual void SetupPalette()=0;
 
   /** Allows a component to specify it's own constant values for parsing. */
-  virtual void RegisterConstant(char *name, int value)=0;
+  virtual void RegisterConstant(const char* name, int value)=0;
 
   /** Returns true if the constant has been registered, false otherwise.  */
-  virtual bool ConstantExists(char *name)=0;
+  virtual bool ConstantExists(const char* name)=0;
 
   /** Allows a component to retrieve the value of a constant, or the parser as well. */
-  virtual int  GetConstantValue(char *name)=0;
+  virtual int  GetConstantValue(const char* name)=0;
 
   /** Creates a new key factory */
   virtual iAwsKeyFactory *CreateKeyFactory()=0;
 };
 
 
-SCF_VERSION (iAwsSinkManager, 0, 0, 1);
+SCF_VERSION (iAwsSinkManager, 0, 0, 2);
 
 /// Interface for the sink manager
 struct iAwsSinkManager : public iBase
 {
   /// Registers a sink by name for lookup.
-  virtual void RegisterSink(char *name, iAwsSink *sink)=0;
+  virtual void RegisterSink(const char *name, iAwsSink *sink)=0;
 
   /// Finds a sink by name for connection.
-  virtual iAwsSink* FindSink(char *name)=0;
+  virtual iAwsSink* FindSink(const char *name)=0;
 
   /// Create a new embeddable sink, with parm as the void * passed into the triggers.
   virtual iAwsSink *CreateSink(void *parm)=0;
 };
 
 
-SCF_VERSION (iAwsSink, 0, 0, 1);
+SCF_VERSION (iAwsSink, 0, 0, 2);
 
 /// Interface for sinks
 struct iAwsSink : public iBase
 {
   /// Maps a trigger name to a trigger id
-  virtual unsigned long GetTriggerID(char *name)=0;
+  virtual unsigned long GetTriggerID(const char *name)=0;
 
   /// Handles trigger events
   virtual void HandleTrigger(int trigger_id, iAwsSource *source)=0;
 
   /// A sink should call this to register trigger events
-  virtual void RegisterTrigger(char *name, void (*Trigger)(void *, iAwsSource *))=0;
+  virtual void RegisterTrigger(const char *name, void (*Trigger)(void *, iAwsSource *))=0;
 
   /**
    * Returns the last error code set.  This code is good until the next call to this sink.
@@ -422,7 +421,7 @@ struct iAwsSlot : public iBase
 };
 
 
-SCF_VERSION (iAwsComponent, 0, 1, 0);
+SCF_VERSION (iAwsComponent, 0, 1, 1);
 
 /// Interface that is the base of ALL components.
 struct iAwsComponent : public iAwsSource
@@ -447,13 +446,13 @@ struct iAwsComponent : public iAwsSource
   virtual bool HandleEvent(iEvent& Event)=0;
 
   /// Gets a copy of the property, put it in parm.  Returns false if the property does not exist.
-  virtual bool GetProperty(char *name, void **parm)=0;
+  virtual bool GetProperty(const char* name, void **parm)=0;
 
   /// Sets the property specified to whatever is in parm. Returns false if there's no such property.
-  virtual bool SetProperty(char *name, void *parm)=0;
+  virtual bool SetProperty(const char* name, void *parm)=0;
 
   /// Executes a scriptable action
-  virtual bool Execute(char *action, iAwsParmList &parmlist)=0;
+  virtual bool Execute(const char* action, iAwsParmList &parmlist)=0;
 
   /// Invalidation routine: allow the component to be redrawn when you call this
   virtual void Invalidate()=0;
@@ -468,7 +467,7 @@ struct iAwsComponent : public iAwsSource
   virtual csRect ClientFrame()=0;
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
-  virtual char *Type()=0;
+  virtual const char *Type()=0;
 
   /**
    * Sets the flag (can handle multiple simultaneous sets). 
@@ -567,7 +566,7 @@ struct iAwsComponent : public iAwsSource
   virtual void SetID(unsigned long _id)=0;
 
   /// Gets a child component by name, returns NULL on failure.
-  virtual iAwsComponent *FindChild(char *name)=0;
+  virtual iAwsComponent *FindChild(const char *name)=0;
 
   /// Gets a child component by id, returns NULL on failure
   virtual iAwsComponent *DoFindChild(unsigned id)=0;
@@ -689,7 +688,7 @@ struct iAwsComponent : public iAwsSource
 };
 
 
-SCF_VERSION (iAwsComponentFactory, 0, 0, 1);
+SCF_VERSION (iAwsComponentFactory, 0, 0, 2);
 
 /// Interface for component factories
 struct iAwsComponentFactory : public iBase
@@ -698,10 +697,10 @@ struct iAwsComponentFactory : public iBase
   virtual iAwsComponent *Create()=0;
 
   /// Registers this factory with the window manager
-  virtual void Register(char *type)=0;
+  virtual void Register(const char *type)=0;
 
   /// Registers constants for the parser so that we can construct right.
-  virtual void RegisterConstant(char *name, int value)=0;
+  virtual void RegisterConstant(const char *name, int value)=0;
 };
 
 

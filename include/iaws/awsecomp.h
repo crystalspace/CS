@@ -22,10 +22,6 @@
 #include "iutil/event.h"
 
 /**
- * \addtogroup aws
- * @{ */
-
-/**
  * Class used to create new AWS components.<p>
  * To create component from scratch, you need to subclass from awsEmbeddedComponent
  * After instantiating from that object, you need to call
@@ -120,15 +116,15 @@ public:
      }
  
      /// Gets the property specified, setting the parameter to a COPY of the property's value. Returns false if there's no such property.
-    virtual bool GetProperty(char *name, void **parm)
+    virtual bool GetProperty(const char *name, void **parm)
     { return comp->GetProperty(name, parm); }
 
     /// Sets the property specified, setting the proprty to whatever is in parm. Returns false if there's no such property.
-    virtual bool SetProperty(char *name, void *parm)
+    virtual bool SetProperty(const char *name, void *parm)
     { return comp->SetProperty(name, parm); }
 
     /// Executes scriptable actions for this window
-    virtual bool Execute(char *action, iAwsParmList &parmlist)
+    virtual bool Execute(const char *action, iAwsParmList &parmlist)
     { return comp->Execute(action, parmlist); }
 
     /// Sets the flag (can handle multiple simultaneous sets)
@@ -160,7 +156,7 @@ public:
     { return comp->ClientFrame(); }
 
     /// Returns the named TYPE of the component, like "Radio Button", etc. This should always be overridden.
-    virtual char *Type()
+    virtual const char *Type()
     { return comp->Type(); }
 
     /// Returns true if this window overlaps the given rect.
@@ -203,7 +199,7 @@ public:
     virtual void SetID(unsigned long _id)
     { comp->SetID(_id); }
 
-    virtual iAwsComponent* FindChild(char* name)
+    virtual iAwsComponent* FindChild(const char* name)
     { return comp->FindChild(name); }
 
     virtual iAwsComponent* DoFindChild(unsigned int id)
@@ -455,6 +451,5 @@ class awsEmbeddedComponentFactory : public iAwsComponentFactory
     }
 };
 
-/** @} */
-
 #endif
+

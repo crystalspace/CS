@@ -31,8 +31,7 @@
 *********************************************************************************************************************/
 
 /// This is the sink manager, which controls all registered sinks.
-class awsSinkManager :
-  public iAwsSinkManager
+class awsSinkManager : public iAwsSinkManager
 {
   struct SinkMap
   {
@@ -57,10 +56,10 @@ public:
   bool Initialize (iObjectRegistry *sys);
 public:
   /// Registers a sink by name for lookup.
-  virtual void RegisterSink (char *name, iAwsSink *sink);
+  virtual void RegisterSink (const char *name, iAwsSink *sink);
 
   /// Finds a sink by name for connection.
-  virtual iAwsSink *FindSink (char *name);
+  virtual iAwsSink *FindSink (const char *name);
 
   /// Create a new embeddable sink, with parm as the void * passed into the triggers.
   virtual iAwsSink *CreateSink (void *parm);
@@ -111,14 +110,13 @@ public:
   virtual ~awsSink ();
 
   /// Maps a trigger name to a trigger id
-  virtual unsigned long GetTriggerID (char *name);
+  virtual unsigned long GetTriggerID (const char *name);
 
   /// Handles trigger events
   virtual void HandleTrigger (int trigger, iAwsSource *source);
 
   /// A sink should call this to register trigger events
-  virtual void RegisterTrigger (
-                char *name,
+  virtual void RegisterTrigger (const char *name,
                 void (*Trigger) (void *, iAwsSource *));
 
   /// Gets the last error code

@@ -197,7 +197,7 @@ iAwsComponent *awsManager::CreateEmbeddableComponent ()
 
 void awsManager::RegisterComponentFactory (
   iAwsComponentFactory *factory,
-  char *name)
+  const char *name)
 {
   awsComponentFactoryMap *cfm = new awsComponentFactoryMap;
 
@@ -209,7 +209,7 @@ void awsManager::RegisterComponentFactory (
   component_factories.AddItem (cfm);
 }
 
-iAwsComponentFactory *awsManager::FindComponentFactory (char *name)
+iAwsComponentFactory *awsManager::FindComponentFactory (const char *name)
 {
   void *p = component_factories.GetFirstItem ();
   unsigned long id = prefmgr->NameToId (name);
@@ -227,7 +227,7 @@ iAwsComponentFactory *awsManager::FindComponentFactory (char *name)
 }
 
 
-iAwsComponent *awsManager::CreateEmbeddableComponentFrom(char *name)
+iAwsComponent *awsManager::CreateEmbeddableComponentFrom(const char *name)
 
 {
 
@@ -883,7 +883,7 @@ iAwsParmList *awsManager::CreateParmList ()
   return new awsParmList;
 }
 
-iAwsComponent *awsManager::CreateWindowFrom (char *defname)
+iAwsComponent *awsManager::CreateWindowFrom (const char* defname)
 {
   if (DEBUG_MANAGER)
     printf ("aws-debug: Searching for window def \"%s\"\n", defname);
@@ -925,9 +925,9 @@ void awsManager::CreateChildrenFromDef (
   awsComponentNode *settings)
 {
   int i;
-  for (i = 0; i < settings->GetLength (); ++i)
+  for (i = 0; i < settings->Length (); ++i)
   {
-    awsKey *key = settings->GetItemAt (i);
+    awsKey *key = settings->GetAt (i);
 
     if (key == NULL) continue;
 
@@ -956,9 +956,9 @@ void awsManager::CreateChildrenFromDef (
       awsConnectionNode *conmap = (awsConnectionNode *)key;
       awsSlot *slot = new awsSlot ();
 
-      for (j = 0; j < conmap->GetLength (); ++j)
+      for (j = 0; j < conmap->Length (); ++j)
       {
-        awsConnectionKey *con = (awsConnectionKey *)conmap->GetItemAt (j);
+        awsConnectionKey *con = (awsConnectionKey *)conmap->GetAt (j);
 
         slot->Connect (parent, con->Signal (), con->Sink (), con->Trigger ());
       }       // end for count of connections

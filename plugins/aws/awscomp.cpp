@@ -19,13 +19,13 @@ const bool AWS_COMP_DEBUG = false;
 awsComponent::awsComponent () :
   wmgr(NULL),
   parent(NULL),
-  layout(NULL),
   top_child(NULL),
-  above(NULL),
   below(NULL),
+  above(NULL),
+  layout(NULL),
+  is_zoomed(false),
   flags(0),
-  signalsrc(this),
-  is_zoomed(false)
+  signalsrc(this)
 {
   SCF_CONSTRUCT_IBASE (NULL);
 }
@@ -61,7 +61,7 @@ csRect awsComponent::ClientFrame ()
   return client;
 }
 
-char *awsComponent::Type ()
+const char *awsComponent::Type ()
 {
   return "Component";
 }
@@ -223,7 +223,7 @@ bool awsComponent::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsComponent::GetProperty (char *name, void **parm)
+bool awsComponent::GetProperty (const char *name, void **parm)
 {
   if (strcmp ("Frame", name) == 0)
   {
@@ -241,7 +241,7 @@ bool awsComponent::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsComponent::SetProperty (char *name, void *parm)
+bool awsComponent::SetProperty (const char *name, void *parm)
 {
   if (strcmp ("Frame", name) == 0)
   {
@@ -254,7 +254,7 @@ bool awsComponent::SetProperty (char *name, void *parm)
   return false;
 }
 
-bool awsComponent::Execute (char *action, iAwsParmList &parmlist)
+bool awsComponent::Execute (const char* action, iAwsParmList &parmlist)
 {
   if (strcmp ("MoveTo", action) == 0)
   {
@@ -426,7 +426,7 @@ int awsComponent::GetChildCount ()
   return count;
 }
 
-iAwsComponent *awsComponent::FindChild(char *name)
+iAwsComponent *awsComponent::FindChild(const char* name)
 {
   unsigned id = WindowManager()->GetPrefMgr()->NameToId(name);
 
@@ -920,12 +920,12 @@ iAwsComponent *awsComponentFactory::Create ()
   return new awsComponent;
 }
 
-void awsComponentFactory::Register (char *name)
+void awsComponentFactory::Register (const char *name)
 {
   wmgr->RegisterComponentFactory (this, name);
 }
 
-void awsComponentFactory::RegisterConstant (char *name, int value)
+void awsComponentFactory::RegisterConstant (const char *name, int value)
 {
   wmgr->GetPrefMgr ()->RegisterConstant (name, value);
 }

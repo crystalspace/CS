@@ -14,6 +14,10 @@ The history order is reversed so that new features are at the top.
 	  the documentation for the basic map format. It does NOT contain
 	  documentation for the loader plugins. This means that everything
 	  that is INSIDE a PARAMS block is not documented by this documentation.
+	- Matze did some aws cleanups:
+		-reindented some stuff
+		-rewrote some parts of the parser
+		-changed some char* into const char*
 2-Jul-2002
 	- Removed an obsolete feature to show the c-buffer in walktest.
 	- Removed db_cbuffer console command in walktest.

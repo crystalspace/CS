@@ -35,10 +35,10 @@ awsImageView::awsImageView () :
   was_down(false),
   img1(NULL),
   img2(NULL),
-  frame_style(0),
-  alpha_level(92),
   draw_color(false),
-  color(-1)
+  color(-1),
+  frame_style(0),
+  alpha_level(92)
 {
 }
 

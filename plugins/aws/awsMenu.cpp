@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "cssysdef.h"
 #include "awsMenu.h"
+#include "csutil/util.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
@@ -17,17 +18,18 @@ const int awsMenuEntry::signalClicked = 1;
 const int awsMenuEntry::signalSelected = 2;
 
 awsMenuEntry::awsMenuEntry() :
-caption(NULL),
-selected(false),
-popup(NULL),
-mouse_over(false),
-user_param(NULL),
-image(NULL),
-image_width(0),
-image_height(0),
-sub_menu_image(NULL),
-sub_menu_image_width(0),
-sub_menu_image_height(0)
+  caption(NULL),
+  popup(NULL),
+  selected(false),
+  mouse_down(false),
+  mouse_over(false),
+  user_param(NULL),
+  image(NULL),
+  image_width(0),
+  image_height(0),
+  sub_menu_image(NULL),
+  sub_menu_image_width(0),
+  sub_menu_image_height(0)
 {}
 
 awsMenuEntry::~awsMenuEntry() 
@@ -359,16 +361,14 @@ bool awsMenuBarEntry::Setup (iAws *_wmgr, awsComponentNode *settings)
 {
   if (!awsCmdButton::Setup (_wmgr, settings)) return false;
 
-  iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
-
   ResizeTo(getPreferredSize());
 
   return true;
 }
 
-char* awsMenuBarEntry::Type() { return "Menu Bar Entry"; }
+const char* awsMenuBarEntry::Type() { return "Menu Bar Entry"; }
 
-bool awsMenuBarEntry::GetProperty(char* name, void **parm)
+bool awsMenuBarEntry::GetProperty(const char* name, void **parm)
 {
 	if (awsCmdButton::GetProperty (name, parm)) return true;
 	
@@ -401,7 +401,7 @@ bool awsMenuBarEntry::GetProperty(char* name, void **parm)
 	return false;
 }
 
-bool awsMenuBarEntry::SetProperty(char *name, void *parm)
+bool awsMenuBarEntry::SetProperty(const char *name, void *parm)
 {
 	if (awsCmdButton::SetProperty (name, parm)) return true;
 	
@@ -458,14 +458,15 @@ iAwsComponent* awsMenuBarEntryFactory::Create()
 
 /********************************* awsMenu  ************************************/
 
-awsMenu::awsMenu() : awsControlBar(),
-select(NULL),
-mouse_pos(0,0),
-child_menu(NULL),
-parent_menu(NULL),
-popup_showing(NULL),
-sink(this),
-let_mouse_exit(true)
+awsMenu::awsMenu() 
+  : awsControlBar(),
+    select(NULL),
+    popup_showing(NULL),
+    child_menu(NULL),
+    parent_menu(NULL),
+    mouse_pos(0,0),
+    sink(this),
+    let_mouse_exit(true)
 {
 }
 
@@ -491,7 +492,7 @@ bool awsMenu::Setup(iAws *wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsMenu::GetProperty(char* name, void** parm)
+bool awsMenu::GetProperty(const char* name, void** parm)
 {
   if(awsControlBar::GetProperty(name, parm)) return true;
   else if(strcmp(name, "Selected") == 0)
@@ -520,10 +521,11 @@ void awsMenu::AddChild(iAwsComponent* comp)
   awsControlBar::AddChild(comp);
 }
 
-iAwsSource* awsMenu::AddChild(char* caption, iTextureHandle* image, awsPopupMenu* popup)
+iAwsSource* awsMenu::AddChild(const char* caption, iTextureHandle* image, awsPopupMenu* popup)
 {
   iAwsComponent* child = GetNewDefaultEntry();
-  child->SetProperty("Caption", caption);
+  // XXX: memory leak here, should delete the string later
+  child->SetProperty("Caption", csStrNew(caption));
   child->SetProperty("Image", image);
   child->SetProperty("PopupMenu", popup);
 
@@ -544,7 +546,7 @@ void awsMenu::RemoveChild(iAwsComponent* comp)
   awsControlBar::RemoveChild(comp);
 }
 
-void awsMenu::RemoveChild(char* caption)
+void awsMenu::RemoveChild(const char* caption)
 {
   for(iAwsComponent* cmp = GetTopChild(); cmp; cmp = cmp->ComponentBelow())
   {
@@ -713,7 +715,7 @@ void awsMenu::OnSelect(void* p, iAwsSource* src)
     m->Select(NULL);
 }
 
-void awsMenu::OnClose(void* p, iAwsSource* src)
+void awsMenu::OnClose(void* p, iAwsSource* )
 {
   awsMenu* m = (awsMenu*)p;
   m->HideAllPopups();
@@ -788,7 +790,7 @@ bool awsMenuBar::Setup(iAws *wmgr, awsComponentNode *settings)
   return true;
 }
 
-char* awsMenuBar::Type() 
+const char* awsMenuBar::Type() 
 {
   return "Menu Bar";
 }
@@ -932,7 +934,7 @@ bool awsPopupMenu::Setup(iAws *wmgr, awsComponentNode *settings)
   return true;
 }
 
-char* awsPopupMenu::Type() 
+const char* awsPopupMenu::Type() 
 {
   return "Menu Bar";
 }
@@ -957,7 +959,7 @@ void awsPopupMenu::HideAllPopups()
     Hide();
 }
 
-void awsPopupMenu::OnTimer(void* param, iAwsSource* src)
+void awsPopupMenu::OnTimer(void* param, iAwsSource* )
 {
   awsPopupMenu* pm = (awsPopupMenu*)param;
   pm->SwitchPopups();

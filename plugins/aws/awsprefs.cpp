@@ -14,6 +14,7 @@
 #include "awstex.h"
 #include "awsadler.h"
 #include "awskcfct.h"
+#include "awsparser.h"
 
 extern int awsparse (void *prefscont);
 
@@ -30,20 +31,14 @@ iFile *aws_fileinputvfs;
 * comparison.  The method of text-to-id mapping may be somewhat slower than a counter, but it does not have to *
 * worry about wrapping or collisions or running out during long execution cycles.                              *
 ***************************************************************************************************************/
-awsKey::awsKey (iString *n)
+void awsKey::ComputeKeyID (const char* n, size_t len)
 {
-  if (n)
-  {
-    name = aws_adler32 (
-        aws_adler32 (0, NULL, 0),
-        (unsigned char *)n->GetData (),
-        n->Length ());
-
-    if (DEBUG_KEYS)
-      printf ("aws-debug: new key %s mapped to %lu\n", n->GetData (), name);
-
-    n->DecRef ();
-  }
+  CS_ASSERT (n);
+  
+  name = aws_adler32 (aws_adler32 (0, NULL, 0), (unsigned char *)n, len);
+  
+  if (DEBUG_KEYS)
+    printf ("aws-debug: new key %s mapped to %lu\n", n, name);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,7 +49,8 @@ awsPrefManager::awsPrefManager (iBase *iParent) :
   awstxtmgr(NULL),
   fontsvr(NULL),
   default_font(NULL),
-  wmgr(NULL)
+  wmgr(NULL),
+  objreg(NULL)
 {
   SCF_CONSTRUCT_IBASE (iParent);
 }
@@ -63,7 +59,6 @@ awsPrefManager::~awsPrefManager ()
 {
   SCF_DEC_REF (default_font);
   SCF_DEC_REF (fontsvr);
-  SCF_DEC_REF (vfs);
   delete awstxtmgr;
 
   // empty the constants list
@@ -86,13 +81,12 @@ bool awsPrefManager::Setup (iObjectRegistry *obj_reg)
 
   awstxtmgr->Initialize (obj_reg);
 
-  vfs = CS_QUERY_REGISTRY (obj_reg, iVFS);
-  if (!vfs) return false;
+  objreg = obj_reg;
 
   return true;
 }
 
-unsigned long awsPrefManager::NameToId (char *n)
+unsigned long awsPrefManager::NameToId (const char *n)
 {
   if (n)
   {
@@ -124,7 +118,7 @@ int awsPrefManager::FindColor(unsigned char r, unsigned char g, unsigned char b)
   return awstxtmgr->GetTextureManager ()->FindRGB (r, g, b);
 }
 
-iTextureHandle *awsPrefManager::GetTexture (char *name, char *filename)
+iTextureHandle *awsPrefManager::GetTexture (const char* name, const char* filename)
 {
   if (awstxtmgr)
     return awstxtmgr->GetTexture (name, filename, false);
@@ -132,7 +126,7 @@ iTextureHandle *awsPrefManager::GetTexture (char *name, char *filename)
     return NULL;
 }
 
-iTextureHandle *awsPrefManager::GetTexture (char *name, char *filename, 
+iTextureHandle *awsPrefManager::GetTexture (const char* name,const char* filename, 
                                             unsigned char key_r,
                                             unsigned char key_g,
                                             unsigned char key_b)
@@ -148,9 +142,7 @@ iFont *awsPrefManager::GetDefaultFont ()
   return default_font;
 }
 
-iFont *awsPrefManager::GetFont (char *
-
-/*filename*/ )
+iFont *awsPrefManager::GetFont (const char *)
 {
   return NULL;
 }
@@ -266,8 +258,15 @@ bool awsPrefManager::Load (const char *def_file)
 
   printf ("\tloading definitions file %s...\n", def_file);
 
-  aws_fileinputvfs = vfs->Open (def_file, VFS_FILE_READ);
-  if (!aws_fileinputvfs) return false;
+  delete static_awsparser;
+  static_awsparser = new awsParser(objreg, wmgr, this);
+  if (!static_awsparser->Initialize (def_file))
+  {
+    printf ("Couldn't open def file\n");
+    delete static_awsparser;
+    static_awsparser = NULL;
+    return false;
+  }
 
   unsigned int ncw = n_win_defs, ncs = n_skin_defs;
 
@@ -288,7 +287,7 @@ bool awsPrefManager::Load (const char *def_file)
   return true;
 }
 
-bool awsPrefManager::SelectDefaultSkin (char *skin_name)
+bool awsPrefManager::SelectDefaultSkin (const char* skin_name)
 {
   awsSkinNode *skin = (awsSkinNode *)skin_defs.GetFirstItem ();
   unsigned long id = NameToId (skin_name);
@@ -329,7 +328,7 @@ bool awsPrefManager::SelectDefaultSkin (char *skin_name)
   return false;
 }
 
-bool awsPrefManager::LookupIntKey (char *name, int &val)
+bool awsPrefManager::LookupIntKey (const char *name, int &val)
 {
   return LookupIntKey (NameToId (name), val);
 }
@@ -350,7 +349,7 @@ bool awsPrefManager::LookupIntKey (unsigned long id, int &val)
   return false;
 }
 
-bool awsPrefManager::LookupStringKey (char *name, iString * &val)
+bool awsPrefManager::LookupStringKey (const char *name, iString * &val)
 {
   return LookupStringKey (NameToId (name), val);
 }
@@ -371,7 +370,7 @@ bool awsPrefManager::LookupStringKey (unsigned long id, iString * &val)
   return false;
 }
 
-bool awsPrefManager::LookupRectKey (char *name, csRect &val)
+bool awsPrefManager::LookupRectKey (const char *name, csRect &val)
 {
   return LookupRectKey (NameToId (name), val);
 }
@@ -393,7 +392,7 @@ bool awsPrefManager::LookupRectKey (unsigned long id, csRect &val)
 }
 
 bool awsPrefManager::LookupRGBKey (
-  char *name,
+  const char *name,
   unsigned char &red,
   unsigned char &green,
   unsigned char &blue)
@@ -427,7 +426,7 @@ bool awsPrefManager::LookupRGBKey (
   return false;
 }
 
-bool awsPrefManager::LookupPointKey (char *name, csPoint &val)
+bool awsPrefManager::LookupPointKey (const char *name, csPoint &val)
 {
   return LookupPointKey (NameToId (name), val);
 }
@@ -448,7 +447,7 @@ bool awsPrefManager::LookupPointKey (unsigned long id, csPoint &val)
   return false;
 }
 
-bool awsPrefManager::GetInt (awsComponentNode *node, char *name, int &val)
+bool awsPrefManager::GetInt (awsComponentNode *node, const char *name, int &val)
 {
   if (!node) return false;
 
@@ -466,7 +465,7 @@ bool awsPrefManager::GetInt (awsComponentNode *node, char *name, int &val)
   return false;
 }
 
-bool awsPrefManager::GetRGB (awsComponentNode *node, char *name, 
+bool awsPrefManager::GetRGB (awsComponentNode *node, const char *name, 
                              unsigned char &red,
                              unsigned char &green,
                              unsigned char &blue)
@@ -491,7 +490,7 @@ bool awsPrefManager::GetRGB (awsComponentNode *node, char *name,
   return false;
 }
 
-bool awsPrefManager::GetRect (awsComponentNode *node, char *name, csRect &val)
+bool awsPrefManager::GetRect (awsComponentNode *node, const char *name, csRect &val)
 {
   if (!node) return false;
 
@@ -517,7 +516,7 @@ bool awsPrefManager::GetRect (awsComponentNode *node, char *name, csRect &val)
 
 bool awsPrefManager::GetString (
   awsComponentNode *node,
-  char *name,
+  const char *name,
   iString * &val)
 {
   if (!node) return false;
@@ -536,7 +535,7 @@ bool awsPrefManager::GetString (
   return false;
 }
 
-awsComponentNode *awsPrefManager::FindWindowDef (char *name)
+awsComponentNode *awsPrefManager::FindWindowDef (const char *name)
 {
   awsComponentNode *win = (awsComponentNode *)win_defs.GetFirstItem ();
   awsComponentNode *firstwin = win;
@@ -554,7 +553,7 @@ awsComponentNode *awsPrefManager::FindWindowDef (char *name)
   return NULL;
 }
 
-void awsPrefManager::RegisterConstant (char *name, int value)
+void awsPrefManager::RegisterConstant (const char *name, int value)
 {
   constant_entry *c = new constant_entry;
 
@@ -564,7 +563,7 @@ void awsPrefManager::RegisterConstant (char *name, int value)
   constants.Push (c);
 }
 
-int awsPrefManager::GetConstantValue (char *name)
+int awsPrefManager::GetConstantValue (const char *name)
 {
   unsigned int namev = NameToId (name);
 
@@ -579,7 +578,7 @@ int awsPrefManager::GetConstantValue (char *name)
   return 0;
 }
 
-bool awsPrefManager::ConstantExists (char *name)
+bool awsPrefManager::ConstantExists (const char *name)
 {
   unsigned int namev = NameToId (name);
 

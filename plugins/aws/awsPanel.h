@@ -1,69 +1,60 @@
 // awsPanel.h: interface for the awsPanel class.
 //
 //////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_AWSPANEL_H__466A8BAA_DB89_423B_9380_7B73EE8176CF__INCLUDED_)
-#define AFX_AWSPANEL_H__466A8BAA_DB89_423B_9380_7B73EE8176CF__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+#ifndef __AWS_PANEL_H__
+#define __AWS_PANEL_H__
 
 #include "awscomp.h"
 #include "csgeom/csrectrg.h"
 #include "aws3dfrm.h"
 
-
-/* This class serves as a generic component which supports many of the basic graphic options
-   that components use such as background drawing and frame styles. It also clips to children
-   so that drawing is optimized */
-
-
+/** This class serves as a generic component which supports many of the basic
+ * graphic options that components use such as background drawing and frame
+ * styles. It also clips to children so that drawing is optimized
+ */
 class awsPanel : public awsComponent  
 {
 protected:
+  // style
+  int style;
 
-   // style
-   int style;
+  // child exclusion region
+  csRectRegion todraw;
 
-   // child exclusion region
-   csRectRegion todraw;
+  // 3D frame drawer
+  aws3DFrame frame_drawer;
 
-   // 3D frame drawer
-   aws3DFrame frame_drawer;
+  // true if the child_exclude region should be recalculated
+  bool todraw_dirty;
 
-   // true if the child_exclude region should be recalculated
-   bool todraw_dirty;
+  // textures for background and overlay
+  iTextureHandle *bkg, *ovl;
 
-   // textures for background and overlay
-   iTextureHandle *bkg, *ovl;
-
-   // alpha levels for background and overlay
-   int bkg_alpha, ovl_alpha;
+  // alpha levels for background and overlay
+  int bkg_alpha, ovl_alpha;
 
   /// Subrects of the background and overlay textures to use
   csRect bm_bkgsub, bm_ovlsub;
-
+  
 public:
-	awsPanel();
-	virtual ~awsPanel();
+  awsPanel();
+  virtual ~awsPanel();
 
-	bool Setup(iAws *_wmgr, awsComponentNode *settings);
+  bool Setup(iAws *_wmgr, awsComponentNode *settings);
 
-	void OnDraw(csRect clip);
-
-	void AddChild(iAwsComponent *comp);
-	void RemoveChild(iAwsComponent *comp);
-
+  void OnDraw(csRect clip);
+  
+  void AddChild(iAwsComponent *comp);
+  void RemoveChild(iAwsComponent *comp);
+  
   void Move(int delta_x, int delta_y);
-
+  
   virtual csRect getInsets();
 
-	virtual void OnChildMoved();
-	virtual void OnResized();
+  virtual void OnChildMoved();
+  virtual void OnResized();
   virtual void OnChildShow();
   virtual void OnChildHide();
-
 
   // frame styles
 public:
@@ -79,7 +70,7 @@ public:
   static const int fsMask;
   static const int fsNormal;
   static const int fsToolbar;
-
 };
 
-#endif // !defined(AFX_AWSPANEL_H__466A8BAA_DB89_423B_9380_7B73EE8176CF__INCLUDED_)
+#endif
+

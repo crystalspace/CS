@@ -20,8 +20,7 @@
 *****************************************************************************/
 # include "awsPanel.h"
 
-class awsCmdButton :
-  public awsPanel
+class awsCmdButton : public awsPanel
 {
 protected:
   /// True when button is down, false if up
@@ -67,15 +66,14 @@ public:
   virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
 
   /// Gets properties
-  bool GetProperty (char *name, void **parm);
+  bool GetProperty (const char* name, void **parm);
 
   /// Sets properties
-  bool SetProperty (char *name, void *parm);
+  bool SetProperty (const char* name, void *parm);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
-  virtual char *Type ();
-public:
-
+  virtual const char* Type ();
+  
   bool HandleEvent (iEvent &Event);
 
   /// Gets how big this button should ideally be.
@@ -118,11 +116,9 @@ public:
   virtual bool OnGainFocus ();
 };
 
-class awsCmdButtonFactory :
-  public awsComponentFactory
+class awsCmdButtonFactory : public awsComponentFactory
 {
 public:
-
   /// Calls register to register the component that it builds with the window manager
   awsCmdButtonFactory (iAws *wmgr);
 
@@ -132,4 +128,6 @@ public:
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();
 };
+
 #endif
+

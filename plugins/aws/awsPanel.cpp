@@ -1,7 +1,6 @@
 // awsPanel.cpp: implementation of the awsPanel class.
 //
 //////////////////////////////////////////////////////////////////////
-
 #include "cssysdef.h"
 #include "awsPanel.h"
 #include "aws3dfrm.h"
@@ -29,14 +28,13 @@ const int awsPanel::fsToolbar = awsPanel::fsFlat;
 
 
 awsPanel::awsPanel() :
-todraw_dirty(false),
-style(fsFlat),
-bkg(NULL),
-ovl(NULL),
-bkg_alpha(128),
-ovl_alpha(0)
-{
-}
+  style(fsFlat),
+  todraw_dirty(false),
+  bkg(NULL),
+  ovl(NULL),
+  bkg_alpha(128),
+  ovl_alpha(0)
+{ }
 
 awsPanel::~awsPanel()
 {
@@ -84,7 +82,7 @@ bool awsPanel::Setup(iAws *_wmgr, awsComponentNode *settings)
 	return true;
 }
 
-void awsPanel::OnDraw(csRect clip)
+void awsPanel::OnDraw(csRect )
 {
 	// if the child exclude region is dirty, refresh it
 	if(todraw_dirty)

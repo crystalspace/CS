@@ -49,11 +49,9 @@ class awsCanvas;
 *       
 *                                                                                                                         *
 **************************************************************************************************************************/
-class awsComponent :
-  public iAwsComponent
+class awsComponent : public iAwsComponent
 {
 protected:
-
   /// The stored handle to the window manager, in case a component needs it.
   iAws *wmgr;
 
@@ -101,6 +99,7 @@ public:
 
   awsComponent ();
   virtual ~awsComponent ();
+
 public:
   /// Registers a slot for a signal
   virtual bool RegisterSlot (iAwsSlot *slot, unsigned long signal);
@@ -113,7 +112,6 @@ public:
 
   /// Returns component that this belongs to.
   virtual iAwsComponent *GetComponent ();
-public:
 
   /** This function takes care of the creation tasks required to prepare this
     * component for use. If you create a component via the window manager's creation functions
@@ -137,13 +135,13 @@ public:
   virtual bool HandleEvent (iEvent &Event);
 
   /// Gets the property specified, setting the parameter to a COPY of the property's value. Returns false if there's no such property.
-  virtual bool GetProperty (char *name, void **parm);
+  virtual bool GetProperty (const char* name, void **parm);
 
   /// Sets the property specified, setting the proprty to whatever is in parm. Returns false if there's no such property.
-  virtual bool SetProperty (char *name, void *parm);
+  virtual bool SetProperty (const char* name, void *parm);
 
   /// Executes a scriptable action
-  virtual bool Execute (char *action, iAwsParmList &parmlist);
+  virtual bool Execute (const char* action, iAwsParmList &parmlist);
 
   /// Invalidation routine: allow the component to be redrawn when you call this
   virtual void Invalidate ();
@@ -161,7 +159,7 @@ public:
   virtual csRect ClientFrame();
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
-  virtual char *Type ();
+  virtual const char* Type ();
 
   /// Sets the flag (can handle multiple simultaneous sets)
   virtual void SetFlag (unsigned int flag);
@@ -200,7 +198,7 @@ public:
   virtual void SetID (unsigned long _id);
 
   /// Gets a child awsComponent by name, returns NULL on failure.
-  virtual iAwsComponent *FindChild(char *name);
+  virtual iAwsComponent *FindChild(const char* name);
 
   /// Returns the highet child (if any) whose frame contains (x,y).
   virtual iAwsComponent *ChildAt(int x, int y);
@@ -394,8 +392,7 @@ protected:
 
 };
 
-class awsComponentFactory :
-  public iAwsComponentFactory
+class awsComponentFactory : public iAwsComponentFactory
 {
   iAws *wmgr;
 public:
@@ -414,10 +411,10 @@ public:
   virtual iAwsComponent *Create ();
 
   /// Registers this factory with the window manager
-  void Register (char *type);
+  void Register (const char* type);
 
   /// Registers constants for the parser so that we can construct right.
-  void RegisterConstant (char *name, int value);
+  void RegisterConstant (const char* name, int value);
 };
 
 class awsComponentVector : public csVector

@@ -1,4 +1,4 @@
-/* A Bison parser, made from skinlang.bsn
+/* A Bison parser, made from plugins/aws/skinlang.bsn
    by GNU bison 1.35.  */
 
 #define YYBISON 1  /* Identify Bison output.  */
@@ -30,15 +30,19 @@
 #include "csutil/csdllist.h"
 #include "aws.h"
 #include "awsprefs.h"
+#include "awsparser.h"
 #include <stdio.h>
 
 
 #ifndef YYSTYPE
 typedef union {
-  char   *str;     /* For returning titles and handles to items. */
-  int     val;     /* For returning numbers                      */
-  csRect *rect;    /* For returning rectangular regions          */
-  awsKey *key;     /* For returning keys to various definition items */
+  char   *str;			/* For returning titles and handles to items. */
+  int     val;			/* For returning numbers                      */
+  csRect *rect;			/* For returning rectangular regions          */
+  awsKey *key;     		/* For returning keys to various definition items */
+  awsComponentNode *comp;	/* for returning windows		      */
+  awsKeyContainer *keycont;	/* for returning KeyContainers		      */
+  awsSkinNode *skin;		/* for returning skins			      */
 } yystype;
 # define YYSTYPE yystype
 # define YYSTYPE_IS_TRIVIAL 1
@@ -48,16 +52,6 @@ typedef union {
 extern int awslex(YYSTYPE *awslval);
 extern int awserror(char *s);
 extern int awslineno;
-static void mapsourcetosink(iAws *windowmgr, unsigned long signal, iString *sinkname, iString *triggername);
-
-/// This is locally global variable that holds keys for a little while
-static awsKeyContainer kcont[32];
-/// This is the locally global variable that holds window keys.
-static awsKeyContainer wkcont;
-/// This is the locally global variable that holds skin keys.
-static awsKeyContainer skcont;
-/// This is the level we're on.
-static int			   klevel=0;
 
 /// This is the parser parameter
 #define YYPARSE_PARAM windowmgr
@@ -69,12 +63,12 @@ static int			   klevel=0;
 
 
 
-#define	YYFINAL		133
+#define	YYFINAL		130
 #define	YYFLAG		-32768
 #define	YYNTBASE	28
 
 /* YYTRANSLATE(YYLEX) -- Bison token number corresponding to YYLEX. */
-#define YYTRANSLATE(x) ((unsigned)(x) <= 267 ? yytranslate[x] : 45)
+#define YYTRANSLATE(x) ((unsigned)(x) <= 267 ? yytranslate[x] : 42)
 
 /* YYTRANSLATE[YYLEX] -- Bison token number corresponding to YYLEX. */
 static const char yytranslate[] =
@@ -112,34 +106,34 @@ static const char yytranslate[] =
 static const short yyprhs[] =
 {
        0,     0,     1,     4,     6,     8,    10,    13,    21,    23,
-      26,    30,    34,    42,    56,    57,    63,    64,    73,    74,
-      81,    83,    86,    90,    94,   108,   113,   121,   123,   126,
-     132,   136,   144,   148,   156,   170,   172,   175,   181,   183,
-     185,   187,   191,   195,   199,   203,   206
+      26,    30,    34,    42,    56,    61,    69,    75,    77,    80,
+      84,    88,   102,   107,   115,   117,   120,   126,   130,   138,
+     142,   150,   164,   166,   169,   175,   177,   179,   181,   185,
+     189,   193,   197,   200
 };
 static const short yyrhs[] =
 {
-      -1,    28,    29,     0,    20,     0,    42,     0,    39,     0,
-       1,    21,     0,    44,    14,    22,     5,    23,    23,     5,
+      -1,    28,    29,     0,    20,     0,    39,     0,    36,     0,
+       1,    21,     0,    41,    14,    22,     5,    23,    23,     5,
        0,    30,     0,    31,    30,     0,     5,    23,     4,     0,
-       5,    23,    44,     0,     5,    23,    44,    24,    44,    24,
-      44,     0,     5,    23,    25,    44,    24,    44,    26,    14,
-      25,    44,    24,    44,    26,     0,     0,    11,    33,    27,
-      31,    21,     0,     0,    10,     4,    12,     4,    27,    34,
-      36,    21,     0,     0,     8,     4,    27,    35,    36,    21,
-       0,    32,     0,    36,    32,     0,     5,    23,     4,     0,
-       5,    23,    44,     0,     5,    23,    25,    44,    24,    44,
-      26,    14,    25,    44,    24,    44,    26,     0,    11,    27,
-      31,    21,     0,    10,     4,    12,     4,    27,    36,    21,
-       0,    37,     0,    38,    37,     0,     8,     4,    27,    38,
-      21,     0,     5,    23,     4,     0,     5,    23,    44,    24,
-      44,    24,    44,     0,     5,    23,    44,     0,     5,    23,
-      25,    44,    24,    44,    26,     0,     5,    23,    25,    44,
-      24,    44,    26,    14,    25,    44,    24,    44,    26,     0,
-      40,     0,    41,    40,     0,     6,     4,    27,    41,    21,
-       0,     5,     0,     3,     0,    43,     0,    44,    15,    44,
-       0,    44,    14,    44,     0,    44,    16,    44,     0,    44,
-      17,    44,     0,    14,    44,     0,    25,    44,    26,     0
+       5,    23,    41,     0,     5,    23,    41,    24,    41,    24,
+      41,     0,     5,    23,    25,    41,    24,    41,    26,    14,
+      25,    41,    24,    41,    26,     0,    11,    27,    31,    21,
+       0,    10,     4,    12,     4,    27,    33,    21,     0,     8,
+       4,    27,    33,    21,     0,    32,     0,    33,    32,     0,
+       5,    23,     4,     0,     5,    23,    41,     0,     5,    23,
+      25,    41,    24,    41,    26,    14,    25,    41,    24,    41,
+      26,     0,    11,    27,    31,    21,     0,    10,     4,    12,
+       4,    27,    33,    21,     0,    34,     0,    35,    34,     0,
+       8,     4,    27,    35,    21,     0,     5,    23,     4,     0,
+       5,    23,    41,    24,    41,    24,    41,     0,     5,    23,
+      41,     0,     5,    23,    25,    41,    24,    41,    26,     0,
+       5,    23,    25,    41,    24,    41,    26,    14,    25,    41,
+      24,    41,    26,     0,    37,     0,    38,    37,     0,     6,
+       4,    27,    38,    21,     0,     5,     0,     3,     0,    40,
+       0,    41,    15,    41,     0,    41,    14,    41,     0,    41,
+      16,    41,     0,    41,    17,    41,     0,    14,    41,     0,
+      25,    41,    26,     0
 };
 
 #endif
@@ -148,11 +142,11 @@ static const short yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined. */
 static const short yyrline[] =
 {
-       0,    81,    82,    85,    86,    87,    88,    96,    99,   100,
-     103,   104,   105,   106,   107,   107,   113,   113,   121,   121,
-     130,   131,   135,   136,   137,   138,   142,   149,   150,   153,
-     165,   166,   167,   168,   169,   172,   173,   176,   185,   199,
-     200,   201,   202,   203,   204,   205,   206
+       0,    77,    78,    81,    82,    83,    84,    91,    96,   102,
+     109,   112,   114,   116,   118,   124,   130,   138,   144,   152,
+     155,   157,   159,   165,   173,   179,   186,   199,   202,   204,
+     206,   208,   212,   218,   225,   236,   245,   246,   247,   248,
+     249,   250,   251,   252
 };
 #endif
 
@@ -167,9 +161,9 @@ static const char *const yytname[] =
   "TOKEN_COMPONENT", "TOKEN_CONNECT", "TOKEN_IS", "'='", "'-'", "'+'", 
   "'*'", "'/'", "NEG", "'^'", "'\\n'", "'}'", "'>'", "':'", "','", "'('", 
   "')'", "'{'", "input", "line", "connection_item", 
-  "connection_item_list", "component_item", "@1", "@2", "@3", 
-  "component_item_list", "window_item", "window_item_list", "window", 
-  "skin_item", "skin_item_list", "skin", "constant_item", "exp", 0
+  "connection_item_list", "component_item", "component_item_list", 
+  "window_item", "window_item_list", "window", "skin_item", 
+  "skin_item_list", "skin", "constant_item", "exp", 0
 };
 #endif
 
@@ -177,20 +171,20 @@ static const char *const yytname[] =
 static const short yyr1[] =
 {
        0,    28,    28,    29,    29,    29,    29,    30,    31,    31,
-      32,    32,    32,    32,    33,    32,    34,    32,    35,    32,
-      36,    36,    37,    37,    37,    37,    37,    38,    38,    39,
-      40,    40,    40,    40,    40,    41,    41,    42,    43,    44,
-      44,    44,    44,    44,    44,    44,    44
+      32,    32,    32,    32,    32,    32,    32,    33,    33,    34,
+      34,    34,    34,    34,    35,    35,    36,    37,    37,    37,
+      37,    37,    38,    38,    39,    40,    41,    41,    41,    41,
+      41,    41,    41,    41
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN. */
 static const short yyr2[] =
 {
        0,     0,     2,     1,     1,     1,     2,     7,     1,     2,
-       3,     3,     7,    13,     0,     5,     0,     8,     0,     6,
-       1,     2,     3,     3,    13,     4,     7,     1,     2,     5,
-       3,     7,     3,     7,    13,     1,     2,     5,     1,     1,
-       1,     3,     3,     3,     3,     2,     3
+       3,     3,     7,    13,     4,     7,     5,     1,     2,     3,
+       3,    13,     4,     7,     1,     2,     5,     3,     7,     3,
+       7,    13,     1,     2,     5,     1,     1,     1,     3,     3,
+       3,     3,     2,     3
 };
 
 /* YYDEFACT[S] -- default rule to reduce with in state S when YYTABLE
@@ -199,115 +193,115 @@ static const short yyr2[] =
 static const short yydefact[] =
 {
        1,     0,     0,     0,     0,     3,     2,     5,     4,     6,
-       0,     0,     0,     0,     0,    35,     0,     0,     0,     0,
-      27,     0,     0,    37,    36,     0,     0,     0,    29,    28,
-      39,    30,    38,     0,     0,    40,    32,    22,     0,    23,
-       0,     0,     8,     0,     0,    45,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    25,     9,     0,     0,    46,
-      42,    41,    43,    44,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,    14,    20,     0,     0,    33,    31,
-       0,     0,     0,     0,     0,    26,    21,     0,     0,     0,
-      10,     0,    11,    18,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     7,     0,     0,     0,     0,     0,
-      16,    15,     0,     0,     0,     0,    19,     0,     0,     0,
-       0,    12,     0,    34,    24,     0,    17,     0,     0,     0,
-       0,    13,     0,     0
+       0,     0,     0,     0,     0,    32,     0,     0,     0,     0,
+      24,     0,     0,    34,    33,     0,     0,     0,    26,    25,
+      36,    27,    35,     0,     0,    37,    29,    19,     0,    20,
+       0,     0,     8,     0,     0,    42,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    22,     9,     0,     0,    43,
+      39,    38,    40,    41,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    17,     0,     0,    30,    28,
+       0,     0,     0,     0,     0,    23,    18,     0,     0,     0,
+      10,     0,    11,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,    14,     7,     0,     0,     0,     0,    16,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,    12,
+      15,    31,    21,     0,     0,     0,     0,     0,    13,     0,
+       0
 };
 
 static const short yydefgoto[] =
 {
-       1,     6,    42,    43,    75,    84,   117,   101,    76,    20,
-      21,     7,    15,    16,     8,    35,    44
+       1,     6,    42,    43,    75,    76,    20,    21,     7,    15,
+      16,     8,    35,    44
 };
 
 static const short yypact[] =
 {
-  -32768,    94,   -15,     6,     9,-32768,-32768,-32768,-32768,-32768,
-      18,    26,    29,     4,    42,-32768,    12,    45,    78,    56,
-  -32768,   105,    17,-32768,-32768,    35,    75,    74,-32768,-32768,
-  -32768,-32768,-32768,    74,    74,-32768,   182,-32768,    74,   240,
-      82,    74,-32768,    27,   244,-32768,   106,    74,    74,    74,
-      74,    74,   119,    62,   136,-32768,-32768,    41,    74,-32768,
-       7,     7,-32768,-32768,   186,    74,   242,    91,   140,    74,
-     144,    81,    93,    97,-32768,-32768,    -3,    88,    84,   240,
-      99,    67,    85,   112,    90,-32768,-32768,    95,   100,   102,
-  -32768,    74,   197,-32768,   124,    74,   126,    74,    74,   123,
-      74,   242,   114,    59,-32768,   201,   212,    74,   216,    46,
-  -32768,-32768,    74,    74,   157,    74,-32768,   242,   161,   165,
-     115,   240,    98,-32768,-32768,   117,-32768,    74,   227,    74,
-     178,-32768,   146,-32768
+  -32768,    50,   -11,    14,    28,-32768,-32768,-32768,-32768,-32768,
+       7,    10,    36,     4,    22,-32768,    12,    32,    57,    38,
+  -32768,   113,    17,-32768,-32768,    35,    54,    -1,-32768,-32768,
+  -32768,-32768,-32768,    -1,    -1,-32768,   187,-32768,    -1,   245,
+      58,    -1,-32768,    43,   249,-32768,   111,    -1,    -1,    -1,
+      -1,    -1,   124,    40,   141,-32768,-32768,    49,    -1,-32768,
+      -9,    -9,-32768,-32768,   191,    -1,   247,    67,   145,    -1,
+     149,    56,    69,    77,    64,-32768,    72,    61,    85,   245,
+      89,    83,    79,    95,    -1,-32768,-32768,    86,    88,    96,
+  -32768,    -1,   202,   247,   106,    91,   110,    -1,    -1,   128,
+      -1,    90,   102,-32768,-32768,   206,   217,    -1,   221,-32768,
+     247,    -1,    -1,   162,    -1,   109,   166,   170,   108,   245,
+  -32768,-32768,-32768,   107,    -1,   232,    -1,   183,-32768,   131,
+  -32768
 };
 
 static const short yypgoto[] =
 {
-  -32768,-32768,   -42,    49,   -72,-32768,-32768,-32768,   -43,   127,
-  -32768,-32768,   147,-32768,-32768,-32768,   -22
+  -32768,-32768,   -42,    52,   -71,   -87,   112,-32768,-32768,   130,
+  -32768,-32768,-32768,   -22
 };
 
 
-#define	YYLAST		261
+#define	YYLAST		266
 
 
 static const short yytable[] =
 {
-      36,    56,    71,    39,    86,    72,     9,    73,    74,    17,
-      10,    45,    46,    11,    18,    19,    52,    14,    85,    54,
-      30,    31,    32,    49,    50,    60,    61,    62,    63,    64,
-      30,    33,    32,    23,    14,    60,    68,    86,    30,    37,
-      32,    33,    34,    70,    30,    12,    32,    79,    55,    33,
-      86,    71,    41,    13,    72,    33,    73,    74,   109,    92,
-      38,    56,    30,    67,    32,    22,    41,   116,    25,    99,
-      30,    90,    32,    33,   122,   105,   106,    30,   108,    32,
-     111,    33,    26,    27,    41,   114,    53,    40,    33,    66,
-     118,   119,    91,   121,   132,     2,    77,    82,    88,    41,
-       3,    83,     4,    71,    81,   128,    72,   130,    73,    74,
-      17,    87,    93,    89,     5,    18,    19,    95,    96,   126,
-      47,    48,    49,    50,    94,    97,    28,    98,   102,   125,
-      58,   104,    59,    47,    48,    49,    50,    47,    48,    49,
-      50,   110,   127,    65,   103,    59,   133,   107,    29,    59,
-      47,    48,    49,    50,    47,    48,    49,    50,    47,    48,
-      49,    50,    59,    24,     0,     0,    78,     0,     0,     0,
-      80,    47,    48,    49,    50,    47,    48,    49,    50,    47,
-      48,    49,    50,   120,     0,     0,     0,   123,     0,     0,
-       0,   124,    47,    48,    49,    50,    47,    48,    49,    50,
-      47,    48,    49,    50,   131,     0,    51,     0,     0,     0,
-      69,    47,    48,    49,    50,    47,    48,    49,    50,     0,
-       0,   100,     0,     0,     0,   112,    47,    48,    49,    50,
-      47,    48,    49,    50,     0,     0,   113,     0,     0,     0,
-     115,    47,    48,    49,    50,     0,     0,    71,     0,     0,
-      72,   129,    73,    74,    47,    48,    49,    50,    57,    48,
-      49,    50
+      36,    56,    30,    39,    32,    86,   101,    49,    50,    17,
+       9,    45,    46,    33,    18,    19,    52,    14,    10,    54,
+      30,    31,    32,   115,    41,    60,    61,    62,    63,    64,
+      86,    33,    11,    23,    12,    60,    68,    13,    30,    37,
+      32,    14,    34,    70,    86,    22,    30,    79,    32,    33,
+     129,     2,    30,    56,    32,    25,     3,    33,     4,    92,
+      38,    26,    53,    33,    55,    27,    40,    66,    41,    99,
+       5,    67,    77,    82,    41,   105,   106,    71,   108,    81,
+      72,    83,    73,    74,    87,   113,    30,    90,    32,   116,
+     117,    84,   119,    85,    30,    71,    32,    33,    72,    88,
+      73,    74,   125,    89,   127,    33,    93,    94,    91,    96,
+     102,   109,   103,    97,    71,   104,    41,    72,    17,    73,
+      74,    98,   123,    18,    19,    47,    48,    49,    50,   110,
+     120,   130,   124,    29,    28,    58,    95,    59,    47,    48,
+      49,    50,    47,    48,    49,    50,    24,     0,    65,     0,
+      59,     0,   107,     0,    59,    47,    48,    49,    50,    47,
+      48,    49,    50,    47,    48,    49,    50,    59,     0,     0,
+       0,    78,     0,     0,     0,    80,    47,    48,    49,    50,
+      47,    48,    49,    50,    47,    48,    49,    50,   118,     0,
+       0,     0,   121,     0,     0,     0,   122,    47,    48,    49,
+      50,    47,    48,    49,    50,    47,    48,    49,    50,   128,
+       0,    51,     0,     0,     0,    69,    47,    48,    49,    50,
+      47,    48,    49,    50,     0,     0,   100,     0,     0,     0,
+     111,    47,    48,    49,    50,    47,    48,    49,    50,     0,
+       0,   112,     0,     0,     0,   114,    47,    48,    49,    50,
+       0,     0,    71,     0,     0,    72,   126,    73,    74,    47,
+      48,    49,    50,    57,    48,    49,    50
 };
 
 static const short yycheck[] =
 {
-      22,    43,     5,    25,    76,     8,    21,    10,    11,     5,
-       4,    33,    34,     4,    10,    11,    38,     5,    21,    41,
-       3,     4,     5,    16,    17,    47,    48,    49,    50,    51,
-       3,    14,     5,    21,     5,    57,    58,   109,     3,     4,
-       5,    14,    25,    65,     3,    27,     5,    69,    21,    14,
-     122,     5,    25,    27,     8,    14,    10,    11,   101,    81,
-      25,   103,     3,    22,     5,    23,    25,    21,    23,    91,
-       3,     4,     5,    14,   117,    97,    98,     3,   100,     5,
-      21,    14,     4,    27,    25,   107,     4,    12,    14,    27,
-     112,   113,    25,   115,     0,     1,     5,     4,    14,    25,
-       6,     4,     8,     5,    23,   127,     8,   129,    10,    11,
-       5,    23,    27,    14,    20,    10,    11,    27,    23,    21,
-      14,    15,    16,    17,    12,    25,    21,    25,     4,    14,
-      24,     5,    26,    14,    15,    16,    17,    14,    15,    16,
-      17,    27,    25,    24,    95,    26,     0,    24,    21,    26,
-      14,    15,    16,    17,    14,    15,    16,    17,    14,    15,
-      16,    17,    26,    16,    -1,    -1,    26,    -1,    -1,    -1,
-      26,    14,    15,    16,    17,    14,    15,    16,    17,    14,
-      15,    16,    17,    26,    -1,    -1,    -1,    26,    -1,    -1,
-      -1,    26,    14,    15,    16,    17,    14,    15,    16,    17,
-      14,    15,    16,    17,    26,    -1,    24,    -1,    -1,    -1,
-      24,    14,    15,    16,    17,    14,    15,    16,    17,    -1,
+      22,    43,     3,    25,     5,    76,    93,    16,    17,     5,
+      21,    33,    34,    14,    10,    11,    38,     5,     4,    41,
+       3,     4,     5,   110,    25,    47,    48,    49,    50,    51,
+     101,    14,     4,    21,    27,    57,    58,    27,     3,     4,
+       5,     5,    25,    65,   115,    23,     3,    69,     5,    14,
+       0,     1,     3,    95,     5,    23,     6,    14,     8,    81,
+      25,     4,     4,    14,    21,    27,    12,    27,    25,    91,
+      20,    22,     5,     4,    25,    97,    98,     5,   100,    23,
+       8,     4,    10,    11,    23,   107,     3,     4,     5,   111,
+     112,    27,   114,    21,     3,     5,     5,    14,     8,    14,
+      10,    11,   124,    14,   126,    14,    27,    12,    25,    23,
+       4,    21,    21,    25,     5,     5,    25,     8,     5,    10,
+      11,    25,    14,    10,    11,    14,    15,    16,    17,    27,
+      21,     0,    25,    21,    21,    24,    84,    26,    14,    15,
+      16,    17,    14,    15,    16,    17,    16,    -1,    24,    -1,
+      26,    -1,    24,    -1,    26,    14,    15,    16,    17,    14,
+      15,    16,    17,    14,    15,    16,    17,    26,    -1,    -1,
+      -1,    26,    -1,    -1,    -1,    26,    14,    15,    16,    17,
+      14,    15,    16,    17,    14,    15,    16,    17,    26,    -1,
+      -1,    -1,    26,    -1,    -1,    -1,    26,    14,    15,    16,
+      17,    14,    15,    16,    17,    14,    15,    16,    17,    26,
       -1,    24,    -1,    -1,    -1,    24,    14,    15,    16,    17,
       14,    15,    16,    17,    -1,    -1,    24,    -1,    -1,    -1,
-      24,    14,    15,    16,    17,    -1,    -1,     5,    -1,    -1,
-       8,    24,    10,    11,    14,    15,    16,    17,    14,    15,
-      16,    17
+      24,    14,    15,    16,    17,    14,    15,    16,    17,    -1,
+      -1,    24,    -1,    -1,    -1,    24,    14,    15,    16,    17,
+      -1,    -1,     5,    -1,    -1,     8,    24,    10,    11,    14,
+      15,    16,    17,    14,    15,    16,    17
 };
 #define YYPURE 1
 
@@ -1017,162 +1011,179 @@ yyreduce:
   switch (yyn) {
 
 case 4:
-{ ;
+{ static_awsparser->AddGlobalSkinDef(yyvsp[0].skin); ;
     break;}
 case 5:
-{ ;
+{ static_awsparser->AddGlobalWindowDef(yyvsp[0].comp); ;
     break;}
 case 6:
 { yyerrok;      ;
     break;}
 case 7:
-{ mapsourcetosink((iAws *)windowmgr, yyvsp[-6].val, new scfString(yyvsp[-3].str), new scfString(yyvsp[0].str)); ;
+{ static_awsparser->MapSourceToSink (yyvsp[-6].val, yyvsp[-3].str, yyvsp[0].str); ;
+    break;}
+case 8:
+{ awsConnectionNode* cn = new awsConnectionNode;
+		  cn->Add(cn);
+		  yyval.keycont = cn;
+		;
+    break;}
+case 9:
+{ awsConnectionNode* cn = (awsConnectionNode*) yyvsp[-1].keycont;
+		  cn->Add(yyvsp[0].key);
+		  yyval.keycont = cn;
+		;
     break;}
 case 10:
-{ kcont[klevel].Add(new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str)));         ;
+{  yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str)); ;
     break;}
 case 11:
-{ kcont[klevel].Add(new awsIntKey(new scfString(yyvsp[-2].str), yyvsp[0].val));                           ;
+{  yyval.key = new awsIntKey(new scfString(yyvsp[-2].str), yyvsp[0].val); ;
     break;}
 case 12:
-{ kcont[klevel].Add(new awsRGBKey(new scfString(yyvsp[-6].str), yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val));                   ;
+{  yyval.key = new awsRGBKey(new scfString(yyvsp[-6].str), yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); ;
     break;}
 case 13:
-{ kcont[klevel].Add(new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)));    ;
+{  yyval.key = new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
     break;}
 case 14:
-{ ++klevel; /* go down a level (mid-action rule) */ ;
+{ awsConnectionNode *cn = new awsConnectionNode();
+		  cn->Consume (yyvsp[-1].keycont);
+		  delete yyvsp[-1].keycont;
+		  yyval.key = cn;
+		;
     break;}
 case 15:
-{ awsConnectionNode *cn = new awsConnectionNode();
-																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
-																				  --klevel;
-																				  kcont[klevel].Add(cn);
-																				;
+{ awsComponentNode *cn = new awsComponentNode(yyvsp[-5].str, yyvsp[-3].str);
+		  cn->Consume(yyvsp[-1].keycont);
+		  delete yyvsp[-1].keycont;
+		  yyval.key = cn;
+		;
     break;}
 case 16:
-{ ++klevel; /* go down a level (mid-action rule) */ ;
+{ awsComponentNode *cn = new awsComponentNode(yyvsp[-3].str, "Window");
+		  cn->Consume(yyvsp[-1].keycont);
+		  delete yyvsp[-1].keycont;
+		  yyval.key = cn;
+		;
     break;}
 case 17:
-{ awsComponentNode *cn = new awsComponentNode(new scfString(yyvsp[-6].str), new scfString(yyvsp[-4].str));
-																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
-																				  --klevel;  /* go up a level in recursion */
-																				  kcont[klevel].Add(cn);
-																				;
+{ awsKeyContainer* keycontainer = new awsKeyContainer;
+		  keycontainer->Add(yyvsp[0].key);
+		  yyval.keycont = keycontainer;
+		;
     break;}
 case 18:
-{ ++klevel; /* go down a level (mid-action rule) */ ;
+{ awsKeyContainer* keycontainer = yyvsp[-1].keycont;
+		  keycontainer->Add(yyvsp[0].key);
+		  yyval.keycont = keycontainer;
+		;
     break;}
 case 19:
-{ awsComponentNode *cn = new awsComponentNode(new scfString(yyvsp[-4].str), new scfString("Window"));
-																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
-																				  --klevel;  /* go up a level in recursion */
-																				  kcont[klevel].Add(cn);
-																				;
-    break;}
-case 20:
-{ /*empty*/ ;
-    break;}
-case 21:
-{ /*empty*/ ;
-    break;}
-case 22:
-{ yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str));          ;
-    break;}
-case 23:
-{ yyval.key = new awsIntKey(new scfString(yyvsp[-2].str), yyvsp[0].val);                            ;
-    break;}
-case 24:
-{ yyval.key = new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val));     ;
-    break;}
-case 25:
-{ awsConnectionNode *cn = new awsConnectionNode();
-																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
-																				  yyval.key=cn;
-			  																	;
-    break;}
-case 26:
-{ awsComponentNode *cn = new awsComponentNode(new scfString(yyvsp[-5].str), new scfString(yyvsp[-3].str));
-																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
-																				   yyval.key=cn;
-																				;
-    break;}
-case 27:
-{ wkcont.Add(yyvsp[0].key); ;
-    break;}
-case 28:
-{ wkcont.Add(yyvsp[0].key); ;
-    break;}
-case 29:
-{
-																				  awsComponentNode *win = new awsComponentNode(new scfString(yyvsp[-3].str), new scfString("Default"));
-																				  ((awsKeyContainer*)win)->Consume(&wkcont);
-																				  ((awsPrefManager *)((awsManager *)windowmgr)->GetPrefMgr())->AddWindowDef(win);
-																				;
-    break;}
-case 30:
 { yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str)); ;
     break;}
+case 20:
+{ yyval.key = new awsIntKey(new scfString(yyvsp[-2].str), yyvsp[0].val); ;
+    break;}
+case 21:
+{ yyval.key = new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
+    break;}
+case 22:
+{ awsConnectionNode *cn = new awsConnectionNode();
+		  cn->Consume(yyvsp[-1].keycont);
+		  delete yyvsp[-1].keycont;
+		  yyval.key=cn;
+		;
+    break;}
+case 23:
+{ awsComponentNode *cn = new awsComponentNode(yyvsp[-5].str, yyvsp[-3].str);
+		  cn->Consume(yyvsp[-1].keycont);
+		  delete yyvsp[-1].keycont;
+		  yyval.key=cn;
+		;
+    break;}
+case 24:
+{ awsKeyContainer* cnt = new awsKeyContainer;
+		cnt->Add(yyvsp[0].key);
+		yyval.keycont = cnt;
+	      ;
+    break;}
+case 25:
+{ awsKeyContainer* cnt = yyvsp[-1].keycont;
+	        cnt->Add(yyvsp[0].key);
+	        yyval.keycont = cnt;
+	      ;
+    break;}
+case 26:
+{ awsComponentNode *win = new awsComponentNode(yyvsp[-3].str, "Default");
+		  win->Consume(yyvsp[-1].keycont);
+		  delete yyvsp[-1].keycont;
+		  yyval.comp = win;
+		;
+    break;}
+case 27:
+{ yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str)); ;
+    break;}
+case 28:
+{ yyval.key = new awsRGBKey(new scfString(yyvsp[-6].str), yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); ;
+    break;}
+case 29:
+{ yyval.key = new awsIntKey(new scfString(yyvsp[-2].str), yyvsp[0].val); ;
+    break;}
+case 30:
+{ yyval.key = new awsPointKey(new scfString(yyvsp[-6].str), csPoint(yyvsp[-3].val, yyvsp[-1].val)); ;
+    break;}
 case 31:
-{ yyval.key = new awsRGBKey(new scfString(yyvsp[-6].str), yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val);           ;
+{ yyval.key = new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
     break;}
 case 32:
-{ yyval.key = new awsIntKey(new scfString(yyvsp[-2].str), yyvsp[0].val);					 ;
+{ awsKeyContainer* kc = new awsKeyContainer;
+		  kc->Add(yyvsp[0].key);
+		  yyval.keycont = kc;
+		;
     break;}
 case 33:
-{ yyval.key = new awsPointKey(new scfString(yyvsp[-6].str), csPoint(yyvsp[-3].val, yyvsp[-1].val));    ;
+{ awsKeyContainer* kc = yyvsp[-1].keycont;
+		  kc->Add(yyvsp[0].key);
+		  yyval.keycont = kc;
+		;
     break;}
 case 34:
-{ yyval.key = new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val));     ;
+{ awsSkinNode *skin = new awsSkinNode(yyvsp[-3].str);
+                  skin->Consume(yyvsp[-1].keycont);
+		  yyval.skin = skin;
+		;
     break;}
 case 35:
-{ skcont.Add(yyvsp[0].key); ;
+{ int v = 0;
+		  if (!static_awsparser->GetConstantValue(yyvsp[0].str, v))
+		    static_awsparser->ReportError ("Constant %s is not defined.", yyvsp[0].str);
+		  yyval.val = v;
+		;
     break;}
 case 36:
-{ skcont.Add(yyvsp[0].key); ;
+{ yyval.val = yyvsp[0].val; ;
     break;}
 case 37:
-{ awsSkinNode *skin = new awsSkinNode(new scfString(yyvsp[-3].str));
-										                      ((awsKeyContainer*)skin)->Consume(&skcont);
-															  ((awsPrefManager *)((awsManager*)windowmgr)->GetPrefMgr())->AddSkinDef(skin);
-															 ;
+{ yyval.val = yyvsp[0].val; ;
     break;}
 case 38:
-{
-																				  if (((awsManager *)windowmgr)->GetPrefMgr()->ConstantExists(yyvsp[0].str))
-																				    {
-																					  yyval.val = ((awsManager *)windowmgr)->GetPrefMgr()->GetConstantValue(yyvsp[0].str);
-																					}
-																				   else
-																				    {
-																					  printf("\taws window definition error: %s is not a registered constant.\n", yyvsp[0].str);
-																					  yyval.val=0;
-																					}
-																				;
-    break;}
-case 39:
-{ yyval.val = yyvsp[0].val;      ;
-    break;}
-case 40:
-{ yyval.val = yyvsp[0].val;      ;
-    break;}
-case 41:
 { yyval.val = yyvsp[-2].val + yyvsp[0].val; ;
     break;}
-case 42:
+case 39:
 { yyval.val = yyvsp[-2].val - yyvsp[0].val; ;
     break;}
-case 43:
+case 40:
 { yyval.val = yyvsp[-2].val * yyvsp[0].val; ;
     break;}
-case 44:
+case 41:
 { yyval.val = yyvsp[-2].val / yyvsp[0].val; ;
     break;}
-case 45:
-{ yyval.val = -yyvsp[0].val;     ;
+case 42:
+{ yyval.val = -yyvsp[0].val; ;
     break;}
-case 46:
-{ yyval.val = yyvsp[-1].val;      ;
+case 43:
+{ yyval.val = yyvsp[-1].val; ;
     break;}
 }
 
@@ -1411,29 +1422,7 @@ yyreturn:
 int
 awserror(char *s)
 {
- printf("\taws definition parse error(%i): %s\n", awslineno, s);
- return 0;
+  static_awsparser->ReportError (s);
+  return 0;
 }
 
-void
-mapsourcetosink(iAws *windowmgr, unsigned long signal, iString *sinkname, iString *triggername)
-{
-
-  if (windowmgr==NULL)
-  {
-    printf("\tinternal error: window manager parameter is null in mapsourcetosink!\n");
-	return;
-  }
-
-  iAwsSink *sink = ((awsManager *)windowmgr)->GetSinkMgr()->FindSink(sinkname->GetData());
-
-  if (sink==NULL)
-  {
-    printf("\tcould not find sink \"%s\" referred to in connection map.\n", sinkname->GetData());
-	return;
-  }
-
-  unsigned long trigger = sink->GetTriggerID(triggername->GetData());
-
-  kcont[klevel].Add(new awsConnectionKey(new scfString("connection"), sink, trigger, signal));
-}
