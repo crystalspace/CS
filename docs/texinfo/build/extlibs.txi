@@ -23,10 +23,10 @@ contains all headers, pre-built library files, and dynamic link libraries in
 pre-compiled form from the following location on the Crystal Space server:
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.94a.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.94b.zip}
 
 @noindent
-@uref{ftp://62.188.48.183/crystal_space/support/win32/msvc_libs_0.94a.zip}
+@uref{ftp://62.188.48.183/crystal_space/support/win32/msvc_libs_0.94b.zip}
 
 Microsoft Visual C++ 7 and @sc{dos} users can download a single package which
 contains all headers, pre-built library files, and dynamic link libraries in
@@ -34,20 +34,20 @@ pre-compiled form from the following location on the Crystal Space server:
 
 @noindent
 @ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.94a.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.94b.zip}
 @end ifnottex
 @iftex
 @code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/}@*
-@code{msvc7_libs_0.94a.zip}
+@code{msvc7_libs_0.94b.zip}
 @end iftex
 
 @noindent
 @ifnottex
-@uref{ftp://62.188.48.183/crystal_space/support/win32/msvc7/msvc7_libs_0.94a.zip}
+@uref{ftp://62.188.48.183/crystal_space/support/win32/msvc7/msvc7_libs_0.94b.zip}
 @end ifnottex
 @iftex
 @code{ftp://62.188.48.183/crystal_space/support/win32/msvc7/}@*
-@code{msvc7_libs_0.94a.zip}
+@code{msvc7_libs_0.94b.zip}
 @end iftex
 
 @subheading zlib

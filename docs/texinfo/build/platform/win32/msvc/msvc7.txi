@@ -33,24 +33,24 @@ and install @file{msvc7_libs}.  msvc7_libs is a package containing all
 third party header, pre-built library and dll files used by Crystal
 Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll} and
 @file{xmlparse.dll} etc.  The latest version of the msvc7_libs package
-@file{msvc7_libs_0.94a.zip} can be downloaded from:
+@file{msvc7_libs_0.94b.zip} can be downloaded from:
 
 @noindent
 @ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.94a.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.94b.zip}
 @end ifnottex
 @iftex
 @code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/}@*
-@code{msvc7_libs_0.94a.zip}
+@code{msvc7_libs_0.94b.zip}
 @end iftex
 
 @noindent
 @ifnottex
-@uref{ftp://62.188.48.183/crystal_space/support/win32/msvc7/msvc7_libs_0.94a.zip}
+@uref{ftp://62.188.48.183/crystal_space/support/win32/msvc7/msvc7_libs_0.94b.zip}
 @end ifnottex
 @iftex
 @code{ftp://62.188.48.183/crystal_space/support/win32/msvc7/}@*
-@code{msvc7_libs_0.94a.zip}
+@code{msvc7_libs_0.94b.zip}
 @end iftex
 
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
