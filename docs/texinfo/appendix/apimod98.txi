@@ -1605,3 +1605,28 @@ overloads that can make life easier for calculating collisions on a path.
 The isometric engine has been removed.  It was beyond repair.  The
 @samp{isotest} application remains, though, and demonstrates how you can
 simulate an isometric look with the normal 3D engine.
+
+@subheading Some Plugins Removed
+
+The following plugins and programs also have been removed (along with any 
+parts of the API they provided exclusively), because they are unmaintained and
+not currently usable. For more discussion see mailing list posts at
+<http://sourceforge.net/mailarchive/message.php?msg_id=8645194>
+<http://sourceforge.net/mailarchive/message.php?msg_id=8296024>
+<http://sourceforge.net/mailarchive/message.php?msg_id=8296017>
+<http://sourceforge.net/mailarchive/message.php?msg_id=8295883>
+
+@itemize @bullet
+@item @code{terrbig} (use new terrain features in the new renderer)
+@item skeletal sprites (use cal3d)
+@item @code{cloth}
+@item @code{cocoa2d} graphics driver for MacOSX
+@item @code{rle} video codec
+@item @code{milk2spr} (use the cal3d conversion)
+@item @code{svgalib} graphics driver
+@item @code{cssocket} (provided @code{iNetworkDriver}, @code{iNetworkListener}, and @code{iNetworkConnection})
+@item @code{ensocket} (provided @code{iNetworkDriver2} and @code{iNetworkSocket2})
+@item @code{netman}
+@item @code{picogui}
+@end itemize
+
