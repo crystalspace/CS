@@ -273,6 +273,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       {
         return setError("Couldn't scan for number of indices.",file);
       }
+      struct TempVertex tempVertices[nbVertices];
       for (int vertexIndex = 0; vertexIndex < nbVertices; vertexIndex++)
       {
         //Here we scan for vertexes,
@@ -285,18 +286,18 @@ bool MsModel::ReadMsFile(const char* msfile)
           return setError("Unexpected ending of file.",file);
         }
         int vertexFlags = 0;
-        struct Vertex* temp = new struct Vertex();
         if (sscanf (szLine, "%d %f %f %f %lf %lf %d",
               &vertexFlags ,
-              &(temp->position.x), &(temp->position.y), &(temp->position.z),
-              &(temp->u), &(temp->v), 
-              &(temp->boneIndex)
+              &(tempVertices[vertexIndex].position.x), 
+              &(tempVertices[vertexIndex].position.y), 
+              &(tempVertices[vertexIndex].position.z),
+              &(tempVertices[vertexIndex].u), 
+              &(tempVertices[vertexIndex].v), 
+              &(tempVertices[vertexIndex].boneIndex)
               ) != 7)
         {
           return setError("Couldn't scan vertex correctly.",file);
         }
-        *currentFrame = new struct Frame(temp);
-        currentFrame = &((*currentFrame)->frame);
       }
       
       // We don't use the normals.
@@ -313,6 +314,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       {
         return setError("Couldn't scan for number of normals.",file);
       }
+      struct TempNormal tempNormals[nbNormals];
       for (int normalIndex = 0; normalIndex < nbNormals; normalIndex++)
       {
         // We don't use normals in CS.
@@ -320,8 +322,10 @@ bool MsModel::ReadMsFile(const char* msfile)
         {
           return setError("Unexpected ending of file.",file);
         }
-        scalar_t normal1,normal2,normal3;
-        if (sscanf (szLine, "%lf %lf %lf", &normal1, &normal2, &normal3) != 3)
+        if (sscanf (szLine, "%f %f %f", 
+                            &(tempNormals[normalIndex].normal.x), 
+                            &(tempNormals[normalIndex].normal.y), 
+                            &(tempNormals[normalIndex].normal.z)) != 3)
         {
           return setError("Couldn't scan for normals.",file);
         }
@@ -337,6 +341,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       {
         return setError("Couldn't scan for number of triangles.",file);
       }
+      long newVertices = vertexCount;
       for (int triangleIndex = 0; triangleIndex < nbTriangles; triangleIndex++)
       {
         int triangleFlags  = 0;
@@ -364,19 +369,62 @@ bool MsModel::ReadMsFile(const char* msfile)
         // Because CS only allows one Triangle definition per sprite.
         if(frameIndex==0)
         {
+          //Make first new point
+          struct Vertex* tempV = new struct Vertex();
+          tempV->position.x = tempVertices[index1].position.x;
+          tempV->position.y = tempVertices[index1].position.y;
+          tempV->position.z = tempVertices[index1].position.z;
+          tempV->normal.x   = tempNormals[normal1].normal.x;
+          tempV->normal.y   = tempNormals[normal1].normal.y;
+          tempV->normal.z   = tempNormals[normal1].normal.z;
+          tempV->u          = tempVertices[index1].u;
+          tempV->v          = tempVertices[index1].v;
+          tempV->boneIndex  = tempVertices[index1].boneIndex;
+          *currentFrame = new struct Frame(tempV);
+          currentFrame = &((*currentFrame)->frame);
+          
+          //Make second new point
+          tempV = new struct Vertex();
+          tempV->position.x = tempVertices[index2].position.x;
+          tempV->position.y = tempVertices[index2].position.y;
+          tempV->position.z = tempVertices[index2].position.z;
+          tempV->normal.x   = tempNormals[normal2].normal.x;
+          tempV->normal.y   = tempNormals[normal2].normal.y;
+          tempV->normal.z   = tempNormals[normal2].normal.z;
+          tempV->u          = tempVertices[index2].u;
+          tempV->v          = tempVertices[index2].v;
+          tempV->boneIndex  = tempVertices[index2].boneIndex;
+          *currentFrame = new struct Frame(tempV);
+          currentFrame = &((*currentFrame)->frame);
+          
+          //Make third new point
+          tempV = new struct Vertex();
+          tempV->position.x = tempVertices[index3].position.x;
+          tempV->position.y = tempVertices[index3].position.y;
+          tempV->position.z = tempVertices[index3].position.z;
+          tempV->normal.x   = tempNormals[normal3].normal.x;
+          tempV->normal.y   = tempNormals[normal3].normal.y;
+          tempV->normal.z   = tempNormals[normal3].normal.z;
+          tempV->u          = tempVertices[index3].u;
+          tempV->v          = tempVertices[index3].v;
+          tempV->boneIndex  = tempVertices[index3].boneIndex;
+          *currentFrame = new struct Frame(tempV);
+          currentFrame = &((*currentFrame)->frame);
           struct Triangle* temp = new Triangle();
+          
           // We must be carefull here because the indices of the triangles 
           // are per mesh so we use the variable vertexCount.
-          temp->index1 = index1 + vertexCount;
-          temp->index2 = index2 + vertexCount;
-          temp->index3 = index3 + vertexCount;
+          temp->index1 = newVertices;
+          temp->index2 = newVertices + 1;
+          temp->index3 = newVertices + 2;
           *currentTriangle = new struct TriangleList(temp);
           currentTriangle = &((*currentTriangle)->triangleList);
+          newVertices += 3;
         }
       }
       
       // Updating VertexCount
-      vertexCount += nbVertices;
+      vertexCount += 3*nbTriangles;
     }
   }
   
@@ -854,6 +902,7 @@ bool MsModel::WriteSPR(const char* spritename)
           if(nbJoints>0)
           {
             currentFrame->vertex->position = inv[currentFrame->vertex->boneIndex]*currentFrame->vertex->position;
+            currentFrame->vertex->normal   = inv[currentFrame->vertex->boneIndex].GetT2O()*currentFrame->vertex->normal;
           }
           csRef<iDocumentNode> v;
           v = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
@@ -863,6 +912,9 @@ bool MsModel::WriteSPR(const char* spritename)
           v->SetAttributeAsFloat("z",currentFrame->vertex->position.z);
           v->SetAttributeAsFloat("u",currentFrame->vertex->u);
           v->SetAttributeAsFloat("v",currentFrame->vertex->v);
+          v->SetAttributeAsFloat("nx",currentFrame->vertex->normal.x);
+          v->SetAttributeAsFloat("ny",currentFrame->vertex->normal.y);
+          v->SetAttributeAsFloat("nz",currentFrame->vertex->normal.z);
           //fprintf(f, "      V (%f,%f,%f:%f,%f)\n", currentFrame->vertex->position.x, 
           //                                         currentFrame->vertex->position.y, 
           //                                         currentFrame->vertex->position.z, 

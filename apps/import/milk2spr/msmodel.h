@@ -36,10 +36,23 @@ typedef double scalar_t;       // Scalar value,
 
 struct iDocumentNode;
 
+struct TempVertex
+{
+  class csVector3 position;
+  scalar_t u;
+  scalar_t v;
+  int boneIndex;
+};
+
+struct TempNormal
+{
+  class csVector3 normal;
+};
 
 struct Vertex              // Vertex
 {
   class csVector3 position;
+  class csVector3 normal;
   scalar_t u;
   scalar_t v;
   int boneIndex;
