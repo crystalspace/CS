@@ -49,6 +49,9 @@ The history order is reversed so that new features are at the top.
 	- Added 'name' parameter to Setup in iVisibilityCuller. This is
 	  used to cache the data better (important for the cached octree,
 	  especially if there are multiple such octrees).
+	- Since 5 July texture mapping was broken in the terrain engine.
+	  The block textures were mapped to the wrong blocks giving a
+	  patch-work like result. Fixed now.
 	- Eric Sunshine applied a patch to SCF_DECLARE_FAST_INTERFACE() to
 	  prevent the DJGPP compiler from complaining about semantics of the
 	  static scfInterfaceID variable generating multiple copies.

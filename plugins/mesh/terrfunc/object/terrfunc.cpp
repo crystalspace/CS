@@ -250,7 +250,7 @@ void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
     sprintf (pMatName, pName, i);
     iMaterialWrapper* mat = engine->FindMaterial (pMatName);
 	Index2Block(i, bx, by);
-    Block2Index(bx, by, newi);
+    Block2Index(by, bx, newi);
     blocks[newi].material = mat;
   }
 }
