@@ -16,6 +16,13 @@ Short-term cleanups that need to be done:
 24-Nov-1999
 	- Eric Sunshine fixed a transpostion error in snddata.cpp which was
 	  leaking memory.
+	- Eric Sunshine fixed some compilation warnings which were recently
+	  introduced into csString.
+	- Eric Sunshine worked around a bug in the OpenStep compiler which
+	  was triggered by recent chagnes to ddgtmesh.h.  The problem occurs
+	  when an inline method calls a second inline method before the
+	  compiler has seen the second method.  The same bug was also
+	  triggered by several files in the new csPhyziks library.
 23-Nov-1999
 	- Robert Bate cleaned up the Macintosh port with relation to the
 	  old COM and new SCF.
