@@ -323,30 +323,6 @@ csCommandLineHelper_Help = _cspace.csCommandLineHelper_Help
 
 csCommandLineHelper_CheckHelp = _cspace.csCommandLineHelper_CheckHelp
 
-class csStringSetIterator(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csStringSetIterator, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csStringSetIterator, name)
-    def __repr__(self):
-        return "<C csStringSetIterator instance at %s>" % (self.this,)
-    def __init__(self, *args):
-        _swig_setattr(self, csStringSetIterator, 'this', _cspace.new_csStringSetIterator(*args))
-        _swig_setattr(self, csStringSetIterator, 'thisown', 1)
-    def HasNext(*args): return _cspace.csStringSetIterator_HasNext(*args)
-    def Next(*args): return _cspace.csStringSetIterator_Next(*args)
-    def __del__(self, destroy=_cspace.delete_csStringSetIterator):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class csStringSetIteratorPtr(csStringSetIterator):
-    def __init__(self, this):
-        _swig_setattr(self, csStringSetIterator, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csStringSetIterator, 'thisown', 0)
-        _swig_setattr(self, csStringSetIterator,self.__class__,csStringSetIterator)
-_cspace.csStringSetIterator_swigregister(csStringSetIteratorPtr)
-
 class csStringSet(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csStringSet, name, value)
@@ -363,7 +339,12 @@ class csStringSet(_object):
         except: pass
     def Request(*args): return _cspace.csStringSet_Request(*args)
     def Contains(*args): return _cspace.csStringSet_Contains(*args)
+    def Delete(*args): return _cspace.csStringSet_Delete(*args)
+    def Empty(*args): return _cspace.csStringSet_Empty(*args)
     def Clear(*args): return _cspace.csStringSet_Clear(*args)
+    def GetSize(*args): return _cspace.csStringSet_GetSize(*args)
+    def IsEmpty(*args): return _cspace.csStringSet_IsEmpty(*args)
+    def GetIterator(*args): return _cspace.csStringSet_GetIterator(*args)
 
 class csStringSetPtr(csStringSet):
     def __init__(self, this):
@@ -2492,14 +2473,18 @@ class csPluginRequestArray(_object):
     def __init__(self, *args):
         _swig_setattr(self, csPluginRequestArray, 'this', _cspace.new_csPluginRequestArray(*args))
         _swig_setattr(self, csPluginRequestArray, 'thisown', 1)
+    def GetSize(*args): return _cspace.csPluginRequestArray_GetSize(*args)
     def Length(*args): return _cspace.csPluginRequestArray_Length(*args)
+    def SetSize(*args): return _cspace.csPluginRequestArray_SetSize(*args)
     def Get(*args): return _cspace.csPluginRequestArray_Get(*args)
     def Push(*args): return _cspace.csPluginRequestArray_Push(*args)
     def Pop(*args): return _cspace.csPluginRequestArray_Pop(*args)
     def Top(*args): return _cspace.csPluginRequestArray_Top(*args)
     def Insert(*args): return _cspace.csPluginRequestArray_Insert(*args)
+    def Contains(*args): return _cspace.csPluginRequestArray_Contains(*args)
     def Truncate(*args): return _cspace.csPluginRequestArray_Truncate(*args)
     def Empty(*args): return _cspace.csPluginRequestArray_Empty(*args)
+    def IsEmpty(*args): return _cspace.csPluginRequestArray_IsEmpty(*args)
     def DeleteIndex(*args): return _cspace.csPluginRequestArray_DeleteIndex(*args)
     def DeleteIndexFast(*args): return _cspace.csPluginRequestArray_DeleteIndexFast(*args)
     def DeleteRange(*args): return _cspace.csPluginRequestArray_DeleteRange(*args)
@@ -8002,6 +7987,7 @@ class iStringArray(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<C iStringArray instance at %s>" % (self.this,)
+    def GetSize(*args): return _cspace.iStringArray_GetSize(*args)
     def Length(*args): return _cspace.iStringArray_Length(*args)
     def Push(*args): return _cspace.iStringArray_Push(*args)
     def Pop(*args): return _cspace.iStringArray_Pop(*args)
@@ -8009,10 +7995,13 @@ class iStringArray(iBase):
     def Find(*args): return _cspace.iStringArray_Find(*args)
     def FindCaseInsensitive(*args): return _cspace.iStringArray_FindCaseInsensitive(*args)
     def FindSortedKey(*args): return _cspace.iStringArray_FindSortedKey(*args)
+    def Contains(*args): return _cspace.iStringArray_Contains(*args)
     def Sort(*args): return _cspace.iStringArray_Sort(*args)
     def DeleteIndex(*args): return _cspace.iStringArray_DeleteIndex(*args)
     def Insert(*args): return _cspace.iStringArray_Insert(*args)
+    def Empty(*args): return _cspace.iStringArray_Empty(*args)
     def DeleteAll(*args): return _cspace.iStringArray_DeleteAll(*args)
+    def IsEmpty(*args): return _cspace.iStringArray_IsEmpty(*args)
     def __del__(self, destroy=_cspace.delete_iStringArray):
         try:
             if self.thisown: destroy(self)
