@@ -301,6 +301,31 @@ csBCTerrBlock::~csBCTerrBlock ()
   if (normals) delete [] normals;
   if (texels) delete [] texels;
   if (color) delete [] color;
+  if (material) material->DecRef ();
+}
+
+void csBCTerrBlock::AddMaterial (iMaterialWrapper* mat)
+{
+  if (material) material->DecRef ();
+  mat->IncRef ();
+  material = mat;
+  if (default_lod)
+    default_lod->mesh->mat_handle = material->GetMaterialHandle ();
+  if (current_lod)
+    current_lod->mesh->mat_handle = material->GetMaterialHandle ();
+  draw_mesh.mat_handle = material->GetMaterialHandle ();  
+}
+
+void csBCTerrBlock::RebuildBlock (csBCTerrBlock* up_neighbor, csBCTerrBlock* left_neighbor)
+{
+  Build (controlpoint, up_neighbor, left_neighbor); 
+  if (draw_mesh.vertex_fog) delete draw_mesh.vertex_fog;
+  if (large_tri) delete [] large_tri;
+  if (verts) delete [] verts;
+  if (normals) delete [] normals;
+  if (texels) delete [] texels;
+  if (color) delete [] color;
+  SetupBaseMesh ();
 }
 
 void csBCTerrBlock::SetupBaseMesh ()
@@ -311,7 +336,6 @@ void csBCTerrBlock::SetupBaseMesh ()
   float u, v, divu, divv;
   csVector3 temp[4];
   size = owner->sys_inc * owner->sys_inc;
-  verts = new csVector3[size];
   verts = new csVector3[size];
   normals = new csVector3[size];
   texels = new csVector2[size];
@@ -383,6 +407,277 @@ void csBCTerrBlock::SetupBaseMesh ()
   }
 }
 
+void csBCTerrBlock::Build (csVector3* cntrl,
+  	csBCTerrBlock* up_neighbor, csBCTerrBlock* left_neighbor)
+{
+  csVector3 *work;
+  int end, i, j;
+  if (!owner->ComputeSharedMesh ( default_lod, cntrl)) exit(0);
+  /* edge creation */
+  /*
+   * Todo:
+   * normal / texel / color creation for edges
+   */
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation");
+  csSharedLODMesh *work_mesh;
+  csVector2* size;
+  float u_add, u, edges;
+  int edge_res, pos, work_end;
+  size = owner->factory_state->GetSize ();
+  edge_res = owner->factory_state->GetMaxEdgeResolution ();
+  end = default_lod->x_verts * default_lod->z_verts;
+  edges = edge_res;
+  work = cntrl + (owner->hor_length * 3); // lower control points
+
+  // up
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation up");
+  if (up_neighbor)
+  {
+    float count = 0.0;
+    work_mesh = up_neighbor->default_lod;
+    pos = end;
+    x1_end = 0;
+    work_end = work_mesh->x_verts * work_mesh->z_verts;
+    u_add = (float)(up_neighbor->x2_end - up_neighbor->z1_end) - 1.0;
+    for (i = (work_end + up_neighbor->z1_end); i < (work_end + up_neighbor->x2_end); i++)
+    {
+      default_lod->verts[pos] = work_mesh->verts[i];
+      default_lod->normals[pos] = work_mesh->normals[i];
+      u = i - (work_end + up_neighbor->z1_end);
+      u = u / u_add;
+      if (u < 0.0f) u = 0.0f;
+      if (u > 1.0f) u = 1.0f;
+      default_lod->texels[pos].Set ( 0.0, u );
+      //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u : 0.0 v: %f", u );
+      default_lod->color[pos] = work_mesh->color[i];
+      pos++;
+      x1_end++;
+      count += 1.0f;
+    }
+    //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u_add %f", u_add );
+  } else
+  {
+    u_add = 1.0 / edges;
+    pos = end;
+    default_lod->verts[pos] = cntrl[0];
+    default_lod->normals[pos].Set (0,1,0);
+    default_lod->texels[pos].Set ( 0, 0);
+    default_lod->color[pos].Set (1.,1.,1.);
+    u = u_add;
+    pos += 1;
+    x1_end = 1;
+    for (i = 0; i < edges; i++)
+    {
+      default_lod->verts[pos] = BezierCompute (u, cntrl);
+      //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
+      default_lod->normals[pos].Set (0,1,0);
+      default_lod->texels[pos].Set ( 0, u);
+      default_lod->color[pos].Set (1.,1.,1.);
+      x1_end++;
+      pos++;
+      u += u_add;
+    }
+    default_lod->verts[pos] = cntrl[3];
+    default_lod->normals[pos].Set (0,1,0);
+    default_lod->texels[pos].Set ( 0, 1);
+    default_lod->color[pos].Set (1.,1.,1.);
+    x1_end++;
+  }  
+  // right
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation right");
+  u_add = 1.0 / (edges + 1.0);
+  pos = end + x1_end;
+  default_lod->verts[pos] = cntrl[3];
+  default_lod->normals[pos].Set (0,1,0);
+  default_lod->texels[pos].Set ( 0, 1);
+  default_lod->color[pos].Set (1,1,1);
+  u = u_add;
+  pos += 1;
+  z1_end = x1_end + 1;
+  for (i = 0; i < edges; i++)
+  {
+    default_lod->verts[pos] = BezierControlCompute (u, &cntrl[3], owner->hor_length) ;
+    //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
+    default_lod->normals[pos].Set (0,1,0);
+    default_lod->texels[pos].Set ( u, 1);
+    default_lod->color[pos].Set (1,1,1);
+    z1_end++;
+    pos++;
+    u += u_add;
+  }
+  default_lod->verts[pos] = work[3];
+  default_lod->normals[pos].Set (0,1,0);
+  default_lod->texels[pos].Set ( 1, 1);
+  default_lod->color[pos].Set (1,1,1);
+  z1_end++;
+
+  // down
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation down");
+  u_add = 1.0 / (edges + 1.0);
+  pos = end + z1_end;
+  default_lod->verts[pos] = work[0];
+  default_lod->normals[pos].Set (0,1,0);
+  default_lod->texels[pos].Set ( 1, 0);
+  default_lod->color[pos].Set (1,1,1);
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","Down u : 1.0 v: 0.0" );
+  u = u_add;
+  pos += 1;
+  x2_end = z1_end + 1;
+  for (i = 0; i < edges; i++)
+  {
+    default_lod->verts[pos] = BezierCompute (u, work) ;
+    //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
+
+    default_lod->normals[pos].Set (0,1,0);
+    default_lod->texels[pos].Set (1, u);
+    //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u : 1.0 v: %f", u );
+    default_lod->color[pos].Set (1,1,1);
+    x2_end++;
+    pos++;
+    u += u_add;
+  }
+  default_lod->verts[pos] = work[3];
+  default_lod->normals[pos].Set (0,1,0);
+  default_lod->texels[pos].Set ( 1, 1);
+  default_lod->color[pos].Set (1,1,1);
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","Down u : 1.0 v: 1.0" );
+  x2_end++;
+
+  // left
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation left");
+  if (left_neighbor)
+  {
+    work_mesh = left_neighbor->default_lod;
+    pos = end + x2_end;
+    z2_end = x2_end;
+    work_end = work_mesh->x_verts * work_mesh->z_verts; // length
+    u_add = (float)(left_neighbor->z1_end - left_neighbor->x1_end) - 1.0;
+    for (i = (work_end + left_neighbor->x1_end); i < (work_end + left_neighbor->z1_end); i++)
+    {
+      default_lod->verts[pos] = work_mesh->verts[i];
+      default_lod->normals[pos] = work_mesh->normals[i];
+      u = i - (work_end + left_neighbor->x1_end);
+      u = u / u_add;
+      if (u < 0.0f) u = 0.0f;
+      if (u > 1.0f) u = 1.0f;
+      default_lod->texels[pos].Set ( u, 0.0);
+      //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u : %f v: 0.0", u );
+      default_lod->color[pos] = work_mesh->color[i];
+      pos++;
+      z2_end++;
+    }
+  } else
+  {
+    u_add = 1.0 / edges;
+    pos = end + x2_end;
+    default_lod->verts[pos] = cntrl[0];
+    default_lod->normals[pos].Set (0,1,0);
+    default_lod->texels[pos].Set ( 0.0, 0.0);
+    default_lod->color[pos].Set (1,1,1);
+    u = u_add;
+    pos += 1;
+    z2_end = x2_end + 1;
+    for (i = 0; i < edges; i++)
+    {
+      default_lod->verts[pos] = BezierControlCompute (u, cntrl, owner->hor_length);
+      //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
+      default_lod->normals[pos].Set (0,1,0);
+      default_lod->texels[pos].Set ( u, 0.0);
+      default_lod->color[pos].Set (1,1,1);
+      z2_end++;
+      pos++;
+      u += u_add;
+    }
+    default_lod->verts[pos] = work[0];
+    default_lod->normals[pos].Set (0,1,0);
+    default_lod->texels[pos].Set ( 1, 0);
+    default_lod->color[pos].Set (1,1,1);
+    z2_end++;
+  }
+  
+  for (i = end; i < (end + z2_end); i++)
+  {
+    default_lod->texels[i].x = (default_lod->texels[i].x * owner->correct_du) +
+      owner->correct_su;
+    default_lod->texels[i].y = (default_lod->texels[i].y * owner->correct_dv) +
+      owner->correct_sv;
+    //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","edge u: %f v: %f",
+      //default_lod->texels[i].x, default_lod->texels[i].y);
+  }
+  /*for (i = end; i < (end + z2_end); i++)
+  {
+    default_lod->texels[i].x = default_lod->texels[i].x * owner->correct_dv +
+      owner->correct_sv;
+    default_lod->texels[i].y = default_lod->texels[i].y * owner->correct_du +
+      owner->correct_su;
+  }*/
+  
+  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Addition");
+
+  AddEdgeTriangles (default_lod);
+  // Setup vertex buffer / g3dTriangleMesh
+  //if (default_lod->buf) csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Vertex Buffer Error");
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Vertex Buffer");
+  owner->SetupVertexBuffer ( default_lod->buf, default_lod->mesh->buffers[0] );
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Finished");
+  // lock mesh?
+  //if (owner->vbufmgr)
+  //  owner->vbufmgr->LockBuffer(default_lod->mesh->buffers[0],
+  //      default_lod->verts, default_lod->texels, default_lod->color,
+  //      (end + z2_end), 0);
+  default_lod->mesh->mat_handle = material->GetMaterialHandle ();
+
+  /*for (i= 0; i < end; i++)
+  {
+    csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
+  }*/
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block", "Triangles %d", default_lod->mesh->num_triangles);
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block", "x_Verts %d Z_Verts %d", default_lod->x_verts, default_lod->z_verts);
+  //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","end %d x1_end %d z1_end %d x2_end %d z2_end %d", end, x1_end, z1_end, x2_end, z2_end);
+  /*csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","up");
+  for (i= end; i < x1_end; i++)
+  {
+    csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
+  }
+  csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","right");
+  for (i= x1_end; i < z1_end; i++)
+  {
+    csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
+  }
+  csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","down");
+  for (i= z1_end; i < x2_end; i++)
+  {
+    csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
+  }
+  csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","left");
+  for (i= x2_end; i < z2_end; i++)
+  {
+    csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
+  }
+  csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","interior");
+  for (i= 0; i < end; i++)
+  {
+    csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
+  }
+  int p;
+  for (i= 0; i < default_lod->mesh->num_triangles; i++)
+  {
+    p = (default_lod->x_verts - 1) * (default_lod->z_verts - 1) * 2;
+    if ( i == p ) csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","After end");
+    csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Triangle # %d %d %d", default_lod->mesh->triangles[i].a, default_lod->mesh->triangles[i].b, default_lod->mesh->triangles[i].c);
+  }*/
+  work = controlpoint;
+  bbox.StartBoundingBox ();
+  for ( j = 0; j < 4; j++)
+  {
+    for ( i = 0; i < 4; i++)
+    {
+      bbox.AddBoundingVertex (work[i]);
+    }
+    work += owner->hor_length; // move work to next row
+  }
+}
+
 /*
  * SetInfo
  * Sets owner, control point pointer;
@@ -400,9 +695,9 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   float dy, low, high; // change from lowest to heightest height
   bool wavy;
   int i, j;
-  int width1, width2, width3, levels, end;
+  int width1, width2, width3, levels;
   csVector3 *work;
-  material = nowner->factory_state->GetDefaultMaterial ();
+  AddMaterial (nowner->factory_state->GetDefaultMaterial ());
   owner = nowner;
   controlpoint = cntrl;
   /* max_LOD & bounding box */
@@ -410,12 +705,10 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   low = cntrl[0].y;
   high = cntrl[0].y;
   work = cntrl;
-  bbox.StartBoundingBox ();
   for ( j = 0; j < 4; j++)
   {
     for ( i = 0; i < 4; i++)
     {
-      bbox.AddBoundingVertex (work[i]);
       if (work[i].y < low) low = work[i].y;
       if (work[i].y > high) high = work[i].y;
     }
@@ -455,265 +748,11 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   //iBCFa
   default_lod = nowner->factory_state->CreateFreeMesh (wavy);
   if (!default_lod) csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Unable to Create Free Mesh");
-  csTriangle* triangles= default_lod->mesh->triangles;
+  
   if (max_LOD > default_lod->level) max_LOD = default_lod->level;
   //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Compute Free Mesh");
-  if (!nowner->ComputeSharedMesh ( default_lod, cntrl)) exit(0);
-  if (default_lod->mesh->triangles != triangles) csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Triangles r fucked up?");
-
-  /* edge creation */
-  /*
-   * Todo:
-   * normal / texel / color creation for edges
-   */
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation");
-  csSharedLODMesh *work_mesh;
-  csVector2* size;
-  float u_add, u, edges;
-  int edge_res, pos, work_end;
-  size = nowner->factory_state->GetSize ();
-  edge_res = nowner->factory_state->GetMaxEdgeResolution ();
-  end = default_lod->x_verts * default_lod->z_verts;
-  edges = edge_res;
-  work = cntrl + (nowner->hor_length * 3); // lower control points
-
-  // up
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation up");
-  if (up_neighbor)
-  {
-    float count = 0.0;
-    work_mesh = up_neighbor->default_lod;
-    pos = end;
-    x1_end = 0;
-    work_end = work_mesh->x_verts * work_mesh->z_verts;
-    u_add = (float)(up_neighbor->x2_end - up_neighbor->z1_end) - 1.0;
-    for (i = (work_end + up_neighbor->z1_end); i < (work_end + up_neighbor->x2_end); i++)
-    {
-      default_lod->verts[pos] = work_mesh->verts[i];
-      default_lod->normals[pos] = work_mesh->normals[i];
-      u = i - (work_end + up_neighbor->z1_end);
-      u = u / u_add;
-      if (u < 0.0f) u = 0.0f;
-      if (u > 1.0f) u = 1.0f;
-      default_lod->texels[pos].Set ( 0.0, u );
-      //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u : 0.0 v: %f", u );
-      default_lod->color[pos] = work_mesh->color[i];
-      pos++;
-      x1_end++;
-      count += 1.0f;
-    }
-    //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u_add %f", u_add );
-  } else
-  {
-    u_add = 1.0 / edges;
-    pos = end;
-    default_lod->verts[pos] = cntrl[0];
-    default_lod->normals[pos].Set (0,1,0);
-    default_lod->texels[pos].Set ( 0, 0);
-    default_lod->color[pos].Set (1.,1.,1.);
-    u = u_add;
-    pos += 1;
-    x1_end = 1;
-    for (i = 0; i < edges; i++)
-    {
-      default_lod->verts[pos] = BezierCompute (u, cntrl);
-      //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
-      default_lod->normals[pos].Set (0,1,0);
-      default_lod->texels[pos].Set ( 0, u);
-      default_lod->color[pos].Set (1.,1.,1.);
-      x1_end++;
-      pos++;
-      u += u_add;
-    }
-    default_lod->verts[pos] = cntrl[3];
-    default_lod->normals[pos].Set (0,1,0);
-    default_lod->texels[pos].Set ( 0, 1);
-    default_lod->color[pos].Set (1.,1.,1.);
-    x1_end++;
-  }  
-  // right
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation right");
-  u_add = 1.0 / (edges + 1.0);
-  pos = end + x1_end;
-  default_lod->verts[pos] = cntrl[3];
-  default_lod->normals[pos].Set (0,1,0);
-  default_lod->texels[pos].Set ( 0, 1);
-  default_lod->color[pos].Set (1,1,1);
-  u = u_add;
-  pos += 1;
-  z1_end = x1_end + 1;
-  for (i = 0; i < edges; i++)
-  {
-    default_lod->verts[pos] = BezierControlCompute (u, &cntrl[3], nowner->hor_length) ;
-    //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
-    default_lod->normals[pos].Set (0,1,0);
-    default_lod->texels[pos].Set ( u, 1);
-    default_lod->color[pos].Set (1,1,1);
-    z1_end++;
-    pos++;
-    u += u_add;
-  }
-  default_lod->verts[pos] = work[3];
-  default_lod->normals[pos].Set (0,1,0);
-  default_lod->texels[pos].Set ( 1, 1);
-  default_lod->color[pos].Set (1,1,1);
-  z1_end++;
-
-  // down
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation down");
-  u_add = 1.0 / (edges + 1.0);
-  pos = end + z1_end;
-  default_lod->verts[pos] = work[0];
-  default_lod->normals[pos].Set (0,1,0);
-  default_lod->texels[pos].Set ( 1, 0);
-  default_lod->color[pos].Set (1,1,1);
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","Down u : 1.0 v: 0.0" );
-  u = u_add;
-  pos += 1;
-  x2_end = z1_end + 1;
-  for (i = 0; i < edges; i++)
-  {
-    default_lod->verts[pos] = BezierCompute (u, work) ;
-    //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
-
-    default_lod->normals[pos].Set (0,1,0);
-    default_lod->texels[pos].Set (1, u);
-    //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u : 1.0 v: %f", u );
-    default_lod->color[pos].Set (1,1,1);
-    x2_end++;
-    pos++;
-    u += u_add;
-  }
-  default_lod->verts[pos] = work[3];
-  default_lod->normals[pos].Set (0,1,0);
-  default_lod->texels[pos].Set ( 1, 1);
-  default_lod->color[pos].Set (1,1,1);
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","Down u : 1.0 v: 1.0" );
-  x2_end++;
-
-  // left
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation left");
-  if (left_neighbor)
-  {
-    work_mesh = left_neighbor->default_lod;
-    pos = end + x2_end;
-    z2_end = x2_end;
-    work_end = work_mesh->x_verts * work_mesh->z_verts; // length
-    u_add = (float)(left_neighbor->z1_end - left_neighbor->x1_end) - 1.0;
-    for (i = (work_end + left_neighbor->x1_end); i < (work_end + left_neighbor->z1_end); i++)
-    {
-      default_lod->verts[pos] = work_mesh->verts[i];
-      default_lod->normals[pos] = work_mesh->normals[i];
-      u = i - (work_end + left_neighbor->x1_end);
-      u = u / u_add;
-      if (u < 0.0f) u = 0.0f;
-      if (u > 1.0f) u = 1.0f;
-      default_lod->texels[pos].Set ( u, 0.0);
-      //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u : %f v: 0.0", u );
-      default_lod->color[pos] = work_mesh->color[i];
-      pos++;
-      z2_end++;
-    }
-  } else
-  {
-    u_add = 1.0 / edges;
-    pos = end + x2_end;
-    default_lod->verts[pos] = cntrl[0];
-    default_lod->normals[pos].Set (0,1,0);
-    default_lod->texels[pos].Set ( 0.0, 0.0);
-    default_lod->color[pos].Set (1,1,1);
-    u = u_add;
-    pos += 1;
-    z2_end = x2_end + 1;
-    for (i = 0; i < edges; i++)
-    {
-      default_lod->verts[pos] = BezierControlCompute (u, cntrl, nowner->hor_length);
-      //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
-      default_lod->normals[pos].Set (0,1,0);
-      default_lod->texels[pos].Set ( u, 0.0);
-      default_lod->color[pos].Set (1,1,1);
-      z2_end++;
-      pos++;
-      u += u_add;
-    }
-    default_lod->verts[pos] = work[0];
-    default_lod->normals[pos].Set (0,1,0);
-    default_lod->texels[pos].Set ( 1, 0);
-    default_lod->color[pos].Set (1,1,1);
-    z2_end++;
-  }
+  Build (cntrl, up_neighbor, left_neighbor);
   
-  for (i = end; i < (end + z2_end); i++)
-  {
-    default_lod->texels[i].x = (default_lod->texels[i].x * owner->correct_du) +
-      owner->correct_su;
-    default_lod->texels[i].y = (default_lod->texels[i].y * owner->correct_dv) +
-      owner->correct_sv;
-    //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","edge u: %f v: %f",
-      //default_lod->texels[i].x, default_lod->texels[i].y);
-  }
-  /*for (i = end; i < (end + z2_end); i++)
-  {
-    default_lod->texels[i].x = default_lod->texels[i].x * owner->correct_dv +
-      owner->correct_sv;
-    default_lod->texels[i].y = default_lod->texels[i].y * owner->correct_du +
-      owner->correct_su;
-  }*/
-  if (default_lod->mesh->triangles != triangles) csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Triangles r fucked up?");
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Addition");
-
-  AddEdgeTriangles (default_lod);
-  // Setup vertex buffer / g3dTriangleMesh
-  //if (default_lod->buf) csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Vertex Buffer Error");
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Vertex Buffer");
-  owner->SetupVertexBuffer ( default_lod->buf, default_lod->mesh->buffers[0] );
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Finished");
-  // lock mesh?
-  //if (owner->vbufmgr)
-  //  owner->vbufmgr->LockBuffer(default_lod->mesh->buffers[0],
-  //      default_lod->verts, default_lod->texels, default_lod->color,
-  //      (end + z2_end), 0);
-  default_lod->mesh->mat_handle = material->GetMaterialHandle ();
-
-  /*for (i= 0; i < end; i++)
-  {
-    csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
-  }*/
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block", "Triangles %d", default_lod->mesh->num_triangles);
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block", "x_Verts %d Z_Verts %d", default_lod->x_verts, default_lod->z_verts);
-  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","end %d x1_end %d z1_end %d x2_end %d z2_end %d", end, x1_end, z1_end, x2_end, z2_end);
-  /*csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","up");
-  for (i= end; i < x1_end; i++)
-  {
-    csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
-  }
-  csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","right");
-  for (i= x1_end; i < z1_end; i++)
-  {
-    csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
-  }
-  csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","down");
-  for (i= z1_end; i < x2_end; i++)
-  {
-    csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
-  }
-  csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","left");
-  for (i= x2_end; i < z2_end; i++)
-  {
-    csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
-  }
-  csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","interior");
-  for (i= 0; i < end; i++)
-  {
-    csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Verts # %f %f %f", default_lod->verts[i].x, default_lod->verts[i].y, default_lod->verts[i].z);
-  }
-  int p;
-  for (i= 0; i < default_lod->mesh->num_triangles; i++)
-  {
-    p = (default_lod->x_verts - 1) * (default_lod->z_verts - 1) * 2;
-    if ( i == p ) csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","After end");
-    csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Triangle # %d %d %d", default_lod->mesh->triangles[i].a, default_lod->mesh->triangles[i].b, default_lod->mesh->triangles[i].c);
-  }*/
   SetupBaseMesh ();
 }
 // split for future suport of 3+ lod levels ie: pass mesh
@@ -1426,6 +1465,24 @@ void csBCTerrObject::Build ()
   }
 }
 
+void csBCTerrObject::RebuildBlocks ()
+{
+  int end, i, j;
+  csBCTerrBlock *left, *up;
+  if (!initialized) return;
+  end = x_blocks * z_blocks;    
+  for ( i = 0; i < x_blocks; i++)
+  {
+    for (j = 0; j < z_blocks; j++)
+    {      
+      end = i * (x_blocks) + j;
+      if (i != 0) up = &blocks[end - x_blocks]; else up = NULL;
+      if (j == 0) left = NULL; else left = &blocks[end - 1];
+      blocks[end].RebuildBlock (up, left);
+    }
+  }
+}
+
 void csBCTerrObject::CorrectSeams (int tw, int th)
 {
   //if (object_reg)
@@ -1523,10 +1580,13 @@ void csBCTerrObject::SetControlPoint (const csVector3 point,
 {
   int size;
   if (!prebuilt) return;
-  if (initialized) return; // need to rebuild, wait on implementation
   size = ((3 * x_blocks) + 1) * ((3 * z_blocks) + 1);
   if ((size <= iter) && (iter >=0) ) 
+  {
     control_points[iter] = point;
+    if (initialized)
+      RebuildBlocks ();
+  }
 }
 
 void csBCTerrObject::SetControlPointHeight (const float height,
@@ -1534,12 +1594,15 @@ void csBCTerrObject::SetControlPointHeight (const float height,
 {
   int size;
   if (!prebuilt) return;
-  if (initialized) return; // need to rebuild, wait on implementation
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Set Control Point Height: %f iter: %d",
     //height, iter);
   size = ((3 * x_blocks) + 1) * ((3 * z_blocks) + 1);
   if ((iter < size) && (iter >=0) )
-    control_points[iter].y = height;
+  {
+    control_points[iter].y = height;    
+    if (initialized)
+      RebuildBlocks ();
+  }
 }
 
 
@@ -1570,7 +1633,7 @@ bool csBCTerrObject::Draw (iRenderView* rview, iMovable* movable,
   bool do_sys_dist, sys_far;
   do_sys_dist = false;
   sys_far = false;
-  float distance;
+  float distance, start_sys, sys_dist ;
   csVector3 dist;
   //SetAllVisible (); // for now
   n = x_blocks * z_blocks;
@@ -1582,19 +1645,18 @@ bool csBCTerrObject::Draw (iRenderView* rview, iMovable* movable,
   pG3D->SetObjectToCamera (&camtrans);
   pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zbufMode );
   float* Distances = factory_state->GetLODDistances ();
-  float sys_dist = factory_state->GetSystemDistance ();
+  factory_state->GetSystemDistance (start_sys, sys_dist);
   lod_levels = factory_state->GetUserLOD ();
 
   dist = bbox.GetCenter () - cam_origin;
   distance = dist.x * dist.x + dist.y * dist.y + dist.z * dist.z;
   vis = true;
   distance -= (radius * radius);
-  if (distance > Distances[lod_levels - 1])
+  if (distance > start_sys)
   {
-    if (distance < sys_dist)
-      do_sys_dist = true;
-    else
-      sys_far = true;
+    do_sys_dist = true;
+    if (distance > sys_dist)
+      sys_far = true;      
   }
   // csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Drawing");
   for (i = 0; i < n; i++)
@@ -2153,7 +2215,8 @@ csBCTerrObjectFactory::csBCTerrObjectFactory (iObjectRegistry* object_reg)
   ResetOwner ();
   time = 0;
   default_mat = NULL;
-  sys_distance = 10000;
+  sys_distance = 20000;
+  start_sys = 10000;
   object_list = NULL;
   num_objects = 0;
   time_count = 0;

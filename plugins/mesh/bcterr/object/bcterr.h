@@ -107,11 +107,15 @@ public:
   void Draw (iRenderView *rview, iCamera* camera, int level);
   void SetInfo (csBCTerrObject* nowner, csVector3* cntrl,
   	csBCTerrBlock* up_neighbor, csBCTerrBlock* left_neighbor);
+  void Build (csVector3* cntrl,
+  	csBCTerrBlock* up_neighbor, csBCTerrBlock* left_neighbor);
   void CreateNewMesh (int level);
   void AddEdgeTriangles ( csSharedLODMesh *lod);
   void AddEdgesToCurrent ();
   void ManagerClosed ();
   void SetupBaseMesh ();
+  void AddMaterial (iMaterialWrapper* mat);
+  void RebuildBlock (csBCTerrBlock* up_neighbor, csBCTerrBlock* left_neighbor);
   csBCTerrBlock ();
   ~csBCTerrBlock ();
 };
@@ -221,6 +225,7 @@ public:
   void SetControlPointHeight (const float height, const int iter);
   void CorrectSeams (int tw, int th);
   void Build ();
+  void RebuildBlocks ();
 
 
   ///--------------------- iMeshObject implementation ---------------------
@@ -293,7 +298,7 @@ public:
             int size;
             size = scfParent->x_blocks * (z_block - 1) + x_block - 1;
             if (size < (scfParent->x_blocks * scfParent->z_blocks))
-              scfParent->blocks[size].material = mat;
+              scfParent->blocks[size].AddMaterial(mat);
           }
         }
       }
@@ -306,7 +311,7 @@ public:
         size = scfParent->x_blocks * scfParent->z_blocks;
         if ( (num < size) && (num > -1) )
         {
-          scfParent->blocks[num].material = mat;
+          scfParent->blocks[num].AddMaterial(mat);
         }
       }
     }
@@ -384,6 +389,21 @@ public:
     virtual void Build ()
     {
       scfParent->Build ();
+    }
+    virtual int GetControlLength ()
+    {
+      return (scfParent->x_blocks * scfParent->z_blocks);
+    }
+    virtual bool GetControlPoint (int iter, csVector3 &point)
+    {
+      int end;
+      end = scfParent->x_blocks * scfParent->z_blocks;
+      if ( (iter > -1) && (iter < end) )
+      {
+        point = scfParent->control_points[iter];
+        return true;
+      } else
+        return false;
     }
   } scfiBCTerrState;
   
@@ -642,7 +662,7 @@ public:
   csSharedLODMesh** Shared_Meshes;
   csVector2* LOD_UV;
   float* LOD_Distance;
-  float sys_distance;
+  float sys_distance, start_sys;
   int LOD_Levels;
   int* LOD_Mesh_Numbers; // # of shared meshes per LOD_Level
   bool initialized; // true after all variables are set
@@ -763,14 +783,25 @@ public:
     {
       return scfParent->LOD_Distance;
     }
-    virtual float GetSystemDistance ()
+    // start_sys
+    virtual void GetSystemDistance (float &start, float &dist)
+    {
+      start = scfParent->start_sys;
+      dist = scfParent->sys_distance;
+    }
+    virtual void SetSystemDistance (float start, float new_dist)
+    {
+      scfParent->sys_distance = new_dist * new_dist;
+      scfParent->start_sys = start * start;
+    }
+    /*virtual float GetSystemDistance ()
     {
       return scfParent->sys_distance;
     }
     virtual void SetSystemDistance (float new_dist)
     {
       scfParent->sys_distance = new_dist * new_dist;
-    }
+    }*/
   } scfiBCTerrFactoryState;
   friend class BCTerrFactoryState;
 };
