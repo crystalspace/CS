@@ -64,6 +64,9 @@ chronological order.
 	- Eric Sunshine fixed bug in the deprecated csutil/hashmap.h where it
 	  was re-declaring the csHashCompute() functions with signatures
 	  different from the ones in csutil/hash.h.
+	- res removed a commented-out debug printf() in 
+	  csHashMap::ChangeBuckets(). The comment was errorneously line-broken,
+	  causing compile errors.
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only

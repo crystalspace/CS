@@ -245,8 +245,6 @@ unsigned int csHashMap::FindNextPrime (unsigned int num)
 
 void csHashMap::ChangeBuckets (unsigned int newsize)
 {
-//printf ("Extend from %d to %d (hash_elements=%d)\n",
-    NumBuckets, newsize, hash_elements);
   Buckets.SetLength (newsize, csHashBucket ());
   unsigned int i;
   // Only go up to old size.
