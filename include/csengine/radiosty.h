@@ -68,13 +68,13 @@ public:
   void SetMaxSize (int s) { max_sizeRGB = s; }
 
   /// Get data.
-  float* GetMap () { return map; }
+  float* GetMap () const { return map; }
   /// Get red map.
-  float* GetRed () { return map; }
+  float* GetRed () const { return map; }
   /// Get green map.
-  float* GetGreen () { return map+max_sizeRGB; }
+  float* GetGreen () const { return map+max_sizeRGB; }
   /// Get blue map.
-  float* GetBlue () { return map+(max_sizeRGB<<1); }
+  float* GetBlue () const { return map+(max_sizeRGB<<1); }
 
   /// Set color maps.
   void SetMap (float* m) { map = m; }
@@ -101,8 +101,12 @@ public:
     Clear ();
     if (other.GetMap()) { 
       Alloc (size); 
-      for(int i=0; i<size*3; i++)
-        map[i] = other.GetMap()[i];
+      for(int i=0; i<size; i++)
+      {
+        GetRed()[i] = other.GetRed()[i];
+        GetGreen()[i] = other.GetGreen()[i];
+        GetBlue()[i] = other.GetBlue()[i];
+      }
     }
   }
 };
@@ -123,16 +127,12 @@ private:
   csRGBLightMap *lightmap;
   /// the change to this lightmap, unshot light.
   csRGBFloatLightMap *deltamap;
-  /// the lumels covered by this polygon
-  float *lumel_coverage_map;
   /// to convert lumels to world coords.
   csVector3 lumel_origin, lumel_x_axis, lumel_y_axis;
   /// the area of one lumel of the polygon
   float one_lumel_area;
   /// values for loop detection, last shooting priority and repeats
   float last_shoot_priority; int num_repeats;
-  /// the cookie to determine if polygon has already received light
-  int iter_cookie;
 
 public:
   csRadPoly(csPolygon3D *original);
@@ -159,12 +159,6 @@ public:
   inline bool DeltaIsZero(int suv)
   { return !(deltamap->GetRed()[suv] || deltamap->GetGreen()[suv] || 
       deltamap->GetBlue()[suv] ); }
-  /// check if a lumel is not used by this polygon
-  inline bool LumelNotCovered(int suv)
-  { return lumel_coverage_map[suv] == 0.0; }
-  /// get lumel coverage for a lumel
-  inline float GetLumelCoverage(int suv)
-  { return lumel_coverage_map[suv]; }
   /// get the delta map
   inline csRGBFloatLightMap* GetDeltaMap() { return deltamap; }
 
@@ -176,10 +170,6 @@ public:
   inline int GetNumRepeats() { return num_repeats; }
   /// Increment the number of repeats of shooting at same priority by one.
   inline void IncNumRepeats() {num_repeats++;}
-  /// Get the iteration cookie
-  inline int GetIterCookie() {return iter_cookie;}
-  /// Set the iteration cookie
-  inline void SetIterCookie(int val) { iter_cookie = val; }
 
   /// Get world coordinates for a lumel -- slow method
   void GetLumelWorldCoords(csVector3& res, int x, int y);
@@ -222,24 +212,11 @@ public:
   void ApplyAmbient(int red, int green, int blue);
 
   /**
-   *  Compute the lumel coverage array. 1.0 = lumel fully visible.
-   *  0.0 lumel not covered by polygon. Returns array of size 'size'.
-   *  you have to delete[] it.
-   */
-  float *ComputeLumelCoverage();
-
-  /**
    *  Compute the texture map at the size of the lumel map.
    *  Gets the texture, and scales down. You must delete the map.
    */
   csRGBLightMap *ComputeTextureLumelSized();
 
-  /**
-   *  Fix a float* map with a polygon or lightfrustum projected onto
-   *  it, for laterinterpolation.
-   */
-  static void FixCoverageMap(float* map, int width, int height);
-  
   /// Get a RadPoly when you have a csPolygon3D (only type we attach to)
   static csRadPoly* GetRadPoly(csPolygon3D &object);
 
@@ -406,26 +383,18 @@ public:
   void ShootRadiosityToPolygon(csRadPoly* dest);
   /// Prepare to shoot from source poly
   void PrepareShootSource(csRadPoly* src);
-  /// Prepare to shoot from source to dest 
-  void PrepareShootDest(csRadPoly* dest, csFrustumView *lview);
+  /// Prepare to shoot from source to dest, if false skip dest.
+  bool PrepareShootDest(csRadPoly* dest, csFrustumView *lview);
   /// Prepare to shoot from a lumel
   void PrepareShootSourceLumel(int sx, int sy, int suv);
   /// Shoot it, dest lumel given.
   void ShootPatch(int rx, int ry, int ruv);
 
 
-  /** 
-   *  Compute visibility of one lumel to another lumel.
-   *  positions in world coords now.
-   */
-  float GetVisibility(csRadPoly *srcpoly, const csVector3& src, 
-    csRadPoly *destpoly, const csVector3& dest);
   /// Apply all deltamaps if stopped early, and add ambient light
   void ApplyDeltaAndAmbient();
   /// Remove old ambient, for now.
   void RemoveAmbient();
-  /// check if dest poly is visible to source poly
-  bool VisiblePoly(csRadPoly *src, csRadPoly *dest);
 
 };
 
