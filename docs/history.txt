@@ -53,6 +53,7 @@ chronological order.
 	    - Improved error handling in the glshader_ps1 plugin a bit.
 	- res fixed the csNullCacheManager::CacheData() implementation
 	  being different from prototype.
+	- res changed stenciltest to vary texture usage some more.
 27-Jun-2004
 	- res worked around a possible VC7 64bit warning in 
 	  csIntegralHashKeyHandler<>.

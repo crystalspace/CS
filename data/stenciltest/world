@@ -5,16 +5,29 @@
 			<file>/lib/stdtex/bricks.jpg</file>
 			<!--<file>stone2.dds</file>-->
 		</texture>
+		<texture name="bricks">
+			<file>bricks.png</file>
+		</texture>
+		<texture name="bricksDOT3">
+			<file>bricks_n.png</file>
+		</texture>
 	</textures>
         <shaders>
 	    <shader><file>/shader/ambient.xml</file></shader>
 	    <shader><file>/shader/light.xml</file></shader>
+	    <shader><file>/shader/light_bumpmap.xml</file></shader>
         </shaders>
 	<materials>
 		<material name="1 - Default">
 			<texture>1 - Default</texture>
 			<shader type="ambient">ambient</shader>
 			<shader type="diffuse">light</shader>
+		</material>
+		<material name="Walls">
+			<texture>bricks</texture>
+			<shadervar name="tex normal" type="texture">bricksDOT3</shadervar>
+			<shader type="ambient">ambient</shader>
+			<shader type="diffuse">light_bumpmap</shader>
 		</material>
 	</materials>
 	<plugins>
@@ -923,7 +936,7 @@
 			<plugin>genmesh</plugin>
 			<params>
 			<factory>Box01FACT</factory>
-			<material>1 - Default</material>
+			<material>Walls</material>
 			</params>
 			<priority>wall</priority>
 			<!--<priority>alpha</priority>-->
