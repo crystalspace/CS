@@ -33,10 +33,9 @@
 struct iClipper2D;
 
 /**
- * The following class represents a general 2D polygon with
- * a bounding box.
+ * The following class represents a general 2D polygon.
  */
-class CS_CSGEOM_EXPORT csPoly2D
+class CS_CSGEOM_EXPORT csPoly2DUnbounded
 {
 protected:
   /// The 2D vertices.
@@ -45,24 +44,20 @@ protected:
   int num_vertices;
   ///
   int max_vertices;
-
-  /// A 2D bounding box that is maintained automatically.
-  csBox2 bbox;
-
 public:
   /**
    * Make a new empty polygon.
    */
-  csPoly2D (int start_size = 10);
+  csPoly2DUnbounded (int start_size = 10);
 
   /// Copy constructor.
-  csPoly2D (const csPoly2D& copy);
+  csPoly2DUnbounded (const csPoly2DUnbounded& copy);
 
   /// Destructor.
-  virtual ~csPoly2D ();
+  virtual ~csPoly2DUnbounded ();
 
   /// Assignment operator.
-  csPoly2D& operator= (const csPoly2D& other);
+  csPoly2DUnbounded& operator= (const csPoly2DUnbounded& other);
 
   /**
    * Initialize the polygon to empty.
@@ -166,12 +161,6 @@ public:
   void SetVertices (csVector2 const* v, int num)
   { MakeRoom (num); memcpy (vertices, v, (num_vertices = num) * sizeof (csVector2)); }
 
-  /// Update the bounding box (useful after SetVertices).
-  void UpdateBoundingBox ();
-
-  /// Get the bounding box (in 2D space) for this polygon.
-  csBox2& GetBoundingBox () { return bbox; }
-
   /**
    * Clipping routines. They return false if the resulting polygon is not
    * visible for some reason.
@@ -190,13 +179,13 @@ public:
    * polygon which already has most edges. i.e. you will not
    * get degenerate polygons.
    */
-  void Intersect (const csPlane2& plane, csPoly2D& left, csPoly2D& right) const;
+  void Intersect (const csPlane2& plane, csPoly2DUnbounded& left, csPoly2DUnbounded& right) const;
 
   /**
    * This routine is similar to Intersect but it only returns the
    * polygon on the 'right' (positive) side of the plane.
    */
-  void ClipPlane (const csPlane2& plane, csPoly2D& right) const;
+  void ClipPlane (const csPlane2& plane, csPoly2DUnbounded& right) const;
 
   /**
    * Extend this polygon with another polygon so that the resulting
@@ -206,7 +195,7 @@ public:
    * Edges are indexed with 0 being the edge from 0 to 1 and n-1 being
    * the edge from n-1 to 0.
    */
-  void ExtendConvex (const csPoly2D& other, int this_edge);
+  void ExtendConvex (const csPoly2DUnbounded& other, int this_edge);
 
   /**
    * Calculate the signed area of this polygon.
@@ -219,6 +208,37 @@ public:
    * @@@ Currently only triangles are supported.
    */
   void Random (int num, const csBox2& max_bbox);
+};
+
+/**
+ * The following class represents a general 2D polygon with
+ * a bounding box.
+ */
+class CS_CSGEOM_EXPORT csPoly2D : public csPoly2DUnbounded
+{
+protected:
+  /// A 2D bounding box that is maintained automatically.
+  csBox2 bbox;
+
+public:
+  csPoly2D (int start_size = 10);
+  /// Copy constructor.
+  csPoly2D (const csPoly2D& copy);
+
+  /// Assignment operator.
+  csPoly2D& operator= (const csPoly2D& other);
+  
+  void MakeEmpty ();
+  int AddVertex (float x, float y);
+  int AddVertex (const csVector2& v) { return AddVertex (v.x, v.y); }
+  
+  /// Update the bounding box (useful after SetVertices).
+  void UpdateBoundingBox ();
+
+  /// Get the bounding box (in 2D space) for this polygon.
+  csBox2& GetBoundingBox () { return bbox; }
+
+  bool ClipAgainst (iClipper2D* view);
 };
 
 /**

@@ -19,25 +19,25 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/polyclip.h"
 
-CS_IMPLEMENT_STATIC_CLASSVAR (csPoly2DFactory,sharedFactory,SharedFactory,csPoly2DFactory,())
+CS_IMPLEMENT_STATIC_CLASSVAR (csPoly2DFactory, sharedFactory, \
+			      SharedFactory, csPoly2DFactory,())
 
-csPoly2D::csPoly2D (int start_size)
+csPoly2DUnbounded::csPoly2DUnbounded (int start_size)
 {
   max_vertices = start_size;
   vertices = new csVector2[max_vertices];
   MakeEmpty ();
 }
 
-csPoly2D::csPoly2D (const csPoly2D &copy)
+csPoly2DUnbounded::csPoly2DUnbounded (const csPoly2DUnbounded &copy)
 {
   max_vertices = copy.max_vertices;
   vertices = new csVector2[max_vertices];
   num_vertices = copy.num_vertices;
   memcpy (vertices, copy.vertices, sizeof (csVector2) * num_vertices);
-  bbox = copy.bbox;
 }
 
-csPoly2D &csPoly2D::operator= (const csPoly2D &other)
+csPoly2DUnbounded &csPoly2DUnbounded::operator= (const csPoly2DUnbounded &other)
 {
   if (other.num_vertices <= max_vertices)
   {
@@ -55,22 +55,20 @@ csPoly2D &csPoly2D::operator= (const csPoly2D &other)
       memcpy (vertices, other.vertices, sizeof (csVector2) * num_vertices);
   }
 
-  bbox = other.bbox;
   return *this;
 }
 
-csPoly2D::~csPoly2D ()
+csPoly2DUnbounded::~csPoly2DUnbounded ()
 {
   delete[] vertices;
 }
 
-void csPoly2D::MakeEmpty ()
+void csPoly2DUnbounded::MakeEmpty ()
 {
   num_vertices = 0;
-  bbox.StartBoundingBox ();
 }
 
-bool csPoly2D::In (const csVector2 &v)
+bool csPoly2DUnbounded::In (const csVector2 &v)
 {
   int i, i1;
   i1 = num_vertices - 1;
@@ -84,7 +82,7 @@ bool csPoly2D::In (const csVector2 &v)
   return true;
 }
 
-bool csPoly2D::In (csVector2 *poly, int num_poly, const csVector2 &v)
+bool csPoly2DUnbounded::In (csVector2 *poly, int num_poly, const csVector2 &v)
 {
   int i, i1;
   i1 = num_poly - 1;
@@ -97,7 +95,7 @@ bool csPoly2D::In (csVector2 *poly, int num_poly, const csVector2 &v)
   return true;
 }
 
-void csPoly2D::MakeRoom (int new_max)
+void csPoly2DUnbounded::MakeRoom (int new_max)
 {
   if (new_max <= max_vertices) return ;
 
@@ -108,33 +106,26 @@ void csPoly2D::MakeRoom (int new_max)
   max_vertices = new_max;
 }
 
-int csPoly2D::AddVertex (float x, float y)
+int csPoly2DUnbounded::AddVertex (float x, float y)
 {
   if (num_vertices >= max_vertices) MakeRoom (max_vertices + 5);
   vertices[num_vertices].x = x;
   vertices[num_vertices].y = y;
   num_vertices++;
-  bbox.AddBoundingVertex (x, y);
   return num_vertices - 1;
 }
 
-void csPoly2D::UpdateBoundingBox ()
-{
-  int i;
-  bbox.StartBoundingBox (vertices[0]);
-  for (i = 1; i < num_vertices; i++) bbox.AddBoundingVertex (vertices[i]);
-}
-
-bool csPoly2D::ClipAgainst (iClipper2D *view)
+bool csPoly2DUnbounded::ClipAgainst (iClipper2D *view)
 {
   MakeRoom (num_vertices + view->GetVertexCount () + 1);
+  csBox2 bbox;
   return view->ClipInPlace (vertices, num_vertices, bbox) ? true : false;
 }
 
-void csPoly2D::Intersect (
+void csPoly2DUnbounded::Intersect (
   const csPlane2 &plane,
-  csPoly2D &left,
-  csPoly2D &right) const
+  csPoly2DUnbounded &left,
+  csPoly2DUnbounded &right) const
 {
   int i, i1;
   float c, c1;
@@ -230,7 +221,7 @@ void csPoly2D::Intersect (
     }
 }
 
-void csPoly2D::ClipPlane (const csPlane2 &plane, csPoly2D &right) const
+void csPoly2DUnbounded::ClipPlane (const csPlane2 &plane, csPoly2DUnbounded &right) const
 {
   int i, i1;
   float c, c1;
@@ -318,7 +309,7 @@ void csPoly2D::ClipPlane (const csPlane2 &plane, csPoly2D &right) const
   }
 }
 
-void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
+void csPoly2DUnbounded::ExtendConvex (const csPoly2DUnbounded &other, int i1)
 {
   // Some conventions:
   //   i1, i2: edge of this polygon common with 'other'.
@@ -356,7 +347,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   }
 
   // Copy this polygon to 'orig' and clear this one.
-  csPoly2D orig (*this);
+  csPoly2DUnbounded orig (*this);
   int orig_num = orig.GetVertexCount ();
   int other_num = other.GetVertexCount ();
   MakeEmpty ();
@@ -480,7 +471,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   }
 }
 
-float csPoly2D::GetSignedArea ()
+float csPoly2DUnbounded::GetSignedArea ()
 {
   float area = 0.0;
 
@@ -496,7 +487,7 @@ static float randflt ()
   return ((float)rand ()) / RAND_MAX;
 }
 
-void csPoly2D::Random (int num, const csBox2 &max_bbox)
+void csPoly2DUnbounded::Random (int num, const csBox2 &max_bbox)
 {
   MakeEmpty ();
 
@@ -517,3 +508,45 @@ void csPoly2D::Random (int num, const csBox2 &max_bbox)
 }
 
 //---------------------------------------------------------------------------
+
+csPoly2D::csPoly2D (int start_size) : csPoly2DUnbounded (start_size)
+{
+  MakeEmpty ();
+}
+
+csPoly2D::csPoly2D(const csPoly2D &copy) : csPoly2DUnbounded (copy)
+{
+  bbox = copy.bbox;
+}
+
+csPoly2D &csPoly2D::operator= (const csPoly2D &other)
+{
+  csPoly2DUnbounded::operator= (other);
+  bbox = other.bbox;
+  return *this;
+}
+
+void csPoly2D::MakeEmpty ()
+{
+  csPoly2DUnbounded::MakeEmpty ();
+  bbox.StartBoundingBox ();
+}
+
+int csPoly2D::AddVertex (float x, float y)
+{
+  bbox.AddBoundingVertex (x, y);
+  return csPoly2DUnbounded::AddVertex (x, y);
+}
+
+void csPoly2D::UpdateBoundingBox ()
+{
+  int i;
+  bbox.StartBoundingBox (vertices[0]);
+  for (i = 1; i < num_vertices; i++) bbox.AddBoundingVertex (vertices[i]);
+}
+
+bool csPoly2D::ClipAgainst (iClipper2D *view)
+{
+  MakeRoom (num_vertices + view->GetVertexCount () + 1);
+  return view->ClipInPlace (vertices, num_vertices, bbox) ? true : false;
+}

@@ -351,7 +351,7 @@ private:
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh* texel_mesh;
   /// The array of texels
-  csPDelArray<csPoly2D> texels;
+  csPDelArray<csPoly2DUnbounded> texels;
   /// The vertices
   csPDelArray<csPoly3D> vertices;
   /// The normals

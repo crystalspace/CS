@@ -135,7 +135,11 @@ public:
   /**
    * Set the number of vertices.
    */
-  void SetVertexCount (size_t n) { vertices.SetLength (n); }
+  void SetVertexCount (size_t n) 
+  { 
+    MakeRoom (n);
+    vertices.SetLength (n); 
+  }
 
   /**
    * Add a vertex (3D) to the polygon.
