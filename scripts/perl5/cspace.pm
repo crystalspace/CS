@@ -5230,6 +5230,12 @@ package cspace::iMeshFactoryWrapper;
 *GetStaticLOD = *cspacec::iMeshFactoryWrapper_GetStaticLOD;
 *AddFactoryToStaticLOD = *cspacec::iMeshFactoryWrapper_AddFactoryToStaticLOD;
 *RemoveFactoryFromStaticLOD = *cspacec::iMeshFactoryWrapper_RemoveFactoryFromStaticLOD;
+*SetZBufMode = *cspacec::iMeshFactoryWrapper_SetZBufMode;
+*GetZBufMode = *cspacec::iMeshFactoryWrapper_GetZBufMode;
+*SetZBufModeRecursive = *cspacec::iMeshFactoryWrapper_SetZBufModeRecursive;
+*SetRenderPriority = *cspacec::iMeshFactoryWrapper_SetRenderPriority;
+*GetRenderPriority = *cspacec::iMeshFactoryWrapper_GetRenderPriority;
+*SetRenderPriorityRecursive = *cspacec::iMeshFactoryWrapper_SetRenderPriorityRecursive;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6205,6 +6211,7 @@ package cspace::iSprite2DState;
 %ITERATORS = ();
 *CreateRegularVertices = *cspacec::iSprite2DState_CreateRegularVertices;
 *SetUVAnimation = *cspacec::iSprite2DState_SetUVAnimation;
+*GetUVAnimation = *cspacec::iSprite2DState_GetUVAnimation;
 *StopUVAnimation = *cspacec::iSprite2DState_StopUVAnimation;
 *PlayUVAnimation = *cspacec::iSprite2DState_PlayUVAnimation;
 sub DESTROY {
