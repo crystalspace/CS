@@ -317,27 +317,32 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)());
 #  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION                    \
 void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
 {                                                                      \
-  static void (**a)()=0;                                               \
-  static int lastEntry=0;                                              \
-  static int maxEntries=0;                                             \
+  static void (**a)() = 0;                                             \
+  static int lastEntry = 0;                                            \
+  static int maxEntries = 0;                                           \
                                                                        \
-  if (p)                                                               \
+  if (p != 0)                                                          \
   {                                                                    \
     if (lastEntry >= maxEntries)                                       \
     {                                                                  \
-      maxEntries+=10;                                                  \
-      a = (void (**)())realloc (a, maxEntries*sizeof(void*));          \
+      maxEntries += 10;                                                \
+      if (a == 0)                                                      \
+        a = (void (**)())malloc(maxEntries * sizeof(void*));           \
+      else                                                             \
+        a = (void (**)())realloc(a, maxEntries * sizeof(void*));       \
     }                                                                  \
     a[lastEntry++] = p;                                                \
   }                                                                    \
-  else                                                                 \
+  else if (a != 0)                                                     \
   {                                                                    \
-    int i;                                                             \
-    for (i=lastEntry-1; i >= 0; i--)                                   \
+    for (int i = lastEntry - 1; i >= 0; i--)                           \
       a[i] ();                                                         \
     free (a);                                                          \
-   }                                                                   \
-}                                                                      
+    a = 0;                                                             \
+    lastEntry = 0;                                                     \
+    maxEntries = 0;                                                    \
+  }                                                                    \
+}
 #endif
 
 #ifndef CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP
