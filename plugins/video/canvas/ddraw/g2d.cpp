@@ -21,6 +21,7 @@
 #include "csutil/csstring.h"
 #include "video/canvas/ddraw/g2d.h"
 #include "cssys/win32/directdetection.h"
+#include "video/canvas/common/dyntex2d.h"
 #include "isystem.h"
 
 DirectDetection DDetection;
@@ -877,3 +878,11 @@ HRESULT csGraphics2DDDraw3::InitFail(HWND hWnd, HRESULT hRet, LPCTSTR szError, .
     return hRet;
 }
 
+
+iGraphics2D *csGraphics2DDDraw3::CreateOffScreenCanvas (int width, int height, 
+	   csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
+{
+  csDynamicTexture2D *tex = new csDynamicTexture2D (System);
+  return tex->CreateOffScreenCanvas (width, height, pfmt, buffer, 
+				     palette, pal_size);
+}
