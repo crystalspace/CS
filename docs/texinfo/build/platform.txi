@@ -3,18 +3,17 @@
 @section Platform Specific Instructions
 
 When working with Crystal Space, always keep in mind that this is a
-multiplatform project. So sometimes not all features will work correctly
-on all platforms. Sometimes a specific port may even be broken due to
-changes in other ports. Since the introduction of CVS, this is usually
-only for a short time so if you got your version out of CVS, it usually
-pays off to post a message describing the problems to the Crystal
-Space Mailing List describing you problem and include the exact error
-messages. If you wait a while, this will probably be fixed, or at least be
-worked around. @xref{Mailing Lists}.
+multiplatform project. Sometimes not all features will work correctly on all
+platforms. Sometimes a specific port may even be broken due to changes in other
+ports. Since the introduction of @sc{cvs}, this is usually only for a short
+time so if you got your version from @sc{cvs}, it usually pays off to post a
+message describing the problems to the Crystal Space mailing list describing
+you problem and include the exact error messages. If you wait a while, this
+will probably be fixed, or at least be worked around. @xref{Mailing Lists}.
 
 For some ports there is additional reference information explaining the
-internal workings of the port.  When such detailed information exists, you
-will find a reference to it from within the instructions in this section.
+internal workings of the port. When such detailed information exists, you will
+find a reference to it from within the instructions in this section.
 
 @menu
 * Unix::
@@ -22,8 +21,8 @@ will find a reference to it from within the instructions in this section.
 * MinGW:: Windows using MinGW
 * Cygwin:: Windows using Cygwin
 * NeXT:: MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
-* OS2:: @sc{os}/2
-* BeOS:: @sc{b}e@sc{os}
+* OS2:: @sc{os/2}
+* BeOS:: BeOS
 * MS-DOS:: @sc{ms-dos} - Using @sc{djgpp} Compiler
 @end menu
 

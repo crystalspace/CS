@@ -3,21 +3,15 @@
 @subsection Unix
 @cindex Unix
 
-This section covers all the Unix and Unix-like platforms which run X-windows.
-Some platforms which use the SVGA library for display on the console
-(sans X-windows) may also be covered.
+This section covers all of the Unix-style platforms supported by Crystal Space.
+At the time of this writing they are Linux, FreeBSD, NetBSD, Solaris, Irix, and
+@sc{gnu/hurd}.
 
-In general, you can use the instructions in this section to configure and
-build Crystal Space for Linux, BSD, Irix, etc.
-
-Note that the X version of Crystal Space optionally supports the Shared
-Memory Extension (SHM). This makes Crystal Space run much faster if your
-server supports it (Crystal Space should also support DGA but this is not
-yet the case).
-
-By default Crystal Space assumes that your server supports SHM. It will
-automatically auto-detect if your server doesn't support it. So you can
-safely leave it enabled.
+Note that the X11 version of Crystal Space optionally supports the @sc{mit}
+Shared Memory Extension (@sc{mit-shm}). This makes Crystal Space run much
+faster if your server supports it. By default Crystal Space assumes that your
+server supports @sc{mit-shm}. It will automatically auto-detect if your server
+doesn't support it, so you can safely leave it enabled.
 
 @menu
 * Unix Editing the Makefile:: Editing the Makefile
@@ -36,40 +30,52 @@ options are suitable for you.
 Some important options in @file{user.mak} are:
 
 @table @code
-@item DO_ASM=... (possible values: 'yes' or 'no')
-With this option you can disable all assembler optimizations
-present in CS. Note that there is currently only assembly for the Intel 
-x86 processor(s) so this option has no effect otherwise.
-The default for this option is @samp{yes} if you are compiling for
-optimization (see above option). Otherwise it is @samp{no} (because
-debugging interferes with the assembler).
+@item USE_PLUGINS=@dots{} ('yes' or 'no')
+This option allows you to select whether or not to build drivers and plugins as
+loadable modules. The default is @samp{yes}.
 
-@item USE_PLUGINS=... (possible values: 'yes' or 'no')
-This option allows you to select whether or not to build drivers and 
-plugins as loadable modules. The default is @samp{yes}.
+@item USE_SHARED_LIBS=@dots{} ('yes' or 'no')
+This option is currently only supported on Unix, and determines whether
+libraries are built as shared or dynamic. The default is @samp{no}.
 
-@item USE_SHARED_LIBS=... (possible values: 'yes' or 'no')
-This option is currently only supported on Unix, and determines 
-whether libraries are built as shared or dynamic. The default 
-is @samp{no}.
+@item MODE=@dots{} ('optimize', 'debug', or 'profile')
+Selects whether Crystal Space is built with debugging information or not. The
+default is @samp{optimize}.
 
-@item MODE=... (possible values: 'optimize' or 'debug')
-Selects whether Crystal Space is built with debugging information 
-or not. The default is @samp{optimize}.
+@item NASM.INSTALLED=@dots{} ('yes' or 'no')
+This option determines whether or not the Netwide Assembler should be used for
+assembly language routines. The default is @samp{no}
+
+@item DO_ASM=@dots{} ('yes' or 'no')
+With this option you can disable all assembler optimizations present in CS.
+Note that there is currently only assembly for x86 processor(s) so this option
+has no effect otherwise. The default for this option is @samp{yes} if you are
+compiling for optimization (see above option). Otherwise it is @samp{no}
+(because debugging interferes with the assembler).
+
+@item DO_MMX=@dots{} ('yes' or 'no')
+This option determines whether or not @sc{mmx} (@emph{M}ulti@emph{M}edia
+e@emph{X}tensions) are used. If your processor supports @sc{mmx} this can
+provide a speed improvement.
+
+@item USE_MESA=@dots{} ('0' or '1')
+This option determines whether or not to use the Mesa library. Mesa is a 3D
+graphics library similar to OpenGL (in fact it uses the same syntax as OpenGL).
+You can find out more information about Mesa at @uref{http://www.mesa3d.org/}.
+The default is @samp{0}.
 @end table
 
 @node Unix Compiling, Unix Other2d3d, Unix Editing the Makefile, Unix
 @subsubsection Compiling on Unix
 
-The makefiles require GNU make, which is typically named @file{make} on most
-systems.  If this is not the case then substitute @file{gmake}, @file{gnumake}
-or whatever GNU make is called on your system.
+The makefiles require @sc{gnu} make, which is typically named @file{make} on
+most systems. If this is not the case then substitute @file{gmake},
+@file{gnumake} or whatever @sc{gnu} make is called on your system. It is
+@emph{not} possible to make Crystal Space using any other make system (unless
+of course you write your own makefiles).
 
-It is NOT possible to make Crystal Space using any other makefile
-(unless by doing so manually).
-
-First you need to configure the makefiles for your system. If you are
-using Linux, for example, you can do this as follows:
+First you need to configure the makefiles for your system. If you are using
+Linux, for example, you can do this as follows: 
 
 @example
 make linux USE_PLUGINS=yes
@@ -97,19 +103,19 @@ make -k all
 
 If you selected @code{USE_PLUGINS=yes} then this will generate an executable
 and drivers (extension @file{*.so} on Linux and most Unix platforms) for the
-software renderer, a 2D driver, and some network drivers.  If you selected
+software renderer, a 2D driver, and some network drivers. If you selected
 @code{USE_PLUGINS=no} then only the executable is generated and the drivers are
 contained in that executable.
 
 @strong{Optional}: @emph{Only perform this step if you are developing a brand
-new plug-in module or changing the SCF identification of an existing one.}  If
+new plug-in module or changing the SCF identification of an existing one.} If
 you selected @code{USE_PLUGINS=yes} then you may need to register the drivers
-with the SCF system.  This generally only needs to be done once.  The
-registration information is maintained in the file @file{scf.cfg}.  However,
+with the @sc{scf} system. This generally only needs to be done once. The
+registration information is maintained in the file @file{scf.cfg}. However,
 typically this file is already up-to-date, so usually you can skip this step
-altogether.  Only perform this step if the system is unable to locate the
+altogether. Only perform this step if the system is unable to locate the
 drivers or if you are actively developing a driver and changing registration
-information.  The program to register plug-ins is called scfreg, and it was
+information. The program to register plug-ins is called scfreg, and it was
 also compiled by @samp{make -k all}.  To run it, type:
 
 @example
@@ -117,7 +123,7 @@ also compiled by @samp{make -k all}.  To run it, type:
 @end example
 
 If all is well this should register all drivers so that Crystal Space will be
-able to load them dynamically.  If your platform uses a file extension other
+able to load them dynamically. If your platform uses a file extension other
 than @file{*.so} for plug-in modules, then alter the command appropriately.
 This step is not needed when @code{USE_PLUGINS=no} is specified.
 
@@ -133,21 +139,20 @@ and some default 2D driver. Here are some other options:
 @item
 OpenGL with X11
 @item
-Software with SVGALIB
+Software with X11
 @item
-Software with GGI
+Software with SVGAlib
 @end itemize
 
 To compile those drivers edit @file{libs/cssys/unix/linux.mak} (or one of the
 other makfiles in that directory) and edit the @samp{PLUGINS} statement so
-that it mentions the drivers you wish to build.  Then do @samp{make -k all}
+that it mentions the drivers you wish to build. Then do @samp{make -k all}
 again and register the new drivers.
 
-The software renderer can run with the X11, SVGALIB, or GGI drivers. If
-the @samp{GGI_DISPLAY} environment variable is defined it will choose the
-GGI driver. Otherwise if @samp{DISPLAY} is defined it will choose the X11
-driver. If that fails it will try the @samp{SVGALIB} driver. There is no need
-to recompile the program.
+The software renderer can run with the X11 or SVGAlib drivers. If
+the @samp{DISPLAY} environment variable is defined it will choose the X11
+driver, otherwise it will try the @samp{SVGAlib} driver. There is no need to
+recompile the program.
 
 To select another 3D rasterizer you need to edit the application's
 configuration file (such as @file{walktest.cfg}) and change the
@@ -162,20 +167,19 @@ walktest -video=opengl
 @subsubsection  Where are the Object Files?
 
 The build process places all object files and libraries in the directory
-@file{CS/out}.  This directory contains subdirectories for the operating
-system and processor architecture.  For example, if you compile on Linux
-for Intel with optimization then all object files will end up in
+@file{CS/out}. This directory contains subdirectories for the operating system
+and processor architecture.  For example, if you compile on Linux for Intel
+with optimization then all object files will end up in
 @file{CS/out/LINUX/X86/optimize}.  However if you compile on a Solaris
 system for Sparc with debugging enabled then all objects files end up in
 @file{CS/out/SOLARIS/SPARC/debug}.
 
 The reason for this directory structure is that it simplifies the
-compilation of CS both with and without optimization, as well as when
+compilation of @sc{cs} both with and without optimization, as well as when
 using a cross-compiler to generate object files for other processor
 architectures.
 
 Another advantage is for people who share the same directory structure for
-different systems.  For example, if Crystal Space is located on a shared
-directory for both a Solaris system and a Linux system then this
-arrangement allows the package to be built for each system without
-over-writing the other.
+different systems. For example, if Crystal Space is located on a shared
+directory for both a Solaris system and a Linux system then this arrangement
+allows the package to be built for each system without overwriting the other.
