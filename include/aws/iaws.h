@@ -220,10 +220,10 @@ struct iAwsSink : public iBase
   virtual unsigned long GetTriggerID(char *name)=0;  
 
   /// Handles trigger events
-  virtual void HandleTrigger(int trigger_id, iAwsSource &source)=0;
+  virtual void HandleTrigger(int trigger_id, iAwsSource *source)=0;
 
   /// A sink should call this to register trigger events
-  virtual void RegisterTrigger(char *name, void (iBase::*Trigger)(iAwsSource &source))=0;
+  virtual void RegisterTrigger(char *name, void (*Trigger)(iAwsSink *, iAwsSource *))=0;
 };
 
 
@@ -410,7 +410,6 @@ struct iAwsComponentFactory : public iBase
   /// Registers constants for the parser so that we can construct right.
   virtual void RegisterConstant(char *name, int value)=0;
 };
-
 
 
 #endif // __IVARIA_AWS_H__

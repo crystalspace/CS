@@ -74,9 +74,9 @@ class awsSink : public iAwsSink
   struct TriggerMap
   {
     unsigned long name;
-    void (iBase::*trigger)(iAwsSource &source);
+    void (*trigger)(iAwsSink *, iAwsSource *);
 
-    TriggerMap(unsigned long n, void (iBase::*t)(iAwsSource &source)):name(n), trigger(t) {};
+    TriggerMap(unsigned long n, void (*t)(iAwsSink *, iAwsSource *)):name(n), trigger(t) {};
   };
     
   /// List of triggers registered.
@@ -92,10 +92,10 @@ public:
   virtual unsigned long GetTriggerID(char *name);
 
   /// Handles trigger events
-  virtual void HandleTrigger(int trigger, iAwsSource &source);
+  virtual void HandleTrigger(int trigger, iAwsSource *source);
 
   /// A sink should call this to register trigger events
-  virtual void RegisterTrigger(char *name, void (iBase::*Trigger)(iAwsSource &source));
+  virtual void RegisterTrigger(char *name, void (*Trigger)(iAwsSink *, iAwsSource *));
   
 };
 
