@@ -559,6 +559,14 @@ Action:  Add a sprite from a template already in memory.
 	 factor for the sprite. The sprite is put at the current
 	 location.
 
+Command: addskel
+Type:    general command
+Action:  Add a skeletal tree (demonstration). The first argument is the
+	 depth. A depth of 1 will create a root and one layer above. The
+	 second argument is the width. This is the number of branches
+	 created at every depth. A good tree is 'addskel 3,3'. Be careful
+	 with large numbers here. The number of triangles grows VERY fast!
+
 Command: gouraud
 Type:    boolean command
 Action:  Toggle support for gouraud shading. By default this is on.
