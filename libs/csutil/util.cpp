@@ -79,7 +79,7 @@ void Combinations (int m, int n, bool (*callback) (int *vector, int count,
   CHK (delete [] vector);
 }
 
-#if defined (OS_OS2) || defined (OS_WIN32)
+#if defined (OS_OS2) || defined (OS_DOS) || defined (OS_WIN32)
 // We need a function to retrieve current working directory on specific drive
 
 static int __getcwd (char drive, char *buffer, int buffersize)
@@ -91,23 +91,7 @@ static int __getcwd (char drive, char *buffer, int buffersize)
   return strlen (buffer);
 }
 
-#endif // defined (OS_OS2) || defined (OS_WIN32)
-
-#if defined (OS_DOS)
-// We need a function to retrieve current working directory on specific drive
-
-static int __getcwd (char drive, char *buffer, int buffersize)
-{
-  unsigned int old_drive, num_drives;
-  _dos_getdrive (&old_drive);
-  _dos_setdrive (drive, &num_drives);
-  getcwd (buffer, buffersize);
-  _dos_setdrive (old_drive, &num_drives);
-  return strlen (buffer);
-}
-
-#endif // defined (OS_DOS)
-
+#endif // defined (OS_OS2) || defined (OS_DOS) || defined (OS_WIN32)
 
 char *expandname (char *iName)
 {

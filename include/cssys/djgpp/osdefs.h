@@ -23,6 +23,21 @@
 // The 2D graphics driver used by software renderer on this platform
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.dosraw"
 
+#if defined (SYSDEF_GETCWD)
+#  include <dos.h>
+char _getdrive ()
+{
+  unsigned int drive;
+  _dos_getdrive (&drive);
+  return (char) drive; // is this correct?
+}
+void _chdrive (char drive)
+{
+  unsigned int num_drives; // useless
+  _dos_setdrive (drive, &num_drives);
+}                  
+#endif
+
 #if defined (SYSDEF_GETCWD) || defined (SYSDEF_ACCESS)
 #  include <unistd.h>
 #  undef SYSDEF_GETCWD
@@ -31,10 +46,6 @@
 
 #if defined (SYSDEF_DIR)
 #  define __NEED_GENERIC_ISDIR
-#endif
-
-#if defined (SYSDEF_GETCWD)
-#  include <dos.h>
 #endif
 
 #endif // __OSDEFS_H__
