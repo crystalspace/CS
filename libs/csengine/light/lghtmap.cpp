@@ -26,11 +26,19 @@
 #include "csengine/engine.h"
 #include "csengine/curve.h"
 #include "csutil/util.h"
+#include "csutil/debug.h"
 #include "iutil/vfs.h"
 
 csShadowMap::csShadowMap ()
 {
   Light = NULL;
+  DG_ADD (this, "NONAME");
+  DG_TYPE (this, "csShadowMap");
+}
+
+csShadowMap::~csShadowMap ()
+{
+  DG_REM (this);
 }
 
 void csShadowMap::Alloc (iLight* l, int w, int h)
@@ -60,6 +68,8 @@ SCF_IMPLEMENT_IBASE_END
 csLightMap::csLightMap ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  DG_ADDI (this, "NONAME");
+  DG_TYPE (this, "csLightMap");
   first_smap = NULL;
   cachedata = NULL;
   delayed_light_info = NULL;
@@ -72,11 +82,13 @@ csLightMap::~csLightMap ()
   while (first_smap)
   {
     csShadowMap *smap = first_smap->next;
+    DG_UNLINK (this, first_smap);
     delete first_smap;
     first_smap = smap;
   }
   static_lm.Clear ();
   real_lm.Clear ();
+  DG_REM (this);
 }
 
 void csLightMap::SetLightCellSize (int size)
@@ -88,15 +100,17 @@ void csLightMap::SetLightCellSize (int size)
 void csLightMap::DelShadowMap (csShadowMap* smap)
 {
   first_smap = smap->next;
+  DG_UNLINK (this, smap);
   delete smap;
 }
 
 csShadowMap *csLightMap::NewShadowMap (csLight* light, int w, int h)
 {
-  csShadowMap *smap = new csShadowMap ();
+  csShadowMap* smap = new csShadowMap ();
   smap->Light = &light->scfiLight;
   smap->next = first_smap;
   first_smap = smap;
+  DG_LINK (this, smap);
 
   smap->Alloc (&light->scfiLight, w, h);
 
@@ -158,6 +172,7 @@ void csLightMap::CopyLightMap (csLightMap* source)
   while (first_smap)
   {
     smap = first_smap->next;
+    DG_UNLINK (this, first_smap);
     delete first_smap;
     first_smap = smap;
   }
@@ -168,6 +183,7 @@ void csLightMap::CopyLightMap (csLightMap* source)
     smap2 = new csShadowMap ();
     smap2->next = first_smap;
     first_smap = smap2;
+    DG_LINK (this, smap2);
     smap2->Copy (smap);
     smap = smap->next;
   }

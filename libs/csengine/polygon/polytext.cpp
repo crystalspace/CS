@@ -32,6 +32,7 @@
 #include "csengine/engine.h"
 #include "csengine/lghtmap.h"
 #include "csutil/bitset.h"
+#include "csutil/debug.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
@@ -48,6 +49,8 @@ SCF_IMPLEMENT_IBASE_END
 csPolyTexture::csPolyTexture ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  DG_ADDI (this, "NONAME");
+  DG_TYPE (this, "csPolyTexture");
   lm = NULL;
   cache_data [0] = cache_data [1] = cache_data [2] = cache_data [3] = NULL;
   polygon = NULL;
@@ -64,13 +67,26 @@ csPolyTexture::~csPolyTexture ()
   CS_ASSERT (cache_data[2] == NULL);
   CS_ASSERT (cache_data[3] == NULL);
   delete shadow_bitmap;
-  if (lm) lm->DecRef ();
+  if (lm)
+  {
+    DG_UNLINK (this, lm);
+    lm->DecRef ();
+  }
+  DG_REM (this);
 }
 
 void csPolyTexture::SetLightMap (csLightMap* lightmap)
 {
-  if (lightmap) lightmap->IncRef ();
-  if (lm) lm->DecRef ();
+  if (lightmap)
+  {
+    DG_LINK (this, lightmap);
+    lightmap->IncRef ();
+  }
+  if (lm)
+  {
+    DG_UNLINK (this, lm);
+    lm->DecRef ();
+  }
   lm = lightmap;
 }
 

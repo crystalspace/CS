@@ -32,6 +32,8 @@ The history order is reversed so that new features are at the top.
 	  tutorial (code only) to reload the current level. This is for
 	  debugging memory leaks in the engine. Also enabled the debugging
 	  graph.
+	- Added yet more DG_LINK() commands in the engine so that the object
+	  graph is better defined in the graph debugger.
 22-Nov-2001
 	- Further work on documentation. Created a 'Documentation Guide'
 	  section which guides the CS game writer through some of the more

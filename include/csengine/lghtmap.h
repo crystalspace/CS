@@ -44,6 +44,7 @@ public:
   csShadowMap *next;
 
   csShadowMap ();
+  virtual ~csShadowMap ();
   void Alloc (iLight *l, int w, int h);
   void Copy (const csShadowMap *other);
 };

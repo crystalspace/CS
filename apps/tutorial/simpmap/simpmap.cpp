@@ -145,6 +145,7 @@ bool Simple::HandleEvent (iEvent& ev)
     csDebuggingGraph::Dump (NULL);
     engine->DeleteAll ();
     csDebuggingGraph::Dump (NULL);
+    csDebuggingGraph::Clear (NULL);
     LoadMap ();
     return true;
   }

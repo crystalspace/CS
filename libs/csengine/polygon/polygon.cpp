@@ -87,12 +87,15 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csPolyTexType::csPolyTexType ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  DG_ADDI (this, "NONAME");
+  DG_TYPE (this, "csPolyTexType");
   Alpha = 0;
   MixMode = CS_FX_COPY;
 }
 
 csPolyTexType::~csPolyTexType ()
 {
+  DG_REM (this);
 }
 
 csPolyTexLightMap::csPolyTexLightMap () : csPolyTexType ()
@@ -100,12 +103,17 @@ csPolyTexLightMap::csPolyTexLightMap () : csPolyTexType ()
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexLightMap);
   txt_plane = NULL;
   tex = new csPolyTexture ();
+  DG_LINK (this, tex);
   lightmap_up_to_date = false;
 }
 
 csPolyTexLightMap::~csPolyTexLightMap ()
 {
-  if (tex) tex->DecRef ();
+  if (tex)
+  {
+    DG_UNLINK (this, tex);
+    tex->DecRef ();
+  }
   if (txt_plane) txt_plane->DecRef ();
 }
 
@@ -128,9 +136,9 @@ iPolyTxtPlane* csPolyTexLightMap::GetPolyTxtPlane () const
 
 void csPolyTexLightMap::SetTxtPlane (csPolyTxtPlane* txt_pl)
 {
+  if (txt_pl) txt_pl->IncRef ();
   if (txt_plane) txt_plane->DecRef ();
   txt_plane = txt_pl;
-  txt_plane->IncRef ();
 }
 
 void csPolyTexLightMap::NewTxtPlane ()
@@ -326,7 +334,11 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
 
   // Share txt_info with original polygon.
   txt_info = poly.txt_info;
-  if (txt_info) txt_info->IncRef ();
+  if (txt_info)
+  {
+    txt_info->IncRef ();
+    DG_LINK ((csObject*)this, txt_info);
+  }
   txt_share_list = orig_poly->txt_share_list;
   orig_poly->txt_share_list = this;
 
@@ -346,7 +358,12 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
 
 csPolygon3D::~csPolygon3D ()
 {
-  if (txt_info) { txt_info->DecRef (); txt_info = NULL; }
+  if (txt_info)
+  {
+    DG_UNLINK ((csObject*)this, txt_info);
+    txt_info->DecRef ();
+    txt_info = NULL;
+  }
   if (plane) { plane->DecRef (); plane = NULL; }
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
   {
@@ -380,7 +397,11 @@ void csPolygon3D::SetTextureType (int type)
     if (txt_info->GetTextureType () == type)
       return;	// Already that type
     else
+    {
+      DG_UNLINK ((csObject*)this, txt_info);
       txt_info->DecRef ();
+      txt_info = NULL;
+    }
   switch (type)
   {
     case POLYTXT_NONE:
@@ -395,7 +416,10 @@ void csPolygon3D::SetTextureType (int type)
     case POLYTXT_LIGHTMAP:
       txt_info = new csPolyTexLightMap ();
       break;
+    default:
+      CS_ASSERT (false);
   }
+  DG_LINK ((csObject*)this, txt_info);
 }
 
 void csPolygon3D::CopyTextureType (iPolygon3D* ipt)
