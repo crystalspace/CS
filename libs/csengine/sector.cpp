@@ -509,6 +509,9 @@ iPolygon3D *csSector::IntersectSegment (
     iMeshWrapper* mesh = vo->GetMeshWrapper ();
     if (!mesh || mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
 
+    // If we have no portals then we don't consider this thing.
+    if (mesh->GetMeshObject ()->GetPortalCount () == 0) continue;
+
     bool has_not_moved = mesh->GetMovable ()->IsFullTransformIdentity ();
 
     csRef<iThingState> ith (SCF_QUERY_INTERFACE (
@@ -535,7 +538,7 @@ iPolygon3D *csSector::IntersectSegment (
           obj_end,
           obj_isect,
           &r,
-          only_portals);
+          only_portals);	// Always true here.
 
       if (p && r < best_r)
       {

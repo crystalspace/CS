@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 24-May-2003
 	- Jorrit fixed a bug in GetObjectBoundingBox() of 2D sprites. This
 	  could cause culling errors of those sprites.
+	- Jorrit performed a small optimization in iSector->FollowSegment()
+	  in case only_portals==true. Now uses GetPortalCount() to avoid
+	  the need to test a thing if there are no portals in it.
 23-May-2003
 	- Jorrit fixed a bug with 3D sprites. If the factory was
 	  HardTransformed() the shape indicator was not changed.
