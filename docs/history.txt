@@ -24,6 +24,8 @@ The history order is reversed so that new features are at the top.
 	- Added DG_TYPE to lots of common csObject's in the engine.
 	- Reverted part of Martin's changes to csObject because
 	  this causes problems in some cases. i.e. re-added ObjReleaseOld().
+	- Matze fixed bad dllist usage in aws
+	- Matze changes aws Skin language loading to use vfs
 16-Nov-2001
 	- Removed csDebuggingGraph::AddInterface() and instead added
 	  a 'bool scf' parameter to AddObject().

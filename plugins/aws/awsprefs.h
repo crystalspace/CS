@@ -25,6 +25,13 @@
 
 #include "awstex.h"
 
+/** global variables for the scanner (XXX: This is ugly a c++ scanner would be
+ * nicer
+ */
+struct iVFS;
+struct iFile;
+extern iFile *aws_fileinputvfs;
+
 struct iString;
 
 /****
@@ -354,6 +361,9 @@ class awsPrefManager : public iAwsPrefManager
   /// window manager
   iAws  *wmgr;
 
+  /// vfs plugin
+  iVFS *vfs;
+
   /// constant value heap
   csBasicVector constants;
 
@@ -374,7 +384,7 @@ public:
     virtual ~awsPrefManager();
 
     /// Invokes the parser to load a definitions file.
-    virtual void Load(const char *def_file);
+    virtual bool Load(const char *def_file);
 
     /// Maps a name to an id
     virtual unsigned long NameToId(char *name);
@@ -466,9 +476,9 @@ public:
        happens automatically normally. */
     virtual void SetupPalette();
 
-    /** Performs whatever initialization is necessary.  For now, it simply initializes the
-     * texture loader. */
-    virtual void Setup(iObjectRegistry *obj_reg);
+    /** Performs whatever initialization is necessary.  For now, it simply
+      * initializes the texture loader. */
+    virtual bool Setup(iObjectRegistry *obj_reg);
 
     /** Allows a component to specify it's own constant values for parsing. */
     virtual void RegisterConstant(char *name, int value);

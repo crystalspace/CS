@@ -377,7 +377,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   col_green = txtmgr->FindRGB (0, 255, 0);
   
   /// 
-  //aws->SetContext(myG2D, myG3D);
+  aws->SetContext(myG2D, myG3D);
   aws->SetDefaultContext(engine, myG3D->GetTextureManager());
 
   // next, setup sinks before loading any preferences
@@ -390,7 +390,8 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   aws->GetSinkMgr()->RegisterSink("testButtonSink", sink);
 
   // now load preferences
-  aws->GetPrefMgr()->Load("./data/temp/awstest.def");
+  if (!aws->GetPrefMgr()->Load("/this/data/temp/awstest.def"))
+      Report(CS_REPORTER_SEVERITY_ERROR, "couldn't load definition file!");
   aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
   
   printf("aws-debug: Creating splash window...\n");

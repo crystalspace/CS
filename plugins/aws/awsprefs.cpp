@@ -1,24 +1,28 @@
 #include "cssysdef.h"
+
+#include <stdio.h>
+#include <string.h>
+
 #include "csutil/scfstr.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
+#include "iutil/vfs.h"
 #include "awsprefs.h"
 #include "awstex.h"
 #include "awsadler.h"
-#include <stdio.h>
-#include <string.h>
  
 extern int awsparse(void *prefscont);
-extern FILE *awsin;
 
 const bool DEBUG_KEYS = false;
 const bool DEBUG_INIT = false;
 
 /// The gradient step for the slightly darker and lighter versions of the highlight and shadow.
 const unsigned char GRADIENT_STEP=25;
+
+iFile *aws_fileinputvfs;
 
 /***************************************************************************************************************
 *   This constructor converts the text-based name into a fairly unique numeric ID.  The ID's are then used for *
@@ -48,6 +52,7 @@ awsPrefManager::~awsPrefManager()
 {
   SCF_DEC_REF (default_font);
   SCF_DEC_REF (fontsvr);
+  SCF_DEC_REF (vfs);
   delete awstxtmgr;
 
   // empty the constants list
@@ -59,7 +64,7 @@ awsPrefManager::~awsPrefManager()
   }
 }
 
-void 
+bool
 awsPrefManager::Setup(iObjectRegistry *obj_reg)
 {  
   if (DEBUG_INIT) printf("aws-debug: initializing AWS Texture Manager\n");
@@ -67,13 +72,20 @@ awsPrefManager::Setup(iObjectRegistry *obj_reg)
   if (DEBUG_INIT) printf("aws-debug: creating texture manager.\n"); 
 
   awstxtmgr = new awsTextureManager();
+  if (!awstxtmgr)
+      return false;
 
   if (DEBUG_INIT) printf("aws-debug: initing texture manager\n");
+  
+  awstxtmgr->Initialize(obj_reg);
 
-  if (awstxtmgr) awstxtmgr->Initialize(obj_reg); 
+  vfs=CS_QUERY_REGISTRY(obj_reg, iVFS);
+  if (!vfs)
+      return false;
 
-  // We setup the window's registered constants here, because windows are special components, and
-  //   do not obey the normal construction rules.
+  /* We setup the window's registered constants here, because windows are
+   * special components, and do not obey the normal construction rules.
+   */
 
   RegisterConstant("wfsNormal",0x0);
   RegisterConstant("wfsToolbar",0x1);
@@ -86,6 +98,8 @@ awsPrefManager::Setup(iObjectRegistry *obj_reg)
   RegisterConstant("wfoGrip",0x20);
   RegisterConstant("wfoRoundBorder",0x0);
   RegisterConstant("wfoBeveledBorder",0x40);
+
+  return true;
 }
 
 unsigned long 
@@ -133,7 +147,7 @@ awsPrefManager::GetDefaultFont()
 }
 
 iFont *
-awsPrefManager::GetFont(char *filename)
+awsPrefManager::GetFont(char * /*filename*/)
 {
   return NULL;
 }
@@ -227,43 +241,47 @@ awsPrefManager::SetupPalette()
  printf("aws-debug: finished palette setup.\n"); 
 }
 
-
-void 
+bool 
 awsPrefManager::Load(const char *def_file)
 {
 
   if (wmgr==NULL) 
   {
     printf("\tunable to load definitions because of an internal error: no window manager.\n");
-    return;
+    return false;
   }
 
   printf("\tloading definitions file %s...\n", def_file);
 
-  awsin = fopen( def_file, "r" );
-
+  aws_fileinputvfs = vfs->Open(def_file, VFS_FILE_READ);
+  if (!aws_fileinputvfs)
+      return false;
+  
   unsigned int ncw = n_win_defs,
                ncs = n_skin_defs;
 
-  if(awsparse(wmgr))
+  if(awsparse(wmgr)) {
       printf("\tsyntax error in definition file, load failed.\n");
-  else
-  {
-     printf("\tload successful (%i windows, %i skins loaded.)\n", n_win_defs-ncw, n_skin_defs-ncs);
+      return false;
   }
   
-  fclose(awsin);
+  printf("\tload successful (%i windows, %i skins loaded.)\n", n_win_defs-ncw,
+	  n_skin_defs-ncs);
+  
+  SCF_DEC_REF(aws_fileinputvfs);
+  aws_fileinputvfs = NULL;
 
+  return true;
 }
 
 bool
 awsPrefManager::SelectDefaultSkin(char *skin_name)
 {
- awsSkinNode *skin = (awsSkinNode *)skin_defs.GetFirstItem();
- unsigned long id  = NameToId(skin_name);
+  awsSkinNode *skin = (awsSkinNode *)skin_defs.GetFirstItem();
+  unsigned long id  = NameToId(skin_name);
 
- do 
- {
+  while (skin)
+  {
     if (skin->Name() == id) {
       def_skin=skin;
 
@@ -289,9 +307,9 @@ awsPrefManager::SelectDefaultSkin(char *skin_name)
     }
 
     skin = (awsSkinNode *)skin_defs.GetNextItem();
- } while(skin!=(awsSkinNode *)skin_defs.PeekFirstItem());
+  }
 
- return false;
+  return false;
 }
 
 bool
@@ -483,22 +501,18 @@ awsPrefManager::GetString(awsComponentNode *node, char *name, iString *&val)
 awsComponentNode *
 awsPrefManager::FindWindowDef(char *name)
 {
-  void *p = win_defs.GetFirstItem();
+  awsComponentNode *win = (awsComponentNode *) win_defs.GetFirstItem();
   unsigned long id = NameToId(name);
   
-  do 
+  while (win)
   {
-    awsComponentNode *win = (awsComponentNode *)p;
-    
     if (win && win->Name() == id)
       return win;
-    else
-      p=win_defs.GetNextItem();
     
-  } while(p!=win_defs.PeekFirstItem());
+    win=(awsComponentNode *) win_defs.GetNextItem();
+  }
   
   return NULL;
- 
 }
 
 void 

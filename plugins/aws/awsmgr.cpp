@@ -84,7 +84,8 @@ awsManager::Initialize(iObjectRegistry *object_reg)
     if (DEBUG_MANAGER) printf("aws-debug: initing and setting the internal preference manager.\n");
     
     prefmgr->SetWindowMgr(this);
-    prefmgr->Setup(object_reg);
+    if (!prefmgr->Setup(object_reg))
+	return false;
   }
 
   if (!sinkmgr)

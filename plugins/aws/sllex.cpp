@@ -446,13 +446,21 @@ char *yytext;
 #include "csgeom/csrect.h"
 #include "aws/awsprefs.h"
 
+#include "iutil/vfs.h"
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "slparse.cpp.h"
 
 #define YY_DECL int yylex YY_PROTO(( YYSTYPE *awslval ))
-                                
+
+/* change input to read from vfs */
+#define YY_INPUT(buf, result, max_size)			\
+{							\
+  result = aws_fileinputvfs->Read(buf, max_size);	\
+}
+                               
 #define YY_NEVER_INTERACTIVE 1
 
 /* Macros after this point can all be overridden by user definitions in
@@ -1310,7 +1318,7 @@ YY_BUFFER_STATE b;
 
 #ifndef YY_ALWAYS_INTERACTIVE
 #ifndef YY_NEVER_INTERACTIVE
-extern int isatty YY_PROTO(( int ));
+#include<unistd.h>
 #endif
 #endif
 
