@@ -868,9 +868,9 @@ public:
     {
       SetFrame (0);
       cur_action = act;
+      return true;
     }
-    else
-      return false;
+    return false;
   }
 
   /**
