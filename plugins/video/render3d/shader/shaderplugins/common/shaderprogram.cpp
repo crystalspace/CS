@@ -342,7 +342,7 @@ iDocumentNode* csShaderProgram::GetProgramNode ()
       docsys.AttachNew (new csTinyDocumentSystem ());
     csRef<iDocument> doc (docsys->CreateDocument ());
 
-    const char* err = doc->Parse (programFile);
+    const char* err = doc->Parse (programFile, true);
     if (err != 0)
     {
       csReport (objectReg,

@@ -1017,7 +1017,7 @@ bool csEngine::HandleEvent (iEvent &Event)
 	    char const* shaderPath = "/shader/or_lighting.xml";
             csRef<iFile> shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
 	    if (shaderFile.IsValid())
-              shaderDoc->Parse (shaderFile);
+	      shaderDoc->Parse (shaderFile, true);
 	    else
 	      Report("WARNING: Shader %s not available  Failure imminent!",
 	        shaderPath);
@@ -1030,7 +1030,7 @@ bool csEngine::HandleEvent (iEvent &Event)
             shaderPath = "/shader/or_lighting_portal.xml";
             shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
             if (shaderFile.IsValid())
-              shaderDoc->Parse (shaderFile);
+              shaderDoc->Parse (shaderFile, true);
             else
               Report("WARNING: Shader %s not available  Failure imminent!",
               shaderPath);
@@ -3238,7 +3238,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
     	CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
-  const char* error = doc->Parse (input);
+  const char* error = doc->Parse (input, true);
   if (error != 0)
   {
     // @@@ Report error?
@@ -3293,7 +3293,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
     	CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
-  const char* error = doc->Parse (input);
+  const char* error = doc->Parse (input, true);
   if (error != 0)
   {
     // @@@ Report error?

@@ -205,7 +205,7 @@ void DocConv::Main ()
   csRef<iDocument> doc = xml->CreateDocument ();
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Parsing...");
   csTicks parse_start = csGetTicks();
-  const char* error = doc->Parse (buf);
+  const char* error = doc->Parse (buf, true);
   csTicks parse_end = csGetTicks();
   buf = 0;
   if (error != 0)

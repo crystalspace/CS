@@ -508,7 +508,7 @@ void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d, const char* phase)
     docsys.AttachNew (new csTinyDocumentSystem ());
   csRef<iDocument> doc (docsys->CreateDocument ());
 
-  const char* err = doc->Parse (dbfile);
+  const char* err = doc->Parse (dbfile, true);
   if (err != 0)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, 

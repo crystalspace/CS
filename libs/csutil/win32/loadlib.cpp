@@ -237,7 +237,7 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
 	    csPtr<iDocumentSystem>(new csTinyDocumentSystem ());
 	  csRef<iDocument> doc = docsys->CreateDocument();
 
-	  char const* errmsg = doc->Parse ((char const*)resData);
+	  char const* errmsg = doc->Parse ((char const*)resData, true);
 	  if (errmsg == 0)	// Parse successful.
 	    metadata = doc;
 	  else			// Parse failed.
@@ -317,7 +317,7 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
 	  csPtr<iDocumentSystem>(new csTinyDocumentSystem ());
 	csRef<iDocument> doc = docsys->CreateDocument();
 
-	char const* errmsg = doc->Parse (&file);
+	char const* errmsg = doc->Parse (&file, true);
 	if (errmsg == 0)	// Parse successful.
 	  metadata = doc;
 	else			// Parse failed.

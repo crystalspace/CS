@@ -461,7 +461,7 @@ bool csWaterDemo::Initialize ()
   csRef<iDocumentSystem> docsys (
     CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
   csRef<iDocument> shaderDoc = docsys->CreateDocument ();
-  shaderDoc->Parse (shaderFile);
+  shaderDoc->Parse (shaderFile, true);
 
   csRef<iShader> shader;
   csRef<iShaderManager> shmgr (CS_QUERY_REGISTRY(object_reg, iShaderManager));

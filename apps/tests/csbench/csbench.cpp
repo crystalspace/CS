@@ -441,7 +441,7 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
   csRef<iShaderCompiler> shcom = GetShaderManager ()->GetCompiler ("XMLShader");
   csRef<iDocument> shaderDoc = GetDocumentSystem ()->CreateDocument ();
   csRef<iFile> shaderFile = vfs->Open (shaderPath, VFS_FILE_READ);
-  shaderDoc->Parse (shaderFile);
+  shaderDoc->Parse (shaderFile, true);
   csRef<iDocumentNode> shadernode = shaderDoc->GetRoot ()->GetNode ("shader");
   csStringID shadertype = strings->Request (shtype);
 
@@ -451,7 +451,7 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
   {
     csRef<iDocument> shaderDoc2 = GetDocumentSystem ()->CreateDocument ();
     csRef<iFile> shaderFile2 = vfs->Open (shaderPath2, VFS_FILE_READ);
-    shaderDoc2->Parse (shaderFile2);
+    shaderDoc2->Parse (shaderFile2, true);
     csRef<iDocumentNode> shadernode2 = shaderDoc2->GetRoot ()
     	->GetNode ("shader");
     shadertype2 = strings->Request (shtype2);

@@ -190,7 +190,7 @@ csConfigDocument::csConfigDocument (const char *Filename, iVFS* vfs) :
   csRef<iDocumentSystem> docsys (csPtr<iDocumentSystem> (
     new csTinyDocumentSystem()));
   csRef<iDocument> doc (docsys->CreateDocument ());
-  doc->Parse (file);
+  doc->Parse (file, true);
   
   document = doc;
   ParseDocument (doc);

@@ -66,7 +66,7 @@ bool csSoftShader_VP::Load(iDataBuffer* program)
     CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
-  const char* error = doc->Parse (program);
+  const char* error = doc->Parse (program, true);
   if (error != 0)
   { 
     csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, 

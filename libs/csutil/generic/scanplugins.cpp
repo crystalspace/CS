@@ -48,7 +48,7 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   csRef<iDocument> doc = docsys->CreateDocument ();
 
   csPhysicalFile file (fullPath, "rb");
-  char const* errmsg = doc->Parse (&file);
+  char const* errmsg = doc->Parse (&file, true);
 
   if (errmsg == 0)	// Parse successful.
     metadata = doc;

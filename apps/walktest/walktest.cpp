@@ -1036,7 +1036,7 @@ public:
   {
     csSleep (2000);
     printf ("================ START PARSING!\n"); fflush (stdout);
-    const char* error = doc->Parse (buf);
+    const char* error = doc->Parse (buf, true);
     if (error != 0)
     {
       printf ("Document system error for file '%s'!", error);

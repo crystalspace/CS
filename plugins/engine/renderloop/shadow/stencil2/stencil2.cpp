@@ -933,7 +933,7 @@ iShader* csStencil2ShadowType::GetShadow ()
 		}
 
 		csRef<iDocument> shaderDoc = docsys->CreateDocument ();
-		shaderDoc->Parse (buf);
+		shaderDoc->Parse (buf, true);
 
 		shadow = shcom->CompileShader (shaderDoc->GetRoot ()->GetNode ("shader"));
 

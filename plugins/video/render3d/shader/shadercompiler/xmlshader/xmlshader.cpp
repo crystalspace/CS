@@ -1450,7 +1450,7 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
     docsys.AttachNew (new csTinyDocumentSystem ());
 
   csRef<iDocument> programDoc = docsys->CreateDocument ();
-  const char* err = programDoc->Parse (programFile);
+  const char* err = programDoc->Parse (programFile, true);
   if (err != 0)
   {
     compiler->Report (CS_REPORTER_SEVERITY_ERROR,

@@ -109,7 +109,7 @@ DemoSequenceLoader::DemoSequenceLoader (Demo* demo,
   	CS_QUERY_REGISTRY (demo->object_reg, iDocumentSystem));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
-  const char* error = doc->Parse (buf);
+  const char* error = doc->Parse (buf, true);
   if (error != 0)
   {
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -517,7 +517,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 		CS_QUERY_REGISTRY (demo->object_reg, iDocumentSystem));
 	if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
 	csRef<iDocument> doc = xml->CreateDocument ();
-	const char* error = doc->Parse (buf);
+	const char* error = doc->Parse (buf, true);
 	if (error != 0)
 	{
 	  demo->Report (CS_REPORTER_SEVERITY_ERROR,

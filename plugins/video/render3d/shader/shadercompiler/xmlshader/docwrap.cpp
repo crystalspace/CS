@@ -351,7 +351,7 @@ void csWrappedDocumentNode::ProcessWrappedNode (NodeProcessingState* state,
 		    docsys.AttachNew (new csTinyDocumentSystem ());
 
 		  csRef<iDocument> includeDoc = docsys->CreateDocument ();
-		  const char* err = includeDoc->Parse (include);
+		  const char* err = includeDoc->Parse (include, true);
 		  if (err != 0)
 		  {
 		    Report (syntaxErrorSeverity, node,

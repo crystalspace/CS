@@ -194,7 +194,7 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
   if (!xml) xml.AttachNew (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
 
-  const char* error = doc->Parse (file);
+  const char* error = doc->Parse (file, true);
   if (error != 0)
   {
     engine->Error ("Error parsing '%s': %s", fileName, error);

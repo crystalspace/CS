@@ -82,7 +82,7 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
           {
             usebfd = true;
             buf[size] = 0;
-            errmsg = doc->Parse (buf);
+            errmsg = doc->Parse (buf, true);
 	    if (errmsg == 0)		// Parse successful.
 	      metadata = doc;
           }
@@ -100,7 +100,7 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
       conflict = true;
     else
     {
-      errmsg = doc->Parse (&file);
+      errmsg = doc->Parse (&file, true);
       if (errmsg == 0)			// Parse successful.
 	metadata = doc;
     }

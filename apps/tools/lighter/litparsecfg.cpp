@@ -208,7 +208,7 @@ bool litConfigParser::ParseConfigFile (const char* vfsfile,
       CS_QUERY_REGISTRY (object_reg, iDocumentSystem);
   if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = docsys->CreateDocument ();
-  const char* error = doc->Parse (databuff);
+  const char* error = doc->Parse (databuff, true);
   if (error != 0)
     return lighter->Report ("Document system error for file '%s': %s!",
     	vfsfile, error);
