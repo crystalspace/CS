@@ -26,7 +26,6 @@
 #include "csutil/inifile.h"
 #include "isystem.h"
 #include "itexture.h"
-#include "video/canvas/common/dyntex2d.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGLX)
 
