@@ -22,6 +22,7 @@
 #include "csws/cstimer.h"
 #include "csws/csapp.h"
 #include "csws/cswsutil.h"
+#include "csws/cswsaux.h"
 #include "cssys/csinput.h"
 
 // Spin box texture name

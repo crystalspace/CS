@@ -30,6 +30,7 @@
 #include "csws/csstatic.h"
 #include "csws/csradbut.h"
 #include "csws/cscwheel.h"
+#include "csws/cswsaux.h"
 #include "isystem.h"
 
 #define MSGBOX_TEXTURE "csws::MessageBoxIcons"

@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "csws/csstatic.h"
 #include "csws/csapp.h"
+#include "csws/cswsaux.h"
 
 csStatic::csStatic (csComponent *iParent, csComponent *iLink, const char *iText,
   csStaticStyle iStyle) : csComponent (iParent)

@@ -22,6 +22,7 @@
 #include "csws/csapp.h"
 #include "csws/csdialog.h"
 #include "csws/cslistbx.h"
+#include "csws/cswsaux.h"
 #include "csutil/scanstr.h"
 #include "isystem.h"
 #include "icfgfile.h"

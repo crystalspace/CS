@@ -97,9 +97,6 @@ struct iGraphics2D;
 struct iGraphics3D;
 struct iEvent;
 
-// CrystalSpace headers
-#include "cswsaux.h"
-
 #ifndef CSWS_INTERNAL
 
 // Include all Windowing System components

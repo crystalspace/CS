@@ -32,6 +32,7 @@
 #include "csws/csapp.h"
 #include "csws/cswsutil.h"
 #include "csws/csskin.h"
+#include "csws/cswsaux.h"
 #include "isystem.h"
 #include "ivfs.h"
 #include "itxtmgr.h"

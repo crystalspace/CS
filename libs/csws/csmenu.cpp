@@ -24,6 +24,7 @@
 #include "csws/cscomp.h"
 #include "csws/csmenu.h"
 #include "csws/csapp.h"
+#include "csws/cswsaux.h"
 #include "cssys/csinput.h"
 
 // Menu texture name

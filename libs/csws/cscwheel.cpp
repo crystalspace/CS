@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csws/cscwheel.h"
 #include "csws/csapp.h"
+#include "csws/cswsaux.h"
 
 #define COLORWHEEL_TEXTURE_NAME	"csws::ColorWheel"
 
