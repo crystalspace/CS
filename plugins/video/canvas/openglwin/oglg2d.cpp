@@ -72,6 +72,8 @@
 #define DISP_CHANGE_BADPARAM        -5
 #endif
 
+#define WINDOW_STYLE (WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
+
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
   LPVOID lpMsgBuf;
@@ -284,7 +286,7 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 
   // create the window.
   DWORD exStyle = 0;
-  DWORD style = WS_POPUP;// | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+  DWORD style =  WINDOW_STYLE;
   if (!FullScreen)
     style |= WS_CAPTION;
   if (FullScreen)
