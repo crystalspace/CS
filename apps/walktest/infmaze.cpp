@@ -30,7 +30,7 @@
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
 #include "csobject/dataobj.h"
-#include "sparse3d.h"
+#include "csutil/sparse3d.h"
 
 InfiniteMaze::InfiniteMaze ()
 {
