@@ -34,13 +34,6 @@
 
     The following variables can be defined:
 
-    #define CS_SYSDEF_PROVIDE_CASE
-      Define the UPPERCASE() and LOWERCASE() macros.
-
-    #define CS_SYSDEF_PROVIDE_PATH
-      Include definition of PATH_SEPARATOR character, MAXPATHLEN and
-      APPEND_SLASH macros.
-
     #define CS_SYSDEF_PROVIDE_MKDIR
       Include definition for MKDIR()
 
@@ -90,10 +83,6 @@
     avoid including util/gnu/getopt.h at the bottom of this file.
 */
 
-#if defined (CS_SYSDEF_PROVIDE_DIR) && !defined (CS_SYSDEF_PROVIDE_PATH)
-#  define CS_SYSDEF_PROVIDE_PATH
-#endif
-
 /*
  * Pull in platform-specific overrides of the requested functionality.
  */
@@ -103,39 +92,6 @@
  * Default definitions for requested functionality.  Platform-specific
  * configuration files may override these.
  */
-
-/**\def PATH_SEPARATOR
- * Path separator character
- */
-/**\def CS_MAXPATHLEN
- * Maximal path length
- */
-#ifdef CS_SYSDEF_PROVIDE_PATH
-#  ifndef PATH_SEPARATOR
-#    if defined(__CYGWIN32__)
-#      define PATH_SEPARATOR '/'
-#    elif defined(OS_OS2) || defined(OS_DOS) || defined(OS_WIN32)
-#      define PATH_SEPARATOR '\\'
-#    else
-#      define PATH_SEPARATOR '/'
-#    endif
-#  endif
-#  ifndef CS_MAXPATHLEN
-#    ifdef _MAX_FNAME
-#      define CS_MAXPATHLEN _MAX_FNAME
-#    else
-#      define CS_MAXPATHLEN 256
-#    endif
-#  endif
-#  define APPEND_SLASH(str,len)			\
-     if ((len)					\
-      && (str[len - 1] != '/')			\
-      && (str[len - 1] != PATH_SEPARATOR))	\
-     {						\
-       str[len++] = PATH_SEPARATOR;		\
-       str[len] = 0;				\
-     } /* endif */
-#endif // CS_SYSDEF_PROVIDE_PATH
 
 /**\def TEMP_DIR
  * Directory for temporary files
@@ -212,7 +168,13 @@
        char fullname [CS_MAXPATHLEN];
        int pathlen = strlen (path);
        memcpy (fullname, path, pathlen + 1);
-       APPEND_SLASH (fullname, pathlen);
+       
+       if ((pathlen) && (fullname[pathlen-1] != PATH_SEPARATOR))
+       {
+	 fullname[pathlen++] = PATH_SEPARATOR;
+	 fullname[pathlen] = 0;
+       }
+              
        strcat (&fullname [pathlen], de->d_name);
        struct stat st;
        stat (fullname, &st);

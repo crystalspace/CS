@@ -26,7 +26,7 @@
 
 bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
 {
-  char *path = getenv ("CRYSTAL");
+  const char *path = getenv ("CRYSTAL");
   if (!path)
   {
     // no setting, use the default.
@@ -69,3 +69,4 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
   oInstallPath [len] = 0;
   return true;
 }
+

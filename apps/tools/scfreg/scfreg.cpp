@@ -18,7 +18,6 @@
 
 #include <stdio.h>
 
-#define CS_SYSDEF_PROVIDE_PATH
 #define CS_SYSDEF_PROVIDE_GETOPT
 #include "cssysdef.h"
 #include "cssys/csshlib.h"

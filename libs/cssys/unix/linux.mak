@@ -97,7 +97,7 @@ else
 endif
 
 # Flags for the compiler which are used when debugging.
-CFLAGS.debug=-g3 -gstabs
+CFLAGS.debug=-g3
 
 # Flags for the compiler which are used when profiling.
 CFLAGS.profile=-pg -O -g
@@ -111,7 +111,7 @@ LFLAGS.GENERAL=
 # Flags for the linker which are used when debugging.
 LFLAGS.debug=-g3
 
-LFLAGS.optimize=-s
+LFLAGS.optimize=
 
 # Flags for the linker which are used when profiling.
 LFLAGS.profile=-pg

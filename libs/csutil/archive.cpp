@@ -42,6 +42,16 @@
 #  define DEFAULT_COMPRESSION_LEVEL Z_DEFAULT_COMPRESSION
 #endif
 
+// helper macro: appends a slash to the string if no slash is present
+#  define APPEND_SLASH(str,len)                 \
+     if ((len)                                  \
+      && (str[len - 1] != '/')                  \
+      && (str[len - 1] != PATH_SEPARATOR))      \
+     {                                          \
+       str[len++] = PATH_SEPARATOR;             \
+       str[len] = 0;                            \
+     } /* endif */
+
 //---------------------------------------------------------------------------
 
 char csArchive::hdr_central[4] = {'P', 'K', CENTRAL_HDR_SIG};
@@ -459,6 +469,7 @@ bool csArchive::WriteZipArchive ()
   int tmplen = strlen (temp_file);
 
   APPEND_SLASH (temp_file, tmplen);
+    
   cs_snprintf (&temp_file[tmplen], CS_MAXPATHLEN - tmplen, TEMP_FILE);
   //sprintf (&temp_file[tmplen], TEMP_FILE);
   if ((temp = fopen (temp_file, "w+b")) == NULL)

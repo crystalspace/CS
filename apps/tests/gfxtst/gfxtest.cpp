@@ -19,7 +19,6 @@
 
 */
 
-#define CS_SYSDEF_PROVIDE_PATH
 #define CS_SYSDEF_PROVIDE_GETOPT
 #include "cssysdef.h"
 #include "cstool/initapp.h"

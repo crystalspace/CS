@@ -17,7 +17,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 #include "csws/csws.h"
 #include "csver.h"

@@ -16,6 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <unistd.h>
+#include <signal.h>
+
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "iutil/vfs.h"
@@ -55,6 +58,21 @@
 #include "csutil/debug.h"
 
 CS_IMPLEMENT_APPLICATION
+
+const char* someptr = "Everything is ok!\n";
+void sighandler (int a)
+{
+        printf ("Enter Handler:\n");
+	    printf ("%s\n", someptr);
+	        signal (a, sighandler);
+		    alarm(1);
+}
+
+void setupsig ()
+{
+        signal (SIGALRM, sighandler);
+	    alarm (1);
+}
 
 //-----------------------------------------------------------------------------
 
@@ -319,6 +337,8 @@ int main (int argc, char* argv[])
 {
   simple = new Simple ();
 
+    setupsig ();
+  
   if (simple->Initialize (argc, argv))
     simple->Start ();
 

@@ -22,7 +22,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define CS_SYSDEF_PROVIDE_PATH
 #define CS_SYSDEF_PROVIDE_DIR
 #define CS_SYSDEF_PROVIDE_ACCESS
 #define CS_SYSDEF_PROVIDE_MKDIR

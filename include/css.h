@@ -33,8 +33,6 @@
 // make it safe so no double cssysdef.h includes
 #ifndef __CS_CSSYSDEFS_H__
 
-#define CS_SYSDEF_PROVIDE_CASE
-#define CS_SYSDEF_PROVIDE_PATH
 #define CS_SYSDEF_PROVIDE_MKDIR
 #define CS_SYSDEF_PROVIDE_GETCWD
 #define CS_SYSDEF_PROVIDE_TEMP

@@ -17,8 +17,6 @@
 */
 
 #include <string.h>
-#define CS_SYSDEF_PROVIDE_PATH
-#include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "sequence.h"
 #include "csutil/scf.h"

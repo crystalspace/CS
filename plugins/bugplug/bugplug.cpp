@@ -15,10 +15,10 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+#include "cssysdef.h"
 
 #include <string.h>
-#define CS_SYSDEF_PROVIDE_PATH
-#include "cssysdef.h"
+
 #include "cssys/sysfunc.h"
 #include "csver.h"
 #include "csutil/scf.h"
