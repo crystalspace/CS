@@ -143,7 +143,17 @@ void csLightMap::SetSize (int w, int h)
   lheight = csLightMap::CalcLightMapHeight (h);
 }
 
-void csLightMap::Alloc (int w, int h, int r, int g, int b)
+void csLightMap::InitColor (int r, int g, int b)
+{
+  long lm_size = lwidth * lheight;
+  csRGBpixel def (r, g, b);
+  // don't know why, but the previous implementation did this:
+  def.alpha = 128;
+  int i;
+  for (i = 0; i < lm_size; i++) static_lm[i] = def;
+}
+
+void csLightMap::Alloc (int w, int h)
 {
   SetSize (w, h);
   delete[] static_lm;
@@ -152,14 +162,6 @@ void csLightMap::Alloc (int w, int h, int r, int g, int b)
   long lm_size = lwidth * lheight;
   static_lm = new csRGBpixel [lm_size];
   real_lm = new csRGBpixel [lm_size];
-
-  csRGBpixel def (r, g, b);
-
-  // don't know why, but the previous implementation did this:
-  def.alpha = 128;
-
-  int i;
-  for (i = 0; i < lm_size; i++) static_lm[i] = def;
 }
 
 struct PolySave

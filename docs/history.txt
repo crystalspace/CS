@@ -16,6 +16,10 @@ chronological order.
 	  yesterday. This would cause walktest to crash at exit.
 	- Jorrit fixed various problems with lights caused by not
 	  initializing the influence radius properly in the constructor.
+	- Jorrit fixed the thing plugin so that the 'clear' in
+	  InitializeDefault actually clears the lightmaps. This should fix
+	  engine->ForceRelight() but it doesn't so more bug hunting is
+	  needed.
 16-Dec-2003
 	- Jorrit fixed a warning in shadervar.h with initializers given in
 	  the wrong order.

@@ -136,9 +136,14 @@ public:
   /**
    * Allocate the lightmap. 'w' and 'h' are the size of the
    * bounding box in lightmap space.
+   */
+  void Alloc (int w, int h);
+
+  /**
+   * Initialize the lightmap to the given color.
    * r,g,b is the ambient light color used to initialize the lightmap.
    */
-  void Alloc (int w, int h, int r, int g, int b);
+  void InitColor (int r, int g, int b);
 
   /**
    * Create a ShadowMap for this LightMap.

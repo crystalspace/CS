@@ -1121,13 +1121,8 @@ void csPolygon3D::Finish ()
         ->blk_lightmap.Alloc ();
       txt_info->SetLightMap (lm);
 
-      csColor ambient;
-      thing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
       lm->Alloc (static_data->polygon_data.tmapping->w_orig,
-      	static_data->polygon_data.tmapping->h,
-          int(ambient.red * 255.0f),
-          int(ambient.green * 255.0f),
-          int(ambient.blue * 255.0f));
+      	static_data->polygon_data.tmapping->h);
 
 #ifndef CS_USE_NEW_RENDERER
       csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;
@@ -1177,13 +1172,22 @@ void csPolygon3D::AddLightpatch (csLightPatch *lp)
   lp->SetPolyCurve (this);
 }
 
-void csPolygon3D::InitializeDefault (bool /*clear*/)
+void csPolygon3D::InitializeDefault (bool clear)
 {
   if (txt_info)
   {
     if (txt_info->lm == 0) return ;
     txt_info->InitLightMaps ();
     txt_info->lightmap_up_to_date = false;
+    if (clear)
+    {
+      csColor ambient;
+      thing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
+      txt_info->lm->InitColor (
+          int(ambient.red * 255.0f),
+          int(ambient.green * 255.0f),
+          int(ambient.blue * 255.0f));
+    }
     return ;
   }
 }
