@@ -153,14 +153,8 @@ STDMETHODIMP SysSystemDriver::XDosSystemDriver::EnablePrintf (bool Enable)
 
 STDMETHODIMP SysSystemDriver::XDosSystemDriver::SetMousePosition (int x, int y)
 {
-//  METHOD_PROLOGUE (SysSystemDriver, DosSystemDriver);
-//  return pThis->Mouse->SetMousePosition (x, y) ? S_OK : E_FAIL;
-  __dpmi_regs regs;
-  regs.x.cx = x;
-  regs.x.dx = y;
-  regs.x.ax = 0x04;
-  __dpmi_int (0x33, &regs);
-  return true;
+  METHOD_PROLOGUE (SysSystemDriver, DosSystemDriver);
+  return ((SysMouseDriver *)pThis->Mouse)->SetMousePosition (x, y) ? S_OK : E_FAIL;
 }
 
 //================================================================ Keyboard ====
