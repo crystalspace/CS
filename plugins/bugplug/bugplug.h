@@ -24,8 +24,9 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/csvector.h"
-#include "ivideo/graph3d.h"
 #include "iutil/plugin.h"
+#include "ivideo/graph3d.h"
+#include "ivaria/bugplug.h"
 
 struct iObjectRegistry;
 struct iVisibilityCuller;
@@ -43,6 +44,8 @@ struct iCamera;
 struct iPolygon3D;
 struct iObjectRegistry;
 struct iPluginManager;
+struct iMaterialWrapper;
+struct iRegion;
 
 class csMatrix3;
 class csVector3;
@@ -50,6 +53,7 @@ class csVector2;
 class csPlane3;
 class csBox2;
 class csBox3;
+class csView;
 
 class csSpider;
 class csShadow;
@@ -99,6 +103,15 @@ class csShadow;
 #define DEBUGCMD_ENGINESTATE	1026	// Test engine state.
 #define DEBUGCMD_VISCULVIEW	1027	// Call viscull->Dump(g3d)
 #define DEBUGCMD_VISCULCMD	1028	// Call viscull->DebugCommand()
+#define DEBUGCMD_DEBUGSECTOR	1029	// Toggle debug sector
+#define DEBUGCMD_DS_FORWARD	1030	// Move forward in debug sector
+#define DEBUGCMD_DS_BACKWARD	1031	// Move backward in debug sector
+#define DEBUGCMD_DS_TURNLEFT	1032	// Rotate left in debug sector
+#define DEBUGCMD_DS_TURNRIGHT	1033	// Rotate right in debug sector
+#define DEBUGCMD_DS_UP		1034	// Move up in debug sector
+#define DEBUGCMD_DS_DOWN	1035	// Move down in debug sector
+#define DEBUGCMD_DS_LEFT	1036	// Move left in debug sector
+#define DEBUGCMD_DS_RIGHT	1037	// Move right in debug sector
 
 /**
  * For key mappings.
@@ -187,6 +200,11 @@ private:
   /// Current visibility culler we are monitoring.
   iVisibilityCuller* visculler;
 
+  /// The Debug Sector.
+  iSector* debug_sector;
+  csView* debug_sector_view;
+  bool debug_sector_show;
+
   /// Set viscull view.
   void VisculView (iCamera* camera);
   /// Call viscull command.
@@ -264,6 +282,64 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
   /// This is set to receive the once per frame nothing  event
   bool HandleEvent (iEvent &event);
+
+  iMaterialWrapper* FindColor (float r, float g, float b);
+  void CleanDebugSector ();
+  void SetupDebugSector ();
+  void DebugSectorBox (const csBox3& box, float r, float g, float b,
+  	const char* name = NULL, iMeshObject* mesh = NULL);
+  void DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
+  	const csVector3& s3, float r, float g, float b);
+  void DebugSectorWireBox (const csBox3& box,
+    	float r, float g, float b, const char* name = NULL);
+  void DebugSectorLine (const csVector3& start, const csVector3& end,
+  	float r, float g, float b);
+  void DebugSectorMarker (const csVector3& point,
+  	float r, float g, float b);
+  void SwitchDebugSector (const csReversibleTransform& trans);
+  bool CheckDebugSector () const { return debug_sector_show; }
+
+  struct BugPlug : public iBugPlug
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csBugPlug);
+    virtual void SetupDebugSector ()
+    {
+      scfParent->SetupDebugSector ();
+    }
+    virtual void DebugSectorBox (const csBox3& box, float r, float g, float b,
+  	const char* name = NULL, iMeshObject* mesh = NULL)
+    {
+      scfParent->DebugSectorBox (box, r, g, b, name, mesh);
+    }
+    virtual void DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
+  	const csVector3& s3, float r, float g, float b)
+    {
+      scfParent->DebugSectorTriangle (s1, s2, s3, r, g, b);
+    }
+    virtual void DebugSectorWireBox (const csBox3& box,
+    	float r, float g, float b, const char* name = NULL)
+    {
+      scfParent->DebugSectorWireBox (box, r, g, b, name);
+    }
+    virtual void DebugSectorLine (const csVector3& start, const csVector3& end,
+  	float r, float g, float b)
+    {
+      scfParent->DebugSectorLine (start, end, r, g, b);
+    }
+    virtual void DebugSectorMarker (const csVector3& point,
+  	float r, float g, float b)
+    {
+      scfParent->DebugSectorMarker (point, r, g, b);
+    }
+    virtual void SwitchDebugSector (const csReversibleTransform& trans)
+    {
+      scfParent->SwitchDebugSector (trans);
+    }
+    virtual bool CheckDebugSector () const
+    {
+      return scfParent->CheckDebugSector ();
+    }
+  } scfiBugPlug;
 
   // This is not an embedded interface in order to avoid
   // a circular reference between this registered event handler

@@ -23,6 +23,8 @@
 #include "csver.h"
 #include "csutil/scf.h"
 #include "csutil/scanstr.h"
+#include "csutil/cscolor.h"
+#include "csutil/debug.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
@@ -30,21 +32,27 @@
 #include "bugplug.h"
 #include "spider.h"
 #include "shadow.h"
-#include "csutil/debug.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "iutil/string.h"
 #include "iutil/event.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
+#include "iutil/dbghelp.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
+#include "ivideo/material.h"
 #include "ivaria/conout.h"
 #include "ivaria/reporter.h"
 #include "iutil/object.h"
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"
 #include "imesh/thing/polygon.h"
+#include "imesh/genmesh.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
@@ -53,11 +61,9 @@
 #include "iengine/camera.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/eventq.h"
-#include "iutil/objreg.h"
-#include "iutil/dbghelp.h"
+#include "iengine/region.h"
+#include "iengine/material.h"
+#include "cstool/csview.h"
 #include "qint.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -71,7 +77,12 @@ SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csBugPlug)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iBugPlug)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBugPlug::BugPlug)
+  SCF_IMPLEMENTS_INTERFACE (iBugPlug)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csBugPlug::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
@@ -98,6 +109,7 @@ void csBugPlug::Report (int severity, const char* msg, ...)
 csBugPlug::csBugPlug (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBugPlug);
   Engine = NULL;
   plugin_mgr = NULL;
   object_reg = NULL;
@@ -118,10 +130,15 @@ csBugPlug::csBugPlug (iBase *iParent)
   selected_mesh = NULL;
   scfiEventHandler = NULL;
   shadow->SetShadowMesh (selected_mesh);
+  debug_sector = NULL;
+  debug_sector_view = NULL;
+  debug_sector_show = false;
 }
 
 csBugPlug::~csBugPlug ()
 {
+  CleanDebugSector ();
+
   if (selected_mesh) selected_mesh->DecRef ();
   if (spider)
   {
@@ -319,6 +336,9 @@ void csBugPlug::HideSpider (iCamera* camera)
 	  EnterEditMode (spider_command, "Enter new fov angle:", buf);
 	}
 	break;
+      case DEBUGCMD_DEBUGSECTOR:
+	SwitchDebugSector (camera->GetTransform ());
+        break;
       case DEBUGCMD_MOUSE1:
         MouseButton3 (camera); //@@@ Temp hack to make bugplug cross platform.
 	break;
@@ -543,7 +563,12 @@ bool csBugPlug::EatKey (iEvent& event)
   }
 
   // Return false if we are not processing our own keys.
-  if (!process_next_key) return false;
+  // If debug_sector_show is true we will process our own keys to...
+  if (!process_next_key && !debug_sector_show) return false;
+  if (debug_sector_show)
+  {
+    process_next_key = false;
+  }
   if (down)
   {
     char buf[100];
@@ -801,8 +826,99 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_DUMPCAM:
       case DEBUGCMD_FOV:
       case DEBUGCMD_FOVANGLE:
+      case DEBUGCMD_DEBUGSECTOR:
         // Set spider on a hunt.
 	UnleashSpider (cmd);
+        break;
+      case DEBUGCMD_DS_LEFT:
+        if (debug_sector_show)
+	{
+	  debug_sector_view->GetCamera ()->Move (csVector3 (-1, 0, 0), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+        break;
+      case DEBUGCMD_DS_RIGHT:
+        if (debug_sector_show)
+	{
+	  debug_sector_view->GetCamera ()->Move (csVector3 (1, 0, 0), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+        break;
+      case DEBUGCMD_DS_FORWARD:
+        if (debug_sector_show)
+	{
+	  debug_sector_view->GetCamera ()->Move (csVector3 (0, 0, 1), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+        break;
+      case DEBUGCMD_DS_BACKWARD:
+        if (debug_sector_show)
+	{
+	  debug_sector_view->GetCamera ()->Move (csVector3 (0, 0, -1), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+        break;
+      case DEBUGCMD_DS_UP:
+        if (debug_sector_show)
+	{
+	  debug_sector_view->GetCamera ()->Move (csVector3 (0, 1, 0), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+        break;
+      case DEBUGCMD_DS_DOWN:
+        if (debug_sector_show)
+	{
+	  debug_sector_view->GetCamera ()->Move (csVector3 (0, -1, 0), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+        break;
+      case DEBUGCMD_DS_TURNLEFT:
+        if (debug_sector_show)
+	{
+	  debug_sector_view->GetCamera ()->GetTransform ().
+	  	RotateThis (CS_VEC_ROT_LEFT, .2);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+        break;
+      case DEBUGCMD_DS_TURNRIGHT:
+        if (debug_sector_show)
+	{
+	  debug_sector_view->GetCamera ()->GetTransform ().
+	  	RotateThis (CS_VEC_ROT_RIGHT, .2);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
         break;
     }
     process_next_key = false;
@@ -850,6 +966,13 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       dbghelp->Dump (G3D);
       dbghelp->DecRef ();
     }
+  }
+
+  if (debug_sector_show)
+  {
+    G3D->BeginDraw (CSDRAW_3DGRAPHICS |
+    	CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN);
+    debug_sector_view->Draw ();
   }
 
   if (edit_mode)
@@ -905,6 +1028,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       }
     }
   }
+
   return false;
 }
 
@@ -1045,6 +1169,15 @@ int csBugPlug::GetCommandCode (const char* cmd, char* args)
   if (!strcmp (cmd, "enginestate"))	return DEBUGCMD_ENGINESTATE;
   if (!strcmp (cmd, "visculview"))	return DEBUGCMD_VISCULVIEW;
   if (!strcmp (cmd, "visculcmd"))	return DEBUGCMD_VISCULCMD;
+  if (!strcmp (cmd, "debugsector"))	return DEBUGCMD_DEBUGSECTOR;
+  if (!strcmp (cmd, "ds_forward"))	return DEBUGCMD_DS_FORWARD;
+  if (!strcmp (cmd, "ds_backward"))	return DEBUGCMD_DS_BACKWARD;
+  if (!strcmp (cmd, "ds_up"))		return DEBUGCMD_DS_UP;
+  if (!strcmp (cmd, "ds_down"))		return DEBUGCMD_DS_DOWN;
+  if (!strcmp (cmd, "ds_turnleft"))	return DEBUGCMD_DS_TURNLEFT;
+  if (!strcmp (cmd, "ds_turnright"))	return DEBUGCMD_DS_TURNRIGHT;
+  if (!strcmp (cmd, "ds_left"))		return DEBUGCMD_DS_LEFT;
+  if (!strcmp (cmd, "ds_right"))	return DEBUGCMD_DS_RIGHT;
 
   return DEBUGCMD_UNKNOWN;
 }
@@ -1393,4 +1526,209 @@ bool csBugPlug::HandleEvent (iEvent& event)
 
   return false;
 }
+
+//---------------------------------------------------------------------------
+
+void csBugPlug::CleanDebugSector ()
+{
+  if (!debug_sector) return;
+  iRegion* cur_region = Engine->GetCurrentRegion ();
+  Engine->SelectRegion ("__BugPlug_region__");
+  iRegion* db_region = Engine->GetCurrentRegion ();
+  db_region->DeleteAll ();
+  Engine->SelectRegion (cur_region);
+
+  iRegionList* reglist = Engine->GetRegions ();
+  reglist->Remove (db_region);
+
+  delete debug_sector_view;
+
+  debug_sector = NULL;
+  debug_sector_view = NULL;
+}
+
+void csBugPlug::SetupDebugSector ()
+{
+  CleanDebugSector ();
+  if (!Engine)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "There is no engine!");
+    return;
+  }
+
+  iRegion* cur_region = Engine->GetCurrentRegion ();
+  Engine->SelectRegion ("__BugPlug_region__");
+  //iRegion* db_region = Engine->GetCurrentRegion ();
+
+  debug_sector = Engine->CreateSector ("__BugPlug_sector__");
+
+  Engine->SelectRegion (cur_region);
+
+  debug_sector_view = new csView (Engine, G3D);
+  int w3d = G3D->GetWidth ();
+  int h3d = G3D->GetHeight ();
+  debug_sector_view->SetRectangle (0, 0, w3d, h3d);
+  debug_sector_view->GetCamera ()->SetSector (debug_sector);
+}
+
+iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
+{
+  // Assumes the current region is the debug region.
+  char name[100];
+  sprintf (name, "mat%d,%d,%d\n", int (r*255), int (g*255), int (b*255));
+  iMaterialWrapper* mw = Engine->FindMaterial (name,
+  	Engine->GetCurrentRegion ());
+  if (mw) return mw;
+  // Create a new material.
+  iMaterial* mat = Engine->CreateBaseMaterial (NULL, 0, NULL, NULL);
+  mat->SetFlatColor (csRGBcolor (int (r*255), int (g*255), int (b*255)));
+  mw = Engine->GetMaterialList ()->NewMaterial (mat);
+  mw->QueryObject ()->SetName (name);
+  mat->DecRef ();
+  mw->Register (G3D->GetTextureManager ());
+  mw->GetMaterialHandle ()->Prepare ();
+  return mw;
+}
+
+void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
+  	const char* name, iMeshObject* mesh)
+{
+  if (!debug_sector) return;
+
+  iMaterialWrapper* mat = FindColor (r, g, b);
+  // Create the box and add it to the engine.
+  csVector3 pos = box.GetCenter ();
+  csBox3 tbox;
+  tbox.Set (box.Min ()-pos, box.Max ()-pos);
+
+  iMeshFactoryWrapper* mf = Engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", name ? name : "__BugPlug_fact__");
+  iGeneralFactoryState* gfs = SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
+  	iGeneralFactoryState);
+  CS_ASSERT (gfs != NULL);
+  gfs->SetMaterialWrapper (mat);
+  gfs->GenerateBox (tbox);
+  gfs->CalculateNormals ();
+  gfs->GetColors ()[0].Set (1, 1, 1);
+  gfs->GetColors ()[1].Set (.5, .5, .5);
+  gfs->GetColors ()[2].Set (.3, .3, .3);
+  gfs->GetColors ()[3].Set (.8, .8, .8);
+  gfs->GetColors ()[4].Set (.4, .4, .4);
+  gfs->GetColors ()[5].Set (.2, .2, .2);
+  gfs->GetColors ()[6].Set (.9, .9, .9);
+  gfs->GetColors ()[7].Set (.6, .6, .6);
+  gfs->DecRef ();
+
+  iMeshWrapper* mw = Engine->CreateMeshWrapper (
+  	mf, name ? name : "__BugPlug_mesh__", debug_sector, pos);
+  mf->DecRef ();
+  iGeneralMeshState* gms = SCF_QUERY_INTERFACE (mw->GetMeshObject (),
+  	iGeneralMeshState);
+  CS_ASSERT (gms != NULL);
+  gms->SetLighting (false);
+  gms->SetColor (csColor (0, 0, 0));
+  gms->SetManualColors (true);
+  gms->DecRef ();
+
+  // The following two calls are not needed since CS_ZBUF_USE and
+  // Object render priority are the default but they show how you
+  // can do this.
+  mw->SetZBufMode (CS_ZBUF_USE);
+  mw->SetRenderPriority (Engine->GetObjectRenderPriority ());
+
+  //mw->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  mw->DecRef ();
+}
+
+void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
+  	const csVector3& s3, float r, float g, float b)
+{
+  if (!debug_sector) return;
+
+  iMaterialWrapper* mat = FindColor (r, g, b);
+  // Create the box and add it to the engine.
+  csVector3 pos = s1;
+  csVector3 ss1 (0);
+  csVector3 ss2 = s2-s1;
+  csVector3 ss3 = s3-s1;
+
+  iMeshFactoryWrapper* mf = Engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", "__BugPlug_tri__");
+  iGeneralFactoryState* gfs = SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
+  	iGeneralFactoryState);
+  CS_ASSERT (gfs != NULL);
+  gfs->SetMaterialWrapper (mat);
+  gfs->SetVertexCount (3);
+  gfs->GetVertices ()[0] = ss1;
+  gfs->GetVertices ()[1] = ss2;
+  gfs->GetVertices ()[2] = ss3;
+  gfs->GetTexels ()[0].Set (0, 0);
+  gfs->GetTexels ()[1].Set (1, 0);
+  gfs->GetTexels ()[2].Set (0, 1);
+  gfs->SetTriangleCount (2);
+  gfs->GetTriangles ()[0].a = 0;
+  gfs->GetTriangles ()[0].b = 1;
+  gfs->GetTriangles ()[0].c = 2;
+  gfs->GetTriangles ()[1].a = 2;
+  gfs->GetTriangles ()[1].b = 1;
+  gfs->GetTriangles ()[1].c = 0;
+
+  gfs->CalculateNormals ();
+  gfs->GetColors ()[0].Set (1, 1, 1);
+  gfs->GetColors ()[1].Set (0, 0, 0);
+  gfs->GetColors ()[2].Set (0, 0, 0);
+  gfs->DecRef ();
+
+  iMeshWrapper* mw = Engine->CreateMeshWrapper (
+  	mf, "__BugPlug_tri__", debug_sector, pos);
+  mf->DecRef ();
+  iGeneralMeshState* gms = SCF_QUERY_INTERFACE (mw->GetMeshObject (),
+  	iGeneralMeshState);
+  CS_ASSERT (gms != NULL);
+  gms->SetLighting (false);
+  gms->SetColor (csColor (0, 0, 0));
+  gms->SetManualColors (true);
+  gms->SetMixMode (CS_FX_ADD);
+  gms->DecRef ();
+
+  mw->SetZBufMode (CS_ZBUF_TEST);
+  mw->SetRenderPriority (Engine->GetAlphaRenderPriority ());
+
+  //mw->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  mw->DecRef ();
+}
+
+void csBugPlug::DebugSectorWireBox (const csBox3& box,
+    	float r, float g, float b, const char* nameNULL)
+{
+  if (!debug_sector) return;
+}
+
+void csBugPlug::DebugSectorLine (const csVector3& start, const csVector3& end,
+  	float r, float g, float b)
+{
+  if (!debug_sector) return;
+}
+
+void csBugPlug::DebugSectorMarker (const csVector3& point,
+  	float r, float g, float b)
+{
+  if (!debug_sector) return;
+}
+
+void csBugPlug::SwitchDebugSector (const csReversibleTransform& trans)
+{
+  if (!debug_sector)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "There is no debug sector!");
+    return;
+  }
+  debug_sector_show = !debug_sector_show;
+  if (debug_sector_show)
+  {
+    debug_sector_view->GetCamera ()->SetTransform (trans);
+  }
+}
+
+//---------------------------------------------------------------------------
 

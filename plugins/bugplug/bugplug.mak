@@ -45,7 +45,7 @@ endif
 INC.BUGPLUG = $(wildcard plugins/bugplug/*.h)
 SRC.BUGPLUG = $(wildcard plugins/bugplug/*.cpp)
 OBJ.BUGPLUG = $(addprefix $(OUT),$(notdir $(SRC.BUGPLUG:.cpp=$O)))
-DEP.BUGPLUG = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.BUGPLUG = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 CFG.BUGPLUG = data/config/bugplug.cfg
 
 TO_INSTALL.CONFIG += $(CFG.BUGPLUG)

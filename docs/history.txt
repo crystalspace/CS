@@ -1,5 +1,35 @@
 The history order is reversed so that new features are at the top.
 
+14-Jun-2002
+	- Upto now BugPlug has always been a plugin with no own interface.
+	  So there was no way to talk with BugPlug. This has now changed.
+	  I added the iBugPlug interface. With this interface it will be
+	  possible to control various features of BugPlug.
+	- Added several commands to enable a new 'debug sector' feature
+	  in BugPlug. With this feature a plugin or application can
+	  create a sector filled with boxes and triangles. This can be
+	  used for debugging purposes. Not all features in this inteface
+	  are already implemented. Currently only filled boxes and
+	  triangles.
+	- Added new 'debugsector' to BugPlug to enable the debug
+	  sector view. Assigned to shift-s key. As soon is this mode
+	  is active you don't have to press ctrl-d anymore for BugPlug
+	  commands. So shift-s is sufficient to exit.
+	- Added several 'ds_...' commands to move in the debug sector.
+	  Assigned to arrow keys and shift-arrow keys for strafe.
+	- Extended Dynavis with a new 'setup_debugsector' command. This
+	  command will use BugPlug to set up a debug sector with boxes
+	  for all objects. The boxes are colored according to the last
+	  visibility result:
+	    white=visible
+	    green=out frustum
+	    dark-gray=invisible because parent kd-tree node is invisible
+	    dark-red=invisible because culled with coverage buffer
+	  While this mode is active Dynavis will mark all objects as
+	  invisible. That means that this mode can run at full speed.
+	- In addition to the boxes the view frustum is also shown with
+	  transparent colored triangles that fade in the distance.
+	- Assigned 'setup_debugsector' to shift-3 key in BugPlug.
 13-Jun-2002
 	- Fixed ode plugin so that it now calls DeferUpdateLighting()
 	  when the object moves so that lighting is calculated. This is

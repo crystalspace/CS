@@ -36,6 +36,7 @@ class csWriteQueue;
 struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
+struct iBugPlug;
 
 enum csVisReason
 {
@@ -99,6 +100,7 @@ class csDynaVis : public iVisibilityCuller
 {
 private:
   iObjectRegistry *object_reg;
+  iBugPlug* bugplug;
   csKDTree* kdtree;
   csCoverageBuffer* covbuf;
   csTiledCoverageBuffer* tcovbuf;
@@ -109,6 +111,7 @@ private:
 
   // For Debug_Dump(g3d): keep the last original camera.
   iCamera* debug_camera;
+  float debug_lx, debug_rx, debug_ty, debug_by;	// Frustum.
 
   // For statistics. Count the number of times VisTest() was called.
   int stats_cnt_vistest;

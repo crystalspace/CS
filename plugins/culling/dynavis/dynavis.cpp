@@ -39,6 +39,7 @@
 #include "imesh/object.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
+#include "ivaria/bugplug.h"
 #include "dynavis.h"
 #include "kdtree.h"
 #include "covbuf.h"
@@ -81,6 +82,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   debug_camera = NULL;
   model_mgr = new csObjectModelManager ();
   write_queue = new csWriteQueue ();
+  bugplug = NULL;
 
   stats_cnt_vistest = 0;
   stats_total_vistest_time = 0;
@@ -112,6 +114,7 @@ csDynaVis::~csDynaVis ()
   delete tcovbuf;
   delete model_mgr;
   delete write_queue;
+  if (bugplug) bugplug->DecRef ();
 }
 
 bool csDynaVis::Initialize (iObjectRegistry *object_reg)
@@ -834,6 +837,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
   static csTicks t2 = 0;
   csTicks t1 = csGetTicks ();
   debug_camera = rview->GetOriginalCamera ();
+  rview->GetFrustum (debug_lx, debug_rx, debug_ty, debug_by);
 
   // Initialize the coverage buffer to all empty.
   if (do_cull_tiled)
@@ -846,6 +850,13 @@ bool csDynaVis::VisTest (iRenderView* rview)
 
   // Update all objects (mark them invisible and update in kdtree if needed).
   UpdateObjects ();
+
+  // If BugPlug is currently showing the debug sector we return here
+  // so that all is marked invisible and rendering goes faster.
+  if (bugplug && bugplug->CheckDebugSector ())
+  {
+    return true;
+  }
 
   // Data for the vis tester.
   VisTest_Front2BackData data;
@@ -966,19 +977,19 @@ iString* csDynaVis::Debug_Dump ()
   return NULL;
 }
 
+struct color { int r, g, b; };
+static color reason_colors[] =
+{
+  { 48, 48, 48 },
+  { 64, 128, 64 },
+  { 128, 64, 64 },
+  { 255, 255, 255 },
+  { 255, 255, 128 },
+  { 255, 255, 196 }
+};
+
 void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 {
-  struct color { int r, g, b; };
-  static color reason_colors[] =
-  {
-    { 48, 48, 48 },
-    { 64, 128, 64 },
-    { 128, 64, 64 },
-    { 255, 255, 255 },
-    { 255, 255, 128 },
-    { 255, 255, 196 }
-  };
-
   if (debug_camera)
   {
     csTicks t1 = csGetTicks ();
@@ -1162,7 +1173,65 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 
 bool csDynaVis::Debug_DebugCommand (const char* cmd)
 {
-  if (!strcmp (cmd, "toggle_frustum"))
+  if (!strcmp (cmd, "setup_debugsector"))
+  {
+    if (!bugplug)
+      bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+    if (bugplug)
+    {
+      bugplug->SetupDebugSector ();
+      int i;
+      for (i = 0 ; i < visobj_vector.Length () ; i++)
+      {
+        csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+          visobj_vector[i];
+        iVisibilityObject* visobj = visobj_wrap->visobj;
+	csBox3 box;
+	CalculateVisObjBBox (visobj, box);
+	bugplug->DebugSectorBox (box,
+		float (reason_colors[visobj_wrap->reason].r) / 256.0,
+		float (reason_colors[visobj_wrap->reason].g) / 256.0,
+		float (reason_colors[visobj_wrap->reason].b) / 256.0);
+      }
+      csVector3 origin (0);
+      const csReversibleTransform& trans = debug_camera->GetTransform ();
+      csVector3 topleft (debug_lx, debug_ty, 1); topleft *= 100.0;
+      csVector3 topright (debug_rx, debug_ty, 1); topright *= 100.0;
+      csVector3 botleft (debug_lx, debug_by, 1); botleft *= 100.0;
+      csVector3 botright (debug_rx, debug_by, 1); botright *= 100.0;
+      origin = trans.This2Other (origin);
+      topleft = trans.This2Other (topleft);
+      topright = trans.This2Other (topright);
+      botleft = trans.This2Other (botleft);
+      botright = trans.This2Other (botright);
+
+      for (i = 0 ; i < 5 ; i++)
+      {
+	csVector3 v1, v2;
+	float fact = float (i) / 5.0;
+	v1 = topleft + fact * (topright-topleft);
+	v2 = topleft + (fact+.1) * (topright-topleft);
+        bugplug->DebugSectorTriangle (origin, v1, v2, .5, 0, 0);
+	v1 = botright + fact * (topright-botright);
+	v2 = botright + (fact+.1) * (topright-botright);
+        bugplug->DebugSectorTriangle (origin, v1, v2, 0, .5, 0);
+	v1 = topleft + fact * (botleft-topleft);
+	v2 = topleft + (fact+.1) * (botleft-topleft);
+        bugplug->DebugSectorTriangle (origin, v1, v2, 0, 0, .5);
+	v1 = botleft + fact * (botright-botleft);
+	v2 = botleft + (fact+.1) * (botright-botleft);
+        bugplug->DebugSectorTriangle (origin, v1, v2, .5, .5, 0);
+      }
+      bugplug->SwitchDebugSector (trans);
+    }
+    else
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"BugPlug not found!");
+    }
+    return true;
+  }
+  else if (!strcmp (cmd, "toggle_frustum"))
   {
     do_cull_frustum = !do_cull_frustum;
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
