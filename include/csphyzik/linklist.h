@@ -51,7 +51,7 @@ public:
     }
   }
 
-  /// Add link
+  /// Add link to front
   void add_link( T* c ){
     head->next = new llLink<T>( c, head->next );
     current = head->next;
@@ -59,6 +59,26 @@ public:
     size++;
   }
   
+  /// Add link to front
+  void push( T* c ){
+    head->next = new llLink<T>( c, head->next );
+    current = head->next;
+    prev = head;
+    size++;
+  }
+
+  /// Pop first element off list
+  T* pop(){
+    T* ret = head->next->contents;
+    prev = head;
+    current = head->next;
+    head->next = current->next;
+    delete current;
+    current = head->next;
+    size--;
+    return ret;
+  }
+
   /// Remove and delete link, delete contents
   void delete_link( T* c ){ 
     if( c == 0 ) return;
