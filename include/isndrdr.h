@@ -50,8 +50,8 @@ public:
   virtual void SetVolume (float vol) = 0;
   /// Get Volume [0, 1]
   virtual float GetVolume () = 0;
-  /// Play a sound buffer without control (it's play until his end)
-  virtual void PlayEphemeral (csSoundData *snd) = 0;
+  /// Play a sound buffer without control (it's play until its end), second arg is for looping
+  virtual void PlayEphemeral (csSoundData *snd, bool loop = false) = 0;
   /// Create a Listener object
   virtual iSoundListener *GetListener () = 0;
   /// Create a Source object
