@@ -21,26 +21,46 @@
 #include "cscom/com.h"
 #include "cs2d/ddraw/g2d.h"
 
-// This is the name of the DLL. Make sure to change this if you change the DLL name!
-// DAN: this might have to be changed for each OS, cuz each OS has a different extension for DLLs.
 #define DLL_NAME "DirectDraw2D.dll"
 
 static unsigned int gb_cRef = 0;
 
-static DllRegisterData gb_regData=
+static DllRegisterData gb_regData =
 {
   &CLSID_DirectDrawGraphics2D,
   SOFTWARE_2D_DRIVER,
   "csGraphics2D DirectDraw DX3 Implementation",
   DLL_NAME
 };
-static DllRegisterData gb_reg3dData=
+
+static DllRegisterData gb_reg3dData =
 {
   &CLSID_DirectDrawWith3DGraphics2D,
   "crystalspace.graphics2d.direct3d.dx5",
   "csGraphics2D DirectDraw DX5 Implementation for Direct3D DX5",
   DLL_NAME
 };
+
+#ifdef CS_STATIC_LINKED
+
+void DDraw2DRegister ()
+{
+  static csGraphics2DDDraw3Factory s_g2dFactory;
+  gb_regData.pClass = &s_g2dFactory;
+  csRegisterServer (&gb_regData);
+
+  static csGraphics2DDDraw3WithDirect3DFactory s_g2dg3dFactory;
+  gb_reg3dData.pClass = &s_g2dg3dFactory;
+  csRegisterServer (&gb_reg3dData);
+}
+
+void DDraw2DUnregister ()
+{
+  csUnregisterServer (&gb_regData);
+  csUnregisterServer (&gb_reg3dData);
+}
+
+#else
 
 void STDAPICALLTYPE ModuleRelease(void)
 {
@@ -105,20 +125,21 @@ STDAPI DllUnregisterServer()
   return csUnregisterServer(&gb_reg3dData);
 }
 
+#endif // CS_STATIC_LINKED
+
 // Implementation of the csGraphics2DDDraw3 factory... ///////////
 
-IMPLEMENT_UNKNOWN_NODELETE( csGraphics2DDDraw3Factory )
+IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DDDraw3Factory)
 
-BEGIN_INTERFACE_TABLE( csGraphics2DDDraw3Factory )
-IMPLEMENTS_INTERFACE( IGraphics2DFactory )
-IMPLEMENTS_INTERFACE( IGraphics2DDirect3DFactory )
-END_INTERFACE_TABLE()
+BEGIN_INTERFACE_TABLE (csGraphics2DDDraw3Factory)
+IMPLEMENTS_INTERFACE (IGraphics2DFactory)
+IMPLEMENTS_INTERFACE (IGraphics2DDirect3DFactory)
+END_INTERFACE_TABLE ()
 
-BEGIN_INTERFACE_TABLE( csGraphics2DDDraw3WithDirect3DFactory )
-IMPLEMENTS_INTERFACE( IGraphics2DFactory )
-IMPLEMENTS_INTERFACE( IGraphics2DDirect3DFactory )
-END_INTERFACE_TABLE()
-
+BEGIN_INTERFACE_TABLE (csGraphics2DDDraw3WithDirect3DFactory)
+IMPLEMENTS_INTERFACE (IGraphics2DFactory)
+IMPLEMENTS_INTERFACE (IGraphics2DDirect3DFactory)
+END_INTERFACE_TABLE ()
 
 STDMETHODIMP csGraphics2DDDraw3Factory::CreateInstance(REFIID riid, ISystem* piSystem, void**ppv)
 {

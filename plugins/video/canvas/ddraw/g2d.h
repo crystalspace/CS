@@ -108,6 +108,7 @@ protected:
   bool m_bDisableDoubleBuffer;
   bool m_bLocked;
   bool m_bUses3D;
+  bool m_bHardwareCursor;
   
   HRESULT RestoreAll();
   unsigned char *LockBackBuf();
