@@ -306,7 +306,7 @@ static uint8 *screen_shot = NULL;
 unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 {
   return screen_shot ?
-    (screen_shot + pfmt.PixelBytes * ((Height - y) * Width + x)) : NULL;
+    (screen_shot + pfmt.PixelBytes * ((Height - y - 1) * Width + x)) : NULL;
 }
 
 csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
