@@ -16,32 +16,25 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOFT_G3D_H__
-#define __SOFT_G3D_H__
+#ifndef __CS_SOFT_G3D_H__
+#define __CS_SOFT_G3D_H__
 
-// GRAPH3D.H
-// csGraphics3DSoftware software rasterizer class.
-
-#include "csutil/scf.h"
 #include "iconfig.h"
-#include "video/renderer/software/sft3dcom.h"
+#include "sft3dcom.h"
 
-
+/// Software 3D renderer
 class csGraphics3DSoftware : public csGraphics3DSoftwareCommon
 {
-
 public:
   DECLARE_IBASE;
-  ///
+  /// Constructor
   csGraphics3DSoftware (iBase *iParent);
-  ///
+  /// Destructor
   virtual ~csGraphics3DSoftware ();
-
-  ///
+  /// Initialize
   virtual bool Initialize (iSystem *iSys);
-  ///
+  /// Open
   virtual bool Open (const char *Title);
-
   /// Create an off screen renderer
   virtual iGraphics3D *CreateOffScreenRenderer (int width, int height, 
      csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size);
@@ -55,8 +48,6 @@ public:
     virtual bool GetOption (int id, csVariant* value);
   } scfiConfig;
   friend struct csSoftConfig;
-
-
 };
 
-#endif // __SOFT_G3D_H__
+#endif // __CS_SOFT_G3D_H__

@@ -145,7 +145,7 @@
 #ifndef NO_draw_scanline_fog
 
 void csScan_8_draw_scanline_fog (int xx, unsigned char* d,
-  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z)
+  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
@@ -194,7 +194,7 @@ fd_done:
 #ifndef NO_draw_scanline_fog_view
 
 void csScan_8_draw_scanline_fog_view (int xx, unsigned char* d,
-  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z)
+  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;

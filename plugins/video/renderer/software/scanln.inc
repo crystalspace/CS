@@ -41,7 +41,7 @@
 #endif
 
 void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-  float u_div_z, float v_div_z)
+  float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   (void)z_buf;
   if (xx <= 0) return;

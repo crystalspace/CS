@@ -19,14 +19,13 @@
 #  error "No valid SCANXX macro defined!"
 #endif
 
-// Hurray! I got it to work :-) The preprocessor is a tricky thing :-(
 #define SCAN_EXPAND(x,y)	csScan_ ## x ## _ ## y
 #define SCAN_NAME(x, y)		SCAN_EXPAND (x, y)
 
 #ifndef NO_draw_scanline_flat_zfil
 
 void SCAN_NAME (SCAN_BPP, draw_scanline_flat_zfil) (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;
@@ -50,7 +49,7 @@ void SCAN_NAME (SCAN_BPP, draw_scanline_flat_zfil) (int xx, unsigned char* d,
 #ifndef NO_draw_scanline_flat_zuse
 
 void SCAN_NAME (SCAN_BPP, draw_scanline_flat_zuse) (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;

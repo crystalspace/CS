@@ -17,36 +17,20 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOFTEX3D_H__
-#define __SOFTEX3D_H__
+#ifndef __CS_SOFTEX3D_H__
+#define __CS_SOFTEX3D_H__
 
-// GRAPH3D.H
-// csDynamicTextureSoft3Dture software rasterizer class.
-
-#include "csutil/scf.h"
 #include "sft3dcom.h"
-
-struct iGraphics2D;
-struct iGraphics3D;
-struct iSystem;
-
 
 class csDynamicTextureSoft3D : public csGraphics3DSoftwareCommon
 {
-
 public:
   DECLARE_IBASE;
-
   iGraphics2D* parentG2D;
-
   csDynamicTextureSoft3D (iSystem *isys, iGraphics2D *iparentG2D);
-  ///
   virtual ~csDynamicTextureSoft3D () {};
-
-  virtual bool Open (const char *Title);
-
   virtual iGraphics3D *CreateOffScreenRenderer (int width, int height, 
      csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size);
 };
 
-#endif // __SOFTEX3D_H__
+#endif // __CS_SOFTEX3D_H__

@@ -1,5 +1,62 @@
 The history order has been reversed so that new features are at the top.
 
+14-May-2000
+	- Eric Sunshine fixed rendering of fog by software renderer in 32-bit
+	  mode on NeXT for both big- and little-endian.  There were several
+	  problems:
+	    - Inconsistent interpretation of TOP8BITS_R8G8B8_USED.  When
+	      Andrew first introduced TOP8BITS_R8G8B8_USED it was interpreted
+	      as meaning that the display driver might _possibly_ use the high
+	      byte of a 4-byte pixel value.  However, in some of his more
+	      recent code, it was interpreted as meaning that the high byte
+	      was _positively_ used.  As a consequence, DrawFogPolygon() chose
+	      completely incorrect values for csScanSetup's FogR, FogG, and
+	      FogB values on little-endian machines.
+	    - Inconsistent interpretation of csScanSetup's FogR, FogG, and
+	      FogB values.  In some cases, the fog scanline functions expected
+	      these values to be normalized to 0x00RRGGBB (note that the high
+	      byte is unused), but DrawFogPolygon() initialized these values
+	      without normalizing them.  Furthermore, even the scanline
+	      functions were inconsistent in their expectation of these
+	      values.  In particular, the calculation of 'fog_pix' neglected
+	      to take normalization into account.
+	    - Incorrect definition of PIXEL_PREPROC() and PIXEL_POSTPROC().
+	      For instance, PIXEL_POSTPROC() was defined as "x << 8".  When
+	      invoked with PIXEL_POSTPROC(r|g|b) this had the unfortunate
+	      side-effect of only shifting the blue color rather than the
+	      composite value, since it expanded to the equivalent of
+	      (r|g|(b<<8)).  The correct definition should have been
+	      "(x) << 8", which would expand to ((r|g|b)<<8) as desired.
+	    - Signed rather than unsigned values in several places, including
+	      the scanline routines as well as csScanSetup's RGB values.
+	      During right-shift operations, this could result in unwanted
+	      sign-extension.
+	- Eric Sunshine fixed a bug in the software renderer's fog scanline
+	  drawing routines where they failed to clamp the blue color to
+	  0x000000ff when recomposing the 'destination' pixel.  (Note that the
+	  red and green colors were correctly clamped to 0x00ff0000 and
+	  0x0000ff00, respectively.)
+	- Eric Sunshine fixed rendering of halos by software renderer in
+	  32-bit mode on NeXT for big-endian machines.  There were several
+	  problems:
+	    - Overflow during computation of a halo color component, which led
+	      to corrupt composite color.  The problem was that
+	      csSoftHalo::Draw() was computing color values based upon color
+	      masks using the formula "(int)(C * pfmt.mask + 0.5)" where C is
+	      a floating point number.  On big-endian NeXT machines, where the
+	      red mask is 0xff000000 this formula overflows (even in the
+	      obvious case when C is 1.0).
+	    - Inconsistent interpretation of csScanSetup's FogR, FogG, and
+	      FogB values.  The halo scanline functions expected these values
+	      to be normalized to 0x00RRGGBB (note that the high byte is
+	      unused), but csSoftHalo::Draw() initialized these values without
+	      normalizing them.
+	    - Signed rather than unsigned values in several places, which
+	      could have resulted in unwanted sign-extension.
+	- Eric Sunshine fixed trilinear filtering in the software renderer for
+	  32-bit big- and little-endian on NeXT.  The problem was that the
+	  32-bit 'filt2' routines neglected to apply PIXEL_POSTPROC() to the
+	  composed pixel value.
 12-May-2000
 	- Michael Dale Long did some bug fixes to csConsole. No longer has
 	  crashes when editing history items.

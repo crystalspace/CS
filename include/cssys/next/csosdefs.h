@@ -26,7 +26,7 @@
 #undef  SOFTWARE_2D_DRIVER
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
 
-// Tell software texture mapper that top 8 bits in RGBA pixel may be used.
+// Tell software renderer that top 8 bits in RGBA pixel may be used.
 #define TOP8BITS_R8G8B8_USED
 
 

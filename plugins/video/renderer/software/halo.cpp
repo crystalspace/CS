@@ -40,11 +40,11 @@ public:
 
   DECLARE_IBASE;
 
-  // Create the halo object
+  /// Create the halo object
   csSoftHalo (float iR, float iG, float iB, unsigned char *iAlpha,
     int iWidth, int iHeight, csGraphics3DSoftwareCommon *iG3D);
 
-  // Destroy the halo object
+  /// Destroy the halo object
   virtual ~csSoftHalo ();
 
   //---------------------------------// iHalo interface implementation //-----//
@@ -181,15 +181,13 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   if (w < 0) w = Width;
   if (h < 0) h = Height;
 
-#if defined (TOP8BITS_R8G8B8_USED)
-  // Used with R|G|B|A big-endian encoding
-  int PostShift = 0;
-#endif
   // Draw a single scanline of halo
   void (*dscan)(void *src, void *dest, int count, int delta, int post_shift) = 0;
   bool clamp = false;
+  const csPixelFormat& pfmt = G3D->pfmt;
+  const int pixel_adjust = G3D->pixel_adjust;
 
-  if (G3D->pfmt.PixelBytes == 1)
+  if (pfmt.PixelBytes == 1)
   {
     Scan.FogR = QRound (R * 255);
     Scan.FogG = QRound (G * 255);
@@ -201,24 +199,26 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   }
   else
   {
-    Scan.FogR = QRound (R * G3D->pfmt.RedMask  ) & (0xffffffff << G3D->pfmt.RedShift);
-    Scan.FogG = QRound (G * G3D->pfmt.GreenMask) & (0xffffffff << G3D->pfmt.GreenShift);
-    Scan.FogB = QRound (B * G3D->pfmt.BlueMask ) & (0xffffffff << G3D->pfmt.BlueShift);
+    Scan.FogR = QRound (R * ((1 << pfmt.RedBits) - 1)) << pfmt.RedShift;
+    Scan.FogG = QRound (G * ((1 << pfmt.GreenBits) - 1)) << pfmt.GreenShift;
+    Scan.FogB = QRound (B * ((1 << pfmt.BlueBits) - 1)) << pfmt.BlueShift;
+
     // halo intensity (0..255)
     Scan.FogDensity = QRound (iIntensity * 255);
-    // Detech when the halo will possibly overflow
-    clamp = (unsigned (Scan.FogR) > G3D->pfmt.RedMask)
-         || (unsigned (Scan.FogG) > G3D->pfmt.GreenMask)
-         || (unsigned (Scan.FogB) > G3D->pfmt.BlueMask);
+    // Detect when the halo will possibly overflow
+    // @@@ FIXME: This is inaccurate if any of the masks are 0xff000000.
+    clamp = (Scan.FogR > pfmt.RedMask)
+         || (Scan.FogG > pfmt.GreenMask)
+         || (Scan.FogB > pfmt.BlueMask);
   }
 
-  switch (G3D->pfmt.PixelBytes)
+  switch (pfmt.PixelBytes)
   {
     case 1:
       dscan = halo_dscan_8;
       break;
     case 2:
-      if (G3D->pfmt.GreenBits == 6)
+      if (pfmt.GreenBits == 6)
       {
         if (clamp)
 	  dscan = halo_dscan_16_565_c;
@@ -239,17 +239,14 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
         dscan = halo_dscan_32_c;
       else
         dscan = halo_dscan_32;
-      unsigned int rs = G3D->pfmt.RedShift;
-      unsigned int gs = G3D->pfmt.GreenShift;
-#if defined (TOP8BITS_R8G8B8_USED)
-      PostShift = (G3D->pfmt.RedShift && G3D->pfmt.GreenShift &&
-        G3D->pfmt.BlueShift) ? 8 : 0;
-      rs -= PostShift; gs -= PostShift;
-#endif
+      unsigned int rs = pfmt.RedShift - pixel_adjust;
+      unsigned int gs = pfmt.GreenShift - pixel_adjust;
       unsigned int r = (rs == 16) ? Scan.FogR : (gs == 16) ? Scan.FogG : Scan.FogB;
       unsigned int g = (rs ==  8) ? Scan.FogR : (gs ==  8) ? Scan.FogG : Scan.FogB;
       unsigned int b = (rs ==  0) ? Scan.FogR : (gs ==  0) ? Scan.FogG : Scan.FogB;
-      Scan.FogR = r; Scan.FogG = g; Scan.FogB = b;
+      Scan.FogR = r >> pixel_adjust;
+      Scan.FogG = g >> pixel_adjust;
+      Scan.FogB = b >> pixel_adjust;
       break;
     }
     default:
@@ -291,12 +288,12 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
   int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
 
-  sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
+  sxL = sxR = dxL = dxR = 0;
   scanL2 = scanR2 = min_i;
   sy = fyL = fyR = QRound (iVertices [scanL2].y);
 
   // Shift amount to get pixel address
-  int pixel_shift = csLog2 (G3D->pfmt.PixelBytes);
+  int pixel_shift = csLog2 (pfmt.PixelBytes);
   // Compute halo X and Y scale
   float scaleX = w / Width;
   float scaleY = h / Height;
@@ -380,11 +377,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
         unsigned char *d = G3D->line_table [sy] + (xL << pixel_shift);
         unsigned char *s = Alpha + QRound (scaleY * (sy - yTL)) * Width +
           QRound (scaleX * (xL - xTL));
-#if defined (TOP8BITS_R8G8B8_USED)
-        dscan (s, d, xR - xL, delta, PostShift);
-#else
-        dscan (s, d, xR - xL, delta, 0);
-#endif
+        dscan (s, d, xR - xL, delta, pixel_adjust);
       }
 
       sxL += dxL;

@@ -16,12 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SFT3DCOM_H__
-#define __SFT3DCOM_H__
+#ifndef __CS_SFT3DCOM_H__
+#define __CS_SFT3DCOM_H__
 
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
-#include "video/renderer/software/soft_txt.h"
+#include "soft_txt.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
 #include "scan.h"
@@ -50,7 +50,6 @@ struct FogBuffer
   float density;
   float red, green, blue;
 };
-
 
 
 class csGraphics3DSoftwareCommon : public iGraphics3D
@@ -84,6 +83,17 @@ protected:
    * combination with line_table to calculate the in-screen offset.
    */
   int pixel_shift;
+
+  /**
+   * Shift amount in bits used to normalize and denormalize pixel data.  Most
+   * drawing routines expect RGB pixel data to occupy least significant part
+   * of RGBA tuple.  This value is used shift the RGB data to the expected
+   * position and back.  For instance, uses pixel data in the form RGBA, and
+   * the drawing routines expect ARGB, then this value will be 8, which means
+   * that the data must be shifted by 8 bits in order to transform it to the
+   * proper format.  Currently only used for 4-byte pixel data.
+   */
+  int pixel_adjust;
 
   /// For debugging: the maximum number of polygons to draw in a frame.
   long dbg_max_polygons_to_draw;
@@ -172,7 +182,7 @@ protected:
   struct
   {
     unsigned char *table;
-    int r, g, b;
+    unsigned long r, g, b;
     int lastuse;
   } fog_tables [MAX_INDEXED_FOG_TABLES];
 
@@ -387,7 +397,4 @@ public:
     int tx, int ty, int tw, int th);
 };
 
-
-
-#endif // __SFT3DCOM_H__
-
+#endif // __CS_SFT3DCOM_H__

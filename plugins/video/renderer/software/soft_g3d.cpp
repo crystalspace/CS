@@ -74,24 +74,13 @@ bool csGraphics3DSoftware::Open (const char *Title)
             bFullScreen ? "full screen" : "windowed", G2D->GetWidth (), G2D->GetHeight (), width, height);
 
   if (pfmt.PixelBytes == 4)
-  {
     SysPrintf (MSG_INITIALIZATION, "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
           pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
-
-    pixel_shift = 2;
-  }
   else if (pfmt.PixelBytes == 2)
-  {
     SysPrintf (MSG_INITIALIZATION, "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
           pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
-
-    pixel_shift = 1;
-  }
   else
-  {
     SysPrintf (MSG_INITIALIZATION, "Using palette mode with 1 byte per pixel (256 colors).\n");
-    pixel_shift = 0;
-  }
 
   return true;
 }

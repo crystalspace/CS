@@ -34,7 +34,7 @@
 #include "isystem.h"
 #include "igraph2d.h"
 #include "ilghtmap.h"
-#include "video/renderer/software/sft3dcom.h"
+#include "sft3dcom.h"
 
 #if defined (DO_MMX)
 #  include "video/renderer/software/i386/cpuid.h"
@@ -128,6 +128,8 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
   do_textured = true;
   do_smaller_rendering = false;
   smaller_buffer = NULL;
+  pixel_shift = 0;
+  pixel_adjust = 0;
   rstate_mipmap = 0;
   do_gouraud = true;
   Gamma = QInt16 (1.0);
@@ -456,7 +458,6 @@ bool csGraphics3DSoftwareCommon::Open (const char *Title)
       SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
       // set "not opened" flag
       width = height = -1;
-
       return false;
   }
 
@@ -465,7 +466,6 @@ bool csGraphics3DSoftwareCommon::Open (const char *Title)
 
   int nWidth = G2D->GetWidth ();
   int nHeight = G2D->GetHeight ();
-//    bool bFullScreen = G2D->GetFullScreen ();
   pfmt = *G2D->GetPixelFormat ();
   if (pfmt.PalEntries)
   {
@@ -483,6 +483,18 @@ bool csGraphics3DSoftwareCommon::Open (const char *Title)
     pfmt.BlueBits   = RGB2PAL_BITS_B;
   }
   texman->SetPixelFormat (pfmt);
+
+  if (pfmt.PixelBytes == 4)
+    pixel_shift = 2;
+  else if (pfmt.PixelBytes == 2)
+    pixel_shift = 1;
+  else
+    pixel_shift = 0;
+
+#ifdef TOP8BITS_R8G8B8_USED
+  if (pfmt.PixelBytes == 4)
+    pixel_adjust = (pfmt.RedShift && pfmt.GreenShift && pfmt.BlueShift) ? 8 : 0;
+#endif
 
   SetDimensions (nWidth, nHeight);
 
@@ -1582,7 +1594,11 @@ texr_done:
 
         // do not draw the rightmost pixel - it will be covered
         // by neightbour polygon's left bound
+#if defined(TOP8BITS_R8G8B8_USED)
+        dscan (xR - xL, d, z_buf, inv_z + deltaX * M, u_div_z + deltaX * J1, v_div_z + deltaX * K1, pixel_adjust);
+#else
         dscan (xR - xL, d, z_buf, inv_z + deltaX * M, u_div_z + deltaX * J1, v_div_z + deltaX * K1);
+#endif
       }
 
       sxL += dxL;
@@ -1730,27 +1746,23 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
     Scan.FogR = QRound (fb->red * ((1 << pfmt.RedBits) - 1)) << pfmt.RedShift;
     Scan.FogG = QRound (fb->green * ((1 << pfmt.GreenBits) - 1)) << pfmt.GreenShift;
     Scan.FogB = QRound (fb->blue * ((1 << pfmt.BlueBits) - 1)) << pfmt.BlueShift;
-    Scan.FogPix = Scan.FogR | Scan.FogG | Scan.FogB;
 
     if (pfmt.PixelBytes == 4)
     {
       // trick: in 32-bit modes set FogR,G,B so that "R" uses bits 16-23,
       // "G" uses bits 8-15 and "B" uses bits 0-7. This is to accomodate
       // different pixel encodings such as RGB, BGR, RBG and so on...
-#ifdef TOP8BITS_R8G8B8_USED
-#  define X 8
-#else
-#  define X 0
-#endif
-      unsigned long r = (pfmt.RedShift == 16+X) ? Scan.FogR :
-        (pfmt.GreenShift == 16+X) ? Scan.FogG : Scan.FogB;
-      unsigned long g = (pfmt.RedShift == 8+X) ? Scan.FogR :
-        (pfmt.GreenShift == 8+X) ? Scan.FogG : Scan.FogB;
-      unsigned long b = (pfmt.RedShift == 0+X) ? Scan.FogR :
-        (pfmt.GreenShift == 0+X) ? Scan.FogG : Scan.FogB;
-#undef X
-      Scan.FogR = r; Scan.FogG = g; Scan.FogB = b;
+      unsigned long r = (pfmt.RedShift == 16+pixel_adjust) ? Scan.FogR :
+        (pfmt.GreenShift == 16+pixel_adjust) ? Scan.FogG : Scan.FogB;
+      unsigned long g = (pfmt.RedShift == 8+pixel_adjust) ? Scan.FogR :
+        (pfmt.GreenShift == 8+pixel_adjust) ? Scan.FogG : Scan.FogB;
+      unsigned long b = (pfmt.RedShift == 0+pixel_adjust) ? Scan.FogR :
+        (pfmt.GreenShift == 0+pixel_adjust) ? Scan.FogG : Scan.FogB;
+      Scan.FogR = r >> pixel_adjust;
+      Scan.FogG = g >> pixel_adjust;
+      Scan.FogB = b >> pixel_adjust;
     }
+    Scan.FogPix = Scan.FogR | Scan.FogG | Scan.FogB;
   }
   else
   {
@@ -1889,7 +1901,11 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
 
         // do not draw the rightmost pixel - it will be covered
         // by neightbour polygon's left bound
+#if defined(TOP8BITS_R8G8B8_USED)
+        dscan (xR - xL, d, z_buf, inv_z + deltaX * M, 0, 0, pixel_adjust);
+#else
         dscan (xR - xL, d, z_buf, inv_z + deltaX * M, 0, 0);
+#endif
       }
 
       sxL += dxL;

@@ -78,11 +78,11 @@ struct csScanSetup
   int InterpolMode;
 
   /// Fog color
-  int FogR;
-  int FogG;
-  int FogB;
+  unsigned long FogR;
+  unsigned long FogG;
+  unsigned long FogB;
   /// The fog pixel (R|G|B for true/hicolor) or index into palette of fog color
-  int FogPix;
+  unsigned long FogPix;
   /// Fog density
   unsigned int FogDensity;
   /// The fog table for paletted (currently only 8-bit) modes
@@ -205,10 +205,18 @@ extern "C"
 /// The only instance of this structure
 extern csScanSetup Scan;
 
+#ifdef TOP8BITS_R8G8B8_USED
+#define PIXEL_ADJUST , int pixel_adjust
+#define PIXEL_INIT = 0
+#else
+#define PIXEL_ADJUST
+#define PIXEL_INIT
+#endif
+
 /// The interface definition for all draw_scanline_XXX routines
 typedef void (csDrawScanline)
   (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z);
+   float u_div_z, float v_div_z PIXEL_ADJUST PIXEL_INIT);
 /// The interface definition for all draw_pi_scanline_XXX routines
 typedef void (csDrawPIScanline)
   (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
@@ -218,6 +226,8 @@ typedef void (csDrawPIScanlineGouraud)
   (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
    unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
    ULong r, ULong g, ULong b, long dr, long dg, long db, bool clamp);
+
+#undef PIXEL_INIT
 
 //---//---//---//---//---//---//---//---//---//---//---//---//- Routines //---//
 

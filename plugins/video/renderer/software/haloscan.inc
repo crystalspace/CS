@@ -15,13 +15,21 @@
 #if (HALO_BPP == 16)
 #  define HALO_PIXTYPE	unsigned short
 #else
-#  define HALO_PIXTYPE	unsigned int
+#  define HALO_PIXTYPE	unsigned long
+#endif
+
+#if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)
+#define PIXEL_PREPROC(x)  ((x) >> pixel_adjust)
+#define PIXEL_POSTPROC(x) ((x) << pixel_adjust)
+#else
+#define PIXEL_PREPROC(x)  (x)
+#define PIXEL_POSTPROC(x) (x)
 #endif
 
 static void HALO_NAME(void *src, void *dest, int count, int delta,
-  int post_shift)
+  int pixel_adjust)
 {
-  (void)post_shift;
+  (void)pixel_adjust;
   unsigned char *A = (unsigned char *)src;
   HALO_PIXTYPE *D = (HALO_PIXTYPE *)dest;
   HALO_PIXTYPE *E = D + count;
@@ -32,15 +40,12 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
       if (a)
       {
         // Get the destination pixel from framebuffer
-        unsigned int d = *D;
-#if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)
-        d >>= post_shift;
-#endif
+        HALO_PIXTYPE d = PIXEL_PREPROC(*D);
 
         // Compute destination R,G,B
-        int dr = d & HALO_RM;
-        int dg = d & HALO_GM;
-        int db = d & HALO_BM;
+        HALO_PIXTYPE dr = d & HALO_RM;
+        HALO_PIXTYPE dg = d & HALO_GM;
+        HALO_PIXTYPE db = d & HALO_BM;
         // Apply alpha
         dr = dr + (a * (Scan.FogR - dr) >> 8);
         dg = dg + (a * (Scan.FogG - dg) >> 8);
@@ -60,15 +65,8 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
         db &= HALO_BM;
 #  endif
 #endif
-
-        // Build the value to write back into framebuffer
-        d = dr | dg | db;
-
-        // Write the new value back into framebuffer
-#if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)
-        d <<= post_shift;
-#endif
-        *D = d;
+        // Build new value and write into framebuffer
+        *D = PIXEL_POSTPROC(dr | dg | db);
       }
       D++;
     }
@@ -81,15 +79,12 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
       if (a)
       {
         // Get the destination pixel from framebuffer
-        unsigned int d = *D;
-#if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)
-        d >>= post_shift;
-#endif
+        HALO_PIXTYPE d = PIXEL_PREPROC(*D);
 
         // Compute destination R,G,B
-        int dr = d & HALO_RM;
-        int dg = d & HALO_GM;
-        int db = d & HALO_BM;
+        HALO_PIXTYPE dr = d & HALO_RM;
+        HALO_PIXTYPE dg = d & HALO_GM;
+        HALO_PIXTYPE db = d & HALO_BM;
         // Apply alpha
         dr = dr + (a * (Scan.FogR - dr) >> 8);
         dg = dg + (a * (Scan.FogG - dg) >> 8);
@@ -109,15 +104,8 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
         db &= HALO_BM;
 #  endif
 #endif
-
-        // Build the value to write back into framebuffer
-        d = dr | dg | db;
-
-        // Write the new value back into framebuffer
-#if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)
-        d <<= post_shift;
-#endif
-        *D = d;
+        // Build new value and write into framebuffer
+        *D = PIXEL_POSTPROC(dr | dg | db);
       }
       D++;
       ax += delta;
@@ -125,6 +113,8 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
   } /* endif */
 }
 
+#undef PIXEL_PREPROC
+#undef PIXEL_POSTPROC
 #undef HALO_NAME
 #undef HALO_BPP
 #undef HALO_PIXTYPE

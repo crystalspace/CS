@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -40,17 +40,17 @@
 //------------------------------------------------------------------
 
 #ifdef TOP8BITS_R8G8B8_USED
-#  define PIXEL_PREPROC(x) x >> 8
-#  define PIXEL_POSTROC(x) x << 8
+#  define PIXEL_PREPROC(x)  ((x) >> pixel_adjust)
+#  define PIXEL_POSTPROC(x) ((x) << pixel_adjust)
 #else
-#  define PIXEL_PREPROC(x) x
-#  define PIXEL_POSTROC(x) x
+#  define PIXEL_PREPROC(x)  (x)
+#  define PIXEL_POSTPROC(x) (x)
 #endif
 
 #ifndef NO_draw_scanline_fog
 
 void csScan_32_draw_scanline_fog (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
@@ -58,7 +58,7 @@ void csScan_32_draw_scanline_fog (int xx, unsigned char* d,
   ULong* _destend = _dest + xx;
   unsigned long izz = QInt24 (inv_z);
   int dzz = QInt24 (Scan.M);
-  ULong fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
+  ULong fog_pix = PIXEL_POSTPROC(Scan.FogR | Scan.FogG | Scan.FogB);
   ULong fog_dens = Scan.FogDensity;
 
   do
@@ -83,11 +83,11 @@ fd_done:
       if (fd < EXP_256_SIZE)
       {
         fd = Scan.exp_256 [fd];
-        unsigned pix = PIXEL_PREPROC (*_dest);
-        register int r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
-        register int g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
-        register int b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
-        *_dest = PIXEL_POSTROC ((r & 0x00ff0000) | (g & 0x0000ff00) | b);
+        ULong pix = PIXEL_PREPROC (*_dest);
+        register ULong r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
+        register ULong g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
+        register ULong b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
+        *_dest = PIXEL_POSTPROC ((r & 0x00ff0000) | (g & 0x0000ff00) | (b & 0x000000ff));
       }
       else
         *_dest = fog_pix;
@@ -106,13 +106,13 @@ fd_done:
 #ifndef NO_draw_scanline_fog_view
 
 void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;
   ULong* _dest = (ULong*)d;
   ULong* _destend = _dest + xx;
-  ULong fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
+  ULong fog_pix = PIXEL_POSTPROC(Scan.FogR | Scan.FogG | Scan.FogB);
   ULong fog_dens = Scan.FogDensity;
 
   do
@@ -124,11 +124,11 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
       if (fd < EXP_256_SIZE)
       {
         fd = Scan.exp_256 [fd];
-        unsigned pix = PIXEL_PREPROC (*_dest);
-        register int r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
-        register int g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
-        register int b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
-        *_dest = PIXEL_POSTROC ((r & 0x00ff0000) | (g & 0x0000ff00) | b);
+        ULong pix = PIXEL_PREPROC (*_dest);
+        register ULong r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
+        register ULong g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
+        register ULong b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
+        *_dest = PIXEL_POSTPROC ((r & 0x00ff0000) | (g & 0x0000ff00) | (b & 0x000000ff));
       }
       else
         *_dest = fog_pix;
@@ -232,7 +232,7 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
         unsigned v = (vv >> 12) & 0x0f;					\
         rbb = (((rbt << 4) + v * (rbb - rbt)) >> 8) & 0x00ff00ff;	\
         gb  = (((gt << 4)  + v * (gb  - gt )) >> 8) & 0x0000ff00;	\
-        *_dest++ = rbb | gb;						\
+        *_dest++ = PIXEL_POSTPROC (rbb | gb);				\
         uu += duu;							\
         vv += dvv;							\
       }									\
@@ -276,25 +276,25 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
       {									\
         if (izz >= *z_buffer)						\
         {								\
-        *z_buffer = izz;						\
-        unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);		\
-        unsigned pl = PIXEL_PREPROC (srcTex [addr]);			\
-        unsigned pr = PIXEL_PREPROC (srcTex [addr + 1]);		\
-        unsigned c, u = (uu >> 12) & 0x0f;				\
-        c = pl & 0x00ff00ff;						\
-        unsigned rbt = (c << 4) + u * ((pr & 0x00ff00ff) - c);		\
-        c = pl & 0x0000ff00;						\
-        unsigned gt  = (c << 4) + u * ((pr & 0x0000ff00) - c);		\
-        pl = PIXEL_PREPROC (srcTex [addr + Scan.tw2]);			\
-        pr = PIXEL_PREPROC (srcTex [addr + Scan.tw2 + 1]);		\
-        c = pl & 0x00ff00ff;						\
-        unsigned rbb = (c << 4) + u * ((pr & 0x00ff00ff) - c);		\
-        c = pl & 0x0000ff00;						\
-        unsigned gb  = (c << 4) + u * ((pr & 0x0000ff00) - c);		\
-        unsigned v = (vv >> 12) & 0x0f;					\
-        rbb = (((rbt << 4) + v * (rbb - rbt)) >> 8) & 0x00ff00ff;	\
-        gb  = (((gt << 4)  + v * (gb  - gt )) >> 8) & 0x0000ff00;	\
-        *_dest = rbb | gb;						\
+          *z_buffer = izz;						\
+          unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);	\
+          unsigned pl = PIXEL_PREPROC (srcTex [addr]);			\
+          unsigned pr = PIXEL_PREPROC (srcTex [addr + 1]);		\
+          unsigned c, u = (uu >> 12) & 0x0f;				\
+          c = pl & 0x00ff00ff;						\
+          unsigned rbt = (c << 4) + u * ((pr & 0x00ff00ff) - c);	\
+          c = pl & 0x0000ff00;						\
+          unsigned gt  = (c << 4) + u * ((pr & 0x0000ff00) - c);	\
+          pl = PIXEL_PREPROC (srcTex [addr + Scan.tw2]);		\
+          pr = PIXEL_PREPROC (srcTex [addr + Scan.tw2 + 1]);		\
+          c = pl & 0x00ff00ff;						\
+          unsigned rbb = (c << 4) + u * ((pr & 0x00ff00ff) - c);	\
+          c = pl & 0x0000ff00;						\
+          unsigned gb  = (c << 4) + u * ((pr & 0x0000ff00) - c);	\
+          unsigned v = (vv >> 12) & 0x0f;				\
+          rbb = (((rbt << 4) + v * (rbb - rbt)) >> 8) & 0x00ff00ff;	\
+          gb  = (((gt << 4)  + v * (gb  - gt )) >> 8) & 0x0000ff00;	\
+          *_dest = PIXEL_POSTPROC (rbb | gb);				\
         }								\
         _dest++;							\
         z_buffer++;							\
@@ -458,3 +458,6 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
 #endif
 
 //------------------------------------------------------------------
+
+#undef PIXEL_PREPROC
+#undef PIXEL_POSTPROC
