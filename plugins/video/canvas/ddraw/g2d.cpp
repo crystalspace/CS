@@ -458,6 +458,7 @@ void csGraphics2DDDraw3::FinishDraw ()
 HRESULT csGraphics2DDDraw3::SetColorPalette()
 {
   HRESULT ret;
+  HRESULT DD_FALSE;
   
 
   if ((Depth==8) && m_bPaletteChanged)
