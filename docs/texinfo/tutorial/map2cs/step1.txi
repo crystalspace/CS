@@ -8,15 +8,11 @@ require a bit complex setup, which I will explain that later.
 
 @itemize @bullet
 @item
-Worldcraft---The Half-Life editor (version 2.1 beta at the time of this
-writing).  You might be technically or legally required to have a legal
-Half-Life on your PC too, so you might want to get this really cool game too,
-if you don't have it yet.
+Worldcraft---The Half-Life editor.  You might be technically or legally
+required to have a legal Half-Life on your PC too, so you might want to get
+this really cool game too, if you don't have it yet.
 
-@uref{ftp://ftp.cdrom.com/pub/planetquake/planethalflife/wavelength/levels/}
-
-Download the most recent version available.  For version 2.1 beta, the package
-name is @file{wc21.exe}.
+@uref{http://halflife.gamedesign.net/}
 
 @item
 QuArK (@emph{optional})---Another editor.  Has a bit strange license, but is
