@@ -917,8 +917,8 @@ actions MsvcProjectGen
   --fragment=$(FRAGMENT_ROOT) \
   --depend=$(DEPEND) \
   --strip-root='$(MSVCGEN_STRIP_ROOT)' \
-  --accept='%null%$(ACCEPTS)' \
-  --reject='%null%$(REJECTS)' \
+  --accept='$(ACCEPTS)' \
+  --reject='$(REJECTS)' \
   --response-file=$(>) \
   --set=project=$(PROJECTNAME) \
   --set=target=$(TARGET) \
@@ -944,8 +944,8 @@ actions together MsvcWorkspaceGen
   $(MSVCGEN_EXTRA_OPTS) \
   --output=$(<) \
   --template-dir=$(MSVCGEN_TEMPLATEDIR) \
-  --accept='%null%$(MSVC.ACCEPTS.$(RAWNAME))' \
-  --reject='%null%$(MSVC.REJECTS.$(RAWNAME))' \
+  --accept='$(MSVC.ACCEPTS.$(RAWNAME))' \
+  --reject='$(MSVC.REJECTS.$(RAWNAME))' \
   --response-file=$(>) \
   --set='$(MSVCGEN_VARIABLES)'
 }

@@ -14,13 +14,15 @@ chronological order.
 	  in CS. It didn't actually calculate the area. Because changing
 	  this function is pretty dangerous I decided to make two new
 	  functions:
-	  	csMath3::DoubleArea3(): which will calculate the real
-		double area (but not signed) with a working formula.
-		csMath3::Direction3(): which will return something <0 or
-		>0 depending on the direction of the triangle.
+	    csMath3::DoubleArea3(): which will calculate the real
+	    double area (but not signed) with a working formula.
+	    csMath3::Direction3(): which will return something <0 or
+	    >0 depending on the direction of the triangle.
 	- Jorrit renamed csPoly3D::GetSignedArea() to GetArea().
 	- Neil Mosafi changed odedynam's default move callback to not call
-	  UpdateMove unless something has actually changed
+	  UpdateMove() unless something has actually changed.
+	- Eric Sunshine fixed 2-Jun-2004 bug in msvcgen.jam which caused
+	  --accept and --reject patterns to be ignored by msvcgen.pl.
 7-Jun-2004
 	- Jorrit added an assignement operator to csHashMapReversible.
 	  This actually fixes the crash at exit bug for some of the CSWS
@@ -60,9 +62,8 @@ chronological order.
 	  several locations; replaced with CS_VERSION.
 	- Eric Sunshine fixed a lot of Texinfo errors and warnings in material
 	  recently added to the CS manual.
-	- Neil Mosafi added GetObject3Ds() function to iVosSector.  This returns
-	  all the loaded objects in the sector
-	
+	- Neil Mosafi added GetObject3Ds() function to iVosSector.  This
+	  returns all the loaded objects in the sector.
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.
