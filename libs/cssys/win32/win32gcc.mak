@@ -103,6 +103,7 @@ SRC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/win32/*.cpp) \
   $(SRCDIR)/libs/cssys/general/getopt.cpp \
   $(SRCDIR)/libs/cssys/general/pluginpaths.cpp \
   $(SRCDIR)/libs/cssys/general/printf.cpp \
+  $(SRCDIR)/libs/cssys/general/resdir.cpp \
   $(SRCDIR)/libs/cssys/general/runloop.cpp \
   $(CSTHREAD.SRC)
 INC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/win32/*.h) $(CSTHREAD.INC)

@@ -32,11 +32,15 @@ The history order is reversed so that new features are at the top.
 	- res added a "special case" for static plugins when checking whether
 	  a class is already registered; in particular, when the class already
 	  registered is inside a static plugin, no message is emitted.
-	- res removed csGetResourcePath () from winsyspath.cpp - it is in
+	- res removed csGetResourcePath() from winsyspath.cpp - it is in
 	  resdir.cpp already.
 	- DeSigna implemented awsWindow::foNoBorder, which existed as
 	  a name, but unaccessable from skin definitions and unhandled
 	  in the code.
+	- Eric Sunshine added cssys/general/resdir.cpp to
+	  cssys/win32/win32gcc.mak, cssys/Jamfile (for Windows), and
+	  msvcgen/win32.mak since Frank removed the csGetResourcePath()
+	  implementation from winsyspath.cpp.
 21-Jun-2003
         - Philip Wyett updated win32.mak to reflect changes/additions in
           the general cssys library affecting MSVC port(s).

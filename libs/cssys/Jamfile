@@ -6,24 +6,49 @@ case WIN32 :
   SearchSubdir win32 ;
   SearchSubdir general ; 
   SYSFILES = [ Wildcard win32 : *.cpp *.h ] 
-		findlib.cpp getopt.cpp printf.cpp runloop.cpp 
-		csprocessorcap.cpp pluginpaths.cpp ;
+		csprocessorcap.cpp
+		findlib.cpp
+		getopt.cpp
+		pluginpaths.cpp ;
+		printf.cpp
+		resdir.cpp
+		runloop.cpp 
 case MACOS_X :
   SearchSubdir macosx ;
   SearchSubdir general ;
   SYSFILES = [ Wildcard macosx : *.cpp *.m *.mm *.h ] 
-		findlib.cpp getopt.cpp printf.cpp sysroot.cpp cspthrd.cpp 
-		cspthrd.h scanplugins.cpp csprocessorcap.cpp pathutil.cpp 
-		apppath.cpp pluginpaths.cpp ;
+		apppath.cpp
+		csprocessorcap.cpp
+		cspthrd.cpp 
+		cspthrd.h
+		findlib.cpp
+		getopt.cpp
+		pathutil.cpp 
+		pluginpaths.cpp ;
+		printf.cpp
+		scanplugins.cpp
+		sysroot.cpp
   InstallConfig macosx.cfg ;
 case * :		# posix/unix/linux mode
   SearchSubdir unix ;
   SearchSubdir general ;
   SYSFILES = [ Wildcard unix : *.cpp *.h ]
-		sysroot.cpp findlib.cpp getopt.cpp printf.cpp runloop.cpp 
-		sysinit.cpp cspthrd.cpp cspthrd.h platformconfig.cpp 
-		scanplugins.cpp csprocessorcap.cpp pathutil.cpp apppath.cpp
-		appdir.cpp resdir.cpp pluginpaths.cpp ;
+		appdir.cpp
+		apppath.cpp
+		csprocessorcap.cpp
+		cspthrd.cpp
+		cspthrd.h
+		findlib.cpp
+		getopt.cpp
+		pathutil.cpp
+		platformconfig.cpp 
+		pluginpaths.cpp ;
+		printf.cpp
+		resdir.cpp
+		runloop.cpp 
+		scanplugins.cpp
+		sysinit.cpp
+		sysroot.cpp
 }
 
 Library cssys :
