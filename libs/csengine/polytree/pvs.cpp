@@ -403,7 +403,6 @@ void csOctree::CalculatePolygonShadow (
     if (rc == CS_CLIP_OUTSIDE)
       num_verts = 0;
     result_poly.SetNumVertices (num_verts);
-    if (num_verts == 0) return;
   }
 }
 
@@ -422,6 +421,7 @@ bool csOctree::CalculatePolygonShadow (
   for (i = 0 ; i < 4 ; i++)
   {
     new_poly.CutToPlane (frustum[i]);
+    // We return
     if (new_poly.GetNumVertices () == 0) return false;
   }
 
@@ -511,6 +511,7 @@ void csOctree::CalculatePolygonShadowArea (
 	csFrustum4* frustums)
 {
   int j;
+  result_poly.MakeEmpty ();
   bool first_time = true;
   for (j = 0 ; j < 8 ; j++)
   {
@@ -544,6 +545,7 @@ bool csOctree::CalculatePolygonsShadowArea (
 	csFrustum4* frustums)
 {
   int j;
+  result_poly.MakeEmpty ();
   bool first_time = true;
   for (j = 0 ; j < 8 ; j++)
   {
@@ -717,11 +719,19 @@ ob.MinX (), ob.MinY (), ob.MinZ (), ob.MaxX (), ob.MaxY (), ob.MaxZ ());
 printf ("  occludee=%f,%f,%f - %f,%f,%f\n",
 oe.MinX (), oe.MinY (), oe.MinZ (), oe.MaxX (), oe.MaxY (), oe.MaxZ ());
 printf ("  plane_nr=%d plane_pos=%f\n", plane_nr, plane_pos);
-int i;
+int i, j;
 for (i = 0 ; i < cur_poly.GetNumVertices () ; i++)
 printf ("  cur: %d: %f,%f,%f\n", i, cur_poly[i].x, cur_poly[i].y, cur_poly[i].z);
 for (i = 0 ; i < result_poly.GetNumVertices () ; i++)
 printf ("  res: %d: %f,%f\n", i, result_poly[i].x, result_poly[i].y);
+for (i = 0 ; i < 8 ; i++)
+{
+printf ("  frustums: %d\n", i);
+  for (j = 0 ; j < 4 ; j++)
+  printf ("    pl=%f,%f,%f,%f\n",
+  frustums[i][j].A (), frustums[i][j].B (), frustums[i][j].C (), frustums[i][j].D ());
+}
+exit (0);
 }
 }
         if (cbuffer->IsFull ())
@@ -745,18 +755,34 @@ bool csOctree::BoxOccludeeShadowOutline (const csBox3& occluder_box,
   result_poly.MakeEmpty ();
   bool first_time = true;
 
+bool verbose = false;
+if ((occluder_box.Min ()-csVector3 (-27.2,0,-6.4)) < .2 &&
+    (occluder_box.Max ()-csVector3 (5,33.6,21.6)) < .2 &&
+    (occludee_box.Min ()-csVector3 (-20.8,-5.2,3.6)) < .2 &&
+    (occludee_box.Max ()-csVector3 (-12.8,0,13.2)) < .2)
+  verbose = true;
+if (verbose) printf ("BoxOccludeeShadowOutline\n");
+
   for (j = 0 ; j < 8 ; j++)
   {
     const csVector3& corner = occludee_box.GetCorner (j);
+if (verbose) printf ("  test corner %d: %f,%f,%f\n", j, corner.x, corner.y, corner.z);
     cur_poly.MakeRoom (6);
     int num_verts;
     occluder_box.GetConvexOutline (corner, cur_poly.GetVertices (),
     	num_verts);
     cur_poly.SetNumVertices (num_verts);
+if (verbose)
+{
+int i;
+for (i = 0 ; i < num_verts ; i++)
+printf ("  outline %d: %f,%f,%f\n", i, cur_poly[i].x, cur_poly[i].y, cur_poly[i].z);
+}
 
     if (!CalculatePolygonShadow (corner, cur_poly, result_poly,
 	first_time, plane_nr, plane_pos, frustums[j]))
       return false;
+if (verbose) printf ("  result_poly.num_verts=%d\n", result_poly.GetNumVertices ());
     first_time = false;
     if (result_poly.GetNumVertices () == 0) break;
   }
@@ -939,7 +965,7 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee_box)
   int plane_nr;
   if (man_dist.x >= man_dist.y && man_dist.x >= man_dist.z)
     plane_nr = PLANE_X;
-  else if (man_dist.y >= man_dist.z && man_dist.y >= man_dist.x)
+  else if (man_dist.y >= man_dist.z)
     plane_nr = PLANE_Y;
   else
     plane_nr = PLANE_Z;
@@ -956,6 +982,7 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee_box)
   // On this plane we now find the largest possible area that will
   // be used. This corresponds with the projection on the plane of
   // the outer set of planes between the occludee and the box.
+  // The area between the outer planes is the area where occluders are relevant.
   csBox2 plane_area;
   CalcBBoxFromBoxes (box, occludee_box, plane_nr, plane_pos, plane_area);
 
@@ -971,22 +998,37 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee_box)
   // Initialize eight frustums as seen from all eight corners of
   // the occludee.
   csFrustum4 frustums[8];
+  csVector3 vxy, vXy, vxY, vXY;
+  vxy = GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (BOX_CORNER_xy)),
+  vXy = GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (BOX_CORNER_Xy));
+  vXY = GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (BOX_CORNER_XY));
+  vxY = GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (BOX_CORNER_xY));
   int i;
+  // First test the direction of one of the planes so that we can see
+  // if we have to negate all the planes.
+  csPlane3 test_plane (occludee_box.GetCorner (0), vxy, vXy);
+  if (test_plane.Classify (vXY) > 0)
+  {
+    csVector3 swap = vxY;
+    vxY = vXy;
+    vXy = swap;
+  }
   for (i = 0 ; i < 8 ; i++)
   {
+printf ("  planes %d\n", i);
     const csVector3& corner = occludee_box.GetCorner (i);
-    frustums[i][0].Set (corner,
-    	GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (0)),
-    	GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (1)));
-    frustums[i][1].Set (corner,
-    	GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (1)),
-    	GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (2)));
-    frustums[i][2].Set (corner,
-    	GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (2)),
-    	GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (3)));
-    frustums[i][3].Set (corner,
-    	GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (3)),
-    	GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (0)));
+    frustums[i][0].Set (corner, vxy, vXy);
+printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
+vxy.x, vxy.y, vxy.z, vXy.x, vXy.y, vXy.z);
+    frustums[i][1].Set (corner, vXy, vXY);
+printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
+vXy.x, vXy.y, vXy.z, vXY.x, vXY.y, vXY.z);
+    frustums[i][2].Set (corner, vXY, vxY);
+printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
+vXY.x, vXY.y, vXY.z, vxY.x, vxY.y, vxY.z);
+    frustums[i][3].Set (corner, vxY, vxy);
+printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
+vxY.x, vxY.y, vxY.z, vxy.x, vxy.y, vxy.z);
   }
 
   BoxOccludeeAddShadows ((csOctreeNode*)root, cbuffer, scale, shift,

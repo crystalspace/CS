@@ -287,16 +287,32 @@ void csPoly3D::CutToPlane (const csPlane3& split_plane)
     ptB = old.vertices[i];
     sideB = split_plane.Classify (ptB);
     if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
-    if ((sideB > 0 && sideA < 0) || (sideB < 0 && sideA > 0))
+    if (sideB > 0)
     {
-      // Compute the intersection point of the line
-      // from point A to point B with the partition
-      // plane. This is a simple ray-plane intersection.
-      csVector3 v = ptB; v -= ptA;
-      float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v ) ;
-      v *= sect; v += ptA;
-      AddVertex (v);
-      if (sideB < 0) AddVertex (ptB);
+      if (sideA < 0)
+      {
+        // Compute the intersection point of the line
+        // from point A to point B with the partition
+        // plane. This is a simple ray-plane intersection.
+        csVector3 v = ptB; v -= ptA;
+        float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v ) ;
+        v *= sect; v += ptA;
+        AddVertex (v);
+      }
+    }
+    else if (sideB < 0)
+    {
+      if (sideA > 0)
+      {
+        // Compute the intersection point of the line
+        // from point A to point B with the partition
+        // plane. This is a simple ray-plane intersection.
+        csVector3 v = ptB; v -= ptA;
+        float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v ) ;
+        v *= sect; v += ptA;
+        AddVertex (v);
+      }
+      AddVertex (ptB);
     }
     else
     {

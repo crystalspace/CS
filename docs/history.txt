@@ -1,5 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
+7-Jun-2000
+	- Paul Garceau added RMDIR equivalent to mingw.mak for cross platform
+	  compatibility.
+	- Gary Haussmann added support for RGBA (transparent meshes) to
+	  DrawTriangleMesh.
+	- Fixed a serious bug in csPoly3D::CutToPlane(). It was completely
+	  messed up.
+	- Fixed a potential bug in PVS. Some of the routines didn't clear
+	  the polygon as they should.
+	- Fixed a bug in the frustum calculation of PVS. The planes were
+	  computed completely wrong.
+	- Restored body dimensions and disabled radiosity. The body
+	  dimensions were changed to make flarge look more natural. But it
+	  is flarge that should be fixed.
+	- Made csloader more robust. It now detects planes which are badly
+	  specified.
 6-Jun-2000
 	- Fixed OpenGL GLX driver (2D driver for OpenGL/X Windows).
 	  It was trying to find a visual with AUX buffers.

@@ -421,7 +421,19 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
 
   if (tx1_given)
     if (tx2_given)
+    {
+      if (!tx1_len)
+      {
+        CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
+	tx1_len = 1;
+      }
+      if (!tx2_len)
+      {
+        CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
+	tx2_len = 1;
+      }
       ppl->SetTextureSpace (tx_orig, tx1, tx1_len, tx2, tx2_len);
+    }
     else
     {
       CsPrintf (MSG_FATAL_ERROR, "Not supported!\n");
@@ -1743,12 +1755,31 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 
   if (tx1_given)
     if (tx2_given)
+    {
+      if (!tx1_len)
+      {
+        CsPrintf (MSG_WARNING, "Bad texture specification for POLYGON '%s'\n", polyname);
+	tx1_len = 1;
+      }
+      if (!tx2_len)
+      {
+        CsPrintf (MSG_WARNING, "Bad texture specification for POLYGON '%s'\n", polyname);
+	tx2_len = 1;
+      }
       poly3d->SetTextureSpace (tx_orig.x, tx_orig.y, tx_orig.z,
                                tx1.x, tx1.y, tx1.z, tx1_len,
                                tx2.x, tx2.y, tx2.z, tx2_len);
+    }
   else
+  {
+    if (!tx1_len)
+    {
+      CsPrintf (MSG_WARNING, "Bad texture specification for POLYGON '%s'\n", polyname);
+      tx1_len = 1;
+    }
     poly3d->SetTextureSpace (tx_orig.x, tx_orig.y, tx_orig.z,
                              tx1.x, tx1.y, tx1.z, tx1_len);
+  }
   else if (plane_name[0])
     poly3d->SetTextureSpace ((csPolyTxtPlane*)World->planes.FindByName (plane_name));
   else if (tx_len)
