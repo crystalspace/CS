@@ -18,7 +18,6 @@
 */
 
 #include "sysdef.h"
-#include "csengine/colldet/collp.h"
 #include "csengine/colldet/collider.h"
 #include "csengine/basic/triangle.h"
 #include "csobject/nameobj.h"

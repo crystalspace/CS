@@ -159,7 +159,7 @@ void HandleDynLight (csDynLight* dyn)
 	  ms->sprite->RemoveFromSectors ();
 	  Sys->view->GetWorld ()->RemoveSprite (ms->sprite);
 	}
-        dyn->ObjRemove(dyn->GetObject(csDataObject::Type()));
+        dyn->ObjRemove(dyn->GetObj(csDataObject::Type()));
         CHK (delete ms);
 	CHK (ExplosionStruct* es = new ExplosionStruct);
 	Sys->piSound->CreateSource (&es->snd, Sys->wMissile_boom);

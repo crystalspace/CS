@@ -25,7 +25,6 @@
 #include "csgeom/polyint.h"
 #include "csobject/csobj.h"
 #include "csengine/basic/fog.h"
-#include "csengine/colldet/collp.h"
 #include "ipolygon.h"
 
 class csPolygonInt;
@@ -420,11 +419,6 @@ public:
    * Delete the returned polygon with 'delete []' when ready.
    */
   csVector2* IntersectCameraZPlane (float z, csVector2* clipper, int num_clip, int& num_pts);
-
-  /*
-   * Collision Detection data.
-   */
-  csColliderP collider;
 
   CSOBJTYPE;
 

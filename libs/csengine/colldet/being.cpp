@@ -21,6 +21,7 @@
 #include "csengine/sysitf.h"
 #include "csengine/colldet/being.h"
 #include "csobject/nameobj.h"
+#include "csobject/cdobj.h"
 
 ///
 bool csBeing::init = false;
@@ -118,12 +119,14 @@ int csBeing::InitWorld (csWorld* world, csCamera* /*camera*/)
     sn--;
     csSector* sp = (csSector*)world->sectors[sn];
     // Initialize the sector itself.
-    CHK (sp->collider.cp = new csCollider(sp));
+    CHK(csCollider* pCollider = new csCollider(sp));
+    csColliderPointerObject::SetCollider(*sp, pCollider, true);
     // Initialize the things in this sector.
     csThing* tp = sp->GetFirstThing ();
     while (tp)
     {
-      CHK (tp->collider.cp = new csCollider(tp));
+      CHK(csCollider* pCollider = new csCollider(tp));
+      csColliderPointerObject::SetCollider(*tp, pCollider, true);
       tp = (csThing*)(tp->GetNext ());
     }
   }
@@ -133,8 +136,10 @@ int csBeing::InitWorld (csWorld* world, csCamera* /*camera*/)
   for (i = 0 ; i < world->sprites.Length () ; i++)
   {
     spp = (csSprite3D*)world->sprites[i];
+    
     // TODO: Should create beings for these.
-    CHK (spp->collider.cp = new csCollider (spp));
+    CHK(csCollider* pCollider = new csCollider(spp));
+    csColliderPointerObject::SetCollider(*spp, pCollider, true);
   }
 
   // Create a player object that follows the camera around.
@@ -155,14 +160,14 @@ int csBeing::_CollisionDetect (csSector* sp, csTransform *cdt)
   int hit = 0;
 
   // Check collision with this sector.
-  hit += CollidePair (this,sp->collider.cp,cdt);
+  hit += CollidePair (this,csColliderPointerObject::GetCollider(*sp),cdt);
 
   // Check collision of with the things in this sector.
   csThing* tp = sp->GetFirstThing ();
   while (tp)
   {
     // TODO, if and when Things can move, their transform must be passed in.
-    hit += CollidePair(this,tp->collider.cp,cdt);
+    hit += CollidePair(this,csColliderPointerObject::GetCollider(*tp),cdt);
     tp = (csThing*)(tp->GetNext ());
     // TODO, should test which one is the closest.
   }
@@ -176,7 +181,8 @@ int csBeing::_CollisionDetect (csSector* sp, csTransform *cdt)
     sp3d = (csSprite3D*)_world->sprites[i];
     cds.SetO2T (sp3d->GetW2T ());
     cds.SetOrigin (sp3d->GetW2TTranslation ());
-    if (sp3d->collider.cp) hit+= CollidePair (this,sp3d->collider.cp,cdt,&cds);
+    csCollider* pCollider = csColliderPointerObject::GetCollider(*sp3d);
+    if (pCollider) hit+= CollidePair (this,pCollider,cdt,&cds);
   }
 
   return hit;

@@ -25,7 +25,6 @@
 #include "csengine/rview.h"
 #include "csengine/cscolor.h"
 #include "csengine/texture.h"
-#include "csengine/colldet/collp.h"
 
 class Dumper;
 class csTextureList;
@@ -422,11 +421,6 @@ public:
 
   /// Remove this sprite from all sectors it is in (but not from the world).
   void RemoveFromSectors ();
-
-  /**
-   * Collision Detection data.
-   */
-  csColliderP collider;
 
   CSOBJTYPE;
 };
