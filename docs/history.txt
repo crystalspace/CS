@@ -15,6 +15,8 @@ chronological order.
 	  and disabled floating portals for new renderer.
 	- Jorrit reverted Marten's last portal fix as it causes totally new
 	  and much worse problems.
+	- Jorrit fixed the /temp path in vfs.cfg. It used ./data instead
+	  of @data.
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during
