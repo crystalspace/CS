@@ -31,7 +31,7 @@ struct iPolygon3D;
 struct iLight;
 struct csRGBpixel;
 struct iFrustumView;
-class csLightingPolyTexQueue;
+struct csLightingPolyTexQueue;
 class csPolygon3D;
 class csPolyTexture;
 class csLightMap;
