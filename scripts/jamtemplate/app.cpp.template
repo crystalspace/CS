@@ -13,8 +13,6 @@
 #include <iutil/eventq.h>
 #include <iutil/vfs.h>
 
-CS_IMPLEMENT_APPLICATION
-
 App#PROJECTNAMECAP#::App#PROJECTNAMECAP#() : csApplicationFramework()
 {
   SetApplicationName("#PROJECTNAME#");
