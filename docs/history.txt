@@ -4,6 +4,16 @@ The history order is reversed so that new features are at the top.
 	- Fixed software renderer procedural textures in 16-bit display
 	  mode. They worked fine in 32-bit display mode and that's why
 	  I didn't notice the bug :-)
+	- Implemented a new fundamental change in the lightmap format.
+	  Due to some HUGE levels that the PlaneShift team is making
+	  (with more than 230000 lightmap files!) I had to rethink the
+	  way lightmaps are stored since ZIP files are limited to 65535
+	  files. So I now group all lightmaps that belong to a single
+	  object in one file. That greatly reduces the number of files
+	  that need to be stored and also increases loading speed
+	  considerably.
+	- Changed csVfsCacheManager so that it will now use one less
+	  directory level if the id == ~0.
 17-Nov-2002
 	- Fixed a huge memory leak in the XML loader. The main document
 	  node was never cleaned up which resulted in the entire node

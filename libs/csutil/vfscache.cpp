@@ -61,7 +61,10 @@ iVFS* csVfsCacheManager::GetVFS ()
 void csVfsCacheManager::CacheName (char* buf, const char* type,
 	const char* scope, uint32 id)
 {
-  sprintf (buf, "%s/%s/%ld", type, scope, id);
+  if (id == ~0)
+    sprintf (buf, "%s/%s", type, scope);
+  else
+    sprintf (buf, "%s/%s/%ld", type, scope, id);
 }
 
 void csVfsCacheManager::SetCurrentType (const char* type)

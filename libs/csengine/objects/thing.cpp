@@ -4236,13 +4236,18 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr, int id)
     cache_mgr->SetCurrentScope (buf);
   }
 
-  int i;
   bool rc = false;
-  for (i = 0; i < polygons.Length (); i++)
-    if (!polygons.Get (i)->ReadFromCache (cache_mgr, id)) goto stop;
-  for (i = 0; i < GetCurveCount (); i++)
-    if (!curves.Get (i)->ReadFromCache (cache_mgr, id)) goto stop;
-  rc = true;
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("thing_lm", NULL, ~0);
+  if (db)
+  {
+    csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
+    int i;
+    for (i = 0; i < polygons.Length (); i++)
+      if (!polygons.Get (i)->ReadFromCache (&mf)) goto stop;
+    for (i = 0; i < GetCurveCount (); i++)
+      if (!curves.Get (i)->ReadFromCache (&mf)) goto stop;
+    rc = true;
+  }
 
 stop:
   cache_mgr->SetCurrentScope (NULL);
@@ -4266,10 +4271,15 @@ bool csThing::WriteToCache (iCacheManager* cache_mgr, int id)
 
   int i;
   bool rc = false;
+  csMemFile mf;
   for (i = 0; i < polygons.Length (); i++)
-    if (!polygons.Get (i)->WriteToCache (cache_mgr, id)) goto stop;
+    if (!polygons.Get (i)->WriteToCache (&mf)) goto stop;
   for (i = 0; i < GetCurveCount (); i++)
-    if (!curves.Get (i)->WriteToCache (cache_mgr, id)) goto stop;
+    if (!curves.Get (i)->WriteToCache (&mf)) goto stop;
+  if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
+    	"thing_lm", NULL, ~0))
+    goto stop;
+
   rc = true;
 
 stop:

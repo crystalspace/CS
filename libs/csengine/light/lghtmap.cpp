@@ -357,8 +357,9 @@ bool csLightMap::ReadFromCache (
     type = "lmcur_d";
 
   data = cache_mgr->ReadCache (type, NULL, uid);
-  if (!data) return true;   // No dynamic data. @@@ Recalc dynamic data?
-  int size = data->GetSize ();
+  if (!data) goto stop;   // No dynamic data. @@@ Recalc dynamic data?
+  int size;
+  size = data->GetSize ();
   d = **data;
   memcpy (lh.header, d, 4);
   d += 4; size -= 4;
@@ -369,11 +370,10 @@ bool csLightMap::ReadFromCache (
   // Calculate the expected size and see if it matches with the
   // size we still have in our data buffer. If it doesn't match
   // we don't load anything.
-  int expected_size = lh.dyn_cnt * (sizeof (ls.light_id) + lm_size);
+  int expected_size;
+  expected_size = lh.dyn_cnt * (sizeof (ls.light_id) + lm_size);
   if (expected_size != size)
-  {
-    return true;
-  }
+    goto stop;
 
   for (i = 0 ; i < lh.dyn_cnt ; i++)
   {
@@ -399,6 +399,7 @@ bool csLightMap::ReadFromCache (
     d += lm_size;
   }
 
+stop:
   CalcMaxStatic ();
   
   return true;
@@ -529,6 +530,262 @@ void csLightMap::Cache (
     {
       return;
     }
+  }
+}
+
+bool csLightMap::ReadFromCache (
+  iFile* file,
+  int w,
+  int h,
+  csObject *obj,
+  bool isPolygon,
+  csEngine *engine)
+{
+  PolySave ps, pswanted;
+  LightHeader lh;
+  LightSave ls;
+  csLight *light;
+  int i;
+
+  csPolygon3D *poly = NULL;
+  csCurve *curve = NULL;
+
+  if (isPolygon)
+    poly = (csPolygon3D *)obj;
+  else
+    curve = (csCurve *)obj;
+
+  SetSize (w, h);
+
+  uint32 uid;
+
+  strcpy (pswanted.header, LMMAGIC);
+  if (poly)
+  {
+    pswanted.x1 = convert_endian (float2short (poly->Vobj (0).x));
+    pswanted.y1 = convert_endian (float2short (poly->Vobj (0).y));
+    pswanted.z1 = convert_endian (float2short (poly->Vobj (0).z));
+    pswanted.x2 = convert_endian (float2short (poly->Vobj (1).x));
+    pswanted.y2 = convert_endian (float2short (poly->Vobj (1).y));
+    pswanted.z2 = convert_endian (float2short (poly->Vobj (1).z));
+    uid = poly->GetPolygonID ();
+  }
+  else
+  {
+    uid = curve->GetCurveID ();
+  }
+
+  pswanted.lm_size = convert_endian (lm_size);
+  pswanted.lm_cnt = convert_endian ((int32) 111);
+
+  char type[5];
+  if (file->Read (type, 4) != 4)
+    return false;
+  type[4] = 0;
+  if (strcmp (type, "lmpn") != 0)
+    return false;
+
+  if (file->Read ((char*)&ps, sizeof (ps)) != sizeof (ps))
+    return false;
+
+  //-------------------------------
+  // Check if cached item is still valid.
+  //-------------------------------
+  if (
+    strncmp (ps.header, pswanted.header, 4) != 0 ||
+    (
+      poly &&
+      (
+        ps.lm_cnt != pswanted.lm_cnt ||
+        ps.x1 != pswanted.x1 ||
+        ps.y1 != pswanted.y1 ||
+        ps.z1 != pswanted.z1 ||
+        ps.x2 != pswanted.x2 ||
+        ps.y2 != pswanted.y2 ||
+        ps.z2 != pswanted.z2 ||
+        ps.lm_size != pswanted.lm_size
+      )
+    ))
+  {
+    // Invalid.
+    return false;
+  }
+
+  //-------------------------------
+  // The cached item is valid.
+  //-------------------------------
+  static_lm.Clear ();
+
+  static_lm.Alloc (lm_size);
+
+  int n = lm_size;
+  char *lm_ptr = (char*)static_lm.GetArray ();
+  while (--n >= 0) 
+  {
+    if (file->Read ((char*)lm_ptr, 3) != 3)
+      return false;
+    lm_ptr += 3;
+    *(lm_ptr++) = -127;
+  }
+
+  //-------------------------------
+  // Check if we have dynamic data.
+  //-------------------------------
+  uint8 have_dyn;
+  if (file->Read ((char*)&have_dyn, sizeof (have_dyn)) != sizeof (have_dyn))
+    return false;
+  if (have_dyn == 0)
+    goto stop;   // No dynamic data. @@@ Recalc dynamic data?
+
+  //-------------------------------
+  // Now load the dynamic data.
+  //-------------------------------
+  if (file->Read ((char*)lh.header, 4) != 4)
+    return false;
+  if (file->Read ((char*)&lh.dyn_cnt, 4) != 4)
+    return false;
+  lh.dyn_cnt = convert_endian (lh.dyn_cnt);
+
+  uint32 size;
+  if (file->Read ((char*)&size, sizeof (size)) != sizeof (size))
+    return false;
+
+  // Calculate the expected size and see if it matches with the
+  // size we still have in our data buffer. If it doesn't match
+  // we don't load anything.
+  size = convert_endian (size);
+
+  int expected_size;
+  expected_size = lh.dyn_cnt * (sizeof (ls.light_id) + lm_size);
+  if (expected_size != size)
+    return false;
+
+  for (i = 0 ; i < lh.dyn_cnt ; i++)
+  {
+    if (file->Read ((char*)&ls.light_id, sizeof (ls.light_id))
+    	!= sizeof (ls.light_id))
+      return false;
+    ls.light_id = convert_endian (ls.light_id);
+
+    iStatLight *il = engine->FindLight (ls.light_id);
+    if (il)
+    {
+      light = il->GetPrivateObject ();
+      csShadowMap *smap = NewShadowMap (light, w, h);
+      if (file->Read ((char*)(smap->GetArray ()), lm_size) != lm_size)
+        return false;
+      smap->CalcMaxShadow ();
+    }
+    else
+    {
+      csEngine::current_engine->Warn (
+          "Warning! Light (%ld) not found!\n",
+          ls.light_id);
+    }
+  }
+
+stop:
+  CalcMaxStatic ();
+  
+  return true;
+}
+
+void csLightMap::Cache (
+  iFile* file,
+  csPolygon3D *poly,
+  csCurve *curve,
+  csEngine *engine)
+{
+  (void)engine;
+
+  PolySave ps;
+
+  uint32 uid;
+
+  strcpy (ps.header, LMMAGIC);
+  if (poly)
+  {
+    ps.x1 = convert_endian (float2short (poly->Vobj (0).x));
+    ps.y1 = convert_endian (float2short (poly->Vobj (0).y));
+    ps.z1 = convert_endian (float2short (poly->Vobj (0).z));
+    ps.x2 = convert_endian (float2short (poly->Vobj (1).x));
+    ps.y2 = convert_endian (float2short (poly->Vobj (1).y));
+    ps.z2 = convert_endian (float2short (poly->Vobj (1).z));
+    uid = poly->GetPolygonID ();
+  }
+  else
+  {
+    uid = curve->GetCurveID ();
+  }
+
+  if (file->Write ("lmpn", 4) != 4)
+    return;
+
+  ps.lm_size = convert_endian (lm_size);
+  ps.lm_cnt = 0;
+  ps.lm_cnt = 111;          // Dummy!
+  ps.lm_cnt = convert_endian (ps.lm_cnt);
+
+  //-------------------------------
+  // Write the normal lightmap data.
+  //-------------------------------
+  file->Write ((char*)&ps, sizeof (ps));
+
+  int n = lm_size;
+  char* lm_ptr = (char*)static_lm.GetArray ();
+  while (--n >= 0) 
+  {
+    file->Write (lm_ptr, 3);
+    lm_ptr += 4;
+  }
+
+  //-------------------------------
+  // Write the dynamic data.
+  //-------------------------------
+  LightHeader lh;
+
+  csShadowMap *smap = first_smap;
+  if (smap)
+  {
+    uint8 have_dyn = 1;
+    file->Write ((char*)&have_dyn, sizeof (have_dyn));
+
+    strcpy (lh.header, "DYNL");
+    lh.dyn_cnt = 0;
+    while (smap)
+    {
+      lh.dyn_cnt++;
+      smap = smap->next;
+    }
+
+    smap = first_smap;
+
+    file->Write (lh.header, 4);
+    uint32 l = convert_endian (lh.dyn_cnt);
+    file->Write ((char *) &l, 4);
+
+    // unsigned long == ls.light_id.
+    uint32 size = lh.dyn_cnt * (sizeof (unsigned long) + lm_size);
+    file->Write ((char*)&size, sizeof (size));
+
+    while (smap)
+    {
+      csLight *light = smap->Light->GetPrivateObject ();
+      if (smap->GetArray ())
+      {
+        LightSave ls;
+        ls.light_id = convert_endian (light->GetLightID ());
+        file->Write ((char *) &ls.light_id, sizeof (ls.light_id));
+        file->Write ((char *)(smap->GetArray ()), lm_size);
+      }
+
+      smap = smap->next;
+    }
+  }
+  else
+  {
+    uint8 have_dyn = 0;
+    file->Write ((char*)&have_dyn, sizeof (have_dyn));
   }
 }
 

@@ -242,6 +242,10 @@ public:
   bool ReadFromCache (iCacheManager* cache_mgr, int id);
   /// Cache the curve lightmaps.
   bool WriteToCache (iCacheManager* cache_mgr, int id);
+  /// Read lighting from file.
+  bool ReadFromCache (iFile* file);
+  /// Cache the curve lightmaps to file.
+  bool WriteToCache (iFile* file);
   /// Prepare lighting.
   void PrepareLighting ();
 

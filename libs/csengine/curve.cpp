@@ -623,6 +623,49 @@ bool csCurve::WriteToCache (iCacheManager* cache_mgr, int id)
   return true;
 }
 
+bool csCurve::ReadFromCache (iFile* file)
+{
+  if (!IsLightable ()) return true;
+  LightMap = new csLightMap ();
+
+  // Allocate space for the LightMap and initialize it to ambient color.
+  int r, g, b;
+  r = csLight::ambient_red;
+  g = csLight::ambient_green;
+  b = csLight::ambient_blue;
+  LightMap->Alloc (
+      CURVE_LM_SIZE * csLightMap::lightcell_size,
+      CURVE_LM_SIZE * csLightMap::lightcell_size,
+      r,
+      g,
+      b);
+
+  LightMap->ReadFromCache (
+      file,
+      CURVE_LM_SIZE * csLightMap::lightcell_size,
+      CURVE_LM_SIZE * csLightMap::lightcell_size,
+      this,
+      false,
+      csEngine::current_engine);
+  LightmapUpToDate = true;
+  return true;
+}
+
+bool csCurve::WriteToCache (iFile* file)
+{
+  if (!LightMap) return true;
+  if (!LightmapUpToDate)
+  {
+    LightmapUpToDate = true;
+    if (
+      csEngine::current_engine->GetLightingCacheMode ()
+        & CS_ENGINE_CACHE_WRITE)
+      LightMap->Cache (file, NULL, this, csEngine::current_engine);
+  }
+
+  return true;
+}
+
 void csCurve::PrepareLighting ()
 {
   if (LightMap) LightMap->ConvertToMixingMode ();

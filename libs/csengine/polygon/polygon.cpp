@@ -2059,6 +2059,110 @@ bool csPolygon3D::WriteToCache (iCacheManager* cache_mgr, int id)
   return true;
 }
 
+bool csPolygon3D::ReadFromCache (iFile* file)
+{
+  if (orig_poly) return true;
+
+  csPolyTexLightMap *lmi = GetLightMapInfo ();
+  if (lmi)
+  {
+    if (lmi->tex->lm == NULL) return true;
+    if (
+      !lmi->tex->lm->ReadFromCache (
+          file,
+          lmi->tex->w_orig,
+          lmi->tex->h,
+          this,
+          true,
+          csEngine::current_engine))
+      lmi->tex->InitLightMaps ();
+    lmi->lightmap_up_to_date = true;
+    return true;
+  }
+
+  csPolyTexGouraud *goi = GetGouraudInfo ();
+  if (goi)
+  {
+    char type[5];
+    if (file->Read (type, 4) != 4)
+      return false;
+    type[4] = 0;
+    if (strcmp (type, "lmpg") != 0)
+      return false;
+
+    uint16 num_vts;
+    if (file->Read ((char*)&num_vts, sizeof (num_vts)) != sizeof (num_vts))
+      return false;
+    num_vts = convert_endian (num_vts);
+    if (num_vts != GetVertexCount ())
+      return false;
+
+    float colors[3];
+    int i;
+    for (i = 0; i < num_vts; i++)
+    {
+      if (file->Read ((char*)colors, sizeof (float)*3) != sizeof (float)*3)
+        return false;
+      colors[0] = convert_endian (colors[0]);
+      colors[1] = convert_endian (colors[1]);
+      colors[2] = convert_endian (colors[2]);
+      goi->SetColor (i, colors[0], colors[1], colors[2]);
+    }
+
+    goi->gouraud_up_to_date = true;
+    return true;
+  }
+
+  return true;
+}
+
+bool csPolygon3D::WriteToCache (iFile* file)
+{
+  if (orig_poly) return true;
+
+  csPolyTexLightMap *lmi = GetLightMapInfo ();
+  if (lmi)
+  {
+    if (lmi->tex->lm == NULL) return true;
+    lmi->lightmap_up_to_date = true;
+    if (csEngine::current_engine->GetLightingCacheMode ()
+          & CS_ENGINE_CACHE_WRITE)
+      lmi->tex->lm->Cache (file, this, NULL,
+		csEngine::current_engine);
+    return true;
+  }
+
+  csPolyTexGouraud *goi = GetGouraudInfo ();
+  if (goi)
+  {
+    goi->gouraud_up_to_date = true;
+
+    if (csEngine::current_engine->GetLightingCacheMode ()
+          & CS_ENGINE_CACHE_WRITE)
+    {
+      file->Write ("lmpg", 4);
+      csColor *sc = goi->GetStaticColors ();
+
+      uint16 num_verts = convert_endian ((uint16) GetVertexCount ());
+      file->Write ((char *) &num_verts, sizeof (num_verts));
+
+      int i;
+      float r, g, b;
+      for (i = 0; i < num_verts; i++)
+      {
+        r = convert_endian (sc[i].red);
+        g = convert_endian (sc[i].green);
+        b = convert_endian (sc[i].blue);
+        file->Write ((char *) &r, sizeof (r));
+        file->Write ((char *) &g, sizeof (g));
+        file->Write ((char *) &b, sizeof (b));
+      }
+    }
+  }
+
+  return true;
+}
+
 void csPolygon3D::PrepareLighting ()
 {
   if (orig_poly) return ;
