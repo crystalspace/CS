@@ -11,6 +11,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
 
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -19,76 +20,153 @@
 #ifndef __VIEWMESH_H__
 #define __VIEWMESH_H__
 
-#include <stdarg.h>
+#include "cssysdef.h"
+#include "csgfx/shadervarcontext.h"
+#include "cstool/csapplicationframework.h"
+#include "cstool/csview.h"
+#include "cstool/meshobjtmpl.h"
+#include "csutil/cmdhelp.h"
+#include "csutil/cmdline.h"
+#include "csutil/csbaseeventh.h"
+#include "csutil/evoutlet.h"
+#include "csutil/plugmgr.h"
+#include "csutil/virtclk.h"
+#include "csutil/xmltiny.h"
+#include "iaws/awscnvs.h"
+#include "iaws/awsecomp.h"
+#include "iengine/camera.h"
+#include "iengine/engine.h"
+#include "iengine/light.h"
+#include "iengine/material.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/region.h"
+#include "iengine/sector.h"
+#include "imap/parser.h"
+#include "imap/writer.h"
+#include "imesh/sprite3d.h"
+#include "imesh/spritecal3d.h"
+#include "imesh/thing.h"
 
-#include "csws/csws.h"
-#include "csutil/stringarray.h"
+class vmAnimCallback;
 
-struct iEngine;
-struct iLoader;
-struct iGraphics3D;
-struct iEvent;
-struct iMeshWrapper;
-struct iKeyboardDriver;
-struct iObjectRegistry;
-struct iVirtualClock;
-struct iSector;
-struct iView;
-struct iMeshObjectFactory;
-
-class ViewMesh : public csApp
+class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 {
 private:
+
   csRef<iEngine> engine;
   csRef<iLoader> loader;
+  csRef<iSaver> saver;
   csRef<iGraphics3D> g3d;
-  iSector* room;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
+  csRef<iVFS> vfs;
   csRef<iView> view;
-  csRef<iMeshWrapper> sprite;
-  csVector3 spritepos;
-  csRef<iMeshObjectFactory> imeshfact;
+  iSector* room;
+  int x,y;
+
+  csRef<iAws> aws;
+  iAwsPrefManager* awsprefs;
+  csRef<iAwsCanvas> awsCanvas;
+  iAwsComponent* form;
+  iAwsComponent* stddlg;
+  enum { load, loadlib, save, savebinary, attach } stddlgPurpose;
+
+  enum { movenormal, moveorigin, rotateorigin } camMode;
+  float rotX, rotY;
+  float roomsize, scale;
   float move_sprite_speed;
-  float scale;
-  bool is_cal3d;
 
-  csMenu *menu,*activemenu;
-  csWindow *dialog;
-  csStringArray stateslist, actionlist, activelist, meshlist,
-    morphanimationlist, socketlist;
-  enum { movenormal, moveorigin, rotateorigin } cammode;
+  csRef<iMeshWrapper> spritewrapper;
+  csRef<iSprite3DFactoryState> sprite;
+  csRef<iSpriteCal3DFactoryState> cal3dsprite;
+  csRef<iSprite3DState> state;
+  csRef<iSpriteCal3DState> cal3dstate;
+  iSpriteSocket* selectedSocket;
+  iSpriteCal3DSocket* selectedCal3dSocket;
+  const char* selectedAnimation;
+  const char* selectedMorphTarget;
+  float meshTx, meshTy, meshTz;
 
-  void UpdateSpritePosition(csTicks elapsed);
-  
-  /**
-   * Attach a mesh file to a socket on the main mesh that is loaded.
-   * \param socketNumber  The number in the list of loaded sockets that we 
-   *                       want to attach to.
-   * \param fileName The VFS path to the mesh we want to attach.
-   */
-  bool AttachMeshToSocket (int socketNumber, const char* fileName, 
-    float xrot,	float yrot, float zrot);
-  
-  /**
-   * Create the window for the rotation of a mesh attached to a slot.
-   * \param socketNumber  The number in the list of loaded sockets that we 
-   *                       want to attach to.
-   * \param fileName The VFS path to the mesh we want to attach.
-   */
-  void CreateRotationWindow(int socketNumber, char* filename);
-  
-public:
-  ViewMesh (iObjectRegistry *object_reg, csSkin &Skin);
-  virtual ~ViewMesh ();
+  vmAnimCallback* callback;
+
+  bool OnKeyboard (iEvent&);
+  bool HandleEvent (iEvent &);
+
+  void ProcessFrame ();
+  void FinishFrame ();
 
   static void Help ();
-  bool LoadSprite (const char *filename,float scale);
-  bool SaveSprite (const char *filename);
-  void ConstructMenu();
+  void HandleCommandLine();
 
-  virtual bool Initialize ();
-  virtual bool HandleEvent (iEvent&);
-  virtual void Draw();
+  void CreateRoom ();
+  void CreateGui ();
+  void LoadLibrary(const char* path, const char* file);
+  void LoadTexture(const char* path, const char* file, const char* name);
+  void LoadSprite (const char* path, const char* file);
+  void SaveSprite (const char* path, const char* file, bool binary);
+  void AttachMesh (const char* path, const char* file);
+  void SelectSocket (const char* newsocket);
+  void ScaleSprite (float newScale);
+  void UpdateSocketList ();
+  void UpdateMorphList ();
+  void UpdateAnimationList ();
+  void UpdateSocket ();
+
+  //SETTING
+  static void CameraMode (void* awst, iAwsSource *s);
+  static void LoadButton (void* awst, iAwsSource *s);
+  static void LoadLibButton (void* awst, iAwsSource *s);
+  static void SaveButton (void* awst, iAwsSource *s);
+  static void SaveBinaryButton (void* awst, iAwsSource *s);
+  static void SetScaleSprite (void* awst, iAwsSource *s);
+  //ANIMATION
+  static void ReversAnimation (void* awstut, iAwsSource *source);
+  static void StopAnimation (void* awstut, iAwsSource *source);
+  static void SlowerAnimation (void* awstut, iAwsSource *source);
+  static void AddAnimation (void* awstut, iAwsSource *source);
+  static void FasterAnimation (void* awstut, iAwsSource *source);
+  static void SetAnimation (void* awstut, iAwsSource *source);
+  static void RemoveAnimation (void* awstut, iAwsSource *source);
+  static void ClearAnimation (void* awstut, iAwsSource *source);
+  static void SelAnimation (void* awstut, iAwsSource *source);
+  //SOCKET
+  static void SetMesh (void* awstut, iAwsSource *source);
+  static void SetSubMesh (void* awstut, iAwsSource *source);
+  static void SetTriangle (void* awstut, iAwsSource *source);
+  static void SetRotX (void* awstut, iAwsSource *source);
+  static void SetRotY (void* awstut, iAwsSource *source);
+  static void SetRotZ (void* awstut, iAwsSource *source);
+  static void AttachButton (void* awst, iAwsSource *s);
+  static void DetachButton (void* awst, iAwsSource *s);
+  static void AddSocket (void* awst, iAwsSource *s);
+  static void DelSocket (void* awst, iAwsSource *s);
+  static void SelSocket (void* awst, iAwsSource *s);
+  static void RenameSocket (void* awst, iAwsSource *s);
+  //MORPH
+  static void SelMorph (void* awst, iAwsSource *s);
+  static void BlendButton (void* awst, iAwsSource *s);
+  static void ClearButton (void* awst, iAwsSource *s);
+
+public:
+
+  ViewMesh ();
+  ~ViewMesh ();
+
+  void OnExit ();
+  bool OnInitialize (int argc, char* argv[]);
+
+  bool Application ();
+
+private:
+
+  bool ParseDir(const char* filename);
+  void StdDlgUpdateLists(const char* filename);
+
+  static void StdDlgOkButton (void* awst, iAwsSource *s);
+  static void StdDlgCancleButton (void* awst, iAwsSource *s);
+  static void StdDlgFileSelect (void* awst, iAwsSource *s);
+  static void StdDlgDirSelect (void* awst, iAwsSource *s);
 };
 
 #endif // __VIEWMESH_H__
-

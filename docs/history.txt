@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Dec-2004
+	- PK replaced the old, csws using viewmesh with a new, aws using version.
 13-Dec-2004
 	- Marten removed the old renderer and methods/classes/plugins
 	  deprecated together with it, for closer info about which see the

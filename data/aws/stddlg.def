@@ -1,0 +1,72 @@
+window "StdDlg"
+{
+  Style: wfsNormal
+  Options: wfoTitle+wfoControl
+  Frame: (0,0) - (242,281)
+  Title: "Select File"
+  component "TextPath" is "Label"
+  {
+    Frame: (10,0) - (191,20)
+    Caption: "Path" 
+  }
+  component "TextFile" is "Label"
+  {
+    Frame: (10,40) - (201,60)
+    Caption: "File"
+  }
+  component "InputFile" is "Text Box"
+  {
+    Frame: (10,60) - (220,82)
+  }
+  component "InputPath" is "Text Box"
+  {
+    Frame: (10,20) - (220,42)
+  }
+  component "FileList" is "List Box"
+  {
+    Type: lbtList
+    Style: lbfsSimple
+    Highlight: "/aws/lbhi.png"
+    Columns: 1
+    DefaultSortCol: 0
+    Column0Width: 100
+    Column0Caption: "Files"
+    Frame: (120,90) - (220,211)
+    connect 
+    {
+      signalListBoxSelectionChanged -> StdDlg::FileSelect
+    }
+  }
+  component "DirList" is "List Box"
+  {
+    Type: lbtList
+    Highlight: "/aws/lbhi.png"
+    Columns: 1
+    DefaultSortCol: 0
+    Column0Width: 100
+    Column0Caption: "Directory"
+    Frame: (10,90) - (110,211)
+    connect 
+    {
+      signalListBoxSelectionChanged -> StdDlg::DirSelect
+    }
+  }
+  component "CancleButton" is "Command Button"
+  {
+    Frame: (10,220) - (111,241)
+    Caption: "Cancle"
+    connect 
+    {
+      signalRadButtonClicked -> StdDlg::CancleButton
+    }
+  }
+  component "OkButton" is "Command Button"
+  {
+    Frame: (120,220) - (221,241)
+    Caption: "OK"
+    connect 
+    {
+      signalRadButtonClicked -> StdDlg::OkButton
+    }
+  }
+}

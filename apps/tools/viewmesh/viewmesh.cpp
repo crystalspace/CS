@@ -18,54 +18,7 @@
 */
 
 /* ViewMesh: tool for displaying mesh objects (3d sprites) */
-#include "cssysdef.h"
 #include "viewmesh.h"
-#include "cstool/csview.h"
-#include "cstool/initapp.h"
-#include "csutil/cmdhelp.h"
-#include "csutil/cscolor.h"
-#include "csutil/event.h"
-#include "csutil/nulcache.h"
-#include "csutil/sysfunc.h"
-#include "csutil/util.h"
-#include "iengine/camera.h"
-#include "iengine/engine.h"
-#include "iengine/light.h"
-#include "iengine/material.h"
-#include "iengine/mesh.h"
-#include "iengine/movable.h"
-#include "iengine/region.h"
-#include "iengine/sector.h"
-#include "iengine/texture.h"
-#include "igraphic/imageio.h"
-#include "imap/parser.h"
-#include "imap/writer.h"
-#include "imesh/fountain.h"
-#include "imesh/object.h"
-#include "imesh/partsys.h"
-#include "imesh/sprite3d.h"
-#include "imesh/spritecal3d.h"
-#include "imesh/thing.h"
-#include "iutil/cache.h"
-#include "iutil/cmdline.h"
-#include "iutil/comp.h"
-#include "iutil/csinput.h"
-#include "iutil/event.h"
-#include "iutil/eventh.h"
-#include "iutil/eventq.h"
-#include "iutil/objreg.h"
-#include "iutil/plugin.h"
-#include "iutil/vfs.h"
-#include "iutil/virtclk.h"
-#include "ivaria/reporter.h"
-#include "ivaria/stdrep.h"
-#include "ivideo/fontserv.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/material.h"
-#include "ivideo/natwin.h"
-#include "ivideo/texture.h"
-#include "ivideo/txtmgr.h"
 
 // Hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -79,67 +32,209 @@
 
 CS_IMPLEMENT_APPLICATION
 
-#define VIEWMESH_COMMAND_LOADMESH       77701
-#define VIEWMESH_COMMAND_SAVEMESH       77702
-#define VIEWMESH_COMMAND_LOADLIB        77703
-#define VIEWMESH_STATES_SELECT_START    77800
-#define VIEWMESH_OVERRIDE_SELECT_START  77900
-#define VIEWMESH_STATES_ADD_START       78000
-#define VIEWMESH_STATES_CLEAR_START     78100
-#define VIEWMESH_MESH_SELECT_START      78200
-#define VIEWMESH_COMMAND_CAMMODE1       77711
-#define VIEWMESH_COMMAND_CAMMODE2       77712
-#define VIEWMESH_COMMAND_CAMMODE3       77713
-#define VIEWMESH_COMMAND_MOVEANIMFASTER 77714
-#define VIEWMESH_COMMAND_MOVEANIMSLOWER 77715
-#define VIEWMESH_COMMAND_REVERSEACTION  77716
-#define VIEWMESH_COMMAND_FORWARDACTION  77717
-#define VIEWMESH_COMMAND_BLEND          78300
-#define VIEWMESH_COMMAND_CLEAR          78400
-#define VIEWMESH_COMMAND_SOCKET         78500
-#define VIEWMESH_COMMAND_LOADSOCKET     79000
-#define VIEWMESH_COMMAND_ATTACH_SOCKET  80000
-
-#define DEFAULT_SOCKET_X_ROTATION -PI/2.0f
-#define DEFAULT_SOCKET_Y_ROTATION 0.0f
-#define DEFAULT_SOCKET_Z_ROTATION 0.0f
+//---------------------------------------------------------------------------
 
 #ifdef CS_HAS_CAL3D
 struct vmAnimCallback : public CalAnimationCallback
 {
-    vmAnimCallback() {}
+  vmAnimCallback() {}
 
-    void AnimationUpdate(float anim_time,CalModel *model)
-    {
-        printf("Anim Update at time %.2f.\n",anim_time);
-    }
+  void AnimationUpdate(float anim_time,CalModel *model)
+  {
+    printf("Anim Update at time %.2f.\n",anim_time);
+  }
 
-    void AnimationComplete(CalModel *model)
-    {
-        printf("Anim Completed!\n");
-    }
+  void AnimationComplete(CalModel *model)
+  {
+    printf("Anim Completed!\n");
+  }
 };
 #endif
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
-ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
-    : csApp (object_reg, Skin)
+ViewMesh::ViewMesh ()
+: camMode(movenormal), roomsize(5), scale(1), selectedSocket(0),
+  selectedCal3dSocket(0), meshTx(0), meshTy(0), meshTz(0), callback(0)
 {
-  SetBackgroundStyle(csabsNothing);
-  menu = 0;
-  dialog = 0;
-  cammode = moveorigin;
-  spritepos = csVector3(0,10,0);
-  move_sprite_speed = 0;
-  scale = 1;
-  is_cal3d = false;
+  SetApplicationName ("CrystalSpace.ViewMesh");
 }
 
 ViewMesh::~ViewMesh ()
 {
-  delete menu;
-  delete dialog;
+#ifdef CS_HAS_CAL3D
+  if (cal3dsprite && callback)
+  {
+    cal3dsprite->RemoveAnimCallback("walk", callback);
+    delete callback;
+    callback = 0;
+  }
+#endif
+}
+
+void ViewMesh::ProcessFrame ()
+{
+  csTicks elapsed_time = vc->GetElapsedTicks ();
+  float speed = (elapsed_time / 1000.0) * (0.06 * 20);
+
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+
+  if (g2d->GetHeight() != y || g2d->GetWidth() != x)
+  {
+    x = g2d->GetWidth();
+    y = g2d->GetHeight();
+    aws->SetupCanvas(0, g3d->GetDriver2D (), g3d);
+  }
+
+  iCamera* c = view->GetCamera();
+
+  if (!spritewrapper) camMode = movenormal;
+
+  switch (camMode)
+  {
+    case movenormal:
+    {
+      if (kbd->GetKeyState (CSKEY_SHIFT))
+      {
+        if (kbd->GetKeyState (CSKEY_RIGHT))
+          c->Move (CS_VEC_RIGHT * 4 * speed);
+        if (kbd->GetKeyState (CSKEY_LEFT))
+          c->Move (CS_VEC_LEFT * 4 * speed);
+        if (kbd->GetKeyState (CSKEY_UP))
+          c->Move (CS_VEC_UP * 4 * speed);
+        if (kbd->GetKeyState (CSKEY_DOWN))
+          c->Move (CS_VEC_DOWN * 4 * speed);
+      }
+      else
+      {
+    	if (kbd->GetKeyState (CSKEY_RIGHT))
+	  c->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed);
+	if (kbd->GetKeyState (CSKEY_LEFT))
+	  c->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed);
+	if (kbd->GetKeyState (CSKEY_PGUP))
+	  c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
+	if (kbd->GetKeyState (CSKEY_PGDN))
+	  c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
+        if (kbd->GetKeyState (CSKEY_UP))
+          c->Move (CS_VEC_FORWARD * 4 * speed);
+        if (kbd->GetKeyState (CSKEY_DOWN))
+          c->Move (CS_VEC_BACKWARD * 4 * speed);
+      }
+      break;
+    }
+    case moveorigin:
+    {
+      csVector3 orig = c->GetTransform().GetOrigin();
+
+      csBox3 box;
+      spritewrapper->GetWorldBoundingBox(box);
+      csVector3 spritepos = box.GetCenter();
+
+      if (kbd->GetKeyState (CSKEY_DOWN))
+	c->GetTransform().SetOrigin (orig + CS_VEC_BACKWARD * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_UP))
+	c->GetTransform().SetOrigin (orig + CS_VEC_FORWARD * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_LEFT))
+	c->GetTransform().SetOrigin (orig + CS_VEC_LEFT * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_RIGHT))
+	c->GetTransform().SetOrigin (orig + CS_VEC_RIGHT * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_PGUP))
+	c->GetTransform().SetOrigin (orig + CS_VEC_UP * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_PGDN))
+	c->GetTransform().SetOrigin (orig + CS_VEC_DOWN * 4 * speed);
+      c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );
+      break;
+    }
+    case rotateorigin:
+    {
+      csVector3 orig = c->GetTransform().GetOrigin();
+
+      csBox3 box;
+      spritewrapper->GetWorldBoundingBox(box);
+      csVector3 spritepos = box.GetCenter();
+
+      if (kbd->GetKeyState (CSKEY_LEFT))
+        orig = csYRotMatrix3(-speed) * (orig-spritepos) + spritepos;
+      if (kbd->GetKeyState (CSKEY_RIGHT))
+        orig = csYRotMatrix3(speed) * (orig-spritepos) + spritepos;
+      if (kbd->GetKeyState (CSKEY_UP))
+        orig = csXRotMatrix3(speed) * (orig-spritepos) + spritepos;
+      if (kbd->GetKeyState (CSKEY_DOWN))
+        orig = csXRotMatrix3(-speed) * (orig-spritepos) + spritepos;
+
+      c->GetTransform().SetOrigin(orig);
+
+      if (kbd->GetKeyState (CSKEY_PGUP))
+        c->Move(CS_VEC_FORWARD * 4 * speed);
+      if (kbd->GetKeyState (CSKEY_PGDN))
+        c->Move(CS_VEC_BACKWARD * 4 * speed);
+
+      c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );
+      break;
+    }
+    default:
+      break;
+  }
+
+  if (spritewrapper)
+  {
+    csRef<iMovable> mov = spritewrapper->GetMovable();
+    csVector3 pos = mov->GetFullPosition();    
+    mov->MovePosition(csVector3(pos.x,pos.y,-move_sprite_speed*elapsed_time/1000.0f));
+    mov->UpdateMove();
+    if (pos.z > roomsize) 
+    {
+      pos.z = -roomsize;
+      mov->SetPosition(pos);
+    }
+    else if (pos.z < -roomsize) 
+    {
+      pos.z = roomsize;
+      mov->SetPosition(pos);
+    }
+  }
+
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+    return;
+
+  view->Draw ();
+
+  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) 
+    return;
+
+  aws->Redraw ();
+  aws->Print (g3d, 64);
+
+}
+
+void ViewMesh::FinishFrame ()
+{
+  g3d->FinishDraw ();
+  g3d->Print (0);
+}
+
+bool ViewMesh::OnKeyboard(iEvent& ev)
+{
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
+  {
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    if (code == CSKEY_ESC)
+    {
+      csRef<iEventQueue> q = 
+        CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
+    }
+  }
+  return false;
+}
+
+bool ViewMesh::HandleEvent (iEvent &event)
+{
+  if (aws)
+    if (aws->HandleEvent (event))
+      return true;
+  return csBaseEventHandler::HandleEvent(event);;
 }
 
 void ViewMesh::Help ()
@@ -151,383 +246,1288 @@ void ViewMesh::Help ()
   printf ("  <file>             Load the specified mesh object (meshfact or library)\n");
 }
 
-/* This is the data we keep for modal processing */
-struct ModalData : public iBase
+void ViewMesh::HandleCommandLine()
 {
-  uint code;
-  csString meshName;
-  uint socket;
-  SCF_DECLARE_IBASE;
-  ModalData() { SCF_CONSTRUCT_IBASE(0); }
-  virtual ~ModalData() { SCF_DESTRUCT_IBASE(); }
-};
+  csRef<iCommandLineParser> cmdline =
+    CS_QUERY_REGISTRY(GetObjectRegistry(), iCommandLineParser);
 
-SCF_IMPLEMENT_IBASE (ModalData)
-SCF_IMPLEMENT_IBASE_END
-
-bool ViewMesh::HandleEvent (iEvent& ev)
-{
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  const char* libname;
+  for (int i=0; (libname=cmdline->GetOption("L",i)); i++)
   {
-    // display next frame
-    Draw();
+    if (!loader->LoadLibraryFile(libname))
+    {
+      ReportError("Couldn't load lib %s.\n", libname);
+    }
   }
 
-  if (csApp::HandleEvent(ev))
-    return true;
+  const char* meshfilename = cmdline->GetName (0);
+  const char* texturefilename = cmdline->GetName (1);
+  const char* texturename = cmdline->GetName (2);
+  const char* scaleTxt = cmdline->GetOption("Scale");
+  const char* roomSize = cmdline->GetOption("RoomSize");
 
-  switch(ev.Type)
+  if (texturefilename && texturename)
   {
-    case csevKeyboard:
-      if ((csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
-	(csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
-      {
-	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-	if (q)
-	  q->GetEventOutlet()->Broadcast
-	    (cscmdQuit);
-	return true;
-      }
-      break;
-    case csevMouseDown:
-    case csevMouseDoubleClick:
-      // show the menu
-      if (menu->GetState(CSS_VISIBLE))
-	menu->Hide();
-      else
-      {
-	menu->Show();
-	menu->SetPos(ev.Mouse.x,ev.Mouse.y);
-      }
-      return true;
-    case csevCommand:
-      switch(ev.Command.Code)
-      {
-	case VIEWMESH_COMMAND_LOADMESH:
-	{
-	  menu->Hide();
-	  delete dialog;
-	  dialog = csFileDialog (this, "Select Mesh Object", "/this/", "Open",
-	      true);
-
-	  ModalData *data=new ModalData;
-	  data->code = VIEWMESH_COMMAND_LOADMESH;
-	  StartModal (dialog, data);
-
-	  return true;
-	}
-	case VIEWMESH_COMMAND_SAVEMESH:
-	{
-	  menu->Hide();
-	  delete dialog;
-	  dialog= csFileDialog (this, "Save As...", "/this/", "Save",
-	      true);
-
-	  ModalData *data=new ModalData;
-	  data->code = VIEWMESH_COMMAND_SAVEMESH;
-	  StartModal (dialog, data);
-
-	  return true;
-	}
-	case VIEWMESH_COMMAND_LOADLIB:
-	{
-	  menu->Hide();
-	  delete dialog;
-	  dialog = csFileDialog (this, "Select Texture Lib", "/this/", "Open",
-	      true);
-
-	  ModalData *data=new ModalData;
-	  data->code = VIEWMESH_COMMAND_LOADLIB;
-	  StartModal (dialog, data);
-
-	  return true;
-	}
-	case VIEWMESH_COMMAND_MOVEANIMFASTER:
-	  move_sprite_speed += .5;
-	  menu->Hide();
-	  return true;
-
-	case VIEWMESH_COMMAND_MOVEANIMSLOWER:
-	  move_sprite_speed -= .5;
-	  menu->Hide();
-	  return true;
-
-	case VIEWMESH_COMMAND_REVERSEACTION:
-	{
-	  csRef<iSprite3DState> spstate (
-	      SCF_QUERY_INTERFACE(sprite->GetMeshObject(),iSprite3DState));
-	  if (spstate)
-	      spstate->SetReverseAction(true);
-	  menu->Hide();
-	  return true;
-	}
-	case VIEWMESH_COMMAND_FORWARDACTION:
-	{
-	  csRef<iSprite3DState> spstate (
-	      SCF_QUERY_INTERFACE(sprite->GetMeshObject(),iSprite3DState));
-	  if (spstate)
-	      spstate->SetReverseAction(false);
-	  menu->Hide();
-	  return true;
-	}
-	case VIEWMESH_COMMAND_CAMMODE1:
-	  cammode = movenormal;
-	  menu->Hide();
-	  return true;
-	case VIEWMESH_COMMAND_CAMMODE2:
-	  cammode = moveorigin;
-	  menu->Hide();
-	  return true;
-	case VIEWMESH_COMMAND_CAMMODE3:
-	  cammode = rotateorigin;
-	  menu->Hide();
-	  return true;
-	case cscmdStopModal:
-	{        
-          char filename[1024];
-          csQueryFileDialog (dialog, filename, sizeof(filename));
-          ModalData *data = (ModalData *) GetTopModalUserdata();
-
-          /* If the dialog was the rotation one then pick out the 
-             rotation information and attach the mesh.
-          */
-          if ( data->code == VIEWMESH_COMMAND_ATTACH_SOCKET )
-          {
-            csComponent *rotX = 0;
-            csComponent *rotY = 0;
-            csComponent *rotZ = 0;
-        
-            csComponent * client = dialog->GetChild (1000);
-            if (client)
-            {
-              rotX = client->GetChild(1001);
-              rotY = client->GetChild(1002);            
-              rotZ = client->GetChild(1003);            
-            }             
-            
-            if (rotX && rotY && rotZ)
-            {
-              AttachMeshToSocket (data->socket, data->meshName.GetData(), 
-                              atof (rotX->GetText()),
-                              atof (rotY->GetText()),
-                              atof (rotZ->GetText()));
-            }
-          }        
-      
-          delete dialog;
-          dialog = 0;
-      
-          /* Check to see if this was from the dialog box to load a mesh for a
-             socket.
-           */            
-          if (data->code >= VIEWMESH_COMMAND_LOADSOCKET &&
-              data->code < VIEWMESH_COMMAND_LOADSOCKET + 100)
-          {
-            CreateRotationWindow (data->code - VIEWMESH_COMMAND_LOADSOCKET,
-	    	filename);
-          }
-                  
-	  switch (data->code)
-	  {     
-            case VIEWMESH_COMMAND_LOADMESH:
-	      if (!LoadSprite(filename, scale))
-	      {
-		Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load mesh %s",
-		    filename);
-	      }
-	      break;
-	    case VIEWMESH_COMMAND_SAVEMESH:
-	      if (!SaveSprite(filename))
-	      {
-		Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't save mesh %s",
-		    filename);
-	      }
-	      break;
-	    case VIEWMESH_COMMAND_LOADLIB:
-	      if (!loader->LoadLibraryFile(filename))
-	      {
-		Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load lib %s",
-		    filename);
-	      }
-	      else
-	      {
-		// register the textures
-		engine->Prepare();
-	      }
-	      break;
-	  }
-	  ConstructMenu();
-	  return true;
-	}
-	default:
-	  break;
-      }
-      if (ev.Command.Code >= VIEWMESH_STATES_SELECT_START &&
-	  ev.Command.Code < VIEWMESH_STATES_SELECT_START + 100)
-      {
-      	csRef<iSprite3DState> spstate (
-		SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-		iSprite3DState));
-	if (spstate)
-	  spstate->SetAction(
-	      stateslist.Get(ev.Command.Code - VIEWMESH_STATES_SELECT_START) );
-	else
-	{
-          csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
-		sprite->GetMeshObject(),
-               iSpriteCal3DState));
-          if (cal3dstate)
-          {
-	    cal3dstate->SetAnimCycle(stateslist.Get(ev.Command.Code
-		  - VIEWMESH_STATES_SELECT_START),1);
-	  }
-	}
-	menu->Hide();
-	return true;
-      }
-      if (ev.Command.Code >= VIEWMESH_OVERRIDE_SELECT_START &&
-	  ev.Command.Code < VIEWMESH_OVERRIDE_SELECT_START + 100)
-      {
-      	csRef<iSprite3DState> spstate (
-		SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-		iSprite3DState));
-	if (spstate)
-	  spstate->SetOverrideAction (stateslist.Get (
-	  	ev.Command.Code - VIEWMESH_OVERRIDE_SELECT_START) );
-	else
-	{
-          csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
-		sprite->GetMeshObject(),
-               iSpriteCal3DState));
-          if (cal3dstate)
-          {
-	    cal3dstate->SetAnimAction(actionlist.Get(ev.Command.Code
-		  - VIEWMESH_OVERRIDE_SELECT_START),1,1);
-	  }
-	}
-	menu->Hide();
-	return true;
-      }
-      if (ev.Command.Code >= VIEWMESH_STATES_ADD_START &&
-	  ev.Command.Code < VIEWMESH_STATES_ADD_START + 100)
-      {
-        csRef<iSpriteCal3DState> cal3dstate (SCF_QUERY_INTERFACE (
-		sprite->GetMeshObject(), iSpriteCal3DState));
-        if (cal3dstate)
-        {
-	  cal3dstate->AddAnimCycle(stateslist.Get(ev.Command.Code
-		- VIEWMESH_STATES_ADD_START),1,3);
-	  activelist.Push(stateslist.Get(ev.Command.Code
-	  	- VIEWMESH_STATES_ADD_START));
-	  menu->Hide();
-	  (void) new csMenuItem(activemenu,stateslist.Get(ev.Command.Code
-		- VIEWMESH_STATES_ADD_START),VIEWMESH_STATES_CLEAR_START
-		+ activelist.Length());
-	  return true;
-	}
-	menu->Hide();
-	return true;
-      }
-      if (ev.Command.Code >= VIEWMESH_STATES_CLEAR_START &&
-	  ev.Command.Code < VIEWMESH_STATES_CLEAR_START + 100)
-      {
-        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
-		sprite->GetMeshObject(), iSpriteCal3DState));
-        if (cal3dstate)
-        {
-	  if (ev.Command.Code > VIEWMESH_STATES_CLEAR_START)
-	  {
-	    csComponent *item = activemenu->GetItem (ev.Command.Code);
-	    cal3dstate->ClearAnimCycle (item->GetText (),3);
-	    activelist.Delete ((char*)item->GetText() );
-	    menu->Hide ();
-	    activemenu->Delete (item);
-	    return true;
-	  }
-	}
-	menu->Hide();
-	return true;
-      }
-      if (ev.Command.Code >= VIEWMESH_MESH_SELECT_START &&
-	  ev.Command.Code < VIEWMESH_MESH_SELECT_START + 100)
-      {
-        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
-		sprite->GetMeshObject(), iSpriteCal3DState));
-        if (cal3dstate)
-        {
-	  if (menu->GetCheck(ev.Command.Code))
-	  {
-	    csComponent *item = menu->GetItem (ev.Command.Code);
-	    cal3dstate->DetachCoreMesh( item->GetText () );
-            menu->SetCheck(ev.Command.Code, false);
-	  }
-	  else
-	  {
-	    csComponent *item = menu->GetItem (ev.Command.Code);
-	    cal3dstate->AttachCoreMesh( item->GetText () );
-            menu->SetCheck(ev.Command.Code, true);
-	  }
-	}
-	menu->Hide();
-	return true;
-      }
-      if (ev.Command.Code >= VIEWMESH_COMMAND_BLEND &&
-          ev.Command.Code < VIEWMESH_COMMAND_BLEND + 100)
-      {
-        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
-		sprite->GetMeshObject(), iSpriteCal3DState));
-        if (cal3dstate)
-        {
-           int i = ev.Command.Code - VIEWMESH_COMMAND_BLEND;
-           cal3dstate->BlendMorphTarget(i,1.0f,10.0f);
-        }
-      }
-      if (ev.Command.Code >= VIEWMESH_COMMAND_CLEAR &&
-          ev.Command.Code < VIEWMESH_COMMAND_CLEAR + 100)
-      {
-        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
-		sprite->GetMeshObject(), iSpriteCal3DState));
-        if (cal3dstate)
-        {
-           int i = ev.Command.Code - VIEWMESH_COMMAND_CLEAR;
-           cal3dstate->ClearMorphTarget(i,10.0f);
-        }
-      }
-                                
-      if (ev.Command.Code >= VIEWMESH_COMMAND_SOCKET &&
-          ev.Command.Code < VIEWMESH_COMMAND_SOCKET + 100)
-      {
-        csRef<iSpriteCal3DState> cal3dstate(
-            SCF_QUERY_INTERFACE(sprite->GetMeshObject(), iSpriteCal3DState));
-            
-        if (cal3dstate)
-        {
-          int i = ev.Command.Code - VIEWMESH_COMMAND_SOCKET;
-          menu->Hide();
-          delete dialog;
-          dialog = csFileDialog (this, "Select Mesh Object", "/this/", "Open",
-                                 true);
-
-          ModalData *data=new ModalData;
-          
-          data->code = VIEWMESH_COMMAND_LOADSOCKET+i;
-          StartModal (dialog, data);     
-        }    
-      }
-      break;
+    csString file(texturefilename);
+    size_t split = file.FindLast('/');
+    LoadTexture(file, file.Slice(split+1, file.Length()-split-1), texturename);
   }
 
-  return false;
+  if (meshfilename)
+  {
+    csString file(meshfilename);
+    size_t split = file.FindLast('/');    
+    LoadSprite(file, file.Slice(split+1, file.Length()-split-1));
+  }
+
+  if (roomSize) roomsize = atof(roomSize);
+
+  if (scaleTxt != 0)
+  {
+    float newScale;
+    sscanf (scaleTxt, "%f", &newScale);
+    ScaleSprite(newScale);
+  }
+
+}
+
+void ViewMesh::LoadTexture(const char* path, const char* file, const char* name)
+{
+  if (path) ParseDir(path);
+
+  if (file && name)
+  {
+    iTextureWrapper* txt = loader->LoadTexture (name, file);
+    if (txt == 0)
+    {
+      ReportError("Cannot load texture '%s' from file '%s'.\n", name, file);
+      return;
+    }
+    txt->Register (g3d->GetTextureManager ());
+    iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (name);
+    mat->Register (g3d->GetTextureManager ());
+    engine->PrepareTextures();
+  }
+}
+
+void ViewMesh::LoadLibrary(const char* path, const char* file)
+{
+  if (path) ParseDir(path);
+  loader->LoadLibraryFile(file);
+}
+
+bool ViewMesh::OnInitialize(int argc, char* argv[])
+{
+
+  if (csCommandLineHelper::CheckHelp (GetObjectRegistry()))
+  {
+    ViewMesh::Help();
+    csCommandLineHelper::Help(GetObjectRegistry());
+    return 0;
+  }
+
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+    CS_REQUEST_VFS,
+    CS_REQUEST_OPENGL3D,
+    CS_REQUEST_ENGINE,
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_IMAGELOADER,
+    CS_REQUEST_LEVELLOADER,
+    CS_REQUEST_LEVELSAVER,
+    CS_REQUEST_REPORTER,
+    CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_PLUGIN("crystalspace.window.alternatemanager", iAws),
+    CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
+
+  if (!RegisterQueue(GetObjectRegistry()))
+    return ReportError("Failed to set up event handler!");
+
+  return true;
+}
+
+void ViewMesh::OnExit()
+{
+}
+
+bool ViewMesh::Application()
+{
+  if (!OpenApplication(GetObjectRegistry()))
+    return ReportError("Error opening system!");
+
+  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+
+  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+
+  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
+  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+
+  vfs = CS_QUERY_REGISTRY(GetObjectRegistry(), iVFS);
+  if (!vfs) return ReportError("Failed to locate Virtual FileSystem!");
+
+  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+
+  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
+  if (!loader) return ReportError("Failed to locate Loader!");
+
+  saver = CS_QUERY_REGISTRY(GetObjectRegistry(), iSaver);
+  if (!saver) return ReportError("Failed to locate Saver!");
+
+  aws = CS_QUERY_REGISTRY(GetObjectRegistry(), iAws);
+  if (!aws) return ReportError("Failed to locate AWS!");
+  
+  view.AttachNew(new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  engine->SetLightingCacheMode (0);
+
+  CreateRoom();
+  CreateGui ();
+
+  HandleCommandLine();
+
+  engine->Prepare ();
+
+  rotY = rotX = 0;
+
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 1, -3));
+
+  x = g3d->GetDriver2D ()->GetWidth ();
+  y = g3d->GetDriver2D ()->GetHeight ();
+
+  Run();
+
+  return true;
+}
+
+void ViewMesh::CreateRoom ()
+{
+  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+    ReportError("Error loading 'stone4' texture!");
+
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+
+  room = engine->CreateSector ("room");
+
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> ws =
+    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
+  walls_state->AddInsideBox (csVector3 (-roomsize, -roomsize/2, -roomsize),
+    csVector3 (roomsize, 3*roomsize/2, roomsize));
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
+  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+
+  csRef<iLight> light;
+  iLightList* ll = room->GetLights ();
+
+  light = engine->CreateLight
+    (0, csVector3(-roomsize/2, roomsize/2, 0), 2*roomsize, csColor(1, 1, 1));
+  ll->Add (light);
+
+  light = engine->CreateLight
+    (0, csVector3(roomsize/2, roomsize/2,  0), 2*roomsize, csColor(1, 1, 1));
+  ll->Add (light);
+
+  light = engine->CreateLight
+    (0, csVector3(0, roomsize/2, -roomsize/2), 2*roomsize, csColor(1, 1, 1));
+  ll->Add (light);
+}
+
+void ViewMesh::CreateGui ()
+{
+  aws->SetupCanvas(0, g3d->GetDriver2D (), g3d);
+
+  iAwsSink* sink;
+
+  //GENERAL
+  sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  sink->RegisterTrigger ("CameraMode", &CameraMode);
+  sink->RegisterTrigger ("LoadButton", &LoadButton);
+  sink->RegisterTrigger ("LoadLibButton", &LoadLibButton);
+  sink->RegisterTrigger ("SaveButton", &SaveButton);
+  sink->RegisterTrigger ("SaveBinaryButton", &SaveBinaryButton);
+  sink->RegisterTrigger ("ScaleSprite", &SetScaleSprite);
+  aws->GetSinkMgr ()->RegisterSink ("General", sink);
+
+  //ANIMATION
+  sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  sink->RegisterTrigger ("ReversAnimation", &ReversAnimation);
+  sink->RegisterTrigger ("StopAnimation", &StopAnimation);
+  sink->RegisterTrigger ("SlowerAnimation", &SlowerAnimation);
+  sink->RegisterTrigger ("AddAnimation", &AddAnimation);
+  sink->RegisterTrigger ("FasterAnimation", &FasterAnimation);
+  sink->RegisterTrigger ("SetAnimation", &SetAnimation);
+  sink->RegisterTrigger ("RemoveAnimation", &RemoveAnimation);
+  sink->RegisterTrigger ("ClearAnimation", &ClearAnimation);
+  sink->RegisterTrigger ("SelAnimation", &SelAnimation);
+  aws->GetSinkMgr ()->RegisterSink ("Anim", sink);
+
+  //SOCKET
+  sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  sink->RegisterTrigger ("SetMesh", &SetMesh);
+  sink->RegisterTrigger ("SetSubMesh", &SetSubMesh);
+  sink->RegisterTrigger ("SetTriangle", &SetTriangle);
+  sink->RegisterTrigger ("SetRotX", &SetRotX);
+  sink->RegisterTrigger ("SetRotY", &SetRotY);
+  sink->RegisterTrigger ("SetRotZ", &SetRotZ);
+  sink->RegisterTrigger ("AttachButton", &AttachButton);
+  sink->RegisterTrigger ("DetachButton", &DetachButton);
+  sink->RegisterTrigger ("AddSocket", &AddSocket);
+  sink->RegisterTrigger ("DelSocket", &DelSocket);
+  sink->RegisterTrigger ("SelSocket", &SelSocket);
+  sink->RegisterTrigger ("RenameSocket", &RenameSocket);
+  aws->GetSinkMgr ()->RegisterSink ("Socket", sink);
+
+  //SOCKET
+  sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  sink->RegisterTrigger ("SelMorph", &SelMorph);
+  sink->RegisterTrigger ("BlendButton", &BlendButton);
+  sink->RegisterTrigger ("ClearButton", &ClearButton);
+  aws->GetSinkMgr ()->RegisterSink ("Morph", sink);
+
+  //STDDLG
+  sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  sink->RegisterTrigger ("OkButton", &StdDlgOkButton);
+  sink->RegisterTrigger ("CancleButton", &StdDlgCancleButton);
+  sink->RegisterTrigger ("FileSelect", &StdDlgFileSelect);
+  sink->RegisterTrigger ("DirSelect", &StdDlgDirSelect);
+  aws->GetSinkMgr ()->RegisterSink ("StdDlg", sink);
+
+  if (!aws->GetPrefMgr()->Load ("/aws/windows_skin.def"))
+    ReportError("couldn't load skin definition file!");
+  if (!aws->GetPrefMgr()->Load ("/varia/viewmesh.def"))
+    ReportError("couldn't load ViewMesh AWS definition file!");
+  if (!aws->GetPrefMgr()->Load ("/aws/stddlg.def"))
+    ReportError("couldn't load Standard Dialog AWS definition file!");
+  aws->GetPrefMgr ()->SelectDefaultSkin ("Windows");
+
+  form = aws->CreateWindowFrom ("Form1");
+  stddlg = aws->CreateWindowFrom ("StdDlg");
+  form->Show();
+
+  iAwsComponent* InputPath = stddlg->FindChild("InputPath");
+  csRef<iString> valuePath(new scfString(vfs->GetCwd()));
+  if (InputPath) InputPath->SetProperty("Text",valuePath);
+
+  StdDlgUpdateLists(valuePath->GetData());
+}
+
+void ViewMesh::LoadSprite (const char* path, const char* filename)
+{
+  if (path) ParseDir(path);
+
+  if (spritewrapper)
+  {
+    if (sprite)
+    {
+      for (int i = 0; i < sprite->GetSocketCount(); i++)
+      {
+        iMeshWrapper* meshWrapOld = sprite->GetSocket(i)->GetMeshWrapper();
+        engine->RemoveObject(meshWrapOld);
+        engine->RemoveObject(meshWrapOld->GetFactory());
+        delete meshWrapOld;
+      }
+    }
+    else if (cal3dsprite)
+    {
+      for (int i = 0; i < cal3dsprite->GetSocketCount(); i++)
+      {
+        iMeshWrapper* meshWrapOld = 
+          cal3dsprite->GetSocket(i)->GetMeshWrapper();
+        engine->RemoveObject(meshWrapOld);
+        engine->RemoveObject(meshWrapOld->GetFactory());
+        delete meshWrapOld;
+      }
+    }
+#ifdef CS_HAS_CAL3D
+    if (cal3dsprite && callback)
+    {
+      cal3dsprite->RemoveAnimCallback("walk", callback);
+      delete callback;
+      callback = 0;
+    }
+#endif
+    engine->RemoveObject(spritewrapper);
+    engine->RemoveObject(spritewrapper->GetFactory());
+    spritewrapper = 0;
+    sprite = 0;
+    cal3dsprite = 0;
+    state = 0;
+    cal3dstate = 0;
+    selectedSocket = 0;
+    selectedCal3dSocket = 0;
+    selectedAnimation = 0;
+    selectedMorphTarget = 0;
+    meshTx = meshTy = meshTz = 0;
+  }
+
+  iBase* result;
+  iRegion* region = engine->CreateRegion ("viewmesh_region");
+  bool rc = loader->Load (filename, result, region, false, true);
+
+  if (!rc)
+    return;
+
+  csRef<iMeshFactoryWrapper> wrap;
+  if (result == 0)
+  {
+    // Library file. Find the first factory in our region.
+    iMeshFactoryList* factories = engine->GetMeshFactories ();
+    int i;
+    for (i = 0 ; i < factories->GetCount () ; i++)
+    {
+      iMeshFactoryWrapper* f = factories->Get (i);
+      if (region->IsInRegion (f->QueryObject ()))
+      {
+        wrap = f;
+        break;
+      }
+    }
+  }
+  else
+  {
+    wrap = SCF_QUERY_INTERFACE (result,iMeshFactoryWrapper);
+  }
+
+  if (!wrap) return;
+
+  if (wrap) 
+  {
+    csRef<iMeshObjectFactory> fact = wrap->GetMeshObjectFactory();
+    if (fact)
+    {
+      csVector3 v(0, 0, 0);
+      spritewrapper = engine->CreateMeshWrapper(wrap, "MySprite", room, v);
+
+      cal3dsprite = SCF_QUERY_INTERFACE(fact, iSpriteCal3DFactoryState);
+      sprite = SCF_QUERY_INTERFACE(fact, iSprite3DFactoryState);
+      if (cal3dsprite || sprite)
+      {
+        iMeshObject* mesh = spritewrapper->GetMeshObject();
+        cal3dstate = SCF_QUERY_INTERFACE(mesh, iSpriteCal3DState);
+        state = SCF_QUERY_INTERFACE(mesh, iSprite3DState);
+      }
+      if (cal3dstate)
+      {
+#ifdef CS_HAS_CAL3D
+        vmAnimCallback *callback = new vmAnimCallback;
+        cal3dsprite->RegisterAnimCallback("walk",callback,.5);
+#endif
+      }
+    }
+  }
+
+  ScaleSprite (scale);
+
+  if (spritewrapper)
+  {
+    csBox3 box;
+    spritewrapper->GetWorldBoundingBox(box);
+    csVector3 sprpos = box.GetCenter();
+    csVector3 campos = view->GetCamera ()->GetTransform ().GetOrigin();
+    view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (campos.x, sprpos.y, campos.z));
+    camMode = rotateorigin;
+  }
+
+  UpdateSocketList();
+  UpdateAnimationList();
+  UpdateMorphList ();
+}
+
+void ViewMesh::SaveSprite (const char* path, const char* filename, bool binary)
+{
+  ParseDir(path);
+
+  csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
+  csRef<iDocument> doc = xml->CreateDocument();
+  csRef<iDocumentNode> root = doc->CreateRoot();
+
+  iMeshFactoryWrapper* meshfactwrap = spritewrapper->GetFactory();
+  iMeshObjectFactory*  meshfact = meshfactwrap->GetMeshObjectFactory();
+
+  //Create the Tag for the MeshObj
+  csRef<iDocumentNode> factNode = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  factNode->SetValue("meshfact");
+
+  //Add the mesh's name to the MeshObj tag
+  const char* name = meshfactwrap->QueryObject()->GetName();
+  if (name && *name)
+    factNode->SetAttribute("name", name);
+
+  csRef<iFactory> factory = 
+    SCF_QUERY_INTERFACE(meshfact->GetMeshObjectType(), iFactory);
+
+  const char* pluginname = factory->QueryClassID();
+
+  if (!(pluginname && *pluginname)) return;
+
+  csRef<iDocumentNode> pluginNode = factNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  pluginNode->SetValue("plugin");
+
+  //Add the plugin tag
+  char loadername[128] = "";
+  csFindReplace(loadername, pluginname, ".object.", ".loader.factory.",128);
+
+  if (binary)
+    strcat(loadername, ".binary");
+
+  pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
+  csRef<iPluginManager> plugin_mgr = 
+    CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+  char savername[128] = "";
+
+  csFindReplace(savername, pluginname, ".object.", ".saver.factory.", 128);
+
+  if (binary)
+    strcat(savername, ".binary");
+
+  //Invoke the iSaverPlugin::WriteDown
+  if (binary)
+  {
+    csRef<iString> fname (new scfString(filename));
+    fname->Append(".binary", 7);
+
+    csRef<iFile> file (vfs->Open(*fname, VFS_FILE_WRITE));
+
+    csRef<iDocumentNode> paramsNode = 
+      factNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    paramsNode->SetValue("paramsfile");
+
+    csRef<iDocumentNode> paramsdataNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+
+    paramsdataNode->SetValue(*fname);
+
+    csRef<iBinarySaverPlugin> saver =
+      CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iBinarySaverPlugin);
+    if (!saver)
+      saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iBinarySaverPlugin);
+    if (saver)
+      saver->WriteDown(meshfact, file);
+  }
+  else
+  {
+    csRef<iSaverPlugin> saver = 
+      CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
+    if (!saver) 
+      saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+    if (saver) 
+      saver->WriteDown(meshfact, factNode);
+  }
+  scfString str;
+  doc->Write(&str);
+  vfs->WriteFile(filename, str.GetData(), str.Length());
+}
+
+void ViewMesh::AttachMesh (const char* path, const char* file)
+{
+  if (selectedSocket)
+  {
+    csRef<iMeshWrapper> meshWrapOld = selectedSocket->GetMeshWrapper();
+    if ( meshWrapOld )
+    {
+      spritewrapper->GetChildren()->Remove( meshWrapOld );
+      selectedSocket->SetMeshWrapper( NULL );    
+    }
+  }
+  else if (selectedCal3dSocket)
+  {
+    csRef<iMeshWrapper> meshWrapOld = selectedCal3dSocket->GetMeshWrapper();
+    if ( meshWrapOld )
+    {
+      spritewrapper->GetChildren()->Remove( meshWrapOld );
+      selectedCal3dSocket->SetMeshWrapper( NULL );    
+    }
+  }
+
+  ParseDir(path);
+
+  iBase* result;
+  iRegion* region = engine->CreateRegion ("viewmesh_region");
+  bool rc = loader->Load (file, result, region, false, true);
+
+  if (!rc)
+    return;
+
+  csRef<iMeshFactoryWrapper> factory;
+  if (result == 0)
+  {
+    // Library file. Find the first factory in our region.
+    iMeshFactoryList* factories = engine->GetMeshFactories ();
+    int i;
+    for (i = 0 ; i < factories->GetCount () ; i++)
+    {
+      iMeshFactoryWrapper* f = factories->Get (i);
+      if (region->IsInRegion (f->QueryObject ()))
+      {
+        factory = f;
+        break;
+      }
+    }
+  }
+  else
+  {
+    factory = SCF_QUERY_INTERFACE (result,iMeshFactoryWrapper);
+  }
+
+  if (!factory) return;
+
+  csRef<iMeshWrapper> meshWrap = engine->CreateMeshWrapper(factory, file);
+  csReversibleTransform t;
+
+  if (selectedSocket)
+  {
+    spritewrapper->GetChildren()->Add( meshWrap );
+    selectedSocket->SetMeshWrapper( meshWrap );
+    spritewrapper->GetMovable()->UpdateMove();
+  }
+  else if (selectedCal3dSocket)
+  {
+    selectedCal3dSocket->SetTransform(t);
+    spritewrapper->GetChildren()->Add( meshWrap );
+    selectedCal3dSocket->SetMeshWrapper( meshWrap );
+    spritewrapper->GetMovable()->UpdateMove();
+  }
+}
+
+void ViewMesh::UpdateSocketList ()
+{
+  iAwsComponent* list = form->FindChild("SocketList");
+  iAwsParmList* pl = aws->CreateParmList();
+  if (!list) return;
+
+  list->Execute("ClearList", pl);
+
+  if (sprite)
+  {
+    for (int i = 0; i < sprite->GetSocketCount(); i++)
+    {
+      iSpriteSocket* sock = sprite->GetSocket(i);
+      if (!sock) continue;
+
+      if (i==0) SelectSocket(sock->GetName());
+
+      pl->AddString("text0", sock->GetName());
+      list->Execute("InsertItem", pl);
+      pl->Clear();
+    }
+  }
+  else if (cal3dsprite)
+  {
+    for (int i = 0; i < cal3dsprite->GetSocketCount(); i++)
+    {
+      iSpriteCal3DSocket* sock = cal3dsprite->GetSocket(i);
+      if (!sock) continue;
+
+      if (i==0) SelectSocket(sock->GetName());
+
+      pl->AddString("text0", sock->GetName());
+      list->Execute("InsertItem", pl);
+      pl->Clear();
+    }
+  }
+}
+
+void ViewMesh::UpdateAnimationList ()
+{
+  iAwsComponent* list = form->FindChild("AnimList");
+  iAwsParmList* pl = aws->CreateParmList();
+  if (!list) return;
+
+  list->Execute("ClearList", pl);
+
+  pl->AddString("text0", "default");
+  list->Execute("InsertItem", pl);
+  pl->Clear();
+
+  if (sprite)
+  {
+    for (int i = 0; i < sprite->GetActionCount(); i++)
+    {
+      iSpriteAction* action = sprite->GetAction(i);
+      if (!action) continue;
+
+      pl->AddString("text0", action->GetName ());
+      list->Execute("InsertItem", pl);
+      pl->Clear();
+    }
+  }
+  else if (cal3dsprite)
+  {
+    for (int i = 0; i < cal3dstate->GetAnimCount(); i++)
+    {
+      const char* animname = cal3dstate->GetAnimName(i);
+      if (!animname) continue;
+
+      pl->AddString("text0", animname);
+      list->Execute("InsertItem", pl);
+      pl->Clear();
+    }
+  }
+}
+
+void ViewMesh::UpdateMorphList ()
+{
+  iAwsComponent* list = form->FindChild("MorphList");
+  iAwsParmList* pl = aws->CreateParmList();
+  if (!list) return;
+
+  list->Execute("ClearList", pl);
+
+  pl->AddString("text0", "default");
+  list->Execute("InsertItem", pl);
+  pl->Clear();
+
+  if (cal3dsprite)
+  {
+    for (int i = 0; i < cal3dsprite->GetMorphAnimationCount(); i++)
+    {
+      const char* morphname = cal3dsprite->GetMorphAnimationName(i);
+      if (!morphname) continue;
+
+      pl->AddString("text0", morphname);
+      list->Execute("InsertItem", pl);
+      pl->Clear();
+    }
+  }
+}
+
+void ViewMesh::SelectSocket (const char* newsocket)
+{
+  if (state)
+  {
+    iSpriteSocket* sock = state->FindSocket(newsocket);
+    if (selectedSocket == sock) return;
+    selectedSocket = sock;
+  }
+  else if (cal3dstate)
+  {
+    iSpriteCal3DSocket* sock = cal3dstate->FindSocket(newsocket);
+    if (selectedCal3dSocket == sock) return;
+    selectedCal3dSocket = sock;
+  }
+  UpdateSocket();
+}
+
+void ViewMesh::UpdateSocket ()
+{
+  if (selectedSocket)
+  {
+    iAwsComponent* InputName = form->FindChild("InputName");
+    const char* name = selectedSocket->GetName();
+    csRef<iString> valueName(new scfString(name));
+    InputName->SetProperty("Text",valueName);
+
+    iAwsComponent* InputTriangle = form->FindChild("InputTriangle");
+    csRef<iString> valueTriangle(new scfString());
+    valueTriangle->Format("%d", selectedSocket->GetTriangleIndex());
+    InputTriangle->SetProperty("Text",valueTriangle);
+  }
+  else if (selectedCal3dSocket)
+  {
+    iAwsComponent* InputName = form->FindChild("InputName");
+    const char* name = selectedCal3dSocket->GetName();
+    csRef<iString> valueName(new scfString(name));
+    InputName->SetProperty("Text",valueName);
+
+    iAwsComponent* InputMesh = form->FindChild("InputMesh");
+    csRef<iString> valueMesh(new scfString());
+    valueMesh->Format("%d", selectedCal3dSocket->GetMeshIndex());
+    InputMesh->SetProperty("Text",valueMesh);
+
+    iAwsComponent* InputSubMesh = form->FindChild("InputSubMesh");
+    csRef<iString> valueSubmesh(new scfString());
+    valueSubmesh->Format("%d", selectedCal3dSocket->GetSubmeshIndex());
+    InputSubMesh->SetProperty("Text",valueSubmesh);
+
+    iAwsComponent* InputTriangle = form->FindChild("InputTriangle");
+    csRef<iString> valueTriangle(new scfString());
+    valueTriangle->Format("%d", selectedCal3dSocket->GetTriangleIndex());
+    InputTriangle->SetProperty("Text",valueTriangle);
+  }
+}
+
+void ViewMesh::ScaleSprite (float newScale)
+{
+  csMatrix3 scalingHt; scalingHt.Identity(); scalingHt *= newScale/scale;
+  csReversibleTransform rTH;
+  rTH.SetT2O (scalingHt);
+  if (spritewrapper)
+    spritewrapper->HardTransform (rTH);
+
+  csMatrix3 scaling; scaling.Identity(); scaling *= newScale;
+  csReversibleTransform rT;
+  rT.SetT2O (scaling);
+  if (spritewrapper)
+    spritewrapper->GetMovable()->SetTransform(rT);
+
+  scale = newScale;
+
+  iAwsComponent* InputMesh = form->FindChild("InputScale");
+  csRef<iString> valueMesh(new scfString());
+  valueMesh->Format("%.2f", scale);
+  InputMesh->SetProperty("Text",valueMesh);
+}
+
+//---------------------------------------------------------------------------
+
+void ViewMesh::ReversAnimation (void* awst, iAwsSource *source)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  if (tut->cal3dstate)
+  {
+    tut->cal3dstate->SetAnimationTime(-1);
+  }
+  else if (tut->state)
+  {
+    tut->state->SetReverseAction(tut->state->GetReverseAction()^true);
+  }
+}
+void ViewMesh::StopAnimation (void* awst, iAwsSource *source)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  tut->move_sprite_speed = 0;
+}
+void ViewMesh::SlowerAnimation (void* awst, iAwsSource *source)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  tut->move_sprite_speed -= 0.5f;
+}
+void ViewMesh::AddAnimation (void* awst, iAwsSource *source)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  if (tut->cal3dstate)
+  {
+    if (!tut->selectedAnimation) return;
+    int anim = tut->cal3dstate->FindAnim(tut->selectedAnimation);
+    tut->cal3dstate->AddAnimCycle(anim,1,3);
+  }
+}
+void ViewMesh::FasterAnimation (void* awst, iAwsSource *source)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  tut->move_sprite_speed += 0.5f;
+}
+void ViewMesh::SetAnimation (void* awst, iAwsSource *source)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  if (tut->cal3dstate)
+  {
+    if (!tut->selectedAnimation) return;
+    int anim = tut->cal3dstate->FindAnim(tut->selectedAnimation);
+    tut->cal3dstate->SetAnimAction(anim,1,1);
+  }
+  else if (tut->state)
+  {
+    if (!tut->selectedAnimation) return;
+    tut->state->SetAction(tut->selectedAnimation);
+  }
+}
+void ViewMesh::RemoveAnimation (void* awst, iAwsSource *source)
+{
+  //TODO: Implement it.
+  ViewMesh* tut = (ViewMesh*)awst;
+  tut->ReportWarning("Removal of Animation is not yet implemented");
+}
+void ViewMesh::ClearAnimation (void* awst, iAwsSource *source)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  if (tut->cal3dstate)
+  {
+    if (!tut->selectedAnimation) return;
+    int anim = tut->cal3dstate->FindAnim(tut->selectedAnimation);
+    tut->cal3dstate->ClearAnimCycle(anim,3);
+  }
+}
+void ViewMesh::SelAnimation (void* awst, iAwsSource *source)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  iString* text;
+  iAwsComponent* list = tut->form->FindChild("AnimList");
+  iAwsParmList* pl = tut->aws->CreateParmList();
+  if (!list) return;
+
+  pl->AddString("text0","");
+  list->Execute("GetSelectedItem", pl);
+  pl->GetString("text0",&text);
+
+  if (!text->GetData()) return;
+
+  tut->selectedAnimation = text->GetData();
+}
+
+//---------------------------------------------------------------------------
+
+void ViewMesh::SetMesh (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  if (!tut->selectedCal3dSocket) return;
+
+  iString* text;
+  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+
+  if (!text->GetData()) return;
+
+  int i;
+  if (sscanf(text->GetData(),"%d", &i) != 1) return;
+
+  tut->selectedCal3dSocket->SetMeshIndex(i);
+  tut->UpdateSocket();
+}
+
+void ViewMesh::SetSubMesh (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  if (!tut->selectedCal3dSocket) return;
+
+  iString* text;
+  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+
+  if (!text->GetData()) return;
+
+  int i;
+  if (sscanf(text->GetData(),"%d", &i) != 1) return;
+
+  tut->selectedCal3dSocket->SetSubmeshIndex(i);
+  tut->UpdateSocket();
+}
+
+void ViewMesh::SetTriangle (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  iString* text;
+  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+
+  if (!text->GetData()) return;
+
+  int i;
+  if (sscanf(text->GetData(),"%d", &i) != 1) return;
+
+  if (tut->selectedCal3dSocket)
+    tut->selectedCal3dSocket->SetTriangleIndex(i);
+  else if (tut->selectedSocket)
+    tut->selectedSocket->SetTriangleIndex(i);
+
+  tut->UpdateSocket();
+}
+
+void ViewMesh::SetRotX (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  iString* text;
+  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+
+  if (!text->GetData()) return;
+
+  float f;
+  if (sscanf(text->GetData(),"%f", &f) != 1) return;
+
+  if (tut->selectedCal3dSocket && tut->selectedCal3dSocket->GetMeshWrapper())
+  {
+    csRef<iMeshWrapper> meshWrap = tut->selectedCal3dSocket->GetMeshWrapper();
+    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    csReversibleTransform Tr;
+    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
+    Tr.RotateOther(csVector3(1,0,0),f);
+    Tr.RotateOther(csVector3(0,1,0),tut->meshTy);
+    Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
+    meshWrap->GetMeshObject()->HardTransform(Tr);
+    meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
+    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    tut->selectedCal3dSocket->SetMeshWrapper( meshWrap );
+    tut->spritewrapper->GetMovable()->UpdateMove();
+    tut->meshTx = f;
+  }
+  else if (tut->selectedSocket && tut->selectedSocket->GetMeshWrapper())
+  {
+    csRef<iMeshWrapper> meshWrap = tut->selectedSocket->GetMeshWrapper();
+    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    csReversibleTransform Tr;
+    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
+    Tr.RotateOther(csVector3(1,0,0),f);
+    Tr.RotateOther(csVector3(0,1,0),tut->meshTy);
+    Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
+    meshWrap->GetMeshObject()->HardTransform(Tr);
+    meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
+    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    tut->selectedSocket->SetMeshWrapper( meshWrap );
+    tut->spritewrapper->GetMovable()->UpdateMove();
+    tut->meshTx = f;
+  }
+}
+
+void ViewMesh::SetRotY (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  iString* text;
+  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+
+  if (!text->GetData()) return;
+
+  float f;
+  if (sscanf(text->GetData(),"%f", &f) != 1) return;
+
+  if (tut->selectedCal3dSocket && tut->selectedCal3dSocket->GetMeshWrapper())
+  {
+    csRef<iMeshWrapper> meshWrap = tut->selectedCal3dSocket->GetMeshWrapper();
+    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    csReversibleTransform Tr;
+    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
+    Tr.RotateOther(csVector3(1,0,0),tut->meshTx);
+    Tr.RotateOther(csVector3(0,1,0),f);
+    Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
+    meshWrap->GetMeshObject()->HardTransform(Tr);
+    meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
+    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    tut->selectedCal3dSocket->SetMeshWrapper( meshWrap );
+    tut->spritewrapper->GetMovable()->UpdateMove();
+    tut->meshTy = f;
+  }
+  else if (tut->selectedSocket && tut->selectedSocket->GetMeshWrapper())
+  {
+    csRef<iMeshWrapper> meshWrap = tut->selectedSocket->GetMeshWrapper();
+    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    csReversibleTransform Tr;
+    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
+    Tr.RotateOther(csVector3(1,0,0),tut->meshTx);
+    Tr.RotateOther(csVector3(0,1,0),f);
+    Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
+    meshWrap->GetMeshObject()->HardTransform(Tr);
+    meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
+    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    tut->selectedSocket->SetMeshWrapper( meshWrap );
+    tut->spritewrapper->GetMovable()->UpdateMove();
+    tut->meshTy = f;
+  }
+}
+
+void ViewMesh::SetRotZ (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  iString* text;
+  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+
+  if (!text->GetData()) return;
+
+  float f;
+  if (sscanf(text->GetData(),"%f", &f) != 1) return;
+
+  if (tut->selectedCal3dSocket && tut->selectedCal3dSocket->GetMeshWrapper())
+  {
+    csRef<iMeshWrapper> meshWrap = tut->selectedCal3dSocket->GetMeshWrapper();
+    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    csReversibleTransform Tr;
+    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
+    Tr.RotateOther(csVector3(1,0,0),tut->meshTx);
+    Tr.RotateOther(csVector3(0,1,0),tut->meshTy);
+    Tr.RotateOther(csVector3(0,0,1),f);
+    meshWrap->GetMeshObject()->HardTransform(Tr);
+    meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
+    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    tut->selectedCal3dSocket->SetMeshWrapper( meshWrap );
+    tut->spritewrapper->GetMovable()->UpdateMove();
+    tut->meshTz = f;
+  }
+  else if (tut->selectedSocket && tut->selectedSocket->GetMeshWrapper())
+  {
+    csRef<iMeshWrapper> meshWrap = tut->selectedSocket->GetMeshWrapper();
+    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    csReversibleTransform Tr;
+    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
+    Tr.RotateOther(csVector3(1,0,0),tut->meshTx);
+    Tr.RotateOther(csVector3(0,1,0),tut->meshTy);
+    Tr.RotateOther(csVector3(0,0,1),f);
+    meshWrap->GetMeshObject()->HardTransform(Tr);
+    meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
+    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    tut->selectedSocket->SetMeshWrapper( meshWrap );
+    tut->spritewrapper->GetMovable()->UpdateMove();
+    tut->meshTz = f;
+  }
+}
+
+void ViewMesh::AttachButton (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  tut->form->Hide();
+  tut->stddlg->Show();
+  tut->stddlgPurpose=attach;
+}
+
+void ViewMesh::DetachButton (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  csRef<iMeshWrapper> meshWrapOld;
+  if (tut->selectedCal3dSocket)
+    meshWrapOld = tut->selectedCal3dSocket->GetMeshWrapper();
+  else if (tut->selectedSocket)
+    meshWrapOld = tut->selectedSocket->GetMeshWrapper();
+  
+  if (!meshWrapOld ) return;
+
+  tut->spritewrapper->GetChildren()->Remove( meshWrapOld );
+
+  tut->engine->RemoveObject(meshWrapOld);
+  tut->engine->RemoveObject(meshWrapOld->GetFactory());
+
+  if (tut->selectedCal3dSocket)
+    tut->selectedCal3dSocket->SetMeshWrapper( 0 );    
+  else if (tut->selectedSocket)
+    tut->selectedSocket->SetMeshWrapper( 0 );    
+}
+
+void ViewMesh::AddSocket (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  tut->ReportWarning("Adding sockets is not yet implemented");
+
+  if (tut->cal3dsprite)
+  {
+    //tut->cal3dsprite->AddSocket()->SetName("NewSocket");
+    //tut->cal3dstate->AddSocket()->SetName("NewSocket");
+    //tut->SelectSocket("NewSocket");
+  }
+  else if (tut->sprite)
+  {
+    //iSpriteSocket* newsocket = tut->sprite->AddSocket();
+    //newsocket->SetName("NewSocket");
+    //tut->SelectSocket(newsocket->GetName());
+  }
+  tut->UpdateSocketList();
+}
+
+void ViewMesh::DelSocket (void* awst, iAwsSource *s)
+{
+  //Change API of iSpriteCal3DFactoryState to enable this!
+  ViewMesh* tut = (ViewMesh*)awst;
+  tut->ReportWarning("Deleting sockets is not yet implemented");
+  //tut->socket->DelSocket(selectedCal3dSocket);
+  //selectedCal3dSocket = 0;
+  tut->UpdateSocketList();
+}
+
+void ViewMesh::SelSocket (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  iString* text;
+  iAwsComponent* list = tut->form->FindChild("SocketList");
+  iAwsParmList* pl = tut->aws->CreateParmList();
+  if (!list) return;
+
+  pl->AddString("text0","");
+  list->Execute("GetSelectedItem", pl);
+  pl->GetString("text0",&text);
+
+  if (!text->GetData()) return;
+
+  tut->SelectSocket(text->GetData());
 }
 
 
-bool ViewMesh::LoadSprite (const char *filename, float scale)
+void ViewMesh::RenameSocket (void* awst, iAwsSource *s)
 {
-  // If there is a ':' in the name then we use vfs->ChDirAuto() which
-  // gives us more flexibility. For example you can then say things like:
-  //   viewmesh data/models.zip:bla/bla.cal3d
-  //   viewmesh /this/data:test.cal3d
+  ViewMesh* tut = (ViewMesh*)awst;
 
+  iAwsComponent* textfield = tut->form->FindChild("InputName");
+  if (!textfield) return;
+
+  iString* text;
+  if (!textfield->GetComponent()->GetProperty("Text",(void **)&text)) return;
+
+  if (!text->GetData()) return;
+
+  if (tut->selectedSocket)
+  {
+    tut->selectedSocket->SetName(*text);
+  }
+  else if (tut->selectedCal3dSocket)
+  {
+    const char* name = tut->selectedCal3dSocket->GetName();
+    tut->cal3dsprite->FindSocket(name)->SetName(*text);
+    tut->cal3dstate->FindSocket(name)->SetName(*text);
+    tut->selectedCal3dSocket = tut->cal3dsprite->FindSocket(*text);
+  }
+
+  tut->UpdateSocketList();
+}
+
+//---------------------------------------------------------------------------
+
+void ViewMesh::CameraMode (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  bool* state;
+  if (!s->GetComponent()->GetProperty("State",(void **)&state)) return;
+
+  if (!state) return;
+
+  iString* caption;
+  if (!s->GetComponent()->GetProperty("Caption",(void **)&caption)) return;
+
+  if (!caption->GetData()) return;
+
+  if (!strcmp (*caption, "Rotate"))
+    tut->camMode = rotateorigin;
+  else if (!strcmp (*caption, "Look to Origin"))
+    tut->camMode = moveorigin;
+  else if (!strcmp (*caption, "Normal Movement"))
+    tut->camMode = movenormal;
+}
+
+void ViewMesh::LoadButton (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  tut->form->Hide();
+  tut->stddlg->Show();
+  tut->stddlgPurpose=load;
+}
+
+void ViewMesh::LoadLibButton (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  tut->form->Hide();
+  tut->stddlg->Show();
+  tut->stddlgPurpose=loadlib;
+}
+
+void ViewMesh::SaveButton (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  tut->form->Hide();
+  tut->stddlg->Show();
+  tut->stddlgPurpose=save;
+}
+
+void ViewMesh::SaveBinaryButton (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  tut->form->Hide();
+  tut->stddlg->Show();
+  tut->stddlgPurpose=savebinary;
+}
+
+void ViewMesh::SetScaleSprite (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  iString* text;
+  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+
+  if (!text->GetData()) return;
+
+  float f;
+  if (sscanf(text->GetData(),"%f", &f) != 1) return;
+
+  tut->ScaleSprite(f);
+}
+
+//---------------------------------------------------------------------------
+void ViewMesh::SelMorph (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  iString* text;
+  iAwsComponent* list = tut->form->FindChild("MorphList");
+  iAwsParmList* pl = tut->aws->CreateParmList();
+  if (!list) return;
+
+  pl->AddString("text0","");
+  list->Execute("GetSelectedItem", pl);
+  pl->GetString("text0",&text);
+
+  if (!text->GetData()) return;
+
+  tut->selectedMorphTarget = text->GetData();
+}
+
+void ViewMesh::BlendButton (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  if (!tut->cal3dstate) return;
+
+  iString *Sweight=0, *Sdelay=0;
+  float weight=1, delay=1;
+
+  iAwsComponent* component;
+  component = tut->stddlg->FindChild("InputWeight");
+  if (component) component->GetProperty("Text",(void **)&Sweight);
+  if (Sweight && Sweight->GetData())
+  {
+    if(sscanf(Sweight->GetData(), "%f", &weight) != 1) weight = 1;
+  }
+
+  component = tut->stddlg->FindChild("InputDelay");
+  if (component) component->GetProperty("Text",(void **)&Sdelay);
+  if (Sdelay && Sdelay->GetData())
+  {
+    if(sscanf(Sdelay->GetData(), "%f", &delay) != 1) delay = 1;
+  }
+
+  int target =
+    tut->cal3dsprite->FindMorphAnimationName(tut->selectedMorphTarget);
+
+  if (target == -1) return;
+
+  tut->cal3dstate->BlendMorphTarget(target, weight, delay);
+}
+
+void ViewMesh::ClearButton (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+  if (!tut->cal3dstate) return;
+
+  iString *Sweight=0;
+  float weight=1;
+
+  iAwsComponent* component;
+  component = tut->stddlg->FindChild("InputWeight");
+  if (component) component->GetProperty("Text",(void **)&Sweight);
+  if (Sweight && Sweight->GetData())
+  {
+    if(sscanf(Sweight->GetData(), "%f", &weight) != 1) weight = 1;
+  }
+
+  int target =
+    tut->cal3dsprite->FindMorphAnimationName(tut->selectedMorphTarget);
+
+  if (target == -1) return;
+
+  tut->cal3dstate->ClearMorphTarget(target, weight);
+}
+//---------------------------------------------------------------------------
+
+bool ViewMesh::ParseDir(const char* filename)
+{
   char* colon = strchr (filename, ':');
   char* path;
   char* fn;
@@ -538,11 +1538,9 @@ bool ViewMesh::LoadSprite (const char *filename, float scale)
     fn = colon+1;
     strncpy (path, filename, pathlen);
     path[pathlen] = 0;
-    if (!VFS->ChDirAuto (path, 0, 0, colon+1))
+    if (!vfs->ChDirAuto (path, 0, 0, colon+1))
     {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	"crystalspace.application.viewmesh", "Couldn't find '%s' in '%s'!",
-		colon+1, path);
+      ReportError ("Couldn't find '%s' in '%s'!", colon+1, path);
       delete[] path;
       return false;
     }
@@ -553,11 +1551,13 @@ bool ViewMesh::LoadSprite (const char *filename, float scale)
     {
       char rs = *slash;
       *slash = 0;
-      VFS->ChDir (fn);
+      if (!vfs->ChDir (fn))
+        return false;
       *slash = rs;
       fn = slash+1;
       slash = strpbrk (fn, "/\\");
     }
+    return true;
   }
   else
   {
@@ -575,729 +1575,171 @@ bool ViewMesh::LoadSprite (const char *filename, float scale)
     }
     else
       dir = "/";
-    VFS->ChDir (dir);
-  }
-
-  iBase* result;
-  iRegion* region = engine->CreateRegion ("viewmesh_region");
-  bool rc = loader->Load (fn, result, region, false, false);
-  delete[] path;
-
-  if (!rc)
-    return false;
-
-  csRef<iMeshFactoryWrapper> imeshfactwrap;
-  if (result == 0)
-  {
-    // Library file. Find the first factory in our region.
-    iMeshFactoryList* factories = engine->GetMeshFactories ();
-    int i;
-    for (i = 0 ; i < factories->GetCount () ; i++)
-    {
-      iMeshFactoryWrapper* f = factories->Get (i);
-      if (region->IsInRegion (f->QueryObject ()))
-      {
-        imeshfactwrap = f;
-	break;
-      }
-    }
-  }
-  if (!imeshfactwrap)
-  {
-    imeshfactwrap = SCF_QUERY_INTERFACE (result, iMeshFactoryWrapper);
-  }
-  if (!imeshfactwrap) return false;
-
-  // eventually remove the old sprite
-  // FIXME: This badly fails if you load the same object again!
-  if (sprite)
-  {
-    sprite->GetMovable()->ClearSectors();
-    engine->GetMeshes()->Remove(sprite);
-  }
-
-  csMatrix3 scaling; scaling.Identity(); scaling *= scale;
-  csReversibleTransform rT;
-  rT.SetT2O (scaling);
-  imeshfactwrap->HardTransform (rT);
-
-  sprite = engine->CreateMeshWrapper(
-      imeshfactwrap, "MySprite", room,
-      csVector3 (0, 10, 0));
-  csRef<iSprite3DState> spstate (SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-      iSprite3DState));
-  if (spstate)
-  {
-    is_cal3d = false;
-    spstate->SetAction("default");
-  }
-  // Update Sprite States menu
-  stateslist.Push (csStrNew("default"));
-  imeshfact = imeshfactwrap->GetMeshObjectFactory();
-  csRef<iSprite3DFactoryState> factstate(SCF_QUERY_INTERFACE(imeshfact,
-      iSprite3DFactoryState));
-  if (factstate)
-  {
-    for (int i=0;i<factstate->GetActionCount ();i++)
-    {
-      iSpriteAction *spaction = factstate->GetAction(i);
-      stateslist.Push (csStrNew (spaction->GetName ()));
-    }
-  }
-  else
-  {
-    csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
-    	sprite->GetMeshObject(), iSpriteCal3DState));
-    if (cal3dstate)
-    {
-      is_cal3d = true;
-      for (int i=0;i<cal3dstate->GetAnimCount();i++)
-      {
-	if (cal3dstate->GetAnimType (i) == iSpriteCal3DState
-		::C3D_ANIM_TYPE_ACTION)
-          actionlist.Push (csStrNew (cal3dstate->GetAnimName (i)));
-	else
-          stateslist.Push (csStrNew (cal3dstate->GetAnimName (i)));
-      }
-      csRef<iSpriteCal3DFactoryState> factstate(
-      	SCF_QUERY_INTERFACE(imeshfact, iSpriteCal3DFactoryState));
-      if (factstate)
-      {
-#ifdef CS_HAS_CAL3D
-        vmAnimCallback *callback = new vmAnimCallback;
-        factstate->RegisterAnimCallback("walk",callback,.5);
-#endif
-        factstate->RescaleFactory(scale);
-	for (int i=0; i<factstate->GetMeshCount(); i++)
-	{
-	  csString push;
-	  if (factstate->IsMeshDefault(i))
-	    push.Append("x"); // This is used as a flag to determine whether
-	  		      // the item should be initially checked or not.
-	  else
-	    push.Append(" ");
-	  push.Append(factstate->GetMeshName(i));
-	  meshlist.Push(push);
-	}
-	int j;
-        for (j=0;j<factstate->GetMorphAnimationCount();j++)
-        {
-          morphanimationlist.Push(
-            csStrNew (factstate->GetMorphAnimationName(j)));
-	}
-	for(j=0;j< factstate->GetSocketCount();j++)
-	{
-	  socketlist.Push(factstate->GetSocket(j)->GetName());
-	}
-      }
-    }
-  }
-
-  // try to get center of the sprite
-  csBox3 box;
-  sprite->GetWorldBoundingBox(box);
-  spritepos = box.GetCenter();
-
-  // light the sprite (needed for things).
-  room->ShineLights(sprite);
-
-  return true;
-}
-
-bool ViewMesh::SaveSprite(const char *filename)
-{
-  csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-  csRef<iBinarySaverPlugin> saver (CS_LOAD_PLUGIN (plugin_mgr,
-    "crystalspace.mesh.saver.factory.sprite.3d.binary", iBinarySaverPlugin));
-  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
-  csRef<iFile> cf (VFS->Open (filename, VFS_FILE_WRITE));
-  saver->WriteDown(imeshfact, cf);
-  return true;
-}
-
-void ViewMesh::ConstructMenu()
-{
-  size_t i;
-
-  if (menu)
-    delete menu;
-
-  menu = new csMenu(this, csmfs3D, 0);
-  (void)new csMenuItem(menu,"Load Mesh", VIEWMESH_COMMAND_LOADMESH);
-  (void)new csMenuItem(menu,"Save Mesh (Binary)", VIEWMESH_COMMAND_SAVEMESH);
-  (void)new csMenuItem(menu,"Load TextureLib", VIEWMESH_COMMAND_LOADLIB);
-
-  // AnimMenu
-  csMenu *animmenu = new csMenu(0);
-  (void)new csMenuItem(animmenu,"Move Sprite Faster",
-  	VIEWMESH_COMMAND_MOVEANIMFASTER);
-  (void)new csMenuItem(animmenu,"Move Sprite Slower",
-  	VIEWMESH_COMMAND_MOVEANIMSLOWER);
-  (void)new csMenuItem(animmenu,"Reverse Action",
-  	VIEWMESH_COMMAND_REVERSEACTION);
-  (void)new csMenuItem(animmenu,"Forward Action",
-  	VIEWMESH_COMMAND_FORWARDACTION);
-  (void)new csMenuItem(menu, "Action Effects",
-  	animmenu);
-
-  // StateMenu
-  csMenu *statesmenu = new csMenu(0);
-  for (i=0;i<stateslist.Length();i++)
-  {
-    (void)new csMenuItem(statesmenu, stateslist.Get(i),
-			 VIEWMESH_STATES_SELECT_START+i);
-  }
-  if (is_cal3d)
-    (void)new csMenuItem(menu, "Set Action Loop", statesmenu);
-  else
-    (void)new csMenuItem(menu, "States", statesmenu);
-
-  if (is_cal3d)
-  {
-    // AddActionMenu
-    csMenu *addmenu = new csMenu(0);
-    for (i=0;i<stateslist.Length();i++)
-    {
-      (void)new csMenuItem(addmenu, stateslist.Get(i),
-			   VIEWMESH_STATES_ADD_START+i);
-    }
-    (void)new csMenuItem(menu, "Add Action Loop", addmenu);
-
-    // ClearActionMenu
-    activemenu = new csMenu(0);
-    (void)new csMenuItem(activemenu, "(All)",
-			   VIEWMESH_STATES_CLEAR_START);
-    for (i=0;i<activelist.Length();i++)
-    {
-      (void)new csMenuItem(activemenu, activelist.Get(i),
-			   VIEWMESH_STATES_CLEAR_START+i+1);
-    }
-    (void)new csMenuItem(menu, "Clear Action Loop", activemenu);
-
-    csMenu *overridemenu = new csMenu(0);
-    for (i=0;i<actionlist.Length();i++)
-    {
-      (void)new csMenuItem(overridemenu, actionlist.Get(i),
- 	  		   VIEWMESH_OVERRIDE_SELECT_START+i);
-    }
-    (void)new csMenuItem(menu, "Overrides", overridemenu);
-
-    csMenu *meshmenu = new csMenu(0);
-    for (i=0;i<meshlist.Length();i++)
-    {
-      (void)new csMenuItem(meshmenu, meshlist.Get(i)+1,
- 	  		   VIEWMESH_MESH_SELECT_START+i);
-      if (*meshlist.Get(i) == 'x')
-	  meshmenu->SetCheck(VIEWMESH_MESH_SELECT_START+i, true);
-    }
-    (void)new csMenuItem(menu, "Attach Meshes", meshmenu);
-    //Blend morph animations
-    csMenu *blendmenu = new csMenu(0);
-    for(i=0;i<morphanimationlist.Length();i++)
-    {
-       (void)new csMenuItem(blendmenu, morphanimationlist.Get(i),
-                           VIEWMESH_COMMAND_BLEND+i);
-    }
-    (void)new csMenuItem(menu, "Blend Morph Animation", blendmenu);
-    //Clear morph animations
-    csMenu *clearmenu = new csMenu(0);
-    for(i=0;i<morphanimationlist.Length();i++)
-    {
-       (void)new csMenuItem(clearmenu, morphanimationlist.Get(i),
-                           VIEWMESH_COMMAND_CLEAR+i);
-    }
-    (void)new csMenuItem(menu, "Clear Morph Animation", clearmenu);
-    //sockets
-    csMenu *socketmenu = new csMenu(0);
-    for(i=0;i<socketlist.Length();i++)
-    {
-      (void)new csMenuItem(socketmenu, socketlist.Get(i),
-			   VIEWMESH_COMMAND_SOCKET+i);
-    }
-    (void)new csMenuItem(menu, "Use Socket", socketmenu);
-
-  }
-  else
-  {
-    // OverrideActionMenu
-    csMenu *overridemenu = new csMenu(0);
-    for (i=0;i<stateslist.Length();i++)
-    {
-      (void)new csMenuItem(overridemenu, stateslist.Get(i),
-  			   VIEWMESH_OVERRIDE_SELECT_START+i);
-    }
-    (void)new csMenuItem(menu, "Overrides", overridemenu);
-  }
-  // Camera Mode
-  csMenu *cammode = new csMenu(0);
-  (void)new csMenuItem(cammode, "Normal Movement", VIEWMESH_COMMAND_CAMMODE1);
-  (void)new csMenuItem(cammode, "Look to Origin", VIEWMESH_COMMAND_CAMMODE2);
-  (void)new csMenuItem(cammode, "Rotate", VIEWMESH_COMMAND_CAMMODE3);
-  (void)new csMenuItem(menu, "Camera Mode", cammode);
-
-  (void)new csMenuItem(menu,"~Quit", cscmdQuit);
-  menu->Hide();
-}
-
-void ViewMesh::UpdateSpritePosition(csTicks elapsed)
-{
-    if (!sprite)
-	return;
-    if (!move_sprite_speed)
-	return;
-
-    csRef<iMovable> mov = sprite->GetMovable();
-    
-    csVector3 v(0,0,-move_sprite_speed*elapsed/1000);
-    mov->MovePosition(v);
-
-    v = mov->GetFullPosition();
-    float const absz = (v.z < 0 ? -v.z : v.z);
-    if (absz > 4.5)  // this should make the sprite loop.
-    {
-	v.z = -v.z;
-	mov->SetPosition(v);
-    }
-    mov->UpdateMove();
-}
-
-void ViewMesh::Draw()
-{
-  // First get elapsed time from the system driver.
-  csTicks elapsed_time, current_time;
-  elapsed_time = vc->GetElapsedTicks ();
-  current_time = vc->GetCurrentTicks ();
-
-  // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
-
-  if (sprite)
-    UpdateSpritePosition(elapsed_time);
-
-  if (!dialog && !menu->GetState(CSS_VISIBLE))
-  {
-    iCamera* c = view->GetCamera();
-    switch (cammode)
-    {
-      case movenormal:
-    	if (GetKeyState (CSKEY_RIGHT))
-	  c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
-	if (GetKeyState (CSKEY_LEFT))
-	  c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-	if (GetKeyState (CSKEY_PGUP))
-	  c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-	if (GetKeyState (CSKEY_PGDN))
-	  c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
-	if (GetKeyState (CSKEY_UP))
-	  c->Move (CS_VEC_FORWARD * 4 * speed);
-	if (GetKeyState (CSKEY_DOWN))
-	  c->Move (CS_VEC_BACKWARD * 4 * speed);
-	break;
-      case moveorigin:
-	{
-	  csVector3 orig = c->GetTransform().GetOrigin();
-
-	  if (GetKeyState (CSKEY_DOWN))
-	    c->GetTransform().SetOrigin (orig + CS_VEC_BACKWARD * 4 * speed);
-	  if (GetKeyState (CSKEY_UP))
-	    c->GetTransform().SetOrigin (orig + CS_VEC_FORWARD * 4 * speed);
-	  if (GetKeyState (CSKEY_LEFT))
-	    c->GetTransform().SetOrigin (orig + CS_VEC_LEFT * 4 * speed);
-	  if (GetKeyState (CSKEY_RIGHT))
-	    c->GetTransform().SetOrigin (orig + CS_VEC_RIGHT * 4 * speed);
-	  if (GetKeyState (CSKEY_PGUP))
-	    c->GetTransform().SetOrigin (orig + CS_VEC_UP * 4 * speed);
-	  if (GetKeyState (CSKEY_PGDN))
-	    c->GetTransform().SetOrigin (orig + CS_VEC_DOWN * 4 * speed);
-	  c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );
-  	  break;
-	}
-      case rotateorigin:
-	{
-	  csVector3 orig = c->GetTransform().GetOrigin();
-	  if (GetKeyState (CSKEY_LEFT))
-	    orig = csYRotMatrix3(-speed) * (orig-spritepos) + spritepos;
-	  if (GetKeyState (CSKEY_RIGHT))
-	    orig = csYRotMatrix3(speed) * (orig-spritepos) + spritepos;
-	  if (GetKeyState (CSKEY_UP))
-	    orig = csXRotMatrix3(speed) * (orig-spritepos) + spritepos;
-	  if (GetKeyState (CSKEY_DOWN))
-	    orig = csXRotMatrix3(-speed) * (orig-spritepos) + spritepos;
-	  c->GetTransform().SetOrigin(orig);
-	  if (GetKeyState (CSKEY_PGUP))
-	    c->Move(CS_VEC_FORWARD * 4 * speed);
-	  if (GetKeyState (CSKEY_PGDN))
-	    c->Move(CS_VEC_BACKWARD * 4 * speed);
-	  c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );
-	  break;
-	}
-      default:
-	break;
-    }
-  }
-
-  //pplBeginDraw(CSDRAW_2DGRAPHICS);
-  csApp::Draw();
-  pplBeginDraw(CSDRAW_3DGRAPHICS);
-  view->Draw();
-  pplInvalidate(bound);
-  if (menu->GetState(CSS_VISIBLE)) {
-    menu->Invalidate(true);
-  }
-  if (dialog) {
-    dialog->Invalidate(true);
-  }
-}
-
-#define VM_QUERYPLUGIN(var, intf, str)				\
-  var = CS_QUERY_REGISTRY (object_reg, intf);			\
-  if (!var)							\
-  {								\
-    Printf (CS_REPORTER_SEVERITY_ERROR, "No " str " plugin!");	\
-    return false;						\
-  }
-
-bool ViewMesh::Initialize ()
-{
-  if (!csApp::Initialize())
-    return false;
-
-  // Query for plugins
-  // Find the pointer to engine plugin
-  VM_QUERYPLUGIN (engine, iEngine, "iEngine");
-
-  VM_QUERYPLUGIN (loader, iLoader, "iLoader");
-  VM_QUERYPLUGIN (g3d, iGraphics3D, "iGraphics3D");
-
-  csRef<iCommandLineParser> cmdline;
-  VM_QUERYPLUGIN (cmdline, iCommandLineParser, "iCommandLineParser");
-
-  const char* meshfilename = cmdline->GetName (0);
-  const char* texturefilename = cmdline->GetName (1);
-  const char* texturename = cmdline->GetName (2);
-  const char* scaleTxt = cmdline->GetOption("Scale");
-  const char* roomSize = cmdline->GetOption("RoomSize");
-
-  float size = (roomSize)?atof(roomSize):5;
-
-  // Set up a null cache.
-  iCacheManager *cachemgr = new csNullCacheManager ();
-  engine->SetCacheManager (cachemgr);
-  cachemgr->DecRef ();
-
-  // Open the main system. This will open all the previously loaded plug-ins.
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  iNativeWindow* nw = g2d->GetNativeWindow ();
-  if (nw)
-    nw->SetTitle ("View Mesh");
-
-  // Setup the texture manager
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-
-  Printf (CS_REPORTER_SEVERITY_NOTIFY,
-    "View Mesh version 0.1.");
-
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
-  // Create our world.
-  Printf (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
-
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-  {
-    Printf (CS_REPORTER_SEVERITY_ERROR, "Error loading 'stone4' texture!");
-    return false;
-  }
-  if (!loader->LoadTexture ("spark", "/lib/std/spark.png"))
-  {
-    Printf (CS_REPORTER_SEVERITY_ERROR, "Error loading 'stone4' texture!");
-    return false;
-  }
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
-
-  room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> ws =
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
-  walls_state->AddInsideBox (csVector3 (-size, 0, -size),
-  	csVector3 (size, 4*size, size));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
-
-  csRef<iLight> light;
-  iLightList* ll = room->GetLights ();
-  light = engine->CreateLight (0, csVector3 (-3, 10, 0), 10,
-  	csColor (0.8f, 0.8f, 0.8f));
-  ll->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (3, 10,  0), 10,
-  	csColor (0.8f, 0.8f, 0.8f));
-  ll->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (0, 10, -3), 10,
-  	csColor (0.8f, 0.8f, 0.8f));
-  ll->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (0, 10,  3), 10,
-  	csColor (0.8f, 0.8f, 0.8f));
-  ll->Add (light);
-
-  engine->Prepare ();
-  Printf (CS_REPORTER_SEVERITY_NOTIFY, "Created.");
-
-  view = csPtr<iView> (new csView (engine, g3d));
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 10, -4));
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  if (scaleTxt != 0)
-  {
-    sscanf (scaleTxt, "%f", &scale);
-    printf ("Scaling: %f\n", scale);
-  }
-  else
-   scale = 1.0F;
-
-  // Load specified Libraries
-  Printf (CS_REPORTER_SEVERITY_NOTIFY, "Loading libs...");
-  const char *libname;
-  int i;
-  for (i=0; (libname=cmdline->GetOption("Lib",i)); i++)
-  {
-    if (!loader->LoadLibraryFile(libname))
-    {
-      Printf (CS_REPORTER_SEVERITY_ERROR, "Couldn't load lib %s.", libname);
-    }
-  }
-  if (i>0)
-    engine->Prepare();
-
-  // Load a texture for our sprite.
-  if (texturefilename && texturename)
-  {
-    iTextureWrapper* txt = loader->LoadTexture (texturename,
-  	  texturefilename);
-    if (txt == 0)
-    {
-      Printf (CS_REPORTER_SEVERITY_ERROR, "Error loading texture '%s'!",
-      	texturefilename);
+    if (!vfs->ChDir(dir))
       return false;
-    }
-    txt->Register (txtmgr);
-    iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (
-    	texturename);
-    mat->Register (txtmgr);
+    return true;
   }
-
-  // Load a sprite template from disk.
-  if (meshfilename && !LoadSprite(meshfilename,scale))
-  {
-    Printf (CS_REPORTER_SEVERITY_ERROR,
-    	"Error loading mesh object factory '%s'!", meshfilename);
-    return false;
-  }
-
-  // Create an menu
-  ConstructMenu();
-
-  return true;
 }
 
-bool ViewMesh::AttachMeshToSocket( int socketNumber, const char* meshFile, 
-                                   float xRot, float yRot, float zRot )
+void ViewMesh::StdDlgUpdateLists(const char* filename)
 {
-  csRef<iSpriteCal3DState> cal3dstate(
-        SCF_QUERY_INTERFACE(sprite->GetMeshObject(), iSpriteCal3DState));
-        
-  if (cal3dstate)
-  {
-    iSpriteCal3DSocket* socket = cal3dstate->FindSocket(
-    	socketlist.Get(socketNumber));
-    if ( !socket )
-    {
-      Printf (CS_REPORTER_SEVERITY_ERROR,
-              "Error getting socket: %d!", socketNumber);  
-      return false;                    
-    }
+  iAwsComponent* dirlist = stddlg->FindChild("DirList");
+  iAwsComponent* filelist = stddlg->FindChild("FileList");
+  iAwsParmList* pl = aws->CreateParmList();
+  if (!dirlist || !filelist) return;
+
+  dirlist->Execute("ClearList", pl);
+  filelist->Execute("ClearList", pl);
+
+  pl->AddString("text0", "..");
+  dirlist->Execute("InsertItem", pl);
+  pl->Clear();
+
+  csRef<iStringArray> files = vfs->FindFiles(filename);
   
-    csRef<iMeshWrapper> meshWrapOld = socket->GetMeshWrapper();
-    if ( meshWrapOld )
+  for (size_t i = 0; i < files->Length(); i++)
+  {
+    char* file = (char*)files->Get(i);
+    if (!file) continue;
+
+    size_t dirlen = strlen(file);
+    if (dirlen)
+      dirlen--;
+    while (dirlen && file[dirlen-1]!= '/')
+      dirlen--;
+    file=file+dirlen;
+
+    if (file[strlen(file)-1] == '/')
     {
-      sprite->GetChildren()->Remove( meshWrapOld );
-      socket->SetMeshWrapper( NULL );    
-    }
-    
-    csRef<iMeshFactoryWrapper> factory = loader->LoadMeshObjectFactory (
-    	meshFile );
-    if (!factory)
-    {
-      Printf (CS_REPORTER_SEVERITY_ERROR,
-              "Error loading mesh object factory '%s'!", meshFile);    
-      return false;
+      file[strlen(file)-1]='\0';
+      pl->AddString("text0", file);
+      dirlist->Execute("InsertItem", pl);
+      pl->Clear();
     }
     else
     {
-      csRef<iMeshWrapper> meshWrap = engine->CreateMeshWrapper (
-      	factory, meshFile );
-      
-      if ( xRot != 0 )          
-      {
-        meshWrap->GetFactory()->GetMeshObjectFactory()->
-            HardTransform( csTransform(csXRotMatrix3(xRot),
-                           csVector3(0,0,0) ));                
-      }
-      
-      if ( yRot != 0 )          
-      {
-        meshWrap->GetFactory()->GetMeshObjectFactory()->
-            HardTransform( csTransform(csYRotMatrix3(yRot),
-                           csVector3(0,0,0) ));                
-      }
-      if ( zRot != 0 )          
-      {
-        meshWrap->GetFactory()->GetMeshObjectFactory()->
-            HardTransform( csTransform(csZRotMatrix3(zRot),
-                           csVector3(0,0,0) ));                
-      }                                  
-      sprite->GetChildren()->Add( meshWrap );
-      socket->SetMeshWrapper( meshWrap );
-      sprite->GetMovable()->UpdateMove();
-    }                
+      pl->AddString("text0", file);
+      filelist->Execute("InsertItem", pl);
+      pl->Clear();
+    }
+  }
+}
+
+//---------------------------------------------------------------------------
+
+void ViewMesh::StdDlgOkButton (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  iString* path=0;
+  iString* file=0;
+
+  tut->form->Show();
+  tut->stddlg->Hide();
+
+  iAwsComponent* inputpath = tut->stddlg->FindChild("InputPath");
+  if (inputpath) inputpath->GetProperty("Text",(void **)&path);
+  if (!path || !path->GetData()) return;
+
+  iAwsComponent* inputfile = tut->stddlg->FindChild("InputFile");
+  if (inputfile) inputfile->GetProperty("Text",(void **)&file);
+  if (!file || !file->GetData()) return;
+
+  switch (tut->stddlgPurpose)
+  {
+  case save:
+    tut->SaveSprite(*path, *file, false);
+    break;
+  case savebinary:
+    tut->SaveSprite(*path, *file, true);
+    break;
+  case load:
+    tut->LoadSprite(*path, *file);
+    break;
+  case loadlib:
+    tut->LoadLibrary(*path, *file);
+    break;
+  case attach:
+    tut->AttachMesh(*path, *file);
+    break;
+  }
+}
+
+void ViewMesh::StdDlgCancleButton (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  tut->form->Show();
+  tut->stddlg->Hide();
+}
+
+void ViewMesh::StdDlgFileSelect (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  iString* text;
+  iAwsComponent* list = tut->stddlg->FindChild("FileList");
+  iAwsParmList* pl = tut->aws->CreateParmList();
+  if (!list) return;
+
+  pl->AddString("text0","");
+  list->Execute("GetSelectedItem", pl);
+  pl->GetString("text0",&text);
+
+  if (!text->GetData()) return;
+
+  iAwsComponent* InputPath = tut->stddlg->FindChild("InputFile");
+  InputPath->SetProperty("Text",text);
+}
+
+void ViewMesh::StdDlgDirSelect (void* awst, iAwsSource *s)
+{
+  ViewMesh* tut = (ViewMesh*)awst;
+
+  iString* text;
+  iAwsComponent* list = tut->stddlg->FindChild("DirList");
+  iAwsParmList* pl = tut->aws->CreateParmList();
+  if (!list) return;
+
+  pl->AddString("text0","");
+  list->Execute("GetSelectedItem", pl);
+  pl->GetString("text0",&text);
+
+  if (!text->GetData()) return;
+
+  printf("cd %s\n",text->GetData());
+
+  iString* path = 0;
+  iAwsComponent* inputpath = tut->stddlg->FindChild("InputPath");
+  if (inputpath) inputpath->GetProperty("Text",(void **)&path);
+  if (!path || !path->GetData()) return;
+
+  csRef<iString> newpath = path;
+
+  if (csString("..") == *text)
+  {
+    size_t i = newpath->Slice(0,newpath->Length()-1)->FindLast('/')+1;
+    printf("%d", i);
+    newpath = newpath->Slice(0,i);
   }
   else
   {
-    Printf (CS_REPORTER_SEVERITY_ERROR,
-            "Could not get iSpriteCal3dState");        
-    return false;              
-  }              
-  
-  
-  return true;
+     newpath->Append(text);
+     newpath->Append("/");
+  }
+
+  if (!newpath->GetData()) newpath->Append("/");
+
+  tut->ParseDir(newpath->GetData());
+
+  iAwsComponent* InputPath = tut->stddlg->FindChild("InputPath");
+  if (InputPath) InputPath->SetProperty("Text",newpath);
+  tut->StdDlgUpdateLists(newpath->GetData());
 }
 
+//---------------------------------------------------------------------------
 
-void ViewMesh::CreateRotationWindow(int socket, char* filename)
+int main(int argc, char** argv)
 {
-  char buffer[100];
-                
-  dialog = new csWindow (this, "Select Rotation",
-                        CSWS_DEFAULTVALUE | CSWS_TOOLBAR | CSWS_CLIENTBORDER);
-  dialog->SetRect (10, 10, 200, 270);               
-  csComponent *client = new csDialog (dialog);        
-  client->id = 1000;
-        
-  csStatic *stat = new csStatic (client, 0, "RotX", csscsFrameLabel);
-  stat->SetRect (10, 10, 150, 50);           
-  csInputLine *il = new csInputLine (client, 40, csifsThickRect);
-  il->id = 1001;
-  il->SetRect (15, 20, 100, 36);        
-  sprintf(buffer, "%f", DEFAULT_SOCKET_X_ROTATION ),
-  il->SetText (buffer);        
-       
-  stat = new csStatic (client, 0, "RotY", csscsFrameLabel);
-  stat->SetRect (10, 60, 150, 110);                           
-  il = new csInputLine (client, 40, csifsThickRect);
-  il->id = 1002;
-  il->SetRect (15, 80, 100, 96);
-  sprintf(buffer, "%f", DEFAULT_SOCKET_Y_ROTATION),
-  il->SetText (buffer);        
-        
-  stat = new csStatic (client, 0, "RotZ", csscsFrameLabel);
-  stat->SetRect (10, 120, 150, 170);                           
-  il = new csInputLine (client, 40, csifsThickRect);
-  il->id = 1003;
-  il->SetRect (15, 140, 100, 157);
-  sprintf(buffer, "%f", DEFAULT_SOCKET_Z_ROTATION),
-  il->SetText (buffer);        
-        
-  csButton* b = new csButton (client, cscmdStopModal,
-  	CSBS_DEFAULTVALUE | CSBS_DISMISS);
-  b->SetText ("~Ok");
-  b->SetRect (10, 180, 150, 200);
-      
-  ModalData *newData=new ModalData;
-  newData->meshName = filename;
-  newData->socket   = socket;
-       
-  newData->code = VIEWMESH_COMMAND_ATTACH_SOCKET;
-  StartModal (dialog, newData);               
+  return ViewMesh().Main(argc, argv);
 }
-
-
-/*---------------------------------------------------------------------*
- * Main function
- *---------------------------------------------------------------------*/
-
-// define a skin for csws
-CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
-
-int main (int argc, char* argv[])
-{
-  srand (time (0));
-
-  iObjectRegistry *object_reg = csInitializer::CreateEnvironment(argc, argv);
-  if (!object_reg)
-    return 1;
-
-  if (!csInitializer::SetupConfigManager (object_reg, 0))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	"crystalspace.application.viewmesh", "Couldn't load config file!");
-    return 1;
-  }
-	
-  if (!csInitializer::RequestPlugins (object_reg,
-	      CS_REQUEST_VFS,
-	      CS_REQUEST_OPENGL3D,
-	      CS_REQUEST_ENGINE,
-	      CS_REQUEST_FONTSERVER,
-	      CS_REQUEST_IMAGELOADER,
-	      CS_REQUEST_LEVELLOADER,
-	      CS_REQUEST_REPORTER,
-	      CS_REQUEST_REPORTERLISTENER,
-	      CS_REQUEST_END))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	"crystalspace.application.viewmesh", "Couldn't find plugins!\n"
-	"Is your CRYSTAL environment var properly set?");
-    return 1;
-  }
-
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    ViewMesh::Help();
-    csCommandLineHelper::Help(object_reg);
-    return 0;
-  }
-
-  if (!csInitializer::OpenApplication(object_reg))
-  {
-    return 1;
-  }
-
-  // Create our main class.
-  ViewMesh *app = new ViewMesh (object_reg, DefaultSkin);
-
-  // Initialize the main system. This will load all needed plug-ins
-  // (3D, 2D, network, sound, ...) and initialize them.
-  if (!app->Initialize ())
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	"crystalspace.application.viewmesh", "Error initializing system!");
-    csInitializer::DestroyApplication(object_reg);
-    return 1;
-  }
-
-  // Main loop.
-  csDefaultRunLoop(object_reg);
-
-  // Cleanup.
-  delete app;
-  csInitializer::DestroyApplication(object_reg);
-
-  return 0;
-}
-
