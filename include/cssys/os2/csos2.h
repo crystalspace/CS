@@ -59,9 +59,6 @@ public:
   /// Initialize system-dependent data
   SysSystemDriver ();
 
-  /// The system is idle: we can sleep for a while
-  virtual void Sleep (int SleepTime);
-
   /// Perform extension function from Os2Helper.
   void StartGUI ();
 };

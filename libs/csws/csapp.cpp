@@ -21,6 +21,7 @@
 #include <limits.h>
 #include <stdarg.h>
 #include "cssysdef.h"
+#include "cssys/system.h"
 #include "qint.h"
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
@@ -522,8 +523,7 @@ int csApp::FindColor (int r, int g, int b)
 
 void csApp::Idle ()
 {
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->Sleep (1);
+  csSleep (1);
 }
 
 void csApp::StartFrame ()

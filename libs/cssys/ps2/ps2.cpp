@@ -25,7 +25,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 }
 
 extern "C" int usleep (unsigned);
-void SysSystemDriver::Sleep (int SleepTime)
+void csSleep (int SleepTime)
 {
 //TODO Azverkan FixMe
 //    usleep (SleepTime * 1000);

@@ -41,7 +41,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   object_reg.Register (os2helper, "SystemHelper");
 }
 
-void SysSystemDriver::Sleep (int SleepTime)
+void csSleep (int SleepTime)
 {
   DosSleep (SleepTime);
 }

@@ -47,7 +47,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 #endif
 }
 
-void SysSystemDriver::Sleep (int SleepTime)
+void csSleep (int SleepTime)
 {
   usleep (SleepTime * 1000);
 }

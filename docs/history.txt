@@ -73,6 +73,10 @@ The history order is reversed so that new features are at the top.
 	- Converted simplept application to use the new csInitializer system.
 	- Converted cslight application to use the new csInitializer system.
 	- Converted csfedit application to use the new csInitializer system.
+	- Made csSystemDriver::NextFrame() and HandleEvent() private so
+	  that it is no longer possible to inherit from SysSystemDriver.
+	- Removed Sleep() from csSystemDriver and iSystem. Instead there
+	  is now csSleep() which should be called instead.
 4-Oct-2001
 	- Removed support for old and obsolete 'debug_level' in system
 	  driver.

@@ -712,7 +712,7 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
   return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
-void SysSystemDriver::Sleep (int SleepTime)
+void csSleep (int SleepTime)
 {
   ::Sleep (SleepTime);
 }

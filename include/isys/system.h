@@ -31,7 +31,7 @@ struct iObjectRegistry;
 #define CS_GET_SYSTEM(object_reg) CS_QUERY_REGISTRY(object_reg, iSystem)
 
 
-SCF_VERSION (iSystem, 12, 0, 0);
+SCF_VERSION (iSystem, 13, 0, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -56,16 +56,6 @@ struct iSystem : public iBase
    * Loop method.
    */
   virtual void NextFrame () = 0;
-
-  //----------------------------- Miscellaneous -----------------------------//
-
-  /**
-   * This function will freeze your application for given number of 1/1000
-   * seconds. The function is very inaccurate, so don't use it for accurate
-   * timing. It may be useful when the application is idle, to explicitly
-   * release CPU for other tasks in multi-tasking operating systems.
-   */
-  virtual void Sleep (int iSleepTime) = 0;
 
   //---------------------------- Object Registry ----------------------------//
 

@@ -61,6 +61,7 @@ class csPluginList;
 class csSystemDriver : public iSystem
 {
   friend class csPluginList;
+  friend class SysSystemDriver;
 
 private:
   /*
@@ -194,6 +195,13 @@ public:
    */
   virtual void Loop ();
 
+// @@@ The following (and some of the above) should all move to the
+// specific implementation of the plugin manager when we have that.
+
+  /// A shortcut for requesting to load a plugin (before Initialize())
+  void RequestPlugin (const char *iPluginName);
+
+private:
   /**
    * SysSystemDriver::Loop calls this method once per frame.
    * This method can be called manually as well if you don't use the
@@ -205,16 +213,6 @@ public:
   /// Handle an event.
   virtual bool HandleEvent(iEvent&);
 
-  /// Sleep for given number of 1/1000 seconds (very inacurate)
-  virtual void Sleep (int /*SleepTime*/) {}
-
-  /// A shortcut for requesting to load a plugin (before Initialize())
-  void RequestPlugin (const char *iPluginName);
-
-// @@@ The following (and some of the above) should all move to the
-// specific implementation of the plugin manager when we have that.
-
-private:
   /// Load a plugin and initialize it.
   iBase *LoadPlugin (const char *iClassID, const char *iFuncID,
     const char *iInterface, int iVersion);
@@ -350,6 +348,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE(csSystemDriver);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiEventHandler;
+  friend struct eiEventHandler;
 };
 
 /// CS version of printf
@@ -368,5 +367,13 @@ extern csTicks csGetTicks ();
  * some initialization tasks still need this.
  */
 extern bool csGetInstallPath (char *oInstallPath, size_t iBufferSize);
+
+/**
+ * This function will freeze your application for given number of 1/1000
+ * seconds. The function is very inaccurate, so don't use it for accurate
+ * timing. It may be useful when the application is idle, to explicitly
+ * release CPU for other tasks in multi-tasking operating systems.
+ */
+extern void csSleep (int /*SleepTime*/);
 
 #endif // __CS_SYSTEM_H__

@@ -309,7 +309,7 @@ void G2DTestSystemDriver::SetupFrame ()
       if (int (csGetTicks () - timer) > 0)
         LeaveState ();
       else
-        Sleep (1);
+        csSleep (1);
       break;
     case stWaitKey:
       if (lastkey)
@@ -322,10 +322,10 @@ void G2DTestSystemDriver::SetupFrame ()
         if (SwitchBB)
         {
           myG2D->Print (NULL);
-          Sleep (200);
+          csSleep (200);
         }
         else
-          Sleep (1);
+          csSleep (1);
       }
       break;
   }

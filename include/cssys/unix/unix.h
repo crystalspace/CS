@@ -28,8 +28,6 @@ class SysSystemDriver : public csSystemDriver
 public:
   // Constructor
   SysSystemDriver ();
-  // Sleep for given number of 1/1000 seconds
-  virtual void Sleep (int SleepTime);
 };
 
 #endif // __UNIX_H__
