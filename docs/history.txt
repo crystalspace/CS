@@ -48,6 +48,8 @@ chronological order.
 	    - Fixed bugs in csJoystickDriver where it confusedly treated the
 	      joystick number as 0-based some of the time, and 1-based other
 	      times. Now, all code treats it as 1-based.
+	    - Fixed the informational messages reported by csjoylin so that
+	      they employ 1-based joystick numbers, rather than 0-based.
 28-Sep-2004
 	- Rhad mutexed some portions of the software renderer to reduce
 	  thread contention issues.  This is not a complete fix but should

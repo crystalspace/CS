@@ -123,7 +123,7 @@ bool csLinuxJoystick::Init ()
   {
     if ((fd = open (it->GetStr (), O_RDONLY)) < 0) 
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      Report (CS_REPORTER_SEVERITY_WARNING,
               "Failed to open joystick device %s - error: %s\n",
               it->GetStr (),
               strerror (errno));
@@ -156,8 +156,10 @@ bool csLinuxJoystick::Init ()
 	ioctl (fd, JSIOCGNAME(128), name);
 
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
-                "Joystick number %d (%s) has %d axes and %d buttons. Driver version is %d.%d.%d.\n",
-		n, name, axes, buttons, version >> 16, (version >> 8) & 0xff, version & 0xff);
+                "Joystick number %d (%s) has %d axes and %d buttons.\n"
+		"Driver version is %d.%d.%d.\n",
+		n + 1, name, axes, buttons,
+		version >> 16, (version >> 8) & 0xff, version & 0xff);
         joystick[n].number = n;
         joystick[n].fd = fd;
         joystick[n].nButtons = buttons;
