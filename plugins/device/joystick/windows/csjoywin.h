@@ -42,12 +42,12 @@ class csWindowsJoystick : public iComponent
 private:
   struct joydata
   {
-    int number;				// joysticknumber
-    LPDIRECTINPUTDEVICE2 device;	// DInput device
-    int nButtons;			// number of buttons
-    int nAxes;				// number of axis
-    DIJOYSTATE2 state[2];		// state of Joystick, last state
-    int nstate;				// this is current state
+    int number;			 // joystick number; CS numbers are 1-based
+    LPDIRECTINPUTDEVICE2 device; // DInput device
+    int nButtons;		 // number of buttons
+    int nAxes;			 // number of axis
+    DIJOYSTATE2 state[2];	 // state of Joystick, last state
+    int nstate;			 // this is current state
     joydata()
     {
       device = 0;

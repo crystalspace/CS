@@ -34,7 +34,7 @@ class csLinuxJoystick : public iComponent
 private:
   struct joydata
   {
-    int number;		// joysticknumber
+    int number;		// joystick number; CS joystick numbers are 1-based
     int fd;		// device descriptor
     int nButtons;	// number of buttons
     int nAxes;		// number of axis

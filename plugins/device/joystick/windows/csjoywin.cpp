@@ -83,37 +83,38 @@ bool csWindowsJoystick::HandleEvent (iEvent &)
   int nstate, last_state;
   for (size_t i = 0; i < joystick.Length (); i++)
   {
-    joystick[i].device->Poll ();
-    nstate = joystick[i].nstate;
-    hr = joystick[i].device->GetDeviceState ((DWORD)sizeof (DIJOYSTATE2), 
-      (LPVOID)&joystick[i].state[nstate]);
+    joydata& jd = joystick[i];
+    jd.device->Poll ();
+    nstate = jd.nstate;
+    hr = jd.device->GetDeviceState ((DWORD)sizeof (DIJOYSTATE2), 
+      (LPVOID)&jd.state[nstate]);
     if (FAILED (hr))
     {
-      joystick[i].device->Acquire();  // try to reacquire
+      jd.device->Acquire();  // try to reacquire
       // ... and try again
-      hr = joystick[i].device->GetDeviceState ((DWORD)sizeof (DIJOYSTATE2), 
-	(LPVOID)&joystick[i].state[nstate]);
+      hr = jd.device->GetDeviceState ((DWORD)sizeof (DIJOYSTATE2), 
+	(LPVOID)&jd.state[nstate]);
     } 
     if (SUCCEEDED (hr))
     {
       last_state=1-nstate;
       for (int btn = 0; btn < 128; btn++) 
       {
-        if (joystick[i].state[nstate].rgbButtons[btn] != 
-	  joystick[i].state[last_state].rgbButtons[btn]) 
+        if (jd.state[nstate].rgbButtons[btn] != 
+	  jd.state[last_state].rgbButtons[btn]) 
 	{
-          EventOutlet->Joystick(i, btn + 1, 
-	    joystick[i].state[nstate].rgbButtons[btn] != 0,
-            joystick[i].state[nstate].lX, joystick[i].state[nstate].lY);
+          EventOutlet->Joystick(jd.number, btn + 1, 
+	    jd.state[nstate].rgbButtons[btn] != 0,
+            jd.state[nstate].lX, jd.state[nstate].lY);
         }
       }    
-      if ((joystick[i].state[nstate].lX != joystick[i].state[last_state].lX) ||
-        (joystick[i].state[nstate].lY != joystick[i].state[last_state].lY))
+      if ((jd.state[nstate].lX != jd.state[last_state].lX) ||
+        (jd.state[nstate].lY != jd.state[last_state].lY))
       {
-        EventOutlet->Joystick (i, 0, 0, joystick[i].state[nstate].lX,
-	joystick[i].state[nstate].lY);
+        EventOutlet->Joystick (jd.number, 0, 0, jd.state[nstate].lX,
+	jd.state[nstate].lY);
       }
-      joystick[i].nstate=last_state;
+      jd.nstate=last_state;
     }
   }
   return false;
@@ -139,7 +140,7 @@ bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCE*  pdidInstanc)
   if (device) 
   {
     joydata data;
-    data.number = joystick.Length ();
+    data.number = joystick.Length() + 1; // CS joystick numbers are 1-based.
     caps.dwSize = sizeof (caps);
     data.device = (LPDIRECTINPUTDEVICE2)device;
     data.device->GetCapabilities (&caps);
@@ -178,12 +179,14 @@ bool csWindowsJoystick::Init ()
     lpdin->EnumDevices (DIDEVTYPE_JOYSTICK, &DIEnumDevicesCallback,
       (LPVOID)this,  DIEDFL_ATTACHEDONLY);
     size_t i;
-    for (i = 0; i < joystick.Length (); i++) 
+    size_t const njoys = joystick.Length();
+    for (i = 0; i < njoys; i++) 
     {
+      joydata& jd = joystick[i];
       DIDEVICEINSTANCEA devInfo;
       memset (&devInfo, 0, sizeof (devInfo));
       devInfo.dwSize = sizeof (devInfo);
-      hr = joystick[i].device->GetDeviceInfo (&devInfo);
+      hr = jd.device->GetDeviceInfo (&devInfo);
       if (FAILED (hr))
       {
 	Report (CS_REPORTER_SEVERITY_WARNING, 
@@ -193,39 +196,44 @@ bool csWindowsJoystick::Init ()
       {
 	wchar_t* devProduct = cswinAnsiToWide (devInfo.tszProductName);
         Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Found input device #%d: %s", i + 1, 
+	  "Found input device #%d: %s", jd.number, 
 	  (const char*)csWtoC (devProduct));
 	delete[] devProduct;
       }
     
 #ifdef CS_DEBUG
-      joystick[i].device->SetCooperativeLevel (window,
+      jd.device->SetCooperativeLevel (window,
         DISCL_EXCLUSIVE | DISCL_BACKGROUND);
 #else
-      joystick[i].device->SetCooperativeLevel (window,
+      jd.device->SetCooperativeLevel (window,
         DISCL_EXCLUSIVE | DISCL_FOREGROUND);
 #endif  
          
       // according to DX SDK 4 joysticks
-      joystick[i].device->Acquire();	
+      jd.device->Acquire();	
       /*
         This is one of the crazy things in DInput: (Un)Acquire! 
 	Who has to be shot for this?
        */
     }
-   // hook into eventqueue
-    eq = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-    if (eq)
+
+    // hook into eventqueue
+    if (njoys > 0)
     {
-      eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
-      EventOutlet = eq->CreateEventOutlet (&scfiEventPlug);
+      eq = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+      if (eq)
+      {
+	eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+	EventOutlet = eq->CreateEventOutlet (&scfiEventPlug);
+      }
     }
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "DirectInput Joystick plugin loaded!");
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "DirectInput Joystick plugin loaded; %d joysticks", njoys);
   } 
   else
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
-      "Can't retrieve Direct Input interface: error %.8x", hr);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Joystick plugin: can't retrieve "
+      "Direct Input interface: error %.8x", hr);
   }
 
   return eq && EventOutlet;

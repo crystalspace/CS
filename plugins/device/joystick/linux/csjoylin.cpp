@@ -33,9 +33,6 @@
 #define CS_LINUX_JOYSTICK_CFG "/config/joystick.cfg"
 #define CS_LINUX_JOYSTICK_KEY "Device.Joystick." CS_PLATFORM_NAME "."
 
-// The values of the first two axis are sent only.
-#define CS_LINUX_JOYSTICK_OLD_EVENTS
-
 CS_IMPLEMENT_PLUGIN;
 
 SCF_IMPLEMENT_FACTORY (csLinuxJoystick);
@@ -86,24 +83,20 @@ bool csLinuxJoystick::HandleEvent (iEvent &)
 
   for (int i = 0; i < nJoy; i++)
   {
-    while (read (joystick [i].fd, &js, sizeof(struct js_event)) ==
-	   sizeof(struct js_event)) 
+    joydata& jd = joystick[i];
+    while (read (jd.fd, &js, sizeof(js)) == sizeof(js)) 
     {
       switch (js.type & ~JS_EVENT_INIT) 
       {
       case JS_EVENT_BUTTON:
-        joystick[i].button[js.number] = js.value;
-        EventOutlet->Joystick (i, js.number+1, js.value, -1, 0);
+        jd.button[js.number] = js.value;
+        EventOutlet->Joystick (jd.number, js.number + 1, js.value,
+          jd.axis[0], jd.nAxes > 1 ? jd.axis[1] : 0);
         break;
       case JS_EVENT_AXIS:
-        joystick[i].axis[js.number] = js.value;
-#ifndef CS_LINUX_JOYSTICK_OLD_EVENTS
-        EventOutlet->Joystick (i, 0, 0, js.number, js.value);
-#else
-        if (js.number < 2)
-          EventOutlet->Joystick (i, 0, 0, joystick[i].axis[0],
-	    (joystick[i].nAxes > 1 ? joystick[i].axis[1] : 0));
-#endif
+        jd.axis[js.number] = js.value;
+        EventOutlet->Joystick (jd.number, 0, 0, jd.axis[0],
+         (jd.nAxes > 1 ? jd.axis[1] : 0));
         break;
       }
     }
@@ -169,12 +162,14 @@ bool csLinuxJoystick::Init ()
 	      "Driver version is %d.%d.%d.\n",
 	      n + 1, name, axes, buttons,
 	      version >> 16, (version >> 8) & 0xff, version & 0xff);
-      joystick[n].number = n;
-      joystick[n].fd = fd;
-      joystick[n].nButtons = buttons;
-      joystick[n].nAxes = axes;
-      joystick[n].axis = new int16[axes];
-      joystick[n].button = new int16[buttons];
+
+      joydata& jd = joystick[n];
+      jd.number = n + 1; // CS joystick numbers are 1-based.
+      jd.fd = fd;
+      jd.nButtons = buttons;
+      jd.nAxes = axes;
+      jd.axis = new int16[axes];
+      jd.button = new int16[buttons];
 
       fcntl(fd, F_SETFL, O_NONBLOCK);
       n++;

@@ -24,6 +24,15 @@ chronological order.
 	  which caused parsing to misbehave.
 	- Eric Sunshine augmented joystick.cfg so that it scans for up to four
 	  joysticks, rather than only two on Unix platforms.
+	- Eric Sunshine fixed a number of bugs in csLinuxJoystick and
+	  csWindowsJoystick, the Linux and Windows joystick drivers, where they
+	  failed to treat joystick numbers as 1-based (which is how CS and the
+	  event outlets interpret them). Also increased CS_MAX_JOYSTICK_COUNT
+	  from 2 to 4 (though this should limitation should be removed
+	  altogether in the future).
+	- Eric Sunshine fixed bug in csLinuxJoystick where each button event
+	  would cause a "joystick motion" event to be sent with coordinates
+	  (-1,0).
 23-Jan-2005
 	- Eric Sunshine applied a boundary-condition fix from Andrew Mann for
 	  the timspec::tv_nsec overflow check in csPosixCondition::Wait().
