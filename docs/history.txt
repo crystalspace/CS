@@ -7,6 +7,7 @@ The history order is reversed so that new features are at the top.
 	  was convert to 4-4-4-4 mode (4 bits for every color and alpha).
 	  This causes image degradation. Thanks to Norman Kramer for
 	  spotting this.
+	- Fixed a bug with the change above.
 27-Sep-2001
 	- The alphamap for textures in the software renderer was not cleaned
 	  up at destruction.

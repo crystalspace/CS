@@ -201,7 +201,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
     // bind all mipmap levels required.  In OpenGL this means the original 
     // mipmap (level 0) with further levels (1,2,3...) being a reduction of 
     // the original mipmap by a factor of 2 in both directions.  You must keep
-    //  reducing the mipmap size until you get down to the 1x1 size mipmap.
+    // reducing the mipmap size until you get down to the 1x1 size mipmap.
     int mipmaplevel = 0;
     transp = txt_handle->GetKeyColor () ? txt_mm->get_transparent () : NULL;
     iImage *previmg = NULL;
@@ -267,9 +267,11 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
       }
 
       int src_mode = GL_RGB16;
+      if (transp) src_mode = GL_RGBA;
+      //else if (bpp <= 16) src_mode = GL_RGB16;
+      //else src_mode = GL_RGB;
       if (transp && !(txt && txt->KeyColorSet ()))
       {
-        src_mode = GL_RGBA;
 	int pixels = tw * th;
 	csRGBpixel *_src = src;
 	while (pixels--)
@@ -285,7 +287,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
       }
 
       // now that the texture has been generated, send it to openGL
-      glTexImage2D (GL_TEXTURE_2D, mipmaplevel, /*4*/src_mode, tw, th,
+      glTexImage2D (GL_TEXTURE_2D, mipmaplevel, src_mode, tw, th,
 		    0, GL_RGBA, GL_UNSIGNED_BYTE, src);
 
       // shrink down to the next mipmap level
@@ -310,9 +312,11 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
       th = txt->get_height ();
       src = txt->get_image_data ();
       int src_mode = GL_RGB16;
+      if (transp) src_mode = GL_RGBA;
+      //else if (bpp <= 16) src_mode = GL_RGB16;
+      //else src_mode = GL_RGB;
       if (transp && !txt->KeyColorSet ())
       {
-        src_mode = GL_RGBA;
 	int pixels = tw * th;
 	csRGBpixel *_src = src;
 	while (pixels--)
@@ -326,7 +330,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 	}
 	txt->KeyColorSet (true);
       }
-      glTexImage2D (GL_TEXTURE_2D, 0, /*4*/src_mode, tw, th,
+      glTexImage2D (GL_TEXTURE_2D, 0, src_mode, tw, th,
 		    0, GL_RGBA, GL_UNSIGNED_BYTE, src);
     }
   }
