@@ -263,13 +263,15 @@ csMeshWrapper *csSector::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
-  iPolygon3D **polygonPtr)
+  iPolygon3D **polygonPtr,
+  bool accurate)
 {
   GetVisibilityCuller ();
   float r;
   iMeshWrapper* mesh;
   iPolygon3D* poly;
-  bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly);
+  bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly,
+  	accurate);
   if (polygonPtr) *polygonPtr = poly;
   if (rc && mesh)
     return mesh->GetPrivateObject ();
@@ -1119,17 +1121,15 @@ iPolygon3D *csSector::eiSector::HitBeam (
 }
 
 iMeshWrapper *csSector::eiSector::HitBeam (
-  const csVector3 &start,
-  const csVector3 &end,
+  const csVector3 &start, const csVector3 &end,
   csVector3 &isect,
-  iPolygon3D **polygonPtr)
+  iPolygon3D **polygonPtr,
+  bool accurate)
 {
   iPolygon3D *p = NULL;
   csMeshWrapper *obj = scfParent->HitBeam (
-      start,
-      end,
-      isect,
-      polygonPtr ? &p : NULL);
+      start, end, isect,
+      polygonPtr ? &p : NULL, accurate);
   if (obj)
   {
     if (p)

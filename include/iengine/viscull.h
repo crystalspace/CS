@@ -62,7 +62,7 @@ struct iVisibilityObjectIterator : public iBase
   virtual bool IsFinished () const = 0;
 };
 
-SCF_VERSION (iVisibilityCuller, 0, 3, 1);
+SCF_VERSION (iVisibilityCuller, 0, 3, 2);
 
 /**
  * This interface represents a visibility culling system.
@@ -119,9 +119,10 @@ struct iVisibilityCuller : public iBase
   /**
    * Intersect a segment with all objects in the visibility culler and
    * return them all in an iterator.
+   * If accurate is true then a more accurate (and slower) method is used.
    */
   virtual csPtr<iVisibilityObjectIterator> IntersectSegment (
-    const csVector3& start, const csVector3& end) = 0;
+    const csVector3& start, const csVector3& end, bool accurate = false) = 0;
 
   /**
    * Intersect a beam using this culler and return the intersection
@@ -129,10 +130,12 @@ struct iVisibilityCuller : public iBase
    * then this means that the object belonging to the culler itself was
    * hit. This function will also detect hits with non-thing objects.
    * In that case the returned polygon will always be NULL.
+   * If accurate is true then a more accurate (and slower) method is used.
    */
   virtual bool IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = NULL,
-    iMeshWrapper** p_mesh = NULL, iPolygon3D** poly = NULL) = 0;
+    iMeshWrapper** p_mesh = NULL, iPolygon3D** poly = NULL,
+    bool accurate = false) = 0;
 
   /**
    * Start casting shadows from a given point in space. What this will

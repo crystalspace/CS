@@ -751,6 +751,7 @@ struct IntersectSegment_Front2BackData
   iMeshWrapper* mesh;
   iPolygon3D* polygon;
   csVector* vector;	// If not-null we need all objects.
+  bool accurate;
 };
 
 static bool IntersectSegment_Front2Back (csKDTree* treenode,
@@ -851,8 +852,14 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
 	    }
 	    else
 	    {
-	      if (visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (
-	      	obj_start, obj_end, obj_isect, &r))
+	      bool rc;
+	      if (data->accurate)
+	        rc = visobj_wrap->mesh->GetMeshObject ()->HitBeamObject (
+	      	  obj_start, obj_end, obj_isect, &r);
+	      else
+	        rc = visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (
+	      	  obj_start, obj_end, obj_isect, &r);
+	      if (rc)
 	      {
 	        if (data->vector)
 		{
@@ -882,7 +889,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
 
 bool csFrustumVis::IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr,
-    iMeshWrapper** p_mesh, iPolygon3D** poly)
+    iMeshWrapper** p_mesh, iPolygon3D** poly, bool accurate)
 {
   UpdateObjects ();
   current_visnr++;
@@ -892,6 +899,7 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
   data.mesh = NULL;
   data.polygon = NULL;
   data.vector = NULL;
+  data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
   if (p_mesh) *p_mesh = data.mesh;
@@ -903,7 +911,7 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
 }
 
 csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
-    const csVector3& start, const csVector3& end)
+    const csVector3& start, const csVector3& end, bool accurate)
 {
   UpdateObjects ();
   current_visnr++;
@@ -913,6 +921,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
   data.mesh = NULL;
   data.polygon = NULL;
   data.vector = new csVector ();
+  data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
   csFrustVisObjIt* vobjit = new csFrustVisObjIt (data.vector, NULL);

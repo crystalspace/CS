@@ -337,7 +337,7 @@ public:
    * If polygonPtr is null then the polygon will not be filled in.
    */
   csMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& intersect, iPolygon3D** polygonPtr);
+  	csVector3& intersect, iPolygon3D** polygonPtr, bool accurate = false);
 
   /**
    * Check visibility in a frustum way for all things and polygons in
@@ -517,7 +517,7 @@ public:
     virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect);
     virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& intersect, iPolygon3D** polygonPtr);
+  	csVector3& intersect, iPolygon3D** polygonPtr, bool accurate = false);
     virtual iSector* FollowSegment (csReversibleTransform& t,
   	csVector3& new_position, bool& mirror, bool only_portals = false);
     virtual void Draw (iRenderView* rview)

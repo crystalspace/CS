@@ -9,6 +9,10 @@ The history order is reversed so that new features are at the top.
 	  convert models which had been created/saved on Windows or older
 	  MacOS.  Problem was that it was explicitly looking for LF terminator
 	  without taking into account CRLF (Windows) or CR (Macintosh).
+	- Added a new 'accurate' flag to iVisibilityCuller->IntersectSegment()
+	  and iSector->HitBeam(). This flag is false by default (old behaviour)
+	  but when you set it to true HitBeamObject() is used instead
+	  of HitBeamOutline(). So this should give more accurate results.
 13-Mar-2003
 	- Received some documentation fixes with regards to 3D sprites
 	  from Simon Posnjak <simon.posnjak@siol.net>.

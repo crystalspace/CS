@@ -67,7 +67,7 @@ struct iSectorCallback : public iBase
 };
 
 
-SCF_VERSION (iSector, 0, 5, 1);
+SCF_VERSION (iSector, 0, 5, 2);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -159,7 +159,7 @@ struct iSector : public iBase
    * If polygonPtr is null then the polygon will not be filled in.
    */
   virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-    csVector3& intersect, iPolygon3D** polygonPtr) = 0;
+    csVector3& intersect, iPolygon3D** polygonPtr, bool accurate = false) = 0;
 
   /**
    * Follow a segment starting at this sector. If the segment intersects
