@@ -1,6 +1,8 @@
 /*
     Crystal Space .INI file management
     Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
+    Extensive functional overhaul by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,14 +22,11 @@
 #ifndef __CS_INIFILE_H__
 #define __CS_INIFILE_H__
 
+#include "csutil/csstring.h"
 #include "csutil/csvector.h"
 #include "ivfs.h"
 
-class csVFS;
 class csStrVector;
-
-typedef bool (*csIniWriteFunc) (csSome Stream, const void *data,
-  unsigned int iniWriteType, size_t len);
 
 class csIniFile : public csBase
 {
@@ -107,19 +106,21 @@ private:
 public:
   /// Initialize INI file object
   csIniFile (char Comment = ';') : CommentChar(Comment), Dirty(false) {}
-  /// Initialize INI file object and load it from a file
+  /// Initialize INI file object and load it from a physical file
   csIniFile (const char* path, char Comment = ';');
   /// Initialize INI file object and load it from a file on VFS volume
-  csIniFile (csVFS* vfs, const char* path, char iCommentChar = ';');
+  csIniFile (iVFS*, const char* path, char iCommentChar = ';');
   /// Initialize INI file object and load it from an iFile
-  csIniFile (iFile* f, char iCommentChar = ';');
+  csIniFile (iFile*, char iCommentChar = ';');
   /// Destroy the object
   virtual ~csIniFile ();
 
-  /// Load INI from file
+  /// Load INI from physical file
   bool Load (const char *fName);
+  /// Load INI from a file on a VFS volume
+  bool Load (iVFS*, const char* fName);
   /// Load INI from iFile
-  bool Load (iFile *f);
+  bool Load (iFile*);
   /// Load INI from memory buffer
   bool Load (const char *Data, size_t DataSize);
   /// Override to type your own error messages
@@ -127,7 +128,7 @@ public:
 
   /// Save INI file
   bool Save (const char *fName);
-  bool Save (iFile *f);
+  bool Save (iFile*);
 
   /// A section iterator
   class SectionIterator : public Iterator
@@ -268,18 +269,17 @@ private:
   PrvINInode* FindNode (const char *SectionPath, const char* KeyName) const;
   /// Set the data for a given node
   void SetData (PrvINInode*, csConstSome Data, size_t DataSize);
-  /// Load a file given a "read from stream" routine
-  bool Load (bool (*ReadLine) (csSome Stream, void *data, size_t size),
-    csSome Stream);
   /// Save a comment
-  void SaveComment (const char* Text, csIniWriteFunc writeFunc, csSome Stream) const;
+  void SaveComment (const char* Text, csString&) const;
   /// Save comments for a section or key
-  void SaveComments (const PrvINIbranch*, csIniWriteFunc writeFunc, csSome Stream) const;
+  void SaveComments (const PrvINIbranch*, csString&) const;
   /// Save all the keys within a section
   void SaveData (const char* Name, csSome Data, size_t DataSize,
-    const PrvINIbranch* comments, csIniWriteFunc writeFunc, csSome Stream) const;
+    const PrvINIbranch* comments, csString&) const;
   /// Save all the data in a section
-  void SaveSection (const PrvINInode*, csIniWriteFunc writeFunc, csSome Stream) const;
+  void SaveSection (const PrvINInode*, csString&) const;
+  /// Text representation of entire database (suitable for saving to a file)
+  csString TextRepresentation () const;
 };
 
 #endif // __CS_INIFILE_H__

@@ -1,6 +1,8 @@
 /*
     Crystal Space .INI file management
     Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
+    Extensive functional overhaul by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,8 +19,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+extern "C" {
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
+}
 #include "sysdef.h"
 #include "types.h"
 #include "csutil/inifile.h"
@@ -26,22 +30,15 @@
 #include "csutil/util.h"
 
 // Maximal INI line length
-#define CS_MAXINILINELEN	1024
+#define CS_MAXINILINELEN 1024
 // Maximal line length for lines containing BASE64 encoded data
-#define CS_B64INILINELEN	76
+#define CS_B64INILINELEN 76
 // Characters ignored in INI files (except in middle of section & key names)
-#define CS_INISPACE		" \t"
+#define CS_INISPACE " \t"
 // Use 8-bit characters in INI files
 #define CS_8BITCFGFILES
 
-// data to be written is a single char
-#define CS_INI_WRITETYPE_CHAR 1
-// data is a string, if length not given ( == 0 ) it is determined by strlen
-#define CS_INI_WRITETYPE_STR 2
-// raw data, length must be given
-#define CS_INI_WRITETYPE_RAW 3
-
-static const char* INIbase64 =
+static const char* const INIbase64 =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 csIniFile::PrvINIbranch::~PrvINIbranch ()
@@ -145,131 +142,107 @@ void csIniFile::CommentIterator::Clone(const CommentIterator& i)
   }
 }
 
-//--------------------------------------------------------- csIniFile::Load ---
+//------------------------------------------------------------ Constructors ---
 
 csIniFile::csIniFile (const char* path, char Comment) :
-  CommentChar(Comment), Dirty(true)
-{
-  Load (path);
-}
+  CommentChar(Comment), Dirty(true) { Load (path); }
+
+csIniFile::csIniFile (iVFS *vfs, const char* path, char Comment) :
+  CommentChar(Comment), Dirty(true) { Load (vfs, path); }
 
 csIniFile::csIniFile (iFile* f, char Comment) :
-  CommentChar(Comment), Dirty(true)
-{
-  Load (f);
-}
+  CommentChar(Comment), Dirty(true) { Load (f); }
 
-csIniFile::~csIniFile ()
-{
-}
+csIniFile::~csIniFile () {}
 
-static bool ReadFileLine (csSome Stream, void *data, size_t size)
-{
-  if (!fgets ((char *)data, size, (FILE *)Stream))
-    return false;
-  size_t sl = strlen ((char *)data);
-  if (sl >= size)
-    sl = size - 1;
-  while (sl && (((char *)data) [sl - 1] < ' '))
-    sl--;
-  ((char *)data) [sl] = 0;
-  return true;
-}
+//--------------------------------------------------------- csIniFile::Load ---
 
-static bool ReadiFileLine (csSome Stream, void *data, size_t size)
+static bool NextLine (csString& line, const char*& source, const char* limit)
 {
-  char *p = (char *)data;
-  size_t sl=0;
-  bool eos=false;
-  while ( sl < size && !eos && ((iFile*)Stream)->Read (p, 1)) {
-    sl++;
-    eos = (*p == '\n');
-    p++;
+  line.Clear();
+  if (source >= limit) return false;
+  const char* const start = source;
+  while (source < limit && *source != '\n' && *source != '\r') source++;
+  line.Append (start, source - start);
+  if (source < limit)
+  {  // Strip line terminator (handles DOS:CRLF, Unix:LF, Macintosh:CR)
+    source++;   // Strip initial LF or CR
+    if (*(source - 1) == '\r' && source < limit && *source == '\n')
+      source++; // Strip CRLF.
   }
-  if ( sl == 0 )
-    return false;
-  if (eos) sl--;
-  if (sl >= size)
-    sl = size - 1;
-  while (sl && (((char *)data) [sl - 1] < ' '))
-    sl--;
-  ((char *)data) [sl] = 0;
   return true;
 }
 
-bool csIniFile::Load (const char *fName)
+bool csIniFile::Load (const char* path)
 {
-  FILE *f = fopen (fName, "r");
-  if (!f)
-    return false;
-  bool rc = Load (ReadFileLine, f);
-  fclose (f);
-  return rc;
-}
-
-bool csIniFile::Load (iFile *f)
-{
-  if (!f)
-    return false;
-  bool rc = Load (ReadiFileLine, f);
-  return rc;
-}
-
-struct csINIDataStream
-{
-  const char *data;
-  int dataleft;
-};
-
-static bool ReadMemoryLine (csSome Stream, void *data, size_t size)
-{
-  csINIDataStream *ds = (csINIDataStream *)Stream;
-  if (!ds->dataleft)
-    return false;
-
-  // Get by one character until we get a character with code less than space
-  while ((*ds->data >= ' ') && ds->dataleft)
+  bool rc = false;
+  FILE* f = fopen (path, "r");
+  if (f)
   {
-    if (size)
+    size_t size;
+    if (fseek (f, 0, SEEK_END) == 0 && (size = ftell(f)) != -1 &&
+        fseek (f, 0, SEEK_SET) == 0)
     {
-      if (size > 1)
-        *((char *)data) = *ds->data;
+      if (size == 0)
+        rc = true; // Empty file, but not an error.
       else
-        *((char *)data) = 0;
-      data = ((char *)data) + 1;
-      size--;
-    } /* endif */
-    ds->data++;
-    ds->dataleft--;
-  } /* endwhile */
-  // Put ending zero
-  if (size)
-    *((char *)data) = 0;
-  // Skip \n, \r and so on
-  while ((*ds->data < ' ') && ds->dataleft)
+      {
+        char* data = new char[size];
+        if (fread (data, size, 1, f) == 1)
+          rc = Load (data, size);
+        delete[] data;
+      }
+    }
+    fclose (f);
+  }
+  return rc;
+}
+
+bool csIniFile::Load (iVFS* vfs, const char* path)
+{
+  bool rc = false;
+  if (vfs)
   {
-    ds->data++;
-    ds->dataleft--;
-  } /* endwhile */
-  return true;
+    iFile* file = vfs->Open (path, VFS_FILE_READ);
+    if (file)
+    {
+      rc = Load (file);
+      file->DecRef();
+    }
+  }
+  return rc;
+}
+
+bool csIniFile::Load (iFile* file)
+{
+  bool rc = false;
+  if (file)
+  {
+    const size_t size = file->GetSize();
+    if (size == 0)
+      rc = true; // Empty file, but not an error.
+    else
+    {
+      char* data = new char[size];
+      if (file->Read (data, size) == size)
+        rc = Load (data, size);
+      delete[] data;
+    }
+  }
+  return rc;
 }
 
 bool csIniFile::Load (const char *Data, size_t DataSize)
 {
-  csINIDataStream ds = { Data, DataSize };
-  return Load (ReadMemoryLine, &ds);
-}
-
-bool csIniFile::Load (bool (*ReadLine)(csSome Stream, void *data, size_t size),
-  csSome Stream)
-{
-  char buff[CS_MAXINILINELEN];
+  csString record;
+  const char* const DataEnd = Data + DataSize;
   char tmp[CS_MAXINILINELEN];
   int LineNo = 0;
   PrvINInode *branch;
   PrvINIbranch *CurBranch = NULL;
   PrvINIbranch *Comments = NULL;
-  bool SkipComment = false, PSkipComment = false;
+  bool SkipComment = false;
+  bool PSkipComment = false;
 
   // Assume object contents is syncronised
   Dirty = false;
@@ -280,15 +253,13 @@ bool csIniFile::Load (bool (*ReadLine)(csSome Stream, void *data, size_t size),
   int b64top = 0;
   unsigned char b64acc = 0;
 
-  for ( ; ; )
+  for (;;)
   {
-    char *cur = buff;
-
-    if (!ReadLine (Stream, cur, CS_MAXINILINELEN))
+    if (!NextLine (record, Data, DataEnd))
       break;
     LineNo++;
-
-    cur += strspn (cur, CS_INISPACE);
+    const char* buff = record;
+    const char* cur = buff + strspn (buff, CS_INISPACE);
 
     if (b64mode)                        // Base64 mode
     {
@@ -302,7 +273,7 @@ bool csIniFile::Load (bool (*ReadLine)(csSome Stream, void *data, size_t size),
           finish = true;
         else
           break;
-      cur[i] = 0;
+      record[cur - buff + i] = 0;
       len = i;
 
       // Check if string is a valid BASE64 string
@@ -373,7 +344,8 @@ plain:
         if (!Comments)
           CHKB (Comments = new PrvINIbranch);
         Comments->Push (branch);
-      } else if (*cur == '[')           // Section
+      }
+      else if (*cur == '[')           // Section
       {
         char *cb;
         int i;
@@ -451,57 +423,34 @@ out:
   {
     while (Comments->Length ())
       Root.Push (Comments->Pop ());
-    //for (int i = 0; i < Comments->Length (); i++)
-      //Root.Push ((*Comments)[i]);
     CHK (delete Comments);
     Comments = NULL;
   }
-  return (true);
+  return true;
 }
 
 //--------------------------------------------------------- csIniFile::Save ---
 
-static bool WriteiFileLine (csSome Stream, const void *data,
-  unsigned int iniWriteType, size_t len)
-{
-  size_t len_in = (iniWriteType == CS_INI_WRITETYPE_CHAR) ? 1 :
-    (iniWriteType == CS_INI_WRITETYPE_STR) ? strlen ((const char*)data) : len;
-  return (len_in == ((iFile *)Stream)->Write ((const char *)data, len_in));
-}
-
-static bool WriteFileLine (csSome Stream, const void *data,
-  unsigned int iniWriteType, size_t len)
-{
-  size_t len_in = (iniWriteType == CS_INI_WRITETYPE_CHAR) ? 1 :
-    (iniWriteType == CS_INI_WRITETYPE_STR) ? strlen ((const char*)data) : len;
-  return (len_in == fwrite (data, 1, len_in, (FILE *)Stream));
-}
-
-void csIniFile::SaveComment (const char* Text, csIniWriteFunc writeFunc, csSome Stream ) const
+void csIniFile::SaveComment (const char* Text, csString& s) const
 {
   if (Text)
-  {
-    writeFunc (Stream, (void *)&CommentChar, CS_INI_WRITETYPE_CHAR, 0);
-    writeFunc (Stream, (void *)Text, CS_INI_WRITETYPE_STR, 0);
-  }
-  writeFunc (Stream, "\n", CS_INI_WRITETYPE_STR, 0);
+    s << CommentChar << Text;
+  s << '\n';
 }
 
-void csIniFile::SaveComments (const PrvINIbranch* branch,
-  csIniWriteFunc writeFunc, csSome Stream) const
+void csIniFile::SaveComments (const PrvINIbranch* branch, csString& s) const
 {
   CommentIterator iterator (*this, branch, "", "");
   while (iterator.NextItem())
-    SaveComment (iterator.GetText(), writeFunc, Stream);
+    SaveComment (iterator.GetText(), s);
 }
 
 void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
-  const PrvINIbranch* comments, csIniWriteFunc writeFunc, csSome Stream) const
+  const PrvINIbranch* comments, csString& s) const
 {
   const char* data = (const char*)Data;
-  SaveComments (comments, writeFunc, Stream);
-  writeFunc (Stream, (void *)Name, CS_INI_WRITETYPE_STR, 0);
-  writeFunc (Stream, " = ", CS_INI_WRITETYPE_STR, 0);
+  SaveComments (comments, s);
+  s << Name << " = ";
   if (Data && DataSize)
   {
     size_t i;
@@ -521,7 +470,7 @@ void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
           break;
         }
     if (!binary)
-      writeFunc (Stream, Data, CS_INI_WRITETYPE_RAW, DataSize);
+      s.Append ((const char*)Data, DataSize);
     else                         // Save in Base64 mode
     {
       char tmp[CS_B64INILINELEN];
@@ -542,8 +491,8 @@ void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
         {
           if (top >= CS_B64INILINELEN)
           {
-            writeFunc (Stream, "\n", CS_INI_WRITETYPE_CHAR, 0);
-            writeFunc (Stream, tmp, CS_INI_WRITETYPE_RAW, top);
+            s << '\n';
+	    s.Append (tmp, top);
             memset (tmp, 0, sizeof (tmp));
             top = 0;
           }
@@ -567,68 +516,61 @@ void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
           tmp[top++] = INIbase64[acc];
           total++;
         }
-        writeFunc (Stream, "\n", CS_INI_WRITETYPE_CHAR, 0);
-        writeFunc (Stream, tmp, CS_INI_WRITETYPE_RAW, top);
-        writeFunc (Stream, "===", CS_INI_WRITETYPE_RAW, tail[total & 3]);
+        s << '\n';
+	s.Append (tmp, top);
+	s.Append ("===", tail[total & 3]);
       }
-      writeFunc (Stream, "\n", CS_INI_WRITETYPE_CHAR, 0);
-      writeFunc (Stream, endofbin, CS_INI_WRITETYPE_STR, 0);
-      writeFunc (Stream, (void *)Name, CS_INI_WRITETYPE_STR, 0);
+      s << '\n' << endofbin << Name;
     } // else if Save in Base64 mode
   }
-  writeFunc (Stream, "\n", CS_INI_WRITETYPE_CHAR, 0);
+  s << '\n';
 }
 
-void csIniFile::SaveSection (const PrvINInode* node, csIniWriteFunc writeFunc,
-  csSome Stream) const
+void csIniFile::SaveSection (const PrvINInode* node, csString& s) const
 {
-  SaveComments (node->Comments, writeFunc, Stream);
-  writeFunc (Stream, "[", CS_INI_WRITETYPE_CHAR, 0);
-  writeFunc (Stream, node->Section.Name, CS_INI_WRITETYPE_STR, 0);
-  writeFunc (Stream, "]\n", CS_INI_WRITETYPE_RAW, 2);
+  SaveComments (node->Comments, s);
+  s << '[' << node->Section.Name << "]\n";
 
   DataIterator iterator (*this, node->Section.Vector, node->Section.Name);
   while (iterator.NextItem())
     SaveData (iterator.GetName(), iterator.GetData(), iterator.GetDataSize(),
-      iterator.GetComments(), writeFunc, Stream);
+      iterator.GetComments(), s);
 }
 
-bool csIniFile::Save (const char *fName)
+csString csIniFile::TextRepresentation () const
 {
-  bool ok = true;
+  csString s;
+  SectionIterator iterator (EnumSections());
+  while (iterator.NextItem())
+    SaveSection (iterator.Node, s);
+  return s;
+}
+
+bool csIniFile::Save (const char* path)
+{
   if (Dirty)
   {
-    FILE* file = fopen (fName, "w");
-    if (file == NULL)
-      ok = false;
-    else
+    FILE* file = fopen (path, "w");
+    if (file)
     {
-      SectionIterator iterator (EnumSections());
-      while (iterator.NextItem())
-        SaveSection (iterator.Node, WriteFileLine, (csSome)file);
+      csString s(TextRepresentation());
+      if (fwrite (s.GetData(), s.Length(), 1, file) == 1)
+        Dirty = false;
       fclose (file);
-      Dirty = false;
     }
   }
-  return ok;
+  return !Dirty; // If still dirty then 'save' failed.
 }
 
-bool csIniFile::Save (iFile *f)
+bool csIniFile::Save (iFile* file)
 {
-  bool ok = true;
-  if (Dirty)
+  if (Dirty && file)
   {
-    if (f == NULL)
-      ok = false;
-    else
-    {
-      SectionIterator iterator (EnumSections());
-      while (iterator.NextItem())
-        SaveSection (iterator.Node, WriteiFileLine, (csSome)f);
+    csString s(TextRepresentation());
+    if (file->Write (s.GetData(), s.Length()) == s.Length())
       Dirty = false;
-    }
   }
-  return ok;
+  return !Dirty; // If still dirty then 'save' failed.
 }
 
 bool csIniFile::Error (int LineNo, const char *Line, int Pos)
