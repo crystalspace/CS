@@ -6,7 +6,7 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-19-Jul-2004
+20-Jul-2004
 	- PK added GetMeshObjectType() to iMeshObjectFactory.
 	- PK worked a bit on iSaver.
 19-Jul-2004
