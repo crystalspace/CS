@@ -157,6 +157,8 @@ private:
   csMatrix3 m_obj2tex;
   /// The transformation from object space to texture space.
   csVector3 v_obj2tex;
+  /// Optional uv coordinates.
+  csVector2* uv_coords;
 
   ///
   csThingTemplate* parent;
@@ -186,6 +188,16 @@ public:
   void AddVertex (int v);
   ///
   char* GetName () { return name; }
+
+  /// Set UV coordinate for specified vertex.
+  void SetUV (int i, float u, float v);
+
+  /// Reset UV coordinate array.
+  void ResetUV ();
+
+  /// Get the pointer to the vertex uv coordinates.
+  csVector2* GetUVCoords () { return uv_coords; }
+
 
   /// Return true if flat color is used (instead of texture).
   bool UseFlatColor () { return use_flat_color; }

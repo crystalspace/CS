@@ -168,11 +168,13 @@ csPolygonTemplate::csPolygonTemplate (csThingTemplate* parent, char* name,
 
   use_flat_color = false;
   use_gouraud = false;
+  uv_coords = NULL;
 }
 
 csPolygonTemplate::~csPolygonTemplate ()
 {
   CHK (delete [] vertices_idx);
+  CHK (delete [] uv_coords);
 }
 
 void csPolygonTemplate::AddVertex (int v)
@@ -192,6 +194,19 @@ void csPolygonTemplate::AddVertex (int v)
   }
 
   vertices_idx[num_vertices++] = v;
+}
+
+void csPolygonTemplate::SetUV (int i, float u, float v)
+{
+  if (!uv_coords) CHKB (uv_coords = new csVector2 [num_vertices]);
+  uv_coords[i].x = u;
+  uv_coords[i].y = v;
+}
+
+void csPolygonTemplate::ResetUV ()
+{
+  CHK (delete [] uv_coords);
+  uv_coords = NULL;
 }
 
 void csPolygonTemplate::PlaneNormal (float* A, float* B, float* C)

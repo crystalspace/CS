@@ -563,6 +563,9 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
       (pt->IsLighted () ? CS_POLY_LIGHTING : 0) |
       (pt->IsMipmapped () ? CS_POLY_MIPMAP : 0) |
       (pt->UseFlatColor () ? CS_POLY_FLATSHADING : 0));
+    if (pt->GetUVCoords ())
+      for (j = 0 ; j < pt->GetNumVertices () ; j++)
+        p->SetUV (j, pt->GetUVCoords ()[j].x, pt->GetUVCoords ()[j].y);
     p->SetTextureSpace (pt->GetTextureMatrix (), pt->GetTextureVector ());
     if (pt->UseGouraud ())
       p->SetColor (0, 0, 0, 0);
