@@ -19,11 +19,13 @@ chronological order.
 	    - Renamed control macro CS_LEAKGUARDS to CS_USE_LEAK_GUARD.
 	    - Renamed configure.ac option --enable-leakguards to
 	      --enable-leak-guard.
-	- Eric Sunshine fixed problem in path() macro (msvcgen/macros.tlib)
-	  where periods in 'striproot' pattern were not being escaped. This
-	  resulted in them incorrectly matching any character rather than a
-	  literal period, as intended. Interestingly, this problem manifested
-	  under Perl 5.6.x, but not 5.8.x.
+	- Eric Sunshine fixed a couple problems in the path() macro
+	  (msvcgen/macros.tlib). (1) Periods in 'striproot' pattern were not
+	  being escaped. The result was that a period incorrectly matched any
+	  character rather than a literal period, as intended. (2) When the
+	  source and build directories were the same, it was incorrectly
+	  stripping single periods from the beginning of paths, even if the
+	  periods were part of a larger unit, such as "../".
 28-Aug-2004
 	- Jorrit removed the leakguard from csShaderVariable since somehow
 	  it prevents combination of optimize and debug plugins.
