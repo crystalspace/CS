@@ -98,7 +98,7 @@ static int __getcwd (char drive, char *buffer, int buffersize)
 
 static int __getcwd (char drive, char *buffer, int buffersize)
 {
-  unsigned_int old_drive, num_drives;
+  unsigned int old_drive, num_drives;
   _dos_getdrive (&old_drive);
   _dos_setdrive (drive, &num_drives);
   getcwd (buffer, buffersize);
