@@ -342,8 +342,8 @@ public:
   //-------------------- iPolygonMesh interface implementation ---------------
   struct PolyMesh : public PolyMeshHelper
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csThingStatic);
-    PolyMesh () : PolyMeshHelper (CS_POLY_COLLDET) { }
+    SCF_DECLARE_IBASE;
+    PolyMesh ();
   } scfiPolygonMesh;
 
   //------------------- Lower detail iPolygonMesh implementation ---------------
@@ -484,7 +484,7 @@ private:
    * see if static data has changed and this thing needs to updated local
    * data
    */
-  uint32 static_data_nr;
+  int32 static_data_nr;
 
   float current_lod;
   uint32 current_features;

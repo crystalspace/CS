@@ -45,6 +45,10 @@ The history order is reversed so that new features are at the top.
 	    - like normal textures, proctexes now don't create a material of the 
 	      same name at load time.
 	    - adjusted flarge to specify materials for the PTs.
+	- res changed the implementation of csThingStatic so that there's no
+	  embedded iPolygonMesh interface now. Queries for iPolygonMesh returns
+	  the result of iObjectModel->GetPolygonMeshColldet() and also printfs
+	  a notification.
 7-May-2003
 	- Eric Sunshine removed MSVC project-related variables from
 	  csjoylin.mak.  This module is Linux-specific, therefore there is no

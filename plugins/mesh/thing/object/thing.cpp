@@ -106,15 +106,26 @@ SCF_IMPLEMENT_IBASE(csThingStatic)
   SCF_IMPLEMENTS_INTERFACE(iThingFactoryState)
   SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygonMesh)
+  {
+    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
+    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
+      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
+    if (iInterfaceID == iPolygonMesh_scfID &&				
+      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
+    {
+#ifdef CS_DEBUG
+      printf ("Deprecated feature use: iPolygonMesh queried from Thing; "
+	"use iObjectModel->GetPolygonMeshColldet() instead.\n");
+#endif
+      iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
+      (Object)->IncRef ();						
+      return STATIC_CAST(iPolygonMesh*, Object);				
+    }
+  }
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE(iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
@@ -122,7 +133,6 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   csThingStatic::thing_type = thing_type;
   static_polygons.SetThingType (thing_type);
 
@@ -750,6 +760,17 @@ void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
   GetBoundingBox (b);
   rad = obj_radius;
   cent = b.GetCenter ();
+}
+
+//----------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csThingStatic::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
+csThingStatic::PolyMesh::PolyMesh () : PolyMeshHelper (CS_POLY_COLLDET) 
+{ 
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 //----------------------------------------------------------------------------
