@@ -399,12 +399,14 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 	    (message == WM_SYSKEYDOWN);
 	bool autoRep = ((lParam & 0x40000000) != 0);
 	csKeyCharType type;
+      #ifdef CS_KEY_DEBUG_ENABLE
 	if (IsKeyboardDebugging())
 	{
 	  csPrintf ("msg: %s wp: %s lp: %.8x\n", 
 	    Win32KeyMsgNames.StringForIdent (message), GetVKName (wParam), 
 	    (uint)lParam);
 	}
+      #endif
 	if (Win32KeyToCSKey (wParam, lParam, raw, cooked, type))
 	{
 	  bool doDoKey = true;
@@ -449,12 +451,16 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 
 	    if (lshiftState != lshiftDown)
 	    {
+	    #ifdef CS_KEY_DEBUG_ENABLE
 	      if (IsKeyboardDebugging()) csPrintf ("Shift quirk: ");
+	    #endif
 	      DoKey (CSKEY_SHIFT_LEFT, CSKEY_SHIFT, lshiftDown, autoRep, type);
 	    }
 	    if (rshiftState != rshiftDown)
 	    {
+	    #ifdef CS_KEY_DEBUG_ENABLE
 	      if (IsKeyboardDebugging()) csPrintf ("Shift quirk: ");
+	    #endif
 	      DoKey (CSKEY_SHIFT_RIGHT, CSKEY_SHIFT, rshiftDown, autoRep, type);
 	    }
 
