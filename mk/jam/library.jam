@@ -152,14 +152,14 @@ rule Library
 }
 
 ##  LibDepends libname : dependant libraries
-##    Make Library dependant on other libraries. This will tell the build
+##    Make Library dependant on other libraries.  This will tell the build
 ##    system that your library uses functions from other libraries in the
-##    project. The build system will resolve all cyclic dependencies.
-##    Note that a library shouldn't be linked with any external library that
-##    should be done by the final application which uses the library.
+##    project.  Note that a library shouldn't be linked with any external
+##    library that should be done by the final application which uses the
+##    library.
 rule LibDepends
 {
-      $(<)_depends += $(>) ;
+  $(<)_depends += $(>) ;
 }
 
 #----------------------------------------------------------------------------

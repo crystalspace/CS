@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-May-2004
+	- Eric Sunshine made the following change to msvcgen.jam:
+	    - Fixed bug in LinkWith where, though Frank changed it to properly
+	      resolve library dependencies, it nevertheless neglected to
+	      consult the EXTERNALLIBS .LFLAGS and .LIBS properties for the
+	      fully resolved library list.
+	    - Fixed LinkWith so that it removes duplicates from the library
+	      list which it assigns to DEPEND.
 17-May-2004
 	- Eric Sunshine made the following msvcgen-related changes:
 	    - Added --source-root and --build-root options to msvcgen.pl, as

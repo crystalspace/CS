@@ -18,21 +18,15 @@
 #
 #============================================================================
 
-##  LinkWith appname : libs
+##  LinkWith target : libs
 ##    Link an application with libraries. The specified libraries should have
 ##    build rules in the same project. For external libraries use the
 ##    ExternalLibs rule. Specify the library names without any extensions or
 ##    the leading "lib".
 rule LinkWith
 {
-  local i libs ;
-  for i in $(>) {
-      libs += $(i) $($(i)_depends) ;
-  }
-  # We must eliminate the duplicates in reverse order in order to ensure that
-  # we do not destroy the overall library ordering since Unix linkers are
-  # order-sensitive.
-  libs = [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
+  local libs = [ ResolveLibs $(>) ] ;
+
   if $($(<)_TYPE) = library
   {
     LibDepends $(<) : $(libs) ;
@@ -104,4 +98,27 @@ rule ExtraObjects
   Depends $($(<)_TARGET) : $(>) ;
   Clean $(<)clean : $(>) ;
   Clean clean : $(>) ;
+}
+
+#----------------------------------------------------------------------------
+# private part
+
+##  ResolveLibs libs
+##    Given a list of libraries, augment the list by adding other libraries
+##    upon which the given libraries depend.  Dependencies between libraries
+##    are specified via LibDepends (or LinkWith when the target is a library).
+##    The returned list is ordered such that it issuitable for Unix linkers
+##    which are sensitive to the order of libraries in the invocation
+##    statement.
+rule ResolveLibs
+{
+  local i libs ;
+  for i in $(<)
+  {
+      libs += $(i) $($(i)_depends) ;
+  }
+  # We must eliminate the duplicates in reverse order in order to ensure that
+  # we do not destroy the overall library ordering since Unix linkers are
+  # order-sensitive.
+  return [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
 }
