@@ -1418,7 +1418,7 @@ public:
     MixMode = mode;
 #ifdef CS_USE_NEW_RENDERER
     if (MixMode & CS_FX_ALPHA)
-      base_color.alpha = float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
+      base_color.alpha = 1.0 - float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
     else
       base_color.alpha = 1.0;
 #endif
@@ -1453,7 +1453,7 @@ public:
     base_color.Set (col);
 #ifdef CS_USE_NEW_RENDERER
     if (MixMode & CS_FX_ALPHA)
-      base_color.alpha = float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
+      base_color.alpha = 1.0 - float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
 #endif
     ResetVertexColors ();
   }
