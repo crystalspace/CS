@@ -33,6 +33,9 @@ The history order has been reversed so that new features are at the top.
 	      within DDG_FIXME blocks.
 	    - Updated makefile so that Crystal Space applications once again
 	      link against the terrain library.
+	- Eric Sunshine worked around a problem with the NextStep compiler in
+	  octree.cpp where it failed to correctly create an array of csPoly3D
+	  objects.
 15-May-2000
 	- Added const version of csPoly3D::operator[].
 	- Added csPoly3D::SplitWithPlaneXYZ().
