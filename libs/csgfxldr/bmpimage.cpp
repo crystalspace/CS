@@ -80,7 +80,7 @@ static inline long l_endian (const UByte* ptr)
 #define BISIZE(x)    ul_endian((x) + 14)
 #define BIWIDTH(x)   l_endian ((x) + 18)
 #define BIHEIGHT(x)  l_endian ((x) + 22)
-#define BITCOUNT(x)  ul_endian((x) + 28)  /* was us_endian */
+#define BITCOUNT(x)  us_endian((x) + 28)
 #define BICOMP(x)    ul_endian((x) + 30)
 #define IMAGESIZE(x) ul_endian((x) + 34)
 #define BICLRUSED(x) ul_endian((x) + 46)
