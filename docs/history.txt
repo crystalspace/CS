@@ -40,6 +40,10 @@ chronological order.
 	  csRef instead.
 	- Eric Sunshine fixed bug in csHash<>::Iterator copy constructor where
 	  it neglected to initialize its `key' member.
+	- Eric Sunshine augmented win32.jam so that it can optionally use
+	  dllwrap during plugin creation instead of "gcc -shared" when invoked
+	  with "jam -sUSE_DLLWRAP=yes myplugin".  Perhaps this change will
+	  allow Jorrit to debug plugin modules in gdb with Mingw.
 3-Nov-2003
 	- Chris Matuszewski added some explicit type casts to stop msvc6 from
 	  emitting warning messages in csgfx/rgbpixel.h and shadervar.h.

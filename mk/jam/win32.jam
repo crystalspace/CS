@@ -8,6 +8,8 @@ CMD.WINDRES ?= windres ;
 CMD.DLLTOOL ?= dlltool ;
 CMD.DLLWRAP ?= dllwrap ;
 
+USE_DLLWRAP ?= no ;
+
 NASM.FLAGS += -f win32 -DEXTERNC_UNDERSCORE ;
 CCFLAGS += -pipe -I/usr/include/directx ;
 C++FLAGS += -pipe -I/usr/include/directx ;
@@ -105,6 +107,23 @@ rule Win32Resource
     }
 
     CompileResources $(rcobject) : $(>) ;
+}
+
+if $(USE_DLLWRAP) = "yes"
+{
+rule GenerateExportDefs
+{
+  SEARCH on $(<) = $(LOCATE.OBJECTS) ;
+  MakeLocate $(<) : $(LOCATE.OBJECTS) ;
+  Depends $(<) : $(>) ;
+}
+
+actions GenerateExportDefs
+{
+  echo "EXPORTS" > $(<)
+  echo "  plugin_compiler" >> $(<)
+  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize:;p;s:_scfInitialize:_scfFinalize:;p;s:_scfFinalize:_Create:' < $(>) >> $(<)
+}
 }
 
 #----------------------------------------------------------------------------
@@ -205,6 +224,15 @@ rule SystemLinkPlugin
 {
   local target = $($(<)_TARGET) ;
 
+  if $(USE_DLLWRAP) = "yes"
+  {
+    local exportdefs = [ DoObjectGrist $(<).def ] ;
+    NAME on $(exportdefs) = $(<) ;
+    GenerateExportDefs $(exportdefs) : $($(<)_METAFILE) ;
+    Depends $(target) : $(exportdefs) ;
+    EXPORTDEFS on $(target) = $(exportdefs) ;
+  }
+
   Depends $(target) : $(>) ;
   LinkPlugin $(target) : $(>) ;
   PluginResourceWin32 $(<) ;
@@ -223,7 +251,17 @@ actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
-actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
+if $(USE_DLLWRAP) != "yes"
 {
-  $(CMD.LINK) -shared -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
+  {
+    $(CMD.LINK) -shared -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  }
+}
+else
+{
+  actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS bind EXPORTDEFS
+  {
+    $(CMD.DLLWRAP) --driver-name=$(CMD.LINK) --dllname $(<:B) --def=$(EXPORTDEFS) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  }
 }
