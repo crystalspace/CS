@@ -511,6 +511,18 @@ uint8 *csLineX2DFontServer::csLineX2DFont::GetGlyphBitmap (uint8 c, int &oW, int
   return (uint8 *)xfont;
 }
 
+uint8 *csLineX2DFontServer::csLineX2DFont::GetGlyphAlphaBitmap (uint8, int &, int &, int &, int &, int &)
+{
+  //TODO behle no clue what this does, but fixes linker errors
+  return NULL;
+}
+
+uint8 *csLineX2DFontServer::csLineX2DFont::GetGlyphAlphaBitmap (uint8, int &, int &)
+{
+  //TODO behle no clue what this does, but fixes linker errors
+  return NULL;
+}
+
 void csLineX2DFontServer::csLineX2DFont::GetDimensions (const char *text, int &oW, int &oH)
 {
   oW = XTextWidth (xfont, text, strlen (text));
