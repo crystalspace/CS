@@ -43,6 +43,8 @@ enum
   cecmdQuit
 };
 
+class ceEngineView;
+
 /**
  * This subclass of csApp is our main entry point
  * for the CSWS application. It controls everything including
@@ -58,7 +60,7 @@ public:
   csRef<iConsoleOutput> Console;
   csRef<iVFS> VFS;
   csRef<iLoader> LevelLoader;
-  csVector engine_views;
+  csArray<ceEngineView*> engine_views;
 
   void SetupDefaultWorld ();
   void LoadNewMap (const char* name);

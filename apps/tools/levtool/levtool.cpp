@@ -719,7 +719,7 @@ bool LevTool::IsAddonAPlane (iDocumentNode* addonnode)
   int i;
   for (i = 0 ; i < plane_plugins.Length () ; i++)
   {
-    csString* str = (csString*)plane_plugins.Get (i);
+    csString* str = plane_plugins.Get (i);
     if (str->Compare (plugname))
       return true;
   }
@@ -743,7 +743,7 @@ bool LevTool::IsMeshAThing (iDocumentNode* meshnode)
   int i;
   for (i = 0 ; i < thing_plugins.Length () ; i++)
   {
-    csString* str = (csString*)thing_plugins.Get (i);
+    csString* str = thing_plugins.Get (i);
     if (str->Compare (plugname))
       return true;
   }
@@ -1025,7 +1025,7 @@ void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
   int i;
   for (i = 0 ; i < things.Length () ; i++)
   {
-    ltThing* th = (ltThing*)things.Get (i);
+    ltThing* th = things.Get (i);
     if (th->GetMeshNode ()->Equals (meshnode))
     {
       if (th->GetPolygonCount () == 0) continue;
@@ -1249,7 +1249,7 @@ void LevTool::CloneAndMovePlanes (iDocumentNode* node, iDocumentNode* newnode)
 	int i;
 	for (i = 0 ; i < planes.Length () ; i++)
 	{
-	  ltPlane* pl = (ltPlane*)planes[i];
+	  ltPlane* pl = planes[i];
 	  if (strcmp (pl->name, planename) == 0)
 	  {
             csRef<iDocumentNode> orig = newnode->CreateNodeBefore (
@@ -1409,7 +1409,7 @@ void LevTool::CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
     int i;
     for (i = 0 ; i < things.Length () ; i++)
     {
-      th = (ltThing*)things.Get (i);
+      th = things.Get (i);
       if (th->GetMeshNode ()->Equals (node)) break;
     }
 
@@ -1608,7 +1608,7 @@ void LevTool::ValidateContents ()
   int i;
   for (i = 0 ; i < things.Length () ; i++)
   {
-    ltThing* th = (ltThing*)things.Get (i);
+    ltThing* th = things.Get (i);
     ValidateContents (th);
   }
 }
@@ -1622,32 +1622,6 @@ LevTool::LevTool ()
 
 LevTool::~LevTool ()
 {
-  int i;
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    ltThing* th = (ltThing*)things.Get (i);
-    delete th;
-  }
-  for (i = 0 ; i < planes.Length () ; i++)
-  {
-    ltPlane* pl = (ltPlane*)planes.Get (i);
-    delete pl;
-  }
-  for (i = 0 ; i < thing_plugins.Length () ; i++)
-  {
-    csString* str = (csString*)thing_plugins.Get (i);
-    delete str;
-  }
-  for (i = 0 ; i < plane_plugins.Length () ; i++)
-  {
-    csString* str = (csString*)plane_plugins.Get (i);
-    delete str;
-  }
-  for (i = 0 ; i < thing_nodes.Length () ; i++)
-  {
-    ltDocNodeWrap* w = (ltDocNodeWrap*)thing_nodes.Get (i);
-    delete w;
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -1941,7 +1915,7 @@ void LevTool::Main ()
 	int i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
-	  ltThing* th = (ltThing*)things.Get (i);
+	  ltThing* th = things.Get (i);
 	  th->CreateBoundingBox ();
 	  global_bbox += th->GetBoundingBox ();
 	}
@@ -1960,7 +1934,7 @@ void LevTool::Main ()
 	  counts[i] = 0;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
-	  ltThing* th = (ltThing*)things.Get (i);
+	  ltThing* th = things.Get (i);
 	  const csBox3& b = th->GetBoundingBox ();
 	  float area = (b.MaxX () - b.MinX ()) *
 		     (b.MaxY () - b.MinY ()) *
@@ -2005,7 +1979,7 @@ void LevTool::Main ()
 	int i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
-	  ltThing* th = (ltThing*)things.Get (i);
+	  ltThing* th = things.Get (i);
 	  th->CreateVertexInfo ();
 	  th->DoNotSplitThingSeperateUnits ();
 	}
@@ -2029,7 +2003,7 @@ void LevTool::Main ()
 	int i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
-	  ltThing* th = (ltThing*)things.Get (i);
+	  ltThing* th = things.Get (i);
 	  th->CompressVertices ();
 	  th->RemoveUnusedVertices ();
 	  th->RemoveDuplicateVertices ();
@@ -2058,7 +2032,7 @@ void LevTool::Main ()
 	int i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
-	  ltThing* th = (ltThing*)things.Get (i);
+	  ltThing* th = things.Get (i);
 	  th->CompressVertices ();
 	  th->RemoveUnusedVertices ();
 	  th->RemoveDuplicateVertices ();
@@ -2074,7 +2048,7 @@ void LevTool::Main ()
 
 	for (i = 0 ; i < things.Length () ; i++)
 	{
-	  ltThing* th = (ltThing*)things.Get (i);
+	  ltThing* th = things.Get (i);
 	  const csBox3& b = th->GetBoundingBox ();
 	  float area = (b.MaxX () - b.MinX ()) *
 		     (b.MaxY () - b.MinY ()) *
@@ -2108,7 +2082,7 @@ void LevTool::Main ()
 	int i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
-	  ltThing* th = (ltThing*)things.Get (i);
+	  ltThing* th = things.Get (i);
 	  th->CreateBoundingBox ();
 	  global_bbox += th->GetBoundingBox ();
 	}
@@ -2120,7 +2094,7 @@ void LevTool::Main ()
 
 	for (i = 0 ; i < things.Length () ; i++)
 	{
-	  ltThing* th = (ltThing*)things.Get (i);
+	  ltThing* th = things.Get (i);
 	  const csBox3& b = th->GetBoundingBox ();
 	  float area = (b.MaxX () - b.MinX ()) *
 		     (b.MaxY () - b.MinY ()) *
@@ -2159,7 +2133,7 @@ void LevTool::Main ()
 	int i;
 	for (i = 0 ; i < things.Length () ; i++)
 	{
-	  ltThing* th = (ltThing*)things.Get (i);
+	  ltThing* th = things.Get (i);
 	  th->CreateBoundingBox ();
 	  global_bbox += th->GetBoundingBox ();
 	}

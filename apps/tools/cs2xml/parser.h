@@ -19,7 +19,7 @@
 #ifndef __CS_CS2XML_PARSER_H__
 #define __CS_CS2XML_PARSER_H__
 
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "csutil/util.h"
 
 /**
@@ -83,33 +83,11 @@ public:
  * }
  * </pre>
  */
-class csTokenVector : public csVector
+class csTokenVector : public csPDelArray<csTokenDesc>
 {
 public:
-  virtual ~csTokenVector () {DeleteAll ();}
-  virtual bool FreeItem (void* Item)
+  static int Compare (csTokenDesc const* td1, csTokenDesc const* td2)
   {
-    delete (csTokenDesc*)Item;
-    return true;
-  }
-  csTokenDesc* Get (int idx) const
-  {
-    return (csTokenDesc*)csVector::Get (idx);
-  }
-  virtual int Compare (void* Item1, void* Item2, int Mode=0) const
-  {
-    (void)Mode;
-    csTokenDesc *td1 = (csTokenDesc*)Item1;
-    csTokenDesc *td2 = (csTokenDesc*)Item2;
-    int l1 = td1->len;
-    int l2 = td2->len;
-    return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
-  }
-  virtual int CompareKey (void* Item1, const void* Key, int Mode=0) const
-  {
-    (void)Mode;
-    csTokenDesc *td1 = (csTokenDesc*)Item1;
-    csTokenDesc *td2 = (csTokenDesc*)Key;
     int l1 = td1->len;
     int l2 = td2->len;
     return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
@@ -120,7 +98,7 @@ public:
     td->id = id;
     td->token = (name ? csStrNew (name) : 0);
     td->len = name ? strlen (name) : 0;
-    InsertSorted (td);
+    InsertSorted (td, Compare);
     return this;
   }
 };

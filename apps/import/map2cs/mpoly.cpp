@@ -119,12 +119,12 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
   m_Vertices.Push(new CdVector3(point));
 
   //Remove plane1 and plane2 from the array
-  redplanes.Delete(redplanes.Find(pPlane1));
-  redplanes.Delete(redplanes.Find(pPlane2));
+  redplanes.DeleteIndex(redplanes.Find(pPlane1));
+  redplanes.DeleteIndex(redplanes.Find(pPlane2));
 
   //Remove the baseplane too.
   int BaseplaneIndex = redplanes.Find(pBaseplane);
-  if (BaseplaneIndex >= 0) redplanes.Delete(BaseplaneIndex);
+  if (BaseplaneIndex >= 0) redplanes.DeleteIndex(BaseplaneIndex);
 
   //Insert pPlane1 as first element of redplanes. This will ensure, that
   //this plane is preferred to close the polygon again. Otherwise there
@@ -187,7 +187,7 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
             m_Planes.Push(pPlane2);
 
             //Remove this plane, so further processing will be faster.
-            redplanes.Delete(redplanes.Find(pPlane2));
+            redplanes.DeleteIndex(redplanes.Find(pPlane2));
           }
           //In any case, we need the vertex. (which _is_ new)
           m_Vertices.Push(new CdVector3(point));
@@ -514,7 +514,9 @@ void CMapPolygon::DumpPolyinfo(CMapTexturedPlane*             pBaseplane,
           {
             double v=(c==0)?point.x:(c==1)?point.y:point.z;
 
-            if (CheckIfInside(point, planes, pBaseplane, planes[x], planes[y]))
+            if (CheckIfInside(point, planes, pBaseplane,
+	    	(CMapTexturedPlane*)planes[x], 
+		(CMapTexturedPlane*)planes[y]))
             {
               printf("%8.3fI ",v); //10 char "Inside"
             }

@@ -28,10 +28,11 @@
  * \addtogroup csws_comps_keyacc
  * @{ */
  
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "cscomp.h"
 
 class csEvent;
+struct csAccElement;
 
 /**
  * A keyboard accelerator is a invisible component which monitors
@@ -40,20 +41,8 @@ class csEvent;
  */
 class csKeyboardAccelerator : public csComponent
 {
-  /// \internal Helper class
-  class csAccVector : public csVector
-  {
-  public:
-    /// Initialize object
-    csAccVector ();
-    /// Destroy the object
-    virtual ~csAccVector ();
-    /// Virtual function which frees a vector element
-    virtual bool FreeItem (void* Item);
-  };
-
   /// The table that contains keyboard event->generated event conversion table
-  csAccVector Accelerators;
+  csPDelArray<csAccElement> Accelerators;
 
 public:
   /// Create keyboard accelerator object

@@ -23,7 +23,6 @@
 #include "igeom/polymesh.h"
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
-#include "csutil/csvector.h"
 #include "csutil/parray.h"
 
 struct iVFS;
@@ -249,6 +248,8 @@ public:
   iDocumentNode* GetPartNode () const { return partnode; }
 };
 
+class csString;
+
 /**
  * Main class.
  */
@@ -258,14 +259,14 @@ public:
   iObjectRegistry* object_reg;
   csRef<iVFS> vfs;
   csRef<iCommandLineParser> cmdline;
-  csVector things;
-  csVector thing_nodes;
-  csVector planes;
+  csPDelArray<ltThing> things;
+  csPDelArray<ltDocNodeWrap> thing_nodes;
+  csPDelArray<ltPlane> planes;
 
   // A vector with all strings that represent 'thing' mesh objects.
-  csVector thing_plugins;
+  csPDelArray<csString> thing_plugins;
   // A vector with all strings that represent 'plane' addons.
-  csVector plane_plugins;
+  csPDelArray<csString> plane_plugins;
 
   void ReportError (const char* description, ...);
   void Report (int severity, const char* description, ...);

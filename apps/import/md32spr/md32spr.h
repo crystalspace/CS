@@ -24,7 +24,7 @@
 #include "csutil/ref.h"
 #include "csutil/csstring.h"
 #include "csutil/stringarray.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"
 #include "csgeom/matrix3.h"
@@ -197,7 +197,6 @@ class MD32spr {
 
  private:
   FILE *fp;
-  csVector outputFileNames;
   csRef<iStringArray> fileNames;
   csRef <iStringArray> weaponFiles;
 
@@ -210,7 +209,7 @@ class MD32spr {
   md3Model *headModel;
   md3Model *upperModel;
   md3Model *lowerModel;
-  csVector generic;
+  csArray<md3Model*> generic;
 
   static const int NUM_ACTIONS;
   int md3Files;

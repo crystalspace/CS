@@ -25,6 +25,7 @@
 #include "csgeom/box.h"
 #include "cstool/collider.h"
 #include "csutil/cscolor.h"
+#include "csutil/parray.h"
 #include "wentity.h"
 #include "iengine/engine.h"
 #include "iengine/fview.h"
@@ -108,17 +109,7 @@ struct csRecordedCameraFile
 /**
  * A vector which holds the recorded items and cleans them up if needed.
  */
-class csRecordVector : public csVector
-{
-public:
-  /// Free a single element of the array
-  virtual bool FreeItem (void* Item)
-  {
-    csRecordedCamera* reccam = (csRecordedCamera*)Item;
-    delete reccam;
-    return true;
-  }
-};
+typedef csPDelArray<csRecordedCamera> csRecordVector;
 
 struct csMapToLoad
 {
@@ -164,9 +155,9 @@ public:
   csVector3 body_radius, body_center, legs_radius, legs_center;
 
   /// A list with all busy entities.
-  csVector busy_entities;
+  csArray<csWalkEntity*> busy_entities;
   /// A vector that is used to temporarily store references to busy entities.
-  csVector busy_vector;
+  csArray<csWalkEntity*> busy_vector;
   /// Plugin which calculates fps and records statistics
   csRef<iPerfStats> perf_stats;
   /// Vector with recorded camera transformations and commands.

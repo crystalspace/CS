@@ -48,6 +48,27 @@ chronological order.
 	    - Replaced 'scfLibraryVector' in scf with
 	      csPDelArray<scfSharedLibrary>.
 	    - Replaced 'scfClassRegistry' in scf with csPDelArray<scfFactory>.
+	- Jorrit replaced various occurances of csVector:
+	    - Replaced 'csHintManager' in csws with csArray<void*>.
+	    - Replaced 'csAccVector' in csws with csPDelArray<csAccElement>.
+	    - Replaced 'sequences' in csdemo with csPDelArray<NamedSequence>.
+	    - Replaced 'paths' in csdemo with csPDelArray<csNamedPath>.
+	    - Replaced 'pathForMesh' in csdemo with csPDelArray<PathForMesh>.
+	    - Replaced 'meshRotation' in csdemo with csPDelArray<MeshRotation>.
+	    - Replaced 'engine_views' in cswseng with csArray<ceEngineView*>.
+	    - Replaced the CS_DECLARE_TYPED_VECTOR define in map2cs so that
+	      it now uses csArray<T> instead of csVector.
+	    - Replaced 'generic' in md32spr with csArray<md3Model*>.
+	    - Replaced 'csTokenVector' in cs2xml with csPDelArray<csTokenDesc>.
+	    - Replaced 'things' in levtool with csPDelArray<ltThing>.
+	    - Replaced 'thing_nodes' in levtool with csPDelArray<ltDocNodeWrap>.
+	    - Replaced 'planes' in levtool with csPDelArray<ltPlane>.
+	    - Replaced 'thing_plugins' in levtool with csPDelArray<csString>.
+	    - Replaced 'plane_plugins' in levtool with csPDelArray<csString>.
+	    - Replaced 'csRecordVector' in walktest with
+	      csPDelArray<csRecordedCamera>.
+	    - Replaced 'busy_entities' in walktest with csArray<csWalkEntity*>.
+	    - Replaced 'busy_vector' in walktest with csArray<csWalkEntity*>.
 1-Aug-2003
 	- Jorrit changed csPDelArray::Sort() to use a new
 	  csArraySortCompareFunction typedef instead of csArrayCompareFunction.

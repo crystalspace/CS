@@ -24,7 +24,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/path.h"
 #include "ivaria/sequence.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "csutil/util.h"
 
 class Demo;
@@ -109,13 +109,13 @@ private:
   //=====
   // For path handling.
   //=====
-  csVector paths;
-  csVector pathForMesh;	// PathForMesh objects.
+  csPDelArray<csNamedPath> paths;
+  csPDelArray<PathForMesh> pathForMesh;
 
   //=====
   // For rotation.
   //=====
-  csVector meshRotation;
+  csPDelArray<MeshRotation> meshRotation;
 
 private:
   void DebugDrawPath (csNamedPath* np, bool hi,
@@ -260,7 +260,7 @@ public:
     int i;
     for (i = 0 ; i < paths.Length () ; i++)
     {
-      csNamedPath* p = (csNamedPath*)paths[i];
+      csNamedPath* p = paths[i];
       if (!strcmp (p->GetName (), name)) return p;
     }
     return 0;

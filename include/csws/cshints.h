@@ -31,7 +31,7 @@
 #define CSWS_INTERNAL
 #include "csws.h"
 #include "cscomp.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
 
 /**
  * This component will display "floating hints", which will vanish
@@ -68,7 +68,7 @@ public:
  * and creates the appropiate csHint when it detects mouse is not moved
  * for too long time.
  */
-class csHintManager : public csVector
+class csHintManager : public csArray<void*>
 {
   /// \internal This structure holds the data about one hint
   struct HintStore
@@ -96,13 +96,15 @@ public:
   /// Initialize the hint manager object
   csHintManager (csApp *iApp);
   /// Destroy the hint manager
-  virtual ~csHintManager ();
-  /// Override FreeItem to correctly free hint store objects
-  virtual bool FreeItem (void* Item);
+  ~csHintManager ();
+  /// Free all hints.
+  void FreeAll ();
+  /// Correctly free hint store objects
+  void FreeItem (void* Item);
   /// Compare two hints (by csComponent's)
-  virtual int Compare (void* Item1, void* Item2, int Mode) const;
+  static int Compare (void* const& Item1, void* const& Item2);
   /// Compare a hint with a csComponent
-  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
+  static int CompareKey (void* const& Item, void* key);
   /// Add a new hint
   void Add (const char *iText, csComponent *iComp);
   /// Remove the hint (if any) associated with this component

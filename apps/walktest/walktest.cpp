@@ -437,16 +437,16 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
   // We first push all entities in a vector so that NextFrame() can safely
   // remove it self from the busy_entities list (or add other entities).
   int i;
-  busy_vector.SetLength (0);
+  busy_vector.DeleteAll ();
   csWalkEntity* wentity;
   for (i = 0 ; i < busy_entities.Length () ; i++)
   {
-    wentity = (csWalkEntity*)busy_entities[i];
+    wentity = busy_entities[i];
     busy_vector.Push (wentity);
   }
   for (i = 0 ; i < busy_vector.Length () ; i++)
   {
-    wentity = (csWalkEntity*)busy_vector[i];
+    wentity = busy_vector[i];
     wentity->NextFrame (elapsed_time);
   }
 
@@ -801,7 +801,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
       reccam->cmd = recorded_cmd;
       reccam->arg = recorded_arg;
       recorded_cmd = recorded_arg = 0;
-      recording.Push ((void*)reccam);
+      recording.Push (reccam);
     }
     if (cfg_playrecording >= 0 && recording.Length () > 0)
     {

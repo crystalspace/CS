@@ -215,7 +215,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
       reccam->arg = new char[len+1];
       cf->Read (reccam->arg, 1+len);
     }
-    Sys->recording.Push ((void*)reccam);
+    Sys->recording.Push (reccam);
   }
 }
 

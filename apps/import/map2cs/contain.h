@@ -22,7 +22,7 @@
 #ifndef __CONTAIN_H__
 #define __CONTAIN_H__
 
-#include "csutil/csvector.h"
+#include "csutil/array.h"
 
 // Central declaration of all required containers to avoid
 // multiple definition of classes.
@@ -42,39 +42,9 @@ class CTextureFile;
 class CMapCurve;
 class CMapCurvePoint;
 
-/*
- * Unfortunately, map2cs was written at the time when CS_DECLARE_TYPED_VECTOR
- * was in a very bad shape (thanks, Brandon). Thus it relies on some incorrect
- * features such as inability to cleanup upon destruction and so on. Thus we
- * redefine the CS_DECLARE_TYPED_VECTOR macro so that it implements the original
- * expected behaviour.
- */
 #undef CS_DECLARE_TYPED_VECTOR
-#define CS_DECLARE_TYPED_VECTOR(NAME,TYPE)				\
-  class NAME : public csVector					\
-  {								\
-  public:							\
-    NAME (int ilimit = 16, int ithreshold = 16) :		\
-      csVector (ilimit, ithreshold) {}				\
-    virtual ~NAME ()						\
-    { DeleteAll (); }						\
-    inline TYPE*& operator [] (int n)				\
-    { return (TYPE*&)csVector::operator [] (n); }		\
-    inline TYPE*& operator [] (int n) const			\
-    { return (TYPE*&)csVector::Get (n); }			\
-    inline TYPE*& Get (int n) const				\
-    { return (TYPE*&)csVector::Get (n); }			\
-    int Find (TYPE* which) const				\
-    { return csVector::Find ((void*)which); }			\
-    int FindKey (const TYPE* value) const			\
-    { return csVector::FindKey ((void*)value); }		\
-    inline void Push (TYPE* what)				\
-    { csVector::Push ((void*)what); }				\
-    inline TYPE* Pop ()						\
-    { return (TYPE*)csVector::Pop (); }				\
-    bool Insert (int n, TYPE* Item)				\
-    { return csVector::Insert (n, (void*)Item); }		\
-  };
+#define CS_DECLARE_TYPED_VECTOR(NAME,TYPE)			\
+  typedef csArray<TYPE*> NAME
 
 CS_DECLARE_TYPED_VECTOR(CMapBrushVector,         CMapBrush);
 CS_DECLARE_TYPED_VECTOR(CMapEntityVector,        CMapEntity);

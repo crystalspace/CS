@@ -23,7 +23,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/path.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "csutil/strhash.h"
 #include "iutil/document.h"
 
@@ -37,6 +37,8 @@ struct NamedSequence
 {
   char* name;
   csRef<iSequence> sequence;
+  NamedSequence () : name (0) { }
+  ~NamedSequence () { delete[] name; }
 };
 
 /**
@@ -45,7 +47,7 @@ struct NamedSequence
 class DemoSequenceLoader
 {
 private:
-  csVector sequences;
+  csPDelArray<NamedSequence> sequences;
   iSequenceManager* seqmgr;
   Demo* demo;
   DemoSequenceManager* demoseq;

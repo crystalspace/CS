@@ -78,7 +78,7 @@ ceEngineView::ceEngineView (csComponent *iParent, iEngine *Engine,
 ceEngineView::~ceEngineView ()
 {
   ceCswsEngineApp* lapp = (ceCswsEngineApp*)app;
-  lapp->engine_views.Delete (lapp->engine_views.Find (this));
+  lapp->engine_views.DeleteIndex (lapp->engine_views.Find (this));
 }
 
 bool ceEngineView::SetRect (int xmin, int ymin, int xmax, int ymax)
@@ -509,7 +509,7 @@ void ceCswsEngineApp::LoadNewMap (const char* filename)
   int i;
   for (i = 0 ; i < engine_views.Length () ; i++)
   {
-    ceEngineView* eview = (ceEngineView*)engine_views[i];
+    ceEngineView* eview = engine_views[i];
     if (cp) cp->Load (eview->GetView ()->GetCamera (), engine);
     else eview->GetView ()->GetCamera ()->GetTransform ().SetOrigin (start_pos);
     eview->GetView ()->GetCamera ()->SetSector (start_sector);

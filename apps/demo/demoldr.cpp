@@ -121,13 +121,6 @@ DemoSequenceLoader::DemoSequenceLoader (Demo* demo,
 
 DemoSequenceLoader::~DemoSequenceLoader ()
 {
-  int i;
-  for (i = 0 ; i < sequences.Length () ; i++)
-  {
-    NamedSequence* ns = (NamedSequence*)sequences[i];
-    delete[] ns->name;
-    delete ns;
-  }
 }
 
 iSequence* DemoSequenceLoader::GetSequence (const char* name)
@@ -135,7 +128,7 @@ iSequence* DemoSequenceLoader::GetSequence (const char* name)
   int i;
   for (i = 0 ; i < sequences.Length () ; i++)
   {
-    NamedSequence* ns = (NamedSequence*)sequences[i];
+    NamedSequence* ns = sequences[i];
     if (!strcmp (ns->name, name)) return ns->sequence;
   }
   return 0;

@@ -77,7 +77,7 @@ void csAnimatedPortal::Activate ()
 {
   // Push ourselves on to the busy list if we're not already there.
   int idx = Sys->busy_entities.Find (this);
-  if (idx != -1) Sys->busy_entities.Delete (idx);
+  if (idx != -1) Sys->busy_entities.DeleteIndex (idx);
   Sys->busy_entities.Push (this);
 }
 

@@ -30,21 +30,6 @@ struct csAccElement
   csEvent Event;
 };
 
-csKeyboardAccelerator::csAccVector::csAccVector () : csVector (16, 16)
-{
-}
-
-csKeyboardAccelerator::csAccVector::~csAccVector ()
-{
-  DeleteAll ();
-}
-
-bool csKeyboardAccelerator::csAccVector::FreeItem (void* Item)
-{
-  delete (csAccElement *)Item;
-  return true;
-}
-
 csKeyboardAccelerator::csKeyboardAccelerator (csComponent *iParent)
   : csComponent (iParent)
 {

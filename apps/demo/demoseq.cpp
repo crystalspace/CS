@@ -75,30 +75,12 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
 DemoSequenceManager::~DemoSequenceManager ()
 {
   Clear ();
-  int i;
-  for (i = 0 ; i < paths.Length () ; i++)
-  {
-    csNamedPath* np = (csNamedPath*)paths[i];
-    delete np;
-  }
-  paths.DeleteAll ();
 }
 
 void DemoSequenceManager::Clear ()
 {
   seqmgr->Clear ();
-  int i;
-  for (i = 0 ; i < pathForMesh.Length () ; i++)
-  {
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
-    delete pfm;
-  }
   pathForMesh.DeleteAll ();
-  for (i = 0 ; i < meshRotation.Length () ; i++)
-  {
-    MeshRotation* mrot = (MeshRotation*)meshRotation[i];
-    delete mrot;
-  }
   meshRotation.DeleteAll ();
 }
 
@@ -136,12 +118,6 @@ void DemoSequenceManager::Resume ()
 void DemoSequenceManager::Restart (const char* sequenceFileName)
 {
   Clear ();
-  int i;
-  for (i = 0 ; i < paths.Length () ; i++)
-  {
-    csNamedPath* np = (csNamedPath*)paths[i];
-    delete np;
-  }
   paths.DeleteAll ();
   main_sequence = 0;
   do_fade = false;
@@ -245,7 +221,7 @@ void DemoSequenceManager::ReplacePathObject (csNamedPath* path,
   int i;
   for (i = 0 ; i < pathForMesh.Length () ; i++)
   {
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    PathForMesh* pfm = pathForMesh[i];
     if (pfm->path == path)
     {
       pfm->mesh = mesh;
@@ -275,7 +251,7 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
   int len = pathForMesh.Length ();
   while (i < len)
   {
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    PathForMesh* pfm = pathForMesh[i];
     float r = float (current_time - pfm->start_path_time)
     	/ float (pfm->total_path_time);
     bool do_path = true;
@@ -331,8 +307,7 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
     }
     if (!do_path)
     {
-      delete pfm;
-      pathForMesh.Delete (i);
+      pathForMesh.DeleteIndex (i);
       len--;
     }
     else i++;
@@ -342,11 +317,10 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
   len = meshRotation.Length ();
   while (i < len)
   {
-    MeshRotation* mrot = (MeshRotation*)meshRotation[i];
+    MeshRotation* mrot = meshRotation[i];
     if (current_time > mrot->start_time + mrot->total_time)
     {
-      delete mrot;
-      meshRotation.Delete (i);
+      meshRotation.DeleteIndex (i);
       len--;
     }
     else
@@ -366,7 +340,7 @@ void DemoSequenceManager::DebugPositionObjects (iCamera* camera,
   int len = pathForMesh.Length ();
   while (i < len)
   {
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    PathForMesh* pfm = pathForMesh[i];
     float r = float (debug_time - pfm->start_path_time)
     	/ float (pfm->total_path_time);
     if (r >= 0 && r <= 1)
@@ -514,7 +488,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
   i = 0;
   while (i < len)
   {
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    PathForMesh* pfm = pathForMesh[i];
     bool hi = (pfm->path == selnp);
     DebugDrawPath (pfm->path, hi, tl, br, selpoint);
     i++;
@@ -528,7 +502,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
   i = 0;
   while (i < len)
   {
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    PathForMesh* pfm = pathForMesh[i];
     bool hi = (pfm->path == selnp);
 
     // Fetch the current time.
@@ -570,7 +544,7 @@ void DemoSequenceManager::SelectFirstPath (char* hilight)
 {
   if (pathForMesh.Length () > 0)
   {
-    strcpy (hilight, ((PathForMesh*)pathForMesh[0])->path->GetName ());
+    strcpy (hilight, pathForMesh[0]->path->GetName ());
   }
 }
 
@@ -578,8 +552,7 @@ void DemoSequenceManager::SelectLastPath (char* hilight)
 {
   if (pathForMesh.Length () > 0)
   {
-    strcpy (hilight, ((PathForMesh*)pathForMesh[
-      pathForMesh.Length ()-1])->path->GetName ());
+    strcpy (hilight, pathForMesh[pathForMesh.Length ()-1]->path->GetName ());
   }
 }
 
@@ -594,14 +567,14 @@ void DemoSequenceManager::SelectPreviousPath (char* hilight)
   int i;
   for (i = 0 ; i < pathForMesh.Length () ; i++)
   {
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    PathForMesh* pfm = pathForMesh[i];
     if (pfm->path == np)
     {
       if (i == 0)
 	return;
       else
       {
-        pfm = (PathForMesh*)pathForMesh[i-1];
+        pfm = pathForMesh[i-1];
 	strcpy (hilight, pfm->path->GetName ());
       }
       return;
@@ -623,12 +596,12 @@ void DemoSequenceManager::SelectNextPath (char* hilight)
   int i;
   for (i = 0 ; i < pathForMesh.Length () ; i++)
   {
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    PathForMesh* pfm = pathForMesh[i];
     if (pfm->path == np)
     {
       if (i < pathForMesh.Length ()-1)
       {
-        pfm = (PathForMesh*)pathForMesh[i+1];
+        pfm = pathForMesh[i+1];
 	strcpy (hilight, pfm->path->GetName ());
       }
       return;
@@ -652,7 +625,7 @@ csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
   int len = pathForMesh.Length ();
   while (i < len)
   {
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    PathForMesh* pfm = pathForMesh[i];
     csNamedPath* np = pfm->path;
     bool hi = (hilight && !strcmp (np->GetName (), hilight));
     if (hi)

@@ -172,7 +172,7 @@ bool csHint::PreHandleEvent (iEvent &Event)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//- Hint manager -//--//
 
-csHintManager::csHintManager (csApp *iApp) : csVector (16, 16)
+csHintManager::csHintManager (csApp *iApp) : csArray<void*> (16, 16)
 {
   app = iApp;
   check = false;
@@ -183,30 +183,35 @@ csHintManager::csHintManager (csApp *iApp) : csVector (16, 16)
 
 csHintManager::~csHintManager ()
 {
-  DeleteAll ();
+  FreeAll ();
   if (font)
     font->DecRef ();
 }
 
-bool csHintManager::FreeItem (void* Item)
+void csHintManager::FreeAll ()
 {
-  free (Item);
-  return true;
+  int i;
+  for (i = 0 ; i < Length () ; i++)
+    FreeItem (Get (i));
+  DeleteAll ();
 }
 
-int csHintManager::Compare (void* Item1, void* Item2, int Mode) const
+void csHintManager::FreeItem (void* Item)
 {
-  (void)Mode;
+  free (Item);
+}
+
+int csHintManager::Compare (void* const& Item1, void* const& Item2)
+{
   HintStore *ts1 = (HintStore *)Item1;
   HintStore *ts2 = (HintStore *)Item2;
   return (ts1->comp < ts2->comp) ? -1 : (ts1->comp > ts2->comp) ? +1 : 0;
 }
 
-int csHintManager::CompareKey (void* Item, const void* Key, int Mode) const
+int csHintManager::CompareKey (void* const& Item, void* key)
 {
-  (void)Mode;
   HintStore *ts = (HintStore *)Item;
-  csComponent *comp = (csComponent *)Key;
+  csComponent *comp = (csComponent *)key;
   return (ts->comp < comp) ? -1 : (ts->comp > comp) ? +1 : 0;
 }
 
@@ -216,14 +221,14 @@ void csHintManager::Add (const char *iText, csComponent *iComp)
   HintStore *ts = (HintStore *)malloc (sizeof (HintStore) + sl);
   ts->comp = iComp;
   memcpy (ts->text, iText, sl + 1);
-  InsertSorted (ts);
+  InsertSorted (ts, Compare);
 }
 
 void csHintManager::Remove (csComponent *iComp)
 {
-  int idx = FindSortedKey (iComp);
+  int idx = FindSortedKey (iComp, CompareKey);
   if (idx >= 0)
-    Delete (idx);
+    DeleteIndex (idx);
 }
 
 void csHintManager::SetFont (iFont *iNewFont, int iSize)
@@ -239,7 +244,7 @@ void csHintManager::SetFont (iFont *iNewFont, int iSize)
 bool csHintManager::do_checkhint (csComponent *comp, void *data)
 {
   csHintManager *This = (csHintManager *)data;
-  return (This->FindSortedKey (comp) >= 0);
+  return (This->FindSortedKey (comp, CompareKey) >= 0);
 }
 
 void csHintManager::HandleEvent (iEvent &Event)
@@ -261,7 +266,7 @@ void csHintManager::HandleEvent (iEvent &Event)
         if (c && !c->GetState (CSS_DISABLED))
         {
           // Look for a hint for given component
-          int idx = FindSortedKey (c);
+          int idx = FindSortedKey (c, CompareKey);
           if (idx >= 0)
           {
             // Okay, create the floating hint object

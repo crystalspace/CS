@@ -282,16 +282,20 @@ void MD32spr::Main()
      */
 
     if (!player && !weaponDir)
-      if (stristr(str, ".md3")) {
+      if (stristr(str, ".md3"))
+      {
 	md3Model *tmpModel = new md3Model(object_reg);
-	if (tmpModel) {
+	if (tmpModel)
+	{
 	  generic.Push(tmpModel);
 	  tmpModel->Init(&vfs);
 	  tmpModel->fileName = str;
 	  tmpModel->LoadMD3();
 	  md3Files++;
 	  continue;
-	} else {
+	}
+	else
+	{
 	  ReportError
 	    ("Fatal Error: Allocating memory for generic model.!");
 	  return;
@@ -356,13 +360,16 @@ void MD32spr::Main()
       /* If this is an md3 file and it contains the weaponName, Init() it. */
       if (stristr(str, ".md3")) {
 	md3Model *tmpModel = new md3Model(object_reg);
-	if (tmpModel) {
+	if (tmpModel)
+	{
 	  generic.Push(tmpModel);
 	  tmpModel->Init(&vfs);
 	  tmpModel->fileName = str;
 	  tmpModel->LoadMD3();
 	  md3Files++;
-	} else {
+	}
+	else
+	{
 	  ReportError
 	    ("Fatal Error: Allocating memory for generic model.!");
 	  return;
@@ -663,7 +670,7 @@ void MD32spr::Write()
     {
       for (i = 0; i < generic.Length(); i++)
       {
-        md3Model *mdl = (md3Model *) generic.Get(i);
+        md3Model *mdl = generic.Get(i);
         mdlName = new char[strlen(mdl->GetFileName()) + 1];
         basename(mdl->GetFileName(), mdlName);
         csRef<iDocumentSystem> xml(csPtr <iDocumentSystem>
@@ -739,9 +746,11 @@ void MD32spr::Write()
       outFile += lowerName;
       doc->Write(out, outFile.GetData());
     }
-    if (weaponDir) {
-      for (i = 0; i < generic.Length(); i++) {
-	md3Model *mdl = (md3Model *) generic.Get(i);
+    if (weaponDir)
+    {
+      for (i = 0; i < generic.Length(); i++)
+      {
+	md3Model *mdl = generic.Get(i);
 	csRef < iDocumentSystem > xml(csPtr < iDocumentSystem >
 				      (new csTinyDocumentSystem()));
 	csRef < iDocument > doc = xml->CreateDocument();
