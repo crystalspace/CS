@@ -180,18 +180,6 @@ public:
   void Cache (iFile* file, csPolygon3D* poly, iEngine*);
 
   /**
-   * Convert the lightmaps to the correct mixing mode.
-   * This function does nothing unless the mixing mode is
-   * nocolor.
-   */
-  void ConvertToMixingMode ();
-
-  /**
-   * Convert the lightmaps to a 3D driver dependent size.
-   */
-  void ConvertFor3dDriver (int maxAspect = 32767);
-
-  /**
    * Set the size of one lightmap cell (default = 16).
    * Do not directly assign to the lightcell_size variable, as
    * lightmap_shift also has to be updated.

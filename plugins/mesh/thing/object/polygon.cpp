@@ -1231,14 +1231,6 @@ bool csPolygon3D::WriteToCache (iFile* file)
   return true;
 }
 
-void csPolygon3D::PrepareLighting ()
-{
-  if (!txt_info || !txt_info->lm) return ;
-  txt_info->lm->ConvertToMixingMode ();
-  txt_info->lm->ConvertFor3dDriver (
-      thing->GetStaticData ()->thing_type->engine->GetMaxLightmapAspectRatio ());
-}
-
 void csPolygon3D::FillLightMapDynamic (iFrustumView* lview)
 {
   csFrustumContext *ctxt = lview->GetFrustumContext ();

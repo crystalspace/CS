@@ -693,15 +693,6 @@ public:
   bool WriteToCache (iFile* file);
 
   /**
-   * Prepare the lightmaps for use.
-   * This function also converts the lightmaps to the correct
-   * format required by the 3D driver. This function does NOT
-   * create the first lightmap. This is done by the precalculated
-   * lighting process (using CalculateLighting()).
-   */
-  void PrepareLighting ();
-
-  /**
    * Fill the lightmap of this polygon according to the given light and
    * the frustum. The light is given in world space coordinates. The
    * view frustum is given in camera space (with (0,0,0) the origin

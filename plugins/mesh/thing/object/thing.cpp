@@ -2620,10 +2620,6 @@ stop:
 
 void csThing::PrepareLighting ()
 {
-  int i;
-  for (i = 0; i < polygons.Length (); i++)
-    polygons.Get (i)->PrepareLighting ();
-
   ClearLMs ();
   PrepareLMs ();
 }

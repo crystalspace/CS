@@ -612,10 +612,6 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   return true;
 }
 
-void csLightMap::ConvertToMixingMode ()
-{
-}
-
 void csLightMap::CalcMaxStatic()
 {
   max_static_color_values.Set(0,0,0);
@@ -633,9 +629,4 @@ void csLightMap::CalcMaxStatic()
     map++;
   }
 }
-
-void csLightMap::ConvertFor3dDriver (int)
-{
-}
-
 
