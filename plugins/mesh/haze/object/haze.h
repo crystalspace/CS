@@ -323,9 +323,8 @@ public:
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return false; }
-  virtual int HitBeamBBox (const csVector3&, const csVector3&,
-        csVector3&, float*)
-  { return -1; }
+  virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
+        csVector3& isect, float* pr);
   virtual bool HitBeamOutline (const csVector3&, const csVector3&,
         csVector3&, float*)
   { return false; }

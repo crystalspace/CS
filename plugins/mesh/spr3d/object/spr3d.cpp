@@ -1578,10 +1578,6 @@ bool csSprite3DMeshObject::HitBeamOutline (const csVector3& start,
 	const csVector3& end, csVector3& isect, float* pr)
 {
   // @@@ We might consider checking to a lower LOD version only.
-  // This function is not very fast if the bounding box test succeeds.
-  // Added a full check of all vertices in the sweep. Its a LOT
-  // slower, but is 100% accurate.
-
   csSegment3 seg (start, end);
   csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
   csVector3* verts = GetObjectVerts (cframe);
@@ -1613,7 +1609,6 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
   int i;
   float dist, temp, max;
   temp = dist = max = csSquaredDist::PointPoint (start, end);
-  float ibeam_len = 1 /max;
   for (i = 0 ; i < factory->GetTriangleCount () ; i++)
   {
     csTriangle& tr = tris[i];
@@ -1626,7 +1621,7 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
       {
           dist = temp;
 	  isect = tsect;
-          if (pr) *pr = qsqrt (dist * ibeam_len);
+          if (pr) *pr = qsqrt (dist / max);
       }
     }
   }

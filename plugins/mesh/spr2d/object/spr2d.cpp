@@ -19,6 +19,8 @@
 #define CS_SYSDEF_PROVIDE_ALLOCA
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
+#include "csgeom/math2d.h"
+#include "csgeom/box.h"
 #include "spr2d.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -63,6 +65,7 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   shapenr = 0;
   current_lod = 1;
   current_features = ALL_FEATURES;
+  o2t.Identity();
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
@@ -76,23 +79,25 @@ void csSprite2DMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
-    if (!lighting)
+    float max_sq_dist = 0;
+    int i;
+    bbox_2d.StartBoundingBox(vertices[0].pos);
+    for (i = 0 ; i < vertices.Length () ; i++)
     {
-      // If there is no lighting then we need to copy the color_init
-      // array to color.
-      float max_sq_dist = 0;
-	  int i;
-      for (i = 0 ; i < vertices.Length () ; i++)
+      csSprite2DVertex& v = vertices[i];
+      bbox_2d.AddBoundingVertexSmart(v.pos);
+      if (!lighting) 
       {
-        csSprite2DVertex& v = vertices[i];
+        // If there is no lighting then we need to copy the color_init
+        // array to color.
         v.color = vertices[i].color_init;
         v.color.Clamp (2, 2, 2);
-	float sqdist = v.pos.x*v.pos.x + v.pos.y*v.pos.y;
-	if (sqdist > max_sq_dist) max_sq_dist = sqdist;
       }
-      float max_dist = qsqrt (max_sq_dist);
-      radius.Set (max_dist, max_dist, max_dist);
+      float sqdist = v.pos.x*v.pos.x + v.pos.y*v.pos.y;
+      if (sqdist > max_sq_dist) max_sq_dist = sqdist;
     }
+    float max_dist = qsqrt (max_sq_dist);
+    radius.Set (max_dist, max_dist, max_dist);
   }
 }
 
@@ -351,11 +356,13 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   return true;
 }
 
-void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& /*bbox*/, int /*type*/)
+void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
   SetupObject ();
-  //@@@ TODO
-  //bbox = object_bbox;
+  //@@@ TODO. This is an initial test....and is invalid
+  csVector2 st = bbox_2d.Min(), end = bbox_2d.Max();
+  bbox.StartBoundingBox(csVector3(st.x,st.y,0));
+  bbox.AddBoundingVertexSmart(csVector3(end.x,end.y,0));
 }
 
 void csSprite2DMeshObject::HardTransform (const csReversibleTransform& t)
@@ -594,6 +601,76 @@ const csVector2 *csSprite2DMeshObject::uvAnimationControl::GetVertices (int &num
 {
   num = frame->GetUVCount ();
   return frame->GetUVCoo ();
+}
+
+// The hit beam methods in sprite2d make a couple of small presumptions.
+// 1) The sprite is always facing the start of the beam.
+// 2) Since it is always facing the the beam, only one side
+// of its bounding box can be hit (if at all).
+
+void csSprite2DMeshObject::CheckBeam (const csVector3& start,
+      const csVector3& pl, float sqr)
+{
+  // This method is an optimized version of LookAt() based on
+  // the presumption that the up vector is always (0,1,0).
+  // This is used to create a transform to move the intersection
+  // to the sprites vector space, then it is tested against the 2d
+  // coords, which are conveniently located at z=0.
+  // The transformation matrix is stored and used again if the
+  // start vector for the beam is in the same position. MHV.
+  
+  if (start == cached_start) return;
+  cached_start.Set (start); 
+  csVector3 pl2 = pl * qisqrt (sqr);
+  csVector3 v1( pl2.z, 0, -pl2.x);
+  sqr = v1*v1;
+  v1 *= qisqrt(sqr);
+  csVector3 v2(pl2.y * v1.z, pl2.z * v1.x - pl2.x * v1.z, -pl2.y * v1.x);
+  o2t.Set (v1.x, v2.x, pl2.x,
+           v1.y, v2.y, pl2.y,
+           v1.z, v2.z, pl2.z);
+}
+
+
+int csSprite2DMeshObject::HitBeamBBox (const csVector3& start,
+      const csVector3& end, csVector3& isect, float* pr)
+{
+  
+  csVector2 cen = bbox_2d.GetCenter ();
+  csVector3 pl = start - csVector3 (cen.x, cen.y, 0);
+  float sqr = pl * pl;
+  if (sqr < SMALL_EPSILON) return -1; // Too close. Cannot intersect
+  float dist;
+  csIntersect3::Plane(start, end, pl, 0, isect, dist);
+  if (pr) *pr = dist;
+  CheckBeam (start, pl, sqr);
+  csVector3 r = o2t * isect;
+  csVector2 min = bbox_2d.Min(), max = bbox_2d.Max();
+  if (r.x < min.x || r.x > max.x) return -1;
+  if (r.y < min.y || r.y > max.y) return -1;
+  return BOX_SIDE_Z;
+}
+
+bool csSprite2DMeshObject::HitBeamOutline(const csVector3& start,
+      const csVector3& end, csVector3& isect, float* pr)
+{
+  csVector2 cen = bbox_2d.GetCenter();
+  csVector3 pl = start - csVector3(cen.x, cen.y, 0);
+  float sqr = pl * pl;
+  if (sqr < SMALL_EPSILON) return false; // Too close, Cannot intersect
+  float dist;
+  csIntersect3::Plane(start, end, pl, 0, isect, dist);
+  if (pr) *pr = dist;
+  CheckBeam (start, pl, sqr);
+  csVector3 r = o2t * isect;
+  float trail, len = vertices.Length();
+  trail = len - 1;
+  csVector2 isec(r.x, r.y);
+  int i;
+  for (i = 0; i < len; trail = i++)
+    if (csMath2::WhichSide2D(isec, vertices[trail].pos, vertices[i].pos) > 0)
+      return false;
+  return true;
 }
 
 //----------------------------------------------------------------------

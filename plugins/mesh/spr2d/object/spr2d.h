@@ -36,6 +36,7 @@
 struct iMaterialWrapper;
 struct iSprite2DUVAnimation;
 class csSprite2DMeshObjectFactory;
+class csBox2;
 
 /**
  * Sprite 2D version of mesh object.
@@ -70,6 +71,9 @@ class csSprite2DMeshObject : public iMeshObject
   long shapenr;
   float current_lod;
   uint32 current_features;
+  csBox2 bbox_2d;
+  csMatrix3 o2t; // Cached LookAt() matrix
+  csVector3 cached_start;
 
   /**
    * Array of 3D vertices.
@@ -94,6 +98,9 @@ class csSprite2DMeshObject : public iMeshObject
 
   /// Update lighting given a position.
   void UpdateLighting (iLight** lights, int num_lights, const csVector3& pos);
+
+  /// Check the start vector and recalculate the LookAt matrix if changed.
+  void CheckBeam(const csVector3& start, const csVector3& plane, float dist_squared);
 
 public:
   /// Constructor.
@@ -137,13 +144,13 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return false; }
   virtual int HitBeamBBox (const csVector3&, const csVector3&,
-        csVector3&, float*)
-  { return -1; }
+        csVector3&, float*);
   virtual bool HitBeamOutline (const csVector3&, const csVector3&,
-        csVector3&, float*)
-  { return false; }
-  virtual bool HitBeamObject (const csVector3&, const csVector3&,
-  	csVector3&, float*) { return false; }
+        csVector3&, float*);
+  /// 2D sprites have no depth, so this is equivalent to HitBeamOutline.
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr) 
+  { return HitBeamOutline(start, end, isect, pr); }
   virtual long GetShapeNumber () const { return shapenr; }
   virtual uint32 GetLODFeatures () const { return current_features; }
   virtual void SetLODFeatures (uint32 mask, uint32 value)
