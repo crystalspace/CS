@@ -239,9 +239,9 @@ csImageFile* csImageFile::mipmap (int steps, Filter3x3* filt1, Filter5x5* filt2)
           // @@@ Consider a more accurate algorithm that shifts the source bitmap one
           // half pixel. In the current implementation there is a small shift in the
           // texture data.
-          r = bm->red + (bm+1)->red + (bm+w)->red + (bm+w+1)->red;
-          g = bm->green + (bm+1)->green + (bm+w)->green + (bm+w+1)->green;
-          b = bm->blue + (bm+1)->blue + (bm+w)->blue + (bm+w+1)->blue;
+          r = (bm->red + (bm+1)->red + (bm+w)->red + (bm+w+1)->red)/4;
+          g = (bm->green + (bm+1)->green + (bm+w)->green + (bm+w+1)->green)/4;
+          b = (bm->blue + (bm+1)->blue + (bm+w)->blue + (bm+w+1)->blue)/4;
 	  bm2->red = r;
 	  bm2->green = g;
 	  bm2->blue = b;
@@ -278,9 +278,9 @@ csImageFile* csImageFile::mipmap (int steps, Filter3x3* filt1, Filter5x5* filt2)
               (bm+w)->blue     + (bm+w+1)->blue     + (bm+w+2)->blue     + (bm+w+3)->blue +
               (bm+w+w)->blue   + (bm+w+w+1)->blue   + (bm+w+w+2)->blue   + (bm+w+w+3)->blue +
               (bm+w*3)->blue   + (bm+w*3+1)->blue   + (bm+w*3+2)->blue   + (bm+w*3+3)->blue;
-	  bm2->red = r;
-	  bm2->green = g;
-	  bm2->blue = b;
+	  bm2->red = r/16;
+	  bm2->green = g/16;
+	  bm2->blue = b/16;
           bm2++;
           bm += 4;
         }
