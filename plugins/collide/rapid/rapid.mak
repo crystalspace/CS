@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/colldet/rapid
+vpath %.cpp plugins/collide/rapid
 
 ifeq ($(USE_PLUGINS),yes)
   RAPID = $(OUTDLL)rapid$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(RAPID)
 endif
 
-INC.RAPID = $(wildcard plugins/colldet/rapid/*.h)
-SRC.RAPID = $(wildcard plugins/colldet/rapid/*.cpp)
+INC.RAPID = $(wildcard plugins/collide/rapid/*.h)
+SRC.RAPID = $(wildcard plugins/collide/rapid/*.cpp)
 OBJ.RAPID = $(addprefix $(OUT),$(notdir $(SRC.RAPID:.cpp=$O)))
 DEP.RAPID = CSGEOM CSUTIL CSSYS CSUTIL
 

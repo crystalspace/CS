@@ -19,8 +19,8 @@
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
-#include "plugins/colldet/rapid/rapcol.h"
-#include "plugins/colldet/rapid/prapid.h"
+#include "rapcol.h"
+#include "prapid.h"
 
 /**
  * Located in eigen.cpp, this function returns the eigenvectors of M,

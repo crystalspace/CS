@@ -62,6 +62,7 @@ The history order is reversed so that new features are at the top.
 	  might include (among others):
 	    plugins/mesh/ball/persist/xml
 	    plugins/mesh/ball/persist/binary
+	- Eric Sunshine renamed plugins/colldet to plugins/collide.
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the

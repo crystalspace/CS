@@ -63,8 +63,8 @@
 #include "cssysdef.h"
 #include "csutil/garray.h"
 #include "csgeom/transfrm.h"
-#include "plugins/colldet/rapid/rapcol.h"
-#include "plugins/colldet/rapid/prapid.h"
+#include "rapcol.h"
+#include "prapid.h"
 #include "iengine/polymesh.h"
 #include "iengine/collider.h"
 
