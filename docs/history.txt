@@ -25,6 +25,8 @@ The history order has been reversed so that new features are at the top.
 	  and C-preprocessor variables named CS_BUILTIN_SIZED_TYPES.  This
 	  change was necessary in order to support BeOS since the BeOS system
 	  headers already define these types.
+	- Wouter Wijngaards fixed rain and snow so that particles will not
+	  disappear on slower systems.
 	- Eric Sunshine eliminated a compilation warning in the Dungeon
 	  plug-in which was reported by BeOS compiler.
 	- Eric Sunshine eliminated a couple compilation warnings in the
