@@ -326,9 +326,10 @@ public:
   /**
    * Return the object-space plane of this polygon.
    */
-  csPlane3& GetObjectPlane () { 
-	  //if(plane_obj_need_update) ComputeNormal();
-	  return plane_obj;
+  csPlane3& GetObjectPlane ()
+  { 
+    //if (plane_obj_need_update) ComputeNormal();
+    return plane_obj;
   }
 
   /**
