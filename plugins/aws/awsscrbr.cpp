@@ -18,12 +18,12 @@ SCF_IMPLEMENT_IBASE_END
 
 const int awsScrollBar::signalChanged=0x1;
 
-const int awsScrollBar::fsVertical =0x0;
-const int awsScrollBar::fsHorizontal =0x1;
+const int awsScrollBar::sboVertical =0x0;
+const int awsScrollBar::sboHorizontal =0x1;
 
 awsScrollBar::awsScrollBar():is_down(false), mouse_is_over(false),
 was_down(false), tex(NULL),
-frame_style(0), alpha_level(92),
+orientation(0), alpha_level(92),
 decVal(NULL), incVal(NULL), knob(NULL), timer (NULL),
 sink(NULL), dec_slot(NULL), inc_slot(NULL), knob_slot(NULL), tick_slot(NULL),
 value(0), max(1), min(0), amntvis(0),
@@ -74,9 +74,15 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
   iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
 
   pm->LookupIntKey("OverlayTextureAlpha", alpha_level); // global get
-  pm->GetInt(settings, "Style", frame_style);
+  pm->GetInt(settings, "Orientation", orientation);
   pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
-
+  
+  int h = (int)min;
+  h = (int)min; pm->GetInt(settings, "Min", h); min =(float)h;
+  h = (int)value; pm->GetInt(settings, "Value", h); value =(float)h;
+  h = 1; pm->GetInt(settings, "Max", h); max =(float)h;
+  h = (int)amntvis; pm->GetInt(settings, "PageSize", h); amntvis =(float)h;
+  
   tex=pm->GetTexture("Texture");
 
   // Setup embedded buttons
@@ -95,9 +101,9 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
   incinfo.AddIntKey(new scfString("Style"), awsCmdButton::fsToolbar);
   knobinfo.AddIntKey(new scfString("Style"), awsCmdButton::fsToolbar);
 
-  switch (frame_style)
+  switch (orientation)
   {
-  case fsVertical:
+  case sboVertical:
     {
 
       incimg = pm->GetTexture("ScrollBarDn");
@@ -270,7 +276,7 @@ awsScrollBar::KnobTick(void *sk, iAwsSource *)
   // adjust position of knob and scrollbar value
   awsScrollBar *sb = (awsScrollBar *)sk;
 
-  if (sb->frame_style==fsVertical)
+  if (sb->orientation==sboVertical)
   {
     int height=10;
     csRect f(sb->Frame());
@@ -291,7 +297,7 @@ awsScrollBar::KnobTick(void *sk, iAwsSource *)
 
     sb->value = (sb->knob->last_y - sb->decVal->Frame().ymax) * sb->max / bh;
   }
-  else if (sb->frame_style==fsHorizontal)
+  else if (sb->orientation==sboHorizontal)
   {
     int width=10;
     csRect f(sb->Frame());
@@ -325,7 +331,7 @@ awsScrollBar::TickTock(void *sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
 
-  if (sb->frame_style==fsVertical)
+  if (sb->orientation==sboVertical)
   {
     if (sb->last_y < sb->knob->Frame ().ymin)
       sb->value-=sb->amntvis;
@@ -391,7 +397,7 @@ awsScrollBar::OnDraw(csRect clip)
 
   csRect f(Frame());
 
-  if (frame_style==fsVertical)
+  if (orientation==sboVertical)
   {
     // Get the bar height
     f.ymin+=decVal->Frame().Height()+1;
@@ -504,7 +510,7 @@ awsScrollBar::HandleClicking (int btn,int x,int y)
   {
     if (captured)
       WindowManager ()->ReleaseMouse ();
-    if (frame_style==fsVertical)
+    if (orientation==sboVertical)
     {
       if (y < knob->Frame().ymin && y > decVal->Frame ().ymax)
         value-=amntvis;
@@ -585,8 +591,8 @@ awsScrollBarFactory::awsScrollBarFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   Register("Scroll Bar");
-  RegisterConstant("sbfsVertical",  awsScrollBar::fsVertical);
-  RegisterConstant("sbfsHorizontal", awsScrollBar::fsHorizontal);
+  RegisterConstant("sboVertical",  awsScrollBar::sboVertical);
+  RegisterConstant("sboHorizontal", awsScrollBar::sboHorizontal);
 
   RegisterConstant("signalScrollBarChanged",  awsScrollBar::signalChanged);
 }

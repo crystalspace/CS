@@ -44,7 +44,7 @@ class awsScrollBar : public awsComponent
   iTextureHandle *incimg;
 
   /// Flags for frame style.
-  int frame_style;
+  int orientation;
 
   /// Alpha level for this component
   int alpha_level;
@@ -103,10 +103,10 @@ protected:
   awsScrollBar();
   virtual ~awsScrollBar();
 
-  /******** Frame styles ***********/
+  /******** scrollbar orientation ***********/
 
-  static const int fsVertical;
-  static const int fsHorizontal;
+  static const int sboVertical;
+  static const int sboHorizontal;
 
   /******* Signals **********************/
 

@@ -210,7 +210,7 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   sbinfo.AddRectKey(new scfString("Frame"),
                     csRect(Frame().Width()-sb_w-1, border, Frame().Width()-1, Frame().Height()-1));
 
-  sbinfo.AddIntKey(new scfString("Style"), awsScrollBar::fsVertical);
+  sbinfo.AddIntKey(new scfString("Orientation"), awsScrollBar::sboVertical);
 
   scrollbar->SetWindow(Window());
   scrollbar->SetParent(this);
