@@ -1096,7 +1096,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
       csRef<iDocumentNode> child = it->Next ();
       if (child->GetType () != CS_NODE_ELEMENT) continue;
       const char* value = child->GetValue ();
-        csStringID id = xmltokens.Request (value);
+      csStringID id = xmltokens.Request (value);
       switch (id)
       {
         case XMLTOKEN_SETTINGS:

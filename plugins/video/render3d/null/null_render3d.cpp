@@ -59,6 +59,10 @@ SCF_IMPLEMENT_IBASE (csNullGraphics3D::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
+SCF_IMPLEMENT_IBASE (csNullPolygonRenderer)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonRenderer)
+SCF_IMPLEMENT_IBASE_END
+
 csNullGraphics3D::csNullGraphics3D (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
@@ -158,6 +162,11 @@ bool csNullGraphics3D::HandleEvent (iEvent& e)
     }
   }
   return false;
+}
+
+csPtr<iPolygonRenderer> csNullGraphics3D::CreatePolygonRenderer ()
+{
+  return csPtr<iPolygonRenderer> (new csNullPolygonRenderer ());
 }
 
 static void FillNormalizationMapSide (unsigned char *normdata, int size, 

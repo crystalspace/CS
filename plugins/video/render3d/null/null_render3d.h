@@ -22,6 +22,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
+#include "ivideo/polyrender.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "csutil/cfgacc.h"
@@ -31,6 +32,24 @@ struct iObjectRegistry;
 struct iGraphics2D;
 struct iShaderManager;
 struct iBugPlug;
+
+class csNullPolygonRenderer : public iPolygonRenderer
+{
+public:
+  csNullPolygonRenderer ()
+  {
+    SCF_CONSTRUCT_IBASE (0);
+  }
+  virtual ~csNullPolygonRenderer ()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
+  SCF_DECLARE_IBASE;
+
+  virtual void PrepareRenderMesh (csRenderMesh&) { }
+  virtual void Clear () { }
+  virtual void AddPolygon (csPolygonRenderData*) { }
+};
 
 class csNullGraphics3D : public iGraphics3D
 {
@@ -151,7 +170,7 @@ public:
   void RemoveFromCache (iRendererLightmap* rlm) { }
   iVertexBufferManager* GetVertexBufferManager () { return 0; }
   bool IsLightmapOK (int lmw, int lmh, int lightCellSize) { return false; }
-  csPtr<iPolygonRenderer> CreatePolygonRenderer () { return 0; }
+  csPtr<iPolygonRenderer> CreatePolygonRenderer ();
   void SetWorldToCamera (csReversibleTransform* w2c) { }
   void DrawSimpleMesh (const csSimpleRenderMesh& mesh, uint flags = 0) { }
 private:

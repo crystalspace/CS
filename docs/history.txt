@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Aug-2004
+	- Jorrit fixed the NR null renderer so that it also returns a
+	  valid iPolygonRenderer instance on calling
+	  g3d->CreatePolygonRenderer(). That way PrecacheDraw() can work
+	  fine in combination with null3d.
 17-Aug-2004
 	- Jorrit did some more work on lighter config parsing.
 	- Jorrit did the following lighter changes:
