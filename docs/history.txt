@@ -45,6 +45,9 @@ chronological order.
 	  caller.
 	- Jorrit reverted the optimization to avoid the construction of
 	  the dynDomain array. It was wrong.
+        - Matze changed bison and flex jam rules to build into the out directory
+          instaead of the source directory and added a rule to copy the
+          generated files.
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during

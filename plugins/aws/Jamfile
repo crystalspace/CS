@@ -31,3 +31,17 @@ C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
 LinkWith aws : csgeom csgfx cstool csutil ;
 
 Help aws : "Alternate Windowing System plug-in" ;
+
+# construct a rule for copying the generated sources from bison and flex into
+# the source directories
+FILES = skinpars.cpp skinpars.hpp skinlex.cpp ;
+FILES = $(FILES:G=copybisonflex) ;
+for i in $(FILES) {
+    SEARCH on $(i) = $(LOCATE_TARGET) ;
+    local targetfile = $(i:D=$(SUBDIR)) ;
+    
+    Copy $(targetfile) : $(i) ;
+    Depends $(targetfile) : $(i) ;
+    Depends copybisonflex : $(targetfile) ;
+}
+
