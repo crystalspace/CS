@@ -52,7 +52,7 @@ public:
   csClipper ();
 
   /// Destructor.
-  virtual ~csClipper () { }
+  virtual ~csClipper ();
 
   /// Wrapper function: clip a polygon in-place.
   virtual uint8 ClipInPlace (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox);

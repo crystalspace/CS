@@ -171,6 +171,7 @@ public:
   {
     Clear ();
     delete[] els;
+    SCF_DESTRUCT_IBASE ();
   }
   void Clear ()
   {

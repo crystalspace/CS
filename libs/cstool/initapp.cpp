@@ -308,6 +308,8 @@ public:
   SCF_DECLARE_IBASE;
   csAppEventHandler (csEventHandlerFunc h) : evhdlr(h)
   { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~csAppEventHandler()
+  { SCF_DESTRUCT_IBASE(); }
   virtual bool HandleEvent (iEvent& e) { return evhdlr (e); }
 };
 

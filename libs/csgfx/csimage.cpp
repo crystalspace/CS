@@ -110,6 +110,7 @@ csImageFile::~csImageFile ()
   FreeImage ();
   delete [] fName;
   DG_REM (this);
+  SCF_DESTRUCT_IBASE ();
 }
 
 int csImageFile::GetWidth ()

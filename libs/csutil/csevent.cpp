@@ -169,6 +169,7 @@ csEvent::csEvent (csEvent const& e) : iEvent(), attributes (53)
 csEvent::~csEvent ()
 {
   RemoveAll();
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEvent::Add(const char *name, int8 v)

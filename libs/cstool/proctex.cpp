@@ -60,7 +60,10 @@ public:
     SCF_CONSTRUCT_IBASE (0);
     ProcEventHandler::object_reg = object_reg;
   }
-  virtual ~ProcEventHandler () { }
+  virtual ~ProcEventHandler ()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
 
   SCF_DECLARE_IBASE;
   virtual bool HandleEvent (iEvent& event);
@@ -137,6 +140,8 @@ csProcTexture::csProcTexture ()
 
 csProcTexture::~csProcTexture ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiProcTexture);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
 }
 
 iEventHandler* csProcTexture::SetupProcEventHandler (
@@ -160,7 +165,7 @@ struct ProcCallback : public iTextureCallback
   csRef<csProcTexture> pt;
   SCF_DECLARE_IBASE;
   ProcCallback () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~ProcCallback () { }
+  virtual ~ProcCallback () { SCF_DESTRUCT_IBASE(); }
   virtual void UseTexture (iTextureWrapper*);
 };
 

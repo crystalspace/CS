@@ -95,6 +95,7 @@ private:
   csShadowIterator (csShadowBlock* cur, bool onlycur, int dir);
   csShadowIterator (const csBox3& bbox, csShadowBlock* cur,
     bool onlycur, int dir);
+  ~csShadowIterator();
   csShadowFrustum* cur_shad;
 
 public:
@@ -291,10 +292,7 @@ public:
   /// Create a new empty list.
   csShadowBlockList ();
   /// Destroy the list and all shadow blocks in it.
-  virtual ~csShadowBlockList ()
-  {
-    DeleteAllShadows ();
-  }
+  virtual ~csShadowBlockList ();
 
   /// Create a new shadow block and append to the list.
   virtual iShadowBlock* NewShadowBlock (int num_shadows = 30);

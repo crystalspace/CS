@@ -88,6 +88,8 @@ csCamera::csCamera (const csCamera &c) :
 csCamera::~csCamera ()
 {
   delete fp;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCamera);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csCamera::SetFarPlane (const csPlane3 *farplane)

@@ -63,6 +63,7 @@ public:
   }
   virtual ~csPluginIterator ()
   {
+    SCF_DESTRUCT_IBASE ();
   }
 
   SCF_DECLARE_IBASE;
@@ -101,6 +102,7 @@ csPluginManager::csPluginManager (iObjectRegistry* object_reg) :
 csPluginManager::~csPluginManager ()
 {
   Clear ();
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csPluginManager::Clear ()

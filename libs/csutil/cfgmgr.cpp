@@ -124,6 +124,7 @@ public:
     Config->RemoveIterator(this);
     delete[] Subsection;
     ClearIterated();
+    SCF_DESTRUCT_IBASE ();
   }
   virtual iConfigFile *GetConfigFile() const
   {
@@ -219,6 +220,7 @@ csConfigManager::~csConfigManager()
     printf("Error saving configuration '%s'.\n",
 	    DynamicDomain->Cfg->GetFileName());
   CleanUp ();
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csConfigManager::CleanUp ()

@@ -65,6 +65,12 @@ csApp::csAppPlugin::csAppPlugin (csApp *iParent)
   app = iParent;
 }
 
+csApp::csAppPlugin::~csAppPlugin ()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  SCF_DESTRUCT_IBASE ();
+}
+
 bool csApp::csAppPlugin::Initialize (iObjectRegistry *object_reg)
 {
   app->VFS = CS_QUERY_REGISTRY (object_reg, iVFS);

@@ -37,6 +37,7 @@ csNullCacheManager::csNullCacheManager ()
 
 csNullCacheManager::~csNullCacheManager ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csNullCacheManager::SetCurrentType (const char*)

@@ -77,8 +77,13 @@ OSXAssistant::OSXAssistant(iObjectRegistry* r) : registry(r),
 OSXAssistant::~OSXAssistant()
 {
   OSXDelegate_shutdown(controller);
+
   if (event_queue.IsValid())
     event_queue->RemoveListener(&scfiEventHandler);
+
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventPlug);
+  SCF_DESTRUCT_IBASE();
 }
 
 

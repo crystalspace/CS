@@ -42,6 +42,8 @@ csCollection::csCollection (
 
 csCollection::~csCollection ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCollection);
+  SCF_DESTRUCT_IBASE ();
 }
 
 iObject *csCollection::FindObject (char *name)

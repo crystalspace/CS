@@ -30,6 +30,7 @@ csImageVector::csImageVector()
 csImageVector::~csImageVector()
 {
   // image references are 0'd in ~csRefArray
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csImageVector::AddImage(iImage* img)

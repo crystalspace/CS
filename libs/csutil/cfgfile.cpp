@@ -258,6 +258,7 @@ csConfigIterator::~csConfigIterator()
   Config->RemoveIterator(this);
   delete[] Subsection;
   Config->DecRef();
+  SCF_DESTRUCT_IBASE ();
 }
 
 iConfigFile *csConfigIterator::GetConfigFile() const
@@ -389,6 +390,7 @@ csConfigFile::~csConfigFile()
   CS_ASSERT(Iterators->Length() == 0);
   delete Iterators;
   delete[] Filename;
+  SCF_DESTRUCT_IBASE ();
 }
 
 const char* csConfigFile::GetFileName() const

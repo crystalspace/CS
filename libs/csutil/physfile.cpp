@@ -50,6 +50,7 @@ csPhysicalFile::~csPhysicalFile()
 {
   if (owner && fp != 0)
     fclose(fp);
+  SCF_DESTRUCT_IBASE ();
 }
 
 size_t csPhysicalFile::Read(char* buff, size_t nbytes)

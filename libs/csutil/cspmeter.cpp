@@ -32,6 +32,11 @@ csTextProgressMeter::csTextProgressMeter (iConsoleOutput* cons, int n)
   SCF_CONSTRUCT_IBASE (0);
 }
 
+csTextProgressMeter::~csTextProgressMeter()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
 void csTextProgressMeter::Step()
 {
   if (current < total)

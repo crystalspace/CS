@@ -37,6 +37,11 @@ csClipper::csClipper ()
   polypool = GetPolyPool ();
 }
 
+csClipper::~csClipper ()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
 csPoly2DPool *csClipper::GetSharedPool ()
 {
   polypool = GetPolyPool ();

@@ -46,6 +46,7 @@ csView::~csView ()
   delete RectView;
   delete PolyView;
   delete Clipper;
+  SCF_DESTRUCT_IBASE();
 }
 
 iEngine* csView::GetEngine ()

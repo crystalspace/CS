@@ -44,6 +44,7 @@ csCommandLineParser::~csCommandLineParser()
   delete[] resDir;
   delete[] appDir;
   delete[] appPath;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csCommandLineParser::Initialize (int argc, const char* const argv[])

@@ -51,6 +51,7 @@ csRegion::csRegion (csEngine *e) :
 csRegion::~csRegion ()
 {
   scfiRegion.Clear ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRegion);
 }
 
 void csRegion::DeleteAll ()
@@ -453,6 +454,12 @@ csRegionList::csRegionList () :
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRegionList);
+}
+
+csRegionList::~csRegionList()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRegionList);
+  SCF_DESTRUCT_IBASE ();
 }
 
 int csRegionList::RegionList::GetCount () const

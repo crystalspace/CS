@@ -148,9 +148,10 @@ csSector::csSector (csEngine *engine) : csObject()
 
 csSector::~csSector ()
 {
-  SCF_DESTRUCT_IBASE ();
   lights.RemoveAll ();
   delete visibleMeshCache;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVisibilityCullerListener);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSector);
 }
 
 //----------------------------------------------------------------------
@@ -272,6 +273,11 @@ public:
   {  
     SCF_CONSTRUCT_IBASE(0);
     privMeshlist = 0;
+  }
+
+  virtual ~csSectorVisibleMeshCallback()
+  {
+    SCF_DESTRUCT_IBASE();
   }
 
   void Setup (csRenderMeshList *meshlist, iRenderView *rview)
@@ -993,6 +999,12 @@ SCF_IMPLEMENT_IBASE_END
 csSectorList::csSectorList ()
 {
   SCF_CONSTRUCT_IBASE (0);
+}
+
+csSectorList::~csSectorList ()
+{
+  RemoveAll ();
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSectorList::FreeSector (iSector* item)

@@ -50,6 +50,7 @@ csCameraPosition::~csCameraPosition ()
 {
   delete[] sector;
   delete[] far_plane;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCameraPosition);
 }
 
 void csCameraPosition::Set (

@@ -43,6 +43,7 @@ csWin32RegistryConfig::~csWin32RegistryConfig()
 {
   Close();
   delete status;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csWin32RegistryConfig::ReplaceSeparators (char* key) const
@@ -491,6 +492,7 @@ csWin32RegistryIterator::~csWin32RegistryIterator()
   owner->iters.Delete (this);
   delete[] SubsectionName;
   delete status;
+  SCF_DESTRUCT_IBASE();
 }
 
 iConfigFile* csWin32RegistryIterator::GetConfigFile () const

@@ -38,6 +38,7 @@ csBaseTextureFactory::csBaseTextureFactory (iBase* parent,
 
 csBaseTextureFactory::~csBaseTextureFactory ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csBaseTextureFactory::SetSize (int w, int h)

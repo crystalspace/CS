@@ -55,6 +55,7 @@ csPortal::csPortal (csPortalContainer* parent)
 csPortal::~csPortal ()
 {
   delete[] name;
+  SCF_DESTRUCT_IBASE (0);
 }
 
 void csPortal::SetSector (iSector *s)
@@ -541,7 +542,7 @@ void csPortal::CheckFrustum (iFrustumView *lview,
 
   csFrustumContext *new_ctxt = lview->GetFrustumContext ();
   if (old_ctxt->GetLightFrustum ())
-    new_ctxt->SetNewLightFrustum (new csFrustum (*old_ctxt->GetLightFrustum ()));
+    new_ctxt->SetNewLightFrustum(new csFrustum (*old_ctxt->GetLightFrustum()));
   lview->StartNewShadowBlock ();
 
   // If copied_frustums is true we copied the frustums and we need to

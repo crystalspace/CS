@@ -148,6 +148,8 @@ csKDTree::csKDTree (csKDTree* parent)
 csKDTree::~csKDTree ()
 {
   Clear ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csKDTree::SetUserObject (iBase* userobj)

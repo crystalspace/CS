@@ -38,6 +38,7 @@ csStaticLODMesh::csStaticLODMesh ()
 
 csStaticLODMesh::~csStaticLODMesh ()
 {
+  SCF_DESTRUCT_IBASE (0);
 }
 
 void csStaticLODMesh::ClearLODListeners ()
@@ -103,6 +104,7 @@ csStaticLODFactoryMesh::csStaticLODFactoryMesh ()
 
 csStaticLODFactoryMesh::~csStaticLODFactoryMesh ()
 {
+  SCF_DESTRUCT_IBASE (0);
 }
 
 void csStaticLODFactoryMesh::SetLOD (float m, float a)

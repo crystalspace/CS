@@ -483,7 +483,7 @@ class csGeomDebugHelper : public iDebugHelper
 {
 public:
   csGeomDebugHelper ();
-  virtual ~csGeomDebugHelper () { }
+  virtual ~csGeomDebugHelper ();
 
   SCF_DECLARE_IBASE;
   virtual int GetSupportedTests () const

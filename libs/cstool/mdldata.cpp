@@ -78,6 +78,8 @@ csModelDataTexture::csModelDataTexture ()
 csModelDataTexture::~csModelDataTexture ()
 {
   delete[] FileName;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csModelDataTexture::SetFileName (const char *fn)
@@ -137,6 +139,8 @@ csModelDataMaterial::csModelDataMaterial ()
 
 csModelDataMaterial::~csModelDataMaterial ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_DESTRUCT_IBASE ();
 }
 
 CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataMaterial, iMaterial*, BaseMaterial);
@@ -187,6 +191,12 @@ csModelDataVertices::csModelDataVertices (const iModelDataVertices *orig,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   CopyFrom (orig);
   CopyFrom (orig2);
+}
+
+csModelDataVertices::~csModelDataVertices()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csModelDataVertices::CopyFrom (const iModelDataVertices *v)
@@ -272,6 +282,12 @@ csModelDataAction::csModelDataAction ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
+csModelDataAction::~csModelDataAction()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_DESTRUCT_IBASE ();
+}
+
 int csModelDataAction::GetFrameCount () const
 {
   return Times.Length ();
@@ -347,7 +363,10 @@ csModelDataPolygon::csModelDataPolygon ()
 
 csModelDataPolygon::~csModelDataPolygon ()
 {
-  if (Material) Material->DecRef ();
+  if (Material)
+    Material->DecRef ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_DESTRUCT_IBASE ();
 }
 
 int csModelDataPolygon::GetVertexCount () const
@@ -408,6 +427,8 @@ csModelDataObject::csModelDataObject ()
 
 csModelDataObject::~csModelDataObject ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_DESTRUCT_IBASE ();
 }
 
 /*** csModelDataCamera ***/
@@ -428,6 +449,12 @@ csModelDataCamera::csModelDataCamera ()
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+}
+
+csModelDataCamera::~csModelDataCamera()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csModelDataCamera::ComputeUpVector ()
@@ -490,6 +517,12 @@ csModelDataLight::csModelDataLight ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
+csModelDataLight::~csModelDataLight()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_DESTRUCT_IBASE ();
+}
+
 iModelDataLight *csModelDataLight::Clone () const
 {
   csModelDataLight *l = new csModelDataLight ();
@@ -512,6 +545,12 @@ csModelData::csModelData ()
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+}
+
+csModelData::~csModelData()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csModelData::LoadImages (iVFS *vfs, iImageIO *io, int Format)

@@ -66,6 +66,9 @@ public:
   /// Create an event cord for a given category/subcategory
   csEventCord(int category, int subcategory);
 
+  /// Destructor.
+  virtual ~csEventCord();
+
   /// Insert an event handler into the event cord
   virtual int Insert(iEventHandler*, int priority);
 

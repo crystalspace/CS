@@ -33,6 +33,11 @@ csUtilDebugHelper::csUtilDebugHelper ()
   SCF_CONSTRUCT_IBASE (0);
 }
 
+csUtilDebugHelper::~csUtilDebugHelper()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
 #define UTI_ASSERT(test,msg) \
   if (!(test)) \
   { \

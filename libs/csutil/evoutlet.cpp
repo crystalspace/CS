@@ -44,6 +44,7 @@ csEventOutlet::~csEventOutlet ()
     Queue->EventOutlets [idx] = 0;
     Queue->EventOutlets.DeleteIndex (idx);
   }
+  SCF_DESTRUCT_IBASE ();
 }
 
 #define DRIVER_GETTER(X) \

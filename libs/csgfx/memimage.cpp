@@ -67,6 +67,7 @@ csImageMemory::~csImageMemory ()
     Image = 0;
     Palette = 0;
   }
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csImageMemory::Clear (const csRGBpixel &colour)

@@ -60,7 +60,7 @@ public:
   /// Constructs a new progress meter.
   csTextProgressMeter (iConsoleOutput* console, int total = 100);
   /// Destroys the progress meter.
-  virtual ~csTextProgressMeter () {}
+  virtual ~csTextProgressMeter ();
 
   /**
    * Set the tick scale.  Valid values are 1-100, inclusive.  Default is 2.  A

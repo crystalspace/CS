@@ -209,7 +209,7 @@ class csTextureList : public csRefArrayObject<iTextureWrapper>
 public:
   /// Initialize the array
   csTextureList ();
-  virtual ~csTextureList () { }
+  virtual ~csTextureList ();
 
   /// Create a new texture.
   iTextureWrapper *NewTexture (iImage *image);

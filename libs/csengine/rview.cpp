@@ -90,7 +90,8 @@ csRenderView::csRenderView (
 
 csRenderView::~csRenderView ()
 {
-  if (top_frustum) top_frustum->DecRef ();
+  if (top_frustum)
+    top_frustum->DecRef ();
   if (ctxt)
   {
     if (ctxt->icamera) ctxt->icamera->DecRef ();
@@ -99,8 +100,9 @@ csRenderView::~csRenderView ()
     DeleteRenderContextData (ctxt);
     delete ctxt;
   }
-
-  if (iengine) iengine->DecRef ();
+  if (iengine)
+    iengine->DecRef ();
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csRenderView::SetCamera (iCamera *icam)

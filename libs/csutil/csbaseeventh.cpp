@@ -34,33 +34,26 @@ csBaseEventHandler::csBaseEventHandler()
 csBaseEventHandler::~csBaseEventHandler()
 {
   if (queue)
-  {
     queue->RemoveListener (this);
-  }
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBaseEventHandler::RegisterQueue (iEventQueue* q, unsigned int trigger)
 {
   if (queue)
-  {
     queue->RemoveListener (this);
-  }
-
   queue = q;
   if (0 != q)
-  {
     q->RegisterListener(this, trigger);
-  }
   return true;
 }
 
-bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry, unsigned int trigger)
+bool csBaseEventHandler::RegisterQueue (
+  iObjectRegistry* registry, unsigned int trigger)
 {
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
   if (0 == q)
-  {
     return false;
-  }
   return RegisterQueue (q, trigger);
 }
 
@@ -85,15 +78,10 @@ bool (csBaseEventHandler::*csBaseEventHandler::pmfnTriggers[])(iEvent &event) =
 bool csBaseEventHandler::HandleEvent (iEvent &event)
 {
   uint8 index = event.Type;
-
   if (_CSBASEEVENT_MAXARRAYINDEX < index)
-  {
     index = 0;
-  }
-
   return (this->*(pmfnTriggers[index]))(event);
 }
-
 
 #define DefaultTrigger(trigger) \
   bool csBaseEventHandler::trigger (iEvent &event) \

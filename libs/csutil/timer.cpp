@@ -44,12 +44,16 @@ private:
   csEventTimer* timer;
 
 public:
+  SCF_DECLARE_IBASE;
   csTimerEventHandler (csEventTimer* timer)
   {
     SCF_CONSTRUCT_IBASE (0);
     csTimerEventHandler::timer = timer;
   }
-  SCF_DECLARE_IBASE;
+  virutal ~csTimerEventHandler()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
   virtual bool HandleEvent (iEvent& e)
   {
     return timer->HandleEvent (e);
@@ -100,6 +104,7 @@ csEventTimer::~csEventTimer ()
     //if (q != 0)
       //q->RemoveListener (handler);
   }
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEventTimer::HandleEvent (iEvent& event)

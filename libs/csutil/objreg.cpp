@@ -57,8 +57,7 @@ csObjectRegistryIterator::csObjectRegistryIterator ()
 
 csObjectRegistryIterator::~csObjectRegistryIterator ()
 {
-  int i;
-  for (i = objects.Length() - 1; i >= 0; i--)
+  for (int i = objects.Length() - 1; i >= 0; i--)
   {
     // Take special care to ensure that this object is no longer on the list
     // before calling DecRef(), since we don't want some other object asking
@@ -66,6 +65,7 @@ csObjectRegistryIterator::~csObjectRegistryIterator ()
     objects.DeleteIndex (i);
     tags.DeleteIndex (i);
   }
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csObjectRegistryIterator::Reset ()
@@ -118,6 +118,7 @@ csObjectRegistry::~csObjectRegistry ()
   CS_ASSERT (registry.Length () == 0);
   CS_ASSERT (tags.Length () == 0);
   CS_ASSERT (clearing == false);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csObjectRegistry::Clear ()

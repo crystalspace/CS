@@ -40,6 +40,7 @@ csMapNode::csMapNode (const char* Name) : m_pSector(0), m_Position(0, 0, 0)
 
 csMapNode::~csMapNode ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMapNode);
 }
 
 void csMapNode::SetPosition (const csVector3& pos)

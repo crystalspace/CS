@@ -107,7 +107,7 @@ public:
   /// Construct an iterator and initialize to start.
   csLightIt (csEngine*, iRegion* region = 0);
 
-  virtual ~csLightIt () { }
+  virtual ~csLightIt ();
 
   SCF_DECLARE_IBASE;
 
@@ -134,7 +134,7 @@ public:
 
   /// constructor
   csCollectionList ();
-  virtual ~csCollectionList () { }
+  virtual ~csCollectionList ();
   /// Create a new collection.
   virtual iCollection* NewCollection (const char* name);
 
@@ -166,7 +166,7 @@ public:
 
   /// constructor
   csCameraPositionList ();
-  virtual ~csCameraPositionList () { }
+  virtual ~csCameraPositionList ();
   /// New camera position.
   virtual iCameraPosition* NewCameraPosition (const char* name);
 

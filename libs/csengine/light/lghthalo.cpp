@@ -51,6 +51,7 @@ csHalo::csHalo (csHaloType iType)
 
 csHalo::~csHalo ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 //---------------------------------------------------------+ csCrossHalo +---//
@@ -70,6 +71,11 @@ csCrossHalo::csCrossHalo (
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCrossHalo);
   IntensityFactor = intensity_factor;
   CrossFactor = cross_factor;
+}
+
+csCrossHalo::~csCrossHalo()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCrossHalo);
 }
 
 uint8 *csCrossHalo::Generate (int Size)
@@ -96,6 +102,11 @@ csNovaHalo::csNovaHalo (
   Seed = seed;
   NumSpokes = num_spokes;
   Roundness = roundness;
+}
+
+csNovaHalo::~csNovaHalo()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiNovaHalo);
 }
 
 uint8 *csNovaHalo::Generate (int Size)
@@ -130,6 +141,7 @@ csFlareHalo::~csFlareHalo ()
     delete p;
     p = np;
   }
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiFlareHalo);
 }
 
 void csFlareHalo::AddComponent (

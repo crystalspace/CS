@@ -190,6 +190,12 @@ csCameraPositionList::csCameraPositionList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCameraPositionList);
 }
 
+csCameraPositionList::~csCameraPositionList ()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCameraPositionList);
+  SCF_DESTRUCT_IBASE ();
+}
+
 iCameraPosition *csCameraPositionList::NewCameraPosition (const char *name)
 {
   csVector3 v (0);
@@ -261,6 +267,12 @@ csCollectionList::csCollectionList ()
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCollectionList);
+}
+
+csCollectionList::~csCollectionList ()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCollectionList);
+  SCF_DESTRUCT_IBASE ();
 }
 
 iCollection *csCollectionList::NewCollection (const char *name)
@@ -465,6 +477,11 @@ csLightIt::csLightIt (csEngine *e, iRegion *r) :
   Reset ();
 }
 
+csLightIt::~csLightIt ()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
 bool csLightIt::NextSector ()
 {
   sector_idx++;
@@ -557,6 +574,7 @@ csSectorIt::csSectorIt (
 csSectorIt::~csSectorIt ()
 {
   delete recursive_it;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csSectorIt::Reset ()
@@ -634,6 +652,7 @@ csObjectListIt::csObjectListIt (csArray<iObject*>* list)
 csObjectListIt::~csObjectListIt ()
 {
   delete list;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csObjectListIt::Reset ()
@@ -670,6 +689,7 @@ csMeshListIt::csMeshListIt (csArray<iMeshWrapper*>* list)
 csMeshListIt::~csMeshListIt ()
 {
   delete list;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csMeshListIt::Reset ()
@@ -794,6 +814,12 @@ csEngine::~csEngine ()
   delete textures;
   delete shared_variables;
   delete renderLoopManager;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEngine::Initialize (iObjectRegistry *object_reg)
@@ -2222,7 +2248,12 @@ public:
     SCF_CONSTRUCT_IBASE (0);
   }
 
-  virtual ~csLightArray ()  { delete[] array; }
+  virtual ~csLightArray ()
+  { 
+    delete[] array;
+    SCF_DESTRUCT_IBASE ();
+  }
+
   void Reset ()             { num_lights = 0; }
   void AddLight (iLight *l, float sqdist)
   {
@@ -3077,6 +3108,7 @@ EngineLoaderContext::EngineLoaderContext (iEngine* Engine,
 
 EngineLoaderContext::~EngineLoaderContext ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 iSector* EngineLoaderContext::FindSector (const char* name)

@@ -121,6 +121,9 @@ csMaterial::~csMaterial ()
   shaders->DeleteAll ();
   delete shaders;
 #endif // CS_USE_NEW_RENDERER
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
+  SCF_DESTRUCT_IBASE ();
 }
 
 #ifdef CS_USE_NEW_RENDERER
@@ -529,9 +532,8 @@ csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject(w)
 csMaterialWrapper::~csMaterialWrapper ()
 {
   if (handle)
-  {
     DG_UNLINK (this, handle);
-  }
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
 }
 
 void csMaterialWrapper::SetMaterial (iMaterial *m)
@@ -596,6 +598,12 @@ csMaterialList::csMaterialList () :
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
+}
+
+csMaterialList::~csMaterialList()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMaterialList);
+  SCF_DESTRUCT_IBASE ();
 }
 
 iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material)

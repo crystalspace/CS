@@ -861,6 +861,11 @@ csGeomDebugHelper::csGeomDebugHelper ()
   SCF_CONSTRUCT_IBASE (0);
 }
 
+csGeomDebugHelper::~csGeomDebugHelper ()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
 #define GEO_ASSERT(test,msg) \
   if (!(test)) \
   { \
@@ -885,7 +890,7 @@ private:
   
 public:
   UnitCubeMesh ();
-  virtual ~UnitCubeMesh () { delete[] triangles; }
+  virtual ~UnitCubeMesh ();
 
   ///---------------------- iPolygonMesh implementation ----------------------
   SCF_DECLARE_IBASE;
@@ -951,6 +956,12 @@ UnitCubeMesh::UnitCubeMesh ()
   int tc;
   csPolygonMeshTools::Triangulate (this, triangles, tc);
   flags.Set (CS_POLYMESH_TRIANGLEMESH);
+}
+
+UnitCubeMesh::~UnitCubeMesh ()
+{
+  delete[] triangles;
+  SCF_DESTRUCT_IBASE ();
 }
 
 static bool ContainsEdge (csPolygonMeshEdge* edges, int num_edges,

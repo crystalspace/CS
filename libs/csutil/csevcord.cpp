@@ -36,6 +36,11 @@ csEventCord::csEventCord(int cat, int subcat) :
   SpinLock = 0;
 }
 
+csEventCord::~csEventCord()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
 int csEventCord::Insert(iEventHandler *plugin, int priority)
 {
   Lock ();

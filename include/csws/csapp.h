@@ -114,8 +114,10 @@ protected:
     /// The parent application
     csApp *app;
 
-    /// Initialize
+    /// Constructor.
     csAppPlugin (csApp *iParent);
+    /// Destructor.
+    vitual ~csAppPlugin();
 
     /// Initialize the application plugin
     virtual bool Initialize (iObjectRegistry *object_reg);

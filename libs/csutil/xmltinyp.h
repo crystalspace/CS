@@ -36,7 +36,7 @@ private:
 
 public:
   csTinyXmlAttributeIterator (TiDocumentNode* parent);
-  virtual ~csTinyXmlAttributeIterator () { }
+  virtual ~csTinyXmlAttributeIterator ();
 
   SCF_DECLARE_IBASE;
 
@@ -67,6 +67,7 @@ public:
 
   virtual ~csTinyXmlAttribute ()
   {
+    SCF_DESTRUCT_IBASE ();
   }
 
   SCF_DECLARE_IBASE;
@@ -131,7 +132,7 @@ private:
 public:
   csTinyXmlNodeIterator (csTinyXmlDocument* doc,
 	TiDocumentNodeChildren* parent, const char* value);
-  virtual ~csTinyXmlNodeIterator () { delete[] value; }
+  virtual ~csTinyXmlNodeIterator ();
 
   SCF_DECLARE_IBASE;
 

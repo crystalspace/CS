@@ -43,6 +43,7 @@ csTinyDocumentSystem::csTinyDocumentSystem ()
 
 csTinyDocumentSystem::~csTinyDocumentSystem ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 csRef<iDocument> csTinyDocumentSystem::CreateDocument ()
@@ -73,6 +74,11 @@ csTinyXmlAttributeIterator::csTinyXmlAttributeIterator (TiDocumentNode* parent)
     return;
   }
   current = 0;
+}
+
+csTinyXmlAttributeIterator::~csTinyXmlAttributeIterator()
+{
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTinyXmlAttributeIterator::HasNext ()
@@ -114,6 +120,12 @@ csTinyXmlNodeIterator::csTinyXmlNodeIterator (
     current = parent->FirstChild (value);
   else
     current = parent->FirstChild ();
+}
+
+csTinyXmlNodeIterator::~csTinyXmlNodeIterator ()
+{
+  delete[] value;
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTinyXmlNodeIterator::HasNext ()
@@ -169,6 +181,7 @@ csTinyXmlNode::csTinyXmlNode (csTinyXmlDocument* doc)
 
 csTinyXmlNode::~csTinyXmlNode ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 csRef<iDocumentNode> csTinyXmlNode::GetParent ()
@@ -488,6 +501,7 @@ csTinyXmlDocument::~csTinyXmlDocument ()
     delete pool;
     pool = n;
   }
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csTinyXmlDocument::Clear ()

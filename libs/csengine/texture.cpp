@@ -85,14 +85,10 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
 csTextureWrapper::~csTextureWrapper ()
 {
   if (handle)
-  {
     DG_UNLINK (this, handle);
-  }
-
   if (image)
-  {
     DG_UNLINK (this, image);
-  }
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
 }
 
 void csTextureWrapper::SetImageFile (iImage *Image)
@@ -263,6 +259,12 @@ csTextureList::csTextureList () :
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureList);
+}
+
+csTextureList::~csTextureList()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTextureList);
+  SCF_DESTRUCT_IBASE ();
 }
 
 iTextureWrapper *csTextureList::NewTexture (iImage *image)

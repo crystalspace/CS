@@ -97,6 +97,8 @@ csLight::~csLight ()
     csEngine::current_engine->RemoveHalo (this);
   delete halo;
   delete[] light_id;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLight);
 }
 
 const char* csLight::GenerateUniqueID ()
@@ -442,6 +444,7 @@ csStatLight::~csStatLight ()
     linfo->DecRef ();
   }
   lightinginfos.DeleteAll ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiStatLight);
 }
 
 static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
@@ -546,7 +549,6 @@ csDynLight::csDynLight (
 csDynLight::~csDynLight ()
 {
   //csEngine::current_engine->RemoveDynLight (this);
-
   csGlobalHashIterator it (lightinginfos.GetHashMap ());
   while (it.HasNext ())
   {
@@ -555,6 +557,7 @@ csDynLight::~csDynLight ()
     linfo->DecRef ();
   }
   lightinginfos.DeleteAll ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDynLight);
 }
 
 void csDynLight::Setup ()
@@ -625,6 +628,12 @@ csLightList::csLightList ()
   SCF_CONSTRUCT_IBASE (0);
 }
 
+csLightList::~csLightList ()
+{
+  RemoveAll ();
+  SCF_DESTRUCT_IBASE (0);
+}
+
 iLight *csLightList::FindByID (const char* id) const
 {
   int i;
@@ -687,6 +696,11 @@ csLightingProcessInfo::csLightingProcessInfo (csLight* light, bool dynamic)
   csLightingProcessInfo::light = light;
   csLightingProcessInfo::dynamic = dynamic;
   csLightingProcessInfo::color = light->GetColor ();
+}
+
+csLightingProcessInfo::~csLightingProcessInfo()
+{
+  SCF_DESTRUCT_IBASE (0);
 }
 
 void csLightingProcessInfo::AttachUserdata (iLightingProcessData* userdata)

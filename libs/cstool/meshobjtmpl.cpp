@@ -39,6 +39,8 @@ csMeshObject::csMeshObject (iEngine *eng)
 
 csMeshObject::~csMeshObject ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csMeshObject::WantToDie ()
@@ -155,6 +157,7 @@ csMeshFactory::csMeshFactory (iEngine *eng, iObjectRegistry* reg)
 
 csMeshFactory::~csMeshFactory ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csMeshFactory::HardTransform (const csReversibleTransform& t)
@@ -196,6 +199,8 @@ csMeshType::csMeshType (iBase *p)
 
 csMeshType::~csMeshType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csMeshType::Initialize (iObjectRegistry* reg)

@@ -107,7 +107,7 @@ public:
 
   /// constructor
   csMeshFactoryList ();
-  virtual ~csMeshFactoryList () { RemoveAll (); }
+  virtual ~csMeshFactoryList ();
   virtual void PrepareFactory (iMeshFactoryWrapper*) { }
   virtual void FreeFactory (iMeshFactoryWrapper*) { }
 

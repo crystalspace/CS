@@ -47,6 +47,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
   csDefaultQuitEventHandler() : shutdown(false) { SCF_CONSTRUCT_IBASE(0); }
+  virtual ~csDefaultQuitEventHandler() { SCF_DESTRUCT_IBASE(); }
   bool ShouldShutdown() const { return shutdown; }
   virtual bool HandleEvent(iEvent& e)
   {

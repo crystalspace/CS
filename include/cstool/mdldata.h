@@ -154,7 +154,7 @@ public:
   csModelDataVertices (const iModelDataVertices *orig1,
     const iModelDataVertices *orig2);
   /// Destructor
-  virtual ~csModelDataVertices() {}
+  virtual ~csModelDataVertices();
 
   /// Add all data from another vertex frame to this one
   void CopyFrom (const iModelDataVertices *Other);
@@ -185,7 +185,7 @@ public:
   /// Constructor
   csModelDataAction ();
   /// Destructor
-  virtual ~csModelDataAction () { }
+  virtual ~csModelDataAction ();
 
   /// Return the number of key frames
   virtual int GetFrameCount () const;
@@ -271,7 +271,7 @@ public:
   /// Constructor
   csModelDataCamera ();
   // Destructor
-  virtual ~csModelDataCamera () {}
+  virtual ~csModelDataCamera ();
 
   CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
   CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, UpVector);
@@ -308,7 +308,7 @@ public:
   /// Constructor
   csModelDataLight ();
   // Destructor
-  virtual ~csModelDataLight () {}
+  virtual ~csModelDataLight ();
 
   CS_DECLARE_ACCESSOR_METHODS (float, Radius);
   CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
@@ -325,7 +325,7 @@ public:
   /// Constructor
   csModelData ();
   /// Destructor
-  virtual ~csModelData () {}
+  virtual ~csModelData ();
 
   /// Load all texture images from the CWD of the given file system
   void LoadImages (iVFS *VFS, iImageIO *il, int Format);

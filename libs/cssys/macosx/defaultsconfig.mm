@@ -69,6 +69,8 @@ csDefaultsConfig::~csDefaultsConfig()
   // Delete our defaults object.
   if (defaults != nil)
     [defaults release];
+
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csDefaultsConfig::Open (const char* Key)
@@ -293,6 +295,7 @@ csDefaultsIterator::~csDefaultsIterator()
   if (keyenum != nil)
     [keyenum release];
   owner = 0;  
+  SCF_DESTRUCT_IBASE();
 }
 
 iConfigFile* csDefaultsIterator::GetConfigFile () const

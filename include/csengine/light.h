@@ -571,7 +571,7 @@ public:
 
   /// constructor
   csLightList ();
-  virtual ~csLightList () { RemoveAll (); }
+  virtual ~csLightList ();
 
   /// Override PrepareLight
   virtual void PrepareLight (iLight*) { }
@@ -606,7 +606,7 @@ private:
 
 public:
   csLightingProcessInfo (csLight* light, bool dynamic);
-  virtual ~csLightingProcessInfo () { }
+  virtual ~csLightingProcessInfo ();
 
   /**
    * Get the light.

@@ -187,6 +187,8 @@ csMeshWrapper::~csMeshWrapper ()
 {
   delete imposter_mesh;
   ClearFromSectorPortalLists ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiImposter);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
 }
 
 void csMeshWrapper::UpdateMove ()
@@ -868,6 +870,7 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
   // This line MUST be here to ensure that the children are not
   // removed after the destructor has already finished.
   children.RemoveAll ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
 }
 
 void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
@@ -1007,6 +1010,7 @@ csMeshList::csMeshList ()
 csMeshList::~csMeshList ()
 {
   RemoveAll ();
+  SCF_DESTRUCT_IBASE ();
 }
 
 iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
@@ -1133,6 +1137,12 @@ SCF_IMPLEMENT_IBASE_END
 csMeshFactoryList::csMeshFactoryList ()
 {
   SCF_CONSTRUCT_IBASE (0);
+}
+
+csMeshFactoryList::~csMeshFactoryList ()
+{
+  RemoveAll ();
+  SCF_DESTRUCT_IBASE (0);
 }
 
 int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)

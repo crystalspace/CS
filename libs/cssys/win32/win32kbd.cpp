@@ -113,6 +113,7 @@ csWin32KeyComposer::csWin32KeyComposer ()
 
 csWin32KeyComposer::~csWin32KeyComposer ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csKeyComposeResult csWin32KeyComposer::HandleKey (

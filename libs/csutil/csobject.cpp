@@ -40,6 +40,7 @@ public:
   }
   virtual ~csObjectIterator ()
   {
+    SCF_DESTRUCT_IBASE ();
   }
 
   virtual bool HasNext() const
@@ -144,6 +145,8 @@ csObject::~csObject ()
     DG_REMPARENT (this, ParentObject);
     ParentObject->ObjReleaseOld (this);
   }
+
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csObject::SetName (const char *iName)

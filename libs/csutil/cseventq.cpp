@@ -54,6 +54,7 @@ csEventQueue::~csEventQueue ()
     EventPool->Free();
     EventPool = e;
   }
+  SCF_DESTRUCT_IBASE ();
 }
 
 uint32 csEventQueue::CountPool()

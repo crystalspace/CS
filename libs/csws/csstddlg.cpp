@@ -48,7 +48,12 @@ struct MessageBoxData : public iMessageBoxData
   iBase* userdata;
   SCF_DECLARE_IBASE;
   MessageBoxData () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~MessageBoxData () { if (userdata) userdata->DecRef (); }
+  virtual ~MessageBoxData ()
+  {
+    if (userdata)
+      userdata->DecRef ();
+    SCF_DESTRUCT_IBASE ();
+  }
   virtual int GetPressedButton () { return id; }
   virtual iBase* GetUserData () { return userdata; }
 };

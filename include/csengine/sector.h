@@ -573,7 +573,7 @@ public:
   /// constructor
   csSectorList ();
   /// destructor
-  virtual ~csSectorList () { RemoveAll (); }
+  virtual ~csSectorList ();
 
   /// Override FreeSector.
   virtual void FreeSector (iSector* item);

@@ -49,6 +49,7 @@ csVfsCacheManager::~csVfsCacheManager ()
   delete[] vfsdir;
   delete[] current_type;
   delete[] current_scope;
+  SCF_DESTRUCT_IBASE ();
 }
 
 iVFS* csVfsCacheManager::GetVFS ()

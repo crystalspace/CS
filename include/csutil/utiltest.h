@@ -29,7 +29,7 @@ class csUtilDebugHelper : public iDebugHelper
 {
 public:
   csUtilDebugHelper ();
-  virtual ~csUtilDebugHelper () { }
+  virtual ~csUtilDebugHelper ();
 
   SCF_DECLARE_IBASE;
   virtual int GetSupportedTests () const

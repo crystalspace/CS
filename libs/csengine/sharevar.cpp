@@ -56,6 +56,8 @@ csSharedVariableList::csSharedVariableList ()
 csSharedVariableList::~csSharedVariableList ()
 {
   DeleteAll ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSharedVariableList);
+  SCF_DESTRUCT_IBASE ();
 }
 
 int csSharedVariableList::SharedVariableList::GetCount () const

@@ -38,6 +38,7 @@ csVirtualClock::csVirtualClock ()
 
 csVirtualClock::~csVirtualClock ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csVirtualClock::Advance ()

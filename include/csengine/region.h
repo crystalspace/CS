@@ -158,7 +158,7 @@ public:
 
   /// constructor
   csRegionList ();
-  virtual ~csRegionList () { }
+  virtual ~csRegionList ();
 
   class RegionList : public iRegionList
   {

@@ -49,6 +49,7 @@ csMemFile::csMemFile(char* p, size_t s, Disposition d) :
 csMemFile::~csMemFile()
 {
   FreeBuffer();
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csMemFile::FreeBuffer()

@@ -110,6 +110,7 @@ csKeyComposer::csKeyComposer ()
 
 csKeyComposer::~csKeyComposer ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 /*
@@ -317,6 +318,8 @@ csKeyboardDriver::csKeyboardDriver (iObjectRegistry* r) :
 
 csKeyboardDriver::~csKeyboardDriver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csKeyboardDriver::Reset ()
@@ -525,6 +528,8 @@ csMouseDriver::csMouseDriver (iObjectRegistry* r) :
 
 csMouseDriver::~csMouseDriver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csMouseDriver::Reset ()
@@ -630,6 +635,8 @@ csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
 
 csJoystickDriver::~csJoystickDriver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csJoystickDriver::Reset ()

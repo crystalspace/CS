@@ -325,7 +325,6 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   else
     ApplicationShow = SW_SHOWNORMAL;
 
-
 // Cygwin has problems with freopen()
 #if defined(CS_DEBUG) || defined(__CYGWIN__)
   console_window = true;
@@ -479,6 +478,7 @@ Win32Assistant::~Win32Assistant ()
   if (!is_console_app && (console_window || cmdline_help_wanted))
     FreeConsole();
   FreeLibrary ((HMODULE)exceptHandlerDLL);
+  SCF_DESTRUCT_IBASE();
 }
 
 void Win32Assistant::Shutdown()

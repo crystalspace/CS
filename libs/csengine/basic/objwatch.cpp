@@ -33,7 +33,10 @@ public:
     SCF_CONSTRUCT_IBASE (0);
     csMovableListener::watcher = watcher;
   }
-  virtual ~csMovableListener () { }
+  virtual ~csMovableListener ()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
 
   SCF_DECLARE_IBASE;
 
@@ -63,7 +66,10 @@ public:
     SCF_CONSTRUCT_IBASE (0);
     csLightCallback::watcher = watcher;
   }
-  virtual ~csLightCallback () { }
+  virtual ~csLightCallback ()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
 
   SCF_DECLARE_IBASE;
 
@@ -120,6 +126,7 @@ csObjectWatcher::~csObjectWatcher ()
   Reset ();
   light_callback->DecRef ();
   movable_listener->DecRef ();
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csObjectWatcher::Reset ()

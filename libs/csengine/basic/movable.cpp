@@ -36,6 +36,7 @@ csMovableSectorList::csMovableSectorList ()
 csMovableSectorList::~csMovableSectorList ()
 {
   DeleteAll ();
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csMovableSectorList::PrepareSector (iSector* sector)
@@ -113,6 +114,8 @@ csMovable::~csMovable ()
     ml->MovableDestroyed (&scfiMovable);
     i--;
   }
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMovable);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csMovable::SetPosition (iSector *home, const csVector3 &pos)

@@ -71,6 +71,9 @@ public:
   /// Create a halo object
   csCrossHalo (float intensity_factor, float cross_factor);
 
+  /// Destructor.
+  virtual ~csCrossHalo();
+
   /// Generate the alphamap for this halo of size Size x Size
   virtual unsigned char *Generate (int Size);
 
@@ -105,6 +108,9 @@ public:
 
   /// Create a halo object
   csNovaHalo (int seed, int num_spokes, float roundness);
+
+  /// Destructor.
+  virtual ~csNovaHalo();
 
   /// Generate the alphamap for this halo of size Size x Size
   virtual unsigned char *Generate (int Size);
@@ -152,14 +158,14 @@ struct csFlareComponent {
 class csFlareHalo : public csHalo
 {
 private:
-  /// list of the flare components. in drawing order
+  /// List of the flare components. in drawing order.
   csFlareComponent *components;
-  /// last flare component to make adding efficient
+  /// Last flare component to make adding efficient.
   csFlareComponent *last;
 public:
-  /// create an (empty) flare
+  /// Create an (empty) flare
   csFlareHalo();
-  ///
+  /// Destructor.
   ~csFlareHalo();
   /**
    * Add a visual component to the flare.

@@ -41,6 +41,8 @@ csKeyValuePair::csKeyValuePair (const char* Key, const char* Value)
 csKeyValuePair::~csKeyValuePair ()
 {
   delete [] m_Value;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiKeyValuePair);
+  SCF_DESTRUCT_IBASE ();
 }
 
 const char *csKeyValuePair::GetKey () const

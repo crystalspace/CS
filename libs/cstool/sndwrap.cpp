@@ -41,6 +41,8 @@ csSoundWrapper::csSoundWrapper (iSoundHandle *buf) : csObject()
 
 csSoundWrapper::~csSoundWrapper ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSoundWrapper);
+  SCF_DESTRUCT_IBASE ();
 }
 
 iSoundHandle* csSoundWrapper::GetSound ()

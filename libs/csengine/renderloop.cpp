@@ -51,6 +51,7 @@ csRenderLoop::csRenderLoop (csEngine* engine)
 
 csRenderLoop::~csRenderLoop ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csRenderLoop::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
@@ -155,12 +156,16 @@ csRenderLoopManager::csRenderLoopManager(csEngine* engine)
 
 csRenderLoopManager::~csRenderLoopManager()
 {
-/*  csGlobalHashIteratorReversible it (&loops);
+// @@@ ???
+#if 0
+  csGlobalHashIteratorReversible it (&loops);
   while (it.HasNext())
   {
     iRenderLoop* loop = (iRenderLoop*)it.Next();
     loop->DecRef ();
-  }*/
+  }
+#endif
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iRenderLoop> csRenderLoopManager::Create ()

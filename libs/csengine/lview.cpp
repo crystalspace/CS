@@ -43,6 +43,7 @@ csFrustumView::csFrustumView () :
 csFrustumView::~csFrustumView ()
 {
   delete ctxt;
+  SCF_DESTRUCT_IBASE (0);
 }
 
 void csFrustumView::StartNewShadowBlock ()
@@ -99,6 +100,7 @@ csShadowBlock::csShadowBlock (uint32 region, int max_shadows, int delta) :
 csShadowBlock::~csShadowBlock ()
 {
   DeleteShadows ();
+  SCF_DESTRUCT_IBASE (0);
 }
 
 void csShadowBlock::IntAddShadow (csShadowFrustum* csf)
@@ -256,6 +258,12 @@ csShadowBlockList::csShadowBlockList () :
   cur_shadow_region = 0;
 }
 
+csShadowBlockList::~csShadowBlockList ()
+{
+  DeleteAllShadows ();
+  SCF_DESTRUCT_IBASE (0);
+}
+
 iShadowBlock *csShadowBlockList::NewShadowBlock (
   int num_shadows)
 {
@@ -305,6 +313,11 @@ csShadowIterator::csShadowIterator (
   csShadowIterator::bbox = bbox;
   use_bbox = true;
   Reset ();
+}
+
+csShadowIterator::~csShadowIterator()
+{
+  SCF_DESTRUCT_IBASE (0);
 }
 
 void csShadowIterator::Reset ()
