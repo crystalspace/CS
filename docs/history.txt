@@ -64,8 +64,8 @@ The history order has been reversed so that new features are at the top.
 	      in a new file named dynworld.txi.
 	    - Completely removed tcache.txi since it was 100% out-of-date and
 	      inaccurate.  It no longer reflected reality.
-	- Eric Sunshine eliminated compilation warning about */ outside of
-	  comment in soft_g3d.cpp.
+	- Eric Sunshine eliminated compilation warning about */ appearing
+	    outside of comment from many of the files which Samuel patched.
 22-May-2000
 	- Added csPoly2D::GetSignedArea() and csPoly3D::GetSignedArea() to
 	  calculate the signed area of a polygon.
