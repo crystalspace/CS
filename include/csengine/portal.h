@@ -211,7 +211,7 @@ public:
    */
   void CheckFrustum (iFrustumView* lview, int alpha);
 
-  DECLARE_IBASE_EXT (csPortal);
+  DECLARE_IBASE_EXT (csObject);
 
   //------------------- iPortal implementation -----------------------
   struct Portal : public iPortal
