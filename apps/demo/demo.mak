@@ -31,7 +31,7 @@ DEMO.EXE=csdemo$(EXE)
 INC.DEMO = $(wildcard apps/demo/*.h)
 SRC.DEMO = $(wildcard apps/demo/*.cpp)
 OBJ.DEMO = $(addprefix $(OUT),$(notdir $(SRC.DEMO:.cpp=$O)))
-DEP.DEMO = CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSTOOL
+DEP.DEMO = CSGFX CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSTOOL
 LIB.DEMO = $(foreach d,$(DEP.DEMO),$($d.LIB))
 CFG.DEMO = data/config/csdemo.cfg
 
