@@ -48,11 +48,25 @@ class csGLFontCache : public csFontCache
   size_t usedTexs;
   int glyphAlign;
   GLuint texWhite;
+  /* There are currently 3 ways to draw text:
+     1) Using a special multitexture setup that blends the FG and BG color.
+        Preferred, as we save the texture environment switch.
+        Obviously requires MT.
+     2) Using "Blend" environment which has the same effect as (1).
+        Not all HW properly supports this.
+     3) Most ugly: separate passes for FG and BG - needs two textures (one 
+        with background, one with foreground transparency), and doesn't always 
+        look right with AA! (We ignore that until someone complains.)
+   */
+  // Whether to use method 1.
   bool multiTexText;
+  // Whether to use method 2.
+  bool intensityBlendText;
 
   struct CacheTexture
   {
     GLuint handle;
+    GLuint mirrorHandle;
     csSubRectangles2* glyphRects;
 
     CacheTexture () 
@@ -74,6 +88,7 @@ class csGLFontCache : public csFontCache
   struct TextJob
   {
     GLuint texture;
+    GLuint mirrorTexture;
     int fg, bg;
     size_t vertOffset, vertCount, bgVertOffset, bgVertCount;
 
@@ -93,7 +108,8 @@ class csGLFontCache : public csFontCache
   csDirtyAccessArray<float> verts2d;
   csDirtyAccessArray<float> texcoords;
 
-  TextJob& GetJob (int fg, int bg, GLuint texture, size_t bgOffset);
+  TextJob& GetJob (int fg, int bg, GLuint texture, GLuint mirrorTexture, 
+    size_t bgOffset);
 
   inline void FlushArrays ();
   void BeginText ();

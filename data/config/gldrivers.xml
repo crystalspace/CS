@@ -271,7 +271,6 @@
 	     Intel gfx hardware. -->
       </conditions>
       <applicable>
-	<usecfg>disableMTtext</usecfg>
 	<usecfg>nolinearfog</usecfg>
       </applicable>
     </rule>

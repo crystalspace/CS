@@ -942,15 +942,20 @@ void G2DTestSystemDriver::DrawAlphaTestScreen ()
 
   csString str;
   int i;
+  int y = 140;
+  int tw, th;
+  font->GetMaxSize (tw, th);
   for (i = 0; i < 6; i++)
   {
     const uint8 alpha = (i * 51);
     str.Format ("FG has alpha %d", alpha);
-    myG2D->Write (font, 320, 140 + i * 20, MakeColor (255, 255, 255, alpha), 
+    myG2D->Write (font, 320, y, MakeColor (255, 255, 255, alpha), 
       black, str);
+    y += th;
     str.Format ("BG has alpha %d", alpha);
-    myG2D->Write (font, 320, 150 + i * 20, white, MakeColor (0, 0, 0, alpha), 
+    myG2D->Write (font, 320, y, white, MakeColor (0, 0, 0, alpha), 
       str);
+    y += th;
   }
 }
 

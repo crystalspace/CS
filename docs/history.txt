@@ -18,6 +18,8 @@ chronological order.
 	- res added some more tweaks for Intel graphics.
 	- res added the simple terrain former and loader plugin to the "meshes"
 	  compile group.
+	- res made some changes to GL text drawing, hopefully improving 
+	  compatibility.
 26-Dec-2004
 	- res removed some unneeded code from win32.cpp.
 	- res moved some code in heightmapgen into their own methods.
