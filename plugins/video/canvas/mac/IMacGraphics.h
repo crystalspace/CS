@@ -1,7 +1,6 @@
 #ifndef __IMACGRAPHICS_H__
 #define __IMACGRAPHICS_H__
 
-#include <QDOffscreen.h>
 #include <Events.h>
 #include "csutil/scf.h"
 
