@@ -27,11 +27,11 @@
 #include "gl_render3d.h"
 
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer)
-SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
+  SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer::FogAccesor)
-SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
+  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
 
 csStringID csGLPolygonRenderer::vertex_name   = csInvalidStringID;

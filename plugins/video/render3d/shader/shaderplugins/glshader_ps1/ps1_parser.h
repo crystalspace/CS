@@ -19,63 +19,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_PS1_PARSER_H__
 #define __GLSHADER_PS1_PARSER_H__
 
+#include "csgeom/vector4.h"
+#include "csutil/csstring.h"
+#include "csutil/strset.h"
 #include "iutil/string.h"
 
-enum csPixelShaderVersion
-{
-  CS_PS_INVALID = 0,
-  CS_PS_1_1 = 1,
-  CS_PS_1_2 = 2,
-  CS_PS_1_3 = 4,
-  CS_PS_1_4 = 8
-};
-
-#define CS_PS_ALLVERSIONS (CS_PS_1_1 | CS_PS_1_2 | CS_PS_1_3 | CS_PS_1_4)
-#define CS_PS_OLDVERSIONS (CS_PS_1_1 | CS_PS_1_2 | CS_PS_1_3)
-
-enum csPixelShaderInstruction
-{
-  CS_PS_INS_INVALID = 0,
-// Arithmetic instructions
-  CS_PS_INS_ADD,
-  CS_PS_INS_BEM,
-  CS_PS_INS_CMP,
-  CS_PS_INS_CND,
-  CS_PS_INS_DP3,
-  CS_PS_INS_DP4,
-  CS_PS_INS_LRP,
-  CS_PS_INS_MAD,
-  CS_PS_INS_MOV,
-  CS_PS_INS_MUL,
-  CS_PS_INS_NOP,
-  CS_PS_INS_SUB,
-// Texture instructions
-  CS_PS_INS_TEX,
-  CS_PS_INS_TEXBEM,
-  CS_PS_INS_TEXBEML,
-  CS_PS_INS_TEXCOORD,
-  CS_PS_INS_TEXCRD,
-  CS_PS_INS_TEXDEPTH,
-  CS_PS_INS_TEXDP3,
-  CS_PS_INS_TEXDP3TEX,
-  CS_PS_INS_TEXKILL,
-  CS_PS_INS_TEXLD,
-  CS_PS_INS_TEXM3X2DEPTH,
-  CS_PS_INS_TEXM3X2PAD,
-  CS_PS_INS_TEXM3X2TEX,
-  CS_PS_INS_TEXM3X3,
-  CS_PS_INS_TEXM3X3PAD,
-  CS_PS_INS_TEXM3X3SPEC,
-  CS_PS_INS_TEXM3X3TEX,
-  CS_PS_INS_TEXM3X3VSPEC,
-  CS_PS_INS_TEXREG2AR,
-  CS_PS_INS_TEXREG2GB,
-  CS_PS_INS_TEXREG2RGB,
-// Phase Instruction (PS 1.4 only)
-  CS_PS_INS_PHASE,
-// End of list (instruction count)
-  CS_PS_INS_END_OF_LIST
-};
+#include "ps1_instr.h"
 
 enum csInstructionModifier
 {
@@ -148,11 +97,9 @@ private:
   csRef<iObjectRegistry> object_reg;
   csStringSet strings;
 
-  struct PS_InstructionData
+  struct PS_InstructionData : public csPixelShaderInstructionData
   {
     csStringID id;
-    unsigned versions;
-    short arguments;
     bool supported;
   } PS_Instructions[CS_PS_INS_END_OF_LIST];
 

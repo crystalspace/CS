@@ -43,6 +43,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ps1_emu_ati.h"
 #include "ps1_emu_common.h"
 #include "ps1_parser.h"
+#include "ps1_1xto14.h"
 
 void csShaderGLPS1_ATI::Activate ()
 {
@@ -219,7 +220,8 @@ bool csShaderGLPS1_ATI::GetATIShaderCommand
     break;
   }
   GLenum error;
-  if((error = glGetError())) {
+  if((error = glGetError())) 
+  {
     Report(CS_REPORTER_SEVERITY_ERROR, "ATI_fragment_shader error!");
     return false;
   }
@@ -235,10 +237,10 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL (const char* programstring)
 
   if(!parser.ParseProgram (programstring)) return false;
 
-  if(parser.GetVersion () != CS_PS_1_4)
+  /*if(parser.GetVersion () != CS_PS_1_4)
   {
     return false;
-  }
+  }*/
 
   const csArray<csPSConstant> &constants = parser.GetConstants ();
 
@@ -266,8 +268,21 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL (const char* programstring)
     vmentry.statlink = var;
   }
 
-  const csArray<csPSProgramInstruction> &instrs =
-    parser.GetParsedInstructionList ();
+  const csArray<csPSProgramInstruction>* instrs =
+    &parser.GetParsedInstructionList ();
+
+  csPS1xTo14Converter conv;
+  if(parser.GetVersion () != CS_PS_1_4)
+  {
+    const char* err;
+    if ((err = conv.GetNewInstructions (instrs)) != 0)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Could not convert pixel shader to version 1.4: %s",
+	err);
+      return false;
+    }
+  }
 
   csGLExtensionManager *ext = shaderPlug->ext;
 
@@ -277,9 +292,9 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL (const char* programstring)
 
   ext->glBeginFragmentShaderATI ();
 
-  for(int i=0;i<instrs.Length ();i++)
+  for(int i = 0; i < instrs->Length (); i++)
   {
-    if(!GetATIShaderCommand (instrs.Get (i)))
+    if(!GetATIShaderCommand (instrs->Get (i)))
     {
       ext->glEndFragmentShaderATI ();
       ext->glDeleteFragmentShaderATI (program_num);

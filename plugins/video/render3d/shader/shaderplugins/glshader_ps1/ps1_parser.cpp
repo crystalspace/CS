@@ -43,123 +43,15 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 void csPixelShaderParser::RegisterInstructions ()
 {
-  // Just to make sure something doesn't accidentally get
-  // mapped to the INVALID instruction placeholder
-  PS_Instructions[CS_PS_INS_INVALID].id = strings.Request ("[INVALID]");
-
   for(int i=0;i<CS_PS_INS_END_OF_LIST;i++)
   {
-    // Default all to supported
-    PS_Instructions[i].supported = true;
+    memcpy (&PS_Instructions[i], &csPixelShaderInstructions[i],
+      sizeof (csPixelShaderInstructionData));
+    PS_Instructions[i].id = 
+      strings.Request (csPixelShaderInstructions[i].name);
+    PS_Instructions[i].supported = (i != CS_PS_INS_INVALID) &&
+      (i != CS_PS_INS_BEM);
   }
-  // Arithmetic instructions (Color operations)
-  PS_Instructions[CS_PS_INS_ADD].id = strings.Request ("add");
-  PS_Instructions[CS_PS_INS_ADD].versions = CS_PS_ALLVERSIONS;
-  PS_Instructions[CS_PS_INS_ADD].arguments = 3;
-  PS_Instructions[CS_PS_INS_BEM].id = strings.Request ("bem");
-  PS_Instructions[CS_PS_INS_BEM].versions = CS_PS_1_4;
-  PS_Instructions[CS_PS_INS_BEM].arguments = 3;
-  PS_Instructions[CS_PS_INS_CMP].id = strings.Request ("cmp");
-  PS_Instructions[CS_PS_INS_CMP].versions = CS_PS_1_2 | CS_PS_1_3 | CS_PS_1_4;
-  PS_Instructions[CS_PS_INS_CMP].arguments = 4;
-  PS_Instructions[CS_PS_INS_CND].id = strings.Request ("cnd");
-  PS_Instructions[CS_PS_INS_CND].versions = CS_PS_ALLVERSIONS;
-  PS_Instructions[CS_PS_INS_CND].arguments = 4;
-  PS_Instructions[CS_PS_INS_DP3].id = strings.Request ("dp3");
-  PS_Instructions[CS_PS_INS_DP3].versions = CS_PS_ALLVERSIONS;
-  PS_Instructions[CS_PS_INS_DP3].arguments = 3;
-  PS_Instructions[CS_PS_INS_DP4].id = strings.Request ("dp4");
-  PS_Instructions[CS_PS_INS_DP4].versions = CS_PS_1_2 | CS_PS_1_3 | CS_PS_1_4;
-  PS_Instructions[CS_PS_INS_DP4].arguments = 3;
-  PS_Instructions[CS_PS_INS_LRP].id = strings.Request ("lrp");
-  PS_Instructions[CS_PS_INS_LRP].versions = CS_PS_ALLVERSIONS;
-  PS_Instructions[CS_PS_INS_LRP].arguments = 4;
-  PS_Instructions[CS_PS_INS_MAD].id = strings.Request ("mad");
-  PS_Instructions[CS_PS_INS_MAD].versions = CS_PS_ALLVERSIONS;
-  PS_Instructions[CS_PS_INS_MAD].arguments = 4;
-  PS_Instructions[CS_PS_INS_MOV].id = strings.Request ("mov");
-  PS_Instructions[CS_PS_INS_MOV].versions = CS_PS_ALLVERSIONS;
-  PS_Instructions[CS_PS_INS_MOV].arguments = 2;
-  PS_Instructions[CS_PS_INS_MUL].id = strings.Request ("mul");
-  PS_Instructions[CS_PS_INS_MUL].versions = CS_PS_ALLVERSIONS;
-  PS_Instructions[CS_PS_INS_MUL].arguments = 3;
-  PS_Instructions[CS_PS_INS_NOP].id = strings.Request ("nop");
-  PS_Instructions[CS_PS_INS_NOP].versions = CS_PS_ALLVERSIONS;
-  PS_Instructions[CS_PS_INS_NOP].arguments = 0;
-  PS_Instructions[CS_PS_INS_SUB].id = strings.Request ("sub");
-  PS_Instructions[CS_PS_INS_SUB].versions = CS_PS_ALLVERSIONS;
-  PS_Instructions[CS_PS_INS_SUB].arguments = 3;
-  // Texture instructions
-  PS_Instructions[CS_PS_INS_TEX].id = strings.Request ("tex");
-  PS_Instructions[CS_PS_INS_TEX].versions = CS_PS_OLDVERSIONS;
-  PS_Instructions[CS_PS_INS_TEX].arguments = 1;
-  PS_Instructions[CS_PS_INS_TEXBEM].id = strings.Request ("texbem");
-  PS_Instructions[CS_PS_INS_TEXBEM].versions = CS_PS_OLDVERSIONS;
-  PS_Instructions[CS_PS_INS_TEXBEM].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXBEML].id = strings.Request ("texbeml");
-  PS_Instructions[CS_PS_INS_TEXBEML].versions = CS_PS_OLDVERSIONS;
-  PS_Instructions[CS_PS_INS_TEXBEML].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXCOORD].id = strings.Request ("texcoord");
-  PS_Instructions[CS_PS_INS_TEXCOORD].versions = CS_PS_OLDVERSIONS;
-  PS_Instructions[CS_PS_INS_TEXCOORD].arguments = 1;
-  PS_Instructions[CS_PS_INS_TEXCRD].id = strings.Request ("texcrd");
-  PS_Instructions[CS_PS_INS_TEXCRD].versions = CS_PS_1_4;
-  PS_Instructions[CS_PS_INS_TEXCRD].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXDEPTH].id = strings.Request ("texdepth");
-  PS_Instructions[CS_PS_INS_TEXDEPTH].versions = CS_PS_1_4;
-  PS_Instructions[CS_PS_INS_TEXDEPTH].arguments = 1;
-  PS_Instructions[CS_PS_INS_TEXDP3].id = strings.Request ("texdp3");
-  PS_Instructions[CS_PS_INS_TEXDP3].versions = CS_PS_1_2 | CS_PS_1_3;
-  PS_Instructions[CS_PS_INS_TEXDP3].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXDP3TEX].id = strings.Request ("texdp3tex");
-  PS_Instructions[CS_PS_INS_TEXDP3TEX].versions = CS_PS_1_2 | CS_PS_1_3;
-  PS_Instructions[CS_PS_INS_TEXDP3TEX].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXKILL].id = strings.Request ("texkill");
-  PS_Instructions[CS_PS_INS_TEXKILL].versions = CS_PS_ALLVERSIONS;
-  PS_Instructions[CS_PS_INS_TEXKILL].arguments = 1;
-  PS_Instructions[CS_PS_INS_TEXLD].id = strings.Request ("texld");
-  PS_Instructions[CS_PS_INS_TEXLD].versions = CS_PS_1_4;
-  PS_Instructions[CS_PS_INS_TEXLD].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXM3X2DEPTH].id = strings.Request ("texm3x2depth");
-  PS_Instructions[CS_PS_INS_TEXM3X2DEPTH].versions = CS_PS_1_3;
-  PS_Instructions[CS_PS_INS_TEXM3X2DEPTH].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXM3X2PAD].id = strings.Request ("texm3x2pad");
-  PS_Instructions[CS_PS_INS_TEXM3X2PAD].versions = CS_PS_OLDVERSIONS;
-  PS_Instructions[CS_PS_INS_TEXM3X2PAD].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXM3X2TEX].id = strings.Request ("texm3x2tex");
-  PS_Instructions[CS_PS_INS_TEXM3X2TEX].versions = CS_PS_OLDVERSIONS;
-  PS_Instructions[CS_PS_INS_TEXM3X2TEX].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXM3X3].id = strings.Request ("texm3x3");
-  PS_Instructions[CS_PS_INS_TEXM3X3].versions = CS_PS_1_2 | CS_PS_1_3;
-  PS_Instructions[CS_PS_INS_TEXM3X3].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXM3X3PAD].id = strings.Request ("texm3x3pad");
-  PS_Instructions[CS_PS_INS_TEXM3X2PAD].versions = CS_PS_OLDVERSIONS;
-  PS_Instructions[CS_PS_INS_TEXM3X2PAD].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXM3X3SPEC].id = strings.Request ("texm3x3spec");
-  PS_Instructions[CS_PS_INS_TEXM3X3SPEC].versions = CS_PS_OLDVERSIONS;
-  PS_Instructions[CS_PS_INS_TEXM3X3SPEC].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXM3X3TEX].id = strings.Request ("texm3x3tex");
-  PS_Instructions[CS_PS_INS_TEXM3X3TEX].versions = CS_PS_OLDVERSIONS;
-  PS_Instructions[CS_PS_INS_TEXM3X3TEX].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXM3X3VSPEC].id = strings.Request ("texm3x3vspec");
-  PS_Instructions[CS_PS_INS_TEXM3X3VSPEC].versions = CS_PS_OLDVERSIONS;
-  PS_Instructions[CS_PS_INS_TEXM3X3VSPEC].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXREG2AR].id = strings.Request ("texreg2ar");
-  PS_Instructions[CS_PS_INS_TEXREG2AR].versions = CS_PS_1_2 | CS_PS_1_3;
-  PS_Instructions[CS_PS_INS_TEXREG2AR].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXREG2GB].id = strings.Request ("texreg2gb");
-  PS_Instructions[CS_PS_INS_TEXREG2GB].versions = CS_PS_1_2 | CS_PS_1_3;
-  PS_Instructions[CS_PS_INS_TEXREG2GB].arguments = 2;
-  PS_Instructions[CS_PS_INS_TEXREG2RGB].id = strings.Request ("texreg2rgb");
-  PS_Instructions[CS_PS_INS_TEXREG2RGB].versions = CS_PS_1_2 | CS_PS_1_3;
-  PS_Instructions[CS_PS_INS_TEXREG2RGB].arguments = 2;
-  // Phase Instruction (PS 1.4 only)
-  PS_Instructions[CS_PS_INS_PHASE].id = strings.Request ("phase");
-  PS_Instructions[CS_PS_INS_PHASE].versions = CS_PS_1_4;
-  PS_Instructions[CS_PS_INS_PHASE].arguments = 0;
-
-  // Unsupported instructions
-  PS_Instructions[CS_PS_INS_BEM].supported = false;
 }
 
 void csPixelShaderParser::Report (int severity, const char* msg, ...)
@@ -285,9 +177,10 @@ bool csPixelShaderParser::GetInstruction (const char *str,
 
   csString istr;
   line.SubString (istr, 0, line.FindFirst (' '));
+  istr.Upcase();
   csStringID inst_id = (csStringID)~0;
 
-  if(!strcmp(istr, "def"))
+  if(!strcmp(istr, "DEF"))
   {
     // Define a constant
     csString dest, f1, f2, f3, f4;

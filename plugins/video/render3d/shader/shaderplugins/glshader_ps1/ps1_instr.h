@@ -1,0 +1,55 @@
+/*
+  Copyright (C) 2004 by John Harger
+            (C) 2004 by Frank Richter
+  
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+  
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+  
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __GLSHADER_PS1_INSTR_H__
+#define __GLSHADER_PS1_INSTR_H__
+
+enum csPixelShaderVersion
+{
+  CS_PS_INVALID = 0,
+  CS_PS_1_1 = 1,
+  CS_PS_1_2 = 2,
+  CS_PS_1_3 = 4,
+  CS_PS_1_4 = 8
+};
+
+#define CS_PS_ALLVERSIONS (CS_PS_1_1 | CS_PS_1_2 | CS_PS_1_3 | CS_PS_1_4)
+#define CS_PS_OLDVERSIONS (CS_PS_1_1 | CS_PS_1_2 | CS_PS_1_3)
+
+enum csPixelShaderInstruction
+{
+  CS_PS_INS_INVALID = 0,
+#define PS_INSTR(instr, args, psversion)	CS_PS_INS_ ## instr,
+#include "ps1_instr.inc"
+  CS_PS_INS_END_OF_LIST
+};
+
+struct csPixelShaderInstructionData
+{
+  const char* name;
+  unsigned versions;
+  short arguments;
+};
+
+extern const csPixelShaderInstructionData 
+  csPixelShaderInstructions[CS_PS_INS_END_OF_LIST];
+
+extern const char* GetInstructionName (int instrID);
+
+#endif // __GLSHADER_PS1_INSTR_H__
