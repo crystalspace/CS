@@ -58,7 +58,7 @@ extern int awslineno;
 %token        TOKEN_IS
 
 %type  <val>	exp constant_item
-%type  <key>	skin_item window_item component_item connection_item window_item
+%type  <key>	skin_item window_item component_item connection_item
 %type  <keycont> component_item_list connection_item_list window_item_list skin_item_list
 %type  <comp>	window
 %type  <skin>	skin
