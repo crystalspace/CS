@@ -18,6 +18,8 @@ The history order has been reversed so that new features are at the top.
 	    implementation for the csSkeleton classes until someone with
 	    better knowledge can fix them so they are correct.
 	- Cleaned up the formatting in the commits from Brandon.
+	- Removed some unneeded dependency stuff from unixconf.sh.
+	- Further work on leafy BSP generator in levtool.
 10-Oct-2000
 	- Norman Kramer did some fixes after Andrew's changes.
 	- Andrew Zabolotny renamed fontserver to fontplex.
