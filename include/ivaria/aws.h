@@ -20,6 +20,7 @@ struct  iGraphics3D;
 struct  iEngine;
 struct  iTextureManager;
 struct  iObjectRegistry;
+struct  iTextureHandle;
 
 const   bool aws_debug=false;  // set to true to turn on debugging printf's
        
@@ -130,13 +131,19 @@ public:
     
   /// Gets the value of a color from the global AWS palette.
   virtual int  GetColor(int index)=0;
+
+  /// Gets a texture from the global AWS cache
+  virtual iTextureHandle *GetTexture(char *name, char *filename)=0;
+
+  /// Sets the texture manager that the preference manager uses
+  virtual void SetTextureManager(iTextureManager *txtmgr)=0;
     
   /** Sets up the AWS palette so that the colors are valid reflections of
        user preferences.  Although SetColor can be used, it's recommended 
        that you do not.  Colors should always be a user preference, and 
        should be read from the window and skin definition files (as
        happens automatically normally. */
-  virtual void SetupPalette(iGraphics3D *g3d)=0;
+  virtual void SetupPalette()=0;
 
 };
 
