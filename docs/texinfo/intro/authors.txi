@@ -196,6 +196,12 @@ user manual and spotted and corrected a large number of typographical problems.
 Manjunath Sripadarao (@email{msripada@@evl.uic.edu})
 
 Manjunath wrote a tutorial for the @code{md32spr} conversion program, wrote for @code{md2spr} and contributed to @code{map2cs}.
+
+@item 
+Martin (@email{martin@@cyber-dog.freeserve.co.uk})
+
+Martin contributed a new, complete and up-to-date walktest reference 
+section for the manual. 
 @end itemize
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.

@@ -328,7 +328,7 @@ you can type:
 @end example
 
 Once invoked, you will be able to explore the map file (@file{flarge}) by using
-the navigation controls (@pxref{Walktest Keyboard}).  To explore a different
+the navigation controls (@pxref{Walktest Movement}).  To explore a different
 map, substitute its name in place of @samp{flarge}.
 
 If you would like to explore a map other than @samp{flarge} without having to

@@ -52,4 +52,4 @@ display depths.
 You can also use other command line parameters when running Crystal Space
 applications.  @xref{Common Command Line Options}.  Detailed setup can be done
 in the configuration file.  @xref{Configuration File}.  In-game setup can be
-done via the console.  @xref{Console}.
+done via the console.  @xref{Walktest Console Commands}.

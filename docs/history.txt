@@ -23,6 +23,10 @@ The history order is reversed so that new features are at the top.
 	  However, the new stuff is still untested, as it isn't used yet 
 	  anywhere.
 	- res fixed some doxygen issues in csshlib.h, sysfunc.h, syspath.h.
+	- DeSigna patched in the walktest documentation contributed by
+	  Marten <martin@cyber-dog.freeserve.co.uk>. The old
+	  documentation remains in CVS until some parts are
+	  transplanted.
 01-Jul-2003
 	- HangDude made the following changes:
 	   - Moved anonrndbuf.h from csutil to cstool (on Jorrit's request).
