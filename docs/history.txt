@@ -36,6 +36,12 @@ The history order is reversed so that new features are at the top.
 	  associated plugins from `Dog' and `Worm' to `dog' and `worm' in the
 	  makefile, he forgot to change the SCF module names in dog.cpp and
 	  worm.cpp.
+	- Eric Sunshine converted use of `static_cast' in cslexan to the
+	  `STATIC_CAST' macro so that the plugin can build cleanly with
+	  compilers which do not support the new casting syntax.
+	- Eric Sunshine worked around another bizarre NextStep compiler bug
+	  where it failed to grok an iDataBuffer reference (&) in the
+	  csLexicalAnalyzer::stream_state structure.
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.

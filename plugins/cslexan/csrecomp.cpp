@@ -200,7 +200,7 @@ csRegExpCompiler::Compile(char *regexp, iRegExp &re, unsigned int start, unsigne
        ++re_index;
        
        // set op
-       re.SetOp(op_index, static_cast<unsigned char>(regexp[re_index]));
+       re.SetOp(op_index, STATIC_CAST(unsigned char,regexp[re_index]));
        
        // clear modifier
        re.SetOp(op_index+1, 0);
@@ -212,7 +212,7 @@ csRegExpCompiler::Compile(char *regexp, iRegExp &re, unsigned int start, unsigne
      default:  // add character as a single match
      
        // set op
-       re.SetOp(op_index, static_cast<unsigned char>(c));
+       re.SetOp(op_index, STATIC_CAST(unsigned char,c));
        
        // clear modifier
        re.SetOp(op_index+1, 0);

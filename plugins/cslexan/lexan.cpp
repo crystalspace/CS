@@ -88,8 +88,8 @@ csLexicalAnalyzer::PopStream()
 bool 
 csLexicalAnalyzer::Exec(iRegExp &re)
 {
-  stream_state *ss   = static_cast<stream_state *>(re_list.GetFirstItem());
-  uint8	       *buf  = ss->buf.GetUint8();
+  stream_state *ss   = STATIC_CAST(stream_state*,re_list.GetFirstItem());
+  uint8	       *buf  = ss->buf->GetUint8();
   unsigned int  pos  = ss->pos;
   unsigned int  i    = 0,
   	        saved_i,
@@ -100,7 +100,7 @@ csLexicalAnalyzer::Exec(iRegExp &re)
    
   csString	str;
   
-  while(op!=OP_END && pos < ss->buf.GetSize())
+  while(op!=OP_END && pos < ss->buf->GetSize())
   {
     saved_i = i;
     re.GetOp(i++, op);
@@ -285,7 +285,7 @@ csLexicalAnalyzer::Exec(iRegExp &re)
       // if there was an OP_MATCH, but it failed to continue, pop the execution state stack
       if (!extended_match)
       {
-        execution_state *es = static_cast<execution_state *>(es_list.GetFirstItem());
+        execution_state *es = STATIC_CAST(execution_state*,es_list.GetFirstItem());
       
         if (es)
         {
@@ -296,7 +296,7 @@ csLexicalAnalyzer::Exec(iRegExp &re)
       // We may need to reset the instruction pointer farther back, if the stack holds anything
       else
       {
-        execution_state *es = static_cast<execution_state *>(es_list.GetFirstItem());
+        execution_state *es = STATIC_CAST(execution_state*,es_list.GetFirstItem());
       
         if (es)
         {

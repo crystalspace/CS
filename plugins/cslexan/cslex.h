@@ -154,7 +154,7 @@ class csLexicalAnalyzer  : public iLexicalAnalyzer
   /// Data object which manages stream state
   struct stream_state
   {
-    iDataBuffer		&buf;
+    iDataBuffer		*buf;
     unsigned int	pos;
   };
   
