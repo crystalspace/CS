@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+26-May-2002
+	- Fixed a bug in the KD-tree of Dynavis. It was possible for
+	  a split axis to be outside the node bounding box.
+	- Made the test on outline radius > instead >=. Otherwise it could
+	  happen that the outline was recalculated every frame if radius
+	  happened to be 0.
+	- Extended the unittest of csKDTree in Dynavis.
 25-May-2002
 	- Fixed a bug in KD-tree of Dynavis which could cause infinite
 	  recursion while traversing the tree. Also enabled normal Dynavis

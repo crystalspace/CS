@@ -249,6 +249,9 @@ int csKDTree::FindBestSplitLocation (int axis, float& split_loc)
     if (bbox.Min (axis) < mina) mina = bbox.Min (axis);
     if (bbox.Max (axis) > maxa) maxa = bbox.Max (axis);
   }
+  // Make sure we don't go outside node_box.
+  if (mina < node_bbox.Min (axis)) mina = node_bbox.Min (axis);
+  if (maxa > node_bbox.Max (axis)) maxa = node_bbox.Max (axis);
 
   // Do 10 tests to find best split location. This should
   // probably be a configurable parameter.
@@ -668,6 +671,10 @@ bool csKDTree::Debug_CheckTree (csString& str)
     	"node_bbox mismatch");
     KDT_ASSERT (GetNodeBBox ().Contains (child2->GetNodeBBox ()),
     	"node_bbox mismatch");
+
+    KDT_ASSERT (split_location >= GetNodeBBox ().Min (split_axis), "split/node");
+    KDT_ASSERT (split_location <= GetNodeBBox ().Max (split_axis), "split/node");
+
     csBox3 new_node_bbox = child1->GetNodeBBox ();
     new_node_bbox += child2->GetNodeBBox ();
     KDT_ASSERT (new_node_bbox == GetNodeBBox (), "node_bbox mismatch");

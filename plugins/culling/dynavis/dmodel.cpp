@@ -60,7 +60,7 @@ void csObjectModel::UpdateOutline (const csVector3& pos)
   else
   {
     float sqdist = csSquaredDist::PointPoint (pos, outline_info.outline_pos);
-    if (sqdist >= outline_info.valid_radius * outline_info.valid_radius)
+    if (sqdist > outline_info.valid_radius * outline_info.valid_radius)
       recalc_outline = true;
   }
 
