@@ -96,6 +96,18 @@ public:
     /// Executes scriptable actions for this window
     virtual bool Execute(char *action, awsParmList &parmlist)
     { return comp->Execute(action, parmlist); }
+    
+    /// Sets the flag (can handle multiple simultaneous sets)
+    virtual void SetFlag(unsigned int flag)
+    { comp->SetFlag(flag); }
+
+    /// Clears the flag (can handle multiple simultaneous clears)
+    virtual void ClearFlag(unsigned int flag)
+    { comp->ClearFlag(flag); }
+    
+    /// Returns the current state of the flags
+    virtual unsigned int Flags()
+    { return comp->Flags(); }
 
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate()

@@ -303,6 +303,15 @@ struct iAwsComponent : public iAwsSource
     /// Returns the named TYPE of the component, like "Radio Button", etc.
     virtual char *Type()=0;
 
+    /// Sets the flag (can handle multiple simultaneous sets)
+    virtual void SetFlag(unsigned int flag)=0;
+
+    /// Clears the flag (can handle multiple simultaneous clears)
+    virtual void ClearFlag(unsigned int flag)=0;
+
+    /// Returns the current state of the flags
+    virtual unsigned int Flags()=0;
+
     /// Gets the window that this component resides in.
     virtual iAwsWindow *Window()=0;
 
