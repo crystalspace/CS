@@ -6,6 +6,12 @@ The history order is reversed so that new features are at the top.
           This results in csfedit not cleaning up the texture
 	  manager correctly, but I will correct this in due
 	  course.
+	- Received a patch from Jonathan Hudson
+	  <nathanoj@realmail.2ndmail.com> to implement quick visibility
+	  testing for particle systems (i.e. the DrawTest() method). This
+	  means that putting a lot of particle systems in a sector will
+	  now be more efficient as only the ones that need to be drawn
+	  will be considered for drawing.
 9-Aug-2001
 	- Martin Geisse reverted recent changes to csObject because they
 	  contradict with the ideas of reference counting.

@@ -25,6 +25,8 @@
 #include "partgen.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
+#include "iengine/rview.h"
+#include "iengine/camera.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
 #include "imesh/sprite2d.h"
@@ -223,9 +225,62 @@ void csParticleSystem::Update (csTicks elapsed_time)
     Rotate (anglepersecond * elapsed_seconds);
 }
 
-bool csParticleSystem::DrawTest (iRenderView*, iMovable*)
+bool csParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
+  // Based and copied this code on csSprite3DMeshObject's
+  //   DrawTest, GetScreenBoundingBox, GetTransformedBoundingBox
+
+  const int BOX_3D_CORNERS = 8;
+
+  iCamera *camera = rview->GetCamera ();
+
+   // Transform the particle's world bounding box (bbox)
+   // from world to camera coordinates, including the movable
+  csBox3 particle_cbox;
+  csReversibleTransform trans = camera->GetTransform () *
+    	movable->GetFullTransform ().GetInverse ();
+  particle_cbox.AddBoundingVertex (trans * bbox.GetCorner (0));
+  int i;
+  for (i=1; i<BOX_3D_CORNERS; i++)
+    particle_cbox.AddBoundingVertexSmart (trans * bbox.GetCorner (i));
+
+   // Not visible if completely behind the camera
+  if (particle_cbox.MaxZ () < 0) return false;
+
+   // Transform from camera to screen space
+  csBox2 particle_sbox;
+  if (particle_cbox.MinZ () <= 0)
+    particle_sbox.Set (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
+	CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE);
+  else
+  {
+    float fov = camera->GetFOV ();
+    float shift_x = camera->GetShiftX ();
+    float shift_y = camera->GetShiftY ();
+
+    csVector3 cv(particle_cbox.GetCorner (0));
+    float inv_z = fov/cv.z;
+    float sx = cv.x*inv_z + shift_x;
+    float sy = cv.y*inv_z + shift_y;
+    particle_sbox.StartBoundingBox (sx, sy);
+
+    for (i=1 ; i<BOX_3D_CORNERS ; i++)
+    {
+      cv = particle_cbox.GetCorner (i);
+      inv_z = fov/cv.z;
+      sx = cv.x*inv_z + shift_x;
+      sy = cv.y*inv_z + shift_y;
+      particle_sbox.AddBoundingVertexSmart (sx, sy);
+    }
+  }
+
+   // Test visibility of bounding box with the clipper
+  int clip_portal, clip_plane, clip_z_plane;
+  if (!rview->ClipBBox (particle_sbox, particle_cbox,
+                      clip_portal,clip_plane,clip_z_plane))
+    return false;
+
   return true;
 }
 
