@@ -48,15 +48,16 @@ char UnshiftedKey [128-32] =
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Keyboard driver <--//--//
 
-csKeyboardDriver::csKeyboardDriver (csSystemDriver *system)
+csKeyboardDriver::csKeyboardDriver (csSystemDriver *system) :
+  KeyState (256 + (CSKEY_LAST - CSKEY_FIRST + 1))
 {
   System = system;
-  memset (KeyState, 0, sizeof (KeyState));
+  KeyState.Reset ();
 }
 
 void csKeyboardDriver::Reset ()
 {
-  for (size_t i = 0; i < sizeof (KeyState); i++)
+  for (size_t i = 0; i < KeyState.GetBitCount (); i++)
     if (KeyState [i])
       do_key (i < 256 ? i : i - 256 + CSKEY_FIRST, false);
 }
@@ -82,7 +83,7 @@ void csKeyboardDriver::do_key (int key, bool down)
 void csKeyboardDriver::SetKeyState (int key, bool state)
 {
   int idx = (key < 256) ? key : (256 + key - CSKEY_FIRST);
-  KeyState [idx] = state;
+  if (state) KeyState.Set (idx); else KeyState.Reset (idx);
 }
 
 bool csKeyboardDriver::GetKeyState (int key)

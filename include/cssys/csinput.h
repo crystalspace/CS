@@ -29,7 +29,7 @@
  */
 
 #include "csutil/scf.h"
-#include "csutil/csbase.h"
+#include "csutil/bitset.h"
 #include "cssys/csevent.h"
 #include "cssys/cseventq.h"
 
@@ -52,7 +52,7 @@ class csKeyboardDriver
   /// The system driver
   csSystemDriver *System;
   /// key state array
-  bool KeyState [256 + (CSKEY_LAST - CSKEY_FIRST + 1)];
+  csBitSet KeyState;
 
 public:
   /// Initialize keyboard interface

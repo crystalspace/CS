@@ -61,7 +61,7 @@ class csBitSet
   unsigned char *bits;
 public:
   /// Create bit set of given size
-  csBitSet (unsigned iBitCount) : bit_count(iBitCount)
+  csBitSet (unsigned iBitCount) : bit_count (iBitCount)
   {
     byte_count = (iBitCount + BITS_PER_BYTE - 1) / BITS_PER_BYTE;
     bits = (unsigned char *)malloc (byte_count);
@@ -147,6 +147,10 @@ public:
   /// Get the value of a bit in the array
   inline bool Get (unsigned index) const
   { IMPLEMENT_BIT_GET }
+
+  /// Same but in a more nice form
+  inline bool operator [] (unsigned index) const
+  { return Get (index); }
 
   /// OR two bit sets together
   inline csBitSet &operator |= (csBitSet &bs)
