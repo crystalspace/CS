@@ -33,6 +33,8 @@ chronological order.
 	- Vincent Knecht modified rpm.txi to avoid an overfull hbox error,
 	  and unix.txi to not display package systems advertisement in "nottex"
 	  mode.
+	- Luca replaced his last commit with a better solution proposed by 
+	  Remi Bonnet.
 10-Jul-2004
 	- res fixed the Win32 manifest resource generation code to not emit
 	  non-numerical characters when writing the version number - Windows
