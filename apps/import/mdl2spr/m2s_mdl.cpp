@@ -434,10 +434,10 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   }
 
   // begin hard work now
-  fprintf(f, "MESHFACT '%s' (\n", spritename);
-  fprintf(f, "\tPLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')\n");
-  fprintf(f, "\tPARAMS (\n");
-  fprintf(f, "\t\tMATERIAL ('%s')\n", spritename);
+  fprintf(f, "<meshfact name=\"%s\">\n", spritename);
+  fprintf(f, "\t<plugin>crystalspace.mesh.loader.factory.sprite.3d</plugin>\n");
+  fprintf(f, "\t<params>\n");
+  fprintf(f, "\t\t<material>%s</material>\n", spritename);
   printf("Generate MDL/SPR vertex correspondence\n");
 
   // count back seam vertices
@@ -531,7 +531,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   {
     for (j = 0; j < framesets[i].nbframes; j++)
     {
-      fprintf(f, "\t\tFRAME '%s' (", framesets[i].frames[j].name);
+      fprintf(f, "\t\t<frame name=\"%s\">", framesets[i].frames[j].name);
       for (k = 0; k < nbvertices + back_seam_verts; k++)
       {
         // it seem y and z are switched
@@ -552,9 +552,9 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
         u = u / (float) skinwidth;
         v = v / (float) skinheight;
 
-        fprintf(f, " V (%.3f,%.3f,%.3f:%.2f,%.2f)", x, y, z, u, v);
+        fprintf(f, " <v x=\"%.3f\" y=\"%.3f\" z=\"%.3f\" u=\"%.2f\" v=\"%.2f\"", x, y, z, u, v);
       }
-      fprintf(f, " )\n");
+      fprintf(f, " </frame>\n");
     }
   }
 
@@ -573,7 +573,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
       base_action=j + 1;
       strncpy(name_action, framesets[i].frames[0].name, base_action);
 
-      fprintf(f, "\t\tACTION '%s' (", name_action);
+      fprintf(f, "\t\t<action name=\"%s\">", name_action);
 
       for (j = 0; j < framesets[i].nbframes; j++)
       {
@@ -581,15 +581,15 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
         if (j > 0)
 	  delay -= framesets[i].delay[j - 1];
         delay *= 1000.0;
-        fprintf(f, " F ('%s', %d)", framesets[i].frames[j].name, (int)delay);
+        fprintf(f, " <f name=\"%s\" delay=\"%d\">", framesets[i].frames[j].name, (int)delay);
       }
-      fprintf(f, " )\n");
+      fprintf(f, " </action>\n");
     }
     else if (actionNamingMdl)
     {
       if (!isdigit(
         framesets[i].frames[0].name[strlen(framesets[i].frames[0].name) - 1]))
-        fprintf(f, "\t\tACTION '%s' ( F ('%s', %d) )\n",
+        fprintf(f, "\t\t<action name=\"%s\"> <f name=\"%s\" delay=\"%d\"> </action>\n",
 	  framesets[i].frames[0].name, framesets[i].frames[0].name, delayMdl);
       else
       {
@@ -603,9 +603,9 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
         base_action=j + 1;
         strncpy(name_action, framesets[i].frames[0].name, base_action);
 
-        fprintf(f, "\t\tACTION '%s' (", name_action);
+        fprintf(f, "\t\t<action name=\"%s\">", name_action);
 
-        fprintf(f, " F ('%s', %d)", framesets[i].frames[0].name, delayMdl);
+        fprintf(f, " <f name=\"%s\" delay=\"%d\"/>", framesets[i].frames[0].name, delayMdl);
         for (j = i + 1; j < outFrames; j++, i++)
         {
           if (framesets[j].group)
@@ -627,11 +627,11 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 	    break;
 
           if (strncmp(name_action,framesets[j].frames[0].name,base_action)==0)
-            fprintf(f, " F ('%s', %d)", framesets[j].frames[0].name, delayMdl);
+            fprintf(f, " <f name=\"%s\" delay=\"%d\"/>", framesets[j].frames[0].name, delayMdl);
           else
 	    break;
         }
-        fprintf(f, " )\n");
+        fprintf(f, " </action>\n");
       }
     }
   }
@@ -639,13 +639,13 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   printf("Generate Triangles\n");
   for (i = 0; i < nbtriangles; i++)
   {
-    fprintf(f, "\t\tTRIANGLE (%d,%d,%d)\n",
+    fprintf(f, "\t\t<t v1=\"%d\" v2=\"%d\" v3=\"%d\"/>\n",
       spr.triangles[i].vertice[0],
       spr.triangles[i].vertice[1],
       spr.triangles[i].vertice[2]);
   }
 
-  fprintf(f, "\t)\n)\n");
+  fprintf(f, "\t</params>\n</meshfact>\n");
   fclose(f);
   return true;
 }
