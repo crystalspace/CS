@@ -28,7 +28,7 @@
 
 class csSoundModule;
 
-class csArtsRenderer : public iSoundRender, public iSoundListener
+class csArtsRenderer : public iSoundListener
 {
  protected:
   friend class csArtsHandle;
@@ -138,6 +138,18 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
+
+  struct eiSoundRender : public iSoundRender
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csArtsRenderer);
+    virtual void SetVolume (float vol){scfParent->SetVolume (vol);}
+    virtual float GetVolume (){return scfParent->GetVolume ();}
+    virtual csPtr<iSoundHandle> RegisterSound(iSoundData *snd){return scfParent->RegisterSound (snd);}
+    virtual void UnregisterSound(iSoundHandle *hdl){scfParent->UnregisterSound (hdl);}
+    virtual iSoundListener *GetListener (){return scfParent->GetListener ();}
+    virtual void MixingFunction (){scfParent->MixingFunction ();}
+  } scfiSoundRender;
+
 };
 
 #endif

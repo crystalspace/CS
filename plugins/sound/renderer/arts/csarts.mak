@@ -27,7 +27,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp %.cc plugins/sound/renderer/arts
+vpath %.cpp %.cc
+# plugins/sound/renderer/arts
 
 CSARTS.DIR = plugins/sound/renderer/arts
 MCOP.LIBDIR = $(KDEDIR)/lib
@@ -113,9 +114,6 @@ clean: csartsclean
 $(ARTSTEST.EXE): $(OBJ.ARTSTEST) $(LIB.CSARTS)
 	$(DO.LINK.CONSOLE.EXE) -L$(MCOP.LIBDIR)
 
-$(CSARTS): $(OBJ.CSARTS) $(LIB.CSARTS)
-	$(DO.PLUGIN) $(LIB.LINK.CSARTS)
-
 $(CSARTS.IDL.LIB): $(OBJ.CSARTS.IDL)
 	$(DO.LIBRARY)
 
@@ -137,6 +135,9 @@ $(OUT)/%$O: $(CSARTS.DIR)/%.cc
 $(CSARTS.DIR)/%.h $(CSARTS.DIR)/%.cc: $(CSARTS.DIR)/%.idl
 	mcopidl -I$(MCOP.INCDIR) $(<<)
 	mv $(basename $(@F)).* $(CSARTS.DIR)
+
+$(CSARTS): $(OBJ.CSARTS) $(LIB.CSARTS)
+	$(DO.PLUGIN) $(LIB.LINK.CSARTS)
 
 csartsclean:
 	$(ARTS.RM) $(CSARTS.IMPL.LIB)

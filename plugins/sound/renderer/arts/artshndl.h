@@ -56,7 +56,7 @@ class csArtsHandle : public iSoundHandle, public iSoundSource
   virtual bool IsStatic();
 
   /// play an instance of this sound
-  virtual void Play(bool Loop = false);
+  virtual csPtr<iSoundSource> Play(bool Loop = false);
   /// create a sound source
   virtual csPtr<iSoundSource> CreateSource(int Mode3d);
 

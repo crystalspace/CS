@@ -27,18 +27,18 @@
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csArtsRenderer)
-  SCF_IMPLEMENTS_INTERFACE (iSoundRender)
   SCF_IMPLEMENTS_INTERFACE (iSoundListener)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSoundRender)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csArtsRenderer::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csArtsRenderer::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE (csArtsRenderer::eiSoundRender)
+  SCF_IMPLEMENTS_INTERFACE (iSoundRender)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csArtsRenderer);
 
@@ -51,7 +51,7 @@ csArtsRenderer::csArtsRenderer (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = NULL;
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiSoundRender);
   dispatcher = NULL;
   bInit = false;
   SetVolume (1.0f);
@@ -126,7 +126,7 @@ csPtr<iSoundHandle> csArtsRenderer::RegisterSound(iSoundData *sd)
   {
     vObject.InsertSorted (sh);
     sh->SetVolume (volume);
-    return csPtr<iSoundData> (sh);
+    return csPtr<iSoundHandle> (sh);
   }
   else
     delete sh;
