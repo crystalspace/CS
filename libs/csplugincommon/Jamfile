@@ -1,24 +1,25 @@
 SubDir TOP libs csplugincommon ;
 
-Library csplugincommon : 
-  [ Wildcard canvas : *.cpp *.h ]
-  [ Wildcard imageloader : *.cpp *.h ]
-  [ Wildcard particlesys : *.cpp *.h ]
-  [ Wildcard render3d : *.cpp *.h ]
-  [ Wildcard renderstep : *.cpp *.h ]
-  [ Wildcard shader : *.cpp *.h ]
-  [ Wildcard soundloader : *.cpp *.h ]
-  [ Wildcard soundrenderer : *.cpp *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon canvas ] : *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon imageloader ] : *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon particlesys ] : *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon render3d ] : *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon renderstep ] : *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon shader ] : *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon soundloader ] : *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon soundrenderer ] : *.h ]
-  : shared ;
-LinkWith csplugincommon : cstool csgfx csgeom csutil ;
+{
+  local subs = 
+    canvas
+    imageloader
+    particlesys
+    render3d
+    renderstep
+    shader
+    soundloader ;
+  local subinc = $(DOTDOT) $(DOTDOT) include csplugincommon ;
+  local i files ;
+  for i in $(subs)
+  {
+    files +=
+      [ Wildcard $(i) : *.cpp *.h ]
+      [ Wildcard [ ConcatDirs $(subinc) $(i) ] : *.h ] ;
+  }
+  Library csplugincommon : $(files) : shared ;
+  LinkWith csplugincommon : cstool csgfx csgeom csutil ;
+}
 
 SubInclude TOP libs csplugincommon directx ;
 SubInclude TOP libs csplugincommon macosx ;

@@ -16,6 +16,10 @@ Recurse InstallHeader : .h .i .inc .fun ;
 # they are specialized polymorphic files intended for inclusion several times
 # under different contexts, or because they are deprecated.
 CS_MASTER_HEADER_REJECTS =
+  [ Wildcard [ ConcatDirs csplugincommon directx ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon macosx ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon opengl ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon win32 ] : *.h ]
   [ ConcatDirs cstool tokenlist.h ]
   [ ConcatDirs csutil archive.h ]
   [ ConcatDirs csutil csosdefs.h ]
@@ -84,6 +88,7 @@ CS_MASTER_HEADERS =
   [ DirectoryMasterHeaders
       csgeom
       csgfx
+      csplugincommon
       cstool
       csws
       iaws

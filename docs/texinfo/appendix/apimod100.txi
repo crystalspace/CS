@@ -399,6 +399,37 @@ recommended, to include @file{cssysdef.h} in header files (@file{.h}). Doing so
 helps to make header files more self-contained, thus reducing the burden of
 clients of those headers.
 
+@subheading Convenience Libraries
+
+Crystal Space now publishes several convenience libraries which eliminate much
+of the drudgery associated with implementing @sc{scf} interfaces in certain
+types of common plugin modules. For example, the @samp{csGraphics2D} class in
+the new @file{csplugincommon} library implements the @samp{iGraphics2D}
+interface and provides much of the functionality common to most canvases.
+Likewise, the @samp{csGraphics3D} class implements the @samp{iGraphics3D}
+interface and provides much functionality common to renderers. You are not
+required to utilize these implementations when authoring your own plugins, but
+they are available for your convenience.
+
+The new convenience libraries are:
+
+@table @code
+@item csplugincommon
+Canvas, image loader, particle system, renderer, shader, sound loader,
+and sound renderer support.
+@item csplugincommon_dx
+DirectX support.
+@item csplugincommon_osx
+MacOS/X canvas support.
+@item csplugincommon_ogl
+OpenGL support.
+@item csplugincommon_w32
+Windows support.
+@end table
+
+For a complete list of available convenience classes, consult the header files
+in the subdirectories of @file{CS/include/csplugincommon}.
+
 @subheading Convenience Headers
 
 For convenience, several top-level @dfn{master header} files have been added to
@@ -413,6 +444,8 @@ Nearly all public headers in entire Crystal Space @sc{sdk}.
 Content of @file{CS/include/csgeom}.
 @item csgfx.h
 Content of @file{CS/include/csgfx}.
+@item csplugincommon.h
+Content of @file{CS/include/csplugincommon}.
 @item cstool.h
 Content of @file{CS/include/cstool}.
 @item csutil.h
@@ -465,6 +498,14 @@ the dependencies at build time.  The list of headers which are excluded from
 the master headers follows.
 
 @table @code
+@item csplugincommon/directx/*.h
+DirectX-specific.
+@item csplugincommon/macosx/*.h
+MacOS/X-specific.
+@item csplugincommon/opengl/*.h
+OpenGL-specific.
+@item csplugincommon/win32/*.h
+Windows-specific.
 @item csutil/archive.h
 Requires zlib indirectly via @file{csutil/zip.h}.
 @item csutil/zip.h

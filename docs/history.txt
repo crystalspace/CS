@@ -18,6 +18,10 @@ chronological order.
 	  libraries (caused odd linking warnings).
 	- res fixed interleaved VBO buffers after the recent change for 
 	  renderer-independency.
+	- Eric Sunshine added a master-header for csplugincommon. Also
+	  refactored the csplugincommon Jamfile for ease of maintenance.
+	- Eric Sunshine documented new csplugincommon convenience libraries in
+	  apimod100.txi.
 22-Feb-2005
 	- Eric Sunshine disabled CS_IEEE_DOUBLE_FORMAT for 64-bit Intel style
 	  platforms. This works around problem where csQint() failed on such
