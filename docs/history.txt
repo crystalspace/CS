@@ -23,6 +23,15 @@ The history order is reversed so that new features are at the top.
 	  by some sequences.
 	- Added 'now' parameter to FireTriggerByName() (engine sequence
 	  manager).
+	- When a good occluder is found, Dynavis will now use the write
+	  queue but with the minimum depth instead of maximum depth.
+	  That improves the usage of the coverage buffer but still maintains
+	  the good potential for using the good occluder polygons.
+	- Fixed a problem that Dynavis would be using outline coverage
+	  or polygon coverage culling based on wrong information. This
+	  happens when inserting polygons from the write queue.
+	- Also fixed a similar problem with comparing a bool with a
+	  non-bool value for coverage buffer insertion.
 9-Dec-2002
 	- Fixed a bug in Dynavis where it would consider polygons as possible
 	  occluders even if Z very close to 0. This could cause bad overflow.

@@ -815,15 +815,24 @@ void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
 	if ((box.MaxX ()-box.MinX ()) < 10 && (box.MaxY ()-box.MinY ()) < 10)
 	  return;
 
-      write_queue->Append (box, max_depth, obj);
+      float depth = max_depth;
+      // If we have a good occluder we use the minimum depth instead
+      // of the maximum depth to ensure that the object gets selected
+      // soon enough (also note that good occluders are inserted polygon
+      // by polygon in the coverage buffer).
+      if (obj->hint_goodoccluder)
+        depth = min_depth;
+
+      write_queue->Append (box, depth, obj);
       if (do_state_dump)
       {
         csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
         if (iobj)
         {
-          printf ("AppendWriteQueue of object %s (max_depth=%g)\n",
+          printf (
+	    "AppendWriteQueue of object %s (depth=%g) (good occluder=%d)\n",
       	    iobj->GetName () ? iobj->GetName () : "<noname>",
-	    max_depth);
+	    depth, obj->hint_goodoccluder);
         }
       }
     }
@@ -839,10 +848,6 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   // For coverage test.
   csBox2 sbox;
   float min_depth = 0;
-
-  bool cull_coverage = do_cull_coverage;
-  if (!obj->hint_closed && !obj->model->CanUseOutlineFiller ())
-    cull_coverage = COVERAGE_POLYGON;
 
   csVisibilityObjectHistory* hist = obj->history;
 
@@ -875,7 +880,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       goto end;
     }
 
-    if (cull_coverage != COVERAGE_NONE)
+    if (do_cull_coverage != COVERAGE_NONE)
     {
       iCamera* camera = data->rview->GetCamera ();
       iMovable* movable = obj->visobj->GetMovable ();
@@ -928,12 +933,16 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	    do
 	    {
 	      // Yes! We found such an object. Insert it now.
-	      if (cull_coverage == COVERAGE_POLYGON)
-		  UpdateCoverageBuffer (data->rview->GetCamera (), qobj->visobj,
+	      bool cc = (do_cull_coverage == COVERAGE_POLYGON);
+	      if ((!qobj->hint_closed && !qobj->model->CanUseOutlineFiller ())
+	      		|| qobj->hint_goodoccluder)
+		cc = true;
+	      if (cc)
+		UpdateCoverageBuffer (data->rview->GetCamera (), qobj->visobj,
 		    qobj->model);
 	      else
-		  UpdateCoverageBufferOutline (data->rview->GetCamera (),
-			  qobj->visobj, qobj->model);
+		UpdateCoverageBufferOutline (data->rview->GetCamera (),
+		    qobj->visobj, qobj->model);
 	      qobj = (csVisibilityObjectWrapper*)
 	    	  write_queue->Fetch (sbox, min_depth, out_depth);
 	    }
@@ -969,15 +978,13 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   }
 
 end:
-  if (do_write_object && cull_coverage != COVERAGE_NONE &&
+  if (do_write_object && do_cull_coverage != COVERAGE_NONE &&
   	obj->visobj->GetObjectModel ()->GetPolygonMeshViscull ())
   {
     if (!obj->hint_badoccluder)
     {
       // Object is visible.
-      // For a good occluder we don't use the write queue but instead
-      // we immediatelly write out the object in polygon mode.
-      if (do_cull_writequeue && !(obj->hint_goodoccluder))
+      if (do_cull_writequeue)
       {
         // We are using the write queue so we insert the object there
         // for later culling.
@@ -988,7 +995,11 @@ end:
       {
         // Let it update the coverage buffer if we
         // are using cull_coverage.
-        if (cull_coverage == COVERAGE_POLYGON || obj->hint_goodoccluder)
+	bool cc = (do_cull_coverage == COVERAGE_POLYGON);
+	if ((!obj->hint_closed && !obj->model->CanUseOutlineFiller ())
+	      		|| obj->hint_goodoccluder)
+	  cc = true;
+        if (cc)
           UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
     	      obj->model);
         else
