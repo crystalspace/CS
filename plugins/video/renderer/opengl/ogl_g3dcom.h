@@ -63,7 +63,6 @@ class csPolyQueue
 {
 public:
   iMaterialHandle* mat_handle;
-  int alpha;
   UInt mixmode;
   csZBufMode z_buf_mode;
   float flat_color_r;
@@ -175,12 +174,28 @@ public:
 #define OPENGL_CLIP_LAZY_STENCIL	'S'
 #define OPENGL_CLIP_LAZY_PLANES		'P'
 
+/**
+ * This is an additional blend mode that is used to get the best detected
+ * SRC*DST mode. Ideally this is the same as CS_FX_MULTIPLY2 but this is
+ * not always the case).
+ */
+#define CS_FX_SRCDST 0x00010000
+/**
+ * This is an additional blend mode that is used for halo drawing in
+ * some cases.
+ */
+#define CS_FX_HALOOVF 0x00020000
+
+#define CS_FX_EXTRA_MODES 0x000f0000
+
 /// Crystal Space OpenGL driver.
 class csGraphics3DOGLCommon : public iGraphics3D
 {
   friend class OpenGLLightmapCache;
 
 public:
+  static csGraphics3DOGLCommon* ogl_g3d;
+
   /**
    * Set proper GL flags based on ZBufMode.
    * This is the ONLY legal way to set the z-buffer flags!
@@ -206,6 +221,11 @@ public:
    * second pass). In that case we need ZEQUAL mode.
    */
   static void SetGLZBufferFlagsPass2 (csZBufMode flags, bool multiPol);
+
+  /**
+   * Setup and remember blend mode for subsequent polygon drawing.
+   */
+  static float SetupBlend (UInt mode, float m_alpha, bool txt_alpha);
 
 private:
   /**

@@ -504,13 +504,15 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
   }
   else
   {
-    CS_LOCAL_STATIC(G3DPolygonDP,g3dpoly);
+    CS_LOCAL_STATIC (G3DPolygonDP,g3dpoly);
 
     g3dpoly.num = num_vertices;
     if (poly->GetMaterialWrapper ())
       poly->GetMaterialWrapper ()->Visit ();
     g3dpoly.mat_handle = poly->GetMaterialHandle ();
     g3dpoly.mixmode = poly->GetTextureTypeInfo ()->GetMixMode ();
+    if (poly->GetAlpha ())
+      g3dpoly.mixmode |= CS_FX_SETALPHA_INT (poly->GetAlpha ());
 
     // We are going to use DrawPolygon.
     if (mirror)
@@ -526,11 +528,10 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
         g3dpoly.vertices[i].sy = vertices[i].y;
       }
 
-    g3dpoly.alpha           = poly->GetAlpha();
-    g3dpoly.z_value         = poly->Vcam(0).z;
+    g3dpoly.z_value = poly->Vcam(0).z;
 #ifdef DO_HW_UVZ
 #if 0
-    g3dpoly.mirror          = mirror;
+    g3dpoly.mirror = mirror;
     if (poly->isClipped || rview->GetView ()->LastClipResult () == CS_CLIP_INSIDE)
        g3dpoly.uvz = NULL;
     else

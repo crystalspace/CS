@@ -37,8 +37,8 @@ class csOpenGLHalo : public iHalo
   int Width, Height;
   /// Width and height factor
   float Wfact, Hfact;
-  /// DST blending factor
-  GLenum dstblend;
+  /// Blending method
+  UInt dstblend;
   /// Our OpenGL texture handle
   GLuint halohandle;
   /// The OpenGL 3D driver
@@ -119,11 +119,11 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
 
   if (R > 1.0 || G > 1.0 || B > 1.0)
   {
-    dstblend = GL_ONE;
+    dstblend = CS_FX_HALOOVF;
     R /= 2; G /= 2; B /= 2;
   }
   else
-    dstblend = GL_ONE_MINUS_SRC_ALPHA;
+    dstblend = CS_FX_ALPHA;
 }
 
 csOpenGLHalo::~csOpenGLHalo ()
@@ -170,14 +170,13 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   glTranslatef (0, 0, 0);
 
   csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
-  glEnable (GL_BLEND);
   glEnable (GL_TEXTURE_2D);
 
   glShadeModel (GL_FLAT);
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   glBindTexture (GL_TEXTURE_2D, halohandle);
 
-  glBlendFunc (GL_SRC_ALPHA, dstblend);
+  csGraphics3DOGLCommon::SetupBlend (dstblend, 0, false);
   glColor4f (R, G, B, iIntensity);
 
   glBegin (GL_POLYGON);
@@ -189,7 +188,6 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   }
   glEnd ();
 
-  glDisable (GL_BLEND);
   glPopMatrix ();
 }
 

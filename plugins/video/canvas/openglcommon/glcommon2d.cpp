@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -186,8 +186,6 @@ void csGraphics2DGLCommon::DrawLine (
   {
     // prepare for 2D drawing--so we need no fancy GL effects!
     glDisable (GL_TEXTURE_2D);
-    glDisable (GL_BLEND);
-    glDisable (GL_DEPTH_TEST);
     glDisable (GL_ALPHA_TEST);
     setGLColorfromint (color);
 
@@ -224,8 +222,6 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   y = Height - y;
   // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
   setGLColorfromint (color);
 
   glBegin (GL_QUADS);
@@ -242,8 +238,6 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
   {
     // prepare for 2D drawing--so we need no fancy GL effects!
     glDisable (GL_TEXTURE_2D);
-    glDisable (GL_BLEND);
-    glDisable (GL_DEPTH_TEST);
     setGLColorfromint(color);
 
     glBegin (GL_POINTS);
@@ -255,8 +249,6 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
 void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg, const char *text)
 {
   glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
 
   if (bg >= 0)
   {
@@ -312,9 +304,7 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
     return NULL;
   }
   glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  glDisable (GL_DITHER);
+  //glDisable (GL_DITHER);
   glDisable (GL_ALPHA_TEST);
   GLenum format, type;
   switch (pfmt.PixelBytes)
@@ -345,9 +335,7 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
 void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
 {
   glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  glDisable (GL_DITHER);
+  //glDisable (GL_DITHER);
   glDisable (GL_ALPHA_TEST);
   if (Area)
   {

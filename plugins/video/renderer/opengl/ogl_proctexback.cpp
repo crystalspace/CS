@@ -153,7 +153,7 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
     if (do_quad)
     {
       csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
-      glDisable (GL_BLEND);
+      csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
     }
   }
   else
@@ -162,8 +162,7 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
     if (!do_quad)
     {
       glDisable (GL_TEXTURE_2D);
-      glEnable (GL_BLEND);
-      glBlendFunc (GL_ZERO, GL_ONE);
+      csGraphics3DOGLCommon::SetupBlend (CS_FX_TRANSPARENT, 0, false);
       glShadeModel (GL_FLAT);
       glColor4f (0.,0.,0.,0.);
     }
@@ -203,8 +202,8 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
   // Optimise: copy over area only
   (void)area;
   glEnable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
   csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
+  csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
   glDisable (GL_DITHER);
   glDisable (GL_ALPHA_TEST);
 
@@ -305,8 +304,8 @@ void csOpenGLProcBackBuffer2D::Clear (int color)
     exit (1);
 #endif
   glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
   csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
+  csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
   glColor3f (float (color & pfmt->RedMask  ) / pfmt->RedMask,
 	     float (color & pfmt->GreenMask) / pfmt->GreenMask,
 	     float (color & pfmt->BlueMask ) / pfmt->BlueMask);

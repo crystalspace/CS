@@ -656,11 +656,8 @@ void OpenGLLightmapCache::Flush ()
   if (!flush_needed) return;
   g3d->SetGLZBufferFlagsPass2 (queue_zbuf_mode, true);
   glEnable (GL_TEXTURE_2D);
-  glEnable (GL_BLEND);
   glColor4f (1, 1, 1, 0);
-  // The following blend function is configurable.
-  glBlendFunc (g3d->m_config_options.m_lightmap_src_blend,
-	       g3d->m_config_options.m_lightmap_dst_blend);
+  csGraphics3DOGLCommon::SetupBlend (CS_FX_SRCDST, 0, false);
   glEnableClientState (GL_VERTEX_ARRAY);
   glEnableClientState (GL_TEXTURE_COORD_ARRAY);
   for (i = 0 ; i < super_lm_num ; i++)
@@ -682,10 +679,7 @@ void OpenGLLightmapCache::Flush (int sup_idx)
 //from ALL the super-lightmaps at once.
   g3d->SetGLZBufferFlagsPass2 (queue_zbuf_mode, true);
   glEnable (GL_TEXTURE_2D);
-  glEnable (GL_BLEND);
-  // The following blend function is configurable.
-  glBlendFunc (g3d->m_config_options.m_lightmap_src_blend,
-	       g3d->m_config_options.m_lightmap_dst_blend);
+  csGraphics3DOGLCommon::SetupBlend (CS_FX_SRCDST, 0, false);
   glEnableClientState (GL_VERTEX_ARRAY);
   glEnableClientState (GL_TEXTURE_COORD_ARRAY);
   lm_queue.Flush (suplm[sup_idx].Handle);

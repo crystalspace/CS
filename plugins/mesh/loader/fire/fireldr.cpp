@@ -221,10 +221,8 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-	int ialpha;
         ScanStr (params, "%f", &alpha);
-	ialpha = QInt (alpha * 255.99);
-	Mixmode |= CS_FX_SETALPHA(ialpha);
+	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
       case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;

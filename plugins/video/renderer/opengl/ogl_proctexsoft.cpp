@@ -312,8 +312,8 @@ bool csOpenGLProcSoftware::Prepare
 void csOpenGLProcSoftware::Print (csRect *area)
 {
   glEnable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
   csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
+  csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
   glDisable (GL_ALPHA_TEST);
 
   csTxtCacheData *tex_data = (csTxtCacheData*) tex->GetCacheData();

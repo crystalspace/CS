@@ -97,7 +97,6 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
 
   G3DPolygonDP poly;
   poly.use_fog = mesh.do_fog;
-  poly.alpha = 0;
   poly.plane.m_cam2tex = &m_cam2tex;
   poly.plane.v_cam2tex = &v_cam2tex;
   if (mesh.master_mat_handle)

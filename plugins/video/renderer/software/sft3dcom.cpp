@@ -1526,8 +1526,9 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 
   Scan.M = M;
 
+  int alpha = poly.mixmode & CS_FX_MASK_ALPHA;
   // Select the right scanline drawing function.
-  if (do_alpha && (poly.alpha || txt_handle->GetKeyColor ()))
+  if (do_alpha && (alpha || txt_handle->GetKeyColor ()))
     return;
   int scan_index = SCANPROC_FLAT_ZNONE;
   if (z_buf_size == CS_ZBUF_FILL) scan_index++;
@@ -2101,8 +2102,10 @@ texr_done:
   // Select the right scanline drawing function.
   bool tex_keycolor = tex_mm->GetKeyColor ();
   csDrawScanline* dscan;
+
   // poly.alpha old way or with mixmode!!!???
-  if (!poly.alpha && poly.mixmode != CS_FX_COPY)
+  int alpha = poly.mixmode & CS_FX_MASK_ALPHA;
+  if (!alpha && poly.mixmode != CS_FX_COPY)
   {
     int scan_index = Scan.bitmap2 ?
     	SCANPROC_MAP_FX_ZNONE :
@@ -2131,7 +2134,7 @@ texr_done:
         break;
       case CS_FX_ALPHA:
       {
-        int alpha = mode & CS_FX_MASK_ALPHA;
+      	// @@@ Can currently not happen!
         if (alpha < 12)
           mode = (mode & ~CS_FX_MASK_MIXMODE) | CS_FX_COPY;
         else if (alpha < 96)
@@ -2149,7 +2152,7 @@ texr_done:
         break;
     }
   }
-  else if (!poly.alpha || !Scan.bitmap2 || !ScanProc_Alpha || !do_alpha)
+  else if (!alpha || !Scan.bitmap2 || !ScanProc_Alpha || !do_alpha)
   {
     int scan_index = Scan.bitmap2 ? SCANPROC_MAP_ZNONE : SCANPROC_TEX_ZNONE;
     if (z_buf_mode == CS_ZBUF_FILL) scan_index++;
@@ -2170,7 +2173,7 @@ texr_done:
     dscan = ScanProc [scan_index];
   }
   else
-    dscan = ScanProc_Alpha (this, poly.alpha);
+    dscan = ScanProc_Alpha (this, alpha);
 
   sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;

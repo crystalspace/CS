@@ -4,6 +4,34 @@ The history order is reversed so that new features are at the top.
 	- Fixed all the plugins makefiles so that they now have an additional
 	  CSUTIL in their link line. This satisfies one-pass linkers after
 	  the changes Martin did to SCF.
+	- Added virtual destructor to scf.
+	- Added an experimental optimization by using the GL_TEXTURE matrix
+	  to scale texture layers instead of scaling manually. On my ATI
+	  this does not seem to speed-up so it is currently disabled. Will
+	  try on other cards later. To enable it set EXP_SCALE_MATRIX to 1.
+	- Removed the now obsolete 'alpha' member in G3DPolygonDP. 'alpha'
+	  is now part of the mixmode that is also in that structure.
+	- Added CS_FX_SETALPHA_INT() which accepts an alpha between 0 and
+	  255 (and complements the already existing CS_FX_SETALPHA which
+	  accepts alpha between 0 and 1). Various parts of CS were actually
+	  calling CS_FX_SETALPHA with alpha between 0 and 255 which is
+	  obviously wrong. This fixes a number of loader bugs (in particular
+	  parsing ALPHA/MIXMODE of material layers, ball loader, cube loader,
+	  emit loader, explo loader, fire loader, fountain loader, rain loader,
+	  snow loader, spiral loader, spr2d loader, spr3d loader, surf loader,
+	  and thing loader).
+	- Cleaned up OpenGL renderer a little with regards to setting up
+	  blending modes. The SetupBlend() routine can now do all this setup.
+	- Optimized OpenGL renderer a little by removing all calls to
+	  glTexEnvf() and calling that routine once at init. The same parameter
+	  was used in all cases (GL_MODULATE). This increases FPS considerably.
+	- Optimized OpenGL::SetupBlend() by remembering the previous blending
+	  state.
+	- The common OpenGL canvas no longer disables depth testing and
+	  blending. It is now the OpenGL 3D renderer which does that right
+	  before going into 2D rendering mode.
+	- Fixed a bug in the common OpenGL canvas handling. It disabled
+	  GL_DITHER without restoring it.
 27-May-2001
 	- Philip added CSSYS dependency to gamecore plugin.
 	- Martin Geisse changed the main export function for dynamic

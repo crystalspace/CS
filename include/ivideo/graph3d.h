@@ -82,8 +82,10 @@ struct csPixelFormat;
 #define CS_FX_TILING		0x02000000	// Tiling
 #define CS_FX_MASK_ALPHA	0x000000FF	// alpha = 0..FF (opaque..transparent)
 
-/// Macro for easier setting of alpha bits into mixmode
+/// Macro for setting of alpha bits into mixmode (alpha between 0 and 1).
 #define CS_FX_SETALPHA(alpha)	(CS_FX_ALPHA | uint (alpha * CS_FX_MASK_ALPHA))
+/// Macro for setting of alpha bits into mixmode (alpha between 0 and 255).
+#define CS_FX_SETALPHA_INT(alpha) (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
 
 /// Vertex Structure for use with G3DPolygonDP and G3DPolygonDFP
 class G3DVertex
@@ -186,12 +188,6 @@ struct G3DPolygonDP : public G3DPolygonDFP
 
   /// Handle to lighted textures (texture + lightmap)
   iPolygonTexture* poly_texture;
-
-  /**
-   * AlphaValue of the polygon. Ranges from 0 to 255.
-   * 0 means opaque, 255 is completely transparent.
-   */
-  int alpha;
 
   /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
   UInt mixmode;
