@@ -22,6 +22,7 @@
 
 
 #include "csgeom/csrect.h"
+#include "csgeom/poly3d.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 
@@ -47,6 +48,7 @@ class csGLTextureCache;
 class csGLTextureHandle;
 class csGLTextureManager;
 
+struct iClipper2D;
 struct iObjectRegistry;
 struct iTextureManager;
 struct iRenderBufferManager;
@@ -57,6 +59,17 @@ struct iEffectDefinition;
 struct iEffectTechnique;
 struct iEvent;
 
+
+#define CS_GL_CLIP_AUTO    'a' // Used for auto-detection.
+#define CS_GL_CLIP_NONE    'n'
+#define CS_GL_CLIP_ZBUF    'z'
+#define CS_GL_CLIP_STENCIL   's'
+#define CS_GL_CLIP_PLANES    'p'
+#define CS_GL_CLIP_SOFTWARE    '0'
+#define CS_GL_CLIP_LAZY_NONE   'N'
+#define CS_GL_CLIP_LAZY_ZBUF   'Z'
+#define CS_GL_CLIP_LAZY_STENCIL  'S'
+#define CS_GL_CLIP_LAZY_PLANES   'P'
 
 class csGLRender3D : public iRender3D
 {
@@ -82,9 +95,14 @@ class csGLRender3D : public iRender3D
   csGLTextureManager *txtmgr;
   
   int current_drawflags;
+  csZBufMode current_zmode;
 
+  int asp_center_x, asp_center_y;
+  float aspect;
   float fov;
   int viewwidth, viewheight;
+  csPoly3D frustum;
+  bool frustum_valid;
 
   csRender3dCaps rendercaps;
 
@@ -92,19 +110,59 @@ class csGLRender3D : public iRender3D
 
   csConfigAccess config;
 
+  bool do_near_plane;
+  csPlane3 near_plane;
+
+  /// Prefered clipping modes to use for optional portals.
+  char clip_optional[3];
+  /// Prefered clipping modes to use for required portals.
+  char clip_required[3];
+  /// Prefered clipping modes to use for outer portal.
+
+  int stencilclipnum;
+  bool stencil_enabled;
+  char clip_outer[3];
+  csRef<iClipper2D> clipper;
+  int cliptype;
+  bool clipperinitialized;
+
+  /// Current render target.
+  csRef<iTextureHandle> render_target;
+  /// If true then the current render target has been put on screen.
+  bool rt_onscreen;
+  /// If true then we have set the old clip rect.
+  bool rt_cliprectset;
+  /// Old clip rect to restore after rendering on a proc texture.
+  int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
+
+
   ////////////////////////////////////////////////////////////////////
   //                         Private helpers
   ////////////////////////////////////////////////////////////////////
 	
   void Report (int severity, const char* msg, ...);
 
+  int GetMaxTextureSize ();
+
+  void SetGlOrtho (bool inverted);
+
+  void SetZMode (csZBufMode mode);
+  
+  csZBufMode GetZModePass2 (csZBufMode mode);
+
+  void CalculateFrustum ();
+
+  void SetupStencil ();
+
+  void SetupClipPlanes (bool add_near_clip, bool add_z_clip);
+
+  void SetupClipper (int clip_portal, int clip_plane, int clip_z_plane);
+
 public:
   SCF_DECLARE_IBASE;
 
   csGLRender3D (iBase *parent);
   virtual ~csGLRender3D ();
-
-  int GetMaxTextureSize ();
 
   ////////////////////////////////////////////////////////////////////
   //                            iRender3d
@@ -139,9 +197,11 @@ public:
   /// Set dimensions of window
   void SetDimensions (int width, int height)
     { viewwidth = width; viewheight = height; }
+  
   /// Get width of window
   int GetWidth () 
     { return viewwidth; }
+  
   /// Get height of window
   int GetHeight () 
     { return viewheight; }
@@ -150,14 +210,53 @@ public:
   csRender3dCaps* GetCaps() 
     { return &rendercaps; }
 
-  /// Field of view
-  void SetFOV(float fov);
-  float GetFOV() 
-    { return fov; }
+  /// Set center of projection.
+  virtual void SetPerspectiveCenter (int x, int y)
+  {
+    asp_center_x = x;
+    asp_center_y = y;
+    frustum_valid = false;
+  }
+  
+  /// Get center of projection.
+  virtual void GetPerspectiveCenter (int& x, int& y)
+  {
+    x = asp_center_x;
+    y = asp_center_y;
+  }
+  
+  /// Set perspective aspect.
+  virtual void SetPerspectiveAspect (float aspect)
+  {
+    csGLRender3D::aspect = aspect;
+    frustum_valid = false;
+  }
+
+  /// Get perspective aspect.
+  virtual float GetPerspectiveAspect ()
+  {
+    return aspect;
+  }
 
   /// Set world to view transform
   void SetObjectToCamera (csReversibleTransform* wvmatrix);
   csReversibleTransform* GetWVMatrix ();
+
+  /// Set the current render target (NULL for screen).
+  virtual void SetRenderTarget (iTextureHandle* handle,
+	  bool persistent = false)
+  {
+    render_target = handle;
+    rt_onscreen = !persistent;
+    rt_cliprectset = false;
+  }
+
+  /// Get the current render target (NULL for screen).
+  virtual iTextureHandle* GetRenderTarget ()
+  {
+    return render_target;
+  }
+
 
   /// Begin drawing in the renderer
   bool BeginDraw (int drawflags);
@@ -169,7 +268,46 @@ public:
   void Print (csRect* area);
 
   /// Drawroutine. Only way to draw stuff
-  void DrawMesh (csRenderMesh* mymesh);
+  void DrawMesh (csRenderMesh* mymesh,
+    csZBufMode z_buf_mode,
+    int clip_portal,
+    int clip_plane,
+    int clip_z_plane);
+
+  /**
+   * Set optional clipper to use. If clipper == null
+   * then there is no clipper.
+   * Currently only used by DrawTriangleMesh.
+   */
+  void SetClipper (iClipper2D* clipper, int cliptype);
+
+  /// Get clipper that was used.
+  iClipper2D* GetClipper ()
+    { return clipper; }
+
+  /// Return type of clipper.
+  int GetClipType ()
+    { return cliptype; }
+
+  /// Set near clip plane.
+  virtual void SetNearPlane (const csPlane3& pl)
+  {
+    do_near_plane = true;
+    near_plane = pl;
+  }
+
+  /// Reset near clip plane (i.e. disable it).
+  virtual void ResetNearPlane () 
+    { do_near_plane = false; }
+
+  /// Get near clip plane.
+  virtual const csPlane3& GetNearPlane () 
+    { return near_plane; }
+
+  /// Return true if we have near plane.
+  virtual bool HasNearPlane () 
+    { return do_near_plane; }
+
 
   /// Get a stringhash to be used by our streamsources etc.
   csStringSet *GetStringContainer () 

@@ -294,13 +294,11 @@ struct iMeshWrapper : public iBase
    * <li>#CS_ZBUF_TEST: only read the Z-buffer but do not write.
    * </ul>
    */
-#ifndef CS_USE_NEW_RENDERER
   virtual void SetZBufMode (csZBufMode mode) = 0;
   /**
    * Get the Z-buf drawing mode.
    */
   virtual csZBufMode GetZBufMode () const = 0;
-#endif // CS_USE_NEW_RENDERER
 
   /**
    * Do a hard transform of this object.

@@ -79,7 +79,7 @@ public:
   virtual CS_RENDERBUFFER_TYPE GetBufferType() { return type; }
 
   /// Get the size of the buffer (in bytes)
-  virtual int GetSize() {return size; }
+  virtual int GetSize() { return size; }
 };
 
 

@@ -74,6 +74,7 @@ protected:
   bool transform (iImage *Image, csGLTexture *tex);
   void ShowFormat ();
 
+
   class texVector : public csVector
   {
   public:
@@ -91,6 +92,8 @@ public:
   bool has_alpha;
   texVector vTex;
   long size;
+  /// true if texture has already been used as a render target
+  bool was_render_target;
 
   /// Initialize the object
   csGLTextureHandle (iImage *image, int flags, GLenum sourceFormat,

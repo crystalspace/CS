@@ -425,6 +425,7 @@ csGLTextureHandle::csGLTextureHandle (
   this->sourceFormat = sourceFormat;
   this->bpp = bpp;
   size = 0;
+  was_render_target = false;
   DG_TYPE (this, "csGLTextureHandle");
 }
 

@@ -790,7 +790,7 @@ void csRenderView::CalculateFogMesh (
     }
   }
 }
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
 void csRenderView::UpdateFrustum (
   iClipper2D *clip,

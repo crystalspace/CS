@@ -30,8 +30,10 @@ class csStringSet;
 
 class csRenderMesh;
 
+struct iClipper2D;
 struct iGraphics2D;
 struct iTextureManager;
+struct iTextureHandle;
 struct iRenderBufferManager;
 struct iLightingManager;
 
@@ -90,6 +92,24 @@ struct iLightingManager;
 #define CS_CLIP_TOPLEVEL 2
 /** @} */
 
+/// Z-buffer modes
+enum csZBufMode
+{
+  // values below are sometimes used as bit masks, so don't change them!
+  /// Don't test/write
+  CS_ZBUF_NONE     = 0x00000000,
+  /// write
+  CS_ZBUF_FILL     = 0x00000001,
+  /// test
+  CS_ZBUF_TEST     = 0x00000002,
+  /// write/test
+  CS_ZBUF_USE      = 0x00000003,
+  /// only write
+  CS_ZBUF_FILLONLY = 0x00000004,
+  /// test if equal
+  CS_ZBUF_EQUAL    = 0x00000005,
+};
+
 class csRender3dCaps
 {
 };
@@ -137,13 +157,40 @@ struct iRender3D : public iBase
   /// Capabilities of the driver
   virtual csRender3dCaps* GetCaps () = 0;
 
-  /// Field of view
-  virtual void SetFOV (float fov) = 0;
-  virtual float GetFOV () = 0;
+  /// Set center of projection.
+  virtual void SetPerspectiveCenter (int x, int y) = 0;
+  
+  /// Get center of projection.
+  virtual void GetPerspectiveCenter (int& x, int& y) = 0;
+  
+  /// Set perspective aspect.
+  virtual void SetPerspectiveAspect (float aspect) = 0;
+
+  /// Get perspective aspect.
+  virtual float GetPerspectiveAspect () = 0;
 
   /// Set world to view transform
   virtual void SetObjectToCamera (csReversibleTransform* wvmatrix) = 0;
   virtual csReversibleTransform* GetWVMatrix () = 0;
+
+  /**
+   * Set the target of rendering. If this is NULL then the target will
+   * be the main screen. Otherwise it is a texture. After calling
+   * g3d->FinishDraw() the target will automatically be reset to NULL (main
+   * screen). Note that on some implementions rendering on a texture
+   * will overwrite the screen. So you should only do this BEFORE you
+   * start rendering your frame.
+   * <p>
+   * If 'persistent' is true then the current contents of the texture
+   * will be copied on screen before drawing occurs (in the first
+   * call to BeginDraw). Otherwise it is assumed that you fully render
+   * the texture.
+   */
+  virtual void SetRenderTarget (iTextureHandle* handle, 
+    bool persistent = false) = 0;
+
+  /// Get the current render target (NULL for screen).
+  virtual iTextureHandle* GetRenderTarget () = 0;
 
   /// Begin drawing in the renderer
   virtual bool BeginDraw (int drawflags) = 0;
@@ -155,7 +202,28 @@ struct iRender3D : public iBase
   virtual void Print (csRect* area) = 0;
 
   /// Drawroutine. Only way to draw stuff
-  virtual void DrawMesh (csRenderMesh* mymesh) = 0;
+  virtual void DrawMesh (csRenderMesh* mymesh,
+    csZBufMode z_buf_mode,
+    int clip_portal,
+    int clip_plane,
+    int clip_z_plane) = 0;
+
+  /**
+   * Set optional clipper to use. If clipper == null
+   * then there is no clipper.
+   * Currently only used by DrawTriangleMesh.
+   */
+  virtual void SetClipper (iClipper2D* clipper, int cliptype) = 0;
+
+  /**
+   * Get clipper that was used.
+   */
+  virtual iClipper2D* GetClipper () = 0;
+
+  /**
+   * Return type of clipper.
+   */
+  virtual int GetClipType () = 0;
 
   /// Get a stringhash to be used by our streamsources etc.
   virtual csStringSet* GetStringContainer () = 0;

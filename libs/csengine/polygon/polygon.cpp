@@ -833,7 +833,7 @@ void csPolygon3D::HardTransform (const csReversibleTransform &t)
 
 void csPolygon3D::Finish ()
 {
-  #ifndef CS_USE_NEW_RENDERER
+#ifndef CS_USE_NEW_RENDERER
 
   if (orig_poly) return ;
 #ifdef DO_HW_UVZ
@@ -864,13 +864,9 @@ void csPolygon3D::Finish ()
       // If material has no texture, switch our type to POLYTXT_NONE
       if (!material->GetMaterialHandle ()->GetTexture ())
       {
-#ifndef CS_USE_NEW_RENDERER
         uint mixmode = scfiPolygon3D.GetPolyTexType ()->GetMixMode ();
-#endif // CS_USE_NEW_RENDERER
         SetTextureType (POLYTXT_NONE);
-#ifndef CS_USE_NEW_RENDERER
         scfiPolygon3D.GetPolyTexType ()->SetMixMode (mixmode);
-#endif // CS_USE_NEW_RENDERER
         return ;
       }
       break;

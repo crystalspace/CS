@@ -75,9 +75,7 @@ csMeshWrapper::csMeshWrapper (
   csEngine::current_engine->AddToCurrentRegion (this);
   csMeshWrapper::mesh = mesh;
   factory = NULL;
-#ifndef CS_USE_NEW_RENDERER
   zbufMode = CS_ZBUF_USE;
-#endif // CS_USE_NEW_RENDERER
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
   children.SetMesh (this);
   imposter_active = false;
@@ -107,9 +105,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   csEngine::current_engine->AddToCurrentRegion (this);
   csMeshWrapper::mesh = 0;
   factory = NULL;
-#ifndef CS_USE_NEW_RENDERER
   zbufMode = CS_ZBUF_USE;
-#endif // CS_USE_NEW_RENDERER
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
   children.SetMesh (this);
 }
@@ -290,11 +286,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
       }
 
       UpdateDeferedLighting (movable.GetFullPosition ());
-#ifndef CS_USE_NEW_RENDERER
       mesh->Draw (rview, &movable.scfiMovable, zbufMode);
-#else
-      mesh->Draw (rview, &movable.scfiMovable);
-#endif // CS_USE_NEW_RENDERER
     }
   }
 

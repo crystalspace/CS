@@ -3260,9 +3260,9 @@ void *csThing::DrawPolygons (
   return NULL;
 }
 
-#ifndef CS_USE_NEW_RENDERER
 bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 {
+#ifndef CS_USE_NEW_RENDERER
   iCamera *icam = rview->GetCamera ();
   const csReversibleTransform &camtrans = icam->GetTransform ();
 
@@ -3352,9 +3352,11 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
   }
 
   draw_busy--;
+#endif // CS_USE_NEW_RENDERER
   return true;                                  // @@@@ RETURN correct vis info
 }
 
+#ifndef CS_USE_NEW_RENDERER
 bool csThing::DrawFoggy (iRenderView *d, iMovable *)
 {
   draw_busy++;
