@@ -1,9 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+4-Mar-2002
+	- Fixed the tutorials in the docs so that they are up-to-date with
+	  regards to changes that happened a long time ago in csInitializer.
 27-Feb-2002
 	- Matze changed oss sound driver to nonblocking mode while opening, so
-		if the soundcard is already used it fails now instead of
-		waiting for the sound card to become free.
+	  if the soundcard is already used it fails now instead of
+	  waiting for the sound card to become free.
 25-Feb-2002
 	- Michael O'Shea found a bug in iLoader::LoadMeshObject(char*fname).
 	  This function was totally broken :-)

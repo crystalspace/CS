@@ -337,8 +337,7 @@ to the commandline. Several Crystal Space plugins and modules will also
 query the commandline so it is important to have this object correctly
 initialized. The commandline parser can be created with
 @code{csInitializer::CreateCommandLineParser()} or
-@code{csInitializer::CreateEnvironment()}. You can setup the commandline
-parser with @code{csInitializer::SetupCommandLineParser()}.
+@code{csInitializer::CreateEnvironment()}.
 
 @subsubheading The Configuration Manager
 @cindex @code{iConfigManager}

@@ -159,10 +159,9 @@ Simple::~Simple ()
 
 bool Simple::Initialize (int argc, const char* const argv[])
 @{
-  object_reg = csInitializer::CreateEnvironment ();
+  object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return false;
 
-  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,
@@ -309,18 +308,14 @@ The main routine first creates an instance of our
 access to it easier. The next step is initialization. The first thing the
 @code{Initialize()} function does is to create the environment with
 @code{csInitializer::CreateEnvironment()}. This will initialize @sc{scf},
-create the object registry, and then create a number of other useful
-entities (plugin manager, event queue, ...).
+create the object registry, setup commandline reading, and then create a
+number of other useful entities (plugin manager, event queue, ...).
 
 Note the usage of the @code{csReport()} function. This is a conveniance
 function to send a message (usually an error or notification) to the
 reporter plugin. It works a lot like @code{printf} except that you
 additionally need to give the severity level and an identifier which can give
 someone listening to the reporter an idea of the origin of the message.
-
-Then we call @code{csInitializer::SetupCommandLineParser()} to setup
-the commandline parser. This will allow the rest of the initialization
-pass to actually read the commandline.
 
 @code{csInitializer::RequestPlugins()} will use the config file (which
 we are not using in this tutorial), the commandline and the requested
