@@ -4470,15 +4470,9 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
 
   /* get format descriptor */
   iSoundRender *SoundRender = QUERY_PLUGIN(System, iSoundRender);
-  csSoundFormat Format;
-  if (SoundRender) {
-    Format = *SoundRender->GetLoadFormat();
-    /*@@@*/SoundRender->DecRef();
-  } else {
-    Format.Freq = -1;
-    Format.Bits = -1;
-    Format.Channels = -1;
-  }
+  if (!SoundRender) return NULL;
+  const csSoundFormat *Format = SoundRender->GetLoadFormat();
+  /*@@@*/SoundRender->DecRef();
 
   /* read the file data */
   size_t size;
@@ -4498,7 +4492,7 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
   }
 
   /* load the sound */
-  iSoundData *Sound = SoundLoader->LoadSound((UByte*)buf, size, &Format);
+  iSoundData *Sound = SoundLoader->LoadSound((UByte*)buf, size, Format);
   delete [] buf;
   /*@@@*/SoundLoader->DecRef();
 
