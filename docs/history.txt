@@ -7,6 +7,9 @@ The history order is reversed so that new features are at the top.
 	- Implemented caching of sprite normals (using SMOOTH()) option.
 	  This greatly speeds up load time of a sprite when the cached
 	  data is present.
+	- 'res' fixed a bug in the OpenGL renderer where sometimes
+	  textures where multiplied with texture mean color. This caused
+	  color seams.
 2-Apr-2002
 	- Eric Sunshine fixed a problem which caused a host of HTML pages in
 	  the user manual to be blank.  The culprit was a missing closing brace
@@ -30,6 +33,8 @@ The history order is reversed so that new features are at the top.
 	  but this is almost always NULL.
 	- Fixed description of -n in 3ds2lev so it is now correct.
 	- Optimized the MergeNormals() code of 3D sprites (SMOOTH option).
+	- Wouter Wijngaards added a ReplaceAge() function in the
+	  emitter particle system API.
 31-Mar-2002
 	- Christian Bayle added $MACHINE error message for not found arch.
 30-Mar-2002
