@@ -53,7 +53,7 @@
 // Open a window if none open
 - (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h
   depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID)
-  display onScreen:(int) screen;
+  display onScreen:(unsigned int) screen;
 
 // Set the window's title
 - (void) setTitle:(char *) newTitle;
@@ -93,7 +93,7 @@ typedef void *csGraphics2DHandle;
 DEL2D_FUNC(OSXDelegate2D, new)(csGraphics2DHandle drv);
 DEL2D_FUNC(void, delete)(OSXDelegate2D);
 DEL2D_FUNC(bool, openWindow)(OSXDelegate2D, char *title, int w, int h,
-  int d, bool fs, CGDirectDisplayID display, int screen);
+  int d, bool fs, CGDirectDisplayID display, unsigned int screen);
 DEL2D_FUNC(void, closeWindow)(OSXDelegate2D);
 DEL2D_FUNC(void, setTitle)(OSXDelegate2D, char *title);
 DEL2D_FUNC(bool, setMouseCursor)(OSXDelegate2D, csMouseCursorID);

@@ -399,11 +399,11 @@ void OSXDriver2D::ChooseDisplay()
 	CS_QUERY_REGISTRY(objectReg, iCommandLineParser);
     const char *s = parser->GetOption("screen");
     if (s != 0)
-        screen = atoi(s);
+        screen = (unsigned int)atoi(s);
     else
     {
         csConfigAccess cfg(objectReg, "/config/video.cfg");
-        screen = cfg->GetInt("Video.ScreenNumber", 0);
+        screen = (unsigned int)cfg->GetInt("Video.ScreenNumber", 0);
     }
 
     // Get list of displays and get id of display to use if not default
@@ -423,14 +423,14 @@ void OSXDriver2D::ChooseDisplay()
             else
                 csReport(objectReg, CS_REPORTER_SEVERITY_WARNING, 
                         "crystalspace.canvas.osxdriver2d",
-                        "WARNING: Requested screen %d but only %d are "
+                        "WARNING: Requested screen %u but only %d are "
 			"available - using main display\n", 
                         screen, numDisplays);
         }
         else
             csReport(objectReg, CS_REPORTER_SEVERITY_WARNING, 
                     "crystalspace.canvas.osxdriver2d",
-                    "WARNING: Requested screen %d but unable to get screen "
+                    "WARNING: Requested screen %u but unable to get screen "
 		    "list - using main display\n", screen);
                     
         if (display == kCGDirectMainDisplay)

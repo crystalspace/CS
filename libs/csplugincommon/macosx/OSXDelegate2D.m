@@ -82,7 +82,7 @@
 // openWindow
 // Open a window if none open
 // In fullscreen mode, opens a zero-sized window to get events
-- (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID) display onScreen:(int) screen;
+- (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID) display onScreen:(unsigned int) screen;
 {
     OSXView *view;
     NSScreen *scr = [[NSScreen screens] objectAtIndex:screen];
@@ -405,7 +405,7 @@ DEL2D_FUNC(void, delete)(OSXDelegate2DHandle delegate)
     [(OSXDelegate2D *) delegate release];
 }
 
-DEL2D_FUNC(bool, openWindow)(OSXDelegate2DHandle delegate, char *title, int w, int h, int d, bool fs, CGDirectDisplayID display, int screen)
+DEL2D_FUNC(bool, openWindow)(OSXDelegate2DHandle delegate, char *title, int w, int h, int d, bool fs, CGDirectDisplayID display, unsigned int screen)
 {
     return [(OSXDelegate2D *) delegate openWindow:title width:w height:h depth:d fullscreen:fs onDisplay:display onScreen:screen];
 }

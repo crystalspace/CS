@@ -122,7 +122,7 @@ protected:
   GammaTable originalGamma;		// Original gamma values
   bool inFullscreenMode;		// In full-screen mode
   CGDirectDisplayID display;		// Screen to display on
-  uint32_t screen;			// Screen number to display on
+  unsigned int screen;			// Screen number to display on
   
   int origWidth, origHeight;		// Original dimensions kept so they can
 					// be restored when switching modes
