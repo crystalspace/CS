@@ -21,7 +21,7 @@ The history order is reversed so that new features are at the top.
 	  (polygon normal) is updated if necessary when GetObjectPlane() 
 	  is called.
 	- Eric Sunshine removed some errant DecRef() invocations from the
-	  "pixmap" how-to which were pointed out by Jacob€Gostylo
+	  "pixmap" how-to which were pointed out by Jacob Gostylo
 	  <jgostylo@users.sourceforge.net>.
 	- Eric Sunshine upgraded glrender.mak and gl_render3d.mak so that they
 	  store their build files in distinct subdirectories of $(OUT).  This
