@@ -20,6 +20,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed problem where empty G3D_FOGMETHOD  enum in cs.i
 	  caused Swig 1.3.19 for Windows to crash with segmentation fault.
 	  Reported by Boyan Histrov.
+	- Eric Sunshine eliminated copy/paste redundancy in LinkApplication
+	  and LinkApplicationConsole rules in unix.jam and win32.jam.
 5-May-2003
 	- Eric Sunshine changed jobber.pl and snapshot.py to once again use
 	  /home/groups/c/cr/crystal as a working area rather than /tmp.  It

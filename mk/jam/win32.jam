@@ -38,12 +38,7 @@ actions LinkApplication bind NEEDLIBS
   rm -f $(TEMP)/$(NAME:B)version.rc $(TEMP)/$(NAME:B)resource.rc $(TEMP)/$(NAME:B)resource.o
 }
 
-actions LinkApplicationConsole bind NEEDLIBS
+rule LinkApplicationConsole
 {
-  $(SHELL) $(TOP)/libs/cssys/win32/mkverres.sh $(TEMP)/$(NAME:B)version.rc "$($(NAME)_help)" $(TOP)/include/csver.h
-  $(SHELL) $(TOP)/libs/cssys/win32/mergeres.sh $(TEMP)/$(NAME:B)resource.rc ./ $(TEMP)/$(NAME:B)version.rc $($(NAME:B)_WIN32RESOURCE)
-  windres --include-dir $(BUILDTOP)/include --include-dir $(TOP)/include $(RCFLAGS) -i $(TEMP)/$(NAME:B)resource.rc -o $(TEMP)/$(NAME:B)resource.o
-
-  $(CMD.LINK) -o $(<) $(TEMP)/$(NAME:B)resource.o $(>) $(NEEDLIBS) $(LINKLIBS) $(ADDLIBS) $(LIBS.EXE)
-  rm -f $(TEMP)/$(NAME:B)version.rc $(TEMP)/$(NAME:B)resource.rc $(TEMP)/$(NAME:B)resource.o
+  LinkApplication $(<) : $(>) ;
 }

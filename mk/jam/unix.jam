@@ -27,7 +27,7 @@ actions LinkApplication bind NEEDLIBS
   $(CMD.LINK) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
 }
 
-actions LinkApplicationConsole bind NEEDLIBS
+rule LinkApplicationConsole
 {
-  $(CMD.LINK) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+  LinkApplication $(<) : $(>) ;
 }
