@@ -22,6 +22,14 @@ Then add this line near the top of the script:
 use cspace;
 @end example
 
+@subheading Quick Start
+
+To get started with pure Perl scripts right away, you probably want to know
+how to initialize CS and get an iObjectRegistry pointer:
+@example
+$object_reg = cspace::csInitializer::CreateEnvironment([ $0, @ARGV ]);
+@end example
+
 @subheading Functions and Classes
 
 CS has several global functions, which can be accessed easily from Perl.

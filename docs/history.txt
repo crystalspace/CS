@@ -38,6 +38,7 @@ chronological order.
 	  now accessible by numbered keys through methods in the binder.
 	  And it now binds to csInputDefinition's instead of iEvent's with a
 	  dodgy hash function.
+	- Oktal added a Quick Start section to the Perl chapter in the manual.
 9-Aug-2004
 	- Jorrit did a fix to csQrount() and other csQ... (except for
 	  csQint()).  In case CS_QINT_WORKAROUND was defined only csQint()
