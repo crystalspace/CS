@@ -1,5 +1,6 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,11 +25,13 @@
 #include "ihalo.h"
 
 class csEngine;
+struct iMaterialWrapper;
 
 enum csHaloType
 {
   cshtCross,
-  cshtNova
+  cshtNova,
+  cshtFlare
 };
 
 /** 
@@ -78,6 +81,7 @@ public:
   virtual unsigned char *Generate (int Size);
 };
 
+/** This halo has a center with a number of spokes */
 class csNovaHalo : public csHalo
 {
 public:
@@ -92,6 +96,50 @@ public:
   csNovaHalo (int seed, int num_spokes, float roundness);
 
   /// Generate the alphamap for this halo of size Size x Size
+  virtual unsigned char *Generate (int Size);
+};
+
+
+/** structure used to keep flare component information */
+struct csFlareComponent {
+  /// position, (0.= at light, 1.=center)
+  float position;
+  /// width and height (1.0 gives size of a normal halo)
+  float width, height;
+  /// visual image of component
+  iMaterialWrapper *image;
+  /// mixmode for drawing
+  UInt mixmode;
+  /// next component to draw
+  csFlareComponent *next;
+};
+
+/** This halo is used for (solar)flares */
+class csFlareHalo : public csHalo
+{
+  /// list of the flare components. in drawing order
+  csFlareComponent *components;
+  /// last flare component to make adding efficient
+  csFlareComponent *last;
+public:
+  /// create an (empty) flare
+  csFlareHalo();
+  ///
+  ~csFlareHalo();
+  /** 
+   * Add a visual component to the flare.
+   * give position, size, image and mixmode.
+   * The component is added at the end of the list - to be displayed last.
+   */
+  void AddComponent(float pos, float w, float h, UInt mode, 
+    iMaterialWrapper *image);
+  /// Get the list of component
+  csFlareComponent *GetComponents() const {return components;}
+  /** 
+   * Generate this halo's alpha map. 
+   * Not used for this halo (returns NULL) since the halo consists of
+   * multiple images.
+   */
   virtual unsigned char *Generate (int Size);
 };
 
@@ -121,7 +169,7 @@ public:
   csLightHalo (csLight *iLight, iHalo *iHandle);
 
   /// Destroy the light halo object
-  ~csLightHalo ();
+  virtual ~csLightHalo ();
 
   /**
    * Process a light halo. The function changes halo brightness depending
@@ -129,7 +177,49 @@ public:
    * reached zero intensity and should be removed from halo queue.
    * The function also actually projects, clips and draws the halo.
    */
-  bool Process (cs_time ElapsedTime, csEngine const&);
+  virtual bool Process (cs_time ElapsedTime, csEngine const&);
+
+  /**
+   * see if camera position is visible, returns it projected onto screen.
+   * Called by Process.
+   */
+  bool IsVisible(csEngine const& engine, csVector3& v);
+
+  /** 
+   * add up elapsed time, and returns new intensity, given the current
+   * halo intensity. Give whether halo is currently visible for fading in 
+   * and out. returns true if intensity >0, returns false if intensity <= 0,
+   * when the halo is completely faded out.
+   * Called by Process.
+   */
+  bool ComputeNewIntensity(cs_time ElapsedTime, float& hintensity, 
+    bool halo_vis);
+};
+
+/**
+ * This class is used to keep track of visible Flares. 
+ * It is a subclass of csLightHalo, and - to the engine - behaves the same.
+ */
+class csLightFlareHalo : public csLightHalo 
+{
+  /// size of halos on the screen
+  int halosize;
+  /// the flare description
+  csFlareHalo *flare;
+public:
+  /**
+   * create. pass light, and flareHalo, the halosize is the size that
+   * halos have on the screen - it is used to scale the flare.
+   */
+  csLightFlareHalo(csLight *light, csFlareHalo *halo, int iHaloSize);
+  /// remove
+  virtual ~csLightFlareHalo();
+
+  /// process the halo.
+  virtual bool Process (cs_time elapsed_time, csEngine const& engine);
+  /// process a flare component (clip and draw it).
+  void ProcessFlareComponent(csEngine const& engine, csFlareComponent *comp,
+    csVector2 const& start, csVector2 const& deltapos);
 };
 
 #endif // __CS_HALO_H__

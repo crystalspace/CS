@@ -1380,9 +1380,18 @@ void csEngine::AddHalo (csLight* Light)
 
   // Halo size is 1/4 of the screen height; also we make sure its odd
   int hs = (frame_height / 4) | 1;
-  unsigned char *Alpha = Light->GetHalo ()->Generate (hs);
+
+  if(Light->GetHalo()->Type == cshtFlare)
+  {
+    // put a new light flare into the queue
+    // the cast is safe because of the type check above
+    halos.Push (new csLightFlareHalo (Light, (csFlareHalo*)Light->GetHalo(), 
+      hs));
+    return;
+  }
 
   // Okay, put the light into the queue: first we generate the alphamap
+  unsigned char *Alpha = Light->GetHalo ()->Generate (hs);
   iHalo *handle = G3D->CreateHalo (Light->GetColor ().red,
     Light->GetColor ().green, Light->GetColor ().blue, Alpha, hs, hs);
 
