@@ -55,7 +55,7 @@ struct nRect
 
 
 /// The length of the nBlock structure
-unsigned const nBlockLen=20;
+unsigned const nBlockLen=18;
 
 typedef unsigned short ti_type;
 
@@ -75,9 +75,6 @@ struct nBlock
 
   /// Middle height of the block
   unsigned short midh;
-
-  /// Texture coordinates of ne vertice, spread down to sw.
-  unsigned char u, v;
 
   /// Texture index
   ti_type ti;
@@ -148,7 +145,6 @@ public:
   }
 
 };
-
 
 struct nTerrainInfo
 {
@@ -282,18 +278,28 @@ private:
         center = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y));
 
     /**  This seems like a lot of duplication, but I don't know how to do it right
-     otherwise. We push one texture index for each vert... even though they're
-     the same inside a block. 
+     * otherwise. We push one texture index for each vert... even though they're
+     * the same inside a block. 
      */
     info->tindexes.Push(b->ti);
     info->tindexes.Push(b->ti);
     info->tindexes.Push(b->ti);
     info->tindexes.Push(b->ti);
     info->tindexes.Push(b->ti);
+
+    /** Build texture indices.  The northeast corner is 0,0 for the texture, and the
+     * southwest corner is 1,1.  That makes the other corners respective of their places,
+     * 0, 1; 1, 0; and .5, .5
+     */
+    info->texels.Push(csVector2(0.0, 0.0));
+    info->texels.Push(csVector2(1.0, 0.0));
+    info->texels.Push(csVector2(0.0, 1.0));
+    info->texels.Push(csVector2(1.0, 1.0));
+    info->texels.Push(csVector2(0.5, 0.5));
     
     /** Build triangle stacks, for each block output four triangles.
-     No need to merge and split because each block is at full resolution,
-     we have no partial resolution blocks.
+     * No need to merge and split because each block is at full resolution,
+     * we have no partial resolution blocks.
      */
     info->triangles.Push(csTriangle(se, center, sw));
     info->triangles.Push(csTriangle(sw, center, nw));
@@ -368,11 +374,10 @@ public:
 
   /** Assembles the terrain into the buffer when called by the engine.  
    */
-  void AssembleTerrain(iRenderView *rv)
+  void AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
   {
     // Clear mesh lists
-    //verts.MakeEmpty();
-    //tris.MakeEmpty();
+    info = terrinfo;   
 
     unsigned int mid = (terrain_w>>1)+1;
     unsigned int x=0, y=0;
@@ -411,12 +416,22 @@ private:
   /// Pointer to vertex buffer for this mesh.
   iVertexBuffer *vbuf;
 
+  /// Logical parent
+  iBase* logparent;
+
   /// Pointer to factory that created this object.
   iMeshObjectFactory *pFactory;
+
+  /// Object registry reference
+  iObjectRegistry* object_reg;
+
+  /// Visible call-back
+  iMeshObjectDrawCallback* vis_cb;
 
   /// Pointer to terrain object
   nTerrain *terrain;
 
+  
 protected:
   void SetupVertexBuffer (iVertexBuffer *&vbuf1);
 
@@ -424,7 +439,7 @@ public:
   ////////////////////////////// iMeshObject implementation ///////////////////////////
   SCF_DECLARE_IBASE;
 
-  csBigTerrainObject();
+  csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory);
   virtual ~csBigTerrainObject();
 
   /// Returns a pointer to the factory that made this.
@@ -440,15 +455,15 @@ public:
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
 
 
-  //virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
-  //{
-  //  SCF_SET_REF (vis_cb, cb);
-  //}
+  virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
+  {
+    SCF_SET_REF (vis_cb, cb);
+  }
 
-  //virtual iMeshObjectDrawCallback* GetVisibleCallback () const
-  //{
-  //  return vis_cb;
-  //}
+  virtual iMeshObjectDrawCallback* GetVisibleCallback () const
+  {
+    return vis_cb;
+  }
 
   /// Gets the bounding box for this terrain.
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
@@ -469,10 +484,10 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
 
   /// Set logical parent.
-  //virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
 
   /// Get logical parent.
-  //virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   /// Check if the terrain is hit by the given object space vector
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end, csVector3& isect, float* pr);
@@ -482,6 +497,36 @@ public:
 
   /// This may eventually return a changing number.
   virtual long GetShapeNumber () const { return 1; }
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Factory for Big Terrain Object.
+ */
+class csBigTerrainObjectFactory : public iMeshObjectFactory
+{
+private:
+  iBase* logparent;
+
+public:
+  iObjectRegistry *object_reg;
+
+  /// Constructor.
+  csBigTerrainObjectFactory (iObjectRegistry* object_reg);
+
+  /// Destructor.
+  virtual ~csBigTerrainObjectFactory ();
+
+  SCF_DECLARE_IBASE;
+
+  virtual iMeshObject* NewInstance ();
+
+  virtual void HardTransform (const csReversibleTransform&) { }
+  virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 };
 
 

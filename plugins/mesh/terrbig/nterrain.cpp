@@ -32,8 +32,9 @@ SCF_IMPLEMENT_IBASE_END
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-csBigTerrainObject::csBigTerrainObject():pFactory(NULL), terrain(NULL)
+csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL)
 {
+  SCF_CONSTRUCT_IBASE (NULL)
 }
 
 csBigTerrainObject::~csBigTerrainObject()
@@ -69,9 +70,11 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
   {
     iCamera* cam = rview->GetCamera ();
 
+    nTerrainInfo *info = new nTerrainInfo();
+
     terrain->SetObjectToCamera(cam->GetTransform());
     terrain->SetCameraOrigin(cam->GetTransform().GetOrigin());
-    terrain->AssembleTerrain(rview);
+    terrain->AssembleTerrain(rview, info);
 
     return true;
   }
@@ -128,6 +131,27 @@ csBigTerrainObject::HitBeamObject (const csVector3& start, const csVector3& end,
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////////
 
+SCF_IMPLEMENT_IBASE (csBigTerrainObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_END
+
+csBigTerrainObjectFactory::csBigTerrainObjectFactory (iObjectRegistry* object_reg)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  csBigTerrainObjectFactory::object_reg = object_reg;
+  logparent = NULL;
+}
+
+csBigTerrainObjectFactory::~csBigTerrainObjectFactory ()
+{
+}
+
+iMeshObject* csBigTerrainObjectFactory::NewInstance ()
+{
+  csBigTerrainObject* pTerrObj = new csBigTerrainObject (object_reg, this);
+  return (iMeshObject*)pTerrObj;
+}
 
 
