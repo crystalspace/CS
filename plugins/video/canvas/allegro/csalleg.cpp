@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "csalleg.h"
-#include "cssys/unix/iunix.h"
+//#include "cssys/unix/iunix.h"
 #include "cssys/csinput.h"
 #include "csutil/csrect.h"
 #include "csutil/csstring.h"
@@ -50,7 +50,7 @@ IMPLEMENT_FACTORY (csGraphics2DAlleg)
 
 EXPORT_CLASS_TABLE (alleg2d)
   EXPORT_CLASS (csGraphics2DAlleg, "crystalspace.graphics2d.allegro",
-    "Unix Allegro 2D graphics driver for Crystal Space")
+    "Allegro 2D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DAlleg)
@@ -67,8 +67,8 @@ csGraphics2DAlleg::csGraphics2DAlleg (iBase *iParent) :
 csGraphics2DAlleg::~csGraphics2DAlleg ()
 {
   Close ();
-  if (UnixSystem)
-    UnixSystem->DecRef ();
+//  if (UnixSystem)
+//    UnixSystem->DecRef ();
 }
 
 bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
@@ -76,6 +76,7 @@ bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
+#if 0
   UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
   if (!UnixSystem)
   {
@@ -83,6 +84,7 @@ bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
                              "the IUnixSystemDriver interface\n");
     return false;
   }
+#endif
 
   switch (Depth)
   {
@@ -366,3 +368,10 @@ bool csGraphics2DAlleg::PerformExtension (const char *args)
   return true;
 }
 
+#ifdef main
+int main (void)
+{
+  return 0;
+}
+END_OF_MAIN ()
+#endif /* main */
