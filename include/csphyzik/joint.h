@@ -60,9 +60,8 @@ public:
 	virtual int get_state( const real *sa );
 	virtual int set_delta_state( real *state_array ); 
 
-	// update the body_to_world reference frame of the outboard body given a 
-	// transformation matrix from inboard to outboard frames of reference
-	void update_link_RF( ctMatrix3 &R_fg );
+	// update the body_to_world reference frame of the outboard handle 
+	void update_link_RF();
 	
 	// return vector from inboard center to outboard center in outboard coords
 	ctVector3 get_r();
@@ -75,7 +74,8 @@ public:
 	// points from joint axis to origin of outboard entity in outboard frame
 	ctVector3 outboard_offset;  // d in Mirtch thesis
 	
-	ctVector3 joint_axis;  // in outboard frame o' reference
+  // valid in both in and out frame of reference
+	ctVector3 joint_axis;
 	real q, qv, qa;  // joint position, velocity and acceleration in radians
 
 protected:
@@ -85,6 +85,7 @@ protected:
 };
 
 // joint that slides in and out
+//!me needs some work.  Needs proper constructor
 class ctPrismaticJoint : public ctJoint
 {
 public:
