@@ -199,7 +199,7 @@ int main (int argc, char *argv[])
       fprintf (f, "DESCRIPTION \"%s\"\n", opt.description);
     fprintf (f, "DATA NONSHARED\n");
     fprintf (f, "EXPORTS\n");
-    fprintf (f, "	%s_GetClassTable\n", opt.modname);
+    fprintf (f, "	%s_scfInitialize\n", opt.modname);
   }
   else
   {

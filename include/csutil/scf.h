@@ -330,11 +330,13 @@ struct scfClassInfo
  * Any module that exports a number of SCF classes can define a table
  * with a list ot all classes exported from this module. The LibraryName
  * parameter is used to construct the name of the table variable; usually
- * the table is called LibraryName_GetClassTable.
+ * the table is returned by a function called LibraryName_scfInitialize.
+ * This function also initializes the global (iSCF::SCF) pointer for each
+ * module.
  */
 #define EXPORT_CLASS_TABLE(LibraryName)					\
 SCF_EXPORT_FUNCTION scfClassInfo*					\
-SCF_EXPORTED_NAME(LibraryName,_GetClassTable)()				\
+SCF_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		\
 {									\
   static scfClassInfo ExportClassTable [] =				\
   {
@@ -351,6 +353,7 @@ SCF_EXPORTED_NAME(LibraryName,_GetClassTable)()				\
 #define EXPORT_CLASS_TABLE_END						\
     { 0, 0, 0, 0 }							\
   };									\
+  iSCF::SCF = SCF;							\
   return ExportClassTable;						\
 }
 
@@ -362,13 +365,13 @@ SCF_EXPORTED_NAME(LibraryName,_GetClassTable)()				\
  * a dummy variable that registers given library during initialization.
  */
 #define REGISTER_STATIC_LIBRARY(LibraryName)				\
-  extern "C" scfClassInfo *LibraryName##_GetClassTable ();		\
+  extern "C" scfClassInfo *LibraryName##_scfInitialize (iSCF*);		\
   class __##LibraryName##_Init						\
   {									\
   public:								\
     __##LibraryName##_Init ()						\
     { if (!iSCF::SCF) scfInitialize ();					\
-      iSCF::SCF->RegisterClassList (LibraryName##_GetClassTable ()); }	\
+      iSCF::SCF->RegisterClassList (LibraryName##_scfInitialize (iSCF::SCF)); }	\
   } __##LibraryName##_dummy;
 
 /**

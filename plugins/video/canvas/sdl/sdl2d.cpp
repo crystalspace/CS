@@ -204,7 +204,7 @@ void csGraphics2DSDL::fixlibrary()
 #ifdef OS_LINUX
     Dl_info dlip;
 
-    dladdr(sdl2d_GetClassTable,&dlip);
+    dladdr(sdl2d_scfInitialize,&dlip);
     dlopen(dlip.dli_fname,RTLD_NOW);
 
     CsPrintf (MSG_INITIALIZATION, "Library %s locked.\n",dlip.dli_fname);

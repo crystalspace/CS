@@ -644,7 +644,7 @@ bool RegisterServer (char *SharedLibraryFilename, csConfigFile *ini, bool Regist
   if ((tmp = strchr (base, '.')) != NULL)
     *tmp = 0;
   strcpy (name, base);
-  strcat (name, "_GetClassTable");
+  strcat (name, "_scfInitialize");
 
   csLibraryHandle Handle = csLoadLibrary (base);
 
@@ -672,8 +672,8 @@ bool RegisterServer (char *SharedLibraryFilename, csConfigFile *ini, bool Regist
 
   // This is the prototype for the only function that
   // a shared library should export
-  typedef scfClassInfo *(*scfGetClassInfo) ();
-  scfGetClassInfo func = (scfGetClassInfo)csGetLibrarySymbol (Handle, name);
+  typedef scfClassInfo *(*scfInitializeFunc) (iSCF*);
+  scfInitializeFunc func = (scfInitializeFunc)csGetLibrarySymbol (Handle, name);
   if (!func)
   {
     if (verbose)
@@ -690,7 +690,7 @@ bool RegisterServer (char *SharedLibraryFilename, csConfigFile *ini, bool Regist
     fflush (stdout);
   } /* endif */
 
-  scfClassInfo *ClassTable = func ();
+  scfClassInfo *ClassTable = func (NULL);
   while (ClassTable->ClassID)
   {
     if (verbose)

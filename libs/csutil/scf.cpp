@@ -27,6 +27,62 @@
 #include "csutil/csobjvec.h"
 #include "csutil/cfgfile.h"
 
+/// This is the registry for all class factories
+static class scfClassRegistry *ClassRegistry = NULL;
+/// If this bool is true, we should sort the registery
+static bool SortClassRegistry = false;
+/// This is our private instance of csSCF
+static class csSCF *PrivateSCF = NULL;
+/// This is the public instance
+iSCF *iSCF::SCF = NULL;
+
+/// This class manages all SCF functionality
+class csSCF : public iSCF
+{
+public:
+  DECLARE_IBASE;
+
+  /// constructor
+  csSCF ();
+  /// destructor
+  ~csSCF ();
+
+  /// Read config file
+  virtual void RegisterConfigClassList (iConfigFile *cfg);
+
+  /// Wrapper for scfClassRegistered ()
+  virtual bool ClassRegistered (const char *iClassID);
+
+  /// Wrapper for scfCreateInstance ()
+  virtual void *CreateInstance (const char *iClassID,
+    const char *iInterfaceID, int iVersion);
+
+  /// Wrapper for scfGetClassDescription ()
+  virtual const char *GetClassDescription (const char *iClassID);
+
+  /// Wrapper for scfGetClassDependencies ()
+  virtual const char *GetClassDependencies (const char *iClassID);
+
+  /// Wrapper for scfRegisterClass ()
+  virtual bool RegisterClass (const char *iClassID,
+    const char *iLibraryName, const char *Dependencies = NULL);
+
+  /// Wrapper for scfRegisterStaticClass ()
+  virtual bool RegisterStaticClass (scfClassInfo *iClassInfo);
+
+  /// Wrapper for scfRegisterClassList ()
+  virtual bool RegisterClassList (scfClassInfo *iClassInfo);
+
+  /// Wrapper for scfUnregisterClass ()
+  virtual bool UnregisterClass (char *iClassID);
+
+  /// Wrapper for scfUnloadUnusedModules
+  virtual void UnloadUnusedModules ();
+
+  /// Wrapper for scfFinish ()
+  virtual void Finish ();
+};
+
 #ifndef CS_STATIC_LINKED
 
 class scfLibraryVector : public csObjVector
@@ -98,19 +154,19 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
 
   // This is the prototype for the only function that
   // a shared library should export
-  typedef scfClassInfo *(*scfGetClassInfo) ();
+  typedef scfClassInfo *(*scfInitializeFunc) (iSCF*);
 
   // To get the library name, split the input name into path and file name.
-  // Then append "_GetClassTable" to the file name to get the name of
+  // Then append "_scfInitialize" to the file name to get the name of
   // the exported function.
   char name [200];
   splitpath (iLibraryName, NULL, 0, name, 200);
-  strcat (name, "_GetClassTable");
+  strcat (name, "_scfInitialize");
 
-  scfGetClassInfo func =
-    (scfGetClassInfo)csGetLibrarySymbol (LibraryHandle, name);
+  scfInitializeFunc func =
+    (scfInitializeFunc)csGetLibrarySymbol (LibraryHandle, name);
   if (func)
-    ClassTable = func ();
+    ClassTable = func (PrivateSCF);
 }
 
 scfSharedLibrary::~scfSharedLibrary ()
@@ -327,63 +383,7 @@ const char *scfFactory::QueryClassID ()
   return ClassID;
 }
 
-//------------------------------------------------- Client SCF functions ----//
-
-// This is the registry for all class factories
-static scfClassRegistry *ClassRegistry = NULL;
-// If this bool is true, we should sort the registery
-static bool SortClassRegistry = false;
-/// This is our private instance of csSCF
-static class csSCF *PrivateSCF = NULL;
-/// This is the public instance
-iSCF *iSCF::SCF = NULL;
-
-/// This class manages all SCF functionality
-class csSCF : public iSCF
-{
-public:
-  DECLARE_IBASE;
-
-  /// constructor
-  csSCF ();
-  /// destructor
-  ~csSCF ();
-
-  /// Read config file
-  virtual void RegisterConfigClassList (iConfigFile *cfg);
-
-  /// Wrapper for scfClassRegistered ()
-  virtual bool ClassRegistered (const char *iClassID);
-
-  /// Wrapper for scfCreateInstance ()
-  virtual void *CreateInstance (const char *iClassID,
-    const char *iInterfaceID, int iVersion);
-
-  /// Wrapper for scfGetClassDescription ()
-  virtual const char *GetClassDescription (const char *iClassID);
-
-  /// Wrapper for scfGetClassDependencies ()
-  virtual const char *GetClassDependencies (const char *iClassID);
-
-  /// Wrapper for scfRegisterClass ()
-  virtual bool RegisterClass (const char *iClassID,
-    const char *iLibraryName, const char *Dependencies = NULL);
-
-  /// Wrapper for scfRegisterStaticClass ()
-  virtual bool RegisterStaticClass (scfClassInfo *iClassInfo);
-
-  /// Wrapper for scfRegisterClassList ()
-  virtual bool RegisterClassList (scfClassInfo *iClassInfo);
-
-  /// Wrapper for scfUnregisterClass ()
-  virtual bool UnregisterClass (char *iClassID);
-
-  /// Wrapper for scfUnloadUnusedModules
-  virtual void UnloadUnusedModules ();
-
-  /// Wrapper for scfFinish ()
-  virtual void Finish ();
-};
+//------------------------------------ Implementation of csSCF functions ----//
 
 IMPLEMENT_IBASE (csSCF);
   IMPLEMENTS_INTERFACE (iSCF);
