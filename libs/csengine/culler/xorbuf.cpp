@@ -17,6 +17,8 @@
 */
 #include "cssysdef.h"
 #include "qint.h"
+#include "qsqrt.h"
+#include "csgeom/math3d.h"
 #include "csengine/xorbuf.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -43,6 +45,8 @@ csXORBuffer::csXORBuffer (int w, int h)
   width, height, width_po2, w_shift, bufsize, numrows); fflush (stdout);
 
   buffer = new uint32[bufsize];
+
+  debug_mode = false;
 }
 
 csXORBuffer::~csXORBuffer ()
@@ -57,39 +61,271 @@ void csXORBuffer::Initialize ()
 
 void csXORBuffer::DrawLeftLine (int x1, int y1, int x2, int y2)
 {
-  int dy = y2-y1;
-  int x = x1<<16;
-  int y = y1;
-  int dx = ((x2-x1)<<16) / dy;
-  int dx2 = dx>>1;
-  if (dx2 < 0) dx2 = -dx2;
-  x -= dx2;
-  while (dy > 0)
+  if (y2 < 0 || y1 >= height)
   {
-    uint32* buf = &buffer[(y>>5) << w_shift];
-    buf[x>>16] |= 1 << (y & 0x1f);
-    x += dx;
-    y++;
+    //------
+    // Totally outside screen vertically.
+    //------
+    return;
+  }
+
+  if (x1 < 0 && x2 < 0)
+  {
+    //------
+    // Totally on the left side. Just clamp.
+    //------
+
+    // First we need to clip vertically. This is easy to do
+    // in this particular case since x=0 all the time.
+    if (y1 < 0) y1 = 0;
+    if (y2 >= height) y2 = height-1;
+
+    int dy = y2-y1;
+    int y = y1;
+    while (dy > 0)
+    {
+      // @@@ Optimize!
+      uint32* buf = &buffer[(y>>5) << w_shift];
+      buf[0] ^= 1 << (y & 0x1f);
+      y++;
+      dy--;
+    }
+    return;
+  }
+  else if (x1 >= width && x2 >= width)
+  {
+    //------
+    // Lines on the far right can just be dropped since they
+    // will have no effect on the XOR buffer.
+    //------
+    return;
+  }
+  else if (x1 == x2)
+  {
+    //------
+    // If line is fully vertical we also have a special case that
+    // is easier to resolve.
+    //------
+    // First we need to clip vertically. This is easy to do
+    // in this particular case since x=0 all the time.
+    if (y1 < 0) y1 = 0;
+    if (y2 >= height) y2 = height-1;
+
+    int dy = y2-y1;
+    int y = y1;
+    while (dy > 0)
+    {
+      // @@@ Optimize!
+      uint32* buf = &buffer[(y>>5) << w_shift];
+      buf[x1] ^= 1 << (y & 0x1f);
+      y++;
+      dy--;
+    }
+    return;
+  }
+
+  //------
+  // We don't have any of the trivial horizontal cases.
+  // So we must clip vertically first.
+  //------
+  if (y1 < 0)
+  {
+    x1 = x1 + ( (0-y1) * (x2-x1) ) / (y2-y1);
+    y1 = 0;
+  }
+  if (y2 >= height)
+  {
+    x2 = x1 + ( (height-1-y1) * (x2-x1) ) / (y2-y1);
+    y2 = height-1;
+  }
+
+  if (x1 >= 0 && x2 >= 0 && x1 < width && x2 < width)
+  {
+    //------
+    // The normal case, no clipping needed at all.
+    //------
+    int dy = (y2-y1)+1;
+    int x = x1<<16;
+    int y = y1;
+    int dx = ((x2-x1)<<16) / dy;
     dy--;
+    while (dy > 0)
+    {
+      uint32* buf = &buffer[(y>>5) << w_shift];
+      buf[x>>16] ^= 1 << (y & 0x1f);
+      x += dx;
+      y++;
+      dy--;
+    }
+  }
+  else
+  {
+    //------
+    // In this case we need to clip horizontally.
+    //------
+    int dy = (y2-y1)+1;
+    int x = x1<<16;
+    int y = y1;
+    int dx = ((x2-x1)<<16) / dy;
+    dy--;
+    while (dy > 0)
+    {
+      uint32* buf = &buffer[(y>>5) << w_shift];
+      if (x < 0)
+      {
+        buf[0] ^= 1 << (y & 0x1f);
+      }
+      else
+      {
+        int xn = x>>16;
+	if (xn < width)
+          buf[xn] ^= 1 << (y & 0x1f);
+        else
+	{
+	  if (dx > 0) break;	// We can stop here.
+	}
+      }
+      x += dx;
+      y++;
+      dy--;
+    }
   }
 }
 
 void csXORBuffer::DrawRightLine (int x1, int y1, int x2, int y2)
 {
-  int dy = y2-y1;
-  int x = x1<<16;
-  int y = y1;
-  int dx = ((x2-x1)<<16) / dy;
-  int dx2 = dx>>1;
-  if (dx2 < 0) dx2 = -dx2;
-  x += dx2;
-  while (dy > 0)
+  if (y2 < 0 || y1 >= height)
   {
-    uint32* buf = &buffer[(y>>5) << w_shift];
-    buf[x>>16] |= 1 << (y & 0x1f);
-    x += dx;
-    y++;
+    //------
+    // Totally outside screen vertically.
+    //------
+    return;
+  }
+
+  if (x1 < 0 && x2 < 0)
+  {
+    //------
+    // Totally on the left side. Just clamp.
+    //------
+
+    // First we need to clip vertically. This is easy to do
+    // in this particular case since x=0 all the time.
+    if (y1 < 0) y1 = 0;
+    if (y2 >= height) y2 = height-1;
+
+    int dy = y2-y1;
+    int y = y1;
+    while (dy > 0)
+    {
+      // @@@ Optimize!
+      uint32* buf = &buffer[(y>>5) << w_shift];
+      buf[0] ^= 1 << (y & 0x1f);
+      y++;
+      dy--;
+    }
+    return;
+  }
+  else if (x1 >= width && x2 >= width)
+  {
+    //------
+    // Lines on the far right can just be dropped since they
+    // will have no effect on the XOR buffer.
+    //------
+    return;
+  }
+  else if (x1 == x2)
+  {
+    //------
+    // If line is fully vertical we also have a special case that
+    // is easier to resolve.
+    //------
+    // First we need to clip vertically. This is easy to do
+    // in this particular case since x=0 all the time.
+    if (y1 < 0) y1 = 0;
+    if (y2 >= height) y2 = height-1;
+
+    int dy = y2-y1;
+    int y = y1;
+    while (dy > 0)
+    {
+      // @@@ Optimize!
+      uint32* buf = &buffer[(y>>5) << w_shift];
+      buf[x1] ^= 1 << (y & 0x1f);
+      y++;
+      dy--;
+    }
+    return;
+  }
+
+  //------
+  // We don't have any of the trivial horizontal cases.
+  // So we must clip vertically first.
+  //------
+  if (y1 < 0)
+  {
+    x1 = x1 + ( (0-y1) * (x2-x1) ) / (y2-y1);
+    y1 = 0;
+  }
+  if (y2 >= height)
+  {
+    x2 = x1 + ( (height-1-y1) * (x2-x1) ) / (y2-y1);
+    y2 = height-1;
+  }
+
+  if (x1 >= 0 && x2 >= 0 && x1 < width && x2 < width)
+  {
+    //------
+    // The normal case, no clipping needed at all.
+    //------
+    int dy = (y2-y1)+1;
+    int x = x1<<16;
+    int y = y1;
+    int dx = ((x2-x1)<<16) / dy;
+    int dx2 = dx>>1;
+    x += dx2;
     dy--;
+    while (dy > 0)
+    {
+      uint32* buf = &buffer[(y>>5) << w_shift];
+      buf[x>>16] ^= 1 << (y & 0x1f);
+      x += dx;
+      y++;
+      dy--;
+    }
+  }
+  else
+  {
+    //------
+    // In this case we need to clip horizontally.
+    //------
+    int dy = (y2-y1)+1;
+    int x = x1<<16;
+    int y = y1;
+    int dx = ((x2-x1)<<16) / dy;
+    int dx2 = dx>>1;
+    x += dx2;
+    dy--;
+    while (dy > 0)
+    {
+      uint32* buf = &buffer[(y>>5) << w_shift];
+      if (x < 0)
+      {
+        buf[0] ^= 1 << (y & 0x1f);
+      }
+      else
+      {
+        int xn = x>>16;
+	if (xn < width)
+          buf[xn] ^= 1 << (y & 0x1f);
+        else
+	{
+	  if (dx > 0) break;	// We can stop here.
+	}
+      }
+      x += dx;
+      y++;
+      dy--;
+    }
   }
 }
 
@@ -129,8 +365,14 @@ void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts)
   //---------
   // First find out in which direction the 'right' lines go.
   //---------
-  //@@@ TODO
-  int dir_right = 1;
+  //@@@@ THIS IS NOT VERY OPTIMAL!
+  int top_vt_right = (top_vt+1)%num_verts;
+  int top_vt_left = (top_vt-1+num_verts)%num_verts;
+  int dxdyR = ((xa[top_vt_right]-xa[top_vt])<<16)
+  	/ (ya[top_vt_right]-ya[top_vt]+1);
+  int dxdyL = ((xa[top_vt_left]-xa[top_vt])<<16)
+  	/ (ya[top_vt_left]-ya[top_vt]+1);
+  int dir_right = (dxdyR > dxdyL) ? 1 : -1;
 
   //---------
   // Draw all right lines.
@@ -142,7 +384,14 @@ void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts)
   while (i != bot_vt)
   {
     if (ya[i] != ya[j])
+    {
+      if (debug_mode)
+      {
+        printf ("R{%d,%d} (%d,%d) - (%d,%d)\n",
+	  i, j, xa[i], ya[i], xa[j], ya[j]);
+      }
       DrawRightLine (xa[i], ya[i], xa[j], ya[j]);
+    }
     i = j;
     j = (j+num_verts+dir)%num_verts;
   }
@@ -157,7 +406,14 @@ void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts)
   while (i != bot_vt)
   {
     if (ya[i] != ya[j])
+    {
+      if (debug_mode)
+      {
+        printf ("L{%d,%d} (%d,%d) - (%d,%d)\n",
+	  i, j, xa[i], ya[i], xa[j], ya[j]);
+      }
       DrawLeftLine (xa[i], ya[i], xa[j], ya[j]);
+    }
     i = j;
     j = (j+num_verts+dir)%num_verts;
   }
@@ -180,10 +436,39 @@ void csXORBuffer::XORSweep ()
   }
 }
 
-void csXORBuffer::GfxDump (iGraphics2D *ig2d, iGraphics3D *ig3d)
+static void DrawZoomedPixel (iGraphics2D* g2d, int x, int y, int col, int zoom)
 {
-  iTextureManager *txtmgr = ig3d->GetTextureManager ();
-  int col = txtmgr->FindRGB (255, 255, 0);
+  if (zoom == 1)
+    g2d->DrawPixel (x, y, col);
+  else if (zoom == 2)
+  {
+    x <<= 1;
+    y <<= 1;
+    g2d->DrawPixel (x+0, y+0, col);
+    g2d->DrawPixel (x+1, y+0, col);
+    g2d->DrawPixel (x+0, y+1, col);
+    g2d->DrawPixel (x+1, y+1, col);
+  }
+  else if (zoom == 3)
+  {
+    x *= 3;
+    y *= 3;
+    g2d->DrawPixel (x+0, y+0, col);
+    g2d->DrawPixel (x+1, y+0, col);
+    g2d->DrawPixel (x+2, y+0, col);
+    g2d->DrawPixel (x+0, y+1, col);
+    g2d->DrawPixel (x+1, y+1, col);
+    g2d->DrawPixel (x+2, y+1, col);
+    g2d->DrawPixel (x+0, y+2, col);
+    g2d->DrawPixel (x+1, y+2, col);
+    g2d->DrawPixel (x+2, y+2, col);
+  }
+}
+
+void csXORBuffer::Debug_Dump (iGraphics2D* g2d, iGraphics3D* g3d, int zoom)
+{
+  iTextureManager *txtmgr = g3d->GetTextureManager ();
+  int col = txtmgr->FindRGB (200, 200, 200);
   int x, y, i;
   for (i = 0 ; i < numrows ; i++)
   {
@@ -194,11 +479,79 @@ void csXORBuffer::GfxDump (iGraphics2D *ig2d, iGraphics3D *ig3d)
       int yy = i*32;
       for (y = 0 ; y < 32 ; y++)
       {
-        ig2d->DrawPixel (x, yy, (c & 1) ? col : 0);
+        DrawZoomedPixel (g2d, x, yy, (c & 1) ? col : 0, zoom);
 	c = c >> 1;
 	yy++;
       }
     }
   }
+}
+
+void csXORBuffer::Debug_DrawLine (iGraphics2D* g2d,
+	float x1, float y1, float x2, float y2, int col, float l,
+	int zoom)
+{
+  int i;
+  int il = QInt (l);
+  for (i = 0 ; i <= il ; i++)
+  {
+    float x = x1 + float (i) * (x2-x1) / l;
+    float y = y1 + float (i) * (y2-y1) / l;
+    DrawZoomedPixel (g2d, QInt (x), QInt (y), col, zoom);
+  }
+}
+
+void csXORBuffer::Debug_DrawPolygon (iGraphics2D* g2d, iGraphics3D* g3d,
+	csVector2* verts, int num_verts, int zoom)
+{
+  iTextureManager *txtmgr = g3d->GetTextureManager ();
+  int col = txtmgr->FindRGB (255, 0, 255);
+  int i;
+  for (i = 0 ; i < num_verts ; i++)
+  {
+    int j = (i+1) % num_verts;
+    float dx = verts[j].x - verts[i].x;
+    float dy = verts[j].y - verts[i].y;
+    float l = dx*dx + dy*dy;
+    Debug_DrawLine (g2d, verts[i].x, verts[i].y,
+    	verts[j].x, verts[j].y, col, qsqrt (l), zoom);
+  }
+}
+
+static float rnd (int totrange, int leftpad, int rightpad)
+{
+  return float (((rand () >> 4) % (totrange-leftpad-rightpad)) + leftpad);
+}
+
+bool csXORBuffer::Debug_ExtensiveTest (int num_iterations, csVector2* verts,
+	int& num_verts)
+{
+  int i;
+  for (i = 0 ; i < num_iterations ; i++)
+  {
+    Initialize ();
+    num_verts = ((rand () >> 4) % 1)+3;
+    switch (num_verts)
+    {
+      case 3:
+        verts[0].Set (rnd (width, -100, 20), rnd (height, -100, -100));
+        verts[1].Set (rnd (width, -100, 20), rnd (height, -100, -100));
+        verts[2].Set (rnd (width, -100, 20), rnd (height, -100, -100));
+        break;
+      case 4:
+        // @@@ TODO!
+	break;
+    }
+    DrawPolygon (verts, num_verts);
+    XORSweep ();
+
+    int r;
+    for (r = 0 ; r < numrows ; r++)
+    {
+      uint32* row = &buffer[(r<<w_shift)+width-2];
+      if (*row) return false;
+    }
+  }
+  return true;
 }
 

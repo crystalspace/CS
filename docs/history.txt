@@ -4,6 +4,17 @@ The history order is reversed so that new features are at the top.
 	- Fixed parsing of FILE keyword in texture parsing so it also
 	  works with quotes.
 	- csScanStr() also accepts '-' for %s now (if no quotes are given).
+	- Continued work on XOR buffer. It now seems to work properly.
+	  I added several debugging utilities. One of those is
+	  Debug_ExtensiveTest() which randomly generates triangles and fills
+	  them in the XOR buffer. It then checks if the resulting buffer
+	  has values in the last column. If all goes well this should never
+	  happen unless the polygon drawer has leaks. After 10000000 random
+	  triangles it failed to find a single leak.
+	  So csXORBuffer::DrawPolygon() now correctly implements polygon
+	  drawing in both directions (clockwise/anti-clockwise) and clipping.
+	  There is still much room for optimization. I will first get things
+	  working.
 17-Apr-2002
 	- Started working on new XOR buffer which *might* (if all goes
 	  well) replace the c-buffer. Nothing functional yet though.
