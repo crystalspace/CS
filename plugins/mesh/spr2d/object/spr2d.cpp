@@ -413,7 +413,7 @@ void csSprite2DMeshObject::NextFrame (csTicks current_time, const csVector3& /*p
   {
     int old_frame_index = uvani->frameindex;
     uvani->Advance (current_time);
-    texels_dirty ||= (old_frame_index != uvani->frameindex);
+    texels_dirty |= (old_frame_index != uvani->frameindex);
   }
 }
 
