@@ -1229,7 +1229,7 @@ public:
       return false;
     }
     virtual bool DrawShadow (iRenderView* rview, iMovable* movable,
-    	csZBufMode zMode)
+    	csZBufMode zMode, iLight *light)
     {
       return false;
     }
