@@ -199,6 +199,9 @@ inline int csBasicVector::PushSmart (csSome what)
 
 inline csSome csBasicVector::Pop ()
 {
+  if (!root)
+    return NULL;
+
   csSome ret = root [count - 1];
   SetLength (count - 1);
   return (ret);
