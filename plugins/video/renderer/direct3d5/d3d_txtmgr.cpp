@@ -74,11 +74,17 @@ void csTextureMMDirect3D::remap_texture (csTextureManager* new_palette)
   if (!ifile) return;
 
   if (for_2d ())
-    if (((csTextureManagerDirect3D*)new_palette)->get_display_depth () == 16) remap_texture_16 (new_palette);
-    else remap_texture_32 (new_palette);
+  {
+    if (((csTextureManagerDirect3D*)new_palette)->get_display_depth () == 16) 
+      remap_texture_16 (new_palette);
+    else 
+      remap_texture_32 (new_palette);
+  }
 
   if (for_3d ())
+  {
     remap_palette_24bit (new_palette);
+  }
 }
 
 void csTextureMMDirect3D::remap_palette_24bit (csTextureManager*)
@@ -92,7 +98,45 @@ void csTextureMMDirect3D::remap_palette_24bit (csTextureManager*)
   RGBPixel* src;
   ifile->GetImageData (&src);
   ULong* dest = t1->get_bitmap32 ();
+  int x, y;
 
+  // Map the texture to the RGB palette.
+
+  //Approximation for black, because we can't use real black. Value 0 is 
+  //reserved for transparent pixels!
+  ULong  black = 1; 
+
+  if (get_transparent ())
+  {
+    //transparent Textures need special processing. Every texel, that is transp_color
+    //will be transformed to 0, because that is the color we use internally to mark
+    //transparent texels.
+    for (y = 0 ; y < h ; y++)
+      for (x = 0 ; x < w ; x++)
+      {
+        if (transp_color == *src)
+        {
+          *dest++ = 0;
+        }
+        else
+        {
+          ULong texel = (src->red<<16) | (src->green<<8) | src->blue;;
+          *dest++ = texel ? texel : black; //transform 0 to become "black"
+        }
+        src++;
+      }
+  }
+  else
+  {
+    for (y = 0 ; y < h ; y++)
+      for (x = 0 ; x < w ; x++)
+      {
+        *dest++ = (src->red<<16) | (src->green<<8) | src->blue;
+        src++;
+      }
+  }
+
+/*
   // Map the texture to the RGB palette.
   int x, y;
   for (y = 0 ; y < h ; y++)
@@ -101,46 +145,97 @@ void csTextureMMDirect3D::remap_palette_24bit (csTextureManager*)
       *dest++ = (src->red<<16) | (src->green<<8) | src->blue;
       src++;
     }
+*/
 }
 
 void csTextureMMDirect3D::remap_texture_16 (csTextureManager* new_palette)
 {
-  int w, h, r, g, b;
+  int w, h;
   ifile->GetWidth (w);
   ifile->GetHeight (h);
   RGBPixel* src;
   ifile->GetImageData (&src);
   UShort* dest = t2d->get_bitmap16 ();
   int x, y;
-  for (y = 0 ; y < h ; y++)
-    for (x = 0 ; x < w ; x++)
-    {
-      r = src->red;
-      g = src->green;
-      b = src->blue;
-      *dest++ = new_palette->find_color (r, g, b);
-      src++;
-    }
+
+  //Approximation for black, because we can't use real black. Value 0 is 
+  //reserved for transparent pixels!
+  UShort black = 1; 
+
+  if (get_transparent ())
+  {
+    //transparent Textures need special processing. Every texel, that is transp_color
+    //will be transformed to 0, because that is the color we use internally to mark
+    //transparent texels.
+    for (y = 0 ; y < h ; y++)
+      for (x = 0 ; x < w ; x++)
+      {
+        if (transp_color == *src)
+        {
+          *dest++ = 0;
+        }
+        else
+        {
+          UShort texel = new_palette->find_color (src->red, src->green, src->blue);
+          *dest++ = texel ? texel : black; //transform 0 to become "black"
+        }
+        src++;
+      }
+  }
+  else
+  {
+    for (y = 0 ; y < h ; y++)
+      for (x = 0 ; x < w ; x++)
+      {
+        *dest++ = new_palette->find_color (src->red, src->green, src->blue);
+        src++;
+      }
+  }
 }
 
 void csTextureMMDirect3D::remap_texture_32 (csTextureManager* new_palette)
 {
-  int w, h, r, g, b;
+  int w, h;
   ifile->GetWidth (w);
   ifile->GetHeight (h);
   RGBPixel* src;
   ifile->GetImageData (&src);
   ULong* dest = t2d->get_bitmap32 ();
   int x, y;
-  for (y = 0 ; y < h ; y++)
-    for (x = 0 ; x < w ; x++)
-    {
-      r = src->red;
-      g = src->green;
-      b = src->blue;
-      *dest++ = new_palette->find_color (r, g, b);
-      src++;
-    }
+  
+  //Approximation for black, because we can't use real black. Value 0 is 
+  //reserved for transparent pixels!
+  ULong  black = 1; 
+
+  if (get_transparent ())
+  {
+    //transparent Textures need special processing. Every texel, that is transp_color
+    //will be transformed to 0, because that is the color we use internally to mark
+    //transparent texels.
+    for (y = 0 ; y < h ; y++)
+      for (x = 0 ; x < w ; x++)
+      {
+        if (transp_color == *src)
+        {
+          *dest++ = 0;
+        }
+        else
+        {
+          ULong texel = new_palette->find_color (src->red, src->green, src->blue);
+          *dest++ = texel ? texel : black; //transform 0 to become "black"
+        }
+        src++;
+      }
+  }
+  else
+  {
+    for (y = 0 ; y < h ; y++)
+      for (x = 0 ; x < w ; x++)
+      {
+        *dest++ = new_palette->find_color (src->red, src->green, src->blue);
+        src++;
+      }
+  }
 }
 
 //---------------------------------------------------------------------------
