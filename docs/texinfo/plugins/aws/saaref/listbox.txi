@@ -11,8 +11,8 @@ Listboxes publish the following attributes.
 @table @code
 @item Style
 One of @samp{lbfsBump}, @samp{lbfsSimple}, @samp{lbfsSunken},
-@samp{lbfsRaised}, @samp{lbfsNone} or @samp{lbfsFlat}. Determines the style of frame for the
-component.
+@samp{lbfsRaised}, @samp{lbfsNone} or @samp{lbfsFlat}.  Determines the style of
+frame for the component.
 
 @item Alpha
 The alpha of the overlay texture.
@@ -21,7 +21,8 @@ The alpha of the overlay texture.
 The alpha of the selection bar texture.
 
 @item Columns
-The number of columns in the list control. For every column the following properties are present (@emph{X} denotes the current cloumn number):
+The number of columns in the list control.  For every column the following
+properties are present (@emph{X} denotes the current cloumn number):
 @itemize
 @item ColumnXImg
 An image for the column header
@@ -64,13 +65,16 @@ Used to connect to items on the same tree level.
 @item TreeHorzLine
 Used to connect to and item with its parent.
 @item TreeChkUnmarked
-Stateful entries can be marked/unmarked. This is used to draw the unmarked case.
+Stateful entries can be marked/unmarked.  This is used to draw the unmarked
+case.
 @item TreeChkMarked
-Stateful entries can be marked/unmarked. This is used to draw the marked case.
+Stateful entries can be marked/unmarked.  This is used to draw the marked case.
 @item TreeGrpUnmarked
-Grouped entries are either marked or unmarked. This is used to draw the unmarked case.
+Grouped entries are either marked or unmarked.  This is used to draw the
+unmarked case.
 @item TreeGrpMarked
-Grouped entries are either marked or unmarked. This is used to draw the marked case.
+Grouped entries are either marked or unmarked.  This is used to draw the marked
+case.
 @end table
 
 @subsubheading Signals
@@ -196,7 +200,8 @@ This sections describes the input parameters understood by the list box's
 
 @item @code{text}
 @tab @code{iString*}
-@tab This string is looked up is the listbox' sorting column. If it is found the corresponding row is deleted.
+@tab This string is looked up is the listbox' sorting column.  If it is found
+the corresponding row is deleted.
 
 @item @code{id}
 @tab @code{iString*}
@@ -227,8 +232,8 @@ Returns the text, state and param values of the selected item if there is one.
 
 @subsubheading Input Parameters
 
-This sections describes the input parameters understood by the list box's
-@samp{GetSelectedItem} action.
+This sections describes the input parameters understood by the
+@samp{GetSelectedItem} action of the list box.
 
 @multitable @columnfractions .15 .2 .55
 @item @emph{Name}

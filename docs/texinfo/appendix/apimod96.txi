@@ -17,11 +17,18 @@ to @file{include/igeom}.
 @cindex @code{iVisibilityObject}
 @cindex @code{iObjectModel}
 
-The functions @code{iMeshObject::GetShapeNumber()},
-@code{iMeshObject::GetObjectBoundingBox()} and @code{iMeshObject::GetRadius()}
-have been removed. Instead there is now a new routine called
-@code{iMeshObject::GetObjectModel()} which will return an instance of
-@code{iObjectModel}. The functions can be called from that instance.
+The following functions have been removed.  Instead there is now a new routine
+called @code{iMeshObject::GetObjectModel()} which will return an instance of
+@code{iObjectModel}.  The functions can be called from that instance.
+
+@itemize
+@item
+@code{iMeshObject::GetShapeNumber()}
+@item
+@code{iMeshObject::GetObjectBoundingBox()}
+@item
+@code{iMeshObject::GetRadius()}
+@end itemize
 
 A similar change has happened in the @code{iVisibilityObject} interface.
 
@@ -32,4 +39,3 @@ A similar change has happened in the @code{iVisibilityObject} interface.
 Functions like @code{csGetObject()} and @code{csGetCommand()} which
 were used to implement parsing functionalities in CS have now been put
 into the @code{csParser} class.
-

@@ -10,7 +10,8 @@ Scrollbars send the following signals.
 
 @table @code
 @item signalScrollBarChanged
-Generated when value of the scroll bar has changed (read the scrollbars knob has moved).
+Generated when value of the scroll bar has changed (read the scrollbars knob
+has moved).
 @end table
 
 @subsubheading Attributes
@@ -22,7 +23,8 @@ Scrollbars publish the following attributes.
 The alpha of the applied textures.
 
 @item Orientation
-This makes the scrollbar either a horizontal scrollbar or a vertical scrollbar. Accepted values are @samp{sboVertical} and @samp{sboHorizontal}.
+This makes the scrollbar either a horizontal scrollbar or a vertical scrollbar.
+Accepted values are @samp{sboVertical} and @samp{sboHorizontal}.
 
 @item Max
 Maximum value the scrollbar's value can take.
@@ -31,7 +33,8 @@ Maximum value the scrollbar's value can take.
 Initial value of scrollbar.
 
 @item PageSize
-The amount the scrollbars value is decreased/increased by a big step backward/forward (read the user clicked on the area the scrollbars knob is in).
+The amount the scrollbars value is decreased/increased by a big step
+backward/forward (read the user clicked on the area the scrollbars knob is in).
 
 @end table
 
@@ -47,16 +50,20 @@ Texture used to draw the components background
 Alpha value used when drawing background texture.
 
 @item ScrollBarDn
-The image used to draw the scrollbars increment handle if scrollbar is vertical.
+The image used to draw the scrollbars increment handle if scrollbar is
+vertical.
 
 @item ScrollBarUp
-The image used to draw the scrollbars decrement handle if scrollbar is vertical.
+The image used to draw the scrollbars decrement handle if scrollbar is
+vertical.
 
 @item ScrollBarRt
-The image used to draw the scrollbars increment handle if scrollbar is horizontal.
+The image used to draw the scrollbars increment handle if scrollbar is
+horizontal.
 
 @item ScrollBarLt
-The image used to draw the scrollbars decrement handle if scrollbar is horizontal.
+The image used to draw the scrollbars decrement handle if scrollbar is
+horizontal.
 
 @end table
 
@@ -75,6 +82,7 @@ The amount the scrollbars value is decremented/incremented. The default is 1.
 The maximum value the scrollbars value can take.
 
 @item PageSize
-The amount the scrollbars value is decreased/increased by a big step backward/forward (read the user clicked on the area the scrollbars knob is in).
+The amount the scrollbars value is decreased/increased by a big step
+backward/forward (read the user clicked on the area the scrollbars knob is in).
 
 @end table

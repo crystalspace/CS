@@ -251,7 +251,7 @@ commandline) but it seems some files are missing.
 forget the @samp{-d} and @samp{-P} commandline options. Otherwise you
 will not get new directories and old empty directories will be
 everywhere. Using @samp{WinCVS} it is also possible to set these
-options. @xref{WinCVS Tutorial}
+options.  @xref{WinCVS Tutorial}.
 
 @item
 Why isn't my object lit correctly (all black) and why doesn't lighting
@@ -262,7 +262,7 @@ static lightmaps as that is expensive. But for dynamic lighting and other
 mesh objects you can dynamically let the object be lit. But in order to
 actually make this work you need to call @code{DeferUpdateLighting()}
 on the object when it is first created, when lights in the vicinity move,
-or when the object itself moves. @xref{HOWTO Mesh LightAnim}
+or when the object itself moves.  @xref{HOWTO Mesh LightAnim}.
 
 @item
 Why isn't my polygon lit correctly? It is simply full bright.
@@ -330,7 +330,7 @@ instance instead. You can get this instance with @code{mesh->GetMeshObject()}.
 I don't understand when I have to use @code{DecRef()} and when not. Can
 you explain this reference counting to me?
 
-@strong{A}: Basically reference counting keeps track of how many times
+@strong{A}: Reference counting keeps track of how many times
 the object is referenced throughout the system. The owner of a reference
 is also responsible for cleaning up that reference later. You are not
 responsible for cleaning up references owned by other modules (like the
@@ -338,30 +338,48 @@ engine). In general you should do @code{DecRef()} in the following
 cases:
 @itemize @bullet
 @item
-On the pointer returned by @code{SCF_QUERY_INTERFACE},
-@code{SCF_QUERY_INTERFACE_FAST}, @code{SCF_QUERY_INTERFACE_SAFE},
-@code{CS_QUERY_REGISTRY}, @code{CS_QUERY_REGISTRY_TAG},
-@code{CS_QUERY_REGISTRY_TAG_INTERFACE}, @code{CS_LOAD_PLUGIN},
-@code{CS_QUERY_PLUGIN_ID}, and @code{CS_QUERY_PLUGIN_CLASS}.
+On the pointer returned by the following macros:
+@itemize @bullet
+@item
+@code{SCF_QUERY_INTERFACE()}
+@item
+@code{SCF_QUERY_INTERFACE_FAST()}
+@item
+@code{SCF_QUERY_INTERFACE_SAFE()}
+@item
+@code{CS_QUERY_REGISTRY()}
+@item
+@code{CS_QUERY_REGISTRY_TAG()}
+@item
+@code{CS_QUERY_REGISTRY_TAG_INTERFACE()}
+@item
+@code{CS_LOAD_PLUGIN()}
+@item
+@code{CS_QUERY_PLUGIN_ID()}
+@item
+@code{CS_QUERY_PLUGIN_CLASS()}
+@end itemize
 @item
 On a pointer on which you explicitely did @code{IncRef()}.
 @item
-On an object that you allocated yourselves (and that inherits
+On an object that you allocated yourselves (which inherits
 from @code{iBase} or another @sc{scf} interface).
 @end itemize
+
 You should do @code{DecRef()} when you no longer need the pointer.
 In some cases you can do it immediatelly after using the pointer like
 in this example:
 @example
-iThingState* st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
+iThingState* st =
+  SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
 if (st)
 @{
   st->blabla...;
   st->DecRef ();
 @}
 @end example
+
 In other cases you can store the pointer in a global class (your application
-class) and call @code{DecRef()} when the application exits.
+class) and call @code{DecRef()} just before the application exits.
 
 @end itemize
-

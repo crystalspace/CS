@@ -426,9 +426,9 @@ and runs on all platforms supported by Crystal Space.
 @cindex Compiling an Application, Tutorial
 
 In order to compile a Crystal Space application I recommend you look at the
-howto on compiling an external application. For @sc{MSVC} this tutorial
+howto on compiling an external application. For @sc{msvc} this tutorial
 can be found at @xref{HOWTO Creating External MSVC Application}, for
-other environments based on GNU make you can look at
+other environments based on @sc{gnu} make you can look at
 @xref{HOWTO CS Project}.
 
 Additionally note that the source for some of these tutorials can be

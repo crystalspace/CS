@@ -62,7 +62,7 @@ splines
 2D and 3D matrices (and transforms)
 
 @item
-@sc{scf} (the backbone of object-orientation in Crystal Space. @xref{SCF})
+Shared Class Facility @sc{scf}.  @xref{SCF}.
 
 @item
 plug-in system

@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+27-Jun-2002
+	- Eric Sunshine fixed a significant number of problems in the Texinfo
+	  source files.  Also eliminated all TeX overfull and underfull 'hbox'
+	  warnings.
 26-Jun-2002
 	- Fixed Dynavis so that the 'freeze' visibility feature works
 	  again.

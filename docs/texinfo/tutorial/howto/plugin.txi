@@ -192,17 +192,16 @@ Note that @samp{MyPlugin} needs a constructor that accepts an @samp{iBase*}
 parameter. Otherwise CS will not be able to load this plugin.
 
 To implement @samp{iComponent} we add an inner class called @samp{Component}.
-This class will inherit directly from @samp{iComponent} so that @samp{MyPlugin}
-also implements @samp{iComponent} indirectly. Because this is an
+This new class will inherit directly from @samp{iComponent} so that
+@samp{MyPlugin} also implements @samp{iComponent} indirectly.  Since this is an
 embedded interface we now need the @samp{SCF_DECLARE_EMBEDDED_IBASE} macro.
-This macro takes care of the fact that this interface actually belongs
-to the parent class (which is given as a parameter). One thing it does
-is declare a variable of type @samp{MyPlugin} which is called @samp{scfParent}.
-Through that variable the method implementations of the embedded
-interface can access the main class. After declaring the class
-@samp{Component} we immediatelly create an instance of this called
-@samp{scfiComponent}. You can call it whatever you like. This name is just
-a convention in Crystal Space.
+This macro takes care of the fact that this interface actually belongs to the
+parent class (which is given as a parameter).  One thing it does is declare a
+variable of type @samp{MyPlugin} which is called @samp{scfParent}.  Through
+that variable the method implementations of the embedded interface can access
+the main class.  After declaring the class @samp{Component} we immediatelly
+create an instance of this called @samp{scfiComponent}.  You can call it
+whatever you like.  This name is just a convention in Crystal Space.
 
 Sometimes embedded classes are also made friend of the main
 class so that they can access the private information. In this case
@@ -283,9 +282,9 @@ the class @samp{MyPlugin} implements. This section says that
 @samp{MyPlugin} implements @samp{iMyApi} directly and @samp{iComponent} through
 embedding.
 
-The second @samp{SCF_IMPLEMENT_EMBEDDED_IBASE} section describes what
-interfaces the class @samp{MyPlugin::Component} implements (i.e. the
-embedded class). @samp{MyPlugin::Component} only implements @samp{iComponent}.
+The second @samp{SCF_IMPLEMENT_EMBEDDED_IBASE} section lists the
+interfaces implemented by the class @samp{MyPlugin::Component} (the
+embedded class).  @samp{MyPlugin::Component} only implements @samp{iComponent}.
 
 It is important to correctly use the above macros. These macros
 will make sure that the implementation for @samp{IncRef()}, @samp{DecRef()},
@@ -294,7 +293,7 @@ general @sc{scf} macros. As such they have nothing to do with plugins. However,
 the following macros actually declare that @samp{MyPlugin} is a plugin.
 
 The @samp{SCF_IMPLEMENT_FACTORY} says that @samp{MyPlugin} represents an
-@sc{SCF} factory which is required to make it a plugin. It will basically
+@sc{scf} factory which is required to make it a plugin. It will basically
 define a function that creates an instance of the @samp{MyPlugin} class.
 Note that one dynamic module can in fact define several distinct
 plugins. In that case you need multiple @samp{SCF_IMPLEMENT_FACTORY}
@@ -374,9 +373,10 @@ To load the plugin there are a few possibilities. First you
 can load the plugin manually using @samp{CS_LOAD_PLUGIN} like this:
 
 @example
-iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-iMyApi* myapi = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mygame.myplugin",
-                                iMyApi);        
+iPluginManager* plugin_mgr = 
+  CS_QUERY_REGISTRY (object_reg, iPluginManager);
+iMyApi* myapi = CS_LOAD_PLUGIN (plugin_mgr,
+  "crystalspace.mygame.myplugin", iMyApi);        
 plugin_mgr->DecRef ();
 @end example
 

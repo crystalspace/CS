@@ -16,8 +16,8 @@ Map2CS.TextureSettings.wad3 = E:\Sierra\Half-Life\valve\liquids.wad
 Map2CS.TextureSettings.wad4 = E:\Sierra\Half-Life\valve\texpack.wad
 Map2CS.TextureSettings.zip1 = E:\Cryst\skybox.zip
 Map2CS.TextureSettings.zip2 = E:\Cryst\skybox2.zip
-Map2CS.TextureSettings.pk1 = D:\Games\Quake III Arena\baseq3\pak0.pk3
-Map2CS.TextureSettings.pk2 = D:\Games\Quake III Arena\baseq3\mapmedia.pk3
+Map2CS.TextureSettings.pk1 = D:\Quake III Arena\baseq3\pak0.pk3
+Map2CS.TextureSettings.pk2 = D:\Quake III Arena\baseq3\mapmedia.pk3
 
 Map2CS.General.Scaling = 0.025
 Map2CS.General.UseBSP = 1

@@ -5,12 +5,12 @@
 @cindex Hierarchy, Directory
 
 @noindent
-@emph{Written by Thomas Hieber, @email{thieber@@gmx.net}. Updated by Chris
-Forno, @email{jcore@@arbornet.org}, on 2002-06-21.}
+@emph{Written by Thomas Hieber, @email{thieber@@gmx.net}.  Last updated 21 June
+2002 by Chris Forno, @email{jcore@@arbornet.org}.}
 
 This section is intended to explain the general CS directory structure. It
-lists all the directories, however some may be missing from your copy of 
-Crystal Space if you just downloaded the files for a specific port like 
+lists all the directories, however some may be missing from your copy of
+Crystal Space if you just downloaded the files for a specific port like
 Linux or Win32.
 
 Crystal Space consists of the following directories:
@@ -24,7 +24,8 @@ Crystal Space consists of the following directories:
 The main directory for Crystal Space.  You can choose any path for it, as long
 as it is supported by your operating system.  This is the path that all
 compiled programs end up in.  This should be your working directory for these
-executables. The two files @file{vfs.cfg} and @file{scf.cfg} also reside in this directory.
+executables.  The two files @file{vfs.cfg} and @file{scf.cfg} also reside in
+this directory.
 
 @item CS/out
 This directory is used by the build process. It will contain all object,
@@ -50,8 +51,8 @@ must update the information in the configuration for the Virtual File System,
 (@file{vfs.cfg}).
 
 @item CS/data/config
-Most applications and plugins utilise a (@file{.cfg}) file. For convenience they
-are all grouped here. 
+Most applications and plugins utilise a (@file{.cfg}) file.  For convenience
+they are all grouped here.
 
 @item CS/docs
 The root of the Crystal Space documentation hierarchy.  There are several
@@ -95,7 +96,7 @@ hierarchy) contain definitions for @sc{scf} interfaces.
 @xref{SCF}.
 
 @item CS/libs
-Here is where all the modules provided by Crystal Space live. Some modules will 
+Here is where all the modules provided by Crystal Space live. Some modules will
 consist of only one subdirectory, others will be a combination of several
 subdirectories.
 
@@ -109,15 +110,15 @@ libraries (csutil, csgeom, csgfxldr).  The 3D engine exports a number of
 
 @table @code
 @item CS/libs/csengine/basic
-collections, movable sector list, polygon edges
+Collections, movable sector list, polygon edges
 @item CS/libs/csengine/culler
-visibility culling
+Visibility culling
 @item CS/libs/csengine/light
-lighting system
+Lighting system
 @item CS/libs/csengine/objects
-things and mesh objects
+Things and mesh objects
 @item CS/libs/csengine/polygon
-polygons and portals
+Polygons and portals
 @item CS/libs/csengine/polytree
 BSP trees and octrees
 @end table
@@ -147,13 +148,13 @@ BeOS
 @item CS/libs/cssys/djgpp
 @sc{dos} using the @sc{djgpp} compiler
 @item CS/libs/cssys/next
-MacOS/X, MacOS/X Server 1.0 (Rhapsody), NeXTSTEP, OPENSTEP
+MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep
 @item CS/libs/cssys/os2
 @sc{os/2}
 @item CS/libs/cssys/unix
 Linux, FreeBSD, NetBSD, Solaris, Irix, @sc{gnu/hurd}
 @item CS/libs/cssys/win32
-Windows 32-bit (9x, NT, ME, 2000, XP)
+Windows 32-bit (9x, @sc{nt}, @sc{me}, 2000, @sc{xp})
 @end table
 
 @item CS/libs/cstool
@@ -162,10 +163,10 @@ It includes procedural textures, a video perference manager, 2D animations,
 key-value pairs, screen effects, map nodes, and more.
 
 @item CS/libs/csutil
-This library contains various utilities. The utilities include an archiver,
-configuration manager, virtual clock, scheduler, strings, hash maps, all
-@sc{scf} (@xref{SCF}) functionality, md5 algorithm, map file parser,
-command-line parser, event structures, and many others.
+This library contains various utilities.  The utilities include an archiver,
+configuration manager, virtual clock, scheduler, strings, hash maps, @sc{scf}
+(@pxref{SCF}), @sc{md5} algorithm, map file parser, command-line parser, event
+structures, and many others.
 
 @item CS/libs/csws
 The Crystal Space Windowing System which is nicely integrated with Crystal
@@ -262,7 +263,7 @@ filesystem-related plugins
 
 @table @code
 @item CS/plugins/filesys/vfs
-the Virtual Filesystem Plugin, or @sc{vfs} (@xref{VFS})
+Virtual Filesystem, @sc{vfs}.  @xref{VFS}.
 @end table
 
 @item CS/plugins/font
@@ -281,7 +282,7 @@ font server multiplexer
 the old isometric world loader plug-in
 
 @item CS/plugins/mesh
-Various mesh object implementations (@xref{MeshObject}). For every mesh object
+Various mesh object implementations (@pxref{MeshObject}). For every mesh object
 there is typically one implementation in @file{object/} and one or more
 loader/saver plugins in @file{persist/}. @file{persist/classic/} is the loader
 in Crystal Space format.
@@ -373,28 +374,37 @@ limited and not very useful (this may change in the future).
 
 @table @code
 @item CS/plugins/video/canvas/allegro
-Allegro (@url{http://www.talula.demon.co.uk/allegro/}) Game Library
+Allegro Game driver
+
+@noindent
+@iftex
+@code{http://www.talula.demon.co.uk/}@*
+@code{allegro/}
+@end iftex
+@ifnottex
+@url{http://www.talula.demon.co.uk/allegro/}
+@end ifnottex
 
 @item CS/plugins/video/canvas/asciiart
-@sc{ascii} Art Library
+@sc{ascii} Art driver
 
 @item CS/plugins/video/canvas/be
-BeOS Driver
+BeOS driver
 
 @item CS/plugins/video/canvas/common
-common code for 2D drivers
+Common code for 2D drivers
 
 @item CS/plugins/video/canvas/csdive
-@sc{os/2} @sc{dive} Driver
+@sc{os/2} @sc{dive} driver
 
 @item CS/plugins/video/canvas/ddraw
-win32 DirectDraw Driver
+Windows DirectDraw driver
 
 @item CS/plugins/video/canvas/ddraw8
-win32 DirectDraw (version 8) Driver
+Windows DirectDraw (version 8) driver
 
 @item CS/plugins/video/canvas/directxcommon
-common DirectX (win32) code
+Common DirectX (Win32) code
 
 @item CS/plugins/video/canvas/dosraw
 @sc{dos} graphics (@sc{bios}-level)
@@ -403,19 +413,19 @@ common DirectX (win32) code
 X11 Line3D Driver
 
 @item CS/plugins/video/canvas/macosx
-MacOS/X Driver (CoreGraphics and OpenGL)
+MacOS/X CoreGraphics and OpenGL
 
 @item CS/plugins/video/canvas/memory
-Memory Driver (render a scene directly to memory)
+Memory driver (render a scene directly to memory)
 
 @item CS/plugins/video/canvas/next
-NeXTSTEP and @sc{openstep} Drivers
+MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep drivers
 
 @item CS/plugins/video/canvas/null2d
-@sc{null} 2D Driver
+@sc{null} 2D driver
 
 @item CS/plugins/video/canvas/openglcommon
-common code for all OpenGL 2D drivers
+Common code for all OpenGL 2D drivers
 
 @item CS/plugins/video/canvas/openglbe
 OpenGL 2D driver for BeOS
@@ -424,7 +434,7 @@ OpenGL 2D driver for BeOS
 OpenGL 2D driver for @sc{os/2}
 
 @item CS/plugins/video/canvas/openglwin
-OpenGL 2D driver for win32
+OpenGL 2D driver for Windows
 
 @item CS/plugins/video/canvas/openglx
 OpenGL 2D driver for X11
@@ -436,67 +446,63 @@ X11 software 2D driver
 SVGAlib
 
 @item CS/plugins/video/canvas/xextf86vm
-X-Extension Driver (X11)
+X-extension driver (X11)
 
 @item CS/plugins/video/canvas/xextshm
-@sc{MIT} X-Extension Shared Memory Driver (X11)
+@sc{mit} X-extension shared memory driver (X11)
 
 @item CS/plugins/video/canvas/xwindow
-X Window Driver
+X11 driver
 @end table
 
 @item CS/plugins/video/format
-code for playing video files on a surface
+Code for playing video files on a surface
 
 @table @code
 @item CS/plugins/video/format/avi
 Audio-Video Interlace format
 
 @item CS/plugins/video/format/codecs
-video codecs for various formats (currently only @sc{avi})
+Video codecs for various formats (currently only @sc{avi})
 
 @table @code
-@item CS/plugins/video/format/codecs/divx4
-DivX ;-) Version 4
+@item codecs/divx4
+DivX version 4
 
-@item CS/plugins/video/format/codecs/opendivx
+@item codecs/opendivx
 OpenDivX
 
-@item CS/plugins/video/format/codecs/rle
+@item codecs/rle
 Run-Length Encoded
 @end table
-
 @end table
 
 @item CS/plugins/video/loader
-loaders for various graphics file formats
+Loaders for various graphics file formats
 
 @item CS/plugins/video/renderer
 The 3D rasterizer component is required by the 3D engine but may also be
-used in a standalone environment.  It requires a 2D Driver to function.  
+used in a standalone environment.  It requires a 2D Driver to function.
 
 @table @code
 @item CS/plugins/video/renderer/common
-common code for 3D rasterizers
+Common code for 3D rasterizers
 
 @item CS/plugins/video/renderer/inf
-infinite 3D renderer
+Infinite 3D renderer
 
 @item CS/plugins/video/renderer/line
-line 3D renderer
+Line 3D renderer
 
 @item CS/plugins/video/renderer/null
 @sc{null} renderer (required to work with 2D graphics only)
 
 @item CS/plugins/video/renderer/opengl
-OpenGL Renderer
+OpenGL renderer
 
 @item CS/plugins/video/renderer/software
-software (non-accelerated) renderer
+Software (non-accelerated) renderer
 @end table
-
 @end table
-
 @end table
-
 @end table

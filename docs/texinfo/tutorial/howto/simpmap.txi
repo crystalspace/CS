@@ -52,7 +52,7 @@ is the @samp{WORLD} keyword which represents the entire world. Inside
 the world the two first sections describe the textures and materials.
 A texture is basically a direct representation of an image on disk. In
 this case we define a texture called @samp{andrew_wood} which corresponds
-to the texture file @file{/lib/stdtex/andrew_wood.jpg). Keep in mind that
+to the texture file @file{/lib/stdtex/andrew_wood.jpg}. Keep in mind that
 the filename is a @sc{vfs} file! @xref{VFS}. A texture is not directly
 usable on geometrical objects. Before we can use it we need to make a
 material as well. The reason for this is that with materials we can
@@ -115,4 +115,3 @@ of all polygons.
 
 Much more is possible in map files. This howto only shows the very basic
 stuff.
-
