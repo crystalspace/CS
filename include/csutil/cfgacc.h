@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CFGMGR_H__
-#define __CFGMGR_H__
+#ifndef __CFGACC_H__
+#define __CFGACC_H__
 
 #include "csutil/csvector.h"
 #include "isystem.h"
