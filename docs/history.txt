@@ -18,8 +18,10 @@ Short-term cleanups that need to be done:
 	  removed.
 	- Jorrit added SetPerspectiveCenter() to IGraphics3D to make
 	  changable view centers work correctly. This is needed to use
-	  the extensions added by Seth. I implemented this function with
-	  all 3D renderers. But I only tested software and OpenGL.
+	  the extensions added by Seth. Jorrit implemented this function with
+	  all 3D renderers but only tested software and OpenGL.
+	- Fixed DOS port so that colors are back. Problem was caused
+	  by change from Long to ULong in pfmt.
 20-Sep-1999
 	- Eric Sunshine fixed an accidental sign-extension problem in
 	  csPixelFormat.
