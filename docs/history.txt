@@ -14,6 +14,7 @@ chronological order.
 	  is currently untested.
 	- Jorrit added a constructor for csColor to csColor4 and also
 	  a Set(csColor) method.
+	- Jorrit updated the howto on how to create a pixmap.
 31-Aug-2004
 	- Jorrit did a huge optimization and cleanup on dynamic lights (old
 	  style dynamic lights which do NOT use stencil hardware). Pressing

@@ -47,8 +47,7 @@ loader to re-interpret the raw data as an actual @samp{iImage} resource.
 csRef<iDataBuffer> buf = VFS->ReadFile ("/lib/mydata/test.jpg");
 csRef<iImage> ifile = imgldr->Load (buf->GetUint8 (),
   buf->GetSize (), txtmgr->GetTextureFormat ());
-iTextureHandle* txt = txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D);
-txt->Prepare ();
+csRef<iTextureHandle> txt = txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D);
 @end example
 
 This code first uses @sc{vfs} to load the image from the given @sc{vfs}
