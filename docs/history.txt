@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Nov-2004
+	- Eric Sunshine enhanced CS_CHECK_LIB_WITH() in checklib.m4 so that it
+	  knows about MacOS/X frameworks, and automatically tests for the
+	  presence of a framework for the given library or one of its aliases,
+	  in addition to performing the normal link library testing.
+	- Eric Sunshine upgraded the Cg check in configure.ac for MacOS/X
+	  compatibility.
+	- Eric Sunshine fixed the SDL check in configure.ac so that it succeeds
+	  on MacOS/X. It now #undefines `main' after #including <SDL/SDL.h>,
+	  since SDL's `main' #define breaks the test.
 15-Nov-2004
 	- Eric Sunshine fixed _CS_CHECK_LIB_PKG_CONFIG_FLAGS() in checklib.m4
 	  so that it no longer checks for `pkg-config' only the very first time

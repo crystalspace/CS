@@ -1501,17 +1501,23 @@ AS_IF([test $cs_cv_libcal3d = yes],
 	[$cs_cv_libcal3d_lflags],
 	[$cs_cv_libcal3d_libs])])
 
-    
+
 
 #------------------------------------------------------------------------------
 # Check for SDL.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([sdl],
-    [AC_LANG_PROGRAM([#include <SDL.h>], [SDL_Init(0); SDL_Quit();])])
+    [AC_LANG_PROGRAM(
+	[[#include <SDL.h>
+	#undef main]],
+	[SDL_Init(0); SDL_Quit();])])
 
 AS_IF([test $cs_cv_libsdl = yes],
     [CS_CHECK_BUILD([if SDL is sufficiently recent], [cs_cv_sdl_recent],
-	[AC_LANG_PROGRAM([[#include <SDL.h>]], [SDL_EnableKeyRepeat(0,0)])],
+	[AC_LANG_PROGRAM(
+	    [[#include <SDL.h>
+	    #undef main]],
+	    [SDL_EnableKeyRepeat(0,0)])],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])], [], [],
 	[$cs_cv_libsdl_cflags], [$cs_cv_libsdl_lflags], [$cs_cv_libsdl_libs])])
 
@@ -1683,7 +1689,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
 	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
 	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs],
-	    [cggl, cgGL, CGGL])])])
+	    [cggl, cgGL, CGGL, Cg, cg, CG])])])
 
 CS_CHECK_LIBCG
 

@@ -45,33 +45,34 @@ m4_define([cs_lib_paths_default], [])
 #	library location via --with-libLIBRARY=dir; and consults `pkg-config'
 #	(if present) and `LIBRARY-config' (if present, i.e. `sdl-config') in
 #	order to obtain compiler and linker flags.  LIBRARY is the name of the
-#	library which is to be located (for example, "readline" for
-#	libreadline.a).  PROGRAM, which is typically composed with
-#	AC_LANG_PROGRAM(), is a program which references at least one function
-#	or symbol in LIBRARY.  SEARCH-LIST is a whitespace-delimited list of
-#	paths in which to search for the library and its header files, in
-#	addition to those searched by the compiler and linker by default, and
-#	those referenced by the cs_lib_paths_default macro.  Each list item can
-#	specify an include|library directory tuple (for example,
-#	"/usr/include|/usr/lib"), or a single directory (for example, "/usr").
-#	If the second form is used, then "include" and "lib" subdirectories of
-#	the directory are searched.  If the library resources are not found,
-#	then the directory itself is searched.  Thus, "/proj" is shorthand for
-#	"/proj/include|/proj/lib /proj|/proj".  Items in the search list can
-#	include wildcards.  SEARCH-LIST can be overriden by the user with the
-#	--with-libLIBRARY=dir option, in which case only "dir/include|dir/lib"
-#	and "dir|dir" are searched.  If SEARCH-LIST is omitted and the user did
-#	not override the search list via --with-libLIBRARY=dir, then only the
-#	directories normally searched by the compiler and the directories
-#	mentioned via cs_lib_paths_default are searched.  LANGUAGE is typically
-#	either C or C++ and specifies which compiler to use for the test.  If
-#	LANGUAGE is omitted, C is used.  OTHER-CFLAGS, OTHER-LFLAGS, and
-#	OTHER-LIBS can specify additional compiler flags, linker flags, and
-#	libraries needed to successfully link with LIBRARY.  The optional
-#	ALIASES is a comma-delimited list of library names for which to search
-#	in case LIBRARY is not located (for example "[sdl1.2, sdl12]" for
-#	libsdl1.2.a and libsdl12.a).  If the library or one of its aliases is
-#	found and can be successfully linked into a program, then the shell
+#	library or MacOS/X framework which is to be located (for example,
+#	"readline" for `libreadline.a' or `readline.framework').  PROGRAM,
+#	which is typically composed with AC_LANG_PROGRAM(), is a program which
+#	references at least one function or symbol in LIBRARY.  SEARCH-LIST is
+#	a whitespace-delimited list of paths in which to search for the library
+#	and its header files, in addition to those searched by the compiler and
+#	linker by default, and those referenced by the cs_lib_paths_default
+#	macro.  Each list item can specify an `include|library' directory tuple
+#	(for example, "/usr/include|/usr/lib"), or a single directory (for
+#	example, "/usr").  If the second form is used, then "include" and "lib"
+#	subdirectories of the directory are searched.  If the library resources
+#	are not found, then the directory itself is searched.  Thus, "/proj" is
+#	shorthand for "/proj/include|/proj/lib /proj|/proj".  Items in the
+#	search list can include wildcards.  SEARCH-LIST can be overriden by the
+#	user with the --with-libLIBRARY=dir option, in which case only
+#	"dir/include|dir/lib" and "dir|dir" are searched.  If SEARCH-LIST is
+#	omitted and the user did not override the search list via
+#	--with-libLIBRARY=dir, then only the directories normally searched by
+#	the compiler and the directories mentioned via cs_lib_paths_default are
+#	searched.  LANGUAGE is typically either C or C++ and specifies which
+#	compiler to use for the test.  If LANGUAGE is omitted, C is used.
+#	OTHER-CFLAGS, OTHER-LFLAGS, and OTHER-LIBS can specify additional
+#	compiler flags, linker flags, and libraries needed to successfully link
+#	with LIBRARY.  The optional ALIASES is a comma-delimited list of
+#	library names for which to search in case LIBRARY is not located (for
+#	example "[sdl1.2, sdl12]" for libsdl1.2.a, sdl1.2.framework,
+#	libsdl12.a, and sdl12.framework).  If the library or one of its aliases
+#	is found and can be successfully linked into a program, then the shell
 #	cache variable cs_cv_libLIBRARY is set to "yes";
 #	cs_cv_libLIBRARY_cflags, cs_cv_libLIBRARY_lflags, and
 #	cs_cv_libLIBRARY_libs are set, respectively, to the compiler flags
@@ -245,14 +246,26 @@ AC_DEFUN([_CS_CHECK_LIB_CREATE_FLAGS],
 
 #------------------------------------------------------------------------------
 # _CS_CHECK_LIB_CREATE_FLAG(VARIABLE, HEADER-DIR, LIBRARY-DIR, LIBRARY)
-#	Helper macro for _CS_CHECK_LIB_CREATE_FLAGS().  Constructs a single
-#	build tuple suitable for CS_CHECK_BUILD() and appends the tuple to the
-#	shell variable VARIABLE.  LIBRARY has the same meanings as the
-#	like-named arguments of CS_CHECK_LIB_WITH().
+#	Helper macro for _CS_CHECK_LIB_CREATE_FLAGS().  Constructs build tuples
+#	suitable for CS_CHECK_BUILD() for given header and library directories,
+#	and appends the tuples to the shell variable VARIABLE. Synthesizes
+#	tuples which check for LIBRARY as a MacOS/X framework, and a standard
+#	link library.
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_CHECK_LIB_CREATE_FLAG],
    [AS_IF([test -n "$2"], [cs_check_lib_cflag="-I$2"], [cs_check_lib_cflag=''])
     AS_IF([test -n "$3"], [cs_check_lib_lflag="-L$3"], [cs_check_lib_lflag=''])
-    AS_IF([test -n "$4"], [cs_check_lib_libs="-l$4" ], [cs_check_lib_libs='' ])
-    $1="$$1 CS_CREATE_TUPLE(
-	[$cs_check_lib_cflag], [$cs_check_lib_lflag], [$cs_check_lib_libs])"])
+    AS_IF([test -n "$4"],
+	[cs_check_lib_libs="-l$4"
+	cs_check_lib_framework="-framework $4"],
+	[cs_check_lib_libs=''
+	cs_check_lib_framework=''])
+    $1="$$1
+	CS_CREATE_TUPLE(
+	    [$cs_check_lib_cflag],
+	    [$cs_check_lib_lflag],
+	    [$cs_check_lib_framework])
+	CS_CREATE_TUPLE(
+	    [$cs_check_lib_cflag],
+	    [$cs_check_lib_lflag],
+	    [$cs_check_lib_libs])"])
