@@ -187,6 +187,12 @@ public:
   /// Draw a Line.
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
   
+  /// Start DrawPolygonQuick drawing.
+  STDMETHODIMP StartPolygonQuick (ITextureHandle* handle, bool gouroud) { return S_OK; }
+
+  /// Finish DrawPolygonQuick drawing.
+  STDMETHODIMP FinishPolygonQuick () { return S_OK; }
+
   /// Draw a projected (non-perspective correct) polygon.
   STDMETHODIMP DrawPolygonQuick (G3DPolygon& poly, bool gouroud);
   
