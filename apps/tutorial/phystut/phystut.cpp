@@ -365,18 +365,23 @@ bool Simple::Initialize (int argc, const char* const argv[])
   iStatLight* light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (NULL, csVector3 (-3, 0, 0), 10,
+  light = engine->CreateLight (NULL, csVector3 (-3, 0, 0), 8,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
   light->DecRef ();
 
-  light = engine->CreateLight (NULL, csVector3 (3, 0,  0), 10,
+  light = engine->CreateLight (NULL, csVector3 (3, 0,  0), 8,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
   light->DecRef ();
 
-  light = engine->CreateLight (NULL, csVector3 (0, 0, 3), 10,
+  light = engine->CreateLight (NULL, csVector3 (0, 0, 3), 8,
   	csColor (0, 1, 0), false);
+  ll->Add (light->QueryLight ());
+  light->DecRef ();
+
+  light = engine->CreateLight (NULL, csVector3 (0, -3, 0), 8,
+  	csColor (1, 1, 0), false);
   ll->Add (light->QueryLight ());
   light->DecRef ();
 

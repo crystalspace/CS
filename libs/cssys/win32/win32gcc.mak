@@ -12,11 +12,11 @@ PLUGINS+= video/canvas/ddraw
 #PLUGINS+= video/canvas/ddraw8
 PLUGINS+= sound/loader/mp3
 PLUGINS+=net/driver/ensocket
-#PLUGINS.DYNAMIC += mesh/impexp/3ds
-#PLUGINS.DYNAMIC += font/server/freefnt2
-#PLUGINS+=video/format/avi
-#PLUGINS+=video/format/codecs/opendivx
-#PLUGINS+=physics/odedynam
+PLUGINS.DYNAMIC += mesh/impexp/3ds
+PLUGINS.DYNAMIC += font/server/freefnt2
+PLUGINS+=video/format/avi
+PLUGINS+=video/format/codecs/opendivx
+PLUGINS+=physics/odedynam
 
 # if u have the following line uncommented make sure one
 # LIBS.OPENGL.SYSTEM is set below or you have a custom

@@ -381,6 +381,11 @@ void csTiledCoverageBuffer::Initialize ()
 void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 	int yfurther)
 {
+int orig_x1 = x1;
+int orig_y1 = y1;
+int orig_x2 = x2;
+int orig_y2 = y2;
+
   y2 += yfurther;
 
   if (y2 < 0 || y1 >= height)
@@ -584,10 +589,13 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     dy--;
   }
 
+  if (dy <= 0) return;
+
   int last_x = x;
   int last_y = y;
-  int cur_tile_x = tile_x1;
-  int cur_tile_y = tile_y1;
+  int cur_tile_x = x >> (16+5);
+  int cur_tile_y = y >> 6;
+  bool need_to_finish;
 
   //------
   // Then we check if there is an initial line segment where x is
@@ -596,6 +604,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   //------
   if (x <= 0)
   {
+    need_to_finish = false;
     while (dy > 0 && x <= 0)
     {
       int tile_y = y >> 6;
@@ -604,8 +613,13 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
         csCoverageTile* tile = GetTile (0, cur_tile_y);
         tile->PushVLine (0, last_y & 63, (y-1) & 63);
         if (!tile->IsFull ()) MarkTileDirty (0, cur_tile_y);
+	need_to_finish = false;
         cur_tile_y = tile_y;
         last_y = y;
+      }
+      else
+      {
+        need_to_finish = true;
       }
 
       x += dx;
@@ -613,14 +627,24 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       dy--;
     }
 
-    int tile_y = (y-1) >> 6;
-    if (cur_tile_y != tile_y)
+    if (need_to_finish)
     {
+      //int tile_y = (y-1) >> 6;
       csCoverageTile* tile = GetTile (0, cur_tile_y);
       tile->PushVLine (0, last_y & 63, (y-1) & 63);
       if (!tile->IsFull ()) MarkTileDirty (0, cur_tile_y);
     }
   }
+
+  if (dy <= 0) return;
+
+  //------
+  // At this point we know that:
+  //    x,y is the first point of the line that actually is on screen.
+  //    x is shifted 16 pixels to the left.
+  //    dy contains the number of lines left to process.
+  //    dx is the slope of the line.
+  //------
 
   last_x = x;
   last_y = y;
@@ -630,6 +654,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   //------
   // Here is the remainder of the line until we go out screen again.
   //------
+  need_to_finish = false;
   while (dy > 0 && x > 0 && x < (width<<16))
   {
     int tile_x = x >> (16+5);
@@ -640,10 +665,15 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
       	(y-1) & 63, dx);
       if (!tile->IsFull ()) MarkTileDirty (cur_tile_x, cur_tile_y);
+      need_to_finish = false;
       cur_tile_x = tile_x;
       cur_tile_y = tile_y;
       last_x = x;
       last_y = y;
+    }
+    else
+    {
+      need_to_finish = true;
     }
 
     x += dx;
@@ -651,15 +681,17 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     dy--;
   }
 
-  int tile_x = (x-dx) >> (16+5);
-  int tile_y = (y-1) >> 6;
-  if (cur_tile_x != tile_x || cur_tile_y != tile_y)
+  if (need_to_finish)
   {
+    //int tile_x = (x-dx) >> (16+5);
+    //int tile_y = (y-1) >> 6;
     csCoverageTile* tile = GetTile (cur_tile_x, cur_tile_y);
     tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
     	(y-1) & 63, dx);
     if (!tile->IsFull ()) MarkTileDirty (cur_tile_x, cur_tile_y);
   }
+
+  if (dy <= 0) return;
 
   //------
   // Now we need to check if there is a remaining part of the line
@@ -671,6 +703,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     last_y = y;
     cur_tile_y = y >> 6;
 
+    need_to_finish = false;
     while (dy > 0 && x <= 0)
     {
       int tile_y = y >> 6;
@@ -679,8 +712,13 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
         csCoverageTile* tile = GetTile (0, cur_tile_y);
         tile->PushVLine (0, last_y & 63, (y-1) & 63);
         if (!tile->IsFull ()) MarkTileDirty (0, cur_tile_y);
+	need_to_finish = false;
         cur_tile_y = tile_y;
         last_y = y;
+      }
+      else
+      {
+        need_to_finish = true;
       }
 
       x += dx;
@@ -689,9 +727,9 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     }
     CS_ASSERT (x <= 0);
 
-    int tile_y = (y-1) >> 6;
-    if (cur_tile_y != tile_y)
+    if (need_to_finish)
     {
+      //int tile_y = (y-1) >> 6;
       csCoverageTile* tile = GetTile (0, cur_tile_y);
       tile->PushVLine (0, last_y & 63, (y-1) & 63);
       if (!tile->IsFull ()) MarkTileDirty (0, cur_tile_y);
@@ -1100,8 +1138,8 @@ bool csTiledCoverageBuffer::Debug_ExtensiveTest (int num_iterations,
       if (*row) return false;
     }
   }
-  return true;
 #endif
+  return true;
 }
 
 #define COV_ASSERT(test,msg) \

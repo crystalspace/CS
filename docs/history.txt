@@ -1,5 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+13-Jun-2002
+	- Fixed ode plugin so that it now calls DeferUpdateLighting()
+	  when the object moves so that lighting is calculated. This is
+	  not good though. ODE plugin should not move objects on its
+	  own but instead call a callback from the application saying
+	  to move the object. The application can then choose to
+	  decide how exactly to move the object. This includes lighting,
+	  moving through another system (i.e. pcmovable in CEL), or
+	  even sending movement information over a network.
+	- Changed lights in phystut a bit.
+	- Further fixes on Dynavis. Doesn't crash now but culls incorrectly.
 12-Jun-2002
 	- Enabled stencil again in opengl.cfg. For some reason it
 	  was disabled.

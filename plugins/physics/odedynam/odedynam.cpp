@@ -24,6 +24,7 @@
 #include "iutil/plugin.h"
 #include "ivaria/collider.h"
 #include "igeom/polymesh.h"
+#include "iengine/engine.h"
 
 #include "odedynam.h"
 
@@ -620,6 +621,7 @@ void csODERigidBody::Update ()
       mesh->GetMovable ()->SetPosition (trans.GetOrigin ());
       mesh->GetMovable ()->GetTransform ().SetT2O (trans.GetO2T ());
       mesh->GetMovable ()->UpdateMove ();
+      mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
     }
     if (bone)
       bone->SetTransformation (trans);
