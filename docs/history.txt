@@ -20,6 +20,8 @@ The history order is reversed so that new features are at the top.
 	- res made the following changes to map2cs:
 	  * Fixed: output of things w/o polys 
 	  * Hopefully fixed texture alignment/rotation this time.
+	- res fixed the GL renderer so polys w/ keycolor textures are lit
+	  properly again
 6-Mar-2003
 	- Reworked the notion of curve templates. The iCurveTemplate has
 	  been removed and it's functionality has moved to iCurve itself.

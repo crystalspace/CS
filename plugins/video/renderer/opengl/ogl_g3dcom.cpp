@@ -2443,6 +2443,10 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     return;
   }
 
+  // If we don't do this then objects can disappear later.
+  // Also needed so additional passes & LMs show up properly
+  statecache->Disable_GL_ALPHA_TEST ();
+
   //=================
   // Pass 2: Here we add all extra texture layers if there are some.
   //=================
@@ -2566,8 +2570,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
   }
 
-  // If we don't do this then objects can disappear later.
-  statecache->Disable_GL_ALPHA_TEST ();
 }
 
 static bool dp_flatlighting = false;
@@ -3850,6 +3852,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   trimesh.use_vertex_color = false;
   trimesh.mat_handle = NULL;
   SetupDTMEffect (trimesh);
+
   csTrianglesPerSuperLightmap *sln = polbuf->GetFirstTrianglesSLM ();
   if (m_renderstate.lighting && sln)
   {
