@@ -178,7 +178,7 @@ bool csIniFile::Load (const char* path)
   FILE* f = fopen (path, "rb");
   if (f)
   {
-    size_t size;
+    size_t size = 0;
     if (fseek (f, 0, SEEK_END) == 0 && (size = ftell(f)) != size_t(-1) &&
         fseek (f, 0, SEEK_SET) == 0)
     {
