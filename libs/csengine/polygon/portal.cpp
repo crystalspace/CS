@@ -157,20 +157,26 @@ void csPortalCS::CalculateLighting (csLightView& lview)
 
   if (do_warp_space)
   {
-    new_lview.beam2source /= warp_wor;
     new_lview.light_frustrum->Transform (&warp_wor);
 
     if (do_mirror) new_lview.mirror = !lview.mirror;
     new_lview.light_frustrum->SetMirrored (new_lview.mirror);
 
     // Transform all shadow frustrums. First make a copy.
+    // Note that we only copy the relevant shadow frustrums.
+    // We know that csPolygon3D::CalculateLighting() called
+    // csPolygon3D::MarkRelevantShadowFrustrums() some time before
+    // calling this function so the 'relevant' flags are still valid.
     new_lview.shadows.Clear ();	// Don't delete elements.
     csShadowFrustrum* sf, * copy_sf;
     sf = lview.shadows.GetFirst ();
     while (sf)
     {
-      CHK (copy_sf = new csShadowFrustrum (*sf));
-      new_lview.shadows.AddLast (copy_sf);
+      if (sf->relevant)
+      {
+        CHK (copy_sf = new csShadowFrustrum (*sf));
+        new_lview.shadows.AddLast (copy_sf);
+      }
       sf = sf->next;
     }
     new_lview.shadows.Transform (&warp_wor);

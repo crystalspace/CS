@@ -49,7 +49,7 @@ public:
 
   /**
    * This variable holds the plane of the portal through which the camera
-   * is looking.<p>
+   * is looking.
    */
   csPlane clip_plane;
 
@@ -88,8 +88,19 @@ public:
 class csShadowFrustrum : public csFrustrum
 {
 public:
+  /// Linked list.
   csShadowFrustrum* next, * prev;
+
+  /// Polygon which generated this shadow.
   csPolygon3D* polygon;
+
+  /**
+   * If true then this frustrum is relevant. This is
+   * a temporary variable which is used during the lighting
+   * calculation process. It may change value several times during
+   * the life time of a shadow frustrum.
+   */
+  bool relevant;
 
 public:
   /// Create empty frustrum.
@@ -110,23 +121,6 @@ public:
 
   /// Destroy the list but do not destroy the individual elements!
   virtual ~csFrustrumList () { }
-
-  void CheckList (char* msg)
-  {
-    if (first && !last) { printf ("###%s### first && !last\n", msg); return; }
-    if (!first && last) { printf ("###%s### !first && last\n", msg); return; }
-    if (!first) return;
-    csShadowFrustrum* f;
-    f = first;
-    while (f)
-    {
-      if (f->prev == NULL && f != first) { printf ("###%s### 'prev' pointer is NULL!\n", msg); return; }
-      if (f->next == NULL && f != last) { printf ("###%s### 'next' pointer is NULL!\n", msg); return; }
-      if (f->prev && f->prev->next != f) { printf ("###%s### prev->next points wrong!\n", msg); return; }
-      if (f->next && f->next->prev != f) { printf ("###%s### next->prev points wrong!\n", msg); return; }
-      f = f->next;
-    }
-  }
 
   /// Destroy all frustrums in the list.
   void DeleteFrustrums ()
@@ -275,16 +269,9 @@ public:
    */
   csFrustrumList shadows;
 
-  /**
-  @@@ Soon will be OBSOLETE!
-   * A tranform from the space of the light beam to the space of the light
-   * source.
-   */
-  csReversibleTransform beam2source;
-
 public:
   ///
-  csLightView () : light_frustrum (NULL), beam2source () { }
+  csLightView () : light_frustrum (NULL) { }
  
   ///
   ~csLightView ()
