@@ -4,6 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 8-Apr-2003
+	- Philip Wyett eliminated some more MSVC compiler warnings.
 	- Fixed two bugs in dynamic ambient for things:
 	    - Overflow wasn't checked so if you used a value that was too
 	      high it would wrap instead of clamp.

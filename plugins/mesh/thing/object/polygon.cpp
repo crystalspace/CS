@@ -1655,8 +1655,8 @@ bool csPolygon3D::DoPerspective (
         rquad++;
       while (quad != rquad)
       {
-        epointx = (float)(quad & 2) ? MAX_VALUE : -MAX_VALUE;
-        epointy = (float)(quad == 0 || quad == 3) ? MAX_VALUE : -MAX_VALUE;
+        epointx = float((quad & 2) ? MAX_VALUE : -MAX_VALUE);
+        epointy = float((quad == 0 || quad == 3) ? MAX_VALUE : -MAX_VALUE);
         dest->AddVertex (epointx, epointy);
         quad = (quad + 1) & 3;
       }
@@ -1675,8 +1675,8 @@ bool csPolygon3D::DoPerspective (
         rquad++;
       while (quad != rquad)
       {
-        epointx = (float)(quad & 2) ? -MAX_VALUE : MAX_VALUE;
-        epointy = (float)(quad == 0 || quad == 3) ? MAX_VALUE : -MAX_VALUE;
+        epointx = float((quad & 2) ? -MAX_VALUE : MAX_VALUE);
+        epointy = float((quad == 0 || quad == 3) ? MAX_VALUE : -MAX_VALUE);
         dest->AddVertex (epointx, epointy);
         quad = (quad + 1) & 3;
       }
