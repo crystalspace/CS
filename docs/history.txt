@@ -23,6 +23,8 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed the pytest makefile again to remove platform
 	  dependancies (and other buggy stuff).
 	- Eric Sunshine fixed the help message in WalkTest.
+	- Eric Sunshine fixed a potential crasher recently introduced into
+	  cctest.
 16-Nov-1999
 	- Eric Sunshine worked around some additional severe bugs in the
 	  NextStep compiler which were triggered by the SCF conversion.  The
