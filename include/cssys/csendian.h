@@ -74,7 +74,7 @@ static inline uint32 big_endian_long (uint32 l)
 
 /// Convert a short from big-endian to machine format
 static inline uint16 big_endian_short (uint16 s)
-{ return (s >> 8) | (s << 8); }
+{ return uint16((s >> 8) | (s << 8)); }
 
 /// Convert a big-endian floating-point number to machine format
 //@@WARNING: Should be removed -- use float2long instead
@@ -235,7 +235,7 @@ static inline short float2short (float f)
   long sign = mant & 0x8000;
   if (mant < 0) mant = -mant;
   if (exp > 7) mant = 0x7ff, exp = 7; else if (exp < -8) mant = 0, exp = -8;
-  return sign | ((exp & 0xf) << 11) | (mant & 0x7ff);
+  return short(sign | ((exp & 0xf) << 11) | (mant & 0x7ff));
 }
 
 /// Convert a 16-bit cross-platform float to native format (no endianess adjustments!)

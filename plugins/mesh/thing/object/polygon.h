@@ -610,7 +610,7 @@ public:
    */
   void SetAlpha (int alpha)
   {
-    Alpha = alpha;
+    Alpha = (uint16) alpha;
   }
 
   /// Get the material handle for the texture manager.
