@@ -1,4 +1,4 @@
-he history order is reversed so that new features are at the top.
+The history order is reversed so that new features are at the top.
 
 21-Jan-2002
 	- Tobias Brueckner suggested a fix for OpenGL with materials
@@ -35,6 +35,12 @@ he history order is reversed so that new features are at the top.
 	  PHP script; and ensures that $PHP_SELF is correctly set for the
 	  requested script.  These modifications should now allow PHP scripts
 	  requested via spoofdir to operate normally.
+	- Eric Sunshine fixed the HTML tables which were being constructed by
+	  CS/docs/support/annotate/annotate.php to display the annotations.
+	  They were totally bonked; were not closed with </table>, and in some
+	  cases, the rows were not introduced with <tr>.  Also fixed the colors
+	  so that the text can be read.  Finally, made some formatting
+	  improvements.
 20-Jan-2002
 	- Tobias Brueckner did the following:
 	    - Fixed a potential initialization bug in the GLX OpenGL
