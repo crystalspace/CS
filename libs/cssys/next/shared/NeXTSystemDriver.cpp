@@ -56,17 +56,19 @@ SysSystemDriver::~SysSystemDriver()
 //-----------------------------------------------------------------------------
 // Initialize -- Create the COM --> Objective-C proxy.
 //-----------------------------------------------------------------------------
-bool SysSystemDriver::Initialize( int argc, char* argv[], IConfig* pconfig )
+bool SysSystemDriver::Initialize( int argc, char* argv[],
+    char const* iConfigName, char const* iVfsConfigName, IConfig* iConfig )
     {
     proxy = new NeXTSystemProxy( this );
-    return superclass::Initialize( argc, argv, pconfig );
+    return superclass::Initialize( argc, argv, iConfigName, iVfsConfigName,
+	iConfig );
     }
 
 
 //-----------------------------------------------------------------------------
 // SetSystemDefaults
 //-----------------------------------------------------------------------------
-void SysSystemDriver::SetSystemDefaults(csIniFile *config)
+void SysSystemDriver::SetSystemDefaults( csIniFile* config )
     {
     superclass::SetSystemDefaults(config);
     simulated_depth = config->GetInt( "VideoDriver", "SIMULATE_DEPTH", 0 );

@@ -49,8 +49,9 @@ protected:
 public:
     SysSystemDriver();
     virtual ~SysSystemDriver();
-    virtual bool Initialize( int argc, char *argv[], IConfig* cfg_engine );
-    virtual void SetSystemDefaults(csIniFile *config);
+    virtual bool Initialize( int argc, char *argv[], char const* iConfigName,
+	char const* iVfsConfigName, IConfig* iOptions );
+    virtual void SetSystemDefaults( csIniFile* );
     virtual void Help();
     virtual void Loop ();
 
