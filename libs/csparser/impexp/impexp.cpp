@@ -538,6 +538,14 @@ void converter::data_init ( ) {
   for ( i = 0; i < 3; i++ ) {
     for ( j = 0; j < MAX_COR3; j++ ) {
       cor3[i][j] = 0.0;
+      temp_cor3[i][j] = 0.0;
+    }
+  }
+
+  for ( i = 0; i < 2; i++ ) {
+    for ( j = 0; j < MAX_COR3; j++ ) {
+      cor3_uv[i][j] = 0.0;
+      temp_cor3_uv[i][j] = 0.0;
     }
   }
 
@@ -566,6 +574,7 @@ void converter::data_init ( ) {
   for ( iface = 0; iface < MAX_FACE; iface++ ) {
     for ( ivert = 0; ivert < MAX_ORDER; ivert++ ) {
       face_mat[ivert][iface] = 0;
+      face_texnode[ivert][iface] = -1;
     }
   }
 
@@ -603,6 +612,9 @@ void converter::data_init ( ) {
 
   num_color = 0;
   num_cor3 = 0;
+  num_cor3_uv = 0;
+  temp_num_cor3 = 0;
+  temp_num_cor3_uv = 0;
   num_face = 0;
   num_line = 0;
   num_texmap = 0;
@@ -642,6 +654,14 @@ void converter::data_init ( ) {
     for ( ivert = 0; ivert < MAX_ORDER; ivert++ ) {
       for ( i = 0; i < 3; i++ ) {
         vertex_normal[i][ivert][iface] = 0.0;
+      }
+    }
+  }
+
+  for ( iface = 0; iface < MAX_FACE; iface++ ) {
+    for ( ivert = 0; ivert < MAX_ORDER; ivert++ ) {
+      for ( i = 0; i < 2; i++ ) {
+        vertex_uv[i][ivert][iface] = 0.0;
       }
     }
   }
@@ -2300,6 +2320,51 @@ int converter::leqi ( char* string1, char* string2 ) {
     } 
   }
   return TRUE;
+}
+
+/**
+ * If several polygons share a vertex that doesnt mean this vertex maps to
+ * the same texture coordinate for every polygon. Nontheless various 3d formats
+ * just store the vertex once and then combine it with different texture points.
+ * For CS sprite format we need to create an instance of such a vertex for every
+ * texturepoint.
+ * So we store the texpoints and geom. points in the temp_* variables and then
+ * duplicate the shared vertices.
+ */
+int converter::makeunique (int idx, int vtidx)
+{
+  int i=0;
+  float x, y, z, u, v, x1, y1, z1, u1, v1;
+  //DEBUG_BREAK;
+  x = temp_cor3[0][idx];
+  y = temp_cor3[1][idx];
+  z = temp_cor3[2][idx];
+  u = temp_cor3_uv[0][vtidx];
+  v = temp_cor3_uv[1][vtidx];
+
+  while (i<num_cor3)
+  {
+    x1 = cor3[0][i];
+    y1 = cor3[1][i];
+    z1 = cor3[2][i];
+    u1 = cor3_uv[0][i];
+    v1 = cor3_uv[1][i];
+    if (x==x1 && y==y1 && z==z1 && u==u1 && v==v1)
+      break;
+    i++;
+  }
+
+  if (i==num_cor3)
+  {
+    cor3[0][i] = x;
+    cor3[1][i] = y;
+    cor3[2][i] = z;
+    cor3_uv[0][i] = u;
+    cor3_uv[1][i] = v;
+    num_cor3++;
+    num_cor3_uv++;
+  }
+  return i;
 }
 
 //

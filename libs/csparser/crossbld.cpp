@@ -131,10 +131,14 @@ void csCrossBuild_SpriteTemplateFactory::Build_TriangleMesh(csSpriteTemplate& me
 {
   for (int triangleindex=0; triangleindex<buildsource.num_face; triangleindex++)
   {
-    int a = buildsource.face[0][triangleindex];
-    int b = buildsource.face[1][triangleindex];
-    int c = buildsource.face[2][triangleindex];
-    meshsource.AddTriangle(a,b,c);
+    // triangulate since CS sprites handle polys of 3rd order only
+    for (int ivert=2; ivert < buildsource.face_order[triangleindex]; ivert++)
+    {
+      int a = buildsource.face[0][triangleindex];
+      int b = buildsource.face[ivert-1][triangleindex];
+      int c = buildsource.face[ivert][triangleindex];
+      meshsource.AddTriangle(a,b,c);
+    }
   }
 }
 

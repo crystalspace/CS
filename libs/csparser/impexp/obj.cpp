@@ -246,23 +246,29 @@ int converter::obj_read ( FILE *filein ) {
   If there's a slash, skip to the next slash, and extract the
   index of the normal vector.
 */
+	//DEBUG_BREAK;
         if ( *next2 == '/' ) {
+	  next2++;
+	  if (*next2 != '/')
+	  {
+	    // read texture index
+	    count = sscanf ( next2, "%d%n", &node, &width );
+	    node = node - 1;
+	    if ( 0 <= node && node < temp_num_cor3_uv )
+	      face_texnode[ivert][num_face] = node;
+	    next2 = next2 + width;
+	  }
+	  next3 = next2;
+	  if ( *next3 == '/' )
+	  {
+	    next3 = next3 + 1;
+	    count = sscanf ( next3, "%d%n", &node, &width );
 
-          for ( next3 = next2 + 1; next3 < token2 + MAX_INCHARS; next3++ ) {
-
-            if ( *next3 == '/' ) {
-              next3 = next3 + 1;
-              count = sscanf ( next3, "%d%n", &node, &width );
-
-              node = node - 1;
-              if ( 0 <= node && node < num_vertex_normal ) {
-                for ( i = 0; i < 3; i++ ) {
-                  vertex_normal[i][ivert][num_face] = normal_temp[i][node];
-                }
-              }
-              break;
-            }
-          }
+	    node = node - 1;
+	    if ( 0 <= node && node < num_vertex_normal )
+	      for ( i = 0; i < 3; i++ )
+		vertex_normal[i][ivert][num_face] = normal_temp[i][node];
+	  }
         }
         ivert = ivert + 1;
       } 
@@ -442,13 +448,13 @@ int converter::obj_read ( FILE *filein ) {
 
       sscanf ( next, "%e %e %e", &r1, &r2, &r3 );
 
-      if ( num_cor3 < MAX_COR3 ) {
-        cor3[0][num_cor3] = r1;
-        cor3[1][num_cor3] = r2;
-        cor3[2][num_cor3] = r3;
+      if ( temp_num_cor3 < MAX_COR3 ) {
+        temp_cor3[0][temp_num_cor3] = r1;
+        temp_cor3[1][temp_num_cor3] = r2;
+        temp_cor3[2][temp_num_cor3] = r3;
       }
 
-      num_cor3 = num_cor3 + 1;
+      temp_num_cor3 = temp_num_cor3 + 1;
 
     }
 /*
@@ -474,7 +480,15 @@ int converter::obj_read ( FILE *filein ) {
   Vertex texture.
 */
     else if ( leqi ( token, "VT" ) == TRUE ) {
-      continue;
+
+      sscanf ( next, "%e %e", &r1, &r2 );
+
+      if ( temp_num_cor3_uv < MAX_COR3 ) {
+        temp_cor3_uv[0][temp_num_cor3_uv] = r1;
+        temp_cor3_uv[1][temp_num_cor3_uv] = r2;
+	temp_num_cor3_uv = temp_num_cor3_uv + 1;
+      }
+
     }
 /*
   VP
@@ -491,8 +505,23 @@ int converter::obj_read ( FILE *filein ) {
     }
 
   }
+
+/*
+  create new vertices if 2 faces share a vertex but have different texturecoo assigned
+  to the vertex.
+*/
+  for (i=0; i < num_face; i++)
+  {
+    for (int j=0; j < face_order[i]; j++)
+    {
+      int vidx = face[j][i];
+      int vtidx = face_texnode[j][i];
+      face[j][i] = makeunique (vidx, vtidx);
+    }
+  }
   return SUCCESS;
 }
+
 /******************************************************************************/
 
 int converter::obj_write ( FILE *fileout ) {
