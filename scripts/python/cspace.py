@@ -6790,36 +6790,6 @@ class csEventCommandDataPtr(csEventCommandData):
         _swig_setattr(self, csEventCommandData,self.__class__,csEventCommandData)
 _cspace.csEventCommandData_swigregister(csEventCommandDataPtr)
 
-class csEventNetworkData(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csEventNetworkData, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csEventNetworkData, name)
-    def __repr__(self):
-        return "<C csEventNetworkData instance at %s>" % (self.this,)
-    __swig_getmethods__["From"] = _cspace.csEventNetworkData_From_get
-    if _newclass:From = property(_cspace.csEventNetworkData_From_get)
-    __swig_getmethods__["From2"] = _cspace.csEventNetworkData_From2_get
-    if _newclass:From2 = property(_cspace.csEventNetworkData_From2_get)
-    __swig_getmethods__["Data"] = _cspace.csEventNetworkData_Data_get
-    if _newclass:Data = property(_cspace.csEventNetworkData_Data_get)
-    __swig_getmethods__["Data2"] = _cspace.csEventNetworkData_Data2_get
-    if _newclass:Data2 = property(_cspace.csEventNetworkData_Data2_get)
-    def __init__(self, *args):
-        _swig_setattr(self, csEventNetworkData, 'this', _cspace.new_csEventNetworkData(*args))
-        _swig_setattr(self, csEventNetworkData, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_csEventNetworkData):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class csEventNetworkDataPtr(csEventNetworkData):
-    def __init__(self, this):
-        _swig_setattr(self, csEventNetworkData, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csEventNetworkData, 'thisown', 0)
-        _swig_setattr(self, csEventNetworkData,self.__class__,csEventNetworkData)
-_cspace.csEventNetworkData_swigregister(csEventNetworkDataPtr)
-
 class iEvent(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -6882,8 +6852,6 @@ class iEvent(iBase):
     if _newclass:Joystick = property(_cspace.iEvent_Joystick_get)
     __swig_getmethods__["Command"] = _cspace.iEvent_Command_get
     if _newclass:Command = property(_cspace.iEvent_Command_get)
-    __swig_getmethods__["Network"] = _cspace.iEvent_Network_get
-    if _newclass:Network = property(_cspace.iEvent_Network_get)
 
 class iEventPtr(iEvent):
     def __init__(self, this):
@@ -7044,7 +7012,6 @@ csevJoystickDown = _cspace.csevJoystickDown
 csevJoystickUp = _cspace.csevJoystickUp
 csevCommand = _cspace.csevCommand
 csevBroadcast = _cspace.csevBroadcast
-csevNetwork = _cspace.csevNetwork
 csevMouseEnter = _cspace.csevMouseEnter
 csevMouseExit = _cspace.csevMouseExit
 csevLostFocus = _cspace.csevLostFocus
@@ -10873,323 +10840,6 @@ _cspace.iScript_swigregister(iScriptPtr)
 
 iScript_scfGetVersion = _cspace.iScript_scfGetVersion
 
-class iNetworkPacket(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNetworkPacket, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iNetworkPacket, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iNetworkPacket instance at %s>" % (self.this,)
-    def Read(*args): return _cspace.iNetworkPacket_Read(*args)
-    def Write(*args): return _cspace.iNetworkPacket_Write(*args)
-    def New(*args): return _cspace.iNetworkPacket_New(*args)
-    def FilterSocket(*args): return _cspace.iNetworkPacket_FilterSocket(*args)
-    def __del__(self, destroy=_cspace.delete_iNetworkPacket):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iNetworkPacket_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iNetworkPacket_scfGetVersion)
-
-class iNetworkPacketPtr(iNetworkPacket):
-    def __init__(self, this):
-        _swig_setattr(self, iNetworkPacket, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iNetworkPacket, 'thisown', 0)
-        _swig_setattr(self, iNetworkPacket,self.__class__,iNetworkPacket)
-_cspace.iNetworkPacket_swigregister(iNetworkPacketPtr)
-
-iNetworkPacket_scfGetVersion = _cspace.iNetworkPacket_scfGetVersion
-
-class iNetworkPacket2(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNetworkPacket2, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iNetworkPacket2, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iNetworkPacket2 instance at %s>" % (self.this,)
-    def Read(*args): return _cspace.iNetworkPacket2_Read(*args)
-    def Write(*args): return _cspace.iNetworkPacket2_Write(*args)
-    def New(*args): return _cspace.iNetworkPacket2_New(*args)
-    def FilterSocket(*args): return _cspace.iNetworkPacket2_FilterSocket(*args)
-    def __del__(self, destroy=_cspace.delete_iNetworkPacket2):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class iNetworkPacket2Ptr(iNetworkPacket2):
-    def __init__(self, this):
-        _swig_setattr(self, iNetworkPacket2, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iNetworkPacket2, 'thisown', 0)
-        _swig_setattr(self, iNetworkPacket2,self.__class__,iNetworkPacket2)
-_cspace.iNetworkPacket2_swigregister(iNetworkPacket2Ptr)
-
-class iNetworkManager(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNetworkManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iNetworkManager, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iNetworkManager instance at %s>" % (self.this,)
-    def RegisterConnection(*args): return _cspace.iNetworkManager_RegisterConnection(*args)
-    def RegisterListener(*args): return _cspace.iNetworkManager_RegisterListener(*args)
-    def UnregisterEndPoint(*args): return _cspace.iNetworkManager_UnregisterEndPoint(*args)
-    def RegisterConnectedSocket(*args): return _cspace.iNetworkManager_RegisterConnectedSocket(*args)
-    def UnregisterConnectedSocket(*args): return _cspace.iNetworkManager_UnregisterConnectedSocket(*args)
-    def RegisterListeningSocket(*args): return _cspace.iNetworkManager_RegisterListeningSocket(*args)
-    def UnregisterListeningSocket(*args): return _cspace.iNetworkManager_UnregisterListeningSocket(*args)
-    def Send(*args): return _cspace.iNetworkManager_Send(*args)
-    def SendToAll(*args): return _cspace.iNetworkManager_SendToAll(*args)
-    def __del__(self, destroy=_cspace.delete_iNetworkManager):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iNetworkManager_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iNetworkManager_scfGetVersion)
-
-class iNetworkManagerPtr(iNetworkManager):
-    def __init__(self, this):
-        _swig_setattr(self, iNetworkManager, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iNetworkManager, 'thisown', 0)
-        _swig_setattr(self, iNetworkManager,self.__class__,iNetworkManager)
-_cspace.iNetworkManager_swigregister(iNetworkManagerPtr)
-
-iNetworkManager_scfGetVersion = _cspace.iNetworkManager_scfGetVersion
-
-CS_NET_SOCKET_TYPE_TCP = _cspace.CS_NET_SOCKET_TYPE_TCP
-CS_NET_SOCKET_TYPE_UDP = _cspace.CS_NET_SOCKET_TYPE_UDP
-CS_NET_SOCKET_NOERROR = _cspace.CS_NET_SOCKET_NOERROR
-CS_NET_SOCKET_CANNOT_CREATE = _cspace.CS_NET_SOCKET_CANNOT_CREATE
-CS_NET_SOCKET_UNSUPPORTED_SOCKET_TYPE = _cspace.CS_NET_SOCKET_UNSUPPORTED_SOCKET_TYPE
-CS_NET_SOCKET_NOTCONNECTED = _cspace.CS_NET_SOCKET_NOTCONNECTED
-CS_NET_SOCKET_CANNOT_SETBLOCK = _cspace.CS_NET_SOCKET_CANNOT_SETBLOCK
-CS_NET_SOCKET_CANNOT_SETREUSE = _cspace.CS_NET_SOCKET_CANNOT_SETREUSE
-CS_NET_SOCKET_CANNOT_BIND = _cspace.CS_NET_SOCKET_CANNOT_BIND
-CS_NET_SOCKET_CANNOT_LISTEN = _cspace.CS_NET_SOCKET_CANNOT_LISTEN
-CS_NET_SOCKET_CANNOT_SELECT = _cspace.CS_NET_SOCKET_CANNOT_SELECT
-CS_NET_SOCKET_CANNOT_IOCTL = _cspace.CS_NET_SOCKET_CANNOT_IOCTL
-CS_NET_SOCKET_CANNOT_ACCEPT = _cspace.CS_NET_SOCKET_CANNOT_ACCEPT
-CS_NET_SOCKET_WOULDBLOCK = _cspace.CS_NET_SOCKET_WOULDBLOCK
-CS_NET_SOCKET_NODATA = _cspace.CS_NET_SOCKET_NODATA
-CS_NET_SOCKET_CANNOT_RESOLVE = _cspace.CS_NET_SOCKET_CANNOT_RESOLVE
-CS_NET_SOCKET_CANNOT_CONNECT = _cspace.CS_NET_SOCKET_CANNOT_CONNECT
-CS_NET_SOCKET_BROADCAST_ERROR = _cspace.CS_NET_SOCKET_BROADCAST_ERROR
-CS_NET_ERR_NO_ERROR = _cspace.CS_NET_ERR_NO_ERROR
-CS_NET_ERR_CANNOT_RESOLVE_ADDRESS = _cspace.CS_NET_ERR_CANNOT_RESOLVE_ADDRESS
-CS_NET_ERR_CANNOT_CONNECT = _cspace.CS_NET_ERR_CANNOT_CONNECT
-CS_NET_ERR_CANNOT_SEND = _cspace.CS_NET_ERR_CANNOT_SEND
-CS_NET_ERR_INVALID_SOCKET = _cspace.CS_NET_ERR_INVALID_SOCKET
-CS_NET_ERR_CANNOT_BIND = _cspace.CS_NET_ERR_CANNOT_BIND
-CS_NET_ERR_CANNOT_LISTEN = _cspace.CS_NET_ERR_CANNOT_LISTEN
-CS_NET_ERR_CANNOT_CREATE = _cspace.CS_NET_ERR_CANNOT_CREATE
-CS_NET_ERR_CANNOT_ACCEPT = _cspace.CS_NET_ERR_CANNOT_ACCEPT
-CS_NET_ERR_CANNOT_SET_BLOCKING_MODE = _cspace.CS_NET_ERR_CANNOT_SET_BLOCKING_MODE
-CS_NET_ERR_CANNOT_RECEIVE = _cspace.CS_NET_ERR_CANNOT_RECEIVE
-CS_NET_ERR_CANNOT_PARSE_ADDRESS = _cspace.CS_NET_ERR_CANNOT_PARSE_ADDRESS
-CS_NET_ERR_CANNOT_GET_VERSION = _cspace.CS_NET_ERR_CANNOT_GET_VERSION
-CS_NET_ERR_WRONG_VERSION = _cspace.CS_NET_ERR_WRONG_VERSION
-CS_NET_ERR_CANNOT_CLEANUP = _cspace.CS_NET_ERR_CANNOT_CLEANUP
-CS_NET_ERR_NO_SUCH_OPTION = _cspace.CS_NET_ERR_NO_SUCH_OPTION
-CS_NET_ERR_CANNOT_SET_OPTION = _cspace.CS_NET_ERR_CANNOT_SET_OPTION
-class csNetworkDriverCapabilities(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csNetworkDriverCapabilities, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csNetworkDriverCapabilities, name)
-    def __repr__(self):
-        return "<C csNetworkDriverCapabilities instance at %s>" % (self.this,)
-    __swig_setmethods__["ConnectionReliable"] = _cspace.csNetworkDriverCapabilities_ConnectionReliable_set
-    __swig_getmethods__["ConnectionReliable"] = _cspace.csNetworkDriverCapabilities_ConnectionReliable_get
-    if _newclass:ConnectionReliable = property(_cspace.csNetworkDriverCapabilities_ConnectionReliable_get, _cspace.csNetworkDriverCapabilities_ConnectionReliable_set)
-    __swig_setmethods__["ConnectionUnreliable"] = _cspace.csNetworkDriverCapabilities_ConnectionUnreliable_set
-    __swig_getmethods__["ConnectionUnreliable"] = _cspace.csNetworkDriverCapabilities_ConnectionUnreliable_get
-    if _newclass:ConnectionUnreliable = property(_cspace.csNetworkDriverCapabilities_ConnectionUnreliable_get, _cspace.csNetworkDriverCapabilities_ConnectionUnreliable_set)
-    __swig_setmethods__["BehaviorBlocking"] = _cspace.csNetworkDriverCapabilities_BehaviorBlocking_set
-    __swig_getmethods__["BehaviorBlocking"] = _cspace.csNetworkDriverCapabilities_BehaviorBlocking_get
-    if _newclass:BehaviorBlocking = property(_cspace.csNetworkDriverCapabilities_BehaviorBlocking_get, _cspace.csNetworkDriverCapabilities_BehaviorBlocking_set)
-    __swig_setmethods__["BehaviorNonBlocking"] = _cspace.csNetworkDriverCapabilities_BehaviorNonBlocking_set
-    __swig_getmethods__["BehaviorNonBlocking"] = _cspace.csNetworkDriverCapabilities_BehaviorNonBlocking_get
-    if _newclass:BehaviorNonBlocking = property(_cspace.csNetworkDriverCapabilities_BehaviorNonBlocking_get, _cspace.csNetworkDriverCapabilities_BehaviorNonBlocking_set)
-    def __init__(self, *args):
-        _swig_setattr(self, csNetworkDriverCapabilities, 'this', _cspace.new_csNetworkDriverCapabilities(*args))
-        _swig_setattr(self, csNetworkDriverCapabilities, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_csNetworkDriverCapabilities):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class csNetworkDriverCapabilitiesPtr(csNetworkDriverCapabilities):
-    def __init__(self, this):
-        _swig_setattr(self, csNetworkDriverCapabilities, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csNetworkDriverCapabilities, 'thisown', 0)
-        _swig_setattr(self, csNetworkDriverCapabilities,self.__class__,csNetworkDriverCapabilities)
-_cspace.csNetworkDriverCapabilities_swigregister(csNetworkDriverCapabilitiesPtr)
-
-class iNetworkEndPoint(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNetworkEndPoint, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iNetworkEndPoint, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iNetworkEndPoint instance at %s>" % (self.this,)
-    def Terminate(*args): return _cspace.iNetworkEndPoint_Terminate(*args)
-    def SetOption(*args): return _cspace.iNetworkEndPoint_SetOption(*args)
-    def GetLastError(*args): return _cspace.iNetworkEndPoint_GetLastError(*args)
-    def __del__(self, destroy=_cspace.delete_iNetworkEndPoint):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iNetworkEndPoint_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iNetworkEndPoint_scfGetVersion)
-
-class iNetworkEndPointPtr(iNetworkEndPoint):
-    def __init__(self, this):
-        _swig_setattr(self, iNetworkEndPoint, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iNetworkEndPoint, 'thisown', 0)
-        _swig_setattr(self, iNetworkEndPoint,self.__class__,iNetworkEndPoint)
-_cspace.iNetworkEndPoint_swigregister(iNetworkEndPointPtr)
-
-iNetworkEndPoint_scfGetVersion = _cspace.iNetworkEndPoint_scfGetVersion
-
-class iNetworkConnection(iNetworkEndPoint):
-    __swig_setmethods__ = {}
-    for _s in [iNetworkEndPoint]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNetworkConnection, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iNetworkEndPoint]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iNetworkConnection, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iNetworkConnection instance at %s>" % (self.this,)
-    def Send(*args): return _cspace.iNetworkConnection_Send(*args)
-    def IsConnected(*args): return _cspace.iNetworkConnection_IsConnected(*args)
-    def Receive(*args): return _cspace.iNetworkConnection_Receive(*args)
-    def IsDataWaiting(*args): return _cspace.iNetworkConnection_IsDataWaiting(*args)
-    def __del__(self, destroy=_cspace.delete_iNetworkConnection):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iNetworkConnection_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iNetworkConnection_scfGetVersion)
-
-class iNetworkConnectionPtr(iNetworkConnection):
-    def __init__(self, this):
-        _swig_setattr(self, iNetworkConnection, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iNetworkConnection, 'thisown', 0)
-        _swig_setattr(self, iNetworkConnection,self.__class__,iNetworkConnection)
-_cspace.iNetworkConnection_swigregister(iNetworkConnectionPtr)
-
-iNetworkConnection_scfGetVersion = _cspace.iNetworkConnection_scfGetVersion
-
-class iNetworkListener(iNetworkEndPoint):
-    __swig_setmethods__ = {}
-    for _s in [iNetworkEndPoint]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNetworkListener, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iNetworkEndPoint]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iNetworkListener, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iNetworkListener instance at %s>" % (self.this,)
-    def Accept(*args): return _cspace.iNetworkListener_Accept(*args)
-    def __del__(self, destroy=_cspace.delete_iNetworkListener):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iNetworkListener_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iNetworkListener_scfGetVersion)
-
-class iNetworkListenerPtr(iNetworkListener):
-    def __init__(self, this):
-        _swig_setattr(self, iNetworkListener, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iNetworkListener, 'thisown', 0)
-        _swig_setattr(self, iNetworkListener,self.__class__,iNetworkListener)
-_cspace.iNetworkListener_swigregister(iNetworkListenerPtr)
-
-iNetworkListener_scfGetVersion = _cspace.iNetworkListener_scfGetVersion
-
-class iNetworkDriver(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNetworkDriver, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iNetworkDriver, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iNetworkDriver instance at %s>" % (self.this,)
-    def NewConnection(*args): return _cspace.iNetworkDriver_NewConnection(*args)
-    def NewListener(*args): return _cspace.iNetworkDriver_NewListener(*args)
-    def GetCapabilities(*args): return _cspace.iNetworkDriver_GetCapabilities(*args)
-    def GetLastError(*args): return _cspace.iNetworkDriver_GetLastError(*args)
-    def __del__(self, destroy=_cspace.delete_iNetworkDriver):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iNetworkDriver_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iNetworkDriver_scfGetVersion)
-
-class iNetworkDriverPtr(iNetworkDriver):
-    def __init__(self, this):
-        _swig_setattr(self, iNetworkDriver, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iNetworkDriver, 'thisown', 0)
-        _swig_setattr(self, iNetworkDriver,self.__class__,iNetworkDriver)
-_cspace.iNetworkDriver_swigregister(iNetworkDriverPtr)
-
-iNetworkDriver_scfGetVersion = _cspace.iNetworkDriver_scfGetVersion
-
-class iNetworkSocket2(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNetworkSocket2, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iNetworkSocket2, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iNetworkSocket2 instance at %s>" % (self.this,)
-    def IsConnected(*args): return _cspace.iNetworkSocket2_IsConnected(*args)
-    def LastError(*args): return _cspace.iNetworkSocket2_LastError(*args)
-    def SetSocketBlock(*args): return _cspace.iNetworkSocket2_SetSocketBlock(*args)
-    def SetSocketReuse(*args): return _cspace.iNetworkSocket2_SetSocketReuse(*args)
-    def SetSocketBroadcast(*args): return _cspace.iNetworkSocket2_SetSocketBroadcast(*args)
-    def SetBroadcastOptions(*args): return _cspace.iNetworkSocket2_SetBroadcastOptions(*args)
-    def Connect(*args): return _cspace.iNetworkSocket2_Connect(*args)
-    def Send(*args): return _cspace.iNetworkSocket2_Send(*args)
-    def Recv(*args): return _cspace.iNetworkSocket2_Recv(*args)
-    def Close(*args): return _cspace.iNetworkSocket2_Close(*args)
-    def Disconnect(*args): return _cspace.iNetworkSocket2_Disconnect(*args)
-    def WaitForConnection(*args): return _cspace.iNetworkSocket2_WaitForConnection(*args)
-    def Accept(*args): return _cspace.iNetworkSocket2_Accept(*args)
-    def ReadLine(*args): return _cspace.iNetworkSocket2_ReadLine(*args)
-    def RemoteName(*args): return _cspace.iNetworkSocket2_RemoteName(*args)
-    def __del__(self, destroy=_cspace.delete_iNetworkSocket2):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iNetworkSocket2_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iNetworkSocket2_scfGetVersion)
-
-class iNetworkSocket2Ptr(iNetworkSocket2):
-    def __init__(self, this):
-        _swig_setattr(self, iNetworkSocket2, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iNetworkSocket2, 'thisown', 0)
-        _swig_setattr(self, iNetworkSocket2,self.__class__,iNetworkSocket2)
-_cspace.iNetworkSocket2_swigregister(iNetworkSocket2Ptr)
-
-iNetworkSocket2_scfGetVersion = _cspace.iNetworkSocket2_scfGetVersion
-
 class csObject(iObject):
     __swig_setmethods__ = {}
     for _s in [iObject]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -11430,8 +11080,6 @@ CS_IS_JOYSTICK_EVENT = _cspace.CS_IS_JOYSTICK_EVENT
 
 CS_IS_INPUT_EVENT = _cspace.CS_IS_INPUT_EVENT
 
-CS_IS_NETWORK_EVENT = _cspace.CS_IS_NETWORK_EVENT
-
 CS_QUERY_REGISTRY_TAG = _cspace.CS_QUERY_REGISTRY_TAG
 
 CS_LOAD_PLUGIN_ALWAYS = _cspace.CS_LOAD_PLUGIN_ALWAYS
@@ -11452,7 +11100,6 @@ CSMASK_JoystickDown = (1 << csevJoystickDown)
 CSMASK_JoystickUp = (1 << csevJoystickUp)
 CSMASK_Command = (1 << csevCommand)
 CSMASK_Broadcast = (1 << csevBroadcast)
-CSMASK_Network = (1 << csevNetwork)
 
 CSMASK_Mouse = (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp
 	| CSMASK_MouseClick | CSMASK_MouseDoubleClick)
