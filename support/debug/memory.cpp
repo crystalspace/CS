@@ -23,6 +23,9 @@
 #include <strings.h>
 #include <ctype.h>
 #include "sysdef.h"
+#include "cssys/common/system.h"
+
+extern csSystemDriver *System;
 
 #ifdef MEM_CHECK_EXTENSIVE
 #  undef MEM_CHECK_FILL
@@ -66,7 +69,7 @@ void* operator new (size_t s)
   }
   else
   {
-    CsPrintf (MSG_STDOUT, "WARNING! Memory was allocated without CHK (%d bytes)!\n", s);
+    System->Printf (MSG_STDOUT, "WARNING! Memory was allocated without CHK (%d bytes)!\n", s);
     me->file = NULL;
   }
   if (entries) entries->prev = me;
@@ -83,21 +86,22 @@ void dump_memory (const char* p, size_t len)
   const char* op = p;
   for (i = 0 ; i < (int)len ; i++)
   {
-    CsPrintf (MSG_STDOUT, "%c", isprint (*p) ? *p : '.');
+    System->Printf (MSG_STDOUT, "%c", isprint (*p) ? *p : '.');
     p++;
   }
   p = op;
-  CsPrintf (MSG_STDOUT, "    ");
+  System->Printf (MSG_STDOUT, "    ");
   for (i = 0 ; i < (int)len ; i++)
   {
-    CsPrintf (MSG_STDOUT, "%02x ", *p);
+    System->Printf (MSG_STDOUT, "%02x ", *p);
     p++;
   }
-  CsPrintf (MSG_STDOUT, "\n");
+  System->Printf (MSG_STDOUT, "\n");
 }
 
 void operator delete (void* p)
 {
+  if (!p) return;
   while (mem_lock) ;
   mem_lock++;
 
@@ -113,12 +117,12 @@ void operator delete (void* p)
 #ifdef MEM_CHECK_EXTENSIVE
   if (e && e->freed)
   {
-    CsPrintf (MSG_STDOUT, "ERROR! Block was already freed earlier!\n");
-    CsPrintf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
+    System->Printf (MSG_STDOUT, "ERROR! Block was already freed earlier!\n");
+    System->Printf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
     	MemLine != -1 ? MemFile : "", MemLine);
-    CsPrintf (MSG_STDOUT, "       Block was originally allocated at %s:%d.\n",
+    System->Printf (MSG_STDOUT, "       Block was originally allocated at %s:%d.\n",
     	e->line != -1 ? e->file : "", e->line);
-    CsPrintf (MSG_STDOUT, "       Block was first freed at %s:%d.\n",
+    System->Printf (MSG_STDOUT, "       Block was first freed at %s:%d.\n",
     	e->free_line != -1 ? e->free_file : "", e->free_line);
     mem_lock--;
     return;
@@ -130,24 +134,24 @@ void operator delete (void* p)
     pp = ((char*)p)-WALL_SIZE;
     if (strncmp (pp, BEFOREWALL_STR, WALL_SIZE))
     {
-      CsPrintf (MSG_STDOUT, "ERROR! Memory was overwritten before block allocated at %s:%d with size %d!\n",
+      System->Printf (MSG_STDOUT, "ERROR! Memory was overwritten before block allocated at %s:%d with size %d!\n",
       	e->file ? e->file : "", e->line, e->size);
-      CsPrintf (MSG_STDOUT, "       Overwritten with: ");
+      System->Printf (MSG_STDOUT, "       Overwritten with: ");
       dump_memory (pp, WALL_SIZE);
-      CsPrintf (MSG_STDOUT, "       Should be       : ");
+      System->Printf (MSG_STDOUT, "       Should be       : ");
       dump_memory (BEFOREWALL_STR, WALL_SIZE);
-      CsPrintf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
+      System->Printf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
     	MemLine != -1 ? MemFile : "", MemLine);
     }
     if (strncmp (pp+e->size+WALL_SIZE, AFTERWALL_STR, WALL_SIZE))
     {
-      CsPrintf (MSG_STDOUT, "ERROR! Memory was overwritten after block allocated at %s:%d with size %d!\n",
+      System->Printf (MSG_STDOUT, "ERROR! Memory was overwritten after block allocated at %s:%d with size %d!\n",
       	e->file ? e->file : "", e->line, e->size);
-      CsPrintf (MSG_STDOUT, "       Overwritten with: ");
+      System->Printf (MSG_STDOUT, "       Overwritten with: ");
       dump_memory (pp+e->size+WALL_SIZE, WALL_SIZE);
-      CsPrintf (MSG_STDOUT, "       Should be       : ");
+      System->Printf (MSG_STDOUT, "       Should be       : ");
       dump_memory (AFTERWALL_STR, WALL_SIZE);
-      CsPrintf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
+      System->Printf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
     	MemLine != -1 ? MemFile : "", MemLine);
     }
 
@@ -185,8 +189,8 @@ void operator delete (void* p)
   }
   else
   {
-    CsPrintf (MSG_STDOUT, "ERROR! Trying to free something that is not allocated!\n");
-    CsPrintf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
+    System->Printf (MSG_STDOUT, "ERROR! Trying to free something that is not allocated!\n");
+    System->Printf (MSG_STDOUT, "       Error discovered while freeing memory at %s:%d.\n",
     	MemLine != -1 ? MemFile : "", MemLine);
   }
   mem_lock--;
@@ -210,13 +214,13 @@ void check_mem ()
         int how_many = MIN (fill_count, strlen (fill_str));
         if (memcmp (fill, fill_str, how_many))
         {
-          CsPrintf (MSG_STDOUT, "ERROR! Memory was overwritten after block allocated at %s:%d with size %d was freed!\n",
+          System->Printf (MSG_STDOUT, "ERROR! Memory was overwritten after block allocated at %s:%d with size %d was freed!\n",
       	    e->file ? e->file : "", e->line, e->size);
-          CsPrintf (MSG_STDOUT, "       Overwritten with: ");
+          System->Printf (MSG_STDOUT, "       Overwritten with: ");
           dump_memory (fill, 16);
-          CsPrintf (MSG_STDOUT, "       Should have been: ");
+          System->Printf (MSG_STDOUT, "       Should have been: ");
           dump_memory (fill_str, 16);
-          CsPrintf (MSG_STDOUT, "       Block was first freed at %s:%d.\n",
+          System->Printf (MSG_STDOUT, "       Block was first freed at %s:%d.\n",
     	    e->free_line != -1 ? e->free_file : "", e->free_line);
 	  break;
         } /* endif */
@@ -237,15 +241,15 @@ class X { public: ~X () { dump_mem_list (); check_mem (); } } x;
 
 void dump_mem_list ()
 {
-  CsPrintf (MSG_STDOUT, "------------------- memory block list -------------------\n");
+  System->Printf (MSG_STDOUT, "------------------- memory block list -------------------\n");
   MemEntryA *cur = entries;
   while (cur)
   {
     if (!cur->freed)
-      CsPrintf (MSG_STDOUT, "%08lX (%ld)  %s:%d\n", (unsigned long)cur->p, cur->size, cur->file, cur->line);
+      System->Printf (MSG_STDOUT, "%08lX (%ld)  %s:%d\n", (unsigned long)cur->p, cur->size, cur->file, cur->line);
     cur = cur->next;
   } /* endwhile */
-  CsPrintf (MSG_STDOUT, "---------------- end of memory block list ---------------\n");
+  System->Printf (MSG_STDOUT, "---------------- end of memory block list ---------------\n");
   fflush (stdout);
 }
 

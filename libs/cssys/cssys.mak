@@ -38,6 +38,11 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/cssys/common $(sort $(dir $(SRC.SYS_CSSYS)))
 
+ifneq ($(MEM),)
+  SRC.SYS_CSSYS_EXE+=memory.cpp
+  SRC.SYS_CSSYS_DLL+=memory.cpp
+endif
+
 CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys$(LIB)
 SRC.CSSYS = libs/cssys/common/csendian.cpp libs/cssys/common/system.cpp \
   $(SRC.SYS_CSSYS)
