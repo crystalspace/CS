@@ -72,29 +72,20 @@ bool csSoundLoaderMultiplexer::Initialize(iSystem *sys)
   sys->Printf(MSG_INITIALIZATION, "Initializing sound loading multiplexer...\n");
   sys->Printf(MSG_INITIALIZATION, "  Looking for sound loader modules:\n");
 
-  iVFS *pVFS = QUERY_PLUGIN (sys, iVFS);
-  if (pVFS)
+  csVector list;
+  iSCF::SCF->QueryClassList ("crystalspace.sound.loader.", list);
+  for (long i=0; i<list.Length (); i++)
   {
-    csVector list;
-    iSCF::SCF->QueryClassList ("crystalspace.sound.loader.", list);
-    for (long i=0; i<list.Length (); i++)
+    const char *classname = (const char *)list.Get (i);
+    if (strcasecmp (classname, "crystalspace.sound.loader.multiplexer"))
     {
-      const char *classname = (const char *)list.Get (i);
-      if (strcasecmp (classname, "crystalspace.sound.loader.multiplexer"))
-      {
-	sys->Printf(MSG_INITIALIZATION, "  soundloader: %s\n", classname);
-	iSoundLoader *ldr = LOAD_PLUGIN (sys, classname, 0, iSoundLoader);
-	if (ldr)
-	  Loaders.Push(ldr);
-      }
+      sys->Printf(MSG_INITIALIZATION, "  soundloader: %s\n", classname);
+      iSoundLoader *ldr = LOAD_PLUGIN (sys, classname, 0, iSoundLoader);
+      if (ldr)
+	Loaders.Push(ldr);
     }
-    pVFS->DecRef ();
-    return true;
   }
-  else
-    sys->Printf(MSG_WARNING, 
-		"  Oops, couldn't query iVFS from the system driver, cannot look for soundloaders now !\n");
-  return false;
+  return true;
 }
 
 iSoundData *csSoundLoaderMultiplexer::LoadSound(void *Data, unsigned long Size) const {
