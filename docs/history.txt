@@ -17,6 +17,11 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the procedural textures. They tried to initialize
 	  themselves too early, even before the Prepare() of the texture-
 	  manager happened.
+	- Removed simple app. Instead added new 'tutor' dir which will
+	  contains sub-dirs for all tutorial sections in the manual.
+	  Currently there are two simple tutorials so there are also
+	  two simple directories in 'tutor'. The targets are 'tutsimp'
+	  and 'tutsimp2'.
 14-Jun-2001
 	- Made the terrain visibility checker more efficient and more robust.
 	  The calculation of the extent works completely different now and
