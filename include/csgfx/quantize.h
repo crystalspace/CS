@@ -24,13 +24,6 @@
  * RGB to paletted image quantization routine
  */
 
-/**\addtogroup gfx
- * @{
- */
-
-  /**
-   */
-   
 #include "csgfx/rgbpixel.h"
 
 struct csColorBox;
@@ -69,63 +62,6 @@ struct csColorBox;
  * big-endian machines the B component starts at bit 8, thus the right
  * shift counter becomes negative. Probably the best solution is to add
  * and #if B_BIT + 8 - HIST_B_BITS - HIST_G_BITS - HIST_R_BITS < 0.
- * 
- * <b>Quantizing</b><br>
- * The following routines can be used to split the quantization process
- * into small steps. First, you should call Begin(). This will
- * allocate some memory for color histogram and also do some other
- * maintenance work. Then you call Count () as much times as
- * you want, to count the frequencies of colors. This is a quite fast
- * operation, thus you can use it, for example, to compute a optimal
- * palette for a large number of images (for example, software 3D renderer
- * uses it for computing the optimal palette in paletted modes, by passing
- * every texture to Count()).
- * <p>
- * When you're finished with images, call Palette(). This will
- * compute the optimal palette. If you need just that, you can call
- * End() and you're done. If you need to remap all those textures
- * to the optimal palette, you can call Remap() as much times
- * as you wish. Finally you anyway should call End() to free
- * all the memory used by quantizer.
- * <p>
- * Now, a typical quantization sequence could look like this:
- * \code
- * Begin ();
- *
- *    Count (image, pixels);
- *   Count (...);
- *   ...
- *
- *   int maxcolors = 256;
- *   Palette (outpalette, maxcolors);
- *   // now maxcolors contains the actual number of palette entries
- *
- *   Remap (image, pixels, outimage);
- *   Remap (...);
- *   ...
- *
- * End ();
- * \endcode
- * The quantizer itself keeps track of its current state, and will silently
- * ignore invalid calls. For example, if you call Remap() right
- * after calling Begin() nothing will happen. You still can call
- * Palette() right after Begin(), and you will get the
- * expected black (or let's call it `empty') palette.
- *<p>
- * The Bias routine can be used to introduce a bias inside the
- * currently open color histogram towards given colors. The "weight"
- * parameter shows how important those colors are (0 - not at all, 100 -
- * very). This can be used to bias the resulting palette towards some
- * hard-coded values, for example you may want to use it to create a
- * relatively uniform palette that is somewhat biased towards the colors
- * contained in some picture(s).
- *<p>
- * Some routines accept an additional parameter (csRGBpixel *transp). If it
- * is NULL, nothing special is performed. If it is non-NULL, it should point
- * to an valid csRGBpixel object; the color of that pixel will be treated in
- * a special way: Count() will ignore pixels of that color,
- * Palette() will allocate color index 0 for that color, and
- * Remap will map all such pixel values to index 0.
  */
 class csColorQuantizer
 {
@@ -176,19 +112,77 @@ public:
    * the storage the pointers point to has enough size to store resulting
    * image and palette (the size of resulting image is exactly "pixels" bytes,
    * the size of resulting palette is palsize colors).
-   * \param image input image
-   * \param pixels number of pixels in input image
-   * \param pixperline number of pixels in one line
-   * \param outimage output image (allocated if NULL)
-   * \param outpalette output palette (allocated if NULL)
-   * \param maxcolors maximal number of colors in output palette
+   * <dl>
+   * <dt>image<dd>input image
+   * <dt>pixels<dd>number of pixels in input image
+   * <dt>pixperline<dd>number of pixels in one line
+   * <dt>outimage<dd>output image (allocated if NULL)
+   * <dt>outpalette<dd>output palette (allocated if NULL)
+   * <dt>maxcolors<dd>maximal number of colors in output palette
    *     (actual number of colors on return)
-   * \param dither Use/do not use Floyd-Steinberg dithering
+   * <dt>dither<dd>Use/do not use Floyd-Steinberg dithering
+   * </dl>
    */
   void DoRGB (csRGBpixel *image, int pixels, int pixperline,
     uint8 *&outimage, csRGBpixel *&outpalette, int &maxcolors, bool dither);
 
-  /// Begin quantization
+  /**
+   * The following routines can be used to split the quantization process
+   * into small steps. First, you should call Begin(). This will
+   * allocate some memory for color histogram and also do some other
+   * maintenance work. Then you call Count () as much times as
+   * you want, to count the frequencies of colors. This is a quite fast
+   * operation, thus you can use it, for example, to compute a optimal
+   * palette for a large number of images (for example, software 3D renderer
+   * uses it for computing the optimal palette in paletted modes, by passing
+   * every texture to Count()).
+   * <p>
+   * When you're finished with images, call Palette(). This will
+   * compute the optimal palette. If you need just that, you can call
+   * End() and you're done. If you need to remap all those textures
+   * to the optimal palette, you can call Remap() as much times
+   * as you wish. Finally you anyway should call End() to free
+   * all the memory used by quantizer.
+   * <p>
+   * Now, a typical quantization sequence could look like this:
+   * <pre>
+   * Begin ();
+   *
+   *   Count (image, pixels);
+   *   Count (...);
+   *   ...
+   *
+   *   int maxcolors = 256;
+   *   Palette (outpalette, maxcolors);
+   *   // now maxcolors contains the actual number of palette entries
+   *
+   *   Remap (image, pixels, outimage);
+   *   Remap (...);
+   *   ...
+   *
+   * End ();
+   * </pre>
+   * The quantizer itself keeps track of its current state, and will silently
+   * ignore invalid calls. For example, if you call Remap() right
+   * after calling Begin() nothing will happen. You still can call
+   * Palette() right after Begin(), and you will get the
+   * expected black (or let's call it `empty') palette.
+   *<p>
+   * The Bias routine can be used to introduce a bias inside the
+   * currently open color histogram towards given colors. The "weight"
+   * parameter shows how important those colors are (0 - not at all, 100 -
+   * very). This can be used to bias the resulting palette towards some
+   * hard-coded values, for example you may want to use it to create a
+   * relatively uniform palette that is somewhat biased towards the colors
+   * contained in some picture(s).
+   *<p>
+   * Some routines accept an additional parameter (csRGBpixel *transp). If it
+   * is NULL, nothing special is performed. If it is non-NULL, it should point
+   * to an valid csRGBpixel object; the color of that pixel will be treated in
+   * a special way: Count() will ignore pixels of that color,
+   * Palette() will allocate color index 0 for that color, and
+   * Remap will map all such pixel values to index 0.
+   */
   void Begin ();
   /// Finish quantization
   void End ();
@@ -207,7 +201,5 @@ public:
     csRGBpixel *palette, int colors, uint8 *&outimage,
     csRGBpixel *transp = NULL);
 };
-
-/** @} */
 
 #endif // __CS_QUANTIZE_H__
