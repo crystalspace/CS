@@ -10,14 +10,15 @@ chronological order.
 	- Philip Wyett made struct ShadowDrawVisCallback a friend to
 	  class csStencilShadowStep. This works round C2248 MSVC 6
 	  compiler error and known compiler bug Q243351.
-        - res fixed the totally bogus OR csLight::GetDistanceForBrightness ().
-        - Philip Wyett added CSTOOL dependency to rlsstd.mak (rendstep_std). 
+	- res fixed the totally bogus OR csLight::GetDistanceForBrightness ().
+	- Philip Wyett added CSTOOL dependency to rlsstd.mak (rendstep_std). 
+	- Anders Stenberg fixed some drawing problems in pgserver.
 9-Sep-2003
-        - res added a simple calculation of binormals and tangents to thing.
-        - res reformatted light.xml a bit.
-        - res added some cheesy new textures to stdtex.zip: normalmaps for the
-          textures used in r3dtest and a new texture for the donut in flarge.
-          Also moved it a bit so it's only half shadowed.
+	- res added a simple calculation of binormals and tangents to thing.
+	- res reformatted light.xml a bit.
+	- res added some cheesy new textures to stdtex.zip: normalmaps for the
+	  textures used in r3dtest and a new texture for the donut in flarge.
+	  Also moved it a bit so it's only half shadowed.
 	- Jorrit added 'cstool' library to rendstep_std plugin.
 	- Jorrit fixed an accidental cvs conflict stuff that got into
 	  plugins/video/render3d/opengl/gl_txtcache.cpp.

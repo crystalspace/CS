@@ -45,10 +45,10 @@ class csHwrBitmap
 {
 private:
   void* CSID;
-  bool dirty;
+  bool dirty, currentlytiled;
   hwrbitmap bitmap;
   csSimplePixmap* pixmap;
-  csImageMemory* image;
+  int lastx, lasty, lastw, lasth;
 
   struct groprender grop;
   int shmid;
@@ -56,24 +56,29 @@ private:
  public:
   /// Construct a bitmap.
   inline csHwrBitmap (hwrbitmap bitmap0, iGraphics3D* g3d, int shmid0 = 0)
-    : bitmap (bitmap0), shmid (shmid0), pixmap (0), image (0), CSID (0)
+    : bitmap (bitmap0), shmid (shmid0), pixmap (0), CSID (0)
   { 
-    image = new csImageMemory (bitmap->w, bitmap->h, 
+    int w = 1, h = 1;
+    while (w<bitmap->w) w <<=1;
+    while (h<bitmap->h) h <<=1;
+    csImageMemory* image = new csImageMemory (w, h, 
       CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
-    memcpy (image->GetImageData (), bitmap->bits, 
-      bitmap->w*bitmap->h*4);
     csRef<iTextureHandle> tex;
     if (g3d && g3d->GetTextureManager ())
     {
       tex = g3d->GetTextureManager ()->RegisterTexture (
-        image, CS_TEXTURE_2D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
+        image, CS_TEXTURE_2D |
+               CS_TEXTURE_NOMIPMAPS);
       if (tex)
       {
         tex->Prepare ();
         pixmap = new csSimplePixmap (tex);
       }
     }
-    dirty = false;
+    delete image;
+    dirty = true;
+    currentlytiled = false;
+    lastx = lasty = lastw = lasth = -1;
   }
 
   inline ~csHwrBitmap ()
@@ -81,7 +86,6 @@ private:
     if (bitmap)
       def_bitmap_free (bitmap);
     delete pixmap;
-    delete image;
   }
 
   /// Get the pico bitmap
@@ -91,16 +95,38 @@ private:
   inline hwrbitmap GetPicoBitmap () { return CSID?(hwrbitmap)this:bitmap; }
 
   /// Get the CS bitmap (pixmap)
-  inline csSimplePixmap* GetCSBitmap () 
+  inline csSimplePixmap* GetCSBitmap (
+    bool tiled = false, int x = 0, int y = 0, int w = 0, int h = 0)
   { 
-    if (dirty)
+    if (currentlytiled == tiled && !dirty
+        && ((x == lastx && y == lasty && w == lastw && h == lasth) 
+             || !tiled))
+      return pixmap;
+    if (!tiled || 
+       (bitmap->w == pixmap->Width () && bitmap->w == pixmap->Height ()
+       && x == 0 && y == 0 && w == bitmap->w && h == bitmap->h))
     {
       csRef<iGraphics2D> g2d = pixmap->GetTextureHandle ()->GetCanvas ();
       g2d->BeginDraw ();
       g2d->Blit (0, 0, bitmap->w, bitmap->h, bitmap->bits);
       g2d->FinishDraw ();
-      dirty = false;
+    } else {
+      csImageMemory* image = new csImageMemory (bitmap->w, bitmap->h, 
+        CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+      memcpy (image->GetImageData (), bitmap->bits,
+        bitmap->w*bitmap->h*4);
+      csRef<iImage> cropped = image->Crop (x, y, w, h);
+      cropped->Rescale (pixmap->Width (), pixmap->Height ());
+      csRef<iGraphics2D> g2d = pixmap->GetTextureHandle ()->GetCanvas ();
+      g2d->BeginDraw ();
+      g2d->Blit (0, 0, pixmap->Width (), pixmap->Height (), 
+        (unsigned char*)cropped->GetImageData ());
+      g2d->FinishDraw ();
+      lastx = x; lasty = y; lastw = w; lasth = h;
+      delete image;
     }
+    dirty = false;
+    currentlytiled = tiled;
     return pixmap; 
   }
 

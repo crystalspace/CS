@@ -99,7 +99,7 @@ bool csPicoGUIServer::HandleEvent (iEvent &ev)
   {
     g_error e;
     
-    //append_param_str("pgserver","themes"," ", "lucid.th");
+    //append_param_str("pgserver","themes"," ", "fluidity.th");
     
     e = pgserver_init (PGINIT_NO_COMMANDLINE | PGINIT_NO_CONFIGFILE, 0, 0);
     if (iserror(e)) {

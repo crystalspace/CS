@@ -69,7 +69,11 @@ class csPGVideoDriver
   static void Rect (hwrbitmap, int16 x1, int16 y1, int16 x2, int16 y2,
     hwrcolor color, int16);
   static void Blit (hwrbitmap, int16 x, int16 y, int16 w, int16 h,
-    stdbitmap *pic, int16 px, int16 py, int16);
+    hwrbitmap src, int16 px, int16 py, int16);
+  static void MultiBlit (hwrbitmap, int16 dx, int16 dy, int16 dw, int16 dh,
+    hwrbitmap, int16 sx, int16 sy, int16 sw, int16 sh, 
+    int16 xo, int16 yo, int16 lgop);
+
   static g_error Load (hwrbitmap*, const uint8 *data, __u32 len);
   static g_error New (hwrbitmap*, int16 w, int16 h, uint16 bpp);
   static void Free (hwrbitmap hb);

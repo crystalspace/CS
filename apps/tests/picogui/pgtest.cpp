@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csutil/ref.h"
 #include "igraphic/imageio.h"
+#include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 #include "iutil/event.h"
@@ -71,7 +72,8 @@ int main (int argc, char *argv[])
   }
 
   bool ok = csInitializer::RequestPlugins (objreg,
-    CS_REQUEST_SOFTWARE3D,
+    //CS_REQUEST_SOFTWARE3D,
+    CS_REQUEST_OPENGL3D,
     CS_REQUEST_FONTSERVER,
     CS_REQUEST_IMAGELOADER,					  
 //  CS_REQUEST_PLUGIN ("crystalspace.gui.pico.client", iGUIClientHelper),
@@ -112,6 +114,7 @@ int main (int argc, char *argv[])
     return 6;
   }
 
+  G3D->GetDriver2D ()->SetMouseCursor (csmcNone);
   csDefaultRunLoop (objreg);
 
   // G3D->Close ();

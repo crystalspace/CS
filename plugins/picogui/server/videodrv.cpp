@@ -68,6 +68,7 @@ g_error csPGVideoDriver::RegFunc (vidlib *v)
   v->line			= Line;
   v->rect			= Rect;
   v->blit			= Blit;
+  v->multiblit			= MultiBlit;
   v->bitmap_load		= Load; 
   v->bitmap_new			= New;
   v->bitmap_free		= Free;
@@ -252,12 +253,44 @@ void csPGVideoDriver::Blit (hwrbitmap db, int16 dx, int16 dy,
   {
     linear32_blit (dstpicobmp, dx, dy, w, h, srcpicobmp, sx, sy, logop);
     ((csHwrBitmap*)db)->MarkAsDirty ();
-  } else if (srcpicobmp && !dstpicobmp) { // pico->cs
+  } else if (srcpicobmp && !dstpicobmp) 
+  { // pico->cs
     // @@@ Should support logop somehow
     // Not sure if there is a better way to draw parts of a pixmap
-    // than to use DrawTiled
-    ((csHwrBitmap*)sb)->GetCSBitmap ()->DrawTiled (
-      Gfx3D, dx, dy, w, h, dx-sx, dy-sy);
+    // than to use DrawTiled.
+    /*((csHwrBitmap*)sb)->GetCSBitmap ()->DrawTiled (
+      Gfx3D, dx, dy, w, h, dx-sx, dy-sy);*/
+    Gfx3D->DrawPixmap (
+      ((csHwrBitmap*)sb)->GetCSBitmap ()->GetTextureHandle (),
+      dx, dy, w, h, sx, sy, w, h);
+  }
+  // cs->pico is not supported
+}
+
+void csPGVideoDriver::MultiBlit (
+                       hwrbitmap db, int16 dx, int16 dy, int16 dw, int16 dh,
+                       hwrbitmap sb, int16 sx, int16 sy, int16 sw, int16 sh, 
+                       int16 xo, int16 yo, int16 logop)
+{
+  hwrbitmap srcpicobmp = sb?((csHwrBitmap*)sb)->GetPicoBitmap ():0;
+  hwrbitmap dstpicobmp = db?((csHwrBitmap*)db)->GetPicoBitmap ():0;
+  if (srcpicobmp && dstpicobmp)
+  {
+    def_multiblit (dstpicobmp, dx, dy, dw, dh, 
+                   srcpicobmp, sx, sy, sw, sh, 
+                   xo, yo, logop);
+    ((csHwrBitmap*)db)->MarkAsDirty ();
+  } else if (srcpicobmp && !dstpicobmp) 
+  { // pico->cs
+    // @@@ Should support logop somehow, and also sx/sy != 0
+    iTextureHandle* tex = 
+      ((csHwrBitmap*)sb)->GetCSBitmap (true, sx, sy, sw, sh)
+      ->GetTextureHandle ();
+    int w, h;
+    tex->GetMipMapDimensions (0, w, h);
+    Gfx3D->DrawPixmap (tex,
+      dx, dy, dw, dh, 
+      xo, yo, dw*(float)w/(sw-sx), dh*(float)h/(sh-sy));
   }
   // cs->pico is not supported
 }
