@@ -36,6 +36,12 @@ chronological order.
 	  combination with libraries) and where you use 'meshlib' to pull
 	  the object in a sector. If the 'meshlib' was not used then the
 	  'meshobj' would remain in the engine without any sector.
+	- res changed the ApplicationIcon Jam rule to set the icon path to
+	  SEARCH_SOURCE if no path was explicitly provided. Without this 
+	  change, was apparently not utilized and the icon file not found.
+	- res updated msvcgen to honor the Jam-set application icon.
+	- res changed the cslight Jamfile to use the ApplicationIcon rule to
+	  set its icon.
 3-May-2004
 	- Eric Sunshine augmented all the "build" instructions in the user
 	  manual to indicate that the project can be built with both Jam and

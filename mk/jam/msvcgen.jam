@@ -334,6 +334,28 @@ rule MsvcProject
       Win32Resource $(rawname) : $(metarc) ;
       RmTemps $(resource) : $(metarc) ;
     }
+
+    if [ IsElem $(type) : appgui appcon ]
+    {
+      local icon = [ ApplicationIcon win32 : $(rawname) ] ;
+      if ! $(icon)
+      {
+	local apptype = gui ;
+	if $(type) = "appcon" { apptype = console ; }
+	icon = [ ApplicationIconDefault win32 : $(apptype) ] ;
+      }
+      if $(icon)
+      {
+	local iconrc = $(resource:S=.irctmp) ;
+      
+	MakeLocate $(metarc) : $(MSVCGEN_LOCATE_FRAGMENT) ;
+    
+	GenerateIconRc $(iconrc) : $(icon) ;
+    
+	Win32Resource $(rawname) : $(iconrc) ;
+	RmTemps $(resource) : $(iconrc) ;
+      }
+    }
   
     Always $(resource) ;
   }

@@ -78,6 +78,10 @@ rule ApplicationIcon
     {
       SEARCH on $(icon) = [ ConcatDirs $(iconpath) ] ;
     }
+    else
+    {
+      SEARCH on $(icon) = $(SEARCH_SOURCE) ;
+    }
 
     # An ugly but effective way to detect incorrect usage.
     if $($(target)_TARGET)
