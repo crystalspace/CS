@@ -427,6 +427,19 @@ SCF_VERSION (iAwsComponent, 0, 1, 0);
 /// Interface that is the base of ALL components.
 struct iAwsComponent : public iAwsSource
 {
+  
+  /** This function takes care of the creation tasks required to prepare this
+    * component for use. If you create a component via the window manager's creation functions
+    * then you should not call this, the window manager has done it for you. If you create
+    * components programatically then you are encouraged to call this func to make setup
+    * easier. For component developers, you should not need to override Create but 
+    * rather do your setup work in Setup. 
+    *
+    * If it returns false then the component was not able to initialize properly and
+    * shouldn't be used.
+    **/
+  virtual bool Create(iAws* mgr, iAwsComponent* parent, awsComponentNode* settings);
+
   /// Sets up a component.
   virtual bool Setup(iAws *wmgr, awsComponentNode *settings)=0;
 
