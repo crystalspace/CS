@@ -100,21 +100,23 @@ SCF_IMPLEMENT_IBASE(csShadowBlock)
   SCF_IMPLEMENTS_INTERFACE(iShadowBlock)
 SCF_IMPLEMENT_IBASE_END
 
-csShadowBlock::csShadowBlock (
-  uint32 region,
-  int max_shadows,
-  int delta) :
-    next(NULL),
-    prev(NULL),
-    shadows(max_shadows, delta)
+csShadowBlock::csShadowBlock (uint32 region, int max_shadows, int delta) :
+    next(NULL), prev(NULL), shadows(max_shadows, delta)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   shadow_region = region;
+  bbox_valid = false;
 }
 
 csShadowBlock::~csShadowBlock ()
 {
   DeleteShadows ();
+}
+
+void csShadowBlock::IntAddShadow (csShadowFrustum* csf)
+{
+  shadows.Push (csf);
+  bbox_valid = false;
 }
 
 void csShadowBlock::AddRelevantShadows (
@@ -131,12 +133,12 @@ void csShadowBlock::AddRelevantShadows (
       {
         csShadowFrustum *copycsf = new csShadowFrustum (*csf);
         copycsf->Transform (trans);
-        shadows.Push (copycsf);
+	IntAddShadow (copycsf);
       }
       else
       {
         csf->IncRef ();
-        shadows.Push (csf);
+	IntAddShadow (csf);
       }
     }
   }
@@ -160,7 +162,7 @@ void csShadowBlock::AddRelevantShadows (csShadowBlockList *source)
     if (csf->IsRelevant ())
     {
       csf->IncRef ();
-      shadows.Push (csf);
+      IntAddShadow (csf);
     }
   }
 
@@ -179,7 +181,7 @@ void csShadowBlock::AddAllShadows (csShadowBlockList *source)
   {
     csShadowFrustum *csf = (csShadowFrustum *)shadow_it->Next ();
     csf->IncRef ();
-    shadows.Push (csf);
+    IntAddShadow (csf);
   }
 
   delete shadow_it;
@@ -206,7 +208,7 @@ void csShadowBlock::AddUniqueRelevantShadows (csShadowBlockList *source)
       if (i >= cnt)
       {
         csf->IncRef ();
-        shadows.Push (csf);
+	IntAddShadow (csf);
       }
     }
   }
@@ -228,7 +230,7 @@ csFrustum *csShadowBlock::AddShadow (
   csShadowFrustum *sf = new csShadowFrustum (origin, num_verts);
   sf->SetBackPlane (backplane);
   sf->SetUserData (userData);
-  shadows.Push (sf);
+  IntAddShadow (sf);
   return (csFrustum *)sf;
 }
 
@@ -237,6 +239,24 @@ void csShadowBlock::UnlinkShadow (int idx)
   csShadowFrustum *sf = (csShadowFrustum *)shadows[idx];
   sf->DecRef ();
   shadows.Delete (idx);
+  bbox_valid = false;
+}
+
+const csBox3& csShadowBlock::GetBoundingBox ()
+{
+  if (!bbox_valid)
+  {
+    bbox.StartBoundingBox ();
+    int i, j;
+    for (i = 0 ; i < shadows.Length () ; i++)
+    {
+      csShadowFrustum *sf = (csShadowFrustum *)shadows[i];
+      for (j = 0 ; j < sf->GetVertexCount () ; j++)
+        bbox.AddBoundingVertex (sf->GetVertex (j));
+    }
+    bbox_valid = true;
+  }
+  return bbox;
 }
 
 //---------------------------------------------------------------------------
@@ -283,6 +303,23 @@ csShadowIterator::csShadowIterator (
   csShadowIterator::onlycur = onlycur;
   csShadowIterator::dir = dir;
   first_cur = cur;
+  use_bbox = false;
+  Reset ();
+}
+
+csShadowIterator::csShadowIterator (
+  const csBox3& bbox,
+  csShadowBlock *cur,
+  bool onlycur,
+  int dir)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  csShadowIterator::cur = cur;
+  csShadowIterator::onlycur = onlycur;
+  csShadowIterator::dir = dir;
+  first_cur = cur;
+  csShadowIterator::bbox = bbox;
+  use_bbox = true;
   Reset ();
 }
 

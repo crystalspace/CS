@@ -21,6 +21,7 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/frustum.h"
+#include "csgeom/box.h"
 #include "csutil/csvector.h"
 #include "iengine/shadows.h"
 #include "iengine/fview.h"
@@ -90,7 +91,11 @@ private:
   int i, cur_num;
   bool onlycur;
   int dir;	// 1 or -1 for direction.
+  csBox3 bbox;	// If use_bbox is true only iterate over relevant shadow blocks.
+  bool use_bbox;
   csShadowIterator (csShadowBlock* cur, bool onlycur, int dir);
+  csShadowIterator (const csBox3& bbox, csShadowBlock* cur,
+  	bool onlycur, int dir);
   csShadowFrustum* cur_shad;
 
 public:
@@ -134,6 +139,10 @@ private:
   csShadowBlock* next, * prev;
   csVector shadows;
   uint32 shadow_region;
+  csBox3 bbox;	// The bbox (in light space) for all shadows in this block.
+  bool bbox_valid;	// If true bbox is valid.
+
+  void IntAddShadow (csShadowFrustum* csf);
 
 public:
   /// Create a new empty list.
@@ -154,7 +163,11 @@ public:
       sf->DecRef ();
     }
     shadows.DeleteAll ();
+    bbox_valid = false;
   }
+
+  /// Get the bounding box of this shadow block.
+  virtual const csBox3& GetBoundingBox ();
 
   /**
    * Copy all relevant shadow frustums from another shadow block
@@ -251,6 +264,7 @@ public:
       CS_ASSERT (sf != NULL);
       sf->Transform (trans);
     }
+    bbox_valid = false;
   }
 
   /// Get iterator to iterate over all shadows in this block.
@@ -385,6 +399,12 @@ public:
   virtual iShadowIterator* GetShadowIterator (bool reverse = false)
   {
     return (iShadowIterator*)(new csShadowIterator (first, false,
+    	reverse ? -1 : 1));
+  }
+  virtual iShadowIterator* GetShadowIterator (
+  	const csBox3& bbox, bool reverse = false)
+  {
+    return (iShadowIterator*)(new csShadowIterator (bbox, first, false,
     	reverse ? -1 : 1));
   }
 

@@ -63,7 +63,7 @@ struct iShadowIterator : public iBase
   virtual iShadowBlock* GetNextShadowBlock () = 0;
 };
 
-SCF_VERSION (iShadowBlock, 0, 0, 2);
+SCF_VERSION (iShadowBlock, 0, 0, 3);
 
 /**
  * A block of shadows represent the shadows that are casted by
@@ -127,9 +127,12 @@ struct iShadowBlock : public iBase
    * Apply a transformation to all frustums in this list.
    */
   virtual void Transform (csTransform* trans) = 0;
+
+  /// Get the bounding box of this shadow block.
+  virtual const csBox3& GetBoundingBox () = 0;
 };
 
-SCF_VERSION (iShadowBlockList, 0, 0, 4);
+SCF_VERSION (iShadowBlockList, 0, 0, 5);
 
 /**
  * This is a list of shadow blocks. An iShadowReceiver will get
@@ -139,6 +142,14 @@ struct iShadowBlockList : public iBase
 {
   /// Get an iterator to iterate over all shadows in this list.
   virtual iShadowIterator* GetShadowIterator (bool reverse = false) = 0;
+  /**
+   * Get an iterator to iterate over all shadows in this list.
+   * This version will test the bounding boxes of all shadow blocks
+   * and only iterate over the shadow blocks that are potentially
+   * relevant (i.e. that potentially shadow the given bounding box).
+   */
+  virtual iShadowIterator* GetShadowIterator (
+  	const csBox3& bbox, bool reverse = false) = 0;
 
   /// Create a new shadow block and append to the list.
   virtual iShadowBlock* NewShadowBlock (int num_shadows = 30) = 0;

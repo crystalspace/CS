@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	  is a huge memory improvement.
 	- Added forgotten 'public' to some inheritance in frustvis and
 	  dynavis. This caused a warning on MSVC.
+	- Implemented the start for a new optimization to make recalculating
+	  lighting on huge levels faster (a lot I hope). Not ready yet!
 21-Nov-2002
 	- Fixed CastShadows() implementation in Dynavis and Frustvis
 	  so that it shadow casting is now correct (I hope).
