@@ -58,8 +58,6 @@ csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
 	      "crystalspace.maploader.parse.sound",
 	      "Cannot create sound data from file '%s'!", filename);
   }
-  else
-    Stats->sounds_loaded++;
 
   return csPtr<iSoundData> (Sound);
 }

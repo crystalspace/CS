@@ -224,25 +224,6 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
 
 //---------------------------------------------------------------------------
 
-void csLoader::csLoaderStats::Init ()
-{
-  polygons_loaded = 0;
-  portals_loaded  = 0;
-  sectors_loaded  = 0;
-  things_loaded   = 0;
-  lights_loaded   = 0;
-  curves_loaded   = 0;
-  meshes_loaded   = 0;
-  sounds_loaded   = 0;
-}
-
-csLoader::csLoaderStats::csLoaderStats()
-{
-  Init ();
-}
-
-//---------------------------------------------------------------------------
-
 void csLoader::ReportError (const char* id, const char* description, ...)
 {
   va_list arg;
@@ -405,7 +386,6 @@ csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iFile* buf,
 bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   bool iOnlyRegion, bool checkdupes)
 {
-  Stats->Init ();
   if (iClearEngine) Engine->DeleteAll ();
   ResolveOnlyRegion = iOnlyRegion;
   csLoader::checkDupes = checkdupes;
@@ -436,17 +416,6 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
     ReportError ("crystalspace.maploader", 
 	    "Please convert your map to XML using cs2xml (file '%s')!", file);
     return false;
-  }
-
-  if (Stats->polygons_loaded)
-  {
-    ReportNotify ("Loaded map file:");
-    ReportNotify ("  %d polygons (%d portals),", Stats->polygons_loaded,
-      Stats->portals_loaded);
-    ReportNotify ("  %d sectors, %d things, %d meshes, ", Stats->sectors_loaded,
-      Stats->things_loaded, Stats->meshes_loaded);
-    ReportNotify ("  %d curves, %d lights, %d sounds.", Stats->curves_loaded,
-      Stats->lights_loaded, Stats->sounds_loaded);
   }
 
   return true;
@@ -638,13 +607,11 @@ csLoader::csLoader (iBase *p)
   flags = 0;
   ResolveOnlyRegion = false;
   checkDupes = false;
-  Stats = new csLoaderStats ();
 }
 
 csLoader::~csLoader()
 {
   loaded_plugins.DeleteAll ();
-  delete Stats;
 }
 
 iLoaderContext* csLoader::GetLoaderContext ()
@@ -2178,7 +2145,6 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 
   const char* priority = '\0';
 
-  Stats->meshes_loaded++;
   iMeshWrapper* mesh = NULL;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -2240,7 +2206,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 
   const char* priority = NULL;
 
-  Stats->meshes_loaded++;
   iLoaderPlugin* plug = NULL;
   iBinaryLoaderPlugin* binplug = NULL;
 
@@ -2918,7 +2883,6 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 {
   const char* lightname = node->GetAttributeValue ("name");
 
-  Stats->lights_loaded++;
   csVector3 pos;
 
 #ifdef CS_USE_NEW_RENDERER
@@ -3334,7 +3298,6 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
   if (sector == NULL)
   {
     sector = Engine->CreateSector (secname);
-    Stats->sectors_loaded++;
   }
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();

@@ -30,6 +30,8 @@ The history order is reversed so that new features are at the top.
 	- Jorrit made VFS thread-safe. Working on the same iFile is not
 	  thread-safe though! Also the concept of the current VFS directory
 	  should not be used in threads.
+	- Jorrit removed the statistics from the loader. It wasn't complete
+	  anymore and it is a pretty useless feature anyway.
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.

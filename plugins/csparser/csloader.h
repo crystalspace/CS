@@ -281,22 +281,6 @@ private:
   /// Pointer to built-in checkerboard texture loader.
   csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
 
-  class csLoaderStats
-  {
-  public:
-    int polygons_loaded;
-    int portals_loaded;
-    int sectors_loaded;
-    int things_loaded;
-    int lights_loaded;
-    int curves_loaded;
-    int meshes_loaded;
-    int sounds_loaded;
-
-    void Init();
-    csLoaderStats();
-  };
-
   class csLoadedPluginVector : public csVector
   {
   private:
@@ -335,8 +319,6 @@ private:
    * region.
    */
   bool ResolveOnlyRegion;
-  /// Statistics
-  class csLoaderStats *Stats;
   /**
    * If true we only load objects (materials, textures and mesh factories)
    * that are not already in memory (ignoring regions).
