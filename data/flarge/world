@@ -99,9 +99,11 @@
         </texture>
     </textures>
     <variables>
-	<variable name="Std Thing Angle" type="float" value="0.54321" />
-	<variable name="Std Thing Range" type="float" value="50.5" />
-	<variable name="Lightning Restore Color" type="color" red="0" green="0" blue="0" />
+	<variable name="Std Thing Angle" value="0.54321" />
+	<variable name="Std Thing Range" value="50.5" />
+	<variable name="Lightning Restore Color">
+	    <color red="0" green="0" blue="0" />
+        </variable>
     </variables>
     <materials>
         <material name="tree">
@@ -5766,6 +5768,7 @@
             <params>
                 <factory>genMeshFact</factory>
                 <material>mosaic</material>
+		<!-- <localshadows /> -->
             </params>
             <move>
                 <v x="-1.5" y="-.7" z="14" />
