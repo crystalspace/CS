@@ -69,8 +69,10 @@ bool csPython::Initialize(iSystem* iSys) {
   sprintf (cmd, "sys.path.append('%sscripts/python/')", path);
   if(!RunText(cmd))
     return 0;
+#if 0 //Azverkan turn this on to send python script prints to the crystal space console
   if(!LoadModule("cshelper"))
     return 0;
+#endif   
   if(!LoadModule("pdb"))
     return 0;
   if(!LoadModule("cspacec"))
