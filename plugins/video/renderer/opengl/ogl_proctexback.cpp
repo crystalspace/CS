@@ -221,7 +221,7 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
     glGenTextures (1, &tex_data->Handle);
     // Texture is in tha cache, update texture directly. 
     glBindTexture (GL_TEXTURE_2D, tex_data->Handle);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

@@ -173,7 +173,6 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   glEnable (GL_TEXTURE_2D);
 
   glShadeModel (GL_FLAT);
-  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   glBindTexture (GL_TEXTURE_2D, halohandle);
 
   csGraphics3DOGLCommon::SetupBlend (dstblend, 0, false);

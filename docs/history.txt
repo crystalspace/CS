@@ -29,6 +29,14 @@ The history order is reversed so that new features are at the top.
 	- Removed simplep since that app is now no longer useful (as its
 	  only purpose was to demonstrate how to use the engine as a plugin,
 	  but simple does that now).
+	- Philip Wyett moved snddata.o from libs to include to aid creation
+	  of a CS developers SDK release package and aid in the porting of
+	  walktest outside the CS tree.
+	- Philip eliminated compiler warning in terrfunc.
+	- Fixed a bug in OpenGL renderer with procedural textures. They
+	  were calling glTexEnv() to set the mode to GL_REPLACE but this
+	  caused problems for the rest of CS since the rest of CS wants
+	  GL_MODULATE.
 29-May-2001
 	- Michael Voasse added accessor functions to iCameraPosition for
 	  sector, position upward vector and forward vector.

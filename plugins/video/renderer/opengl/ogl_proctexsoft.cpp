@@ -320,7 +320,7 @@ void csOpenGLProcSoftware::Print (csRect *area)
   if (tex_data)
   {
     // Texture is in tha cache, update texture directly.
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     glBindTexture (GL_TEXTURE_2D, tex_data->Handle);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
 		    width, height,
