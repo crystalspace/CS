@@ -179,7 +179,7 @@ CC=gcc -c
 CXX=g++ -c
 
 # The linker.
-LINK=gcc
+LINK=g++
 
 # Command sequence for creating a directory.
 # Note that directories will have forward slashes. Please
