@@ -12,6 +12,14 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+28-Feb-2000
+	- Eric Sunshine rewrote the endian-conversion functions in the BMP
+	  loader to work on platforms (such as Sparc and HPPA) which enforce
+	  strict-alignment.  On such platforms, it is illegal to attempt to
+	  access primitive data types at addresses which are not mulitples of
+	  the type's size.  For instance, a 'long' can only be accessed at a
+	  memory location which is a multiple of four.  He also cleaned up the
+	  palette conversion code a bit.
 27-Feb-2000
 	- Eric Sunshine fixed a bug in polytext.cpp where a recent "patch"
 	  following Andrew's "Big Change" broke CleanIfDirty().  The 'src' and
