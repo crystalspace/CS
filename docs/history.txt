@@ -24,6 +24,11 @@ The history order is reversed so that new features are at the top.
 	  and 'tutsimp2'.
 	- Wouter Wijngaards writes: the clipping of mesh objects should now
 	  be correctly handled in the iso engine.
+	- Renamed widht2/height2 to asp_center_x/y in OpenGL renderer.
+	  This is really the center of the perspective aspect and not
+	  just width or height divided by two. Fixed a related bug in the
+	  edge drawing which would not work correctly with iso engine for
+	  this reason.
 14-Jun-2001
 	- Made the terrain visibility checker more efficient and more robust.
 	  The calculation of the extent works completely different now and

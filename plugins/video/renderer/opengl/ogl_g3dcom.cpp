@@ -360,9 +360,9 @@ void csGraphics3DOGLCommon::PerfTest ()
 
   float zx, zy, z;
   // First we calculate the z which will bring the top-left vertex
-  // further than (-width2,-height2).
-  zx = -5. / ((-width2-width2) * inv_aspect);
-  zy = -5. / ((-height2-height2) * inv_aspect);
+  // further than (-asp_center_x,-asp_center_y).
+  zx = -5. / ((-asp_center_x-asp_center_x) * inv_aspect);
+  zy = -5. / ((-asp_center_y-asp_center_y) * inv_aspect);
   if (zy < zx) z = zy;
   else z = zx;
 
@@ -484,8 +484,8 @@ void csGraphics3DOGLCommon::PerfTest ()
   // but not in the small clipper.
   // First we calculate the z which will bring the top-left vertex
   // beyond (dw,dh).
-  zx = -5. / ((dw-width2) * inv_aspect);
-  zy = -5. / ((dh-height2) * inv_aspect);
+  zx = -5. / ((dw-asp_center_x) * inv_aspect);
+  zy = -5. / ((dh-asp_center_y) * inv_aspect);
   if (zy > zx) z = zy;
   else z = zx;
   for (i = 0 ; i < mesh.num_vertices ; i++)
@@ -764,8 +764,8 @@ void csGraphics3DOGLCommon::CommonOpen ()
   DrawMode = 0;
   width = G2D->GetWidth ();
   height = G2D->GetHeight ();
-  width2 = width / 2;
-  height2 = height / 2;
+  asp_center_x = width / 2;
+  asp_center_y = height / 2;
   SetDimensions (width, height);
   // default lightmap blend style
   m_config_options.m_lightmap_src_blend = GL_DST_COLOR;
@@ -820,8 +820,8 @@ void csGraphics3DOGLCommon::SetDimensions (int width, int height)
 {
   csGraphics3DOGLCommon::width = width;
   csGraphics3DOGLCommon::height = height;
-  csGraphics3DOGLCommon::width2 = width / 2;
-  csGraphics3DOGLCommon::height2 = height / 2;
+  csGraphics3DOGLCommon::asp_center_x = width / 2;
+  csGraphics3DOGLCommon::asp_center_y = height / 2;
   frustum_valid = false;
 }
 
@@ -883,8 +883,8 @@ void csGraphics3DOGLCommon::CalculateFrustum ()
     int i;
     for (i = 0 ; i < nv ; i++)
     {
-      v3.x = (v[i].x - width2) * inv_aspect;
-      v3.y = (v[i].y - height2) * inv_aspect;
+      v3.x = (v[i].x - asp_center_x) * inv_aspect;
+      v3.y = (v[i].y - asp_center_y) * inv_aspect;
       frustum.AddVertex (v3);
     }
   }
@@ -1029,11 +1029,11 @@ void csGraphics3DOGLCommon::DebugDrawElements (iGraphics2D* g2d,
       b <<= 2;
       c <<= 2;
       x1 = verts[a] / verts[a+3];
-      y1 = ogl_g3d->height-verts[a+1] / verts[a+3];
+      y1 = ogl_g3d->height - verts[a+1] / verts[a+3];
       x2 = verts[b] / verts[b+3];
-      y2 = ogl_g3d->height-verts[b+1] / verts[b+3];
+      y2 = ogl_g3d->height - verts[b+1] / verts[b+3];
       x3 = verts[c] / verts[c+3];
-      y3 = ogl_g3d->height-verts[c+1] / verts[c+3];
+      y3 = ogl_g3d->height - verts[c+1] / verts[c+3];
     }
     else
     {
@@ -1059,14 +1059,14 @@ void csGraphics3DOGLCommon::DebugDrawElements (iGraphics2D* g2d,
       }
       float iz;
       iz = ogl_g3d->aspect / va.z;
-      x1 = va.x * iz + ogl_g3d->width2;
-      y1 = ogl_g3d->height2 - va.y * iz;
+      x1 = va.x * iz + ogl_g3d->asp_center_x;
+      y1 = ogl_g3d->height - va.y * iz - ogl_g3d->asp_center_y;
       iz = ogl_g3d->aspect / vb.z;
-      x2 = vb.x * iz + ogl_g3d->width2;
-      y2 = ogl_g3d->height2 - vb.y * iz;
+      x2 = vb.x * iz + ogl_g3d->asp_center_x;
+      y2 = ogl_g3d->height - vb.y * iz - ogl_g3d->asp_center_y;
       iz = ogl_g3d->aspect / vc.z;
-      x3 = vc.x * iz + ogl_g3d->width2;
-      y3 = ogl_g3d->height2 - vc.y * iz;
+      x3 = vc.x * iz + ogl_g3d->asp_center_x;
+      y3 = ogl_g3d->height - vc.y * iz - ogl_g3d->asp_center_y;
     }
     g2d->DrawLine (x1, y1, x2, y2, color);
     g2d->DrawLine (x2, y2, x3, y3, color);
@@ -1697,8 +1697,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   GLfloat* gltxt = queue.GetGLTxt (idx);
   for (i = 0; i < poly.num; i++)
   {
-    sx = poly.vertices[i].sx - width2;
-    sy = poly.vertices[i].sy - height2;
+    sx = poly.vertices[i].sx - asp_center_x;
+    sy = poly.vertices[i].sy - asp_center_y;
     one_over_sz = M * sx + N * sy + O;
     sz = 1.0 / one_over_sz;
     u_over_sz = (J1 * sx + J2 * sy + J3);
@@ -1854,8 +1854,8 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
   float sx, sy, sz, one_over_sz;
   for (i = 0; i < poly.num; i++)
   {
-    sx = poly.vertices[i].sx - width2;
-    sy = poly.vertices[i].sy - height2;
+    sx = poly.vertices[i].sx - asp_center_x;
+    sy = poly.vertices[i].sy - asp_center_y;
     one_over_sz = M * sx + N * sy + O;
     sz = 1.0 / one_over_sz;
     glverts[vtidx++] = poly.vertices[i].sx * sz;
@@ -2693,7 +2693,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
 
 
-  glTranslatef (width2, height2, 0);
+  glTranslatef (asp_center_x, asp_center_y, 0);
   for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
   matrixholder[0] = matrixholder[5] = 1.0;
   matrixholder[11] = inv_aspect;
@@ -3360,8 +3360,8 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   glBegin (GL_TRIANGLE_FAN);
   for (i = 0; i < poly.num; i++)
   {
-    sx = poly.vertices[i].sx - width2;
-    sy = poly.vertices[i].sy - height2;
+    sx = poly.vertices[i].sx - asp_center_x;
+    sy = poly.vertices[i].sy - asp_center_y;
     one_over_sz = M * sx + N * sy + O;
     sz = 1.0 / one_over_sz;
     u_over_sz = (J1 * sx + J2 * sy + J3);

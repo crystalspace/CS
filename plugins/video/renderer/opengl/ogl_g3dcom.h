@@ -365,10 +365,10 @@ protected:
   int width;
   /// Height of display.
   int height;
-  /// Opt: width divided by 2.
-  int width2;
-  /// Opt: height divided by 2.
-  int height2;
+  /// Aspect center x.
+  int asp_center_x;
+  /// Aspect center y.
+  int asp_center_y;
 
   /// Current transformation from world to camera.
   csReversibleTransform o2c;
@@ -571,15 +571,15 @@ public:
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y)
   {
-    width2 = x;
-    height2 = y;
+    asp_center_x = x;
+    asp_center_y = y;
     frustum_valid = false;
   }
   /// Get center of projection.
   virtual void GetPerspectiveCenter (int& x, int& y)
   {
-    x = width2;
-    y = height2;
+    x = asp_center_x;
+    y = asp_center_y;
   }
   /// Set perspective aspect.
   virtual void SetPerspectiveAspect (float aspect)
@@ -635,7 +635,7 @@ public:
   {
     FlushDrawPolygon ();
     DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect,
-    	width2, height2);
+    	asp_center_x, asp_center_y);
   }
 
   /// Get the iGraphics2D driver.
