@@ -14,6 +14,7 @@ SubInclude TOP plugins video canvas openglwin ;
 SubInclude TOP plugins video canvas openglx ;
 SubInclude TOP plugins video canvas sdl ;
 SubInclude TOP plugins video canvas softx ;
+SubInclude TOP plugins video canvas wxgl ;
 SubInclude TOP plugins video canvas xextf86vm ;
 SubInclude TOP plugins video canvas xextshm ;
 SubInclude TOP plugins video canvas xwindow ;
