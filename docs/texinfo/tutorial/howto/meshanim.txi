@@ -1,6 +1,10 @@
 @c -*-texinfo-*-
 @node HOWTO Mesh LightAnim, HOWTO Mesh Movement, HOWTO Collision Detection, HOWTO
 @subsection Mesh Lighting and Animation
+@cindex mesh lighting
+@cindex mesh animation
+@cindex @code{iMeshWrapper}
+@cindex @code{DeferUpdateLighting}
 
 This section describes how to do animation for meshes and how they can
 get lit by surrounding lights.
@@ -53,4 +57,13 @@ be visible. Here is an example:
 
 This example considers both dynamic and static lights and will take the
 10 lights that are closest to the mesh.
+
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+  #include "iengine/mesh.h"
+  #include "iengine/engine.h"
+@end example
 

@@ -198,4 +198,14 @@ Note that sky objects are usually created with the @samp{CAMERA} keyword
 camera will always be in the center of that object. So you can move forever
 in some direction without ever reaching the bounds of the sky.
 
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+  #include "iengine/mesh.h"
+  #include "iengine/sector.h"
+  #include "iengine/engine.h"
+  #include "ivideo/graph3d.h"
+@end example
 

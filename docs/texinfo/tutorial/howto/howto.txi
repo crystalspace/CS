@@ -6,10 +6,12 @@
 @noindent
 @emph{Written by Jorrit Tyberghein, @email{Jorrit.Tyberghein@@pandora.be}}
 
-Last updated 10 May, 2001.
+Last updated 16 May, 2001.
 
 This is a list of HOWTO's for Crystal Space. They contain short questions with
-more or less short answers.
+more or less short answers. In every howto where it is relevant you can find
+a short subsection with all the include files you need to use the example
+code.
 
 @menu
 * HOWTO Collision Detection:: Doing Collision Detection

@@ -125,3 +125,14 @@ the object space vertices itself. But this can of course not be used
 dynamically as you would have to recalculate the collider every time
 the object changes.
 
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+  #include "iobject/object.h"
+  #include "iengine/collider.h"
+  #include "iengine/polymesh.h"
+  #include "iengine/mesh.h"
+@end example
+

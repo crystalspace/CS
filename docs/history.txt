@@ -29,9 +29,34 @@ The history order is reversed so that new features are at the top.
 	  correct. This fixes both collision detection (i.e. walking on the
 	  terrain which used to be very bumpy) as well as texture mapping
 	  using the texture generation process.
+	- Added a new subsection to all howto's giving a short summary of
+	  the relevant include files for the example code in that section.
 	- Fixed a bug in csThing (creation of bounding box) which was
 	  harmless but nevertheless it did cause an assert to fail
 	  (and rightly so).
+	- Thomas Hieber writes the following: tried to get map2cs to work
+	  with the new map format, but I really have the impression, the new
+	  map format was designed for obscurity. My head is now buzzing with
+	  meshfactories and plugins and all that stuff. To make it short:
+	  I am giving up on it. I have committed my effort in the hope there
+	  is somebody out there who understands the new map format and can
+	  fix it. At least my changes to the material stuff and the plane
+	  stuff seem reasonable.
+	  I also output the "plugins" section right so maybe this is a start.
+	  I don't have a clue, how to convert bezier curves. I have put
+	  everything together on curves that I thought I had understood,
+	  but maybe I am wrong there.
+	  Sectors and things are a lot more difficult. I don't know how to
+	  connect polygons to texture planes, and all the stuff with these
+	  factories and parts is over my head.
+	  I don't think the old format of CS map files was easy to
+	  understand, but the new format is much more complicated.
+	  At least to complicated for me.
+	- Norman Kramer writes: years after Raider was renamed to Twix I
+	  now renamed MESHOBJ to MESHFACT in the meshobj documentation.
+	- Martin Geisse added a generic 'string set' utility class. Its
+	  functionality is the same as of the string server plug-in.
+	- Martin also did a bugfix to the material code.
 15-May-2001
 	- Philip Wyett added the new cslexan to global build process.
 	  Philip also changed MSVC project file generation process to create

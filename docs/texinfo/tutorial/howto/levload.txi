@@ -2,6 +2,7 @@
 @node HOWTO Level Loading, HOWTO Pixmaps, HOWTO Pseudo DynLight, HOWTO
 @subsection Loading a Level
 @cindex @code{iLoader}
+@cindex loading level
 
 This section describes how you can load a level in your game.
 
@@ -71,4 +72,13 @@ The line @code{engine->Prepare()} will make sure that everything that
 is loaded is correctly set up (i.e. materials and texture will be registered,
 lightmaps will be loaded from the cache, ...).
 
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+  #include "isys/vfs.h"
+  #include "imap/parser.h"
+  #include "iengine/engine.h"
+@end example
 

@@ -96,3 +96,16 @@ for more info. But here is one example:
 This will draw the pixmap at location 10, 10 with dimension 400, 400.
 If needed it will scale so that the pixmap really fits there.
 
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+  #include "csfx/cspixmap.h"
+  #include "igraphic/image.h"
+  #include "igraphic/imageio.h"
+  #include "ivideo/texture.h"
+  #include "ivideo/txtmgr.h"
+  #include "isys/vfs.h"
+@end example
+

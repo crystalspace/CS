@@ -4,6 +4,8 @@
 @cindex pseudo-dynamic lights
 @cindex dynamic lights
 @cindex static lights
+@cindex @code{iStatLight}
+@cindex @code{iLight}
 
 One little known feature in CS is the ability to have pseudo-dynamic
 lights. Pseudo-dynamic lights are somewhere between static lights and
@@ -65,4 +67,14 @@ do this with the following code:
 @end example
 
 This will change the color of the light from red to blue.
+
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+  #include "iengine/light.h"
+  #include "iengine/sector.h"
+  #include "iengine/engine.h"
+@end example
 

@@ -52,3 +52,12 @@ This will move the camera in the world so that it goes one unit in
 the positive Z direction. This will happen independently of the orientation
 of the camera.
 
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+  #include "iengine/camera.h"
+  #include "csgeom/transfrm.h"
+@end example
+

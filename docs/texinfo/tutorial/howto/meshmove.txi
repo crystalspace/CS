@@ -1,8 +1,9 @@
 @c -*-texinfo-*-
 @node HOWTO Mesh Movement, HOWTO Camera Movement, HOWTO Mesh LightAnim, HOWTO
 @subsection Mesh Movement
-@cindex @samp{iMovable}
-@cindex @samp{csReversibleTransform}
+@cindex @code{iMovable}
+@cindex @code{iMeshWrapper}
+@cindex @code{csReversibleTransform}
 @cindex movement
 @cindex moving
 @cindex @code{HardTransform}
@@ -117,4 +118,14 @@ want to move them so that the origin is ok. That can make later transformations
 from object to world space easier. @code{HardTransform()} is not a function
 of @samp{iMovable} but of @samp{iMeshWrapper} (which will in turn delegate
 this to the mesh object itself).
+
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+  #include "csgeom/transfrm.h"
+  #include "iengine/movable.h"
+  #include "iengine/mesh.h"
+@end example
 
