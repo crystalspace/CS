@@ -231,7 +231,7 @@ public:
   /**
    * Get the number of things in this sector.
    */
-  int GetNumberThings ()
+  int GetNumThings ()
   {
     return things.Length ();
   }
