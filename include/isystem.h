@@ -155,6 +155,7 @@ struct iEventOutlet;
 struct iEventPlug;
 struct iEventCord;
 struct iStrVector;
+struct iConfigFile;
 struct iConfigFileNew;
 
 SCF_VERSION (iSystem, 4, 0, 1);

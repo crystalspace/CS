@@ -365,7 +365,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // Find scf.cfg and initialize SCF
   GetInstallPath (scfconfigpath, sizeof (scfconfigpath));
   strcat (scfconfigpath, "scf.cfg");
-  csIniFile scfconfig (scfconfigpath);
+  csConfigFile scfconfig (scfconfigpath);
   scfInitialize (&scfconfig);
 
   // @@@ This is ugly.  We need a better, more generalized way of doing this.
