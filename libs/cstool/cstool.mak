@@ -1,4 +1,3 @@
-# Library description
 DESCRIPTION.cstool = Crystal Space tool Library
 
 #------------------------------------------------------------- rootdefines ---#
@@ -12,9 +11,9 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cstool
-
+.PHONY: cstool cstoolclean
 all libs: cstool
+
 cstool:
 	$(MAKE_TARGET)
 cstoolclean:
@@ -25,13 +24,17 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/libs/cstool libs/cstool/impexp
-
 CSTOOL.LIB = $(OUT)/$(LIB_PREFIX)cstool$(LIB_SUFFIX)
-INC.CSTOOL = $(wildcard $(addprefix $(SRCDIR)/,include/cstool/*.h))
-SRC.CSTOOL = $(wildcard $(addprefix $(SRCDIR)/,libs/cstool/*.cpp))
-OBJ.CSTOOL = $(addprefix $(OUT)/,$(notdir $(SRC.CSTOOL:.cpp=$O)))
+
+DIR.CSTOOL = libs/cstool
+OUT.CSTOOL = $(OUT)/$(DIR.CSTOOL)
+INC.CSTOOL = \
+  $(wildcard $(SRCDIR)/$(DIR.CSTOOL)/*.h $(SRCDIR)/include/cstool/*.h)
+SRC.CSTOOL = $(wildcard $(SRCDIR)/$(DIR.CSTOOL)/*.cpp)
+OBJ.CSTOOL = $(addprefix $(OUT.CSTOOL)/,$(notdir $(SRC.CSTOOL:.cpp=$O)))
 CFG.CSTOOL = $(SRCDIR)/data/config/system.cfg
+
+OUTDIRS += $(OUT.CSTOOL)
 
 TO_INSTALL.CONFIG += $(CFG.CSTOOL)
 TO_INSTALL.DATA += $(SRCDIR)/data/varia/vidprefs.def
@@ -46,24 +49,30 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cstool cstoolclean
+.PHONY: cstool cstoolclean cstoolcleandep
 
-all: $(CSTOOL.LIB)
 cstool: $(OUTDIRS) $(CSTOOL.LIB)
-clean: cstoolclean
+
+$(OUT.CSTOOL)/%$O: $(SRCDIR)/$(DIR.CSTOOL)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CSTOOL.LIB): $(OBJ.CSTOOL)
 	$(DO.LIBRARY)
 
+clean: cstoolclean
 cstoolclean:
-	-$(RM) $(CSTOOL.LIB) $(OBJ.CSTOOL)
+	-$(RMDIR) $(CSTOOL.LIB) $(OBJ.CSTOOL)
+
+cleandep: cstoolcleandep
+cstoolcleandep:
+	-$(RM) $(OUT.CSTOOL)/cstool.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/cstool.dep
-$(OUTOS)/cstool.dep: $(SRC.CSTOOL)
-	$(DO.DEP)
+dep: $(OUT.CSTOOL) $(OUT.CSTOOL)/cstool.dep
+$(OUT.CSTOOL)/cstool.dep: $(SRC.CSTOOL)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/cstool.dep
+-include $(OUT.CSTOOL)/cstool.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

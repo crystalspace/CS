@@ -1,4 +1,3 @@
-# Library description
 DESCRIPTION.csgfx = Crystal Space graphics utility library
 
 #------------------------------------------------------------- rootdefines ---#
@@ -13,9 +12,9 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csgfx
-
+.PHONY: csgfx csgfxclean
 all libs: csgfx
+
 csgfx:
 	$(MAKE_TARGET)
 csgfxclean:
@@ -26,12 +25,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/libs/csgfx
-
 CSGFX.LIB = $(OUT)/$(LIB_PREFIX)csgfx$(LIB_SUFFIX)
-INC.CSGFX = $(wildcard $(addprefix $(SRCDIR)/,include/csgfx/*.h))
-SRC.CSGFX = $(wildcard $(addprefix $(SRCDIR)/,libs/csgfx/*.cpp))
-OBJ.CSGFX = $(addprefix $(OUT)/,$(notdir $(SRC.CSGFX:.cpp=$O)))
+
+DIR.CSGFX = libs/csgfx
+OUT.CSGFX = $(OUT)/$(DIR.CSGFX)
+INC.CSGFX = $(wildcard $(SRCDIR)/$(DIR.CSGFX)/*.h $(SRCDIR)/include/csgfx/*.h)
+SRC.CSGFX = $(wildcard $(SRCDIR)/$(DIR.CSGFX)/*.cpp)
+OBJ.CSGFX = $(addprefix $(OUT.CSGFX)/,$(notdir $(SRC.CSGFX:.cpp=$O)))
 
 ifneq ($(USE_PLUGINS),yes)
   # When not using plugins, applications usually require this library since
@@ -39,36 +39,44 @@ ifneq ($(USE_PLUGINS),yes)
   DEP.EXE += $(CSGFX.LIB)
 endif
 
+OUTDIRS += $(OUT.CSGFX)
+
 TO_INSTALL.STATIC_LIBS += $(CSGFX.LIB)
 
 MSVC.DSP += CSGFX
 DSP.CSGFX.NAME = csgfx
 DSP.CSGFX.TYPE = library
-DSP.CSGFX.RESOURCES = $(SRCDIR)/libs/csgfx/mipmap.inc
+DSP.CSGFX.RESOURCES = $(wildcard $(SRCDIR)/libs/csgfx/*.inc)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csgfx csgfxclean
+.PHONY: csgfx csgfxclean csgfxcleandep
 
-all: $(CSGFX.LIB)
 csgfx: $(OUTDIRS) $(CSGFX.LIB)
-clean: csgfxclean
+
+$(OUT.CSGFX)/%$O: $(SRCDIR)/$(DIR.CSGFX)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CSGFX.LIB): $(OBJ.CSGFX)
 	$(DO.LIBRARY)
 
+clean: csgfxclean
 csgfxclean:
-	-$(RM) $(CSGFX.LIB) $(OBJ.CSGFX)
+	-$(RMDIR) $(CSGFX.LIB) $(OBJ.CSGFX)
+
+cleandep: csgfxcleandep
+csgfxcleandep:
+	-$(RM) $(OUT.CSGFX)/csgfx.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/csgfx.dep
-$(OUTOS)/csgfx.dep: $(SRC.CSGFX)
-	$(DO.DEP)
+dep: $(OUT.CSGFX) $(OUT.CSGFX)/csgfx.dep
+$(OUT.CSGFX)/csgfx.dep: $(SRC.CSGFX)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/csgfx.dep
+-include $(OUT.CSGFX)/csgfx.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

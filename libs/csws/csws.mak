@@ -1,7 +1,6 @@
-# Library description
 DESCRIPTION.csws = Crystal Space Windowing System library
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
@@ -9,12 +8,12 @@ LIBHELP += $(NEWLINE)echo $"  make csws         Make the $(DESCRIPTION.csws)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csws
-
+.PHONY: csws cswsclean
 all libs: csws
+
 csws:
 	$(MAKE_TARGET)
 cswsclean:
@@ -22,16 +21,21 @@ cswsclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/libs/csws $(SRCDIR)/libs/csws/skins/default
-
 CSWS.LIB = $(OUT)/$(LIB_PREFIX)csws$(LIB_SUFFIX)
-INC.CSWS = $(wildcard $(addprefix $(SRCDIR)/,include/csws/*.h))
-SRC.CSWS = $(wildcard $(addprefix $(SRCDIR)/,libs/csws/*.cpp libs/csws/skins/*/*.cpp))
-OBJ.CSWS = $(addprefix $(OUT)/,$(notdir $(SRC.CSWS:.cpp=$O)))
+
+DIR.CSWS = libs/csws
+OUT.CSWS = $(OUT)/$(DIR.CSWS)
+INC.CSWS = $(wildcard $(addprefix $(SRCDIR)/, \
+  $(DIR.CSWS)/*.h $(DIR.CSWS)/skins/default/*.h include/csws/*.h))
+SRC.CSWS = $(wildcard $(addprefix $(SRCDIR)/, \
+  $(DIR.CSWS)/*.cpp $(DIR.CSWS)/skins/default/*.cpp))
+OBJ.CSWS = $(addprefix $(OUT.CSWS)/,$(notdir $(SRC.CSWS:.cpp=$O)))
 CFG.CSWS = $(SRCDIR)/data/config/csws.cfg
+
+OUTDIRS += $(OUT.CSWS)
 
 TO_INSTALL.STATIC_LIBS += $(CSWS.LIB)
 TO_INSTALL.DATA += $(SRCDIR)/data/csws.zip
@@ -43,27 +47,36 @@ DSP.CSWS.TYPE = library
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csws cswsclean
+.PHONY: csws cswsclean cswscleandep
 
-all: $(CSWS.LIB)
 csws: $(OUTDIRS) $(CSWS.LIB)
-clean: cswsclean
+
+$(OUT.CSWS)/%$O: $(SRCDIR)/$(DIR.CSWS)/%.cpp
+	$(DO.COMPILE.CPP)
+
+$(OUT.CSWS)/%$O: $(SRCDIR)/$(DIR.CSWS)/skins/default/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CSWS.LIB): $(OBJ.CSWS)
 	$(DO.LIBRARY)
 
+clean: cswsclean
 cswsclean:
-	-$(RM) $(CSWS.LIB) $(OBJ.CSWS)
+	-$(RMDIR) $(CSWS.LIB) $(OBJ.CSWS)
+
+cleandep: cswscleandep
+cswscleandep:
+	-$(RM) $(OUT.CSWS)/csws.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/csws.dep
-$(OUTOS)/csws.dep: $(SRC.CSWS)
-	$(DO.DEP)
+dep: $(OUT.CSWS) $(OUT.CSWS)/csws.dep
+$(OUT.CSWS)/csws.dep: $(SRC.CSWS)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/csws.dep
+-include $(OUT.CSWS)/csws.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

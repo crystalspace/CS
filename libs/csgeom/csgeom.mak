@@ -1,4 +1,3 @@
-# Library description
 DESCRIPTION.csgeom = Crystal Space geometry library
 
 #------------------------------------------------------------- rootdefines ---#
@@ -12,9 +11,9 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csgeom
-
+.PHONY: csgeom csgeomclean
 all libs: csgeom
+
 csgeom:
 	$(MAKE_TARGET)
 csgeomclean:
@@ -25,12 +24,16 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/libs/csgeom
-
 CSGEOM.LIB = $(OUT)/$(LIB_PREFIX)csgeom$(LIB_SUFFIX)
-INC.CSGEOM = $(wildcard $(addprefix $(SRCDIR)/,include/csgeom/*.h))
-SRC.CSGEOM = $(wildcard $(addprefix $(SRCDIR)/,libs/csgeom/*.cpp))
-OBJ.CSGEOM = $(addprefix $(OUT)/,$(notdir $(SRC.CSGEOM:.cpp=$O)))
+
+DIR.CSGEOM = libs/csgeom
+OUT.CSGEOM = $(OUT)/$(DIR.CSGEOM)
+INC.CSGEOM = \
+  $(wildcard $(SRCDIR)/$(DIR.CSGEOM)/*.h $(SRCDIR)/include/csgeom/*.h)
+SRC.CSGEOM = $(wildcard $(SRCDIR)/$(DIR.CSGEOM)/*.cpp)
+OBJ.CSGEOM = $(addprefix $(OUT.CSGEOM)/,$(notdir $(SRC.CSGEOM:.cpp=$O)))
+
+OUTDIRS += $(OUT.CSGEOM)
 
 TO_INSTALL.STATIC_LIBS += $(CSGEOM.LIB)
 
@@ -44,24 +47,30 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csgeom csgeomclean
+.PHONY: csgeom csgeomclean csgeomcleandep
 
-all: $(CSGEOM.LIB)
 csgeom: $(OUTDIRS) $(CSGEOM.LIB)
-clean: csgeomclean
+
+$(OUT.CSGEOM)/%$O: $(SRCDIR)/$(DIR.CSGEOM)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CSGEOM.LIB): $(OBJ.CSGEOM)
 	$(DO.LIBRARY)
 
+clean: csgeomclean
 csgeomclean:
-	-$(RM) $(CSGEOM.LIB) $(OBJ.CSGEOM)
+	-$(RMDIR) $(CSGEOM.LIB) $(OBJ.CSGEOM)
+
+cleandep: csgeomcleandep
+csgeomcleandep:
+	-$(RM) $(OUT.CSGEOM)/csgeom.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/csgeom.dep
-$(OUTOS)/csgeom.dep: $(SRC.CSGEOM)
-	$(DO.DEP)
+dep: $(OUT.CSGEOM) $(OUT.CSGEOM)/csgeom.dep
+$(OUT.CSGEOM)/csgeom.dep: $(SRC.CSGEOM)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/csgeom.dep
+-include $(OUT.CSGEOM)/csgeom.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

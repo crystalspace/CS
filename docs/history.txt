@@ -27,6 +27,10 @@ chronological order.
 	  given.
 	- Jorrit added a small optimization to the NR GL renderer with
 	  ApplyObjectToCamera().
+	- Eric Sunshine converted csappframe.mak, csgeom.mak, csgfx.mak,
+	  cstool.mak, and csws.mak to the new style where built resources are
+	  placed in a target-specific subdirectory of $(OUT) rather than
+	  directly polluting $(OUT).
 2-Mar-2004
 	- Jorrit modified the stdrep plugin (standard reporter listener) so
 	  that it now prints all messages on standard output if the

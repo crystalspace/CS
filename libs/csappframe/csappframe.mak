@@ -1,4 +1,3 @@
-# Library description
 DESCRIPTION.csappframe = Crystal Space application framework library
 
 #------------------------------------------------------------- rootdefines ---#
@@ -13,9 +12,9 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csappframe
-
+.PHONY: csappframe csappframeclean
 all libs: csappframe
+
 csappframe:
 	$(MAKE_TARGET)
 csappframeclean:
@@ -26,14 +25,17 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/libs/csappframe libs/csappframe/basic \
-  libs/csappframe/light libs/csappframe/objects
-
 CSAPPFRAME.LIB = $(OUT)/$(LIB_PREFIX)csappframe$(LIB_SUFFIX)
-INC.CSAPPFRAME = $(wildcard $(addprefix $(SRCDIR)/,libs/csappframe/*.h))
-SRC.CSAPPFRAME = $(wildcard $(addprefix $(SRCDIR)/, \
-  libs/csappframe/*.cpp libs/csappframe/*/*.cpp))
-OBJ.CSAPPFRAME = $(addprefix $(OUT)/,$(notdir $(SRC.CSAPPFRAME:.cpp=$O)))
+
+DIR.CSAPPFRAME = libs/csappframe
+OUT.CSAPPFRAME = $(OUT)/$(DIR.CSAPPFRAME)
+INC.CSAPPFRAME = \
+  $(wildcard $(SRCDIR)/$(DIR.CSAPPFRAME)/*.h $(SRCDIR)/include/csappframe/*.h)
+SRC.CSAPPFRAME = $(wildcard $(SRCDIR)/$(DIR.CSAPPFRAME)/*.cpp)
+OBJ.CSAPPFRAME = \
+  $(addprefix $(OUT.CSAPPFRAME)/,$(notdir $(SRC.CSAPPFRAME:.cpp=$O)))
+
+OUTDIRS += $(OUT.CSAPPFRAME)
 
 TO_INSTALL.STATIC_LIBS += $(CSAPPFRAME.LIB)
 
@@ -46,24 +48,30 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csappframe csappframeclean
+.PHONY: csappframe csappframeclean csappframecleandep
 
-all: $(CSAPPFRAME.LIB)
 csappframe: $(OUTDIRS) $(CSAPPFRAME.LIB)
-clean: csappframeclean
+
+$(OUT.CSAPPFRAME)/%$O: $(SRCDIR)/$(DIR.CSAPPFRAME)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CSAPPFRAME.LIB): $(OBJ.CSAPPFRAME)
 	$(DO.LIBRARY)
 
+clean: csappframeclean
 csappframeclean:
-	-$(RM) $(CSAPPFRAME.LIB) $(OBJ.CSAPPFRAME)
+	-$(RMDIR) $(CSAPPFRAME.LIB) $(OBJ.CSAPPFRAME)
+
+cleandep: csappframecleandep
+csappframecleandep:
+	-$(RM) $(OUT.CSAPPFRAME)/csappframe.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/csappframe.dep
-$(OUTOS)/csappframe.dep: $(SRC.CSAPPFRAME)
-	$(DO.DEP)
+dep: $(OUT.CSAPPFRAME) $(OUT.CSAPPFRAME)/csappframe.dep
+$(OUT.CSAPPFRAME)/csappframe.dep: $(SRC.CSAPPFRAME)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/csappframe.dep
+-include $(OUT.CSAPPFRAME)/csappframe.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
