@@ -32,6 +32,7 @@ PLUGINS += sound/loader/aiff
 PLUGINS += sound/loader/iff
 PLUGINS += sound/loader/wav
 #PLUGINS += sound/loader/ogg
+#PLUGINS += sound/loader/mp3
 PLUGINS += font/server/csfont 
 PLUGINS += console/output/simple
 PLUGINS += console/input/standard
