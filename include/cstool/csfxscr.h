@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSFXSCR_H__
-#define __CSFXSCR_H__
+#ifndef __CS_FXSCR_H__
+#define __CS_FXSCR_H__
 
 #include "ivideo/graph3d.h"
 class csColor;
@@ -111,5 +111,5 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
 void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, UInt mixmode,
   UByte r, UByte g, UByte b);
 
-#endif
+#endif // __CS_FXSCR_H__
 

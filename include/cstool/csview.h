@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSVIEW_H__
-#define __CS_CSVIEW_H__
+#ifndef __CS_VIEW_H__
+#define __CS_VIEW_H__
 
 #include "ivaria/view.h"
 
@@ -92,4 +92,4 @@ public:
   SCF_DECLARE_IBASE;
 };
 
-#endif // __CS_CSVIEW_H__
+#endif // __CS_VIEW_H__

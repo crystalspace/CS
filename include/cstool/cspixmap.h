@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSPIXMAP_H__
-#define __CSPIXMAP_H__
+#ifndef __CS_PIXMAP_H__
+#define __CS_PIXMAP_H__
 
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
@@ -114,4 +114,4 @@ public:
   virtual iTextureHandle *GetTextureHandle ();
 };
 
-#endif // __CSPIXMAP_H__
+#endif // __CS_PIXMAP_H__

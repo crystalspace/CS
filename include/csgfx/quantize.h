@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __QUANTIZE_H__
-#define __QUANTIZE_H__
+#ifndef __CS_QUANTIZE_H__
+#define __CS_QUANTIZE_H__
 
 #include "csgfx/rgbpixel.h"
 
@@ -125,4 +125,4 @@ extern void csQuantizeRemap (csRGBpixel *image, int pixels,
 extern void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
   csRGBpixel *palette, int colors, UByte *&outimage, csRGBpixel *transp = NULL);
 
-#endif // __QUANTIZE_H__
+#endif // __CS_QUANTIZE_H__

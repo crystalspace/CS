@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSGENTERTEX_H__
-#define __CSGENTERTEX_H__
+#ifndef __CS_GENTERTEX_H__
+#define __CS_GENTERTEX_H__
 
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
@@ -239,5 +239,5 @@ public:
 };
 
 
-#endif
+#endif // __CS_GENTERTEX_H__
 

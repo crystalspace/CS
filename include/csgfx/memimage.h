@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __MEMIMAGE_H__
-#define __MEMIMAGE_H__
+#ifndef __CS_MEMIMAGE_H__
+#define __CS_MEMIMAGE_H__
 
 #include "csimage.h"
 
@@ -74,4 +74,4 @@ public:
 };
 
 
-#endif // __MEMIMAGE_H__
+#endif // __CS_MEMIMAGE_H__
