@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Jul-2004
+	- Eric Sunshine fixed bug in jamtemplate/app.cpp.template where it
+	  asked SCF to scan CEL plugin path multiple times.
 5-Jul-2004
 	- Jorrit fixed the cs096 in csdemo.
 4-Jul-2004
