@@ -1,0 +1,94 @@
+
+         Crystal Exporter Editor v0.1
+
+   After a lot of pain trying to use the current Blender->CrystalSpace exporter scripts,
+ i decided to make my own, but then realized that the difficulty of doing a good working
+ exporter was due to several flakyness in the Python API inside Blender. despite this, with
+ this baby doing a sector or a thing and setting flags like ZFILL() or whatever Z-buffer
+  mode you need for your mesh, and then exporting it to a zip ready for use in walktest or
+  loading it from a modified version of simpmap is really straightforward
+
+ Editor Instructions:
+
+
+Create your meshes in Blender like you use to.
+At putting textures have in mind this:
+Blender CAN'T export texture information that is not added thru the UV editor:
+
+ how to use the blender UV editor:
+
+select your mesh, and enter in face select mode (F-key), in there, you can select/unselect all
+faces with (A-key) or select individual faces with right-mouse click
+
+there are two importants view modes to models : (Z-key) gives gray colored faces where there are, (alt-Z)
+gives the faces with the actual textures. If some of the faces of your model doesn't show up correctly,
+could be that the normals are in the wrong side, for fixing this, go into vertex edit mode (TAB-key), where
+the vertexes appear individually as purple dots(unselected) or yellow (selected), again, you can
+ select/unselect all with (A-key), select some of them with the select brush (B-key 2 times and rescale the
+ brush with -+), select the vertexes that bound the face with the wrong normal, go to edit buttons panel
+ (F9-key) and press "flip normals", that should work, check going into alt-Z mode
+
+Once you have selected the faces that you want to texture, load an image of your liking in a splitted
+window aside your 3d window ( is good to have at least 2 windows in order you can see what is happening,
+remember that the active window is always the one where the mouse cursor is ), the image window is the one
+that has an human face icon
+
+Go back to your 3d window, and select the UV mapping of your liking with (U-key). there you can map it
+cylindrically, cubical, etc. the option "from window" means that the texture is mapped exactly to the
+current point of view of your model. If you select that, you will see the outline of your model mapped onto
+the texture
+
+whatever you have choosed, the outline over the texture can be modified selecting individual or group of
+vertexes, scaling them (S-key) rotating them (R-key) or something else i cant remind now
+
+ok, exit from face select mode (F-key again) and go into alt-Z mode, there you could look already how
+its looking your model
+
+ Once you have a satisfying set of sector meshes and things, its time to set some flags onto the models,
+preparing the import, now is the point where we actually fire the script:
+
+In your splitted window you used to load your image, now go to a text edit window (the one with something
+like a text over a white square icon ) and load the script, run it with alt-P
+
+ok, now its time to set individual flags for the meshes (i.e: ZFILL() for wall meshes, ZUSE() for inside
+sector meshes, etc.) for this, once the script is running, a GUI should have appeared with some buttons,
+select an object which you want to set the individual flags, ok, now the GUI doesnt refresh automatically,
+go to the GUI window of the script and NOW appears buttons depending if the object is a mesh, a light, etc.
+(which currently are the only cases with individual flag editing supported =)  )
+
+for Meshes you can choose the Zmode : ZFILL, ZUSE, ZTEST or ZNONE
+                      or the plugin : thing , spr3d and mesh currently
+
+for Lamps you can choose the attenuation: only none for now, but its a matter of putting the stuff
+
+
+Ok, after you finished setting all the flags you want, you're ready to export, put the path to the CS
+installation and some WorkDir where the script will copy all textures for the model, now launch the
+export
+
+(SYSTEM NOTE: in order to get the textures, the script depend on the 'locate' shell command, this is in
+ the line 218, for me it works with locate -r, if to you don't try removing the -r flag, and beware with
+  messing the identation, python depends on the identation to work.
+ in line 225 is another OS dependant detail, i putted there for Windows support, but i've never tried it
+ myself, and it depends if the results of the locate command are in windows path format (with \ instead of /)
+ ( this means also that windows users require GNU tools accesible thru a prompt)
+ )
+
+ In order to be able to load it, the export assumes that in VFS exists a mountpoint entry like this
+  in vfs.cfg:
+
+
+VFS.Mount.lev/blend    = $@data$/flarge$/exported.zip
+
+
+Ok, i can't say anything else, just luck =)
+
+
+ TO DO:
+  portal editing
+  animations of sprites
+  a lot of other things,.. any ideas?
+
+
+
+
