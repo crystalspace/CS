@@ -172,7 +172,7 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	    line->Append((char) event.Key.Code);
 #ifdef CS_DEBUG
 	  else if(cursor>line->Length())
-	    piSystem->Print(MSG_FATAL_ERROR, "csConsoleInput:  Cursor past end of line!\n");
+	    piSystem->Printf(MSG_FATAL_ERROR, "csConsoleInput:  Cursor past end of line!\n");
 #endif
 	  else
 	    line->Insert(cursor, (char) event.Key.Code);
