@@ -56,7 +56,7 @@ stated are not required.  However, if you choose not to install them, at
 compile time you must follow the documented instructions of how to unload these
 projects from the Crystal Space build process.
 
-@subsubheading Winlibs (REQUIRED)
+@subsubheading Winlibs - Required
 
 Before you attempt to compile Crystal Space, you must download
 and install @emph{winlibs}.  Winlibs is a package containing all
