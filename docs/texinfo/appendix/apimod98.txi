@@ -875,13 +875,13 @@ consistency with the other @sc{scf} instantiation and query macros.  This means
 that you should now assign the result of @code{SCF_CREATE_INSTANCE()} to a
 @code{csRef<>}.
 
+The macros @code{SCF_SET_REF()}, @code{SCF_INC_REF()}, and @code{SCF_DEC_REF()}
+have been removed. Instead you should use @code{csRef<>}.
+
 The query template class @code{scfInterface<>} has been introduced.  This class
 provides a means to query static information about @sc{scf} interfaces, such
 as an interface's current version number.  Presently, this class allows access
 to the following static information:
-
-The macros @code{SCF_SET_REF()}, @code{SCF_INC_REF()}, and @code{SCF_DEC_REF()}
-have been removed. Instead you should use @code{csRef<>}.
 
 @itemize @bullet
 @item
