@@ -178,8 +178,8 @@ public:
     /// test if chance that we must clip to a portal -> or the Toplevel clipper
     /// better: only if it crosses that.
     const csRect& rect = isorview->GetView()->GetRect();
-    if( (rect.xmin <= QInt(sbox.MinX())) || (rect.xmax >= QInt(sbox.MaxX())) ||
-        (rect.ymin <= QInt(sbox.MinY())) || (rect.ymax >= QInt(sbox.MaxY())) )
+    if( (rect.xmin >= QInt(sbox.MinX())) || (rect.xmax <= QInt(sbox.MaxX())) ||
+        (rect.ymin >= QInt(sbox.MinY())) || (rect.ymax <= QInt(sbox.MaxY())) )
       clip_portal = CS_CLIP_TOPLEVEL;
     else clip_portal = CS_CLIP_NOT;
     /// test if z becomes negative, should never happen
