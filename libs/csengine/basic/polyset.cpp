@@ -636,6 +636,17 @@ void csPolygonSet::CreateBoundingBox ()
     if (obj_verts[i].z < minz) minz = obj_verts[i].z;
     else if (obj_verts[i].z > maxz) maxz = obj_verts[i].z;
   }
+  for (i = 0 ; i < num_curve_vertices ; i++)
+  {
+    csVector3& cv = curve_vertices[i];
+    if (cv.x < minx) minx = cv.x;
+    else if (cv.x > maxx) maxx = cv.x;
+    if (cv.y < miny) miny = cv.y;
+    else if (cv.y > maxy) maxy = cv.y;
+    if (cv.z < minz) minz = cv.z;
+    else if (cv.z > maxz) maxz = cv.z;
+  }
+
   bbox->i7 = AddVertexSmart (minx, miny, minz);
   bbox->i3 = AddVertexSmart (minx, miny, maxz);
   bbox->i5 = AddVertexSmart (minx, maxy, minz);

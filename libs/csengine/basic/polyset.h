@@ -324,12 +324,12 @@ public:
   int GetNumCurves () { return num_curves; }
 
   /**
-   * Get the specified polygon from this set.
+   * Get the specified curve from this set.
    */
   csCurve* GetCurve (int idx) { return curves[idx]; }
 
   /**
-   * Get the named polygon from this set.
+   * Get the named curve from this set.
    */
   csCurve* GetCurve (char* name);
 
@@ -434,10 +434,6 @@ public:
    * are added to the csPolygonSetBBox structure which is returned here.
    * Note that this creation is done in object space. The newly added
    * vertices will not have been translated to world/camera space yet.<p>
-   *
-   * @@@WARNING! Currently the bounding box does not look at the
-   * curved surfaces present in this polygon set. So you can't use the
-   * bounding box safely when curves are present.
    */
   void CreateBoundingBox ();
 
