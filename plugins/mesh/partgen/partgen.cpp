@@ -22,7 +22,6 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
-#include "csutil/floatrand.h"
 #include "cstool/rbuflock.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -439,41 +438,35 @@ void csParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
 
 //---------------------------------------------------------------------
 
-CS_IMPLEMENT_STATIC_VAR (RandDir1, csVector3, ())
-
-csVector3& csParticleSystem::GetRandomDirection ()
+csVector3 csParticleSystem::GetRandomDirection ()
 {
-  static csVector3 *dir = RandDir1 ();
-  dir->x = 2.0 * csFastRandFloat() - 1.0;
-  dir->y = 2.0 * csFastRandFloat() - 1.0;
-  dir->z = 2.0 * csFastRandFloat() - 1.0;
-  return *dir;
+  csVector3 dir;
+  dir.x = 2.0 * randgen.Get() - 1.0;
+  dir.y = 2.0 * randgen.Get() - 1.0;
+  dir.z = 2.0 * randgen.Get() - 1.0;
+  return dir;
 }
 
-CS_IMPLEMENT_STATIC_VAR (RandDir2, csVector3, ())
-
-csVector3& csParticleSystem::GetRandomDirection (const csVector3& magnitude,
-	const csVector3& offset)
+csVector3 csParticleSystem::GetRandomDirection (csVector3 const& magnitude,
+	csVector3 const& offset)
 {
-  static csVector3 *dir = RandDir2 ();
-  dir->x = csFastRandFloat() * magnitude.x;
-  dir->y = csFastRandFloat() * magnitude.y;
-  dir->z = csFastRandFloat() * magnitude.z;
-  *dir = *dir + offset;
-  return *dir;
+  csVector3 dir;
+  dir.x = randgen.Get() * magnitude.x;
+  dir.y = randgen.Get() * magnitude.y;
+  dir.z = randgen.Get() * magnitude.z;
+  dir += offset;
+  return dir;
 }
 
-CS_IMPLEMENT_STATIC_VAR (RandDir3, csVector3, ())
-
-csVector3& csParticleSystem::GetRandomPosition (const csBox3& box)
+csVector3 csParticleSystem::GetRandomPosition (csBox3 const& box)
 {
-  static csVector3 *dir = RandDir3 ();
-  *dir = box.Max() - box.Min();
-  dir->x *= csFastRandFloat();
-  dir->y *= csFastRandFloat();
-  dir->z *= csFastRandFloat();
-  *dir += box.Min();
-  return *dir;
+  csVector3 dir;
+  dir = box.Max() - box.Min();
+  dir.x *= randgen.Get();
+  dir.y *= randgen.Get();
+  dir.z *= randgen.Get();
+  dir += box.Min();
+  return dir;
 }
 //-- csNewtonianParticleSystem ------------------------------------------
 

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2004 by Jorrit Tyberghein
+    Copyright (C) 2005 by Eric Sunshine
 
     Fast simple floating point generator for a floating point value
     between 0 and 1.
@@ -20,7 +21,10 @@
 */
 
 #include "cssysdef.h"
-#include "csextern.h"
 #include "csutil/floatrand.h"
+#include <time.h>
 
-CS_CSUTIL_EXPORT unsigned int cs_floatrand_seed = 0;
+void csRandomFloatGen::Initialize()
+{
+  Initialize(time(0));
+}

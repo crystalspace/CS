@@ -36,6 +36,7 @@ class csEmitMeshObject;
 /** fixed value emitter */
 class csEmitFixed : public iEmitFixed
 {
+private:
   csVector3 val;
 public:
   SCF_DECLARE_IBASE;
@@ -48,8 +49,10 @@ public:
 /** box value emitter */
 class csEmitBox : public iEmitBox
 {
+private:
   csVector3 min, max;
   csVector3 mult;
+  csRandomFloatGen randgen;
 public:
   SCF_DECLARE_IBASE;
   csEmitBox (iBase *parent);
@@ -62,9 +65,11 @@ public:
 /** Sphere value emitter */
 class csEmitSphere : public iEmitSphere
 {
+private:
   csVector3 center;
   float min, max;
   float rand_min, rand_mult;
+  csRandomFloatGen randgen;
 public:
   SCF_DECLARE_IBASE;
   csEmitSphere (iBase *parent);
@@ -77,8 +82,10 @@ public:
 /** Cone value emitter */
 class csEmitCone : public iEmitCone
 {
+private:
   csVector3 origin;
   float elevation, azimuth, aperture, min, max;
+  csRandomFloatGen randgen;
 public:
   SCF_DECLARE_IBASE;
   csEmitCone (iBase *parent);
@@ -93,6 +100,7 @@ public:
 /** Mix value emitter */
 class csEmitMix : public iEmitMix
 {
+private:
   struct part
   {
     csRef<iEmitGen3D> emit;
@@ -101,6 +109,7 @@ class csEmitMix : public iEmitMix
   } *list;
   float totalweight;
   int nr;
+  csRandomFloatGen randgen;
 public:
   SCF_DECLARE_IBASE;
   csEmitMix (iBase *parent);
@@ -117,7 +126,9 @@ public:
 /** Line value emitter */
 class csEmitLine : public iEmitLine
 {
+private:
   csVector3 start, end;
+  csRandomFloatGen randgen;
 public:
   SCF_DECLARE_IBASE;
   csEmitLine (iBase *parent);
@@ -130,8 +141,10 @@ public:
 /** Cylinder value emitter */
 class csEmitCylinder : public iEmitCylinder
 {
+private:
   csVector3 start, end;
   float min, max;
+  csRandomFloatGen randgen;
 public:
   SCF_DECLARE_IBASE;
   csEmitCylinder (iBase *parent);
@@ -146,8 +159,10 @@ public:
 /** SphereTangent value emitter */
 class csEmitSphereTangent : public iEmitSphereTangent
 {
+private:
   csVector3 center;
   float min, max;
+  csRandomFloatGen randgen;
 public:
   SCF_DECLARE_IBASE;
   csEmitSphereTangent (iBase *parent);
@@ -160,8 +175,10 @@ public:
 /** CylinderTangent value emitter */
 class csEmitCylinderTangent : public iEmitCylinderTangent
 {
+private:
   csVector3 start, end;
   float min, max;
+  csRandomFloatGen randgen;
 public:
   SCF_DECLARE_IBASE;
   csEmitCylinderTangent (iBase *parent);
@@ -172,7 +189,6 @@ public:
   virtual void GetContent (csVector3& start, csVector3& end,
       float& min, float& max);
 };
-
 
 /** emit ages structure */
 class csEmitAge
@@ -205,7 +221,7 @@ public:
 class csEmitMeshObject : public csParticleSystem
 {
 protected:
-  ///
+  /// true if particles should be lighted
   bool lighted_particles;
   /// the start position generator
   csRef<iEmitGen3D> startpos;
@@ -245,6 +261,9 @@ protected:
   /// attractor position per particle
   csVector3 *part_attract;
 
+  // random number generator
+  csRandomFloatGen randgen;
+
   /// give particle i new start values
   void StartParticle (int i);
   /// age particle i elapsed msec. delta_t is elapsed/1000.
@@ -253,8 +272,7 @@ protected:
   void SetupObject ();
 
 public:
-  /**
-   */
+  /// Constructor.
   csEmitMeshObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csEmitMeshObject ();
@@ -460,9 +478,9 @@ public:
     virtual void RemoveAge (int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale)
     { scfParent->RemoveAge (time, color, alpha, swirl, rotspeed, scale);}
-    virtual void GetAgingMoment (int i, int& time, csColor& color, float &alpha,
+    virtual void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
         float& swirl, float& rotspeed, float& scale)
-    {scfParent->GetAgingMoment (i, time, color, alpha, swirl, rotspeed, scale);}
+    {scfParent->GetAgingMoment(i, time, color, alpha, swirl, rotspeed, scale);}
     virtual void ReplaceAge (int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale)
     { scfParent->ReplaceAge (time, color, alpha, swirl, rotspeed, scale);}
@@ -499,7 +517,7 @@ private:
 
 public:
   /// Constructor.
-  csEmitMeshObjectFactory (iMeshObjectType *pParent, iObjectRegistry* object_reg);
+  csEmitMeshObjectFactory (iMeshObjectType *pParent, iObjectRegistry*);
 
   /// Destructor.
   virtual ~csEmitMeshObjectFactory ();

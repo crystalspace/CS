@@ -92,24 +92,6 @@ struct csEmitCompPart
 typedef csDirtyAccessArray<csEmitCompPart> csCompPartArray;
 CS_IMPLEMENT_STATIC_VAR (GetStaticCompPartArray,csCompPartArray,())
 
-/// utility function
-static inline float GetRandomFloat(float min, float max)
-{
-  float w = max - min;
-  return min + (w*csFastRandFloat());
-}
-
-/// utility function
-static inline float GetRandomFloat(float max)
-{
-  return max*csFastRandFloat();
-}
-
-static inline float GetRandomFloatTWOPI()
-{
-  return TWO_PI*csFastRandFloat();
-}
-
 csEmitFixed::csEmitFixed(iBase *parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
@@ -121,7 +103,7 @@ csEmitFixed::~csEmitFixed()
   SCF_DESTRUCT_IBASE();
 }
 
-void csEmitFixed::GetValue(csVector3& value, csVector3 & /*given*/)
+void csEmitFixed::GetValue(csVector3& value, csVector3& /*given*/)
 {
   value = val;
 }
@@ -143,12 +125,11 @@ csEmitBox::~csEmitBox()
   SCF_DESTRUCT_IBASE();
 }
 
-void csEmitBox::GetValue(csVector3& value, csVector3 & /*given*/)
+void csEmitBox::GetValue(csVector3& value, csVector3& /*given*/)
 {
-  /// utility function
-  value.x = min.x + mult.x * csFastRandFloat ();
-  value.y = min.y + mult.y * csFastRandFloat ();
-  value.z = min.z + mult.z * csFastRandFloat ();
+  value.x = min.x + mult.x * randgen.Get();
+  value.y = min.y + mult.y * randgen.Get();
+  value.z = min.z + mult.z * randgen.Get();
 }
 
 void csEmitBox::SetContent(const csVector3& min, const csVector3& max)
@@ -179,32 +160,33 @@ csEmitSphere::~csEmitSphere()
   SCF_DESTRUCT_IBASE();
 }
 
-void csEmitSphere::GetValue(csVector3& value, csVector3 & /*given*/)
+void csEmitSphere::GetValue(csVector3& value, csVector3& /*given*/)
 {
   //because the volume of a slice at a certain distance
   // is the dist*dist(*pi..) in size. Taking random min..max will
   // cause an uneven spread of points in the sphere.
-  float sqdist = rand_min + (rand_mult*csFastRandFloat());
+  float sqdist = rand_min + (rand_mult * randgen.Get());
   float dist = pow(sqdist, (float)(1./3.));
   value.Set(dist, 0, 0);
-  float rotz_open = GetRandomFloatTWOPI ();
+  float rotz_open = randgen.GetAngle();
   csZRotMatrix3 openrot(rotz_open);
   value = openrot * value;
-  float rot_around = GetRandomFloatTWOPI ();
+  float rot_around = randgen.GetAngle();
   csXRotMatrix3 xaround(rot_around);
   value = xaround * value;
   value += center;
-
+#if 0
   // slow but gives a good even spreading
-  //while(1)
-  //{
-    //value.Set (GetRandomFloat(-max,max), GetRandomFloat(-max,max),
-      //GetRandomFloat(-max,max));
-    //float dist = value.SquaredNorm();
-    //if( (min*min <= dist) && (dist <= max*max) )
-      //break;
-  //}
-  //value += center;
+  while(1)
+  {
+    value.Set (randgen.Get(-max,max), randgen.Get(-max,max),
+      randgen.Get(-max,max));
+    float dist = value.SquaredNorm();
+    if (min*min <= dist && dist <= max*max)
+      break;
+  }
+  value += center;
+#endif
 }
 
 void csEmitSphere::SetContent(const csVector3& center, float min, float max)
@@ -239,16 +221,16 @@ csEmitCone::~csEmitCone()
   SCF_DESTRUCT_IBASE();
 }
 
-void csEmitCone::GetValue(csVector3& value, csVector3 & /*given*/)
+void csEmitCone::GetValue(csVector3& value, csVector3& /*given*/)
 {
-  csVector3 dest(GetRandomFloat(min, max), 0, 0);
+  csVector3 dest(randgen.Get(min, max), 0, 0);
   /// from fountain code
 
   // now make it shoot to a circle in the x direction
-  float rotz_open = GetRandomFloat (2.0 * aperture) - aperture;
+  float rotz_open = randgen.Get(2.0 * aperture) - aperture;
   csZRotMatrix3 openrot(rotz_open);
   dest = openrot * dest;
-  float rot_around = GetRandomFloatTWOPI ();
+  float rot_around = randgen.GetAngle();
   csXRotMatrix3 xaround(rot_around);
   dest = xaround * dest;
   // now dest point to somewhere in a circular cur of a sphere around the
@@ -310,9 +292,9 @@ csEmitMix::~csEmitMix()
   SCF_DESTRUCT_IBASE();
 }
 
-void csEmitMix::GetValue(csVector3& value, csVector3 & given)
+void csEmitMix::GetValue(csVector3& value, csVector3& given)
 {
-  float num = GetRandomFloat(totalweight);
+  float num = randgen.Get(totalweight);
   float passed = 0.0;
   struct part *p = list;
   struct part *found = list;
@@ -358,7 +340,8 @@ void csEmitMix::RemoveEmitter(int num)
   if (!pp)
     list=p->next;
   else
-    pp->next=p->next; // Otherwise remove this entry from the list by adjusting linkage
+    pp->next=p->next; // Otherwise remove this entry from the list by
+                      // adjusting linkage
 
   // Drop our reference
   p->emit=NULL;
@@ -412,9 +395,9 @@ csEmitLine::~csEmitLine()
   SCF_DESTRUCT_IBASE();
 }
 
-void csEmitLine::GetValue(csVector3& value, csVector3 & /*given*/)
+void csEmitLine::GetValue(csVector3& value, csVector3& /*given*/)
 {
-  float v = GetRandomFloat(1.);
+  float v = randgen.Get(1.0);
   value = start + (end-start)*v;
 }
 
@@ -460,22 +443,22 @@ csEmitCylinder::~csEmitCylinder()
   SCF_DESTRUCT_IBASE();
 }
 
-void csEmitCylinder::GetValue(csVector3& value, csVector3 & /*given*/)
+void csEmitCylinder::GetValue(csVector3& value, csVector3& /*given*/)
 {
   // point on the center line of the cylinder
-  float v = GetRandomFloat(1.);
-  value = start + (end-start)*v;
+  float v = randgen.Get(1.0);
+  value = start + (end-start) * v;
 
   // setup 3 axis for the cylinder
   csVector3 normal = (end-start).Unit();
   csVector3 udir; FindAxis(normal, udir);
   csVector3 vdir = udir % normal;
-  float angle = GetRandomFloatTWOPI ();
+  float angle = randgen.GetAngle();
   // direction on the circle
   csVector3 oncirc = udir*cos(angle) + vdir*sin(angle);
 
   // distance from cylinder line
-  float amount = GetRandomFloat(min*min, max*max);
+  float amount = randgen.Get(min*min, max*max);
   amount = csQsqrt(amount); // cause even spread of points in the circle
   value += oncirc * amount;
 }
@@ -512,7 +495,7 @@ csEmitCylinderTangent::~csEmitCylinderTangent()
   SCF_DESTRUCT_IBASE();
 }
 
-void csEmitCylinderTangent::GetValue(csVector3& value, csVector3 &given)
+void csEmitCylinderTangent::GetValue(csVector3& value, csVector3& given)
 {
   // cylinder direction
   csVector3 cyldir = (end - start).Unit();
@@ -529,7 +512,7 @@ void csEmitCylinderTangent::GetValue(csVector3& value, csVector3 &given)
 
   // need a direction tangential to normal and cyldirection
   csVector3 direction = normal % cyldir;
-  float amount = GetRandomFloat(min, max);
+  float amount = randgen.Get(min, max);
   value = direction * amount;
 }
 
@@ -564,19 +547,19 @@ csEmitSphereTangent::~csEmitSphereTangent()
   SCF_DESTRUCT_IBASE();
 }
 
-void csEmitSphereTangent::GetValue(csVector3& value, csVector3 & given)
+void csEmitSphereTangent::GetValue(csVector3& value, csVector3& given)
 {
   csVector3 path = given - center;
   // setup axis
   csVector3 normal = path.Unit();
   csVector3 udir; FindAxis(normal, udir);
   csVector3 vdir = udir % normal;
-  float angle = GetRandomFloatTWOPI ();
+  float angle = randgen.GetAngle();
   // direction on the circle
   csVector3 oncirc = udir*cos(angle) + vdir*sin(angle);
 
   // size of direction
-  float amount = GetRandomFloat(min*min, max*max);
+  float amount = randgen.Get(min*min, max*max);
   amount = csQsqrt(amount); // cause even spread of points in the circle
   value = oncirc * amount;
 }
@@ -639,7 +622,7 @@ void csEmitMeshObject::SetupObject ()
         lighted_particles);
       StartParticle(i);
       /// age each particle randomly, to spread out particles over ages.
-      int elapsed = csQint(GetRandomFloat(timetolive));
+      int elapsed = csQint(randgen.Get(timetolive));
       MoveAgeParticle(i, elapsed, elapsed/1000.);
     }
     SetupColor ();
@@ -868,7 +851,7 @@ void csEmitMeshObject::Update (csTicks elapsed_time)
   }
 }
 
-void csEmitMeshObject::HardTransform (const csReversibleTransform& /*t*/)
+void csEmitMeshObject::HardTransform (const csReversibleTransform&)
 {
 }
 
@@ -903,9 +886,16 @@ void csEmitMeshObject::RemoveAge(int time, const csColor& color, float alpha,
   // Find the aging moment to remove and the aging moment entry prior to it
   while(p && (p->time <= time))
   {
-    // Compare all elements.  We don't stop multiple entries with the same time from being added, so we have to check all parts for match.
-    if (p->time == time && p->alpha == alpha && p->swirl == swirl && p->rotspeed == rotspeed && p->scale == scale &&
-      p->color.blue == color.blue && p->color.red == color.red && p->color.green == color.green)
+    // Compare all elements.  We don't stop multiple entries with the same time
+    // from being added, so we have to check all parts for match.
+    if (p->time == time &&
+        p->alpha == alpha &&
+	p->swirl == swirl &&
+	p->rotspeed == rotspeed &&
+	p->scale == scale &&
+        p->color.blue == color.blue &&
+	p->color.red == color.red &&
+	p->color.green == color.green)
     {
       found=true;
       break;
@@ -979,7 +969,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObjectFactory::EmitFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iEmitFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csEmitMeshObjectFactory::csEmitMeshObjectFactory (iMeshObjectType *p, iObjectRegistry* s)
+csEmitMeshObjectFactory::csEmitMeshObjectFactory (iMeshObjectType *p,
+  iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitFactoryState);
@@ -1037,4 +1028,3 @@ csPtr<iMeshObjectFactory> csEmitMeshObjectType::NewFactory ()
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
 }
-

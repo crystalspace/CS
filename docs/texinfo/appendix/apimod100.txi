@@ -719,19 +719,17 @@ domain name ``crystalspace3d.org''. This replaces the older package name
 @cindex @file{vfs.cfg}, @sc{vfs} Configuration File
 
 At initialization time, @sc{vfs} now merges all @file{vfs.cfg} files located
-during its start-up scan. It searches for a file named @file{vfs.cfg} in the
-application resource directory (@code{csGetResourceDir()}), then in the
-directory containing the application (@code{csGetAppDir()}), and finally in the
-Crystal Space installation directory (@code{csGetConfigPath()}).  The full set
-of directories mounted by @sc{vfs} following the initial configuration file
-scan is the union of the entries in all of the discovered @file{vfs.cfg}
-files. If there are conflicting entries, then mounts and variable assignments
-specified in configuration files discovered earlier in the scan take precedence
-over those discovered later.
-
-Previously, @sc{vfs} stopped searching for configuration information at the
-first directory containing a file named @file{vfs.cfg}, and loaded only that
-file.
+during its start-up scan.  Previously, @sc{vfs} stopped scanning at the first
+discovered @file{vfs.cfg}, and loaded only that file.  During the start-up
+scan, it searches for a file named @file{vfs.cfg} in the application resource
+directory (@code{csGetResourceDir()}), then in the directory containing the
+application (@code{csGetAppDir()}), and finally in the Crystal Space
+installation directory (@code{csGetConfigPath()}).  The full set of directories
+mounted by @sc{vfs} following the initial configuration file scan is the union
+of the entries in all of the discovered @file{vfs.cfg} files.  If there are
+conflicting entries, then mounts and variable assignments specified in
+configuration files discovered earlier in the scan take precedence over those
+discovered later.
 
 @subheading @code{iEvent} Changes
 
@@ -793,14 +791,27 @@ provide more information.
 
 @subsubheading Removed and Renamed Files
 
-The following additional files have been removed or renamed:
+The following files were removed:
 
 @itemize @bullet
 @item
-@file{include/ivideo/vbufmgr.h} @result{} (removed)
+@code{include/ivideo/vbufmgr.h}
+@end itemize
+
+The following files in @file{data/shader} were renamed:
+
+@itemize @bullet
 @item
-@file{data/shader/or_lighting*.xml} @result{}
-@file{data/shader/std_lighting*.xml}
+@code{or_lighting.xml} @result{} @code{std_lighting.xml}
+@item
+@code{or_lighting_detail.xml} @result{} @code{std_lighting_detail.xml}
+@item
+@code{or_lighting_detail_add.xml} @result{} @code{std_lighting_detail_add.xml}
+@item
+@code{or_lighting_detail_alpha.xml} @result{}
+@code{std_lighting_detail_alpha.xml}
+@item
+@code{or_lighting_portal.xml} @result{} @code{std_lighting_portal.xml}
 @end itemize
 
 @subsubheading Removed Methods and Classes
@@ -842,11 +853,18 @@ Fog is now calculated within the renderer.
 @code{CalculateFogPolygon()}
 @end itemize
 
-The old methods for rendering (@code{Draw()} and @code{DrawTest()})
-have been removed from @samp{iMeshObject} and @samp{iParticle} interfaces.
+From @samp{iMeshObject} and @samp{iParticle}, the following rendering-related
+methods have been removed:
 
-Apart from these methods, the following classes and structs have been removed
-or have become private, and are no longer available to client code:
+@itemize @bullet
+@item
+@code{Draw()}
+@item
+@code{DrawTest()}
+@end itemize
+
+Apart from these methods, the following classes and structures have been
+removed or have become private, and are no longer available to client code:
 
 @itemize @bullet
 @item
@@ -874,3 +892,13 @@ interface, and then asking the plugin manager to load a plugin supplying the
 desired object if it was not found in the object-registry. It also registers
 the object with the object-registry if the plugin manager loads it
 successfully.
+
+@subheading Random Number Generator Changes
+
+The global function @code{csFastRandFloat()} has been retired.  In its stead is
+the new instantiable class @samp{csRandomFloatGen}, which is modeled after the
+@samp{csRandomGen} class.  Unlike the old @code{csFastRandFloat()} function
+which was shared by all clients, instances of @samp{csRandomFloatGen} can be
+controlled and seeded individually, thus making it far more flexible and
+useful.  (Note that the more general-purpose @samp{csRandomGen} class is also
+able to vend floating point numbers.)

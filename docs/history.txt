@@ -17,6 +17,13 @@ chronological order.
 	  the manual.
 	- res changed the cs_floatrand_seed definition again, so it now 
 	  hopefully works on non-Win32 again.
+	- Eric Sunshine retired the global function csFastRandFloat() along
+	  with the problematic global variable cs_floatrand_seed, and replaced
+	  it with a new instantiable class csRandomFloatGen, which is modeled
+	  after the csRandomGen class.  Unlike the old csFastRandFloat()
+	  function which was shared by all clients, instances of
+	  csRandomFloatGen can be controlled and seeded individually, thus
+	  making it far more flexible and useful.
 4-Jan-2005
 	- Jorrit added a new iSectorMeshCallback and associated setter
 	  functions in iSector. With this callback you can get notified whenever

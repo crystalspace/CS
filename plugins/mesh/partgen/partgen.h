@@ -20,20 +20,21 @@
 #ifndef __CS_PARTGEN_H__
 #define __CS_PARTGEN_H__
 
-#include "csgeom/vector3.h"
 #include "csgeom/box.h"
 #include "csgeom/objmodel.h"
-#include "csutil/refarr.h"
-#include "csutil/cscolor.h"
+#include "csgeom/vector3.h"
+#include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"
-#include "ivideo/graph3d.h"
-#include "imesh/object.h"
-#include "imesh/partsys.h"
-#include "imesh/particle.h"
-#include "imesh/sprite2d.h"
+#include "csutil/cscolor.h"
+#include "csutil/floatrand.h"
+#include "csutil/refarr.h"
 #include "iengine/lightmgr.h"
 #include "iengine/material.h"
-#include "csgfx/shadervarcontext.h"
+#include "imesh/object.h"
+#include "imesh/particle.h"
+#include "imesh/partsys.h"
+#include "imesh/sprite2d.h"
+#include "ivideo/graph3d.h"
 
 struct iMeshObjectFactory;
 struct iMaterialWrapper;
@@ -132,13 +133,16 @@ protected:
     scfiObjectModel.ShapeChanged ();
   }
 
+private:
+  csRandomFloatGen randgen;
 protected:
-  /// Helping func. Returns vector of with -1..+1 members. Varying length!
-  static csVector3& GetRandomDirection ();
-  /// Helping func. Returns vector of with -1..+1 members. Varying length!
-  static csVector3& GetRandomDirection (const csVector3& magnitude,
-	const csVector3& offset);
-  static csVector3& GetRandomPosition (const csBox3& box);
+  /// Return vector with -1..+1 members. Varying length.
+  csVector3 GetRandomDirection();
+  /// Return vector with -1..+1 members. Varying length.
+  csVector3 GetRandomDirection(csVector3 const& magnitude,
+    csVector3 const& offset);
+  /// Return vector with random position within box.
+  csVector3 GetRandomPosition(csBox3 const& box);
 
 public:
   /**
