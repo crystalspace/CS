@@ -1,6 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
 6-Apr-2001
+	- Martin Geisse fixed a bug in cctest.
+	- Martin fixed a bug in csstring.
+	- Philip Wyett fixed a bug in simple.
+	- Philip updated MingW package version number to 0.20.
 	- Wouter Wijngaards added /usr/lib/crystalspace to the installation
 	  search for the unix driver.
 	- Fixed a bug in drawing of things which are represented in the
