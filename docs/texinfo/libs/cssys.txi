@@ -5,7 +5,9 @@
 @cindex System Library
 
 The system library is the basic module in every Crystal Space application. It
-helps in several ways:
+contains one main class, the @dfn{system driver}. This driver helps in
+several ways:
+
 @itemize @bullet
 @item
 It handles the main system-specific operations, like loading dynamic
@@ -35,3 +37,55 @@ all options required by the system or any plug-in.
 It processes the command-line parameters and also allows plug-ins to react
 to the parameters.
 @end itemize
+
+@node csSys howto
+@subsection How to use the System Driver
+
+The system driver is explicitly designed to be a superclass for your own
+system driver class. Especially the @code{NextFrame()} and @code{HandleEvent}
+methods get overridden by most applications.
+
+The system driver class is named @samp{SysSystemDriver}. This class contains
+all system-specific functions. It is itself a subclass of
+@samp{csSystemDriver}, which contains the system-independent stuff.
+
+A typical application would do the following steps:
+@itemize @bullet
+@item
+Create an instance of its subclass of @code{SysSystemDriver}.
+
+@item
+Call @code{System->Initialize()}. This will process the command-line, load
+and initialize the plug-in modules and open the main configuration file.
+
+@item
+Load all application-specific data. You can of course load additional stuff
+later, but if an error occurs (e.g. an important file is missing), the user
+does not have to wait until complete start-up to see this error.
+
+@item
+Call @code{System->Open()}. This will open the driver plug-ins, which means
+to change the graphics mode, switch on sound output, take over the keyboard
+etc.
+
+Any events triggered by these drivers will be sent to your application by the
+@code{HandleEvent()} function. If you override this function, you must still
+call the old function.
+
+@item
+Call @code{System->Loop()}. This function will only return when your program
+exits the main loop. Of course you can control when this happens, and you can
+restart the loop later, but for most applications exiting the main loop means
+exiting the application.
+
+Once you have entered this loop, the system driver will call the
+@code{NextFrame()} method every frame. This happens at irregular time steps,
+so you should use the @code{GetElapsedTime()} function to see how much time
+has passed.
+
+@item
+Close and delete the system driver. You don't have to call
+@code{System->Close()} explicitly, as this will be done automatically when
+you delete the object.
+@end itemize
+

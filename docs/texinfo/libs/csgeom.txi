@@ -8,7 +8,7 @@ This library is used to perform any calculations dealing with 2d or 3d
 geometry. It contains several more or less independent classes. The most
 important classes are:
 
-@itemize @bullet
+@table @dfn
 @item misc. geometry functions
 These are functions that don't fit in one of the following classes, for
 example to calculate intersections. They are grouped as static member
@@ -74,7 +74,7 @@ clipper, resulting in a new, smaller polygon). Then there is a 2d polygon
 that stores its sides as line segments, not its vertices as vectors.
 The most important type for the engine is the indexed polygon, which does not
 store its vertices as 3d vectors but only as indices in a table.
-@end itemize
+@end table
 
 There are also other classes that are mostly used inside the engine: Bounding
 boxes, frustums, polygon pools, etc.

@@ -11,6 +11,8 @@ graph.  @xref{Dependencies}.
 
 @menu
 * Lib Overview:: Quick Overview
+* csSys:: System Library (@sc{cssys})
+* csUtil:: Utility Library (@sc{csutil})
 * SCF:: Shared Class Facility (@sc{scf})
 * csGeom:: Geometry Library (@code{csGeom})
 * csParser:: World File Parser (@code{csParser})
@@ -19,6 +21,8 @@ graph.  @xref{Dependencies}.
 @end menu
 
 @imports{libs,overview.txi}
+@imports{libs,cssys.txi}
+@imports{libs,csutil.txi}
 @imports{libs,scf.txi}
 @imports{libs,csgeom.txi}
 @imports{libs,csparser.txi}
