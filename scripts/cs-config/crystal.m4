@@ -62,7 +62,7 @@ fi
 # Well, either we found cs by now, or we caused an error.
 # Now we define stuff, then check if we are running a new enough version
 
-if test x$no_cs = x ; then
+if test "x$no_cs" = "x" ; then
 	min_cs_version=ifelse([$1], ,0.93,$1)
 	AC_MSG_CHECKING(for Crystal Space - version >= $min_cs_version)
 	CRYSTAL_CFLAGS=`$CSCONF $csconf_args --cflags $4`
@@ -81,7 +81,7 @@ if test x$no_cs = x ; then
 	fi
 fi
 
-if test x$no_cs != x ; then
+if test "x$no_cs" != "x" ; then
 	enable_cstest=no
 fi
 
@@ -153,7 +153,7 @@ int main (int argc, char *argv[])
        LIBS="$ac_save_LIBS"
   fi
 
-  if test x$no_cs = x ; then
+  if test "x$no_cs" = "x" ; then
      AC_MSG_RESULT($CRYSTAL_LONGVERSION)
      ifelse([$2], , :, [$2])     
   else
