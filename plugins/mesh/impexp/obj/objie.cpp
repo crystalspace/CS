@@ -28,7 +28,7 @@
 #include "csutil/objiter.h"
 #include <ctype.h>
 
-class csModelConverterOBJ : iModelConverter
+class csModelConverterOBJ : public iModelConverter
 {
 private:
   csModelConverterFormat FormatInfo;

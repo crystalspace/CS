@@ -57,7 +57,7 @@ public:
 };
 
 /// Base texture loader pseudo-plugin
-class csBaseTextureLoader : public iLoaderPlugin, iComponent  
+class csBaseTextureLoader : public iLoaderPlugin, public iComponent  
 {
 protected:
   csRef<iObjectRegistry> object_reg;

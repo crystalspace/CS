@@ -33,7 +33,7 @@
 
 typedef csArray<csModelConverterFormat const *> csModelConverterFormatVector;
 
-class csModelConverterMultiplexer : iModelConverter
+class csModelConverterMultiplexer : public iModelConverter
 {
 private:
   csRef<iStringArray> classlist;

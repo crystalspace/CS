@@ -71,7 +71,7 @@ struct csMD2Header
 
 // ---------------------------------------------------------------------------
 
-class csModelConverterMD2 : iModelConverter
+class csModelConverterMD2 : public iModelConverter
 {
 private:
   csModelConverterFormat FormatInfo;

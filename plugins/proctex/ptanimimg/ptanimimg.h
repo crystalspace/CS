@@ -30,7 +30,7 @@
 
 class csProcTexture;
 
-class csAnimateProctexLoader : public iLoaderPlugin, iComponent  
+class csAnimateProctexLoader : public iLoaderPlugin, public iComponent  
 {
 protected:
   csRef<iObjectRegistry> object_reg;

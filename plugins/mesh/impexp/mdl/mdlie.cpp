@@ -63,7 +63,7 @@ typedef csDirtyAccessArray<csVector2> csVector2Array;
 
 // ---------------------------------------------------------------------------
 
-class csModelConverterMDL : iModelConverter
+class csModelConverterMDL : public iModelConverter
 {
 private:
   csModelConverterFormat FormatInfo;

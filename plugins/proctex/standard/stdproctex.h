@@ -28,7 +28,7 @@
 
 class csProcTexture;
 
-class csBaseProctexType : public iComponent, iTextureType
+class csBaseProctexType : public iComponent, public iTextureType
 {
 protected:
   csRef<iObjectRegistry> object_reg;

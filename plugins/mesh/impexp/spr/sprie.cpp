@@ -25,7 +25,7 @@
 #include "cstool/mdldata.h"
 #include "cstool/sprbuild.h"
 
-class csModelConverterSPR : iModelConverter
+class csModelConverterSPR : public iModelConverter
 {
 private:
   csModelConverterFormat FormatInfo;

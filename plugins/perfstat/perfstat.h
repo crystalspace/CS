@@ -32,7 +32,7 @@ struct iEngine;
 
 // For more complete comments see iperfstat.h For usage see walktest
 
-class csPerfStats : iPerfStats
+class csPerfStats : public iPerfStats
 {
 protected:
   //------------------------------------------------------------------------

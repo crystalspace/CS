@@ -32,7 +32,7 @@
  * This is the standard command-line handler with history and
  * a connection to a iConsoleOutput for output.
  */
-class csConsoleInput : iConsoleInput
+class csConsoleInput : public iConsoleInput
 {
   // The command history
   csStringArray History;

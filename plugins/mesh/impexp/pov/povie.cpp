@@ -26,7 +26,7 @@
 #include "csutil/databuf.h"
 #include "csutil/objiter.h"
 
-class csModelConverterPOV : iModelConverter
+class csModelConverterPOV : public iModelConverter
 {
 private:
   csModelConverterFormat FormatInfo;

@@ -23,7 +23,7 @@
 #include "imesh/mdlconv.h"
 #include <lib3ds/types.h>
 
-class csModelConverter3ds : iModelConverter
+class csModelConverter3ds : public iModelConverter
 {
 private:
   iObjectRegistry *object_reg;

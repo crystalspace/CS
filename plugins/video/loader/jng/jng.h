@@ -76,7 +76,7 @@ class csJNGImageIO : public iImageIO
  * An csImageFile subclass for reading JNG files.<p>
  * This implementation needs libmng to read .JNG files.
  */
-class ImageJngFile : public csImageFile, iAnimatedImage
+class ImageJngFile : public csImageFile, public iAnimatedImage
 {
   friend class csJNGImageIO;
 private:

@@ -29,7 +29,7 @@
 
 #include "../common/parserenderstep.h"
 
-class csRenderLoopLoader : public iComponent, iLoaderPlugin
+class csRenderLoopLoader : public iComponent, public iLoaderPlugin
 {
 protected:
   csRef<iObjectRegistry> object_reg;
