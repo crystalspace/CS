@@ -3,7 +3,7 @@ SubDir TOP plugins video canvas macosx opengl ;
 if $(TARGET.OS) = "MACOS_X" 
 {
 Plugin glosx2d
-	: [ Wildcard *.cpp *.h ]
+	: [ Wildcard *.cpp *.m *.h ]
 ;
 LinkWith glosx2d : canvascommon openglcommon osxcanvascommon cssys csutil ;
 

@@ -3,7 +3,7 @@ SubDir TOP plugins video canvas macosx coregraphics ;
 if $(TARGET.OS) = "MACOS_X" 
 {
 Plugin cgdriver2d
-	: [ Wildcard *.cpp *.h ]
+	: [ Wildcard *.cpp *.m *.h ]
 ;
 LinkWith cgdriver2d : canvascommon osxcanvascommon cssys csutil ;
 

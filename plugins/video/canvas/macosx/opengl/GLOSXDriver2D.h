@@ -10,7 +10,7 @@
 #ifndef __CS_GLOSXDRIVER2D_H__
 #define __CS_GLOSXDRIVER2D_H__
 
-#include "OSXDriver2D.h"
+#include "video/canvas/macosx/common/OSXDriver2D.h"
 
 
 #if defined(__cplusplus)

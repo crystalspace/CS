@@ -1,5 +1,6 @@
 SubDir TOP plugins video canvas macosx ;
 
+SubInclude TOP plugins video canvas macosx common ;
 SubInclude TOP plugins video canvas macosx cocoa ;
 SubInclude TOP plugins video canvas macosx coregraphics ;
 SubInclude TOP plugins video canvas macosx opengl ;
