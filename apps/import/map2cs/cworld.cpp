@@ -391,6 +391,8 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
     ThingSides[s].pTex = pTexMan->GetTexture(name);
   }
  
+  CreateNode (node, "moveable");
+
   for (v = 0; v<int(sizeof(Vertices)/sizeof(Vertices[0])); v++)
   {
     DocNode vertex = CreateNode (node, "v");

@@ -16,6 +16,7 @@ The history order is reversed so that new features are at the top.
 	- Andrew Mann fixed a typo in the RAPID collision detection code.
 	  This bug must have been there since the RAPID plugin was created
 	  and could occasionally cause collision detection errors.
+	- res fixed map2cs so skyboxes get the <moveable /> flag.
 7-Mar-2003
 	- Philip Wyett fixed some old legacy instructions reported
 	  by 'Sqee' (docs mailing list) in the MSVC7 build documentation,
