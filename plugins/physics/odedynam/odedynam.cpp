@@ -313,6 +313,7 @@ int csODEDynamics::CollideMeshMesh (dGeomID o1, dGeomID o2, int flags,
 /* defined in ode */
 extern int dCollideBoxPlane (dxGeom *o1, dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
 extern int dCollideCCylinderPlane (dxGeom *o1, dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
+extern int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int flags, dContactGeom *contact, int skip);
 
 typedef csDirtyAccessArray<csMeshedPolygon> csPolyMeshList;
 
@@ -677,12 +678,131 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   return outcount;
 }
 
+int csODEDynamics::CollideMeshPlane (dGeomID mesh, dGeomID plane, int flags,
+    dContactGeom *outcontacts, int skip)
+{
+  int N = flags & 0xFF;
+  
+  //Make a bounding Box
+  MeshInfo *mi = (MeshInfo*)dGeomGetClassData (mesh);
+  iMeshWrapper *m = mi->mesh;
+  CS_ASSERT (m);
+  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()
+        ->GetPolygonMeshColldet();
+  csVector3 *vertex_table = p->GetVertices ();
+  csMeshedPolygon *polygon_list = p->GetPolygons ();
+
+  csReversibleTransform mesht = GetGeomTransform (mesh);
+ 
+  csBox3 box;
+  box.StartBoundingBox ();
+  for (int i = 0; i < p->GetVertexCount(); i ++)
+  {
+    box.AddBoundingVertex (vertex_table[i] / mesht);
+  }
+
+  //Fast Check
+  
+  csVector3 current;
+  int i,j;
+  bool planecut = false;
+  current = box.GetCorner(0);
+  float last = dGeomPlanePointDepth(plane,current.x,current.y,current.z);
+  for(i=1;i<8;i++)
+  {
+    current = box.GetCorner(i);
+    float now = dGeomPlanePointDepth(plane,current.x,current.y,current.z);
+    if((now<0.0f && last>0.0f)||(now>0.0f && last<0.0f))
+    {
+      planecut = true;
+      break;
+    }
+    last = now;
+  }
+  
+  if(!planecut)
+  {
+    return 0;
+  }
+  
+  dVector4 result;
+  dGeomPlaneGetParams (plane, result);
+  
+  //Serious Check
+  int outcount = 0;
+  int polycount = p->GetPolygonCount();
+  for(i=0;i<polycount && outcount < N;i++)
+  {
+    int vcount = polygon_list[i].num_vertices;
+    //Checking if the poly is cut
+    planecut = false;
+    current = vertex_table[polygon_list[i].vertices[0]]/mesht;
+    last = dGeomPlanePointDepth(plane,current.x,current.y,current.z);
+    for (j = 0; j < vcount; j++)
+    {
+      current = vertex_table[polygon_list[i].vertices[j]]/mesht;
+      float now = dGeomPlanePointDepth(plane,current.x,current.y,current.z);
+      if((now<0.0f && last>0.0f)||(now>0.0f && last<0.0f))
+      {
+        planecut = true;
+        break;
+      }
+      last = now;
+    }
+    if(planecut)
+    {
+      //Determining the places where the poly is cut
+      int ind1 = polygon_list[i].vertices[vcount-1];
+      csVector3 v1;
+      csVector3 v2 = vertex_table[ind1] / mesht;
+      for (j = 0; j < vcount && outcount < N; v1 = v2, j++)
+      {
+        int ind2 = polygon_list[i].vertices[j];
+        v2 = vertex_table[ind2] / mesht;
+        csVector3 diff = v2-v1;
+        
+        dGeomID oderay = dCreateRay (0, diff.Norm());
+        dGeomRaySet (oderay, v1.x, v1.y, v1.z,
+                    diff.x, diff.y, diff.z);
+        dContactGeom tempcontacts[5];
+        int count = dCollideRayPlane (oderay, plane, 5, tempcontacts, sizeof (dContactGeom));
+        dGeomDestroy (oderay);
+        if(count==1)
+        {
+          dContactGeom *c = &tempcontacts[0];
+          dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
+          out->pos[0] = c->pos[0];
+          out->pos[1] = c->pos[1];
+          out->pos[2] = c->pos[2];
+          out->normal[0] = result[0];
+          out->normal[1] = result[1];
+          out->normal[2] = result[2];
+          float depth1 = dGeomPlanePointDepth(plane,v1.x,v1.y,v1.z);
+          float depth2 = dGeomPlanePointDepth(plane,v2.x,v2.y,v2.z);
+          if(depth1>0.0f)
+            out->depth = depth1;
+          else if (depth2 > 0.0f)
+            out->depth = depth2;
+          else
+            out->depth = 0.0f;
+          out->g1 = mesh;
+          out->g2 = plane;
+          outcount ++;
+        }
+      }
+    }
+  }
+
+  return outcount;
+}
+
 dColliderFn* csODEDynamics::CollideSelector (int num)
 {
   if (num == geomclassnum) return (dColliderFn *)&CollideMeshMesh;
   if (num == dBoxClass) return (dColliderFn *)&CollideMeshBox;
   if (num == dCCylinderClass) return (dColliderFn *)&CollideMeshCylinder;
   if (num == dSphereClass) return (dColliderFn *)&CollideMeshSphere;
+  if (num == dPlaneClass) return (dColliderFn *)&CollideMeshPlane;
   return 0;
 }
 

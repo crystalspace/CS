@@ -145,6 +145,8 @@ public:
   	dContactGeom *contact, int skip);
   static int CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   	dContactGeom *contact, int skip);
+  static int CollideMeshPlane (dGeomID mesh, dGeomID plane, int flags,
+        dContactGeom *contact, int skip);
   static dColliderFn* CollideSelector (int num);
   static void GetAABB (dGeomID g, dReal aabb[6]);
 
