@@ -27,8 +27,10 @@ Direct3D.
 @subsubsection General Information
 
 To compile Crystal Space for Windows, you'll need the
-@emph{Microsoft Developer Studio} or @emph{Microsoft Visual C++} version 6.
-You can try to compile it with version 5, but this is unsupported and not
+@emph{Microsoft Developer Studio} or @emph{Microsoft Visual C++} version 6, with
+Service pack 4 installed and optionally the Microsoft Processor Pack.
+
+You may try to compile Crystal Space with version 5 of @emph{Visual C++}, however it is unsupported and not
 recommended. @xref{Win32 MSVC5}.
 
 In addition to @file{zlib}, @file{libjpeg} and @file{libpng} you also need
