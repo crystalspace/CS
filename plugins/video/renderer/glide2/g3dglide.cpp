@@ -1200,8 +1200,6 @@ void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
                                GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
                                FXFALSE,FXFALSE);
       }
-      GlideLib_grColorCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
-                               GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_TEXTURE, FXFALSE );
       GlideLib_grAlphaCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
                                GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_CONSTANT, FXFALSE );
     }
@@ -1213,7 +1211,20 @@ void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
   
   m_dpfx.mixmode = mode;
   m_dpfx.gouraud = m_renderstate.gouraud && ((mode & CS_FX_GOURAUD) != 0);
-  
+
+  if ( m_dpfx.gouraud )
+  {
+    if ( !m_thTex )
+    GlideLib_grColorCombine( GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE, 
+                             GR_COMBINE_LOCAL_ITERATED, GR_COMBINE_OTHER_NONE, FXFALSE );
+    else
+    GlideLib_grColorCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL, 
+                             GR_COMBINE_LOCAL_ITERATED, GR_COMBINE_OTHER_TEXTURE, FXFALSE );
+  }
+  else if ( m_thTex )
+    GlideLib_grColorCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
+                             GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_TEXTURE, FXFALSE );
+
   switch (mode & CS_FX_MASK_MIXMODE)
   {
   case CS_FX_MULTIPLY:
