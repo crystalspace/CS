@@ -37,6 +37,7 @@ The history order is reversed so that new features are at the top.
 	  improve performance of Dynavis levels a bit. Note that the
 	  fix is not complete. I only fixed a few common trivial cases.
 	  The hard general case hasn't been fixed yet.
+	- Eric Sunshine eliminated compilation warnings.
 10-Dec-2002
 	- Fixed a bug I introduced yesterday in parsing of HardMove.
 	  The transform was inverted.

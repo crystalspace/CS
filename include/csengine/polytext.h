@@ -320,7 +320,7 @@ private:
   void *cache_data [4];
 
   /// Compared against csThing ambient version to know whether lightmap needs updating.
-  int  ambient_version;
+  uint32 ambient_version;
 
 public:
   /**
@@ -333,9 +333,9 @@ public:
    */
   static float cfg_cosinus_factor;
 
-  ///
+  /// Constructor.
   csPolyTexture ();
-  ///
+  /// Destructor.
   virtual ~csPolyTexture ();
 
   /**

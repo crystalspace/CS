@@ -528,7 +528,6 @@ static int total_cnt = 0;
     	+ sizeof (csPolyTexLightMap) + sizeof (csPolyTxtPlane)
 	+ sizeof (csPolyPlane) + sizeof (csLightMap);
     polsize *= polygons.Length ();
-    int lm_size = 0;
     int i;
     for (i = 0 ; i < polygons.Length () ; i++)
     {
