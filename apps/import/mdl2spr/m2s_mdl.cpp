@@ -640,7 +640,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   printf("Generate Triangles\n");
   for (i = 0; i < nbtriangles; i++)
   {
-    fprintf(f, "\t\tTRIANGLE (%ld,%ld,%ld)\n",
+    fprintf(f, "\t\tTRIANGLE (%d,%d,%d)\n",
       spr.triangles[i].vertice[0],
       spr.triangles[i].vertice[1],
       spr.triangles[i].vertice[2]);
