@@ -49,6 +49,7 @@ public:
 class csEmitBox : public iEmitBox
 {
   csVector3 min, max;
+  csVector3 mult;
 public:
   SCF_DECLARE_IBASE;
   csEmitBox (iBase *parent);
@@ -63,6 +64,7 @@ class csEmitSphere : public iEmitSphere
 {
   csVector3 center;
   float min, max;
+  float rand_min, rand_mult;
 public:
   SCF_DECLARE_IBASE;
   csEmitSphere (iBase *parent);

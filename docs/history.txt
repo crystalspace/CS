@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Dec-2004
+	- Jorrit added csFastRandFloat() which is a fast random number
+	  generator routine that returns a number between 0 and 1.
+	- Jorrit optimized emit particle system by using that function
+	  instead of rand(). This speeds it up a little.
 19-Dec-2004
 	- Eric Sunshine fixed problem on MacOS/X where output of `cs-config
 	  --libs' did not include "-framework AppKit -framework Foundation".

@@ -22,6 +22,7 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
+#include "csutil/floatrand.h"
 #include "cstool/rbuflock.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -443,9 +444,9 @@ CS_IMPLEMENT_STATIC_VAR (RandDir1, csVector3, ())
 csVector3& csParticleSystem::GetRandomDirection ()
 {
   static csVector3 *dir = RandDir1 ();
-  dir->x = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
-  dir->y = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
-  dir->z = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
+  dir->x = 2.0 * csFastRandFloat() - 1.0;
+  dir->y = 2.0 * csFastRandFloat() - 1.0;
+  dir->z = 2.0 * csFastRandFloat() - 1.0;
   return *dir;
 }
 
@@ -455,9 +456,9 @@ csVector3& csParticleSystem::GetRandomDirection (const csVector3& magnitude,
 	const csVector3& offset)
 {
   static csVector3 *dir = RandDir2 ();
-  dir->x = (rand() / (1.0+RAND_MAX)) * magnitude.x;
-  dir->y = (rand() / (1.0+RAND_MAX)) * magnitude.y;
-  dir->z = (rand() / (1.0+RAND_MAX)) * magnitude.z;
+  dir->x = csFastRandFloat() * magnitude.x;
+  dir->y = csFastRandFloat() * magnitude.y;
+  dir->z = csFastRandFloat() * magnitude.z;
   *dir = *dir + offset;
   return *dir;
 }
@@ -468,9 +469,9 @@ csVector3& csParticleSystem::GetRandomPosition (const csBox3& box)
 {
   static csVector3 *dir = RandDir3 ();
   *dir = box.Max() - box.Min();
-  dir->x *= rand() / (1.0+RAND_MAX);
-  dir->y *= rand() / (1.0+RAND_MAX);
-  dir->z *= rand() / (1.0+RAND_MAX);
+  dir->x *= csFastRandFloat();
+  dir->y *= csFastRandFloat();
+  dir->z *= csFastRandFloat();
   *dir += box.Min();
   return *dir;
 }

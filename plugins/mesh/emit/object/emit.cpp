@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
+#include "csutil/floatrand.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "iengine/rview.h"
@@ -92,10 +93,21 @@ typedef csDirtyAccessArray<csEmitCompPart> csCompPartArray;
 CS_IMPLEMENT_STATIC_VAR (GetStaticCompPartArray,csCompPartArray,())
 
 /// utility function
-static float GetRandomFloat(float min, float max)
+static inline float GetRandomFloat(float min, float max)
 {
   float w = max - min;
-  return min + (w*rand()/(RAND_MAX+1.0));
+  return min + (w*csFastRandFloat());
+}
+
+/// utility function
+static inline float GetRandomFloat(float max)
+{
+  return max*csFastRandFloat();
+}
+
+static inline float GetRandomFloatTWOPI()
+{
+  return TWO_PI*csFastRandFloat();
 }
 
 csEmitFixed::csEmitFixed(iBase *parent)
@@ -133,15 +145,19 @@ csEmitBox::~csEmitBox()
 
 void csEmitBox::GetValue(csVector3& value, csVector3 & /*given*/)
 {
-  value.x = GetRandomFloat(min.x, max.x);
-  value.y = GetRandomFloat(min.y, max.y);
-  value.z = GetRandomFloat(min.z, max.z);
+  /// utility function
+  value.x = min.x + mult.x * csFastRandFloat ();
+  value.y = min.y + mult.y * csFastRandFloat ();
+  value.z = min.z + mult.z * csFastRandFloat ();
 }
 
 void csEmitBox::SetContent(const csVector3& min, const csVector3& max)
 {
   csEmitBox::min = min;
   csEmitBox::max = max;
+  mult.x = (max.x - min.x);
+  mult.y = (max.y - min.y);
+  mult.z = (max.z - min.z);
 }
 
 void csEmitBox::GetContent(csVector3& min, csVector3& max)
@@ -168,13 +184,13 @@ void csEmitSphere::GetValue(csVector3& value, csVector3 & /*given*/)
   //because the volume of a slice at a certain distance
   // is the dist*dist(*pi..) in size. Taking random min..max will
   // cause an uneven spread of points in the sphere.
-  float sqdist = GetRandomFloat( min*min*min, max*max*max );
+  float sqdist = rand_min + (rand_mult*csFastRandFloat());
   float dist = pow(sqdist, (float)(1./3.));
   value.Set(dist, 0, 0);
-  float rotz_open = TWO_PI * (rand() / (1.0+RAND_MAX));
+  float rotz_open = GetRandomFloatTWOPI ();
   csZRotMatrix3 openrot(rotz_open);
   value = openrot * value;
-  float rot_around = TWO_PI * (rand() / (1.0+RAND_MAX));
+  float rot_around = GetRandomFloatTWOPI ();
   csXRotMatrix3 xaround(rot_around);
   value = xaround * value;
   value += center;
@@ -196,6 +212,8 @@ void csEmitSphere::SetContent(const csVector3& center, float min, float max)
   csEmitSphere::center = center;
   csEmitSphere::min = min;
   csEmitSphere::max = max;
+  rand_min = min * min * min;
+  rand_mult = max * max * max - rand_min;
 }
 
 void csEmitSphere::GetContent(csVector3& center, float& min, float& max)
@@ -227,10 +245,10 @@ void csEmitCone::GetValue(csVector3& value, csVector3 & /*given*/)
   /// from fountain code
 
   // now make it shoot to a circle in the x direction
-  float rotz_open = 2.0 * aperture * (rand() / (1.0+RAND_MAX)) - aperture;
+  float rotz_open = GetRandomFloat (2.0 * aperture) - aperture;
   csZRotMatrix3 openrot(rotz_open);
   dest = openrot * dest;
-  float rot_around = TWO_PI * (rand() / (1.0+RAND_MAX));
+  float rot_around = GetRandomFloatTWOPI ();
   csXRotMatrix3 xaround(rot_around);
   dest = xaround * dest;
   // now dest point to somewhere in a circular cur of a sphere around the
@@ -294,7 +312,7 @@ csEmitMix::~csEmitMix()
 
 void csEmitMix::GetValue(csVector3& value, csVector3 & given)
 {
-  float num = GetRandomFloat(0., totalweight);
+  float num = GetRandomFloat(totalweight);
   float passed = 0.0;
   struct part *p = list;
   struct part *found = list;
@@ -396,7 +414,7 @@ csEmitLine::~csEmitLine()
 
 void csEmitLine::GetValue(csVector3& value, csVector3 & /*given*/)
 {
-  float v = GetRandomFloat(0., 1.);
+  float v = GetRandomFloat(1.);
   value = start + (end-start)*v;
 }
 
@@ -445,14 +463,14 @@ csEmitCylinder::~csEmitCylinder()
 void csEmitCylinder::GetValue(csVector3& value, csVector3 & /*given*/)
 {
   // point on the center line of the cylinder
-  float v = GetRandomFloat(0., 1.);
+  float v = GetRandomFloat(1.);
   value = start + (end-start)*v;
 
   // setup 3 axis for the cylinder
   csVector3 normal = (end-start).Unit();
   csVector3 udir; FindAxis(normal, udir);
   csVector3 vdir = udir % normal;
-  float angle = GetRandomFloat(0, TWO_PI);
+  float angle = GetRandomFloatTWOPI ();
   // direction on the circle
   csVector3 oncirc = udir*cos(angle) + vdir*sin(angle);
 
@@ -553,7 +571,7 @@ void csEmitSphereTangent::GetValue(csVector3& value, csVector3 & given)
   csVector3 normal = path.Unit();
   csVector3 udir; FindAxis(normal, udir);
   csVector3 vdir = udir % normal;
-  float angle = GetRandomFloat(0, TWO_PI);
+  float angle = GetRandomFloatTWOPI ();
   // direction on the circle
   csVector3 oncirc = udir*cos(angle) + vdir*sin(angle);
 
@@ -621,7 +639,7 @@ void csEmitMeshObject::SetupObject ()
         lighted_particles);
       StartParticle(i);
       /// age each particle randomly, to spread out particles over ages.
-      int elapsed = csQint(GetRandomFloat(0,timetolive));
+      int elapsed = csQint(GetRandomFloat(timetolive));
       MoveAgeParticle(i, elapsed, elapsed/1000.);
     }
     SetupColor ();
