@@ -5,7 +5,7 @@ if $(MNG.AVAILABLE) = "yes"
 Plugin csjngimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csjngimg : csgfx cssys csutil ;
+LinkWith csjngimg : csgeom csgfx cssys csutil ;
 ExternalLibs csjngimg :  MNG ;
 
 Help csjngimg : "Crystal Space jng image loader" ;

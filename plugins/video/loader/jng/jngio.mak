@@ -42,7 +42,7 @@ INC.CSJNGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/jng/*.h))
 SRC.CSJNGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/jng/*.cpp))
 
 OBJ.CSJNGIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSJNGIMG:.cpp=$O)))
-DEP.CSJNGIMG = CSUTIL CSSYS CSGFX CSUTIL
+DEP.CSJNGIMG = CSGEOM CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += CSJNGIMG
 DSP.CSJNGIMG.NAME = csjngimg

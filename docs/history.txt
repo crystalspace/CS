@@ -21,6 +21,9 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett updated external MSVC app HOWTO to include links
           to the video(s) of each step and all steps in one archive from
           our sunsite ftp space.
+	- Eric Sunshine fixed jng/jngio.mak and jng/Jamfile so that the JNG
+	  loader plugin once again builds.  It must now link against csgeom
+	  since it employs csRect.
 12-May-2003
 	- Philip Wyett brought warning level in MSVC 7 project files down
           to 3 to match MSVC 6 ones. Also cleaned up 'group.tpl' for
