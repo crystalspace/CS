@@ -3143,7 +3143,7 @@ void csGraphics3DSoftware::csHaloDrawer::drawline_innerrim(int x1, int x2, int y
 
 #define NUM_OPTIONS 15
 
-csOptionDescription csGraphics3DSoftware::config_options [NUM_OPTIONS] =
+static const csOptionDescription config_options [NUM_OPTIONS] =
 {
   { 0, "ilace", "Interlacing", CSVAR_BOOL },
   { 1, "light", "Texture lighting", CSVAR_BOOL },

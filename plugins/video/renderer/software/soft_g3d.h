@@ -451,9 +451,6 @@ public:
   virtual bool GetOptionDescription (int idx, csOptionDescription *option);
   virtual bool SetOption (int id, csVariant* value);
   virtual bool GetOption (int id, csVariant* value);
-
-private:
-  static csOptionDescription config_options[];
 };
 
 #endif // __SOFT_G3D_H__
