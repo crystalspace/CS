@@ -278,8 +278,8 @@ class TiDocumentNode : public TiXmlBase
 	friend class TiXmlElement;
 
 public:
-	    // Used internally, not part of the public API.
-	    friend TIXML_OSTREAM& operator<< (TIXML_OSTREAM& out, const TiDocumentNode& base);
+	// Used internally, not part of the public API.
+	friend TIXML_OSTREAM& operator<< (TIXML_OSTREAM& out, const TiDocumentNode& base);
 
 	/** The types of XML nodes supported by TinyXml. (All the
 			unsupported types are picked up by UNKNOWN.)
@@ -326,7 +326,7 @@ public:
 	void Clear();
 
 	/// One step up the DOM.
-	TiDocumentNode* Parent() const					{ return parent; }
+	TiDocumentNode* Parent() const{ return parent; }
 
 	TiDocumentNode* FirstChild()	const	{ return firstChild; }		///< The first child of this node. Will be null if there are no children.
 	TiDocumentNode* FirstChild( const char * value ) const;			///< The first child of this node with the matching 'value'. Will be null if none found.
@@ -409,7 +409,7 @@ public:
 	TiXmlElement* FirstChildElement( const char * value ) const;
 
 	/// Query the type (as an enumerated value, above) of this node.
-	virtual int Type() const	{ return type; }
+	virtual int Type() const = 0;
 
 	/** Return a pointer to the Document this node lives in.
 		Returns null if not in a document.
@@ -419,17 +419,17 @@ public:
 	/// Returns true if this node has no children.
 	bool NoChildren() const						{ return !firstChild; }
 
-	TiDocument* ToDocument()	const		{ return ( this && type == DOCUMENT ) ? (TiDocument*) this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
-	TiXmlElement*  ToElement() const		{ return ( this && type == ELEMENT  ) ? (TiXmlElement*)  this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
-	TiXmlComment*  ToComment() const		{ return ( this && type == COMMENT  ) ? (TiXmlComment*)  this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
-	TiXmlUnknown*  ToUnknown() const		{ return ( this && type == UNKNOWN  ) ? (TiXmlUnknown*)  this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
-	TiXmlText*	   ToText()    const		{ return ( this && type == TEXT     ) ? (TiXmlText*)     this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
-	TiXmlDeclaration* ToDeclaration() const	{ return ( this && type == DECLARATION ) ? (TiXmlDeclaration*) this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
+	TiDocument* ToDocument() const	{ return ( this && Type () == DOCUMENT ) ? (TiDocument*) this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
+	TiXmlElement*  ToElement() const		{ return ( this && Type () == ELEMENT  ) ? (TiXmlElement*)  this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
+	TiXmlComment*  ToComment() const		{ return ( this && Type () == COMMENT  ) ? (TiXmlComment*)  this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
+	TiXmlUnknown*  ToUnknown() const		{ return ( this && Type () == UNKNOWN  ) ? (TiXmlUnknown*)  this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
+	TiXmlText*	   ToText()    const		{ return ( this && Type () == TEXT     ) ? (TiXmlText*)     this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
+	TiXmlDeclaration* ToDeclaration() const	{ return ( this && Type () == DECLARATION ) ? (TiXmlDeclaration*) this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
 
 	virtual TiDocumentNode* Clone() const = 0;
 
 protected:
-	TiDocumentNode( NodeType type );
+	TiDocumentNode( );
 
 	// The node is passed in by ownership. This object will delete it.
 	TiDocumentNode* LinkEndChild( TiDocumentNode* addThis );
@@ -442,7 +442,6 @@ protected:
 	}
 
 	TiDocumentNode*		parent;
-	NodeType		type;
 
 	TiDocumentNode*		firstChild;
 	TiDocumentNode*		lastChild;
@@ -555,6 +554,8 @@ public:
 
 	virtual ~TiXmlElement();
 
+	virtual int Type() const { return ELEMENT; }
+
 	/** Given an attribute name, attribute returns the value
 		for the attribute of that name, or null if none exists.
 	*/
@@ -639,8 +640,9 @@ class TiXmlComment : public TiDocumentNode
 {
 public:
 	/// Constructs an empty comment.
-	TiXmlComment() : TiDocumentNode( TiDocumentNode::COMMENT ) {}
+	TiXmlComment() {}
 	virtual ~TiXmlComment()	{}
+	virtual int Type() const { return COMMENT; }
 
 	// [internal use] Creates a new Element and returs it.
 	virtual TiDocumentNode* Clone() const;
@@ -668,11 +670,12 @@ class TiXmlText : public TiDocumentNode
 	friend class TiXmlElement;
 public:
 	/// Constructor.
-	TiXmlText (const char * initValue) : TiDocumentNode (TiDocumentNode::TEXT)
+	TiXmlText (const char * initValue)
 	{
 		SetValue( initValue );
 	}
 	virtual ~TiXmlText() {}
+	virtual int Type() const { return TEXT; }
 	virtual const char * Value () const { return value.c_str (); }
 	virtual void SetValue (const char * _value) { value = _value;}
 
@@ -707,6 +710,7 @@ public:
 		SetValue( initValue );
 	}
 	virtual ~TiXmlCData() {}
+	virtual int Type() const { return TEXT; }
 	virtual const char * Value () const { return value.c_str (); }
 	virtual void SetValue (const char * _value) { value = _value;}
 
@@ -732,14 +736,14 @@ class TiXmlDeclaration : public TiDocumentNode
 {
 public:
 	/// Construct an empty declaration.
-	TiXmlDeclaration()   : TiDocumentNode( TiDocumentNode::DECLARATION ) {}
+	TiXmlDeclaration() { }
 
 	/// Construct.
 	TiXmlDeclaration::TiXmlDeclaration( const char * _version,
-										const char * _encoding,
-										const char * _standalone );
+		const char * _encoding, const char * _standalone );
 
 	virtual ~TiXmlDeclaration()	{}
+	virtual int Type() const { return DECLARATION; }
 
 	/// Version. Will return empty if none was found.
 	const char * Version() const		{ return version.c_str (); }
@@ -780,8 +784,9 @@ private:
 class TiXmlUnknown : public TiDocumentNode
 {
 public:
-	TiXmlUnknown() : TiDocumentNode( TiDocumentNode::UNKNOWN ) {}
+	TiXmlUnknown() { }
 	virtual ~TiXmlUnknown() {}
+	virtual int Type() const { return UNKNOWN; }
 
 	// [internal use]
 	virtual TiDocumentNode* Clone() const;
@@ -817,6 +822,7 @@ public:
 	TiDocument( const char * documentName );
 
 	virtual ~TiDocument() {}
+	virtual int Type() const { return DOCUMENT; }
 
 	virtual const char * Value () const { return value.c_str (); }
 	virtual void SetValue (const char * _value) { value = _value;}

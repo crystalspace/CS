@@ -121,10 +121,9 @@ TiXmlBase::StringToBuffer::~StringToBuffer()
 // End strange bug fix. -->
 
 
-TiDocumentNode::TiDocumentNode( NodeType _type )
+TiDocumentNode::TiDocumentNode( )
 {
 	parent = 0;
-	type = _type;
 	firstChild = 0;
 	lastChild = 0;
 	prev = 0;
@@ -448,7 +447,7 @@ TiDocument* TiDocumentNode::GetDocument() const
 }
 
 
-TiXmlElement::TiXmlElement () : TiDocumentNode( TiDocumentNode::ELEMENT )
+TiXmlElement::TiXmlElement ()
 {
 	firstChild = lastChild = 0;
 	value = NULL;
@@ -632,14 +631,13 @@ TiDocumentNode* TiXmlElement::Clone() const
 }
 
 
-TiDocument::TiDocument() : TiDocumentNode( TiDocumentNode::DOCUMENT ),
-	strings (431)	//701?
+TiDocument::TiDocument() : strings (431)
 {
 	error = false;
 	//	ignoreWhiteSpace = true;
 }
 
-TiDocument::TiDocument( const char * documentName ) : TiDocumentNode( TiDocumentNode::DOCUMENT )
+TiDocument::TiDocument( const char * documentName ) : strings (431)
 {
 	//	ignoreWhiteSpace = true;
 	value = documentName;
@@ -899,7 +897,6 @@ TiDocumentNode* TiXmlText::Clone() const
 TiXmlDeclaration::TiXmlDeclaration( const char * _version,
 	const char * _encoding,
 	const char * _standalone )
-: TiDocumentNode( TiDocumentNode::DECLARATION )
 {
 	version = _version;
 	encoding = _encoding;
