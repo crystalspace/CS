@@ -55,7 +55,6 @@ void csShadowMap::MipmapLightmap (int w, int h, int lms, csShadowMap* source, in
 {
   int size = w*h;
 
-  if (size > 1000000) return;
   int lw = w/lms+2;
   int lh = h/lms+2;
   int lw2 = w2/lms2+2;
@@ -122,8 +121,6 @@ void csLightMap::DelShadowMap (csShadowMap* smap)
 
 csShadowMap* csLightMap::NewShadowMap (csLight* light, int w, int h, int lms)
 {
-  if (size > 1000000) return NULL;
-
   CHK (csShadowMap* smap = new csShadowMap ());
   smap->light = light;
   smap->next = first_smap;
@@ -187,8 +184,6 @@ void csLightMap::Alloc (int w, int h, int lms, int r, int g, int b)
   static_lm.Clear ();
   real_lm.Clear ();
 
-  if (size > 1000000) return;
-
 //@@@
 #if 0
   if (Textures::mixing == MIX_NOCOLOR)
@@ -219,7 +214,6 @@ void csLightMap::MipmapLightmap (int w, int h, int lms, csLightMap* source, int 
 {
   Alloc (w, h, lms, 0, 0, 0);
 
-  if (size > 1000000 || source->size > 1000000) return;
   int lw2 = source->GetWidth ();
   int lh2 = source->GetHeight ();
   int u, v, uv, uv2;
