@@ -30,67 +30,12 @@
 #include "../../common/shaderplugin.h"
 
 class csXMLShaderCompiler;
+class csXMLShader;
 
-class csXMLShader : public iShader, public csObject
+class csXMLShaderTech
 {
-public:
-  SCF_DECLARE_IBASE_EXT (csObject);
-
-  csXMLShader (iGraphics3D* g3d);
-  virtual ~csXMLShader();
-
-  /// Get number of passes this shader have
-  virtual int GetNumberOfPasses ()
-  {
-    return passesCount;
-  }
-
-  virtual iObject* QueryObject () { return (iObject*)(csObject*)this; }
-
-  /// Activate a pass for rendering
-  virtual bool ActivatePass (unsigned int number);
-
-  /// Setup a pass.
-  virtual bool SetupPass (const csRenderMesh *mesh,
-    csRenderMeshModes& modes,
-    const csShaderVarStack &stacks);
-
-  /**
-  * Tear down current state, and prepare for a new mesh 
-  * (for which SetupPass is called)
-  */
-  virtual bool TeardownPass ();
-
-  /// Completly deactivate a pass
-  virtual bool DeactivatePass ();
-
-  friend class csXMLShaderCompiler;
-
-  //=================== iShaderVariableContext ================//
-
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-  { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-  { return svcontext.GetVariable (name); }
-
-  /**
-  * Push the variables of this context onto the variable stacks
-  * supplied in the "stacks" argument
-  */
-  void PushVariables (csShaderVarStack &stacks) const
-  { svcontext.PushVariables (stacks); }
-
-  /**
-  * Pop the variables of this context off the variable stacks
-  * supplied in the "stacks" argument
-  */
-  void PopVariables (csShaderVarStack &stacks) const
-  { svcontext.PopVariables (stacks); }
-
 private:
+  friend class csXMLShader;
 
   struct shaderPass
   {
@@ -136,7 +81,7 @@ private:
     //variable context
     csShaderVariableContext svcontext;
 
-    csXMLShader *owner;
+    csXMLShaderTech* owner;
   };
 
   //variable context
@@ -163,10 +108,109 @@ private:
 
   unsigned int currentPass;
 
-  //Holders
-  csWeakRef<iGraphics3D> g3d;
-public:
+  csXMLShader* parent;
+  const csStringHash& xmltokens;
+  bool do_verbose;
+  csString fail_reason;
+
+  // load one pass, return false if it fails
+  bool LoadPass (iDocumentNode *node, shaderPass *pass);
+  // load a shaderdefinition block
+  bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
+  // load a shaderprogram
+  csPtr<iShaderProgram> LoadProgram (iDocumentNode *node, shaderPass *pass);
+  // Set reason for failure.
+  void SetFailReason (const char* reason, ...);
+
   int GetPassNumber (shaderPass* pass);
+public:
+  csXMLShaderTech (csXMLShader* parent);
+  ~csXMLShaderTech();
+
+  int GetNumberOfPasses()
+  { return passesCount; }
+  bool ActivatePass (unsigned int number);
+  bool SetupPass  (const csRenderMesh *mesh,
+    csRenderMeshModes& modes,
+    const csShaderVarStack &stacks);
+  bool TeardownPass();
+  bool DeactivatePass();
+
+  bool Load (iDocumentNode* node, iDocumentNode* parentSV);
+
+  const char* GetFailReason()
+  { return fail_reason.GetData(); }
+};
+
+class csXMLShader : public iShader, public csObject
+{
+public:
+  SCF_DECLARE_IBASE_EXT (csObject);
+
+  csXMLShader (csXMLShaderCompiler* compiler);
+  virtual ~csXMLShader();
+
+  virtual iObject* QueryObject () 
+  { return (iObject*)(csObject*)this; }
+
+  /// Get number of passes this shader have
+  virtual int GetNumberOfPasses ()
+  {
+    return activeTech->GetNumberOfPasses();
+  }
+
+  /// Activate a pass for rendering
+  virtual bool ActivatePass (unsigned int number)
+  { return activeTech->ActivatePass (number); }
+
+  /// Setup a pass.
+  virtual bool SetupPass (const csRenderMesh *mesh,
+    csRenderMeshModes& modes,
+    const csShaderVarStack &stacks)
+  { return activeTech->SetupPass (mesh, modes, stacks); }
+
+  /**
+  * Tear down current state, and prepare for a new mesh 
+  * (for which SetupPass is called)
+  */
+  virtual bool TeardownPass ()
+  { return activeTech->TeardownPass(); }
+
+  /// Completly deactivate a pass
+  virtual bool DeactivatePass ()
+  { return activeTech->DeactivatePass(); }
+
+  friend class csXMLShaderCompiler;
+
+  //=================== iShaderVariableContext ================//
+
+  /// Add a variable to this context
+  void AddVariable (csShaderVariable *variable)
+  { activeTech->svcontext.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  csShaderVariable* GetVariable (csStringID name) const
+  { return activeTech->svcontext.GetVariable (name); }
+
+  /**
+  * Push the variables of this context onto the variable stacks
+  * supplied in the "stacks" argument
+  */
+  void PushVariables (csShaderVarStack &stacks) const
+  { activeTech->svcontext.PushVariables (stacks); }
+
+  /**
+  * Pop the variables of this context off the variable stacks
+  * supplied in the "stacks" argument
+  */
+  void PopVariables (csShaderVarStack &stacks) const
+  { activeTech->svcontext.PopVariables (stacks); }
+
+public:
+  //Holders
+  csXMLShaderCompiler* compiler;
+  csXMLShaderTech* activeTech;
+  csRef<iGraphics3D> g3d;
 };
 
 class csXMLShaderCompiler : public iShaderCompiler, public iComponent
@@ -197,8 +241,8 @@ public:
   virtual csPtr<iShaderPriorityList> GetPriorities (
 		  iDocumentNode* templ);
 
-private:
   void Report (int severity, const char* msg, ...);
+private:
 
   // struct to hold all techniques, until we decide which to use
   struct TechniqueKeeper
@@ -217,29 +261,11 @@ private:
   
   static int CompareTechniqueKeeper (TechniqueKeeper const&,
 				     TechniqueKeeper const&);
-  
-  // load one technique, and create shader from it
-  csPtr<csXMLShader> CompileTechnique (iDocumentNode *node, 
-    const char* shaderName, iDocumentNode *parentSV = 0);
 
-  // load one pass, return false if it fails
-  bool LoadPass (iDocumentNode *node, csXMLShader::shaderPass *pass);
-
-  // load a shaderdefinition block
-  bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
-
-  // load a shaderprogram
-  csPtr<iShaderProgram> LoadProgram (iDocumentNode *node,
-	csXMLShader::shaderPass *pass);
-
-  // Set reason for failure.
-  void SetFailReason (const char* reason, ...);
-
+public:
+  bool do_verbose;
   /// XML Token and management
   csStringHash xmltokens;
-#define CS_TOKEN_ITEM_FILE \
-  "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"
-#include "cstool/tokenlist.h"
 
   //Standard vars
   iObjectRegistry* objectreg;
@@ -248,8 +274,9 @@ private:
   csRef<iSyntaxService> synldr;
   csWeakRef<iShaderManager> shadermgr;
 
-  bool do_verbose;
-  csString fail_reason;
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"
+#include "cstool/tokenlist.h"
 };
 
 #endif

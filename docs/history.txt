@@ -86,6 +86,8 @@ chronological order.
 	  This fixes the remaining ref leaks in terrain and terrainf levels.
 	- Jorrit but the unused csBlockBuilder class in #if 0 in bruteblock
 	  terrain.
+	- res changed the xmlshader plugin so shaders internally have the 
+	  notion of techniques.
 18-Aug-2004
 	- Jorrit fixed the NR null renderer so that it also returns a
 	  valid iPolygonRenderer instance on calling
