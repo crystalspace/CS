@@ -324,7 +324,7 @@ void csSprite3D::GenerateSpriteLOD (int num_vts)
   int* emerge_from = tpl->GetEmergeFrom ();
   csTriangleMesh* base_mesh = tpl->GetBaseMesh ();
   mesh.Reset ();
-  int i, from;
+  int i;
   int a, b, c;
   for (i = 0 ; i < base_mesh->GetNumTriangles () ; i++)
   {
