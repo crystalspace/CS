@@ -112,6 +112,9 @@ struct iImage : public iBase
 
   /// Create yet another image and copy this one into the new image.
   virtual iImage *Clone () = 0;
+
+  /// Create a new image and copy a subpart of the actual image into the new image.
+  virtual iImage *Crop (int x, int y, int width, int height) = 0;
 };
 
 #endif // __IIMAGE_H__

@@ -154,6 +154,8 @@ public:
   virtual void SetFormat (int iFormat);
   /// Create yet another image and copy this one into the new image.
   virtual iImage *Clone ();
+  /// Create another image and copy a subpart of this image into the new image.
+  virtual iImage *Crop (int x, int y, int width, int height);
 };
 
 /**
