@@ -21,6 +21,18 @@ The history order has been reversed so that new features are at the top.
 	  The isometric sprites now use zbuffer TEST mode when the sprite is
 	  transparent. This removes some glitches in drawing overlapping
 	  transparent sprites.
+	- Eric Sunshine reverted Philip Wyett's changes to blocks.cpp.
+	  Philip's intention was to fix a problem with Blocks locking up at
+	  termination time on Windows 2000.  Unfortunately, his changes were
+	  entirely invalid for the following reasons:
+	    - He moved the `delete' call for the system driver into its own
+	      destructor.  Thus, the object's own destructor was trying to
+	      destroy itself.
+	    - He removed all code which performed termination-time clean-up and
+	      shut-down.  Rather than actually solving the lock-up problem on
+	      Windows 2000, he simply side-stepped the issue entirely by not
+	      performing any application clean-up.  This is _not_ an acceptable
+	      solution.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works
