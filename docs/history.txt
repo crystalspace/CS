@@ -28,6 +28,10 @@ The history order is reversed so that new features are at the top.
 	- Added a -regions commandline option to walktest so that when you
 	  load multiple maps every map is loaded in a seperate region and
 	  lighting information is taken from that map zip file.
+	- Added a -prepare commandline option to walktest. When you give this
+	  option all things are pre-prepared (using the iThingState->Prepare()
+	  I added above). This increases load time but might improve
+	  jerky movement during running.
 	- Eric Sunshine moved crystal.fgd from scripts/worldcraft to
 	  scripts/hammer at the request of its author.
 2-Mar-2003

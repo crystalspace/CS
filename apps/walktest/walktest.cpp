@@ -69,6 +69,7 @@
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
 #include "isound/wrapper.h"
+#include "imesh/thing/thing.h"
 #include "imesh/terrfunc.h"
 #include "imesh/object.h"
 #include "imesh/mdlconv.h"
@@ -325,6 +326,7 @@ void WalkTest::Help ()
   printf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
   printf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   printf ("  -regions           load every map in a seperate region (default off)\n");
+  printf ("  -prepare           after loading, pre-prepare all things (default off)\n");
   printf ("  -infinite          special infinite level generation (ignores map file!)\n");
   printf ("  -bots              allow random generation of bots\n");
   printf ("  <path>             load map from VFS <path> (default '%s')\n",
@@ -1342,9 +1344,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       	first_map->map_dir);
 
     // Check if we have to load every seperate map in a seperate region.
-    bool do_regions = false;
     csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
     	iCommandLineParser);
+    bool do_regions = false;
     if (cmdline->GetOption ("regions"))
       do_regions = true;
       
@@ -1414,6 +1416,24 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       csTextProgressMeter* meter = new csTextProgressMeter (myConsole);
       Engine->Prepare (meter);
       delete meter;
+    }
+
+    if (cmdline->GetOption ("prepare"))
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Preparing all things...");
+      iMeshList* ml = Engine->GetMeshes ();
+      int i;
+      for (i = 0 ; i < ml->GetCount () ; i++)
+      {
+        iMeshWrapper* m = ml->Get (i);
+	if (m->GetMeshObject ())
+	{
+	  csRef<iThingState> thing = SCF_QUERY_INTERFACE (m->GetMeshObject (),
+	  	iThingState);
+	  if (thing) thing->Prepare ();
+        }
+      }
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Preparing finished...");
     }
 
     Create2DSprites ();
