@@ -84,7 +84,7 @@ void CTextureFile::SetOriginalData(char* Data, int Size)
   {
     IL_Loaded = true;
 
-    csRef<iImageLoader> il = SCF_CREATE_INSTANCE(
+    csRef<iImageIO> il = SCF_CREATE_INSTANCE(
     	"crystalspace.graphic.image.io.multiplex", iImageIO);
     if (il.IsValid())
     {
