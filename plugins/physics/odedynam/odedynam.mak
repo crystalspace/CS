@@ -31,6 +31,8 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/physics/odedynam
 
+LIB.EXTERNAL.odedynam = -lode
+
 ifeq ($(USE_PLUGINS),yes)
   odedynam = $(OUTDLL)odedynam$(DLL)
   LIB.odedynam = $(foreach d,$(DEP.odedynam),$($d.LIB))
@@ -62,7 +64,7 @@ ifeq ($(MAKESECTION),targets)
 odedynam: $(OUTDIRS) $(odedynam)
 
 $(odedynam): $(OBJ.odedynam) $(LIB.odedynam)
-	$(DO.PLUGIN)
+	$(DO.PLUGIN) $(LIB.EXTERNAL.odedynam)
 
 clean: odedynamclean
 odedynamclean:
