@@ -49,6 +49,7 @@ enum
   XMLTOKEN_BOX = 1,
   XMLTOKEN_LIGHTING,
   XMLTOKEN_COLOR,
+  XMLTOKEN_DEFAULTCOLOR,
   XMLTOKEN_MATERIAL,
   XMLTOKEN_FACTORY,
   XMLTOKEN_MIXMODE,
@@ -138,6 +139,13 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("n", XMLTOKEN_N);
   xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
   xmltokens.Register ("back2front", XMLTOKEN_BACK2FRONT);
+
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("manualcolors", XMLTOKEN_MANUALCOLORS);
+  xmltokens.Register ("defaultcolor", XMLTOKEN_DEFAULTCOLOR);
+  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
+  xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
+  xmltokens.Register ("localshadows", XMLTOKEN_LOCALSHADOWS);
   return true;
 }
 
@@ -325,6 +333,48 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_MANUALCOLORS:
+	{
+	  bool r;
+	  if (!synldr->ParseBool (child, r, true))
+	    return 0;
+	  state->SetManualColors (r);
+	}
+	break;
+      case XMLTOKEN_NOSHADOWS:
+	{
+	  state->SetShadowCasting (false);
+	}
+	break;
+      case XMLTOKEN_LOCALSHADOWS:
+	{
+	  state->SetShadowReceiving (true);
+	}
+	break;
+      case XMLTOKEN_LIGHTING:
+	{
+	  bool r;
+	  if (!synldr->ParseBool (child, r, true))
+	    return 0;
+	  state->SetLighting (r);
+	}
+	break;
+      case XMLTOKEN_DEFAULTCOLOR:
+	{
+	  csColor col;
+	  if (!synldr->ParseColor (child, col))
+	    return 0;
+	  state->SetColor (col);
+	}
+	break;
+      case XMLTOKEN_MIXMODE:
+        {
+	  uint mm;
+	  if (!synldr->ParseMixmode (child, mm))
+	    return 0;
+          state->SetMixMode (mm);
+	}
+	break;
       case XMLTOKEN_MATERIAL:
 	{
 	  const char* matname = child->GetContentsValue ();

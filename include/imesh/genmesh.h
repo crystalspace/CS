@@ -53,7 +53,7 @@ struct iGeneralMeshState : public iBase
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
   /// Get the color.
-  virtual csColor GetColor () const = 0;
+  virtual const csColor& GetColor () const = 0;
   /**
    * Set manual colors. If this is set then lighting will be ignored
    * and so will the color set with SetColor(). In this case you can
@@ -82,18 +82,21 @@ struct iGeneralMeshState : public iBase
   virtual bool IsShadowReceiving () const = 0;
 };
 
-SCF_VERSION (iGeneralFactoryState, 0, 0, 2);
+SCF_VERSION (iGeneralFactoryState, 0, 1, 0);
 
 /**
  * This interface describes the API for the general mesh factory.
+ * iGeneralFactoryState inherits from iGeneralMeshState. All methods
+ * from iGeneralMeshState as set on the factory will serve as defaults
+ * for mesh objects that are created from this factory AFTER the
+ * default value is set. So changing such a value on the factory will have
+ * no effect on meshes already created. The material wrapper is an
+ * exception to this rule. Setting that on the factory will have an
+ * effect immediatelly on all mesh objects created from that factory
+ * except for those mesh objects that have their own material set.
  */
-struct iGeneralFactoryState : public iBase
+struct iGeneralFactoryState : public iGeneralMeshState
 {
-  /// Set material of factory.
-  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
-  /// Get material of factory.
-  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
-
   /// Set the number of vertices to use for this mesh.
   virtual void SetVertexCount (int n) = 0;
   /// Get the number of vertices for this mesh.

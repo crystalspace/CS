@@ -107,6 +107,18 @@ chronological order.
 	      date-based claim was more misleading than not.)
 	- DeSigna began the implementation of the sexp parser, for use with
 	  shader-expressions.
+	- Jorrit changed genmesh so that iGeneralFactoryState is now a
+	  subclass of iGeneralMeshState. All methods in iGeneralFactoryState
+	  that are also in iGeneralMeshState (except for the material methods)
+	  will now serve as defaults for creating mesh objects from the
+	  factory. For example, you can now set a default mixmode for
+	  a factory. All objects created from that factory AFTER changing
+	  the default mixmode will also get that mixmode.
+	- Jorrit enhanced the genmesh factory loader so that the following
+	  keywords can now be used in factories: 'mixmode', 'manualcolors',
+	  'lighting', 'noshadows', 'localshadows', and 'defaultcolor'.
+	  'defaultcolor' is the same as 'color' for mesh objects but 'color'
+	  was already taken for factories.
 7-Apr-2004
 	- res added a small helper class to create minidumps on Win32.
 	- res augmented the Win32 assistant to allow user-defined exception

@@ -184,14 +184,17 @@ public:
   /// Destructor.
   virtual ~csGenmeshMeshObject ();
 
+  void SetMixMode (uint mode) { MixMode = mode; }
   uint GetMixMode () const { return MixMode; }
   void SetLighting (bool l) { do_lighting = l; }
   bool IsLighting () const { return do_lighting; }
-  csColor GetColor () const { return color; }
+  const csColor& GetColor () const { return color; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& cent);
+  void SetShadowCasting (bool m) { do_shadows = m; }
+  void SetShadowReceiving (bool m) { do_shadow_rec = m; }
 
   //----------------------- Shadow and lighting system ----------------------
   char* GenerateCacheName ();
@@ -338,7 +341,7 @@ public:
     virtual void SetLighting (bool l) { scfParent->SetLighting (l); }
     virtual bool IsLighting () const { return scfParent->IsLighting (); }
     virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
-    virtual csColor GetColor () const { return scfParent->GetColor (); }
+    virtual const csColor& GetColor () const { return scfParent->GetColor (); }
     virtual void SetManualColors (bool m)
     {
       scfParent->SetManualColors (m);
@@ -455,6 +458,13 @@ private:
   csAnonRenderBufferManager anon_buffers;
   csArray<csStringID> anon_buffer_names;
 #endif
+
+  uint default_mixmode;
+  bool default_lighting;
+  csColor default_color;
+  bool default_manualcolors;
+  bool default_shadowcasting;
+  bool default_shadowreceiving;
 
   csVector3 radius;
   csBox3 object_bbox;
@@ -585,6 +595,55 @@ public:
   }
 #endif
 
+  void SetMixMode (uint mode)
+  {
+    default_mixmode = mode;
+  }
+  uint GetMixMode () const
+  {
+    return default_mixmode;
+  }
+  void SetLighting (bool l)
+  {
+    default_lighting = l;
+  }
+  bool IsLighting () const
+  {
+    return default_lighting;
+  }
+  void SetColor (const csColor& col)
+  {
+    default_color = col;
+  }
+  const csColor& GetColor () const
+  {
+    return default_color;
+  }
+  void SetManualColors (bool m)
+  {
+    default_manualcolors = m;
+  }
+  bool IsManualColors () const
+  {
+    return default_manualcolors;
+  }
+  void SetShadowCasting (bool m)
+  {
+    default_shadowcasting = m;
+  }
+  bool IsShadowCasting () const
+  {
+    return default_shadowcasting;
+  }
+  void SetShadowReceiving (bool m)
+  {
+    default_shadowreceiving = m;
+  }
+  bool IsShadowReceiving () const
+  {
+    return default_shadowreceiving;
+  }
+
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
@@ -599,6 +658,56 @@ public:
   class GeneralFactoryState : public iGeneralFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+
+    virtual void SetMixMode (uint mode)
+    {
+      scfParent->SetMixMode (mode);
+    }
+    virtual uint GetMixMode () const
+    {
+      return scfParent->GetMixMode ();
+    }
+    virtual void SetLighting (bool l)
+    {
+      scfParent->SetLighting (l);
+    }
+    virtual bool IsLighting () const
+    {
+      return scfParent->IsLighting ();
+    }
+    virtual void SetColor (const csColor& col)
+    {
+      scfParent->SetColor (col);
+    }
+    virtual const csColor& GetColor () const
+    {
+      return scfParent->GetColor ();
+    }
+    virtual void SetManualColors (bool m)
+    {
+      scfParent->SetManualColors (m);
+    }
+    virtual bool IsManualColors () const
+    {
+      return scfParent->IsManualColors ();
+    }
+    virtual void SetShadowCasting (bool m)
+    {
+      scfParent->SetShadowCasting (m);
+    }
+    virtual bool IsShadowCasting () const
+    {
+      return scfParent->IsShadowCasting ();
+    }
+    virtual void SetShadowReceiving (bool m)
+    {
+      scfParent->SetShadowReceiving (m);
+    }
+    virtual bool IsShadowReceiving () const
+    {
+      return scfParent->IsShadowReceiving ();
+    }
+
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
       scfParent->SetMaterialWrapper (material);

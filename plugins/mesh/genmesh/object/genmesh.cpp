@@ -1382,6 +1382,13 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   buffers_version = 0;
 #endif
 
+  default_mixmode = 0;
+  default_lighting = true;
+  default_color.Set (0, 0, 0);
+  default_manualcolors = false;
+  default_shadowcasting = true;
+  default_shadowreceiving = false;
+
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
   engine = eng; // We don't want a circular reference!
 }
@@ -2261,6 +2268,13 @@ void csGenmeshMeshObjectFactory::HardTransform (
 csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
 {
   csGenmeshMeshObject* cm = new csGenmeshMeshObject (this);
+  cm->SetMixMode (default_mixmode);
+  cm->SetLighting (default_lighting);
+  cm->SetColor (default_color);
+  cm->SetManualColors (default_manualcolors);
+  cm->SetShadowCasting (default_shadowcasting);
+  cm->SetShadowReceiving (default_shadowreceiving);
+
   csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
   cm->DecRef ();
   return csPtr<iMeshObject> (im);
