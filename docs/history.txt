@@ -13,6 +13,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+23-Jul-1999
+	- Small optimization in WhichSide3D (made inline). This could
+	  be important for the lighting routines which use this function
+	  a LOT.
+	- Removed volume.cpp from csgeom library.
 22-Jul-1999
 	- Updated some docs (like the todo and faq).
 	- Added a callback to csSprite3D which is called just before the
@@ -33,6 +38,22 @@ Short-term cleanups that need to be done:
 	  (note from Jorrit: as a result of these makefile changes the
 	  Linux port will now run about 25-50% faster compared to the
 	  previous CVS update. This is no joke! :-)
+	- Changed Initialize() function in csWorld so that the IGraphics3D
+	  interface pointer is given instead of IGraphicsInfo. The reason is
+	  that the 3D engine needs to get the width,height of the display
+	  from the 3D rasterizer and not from the graphics subsystem.
+	  The 3D rasterizer can fake things and run as if the system is in
+	  another resolution (new feature in the software renderer).
+	- Added '-smaller' commandline option to the software renderer.
+	  With this option the rendering happens in a smaller internal
+	  buffer which is then copied to the window every frame. The
+	  copy happens with blending so that it looks nice. Simulated
+	  640x480 is faster than normal 640x480 (but it does not look
+	  as nice). The speed difference is larger with expensive software
+	  features like fog and transparency.
+	  Note that the 2D drawing is not affected by this. The copy from
+	  the internal frame to the real window is done when 3D graphics
+	  drawing has ended (before 2D drawing starts).
 	- Eric Sunshine updated the MacOS/X Server, OpenStep, and NextStep
 	  makefiles to work properly with Andrew's recent makefile system
 	  changes.  There were a few errors, including a couple crashers,
