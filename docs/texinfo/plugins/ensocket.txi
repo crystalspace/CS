@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node En Socket, csEngine, Sound Drivers, Plug-In Drivers
+@node En Socket, , Network Drivers, Network Drivers
 @subsection EN Socket
 
 The EN Network Driver consists of two components.
