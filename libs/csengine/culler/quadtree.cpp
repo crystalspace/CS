@@ -64,8 +64,8 @@ csQuadTree :: csQuadTree (const csBox2& the_box, int the_depth)
 
   /// 4 nodes per byte, the root node is stored seperately
   state_size = (nr_nodes - 1) / 4;
-  CsPrintf(MSG_STDOUT, "QuadTree: depth %d, nodes %d, leaves %d, statesize %d"
-    "bytes\n", max_depth, nr_nodes, nr_leaves, state_size);
+  printf("QuadTree: depth %d, nodes %d, leaves %d, statesize %d"
+    " bytes\n", max_depth, nr_nodes, nr_leaves, state_size);
 
   if(state_size > 0)
   {
@@ -129,14 +129,14 @@ void csQuadTree :: CallChildren(int (csQuadTree::*func)(
         childbox.Set(box.Min(), center); break;
       case 1 /*topright*/ : 
         childbox.Set(center.x, box.MinY(), box.MaxX(), center.y); break;
-      case 2 /*bottomright*/ : 
-        childbox.Set(center, box.Max()); break;
-      case 3 /*bottomleft*/ : 
+      case 2 /*bottomleft*/ : 
         childbox.Set(box.MinX(), center.y, center.x, box.MaxY()); break;
+      case 3 /*bottomright*/ : 
+        childbox.Set(center, box.Max()); break;
       default: CsPrintf(MSG_FATAL_ERROR, "QuadTree: Unknown child\n");
     }
     childstate = GetNodeState(childoffset, childnr);
-    retval[childnr] = func(childbox, depth+1, childstate, childoffset, 
+    retval[childnr] = this->*func(childbox, depth+1, childstate, childoffset, 
       childnr, data);
   }
 }
@@ -219,6 +219,9 @@ int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
   /// So, the polygon bbox overlaps this node. How much?
   ///----------------------------------------------------
 
+  printf("Depth %d Checking node %d,%d(%d)\n", node_depth, offset, 
+    node_nr, node_state);
+
   /// is the whole node covered?
   /// first check bounding boxes then precisely.
   if(info.pol_bbox->Contains(node_bbox) &&
@@ -228,13 +231,15 @@ int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
       SetNodeState(offset, node_nr, CS_QUAD_FULL);
     /// mark children (if any) as unknown, since they should not be reached.
     if(node_depth < max_depth)
-      CallChildren(mark_node_func, node_bbox, node_depth, offset, node_nr, 
-        (void*)CS_QUAD_UNKNOWN);
+      CallChildren(&csQuadTree::mark_node_func, node_bbox, node_depth, 
+        offset, node_nr, (void*)CS_QUAD_UNKNOWN);
     return CS_QUAD_CERTAINCHANGE;
   }
   
   /// So a part of the node may be covered, perhaps none.
   /// could test some more points here.
+  /// note that the test if the node is inside the poly must be before
+  /// the box::intersect test.
   if( csPoly2D::In(info.verts, info.num_verts, node_bbox.GetCenter())
     || node_bbox.Intersect(info.verts, info.num_verts))
   { 
@@ -244,8 +249,8 @@ int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
     {
       // mark children as empty now, since they should be empty, and
       // can be reached now...
-      CallChildren(mark_node_func, node_bbox, node_depth, offset, node_nr, 
-        (void*)CS_QUAD_EMPTY);
+      CallChildren(&csQuadTree::mark_node_func, node_bbox, node_depth, 
+        offset, node_nr, (void*)CS_QUAD_EMPTY);
     }
     // this node is partially covered.
     if(!info.test_only)
@@ -255,8 +260,8 @@ int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
     if(node_depth < max_depth)
     {
       int retval[4];
-      CallChildren(insert_polygon_func, node_bbox, node_depth, offset, node_nr, 
-        data, retval);
+      CallChildren(&csQuadTree::insert_polygon_func, node_bbox, node_depth, 
+        offset, node_nr, data, retval);
       return GetPolygonResult(retval);
     }
     /// no children, return value for change, either 
@@ -345,8 +350,8 @@ int csQuadTree :: test_point_func (const csBox2& node_bbox,
     return node_state;
   // for a partial covered node with children, call the children
   int retval[4];
-  CallChildren(test_point_func, node_bbox, node_depth, offset, node_nr, data, 
-    retval);
+  CallChildren(&csQuadTree::test_point_func, node_bbox, node_depth, offset, 
+    node_nr, data, retval);
   return GetTestPointResult(retval);
 }
 
@@ -356,3 +361,30 @@ int csQuadTree :: TestPoint (const csVector2& point)
   return test_point_func(bbox, 1, root_state, -1, 0, (void*)&point);
 }
 
+
+#if 0
+void csQuadTree :: Print(void)
+{
+  printf("csQuadTree depth %d, statesize %d, root_state %d\n", 
+    max_depth, state_size, root_state);
+  if(states)
+  for(int i=0; i<state_size; i++)
+    printf("%2.2x ", states[i]);
+  printf("\n");
+  for(int dep=1; dep<max_depth; dep++)
+  {
+    int dep_offset = ( Pow2( 2*(dep-1) ) - 1 ) / 3;
+    // dep_offset is the number of nodes in dep-1 tree.
+    int side = Pow2( (max_depth-1) ); // is sqrt(nr_leaves)
+    for(int y=0;x<side;x++)
+      for(int x=0;x<side;x++)
+       ;
+  }
+}
+#endif
+
+/*
+ * 2 bytes form a 4x4 rectangle.
+ * Bit coordinate x,y corresponds with bitnr y*4+x
+ * And then 1<<bitnr is used.
+ */

@@ -31,6 +31,8 @@
 #define CS_QUAD_PARTIAL 1
 #define CS_QUAD_UNKNOWN 2
 #define CS_QUAD_FULL 3
+#define CS_QUAD_ALL_EMPTY 0x0 /* because CS_QUAD_EMPTY == 0 */
+#define CS_QUAD_ALL_FULL 0xFF /* because CS_QUAD_FULL == 3 */
 
 class csQuadTree;
 class Dumper;
@@ -38,10 +40,8 @@ class Dumper;
 /**
  *  4 child node states are stored in one byte.
  *  2 bits per node, in sequence. topleft, topright, botright, botleft
- *  nodenrs are: 0 = topleft, 1=topright, 2=bottomright, 3=bottomleft.
+ *  nodenrs are: 0 = topleft, 1=topright, 2=bottomleft, 3=bottomright.
  */
-#define CS_QUAD_ALL_EMPTY 0x0 /* because CS_QUAD_EMPTY == 0 */
-#define CS_QUAD_ALL_FULL 0xFF /* because CS_QUAD_FULL == 3 */
 
 /**
  * values denoting if the tree changed.
@@ -214,6 +214,12 @@ public:
    *  4x4 bit array (2bytes) -> Quadtree of depth 3.
    *  depth3 quadtree->4x4 array (partial -> empty)
    */
+
+  /** a TestRectangle function that will test on leaf-coordinates, for full */
+  
+  /** This function will print the quadtree...
+   */
+  void Print(void);
 };
 
 
