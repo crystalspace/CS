@@ -38,12 +38,12 @@
 //------------------------------------------------------------------------
 
 #define INTERPOLATE1_S(var) \
-  g3dpoly->var [i] = tritexcoords_##var## [vt]+ \
-    t * (tritexcoords_##var## [vt2] - tritexcoords_##var## [vt]);
+  g3dpoly->var [i] = tritexcoords_##var [vt]+ \
+    t * (tritexcoords_##var [vt2] - tritexcoords_##var [vt]);
 
 #define INTERPOLATE1(var,component) \
-  g3dpoly->var [i].component = tritexcoords_##var## [vt].component + \
-    t * (tritexcoords_##var## [vt2].component - tritexcoords_##var## [vt].component);
+  g3dpoly->var [i].component = tritexcoords_##var [vt].component + \
+    t * (tritexcoords_##var [vt2].component - tritexcoords_##var [vt].component);
 
 #define INTERPOLATE1_FOG(component) \
   g3dpoly->fog_info [i].component = trifoginfo [vt].component + \
@@ -51,22 +51,22 @@
 
 #define INTERPOLATE_S(var) \
 { \
-  float v1 = tritexcoords_##var## [edge1 [0]] + \
-    t1 * (tritexcoords_##var## [edge1 [1]] - \
-          tritexcoords_##var## [edge1 [0]]); \
-  float v2 = tritexcoords_##var## [edge2 [0]] + \
-    t2 * (tritexcoords_##var## [edge2 [1]] - \
-          tritexcoords_##var## [edge2 [0]]); \
+  float v1 = tritexcoords_##var [edge1 [0]] + \
+    t1 * (tritexcoords_##var [edge1 [1]] - \
+          tritexcoords_##var [edge1 [0]]); \
+  float v2 = tritexcoords_##var [edge2 [0]] + \
+    t2 * (tritexcoords_##var [edge2 [1]] - \
+          tritexcoords_##var [edge2 [0]]); \
   g3dpoly->var [i] = v1 + t * (v2 - v1); \
 }
 #define INTERPOLATE(var,component) \
 { \
-  float v1 = tritexcoords_##var## [edge1 [0]].component + \
-    t1 * (tritexcoords_##var## [edge1 [1]].component - \
-          tritexcoords_##var## [edge1 [0]].component); \
-  float v2 = tritexcoords_##var## [edge2 [0]].component + \
-    t2 * (tritexcoords_##var## [edge2 [1]].component - \
-          tritexcoords_##var## [edge2 [0]].component); \
+  float v1 = tritexcoords_##var [edge1 [0]].component + \
+    t1 * (tritexcoords_##var [edge1 [1]].component - \
+          tritexcoords_##var [edge1 [0]].component); \
+  float v2 = tritexcoords_##var [edge2 [0]].component + \
+    t2 * (tritexcoords_##var [edge2 [1]].component - \
+          tritexcoords_##var [edge2 [0]].component); \
   g3dpoly->var [i].component = v1 + t * (v2 - v1); \
 }
 #define INTERPOLATE_FOG(component) \
