@@ -1,5 +1,5 @@
 # Library description
-DESCRIPTION.csscript = Crystal Space 3D engine
+DESCRIPTION.csscript = Crystal Space scripting library
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
