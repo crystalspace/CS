@@ -39,7 +39,7 @@ endif
 INC.ODIVX = $(wildcard plugins/video/format/codecs/opendivx/*.h)
 SRC.ODIVX = $(wildcard plugins/video/format/codecs/opendivx/*.cpp)
 OBJ.ODIVX = $(addprefix $(OUT),$(notdir $(SRC.ODIVX:.cpp=$O)))
-DEP.ODIVX = CSGFX CSUTIL CSSYS
+DEP.ODIVX = CSUTIL CSSYS
 CFG.ODIVX = 
 
 TO_INSTALL.CONFIG += $(CFG.ODIVX)

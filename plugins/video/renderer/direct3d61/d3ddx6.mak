@@ -51,7 +51,7 @@ SRC.D3DDX6 = $(wildcard plugins/video/renderer/direct3d61/*.cpp) \
   plugins/video/renderer/common/dtmesh.cpp \
   plugins/video/renderer/common/dpmesh.cpp
 OBJ.D3DDX6 = $(addprefix $(OUT),$(notdir $(SRC.D3DDX6:.cpp=$O)))
-DEP.D3DDX6 = CSGEOM CSGFX CSUTIL CSSYS
+DEP.D3DDX6 = CSGEOM CSUTIL CSSYS
 CFG.D3DDX6 = data/config/direct3ddx6.cfg
 
 TO_INSTALL.CONFIG += $(CFG.D3DDX6)
