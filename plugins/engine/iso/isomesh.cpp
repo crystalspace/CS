@@ -132,7 +132,10 @@ class csIsoFakeRenderView : public iRenderView {
   
 public:
   DECLARE_IBASE;
-  csIsoFakeRenderView() {}
+  csIsoFakeRenderView() 
+  {
+    callback = NULL;
+  }
   virtual ~csIsoFakeRenderView() 
   {
     DEC_REF (callback);
