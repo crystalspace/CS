@@ -737,6 +737,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     bool alt = (Event.Key.Modifiers & CSMASK_ALT) != 0;
     bool ctrl = (Event.Key.Modifiers & CSMASK_CTRL) != 0;
 
+#if 0
     if (do_demo != 3)
     {
       if (Event.Key.Code == CSKEY_ESC)
@@ -750,7 +751,9 @@ bool Demo::DemoHandleEvent (iEvent &Event)
         return true;
       }
     }
-    else if (map_enabled == MAP_EDIT_FORWARD)
+    else
+#endif
+    if (map_enabled == MAP_EDIT_FORWARD)
     {
       //==============================
       // Handle keys in path_edit_forward mode.
