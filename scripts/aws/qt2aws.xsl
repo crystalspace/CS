@@ -38,11 +38,11 @@
 
   </xsl:template>
   
-  <xsl:template match="widget[class[text()='QDialog']]">
+  <xsl:template match="widget[class[text()='QDialog' or text()='QWidget']]">
     <!-- set the title if any -->
     <xsl:call-template name="style"/>
     <xsl:call-template name="options"/>
-    <xsl:apply-templates select="widget"/>
+    <xsl:apply-templates/>
   </xsl:template>
 
 
@@ -61,7 +61,7 @@
     <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Highlight: "/aws/lbhi.png"</xsl:text>
     <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Columns: 1</xsl:text>
     <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>DefaultSortCol: 0</xsl:text>
-    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Column0Width: </xsl:text><xsl:value-of select="property/geometry/rect/width"/>
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Column0Width: </xsl:text><xsl:value-of select="property/rect/width"/>
     <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Column0Caption: "Column 0"</xsl:text>
     <!-- we ignore scrollbar stuff since aws always creates a vertical one (currently) -->
     <xsl:apply-templates/>
@@ -89,7 +89,9 @@
   </xsl:template>
 
   <xsl:template match="property[name[text()='text' or text()='title'] and ../class[text() != 'QLineEdit']]">
-    <xsl:call-template name="spacer"/><xsl:text>Caption: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
+    <xsl:if test="string-length(string) > 0">
+      <xsl:call-template name="spacer"/><xsl:text>Caption: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="property[name[text()='text'] and ../class[text()='QLineEdit']]">
@@ -144,7 +146,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="property[name[text()='frameShadow']]">
+  <xsl:template match="property[name[text()='frameShadow'] and not(../class='QLabel')]">
     <xsl:call-template name="spacer"/><xsl:text>Style: </xsl:text>
     <xsl:choose>
       <xsl:when test="enum='Raised'">
@@ -181,7 +183,7 @@
   <xsl:template name="options">
     <xsl:choose>
       <xsl:when test="class[text()='QDialog']">
-        <xsl:call-template name="spacer"/><xsl:text>Options: wfoBeveledBorder+wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl</xsl:text>
+        <xsl:call-template name="spacer"/><xsl:text>Options: wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl</xsl:text>
       </xsl:when>
       <xsl:when test="class[text()='QWidget']">
         <xsl:call-template name="spacer"/><xsl:text>Options: wfoTitle+wfoClose</xsl:text>
@@ -200,6 +202,7 @@
       <xsl:when test="class='QButtonGroup'">"Group Frame"</xsl:when>
       <xsl:when test="class='QGroupBox'">"Group Frame"</xsl:when>
       <xsl:when test="class='QFrame'">"Group Frame"</xsl:when>
+      <xsl:when test="class='QLineEdit'">"Text Box"</xsl:when>
       <xsl:when test="class='QCheckBox'">"Check Box"</xsl:when>
       <xsl:when test="class='QListBox'">"List Box"</xsl:when>
       <xsl:when test="class='QListView'">"List Box"</xsl:when>
