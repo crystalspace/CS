@@ -23,6 +23,10 @@ chronological order.
 	  package can be used with many different compilers.  Other platforms
 	  do not need `extern "C"', nor do Windows installations in which ODE
 	  has been installed manually.
+	- Jorrit changed iEngine->CreateTexture() so that it asks the
+	  texture format from the texture manager instead of just
+	  loading CS_IMGFMT_TRUECOLOR. By doing that it is now possible
+	  to load textures with alpha channel using CreateTexture().
 17-May-2004
 	- Eric Sunshine made the following msvcgen-related changes:
 	    - Added --source-root and --build-root options to msvcgen.pl, as

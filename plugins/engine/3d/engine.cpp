@@ -2667,7 +2667,8 @@ iTextureWrapper *csEngine::CreateTexture (
   csRef<iImage> ifile (ImageLoader->Load (
       data->GetUint8 (),
       data->GetSize (),
-      CS_IMGFMT_TRUECOLOR)); // GetTextureFormat ());
+      G3D->GetTextureManager ()->GetTextureFormat ()));
+      //CS_IMGFMT_TRUECOLOR));
 
   if (!ifile)
   {
