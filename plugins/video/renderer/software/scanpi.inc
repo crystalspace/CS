@@ -35,45 +35,52 @@
 #undef REDBITS
 #undef GREENBITS
 #undef BLUEBITS
+#undef REDMAXFP
+#undef GREENMAXFP
+#undef BLUEMAXFP
 
 #ifdef BPP16
   #define PIXTYPE UShort
 
   #ifdef COLOR555
-    #define REDSHIFT     10
-    #define REDBITS       5
-    #define REDMASK    0x1f
-    #define GREENSHIFT    5
-    #define GREENBITS     5
-    #define GREENMASK  0x1f
-    #define BLUEMASK   0x1f
-    #define BLUEBITS      5
+    #define REDSHIFT		10
+    #define REDBITS		5
+    #define REDMASK		0x1f
+    #define GREENSHIFT		5
+    #define GREENBITS		5
+    #define GREENMASK		0x1f
+    #define BLUEMASK		0x1f
+    #define BLUEBITS		5
   #endif
 
   #ifdef COLOR565
-    #define REDSHIFT     11
-    #define REDBITS       5
-    #define REDMASK    0x1f
-    #define GREENSHIFT    5
-    #define GREENBITS     6
-    #define GREENMASK  0x3f
-    #define BLUEMASK   0x1f
-    #define BLUEBITS      5
+    #define REDSHIFT		11
+    #define REDBITS		5
+    #define REDMASK		0x1f
+    #define GREENSHIFT		5
+    #define GREENBITS		6
+    #define GREENMASK		0x3f
+    #define BLUEMASK		0x1f
+    #define BLUEBITS		5
   #endif
 #endif
 
 #ifdef BPP32
   #define PIXTYPE ULong
 
-  #define REDSHIFT     16
-  #define REDBITS       8
-  #define REDMASK    0xff
-  #define GREENSHIFT    8
-  #define GREENBITS     8
-  #define GREENMASK  0xff
-  #define BLUEMASK   0xff
-  #define BLUEBITS      8
+  #define REDSHIFT		16
+  #define REDBITS		8
+  #define REDMASK		0xff
+  #define GREENSHIFT		8
+  #define GREENBITS		8
+  #define GREENMASK		0xff
+  #define BLUEMASK		0xff
+  #define BLUEBITS		8
 #endif
+
+#define REDMAXFP		((REDMASK << 16) | 0xffff)
+#define GREENMAXFP		((GREENMASK << 16) | 0xffff)
+#define BLUEMAXFP		((BLUEMASK << 16) | 0xffff)
 
 void PI_SCANFUNC (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
@@ -88,7 +95,7 @@ void PI_SCANFUNC (void *dest, int len,
 {
   PIXTYPE *_dest = (PIXTYPE *)dest;
   PIXTYPE *_destend = _dest + len;
-  PIXTYPE tex;
+  ULong texel;
 
 #ifdef GOURAUD
   ULong r1, g1, b1;
@@ -98,91 +105,22 @@ void PI_SCANFUNC (void *dest, int len,
   ULong r2, g2, b2;
 #endif
 
-  while (_dest < _destend)
-  {
-
-#ifdef ZUSE
-    if (z >= *zbuff)
-#endif
-    {
-
-#ifdef FLAT
-      //if flat shading is desired, we will just use white as our texel color
-      (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
-      #ifndef GOURAUD
-        //if Gouraud is selected, we don't need to intialize tex here.
-        #ifdef BPP16
-          tex = 0xffff;
-        #else
-          tex = 0xffffff;
-        #endif
-      #endif
-#else
-      //read the texel from the texture
-      #ifdef BPP16
-        tex = Scan.PaletteTable[*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
-      #else
-        tex = *(((ULong*)bitmap) + ((v >> 16) << bitmap_log2w) + (u >> 16));
-      #endif
-#endif
-
-      #ifdef COLORKEY
-        //if colorkeying is enabled, we will ignore texels with the value 0.
-        if (tex)
-      #endif
-      {
-        #ifdef GOURAUD
-          #ifdef FLAT
-            r1 = r >> 16;
-            g1 = g >> 16;
-            b1 = b >> 16;
-          #else
-            r1 =  tex >> REDSHIFT;
-            g1 = (tex >> GREENSHIFT) & GREENMASK;
-            b1 =  tex  & BLUEMASK;
-            r1 = (r1*r) >> (16+REDBITS);
-            g1 = (g1*g) >> (16+GREENBITS);
-            b1 = (b1*b) >> (16+BLUEBITS);
-          #endif
-          // Now r1, g1 and b1 contain the color of the new pixel on screen
-          #ifdef USEEFFECTS
-            PIXTYPE Screen = *_dest;
-            r2 =  Screen >> REDSHIFT    & REDMASK;
-            g2 = (Screen >> GREENSHIFT) & GREENMASK;
-            b2 =  Screen  & BLUEMASK;
-            //Now r2, g2 and b2 contain the color of the old pixel on screen
-            #ifdef BPP16
-              r1 = BlendingTable[r1*2+r2*128]/2;
-              #ifdef COLOR555
-              g1 = BlendingTable[g1*2+g2*128]/2;
-              #else
-              g1 = BlendingTable[g1+g2*64];
-              #endif
-              b1 = BlendingTable[b1*2+b2*128]/2;
-            #else
-              //32Bit Blending Mode
-              r1 = BlendingTable[(r1>>2)+(r2>>2)*64]<<2;
-              g1 = BlendingTable[(g1>>2)+(g2>>2)*64]<<2;
-              b1 = BlendingTable[(b1>>2)+(b2>>2)*64]<<2;
-            #endif
-            //Now r1, g1 and b1 now contain a blend between old and new pixel.
-          #endif
-          tex = (r1<<REDSHIFT) | (g1<<GREENSHIFT) | b1;
-        #endif
-
-        *_dest = tex;
-        #if defined(ZUSE) || defined (ZFILL)
-          *zbuff = z;
-        #endif
-      }
-    }
-    _dest++;
-    zbuff++;
-    u += du; v += dv; z += dz;
 #ifdef GOURAUD
-    r += dr; g += dg; b += db;
+  // Check for overflow (in the cause the source is brighter than 128)
+  if (r <= REDMAXFP   && r + dr * len <= REDMAXFP
+   && g <= GREENMAXFP && g + dg * len <= GREENMAXFP
+   && b <= BLUEMAXFP  && b + db * len <= BLUEMAXFP)
 #endif
-  } /* endwhile */
+#include "scanpi2.inc"
+#ifdef GOURAUD
+  // If either r,g,b is going to overflow past 1.0 we should clamp it to 1.0
+  else
+  {
+#define CLAMP_RGB
+#include "scanpi2.inc"
+  }
+#endif
+
 }
 
 #undef PI_SCANFUNC
@@ -196,3 +134,4 @@ void PI_SCANFUNC (void *dest, int len,
 #undef BPP16
 #undef BPP32
 #undef USEEFFECTS
+#undef CLAMP_RGB
