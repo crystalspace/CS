@@ -54,7 +54,7 @@ SRC.SOFT3D = $(wildcard plugins/video/renderer/software/*.cpp) \
   plugins/video/renderer/common/dpmesh.cpp \
   plugins/video/renderer/common/vbufmgr.cpp \
   plugins/video/renderer/common/polybuf.cpp
-ifeq ($(NASM.INSTALLED),yes)
+ifeq ($(NASM.AVAILABLE),yes)
   SRC.SOFT3D += $(wildcard plugins/video/renderer/software/i386/*.asm)
 endif
 OBJ.SOFT3D = \

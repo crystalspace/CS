@@ -111,8 +111,8 @@
   "nasm -f win32 "testasm" -o "testobj" >nul 2>&1"
   if rc = 0 then
   do
-    call saycon  ANSI.LCYAN||"      supported: "ANSI.WHITE"NASM.INSTALLED = yes"
-    say "NASM.INSTALLED = yes"
+    call saycon  ANSI.LCYAN||"      supported: "ANSI.WHITE"NASM.AVAILABLE = yes"
+    say "NASM.AVAILABLE = yes"
   end;
   /* Remove temporary files */
   call SysFileDelete testasm
@@ -208,7 +208,7 @@
     end;
     if (version >= "0.0.1") then
     do
-      say 'MAKEDEP.INSTALLED = yes';
+      say 'MAKEDEP.AVAILABLE = yes';
       call saycon ANSI.LCYAN||"      found"
     end;
   end;

@@ -5,6 +5,10 @@
   rem *** language" is so poor that we can only hope the user have the
   rem *** configuration we are expecting.
 
+  echo extern "C" void* opendir(char const*);>conftest.cpp
+  echo int main () { opendir(""); }>>conftest.cpp
+  echo %%xdefine TEST>conftest.asm
+
   echo ###------------------------------------------------------------
   echo ### To successfully compile Crystal Space on Windows32 platform
   echo ### you should have the following utilites/toolsets installed
@@ -16,7 +20,27 @@
   goto nothing
 
 :mingw32
+  rem *** As of gcc 3.x, -fvtable-thunks is deprecated and produces a harmless
+  rem *** warning message, however it is still required for pre-gcc 3.x
+  rem *** configurations, thus we must add it to CFLAGS.SYSTEM.
+
   echo ### - Crystal Space MinGW32 Package 0.90 or later
+  echo CC = gcc -c>>config.tmp
+  echo CXX = g++ -c>>config.tmp
+  echo LINK = g++>>config.tmp
+  echo # Remove the following line if compiler complains>>config.tmp
+  echo # about -fvtable-thunks option.>>config.tmp
+  echo CFLAGS.SYSTEM += -fvtable-thunks>>config.tmp
+
+  echo ### Checking if -lmingwex is needed for linking...
+  gcc conftest.cpp -lmingwex -o conftest.exe
+  if not exist conftest.exe goto nomingwex
+
+  del conftest.exe >nul
+  echo $$$ Yes, setting MINGW_LIBS to "-lmingwex"
+  echo MINGW_LIBS = -lmingwex>>config.tmp
+
+:nomingwex
   goto nothing
 
 :msvc
@@ -35,26 +59,23 @@
   echo.
   pause >nul
 
-  echo int main () {} >conftest.cpp
-  echo %%xdefine TEST >conftest.asm
-
   echo ### Testing whenever you have (the right version of) NASM installed ...
   nasm -f win32 conftest.asm -o conftest.o
   if not exist conftest.o goto nonasm
 
   del conftest.o >nul
-  echo $$$ O.K., setting NASM.INSTALLED to "yes"
-  echo NASM.INSTALLED = yes>>config.tmp
+  echo $$$ O.K., setting NASM.AVAILABLE to "yes"
+  echo NASM.AVAILABLE = yes>>config.tmp
 
 :nonasm
 
-  echo ### Checking whenever you have makedep already compiled and installed ...
+  echo ### Checking whenever you have makedep already built and installed ...
   makedep conftest.cpp -fconftest.o -c
   if not exist conftest.o goto nomakedep
 
   del conftest.o >nul
-  echo $$$ O.K., setting MAKEDEP.INSTALLED to "yes"
-  echo MAKEDEP.INSTALLED = yes>>config.tmp
+  echo $$$ O.K., setting MAKEDEP.AVAILABLE to "yes"
+  echo MAKEDEP.AVAILABLE = yes>>config.tmp
 
 :nomakedep
   del conftest.* >nul
@@ -62,6 +83,7 @@
   rem *** The following is carefully tuned. Seemingly 'nonfunctional'
   rem *** statements are not so. Leave them. They work around weird
   rem *** configurations
+
   echo ### Checking if you use cmd.exe or some fancy shell...
   echo testing>conftest.1
   make -f libs\cssys\win32\winconf.mak DO_WIN_TEST_ECHO=yes testecho

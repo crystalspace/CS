@@ -6,8 +6,25 @@ The history order is reversed so that new features are at the top.
 	  seems to work mostly except that the rendering of a procedural
 	  texture also causes the proc texture to be rendered on the
 	  main screen.
+	- Eric Sunshine corrected some outdated references to the old makefile
+	  variables MAKEDEP.INSTALLED and NASM.INSTALLED to reflect the new
+	  names MAKEDEP.AVAILABLE and NASM.AVAILABLE, respectively.
+	- Eric Sunshine made the following changes to winconf.bat:
+	    - Now sets the CC, CXX, and LINK variables in config.mak since they
+	      are no longer set by the makefile.
+	    - Now adds -fvtable-thunks to CFLAGS.SYSTEM since this is no longer
+	      done by the makefile.  Unfortunately, with gcc 3.x, this option
+	      is deprecated and produces a harmless warning, but it is still
+	      required for earlier releases of gcc, so we take the safe route
+	      and use it.  (Note that this only affects Mingw users who are not
+	      using Msys.)
+	    - Now checks if the linker flag -lmingwex is required.  This flag
+	      is needed by some interim Mingw releases.
+	- Eric Sunshine removed the -fno-rtti check from djgpp/dosconf.bat
+	  since CS should no longer employ that flag.  (The Unix and Unix-like
+	  ports stopped using it quite some time ago.)
 12-Oct-2002
-	- Some MSVC warnings cleanup to the opcode plugin (jtarbox).
+	- Jonathan Tarbox eliminated some MSVC warnings from the opcode plugin.
 11-Oct-2002
 	- Some more cleanups in the OpenGL renderer.
 10-Oct-2002

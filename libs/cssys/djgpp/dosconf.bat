@@ -46,16 +46,6 @@
 
 :noexceptions
 
-  echo ### Testing whenever your version of GNU C/C++ supports RTTI ...
-  gcc -c -fno-rtti conftest.cpp -o conftest.o
-  if not exist conftest.o goto nortti
-
-  del conftest.o
-  echo $$$ O.K., using the -fno-rtti switch to get smaller executables
-  echo CFLAGS.SYSTEM += -fno-rtti>>config.tmp
-
-:nortti
-
   echo ### Testing whenever your version of GNU C/C++ supports P5 architecture ...
   gcc -c -mpentium -march=pentium conftest.cpp -o conftest.o
   if not exist conftest.o goto nop5
@@ -72,8 +62,8 @@
 
   attrib -r conftest.o
   del conftest.o
-  echo $$$ O.K., setting NASM.INSTALLED to "yes"
-  echo NASM.INSTALLED = yes>>config.tmp
+  echo $$$ O.K., setting NASM.AVAILABLE to "yes"
+  echo NASM.AVAILABLE = yes>>config.tmp
 
 :nonasm
 
@@ -83,8 +73,8 @@
 
   attrib -r conftest.o
   del conftest.o
-  echo $$$ O.K., setting MAKEDEP.INSTALLED to "yes"
-  echo MAKEDEP.INSTALLED = yes>>config.tmp
+  echo $$$ O.K., setting MAKEDEP.AVAILABLE to "yes"
+  echo MAKEDEP.AVAILABLE = yes>>config.tmp
 
 :nomakedep
 

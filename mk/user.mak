@@ -179,9 +179,10 @@ ifndef MONITOR_MAKEFILE_CACHE
   MONITOR_MAKEFILE_CACHE=yes
 endif
 
-# Should we use NASM for assembly?
-ifndef NASM.INSTALLED
-  NASM.INSTALLED=no
+# Should we use NASM for assembly?  For most environments, this setting is
+# automatically enabled if nasm is available.
+ifndef NASM.AVAILABLE
+  NASM.AVAILABLE=no
 endif
 
 # If 'yes' include assembly optimizations in Crystal Space.  On systems that

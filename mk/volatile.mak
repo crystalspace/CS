@@ -74,7 +74,7 @@ endif
 ifeq ($(DO_SOUND),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SOUND$">>volatile.tmp
 endif
-ifeq ($(NASM.INSTALLED),yes)
+ifeq ($(NASM.AVAILABLE),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_NASM$">>volatile.tmp
 endif
 ifeq ($(DO_MMX),yes)

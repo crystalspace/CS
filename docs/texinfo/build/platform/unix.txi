@@ -42,7 +42,7 @@ libraries are built as shared or dynamic. The default is @samp{no}.
 Selects whether Crystal Space is built with debugging information or not. The
 default is @samp{optimize}.
 
-@item NASM.INSTALLED=@dots{} ('yes' or 'no')
+@item NASM.AVAILABLE=@dots{} ('yes' or 'no')
 This option determines whether or not the Netwide Assembler should be used for
 assembly language routines. The default is @samp{no}
 
