@@ -35,7 +35,7 @@ csFontDef csDefaultFontRender::FontList [] =
   { "Courier.fixed",	8, 8, 8,	font_Courier,	NULL		},
   { "Tiny",		4, 6, 8,	font_Tiny,	width_Tiny	},
   { "Tiny.fixed",	6, 6, 8,	font_Tiny,	NULL		},
-  { NULL }
+  { NULL,               0, 0, 0,        NULL,           NULL            }
 };
 
 IMPLEMENT_IBASE (csDefaultFontRender)
@@ -53,13 +53,11 @@ EXPORT_CLASS_TABLE_END
 csDefaultFontRender::csDefaultFontRender (iBase *pParent)
 {
   CONSTRUCT_IBASE (pParent);
-  for (FontCount = 1; FontList [FontCount - 1].Name; FontCount++)
-    ;
+  FontCount = sizeof(FontList) / sizeof(FontList[0]) - 1;
 }
 
-bool csDefaultFontRender::Initialize (iSystem *pSystem)
+bool csDefaultFontRender::Initialize (iSystem*)
 {
-  (void)pSystem;
   return true;
 }
 
@@ -71,17 +69,16 @@ int csDefaultFontRender::LoadFont (const char* name, const char* /*filename*/)
   return -1;
 }
 
-bool csDefaultFontRender::SetFontProperty (int fontId,
-  CS_FONTPROPERTY propertyId, long& property, bool autoApply)
+bool csDefaultFontRender::SetFontProperty (int /*fontId*/,
+  CS_FONTPROPERTY propertyId, long& property, bool /*autoApply*/)
 {
-  (void)fontId;
-  (void)autoApply;
   bool succ = (propertyId == CS_FONTSIZE);
   if (succ && property != 1) property = 1;
   return succ;
 }
 
-bool csDefaultFontRender::GetFontProperty (int fontId, CS_FONTPROPERTY propertyId, long& property)
+bool csDefaultFontRender::GetFontProperty (int fontId,
+  CS_FONTPROPERTY propertyId, long& property)
 {
   (void)fontId;
   bool succ = (propertyId == CS_FONTSIZE);
@@ -91,7 +88,6 @@ bool csDefaultFontRender::GetFontProperty (int fontId, CS_FONTPROPERTY propertyI
 
 unsigned char *csDefaultFontRender::GetCharBitmap (int fontId, unsigned char c)
 { 
-  // printf("%c of font %d\n", c, fontId);
   return &(FontList [fontId].FontBitmap [c * FontList [fontId].BytesPerChar]); 
 }
 
@@ -116,7 +112,8 @@ int csDefaultFontRender::GetMaximumHeight (int fontId)
   return FontList [fontId].Height; 
 }
 
-void csDefaultFontRender::GetTextDimensions (int fontId, const char* text, int& width, int& height)
+void csDefaultFontRender::GetTextDimensions (int fontId, const char* text,
+  int& width, int& height)
 {
   int i, n = strlen (text);
 
