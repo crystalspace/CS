@@ -502,10 +502,10 @@ float csMeshWrapper::MeshWrapper::GetScreenBoundingBox (iCamera* camera,
 
 //--------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csMeshFactoryWrapper)
+IMPLEMENT_IBASE_EXT (csMeshFactoryWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshFactoryWrapper)
   IMPLEMENTS_INTERFACE (csMeshFactoryWrapper)
-IMPLEMENT_IBASE_END
+IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csMeshFactoryWrapper::MeshFactoryWrapper)
   IMPLEMENTS_INTERFACE (iMeshFactoryWrapper)

@@ -144,9 +144,9 @@ void csTerrainWrapper::UpdateLighting( iLight** lights, int iNumLights )
 
 //--------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csTerrainFactoryWrapper)
+IMPLEMENT_IBASE_EXT (csTerrainFactoryWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainFactoryWrapper)
-IMPLEMENT_IBASE_END
+IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csTerrainFactoryWrapper::TerrainFactoryWrapper)
   IMPLEMENTS_INTERFACE (iTerrainFactoryWrapper)
