@@ -19,6 +19,29 @@ Short-term cleanups that need to be done:
 	- Fixes to Win port from Siu-Hang Or.
 	- Some fixes to OpenGL. At least it compiles with SCF now
 	  but it doesn't run yet.
+	- Eric Sunshine fixed bugs in scfString where the constructors were
+	  not calling CONSTRUCT_IBASE().
+	- Eric Sunshine fixed a heap corrupting bug in csVector::Insert().
+	  It was copying one too many elements of data beyond the end of the
+	  array.
+	- Eric Sunshine fixed bug in csSystem::DeregisterDriver() which
+	  resulted in an infinite loop when one of the well-known plug-ins
+	  deregistered itself in its destructor.  Also fixed constructor to
+	  initialize VFS to NULL.  Bug reported by Peter Donald
+	  <donaldp@mad.scientist.com>.
+	- Eric Sunshine fixed a bug in g2d.cpp where it was exporting the
+	  wrong class name.
+	- Eric Sunshine made a couple changes to the SCF macros to better
+	  support virtual multiple inheritance.  These changes were requested
+	  by Peter Donald.
+	- Eric Sunshine fixed a bug in g2d.cpp where it was accessing its
+	  'System' instance variable before it was initialized.  Bug was
+	  reported by Peter Donald.
+	- Eric Sunshine performed the SCF conversion on the MacOS/X Server,
+	  OpenStep, and NextStep ports.
+	- Eric Sunshine worked around an OpenStep compiler bug which was
+	  triggered by csstring.h & csspr2d.h, and which generates unlinkable
+	  object files.
 11-Nov-1999
 	- Eric Sunshine fixed a "pure virtual method called" crasher at
 	  application termination time.  This bug appeared with the
