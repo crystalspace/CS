@@ -16,7 +16,7 @@ DRIVERS=\
   csnetdrv/null csnetman/null csnetman/simple \
   cssnddrv/null cssndrdr/null cssndrdr/software \
   cs2d/csdive cs3d/software \
-# cs2d/openglos2 cs3d/opengl
+  cs2d/openglos2 cs3d/opengl
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

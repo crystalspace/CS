@@ -29,12 +29,17 @@ LIBHELP = \
   echo $"The following Crystal Space libraries can be built:$"
 SYSHELP = \
   echo $"The makefile system can be configured for the following platforms:$"
-SYSMODIFIERSHELP = \
-            echo $"  -*- Modifiers -*-$" \
-  $(NEWLINE)echo $"  USE_DLL=yes$|no$" \
-  $(NEWLINE)echo $"      Build drivers/plugins as dynamic/static modules$" \
-  $(NEWLINE)echo $"  MODE=optimize$|debug$|profile$" \
-  $(NEWLINE)echo $"      Select one of three available compilation modes$"
+define SYSMODIFIERSHELP
+  echo $"  -*- Modifiers -*-$"
+  echo $"  USE_DLL=yes$|no$"
+  echo $"      Build drivers/plugins as dynamic/static modules$"
+  echo $"  MODE=optimize$|debug$|profile$"
+  echo $"      Select one of three available compilation modes$"
+endef
+define SYSCONFIG
+  echo MODE = $(MODE)>>config.tmp
+  echo USE_DLL = $(USE_DLL)>>config.tmp
+endef
 
 # If there is no target defined (makefile system were not configured),
 # look which targets are available in mk/system directory.
@@ -63,25 +68,25 @@ unknown:
 	$(RM) include/volatile.h
 
 platforms:
-	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $(SEPARATOR)
 	@$(MAKE) --no-print-directory TARGET= showplatforms
 
 showconfig:
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
 	@echo $"  USE_DLL=$(USE_DLL) MODE=$(MODE) $(SYSMODIFIERS)$"
-	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $(SEPARATOR)
 
 drvhelp:
 	@$(DRVHELP)
-	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $(SEPARATOR)
 
 libhelp:
 	@$(LIBHELP)
-	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $(SEPARATOR)
 
 apphelp:
 	@$(APPHELP)
-	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $(SEPARATOR)
 
 pseudohelp:
 	@echo $"  make apps         Make all applications$"
@@ -99,22 +104,22 @@ pseudohelp:
 	@echo $"  make cleandep     Clean all dependency rule files$"
 	@echo $"  make distclean    Clean everything$"
 	@echo $"  make platforms    List the available target platforms$"
-	@echo $"----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
+	@echo $(SEPARATOR)
 
 endif
 
 banner:
-	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $(SEPARATOR)
 	@echo $"  Before compiling Crystal Space examine mk/user.mak and see if settings$"
 	@echo $"  are suited for your system. Note that you need at least one renderer and$"
 	@echo $"  at least one 2D driver in order to be able to run the engine.$"
-	@echo $"----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
+	@echo $(SEPARATOR)
 
 showplatforms:
 	@$(SYSHELP)
 	@$(SYSMODIFIERSHELP)
 	@echo $"  Example: make linux USE_DLL=yes MODE=debug$"
-	@echo $"----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
+	@echo $(SEPARATOR)
 
 # Prepare for specific system
 # WARNING: Try to avoid quotes in most important "echo" statements
@@ -131,16 +136,12 @@ ifeq ($(ROOTCONFIG),config)
 
 configure: config.tmp
 	@$(MAKE) --no-print-directory ROOTCONFIG=volatile configure
-	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $(SEPARATOR)
 	@echo $"  Makefiles are now configured for $(DESCRIPTION.$(TARGET)).$"
-	@echo $"----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
+	@echo $(SEPARATOR)
 
 config.tmp:
-	@echo MODE = $(MODE)>>config.tmp
-	@echo USE_DLL = $(USE_DLL)>>config.tmp
-ifdef SYSCONFIG
 	@$(SYSCONFIG)
-endif
 	$(subst DEST,config.mak,$(UPD))
 
 endif

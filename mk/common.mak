@@ -12,6 +12,7 @@ endef
 COMMA=,
 EMPTY=
 SPACE=$(EMPTY) $(EMPTY)
+SEPARATOR=$"*-------------------------------------------------------------------------*$"
 
 # The suffixes for $(OUT) directory when making PIC and non-PIC code
 # Can be changed from system-dependent makefile
@@ -38,10 +39,10 @@ endef
 
 # Macro used to build a subtarget
 define MAKE_TARGET
-  @echo $",------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
-  @echo $"$| Compiling $(DESCRIPTION.$@)$"
-  @echo $"$| Compiling for $(OS)/$(COMP)/$(PROC) in $(MODE) mode$"
-  @echo $"`----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
+  @echo $(SEPARATOR)
+  @echo $"  Compiling $(DESCRIPTION.$@)$"
+  @echo $"  Compiling for $(OS)/$(COMP)/$(PROC) in $(MODE) mode$"
+  @echo $(SEPARATOR)
   @$(MAKE) --no-print-directory -f mk/cs.mak $@
 endef
 

@@ -195,7 +195,8 @@ SYSHELP += $(NEXT.SYSHELP)
 SYSMODIFIERSHELP += \
   $(NEWLINE)echo $"  TARGET_ARCHS="$(sort $(NEXT.ARCHS.ALL))" ($(strip $(NEXT.DESCRIPTION.ALL)))$" \
   $(NEWLINE)echo $"      Target architectures to build.  If not specified, then the current$" \
-  $(NEWLINE)echo $"      architecture is used.  Possible values are: $(NEXT.ARCHS.HELP)$"
+  $(NEWLINE)echo $"      architecture is used.  Possible values are:$" \
+  $(NEXT.ARCHS.HELP)
 
 # Ensure that these variables are simply expanded by using :=
 # This will cause += to also perform simple expansion, which is necessary
