@@ -223,22 +223,22 @@ inline void csVector::QuickSort (int Mode)
 
 /**
  * Declares a new vector type NAME as a subclass of csVector. Elements of
- * this vector are of type TYPE. The elements are automatically delete'd
- * on either Delete() or DeleteAll() or upon vector destruction. This macro
- * lets you define your own FreeItem() function.
+ * this vector are of type TYPE. The elements are automatically given to
+ * FreeTypedItem() on either Delete() or DeleteAll() or upon vector
+ * destruction. However, you must define FreeTypedItem() yourself.
  *
  * Usage:
- *   BEGIN_TYPED_VECTOR_EXT(NAME,TYPE,OBJ)
- *     user-defined FreeItem(OBJ) here
+ *   BEGIN_TYPED_VECTOR_EXT(NAME,TYPE)
+ *     user-defined FreeTypedItem() here
+ *     any other user-defined methods
  *   END_TYPED_VECTOR_EXT(TYPE)
  *
  * Parameters:
  *   NAME - Name of the new vector class.
  *   TYPE - Data type to which this vector refer.
  *          The TYPE should be possible to cast to (void *) and back.
- *   OBJ  - Name of the object in the user-defined FreeItem().
  */
-#define BEGIN_TYPED_VECTOR_EXT(NAME,TYPE,OBJ)				\
+#define BEGIN_TYPED_VECTOR_EXT(NAME,TYPE)				\
   class NAME : private csVector						\
   {									\
   public:								\
@@ -260,30 +260,32 @@ inline void csVector::QuickSort (int Mode)
     inline int InsertSorted (TYPE *Item, int *oEqual = NULL, int Mode = 0) \
     { return csVector::InsertSorted ((csSome)Item, oEqual, Mode); }	\
     inline bool Replace (int n, TYPE *what, bool FreePrevious = true)	\
-    { return csVector::Replace(n, (csSome)what, FreePrevious); }	\
-    inline bool FreeTypedItem (TYPE *OBJ) {
+    { return csVector::Replace(n, (csSome)what, FreePrevious); }
 
 #define END_TYPED_VECTOR_EXT(TYPE)					\
-    }									\
     virtual bool FreeItem (csSome Item)					\
     { return FreeTypedItem ((TYPE *)Item); }				\
   }
 
 /**
  * Declares a new vector type NAME as a subclass of csVector. Elements
- * of this vector are of type TYPE. The elements are automatically delete'd
+ * of this vector are of type TYPE. The elements are automatically deleted
  * on either Delete() or DeleteAll() or upon vector destruction.
  */
 #define DECLARE_TYPED_VECTOR(NAME,TYPE)					\
-  BEGIN_TYPED_VECTOR_EXT (NAME,TYPE,obj)				\
-    delete obj;								\
-    return true;							\
+  BEGIN_TYPED_VECTOR_EXT (NAME,TYPE)					\
+    inline bool FreeTypedItem (TYPE* obj)				\
+    { delete obj; return true; }					\
   END_TYPED_VECTOR_EXT (TYPE)
 
-/// This is a special version of typed vectors that don't delete their elements
+/**
+ * Declares a new vector type NAME as a subclass of csVector. Elements of
+ * this vector are of type TYPE. The elements are not deleted by this vector.
+ */
 #define DECLARE_TYPED_VECTOR_NODELETE(NAME,TYPE)			\
-  BEGIN_TYPED_VECTOR_EXT (NAME,TYPE,obj)				\
-    return true;							\
+  BEGIN_TYPED_VECTOR_EXT (NAME,TYPE)					\
+    inline bool FreeTypedItem (TYPE* obj)				\
+    { return true; }							\
   END_TYPED_VECTOR_EXT (TYPE)
 
 /**
@@ -304,8 +306,6 @@ inline void csVector::QuickSort (int Mode)
     { csVector::DeleteAll (true); }					\
     DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)				\
     inline TYPE *operator [] (int n) const				\
-    { return (TYPE *)csVector::operator [] (n); }			\
-    inline TYPE*& operator [] (int n)   				\
     { return (TYPE *)csVector::operator [] (n); }			\
     inline TYPE *Get (int n) const					\
     { return (TYPE *)csVector::Get(n); }				\
