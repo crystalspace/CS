@@ -86,7 +86,9 @@ Bugs to fix:
 	     the cloth mesh is invalid and it always crashs at exit for him.
 	     Charles James Leonardo Quarra Cappiello <charsquarra@hotmail.com>
 	     further reports that MatzeB fixed the simplecloth crash at exit,
-	     but the fix is not yet in CVS.
+	     but the fix is not yet in CVS.  Dan Mahoney
+	     <domahoneyii@users.sourceforget.net> reports that the crash is on
+	     line 95 of scanp2.inc.
 	[S]  Starting walktest with infinite renderer leads to direct crash
 	[**] simpvs crashes immediately at startup dereferencing a null pointer.
 	     (optimize mode)
