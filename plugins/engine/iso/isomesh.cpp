@@ -559,7 +559,6 @@ csIsoMeshFactoryWrapper::csIsoMeshFactoryWrapper (iMeshObjectFactory* meshFact)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
   csIsoMeshFactoryWrapper::meshFact = meshFact;
-  meshFact->IncRef ();
 }
 
 csIsoMeshFactoryWrapper::csIsoMeshFactoryWrapper ()
@@ -570,7 +569,6 @@ csIsoMeshFactoryWrapper::csIsoMeshFactoryWrapper ()
 
 csIsoMeshFactoryWrapper::~csIsoMeshFactoryWrapper ()
 {
-  if (meshFact) meshFact->DecRef ();
 }
 
 void csIsoMeshFactoryWrapper::SetMeshObjectFactory (
