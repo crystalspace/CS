@@ -1,8 +1,4 @@
-if ! $(BUILDTOP)
-{
-BUILDTOP = . ;
-}
-
+BUILDTOP ?= . ;
 # Include config
 JAMCONFIG ?= $(BUILDTOP)/Jamconfig ;
 include $(JAMCONFIG) ;
@@ -97,8 +93,8 @@ include $(TOP)/mk/jam/build.jam ;
 IncludeDir
     $(BUILDTOP)/include
     $(TOP)
-    $(TOP)/apps
     $(TOP)/include
+    $(TOP)/apps
     $(TOP)/libs
     $(TOP)/plugins
     ;
