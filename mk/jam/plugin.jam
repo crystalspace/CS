@@ -34,10 +34,11 @@ GRISTMETA ?= pluginmeta ;
 ##	independent: The target will not be made a dependency of the plugins
 ##		     and all target.
 ##	nohelp: Do not invoke Help for this target.
+##      notest: Do not set up unit-testing support for this target.
 rule Plugin
 {
   # check options
-  CheckOptions noinstall independent nohelp : $(3) : $(<) ;
+  CheckOptions noinstall independent nohelp notest : $(3) : $(<) ;
 
   local metafile ;
   metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
@@ -62,7 +63,7 @@ rule Plugin
   if ! $(NO_STATIC_LINKING)
   {
     SubVariant static ;
-    Library $(<)_static : $(>) : $(3) independent noinstall nohelp ;
+    Library $(<)_static : $(>) : $(3) independent noinstall nohelp notest ;
     CFlags $(<)_static : [ FDefines CS_STATIC_LINKED ] : nostatic ;
     LFlags $(<)_static : $(LINKLIBS) : nostatic ;
     SubVariant ;
@@ -99,6 +100,11 @@ rule Plugin
     local desc = [ Description $(<) ] ;
     if ! $(desc) { desc = "$(<) plugin" ; }
     Help $(<) : "Build the $(desc)" ;
+  }
+
+  if ! [ IsElem notest : $(options) ]
+  {
+    UnitTest $(<) ;
   }
 }
 

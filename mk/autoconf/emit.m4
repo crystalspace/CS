@@ -101,3 +101,41 @@ AC_DEFUN([CS_EMIT_BUILD_FLAGS],
 	[CS_EMIT_BUILD_PROPERTY([$5], [$$2], [$6], [], [$9])
 	    $7],
 	[$8])])
+
+
+
+#------------------------------------------------------------------------------
+# CS_EMITTER_OPTIONAL([EMITTER])
+#	The CS_EMIT_FOO() macros optionally accept an emitter. If no emitter is
+#	supplied to those macros, then a default emitter is chosen.  Other
+#	macros, however, which perform testing and optionally emit the results
+#	may wish to interpret an omitted EMITTER as a request not to emit the
+#	results. CS_EMITTER_OPTIONAL() is a convenience macro to help in these
+#	cases. It should be passed to one of the CS_EMIT_FOO() macros in place
+#	of the literal EMITTER argument. It functions by re-interpretating
+#	EMITTER as follows:
+#
+#	- If EMITTER is omitted, then CS_NULL_EMITTER is returned, effectively
+#	  disabling output by the CS_EMIT_FOO() macro.
+#	- If EMITTER is the literal string "emit" or "yes", then it asks the
+#	  CS_EMIT_FOO() macro to use its default emitter by returning an empty
+#	  string.
+#	- Any other value for EMITTER is passed along as-is to the
+#	  CS_EMIT_FOO() macro.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_EMITTER_OPTIONAL],
+    [m4_case([$1],
+	[], [[CS_NULL_EMITTER]],
+	[emit], [],
+	[yes], [],
+	[[$1]])])
+
+
+
+#------------------------------------------------------------------------------
+# CS_NULL_EMITTER(KEY, VALUE, [APPEND])
+#	A do-nothing emitter suitable for use as the EMITTER argument of one of
+#	the CS_EMIT_FOO() macros.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_NULL_EMITTER], [:
+])

@@ -56,6 +56,7 @@ include $(jamrulesdir)/static.jam ;
 include $(jamrulesdir)/application.jam ;
 include $(jamrulesdir)/plugin.jam ;
 include $(jamrulesdir)/docs.jam ;
+include $(jamrulesdir)/unittest.jam ;
 
 # Include OS specific rules
 switch $(TARGET.OS)

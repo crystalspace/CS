@@ -5,7 +5,7 @@
 AC_PREREQ([2.54])
 
 #----------------------------------------------------------------------------
-# Initialize Autoconf
+# Initialize Autoconf.
 #----------------------------------------------------------------------------
 AC_INIT(
     [#PROJECTNAME#],
@@ -20,12 +20,12 @@ AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST
 
 #----------------------------------------------------------------------------
-# Setup for the configuration header
+# Setup for the configuration header.
 #----------------------------------------------------------------------------
 AC_CONFIG_HEADERS([config.h])
 
 #----------------------------------------------------------------------------
-# Check for applications
+# Check for tools.
 #----------------------------------------------------------------------------
 CS_CHECK_MKDIR
 CS_EMIT_BUILD_PROPERTY([CMD.MKDIR], [$MKDIR])
@@ -51,6 +51,8 @@ CS_EMIT_BUILD_PROPERTY([RANLIB], [$RANLIB], [], [], [], [Y])
 AC_CHECK_PROGS([PERL], [perl5 perl])
 CS_EMIT_BUILD_PROPERTY([PERL], [$PERL])
 
+CS_CHECK_TEMPLATE_TOOLKIT2([emit])
+
 #----------------------------------------------------------------------------
 # Determine system type
 #----------------------------------------------------------------------------
@@ -63,6 +65,11 @@ CS_CHECK_HOST
 
 #----------------------------------------------------------------------------
 # Check for external libraries
+#----------------------------------------------------------------------------
+CS_CHECK_CPPUNIT([emit])
+
+#----------------------------------------------------------------------------
+# Check for Crystal Space (CS)
 #----------------------------------------------------------------------------
 AC_ARG_WITH([cs], [AC_HELP_STRING([--without-cs],
   [do not look for an installed Crystal Space SDK; this option is useful only
@@ -80,6 +87,9 @@ AS_IF([test $with_cs != no],
 *** CRYSTAL environment variable properly.
 ])], [cstool csgfx csgeom csutil])])
 
+#----------------------------------------------------------------------------
+# Check for Crystal Entity Layer (CEL)
+#----------------------------------------------------------------------------
 m4_define([cel_desired], [#USECEL#])
 CS_EMIT_BUILD_PROPERTY([CEL.DESIRED], [cel_desired])
 m4_if(cel_desired, [yes],
@@ -101,21 +111,8 @@ AC_DEFINE_UNQUOTED([CEL_PLUGIN_DIR], ["$CEL_PLUGIN_DIR"],
   [Define with path to CEL plugins.])
 ])])
 
-#------------------------------------------------------------------------------
-# Check if TemplateToolkit2 is installed (needed for MSVC project generation).
-#------------------------------------------------------------------------------
-AS_IF([test -n "$PERL"],
-    [AC_CACHE_CHECK([for TemplateToolkit], [cs_cv_perl_tt2],
-	[AS_IF([AC_RUN_LOG(
-	    [$PERL -M'Template 2.11' -MTemplate::Plugin -e 0 1>&2])],
-	    [cs_cv_perl_tt2=yes],
-	    [cs_cv_perl_tt2=no])])
-    AC_PATH_PROGS([TTREE], [ttree])
-    AS_IF([test $cs_cv_perl_tt2 = yes && test -n "$TTREE"],
-	[CS_EMIT_BUILD_PROPERTY([TTREE], [$TTREE])])])
-
 #----------------------------------------------------------------------------
-# Package configuration switches
+# Package configuration switches.
 #----------------------------------------------------------------------------
 AC_ARG_ENABLE([debug],
     [AC_HELP_STRING([--enable-debug],
@@ -129,13 +126,13 @@ AC_MSG_RESULT([$build_mode])
 CS_EMIT_BUILD_PROPERTY([MODE], [$build_mode])
 
 #-----------------------------------------------------------------------------
-# Output Installpaths/package info
+# Emit install paths and package information.
 #-----------------------------------------------------------------------------
 CS_OUTPUT_INSTALLDIRS
 CS_EMIT_PACKAGEINFO
 
 #----------------------------------------------------------------------------
-# Output generated files.
+# Emit generated files.
 #----------------------------------------------------------------------------
 CS_JAMCONFIG_OUTPUT([Jamconfig])
 AC_CONFIG_FILES([Jamfile])

@@ -20,7 +20,7 @@
 AC_PREREQ([2.56])
 
 #------------------------------------------------------------------------------
-# CS_CHECK_PYTHON([SDK-CHECK-DEFAULT], [WITH-DESCRIPTION])
+# CS_CHECK_PYTHON([EMITTER], [SDK-CHECK-DEFAULT], [WITH-DESCRIPTION])
 #	Check for Python and a working Python SDK.  Sets the shell variable
 #	PYTHON to the name of the Python interpreter and invokes AC_SUBST().
 #	The shell variable cs_cv_python is set to "yes" if a working Python SDK
@@ -37,21 +37,28 @@ AC_PREREQ([2.56])
 #	the default.  WITH-DESCRIPTION is the description to use for the
 #	--with[out]-python option. The literal string "use" (or "do not use")
 #	is prepended to WITH-DESCRIPTION. If omitted, WITH-DESCRIPTION defaults
-#	to "Python".
+#	to "Python".  If EMITTER is provided, then CS_EMIT_BUILD_RESULT() is
+#	invoked with EMITTER in order to record the results in an output
+#	file. As a convenience, if EMITTER is the literal value "emit" or
+#	"yes", then CS_EMIT_BUILD_RESULT()'s default emitter will be used.
+#	When EMITTER is provided, the following properties are emitted to the
+#	output file: PTYHON (the actual interpreter), PYTHON.AVAILABLE ("yes"
+#	or "no"), PYTHON.CFLAGS, PYTHON.LFLAGS, and PYTHON.MODULE_EXT.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_PYTHON],
     [AC_REQUIRE([CS_CHECK_PTHREAD])
     CS_CHECK_SUPPRESS_LONG_DOUBLE_WARNINGS
 
     AC_ARG_WITH([python],
-	[AC_HELP_STRING([--]m4_if([$1],[without],[with],[without])[-python],
-	    m4_if([$1],[without],[use],[do not use])
-		m4_default([$2],[Python]))])
+	[AC_HELP_STRING([--]m4_if([$2],[without],[with],[without])[-python],
+	    m4_if([$2],[without],[use],[do not use])
+		m4_default([$3],[Python]))])
     AS_IF([test -z "$with_python"],
-	[with_python=m4_if([$1], [without], [no], [yes])])
+	[with_python=m4_if([$2], [without], [no], [yes])])
 
     CS_CHECK_PROGS([PYTHON], [python])
     AC_SUBST([PYTHON])
+    CS_EMIT_BUILD_PROPERTY([PYTHON],[$PYTHON],[],[],CS_EMITTER_OPTIONAL([$1]))
 
     AS_IF([test -n "$PYTHON" && test "$with_python" != no],
 	[AC_CACHE_CHECK([for python SDK], [cs_cv_python_sdk],
@@ -82,6 +89,8 @@ AC_DEFUN([CS_CHECK_PYTHON],
 	    cs_cv_python_ext=`AC_RUN_LOG([$PYTHON -c \
 		'import distutils.sysconfig; \
 		print (distutils.sysconfig.get_config_var("SO") or "")'])`
+	    CS_EMIT_BUILD_PROPERTY([PYTHON.MODULE_EXT], [$cs_cv_python_ext],
+		[], [], CS_EMITTER_OPTIONAL([$1]))
 
 	    AS_IF([test -n "$cs_pyver" &&
 		   test -n "$cs_cv_pybase_cflags" &&
@@ -111,7 +120,9 @@ AC_DEFUN([CS_CHECK_PYTHON],
 	    CS_CHECK_BUILD([if python SDK is usable], [cs_cv_python],
 		[AC_LANG_PROGRAM([[#include <Python.h>]],
 		    [Py_Initialize(); Py_Finalize();])],
-		[$cs_pyflags], [], [], [], [],
+		[$cs_pyflags], [],
+		[CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON],
+		    CS_EMITTER_OPTIONAL([$1]))], [], [],
 		[$cs_cv_pybase_cflags $cs_cv_sys_pthread_cflags],
 		[$cs_cv_pybase_lflags $cs_cv_sys_pthread_lflags],
 		[$cs_cv_pybase_libs   $cs_cv_sys_pthread_libs])])])])])
@@ -120,20 +131,11 @@ AC_DEFUN([CS_CHECK_PYTHON],
 
 #------------------------------------------------------------------------------
 # CS_EMIT_CHECK_PYTHON([SDK-CHECK-DEFAULT], [WITH-DESCRIPTION], [EMITTER])
-#	A convenience wrapper for CS_CHECK_PYTHON() which automatically emits
-#	the results of the check.  EMITTER is a macro name, such as
-#	CS_JAMCONFIG_PROPERTY or CS_MAKEFILE_PROPERTY, which performs the
-#	actual task of emitting KEY/VALUE tuples. If EMITTER is omitted,
-#	CS_JAMCONFIG_PROPERTY is used. The following properties are emitted:
-#	PTYHON (the actual interpreter), PYTHON.AVAILABLE ("yes" or "no"),
-#	PYTHON.CFLAGS, PYTHON.LFLAGS, and PYTHON.MODULE_EXT.
+#	DEPRECATED: Previously, layered EMITTER functionality atop
+#	CS_CHECK_PYTHON() before CS_CHECK_PYTHON() supported emitters directly.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_CHECK_PYTHON],
-    [CS_CHECK_PYTHON([$1], [$2])
-    CS_EMIT_BUILD_PROPERTY([PYTHON], [$PYTHON], [], [], [$3])
-    CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON], [$3])
-    CS_EMIT_BUILD_PROPERTY([PYTHON.MODULE_EXT], [$cs_cv_python_ext],
-	[], [], [$3])])
+    [CS_CHECK_PYTHON(m4_ifval([$3], [$3], [emit]), [$1], [$2])])
 
 
 

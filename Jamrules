@@ -21,8 +21,19 @@ COMPILER.LFLAGS.profile += -g3 -pg ;
 include $(TOP)/mk/jam/build.jam ;
 
 # Set up default application icon.
-ApplicationIconDefault macosx : gui : appicon.icns : $(TOP) libs csutil macosx ;
 ApplicationIconDefault win32 : gui : cs1.ico : $(TOP) libs csutil win32 ;
+ApplicationIconDefault macosx : gui : appicon.icns :
+  $(TOP) libs csutil macosx ;
+
+# Unit-testing boilerplate: The code we want inserted into each test case and
+# the main driver program.
+UNITTEST_BOILERPLATE_TEST_PRE = "
+#include \"cssysdef.h\"
+#include \"csutil/scf.h\"
+" ;
+UNITTEST_BOILERPLATE_MAIN_PRE = $(UNITTEST_BOILERPLATE_TEST_PRE) "
+CS_IMPLEMENT_APPLICATION
+" ;
 
 # Set up a property which clients can query to determine if the build directory
 # differs from source directory.  This allows clients to perform conditional

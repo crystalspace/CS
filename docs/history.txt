@@ -6,6 +6,47 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Jan-2004
+	- Eric Sunshine added a new automated and highly dynamic unit testing
+	  framework which employs CppUnit (http://cppunit.sourceforge.net/).
+	  The new Jam rule `UnitTest' can be used to set up unit testing for
+	  any module. The Application, Library, and Plugin rules now invoke
+	  UnitTest automatically (unless 'notest' is specified), so the vast
+	  majority of clients inherit unit testing support for free. By
+	  default, UnitTest enables testing for any modules which have a `t/'
+	  subdirectory populated with *.t test fragment files. For each such
+	  module, it creates a "check_module" Jam target which synthesizes C++
+	  wrapper and driver programs for the test fragments, and builds and
+	  runs the test cases for that module. Furthermore (and this is where
+	  it gets neat) UnitTest dynamically synthesizes test programs at each
+	  directory leading up to modules containing test code. The
+	  directory-level test programs incorporate all of the tests from child
+	  directories (recursively).  This allows entire selected branches of
+	  tests to be run all at once rather than having to run several
+	  different driver programs to get a complete report. For example, the
+	  module-based target "jam check_csutil" runs only csutil's tests, as
+	  does the directory-based target "jam check_libs_csutil", but "jam
+	  check_libs" runs csutil's, cstool's, csgeom's, csgfx's, and csws's
+	  tests; and "jam check" (or "jam check_all") runs, as a single batch,
+	  all tests in the entire project. Other examples: check_plugins,
+	  check_plugins_video, check_plugins_video_canvas,
+	  check_plugins_video_canvas_macosx. The UnitTest rule and supporting
+	  framework are generic, and can be employed by client projects based
+	  upon the CS Jam system, such as those created with `jamtemplate'.
+	  For further information, consult the extensive documentation in
+	  CS/mk/jam/unittest.jam (or the soon-to-be-written HOWTO).
+	- Eric Sunshined wrote some (complete and incomplete) unit tests for
+	  csgeom and csutil. Also added an incomplete test from C. J. Collier
+	  <cjcollier@colliertech.org> for csObjectRegistry.
+	- Eric Sunshine extracted the TemplateToolkit2 check from configure.ac
+	  and placed it into CS/mk/autoconf/checktt2.m4 so that it can be
+	  re-used by foreign projects.
+	- Eric Sunshine added a re-usable CppUnit Autoconf check at
+	  CS/mk/autoconf/checkcppunit.m4.
+	- Eric Sunshine augmented the CS_CHECK_PYTHON() check (checkpython.m4)
+	  so that it can optionally emit its results via an EMITTER. This
+	  change obsoletes the CS_EMIT_CHECK_PYTHON() macro, which is now
+	  deprecated.
 13-Jan-2004
 	- Eric Sunshine renamed the 'memory' plugin to 'memory2d' for the
 	  following reasons:

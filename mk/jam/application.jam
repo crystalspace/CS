@@ -39,10 +39,11 @@ if "$(EXEMODE)" = "711" { EXEMODE = "+x" ; }
 ##	independent: The target will not be made a dependency of the apps and
 ##		     all target.
 ##	nohelp: Do not invoke Help for this target.
+##      notest: Do not set up unit-testing support for this target.
 rule Application
 {
   # check options
-  CheckOptions noinstall console independent nohelp : $(3) : $(<) ;
+  CheckOptions noinstall console independent nohelp notest : $(3) : $(<) ;
 
   local target = [ ConstructApplicationTarget $(<) : $(3) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
@@ -94,6 +95,11 @@ rule Application
     local desc = [ Description $(<) ] ;
     if ! $(desc) { desc = "$(<) application" ; }
     Help $(<) : "Build the $(desc)" ;
+  }
+
+  if ! [ IsElem notest : $(options) ]
+  {
+    UnitTest $(<) ;
   }
 }
 

@@ -35,10 +35,11 @@
 ##		     all targets.
 ##	shared: Create as a shared library on supported platforms.
 ##	nohelp: Do not invoke Help for this target.
+##      notest: Do not set up unit-testing support for this target.
 rule Library
 {
   local options = $(3) ;
-  CheckOptions noinstall independent shared nohelp : $(options) : $(<) ;
+  CheckOptions noinstall independent shared nohelp notest : $(options) : $(<) ;
 
   local target = [ ConstructLibraryTarget $(<) : $(options) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
@@ -94,6 +95,11 @@ rule Library
     if ! $(desc) { desc = "$(<) library" ; }
     Help $(<) : "Build the $(desc)" ;
   }
+
+  if ! [ IsElem notest : $(options) ]
+  {
+    UnitTest $(<) ;
+  }
 }
 
 ##  LibDepends libname : dependant libraries
@@ -110,6 +116,8 @@ rule LibDepends
   {
     LinkWith $(<) : $(>) ;
   }
+
+  UnitTestLibDepends $(<) : $(>) ;
 }
 
 #----------------------------------------------------------------------------

@@ -41,7 +41,7 @@ rule LinkWith
     libs += [ ConstructLibraryLinkTarget $(i) : $($(i)_SHARED) ] ;
   }
       
-  DEPENDS $($(<)_TARGET) : $(libs) ;
+  Depends $($(<)_TARGET) : $(libs) ;
   NEEDLIBS on $($(<)_TARGET) += $(libs) ;
 
   if $($(<)_TYPE) = plugin
@@ -50,7 +50,7 @@ rule LinkWith
   }
 }
 
-##  CFlags target : flags : options
+##  CFlags target : flags [ : options ]
 ##    Sets cflags on all sourcefiles of a library, plugin or application target
 ##    This rule affects c++ and c compiler flags.
 ##    Options
@@ -66,9 +66,11 @@ rule CFlags
   {
     CFlags $(<)_static : $(>) ;
   }
+
+  UnitTestCFlags $(<) : $(>) : $(3) ;
 }
 
-##  LFlags target : flags : options
+##  LFlags target : flags [ : options ]
 ##    Sets linker flags for a library, plugin or application target
 ##    Options
 ##      nostatic - Do not apply the flags to a "_static" variation.
@@ -82,23 +84,26 @@ rule LFlags
   {
     $(<)_static.LFLAGS += $(>) ;
   }
+
+  UnitTestLFlags $(<) : $(>) : $(3) ;
 }
 
-##  ExternalLibs target : identifier
-##    Specify a dependency between 'target' and the external library indicated
-##    by 'identifier'.  If 'target' is an application or plugin, then it is
-##    linked against the indicated external library.  If 'target' is a library,
-##    then its dependency upon 'identifier' is noted, and applications or
-##    plugins which link against 'target' will also be linked against the
-##    library indicated by 'identifier'.  'identifier' is the base name of a
-##    set of variables which provide build tool information about the external
-##    library.  In particular, the value of $(identifier).CFLAGS should provide
-##    compiler flags needed for the external library indicated by 'identifier';
-##    and $(identifier).LFLAGS should provide linker flags for the library.
+##  ExternalLibs target : identifiers
+##    Specify a dependency between 'target' and the external libraries
+##    indicated by 'identifiers'.  If 'target' is an application or plugin,
+##    then it is linked against the indicated external libraries.  If 'target'
+##    is a library, then its dependency upon 'identifiers' is noted, and
+##    applications or plugins which link against 'target' will also be linked
+##    against the libraries indicated by 'identifiers'.  'identifiers' is a
+##    list of base names of a set of variables which provide build tool
+##    information about each external library.  In particular, assuming that
+##    `ident' is one element of `identifiers', the value of $(ident).CFLAGS
+##    should provide compiler flags needed for the external library indicated
+##    by 'ident'; and $(ident).LFLAGS should provide linker flags for the
+##    library.
 rule ExternalLibs
 {
   local i ;
-  
   for i in $(>)
   {
     CFlags $(<) : $($(i).CFLAGS) ;
