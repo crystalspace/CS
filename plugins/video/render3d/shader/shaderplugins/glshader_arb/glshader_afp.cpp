@@ -42,9 +42,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_arb.h"
 #include "glshader_afp.h"
 
-SCF_IMPLEMENT_IBASE(csShaderGLAFP)
-SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT(csShaderGLAFP)
+  SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
+SCF_IMPLEMENT_IBASE_EXT_END
 
 void csShaderGLAFP::Report (int severity, const char* msg, ...)
 {
@@ -110,12 +110,15 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
     return false;
 
   //step to first !!
+printf ("AFPlps0\n");
   csRef<iDataBuffer> data = GetProgramData();
   if (!data)
     return false;
 
+printf ("AFPlps1\n");
   const char* programstring = (char*)data->GetData ();
   int stringlen = data->GetSize ();
+printf ("AFPlps2\n");
 
   int i=0;
   while (*programstring != '!' && (i < stringlen))
@@ -125,6 +128,7 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
   }
   stringlen -= i;
 
+printf ("AFPlps3\n");
   ext->glGenProgramsARB(1, &program_num);
   ext->glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, program_num);
   
@@ -137,6 +141,7 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
   glGetIntegerv (GL_PROGRAM_ERROR_POSITION_ARB, &errorpos);
   if(errorpos != -1)
   {
+printf ("AFPlps4\n");
     CS_ALLOC_STACK_ARRAY (char, errorStart, strlen (programstring) + 1);
     strcpy (errorStart, programstring);
 
@@ -159,10 +164,12 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
     Report (CS_REPORTER_SEVERITY_WARNING, "Program error at: \"%s\"", start);
     Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
       programErrorString);
+printf ("AFPlps5\n");
     return false;
   }
   else
   {
+printf ("AFPlps6\n");
     if ((programErrorString != 0) && (*programErrorString != 0))
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
@@ -171,6 +178,7 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
     }
   }
 
+printf ("AFPlps7\n");
   return true;
 }
 

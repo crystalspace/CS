@@ -251,7 +251,9 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
   {
     program = LoadProgram (programNode, pass);
     if (program)
+    {
       pass->vp = program;
+    }
     else
     {
       if (do_verbose)

@@ -27,6 +27,9 @@ chronological order.
 	  to the Cg check in configure.ac to ensure that the pthread cflags,
 	  lflags, and libs variables are available since the Cg check now
 	  utilizes those variables.
+	- Jorrit fixed a bug in the new shader code from res2k. It would
+	  use SCF_DECLARE_IBASE instead of SCF_DECLARE_IBASE_EXT and this could
+	  cause crashes in some circumstances.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.

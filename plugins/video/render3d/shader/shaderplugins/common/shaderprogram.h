@@ -79,7 +79,7 @@ protected:
 
   bool ParseCommon (iDocumentNode* child);
   iDocumentNode* GetProgramNode ();
-  csRef<iDataBuffer> GetProgramData ();
+  csPtr<iDataBuffer> GetProgramData ();
   void ResolveStaticVars (csArray<iShaderVariableContext*> &staticContexts);
 public:
   SCF_DECLARE_IBASE;

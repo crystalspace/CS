@@ -161,7 +161,7 @@ iDocumentNode* csShaderProgram::GetProgramNode ()
   return 0;
 }
 
-csRef<iDataBuffer> csShaderProgram::GetProgramData ()
+csPtr<iDataBuffer> csShaderProgram::GetProgramData ()
 {
   if (programFile.IsValid())
   {
@@ -174,7 +174,7 @@ csRef<iDataBuffer> csShaderProgram::GetProgramData ()
 
     csRef<iDataBuffer> newbuff;
     newbuff.AttachNew (new csDataBuffer (data, strlen (data)));
-    return newbuff;
+    return csPtr<iDataBuffer> (newbuff);
   }
 
   return 0;

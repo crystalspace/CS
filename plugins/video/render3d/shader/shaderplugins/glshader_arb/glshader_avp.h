@@ -39,7 +39,7 @@ private:
 
   void Report (int severity, const char* msg, ...);
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT (csShaderProgram);
 
   csShaderGLAVP(csGLShader_ARB* shaderPlug) : 
     csShaderProgram (shaderPlug->object_reg)
