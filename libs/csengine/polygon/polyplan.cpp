@@ -167,6 +167,12 @@ void csPolyPlane::ObjectToWorld (const csReversibleTransform& obj,
 
   // Now we transform the plane itself.
   obj.This2Other (plane_obj, vertex1, plane_wor);
+
+  // This is not efficient and only needed in those cases where the
+  // thing is really scaled. We have to see if this is a problem. Normally
+  // it is a good thing to avoid calling csThing::Transform() to often.
+  // So normally it should not be a problem.
+  plane_wor.Normalize ();
 }
 
 void csPolyPlane::GetCameraNormal (float* p_A, float* p_B, float* p_C, float* p_D)
