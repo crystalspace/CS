@@ -181,7 +181,7 @@ void ddgTBinTree::initTriangle( unsigned int level,
 
 
 /// Return the quad neighbour. If 0 there is no neighbour.
-inline ddgTriIndex ddgTBinTree::neighbour( ddgTriIndex i)
+ddgTriIndex ddgTBinTree::neighbour( ddgTriIndex i)
 {
 	switch(_mesh->stri[i].edge())
 	{
@@ -199,7 +199,7 @@ inline ddgTriIndex ddgTBinTree::neighbour( ddgTriIndex i)
 	}
 }
 /// Return the bintree of the neighbour.
-inline ddgTBinTree *ddgTBinTree::neighbourTree( ddgTriIndex i)
+ddgTBinTree *ddgTBinTree::neighbourTree( ddgTriIndex i)
 {
 	switch(_mesh->stri[i].edge())
 	{
@@ -258,10 +258,10 @@ unsigned int ddgTBinTree::row(unsigned int i)
 unsigned int ddgTBinTree::col(unsigned int i)
 { return _mesh->stri[i].col; }
 /// Get the triangle row on the master mesh.
-inline unsigned int ddgTBinTree::mrow(unsigned int i)
+unsigned int ddgTBinTree::mrow(unsigned int i)
 { return _mirror ? _dr - _mesh->stri[i].row : _dr + _mesh->stri[i].row; }
 /// Get the triangle column on the master mesh.
-inline unsigned int ddgTBinTree::mcol(unsigned int i)
+unsigned int ddgTBinTree::mcol(unsigned int i)
 { return _mirror ? _dc - _mesh->stri[i].col : _dc + _mesh->stri[i].col; }
 
 /// QUEUE OPERATIONS

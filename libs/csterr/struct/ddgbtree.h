@@ -176,24 +176,24 @@ public:
 	/// Set the number of visible triangles which this bin tree is managing.
 	void visTriangle(unsigned int v) { _visTriangle = v; }
 	/// Return the neighbouring bin tree.
-	inline ddgTBinTree* pNeighbourDiag(void) { return _pNeighbourDiag; }
+	ddgTBinTree* pNeighbourDiag(void) { return _pNeighbourDiag; }
 	/// Return the neighbouring bin tree.
-	inline ddgTBinTree* pNeighbourTop(void) { return _pNeighbourTop; }
+	ddgTBinTree* pNeighbourTop(void) { return _pNeighbourTop; }
 	/// Return the neighbouring bin tree.
-	inline ddgTBinTree* pNeighbourLeft(void) { return _pNeighbourLeft; }
+	ddgTBinTree* pNeighbourLeft(void) { return _pNeighbourLeft; }
 	/// Set the neighbouring bin tree.
-	inline void pNeighbourDiag(ddgTBinTree* t) { _pNeighbourDiag = t; }
+	void pNeighbourDiag(ddgTBinTree* t) { _pNeighbourDiag = t; }
 	/// Set the neighbouring bin tree.
-	inline void pNeighbourTop(ddgTBinTree* t) { _pNeighbourTop = t; }
+	void pNeighbourTop(ddgTBinTree* t) { _pNeighbourTop = t; }
 	/// Set the neighbouring bin tree.
-	inline void pNeighbourLeft(ddgTBinTree* t) { _pNeighbourLeft = t; }
+	void pNeighbourLeft(ddgTBinTree* t) { _pNeighbourLeft = t; }
 
 	/// Returns the column offset in the height map.
-	inline int dc(void) { return _dc; }
+	int dc(void) { return _dc; }
 	/// Returns the row offset in the height map.
-	inline int dr(void) { return _dr; }
+	int dr(void) { return _dr; }
 	/// Returns true if this is a mirrored mesh.
-	inline bool mirror(void) { return _mirror; }
+	bool mirror(void) { return _mirror; }
 
 	/// Initialize the bin tree.
 	bool init(void);
@@ -203,20 +203,20 @@ private:
 	/// Get triangle col.
 	unsigned int col(unsigned int i);
 	/// Get the triangle row on the master mesh.
-	inline unsigned int mrow(unsigned int i);
+	unsigned int mrow(unsigned int i);
 	/// Get the triangle column on the master mesh.
-	inline unsigned int mcol(unsigned int i);
+	unsigned int mcol(unsigned int i);
 	/** Return the starting offset in the array where a
 	 * given level is stored.
 	 */
-	inline static unsigned int offset(unsigned int l)
+	static unsigned int offset(unsigned int l)
 	{
 		return ddgBintreeOffset[l];
 	}
 public:
 
 	/// Return the level of this triangle based on its index.
-	inline static unsigned int level(ddgTriIndex i)
+	static unsigned int level(ddgTriIndex i)
 	{
 		unsigned int l = 0;
 		if (i > 0)
@@ -225,17 +225,17 @@ public:
 		return l;
 	}
 	/// If this is odd (right) or even(left) child in the tree.
-	inline static bool isRight(ddgTriIndex i)
+	static bool isRight(ddgTriIndex i)
 	{
 		return ((i%2) == 1);
 	}
 	/// If this is odd (right) or even(left) child in the tree.
-	inline static bool isLeft(ddgTriIndex i)
+	static bool isLeft(ddgTriIndex i)
 	{
 		return ((i%2) == 0);
 	}
 	/// Return the parent of this element.
-	inline static ddgTriIndex parent(ddgTriIndex i)
+	static ddgTriIndex parent(ddgTriIndex i)
 	{
 //		asserts (i < _triNo,"Invalid element number.");
 		if (i == 0)
@@ -244,12 +244,12 @@ public:
 		return i/2;
 	}
 	/// Return the index of the left child.
-	inline static ddgTriIndex right(ddgTriIndex i)
+	static ddgTriIndex right(ddgTriIndex i)
 	{
 		return i*2;
 	}
 	/// Return the index of the left child.
-	inline static ddgTriIndex left(ddgTriIndex i)
+	static ddgTriIndex left(ddgTriIndex i)
 	{
 		return right(i)+1;
 	}
@@ -260,28 +260,28 @@ private:
 	ddgTBinTree *neighbourTree( ddgTriIndex i);
 public:
 	/// Set the cache index for a triangle
-	inline void tcacheId( ddgTriIndex tindex, ddgCacheIndex ci )
+	void tcacheId( ddgTriIndex tindex, ddgCacheIndex ci )
 	{
 		_cacheIndex[tindex] = ci;
 	}
 	/// Get the cache index for a triangle.
-	inline ddgCacheIndex tcacheId( ddgTriIndex tindex )
+	ddgCacheIndex tcacheId( ddgTriIndex tindex )
 	{
 		return _cacheIndex[tindex];
 	}
 
 	/// Get the raw height for a triangle.
-	inline short rawHeight( ddgTriIndex tindex )
+	short rawHeight( ddgTriIndex tindex )
 	{
 		return _rawHeight[tindex];
 	}
 	/// Get the min height for a triangle block.
-	inline short rawMinVal( ddgTriIndex tindex )
+	short rawMinVal( ddgTriIndex tindex )
 	{
 		return _rawMinVal[tindex];
 	}
 	/// Get the max height for a triangle block.
-	inline short rawMaxVal( ddgTriIndex tindex )
+	short rawMaxVal( ddgTriIndex tindex )
 	{
 		return _rawMaxVal[tindex];
 	}
@@ -300,34 +300,34 @@ private:
 	ddgTNode *snode(ddgTriIndex tindex);
 public:
 	/// Return the objects visibility state.
-	inline ddgVisState vis(ddgTriIndex tindex)				{ return gnode(tindex)->vis(); }
+	ddgVisState vis(ddgTriIndex tindex)				{ return gnode(tindex)->vis(); }
 	/// Set the objects visibility state.
-	inline void vis(ddgTriIndex tindex, ddgVisState v)		{ snode(tindex)->vis(v); }
+	void vis(ddgTriIndex tindex, ddgVisState v)		{ snode(tindex)->vis(v); }
 
     /// Return the priority of this triangle.
-    inline int  priority(ddgTriIndex tindex)		{ return gnode(tindex)->priority(); }
+    int  priority(ddgTriIndex tindex)		{ return gnode(tindex)->priority(); }
     /// Set the priority of this triangle.
     void priority(ddgTriIndex tindex, int p)		{ snode(tindex)->priority( p ); }
 
     /// Return the priority of this triangle.
-    inline float priorityFactor(ddgTriIndex tindex)		{ return gnode(tindex)->priorityFactor(); }
+    float priorityFactor(ddgTriIndex tindex)		{ return gnode(tindex)->priorityFactor(); }
     /// Set the priority of this triangle.
     void priorityFactor(ddgTriIndex tindex, float pf)		{ snode(tindex)->priorityFactor( pf ); }
 
 	/// Return flags.
-	inline unsigned char vbufferIndex(ddgTriIndex tindex){ return gnode( tindex)->vbufferIndex(); }
+	unsigned char vbufferIndex(ddgTriIndex tindex){ return gnode( tindex)->vbufferIndex(); }
 	/// Set flags.
-	inline void vbufferIndex(ddgTriIndex tindex, unsigned int i) { snode( tindex)->vbufferIndex(i); }
+	void vbufferIndex(ddgTriIndex tindex, unsigned int i) { snode( tindex)->vbufferIndex(i); }
 
 	/// Return split cache index if any.
-	inline ddgCacheIndex qscacheIndex(ddgTriIndex tindex){ return gnode( tindex)->qscacheIndex(); }
+	ddgCacheIndex qscacheIndex(ddgTriIndex tindex){ return gnode( tindex)->qscacheIndex(); }
 	/// Set split cache index if any.
-	inline void qscacheIndex(ddgTriIndex tindex, ddgCacheIndex i) { snode( tindex)->qscacheIndex(i); }
+	void qscacheIndex(ddgTriIndex tindex, ddgCacheIndex i) { snode( tindex)->qscacheIndex(i); }
 
 	/// Return split cache index if any.
-	inline ddgCacheIndex qmcacheIndex(ddgTriIndex tindex){ return gnode( tindex)->qmcacheIndex(); }
+	ddgCacheIndex qmcacheIndex(ddgTriIndex tindex){ return gnode( tindex)->qmcacheIndex(); }
 	/// Set split cache index if any.
-	inline void qmcacheIndex(ddgTriIndex tindex, ddgCacheIndex i) { snode( tindex)->qmcacheIndex(i); }
+	void qmcacheIndex(ddgTriIndex tindex, ddgCacheIndex i) { snode( tindex)->qmcacheIndex(i); }
 
 	/// Return the height of a location on the bintree mesh.
     float heightByPos(unsigned int r, unsigned int c);
@@ -352,12 +352,12 @@ public:
 	/// Calculate visibility of a triangle.
 	ddgVisState visibilityTriangle(ddgTriIndex tvc);
 	/// Is triangle visible (even partially)?
-	inline bool visible(ddgTriIndex i)
+	bool visible(ddgTriIndex i)
 	{
 		return (vis(i) != ddgOUT) ? true : false;
 	}
 	/// Is triangle fully visible?
-	inline bool fullyvisible(ddgTriIndex i)
+	bool fullyvisible(ddgTriIndex i)
 	{
 		return (vis(i) == ddgIN) ? true : false;
 	}
@@ -397,7 +397,7 @@ public:
 	ddgPriority priorityCalc(ddgTriIndex tindex, float priorityFactor);
 
 	/// Return the index in the mesh.
-	inline unsigned int index(void) { return _index; }
+	unsigned int index(void) { return _index; }
 
 	/// Initialize view context called once during initialization.
 	static void initContext( ddgContext *context, ddgTBinMesh *mesh );
