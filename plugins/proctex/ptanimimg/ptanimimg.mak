@@ -1,4 +1,4 @@
-DESCRIPTION.ptanimimg = Crystal Space animated image procedural texture
+DESCRIPTION.ptanimimg = Animated image procedural texture
 
 #-----------------------------------------------------------------------------#
 ifeq ($(MAKESECTION),rootdefines)
@@ -40,8 +40,9 @@ OUT.PTANIMIMG = $(OUT)/$(DIR.PTANIMIMG)
 INF.PTANIMIMG = $(SRCDIR)/$(DIR.PTANIMIMG)/ptanimimg.csplugin
 INC.PTANIMIMG = $(wildcard $(SRCDIR)/$(DIR.PTANIMIMG)/*.h)
 SRC.PTANIMIMG = $(wildcard $(SRCDIR)/$(DIR.PTANIMIMG)/*.cpp)
-OBJ.PTANIMIMG = $(addprefix $(OUT.PTANIMIMG)/,$(notdir $(SRC.PTANIMIMG:.cpp=$O)))
-DEP.PTANIMIMG = CSTOOL CSGFX CSUTIL CSUTIL
+OBJ.PTANIMIMG = \
+  $(addprefix $(OUT.PTANIMIMG)/,$(notdir $(SRC.PTANIMIMG:.cpp=$O)))
+DEP.PTANIMIMG = CSTOOL CSGFX CSGEOM CSUTIL
 
 OUTDIRS += $(OUT.PTANIMIMG)
 
@@ -66,7 +67,8 @@ $(PTANIMIMG): $(OBJ.PTANIMIMG) $(LIB.PTANIMIMG)
 
 clean: ptanimimgclean
 ptanimimgclean:
-	-$(RMDIR) $(PTANIMIMG) $(OBJ.PTANIMIMG) $(OUTDLL)/$(notdir $(INF.PTANIMIMG))
+	-$(RMDIR) $(PTANIMIMG) $(OBJ.PTANIMIMG) \
+	$(OUTDLL)/$(notdir $(INF.PTANIMIMG))
 
 cleandep: ptanimimgcleandep
 ptanimimgcleandep:
