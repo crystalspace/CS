@@ -1,6 +1,9 @@
 The history order is reversed so that new features are at the top.
 
-3-Jul-2001
+5-Aug-2001
+	- Fixed a small bug in haze. Now it shows in OpenGL but not
+	  correctly right yet.
+3-Aug-2001
 	- Removed iSystem::AddConfig(). Use iConfigManager::AddDomain()
 	  instead.
 	- Removed iSystem::RemoveConfig(). Use iConfigManager::RemoveDomain()
@@ -24,7 +27,7 @@ The history order is reversed so that new features are at the top.
 	    - Fixed (a typo) and updated djgpp.mak
 	    - Fixed dosconf.bat to output a more useful config.mak
 	    - Changed perftest and vsh so that they can be linked statically
-2-Jul-2001
+2-Aug-2001
 	- Eric Sunshine eliminated a compilation warning about unused variable
 	  in mdltool.cpp.  (In fact, this particular variable was being
 	  shadowed by another variable in another scope.)

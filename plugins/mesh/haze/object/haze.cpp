@@ -815,9 +815,10 @@ void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
   float shiftx, float shifty, const csVector3& objpos, csVector3& scrpos)
 {
   scrpos = tr_o2c * objpos;  // to camera space
-  scrpos.z = fov / scrpos.z; // = iz
-  scrpos.x = scrpos.x * scrpos.z + shiftx;
-  scrpos.y = scrpos.y * scrpos.z + shifty;
+  scrpos.z = 1. / scrpos.z; // = iz
+  float inv_z = fov * scrpos.z; // = iz
+  scrpos.x = scrpos.x * inv_z + shiftx;
+  scrpos.y = scrpos.y * inv_z + shifty;
 }
 
 void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d, 
