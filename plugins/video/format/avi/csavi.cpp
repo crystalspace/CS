@@ -129,9 +129,12 @@ bool csAVIFormat::InitVideoData ()
   memcpy (&fileheader, p, len_hcl);
   p += len_hcl;
   fileheader.Endian ();
-  bSucc = fileheader.Is (RIFF_ID, RIFF_AVI, p) && fileheader.size <= datalen;
+  bSucc = fileheader.Is (RIFF_ID, RIFF_AVI, p);
   if (bSucc)
   {
+    if (fileheader.size > datalen)
+      pSystem->Printf (MSG_WARNING, 
+		       "AVI: RIFF header claims to be longer than the whole file is !\n");
     bSucc = false;
     p += len_id;
     memcpy (&hdrl, p, len_hcl);
@@ -289,6 +292,8 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
   UByte *pCID=NULL;
   char *pName = NULL;
   ULong nCIDLen = 0;
+  UByte *pFormatEx;
+  ULong nFormatEx;
 
   if (!strncmp (streamheader->type, "auds", 4))
   {
@@ -303,6 +308,8 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
       memcpy (&audsf, p, sizeof (AudioStreamFormat));
       audsf.Endian ();
       p += AVI_EVEN(strh.size);
+      pFormatEx = (UByte*)p;
+      nFormatEx = sizeof (audsf) + sizeof (audsf.extra);
       n = AVI_EVEN(strh.size) + len_hcl;
       // optionally follows a "strd" chunk containing codec specific data which is handed
       // over to the codec 'as is'
@@ -328,7 +335,7 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
 	n += AVI_EVEN(strh.size) + len_hcl;
       }
       if (pAudioStream->Initialize (&aviheader, streamheader, &audsf, nAudio, 
-				    pCID, nCIDLen, pName, pSystem))
+				    pCID, nCIDLen, pName, pFormatEx, nFormatEx, pSystem))
 	vStream.Push (pAudioStream);
       else
 	pAudioStream->DecRef ();
@@ -348,6 +355,8 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
       p += len_hcl;
       memcpy (&vidsf, p, sizeof (VideoStreamFormat));
       vidsf.Endian ();
+      pFormatEx = (UByte*)p;
+      nFormatEx = sizeof(vidsf) + vidsf.size;
       p += AVI_EVEN(strh.size);
       n = AVI_EVEN(strh.size) + len_hcl;
       // optionally follows a "strd" chunk containing codec specific data which is handed
@@ -374,7 +383,7 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
 	n += AVI_EVEN(strh.size) + len_hcl;
       }
       if (pVideoStream->Initialize (&aviheader, streamheader, &vidsf, nVideo, 
-				    pCID, nCIDLen, pName, pSystem))
+				    pCID, nCIDLen, pName, pFormatEx, nFormatEx, pSystem))
       vStream.Push (pVideoStream);
       else
 	pVideoStream->DecRef ();

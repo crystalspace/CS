@@ -47,18 +47,23 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 				   const csAVIFormat::VideoStreamFormat *pf, 
 				   UShort nStreamNumber, 
 				   UByte *pInitData, ULong nInitDataLen,
-				   char *pName, iSystem *pTheSystem)
+				   char *pName,
+				   UByte *pFormatEx, ULong nFormatEx, 
+				   iSystem *pTheSystem)
 {
   strdesc.type = CS_STREAMTYPE_VIDEO;
   memcpy (strdesc.codec, psh->handler, 4);
-  strdesc.codec[4] = '\0';
-  strdesc.colordepth = pf->planes * pf->bitcount;
+  strdesc.colordepth = pf->bitcount;
   strdesc.framecount = ph->framecount;
   strdesc.width = ph->width;
   strdesc.height = ph->height;
   strdesc.framerate = psh->rate/psh->scale;
   strdesc.duration = psh->length / psh->scale;
   strdesc.name = pName;
+
+  int i;
+  for (i=3; i>=0 && strdesc.codec[i] == ' '; i--);
+  strdesc.codec[i+1] = '\0';
 
   delete pChunk;
   pChunk = new csAVIFormat::AVIDataChunk;
@@ -106,7 +111,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 
   if (pMaterial) pMaterial->DecRef ();
   pMaterial = NULL;
-  return LoadCodec (pInitData, nInitDataLen);
+  return LoadCodec (pInitData, nInitDataLen, pFormatEx, nFormatEx);
 }
 
 csAVIStreamVideo::~csAVIStreamVideo ()
@@ -227,7 +232,9 @@ bool csAVIStreamVideo::NextFrameGetData ()
     if (cdesc.decodeoutput == CS_CODECFORMAT_RGBA_CHANNEL)
       rgba_channel_2_rgba_interleave ((char **)outdata);
     else
-    if (cdesc.decodeoutput != CS_CODECFORMAT_RGBA_INTERLEAVED)
+    if (cdesc.decodeoutput == CS_CODECFORMAT_RGBA_INTERLEAVED)
+      rgba_interleave ((char*)outdata);
+    else
       return false;
     return true;
 
@@ -342,6 +349,46 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
 #endif
 }
 
+void csAVIStreamVideo::rgba_interleave (char *data)
+{
+  int idx=0, tidx=0;
+  int sw = strdesc.width;
+  int sh = strdesc.height;
+  int tw = rc.Width ();
+  int th = rc.Height ();
+  int ytic=th, xtic;
+  int ls = 0;
+  int sr=0, sc; // source row and col
+
+  csRGBpixel *src = (csRGBpixel*)data;
+  csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
+  for (int row=0; row < th; row++)
+  {
+    xtic = 0;
+    sc = 0;
+    for (int col=0; col < tw; col++)
+    {
+      memcpy (&pixel[tidx], &src[idx], sizeof (csRGBpixel));
+      while (xtic < sw)
+      {
+	idx++;
+	sc++;
+	xtic += tw;
+      }
+      xtic -=sw;
+      tidx++;
+    }
+    while (ytic < sh)
+    {
+      ls += sw;
+      sr++;
+      ytic += th;
+    }
+    ytic -=sh;
+    idx = ls;
+  }
+}
+
 void csAVIStreamVideo::rgb_channel_2_rgba_interleave (char *data[3])
 {
   char *rdata = data[0];
@@ -388,7 +435,8 @@ void csAVIStreamVideo::makeMaterial ()
   pMaterial->Prepare ();
 }
 
-bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen)
+bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen, 
+				  UByte *pFormatEx, ULong nFormatEx)
 {
   // based on the codec id we try to load the apropriate codec
   iSCF *pSCF = QUERY_INTERFACE (pSystem, iSCF);
@@ -396,14 +444,14 @@ bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen)
   {
     // create a classname from the coec id
     char cn[128];
-    sprintf (cn, "crystalspace.video.codec.%s", strdesc.codec);
+    sprintf (cn, "crystalspace.video.codec.avi.%s", strdesc.codec);
     // try open this class
-    pCodec = (iCodec*)pSCF->scfCreateInstance (cn, "iCodec", 0);
+    pCodec = (iAVICodec*)pSCF->scfCreateInstance (cn, "iAVICodec", 0);
     pSCF->DecRef ();
     if (pCodec)
     {
       // codec exists, now try to initialize it
-      if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen))
+      if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen, pFormatEx, nFormatEx))
       {
 	pCodec->GetCodecDescription (cdesc);
        	return true;

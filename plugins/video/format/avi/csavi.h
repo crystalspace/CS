@@ -226,6 +226,7 @@ class csAVIFormat : public iStreamFormat
       bottom = little_endian_long (bottom);
     }
   };
+
   struct VideoStreamFormat
   {
     ULong size;
@@ -254,6 +255,7 @@ class csAVIFormat : public iStreamFormat
       colorsimportant = little_endian_long (colorsimportant);
     }
   };
+
   struct AudioStreamFormat
   {
     UShort formattag;

@@ -39,19 +39,24 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
 				   const csAVIFormat::AudioStreamFormat *pf, 
 				   UShort nStreamNumber,
 				   UByte *pInitData, ULong nInitDataLen,
-				   char *pName, iSystem *pTheSystem)
+				   char *pName, 
+				   UByte *pFormatEx, ULong nFormatEx, 
+				   iSystem *pTheSystem)
 {
 
   (void)ph;
   strdesc.type = CS_STREAMTYPE_AUDIO;
   memcpy (strdesc.codec, psh->handler, 4);
-  strdesc.codec[4] = '\0';
   strdesc.formattag = pf->formattag;
   strdesc.channels = pf->channels;
   strdesc.samplespersecond = pf->samplespersecond;
   strdesc.bitspersample = pf->bitspersample;
   strdesc.duration = psh->length / psh->scale;
   strdesc.name = pName;
+
+  int i;
+  for (i=3; i>=0 && strdesc.codec[i] == ' '; i--);
+  strdesc.codec[i+1] = '\0';
 
   delete pChunk;
   pChunk = new csAVIFormat::AVIDataChunk;
@@ -66,7 +71,7 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
 
   bTimeSynced = false;
   // load the CODEC
-  return LoadCodec (pInitData, nInitDataLen);
+  return LoadCodec (pInitData, nInitDataLen, pFormatEx, nFormatEx);
 }
 
 csAVIStreamAudio::~csAVIStreamAudio ()
@@ -118,7 +123,8 @@ void csAVIStreamAudio::NextFrame ()
   */
 }
 
-bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen)
+bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen, 
+				  UByte *pFormatEx, ULong nFormatEx)
 {
   // based on the codec id we try to load the apropriate codec
   iSCF *pSCF = QUERY_INTERFACE (pSystem, iSCF);
@@ -126,14 +132,14 @@ bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen)
   {
     // create a classname from the coec id
     char cn[128];
-    sprintf (cn, "crystalspace.audio.codec.%s", strdesc.codec);
+    sprintf (cn, "crystalspace.audio.codec.avi.%s", strdesc.codec);
     // try open this class
-    pCodec = (iCodec*)pSCF->scfCreateInstance (cn, "iCodec", 0);
+    pCodec = (iAVICodec*)pSCF->scfCreateInstance (cn, "iAVICodec", 0);
     pSCF->DecRef ();
     if (pCodec)
     {
       // codec exists, now try to initialize it
-      if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen))
+      if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen, pFormatEx, nFormatEx))
 	return true;
       else
       {

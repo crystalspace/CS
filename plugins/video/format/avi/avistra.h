@@ -21,6 +21,7 @@
 
 #include "ivideo/ividecod.h"
 #include "csavi.h"
+#include "iavicdec.h"
 
 class csAVIStreamAudio : public iAudioStream
 {
@@ -32,9 +33,9 @@ class csAVIStreamAudio : public iAudioStream
   csAudioStreamDescription strdesc;
 
   iSystem *pSystem;
-  iCodec *pCodec;
+  iAVICodec *pCodec;
 
-  bool LoadCodec (UByte *pInitData, ULong nInitDataLen);
+  bool LoadCodec (UByte *pInitData, ULong nInitDataLen, UByte *pFormatEx, ULong nFormatEx);
 
  public:
   DECLARE_IBASE;
@@ -45,7 +46,9 @@ class csAVIStreamAudio : public iAudioStream
 		   const csAVIFormat::AudioStreamFormat *pf, 
 		   UShort nStreamNumber,
 		   UByte *pInitData, ULong nInitDataLen,
-		   char *pName, iSystem *pTheSystem);
+		   char *pName,
+		   UByte *pFormatEx, ULong nFormatEx, 
+		   iSystem *pTheSystem);
   virtual ~csAVIStreamAudio ();
 
   // iStream

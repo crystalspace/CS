@@ -27,6 +27,7 @@
 #include "ivideo/igraph3d.h"
 #include "ivideo/igraph2d.h"
 #include "csgfxldr/memimage.h"
+#include "iavicdec.h"
 
 class csAVIStreamVideo : public iVideoStream
 {
@@ -46,14 +47,15 @@ class csAVIStreamVideo : public iVideoStream
   iGraphics3D *pG3D;
   iGraphics2D *pG2D;
   iSystem *pSystem;
-  iCodec *pCodec;
+  iAVICodec *pCodec;
   csCodecDescription cdesc;
 
   void yuv_channel_2_rgba_interleave (char *data[3]);
   void rgb_channel_2_rgba_interleave (char *data[3]);
   void rgba_channel_2_rgba_interleave (char *data[4]);
+  void rgba_interleave (char *data);
 
-  bool LoadCodec (UByte *pInitData, ULong nInitDataLen);
+  bool LoadCodec (UByte *pInitData, ULong nInitDataLen, UByte *pFormatEx, ULong nFormatEx);
   void makeMaterial ();
   bool NextFrameGetData ();
   void PrepImageArea ();
@@ -67,7 +69,9 @@ class csAVIStreamVideo : public iVideoStream
 		   const csAVIFormat::VideoStreamFormat *pf, 
 		   UShort nStreamNumber,
 		   UByte *pInitData, ULong nInitDataLen,
-		   char *pName, iSystem *pTheSystem);
+		   char *pName, 
+		   UByte *pFormatEx, ULong nFormatEx, 
+		   iSystem *pTheSystem);
   virtual ~csAVIStreamVideo ();
 
   // iStream
