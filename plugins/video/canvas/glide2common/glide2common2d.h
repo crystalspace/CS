@@ -51,6 +51,10 @@ protected:
   /// flag to prevent 2D drawing
   static bool locked;	
 
+  // Decode and encode internal color representation to/from RGB scheme
+  void EncodeRGB ( UShort& color, UByte r, UByte g, UByte b );
+  void DecodeRGB ( UShort color, UByte& r, UByte& g, UByte& b );
+  
 public:
   DECLARE_IBASE;
 
