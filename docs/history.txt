@@ -1,5 +1,35 @@
 The history order is reversed so that new features are at the top.
 
+23-Jun-2002
+	- Added csIntersect3::BoxSphere() function which tests intersection
+	  between a box and a sphere.
+	- Extended iVisibilityCuller interface with two new VisTest()
+	  variants that take a bounding box and bounding sphere. These
+	  functions will mark all objects visible that intersect
+	  with those bounding objects.
+	- Implemented Dynavis version of these functions.
+	- Implemented octree version of these functions. This implementation
+	  is very naive though. It will not use the octree and instead
+	  just traverses all objects to test them with the bounding
+	  box or sphere.
+	- Changed iEngine->GetNearbyObjects() so that it will use the
+	  new VisTest(sphere) function if there is a visibility culler.
+	  That way GetNearbyObjects() will actually become a lot more
+	  useful and faster if a culler is used.
+	- Completely rewrote the object iterator in the engine. It was
+	  hard to understand and very buggy. The current one is a lot
+	  more robust. GetNearbyObjects() now uses this.
+	- Walktest collision detection now uses GetNearbyObjects() for
+	  a LOT faster moving around now. Especially in large levels that
+	  have lots of mesh objects.
+	- GetNearbyObjects() now correctly supports portals (it will
+	  check if the portal is in the given radius) and then
+	  traverse the portal if needed. This does not (yet) work
+	  for space warping portals though! This finally fixes the bug
+	  when you walk around in the flarge street and you sink through
+	  the floor :-)
+	- Removed the old csObjectIt class. csObjectListIt replaces it
+	  (used by the updated GetNearbyObjects() function).
 22-Jun-2002
 	- Fixed a small bug in the adding of operations to a tiled
 	  coverage buffer.

@@ -219,48 +219,43 @@ int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
   return c;
 }
 
-int CollisionDetect (csColliderWrapper *c, iSector* sp,
+int CollisionDetect (iEngine* Engine, csColliderWrapper *c, iSector* sp,
 	csReversibleTransform *cdt)
 {
   int hit = 0;
-  int i, j;
+  int j;
 
   // Check collision with this sector.
   csCollisionPair* CD_contact;
-#if 0
-  Sys->collide_system->ResetCollisionPairs ();
-  if (c->Collide (sp->QueryObject (), cdt)) hit++;
-  csCollisionPair* CD_contact = Sys->collide_system->GetCollisionPairs ();
 
-  for (i=0 ; i<Sys->collide_system->GetCollisionPairCount () ; i++)
-    our_cd_contact[num_our_cd++] = CD_contact[i];
-
-  if (Sys->collide_system->GetOneHitOnly () && hit)
-    return 1;
-#endif
-
-  // Check collision with the meshes in this sector.
-  iMeshList* ml = sp->GetMeshes ();
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  iObjectIterator* objit = Engine->GetNearbyObjects (sp,
+	cdt->GetOrigin (), 3);		// 3 should be enough for moving around.
+  while (!objit->IsFinished ())
   {
-    iMeshWrapper* tp = ml->Get (i);
-    Sys->collide_system->ResetCollisionPairs ();
-    if (c->Collide (tp->QueryObject (), cdt,
-    	&tp->GetMovable ()->GetTransform ())) hit++;
+    iObject* mw_obj = objit->GetObject ();
+    iMeshWrapper* mw = SCF_QUERY_INTERFACE (mw_obj, iMeshWrapper);
+    if (mw)
+    {
+      Sys->collide_system->ResetCollisionPairs ();
+      if (c->Collide (mw_obj, cdt,
+    	  &mw->GetMovable ()->GetTransform ())) hit++;
+      mw->DecRef ();
 
-    CD_contact = Sys->collide_system->GetCollisionPairs ();
-    for (j=0 ; j<Sys->collide_system->GetCollisionPairCount () ; j++)
-      our_cd_contact[num_our_cd++] = CD_contact[j];
+      CD_contact = Sys->collide_system->GetCollisionPairs ();
+      for (j=0 ; j<Sys->collide_system->GetCollisionPairCount () ; j++)
+        our_cd_contact[num_our_cd++] = CD_contact[j];
 
-    if (Sys->collide_system->GetOneHitOnly () && hit)
-      return 1;
-    // TODO, should test which one is the closest.
+      if (Sys->collide_system->GetOneHitOnly () && hit)
+        return 1;
+      // TODO, should test which one is the closest.
+    }
+    objit->Next ();
   }
 
   return hit;
 }
 
-void DoGravity (csVector3& pos, csVector3& vel)
+void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
 {
   pos=Sys->view->GetCamera ()->GetTransform ().GetOrigin ();
 
@@ -279,6 +274,8 @@ void DoGravity (csVector3& pos, csVector3& vel)
   // Check to see if there are any terrains, if so test against those.
   // This routine will automatically adjust the transform to the highest
   // terrain at this point.
+
+  // @@@@@@ This is not efficient if there are lots of objects in the level!!!
   int k;
   for ( k = 0; k < num_sectors ; k++)
   {
@@ -313,7 +310,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     Sys->collide_system->ResetCollisionPairs ();
 
     for ( ; num_sectors-- ; )
-      hits += CollisionDetect (Sys->body, n[num_sectors], &test);
+      hits += CollisionDetect (Engine, Sys->body, n[num_sectors], &test);
 
 #if 0
     if (num_our_cd > 0)
@@ -339,7 +336,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     test = csOrthoTransform (csMatrix3(), new_pos);
     int hit = 0;
     for (; num_sectors--;)
-      if (CollisionDetect (Sys->body, n[num_sectors], &test) > 0)
+      if (CollisionDetect (Engine, Sys->body, n[num_sectors], &test) > 0)
       {
 	new_pos-=vel;
 	break;
@@ -355,7 +352,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     Sys->collide_system->ResetCollisionPairs ();
 
     for ( ; num_sectors-- ; )
-      hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
+      hit += CollisionDetect (Engine, Sys->legs, n[num_sectors], &test);
 
     if (!hit)
     {

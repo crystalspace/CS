@@ -27,6 +27,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/obb.h"
 #include "csgeom/segment.h"
+#include "csgeom/sphere.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "csutil/flags.h"
@@ -831,6 +832,8 @@ end:
   return vis;
 }
 
+//======== VisTest =========================================================
+
 static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
 	uint32 cur_timestamp)
 {
@@ -971,6 +974,126 @@ bool csDynaVis::VisTest (iRenderView* rview)
   return true;
 }
 
+//======== VisTest box =====================================================
+
+struct VisTestBox_Front2BackData
+{
+  csBox3 box;
+};
+
+static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
+	uint32 cur_timestamp)
+{
+  VisTestBox_Front2BackData* data = (VisTestBox_Front2BackData*)userdata;
+
+  // In the first part of this test we are going to test if the
+  // box vector intersects with the node. If not then we don't
+  // need to continue.
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  if (!node_bbox.TestIntersect (data->box))
+  {
+    return false;
+  }
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+      	objects[i]->GetObject ();
+
+      // Test the bounding box of the object.
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      if (obj_bbox.TestIntersect (data->box))
+      {
+	visobj_wrap->visobj->MarkVisible ();
+      }
+    }
+  }
+
+  return true;
+}
+
+bool csDynaVis::VisTest (const csBox3& box)
+{
+  UpdateObjects ();
+  VisTestBox_Front2BackData data;
+  data.box = box;
+  kdtree->Front2Back (box.GetCenter (), VisTestBox_Front2Back, (void*)&data);
+  return true;
+}
+
+//======== VisTest sphere ==================================================
+
+struct VisTestSphere_Front2BackData
+{
+  csVector3 pos;
+  float sqradius;
+};
+
+static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
+	uint32 cur_timestamp)
+{
+  VisTestSphere_Front2BackData* data = (VisTestSphere_Front2BackData*)userdata;
+
+  // In the first part of this test we are going to test if the
+  // box vector intersects with the node. If not then we don't
+  // need to continue.
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  if (!csIntersect3::BoxSphere (node_bbox, data->pos, data->sqradius))
+  {
+    return false;
+  }
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+      	objects[i]->GetObject ();
+
+      // Test the bounding box of the object.
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      if (csIntersect3::BoxSphere (obj_bbox, data->pos, data->sqradius))
+      {
+	visobj_wrap->visobj->MarkVisible ();
+      }
+    }
+  }
+
+  return true;
+}
+
+bool csDynaVis::VisTest (const csSphere& sphere)
+{
+  UpdateObjects ();
+  VisTestSphere_Front2BackData data;
+  data.pos = sphere.GetCenter ();
+  data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
+  kdtree->Front2Back (data.pos, VisTestSphere_Front2Back, (void*)&data);
+  return true;
+}
+
+//======== IntersectSegment ================================================
+
 struct IntersectSegment_Front2BackData
 {
   csSegment3 seg;
@@ -1087,6 +1210,8 @@ iPolygon3D* csDynaVis::IntersectSegment (const csVector3& start,
 
   return data.polygon;
 }
+
+//======== Debugging =======================================================
 
 iString* csDynaVis::Debug_UnitTest ()
 {
@@ -1797,7 +1922,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	  "?",
 	  vispix, totpix,
 	  vispix != 0 && visobj_wrap->history->reason < VISIBLE
-	  	? "????!!!!" : "");
+	  	? "????" : "");
         if (iobj) iobj->DecRef ();
       }
     }

@@ -843,6 +843,12 @@ bool csIntersect3::BoxFrustum (const csBox3& box, csPlane3* f,
   return true;	// There is an intersection.
 }
 
+bool csIntersect3::BoxSphere (const csBox3& box, const csVector3& center,
+		  float sqradius)
+{
+  csBox3 b (box.Min ()-center, box.Max ()-center);
+  return (b.SquaredOriginDist () <= sqradius);
+}
 
 //-------------------------------------------------------------------------
 

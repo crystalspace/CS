@@ -33,8 +33,9 @@ struct iPolygonMesh;
 struct iObjectModel;
 class csVector3;
 class csBox3;
+class csSphere;
 
-SCF_VERSION (iVisibilityCuller, 0, 0, 5);
+SCF_VERSION (iVisibilityCuller, 0, 0, 6);
 
 /**
  * This interface represents a visibility culling system.
@@ -68,6 +69,18 @@ struct iVisibilityCuller : public iBase
    * be considered visible.
    */
   virtual bool VisTest (iRenderView* irview) = 0;
+
+  /**
+   * Mark all objects as visible that intersect with the given bounding
+   * box.
+   */
+  virtual bool VisTest (const csBox3& box) = 0;
+
+  /**
+   * Mark all objects as visible that intersect with the given bounding
+   * sphere.
+   */
+  virtual bool VisTest (const csSphere& sphere) = 0;
 
   /**
    * Intersect a beam using this culler and return the intersection

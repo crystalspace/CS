@@ -162,6 +162,9 @@ Bugs to fix:
 	     sorting such polygons from back to front in relation to other
 	     objects in the same sector.
 	     [Bug 409067]
+	[F]  Support space warping portals for GetNearbyObjects(), for
+	     PlaceMesh() and for lighting.
+	[F]  Support lights for GetNearbyObjects().
 
 API and Small Feature Additions:
 	[F]  Translate point on polygon to texture space/object space

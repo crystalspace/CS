@@ -41,6 +41,7 @@
 #include "csengine/radiosty.h"
 #include "csengine/region.h"
 #include "csgeom/fastsqrt.h"
+#include "csgeom/sphere.h"
 #include "csgeom/polypool.h"
 #include "csgfx/csimage.h"
 #include "csutil/util.h"
@@ -356,65 +357,25 @@ public:
 };
 
 /**
- * Iterator to iterate over objects in the engine.
- * This iterator assumes there are no fundamental changes
- * in the engine while it is being used.
- * If changes to the engine happen the results are unpredictable.
+ * Iterator to iterate over objects in the given list.
  */
-class csObjectIt :
-  public iObjectIterator
+class csObjectListIt : public iObjectIterator
 {
   friend class csEngine;
 private:
-  // The engine for this iterator.
-  csEngine *engine;
-
-  // The starting position and radius.
-  csSector *start_sector;
-  csVector3 start_pos;
-  float radius;
-
-  // Current position ('pos' can be warped so that's why it is here).
-  csSector *cur_sector;
-  csVector3 cur_pos;
-
-  // Current object.
-  iObject *cur_object;
-
-  // Current object for iterator.
-  iObject *it_cur_obj;
+  iObject** list;
+  int num_objects;
 
   // Current index.
   int cur_idx;
 
-  // Iterator over the sectors.
-  csSectorIt *sectors_it;
-
-  // Current object list to iterate over
-  enum
-  {
-    ITERATE_SECTORS,
-    ITERATE_STATLIGHTS,
-    ITERATE_DYNLIGHTS,
-    ITERATE_MESHES,
-    ITERATE_NONE
-  } CurrentList;
 private:
-  // Start looking for stuff.
-  void StartStatLights ();
-  void StartMeshes ();
-  void EndSearch ();
-
   /// Construct an iterator and initialize to start.
-  csObjectIt (
-    csEngine *,
-    csSector *sector,
-    const csVector3 &pos,
-    float radius);
-  iObject *Fetch ();
+  csObjectListIt (iObject** list, int num_objects);
+
 public:
   /// Destructor.
-  virtual ~csObjectIt ();
+  virtual ~csObjectListIt ();
 
   SCF_DECLARE_IBASE;
 
@@ -584,179 +545,46 @@ iSector *csSectorIt::Fetch ()
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csObjectIt)
+
+SCF_IMPLEMENT_IBASE(csObjectListIt)
   SCF_IMPLEMENTS_INTERFACE(iObjectIterator)
 SCF_IMPLEMENT_IBASE_END
 
-csObjectIt::csObjectIt (
-  csEngine *e,
-  csSector *sector,
-  const csVector3 &pos,
-  float radius)
+csObjectListIt::csObjectListIt (iObject** list, int num_objects)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  csObjectIt::engine = e;
-  csObjectIt::start_sector = sector;
-  csObjectIt::start_pos = pos;
-  csObjectIt::radius = radius;
-  sectors_it = new csSectorIt (sector, pos, radius);
-
+  csObjectListIt::list = list;
+  csObjectListIt::num_objects = num_objects;
   Reset ();
 }
 
-csObjectIt::~csObjectIt ()
+csObjectListIt::~csObjectListIt ()
 {
-  delete sectors_it;
+  delete[] list;
 }
 
-void csObjectIt::Reset ()
+void csObjectListIt::Reset ()
 {
-  CurrentList = ITERATE_DYNLIGHTS;
-  cur_object = engine->GetFirstDynLight ();
-  sectors_it->Restart ();
-  it_cur_obj = NULL;
-}
-
-void csObjectIt::StartStatLights ()
-{
-  CurrentList = ITERATE_STATLIGHTS;
   cur_idx = 0;
 }
 
-void csObjectIt::StartMeshes ()
+bool csObjectListIt::Next ()
 {
-  CurrentList = ITERATE_MESHES;
-  cur_idx = 0;
+  cur_idx++;
+  return cur_idx < num_objects;
 }
 
-void csObjectIt::EndSearch ()
+iObject *csObjectListIt::GetObject () const
 {
-  CurrentList = ITERATE_NONE;
-}
-
-bool csObjectIt::Next ()
-{
-  it_cur_obj = Fetch ();
-  return it_cur_obj != NULL;
-}
-
-iObject *csObjectIt::GetObject () const
-{
-  return it_cur_obj;
-}
-
-bool csObjectIt::IsFinished () const
-{
-  return it_cur_obj != NULL;
-}
-
-iObject *csObjectIt::Fetch ()
-{
-  if (CurrentList == ITERATE_NONE) return NULL;
-
-  // Handle csDynLight.
-  if (CurrentList == ITERATE_DYNLIGHTS)
-  {
-    if (cur_object == NULL)
-      CurrentList = ITERATE_SECTORS;
-    else
-    {
-      do
-      {
-        iObject *rc = cur_object;
-        iDynLight *dl = SCF_QUERY_INTERFACE_FAST (rc, iDynLight);
-        if (!dl)
-          cur_object = NULL;
-        else
-        {
-          cur_object = dl->GetNext ()->QueryObject ();
-
-          float r = dl->QueryLight ()->GetRadius () + radius;
-          if (
-            csSquaredDist::PointPoint (
-                dl->QueryLight ()->GetCenter (),
-                cur_pos) <= r * r)
-          {
-            dl->DecRef ();
-            return rc;
-          }
-          else
-            dl->DecRef ();
-        }
-      } while (cur_object);
-      if (cur_object == NULL) CurrentList = ITERATE_SECTORS;
-    }
-  }
-
-  // Handle this sector first.
-  if (CurrentList == ITERATE_SECTORS)
-  {
-    iSector *s = sectors_it->Fetch ();
-    if (s)
-      cur_sector = s->GetPrivateObject ();
-    else
-      cur_sector = NULL;
-    if (!cur_sector)
-    {
-      EndSearch ();
-      return NULL;
-    }
-
-    cur_pos = sectors_it->GetLastPosition ();
-
-    StartStatLights ();
-    return cur_sector;
-  }
-
-  // Handle csLight.
-  if (CurrentList == ITERATE_STATLIGHTS)
-  {
-    if (cur_idx >= cur_sector->scfiSector.GetLights ()->GetCount ())
-      StartMeshes ();
-    else
-    {
-      iLightList *ll = cur_sector->scfiSector.GetLights ();
-      do
-      {
-        iObject *rc = ll->Get (cur_idx)->QueryObject ();
-        cur_idx++;
-
-        iStatLight *sl = SCF_QUERY_INTERFACE_FAST (rc, iStatLight);
-        if (sl)
-        {
-          float r = sl->QueryLight ()->GetRadius () + radius;
-          if (
-            csSquaredDist::PointPoint (
-                sl->QueryLight ()->GetCenter (),
-                cur_pos) <= r * r)
-          {
-            sl->DecRef ();
-            return rc;
-          }
-          else
-            sl->DecRef ();
-        }
-      } while (cur_idx < ll->GetCount ());
-      if (cur_idx >= ll->GetCount ()) StartMeshes ();
-    }
-  }
-
-  // Handle csMeshWrapper.
-  if (CurrentList == ITERATE_MESHES)
-  {
-    if (cur_idx >= cur_sector->GetMeshes ()->GetCount ())
-      CurrentList = ITERATE_SECTORS;
-    else
-    {
-      iObject *rc = cur_sector->GetMeshes ()->Get (cur_idx)->QueryObject ();
-      cur_idx++;
-      return rc;
-    }
-  }
+  if (cur_idx < num_objects)
+    return list[cur_idx];
   else
-    CurrentList = ITERATE_SECTORS;
+    return NULL;
+}
 
-  return NULL;
+bool csObjectListIt::IsFinished () const
+{
+  return cur_idx >= num_objects;
 }
 
 //---------------------------------------------------------------------------
@@ -2294,16 +2122,121 @@ iSectorIterator *csEngine::GetNearbySectors (
   return it;
 }
 
+static void AddObject (iObject**& list, int& num_objects, int& max_objects, iObject* obj)
+{
+  CS_ASSERT (num_objects <= max_objects);
+  if (num_objects >= max_objects)
+  {
+    if (max_objects == 0)
+      max_objects = 50;
+    else if (max_objects < 1000)
+      max_objects += max_objects;
+    else
+      max_objects += 1000;
+    iObject** new_list = new iObject*[max_objects];
+    if (num_objects > 0)
+    {
+      memcpy (new_list, list, sizeof (iObject*)*num_objects);
+    }
+    delete[] list;
+    list = new_list;
+  }
+  list[num_objects++] = obj;
+}
+
+void csEngine::GetNearbyObjectList (iSector* sector,
+    const csVector3& pos, float radius, iObject**& list, int& num_objects,
+    int& max_objects)
+{
+  iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+  if (!(culler && culler->VisTest (csSphere (pos, radius))))
+  {
+    // There was no culler or culler failed. In that case
+    // mark objects manually.
+    int i;
+    iMeshList* ml = sector->GetMeshes ();
+    for (i = 0 ; i < ml->GetCount () ; i++)
+    {
+      iMeshWrapper *imw = ml->Get (i);
+      csMeshWrapper* mw = imw->GetPrivateObject ();
+      //@@@ SHOULD USE BBOX HERE!!!
+      //@@@ NOT OPTIMAL!
+      mw->MarkVisible ();
+    }
+  }
+
+  int i;
+  //@@@@@@@@ TODO ALSO SUPPORT LIGHTS!
+  iMeshList* ml = sector->GetMeshes ();
+  for (i = 0 ; i < ml->GetCount () ; i++)
+  {
+    iMeshWrapper *imw = ml->Get (i);
+    csMeshWrapper* mw = imw->GetPrivateObject ();
+    if (mw->IsVisible ())
+    {
+      AddObject (list, num_objects, max_objects, imw->QueryObject ());
+      iThingState* st = SCF_QUERY_INTERFACE_FAST (imw->GetMeshObject (), iThingState);
+      if (st)
+      {
+	// Check if there are portals and if they are near the position.
+	int pc = st->GetPortalCount ();
+	int j;
+	for (j = 0 ; j < pc ; j++)
+	{
+	  iPolygon3D* pp = st->GetPortalPolygon (j);
+	  const csPlane3& wor_plane = pp->GetWorldPlane ();
+	  // Can we see the portal?
+	  if (wor_plane.Classify (pos) < -0.001)
+	  {
+	    csVector3 poly[100];	//@@@ HARDCODE
+	    int k;
+	    for (k = 0 ; k < pp->GetVertexCount () ; k++)
+	    {
+	      poly[k] = pp->GetVertexW (k);
+	    }
+	    float sqdist_portal = csSquaredDist::PointPoly (
+		  pos, poly, pp->GetVertexCount (),
+		  wor_plane);
+	    if (sqdist_portal <= radius * radius)
+	    {
+	      // Also handle objects in the destination sector unless
+	      // it is a warping sector.
+	      iPortal* portal = pp->GetPortal ();
+	      portal->CompleteSector (NULL);
+	      CS_ASSERT (portal != NULL);
+	      if (sector != portal->GetSector () && portal->GetSector ()
+			      && !portal->GetFlags ().Check (CS_PORTAL_WARP))
+	      {
+		GetNearbyObjectList (portal->GetSector (), pos, radius,
+				list, num_objects, max_objects);
+	      }
+	    }
+	  }
+	}
+	st->DecRef ();
+      }
+    }
+  }
+}
+
+iObject** csEngine::GetNearbyObjectList (iSector* sector,
+    const csVector3& pos, float radius, int& num_objects)
+{
+  iObject** list = NULL;
+  num_objects = 0;
+  int max_objects = 0;
+  GetNearbyObjectList (sector, pos, radius, list, num_objects, max_objects);
+  return list;
+}
+
 iObjectIterator *csEngine::GetNearbyObjects (
   iSector *sector,
   const csVector3 &pos,
   float radius)
 {
-  csObjectIt *it = new csObjectIt (
-      this,
-      sector->GetPrivateObject (),
-      pos,
-      radius);
+  int num_objects;
+  iObject** list = GetNearbyObjectList (sector, pos, radius, num_objects);
+  csObjectListIt *it = new csObjectListIt (list, num_objects);
   return it;
 }
 

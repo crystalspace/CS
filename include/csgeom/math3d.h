@@ -460,6 +460,13 @@ public:
    */
   static bool BoxFrustum (const csBox3& box, csPlane3* frustum,
   	uint32 inClipMask, uint32& outClipMask);
+
+  /**
+   * Test if a box intersects with a sphere. The intersection is not
+   * computed. The sphere is given with squared radius.
+   */
+  static bool BoxSphere (const csBox3& box, const csVector3& center,
+		  float sqradius);
 };
 
 /**

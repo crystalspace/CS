@@ -773,12 +773,12 @@ public:
   /// Unregister a visibility object with this culler.
   void UnregisterVisObject (iVisibilityObject* visobj);
 
-  /**
-   * Do the visibility test from a given viewpoint. This will first
-   * clear the visible flag on all registered objects and then it will
-   * mark all visible objects.
-   */
+  /// General VisTest.
   bool VisTest (iRenderView* irview);
+  /// Box VisTest.
+  bool VisTest (const csBox3& box);
+  /// Sphere VisTest.
+  bool VisTest (const csSphere& sphere);
 
   //----------------------------------------------------------------------
   // Shadow System
@@ -1178,6 +1178,14 @@ public:
     virtual bool VisTest (iRenderView* irview)
     {
       return scfParent->VisTest (irview);
+    }
+    virtual bool VisTest (const csBox3& box)
+    {
+      return scfParent->VisTest (box);
+    }
+    virtual bool VisTest (const csSphere& sphere)
+    {
+      return scfParent->VisTest (sphere);
     }
     virtual iPolygon3D* IntersectSegment (const csVector3& start,
       const csVector3& end, csVector3& isect, float* pr = NULL,

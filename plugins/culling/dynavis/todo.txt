@@ -38,3 +38,8 @@
   touch some bounding box or sphere. This can then be used to
   optimize collision detection.
 
+- Make a simpler version of Dynavis with only kdtree and frustum
+  checking. Then use this as the default culler if no other culler
+  is present. Then remove all 'if (culler)' from engine and
+  additionally remove all frustum culling from engine.
+

@@ -685,7 +685,7 @@ float csBox3::SquaredOriginDist () const
   if (minbox.z > 0)
     res += minbox.z * minbox.z;
   else if (maxbox.z < 0)
-    res += maxbox.z * maxbox.z;;
+    res += maxbox.z * maxbox.z;
   return res;
 }
 

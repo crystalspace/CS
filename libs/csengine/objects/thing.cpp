@@ -33,6 +33,8 @@
 #include "csengine/texture.h"
 #include "csengine/material.h"
 #include "csengine/meshobj.h"
+#include "csgeom/sphere.h"
+#include "csgeom/math3d.h"
 #include "csutil/csstring.h"
 #include "csutil/memfile.h"
 #include "csutil/hashmap.h"
@@ -3393,6 +3395,52 @@ bool csThing::VisTest (iRenderView *irview)
     UpdateTransformation (icam->GetTransform (), icam->GetCameraNumber ());
     return false;
   }
+}
+
+bool csThing::VisTest (const csBox3& box)
+{
+  if (!static_tree) return false;
+
+  // @@@ Very ugly implementation. Should at least try
+  // to use the octree!!!
+  int i;
+  for (i = 0; i < visobjects.Length (); i++)
+  {
+    csVisObjInfo *vinf = (csVisObjInfo *)visobjects[i];
+    iVisibilityObject *vo = vinf->visobj;
+    CheckVisUpdate (vinf);
+    csBox3 bbox;
+    vo->GetObjectModel ()->GetObjectBoundingBox (bbox, CS_BBOX_MAX);
+    if (bbox.TestIntersect (box))
+      vo->MarkVisible ();
+    else
+      vo->MarkInvisible ();
+  }
+  return true;
+}
+
+bool csThing::VisTest (const csSphere& sphere)
+{
+  if (!static_tree) return false;
+
+  // @@@ Very ugly implementation. Should at least try
+  // to use the octree!!!
+  csVector3 pos = sphere.GetCenter ();
+  float sqradius = sphere.GetRadius () * sphere.GetRadius ();
+  int i;
+  for (i = 0; i < visobjects.Length (); i++)
+  {
+    csVisObjInfo *vinf = (csVisObjInfo *)visobjects[i];
+    iVisibilityObject *vo = vinf->visobj;
+    CheckVisUpdate (vinf);
+    csBox3 bbox;
+    vo->GetObjectModel ()->GetObjectBoundingBox (bbox, CS_BBOX_MAX);
+    if (csIntersect3::BoxSphere (bbox, pos, sqradius))
+      vo->MarkVisible ();
+    else
+      vo->MarkInvisible ();
+  }
+  return true;
 }
 
 void csThing::RegisterShadowReceiver (iShadowReceiver *receiver)

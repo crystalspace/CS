@@ -1010,7 +1010,7 @@ void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks current_time)
 
   if (do_cd)
   {
-    extern void DoGravity (csVector3& pos, csVector3& vel);
+    extern void DoGravity (iEngine* engine, csVector3& pos, csVector3& vel);
     if (!player_spawned)
     {
       CreateColliders ();
@@ -1038,9 +1038,9 @@ void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks current_time)
 	// However, we need to do it once to make sure that we are standing
 	// on solid ground. So we first set 'check_once' to true to enable
 	// one more test.
-	if (check_once == false) { check_once = true; DoGravity (pos, vel); }
+	if (check_once == false) { check_once = true; DoGravity (Engine, pos, vel); }
       }
-      else { check_once = false; DoGravity (pos, vel); }
+      else { check_once = false; DoGravity (Engine, pos, vel); }
     }
   }
 }

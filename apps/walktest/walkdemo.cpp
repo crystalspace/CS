@@ -832,7 +832,7 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
 #define MAXSECTORSOCCUPIED  20
 
 extern int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa);
-extern int CollisionDetect (csColliderWrapper *c, iSector* sp,
+extern int CollisionDetect (iEngine* Engine, csColliderWrapper *c, iSector* sp,
 	csReversibleTransform* cdt);
 extern csCollisionPair our_cd_contact[1000];//=0;
 extern int num_our_cd;
@@ -863,7 +863,7 @@ void move_ghost (iMeshWrapper* spr)
   Sys->collide_system->SetOneHitOnly (false);
   int hits = 0;
   for ( ; num_sectors-- ; )
-    hits += CollisionDetect (col, n[num_sectors], &test);
+    hits += CollisionDetect (Sys->view->GetEngine (), col, n[num_sectors], &test);
 
   // Change our velocity according to the collisions.
   int j;
