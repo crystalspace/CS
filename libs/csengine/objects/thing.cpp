@@ -46,6 +46,7 @@ csThing::csThing () : csPolygonSet (), obj()
   merged = NULL;
   flags = 0;
   center_idx = -1;
+  ParentTemplate = NULL;
 }
 
 csThing::~csThing ()
@@ -538,6 +539,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
   //TODO should merge? take averages or something?
   curves_center = tpl->curves_center;
   curves_scale = tpl->curves_scale;
+  ParentTemplate = tpl;
 
   CHK (merge_vertices = new int [tpl->GetNumVertices ()+1]);
   for (i = 0 ; i < tpl->GetNumVertices () ; i++)

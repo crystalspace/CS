@@ -234,6 +234,10 @@ public:
   	float default_texlen = 1, CLights* default_lightx = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
+  // Pointer to the Thing Template which it derived from
+  csThingTemplate* ParentTemplate;
+
+
 
   CSOBJTYPE;
 };
