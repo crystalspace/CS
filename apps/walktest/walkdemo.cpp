@@ -114,6 +114,7 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
   Sys->view->GetEngine ()->meshes.Push (exp);
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().UpdateMove ();
+  exp->SetZBufMode(CS_ZBUF_TEST);
 
   iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
@@ -159,6 +160,7 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
   Sys->view->GetEngine ()->meshes.Push (exp);
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().UpdateMove ();
+  exp->SetZBufMode(CS_ZBUF_TEST);
 
   iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
@@ -203,6 +205,7 @@ void add_particles_fire (csSector* sector, char* matname, int num,
   Sys->view->GetEngine ()->meshes.Push (exp);
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().UpdateMove ();
+  exp->SetZBufMode(CS_ZBUF_TEST);
 
   iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
@@ -214,7 +217,7 @@ void add_particles_fire (csSector* sector, char* matname, int num,
   firestate->SetLighting (false);
   firestate->SetOrigin (origin);
   firestate->SetDirection (csVector3 (0, 1., 0));
-  firestate->SetSwirl (0.6);
+  firestate->SetSwirl (1.6);
   firestate->SetColorScale (0.2);
   partstate->DecRef ();
   firestate->DecRef ();
@@ -248,6 +251,7 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().SetPosition (origin);
   exp->GetMovable ().UpdateMove ();
+  exp->SetZBufMode(CS_ZBUF_TEST);
 
   iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
@@ -296,6 +300,7 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().SetPosition (center);
   exp->GetMovable ().UpdateMove ();
+  exp->SetZBufMode(CS_ZBUF_TEST);
 
   iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
@@ -349,6 +354,7 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().SetPosition (bottom);
   exp->GetMovable ().UpdateMove ();
+  exp->SetZBufMode(CS_ZBUF_TEST);
 
   iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
   partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
