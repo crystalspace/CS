@@ -17,32 +17,31 @@ resides in LaTeX format.
 
 @itemize @bullet
 @item
-Cameras and Matrices
-@item
-Warping
-@item
 Octree
 @item
 Texture Cache
 @item
 Texture Mapping
 @item
-Rendering Loop
-@item
 Lighting
 @item
 Defining a World
 @item
 Collision Detection
-@item
-Miscallenous notes requiring classification.  (Jorrit's @dfn{brain dump}.)
 @end itemize
 
 @menu
+* Cameras and Matrices::
+* Space Warping::
+* Rendering Loop::
 * Visibility Culling:: Visibility Culling In Detail
 * 3D Sprites::
+* Misc Notes:: Miscallenous notes requiring classification (Jorrit's Brain Dump)
 @end menu
 
+@imports{concepts,camera.txi}
+@imports{concepts,warping.txi}
+@imports{concepts,rdrloop.txi}
 @imports{concepts,viscull.txi}
 @imports{concepts,3dsprite.txi}
-
+@imports{concepts,miscnote.txi}
