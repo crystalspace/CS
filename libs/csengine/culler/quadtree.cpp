@@ -83,22 +83,18 @@ csQuadTree :: ~csQuadTree ()
 }
 
 
-void csQuadTree :: CallChildren(int (csQuadTree::*func)(
-    const csBox2& node_bbox, int node_depth, int node_state, int offset, 
-    int node_nr, void* data), 
+void csQuadTree :: CallChildren(quad_traverse_func* func, csQuadTree* pObj, 
   const csBox2& box, int depth, int offset, int node_nr, void *data)
 {
   int retval[4];
-  CallChildren(func, box, depth, offset, node_nr, data, retval);
+  pObj->CallChildren(func, pObj, box, depth, offset, node_nr, data, retval);
 }
 
-void csQuadTree :: CallChildren(int (csQuadTree::*func)(
-    const csBox2& node_bbox, int node_depth, int node_state, int offset, 
-    int node_nr, void* data), 
+void csQuadTree :: CallChildren(quad_traverse_func* func, csQuadTree* pObj,  
   const csBox2& box, int depth, int offset, int node_nr, 
   void *data, int retval[4])
 {
-  if(depth >= max_depth)
+  if(depth >= pObj->max_depth)
   {
     CsPrintf(MSG_INTERNAL_ERROR, "QuadTree: leaf trying to recurse.\n");
     return;
@@ -135,8 +131,8 @@ void csQuadTree :: CallChildren(int (csQuadTree::*func)(
         childbox.Set(center, box.Max()); break;
       default: CsPrintf(MSG_FATAL_ERROR, "QuadTree: Unknown child\n");
     }
-    childstate = GetNodeState(childoffset, childnr);
-    retval[childnr] = (this->*func)(childbox, depth+1, childstate, childoffset,
+    childstate = pObj->GetNodeState(childoffset, childnr);
+    retval[childnr] = func(pObj, childbox, depth+1, childstate, childoffset,
       childnr, data);
   }
 }
@@ -188,18 +184,18 @@ void csQuadTree :: MakeEmpty()
 }
 
 
-int csQuadTree :: mark_node_func (const csBox2& node_bbox,
+int csQuadTree :: mark_node_func (csQuadTree* pObj, const csBox2& node_bbox,
   int node_depth, int node_state, int offset, int node_nr, void* data)
 {
   (void)node_bbox;
   (void)node_depth;
   (void)node_state;
-  SetNodeState(offset, node_nr, (int)data);
+  pObj->SetNodeState(offset, node_nr, (int)data);
   return (int)data;
 }
 
 
-int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
+int csQuadTree :: insert_polygon_func (csQuadTree* pObj, const csBox2& node_bbox,
   int node_depth, int node_state, int offset, int node_nr, void* data)
 {
   struct poly_info& info = *(struct poly_info*)data;
@@ -228,10 +224,10 @@ int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
     BoxEntirelyInPolygon(info.verts, info.num_verts, node_bbox))
   {
     if(!info.test_only)
-      SetNodeState(offset, node_nr, CS_QUAD_FULL);
+      pObj->SetNodeState(offset, node_nr, CS_QUAD_FULL);
     /// mark children (if any) as unknown, since they should not be reached.
-    if(node_depth < max_depth)
-      CallChildren(&csQuadTree::mark_node_func, node_bbox, node_depth, 
+    if(node_depth < pObj->max_depth)
+      pObj->CallChildren(csQuadTree::mark_node_func, pObj, node_bbox, node_depth, 
         offset, node_nr, (void*)CS_QUAD_UNKNOWN);
     return CS_QUAD_CERTAINCHANGE;
   }
@@ -245,24 +241,24 @@ int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
   { 
     int old_node_state = node_state;
     // so it overlaps a bit.
-    if(node_state == CS_QUAD_EMPTY && node_depth < max_depth)
+    if(node_state == CS_QUAD_EMPTY && node_depth < pObj->max_depth)
     {
       // mark children as empty now, since they should be empty, and
       // can be reached now...
-      CallChildren(&csQuadTree::mark_node_func, node_bbox, node_depth, 
+      pObj->CallChildren(&csQuadTree::mark_node_func, pObj, node_bbox, node_depth, 
         offset, node_nr, (void*)CS_QUAD_EMPTY);
     }
     // this node is partially covered.
     if(!info.test_only)
-      SetNodeState(offset, node_nr, CS_QUAD_PARTIAL);
+      pObj->SetNodeState(offset, node_nr, CS_QUAD_PARTIAL);
     // if any children they can process the polygon too. And they determine
     // the return value.
-    if(node_depth < max_depth)
+    if(node_depth < pObj->max_depth)
     {
       int retval[4];
-      CallChildren(&csQuadTree::insert_polygon_func, node_bbox, node_depth, 
+      pObj->CallChildren(&csQuadTree::insert_polygon_func, pObj, node_bbox, node_depth, 
         offset, node_nr, data, retval);
-      return GetPolygonResult(retval);
+      return pObj->GetPolygonResult(retval);
     }
     /// no children, return value for change, either 
     /// EMPTY->PARTIAL (certain change) or 
@@ -297,7 +293,7 @@ int csQuadTree :: InsertPolygon (csVector2* verts, int num_verts,
   info.num_verts = num_verts;
   info.pol_bbox = &pol_bbox;
   info.test_only = false;
-  return insert_polygon_func(bbox, 1, root_state, -1, 0, (void*)&info);
+  return insert_polygon_func(this, bbox, 1, root_state, -1, 0, (void*)&info);
 }
 
 
@@ -309,7 +305,7 @@ int csQuadTree :: TestPolygon (csVector2* verts, int num_verts,
   info.num_verts = num_verts;
   info.pol_bbox = &pol_bbox;
   info.test_only = true;
-  return insert_polygon_func(bbox, 1, root_state, -1, 0, (void*)&info);
+  return insert_polygon_func(this, bbox, 1, root_state, -1, 0, (void*)&info);
 }
 
 
@@ -336,7 +332,7 @@ int csQuadTree :: GetTestPointResult(int retval[4])
 }
 
 
-int csQuadTree :: test_point_func (const csBox2& node_bbox,
+int csQuadTree :: test_point_func (csQuadTree* pObj, const csBox2& node_bbox,
   int node_depth, int node_state, int offset, int node_nr, void* data)
 {
   if(node_state == CS_QUAD_UNKNOWN)
@@ -346,19 +342,19 @@ int csQuadTree :: test_point_func (const csBox2& node_bbox,
   }
   if(!node_bbox.In(*(csVector2*)data))
     return CS_QUAD_UNKNOWN;
-  if(node_state != CS_QUAD_PARTIAL || node_depth == max_depth)
+  if(node_state != CS_QUAD_PARTIAL || node_depth == pObj->max_depth)
     return node_state;
   // for a partial covered node with children, call the children
   int retval[4];
-  CallChildren(&csQuadTree::test_point_func, node_bbox, node_depth, offset, 
+  CallChildren(&csQuadTree::test_point_func, pObj, node_bbox, node_depth, offset, 
     node_nr, data, retval);
-  return GetTestPointResult(retval);
+  return pObj->GetTestPointResult(retval);
 }
 
 
 int csQuadTree :: TestPoint (const csVector2& point)
 {
-  return test_point_func(bbox, 1, root_state, -1, 0, (void*)&point);
+  return test_point_func(this, bbox, 1, root_state, -1, 0, (void*)&point);
 }
 
 

@@ -51,6 +51,8 @@ class Dumper;
 #define CS_QUAD_POSSIBLECHANGE 1
 #define CS_QUAD_CERTAINCHANGE 2
 
+class csQuadTree;
+
 /**
  *  QuadTree
  */
@@ -77,7 +79,6 @@ private:
   /// convenience variable: how many bytes alloced in states
   int state_size;
 
-
   /** this function is used for traversing the quadtree.
    *  it will get the nodes bounding box, state, byte offset and node_nr,
    *  all these are this node's values.
@@ -86,8 +87,9 @@ private:
    *  node_depth==1 means you are the root, and so on,
    *  if the node_depth == max_depth you are a leaf.
    */
-  typedef int (csQuadTree::quad_traverse_func)(const csBox2& node_bbox, 
-    int node_depth, int node_state, int offset, int node_nr, void* data);
+  typedef int (csQuadTree::quad_traverse_func)(csQuadTree* pObj, 
+    const csBox2& node_bbox, int node_depth, int node_state, 
+    int offset, int node_nr, void* data);
 
   /** private functions to help dealing with quadtree
    *  call all four children. Of the node with it's state at offset and node_nr
@@ -98,18 +100,17 @@ private:
    *  also: the offset -1 denotes the root node is calling.
    *  func is of type quad_traverse_func.
    */
-  void CallChildren(int (csQuadTree::*func)(const csBox2& node_bbox,
-    int node_depth, int node_state, int offset, int node_nr, void* data), 
-    const csBox2& box, int depth, int offset, int node_nr, 
+  static void CallChildren(quad_traverse_func* func, 
+    csQuadTree* pObj, const csBox2& box, int depth, int offset, int node_nr, 
     void *data, int retval[4]);
 
   /** Convenience version, the retval argument is omitted, return values
    * are discarded.
    */
-  void CallChildren(int (csQuadTree::*func)(const csBox2& node_bbox,
-    int node_depth, int node_state, int offset, int node_nr, void* data), 
-    const csBox2& box, int depth, int offset, int node_nr, 
+  static void CallChildren(quad_traverse_func* func, 
+    csQuadTree* pObj, const csBox2& box, int depth, int offset, int node_nr, 
     void *data);
+
   /** Get the state of a node, in byte offset , nodenr given.
    *  offset -1 means root node.
    */
@@ -125,7 +126,7 @@ private:
    * returning the QUAD_FULL/PARTIAL/EMPTY if it hits.
    * returning QUAD_UNKOWN if the point is not in the node.
    */
-  quad_traverse_func test_point_func;
+  static quad_traverse_func test_point_func;
 
   /** gather result from retval for testpoint
    */
@@ -148,7 +149,7 @@ private:
    *  CS_QUAD_POSSIBLECHANGE if it probably changed, and 
    *  CS_QUAD_CERTAINCHANGE if it changed for certain.
    */
-  quad_traverse_func insert_polygon_func;
+  static quad_traverse_func insert_polygon_func;
 
   /** gather result from retval for insertpolygon_func
    *  NOCHANGE < POSSIBLECHANGE < CERTAINCHANGE
@@ -158,7 +159,7 @@ private:
   /** for a node, mark it by casting (void*)data to an int.
    *  that is the new state.
    */
-  quad_traverse_func mark_node_func;
+  static quad_traverse_func mark_node_func;
 
 
 public:
