@@ -70,8 +70,13 @@ public:
   csPlane incoming_plane;
   /// The outgoing plane (also of a portal).
   csPlane outgoing_plane;
-  /// If this is false then there is no incoming plane (the current sector has fog).
+  /// If this is false then there is no incoming plane (the current sector has fog and is not being drawn through a portal).
   bool has_incoming_plane;
+
+  /// If this is false there is no outgoing plane.  The 'outgoing plane distance'
+  /// is then calculated by straight distance to a vertex instead of
+  /// projecting throught the outgoing plane
+  bool has_outgoing_plane;
 
   /// The structure describing the fog.
   csFog* fog;

@@ -512,6 +512,7 @@ void csSector::Draw (csRenderView& rview)
       }
       else fog_info->has_incoming_plane = false;
       fog_info->fog = &GetFog ();
+      fog_info->has_outgoing_plane = true;
       rview.fog_info = fog_info;
       rview.added_fog_info = true;
     }
@@ -705,6 +706,9 @@ void csSector::Draw (csRenderView& rview)
     int spr_num;
     if (sprite_queue) spr_num = num_sprite_queue;
     else spr_num = sprites.Length ();
+
+    if (rview.added_fog_info)
+      rview.fog_info->has_outgoing_plane = false;
 
     for (i = 0 ; i < spr_num ; i++)
     {
