@@ -33,10 +33,10 @@ vpath %.cpp libs/cssnddrv/oss
 
 # The OSS sound driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  SNDOSS=$(OUTDLL)SoundDriverOSS$(DLL)
+  SNDOSS=$(OUTDLL)ossdrv$(DLL)
   DEP.OSS+=$(CSUTIL.LIB) $(CSSYS.LIB)
 else
-  SNDOSS=$(OUT)$(LIB_PREFIX)SoundDriverOSS.a
+  SNDOSS=$(OUT)$(LIB_PREFIX)ossdrv.a
   DEP.EXE+=$(SNDOSS)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDOSS
 endif

@@ -36,13 +36,19 @@
 #include "sysdef.h"
 #include "csutil/scf.h"
 #include "cssnddrv/oss/ossdrv.h"
+#include "iplugin.h"
 #include "isystem.h"
 #include "isndlstn.h"
 #include "isndsrc.h"
 
 IMPLEMENT_FACTORY(csSoundDriverOSS)
 
+EXPORT_CLASS_TABLE(ossdrv)
+    EXPORT_CLASS(csSoundDriverOSS, "crystalspace.sound.driver.oss", "OSS Sounddriver for Crystal Space")    
+EXPORT_CLASS_TABLE_END;
+
 IMPLEMENT_IBASE(csSoundDriverOSS)
+  IMPLEMENTS_INTERFACE(iPlugIn)
   IMPLEMENTS_INTERFACE(iSoundDriver)
 IMPLEMENT_IBASE_END;
 
