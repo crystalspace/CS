@@ -97,15 +97,15 @@ chronological order.
 	- Rhad commited a partial rework of the partedit tool.  Still a lot
 	  of UI work and cleanup to do.
 18-Oct-2003
-	- DeSigna:
-	  - Considerable cleanups to the csShaderExpression optimizer pass.
-	  - Added support for zero-arg and fixed arg operations to optimizer.
-	  - Added support for zero-arg ops to the compiler. Fixed arg ops
-	    require special handling in the compiler, not done yet.
-	  - Added various sanity checks in the optimizer.
-	  - Fixed a severe optimizer bug, where it didn't check if the reverse
-	    CDR was a cons cell, and tried to feed it through argument
-	    reduction as an atom.
+	- DeSigna made the following changes:
+	    - Considerable cleanups to the csShaderExpression optimizer pass.
+	    - Added support for zero-arg and fixed arg operations to optimizer.
+	    - Added support for zero-arg ops to the compiler.  Fixed arg ops
+	      require special handling in the compiler, not done yet.
+	    - Added various sanity checks in the optimizer.
+	    - Fixed a severe optimizer bug, where it didn't check if the
+	      reverse CDR was a cons cell, and tried to feed it through
+	      argument reduction as an atom.
 	- Jorrit fixed the python plugin to compile again. Unfortunatelly this
 	  was done by simply removing support for getting key event
 	  information. We need to fix cspace.i so we can get this
@@ -117,7 +117,7 @@ chronological order.
 	  Please use:
 		static int bla;
 	- res fixed a cut'n'paste error in the xwindow plugin.
-	- DeSigna:
+	- DeSigna made the following changes:
 	  - Added support for MAKE-VECTOR to csShaderExpression.
 	  - Fixed a bug in the compiler, which wouldn't generate opcodes
 	    for single argument ops if the arg wasn't an atom.
@@ -186,15 +186,15 @@ chronological order.
 	- Anders Stenberg made the buffer and texture activation in NR more
 	  efficient. Also made sure render mesh lists are sorted on material
 	  to minimize state switches.
-	- DeSigna:
-	  - fixed compilation error for VC6, the debug macro's use of
-	    variable arguments isn't valid
-	  - Macro now uses csPrintf (not a big issue, since it'll all be
-	    removed once the shaderexps are complete).
-	  - Fixed initializer problem in csShaderExpression::Parse(), MSVC6
-	    doesn't accept the constant initializer for an oper_arg struct.
-	  - Added some extra comments to csShaderExpression::eval_const() and
-	    csShaderExpression::compile_cons().
+	- DeSigna made the following changes:
+	    - Fixed compilation error for VC6, the debug macro's use of
+	      variable arguments isn't valid
+	    - Macro now uses csPrintf (not a big issue, since it'll all be
+	      removed once the shaderexps are complete).
+	    - Fixed initializer problem in csShaderExpression::Parse(), MSVC6
+	      doesn't accept the constant initializer for an oper_arg struct.
+	    - Added some extra comments to csShaderExpression::eval_const() and
+	      csShaderExpression::compile_cons().
 16-Oct-2003
 	- Jorrit fixed a big memory leak related to the engine sequence
 	  manager. There are actually three fixes to solve this bug:
@@ -2176,7 +2176,7 @@ chronological order.
 	      built.
 	    - Moved Unix-specific makefile goop out of general mk/cs.mak and
 	      into unix.mak where it belongs.
-	- DeSigna:
+	- DeSigna made the following changes:
           - Modified csGraphics2D::Initialize constructor used by
 	    csGraphics2D::CreateOffscreenCanvas(), as it did not correctly
 	    initialize the config accessor member. The font cache, loaded by
@@ -2658,13 +2658,12 @@ chronological order.
 	  (highest detail possible).
 	- Matze fixed csArray::Iterator. The code was always assuming default
 	  ElementHandler.
-	- DeSigna:
-	  - Fixed pgserver plugin to compile ok on Linux. There may
-	    still be library problems, depending on pgserver build config.
-	  - Fixed segfaulting problems at pgui plugin unloading (temp
-	    fix).
-	  - Patched in changes suggested by Dentoid to increase frame
-	    update speed.
+	- DeSigna made the following changes:
+	    - Fixed pgserver plugin to compile ok on Linux.  There may still be
+	      library problems, depending on pgserver build config.
+	    - Fixed segfaulting problems at pgui plugin unloading (temp fix).
+	    - Patched in changes suggested by Dentoid to increase frame update
+	      speed.
 	- res fixed the crash bug when using '-mode' cmdline parameter with
 	  GL canvases.
 12-Aug-2003
