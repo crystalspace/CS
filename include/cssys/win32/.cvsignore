@@ -10,10 +10,15 @@ lauxlib.h
 lua.h
 luadebug.h
 lualib.h
+mikmod.h
 png.h
 pngconf.h
 zconf.h
 zlib.h
+cal3d
 divx
+freetype
 lib3ds
+ogg
+vorbis
 
