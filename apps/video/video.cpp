@@ -188,16 +188,20 @@ bool Video::Initialize (int argc, const char* const argv[],
 
   // load the videoformat plugin
   iSCF *pSCF = QUERY_INTERFACE (this, iSCF);
+  Printf (MSG_INITIALIZATION, "Loading an iVideoFormat.\n");
   pVideoFormat = (iStreamFormat*)pSCF->scfCreateInstance ("crystalspace.video.format.avi", 
 							  "iStreamFormat", 0);
   pSCF->DecRef ();
+  Printf (MSG_INITIALIZATION, "initializing iVideoFormat.\n");
   if (pVideoFormat && pVideoFormat->Initialize (this))
   {
     iVFS *pVFS = QUERY_PLUGIN (this, iVFS);
     if (pVFS)
     {
-      iFile *pFile = pVFS->Open ("data/video.avi", VFS_FILE_READ);
+      Printf (MSG_INITIALIZATION, "Opening the video file.\n");
+      iFile *pFile = pVFS->Open ("/this/data/video.avi", VFS_FILE_READ);
       pVFS->DecRef ();
+      Printf (MSG_INITIALIZATION, "Scanning the video file.\n");
       if (pFile && pVideoFormat->Load (pFile))
       {
 	pFile->DecRef ();
@@ -206,12 +210,14 @@ bool Video::Initialize (int argc, const char* const argv[],
 	// look up an video stream
 	csStreamDescription desc;
 	iStream *pStream=NULL, *pS;
+	Printf (MSG_INITIALIZATION, "Looking for video stream.\n");
 	while (it->HasNext ())
 	{
 	   pS= it->GetNext ();
 	   pS->GetStreamDescription (desc);
 	   if (desc.type == CS_STREAMTYPE_VIDEO)
 	   {
+	     Printf (MSG_INITIALIZATION, "found video stream.\n");
 	     pStream = pS;
 	     break;
 	   }
@@ -240,9 +246,17 @@ bool Video::Initialize (int argc, const char* const argv[],
 	  //pVStream->SetRect (x, y, desc.width, desc.height);
 	  pVStream->SetRect (x, y, vw, vh);
  	}
+	else
+	  Printf (MSG_DEBUG_0, "No video stream found in video file.\n");
       }
+      else
+	Printf (MSG_DEBUG_0, "Could not load the video file.\n");
     }
+    else
+      Printf (MSG_DEBUG_0, "Could not query VFS plugin.\n");
   }
+  else
+    Printf (MSG_DEBUG_0, "Could not create or initialize an instance of crystalspace.video.format.avi.\n");
   // @@@ DEBUG: IF THIS IS REMOVED THE SPRITE CRASHES!
   engine->Prepare ();
 
