@@ -13,6 +13,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+1-Nov-1999
+	- Eric Sunshine eliminated some compiler warnings issued by
+	  VC++ 5.0.
 31-Oct-1999
 	- Eric Sunshine moved the Python detection code from unixconf.sh to
 	  haspythn.sh since it is needed by platforms which do not invoke
