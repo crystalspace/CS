@@ -3525,7 +3525,7 @@ echo $ECHO_N "checking for nasm extensions... $ECHO_C" >&6
 if test "${cs_cv_prog_nasm_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  echo "%xdefine TEST" >conftest.asm
+  echo "%xdefine TEST" > conftest.asm
 	if { (echo "$as_me:$LINENO: \$NASM -f elf conftest.asm -o conftest.\$OBJEXT 1>&2") >&5
   ($NASM -f elf conftest.asm -o conftest.$OBJEXT 1>&2) 2>&5
   ac_status=$?
@@ -12287,7 +12287,7 @@ fi
 	if test $with_libz != yes; then
   cs_check_lib_paths=$with_libz
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/zlib*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/zlib*"
 fi
 
 
@@ -12740,7 +12740,7 @@ fi
 	if test $with_libpng != yes; then
   cs_check_lib_paths=$with_libpng
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libpng*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libpng*"
 fi
 
 
@@ -13190,7 +13190,7 @@ fi
 	if test $with_libjpeg != yes; then
   cs_check_lib_paths=$with_libjpeg
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/*jpeg*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/*jpeg*"
 fi
 
 
@@ -13643,7 +13643,7 @@ fi
 	if test $with_libmng != yes; then
   cs_check_lib_paths=$with_libmng
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libmng*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libmng*"
 fi
 
 
@@ -14093,7 +14093,7 @@ fi
 	if test $with_libmikmod != yes; then
   cs_check_lib_paths=$with_libmikmod
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libmikmod*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libmikmod*"
 fi
 
 
@@ -14542,7 +14542,7 @@ fi
 	if test $with_libogg != yes; then
   cs_check_lib_paths=$with_libogg
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libogg*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libogg*"
 fi
 
 
@@ -14985,7 +14985,7 @@ fi
 	if test $with_libvorbis != yes; then
   cs_check_lib_paths=$with_libvorbis
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libvorbis.*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libvorbis.*"
 fi
 
 
@@ -15430,7 +15430,7 @@ fi
 	if test $with_libvorbisfile != yes; then
   cs_check_lib_paths=$with_libvorbisfile
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libvorbisfile*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libvorbisfile*"
 fi
 
 
@@ -15884,7 +15884,7 @@ fi
 	if test $with_libpgserver != yes; then
   cs_check_lib_paths=$with_libpgserver
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libpgserver*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libpgserver*"
 fi
 
 
@@ -16336,7 +16336,7 @@ fi
 	if test $with_lib3ds != yes; then
   cs_check_lib_paths=$with_lib3ds
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/lib3ds*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/lib3ds*"
 fi
 
 
@@ -17074,7 +17074,7 @@ fi
 	if test $with_libode != yes; then
   cs_check_lib_paths=$with_libode
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libode*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libode*"
 fi
 
 
@@ -17788,8 +17788,7 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check for libopenal.  In addition to the standard installed locations, we
-# also search CS/libs/libopenal*.
+# Check for libopenal.
 #------------------------------------------------------------------------------
 # CS_AL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
 

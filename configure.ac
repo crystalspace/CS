@@ -256,7 +256,7 @@ AS_VAR_SET_IF([cs_cv_shell_mkdir_p],
 AC_CHECK_PROGS([NASM], [nasm])
 AS_IF([test -n "$NASM"],
     [AC_CACHE_CHECK([for nasm extensions], [cs_cv_prog_nasm_ok],
-	[echo "%xdefine TEST" >conftest.asm
+	[echo "%xdefine TEST" > conftest.asm
 	AS_IF([AC_RUN_LOG(
 	    [$NASM -f elf conftest.asm -o conftest.$OBJEXT 1>&2])],
 	    [cs_cv_prog_nasm_ok=yes], [cs_cv_prog_nasm_ok=no])
@@ -973,7 +973,7 @@ CS_CHECK_BUILD([for DirectDraw], [cs_cv_libddraw],
 # search CS/libs/zlib*.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([z], [AC_LANG_PROGRAM([#include <zlib.h>], [zlibVersion()])],
-    [libs/zlib*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libz], [ZLIB])])
+    [$srcdir/libs/zlib*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libz], [ZLIB])])
 
 
 
@@ -990,7 +990,7 @@ AS_IF([test "$cs_cv_libz" = yes],
     CS_CHECK_LIB_WITH([png],
 	[AC_LANG_PROGRAM([#include <png.h>],
 	    [png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0)])],
-	[libs/libpng*], [],
+	[$srcdir/libs/libpng*], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libpng], [PNG])], [],
 	[$cs_cv_libz_cflags $cs_cv_libm_cflags],
 	[$cs_cv_libz_lflags $cs_cv_libm_lflags],
@@ -1008,7 +1008,7 @@ CS_CHECK_LIB_WITH([jpeg],
 	#include <stdio.h>
 	#include <jpeglib.h>],
 	[jpeg_create_compress(0)])],
-    [libs/*jpeg*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjpeg], [JPEG])])
+    [$srcdir/libs/*jpeg*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjpeg], [JPEG])])
 
 
 
@@ -1019,7 +1019,7 @@ CS_CHECK_LIB_WITH([jpeg],
 AS_IF([test "$cs_cv_libz" = yes && test "$cs_cv_libjpeg" = yes],
     [CS_CHECK_LIB_WITH([mng],
 	[AC_LANG_PROGRAM([#include <libmng.h>], [mng_version_release()])],
-	[libs/libmng*], [],
+	[$srcdir/libs/libmng*], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libmng], [MNG])], [],
 	[$cs_cv_libjpeg_cflags $cs_cv_libz_cflags],
 	[$cs_cv_libjpeg_lflags $cs_cv_libz_lflags],
@@ -1035,7 +1035,7 @@ CS_CHECK_LIB_WITH([mikmod],
     [AC_LANG_PROGRAM(
 	[#include <mikmod.h>],
 	[MikMod_Init("mikmodtest"); MikMod_Exit();])],
-    [libs/libmikmod*], [],
+    [$srcdir/libs/libmikmod*], [],
     [CS_EMIT_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])])
 
 
@@ -1049,14 +1049,14 @@ CS_CHECK_LIB_WITH([ogg],
     [AC_LANG_PROGRAM(
 	[#include <ogg/ogg.h>],
 	[ogg_sync_state state; ogg_sync_init(&state);])],
-    [libs/libogg*], [],
+    [$srcdir/libs/libogg*], [],
     [CS_EMIT_BUILD_RESULT([cs_cv_libogg], [OGG])])
 
 AS_IF([test "$cs_cv_libogg" = yes],
     [CS_CHECK_LIB_WITH([vorbis],
 	[AC_LANG_PROGRAM([#include <vorbis/codec.h>],
 	  [vorbis_info info; vorbis_info_init(&info);])],
-	[libs/libvorbis.*], [],
+	[$srcdir/libs/libvorbis.*], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libvorbis], [VORBIS])], [],
 	[$cs_cv_libogg_cflags],
 	[$cs_cv_libogg_lflags],
@@ -1069,7 +1069,7 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 	   #include <stdio.h>],
 	  [ OggVorbis_File file;
 	    ov_test(stdin, &file, "", 0); ])],
-	[libs/libvorbisfile*], [],
+	[$srcdir/libs/libvorbisfile*], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libvorbisfile], [VORBISFILE])], [],
 	[$cs_cv_libogg_cflags $cs_cv_libvorbis_cflags],
 	[$cs_cv_libogg_lflags $cs_cv_libvorbis_lflags],
@@ -1083,7 +1083,7 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([pgserver],
   [AC_LANG_PROGRAM([#include <pgserver/g_error.h>], [g_error e;])],
-  [libs/libpgserver*], [],
+  [$srcdir/libs/libpgserver*], [],
   [CS_EMIT_BUILD_RESULT([cs_cv_libpgserver], [PGSERVER])])
 
 
@@ -1099,7 +1099,7 @@ CS_CHECK_LIB3DS_PREPARE
 
 CS_CHECK_LIB_WITH([3ds],
     [AC_LANG_PROGRAM([#include <lib3ds/file.h>],[lib3ds_file_new();])],
-    [libs/lib3ds*], [], [], [], [], [], [$cs_cv_libm_libs])
+    [$srcdir/libs/lib3ds*], [], [], [], [], [], [$cs_cv_libm_libs])
 
 AS_IF([test $cs_cv_lib3ds = yes],
     [CS_CHECK_BUILD([if lib3ds is sufficiently recent], [cs_cv_lib3ds_recent],
@@ -1116,7 +1116,7 @@ AS_IF([test $cs_cv_lib3ds = yes],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([ode],
     [AC_LANG_PROGRAM([#include <ode/ode.h>], [dWorldCreate()])],
-    [libs/libode*], [C++])
+    [$srcdir/libs/libode*], [C++])
 
 AS_IF([test $cs_cv_libode = yes],
     [CS_CHECK_BUILD([if libode is sufficiently recent], [cs_cv_libode_recent],
@@ -1131,8 +1131,7 @@ AS_IF([test $cs_cv_libode = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for libopenal.  In addition to the standard installed locations, we
-# also search CS/libs/libopenal*.
+# Check for libopenal.
 #------------------------------------------------------------------------------
 # CS_AL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
 AC_DEFUN([CS_AL_INCLUDE],

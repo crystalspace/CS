@@ -11,6 +11,10 @@ The history order is reversed so that new features are at the top.
 	  presence of the Linux joystick API.  The test is based upon a code
 	  fragment provided by Norman Kraemer.  This test obsoletes the
 	  --enable-linux-joystick switch.
+	- Eric Sunshine fixed configure.ac so that zlib, libpng, libjpeg, etc.
+	  can be found when they reside in CS/libs (rather than an official
+	  install location) even when building outside of the source directory
+	  (i.e. building CS from CD-ROM, or cross-compiling, etc.).
 6-May-2003
 	- Eric Sunshine made the following changes:
 	    - Fixed Linux joystick makefile so that makefile target and
