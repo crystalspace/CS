@@ -38,9 +38,9 @@ csLibraryHandle csLoadLibrary (const char* iName)
   strcpy (binName, iName);
   
   if ((nameLen >= 7) && 
-    (strcasecmp (binName + nameLen - 7, ".csplugin") == 0))
+    (strcasecmp (binName + nameLen - 9, ".csplugin") == 0))
   {
-    strcpy (binName + nameLen - 7, ".so");
+    strcpy (binName + nameLen - 9, ".so");
   }
   else if ((nameLen >= 3) && 
     (strcasecmp (binName + nameLen - 3, ".so") != 0))
