@@ -41,6 +41,8 @@ csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   screen_shot = 0;
   multiSamples = 0;
   multiFavorQuality = false;
+
+  ssPool = 0;
 }
 
 bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
@@ -80,6 +82,13 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
   
   delete statecache;
   delete[] screen_shot;
+
+  while (ssPool)
+  {
+    csGLScreenShot* next = ssPool->poolNext;
+    delete ssPool;
+    ssPool = next;
+  }
 }
 
 bool csGraphics2DGLCommon::Open ()
@@ -258,6 +267,34 @@ void csGraphics2DGLCommon::setGLColorfromint (int color)
   GLubyte r, g, b;
   DecomposeColor (color, r, g, b);
   glColor3ub (r, g, b);
+}
+
+csGLScreenShot* csGraphics2DGLCommon::GetScreenShot ()
+{
+  csGLScreenShot* res = 0;
+  if (ssPool)
+  {
+    res = ssPool;
+    ssPool = ssPool->poolNext;
+  }
+  else
+  {
+    res = new csGLScreenShot (this);
+  }
+  scfRefCount++;
+  return res;
+}
+
+void csGraphics2DGLCommon::RecycleScreenShot (csGLScreenShot* shot)
+{
+  shot->poolNext = ssPool;
+  ssPool = shot;
+  if (scfRefCount == 1)
+  {
+    delete this;
+    return;
+  }
+  scfRefCount--;
 }
 
 void csGraphics2DGLCommon::Clear (int color)
@@ -558,90 +595,15 @@ csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
 #endif*/
 
   // Need to resolve pixel alignment issues
-#ifdef GL_VERSION_1_2
-  int screen_width = Width * pfmt.PixelBytes;
-#else
-  int screen_width = Width * (pfmt.PixelBytes == 1? 1 : 4);
-#endif
+  int screen_width = Width * (4);
   if (!screen_shot) screen_shot = new uint8 [screen_width * Height];
   //if (!screen_shot) return 0;
 
-  // glPixelStore ()?
-  switch (pfmt.PixelBytes)
-  {
-    case 1:
-      glReadPixels (0, 0, Width, Height, GL_COLOR_INDEX,
-        GL_UNSIGNED_BYTE, screen_shot);
-      break;
-#ifdef GL_VERSION_1_2
-    case 2:
-      // experimental
-      glReadPixels (0, 0, Width, Height, GL_RGB,
-        GL_UNSIGNED_SHORT_5_6_5, screen_shot);
-      break;
-#endif
-    default:
-      glReadPixels (0, 0, Width, Height, GL_RGBA,
-        GL_UNSIGNED_BYTE, screen_shot);
-      break;
-  }
+  glReadPixels (0, 0, Width, Height, GL_RGBA,
+    GL_UNSIGNED_BYTE, screen_shot);
 
-// Pixel format is read as RGBA (in a byte array) but as soon as we
-// cast it to a 32 bit integer we have to deal with endianess, so convert
-// to big endian and convert RGBA to ARGB
-// On ABGR machines, we also need to swap B/R bytes
-#ifdef GL_VERSION_1_2
-  if (pfmt.PixelBytes == 4)
-#else
-  if (pfmt.PixelBytes > 1)
-#endif
-  {
-    uint32* s = (uint32*)screen_shot;
-    int i;
-    for (i = 0 ; i < Width*Height ; i++)
-    {
-        *s = big_endian_long(*s);
-#if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
-        *s = ((*s & 0x000000FF) << 24) | ((*s & 0x0000FF00) << 8) |
-                ((*s & 0x00FF0000) >> 8) | ((*s & 0xFF000000) >> 24);
-#else 
-        *s = ((*s & 0xFF) << 24) | ((*s & 0xFFFFFF00) >> 8);
-#endif
-  s++;
-    }
-  }
-
-#ifndef GL_VERSION_1_2
-  /* kludge: the data is already captured in the right format
-    (RGBA). However, pfmt may contain the correct 16-bit
-    masks and shift which csScreenShot will use to convert the
-    data and thus totally garble it. 
-   */
-  csPixelFormat oldpfmt;
-  memcpy (&oldpfmt, &pfmt, sizeof(csPixelFormat));
-
-#if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
-    pfmt.RedMask = 0x000000FF;
-    pfmt.GreenMask = 0x0000FF00;
-    pfmt.BlueMask = 0x00FF0000;
-#else 
-    pfmt.RedMask = 0x00FF0000;
-    pfmt.GreenMask = 0x0000FF00;
-    pfmt.BlueMask = 0x000000FF;
-#endif
-  pfmt.PixelBytes = 4;
-  pfmt.PalEntries = 0;
-  pfmt.complete ();
-#endif
-
-  csScreenShot *ss = new csScreenShot (this);
-
-#ifndef GL_VERSION_1_2
-  memcpy (&pfmt, &oldpfmt, sizeof(csPixelFormat));
-#endif
-
-  //delete [] screen_shot;
-  //screen_shot = 0;
+  csGLScreenShot* ss = GetScreenShot ();
+  ss->SetData (screen_shot);
 
   return ss;
 }

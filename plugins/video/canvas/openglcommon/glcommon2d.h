@@ -25,6 +25,7 @@
 #include "iutil/event.h"
 #include "video/canvas/openglcommon/glstates.h"
 #include "video/canvas/openglcommon/glextmanager.h"
+#include "glss.h"
 
 class OpenGLTextureCache;
 class GLFontCache;
@@ -42,6 +43,8 @@ class GLFontCache;
  */
 class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
 {
+  friend class csGLScreenShot;
+
   /// hold the CS fonts in an OpenGL-friendly format
   GLFontCache *FontCache;
 
@@ -56,6 +59,11 @@ class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
   void setGLColorfromint (int color);
 
   uint8 *screen_shot;
+
+  csGLScreenShot* ssPool;
+
+  csGLScreenShot* GetScreenShot ();
+  void RecycleScreenShot (csGLScreenShot* shot);
 
 protected:
   /// Extension manager

@@ -78,6 +78,7 @@ NuppelWriter::NuppelWriter(int width, int height,
   compressBuffer = new unsigned char [width*height+(width*height)/2];
   yuvBuffer = new unsigned char [width*height+(width*height)/2];
   memset (yuvBuffer, 0, width*height+(width*height)/2);
+  rgbBuffer = NULL;//new uint8 [width * height * 3];
   lzoTmp = new unsigned char [LZO1X_MEM_COMPRESS];
   InitLookupTable();
 
@@ -106,16 +107,23 @@ NuppelWriter::~NuppelWriter() {
   delete[] lzoTmp;
   delete[] compressBuffer;
   delete[] yuvBuffer;
+  delete[] rgbBuffer;
 }
 
-void NuppelWriter::writeFrame(unsigned char *frameBuffer) {
+void NuppelWriter::writeFrame(unsigned char *frameBuffer, 
+			      csTicks& encodeTime, csTicks& writeTime) 
+{
   rtframeheader frameh;
   lzo_uint lzoSize;
   unsigned char *currentBuffer;
   unsigned int currentBufferSize;
 
+
+  writeTime = 0; encodeTime = 0;
+
   /* Do we need to write a keyframe? */
   if ((frameofgop % keyframeFreq) == 0) {
+    writeTime = csGetTicks();
     memset(&frameh, 'j', sizeof(frameh));
     frameh.frametype = 'R';
     frameh.comptype = 'T';
@@ -126,8 +134,10 @@ void NuppelWriter::writeFrame(unsigned char *frameBuffer) {
     frameh.comptype = 'V';
     frameh.timecode = frameNumber;
     outputCallback(&frameh, sizeof(frameh), callbackExtra);
+    writeTime = csGetTicks() - writeTime;
   }
   
+  encodeTime = csGetTicks();
   /* Set up a video frame with RTJpeg and LZO compression */
   memset(&frameh, 0, sizeof(frameh));
   frameh.frametype = 'V';
@@ -137,8 +147,32 @@ void NuppelWriter::writeFrame(unsigned char *frameBuffer) {
   if (rgb) {
     /* Nonstandard: uncompressed bottom-up RGB24 */
     frameh.comptype = 'R';
+#if 0
+    uint8 *rawRgb = frameBuffer;
+    int bufPitch = width * 3;
+    uint8 *destLine = rgbBuffer + (height - 1) * bufPitch;
+    
+    int x, y;
+    y = height;
+    while (y--)
+    {
+      x = width;
+      while (x--)
+      {
+	*destLine++ = *rawRgb++;
+	*destLine++ = *rawRgb++;
+	*destLine++ = *rawRgb++;
+	rawRgb++;
+      }
+      destLine -= bufPitch * 2;
+    }
+
+    currentBuffer = rgbBuffer;
+    currentBufferSize = bufferSize;
+#else
     currentBuffer = frameBuffer;
     currentBufferSize = bufferSize;
+#endif
   }
   else {
     /* Convert from RGB to YUV420. This routine has also
@@ -171,11 +205,16 @@ void NuppelWriter::writeFrame(unsigned char *frameBuffer) {
 	frameh.comptype = '3';
     }
   }
+  csTicks ticks = csGetTicks();
+  encodeTime = ticks - encodeTime;
+  writeTime = ticks - writeTime;
 
   /* Write the frame */
   frameh.packetlength = currentBufferSize;
   outputCallback(&frameh, sizeof(frameh), callbackExtra);
   outputCallback(currentBuffer, currentBufferSize, callbackExtra);
+
+  writeTime = csGetTicks() - writeTime;
 
   frameNumber++;
   frameofgop++;

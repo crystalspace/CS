@@ -3,6 +3,14 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+01-June-2003
+	- res made some minor optimizations to the movie recorder.
+	- res added output of some statistics when a movie finished recording.
+	- res improved the performance of GL screenshots. They now deal
+	  directly with the data returned from glReadPixels() and thus need
+	  less computations on the pixel data. They also come from a pool
+	  now, which reduces the number of new/delete calls when many 
+	  screenshots are requested (i.e. when recording a movie.)
 31-May-2003
 	- Oktal fixed an error in the Perl plugin that only appeared with
 	  certain versions of Perl, to do with their funny macros.
@@ -10,11 +18,11 @@ The history order is reversed so that new features are at the top.
 	  wasn't shown sometimes because of a badly initialized variable 
 	  (cmdshow).
 	- Keith Fulton fixed the OverrideAction problem, which was that if
-	  Action A was running, and OverrideAction B was called, then SetAction
-	  was again called with Action C while Action B was still active, when
-	  Action B ended, Action A would be restored instead of C.  Now,
-	  when SetAction(C) is called, the Override is cleared out, so only
-	  Action C will run until further notice.
+	  Action A was running, and OverrideAction B was called, then 
+	  SetAction was again called with Action C while Action B was still 
+	  active, when Action B ended, Action A would be restored instead of 
+	  C.  Now, when SetAction(C) is called, the Override is cleared out, 
+	  so only Action C will run until further notice.
 30-May-2003
 	- Philip Wyett added the CS copyright notice and moved the includes to
 	  the correct place in 'iddetect.h'.
@@ -29,8 +37,8 @@ The history order is reversed so that new features are at the top.
 	    response.
 	  - Modified joint interface to survive being attached to only one
 	    body, the other is attached to body 0 and static on the other end.
-	  - Allowed an arbitrary execute callback for use when a mesh or a bone
-	    is not attached to a body, but there is a callback handler.
+	  - Allowed an arbitrary execute callback for use when a mesh or a 
+	    bone is not attached to a body, but there is a callback handler.
 	- Duhprey made the following changes to physldr:
 	  - Fixed a few bugs in the parsing.
 	  - Added parse commands for the new features in odedynam.

@@ -64,29 +64,34 @@ int RGB2YUV420 (int x_dim, int y_dim,
     for (j=0;j < x_dim; j++){
       uint32 tu = 0, tv = 0;
       uint32 c;
+      int r, g, b;
       
       c = *rgb_line;
-      *y =  ( RGB2YUV_YR[R(c)]  +RGB2YUV_YG[G(c)]+RGB2YUV_YB[B(c)])>>16;
-      tu += (-RGB2YUV_UR[R(c)]  -RGB2YUV_UG[G(c)]+RGB2YUV_UBVR[B(c)]);
-      tv += ( RGB2YUV_UBVR[R(c)]-RGB2YUV_VG[G(c)]-RGB2YUV_VB[B(c)]);
+      r = R(c), g = G(c), b = B(c);
+      *y =  ( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
+      tu += ( RGB2YUV_UR[r]  +RGB2YUV_UG[g]+RGB2YUV_UBVR[b]);
+      tv += ( RGB2YUV_UBVR[r]+RGB2YUV_VG[g]+RGB2YUV_VB[b]);
 
       c = *(rgb_line + 1);
+      r = R(c), g = G(c), b = B(c);
       *(y + 1) = 
-	    ( RGB2YUV_YR[R(c)]  +RGB2YUV_YG[G(c)]+RGB2YUV_YB[B(c)])>>16;
-      tu += (-RGB2YUV_UR[R(c)]  -RGB2YUV_UG[G(c)]+RGB2YUV_UBVR[B(c)]);
-      tv += ( RGB2YUV_UBVR[R(c)]-RGB2YUV_VG[G(c)]-RGB2YUV_VB[B(c)]);
+	    ( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
+      tu += ( RGB2YUV_UR[r]  +RGB2YUV_UG[g]+RGB2YUV_UBVR[b]);
+      tv += ( RGB2YUV_UBVR[r]+RGB2YUV_VG[g]+RGB2YUV_VB[b]);
 
       c = *(rgb_line + pitch);
+      r = R(c), g = G(c), b = B(c);
       *(y + pitch) = 
-	    ( RGB2YUV_YR[R(c)]  +RGB2YUV_YG[G(c)]+RGB2YUV_YB[B(c)])>>16;
-      tu += (-RGB2YUV_UR[R(c)]  -RGB2YUV_UG[G(c)]+RGB2YUV_UBVR[B(c)]);
-      tv += ( RGB2YUV_UBVR[R(c)]-RGB2YUV_VG[G(c)]-RGB2YUV_VB[B(c)]);
+	    ( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
+      tu += ( RGB2YUV_UR[r]  +RGB2YUV_UG[g]+RGB2YUV_UBVR[b]);
+      tv += ( RGB2YUV_UBVR[r]+RGB2YUV_VG[g]+RGB2YUV_VB[b]);
 
       c = *(rgb_line + pitch + 1);
+      r = R(c), g = G(c), b = B(c);
       *(y + pitch + 1) = 
-	    ( RGB2YUV_YR[R(c)]  +RGB2YUV_YG[G(c)]+RGB2YUV_YB[B(c)])>>16;
-      tu += (-RGB2YUV_UR[R(c)]  -RGB2YUV_UG[G(c)]+RGB2YUV_UBVR[B(c)]);
-      tv += ( RGB2YUV_UBVR[R(c)]-RGB2YUV_VG[G(c)]-RGB2YUV_VB[B(c)]);
+	    ( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
+      tu += ( RGB2YUV_UR[r]  +RGB2YUV_UG[g]+RGB2YUV_UBVR[b]);
+      tv += ( RGB2YUV_UBVR[r]+RGB2YUV_VG[g]+RGB2YUV_VB[b]);
 
       *u++ = tu >> 18;
       *v++ = tv >> 18;
@@ -111,10 +116,10 @@ void InitLookupTable()
     RGB2YUV_YR[i] = (int) ((float)65.481 * (isl8));
     RGB2YUV_YG[i] = (int) ((float)128.553 * (isl8)) + 1048576;
     RGB2YUV_YB[i] = (int) ((float)24.966 * (isl8));
-    RGB2YUV_UR[i] = (int) ((float)37.797 * (isl8));
-    RGB2YUV_UG[i] = (int) ((float)74.203 * (isl8)) + 8388608;
-    RGB2YUV_VG[i] = (int) ((float)93.786 * (isl8)) + 8388608;
-    RGB2YUV_VB[i] = (int) ((float)18.214 * (isl8));
+    RGB2YUV_UR[i] = (int) ((float)-37.797 * (isl8));
+    RGB2YUV_UG[i] = (int) ((float)-74.203 * (isl8)) - 8388608;
+    RGB2YUV_VG[i] = (int) ((float)-93.786 * (isl8)) - 8388608;
+    RGB2YUV_VB[i] = (int) ((float)-18.214 * (isl8));
     RGB2YUV_UBVR[i] = (int) ((float)112 * (isl8));
   }
 }

@@ -70,6 +70,11 @@ private:
   /// How many ticks in our fake clocks have elapsed since last advance.
   csTicks fakeClockElapsed;
   bool paused;
+  // some statistic
+  int numFrames;
+  csTicks totalFrameEncodeTime, minFrameEncodeTime, maxFrameEncodeTime;
+  csTicks totalWriteToDiskTime, minWriteToDiskTime, maxWriteToDiskTime;
+  csTicks frameStartTime, totalFrameTime, minFrameTime, maxFrameTime;
 
   /// format of the movie filename (e.g. "/this/cryst%03d.nuv")
   char* captureFormat;

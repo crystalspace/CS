@@ -525,7 +525,7 @@ bool csGraphics2DOpenGL::Open ()
 
   if (!m_hWnd)
     SystemFatalError ("Cannot create Crystal Space window", GetLastError());
-
+  
   // Subclass the window
   m_OldWndProc = (WNDPROC)SetWindowLong (m_hWnd, GWL_WNDPROC, (LONG) WindowProc);
   SetWindowLong (m_hWnd, GWL_USERDATA, (LONG)this);

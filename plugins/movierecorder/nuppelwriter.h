@@ -51,7 +51,7 @@ class NuppelWriter {
    * depending on the compression type selected, it may be reused as a
    * temporary buffer during compression.
    */
-  void writeFrame(unsigned char *frameBuffer);
+  void writeFrame(unsigned char *frameBuffer, csTicks& encodeTime, csTicks& writeTime);
 
   /* Expected size of the framebuffer */
   unsigned long bufferSize;
@@ -62,7 +62,7 @@ class NuppelWriter {
  private:
   outputCallback_t outputCallback;
   void *callbackExtra;
-  unsigned char *compressBuffer, *yuvBuffer;
+  unsigned char *compressBuffer, *yuvBuffer, *rgbBuffer;
   unsigned char *lzoTmp;
   int keyframeFreq;
   int frameofgop;

@@ -308,6 +308,8 @@ bool csMovieRecorder::EatKey (iEvent& event)
 bool csMovieRecorder::HandleStartFrame (iEvent& /*event*/)
 {
   SetupPlugin();
+  // don't use VC here - we need 'real' ticks.
+  frameStartTime = csGetTicks();
   return false;
 }
 
@@ -315,6 +317,9 @@ bool csMovieRecorder::HandleEndFrame (iEvent& /*event*/)
 {
   if (IsRecording() && !IsPaused()) {
     csRef<iImage> img (csPtr<iImage> (G2D->ScreenShot ()));
+
+    csTicks ticks = csGetTicks();
+    csTicks thisFrameTime = ticks - frameStartTime;
 
     if (!img) {
       Report (CS_REPORTER_SEVERITY_ERROR, "This video driver doesn't support screen capture.");
@@ -333,8 +338,23 @@ bool csMovieRecorder::HandleEndFrame (iEvent& /*event*/)
       }
     }
 
+    numFrames++;
+
+    csTicks encodeTime, writeTime;
     unsigned char *buffer = (unsigned char *) img->GetImageData();
-    writer->writeFrame(buffer);
+    writer->writeFrame(buffer, encodeTime, writeTime);
+
+    totalFrameTime += thisFrameTime;
+    minFrameTime = MIN (minFrameTime, thisFrameTime);
+    maxFrameTime = MAX (maxFrameTime, thisFrameTime);
+
+    totalFrameEncodeTime += encodeTime;
+    minFrameEncodeTime = MIN (minFrameEncodeTime, encodeTime);
+    maxFrameEncodeTime = MAX (maxFrameEncodeTime, encodeTime);
+
+    totalWriteToDiskTime += writeTime;
+    minWriteToDiskTime = MIN (minWriteToDiskTime, writeTime);
+    maxWriteToDiskTime = MAX (maxWriteToDiskTime, writeTime);
   }
 
   return false;
@@ -375,9 +395,16 @@ void csMovieRecorder::Start(void)
   int w = recordWidth  ? recordWidth  : G2D->GetWidth();
   int h = recordHeight ? recordHeight : G2D->GetHeight();
 
+  numFrames = 0;
+  totalFrameEncodeTime = totalFrameTime = totalWriteToDiskTime = 0;
+  minFrameEncodeTime = minFrameTime = minWriteToDiskTime = (csTicks)-1;
+  maxFrameEncodeTime = maxFrameTime = maxWriteToDiskTime = 0;
+
   movieFile = VFS->Open(movieFileName, VFS_FILE_WRITE | VFS_FILE_UNCOMPRESSED);
   fakeTicksPerFrame = (1000 / frameRate);
   ffakeClockTicks = fakeClockTicks;
+
+  frameStartTime = csGetTicks();
 
   writer = new NuppelWriter(w, h, &WriterCallback, this, frameRate,
 			    rtjQuality, useRTJpeg, useLZO, useRGB);
@@ -392,6 +419,36 @@ void csMovieRecorder::Stop(void)
     writer = 0;
     movieFile = 0;
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder stopped - %s", movieFileName);
+
+    if (numFrames != 0)
+    {
+      float avgFrameEncodeTime = ((float)totalFrameEncodeTime / (float)numFrames);
+      float avgWriteToDiskTime = ((float)totalWriteToDiskTime / (float)numFrames);
+      float avgFrameTime = ((float)totalFrameTime / (float)numFrames);
+      
+      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	"Video recording statistics for %s:\n"
+	" Number of frames: %d\n"
+	" Time spent for:\n"
+	"  encoding image data - total: %.3fs, per frame: %d min/%g avg/%d max ms\n"
+	"  writing encoded data - total: %.3fs, per frame: %d min/%g avg/%d max ms\n"
+	"  drawing frame - total: %.3fs, per frame: %d min/%g avg/%d max ms\n"
+	"\n"
+	" Frame time in relation to real time: x%.4f\n"
+	" Theoretical video FPS recordable in real-time: %.2f\n",
+	movieFileName, 
+	numFrames,
+	((float)totalFrameEncodeTime / 1000.0f),
+	  minFrameEncodeTime, avgFrameEncodeTime, maxFrameEncodeTime,
+	((float)totalWriteToDiskTime / 1000.0f),
+	  minWriteToDiskTime, avgWriteToDiskTime, maxWriteToDiskTime,
+	((float)totalFrameTime / 1000.0f),
+	  minFrameTime, avgFrameTime, maxFrameTime,
+	((avgFrameEncodeTime + avgWriteToDiskTime + avgFrameTime) * 
+	  frameRate) / 1000.0f,
+	1000.0f / (avgFrameEncodeTime + avgWriteToDiskTime + avgFrameTime)
+      );
+    }
   }
 }
 
