@@ -45,7 +45,7 @@ public:
   collision_pair cd_contact[MAX_COL_PER_STO];
   int num_collisions;
 
-	ctCollidingContact contact;
+	ctCollidingContact *contact;
 
 	csRigidSpaceTimeObj( csSprite3D *psprt, ctRigidBody *prb );
 
