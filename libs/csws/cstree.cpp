@@ -1105,7 +1105,7 @@ csTreeCtrl::TreeCtrlNode *csTreeCtrl::TreeCtrlNode::Prev (TreeCtrlNode* before)
 
 bool BranchOpen (csTreeNode *node)
 {
-  return ((csTreeCtrl::TreeCtrlNode*)node)->open;
+  return ((csTreeCtrl::TreeCtrlNode*)node)->open || node->IsLeaf ();
 }
 
 bool TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess)
@@ -1113,7 +1113,7 @@ bool TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess)
   (void)param;
   (void)stopOnSuccess;
   csComponent *c = ((csTreeCtrl::TreeCtrlNode*)node)->item;
-  bool isSel = c->GetState (CSS_TREEITEM_SELECTED);
+  bool isSel = c && c->GetState (CSS_TREEITEM_SELECTED);
   if (param && isSel)
   {
     ((csVector*)param)->Push (c);
