@@ -3132,11 +3132,11 @@ sub GetIndexEntries
     {
       unless (exists $normal->{$keys})
       {
-        for $key (keys %{$index->{$prefix}})
-        {
+	for $key (keys %{$index->{$prefix}})
+	{
 	  $entries->{$key} = {%{$index->{$prefix}->{$key}}};
 	  $entries->{$key}->{html_key} = "<CODE>$entries->{$key}->{html_key}</CODE>";
-        }
+	}
       }
     }
   }
