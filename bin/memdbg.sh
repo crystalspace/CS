@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Usage: memdb.sh [debug-executable] {memdbg-options}
 #
@@ -44,7 +43,13 @@
 # Full throttle:	aslbLfdv
 #
 
-NM=/emx/bin/nm
+# See if we're using BASH
+if [ -z "$BASH" ]; then
+	echo "ERROR: This script is supposed to be run with GNU bash"
+	echo "If you stil want to try it, remove the check at the"
+	echo "beginning of the script"
+	exit
+fi
 
 # Find a tool along the PATH and type an error message if it is not found
 find ( )
