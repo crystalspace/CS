@@ -19,11 +19,6 @@
 #ifndef __CS_SPRCAL3D_H__
 #define __CS_SPRCAL3D_H__
 
-// This include looks horrible, but assumes that cal3d 
-// is set up in the usual way and shares the same parent
-// directory as CS.
-#include "cal3d/cal3d.h"
-
 #include "cssys/sysfunc.h"
 #include "csutil/cscolor.h"
 #include "csutil/parray.h"
@@ -54,12 +49,12 @@
 #include "ivideo/material.h"
 #include "qint.h"
 
+#include <cal3d/cal3d.h>
 
 struct iObjectRegistry;
 struct iEngine;
 
 #define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
-
 
 struct csCal3DAnimation
 {
