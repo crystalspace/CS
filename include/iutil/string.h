@@ -20,6 +20,7 @@
 #ifndef __IUTIL_STRING_H__
 #define __IUTIL_STRING_H__
 
+#include <stdarg.h>
 #include "csutil/scf.h"
 
 SCF_VERSION (iString, 0, 1, 0);
