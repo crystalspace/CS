@@ -723,25 +723,12 @@ public:
    */
   virtual iDynLight* GetFirstDynLight () const;
 
-  /**
-   * This routine returns all lights which might affect an object
-   * at some position according to the following flags:<br>
-   * <ul>
-   * <li>CS_NLIGHT_SHADOWS: detect shadows and don't return lights for
-   *     which the object is shadowed (not implemented yet).
-   * <li>CS_NLIGHT_STATIC: return static lights.
-   * <li>CS_NLIGHT_DYNAMIC: return dynamic lights.
-   * <li>CS_NLIGHT_NEARBYSECTORS: Also check lights in nearby sectors
-   *     (not implemented yet).
-   * </ul><br>
-   * It will only return as many lights as the size that you specified
-   * for the light array. The returned lights are not guaranteed to be sorted
-   * but they are guaranteed to be the specified number of lights closest to
-   * the given position.<br>
-   * This function returns the actual number of lights added to the 'lights'
-   * array.
-   */
+  /// Get all nearby lights.
   virtual int GetNearbyLights (iSector* sector, const csVector3& pos,
+  	uint32 flags, iLight** lights, int max_num_lights);
+
+  /// Get all nearby lights.
+  virtual int GetNearbyLights (iSector* sector, const csBox3& box,
   	uint32 flags, iLight** lights, int max_num_lights);
 
   /**

@@ -203,8 +203,11 @@ protected:
    */
   long render_priority;
 
+  /// Get the bounding box in object space but correct in hierarchy.
+  void GetFullBBox (csBox3& box);
+
   /// Update defered lighting.
-  void UpdateDeferedLighting (const csVector3& pos);
+  void UpdateDeferedLighting (const csBox3& box);
 
 private:
   /// Mesh object corresponding with this csMeshWrapper.

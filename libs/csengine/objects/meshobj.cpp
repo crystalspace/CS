@@ -193,7 +193,7 @@ void csMeshWrapper::SetRenderPriority (long rp)
 typedef csGrowingArray<iLight*> engine3d_LightWorkTable;
 CS_IMPLEMENT_STATIC_VAR (GetStaticLightWorkTable, engine3d_LightWorkTable,())
 
-void csMeshWrapper::UpdateDeferedLighting (const csVector3 &pos)
+void csMeshWrapper::UpdateDeferedLighting (const csBox3 &box)
 {
   static engine3d_LightWorkTable &light_worktable = *GetStaticLightWorkTable ();
   const iSectorList *movable_sectors = movable.GetSectors ();
@@ -205,7 +205,7 @@ void csMeshWrapper::UpdateDeferedLighting (const csVector3 &pos)
     iSector *sect = movable_sectors->Get (0);
     int num_lights = csEngine::current_iengine->GetNearbyLights (
         sect,
-        pos,
+        box,
         defered_lighting_flags,
         light_worktable.GetArray (),
         defered_num_lights);
@@ -321,6 +321,29 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
   return (wor_sq_dist > dist*dist);
 }
 
+void csMeshWrapper::GetFullBBox (csBox3& box)
+{
+  meshobj->GetObjectModel ()->GetObjectBoundingBox (box, CS_BBOX_MAX);
+  if (movable.GetParent ())
+  {
+    iMovable* mov = &movable.scfiMovable;
+    while (mov->GetParent ())
+    {
+      const csReversibleTransform& trans = mov->GetTransform ();
+      csBox3 b (trans.This2Other (box.GetCorner (0)));
+      b.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (1)));
+      b.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (2)));
+      b.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (3)));
+      b.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (4)));
+      b.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (5)));
+      b.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (6)));
+      b.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (7)));
+      box = b;
+      mov = mov->GetParent ();
+    }
+  }
+}
+
 void csMeshWrapper::DrawIntFull (iRenderView *rview)
 {
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
@@ -348,7 +371,9 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
       }
     }
 
-    UpdateDeferedLighting (movable.GetFullPosition ());
+    csBox3 bbox;
+    GetFullBBox (bbox);
+    UpdateDeferedLighting (bbox);
     meshobj->Draw (rview, &movable.scfiMovable, zbufMode);
   }
 

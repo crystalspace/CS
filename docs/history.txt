@@ -43,6 +43,13 @@ The history order is reversed so that new features are at the top.
 	- Fixed two cases (in engine and genmesh) where a comparison was done
 	  with the influence radius of a light (for new renderer) instead
 	  of with the squared radius. Avoid qsqrt or sqrt at all cost!
+	- Added new version of iEngine->GetNearbyLights() which accepts
+	  a box instead of a position.
+	- DeferUpdateLighting() now uses this new GetNearbyLights() function
+	  to have more accurate lighting. This especially improves things
+	  when you have big objects. In the past with the old GetNearbyLights()
+	  this would often give bad results because lights with a radius
+	  smaller then the object would not be registered.
 15-Apr-2003
 	- Fixed a bug in the thing plugin.  If the dynavis culler was already
 	  mentioned before all other objects in the sector then this could

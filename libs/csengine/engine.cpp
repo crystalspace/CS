@@ -2012,9 +2012,109 @@ int csEngine::GetNearbyLights (
       iLight *l = ll->Get (i);
       sqdist = csSquaredDist::PointPoint (pos, l->GetCenter ());
 #ifdef CS_USE_NEW_RENDERER
-        if (sqrt (sqdist) < l->GetInfluenceRadius ())
+      if (sqdist < l->GetInfluenceRadiusSq ())
 #else
-        if (sqdist < l->GetSquaredRadius ())
+      if (sqdist < l->GetSquaredRadius ())
+#endif
+      {
+        light_array->AddLight (l, sqdist);
+      }
+    }
+  }
+
+  if (light_array->num_lights <= max_num_lights)
+  {
+    // The number of lights that we found is smaller than what fits
+
+    // in the array given us by the user. So we just copy them all
+
+    // and don't need to sort.
+    for (i = 0; i < light_array->num_lights; i++)
+      lights[i] = light_array->GetLight (i);
+    return light_array->num_lights;
+  }
+  else
+  {
+    // We found more lights than we can put in the given array
+
+    // so we sort the lights and then return the nearest.
+    qsort (
+      light_array->array,
+      light_array->num_lights,
+      sizeof (LightAndDist),
+      compare_light);
+    for (i = 0; i < max_num_lights; i++)
+      lights[i] = light_array->GetLight (i);
+    return max_num_lights;
+  }
+}
+
+int csEngine::GetNearbyLights (
+  iSector *sector,
+  const csBox3 &box,
+  uint32 flags,
+  iLight **lights,
+  int max_num_lights)
+{
+  int i;
+  float sqdist;
+
+  // This is a static light array which is adapted to the
+  // right size everytime it is used. In the beginning it means
+  // that this array will grow a lot but finally it will
+  // stabilize to a maximum size (not big). The advantage of
+  // this approach is that we don't have a static array which can
+  // overflow. And we don't have to do allocation every time we
+  // come here. We register this memory to the 'cleanup' array
+  // in csEngine so that it will be freed later.
+  static csLightArray *light_array = NULL;
+  if (!light_array)
+  {
+    light_array = new csLightArray ();
+    csEngine::current_engine->cleanup.Push (light_array);
+    light_array->DecRef ();
+  }
+
+  light_array->Reset ();
+
+  // Add all dynamic lights to the array (if CS_NLIGHT_DYNAMIC is set).
+  if (flags & CS_NLIGHT_DYNAMIC)
+  {
+    csDynLight *dl = first_dyn_lights;
+    while (dl)
+    {
+      if (dl->GetSector () == sector->GetPrivateObject ())
+      {
+        csBox3 b (box.Min () - dl->GetCenter (), box.Max () - dl->GetCenter ());
+        sqdist = b.SquaredOriginDist ();
+#ifdef CS_USE_NEW_RENDERER
+        if (sqdist < dl->GetInfluenceRadiusSq ())
+#else
+        if (sqdist < dl->GetSquaredRadius ())
+#endif
+        {
+          csRef<iLight> il (SCF_QUERY_INTERFACE (dl, iLight));
+          light_array->AddLight (il, sqdist);
+        }
+      }
+
+      dl = dl->GetNext ();
+    }
+  }
+
+  // Add all static lights to the array (if CS_NLIGHT_STATIC is set).
+  if (flags & CS_NLIGHT_STATIC)
+  {
+    iLightList *ll = sector->GetLights ();
+    for (i = 0; i < ll->GetCount (); i++)
+    {
+      iLight *l = ll->Get (i);
+      csBox3 b (box.Min () - l->GetCenter (), box.Max () - l->GetCenter ());
+      sqdist = b.SquaredOriginDist ();
+#ifdef CS_USE_NEW_RENDERER
+      if (sqdist < l->GetInfluenceRadiusSq ())
+#else
+      if (sqdist < l->GetSquaredRadius ())
 #endif
       {
         light_array->AddLight (l, sqdist);
