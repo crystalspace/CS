@@ -21,7 +21,7 @@ What do I need to compile Crystal Space?
 @strong{A}: You need the source code, which you can obtain in a variety of
 ways.  @xref{Where to Get}.  You also need a compiler and development system
 for the platform which you are using.  Some of the supported compilers are
-@sc{gcc}, @sc{msvc}, Code Warrior, and Borland C++.
+@sc{gcc}, @sc{msvc} and Code Warrior.
 
 @item
 What do you I to run Crystal Space?
