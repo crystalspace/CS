@@ -120,7 +120,6 @@ endef
 define CACHE.BODY
   echo SUBMAKEFILES = >$(MAKEFILE_CACHE)
   $(foreach r,$(SUBMAKEFILES),$(CACHE.BODY.NAME))
-  echo >>$(MAKEFILE_CACHE)
   $(foreach r,$(SUBMAKEFILES),$(CACHE.BODY.CONTENT))
 endef
 
