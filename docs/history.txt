@@ -38,6 +38,8 @@ chronological order.
 	  in the makefile build system so that they no longer contain a
 	  trailing "-c".  This makes these variables more consistent with
 	  like-named variables in makefiles the world over.
+	- Eric Sunshine fixed copy/paste bug in cspython.mak where
+	  `cspythonclean' rule did not get defined if Swig was not detected.
 28-Feb-2004
 	- Philip Wyett removed reference to 'include/imesh/thing' dir from
 	  CS spec file.

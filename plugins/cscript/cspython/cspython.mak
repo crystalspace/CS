@@ -192,12 +192,12 @@ $(SWIG.CSPYTHON.CVS): $(SWIG.CSPYTHON)
 $(SWIG.CSPYTHON.PY.CVS): $(SWIG.CSPYTHON.PY)
 	-$(RM) $@
 	$(CP) $(SWIG.CSPYTHON.PY) $@
+endif
 
 cspythonclean: swigpythclean
 	-$(RMDIR) $(CSPYTHON) $(OBJ.CSPYTHON) \
 	$(OUTDLL)/$(notdir $(INF.CSPYTHON)) $(TRASH.CSPYTHON) python.cex \
 	$(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY) $(SWIG.CSPYTHON.OUTDIR)
-endif
 
 python.cex: $(SRCDIR)/plugins/cscript/cspython/python.cin
 	@echo Generate python cs-config extension...
