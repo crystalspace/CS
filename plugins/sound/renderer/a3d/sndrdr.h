@@ -48,7 +48,7 @@ public:
 	void SetVolume(float vol);
 	float GetVolume();
 	
-	void PlayEphemeral(csSoundData *snd);
+	void PlayEphemeral(csSoundData *snd, bool loop = false);
 	
 	iSoundListener *GetListener();
 	iSoundSource *CreateSource(csSoundData *snd);

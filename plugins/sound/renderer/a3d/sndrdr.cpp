@@ -175,12 +175,14 @@ float csSoundRenderA3D::GetVolume()
 	return vol;
 }
 
-void csSoundRenderA3D::PlayEphemeral(csSoundData *snd)
+void csSoundRenderA3D::PlayEphemeral(csSoundData *snd, bool loop)
 {
 	iSoundBuffer *played = CreateSoundBuffer(snd);
 	if(played)
 	{
-		played->Play(SoundBufferPlay_DestroyAtEnd);
+	//to loop or not, defaults to not
+	if (loop == true) played->Play(SoundBufferPlay_InLoop);
+	if (!loop) played->Play(SoundBufferPlay_DestroyAtEnd);
 	}
 }
 
