@@ -21,6 +21,8 @@
 #include "csgeom/octree.h"
 #include "csgeom/bsp.h"
 
+//---------------------------------------------------------------------------
+
 // We have a coordinate system around our node which is
 // divided into 27 regions. The center region at coordinate (1,1,1)
 // is the node itself. Every one of the 26 remaining regions
@@ -42,7 +44,7 @@ struct Outline
   int vertices[6];
 };
 /// Outline lookup table.
-static const Outline outlines[27] =
+static Outline outlines[27] =
 {
   { 6, { 3, 2, 6, 4, 5, 1 } },		// 0,0,0
   { 6, { 3, 2, 0, 4, 5, 1 } },		// 0,0,1
@@ -81,6 +83,7 @@ csOctreeNode::csOctreeNode ()
   for (i = 0 ; i < 8 ; i++)
     children[i] = NULL;
   minibsp = NULL;
+  minibsp_verts = NULL;
 }
 
 csOctreeNode::~csOctreeNode ()
@@ -91,6 +94,7 @@ csOctreeNode::~csOctreeNode ()
     CHK (delete children[i]);
   }
   CHK (delete minibsp);
+  CHK (delete [] minibsp_verts);
 }
 
 void csOctreeNode::RemoveDynamicPolygons ()
@@ -116,6 +120,21 @@ bool csOctreeNode::IsEmpty ()
     if (children[i] && !children[i]->IsEmpty ()) return false;
   if (minibsp) return false;
   return true;
+}
+
+void csOctreeNode::SetMiniBsp (csBspTree* mbsp)
+{
+  minibsp = mbsp;
+}
+
+void csOctreeNode::BuildVertexTables ()
+{
+  CHK (delete [] minibsp_verts);
+  if (minibsp)
+    minibsp_verts = minibsp->GetVertices (minibsp_numverts);
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+    if (children[i]) ((csOctreeNode*)children[i])->BuildVertexTables ();
 }
 
 //---------------------------------------------------------------------------
@@ -211,8 +230,8 @@ void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** npB,
   }
 }
 
-void csOctree::Build (csOctreeNode* node, const csVector3& bmin, const csVector3& bmax,
-	csPolygonInt** polygons, int num)
+void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
+	const csVector3& bmax, csPolygonInt** polygons, int num)
 {
   node->SetBox (bmin, bmax);
 
@@ -220,8 +239,8 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin, const csVector3
   {
     csBspTree* bsp;
     CHK (bsp = new csBspTree (pset, mode));
-    node->SetMiniBsp (bsp);
     bsp->Build (polygons, num);
+    node->SetMiniBsp (bsp);
     return;
   }
 
@@ -272,14 +291,15 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin, const csVector3
       else { new_bmin.y = bmin.y; new_bmax.y = center.y; }
       if (i & 1) { new_bmin.z = center.z; new_bmax.z = bmax.z; }
       else { new_bmin.z = bmin.z; new_bmax.z = center.z; }
-      Build ((csOctreeNode*)node->children[i], new_bmin, new_bmax, polys[i], idx[i]);
+      Build ((csOctreeNode*)node->children[i], new_bmin, new_bmax,
+      	polys[i], idx[i]);
     }
     CHK (delete [] polys[i]);
   }
 }
 
-void csOctree::BuildDynamic (csOctreeNode* node, const csVector3& bmin, const csVector3& bmax,
-	csPolygonInt** polygons, int num)
+void csOctree::BuildDynamic (csOctreeNode* node, const csVector3& bmin,
+	const csVector3& bmax, csPolygonInt** polygons, int num)
 {
 #if 0
   int i;
@@ -329,13 +349,15 @@ void csOctree::BuildDynamic (csOctreeNode* node, const csVector3& bmin, const cs
 #endif
 }
 
-void* csOctree::Back2Front (const csVector3& pos, csTreeVisitFunc* func, void* data,
+void* csOctree::Back2Front (const csVector3& pos,
+	csTreeVisitFunc* func, void* data,
 	csTreeCullFunc* cullfunc, void* culldata)
 {
   return Back2Front ((csOctreeNode*)root, pos, func, data, cullfunc, culldata);
 }
 
-void* csOctree::Front2Back (const csVector3& pos, csTreeVisitFunc* func, void* data,
+void* csOctree::Front2Back (const csVector3& pos,
+	csTreeVisitFunc* func, void* data,
 	csTreeCullFunc* cullfunc, void* culldata)
 {
   return Front2Back ((csOctreeNode*)root, pos, func, data, cullfunc, culldata);

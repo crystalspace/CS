@@ -167,7 +167,8 @@ int csPolygonSet::AddVertex (float x, float y, float z)
   }
   while (num_vertices >= max_vertices)
   {
-    max_vertices += 10;
+    if (max_vertices < 10000) max_vertices *= 2;
+    else max_vertices += 10000;
     CHK (csVector3* new_wor_verts = new csVector3 [max_vertices]);
     CHK (csVector3* new_obj_verts = new csVector3 [max_vertices]);
     memcpy (new_wor_verts, wor_verts, sizeof (csVector3)*num_vertices);
@@ -200,6 +201,113 @@ int csPolygonSet::AddVertexSmart (float x, float y, float z)
     }
   AddVertex (x, y, z);
   return num_vertices-1;
+}
+
+struct CompressVertex
+{
+  int orig_idx;
+  float x, y, z;
+  int new_idx;
+};
+
+int compare_vt (const void* p1, const void* p2)
+{
+  CompressVertex* sp1 = (CompressVertex*)p1;
+  CompressVertex* sp2 = (CompressVertex*)p2;
+  if (sp1->x < sp2->x) return -1;
+  else if (sp1->x > sp2->x) return 1;
+  if (sp1->y < sp2->y) return -1;
+  else if (sp1->y > sp2->y) return 1;
+  if (sp1->z < sp2->z) return -1;
+  else if (sp1->z > sp2->z) return 1;
+  return 0;
+}
+
+int compare_vt_orig (const void* p1, const void* p2)
+{
+  CompressVertex* sp1 = (CompressVertex*)p1;
+  CompressVertex* sp2 = (CompressVertex*)p2;
+  if (sp1->orig_idx < sp2->orig_idx) return -1;
+  else if (sp1->orig_idx > sp2->orig_idx) return 1;
+  return 0;
+}
+
+void csPolygonSet::CompressVertices ()
+{
+  CHK (CompressVertex* vt = new CompressVertex [num_vertices]);
+  int i, j;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    vt[i].orig_idx = i;
+    vt[i].x = ceil (obj_verts[i].x*1000000);
+    vt[i].y = ceil (obj_verts[i].y*1000000);
+    vt[i].z = ceil (obj_verts[i].z*1000000);
+  }
+
+  // First sort so that all (nearly) equal vertices are together.
+  qsort (vt, num_vertices, sizeof (CompressVertex), compare_vt);
+
+  // Count unique values and tag all doubles with the index of the unique one.
+  // new_idx in the vt table will be the index inside vt to the unique vector.
+  int count_unique = 1;
+  int last_unique = 0;
+  vt[0].new_idx = last_unique;
+  for (i = 1 ; i < num_vertices ; i++)
+  {
+    if (vt[i].x != vt[last_unique].x || vt[i].y != vt[last_unique].y ||
+    	vt[i].z != vt[last_unique].z)
+    {
+      last_unique = i;
+      count_unique++;
+    }
+    vt[i].new_idx = last_unique;
+  }
+
+  // Now allocate and fill new vertex tables.
+  // After this new_idx in the vt table will be the new index
+  // of the vector.
+  CHK (csVector3* new_obj = new csVector3 [count_unique]);
+  CHK (csVector3* new_wor = new csVector3 [count_unique]);
+  new_obj[0] = obj_verts[vt[0].orig_idx];
+  new_wor[0] = wor_verts[vt[0].orig_idx];
+  vt[0].new_idx = 0;
+  j = 1;
+  for (i = 1 ; i < num_vertices ; i++)
+  {
+    if (vt[i].new_idx == i)
+    {
+      new_obj[j] = obj_verts[vt[i].orig_idx];
+      new_wor[j] = wor_verts[vt[i].orig_idx];
+      vt[i].new_idx = j;
+      j++;
+    }
+    else
+      vt[i].new_idx = j-1;
+  }
+
+  // Now we sort the table back on orig_idx so that we have
+  // a mapping from the original indices to the new one (new_idx).
+  qsort (vt, num_vertices, sizeof (CompressVertex), compare_vt_orig);
+
+  // Replace the old vertex tables.
+  CHK (delete [] wor_verts);
+  CHK (delete [] obj_verts);
+  wor_verts = new_wor;
+  obj_verts = new_obj;
+  int old_num_vertices = num_vertices;
+  num_vertices = max_vertices = count_unique;
+
+  // Now we can remap the vertices in all polygons.
+  for (i = 0 ; i < num_polygon ; i++)
+  {
+    csPolygon3D* p = (csPolygon3D*)polygons[i];
+    csPolyIndexed& pi = p->GetVertices ();
+    int* idx = pi.GetVertexIndices ();
+    for (j = 0 ; j < pi.GetNumVertices () ; j++)
+      idx[j] = vt[idx[j]].new_idx;
+  }
+
+  CHK (delete [] vt);
 }
 
 csPolygon3D* csPolygonSet::GetPolygon (char* name)
@@ -588,14 +696,14 @@ void csPolygonSet::CreateBoundingBox ()
     else if (cv.z > maxz) maxz = cv.z;
   }
 
-  bbox->i7 = AddVertexSmart (minx, miny, minz);
-  bbox->i3 = AddVertexSmart (minx, miny, maxz);
-  bbox->i5 = AddVertexSmart (minx, maxy, minz);
-  bbox->i1 = AddVertexSmart (minx, maxy, maxz);
-  bbox->i8 = AddVertexSmart (maxx, miny, minz);
-  bbox->i4 = AddVertexSmart (maxx, miny, maxz);
-  bbox->i6 = AddVertexSmart (maxx, maxy, minz);
-  bbox->i2 = AddVertexSmart (maxx, maxy, maxz);
+  bbox->i7 = AddVertex (minx, miny, minz);
+  bbox->i3 = AddVertex (minx, miny, maxz);
+  bbox->i5 = AddVertex (minx, maxy, minz);
+  bbox->i1 = AddVertex (minx, maxy, maxz);
+  bbox->i8 = AddVertex (maxx, miny, minz);
+  bbox->i4 = AddVertex (maxx, miny, maxz);
+  bbox->i6 = AddVertex (maxx, maxy, minz);
+  bbox->i2 = AddVertex (maxx, maxy, maxz);
 }
 
 void csPolygonSet::GetBoundingBox (csVector3& min_bbox, csVector3& max_bbox)

@@ -519,16 +519,20 @@ public:
   int AddVertex (int v);
 
   /**
-   * Add a vertex in a smart way: check if the vertex
-   * already exists in the containing csPolygonSet. If so,
-   * return that index. Otherwise add the new vertex.
+   * Add a vertex to the polygon (and containing csPolygonSet).
+   * Note that it will not check if the vertex is already there.
+   * After adding all vertices/polygons you should call
+   * csPolygonSet::CompressVertices() to safe space and gain
+   * efficiency.
    */
   int AddVertex (const csVector3& v);
 
   /**
-   * Add a vertex in a smart way: check if the vertex
-   * already exists in the containing csPolygonSet. If so,
-   * return that index. Otherwise add the new vertex.
+   * Add a vertex to the polygon (and containing csPolygonSet).
+   * Note that it will not check if the vertex is already there.
+   * After adding all vertices/polygons you should call
+   * csPolygonSet::CompressVertices() to safe space and gain
+   * efficiency.
    */
   int AddVertex (float x, float y, float z);
 
@@ -617,6 +621,16 @@ public:
    * Get the vertices.
    */
   csPolyIndexed& GetVertices () { return vertices; }
+
+  /**
+   * Get number of vertices (required for csPolygonInt).
+   */
+  virtual int GetNumVertices () { return vertices.GetNumVertices (); }
+
+  /**
+   * Get vertex index table (required for csPolygonInt).
+   */
+  virtual int* GetVertexIndices () { return vertices.GetVertexIndices (); }
 
   /**
    * Set the warping transformation for the portal.
@@ -833,7 +847,7 @@ public:
   void CreateLightMaps (IGraphics3D* g3d);
 
   /// Return the pointer to the original polygon (before any BSP splits).
-  csPolygon3D* GetUnsplitPolygon () { return orig_poly; }
+  csPolygonInt* GetUnsplitPolygon () { return orig_poly; }
 
   /**
    * A dynamic light has changed (this can be either an

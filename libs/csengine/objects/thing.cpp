@@ -506,7 +506,7 @@ void csThing::Merge (csThing* other)
   int i, j;
   CHK (int *merge_vertices = new int [other->GetNumVertices ()+1]);
   for (i = 0 ; i < other->GetNumVertices () ; i++)
-    merge_vertices[i] = AddVertexSmart (other->Vwor (i));
+    merge_vertices[i] = AddVertex (other->Vwor (i));
 
   for (i = 0 ; i < other->GetNumPolygons () ; i++)
   {
@@ -543,7 +543,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     csVector3 v = tpl->Vtex (i);
     if (transform) v = *transform * v;
     if (shift) v += *shift;
-    merge_vertices[i] = AddVertexSmart (v);
+    merge_vertices[i] = AddVertex (v);
   }
 
   for (i = 0 ; i < tpl->GetNumPolygon () ; i++)

@@ -25,6 +25,7 @@ class csWorld;
 class csSector;
 class csPolygon3D;
 class csPolygonSet;
+class csPolyPlane;
 class csThing;
 
 /**
@@ -96,7 +97,7 @@ private:
   ///
   csPolygon3D* create_polygon (csSector* sector, csPolygonSet* thing,
   	const csVector3& p1, const csVector3& p2, const csVector3& p3,
-	int txt);
+	int txt, csPolyPlane* plane = NULL);
 
   ///
   void create_wall (csSector* sector, csPolygonSet* thing,

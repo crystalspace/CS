@@ -909,6 +909,7 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
   if (is_convex || thing->GetFog ().enabled) thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
   thing->SetTransform (obj);
   thing->Transform ();
+  thing->CompressVertices ();
 
   return thing;
 }
@@ -1012,8 +1013,9 @@ csThing* CSLoader::load_thing (char* name, csWorld* w, char* buf,
     fatal_exit (0, false);
   }
 
-  thing->SetTransform(obj);
+  thing->SetTransform (obj);
   thing->Transform ();
+  thing->CompressVertices ();
   if (is_convex || thing->GetFog ().enabled) thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
   if (info.use_bsp) thing->UseBSP ();
  
@@ -3107,6 +3109,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
     p->SetAlpha (portals[i].alpha);
   }
 
+  sector->CompressVertices ();
   if (do_bsp) sector->UseBSP ();
   if (do_stat_bsp) sector->UseStaticTree ();
 
@@ -3196,6 +3199,7 @@ csSector* CSLoader::load_sector (char* secname, csWorld* w, char* buf,
     fatal_exit (0, false);
   }
 
+  sector->CompressVertices ();
   if (info.use_bsp) sector->UseBSP ();
   if (do_stat_bsp) sector->UseStaticTree ();
   return sector;

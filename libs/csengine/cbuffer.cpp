@@ -326,7 +326,7 @@ bool csCBuffer::TestPolygon (csVector2* verts, int num_verts)
       // Compute the rounded screen coordinates of horizontal strip
       xL = QRound (sxL);
       xR = QRound (sxR);
-      if (TestSpan (xL, xR, sy)) return true;
+      if (TestSpan (xL, xR-1, sy)) return true;
 
       sxL += dxL;
       sxR += dxR;
@@ -481,7 +481,7 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
         if (InsertSpan (xR+1, endx, sy)) vis = true;
       }
       else
-        if (InsertSpan (xL, xR, sy)) vis = true;
+        if (InsertSpan (xL, xR-1, sy)) vis = true;
 
       // See if we need to update the full-line buffer.
       if (IsFull (sy))

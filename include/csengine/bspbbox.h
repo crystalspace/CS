@@ -68,6 +68,15 @@ public:
   /// Get the reference to the polygon.
   csPolyIndexed& GetPolygon () { return polygon; }
 
+  /// Get number of vertices.
+  virtual int GetNumVertices () { return polygon.GetNumVertices (); }
+
+  /// Get vertex index table (required for csPolygonInt).
+  virtual int* GetVertexIndices () { return polygon.GetVertexIndices (); }
+
+  /// Get original polygon (not known for this polygon type).
+  virtual csPolygonInt* GetUnsplitPolygon () { return NULL; }
+
   /// Set the plane for this polygon.
   void SetPolyPlane (const csPlane& pl) { plane = pl; }
 
@@ -137,7 +146,7 @@ public:
 
   /// Get vector array for this container.
   csVector3Array& GetVertices () { return vertices; }
-
+  
   /// Get camera vector array for this container.
   csVector3Array& GetCameraVertices () { return cam_vertices; }
 

@@ -198,7 +198,6 @@ public:
    */
   int draw_busy;
 
-
   /**
    * Tesselation parameter:
    * Center of thing to determine distance from
@@ -253,6 +252,9 @@ public:
    * Add a vertex but first check if there is already
    * a vertex close to the wanted position. In that case
    * don't add a new vertex but return the index of the old one.
+   * Note that this function is not very efficient. If you plan
+   * to add a lot of vertices you should just use AddVertex()
+   * and call CompressVertices() later.
    */
   int AddVertexSmart (const csVector3& v) { return AddVertexSmart (v.x, v.y, v.z); }
 
@@ -260,8 +262,23 @@ public:
    * Add a vertex but first check if there is already
    * a vertex close to the wanted position. In that case
    * don't add a new vertex but return the index of the old one.
+   * Note that this function is not very efficient. If you plan
+   * to add a lot of vertices you should just use AddVertex()
+   * and call CompressVertices() later.
    */
   int AddVertexSmart (float x, float y, float z);
+
+  /**
+   * Compress the vertex table so that all nearly identical vertices
+   * are compressed. The polygons in the set are automatically adapted.
+   * This function can be called at any time in the creation of the object
+   * and it can be called multiple time but it normally only makes sense
+   * to call this function after you have finished adding all polygons
+   * and all vertices.<p>
+   * Note that calling this function will make the camera vertex array
+   * invalid.
+   */
+  void CompressVertices ();
 
   /**
    * Return the world space vector for the vertex.
@@ -279,15 +296,6 @@ public:
    * possible that this coordinate will not be valid.
    */
   csVector3& Vcam (int idx) { return cam_verts[idx]; }
-
-  /**
-   * Make sure the camera vertices are up-to-date to the current camera frame.
-   */
-  void CamUpdate ()
-  {
-    cam_verts_set.CheckUpdate ();
-    cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
-  }
 
   /**
    * Return the number of vertices.
@@ -402,6 +410,34 @@ public:
   {
     cam_verts_set.Translate (wor_verts, num_vertices, trans);
     cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
+  }
+
+  /**
+   * Make transformation table ready but don't do the transform yet.
+   */
+  void UpdateTransformation ()
+  {
+    cam_verts_set.Update ();
+    cam_verts_set.GetVertexArray ()->SetNumVertices (num_vertices);
+    cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
+  }
+
+  /**
+   * Make sure the camera vertices are up-to-date to the current camera frame.
+   */
+  void CamUpdate ()
+  {
+    cam_verts_set.CheckUpdate ();
+    cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
+  }
+
+  /**
+   * Get the array of camera vertices.
+   */
+  csVector3* GetCameraVertices ()
+  {
+    CamUpdate ();
+    return cam_verts;
   }
 
   /**

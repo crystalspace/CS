@@ -86,6 +86,21 @@ private:
    */
   void RemoveDynamicPolygons ();
 
+  /**
+   * Count all vertices used by polygons in this bsp node
+   * and children. Vertices used multiple times will be counted
+   * multiple times as well. So really it counts all the corners
+   * of all polygons used in the bsp node.
+   */
+  int CountVertices ();
+
+  /**
+   * Fetch all vertex indices used by polygons in this bsp node
+   * and children. The given array must be at least CountVertices()
+   * big.
+   */
+  void FetchVertices (int* array, int& cur_idx);
+
 public:
   /// Return true if node is empty.
   bool IsEmpty ()
@@ -187,6 +202,13 @@ public:
   /// Return statistics about this bsp tree.
   void Statistics (int* num_nodes, int* num_leaves, int* max_depth,
   	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node);
+
+  /**
+   * Get a list of all vertices used by all the polygons in this
+   * bsp tree. This list should be deleted with 'delete[]' after use.
+   * The vertices are returned as indices into the parent object (pset).
+   */
+  int* GetVertices (int& count);
 };
 
 #endif /*BSP_H*/

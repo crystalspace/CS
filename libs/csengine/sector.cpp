@@ -172,7 +172,13 @@ void csSector::UseStaticTree (int mode, bool octree)
   {
     CHK (static_tree = new csBspTree (static_thing, mode));
   }
+  CsPrintf (MSG_INITIALIZATION, "Calculate bsp/octree...\n");
   static_tree->Build ();
+  CsPrintf (MSG_INITIALIZATION, "Compress vertices...\n");
+  static_thing->CompressVertices ();
+  CsPrintf (MSG_INITIALIZATION, "Build vertex tables...\n");
+  if (octree) { ((csOctree*)static_tree)->BuildVertexTables (); }
+  CsPrintf (MSG_INITIALIZATION, "DONE!\n");
 }
 
 csPolygon3D* csSector::HitBeam (csVector3& start, csVector3& end)
@@ -227,8 +233,8 @@ void csSector::CreateLightMaps (IGraphics3D* g3d)
   }
 }
 
-csPolygon3D* csSector::IntersectSegment (const csVector3& start, const csVector3& end,
-                                      csVector3& isect, float* pr)
+csPolygon3D* csSector::IntersectSegment (const csVector3& start,
+	const csVector3& end, csVector3& isect, float* pr)
 {
   csThing* sp = first_thing;
   while (sp)
@@ -241,8 +247,8 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start, const csVector3
   return csPolygonSet::IntersectSegment (start, end, isect, pr);
 }
 
-csSector* csSector::FollowSegment (csReversibleTransform& t, csVector3& new_position,
-                                bool& mirror)
+csSector* csSector::FollowSegment (csReversibleTransform& t,
+	csVector3& new_position, bool& mirror)
 {
   csVector3 isect;
   csPolygon3D* p = sector->IntersectSegment (t.GetOrigin (), new_position, isect);
@@ -261,7 +267,8 @@ csSector* csSector::FollowSegment (csReversibleTransform& t, csVector3& new_posi
 }
 
 
-csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius, float* pr)
+csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
+	float* pr)
 {
   float d, min_d = radius;
   int i;
@@ -363,43 +370,111 @@ int compare_z_thing (const void* p1, const void* p2)
   return 0;
 }
 
+static int count_cull_node_notvis_behind;
+static int count_cull_node_vis_cutzplane;
+static int count_cull_node_notvis_cbuffer;
+static int count_cull_node_vis;
+
+// @@@ This routine need to be cleaned up!!! It needs to
+// be part of the class.
+
 bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 	const csVector3& pos, void* data)
 {
   if (!node) return false;
   if (node->Type () != NODE_OCTREE) return true;
+  int i;
   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csRenderView* rview = (csRenderView*)data;
   csVector3 array[6];
+  static csPolygon2D persp;
   int num_array;
   otree->GetConvexOutline (onode, pos, array, num_array);
   if (num_array)
   {
-    csVector2 persp[6];
-    csVector3 cam;
-    float iz;
-    int i;
+    csVector3 cam[6];
     // If all vertices are behind z plane then the node is
     // not visible. If some vertices are behind z plane then we
-    // assume the node is visible in order to avoid having to
-    // clip the polygon.
+    // need to clip the polygon.
     int num_z_0 = 0;
     for (i = 0 ; i < num_array ; i++)
     {
-      cam = rview->Other2This (array[i]);
-      if (cam.z < SMALL_EPSILON) num_z_0++;
-      else
+      cam[i] = rview->Other2This (array[i]);
+      if (cam[i].z < SMALL_EPSILON) num_z_0++;
+    }
+    if (num_z_0 == num_array)
+    {
+      // Node behind camera.
+      count_cull_node_notvis_behind++;
+      return false;
+    }
+    persp.MakeEmpty ();
+    if (num_z_0 == 0)
+    {
+      // No vertices are behind. Just perspective correct.
+      for (i = 0 ; i < num_array ; i++)
+        persp.AddPerspective (cam[i]);
+    }
+    else
+    {
+      // Some vertices are behind. We need to clip.
+      csVector3 isect;
+      int i1 = num_array-1;
+      for (i = 0 ; i < num_array ; i++)
       {
-        iz = csCamera::aspect/cam.z;
-        persp[i].x = cam.x * iz + csWorld::shift_x;
-        persp[i].y = cam.y * iz + csWorld::shift_y;
+        if (cam[i].z < SMALL_EPSILON)
+	{
+	  if (cam[i1].z < SMALL_EPSILON)
+	  {
+	    // Just skip vertex.
+	  }
+	  else
+	  {
+	    // We need to intersect and add intersection point.
+	    csIntersect3::ZPlane (SMALL_EPSILON, cam[i], cam[i1], isect);
+	    persp.AddPerspective (isect);
+	  }
+	}
+	else
+	{
+	  if (cam[i1].z < SMALL_EPSILON)
+	  {
+	    // We need to intersect and add both intersection point and this point.
+	    csIntersect3::ZPlane (SMALL_EPSILON, cam[i], cam[i1], isect);
+	    persp.AddPerspective (isect);
+	  }
+	  // Just perspective correct and add to the 2D polygon.
+	  persp.AddPerspective (cam[i]);
+	}
+        i1 = i;
       }
     }
-    if (num_z_0 == num_array) return false;	// Node behind camera.
-    if (num_z_0 > 0) return true;		// Node visible.
-    if (!c_buffer->TestPolygon (persp, num_array)) return false;
+    if (!persp.ClipAgainst (rview->view)) return false;
+
+    // c-buffer test.
+    if (!c_buffer->TestPolygon (persp.GetVertices (), persp.GetNumVertices ()))
+    {
+      count_cull_node_notvis_cbuffer++;
+      return false;
+    }
+  }
+  count_cull_node_vis++;
+  // If a node is visible we check wether or not it has a minibsp.
+  // If it has a minibsp then we need to transform all vertices used
+  // by that minibsp to camera space.
+  csVector3* cam;
+  int* indices;
+  int num_indices;
+  if (onode->GetMiniBspVerts ())
+  {
+    csPolygonSet* pset = (csPolygonSet*)(otree->GetParent ());
+    cam = pset->GetCameraVertices ();
+    indices = onode->GetMiniBspVerts ();
+    num_indices = onode->GetMiniBspNumVerts ();
+    for (i = 0 ; i < num_indices ; i++)
+      cam[indices[i]] = rview->Other2This (pset->Vwor (indices[i]));
   }
   return true;
 }
@@ -474,9 +549,18 @@ void csSector::Draw (csRenderView& rview)
 
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()+
       	static_thing->GetNumPolygons ()));
-      static_thing->UpdateTransformation (rview);
+      static_thing->UpdateTransformation ();
+//count_cull_node_notvis_behind = 0;
+//count_cull_node_vis_cutzplane = 0;
+//count_cull_node_notvis_cbuffer = 0;
+//count_cull_node_vis = 0;
       static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
       	(void*)&rview, CullOctreeNode, (void*)&rview);
+//printf ("-(behind)=%d -(cbuffer)=%d +(cutzplane)=%d +(vis)=%d\n",
+//count_cull_node_notvis_behind,
+//count_cull_node_notvis_cbuffer,
+//count_cull_node_vis_cutzplane,
+//count_cull_node_vis);
 
       if (sprites.Length () > 0)
       {
@@ -757,7 +841,7 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*,
   for (i = 0 ; i < num ; i++)
   {
     p = (csPolygon3D*)polygon[i];
-    if (p->GetUnsplitPolygon ()) p = p->GetUnsplitPolygon ();
+    if (p->GetUnsplitPolygon ()) p = (csPolygon3D*)(p->GetUnsplitPolygon ());
     p->CamUpdate ();
     p->CalculateLighting (lview);
   }
@@ -812,14 +896,22 @@ csThing** csSector::GetVisibleThings (csLightView& lview, int& num_things)
 	{
 	  csVector3& v1 = lf->GetVertex (i);
 	  csVector3& v2 = lf->GetVertex (i1);
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i1)-center, v1, v2) < 0) continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i2)-center, v1, v2) < 0) continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i3)-center, v1, v2) < 0) continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i4)-center, v1, v2) < 0) continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i5)-center, v1, v2) < 0) continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i6)-center, v1, v2) < 0) continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i7)-center, v1, v2) < 0) continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i8)-center, v1, v2) < 0) continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i1)-center, v1, v2) < 0)
+	  	continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i2)-center, v1, v2) < 0)
+	  	continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i3)-center, v1, v2) < 0)
+	  	continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i4)-center, v1, v2) < 0)
+	  	continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i5)-center, v1, v2) < 0)
+	  	continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i6)-center, v1, v2) < 0)
+	  	continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i7)-center, v1, v2) < 0)
+	  	continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i8)-center, v1, v2) < 0)
+	  	continue;
 	  // Here we have a case of all vertices of the bbox being on the
 	  // outside of the same plane.
 	  vis = false;

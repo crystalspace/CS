@@ -146,6 +146,22 @@ public:
    * you can recognize them.
    */
   virtual int GetType () = 0;
+
+  /**
+   * Get number of vertices for this polygon.
+   */
+  virtual int GetNumVertices () = 0;
+
+  /**
+   * Get pointer to array of vertex indices.
+   */
+  virtual int* GetVertexIndices () = 0;
+
+  /**
+   * If known and if there is any, return the pointer to
+   * the original unsplit polygon.
+   */
+  virtual csPolygonInt* GetUnsplitPolygon () = 0;
 };
 
 #endif /*POLYINT_H*/

@@ -77,6 +77,8 @@ void HugeRoom::create_wall (csSector* sector, csPolygonSet* thing,
 	const csVector3& p4, int hor_res, int ver_res, int txt)
 {
   int i, j;
+  csPolygon3D* p;
+  csPolyPlane* plane = NULL;
   for (i = 0 ; i < hor_res ; i++)
     for (j = 0 ; j < ver_res ; j++)
     {
@@ -88,14 +90,15 @@ void HugeRoom::create_wall (csSector* sector, csPolygonSet* thing,
       csVector3 v2 = v12b + ((float)j/(float)ver_res) * (v43b-v12b);
       csVector3 v3 = v12b + ((float)(j+1)/(float)ver_res) * (v43b-v12b);
       csVector3 v4 = v12a + ((float)(j+1)/(float)ver_res) * (v43a-v12a);
-      create_polygon (sector, thing, v1, v2, v3, txt);
-      create_polygon (sector, thing, v1, v3, v4, txt);
+      p = create_polygon (sector, thing, v1, v2, v3, txt, plane);
+      if (!plane) plane = p->GetPlane ();
+      create_polygon (sector, thing, v1, v3, v4, txt, plane);
     }
 }
 
 csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
 	const csVector3& p1, const csVector3& p2, const csVector3& p3,
-	int txt)
+	int txt, csPolyPlane* plane)
 {
   csMatrix3 t_m;
   csVector3 t_v (0, 0, 0);
@@ -134,7 +137,10 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
     	rand1 (wall_max_green-wall_min_green)+wall_min_green,
     	rand1 (wall_max_blue-wall_min_blue)+wall_min_blue);
 
-  p->SetTextureSpace (t_m, t_v);
+  if (plane)
+    p->SetTextureSpace (plane);
+  else
+    p->SetTextureSpace (t_m, t_v);
 
   return p;
 }
@@ -235,8 +241,8 @@ csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
   csVector3 p6 (xdim/2,y_high,zdim/2);
   csVector3 p7 (xdim/2,y_high,-zdim/2);
   csVector3 p8 (-xdim/2,y_high,-zdim/2);
-  int hor_div = 4;//4
-  int ver_div = 8;//8
+  int hor_div = 7;//7	(10)
+  int ver_div = 14;//14	(20)
   create_wall (sector, thing, p5, p6, p7, p8, hor_div, hor_div, txt);	// Top
   create_wall (sector, thing, p8, p7, p3, p4, hor_div, ver_div, txt);	// Front
   create_wall (sector, thing, p7, p6, p2, p3, hor_div, ver_div, txt);	// Right
@@ -462,6 +468,8 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   	num_nodes, num_leaves, max_depth);
   Sys->Printf (MSG_INITIALIZATION, "            totpoly=%d maxpoly=%d minpoly=%d\n",
 	tot_polygons, max_poly_in_node, min_poly_in_node);
+  Sys->Printf (MSG_INITIALIZATION, "            vertices=%d\n",
+  	room->GetStaticThing ()->GetNumVertices ());
   return room;
 }
 

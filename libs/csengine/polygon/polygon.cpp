@@ -45,8 +45,6 @@ bool csPolygon3D::do_not_force_recalc = false;
 // Option variable: shadow mipmap size
 int csPolygon3D::def_mipmap_size = 16;
 
-#define SAFETY 1
-
 //---------------------------------------------------------------------------
 
 csLightMapped::csLightMapped ()
@@ -182,38 +180,12 @@ void csGouraudShaded::EnableGouraud (bool g)
 
 void csGouraudShaded::SetUV (int i, float u, float v)
 {
-#if SAFETY
-  if (!uv_coords)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "SetUV: Uv_coords is NULL!\n");
-    fatal_exit (0, false);
-  }
-  if (i >= num_vertices)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "SetUV: Index %d is out of bounds (>= %d)!\n",
-    	i, num_vertices);
-    fatal_exit (0, false);
-  }
-#endif
   uv_coords[i].x = u;
   uv_coords[i].y = v;
 }
 
 void csGouraudShaded::AddColor (int i, float r, float g, float b)
 {
-#if SAFETY
-  if (!static_colors)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "AddColor: static_colors is NULL!\n");
-    fatal_exit (0, false);
-  }
-  if (i >= num_vertices)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "AddColor: Index %d is out of bounds (>= %d)!\n",
-    	i, num_vertices);
-    fatal_exit (0, false);
-  }
-#endif
   r += static_colors[i].red; if (r > 2) r = 2;
   g += static_colors[i].green; if (g > 2) g = 2;
   b += static_colors[i].blue; if (b > 2) b = 2;
@@ -222,19 +194,6 @@ void csGouraudShaded::AddColor (int i, float r, float g, float b)
 
 void csGouraudShaded::AddDynamicColor (int i, float r, float g, float b)
 {
-#if SAFETY
-  if (!colors)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "AddDynamicColor: colors is NULL!\n");
-    fatal_exit (0, false);
-  }
-  if (i >= num_vertices)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "AddDynamicColor: Index %d is out of bounds (>= %d)!\n",
-    	i, num_vertices);
-    fatal_exit (0, false);
-  }
-#endif
   r += colors[i].red; if (r > 2) r = 2;
   g += colors[i].green; if (g > 2) g = 2;
   b += colors[i].blue; if (b > 2) b = 2;
@@ -244,62 +203,16 @@ void csGouraudShaded::AddDynamicColor (int i, float r, float g, float b)
 
 void csGouraudShaded::SetColor (int i, float r, float g, float b)
 {
-#if SAFETY
-  if (!static_colors)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "SetColor: static_colors is NULL!\n");
-    fatal_exit (0, false);
-  }
-  if (i >= num_vertices)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "SetColor: Index %d is out of bounds (>= %d)!\n",
-    	i, num_vertices);
-    fatal_exit (0, false);
-  }
-#endif
   static_colors[i].Set (r, g, b);
 }
 
 void csGouraudShaded::ResetDynamicColor (int i)
 {
-#if SAFETY
-  if (!static_colors)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "ResetDynamicColor: static_colors is NULL!\n");
-    fatal_exit (0, false);
-  }
-  if (!colors)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "ResetDynamicColor: colors is NULL!\n");
-    fatal_exit (0, false);
-  }
-  if (i >= num_vertices)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "ResetDynamicColor: Index %d is out of bounds (>= %d)!\n",
-    	i, num_vertices);
-    int *a = 0, b = 0;
-    *a = b;
-    fatal_exit (0, false);
-  }
-#endif
   colors[i] = static_colors[i];
 }
 
 void csGouraudShaded::SetDynamicColor (int i, float r, float g, float b)
 {
-#if SAFETY
-  if (!colors)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "SetDynamicColor: colors is NULL!\n");
-    fatal_exit (0, false);
-  }
-  if (i >= num_vertices)
-  {
-    CsPrintf (MSG_INTERNAL_ERROR, "SetDynamicColor: Index %d is out of bounds (>= %d)!\n",
-    	i, num_vertices);
-    fatal_exit (0, false);
-  }
-#endif
   colors[i].Set (r, g, b);
 }
 
@@ -844,14 +757,14 @@ int csPolygon3D::AddVertex (int v)
 
 int csPolygon3D::AddVertex (const csVector3& v)
 {
-  int i = poly_set->AddVertexSmart (v);
+  int i = poly_set->AddVertex (v);
   AddVertex (i);
   return i;
 }
 
 int csPolygon3D::AddVertex (float x, float y, float z)
 {
-  int i = poly_set->AddVertexSmart (x, y, z);
+  int i = poly_set->AddVertex (x, y, z);
   AddVertex (i);
   return i;
 }

@@ -57,6 +57,16 @@ private:
   csVector3 center;
   /// Mini-bsp tree (in this case there are no children).
   csBspTree* minibsp;
+  /**
+   * If there is a mini-bsp tree this array contains the indices
+   * of all vertices that are used by the polygons in the tree.
+   * This can be used to optimize the world->camera transformation
+   * process because only the minibsp nodes that are really used
+   * need to be traversed.
+   */
+  int* minibsp_verts;
+  /// Number of vertices in minibsp_verts.
+  int minibsp_numverts;
 
 private:
   /// Make an empty octree node.
@@ -79,7 +89,10 @@ private:
   }
 
   /// Set mini-bsp tree.
-  void SetMiniBsp (csBspTree* mbsp) { minibsp = mbsp; }
+  void SetMiniBsp (csBspTree* mbsp);
+
+  /// Build vertex tables.
+  void BuildVertexTables ();
 
 public:
   /// Return true if node is empty.
@@ -96,6 +109,12 @@ public:
 
   /// Get mini-bsp tree.
   csBspTree* GetMiniBsp () { return minibsp; }
+
+  /// Get indices of vertices used in the mini-bsp of this leaf.
+  int* GetMiniBspVerts () { return minibsp_verts; }
+
+  /// Get number of vertices.
+  int GetMiniBspNumVerts () { return minibsp_numverts; }
 
   /// Return type (NODE_???).
   int Type () { return NODE_OCTREE; }
@@ -206,6 +225,13 @@ public:
    */
   void GetConvexOutline (csOctreeNode* node, const csVector3& pos,
   	csVector3* array, int& num_array);
+
+  /**
+   * Build vertex tables for minibsp leaves. These tables are
+   * used to optimize the world to camera transformation so that only
+   * the needed vertices are transformed.
+   */
+  void BuildVertexTables () { if (root) ((csOctreeNode*)root)->BuildVertexTables (); }
 
   /// Return statistics about this octree.
   void Statistics (int* num_nodes, int* num_leaves, int* max_depth,

@@ -86,6 +86,41 @@ void csBspNode::RemoveDynamicPolygons ()
   }
 }
 
+int csBspNode::CountVertices ()
+{
+  int num_verts = 0;
+  if (front) num_verts += front->CountVertices ();
+  if (back) num_verts += back->CountVertices ();
+  int i;
+  for (i = 0 ; i < num ; i++)
+  {
+    num_verts += polygons[i]->GetNumVertices ();
+    if (polygons[i]->GetUnsplitPolygon ())
+      num_verts += polygons[i]->GetUnsplitPolygon ()->GetNumVertices ();
+  }
+  return num_verts;
+}
+
+void csBspNode::FetchVertices (int* array, int& cur_idx)
+{
+  if (front) front->FetchVertices (array, cur_idx);
+  if (back) back->FetchVertices (array, cur_idx);
+  int i;
+  for (i = 0 ; i < num ; i++)
+  {
+    int* idx = polygons[i]->GetVertexIndices ();
+    int n = polygons[i]->GetNumVertices ();
+    memcpy (array+cur_idx, idx, sizeof (int)*n);
+    cur_idx += n;
+    if (polygons[i]->GetUnsplitPolygon ())
+    {
+      int* idx = polygons[i]->GetUnsplitPolygon ()->GetVertexIndices ();
+      int n = polygons[i]->GetUnsplitPolygon ()->GetNumVertices ();
+      memcpy (array+cur_idx, idx, sizeof (int)*n);
+      cur_idx += n;
+    }
+  }
+}
 
 //---------------------------------------------------------------------------
 
@@ -463,6 +498,43 @@ void csBspTree::Statistics (int* num_nodes, int* num_leaves, int* max_depth,
   if (root) Statistics ((csBspNode*)root, 0, num_nodes, num_leaves,
   	max_depth, tot_polygons,
   	max_poly_in_node, min_poly_in_node);
+}
+
+int compare_int (const void* p1, const void* p2)
+{
+  int i1 = *(int*)p1;
+  int i2 = *(int*)p2;
+  if (i1 < i2) return -1;
+  else if (i1 > i2) return 1;
+  return 0;
+}
+
+int* csBspTree::GetVertices (int& count)
+{
+  if (!root) return 0;
+  int cnt = ((csBspNode*)root)->CountVertices ();
+  CHK (int* idx = new int [cnt]);
+  CHK (int* idx2 = new int [cnt]);
+  int cur_idx = 0;
+  ((csBspNode*)root)->FetchVertices (idx, cur_idx);
+
+  // Sort first.
+  qsort (idx, cur_idx, sizeof (int), compare_int);
+  // Remove all doubles.
+  idx2[0] = idx[0];
+  int i, j;
+  j = 1;
+  for (i = 1 ; i < cur_idx ; i++)
+  {
+    if (idx[i] != idx2[j-1]) idx2[j++] = idx[i];
+  }
+  CHK (int* indices = new int [j]);
+  memcpy (indices, idx2, j*sizeof (int));
+  count = j;
+
+  CHK (delete [] idx);
+  CHK (delete [] idx2);
+  return indices;
 }
 
 //---------------------------------------------------------------------------
