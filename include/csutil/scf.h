@@ -121,10 +121,8 @@ void Class::DecRef ()							\
   scfRefCount--;							\
   if (scfParent)							\
     scfParent->DecRef ();						\
-  if (scfRefCount = 0)							\
+  if (scfRefCount <= 0)							\
     CHKB (delete this);							\
-  if (scfRefCount < 0)							\
-    printf("DecRef %d<0 in Class\n", scfRefCount);					\
 }									\
 void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
 {
