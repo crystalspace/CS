@@ -21,8 +21,8 @@
 #------------------------------------------------------------------------------
 # msvcgen.mak
 #
-#	A makefile for synthesizing a complete set of MSVC-compliant DSW and
-#	DSP project files based upon information gleaned from GNU makefiles
+#	A makefile for synthesizing a complete set of MSVC-compliant workspace 
+# 	and project files based upon information gleaned from GNU makefiles
 #	project-wide.
 #
 #	This process strives to enforce the fundamental invariant that if the
@@ -136,7 +136,15 @@
 #	o msvcgen -- Generates the DSW file csall.dsw, as well as one DSP
 #	  project files for each module mentioned by the MSVC.DSP variable.
 #
+#	o msvc7gen -- Generates the SLN file csall.sln, as well as one VCPROJ
+#	  project files for each module mentioned by the MSVC.DSP variable.
+#
 #	o msvcinst -- Copies the newly generated project files over top of the
+#	  existing files from the CVS repository and informs the user as to
+#	  exactly which CVS commands must be invoked in order to permanently
+#	  commit the new files to the repository.
+#
+#	o msvc7inst -- Copies the newly generated project files over top of the
 #	  existing files from the CVS repository and informs the user as to
 #	  exactly which CVS commands must be invoked in order to permanently
 #	  commit the new files to the repository.
@@ -148,18 +156,24 @@
 #	  cases a makefile may check this variable to alter its behavior.  For
 #	  instance, in rare circumstances, a makefile may need to use a
 #	  different $(wildcard) expression during the `msvcgen' process.
+#	o MSVCGEN_VERSION is either '6' or '7' and is used internally to 
+#	  determine the right behaviour for either MSVC 6 or 7 projects.
 #------------------------------------------------------------------------------
 
 # Target description
 DESCRIPTION.msvcgen = MSVC DSW and DSP resources
 DESCRIPTION.msvcinst = $(DESCRIPTION.msvcgen)
+DESCRIPTION.msvc7gen = MSVC7 .SLN and .VCPROJ resources
+DESCRIPTION.msvc7inst = $(DESCRIPTION.msvc7gen)
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PSEUDOHELP += \
   $(NEWLINE)echo $"  make msvcgen      Rebuild the $(DESCRIPTION.msvcgen)$" \
-  $(NEWLINE)echo $"  make msvcinst     Install the $(DESCRIPTION.msvcinst)$"
+  $(NEWLINE)echo $"  make msvcinst     Install the $(DESCRIPTION.msvcinst)$" \
+  $(NEWLINE)echo $"  make msvc7gen     Rebuild the $(DESCRIPTION.msvc7gen)$" \
+  $(NEWLINE)echo $"  make msvc7inst    Install the $(DESCRIPTION.msvc7inst)$"
 
 # Set MSVC.PLUGINS.REQUIRED to a list of plug-ins for which DSP files must be
 # generated even if the current makefile target (i.e. 'linux') would not
@@ -171,7 +185,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: msvcgen msvcinst msvcgenclean
+.PHONY: msvcgen msvcinst msvcgenclean msvc7gen msvc7inst msvc7genclean
 
 msvcgen:
 	@echo $(SEPARATOR)
@@ -179,6 +193,7 @@ msvcgen:
 	@echo $(SEPARATOR)
 	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ \
 	DO_MSVCGEN=yes DO_ASM=no USE_MAKEFILE_CACHE=no \
+	MSVCGEN_VERSION=6 \
 	PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
 
 msvcinst: msvcgen
@@ -188,6 +203,26 @@ msvcinst: msvcgen
 	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 
 msvcgenclean:
+	MSVCGEN_VERSION=6
+	$(MAKE_CLEAN)
+
+msvc7gen:
+	@echo $(SEPARATOR)
+	@echo $"  Generating $(DESCRIPTION.$@)$"
+	@echo $(SEPARATOR)
+	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ \
+	DO_MSVCGEN=yes DO_ASM=no USE_MAKEFILE_CACHE=no \
+	MSVCGEN_VERSION=7 \
+	PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
+
+msvc7inst: msvc7gen
+	@echo $(SEPARATOR)
+	@echo $"  Installing $(DESCRIPTION.$@)$"
+	@echo $(SEPARATOR)
+	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
+
+msvc7genclean:
+	MSVCGEN_VERSION=7
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -196,20 +231,35 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 MSVCGEN = $(PERL) mk/msvcgen/msvcgen.pl
+ifeq ($(MSVCGEN_VERSION),6)
+MSVCGEN.EXTRA = 
 MSVC.TEMPLATE.DIR = mk/msvcgen/template
+else
+MSVCGEN.EXTRA = -htmlents
+MSVC.TEMPLATE.DIR = mk/msvcgen/template7
+endif
 ifneq (,$(MSVC_QUIET))
 MSVC.SILENT = @
 endif
 
 MSVC.CVS.BASE = mk
-MSVC.CVS.DIR = $(MSVC.CVS.BASE)/visualc
 MSVC.OUT.BASE = $(OUTBASE)mk
+ifeq ($(MSVCGEN_VERSION),6)
+MSVC.CVS.DIR = $(MSVC.CVS.BASE)/visualc
 MSVC.OUT.DIR = $(MSVC.OUT.BASE)/visualc
 MSVC.OUT.FRAGMENT = $(MSVC.OUT.BASE)/fragment
 MSVC.EXT.PROJECT = dsp
 MSVC.EXT.WORKSPACE = dsw
+else
+MSVC.CVS.DIR = $(MSVC.CVS.BASE)/visualc7
+MSVC.OUT.DIR = $(MSVC.OUT.BASE)/visualc7
+MSVC.OUT.FRAGMENT = $(MSVC.OUT.BASE)/fragment7
+MSVC.EXT.PROJECT = vcproj
+MSVC.EXT.WORKSPACE = sln
+endif
 MSVC.EXT.FRAGMENT = frag
-MSVC.DSW = csall.$(MSVC.EXT.WORKSPACE)
+MSVC.EXT.RESOURCES = rc
+MSVC.WORKSPACE = csall.$(MSVC.EXT.WORKSPACE)
 
 # Prefixes for particular project types.  For instance, the name "csgeom"
 # which is of type "library" is transformed into a project name "libcsgeom".
@@ -227,9 +277,9 @@ MSVC.DEPEND.library =
 MSVC.DEPEND.group   =
 
 # Project types for which version information should be generated.
-MSVC.MAKEVERRC.appgui  = $(MSVC.MAKEVERRC.COMMAND)
-MSVC.MAKEVERRC.appcon  = $(MSVC.MAKEVERRC.COMMAND)
-MSVC.MAKEVERRC.plugin  = $(MSVC.MAKEVERRC.COMMAND)
+MSVC.MAKEVERRC.appgui  = $(MSVC.MAKEVERRC.COMMAND.APP)
+MSVC.MAKEVERRC.appcon  = $(MSVC.MAKEVERRC.COMMAND.APP)
+MSVC.MAKEVERRC.plugin  = $(MSVC.MAKEVERRC.COMMAND.PLG)
 MSVC.MAKEVERRC.library =
 MSVC.MAKEVERRC.group   =
 
@@ -261,11 +311,14 @@ MSVC.VERSIONRC.NAME = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).rc
 MSVC.VERSIONRC = $(MSVC.VERSIONRC.$(DSP.$*.TYPE))
 
 # Module name/description for project.rc.
-MSVC.VERSIONDESC = $(DSP.$*.NAME)
+MSVC.VERSIONDESC.PLG = $(DESCRIPTION.$(DSP.$*.NAME))
+MSVC.VERSIONDESC.APP = $(DSP.$*.NAME)
 
 # Command to generate the project.rc file.
-MSVC.MAKEVERRC.COMMAND = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
-  '$(MSVC.VERSIONRC)' '$(MSVC.VERSIONDESC)'
+MSVC.MAKEVERRC.COMMAND.APP = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
+  '$(MSVC.VERSIONRC)' '$(MSVC.VERSIONDESC.APP)'
+MSVC.MAKEVERRC.COMMAND.PLG = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
+  '$(MSVC.VERSIONRC)' '$(MSVC.VERSIONDESC.PLG)'
 
 # Command to generate the project.rc file for a given project.
 MSVC.MAKEVERRC = $(MSVC.MAKEVERRC.$(DSP.$*.TYPE))
@@ -309,10 +362,12 @@ MSVC.CFLAGS.DIRECTIVE = $(subst --cflags='',,--cflags='$(DSP.$*.CFLAGS)')
 # Macros to compose lists of existing and newly created DSW and DSP files.
 MSVC.CVS.FILES = $(sort $(subst $(MSVC.CVS.DIR)/,,\
   $(wildcard $(addprefix $(MSVC.CVS.DIR)/*,\
-  .$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) .rc))))
-MSVC.OUT.FILES = $(sort $(subst $(MSVC.OUT.DIR)/,,\
+  .$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) \
+  .$(MSVC.EXT.RESOURCES)))))
+MSVC.OUT7.FILES = $(sort $(subst $(MSVC.OUT.DIR)/,,\
   $(wildcard $(addprefix $(MSVC.OUT.DIR)/*,\
-  .$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) .rc))))
+  .$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) \
+  .$(MSVC.EXT.RESOURCES)))))
 
 # Quick'n'dirty macro to compare two file lists and report the appropriate
 # CVS "add" and "remove" commands which the user will need to invoke in order
@@ -350,11 +405,12 @@ $(MSVC.OUT.BASE): $(OUTBASE)
 
 $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 	$(MSVC.SILENT)$(MKDIR)
-
-# Build a DSP project file and an associated DSW fragment file.
-%.MAKEDSP:
+	
+# Build a project project file and an associated DSW fragment file.
+%.MAKEPROJECT:
 	$(MSVC.SILENT)$(MSVC.MAKEVERRC)
 	$(MSVC.SILENT)$(MSVCGEN) --quiet --project \
+	$(MSVCGEN.EXTRA) \
 	--projext=$(MSVC.EXT.PROJECT) --wsext=$(MSVC.EXT.WORKSPACE) \
 	--name=$(DSP.$*.NAME) \
 	--template=$(DSP.$*.TYPE) \
@@ -367,25 +423,32 @@ $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 	$(MSVC.LFLAGS.DIRECTIVE) \
 	$(MSVC.CFLAGS.DIRECTIVE) \
 	$(MSVC.CONTENTS)
+	
 
-# Build the project-wide DSW file (csall.dsw).
-dswgen:
+# Build the project-wide workspace file (csall.sln/.dsw).
+workspacegen:
 	$(MSVC.SILENT)$(MSVCGEN) --quiet --workspace \
+	$(MSVCGEN.EXTRA) \
 	--projext=$(MSVC.EXT.PROJECT) --wsext=$(MSVC.EXT.WORKSPACE) \
-	--output=$(MSVC.OUT.DIR)/$(MSVC.DSW) \
+	--output=$(MSVC.OUT.DIR)/$(MSVC.WORKSPACE) \
 	--template-dir=$(MSVC.TEMPLATE.DIR) \
 	$(wildcard $(MSVC.OUT.FRAGMENT)/*.$(MSVC.EXT.FRAGMENT))
-
-# Build all Visual-C++ DSW and DSP project files.  The DSW file is built last
+	
+# Build all Visual C++ DSW and DSP project files.  The DSW file is built last
 # since it is composed of the fragment files generated as part of the DSP file
 # synthesis process.
 msvcgen: \
   msvcgenclean \
   $(MSVC.OUT.DIR) \
   $(MSVC.OUT.FRAGMENT) \
-  $(addsuffix .MAKEDSP,$(MSVC.DSP)) \
-  dswgen
+  $(addsuffix .MAKEPROJECT,$(MSVC.DSP)) \
+  workspacegen
 
+# Build all Visual C++ 7 SLN and VCPROJ project files.  The SLN file is built
+# last since it is composed of the fragment files generated as part of the
+# VCPROJ file synthesis process.
+msvc7gen: msvcgen
+  
 # Install the generated project files in place of the files from the CVS
 # repository and inform the user as to which CVS commands must be manually
 # invoked in order to permanently commit the generated files to the repository.
@@ -411,9 +474,13 @@ endif
 	@echo $"  $(MSVC.CVS.WARNING.3)$"
 	@echo $(SEPARATOR)
 
+msvc7inst: msvcinst
+	
 # Scrub the sink; mop the floor; wash the dishes; paint the door.
 clean: msvcgenclean
 msvcgenclean:
 	$(MSVC.SILENT)$(RMDIR) $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT)
+	
+msvc7genclean: msvcgenclean
 
 endif # ifeq ($(MAKESECTION),targets)
