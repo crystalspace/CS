@@ -52,6 +52,11 @@ public:
 template <class T>
 class csPDelArray : public csArray<T*, csPDelArrayElementHandler<T*> >
 {
+private:
+  csPDelArray (const csPDelArray&) {}
+  csPDelArray& operator= (const csPDelArray&) {}
+  csPDelArray Section (int, int) const {}
+
 public:
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase

@@ -48,6 +48,8 @@ chronological order.
 	  csArray<>.
 	- Jorrit changed csStringArray<char*,...> to
 	  csStringArray<const char*,...>.
+	- Jorrit made copy constructor, assignment operator and Section()
+	  in csPDelArray private so that people cannot mistakenly use those.
 7-Aug-2003
 	- Jorrit did the following array related changes:
 	    - Added Put() to csArray.
