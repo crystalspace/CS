@@ -53,6 +53,8 @@ struct iMeshWrapper;
 struct iLight;
 struct iPolygon3D;
 struct iView;
+struct iSoundRender;
+struct iMotionManager;
 
 // type information
 

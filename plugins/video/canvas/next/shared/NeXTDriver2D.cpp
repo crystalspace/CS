@@ -25,6 +25,7 @@
 #include "NeXTFrameBuffer32.h"
 #include "csutil/cfgacc.h"
 #include "iutil/cfgfile.h"
+#include "iutil/cmdline.h"
 #include "isys/event.h"
 #include "isys/system.h"
 #include "csver.h"
@@ -119,7 +120,7 @@ bool NeXTDriver2D::init_driver(int desired_depth)
 int NeXTDriver2D::get_desired_depth() const
 {
   int depth = 0;
-  char const* s = System->GetOptionCL("simdepth");
+  char const* s = System->GetCommandLine ()->GetOption("simdepth");
   if (s != 0)
     depth = atoi(s);
   else

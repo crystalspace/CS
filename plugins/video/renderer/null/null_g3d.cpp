@@ -24,6 +24,7 @@
 #include "null_g3d.h"
 #include "null_txt.h"
 #include "iutil/cfgfile.h"
+#include "iutil/cmdline.h"
 #include "isys/system.h"
 #include "ivideo/graph2d.h"
 
@@ -82,7 +83,7 @@ bool csGraphics3DNull::Initialize (iSystem *iSys)
 
   width = height = -1;
 
-  const char *driver = iSys->GetOptionCL ("canvas");
+  const char *driver = iSys->GetCommandLine ()->GetOption ("canvas");
   if (!driver)
     driver = config->GetStr ("Video.Null.Canvas", CS_SOFTWARE_2D_DRIVER);
 

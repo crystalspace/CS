@@ -26,6 +26,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
+#include "inetwork/driver.h"
 
 struct iEngine;
 struct iMaterialWrapper;

@@ -41,6 +41,7 @@
 #include "csver.h"
 #include "qint.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/cmdline.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
@@ -242,7 +243,7 @@ void WalkTest::SetSystemDefaults (iConfigManager *Config)
   do_cd = Config->GetBool ("Walktest.Settings.Colldet", true);
 
   const char *val;
-  if (!(val = GetNameCL ()))
+  if (!(val = GetCommandLine ()->GetName ()))
     val = Config->GetStr ("Walktest.Settings.WorldFile");
 
   // if an absolute path is given, copy it. Otherwise prepend "/lev/".
@@ -251,50 +252,50 @@ void WalkTest::SetSystemDefaults (iConfigManager *Config)
   else
     sprintf (map_dir, "/lev/%s", val);
   
-  if (GetOptionCL ("stats"))
+  if (GetCommandLine ()->GetOption ("stats"))
   {
     do_stats = true;
     Sys->Printf (CS_MSG_INITIALIZATION, "Statistics enabled.\n");
   }
-  else if (GetOptionCL ("nostats"))
+  else if (GetCommandLine ()->GetOption ("nostats"))
   {
     do_stats = false;
     Sys->Printf (CS_MSG_INITIALIZATION, "Statistics disabled.\n");
   }
 
-  if (GetOptionCL ("fps"))
+  if (GetCommandLine ()->GetOption ("fps"))
   {
     do_fps = true;
     Sys->Printf (CS_MSG_INITIALIZATION, "Frame Per Second enabled.\n");
   }
-  else if (GetOptionCL ("nofps"))
+  else if (GetCommandLine ()->GetOption ("nofps"))
   {
     do_fps = false;
     Sys->Printf (CS_MSG_INITIALIZATION, "Frame Per Second disabled.\n");
   }
 
-  if (GetOptionCL ("infinite"))
+  if (GetCommandLine ()->GetOption ("infinite"))
     do_infinite = true;
 
-  if (GetOptionCL ("huge"))
+  if (GetCommandLine ()->GetOption ("huge"))
     do_huge = true;
 
   extern bool do_bots;
-  if (GetOptionCL ("bots"))
+  if (GetCommandLine ()->GetOption ("bots"))
     do_bots = true;
 
-  if (GetOptionCL ("colldet"))
+  if (GetCommandLine ()->GetOption ("colldet"))
   {
     do_cd = true;
     Sys->Printf (CS_MSG_INITIALIZATION, "Enabled collision detection system.\n");
   }
-  else if (GetOptionCL ("nocolldet"))
+  else if (GetCommandLine ()->GetOption ("nocolldet"))
   {
     do_cd = false;
     Sys->Printf (CS_MSG_INITIALIZATION, "Disabled collision detection system.\n");
   }
 
-  if ((val = GetOptionCL ("exec")))
+  if ((val = GetCommandLine ()->GetOption ("exec")))
   {
     delete [] auto_script;
     auto_script = csStrNew (val);

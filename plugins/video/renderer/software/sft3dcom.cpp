@@ -34,6 +34,7 @@
 #include "imesh/thing/lightmap.h"	//@@@!!!
 #include "sft3dcom.h"
 #include "iutil/cfgfile.h"
+#include "iutil/cmdline.h"
 
 #if defined (DO_MMX)
 #  include "video/renderer/software/i386/cpuid.h"
@@ -298,7 +299,7 @@ void csGraphics3DSoftwareCommon::NewInitialize ()
   mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3);
   do_interlaced = config->GetBool ("Video.Software.Interlacing", false) ? 0 : -1;
 
-  const char *gamma = System->GetOptionCL ("gamma");
+  const char *gamma = System->GetCommandLine ()->GetOption ("gamma");
   if (!gamma) gamma = config->GetStr ("Video.Software.Gamma", "1");
   float fGamma;
   sscanf (gamma, "%f", &fGamma);

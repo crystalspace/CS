@@ -166,6 +166,8 @@ struct iEventCord;
 struct iStrVector;
 struct iConfigFile;
 struct iConfigManager;
+struct iCommandLineParser;
+
 
 SCF_VERSION (iSystem, 4, 0, 1);
 
@@ -381,18 +383,8 @@ struct iSystem : public iBase
 
   //--------------------------- Command-line access --------------------------//
 
-  /// Query a specific commandline option (you can query second etc such option)
-  virtual const char *GetOptionCL (const char *iName, int iIndex = 0) = 0;
-  /// Query a filename specified on the commandline (that is, without leading '-')
-  virtual const char *GetNameCL (int iIndex = 0) = 0;
-  /// Add a command-line option to the command-line option array
-  virtual void AddOptionCL (const char *iName, const char *iValue) = 0;
-  /// Add a command-line name to the command-line names array
-  virtual void AddNameCL (const char *iName) = 0;
-  /// Replace the Nth command-line option with a new value
-  virtual bool ReplaceOptionCL (const char *iName, const char *iValue, int iIndex = 0) = 0;
-  /// Replace the Nth command-line name with a new value
-  virtual bool ReplaceNameCL (const char *iValue, int iIndex = 0) = 0;
+  /// Return the command line parser
+  virtual iCommandLineParser *GetCommandLine () = 0;
 };
 
 #endif // __ISYS_SYSTEM_H__

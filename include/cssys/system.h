@@ -36,12 +36,9 @@ class csMouseDriver;
 
 struct iGraphics3D;
 struct iGraphics2D;
-struct iNetworkDriver;
-struct iSoundRender;
 struct iConfig;
 struct iConsoleOutput;
 struct iConfigManager;
-struct iMotionManager;
 
 /**
  * This is the interface to operating system.<p>
@@ -132,41 +129,6 @@ class csSystemDriver : public iSystem
   };
 
   /*
-   * This structure contains the data related to one command-line option.
-   */
-  struct csCommandLineOption
-  {
-    /// Option name
-    char *Name;
-    /// Option value
-    char *Value;
-    /// Name and Value should be already allocated
-    csCommandLineOption (char *iName, char *iValue)
-    { Name = iName; Value = iValue; }
-    /// Destructor
-    ~csCommandLineOption ()
-    { delete [] Name; delete [] Value; }
-  };
-
-  /*
-   * The array of all command-line options.
-   */
-  class csCommandLineOptions : public csVector
-  {
-  public:
-    csCommandLineOptions (int iLength, int iDelta) : csVector (iLength, iDelta) {}
-    virtual ~csCommandLineOptions ()
-    { DeleteAll (); }
-    virtual bool FreeItem (csSome Item)
-    { delete (csCommandLineOption *)Item; return true; }
-    virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
-    { return strcmp (((csCommandLineOption *)Item)->Name, (const char*)Key); }
-  };
-
-  // Find Nth command-line option and return a pointer to the object (or NULL)
-  csCommandLineOption *FindOptionCL (const char *iName, int iIndex);
-
-  /*
    * A private class which implements the iEventOutlet interface.
    */
   class csEventOutlet : public iEventOutlet
@@ -235,9 +197,6 @@ class csSystemDriver : public iSystem
     int Find (int Category, int SubCategory);
   } EventCords;
 
-  // Collect all options from command line
-  virtual void CollectOptions (int argc, const char* const argv[]);
-
   // Query all options supported by given plugin and place into OptionList
   void QueryOptions (iPlugIn *iObject);
 
@@ -245,6 +204,8 @@ class csSystemDriver : public iSystem
   cs_time ElapsedTime, CurrentTime;
   
 protected:
+  /// The command line parser
+  iCommandLineParser *CommandLine;
   /// The configuration manager
   iConfigManager *Config;
   /// The Virtual File System object
@@ -253,14 +214,8 @@ protected:
   iGraphics3D* G3D;
   /// 2D Graphics context
   iGraphics2D* G2D;
-  /// Sound render
-  iSoundRender* Sound;
-  /// Network driver
-  iNetworkDriver* NetDrv;
   /// System console
   iConsoleOutput *Console;
-  /// Motion manager
-  iMotionManager *MotionMan;
 
 public:
   /// -------------------------- plug-ins --------------------------
@@ -290,10 +245,6 @@ public:
   int debug_level;
   /// List of all options for all plug-in modules.
   CS_DECLARE_TYPED_VECTOR (csOptionVector, csPluginOption) OptionList;
-  /// The collection of all options specified on command line
-  csCommandLineOptions CommandLine;
-  /// The list of raw filenames on the command line (i.e. without any switches)
-  csStrVector CommandLineNames;
 
   /// Initialize system-dependent data
   csSystemDriver ();
@@ -481,18 +432,8 @@ public:
   /// Get a public event outlet for posting just a single event and such.
   virtual iEventOutlet *GetSystemEventOutlet ();
 
-  /// Query a specific commandline option (you can query second etc such option)
-  virtual const char *GetOptionCL (const char *iName, int iIndex = 0);
-  /// Query a filename specified on the commandline (that is, without leading '-')
-  virtual const char *GetNameCL (int iIndex = 0);
-  /// Add a command-line option to the command-line option array
-  virtual void AddOptionCL (const char *iName, const char *iValue);
-  /// Add a command-line name to the command-line names array
-  virtual void AddNameCL (const char *iName);
-  /// Replace the Nth command-line option with a new value
-  virtual bool ReplaceOptionCL (const char *iName, const char *iValue, int iIndex = 0);
-  /// Replace the Nth command-line name with a new value
-  virtual bool ReplaceNameCL (const char *iValue, int iIndex = 0);
+  /// Return the command line parser
+  virtual iCommandLineParser *GetCommandLine ();
 };
 
 // CrystalSpace global variables

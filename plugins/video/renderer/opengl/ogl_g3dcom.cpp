@@ -33,6 +33,7 @@
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
 #include "iutil/cfgfile.h"
+#include "iutil/cmdline.h"
 #include "isys/system.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
@@ -207,7 +208,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
 {
   config.AddConfig(System, "/config/opengl.cfg");
 
-  const char *driver = System->GetOptionCL ("canvas");
+  const char *driver = System->GetCommandLine ()->GetOption ("canvas");
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 

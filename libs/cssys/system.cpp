@@ -33,10 +33,10 @@
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
 #include "csutil/cfgacc.h"
+#include "csutil/cmdline.h"
 #include "isys/plugin.h"
 #include "isys/vfs.h"
 #include "ivaria/conout.h"
-#include "isound/renderer.h"
 #include "inetwork/driver.h"
 #include "iutil/config.h"
 #include "ivideo/graph3d.h"
@@ -284,7 +284,7 @@ SCF_IMPLEMENT_IBASE (csSystemDriver)
 SCF_IMPLEMENT_IBASE_END
 
 csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
-  OptionList (16, 16), CommandLine (16, 16), CommandLineNames (16, 16)
+  OptionList (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
 
@@ -301,9 +301,6 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   VFS = NULL;
   G3D = NULL;
   G2D = NULL;
-  NetDrv = NULL;
-  Sound = NULL;
-  MotionMan = NULL;
 
   Console = NULL;
   Config = NULL;
@@ -311,6 +308,8 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   debug_level = 0;
   Shutdown = false;
   CurrentTime = cs_time (-1);
+
+  CommandLine = new csCommandLineParser ();
 }
 
 csSystemDriver::~csSystemDriver ()
@@ -326,12 +325,9 @@ csSystemDriver::~csSystemDriver ()
 
   // Deregister all known drivers and plugins
   if (Console) Console->DecRef ();
-  if (NetDrv) NetDrv->DecRef ();
-  if (Sound) Sound->DecRef ();
   if (G2D) G2D->DecRef ();
   if (G3D) G3D->DecRef ();
   if (VFS) VFS->DecRef ();
-  if (MotionMan) MotionMan->DecRef();
 
   // Free all plugins
   PlugIns.DeleteAll ();
@@ -341,6 +337,9 @@ csSystemDriver::~csSystemDriver ()
   // this must happen *after* the plug-ins are deleted, because most plug-ins
   // de-register their config file at destruction time
   if (Config) Config->DecRef ();
+
+  // release the command line parser
+  CommandLine->DecRef ();
 
   iSCF::SCF->Finish ();
 }
@@ -415,7 +414,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   }
   
   // Collect all options from command line
-  CollectOptions (argc, argv);
+  CommandLine->Initialize (argc, argv);
 
   // Analyse config and command line
   SetSystemDefaults (Config);
@@ -427,7 +426,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   bool g3d_override = false;
 
   const char *val;
-  if ((val = GetOptionCL ("video")))
+  if ((val = CommandLine->GetOption ("video")))
   {
     // Alternate videodriver
     char temp [100];
@@ -436,19 +435,19 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     PluginList.Push (new csPluginLoadRec (CS_FUNCID_VIDEO, temp));
     g3d_override = true;
   }
-  if ((val = GetOptionCL ("canvas")))
+  if ((val = CommandLine->GetOption ("canvas")))
   {
     char temp [100];
     if (!strchr (val, '.'))
     {
       sprintf (temp, "crystalspace.graphics2d.%s", val);
-      ReplaceOptionCL ("canvas", temp);
+      CommandLine->ReplaceOption ("canvas", temp);
     }
   }
 
   // Eat all --plugin switches specified on the command line
   int n = 0;
-  while ((val = GetOptionCL ("plugin", n++)))
+  while ((val = CommandLine->GetOption ("plugin", n++)))
   {
     size_t sl = strlen (val);
     char temp [100];
@@ -491,7 +490,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   }
 
   // See if user wants help
-  if ((val = GetOptionCL ("help")))
+  if ((val = CommandLine->GetOption ("help")))
   {
     Help ();
     exit (0);
@@ -505,10 +504,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     (G2D = G3D->GetDriver2D ())->IncRef ();
   else
     G2D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CANVAS, iGraphics2D);
-  Sound = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
-  NetDrv = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_NETDRV, iNetworkDriver);
   Console = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
-  MotionMan = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_MOTION, iMotionManager);
 
   // flush all removed config files
   Config->FlushRemoved();
@@ -628,32 +624,6 @@ bool csSystemDriver::HandleEvent (iEvent&Event)
   return false;
 }
 
-void csSystemDriver::CollectOptions (int argc, const char* const argv[])
-{
-  for (int i = 1; i < argc; i++)
-  {
-    char *opt = (char *)argv [i];
-    if (*opt == '-')
-    {
-      while (*opt == '-') opt++;
-      char *arg = strchr (opt, '=');
-      if (arg)
-      {
-        int n = arg - opt;
-        char *newopt = new char [n + 1];
-        memcpy (newopt, opt, n);
-        (opt = newopt) [n] = 0;
-        arg = csStrNew (arg + 1);
-      }
-      else
-        opt = csStrNew (opt);
-      CommandLine.Push (new csCommandLineOption (opt, arg));
-    }
-    else
-      CommandLineNames.Push (csStrNew (opt));
-  }
-}
-
 void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
 {
   // First look in .cfg file
@@ -669,10 +639,10 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
   // Now analyze command line
   const char *val;
 
-  if ((val = GetOptionCL ("debug")))
+  if ((val = CommandLine->GetOption ("debug")))
     debug_level = atoi(val);
 
-  if ((val = GetOptionCL ("mode")))
+  if ((val = CommandLine->GetOption ("mode")))
   {
     int wres, hres;
     if (sscanf(val, "%dx%d", &wres, &hres) != 2)
@@ -687,10 +657,10 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
     }
   }
 
-  if ((val = GetOptionCL ("depth")))
+  if ((val = CommandLine->GetOption ("depth")))
     Depth = atoi (val);
 
-  if ((val = GetOptionCL ("fs")))
+  if ((val = CommandLine->GetOption ("fs")))
     if (!strcmp (val, "no"))
       FullScreen = false;
     else if (!val [0] || !strcmp (val, "yes"))
@@ -827,7 +797,7 @@ void csSystemDriver::QueryOptions (iPlugIn *iObject)
     {
       csPluginOption *pio = (csPluginOption *)OptionList.Get (on);
       const char *val;
-      if ((val = GetOptionCL (pio->Name)))
+      if ((val = CommandLine->GetOption (pio->Name)))
       {
         csVariant optval;
         optval.type = pio->Type;
@@ -855,7 +825,7 @@ void csSystemDriver::QueryOptions (iPlugIn *iObject)
 
 void csSystemDriver::RequestPlugin (const char *iPluginName)
 {
-  AddOptionCL ("plugin", iPluginName);
+  CommandLine->AddOption ("plugin", iPluginName);
 }
 
 //--------------------------------- iSystem interface for csSystemDriver -----//
@@ -1075,8 +1045,6 @@ bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
   CHECK (VFS, CS_FUNCID_VFS)
   CHECK (G3D, CS_FUNCID_VIDEO)
   CHECK (G2D, CS_FUNCID_CANVAS)
-  CHECK (Sound, CS_FUNCID_SOUND)
-  CHECK (NetDrv, CS_FUNCID_NETDRV)
   CHECK (Console, CS_FUNCID_CONSOLE)
 
 #undef CHECK
@@ -1175,67 +1143,7 @@ iEventOutlet *csSystemDriver::GetSystemEventOutlet ()
   return EventOutlets.Get (0);
 }
 
-csSystemDriver::csCommandLineOption *csSystemDriver::FindOptionCL (const char *iName, int iIndex)
+iCommandLineParser *csSystemDriver::GetCommandLine ()
 {
-  int idx = CommandLine.FindKey (iName);
-  if (idx >= 0)
-  {
-    while (iIndex)
-    {
-      idx++; 
-      if (idx >= CommandLine.Length ())
-        return NULL;
-      if (CommandLine.CompareKey (CommandLine.Get (idx), iName, 0) == 0)
-        iIndex--;
-    }
-    return (csCommandLineOption *)CommandLine.Get (idx);
-  }
-  return NULL;
-}
-
-bool csSystemDriver::ReplaceOptionCL (const char *iName, const char *iValue, int iIndex)
-{
-  csCommandLineOption *clo = FindOptionCL (iName, iIndex);
-  if (clo)
-  {
-    delete [] clo->Value;
-    clo->Value = csStrNew (iValue);
-    return true;
-  }
-  else
-    return false;
-}
-
-bool csSystemDriver::ReplaceNameCL (const char *iValue, int iIndex)
-{
-  if ((iIndex >= 0) && (iIndex < CommandLineNames.Length ()))
-  {
-    CommandLineNames.Replace (iIndex, csStrNew (iValue));
-    return true;
-  }
-  else
-    return false;
-}
-
-const char *csSystemDriver::GetOptionCL (const char *iName, int iIndex)
-{
-  csCommandLineOption *clo = FindOptionCL (iName, iIndex);
-  return clo ? (clo->Value ? clo->Value : "") : NULL;
-}
-
-const char *csSystemDriver::GetNameCL (int iIndex)
-{
-  if ((iIndex >= 0) && (iIndex < CommandLineNames.Length ()))
-    return (const char *)CommandLineNames.Get (iIndex);
-  return NULL;
-}
-
-void csSystemDriver::AddOptionCL (const char *iName, const char *iValue)
-{
-  CommandLine.Push (new csCommandLineOption (csStrNew (iName), csStrNew (iValue)));
-}
-
-void csSystemDriver::AddNameCL (const char *iName)
-{
-  CommandLineNames.Push (csStrNew (iName));
+  return CommandLine;
 }

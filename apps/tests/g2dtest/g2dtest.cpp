@@ -31,6 +31,7 @@
 #include "isys/vfs.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
+#include "iutil/cmdline.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -783,7 +784,7 @@ int main (int argc, char *argv[])
   // Now load the canvas plugin
   if (!System.myG2D)
   {
-    const char *canvas = System.GetOptionCL ("canvas");
+    const char *canvas = System.GetCommandLine ()->GetOption ("canvas");
     if (!canvas || !*canvas)
       canvas = CS_SOFTWARE_2D_DRIVER;
     else if (strncmp ("crystalspace.", canvas, 13))

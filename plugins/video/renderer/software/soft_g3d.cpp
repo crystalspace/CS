@@ -25,6 +25,7 @@
 #include "isys/system.h"
 #include "ivideo/graph2d.h"
 #include "iutil/cfgfile.h"
+#include "iutil/cmdline.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -68,7 +69,7 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 {
   csGraphics3DSoftwareCommon::Initialize(iSys);
   NewInitialize ();
-  const char *driver = iSys->GetOptionCL ("canvas");
+  const char *driver = iSys->GetCommandLine ()->GetOption ("canvas");
   if (!driver)
     driver = config->GetStr ("Video.Software.Canvas", CS_SOFTWARE_2D_DRIVER);
   G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);

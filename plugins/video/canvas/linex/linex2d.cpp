@@ -27,6 +27,7 @@
 #include "csutil/cfgacc.h"
 #include "isys/system.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/cmdline.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -84,9 +85,9 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
 
   csConfigAccess Config(pSystem, "/config/video.cfg");
   do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
-  if (System->GetOptionCL ("sysmouse"))
+  if (System->GetCommandLine ()->GetOption ("sysmouse"))
     do_hwmouse = true;
-  if (System->GetOptionCL ("nosysmouse"))
+  if (System->GetCommandLine ()->GetOption ("nosysmouse"))
     do_hwmouse = false;
 
   screen_num = DefaultScreen (dpy);

@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "x11comm.h"
 #include "csutil/cfgacc.h"
+#include "iutil/cmdline.h"
 
 void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
   bool &oHardwareCursor)
@@ -30,13 +31,13 @@ void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
   oHardwareCursor = Config->GetBool ("Video.SystemMouseCursor", true);
 
   const char *val;
-  if ((val = iSys->GetOptionCL ("shm")))
+  if ((val = iSys->GetCommandLine ()->GetOption ("shm")))
     oUseSHM = true;
 
-  if ((val = iSys->GetOptionCL ("noshm")))
+  if ((val = iSys->GetCommandLine ()->GetOption ("noshm")))
     oUseSHM = false;
 
-  if ((val = iSys->GetOptionCL ("sdepth")))
+  if ((val = iSys->GetCommandLine ()->GetOption ("sdepth")))
   {
     oSimDepth = atol (val);
     if (oSimDepth != 8 && oSimDepth != 15 && oSimDepth != 16 && oSimDepth != 32)
@@ -46,8 +47,8 @@ void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
     }
   }
 
-  if (iSys->GetOptionCL ("sysmouse"))
+  if (iSys->GetCommandLine ()->GetOption ("sysmouse"))
     oHardwareCursor = true;
-  if (iSys->GetOptionCL ("nosysmouse"))
+  if (iSys->GetCommandLine ()->GetOption ("nosysmouse"))
     oHardwareCursor = false;
 }

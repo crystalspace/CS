@@ -27,6 +27,7 @@
 #include "line_g3d.h"
 #include "line_txt.h"
 #include "iutil/cfgfile.h"
+#include "iutil/cmdline.h"
 #include "isys/system.h"
 #include "ivideo/graph2d.h"
 #include "imesh/thing/polygon.h"	//@@@
@@ -109,7 +110,7 @@ bool csGraphics3DLine::Initialize (iSystem *iSys)
 
   width = height = -1;
 
-  const char *driver = iSys->GetOptionCL ("canvas");
+  const char *driver = iSys->GetCommandLine ()->GetOption ("canvas");
   if (!driver)
     driver = config->GetStr ("Video.Line.Canvas", LINE_CS_SOFTWARE_2D_DRIVER);
 

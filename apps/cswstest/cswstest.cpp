@@ -23,6 +23,7 @@
 #include "csver.h"
 #include "ivideo/fontserv.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/cmdline.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -1008,7 +1009,7 @@ int main (int argc, char* argv[])
     return -1;
 
   // Look for skin variant from config file
-  DefaultSkin.Prefix = System.GetOptionCL ("skin");
+  DefaultSkin.Prefix = System.GetCommandLine ()->GetOption ("skin");
   if (!DefaultSkin.Prefix)
     DefaultSkin.Prefix = System.GetConfig ()->GetStr ("CSWS.Skin.Variant", NULL);
 

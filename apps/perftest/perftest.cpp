@@ -27,6 +27,7 @@
 #include "ivaria/conout.h"
 #include "igraphic/imageio.h"
 #include "igraphic/image.h"
+#include "iutil/cmdline.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -138,7 +139,7 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   const char *val;
-  if ((val = GetOptionCL ("2d")))
+  if ((val = GetCommandLine ()->GetOption ("2d")))
   {
     current_tester = new StringTester ();
     draw_3d = false;
@@ -146,7 +147,7 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   else
     current_tester = new SinglePolygonTester ();
 
-  if ((val = GetOptionCL ("3d")))
+  if ((val = GetCommandLine ()->GetOption ("3d")))
     draw_2d = false;
 
   needs_setup = true;
