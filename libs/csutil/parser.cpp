@@ -49,6 +49,9 @@ int csParser::GetParserLine()
 long csParser::GetObject (char **buf, csTokenVector * tokens, char **name,
   char **data)
 {
+  if (name) *name = NULL;
+  if (data) *data = NULL;
+
   SkipCharacters (buf, kWhiteSpace);
 
   // skip comment lines.
@@ -86,22 +89,25 @@ long csParser::GetObject (char **buf, csTokenVector * tokens, char **name,
   SkipCharacters (buf, kWhiteSpace);
 
   // get optional name
-  *name = GetSubText (buf, '\'', '\''); // single quotes
+  if (name)
+    *name = GetSubText (buf, '\'', '\''); // single quotes
   SkipCharacters (buf, kWhiteSpace);
 
   // get optional data
-  if (**buf == '=') // An assignment rather than a command/object.
-    *data = GetAssignmentText (buf);
-  else
-    *data = GetSubText (buf, '(', ')');
+  if (data)
+  {
+    if (**buf == '=') // An assignment rather than a command/object.
+      *data = GetAssignmentText (buf);
+    else
+      *data = GetSubText (buf, '(', ')');
+  }
 
   return tokens->Get (i)->id;
 }
 
 long csParser::GetCommand (char **buf, csTokenVector * tokens, char **params)
 {
-  char *name;
-  return GetObject (buf, tokens, &name, params);
+  return GetObject (buf, tokens, NULL, params);
 }
 
 void csParser::SkipCharacters (char **buf, const char *toSkip)

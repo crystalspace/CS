@@ -186,6 +186,10 @@ public:
    * to the text after the object description. The token id for the object is
    * returned. The name pointer will point to the optional name string in the
    * buffer. The data pointer will point to the optional data for the object.
+   * NULL can be passed for name/data if this information is not wanted. 
+   * Otherwise the variables pointed to are ALWAYS modified; if the optional
+   * name/data is not present or an error occured retrieving the token the 
+   * variables pointed to by name/data are set to NULL.
    * <i>The text buffer will get modified so BEWARE.</i>
    * <p><b>eg text</b>:
    * <pre>
