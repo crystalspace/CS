@@ -6,11 +6,45 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in Blocks with the menu entries having a weird
 	  color when fog was enabled (used for fading in/out). Fixed this
 	  by not using fog but csfxFadeOut() instead.
+21-Oct-2001
+	- Martin Geisse did some clean-up in the region code.
+	- Justin Miller added a few basic build speed/size Q/As to msvc FAQs.
+	- Philip Wyett extended one of the new additions in msvc documentation
+	  to put emphasis on the problems which can be caused by unloading
+	  projects which are dependant on other parts of CS. :-)
 20-Oct-2001
 	- Removed several warnings throughout the project.
 	- Fixed a bug in GetLODPolygonCount() in spr3d.
 	- Matze: cleaned up cs-config and fixed some bugs
 	- Matze: fixed linking of csfgen
+	- Norman Kramer made the lib3ds includes system includes, this will
+	  avoid all the warning when running mkdep.
+	- Norman additionally reports:
+	  Removed the local lib3ds include files. Get the lib3ds instead and
+	  install that one. Using a local set of include file is dangerous
+	  anyway. Note you need to get a version after July 7th 2001 (that
+	  was when the io_seek function signature has changed (what caused
+	  problems with our local includes which still had the old return
+	  type)).
+	- Norman also made vorbis includes system includes to get rid of
+	  warnings during mkdep.
+	- Norman also updated freefont readme to indicate that version
+	  1.x of freetype is required.
+	- Norman fixed compile errors for linux (xfermem.* in mp3 loader).
+	- Norman also updated the mp3 makefile.
+	- Norman fixed a warning in ie3ds about virtual destructor and
+	  unused variables.
+	- Philip Wyett did some updates to MSVC documentation.
+	- Eric Sunshine reports:
+	  3ds2lev.dep is no longer built by default when invoking the `depend'
+	  makefile target.  This eliminates the plethora of error messages
+	  encountered by most people when running `make depend', since most
+	  people do not have lib3ds installed.  You can still create the
+	  3ds2lev dependency file by manually invoking the `3ds2levdep'
+	  makefile target.  In the future, we should auto-detect the presence
+	  of lib3ds at configuration time (as we do with other optional
+	  facilities) and enable the 3ds2lev makefile based upon the result
+	  of the auto-detection.
 19-Oct-2001
 	- Removed diagnostic messages from image multiplexer. Those are
 	  not really needed.
@@ -55,6 +89,44 @@ The history order is reversed so that new features are at the top.
 	  'thing', 'haze', 'terrfunc', and 'metaball' mesh objects but
 	  these sections are still empty.
 	- Matze: cs-config now computes dependices!!
+	- Wouter Wijngaards added a stream of particles from the portal
+	  in flarge/basement. Also disabled lighting so it looks better
+	  in software. The portal in the basement now has a matrix associated
+	  which rotates the view, it looks over the ballustrade, at the
+	  cube&ball meshes. When stepping through the camera is not rotated
+	  btw.
+	- Christopher Nelson did the following:
+	    - Created a new sub-directory for AWS include files. The reason
+	      that this has to happen is that if a person wants to sub-class
+	      a component or window or sink or slot, etc.  then they need
+	      access to the headers which define the implementation version
+	      of those components too. Otherwise this is not possible
+	      (unless they add source directly into AWS's core module.)
+	    - Added support for connect into lexical analyzer. 
+	    - Removed .h files from aws plugin directory.
+	    - Various fixes to make all work again.
+	    - Accepted the patch by 'res' for cosmetic fix. Thanks!
+	    - Lots of changes in interface for slots. Trying to get handlers
+	      right.
+	    - Made (probably) final changes to slot mechanism to allow them
+	      to be used by applications not inside the aws plugin. The idea
+	      now is to simply embed a sink into some class. Using either
+	      static member functions or just normal C++ functions, you
+	      register trigger callbacks for a sink. These are automatically
+	      resolved by the parser and window builder at runtime. When a
+	      signal that you want to listen to is generated, the trigger is
+	      activated and passed an additional void * parameter that you
+	      pass in to the sink when it's created. This lets you use static
+	      member functions or some sort of general memory buffer
+	      associated with a particular sink.
+	    - Updated awstest to have a test sink and to register to use it.
+	    - Made a few additional modifications to the slot API so that it
+	      would be more optimal for memory usage.
+	    - Added functionality: the window builder now scans for
+	      connection maps and connects all signals to their sinks. Note
+	      that a connection is only created if the sink was found at
+	      parse times.
+	    - Added printf's into awstest triggers to prove that they work.
 18-Oct-2001
 	- Michael Voase shifted water and fire proctex down to the basement.
 	- Removed usage of cs_snprintf in cfgfile.cpp and
@@ -118,6 +190,16 @@ The history order is reversed so that new features are at the top.
 	  above related to extern "C" and not extern "C" for declarations.
 	  That way the functions are at least normal C++ functions like
 	  we're used to in CS.
+	- Philip Wyett reports for the mp3 loader:
+	  Moved xfermem to it''s own dir away from inclusion in the MSVC
+	  project. Modified makefile for Win32 and non Win32 ports to use
+	  the correct files.
+	  Added waveoutstd to default MinGW build process.
+	  Added Normans mp3 plugin to both MinGW and MSVC default build
+	  processes.
+	  Manually updated MSVC project files.
+	- Wouter Wijngaards made a new portal in the flarge basement so it
+	  is easier to get out the basement again.
 17-Oct-2001
 	- M Voase did the following
 	  - Small typo fix to data/walktest.cfg. This just fixes up
@@ -139,11 +221,35 @@ The history order is reversed so that new features are at the top.
 	  Why this bug only presented itself now I don't know.
 	- At this moment my changes cause big leaks in SCF at exit. I have
 	  not yet been able to find out why.
-	- Matze Braun fixed static build with linux
+	- Matze Braun fixed static build with linux.
+	- Matze added cs-config system for easy usage of CS outside the
+	  CS tree.
 	- Added first experimental version of the cs-config script for systems
           with unix shell. compile simple1 with 2 (short) lines:
 		g++ `cs-config --cxxflags csengine` -c simple1.cpp -o simple1.o
 		g++ -o simple1 simple1.o `cs-config --libs csengine` 
+	- Philip Wyett added new Mik Mod plugin to default MSVC build.
+	  Changed part of class to public to allow MSVC to access to read.
+	  Updated docs for new msvc_libs release.
+	- Jorge Acereda added linker flag (in netbsd.mak) to export symbols
+	  in executables to the dynamic symbol table. This fixes wrong
+	  behaviour of memdebug.cpp when using plugins.
+	  Added /usr/include to the include path to fix a makedep problem
+	  (makedep doesn't search in /usr/include).
+	- Michael Voasse moved water and fire proctex in flarge down to the
+	  basement.
+	- Christopher Nelson did the following:
+	    - Updated AWS to fix some virtual inlines that might be causing
+	      problems on some distributions.
+	    - Changed patch over to the defines method (snprintf.cpp). If
+	      someone could test this and let me know if it works, I would be
+	      grateful.
+	- Philip Wyett tested snprintf.cpp and reports:
+	  After all the patching (Chris's seems to be a winner :-) ) and
+	  loads of testing...
+Re-enabled use of cs_snprintf as all seems to be well again.
+	- Philip also fixed a function parameter redefinition error under
+	  MSVC.
 16-Oct-2001
 	- iObjectRegistry::Register() will now return false if something
 	  is registered with a duplicate tag (exception is the NULL tag).
