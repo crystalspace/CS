@@ -458,8 +458,7 @@ void csTextureManagerLine::PrepareTextures ()
   // Create mipmaps for all textures
   int i;
   for (i = 0; i < textures.Length (); i++)
-    ((csTextureMMLine*)textures[i])->CreateMipmaps (
-      mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+    textures [i]->CreateMipmaps ();
 
   // The only thing left to do is to compute the palette
   // Everything other has been done during textures registration
@@ -485,7 +484,7 @@ void csTextureManagerLine::PrepareTexture (iTextureHandle *handle)
   if (!handle) return;
 
   csTextureMMLine *txt = (csTextureMMLine *)handle->GetPrivateObject ();
-  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+  txt->CreateMipmaps ();
   txt->remap_texture (this);
 }
 

@@ -47,6 +47,8 @@ TOKEN_DEF_START
   TOKEN_DEF (TEXTURE)
   TOKEN_DEF (TRANSPARENT)
   TOKEN_DEF (FILE)
+  TOKEN_DEF (MIPMAP)
+  TOKEN_DEF (DITHER)
 TOKEN_DEF_END
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csApp  -//--
@@ -200,15 +202,15 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   TOKEN_TABLE_START (texcommands)
     TOKEN_TABLE (FILE)
     TOKEN_TABLE (TRANSPARENT)
+    TOKEN_TABLE (MIPMAP)
+    TOKEN_TABLE (DITHER)
   TOKEN_TABLE_END
 
   const char *filename = iTexName;
   char *buffer = strnew (iTexParams);
   char *bufptr = buffer;
   bool transp = false;
-  float tr=0;
-  float tg=0;
-  float tb=0;
+  float tr = 0, tg = 0, tb = 0;
 
   int cmd;
   char *name, *params;
@@ -222,10 +224,30 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
         transp = true;
         ScanStr (params, "%f,%f,%f", &tr, &tg, &tb);
         break;
-      default:
-        CHK (delete [] buffer);
-        return false;
+      case TOKEN_MIPMAP:
+        if (strcasecmp (params, "yes") == 0)
+          iFlags &= ~CS_TEXTURE_NOMIPMAPS;
+        else if (strcasecmp (params, "no") == 0)
+          iFlags |= CS_TEXTURE_NOMIPMAPS;
+        else
+          printf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
+        break;
+      case TOKEN_DITHER:
+        if (strcasecmp (params, "yes") == 0)
+          iFlags |= CS_TEXTURE_DITHER;
+        else if (strcasecmp (params, "no") == 0)
+          iFlags &= ~CS_TEXTURE_DITHER;
+        else
+          printf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
+        break;
     }
+
+  if (cmd == PARSERR_TOKENNOTFOUND)
+  {
+    printf (MSG_WARNING, "Unknown texture parameter keyword detected: '%s'\n", bufptr);
+    CHK (delete [] buffer);
+    return false;
+  }
 
   // Now load the texture
   size_t size;

@@ -85,7 +85,7 @@ iTextureHandle *csTextureManagerDirect3D::RegisterTexture (iImage* image,
   if (!image) return NULL;
 
   csTextureMMDirect3D *txt = new csTextureMMDirect3D (image, flags);
-  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+  txt->CreateMipmaps ();
   textures.Push (txt);
   return txt;
 }
@@ -95,7 +95,7 @@ void csTextureManagerDirect3D::PrepareTexture (iTextureHandle *handle)
   if (!handle) return;
 
   csTextureMMDirect3D *txt = (csTextureMMDirect3D *)handle->GetPrivateObject ();
-  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+  txt->CreateMipmaps ();
   txt->remap_texture (this);
 }
 

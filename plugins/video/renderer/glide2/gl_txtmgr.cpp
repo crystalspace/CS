@@ -149,7 +149,7 @@ void csTextureManagerGlide::PrepareTextures ()
   {
     csTextureMM* txt = textures.Get (i);
     txt->ApplyGamma ();
-    txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+    txt->CreateMipmaps ();
     ((csTextureMMGlide *)txt)->remap_mm();
   }
 }
@@ -169,7 +169,7 @@ void csTextureManagerGlide::PrepareTexture (iTextureHandle *handle)
   if (!handle) { printf( "NULL image\n"); return; }
 
   csTextureMMGlide *txt = (csTextureMMGlide *)handle->GetPrivateObject ();
-  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+  txt->CreateMipmaps ();
   txt->remap_mm ();
 }
 

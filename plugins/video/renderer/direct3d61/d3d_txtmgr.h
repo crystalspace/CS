@@ -49,7 +49,7 @@ public:
   virtual void ComputeMeanColor ();
 
   /// Create all mipmapped bitmaps from the first level.
-  virtual void CreateMipmaps (bool verynice, bool blend_mipmap0);
+  virtual void CreateMipmaps ();
 
   /// Override GetMipMapData() to return 2d texture if (mm == -2)
   virtual void *GetMipMapData (int mm);

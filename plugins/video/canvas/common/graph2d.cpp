@@ -169,7 +169,35 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
 
   int fx1 = QInt (x1), fx2 = QInt (x2),
       fy1 = QInt (y1), fy2 = QInt (y2);
-  if (abs (fx2 - fx1) > abs (fy2 - fy1))
+  if (fy1 == fy2)
+  {
+    if (fx2 - fx1)
+    {
+      if (fx1 > fx2) { int tmp = fx1; fx1 = fx2; fx2 = tmp; }
+      int count = fx2 - fx1 + 1;
+      switch (pfmt.PixelBytes)
+      {
+        case 1:
+          memset (GetPixelAt (fx1, fy1), color, count);
+          break;
+        case 2:
+        {
+          UShort *dest = (UShort *)GetPixelAt (fx1, fy1);
+          while (count--) *dest++ = color;
+          break;
+        }
+        case 4:
+        {
+          ULong *dest = (ULong *)GetPixelAt (fx1, fy1);
+          while (count--) *dest++ = color;
+          break;
+        }
+      } /* endswitch */
+    }
+    else
+      DrawPixel (fx1, fy1, color);
+  }
+  else if (abs (fx2 - fx1) > abs (fy2 - fy1))
   {
     // Transform floating-point format to 16.16 fixed-point
     int fy1 = QInt16 (y1), fy2 = QInt16 (y2);
@@ -188,7 +216,7 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
       y += deltay;
     }
   }
-  else if (fy2 != fy1)
+  else
   {
     // Transform floating-point format to 16.16 fixed-point
     int fx1 = QInt16 (x1), fx2 = QInt16 (x2);
@@ -207,31 +235,6 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
       x += deltax;
     }
   }
-  else if (fx2 - fx1)
-  {
-    if (fx1 > fx2) { int tmp = fx1; fx1 = fx2; fx2 = tmp; }
-    int count = fx2 - fx1 + 1;
-    switch (pfmt.PixelBytes)
-    {
-      case 1:
-        memset (GetPixelAt (fx1, fy1), color, count);
-        break;
-      case 2:
-      {
-        UShort *dest = (UShort *)GetPixelAt (fx1, fy1);
-        while (count--) *dest++ = color;
-        break;
-      }
-      case 4:
-      {
-        ULong *dest = (ULong *)GetPixelAt (fx1, fy1);
-        while (count--) *dest++ = color;
-        break;
-      }
-    } /* endswitch */
-  }
-  else
-    DrawPixel (fx1, fy1, color);
 }
 #endif
 

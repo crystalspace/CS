@@ -221,7 +221,7 @@ void csScan_Finalize ()
   CHK (delete [] Scan.filter_mul_table);
 }
 
-void csScan_InitDraw (bool verynice, int MipMap, csGraphics3DSoftware* g3d,
+void csScan_InitDraw (int MipMap, csGraphics3DSoftware* g3d,
   iPolygonTexture* tex, csTextureMMSoftware* texture, csTexture* untxt)
 {
   Scan.Texture = texture;
@@ -245,17 +245,16 @@ void csScan_InitDraw (bool verynice, int MipMap, csGraphics3DSoftware* g3d,
   }
   else
     Scan.bitmap2 = NULL;
-  int mmshift = verynice && MipMap ? MipMap - 1 : MipMap;
-  Scan.tw2 = tex->GetWidth () >> mmshift;
-  Scan.th2 = tex->GetHeight () >> mmshift;
-  Scan.min_u = (tex->GetIMinU () >> mmshift) << 16;
-  Scan.min_v = (tex->GetIMinV () >> mmshift) << 16;
+  Scan.tw2 = tex->GetWidth () >> MipMap;
+  Scan.th2 = tex->GetHeight () >> MipMap;
+  Scan.min_u = (tex->GetIMinU () >> MipMap) << 16;
+  Scan.min_v = (tex->GetIMinV () >> MipMap) << 16;
 
 #ifdef STUPID_TEST
   Scan.tw2fp = (Scan.tw2 << 16) - 1;
   Scan.th2fp = (Scan.th2 << 16) - 1;
 #endif
-  Scan.shf_u = tex->GetShiftU () - mmshift;
+  Scan.shf_u = tex->GetShiftU () - MipMap;
 
   Scan.and_h <<= Scan.shf_w;
   Scan.shf_h = 16 - Scan.shf_w;

@@ -29,28 +29,6 @@ class csTexture;
 struct iImage;
 
 /**
- * Standard mipmap mode:
- * <ul>
- * <li>original texture
- * <li>texture scaled down 2 times
- * <li>texture scaled down 4 times
- * <li>texture scaled down 8 times
- * </ul>
- */
-#define MIPMAP_NICE	0
-
-/**
- * Enhanced (but memory-hungry) mipmap mode:
- * <ul>
- * <li>original texture
- * <li>blended original texture
- * <li>texture scaled down 2 times
- * <li>texture scaled down 4 times
- * </ul>
- */
-#define MIPMAP_VERYNICE	1
-
-/**
  * This class is the top-level representation of a texture.
  * It contains a number of csTexture objects that represents
  * each a single image. A csTexture object is created for
@@ -105,10 +83,11 @@ public:
   void FreeImage ();
 
   /// Create all mipmapped bitmaps from the first level.
-  virtual void CreateMipmaps (bool verynice, bool blend_mipmap0);
+  virtual void CreateMipmaps ();
 
   /// Get the texture at the corresponding mipmap level (0..3)
-  virtual csTexture *get_texture (int mipmap);
+  csTexture *get_texture (int mipmap)
+  { return (mipmap >= 0) && (mipmap < 4) ? tex [mipmap] : NULL; }
 
   /**
    * Adjusts the textures size, to ensure some restrictions like
@@ -269,12 +248,6 @@ protected:
 
   /// Verbose mode.
   bool verbose;
-
-  /// Configuration value: how is mipmapping done (one of MIPMAP_...)
-  int mipmap_mode;
-
-  /// Configuration value: blend mipmap level 0.
-  bool do_blend_mipmap0;
 
   /// Read configuration values from config file.
   virtual void read_config (csIniFile *config);

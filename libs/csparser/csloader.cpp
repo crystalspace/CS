@@ -53,6 +53,7 @@
 #include "csgfxldr/csimage.h"
 #include "csscript/objtrig.h"
 #include "csscript/scripts.h"
+#include "itxtmgr.h"
 
 typedef char ObName[30];
 /// The world we are currently processing
@@ -117,6 +118,7 @@ TOKEN_DEF_START
   TOKEN_DEF (CURVECONTROL)
   TOKEN_DEF (CURVESCALE)
   TOKEN_DEF (DIM)
+  TOKEN_DEF (DITHER)
   TOKEN_DEF (DYNAMIC)
   TOKEN_DEF (F)
   TOKEN_DEF (FILE)
@@ -1914,6 +1916,8 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
     TOKEN_TABLE (TRANSPARENT)
     TOKEN_TABLE (FILTER)
     TOKEN_TABLE (FILE)
+    TOKEN_TABLE (MIPMAP)
+    TOKEN_TABLE (DITHER)
   TOKEN_TABLE_END
 
   long cmd;
@@ -1921,6 +1925,7 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   char *params;
   csColor transp (0, 0, 0);
   bool do_transp = false;
+  int flags = 0;
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
@@ -1936,6 +1941,22 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
         break;
       case TOKEN_FILE:
         filename = params;
+        break;
+      case TOKEN_MIPMAP:
+        if (strcasecmp (params, "yes") == 0)
+          flags &= ~CS_TEXTURE_NOMIPMAPS;
+        else if (strcasecmp (params, "no") == 0)
+          flags |= CS_TEXTURE_NOMIPMAPS;
+        else
+          CsPrintf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
+        break;
+      case TOKEN_DITHER:
+        if (strcasecmp (params, "yes") == 0)
+          flags |= CS_TEXTURE_DITHER;
+        else if (strcasecmp (params, "no") == 0)
+          flags &= ~CS_TEXTURE_DITHER;
+        else
+          CsPrintf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
         break;
     }
   }
@@ -1955,6 +1976,7 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   // not have power-of-two dimensions...
 
   csTextureHandle *tex = World->GetTextures ()->NewTexture (image);
+  tex->flags |= flags;
   if (prefix)
   {
     char *prefixedname = new char [strlen (name) + strlen (prefix) + 2];

@@ -87,7 +87,8 @@ bool cswsSystemDriver::Initialize (int argc, const char* const argv[],
   } /* endfor */
 
   // Open the visual, initialize keyboard and mouse
-  Open (application->GetText ());
+  if (!Open (application->GetText ()))
+    return false;
 
   // Initialize palette etc (no textures at this time anyway)
   application->PrepareTextures ();

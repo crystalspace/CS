@@ -137,15 +137,14 @@ public:
    * overall size of all textures exceeds maximal cache size, the
    * least used texture is discarded.
    */
-  SoftwareCachedTexture *cache_texture (bool verynice, int MipMap,
-    iPolygonTexture* pt);
+  SoftwareCachedTexture *cache_texture (int MipMap, iPolygonTexture* pt);
 
   /**
    * Check if the given texture is in the cache and possibly
    * add it if not. The parts of lighted texture that were changed
    * will be recomputed.
    */
-  void fill_texture (bool verynice, int MipMap, iPolygonTexture* pt,
+  void fill_texture (int MipMap, iPolygonTexture* pt,
     float u_min, float v_min, float u_max, float v_max);
 
   /**

@@ -172,7 +172,7 @@ void csTextureMMSoftware::ComputeMeanColor ()
       csTextureSoftware *t = (csTextureSoftware *)tex [i];
       if (!t->image) break;
 
-      if (texman->dither_textures)
+      if (texman->dither_textures || (flags & CS_TEXTURE_DITHER))
         csQuantizeRemapDither ((RGBPixel *)t->image->GetImageData (),
           t->get_size (), t->get_width (), pal, palette_size, t->bitmap, tc);
       else
@@ -476,7 +476,7 @@ void csTextureManagerSoftware::PrepareTextures ()
     csTextureMM *txt = textures.Get (i);
     if (!pfmt.PalEntries)
       txt->ApplyGamma ();
-    txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+    txt->CreateMipmaps ();
   }
 
   // The only thing left to do is to compute the palette
@@ -505,7 +505,7 @@ void csTextureManagerSoftware::PrepareTexture (iTextureHandle *handle)
   csTextureMMSoftware *txt = (csTextureMMSoftware *)handle->GetPrivateObject ();
   if (!pfmt.PalEntries)
     txt->ApplyGamma ();
-  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+  txt->CreateMipmaps ();
   txt->remap_texture (this);
 }
 

@@ -187,9 +187,10 @@ csMatrix3 operator* (float f, const csMatrix3& m)
 
 csMatrix3 operator/ (const csMatrix3& m, float f)
 {
-  return csMatrix3 (m.m11/f, m.m12/f, m.m13/f,
-                    m.m21/f, m.m22/f, m.m23/f,
-                    m.m31/f, m.m32/f, m.m33/f);
+  float inv_f = 1 / f;
+  return csMatrix3 (m.m11*inv_f, m.m12*inv_f, m.m13*inv_f,
+                    m.m21*inv_f, m.m22*inv_f, m.m23*inv_f,
+                    m.m31*inv_f, m.m32*inv_f, m.m33*inv_f);
 }
 
 bool operator== (const csMatrix3& m1, const csMatrix3& m2)

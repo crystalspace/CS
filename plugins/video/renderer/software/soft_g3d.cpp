@@ -1288,15 +1288,17 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   else
     mipmap = rstate_mipmap - 1;
 
-  // If mipmap is too small, use the level that is still visible ...
-  int mmshift = texman->is_verynice () && mipmap ? mipmap - 1 : mipmap;
-  int shf_u = tex->GetShiftU () - mmshift;
+  // If mipmap is too small or not available, use the mipmap level
+  // that is still visible or available ...
+  int shf_u = tex->GetShiftU () - mipmap;
   if (shf_u < 0) mipmap += shf_u;
   if (mipmap < 0) mipmap = 0;
+  while (mipmap && !tex_mm->get_texture (mipmap))
+    mipmap--;
 
-  if (mmshift)
+  if (mipmap)
   {
-    int duv = (1 << mmshift);
+    int duv = (1 << mipmap);
     fdu /= duv;
     fdv /= duv;
   }
@@ -1451,7 +1453,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
       // Compute U/V and check against bounding box
 #define CHECK(sx)					\
       {							\
-        float cx = (sx - float (width2));		\
+        float cx = sx - float (width2);			\
         float z = 1 / (M * cx + N * cy + O);		\
         float u = (J1 * cx + J2 * cy + J3) * z;		\
         float v = (K1 * cx + K2 * cy + K3) * z;		\
@@ -1463,8 +1465,9 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
       }
 
       float cy = (float (sy) - 0.5 - float (height2));
-      CHECK (sxL);
-      CHECK (sxR);
+      // Due to sub-pixel correction we can arrive half of pixel left or right
+      CHECK (sxL - 0.5);
+      CHECK (sxR + 0.5);
 
       // Find the trapezoid top (or bottom in inverted Y coordinates)
       int old_sy = sy;
@@ -1483,10 +1486,9 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     }
 texr_done:
 
-    // In VERYNICE mode we need other texture sizes
-    tcache->fill_texture (texman->is_verynice (), mipmap, tex, u_min, v_min, u_max, v_max);
+    tcache->fill_texture (mipmap, tex, u_min, v_min, u_max, v_max);
   }
-  csScan_InitDraw (texman->is_verynice (), mipmap, this, tex, tex_mm, txt_unl);
+  csScan_InitDraw (mipmap, this, tex, tex_mm, txt_unl);
 
   // Select the right scanline drawing function.
   bool tex_transp = tex_mm->GetTransparent ();

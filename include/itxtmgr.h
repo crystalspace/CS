@@ -48,14 +48,24 @@ struct iTextureHandle;
  */
 #define CS_TEXTURE_DYNAMIC		0x00000004
 /**
- * The number of mipmaps computed for this texture
- * 0     .. default number ( implementation dependend )
- * n > 0 .. not more than n
+ * Create mipmaps for this texture?<p>
+ * Sometimes we know in advance that some texture will need just one
+ * mipmap (or we just don't care about the mipmapping artifacts because of,
+ * say, how texture is looking (smoothed etc)). This flag is a <b>hint</b>
+ * for texture manager so that it will know this.<p>
+ * Note that if texture is not registered for 3D usage (i.e. if CS_TEXTURE_3D
+ * is not set) this flag does not matter - 2D textures do not use mipmaps.
  */
-#define CS_TEXTURE_MMLEVEL_MASK		0x000000F0
-
-#define CS_SET_TEXTURE_MMLEVEL(level)	((UInt)level << 4)
-#define CS_GET_TEXTURE_MMLEVEL(flag)	((flag & CS_TEXTURE_MMLEVEL_MASK) >> 4)
+#define CS_TEXTURE_NOMIPMAPS		0x00000008
+/**
+ * Dither texture or not.<p>
+ * Some renderers may use dithering while converting textures to internal
+ * format (say from truecolor to 8-bit paletted). For most textures dithering
+ * won't give any visual effect, but very seldom there are textures that looks
+ * relatively bad after being converted. In this case you can enable this
+ * per-texture flag.
+ */
+#define CS_TEXTURE_DITHER		0x00000010
 
 SCF_VERSION (iTextureManager, 1, 0, 0);
 

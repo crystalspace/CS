@@ -203,7 +203,7 @@ void csTextureMMDirect3D::ComputeMeanColor ()
   mean_color.blue  = b / pixels;
 }
 
-void csTextureMMDirect3D::CreateMipmaps (bool verynice, bool blend_mipmap0)
+void csTextureMMDirect3D::CreateMipmaps ()
 {
   (void) verynice;
   (void) blend_mipmap0;
@@ -310,12 +310,12 @@ void csTextureManagerDirect3D::PrepareTextures ()
   {
     csTextureMM *txt = textures.Get (i);
     txt->ApplyGamma ();
-    txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+    txt->CreateMipmaps ();
   }
 }
 
-iTextureHandle *csTextureManagerDirect3D::RegisterTexture (iImage* image,
-                                                           int     flags)
+iTextureHandle *csTextureManagerDirect3D::RegisterTexture (
+  iImage* image, int flags)
 {
   if (!image) return NULL;
 
@@ -330,7 +330,7 @@ void csTextureManagerDirect3D::PrepareTexture (iTextureHandle *handle)
 
   csTextureMMDirect3D *txt = (csTextureMMDirect3D *)handle->GetPrivateObject ();
   txt->ApplyGamma ();
-  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+  txt->CreateMipmaps ();
 }
 
 void csTextureManagerDirect3D::UnregisterTexture (iTextureHandle* handle)

@@ -46,8 +46,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   float u_min, float v_min, float u_max, float v_max)
 {
   int mipmap = ct->mipmap;
-  int mmshift = texman->is_verynice () && mipmap ? mipmap - 1 : mipmap;
-  int mipmap_delta = (1 << mmshift) - 1;
+  int mipmap_delta = (1 << mipmap);
 
   csTextureMMSoftware *texmm =
     (csTextureMMSoftware *)pt->GetTextureHandle ()->GetPrivateObject ();
@@ -55,13 +54,13 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   RGBPixel *tx_palette = texmm->GetColorMap ();
   UByte *tx_bitmap = (UByte *)tx->get_bitmap ();
 
-  int pt_min_u = pt->GetIMinU () >> mmshift;
-  int pt_min_v = pt->GetIMinV () >> mmshift;
-  int pt_cell_size = pt->GetLightCellSize () >> mmshift;
-  int pt_cell_shift = pt->GetLightCellShift () - mmshift;
-  int pt_shfw = pt->GetShiftU () - mmshift;
+  int pt_min_u = pt->GetIMinU () >> mipmap;
+  int pt_min_v = pt->GetIMinV () >> mipmap;
+  int pt_cell_size = pt->GetLightCellSize () >> mipmap;
+  int pt_cell_shift = pt->GetLightCellShift () - mipmap;
+  int pt_shfw = pt->GetShiftU () - mipmap;
   int pt_w = 1 << pt_shfw;
-  int pt_h = (pt->GetHeight () + mipmap_delta) >> mmshift;
+  int pt_h = (pt->GetHeight () + mipmap_delta) >> mipmap;
 
   iLightMap *lm = pt->GetLightMap ();
   int lm_w = lm->GetWidth ();
@@ -112,7 +111,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   if (min_lu >= max_lu) return;
   if (min_lv >= max_lv) return;
 
-  int max_lu2 = ((((pt->GetOriginalWidth () + mipmap_delta) >> mmshift) +
+  int max_lu2 = ((((pt->GetOriginalWidth () + mipmap_delta) >> mipmap) +
     pt_cell_size - 1) >> pt_cell_shift);
   if (max_lu > max_lu2) max_lu = max_lu2;
 
@@ -139,10 +138,17 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 #undef GET
 
       // this is somewhat tricky but in practice it works well
+#if 0
       ULong cellid = ((r00 + g00 + b00)      ) ^
                      ((r01 + g01 + b01) << 8 ) ^
                      ((r10 + g10 + b10) << 16) ^
                      ((r11 + g11 + b11) << 24);
+#else
+      ULong cellid =
+        ((r00 + hash_table [r01] + hash_table [r10 + 64] + hash_table [r11 + 128])      ) +
+        ((g00 + hash_table [g01] + hash_table [g10 + 64] + hash_table [g11 + 128]) << 11) +
+        ((b00 + hash_table [b01] + hash_table [b10 + 64] + hash_table [b11 + 128]) << 22);
+#endif
 
       // If this lightmap cell did not changed, do not recalculate
       if (old_lm [src] == cellid)

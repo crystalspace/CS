@@ -314,10 +314,10 @@ void csPolygon3D::SetTextureType (int type)
   switch (type)
   {
     case POLYTXT_LIGHTMAP:
-      CHK (txt_info = (csPolygonTextureType *)new csLightMapped ());
+      CHK (txt_info = new csLightMapped ());
       break;
     case POLYTXT_GOURAUD:
-      CHK (txt_info = (csPolygonTextureType *)new csGouraudShaded ());
+      CHK (txt_info = new csGouraudShaded ());
       break;
   }
 }

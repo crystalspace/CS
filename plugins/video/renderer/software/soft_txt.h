@@ -237,10 +237,6 @@ public:
   /// Find an rgb value using the faster lookup tables.
   int find_rgb (int r, int g, int b);
 
-  /// Are we using verynice mode?
-  bool is_verynice ()
-  { return !!(mipmap_mode & MIPMAP_VERYNICE); }
-
   /**
    * Compute the 'best' palette for all loaded textures.
    * This function will exactly behave the same in 16-bit mode

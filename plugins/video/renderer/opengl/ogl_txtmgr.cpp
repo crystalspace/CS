@@ -130,7 +130,7 @@ void csTextureManagerOpenGL::PrepareTextures ()
   {
     csTextureMM *txt = textures.Get (i);
     txt->ApplyGamma ();
-    txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+    txt->CreateMipmaps ();
   }
 }
 
@@ -150,7 +150,7 @@ void csTextureManagerOpenGL::PrepareTexture (iTextureHandle *handle)
 
   csTextureMMOpenGL *txt = (csTextureMMOpenGL *)handle->GetPrivateObject ();
   txt->ApplyGamma ();
-  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+  txt->CreateMipmaps ();
 }
 
 void csTextureManagerOpenGL::UnregisterTexture (iTextureHandle* handle)

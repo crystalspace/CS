@@ -69,7 +69,7 @@ void csTextureMM::FreeImage ()
   image = NULL;
 }
 
-void csTextureMM::CreateMipmaps (bool verynice, bool blend_mipmap0)
+void csTextureMM::CreateMipmaps ()
 {
   if (!image) return;
 
@@ -77,38 +77,22 @@ void csTextureMM::CreateMipmaps (bool verynice, bool blend_mipmap0)
   for (int i = 0; i < 4; i++)
     CHKB (delete tex [i]);
 
-  int step = verynice ? 0 : 1;
-
   RGBPixel *tc = transp ? &transp_color : (RGBPixel *)NULL;
 
-  if (flags & CS_TEXTURE_3D)
-  {
-    int n=1;
-    int maxMM = CS_GET_TEXTURE_MMLEVEL(flags);
-    maxMM = maxMM == 0 ? 4 : MIN( maxMM, 4 );
-    iImage *i0 = blend_mipmap0 ? image->MipMap (0, tc) : (image->IncRef (), image);
-#if 1
-    // Create each new level by creating a level 2 mipmap from previous level
-    iImage *i1 = ++n <= maxMM ? i0->MipMap (step, tc) : NULL;
-    iImage *i2 = ++n <= maxMM ? i1->MipMap (1, tc) : NULL;
-    iImage *i3 = ++n <= maxMM ? i2->MipMap (1, tc) : NULL;
-#else
-    // Create each mipmap level from original texture
-    iImage *i1 = ++n <= maxMM ? image->MipMap (step++, tc) : NULL;
-    iImage *i2 = ++n <= maxMM ? image->MipMap (step++, tc) : NULL;
-    iImage *i3 = ++n <= maxMM ? image->MipMap (step++, tc) : NULL;
-#endif
+  image->IncRef ();
+  tex [0] = NewTexture (image);
 
-    tex [0] = NewTexture (i0);
-    tex [1] = i1 ? NewTexture (i1) : NULL;
-    tex [2] = i2 ? NewTexture (i2) : NULL;
-    tex [3] = i3 ? NewTexture (i3) : NULL;
-  }
-  else
+  // 2D textures uses just the top-level mipmap
+  if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
   {
-    // 2D textures uses just the top-level mipmap
-    image->IncRef ();
-    tex [0] = NewTexture (image);
+    // Create each new level by creating a level 2 mipmap from previous level
+    iImage *i1 = image->MipMap (1, tc);
+    iImage *i2 = i1->MipMap (1, tc);
+    iImage *i3 = i2->MipMap (1, tc);
+
+    tex [1] = NewTexture (i1);
+    tex [2] = NewTexture (i2);
+    tex [3] = NewTexture (i3);
   }
 
   ComputeMeanColor ();
@@ -146,11 +130,6 @@ void csTextureMM::GetMeanColor (UByte &r, UByte &g, UByte &b)
   r = mean_color.red;
   g = mean_color.green;
   b = mean_color.blue;
-}
-
-csTexture* csTextureMM::get_texture (int lev)
-{
-  return (lev >= 0) && (lev < 4) ? tex [lev] : NULL;
 }
 
 bool csTextureMM::GetMipMapDimensions (int mipmap, int& w, int& h) 
@@ -243,8 +222,6 @@ csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D *iG2D)
   verbose = false;
 
   Gamma = 1.0;
-  mipmap_mode = MIPMAP_NICE;
-  do_blend_mipmap0 = false;
   pfmt = *iG2D->GetPixelFormat ();
 }
 
@@ -256,22 +233,6 @@ csTextureManager::~csTextureManager()
 void csTextureManager::read_config (csIniFile *config)
 {
   Gamma = config->GetFloat ("TextureManager", "GAMMA", 1.0);
-  do_blend_mipmap0 = config->GetYesNo ("TextureManager", "BLEND_MIPMAP", false);
-  const char *p = config->GetStr ("TextureManager", "MIPMAP_MODE", "nice");
-  if (!strcmp (p, "nice"))
-  {
-    mipmap_mode = MIPMAP_NICE;
-    if (verbose)
-      System->Printf (MSG_INITIALIZATION, "Mipmap calculation 'nice'.\n");
-  }
-  else if (!strcmp (p, "verynice"))
-  {
-    mipmap_mode = MIPMAP_VERYNICE;
-    if (verbose)
-      System->Printf (MSG_INITIALIZATION, "Mipmap calculation 'verynice'\n");
-  }
-  else
-    System->Printf (MSG_FATAL_ERROR, "Bad value '%s' for MIPMAP_MODE!\n(Use 'verynice' or 'nice')\n", p);
   compute_gamma_table ();
 }
 
