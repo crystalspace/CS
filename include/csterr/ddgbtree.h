@@ -92,12 +92,12 @@ public:
 #if (defined(OS_SOLARIS))
     inline void reset()
 	{
-		_state.merged = false;
-		_state.split =false;
-		_state.coord = false;
-		_state.priority = false;
-		_state.dirty = false;
-		_state.vbuffer = false;
+		_state.flags.merged = false;
+		_state.flags.split =false;
+		_state.flags.coord = false;
+		_state.flags.priority = false;
+		_state.flags.dirty = false;
+		_state.flags.vbuffer = false;
 	    _vis.visibility = ddgINIT; }
 #else
     inline void reset()    { _state.all &= 3; _vis.visibility = ddgINIT; }
