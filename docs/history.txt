@@ -40,6 +40,8 @@ The history order is reversed so that new features are at the top.
 	  depend on iMeshWrapper.
 	- Fixed a bug with closing brackets on 3ds2lev. This is untested
 	  though.
+	- Added some information to the second tutorial about render
+	  priorities and Z-buffer mode.
 11-Dec-2001
 	- Thanks to Matze we finally got debugging to work properly with
 	  cygwin and mingw ports. In the past there was no useful debug

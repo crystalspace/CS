@@ -366,7 +366,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  // Add the sprite to the engine.
+  // Create the sprite and add it to the engine.
   iMeshWrapper* sprite = engine->CreateMeshWrapper (
   	imeshfact, "MySprite", room,
 	csVector3 (-3, 5, 3));
@@ -378,6 +378,13 @@ bool Simple::Initialize (int argc, const char* const argv[])
   spstate->SetAction ("default");
   imeshfact->DecRef ();
   spstate->DecRef ();
+
+  // The following two calls are not needed since CS_ZBUF_USE and
+  // Object render priority are the default but they show how you
+  // can do this.
+  sprite->SetZBufMode (CS_ZBUF_USE);
+  sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
+
   sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   sprite->DecRef ();
   return true;
