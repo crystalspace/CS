@@ -50,6 +50,8 @@ chronological order.
 	- Eric Sunshine applied a few small patches from Dariusz Dawidowski
 	  <truman@go2.pl> protecting some printf()'s in CS_DEBUG and changing
 	  others to use iReporter.
+	- Eric Sunshine eliminated a slew of compilation warnings in cstool
+	  which were present when the new-renderer was enabled.
 28-Sep-2003
 	- Eric Sunshine corrected erroneous comments in
 	  CS/mk/autoconf/compiler.m4.
