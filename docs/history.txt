@@ -1,5 +1,40 @@
 The history order has been reversed so that new features are at the top.
 
+9-Apr-2001
+	- Removed the 'movable' from csThing. The 'movable' is part of the
+	  mesh wrapper and the one in csThing should not be used.
+	- csThing no longer implements iVisibilityObject as the mesh wrapper
+	  already does this.
+	- Removed MarkVisible() and related functions from csThing.
+	- Removed sky and template flags from csThing. Sky support will soon
+	  be reimplemented using render order techniques.
+	- Removed zbufMode from csThing. This is part of mesh wrapper.
+	- Made csThing::Draw() and DrawCurves() smarter. If a thing cannot
+	  move (which is default and occurs a lot) these functions will not
+	  try to use the movable anymore. This makes it a bit more efficient.
+	- Removed csLight::CalculateLighting() for csThing.
+	- Also removed csSector::ShineLights() for a csThing.
+	- Fixed a bug in the use of csPortal::CompleteSector(). When this
+	  function returns false all routines will now correctly stop
+	  processing that portal.
+	- Fixed a bug in infinite maze (-infinite option of WalkTest) which
+	  makes it work a little better but still not good enough (still
+	  crashes when trying to complete the first sector).
+	- Added iVisibilityCuller::Setup(). This function will setup the
+	  visibility culler. It replaces csThing::BuildStaticTree().
+	- Removed iSector::CreateBSP().
+	- Added a parameter to csSector::UseStaticTree() which indicates
+	  the mesh object to use for visibility culling. In addition the
+	  STATBSP keyword in map files now requires an additional parameter
+	  which is the name of the mesh object to use for visibility culling.
+	  At this moment the only way to use this is to have a thing mesh
+	  object and add the VISTREE() flag to that.
+	- Renamed csSector::static_thing to culler_mesh. Also made it a
+	  mesh wrapper instead of a thing.
+	- I disabled a lot of more of the octree debugging stuff in WalkTest.
+	  This is all broken now.
+	- Removed the 'things' console command. It is broken now and needs
+	  to be replaced with something more general.
 8-Apr-2001
 	- Extended iPortal with SetPortalSectorCallback() to set a callback
 	  that is called whenever a sector for a portal is missing. This

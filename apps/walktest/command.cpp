@@ -401,8 +401,6 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     change_boolean_gfx3d (arg, G3DRENDERSTATE_BILINEARMAPPINGENABLE, "bi-linear filtering");
   else if (!strcasecmp (cmd, "trilinear"))
     change_boolean_gfx3d (arg, G3DRENDERSTATE_TRILINEARMAPPINGENABLE, "tri-linear filtering");
-  else if (!strcasecmp (cmd, "things"))
-    change_boolean (arg, &csSector::do_things, "things");
   else if (!strcasecmp (cmd, "lighting"))
     change_boolean_gfx3d (arg, G3DRENDERSTATE_LIGHTINGENABLE, "lighting");
   else if (!strcasecmp (cmd, "gouraud"))

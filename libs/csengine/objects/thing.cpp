@@ -59,7 +59,6 @@ IMPLEMENT_IBASE_EXT (csThing)
   IMPLEMENTS_EMBEDDED_INTERFACE (iThingState)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
   IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityCuller)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObjectFactory)
 IMPLEMENT_IBASE_EXT_END
@@ -80,10 +79,6 @@ IMPLEMENT_EMBEDDED_IBASE(csThing::VisCull)
   IMPLEMENTS_INTERFACE(iVisibilityCuller)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE(csThing::VisObject)
-  IMPLEMENTS_INTERFACE(iVisibilityObject)
-IMPLEMENT_EMBEDDED_IBASE_END
-
 IMPLEMENT_EMBEDDED_IBASE(csThing::MeshObject)
   IMPLEMENTS_INTERFACE(iMeshObject)
 IMPLEMENT_EMBEDDED_IBASE_END
@@ -92,14 +87,12 @@ IMPLEMENT_EMBEDDED_IBASE(csThing::MeshObjectFactory)
   IMPLEMENTS_INTERFACE(iMeshObjectFactory)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csThing::csThing (bool is_sky, bool is_template) :
-	csPObject (), polygons (64, 64), curves (16, 16), movable ()
+csThing::csThing () : csPObject (), polygons (64, 64), curves (16, 16)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiThing);
   CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
-  CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
   CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
   CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
 
@@ -122,15 +115,8 @@ csThing::csThing (bool is_sky, bool is_template) :
   obj_bbox_valid = false;
   light_frame_number = -1;
 
-  movable.scfParent = &scfiThing;
-  movable.SetObject (this);
-
   center_idx = -1;
   ParentTemplate = NULL;
-  csThing::is_sky = is_sky;
-  csThing::is_template = is_template;
-  if (is_sky) zbufMode = CS_ZBUF_FILL;
-  else zbufMode = CS_ZBUF_USE;
 
   cameranr = -1;
   movablenr = -1;
@@ -212,7 +198,7 @@ void csThing::WorUpdate ()
           csPolygon3D* p = GetPolygon3D (i);
           p->ObjectToWorld (movtrans, p->Vwor (0));
         }
-        UpdateCurveTransform ();
+        UpdateCurveTransform (movtrans);
 	// If the movable changed we invalidate the camera number as well
 	// to make sure the camera vertices are recalculated as well.
 	cameranr--;
@@ -223,16 +209,6 @@ void csThing::WorUpdate ()
       //@@@ Not implemented yet!
       return;
   }
-}
-
-void csThing::UpdateMove ()
-{
-  //@@@ Still needed?
-  if (!bbox) CreateBoundingBox ();
-  //@@@ Is this the good way?
-  cached_movable = &movable.scfiMovable;
-  //@@@ TEMPORARY
-  WorUpdate ();
 }
 
 void csThing::UpdateTransformation (const csTransform& c, long cam_cameranr)
@@ -470,10 +446,9 @@ void csThing::CompressVertices ()
   if (bbox) CreateBoundingBox ();
 }
 
-void csThing::BuildStaticTree (int mode, bool /*octree*/)
+void csThing::BuildStaticTree (int mode)
 {
   //mode = BSP_BALANCE_AND_SPLITS;
-
   delete static_tree; static_tree = NULL;
 
   CreateBoundingBox ();
@@ -1258,27 +1233,14 @@ void csThing::SetConvex (bool c)
   }
 }
 
-void csThing::MoveToSector (csSector* s)
+void csThing::UpdateCurveTransform (const csReversibleTransform& movtrans)
 {
-  //@@@
-}
-
-void csThing::RemoveFromSectors ()
-{
-  //@@@@@@if (GetPolyTreeObject ())
-    //@@@@@@GetPolyTreeObject ()->RemoveFromTree ();
-  //@@@
-}
-
-void csThing::UpdateCurveTransform()
-{
+  if (GetNumCurves () == 0) return;
   // since obj has changed (possibly) we need to tell all of our curves
-  csReversibleTransform movtrans = movable.GetFullTransform ();
+  csReversibleTransform o2w = movtrans.GetInverse();
   for (int i = 0 ; i < GetNumCurves () ; i++)
   {
     csCurve* c = curves.Get (i);
- 
-    csReversibleTransform o2w = movtrans.GetInverse();
     c->SetObject2World (&o2w);
   }
 }
@@ -1333,13 +1295,23 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
 
+  csReversibleTransform movtrans;
+  // Only get the transformation if this thing can move.
+  bool can_move = false;
+  if (movable && cfg_moving != CS_THING_MOVE_NEVER)
+  {
+    movtrans = movable->GetFullTransform ();
+    can_move = true;
+  }
+
   int i;
   int res=1;
 
   // Calculate tesselation resolution
   csVector3 wv = curves_center;
-  csReversibleTransform movtrans = movable->GetFullTransform ();
-  csVector3 world_coord = movtrans.This2Other (wv);
+  csVector3 world_coord;
+  if (can_move) world_coord = movtrans.This2Other (wv);
+  else world_coord = wv;
   csVector3 camera_coord = camtrans.Other2This (world_coord);
 
   if (camera_coord.z >= SMALL_Z)
@@ -1352,7 +1324,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
   // Create the combined transform of object to camera by
   // combining object to world and world to camera.
   csReversibleTransform obj_cam = camtrans;
-  obj_cam /= movtrans;
+  if (can_move) obj_cam /= movtrans;
   rview->GetGraphics3D ()->SetObjectToCamera (&obj_cam);
   rview->GetGraphics3D ()->SetClipper (rview->GetClipper ()->GetClipPoly (),
   	rview->GetClipper ()->GetNumVertices ());
@@ -1691,7 +1663,14 @@ bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
 
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
-  csReversibleTransform movtrans = movable->GetFullTransform ();
+  csReversibleTransform movtrans;
+  // Only get the transformation if this thing can move.
+  bool can_move = false;
+  if (movable && cfg_moving != CS_THING_MOVE_NEVER)
+  {
+    movtrans = movable->GetFullTransform ();
+    can_move = true;
+  }
 
   //@@@ Ok?
   cached_movable = movable;
@@ -1750,7 +1729,9 @@ bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
     if (num_vertices>0)
     {
       csVector3 wv = wor_verts[0];
-      csVector3 world_coord = movtrans.This2Other (wv);
+      csVector3 world_coord;
+      if (can_move) world_coord = movtrans.This2Other (wv);
+      else world_coord = wv;
       csVector3 camera_coord = camtrans.Other2This (world_coord);
   
       if (camera_coord.z > 0.0001)
@@ -2115,8 +2096,9 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
 	      if (ith != ithing)
 	      {
 	        csThing* th = ith->GetPrivateObject ();
+		// @@@ UGLY!!!: flags are in mesh wrapper!!?
 		if (fview->CheckShadowMask (th->flags.Get ()))
-	          th->AppendShadows (&(th->GetMovable ().scfiMovable),
+	          th->AppendShadows (obj->visobj->GetMovable (),
 		  	shadows, center);
 	      }
 	    }
@@ -2273,28 +2255,17 @@ void csThing::CastShadows (iFrustumView* fview)
   while (it->HasNext ())
   {
     o = (csObject*)(it->Next ());
-    if (o->GetType () >= csThing::Type)
+    csMeshWrapper* mesh = (csMeshWrapper*)o;
+    // @@@ should not be known in engine.
+    // @@@ UGLY
+    iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+    if (ithing)
     {
-      csThing* sp = (csThing*)o;
-      if (sp != this)
-        if (fview->CheckProcessMask (sp->flags.Get ()))
-	  //@@@ BAD!!! AVOID csFrustumView
-          sp->RealCheckFrustum (fview, &(sp->GetMovable ().scfiMovable));
-    }
-    else
-    {
-      csMeshWrapper* mesh = (csMeshWrapper*)o;
-      // @@@ should not be known in engine.
-      // @@@ UGLY
-      iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
-      if (ithing)
-      {
-	csThing* sp = ithing->GetPrivateObject ();
-	// Only if the thing has right flags do we consider it for shadows.
-        if (fview->CheckProcessMask (mesh->flags.Get ()))
-          sp->RealCheckFrustum (fview, &(mesh->GetMovable ().scfiMovable));
-	ithing->DecRef ();
-      }
+      csThing* sp = ithing->GetPrivateObject ();
+      // Only if the thing has right flags do we consider it for shadows.
+      if (fview->CheckProcessMask (mesh->flags.Get ()))
+        sp->RealCheckFrustum (fview, &(mesh->GetMovable ().scfiMovable));
+      ithing->DecRef ();
     }
   }
 }

@@ -29,7 +29,7 @@ struct iMovable;
 struct iShadowReceiver;
 class csBox3;
 
-SCF_VERSION (iVisibilityCuller, 0, 0, 1);
+SCF_VERSION (iVisibilityCuller, 0, 0, 2);
 
 /**
  * This interface represents a visibility culling system.
@@ -39,6 +39,11 @@ SCF_VERSION (iVisibilityCuller, 0, 0, 1);
  */
 struct iVisibilityCuller : public iBase
 {
+  /**
+   * Setup all data for this visibility culler. This needs
+   * to be called before the culler is used for the first time.
+   */
+  virtual void Setup () = 0;
   /**
    * Register a visibility object with this culler.
    * If this visibility object also supports iShadowCaster and

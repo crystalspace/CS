@@ -925,6 +925,8 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "db_boxnode1"))
   {
+#if 0
+//@@@
     csSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
     if (stat)
@@ -940,9 +942,12 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
       Sys->Printf (MSG_CONSOLE, "There is no octree in this sector!\n");
+#endif
   }
   else if (!strcasecmp (cmd, "db_boxnode2"))
   {
+#if 0
+//@@@
     csSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
     if (stat)
@@ -958,9 +963,12 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
       Sys->Printf (MSG_CONSOLE, "There is no octree in this sector!\n");
+#endif
   }
   else if (!strcasecmp (cmd, "db_boxvis"))
   {
+#if 0
+//@@@
     csSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
     if (stat)
@@ -973,6 +981,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
       CsPrintf (MSG_CONSOLE, "No octree in this sector!\n");
+#endif
   }
   else if (!strcasecmp (cmd, "db_cbuffer"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_cbuffer, "debug cbuffer");
@@ -982,6 +991,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_int (arg, &Sys->cfg_draw_octree, "debug octree", -1, 10);
   else if (!strcasecmp (cmd, "db_curleaf"))
   {
+#if 0
+//@@@
     csSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
     if (stat)
@@ -1001,9 +1012,12 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
       Sys->Printf (MSG_CONSOLE, "There is no octree in this sector!\n");
+#endif
   }
   else if (!strcasecmp (cmd, "db_dumpstubs"))
   {
+#if 0
+//@@@
     csSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
     if (stat)
@@ -1019,9 +1033,12 @@ bool CommandHandler (const char *cmd, const char *arg)
       //@@@@@Dumper::dump_stubs (spr->GetPolyTreeObject ());
     }
     CsPrintf (MSG_DEBUG_0F, "======\n");
+#endif
   }
   else if (!strcasecmp (cmd, "db_osolid"))
   {
+#if 0
+//@@@
     extern void CreateSolidThings (csEngine*, csSector*, csOctreeNode*, int);
     csSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
@@ -1031,6 +1048,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       csOctree* otree = (csOctree*)tree;
       CreateSolidThings (Sys->engine, room, otree->GetRoot (), 0);
     }
+#endif
   }
   else if (!strcasecmp (cmd, "db_radstep"))
   {
@@ -1300,6 +1318,8 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "debug0"))
   {
+#if 0
+//@@@
     csCamera* c = Sys->view->GetCamera ();
     if (c->GetSector ()->GetStaticThing ())
     {
@@ -1316,6 +1336,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 #endif
     }
     //Sys->Printf (MSG_CONSOLE, "No debug0 implementation in this version.\n");
+#endif
   }
   else if (!strcasecmp (cmd, "debug1"))
   {

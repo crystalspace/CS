@@ -844,7 +844,9 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   char* name;
   long cmd;
   char* params;
+
   bool do_stat_bsp = false;
+  char bspname[100];
 
   csSector* sector = new csSector (Engine) ;
   sector->SetName (secname);
@@ -865,6 +867,12 @@ csSector* csLoader::load_sector (char* secname, char* buf)
       	break;
       case CS_TOKEN_STATBSP:
         do_stat_bsp = true;
+	if (!ScanStr (params, "%s", bspname))
+	{
+          CsPrintf (MSG_FATAL_ERROR,
+	  	"STATBSP expects the name of a mesh object!\n");
+          fatal_exit (0, false);
+	}
         break;
       case CS_TOKEN_MESHOBJ:
         {
@@ -906,12 +914,13 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a sector!\n", csGetLastOffender ());
+    CsPrintf (MSG_FATAL_ERROR,
+    	"Token '%s' not found while parsing a sector!\n", csGetLastOffender ());
     fatal_exit (0, false);
   }
 
   if (!(flags & CS_LOADER_NOBSP))
-    if (do_stat_bsp) sector->UseStaticTree ();
+    if (do_stat_bsp) sector->UseStaticTree (bspname);
   return sector;
 }
 

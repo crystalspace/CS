@@ -124,7 +124,7 @@ static void InvPerspective (const csVector2& p, float z, csVector3& v,
 bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     	iRenderView* rview)
 {
-  CompleteSector (rview);
+  if (!CompleteSector (rview)) return false;
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
   float inv_aspect = icam->GetInvFOV ();
@@ -208,7 +208,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
 csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
 	csVector3& isect)
 {
-  CompleteSector (NULL);
+  if (!CompleteSector (NULL)) return NULL;
 
   if (sector->draw_busy >= 5)
     return NULL;
@@ -228,7 +228,7 @@ csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
 csObject* csPortal::HitBeam (const csVector3& start, const csVector3& end,
 	csPolygon3D** polygonPtr)
 {
-  CompleteSector (NULL);
+  if (!CompleteSector (NULL)) return NULL;
 
   if (sector->draw_busy >= 5)
     return NULL;
@@ -244,7 +244,7 @@ csObject* csPortal::HitBeam (const csVector3& start, const csVector3& end,
 
 void csPortal::CheckFrustum (iFrustumView* lview, int alpha)
 {
-  CompleteSector (lview);
+  if (!CompleteSector (lview)) return;
   if (sector->draw_busy > csSector::cfg_reflections) return;
 
   csFrustumContext* old_ctxt = lview->GetFrustumContext ();

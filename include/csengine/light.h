@@ -32,7 +32,6 @@ class Dumper;
 class csSector;
 class csLightMap;
 class csDynLight;
-class csThing;
 class csLightPatchPool;
 class csHalo;
 struct iMeshWrapper;
@@ -323,13 +322,6 @@ public:
    * update the corresponding shadow map.
    */
   void CalculateLighting ();
-
-  /**
-   * Shine this light on all polygons of the csThing.
-   * Only backface culling is used. The light is assumed
-   * to be in the same sector as the csThing.
-   */
-  void CalculateLighting (csThing* th);
 
   /**
    * Shine this light on all polygons of the mesh.

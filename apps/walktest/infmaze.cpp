@@ -189,7 +189,9 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2, int
 static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
 {
   InfPortalCS* ipc = (InfPortalCS*)data;
-  iFrustumView* fv = QUERY_INTERFACE (context, iFrustumView);
+  iFrustumView* fv;
+  if (context) fv = QUERY_INTERFACE (context, iFrustumView);
+  else fv = NULL;
   if (fv)
   {
     if (!fv->IsDynamic ())

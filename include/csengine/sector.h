@@ -86,10 +86,10 @@ private:
   csFog fog;
 
   /**
-   * If static_tree is not NULL then this is a pointer to the csThing
-   * which holds all polygons of the non-moving csThings.
+   * This is a pointer to the csMeshWrapper which implements the visibility
+   * culler.
    */
-  csThing* static_thing;
+  csMeshWrapper* culler_mesh;
 
   /**
    * The visibility culler for this sector or NULL if none.
@@ -103,12 +103,6 @@ public:
    * If this variable is false portals are rendered as a solid polygon.
    */
   static bool do_portals;
-
-  /**
-   * Option variable: render things?
-   * If this variable is false meshes and things are not rendered.
-   */
-  static bool do_things;
 
   /**
    * Configuration variable: number of allowed reflections for static lighting.
@@ -306,20 +300,15 @@ public:
   //----------------------------------------------------------------------
 
   /**
-   * Get the thing representing all non-moving things (all
-   * things which are moved into this thing will return IsMerged()==true).
+   * Get the mesh which implements the visibility culler.
    */
-  csThing* GetStaticThing () { return static_thing; }
+  csMeshWrapper* GetCullerMesh () { return culler_mesh; }
 
   /**
-   * Call this function to generate a polygon tree for all csThings
-   * in this sector which are marked as needing such a tree.
-   * If 'octree' is true this function will create an octree with mini-bsp
-   * trees instead of a BSP tree alone.
-   * Note that at this moment only one thing with such a tree will be
-   * properly supported.
+   * This function will generate a polygon tree from the given mesh
+   * object. This mesh object needs to implement iVisibilityCuller.
    */
-  void UseStaticTree (int mode = BSP_MINIMIZE_SPLITS, bool octree = false);
+  void UseStaticTree (const char* meshname);
 
   /**
    * Get the visibility culler that is used for this sector.
@@ -471,8 +460,6 @@ public:
    */
   void ShineLights (csProgressPulse* = 0);
 
-  /// Version of shine_lights() which only affects one thing.
-  void ShineLights (csThing*, csProgressPulse* = 0);
   /// Version of shine_lights() which only affects one mesh object.
   void ShineLights (iMeshWrapper*, csProgressPulse* = 0);
 
@@ -512,8 +499,6 @@ public:
 
     virtual csSector *GetPrivateObject ()
     { return (csSector*)scfParent; }
-    virtual void CreateBSP ()
-    { scfParent->UseStaticTree (); }
     virtual iVisibilityCuller* GetVisibilityCuller ()
     {
       return scfParent->GetVisibilityCuller ();

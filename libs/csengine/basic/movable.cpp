@@ -107,12 +107,7 @@ void csMovable::ClearSectors ()
 {
   if (parent == NULL)
   {
-    if (object->GetType () >= csThing::Type)
-    {
-      csThing* th = (csThing*)object;
-      th->RemoveFromSectors ();
-    }
-    else if (object->GetType () >= csMeshWrapper::Type)
+    if (object->GetType () >= csMeshWrapper::Type)
     {
       csMeshWrapper* sp = (csMeshWrapper*)object;
       sp->RemoveFromSectors ();
@@ -132,12 +127,7 @@ void csMovable::AddSector (csSector* sector)
   if (parent == NULL)
   {
     sectors.Push (sector);
-    if (object->GetType () >= csThing::Type)
-    {
-      csThing* th = (csThing*)object;
-      th->MoveToSector (sector);
-    }
-    else if (object->GetType () >= csMeshWrapper::Type)
+    if (object->GetType () >= csMeshWrapper::Type)
     {
       csMeshWrapper* sp = (csMeshWrapper*)object;
       sp->MoveToSector (sector);
@@ -168,12 +158,7 @@ void csMovable::RemoveListener (iMovableListener* listener)
 void csMovable::UpdateMove ()
 {
   updatenr++;
-  if (object->GetType () >= csThing::Type)
-  {
-    csThing* th = (csThing*)object;
-    th->UpdateMove ();
-  }
-  else if (object->GetType () >= csMeshWrapper::Type)
+  if (object->GetType () >= csMeshWrapper::Type)
   {
     csMeshWrapper* sp = (csMeshWrapper*)object;
     sp->UpdateMove ();

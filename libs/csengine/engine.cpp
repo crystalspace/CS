@@ -646,14 +646,19 @@ void csEngine::ResolveEngineMode ()
     for (int i = 0 ; i < sectors.Length () ; i++)
     {
       csSector* s = (csSector*)sectors[i];
-      csThing* ss = s->GetStaticThing ();
+      csMeshWrapper* ss = s->GetCullerMesh ();
       if (ss)
       {
+#if 0
+// @@@ Disabled because we can't get at the tree now.
         csPolygonTree* ptree = ss->GetStaticTree ();
         csOctree* otree = (csOctree*)ptree;
 	int num_nodes = otree->GetRoot ()->CountChildren ();
 	if (num_nodes > 30) switch_f2b += 10;
 	else if (num_nodes > 15) switch_f2b += 5;
+#else
+	switch_f2b += 10;
+#endif
       }
       if (switch_f2b >= 10) break;
     }

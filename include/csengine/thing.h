@@ -22,13 +22,11 @@
 #include "csgeom/transfrm.h"
 #include "csobject/pobject.h"
 #include "csengine/bsp.h"
-#include "csengine/movable.h"
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 #include "csutil/garray.h"
 #include "iengine/thing.h"
-#include "iengine/movable.h"
 #include "iengine/polymesh.h"
 #include "iengine/viscull.h"
 #include "imesh/object.h"
@@ -100,7 +98,6 @@ struct csThingBBox
  */
 class csThing : public csPObject
 {
-  friend class csMovable;
   friend class Dumper;
 
 private:
@@ -191,20 +188,8 @@ private:
   /// Pointer to the Thing Template which it derived from.
   csThing* ParentTemplate;
 
-  /// If true this thing is visible.
-  bool is_visible;
-
   /// If true then this thing has been prepared (Prepare() function).
   bool prepared;
-
-  /// If true this thing is a 'sky' object. @@@ Obsolete when 'render order' is implemented
-  bool is_sky;
-
-  /// If true this thing is a 'template' object.
-  bool is_template;
-
-  /// Position in the world.
-  csMovable movable;
 
   /**
    * Tesselation parameter:
@@ -226,9 +211,6 @@ private:
   int num_curve_vertices;
   /// Maximum number of vertices.
   int max_curve_vertices;
-
-  /// Z-buf mode to use for drawing this object.
-  csZBufMode zbufMode;
 
 public:
   /// Set of flags
@@ -311,31 +293,16 @@ private:
    * Utility function to be called whenever movable changes so the
    * object to world transforms in all the curves have to be updated.
    */
-  void UpdateCurveTransform ();
+  void UpdateCurveTransform (const csReversibleTransform& movtrans);
 
   /// Internal draw function.
   bool DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode);
-
-  /// Move this thing to the specified sector. Can be called multiple times.
-  void MoveToSector (csSector* s);
-
-  /// Remove this thing from all sectors it is in (but not from the engine).
-  void RemoveFromSectors ();
-
-  /**
-   * Update transformations after the thing has moved
-   * (through updating the movable instance).
-   * This MUST be done after you change the movable otherwise
-   * some of the internal data structures will not be updated
-   * correctly. This function is called by movable.UpdateMove().
-   */
-  void UpdateMove ();
 
 public:
   /**
    * Create an empty thing.
    */
-  csThing (bool is_sky = false, bool is_template = false);
+  csThing ();
 
   /// Destructor.
   virtual ~csThing ();
@@ -577,10 +544,8 @@ public:
    * This might make drawing more efficient because
    * this thing can then be drawn using Z-fill instead of Z-buffer.
    * Also the c-buffer requires a tree of this kind.
-   * If 'octree' is true this function will create an octree with mini-bsp
-   * trees instead of a BSP tree alone.
    */
-  void BuildStaticTree (int mode = BSP_MINIMIZE_SPLITS, bool octree = false);
+  void BuildStaticTree (int mode = BSP_MINIMIZE_SPLITS);
 
   /// Register a visibility object with this culler.
   void RegisterVisObject (iVisibilityObject* visobj);
@@ -612,11 +577,6 @@ public:
   // Drawing
   //----------------------------------------------------------------------
   
-  /// Set the Z-buf drawing mode to use for this object.
-  void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
-  /// Get the Z-buf drawing mode.
-  csZBufMode GetZBufMode () { return zbufMode; }
-
   /**
    * Draw this thing given a view and transformation.
    */
@@ -652,15 +612,6 @@ public:
    * Cache the lightmaps for all polygons in this thing.
    */
   void CacheLightMaps ();
-
-  /// Mark this thing as visible.
-  void MarkVisible () { is_visible = true; }
-
-  /// Mark this thing as invisible.
-  void MarkInvisible () { is_visible = false; }
-
-  /// Return if this thing is visible.
-  bool IsVisible () { return is_visible; }
 
   //----------------------------------------------------------------------
   // Utility functions
@@ -745,15 +696,6 @@ public:
   //----------------------------------------------------------------------
 
   /**
-   * Get the movable instance for this thing.
-   * It is very important to call GetMovable().UpdateMove()
-   * after doing any kind of modification to this movable
-   * to make sure that internal data structures are
-   * correctly updated.
-   */
-  csMovable& GetMovable () { return movable; }
-
-  /**
    * Control how this thing will be moved.
    */
   void SetMovingOption (int opt);
@@ -762,16 +704,6 @@ public:
    * Get the moving option.
    */
   int GetMovingOption () { return cfg_moving; }
-
-  /**
-   * Return true if this thing is a sky object.
-   */
-  bool IsSky () { return is_sky; }
-
-  /**
-   * Return true if this thing is a template.
-   */
-  bool IsTemplate () { return is_template; }
 
   /**
    * Set convexity flag of this thing. You should call this instead
@@ -828,10 +760,6 @@ public:
     virtual int CreateVertex (const csVector3 &iVertex)
     { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
     virtual bool CreateKey (const char *iName, const char *iValue);
-    virtual iMovable* GetMovable ()
-    {
-      return &scfParent->GetMovable ().scfiMovable;
-    }
   } scfiThing;
   friend struct eiThing;
  
@@ -930,6 +858,10 @@ public:
   struct VisCull : public iVisibilityCuller
   {
     DECLARE_EMBEDDED_IBASE (csThing);
+    virtual void Setup ()
+    {
+      scfParent->BuildStaticTree (BSP_MINIMIZE_SPLITS);
+    }
     virtual void RegisterVisObject (iVisibilityObject* visobj)
     {
       scfParent->RegisterVisObject (visobj);
@@ -1012,28 +944,6 @@ public:
     virtual bool SupportsHardTransform () { return true; }
   } scfiMeshObjectFactory;
   friend struct MeshObjectFactory;
-
-  //-------------------- iVisibilityObject interface implementation ----------
-  struct VisObject : public iVisibilityObject
-  {
-    DECLARE_EMBEDDED_IBASE (csThing);
-    virtual iMovable* GetMovable ()
-    {
-      return &scfParent->GetMovable ().scfiMovable;
-    }
-    virtual long GetShapeNumber ()
-    {
-      return scfParent->scfiMeshObject.GetShapeNumber ();
-    }
-    virtual void GetBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetBoundingBox (bbox);
-    }
-    virtual void MarkVisible () { scfParent->MarkVisible (); }
-    virtual void MarkInvisible () { scfParent->MarkInvisible (); }
-    virtual bool IsVisible () { return scfParent->IsVisible (); }
-  } scfiVisibilityObject;
-  friend struct VisObject;
 };
 
 /**

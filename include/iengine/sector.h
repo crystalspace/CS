@@ -29,7 +29,7 @@ struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
 
-SCF_VERSION (iSector, 0, 1, 8);
+SCF_VERSION (iSector, 0, 1, 9);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -43,8 +43,6 @@ struct iSector : public iBase
 {
   /// Used by the engine to retrieve internal sector object (ugly)
   virtual csSector *GetPrivateObject () = 0;
-  /// Create the static BSP or octree for this sector.
-  virtual void CreateBSP () = 0;
 
   /// Get the ID of this sector.
   virtual CS_ID GetID () = 0;

@@ -239,28 +239,6 @@ void csStatLight::CalculateLighting ()
   sector->CheckFrustum ((iFrustumView*)&lview);
 }
 
-void csStatLight::CalculateLighting (csThing* th)
-{
-  //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
-  csFrustumView lview;
-  csFrustumContext* ctxt = lview.GetFrustumContext ();
-  csLightingInfo& linfo = ctxt->GetLightingInfo ();
-  linfo.SetGouraudOnly (false);
-  linfo.SetColor (GetColor ());
-  lview.SetUserData ((void*)this);
-  lview.SetPolygonFunction (poly_light_func);
-  lview.SetCurveFunction (curve_light_func);
-  lview.SetRadius (GetRadius ());
-  lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
-  lview.SetDynamic (false);
-  lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
-  lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
-
-  ctxt->SetLightFrustum (new csFrustum (center));
-  ctxt->GetLightFrustum ()->MakeInfinite ();
-  th->CheckFrustum ((iFrustumView*)&lview, &(th->GetMovable ().scfiMovable));
-}
-
 void csStatLight::CalculateLighting (iMeshWrapper* th)
 {
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);

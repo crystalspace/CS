@@ -55,8 +55,6 @@
 
 // Option variable: render portals?
 bool csSector::do_portals = true;
-// Option variable: render things?
-bool csSector::do_things = true;
 // Configuration variable: number of allowed reflections for static lighting.
 int csSector::cfg_reflections = 1;
 // Option variable: do pseudo radiosity?
@@ -78,11 +76,11 @@ csSector::csSector (csEngine* engine) : csPObject ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   csSector::engine = engine;
-  static_thing = NULL;
+  culler_mesh = NULL;
+  culler = NULL;
   engine->AddToCurrentRegion (this);
   fog.enabled = false;
   draw_busy = 0;
-  culler = NULL;
 }
 
 csSector::~csSector ()
@@ -94,6 +92,7 @@ csSector::~csSector ()
 
   lights.DeleteAll ();
   terrains.DeleteAll ();
+  if (culler) culler->DecRef ();
 }
 
 //----------------------------------------------------------------------
@@ -232,32 +231,18 @@ csTerrainWrapper* csSector::GetTerrain (const char* name)
 
 //----------------------------------------------------------------------
 
-void csSector::UseStaticTree (int mode, bool octree)
+void csSector::UseStaticTree (const char* meshname)
 {
-  if (static_thing) return;
-  int i;
-  for (i = 0 ; i < meshes.Length () ; i++)
-  {
-    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
-    // @@@@ VERY UGLY!
-    iThing* ith = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
-    if (ith)
-    {
-      csThing* th = ith->GetPrivateObject ();
-      if (th->flags.Check (CS_THING_VISTREE))
-      {
-        static_thing = th;
-        static_thing->BuildStaticTree (mode, octree);
-        culler = QUERY_INTERFACE (static_thing, iVisibilityCuller);
-        culler->DecRef ();
-        break;//@@@@@@ Only support one static_thing for now!!!
-      }
-      ith->DecRef ();
-    }
-  }
+  if (culler_mesh) return;
+  culler_mesh = GetMesh (meshname);
+  if (!culler_mesh) return;
+  culler = QUERY_INTERFACE (culler_mesh->GetMeshObject (), iVisibilityCuller);
+  if (!culler) return;
+  culler->Setup ();
 
   // Loop through all meshes and update their bounding box in the
   // polygon trees.
+  int i;
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     csMeshWrapper* th = (csMeshWrapper*)meshes[i];
@@ -413,13 +398,13 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
-    // @@@ UGLY!!!
-    iThing* ith = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
-    if (ith)
+    if (mesh != culler_mesh)
     {
-      csThing* sp = ith->GetPrivateObject ();
-      if (sp != static_thing)
+      // @@@ UGLY!!!
+      iThing* ith = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+      if (ith)
       {
+        csThing* sp = ith->GetPrivateObject ();
         r = best_r;
 	//@@@ Put this in csMeshWrapper???
         if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
@@ -446,16 +431,21 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
 	  best_p = p;
 	  isect = cur_isect;
         }
+        ith->DecRef ();
       }
-      ith->DecRef ();
     }
   }
 
-  if (static_thing)
+  if (culler_mesh)
   {
-    // Static_thing has option CS_THING_MOVE_NEVER so
+    // culler_mesh has option CS_THING_MOVE_NEVER so
     // object space == world space.
-    csPolygonTree* static_tree = static_thing->GetStaticTree ();
+    // @@@ UGLY!!! We need another abstraction for this.
+    iThing* ith = QUERY_INTERFACE (culler_mesh->GetMeshObject (), iThing);
+    csThing* sp = ith->GetPrivateObject ();
+    ith->DecRef ();
+
+    csPolygonTree* static_tree = sp->GetStaticTree ();
     // Handle the octree.
     ISectData idata;
     idata.seg.Set (start, end);
@@ -468,7 +458,6 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
       isect = idata.isect;
     }
   }
-
 
   if (pr) *pr = best_r;
   return best_p;
@@ -750,123 +739,75 @@ void csSector::Draw (iRenderView* rview)
   }
 
   // If we have a static thing we draw it here.
-  if (static_thing)
-    static_thing->Draw (rview, &static_thing->GetMovable ().scfiMovable,
-    	static_thing->GetZBufMode ());
+  // @@@ Generalize using render order mechanism!!!
+  if (culler_mesh) culler_mesh->Draw (rview);
 
-  if (do_things)
+  // If the queues are not used for things we still fill the queue here
+  // just to make the code below easier.
+  if (!use_object_queue)
   {
-    // If the queues are not used for things we still fill the queue here
-    // just to make the code below easier.
-    if (!use_object_queue)
+    num_mesh_queue = 0;
+    if (meshes.Length ())
     {
-      num_mesh_queue = 0;
-      if (meshes.Length ())
+      mesh_queue = new csMeshWrapper* [meshes.Length ()];
+      for (i = 0 ; i < meshes.Length () ; i++)
       {
-        mesh_queue = new csMeshWrapper* [meshes.Length ()];
-        for (i = 0 ; i < meshes.Length () ; i++)
-        {
-          csMeshWrapper* th = (csMeshWrapper*)meshes[i];
-          mesh_queue[num_mesh_queue++] = th;
-        }
-      }
-      else
-        mesh_queue = NULL;
-    }
-
-#if 0
-    // All meshes still need to be drawn.
-    // Unless they are fog objects (or transparent, this is a todo!)
-    // we just render them using the Z-buffer. Fog or transparent objects
-    // are z-sorted and rendered back to front.
-    //
-    // We should see if there are better alternatives to Z-sort which are
-    // more accurate in more cases (@@@).
-    csMeshWrapper* sort_list[256];    // @@@HARDCODED == BAD == EASY!
-    int sort_idx = 0;
-    int i;
-
-    // First we do z-sorting for fog objects so that they are rendered
-    // correctly from back to front. All other objects are drawn using
-    // the z-buffer.
-    for (i = 0 ; i < num_mesh_queue ; i++)
-    {
-      csMeshWrapper* th = mesh_queue[i];
-      //@@@!!!
-      iThing* ith = QUERY_INTERFACE (th->GetMeshObject (), iThing);
-      if (!ith || ith->GetPrivateObject () != static_thing)
-        //if (th->GetFog ().enabled) sort_list[sort_idx++] = th;
-        /*else*/ th->Draw (rview, &th->GetMovable ().scfiMovable,
-		th->GetZBufMode ());
-    }
-
-    if (sort_idx)
-    {
-      // Now sort the objects in sort_list.
-      qsort (sort_list, sort_idx, sizeof (csMeshWrapper*), compare_z_thing);
-
-      // Draw them back to front.
-      for (i = 0 ; i < sort_idx ; i++)
-      {
-        csMeshWrapper* th = sort_list[i];
-        //@@@ FOG not supported for now! if (th->GetFog ().enabled)
-	  //th->DrawFoggy (rview, &th->GetMovable ().scfiMovable);
-        /*else*/ th->Draw (rview, &th->GetMovable ().scfiMovable,
-		th->GetZBufMode ());
+        csMeshWrapper* th = (csMeshWrapper*)meshes[i];
+        mesh_queue[num_mesh_queue++] = th;
       }
     }
-#endif
+    else
+      mesh_queue = NULL;
+  }
 
-    //delete [] mesh_queue;
+  // Draw meshes.
+  // To correctly support meshes in multiple sectors we only draw a
+  // mesh if the mesh is not in the sector we came from. If the
+  // mesh is also present in the previous sector then we will still
+  // draw it in any of the following cases:
+  //    - the previous sector has fog
+  //    - the portal we just came through has alpha transparency
+  //    - the portal is a portal on a thing (i.e. a floating portal)
+  //    - the portal does space warping
+  // In those cases we draw the mesh anyway. @@@ Note that we should
+  // draw it clipped (in 3D) to the portal polygon. This is currently not
+  // done.
+  iSector* previous_sector = rview->GetPreviousSector ();
 
-    // Draw meshes.
-    // To correctly support meshes in multiple sectors we only draw a
-    // mesh if the mesh is not in the sector we came from. If the
-    // mesh is also present in the previous sector then we will still
-    // draw it in any of the following cases:
-    //    - the previous sector has fog
-    //    - the portal we just came through has alpha transparency
-    //    - the portal is a portal on a thing (i.e. a floating portal)
-    //    - the portal does space warping
-    // In those cases we draw the mesh anyway. @@@ Note that we should
-    // draw it clipped (in 3D) to the portal polygon. This is currently not
-    // done.
-    iSector* previous_sector = rview->GetPreviousSector ();
+  int spr_num;
+  if (mesh_queue) spr_num = num_mesh_queue;
+  else spr_num = meshes.Length ();
 
-    int spr_num;
-    if (mesh_queue) spr_num = num_mesh_queue;
-    else spr_num = meshes.Length ();
+  if (rview->AddedFogInfo ())
+    rview->GetFirstFogInfo ()->has_outgoing_plane = false;
 
-    if (rview->AddedFogInfo ())
-      rview->GetFirstFogInfo ()->has_outgoing_plane = false;
+  //if (culler_mesh) culler_mesh->Draw (rview);
+  for (i = 0 ; i < spr_num ; i++)
+  {
+    csMeshWrapper* sp;
+    if (mesh_queue) sp = mesh_queue[i];
+    else sp = (csMeshWrapper*)meshes[i];
 
-    for (i = 0 ; i < spr_num ; i++)
+    if (!previous_sector || sp->GetMovable ().GetSectors ().
+    	Find (previous_sector->GetPrivateObject ()) == -1)
     {
-      csMeshWrapper* sp;
-      if (mesh_queue) sp = mesh_queue[i];
-      else sp = (csMeshWrapper*)meshes[i];
-
-      if (!previous_sector || sp->GetMovable ().GetSectors ().
-      	Find (previous_sector->GetPrivateObject ()) == -1)
-      {
-        // Mesh is not in the previous sector or there is no previous sector.
-        sp->Draw (rview);
-      }
-      else
-      {
-        if (
+      // Mesh is not in the previous sector or there is no previous sector.
+      sp->Draw (rview);
+    }
+    else
+    {
+      if (
 	  previous_sector->HasFog () ||
 	  rview->GetPortalPolygon ()->IsTransparent () ||
 	  rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().
 	  	Check (CS_PORTAL_WARP))
-	{
-	  // @@@ Here we should draw clipped to the portal.
-          sp->Draw (rview);
-	}
+      {
+	// @@@ Here we should draw clipped to the portal.
+	sp->Draw (rview);
       }
     }
-    delete [] mesh_queue;
   }
+  delete [] mesh_queue;
 
   // Draw all terrain surfaces.
   if (terrains.Length () > 0)
@@ -1138,16 +1079,6 @@ void csSector::ShineLights (csProgressPulse* pulse)
     if (pulse != 0)
       pulse->Step();
     ((csStatLight*)lights[i])->CalculateLighting ();
-  }
-}
-
-void csSector::ShineLights (csThing* th, csProgressPulse* pulse)
-{
-  for (int i = 0 ; i < lights.Length () ; i++)
-  {
-    if (pulse != 0)
-      pulse->Step();
-    ((csStatLight*)lights[i])->CalculateLighting (th);
   }
 }
 

@@ -469,11 +469,7 @@ csSector* HugeRoom::create_huge_world (csEngine* engine)
   thing_state->DecRef ();
 
   Sys->Printf (MSG_INITIALIZATION, "Number of polygons: %d\n", pol_nr);
-  room->UseStaticTree (BSP_ALMOST_MINIMIZE_SPLITS, true);
-  room->GetStaticThing ()->GetStaticTree ()->Statistics ();
-
-  Sys->Printf (MSG_INITIALIZATION, "            vertices=%d\n",
-  	room->GetStaticThing ()->GetNumVertices ());
+  room->UseStaticTree ("@@@ (NOT WORKING!!!)");
   return room;
 }
 

@@ -27,7 +27,6 @@ class csVector3;
 class csMatrix3;
 class csThing;
 struct iSector;
-struct iMovable;
 struct iPolygon3D;
 struct iGraphics3D;
 struct iFrustumView;
@@ -53,7 +52,7 @@ struct iMovable;
 #define CS_THING_MOVE_OCCASIONAL 2
 
 
-SCF_VERSION (iThing, 0, 0, 4);
+SCF_VERSION (iThing, 0, 0, 5);
 
 /**
  * This is the generalized interface to Things.<p>
@@ -102,9 +101,6 @@ struct iThing : public iBase
 
   /// Create a key/value pair object
   virtual bool CreateKey (const char *iName, const char *iValue) = 0;
-
-  /// Get the movable for this thing.
-  virtual iMovable* GetMovable () = 0;
 };
 
 SCF_VERSION (iThingState, 0, 0, 6);
