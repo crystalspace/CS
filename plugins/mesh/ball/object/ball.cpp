@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
-#include "ball.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
@@ -32,6 +31,7 @@
 #include "iengine/engine.h"
 #include "iengine/light.h"
 #include "iutil/objreg.h"
+#include "ball.h"
 
 #include "qsqrt.h"
 #include "iutil/strset.h"

@@ -853,8 +853,10 @@ bool csXMLShader::ActivatePass (unsigned int number)
   currentPass = number;
 
   shaderPass *thispass = &passes[currentPass];
-  if(thispass->vp) thispass->vp->Activate ();
-  if(thispass->fp) thispass->fp->Activate ();
+  if(thispass->vp)
+    thispass->vp->Activate ();
+  if(thispass->fp)
+    thispass->fp->Activate ();
   
   if (thispass->overrideZmode)
   {

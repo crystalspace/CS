@@ -20,9 +20,9 @@
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
-#include "spiral.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
+#include "spiral.h"
 #include "qsqrt.h"
 #include <math.h>
 #include <stdlib.h>

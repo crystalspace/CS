@@ -22,7 +22,6 @@
 #include "csgeom/box.h"
 #include "csgeom/transfrm.h"
 #include "cstool/rbuflock.h"
-#include "spr2d.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
@@ -34,6 +33,7 @@
 #include "iengine/engine.h"
 #include "iengine/light.h"
 #include "iutil/objreg.h"
+#include "spr2d.h"
 #include "qsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -541,21 +541,20 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
   {
     if (texels_dirty)
     {
-		
-	  int texels_count;
-	  const csVector2 *uvani_uv;
-	  if (!uvani)
-	    texels_count = vertices.Length ();
-	  else
-	 	uvani_uv = uvani->GetVertices (texels_count);
+      int texels_count;
+      const csVector2 *uvani_uv = 0;
+      if (!uvani)
+	texels_count = vertices.Length ();
+      else
+	uvani_uv = uvani->GetVertices (texels_count);
 	  
-	  size_t texelSize = sizeof (float) * texels_count * 2;
-      if (!texel_buffer.IsValid() || (size_t)texel_buffer->GetSize() != texelSize)
+      size_t texelSize = sizeof (float) * texels_count * 2;
+      if (!texel_buffer.IsValid() || (size_t)texel_buffer->GetSize()
+      	!= texelSize)
       {
-		texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
-		texelSize, CS_BUF_STATIC, 
-		CS_BUFCOMP_FLOAT, 2));
-		variable->SetValue (texel_buffer);
+	texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+	  texelSize, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2));
+	variable->SetValue (texel_buffer);
       }
 
       csRenderBufferLock<csVector2> texelLock (texel_buffer);
@@ -915,7 +914,8 @@ void csSprite2DMeshObject::uvAnimationControl::Advance (csTicks current_time)
 
 }
 
-const csVector2 *csSprite2DMeshObject::uvAnimationControl::GetVertices (int &num)
+const csVector2 *csSprite2DMeshObject::uvAnimationControl::GetVertices (
+	int &num)
 {
   num = frame->GetUVCount ();
   return frame->GetUVCoo ();
