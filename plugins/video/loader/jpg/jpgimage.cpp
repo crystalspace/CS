@@ -23,6 +23,8 @@
 
 #include "cssysdef.h"
 #include "jpgimage.h"
+#include "csgfx/rgbpixel.h"
+#include "csutil/databuf.h"
 
 extern "C"
 {
@@ -47,10 +49,12 @@ EXPORT_CLASS_TABLE (csjpgimg)
   EXPORT_CLASS (csJPGImageIO, "crystalspace.graphic.image.io.jpg", "CrystalSpace JPG image format I/O plugin")
 EXPORT_CLASS_TABLE_END
 
+#define JPG_MIME "image/jpg"
+
 static iImageIO::FileFormatDescription formatlist[2] = 
 {
-  {"image/jpg", "Grayscale", CS_IMAGEIO_LOAD},
-  {"image/jpg", "Truecolor", CS_IMAGEIO_LOAD}
+  {JPG_MIME, "Grayscale", CS_IMAGEIO_LOAD},
+  {JPG_MIME, "Truecolor", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE}
 };
 
 csJPGImageIO::csJPGImageIO (iBase *pParent)
@@ -70,33 +74,6 @@ const csVector& csJPGImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csJPGImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
-{
-  ImageJpgFile* i = new ImageJpgFile (iFormat);
-  if (i && !i->Load (iBuffer, iSize))
-  {
-    delete i;
-    return NULL;
-  }
-  return i;    
-}
-
-void csJPGImageIO::SetDithering (bool)
-{
-}
-
-iDataBuffer *csJPGImageIO::Save (iImage *, iImageIO::FileFormatDescription *)
-{
-  return NULL;
-}
-
-iDataBuffer *csJPGImageIO::Save (iImage *, const char *)
-{
-  return NULL;
-}
-
-//---------------------------------------------------------------------------
-
 /* ==== Error mgmnt ==== */
 
 struct my_error_mgr
@@ -115,6 +92,175 @@ static void my_error_exit (j_common_ptr cinfo)
   /* Return control to the setjmp point */
   longjmp(myerr->setjmp_buffer, 1);
 }
+
+/* ==== Destination mgmnt ==== */
+
+struct jpg_datastore{
+  unsigned char *data;
+  size_t len;
+
+  jpg_datastore () { data = NULL; len = 0; }
+  ~jpg_datastore () { free (data); }
+};
+
+
+struct my_dst_mgr
+{
+  static size_t buf_len;
+  struct jpeg_destination_mgr pub;	/* public fields */
+  JOCTET *buffer;		/* start of buffer */
+
+  jpg_datastore *ds;
+};
+
+size_t my_dst_mgr::buf_len = 4096;
+
+static void init_destination (j_compress_ptr cinfo)
+{
+  my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
+  dest->buffer = (JOCTET*)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, 
+						     JPOOL_IMAGE,
+						     sizeof(JOCTET) * my_dst_mgr::buf_len);
+  dest->pub.next_output_byte = dest->buffer;
+  dest->pub.free_in_buffer = my_dst_mgr::buf_len;
+}
+
+static boolean empty_output_buffer (j_compress_ptr cinfo)
+{
+  my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
+
+  dest->ds->data = (unsigned char*)realloc (dest->ds->data, 
+					    dest->ds->len + sizeof(JOCTET) * my_dst_mgr::buf_len);
+  if (!dest->ds->data)
+    ERREXITS(cinfo,JERR_OUT_OF_MEMORY, "Could not reallocate enough memory");
+  memcpy (dest->ds->data + dest->ds->len, dest->buffer, sizeof(JOCTET) * my_dst_mgr::buf_len);
+  dest->pub.next_output_byte = dest->buffer;
+  dest->pub.free_in_buffer = my_dst_mgr::buf_len;
+  dest->ds->len += sizeof(JOCTET) * my_dst_mgr::buf_len;
+  return true;
+}
+
+
+static void term_destination (j_compress_ptr cinfo)
+{
+  my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
+  size_t len = my_dst_mgr::buf_len - dest->pub.free_in_buffer;
+  
+  if (len > 0)
+  {
+    dest->ds->data = (unsigned char*)realloc (dest->ds->data, dest->ds->len + sizeof(JOCTET) * len);
+    if (!dest->ds->data)
+      ERREXITS(cinfo,JERR_OUT_OF_MEMORY, "Could not reallocate enough memory");
+    memcpy (dest->ds->data + dest->ds->len, dest->buffer, sizeof(JOCTET) * len);
+    dest->ds->len += sizeof(JOCTET) * len;
+  }
+}
+
+static void jpeg_buffer_dest (j_compress_ptr cinfo, jpg_datastore *ds)
+{
+  my_dst_mgr *dest;
+
+  if (cinfo->dest == NULL)
+  {
+    cinfo->dest = (struct jpeg_destination_mgr*)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo,
+							  JPOOL_PERMANENT,
+							  sizeof(my_dst_mgr));
+  }
+
+  dest = (my_dst_mgr*)cinfo->dest;
+  dest->pub.init_destination = init_destination;
+  dest->pub.empty_output_buffer = empty_output_buffer;
+  dest->pub.term_destination = term_destination;
+  dest->ds = ds;
+}
+
+iImage *csJPGImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
+{
+  ImageJpgFile* i = new ImageJpgFile (iFormat);
+  if (i && !i->Load (iBuffer, iSize))
+  {
+    delete i;
+    return NULL;
+  }
+  return i;    
+}
+
+void csJPGImageIO::SetDithering (bool)
+{
+}
+
+iDataBuffer *csJPGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *)
+{
+
+  int format = Image->GetFormat ();
+
+  switch (format & CS_IMGFMT_MASK)
+  {
+    case CS_IMGFMT_TRUECOLOR:
+      break;
+    default:
+      // unknown format
+      return NULL;
+  } /* endswitch */
+
+
+  csRGBcolor *row=NULL;
+  struct jpg_datastore ds;
+  struct jpeg_compress_struct cinfo;
+  struct my_error_mgr jerr;
+  cinfo.err = jpeg_std_error (&jerr.pub);
+  jerr.pub.error_exit = my_error_exit;
+
+  if (setjmp (jerr.setjmp_buffer))
+  {
+    delete [] row;
+    jpeg_destroy_compress (&cinfo);
+    return NULL;
+  }
+
+  jpeg_create_compress (&cinfo);
+  jpeg_buffer_dest (&cinfo, &ds);
+
+  cinfo.image_width = Image->GetWidth ();
+  cinfo.image_height = Image->GetHeight ();
+  cinfo.input_components = 3;
+  cinfo.in_color_space = JCS_RGB;
+
+  row = new csRGBcolor[cinfo.image_width];
+  jpeg_set_defaults (&cinfo);
+  jpeg_start_compress (&cinfo, true);
+
+  JSAMPROW row_pointer[1];
+  csRGBpixel *image = (csRGBpixel*)Image->GetImageData ();
+  row_pointer[0] = (JSAMPLE*)&row[0];
+
+  while (cinfo.next_scanline < cinfo.image_height)
+  {
+    for (size_t i=0; i < cinfo.image_width; i++)
+      row[i] = image[cinfo.next_scanline * cinfo.image_width + i];
+    jpeg_write_scanlines (&cinfo, row_pointer, 1);
+  }
+
+  jpeg_finish_compress (&cinfo);
+  jpeg_destroy_compress (&cinfo);
+
+  delete [] row;
+
+  /* make the iDataBuffer to return */
+  csDataBuffer *db = new csDataBuffer (ds.len);
+  memcpy (db->GetData (), ds.data, ds.len);
+  
+  return db;
+}
+
+iDataBuffer *csJPGImageIO::Save (iImage *Image, const char *mime)
+{
+  if (!strcasecmp (mime, JPG_MIME))
+    return Save (Image, (iImageIO::FileFormatDescription *)NULL);
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
 
 /* Expanded data source object for memory buffer input */
 typedef struct
