@@ -1,0 +1,3 @@
+If your C library does not contain the getopt_long function, please include
+the src/util/gnu/getopt*.c file in your project or append it to the
+SRC.SYS_CSSYS variable in your system makefile.

@@ -1,0 +1,12 @@
+To force makefile system to build makedep you should add to your config.mak
+file (if there isn't yet such a line):
+
+DEPEND_TOOL=mkdep
+
+When you'll do "make depend" the makedep tool will be built prior to creating
+dependencies. Alternatively if you build the makedep executable (by typing
+"make mkdep") and install somewhere in your system, you can add instead:
+
+DEPEND_TOOL.INSTALLED = yes
+
+This will not force building the mkdep tool, but will force the usage of it.

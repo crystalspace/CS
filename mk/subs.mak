@@ -60,6 +60,13 @@ ifneq ($(IMPORT_SUBMAKEFILES),)
   include $(IMPORT_SUBMAKEFILES)
 endif
 
+ifeq ($(TOOLS_SUBMAKEFILES),)
+  TOOLS_SUBMAKEFILES=$(wildcard apps/tools/*/*.mak)
+endif
+ifneq ($(TOOLS_SUBMAKEFILES),)
+  include $(TOOLS_SUBMAKEFILES)
+endif
+
 ifeq ($(COMPOSITE_SUBMAKEFILES),)
   COMPOSITE_SUBMAKEFILES=docs/docs.mak mk/install.mak mk/msvcgen/msvcgen.mak \
     mk/static.mak
