@@ -303,6 +303,14 @@ public:
 	/// Set the required LOD.
 	void maxdetail( unsigned int d ) { _maxdetail = d; }
 
+	/// Function to add a bintree.
+	void addBinTree( ddgTBinTree *bt );
+	/// Function to remove a bintree.
+	void removeBinTree( ddgTBinTree *bt );
+	/// Return the bintree for a given index.
+	ddgTBinTree *getBinTree( ddgTreeIndex i)
+	{ ddgAssert(i < _bintreeMax && i >= 0); return _bintree[i]; }
+
 	/// Return the split queue 
 	ddgSplayTree *qs(void) { return _qs; }
 	/// Return the merge queue 
@@ -373,13 +381,6 @@ public:
 	 */
 	bool calculate(void);
 
-	/// Function to add a bintree.
-	void addBinTree( ddgTBinTree *bt );
-	/// Function to remove a bintree.
-	void removeBinTree( ddgTBinTree *bt );
-	/// Return the bintree for a given index.
-	ddgTBinTree *getBinTree( ddgTreeIndex i)
-	{ ddgAssert(i < _bintreeMax && i >= 0); return _bintree[i]; }
 	/// Distant clip range triangles beyond this point are not needed.
 	float		farclip(void) { return _farclip; }
 	/// Near clip range triangles beyond this point are not needed.
