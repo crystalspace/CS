@@ -432,15 +432,16 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
   //   0 -- horizontal
   //   1 -- vertical
 
-  int height=QInt (visible.bottom-visible.top);
-  int width=QInt (visible.right-visible.left);
+  //@@@Note from Jorrit, I tried to use QInt() here but this didn't work?
+  int height=(int) (visible.bottom-visible.top);
+  int width=(int) (visible.right-visible.left);
 
   float a=calc_area (n,p2d);
   if (fabs (a-height*width)<EPS)
   {
     // this area is completely covered
 
-    int x=QInt (visible.left),y=QInt (visible.top);
+    int x=(int) (visible.left),y=(int) (visible.top);
     for (int i=0 ; i<height ; i++)
       for (int j=0 ; j<width ; j++)
   __draw_func (j+x, i+y, 1);
@@ -458,15 +459,15 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 
   if (height==1&&width==1)
   {
-    int x=QInt (visible.left), y=QInt (visible.top);
+    int x=(int) (visible.left), y=(int) (visible.top);
     __draw_func (x, y, a);
 
     depth--;
     return;
   }
 
-  int sub_x = QInt (visible.left+width/2);
-  int sub_y = QInt (visible.top+height/2);
+  int sub_x = (int) (visible.left+width/2);
+  int sub_y = (int) (visible.top+height/2);
 
   int how_to_divide=1;
 
