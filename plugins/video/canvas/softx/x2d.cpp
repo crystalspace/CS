@@ -79,6 +79,8 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   display_width = DisplayWidth (dpy, screen_num);
   display_height = DisplayHeight (dpy, screen_num);
 
+  // First make a window which is never mapped (trick from gtk to get the main
+  // window to behave under certain window managers, themes and circumstances)
   leader_window = XCreateSimpleWindow(dpy, root_window,
 					  10, 10, 10, 10, 0, 0 , 0);
   XClassHint *class_hint = XAllocClassHint();
@@ -310,6 +312,8 @@ bool csGraphics2DXLib::Open(const char *Title)
   wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
   XSetWMProtocols (dpy, window, &wm_delete_window, 1);
 
+  // Now communicate fully to the window manager our wishes using the non-mapped
+  // leader_window to form a window_group
   XSizeHints normal_hints;
   normal_hints.flags = PSize | PResizeInc;
   normal_hints.width = Width;
