@@ -27,10 +27,6 @@
 #include "csplatform.h"
 #include <float.h>
 
-#if defined(CS_HAS_INTTYPES_H)
-#include <inttypes.h>
-#endif
-
 #if defined(CS_HAS_STDINT_H)
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
@@ -39,6 +35,10 @@
 #define __STDC_LIMIT_MACROS
 #endif
 #include <stdint.h>
+#endif
+
+#if defined(CS_HAS_INTTYPES_H)
+#include <inttypes.h>
 #endif
 
 /**\name Specific sized types.
