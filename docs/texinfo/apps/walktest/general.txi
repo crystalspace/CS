@@ -255,6 +255,11 @@ Add a particle system simulating a fountain. The two parameter for this
 command are the texture to use for the particles and
 the number of particles. The default number of particles is 50.
 
+@item flame
+Add a particle system simulating a flame. The two parameter for this
+command are the texture to use for the particles and
+the number of particles. The default number of particles is 50.
+
 @item explosion
 Add a particle system simulating an explosion. The parameter for this
 command is the texture to use for the particles.

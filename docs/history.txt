@@ -1,20 +1,27 @@
 The history order has been reversed so that new features are at the top.
 
 20-Jun-2000
+	- Changed csDynLight::SetColor() so that it will work without
+	  having to call Setup() later. This is MUCH more efficient if you
+	  have a dynamic light that doesn't move but only changes color.
+	  It is also more consistant.
 	- Changed default halo parameters a bit to more resemble a cross.
 	- Added SNOW, RAIN, and FOUNTAIN keywords to the world file format.
 	  For a simple fountain use:
 		FOUNTAIN 'fount1' (ORIGIN (x,y,z) TEXTURE ('green.gif'))
 	  For snow use:
 		SNOW 'snow' (BOX (x1,y1,z1,x2,y2,z2) TEXTURE ('snow.jpg'))
-	  There are many more options.  See docs/incoming/worldfmt.tex for a
-	  list.
-	- Wouter Wijngaards added a fountain particle system.  Under
-	  construction still...
-	- Added 'fountain' console command to create a fountain.  The first
-	  argument is the texture (default is 'green.gif' until we find a
-	  better splash texture).  The second argument is the number of
-	  particles (default is 50).
+	  There are many more options.  See docs/incoming/worldfmt.tex for a 
+	  list.  
+	- Wouter Wijngaards added a fountain particle system.
+	- Added 'fountain' console command to create a fountain.  The first 
+	  argument is the texture (default is 'green.gif' until we find a 
+	  better splash texture).  The second argument is the number of 
+	  particles (default is 50).  
+	- Wouter added a fire particle system.
+	- Added 'flame' console command to create a flame.  The first
+	  parameter is the texture (default is 'raindrop.png'). The
+	  second argument is the number of particles (default is 50).
 	- Enabled extensions in OpenGL renderer.
 	- Disabled the experimental optimization in DrawPolygon for OpenGL.
 	  It had a bad effect on performance.
