@@ -15,6 +15,8 @@ Short-term cleanups that need to be done:
 6-Mar-2000
 	- Started work on new csSprite superclass for csSprite3D (already
 	  done) and csSprite2D. csSprite3D now inherits from csSprite.
+	- Eric Sunshine fixed a bug in the way mdl2spr was walking through
+	  argv[].
 5-Mar-2000
 	- Thomas Hieber did some general reworking of polygon handling in
 	  Map2CS. Allows a much cleaner way to add specific effects like
@@ -26,12 +28,12 @@ Short-term cleanups that need to be done:
 	  the project files.
 	- Thomas reenabled Startup console text. (Was a wrong
 	  implementation for FindRGB in the texture manager base class).
-	- Eric Sunshine: The Microsoft sorcerers cast a spell to prevent
-	  VC++ from compiling valid C++, so I derived a counter-spell to
-	  undermine their Black Magic.
+	- The Microsoft sorcerers cast a spell to prevent VC++ from compiling 
+	  valid C++, so Eric Sunshine derived a counter-spell to undermine 
+	  their Black Magic.  
 	- Norman Kramer added a Crop() method to iImage.
-	- Eric Sunshine made ColliderType public so that it is possible
-	  to call GetType() (which is also public).
+	- Eric Sunshine made ColliderType public so that it is possible to 
+	  call GetType() (which is also public).  
 	- Seth Galbraith did some changes to sprites again: mergetexels
 	  and mergenormals now measure the number of redundant vertices
 	  which can be merged. Also commited some disabled code which
