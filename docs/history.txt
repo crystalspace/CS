@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+28-Sep-2002
+	- Fixed a new bug with iSector->HitBeam() in octree based
+	  levels.
 27-Sep-2002
 	- Added new set and fade color operations to the engine
 	  sequence manager. Also added the appropriate commands

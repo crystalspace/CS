@@ -307,7 +307,7 @@ csMeshWrapper *csSector::HitBeam (
   iPolygon3D* poly;
   bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly);
   if (polygonPtr) *polygonPtr = poly ? poly->GetPrivateObject () : NULL;
-  if (rc)
+  if (rc && mesh)
     return mesh->GetPrivateObject ();
   else
     return NULL;
