@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 	  AWS. This does not work yet and the API is subject to change
 	  so I don't recommend using this yet. Also add a 'simpvs'
 	  application that uses this feature.
+	- Removed dependency on AWS to libflex (for MSVC). This is not
+	  required.
 15-Feb-2002
 	- Reverted 'res' change to win32gcc.mak since it breaks compile of
 	  ddraw plugin. The problem is that the -lddraw library link command

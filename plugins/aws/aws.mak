@@ -47,7 +47,6 @@ MSVC.DSP += AWS
 DSP.AWS.NAME = aws
 DSP.AWS.TYPE = plugin
 DSP.AWS.CFLAGS = /D "YY_NEVER_INTERACTIVE"
-DSP.AWS.LIBS = libflex
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
