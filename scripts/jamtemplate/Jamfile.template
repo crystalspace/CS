@@ -2,9 +2,8 @@ SubDir TOP ;
 
 # Construct a distclean target
 Clean distclean : config.log config.status config.cache aclocal.m4
-		  Jamconfig
-		  autom4te.cache config.h
-		  out ;
+		  Jamconfig config.h ;
+CleanDir distclean : autom4te.cache out ;
 Depends distclean : clean ;
 
 Clean maintainerclean : configure aclocal.m4 config.h.in ;
