@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.glidx2d3 = Crystal Space Glide V3/X 2D driver 
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make glidx2d3     Make the $(DESCRIPTION.glidx2d3)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make glidx2d3     Make the $(DESCRIPTION.glidx2d3)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: glidx2d3
+.PHONY: glidx2d3 glidx2d3clean
 
 all plugins drivers drivers2d: glidx2d3
 
@@ -26,12 +27,11 @@ glidx2d3clean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # local CFLAGS
 CFLAGS.GLIDX2D3=-I$(X11_PATH)/include $(GLIDE3_PATH) -DGLIDE3
-
 LIBS._GLIDX2D3+=-L$(X11_PATH)/lib -lXext -lX11 -lglide3x  
 
 # The 2D GlideX driver
@@ -45,15 +45,14 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDX2D3
 endif
 DESCRIPTION.$(GLIDX2D3) = $(DESCRIPTION.glidx2d3)
-SRC.GLIDX2D3 = plugins/video/canvas/unxglide/glidex2d.cpp plugins/video/canvas/glide2common/glide2common2d.cpp \
-               $(SRC.COMMON.DRV2D)
+SRC.GLIDX2D3 = plugins/video/canvas/unxglide/glidex2d.cpp \
+  plugins/video/canvas/glide2common/glide2common2d.cpp $(SRC.COMMON.DRV2D)
 OBJ.GLIDX2D3 = $(OUT)glidx2d3$O $(OUT)glide3common2d$O \
-               $(addprefix $(OUT), $(notdir $(SRC.COMMON.DRV2D:.cpp=$O)))
-
+  $(addprefix $(OUT), $(notdir $(SRC.COMMON.DRV2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: glidx2d3 glidx2d3clean
@@ -66,7 +65,8 @@ glidx2d3: $(OUTDIRS) $(GLIDX2D3)
 $(OUT)glidx2d3$O: plugins/video/canvas/unxglide/glidex2d.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D3)
 
-$(OUT)glide3common2d$O: plugins/video/canvas/glide2common/glide2common2d.cpp plugins/video/canvas/glide2common/glidcurs.h
+$(OUT)glide3common2d$O: plugins/video/canvas/glide2common/glide2common2d.cpp \
+  plugins/video/canvas/glide2common/glidcurs.h
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D3)
 
 $(OUT)%$O: plugins/video/canvas/common/%.cpp
@@ -76,7 +76,7 @@ $(GLIDX2D3): $(OBJ.GLIDX2D3) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 	$(DO.PLUGIN) $(LIBS.GLIDX2D3)
 
 glidx2d3clean:
-	$(RM) $(GLIDX2D3) $(OBJ.GLIDX2D3)
+	$(RM) $(GLIDX2D3) $(OBJ.GLIDX2D3) $(OUTOS)glidx2d3.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)glidx2d3.dep
@@ -88,7 +88,7 @@ endif
 
 endif # ifeq ($(MAKESECTION),targets)
 
-#------------------------------------------------------------------- config ---#
+#------------------------------------------------------------------ config ---#
 ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
 
 # Default value for DO_SHM
