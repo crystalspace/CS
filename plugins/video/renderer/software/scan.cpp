@@ -221,6 +221,20 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   Scan.shf_h = 16 - Scan.shf_w;
 }
 
+void csScan_InitDrawFX (csTextureHandleSoftware* texture,
+    	csTextureSoftware *untxt)
+{
+  Scan.shf_w = untxt->get_w_shift ();
+  Scan.and_w = untxt->get_w_mask ();
+  Scan.shf_h = untxt->get_h_shift ();
+  Scan.and_h = untxt->get_h_mask ();
+
+  Scan.PaletteTable = texture->GetPaletteToGlobal ();
+  Scan.TexturePalette = texture->GetColorMap ();
+  Scan.AlphaMap = untxt->get_alphamap ();
+  Scan.PrivateCMap = texture->GetPaletteToGlobal8 ();
+}
+
 #define SysPrintf pG3D->System->Printf
 
 void csScan_dump (csGraphics3DSoftwareCommon* pG3D)

@@ -38,6 +38,7 @@
     PI_BLEND     Apply the function given with a blending table passed as
                  an argument to screen pixel and texel to determine the color
                  of resulting pixel. This must be combined with PI_GOURAUD!
+    PI_TILE	 Perform tiling on the source textre
 */
 
 /*
@@ -105,4 +106,6 @@ void PI_SCANFUNC (void *dest, int len, uint32 *zbuff,
 #undef PI_FLAT
 #undef PI_BLEND
 #undef PI_CLAMP_RGB
+#undef PI_TILE
+
 

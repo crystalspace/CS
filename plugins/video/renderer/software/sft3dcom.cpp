@@ -132,55 +132,89 @@ int csGraphics3DSoftwareCommon::filter_bf = 1;
 #define SCANPROC_PI_TEX_KEY_ZFIL        0x09
 #define SCANPROC_PI_TEX_KEY_ZUSE        0x0a
 #define SCANPROC_PI_TEX_KEY_ZTEST       0x0b
+// Textured flat-shaded polygons with tiling
+#define SCANPROC_PI_TILE_TEX_ZNONE      0x0c
+#define SCANPROC_PI_TILE_TEX_ZFIL       0x0d
+#define SCANPROC_PI_TILE_TEX_ZUSE       0x0e
+#define SCANPROC_PI_TILE_TEX_ZTEST      0x0f
+#define SCANPROC_PI_TILE_TEX_KEY_ZNONE  0x10
+#define SCANPROC_PI_TILE_TEX_KEY_ZFIL   0x11
+#define SCANPROC_PI_TILE_TEX_KEY_ZUSE   0x12
+#define SCANPROC_PI_TILE_TEX_KEY_ZTEST  0x13
 // Scanline drawing routines with flat shading + effects.
-#define SCANPROC_PI_FLAT_FX_ZNONE       0x0c
-#define SCANPROC_PI_FLAT_FX_ZFIL        0x0d
-#define SCANPROC_PI_FLAT_FX_ZUSE        0x0e
-#define SCANPROC_PI_FLAT_FX_ZTEST       0x0f
-#define SCANPROC_PI_TEX_FX_ZNONE        0x10
-#define SCANPROC_PI_TEX_FX_ZFIL         0x11
-#define SCANPROC_PI_TEX_FX_ZUSE         0x12
-#define SCANPROC_PI_TEX_FX_ZTEST        0x13
-#define SCANPROC_PI_TEX_FXKEY_ZNONE     0x14
-#define SCANPROC_PI_TEX_FXKEY_ZFIL      0x15
-#define SCANPROC_PI_TEX_FXKEY_ZUSE      0x16
-#define SCANPROC_PI_TEX_FXKEY_ZTEST     0x17
+#define SCANPROC_PI_FLAT_FX_ZNONE       0x14
+#define SCANPROC_PI_FLAT_FX_ZFIL        0x15
+#define SCANPROC_PI_FLAT_FX_ZUSE        0x16
+#define SCANPROC_PI_FLAT_FX_ZTEST       0x17
+#define SCANPROC_PI_TEX_FX_ZNONE        0x18
+#define SCANPROC_PI_TEX_FX_ZFIL         0x19
+#define SCANPROC_PI_TEX_FX_ZUSE         0x1a
+#define SCANPROC_PI_TEX_FX_ZTEST        0x1b
+#define SCANPROC_PI_TEX_FXKEY_ZNONE     0x1c
+#define SCANPROC_PI_TEX_FXKEY_ZFIL      0x1d
+#define SCANPROC_PI_TEX_FXKEY_ZUSE      0x1e
+#define SCANPROC_PI_TEX_FXKEY_ZTEST     0x1f
+#define SCANPROC_PI_TILE_TEX_FX_ZNONE   0x20
+#define SCANPROC_PI_TILE_TEX_FX_ZFIL    0x21
+#define SCANPROC_PI_TILE_TEX_FX_ZUSE    0x22
+#define SCANPROC_PI_TILE_TEX_FX_ZTEST   0x23
+#define SCANPROC_PI_TILE_TEX_FXKEY_ZNONE 0x24
+#define SCANPROC_PI_TILE_TEX_FXKEY_ZFIL 0x25
+#define SCANPROC_PI_TILE_TEX_FXKEY_ZUSE 0x26
+#define SCANPROC_PI_TILE_TEX_FXKEY_ZTEST 0x27
 // Perspective-incorrect flat-shaded alpha-mapped texture
-#define SCANPROC_PI_TEX_ALPHA_ZNONE     0x18
-#define SCANPROC_PI_TEX_ALPHA_ZFIL      0x19
-#define SCANPROC_PI_TEX_ALPHA_ZUSE      0x1a
-#define SCANPROC_PI_TEX_ALPHA_ZTEST     0x1b
+#define SCANPROC_PI_TEX_ALPHA_ZNONE     0x28
+#define SCANPROC_PI_TEX_ALPHA_ZFIL      0x29
+#define SCANPROC_PI_TEX_ALPHA_ZUSE      0x2a
+#define SCANPROC_PI_TEX_ALPHA_ZTEST     0x2b
 
 // Gouraud-shaded PI routines should have same indices
 // as their non-Gouraud counterparts. Every routine except
 // flat-shaded ones have two versions: without table-driven
 // effects (FX) and one with them.
-#define SCANPROC_PI_FLAT_GOU_ZNONE      0x00
-#define SCANPROC_PI_FLAT_GOU_ZFIL       0x01
-#define SCANPROC_PI_FLAT_GOU_ZUSE       0x02
-#define SCANPROC_PI_FLAT_GOU_ZTEST      0x03
+#define SCANPROC_PI_FLAT_GOU_ZNONE           0x00
+#define SCANPROC_PI_FLAT_GOU_ZFIL            0x01
+#define SCANPROC_PI_FLAT_GOU_ZUSE            0x02
+#define SCANPROC_PI_FLAT_GOU_ZTEST           0x03
 // Textured Gouraud-shaded polygons
-#define SCANPROC_PI_TEX_GOU_ZNONE       0x04
-#define SCANPROC_PI_TEX_GOU_ZFIL        0x05
-#define SCANPROC_PI_TEX_GOU_ZUSE        0x06
-#define SCANPROC_PI_TEX_GOU_ZTEST       0x07
-#define SCANPROC_PI_TEX_GOUKEY_ZNONE    0x08
-#define SCANPROC_PI_TEX_GOUKEY_ZFIL     0x09
-#define SCANPROC_PI_TEX_GOUKEY_ZUSE     0x0a
-#define SCANPROC_PI_TEX_GOUKEY_ZTEST    0x0b
+#define SCANPROC_PI_TEX_GOU_ZNONE            0x04
+#define SCANPROC_PI_TEX_GOU_ZFIL             0x05
+#define SCANPROC_PI_TEX_GOU_ZUSE             0x06
+#define SCANPROC_PI_TEX_GOU_ZTEST            0x07
+#define SCANPROC_PI_TEX_GOUKEY_ZNONE         0x08
+#define SCANPROC_PI_TEX_GOUKEY_ZFIL          0x09
+#define SCANPROC_PI_TEX_GOUKEY_ZUSE          0x0a
+#define SCANPROC_PI_TEX_GOUKEY_ZTEST         0x0b
+// Textured Gouraud-shaded polygons with tiling
+#define SCANPROC_PI_TILE_TEX_GOU_ZNONE       0x0c
+#define SCANPROC_PI_TILE_TEX_GOU_ZFIL        0x0d
+#define SCANPROC_PI_TILE_TEX_GOU_ZUSE        0x0e
+#define SCANPROC_PI_TILE_TEX_GOU_ZTEST       0x0f
+#define SCANPROC_PI_TILE_TEX_GOUKEY_ZNONE    0x10
+#define SCANPROC_PI_TILE_TEX_GOUKEY_ZFIL     0x11
+#define SCANPROC_PI_TILE_TEX_GOUKEY_ZUSE     0x12
+#define SCANPROC_PI_TILE_TEX_GOUKEY_ZTEST    0x13
 // Scanline drawing routines with Gouraud shading + effects.
-#define SCANPROC_PI_FLAT_GOUFX_ZNONE    0x0c
-#define SCANPROC_PI_FLAT_GOUFX_ZFIL     0x0d
-#define SCANPROC_PI_FLAT_GOUFX_ZUSE     0x0e
-#define SCANPROC_PI_FLAT_GOUFX_ZTEST    0x0f
-#define SCANPROC_PI_TEX_GOUFX_ZNONE     0x10
-#define SCANPROC_PI_TEX_GOUFX_ZFIL      0x11
-#define SCANPROC_PI_TEX_GOUFX_ZUSE      0x12
-#define SCANPROC_PI_TEX_GOUFX_ZTEST     0x13
-#define SCANPROC_PI_TEX_GOUFXKEY_ZNONE  0x14
-#define SCANPROC_PI_TEX_GOUFXKEY_ZFIL   0x15
-#define SCANPROC_PI_TEX_GOUFXKEY_ZUSE   0x16
-#define SCANPROC_PI_TEX_GOUFXKEY_ZTEST  0x17
+#define SCANPROC_PI_FLAT_GOUFX_ZNONE         0x14
+#define SCANPROC_PI_FLAT_GOUFX_ZFIL          0x15
+#define SCANPROC_PI_FLAT_GOUFX_ZUSE          0x16
+#define SCANPROC_PI_FLAT_GOUFX_ZTEST         0x17
+#define SCANPROC_PI_TEX_GOUFX_ZNONE          0x18
+#define SCANPROC_PI_TEX_GOUFX_ZFIL           0x19
+#define SCANPROC_PI_TEX_GOUFX_ZUSE           0x1a
+#define SCANPROC_PI_TEX_GOUFX_ZTEST          0x1b
+#define SCANPROC_PI_TEX_GOUFXKEY_ZNONE       0x1c
+#define SCANPROC_PI_TEX_GOUFXKEY_ZFIL        0x1d
+#define SCANPROC_PI_TEX_GOUFXKEY_ZUSE        0x1e
+#define SCANPROC_PI_TEX_GOUFXKEY_ZTEST       0x1f
+#define SCANPROC_PI_TILE_TEX_GOUFX_ZNONE     0x20
+#define SCANPROC_PI_TILE_TEX_GOUFX_ZFIL      0x21
+#define SCANPROC_PI_TILE_TEX_GOUFX_ZUSE      0x22
+#define SCANPROC_PI_TILE_TEX_GOUFX_ZTEST     0x23
+#define SCANPROC_PI_TILE_TEX_GOUFXKEY_ZNONE  0x24
+#define SCANPROC_PI_TILE_TEX_GOUFXKEY_ZFIL   0x25
+#define SCANPROC_PI_TILE_TEX_GOUFXKEY_ZUSE   0x26
+#define SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST  0x27
 
 ///---------------------------------------------------------------------------
 csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
@@ -476,6 +510,14 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZFIL] = csScan_8_scan_pi_tex_key_zfil;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZUSE] = csScan_8_scan_pi_tex_key_zuse;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZTEST] = csScan_8_scan_pi_tex_key_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZNONE] = csScan_8_scan_pi_tile_tex_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZFIL] = csScan_8_scan_pi_tile_tex_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZUSE] = csScan_8_scan_pi_tile_tex_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZTEST] = csScan_8_scan_pi_tile_tex_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZNONE] = csScan_8_scan_pi_tile_tex_key_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZFIL] = csScan_8_scan_pi_tile_tex_key_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZUSE] = csScan_8_scan_pi_tile_tex_key_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZTEST] = csScan_8_scan_pi_tile_tex_key_ztest;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZNONE] = csScan_8_scan_pi_flat_fx_znone;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZFIL] = csScan_8_scan_pi_flat_fx_zfil;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZUSE] = csScan_8_scan_pi_flat_fx_zuse;
@@ -488,6 +530,14 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZFIL] = csScan_8_scan_pi_tex_fxkey_zfil;
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZUSE] = csScan_8_scan_pi_tex_fxkey_zuse;
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZTEST] = csScan_8_scan_pi_tex_fxkey_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZNONE] = csScan_8_scan_pi_tile_tex_fx_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZFIL] = csScan_8_scan_pi_tile_tex_fx_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZUSE] = csScan_8_scan_pi_tile_tex_fx_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZTEST] = csScan_8_scan_pi_tile_tex_fx_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZNONE] = csScan_8_scan_pi_tile_tex_fxkey_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZFIL] = csScan_8_scan_pi_tile_tex_fxkey_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZUSE] = csScan_8_scan_pi_tile_tex_fxkey_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZTEST] = csScan_8_scan_pi_tile_tex_fxkey_ztest;
       ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZNONE] = csScan_8_scan_pi_tex_alpha_znone;
       ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZFIL] = csScan_8_scan_pi_tex_alpha_zfil;
       ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZUSE] = csScan_8_scan_pi_tex_alpha_zuse;
@@ -505,6 +555,14 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZFIL] = csScan_8_scan_pi_tex_goukey_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZUSE] = csScan_8_scan_pi_tex_goukey_zuse;
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZTEST] = csScan_8_scan_pi_tex_goukey_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZNONE] = csScan_8_scan_pi_tile_tex_gou_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZFIL] = csScan_8_scan_pi_tile_tex_gou_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZUSE] = csScan_8_scan_pi_tile_tex_gou_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZTEST] = csScan_8_scan_pi_tile_tex_gou_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZNONE] = csScan_8_scan_pi_tile_tex_goukey_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZFIL] = csScan_8_scan_pi_tile_tex_goukey_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZUSE] = csScan_8_scan_pi_tile_tex_goukey_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZTEST] = csScan_8_scan_pi_tile_tex_goukey_ztest;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZNONE] = csScan_8_scan_pi_flat_goufx_znone;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZFIL] = csScan_8_scan_pi_flat_goufx_zfil;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZUSE] = csScan_8_scan_pi_flat_goufx_zuse;
@@ -517,6 +575,14 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZFIL] = csScan_8_scan_pi_tex_goufxkey_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZUSE] = csScan_8_scan_pi_tex_goufxkey_zuse;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZTEST] = csScan_8_scan_pi_tex_goufxkey_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZNONE] = csScan_8_scan_pi_tile_tex_goufx_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZFIL] = csScan_8_scan_pi_tile_tex_goufx_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZUSE] = csScan_8_scan_pi_tile_tex_goufx_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZTEST] = csScan_8_scan_pi_tile_tex_goufx_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZNONE] = csScan_8_scan_pi_tile_tex_goufxkey_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZFIL] = csScan_8_scan_pi_tile_tex_goufxkey_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZUSE] = csScan_8_scan_pi_tile_tex_goufxkey_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST] = csScan_8_scan_pi_tile_tex_goufxkey_ztest;
       break;
 
     case 2:
@@ -648,6 +714,14 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZFIL] = csScan_16_scan_pi_tex_key_zfil;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZUSE] = csScan_16_scan_pi_tex_key_zuse;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZTEST] = csScan_16_scan_pi_tex_key_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZNONE] = csScan_16_scan_pi_tile_tex_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZFIL] = csScan_16_scan_pi_tile_tex_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZUSE] = csScan_16_scan_pi_tile_tex_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZTEST] = csScan_16_scan_pi_tile_tex_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZNONE] = csScan_16_scan_pi_tile_tex_key_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZFIL] = csScan_16_scan_pi_tile_tex_key_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZUSE] = csScan_16_scan_pi_tile_tex_key_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZTEST] = csScan_16_scan_pi_tile_tex_key_ztest;
 
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZNONE] = (pfmt.GreenBits == 5) ?
         csScan_16_555_scan_pi_flat_fx_znone :
@@ -685,6 +759,30 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZTEST] = (pfmt.GreenBits == 5) ?
         csScan_16_555_scan_pi_tex_fxkey_ztest :
         csScan_16_565_scan_pi_tex_fxkey_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_fx_znone :
+        csScan_16_565_scan_pi_tile_tex_fx_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZFIL] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_fx_zfil :
+        csScan_16_565_scan_pi_tile_tex_fx_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_fx_zuse :
+        csScan_16_565_scan_pi_tile_tex_fx_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZTEST] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_fx_ztest :
+        csScan_16_565_scan_pi_tile_tex_fx_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_fxkey_znone :
+        csScan_16_565_scan_pi_tile_tex_fxkey_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZFIL] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_fxkey_zfil :
+        csScan_16_565_scan_pi_tile_tex_fxkey_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_fxkey_zuse :
+        csScan_16_565_scan_pi_tile_tex_fxkey_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZTEST] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_fxkey_ztest :
+        csScan_16_565_scan_pi_tile_tex_fxkey_ztest;
       ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZNONE] = (pfmt.GreenBits == 5) ?
         csScan_16_555_scan_pi_tex_alpha_znone :
         csScan_16_565_scan_pi_tex_alpha_znone;
@@ -734,6 +832,30 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZTEST] = (pfmt.GreenBits == 5) ?
         csScan_16_555_scan_pi_tex_goukey_ztest :
         csScan_16_565_scan_pi_tex_goukey_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_gou_znone :
+        csScan_16_565_scan_pi_tile_tex_gou_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZFIL] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_gou_zfil :
+        csScan_16_565_scan_pi_tile_tex_gou_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_gou_zuse :
+        csScan_16_565_scan_pi_tile_tex_gou_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZTEST] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_gou_ztest :
+        csScan_16_565_scan_pi_tile_tex_gou_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goukey_znone :
+        csScan_16_565_scan_pi_tile_tex_goukey_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZFIL] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goukey_zfil :
+        csScan_16_565_scan_pi_tile_tex_goukey_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goukey_zuse :
+        csScan_16_565_scan_pi_tile_tex_goukey_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZTEST] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goukey_ztest :
+        csScan_16_565_scan_pi_tile_tex_goukey_ztest;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZNONE] = (pfmt.GreenBits == 5) ?
         csScan_16_555_scan_pi_flat_goufx_znone :
         csScan_16_565_scan_pi_flat_goufx_znone;
@@ -770,6 +892,30 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZTEST] = (pfmt.GreenBits == 5) ?
         csScan_16_555_scan_pi_tex_goufxkey_ztest :
         csScan_16_565_scan_pi_tex_goufxkey_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goufx_znone :
+        csScan_16_565_scan_pi_tile_tex_goufx_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZFIL] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goufx_zfil :
+        csScan_16_565_scan_pi_tile_tex_goufx_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goufx_zuse :
+        csScan_16_565_scan_pi_tile_tex_goufx_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZTEST] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goufx_ztest :
+        csScan_16_565_scan_pi_tile_tex_goufx_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goufxkey_znone :
+        csScan_16_565_scan_pi_tile_tex_goufxkey_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZFIL] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goufxkey_zfil :
+        csScan_16_565_scan_pi_tile_tex_goufxkey_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goufxkey_zuse :
+        csScan_16_565_scan_pi_tile_tex_goufxkey_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_pi_tile_tex_goufxkey_ztest :
+        csScan_16_565_scan_pi_tile_tex_goufxkey_ztest;
       break;
 
     case 4:
@@ -845,6 +991,14 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZFIL] = csScan_32_scan_pi_tex_key_zfil;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZUSE] = csScan_32_scan_pi_tex_key_zuse;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZTEST] = csScan_32_scan_pi_tex_key_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZNONE] = csScan_32_scan_pi_tile_tex_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZFIL] = csScan_32_scan_pi_tile_tex_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZUSE] = csScan_32_scan_pi_tile_tex_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_ZTEST] = csScan_32_scan_pi_tile_tex_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZNONE] = csScan_32_scan_pi_tile_tex_key_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZFIL] = csScan_32_scan_pi_tile_tex_key_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZUSE] = csScan_32_scan_pi_tile_tex_key_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZTEST] = csScan_32_scan_pi_tile_tex_key_ztest;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZNONE] = csScan_32_scan_pi_flat_fx_znone;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZFIL] = csScan_32_scan_pi_flat_fx_zfil;
       ScanProcPI [SCANPROC_PI_FLAT_FX_ZUSE] = csScan_32_scan_pi_flat_fx_zuse;
@@ -857,6 +1011,14 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZFIL] = csScan_32_scan_pi_tex_fxkey_zfil;
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZUSE] = csScan_32_scan_pi_tex_fxkey_zuse;
       ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZTEST] = csScan_32_scan_pi_tex_fxkey_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZNONE] = csScan_32_scan_pi_tile_tex_fx_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZFIL] = csScan_32_scan_pi_tile_tex_fx_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZUSE] = csScan_32_scan_pi_tile_tex_fx_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZTEST] = csScan_32_scan_pi_tile_tex_fx_ztest;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZNONE] = csScan_32_scan_pi_tile_tex_fxkey_znone;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZFIL] = csScan_32_scan_pi_tile_tex_fxkey_zfil;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZUSE] = csScan_32_scan_pi_tile_tex_fxkey_zuse;
+      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZTEST] = csScan_32_scan_pi_tile_tex_fxkey_ztest;
       ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZNONE] = csScan_32_scan_pi_tex_alpha_znone;
       ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZFIL] = csScan_32_scan_pi_tex_alpha_zfil;
       ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZUSE] = csScan_32_scan_pi_tex_alpha_zuse;
@@ -874,6 +1036,14 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZFIL] = csScan_32_scan_pi_tex_goukey_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZUSE] = csScan_32_scan_pi_tex_goukey_zuse;
       ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZTEST] = csScan_32_scan_pi_tex_goukey_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZNONE] = csScan_32_scan_pi_tile_tex_gou_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZFIL] = csScan_32_scan_pi_tile_tex_gou_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZUSE] = csScan_32_scan_pi_tile_tex_gou_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZTEST] = csScan_32_scan_pi_tile_tex_gou_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZNONE] = csScan_32_scan_pi_tile_tex_goukey_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZFIL] = csScan_32_scan_pi_tile_tex_goukey_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZUSE] = csScan_32_scan_pi_tile_tex_goukey_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZTEST] = csScan_32_scan_pi_tile_tex_goukey_ztest;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZNONE] = csScan_32_scan_pi_flat_goufx_znone;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZFIL] = csScan_32_scan_pi_flat_goufx_zfil;
       ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZUSE] = csScan_32_scan_pi_flat_goufx_zuse;
@@ -886,6 +1056,14 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZFIL] = csScan_32_scan_pi_tex_goufxkey_zfil;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZUSE] = csScan_32_scan_pi_tex_goufxkey_zuse;
       ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZTEST] = csScan_32_scan_pi_tex_goufxkey_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZNONE] = csScan_32_scan_pi_tile_tex_goufx_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZFIL] = csScan_32_scan_pi_tile_tex_goufx_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZUSE] = csScan_32_scan_pi_tile_tex_goufx_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZTEST] = csScan_32_scan_pi_tile_tex_goufx_ztest;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZNONE] = csScan_32_scan_pi_tile_tex_goufxkey_znone;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZFIL] = csScan_32_scan_pi_tile_tex_goufxkey_zfil;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZUSE] = csScan_32_scan_pi_tile_tex_goufxkey_zuse;
+      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST] = csScan_32_scan_pi_tile_tex_goufxkey_ztest;
       break;
   } /* endswitch */
 
@@ -2466,6 +2644,7 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
   {
     csTextureHandleSoftware *tex_mm = (csTextureHandleSoftware*)txt_handle->GetPrivateObject ();
     csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (0);
+    csScan_InitDrawFX (tex_mm, txt_unl);
     pqinfo.bm = txt_unl->get_bitmap ();
     pqinfo.tw = txt_unl->get_width ();
     pqinfo.th = txt_unl->get_height ();
@@ -2474,10 +2653,6 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
     pqinfo.thfp = QInt16 (pqinfo.th) - 1;
     pqinfo.keycolor = tex_mm->GetKeyColor ();
     pqinfo.textured = do_textured;
-    Scan.PaletteTable = tex_mm->GetPaletteToGlobal ();
-    Scan.TexturePalette = tex_mm->GetColorMap ();
-    Scan.AlphaMap = txt_unl->get_alphamap ();
-    Scan.PrivateCMap = tex_mm->GetPaletteToGlobal8 ();
   }
   else
     pqinfo.textured = false;
@@ -2543,7 +2718,9 @@ zfill_only:
   if (pqinfo.textured && pqinfo.keycolor)
     scan_index += 4;
   if ((mode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
-    scan_index += 12;
+    scan_index += 20;
+  if (pqinfo.textured && (mode & CS_FX_TILING))
+    scan_index += 8;
   if (!pqinfo.drawline)
     pqinfo.drawline = ScanProcPI [scan_index];
   if (mode & CS_FX_GOURAUD)

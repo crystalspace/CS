@@ -257,6 +257,8 @@ void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits,
 /// Initialize the scanline variables
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   iPolygonTexture* tex, csTextureHandleSoftware* texture, csTextureSoftware *untxt);
+/// Initialize the scanline variables for DrawPolygonFX
+void csScan_InitDrawFX (csTextureHandleSoftware* texture, csTextureSoftware *untxt);
 /// Dump debugging information about last polygon
 void csScan_dump (csGraphics3DSoftwareCommon* pG3D);
 /// Pixel-depth independent routine
@@ -339,12 +341,20 @@ PI_SCAN_ROUTINE (8, flat)
 PI_SCAN_ROUTINE (8, tex)
 /// Draw a perspective-incorrect texture mapped polygon scanline with color keying
 PI_SCAN_ROUTINE (8, tex_key)
+/// Draw a perspective-incorrect texture mapped polygon scanline
+PI_SCAN_ROUTINE (8, tile_tex)
+/// Draw a perspective-incorrect texture mapped polygon scanline with color keying
+PI_SCAN_ROUTINE (8, tile_tex_key)
 /// Draw a flat-lighted perspective-incorrect with table-driven effects
 PI_SCAN_ROUTINE (8, flat_fx)
 /// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects
 PI_SCAN_ROUTINE (8, tex_fx)
 /// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
 PI_SCAN_ROUTINE (8, tex_fxkey)
+/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects
+PI_SCAN_ROUTINE (8, tile_tex_fx)
+/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
+PI_SCAN_ROUTINE (8, tile_tex_fxkey)
 /// Draw a flat-shaded alpha-mapped texture
 PI_SCAN_ROUTINE (8, tex_alpha)
 
@@ -354,12 +364,20 @@ PIG_SCAN_ROUTINE (8, flat_gou)
 PIG_SCAN_ROUTINE (8, tex_gou)
 /// Perspective-incorrect textured polygon with Gouraud shading and color keying
 PIG_SCAN_ROUTINE (8, tex_goukey)
+/// Draw a perspective-incorrect texture mapped polygon scanline with Gouraud shading
+PIG_SCAN_ROUTINE (8, tile_tex_gou)
+/// Perspective-incorrect textured polygon with Gouraud shading and color keying
+PIG_SCAN_ROUTINE (8, tile_tex_goukey)
 /// Draw a single-color Gouraud-shaded polygon with table-driven effects
 PIG_SCAN_ROUTINE (8, flat_goufx)
 /// Draw a perspective-incorrect textured polygon scanline with table-driven effects
 PIG_SCAN_ROUTINE (8, tex_goufx)
 /// Draw a perspective-incorrect polygon scanline with various effects and color keying
 PIG_SCAN_ROUTINE (8, tex_goufxkey)
+/// Draw a perspective-incorrect textured polygon scanline with table-driven effects
+PIG_SCAN_ROUTINE (8, tile_tex_goufx)
+/// Draw a perspective-incorrect polygon scanline with various effects and color keying
+PIG_SCAN_ROUTINE (8, tile_tex_goufxkey)
 
 #ifdef DO_MMX
 /// Draw one horizontal scanline (lighting) using MMX
@@ -431,6 +449,10 @@ PI_SCAN_ROUTINE (16, flat)
 PI_SCAN_ROUTINE (16, tex)
 /// Draw a perspective-incorrect texture mapped polygon scanline with color keying
 PI_SCAN_ROUTINE (16, tex_key)
+/// Draw a perspective-incorrect texture mapped polygon scanline
+PI_SCAN_ROUTINE (16, tile_tex)
+/// Draw a perspective-incorrect texture mapped polygon scanline with color keying
+PI_SCAN_ROUTINE (16, tile_tex_key)
 /// Draw a flat-lighted perspective-incorrect with table-driven effects
 PI_SCAN_ROUTINE (16_555, flat_fx)
 PI_SCAN_ROUTINE (16_565, flat_fx)
@@ -440,6 +462,12 @@ PI_SCAN_ROUTINE (16_565, tex_fx)
 /// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
 PI_SCAN_ROUTINE (16_555, tex_fxkey)
 PI_SCAN_ROUTINE (16_565, tex_fxkey)
+/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects
+PI_SCAN_ROUTINE (16_555, tile_tex_fx)
+PI_SCAN_ROUTINE (16_565, tile_tex_fx)
+/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
+PI_SCAN_ROUTINE (16_555, tile_tex_fxkey)
+PI_SCAN_ROUTINE (16_565, tile_tex_fxkey)
 /// Draw a flat-shaded alpha-mapped texture
 PI_SCAN_ROUTINE (16_555, tex_alpha)
 PI_SCAN_ROUTINE (16_565, tex_alpha)
@@ -453,6 +481,12 @@ PIG_SCAN_ROUTINE (16_565, tex_gou)
 /// Perspective-incorrect textured polygon with Gouraud shading and color keying
 PIG_SCAN_ROUTINE (16_555, tex_goukey)
 PIG_SCAN_ROUTINE (16_565, tex_goukey)
+/// Draw a perspective-incorrect texture mapped polygon scanline with Gouraud shading
+PIG_SCAN_ROUTINE (16_555, tile_tex_gou)
+PIG_SCAN_ROUTINE (16_565, tile_tex_gou)
+/// Perspective-incorrect textured polygon with Gouraud shading and color keying
+PIG_SCAN_ROUTINE (16_555, tile_tex_goukey)
+PIG_SCAN_ROUTINE (16_565, tile_tex_goukey)
 /// Draw a single-color Gouraud-shaded polygon with table-driven effects
 PIG_SCAN_ROUTINE (16_555, flat_goufx)
 PIG_SCAN_ROUTINE (16_565, flat_goufx)
@@ -462,6 +496,12 @@ PIG_SCAN_ROUTINE (16_565, tex_goufx)
 /// Draw a perspective-incorrect polygon scanline with various effects and color keying
 PIG_SCAN_ROUTINE (16_555, tex_goufxkey)
 PIG_SCAN_ROUTINE (16_565, tex_goufxkey)
+/// Draw a perspective-incorrect textured polygon scanline with table-driven effects
+PIG_SCAN_ROUTINE (16_555, tile_tex_goufx)
+PIG_SCAN_ROUTINE (16_565, tile_tex_goufx)
+/// Draw a perspective-incorrect polygon scanline with various effects and color keying
+PIG_SCAN_ROUTINE (16_555, tile_tex_goufxkey)
+PIG_SCAN_ROUTINE (16_565, tile_tex_goufxkey)
 
 #ifdef DO_MMX
 /// Draw one horizontal scanline (lighting) using MMX
@@ -518,12 +558,20 @@ PI_SCAN_ROUTINE (32, flat)
 PI_SCAN_ROUTINE (32, tex)
 /// Draw a perspective-incorrect texture mapped polygon scanline with color keying
 PI_SCAN_ROUTINE (32, tex_key)
+/// Draw a perspective-incorrect texture mapped polygon scanline
+PI_SCAN_ROUTINE (32, tile_tex)
+/// Draw a perspective-incorrect texture mapped polygon scanline with color keying
+PI_SCAN_ROUTINE (32, tile_tex_key)
 /// Draw a flat-lighted perspective-incorrect with table-driven effects
 PI_SCAN_ROUTINE (32, flat_fx)
 /// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects
 PI_SCAN_ROUTINE (32, tex_fx)
 /// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
 PI_SCAN_ROUTINE (32, tex_fxkey)
+/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects
+PI_SCAN_ROUTINE (32, tile_tex_fx)
+/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
+PI_SCAN_ROUTINE (32, tile_tex_fxkey)
 /// Draw a flat-shaded alpha-mapped texture
 PI_SCAN_ROUTINE (32, tex_alpha)
 
@@ -533,12 +581,20 @@ PIG_SCAN_ROUTINE (32, flat_gou)
 PIG_SCAN_ROUTINE (32, tex_gou)
 /// Perspective-incorrect textured polygon with Gouraud shading and color keying
 PIG_SCAN_ROUTINE (32, tex_goukey)
+/// Draw a perspective-incorrect texture mapped polygon scanline with Gouraud shading
+PIG_SCAN_ROUTINE (32, tile_tex_gou)
+/// Perspective-incorrect textured polygon with Gouraud shading and color keying
+PIG_SCAN_ROUTINE (32, tile_tex_goukey)
 /// Draw a single-color Gouraud-shaded polygon with table-driven effects
 PIG_SCAN_ROUTINE (32, flat_goufx)
 /// Draw a perspective-incorrect textured polygon scanline with table-driven effects
 PIG_SCAN_ROUTINE (32, tex_goufx)
 /// Draw a perspective-incorrect polygon scanline with various effects and color keying
 PIG_SCAN_ROUTINE (32, tex_goufxkey)
+/// Draw a perspective-incorrect textured polygon scanline with table-driven effects
+PIG_SCAN_ROUTINE (32, tile_tex_goufx)
+/// Draw a perspective-incorrect polygon scanline with various effects and color keying
+PIG_SCAN_ROUTINE (32, tile_tex_goufxkey)
 
 #if defined (DO_MMX)
 /// Draw a perspective-incorrect texture mapped polygon scanline using MMX

@@ -150,9 +150,9 @@ protected:
   /// scan_xxx routines
   csDrawScanline* ScanProc [0x28];
   /// scan_pi_xxx routines
-  csDrawPIScanline* ScanProcPI [0x1c];
+  csDrawPIScanline* ScanProcPI [0x2c];
   /// scan_pi_xxx routines
-  csDrawPIScanlineGouraud* ScanProcPIG [0x18];
+  csDrawPIScanlineGouraud* ScanProcPIG [0x28];
 
   /// The routine for getting the address of needed scanline_xxx_alpha
   csDrawScanline* (*ScanProc_Alpha) (csGraphics3DSoftwareCommon*, int alpha);

@@ -58,6 +58,7 @@ struct csPixelFormat;
 #define CS_FX_TRANSPARENT	0x50000000	// =DST
 #define CS_FX_KEYCOLOR		0x08000000	// color 0 is transparent
 #define CS_FX_GOURAUD		0x04000000	// Gouraud shading
+#define CS_FX_TILING		0x02000000	// Tiling
 #define CS_FX_MASK_ALPHA	0x000000FF	// alpha = 0..FF (opaque..transparent)
 
 /// Macro for easier setting of alpha bits into mixmode

@@ -32,7 +32,12 @@
 #endif
     {
 #ifndef PI_FLAT
+  #ifdef PI_TILE
+      UByte texel = bitmap [(((v >> 16) & Scan.and_h) << bitmap_log2w)
+      	+ ((u >> 16) & Scan.and_w)];
+  #else
       UByte texel = bitmap [((v >> 16) << bitmap_log2w) + (u >> 16)];
+  #endif
   #ifdef PI_COLORKEY
       // if colorkeying is enabled, we will ignore texels with the value 0.
       if (texel)

@@ -12,7 +12,7 @@ The history order is reversed so that new features are at the top.
 	- Added support for FX mode scanline drawing to DrawPolygon.
 	  So you can now use CS_FX_ADD (for example) with both lighted
 	  and unlighted polygon drawing. Only CS_FX_TRANSPARENT is not
-	  supported.
+	  supported. Added 'mixmode' to G3DPolygonDP.
 	- Moved MixMode from csPolyTexNone to csPolyTexType.
 	- Removed csPolyTexNone and iPolyTexNone. This functionality is now
 	  in csPolyTexType and iPolyTexType.
@@ -26,6 +26,11 @@ The history order is reversed so that new features are at the top.
 	- Also added support for new FX polygon drawing in OpenGL/DrawPolygon.
 	- Consistently renamed all GetMixmode() and SetMixmode() functions
 	  to GetMixMode() and SetMixMode().
+	- Added support for tiling in DrawPolygonFX and DrawTriangleMesh
+	  (software renderer). This is enabled by the CS_FX_TILING flag
+	  for mixmode. This is somewhat slower though so only use this if
+	  you really need it. Tiling is not supported for images
+	  with an alpha map. This tiling is untested for now.
 29-Apr-2001
 	- Fixed the python plugin again.
 	- Fixed a bug that caused stray particle systems to be visible

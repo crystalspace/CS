@@ -402,6 +402,10 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_SCANFUNC csScan_8_scan_pi_tex_znone
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_znone
+#define PI_TILE
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_znone
 
@@ -410,6 +414,11 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_zfil
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_zfil
+#define PI_ZFILL
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_zfil
+#define PI_TILE
 #define PI_ZFILL
 #define PI_INDEX8
 #include "scanpi.inc"
@@ -427,11 +436,26 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 
 #endif // NO_scan_pi_tex_zuse
 
+#ifndef NO_scan_pi_tile_tex_zuse
+
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_zuse
+#define PI_TILE
+#define PI_ZUSE
+#define PI_INDEX8
+#include "scanpi.inc"
+
+#endif // NO_scan_pi_tile_tex_zuse
+
 //------------------------------------------------------------------
 
 #ifndef NO_scan_pi_tex_ztest
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_ztest
+#define PI_ZTEST
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_ztest
+#define PI_TILE
 #define PI_ZTEST
 #define PI_INDEX8
 #include "scanpi.inc"
@@ -446,6 +470,11 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_COLORKEY
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_key_znone
+#define PI_TILE
+#define PI_COLORKEY
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_key_znone
 
@@ -454,6 +483,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_key_zfil
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_key_zfil
+#define PI_ZFILL
+#define PI_COLORKEY
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_key_zfil
+#define PI_TILE
 #define PI_ZFILL
 #define PI_COLORKEY
 #define PI_INDEX8
@@ -470,6 +505,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_COLORKEY
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_key_zuse
+#define PI_TILE
+#define PI_ZUSE
+#define PI_COLORKEY
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_key_zuse
 
@@ -478,6 +519,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_key_ztest
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_key_ztest
+#define PI_ZTEST
+#define PI_COLORKEY
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_key_ztest
+#define PI_TILE
 #define PI_ZTEST
 #define PI_COLORKEY
 #define PI_INDEX8
@@ -544,6 +591,11 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_BLEND
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_fx_znone
+#define PI_TILE
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_fx_znone
 
@@ -552,6 +604,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_fx_zfil
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_fx_zfil
+#define PI_ZFILL
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_fx_zfil
+#define PI_TILE
 #define PI_ZFILL
 #define PI_BLEND
 #define PI_INDEX8
@@ -568,6 +626,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_BLEND
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_fx_zuse
+#define PI_TILE
+#define PI_ZUSE
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_zuse
 
@@ -576,6 +640,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_fx_ztest
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_fx_ztest
+#define PI_ZTEST
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_fx_ztest
+#define PI_TILE
 #define PI_ZTEST
 #define PI_BLEND
 #define PI_INDEX8
@@ -592,6 +662,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_BLEND
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_fxkey_znone
+#define PI_TILE
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_fxkey_znone
 
@@ -600,6 +676,13 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_fxkey_zfil
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_fxkey_zfil
+#define PI_ZFILL
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_fxkey_zfil
+#define PI_TILE
 #define PI_ZFILL
 #define PI_COLORKEY
 #define PI_BLEND
@@ -618,6 +701,13 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_BLEND
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_fxkey_zuse
+#define PI_TILE
+#define PI_ZUSE
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_fxkey_zuse
 
@@ -626,6 +716,13 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_fxkey_ztest
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_fxkey_ztest
+#define PI_ZTEST
+#define PI_COLORKEY
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_fxkey_ztest
+#define PI_TILE
 #define PI_ZTEST
 #define PI_COLORKEY
 #define PI_BLEND
@@ -693,6 +790,11 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_GOURAUD
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_gou_znone
+#define PI_TILE
+#define PI_GOURAUD
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_gou_znone
 
@@ -701,6 +803,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_gou_zfil
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_gou_zfil
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_gou_zfil
+#define PI_TILE
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_INDEX8
@@ -717,6 +825,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_GOURAUD
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_gou_zuse
+#define PI_TILE
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_gou_zuse
 
@@ -725,6 +839,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_gou_ztest
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_gou_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_gou_ztest
+#define PI_TILE
 #define PI_ZTEST
 #define PI_GOURAUD
 #define PI_INDEX8
@@ -741,6 +861,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_COLORKEY
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goukey_znone
+#define PI_TILE
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_goukey_znone
 
@@ -749,6 +875,13 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_goukey_zfil
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_goukey_zfil
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goukey_zfil
+#define PI_TILE
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_COLORKEY
@@ -767,6 +900,13 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_COLORKEY
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goukey_zuse
+#define PI_TILE
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_goukey_zuse
 
@@ -775,6 +915,13 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_goukey_ztest
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_goukey_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_COLORKEY
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goukey_ztest
+#define PI_TILE
 #define PI_ZTEST
 #define PI_GOURAUD
 #define PI_COLORKEY
@@ -847,6 +994,12 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_BLEND
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goufx_znone
+#define PI_TILE
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_goufx_znone
 
@@ -855,6 +1008,13 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_goufx_zfil
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_goufx_zfil
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goufx_zfil
+#define PI_TILE
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_BLEND
@@ -873,6 +1033,13 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_BLEND
 #define PI_INDEX8
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goufx_zuse
+#define PI_TILE
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_goufx_zuse
 
@@ -881,6 +1048,13 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_goufx_ztest
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_goufx_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_BLEND
+#define PI_INDEX8
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goufx_ztest
+#define PI_TILE
 #define PI_ZTEST
 #define PI_GOURAUD
 #define PI_BLEND
@@ -899,6 +1073,13 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_COLORKEY
 #define PI_BLEND
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goufxkey_znone
+#define PI_TILE
+#define PI_GOURAUD
+#define PI_INDEX8
+#define PI_COLORKEY
+#define PI_BLEND
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_goufxkey_znone
 
@@ -907,6 +1088,14 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_goufxkey_zfil
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_goufxkey_zfil
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_INDEX8
+#define PI_COLORKEY
+#define PI_BLEND
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goufxkey_zfil
+#define PI_TILE
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_INDEX8
@@ -927,6 +1116,14 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #define PI_COLORKEY
 #define PI_BLEND
 #include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goufxkey_zuse
+#define PI_TILE
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_INDEX8
+#define PI_COLORKEY
+#define PI_BLEND
+#include "scanpi.inc"
 
 #endif // NO_scan_pi_tex_goufxkey_zuse
 
@@ -935,6 +1132,14 @@ void csScan_8_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_scan_pi_tex_goufxkey_ztest
 
 #define PI_SCANFUNC csScan_8_scan_pi_tex_goufxkey_ztest
+#define PI_ZTEST
+#define PI_GOURAUD
+#define PI_INDEX8
+#define PI_COLORKEY
+#define PI_BLEND
+#include "scanpi.inc"
+#define PI_SCANFUNC csScan_8_scan_pi_tile_tex_goufxkey_ztest
+#define PI_TILE
 #define PI_ZTEST
 #define PI_GOURAUD
 #define PI_INDEX8
