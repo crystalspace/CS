@@ -39,8 +39,24 @@ else
   TO_INSTALL.STATIC_LIBS += $(MP3)
 endif
 
-INC.MP3 = $(wildcard plugins/sound/loader/mp3/*.h) $(wildcard plugins/sound/loader/mp3/mpg123/*.h)
-SRC.MP3 = $(wildcard plugins/sound/loader/mp3/*.cpp) $(wildcard plugins/sound/loader/mp3/mpg123/*.cpp)
+ifeq ($(OS),WIN32)
+  INC.MP3 = $(wildcard plugins/sound/loader/mp3/*.h) \
+    plugins/sound/loader/mp3/mpg123/bitstrm.h plugins/sound/loader/mp3/mpg123/frame.h \
+    plugins/sound/loader/mp3/mpg123/genre.h plugins/sound/loader/mp3/mpg123/huffman.h \
+    plugins/sound/loader/mp3/mpg123/l2tables.h plugins/sound/loader/mp3/mpg123/mpg123.h \
+    plugins/sound/loader/mp3/mpg123/version.h
+  SRC.MP3 = $(wildcard plugins/sound/loader/mp3/*.cpp) \
+    plugins/sound/loader/mp3/mpg123/bitstrm.cpp plugins/sound/loader/mp3/mpg123/dct64.cpp \
+    plugins/sound/loader/mp3/mpg123/dec2to1.cpp plugins/sound/loader/mp3/mpg123/decntom.cpp \
+    plugins/sound/loader/mp3/mpg123/dec4to1.cpp plugins/sound/loader/mp3/mpg123/decode.cpp \
+    plugins/sound/loader/mp3/mpg123/frame.cpp plugins/sound/loader/mp3/mpg123/layer1.cpp \
+    plugins/sound/loader/mp3/mpg123/layer2.cpp plugins/sound/loader/mp3/mpg123/layer3.cpp \
+    plugins/sound/loader/mp3/mpg123/tabinit.cpp
+else
+  INC.MP3 = $(wildcard plugins/sound/loader/mp3/*.h) $(wildcard plugins/sound/loader/mp3/mpg123/*.h)
+  SRC.MP3 = $(wildcard plugins/sound/loader/mp3/*.cpp) $(wildcard plugins/sound/loader/mp3/mpg123/*.cpp)
+endif
+
 OBJ.MP3 = $(addprefix $(OUT),$(notdir $(SRC.MP3:.cpp=$O)))
 DEP.MP3 = CSUTIL CSSYS CSUTIL
 
