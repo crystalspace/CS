@@ -19,12 +19,14 @@
 */
 
 #include "cssysdef.h"
+#include "ivaria/reporter.h"
 #include "isound/listener.h"
 #include "isound/data.h"
 #include "srdrsrc.h"
 #include "srdrcom.h"
 #include "sndhdl.h"
 #include "csqsqrt.h"
+
 
 SCF_IMPLEMENT_IBASE(csSoundSourceSoftware)
   SCF_IMPLEMENTS_INTERFACE(iSoundSource)
@@ -46,6 +48,8 @@ csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
   SoundHandle = hdl;
   SampleOffset=0.0f;
   mutex_RenderLock=csMutex::Create(true);
+  SetMinimumDistance(1.0f);
+  SetMaximumDistance(SOUND_DISTANCE_INFINITE);
 }
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
@@ -134,8 +138,38 @@ csVector3 csSoundSourceSoftware::GetVelocity()
   return Velocity;
 }
 
+void csSoundSourceSoftware::SetMinimumDistance (float distance)
+{
+  MinimumDistance = distance;
+  if (MinimumDistance < 0.000001f)
+    MinimumDistance=0.000001f;
+}
+
+void csSoundSourceSoftware::SetMaximumDistance (float distance)
+{
+  MaximumDistance = distance;
+  if (MaximumDistance != SOUND_DISTANCE_INFINITE && 
+      MaximumDistance < MinimumDistance)
+      MaximumDistance=0.0f; // Don't play at all
+}
+
+float csSoundSourceSoftware::GetMinimumDistance ()
+{
+  return MinimumDistance;
+}
+
+float csSoundSourceSoftware::GetMaximumDistance ()
+{
+  return MaximumDistance;
+}
+
+
 void csSoundSourceSoftware::Prepare(float BaseVolume)
 {
+  float LeftScale,RightScale;
+  csVector3 Front,Top,Left;
+  csVector3 LeftToSound,RightToSound;
+
   csScopedMutexLock lock(mutex_RenderLock);
 
   // frequency
@@ -153,19 +187,21 @@ void csSoundSourceSoftware::Prepare(float BaseVolume)
   // position of the listener's ears
   csVector3 EarL,EarR;
 
+
   if (Mode3d == SOUND3D_RELATIVE)
   {
     // position of the sound is relative to the listener, so we simply
     // place the listener at (0,0,0) with front (0,0,1) and top (0,1,0)
     EarL = csVector3(-Listener->GetHeadSize()/2, 0, 0);
     EarR = csVector3(+Listener->GetHeadSize()/2, 0, 0);
+    Left.Set(1.0f,0.0f,0.0f);
   }
   else
   {
     // calculate the 'left' vector
-    csVector3 Front,Top,Left;
     Listener->GetDirection(Front,Top);
-    Left=Top%Front;
+    // Use the proper coordinate system
+    Left=Front%Top;
     if (Left.Norm()<EPSILON)
     {
       // user has supplied bad front and top vectors
@@ -180,30 +216,58 @@ void csSoundSourceSoftware::Prepare(float BaseVolume)
 
   // calculate ear distance
   float DistL,DistR;
-  DistL=(EarL-Position).Norm();
-  DistR=(EarR-Position).Norm();
 
-  // the following tests should not be deleted until we see (or hear)
-  // what gives the best results. Just try it!
+  LeftScale=1.0f;
+  RightScale=1.0f;
+  LeftToSound=Position-EarL;
+  RightToSound=Position-EarR;
+  DistL=LeftToSound.Norm();
+  DistR=RightToSound.Norm();
 
-  // @@@ test: amplify difference between ears.
-//  float d=DistL-DistR;
-//  DistL+=2*d;
-//  DistR-=2*d;
+  // Early out if we're beyond the maximum distance
+  if (MaximumDistance != SOUND_DISTANCE_INFINITE)
+  {
+    if (DistL > MaximumDistance && DistR > MaximumDistance)
+      return;
+  }
 
-  // @@@ test: take square root of distance. Otherwise the missile sound
-  // in walktest seems to become distant too fast.
-//  DistL=sqrt(DistL);
-//  DistR=sqrt(DistR);
+  // Normalize the Ear-to-sound vectors used for direction factor calculations
+  LeftToSound.Normalize();
+  RightToSound.Normalize();
 
-  // prevent too near sounds
-  if (DistL<1) DistL=1;
-  if (DistR<1) DistR=1;
 
-  // calculate ear volume
-  float DistFactor=Listener->GetDistanceFactor();
-  CalcVolL/=DistL*DistFactor;
-  CalcVolR/=DistR*DistFactor;
+  // Approximate the effect of direction as a 60 percent variance in volume
+  LeftScale = 0.60f * (LeftToSound * Left);
+  if (LeftScale < 0.0f)
+    LeftScale=0.0f;
+  RightScale = 0.60f * (RightToSound * (-Left));
+  if (RightScale < 0.0f)
+    RightScale = 0.0f;
+  LeftScale+=0.40f;
+  RightScale+=0.40f;
+
+
+  // Turn distances into units based off minimum distance
+  float minimum_distance=MinimumDistance;
+  if (minimum_distance < 0.000001f)
+    minimum_distance=0.000001f;
+  DistL/=minimum_distance;
+  DistR/=minimum_distance;
+
+  // The minimum distance is, of course, 1 minimum distance unit
+  if (DistL<1.0f) DistL=1.0f;
+  if (DistR<1.0f) DistR=1.0f;
+
+  // The rolloff factor is applied as a factor to the natural rolloff power of 2.0
+  float RolloffFactor=Listener->GetRollOffFactor() * 2.0f;
+
+  // Apply the rolloff factor to the volume
+  CalcVolL/=pow(DistL,RolloffFactor);
+  CalcVolR/=pow(DistR,RolloffFactor);
+
+  // Finally apply the directional scaling to each ear
+  CalcVolL*=LeftScale;
+  CalcVolR*=RightScale;
 }
 
 /* helper macros */

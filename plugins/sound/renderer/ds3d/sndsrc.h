@@ -51,6 +51,11 @@ public:
   virtual csVector3 GetPosition();
   virtual void SetVelocity(csVector3 spd);
   virtual csVector3 GetVelocity();
+  virtual void SetMinimumDistance (float distance);
+  virtual void SetMaximumDistance (float distance);
+  virtual float GetMinimumDistance ();
+  virtual float GetMaximumDistance ();
+
 
   bool IsPlaying();
   void Write(void *d, unsigned long NumBytes);
@@ -82,6 +87,9 @@ private:
   // values to assure correct return values when calling Get*() while
   // deferred settings are not yet committed.
   csVector3 Position, Velocity;
+
+  // Minimum and maximum distances of the sound object. Copies of internal values.
+  float MinimumDistance,MaximumDistance;
 
   // sound buffers
   LPDIRECTSOUND3DBUFFER Buffer3D;

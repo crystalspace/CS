@@ -39,7 +39,9 @@ enum
   SOUND3D_ABSOLUTE
 };
 
-SCF_VERSION (iSoundSource, 0, 0, 1);
+#define SOUND_DISTANCE_INFINITE -1.0f
+
+SCF_VERSION (iSoundSource, 0, 0, 2);
 
 /**
  * The sound source is an instance of a sound. It can be a non-3d source,
@@ -74,6 +76,23 @@ struct iSoundSource : public iBase
   virtual void SetVelocity(csVector3 spd) = 0;
   /// get velocity of this source
   virtual csVector3 GetVelocity() = 0;
+
+  /** Set the greatest distance from a sound at which the sound plays at full amplitude. 
+   *   When a listener is closer than this distance, the amplitude is the volume of the sound.
+   *   When a listener is further than this distance, the amplitude follows the formula V = (volume / ((distance/minimum_distance) ^ rolloff_factor))
+   */
+  virtual void SetMinimumDistance (float distance) = 0;
+
+  /** Set the greatest distance from a sound at which the sound can be heard.
+   *   If the distance to a listener is above this threshold, it will not be mixed into the output buffer at all.  This saves a tiny bit of processing.
+   */
+  virtual void SetMaximumDistance (float distance) = 0;
+
+  /// Retrieve the maximum distance for which a sound is heard at full volume.  See SetMaximumDistance and SetMinimumDistance for distance notes.
+  virtual float GetMinimumDistance () = 0;
+
+  /// Retrieve the maximum distance for which a sound can be heard.  See SetMaximumDistance and SetMinimumDistance for distance notes.
+  virtual float GetMaximumDistance () = 0;
 };
 
 #endif // __CS_ISOUND_SOURCE_H__

@@ -7,6 +7,23 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+01-Oct-2004
+	- Rhad added Get,set MinimumDistance and MaximumDistance interface
+	  functions to the iSoundSource interface
+	  -
+	  -  ****** INTERFACE CHANGE AND VERSION BUMP ******
+	  -  iSoundSource interface version changed to 0,0,2
+	  - 
+	- Software, OpenAL and DS3D sound renderers updated to make use
+	  of the new interface members.
+	- Fixed software sound renderer reverse channels for 3d positional
+	  sounds.
+	- Added simplistic direction-based volume adjustment to software
+	  sound renderer.
+	- RollOffFactor is now properly used instead of DistanceFactor in
+	  attenuation (sound attenuation is normally not linear).
+	  See documentation on SetMinimumDistance in iSoundSource interface
+	  for details (or the OpenAL sound guide, or the DirectSound help)
 30-Sep-2004
 	- Jorrit added a new 'copy' flag to CreateRenderBuffer() and
 	  CreateIndexRenderBuffer() which is default to true. Meshes can

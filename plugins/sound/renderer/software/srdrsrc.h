@@ -65,6 +65,12 @@ public:
   // source (volume, format etc.)
   void WriteBuffer(const void *Source, void *Dest, long NumSamples);
 
+  void SetMinimumDistance (float distance);
+  void SetMaximumDistance (float distance);
+  float GetMinimumDistance ();
+  float GetMaximumDistance ();
+
+
   // pointer to the sound renderer
   csSoundRenderSoftware *SoundRender;
   // the sound stream for this source
@@ -92,6 +98,9 @@ public:
   float CalcFreqFactor;
   // stored sample offset used between steps  0.0<=SampleOffset<1.0
   float SampleOffset;
+
+  /// Closer than the MinimumDistance the sound is heard at full volume. Futher than the maximum distance it is not heard at all.  Between, the sound is attenuated using the rolloff factor.
+  float MinimumDistance,MaximumDistance;
 
 protected:
   // restart the sound to the beginning

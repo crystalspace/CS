@@ -48,6 +48,10 @@ public:
   void SetVelocity(csVector3 spd);
   csVector3 GetVelocity() 
   { return csVector3 (velocity[0], velocity[1], velocity[2]); }
+  void SetMinimumDistance (float distance);
+  void SetMaximumDistance (float distance);
+  float GetMinimumDistance ();
+  float GetMaximumDistance ();
 
   ALuint GetID () { return source; }
 

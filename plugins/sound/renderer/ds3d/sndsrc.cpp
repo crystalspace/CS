@@ -46,6 +46,8 @@ csSoundSourceDS3D::csSoundSourceDS3D(iBase *piBase)
   Renderer = 0;
   SoundHandle = 0;
   WriteCursor = -1;
+  MinimumDistance=1.0f;
+  MaximumDistance=DS3D_DEFAULTMAXDISTANCE;
 }
 
 csSoundSourceDS3D::~csSoundSourceDS3D() 
@@ -187,6 +189,39 @@ float csSoundSourceDS3D::GetVolume()
   long dsvol=DSBVOLUME_MIN;
   if (Renderer->AudioRenderer && Buffer2D) Buffer2D->GetVolume(&dsvol);
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
+}
+
+void csSoundSourceDS3D::SetMinimumDistance (float distance)
+{
+  Renderer->SetDirty();
+  if (distance < 0.0f)
+    distance = 0.0f;
+  if (Renderer->AudioRenderer && Buffer3D) Buffer3D->SetMinDistance(distance, DS3D_DEFERRED);
+}
+
+void csSoundSourceDS3D::SetMaximumDistance (float distance)
+{
+  Renderer->SetDirty();
+  if (distance == SOUND_DISTANCE_INFINITE)
+    distance = DS3D_DEFAULTMAXDISTANCE;
+  else
+  {
+    if (distance < 0.000001f) distance = 0.000001f;
+    if (distance < MinimumDistance) distance = MinimumDistance;
+  }
+
+  MaximumDistance=distance;
+  if (Renderer->AudioRenderer && Buffer3D) Buffer3D->SetMaxDistance(distance, DS3D_DEFERRED);
+}
+
+float csSoundSourceDS3D::GetMinimumDistance ()
+{
+  return MinimumDistance;
+}
+
+float csSoundSourceDS3D::GetMaximumDistance ()
+{
+  return MaximumDistance;
 }
 
 void csSoundSourceDS3D::SetMode3D(int mode3D) 

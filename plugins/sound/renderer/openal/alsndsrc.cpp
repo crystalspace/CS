@@ -223,6 +223,53 @@ float csSoundSourceOpenAL::GetFrequencyFactor ()
   return factor;
 }
 
+void csSoundSourceOpenAL::SetMinimumDistance (float distance)
+{
+  if (!SoundRender->al_open)
+    return;
+  // distance = distance * sqrt(2)  .  OpenAL uses a "reference distance" for half sound volume.
+  // This is a translation of the inner radius number to that value.
+  distance*=1.4142135623f;
+  SoundRender->mutex_OpenAL->LockWait();
+  alSourcef (source, AL_REFERENCE_DISTANCE, distance);
+  SoundRender->mutex_OpenAL->Release();
+}
+
+void csSoundSourceOpenAL::SetMaximumDistance (float distance)
+{
+  if (distance == SOUND_DISTANCE_INFINITE)
+    distance=10000000.0f; // A really big number.  OpenAL doesn't seem to have a #define for no max
+  if (!SoundRender->al_open)
+    return;
+  SoundRender->mutex_OpenAL->LockWait();
+  alSourcef (source, AL_MAX_DISTANCE, distance);
+  SoundRender->mutex_OpenAL->Release();
+}
+
+float csSoundSourceOpenAL::GetMinimumDistance ()
+{
+  if (!SoundRender->al_open)
+    return 1.0f;
+  float distance;
+  SoundRender->mutex_OpenAL->LockWait();
+  alGetSourcef (source, AL_REFERENCE_DISTANCE, &distance);
+  SoundRender->mutex_OpenAL->Release();
+  distance/=1.4142135623f;
+  return distance;
+}
+
+float csSoundSourceOpenAL::GetMaximumDistance ()
+{
+  if (!SoundRender->al_open)
+    return 1.0f;
+  float distance;
+  SoundRender->mutex_OpenAL->LockWait();
+  alGetSourcef (source, AL_MAX_DISTANCE, &distance);
+  SoundRender->mutex_OpenAL->Release();
+  return distance;
+}
+
+
 void csSoundSourceOpenAL::SetMode3D(int m) 
 {
   if (!SoundRender->al_open)
