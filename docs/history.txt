@@ -11,6 +11,9 @@ chronological order.
 	  the texture twice resuling in two texture handles. For the OR this
 	  is actually not a real problem (except for wasting resources) but
 	  the NR could not cope with this.
+	- Luca fixed a bug in the csEventQueue::CreateEvent(uint8 type)
+	  method. The method was not setting the flag CSEF_BROADCAST when the
+	  the event's Type is csevBroadcast.
 21-Dec-2003
 	- res added a shader, or_lighting.xml, which mimics the old renderer.
 	- res fixed genmesh to provide the lighting as vertex colors on NR as

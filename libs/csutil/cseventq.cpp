@@ -87,6 +87,20 @@ csPtr<iEvent> csEventQueue::CreateEvent(uint8 type)
   e->Time = csGetTicks();
   e->Category = 0;
   e->SubCategory = 0;
+
+  //@@@ Set here the right event's flag. This seems to me an ugly hack
+  //more than a bug fixed. I think that something should be redesigned.
+  //For example, we could remove the 'Flags' field
+  //from iEvent since it seems pretty unused (ie the only possible
+  //flag used is CSEF_BROADCAST). When we would like to detect if the event
+  //is a "broadcasted" event, instead of detecting the presence
+  //of that flag, we could simply test for the iEvent::Type being equal to
+  //csevBroadcast.     Luca
+  if (type == csevBroadcast)
+    e->Flags = CSEF_BROADCAST;
+  else
+    e->Flags = 0;
+
   return csPtr<iEvent>((iEvent*)e);
 }
  
