@@ -506,7 +506,11 @@ struct scfClassInfo
  * `extern "C"'.
  */
 // extern CS_DECLARE_STATIC_VARIABLE_CLEANUP 
-#define SCF_EXPORT_CLASS_TABLE(LibraryName)			\
+#define SCF_EXPORT_CLASS_TABLE(LibraryName)			        \
+CS_DECLARE_STATIC_VARIABLE_CLEANUP                                      \
+CS_EXPORTED_FUNCTION void              		                        \
+CS_EXPORTED_NAME(LibraryName,_scfFinalize)()                            \
+{ CS_STATIC_VARIABLE_CLEANUP }                                          \
 static inline void							\
 CS_EXPORTED_NAME(LibraryName,_scfUnitInitialize)(iSCF *SCF)		\
 { iSCF::SCF = SCF; }							\

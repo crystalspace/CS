@@ -379,13 +379,18 @@
 #  define CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION cs_static_var_cleanup
 #endif
 
-#ifndef CS_DECLARE_STATIC_VARIABLE_CLEANUP
-#  define CS_DECLARE_STATIC_VARIABLE_CLEANUP \
+#ifndef CS_DECLARE_STATIC_VARIABLE_REGISTRATION
+#  define CS_DECLARE_STATIC_VARIABLE_REGISTRATION \
 void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)());
 #endif
 
-#ifndef CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP
-#  define CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP                         \
+#ifndef CS_DECLARE_STATIC_VARIABLE_CLEANUP
+#  define CS_DECLARE_STATIC_VARIABLE_CLEANUP \
+   CS_DECLARE_STATIC_VARIABLE_REGISTRATION
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
+#  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION                    \
 void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
 {                                                                      \
   static void (**a)()=0;                                               \
@@ -409,7 +414,11 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
     free (a);                                                          \
    }                                                                   \
 }                                                                      
+#endif
 
+#ifndef CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP
+#  define CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP \
+   CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION   
 #endif
 
 /**
@@ -430,12 +439,9 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
 #else
 
 #  ifndef CS_IMPLEMENT_PLUGIN
-#  define CS_IMPLEMENT_PLUGIN                                   \
-static CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP                     \
-          CS_EXPORTED_FUNCTION void              		\
-          CS_EXPORTED_NAME(LibraryName,_scfFinalize)()          \
-          { CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (0);}  \
-          CS_IMPLEMENT_PLATFORM_PLUGIN 
+#  define CS_IMPLEMENT_PLUGIN              \
+   CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP    \
+   CS_IMPLEMENT_PLATFORM_PLUGIN 
 #  endif
 
 #endif
@@ -448,7 +454,9 @@ static CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP                     \
  * platform.
  */
 #ifndef CS_IMPLEMENT_APPLICATION
-#  define CS_IMPLEMENT_APPLICATION CS_IMPLEMENT_PLATFORM_APPLICATION 
+#  define CS_IMPLEMENT_APPLICATION       \
+   CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP  \
+   CS_IMPLEMENT_PLATFORM_APPLICATION 
 #endif
 
 /**
@@ -462,8 +470,9 @@ static CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP                     \
 /**
  * Invoke the function that will call all destruction functions
  */
-#ifndef CS_STATIC_VAR_DESTRUCTION
-#define CS_STATIC_VAR_DESTRUCTION  CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (0);
+#ifndef CS_STATIC_VARIABLE_CLEANUP
+#define CS_STATIC_VARIABLE_CLEANUP  \
+        CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (0);
 #endif
 
 /**
@@ -487,10 +496,11 @@ void getterFunc ## _kill ()                                   \
 Type* getterFunc ()                                           \
 {                                                             \
   static Type *v=0;                                           \
-  if (v)                                                      \
-    return v;                                                 \
-  v = new Type (initParam);                                   \
-  CS_REGISTER_STATIC_FOR_DESTRUCTION (getterFunc ## _kill);   \
+  if (!v)                                                     \
+  {                                                           \
+    v = new Type (initParam);                                 \
+    CS_REGISTER_STATIC_FOR_DESTRUCTION (getterFunc ## _kill); \
+  }                                                           \
   return v;                                                   \
 }                                                             \
 }
@@ -517,23 +527,24 @@ static Type *getterFunc ();
  * CS_IMPLEMENT_STATIC_CLASSVAR (csPolygon2D, pool, GetVertexPool, csVertexPool,)
  */
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR
-#define CS_IMPLEMENT_STATIC_CLASSVAR(Class,var,getterFunc,Type,initParam) \
-Type *Class::var = 0;                                                     \
-extern "C" {                                                              \
-void Class ## _ ## getterFunc ## _kill ();                                \
-void Class ## _ ## getterFunc ## _kill ()                                 \
-{                                                                         \
-  delete Class::getterFunc ();                                            \
-}                                                                         \
-}                                                                         \
-Type* Class::getterFunc ()                                                \
-{                                                                         \
-  static Type *var=0;                                                     \
-  if (var)                                                                \
-    return var;                                                           \
-  var = new Type (initParam);                                             \
-  CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## _kill); \
-  return v;                                                               \
+#define CS_IMPLEMENT_STATIC_CLASSVAR(Class,var,getterFunc,Type,initParam)   \
+Type *Class::var = 0;                                                       \
+extern "C" {                                                                \
+void Class ## _ ## getterFunc ## _kill ();                                  \
+void Class ## _ ## getterFunc ## _kill ()                                   \
+{                                                                           \
+  delete Class::getterFunc ();                                              \
+}                                                                           \
+}                                                                           \
+Type* Class::getterFunc ()                                                  \
+{                                                                           \
+  static Type *var=0;                                                       \
+  if (!var)                                                                 \
+  {                                                                         \
+    var = new Type (initParam);                                             \
+    CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## _kill); \
+  }                                                                         \
+  return var;                                                               \
 }
 #endif
 
