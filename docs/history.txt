@@ -4598,7 +4598,7 @@ chronological order.
 	      to invoke Help automatically with the text "Build the
 	      $(description)".
 	    - Augmented msvcgen.jam and win32.jam to utilize the target's
-	      decription string (as collected by the Description rule) rather
+	      description string (as collected by the Description rule) rather
 	      than the help string (which was not necessarily appropriate in
 	      the context of project files and .rc files).
 	- Eric Sunshine fixed bug in Doxygen rule (docs.jam) where it was
