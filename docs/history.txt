@@ -15,6 +15,11 @@ The history order is reversed so that new features are at the top.
 		iConfigManager);
 	- In addition to the above changes also moved the enum values
 	  ConfigPriority??? from iSystem to iConfigManager.
+	- Removed iSystem::GetInstallPath(). Removed
+	  csSystemDriver::InstallPath(). Instead there is now the global
+	  csGetInstallPath() function.
+	- Removed all 'fatal_exit' calls and also removed fatal_exit()
+	  itself.
 2-Jul-2001
 	- Eric Sunshine eliminated a compilation warning about unused variable
 	  in mdltool.cpp.  (In fact, this particular variable was being

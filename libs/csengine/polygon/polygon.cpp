@@ -783,7 +783,7 @@ void csPolygon3D::Finish ()
   if (!lmi)
   {
     csEngine::current_engine->ReportBug ("No txt_info in polygon!");
-    fatal_exit (0, false);
+    return;
   }
   lmi->Setup (this, material);
   lmi->tex->SetLightMap (NULL);

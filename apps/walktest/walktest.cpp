@@ -1604,7 +1604,7 @@ int main (int argc, char* argv[])
   if (!Sys->Initialize (argc, argv, "/config/walktest.cfg"))
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
-    fatal_exit (-1, false);
+    exit (-1);
   }
 
   // Start the 'autoexec.cfg' script and fully execute it.

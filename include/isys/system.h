@@ -133,15 +133,6 @@ struct iSystem : public iBase
    */
   virtual void Sleep (int iSleepTime) = 0;
 
-  /**
-   * Get the installation path.<p>
-   * This returns the path where the system has been installed to.
-   * It has a limited use because mostly everything should be done
-   * through VFS which is installation directory - independent; but
-   * some initialization tasks still need this.
-   */
-  virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize) = 0;
-
   //---------------------------- Object Registry -----------------------------//
 
   /**

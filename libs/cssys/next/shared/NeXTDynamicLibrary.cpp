@@ -75,7 +75,7 @@ csLibraryHandle csFindLoadLibrary(char const* name)
   {
     initialized = true;
     char path[ MAXPATHLEN ];
-    csSystemDriver::InstallPath(path, sizeof(path));
+    csGetInstallPath(path, sizeof(path));
     strcat(path, OS_NEXT_PLUGIN_DIR);
     csAddLibraryPath(OS_NEXT_PLUGIN_DIR);
     csAddLibraryPath(path);

@@ -23,7 +23,7 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 
-bool csSystemDriver::InstallPath (char *oInstallPath, size_t iBufferSize)
+bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
 {
   if (iBufferSize == 0)
     return false;

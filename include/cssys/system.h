@@ -284,9 +284,6 @@ public:
    */
   virtual void Help ();
 
-  /// Get the installation path.
-  static bool InstallPath (char *oInstallPath, size_t iBufferSize);
-
   /// A shortcut for requesting to load a plugin (before Initialize())
   void RequestPlugin (const char *iPluginName);
 
@@ -362,8 +359,6 @@ public:
   /// Query the elapsed time between last frames and absolute time.
   virtual void GetElapsedTime (csTicks &oElapsedTime, csTicks &oCurrentTime)
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
-  /// Get the installation path.
-  virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
 
   /// Register the plugin to receive specific events
   virtual bool CallOnEvents (iPlugin *iObject, unsigned int iEventMask);
@@ -449,15 +444,22 @@ public:
   friend class PluginManager;
 };
 
-// Fatal exit routine (which can be replaced if neccessary)
-extern void (*fatal_exit) (int errorcode, bool canreturn);
-
-// CS version of printf
+/// CS version of printf
 extern int csPrintf (const char* str, ...);
-// CS version of vprintf
+/// CS version of vprintf
 extern int csPrintfV (const char* str, va_list arg);
 
-// Get the time.
+/// Get the current tick count.
 extern csTicks csGetTicks ();
+
+/**
+ * Get the installation path.<p>
+ * This returns the path where the system has been installed to.
+ * It has a limited use because mostly everything should be done
+ * through VFS which is installation directory - independent; but
+ * some initialization tasks still need this.
+ */
+extern bool csGetInstallPath (char *oInstallPath, size_t iBufferSize);
+
 
 #endif // __CS_SYSTEM_H__

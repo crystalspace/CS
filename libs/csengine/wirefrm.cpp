@@ -180,7 +180,7 @@ void csWfPolygon::SetVertex (int i, csVector3& v)
   {
     csEngine::current_engine->ReportBug (
     	"Bad vertex number %d in csWfPolygon::set_vertex!", i);
-    fatal_exit (0, false);
+    exit (-1);
   }
   vertices[i] = v;
 }

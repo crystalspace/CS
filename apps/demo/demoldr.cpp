@@ -130,7 +130,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
     {
       demo->Report (CS_REPORTER_SEVERITY_ERROR,
       	"Expected parameters instead of '%s'!", buf);
-      fatal_exit (0, false);
+      exit (-1);
     }
     switch (cmd)
     {
@@ -262,7 +262,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
       	"Token '%s' not found while parsing a sequence!",
 	csGetLastOffender ());
-    fatal_exit (0, false);
+    exit (-1);
   }
 }
 
@@ -284,7 +284,7 @@ void DemoSequenceLoader::LoadSequences (char* buf)
     {
       demo->Report (CS_REPORTER_SEVERITY_ERROR,
       	"Expected parameters instead of '%s'!", buf);
-      fatal_exit (0, false);
+      exit (-1);
     }
     switch (cmd)
     {
@@ -335,7 +335,7 @@ void DemoSequenceLoader::LoadSequences (char* buf)
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
       	"Token '%s' not found while parsing sequences!",
 	csGetLastOffender ());
-    fatal_exit (0, false);
+    exit (-1);
   }
 }
 
@@ -353,7 +353,7 @@ void DemoSequenceLoader::LoadSequencesMain (char* buf)
     {
       demo->Report (CS_REPORTER_SEVERITY_ERROR,
       	"Expected parameters instead of '%s'!", buf);
-      fatal_exit (0, false);
+      exit (-1);
     }
     LoadSequences (data);
   }
@@ -416,7 +416,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
     {
       demo->Report (CS_REPORTER_SEVERITY_ERROR,
       	"Expected parameters instead of '%s'!", buf);
-      fatal_exit (0, false);
+      exit (-1);
     }
     switch (cmd)
     {
@@ -635,7 +635,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
       	"Token '%s' not found while parsing a path!",
 	csGetLastOffender ());
-    fatal_exit (0, false);
+    exit (-1);
   }
 
   return np;

@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 
-bool csSystemDriver::InstallPath (char *oInstallPath, size_t iBufferSize)
+bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
 {
   // override the default to get install path from
   // 1. CRYSTAL environment variable

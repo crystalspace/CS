@@ -1467,7 +1467,7 @@ int SysSystemDriver::GetCommandLine(char ***arg)
             break;
         } else if ( kQUIT == theItem ) {
             ::DisposeDialog( theDialog );
-            fatal_exit( 0, false );
+            exit (-1);
         }
     }
 

@@ -907,7 +907,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (!factory->cstxt)
   {
     factory->Report (CS_REPORTER_SEVERITY_ERROR, "Error! Trying to draw a sprite with no material!");
-    exit (0); //fatal_exit (0, false);
+    return false;
   }
  
   iGraphics3D* g3d = rview->GetGraphics3D ();
@@ -1150,7 +1150,7 @@ void csSprite3DMeshObject::InitSprite ()
   if (!factory)
   {
     factory->Report (CS_REPORTER_SEVERITY_ERROR, "There is no defined template for this sprite!");
-    exit (0); //fatal_exit (0, false);
+    return;
   }
 
   if (!cur_action) { SetFrame (0); cur_action = factory->GetFirstAction (); }

@@ -21,6 +21,7 @@ extern "C" {
 }
 #include "cssysdef.h"
 #include "cspython.h"
+#include "cssys/system.h"
 #include "csutil/csstring.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
@@ -72,7 +73,7 @@ bool csPython::Initialize(iSystem* iSys)
   InitPytocs();
 
   char path[256];
-  iSys->GetInstallPath (path, 255);
+  csGetInstallPath (path, 255);
   if (path[0] == 0) strcpy (path, "./");
 
   if (!LoadModule ("sys")) return false;

@@ -1164,7 +1164,7 @@ bool csVFS::Initialize (iSystem *iSys)
 {
   System = iSys;
   char vfsconfigpath [MAXPATHLEN + 1];
-  iSys->GetInstallPath (vfsconfigpath, sizeof (vfsconfigpath));
+  csGetInstallPath (vfsconfigpath, sizeof (vfsconfigpath));
   basedir = csStrNew (vfsconfigpath);
   strcat (vfsconfigpath, "vfs.cfg");
   config.Load (vfsconfigpath);

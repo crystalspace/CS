@@ -3102,7 +3102,7 @@ int main (int argc, char* argv[])
   {
     Sys->Report  (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();
-    fatal_exit (0, false);
+    exit (-1);
   }
 
   csInitializeApplication (Sys);
@@ -3120,7 +3120,7 @@ int main (int argc, char* argv[])
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
-    fatal_exit (0, false);
+    exit (-1);
   }
 
   Sys->FrameWidth = Gfx2D->GetWidth ();

@@ -44,19 +44,6 @@
 #include "iengine/motion.h"
 #include "ivaria/reporter.h"
 
-// This is the default fatal exit function. The user can replace
-// it by some other function that lonjumps somewhere, for example.
-// The 'canreturn' indicates a error that can be ignored (i.e. a
-// not-too-fatal error) and if it is 'true', the function can return.
-// Returning when canreturn is 'false' will cause unpredictable behavior.
-void default_fatal_exit (int errorcode, bool canreturn)
-{
-  (void)canreturn;
-  exit (errorcode);
-}
-
-void (*fatal_exit) (int errorcode, bool canreturn) = default_fatal_exit;
-
 void csSystemDriver::ReportSys (int severity, const char* msg, ...)
 {
   va_list arg;
@@ -339,7 +326,7 @@ csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
 
 #ifndef CS_STATIC_LINKED
   // Add both installpath and installpath/lib dirs to search for plugins
-  GetInstallPath (scfconfigpath, sizeof (scfconfigpath));
+  csGetInstallPath (scfconfigpath, sizeof (scfconfigpath));
   csAddLibraryPath (scfconfigpath);
   strcat (scfconfigpath, "lib");   
   int scfconfiglen = strlen(scfconfigpath);
@@ -349,7 +336,7 @@ csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
 #endif
 
   // Find scf.cfg and initialize SCF
-  GetInstallPath (scfconfigpath, sizeof (scfconfigpath));
+  csGetInstallPath (scfconfigpath, sizeof (scfconfigpath));
   strcat (scfconfigpath, "scf.cfg");
   csConfigFile scfconfig (scfconfigpath);
   scfInitialize (&scfconfig);
@@ -791,11 +778,6 @@ void csSystemDriver::RequestPlugin (const char *iPluginName)
 }
 
 //--------------------------------- iSystem interface for csSystemDriver -----//
-
-bool csSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
-{
-  return InstallPath (oInstallPath, iBufferSize);
-}
 
 bool csSystemDriver::PerformExtensionV (char const*, va_list)
 {
