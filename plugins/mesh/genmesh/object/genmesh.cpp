@@ -540,6 +540,7 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
     if ((clas <= 0) != cw) continue;
 #endif
 
+    // Let the casted shadow appear with a tiny tiny offset...
     const csVector3 offs = csVector3 (pl.norm) * csVector3 (EPSILON);
     pl.DD += (origin + offs) * pl.norm;
 #ifndef SHADOW_CAST_BACKFACE
