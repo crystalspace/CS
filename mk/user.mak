@@ -54,7 +54,7 @@ endif
 
 # Default build mode
 ifndef MODE
-  MODE=debug
+  MODE=optimize
 endif
 
 # Should we use NASM for assembly?
