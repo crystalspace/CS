@@ -59,6 +59,7 @@ csTextureHandleOpenGL::csTextureHandleOpenGL (iImage *image, int flags,
   csGraphics3DOGLCommon *iG3D) : csTextureHandle (image, flags)
 {
   (G3D = iG3D)->IncRef ();
+  (txtmgr = G3D->txtmgr)->IncRef ();
   has_alpha = false;
 }
 
@@ -66,8 +67,8 @@ csTextureHandleOpenGL::~csTextureHandleOpenGL ()
 {
   if (G3D->texture_cache)
     G3D->texture_cache->Uncache (this);
-  G3D->txtmgr->UnregisterTexture (this);
-  G3D->txtmgr->DecRef();
+  txtmgr->UnregisterTexture (this);
+  txtmgr->DecRef();
   G3D->DecRef ();
 }
 
@@ -186,7 +187,7 @@ iGraphics3D *csTextureHandleOpenGL::GetProcTextureInterface ()
 
 void csTextureHandleOpenGL::Prepare ()
 {
-  InitTexture (G3D->txtmgr, &G3D->txtmgr->pfmt);
+  InitTexture (txtmgr, &txtmgr->pfmt);
 }
 
 //---------------------------------------------------------------------------

@@ -55,8 +55,14 @@ struct txt_handles
 {
   txt_handles (iTextureHandle *soft, iTextureHandle *ogl)
   { 
-    soft_txt = soft;
-    ogl_txt = ogl;
+    (soft_txt = soft)->IncRef ();
+    (ogl_txt = ogl)->IncRef ();
+  }
+
+  ~txt_handles ()
+  {
+    SCF_DEC_REF (soft_txt);
+    SCF_DEC_REF (ogl_txt);
   }
 
   iTextureHandle *soft_txt;
@@ -101,15 +107,17 @@ public:
     : csVector (8, 8), object_reg (objreg), soft_man (stm)
   {
     plugin_mgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
+    soft_man->IncRef ();
   }; 
   // Destructor
-  virtual ~TxtHandleVector () { DeleteAll (); }
+  virtual ~TxtHandleVector () 
+  { 
+    DeleteAll (); 
+    SCF_DEC_REF (soft_man);
+  }
   // Free an item from array
   virtual bool FreeItem (csSome Item)
-  { 
-    ((txt_handles *)Item)->soft_txt->DecRef(); 
-    ((txt_handles *)Item)->ogl_txt->DecRef();
-    delete (txt_handles *)Item; return true; }
+  { delete (txt_handles *)Item; return true; }
   // Find a state by referenced OpenGL texture handle
   virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
   { return ((txt_handles *)Item)->ogl_txt == (iTextureHandle *)Key ? 0 : -1; }
@@ -137,7 +145,7 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
 #endif
   // image gets a DecRef() in the software texture manager if procedural texture
   // flags are not set. 
-  image->IncRef ();
+  // image->IncRef ();
   iTextureHandle *hstxt = soft_man->RegisterTexture (image, flags);
   // deal with key colours..
   if (ogl_txt->GetKeyColor ())
@@ -166,20 +174,25 @@ csOpenGLProcSoftware::csOpenGLProcSoftware (iBase * pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   tex = NULL; 
   g3d = NULL; 
+  isoft_proc = NULL;
   parent_g3d = NULL;
   alone_mode = true;
   head_soft_tex = NULL;
   next_soft_tex = NULL;
+  dummy_g2d = NULL;
 }
 
 csOpenGLProcSoftware::~csOpenGLProcSoftware ()
 {
-  if (g3d) g3d->DecRef ();
+  printf ("*** csOpenGLProcSoftware dtor\n");
   // remove ourselves from the linked list
   if (!head_soft_tex)
   {
     if (!next_soft_tex)
+    {
+      printf ("*** freeing proctexture handles\n");
       delete txts_vector;
+    }
     else
     {
       next_soft_tex->head_soft_tex = NULL;
@@ -200,7 +213,9 @@ csOpenGLProcSoftware::~csOpenGLProcSoftware ()
     if (q != 0)
       q->GetEventOutlet()->Broadcast(cscmdContextClose,(void*)dummy_g2d);
   }
-  dummy_g2d->DecRef ();
+  SCF_DEC_REF (dummy_g2d);
+  SCF_DEC_REF (g3d);
+  SCF_DEC_REF (isoft_proc);
 }
 
 void csOpenGLProcSoftware::ConvertAloneMode ()
@@ -284,21 +299,21 @@ bool csOpenGLProcSoftware::Prepare(
     return false;
   }
 
-  isoft_proc =(iSoftProcTexture*)SCF_QUERY_INTERFACE(soft_proc_g3d, 
-						 iSoftProcTexture);
-  isoft_proc->DecRef ();
+  isoft_proc = SCF_QUERY_INTERFACE(soft_proc_g3d, iSoftProcTexture);
 
   if (!isoft_proc)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	"crystalspace.graphics3d.opengl",
     	"Error creating offscreen software renderer");
+    soft_proc_g3d->DecRef ();
     return false;
   }
+
   // temporarily assign parent_g3d as g3d so that the software 3d driver
   // can get the 2d software procedural texture driver from the opengl 2d 
   // driver.
-//    g3d = parent_g3d;
+  //    g3d = parent_g3d;
 
   iTextureHandle *soft_proc_tex = isoft_proc->CreateOffScreenRenderer 
     ((iGraphics3D*) parent_g3d, head_soft_tex ? head_soft_tex->g3d : NULL, 
@@ -306,6 +321,7 @@ bool csOpenGLProcSoftware::Prepare(
 
   if (!soft_proc_tex)
   {
+    isoft_proc->DecRef ();
     soft_proc_g3d->DecRef ();
     return false;
   }
@@ -324,6 +340,7 @@ bool csOpenGLProcSoftware::Prepare(
 
   // Register ourselves.
   txts_vector->AddTextureHandles (soft_proc_tex, (iTextureHandle*)tex);
+  soft_proc_tex->DecRef ();
 
   // Here we add ourselves to the end of the linked list of software textures
   if (head_soft_tex)
@@ -389,6 +406,7 @@ void csOpenGLProcSoftware::DrawPolygon (G3DPolygonDP& poly)
   int idx = txts_vector->FindKey ((void*)poly.mat_handle->GetTexture ());
   if (idx == -1)
   {
+    /// @@@ this will grow unrestricted
     dmat.handle = txts_vector->RegisterAndPrepare (poly.mat_handle->GetTexture ());
     handles = txts_vector->Get(txts_vector->FindKey ((void*)poly.mat_handle->GetTexture ()));
   }
@@ -427,7 +445,7 @@ void csOpenGLProcSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
   iMaterialHandle* old_handle = poly.mat_handle;
   poly.mat_handle = &dmat;
   int idx = txts_vector->FindKey ((void*)old_handle->GetTexture ());
-  if (idx == -1)
+  if (idx == -1) // @@@ grow grow grow
     dmat.handle = txts_vector->RegisterAndPrepare (old_handle->GetTexture ());
   else
     dmat.handle = (iTextureHandle*) txts_vector->Get (idx)->soft_txt;
@@ -442,7 +460,7 @@ void csOpenGLProcSoftware::DrawTriangleMesh (G3DTriangleMesh& mesh)
   dummyMaterial dmat;
   cmesh.mat_handle = &dmat;
   int idx = txts_vector->FindKey ((void*)mesh.mat_handle->GetTexture ());
-  if (idx == -1)
+  if (idx == -1) // @@@ grow grow grow
     dmat.handle = txts_vector->RegisterAndPrepare (
     	mesh.mat_handle->GetTexture ());
   else
@@ -462,7 +480,7 @@ void csOpenGLProcSoftware::DrawPolygonMesh (G3DPolygonMesh& mesh)
     iMaterialHandle* oldmat = pb->GetMaterial (i);
     old_materials[i] = oldmat;
     int idx = txts_vector->FindKey ((void*)oldmat->GetTexture ());
-    if (idx == -1)
+    if (idx == -1) // @@@ grow grow grow
       dmat[i].handle = txts_vector->RegisterAndPrepare (oldmat->GetTexture ());
     else
       dmat[i].handle =(iTextureHandle*) txts_vector->Get (idx)->soft_txt;
@@ -587,7 +605,7 @@ void csOpenGLProcSoftware::DrawPixmap (iTextureHandle *hTex, int sx,
 { 
   iTextureHandle *soft_txt_handle;
   int idx = txts_vector->FindKey ((void*)hTex);
-  if (idx == -1)
+  if (idx == -1) // @@@ grow grow grow
     soft_txt_handle = txts_vector->RegisterAndPrepare (hTex);
   else
     soft_txt_handle = (iTextureHandle*)txts_vector->Get (idx)->soft_txt;

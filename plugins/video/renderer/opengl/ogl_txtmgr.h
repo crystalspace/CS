@@ -73,6 +73,7 @@ public:
  */
 class csTextureHandleOpenGL : public csTextureHandle
 {
+  csTextureManagerOpenGL *txtmgr;
 public:
   /// Retains original size of image before any readjustment
   int orig_width, orig_height;
