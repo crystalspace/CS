@@ -135,9 +135,6 @@ enum
   XMLTOKEN_ROTX = 1,
   XMLTOKEN_ROTY,
   XMLTOKEN_ROTZ,
-  XMLTOKEN_SCALEX,
-  XMLTOKEN_SCALEY,
-  XMLTOKEN_SCALEZ,
   XMLTOKEN_SCALE,
   XMLTOKEN_M11,
   XMLTOKEN_M12,
@@ -239,9 +236,6 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("rotx", XMLTOKEN_ROTX);
   xmltokens.Register ("roty", XMLTOKEN_ROTY);
   xmltokens.Register ("rotz", XMLTOKEN_ROTZ);
-  xmltokens.Register ("scalex", XMLTOKEN_SCALEX);
-  xmltokens.Register ("scaley", XMLTOKEN_SCALEY);
-  xmltokens.Register ("scalez", XMLTOKEN_SCALEZ);
   xmltokens.Register ("scale", XMLTOKEN_SCALE);
   xmltokens.Register ("m11", XMLTOKEN_M11);
   xmltokens.Register ("m12", XMLTOKEN_M12);
@@ -1467,26 +1461,18 @@ bool csTextSyntaxService::ParseMatrix (iXmlNode* node, csMatrix3 &m)
     {
       case XMLTOKEN_SCALE:
         {
-	  float scale = child->GetContentsValueAsFloat ();
-	  m *= scale;
-	}
-        break;
-      case XMLTOKEN_SCALEX:
-        {
-	  float scale = child->GetContentsValueAsFloat ();
-          m *= csXScaleMatrix3 (scale);
-	}
-        break;
-      case XMLTOKEN_SCALEY:
-        {
-	  float scale = child->GetContentsValueAsFloat ();
-          m *= csYScaleMatrix3 (scale);
-	}
-        break;
-      case XMLTOKEN_SCALEZ:
-        {
-	  float scale = child->GetContentsValueAsFloat ();
-          m *= csZScaleMatrix3 (scale);
+	  float scale;
+	  scale = child->GetAttributeValueAsFloat ("x");
+	  if (ABS (scale) > SMALL_EPSILON) m *= csXScaleMatrix3 (scale);
+
+	  scale = child->GetAttributeValueAsFloat ("y");
+	  if (ABS (scale) > SMALL_EPSILON) m *= csYScaleMatrix3 (scale);
+
+	  scale = child->GetAttributeValueAsFloat ("z");
+	  if (ABS (scale) > SMALL_EPSILON) m *= csZScaleMatrix3 (scale);
+
+	  scale = child->GetAttributeValueAsFloat ("all");
+	  if (ABS (scale) > SMALL_EPSILON) m *= scale;
 	}
         break;
       case XMLTOKEN_ROTX:
