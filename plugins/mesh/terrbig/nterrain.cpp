@@ -609,9 +609,7 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
       info->mesh[i].vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
     }
   }
-}  
-
-#include <sys/time.h>
+}
 
 bool 
 csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
