@@ -396,16 +396,15 @@ void Reset()             // resets iterator (not all implement this).
 
 @subheading @sc{aws} Changes
 
-@code{iAWS::CreateCustomCanvas()} was removed.  To set up the @sc{aws} with a
-cavas, use @code{iAWS::SetupCanvas()} instead. 
+@code{iAWS::CreateCustomCanvas()} was removed.  To set up @sc{aws} with a
+canvas, use @code{iAWS::SetupCanvas()} instead. 
 
 @code{iAWS::CreateTransition()} and @code{iAWS::CreateTransitionEx()} have been
-changed to take a @samp{delay} parameter specified in @code{csTicks} instead of
-using a @samp{step_size} parameter.  This change ensures that transitions take
+changed to take a @var{delay} parameter specified in @samp{csTicks} instead of
+using a @var{step_size} parameter.  This change ensures that transitions take
 the same amount of time on computers having different processor speeds.
-
-@code{iAWS::ComponentIsInTransition()} has been added to allow users to query if
-a specified @code{iAwsComponent} is experiencing a transition.
+@code{iAWS::ComponentIsInTransition()} has been added to allow users to query
+if a specified @samp{iAwsComponent} is in the midst of a transition.
 
 @subheading Array Changes
 @cindex @code{csArray}
@@ -1179,7 +1178,7 @@ switch (e.Type)
 @}
 @end example
 
-@subheading @code{iGraphics2D::WriteBaseline()} deprecated
+@subheading iGraphics2D::WriteBaseline() Deprecated
 
 The functionality provided by @code{WriteBaseline()} is now available by 
 specifying the @code{CS_WRITE_BASELINE} flag when calling 

@@ -19,6 +19,8 @@ chronological order.
 	- res fixed a few double-to-float warnings in the chunklod plugin.
 	- res added missing SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS invocations
 	  to bindoc.
+	- Eric Sunshine fixed some Texinfo mark-up problems and typographical
+	  errors in apimod98.txi.
 7-Nov-2003
 	- res reverted the behaviour of setting the alpha of keycolored pixels
 	  of textures in GL: just drop the alpha of KCed pixels to 0, but don't
