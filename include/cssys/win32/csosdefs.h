@@ -21,6 +21,7 @@
 #define __CSOSDEFS_H__
 
 #if defined(COMP_VC)
+  #pragma warning(disable:4291)   // no matching operator delete found
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
   #pragma warning(disable:4305)   // conversion from 'const double' to 'float'
   #pragma warning(disable:4018)   // Signed unsigned warnings
