@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+20-Aug-2002
+	- Implemented XML version of the spr2d mesh object loader.
 19-Aug-2002
 	- Implemented XML version of the ball mesh object loader.
 	- Fixed a memory leak in SKELETON statement of spr3d loader.
