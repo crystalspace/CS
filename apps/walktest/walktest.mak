@@ -18,7 +18,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: walktest walktestclean walkall
 
-walkall: walktest vfs gl3d openglcanvas effects csfont csconin simpcon \
+walkall: walktest vfs gl3d softcanvas openglcanvas effects csfont csconin simpcon \
   rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg csbmpimg \
   reporter stdrep csparser frustvis bugplug sequence engseq
 all apps: walktest
