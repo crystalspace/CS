@@ -19,16 +19,10 @@
 #ifndef PERF_H
 #define PERF_H
 
-#include <stdarg.h>
 #include "cssys/sysdriv.h"
-#include "csgeom/math2d.h"
-#include "csgeom/math3d.h"
-#include "igraph3d.h"
 
 class PerfTest;
-
-// Number of horizontal and vertical polygons for every multi-polygon test.
-#define NUM_MULTIPOLTEST 24
+struct iTextureHandle;
 
 class Tester
 {
@@ -43,136 +37,14 @@ public:
   int GetCount () { return draw; }
 };
 
-class SinglePolygonTester : public Tester
-{
-private:
-  G3DPolygonDPFX poly;
-
-public:
-  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
-  virtual void Draw (iGraphics3D* g3d);
-  virtual void Description (char* dst)
-  {
-    strcpy (dst, "Texture mapped polygon with gouraud shading... ");
-  }
-  virtual Tester* NextTester ();
-};
-
-class SinglePolygonTesterFlat : public Tester
-{
-private:
-  G3DPolygonDPFX poly;
-
-public:
-  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
-  virtual void Draw (iGraphics3D* g3d);
-  virtual void Description (char* dst)
-  {
-    strcpy (dst, "Polygon with gouraud shading... ");
-  }
-  virtual Tester* NextTester ();
-};
-
-class SinglePolygonTesterAlpha : public Tester
-{
-private:
-  G3DPolygonDPFX poly;
-
-public:
-  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
-  virtual void Draw (iGraphics3D* g3d);
-  virtual void Description (char* dst)
-  {
-    strcpy (dst, "Texture mapped polygon with alpha transparency... ");
-  }
-  virtual Tester* NextTester ();
-};
-
-class MultiPolygonTester : public Tester
-{
-private:
-  G3DPolygonDPFX poly[NUM_MULTIPOLTEST][NUM_MULTIPOLTEST];
-
-public:
-  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
-  virtual void Draw (iGraphics3D* g3d);
-  virtual void Description (char* dst)
-  {
-    sprintf (dst, "%d Texture mapped polygons with gouraud shading... ",
-    	NUM_MULTIPOLTEST*NUM_MULTIPOLTEST);;
-  }
-  virtual Tester* NextTester ();
-};
-
-class MultiPolygon2Tester : public Tester
-{
-private:
-  G3DPolygonDPFX poly[NUM_MULTIPOLTEST][NUM_MULTIPOLTEST];
-
-public:
-  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
-  virtual void Draw (iGraphics3D* g3d);
-  virtual void Description (char* dst)
-  {
-    sprintf (dst, "%d Texture mapped polygons with gouraud shading (vs 2)... ",
-    	NUM_MULTIPOLTEST*NUM_MULTIPOLTEST);
-  }
-  virtual Tester* NextTester ();
-};
-
-class MultiTexture1Tester : public Tester
-{
-private:
-  G3DPolygonDPFX poly[NUM_MULTIPOLTEST][NUM_MULTIPOLTEST];
-
-public:
-  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
-  virtual void Draw (iGraphics3D* g3d);
-  virtual void Description (char* dst)
-  {
-    sprintf (dst, "%d polygons with four alternating textures... ",
-    	NUM_MULTIPOLTEST*NUM_MULTIPOLTEST);
-  }
-  virtual Tester* NextTester ();
-};
-
-class MultiTexture2Tester : public Tester
-{
-private:
-  G3DPolygonDPFX poly[NUM_MULTIPOLTEST][NUM_MULTIPOLTEST];
-
-public:
-  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
-  virtual void Draw (iGraphics3D* g3d);
-  virtual void Description (char* dst)
-  {
-    sprintf (dst, "%d polygons with four grouped textures... ",
-    	NUM_MULTIPOLTEST*NUM_MULTIPOLTEST);
-  }
-  virtual Tester* NextTester ();
-};
-
-class MeshTester : public Tester
-{
-private:
-  G3DTriangleMesh mesh;
-
-public:
-  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
-  virtual void Draw (iGraphics3D* g3d);
-  virtual void Description (char* dst)
-  {
-    sprintf (dst, "%d polygons with DrawTriangleMesh... ",
-    	NUM_MULTIPOLTEST*NUM_MULTIPOLTEST);
-  }
-  virtual Tester* NextTester ();
-};
 
 class PerfTest : public SysSystemDriver
 {
   typedef SysSystemDriver superclass;
 
 private:
+  bool draw_3d;
+  bool draw_2d;
   bool needs_setup;
   Tester* current_tester;
   iTextureHandle* texture[4];

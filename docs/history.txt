@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+3-Aug-2000
+	- Samuel Humphreys did the following:
+	    - Rearranged perftest for 2d testing aswell. Added tests for pixmaps,
+              lines, pixels and text.
 2-Aug-2000
 	- Changed API in iCollideSystem to make it easier to collect
 	  collisions with multiple objects.

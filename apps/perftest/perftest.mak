@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.perf = Crystal Space 3D Performance Tester
+DESCRIPTION.perf = Crystal Space Graphics Performance Tester
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
