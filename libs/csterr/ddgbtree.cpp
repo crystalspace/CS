@@ -173,7 +173,10 @@ void ddgTBinTree::removeSQ(ddgTriIndex tindex )
     if (tri(tindex)->_state.flags.sq)
     {
 	    tri(tindex)->_state.flags.sq = false;
-	    _mesh->qs()->remove(tindex,this);
+		// If we were visible and not a leaf node actually remove us.
+		_mesh->remCountIncr();
+		unsigned int p = priority(tindex);
+		_mesh->qs()->remove(_index,tindex,p);
 
 		// If we were visible, reduce the count.
 		if (!tri(tindex)->_vis.flags.none)
@@ -193,7 +196,11 @@ void ddgTBinTree::insertSQ(ddgTriIndex tindex)
 {
 	reset(tindex,0);
 	tri(tindex)->_state.flags.sq = true;
-	_mesh->qs()->insert(tindex,this);
+	_mesh->insCountIncr();
+	tri(tindex)->resetDelay();
+	unsigned int p = priority(tindex);
+	// Find insertion point.
+	_mesh->qs()->insert(_index,tindex,p);
 
 	ddgTriIndex b = 0;
 	// If we are the child of a merge diamond.
@@ -215,15 +222,18 @@ void ddgTBinTree::removeMQ(ddgTriIndex tindex)
 	// See which is actually in the queue and remove it.
 	if (tri(tindex)->_state.flags.mq)
 	{
-		_mesh->qm()->remove(tindex,this);
+		unsigned int p = priority(tindex);
+		_mesh->qm()->remove(_index,tindex,p);
 	    tri(tindex)->_state.flags.mq = false;
 	}
-	else if ((b = brother(tindex)))
+	else if (b = brother(tindex))
 	{
 		bt = brotherTree(tindex);
-		_mesh->qm()->remove(b,bt);
+		unsigned int p = bt->priority(b);
+		_mesh->qm()->remove(bt->index(),b,p);
 	    bt->tri(b)->_state.flags.mq = false;
 	}
+	_mesh->remCountIncr();
 }
 
 /// Insert triangle i into queue.
@@ -233,16 +243,21 @@ void ddgTBinTree::insertMQ(ddgTriIndex tindex)
 	// Insert the one with higher priority into the queue.
 	ddgTriIndex b = brother(tindex);
 	ddgTBinTree *bt = b ? brotherTree(tindex) : 0;
+	ddgMTri *ti;
+	_mesh->insCountIncr();
 	if (b && priority(tindex) > bt->priority(b))
 	{
-		_mesh->qm()->insert(b,bt);
-	    bt->tri(b)->_state.flags.mq = true;
+		ti = bt->tri(b);
+		ti->resetDelay();
+		_mesh->qm()->insert(bt->index(),b,bt->priority(b));
 	}
 	else
 	{
-		_mesh->qm()->insert(tindex,this);
-	    tri(tindex)->_state.flags.mq = true;
+		ti = tri(tindex);
+		ti->resetDelay();
+		_mesh->qm()->insert(_index,tindex,priority(tindex));
 	}
+	ti->_state.flags.mq = true;
 }
 
 /** Split a triangle while keeping the mesh consistent.
@@ -465,21 +480,36 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 }
 
 // Recusively update priorities.
-void ddgTBinTree::priorityUpdate(ddgTriIndex tvc, unsigned int level)
+void ddgTBinTree::priorityUpdate(ddgTriIndex tindex, unsigned int level)
 { 
 	// If priority information is not valid.
-	if (!tri(tvc)->_state.flags.priority)
+	if (!tri(tindex)->_state.flags.priority
+		&& (tri(tindex)->_state.flags.sq || tri(tindex)->_state.flags.mq))
 	{
-		if (tri(tvc)->_state.flags.sq )
-			_mesh->qs()->update(tvc,this);
-		if (tri(tvc)->_state.flags.mq )
-			_mesh->qm()->update(tvc,this);
+		unsigned int op = tri(tindex)->priority();
+		unsigned int p = priority(tindex);
+
+		if (op != p)
+		{
+			_mesh->movCountIncr();
+			if (tri(tindex)->_state.flags.sq)
+			{
+				_mesh->qs()->remove(_index,tindex,op);
+				_mesh->qs()->insert(_index,tindex,p);
+			}
+
+			if (tri(tindex)->_state.flags.mq )
+			{
+				_mesh->qm()->remove(_index,tindex,op);
+				_mesh->qm()->insert(_index,tindex,p);
+			}
+		}
 	}
-		// 
-	if (!tri(tvc)->_state.flags.sq && level )
+	// 
+	if (!tri(tindex)->_state.flags.sq && level )
 	{
-		priorityUpdate(left(tvc),level-1);
-		priorityUpdate(right(tvc),level-1);
+		priorityUpdate(left(tindex),level-1);
+		priorityUpdate(right(tindex),level-1);
 	}
 }
 

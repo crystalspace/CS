@@ -96,11 +96,6 @@ static void transformer(ddgVector3 vin, ddgVector3 *vout)
 	}
 }
 
-// Z depth queue iterator
-static ddgSplayIterator		*qri;
-// Z depth queue.
-static ddgQueue			*qr;
-
 bool csTerrain::Initialize (char* heightmap)
 {
 
@@ -152,48 +147,38 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 	// If we are not using Z-buffer...
     // For all the triangle in the visible queue, insert them in z-order.
 
-  	if ( 1 /*!use_z_buf*/ )
+	mesh->qzi()->reset();
+	// Clear queue.
+	mesh->qz()->clear();
+	mesh->qsi()->reset();
+	while (!mesh->qsi()->end())
 	{
-		mesh->qzi()->reset();
-		// Clear queue.
-		mesh->qz()->clear();
-		mesh->qsi()->reset();
-		while (!mesh->qsi()->end())
-		{
-			ddgTriIndex tvc = mesh->qs ()->index (mesh->qsi ()), tvp, tv0, tv1;
-            float d;
-			ddgTBinTree *bt = mesh->qs ()->tree (mesh->qsi ());
+		ddgTriIndex tvc = mesh->indexSQ(mesh->qsi()), tvp, tv0, tv1;
+        float d;
+		ddgTBinTree *bt = mesh->treeSQ(mesh->qsi());
 
-            tvp = ddgTBinTree::parent(tvc);
-            tv0 = mesh->stri[tvc].v0;
-            tv1 = mesh->stri[tvc].v1;
-			ddgVector3 *p = bt->tri(tv0)->pos();
-    		// Use the nearest coord of the triangle.
+        tvp = ddgTBinTree::parent(tvc);
+        tv0 = mesh->stri[tvc].v0;
+        tv1 = mesh->stri[tvc].v1;
+		ddgVector3 *p = bt->tri(tv0)->pos();
+    	// Use the nearest coord of the triangle.
+        d = p->v[2];
+		p = bt->tri(tv1)->pos();
+        if (p->v[2] < d)
             d = p->v[2];
-			p = bt->tri(tv1)->pos();
-            if (p->v[2] < d)
-                d = p->v[2];
-			p = bt->tri(tvp)->pos();
-            if (p->v[2] < d)
-                d = p->v[2];
-            mesh->qz()->ddgSplayTree::insert (bt->index(),tvc,(unsigned int)d);
-			mesh->qsi ()->next ();
-		}
-		qri = mesh->qzi();
-		qr  = mesh->qz();
-	}
-	else
-	{
-		qri = mesh->qsi ();
-		qr  = mesh->qs ();
+		p = bt->tri(tvp)->pos();
+        if (p->v[2] < d)
+            d = p->v[2];
+        mesh->qz()->ddgSplayTree::insert (bt->index(),tvc,(unsigned int)d);
+		mesh->qsi ()->next ();
 	}
 
    // Render
-  qri->reset ();
-  while (!qri->end ())
+  mesh->qzi()->reset ();
+  while (!mesh->qzi()->end ())
   {
-    ddgTriIndex tvc = qr->index (qri );
-    ddgTBinTree *bt = qr->tree (qri );
+    ddgTriIndex tvc = mesh->indexZQ (mesh->qzi());
+    ddgTBinTree *bt = mesh->treeZQ (mesh->qzi());
 
     if (!bt->tri (tvc)->vis ().flags.none)
     {
@@ -278,7 +263,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     }
 
     not_vis:
-    qri ->next ();
+    mesh->qzi() ->next ();
   }
 
   rview.g3d->FinishPolygonFX ();

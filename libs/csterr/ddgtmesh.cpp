@@ -25,58 +25,17 @@
 // ----------------------------------------------------------------------
 
 
-ddgQueue::ddgQueue(ddgTBinMesh *bm)
+/// Return a priority from the split queue.
+unsigned int ddgTBinMesh::prioritySQ( ddgSplayIterator *i )
 {
-	_bm = bm;
+	ddgSplayKey *sk = _qs->retrieve(i->current());
+	return getBinTree(sk->tree())->priority(sk->index());
 }
-/// Add item i to the queue.
-void ddgQueue::insert( ddgTriIndex tindex, ddgTBinTree *bt )
+/// Return a priority from the merge queue.
+unsigned int ddgTBinMesh::priorityMQ( ddgSplayIterator *i )
 {
-	bt->mesh()->insCountIncr();
-	bt->tri(tindex)->resetDelay();
-	unsigned int p = bt->priority(tindex);
-	// Find insertion point.
-	ddgSplayTree::insert(bt->index(),tindex,p);
-}
-
-/// Remove triangle index i from the queue.
-void ddgQueue::remove( ddgTriIndex tindex, ddgTBinTree *bt )
-{
-	bt->mesh()->remCountIncr();
-	unsigned int p = bt->priority(tindex);
-	ddgSplayTree::remove(bt->index(),tindex,p);
-}
-
-/// Update node tindex in the queue if its key has changed.
-void ddgQueue::update( ddgTriIndex tindex, ddgTBinTree *bt )
-{
-	if (bt->tri(tindex)->state().flags.priority == false)
-	{
-		unsigned int op = bt->tri(tindex)->priority();
-		unsigned int p = bt->priority(tindex);
-
-		if (op != p)
-		{
-			bt->mesh()->movCountIncr();
-			ddgSplayTree::remove(bt->index(),tindex,op);
-			ddgSplayTree::insert(bt->index(),tindex,p);
-		}
-
-	}
-}
-
-
-ddgTBinTree* ddgQueue::tree( ddgSplayIterator *i )
-{
-	ddgSplayKey *sk = retrieve(i->current());
-	return _bm->getBinTree(sk->tree());
-}
-
-// Return an item from the queue.
-unsigned int ddgQueue::index(ddgSplayIterator *i)
-{
-	ddgSplayKey *sk = retrieve(i->current());
-	return sk->index();
+	ddgSplayKey *sk = _qm->retrieve(i->current());
+	return getBinTree(sk->tree())->priority(sk->index());
 }
 
 // ----------------------------------------------------------------------
@@ -106,9 +65,9 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	stri = new ddgMSTri[_triNo+2];
 
 	// Queues to hold the visible, clipped and sorted visible triangles.
-	_qs = new ddgQueue( this );
-	_qm = new ddgQueue( this );
-	_qz = new ddgQueue( this );
+	_qs = new ddgSplayTree( );
+	_qm = new ddgSplayTree( );
+	_qz = new ddgSplayTree( );
 	// By default the iterators support 1000 levels of nesting.
 	_qsi = new ddgSplayIterator(_qs);
 	_qmi = new ddgSplayIterator(_qm);
@@ -488,7 +447,7 @@ void ddgTBinMesh::clearSQ(void)
 	_qsi->reset();
 	while(!_qsi->end()) 
 	{
-		_qs->tree(_qsi)->tri(_qs->index(_qsi))->_state.flags.sq = false;
+		treeSQ(_qsi)->tri(indexSQ(_qsi))->_state.flags.sq = false;
 		_qsi->next();
 	}
 
@@ -502,7 +461,7 @@ void ddgTBinMesh::clearMQ(void)
 	_qmi->reset();
 	while(!_qmi->end()) 
 	{
-		_qm->tree(_qmi)->tri(_qm->index(_qmi))->_state.flags.sq = false;
+		treeMQ(_qmi)->tri(indexMQ(_qmi))->_state.flags.sq = false;
 		_qmi->next();
 	}
 	// Clear queue.
@@ -518,8 +477,8 @@ bool ddgTBinMesh::splitQueue(void)
 	_qsi->reset(true);
 	while (!split)
 	{
-		ddgTBinTree *bt = _qs->tree(_qsi);
-		ddgTriIndex i = _qs->index(_qsi);
+		ddgTBinTree *bt = treeSQ(_qsi);
+		ddgTriIndex i = indexSQ(_qsi);
 		if ( i < _triNo/2 
 			&& !bt->tri(i)->_state.flags.split
 			&& !bt->tri(i)->_state.flags.merged
@@ -547,8 +506,8 @@ bool ddgTBinMesh::mergeQueue(void)
 	_qmi->reset();
 	while (!merged)
 	{
-		ddgTBinTree *bt = _qm->tree(_qmi);
-		ddgTriIndex i = _qm->index(_qmi);
+		ddgTBinTree *bt = treeMQ(_qmi);
+		ddgTriIndex i = indexMQ(_qmi);
 		if ( i > 1 && !bt->tri(i)->_state.flags.merged) // Not a root!
 		{
 			bt->forceMerge(i);
@@ -591,12 +550,12 @@ unsigned int ddgTBinMesh::balanceQueue(void)
 	if (qsz)
 	{
 		_qsi->reset(true);
-		maxSp = _qs->tree(_qsi)->priority(_qs->index(_qsi));
+		maxSp = prioritySQ(_qsi);
 	}
 	if (_qm->size())
 	{
 		_qmi->reset();
-		minMp = _qm->tree(_qmi)->priority(_qm->index(_qmi));
+		minMp = priorityMQ(_qmi);
 	}
 	// Loops should be gone no that we have the flags to indicate if a triangle has been split/merged
 	// in this cycle.
@@ -644,12 +603,12 @@ unsigned int ddgTBinMesh::balanceQueue(void)
 		if (pqs)
 		{
 			_qsi->reset(true);
-		    maxSp = _qs->tree(_qsi)->priority(_qs->index(_qsi));
+		    maxSp = prioritySQ(_qsi);
 		}
 		if (pqm)
 		{
 			_qmi->reset();
-			minMp = _qm->tree(_qmi)->priority(_qm->index(_qmi));
+			minMp = priorityMQ(_qmi);
 		}
 	}
 	return count;

@@ -70,36 +70,6 @@ public:
 };
 
 
-/**
- * This queue keeps items sorted according to priority.
- *
- */
-
-class WEXP ddgQueue : public ddgSplayTree {
-	/// Perform a binary search for object with priority n. Only used by insert and remove.
-	unsigned int find( unsigned int p, ddgTBinTree *tb );
-	/// BinMesh that manages this queue.
-	ddgTBinMesh* _bm;
-public:
-	/// Create an empty queue.
-	ddgQueue( ddgTBinMesh *bm );
-	/// Destroy a queue.
-	~ddgQueue() { }
-	/// Return an item from the queue.
-	unsigned int index(ddgSplayIterator *i);
-	/// Return the tree of an item from the queue.
-	ddgTBinTree * tree(ddgSplayIterator *i);
-	/** Insert an item in the queue. Keep items sorted.
-	 *  Priority of item is cached at time of insertion.
-	 *  If this is the merge queue, we must use the larger of
-	 *  this and the brother's priority
-	 */
-	void insert( ddgTriIndex tindex, ddgTBinTree *tb);
-	/// Remove item from the queue.
-	void remove( ddgTriIndex tindex, ddgTBinTree *tb );
-	/// Update triangle index tindex in the queue if its key has changed.
-	void update( ddgTriIndex tindex, ddgTBinTree *tb );
-};
 
 
 /**
@@ -205,11 +175,11 @@ class WEXP ddgTBinMesh
 	/// Number of visible triangles in the mesh.
 	unsigned int _visTri;
 	/// Split queue.
-	ddgQueue		*_qs;
+	ddgSplayTree	*_qs;
 	/// Merge queue.
-	ddgQueue		*_qm;
+	ddgSplayTree	*_qm;
 	/// Z depth queue.
-	ddgQueue		*_qz;
+	ddgSplayTree	*_qz;
 	/// Split queue iterator
 	ddgSplayIterator		*_qsi;
 	/// Merge queue
@@ -287,15 +257,55 @@ public:
 	void detail( unsigned int d ) { _detail = d; }
 
 	/// Return the split queue 
-	ddgQueue *qs(void) { return _qs; }
+	ddgSplayTree *qs(void) { return _qs; }
 	/// Return the merge queue 
-	ddgQueue *qm(void) { return _qm; }
+	ddgSplayTree *qm(void) { return _qm; }
 	/// Return the merge queue 
-	ddgQueue *qz(void) { return _qz; }
+	ddgSplayTree *qz(void) { return _qz; }
 	/// Return an iterator for the visible set of triangles.
 	ddgSplayIterator* qsi(void) { return _qsi; }
 	/// Return an iterator for the visible set of triangles.
 	ddgSplayIterator* qzi(void) { return _qzi; }
+	/// Return a priority from the merge queue.
+	unsigned int prioritySQ( ddgSplayIterator *i );
+	/// Return the tree of an item from the split queue.
+	ddgTBinTree* treeSQ( ddgSplayIterator *i )
+	{
+		ddgSplayKey *sk = _qs->retrieve(i->current());
+		return getBinTree(sk->tree());
+	}
+	/// Return an item from the split queue.
+	unsigned int indexSQ(ddgSplayIterator *i)
+	{
+		ddgSplayKey *sk = _qs->retrieve(i->current());
+		return sk->index();
+	}
+	/// Return a priority from the merge queue.
+	unsigned int priorityMQ( ddgSplayIterator *i );
+	/// Return the tree of an item from the merge queue.
+	ddgTBinTree* treeMQ( ddgSplayIterator *i )
+	{
+		ddgSplayKey *sk = _qm->retrieve(i->current());
+		return getBinTree(sk->tree());
+	}
+	/// Return an item from the split queue.
+	unsigned int indexMQ(ddgSplayIterator *i)
+	{
+		ddgSplayKey *sk = _qm->retrieve(i->current());
+		return sk->index();
+	}
+	/// Return the tree of an item from the merge queue.
+	ddgTBinTree* treeZQ( ddgSplayIterator *i )
+	{
+		ddgSplayKey *sk = _qz->retrieve(i->current());
+		return getBinTree(sk->tree());
+	}
+	/// Return an item from the split queue.
+	unsigned int indexZQ(ddgSplayIterator *i)
+	{
+		ddgSplayKey *sk = _qz->retrieve(i->current());
+		return sk->index();
+	}
 	/// Return the number of triangles.
 	unsigned int triNo(void) { return _triNo; }
 	/**
