@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+28-May-2002
+	- Fixed visibility culling in Dynavis when the camera was inside
+	  the bounding box of an object.
 27-May-2002
 	- Fixed IsZero() from Toni by using a 'float' precision instead
 	  of 'double'.

@@ -271,7 +271,11 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   csVisReason reason = VISIBLE;
   bool vis = true;
 
-  if (node_bbox.Contains (pos)) goto end;
+  if (node_bbox.Contains (pos))
+  {
+    reason = VISIBLE_INSIDE;
+    goto end;
+  }
 
   if (do_cull_frustum)
   {
@@ -310,16 +314,17 @@ end:
     	node_bbox.MaxX (), node_bbox.MaxY (), node_bbox.MaxZ (),
 	reason == INVISIBLE_FRUSTUM ? "outside frustum" :
 	reason == INVISIBLE_TESTRECT ? "covered" :
+	reason == VISIBLE_INSIDE ? "visible inside" :
 	reason == VISIBLE ? "visible" :
 	"?"
 	);
-    if (reason != INVISIBLE_FRUSTUM)
+    if (reason != INVISIBLE_FRUSTUM && reason != VISIBLE_INSIDE)
     {
       printf ("  (%g,%g)-(%g,%g) min_depth=%g\n",
       	sbox.MinX (), sbox.MinY (),
       	sbox.MaxX (), sbox.MaxY (), min_depth);
     }
-    if (reason != VISIBLE)
+    if (reason != VISIBLE && reason != VISIBLE_INSIDE)
     {
       printf ("  ");
       treenode->Front2Back (data->pos, PrintObjects, NULL);
@@ -526,6 +531,13 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   if (!obj->visobj->IsVisible ())
   {
     const csBox3& obj_bbox = obj->child->GetBBox ();
+    const csVector3& pos = data->pos;
+    if (obj_bbox.Contains (pos))
+    {
+      obj->visobj->MarkVisible ();
+      obj->reason = VISIBLE_INSIDE;
+      goto end;
+    }
   
     uint32 new_mask;
     if (do_cull_frustum && !csIntersect3::BoxFrustum (obj_bbox, data->frustum,
@@ -581,11 +593,12 @@ end:
 	(iobj && iobj->GetName ()) ? iobj->GetName () : "<noname>",
 	obj->reason == INVISIBLE_FRUSTUM ? "outside frustum" :
 	obj->reason == INVISIBLE_TESTRECT ? "covered" :
+	obj->reason == VISIBLE_INSIDE ? "visible inside" :
 	obj->reason == VISIBLE ? "visible" :
 	"?"
 	);
     if (iobj) iobj->DecRef ();
-    if (obj->reason != INVISIBLE_FRUSTUM)
+    if (obj->reason != INVISIBLE_FRUSTUM && obj->reason != VISIBLE_INSIDE)
     {
       printf ("  (%g,%g)-(%g,%g) min_depth=%g\n",
       	sbox.MinX (), sbox.MinY (),
@@ -769,7 +782,8 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
     { 48, 48, 48 },
     { 64, 128, 64 },
     { 128, 64, 64 },
-    { 255, 255, 255 }
+    { 255, 255, 255 },
+    { 255, 255, 128 }
   };
 
   if (debug_camera)

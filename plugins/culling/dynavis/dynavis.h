@@ -41,6 +41,7 @@ enum csVisReason
   INVISIBLE_FRUSTUM,	// Invisible because object outside frustum.
   INVISIBLE_TESTRECT,	// Invisible because covbuf->TestRectangle() failed.
   VISIBLE,		// Just visible.
+  VISIBLE_INSIDE,	// Visible because camera is inside bbox.
   LAST_REASON
 };
 
