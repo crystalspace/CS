@@ -154,34 +154,78 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     poly->Intersect (node->splitter, left_poly, right_poly, onplane);
     bool rc1, rc2;
 
-    if (left_poly->GetNumEdges () == 0 && !onplane)
+    if (onplane)
     {
-      // Left polygon has no edges. We test if the left node
-      // is completely contained in the right polygon. In that
-      // case we can clear the subtree and mark it as solid.
-      if (!node->left->solid && right_poly->In (node->split_center))
+      // If there was an edge on the splitter plane then we know that
+      // the polygon can not be both in the left and the right side.
+      // If the two polygons are both empty then we mark one of the two
+      // nodes as solid depending on the edge from the original polygon.
+      if (left_poly->GetNumEdges () == 0 && right_poly->GetNumEdges () == 0)
       {
-        node->left->solid = true;
-	node_pool.Free (node->left->left); node->left->left = NULL;
-	node_pool.Free (node->left->right); node->left->right = NULL;
-	rc1 = true;
+        rc1 = rc2 = false;
+        csPlane2 edge_plane ((*poly)[0].v1, (*poly)[0].v2);
+	if (csMath2::PlanesEqual (edge_plane, node->splitter))
+	{
+	  // Two planes are equal. This means that the right node
+	  // will be solid.
+	  if (!node->right->solid)
+	  {
+            node->right->solid = true;
+	    node_pool.Free (node->right->left); node->right->left = NULL;
+	    node_pool.Free (node->right->right); node->right->right = NULL;
+	    rc2 = true;
+	  }
+	}
+	else
+	{
+	  // Two planes are negated. This means that the left node
+	  // will be solid.
+	  if (!node->left->solid)
+	  {
+            node->left->solid = true;
+	    node_pool.Free (node->left->left); node->left->left = NULL;
+	    node_pool.Free (node->left->right); node->left->right = NULL;
+	    rc1 = true;
+	  }
+	}
       }
-      else rc1 = false;
+      else
+      {
+        rc1 = InsertPolygon (node->left, left_poly);
+        rc2 = InsertPolygon (node->right, right_poly);
+      }
     }
-    else rc1 = InsertPolygon (node->left, left_poly);
+    else
+    {
+      if (left_poly->GetNumEdges () == 0)
+      {
+        // Left polygon has no edges. We test if the left node
+        // is completely contained in the right polygon. In that
+        // case we can clear the subtree and mark it as solid.
+        if (!node->left->solid && right_poly->In (node->split_center))
+        {
+          node->left->solid = true;
+	  node_pool.Free (node->left->left); node->left->left = NULL;
+	  node_pool.Free (node->left->right); node->left->right = NULL;
+	  rc1 = true;
+        }
+        else rc1 = false;
+      }
+      else rc1 = InsertPolygon (node->left, left_poly);
 
-    if (right_poly->GetNumEdges () == 0 && !onplane)
-    {
-      if (!node->right->solid && left_poly->In (node->split_center))
+      if (right_poly->GetNumEdges () == 0)
       {
-        node->right->solid = true;
-	node_pool.Free (node->right->left); node->right->left = NULL;
-	node_pool.Free (node->right->right); node->right->right = NULL;
-	rc2 = true;
+        if (!node->right->solid && left_poly->In (node->split_center))
+        {
+          node->right->solid = true;
+	  node_pool.Free (node->right->left); node->right->left = NULL;
+	  node_pool.Free (node->right->right); node->right->right = NULL;
+	  rc2 = true;
+        }
+        else rc2 = false;
       }
-      else rc2 = false;
+      else rc2 = InsertPolygon (node->right, right_poly);
     }
-    else rc2 = InsertPolygon (node->right, right_poly);
 
     if (node->left->solid && node->right->solid)
     {
@@ -204,7 +248,7 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     int i;
     for (i = 0 ; i < poly->GetNumEdges () ; i++)
     {
-      n->splitter = csPlane2 ((*poly)[i].v1, (*poly)[i].v2);
+      n->splitter.Set ((*poly)[i].v1, (*poly)[i].v2);
       n->split_center = ((*poly)[i].v1 + (*poly)[i].v2) / 2;
       n->left = node_pool.Alloc ();
       n->right = node_pool.Alloc ();
@@ -215,6 +259,23 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     return true;
   }
   return false;
+}
+
+void csSolidBsp::InsertPolygonInv (csSolidBspNode* node, csPoly2DEdges* poly)
+{
+  // Node has no children so we take a new splitter and
+  // create children.
+  csSolidBspNode* n = node;
+  int i;
+  for (i = 0 ; i < poly->GetNumEdges () ; i++)
+  {
+    n->splitter.Set ((*poly)[i].v1, (*poly)[i].v2);
+    n->split_center = ((*poly)[i].v1 + (*poly)[i].v2) / 2;
+    n->left = node_pool.Alloc ();
+    n->right = node_pool.Alloc ();
+    n->left->solid = true;
+    n = n->right;
+  }
 }
 
 bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
@@ -233,22 +294,49 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     bool onplane;
     poly->Intersect (node->splitter, left_poly, right_poly, onplane);
 
-    if (left_poly->GetNumEdges () == 0 && !onplane)
+    if (onplane)
     {
-      // Left polygon has no edges. We test if the left node
-      // is completely contained in the right polygon. In that
-      // case the solid state of that node is important for visibility.
-      if (!node->left->solid && right_poly->In (node->split_center))
-      { rc = true; goto end; }
+      // If there was an edge on the splitter plane then we know that
+      // the polygon can not be both in the left and the right side.
+      if (left_poly->GetNumEdges () == 0 && right_poly->GetNumEdges () == 0)
+      {
+        csPlane2 edge_plane ((*poly)[0].v1, (*poly)[0].v2);
+	if (csMath2::PlanesEqual (edge_plane, node->splitter))
+	{
+	  // Two planes are equal.
+	  if (!node->right->solid) { rc = true; goto end; }
+	}
+	else
+	{
+	  // Two planes are negated.
+	  if (!node->left->solid) { rc = true; goto end; }
+	}
+      }
+      else
+      {
+        if (TestPolygon (node->left, left_poly)) { rc = true; goto end; }
+        if (TestPolygon (node->right, right_poly)) { rc = true; goto end; }
+      }
     }
-    else if (TestPolygon (node->left, left_poly)) { rc = true; goto end; }
+    else
+    {
+      if (left_poly->GetNumEdges () == 0)
+      {
+        // Left polygon has no edges. We test if the left node
+        // is completely contained in the right polygon. In that
+        // case the solid state of that node is important for visibility.
+        if (!node->left->solid && right_poly->In (node->split_center))
+        { rc = true; goto end; }
+      }
+      else if (TestPolygon (node->left, left_poly)) { rc = true; goto end; }
 
-    if (right_poly->GetNumEdges () == 0 && !onplane)
-    {
-      if (!node->right->solid && left_poly->In (node->split_center))
-      { rc = true; goto end; }
+      if (right_poly->GetNumEdges () == 0)
+      {
+        if (!node->right->solid && left_poly->In (node->split_center))
+        { rc = true; goto end; }
+      }
+      else if (TestPolygon (node->right, right_poly)) { rc = true; goto end; }
     }
-    else if (TestPolygon (node->right, right_poly)) { rc = true; goto end; }
 
     rc = false;
 
@@ -278,6 +366,21 @@ bool csSolidBsp::InsertPolygon (csVector2* verts, int num_verts)
   bool rc = InsertPolygon (root, poly);
   poly_pool.Free (poly);
   return rc;
+}
+
+void csSolidBsp::InsertPolygonInv (csVector2* verts, int num_verts)
+{
+  csPoly2DEdges* poly = poly_pool.Alloc ();
+  poly->SetNumEdges (0);
+  int i, i1;
+  i1 = num_verts-1;
+  for (i = 0 ; i < num_verts ; i++)
+  {
+    poly->AddEdge (verts[i1], verts[i]);
+    i1 = i;
+  }
+  InsertPolygonInv (root, poly);
+  poly_pool.Free (poly);
 }
 
 bool csSolidBsp::TestPolygon (csVector2* verts, int num_verts)

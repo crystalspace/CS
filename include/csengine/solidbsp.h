@@ -127,6 +127,9 @@ private:
   /// Insert a polygon in the node.
   bool InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly);
 
+  /// Insert a polygon inverted in the node (i.e. solid pointing outwards).
+  void InsertPolygonInv (csSolidBspNode* node, csPoly2DEdges* poly);
+
   /// Test a polygon in the node.
   bool TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly);
 
@@ -153,17 +156,26 @@ public:
   /**
    * Is the tree full?
    */
-  bool IsFull () { return false; }
+  bool IsFull () { return root->solid; }
 
   /**
-   * Insert a polygon into the quad-tree.
+   * Insert a polygon into the solid bsp.
    * Return true if the tree was modified (i.e. if parts of the
    * polygon were visible.
    */
   bool InsertPolygon (csVector2* verts, int num_verts);
 
   /**
-   * Test for polygon visibility with the quad-tree.
+   * Insert a polygon inverted into the solid bsp.
+   * This routine considers the outside of the polygon as solid.
+   * Note that this routine currently ONLY works on an empty
+   * solid BSP. You cannot use it when the tree already has
+   * some contents.
+   */
+  void InsertPolygonInv (csVector2* verts, int num_verts);
+
+  /**
+   * Test for polygon visibility with the solid bsp.
    * Return true if polygon is visible.
    */
   bool TestPolygon (csVector2* verts, int num_verts);

@@ -129,7 +129,18 @@ public:
   csPlane2 (float a, float b, float c=0) : norm (a,b), CC (c) {}
 
   /// Initialize the plane given two vectors.
-  csPlane2 (const csVector2& v1, const csVector2& v2);
+  inline void Set (const csVector2& v1, const csVector2& v2)
+  {
+    norm.x = v2.y-v1.y;
+    norm.y = -(v2.x-v1.x);
+    CC = - (v2 * norm);
+  }
+
+  /// Initialize the plane given two vectors.
+  csPlane2 (const csVector2& v1, const csVector2& v2)
+  {
+    Set (v1, v2);
+  }
 
   /// Return the normal vector of this plane.
   inline csVector2& Normal () { return norm; }
@@ -204,7 +215,14 @@ public:
    *       or 0 if point v lies on segment 's1-s2'.
    */
   static int WhichSide2D (const csVector2& v, 
-                          const csVector2& s1, const csVector2& s2);
+                          const csVector2& s1, const csVector2& s2)
+  {
+    float k  = (s1.y - v.y)*(s2.x - s1.x);
+    float k1 = (s1.x - v.x)*(s2.y - s1.y);
+    if (k < k1) return -1;
+    else if (k > k1) return 1;
+    else return 0;
+  }
 
   /**
    * Calculates whether a vector lies inside a given 2D polygon.

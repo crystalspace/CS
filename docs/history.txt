@@ -12,6 +12,21 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+16-Mar-2000
+	- Michael Dale Long did some changes to Crystal Clear:
+	    - Rewrote ccActor class to make it less prone to errors of
+	      confusion. Now subclasses iActor instead of ccEntity.
+	    - Fixes for sprite collision detection code within ccActor.
+	      However still does not function properly due to unexpected
+	      behavior of sprite code.
+	    - More cleanup and fixes for various parts of CrystalClear.
+	- Fixed additional bugs in csSolidBsp so that it works even
+	  better now. It is STILL not perfect but the culling errors
+	  are getting rare now.
+	- Did a small optimization in csPlane2 for initializing it given
+	  two vectors.
+	- Fixed a camera transformation bug in cctest.
+	- Added csSolidBspCube (a cube of solid BSP trees).
 15-Mar-2000
 	- Fixed bug in terrain interface to terrain engine. Now passes
 	  1/z instead of z. This fixes the OpenGL clipping bug and also
@@ -26,6 +41,11 @@ Short-term cleanups that need to be done:
 	- Ok, fixed a number of new bugs which made the solid bsp work
 	  better now. Still not bug free though but at least it starts
 	  to resemble doing visibility culling :-)
+	- Thomas Hieber adjusted several files (csimage.h, txtmgr.cpp, D3D,
+	  ...) to CS naming convention (ThisIsAMethod and not
+	  this_is_a_method).
+	- Thomas also fixed transparency for the D3D 6.1 renderer.
+	- Eric Sunshine fixed several errors in the OS/" TexInfo docs.
 14-Mar-2000
 	- Michael Dale Long did a major rewrite of the iEntityManager
 	  interface.  Replaced Entity and Render lists with "associative

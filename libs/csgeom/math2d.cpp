@@ -25,17 +25,6 @@
 
 //---------------------------------------------------------------------------
 
-int csMath2::WhichSide2D (const csVector2& v, 
-                          const csVector2& s1, const csVector2& s2)
-{
-  float k  = (s1.y - v.y)*(s2.x - s1.x);
-  float k1 = (s1.x - v.x)*(s2.y - s1.y);
-
-  if (k < k1) return -1;
-  else if (k > k1) return 1;
-  else return 0;
-}
-
 // This algorithm assumes that the polygon is convex and that
 // the vertices of the polygon are oriented in clockwise ordering.
 // If this was not the case then the polygon should not be drawn (culled)
@@ -197,14 +186,6 @@ bool csIntersect2::Plane(const csVector2& u, const csVector2& v,
 }
 
 //---------------------------------------------------------------------------
-
-csPlane2::csPlane2 (const csVector2& v1, const csVector2& v2)
-{
-  norm.x = -(v2.y-v1.y);
-  norm.y = v2.x-v1.x;
-  CC = - (v2 * norm);
-  Invert ();
-}
 
 bool csPlane2::IntersectPolygon (csPoly2D* poly, csVector2& v1, csVector2& v2)
 {

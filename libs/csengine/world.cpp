@@ -969,10 +969,17 @@ void csWorld::Draw (csCamera* c, csClipper* view)
     for (i = 0 ; i < num ; i++) verts[i] = view->GetVertex (i);
     c_buffer->InsertPolygon (verts, num, true);
   }
+  else if (solidbsp)
+  {
+    solidbsp->MakeEmpty ();
+    csVector2 verts[50];	// @@@ BAD! Hardcoded!
+    int i, num;
+    num = view->GetNumVertices ();
+    for (i = 0 ; i < num ; i++) verts[num-i-1] = view->GetVertex (i);
+    solidbsp->InsertPolygonInv (verts, num);
+  }
   else if (quadtree)
     quadtree->MakeEmpty ();
-  else if (solidbsp)
-    solidbsp->MakeEmpty ();
   else if (covtree)
   {
     covtree->MakeEmpty ();

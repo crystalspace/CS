@@ -590,6 +590,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         poly_queue->Push (p, clip);
 	Stats::polygons_accepted++;
 	if (c_buffer && c_buffer->IsFull ()) return (void*)1;	// End BSP processing
+	if (solidbsp && solidbsp->IsFull ()) return (void*)1;	// End BSP processing
       }
       else
       {
