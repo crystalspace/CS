@@ -64,6 +64,8 @@ The history order is reversed so that new features are at the top.
 	  the future, in order to address this chicken-and-egg problem, I think
 	  that we should eliminate both iConfigFile and iStrVector from the
 	  core scf.h interface.
+	- Eric Sunshine repaired an outdated reference to the metaball plugin
+	  in metaball.cfg which prevented the plugin from loading.
 7-Jun-2001
 	- Justin Miller fixed a minor syntax error in csview.h.
 	- Wouter Wijngaards gave the start to implementing a visibility
