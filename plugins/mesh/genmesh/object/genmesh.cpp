@@ -1202,13 +1202,37 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
     }
     if (mesh_colors_dirty_flag)
     {
-      color_buffer = g3d->CreateRenderBuffer (
-        sizeof (csColor) * num_lit_mesh_colors, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3, false);
-      mesh_colors_dirty_flag = false;
-      color_buffer->CopyToBuffer (
-	do_lighting ? lit_mesh_colors : static_mesh_colors,
-	sizeof (csColor) * num_lit_mesh_colors);
+      if (!do_manual_colors)
+      {
+        if (!color_buffer || 
+            (color_buffer->GetSize() < (sizeof (csColor) * num_lit_mesh_colors)))
+        {
+          // Recreate the render buffer only if the new data cannot fit inside
+          //  the existing buffer.
+          color_buffer = g3d->CreateRenderBuffer (
+              sizeof (csColor) * num_lit_mesh_colors, CS_BUF_STATIC,
+              CS_BUFCOMP_FLOAT, 3, false);
+        }
+        mesh_colors_dirty_flag = false;
+        color_buffer->CopyToBuffer (
+	    do_lighting ? lit_mesh_colors : static_mesh_colors,
+	    sizeof (csColor) * num_lit_mesh_colors);
+      }
+      else
+      {
+        if (!color_buffer || 
+            (color_buffer->GetSize() < (sizeof (csColor) * factory->GetVertexCount())))
+        {
+          // Recreate the render buffer only if the new data cannot fit inside
+          //  the existing buffer.
+          color_buffer = g3d->CreateRenderBuffer (
+              sizeof (csColor) * factory->GetVertexCount(), CS_BUF_STATIC,
+              CS_BUFCOMP_FLOAT, 3, false);
+        }
+        mesh_colors_dirty_flag = false;
+        color_buffer->CopyToBuffer ( factory->GetColors(),
+        sizeof (csColor) * factory->GetVertexCount());        
+      }
     }
     var->SetValue(color_buffer);
     return;

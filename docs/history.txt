@@ -9,6 +9,10 @@ chronological order.
 13-Jun-2004
 	- res changed the Win32 thread error reporting to be less 
 	  macro-centric.
+	- Rhad fixed use_manual_colors in genmeshes by adding handling to
+	  csGenmeshMeshObject::PreGetShaderVariableValues.
+	- Rhad altered csGenmeshMeshObject::PreGetShaderVariableValues to use the
+	  existing renderbuffer if the new data set will still fit inside.
 12-Jun-2004
 	- res made all Win32 platforms, not only VC, use CS' own opendir() etc 
 	  functions.
