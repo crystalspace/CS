@@ -646,11 +646,7 @@ bool RegisterServer (char *SharedLibraryFilename, csIniFile *ini, bool Register)
   strcpy (name, base);
   strcat (name, "_GetClassTable");
 
-  char *install_path = System->InferInstallLocationOf("");
-
-  csLibraryHandle Handle = csLoadLibrary (install_path, base);
-
-  free(install_path);
+  csLibraryHandle Handle = csLoadLibrary (base);
 
   if (!Handle)
   {

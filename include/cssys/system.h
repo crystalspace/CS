@@ -399,8 +399,8 @@ public:
   /// Query the elapsed time between last frames and absolute time
   virtual void GetElapsedTime (cs_time &oElapsedTime, cs_time &oCurrentTime)
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
-  /// Get disk path to a file in install dir
-  virtual char *InferInstallLocationOf(char *filename);
+  /// Get the installation path.
+  virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
 
   /// Load a plugin and initialize it
   virtual iBase *LoadPlugIn (const char *iClassID, const char *iFuncID,

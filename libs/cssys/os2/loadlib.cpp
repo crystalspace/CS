@@ -28,13 +28,17 @@ extern "C" int DosFreeModule (csLibraryHandle ModuleHandle);
 extern "C" int DosQueryProcAddr (csLibraryHandle ModuleHandle,
   unsigned long Ordinal, const char *FunctionName, void *FunctionAddress);
 
-csLibraryHandle csLoadLibrary (const char *installpath, const char* iName)
+csLibraryHandle csLoadLibrary (const char* iName)
 {
-  char name [260];
-  strcat (strcpy (name, iName), ".dll");
+  char *name = csFindLibrary (NULL, iName, ".dll");
+  if (!name) return (csLibraryHandle)0;
+
   csLibraryHandle Handle;
-  return DosLoadModule ((const char *)0, 0, name, &Handle) ?
-    (csLibraryHandle)0 : Handle;
+  if (DosLoadModule ((const char *)0, 0, name, &Handle))
+    Handle = (csLibraryHandle)0;
+
+  delete [] name;
+  return Handle;
 }
 
 void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)

@@ -26,8 +26,6 @@
 #include "csutil/csvector.h"
 #include "csutil/csobjvec.h"
 #include "csutil/inifile.h"
-#include "cssys/system.h"
-#include "debug/memory.h"
 
 #ifndef CS_STATIC_LINKED
 
@@ -94,9 +92,7 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
 
   RefCount = 0;
   ClassTable = NULL;
-  char *installpath = System->InferInstallLocationOf("");
-  LibraryHandle = csLoadLibrary (installpath, LibraryName = iLibraryName);
-  free(installpath);
+  LibraryHandle = csLoadLibrary (LibraryName = iLibraryName);
   if (!LibraryHandle)
     return;
 
@@ -333,18 +329,18 @@ void scfInitialize (csIniFile *iConfig)
     ClassRegistry = new scfClassRegistry ();
 #ifndef CS_STATIC_LINKED
   if (!LibraryRegistry)
-    LibraryRegistry = new scfLibraryVector();
+    LibraryRegistry = new scfLibraryVector ();
   if (iConfig)
   {
     csIniFile::DataIterator iterator (iConfig->EnumData ("SCF.Registry"));
-    while (iterator.NextItem())
+    while (iterator.NextItem ())
     {
-      const char* data = (char*)iterator.GetData();
-      char* val = (char*)alloca (strlen (data) + 1);
+      const char *data = (char *)iterator.GetData();
+      char *val = (char *)alloca (strlen (data) + 1);
       strcpy (val, data);
-      char* depend = strchr (val, ':');
+      char *depend = strchr (val, ':');
       if (depend) *depend++ = 0;
-      scfRegisterClass (iterator.GetName(), val, depend);
+      scfRegisterClass (iterator.GetName (), val, depend);
     }
   }
 #else

@@ -21,10 +21,12 @@
 #include <stdlib.h>
 
 #define SYSDEF_ALLOCA
+#define SYSDEF_PATH
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "cssys/sysdriv.h"
 #include "cssys/csinput.h"
+#include "cssys/csshlib.h"
 #include "csutil/csrect.h"
 #include "csutil/util.h"
 #include "csutil/inifile.h"
@@ -352,11 +354,13 @@ csSystemDriver::~csSystemDriver ()
 
 bool csSystemDriver::Initialize (int argc, const char* const argv[], const char *iConfigName)
 {
-  // Initialize Shared Class Facility
-  char *scfconfigpath = InferInstallLocationOf("scf.cfg");
+  // Initialize Shared Class Facility|
+  char scfconfigpath [MAXPATHLEN + 1];
+  GetInstallPath (scfconfigpath, sizeof (scfconfigpath));
+  csAddLibraryPath (scfconfigpath);
+  strcat (scfconfigpath, "scf.cfg");
   csIniFile scfconfig (scfconfigpath);
   scfInitialize (&scfconfig);
-  free(scfconfigpath);
 
   // @@@ This is ugly.  We need a better, more generalized way of doing this.
   // Hard-coding the name of the VFS plugin (crytalspace.kernel.vfs) is bad.
@@ -882,6 +886,36 @@ cs_time csSystemDriver::GetTime ()
   return Time ();
 }
 
+bool csSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
+{
+  char *path = getenv ("CRYSTAL");
+  if (!path || !*path)
+  {
+    // Won't check here for the schisofrenic case when iBufferSize == 0;
+    // Crystal Space is bloated enough without that...
+    oInstallPath [0] = 0;
+    return true;
+  }
+
+  size_t pl = strlen (path);
+  // See if we have to add an ending path separator to the directory
+  bool addsep = (path [pl - 1] != PATH_SEPARATOR)
+#if defined (OS_DOS) || defined (OS_OS2) || defined (OS_WIN32)
+             && (path [pl - 1] != '/')
+#endif
+    ;
+  if (addsep)
+    pl++;
+
+  if (pl >= iBufferSize)
+    pl = iBufferSize - 1;
+  memcpy (oInstallPath, path, pl);
+  if (addsep)
+    oInstallPath [pl - 1] = PATH_SEPARATOR;
+  oInstallPath [pl] = 0;
+  return true;
+}
+
 void csSystemDriver::Printf (int mode, const char *format, ...)
 {
   char buf[1024];
@@ -949,26 +983,6 @@ void csSystemDriver::Printf (int mode, const char *format, ...)
       break;
   } /* endswitch */
 }
-
-
-char * csSystemDriver::InferInstallLocationOf(char *filename)
-{
-  char *installdir = 0;
-  installdir = getenv("CRYSTAL");
-  if(installdir == 0)
-    installdir = ""; // default to 'current' dir, in this general case.
-  // For a system specific version you could look for scf.cfg, vfs.cfg or
-  // install.log in a directory, to see is you want to default to "." or
-  // to some other predefined value (e.g. /usr/local/crystal);
-
-  // concat strings.
-  char buf[256];
-  if(strlen(installdir) + strlen(filename) > 250)
-    return strdup(filename);
-  sprintf(buf, "%s%s", installdir, filename);
-  return strdup(buf);
-}
-
 
 iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
   const char *iInterface, int iVersion)

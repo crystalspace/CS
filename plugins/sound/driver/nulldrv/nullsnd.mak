@@ -9,7 +9,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make nullsnddrv          Make the $(DESCRIPTION.nullsnddrv)$"
+  $(NEWLINE)echo $"  make nullsnddrv   Make the $(DESCRIPTION.nullsnddrv)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

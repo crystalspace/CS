@@ -27,8 +27,9 @@ extern "C" {
 //-----------------------------------------------------------------------------
 // csLoadLibrary
 //-----------------------------------------------------------------------------
-csLibraryHandle csLoadLibrary( const char * installpath, char const* lib )
+csLibraryHandle csLoadLibrary( char const* lib )
     {
+//@@TODO: use csFindLibrary
     char* file = new char[strlen(lib) + sizeof(OS_NEXT_PLUGIN_DIR) +
 	sizeof(OS_NEXT_PLUGIN_EXT)]; // Includes '\0'.
     strcpy( file, OS_NEXT_PLUGIN_DIR );

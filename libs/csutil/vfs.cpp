@@ -231,11 +231,11 @@ public:
   virtual ~VfsNode ();
 
   // Parse a directory link directive and fill RPathV
-  bool AddRPath (const char *RealPath, const csIniFile *Config);
+  bool AddRPath (const char *RealPath, const csVFS *Parent);
   // Remove a real-world path
   bool RemoveRPath (const char *RealPath);
   // Get value of a variable
-  const char *GetValue (const csIniFile *Config, const char *VarName);
+  const char *GetValue (const csVFS *Parent, const char *VarName);
   // Find all files in a subpath
   void FindFiles (const char *Suffix, const char *Mask, iStrVector *FileList);
   // Find a file and return the appropiate csFile object
@@ -628,7 +628,7 @@ VfsNode::~VfsNode ()
   delete [] VPath;
 }
 
-bool VfsNode::AddRPath (const char *RealPath, const csIniFile *Config)
+bool VfsNode::AddRPath (const char *RealPath, const csVFS *Parent)
 {
   bool rc = false;
   // Split rpath into several, separated by commas
@@ -688,7 +688,7 @@ bool VfsNode::AddRPath (const char *RealPath, const csIniFile *Config)
             var [1] = 0;
           }
 
-          strcpy (dst, GetValue (Config, var));
+          strcpy (dst, GetValue (Parent, var));
           dst += strlen (dst);
         } /* endif */
         else
@@ -725,15 +725,14 @@ bool VfsNode::RemoveRPath (const char *RealPath)
   return false;
 }
 
-const char *VfsNode::GetValue (const csIniFile *Config, const char *VarName)
+const char *VfsNode::GetValue (const csVFS *Parent, const char *VarName)
 {
   // Look in environment first
   const char *value = getenv (VarName);
   if (value)
     return value;
 
-  if(strcmp(VarName, "@") == 0)
-    return System->InferInstallLocationOf(""); /// @@@ small memory leak.
+  csIniFile *Config = Parent->config;
 
   // Now look in "VFS.Solaris" section, for example
   value = Config->GetStr ("VFS." OS_VERSION, VarName, NULL);
@@ -756,6 +755,9 @@ const char *VfsNode::GetValue (const csIniFile *Config, const char *VarName)
     static char path_sep [] = {PATH_SEPARATOR, 0};
     return path_sep;
   }
+
+  if (strcmp (VarName, "@") == 0) // Installation directory?
+    return Parent->basedir;
 
   return "";
 }
@@ -1082,7 +1084,8 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
   cnode = NULL;
   cnsufx [0] = 0;
   config = NULL;
-  CS_ASSERT (ArchiveCache == NULL);
+  basedir = NULL;
+  CS_ASSERT (!ArchiveCache);
   ArchiveCache = new VfsArchiveCache ();
 }
 
@@ -1090,7 +1093,8 @@ csVFS::~csVFS ()
 {
   delete config;
   delete [] cwd;
-  CS_ASSERT (ArchiveCache != NULL);
+  delete [] basedir;
+  CS_ASSERT (ArchiveCache);
   delete ArchiveCache;
   ArchiveCache = NULL;
   if (System) System->DecRef ();
@@ -1099,11 +1103,13 @@ csVFS::~csVFS ()
 bool csVFS::Initialize (iSystem *iSys)
 {
   (System = iSys)->IncRef ();
-  char *vfsconfigpath = iSys->InferInstallLocationOf("vfs.cfg");
+  char vfsconfigpath [MAXPATHLEN + 1];
+  iSys->GetInstallPath (vfsconfigpath, sizeof (vfsconfigpath));
+  basedir = strnew (vfsconfigpath);
+  strcat (vfsconfigpath, "vfs.cfg");
   csIniFile *vfsconfig = new csIniFile (System->ConfigGetStr ("VFS.Options", 
     "Config", vfsconfigpath));
   bool retval = ReadConfig (vfsconfig);
-  free(vfsconfigpath);
   return retval;
 }
 
@@ -1121,7 +1127,7 @@ bool csVFS::AddLink (const char *VirtualPath, const char *RealPath)
 {
   char *xp = ExpandPath (VirtualPath, true);
   VfsNode *e = new VfsNode (xp, VirtualPath, System);
-  if (!e->AddRPath (RealPath, config))
+  if (!e->AddRPath (RealPath, this))
   {
     delete e;
     return false;
@@ -1462,7 +1468,7 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
     NodeList.Push (node);
   }
 
-  node->AddRPath (RealPath, config);
+  node->AddRPath (RealPath, this);
   if (node->RPathV.Length () == 0)
   {
     int idx = NodeList.Find (node);

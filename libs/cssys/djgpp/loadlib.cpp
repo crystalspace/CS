@@ -152,16 +152,15 @@ static __attribute__((constructor)) void _dlinit ()
   dlsetres (_dlerrh);
 }
 
-csLibraryHandle csLoadLibrary (const char *installpath, const char* iName)
+csLibraryHandle csLoadLibrary (const char* iName)
 {
-  char name [260];
-  strcat (strcpy (name, iName), ".dxe");
+  char *name = csFindLibrary (NULL, iName, ".dxe");
+  if (!name) return (csLibraryHandle)0;
 
-  csLibraryHandle Handle;
-  if ((Handle = dlopen (module = name, 0)))
-    return Handle;
+  csLibraryHandle Handle = dlopen (module = name, 0);
 
-  return NULL;
+  delete [] name;
+  return Handle;
 }
 
 void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)

@@ -97,6 +97,8 @@ protected:
  */
 class csVFS : public iVFS
 {
+  friend class VfsNode;
+
   // A vector of VFS nodes
   class VfsVector : public csVector
   {
@@ -111,6 +113,8 @@ class csVFS : public iVFS
   // Current working directory (in fact, the automaticaly-added prefix path)
   // NOTE: cwd ALWAYS ends in '/'!
   char *cwd;
+  // The installation directory (the value of $@)
+  char *basedir;
   // Current node
   const VfsNode *cnode;
   // The current directory minus current node (cnode suffix)

@@ -30,41 +30,29 @@
 #  define DLOPEN_MODE   RTLD_LAZY | RTLD_GLOBAL
 #endif
 
-/**
- * We try to find the library in the following sequence:
- * <installpath>lib/<iName>.so, <installpath>lib/lib<iName>.so,
- * <iName>.so, lib<iName>.so, <cwd><iName>.so, <cwd>lib<iName>.so
- */
-csLibraryHandle csLoadLibrary (const char *installpath, const char* iName)
+// Upon initialization add the current directory to the
+// list of paths searched for plugins
+class __loadlib_init
 {
-  csString Error;
-  csLibraryHandle Handle;
-  for (int Try = 0; Try < 6; Try++)
+  __loadlib_init ()
   {
-    char name [1255];
-    name [0] = 0;
-    if ( Try <= 1 )
-    {
-      strcat (name, installpath);
-      strcat (name, "lib/");
-    }
-    else if (Try >= 4)
-    {
-      getcwd (name, sizeof (name));
-      strcat (name, "/");
-    }
-    if (Try & 1)
-      strcat (name, "lib");
-    strcat (strcat (name, iName), ".so");
-    if ((Handle = dlopen (name, DLOPEN_MODE)))
-      break;
-    char *t;
-    if((t=dlerror()))
-      Error+=csString("DLERROR: ")+t+"\n";
+    char path [1255];
+    getcwd (path, sizeof (path));
+    strcat (path, "/");
+    csAddLibraryPath (path);
   }
-  if (!Handle)
-    fprintf (stderr, Error);
+} __loadlib_init_dummy;
 
+csLibraryHandle csLoadLibrary (const char* iName)
+{
+  char *name = csFindLibrary ("lib", iName, ".so");
+  if (!name) return (csLibraryHandle)0;
+
+  csLibraryHandle Handle = dlopen (name, DLOPEN_MODE);
+  if (!Handle)
+    fprintf (stderr, "DLERROR: %s\n", dlerror ());
+
+  delete [] name;
   return Handle;
 }
 

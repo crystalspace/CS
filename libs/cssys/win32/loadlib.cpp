@@ -19,16 +19,15 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 
-csLibraryHandle csLoadLibrary (const char* installpath, const char* szLibName)
+csLibraryHandle csLoadLibrary (const char* szLibName)
 {
-  //First we look for the lib in the installdir
-  char FullPath[MAX_PATH];
-  sprintf(FullPath, installpath, szLibName);
-  csLibraryHandle lib = LoadLibrary (FullPath);
-  if (lib) return lib;
+  char *name = csFindLibrary (NULL, iName, ".dll");
+  if (!name) return (csLibraryHandle)0;
 
-  //if we didn't find it there, we let windows look in the default win locations.
-  return LoadLibrary (szLibName);
+  csLibraryHandle Handle = LoadLibrary (name);
+
+  delete [] name;
+  return Handle;
 }
 
 void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)

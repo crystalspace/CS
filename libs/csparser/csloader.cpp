@@ -4493,7 +4493,7 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
   iSoundLoader *SoundLoader = QUERY_PLUGIN(System, iSoundLoader);
   if (!SoundLoader) {
     CsPrintf (MSG_FATAL_ERROR, "Cannot load sound \"%s\" "
-      "without sound loader plug-in", filename);
+      "without sound loader plug-in\n", filename);
     return NULL;
   }
 

@@ -228,15 +228,12 @@ endif
 # ----- End Construction Zone ----------------------------
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/general/printf.cpp \
-  libs/cssys/win32/timing.cpp libs/cssys/win32/dir.cpp \
-  libs/cssys/win32/win32.cpp libs/cssys/win32/loadlib.cpp \
+SRC.SYS_CSSYS = libs/cssys/win32/win32.cpp libs/cssys/win32/dir.cpp \
+  libs/cssys/general/printf.cpp libs/cssys/win32/timing.cpp \
+  libs/cssys/win32/loadlib.cpp libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp
-
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
-
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
-
 
 # Command sequence for creating a directory.
 # Note that directories will have forward slashes. Please

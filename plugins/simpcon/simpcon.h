@@ -204,7 +204,7 @@ public:
    * Implement simple extension commands.
    */
   virtual bool ConsoleExtension (const char *iCommand, ...)
-  { return false; }
+  { (void)iCommand; return false; }
 
 private:
   /// Time left until messages will scroll up

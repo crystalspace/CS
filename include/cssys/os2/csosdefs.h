@@ -34,10 +34,12 @@
 #  define SOFTWARE_2D_DRIVER get_software_2d_driver ()
    static inline char *get_software_2d_driver ()
    {
-     PTIB tb; PPIB pb;
+     PTIB tb; PPIB pb; char *display;
      if (DosGetInfoBlocks (&tb, &pb) == 0
       && pb->pib_ultype == 0)
        return "crystalspace.graphics2d.mgl";
+     else if ((display = getenv ("DISPLAY")) && !strcmp (display, ":0.0"))
+       return "crystalspace.graphics2d.x2d";
      else
        return "crystalspace.graphics2d.dive";
    }
@@ -124,6 +126,7 @@
 #ifdef SYSDEF_SOCKETS
 #  include <sys/ioctl.h>
 #  include <sys/so_ioctl.h>
+#  include <sys/time.h>
 #  define DO_FAKE_SOCKLEN_T
 #endif
 

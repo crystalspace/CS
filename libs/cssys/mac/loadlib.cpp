@@ -23,13 +23,14 @@
 #include "cssys/csshlib.h"
 
 
-csLibraryHandle csLoadLibrary( const char *installpath, const char* iName )
+csLibraryHandle csLoadLibrary( const char* iName )
 {
+//@@TODO: use csFindLibrary
 	CFragConnectionID libID;
 	OSErr	theError;
 	Str63	theLibName;
 	Str255	errorString;
-    void (*pfnDllInitialize)(void) = NULL;
+  void (*pfnDllInitialize)(void) = NULL;
 
 	strcpy( (char *)&theLibName[1], iName );
 	strcat( (char *)&theLibName[1], ".shlb" );

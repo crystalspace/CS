@@ -137,8 +137,9 @@ NASMFLAGS.SYSTEM=-f obj -DEXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/general/timing.cpp \
-  libs/cssys/os2/csos2.cpp libs/cssys/os2/loadlib.cpp \
-  libs/cssys/os2/scancode.cpp libs/cssys/general/getopt.cpp
+  libs/cssys/os2/csos2.cpp libs/cssys/os2/scancode.cpp \
+  libs/cssys/os2/loadlib.cpp libs/cssys/general/findlib.cpp
+  libs/cssys/general/getopt.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/os2/dllentry.cpp
 
 # The C compiler.

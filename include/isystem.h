@@ -222,15 +222,13 @@ struct iSystem : public iBase
   virtual void Sleep (int iSleepTime) = 0;
 
   /**
-   * This function is only used during initialization.
-   * It tries to find the crystal space install directory, usually by
-   * looking at environment variables, and then returns a newly malloced
-   * string with filename attached. If filename were "", it would return
-   * the install directory with a trailing '/', '\' or ':'. The path is
-   * a path in the underlying disk filesystem, not in the VFS.
-   * Note that this path may be wrong (if we are not or wrongly installed).
+   * Get the installation path.<p>
+   * This returns the path where the system has been installed to.
+   * It has a limited use because mostly everything should be done
+   * through VFS which is installation directory - independent; but
+   * some initialization tasks still need this.
    */
-  virtual char *InferInstallLocationOf(char *filename) = 0;
+  virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize) = 0;
 
   //---------------------------- Plug-in manager -----------------------------//
 
