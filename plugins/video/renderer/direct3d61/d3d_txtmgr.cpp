@@ -50,6 +50,7 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
   int bsl = iG3D->bsl;
   int bsr = iG3D->bsr;
 
+  Image->SetFormat(CS_IMGFMT_TRUECOLOR);
   RGBPixel* pPixels   = (RGBPixel *)Image->GetImageData();
   int       NumPixels = get_size ();
 
@@ -61,9 +62,9 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
       UShort *dst = (UShort *)image;
       while (NumPixels--)
       {
-        *dst = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
-               ((unsigned (pPixels->green) >> gsr) << gsl) |
-               ((unsigned (pPixels->blue ) >> bsr) << bsl);
+        *dst++ = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
+                 ((unsigned (pPixels->green) >> gsr) << gsl) |
+                 ((unsigned (pPixels->blue ) >> bsr) << bsl);
         pPixels++;
       }
       break;
@@ -74,9 +75,9 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
       ULong *dst = (ULong *)image;
       while (NumPixels--)
       {
-        *dst = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
-               ((unsigned (pPixels->green) >> gsr) << gsl) |
-               ((unsigned (pPixels->blue ) >> bsr) << bsl);
+        *dst++ = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
+                 ((unsigned (pPixels->green) >> gsr) << gsl) |
+                 ((unsigned (pPixels->blue ) >> bsr) << bsl);
         pPixels++;
       }
       break;
