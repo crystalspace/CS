@@ -5,6 +5,7 @@ from string import *;
 
 try:
 	import cPickle
+	pickle=cPickle
 except:
 	print "WARNING: Failed to import module cPickle, using slower pickle library"
 	import pickle
@@ -87,7 +88,7 @@ class UnrealMap:
 	def Save(self, file):
 		if(type(file)==types.StringType):
 			file=open(file, 'w+')
-		cPickle.dump(self.map, file)		
+		pickle.dump(self.map, file)
 	def Parse(self):
 		self.NextLine()
 		if(not len(self.line)):
@@ -168,7 +169,7 @@ class UnrealMap:
 def Load(file):
     	try:
     		print 'Unrmap: Opening '+file+'.pym'
-		a=cPickle.load(open(file+'.pym','r'))
+		a=pickle.load(open(file+'.pym','r'))
 	except:
 		print 'Unrmap: file not openable, attempting conversion of '+file+'.t3d'
 	 	m=UnrealMap()
