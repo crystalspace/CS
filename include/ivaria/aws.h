@@ -14,6 +14,8 @@ struct iAwsSigSrc;
 class  awsWindow;
 class  awsComponentNode;
 class  awsComponentFactory;
+class  iGraphics2D;
+class  iGraphics3D;
             
 
 SCF_VERSION (iAws, 0, 0, 1);
@@ -38,6 +40,20 @@ public:
 
   /// Mark a region dirty
   virtual void       Mark(csRect &rect)=0;
+  
+  /// Set the contexts however you want
+  virtual void SetContext(iGraphics2D *g2d, iGraphics3D *g3d)=0;
+
+  /// Set the context to the procedural texture
+  virtual void SetDefaultContext()=0;
+
+  /// Get the iGraphics2D interface so that components can use it.
+  virtual iGraphics2D *G2D()=0;
+
+  /// Get the iGraphics3D interface so that components can use it.
+  virtual iGraphics3D *G3D()=0; 
+  
+
 };
 
 
