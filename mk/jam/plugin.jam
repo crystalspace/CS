@@ -45,11 +45,14 @@ rule Plugin
   Clean $(<)clean : $(objects) ; # create target clean rule 
 
   # Create a target for eventual static linking
-  SubVariant static ;
-  Library $(<)_static : $(>) : $(3) independent noinstall ;
-  CFlags $(<)_static : -DCS_STATIC_LINKED ;
-  LFlags $(<)_static : $(LINKLIBS) ;
-  SubVariant ;
+  if ! $(NO_STATIC_LINKING)
+  {
+    SubVariant static ;
+    Library $(<)_static : $(>) : $(3) independent noinstall ;
+    CFlags $(<)_static : -DCS_STATIC_LINKED ;
+    LFlags $(<)_static : $(LINKLIBS) ;
+    SubVariant ;
+  }
 
   # so 'jam foo' works when it's really foo.dll (Windows) or foo.csbundle
   # (MacOS/X)
