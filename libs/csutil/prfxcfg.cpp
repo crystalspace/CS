@@ -60,14 +60,25 @@ bool csPrefixConfig::LoadNow(const char *Filename, iVFS *vfs, bool overwrite)
 
 bool csPrefixConfig::SaveNow(const char *Filename, iVFS *vfs) const
 {
+  iConfigIterator *it;
   csConfigFile cfg;
 
   // first load the existing config file to preserve the user
   // configuration of other applications
   cfg.Load(Filename, vfs);
 
+  // Delete all keys for this application. In fact we only have to delete
+  // those keys that exist in 'cfg' but not in this object, but I don't
+  // know a fast way to test for this. Anyway, with this approach the
+  // keys in the prefix config file are always grouped by application,
+  // which isn't too bad after all.
+  it = cfg.Enumerate(Prefix);
+  while (it->Next())
+    cfg.DeleteKey(it->GetKey());
+  it->DecRef();
+
   // copy all options for the current user
-  iConfigIterator *it = ((iConfigFile*)this)->Enumerate();
+  it = ((iConfigFile*)this)->Enumerate();
   while (it->Next()) {
     char tmp[1024];
     memcpy(tmp, Prefix, PrefixLength);
