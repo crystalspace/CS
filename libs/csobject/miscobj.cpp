@@ -21,10 +21,13 @@
 #include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
 #include "csobject/pobject.h"
+#include "csobject/cdobj.h"
+#include "csengine/colldet/collider.h"
 
 CSOBJTYPE_IMPL(csNameObject,csObject);
 CSOBJTYPE_IMPL(csDataObject,csObject);
 CSOBJTYPE_IMPL(csPObject,csObject);
+CSOBJTYPE_IMPL(csColliderPointerObject,csObject);
 
 csNameObject::csNameObject(const char* n) : csObject()
 {
@@ -34,7 +37,7 @@ csNameObject::csNameObject(const char* n) : csObject()
 
 const char* csNameObject::GetName(csObject& csobj)
 {
-  csObject *o = csobj.GetObject(csNameObject::Type());
+  csObject *o = csobj.GetObj(csNameObject::Type());
   if (o) return ((csNameObject*) o)->Name();
   return NULL;
 }
@@ -43,4 +46,33 @@ void csNameObject::AddName(csObject& csobj, const char* name)
 {
   CHK(csNameObject* nameobj = new csNameObject(name));
   csobj.ObjAdd(nameobj); 
+}
+
+
+
+csColliderPointerObject::csColliderPointerObject(csCollider* pCollider, bool AutoDelete)
+{
+  m_pCollider  = pCollider;
+  m_AutoDelete = AutoDelete;
+}
+
+csColliderPointerObject::~csColliderPointerObject()
+{
+  if (m_AutoDelete)
+  {
+    delete (m_pCollider);
+  }
+}
+
+csCollider* csColliderPointerObject::GetCollider(csObject& csobj)
+{
+  csObject *o = csobj.GetObj(csColliderPointerObject::Type());
+  if (o) return ((csColliderPointerObject*) o)->m_pCollider;
+  return NULL;
+}
+
+void csColliderPointerObject::SetCollider(csObject& csobj, csCollider* pCollider, bool AutoDelete)
+{
+  CHK(csColliderPointerObject* collobj = new csColliderPointerObject(pCollider, AutoDelete));
+  csobj.ObjAdd(collobj); 
 }

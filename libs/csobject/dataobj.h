@@ -43,7 +43,7 @@ public:
   ///
   static void* GetData(csObject& csobj)
   {
-    csDataObject* d = (csDataObject*)(csobj.GetObject(csDataObject::Type()));
+    csDataObject* d = (csDataObject*)(csobj.GetObj(csDataObject::Type()));
     if (d) return d->GetData();
     else return NULL;
   }

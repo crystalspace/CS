@@ -80,7 +80,7 @@ public:
   int GetNumObjects() const { return child_cnt; }
 
   ///
-  csObject* GetObject(int i) { return children[i]; }
+  csObject* GetObj(int i) { return children[i]; }
 
   ///
   int GetNumSubNodes() const { return subnode_cnt; }

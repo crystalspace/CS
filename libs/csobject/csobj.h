@@ -26,9 +26,6 @@
 #include "csobject/treeitr.h"
 #include "csutil/csbase.h"
 
-//wingdi will define GetObject to GetObjectA. This will collide with this file!
-#undef GetObject
-
 // Note: this implementation of csObject doesn't include the 'name' field.
 // if a name is necessary, then a csNameObject can be created and attached.
 
@@ -66,7 +63,7 @@ public:
   virtual csObject* GetObjectParent () { return NULL; }
 
   /// Return the first subobject instance of the given type
-  csObject* GetObject (const csIdType& objtype);
+  csObject* GetObj (const csIdType& objtype);
 
   /// Return an iterator referencing all objects of the given type
   csObjIterator ObjGet (const csIdType& objtype);

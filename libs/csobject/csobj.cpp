@@ -41,7 +41,7 @@ csObject::csObject(csObject& csobj) : csBase(), objtree(NULL)
   if (csobj.objtree) objtree = csobj.objtree->GetCopy(); 
 }
 
-csObject* csObject::GetObject(const csIdType& objtype)
+csObject* csObject::GetObj(const csIdType& objtype)
 {
   if (!objtree) return NULL;
   csObjIterator i(objtree->GetNode(objtype));  

@@ -57,7 +57,7 @@ csObject& csObjIterator::operator* ()
 {
   /* Yes, this does cause an error if 'top' is NULL.  As it should.
      Compare to dereferencing a NULL pointer. */
-  return *(top->treenode->GetObject(top->child_ind));
+  return *(top->treenode->GetObj(top->child_ind));
 }
 
 csObjIterator& csObjIterator::operator++ () 
