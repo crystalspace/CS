@@ -25,6 +25,7 @@
 #include "csutil/scf.h"
 #include "cstypes.h"
 
+
 struct iEffectTechnique;
 
 SCF_VERSION (iEffectDefinition, 0, 0, 1);
@@ -45,6 +46,8 @@ struct iEffectDefinition : public iBase
   virtual void SetName( const char* name ) = 0;
   /// Retrieve name of effect
   virtual const char* GetName() = 0;
+
+	/// Set a 
 };
 
 #endif // __IEFFECTDEFINITION_H__

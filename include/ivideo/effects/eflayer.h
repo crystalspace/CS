@@ -24,6 +24,8 @@
  */
 #include "csutil/scf.h"
 #include "cstypes.h"
+#include "csutil/ref.h"
+#include "efvector4.h"
 
 SCF_VERSION (iEffectLayer, 0, 0, 1);
 
@@ -38,6 +40,8 @@ struct iEffectLayer : public iBase
   virtual void SetStateString( csStringID state, csStringID value ) = 0;
   /// Set a state opaque data.
   virtual void SetStateOpaque( csStringID state, void *value ) = 0;
+	/// Set a state vector4.
+	virtual void SetStateVector4( csStringID state, csEffectVector4 value) = 0;
   
   /// Get a state float.
   virtual float GetStateFloat( csStringID state ) = 0;
@@ -45,11 +49,18 @@ struct iEffectLayer : public iBase
   virtual csStringID GetStateString( csStringID state ) = 0;
   /// Get a state opaque data.
   virtual void *GetStateOpaque( csStringID state ) = 0;
+	/// Get a state vector4.
+	virtual csEffectVector4 GetStateVector4( csStringID state) = 0;
 
   /// Get the id of the first state.
   virtual csStringID GetFirstState() = 0;
   /// Get the id of the next state.
   virtual csStringID GetNextState() = 0;
+
+	/// Get renderer specific data
+	virtual csRef<iBase> GetRendererData() = 0;
+	/// Set renderer specific data
+	virtual void SetRendererData(csRef<iBase> data) = 0;
 };
 
 #endif // __IEFFECTLAYER_H__
