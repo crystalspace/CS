@@ -23,6 +23,7 @@
 #include "iplugin.h"
 #include "csgeom/quaterni.h"
 #include "csgeom/matrix3.h"
+#include "iskeleton.h"
 
 SCF_VERSION (iMotion, 0, 0, 1);
 
@@ -54,6 +55,10 @@ struct iMotionManager : public iPlugIn
   virtual iMotion* FindByName (const char* name) = 0;
   ///
   virtual iMotion* AddMotion (const char* name) = 0;
+	///
+	virtual bool ApplyMotion(iSkeletonBone *skel, const char* motion) = 0;
+	///
+	virtual void UpdateAll() = 0;
 };
 
 #endif

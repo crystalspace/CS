@@ -25,81 +25,107 @@
 #include "csgeom/matrix3.h"
 
 struct csMotionFrame {
-	int keyframe;
+  cs_time keyframe;
 
-	int size;
-	int *links;
-	unsigned int *affectors;
+  int size;
+  int *links;
+  unsigned int *affectors;
 };
 
 ///
 class csMotion:public iMotion {
-	char* name;
-	char matrixmode;
-
-	unsigned int hash;
-
-	void* transforms;
-	int numtransforms;
-
-	csMotionFrame* frames;
-	int numframes;
-
 public:
+  char* name;
+  char matrixmode;
+
+  unsigned int hash;
+
+  void* transforms;
+  int numtransforms;
+
+  csMotionFrame* frames;
+  int numframes;
+
   DECLARE_IBASE;
 
-	///
-	csMotion();
-	///
-	virtual ~csMotion();
-	///
-	unsigned int GetHash() { return hash; }
-	///
-	virtual const char* GetName ();
-	///
-	virtual void SetName (const char* name); 
-	///
-	virtual bool AddAnim (const csQuaternion &quat);
-	///
-	virtual bool AddAnim (const csMatrix3 &mat);
-	///
-	virtual int AddFrame (int framenumber);
-	///
-	virtual void AddFrameLink (int frameindex, const char* affector, int link);
+  ///
+  csMotion();
+  ///
+  virtual ~csMotion();
+  ///
+  virtual const char* GetName ();
+  ///
+  virtual void SetName (const char* name); 
+  ///
+  virtual bool AddAnim (const csQuaternion &quat);
+  ///
+  virtual bool AddAnim (const csMatrix3 &mat);
+  ///
+  virtual int AddFrame (int framenumber);
+  ///
+  virtual void AddFrameLink (int frameindex, const char* affector, int link);
+  ///
+  unsigned int GetHash() { return hash; }
 };
 
 class csMotionVectorBase:public csVector {
 public:
   csMotionVectorBase (int ilimit = 8, int ithreshold = 16) 
     : csVector(ilimit, ithreshold) {}
-	virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
-		{ int id1 = ((csMotion*)Item1)->GetHash(), id2 = ((csMotion*)Item2)->GetHash();
-		return id1 - id2; }
+  virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+    { int id1 = ((csMotion*)Item1)->GetHash(), id2 = ((csMotion*)Item2)->GetHash();
+      return id1 - id2; }
 
-	virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
-		{ int id1 = ((csMotion*)Item1)->GetHash(), id2 = (int)Key; return id1 - id2; }
+  virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
+    { int id1 = ((csMotion*)Item1)->GetHash(), id2 = (unsigned int)Key; return id1 - id2; }
 };
 
 DECLARE_TYPED_VECTOR_WITH_BASE(csMotionVector,csMotion,csMotionVectorBase); 
 
+struct csAppliedMotion {
+	iSkeletonBone* skel;
+	csMotion* curmotion;
+	cs_time curtime;
+	csMotionFrame* curframe;
+	csMotionFrame* nextframe;
+};
+
+DECLARE_TYPED_VECTOR(csAppliedMotionVector,csAppliedMotion); 
+
 ///
 class csMotionManager:public iMotionManager {
-	csMotionVector motions;
-
+  csMotionVector motions;
+	csAppliedMotionVector skels;
+	cs_time oldtime;
+	iSystem* iSys;
 public:
   DECLARE_IBASE;
 
-	///
-	csMotionManager(iBase *iParent);
-	///
-	virtual ~csMotionManager();
-
-	///
-	virtual bool Initialize (iSystem *iSys);
   ///
-  virtual iMotion* FindByName (const char* name);
+  csMotionManager(iBase *iParent);
+  ///
+  virtual ~csMotionManager();
+
+  ///
+  virtual bool Initialize (iSystem *iSys);
+  ///
+  virtual iMotion* FindByName (const char* name) {
+		return FindClassByName(name);  
+	}
   ///
   virtual iMotion* AddMotion (const char* name);
+	///
+	virtual bool ApplyMotion(iSkeletonBone *skel, const char* motion);
+	///
+	virtual void UpdateAll();
+
+  ///
+  csMotion* FindClassByName (const char* name);
+
+	void UpdateTransform(csAppliedMotion *am, iSkeletonBone *bone, int link, int link2);
+	bool UpdateBone(csAppliedMotion *am, iSkeletonBone *bone, unsigned int hash);
+	void UpdateAppliedBones(csAppliedMotion *am, iSkeletonBone *bone);
+	bool UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime);
 };
 
 #endif

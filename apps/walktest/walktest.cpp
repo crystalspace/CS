@@ -69,7 +69,7 @@
 #include "isndrdr.h"
 #include "iimage.h"
 #include "icollide.h"
-
+#include "imotion.h"
 #include "iperstat.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
@@ -302,6 +302,11 @@ void WalkTest::NextFrame ()
   else
     // The console has been turned on so we pause the stats plugin.
     if (perf_stats) perf_stats->Pause (true);
+
+	//Update the Motion Manager
+	if(System->MotionMan) {
+		System->MotionMan->UpdateAll();
+	}
 
   MoveSystems (elapsed_time, current_time);
   PrepareFrame (elapsed_time, current_time);

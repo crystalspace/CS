@@ -31,6 +31,8 @@ csSkeletonLimb::~csSkeletonLimb ()
     delete children;
     children = n;
   }
+	if(name)
+		free(name);
 }
 
 void csSkeletonLimb::AddVertex (int v)
@@ -62,6 +64,8 @@ void csSkeletonLimbState::AddChild (csSkeletonLimbState* child)
 
 void csSkeletonLimb::UpdateState (csSkeletonLimbState* limb)
 {
+	if(name)
+		limb->SetName(name);
   limb->vertices = vertices;
   limb->num_vertices = num_vertices;
   limb->tmpl = this;
@@ -111,6 +115,12 @@ void csSkeletonLimb::ComputeBoundingBox (csPoly3D* source)
   }
 }
 
+void csSkeletonLimb::SetName(const char *newname) {
+	if(name)
+		free(name);
+	name=strdup(newname);
+}
+
 csSkeletonLimbState* csSkeletonLimb::CreateState ()
 {
   csSkeletonLimbState* limb = new csSkeletonLimbState ();
@@ -138,6 +148,16 @@ csSkeletonLimbState* csSkeleton::CreateState ()
 IMPLEMENT_CSOBJTYPE (csSkeletonLimbState,csObject);
 IMPLEMENT_CSOBJTYPE (csSkeletonConnectionState,csSkeletonLimbState);
 IMPLEMENT_CSOBJTYPE (csSkeletonState,csSkeletonLimbState);
+
+IMPLEMENT_IBASE (csSkeletonLimbState)
+  IMPLEMENTS_INTERFACE (iBase)
+IMPLEMENT_IBASE_END
+
+csSkeletonLimbState::csSkeletonLimbState (): 
+  next (NULL), vertices (NULL), num_vertices (0), children (NULL)
+{ 
+	CONSTRUCT_IBASE(NULL);
+}
 
 csSkeletonLimbState::~csSkeletonLimbState ()
 {
@@ -195,11 +215,36 @@ void csSkeletonLimbState::ComputeBoundingBox (const csTransform& tr,
   }
 }
 
+IMPLEMENT_IBASE_EXT (csSkeletonConnectionState)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csSkeletonConnectionState::SkeletonBone)
+  IMPLEMENTS_INTERFACE (iSkeletonBone)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+csSkeletonConnectionState::csSkeletonConnectionState () {
+  CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
+}
+
+
 void csSkeletonConnectionState::ComputeBoundingBox (const csTransform& tr,
 	csBox3& box)
 {
   csTransform tr_new = tr * trans;
   csSkeletonLimbState::ComputeBoundingBox (tr_new, box);
+}
+
+IMPLEMENT_IBASE_EXT (csSkeletonState)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csSkeletonState::SkeletonBone)
+  IMPLEMENTS_INTERFACE (iSkeletonBone)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+csSkeletonState::csSkeletonState () {
+  CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
 }
 
 void csSkeletonState::ComputeBoundingBox (const csTransform& tr,

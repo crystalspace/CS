@@ -25,6 +25,7 @@
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
 #include "csengine/cssprite.h"
+#include "iskeleton.h"
 
 class csSkeletonLimbState;
 class csPoly3D;
@@ -52,13 +53,16 @@ private:
   /// Bounding box in object space for this limb.
   csBox3 box;
 
+	/// The name of this Limb
+	char* name;
+
 protected:
   /// Update state information.
   void UpdateState (csSkeletonLimbState* limb);
 
 public:
   /// Create an empty limb.
-  csSkeletonLimb () : next (NULL), vertices (NULL), num_vertices (0), children (NULL) { }
+  csSkeletonLimb () : next (NULL), vertices (NULL), num_vertices (0), children (NULL), name(NULL) { }
 
   /// Destructor.
   virtual ~csSkeletonLimb ();
@@ -93,6 +97,8 @@ public:
    * Compute the object space bounding box for this limb.
    */
   void ComputeBoundingBox (csPoly3D* source);
+
+	void SetName(const char* name);
 };
 
 /**
@@ -116,7 +122,7 @@ public:
   virtual ~csSkeletonConnection () { }
 
   /// Set the transformation.
-  void SetTransformation (csTransform& tr) { trans = tr; }
+  void SetTransformation (const csTransform& tr) { trans = tr; }
 
   /// Get the transformation.
   csTransform& GetTransformation () { return trans; }
@@ -145,7 +151,7 @@ public:
  * A limb in a skeletal system (state version, see csSkeletonState for
  * more information).
  */
-class csSkeletonLimbState : public csObject
+class csSkeletonLimbState : public csObject, public iBase
 {
   friend class csSkeletonLimb;
 
@@ -173,7 +179,7 @@ private:
 
 protected:
   /// Create an empty limb (protected constructor).
-  csSkeletonLimbState () : next (NULL), vertices (NULL), num_vertices (0), children (NULL) { }
+  csSkeletonLimbState ();
 
 public:
   /// Destructor.
@@ -198,6 +204,7 @@ public:
   csSkeletonLimbState* GetNext () { return next; }
 
   CSOBJTYPE;
+	DECLARE_IBASE;
 };
 
 /**
@@ -215,7 +222,7 @@ private:
 
 protected:
   /// Create an empty limb with an identity transformation (protected constructor).
-  csSkeletonConnectionState () { }
+  csSkeletonConnectionState ();
 
 public:
   /// Destructor.
@@ -228,12 +235,44 @@ public:
   virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box);
 
   /// Set the transformation.
-  void SetTransformation (csTransform& tr) { trans = tr; }
+  void SetTransformation (const csTransform& tr) { trans = tr; }
 
   /// Get the transformation.
   csTransform& GetTransformation () { return trans; }
 
   CSOBJTYPE;
+
+  DECLARE_IBASE_EXT (csSkeletonLimbState);
+
+  struct SkeletonBone : public iSkeletonBone
+  {
+    DECLARE_EMBEDDED_IBASE (csSkeletonConnectionState);
+
+    ///
+    virtual iSkeletonBone* GetNext () {
+      csSkeletonLimbState* ls=scfParent->GetNext();
+			if(!ls)
+				return NULL;
+			return QUERY_INTERFACE(ls, iSkeletonBone);
+    }
+    ///
+    virtual iSkeletonBone* GetChildren () {
+      csSkeletonLimbState* ls=scfParent->GetChildren();
+			if(!ls)
+				return NULL;
+			return QUERY_INTERFACE(ls, iSkeletonBone);
+    }
+    ///
+    virtual const char* GetName () {
+			return scfParent->GetName();
+		}
+    ///
+    void SetTransformation (const csTransform& tr) {
+			scfParent->SetTransformation(tr);
+		}
+
+  } scfiSkeletonBone;
+  friend struct SkeletonBone;
 };
 
 /**
@@ -254,7 +293,7 @@ protected:
    * The constructor is protected because it is csSkeleton which
    * creates instances of this class.
    */
-  csSkeletonState () { }
+  csSkeletonState ();
 
 public:
   /// Destructor.
@@ -264,6 +303,36 @@ public:
   virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box);
 
   CSOBJTYPE;
+
+  DECLARE_IBASE_EXT (csSkeletonLimbState);
+
+  struct SkeletonBone : public iSkeletonBone
+  {
+    DECLARE_EMBEDDED_IBASE (csSkeletonState);
+
+    ///
+    virtual iSkeletonBone* GetNext () {
+      csSkeletonLimbState* ls=scfParent->GetNext();
+			if(!ls)
+				return NULL;
+			return QUERY_INTERFACE(ls, iSkeletonBone);
+    }
+    ///
+    virtual iSkeletonBone* GetChildren () {
+      csSkeletonLimbState* ls=scfParent->GetChildren();
+			if(!ls)
+				return NULL;
+			return QUERY_INTERFACE(ls, iSkeletonBone);
+    }
+    ///
+    virtual const char* GetName () {
+			return scfParent->GetName();
+		}
+    ///
+    void SetTransformation (const csTransform&) {}
+
+  } scfiSkeletonBone;
+  friend struct SkeletonBone;
 };
 
 #endif /*SKELETON_H*/

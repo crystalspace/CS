@@ -19,7 +19,6 @@
 #ifndef __CS_QUATERNION_H__
 #define __CS_QUATERNION_H__
 
-#include <math.h>
 #include "csgeom/math3d.h"
 
 /**
@@ -29,13 +28,13 @@ class csQuaternion
 {
 public:
   /// Initialize a quaternion with specific values.
-  inline void Init (double theR, double theX, double theY, double theZ)
+  inline void Init (float theR, float theX, float theY, float theZ)
   { r = theR; x = theX; y = theY; z = theZ; } 
 
   /// Construct a 0,0,0,0 quaternion.
   csQuaternion () { Init(0, 0, 0, 0 ); }
   /// Construct a quaternion with the given parameters.
-  csQuaternion (double theR, double theX=0.0, double theY=0.0, double theZ=0.0)
+  csQuaternion (float theR, float theX=0.0, float theY=0.0, float theZ=0.0)
   { Init (theR, theX, theY, theZ ); }
   /// Copy constructor.
   csQuaternion (const csQuaternion& q) { Init (q.r, q.x, q.y, q.z); }
@@ -68,12 +67,15 @@ public:
   ///
   void Conjugate () { Init (r, -x, -y, -z); }
 
+	/// Negate all parameters of the quaternion
+	void Negate () { Init(-r, -x, -y, -z); }
+
   /**
    * Prepare a rotation quaternion, we do a rotation around vec by
    * an angle of "angle". Note that vec needs to be a normalized
    * vector ( we don't check this ).
    */
-  void PrepRotation (double angle, csVector3 vec)
+  void PrepRotation (float angle, csVector3 vec)
   { 
     double theSin = sin (angle/2);
     Init (cos (angle/2), vec.x*theSin, vec.y*theSin, vec.z*theSin);
@@ -93,17 +95,39 @@ public:
   void Normalize() {
     if(x*x + y*y + z*z > .999) {
       // Severe problems...
-      double len = x*x + y*y + z*z;
-      x /= len;
-      y /= len;
-      z /= len;
+      float inverselen = 1.0/(x*x + y*y + z*z);
+      x *= inverselen;
+      y *= inverselen;
+      z *= inverselen;
       r = 0.0;
     } else {
       r = sqrt(1.0 - x*x - y*y - z*z);
     }
   }
 
-  double r,x,y,z;
+  /**
+   * Convert a set of Euler angles to a Quaternion
+   * Takes a (X,Y,Z) rather than Yaw-Pitch-Roll (Y,X,Z)
+   * The output is NOT Normalized, if you wish to do so, normalize it yourself.
+   */
+  void SetWithEuler(const csVector3 &rot);
+
+  /**
+   * Return an Axis Angle representation of this Quaternion
+   */
+  csQuaternion ToAxisAngle() const;
+
+  /**
+	 * Spherical Linear Interpolation between two quaternions
+	 * Calculated between this class & the second quaternion by the slerp
+	 * factor and returned as a new quaternion
+   */
+	csQuaternion Slerp(const csQuaternion &quat2, float slerp) const; 
+
+//	csQuaternion Lerp(const csQuaternion& quat2, float ratio) const;
+
+  float r,x,y,z;
 };
+
 
 #endif // __CS_QUATERNION_H__

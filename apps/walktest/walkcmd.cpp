@@ -61,7 +61,7 @@
 #include "igraph3d.h"
 #include "igraph2d.h"
 #include "ivfs.h"
-
+#include "imotion.h"
 #include "iperstat.h"
 
 extern WalkTest* Sys;
@@ -559,6 +559,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Sprites:\n");
     CONPRI("  loadsprite addsprite delsprite listsprites\n");
     CONPRI("  listactions setaction\n");
+    CONPRI("  setmotion\n");
     CONPRI("Various:\n");
     CONPRI("  coordsave coordload bind capture map mapproj p_alpha s_fog\n");
     CONPRI("  snd_play snd_volume record play clrrec saverec\n");
@@ -1385,6 +1386,46 @@ bool CommandHandler (const char *cmd, const char *arg)
       {
         Sys->Printf (MSG_CONSOLE,
 		     "Expected parameters 'spritename,action'!\n");
+	Sys->Printf (MSG_CONSOLE,
+		 "That sprite does not exist, use the listsprites command.\n");
+      }
+    }
+  }
+  else if (!strcasecmp (cmd, "setmotion"))
+  {
+    char name[100];
+    char motion[100];
+    int cnt = 0;
+    if (arg) cnt = ScanStr (arg, "%s,%s", name, motion);
+    if(cnt != 2)
+    {
+      Sys->Printf (MSG_CONSOLE, "Expected parameters 'spritename,motion'!\n");
+      Sys->Printf (MSG_CONSOLE, "To get the names use 'listsprites'\n");
+    }
+    else
+    {
+      // Test to see if the sprite exists.
+      csSprite3D* aspr = (csSprite3D *) Sys->world->sprites.FindByName(name);
+      
+      if(aspr)
+      {
+				iSkeletonBone *sb=QUERY_INTERFACE(aspr->GetSkeletonState(), iSkeletonBone);
+				if(sb) {
+					if(System->MotionMan) {
+						if(!System->MotionMan->ApplyMotion(sb, motion)) {
+							Sys->Printf (MSG_CONSOLE, "That motion does not exist!\n");
+						}
+					} else {
+						Sys->Printf (MSG_CONSOLE, "No motion manager exists to animate the skeleton!\n");
+					}
+				} else {
+					Sys->Printf (MSG_CONSOLE, "That sprite does not contain a skeleton!\n");
+				}
+      }
+      else
+      {
+        Sys->Printf (MSG_CONSOLE,
+		     "Expected parameters 'spritename,motion'!\n");
 	Sys->Printf (MSG_CONSOLE,
 		 "That sprite does not exist, use the listsprites command.\n");
       }
