@@ -355,9 +355,9 @@ void csPolyTexture::InitLightmaps ()
 }
 
 /*
- *  Added by Denis Dmitriev for correct lightmaps shining. This code above draws perfectly (like perfect
- *  texture mapping -- I mean most correctly) anti-aliased polygon on lightmap and adjusts it according
- *  to the actual polygon shape on the texture
+ * Added by Denis Dmitriev for correct lightmaps shining. This code above draws perfectly (like perfect
+ * texture mapping -- I mean most correctly) anti-aliased polygon on lightmap and adjusts it according
+ * to the actual polygon shape on the texture
  */
 #define EPS   0.0001
 
@@ -380,7 +380,8 @@ float calc_area (int n, csVector2 *p)
 }
 
 static int __texture_width;
-static unsigned char *__texture;
+static float *__texture;
+static unsigned char *__mark;
 
 struct __rect
 {
@@ -390,6 +391,8 @@ struct __rect
 
 static void (*__draw_func)(int, int, float);
 
+FILE *fo;
+
 static void lixel_intensity (int x, int y, float density)
 {
   int addr=x+y*__texture_width;
@@ -397,7 +400,7 @@ static void lixel_intensity (int x, int y, float density)
   if (density>=1.0)
     density=1.0;
 
-  __texture[addr] = 255*density;
+  __texture[addr] = density;
 }
 
 static void correct_results (int x, int y, float density)
@@ -407,9 +410,12 @@ static void correct_results (int x, int y, float density)
 
   int addr=x+y*__texture_width;
   float res=__texture[addr]/density;
-  if (res>255)
-    res=255;
+
+  if (res>1)
+    res=1;
+
   __texture[addr]=res;
+  __mark[addr]=1;
 }
 
 /* I was interested in these values */
@@ -438,6 +444,7 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
     for (int i=0 ; i<height ; i++)
       for (int j=0 ; j<width ; j++)
 	__draw_func (j+x, i+y, 1);
+
     depth--;
     return;
   }
@@ -546,11 +553,11 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
       else
       {
 	float x=(p2d[prev].x*(p2d[i].y-sub_y)+p2d[i].x*(sub_y-p2d[prev].y))/(p2d[i].y-p2d[prev].y);
-        csVector2 p(x,sub_y);
+	csVector2 p(x, sub_y);
 
 	p2[0][n2[0]++]=p2[1][n2[1]++]=p;
 
-	if(i)
+	if (i)
 	  p2[now_we_are][n2[now_we_are]++]=p2d[i];
       }
 
@@ -718,31 +725,63 @@ void csPolyTexture::ShineLightmaps (csLightView& lview)
   float b200d = lview.b * NORMAL_LIGHT_LEVEL / light->GetRadius ();
 
   __texture_width=lw;
-  __texture=(unsigned char*)calloc(lh,lw);
+  __texture=(float*)calloc(lh*lw,sizeof(float));
+  __mark=(unsigned char*)calloc(lh,lw);
 
   __rect vis={0,lw,0,lh};
+
+  //fo=fopen("light.txt","at");
 
   __draw_func=lixel_intensity;
   poly_fill(lview.num_frustrum,f_uv,vis);
   __draw_func=correct_results;
   poly_fill(rpv,rp,vis);
-  
+
   uv=0;
   for (int __uv,sy=0;sy<lh;sy++)
   {
     for (u=0;u<lw;u++,uv++)
     {
-       __uv=uv;
+        float usual_value=1.0;
 
-        if (!__texture[__uv])
+//      __uv=uv;
+        float lightintensity=__texture[uv];
+
+        if(!lightintensity)
         {
-          if (sy==lh-1) __uv-=lw;
-          if (u==lw-1) __uv--;
+          usual_value=0.0;
 
-          if (!__texture[__uv]) continue;
+          if(u&&__mark[uv-1])
+          {
+            lightintensity+=__texture[uv-1];
+            usual_value++;
+          }
+
+          if(sy&&__mark[uv-lw])
+          {
+            lightintensity+=__texture[uv-lw];
+            usual_value++;
+          }
+
+          if((u!=lw-1)&&__mark[uv+1])
+          {
+            lightintensity+=__texture[uv+1];
+            usual_value++;
+          }
+
+          if((sy!=lh-1)&&__mark[uv+lw])
+          {
+            lightintensity+=__texture[uv+lw];
+            usual_value++;
+          }
+
+          if(!lightintensity)
+            continue;
         }
 
-        float lightness=__texture[__uv]/255.0;
+        float lightness=lightintensity/usual_value;
+//      if(lightness>1||lightness<0)
+//        fprintf(fo,"(%d, %d) -> lightness=%.2f/%.2f=%.2f\n",u,sy,lightintensity,usual_value,lightness);
 
         ru = u  << mipmap_shift;
         rv = sy << mipmap_shift;
@@ -843,9 +882,13 @@ void csPolyTexture::ShineLightmaps (csLightView& lview)
     }
   }
 
-  CHKB (delete [] f_uv);
-  free (__texture);
-  CHKB (delete [] rp);
+  if (f_uv) CHKB (delete [] f_uv);
+  CHKB(delete[] rp);
+
+  free(__texture);
+  free(__mark);
+
+  //fclose(fo);
 
   if (dyn && first_time)
   {
