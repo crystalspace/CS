@@ -85,8 +85,9 @@ public:
   ~SoftwareCachedTexture ()
   {
 	// BUG: Following code line causes an error upon exit
-	//      in "appptlab", when run in Windows. If line is
-	//      removed it causes lock-ups in "appwalktest"
+	//      in combination with procedural textures, when
+	//      run in Windows. If line is removed it causes
+	//	lock-ups in "appwalktest".
     source->SetCacheData (mipmap, NULL);
 
     delete [] data;
