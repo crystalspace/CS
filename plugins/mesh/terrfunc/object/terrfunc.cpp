@@ -131,12 +131,18 @@ struct terrdata {
 };
 
 /// get triangles
-static void TerrTri(void *userdata, const csVector3& t1, 
-  const csVector3& t2, const csVector3& t3)
+static void TerrTri(void *userdata, const csVector3& zt1, 
+  const csVector3& zt2, const csVector3& zt3)
 {
   struct terrdata *dat = (struct terrdata*)userdata;
   /// get indices for triangle
   int trinum = dat->vertices.Length();
+  csVector3 t1 = zt1;
+  csVector3 t2 = zt2;
+  csVector3 t3 = zt3;
+  t1.y = dat->terr->quad_height->GetHeight(t1.x, t1.z);
+  t2.y = dat->terr->quad_height->GetHeight(t2.x, t2.z);
+  t3.y = dat->terr->quad_height->GetHeight(t3.x, t3.z);
   dat->vertices.Push(t1);
   dat->vertices.Push(t2);
   dat->vertices.Push(t3);
@@ -146,27 +152,27 @@ static void TerrTri(void *userdata, const csVector3& t1,
   tri.c = trinum+2;
   dat->triangles.Push( tri );
 
-  float boxxsize = dat->block->bbox.MaxX() - dat->block->bbox.MinX();
-  float boxysize = dat->block->bbox.MaxZ() - dat->block->bbox.MinZ();
   float minx = dat->block->bbox.MinX();
   float miny = dat->block->bbox.MinZ();
+  float boxxsize = dat->block->bbox.MaxX() - minx;
+  float boxysize = dat->block->bbox.MaxZ() - miny;
 
   /// hack for light!
   /// need to precompute a light-map texture
   csColor res1 = dat->terr->base_color;
   csColor res2 = dat->terr->base_color;
   csColor res3 = dat->terr->base_color;
-  if(dat->terr->do_dirlight && dat->terr->normal_func)
+  if(dat->terr->do_dirlight && dat->terr->quad_normal)
   {
     float l;
-    l = dat->terr->dirlight * dat->terr->normal_func->GetNormal
-      ((t1.x-minx)/boxxsize, (t1.z-miny)/boxysize);
+    l = dat->terr->dirlight * dat->terr->quad_normal->GetNormal(t1.x,t1.z);
+    l=1;
     if(l>0) res1 += dat->terr->dirlight_color * l;
-    l = dat->terr->dirlight * dat->terr->normal_func->GetNormal
-      ((t2.x-minx)/boxxsize, (t2.z-miny)/boxysize);
+    l = dat->terr->dirlight * dat->terr->quad_normal->GetNormal(t2.x,t2.z);
+    l=1;
     if(l>0) res2 += dat->terr->dirlight_color * l;
-    l = dat->terr->dirlight * dat->terr->normal_func->GetNormal
-      ((t3.x-minx)/boxxsize, (t3.z-miny)/boxysize);
+    l = dat->terr->dirlight * dat->terr->quad_normal->GetNormal(t3.x,t3.z);
+    l=1;
     if(l>0) res3 += dat->terr->dirlight_color * l;
   }
   dat->colors.Push(res1);
@@ -175,20 +181,17 @@ static void TerrTri(void *userdata, const csVector3& t1,
 
   // obtain texture coords
   csVector2 uv(t1.x - minx, t1.z - miny);
-  uv.x /= boxxsize;
-  uv.y /= boxysize;
+  uv.x /= boxxsize; uv.y /= boxysize;
   uv.x = uv.x * dat->correct_du + dat->correct_su;
   uv.y = uv.y * dat->correct_dv + dat->correct_sv;
   dat->texels.Push( uv );
   uv.Set(t2.x - minx, t2.z - miny);
-  uv.x /= dat->block->bbox.MaxX() - dat->block->bbox.MinX();
-  uv.y /= dat->block->bbox.MaxZ() - dat->block->bbox.MinZ();
+  uv.x /= boxxsize; uv.y /= boxysize;
   uv.x = uv.x * dat->correct_du + dat->correct_su;
   uv.y = uv.y * dat->correct_dv + dat->correct_sv;
   dat->texels.Push( uv );
   uv.Set(t3.x - minx, t3.z - miny);
-  uv.x /= dat->block->bbox.MaxX() - dat->block->bbox.MinX();
-  uv.y /= dat->block->bbox.MaxZ() - dat->block->bbox.MinZ();
+  uv.x /= boxxsize; uv.y /= boxysize;
   uv.x = uv.x * dat->correct_du + dat->correct_su;
   uv.y = uv.y * dat->correct_dv + dat->correct_sv;
   dat->texels.Push( uv );
@@ -272,6 +275,8 @@ struct QuadDivHeightFunc : public iTerrainHeightFunction
   {
     float localx = x * scx + offx;
     float localy = y * scy + offy;
+    localx -= floor(localx);
+    localy -= floor(localy);
     float res = hf->GetHeight(localx, localy);
     res = res*sch + offh;
     //printf("QDHF %g, %g -> (%g,%g) to %g\n", x, y, localx, localy, res);
@@ -283,6 +288,57 @@ SCF_IMPLEMENT_IBASE (QuadDivHeightFunc)
   SCF_IMPLEMENTS_INTERFACE (iTerrainHeightFunction)
 SCF_IMPLEMENT_IBASE_END
 
+//---- divisor normal function --------------------------
+struct QuadDivNormalFunc : public iTerrainNormalFunction
+{
+  /// Normal func to wrap
+  iTerrainNormalFunction *nf;
+  /// Height func to wrap (and approx a normal)
+  iTerrainHeightFunction *hf;
+  /// scale and offset in world
+  float scx, scy, offx, offy;
+  /// inverse tox
+  float inv_totx, inv_toty;
+
+  SCF_DECLARE_IBASE;
+  QuadDivNormalFunc () { SCF_CONSTRUCT_IBASE (NULL); nf=NULL; hf=NULL;}
+  virtual ~QuadDivNormalFunc () {}
+  /// get Normal using world space in world space answers
+  virtual csVector3 GetNormal (float x, float y)
+  {
+    float dx = x * scx + offx;
+    float dy = y * scy + offy;
+    if(nf)
+    {
+      return nf->GetNormal(dx, dy);
+    }
+
+    CS_ASSERT(hf);
+    csVector3 n(0,0,0);
+    csVector3 v[8];
+    v[0].Set(-.1, hf->GetHeight (dx-inv_totx, dy-inv_toty), -.1);
+    v[1].Set(  0, hf->GetHeight (dx, dy-inv_toty), -.1);
+    v[2].Set( .1, hf->GetHeight (dx+inv_totx, dy-inv_toty), -.1);
+    v[3].Set( .1, hf->GetHeight (dx+inv_totx, dy), 0);
+    v[4].Set( .1, hf->GetHeight (dx+inv_totx, dy+inv_toty),  .1);
+    v[5].Set(  0, hf->GetHeight (dx, dy+inv_toty),  .1);
+    v[6].Set(-.1, hf->GetHeight (dx-inv_totx, dy+inv_toty),  .1);
+    v[7].Set(-.1, hf->GetHeight (dx-inv_totx, dy), 0);
+    int j1, j;
+    j1 = 7;
+    for(j = 0; j < 8; j++)
+    {
+      n += (v[j1] % v[j]).Unit ();
+      j1 = j;
+    }
+    n.Normalize();
+    return n;
+  }
+};
+
+SCF_IMPLEMENT_IBASE (QuadDivNormalFunc)
+  SCF_IMPLEMENTS_INTERFACE (iTerrainNormalFunction)
+SCF_IMPLEMENT_IBASE_END
 
 //------------------------------------------------------------------------
 
@@ -410,6 +466,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   vbufmgr = NULL;
   quaddiv_enabled = false;
   quad_height = NULL;
+  quad_normal = NULL;
 }
 
 csTerrFuncObject::~csTerrFuncObject ()
@@ -1609,6 +1666,31 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	    qdhf->offh = topleft.y;
 	    qdhf->sch = scale.y;
 	    quad_height = qdhf;
+	  }
+	  if(!quad_normal)
+	  {
+	    QuadDivNormalFunc *qdnf = new QuadDivNormalFunc();
+	    if(normal_func) 
+	    {
+	      qdnf->nf = normal_func;
+	      qdnf->scx = 1.0 / (scale.x * float (blockxy));
+	      qdnf->scy = 1.0 / (scale.z * float (blockxy));
+	      qdnf->offx = -topleft.x * qdnf->scx;
+	      qdnf->offy = -topleft.z * qdnf->scy;
+	      qdnf->inv_totx = 0.0;
+	      qdnf->inv_toty = 0.0;
+	    }
+	    else 
+	    {
+	      qdnf->hf = quad_height;
+	      qdnf->scx = 1.;
+	      qdnf->scy = 1.;
+	      qdnf->offx = 0.;
+	      qdnf->offy = 0.;
+              qdnf->inv_totx = .5 / float (1+blockxy*gridx);
+              qdnf->inv_toty = .5 / float (1+blockxy*gridy);
+	    }
+	    quad_normal = qdnf;
 	  }
 	  block.PrepareQuadDiv(quad_height);
 	  block.PrepareFrame( origin );

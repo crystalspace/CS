@@ -107,6 +107,8 @@ public:
   bool quaddiv_enabled;
   /// quad height function wrapper
   iTerrainHeightFunction *quad_height;
+  /// quad normal function wrapper
+  iTerrainNormalFunction *quad_normal;
 
 //private: //@@@
 public:

@@ -181,12 +181,13 @@ void csTerrainQuadDiv::Triangulate(void (*cb)(void *, const csVector3&,
       midx, midy, maxx, maxy);
     return;
   }
-  /// create a polygon at medio height
-  float h = (min_height + max_height)*0.5;
+  /// debug, create a polygon at medio height
+  /// float h = (min_height + max_height)*0.5;
+  float h=0.0;
   cb(userdata, 
     csVector3(minx,h,miny), csVector3(minx,h,maxy), csVector3(maxx,h,miny));
   cb(userdata, 
-    csVector3(maxx,h,miny), csVector3(minx,h,maxy), csVector3(maxx,h,maxy));
+   csVector3(maxx,h,miny), csVector3(minx,h,maxy), csVector3(maxx,h,maxy));
 }
 
 
