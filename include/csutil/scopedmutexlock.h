@@ -28,19 +28,19 @@
  * in each case.
  * Example:
  *   void Myfunc() {
- *      csScopedMutex (mymutex);
+ *      csScopedMutexLock lock(mymutex);
  *      do something special
  *
  *      return;
  *  }
  */
-class csScopedMutex
+class csScopedMutexLock
 {
 public:
-  csScopedMutex (csMutex* newmutex)
+  csScopedMutexLock (csMutex* newmutex)
     : mutex(newmutex)
   { mutex->LockWait (); }
-  ~csScopedMutex ()
+  ~csScopedMutexLock ()
   { mutex->Release (); }
 
   csMutex* mutex;
