@@ -8,4 +8,4 @@
 #include "csphyzik/articula.h"
 #include "csphyzik/linklist.h"
 #include "csphyzik/ik.h"
-
+#include "csphyzik/contact.h"
