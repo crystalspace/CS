@@ -78,9 +78,9 @@ private:
   // Window colormap
   Colormap cmap;
 
-#ifdef DO_SHM
   // Use SHM or not?
   bool do_shm;
+#ifdef DO_SHM
   XShmSegmentInfo shmi;
   XImage shm_image;
 #endif
