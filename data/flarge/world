@@ -394,7 +394,7 @@
         </params>
 	    <hardmove>
                 <matrix>
-                    <scale x=".3" y=".3" z=".3" />
+                    <scale x="3" y="3" z="3" />
                 </matrix>
 	    </hardmove>
     </meshfact>

@@ -110,3 +110,13 @@ The following methods were removed:
 
 The procedural texture system has been rewritten. See the documentation for
 @code{iGraphics3D::SetRenderTarget()} for details.
+
+@subheading Hardmove Change
+@cindex @samp{Hardmove}
+
+The interpretation of the matrix used in the @samp{hardmove} tag
+for mesh factories (@samp{meshfact}) has been inverted so it is more
+logical and also corresponds with the wah @samp{hardmove} is interpreted
+for mesh objects (@samp{meshobj}).
+
+

@@ -1450,7 +1450,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	    csMatrix3 m;
 	    if (!SyntaxService->ParseMatrix (matrix_node, m))
 	      return false;
-            tr.SetO2T (m);
+            tr.SetT2O (m);
 	  }
 	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
 	  if (vector_node)
@@ -1732,7 +1732,7 @@ bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
 	  csMatrix3 m;
 	  if (!SyntaxService->ParseMatrix (matrix_node, m))
 	    return false;
-          tr.SetO2T (m);
+          tr.SetT2O (m);
 	}
 	csRef<iDocumentNode> vector_node = child->GetNode ("v");
 	if (vector_node)

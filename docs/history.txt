@@ -1,6 +1,15 @@
 The history order is reversed so that new features are at the top.
 
 10-Dec-2002
+	- Fixed a bug I introduced yesterday in parsing of HardMove.
+	  The transform was inverted.
+	- Apparently the meaning of HARDMOVE was inverted for factories.
+	  I changed HARDMOVE for factories so that the matrix is inverted.
+	  This means that if you have a <meshfact> you now have to invert
+	  your matrices. For example, a matrix that scales .5 will now
+	  have to be a matrix that multiplies with 2. That way it is more
+	  consistent with HARDMOVE for <meshobj> but also it is more
+	  correct.
 	- Keith Fulton added direct application access to running sequences
 	  and triggering triggers defined in the world file.  Also added
 	  lightning effect to "large" room in flarge, activated with ctrl-L
