@@ -74,10 +74,7 @@ csPortal::~csPortal ()
 iReferencedObject *csPortal::GetReferencedObject () const
 {
   if (!sector) return NULL;
-
-  csRef<iReferencedObject> refobj (SCF_QUERY_INTERFACE (
-      sector, iReferencedObject));
-  return refobj;	// DecRef is ok here.
+  return &(sector->GetPrivateObject ()->scfiReferencedObject);
 }
 
 void csPortal::SetReferencedObject (iReferencedObject *b)

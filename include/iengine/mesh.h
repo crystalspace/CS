@@ -50,6 +50,7 @@ struct iMeshFactoryWrapper;
 struct iRenderView;
 struct iMovable;
 struct iLight;
+struct iLightingInfo;
 struct iObject;
 class csFlags;
 
@@ -122,7 +123,7 @@ struct iMeshDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 2, 0);
+SCF_VERSION (iMeshWrapper, 0, 3, 0);
 
 /**
  * A mesh wrapper is an engine-level object that wraps around an actual
@@ -147,6 +148,13 @@ struct iMeshWrapper : public iBase
   virtual iMeshObject* GetMeshObject () const = 0;
   /// Set the iMeshObject.
   virtual void SetMeshObject (iMeshObject*) = 0;
+
+  /**
+   * Get the optional lighting information that is implemented
+   * by this mesh object. If the mesh object doesn't implement it
+   * then this will return NULL.
+   */
+  virtual iLightingInfo* GetLightingInfo () const = 0;
 
   /// Get the parent factory.
   virtual iMeshFactoryWrapper *GetFactory () const = 0;

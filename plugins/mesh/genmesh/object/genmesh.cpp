@@ -108,6 +108,9 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   current_features = 0;
   do_shadows = true;
   do_shadow_rec = false;
+
+  dynamic_ambient.Set (0,0,0);
+  ambient_version = 0;
 }
 
 csGenmeshMeshObject::~csGenmeshMeshObject ()

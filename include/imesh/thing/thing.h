@@ -69,7 +69,7 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 1, 1);
+SCF_VERSION (iThingState, 0, 2, 0);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -272,11 +272,6 @@ struct iThingState : public iBase
   /// Return the fog structure (even if fog is disabled).
   virtual csFog* GetFog () const = 0;
 #endif // CS_USE_NEW_RENDERER
-
-  /// Sets dynamic ambient light for this thing
-  virtual void SetDynamicAmbientLight(const csColor& color) = 0;
-  /// Get dynamic ambient light version to test if needs to be recalculated
-  virtual int GetDynamicAmbientVersion() const = 0;
 
   /**
    * Intersect a segment with this thing and return the first

@@ -309,7 +309,7 @@ private:
    * Version number of ambient light color determines whether recalc
    * is necessary in poly.
    */
-  int ambient_version;
+  uint32 ambient_version;
 
   /**
    * Vector with visibility objects. Only useful if this thing has a
@@ -1070,7 +1070,7 @@ public:
   }
 
   /// Get dynamic ambient light version to test if needs to be recalculated
-  int GetDynamicAmbientVersion()
+  uint32 GetDynamicAmbientVersion()
   {   return ambient_version; }
 
 
@@ -1185,16 +1185,6 @@ public:
     { return &scfParent->GetFog (); }
 #endif // CS_USE_NEW_RENDERER
 
-    /// Sets dynamic ambient light for this thing
-    virtual void SetDynamicAmbientLight (const csColor& color)
-    { scfParent->SetDynamicAmbientLight (color); }
-    /// Returns the dynamic ambient light color
-    virtual const csColor& GetDynamicAmbientLight ()
-    { return scfParent->GetDynamicAmbientLight (); }
-    /// Get dynamic ambient light version to test if needs to be recalculated
-    virtual int GetDynamicAmbientVersion () const
-    { return scfParent->GetDynamicAmbientVersion (); }
-
     virtual iPolygon3D* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = NULL, bool only_portals = false);
@@ -1242,6 +1232,12 @@ public:
     {
       scfParent->PrepareLighting ();
     }
+    virtual void SetDynamicAmbientLight (const csColor& color)
+    { scfParent->SetDynamicAmbientLight (color); }
+    virtual const csColor& GetDynamicAmbientLight ()
+    { return scfParent->GetDynamicAmbientLight (); }
+    virtual uint32 GetDynamicAmbientVersion () const
+    { return scfParent->GetDynamicAmbientVersion (); }
   } scfiLightingInfo;
   friend struct LightingInfo;
 

@@ -1338,8 +1338,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
-      csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (
-        s->GetMeshObject (), iLightingInfo));
+      iLightingInfo* linfo = s->GetLightingInfo ();
       if (linfo)
       {
         if (do_relight)
@@ -1418,8 +1417,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
-      csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (
-          s->GetMeshObject (), iLightingInfo));
+      iLightingInfo* linfo = s->GetLightingInfo ();
       if (linfo)
       {
         if (do_relight) linfo->WriteToCache (cm);
@@ -2171,7 +2169,7 @@ void csEngine::GetNearbyObjectList (iSector* sector,
   {
     iVisibilityObject* vo = visit->GetObject ();
     visit->Next ();
-    csRef<iMeshWrapper> imw (SCF_QUERY_INTERFACE (vo, iMeshWrapper));
+    iMeshWrapper* imw = vo->GetMeshWrapper ();
     if (imw)
     {
       AddObject (list, num_objects, max_objects, imw->QueryObject ());

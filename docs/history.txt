@@ -1,5 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+2-Dec-2002
+	- Moved the dynamic ambient functions from iThingState to
+	  iLightingInfo. That means dynamic ambient can now also be used
+	  by other objects (i.e. like genmesh). Genmesh already implements
+	  the interface but doesn't use it.
+	- Optimization so that the iLightingInfo interface is remembered
+	  with a mesh. That makes the loop to change dynamic ambient
+	  in a sector considerably faster. There is now a new method:
+	  iMeshWrapper->GetLightingInfo().
+	- Optimization in dynamic lighting so that a query interface
+	  call is avoided for every polygon that is hit by a dynamic light.
+	- Optimization in polygon->GetParent(). This call was also doing
+	  a query interface for nothing.
+	- Optimization in csPortal->GetReferencedObject(). Removed unneeded
+	  query interface.
+	- Extended iVisibilityObject with GetMeshWrapper() function. This
+	  avoids a lot of extra query interface calls in the engine and
+	  visibility cullers.
 1-Dec-2002
 	- Fixed initialization plugin in the explosion mesh object. This
 	  could cause crashes in some cases.

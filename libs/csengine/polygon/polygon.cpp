@@ -682,9 +682,7 @@ iPolyTexType *csPolygon3D::eiPolygon3D::GetPolyTexType ()
 
 iThingState *csPolygon3D::eiPolygon3D::GetParent ()
 {
-  csRef<iThingState> it (SCF_QUERY_INTERFACE (
-      scfParent->GetParent (), iThingState));
-  return it;	// DecRef is ok here.
+  return &(scfParent->GetParent ()->scfiThingState);
 }
 
 void csPolygon3D::eiPolygon3D::CreatePlane (

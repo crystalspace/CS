@@ -293,7 +293,7 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
 		  visobj->GetObjectModel ());
   visobj_wrap->shape_number = visobj_wrap->model->GetShapeNumber ();
 
-  csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (visobj, iMeshWrapper));
+  iMeshWrapper* mesh = visobj->GetMeshWrapper ();
   visobj_wrap->mesh = mesh;
   if (mesh)
   {

@@ -450,7 +450,8 @@ void csPolygon2D::DrawFilled (
           bool reset = true;
           while (lp)
           {
-            csRef<iLight> il (SCF_QUERY_INTERFACE (lp->GetLight (), iLight));
+	    csDynLight* dl = lp->GetLight ();
+	    iLight* il = &(dl->scfiLight);
             unsplit->UpdateVertexLighting (
                 il,
                 lp->GetLight ()->GetColor (),

@@ -54,7 +54,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMeshWrapper::csMeshWrapper (
   iMeshWrapper *theParent,
-  iMeshObject *mesh) :
+  iMeshObject *meshobj) :
     csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
@@ -73,7 +73,9 @@ csMeshWrapper::csMeshWrapper (
   if (Parent) movable.SetParent (Parent->GetMovable ());
 
   csEngine::current_engine->AddToCurrentRegion (this);
-  csMeshWrapper::mesh = mesh;
+  csMeshWrapper::meshobj = meshobj;
+  if (meshobj)
+    light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
@@ -103,16 +105,19 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   if (Parent) movable.SetParent (Parent->GetMovable ());
 
   csEngine::current_engine->AddToCurrentRegion (this);
-  csMeshWrapper::mesh = 0;
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
   children.SetMesh (this);
 }
 
-void csMeshWrapper::SetMeshObject (iMeshObject *mesh)
+void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 {
-  csMeshWrapper::mesh = mesh;
+  csMeshWrapper::meshobj = meshobj;
+  if (meshobj)
+    light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
+  else
+    light_info = NULL;
 }
 
 csMeshWrapper::~csMeshWrapper ()
@@ -123,8 +128,7 @@ csMeshWrapper::~csMeshWrapper ()
     iMeshDrawCallback* cb = (iMeshDrawCallback*)draw_cb_vector.Get (i);
     cb->DecRef ();
   }
-  if (imposter_mesh)
-      delete imposter_mesh;
+  delete imposter_mesh;
 }
 
 void csMeshWrapper::UpdateMove ()
@@ -267,7 +271,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
     i--;
   }
 
-  if (mesh->DrawTest (rview, &movable.scfiMovable))
+  if (meshobj->DrawTest (rview, &movable.scfiMovable))
   {
     if (rview->GetCallback ())
     {
@@ -280,13 +284,13 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
       {
         if (lt != last_anim_time)
         {
-          mesh->NextFrame (lt,movable.GetPosition ());
+          meshobj->NextFrame (lt,movable.GetPosition ());
           last_anim_time = lt;
         }
       }
 
       UpdateDeferedLighting (movable.GetFullPosition ());
-      mesh->Draw (rview, &movable.scfiMovable, zbufMode);
+      meshobj->Draw (rview, &movable.scfiMovable, zbufMode);
     }
   }
 
@@ -310,7 +314,8 @@ bool csMeshWrapper::DrawImposter (iRenderView *rview)
       return false;
 
   // Check for too much camera movement since last imposter render
-  if (!imposter_mesh->CheckIncidenceAngle(rview, imposter_rotation_tolerance->Get () ))
+  if (!imposter_mesh->CheckIncidenceAngle (rview,
+  	imposter_rotation_tolerance->Get () ))
       return false;
 
   // Else draw imposter as-is.
@@ -323,7 +328,7 @@ void csMeshWrapper::SetImposterActive(bool flag,iObjectRegistry *objreg)
   imposter_active = flag;
   if (flag)
   {
-    imposter_mesh = new csImposterMesh (this,objreg);
+    imposter_mesh = new csImposterMesh (this, objreg);
     imposter_mesh->SetImposterReady (false);
   }
 }
@@ -333,7 +338,7 @@ void csMeshWrapper::UpdateLighting (iLight **lights, int num_lights)
   defered_num_lights = 0;
 
   //if (num_lights <= 0) return;
-  mesh->UpdateLighting (lights, num_lights, &movable.scfiMovable);
+  meshobj->UpdateLighting (lights, num_lights, &movable.scfiMovable);
 
   int i;
   for (i = 0; i < children.Length (); i++)
@@ -349,7 +354,7 @@ void csMeshWrapper::PlaceMesh ()
   if (movable_sectors->GetCount () == 0) return ; // Do nothing
   csSphere sphere;
   csVector3 radius;
-  mesh->GetObjectModel ()->GetRadius (radius, sphere.GetCenter ());
+  meshobj->GetObjectModel ()->GetRadius (radius, sphere.GetCenter ());
 
   iSector *sector = movable_sectors->Get (0);
   movable.SetSector (sector);       // Make sure all other sectors are removed
@@ -365,9 +370,7 @@ void csMeshWrapper::PlaceMesh ()
   float max_sq_radius = max_radius * max_radius;
 
   // @@@ This function only goes one level deep in portals. Should be fixed!
-
   // @@@ It would be nice if we could find a more optimal portal representation
-
   // for large sectors.
   int i, j;
   iMeshList *ml = sector->GetMeshes ();
@@ -420,7 +423,7 @@ int csMeshWrapper::HitBeamBBox (
   float *pr)
 {
   csBox3 b;
-  mesh->GetObjectModel ()->GetObjectBoundingBox (b, CS_BBOX_MAX);
+  meshobj->GetObjectModel ()->GetObjectBoundingBox (b, CS_BBOX_MAX);
 
   csSegment3 seg (start, end);
   return csIntersect3::BoxSegment (b, seg, isect, pr);
@@ -432,7 +435,7 @@ bool csMeshWrapper::HitBeamOutline (
   csVector3 &isect,
   float *pr)
 {
-  return mesh->HitBeamOutline (start, end, isect, pr);
+  return meshobj->HitBeamOutline (start, end, isect, pr);
 }
 
 bool csMeshWrapper::HitBeamObject (
@@ -441,7 +444,7 @@ bool csMeshWrapper::HitBeamObject (
   csVector3 &isect,
   float *pr)
 {
-  return mesh->HitBeamObject (start, end, isect, pr);
+  return meshobj->HitBeamObject (start, end, isect, pr);
 }
 
 bool csMeshWrapper::HitBeam (
@@ -465,7 +468,7 @@ bool csMeshWrapper::HitBeam (
 
 void csMeshWrapper::HardTransform (const csReversibleTransform &t)
 {
-  mesh->HardTransform (t);
+  meshobj->HardTransform (t);
 
   int i;
   for (i = 0; i < children.Length (); i++)
@@ -482,7 +485,7 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
     wor_bbox_movablenr = movable.GetUpdateNumber ();
 
     csBox3 obj_bbox;
-    mesh->GetObjectModel ()->GetObjectBoundingBox (obj_bbox, CS_BBOX_MAX);
+    meshobj->GetObjectModel ()->GetObjectBoundingBox (obj_bbox, CS_BBOX_MAX);
 
     // @@@ Maybe it would be better to really calculate the bounding box
 
@@ -503,7 +506,7 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
 
 void csMeshWrapper::GetRadius (csVector3 &rad, csVector3 &cent) const
 {
-  mesh->GetObjectModel ()->GetRadius (rad, cent);
+  meshobj->GetObjectModel ()->GetRadius (rad, cent);
   if (children.Length () > 0)
   {
     float max_radius = rad.x;
@@ -539,7 +542,7 @@ void csMeshWrapper::GetTransformedBoundingBox (
   csBox3 &cbox)
 {
   csBox3 box;
-  mesh->GetObjectModel ()->GetObjectBoundingBox (box);
+  meshobj->GetObjectModel ()->GetObjectBoundingBox (box);
   cbox.StartBoundingBox (trans * box.GetCorner (0));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (2));

@@ -44,6 +44,24 @@ class csColor;
 class G3DFogInfo;
 
 /**
+ * An array giving shadow information for a pseudo-dynamic light.
+ */
+class csShadowArray
+{
+public:
+  iLight* light;
+  csShadowArray* next;
+  // For every vertex of the mesh a value.
+  uint8* shadowmap;
+
+  csShadowArray () : shadowmap (NULL) { }
+  ~csShadowArray ()
+  {
+    delete[] shadowmap;
+  }
+};
+
+/**
  * Genmesh version of mesh object.
  */
 class csGenmeshMeshObject : public iMeshObject
@@ -64,6 +82,9 @@ private:
   bool do_shadow_rec;
 
   csColor* lit_mesh_colors;
+  /// Dynamic ambient light assigned to this genmesh.
+  csColor dynamic_ambient;
+  uint32 ambient_version;
 
   bool initialized;
   long shapenr;
@@ -126,6 +147,12 @@ public:
   bool ReadFromCache (iCacheManager* cache_mgr);
   bool WriteToCache (iCacheManager* cache_mgr);
   void PrepareLighting ();
+
+  void SetDynamicAmbientLight (const csColor& color)
+  {
+    dynamic_ambient = color;
+    ambient_version++;
+  }
 
   void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
     	const csVector3& origin);
@@ -220,6 +247,18 @@ public:
     virtual void PrepareLighting ()
     {
       scfParent->PrepareLighting ();
+    }
+    virtual void SetDynamicAmbientLight (const csColor& color)
+    {
+      scfParent->SetDynamicAmbientLight (color);
+    }
+    virtual const csColor& GetDynamicAmbientLight ()
+    {
+      return scfParent->dynamic_ambient;
+    }
+    virtual uint32 GetDynamicAmbientVersion () const
+    {
+      return scfParent->ambient_version;
     }
   } scfiLightingInfo;
   friend struct LightingInfo;

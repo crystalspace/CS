@@ -132,7 +132,7 @@ struct iVisibilityCuller : public iBase
   virtual uint32 GetCurrentVisibilityNumber () const = 0;
 };
 
-SCF_VERSION (iVisibilityObject, 0, 1, 0);
+SCF_VERSION (iVisibilityObject, 0, 2, 0);
 
 /**
  * An object that wants to know if it is visible or not
@@ -142,6 +142,9 @@ struct iVisibilityObject : public iBase
 {
   /// Get the reference to the movable from this object.
   virtual iMovable* GetMovable () const = 0;
+  /// Get the reference to the mesh wrapper from this object.
+  virtual iMeshWrapper* GetMeshWrapper () const = 0;
+
   /**
    * Set the visibility number for this object. A visibility culler
    * will set the visibility number of an object equal to the current

@@ -32,6 +32,7 @@
 #include "csengine/sector.h"
 #include "csengine/light.h"
 #include "iengine/rview.h"
+#include "imesh/lighting.h"
 #include "csengine/polygon.h"
 #include "csengine/cbufcube.h"
 
@@ -360,7 +361,7 @@ csPolygon3D *csSector::IntersectSegment (
   {
     iVisibilityObject* vo = visit->GetObject ();
     visit->Next ();
-    csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (vo, iMeshWrapper));
+    iMeshWrapper* mesh = vo->GetMeshWrapper ();
     if (!mesh || mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
 
     // @@@ UGLY!!!
@@ -891,16 +892,15 @@ void csSector::ShineLights (iMeshWrapper *mesh, csProgressPulse *pulse)
   }
 }
 
-void csSector::SetDynamicAmbientLight(const csColor& color)
+void csSector::SetDynamicAmbientLight (const csColor& color)
 {
   iMeshList* ml = GetMeshes ();
   for (int i = 0 ; i < ml->GetCount () ; i++)
   {
     iMeshWrapper* mesh = ml->Get (i);
-    csRef<iThingState> thing (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-    	iThingState));
-    if (thing)
-      thing->SetDynamicAmbientLight(color);
+    iLightingInfo* li = mesh->GetLightingInfo ();
+    if (li)
+      li->SetDynamicAmbientLight (color);
   }
 }
 

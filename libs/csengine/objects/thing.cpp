@@ -154,7 +154,7 @@ csThing::csThing (iBase *parent) :
   obj_bbox_valid = false;
   light_frame_number = -1;
 
-  dynamic_ambient.Set(0,0,0);
+  dynamic_ambient.Set (0,0,0);
   ambient_version = 0;
 
   center_idx = -1;
@@ -1341,9 +1341,7 @@ static void *IntersectSegmentTestPol (
     {
       csBspPolygon *bsppol = (csBspPolygon *)polygon[i];
       csVisObjInfo *obj = bsppol->GetOriginator ();
-      csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (
-          obj->visobj,
-          iMeshWrapper));
+      iMeshWrapper* mesh = obj->visobj->GetMeshWrapper ();
       if (mesh)
       {
         if (mesh->GetMeshObject () == &(thing->scfiMeshObject)) continue;
@@ -3602,8 +3600,7 @@ bool csThing::VisTest (iRenderView *irview)
       CheckVisUpdate (vinf);
 
       iVisibilityObject *vo = vinf->visobj;
-
-      csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (vo, iMeshWrapper));
+      iMeshWrapper* mw = vo->GetMeshWrapper ();
       if (mw->GetMeshObject () == &scfiMeshObject)
       {
         // If the object represents the object of the culler then
@@ -3826,7 +3823,7 @@ csPtr<iVisibilityObjectIterator> csThing::VisTest (const csSphere& sphere)
 struct CheckFrustData
 {
   iFrustumView *fview;
-  csHashSet visible_things;                     // Contains objects of type iMeshWrapper.
+  csHashSet visible_things;	// Contains objects of type iMeshWrapper.
 };
 
 static int frust_cnt = 50;
@@ -3895,9 +3892,7 @@ static void *CheckFrustumPolygonsFB (
 
       // @@@ The code below is all not very nice. We should not assume
       // that only meshes can be used in vis info.
-      csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (
-          obj->visobj,
-          iMeshWrapper));
+      iMeshWrapper* mesh = obj->visobj->GetMeshWrapper ();
       if (mesh)
       {
         if (!fdata->visible_things.In (mesh))

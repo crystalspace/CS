@@ -27,6 +27,7 @@
 #include "csutil/garray.h"
 #include "csengine/movable.h"
 #include "imesh/object.h"
+#include "imesh/lighting.h"
 #include "iengine/mesh.h"
 #include "iengine/viscull.h"
 #include "iengine/imposter.h"
@@ -193,7 +194,9 @@ protected:
 
 private:
   /// Mesh object corresponding with this csMeshWrapper.
-  csRef<iMeshObject> mesh;
+  csRef<iMeshObject> meshobj;
+  /// For optimization purposes we keep the iLightingInfo interface here.
+  csRef<iLightingInfo> light_info;
 
   /// Children of this object (other instances of iMeshWrapper).
   csMeshMeshList children;
@@ -255,7 +258,7 @@ protected:
 
 public:
   /// Constructor.
-  csMeshWrapper (iMeshWrapper* theParent, iMeshObject* mesh);
+  csMeshWrapper (iMeshWrapper* theParent, iMeshObject* meshobj);
   /// Constructor.
   csMeshWrapper (iMeshWrapper* theParent);
 
@@ -276,9 +279,9 @@ public:
   }
 
   /// Set the mesh object.
-  void SetMeshObject (iMeshObject* mesh);
+  void SetMeshObject (iMeshObject* meshobj);
   /// Get the mesh object.
-  iMeshObject* GetMeshObject () const {return mesh;}
+  iMeshObject* GetMeshObject () const { return meshobj; }
 
   /// Set the Z-buf drawing mode to use for this object.
   void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
@@ -346,7 +349,7 @@ public:
   void Draw (iRenderView* rview);
 
   /// Returns true if this object wants to die.
-  bool WantToDie () { return mesh->WantToDie (); }
+  bool WantToDie () { return meshobj->WantToDie (); }
 
   /**
    * Get the movable instance for this object.
@@ -525,6 +528,10 @@ public:
     {
       scfParent->SetMeshObject (m);
     }
+    virtual iLightingInfo* GetLightingInfo () const
+    {
+      return scfParent->light_info;
+    }
     virtual iMeshFactoryWrapper* GetFactory () const
     {
       return scfParent->GetFactory ();
@@ -655,6 +662,10 @@ public:
     {
       return &(scfParent->movable.scfiMovable);
     }
+    virtual iMeshWrapper* GetMeshWrapper () const
+    {
+      return &(scfParent->scfiMeshWrapper);
+    }
     virtual void SetVisibilityNumber (uint32 vis)
     {
       scfParent->SetVisibilityNumber (vis);
@@ -665,7 +676,7 @@ public:
     }
     virtual iObjectModel* GetObjectModel ()
     {
-      return scfParent->mesh->GetObjectModel ();
+      return scfParent->meshobj->GetObjectModel ();
     }
   } scfiVisibilityObject;
   friend struct VisObject;
