@@ -59,6 +59,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   else
   {
     targetdir = [ ConcatDirs $(TOP) scripts perl5 ] ;
+    SEARCH on $(target) = $(targetdir) ;
   }
 
   local perlxs = [ FGristFiles csperlxs.c ] ;

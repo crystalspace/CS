@@ -68,6 +68,12 @@ chronological order.
 	  (/Developer/Private/jam) in recent OSX releases, some users might
 	  have it in their PATH anyhow.  Also, with older OSX releases, it was
 	  in a publicly accessible location (/usr/bin/jam).
+	- Eric Sunshine fixed bug in csperl5/Jamfile where Jam complained
+	  "don't know how to make <plugins!cscript!csperl5>cswigpl5.inc" if
+	  Swig was not installed.  As a side-effect, this problem caused the
+	  'make' emulation synthesis performed by the configured script to fail
+	  if Swig was not installed and the user had given the --with-perl
+	  configure option.
 1-May-2004
 	- Jorrit added a new data/terrainf/world which is a variant of
 	  data/terrain/world that uses the fixed shaders. Keep in mind that you
