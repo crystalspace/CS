@@ -8444,26 +8444,10 @@ CS_ZBUF_EQUAL = _cspace.CS_ZBUF_EQUAL
 CS_ZBUF_INVERT = _cspace.CS_ZBUF_INVERT
 CS_ZBUF_MESH = _cspace.CS_ZBUF_MESH
 CS_ZBUF_MESH2 = _cspace.CS_ZBUF_MESH2
-CS_VATTRIB_GENERIC_FIRST = _cspace.CS_VATTRIB_GENERIC_FIRST
-CS_VATTRIB_GENERIC_LAST = _cspace.CS_VATTRIB_GENERIC_LAST
 CS_VATTRIB_SPECIFIC_FIRST = _cspace.CS_VATTRIB_SPECIFIC_FIRST
 CS_VATTRIB_SPECIFIC_LAST = _cspace.CS_VATTRIB_SPECIFIC_LAST
-CS_VATTRIB_0 = _cspace.CS_VATTRIB_0
-CS_VATTRIB_1 = _cspace.CS_VATTRIB_1
-CS_VATTRIB_2 = _cspace.CS_VATTRIB_2
-CS_VATTRIB_3 = _cspace.CS_VATTRIB_3
-CS_VATTRIB_4 = _cspace.CS_VATTRIB_4
-CS_VATTRIB_5 = _cspace.CS_VATTRIB_5
-CS_VATTRIB_6 = _cspace.CS_VATTRIB_6
-CS_VATTRIB_7 = _cspace.CS_VATTRIB_7
-CS_VATTRIB_8 = _cspace.CS_VATTRIB_8
-CS_VATTRIB_9 = _cspace.CS_VATTRIB_9
-CS_VATTRIB_10 = _cspace.CS_VATTRIB_10
-CS_VATTRIB_11 = _cspace.CS_VATTRIB_11
-CS_VATTRIB_12 = _cspace.CS_VATTRIB_12
-CS_VATTRIB_13 = _cspace.CS_VATTRIB_13
-CS_VATTRIB_14 = _cspace.CS_VATTRIB_14
-CS_VATTRIB_15 = _cspace.CS_VATTRIB_15
+CS_VATTRIB_GENERIC_FIRST = _cspace.CS_VATTRIB_GENERIC_FIRST
+CS_VATTRIB_GENERIC_LAST = _cspace.CS_VATTRIB_GENERIC_LAST
 CS_VATTRIB_POSITION = _cspace.CS_VATTRIB_POSITION
 CS_VATTRIB_WEIGHT = _cspace.CS_VATTRIB_WEIGHT
 CS_VATTRIB_NORMAL = _cspace.CS_VATTRIB_NORMAL
@@ -8480,6 +8464,22 @@ CS_VATTRIB_TEXCOORD4 = _cspace.CS_VATTRIB_TEXCOORD4
 CS_VATTRIB_TEXCOORD5 = _cspace.CS_VATTRIB_TEXCOORD5
 CS_VATTRIB_TEXCOORD6 = _cspace.CS_VATTRIB_TEXCOORD6
 CS_VATTRIB_TEXCOORD7 = _cspace.CS_VATTRIB_TEXCOORD7
+CS_VATTRIB_0 = _cspace.CS_VATTRIB_0
+CS_VATTRIB_1 = _cspace.CS_VATTRIB_1
+CS_VATTRIB_2 = _cspace.CS_VATTRIB_2
+CS_VATTRIB_3 = _cspace.CS_VATTRIB_3
+CS_VATTRIB_4 = _cspace.CS_VATTRIB_4
+CS_VATTRIB_5 = _cspace.CS_VATTRIB_5
+CS_VATTRIB_6 = _cspace.CS_VATTRIB_6
+CS_VATTRIB_7 = _cspace.CS_VATTRIB_7
+CS_VATTRIB_8 = _cspace.CS_VATTRIB_8
+CS_VATTRIB_9 = _cspace.CS_VATTRIB_9
+CS_VATTRIB_10 = _cspace.CS_VATTRIB_10
+CS_VATTRIB_11 = _cspace.CS_VATTRIB_11
+CS_VATTRIB_12 = _cspace.CS_VATTRIB_12
+CS_VATTRIB_13 = _cspace.CS_VATTRIB_13
+CS_VATTRIB_14 = _cspace.CS_VATTRIB_14
+CS_VATTRIB_15 = _cspace.CS_VATTRIB_15
 G3DFOGMETHOD_NONE = _cspace.G3DFOGMETHOD_NONE
 G3DFOGMETHOD_ZBUFFER = _cspace.G3DFOGMETHOD_ZBUFFER
 G3DFOGMETHOD_VERTEX = _cspace.G3DFOGMETHOD_VERTEX
@@ -8724,7 +8724,8 @@ class iGraphics3D(iBase):
     def CreateRenderBuffer(*args): return _cspace.iGraphics3D_CreateRenderBuffer(*args)
     def CreateIndexRenderBuffer(*args): return _cspace.iGraphics3D_CreateIndexRenderBuffer(*args)
     def CreateInterleavedRenderBuffers(*args): return _cspace.iGraphics3D_CreateInterleavedRenderBuffers(*args)
-    def SetBufferState(*args): return _cspace.iGraphics3D_SetBufferState(*args)
+    def ActivateBuffers(*args): return _cspace.iGraphics3D_ActivateBuffers(*args)
+    def DeactivateBuffers(*args): return _cspace.iGraphics3D_DeactivateBuffers(*args)
     def SetTextureState(*args): return _cspace.iGraphics3D_SetTextureState(*args)
     def DrawMesh(*args): return _cspace.iGraphics3D_DrawMesh(*args)
     def SetWriteMask(*args): return _cspace.iGraphics3D_SetWriteMask(*args)
