@@ -30,6 +30,9 @@ The history order is reversed so that new features are at the top.
 	- Several fixes to csArray::SetCapacity() and related.
 	- Anoter csArray::SetCapacity() fix.
 	- Eric Sunshine fixed some Texinfo mark-up errors reported by makeinfo.
+	- Eric Sunshine fixed a number of formatting and Texinfo mark-up
+	  problems in movierec.txi.  Also eliminated a number of `hbox'
+	  warnings from various .txi files reported by TeX.
 24-Apr-2003
 	- Eric Sunshine made the following changes:
 	    - Improved robustness of --with-x check for Darwin/Macintosh, since

@@ -19,14 +19,19 @@ The following interfaces have been removed: @code{iPolyTexNone},
 The combined @sc{api} from @code{iPolyTexNone} and the @code{iPolyTexLightMap}
 have moved to @code{iPolygon3D} itself.
 
-@code{iPolygon3D->SetTextureType()} has been removed (and also
-@code{GetTextureType()}. Instead there is now
-@code{iPolygon3D->EnableTextureMapping()} and
-@code{iPolygon3D->IsTextureMappingEnabled()}.
+@code{iPolygon3D->SetTextureType()} and @code{GetTextureType()} have been
+removed.  Instead use:
+
+@itemize @bullet
+@item
+@code{iPolygon3D->EnableTextureMapping()}
+@item
+@code{iPolygon3D->IsTextureMappingEnabled()}
+@end itemize
 
 @code{iPolygon3D->GetPolyTexType()} has been removed.
 
-The @code{shading} keyword in polygons now accepts a boolean value
+The @samp{shading} keyword in polygons now accepts a boolean value
 instead of @samp{NONE}, @samp{FLAT}, @samp{GOURAUD}, or @samp{LIGHTMAP}.
 With this you can enable/disable lightmapping.
 
@@ -45,6 +50,7 @@ been removed and it's functionality has moved to @code{iCurve} itself.
 As a consequence of this change the bezier addon loader has been removed.
 Also curves have been seperated from the thing plugin and now live in the
 'bezier' plugin. So a curve like this in the past:
+
 @example
 <addon>
   <plugin>crystalspace.mesh.loader.thing.bezier</plugin>
@@ -68,6 +74,7 @@ Also curves have been seperated from the thing plugin and now live in the
 </meshfact>
 @end example
 
+@noindent
 should now become (mark the new plugin line):
 
 @example
