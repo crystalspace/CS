@@ -32,6 +32,7 @@
 #include "iengine/texture.h"
 #include "ivideo/texture.h"
 #include "csutil/refarr.h"
+#include "csutil/leakguard.h"
 #include "ivideo/rndbuf.h"
 
 struct iTextureHandle;
@@ -73,6 +74,7 @@ public:
     MATRIX
   };
 
+  CS_LEAKGUARD_DECLARE (csShaderVariable);
 private:
 
   VariableType Type;
