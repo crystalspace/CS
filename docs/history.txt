@@ -8,6 +8,9 @@ chronological order.
 
 6-Feb-2004
 	- Jorrit clarified the comment for iEngine->CreateBaseMaterial().
+	- Jorrit corrected the howto on creating a thing. It was still
+	  mentioning that things support portals. But this is no longer true.
+	- Jorrit added a howto on creating genmesh objects.
 5-Feb-2004
 	- res added a small convenience wrapper arounf LoadLibrary() and 
 	  FreeLibrary() for Win32.

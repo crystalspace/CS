@@ -11,8 +11,7 @@ This section describes how to create a thing mesh.
 
 A @samp{thing} mesh object (@pxref{MeshObject Thing}) is an object made
 out of polygons. Every polygon can have another material and the polygons
-can have three or more vertices. It is also possible for polygons to be
-a portal (@pxref{Portal Engine}) to another sector. A thing uses lightmapping
+can have three or more vertices. A thing uses lightmapping
 for lighting (roughly this means that every polygon gets another texture
 which contains light and shadow information for that polygon).
 
@@ -88,8 +87,8 @@ A factory will be created invisibly to support the thing geometry:
 @end example
 
 There is a lot more you can do in a thing. For example you can specify
-exactly how you want to map the texture on the polygons. You can also use
-portals and other stuff. In this particular example we create a cube that
+exactly how you want to map the texture on the polygons.
+In this particular example we create a cube that
 has another material for the upper polygon.
 
 @subsubheading Creating a Thing from Code

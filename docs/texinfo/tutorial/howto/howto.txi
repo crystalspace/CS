@@ -14,6 +14,7 @@ code.
 * HOWTO Mesh LightAnim:: Mesh Lighting and Animation
 * HOWTO Mesh Movement:: Mesh Movement
 * HOWTO Create Thing:: Creating a Thing Mesh
+* HOWTO Create Genmesh:: Creating a Genmesh Mesh
 * HOWTO Camera Movement:: Camera Movement
 * HOWTO Clicking on Objects:: Clicking on Objects
 * HOWTO Pseudo DynLight:: Pseudo-dynamic Lights
@@ -39,6 +40,7 @@ code.
 @importss{tutorial,howto,meshanim.txi}
 @importss{tutorial,howto,meshmove.txi}
 @importss{tutorial,howto,creatething.txi}
+@importss{tutorial,howto,creategenmesh.txi}
 @importss{tutorial,howto,cammove.txi}
 @importss{tutorial,howto,clickobj.txi}
 @importss{tutorial,howto,pseudolit.txi}
