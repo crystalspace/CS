@@ -1646,7 +1646,6 @@ const char* csBinaryDocument::Write (csMemFile& out)
 
   outStrStorage = &out;
   outStrHash = new csStringHash (431);
-  outStrHash->Register ("fuck", 0);
   doc.ofsStr = out.GetPos();
   {
     int pad = (4 - doc.ofsStr) & 3;

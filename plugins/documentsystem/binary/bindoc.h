@@ -79,10 +79,10 @@ typedef struct
     string table 
 
     format:
-      ASCIIZ string, uint32 ID
-     until string is empty
+      ASCIIZ string ... ASCIIZ string ...
+      * There's *no* special terminator. 
    */
-  /* root */
+  /* root element */
 } bdDocument;
 
 /// mask for a node/attr value type
@@ -146,7 +146,7 @@ typedef struct
 {
   /**
    * Value of this node
-   *  str: ID of string or immediate string
+   *  str: offset of string into string table or 'immediate' string
    *  int: value
    *  float: value converted using float2long
    */
@@ -175,7 +175,7 @@ typedef struct
 /// Binary document node attribute
 typedef struct
 {
-  /// ID of the name
+  /// string table offset of the name or immediate
   uint32 nameID;
   /// Attribute flags
   uint32 flags;
