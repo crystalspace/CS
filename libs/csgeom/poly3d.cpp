@@ -509,7 +509,7 @@ int csVector3Array::AddVertexSmart (float x, float y, float z)
   return num_vertices-1;
 }
 
-csVector3 csPoly3D::ComputeNormal () const
+csVector3 csPoly3D::ComputeNormal (csVector3* vertices, int num)
 {
   float ayz = 0;
   float azx = 0;
@@ -517,8 +517,8 @@ csVector3 csPoly3D::ComputeNormal () const
   int i, i1;
   float x1, y1, z1, x, y, z;
 
-  i1 = num_vertices-1;
-  for (i = 0 ; i < num_vertices ; i++)
+  i1 = num-1;
+  for (i = 0 ; i < num; i++)
   {
     x = vertices[i].x;
     y = vertices[i].y;
@@ -539,10 +539,10 @@ csVector3 csPoly3D::ComputeNormal () const
   return csVector3 (ayz / d, azx / d, axy / d);
 }
 
-csPlane3 csPoly3D::ComputePlane () const
+csPlane3 csPoly3D::ComputePlane (csVector3* vertices, int num_vertices)
 {
   float D;
-  csVector3 pl = ComputeNormal ();
+  csVector3 pl = ComputeNormal (vertices, num_vertices);
   D = -pl.x*vertices[0].x - pl.y*vertices[0].y - pl.z*vertices[0].z;
   return csPlane3 (pl, D);
 }

@@ -1,5 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+28-Jul-2000
+	- Norman Kramer fixes the x2d canvas so that the title is set
+	  to the right window.
+	- Added csPoly3D::ComputeNormal() and ComputePlane() as static
+	  functions with the polygon given as a parameter.
+	- Fixed a big bug in the lighting routines which could cause
+	  some polygons not to be reached by a light even though they
+	  should have been affected. Turned out the distance between the
+	  light and the polygon was not computed right.
 27-Jul-2000
 	- Martin Geisse converted some more docs to texinfo format
 	  (including the much asked for worldfmt.tex file).

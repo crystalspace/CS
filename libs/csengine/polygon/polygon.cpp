@@ -1734,13 +1734,14 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   // an accurate minimum squared distance from the light to the polygon. Note
   // that we use the new_frustum which is relative to the center of the
   // light.
-  // So this algorithm works with the light position at (0,0,0) (@@@ we should
-  // use this to optimize this algorithm further).
+  // So this algorithm works with the light position at (0,0,0).
+  csPlane3 poly_plane = csPoly3D::ComputePlane (poly, num_vertices);
+
   csVector3 o (0, 0, 0);
   float min_sqdist = csSquaredDist::PointPoly (o,
-              new_light_frustum->GetVertices (),
-              new_light_frustum->GetNumVertices (),
-              *GetPolyPlane (), dist_to_plane * dist_to_plane);
+        new_light_frustum->GetVertices (),
+        new_light_frustum->GetNumVertices (),
+        poly_plane, dist_to_plane * dist_to_plane);
 
   if (min_sqdist >= lview->sq_radius)
   {

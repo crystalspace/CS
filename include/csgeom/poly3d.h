@@ -229,11 +229,23 @@ public:
   /// Split this polygon to the z-plane.
   void SplitWithPlaneZ (csPoly3D& front, csPoly3D& back, float z) const;
 
+  /// Compute the normal of a polygon.
+  static csVector3 ComputeNormal (csVector3* vertices, int num);
+
   /// Compute the normal of this polygon.
-  csVector3 ComputeNormal () const;
+  csVector3 ComputeNormal () const
+  {
+    return ComputeNormal (vertices, num_vertices);
+  }
+
+  /// Compute the plane of a polygon.
+  static csPlane3 ComputePlane (csVector3* vertices, int num);
 
   /// Compute the plane of this polygon.
-  csPlane3 ComputePlane () const;
+  csPlane3 ComputePlane () const
+  {
+    return ComputePlane (vertices, num_vertices);
+  }
 
   /**
    * Calculate the signed area of this polygon.
