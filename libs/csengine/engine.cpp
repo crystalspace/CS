@@ -1740,8 +1740,8 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
 
 iMaterialWrapper* csEngine::CreateMaterial (const char *iName, iTextureWrapper* texture)
 {
-  csMaterial* mat =
-    new csMaterial (((csTextureWrapper::TextureWrapper*)texture)->scfParent);
+  csMaterial* mat = new csMaterial
+    (texture ? ((csTextureWrapper::TextureWrapper*)texture)->scfParent : NULL);
   csMaterialWrapper* wrapper = materials->NewMaterial (mat);
   wrapper->SetName (iName);
   return &wrapper->scfiMaterialWrapper;
