@@ -20,7 +20,7 @@ PLUGINS+=video/format/avi
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
-# Processor. Can be one of: INTEL, SPARC, POWERPC, M68K, UNKNOWN
+# Processor. Can be one of: X86, SPARC, POWERPC, M68K, UNKNOWN
 PROC=X86
 
 # Operating system. Can be one of:

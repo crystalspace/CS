@@ -41,7 +41,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
-# Processor. Can be one of: INTEL, SPARC, POWERPC, M68K, HPPA, UNKNOWN
+# Processor. Can be one of: X86, SPARC, POWERPC, M68K, HPPA, UNKNOWN
 # May use TARGET_ARCHS to specify multiple architectures at once.
 # Ex. TARGET_ARCHS="m68k i386 sparc hppa"
 PROC = $(subst $(SPACE),_,$(foreach arch,$(NEXT.TARGET_ARCHS),$(PROC.$(arch))))

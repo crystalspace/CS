@@ -59,7 +59,7 @@ TARGET = linux
 TARGET_MAKEFILE = libs/cssys/unix/linux.mak
 MODE = debug
 USE_PLUGINS = yes
-PROC = INTEL
+PROC = X86
 CXX = gcc
 CFLAGS.CONFIG += -mpentium -march=i586
 CFLAGS.CONFIG += -fno-exceptions
@@ -109,7 +109,7 @@ execute appropiate makefile statements.  In our case:
 
 @example
 ifeq ($(MAKESECTION),rootdefines)
-PROC=INTEL
+PROC=X86
 OS=LINUX
 COMP=GCC
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -382,7 +382,7 @@ OUT = out/$(OS)/$(PROC)/$(MODE)$(MAKE_DLL)
 @end example
 
 So, if you're building a dynamic library for Linux on an x86 machine, the
-output directory would be named @file{out/LINUX/INTEL/optimize.so/}.  To
+output directory would be named @file{out/LINUX/X86/optimize.so/}.  To
 reference to the output directory you should use the variable @code{$(OUT)} in
 your submakefiles.  For example, the following rule tells @samp{make} how to
 compile @file{.cpp} files:
