@@ -97,20 +97,6 @@ static int __getcwd (char drive, char *buffer, int buffersize) {
 }
 #endif
 
-#if !defined(COMP_BC)
-// We need a function to retrieve current working directory on specific drive
-
-static int __getcwd (char drive, char *buffer, int buffersize)
-{
-  char old_drive = _getdrive ();
-  _chdrive (drive);
-  getcwd (buffer, buffersize);
-  _chdrive (old_drive);
-  return strlen (buffer);
-}
-
-#endif
-
 #if defined (OS_DOS)
 // We need a function to retrieve current working directory on specific drive
 
