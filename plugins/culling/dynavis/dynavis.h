@@ -73,6 +73,11 @@ public:
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
   csObjectModel* model;
+
+  bool hint_closed;
+  bool hint_badoccluder;
+  bool hint_goodoccluder;
+
   csVisibilityObjectHistory* history;
   // Optional data for shadows. Both fields can be NULL.
   csRef<iMeshWrapper> mesh;

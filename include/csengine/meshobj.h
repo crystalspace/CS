@@ -227,6 +227,8 @@ private:
 public:
   /// Set of flags
   csFlags flags;
+  /// Culler flags.
+  csFlags culler_flags;
 
 protected:
   /// Move this object to the specified sector. Can be called multiple times.
@@ -677,6 +679,10 @@ public:
     virtual iObjectModel* GetObjectModel ()
     {
       return scfParent->meshobj->GetObjectModel ();
+    }
+    virtual csFlags& GetCullerFlags ()
+    {
+      return scfParent->culler_flags;
     }
   } scfiVisibilityObject;
   friend struct VisObject;

@@ -319,6 +319,13 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   visobj_wrap->model->GetModel ()->AddListener (
 		  (iObjectModelListener*)visobj_wrap);
 
+  visobj_wrap->hint_closed = visobj->GetCullerFlags ().Check (
+  	CS_CULLER_HINT_CLOSED);
+  visobj_wrap->hint_badoccluder = visobj->GetCullerFlags ().Check (
+  	CS_CULLER_HINT_BADOCCLUDER);
+  visobj_wrap->hint_goodoccluder = visobj->GetCullerFlags ().Check (
+  	CS_CULLER_HINT_GOODOCCLUDER);
+
   visobj_vector.Push (visobj_wrap);
 }
 
@@ -834,7 +841,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   float min_depth = 0;
 
   bool cull_coverage = do_cull_coverage;
-  if (!obj->model->CanUseOutlineFiller ())
+  if (!obj->hint_closed && !obj->model->CanUseOutlineFiller ())
     cull_coverage = COVERAGE_POLYGON;
 
   csVisibilityObjectHistory* hist = obj->history;
@@ -965,24 +972,29 @@ end:
   if (do_write_object && cull_coverage != COVERAGE_NONE &&
   	obj->visobj->GetObjectModel ()->GetPolygonMeshViscull ())
   {
-    // Object is visible.
-    if (do_cull_writequeue)
+    if (!obj->hint_badoccluder)
     {
-      // We are using the write queue so we insert the object there
-      // for later culling.
-      AppendWriteQueue (data->rview->GetCamera (), obj->visobj, obj->model,
-      	obj);
-    }
-    else
-    {
-      // Let it update the coverage buffer if we
-      // are using cull_coverage.
-      if (cull_coverage == COVERAGE_POLYGON)
-        UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
-    	    obj->model);
+      // Object is visible.
+      // For a good occluder we don't use the write queue but instead
+      // we immediatelly write out the object in polygon mode.
+      if (do_cull_writequeue && !(obj->hint_goodoccluder))
+      {
+        // We are using the write queue so we insert the object there
+        // for later culling.
+        AppendWriteQueue (data->rview->GetCamera (), obj->visobj, obj->model,
+      	  obj);
+      }
       else
-        UpdateCoverageBufferOutline (data->rview->GetCamera (), obj->visobj,
-      	    obj->model);
+      {
+        // Let it update the coverage buffer if we
+        // are using cull_coverage.
+        if (cull_coverage == COVERAGE_POLYGON || obj->hint_goodoccluder)
+          UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
+    	      obj->model);
+        else
+          UpdateCoverageBufferOutline (data->rview->GetCamera (), obj->visobj,
+      	      obj->model);
+      }
     }
   }
 

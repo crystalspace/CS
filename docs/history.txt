@@ -3,6 +3,36 @@ The history order is reversed so that new features are at the top.
 9-Dec-2002
 	- Fixed a bug in Dynavis where it would consider polygons as possible
 	  occluders even if Z very close to 0. This could cause bad overflow.
+	- Added iVisibilityObject::GetCullerFlags(). With this you can set
+	  various hints for the visibility culler to help optimize
+	  performance. The visibility culler can choose to ignore or honor
+	  these hints. The following hint flags are defined at this moment
+	  but no visibility culler honors them yet:
+	    - CS_CULLER_HINT_CONVEX: object is convex.
+	    - CS_CULLER_HINT_CLOSED: object is closed (i.e. if you are
+	      outside the object you can only see the visible side
+	      of the object.
+	    - CS_CULLER_HINT_GOODOCCLUDER: this object is a good occluder
+	      (i.e. it will probably be able to cull away a lot of the
+	      geometry).
+	    - CS_CULLER_HINT_BADOCCLUDER: this object is a bad occluder
+	      (i.e. it is too small or not convex enough to be a useful
+	      occluder).
+	- Generalized parameter parsing for mesh objects. A large part of
+	  this was now duplicated in two routines (csloader plugin).
+	- The <convex/> flag now also sets CS_CULLER_HINT_CONVEX.
+	- Added <closed/>, <goodoccluder/>, and <badoccluder/> flags for
+	  mesh objects.
+	- Dynavis now honors the <badoccluder/> and <closed/> flags. In
+	  case of <closed/> it will use outline based culling in any case.
+	  In case of <badoccluder/> it will simply not use the object
+	  as an occluder.
+	- Dynavis now also honors the <goodoccluder/> flag. In that
+	  case it will not use the write queue to delay writing of the
+	  occluder and it will also use polygon mode instead of outline
+	  mode to have more accurate filling of the coverage buffer.
+	  The idea is to only use this for large objects that don't have
+	  too many small polygons.
 8-Dec-2002
 	- Experimental optimation in Dynavis for clamp in polygon mode (not
 	  yet outline mode). Not enabled yet since it isn't working properly

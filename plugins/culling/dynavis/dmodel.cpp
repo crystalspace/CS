@@ -182,6 +182,7 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model,
       // one adjacent polygon. If we find such an edge then we will not use
       // outline based culling for this object. This is not good as it will
       // slow down culling so you should try to avoid this situation in levels.
+
       int i;
       for (i = 0 ; i < model->num_edges ; i++)
         if (model->edges[i].poly2 == -1)

@@ -84,10 +84,12 @@ enum
   XMLTOKEN_AMBIENT = 1,
   XMLTOKEN_ADDON,
   XMLTOKEN_ATTENUATION,
+  XMLTOKEN_BADOCCLUDER,
   XMLTOKEN_CAMERA,
   XMLTOKEN_CENTER,
   XMLTOKEN_CLEARZBUF,
   XMLTOKEN_CLEARSCREEN,
+  XMLTOKEN_CLOSED,
   XMLTOKEN_COLLECTION,
   XMLTOKEN_COLOR,
   XMLTOKEN_CONVEX,
@@ -104,6 +106,7 @@ enum
   XMLTOKEN_FORWARD,
   XMLTOKEN_FOR2D,
   XMLTOKEN_FOR3D,
+  XMLTOKEN_GOODOCCLUDER,
   XMLTOKEN_HALO,
   XMLTOKEN_HARDMOVE,
   XMLTOKEN_HEIGHTGEN,
@@ -408,6 +411,11 @@ private:
   bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact,
   	iDocumentNode* node, csReversibleTransform* transf = NULL);
 
+  /**
+   * Handle various common mesh object parameters.
+   */
+  bool HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
+	csStringID id, bool& handled, const char*& priority);
   /**
    * Load the mesh object from the map file.
    */

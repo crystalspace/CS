@@ -57,6 +57,7 @@
 #include "iengine/lod.h"
 #include "iengine/imposter.h"
 #include "iengine/sharevar.h"
+#include "iengine/viscull.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "igraphic/imageio.h"
@@ -652,10 +653,12 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("ambient", XMLTOKEN_AMBIENT);
   xmltokens.Register ("addon", XMLTOKEN_ADDON);
   xmltokens.Register ("attenuation", XMLTOKEN_ATTENUATION);
+  xmltokens.Register ("badoccluder", XMLTOKEN_BADOCCLUDER);
   xmltokens.Register ("camera", XMLTOKEN_CAMERA);
   xmltokens.Register ("center", XMLTOKEN_CENTER);
   xmltokens.Register ("clearzbuf", XMLTOKEN_CLEARZBUF);
   xmltokens.Register ("clearscreen", XMLTOKEN_CLEARSCREEN);
+  xmltokens.Register ("closed", XMLTOKEN_CLOSED);
   xmltokens.Register ("collection", XMLTOKEN_COLLECTION);
   xmltokens.Register ("color", XMLTOKEN_COLOR);
   xmltokens.Register ("convex", XMLTOKEN_CONVEX);
@@ -1468,6 +1471,317 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
   return true;
 }
 
+bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
+	csStringID id, bool& handled, const char*& priority)
+{
+  handled = true;
+  switch (id)
+  {
+    case XMLTOKEN_LOD:
+      {
+        if (!mesh)
+	{
+	  SyntaxService->ReportError (
+	  	  "crystalspace.maploader.load.meshobject",
+	  	  child, "First specify the parent factory with 'factory'!");
+	  return false;
+	}
+	if (!mesh->GetMeshObject ())
+	{
+          SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+              child, "Mesh object is missing!");
+	  return false;
+	}
+	csRef<iLODControl> lodctrl (SCF_QUERY_INTERFACE (
+	    	mesh->GetMeshObject (),
+		iLODControl));
+	if (!lodctrl)
+	{
+          SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+              child, "This mesh doesn't implement LOD control!");
+	  return false;
+	}
+	if (!LoadLodControl (lodctrl, child))
+	  return false;
+      }
+      break;
+    case XMLTOKEN_PRIORITY:
+      priority = child->GetContentsValue ();
+      break;
+    case XMLTOKEN_ADDON:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      if (!LoadAddOn (child, mesh))
+	return false;
+      break;
+    case XMLTOKEN_NOLIGHTING:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      mesh->GetFlags().Set (CS_ENTITY_NOLIGHTING);
+      break;
+    case XMLTOKEN_NOSHADOWS:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      mesh->GetFlags().Set (CS_ENTITY_NOSHADOWS);
+      break;
+    case XMLTOKEN_INVISIBLE:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      mesh->GetFlags().Set (CS_ENTITY_INVISIBLE);
+      break;
+    case XMLTOKEN_DETAIL:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      mesh->GetFlags().Set (CS_ENTITY_DETAIL);
+      break;
+    case XMLTOKEN_IMPOSTER:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      ParseImposterSettings (mesh, child);
+      break;
+    case XMLTOKEN_ZFILL:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      if (!priority) priority = "wall";
+#ifndef CS_USE_NEW_RENDERER
+      mesh->SetZBufMode (CS_ZBUF_FILL);
+#endif // CS_USE_NEW_RENDERER        
+      break;
+    case XMLTOKEN_ZUSE:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      if (!priority) priority = "object";
+#ifndef CS_USE_NEW_RENDERER
+      mesh->SetZBufMode (CS_ZBUF_USE);
+#endif // CS_USE_NEW_RENDERER
+      break;
+    case XMLTOKEN_ZNONE:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      if (!priority) priority = "sky";
+#ifndef CS_USE_NEW_RENDERER
+      mesh->SetZBufMode (CS_ZBUF_NONE);
+#endif // CS_USE_NEW_RENDERER
+      break;
+    case XMLTOKEN_ZTEST:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      if (!priority) priority = "alpha";
+#ifndef CS_USE_NEW_RENDERER
+      mesh->SetZBufMode (CS_ZBUF_TEST);
+#endif // CS_USE_NEW_RENDERER
+      break;
+    case XMLTOKEN_CAMERA:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      if (!priority) priority = "sky";
+      mesh->GetFlags().Set (CS_ENTITY_CAMERA);
+      break;
+    case XMLTOKEN_BADOCCLUDER:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      {
+        csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
+  	  iVisibilityObject);
+        visobj->GetCullerFlags ().Set (CS_CULLER_HINT_BADOCCLUDER);
+      }
+      break;
+    case XMLTOKEN_GOODOCCLUDER:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      {
+        csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
+  	  iVisibilityObject);
+        visobj->GetCullerFlags ().Set (CS_CULLER_HINT_GOODOCCLUDER);
+      }
+      break;
+    case XMLTOKEN_CLOSED:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      {
+        csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
+  	  iVisibilityObject);
+        visobj->GetCullerFlags ().Set (CS_CULLER_HINT_CLOSED);
+      }
+      break;
+    case XMLTOKEN_CONVEX:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      mesh->GetFlags().Set (CS_ENTITY_CONVEX);
+      {
+        csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
+  	  iVisibilityObject);
+        visobj->GetCullerFlags ().Set (CS_CULLER_HINT_CONVEX);
+      }
+      break;
+    case XMLTOKEN_KEY:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      {
+        iKeyValuePair* kvp = ParseKey (child, mesh->QueryObject());
+	if (kvp)
+	  kvp->DecRef ();
+	else
+	  return false;
+      }
+      break;
+    case XMLTOKEN_HARDMOVE:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      else if (!mesh->GetMeshObject ()->SupportsHardTransform ())
+      {
+        SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.meshobject",
+            child, "This mesh object doesn't support 'hardmove'!");
+	return false;
+      }
+      else
+      {
+	csReversibleTransform tr;
+	csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+	if (matrix_node)
+	{
+	  csMatrix3 m;
+	  if (!SyntaxService->ParseMatrix (matrix_node, m))
+	    return false;
+          tr.SetO2T (m);
+	}
+	csRef<iDocumentNode> vector_node = child->GetNode ("v");
+	if (vector_node)
+	{
+	  csVector3 v;
+	  if (!SyntaxService->ParseVector (vector_node, v))
+	    return false;
+          tr.SetOrigin (v);
+	}
+	mesh->HardTransform (tr);
+      }
+      break;
+    case XMLTOKEN_MOVE:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      }
+      else
+      {
+        mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
+        mesh->GetMovable ()->SetPosition (csVector3 (0));
+	csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+	if (matrix_node)
+	{
+	  csMatrix3 m;
+	  if (!SyntaxService->ParseMatrix (matrix_node, m))
+	    return false;
+          mesh->GetMovable ()->SetTransform (m);
+	}
+	csRef<iDocumentNode> vector_node = child->GetNode ("v");
+	if (vector_node)
+	{
+	  csVector3 v;
+	  if (!SyntaxService->ParseVector (vector_node, v))
+	    return false;
+          mesh->GetMovable ()->SetPosition (v);
+	}
+	mesh->GetMovable ()->UpdateMove ();
+      }
+      break;
+    default:
+      handled = false;
+      return true;
+  }
+  return true;
+}
+
 iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 {
   if (!Engine) return NULL;
@@ -1484,260 +1798,11 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
     if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
-    switch (id)
+    bool handled;
+    if (!HandleMeshParameter (mesh, child, id, handled, priority))
+      return false;
+    if (!handled) switch (id)
     {
-      case XMLTOKEN_LOD:
-        {
-          if (!mesh)
-	  {
-	    SyntaxService->ReportError (
-	  	  "crystalspace.maploader.load.meshobject",
-	  	  child, "First specify the parent factory with 'factory'!");
-	    return NULL;
-	  }
-	  if (!mesh->GetMeshObject ())
-	  {
-            SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.meshobject",
-              child, "Mesh object is missing!");
-	    return NULL;
-	  }
-	  csRef<iLODControl> lodctrl (SCF_QUERY_INTERFACE (
-	    	mesh->GetMeshObject (),
-		iLODControl));
-	  if (!lodctrl)
-	  {
-            SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.meshobject",
-              child, "This mesh doesn't implement LOD control!");
-	    return NULL;
-	  }
-	  if (!LoadLodControl (lodctrl, child))
-	    return NULL;
-	}
-        break;
-      case XMLTOKEN_PRIORITY:
-	priority = child->GetContentsValue ();
-	break;
-      case XMLTOKEN_ADDON:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-	if (!LoadAddOn (child, mesh))
-	  return NULL;
-      	break;
-      case XMLTOKEN_NOLIGHTING:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-        mesh->GetFlags().Set (CS_ENTITY_NOLIGHTING);
-        break;
-      case XMLTOKEN_NOSHADOWS:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-        mesh->GetFlags().Set (CS_ENTITY_NOSHADOWS);
-        break;
-      case XMLTOKEN_INVISIBLE:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-        mesh->GetFlags().Set (CS_ENTITY_INVISIBLE);
-        break;
-      case XMLTOKEN_DETAIL:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-        mesh->GetFlags().Set (CS_ENTITY_DETAIL);
-        break;
-      case XMLTOKEN_IMPOSTER:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-	ParseImposterSettings(mesh,child);
-        break;
-      case XMLTOKEN_ZFILL:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-        if (!priority) priority = "wall";
-#ifndef CS_USE_NEW_RENDERER
-        mesh->SetZBufMode (CS_ZBUF_FILL);
-#endif // CS_USE_NEW_RENDERER        
-        break;
-      case XMLTOKEN_ZUSE:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-        if (!priority) priority = "object";
-#ifndef CS_USE_NEW_RENDERER
-        mesh->SetZBufMode (CS_ZBUF_USE);
-#endif // CS_USE_NEW_RENDERER
-        break;
-      case XMLTOKEN_ZNONE:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-        if (!priority) priority = "sky";
-#ifndef CS_USE_NEW_RENDERER
-        mesh->SetZBufMode (CS_ZBUF_NONE);
-#endif // CS_USE_NEW_RENDERER
-        break;
-      case XMLTOKEN_ZTEST:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-        if (!priority) priority = "alpha";
-#ifndef CS_USE_NEW_RENDERER
-        mesh->SetZBufMode (CS_ZBUF_TEST);
-#endif // CS_USE_NEW_RENDERER
-        break;
-      case XMLTOKEN_CAMERA:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-        if (!priority) priority = "sky";
-        mesh->GetFlags().Set (CS_ENTITY_CAMERA);
-        break;
-      case XMLTOKEN_CONVEX:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-        mesh->GetFlags().Set (CS_ENTITY_CONVEX);
-        break;
-      case XMLTOKEN_KEY:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-	{
-          iKeyValuePair* kvp = ParseKey (child, mesh->QueryObject());
-	  if (kvp)
-	    kvp->DecRef ();
-	  else
-	    return NULL;
-	}
-        break;
-      case XMLTOKEN_HARDMOVE:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-	else if (!mesh->GetMeshObject ()->SupportsHardTransform ())
-	{
-          SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.meshobject",
-            child, "This mesh object doesn't support 'hardmove'!");
-	  return NULL;
-	}
-	else
-        {
-	  csReversibleTransform tr;
-	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
-	  if (matrix_node)
-	  {
-	    csMatrix3 m;
-	    if (!SyntaxService->ParseMatrix (matrix_node, m))
-	      return NULL;
-            tr.SetO2T (m);
-	  }
-	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
-	  if (vector_node)
-	  {
-	    csVector3 v;
-	    if (!SyntaxService->ParseVector (vector_node, v))
-	      return NULL;
-            tr.SetOrigin (v);
-	  }
-	  mesh->HardTransform (tr);
-        }
-        break;
-      case XMLTOKEN_MOVE:
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	  return NULL;
-	}
-	else
-        {
-          mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
-          mesh->GetMovable ()->SetPosition (csVector3 (0));
-	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
-	  if (matrix_node)
-	  {
-	    csMatrix3 m;
-	    if (!SyntaxService->ParseMatrix (matrix_node, m))
-	      return NULL;
-            mesh->GetMovable ()->SetTransform (m);
-	  }
-	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
-	  if (vector_node)
-	  {
-	    csVector3 v;
-	    if (!SyntaxService->ParseVector (vector_node, v))
-	      return NULL;
-            mesh->GetMovable ()->SetPosition (v);
-	  }
-	  mesh->GetMovable ()->UpdateMove ();
-        }
-        break;
-
       case XMLTOKEN_FACTORY:
         if (mesh)
 	{
@@ -1796,94 +1861,11 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
     if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
-    switch (id)
+    bool handled;
+    if (!HandleMeshParameter (mesh, child, id, handled, priority))
+      return false;
+    if (!handled) switch (id)
     {
-      case XMLTOKEN_LOD:
-        {
-	  if (!mesh->GetMeshObject ())
-	  {
-            SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.meshobject",
-	      child, "Only use 'lod' after 'params'!");
-	    return false;
-	  }
-	  csRef<iLODControl> lodctrl (
-	  	SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iLODControl));
-	  if (!lodctrl)
-	  {
-            SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.meshobject",
-              child, "This mesh doesn't implement LOD control!");
-	    return false;
-	  }
-	  if (!LoadLodControl (lodctrl, child))
-	  {
-	    return false;
-	  }
-	}
-        break;
-      case XMLTOKEN_PRIORITY:
-	priority = child->GetContentsValue ();
-	break;
-      case XMLTOKEN_ADDON:
-	if (!LoadAddOn (child, mesh))
-	  return false;
-      	break;
-      case XMLTOKEN_NOLIGHTING:
-        mesh->GetFlags().Set (CS_ENTITY_NOLIGHTING);
-        break;
-      case XMLTOKEN_NOSHADOWS:
-        mesh->GetFlags().Set (CS_ENTITY_NOSHADOWS);
-        break;
-      case XMLTOKEN_INVISIBLE:
-        mesh->GetFlags().Set (CS_ENTITY_INVISIBLE);
-        break;
-      case XMLTOKEN_DETAIL:
-        mesh->GetFlags().Set (CS_ENTITY_DETAIL);
-        break;
-      case XMLTOKEN_ZFILL:
-        if (!priority) priority = "wall";
-#ifndef CS_USE_NEW_RENDERER
-        mesh->SetZBufMode (CS_ZBUF_FILL);
-#endif // CS_USE_NEW_RENDERER
-        break;
-      case XMLTOKEN_ZUSE:
-        if (!priority) priority = "object";
-#ifndef CS_USE_NEW_RENDERER
-        mesh->SetZBufMode (CS_ZBUF_USE);
-#endif // CS_USE_NEW_RENDERER
-        break;
-      case XMLTOKEN_ZNONE:
-        if (!priority) priority = "sky";
-#ifndef CS_USE_NEW_RENDERER
-        mesh->SetZBufMode (CS_ZBUF_NONE);
-#endif // CS_USE_NEW_RENDERER
-        break;
-      case XMLTOKEN_ZTEST:
-        if (!priority) priority = "alpha";
-#ifndef CS_USE_NEW_RENDERER
-        mesh->SetZBufMode (CS_ZBUF_TEST);
-#endif // CS_USE_NEW_RENDERER
-        break;
-      case XMLTOKEN_IMPOSTER:
-	ParseImposterSettings(mesh,child);
-        break;
-      case XMLTOKEN_CAMERA:
-        if (!priority) priority = "sky";
-        mesh->GetFlags().Set (CS_ENTITY_CAMERA);
-        break;
-      case XMLTOKEN_CONVEX:
-        mesh->GetFlags().Set (CS_ENTITY_CONVEX);
-        break;
-      case XMLTOKEN_KEY:
-        {
-          iKeyValuePair* kvp = ParseKey (child, mesh->QueryObject());
-          if (kvp)
-	    kvp->DecRef ();
-	  else
-	    return false;
-	}
-        break;
       case XMLTOKEN_MESHREF:
         {
           iMeshWrapper* sp = LoadMeshObjectFromFactory (child);
@@ -1909,58 +1891,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	  }
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetChildren ()->Add (sp);
-        }
-        break;
-      case XMLTOKEN_HARDMOVE:
-        {
-	  if (!mesh->GetMeshObject ()->SupportsHardTransform ())
-	  {
-            SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.meshobject",
-              child, "This mesh object doesn't support 'hardmove'!");
-	    return false;
-	  }
-	  csReversibleTransform tr;
-	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
-	  if (matrix_node)
-	  {
-	    csMatrix3 m;
-	    if (!SyntaxService->ParseMatrix (matrix_node, m))
-	      return false;
-	    tr.SetT2O (m);
-	  }
-	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
-	  if (vector_node)
-	  {
-	    csVector3 v;
-	    if (!SyntaxService->ParseVector (vector_node, v))
-	      return false;
-	    tr.SetOrigin (v);
-	  }
-	  mesh->HardTransform (tr);
-        }
-        break;
-      case XMLTOKEN_MOVE:
-        {
-          mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
-          mesh->GetMovable ()->SetPosition (csVector3 (0));
-	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
-	  if (matrix_node)
-	  {
-	    csMatrix3 m;
-	    if (!SyntaxService->ParseMatrix (matrix_node, m))
-	      return false;
-            mesh->GetMovable ()->SetTransform (m);
-	  }
-	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
-	  if (vector_node)
-	  {
-	    csVector3 v;
-	    if (!SyntaxService->ParseVector (vector_node, v))
-	      return false;
-            mesh->GetMovable ()->SetPosition (v);
-	  }
-	  mesh->GetMovable ()->UpdateMove ();
         }
         break;
 
