@@ -4,6 +4,9 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine eliminated a couple compilation warnings in
 	  csfedit.cpp.
 	- Added GetFOVAngle() to iCamera.
+	- Created the spr3d plugin (untested). The old csSprite3D is still
+	  there and will remain there until everything is ported to the
+	  new plugin. I also still have to implement spr3dldr (the loader).
 4-Feb-2001
 	- Wouter Wijngaards changed includes, so that make depend works
 	  nicer for csfedit.

@@ -230,7 +230,7 @@ public:
   //------------------------ iMeshObjectType implementation --------------
   DECLARE_IBASE;
 
-  /// Draw.
+  /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
 };
 
