@@ -333,9 +333,6 @@ struct iLight : public iBase
    * lighting calculations.
    */
   virtual void Setup () = 0;
-
-  /// Get the next dynamic light in the list. @@@ TEMPORARY
-  virtual iLight* GetNext () = 0;
 };
 
 SCF_VERSION (iLightList, 0, 0, 2);

@@ -52,15 +52,6 @@ private:
   /// Childnode representing this light in the sector light list kdtree.
   csKDTreeChild* childnode;
 
-  // @@@ TEMPORARY!
-  csLight* next;
-  csLight* prev;
-public:
-  csLight* GetCsNext () { return next; }
-  csLight* GetCsPrev () { return prev; }
-  void SetNext (csLight* n) { next = n; }
-  void SetPrev (csLight* p) { prev = p; }
-
 protected:
   /// Home sector of the light.
   iSector* sector;
@@ -168,11 +159,6 @@ public:
    * Currently only works on thing meshes.
    */
   void CalculateLighting (iMeshWrapper* mesh);
-
-  iLight* GetNext () // @@@ Temporary
-  {
-    return next ? &(next->scfiLight) : 0;
-  }
 
   /**
    * Set the kdtree child node used by this light (in the kdtree
@@ -418,8 +404,6 @@ public:
 
     virtual void Setup ()
     { scfParent->CalculateLighting (); }
-    virtual iLight* GetNext ()
-    { return scfParent->GetNext (); }
   } scfiLight;
   friend struct Light;
 };
