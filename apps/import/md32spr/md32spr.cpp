@@ -595,7 +595,6 @@ bool MD32spr::LoadAnimation(char *animFile)
   headModel->numActions = headActions;
   upperModel->numActions = upperActions;
   lowerModel->numActions = lowerActions;
-  printf("%d %d %d\n", headActions, upperActions, lowerActions);
   /*
    * Post Processing:
    * In some of the animation config files, the numbering leg animations of start frames continue 

@@ -22,8 +22,9 @@
 
 DataBuffer::DataBuffer(char *d, int sz) 
 {
-  data = new char[sz + 1];
+  data = new char[sz + 2];
   memcpy(data, d, sz);
+  data[sz] = '\n';
   data[sz + 1] = '\0';
   buffSize = sz;
   position = 0;
