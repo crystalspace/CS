@@ -284,7 +284,7 @@ show:
 # of the fallback implicit rules works around the problem (by pure magic); such
 # that GNU make uses the correct implicit rules defined by the various module
 # makefiles (at least in the observed cases).  This bug has manifested on
-# several occassions.  The incident which prompted this particular comment and
+# several occasions.  The incident which prompted this particular comment and
 # movement of this `include' above the fallback implicit rules involved the
 # OpenGL renderer.  GNU make was using the wrong implicit rule, and thus the
 # wrong commands (specifically, it failed to consult GL.CFLAGS) when building
