@@ -59,6 +59,10 @@ chronological order.
 	- Eric Sunshine added example to the jamtemplate-synthesized Jamfile.in
 	  which shows how to set additional compiler and linker options for
 	  msvcgen.
+	- res fixed the moving light in terrain. Due the Y offset it would 
+	  move higher and, until eventually the terrain was considered "out of
+	  influence radius" for the light, causing the diffuse pass not to be
+	  drawn.
 29-May-2004
 	- Peter Amstutz added a "--with-vos" option to the configure
 	  script to set the PKG_CONFIG_PATH environment variable when

@@ -155,7 +155,7 @@
   <meshfact name="TerrainFact">
     <plugin>terrainFact</plugin>
     <params>
-	    <!--<plugin>crystalspace.mesh.object.terrain.chunklod</plugin>-->
+      <!--plugin>crystalspace.mesh.object.terrain.chunklod</plugin-->
       <plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>
       <terraformer>simple</terraformer>
       <sampleregion>
@@ -218,10 +218,10 @@
     <sequences>
         <sequence name="moveLight">
 	    <movelight light="sun" duration="5000"
-	      x="5000000" y="866030" z="-6000000" />
+	      x="5000000" y="0" z="-6000000" />
 	    <delay time="5000" />
 	    <movelight light="sun" duration="5000"
-	      x="-5000000" y="866030" z="6000000" />
+	      x="-5000000" y="0" z="6000000" />
 	    <delay time="5000" />
 	    <enable trigger="moveLight" />
         </sequence>
