@@ -800,9 +800,9 @@ void Scan16::draw_pi_scanline_zfill (void *dest, int len, long *zbuff, long u, l
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_gouroud_zfill_555
+#ifndef NO_draw_pi_scanline_gouraud_zfill_555
 
-void Scan16::draw_pi_scanline_gouroud_zfill_555 (void *dest, int len, long *zbuff, long u, long du,
+void Scan16::draw_pi_scanline_gouraud_zfill_555 (void *dest, int len, long *zbuff, long u, long du,
   long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
   long r, long g, long b, long dr, long dg, long db)
 {
@@ -826,13 +826,13 @@ void Scan16::draw_pi_scanline_gouroud_zfill_555 (void *dest, int len, long *zbuf
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_gouroud_zfill_555
+#endif // NO_draw_pi_scanline_gouraud_zfill_555
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_gouroud_zfill_565
+#ifndef NO_draw_pi_scanline_gouraud_zfill_565
 
-void Scan16::draw_pi_scanline_gouroud_zfill_565 (void *dest, int len, long *zbuff, long u, long du,
+void Scan16::draw_pi_scanline_gouraud_zfill_565 (void *dest, int len, long *zbuff, long u, long du,
   long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
   long r, long g, long b, long dr, long dg, long db)
 {
@@ -856,13 +856,13 @@ void Scan16::draw_pi_scanline_gouroud_zfill_565 (void *dest, int len, long *zbuf
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_gouroud_zfill_565
+#endif // NO_draw_pi_scanline_gouraud_zfill_565
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_gouroud_555
+#ifndef NO_draw_pi_scanline_gouraud_555
 
-void Scan16::draw_pi_scanline_gouroud_555 (void *dest, int len, long *zbuff, long u, long du,
+void Scan16::draw_pi_scanline_gouraud_555 (void *dest, int len, long *zbuff, long u, long du,
   long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
   long r, long g, long b, long dr, long dg, long db)
 {
@@ -891,13 +891,13 @@ void Scan16::draw_pi_scanline_gouroud_555 (void *dest, int len, long *zbuff, lon
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_gouroud_555
+#endif // NO_draw_pi_scanline_gouraud_555
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_gouroud_565
+#ifndef NO_draw_pi_scanline_gouraud_565
 
-void Scan16::draw_pi_scanline_gouroud_565 (void *dest, int len, long *zbuff, long u, long du,
+void Scan16::draw_pi_scanline_gouraud_565 (void *dest, int len, long *zbuff, long u, long du,
   long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
   long r, long g, long b, long dr, long dg, long db)
 {
@@ -926,7 +926,166 @@ void Scan16::draw_pi_scanline_gouroud_565 (void *dest, int len, long *zbuff, lon
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_gouroud_565
+#endif // NO_draw_pi_scanline_gouraud_565
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat
+
+void Scan16::draw_pi_scanline_flat (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
+{
+  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
+  UShort *_dest = (UShort *)dest;
+  UShort *_destend = _dest + len;
+  while (_dest < _destend)
+  {
+    if (z >= *zbuff)
+    {
+      *_dest = 0xffff;
+      *zbuff = z;
+    }
+    _dest++;
+    zbuff++;
+    z += dz;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_flat
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_zfill
+
+void Scan16::draw_pi_scanline_flat_zfill (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
+{
+  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
+  UShort *_dest = (UShort *)dest;
+  UShort *_destend = _dest + len;
+  while (_dest < _destend)
+  {
+    *_dest++ = 0xffff;
+    *zbuff++ = z;
+    z += dz;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_flat_zfill
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud_zfill_555
+
+void Scan16::draw_pi_scanline_flat_gouraud_zfill_555 (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+  long r, long g, long b, long dr, long dg, long db)
+{
+  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
+  UShort *_dest = (UShort *)dest;
+  UShort *_destend = _dest + len;
+  int r1, g1, b1;
+  while (_dest < _destend)
+  {
+    r1 = r >> 16;
+    g1 = g >> 16;
+    b1 = b >> 16;
+    *_dest++ = (r1<<10) | (g1<<5) | b1;
+    *zbuff++ = z;
+    z += dz;
+    r += dr; g += dg; b += db;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_flat_gouraud_zfill_555
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud_zfill_565
+
+void Scan16::draw_pi_scanline_flat_gouraud_zfill_565 (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+  long r, long g, long b, long dr, long dg, long db)
+{
+  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
+  UShort *_dest = (UShort *)dest;
+  UShort *_destend = _dest + len;
+  int r1, g1, b1;
+  while (_dest < _destend)
+  {
+    r1 = r >> 16;
+    g1 = g >> 16;
+    b1 = b >> 16;
+    *_dest++ = (r1<<11) | (g1<<5) | b1;
+    *zbuff++ = z;
+    z += dz;
+    r += dr; g += dg; b += db;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_flat_gouraud_zfill_565
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud_555
+
+void Scan16::draw_pi_scanline_flat_gouraud_555 (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+  long r, long g, long b, long dr, long dg, long db)
+{
+  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
+  UShort *_dest = (UShort *)dest;
+  UShort *_destend = _dest + len;
+  int r1, g1, b1;
+  while (_dest < _destend)
+  {
+    if (z >= *zbuff)
+    {
+      r1 = r >> 16;
+      g1 = g >> 16;
+      b1 = b >> 16;
+      *_dest = (r1<<10) | (g1<<5) | b1;
+      *zbuff = z;
+    }
+    _dest++;
+    zbuff++;
+    z += dz;
+    r += dr; g += dg; b += db;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_flat_gouraud_555
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud_565
+
+void Scan16::draw_pi_scanline_flat_gouraud_565 (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+  long r, long g, long b, long dr, long dg, long db)
+{
+  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
+  UShort *_dest = (UShort *)dest;
+  UShort *_destend = _dest + len;
+  int r1, g1, b1;
+  while (_dest < _destend)
+  {
+    if (z >= *zbuff)
+    {
+      r1 = r >> 16;
+      g1 = g >> 16;
+      b1 = b >> 16;
+      *_dest = (r1<<11) | (g1<<5) | b1;
+      *zbuff = z;
+    }
+    _dest++;
+    zbuff++;
+    z += dz;
+    r += dr; g += dg; b += db;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_flat_gouraud_565
 
 //---------------------------------------------------------------------------
 

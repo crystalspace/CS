@@ -410,9 +410,9 @@ void Scan32::draw_pi_scanline (void *dest, int len, long *zbuff, long u, long du
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_gouroud_zfill
+#ifndef NO_draw_pi_scanline_gouraud_zfill
 
-void Scan32::draw_pi_scanline_gouroud_zfill (void *dest, int len, long *zbuff, long u, long du,
+void Scan32::draw_pi_scanline_gouraud_zfill (void *dest, int len, long *zbuff, long u, long du,
   long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
   long r, long g, long b, long dr, long dg, long db)
 {
@@ -437,13 +437,13 @@ void Scan32::draw_pi_scanline_gouroud_zfill (void *dest, int len, long *zbuff, l
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_gouroud_zfill
+#endif // NO_draw_pi_scanline_gouraud_zfill
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_gouroud
+#ifndef NO_draw_pi_scanline_gouraud
 
-void Scan32::draw_pi_scanline_gouroud (void *dest, int len, long *zbuff, long u, long du,
+void Scan32::draw_pi_scanline_gouraud (void *dest, int len, long *zbuff, long u, long du,
   long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
   long r, long g, long b, long dr, long dg, long db)
 {
@@ -473,7 +473,109 @@ void Scan32::draw_pi_scanline_gouroud (void *dest, int len, long *zbuff, long u,
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_gouroud
+#endif // NO_draw_pi_scanline_gouraud
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud_zfill
+
+void Scan32::draw_pi_scanline_flat_gouraud_zfill (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+  long r, long g, long b, long dr, long dg, long db)
+{
+  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
+  ULong *_dest = (ULong *)dest;
+  ULong *_destend = _dest + len;
+  ULong r1, g1, b1;
+  while (_dest < _destend)
+  {
+    r1 = ((ULong)r) >> 16;
+    g1 = ((ULong)g) >> 16;
+    b1 = ((ULong)b) >> 16;
+    *_dest++ = (r1<<16) | (g1<<8) | b1;
+    *zbuff++ = z;
+    z += dz;
+    r += dr; g += dg; b += db;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_flat_gouraud_zfill
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud
+
+void Scan32::draw_pi_scanline_flat_gouraud (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+  long r, long g, long b, long dr, long dg, long db)
+{
+  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
+  ULong *_dest = (ULong *)dest;
+  ULong *_destend = _dest + len;
+  ULong r1, g1, b1;
+  while (_dest < _destend)
+  {
+    if (z >= *zbuff)
+    {
+      r1 = ((ULong)r) >> 16;
+      g1 = ((ULong)g) >> 16;
+      b1 = ((ULong)b) >> 16;
+      *_dest = (r1<<16) | (g1<<8) | b1;
+      *zbuff = z;
+    }
+    _dest++;
+    zbuff++;
+    z += dz;
+    r += dr; g += dg; b += db;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_flat_gouraud
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_zfill
+
+void Scan32::draw_pi_scanline_flat_zfill (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
+{
+  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
+  ULong *_dest = (ULong *)dest;
+  ULong *_destend = _dest + len;
+  while (_dest < _destend)
+  {
+    *_dest++ = 0xffffff;
+    *zbuff++ = z;
+    z += dz;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_flat_zfill
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat
+
+void Scan32::draw_pi_scanline_flat (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
+{
+  (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
+  ULong *_dest = (ULong *)dest;
+  ULong *_destend = _dest + len;
+  while (_dest < _destend)
+  {
+    if (z >= *zbuff)
+    {
+      *_dest = 0xffffff;
+      *zbuff = z;
+    }
+    _dest++;
+    zbuff++;
+    z += dz;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_flat
 
 //------------------------------------------------------------------
 

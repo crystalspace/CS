@@ -23,6 +23,7 @@
 #include "csgeom/math2d.h"  // texel coords
 #include "csobject/csobj.h"
 #include "csengine/basic/fog.h"
+#include "csengine/cscolor.h"
 
 class csPolygonTemplate;
 class csTextureHandle;
@@ -160,6 +161,15 @@ private:
   ///
   csThingTemplate* parent;
 
+  /// Flat color to use instead of texture map.
+  csColor flat_color;
+
+  /// True if flat_color should be used.
+  bool use_flat_color;
+
+  /// True if gouraud shading used.
+  bool use_gouraud;
+
 public:
   ///
   csPolygonTemplate (csThingTemplate* parent, char* name, csTextureHandle* texture = NULL);
@@ -176,6 +186,33 @@ public:
   void AddVertex (int v);
   ///
   char* GetName () { return name; }
+
+  /// Return true if flat color is used (instead of texture).
+  bool UseFlatColor () { return use_flat_color; }
+
+  /// Get the flat color for this polygon.
+  csColor& GetFlatColor () { return flat_color; }
+
+  /// Enable gouraud shading.
+  void SetGouraud () { use_gouraud = true; }
+
+  /// Is gouraud shading used?
+  bool UseGouraud () { return use_gouraud; }
+
+  /// Set the flat color for this polygon.
+  void SetFlatColor (float r, float g, float b)
+  {
+    flat_color.red = r;
+    flat_color.green = g;
+    flat_color.blue = b;
+    use_flat_color = true;
+  }
+
+  /// Set the flat color for this polygon.
+  void SetFlatColor (csColor& fc) { flat_color = fc; use_flat_color = true; }
+
+  /// Reset flat color (i.e. use texturing again).
+  void ResetFlatColor () { use_flat_color = false; }
 
   /// Compute the plane normal of this polygon.
   void PlaneNormal (float* A, float* B, float* C);

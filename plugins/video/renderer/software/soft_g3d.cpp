@@ -1704,33 +1704,44 @@ struct PQInfo
   float th;
   unsigned char* bm;
   int shf_w;
+  bool textured;
+  bool do_gouraud;
+  float r, g, b;
   void (*drawline) (void *dest, int len, long *zbuff, long u, long du, long v,
     long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w);
   void (*drawline_gouraud) (void *dest, int len, long *zbuff, long u, long du, long v,
     long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
     long r, long g, long b, long dr, long dg, long db);
-
 };
 
 PQInfo pqinfo;
 
 STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle, bool gouraud)
 {
-  csTextureMMSoftware* txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (handle);
-  csTexture* txt_unl = txt_mm->get_texture (0);
+  csTextureMMSoftware* txt_mm;
+  csTexture* txt_unl;
+  pqinfo.textured = true;
   if (!do_lighting) gouraud = false;
+  if (!do_textured) pqinfo.textured = false;
+  if (!handle) pqinfo.textured = false;
+  pqinfo.do_gouraud = gouraud || !handle;
 
   int itw, ith;
 
-  pqinfo.bm = txt_unl->get_bitmap8 ();
-  itw = txt_unl->get_width ();
-  ith = txt_unl->get_height ();
-  pqinfo.shf_w = txt_unl->get_w_shift ();
+  if (handle)
+  {
+    txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (handle);
+    txt_unl = txt_mm->get_texture (0);
+    pqinfo.bm = txt_unl->get_bitmap8 ();
+    itw = txt_unl->get_width ();
+    ith = txt_unl->get_height ();
+    pqinfo.shf_w = txt_unl->get_w_shift ();
 
-  pqinfo.tw = (float)itw; 
-  pqinfo.th = (float)ith; 
-  pqinfo.twfp = QInt16 (pqinfo.tw);
-  pqinfo.thfp = QInt16 (pqinfo.th);
+    pqinfo.tw = (float)itw; 
+    pqinfo.th = (float)ith; 
+    pqinfo.twfp = QInt16 (pqinfo.tw);
+    pqinfo.thfp = QInt16 (pqinfo.th);
+  }
 
   IGraphicsInfo* piGI;
 
@@ -1757,53 +1768,100 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle, bo
     TextureTablesPalette* lt_pal = txtmgr->lt_pal;
     Scan16::pal_table = lt_pal->pal_to_true;
 
-    if (gouraud)
+    if (!pqinfo.textured)
     {
-      if (z_buf_mode == ZBuf_Use)
-	if (pqinfo.greenBits == 5)
-          pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouroud_555;
-	else
-          pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouroud_565;
+      if (pqinfo.do_gouraud)
+      {
+        if (z_buf_mode == ZBuf_Use)
+	  if (pqinfo.greenBits == 5)
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_555;
+	  else
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_565;
+        else
+	  if (pqinfo.greenBits == 5)
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_zfill_555;
+	  else
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_zfill_565;
+      }
       else
-	if (pqinfo.greenBits == 5)
-          pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouroud_zfill_555;
-	else
-          pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouroud_zfill_565;
+      {
+        if (z_buf_mode == ZBuf_Use)
+          pqinfo.drawline = Scan16::draw_pi_scanline_flat;
+        else
+          pqinfo.drawline = Scan16::draw_pi_scanline_flat_zfill;
+      }
     }
     else
     {
-      if (z_buf_mode == ZBuf_Use)
+      if (gouraud)
       {
-#       if defined(DO_MMX) && !defined(NO_ASSEMBLER)
-	  // if (cpu_mmx && do_mmx)
-	  // drawline = Scan16::mmx_draw_pi_scanline;
-	  // else
-#       endif
-        pqinfo.drawline = Scan16::draw_pi_scanline;
+        if (z_buf_mode == ZBuf_Use)
+	  if (pqinfo.greenBits == 5)
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_555;
+	  else
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_565;
+        else
+	  if (pqinfo.greenBits == 5)
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_zfill_555;
+	  else
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_zfill_565;
       }
       else
-        pqinfo.drawline = Scan16::draw_pi_scanline_zfill;
+      {
+        if (z_buf_mode == ZBuf_Use)
+        {
+#         if defined(DO_MMX) && !defined(NO_ASSEMBLER)
+	    // if (cpu_mmx && do_mmx)
+	    // drawline = Scan16::mmx_draw_pi_scanline;
+	    // else
+#         endif
+          pqinfo.drawline = Scan16::draw_pi_scanline;
+        }
+        else
+          pqinfo.drawline = Scan16::draw_pi_scanline_zfill;
+      }
     }
   }
   else if (pqinfo.pixelbytes == 4)
   {
-    if (gouraud)
+    if (!pqinfo.textured)
     {
-      if (z_buf_mode == ZBuf_Use)
-        pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_gouroud;
+      if (pqinfo.do_gouraud)
+      {
+        if (z_buf_mode == ZBuf_Use)
+          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_flat_gouraud;
+        else
+          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_flat_gouraud_zfill;
+      }
       else
-        pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_gouroud_zfill;
+      {
+        if (z_buf_mode == ZBuf_Use)
+          pqinfo.drawline = Scan32::draw_pi_scanline_flat;
+        else
+          pqinfo.drawline = Scan32::draw_pi_scanline_flat_zfill;
+      }
     }
     else
     {
-      if (z_buf_mode == ZBuf_Use)
-        pqinfo.drawline = Scan32::draw_pi_scanline;
+      if (gouraud)
+      {
+        if (z_buf_mode == ZBuf_Use)
+          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_gouraud;
+        else
+          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_gouraud_zfill;
+      }
       else
-        pqinfo.drawline = Scan32::draw_pi_scanline_zfill;
+      {
+        if (z_buf_mode == ZBuf_Use)
+          pqinfo.drawline = Scan32::draw_pi_scanline;
+        else
+          pqinfo.drawline = Scan32::draw_pi_scanline_zfill;
+      }
     }
   }
   else
   {
+    if (!handle) return S_OK;	// Not implemented yet@@@
     if (z_buf_mode == ZBuf_Use)
     {
 #     if defined(DO_MMX) && !defined(NO_ASSEMBLER)
@@ -1828,7 +1886,11 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
 {
   int i;
   if (pqinfo.pixelbytes <= 1) gouraud = false;	// Currently no gouraud shading in 8-bit mode.
-  if (!do_lighting) gouraud = false;
+  gouraud = pqinfo.do_gouraud;
+
+  float flat_r, flat_g, flat_b;
+  if (poly.txt_handle) { flat_r = flat_g = flat_b = 0; }
+  else { flat_r = poly.flat_color_r; flat_g = poly.flat_color_g; flat_b = poly.flat_color_b; }
 
   //-----
   // Get the values from the polygon for more conveniant local access.
@@ -1845,9 +1907,9 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
     uu[i] = pqinfo.tw * poly.pi_texcoords [i].u;
     vv[i] = pqinfo.th * poly.pi_texcoords [i].v;
     iz[i] = poly.pi_texcoords [i].z;
-    rr[i] = pqinfo.redFact*poly.pi_texcoords[i].r;
-    gg[i] = pqinfo.greenFact*poly.pi_texcoords[i].g;
-    bb[i] = pqinfo.blueFact*poly.pi_texcoords[i].b;
+    rr[i] = pqinfo.redFact*(flat_r+poly.pi_texcoords[i].r);
+    gg[i] = pqinfo.greenFact*(flat_g+poly.pi_texcoords[i].g);
+    bb[i] = pqinfo.blueFact*(flat_b+poly.pi_texcoords[i].b);
     if (poly.vertices [i].sy > top_y)
     {
       top_y = poly.vertices [i].sy;
@@ -1873,16 +1935,20 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
            * (poly.pi_triangle [0].y - poly.pi_triangle [2].y);
   float inv_dd = 1/dd;
 
-  float uu0 = pqinfo.tw * poly.pi_tritexcoords [0].u;
-  float uu1 = pqinfo.tw * poly.pi_tritexcoords [1].u;
-  float uu2 = pqinfo.tw * poly.pi_tritexcoords [2].u;
-  int du = QInt16 (((uu0 - uu2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
-                  - (uu1 - uu2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
-  float vv0 = pqinfo.th * poly.pi_tritexcoords [0].v;
-  float vv1 = pqinfo.th * poly.pi_tritexcoords [1].v;
-  float vv2 = pqinfo.th * poly.pi_tritexcoords [2].v;
-  int dv = QInt16 (((vv0 - vv2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
-                  - (vv1 - vv2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
+  int du = 0, dv = 0;
+  if (pqinfo.textured)
+  {
+    float uu0 = pqinfo.tw * poly.pi_tritexcoords [0].u;
+    float uu1 = pqinfo.tw * poly.pi_tritexcoords [1].u;
+    float uu2 = pqinfo.tw * poly.pi_tritexcoords [2].u;
+    du = QInt16 (((uu0 - uu2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
+                - (uu1 - uu2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
+    float vv0 = pqinfo.th * poly.pi_tritexcoords [0].v;
+    float vv1 = pqinfo.th * poly.pi_tritexcoords [1].v;
+    float vv2 = pqinfo.th * poly.pi_tritexcoords [2].v;
+    dv = QInt16 (((vv0 - vv2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
+                - (vv1 - vv2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
+  }
   float iz0 = poly.pi_tritexcoords [0].z;
   float iz1 = poly.pi_tritexcoords [1].z;
   float iz2 = poly.pi_tritexcoords [2].z;
@@ -1891,19 +1957,19 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
   long dr = 0, dg = 0, db = 0;
   if (gouraud)
   {
-    float rr0 = pqinfo.redFact*poly.pi_tritexcoords [0].r;
-    float rr1 = pqinfo.redFact*poly.pi_tritexcoords [1].r;
-    float rr2 = pqinfo.redFact*poly.pi_tritexcoords [2].r;
+    float rr0 = pqinfo.redFact*(flat_r+poly.pi_tritexcoords [0].r);
+    float rr1 = pqinfo.redFact*(flat_r+poly.pi_tritexcoords [1].r);
+    float rr2 = pqinfo.redFact*(flat_r+poly.pi_tritexcoords [2].r);
     dr = QInt16 (((rr0 - rr2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
                 - (rr1 - rr2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
-    float gg0 = pqinfo.greenFact*poly.pi_tritexcoords [0].g;
-    float gg1 = pqinfo.greenFact*poly.pi_tritexcoords [1].g;
-    float gg2 = pqinfo.greenFact*poly.pi_tritexcoords [2].g;
+    float gg0 = pqinfo.greenFact*(flat_g+poly.pi_tritexcoords [0].g);
+    float gg1 = pqinfo.greenFact*(flat_g+poly.pi_tritexcoords [1].g);
+    float gg2 = pqinfo.greenFact*(flat_g+poly.pi_tritexcoords [2].g);
     dg = QInt16 (((gg0 - gg2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
                 - (gg1 - gg2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
-    float bb0 = pqinfo.blueFact*poly.pi_tritexcoords [0].b;
-    float bb1 = pqinfo.blueFact*poly.pi_tritexcoords [1].b;
-    float bb2 = pqinfo.blueFact*poly.pi_tritexcoords [2].b;
+    float bb0 = pqinfo.blueFact*(flat_b+poly.pi_tritexcoords [0].b);
+    float bb1 = pqinfo.blueFact*(flat_b+poly.pi_tritexcoords [1].b);
+    float bb2 = pqinfo.blueFact*(flat_b+poly.pi_tritexcoords [2].b);
     db = QInt16 (((bb0 - bb2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
                 - (bb1 - bb2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
   }
@@ -1973,8 +2039,11 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
         {
 	  float inv_dyL = 1/dyL;
           dxdyL = QInt16 ((poly.vertices [scanL2].sx - poly.vertices [scanL1].sx) * inv_dyL);
-          dudyL = QInt16 ((uu[scanL2] - uu[scanL1]) * inv_dyL);
-          dvdyL = QInt16 ((vv[scanL2] - vv[scanL1]) * inv_dyL);
+	  if (pqinfo.textured)
+	  {
+            dudyL = QInt16 ((uu[scanL2] - uu[scanL1]) * inv_dyL);
+            dvdyL = QInt16 ((vv[scanL2] - vv[scanL1]) * inv_dyL);
+	  }
           dzdyL = QInt24 ((iz[scanL2] - iz[scanL1]) * inv_dyL);
 	  if (gouraud)
 	  {
@@ -1995,8 +2064,11 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
             Factor = deltaX / (poly.vertices [scanL2].sx - poly.vertices [scanL1].sx);
           else
             Factor = 0;
-          uL = QInt16 (uu [scanL1] + (uu [scanL2] - uu [scanL1]) * Factor);
-          vL = QInt16 (vv [scanL1] + (vv [scanL2] - vv [scanL1]) * Factor);
+	  if (pqinfo.textured)
+	  {
+            uL = QInt16 (uu [scanL1] + (uu [scanL2] - uu [scanL1]) * Factor);
+            vL = QInt16 (vv [scanL1] + (vv [scanL2] - vv [scanL1]) * Factor);
+	  }
           zL = QInt24 (iz [scanL1] + (iz [scanL2] - iz [scanL1]) * Factor);
           if (gouraud)
 	  {
@@ -2019,65 +2091,82 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
       fin_y = fyR;
 
     int screenY = height - 1 - sy;
-    while (sy > fin_y)
-    {
-      if ((sy & 1) != do_interlaced)
+    if (!pqinfo.textured)
+      while (sy > fin_y)
       {
-        //-----
-        // Draw one scanline.
-        //-----
-        int xl = round16 (xL);
-        int xr = round16 (xR);
-
-        register long* zbuff = (long *)z_buffer + width * screenY + xl;
-
-        // Check for texture overflows
-        int uu = uL, vv = vL;
-        int duu = du, dvv = dv;
-        if (uu < 0) uu = 0; if (uu > pqinfo.twfp) uu = pqinfo.twfp;
-        if (vv < 0) vv = 0; if (vv > pqinfo.thfp) vv = pqinfo.thfp;
-        if (xr > xl)
+        if ((sy & 1) != do_interlaced)
         {
-          int tmpu = uu + du * (xr - xl);
-          int tmpv = vv + dv * (xr - xl);
-          if (tmpu < 0 || tmpu > pqinfo.twfp)
-          {
-            if (tmpu < 0) tmpu = 0; if (tmpu > pqinfo.twfp) tmpu = pqinfo.twfp;
-            duu = (tmpu - uu) / (xr - xl);
-          } /* endif */
-          if (tmpv < 0 || tmpv > pqinfo.thfp)
-          {
-            if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp) tmpv = pqinfo.thfp;
-            dvv = (tmpv - vv) / (xr - xl);
-          } /* endif */
+          //-----
+          // Draw one scanline.
+          //-----
+          int xl = round16 (xL);
+          int xr = round16 (xR);
+
+          register long* zbuff = (long *)z_buffer + width * screenY + xl;
+          unsigned char* pixel_at = line_table[screenY] + (xl << pixel_shift);
+	  if (gouraud)
+            pqinfo.drawline_gouraud (pixel_at, xr - xl, zbuff, 0, 0,
+                    0, 0, zL, dz, NULL, 0, rL, gL, bL, dr, dg, db);
+          else
+	    pqinfo.drawline (pixel_at, xr - xl, zbuff, 0, 0,
+                    0, 0, zL, dz, NULL, 0);
         } /* endif */
 
-        unsigned char* pixel_at;
-        //m_piG2D->GetPixelAt(xl, screenY, &pixel_at);
-	pixel_at = line_table[screenY] + (xl << pixel_shift);
-	if (gouraud)
-          pqinfo.drawline_gouraud (pixel_at, xr - xl, zbuff, uu, duu,
-                  vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w, rL, gL, bL, dr, dg, db);
-        else
-	  pqinfo.drawline (pixel_at, xr - xl, zbuff, uu, duu,
-                  vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w);
-      } /* endif */
-
-      xL += dxdyL;
-      xR += dxdyR;
-      uL += dudyL;
-      vL += dvdyL;
-      zL += dzdyL;
-      if (gouraud)
-      {
-        rL += drdyL;
-        gL += dgdyL;
-        bL += dbdyL;
+        xL += dxdyL; xR += dxdyR; zL += dzdyL;
+        if (gouraud) { rL += drdyL; gL += dgdyL; bL += dbdyL; }
+        sy--;
+        screenY++;
       }
-      sy--;
-      screenY++;
-    } /* endwhile */
-  } /* endfor */
+    else
+      while (sy > fin_y)
+      {
+        if ((sy & 1) != do_interlaced)
+        {
+          //-----
+          // Draw one scanline.
+          //-----
+          int xl = round16 (xL);
+          int xr = round16 (xR);
+
+          register long* zbuff = (long *)z_buffer + width * screenY + xl;
+
+          // Check for texture overflows
+          int uu = uL, vv = vL;
+          int duu = du, dvv = dv;
+          if (uu < 0) uu = 0; if (uu > pqinfo.twfp) uu = pqinfo.twfp;
+          if (vv < 0) vv = 0; if (vv > pqinfo.thfp) vv = pqinfo.thfp;
+          if (xr > xl)
+          {
+            int tmpu = uu + du * (xr - xl);
+            int tmpv = vv + dv * (xr - xl);
+            if (tmpu < 0 || tmpu > pqinfo.twfp)
+            {
+              if (tmpu < 0) tmpu = 0; if (tmpu > pqinfo.twfp) tmpu = pqinfo.twfp;
+              duu = (tmpu - uu) / (xr - xl);
+            }
+            if (tmpv < 0 || tmpv > pqinfo.thfp)
+            {
+              if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp) tmpv = pqinfo.thfp;
+              dvv = (tmpv - vv) / (xr - xl);
+            }
+          }
+
+          unsigned char* pixel_at = line_table[screenY] + (xl << pixel_shift);
+	  if (gouraud)
+            pqinfo.drawline_gouraud (pixel_at, xr - xl, zbuff, uu, duu,
+                    vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w, rL, gL, bL, dr, dg, db);
+          else
+	    pqinfo.drawline (pixel_at, xr - xl, zbuff, uu, duu,
+                    vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w);
+        }
+
+        xL += dxdyL; xR += dxdyR;
+        uL += dudyL; vL += dvdyL; zL += dzdyL;
+        if (gouraud) { rL += drdyL; gL += dgdyL; bL += dbdyL; }
+        sy--;
+        screenY++;
+      }
+  }
 
 finish:
   if (rstate_edges)

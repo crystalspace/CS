@@ -119,6 +119,10 @@ struct G3DPolygon
   csVector2 *pi_triangle;
   /// The original u,v,z
   poly_texture_def pi_tritexcoords [3];
+  /// Use this color for drawing (if txt_handle == NULL) instead of a texture.
+  float flat_color_r;
+  float flat_color_g;
+  float flat_color_b;
 };
 
 ///

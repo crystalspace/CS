@@ -236,18 +236,22 @@ be visible.
   <uv> ::= 'UV' '(' <texture-coordinate> ',' <texture-coordinate> ',' <texture-coordinate> ')'
 
   <colors> ::= 'COLORS' '(' <color> ',' <color> ',' <color> ')'
+  <gouraud> ::= 'GOURAUD' '(' ')'
+  <flatcol> ::= 'FLATCOL' '(' <color> ')'
   
   <cosfact> ::= 'COSFACT' '(' <number> ')'
 
   <polygon-comp> ::= <texnr> | <lighting> | <mipmap> | <portal> | <warp> |
 		   <lightx> | <polygon-texture> | <vertices> | <alpha> |
-		   <fog> | <uv> | <uva> | <colors> | <cosfact>
+		   <fog> | <uv> | <uva> | <colors> | <cosfact> | <gouraud> |
+		   <flatcol>
   <polygon> ::= 'POLYGON' <polygon-name> '(' { <polygon-comp> } ')'
 
 -----------------------------------------------------------------------------
 Polygon templates:
 
-  <polygon-tpl-comp> ::= <texnr> | <lighting> | <mipmap> | <polygon-texture> | <vertices>
+  <polygon-tpl-comp> ::= <texnr> | <lighting> | <mipmap> | <polygon-texture> | <vertices> |
+  			 <gouraud> | <flatcol>
   <polygon-template> ::= 'POLYGON' <polygon-name> '(' { <polygon-tpl-comp> } ')'
 
 -----------------------------------------------------------------------------

@@ -165,6 +165,8 @@ csPolygonTemplate::csPolygonTemplate (csThingTemplate* parent, char* name,
   no_mipmap = false;
   no_lighting = false;
 
+  use_flat_color = false;
+  use_gouraud = false;
 }
 
 csPolygonTemplate::~csPolygonTemplate ()

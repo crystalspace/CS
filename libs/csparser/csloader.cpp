@@ -1002,7 +1002,7 @@ enum { kTokenPolTexNr = 1, kTokenPolLighting, kTokenPolMipmap,
        kTokenPolPortal, kTokenPolWarp, kTokenPolLightX,
        kTokenPolTexture, kTokenPolVertices, kTokenPolAlpha,
        kTokenPolFog, kTokenPolUV, kTokenPolUVA, kTokenPolColors,
-       kTokenPolCosFact };
+       kTokenPolFlatCol, kTokenPolCosFact, kTokenPolGouraud };
 
 enum { kTokenPTexOrig = 1, kTokenPTexFirst, kTokenPTexFirstLen,
        kTokenPTexSecond, kTokenPTexSecondLen, kTokenPTexLen,
@@ -1026,9 +1026,11 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
 	{kTokenPolUVA, "UVA"},
 	{kTokenPolUV, "UV"},
 	{kTokenPolColors, "COLORS"},
+	{kTokenPolFlatCol, "FLATCOL"},
 	{kTokenPolAlpha, "ALPHA"},
 	{kTokenPolFog, "FOG"},
 	{kTokenPolCosFact, "COSFACT"},
+	{kTokenPolGouraud, "GOURAUD"},
 	{0,0}};
   static tokenDesc tCommands[] = {
 	{kTokenPTexOrig, "ORIG"},
@@ -1228,6 +1230,16 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           ScanStr (params, "%D", list, &num);
 	  for (i = 0 ; i < num ; i++) poly3d->AddVertex (list[i]);
 	}
+	break;
+      case kTokenPolFlatCol:
+        {
+	  float r, g, b;
+          ScanStr (params, "%f,%f,%f", &r, &g, &b);
+	  poly3d->SetFlatColor (r, g, b);
+	}
+	break;
+      case kTokenPolGouraud:
+	poly3d->SetColor (0, 0, 0, 0);
 	break;
       case kTokenPolUV:
         {
@@ -1543,7 +1555,7 @@ void CSLoader::txt_process (csTextureHandle* txt_handle, char* buf)
 //---------------------------------------------------------------------------
 
 enum { kTokenPolTTexNr = 1, kTokenPolTLighting, kTokenPolTMipmap,
-       kTokenPolTTexture, kTokenPolTVertices };
+       kTokenPolTTexture, kTokenPolTVertices, kTokenPolTFlatCol, kTokenPolTGouraud };
 
 enum { kTokenPTTexOrig = 1, kTokenPTTexFirst, kTokenPTTexFirstLen,
        kTokenPTTexSecond, kTokenPTTexSecondLen, kTokenPTTexLen,
@@ -1559,6 +1571,8 @@ csPolygonTemplate* CSLoader::load_ptemplate (char* ptname, char* buf,
 	{kTokenPolTMipmap, "MIPMAP"},
 	{kTokenPolTTexture, "TEXTURE"},
 	{kTokenPolTVertices, "VERTICES"},
+	{kTokenPolTFlatCol, "FLATCOL"},
+	{kTokenPolTGouraud, "GOURAUD"},
 	{0,0}};
   static tokenDesc tCommands[] = {
 	{kTokenPTTexOrig, "ORIG"},
@@ -1608,6 +1622,16 @@ csPolygonTemplate* CSLoader::load_ptemplate (char* ptname, char* buf,
 	  fatal_exit (0, false);
         }
         ptemplate->SetTexture (tex);
+	break;
+      case kTokenPolTGouraud:
+        ptemplate->SetGouraud ();
+	break;
+      case kTokenPolTFlatCol:
+        {
+	  float r, g, b;
+          ScanStr (params, "%f,%f,%f", &r, &g, &b);
+	  ptemplate->SetFlatColor (r, g, b);
+	}
 	break;
       case kTokenPolTLighting:
         {

@@ -121,23 +121,51 @@ public:
   static void draw_pi_scanline_zfill (void *dest, int len, long *zbuff,
                                 long u, long du, long v, long dv, long z, long dz,
                                 unsigned char *bitmap, int bitmap_log2w);
-  /// Draw a perspective-incorrect texture mapped polygon scanline with gouroud shading. Z fill only
-  static void draw_pi_scanline_gouroud_zfill_555 (void *dest, int len, long *zbuff,
+  /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading. Z fill only
+  static void draw_pi_scanline_gouraud_zfill_555 (void *dest, int len, long *zbuff,
                                 long u, long du, long v, long dv, long z, long dz,
                                 unsigned char *bitmap, int bitmap_log2w,
 				long r, long g, long b, long dr, long dg, long db);
-  /// Draw a perspective-incorrect texture mapped polygon scanline with gouroud shading. Z fill only
-  static void draw_pi_scanline_gouroud_zfill_565 (void *dest, int len, long *zbuff,
+  /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading. Z fill only
+  static void draw_pi_scanline_gouraud_zfill_565 (void *dest, int len, long *zbuff,
                                 long u, long du, long v, long dv, long z, long dz,
                                 unsigned char *bitmap, int bitmap_log2w,
 				long r, long g, long b, long dr, long dg, long db);
-  /// Draw a perspective-incorrect texture mapped polygon scanline with gouroud shading.
-  static void draw_pi_scanline_gouroud_555 (void *dest, int len, long *zbuff,
+  /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading.
+  static void draw_pi_scanline_gouraud_555 (void *dest, int len, long *zbuff,
                                 long u, long du, long v, long dv, long z, long dz,
                                 unsigned char *bitmap, int bitmap_log2w,
 				long r, long g, long b, long dr, long dg, long db);
-  /// Draw a perspective-incorrect texture mapped polygon scanline with gouroud shading.
-  static void draw_pi_scanline_gouroud_565 (void *dest, int len, long *zbuff,
+  /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading.
+  static void draw_pi_scanline_gouraud_565 (void *dest, int len, long *zbuff,
+                                long u, long du, long v, long dv, long z, long dz,
+                                unsigned char *bitmap, int bitmap_log2w,
+				long r, long g, long b, long dr, long dg, long db);
+  /// Draw a flat shaded polygon scanline
+  static void draw_pi_scanline_flat (void *dest, int len, long *zbuff,
+                                long u, long du, long v, long dv, long z, long dz,
+                                unsigned char *bitmap, int bitmap_log2w);
+  /// Draw a flat shaded polygon scanline. Z fill only
+  static void draw_pi_scanline_flat_zfill (void *dest, int len, long *zbuff,
+                                long u, long du, long v, long dv, long z, long dz,
+                                unsigned char *bitmap, int bitmap_log2w);
+  /// Draw a flat shaded polygon scanline with gouraud shading. Z fill only
+  static void draw_pi_scanline_flat_gouraud_zfill_555 (void *dest, int len, long *zbuff,
+                                long u, long du, long v, long dv, long z, long dz,
+                                unsigned char *bitmap, int bitmap_log2w,
+				long r, long g, long b, long dr, long dg, long db);
+  /// Draw a flat shaded polygon scanline with gouraud shading. Z fill only
+  static void draw_pi_scanline_flat_gouraud_zfill_565 (void *dest, int len, long *zbuff,
+                                long u, long du, long v, long dv, long z, long dz,
+                                unsigned char *bitmap, int bitmap_log2w,
+				long r, long g, long b, long dr, long dg, long db);
+  /// Draw a flat shaded polygon scanline with gouraud shading.
+  static void draw_pi_scanline_flat_gouraud_555 (void *dest, int len, long *zbuff,
+                                long u, long du, long v, long dv, long z, long dz,
+                                unsigned char *bitmap, int bitmap_log2w,
+				long r, long g, long b, long dr, long dg, long db);
+  /// Draw a flat shaded polygon scanline with gouraud shading.
+  static void draw_pi_scanline_flat_gouraud_565 (void *dest, int len, long *zbuff,
                                 long u, long du, long v, long dv, long z, long dz,
                                 unsigned char *bitmap, int bitmap_log2w,
 				long r, long g, long b, long dr, long dg, long db);

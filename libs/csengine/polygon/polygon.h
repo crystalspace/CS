@@ -201,6 +201,17 @@ private:
   csLightPatch* lightpatches;
 
   /**
+   * If this value is true then the polygon is not texture mapped
+   * (does not every require a texture) but flat-shaded instead.
+   */
+  bool use_flat_color;
+
+  /**
+   * Flat shading color.
+   */
+  csColor flat_color;
+
+  /**
    * If the following arrays is non-NULL then this polygon is drawn
    * using a different technique (all previous mipmap and lightmap stuff
    * is ignored). The polygon will be drawn with perspective incorrect
@@ -334,6 +345,27 @@ public:
 
   /// Get the pointer to the vertex color table.
   csColor* GetColors () { return colors; }
+
+  /// Return true if flat color is used (instead of texture).
+  bool UseFlatColor () { return use_flat_color; }
+
+  /// Get the flat color for this polygon.
+  csColor& GetFlatColor () { return flat_color; }
+
+  /// Set the flat color for this polygon.
+  void SetFlatColor (float r, float g, float b)
+  {
+    flat_color.red = r;
+    flat_color.green = g;
+    flat_color.blue = b;
+    use_flat_color = true;
+  }
+
+  /// Set the flat color for this polygon.
+  void SetFlatColor (csColor& fc) { flat_color = fc; use_flat_color = true; }
+
+  /// Reset flat color (i.e. use texturing again).
+  void ResetFlatColor () { use_flat_color = false; }
 
   /**
    * Set a color. Only use after 'set_uv' has been called for this index.

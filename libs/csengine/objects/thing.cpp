@@ -695,6 +695,10 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     p->SetLighting (pt->IsLighted ());
     p->SetMipmapping (pt->IsMipmapped ());
     p->SetTextureSpace (pt->GetTextureMatrix (), pt->GetTextureVector ());
+    if (pt->UseFlatColor ())
+      p->SetFlatColor (pt->GetFlatColor ());
+    if (pt->UseGouraud ())
+      p->SetColor (0, 0, 0, 0);
   }
 
   for (i=0;i< tpl->GetNumCurveVertices();i++)

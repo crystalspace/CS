@@ -110,6 +110,8 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture)
   lightpatches = NULL;
   uv_coords = NULL;
   colors = NULL;
+
+  use_flat_color = false;
 }
 
 csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
@@ -152,6 +154,9 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
   lightpatches = NULL;
   uv_coords = NULL;
   colors = NULL;
+
+  flat_color = poly.flat_color;
+  use_flat_color = poly.use_flat_color;
 }
 
 csPolygon3D::~csPolygon3D ()
@@ -301,7 +306,7 @@ void csPolygon3D::SetTexture (csTextureHandle* texture)
 
 ITextureHandle* csPolygon3D::GetTextureHandle ()
 {
-  return txtMM->GetTextureHandle ();
+  return txtMM ? txtMM->GetTextureHandle () : (ITextureHandle*)NULL;
 }
 
 
@@ -376,7 +381,7 @@ void csPolygon3D::ObjectToWorld (const csReversibleTransform& t)
 void csPolygon3D::Finish ()
 {
   if (orig_poly) return;
-  if (uv_coords) return;
+  if (uv_coords || use_flat_color) return;
 
   tex->SetTextureHandle (txtMM->GetTextureHandle ());
   tex1->SetTextureHandle (txtMM->GetTextureHandle ());
@@ -901,7 +906,7 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     // we stop here because the triangle is only visible if all
     // vertices are visible (this is not exactly true but it is
     // easier this way! @@@ CHANGE IN FUTURE).
-    if (uv_coords) return false;
+    if (uv_coords || use_flat_color) return false;
 
     csVector3 *exit = NULL, *exitn = NULL, *reenter = NULL, *reentern = NULL;
     csVector2 *evert = NULL;
@@ -1170,7 +1175,7 @@ void csPolygon3D::ShineLightmaps (csLightView& lview)
 {
   if (orig_poly) return;
 
-  if (uv_coords)
+  if (uv_coords || use_flat_color)
   {
     // We are working for a vertex lighted polygon.
     csLight* light = (csLight*)lview.l;
@@ -1443,14 +1448,17 @@ void PreparePolygonQuick (G3DPolygon* g3dpoly, bool gouraud)
     INTERPOLATE (g3dpoly->pi_texcoords [j].z,
           g3dpoly->pi_tritexcoords [vtl].z, g3dpoly->pi_tritexcoords [vbl].z,
           g3dpoly->pi_tritexcoords [vtr].z, g3dpoly->pi_tritexcoords [vbr].z);
-    // Calculate U
-    INTERPOLATE (g3dpoly->pi_texcoords [j].u,
-          g3dpoly->pi_tritexcoords [vtl].u, g3dpoly->pi_tritexcoords [vbl].u,
-          g3dpoly->pi_tritexcoords [vtr].u, g3dpoly->pi_tritexcoords [vbr].u);
-    // Calculate V
-    INTERPOLATE (g3dpoly->pi_texcoords [j].v,
-          g3dpoly->pi_tritexcoords [vtl].v, g3dpoly->pi_tritexcoords [vbl].v,
-          g3dpoly->pi_tritexcoords [vtr].v, g3dpoly->pi_tritexcoords [vbr].v);
+    if (g3dpoly->txt_handle)
+    {
+      // Calculate U
+      INTERPOLATE (g3dpoly->pi_texcoords [j].u,
+            g3dpoly->pi_tritexcoords [vtl].u, g3dpoly->pi_tritexcoords [vbl].u,
+            g3dpoly->pi_tritexcoords [vtr].u, g3dpoly->pi_tritexcoords [vbr].u);
+      // Calculate V
+      INTERPOLATE (g3dpoly->pi_texcoords [j].v,
+            g3dpoly->pi_tritexcoords [vtl].v, g3dpoly->pi_tritexcoords [vbl].v,
+            g3dpoly->pi_tritexcoords [vtr].v, g3dpoly->pi_tritexcoords [vbr].v);
+    }
     if (gouraud)
     {
       // Calculate R
@@ -1465,6 +1473,12 @@ void PreparePolygonQuick (G3DPolygon* g3dpoly, bool gouraud)
       INTERPOLATE (g3dpoly->pi_texcoords [j].b,
             g3dpoly->pi_tritexcoords [vtl].b, g3dpoly->pi_tritexcoords [vbl].b,
             g3dpoly->pi_tritexcoords [vtr].b, g3dpoly->pi_tritexcoords [vbr].b);
+    }
+    else
+    {
+      g3dpoly->pi_texcoords[j].r = 0;
+      g3dpoly->pi_texcoords[j].g = 0;
+      g3dpoly->pi_texcoords[j].b = 0;
     }
   }
 }
@@ -1530,20 +1544,28 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
   g3dpoly.txt_handle = poly->GetTextureHandle ();
   g3dpoly.inv_aspect = csCamera::inv_aspect;
 
-  if (poly->GetUVCoords ())
+  if (poly->GetUVCoords () || poly->UseFlatColor ())
   {
+    csColor* po_colors = poly->GetColors ();
+    g3dpoly.flat_color_r = poly->GetFlatColor ().red;
+    g3dpoly.flat_color_g = poly->GetFlatColor ().green;
+    g3dpoly.flat_color_b = poly->GetFlatColor ().blue;
+    if (poly->UseFlatColor ()) g3dpoly.txt_handle = NULL;
+
     // We are going to use DrawPolygonQuick.
     g3dpoly.pi_triangle = orig_triangle;
     g3dpoly.pi_tritexcoords[0].z = 1. / poly->Vcam (0).z;
-    g3dpoly.pi_tritexcoords[0].u = poly->GetUVCoords ()[0].x;
-    g3dpoly.pi_tritexcoords[0].v = poly->GetUVCoords ()[0].y;
     g3dpoly.pi_tritexcoords[1].z = 1. / poly->Vcam (1).z;
-    g3dpoly.pi_tritexcoords[1].u = poly->GetUVCoords ()[1].x;
-    g3dpoly.pi_tritexcoords[1].v = poly->GetUVCoords ()[1].y;
     g3dpoly.pi_tritexcoords[2].z = 1. / poly->Vcam (2).z;
-    g3dpoly.pi_tritexcoords[2].u = poly->GetUVCoords ()[2].x;
-    g3dpoly.pi_tritexcoords[2].v = poly->GetUVCoords ()[2].y;
-    csColor* po_colors = poly->GetColors ();
+    if (g3dpoly.txt_handle)
+    {
+      g3dpoly.pi_tritexcoords[0].u = poly->GetUVCoords ()[0].x;
+      g3dpoly.pi_tritexcoords[0].v = poly->GetUVCoords ()[0].y;
+      g3dpoly.pi_tritexcoords[1].u = poly->GetUVCoords ()[1].x;
+      g3dpoly.pi_tritexcoords[1].v = poly->GetUVCoords ()[1].y;
+      g3dpoly.pi_tritexcoords[2].u = poly->GetUVCoords ()[2].x;
+      g3dpoly.pi_tritexcoords[2].v = poly->GetUVCoords ()[2].y;
+    }
     if (po_colors)
     {
       g3dpoly.pi_tritexcoords[0].r = po_colors[0].red;
