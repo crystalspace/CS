@@ -41,6 +41,8 @@
   #pragma warning(disable:4786)   // identifier was truncated to '255' characters in the browser information (VC6)
   #pragma warning(disable:4800)   // Forcing value to bool
   #pragma warning(disable:4805)   // unsafe mix of bool and int.
+  
+  #pragma warning(default:4265)   // class has virtual functions, but destructor is not virtual
 
   #pragma inline_depth (255)
   #pragma inline_recursion (on)
@@ -404,8 +406,8 @@ struct mmioInfo
 #endif // CS_SYSDEF_PROVIDE_TEMP
 
 // Microsoft Visual C++ compiler includes a very in-efficient 'memcpy'.
-// This also replaces the older 'better_memcpy',which was also not as
-// efficient as it could be ergo...heres a better solution.
+// This also replaces the older 'better_memcpy', which was also not as
+// efficient as it could be ergo... heres a better solution.
 #if defined(COMP_VC) && (_MSC_VER < 1300)
 #include <memory.h>
 #define memcpy fast_mem_copy
