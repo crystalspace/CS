@@ -934,8 +934,9 @@ public:
     {
       return scfParent->Draw (rview, movable, zMode);
     }
-    virtual void SetVisibleCallback (csMeshCallback* /*cb*/, void* /*cbData*/) { }
-    virtual csMeshCallback* GetVisibleCallback () const { return NULL; }
+    virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
+    virtual iMeshObjectDrawCallback* GetVisibleCallback () const
+    { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox,
     	int /*type = CS_BBOX_NORMAL*/)
     {

@@ -865,7 +865,7 @@ public:
    * or draw debugging information (2D egdes for example).
    */
   virtual void DrawFunc (iCamera* c, iClipper2D* clipper,
-    csDrawFunc* callback, void* callback_data = NULL);
+    iDrawFuncCallback* callback);
 
   /**
    * Locate the first static light which is closer than 'dist' to the

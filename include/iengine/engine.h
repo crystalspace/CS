@@ -117,18 +117,26 @@ struct iKeyValuePair;
 /**
  * Flags for the callbacks called via iEngine::DrawFunc() or
  * iLight::LightingFunc().
- * (type csDrawFunc or csLightingFunc).
+ * (type iDrawFuncCallback or iLightingFuncCallback).
  */
 #define CALLBACK_SECTOR 1
 #define CALLBACK_SECTOREXIT 2
 #define CALLBACK_MESH 3
 #define CALLBACK_VISMESH 4
 
-/// A callback function for csEngine::DrawFunc().
-typedef void (csDrawFunc) (iRenderView* rview, int type, void* entity);
+SCF_VERSION (iDrawFuncCallback, 0, 0, 1);
+
+/**
+ * A callback function for csEngine::DrawFunc().
+ */
+struct iDrawFuncCallback : public iBase
+{
+  /// Before drawing.
+  virtual void DrawFunc (iRenderView* rview, int type, void* entity) = 0;
+};
 
 
-SCF_VERSION (iEngine, 0, 1, 30);
+SCF_VERSION (iEngine, 0, 1, 31);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -576,7 +584,7 @@ struct iEngine : public iPlugIn
    * or draw debugging information (2D egdes for example).
    */
   virtual void DrawFunc (iCamera* c, iClipper2D* clipper,
-    csDrawFunc* callback, void* callback_data = NULL) = 0;
+    iDrawFuncCallback* callback) = 0;
 
   /// Set the drawing context
   virtual void SetContext (iGraphics3D*) = 0;

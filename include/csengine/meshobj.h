@@ -109,9 +109,7 @@ private:
   csNamedObjVector children;
 
   /// The callback which is called just before drawing.
-  csDrawCallback* draw_cb;
-  /// Userdata for the draw_callback.
-  void* draw_cbData;
+  iMeshDrawCallback* draw_cb;
 
   /// Optional reference to the parent csMeshFactoryWrapper.
   csMeshFactoryWrapper* factory;
@@ -192,14 +190,15 @@ public:
    * if there is a likely probability that the object is visible (i.e.
    * it is in the same sector as the camera for example).
    */
-  void SetDrawCallback (csDrawCallback* cb, void* cbData)
+  void SetDrawCallback (iMeshDrawCallback* cb)
   {
+    if (cb) cb->IncRef ();
+    if (draw_cb) draw_cb->DecRef ();
     draw_cb = cb;
-    draw_cbData = cbData;
   }
 
   /// Get the draw callback.
-  csDrawCallback* GetDrawCallback () const
+  iMeshDrawCallback* GetDrawCallback () const
   {
     return draw_cb;
   }
@@ -362,11 +361,11 @@ public:
     {
       return scfParent->HitBeam (start, end, isect, pr);
     }
-    virtual void SetDrawCallback (csDrawCallback* cb, void* cbData)
+    virtual void SetDrawCallback (iMeshDrawCallback* cb)
     {
-      scfParent->SetDrawCallback (cb, cbData);
+      scfParent->SetDrawCallback (cb);
     }
-    virtual csDrawCallback* GetDrawCallback () const
+    virtual iMeshDrawCallback* GetDrawCallback () const
     {
       return scfParent->GetDrawCallback ();
     }

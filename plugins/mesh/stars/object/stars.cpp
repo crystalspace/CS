@@ -64,6 +64,7 @@ csStarsMeshObject::csStarsMeshObject (iMeshObjectFactory* factory)
 
 csStarsMeshObject::~csStarsMeshObject ()
 {
+  if (vis_cb) vis_cb->DecRef ();
 }
 
 void csStarsMeshObject::SetupObject ()
@@ -102,7 +103,7 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
 bool csStarsMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	csZBufMode mode)
 {
-  if (vis_cb) vis_cb (this, rview, vis_cbData);
+  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
 #if 0
   iGraphics2D* g2d; g2d = rview->GetGraphics2D ();

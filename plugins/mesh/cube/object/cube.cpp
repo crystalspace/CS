@@ -63,6 +63,7 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
 
 csCubeMeshObject::~csCubeMeshObject ()
 {
+  if (vis_cb) vis_cb->DecRef ();
   if (ifactory) ifactory->DecRef ();
 }
 
@@ -319,7 +320,7 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
     return false;
   }
 
-  if (vis_cb) vis_cb (this, rview, vis_cbData);
+  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
 

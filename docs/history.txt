@@ -39,6 +39,12 @@ The history order is reversed so that new features are at the top.
 	  sure that it is not misused.
 	- Fixed handling of csRegion::DeleteAll(). It should now work a lot
 	  better and actually delete everything.
+	- Replaced csDrawCallback with iMeshDrawCallback (similar to
+	  the iPortalCallback). This new callback can even return false
+	  to prevent the drawing to take place.
+	- Replaced csMeshCallback with iMeshObjectDrawCallback.
+	  Can now also prevent drawing.
+	- Replaced csDrawFunc with iDrawFuncCallback.
 	- Norman Kramer removed UnlinkCollection() from csEngine.
 	- Fixed a problem with the transparent sphere in flarge.
 20-Jun-2001

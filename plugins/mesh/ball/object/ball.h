@@ -43,8 +43,7 @@ private:
   csVector3 shift;
   iMaterialWrapper* material;
   UInt MixMode;
-  csMeshCallback* vis_cb;
-  void* vis_cbData;
+  iMeshObjectDrawCallback* vis_cb;
   bool reversed;
   bool toponly;
   bool cyl_mapping;
@@ -176,12 +175,13 @@ public:
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
-  virtual void SetVisibleCallback (csMeshCallback* cb, void* cbData)
+  virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
+    if (cb) cb->IncRef ();
+    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
-    vis_cbData = cbData;
   }
-  virtual csMeshCallback* GetVisibleCallback () const
+  virtual iMeshObjectDrawCallback* GetVisibleCallback () const
   {
     return vis_cb;
   }

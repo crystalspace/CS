@@ -74,6 +74,7 @@ csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory
 
 csParticleSystem::~csParticleSystem()
 {
+  if (vis_cb) vis_cb->DecRef ();
   RemoveParticles ();
   if (spr_factory) spr_factory->DecRef ();
 }
@@ -226,7 +227,7 @@ bool csParticleSystem::DrawTest (iRenderView*, iMovable*)
 bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable,
 	csZBufMode mode)
 {
-  if (vis_cb) vis_cb (this, rview, vis_cbData);
+  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
   csReversibleTransform trans = movable->GetFullTransform ();
   for (int i = 0 ; i < particles.Length() ; i++)
     GetParticle (i)->Draw (rview, trans, mode);

@@ -147,7 +147,7 @@ public:
   int draw_rec_level;
 };
 
-SCF_VERSION (iRenderView, 0, 1, 4);
+SCF_VERSION (iRenderView, 0, 1, 5);
 
 /**
  * This interface represents all information needed to render
@@ -327,13 +327,11 @@ struct iRenderView : public iBase
    * Set a callback that will be called instead of drawing something.
    * This will be used by iEngine::DrawFunc().
    */
-  virtual void SetCallback (csDrawFunc* cb, void* cbdata) = 0;
+  virtual void SetCallback (iDrawFuncCallback* cb) = 0;
   /**
    * Get the callback.
    */
-  virtual csDrawFunc* GetCallback () = 0;
-  /// Get the data for the callback.
-  virtual void* GetCallbackData () = 0;
+  virtual iDrawFuncCallback* GetCallback () = 0;
   /**
    * Call callback.
    */

@@ -77,6 +77,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
 
 csBallMeshObject::~csBallMeshObject ()
 {
+  if (vis_cb) vis_cb->DecRef ();
   delete[] top_normals;
   delete[] top_mesh.vertices[0];
   delete[] top_mesh.vertex_colors[0];
@@ -552,7 +553,7 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
     return false;
   }
 
-  if (vis_cb) vis_cb (this, rview, vis_cbData);
+  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
 

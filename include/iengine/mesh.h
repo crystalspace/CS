@@ -93,11 +93,24 @@ class csFlags;
  */
 #define CS_ENTITY_BACK2FRONT 64
 
-/// A callback function for MeshWrapper::Draw().
-typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
-	void* callbackData);
+SCF_VERSION (iMeshDrawCallback, 0, 0, 1);
 
-SCF_VERSION (iMeshWrapper, 0, 0, 13);
+/**
+ * Set a callback which is called just before the object is drawn.
+ * This is useful to do some expensive computations which only need
+ * to be done on a visible object. Note that this function will be
+ * called even if the object is not visible. In general it is called
+ * if there is a likely probability that the object is visible (i.e.
+ * it is in the same sector as the camera for example).
+ */
+struct iMeshDrawCallback : public iBase
+{
+  /// Before drawing.
+  virtual bool BeforeDrawing (iMeshWrapper* spr, iRenderView* rview) = 0;
+};
+
+
+SCF_VERSION (iMeshWrapper, 0, 0, 14);
 
 /**
  * This interface corresponds to the object in the engine
@@ -162,10 +175,10 @@ struct iMeshWrapper : public iBase
    * if there is a likely probability that the object is visible (i.e.
    * it is in the same sector as the camera for example).
    */
-  virtual void SetDrawCallback (csDrawCallback* cb, void* cbData) = 0;
+  virtual void SetDrawCallback (iMeshDrawCallback* cb) = 0;
 
   /// Get the draw callback.
-  virtual csDrawCallback* GetDrawCallback () const = 0;
+  virtual iMeshDrawCallback* GetDrawCallback () const = 0;
 
   /// Set the parent factory.
   virtual void SetFactory (iMeshFactoryWrapper* factory) = 0;

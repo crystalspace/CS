@@ -623,6 +623,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()
 {
+  if (!vis_cb) vis_cb->DecRef ();
   uv_verts.DecRef ();
   tr_verts.DecRef ();
   fog_verts.DecRef ();
@@ -1089,7 +1090,7 @@ bool csSprite3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   //else
   // @@@ Provide functionality for visible edges here...
 
-  if (vis_cb) vis_cb (this, rview, vis_cbData);
+  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
   return true;
 }
 

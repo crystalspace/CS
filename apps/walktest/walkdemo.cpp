@@ -525,13 +525,31 @@ void animate_skeleton_tree (iSkeletonLimbState* limb)
   }
 }
 
-void animate_skeleton_tree_cb (iMeshWrapper* spr, iRenderView* /*rview*/, void* /*data*/)
+struct AnimSkelTree : public iMeshDrawCallback
+{
+  DECLARE_IBASE;
+  AnimSkelTree ();
+  virtual bool BeforeDrawing (iMeshWrapper* spr, iRenderView* rview);
+};
+
+
+IMPLEMENT_IBASE (AnimSkelTree)
+  IMPLEMENTS_INTERFACE (iMeshDrawCallback)
+IMPLEMENT_IBASE_END
+
+AnimSkelTree::AnimSkelTree ()
+{
+  CONSTRUCT_IBASE (NULL);
+}
+
+bool AnimSkelTree::BeforeDrawing (iMeshWrapper* spr, iRenderView* /*rview*/)
 {
   iMeshObject* obj = spr->GetMeshObject ();
   iSprite3DState* state = QUERY_INTERFACE (obj, iSprite3DState);
   iSkeletonState* sk_state = state->GetSkeletonState ();
   animate_skeleton_tree (QUERY_INTERFACE (sk_state, iSkeletonLimbState));
   state->DecRef ();
+  return true;
 }
 
 // Add a skeletal tree sprite. If needed it will also create
@@ -563,8 +581,11 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
     create_skeltree (state, fr, vertex_idx, depth, width);
     state->DecRef ();
   }
-  iMeshWrapper* spr = add_meshobj (skelname, "__skeltree__", where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
-  spr->SetDrawCallback (animate_skeleton_tree_cb, NULL);
+  iMeshWrapper* spr = add_meshobj (skelname, "__skeltree__",
+  	where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
+  AnimSkelTree* cb = new AnimSkelTree ();
+  spr->SetDrawCallback (cb);
+  cb->DecRef ();
 }
 
 //===========================================================================
@@ -737,7 +758,24 @@ void animate_skeleton_ghost (iSkeletonLimbState* limb)
   }
 }
 
-void animate_skeleton_ghost_cb (iMeshWrapper* spr, iRenderView* /*rview*/, void* /*data*/)
+struct AnimSkelGhost : public iMeshDrawCallback
+{
+  DECLARE_IBASE;
+  AnimSkelGhost ();
+  virtual bool BeforeDrawing (iMeshWrapper* spr, iRenderView* rview);
+};
+
+
+IMPLEMENT_IBASE (AnimSkelGhost)
+  IMPLEMENTS_INTERFACE (iMeshDrawCallback)
+IMPLEMENT_IBASE_END
+
+AnimSkelGhost::AnimSkelGhost ()
+{
+  CONSTRUCT_IBASE (NULL);
+}
+
+bool AnimSkelGhost::BeforeDrawing (iMeshWrapper* spr, iRenderView* /*rview*/)
 {
   iMeshObject* obj = spr->GetMeshObject ();
   iSprite3DState* state = QUERY_INTERFACE (obj, iSprite3DState);
@@ -746,8 +784,8 @@ void animate_skeleton_ghost_cb (iMeshWrapper* spr, iRenderView* /*rview*/, void*
   animate_skeleton_ghost (isk_limb);
   isk_limb->DecRef ();
   state->DecRef ();
+  return true;
 }
-
 
 // Add a skeletal ghost sprite. If needed it will also create
 // the template for this.
@@ -789,7 +827,9 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
   iObject* iobj = QUERY_INTERFACE (gh_info, iObject);
   sprobj->ObjAdd (iobj);
   gh_info->dir = 1;
-  spr->SetDrawCallback (animate_skeleton_ghost_cb, NULL);
+  AnimSkelGhost* cb = new AnimSkelGhost ();
+  spr->SetDrawCallback (cb);
+  cb->DecRef ();
   iobj->DecRef ();
   state->DecRef ();
   mesh->DecRef ();

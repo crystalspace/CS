@@ -63,8 +63,7 @@ class csMetaBall : public iMeshObject
   iMeshObjectFactory* factory;
   csBox3 camera_bbox;
   csBox3 object_bbox;
-  csMeshCallback* vis_cb;
-  void* vis_cbdata;
+  iMeshObjectDrawCallback* vis_cb;
   bool do_lighting;
   bool initialize;
   long shape_num;
@@ -119,9 +118,13 @@ public:
 	  iMovable* movable );
   virtual bool Draw ( iRenderView* rview, iMovable* movable,
 	  csZBufMode mode );
-  virtual void SetVisibleCallback( csMeshCallback* cb, void* cbDat )
-	  { vis_cb = cb; vis_cbdata = cbDat; }
-  virtual csMeshCallback* GetVisibleCallback() const { return vis_cb; }
+  virtual void SetVisibleCallback( iMeshObjectDrawCallback* cb )
+  {
+    if (cb) cb->IncRef ();
+    if (vis_cb) vis_cb->DecRef ();
+    vis_cb = cb;
+  }
+  virtual iMeshObjectDrawCallback* GetVisibleCallback() const { return vis_cb; }
   float GetScreenBoundingBox( long cam_num, long mov_num,
 		float fov, float sx, float sy, const csReversibleTransform& trans,
 		csBox2& sbox, csBox3& cbox );

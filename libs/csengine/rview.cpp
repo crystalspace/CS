@@ -33,7 +33,7 @@ IMPLEMENT_IBASE_END
 
 csRenderView::csRenderView () :
     ctxt (NULL), iengine (NULL), g3d (NULL), g2d (NULL),
-    callback (NULL), callback_data (NULL)
+    callback (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   ctxt = new csRenderContext ();
@@ -42,7 +42,7 @@ csRenderView::csRenderView () :
 
 csRenderView::csRenderView (iCamera* c) :
     ctxt (NULL), iengine (NULL), g3d (NULL), g2d (NULL),
-    callback (NULL), callback_data (NULL)
+    callback (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   ctxt = new csRenderContext ();
@@ -54,7 +54,7 @@ csRenderView::csRenderView (iCamera* c) :
 csRenderView::csRenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d,
     	iGraphics2D* ig2d) :
     ctxt (NULL), iengine (NULL), g3d (ig3d), g2d (ig2d),
-    callback (NULL), callback_data (NULL)
+    callback (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   ctxt = new csRenderContext ();
@@ -66,6 +66,7 @@ csRenderView::csRenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d,
 
 csRenderView::~csRenderView ()
 {
+  if (callback) callback->DecRef ();
   if (ctxt)
   {
     if (ctxt->icamera) ctxt->icamera->DecRef ();

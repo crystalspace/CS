@@ -77,8 +77,8 @@ public:
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight**, int, iMovable*) { }
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode) { return false; }
-  virtual void SetVisibleCallback (csMeshCallback*, void*) { }
-  virtual csMeshCallback* GetVisibleCallback () const { return NULL; }
+  virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
+  virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return NULL; }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
   {
     bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);

@@ -1155,7 +1155,7 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
 {
   csRenderView rview (c, view, G3D, G2D);
   StartDraw (c->GetPrivateObject (), view, rview);
-  rview.SetCallback (NULL, NULL);
+  rview.SetCallback (NULL);
 
   // First initialize G3D with the right clipper.
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);	// We are at top-level.
@@ -1176,11 +1176,11 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
 }
 
 void csEngine::DrawFunc (iCamera* c, iClipper2D* view,
-  csDrawFunc* callback, void* callback_data)
+  iDrawFuncCallback* callback)
 {
   csRenderView rview (c, view, G3D, G2D);
   StartDraw (c->GetPrivateObject (), view, rview);
-  rview.SetCallback (callback, callback_data);
+  rview.SetCallback (callback);
 
   // First initialize G3D with the right clipper.
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);	// We are at top-level.

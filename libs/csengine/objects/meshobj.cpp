@@ -144,8 +144,8 @@ void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
 
 csMeshWrapper::~csMeshWrapper ()
 {
-  if (mesh)
-    mesh->DecRef ();
+  if (draw_cb) draw_cb->DecRef ();
+  if (mesh) mesh->DecRef ();
 }
 
 void csMeshWrapper::UpdateMove ()
@@ -246,7 +246,7 @@ void csMeshWrapper::DrawInt (iRenderView* rview)
   {
     rview->CallCallback (CALLBACK_MESH, (void*)&scfiMeshWrapper);
   }
-  if (draw_cb) draw_cb (meshwrap, rview, draw_cbData);
+  if (draw_cb) if (!draw_cb->BeforeDrawing (meshwrap, rview)) return;
   if (mesh->DrawTest (rview, &movable.scfiMovable))
   {
     if (rview->GetCallback ())

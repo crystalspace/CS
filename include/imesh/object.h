@@ -71,12 +71,19 @@ class csReversibleTransform;
 #define CS_OBJECT_FEATURE_ALL (~0)
 
 
+SCF_VERSION (iMeshObjectDrawCallback, 0, 0, 1);
 
-/// A callback function for MeshObj::Draw().
-typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
-	void* callbackData);
+/**
+ * Set a callback which is called just before the object is drawn.
+ */
+struct iMeshObjectDrawCallback : public iBase
+{
+  /// Before drawing.
+  virtual bool BeforeDrawing (iMeshObject* spr, iRenderView* rview) = 0;
+};
 
-SCF_VERSION (iMeshObject, 0, 0, 16);
+
+SCF_VERSION (iMeshObject, 0, 0, 17);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -120,12 +127,12 @@ struct iMeshObject : public iBase
    * very accurate or not accurate at all. But in all cases it will
    * certainly be called if the object is visible.
    */
-  virtual void SetVisibleCallback (csMeshCallback* cb, void* cbData) = 0;
+  virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb) = 0;
 
   /**
    * Get the current visible callback.
    */
-  virtual csMeshCallback* GetVisibleCallback () const = 0;
+  virtual iMeshObjectDrawCallback* GetVisibleCallback () const = 0;
 
   /**
    * Get the bounding box in object space for this mesh object.

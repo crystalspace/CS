@@ -643,8 +643,8 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   extern bool check_light;
   extern void select_object (iRenderView* rview, int type, void* entity);
   check_light = true;
-  view->GetEngine ()->DrawFunc (view->GetCamera (),
-    view->GetClipper (), select_object);
+  //view->GetEngine ()->DrawFunc (view->GetCamera (),
+    //view->GetClipper (), select_object);
 }
 
 // right mouse button

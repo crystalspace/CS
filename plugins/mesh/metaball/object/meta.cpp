@@ -60,7 +60,6 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   factory = fact;
   Sys = NULL;
   vis_cb = NULL;
-  vis_cbdata = NULL;
   do_lighting = false;
   initialize = false;
   shape_num = 0;
@@ -82,6 +81,7 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
 
 csMetaBall::~csMetaBall ()
 {
+  if (vis_cb) vis_cb->DecRef ();
   delete [] meta_balls;
   delete [] mesh.triangles;
   delete [] mesh.vertices[0];
@@ -420,7 +420,7 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   printf("Finished dump =============================================\n");
 #endif
 
-  if (vis_cb) vis_cb( this, rview, vis_cbdata );
+  if (vis_cb) if (!vis_cb->BeforeDrawing ( this, rview )) return false;
   iGraphics3D* G3D = rview->GetGraphics3D();
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
   mesh.fxmode = MixMode | CS_FX_GOURAUD;
