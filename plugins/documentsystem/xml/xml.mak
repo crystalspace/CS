@@ -38,9 +38,9 @@ else
   TO_INSTALL.STATIC_LIBS += $(XML)
 endif
 
-# XXX: Needs a test
-LIBXML2.CFLAGS = -I/usr/include/libxml2
-LIBXML2.LFLAGS = -L/usr/lib -lxml2
+# XXX: Needs a test (Test exists; please use values from config.mak.)
+# LIBXML2.CFLAGS = -I/usr/include/libxml2
+# LIBXML2.LFLAGS = -L/usr/lib -lxml2
 
 INC.XML = $(wildcard plugins/documentsystem/xml/*.h)
 SRC.XML = $(wildcard plugins/documentsystem/xml/*.cpp)
