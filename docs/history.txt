@@ -4,8 +4,10 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 9-Apr-2003
-	- Matze fixed (blindly) lots of errors when using the jambuild on
-	  macosx.
+	- Matze
+	  - fixed (blindly) lots of errors when using the jambuild on  macosx.
+	  - fixed several warnings through the whole project.
+	  - put back csSchedul, seems this class was used.
 	- Fixed BugPlug so that it compiles again without the new renderer
 	  enabled.
 8-Apr-2003
