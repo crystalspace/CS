@@ -412,7 +412,12 @@ csSCF::csSCF ()
 
 csSCF::~csSCF ()
 {
-  Finish ();
+  delete ClassRegistry;
+  ClassRegistry = NULL;
+#ifndef CS_STATIC_LINKED
+  delete LibraryRegistry;
+  LibraryRegistry = NULL;
+#endif
   
   SCF = PrivateSCF = NULL;
 }
@@ -444,12 +449,7 @@ void csSCF::RegisterConfigClassList (iConfigFile *iConfig)
 
 void csSCF::Finish ()
 {
-  delete ClassRegistry;
-  ClassRegistry = NULL;
-#ifndef CS_STATIC_LINKED
-  delete LibraryRegistry;
-  LibraryRegistry = NULL;
-#endif
+  delete this;
 }
 
 void *csSCF::CreateInstance (const char *iClassID, const char *iInterfaceID,
