@@ -55,8 +55,8 @@ int csBuddyAllocator::treeSize(int size)
 int csBuddyAllocator::ptoi(void *ptr)
 {
   int i;
-  assert(m_Tree&&m_Size>0&&m_Height>0);
-  assert((((int)ptr)&CS_BUDDY_ADD)==0);
+  CS_ASSERT(m_Tree&&m_Size>0&&m_Height>0);
+  CS_ASSERT((((int)ptr)&CS_BUDDY_ADD)==0);
   i=((int)ptr)>>CS_BUDDY_SHIFT;
   if(i<0||i>=m_Size)                 /*doesn't fit?*/
     return -1;
@@ -66,17 +66,17 @@ int csBuddyAllocator::ptoi(void *ptr)
 
 void* csBuddyAllocator::itop(int i, char level)
 {
-  assert(m_Tree&&m_Size>0&&m_Height>0);
-  assert(i<2*m_Size-1&&i>=0);
-  assert(level<m_Height);
+  CS_ASSERT(m_Tree&&m_Size>0&&m_Height>0);
+  CS_ASSERT(i<2*m_Size-1&&i>=0);
+  CS_ASSERT(level<m_Height);
   i-=(1<<m_Height-level-1)-1;      /*cryptic conversion i->address*/
   return (void*)((i<<level+CS_BUDDY_SHIFT));
 }
 
 void csBuddyAllocator::stabilize1(int i)
 {
-  assert(m_Tree&&m_Size>0&&m_Height>0);
-  assert(i<2*m_Size-1&&i>0);
+  CS_ASSERT(m_Tree&&m_Size>0&&m_Height>0);
+  CS_ASSERT(i<2*m_Size-1&&i>0);
   while(i>0)
   {
     i=(i-1)/2;                         /*go parent*/
@@ -86,13 +86,13 @@ void csBuddyAllocator::stabilize1(int i)
 
 void csBuddyAllocator::stabilize2(int i, char level)
 {
-  assert(m_Tree&&m_Size>0&&m_Height>0);
-  assert(i<2*m_Size-1&&i>0);
-  assert(level<m_Height);
+  CS_ASSERT(m_Tree&&m_Size>0&&m_Height>0);
+  CS_ASSERT(i<2*m_Size-1&&i>0);
+  CS_ASSERT(level<m_Height);
   while(i>0)
   {
     i=(i-1)/2;                         /*go parent*/
-    assert(m_Tree[i]<=level+1);
+    CS_ASSERT(m_Tree[i]<=level+1);
     if(m_Tree[2*i+1]>m_Tree[2*i+2])
       m_Tree[i]=m_Tree[2*i+1]; /*-use left-*/
     else if(m_Tree[2*i+1]<m_Tree[2*i+2])
@@ -110,13 +110,13 @@ void csBuddyAllocator::traverse(int i, char level)
   int   block_no=(i-((1<<m_Height-level-1)-1))*(1<<level);
   void *block_addr=itop(i,level);
   int   block_sz=1<<level;
-  assert(m_Tree&&m_Size>0&&m_Height>0);
-  assert(i<2*m_Size-1&&i>=0);
-  assert(level<m_Height);
+  CS_ASSERT(m_Tree&&m_Size>0&&m_Height>0);
+  CS_ASSERT(i<2*m_Size-1&&i>=0);
+  CS_ASSERT(level<m_Height);
   if(m_Tree[i]==level)
-    printf("#%6d, at %08x, size %6d, Free\n",block_no,block_addr,block_sz);
+    printf("#%6d, at %p, size %6d, Free\n",block_no,block_addr,block_sz);
   else if(m_Tree[i]<0)
-    printf("#%6d, at %08x, size %6d, Busy\n",block_no,block_addr,block_sz);
+    printf("#%6d, at %p, size %6d, Busy\n",block_no,block_addr,block_sz);
   else
   {
     traverse(2*i+1,level-1);
@@ -141,7 +141,7 @@ bool csBuddyAllocator::Initialize(int size)
   
   {
     int i;
-    assert(m_Tree&&m_Size>0&&m_Height>0);
+    CS_ASSERT(m_Tree&&m_Size>0&&m_Height>0);
     for(i=0;i<2*m_Size-1;i++)
       m_Tree[i]=-1;
     m_Freeblk=0;
@@ -150,7 +150,7 @@ bool csBuddyAllocator::Initialize(int size)
   {
     int  i,j,k;
     char level=m_Height-1;
-    assert(m_Tree&&m_Size>0&&m_Height>0);
+    CS_ASSERT(m_Tree&&m_Size>0&&m_Height>0);
     for(i=1,j=0;i<=m_Size;level--,i=2*i)
       for(k=i;k>0;j++,k--)               /*fill line*/
         m_Tree[j]=level;
@@ -163,14 +163,14 @@ void* csBuddyAllocator::alloc(int size)
 {
   int  i,found;
   char level=m_Height-1;
-  assert(m_Tree&&m_Size>0&&m_Height>0);
+  CS_ASSERT(m_Tree&&m_Size>0&&m_Height>0);
   size=(size+CS_BUDDY_ADD)>>CS_BUDDY_SHIFT;      /*sz in blocks now*/
   if(size<=0||1<<m_Tree[0]<size)       /*oops?*/
     return 0;
 
   for(found=0,i=0;!found&&2*i+2<2*m_Size-1;level--)
   {
-    assert(m_Tree[i]<=level&&m_Tree[i]>=0);
+    CS_ASSERT(m_Tree[i]<=level&&m_Tree[i]>=0);
                                        /**left smaller than right?**/
     if(m_Tree[2*i+1]<=m_Tree[2*i+2])
       if(1<<m_Tree[2*i+1]>=size)     /*...and still large enough?*/
@@ -187,7 +187,7 @@ void* csBuddyAllocator::alloc(int size)
       else
         found=1;                       /*none enough, use current*/
   }
-  assert(1<<m_Tree[i]>=size);
+  CS_ASSERT(1<<m_Tree[i]>=size);
   level=m_Tree[i];
   m_Tree[i]=-1;                    /*mark allocated*/
   stabilize1(i);                 /*correct tree*/
@@ -199,7 +199,7 @@ bool csBuddyAllocator::free(void *ptr)
 {
   char level;
   int  i=ptoi(ptr);
-  assert(m_Tree&&m_Size>0&&m_Height>0);
+  CS_ASSERT(m_Tree&&m_Size>0&&m_Height>0);
   if(i<0)
     return 0;                          /*find parent with tree[i]<=0*/
   for(level=0;i>=0&&m_Tree[i]>=0;level++)
@@ -270,7 +270,9 @@ csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYP
   {
     isRealVAR = true;
     memblock->buffer = bm->var_buffer + (int) bm->myalloc->alloc(size);
-    bm->render3d->ext.glGenFencesNV(1, &memblock->fence_id);
+    GLuint temp = (GLuint)memblock->fence_id;
+    bm->render3d->ext.glGenFencesNV(1, &temp);
+    memblock->fence_id = (unsigned int)temp;
   } else 
   {
     isRealVAR = true;
@@ -288,7 +290,7 @@ csVARRenderBuffer::~csVARRenderBuffer()
   if (memblock)
   {
     bm->render3d->ext.glFinishFenceNV(memblock->fence_id);
-    delete memblock->buffer;
+    delete (char*)memblock->buffer;
     delete memblock;
   }
 }
@@ -335,7 +337,9 @@ void* csVARRenderBuffer::Lock(CS_BUFFER_LOCK_TYPE lockType)
     {
       //alloc a new VAR buffer..
       memblock->buffer = bm->myalloc->alloc(size);
-      bm->render3d->ext.glGenFencesNV(1, &memblock->fence_id);
+      GLuint temp = (GLuint)memblock->fence_id;
+      bm->render3d->ext.glGenFencesNV(1, &temp);
+      memblock->fence_id = (unsigned int)temp;
       lastlock = lockType;
       locked = true;
       return memblock->buffer;

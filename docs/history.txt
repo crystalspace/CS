@@ -23,6 +23,9 @@ The history order is reversed so that new features are at the top.
 	  fix the issue though. Still have to investigate what's wrong.
 	- Fixed the bug in IntersectSegment(). It was not calculating the
 	  bounding box the right way.
+	- Eric Sunshine eliminated several compilation warnings in
+	  gl_varbufmgr.cpp, and also replaced assert() inovcations with
+	  CS_ASSERT().
 3-Nov-2002
 	- Changed DynaVis to use the new movable and object model
 	  listeners. This significantly speeds up rendering and walking
