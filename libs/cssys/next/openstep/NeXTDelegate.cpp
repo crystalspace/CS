@@ -334,7 +334,7 @@ enum
     NSPoint const p = [view convertPoint:[event locationInWindow] fromView:0];
     NSRect const r = [view bounds];
     *x = int(p.x);
-    *y = int(r.size.height - p.y);	// CrystalSpace coords flipped.
+    *y = int(r.size.height - p.y - 1);	// CrystalSpace coords flipped.
     return (*x >= 0 && *y >= 0 && *x < r.size.width && *y < r.size.height);
     }
 

@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
-    Written by Andrew Zabolotny
+    Copyright (C) 1998-2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -56,6 +55,26 @@ struct iPolygonTexture;
 #define BLENDTABLE_ALPHA50              0x04
 #define BLENDTABLE_ALPHA75              0x05
 #define NUMBLENDINGTABLES               6
+
+//---//---//---//---//---//---//---//---//---// Special Pixel Processing //---//
+
+/*
+ * These macros allow special processing of 32-bit pixel data.  For performance
+ * reasons, the software renderer has a fixed notion about the layout of an RGB
+ * pixel (BGRA on little-endian, and ABGR on big-endian).  If you need to store
+ * textures and have the final rendered image use a different pixel layout,
+ * then you can use these macros to transform the layout to and from the the
+ * canonical layout expected by the software renderer.  The PREPROC macro
+ * should be defined to transform your custom pixel layout into the renderer's
+ * canonical form, and the POSTPROC macro should transform the data in the
+ * reverse direction.  The SHIFT_ADJUST macro should be used to transform pixel
+ * data shift amounts from your custom form to the canonical form.  To really
+ * understand how these macros affect the rendering process, examine the source
+ * code which invokes them.
+ */
+#define R8G8B8_PIXEL_PREPROC(x)  (x)
+#define R8G8B8_PIXEL_POSTPROC(x) (x)
+#define R8G8B8_SHIFT_ADJUST(x)   (x)
 
 //---//---//---//---//---//---//---//---//---//---//---/ Precomputed data /---//
 
@@ -209,18 +228,10 @@ extern "C"
 /// The only instance of this structure
 extern csScanSetup Scan;
 
-#ifdef TOP8BITS_R8G8B8_USED
-#define PIXEL_ADJUST , int pixel_adjust
-#define PIXEL_INIT = 0
-#else
-#define PIXEL_ADJUST
-#define PIXEL_INIT
-#endif
-
 /// The interface definition for all scan_XXX routines
 typedef void (csDrawScanline)
   (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
-   float u_div_z, float v_div_z PIXEL_ADJUST PIXEL_INIT);
+   float u_div_z, float v_div_z);
 /// The interface definition for all scan_pi_XXX routines
 typedef void (csDrawPIScanline)
   (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
@@ -230,8 +241,6 @@ typedef void (csDrawPIScanlineGouraud)
   (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
    unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
    ULong r, ULong g, ULong b, long dr, long dg, long db, bool clamp);
-
-#undef PIXEL_INIT
 
 //---//---//---//---//---//---//---//---//---//---//---//---//- Routines //---//
 

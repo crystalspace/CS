@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -15,28 +15,43 @@
 //	A concrete subclass of NeXTFrameBuffer which knows how to convert
 //	Crystal Space RGB:888 to NeXT RGBA:8888.
 //
-//	Conversion from Crystal Space format frame buffer to NeXT format
-//	occurs in place.  Using the red, green, and blue masks, Crystal Space
-//	is instructed to generate RGB data in the three high-order bytes of a
-//	four byte pixel.  During the cooking process, the fourth (alpha) byte
-//	is set to 0xff.  The resulting data can then be used directly by the
-//	NeXT Window Server.
+//	For performance reasons, the Crystal Space software renderer has
+//	hard-coded notions of pixel format (in particular, BGRA on
+//	little-endian and ABGR on big-endian).  The AppKit, on the other hand
+//	expects pixel data to be in the format RGBA regardless of endian.  It
+//	is possible to remove the hard-coded notions of pixel format from the
+//	renderer, but the loss of performance would likely be dramatic.
+//	Consequently, this frame buffer implementation cooks the Crystal Space
+//	generated BGRA or ABGR data into the RGBA:8888 data expected by the
+//	AppKit.  Thus modification to the software renderer is unnecessary.
+//	(Modifying the renderer would also tightly couple it to this 2D driver
+//	implementation.  That would be undesirable since it would make it
+//	difficult to use a different 2D driver with the same renderer.)
 //
-//	See the file CS/docs/texinfo/internal/platform/next.txi for an
-//	explanation of why the alpha byte of RGBA:8888 is set to 0xff before
-//	handing the data off to the Window Server.
+//	A further restriction is that the NeXT Window Server release notes for
+//	NextStep 3.0 stipulate that the alpha byte must be set to 0xff.  (See
+//	CS/docs/texinfo/internal/platform/next.txi for more details.)  This
+//	requirement is met by setting all of the alpha bytes to 0xff, once
+//	only, when the destination buffer is first created.
 //
 //-----------------------------------------------------------------------------
 #include "NeXTFrameBuffer32.h"
+#include <string.h>
 
 #if defined(__LITTLE_ENDIAN__)
-#define RED_MASK   0x000000ff
-#define GREEN_MASK 0x0000ff00
-#define BLUE_MASK  0x00ff0000
+#define RED_MASK     0x00ff0000
+#define GREEN_MASK   0x0000ff00
+#define BLUE_MASK    0x000000ff
+#define RED_OFFSET   2
+#define GREEN_OFFSET 1
+#define BLUE_OFFSET  0
 #else
-#define RED_MASK   0xff000000
-#define GREEN_MASK 0x00ff0000
-#define BLUE_MASK  0x0000ff00
+#define RED_MASK     0x000000ff
+#define GREEN_MASK   0x0000ff00
+#define BLUE_MASK    0x00ff0000
+#define RED_OFFSET   3
+#define GREEN_OFFSET 2
+#define BLUE_OFFSET  1
 #endif
 
 int const CS_NEXT_DEPTH = 32;
@@ -53,9 +68,9 @@ int NeXTFrameBuffer32::green_mask() const { return GREEN_MASK; }
 int NeXTFrameBuffer32::blue_mask () const { return BLUE_MASK;  }
 
 unsigned char* NeXTFrameBuffer32::get_raw_buffer() const
-    { return frame_buffer; }
+    { return raw_buffer; }
 unsigned char* NeXTFrameBuffer32::get_cooked_buffer() const
-    { return frame_buffer; }
+    { return cooked_buffer; }
 
 //-----------------------------------------------------------------------------
 // Constructor
@@ -64,7 +79,9 @@ NeXTFrameBuffer32::NeXTFrameBuffer32( unsigned int w, unsigned int h ) :
     NeXTFrameBuffer(w,h)
     {
     buffer_size = adjust_allocation_size( CS_NEXT_BPP * width * height );
-    frame_buffer = allocate_memory( buffer_size );
+    raw_buffer    = allocate_memory( buffer_size );
+    cooked_buffer = allocate_memory( buffer_size );
+    memset( cooked_buffer, 0xff, buffer_size ); // See 0xff note above.
     }
 
 
@@ -73,7 +90,8 @@ NeXTFrameBuffer32::NeXTFrameBuffer32( unsigned int w, unsigned int h ) :
 //-----------------------------------------------------------------------------
 NeXTFrameBuffer32::~NeXTFrameBuffer32()
     {
-    deallocate_memory( frame_buffer, buffer_size );
+    deallocate_memory( cooked_buffer, buffer_size );
+    deallocate_memory( raw_buffer,    buffer_size );
     }
 
 
@@ -82,7 +100,12 @@ NeXTFrameBuffer32::~NeXTFrameBuffer32()
 //-----------------------------------------------------------------------------
 void NeXTFrameBuffer32::cook()
     {
-    unsigned char* p = frame_buffer + 3;
-    for (unsigned int n = width * height; n-- > 0; p += 4)
-	*p = 0xff;
+    unsigned char const* p = raw_buffer;
+    unsigned char* q = cooked_buffer;
+    for (unsigned int n = width * height; n-- > 0; p += 4, q += 1)
+	{
+	*q++ = *(p +   RED_OFFSET);
+	*q++ = *(p + GREEN_OFFSET);
+	*q++ = *(p +  BLUE_OFFSET);
+	}
     }

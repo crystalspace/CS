@@ -256,13 +256,13 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
   char *d = **data;
   memcpy (ps.header, d, 4); d += 4;
   memcpy (&ps.x1, d, sizeof (ps.x1)); d += sizeof (ps.x1);
-  memcpy (&ps.y1, d, sizeof (ps.x1)); d += sizeof (ps.x1);
-  memcpy (&ps.z1, d, sizeof (ps.x1)); d += sizeof (ps.x1);
-  memcpy (&ps.x2, d, sizeof (ps.x1)); d += sizeof (ps.x1);
-  memcpy (&ps.y2, d, sizeof (ps.x1)); d += sizeof (ps.x1);
-  memcpy (&ps.z2, d, sizeof (ps.x1)); d += sizeof (ps.x1);
+  memcpy (&ps.y1, d, sizeof (ps.y1)); d += sizeof (ps.y1);
+  memcpy (&ps.z1, d, sizeof (ps.z1)); d += sizeof (ps.z1);
+  memcpy (&ps.x2, d, sizeof (ps.x2)); d += sizeof (ps.x2);
+  memcpy (&ps.y2, d, sizeof (ps.y2)); d += sizeof (ps.y2);
+  memcpy (&ps.z2, d, sizeof (ps.z2)); d += sizeof (ps.z2);
   memcpy (&ps.lm_size, d, sizeof (ps.lm_size)); d += sizeof (ps.lm_size);
-  memcpy (&ps.lm_cnt, d, sizeof (ps.lm_size)); d += sizeof (ps.lm_size);
+  memcpy (&ps.lm_cnt, d, sizeof (ps.lm_cnt)); d += sizeof (ps.lm_cnt);
 
   //-------------------------------
   // Check if cached item is still valid.
@@ -307,7 +307,7 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
 
   for (i = 0; i < lh.dyn_cnt; i++)
   {
-    memcpy (&ls.id, d, sizeof (CS_ID)); d += sizeof (CS_ID);
+    memcpy (&ls.id, d, sizeof (ls.id)); d += sizeof (ls.id);
     ls.id = convert_endian (ls.id);
 
     light = engine->FindLight (ls.id);
@@ -416,7 +416,7 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csEng
       {
         LightSave ls;
 	ls.id = convert_endian (light->GetID ());
-        cf->Write ((char*)&ls.id, sizeof (CS_ID));
+        cf->Write ((char*)&ls.id, sizeof (ls.id));
         cf->Write ((char*)(smap->map), lm_size);
       }
       smap = smap->next;

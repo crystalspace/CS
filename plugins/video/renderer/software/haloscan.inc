@@ -38,20 +38,16 @@
 #  define HALO_PIXTYPE	uint32
 #endif
 
-#if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)
-#define PIXEL_PREPROC(x)  ((x) >> pixel_adjust)
-#define PIXEL_POSTPROC(x) ((x) << pixel_adjust)
-#define RED_PREPROC(r)    (r >> 1)
+#if (HALO_BPP == 32)
+#define HALO_PIXEL_PREPROC(x)  R8G8B8_PIXEL_PREPROC(x)
+#define HALO_PIXEL_POSTPROC(x) R8G8B8_PIXEL_POSTPROC(x)
 #else
-#define PIXEL_PREPROC(x)  (x)
-#define PIXEL_POSTPROC(x) (x)
-#define RED_PREPROC(r)    r
+#define HALO_PIXEL_PREPROC(x)  (x)
+#define HALO_PIXEL_POSTPROC(x) (x)
 #endif
 
-static void HALO_NAME(void *src, void *dest, int count, int delta,
-  int pixel_adjust)
+static void HALO_NAME(void *src, void *dest, int count, int delta)
 {
-  (void)pixel_adjust;
   unsigned char *A = (unsigned char *)src;
   HALO_PIXTYPE *D = (HALO_PIXTYPE *)dest;
   HALO_PIXTYPE *E = D + count;
@@ -64,7 +60,7 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
         // Get the destination pixel from framebuffer
         // NOTE: d, dr, dg and db SHOULD be 32-bit,
         // even for 16-bit modes due to possible overflow (HALO_CLAMP)
-        uint32 d = PIXEL_PREPROC (*D);
+        uint32 d = HALO_PIXEL_PREPROC (*D);
 
         // Compute destination R,G,B
         uint32 dr = d & HALO_RM;
@@ -93,7 +89,7 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
 #  endif
 #endif
         // Build new value and write into framebuffer
-        *D = PIXEL_POSTPROC (dr | dg | db);
+        *D = HALO_PIXEL_POSTPROC (dr | dg | db);
       }
       D++;
     }
@@ -106,7 +102,7 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
       if (a)
       {
         // Get the destination pixel from framebuffer
-        uint32 d = PIXEL_PREPROC (*D);
+        uint32 d = HALO_PIXEL_PREPROC (*D);
 
         // Compute destination R,G,B
         uint32 dr = d & HALO_RM;
@@ -135,7 +131,7 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
 #  endif
 #endif
         // Build new value and write into framebuffer
-        *D = PIXEL_POSTPROC (dr | dg | db);
+        *D = HALO_PIXEL_POSTPROC (dr | dg | db);
       }
       D++;
       ax += delta;
@@ -143,9 +139,8 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
   } /* endif */
 }
 
-#undef RED_PREPROC
-#undef PIXEL_PREPROC
-#undef PIXEL_POSTPROC
+#undef HALO_PIXEL_PREPROC
+#undef HALO_PIXEL_POSTPROC
 #undef HALO_NAME
 #undef HALO_BPP
 #undef HALO_PIXTYPE

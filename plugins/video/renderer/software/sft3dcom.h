@@ -88,18 +88,6 @@ protected:
    */
   int pixel_shift;
 
-  /**
-   * Shift amount in bits used to normalize and denormalize pixel data.  Most
-   * drawing routines expect RGB pixel data to occupy least significant part
-   * of RGBA tuple.  This value is used shift the RGB data to the expected
-   * position and back.  For instance, if a 2D driver uses pixel data in the
-   * form RGBA, and the drawing routines expect ARGB, then this value will be
-   * 8, which means that the data must be shifted by 8 bits in order to
-   * transform it to the proper format.  Currently only used for 4-byte pixel
-   * data.
-   */
-  int pixel_adjust;
-
   /// For debugging: the maximum number of polygons to draw in a frame.
   long dbg_max_polygons_to_draw;
   /// For debugging: the current polygon number.

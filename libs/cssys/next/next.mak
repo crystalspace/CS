@@ -177,13 +177,24 @@ ARFLAGS = -static -o
 # The stripper :-)
 STRIP = strip
 
-# Extra parameters for 'sed' which are used for doing 'make depend'.
-SYS_SED_DEPEND = -e "s/\.cpp\.o \:/\.o\:/g"
-
 # We don't need separate directories for dynamic libraries
 OUTSUFX.yes =
 
 endif # ifeq ($(MAKESECTION),defines)
+
+#----------------------------------------------------------------- defines ---#
+ifeq ($(MAKESECTION),postdefines)
+
+# Multiple -arch flags cause the compiler to barf when generating dependency
+# information, so we filter out -arch commands.  This step is performed under
+# `postdefines' rather than `defines' since we want to use the existing
+# definition of DO.DEP1 as the basis of our augmented DO.DEP1.
+DO.DEP1 := $(subst $(NEXT.ARCH_FLAGS),,$(DO.DEP1))
+
+# Extra parameters for 'sed' which are used for doing 'make depend'.
+SYS_SED_DEPEND = -e "s/\.cpp\.o \:/\.o\:/g"
+
+endif # ifeq ($(MAKESECTION),postdefines)
 
 #-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)

@@ -98,6 +98,14 @@
 #  error "ERROR: Pixel format not defined before including scanalph.inc!"
 #endif
 
+#if defined (A_R8G8B8)
+#define A_PIXEL_PREPROC(x)  R8G8B8_PIXEL_PREPROC(x)
+#define A_PIXEL_POSTPROC(x) R8G8B8_PIXEL_POSTPROC(x)
+#else
+#define A_PIXEL_PREPROC(x)  (x)
+#define A_PIXEL_POSTPROC(x) (x)
+#endif
+
 #ifndef A_PI
 
 #if defined (A_ZUSE)
@@ -129,15 +137,16 @@
       Z_FILL;								\
       unsigned srcaddr = A_SRCADDR;					\
       uint8 alpha = Scan.AlphaMap [srcaddr];				\
-      A_IPIXTYPE src = A_COLORMAP (srcTex [srcaddr]);			\
-      A_IPIXTYPE dst = A_DSTTEX;					\
+      A_IPIXTYPE src = A_PIXEL_PREPROC(A_COLORMAP (srcTex [srcaddr]));	\
+      A_IPIXTYPE dst = A_PIXEL_PREPROC(A_DSTTEX);			\
       unsigned src_rb = src & A_MASK_RB;				\
       unsigned dst_rb = dst & A_MASK_RB;				\
       dst_rb = dst_rb + (alpha * (src_rb - dst_rb) >> A_NORMSHIFT);	\
       unsigned src_g = src & A_MASK_G;					\
       unsigned dst_g = dst & A_MASK_G;					\
       dst_g = dst_g + (alpha * (src_g - dst_g) >> A_NORMSHIFT);		\
-      *_dest = INV_COLORMAP ((dst_rb & A_MASK_RB) | (dst_g & A_MASK_G));\
+      *_dest = A_PIXEL_POSTPROC(					\
+        INV_COLORMAP ((dst_rb & A_MASK_RB) | (dst_g & A_MASK_G)));	\
     }									\
     _dest++;								\
     uu += duu;								\
@@ -169,15 +178,16 @@ void A_SCANFUNC (void *dest, int len, unsigned long *zbuff,
 #endif
       unsigned srcaddr = ((v >> 16) << bitmap_log2w) + (u >> 16);
       uint8 alpha = Scan.AlphaMap [srcaddr];
-      A_IPIXTYPE src = A_COLORMAP (bitmap [srcaddr]);
-      A_IPIXTYPE dst = A_DSTTEX;
+      A_IPIXTYPE src = A_PIXEL_PREPROC(A_COLORMAP (bitmap [srcaddr]));
+      A_IPIXTYPE dst = A_PIXEL_PREPROC(A_DSTTEX);
       unsigned src_rb = src & A_MASK_RB;
       unsigned dst_rb = dst & A_MASK_RB;
       dst_rb = dst_rb + (alpha * (src_rb - dst_rb) >> A_NORMSHIFT);
       unsigned src_g = src & A_MASK_G;
       unsigned dst_g = dst & A_MASK_G;
       dst_g = dst_g + (alpha * (src_g - dst_g) >> A_NORMSHIFT);
-      *_dest = INV_COLORMAP ((dst_rb & A_MASK_RB) | (dst_g & A_MASK_G));
+      *_dest = A_PIXEL_POSTPROC(
+        INV_COLORMAP ((dst_rb & A_MASK_RB) | (dst_g & A_MASK_G)));
       u += du; v += dv;
     }
 #if defined (A_ZUSE) || defined (A_ZFIL)
@@ -190,6 +200,8 @@ void A_SCANFUNC (void *dest, int len, unsigned long *zbuff,
 
 #endif // A_PI
 
+#undef A_PIXEL_POSTPROC
+#undef A_PIXEL_PREPROC
 #undef A_SCANFUNC
 #undef A_MAP
 #undef A_PI

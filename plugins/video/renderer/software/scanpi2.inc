@@ -100,7 +100,7 @@
     #ifdef PI_CLAMP_RGB
         if (r >= ((PI_RM >> PI_RS) << 16)) rs = PI_RM; else
     #endif
-        // Separate case for TOP8BITS_R8G8B8_USED (NeXT)
+        // Separate case if high-byte is occupied by color component.
     #if (PI_RS > 16)
         rs = (r << (PI_RS - 16)) & PI_RM;
     #else
@@ -119,7 +119,7 @@
         // If in textured Gouraud but not in blending mode, we should normalize
         // R,G,B components as they were multiplied with #.16 light components
         rs = (rgbtexel.red * r);
-        // Separate case for TOP8BITS_R8G8B8_USED (NeXT)
+        // Separate case if high-byte is occupied by color component.
     #ifdef PI_CLAMP_RGB
         if (rs > PI_RM_GOUTEX) rs = PI_RM_GOUTEX;
     #endif

@@ -45,7 +45,7 @@
 #ifndef NO_scan_flat_zfil
 
 void SCAN_NAME (SCAN_BPP, scan_flat_zfil) (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;
@@ -69,7 +69,7 @@ void SCAN_NAME (SCAN_BPP, scan_flat_zfil) (int xx, unsigned char* d,
 #ifndef NO_scan_flat_zuse
 
 void SCAN_NAME (SCAN_BPP, scan_flat_zuse) (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;

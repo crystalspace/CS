@@ -414,7 +414,7 @@
 #ifndef NO_555_scan_fog
 
 void csScan_16_555_scan_fog (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
@@ -469,7 +469,7 @@ fd_done:
 #ifndef NO_565_scan_fog
 
 void csScan_16_565_scan_fog (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
@@ -524,7 +524,7 @@ fd_done:
 #ifndef NO_555_scan_fog_view
 
 void csScan_16_555_scan_fog_view (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;
@@ -563,7 +563,7 @@ void csScan_16_555_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_565_scan_fog_view
 
 void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;

@@ -1,7 +1,7 @@
 /*  -*- Mode: C++; -*- */
 /*
     Crystal Space 3D engine
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000 by Andrew Zabolotny
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -62,17 +62,7 @@
 #  define PI_RB	8
 #  define PI_GB	8
 #  define PI_BB	8
-#  if defined (TOP8BITS_R8G8B8_USED)
-#    if defined (CS_BIG_ENDIAN)
-#      define PI_RS	24
-#      define PI_GS	16
-#      define PI_BS	8
-#    else
-#      define PI_RS	0
-#      define PI_GS	8
-#      define PI_BS	16
-#    endif
-#  elif defined (CS_BIG_ENDIAN)
+#  if defined (CS_BIG_ENDIAN)
 #    define PI_RS	0
 #    define PI_GS	8
 #    define PI_BS	16
@@ -85,6 +75,6 @@
 #  error "ERROR: Pixel format not defined before including pixtype.inc!"
 #endif
 
-#define PI_RM		unsigned (((1 << PI_RB) - 1) << PI_RS)
-#define PI_GM		unsigned (((1 << PI_GB) - 1) << PI_GS)
-#define PI_BM		unsigned (((1 << PI_BB) - 1) << PI_BS)
+#define PI_RM unsigned (((1 << PI_RB) - 1) << PI_RS)
+#define PI_GM unsigned (((1 << PI_GB) - 1) << PI_GS)
+#define PI_BM unsigned (((1 << PI_BB) - 1) << PI_BS)

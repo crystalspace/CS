@@ -2,7 +2,7 @@
 #define __NeXT_csosdefs_h
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -74,9 +74,6 @@
 //-----------------------------------------------------------------------------
 #undef  SOFTWARE_2D_DRIVER
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
-
-// Tell software renderer that top 8 bits in RGBA pixel may be used.
-#define TOP8BITS_R8G8B8_USED
 
 
 //-----------------------------------------------------------------------------
@@ -185,5 +182,22 @@ static inline char* getcwd( char* p, size_t size )
 //-----------------------------------------------------------------------------
 #undef CS_STATIC_TABLE
 #define CS_STATIC_TABLE static
+
+
+//-----------------------------------------------------------------------------
+// Although the IEEE double-format optimizations of QInt() and QRound() work
+// on M68K, there are cases (particularly in the software renderer) where the
+// compiler corrupts the emitted code for these functions.  Therefore, disable
+// these optimizations.
+//-----------------------------------------------------------------------------
+#if !defined(PROC_INTEL)
+#  define CS_NO_IEEE_OPTIMIZATIONS
+#endif
+
+//-----------------------------------------------------------------------------
+// The special assembly version of qsqrt() (from CS/include/qsqrt.h) fails to
+// compile on NeXT.
+//-----------------------------------------------------------------------------
+#define CS_NO_QSQRT
 
 #endif // __NeXT_csosdefs_h

@@ -75,7 +75,7 @@ public:
 
 //----------------// Halo scanline rasterizing functions for all modes //-----//
 
-void halo_dscan_8 (void *src, void *dest, int count, int delta, int /*post_shift*/)
+void halo_dscan_8 (void *src, void *dest, int count, int delta)
 {
   unsigned char *A = (unsigned char *)src;
   unsigned char *D = (unsigned char *)dest;
@@ -182,10 +182,9 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   if (h < 0) h = Height;
 
   // Draw a single scanline of halo
-  void (*dscan)(void *src, void *dest, int count, int delta, int post_shift) = 0;
+  void (*dscan)(void *src, void *dest, int count, int delta) = 0;
   bool clamp = false;
   const csPixelFormat& pfmt = G3D->pfmt;
-  const int pixel_adjust = G3D->pixel_adjust;
 
   if (pfmt.PixelBytes == 1)
   {
@@ -200,18 +199,18 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   else
   {
     Scan.FogR = QRound (R * ((1 << pfmt.RedBits  ) - 1))
-      << (pfmt.RedShift - pixel_adjust);
+      << R8G8B8_SHIFT_ADJUST(pfmt.RedShift);
     Scan.FogG = QRound (G * ((1 << pfmt.GreenBits) - 1))
-      << (pfmt.GreenShift - pixel_adjust);
+      << R8G8B8_SHIFT_ADJUST(pfmt.GreenShift);
     Scan.FogB = QRound (B * ((1 << pfmt.BlueBits ) - 1))
-      << (pfmt.BlueShift - pixel_adjust);
+      << R8G8B8_SHIFT_ADJUST(pfmt.BlueShift);
 
     // halo intensity (0..64)
     Scan.FogDensity = QRound (iIntensity * 64);
     // Detect when the halo will possibly overflow
-    clamp = (Scan.FogR > (pfmt.RedMask >> pixel_adjust))
-         || (Scan.FogG > (pfmt.GreenMask >> pixel_adjust))
-         || (Scan.FogB > (pfmt.BlueMask >> pixel_adjust));
+    clamp = (Scan.FogR > R8G8B8_PIXEL_PREPROC(pfmt.RedMask  ))
+         || (Scan.FogG > R8G8B8_PIXEL_PREPROC(pfmt.GreenMask))
+         || (Scan.FogB > R8G8B8_PIXEL_PREPROC(pfmt.BlueMask ));
   }
 
   switch (pfmt.PixelBytes)
@@ -237,8 +236,8 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
       break;
     case 4:
     {
-      unsigned int rs = pfmt.RedShift - pixel_adjust;
-      unsigned int gs = pfmt.GreenShift - pixel_adjust;
+      unsigned int rs = R8G8B8_SHIFT_ADJUST(pfmt.RedShift);
+      unsigned int gs = R8G8B8_SHIFT_ADJUST(pfmt.GreenShift);
       ULong r = Scan.FogR, g = Scan.FogG, b = Scan.FogB;
       Scan.FogR = (rs == 16) ? r : (gs == 16) ? g : b;
       Scan.FogG = (rs ==  8) ? r : (gs ==  8) ? g : b;
@@ -377,7 +376,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
         unsigned char *d = G3D->line_table [sy] + (xL << pixel_shift);
         unsigned char *s = Alpha + QRound (scaleY * (sy - yTL)) * Width +
           QRound (scaleX * (xL - xTL));
-        dscan (s, d, xR - xL, delta, pixel_adjust);
+        dscan (s, d, xR - xL, delta);
       }
 
       sxL += dxL;

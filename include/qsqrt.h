@@ -17,17 +17,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// Uncomment the following line to define NO_QSQRT if you experience
+// Uncomment the following line to define CS_NO_QSQRT if you experience
 // mysterious problems with CS which you think are related to this
 // version of sqrt not behaving properly. If you find something like
 // that I'd like to be notified of this so we can make sure this really
 // is the problem.
-//#define NO_QSQRT
+//#define CS_NO_QSQRT
 
 #ifndef __QSQRT_H__
 #define __QSQRT_H__
 
-#if (!defined (NO_QSQRT)) && defined (PROC_INTEL) && defined (COMP_GCC)
+#if (!defined (CS_NO_QSQRT)) && defined (PROC_INTEL) && defined (COMP_GCC)
 
 /*
   NB: Single-precision floating-point format (32 bits):
@@ -123,7 +123,7 @@ static inline float qisqrt (float x)
   return -ret;
 }
 
-#elif (!defined (NO_QSQRT)) && defined (COMP_MSVC)
+#elif !defined (CS_NO_QSQRT) && defined (COMP_MSVC)
 
 #pragma warning(disable:4035)               // re-enable below
 
@@ -188,8 +188,8 @@ static inline float __cdecl qisqrt (float x)
 #else
 
 #include <math.h>
-#define qsqrt(x)	sqrt(x)
-#define qisqrt(x)	(1./sqrt(x))
+#define qsqrt(x)  sqrt(x)
+#define qisqrt(x) (1.0/sqrt(x))
 
 #endif
 

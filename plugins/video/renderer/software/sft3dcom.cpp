@@ -168,7 +168,6 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
   do_smaller_rendering = false;
   smaller_buffer = NULL;
   pixel_shift = 0;
-  pixel_adjust = 0;
   rstate_mipmap = 0;
   do_gouraud = true;
   Gamma = QInt16 (1.0);
@@ -265,11 +264,6 @@ bool csGraphics3DSoftwareCommon::Open (const char* Title)
     pixel_shift = 1;
   else
     pixel_shift = 0;
-
-#ifdef TOP8BITS_R8G8B8_USED
-  if (pfmt.PixelBytes == 4)
-    pixel_adjust = (pfmt.RedShift && pfmt.GreenShift && pfmt.BlueShift) ? 8 : 0;
-#endif
 
   title = Title;
   DrawMode = 0;
@@ -1838,11 +1832,7 @@ texr_done:
 
         // do not draw the rightmost pixel - it will be covered
         // by neightbour polygon's left bound
-#if defined(TOP8BITS_R8G8B8_USED)
-        dscan (xR - xL, d, z_buf, inv_z + deltaX * M, u_div_z + deltaX * J1, v_div_z + deltaX * K1, pixel_adjust);
-#else
         dscan (xR - xL, d, z_buf, inv_z + deltaX * M, u_div_z + deltaX * J1, v_div_z + deltaX * K1);
-#endif
       }
 
       sxL += dxL;
@@ -1999,15 +1989,15 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
         // trick: in 32-bit modes set FogR,G,B so that "R" uses bits 16-23,
         // "G" uses bits 8-15 and "B" uses bits 0-7. This is to accomodate
         // different pixel encodings such as RGB, BGR, RBG and so on...
-        unsigned long r = (pfmt.RedShift == 16 + pixel_adjust) ? Scan.FogR :
-          (pfmt.GreenShift == 16 + pixel_adjust) ? Scan.FogG : Scan.FogB;
-        unsigned long g = (pfmt.RedShift == 8 + pixel_adjust) ? Scan.FogR :
-          (pfmt.GreenShift == 8 + pixel_adjust) ? Scan.FogG : Scan.FogB;
-        unsigned long b = (pfmt.RedShift == 0 + pixel_adjust) ? Scan.FogR :
-          (pfmt.GreenShift == 0 + pixel_adjust) ? Scan.FogG : Scan.FogB;
-        Scan.FogR = r >> pixel_adjust;
-        Scan.FogG = g >> pixel_adjust;
-        Scan.FogB = b >> pixel_adjust;
+        unsigned long r = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 16) ? Scan.FogR :
+          (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 16) ? Scan.FogG : Scan.FogB;
+        unsigned long g = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 8) ? Scan.FogR :
+          (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 8) ? Scan.FogG : Scan.FogB;
+        unsigned long b = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 0) ? Scan.FogR :
+          (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 0) ? Scan.FogG : Scan.FogB;
+        Scan.FogR = R8G8B8_PIXEL_PREPROC(r);
+        Scan.FogG = R8G8B8_PIXEL_PREPROC(g);
+        Scan.FogB = R8G8B8_PIXEL_PREPROC(b);
       }
       Scan.FogPix = Scan.FogR | Scan.FogG | Scan.FogB;
     }
@@ -2149,11 +2139,7 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
 
         // do not draw the rightmost pixel - it will be covered
         // by neightbour polygon's left bound
-#if defined(TOP8BITS_R8G8B8_USED)
-        dscan (xR - xL, d, z_buf, inv_z + deltaX * M, 0, 0, pixel_adjust);
-#else
         dscan (xR - xL, d, z_buf, inv_z + deltaX * M, 0, 0);
-#endif
       }
 
       sxL += dxL;

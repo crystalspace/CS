@@ -413,7 +413,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     NXRect r; [view getBounds:&r];
     [view convertPoint:&p fromView:0];
     *x = int(p.x);
-    *y = int(r.size.height - p.y);	// CrystalSpace uses flipped coords.
+    *y = int(r.size.height - p.y - 1);	// CrystalSpace coords flipped.
     return (*x >= 0 && *y >= 0 && *x < r.size.width && *y < r.size.height);
     }
 

@@ -35,7 +35,7 @@ csScanSetup Scan;
 #ifndef NO_scan_zfil
 
 void csScan_scan_zfil (int xx, unsigned char* d,
-  ULong* z_buf, float inv_z, float u_div_z, float v_div_z PIXEL_ADJUST)
+  ULong* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z; (void)inv_z; (void)d;
   ULong* lastZbuf = z_buf + xx-1;

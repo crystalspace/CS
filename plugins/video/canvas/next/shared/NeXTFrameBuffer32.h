@@ -2,7 +2,7 @@
 #define __NeXTFrameBuffer32_h
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -23,7 +23,8 @@
 class NeXTFrameBuffer32 : public NeXTFrameBuffer
     {
 private:
-	unsigned char* frame_buffer;
+	unsigned char* raw_buffer;
+	unsigned char* cooked_buffer;
 	unsigned long buffer_size;
 
 public:

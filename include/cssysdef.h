@@ -382,8 +382,12 @@
 #endif
 
 // Use fast QInt and QRound on CPUs that are known to support it
-#if !defined (CS_IEEE_DOUBLE_FORMAT) && (defined (PROC_INTEL) || defined (PROC_M68K))
-#  define CS_IEEE_DOUBLE_FORMAT
+#if !defined (CS_NO_IEEE_OPTIMIZATIONS)
+#  if !defined (CS_IEEE_DOUBLE_FORMAT)
+#    if defined (PROC_INTEL) || defined (PROC_M68K)
+#      define CS_IEEE_DOUBLE_FORMAT
+#    endif
+#  endif
 #endif
 
 // Fatal exit routine (which can be replaced if neccessary)
