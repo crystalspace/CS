@@ -1,5 +1,5 @@
 /*
-    Simple console example
+    Simple Console
     Copyright (C) 1998 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
@@ -17,14 +17,26 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SCON_H__
-#define __SCON_H__
+#ifndef __SIMPCONS_H
+#define __SIMPCONS_H
 
-#include "support/console.h"
+#include "cssys/common/console.h"
+#include "cscom/com.h"
 
 interface ITextureManager;
 
 class csRect;
+
+/**
+ * An abstract command interpreter.  Console calls upon this object when it
+ * has a command line which needs to be interpreted.
+ */
+class csSimpleCommand : public csBase
+{
+public:
+  virtual bool PerformLine( char* ) = 0;  // Should be (char const*)
+};
+
 
 /// Two possible console modes
 enum
@@ -36,7 +48,7 @@ enum
 /**
  * The console.
  */
-class SimpleConsole : public csConsole
+class csSimpleConsole : public csConsole
 {
 protected:
   /// Text foreground color
@@ -53,17 +65,14 @@ protected:
   int ConsoleMode;
   /// Select font (-1 = automatic, else one of cs_Font_...)
   int console_font;
-
-  /// 'Work' ticker
-  int current_work_done;
-  /// Are we 'showing work' now?..
-  int showing_work;
+  /// The command handler
+  csSimpleCommand* command_handler;
 
 public:
   /// Create console object
-  SimpleConsole ();
+  csSimpleConsole (csSimpleCommand* = 0);
   /// Destroy console object
-  virtual ~SimpleConsole ();
+  virtual ~csSimpleConsole ();
 
   /// Return true if console is active
   virtual bool IsActive () { return (ConsoleMode == CONSOLE_MODE); }
@@ -91,11 +100,7 @@ public:
   int get_bg () { return console_bg; }
 
   /// Add a text line to message console (overlapped on rendering screen)
-  void PutMessage (char *str,...);
-  /// Replaces last message on the console
-  void ReplaceLastMessage (char *str,...);
-  /// Shows user that we're not hanging...
-  void ShowWork (void);
+  void PutMessage (bool advance, char *str,...);
   /// Add a text line to main console window
   virtual void PutText (char *str, ...);
   /// Print (if console is active) and execute a command
@@ -123,8 +128,8 @@ private:
 
   /// Console contents
   char **Line;
-  /// Number of lines on console
-  int LineCount;
+  /// Current output line on console
+  int LineNumber;
   /// Maximum lines on console
   int LineMax;
   /// Characters per line
@@ -134,8 +139,8 @@ private:
 
   /// Messages overlapped onto renderer screen
   char **LineMessage;
-  /// Number of lines on message pad
-  int LineMessageCount;
+  /// Current output line on message pad
+  int LineMessageNumber;
   /// Maximum lines on message pad
   int LineMessageMax;
 
@@ -154,11 +159,8 @@ private:
   int HistoryMax;
   /// Current position in history array
   int HistoryCurrent;
-
-  /// Unfinished line for PutText()
-  char *buff_text;
 };
 
 extern void GfxWrite (int x, int y, int fg, int bg, char *str, ...);
 
-#endif // __SCON_H__
+#endif // __SIMPCONS_H
