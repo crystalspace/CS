@@ -707,14 +707,15 @@ csODEDynamicSystem::~csODEDynamicSystem ()
   if (move_cb) move_cb->DecRef ();
 }
 
+
 csPtr<iRigidBody> csODEDynamicSystem::CreateBody ()
 {
   csODERigidBody* body = new csODERigidBody (this);
-  csRef<iRigidBody> ibody (SCF_QUERY_INTERFACE (body, iRigidBody));
-  bodies.Push (ibody);
-  ibody->SetMoveCallback(move_cb);
-  return csPtr<iRigidBody> (ibody);
+  bodies.Push (&body->scfiRigidBody);
+  body->scfiRigidBody.SetMoveCallback(move_cb);
+  return &body->scfiRigidBody;
 }
+
 
 void csODEDynamicSystem::RemoveBody (iRigidBody* body)
 {
@@ -955,6 +956,9 @@ void DestroyGeoms( csGeomList & geoms )
     if (dGeomGetClass (geoms[i]) == dGeomTransformClass)
       tempID = dGeomTransformGetGeom (geoms[i]);
 
+    float *properties = (float *)dGeomGetData (tempID);
+    delete [] properties;
+
     if( dGeomGetClass (tempID) == csODEDynamics::GetGeomClassNum() )
     {
       MeshInfo *gdata = (MeshInfo*)dGeomGetClassData (tempID);
@@ -1008,8 +1012,8 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   dMassSetZero (&m);
 
   dGeomID id = dCreateGeomTransform (0);
-  geoms.Push(id);
   dGeomTransformSetCleanup (id, 1);
+  geoms.Push(id);
 
   dGeomID gid = dCreateGeom (csODEDynamics::GetGeomClassNum());
   MeshInfo *gdata = (MeshInfo*)dGeomGetClassData (gid);

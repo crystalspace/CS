@@ -16,6 +16,9 @@ chronological order.
 	  with the mouse.
 	- Eric Sunshine fixed bug in csTypedObjectIterator where pure virtual
 	  method GetRequestedInterface() was called by constructor.
+	- Troy in odedynam: Fixed longstanding memory leak with float arrays.
+	  Altered iDynamicSystem::CreateBody to prevent extra references from 
+	  being created (thanks to Eric Sunshine on this one).
 19-Aug-2003
 	- Jorrit fixed a bug in the new optimization in odedynamics where
 	  the transform of the object was ignored.
