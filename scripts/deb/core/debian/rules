@@ -34,7 +34,7 @@ endif
 ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), s390))
 	CONFFLAG = --without-lib3ds --without-libode
 endif
-NEWRENDERER = --enable-new-renderer
+#NEWRENDERER = --enable-new-renderer
 
 configure: configure-stamp
 configure-stamp:
