@@ -300,7 +300,7 @@ struct iParticlesObjectState : public iBase
   virtual void Update (float elapsed_time) = 0;
 };
 
-SCF_VERSION (iParticlesFactoryState, 0, 1, 0);
+SCF_VERSION (iParticlesFactoryState, 0, 2, 0);
 
 /**
  * Particles factory state.
