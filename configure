@@ -18902,7 +18902,10 @@ fi
 
 #------------------------------------------------------------------------------
 # Check for BSD-style socket support.  Also test for presence of type
-# socklen_t.
+# socklen_t.  Note that we must not include both <winsock.h> and <sys/socket.h>
+# at the same time on Cygwin even though they both exist since the inclusion of
+# both files generates a lot of errors.  Therefore, if <winsock.h> is present,
+# we include only it, otherwise we include <sys/socket.h>.
 #------------------------------------------------------------------------------
 
 
@@ -19152,9 +19155,6 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if HAVE_SYS_TYPES_H
 	#include <sys/types.h>
 	#endif
-	#if HAVE_SYS_SOCKET_H
-	#include <sys/socket.h>
-	#endif
 	#if HAVE_NETINET_IN_H
 	#include <netinet/in.h>
 	#endif
@@ -19163,6 +19163,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 	#endif
 	#if HAVE_WINSOCK_H
 	#include <winsock.h>
+	#elif HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
 	#endif
 int
 main ()
@@ -19304,9 +19306,6 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if HAVE_SYS_TYPES_H
 	#include <sys/types.h>
 	#endif
-	#if HAVE_SYS_SOCKET_H
-	#include <sys/socket.h>
-	#endif
 	#if HAVE_NETINET_IN_H
 	#include <netinet/in.h>
 	#endif
@@ -19315,6 +19314,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 	#endif
 	#if HAVE_WINSOCK_H
 	#include <winsock.h>
+	#elif HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
 	#endif
 int
 main ()

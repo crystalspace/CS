@@ -27,6 +27,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine patched win32gcc.mak to work around problem on Win9x
 	  and WinME where "dllwrap --driver-name=g++" results in the error
 	  "dllwrap.exe: installation problem, cannot exec g++".
+	- Eric Sunshine changed the socket support check in the configure
+	  script so that it no longer includes both <winsock.h> and
+	  <sys/socket.h> at the same time even if both are present.  This works
+	  around a problem with Cygwin where including both files causes the
+	  test to fail because the headers are incompatible with one another.
 24-Feb-2003
 	- Eric Sunshine removed the recently added empty mottest.cfg and
 	  instead fixed the problem of Debian installation failing by repairing
