@@ -9,6 +9,9 @@ The history order is reversed so that new features are at the top.
 	- Removed the commands 'gamma', 'dblbuff', 'dump', 'coorddump',
 	  'fov', and 'fovangle' from WalkTest. Extended BugPlug to have
 	  the equivalent functionality.
+	- Added the ability to open an edit line (to enter text) in
+	  BugPlug. This works but unfortunatelly the display flickers.
+	  I'm not sure how to avoid that.
 	- Beware! In the dark recesses of BugPlug there now lives a creature
 	  so awful and fierce that even the mightiest heroes don't dare to
 	  look at it! When the sun shines over the mountains and fields,
