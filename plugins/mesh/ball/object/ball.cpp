@@ -557,22 +557,10 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
 
   iCamera* camera = rview->GetCamera ();
 
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c;
-  tr_o2c = camera->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
   	clip_z_plane);
-  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
-
+  
   if (((csBallMeshObjectFactory*)factory)->light_mgr)
   {
     const csArray<iLight*>& relevant_lights
@@ -595,7 +583,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
     rview->GetCurrentFrameNumber ());
   
-  const csReversibleTransform& o2wt = movable->GetFullTransform ();
+  const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3 &wo = o2wt.GetOrigin ();
 
   meshPtr->mixmode = MixMode;

@@ -229,7 +229,7 @@ void csPortalContainer::CheckMovable ()
 {
   const csMovable& cmovable = meshwrapper->GetCsMovable ();
   if (movable_nr == cmovable.GetUpdateNumber ()) return;
-  const csReversibleTransform& movtrans = cmovable.GetFullTransform ();
+  const csReversibleTransform movtrans = cmovable.GetFullTransform ();
   ObjectToWorld (cmovable, movtrans);
 }
 
@@ -804,7 +804,7 @@ bool csPortalContainer::ExtraVisTest (iRenderView* rview,
   const csMovable& cmovable = meshwrapper->GetCsMovable ();
   if (movable_nr != cmovable.GetUpdateNumber ())
   {
-    const csReversibleTransform& movtrans = cmovable.GetFullTransform ();
+    const csReversibleTransform movtrans = cmovable.GetFullTransform ();
     ObjectToWorld (cmovable, movtrans);
   }
 
@@ -815,7 +815,7 @@ bool csPortalContainer::ExtraVisTest (iRenderView* rview,
   tr_o2c = camtrans;
   if (!movable_identity)
   {
-    const csReversibleTransform& movtrans = cmovable.GetFullTransform ();
+    const csReversibleTransform movtrans = cmovable.GetFullTransform ();
     tr_o2c /= movtrans;
     world_sphere = movtrans.This2Other (sphere);
   }

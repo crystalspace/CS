@@ -159,7 +159,7 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
       clip_z_plane);
 
-  const csReversibleTransform& o2wt = movable->GetFullTransform ();
+  const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
 
   CS_ASSERT (material != 0);

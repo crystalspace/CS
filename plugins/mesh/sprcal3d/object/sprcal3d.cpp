@@ -1686,7 +1686,7 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   csDirtyAccessArray<csRenderMesh*>& meshes = 
     rmHolder.GetUnusedMeshes (rview->GetCurrentFrameNumber ());
 
-  const csReversibleTransform& o2wt = movable->GetFullTransform ();
+  const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
 
   for (size_t m = 0; m < allRenderMeshes.Length(); m++)

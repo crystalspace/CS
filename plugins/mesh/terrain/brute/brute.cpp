@@ -575,7 +575,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   
   bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, terr->mesh_indices[idx]);
 
-  const csReversibleTransform& o2wt = movable->GetFullTransform ();
+  const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
 
   for (int i=0; i<=(baseonly?0:(int)terr->palette.Length ()); ++i)
