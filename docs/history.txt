@@ -6,6 +6,7 @@ each new day's apears before the previous day's entry.  The individual changes
 for each given day, however, are in normal (ascending) chronological order.
 
 27-Jul-2003
+	- Philipp Aumayr added Cubemap and Texture3d Parser/Loader
 	- Marten Svanfeldt made a few changes related to new renderer
 	    - Some cleanup of code not used anymore in libcsengine, sector.cpp
 	      and related headerfiles.
