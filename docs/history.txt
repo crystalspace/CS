@@ -1,6 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
 7-Feb-2001
+	- Wouter Wijngaards added missing CreateInstance routine to
+	  csAnimationTemplate.
 	- Converted the missile in walktest to use the new mesh object
 	  spr3d plugin instead of csSprite3D. Also modified standard.zip
 	  accordingly.
