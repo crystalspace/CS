@@ -11,6 +11,9 @@ The history order is reversed so that new features are at the top.
 	  the command line (that option there was already there, but it
 	  was no implemented, i.e. the scale factor was always 1.0, whatever
 	  the value of XX.XX was).
+	- Oktal replaced a couple of `unsigned int's with `socklen_t's where
+	  appropriate in the cssocket plugin. This was causing errors on
+	  Windows where socklen_t is defined as a signed int.
 10-May-2003
 	- Philip Wyett eliminated the 88 double to float conversion compiler
           warnings in gtreeldr.cpp under MSVC 6.

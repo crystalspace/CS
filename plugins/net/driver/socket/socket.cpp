@@ -183,7 +183,7 @@ bool csSocketConnection::IsDataWaiting () const
   else
   {
     struct sockaddr addr;
-    unsigned addrlen = sizeof(addr);
+    socklen_t addrlen = sizeof(addr);
     addr.sa_family = AF_INET;
     if (recvfrom(Socket, NULL, 0, MSG_PEEK, & addr, & addrlen) == -1)
       return false;
@@ -257,7 +257,7 @@ csPtr<iNetworkConnection> csSocketListener::Accept()
       if (FD_ISSET (Socket, & readfds))
       {
         struct sockaddr addr;
-        unsigned addrlen = sizeof(addr);
+        socklen_t addrlen = sizeof(addr);
         addr.sa_family = AF_INET;
         if (recvfrom(Socket, NULL, 0, MSG_PEEK, & addr, & addrlen) != -1)
           connection = new csSocketConnection (scfParent, Socket, BlockingConnection, Reliable, addr);
