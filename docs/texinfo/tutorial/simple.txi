@@ -131,6 +131,9 @@ In the source file @file{simple.cpp} we place the following:
 // Needed for every CS application.
 CS_IMPLEMENT_APPLICATION
 
+// The global system driver
+Simple *System;
+
 Simple::Simple ()
 @{
   engine = NULL;
@@ -258,7 +261,8 @@ essential for every application using CS.  It makes sure that the @code{main()}
 routine is correctly linked and called on every platform.
 
 The main routine first creates an instance of our
-@samp{Simple} class.  The next step is the creation of the world.  The world
+@samp{Simple} class. We put this instance into a global variable to make
+access to it easier. The next step is the creation of the world.  The world
 is actually the main 3D engine class and is one of the most important classes
 for interfacing with the engine (see @samp{iEngine} reference for more
 information).

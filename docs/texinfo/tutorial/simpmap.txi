@@ -84,6 +84,8 @@ Similarly for @file{simple.cpp}:
 
 CS_IMPLEMENT_APPLICATION
 
+Simple *System;
+
 Simple::Simple ()
 @{
   view = NULL;
