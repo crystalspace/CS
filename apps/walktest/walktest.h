@@ -73,6 +73,38 @@ public:
   csCollider *legs;
   csCollider *body;
 
+  // Various configuration values for collision detection.
+  /// Initial speed of jumping.
+  float cfg_jumpspeed;
+  /// Walk acceleration.
+  float cfg_walk_accelerate;
+  /// Walk maximum speed.
+  float cfg_walk_maxspeed;
+  /// Walk brake deceleration.
+  float cfg_walk_brake;
+  /// Rotate acceleration.
+  float cfg_rotate_accelerate;
+  /// Rotate maximum speed.
+  float cfg_rotate_maxspeed;
+  /// Rotate brake deceleration.
+  float cfg_rotate_brake;
+  /// Look acceleration.
+  float cfg_look_accelerate;
+  /// Body height.
+  float cfg_body_height;
+  /// Body width.
+  float cfg_body_width;
+  /// Body depth.
+  float cfg_body_depth;
+  /// Eye offset.
+  float cfg_eye_offset;
+  /// Legs width.
+  float cfg_legs_width;
+  /// Legs depth.
+  float cfg_legs_depth;
+  /// Legs offset.
+  float cfg_legs_offset;
+
   /// Was player already spawned?..
   bool player_spawned;
 

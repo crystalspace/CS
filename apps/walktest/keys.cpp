@@ -675,7 +675,7 @@ static bool CommandHandler (char *cmd, char *arg)
   else if (!strcasecmp (cmd, "jump"))
   {
     if (Sys->do_gravity && Sys->on_ground)
-      Sys->velocity.y=0.08;
+      Sys->velocity.y = Sys->cfg_jumpspeed;
   }
   else if (!strcasecmp (cmd, "i_forward"))
   {
@@ -1070,7 +1070,7 @@ void WalkTest::strafe (float speed,int keep_old)
     if (new_pressed != pressed)
     {
       pressed = new_pressed;
-      strafe_speed = speed * 0.007;
+      strafe_speed = speed * cfg_walk_accelerate;
       start_time = cur_time - 100;
     }
   }
@@ -1080,16 +1080,16 @@ void WalkTest::strafe (float speed,int keep_old)
     if (pressed)
     {
       // accelerate
-      if (fabs (velocity.x) < 0.1)
+      if (fabs (velocity.x) < cfg_walk_maxspeed)
         velocity.x += strafe_speed;
     }
     else
     {
       // brake!
-      if (velocity.x > 0.014)
-        velocity.x -= 0.014;
-      else if (velocity.x < -0.014)
-        velocity.x += 0.014;
+      if (velocity.x > cfg_walk_brake)
+        velocity.x -= cfg_walk_brake;
+      else if (velocity.x < -cfg_walk_brake)
+        velocity.x += cfg_walk_brake;
       else
         velocity.x = 0;
     }
@@ -1112,7 +1112,7 @@ void WalkTest::step (float speed,int keep_old)
     if (new_pressed != pressed)
     {
       pressed = new_pressed;
-      step_speed = speed * 0.007;
+      step_speed = speed * cfg_walk_accelerate;
       start_time = cur_time - 100;
     }
   }
@@ -1122,16 +1122,16 @@ void WalkTest::step (float speed,int keep_old)
     if (pressed)
     {
       // accelerate
-      if (fabs (velocity.z) < 0.1)
+      if (fabs (velocity.z) < cfg_walk_maxspeed)
         velocity.z += step_speed;
     }
     else
     {
       // brake!
-      if (velocity.z > 0.014)
-        velocity.z -= 0.014;
-      else if (velocity.z < -0.014)
-        velocity.z += 0.014;
+      if (velocity.z > cfg_walk_brake)
+        velocity.z -= cfg_walk_brake;
+      else if (velocity.z < -cfg_walk_brake)
+        velocity.z += cfg_walk_brake;
       else
         velocity.z = 0;
     }
@@ -1154,7 +1154,7 @@ void WalkTest::rotate (float speed,int keep_old)
     if (new_pressed != pressed)
     {
       pressed = new_pressed;
-      angle_accel = speed * 0.005;
+      angle_accel = speed * cfg_rotate_accelerate;
       start_time = cur_time - 100;
     }
   }
@@ -1164,16 +1164,16 @@ void WalkTest::rotate (float speed,int keep_old)
     if (pressed)
     {
       // accelerate rotation
-      if (fabs (angle_velocity.y) < 0.03)
+      if (fabs (angle_velocity.y) < cfg_rotate_maxspeed)
         angle_velocity.y += angle_accel;
     }
     else
     {
       // brake!
-      if (angle_velocity.y > 0.015)
-        angle_velocity.y -= 0.015;
-      else if (angle_velocity.y < -0.015)
-        angle_velocity.y += 0.015;
+      if (angle_velocity.y > cfg_rotate_brake)
+        angle_velocity.y -= cfg_rotate_brake;
+      else if (angle_velocity.y < -cfg_rotate_brake)
+        angle_velocity.y += cfg_rotate_brake;
       else
         angle_velocity.y = 0;
     }
@@ -1186,7 +1186,7 @@ void WalkTest::look (float speed,int keep_old)
   if (move_3d || map_mode) return;
   static float step_speed = 0;
   if (!keep_old)
-    step_speed = speed*0.028;
+    step_speed = speed*cfg_look_accelerate;
   if (fabs (angle.x+step_speed) <= (355.0/113.0/4))
     angle.x += step_speed;
 }

@@ -336,7 +336,7 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
 // that is currently visible. This is useful to debug clipping errors
 // and other visual errors.
 int dump_visible_indent = 0;
-void dump_visible (csRenderView* /*rview*/, int type, void* entity)
+void dump_visible (csRenderView* rview, int type, void* entity)
 {
   int i;
   char indent_spaces[255];
@@ -696,13 +696,13 @@ int FindIntersection(CDTriangle *t1,CDTriangle *t2,csVector3 line[2])
 // Is the size of the camera/person and the origin
 // coordinates (OX,OY,OZ) locate the bbox with respect to the eye.
 // This player is 1.8 metres tall (assuming 1cs unit = 1m) (6feet)
-#define DX    0.75
-#define DY    1.4
-#define DZ    0.75
-#define OY   (-0.7)
+#define DX    cfg_body_width
+#define DY    cfg_body_height
+#define DZ    cfg_body_depth
+#define OY    Sys->cfg_eye_offset
 
-#define DX_L  0.4
-#define DZ_L  0.4
+#define DX_L  cfg_legs_width
+#define DZ_L  cfg_legs_depth
 
 #define DX_2  (DX/2)
 #define DZ_2  (DZ/2)
@@ -710,10 +710,10 @@ int FindIntersection(CDTriangle *t1,CDTriangle *t2,csVector3 line[2])
 #define DX_2L (DX_L/2)
 #define DZ_2L (DZ_L/2)
 
-#define OYL  (-1.1)
+#define OYL  Sys->cfg_legs_offset
 #define DYL  (OY-OYL)
 
-void WalkTest::CreateColliders(void)
+void WalkTest::CreateColliders (void)
 {
   csPolygon3D *p;
   CHK (csPolygonSet *pb = new csPolygonSet());
@@ -803,7 +803,7 @@ void WalkTest::CreateColliders(void)
   p->AddVertex (0); p->AddVertex (4);
   p->AddVertex (7); p->AddVertex (3);
 
-  this->legs=new csCollider(pl);
+  CHK (this->legs=new csCollider(pl));
 
   if(!this->body||!this->legs)
     do_cd=false;
@@ -817,7 +817,7 @@ extern collision_pair *CD_contact;
 static collision_pair our_cd_contact[1000];//=0;
 static int num_our_cd;
 
-int FindSectors(csVector3 v, csVector3 d, csSector *s, csSector **sa)
+int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
 {
   sa[0] = s;
   int i, c = 1;
@@ -1328,6 +1328,23 @@ int main (int argc, char* argv[])
   Sys->do_stats = config->GetYesNo ("WalkTest", "STATS", false);
   Sys->do_cd = config->GetYesNo ("WalkTest", "COLLDET", true);
   strcpy (WalkTest::world_file, config->GetStr ("World", "WORLDFILE", "world"));
+
+  // Get all collision detection and movement config file parameters.
+  Sys->cfg_jumpspeed = config->GetFloat ("CD", "JUMPSPEED", 0.08);
+  Sys->cfg_walk_accelerate = config->GetFloat ("CD", "WALKACCELERATE", 0.007);
+  Sys->cfg_walk_maxspeed = config->GetFloat ("CD", "WALKMAXSPEED", 0.1);
+  Sys->cfg_walk_brake = config->GetFloat ("CD", "WALKBRAKE", 0.014);
+  Sys->cfg_rotate_accelerate = config->GetFloat ("CD", "ROTATEACCELERATE", 0.005);
+  Sys->cfg_rotate_maxspeed = config->GetFloat ("CD", "ROTATEMAXSPEED", 0.03);
+  Sys->cfg_rotate_brake = config->GetFloat ("CD", "ROTATEBRAKE", 0.015);
+  Sys->cfg_look_accelerate = config->GetFloat ("CD", "LOOKACCELERATE", 0.028);
+  Sys->cfg_body_height = config->GetFloat ("CD", "BODYHEIGHT", 1.4);
+  Sys->cfg_body_width = config->GetFloat ("CD", "BODYWIDTH", 0.5);
+  Sys->cfg_body_depth = config->GetFloat ("CD", "BODYDEPTH", 0.5);
+  Sys->cfg_eye_offset = config->GetFloat ("CD", "EYEOFFSET", -0.7);
+  Sys->cfg_legs_width = config->GetFloat ("CD", "LEGSWIDTH", 0.4);
+  Sys->cfg_legs_depth = config->GetFloat ("CD", "LEGSDEPTH", 0.4);
+  Sys->cfg_legs_offset = config->GetFloat ("CD", "LEGSOFFSET", -1.1);
 
   // Create our world. The world is the representation of
   // the 3D engine.
