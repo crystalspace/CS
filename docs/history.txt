@@ -71,6 +71,8 @@ chronological order.
 	  chances of having memory leaks. And indeed, it fixes the memory
 	  leaks with walktest flarge, stenciltest, partsys, isomap, and
 	  r3dtest but not with terrain, terrainf, and particles.
+	- Jorrit fixed several wrong usages of csRef (forgotten AttachNew()
+	  and so on).
 	- Jorrit fixed a bug in ODE plugin. It would use a csRef to
 	  an event handler but still use DecRef() later.
 18-Aug-2004

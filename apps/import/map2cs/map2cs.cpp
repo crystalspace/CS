@@ -153,7 +153,7 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
 int main (int argc, char *argv[])
 {
   // this is required for the image loader
-  csRef<iObjectRegistry> object_reg = csInitializer::CreateEnvironment (argc, argv);
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return false;
   if (!csInitializer::RequestPlugins (object_reg,
 	CS_REQUEST_VFS,

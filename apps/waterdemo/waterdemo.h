@@ -35,7 +35,7 @@ struct iVFS;
 class csWaterDemo
 {
 private:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   csRef<iEngine> engine;
   csRef<iGraphics3D> r3d;
   csRef<iView> view;
