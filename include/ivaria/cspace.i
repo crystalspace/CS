@@ -884,26 +884,26 @@ TYPEMAP_OUT_csWrapPtr
 #ifndef CS_MICRO_SWIG
 %rename(AddInt8) iEvent::Add(const char *, int8);
 %rename(AddInt16) iEvent::Add(const char *, int16);
-%rename(AddInt32) iEvent::Add(const char *, int32, bool);
+%rename(AddInt32) iEvent::Add(const char *, int32);
 %rename(AddUInt8) iEvent::Add(const char *, uint8);
 %rename(AddUInt16) iEvent::Add(const char *, uint16);
 %rename(AddUInt32) iEvent::Add(const char *, uint32);
 %rename(AddFloat) iEvent::Add(const char *, float);
 %rename(AddDouble) iEvent::Add(const char *, double);
 %rename(AddString) iEvent::Add(const char *, char *);
-%rename(AddBool) iEvent::Add(const char *, bool, bool);
+%rename(AddBool) iEvent::Add(const char *, bool);
 %rename(AddVoidPtr) iEvent::Add(const char *, void *, uint32);
-%rename(FindInt8) iEvent::Find(const char *, int8 &, int) const;
-%rename(FindInt16) iEvent::Find(const char *, int16 &, int) const;
-%rename(FindInt32) iEvent::Find(const char *, int32 &, bool, int) const;
-%rename(FindUInt8) iEvent::Find(const char *, uint8 &, int) const;
-%rename(FindUInt16) iEvent::Find(const char *, uint16 &, int) const;
-%rename(FindUInt32) iEvent::Find(const char *, uint32 &, int) const;
-%rename(FindFloat) iEvent::Find(const char *, float &, int) const;
-%rename(FindDouble) iEvent::Find(const char *, double &, int) const;
-%rename(FindString) iEvent::Find(const char *, char **, int) const;
-%rename(FindBool) iEvent::Find(const char *, bool &, int) const;
-%rename(FindVoidPtr) iEvent::Find(const char *, void **, uint32 &, int) const;
+%rename(RetrieveInt8) iEvent::Retrieve(const char *, int8 &) const;
+%rename(RetrieveInt16) iEvent::Retrieve(const char *, int16 &) const;
+%rename(RetrieveInt32) iEvent::Retrieve(const char *, int32 &, bool) const;
+%rename(RetrieveUInt8) iEvent::Retrieve(const char *, uint8 &) const;
+%rename(RetrieveUInt16) iEvent::Retrieve(const char *, uint16 &) const;
+%rename(RetrieveUInt32) iEvent::Retrieve(const char *, uint32 &) const;
+%rename(RetrieveFloat) iEvent::Retrieve(const char *, float &) const;
+%rename(RetrieveDouble) iEvent::Retrieve(const char *, double &) const;
+%rename(RetrieveString) iEvent::Retrieve(const char *, char **) const;
+%rename(RetrieveBool) iEvent::Retrieve(const char *, bool &) const;
+%rename(RetrieveVoidPtr) iEvent::Retrieve(const char *, void **, uint32 &) const;
 #pragma SWIG nowarn=312; // nested union not supported
 
 %include "iutil/event.h"
