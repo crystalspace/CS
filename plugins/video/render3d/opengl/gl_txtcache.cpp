@@ -76,13 +76,13 @@ csGLTextureCache::csGLTextureCache (int max_size,
   num = 0;
   head = tail = NULL;
   total_size = 0;
-  (csGLTextureCache::R3D = R3D)->IncRef ();
+  (csGLTextureCache::R3D = R3D)/*->IncRef ()*/;
 }
 
 csGLTextureCache::~csGLTextureCache ()
 {
   Clear ();
-  R3D->DecRef ();
+  //R3D->DecRef ();
 }
 
 void csGLTextureCache::Cache (iTextureHandle *txt_handle)

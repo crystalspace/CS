@@ -3,6 +3,13 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+18-May-2003
+	- res made the following changes in and around render3d:
+	    - ATI/NV only exts can be disabled all at once via cfg.
+	    - improved error reporting for MTEX shader loader.
+	    - r3dtest properly catches/releases the mouse pointer when it
+	      gains resp. loses focus.
+	    - leak fixes.
 17-May-2003
 	- res made the following changes:
 	    - extended the stdpt plugin with a fire texture loader.

@@ -111,7 +111,7 @@ csShaderManager::~csShaderManager()
 
   while(cIter.HasNext() )
   {
-    iShaderVariable* i = (iShaderVariable*)cIter.Next();
+    iShaderVariable* i = (csShaderVariable*)cIter.Next();
     i->DecRef();
   }
 
@@ -121,16 +121,10 @@ csShaderManager::~csShaderManager()
   //clear all shaders
   while(shaders->Length() > 0)
   {
-    delete (iShader*)shaders->Pop();
+    delete (csShader*)shaders->Pop();
   }
   delete shaders;
-
-  int i;
-  for(i = 0; i < pluginlist.Length(); ++i)
-  {
-    iShaderProgramPlugin* sp = (iShaderProgramPlugin*)pluginlist.Pop();
-    sp->DecRef();
-  }
+  if (scfiEventHandler) scfiEventHandler->DecRef();
 }
 
 bool csShaderManager::Initialize(iObjectRegistry *objreg)
@@ -148,7 +142,8 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY(objectreg, iPluginManager);
 
-  iStrVector* classlist = iSCF::SCF->QueryClassList("crystalspace.render3d.shader.");
+  csRef<iStrVector> classlist (csPtr<iStrVector> 
+    (iSCF::SCF->QueryClassList("crystalspace.render3d.shader.")));
   int const nmatches = classlist->Length();
   if(nmatches != 0)
   {
@@ -159,9 +154,9 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
       csRef<iShaderProgramPlugin> plugin = CS_LOAD_PLUGIN(plugin_mgr, classname, iShaderProgramPlugin);
       if(plugin)
       {
-        csReport( objectreg,  CS_REPORTER_SEVERITY_NOTIFY,"crystalspace.render3d.shadermgr", "Loaded plugin %s", classname);
+        csReport(objectreg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.render3d.shadermgr", "Loaded plugin %s", classname);
         pluginlist.Push(plugin);
-        plugin->IncRef();
         plugin->Open();
       }
     }
@@ -293,7 +288,7 @@ csShader::csShader(csShaderManager* owner, iObjectRegistry* reg)
 csShader::csShader(const char* name, csShaderManager* owner, iObjectRegistry* reg)
 {
   SCF_CONSTRUCT_IBASE( NULL );
-  this->name = 0;
+  csShader::name = 0;
   variables = new csHashMap();
   techniques = new csBasicVector();
   parent = owner;
@@ -303,8 +298,7 @@ csShader::csShader(const char* name, csShaderManager* owner, iObjectRegistry* re
 
 csShader::~csShader()
 {
-  if(name)
-    delete name;
+  delete name;
 
   //Clear variables
   csGlobalHashIterator cIter( variables);
@@ -320,9 +314,8 @@ csShader::~csShader()
 
   while(techniques->Length() > 0)
   {
-    delete (iShaderTechnique*)techniques->Pop();
+    delete (csShaderTechnique*)techniques->Pop();
   }
-
   delete techniques;
 }
 
@@ -967,7 +960,7 @@ csShaderTechnique::~csShaderTechnique()
 {
   while(passes->Length() > 0)
   {
-    delete (iShaderPass*)passes->Pop();
+    delete (csShaderPass*)passes->Pop();
   }
   delete passes;
 }

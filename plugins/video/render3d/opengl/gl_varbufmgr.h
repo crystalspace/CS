@@ -70,8 +70,8 @@ private:
 public:
   
   bool Initialize(int size);
-  void* alloc(int size);
-  bool free(void* ptr);
+  void* Alloc(int size);
+  bool Free(void* ptr);
 
   void PrintStats();
 };

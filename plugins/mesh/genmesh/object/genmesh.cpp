@@ -1375,6 +1375,13 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
   delete[] polygons;
   if (mesh_tri_normals)
     delete [] mesh_tri_normals;
+
+#ifdef CS_USE_NEW_RENDERER
+  delete [] edge_indices;
+  delete [] edge_normals;
+  delete [] edge_midpts;
+  delete [] mesh_triangles;
+#endif
 }
 
 void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()

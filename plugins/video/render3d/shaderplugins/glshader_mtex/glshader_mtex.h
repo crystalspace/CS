@@ -21,6 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __GLSHADER_MTEX_H__
 
 #include "ivideo/shader/shader.h"
+#include "imap/services.h"
 
 class csGLRender3D;
 
@@ -30,9 +31,7 @@ private:
 
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
-  
-
-
+  csRef<iSyntaxService> SyntaxService;
 public:
   SCF_DECLARE_IBASE;
   
@@ -73,6 +72,9 @@ private:
   iGLTextureCache* txtcache;
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
+
+  /// Parser for common stuff like MixModes, vectors, matrices, ...
+  csRef<iSyntaxService> SyntaxService;
 
   csGLStateCache* statecache;
 

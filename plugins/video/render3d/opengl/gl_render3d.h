@@ -102,7 +102,8 @@ private:
   csGLExtensionManager *ext;
   csGLVertexArrayHelper varr;
   csGLTextureCache *txtcache;
-  csGLTextureManager *txtmgr;
+  //csGLTextureManager *txtmgr;
+  csRef<csGLTextureManager> txtmgr;
 
   bool color_red_enabled, color_green_enabled, color_blue_enabled, 
     alpha_enabled;
@@ -230,7 +231,7 @@ public:
 
   /// Get a pointer to our texture manager
   iTextureManager* GetTextureManager () 
-    { return (iTextureManager*)txtmgr; }
+    { return (iTextureManager*)((csGLTextureManager*)txtmgr); }
 
   /**
    * Get a pointer to the VB-manager

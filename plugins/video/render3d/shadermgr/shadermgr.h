@@ -21,6 +21,7 @@
 #define __SHADERMGR_H__
 
 #include "csutil/ref.h"
+#include "csutil/refarr.h"
 #include "csutil/scf.h"
 #include "csutil/objreg.h"
 #include "csutil/csstring.h"
@@ -54,7 +55,7 @@ private:
   csRef<iShaderVariable> sv_time;
   void UpdateStandardVariables();
 
-  csBasicVector pluginlist;
+  csRefArray<iShaderProgramPlugin> pluginlist;
 public:
   SCF_DECLARE_IBASE;
 
@@ -159,9 +160,9 @@ public:
   /// Set this shader's name
   virtual void SetName( const char* name ) 
   {
-    if(this->name) delete this->name;
-    this->name = new char[strlen(name)+1];
-    strcpy(this->name, name);
+    delete csShader::name;
+    csShader::name = new char[strlen(name)+1];
+    strcpy(csShader::name, name);
   }
   /// Retrieve name of shader
   virtual const char* GetName() { return name; }

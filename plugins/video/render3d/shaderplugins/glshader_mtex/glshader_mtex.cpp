@@ -54,19 +54,19 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGLShader_MTEX)
 
 SCF_EXPORT_CLASS_TABLE (glshader_mtex)
-SCF_EXPORT_CLASS_DEP (csGLShader_MTEX, "crystalspace.render3d.shader.glmtex",
-                      "OpenGL specific shaderprogram provider for Render3D",
-                      "")
+  SCF_EXPORT_CLASS_DEP (csGLShader_MTEX, "crystalspace.render3d.shader.glmtex",
+			"OpenGL specific shaderprogram provider for Render3D",
+			"")
 SCF_EXPORT_CLASS_TABLE_END
 
 
 SCF_IMPLEMENT_IBASE(csGLShader_MTEX)
-SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGLShader_MTEX::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
@@ -105,8 +105,14 @@ void csGLShader_MTEX::Open()
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
   ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
+
   ext->InitGL_ARB_texture_env_dot3 ();
+  if (!ext->CS_GL_ARB_texture_env_dot3)
+    ext->InitGL_EXT_texture_env_dot3 ();
+
   ext->InitGL_ARB_texture_env_combine ();
+  if (!ext->CS_GL_ARB_texture_env_combine)
+    ext->InitGL_EXT_texture_env_combine ();
 }
 
 csPtr<iString> csGLShader_MTEX::GetProgramID(const char* programstring)
@@ -123,6 +129,31 @@ csPtr<iString> csGLShader_MTEX::GetProgramID(const char* programstring)
 bool csGLShader_MTEX::Initialize(iObjectRegistry* reg)
 {
   object_reg = reg;
+
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+
+  SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  if (!SyntaxService)
+  {
+    SyntaxService = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.syntax.loader.service.text", iSyntaxService);
+    if (!SyntaxService)
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
+	"crystalspace.render3d.shader.glmtex",
+	"Could not load the syntax services!");
+      return false;
+    }
+    if (!object_reg->Register (SyntaxService, "iSyntaxService"))
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
+	"crystalspace.render3d.shader.glmtex",
+	"Could not register the syntax services!");
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -133,18 +164,19 @@ bool csGLShader_MTEX::Initialize(iObjectRegistry* reg)
 ////////////////////////////////////////////////////////////////////
 
 SCF_IMPLEMENT_IBASE(csShaderGLMTEX)
-SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
+  SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
 csShaderGLMTEX::csShaderGLMTEX(iObjectRegistry* objreg)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+
   this->object_reg = objreg;
   this->ext = ext;
   programstring = NULL;
   validProgram = true;
 
-  
+  SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 }
 
 void csShaderGLMTEX::BuildTokenHash()
@@ -284,13 +316,36 @@ bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
         if(num < 0 || num > 3 )
           continue;
         
-        int i = xmltokens.Request(child->GetAttributeValue("source"));
-        if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
-          layer->colorsource[num] = i;
+	const char* str;
+	if (str = child->GetAttributeValue("source"))
+	{
+	  int i = xmltokens.Request(str);
+	  if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
+	  {
+	    layer->colorsource[num] = i;
+	  }
+	  else
+	  {
+	    SyntaxService->Report ("crystalspace.render3d.shader.glmtex",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child, "Invalid color source: %s", str);
+	  }
+	}
 
-        int m = xmltokens.Request(child->GetAttributeValue("modifier"));
-        if(m == GL_SRC_COLOR ||m == GL_ONE_MINUS_SRC_COLOR||m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
-          layer->colormod[num] = m;
+	if (str = child->GetAttributeValue("modifier"))
+	{
+          int m = xmltokens.Request(str);
+          if(m == GL_SRC_COLOR ||m == GL_ONE_MINUS_SRC_COLOR||m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
+	  {
+            layer->colormod[num] = m;
+	  }
+	  else
+	  {
+	    SyntaxService->Report ("crystalspace.render3d.shader.glmtex",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child, "Invalid color modifier: %s", str);
+	  }
+	}
       }
       break;
     case XMLTOKEN_ALPHASOURCE:
@@ -343,7 +398,7 @@ bool csShaderGLMTEX::Load(iDataBuffer* program)
   if (error != NULL)
   { 
     csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.render3d.shader.glmtex",
-      "XML error '%s'!", error);
+      "Document error '%s'!", error);
     return false;
   }
   return Load(doc->GetRoot());

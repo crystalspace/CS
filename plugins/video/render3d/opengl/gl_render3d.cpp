@@ -143,11 +143,11 @@ csGLRender3D::csGLRender3D (iBase *parent)
 
 csGLRender3D::~csGLRender3D()
 {
-  delete strings;
-
   delete buffermgr;
   delete txtcache;
   delete txtmgr;
+
+  scfiEventHandler->DecRef();
 }
 
 
@@ -716,22 +716,39 @@ bool csGLRender3D::Open ()
   }*/
 
   // The extension manager requires to initialize all used extensions with
-  // a call to InitExtension first.
+  // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_compression ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
-  ext->InitGL_NV_vertex_array_range ();
-  ext->InitGL_NV_fence ();
-  ext->InitGL_ATI_vertex_array_object ();
-  ext->InitGL_ATI_vertex_attrib_array_object ();
   ext->InitGL_EXT_texture_lod_bias ();
+  /*
+    Check whether to init NVidia-only exts.
+    Note: NV extensions supported by multiple vendors
+     should always be inited.
+   */
+  if (config->GetBool ("Video.OpenGL.UseNVidiaExt", true))
+  {
+    ext->InitGL_NV_vertex_array_range ();
+    ext->InitGL_NV_fence ();
+  }
+  /*
+    Check whether to init ATI-only exts.
+    Note: ATI extensions supported by multiple vendors
+     should always be inited.
+   */
+  if (config->GetBool ("Video.OpenGL.UseATIExt", true))
+  {
+    ext->InitGL_ATI_vertex_array_object ();
+    ext->InitGL_ATI_vertex_attrib_array_object ();
+  }
   varr.ext = ext;
 
   shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
   if( !shadermgr )
   {
-    shadermgr = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.render3d.shadermanager", iShaderManager);
+    shadermgr = csPtr<iShaderManager>
+      (CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.render3d.shadermanager", iShaderManager));
     object_reg->Register( shadermgr, "iShaderManager");
   }
 
@@ -769,11 +786,11 @@ bool csGLRender3D::Open ()
   }
   else
   {
-    buffermgr = new csSysRenderBufferManager();
+    buffermgr.AttachNew (new csSysRenderBufferManager());
   }
 
   txtcache = new csGLTextureCache (1024*1024*32, this);
-  txtmgr = new csGLTextureManager (object_reg, GetDriver2D (), config, this);
+  txtmgr.AttachNew (new csGLTextureManager (object_reg, GetDriver2D (), config, this));
 
   glClearDepth (0.0);
   statecache->Enable_GL_CULL_FACE ();
@@ -798,12 +815,14 @@ void csGLRender3D::Close ()
     txtmgr->Clear ();
     //delete txtmgr; txtmgr = NULL;
   }
+  txtmgr = NULL;
   if (txtcache)
   {
     txtcache->Clear ();
     //delete txtcache; txtcache = NULL;
   }
   buffermgr = NULL;
+  shadermgr = NULL;
 
   if (G2D)
     G2D->Close ();

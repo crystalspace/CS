@@ -81,7 +81,7 @@ public:
   }
   virtual ~csShaderGLAVP ()
   {
-    if(programstring) delete programstring;
+    delete programstring;
   }
 
   bool LoadProgramStringToGL( const char* programstring );

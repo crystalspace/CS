@@ -22,7 +22,6 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
-#include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
@@ -57,6 +56,7 @@
 #else
 #  include "ivideo/graph3d.h"
 #endif
+#include "cstool/csview.h"
 
 #include "r3dtest.h"
 
@@ -97,27 +97,58 @@ void R3DTest::SetupFrame ()
   int x = mouse->GetLastX();
   int y = mouse->GetLastY();
 
-  //if (hasfocus)
+  bool moved = false;
+
+  if (hasfocus)
   {
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, (y-h) * 0.01);
     view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, (x-w) * 0.01);
     r3d->GetDriver2D ()->SetMousePosition (w, h);
+    moved |= (y-h);
+    moved |= (x-w);
   }
 
-
-
   if (kbd->GetKeyState (CSKEY_UP))
+  {
     view->GetCamera ()->Move (CS_VEC_FORWARD * speed * 25.0);
+    moved = true;
+  }
   if (kbd->GetKeyState (CSKEY_DOWN))
+  {
     view->GetCamera ()->Move (CS_VEC_BACKWARD * speed * 25.0);
+    moved = true;
+  }
   if (kbd->GetKeyState (CSKEY_LEFT))
+  {
     view->GetCamera ()->Move (CS_VEC_LEFT * speed * 25.0);
+    moved = true;
+  }
   if (kbd->GetKeyState (CSKEY_RIGHT))
+  {
     view->GetCamera ()->Move (CS_VEC_RIGHT * speed * 25.0);
+    moved = true;
+  }
   if (kbd->GetKeyState (CSKEY_HOME))
+  {
     view->GetCamera ()->Move (CS_VEC_UP * speed * 25.0);
+    moved = true;
+  }
   if (kbd->GetKeyState (CSKEY_END))
+  {
     view->GetCamera ()->Move (CS_VEC_DOWN * speed * 25.0);
+    moved = true;
+  }
+/*
+  // dump camera position. might be useful for debugging.
+  if (moved)
+  {
+    csReversibleTransform ct = view->GetCamera()->GetTransform();
+    const csVector3 camPos = ct.GetOrigin();
+    const csVector3 camPlaneZ = ct.GetT2O().Col3 ();
+    printf ("(%g,%g,%g) (%g,%g,%g)\n", camPos.x, camPos.y, camPos.z,
+      camPlaneZ.x, camPlaneZ.y, camPlaneZ.z);
+  }
+  */
 
   r3d->SetPerspectiveAspect (r3d->GetDriver2D ()->GetHeight ());
   r3d->SetPerspectiveCenter (r3d->GetDriver2D ()->GetWidth ()/2,
@@ -141,12 +172,20 @@ void R3DTest::FinishFrame ()
 
 bool R3DTest::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == cscmdFocusChanged)
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFocusChanged)
   {
     hasfocus = (bool)ev.Command.Info;
-    int w = r3d->GetDriver2D ()->GetWidth()/2;
-    int h = r3d->GetDriver2D ()->GetHeight()/2;
-    r3d->GetDriver2D ()->SetMousePosition (w, h);
+    if (hasfocus)
+    {
+      int w = r3d->GetDriver2D ()->GetWidth()/2;
+      int h = r3d->GetDriver2D ()->GetHeight()/2;
+      r3d->GetDriver2D ()->SetMousePosition (w, h);
+      r3d->GetDriver2D()->SetMouseCursor (csmcNone);
+    }
+    else
+    {
+      r3d->GetDriver2D()->SetMouseCursor (csmcArrow);
+    }
   }
   else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
@@ -294,7 +333,7 @@ bool R3DTest::Initialize ()
   mat->QueryObject ()->SetName ("shadow extruder");
 
   // Change this path to something /Anders Stenberg
-  vfs->Mount ("/lev/testrender", "testrender.zip");
+  vfs->Mount ("/lev/testrender", "$@data$/r3dbox.zip");
   vfs->ChDir ("/lev/testrender");
   if (!loader->LoadMapFile ("world", false))
   {
@@ -313,6 +352,21 @@ bool R3DTest::Initialize ()
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
   csRef<iGraphics2D> g2d = r3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  bool hasAccel;
+  if (g2d->PerformExtension ("hardware_accelerated", &hasAccel))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.application.r3dtest",
+      "Hardware acceleration %s.\n",
+      hasAccel ? "present" : "not present");
+  }
+  else
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.application.r3dtest",
+      "Hardware acceleration check not available.\n");
+  }
 
   r3d->GetDriver2D ()->SetMouseCursor( csmcNone );
 
@@ -338,7 +392,7 @@ bool R3DTest::Initialize ()
       shader->Load(csRef<iDataBuffer>(vfs->ReadFile("/shader/shadow.xml")));
       if(shader->Prepare())
       {
-        engine->FindMaterial ("shadow extruder")->GetMaterial ()->SetShader(shader);
+        shadow->SetShader(shader);
       }
     }
   }

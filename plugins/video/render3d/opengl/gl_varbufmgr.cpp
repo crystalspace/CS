@@ -2,7 +2,7 @@
     Copyright (C) 2002 by Mårten Svanfeldt
                           Anders Stenberg
 
-    This library is free software; you can redistribute it and/or
+    This library is Free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
@@ -160,7 +160,7 @@ bool csBuddyAllocator::Initialize(int size)
   return true;
 }
 
-void* csBuddyAllocator::alloc(int size)
+void* csBuddyAllocator::Alloc(int size)
 {
   int  i,found;
   char level=m_Height-1;
@@ -196,7 +196,7 @@ void* csBuddyAllocator::alloc(int size)
   return itop(i,level);
 }
 
-bool csBuddyAllocator::free(void *ptr)
+bool csBuddyAllocator::Free(void *ptr)
 {
   char level;
   int  i=ptoi(ptr);
@@ -205,7 +205,7 @@ bool csBuddyAllocator::free(void *ptr)
     return 0;                          /*find parent with tree[i]<=0*/
   for(level=0;i>=0&&m_Tree[i]>=0;level++)
     i=(i-1)/2;
-  if(i>=0)                             /*if found, free it*/
+  if(i>=0)                             /*if found, Free it*/
   {
     m_Tree[i]=level;
     stabilize2(i,level);         /*correct tree*/
@@ -229,7 +229,7 @@ void csBuddyAllocator::PrintStats()
   {
     printf("Buddy system initialized.\n");
     printf("Address %x, %d blocks (%dKB), ",0,m_Size,m_Size<<CS_BUDDY_SHIFT-10);
-    printf("%d blocks free (%dKB).\n",m_Freeblk,m_Freeblk<<CS_BUDDY_SHIFT-10);
+    printf("%d blocks Free (%dKB).\n",m_Freeblk,m_Freeblk<<CS_BUDDY_SHIFT-10);
     traverse(0,m_Height-1);
     printf("\n");
   }
@@ -363,12 +363,12 @@ void* csVARRenderBuffer::AllocData(int size)
 {
   long offset;
   /*
-  while( ((offset = (long) bm->myalloc->alloc(size)) == -1) && bm->ReclaimMemory())
+  while( ((offset = (long) bm->myalloc->Alloc(size)) == -1) && bm->ReclaimMemory())
     {};*/
 
-  offset = (long) bm->myalloc->alloc(size);
+  offset = (long) bm->myalloc->Alloc(size);
 
-  if(offset == -1) return NULL; //could not alloc memory
+  if(offset == -1) return NULL; //could not Alloc memory
 
   return bm->var_buffer + offset;
 }
@@ -417,7 +417,7 @@ csVARRenderBuffer::~csVARRenderBuffer()
     {
       ext->glFinishFenceNV(memblock[i].fence_id);
       if(memblock[i].buffer)
-        bm->myalloc->free( (void*)((long)(memblock[i].buffer) - (long)(bm->var_buffer)));
+        bm->myalloc->Free( (void*)((long)(memblock[i].buffer) - (long)(bm->var_buffer)));
       ext->glDeleteFencesNV(1, &memblock[i].fence_id);
     }
   }
@@ -488,7 +488,7 @@ void* csVARRenderBuffer::Lock(csRenderBufferLockType lockType)
   {
     if(bm->render3d->ext->glTestFenceNV(memblock[currentBlock].fence_id))
     {
-      //it was free, use it
+      //it was Free, use it
       locked = true;
       discarded = false;
       lastlock = lockType;
@@ -532,7 +532,7 @@ bool csVARRenderBuffer::Discard()
     if(memblock[i].buffer != NULL)
     {
       ext->glFinishFenceNV(memblock[i].fence_id);
-      bm->myalloc->free( (void*)((long)(memblock[i].buffer) - (long)(bm->var_buffer)));
+      bm->myalloc->Free( (void*)((long)(memblock[i].buffer) - (long)(bm->var_buffer)));
       ext->glDeleteFencesNV(1, &memblock[i].fence_id);
       memblock[i].buffer = NULL;
     }

@@ -546,7 +546,7 @@ void csGLTextureHandle::CreateMipMaps()
   // we do this down to 1x1 as opengl defines it
 
   iImageVector* prevImages = images;
-  csRef<iImageVector> thisImages =  new csImageVector(); 
+  csRef<iImageVector> thisImages  (csPtr<iImageVector> (new csImageVector())); 
   csArray<int> nMipmaps;
 
   int w = (*prevImages)[0]->GetWidth ();

@@ -283,7 +283,8 @@ protected:
   /// Original material.
   csRef<iMaterial> material;
   /// Parent texture manager
-  csRef<csGLTextureManager> texman;
+  //csRef<csGLTextureManager> texman;
+  csGLTextureManager* texman;
 
 public:
   ///

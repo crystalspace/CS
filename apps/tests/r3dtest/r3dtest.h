@@ -37,7 +37,7 @@ class csTestMesh;
 class R3DTest
 {
 private:
-  iObjectRegistry* object_reg;
+  csRef<iObjectRegistry> object_reg;
   csRef<iEngine> engine;
 #ifdef CS_USE_NEW_RENDERER
   csRef<iRender3D> r3d;
