@@ -35,6 +35,8 @@
 
 ///---------------------------------------------------------------------------
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics3DInfinite)
 IMPLEMENT_FACTORY (csGraphics2DInfinite)
 

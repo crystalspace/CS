@@ -46,10 +46,11 @@
 
 #define SysPrintf System->Printf
 
-
 /*=========================================================================
  SCF macro section
 =========================================================================*/
+
+CS_IMPLEMENT_PLUGIN
 
 IMPLEMENT_FACTORY (csGraphics3DOpenGL)
   EXPORT_CLASS_TABLE (gl3d)

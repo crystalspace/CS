@@ -25,6 +25,8 @@ extern "C" {
 #include "cslua.h"
 #include "csutil/csstring.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE(csLua)
   IMPLEMENTS_INTERFACE(iScript)
   IMPLEMENTS_INTERFACE(iPlugIn)

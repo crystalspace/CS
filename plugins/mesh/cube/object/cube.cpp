@@ -30,6 +30,8 @@
 #include "iengine/light.h"
 #include "qsqrt.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csCubeMeshObject)
   IMPLEMENTS_INTERFACE (iMeshObject)
 IMPLEMENT_IBASE_END

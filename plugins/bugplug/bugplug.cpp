@@ -48,6 +48,8 @@
 #include "iengine/camera.h"
 #include "qint.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csBugPlug)
 
 EXPORT_CLASS_TABLE (bugplug)

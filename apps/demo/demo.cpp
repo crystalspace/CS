@@ -50,6 +50,8 @@
 #include "igraphic/loader.h"
 #include "qsqrt.h"
 
+CS_IMPLEMENT_APPLICATION
+
 //-----------------------------------------------------------------------------
 
 #define  QUERY_PLUG(myPlug, iFace, errMsg) \

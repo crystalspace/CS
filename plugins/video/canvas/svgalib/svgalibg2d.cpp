@@ -24,6 +24,8 @@
 #include "cssys/csinput.h"
 #include "isys/system.h"
 
+CS_IMPLEMENT_PLUGIN
+
 static unsigned short ScanCodeToChar[128] =
 {
   CSKEY_ESC,27,       '1',      '2',      '3',      '4',      '5',      '6',    // 00..07

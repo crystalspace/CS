@@ -28,6 +28,8 @@
 #include "SDL/SDL.h"
 #include <fakegl.h>
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2Dps2)
 
 EXPORT_CLASS_TABLE (ps2d)

@@ -113,7 +113,6 @@ SRC.SYS_CSSYS = libs/cssys/ps2/ps2dummy.cpp libs/cssys/ps2/ps2.cpp \
   libs/cssys/general/findlib.cpp libs/cssys/ps2/ptiming.cpp \
   libs/cssys/general/printf.cpp libs/cssys/general/getopt.cpp \
   libs/cssys/ps2/loadlib.cpp
-SRC.SYS_CSSYS_DLL = 
 
 # The C compiler.
 CC=ee-g++ -c

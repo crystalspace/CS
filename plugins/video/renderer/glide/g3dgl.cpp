@@ -49,6 +49,8 @@
 #include "g3dgl.h"
 #include "glalpha.h"
 
+CS_IMPLEMENT_PLUGIN
+
 //
 // Interface table definition
 //

@@ -24,6 +24,8 @@
 #include "oglg2d.h"
 #include "isys/system.h"
 
+CS_IMPLEMENT_PLUGIN
+
 #ifndef CDS_UPDATEREGISTRY
 #  define CDS_UPDATEREGISTRY  0x00000001
 #endif

@@ -32,6 +32,8 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
 
+CS_IMPLEMENT_APPLICATION
+
 #define APP_TITLE	"Graphics canvas plugin test"
 
 class G2DTestSystemDriver : public SysSystemDriver

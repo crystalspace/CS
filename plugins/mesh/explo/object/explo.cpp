@@ -30,6 +30,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE_EXT (csExploMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iExplosionState)
 IMPLEMENT_IBASE_EXT_END

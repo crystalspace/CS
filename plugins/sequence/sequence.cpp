@@ -27,6 +27,8 @@
 #include "isys/vfs.h"
 #include "isys/event.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csSequence)
   IMPLEMENTS_INTERFACE (iSequence)
 IMPLEMENT_IBASE_END

@@ -28,6 +28,8 @@
 #include "video/canvas/common/scancode.h"
 #include "video/renderer/glide/gllib.h"
 
+CS_IMPLEMENT_PLUGIN
+
 #ifdef GLIDE3
 
 IMPLEMENT_FACTORY (csGraphics2DGlideX)

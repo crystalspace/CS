@@ -31,6 +31,8 @@
 #include "iterrain/object.h"
 #include "iengine/terrain.h"
 
+CS_IMPLEMENT_PLUGIN
+
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (COLOR)

@@ -27,6 +27,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE_EXT (csFountainMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iFountainState)
 IMPLEMENT_IBASE_EXT_END

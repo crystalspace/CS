@@ -50,18 +50,6 @@
 #undef GetCurrentTime
 #undef DeleteFile
 
-// For GUI applications, use "csMain" instead of "main".
-// For console applications, use regular "main".
-#ifndef CONSOLE
-  #define main csMain
-#endif
-
-#if defined(COMP_BC)
-  // The Borland C++ compiler does not accept a 'main' routine
-  // in a program which already contains WinMain. This is a work-around.
-  #define main csMain
-#endif
-
 #ifdef _DEBUG
   #include <assert.h>
   #define ASSERT(expression) assert(expression)
@@ -248,5 +236,48 @@ static inline void *better_memcpy (void *dst, const void *src, size_t len)
 #else
 #  error "Please define a suitable CS_XXX_ENDIAN macro in win32/csosdefs.h!"
 #endif
+
+#if defined(COMP_BC)
+  // The Borland C++ compiler does not accept a 'main' routine
+  // in a program which already contains WinMain. This is a work-around.
+  #undef main
+  #define main csMain
+#endif
+
+#if defined(COMP_BC)
+  #define CS_WIN32_ARGC _argc
+  #define CS_WIN32_ARGV _argv
+#else
+  #define CS_WIN32_ARGC __argc
+  #define CS_WIN32_ARGV __argv
+#endif
+
+#define CS_IMPLEMENT_APPLICATION \
+extern int main (int argc, char* argv[]); \
+HINSTANCE ModuleHandle = NULL; \
+int ApplicationShow = SW_SHOWNORMAL; \
+int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
+{ \
+  ModuleHandle = hApp; \
+  ApplicationShow = show; \
+  (void)prev; \
+  (void)cmd; \
+  return main(CS_WIN32_ARGC, CS_WIN32_ARGV); \
+}
+
+#if !defined(CS_STATIC_LINKED)
+
+#define CS_IMPLEMENT_PLUGIN \
+HINSTANCE ModuleHandle = NULL; \
+int ApplicationShow = SW_SHOWNORMAL; \
+extern "C" BOOL WINAPI \
+DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/) \
+{ \
+  if (fdwReason == DLL_PROCESS_ATTACH) \
+    ModuleHandle = hinstDLL; \
+  return TRUE; \
+}
+
+#endif // !CS_STATIC_LINKED
 
 #endif // __CSOSDEFS_H__

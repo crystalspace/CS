@@ -27,6 +27,8 @@ public:
 
 //--------------- implementation ----------------
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csWorm)
   IMPLEMENTS_INTERFACE (iWorm)
 IMPLEMENT_IBASE_END

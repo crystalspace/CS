@@ -35,6 +35,8 @@
 #include "csutil/csstring.h"
 #include "isys/system.h"
 
+CS_IMPLEMENT_PLUGIN
+
 // Characters ignored in VFS paths (except in middle)
 #define CS_VFSSPACE		" \t"
 

@@ -27,6 +27,8 @@
 
 #include <ggi/ggi.h>
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DGGI)
 
 EXPORT_CLASS_TABLE (ggi2d)

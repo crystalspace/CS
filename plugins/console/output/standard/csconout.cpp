@@ -32,6 +32,8 @@
 #include "csgeom/csrect.h"
 #include "csutil/csstring.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE(csConsoleOutput)
   IMPLEMENTS_INTERFACE(iConsoleOutput)
   IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)

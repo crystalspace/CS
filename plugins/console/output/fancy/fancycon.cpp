@@ -33,6 +33,8 @@
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE(csFancyConsole)
   IMPLEMENTS_INTERFACE(iConsoleOutput)
   IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)

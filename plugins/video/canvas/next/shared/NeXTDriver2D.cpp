@@ -32,6 +32,8 @@
 typedef void* NeXTDriverHandle2D;
 #define N2D_PROTO(RET,FUNC) extern "C" RET NeXTDriver2D_##FUNC
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY(NeXTDriver2D)
 
 EXPORT_CLASS_TABLE(next2d)

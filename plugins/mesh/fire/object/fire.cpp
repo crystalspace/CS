@@ -31,6 +31,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE_EXT (csFireMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iFireState)
 IMPLEMENT_IBASE_EXT_END

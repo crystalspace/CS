@@ -1,12 +1,12 @@
-################################################################################
+###############################################################################
 #                        This is the makefile for OS2/EMX
 #                       *** (tested only with pgcc-1.0) ***
-################################################################################
+###############################################################################
 
-#---------------------------------------------------
+#------------------------------------------------------------------------------
 # NOTE: OS/2 makefiles for libjpeg, libpng and zlib
 # can be found in libs/cssys/os2 subdirectory
-#---------------------------------------------------
+#------------------------------------------------------------------------------
 
 # Friendly names for building environment
 DESCRIPTION.os2gcc = OS/2-GCC/EMX
@@ -15,7 +15,7 @@ DESCRIPTION.OS.os2gcc = OS/2
 # Choose which drivers you want to build/use
 PLUGINS += video/canvas/csdive sound/renderer/software
 
-#---------------------------------------------------- rootdefines & defines ---#
+#--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
 .SUFFIXES: .exe .dll .lib .res .rc
@@ -42,7 +42,7 @@ UPD=cmd /c bin\\os2upd.cmd $@ DEST
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
-#------------------------------------------------------------------ defines ---#
+#----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
 include mk/dos.mak
@@ -132,8 +132,6 @@ SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/general/timing.cpp \
   libs/cssys/os2/loadlib.cpp libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp
 
-SRC.SYS_CSSYS_DLL=libs/cssys/os2/dllentry.cpp
-
 # The C compiler (autodetected)
 #CC=gcc -c
 
@@ -172,7 +170,7 @@ DEPEND_TOOL=mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#--------------------------------------------------------------- confighelp ---#
+#-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
 ifneq (,$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
@@ -193,7 +191,7 @@ SYSMODIFIERSHELP += \
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
-#---------------------------------------------------------------- configure ---#
+#--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
 # Default value for USE_OMF
@@ -214,7 +212,7 @@ endef
 
 endif # ifeq ($(ROOTCONFIG),config)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 ifndef OS2LINK

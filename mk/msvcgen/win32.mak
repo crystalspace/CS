@@ -58,22 +58,9 @@ MSVC.DSP += WIN32SYS
 DSP.WIN32SYS.NAME = cssys
 DSP.WIN32SYS.TYPE = library
 DSP.WIN32SYS.RESOURCES = \
-  $(filter-out libs/cssys/win32/dllentry.cpp libs/cssys/win32/exeentry.cpp, \
   $(wildcard libs/cssys/*.cpp libs/cssys/win32/*.cpp \
-  libs/cssys/win32/*.h include/cssys/*.h include/cssys/win32/*.h)) \
+  libs/cssys/win32/*.h include/cssys/*.h include/cssys/win32/*.h) \
   libs/cssys/general/findlib.cpp libs/cssys/general/getopt.cpp
-
-# libcswin32exe -- static library which must be linked with all applications.
-MSVC.DSP += WIN32EXE
-DSP.WIN32EXE.NAME = cswin32exe
-DSP.WIN32EXE.TYPE = library
-SRC.WIN32EXE = libs/cssys/win32/exeentry.cpp
-
-# libcswin32dll -- static library which must be linked with all plug-ins.
-MSVC.DSP += WIN32DLL
-DSP.WIN32DLL.NAME = cswin32dll
-DSP.WIN32DLL.TYPE = library
-SRC.WIN32DLL = libs/cssys/win32/dllentry.cpp
 
 # grpall -- represents all other projects indirectly through grpapps,
 # grpplugins, and grplibs.

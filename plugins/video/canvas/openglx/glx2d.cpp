@@ -30,6 +30,8 @@
 #include "iengine/texture.h"
 #include "iutil/cfgfile.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DGLX)
 
 EXPORT_CLASS_TABLE (glx2d)

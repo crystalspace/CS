@@ -28,6 +28,8 @@
 #include "isys/system.h"
 #include "iutil/cfgmgr.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DLineXLib)
 IMPLEMENT_FACTORY (csLineX2DFontServer)
 

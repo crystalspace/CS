@@ -31,17 +31,11 @@
 
 #include <string.h>
 
+CS_IMPLEMENT_APPLICATION
+
 char *programversion = "0.0.1";
 char *programname;
 iImageIO *ImageLoader = NULL;
-
-/*
-
-  NOTE: If your Losing Operating System {tm} (R) does not have getopt_long,
-  please use the one in support/gnu instead. Please don't comment out blocks
-  of code, dont #ifdef and so on. It is ugly.
-
-*/
 
 static struct option long_options[] =
 {

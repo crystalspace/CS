@@ -174,7 +174,6 @@
 #  endif
 #endif // SYSDEF_MKDIR
 
-
 #ifdef SYSDEF_GETCWD
 #  if defined(OS_MACOS)
 #    include <unix.h>
@@ -332,6 +331,30 @@
 #  include <sys/select.h>
 #endif
 
+/**
+ * The CS_IMPLEMENT_PLUGIN macro should be placed at the global scope in
+ * exactly one compilation unit comprising a plugin module.  For maximum
+ * portability, each plugin module must employ this macro.  Platforms may
+ * override the definition of this macro in order to augment the implementation
+ * of the plugin module with any special implementation details required by the
+ * platform.
+ */
+#ifndef CS_IMPLEMENT_PLUGIN
+#  define CS_IMPLEMENT_PLUGIN
+#endif
+
+/**
+ * The CS_IMPLEMENT_APPLICATION macro should be placed at the global scope in
+ * exactly one compilation unit comprising an application.  For maximum
+ * portability, each application should employ this macro.  Platforms may
+ * override the definition of this macro in order to augment the implementation
+ * of an application with any special implementation details required by the
+ * platform.
+ */
+#ifndef CS_IMPLEMENT_APPLICATION
+#  define CS_IMPLEMENT_APPLICATION
+#endif
+
 // The following define should only be enabled if you have defined
 // a special version of overloaded new that accepts two additional
 // parameters: a (void*) pointing to the filename and an int with the
@@ -413,7 +436,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  endif
 #endif
 
-// Fatal exit routine (which can be replaced if neccessary)
+/// Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
 
 #endif // __CS_CSSYSDEFS_H__

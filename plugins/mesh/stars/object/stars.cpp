@@ -31,6 +31,8 @@
 #include "iengine/light.h"
 #include "qsqrt.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csStarsMeshObject)
   IMPLEMENTS_INTERFACE (iMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iStarsState)

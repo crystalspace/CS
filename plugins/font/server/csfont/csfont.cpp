@@ -30,6 +30,8 @@
 #include "tiny.fnt"	// font (C) Andrew Zabolotny
 #include "italic.fnt"	// font (C) Andrew Zabolotny
 
+CS_IMPLEMENT_PLUGIN
+
 struct csFontDef
 {
   char *Name;

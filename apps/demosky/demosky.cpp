@@ -42,6 +42,8 @@
 
 //------------------------------------------------- We need the 3D engine -----
 
+CS_IMPLEMENT_APPLICATION
+
 REGISTER_STATIC_LIBRARY (engine)
 REGISTER_STATIC_LIBRARY (lvlload)
 

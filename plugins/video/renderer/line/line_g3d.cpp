@@ -34,6 +34,8 @@
 
 #define SysPrintf System->Printf
 
+CS_IMPLEMENT_PLUGIN
+
 ///---------------------------------------------------------------------------
 
 #if defined(OS_UNIX)

@@ -34,8 +34,9 @@
 #include "igeom/clip2d.h"
 #include "iutil/cfgmgr.h"
 #include "isys/system.h"
-
 #include "meta.h"
+
+CS_IMPLEMENT_PLUGIN
 
 IMPLEMENT_IBASE (csMetaBall)
   IMPLEMENTS_INTERFACE (iMeshObject)

@@ -29,6 +29,8 @@
 #include "iengine/light.h"
 #include "qsqrt.h"
 
+CS_IMPLEMENT_PLUGIN
+
 // Set the default lighting quality.
 // See header file for CS_SPR_LIGHTING_* definitions.
 //#define DEFAULT_LIGHTING CS_SPR_LIGHTING_HQ

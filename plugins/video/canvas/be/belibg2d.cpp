@@ -24,6 +24,8 @@
 #include "isys/system.h"
 #include <Screen.h>
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DBeLib)
 
 EXPORT_CLASS_TABLE (be2d)

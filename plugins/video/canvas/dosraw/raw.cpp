@@ -31,6 +31,8 @@ static VideoSystem VS;
 
 //------------------------------------------------------- csGraphics2DDOSRAW ---
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DDOSRAW)
 
 EXPORT_CLASS_TABLE (dosraw)

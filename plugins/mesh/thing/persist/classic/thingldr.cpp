@@ -43,6 +43,8 @@
 #include "iengine/ptextype.h"
 #include "iengine/curve.h"
 
+CS_IMPLEMENT_PLUGIN
+
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
   CS_TOKEN_DEF (ALPHA)

@@ -116,6 +116,8 @@ In the source file @file{simple.cpp} we place the following:
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 
+CS_IMPLEMENT_APPLICATION
+
 // We need the 3D engine
 REGISTER_STATIC_LIBRARY (engine)
 

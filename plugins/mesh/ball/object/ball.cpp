@@ -31,6 +31,8 @@
 #include "iengine/light.h"
 #include "qsqrt.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csBallMeshObject)
   IMPLEMENTS_INTERFACE (iMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iBallState)

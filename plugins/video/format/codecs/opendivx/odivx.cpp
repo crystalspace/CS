@@ -20,6 +20,8 @@
 #include "cssysdef.h"
 #include "odivx.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csOpenDivX)
   IMPLEMENTS_INTERFACE (iAVICodec)
   IMPLEMENTS_INTERFACE (iBase)

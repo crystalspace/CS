@@ -38,6 +38,8 @@
 #include "terrvis.h"
 #include "qint.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csTerrFuncObject)
   IMPLEMENTS_INTERFACE (iTerrainObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iTerrFuncState)

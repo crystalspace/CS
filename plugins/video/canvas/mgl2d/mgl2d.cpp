@@ -25,6 +25,8 @@
 #include "mgl2d.h"
 #include "iutil/cfgfile.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DMGL)
 
 EXPORT_CLASS_TABLE (mgl2d)

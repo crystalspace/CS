@@ -63,4 +63,16 @@ extern "C" unsigned long inet_addr(const char*);
 extern "C" int usleep (unsigned);
 #endif
 
+#if !defined(CS_STATIC_LINKED) && defined(CS_UNIX_PLUGIN_REQUIRES_MAIN)
+// Dummy main function required for plugin modules on some Unix platforms.
+// Implementing this function ensures that global constructors in plugin
+// modules are invoked.
+#define CS_IMPLEMENT_PLUGIN \
+int main (int argc, char* argv[]) \
+{ \
+  (void)argc; (void)argv; \
+  return 0; \
+}
+#endif // !CS_STATIC_LINKED && CS_UNIX_PLUGIN_REQUIRES_MAIN
+
 #endif // __CSOSDEFS_H__

@@ -24,6 +24,8 @@
 #include "isys/system.h"
 #include "oglFont.h"
 
+CS_IMPLEMENT_PLUGIN
+
 /** The constructor initializes it member variables and constructs the
  * first font, if one was passed into the constructor */
 csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer(int /*nFonts*/, iFontServer *pFS)

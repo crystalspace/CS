@@ -33,6 +33,8 @@
 #include "srdrsrc.h"
 #include "sndhdl.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csSoundRenderSoftware)
 
 EXPORT_CLASS_TABLE (sndsoft)

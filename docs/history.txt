@@ -1,10 +1,6 @@
 The history order is reversed so that new features are at the top.
 
 14-Jun-2001
-	- Made the terrain visibility checker more efficient and more robust.
-	  The calculation of the extent works completely different now and
-	  first calculates the left/right indices of the bounding box. Then
-	  it will compute the angles only of those two vertices instead of
 	  all four vertices. This speeds up vis testing a little.
 	  Unfortunatelly it doesn't solve a bug which seems to cull away
 	  terrain blocks wrongly.
@@ -23,6 +19,66 @@ The history order is reversed so that new features are at the top.
 	  regards to selecting front2back/back2front modes.
 	- BugPlug will now also work for apps that don't have a font
 	  server. But a lot of functionality will not work.
+	- Eric Sunshine eliminated all of the special platform-specific glue
+	  libraries and objects with which applications and plugin were
+	  required to link in the past.  Rather than maintaining special object
+	  files and static libraries, the platform-specific glue is now
+	  implemented on-the-fly via macros.
+	    - Eliminated all of the platform-specific special implementation
+	      files:
+		cssys/os2/dllentry.cpp
+		cssys/ps2/dummy.cpp
+		cssys/unix/dummy.cpp
+		cssys/win32/dllentry.cpp
+		cssys/win32/exeentry.cpp
+	    - Removed the Windows-specific special static link libraries along
+	      with their project files:
+		cswin32exe.lib
+		cswin32dll.lib
+		libcswin32exe.dsp
+		libcswin32dll.dsp
+	    - Eliminated the MSVC dependencies upon libcswin32exe.dsp and
+	      libcswin32dll.dsp.
+	    - Eliminated the SRC.SYS_CSSYS_EXE and SRC.SYS_CSSYS_DLL
+	      system-level makefile variables which controlled how the special
+	      implementation files were inserted into the build process.
+	    - Added the new macro CS_IMPLEMENT_PLUGIN to cssysdef.h.  This
+	      macro should be placed at the global scope in exactly one
+	      compilation unit comprising a plugin module.  For maximum
+	      portability, each plugin module must employ this macro.  Some
+	      platforms override the definition of this macro in order to
+	      augment the implementation of the plugin module with any special
+	      implementation details required by the platform.  For example,
+	      the Windows port uses this macro to implement the DllMain()
+	      function.
+	    - Added the new macro CS_IMPLEMENT_APPLICATION to cssysdef.h.  This
+	      macro should be placed at the global scope in exactly one
+	      compilation unit comprising an application.  For maximum
+	      portability, each application should employ this macro.
+	      Platforms override the definition of this macro in order to
+	      augment the implementation of an application with any special
+	      implementation details required by the platform.  For example,
+	      the Windows port uses this macro to implement the WinMain()
+	      function.
+	    - cssysdef.h for OS/2 now defines CS_IMPLEMENT_PLUGIN to implement
+	      _DLL_InitTerm() and a version of getenv() which works for plugin
+	      modules.
+	    - cssysdef.h for Unix now defines CS_IMPLEMENT_PLUGIN to implement
+	      main() in plugin modules if requested by the platform-specific
+	      makefile.  Currently, the Linux, FreeBSD, and Hurd makefiles
+	      request this augmentation.
+	    - cssysdef.h for Windows now defines CS_IMPLEMENT_PLUGIN to
+	      implement DllMain(), and CS_IMPLEMENT_APPLICATION to define
+	      WinMain().
+	    - Completely re-worked and simplified the convoluted `main' versus
+	      `csMain' versus `WinMain' issue on Windows.  In the past, the
+	      Windows port tried renaming all `main' functions to `csMain' (via
+	      the C-preprocessor), and then implemented its own `main' and
+	      `WinMain' functions which acted as covers to `csMain'.  With the
+	      new, much simpler scheme, `WinMain' is merely a thin cover over
+	      `main' and global renaming is unnecessary.
+	    - Augmented all applications and plugin modules with the new
+	      CS_IMPLEMENT_APPLICATION and CS_IMPLEMENT_PLUGIN macros.
 13-Jun-2001
 	- Increased robustness of the Spider in BugPlug a little. If there
 	  are no sectors it will not start hunting. There is also a timeout

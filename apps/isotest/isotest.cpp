@@ -35,6 +35,7 @@
 #include "imesh/partsys.h"
 #include "imesh/fountain.h"
 
+CS_IMPLEMENT_APPLICATION
 
 IsoTest::IsoTest ()
 {

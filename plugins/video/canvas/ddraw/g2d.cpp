@@ -38,6 +38,8 @@ DirectDetectionDevice *DirectDevice;
 
 //--//--//--//--//--//--//--//--//--//--//--//--//-- csGraphics2DDDraw3 --//--//
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 
 EXPORT_CLASS_TABLE (csddraw)

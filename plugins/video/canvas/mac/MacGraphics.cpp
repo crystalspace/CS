@@ -62,6 +62,8 @@
 
 /////The 2D Graphics Driver//////////////
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DMac)
 
 EXPORT_CLASS_TABLE (Driver2D)

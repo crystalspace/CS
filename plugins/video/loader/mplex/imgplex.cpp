@@ -24,6 +24,8 @@
 
 #define MY_CLASSNAME "crystalspace.graphic.image.io.multiplex"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE(csMultiplexImageIO);
   IMPLEMENTS_INTERFACE(iImageIO);
   IMPLEMENTS_INTERFACE(iPlugIn);

@@ -14,8 +14,9 @@ PLUGINS+=video/canvas/linex
 # formats (this is the wrapping format for the video data)
 # Microsofts AVI
 PLUGINS+=video/format/avi
-# CODECS (some formats are dynamic, that is they need codecs to encod/decode data)
-# OpenDivX : you need an additional library you can get from www.projectmayo.com
+# CODECS (some formats are dynamic, that is they need codecs to encod/decode
+# data) OpenDivX : you need an additional library you can get from
+# www.projectmayo.com
 #PLUGINS+=video/format/codecs/opendivx                                                                  
 PLUGINS+=video/format/codecs/rle                                                                  
 
@@ -98,7 +99,6 @@ NASMFLAGS.SYSTEM=-f aoutb $(CFLAGS.D)EXTERNC_UNDERSCORE
 SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/utiming.cpp \
   libs/cssys/unix/loadlib.cpp libs/cssys/general/findlib.cpp \
   libs/cssys/general/printf.cpp libs/cssys/general/getopt.cpp
-SRC.SYS_CSSYS_DLL = libs/cssys/unix/dummy.cpp
 
 # The C compiler.
 #CC=gcc -c
@@ -125,6 +125,9 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #---------------------------------------------------------------- configure --#
 ifeq ($(ROOTCONFIG),config)
 
-SYSCONFIG=bin/unixconf.sh freebsd >>config.tmp
+SYSCONFIG += bin/unixconf.sh freebsd>>config.tmp
+
+MAKE_VOLATILE_H += \
+  $(NEWLINE)echo $"\#define CS_UNIX_PLUGIN_REQUIRES_MAIN$">>volatile.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)

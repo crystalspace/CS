@@ -38,6 +38,8 @@ extern "C"
 #include <jerror.h>
 }
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csJPGImageIO)
   IMPLEMENTS_INTERFACE (iImageIO)
   IMPLEMENTS_INTERFACE (iPlugIn)

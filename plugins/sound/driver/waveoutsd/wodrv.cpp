@@ -29,6 +29,8 @@
 #include "isys/event.h"
 #include "wodrv.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csSoundDriverWaveOut)
 
 EXPORT_CLASS_TABLE (sndwaveout)

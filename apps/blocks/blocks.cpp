@@ -67,6 +67,8 @@
 #include "inetwork/driver.h"
 #endif
 
+CS_IMPLEMENT_APPLICATION
+
 //-----------------------------------------------------------------------------
 // Networking stuff.
 

@@ -27,6 +27,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE_EXT (csRainMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iRainState)
 IMPLEMENT_IBASE_EXT_END

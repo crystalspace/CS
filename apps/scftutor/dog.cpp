@@ -35,6 +35,8 @@ public:
 
 //--------------- implementation ----------------
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csDog)
   IMPLEMENTS_INTERFACE (iDog)
   IMPLEMENTS_EMBEDDED_INTERFACE (iName)

@@ -83,8 +83,9 @@ converter *ImportExport;
 #define Gfx3D Sys->myG3D
 #define Gfx2D Sys->myG2D
 
-
 //------------------------------------------------- We need the 3D engine -----
+
+CS_IMPLEMENT_APPLICATION
 
 REGISTER_STATIC_LIBRARY (engine)
 REGISTER_STATIC_LIBRARY (lvlload)

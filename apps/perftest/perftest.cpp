@@ -28,6 +28,8 @@
 #include "igraphic/imageio.h"
 #include "igraphic/image.h"
 
+CS_IMPLEMENT_APPLICATION
+
 //-----------------------------------------------------------------------------
 
 PerfTest::PerfTest ()

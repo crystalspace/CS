@@ -33,6 +33,8 @@
 
 ///---------------------------------------------------------------------------
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics3DNull)
 
 EXPORT_CLASS_TABLE (null3d)

@@ -210,9 +210,9 @@ MSVC.PREFIX.library = lib
 MSVC.PREFIX.group   = grp
 
 # Special dependencies for particular project types.
-MSVC.DEPEND.appgui  = WIN32EXE
-MSVC.DEPEND.appcon  = WIN32EXE
-MSVC.DEPEND.plugin  = WIN32DLL
+MSVC.DEPEND.appgui  =
+MSVC.DEPEND.appcon  =
+MSVC.DEPEND.plugin  =
 MSVC.DEPEND.library =
 MSVC.DEPEND.group   =
 

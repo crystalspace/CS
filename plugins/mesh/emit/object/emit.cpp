@@ -29,6 +29,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csEmitFixed)
   IMPLEMENTS_INTERFACE (iEmitGen3D)
 IMPLEMENT_IBASE_END

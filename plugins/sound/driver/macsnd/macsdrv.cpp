@@ -33,6 +33,8 @@ static pascal void SoundDoubleBackProc(
 
 #define kDoubleBufferSize	4096L
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY(csSoundDriverMac);
 
 EXPORT_CLASS_TABLE (snddrv)

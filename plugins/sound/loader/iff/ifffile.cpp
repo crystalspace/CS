@@ -26,6 +26,8 @@
 #include "../common/soundraw.h"
 #include "../common/sndload.h"
 
+CS_IMPLEMENT_PLUGIN
+
 // Amiga 8svx/iff file format loader
 //  support 8 bits PCM
 

@@ -23,6 +23,8 @@
 #include "cssysdef.h"
 #include "gifimage.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csGIFImageIO)
   IMPLEMENTS_INTERFACE (iImageIO)
   IMPLEMENTS_INTERFACE (iPlugIn)

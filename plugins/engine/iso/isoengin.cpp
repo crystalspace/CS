@@ -36,6 +36,7 @@
 #include "igraphic/imageio.h"
 #include "imesh/object.h"
 
+CS_IMPLEMENT_PLUGIN
 
 IMPLEMENT_IBASE (csIsoEngine)
   IMPLEMENTS_INTERFACE (iIsoEngine)

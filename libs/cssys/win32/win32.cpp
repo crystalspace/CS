@@ -54,8 +54,8 @@ extern int	_argc;
 extern char**	_argv;
 #endif
 
-extern HINSTANCE ModuleHandle;
 bool ApplicationActive = true;
+extern HINSTANCE ModuleHandle;
 extern int ApplicationShow;
 extern bool need_console;
 
@@ -420,6 +420,9 @@ IMPLEMENT_IBASE_EXT_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
+  if (ModuleHandle == NULL)
+    ModuleHandle = GetModuleHandle(NULL);
+
   WNDCLASS wc;
   wc.hCursor        = NULL;
   wc.hIcon          = LoadIcon (NULL, IDI_APPLICATION);

@@ -2,6 +2,8 @@
 #include "aws.h"
 #include "awsprefs.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (awsPrefManager)
   IMPLEMENTS_INTERFACE (iAwsPrefs)
 IMPLEMENT_IBASE_END

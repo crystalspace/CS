@@ -36,6 +36,8 @@
 #include "csgfx/rgbpixel.h"
 #include "csutil/databuf.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csTGAImageIO)
   IMPLEMENTS_INTERFACE (iImageIO)
   IMPLEMENTS_INTERFACE (iPlugIn)

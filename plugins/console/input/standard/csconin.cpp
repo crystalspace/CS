@@ -24,6 +24,8 @@
 #include "isys/system.h"
 #include "isys/event.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csConsoleInput)
   IMPLEMENTS_INTERFACE (iConsoleInput)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)

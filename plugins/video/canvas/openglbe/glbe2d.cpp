@@ -23,6 +23,8 @@
 #include "isys/system.h"
 #include <Screen.h>
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DGLBe)
 
 EXPORT_CLASS_TABLE (glbe2d)

@@ -45,6 +45,8 @@ inline void memsetd (void *dest, unsigned int value, size_t count)
 
 //------------------------------------------------------ csGraphics2DOS2DIVE ---
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DOS2DIVE)
 
 EXPORT_CLASS_TABLE (csdive)

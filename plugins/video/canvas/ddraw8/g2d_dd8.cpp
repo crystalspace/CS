@@ -31,6 +31,8 @@
 DirectDetection DDetection;
 DirectDetectionDevice *DirectDevice;
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DDDraw8)
 
 EXPORT_CLASS_TABLE (ddraw8)

@@ -27,6 +27,8 @@
 #include "isys/event.h"
 #include "x2d.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DXLib)
 
 EXPORT_CLASS_TABLE (x2d)

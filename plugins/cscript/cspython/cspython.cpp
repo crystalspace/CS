@@ -23,6 +23,8 @@ extern "C" {
 #include "cspython.h"
 #include "csutil/csstring.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE(csPython)
   IMPLEMENTS_INTERFACE(iScript)
   IMPLEMENTS_INTERFACE(iPlugIn)

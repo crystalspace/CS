@@ -24,6 +24,8 @@
 #include "cssysdef.h"
 #include "sgiimage.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csSGIImageIO)
   IMPLEMENTS_INTERFACE (iImageIO)
   IMPLEMENTS_INTERFACE (iPlugIn)

@@ -26,6 +26,8 @@
 #include "ivideo/graph2d.h"
 #include "iutil/cfgfile.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics3DSoftware)
 IMPLEMENT_FACTORY (csSoftProcTexture3D)
 

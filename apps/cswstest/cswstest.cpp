@@ -24,6 +24,8 @@
 #include "ivideo/fontserv.h"
 #include "iutil/cfgmgr.h"
 
+CS_IMPLEMENT_APPLICATION
+
 class csWsTest : public csApp
 {
   void MiscDialog ();

@@ -26,6 +26,8 @@
 #include "../common/soundraw.h"
 #include "../common/sndload.h"
 
+CS_IMPLEMENT_PLUGIN
+
 // MacIntosh AIFF file format loader
 
 // big warning, I hack this format with a hex editor,

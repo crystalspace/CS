@@ -21,6 +21,8 @@
 #include "avistrv.h"
 #include "avistra.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csAVIFormat)
   IMPLEMENTS_INTERFACE (iStreamFormat)
   IMPLEMENTS_INTERFACE (iPlugIn)

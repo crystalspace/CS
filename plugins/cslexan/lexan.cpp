@@ -21,6 +21,8 @@
 #include "csutil/scfstr.h"
 #include <ctype.h>
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csLexicalAnalyzer)
   IMPLEMENTS_INTERFACE (iLexicalAnalyzer)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)

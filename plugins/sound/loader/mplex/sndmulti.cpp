@@ -26,6 +26,8 @@
 
 #define MY_CLASSNAME "crystalspace.sound.loader.multiplexer"
 
+CS_IMPLEMENT_PLUGIN
+
 class csSoundLoaderMultiplexer : public iSoundLoader {
 private:
   csVector Loaders;

@@ -33,6 +33,8 @@
 
 //----------------------------------------------------------- csGraphics2DAA ---
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DAA)
 
 EXPORT_CLASS_TABLE (asciiart)

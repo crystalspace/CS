@@ -42,6 +42,8 @@
 #include "isound/source.h"
 #include "isound/renderer.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY(csSoundDriverOSS)
 
 EXPORT_CLASS_TABLE(ossdrv)

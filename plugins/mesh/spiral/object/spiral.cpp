@@ -27,6 +27,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE_EXT (csSpiralMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSpiralState)
 IMPLEMENT_IBASE_EXT_END

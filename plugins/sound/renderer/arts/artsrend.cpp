@@ -23,6 +23,8 @@
 
 #define ARTS_SIMPLESOUNDSERVER "global:Arts_SimpleSoundServer"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csArtsRenderer)
   IMPLEMENTS_INTERFACE (iSoundRender)
   IMPLEMENTS_INTERFACE (iPlugIn)

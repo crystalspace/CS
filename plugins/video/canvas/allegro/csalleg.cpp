@@ -45,6 +45,8 @@ static unsigned short ScanCodeToChar [128] =
 
 //------------------------------------------------------- csGraphics2DAlleg ---
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DAlleg)
 
 EXPORT_CLASS_TABLE (alleg2d)

@@ -27,8 +27,9 @@
 #include "ivideo/graph2d.h"
 #include "isys/vfs.h"
 #include "isys/event.h"
-
 #include "iengine/engine.h"
+
+CS_IMPLEMENT_PLUGIN
 
 IMPLEMENT_FACTORY (csPerfStats)
 

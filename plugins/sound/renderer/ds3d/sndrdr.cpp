@@ -32,6 +32,8 @@
 #include "sndsrc.h"
 #include "sndhdl.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY(csSoundRenderDS3D);
 
 EXPORT_CLASS_TABLE (sndrdrds3d)

@@ -21,6 +21,8 @@
 #include "rapcol.h"
 #include "iengine/polymesh.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csRapidCollider)
   IMPLEMENTS_INTERFACE (iCollider)
 IMPLEMENT_IBASE_END

@@ -20,7 +20,7 @@
 #ifndef __CSOSDEFS_H__
 #define __CSOSDEFS_H__
 
-//--//--//--//--//--//--//--//--//--//--//--/ Unconditional definitions --//--//
+//--//--//--//--//--//--//--//--//--//--//-- Unconditional definitions --//--//
 #define strcasecmp stricmp
 #define strncasecmp strnicmp
 
@@ -141,5 +141,55 @@
 #else
 #  error "Please define a suitable CS_XXX_ENDIAN macro in os2/csosdefs.h!"
 #endif
+
+#if !defined(CS_STATIC_LINKED)
+
+#if defined (__EMX__)
+
+#define CS_IMPLEMENT_PLUGIN_AUGMENT \
+extern "C" int _CRT_init (void); \
+extern "C" void _CRT_term (void); \
+extern "C" void __ctordtorInit (void); \
+extern "C" void __ctordtorTerm (void); \
+extern "C" unsigned long \
+_DLL_InitTerm (unsigned long mod_handle, unsigned long flag) \
+{ \
+  dll_handle = mod_handle; \
+  switch (flag) \
+  { \
+    case 0: \
+      if (_CRT_init ()) return 0; \
+      __ctordtorInit (); \
+      return 1; \
+    case 1: \
+      __ctordtorTerm (); \
+      _CRT_term (); \
+      return 1; \
+    default: \
+      return 0; \
+  } \
+}
+
+#else
+
+#define CS_IMPLEMENT_PLUGIN_AUGMENT /* empty :-( */
+#error "no DLL initialization/finalization routines for current runtime"
+
+#endif // __EMX__
+
+#define CS_IMPLEMENT_PLUGIN \
+unsigned long dll_handle; \
+extern "C" int DosScanEnv (const char *pszName, char **ppszValue); \
+extern "C" char *getenv (const char *name) /* getenv() that works in DLLs */ \
+{ \
+  char *value; \
+  if (DosScanEnv (name, &value)) \
+    return NULL; \
+  else \
+    return value; \
+} \
+CS_IMPLEMENT_PLUGIN_AUGMENT
+
+#endif // !CS_STATIC_LINKED
 
 #endif // __CSOSDEFS_H__

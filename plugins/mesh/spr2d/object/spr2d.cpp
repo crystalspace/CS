@@ -32,6 +32,8 @@
 #include "iengine/light.h"
 #include "qsqrt.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csSprite2DMeshObject)
   IMPLEMENTS_INTERFACE (iMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSprite2DState)

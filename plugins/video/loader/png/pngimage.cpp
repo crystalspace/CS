@@ -31,6 +31,8 @@ extern "C"
 
 #include "pngimage.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_IBASE (csPNGImageIO)
   IMPLEMENTS_INTERFACE (iImageIO)
   IMPLEMENTS_INTERFACE (iPlugIn)

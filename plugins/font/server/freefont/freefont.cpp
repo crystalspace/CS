@@ -25,6 +25,8 @@
 #include "isys/vfs.h"
 #include "freefont.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csFreeTypeServer)
 
 EXPORT_CLASS_TABLE (freefont)

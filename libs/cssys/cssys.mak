@@ -5,10 +5,6 @@
 # SRC.SYS_CSSYS
 #   - all system-dependent source files that should be included in cssys
 #     library
-# SRC.SYS_CSSYS_DLL
-#   - additional source files needed only for dynamic libraries
-# SRC.SYS_CSSYS_EXE
-#   - additional source files needed only for executable files
 #
 
 # Library description
@@ -46,7 +42,6 @@ INC.CSSYS = $(wildcard include/cssys/*.h)
 SRC.CSSYS = $(wildcard libs/cssys/*.cpp $(SRC.SYS_CSSYS))
 ifeq ($(MAKE_DLL),yes)
   CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys_D$(LIB_SUFFIX)
-  SRC.CSSYS += $(SRC.SYS_CSSYS_DLL)
 else
   ifneq ($(OS),WIN32)
     CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys$(LIB_SUFFIX)
@@ -55,7 +50,6 @@ else
     DEP.EXE  += $(CSSYS.LIB)
     LIBS.EXE += $(LIBS.DXINPUT) $(LIBS.DXGUID)
   endif
-  SRC.CSSYS += $(SRC.SYS_CSSYS_EXE)
 endif
 ifeq (,$(strip $(OBJ.CSSYS)))
 OBJ.CSSYS = $(addprefix $(OUT),$(notdir \

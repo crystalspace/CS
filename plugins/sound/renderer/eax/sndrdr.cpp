@@ -33,6 +33,8 @@
 #include "sndsrc.h"
 #include "../common/convmeth.h"
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY(csSoundRenderEAX);
 
 EXPORT_CLASS_TABLE (sndrdrds3d)

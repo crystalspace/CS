@@ -38,6 +38,8 @@
 
 //-------------------------------------------------------- csGraphics2DOS2GL ---
 
+CS_IMPLEMENT_PLUGIN
+
 IMPLEMENT_FACTORY (csGraphics2DOS2GL)
 
 EXPORT_CLASS_TABLE (glos2)
