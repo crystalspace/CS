@@ -154,3 +154,9 @@ actions Copy
 {
   $(CP) $(>) $(<)
 }
+
+actions ignore Move
+{
+  $(MV) $(>) $(<)
+}
+
