@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2003 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -65,10 +65,13 @@ struct TGAheader
   unsigned char Width_lo, Width_hi;	/* width of image */
   unsigned char Height_lo, Height_hi;	/* height of image */
   unsigned char PixelSize;		/* pixel size (8,16,24,32) */
-  unsigned char AttBits : 4;		/* 4 bits, number of attribute bits per pixel */
-  unsigned char Rsrvd : 1;		/* 1 bit, reserved */
-  unsigned char OrgBit : 1;		/* 1 bit, origin: 0=lower left, 1=upper left */
-  unsigned char IntrLve : 2;		/* 2 bits, interleaving flag */
+  /* 
+    4 bits, number of attribute bits per pixel 
+    1 bit, reserved
+    1 bit, origin: 0=lower left, 1=upper left
+    2 bits, interleaving flag
+   */
+  unsigned char flags;
 };
 
 typedef char ImageIDField[256];
@@ -88,6 +91,11 @@ typedef char ImageIDField[256];
 #define TGA_IL_None 0
 #define TGA_IL_Two 1
 #define TGA_IL_Four 2
+#define TGA_IL_MASK   0x03
+
+#define TGA_Org_MASK  0x04
+#define TGA_Org_BL    0x00
+#define TGA_Org_TL    0x04
 
 #define MAXCOLORS 16384
 
@@ -191,10 +199,7 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   hdr.Height_lo = h%256;
   hdr.Height_hi = h/256;
   hdr.PixelSize = (palette ? 8 : (has_alpha?32:24));
-  hdr.AttBits = 0;
-  hdr.Rsrvd = 0;
-  hdr.OrgBit = 0;
-  hdr.IntrLve = TGA_IL_None;
+  hdr.flags = TGA_IL_None | TGA_Org_BL;
 
 
   size_t size = w*h*hdr.PixelSize/8 + MAXCOLORS * hdr.CoSize / 8 + sizeof (TGAheader) + hdr.IDLength;
@@ -363,15 +368,15 @@ bool ImageTgaFile::Load (uint8* iBuffer, uint32 iSize)
   for (row = 0; row < rows; ++row)
   {
     realrow = truerow;
-    if (tga_head.OrgBit == 0)
+    if ((tga_head.flags & TGA_Org_MASK) == TGA_Org_BL)
       realrow = rows - realrow - 1;
 
     for (col = 0; col < cols; ++col)
       get_pixel (iBuffer, &(pixels [realrow * cols + col]),
         (int) tga_head.PixelSize, Format & CS_IMGFMT_ALPHA);
-    if (tga_head.IntrLve == TGA_IL_Four)
+    if ((tga_head.flags & TGA_IL_MASK) == TGA_IL_Four)
       truerow += 4;
-    else if (tga_head.IntrLve == TGA_IL_Two)
+    else if ((tga_head.flags & TGA_IL_MASK) == TGA_IL_Two)
       truerow += 2;
     else
       ++truerow;
@@ -391,7 +396,7 @@ bool ImageTgaFile::Load (uint8* iBuffer, uint32 iSize)
 
 static void readtga (uint8*& iBuffer, TGAheader* tgaP)
 {
-  unsigned char flags;
+//  unsigned char flags;
 
   tgaP->IDLength = *iBuffer++;
   tgaP->CoMapType = *iBuffer++;
@@ -410,11 +415,7 @@ static void readtga (uint8*& iBuffer, TGAheader* tgaP)
   tgaP->Height_lo = *iBuffer++;
   tgaP->Height_hi = *iBuffer++;
   tgaP->PixelSize = *iBuffer++;
-  flags = *iBuffer++;
-  tgaP->AttBits = flags & 0xf;
-  tgaP->Rsrvd = (flags & 0x10)  >> 4;
-  tgaP->OrgBit = (flags & 0x20)  >> 5;
-  tgaP->IntrLve = (flags & 0xc0)  >> 6;
+  tgaP->flags = *iBuffer++;
 
   if (tgaP->IDLength != 0)
     iBuffer += tgaP->IDLength;

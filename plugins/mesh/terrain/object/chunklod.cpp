@@ -383,7 +383,7 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
   ProcessMap (0, c, nw, sw);
   AddVertex (p->datamap[sw], 1);
 
-  float eps = 0.00001;
+  const float eps = 0.00001f;
   Data south, east, north, west;
   south.pos = csVector3 (0,-error-1,eps);
   south.norm = csVector3 (0,0,-1);
@@ -411,9 +411,9 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
 
   Data southwest;
   southwest.pos = csVector3 (eps,-error-1,eps);
-  southwest.norm = csVector3 (-.707,0,-.707);
-  southwest.tan = csVector3 (.707,0,-.707);
-  southwest.bin = csVector3 (0,-1,0);
+  southwest.norm = csVector3 (-0.707f, 0.0f, -0.707f);
+  southwest.tan = csVector3 (0.707f, 0.0f, -0.707f);
+  southwest.bin = csVector3 (0, -1, 0);
   southwest.tex = csVector2 (-error-1,error+1);
   AddEdgeVertex (p->datamap[sw], southwest);
   AddSkirtVertex (p->datamap[sw], southwest);
@@ -423,8 +423,8 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
 
   Data southeast;
   southeast.pos = csVector3 (-eps,-error-1,eps);
-  southeast.norm = csVector3 (.707,0,-.707);
-  southeast.tan = csVector3 (.707,0,.707);
+  southeast.norm = csVector3 (0.707f, 0.0f, -0.707f);
+  southeast.tan = csVector3 (0.707f, 0.0f, 0.707f);
   southeast.bin = csVector3 (0,-1,0);
   southeast.tex = csVector2 (error+1,error+1);
   AddEdgeVertex (p->datamap[se], southeast);
@@ -435,8 +435,8 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
 
   Data northeast;
   northeast.pos = csVector3 (-eps,-error-1,-eps);
-  northeast.norm = csVector3 (.707,0,.707);
-  northeast.tan = csVector3 (-.707,0,.707);
+  northeast.norm = csVector3 (0.707f, 0.0f, 0.707f);
+  northeast.tan = csVector3 (-0.707f, 0.0f, 0.707f);
   northeast.bin = csVector3 (0,-1,0);
   northeast.tex = csVector2 (error+1,-error-1);
   AddEdgeVertex (p->datamap[ne], northeast);
@@ -447,8 +447,8 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
 
   Data northwest;
   northwest.pos = csVector3 (eps,-error-1,-eps);
-  northwest.norm = csVector3 (-.707,0,.707);
-  northwest.tan = csVector3 (-.707,0,-.707);
+  northwest.norm = csVector3 (-0.707f, 0.0f ,0.707f);
+  northwest.tan = csVector3 (-0.707f, 0.0f, -0.707f);
   northwest.bin = csVector3 (0,-1,0);
   northwest.tex = csVector2 (-error-1,-error-1);
   AddEdgeVertex (p->datamap[nw], northwest);

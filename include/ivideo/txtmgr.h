@@ -83,7 +83,7 @@ struct iImageVector;
 #define CS_TEXTURE_NOFILTER		0x00000020
 /** @} */
 
-SCF_VERSION (iRendererLightmap, 1, 0, 0);
+SCF_VERSION (iRendererLightmap, 1, 1, 0);
 
 /**
  * A lightmap registered with a renderer.
@@ -103,7 +103,7 @@ struct iRendererLightmap : public iBase
   virtual void SetLightCellSize (int size) = 0;
 };
 
-SCF_VERSION (iSuperLightmap, 1, 0, 0);
+SCF_VERSION (iSuperLightmap, 1, 0, 1);
 
 /**
  * A super light map.
@@ -120,7 +120,7 @@ struct iSuperLightmap : public iBase
   virtual iTextureHandle* GetTexture () = 0;
 };
 
-SCF_VERSION (iTextureManager, 2, 3, 0);
+SCF_VERSION (iTextureManager, 2, 3, 1);
 
 /**
  * This is the standard texture manager interface.

@@ -694,7 +694,6 @@ private:
   void ClearLMs ();
   void UpdateDirtyLMs ();
 
-  //csShaderVariableContextHelper svContextHelper;
 private:
   /**
    * Prepare the polygon buffer for use by DrawPolygonMesh.

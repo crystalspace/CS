@@ -679,7 +679,7 @@ bool csShaderPass::Load (iDocumentNode* node)
               attribute = CS_VATTRIB_TEXCOORD;
               found = true;
             }
-            else //if (strcmp (dest, "texture coordinate 0") == 0)
+            else
             {
 	      static const char mapName[] = "texture coordinate %d";
 	      char buf[sizeof (mapName)];
