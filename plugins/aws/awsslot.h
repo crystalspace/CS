@@ -23,11 +23,11 @@
 #include "iutil/comp.h"
 #include "csutil/parray.h"
 
-/**                                                                                                                   *
+/**
  * This implements the signal source architecture.  A signal source is
  * an object which knows how to register and unregister slots. A signal
  * source always defines and emits signals. A signal source does not
- * care if someone is listening or not.                                                                                            *
+ * care if someone is listening or not.
  */
 
 /**
