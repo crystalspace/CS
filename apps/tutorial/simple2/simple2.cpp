@@ -119,8 +119,7 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   {
-    csRef<iEventQueue> q;
-    q.Take (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
@@ -168,7 +167,7 @@ bool Simple::Initialize ()
   }
 
   // The virtual clock.
-  vc.Take (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (vc == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -178,7 +177,7 @@ bool Simple::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine.Take (CS_QUERY_REGISTRY (object_reg, iEngine));
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (engine == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -187,7 +186,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  loader.Take (CS_QUERY_REGISTRY (object_reg, iLoader));
+  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (loader == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -196,7 +195,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g3d.Take (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (g3d == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -205,7 +204,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  kbd.Take (CS_QUERY_REGISTRY (object_reg, iKeyboardDriver));
+  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (kbd == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -237,11 +236,10 @@ bool Simple::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls;
-  walls.Take (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> walls_state;
-  walls_state.Take (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState));
+  csRef<iMeshWrapper> walls (csPtr<iMeshWrapper> (
+  	engine->CreateSectorWallsMesh (room, "walls")));
+  csRef<iThingState> walls_state (
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -294,21 +292,24 @@ bool Simple::Initialize ()
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light.Take (engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  light = csPtr<iStatLight> (
+  	engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false));
   ll->Add (light->QueryLight ());
 
-  light.Take (engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  light = csPtr<iStatLight> (
+  	engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false));
   ll->Add (light->QueryLight ());
 
-  light.Take (engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  light = csPtr<iStatLight> (
+  	engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false));
   ll->Add (light->QueryLight ());
 
   engine->Prepare ();
 
-  view.Take (new csView (engine, g3d));
+  view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -329,9 +330,8 @@ bool Simple::Initialize ()
   }
 
   // Load a sprite template from disk.
-  csRef<iMeshFactoryWrapper> imeshfact;
-  imeshfact.Take (loader->LoadMeshObjectFactory (
-  	"/lib/std/sprite1"));
+  csRef<iMeshFactoryWrapper> imeshfact (csPtr<iMeshFactoryWrapper> (
+  	loader->LoadMeshObjectFactory ("/lib/std/sprite1")));
   if (imeshfact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -341,16 +341,14 @@ bool Simple::Initialize ()
   }
 
   // Create the sprite and add it to the engine.
-  csRef<iMeshWrapper> sprite;
-  sprite.Take (engine->CreateMeshWrapper (
+  csRef<iMeshWrapper> sprite (csPtr<iMeshWrapper> (engine->CreateMeshWrapper (
   	imeshfact, "MySprite", room,
-	csVector3 (-3, 5, 3)));
+	csVector3 (-3, 5, 3))));
   csMatrix3 m; m.Identity (); m *= 5.;
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
-  csRef<iSprite3DState> spstate;
-  spstate.Take (SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
-  	iSprite3DState));
+  csRef<iSprite3DState> spstate (
+  	SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState));
   spstate->SetAction ("default");
 
   // The following two calls are not needed since CS_ZBUF_USE and

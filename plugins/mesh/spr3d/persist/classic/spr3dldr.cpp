@@ -347,8 +347,8 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iDocumentNode* node,
 					    iReporter* reporter,
 					    iSkeletonLimb* limb)
 {
-  csRef<iSkeletonConnection> con;
-  con.Take (SCF_QUERY_INTERFACE (limb, iSkeletonConnection));
+  csRef<iSkeletonConnection> con (
+  	SCF_QUERY_INTERFACE (limb, iSkeletonConnection));
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -479,11 +479,12 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
   // @@@ Temporary fix to allow to set actions for objects loaded
   // with impexp. Once those loaders move to another plugin this code
   // below should be removed.
-  iMeshObjectFactory* fact =
-    context
-      ? SCF_QUERY_INTERFACE (context, iMeshObjectFactory)
-      : NULL;
-  // DecRef of fact will be handled later.
+  iMeshObjectFactory* fact = NULL;
+  if (context)
+  {
+    fact = SCF_QUERY_INTERFACE (context, iMeshObjectFactory);
+    // DecRef of fact will be handled later.
+  }
 
   // If there was no factory we create a new one.
   if (!fact)
@@ -528,8 +529,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
       {
         spr3dLook->EnableSkeletalAnimation ();
         iSkeleton* skeleton = spr3dLook->GetSkeleton ();
-        csRef<iSkeletonLimb> skellimb;
-	skellimb.Take (SCF_QUERY_INTERFACE (skeleton,
+        csRef<iSkeletonLimb> skellimb (SCF_QUERY_INTERFACE (skeleton,
 	        iSkeletonLimb));
         if (name) skellimb->SetName (name);
         if (!LoadSkeleton (parser, reporter, skellimb, params))
@@ -730,15 +730,15 @@ iBase* csSprite3DFactoryLoader::Parse (iDocumentNode* node,
   // below should be removed.
   csRef<iMeshObjectFactory> fact;
   if (context)
-    fact.Take (SCF_QUERY_INTERFACE (context, iMeshObjectFactory));
+    fact = SCF_QUERY_INTERFACE (context, iMeshObjectFactory);
   // DecRef of fact will be handled later.
   // If there was no factory we create a new one.
   if (!fact)
-    fact.Take (type->NewFactory ());
+    fact = csPtr<iMeshObjectFactory> (type->NewFactory ());
 
   type->DecRef ();
-  csRef<iSprite3DFactoryState> spr3dLook;
-  spr3dLook.Take (SCF_QUERY_INTERFACE (fact, iSprite3DFactoryState));
+  csRef<iSprite3DFactoryState> spr3dLook (
+  	SCF_QUERY_INTERFACE (fact, iSprite3DFactoryState));
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -768,8 +768,8 @@ iBase* csSprite3DFactoryLoader::Parse (iDocumentNode* node,
         {
           spr3dLook->EnableSkeletalAnimation ();
           iSkeleton* skeleton = spr3dLook->GetSkeleton ();
-          csRef<iSkeletonLimb> skellimb;
-	  skellimb.Take (SCF_QUERY_INTERFACE (skeleton, iSkeletonLimb));
+          csRef<iSkeletonLimb> skellimb (
+	  	SCF_QUERY_INTERFACE (skeleton, iSkeletonLimb));
 	  const char* skelname = child->GetAttributeValue ("name");
           if (skelname) skellimb->SetName (skelname);
           if (!LoadSkeleton (child, reporter, skellimb))
@@ -1317,8 +1317,9 @@ iBase* csSprite3DLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          spr3dLook.Take (SCF_QUERY_INTERFACE (mesh, iSprite3DState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          spr3dLook = SCF_QUERY_INTERFACE (mesh, iSprite3DState);
 	}
 	break;
       case XMLTOKEN_ACTION:

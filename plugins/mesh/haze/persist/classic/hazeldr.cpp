@@ -166,8 +166,8 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter* reporter,
   int number;
   float p, q;
 
-  csRef<iHazeHullCreation> hullcreate;
-  hullcreate.Take (SCF_QUERY_INTERFACE (fstate, iHazeHullCreation));
+  csRef<iHazeHullCreation> hullcreate (
+  	SCF_QUERY_INTERFACE (fstate, iHazeHullCreation));
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -383,9 +383,9 @@ iBase* csHazeFactoryLoader::Parse (iDocumentNode* node,
     printf ("Load TYPE plugin crystalspace.mesh.object.haze\n");
   }
   csRef<iMeshObjectFactory> fact;
-  fact.Take (type->NewFactory ());
-  csRef<iHazeFactoryState> hazefactorystate;
-  hazefactorystate.Take (SCF_QUERY_INTERFACE (fact, iHazeFactoryState));
+  fact = csPtr<iMeshObjectFactory> (type->NewFactory ());
+  csRef<iHazeFactoryState> hazefactorystate (
+  	SCF_QUERY_INTERFACE (fact, iHazeFactoryState));
   CS_ASSERT (hazefactorystate);
   type->DecRef ();
 
@@ -700,10 +700,11 @@ iBase* csHazeLoader::Parse (iDocumentNode* node,
 		child, "Could not find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          hazestate.Take (SCF_QUERY_INTERFACE (mesh, iHazeState));
-	  hazefactorystate.Take (SCF_QUERY_INTERFACE (
-	  	fact->GetMeshObjectFactory(), iHazeFactoryState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          hazestate = SCF_QUERY_INTERFACE (mesh, iHazeState);
+	  hazefactorystate = SCF_QUERY_INTERFACE (
+	  	fact->GetMeshObjectFactory(), iHazeFactoryState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:

@@ -361,9 +361,9 @@ bool csLoader::TestXml (const char* file, iDataBuffer* buf,
     // First try to find out if there is an iDocumentSystem registered in the
     // object registry. If that's the case we will use that. Otherwise
     // we'll use tinyxml.
-    csRef<iDocumentSystem> xml;
-    xml.Take (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
-    if (!xml) xml.Take (new csTinyDocumentSystem ());
+    csRef<iDocumentSystem> xml (
+    	CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+    if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
     doc = xml->CreateDocument ();
     const char* error = doc->Parse (buf);
     if (error != NULL)
@@ -560,8 +560,7 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   ResolveOnlyRegion = iOnlyRegion;
   SCF_DEC_REF (ldr_context); ldr_context = NULL;
 
-  csRef<iDataBuffer> buf;
-  buf.Take (VFS->ReadFile (file));
+  csRef<iDataBuffer> buf (VFS->ReadFile (file));
 
   if (!buf || !buf->GetSize ())
   {
@@ -761,8 +760,7 @@ bool csLoader::LoadLibrary (char* buf)
 
 bool csLoader::LoadLibraryFile (const char* fname)
 {
-  csRef<iDataBuffer> buf;
-  buf.Take (VFS->ReadFile (fname));
+  csRef<iDataBuffer> buf (VFS->ReadFile (fname));
 
   if (!buf || !buf->GetSize ())
   {
@@ -898,8 +896,7 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
   ResolveOnlyRegion = false;
   SCF_DEC_REF (ldr_context); ldr_context = NULL;
 
-  csRef<iDataBuffer> databuff;
-  databuff.Take (VFS->ReadFile (fname));
+  csRef<iDataBuffer> databuff (VFS->ReadFile (fname));
 
   if (!databuff || !databuff->GetSize ())
   {
@@ -2349,8 +2346,7 @@ iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
 {
   if (!Engine) return NULL;
 
-  csRef<iDataBuffer> databuff;
-  databuff.Take (VFS->ReadFile (fname));
+  csRef<iDataBuffer> databuff (VFS->ReadFile (fname));
   iMeshWrapper* mesh = NULL;
 
   if (!databuff || !databuff->GetSize ())
@@ -3428,8 +3424,8 @@ bool csLoader::LoadMap (iDocumentNode* node)
         case XMLTOKEN_MESHFACT:
           {
 	    const char* name = child->GetAttributeValue ("name");
-            csRef<iMeshFactoryWrapper> t;
-	    t.Take (Engine->CreateMeshFactory (name));
+            csRef<iMeshFactoryWrapper> t (csPtr<iMeshFactoryWrapper> (
+	    	Engine->CreateMeshFactory (name)));
 	    if (!t || !LoadMeshObjectFactory (t, child))
 	    {
 	      // Error is already reported.
@@ -3726,8 +3722,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
               child, "Please use 'params' before specifying LOD!");
 	    return false;
 	  }
-	  csRef<iLODControl> lodctrl;
-	  lodctrl.Take (SCF_QUERY_INTERFACE (
+	  csRef<iLODControl> lodctrl (SCF_QUERY_INTERFACE (
 	    	stemp->GetMeshObjectFactory (),
 		iLODControl));
 	  if (!lodctrl)
@@ -4051,8 +4046,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
               child, "Mesh object is missing!");
 	    return NULL;
 	  }
-	  csRef<iLODControl> lodctrl;
-	  lodctrl.Take (SCF_QUERY_INTERFACE (
+	  csRef<iLODControl> lodctrl (SCF_QUERY_INTERFACE (
 	    	mesh->GetMeshObject (),
 		iLODControl));
 	  if (!lodctrl)
@@ -4339,9 +4333,8 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	      child, "Only use 'lod' after 'params'!");
 	    return false;
 	  }
-	  csRef<iLODControl> lodctrl;
-	  lodctrl.Take (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-		iLODControl));
+	  csRef<iLODControl> lodctrl (
+	  	SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iLODControl));
 	  if (!lodctrl)
 	  {
             SyntaxService->ReportError (

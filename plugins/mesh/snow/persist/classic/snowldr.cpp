@@ -436,9 +436,10 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          partstate.Take (SCF_QUERY_INTERFACE (mesh, iParticleState));
-          snowstate.Take (SCF_QUERY_INTERFACE (mesh, iSnowState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          snowstate = SCF_QUERY_INTERFACE (mesh, iSnowState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:

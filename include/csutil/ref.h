@@ -21,6 +21,27 @@
 #define __CSREF_H__
 
 /**
+ * A normal pointer. This class should ONLY be used for functions
+ * returning pointers that are already IncRef()'ed for the caller.
+ * This class behaves like a pointer encapsulator. Please do NOT
+ * use this for anything else (for example, don't use this class
+ * to remember pointers to anything. Use csRef for that).
+ * It only stores the pointer. Nothing else. When it is assigned to
+ * a csRef, the csRef smart pointer will 'inherit' the reference
+ * (so no IncRef()) happens.
+ */
+template <class T>
+class csPtr
+{
+private:
+  T* obj;
+
+public:
+  csPtr (T* p) : obj (p) { }
+  operator T* () const { return obj; }
+};
+
+/**
  * A smart pointer.  Maintains and correctly manages a reference to a
  * reference-counted object.  This template requires only that the object type
  * T implement the methods IncRef() and DecRef().  No other requirements are
@@ -36,9 +57,19 @@ public:
   /**
    * Construct an invalid smart pointer (that is, one pointing at nothing).
    * Dereferencing or attempting to use the invalid pointer will result in a
-   * run-time error, however it is safe to invoke IsValid() and Assign().
+   * run-time error, however it is safe to invoke IsValid().
    */
   csRef () : obj (0) {}
+
+  /**
+   * Construct a smart pointer from a csPtr. Doesn't call IncRef() on
+   * the object since it is assumed that the object in csPtr is already
+   * IncRef()'ed.
+   */
+  csRef (const csPtr<T>& newobj)
+  {
+    obj = newobj;
+  }
 
   /**
    * Construct a smart pointer from a raw object reference. Calls IncRef()
@@ -69,6 +100,19 @@ public:
   }
 
   /**
+   * Assign a csPtr to a smart pointer. Doesn't call IncRef() on
+   * the object since it is assumed that the object in csPtr is already
+   * IncRef()'ed.
+   */
+  csRef& operator = (const csPtr<T>& newobj)
+  {
+    if (obj)
+      obj->DecRef ();
+    obj = newobj;
+    return *this;
+  }
+
+  /**
    * Assign a raw object reference to this smart pointer.  This function
    * calls the object's IncRef() method.
    */
@@ -92,19 +136,6 @@ public:
   {
     this->operator=(other.obj);
     return *this;
-  }
-
-  /**
-   * Transfer ownership of a raw object reference to this smart pointer.
-   * This function assumes that the object's IncRef() method has already
-   * been called on behalf of the smart pointer.  The smart pointer is
-   * responsible for invoking DecRef() at destruction time.
-   */
-  void Take (T* newobj)
-  {
-    if (obj)		// It is assumed that newobj already has an extra
-      obj->DecRef();	// reference, thus we can safely DecRef() old obj even
-    obj = newobj;	// if (obj == newobj).
   }
 
   /// Test if the two references point to same object.

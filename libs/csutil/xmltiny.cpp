@@ -46,8 +46,7 @@ csTinyDocumentSystem::~csTinyDocumentSystem ()
 
 csRef<iDocument> csTinyDocumentSystem::CreateDocument ()
 {
-  csRef<iDocument> doc;
-  doc.Take (new csTinyXmlDocument ());
+  csRef<iDocument> doc (csPtr<iDocument> (new csTinyXmlDocument ()));
   return doc;
 }
 
@@ -79,7 +78,7 @@ csRef<iDocumentAttribute> csTinyXmlAttributeIterator::Next ()
   csRef<iDocumentAttribute> attr;
   if (current != NULL)
   {
-    attr.Take (new csTinyXmlAttribute (current));
+    attr = csPtr<iDocumentAttribute> (new csTinyXmlAttribute (current));
     current = current->Next ();
   }
   return attr;
@@ -113,7 +112,7 @@ csRef<iDocumentNode> csTinyXmlNodeIterator::Next ()
   csRef<iDocumentNode> node;
   if (current != NULL)
   {
-    node.Take (new csTinyXmlNode (current));
+    node = csPtr<iDocumentNode> (new csTinyXmlNode (current));
     if (value)
       current = current->NextSibling (value);
     else
@@ -154,7 +153,7 @@ csRef<iDocumentNode> csTinyXmlNode::GetParent ()
 {
   csRef<iDocumentNode> child;
   if (!node->Parent ()) return child;
-  child.Take (new csTinyXmlNode (node->Parent ()));
+  child = csPtr<iDocumentNode> (new csTinyXmlNode (node->Parent ()));
   return child;
 }
 
@@ -198,14 +197,14 @@ void csTinyXmlNode::SetValueAsFloat (float value)
 csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes ()
 {
   csRef<iDocumentNodeIterator> it;
-  it.Take (new csTinyXmlNodeIterator (node, NULL));
+  it = csPtr<iDocumentNodeIterator> (new csTinyXmlNodeIterator (node, NULL));
   return it;
 }
 
 csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes (const char* type)
 {
   csRef<iDocumentNodeIterator> it;
-  it.Take (new csTinyXmlNodeIterator (node, type));
+  it = csPtr<iDocumentNodeIterator> (new csTinyXmlNodeIterator (node, type));
   return it;
 }
 
@@ -214,7 +213,7 @@ csRef<iDocumentNode> csTinyXmlNode::GetNode (const char* type)
   csRef<iDocumentNode> child;
   TiDocumentNode* c = node->FirstChild (type);
   if (!c) return child;
-  child.Take (new csTinyXmlNode (c));
+  child = csPtr<iDocumentNode> (new csTinyXmlNode (c));
   return child;
 }
 
@@ -302,7 +301,7 @@ csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (csDocumentNodeType type,
       break;
   }
   if (child)
-    n.Take (new csTinyXmlNode (child));
+    n = csPtr<iDocumentNode> (new csTinyXmlNode (child));
   return n;
 }
 
@@ -341,7 +340,8 @@ float csTinyXmlNode::GetContentsValueAsFloat ()
 csRef<iDocumentAttributeIterator> csTinyXmlNode::GetAttributes ()
 {
   csRef<iDocumentAttributeIterator> it;
-  it.Take (new csTinyXmlAttributeIterator (node));
+  it = csPtr<iDocumentAttributeIterator> (
+  	new csTinyXmlAttributeIterator (node));
   return it;
 }
 
@@ -436,7 +436,7 @@ csRef<iDocumentNode> csTinyXmlDocument::CreateRoot ()
 {
   Clear ();
   TiDocument* doc = new TiDocument ();
-  root.Take (new csTinyXmlNode (doc));
+  root = csPtr<iDocumentNode> (new csTinyXmlNode (doc));
   return root;
 }
 

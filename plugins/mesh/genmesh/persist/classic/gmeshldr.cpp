@@ -514,8 +514,8 @@ iBase* csGeneralFactoryLoader::Parse (iDocumentNode* node,
   csRef<iMeshObjectFactory> fact;
   csRef<iGeneralFactoryState> state;
 
-  fact.Take (type->NewFactory ());
-  state.Take (SCF_QUERY_INTERFACE (fact, iGeneralFactoryState));
+  fact = csPtr<iMeshObjectFactory> (type->NewFactory ());
+  state = SCF_QUERY_INTERFACE (fact, iGeneralFactoryState);
 
   type->DecRef ();
 
@@ -876,8 +876,9 @@ iBase* csGeneralMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          meshstate.Take (SCF_QUERY_INTERFACE (mesh, iGeneralMeshState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          meshstate = SCF_QUERY_INTERFACE (mesh, iGeneralMeshState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:

@@ -708,8 +708,7 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
               child, "Couldn't find thing factory '%s'!", factname);
             return false;
           }
-	  csRef<iThingState> tmpl_thing_state;
-	  tmpl_thing_state.Take (SCF_QUERY_INTERFACE (
+	  csRef<iThingState> tmpl_thing_state (SCF_QUERY_INTERFACE (
 	  	fact->GetMeshObjectFactory (), iThingState));
 	  if (!tmpl_thing_state)
 	  {
@@ -747,8 +746,7 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
             return false;
           }
 
-	  csRef<iThingState> tmpl_thing_state;
-	  tmpl_thing_state.Take (SCF_QUERY_INTERFACE (
+	  csRef<iThingState> tmpl_thing_state (SCF_QUERY_INTERFACE (
 	  	wrap->GetMeshObject (), iThingState));
 	  if (!tmpl_thing_state)
 	  {
@@ -1381,11 +1379,9 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
 			      iLoaderContext* ldr_context, iBase* /*context*/)
 {
   // Things only work with the real 3D engine and not with the iso engine.
-  csRef<iEngine> engine;
-  engine.Take (CS_QUERY_REGISTRY (object_reg, iEngine));
+  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   CS_ASSERT (engine != NULL);
-  csRef<iSyntaxService> synldr;
-  synldr.Take (CS_QUERY_REGISTRY (object_reg, iSyntaxService));
+  csRef<iSyntaxService> synldr (CS_QUERY_REGISTRY (object_reg, iSyntaxService));
 
   iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
 	    iThingEnvironment);

@@ -1823,14 +1823,14 @@ void Cs2Xml::ConvertDir (const char* vfspath, bool backup)
 {
   vfs->PushDir ();
   vfs->ChDir (vfspath);
-  csRef<iStrVector> files(vfs->FindFiles ("."));
+  csRef<iStrVector> files (vfs->FindFiles ("."));
   int i;
   for (i = 0 ; i < files->Length () ; i++)
   {
     char* str = files->Get (i);
 
     // Test if it is a dir (@@@ rather ugly test! Needs support in VFS).
-    csRef<iStrVector> recfiles(vfs->FindFiles (str));
+    csRef<iStrVector> recfiles (vfs->FindFiles (str));
     if (recfiles->Length () > 0 && strcmp (recfiles->Get (0), str) != 0)
     {
       ConvertDir (str, backup);
@@ -1848,8 +1848,7 @@ bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
   if (!TestCSFile (vfspath)) return false;
 
   printf ("Trying to convert '%s' ... \n", vfspath); fflush (stdout);
-  csRef<iDataBuffer> buf;
-  buf.Take (vfs->ReadFile (vfspath));
+  csRef<iDataBuffer> buf (vfs->ReadFile (vfspath));
   if (!buf || !buf->GetSize ())
   {
     ReportError ("Could not read file '%s'!", vfspath);
@@ -1882,8 +1881,8 @@ bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
     if (params)
     {
       char* tokname = ToLower (parser->GetUnknownToken (), true);
-      csRef<iDocumentSystem> xml;
-      xml.Take (new csTinyDocumentSystem ());
+      csRef<iDocumentSystem> xml (csPtr<iDocumentSystem> (
+      	new csTinyDocumentSystem ()));
       csRef<iDocument> doc = xml->CreateDocument ();
       csRef<iDocumentNode> root = doc->CreateRoot ();
       csRef<iDocumentNode> parent = root->CreateNodeBefore (
@@ -1921,8 +1920,7 @@ bool Cs2Xml::TestCSFile (const char* vfspath)
     if (!strcasecmp (ext, ".bak")) return false;
   }
 
-  csRef<iDataBuffer> buf;
-  buf.Take (vfs->ReadFile (vfspath));
+  csRef<iDataBuffer> buf (vfs->ReadFile (vfspath));
   if (!buf || !buf->GetSize ()) return false;
 
   csParser* parser = new csParser (true);
@@ -1970,8 +1968,8 @@ bool Cs2Xml::TestCSFile (const char* vfspath)
 
 void Cs2Xml::Main ()
 {
-  cmdline.Take (CS_QUERY_REGISTRY (object_reg, iCommandLineParser));
-  vfs.Take (CS_QUERY_REGISTRY (object_reg, iVFS));
+  cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   const char* val = cmdline->GetName ();
   if (!val)

@@ -927,7 +927,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
   }
 }
 
-iFile *VfsNode::Open (int Mode, const char *FileName)
+iFile* VfsNode::Open (int Mode, const char *FileName)
 {
   csFile *f = NULL;
 
@@ -1288,10 +1288,10 @@ char *csVFS::_ExpandPath (const char *Path, bool IsDir) const
   return ret;
 }
 
-iDataBuffer *csVFS::ExpandPath (const char *Path, bool IsDir) const
+csPtr<iDataBuffer> csVFS::ExpandPath (const char *Path, bool IsDir) const
 {
   char *xp = _ExpandPath (Path, IsDir);
-  return new csDataBuffer (xp, strlen (xp) + 1);
+  return csPtr<iDataBuffer> (new csDataBuffer (xp, strlen (xp) + 1));
 }
 
 VfsNode *csVFS::GetNode (const char *Path, char *NodePrefix,
@@ -1416,11 +1416,11 @@ csRef<iStrVector> csVFS::MountRoot (const char *Path)
   }
 
   csRef<iStrVector> v(outv);
-  outv->DecRef();
+  outv->DecRef ();
   return v;
 }
 
-csRef<iStrVector> csVFS::FindFiles (const char *Path) const
+csPtr<iStrVector> csVFS::FindFiles (const char *Path) const
 {
   scfStrVector *fl = new scfStrVector;		// the output list
 
@@ -1487,25 +1487,24 @@ csRef<iStrVector> csVFS::FindFiles (const char *Path) const
     ArchiveCache->CheckUp ();
   }
 
-  csRef<iStrVector> v(fl);
-  fl->DecRef();
+  csPtr<iStrVector> v(fl);
   return v;
 }
 
-iFile *csVFS::Open (const char *FileName, int Mode)
+csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
 {
   if (!FileName)
-    return NULL;
+    return csPtr<iFile> (NULL);
 
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
   if (!PreparePath (FileName, false, node, suffix, sizeof (suffix)))
-    return NULL;
+    return csPtr<iFile> (NULL);
 
   iFile *f = node->Open (Mode, suffix);
 
   ArchiveCache->CheckUp ();
-  return f;
+  return csPtr<iFile> (f);
 }
 
 bool csVFS::Sync ()
@@ -1514,38 +1513,30 @@ bool csVFS::Sync ()
   return (ArchiveCache->Length () == 0);
 }
 
-iDataBuffer *csVFS::ReadFile (const char *FileName)
+csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName)
 {
-  iFile *F = Open (FileName, VFS_FILE_READ);
+  csRef<iFile> F (Open (FileName, VFS_FILE_READ));
   if (!F)
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
 
   size_t Size = F->GetSize ();
   iDataBuffer *data = F->GetAllData ();
   if (data)
-  {
-    F->DecRef ();
-    return data;
-  }
+    return csPtr<iDataBuffer> (data);
 
   char *buff = new char [Size + 1];
   if (!buff)
-  {
-    F->DecRef ();
-    return NULL;
-  }
+    return csPtr<iDataBuffer> (NULL);
 
   // Make the file zero-terminated in the case we'll use it as an ASCIIZ string
   buff [Size] = 0;
   if (F->Read (buff, Size) != Size)
   {
     delete [] buff;
-    F->DecRef ();
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
 
-  F->DecRef ();
-  return new csDataBuffer (buff, Size);
+  return csPtr<iDataBuffer> (new csDataBuffer (buff, Size));
 }
 
 bool csVFS::WriteFile (const char *FileName, const char *Data, size_t Size)
@@ -1714,15 +1705,15 @@ bool csVFS::GetFileSize (const char *FileName, size_t &oSize)
   return success;
 }
 
-iDataBuffer *csVFS::GetRealPath (const char *FileName)
+csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
 {
   if (!FileName)
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
 
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
   PreparePath (FileName, false, node, suffix, sizeof (suffix));
-  if (!node) return NULL;
+  if (!node) return csPtr<iDataBuffer> (NULL);
 
   char path [CS_MAXPATHLEN + 1];
   int i;
@@ -1736,5 +1727,6 @@ iDataBuffer *csVFS::GetRealPath (const char *FileName)
 
   strcat (strcpy (path, node->RPathV.Get (0)), suffix);
 done:
-  return new csDataBuffer (csStrNew (path), strlen (path) + 1);
+  return csPtr<iDataBuffer> (
+  	new csDataBuffer (csStrNew (path), strlen (path) + 1));
 }

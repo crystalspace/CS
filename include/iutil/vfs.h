@@ -169,7 +169,7 @@ struct iVFS : public iBase
    * 'currend virtual directory'. Return a new iString object.
    * If IsDir is true, expanded path ends in an '/', otherwise no.
    */
-  virtual iDataBuffer *ExpandPath (
+  virtual csPtr<iDataBuffer> ExpandPath (
     const char *Path, bool IsDir = false) const = 0;
 
   /// Check whenever a file exists
@@ -179,13 +179,15 @@ struct iVFS : public iBase
    * Find all files in a virtual directory and return an array with their
    * names.
    */
-  virtual csRef<iStrVector> FindFiles (const char *Path) const = 0;
+  virtual csPtr<iStrVector> FindFiles (const char *Path) const = 0;
+
   /**
    * Replacement for standard fopen().
    * Mode: combination of VFS_FILE_XXX.
    * \sa #VFS_FILE_MODE
    */
-  virtual iFile *Open (const char *FileName, int Mode) = 0;
+  virtual csPtr<iFile> Open (const char *FileName, int Mode) = 0;
+
   /**
    * Get an entire file at once. You should DecRef() returned data
    * after usage. This is more effective than opening files and reading
@@ -193,7 +195,7 @@ struct iVFS : public iBase
    * terminated (so that it can be conveniently used with string functions)
    * but the extra null-terminator is not counted as part of the returned size.
    */
-  virtual iDataBuffer *ReadFile (const char *FileName) = 0;
+  virtual csPtr<iDataBuffer> ReadFile (const char *FileName) = 0;
   /// Write an entire file in one pass.
   virtual bool WriteFile (const char *Name, const char *Data, size_t Size) = 0;
 
@@ -230,7 +232,7 @@ struct iVFS : public iBase
    * not in archive files. You should expect this function to return
    * NULL in this case.
    */
-  virtual iDataBuffer *GetRealPath (const char *FileName) = 0;
+  virtual csPtr<iDataBuffer> GetRealPath (const char *FileName) = 0;
 };
 
 /** @} */

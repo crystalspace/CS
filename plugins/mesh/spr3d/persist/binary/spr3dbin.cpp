@@ -168,11 +168,12 @@ iBase* csSprite3DBinFactoryLoader::Parse (void* data,
   // @@@ Temporary fix to allow to set actions for objects loaded
   // with impexp. Once those loaders move to another plugin this code
   // below should be removed.
-  iMeshObjectFactory* fact =
-    context
-      ? SCF_QUERY_INTERFACE (context, iMeshObjectFactory)
-      : NULL;
-  // DecRef of fact will be handled later.
+  iMeshObjectFactory* fact = NULL;
+  if (context)
+  {
+    fact = SCF_QUERY_INTERFACE (context, iMeshObjectFactory);
+    // DecRef of fact will be handled later.
+  }
 
   // If there was no factory we create a new one.
   if (!fact)

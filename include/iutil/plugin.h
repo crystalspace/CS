@@ -39,8 +39,8 @@ struct iComponent;
  * not implement the requested interface, NULL is returned.
  */
 #define CS_QUERY_PLUGIN_CLASS(Object,ClassID,Interface)			\
-  (Interface *)((Object)->QueryPlugin					\
-  (ClassID, #Interface, VERSION_##Interface))
+  csPtr<Interface> ((Interface *)((Object)->QueryPlugin			\
+  (ClassID, #Interface, VERSION_##Interface)))
 
 /**
  * Tell plugin manager driver to load a plugin.
@@ -49,15 +49,15 @@ struct iComponent;
  * `Interface' is a interface name (iGraphics2D, iVFS and so on).
  */
 #define CS_LOAD_PLUGIN(Object,ClassID,Interface)			\
-  (Interface *)((Object)->LoadPlugin					\
-  (ClassID, #Interface, VERSION_##Interface))
+  csPtr<Interface> ((Interface *)((Object)->LoadPlugin			\
+  (ClassID, #Interface, VERSION_##Interface)))
 
 /**
  * Same as CS_LOAD_PLUGIN but don't bother asking for a interface.
  * This is useful for unconditionally loading plugins.
  */
 #define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)			\
-  ((Object)->LoadPlugin (ClassID, NULL, 0))
+  csPtr<iBase> ((Object)->LoadPlugin (ClassID, NULL, 0))
 
 SCF_VERSION (iPluginManager, 0, 1, 0);
 

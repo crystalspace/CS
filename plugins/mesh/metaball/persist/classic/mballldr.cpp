@@ -480,8 +480,9 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 		child, "Can't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          ballstate.Take (SCF_QUERY_INTERFACE (mesh, iMetaBallState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          ballstate = SCF_QUERY_INTERFACE (mesh, iMetaBallState);
 	  mp = ballstate->GetParameters();
 	}
 	break;

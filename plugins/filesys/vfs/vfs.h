@@ -152,15 +152,16 @@ public:
    * 'currend virtual directory'. Return a new iString object.
    * If IsDir is true, expanded path ends in an '/', otherwise no.
    */
-  virtual iDataBuffer *ExpandPath (const char *Path, bool IsDir = false) const;
+  virtual csPtr<iDataBuffer> ExpandPath (
+  	const char *Path, bool IsDir = false) const;
 
   /// Check whenever a file exists
   virtual bool Exists (const char *Path) const;
 
   /// Find all files in a virtual directory and return an array of their names
-  virtual csRef<iStrVector> FindFiles (const char *Path) const;
+  virtual csPtr<iStrVector> FindFiles (const char *Path) const;
   /// Replacement for standard fopen()
-  virtual iFile *Open (const char *FileName, int Mode);
+  virtual csPtr<iFile> Open (const char *FileName, int Mode);
   /**
    * Get an entire file at once. You should delete[] returned data
    * after usage. This is more effective than opening files and reading
@@ -168,7 +169,7 @@ public:
    * terminated (so that it can be conveniently used with string functions)
    * but the extra null-terminator is not counted as part of the returned size.
    */
-  virtual iDataBuffer *ReadFile (const char *FileName);
+  virtual csPtr<iDataBuffer> ReadFile (const char *FileName);
   /// Write an entire file in one pass.
   virtual bool WriteFile (const char *FileName, const char *Data, size_t Size);
 
@@ -206,7 +207,7 @@ public:
    * not in archive files. You should expect this function to return
    * NULL in this case.
    */
-  virtual iDataBuffer *GetRealPath (const char *FileName);
+  virtual csPtr<iDataBuffer> GetRealPath (const char *FileName);
 
   struct eiComponent : public iComponent
   {

@@ -98,8 +98,7 @@ DemoSequenceLoader::DemoSequenceLoader (Demo* demo,
   xmltokens.Register ("speed", XMLTOKEN_SPEED);
   xmltokens.Register ("v", XMLTOKEN_V);
 
-  csRef<iDataBuffer> buf;
-  buf.Take (demo->myVFS->ReadFile (fileName));
+  csRef<iDataBuffer> buf (demo->myVFS->ReadFile (fileName));
   if (!buf || !buf->GetSize ())
   {
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -107,9 +106,9 @@ DemoSequenceLoader::DemoSequenceLoader (Demo* demo,
     exit (0);
   }
 
-  csRef<iDocumentSystem> xml;
-  xml.Take (CS_QUERY_REGISTRY (demo->object_reg, iDocumentSystem));
-  if (!xml) xml.Take (new csTinyDocumentSystem ());
+  csRef<iDocumentSystem> xml (
+  	CS_QUERY_REGISTRY (demo->object_reg, iDocumentSystem));
+  if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (buf);
   if (error != NULL)
@@ -512,17 +511,16 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
       case XMLTOKEN_FILE:
       {
 	const char* fname = child->GetContentsValue ();
-  	csRef<iDataBuffer> buf;
-	buf.Take (demo->myVFS->ReadFile (fname));
+  	csRef<iDataBuffer> buf (demo->myVFS->ReadFile (fname));
 	if (!buf || !buf->GetSize ())
 	{
 	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
 	    "Could not open path file '%s' on VFS!", fname);
 	  exit (0);
 	}
-	csRef<iDocumentSystem> xml;
-	xml.Take (CS_QUERY_REGISTRY (demo->object_reg, iDocumentSystem));
-	if (!xml) xml.Take (new csTinyDocumentSystem ());
+	csRef<iDocumentSystem> xml (
+		CS_QUERY_REGISTRY (demo->object_reg, iDocumentSystem));
+	if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
 	csRef<iDocument> doc = xml->CreateDocument ();
 	const char* error = doc->Parse (buf);
 	if (error != NULL)

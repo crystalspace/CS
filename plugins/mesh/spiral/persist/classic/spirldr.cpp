@@ -370,9 +370,10 @@ iBase* csSpiralLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          partstate.Take (SCF_QUERY_INTERFACE (mesh, iParticleState));
-          spiralstate.Take (SCF_QUERY_INTERFACE (mesh, iSpiralState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          spiralstate = SCF_QUERY_INTERFACE (mesh, iSpiralState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:

@@ -494,9 +494,10 @@ iBase* csFountainLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          partstate.Take (SCF_QUERY_INTERFACE (mesh, iParticleState));
-          fountstate.Take (SCF_QUERY_INTERFACE (mesh, iFountainState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          fountstate = SCF_QUERY_INTERFACE (mesh, iFountainState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:

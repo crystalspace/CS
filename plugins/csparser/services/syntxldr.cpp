@@ -1867,8 +1867,8 @@ bool csTextSyntaxService::ParsePoly3d (
   }
 
   CS_ASSERT (thing_type != NULL);
-  csRef<iThingEnvironment> te;
-  te.Take (SCF_QUERY_INTERFACE (thing_type, iThingEnvironment));
+  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
+  	thing_type, iThingEnvironment));
 
   uint texspec = 0;
   int tx_uv_i1 = 0;
@@ -2046,7 +2046,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	  if (!fs)
 	  {
 	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	    fs.Take (SCF_QUERY_INTERFACE (ptt, iPolyTexFlat));
+	    fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
 	    fs->Setup (poly3d);
 	  }
 	  if (num_uv >= poly3d->GetVertexCount ())
@@ -2072,7 +2072,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	  if (!fs)
 	  {
 	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	    fs.Take (SCF_QUERY_INTERFACE (ptt, iPolyTexFlat));
+	    fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
 	    fs->Setup (poly3d);
 	  }
 	  if (num_uv >= poly3d->GetVertexCount ())
@@ -2099,7 +2099,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	  if (!gs)
 	  {
 	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	    gs.Take (SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud));
+	    gs = SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud);
 	    gs->Setup (poly3d);
 	  }
 	  if (num_col >= poly3d->GetVertexCount ())
@@ -2341,15 +2341,14 @@ void csTextSyntaxService::ReportBadToken (iDocumentNode* badtokennode)
 
 iString* csTextSyntaxService::Debug_UnitTest ()
 {
-  csRef<scfString> rc;
-  rc.Take (new scfString ());
+  csRef<scfString> rc (csPtr<scfString> (new scfString ()));
   csString& str = rc->GetCsString ();
 
   //==========================================================================
   // Tests for XML parsing.
   //==========================================================================
-  csRef<iDocumentSystem> xml;
-  xml.Take (new csTinyDocumentSystem ());
+  csRef<iDocumentSystem> xml (csPtr<iDocumentSystem> (
+  	new csTinyDocumentSystem ()));
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse ("\
     <root>\

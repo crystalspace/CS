@@ -417,8 +417,9 @@ iBase* csStarLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          starstate.Take (SCF_QUERY_INTERFACE (mesh, iStarsState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          starstate = SCF_QUERY_INTERFACE (mesh, iStarsState);
 	}
 	break;
       default:

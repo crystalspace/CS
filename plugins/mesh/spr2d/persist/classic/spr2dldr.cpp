@@ -409,10 +409,10 @@ iBase* csSprite2DFactoryLoader::Parse (iDocumentNode* node,
     return NULL;
   }
   csRef<iMeshObjectFactory> fact;
-  fact.Take (type->NewFactory ());
+  fact = csPtr<iMeshObjectFactory> (type->NewFactory ());
   type->DecRef ();
-  csRef<iSprite2DFactoryState> spr2dLook;
-  spr2dLook.Take (SCF_QUERY_INTERFACE (fact, iSprite2DFactoryState));
+  csRef<iSprite2DFactoryState> spr2dLook (
+  	SCF_QUERY_INTERFACE (fact, iSprite2DFactoryState));
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -744,8 +744,9 @@ iBase* csSprite2DLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          spr2dLook.Take (SCF_QUERY_INTERFACE (mesh, iSprite2DState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          spr2dLook = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
 	  verts = &(spr2dLook->GetVertices ());
 	}
 	break;

@@ -32,6 +32,8 @@
  * \addtogroup scf
  * @{ */
 
+#include "csutil/ref.h"
+
 /**
  * Type of registered interface handle used by iBase::QueryInterface().
  */
@@ -636,8 +638,8 @@ inline static scfInterfaceID scfGetID_##Name ()				\
  * This is a wrapper around iBase::QueryInterface method.
  */
 #define SCF_QUERY_INTERFACE(Object,Interface)				\
-  (Interface *)(Object)->QueryInterface (				\
-  scfGetID_##Interface (), VERSION_##Interface)
+  csPtr<Interface> ((Interface *)(Object)->QueryInterface (		\
+  scfGetID_##Interface (), VERSION_##Interface))
 
 /**
  * Shortcut macro to query given interface from given object.
@@ -645,8 +647,8 @@ inline static scfInterfaceID scfGetID_##Name ()				\
  * This version tests if Object is NULL and will return NULL in that case.
  */
 #define SCF_QUERY_INTERFACE_SAFE(Object,Interface)			\
-  (Interface *)(iBase::QueryInterfaceSafe ((Object),			\
-  scfGetID_##Interface (), VERSION_##Interface))
+  csPtr<Interface> ((Interface *)(iBase::QueryInterfaceSafe ((Object),	\
+  scfGetID_##Interface (), VERSION_##Interface)))
 
 /**
  * This function should be called to initialize client SCF library.

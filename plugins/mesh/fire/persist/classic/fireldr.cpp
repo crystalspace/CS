@@ -484,9 +484,10 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          partstate.Take (SCF_QUERY_INTERFACE (mesh, iParticleState));
-          firestate.Take (SCF_QUERY_INTERFACE (mesh, iFireState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          firestate = SCF_QUERY_INTERFACE (mesh, iFireState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:

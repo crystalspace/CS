@@ -24,6 +24,7 @@
 /**\addtogroup util
  * @{ */
 #include "csutil/scf.h"
+#include "csutil/ref.h"
 
 struct iObjectIterator;
 
@@ -33,14 +34,15 @@ struct iObjectIterator;
  * ID variable.
  */
 #define CS_GET_CHILD_OBJECT(object,Interface)			\
-  ((Interface*)(object)->GetChild(scfGetID_##Interface(), VERSION_##Interface))
+  csPtr<Interface> ((Interface*)(object)->GetChild(		\
+  scfGetID_##Interface(), VERSION_##Interface))
 
 /**
  * You can use this macro to get a child object with the given name and
  * interface from a csObject. The returned object will be IncRef'ed.
  */
 #define CS_GET_NAMED_CHILD_OBJECT(object,Interface,name)		\
-  ((Interface*)(object)->GetChild					\
+  csPtr<Interface> ((Interface*)(object)->GetChild			\
   (scfGetID_##Interface (), VERSION_##Interface, name))
 
 /**
@@ -48,7 +50,7 @@ struct iObjectIterator;
  * with the given name, even if it does not implement the requested interface.
  */
 #define CS_GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)		\
-  ((Interface*)(object)->GetChild					\
+  csPtr<Interface> ((Interface*)(object)->GetChild			\
   (scfGetID_##Interface (), VERSION_##Interface, name, true))
 
 

@@ -780,11 +780,12 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 		child, "Cannot find factory '%s' for emit!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          partstate.Take (SCF_QUERY_INTERFACE (mesh, iParticleState));
-          emitstate.Take (SCF_QUERY_INTERFACE (mesh, iEmitState));
-	  emitfactorystate.Take (SCF_QUERY_INTERFACE (
-	  	fact->GetMeshObjectFactory(), iEmitFactoryState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          emitstate = SCF_QUERY_INTERFACE (mesh, iEmitState);
+	  emitfactorystate = SCF_QUERY_INTERFACE (
+	  	fact->GetMeshObjectFactory(), iEmitFactoryState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:

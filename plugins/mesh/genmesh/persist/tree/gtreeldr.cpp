@@ -797,8 +797,8 @@ iBase* csGeneralTreeFactoryLoader::Parse (
   csRef<iMeshObjectFactory> fact;
   csRef<iGeneralFactoryState> state;
 
-  fact.Take (type->NewFactory ());
-  state.Take (SCF_QUERY_INTERFACE (fact, iGeneralFactoryState));
+  fact = csPtr<iMeshObjectFactory> (type->NewFactory ());
+  state = SCF_QUERY_INTERFACE (fact, iGeneralFactoryState);
   type->DecRef ();
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();

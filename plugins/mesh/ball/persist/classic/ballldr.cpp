@@ -516,8 +516,9 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
-          ballstate.Take (SCF_QUERY_INTERFACE (mesh, iBallState));
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          ballstate = SCF_QUERY_INTERFACE (mesh, iBallState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:

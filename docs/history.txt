@@ -1,5 +1,34 @@
 The history order is reversed so that new features are at the top.
 
+29-Aug-2002
+	- Added csPtr class. This is a simple encapsulator of normal
+	  pointers. The only place where this should be used is when
+	  you have a function that returns a pointer to an already
+	  IncRef()'ed object. When csPtr's are assigned to normal pointers
+	  you are then responsible for doing DecRef() yourselves later (which
+	  corresponds to old API usage). When csPtr's are assigned to
+	  csRef's, it behaves like Take(). In that case the csRef inherits
+	  the reference and will clean it up later.
+	- Changed iVFS->FindFiles() to return csPtr instead of csRef.
+	  This makes this function again API compatible.
+	- Changed SCF_QUERY_INTERFACE, SCF_QUERY_INTERFACE_FAST,
+	  CS_QUERY_REGISTRY, CS_QUERY_REGISTRY_TAG,
+	  CS_QUERY_REGISTRY_TAG_INTERFACE, CS_LOAD_PLUGIN,
+	  CS_LOAD_PLUGIN_ALWAYS, CS_QUERY_PLUGIN_CLASS, CS_GET_CHILD_OBJECT,
+	  CS_GET_NAMED_CHILD_OBJECT, and CS_GET_FIRST_NAMED_CHILD_OBJECT
+	  to return csPtr. This means that you no longer have to use Take()
+	  to put the returns of these values into a csRef.
+	- Removed csRef::Take(). There are still some cases where the
+	  functionality of Take() is needed. In that case use csPtr to
+	  first wrap your pointer and then assign that to the csRef.
+	  For example. Old code:
+	      csRef<iBla> bla;
+	      bla.Take (new csBla());
+	  New code:
+	      csRef<iBla> bla (csPtr<iBla> (new csBla()));
+	- Changed iVFS->Open(), iVFS->ReadFile(), iVFS->ExpandPath(), and
+	  iVFS->GetRealPath() to return csPtr. This means that VFS is now
+	  fully csRef clean.
 28-Aug-2002
 	- Added iPolygonMesh implementation for genmesh so it now works
 	  with collision detection.

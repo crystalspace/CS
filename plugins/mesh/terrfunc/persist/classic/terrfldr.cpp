@@ -481,8 +481,9 @@ iBase* csTerrFuncLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh.Take (iFactory->GetMeshObjectFactory()->NewInstance());
-          terrstate.Take (SCF_QUERY_INTERFACE (mesh, iTerrFuncState));
+	  mesh = csPtr<iMeshObject> (
+	  	iFactory->GetMeshObjectFactory()->NewInstance());
+          terrstate = SCF_QUERY_INTERFACE (mesh, iTerrFuncState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:
@@ -636,8 +637,7 @@ iBase* csTerrFuncLoader::Parse (iDocumentNode* node,
 	  csRef<iDocumentNode> shiftnode = child->GetNode ("shift");
 	  if (shiftnode) hshift = shiftnode->GetContentsValueAsFloat ();
 
-	  csRef<iVFS> vfs;
-	  vfs.Take (CS_QUERY_REGISTRY (object_reg, iVFS));
+	  csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
 	  if (!vfs)
 	  {
       	    synldr->ReportError (
@@ -645,8 +645,7 @@ iBase* csTerrFuncLoader::Parse (iDocumentNode* node,
 		child, "VFS is missing!");
 	    return NULL;
 	  }
-	  csRef<iImageIO> loader;
-	  loader.Take (CS_QUERY_REGISTRY (object_reg, iImageIO));
+	  csRef<iImageIO> loader (CS_QUERY_REGISTRY (object_reg, iImageIO));
 	  if (!loader)
 	  {
       	    synldr->ReportError (
@@ -655,8 +654,7 @@ iBase* csTerrFuncLoader::Parse (iDocumentNode* node,
 	    return NULL;
 	  }
 
-	  csRef<iDataBuffer> buf;
-	  buf.Take (vfs->ReadFile (imgname));
+	  csRef<iDataBuffer> buf (vfs->ReadFile (imgname));
 	  if (!buf || !buf->GetSize ())
 	  {
       	    synldr->ReportError (
@@ -665,7 +663,7 @@ iBase* csTerrFuncLoader::Parse (iDocumentNode* node,
 	    return NULL;
 	  }
 	  csRef<iImage> ifile;
-	  ifile.Take (loader->Load (buf->GetUint8 (), buf->GetSize (),
+	  ifile = csPtr<iFile> (loader->Load (buf->GetUint8 (), buf->GetSize (),
 	  	CS_IMGFMT_TRUECOLOR));
 	  if (!ifile)
 	  {
