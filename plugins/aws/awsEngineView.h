@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_AWS_AWSENGINEVIEW_H__
-#define __CS_AWS_AWSENGINEVIEW_H__
+#ifndef __CS_AWS_ENGINEVIEW_H__
+#define __CS_AWS_ENGINEVIEW_H__
 
 #include "awscomp.h"
 
@@ -52,4 +52,4 @@ public:
   iAwsComponent* Create ();
 };
 
-#endif // __CS_AWS_AWSENGINEVIEW_H__
+#endif // __CS_AWS_ENGINEVIEW_H__

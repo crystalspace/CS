@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_AWS_AWSCONTROLBAR_H__
-#define __CS_AWS_AWSCONTROLBAR_H__
+#ifndef __CS_AWS_CONTROLBAR_H__
+#define __CS_AWS_CONTROLBAR_H__
 
 #include "awscomp.h"
 #include "awsPanel.h"
@@ -131,4 +131,4 @@ public:
   iAwsComponent* Create ();
 };
 
-#endif // __CS_AWS_AWSCONTROLBAR_H__
+#endif // __CS_AWS_CONTROLBAR_H__

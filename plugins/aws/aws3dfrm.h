@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_AWS_AWS3DFRM_H__
-#define __CS_AWS_AWS3DFRM_H__
+#ifndef __CS_AWS_3DFRM_H__
+#define __CS_AWS_3DFRM_H__
 
 #include "csgeom/csrectrg.h"
 #include "ivideo/texture.h"
@@ -138,4 +138,4 @@ const int _3dfsSmallRaised = 9;
 const int _3dfsSmallSunken = 10;
 const int _3dfsMask  = 0x1f;
 
-#endif // __CS_AWS_AWS3DFRM_H__
+#endif // __CS_AWS_3DFRM_H__
