@@ -26,7 +26,6 @@
 #include "csengine/stats.h"
 #include "itexture.h"
 
-
 csPortal::csPortal ()
 {
   cfg_alpha = 0;

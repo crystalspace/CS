@@ -285,6 +285,10 @@ public:
   static bool do_not_force_revis;
   /// Option variable: force visibility recalculation?
   static bool do_force_revis;
+  /// Option variable: do accurate shadows for static lighting?
+  static bool do_accurate_statlight;
+  /// Option variable: do accurate shadows for dynamic lighting?
+  static bool do_accurate_dynlight;
 
 private:
   /// Texture and color information object.

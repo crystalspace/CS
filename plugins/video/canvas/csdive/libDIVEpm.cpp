@@ -89,7 +89,7 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
         case pmcmdDestroyDIVEctx:
         {
           if (rqData->Parm.DestroyCtx.dW)
-            delete rqData->Parm.DestroyCtx.dW
+            delete rqData->Parm.DestroyCtx.dW;
           else
             rc = pmrcNotInitialized;
           break;

@@ -53,7 +53,10 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
     "FontServer", CS_FUNCID_FONT, "crystalspace.font.server.csfont");
   FontServer = LOAD_PLUGIN (pSystem, p, CS_FUNCID_FONT, iFontServer);
   Font = 0;
+  if (!FontServer)
+    return false;
 
+  Palette = new RGBPixel [256];
   pfmt.PalEntries = 256;
   pfmt.PixelBytes = 1;
   // Initialize pointers to default drawing methods

@@ -123,6 +123,9 @@ struct RGBPixel
   /// Compare with another RGBPixel, but don't take alpha into account
   bool eq (const RGBPixel& p) const
   { return ((*(ULong *)this) & RGB_MASK) == ((*(ULong *)&p) & RGB_MASK); }
+  /// Get the pixel intensity
+  int Intensity ()
+  { return (red + green + blue) / 3; }
 };
 
 // We don't need RGB_MASK anymore

@@ -117,7 +117,7 @@ bool csVector::Insert (int n, csSome Item)
 
 int csVector::Find (csSome which) const
 {
-  for (int i = 0; i < Length (); i++)
+  for (int i = Length () - 1; i >= 0; i--)
     if (root [i] == which)
       return i;
   return -1;
@@ -125,7 +125,7 @@ int csVector::Find (csSome which) const
 
 int csVector::FindKey (csConstSome Key, int Mode) const
 {
-  for (int i = 0; i < Length (); i++)
+  for (int i = Length () - 1; i >= 0; i--)
     if (CompareKey (root [i], Key, Mode) == 0)
       return i;
   return -1;

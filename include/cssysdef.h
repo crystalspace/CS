@@ -355,14 +355,21 @@
 #    if defined (PROC_INTEL)
 #      if defined (COMP_GCC)
 #        define DEBUG_BREAK	asm ("int $3")
+#      elif
+#        define DEBUG_BREAK	_asm int 3
 #      endif
 #    else
 #      define DEBUG_BREAK	{ static int x = 0; x /= x; }
+#    endif
+#    if !defined (CS_ASSERT)
+#      define CS_ASSERT(x)	if (x) DEBUG_BREAK;
 #    endif
 #  endif
 #else
 #  undef DEBUG_BREAK
 #  define DEBUG_BREAK
+#  undef CS_ASSERT
+#  define CS_ASSERT(x)
 #endif
 
 // Check if the csosdefs.h defined either CS_LITTLE_ENDIAN or CS_BIG_ENDIAN

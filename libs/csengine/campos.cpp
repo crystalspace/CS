@@ -28,7 +28,7 @@ csCameraPosition::csCameraPosition (const char *iName, const char *iSector,
   const csVector3 &iPosition, const csVector3 &iForward, const csVector3 &iUpward)
 {
   SetName (iName);
-  Sector = strdup (iSector);
+  Sector = strnew (iSector);
   Position = iPosition;
   Forward = iForward;
   Upward = iUpward;

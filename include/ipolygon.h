@@ -30,6 +30,19 @@ struct iLightMap;
 class csVector3;
 class csMatrix3;
 
+/**
+ * If CS_POLY_LIGHTING is set for a polygon then the polygon will be lit.
+ * It is set by default.
+ */
+#define CS_POLY_LIGHTING	0x00000001
+
+/**
+ * If CS_POLY_FLATSHADING is set for a polygon then the polygon will not
+ * be texture mapped but instead it will be flat shaded (possibly with gouraud).
+ * It is unset by default.
+ */
+#define CS_POLY_FLATSHADING	0x00000002
+
 SCF_VERSION (iPolygon3D, 0, 1, 1);
 
 /**
@@ -42,7 +55,10 @@ struct iPolygon3D : public iBase
   /// Set polygon name
   virtual void SetName (const char *iName) = 0;
 
-  /// Get the polygonset (container) that this polygons belongs to.
+  /**
+   * Get the polygonset (container) that this polygons belongs to.
+   * The reference counter on iPolygonSet is NOT incremented.
+   */
   virtual iPolygonSet *GetContainer () = 0;
   /// Get the lightmap associated with this polygon
   virtual iLightMap *GetLightMap () = 0;

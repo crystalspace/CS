@@ -1129,7 +1129,7 @@ void CompressShadowFrustums (csFrustumList* list)
       csShadowFrustum* sfdel = sf;
       sf = sf->prev;
       list->Unlink (sfdel);
-      delete sfdel;
+      sfdel->DecRef ();
     }
     else
       sf = sf->prev;
@@ -1481,13 +1481,12 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
   // all the shadow frustums that were added in this recursion
   // level.
   csShadowFrustum* frustum;
-  if (previous_last) frustum = previous_last->next;
-  else frustum = lview.shadows.GetFirst ();
+  frustum = previous_last ? previous_last->next : lview.shadows.GetFirst ();
   lview.shadows.SetLast (previous_last);
   while (frustum)
   {
     csShadowFrustum* sf = frustum->next;
-    delete frustum;
+    frustum->DecRef ();
     frustum = sf;
   }
 

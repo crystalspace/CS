@@ -30,38 +30,6 @@
 #include "csengine/polygon.h"
 #include "csengine/curve.h"
 
-//---------------------------------------------------------------------------
-
-static int __last_frustum_id = 666;
-
-csFrustumView::csFrustumView () : light_frustum (NULL), callback (NULL),
-  callback_data (NULL)
-{
-  frustum_id = __last_frustum_id++;
-  poly_func = NULL;
-  curve_func = NULL;
-  node_func = NULL;
-  userdata = NULL;
-  light_frustum = NULL;
-  callback = NULL;
-  callback_data = NULL;
-}
-
-csFrustumView::csFrustumView (const csFrustumView &iCopy)
-{
-  // hehe. kind of a trick.
-  memcpy (this, &iCopy, sizeof (csFrustumView));
-  // Generate a new id
-  frustum_id = __last_frustum_id++;
-}
-
-csFrustumView::~csFrustumView ()
-{
-  delete light_frustum;
-}
-
-//---------------------------------------------------------------------------
-
 int csLight::ambient_red = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
@@ -197,7 +165,7 @@ csStatLight::csStatLight (float x, float y, float z, float dist,
 {
   csStatLight::dynamic = dynamic;
   polygons = NULL;
-  flags.Set (CS_LIGHT_THINGSHADOWS);
+  flags.SetAll (CS_LIGHT_THINGSHADOWS);
 }
 
 csStatLight::~csStatLight ()

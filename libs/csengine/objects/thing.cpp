@@ -415,7 +415,7 @@ void csThing::DrawFoggy (csRenderView& d)
     for (i = 0 ; i < polygons.Length () ; i++)
     {
       p = GetPolygon3D (i);
-      if (p->dont_draw) continue;
+      if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
       clip = (csPolygon2D*)(render_pool->Alloc ());
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
 
@@ -444,7 +444,7 @@ void csThing::DrawFoggy (csRenderView& d)
     for (i = 0 ; i < polygons.Length () ; i++)
     {
       p = GetPolygon3D (i);
-      if (p->dont_draw) continue;
+      if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
       clip = (csPolygon2D*)(render_pool->Alloc ());
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
 

@@ -1788,12 +1788,12 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
       // trick: in 32-bit modes set FogR,G,B so that "R" uses bits 16-23,
       // "G" uses bits 8-15 and "B" uses bits 0-7. This is to accomodate
       // different pixel encodings such as RGB, BGR, RBG and so on...
-      unsigned long r = (pfmt.RedShift == 16+pixel_adjust) ? Scan.FogR :
-        (pfmt.GreenShift == 16+pixel_adjust) ? Scan.FogG : Scan.FogB;
-      unsigned long g = (pfmt.RedShift == 8+pixel_adjust) ? Scan.FogR :
-        (pfmt.GreenShift == 8+pixel_adjust) ? Scan.FogG : Scan.FogB;
-      unsigned long b = (pfmt.RedShift == 0+pixel_adjust) ? Scan.FogR :
-        (pfmt.GreenShift == 0+pixel_adjust) ? Scan.FogG : Scan.FogB;
+      unsigned long r = (pfmt.RedShift == 16 + pixel_adjust) ? Scan.FogR :
+        (pfmt.GreenShift == 16 + pixel_adjust) ? Scan.FogG : Scan.FogB;
+      unsigned long g = (pfmt.RedShift == 8 + pixel_adjust) ? Scan.FogR :
+        (pfmt.GreenShift == 8 + pixel_adjust) ? Scan.FogG : Scan.FogB;
+      unsigned long b = (pfmt.RedShift == 0 + pixel_adjust) ? Scan.FogR :
+        (pfmt.GreenShift == 0 + pixel_adjust) ? Scan.FogG : Scan.FogB;
       Scan.FogR = r >> pixel_adjust;
       Scan.FogG = g >> pixel_adjust;
       Scan.FogB = b >> pixel_adjust;

@@ -258,7 +258,7 @@ public:
     while (first)
     {
       sf = first->next;
-      delete first;
+      first->DecRef ();
       first = sf;
     }
     last = NULL;
@@ -372,6 +372,25 @@ typedef void (csFrustumViewNodeFunc)(csOctreeNode* node, csFrustumView* lview);
 class csFrustumView
 {
 public:
+  /**
+   * The structure for registering cleanup actions.
+   * You can register with any frustumlist object any number
+   * of cleanup routines. For this you create such a structure
+   * and pass it to RegisterCleanup () method of csFrsutumList.
+   * You can derive a subclass from CleanupAction and keep all
+   * additional data there.
+   */
+  struct CleanupAction
+  {
+    // Pointer to next cleanup action in chain
+    CleanupAction *next;
+    // The routine that is called for cleanup
+    void (*action) (csFrustumView *, CleanupAction *);
+  };
+
+  /// The head of cleanup actions
+  CleanupAction *cleanup;
+
   /// Data for the functions below.
   void* userdata;
   /// A function that is called for every node that is visited.
@@ -380,8 +399,6 @@ public:
   csFrustumViewFunc* poly_func;
   /// A function that is called for every curve that is hit.
   csFrustumViewFunc* curve_func;
-  /// If true the we process shadows for things.
-  bool things_shadow;
 
   /**
    * The current color of the light. Initially this is the same as the
@@ -394,6 +411,9 @@ public:
 
   /// Squared radius.
   float sq_radius;
+
+  /// If true the we process shadows for things.
+  bool things_shadow;
 
   /// If space is mirrored.
   bool mirror;
@@ -439,12 +459,6 @@ public:
   /// Userdata belonging to the callback.
   void* callback_data;
 
-  /**
-   * Every light frustum has its own numeric ID which UNIQUELY identifies it.
-   * This ID is incremented each time a new frustum is created.
-   */
-  int frustum_id;
-
 public:
   /// Constructor. frustum_id is generated each time a new object is created.
   csFrustumView ();
@@ -453,6 +467,12 @@ public:
 
   /// Destroy the object
   ~csFrustumView ();
+
+  /// Register a cleanup action to be called from destructor
+  void RegisterCleanup (CleanupAction *action)
+  { action->next = cleanup; cleanup = action; }
+  /// Deregister a cleanup action
+  bool DeregisterCleanup (CleanupAction *action);
 };
 
 #endif // __CS_RVIEW_H__

@@ -101,6 +101,13 @@ public:
   static bool do_accurate_things;
 
   /**
+   * Option variable: do accurate shadows. This is slower but more accurate.
+   * Usually it is enabled at precalculation stage (for static lighting)
+   * and disabled at runtime (for dynamic lights).
+   */
+  static bool do_accurate_shadows;
+
+  /**
    * Option variable: control how much the angle of the light with the polygon
    * it hits affects the final light value. Values ranges from -1 to 1.
    * With -1 the polygons will get no light at all. With 0 it will be perfect
@@ -119,6 +126,11 @@ public:
    * Set the corresponding polygon for this polytexture.
    */
   void SetPolygon (csPolygon3D* p) { polygon = p; }
+
+  /**
+   * Return the polygon corresponding to this texture
+   */
+  csPolygon3D *GetCSPolygon () { return polygon; }
 
   /**
    * Set the lightmap for this polytexture (and call IncRef()
@@ -177,6 +189,13 @@ public:
 
   /// Get the coverage matrix for the associated lightmap
   void GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &cm);
+
+  /// Process lighting for all delayed polygon lightmaps
+  static void ProcessDelayedLightmaps (csFrustumView *lview,
+    csFrustumView::CleanupAction *lighting_info);
+
+  /// Collect all relevant shadows from this frustum that covers this lightmap
+  bool CollectShadows (csFrustumView *lview, csPolygon3D *poly);
 
   //--------------------- iPolygonTexture implementation ---------------------
   DECLARE_IBASE;

@@ -208,7 +208,8 @@ static void *__new (address addr, size_t s)
   MDB_UNLOCK;
 
   for (i = 0; i <= break_alloc_count; i++)
-    if (break_alloc [i] == p && break_alloc_addr [i] == addr)
+    if (break_alloc [i] == p
+     && (!break_alloc_addr [i] || break_alloc_addr [i] == addr))
     {
       DEBUG_BREAK;
       break;
@@ -228,7 +229,8 @@ static void __delete (address addr, void *p)
 
   int i;
   for (i = 0; i <= break_free_count; i++)
-    if (break_free [i] == p && break_free_addr [i] == addr)
+    if (break_free [i] == p
+     && (!break_free_addr [i] || break_free_addr [i] == addr))
     {
       DEBUG_BREAK;
       break;

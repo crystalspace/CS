@@ -64,7 +64,7 @@ csRadPoly :: csRadPoly(csPolygon3D *original)
   // 'real' lightmap, which includes dynamic lights.
   // but we need the static lightmap
   csmap = polygon->GetLightMapInfo()->GetPolyTex()->GetCSLightMap();
-  csmap->SetLastFrustumId(0); // id's start at zero again
+//  csmap->SetLastFrustumId(0); // id's start at zero again
   width = csmap->GetRealWidth();
   height = csmap->GetRealHeight();
   size = csmap->GetSize();
@@ -723,7 +723,6 @@ void csRadiosity :: StartFrustum()
   lview->g = 1.0;
   lview->b = 1.0;
   lview->dynamic = false;
-  lview->frustum_id = iterations;
   csVector3 center; // start from the center of the shooting poly.
   // this will lead to inaccuracy as each lumel of the shooting
   // poly is it's own center. But that is too slow.

@@ -500,7 +500,10 @@ bool csArchive::WriteZipArchive ()
             goto temp_failed;   /* Write error */
         }
         else
+        {
+          DEBUG_BREAK;
           goto skip_file;       /* hmm... strange. */
+        }
       }
     }
     else if (memcmp (buff, hdr_central, sizeof (hdr_central)) == 0)
@@ -661,7 +664,7 @@ void csArchive::UpdateDirectory ()
   {
     ArchiveEntry *e = lazy.Get (n);
     e->FreeBuffer ();
-    dir.Push (e);
+    dir.InsertSorted (e);
     lazy [n] = NULL;
   }
   lazy.DeleteAll ();

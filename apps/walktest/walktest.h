@@ -189,6 +189,9 @@ public:
   /// Collision detection plugin.
   iCollideSystem* collide_system;
 
+  /// Player's body (as a 3D model) and legs
+  csPolygonSet *plbody, *pllegs;
+
 public:
   ///
   WalkTest ();

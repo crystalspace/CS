@@ -17,7 +17,6 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
@@ -34,6 +33,7 @@
 #include "csengine/dumper.h"
 #include "csengine/lppool.h"
 #include "csutil/garray.h"
+#include "qint.h"
 #include "igraph3d.h"
 #include "itexture.h"
 #include "itxtmgr.h"
@@ -68,10 +68,10 @@ csLightMapped::~csLightMapped ()
   if (txt_plane) txt_plane->DecRef ();
 }
 
-void csLightMapped::Setup (csPolygon3D* poly3d, csTextureHandle* txtMM)
+void csLightMapped::Setup (csPolygon3D* poly3d, csTextureHandle* texh)
 {
   tex->SetPolygon (poly3d);
-  tex->SetTextureHandle (txtMM->GetTextureHandle ());
+  tex->SetTextureHandle (texh->GetTextureHandle ());
   tex->CreateBoundingTextureBox ();
 }
 
@@ -212,8 +212,8 @@ IMPLEMENT_IBASE (csPolygon3D)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygon3D)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE(csPolygon3D::Poly3D)
-  IMPLEMENTS_INTERFACE(iPolygon3D)
+IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::Poly3D)
+  IMPLEMENTS_INTERFACE (iPolygon3D)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
@@ -221,21 +221,21 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
-  txtMM = texture;
+  texh = texture;
   if (texture) SetTexture (texture);
 
   txt_info = NULL;
+  txt_share_list = NULL;
 
   plane = NULL;
 
   portal = NULL;
-  delete_portal = false;
 
   sector = NULL;
   orig_poly = NULL;
-  dont_draw = false;
+  txt_share_list = NULL;
 
-  flags.Set (CS_POLY_LIGHTING);
+  flags.SetAll (CS_POLY_LIGHTING);
 
   light_info.cosinus_factor = -1;
   light_info.lightpatches = NULL;
@@ -263,22 +263,23 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : iBase(), csObject (),
   sector = poly.sector;
 
   portal = poly.portal;
-  delete_portal = false;	// This polygon is no owner
 
   plane = poly.plane;
   plane->IncRef ();
 
-  txtMM = poly.txtMM;
+  texh = poly.texh;
+
+  poly.flags.Set (CS_POLY_NO_DRAW);
+  orig_poly = poly.orig_poly ? poly.orig_poly : &poly;
 
   // Share txt_info with original polygon.
   txt_info = poly.txt_info;
   txt_info->IncRef ();
-
-  poly.dont_draw = true;
-  dont_draw = false;
-  orig_poly = poly.orig_poly ? poly.orig_poly : &poly;
+  txt_share_list = orig_poly->txt_share_list;
+  orig_poly->txt_share_list = this;
 
   flags = poly.flags;
+  flags.Reset (CS_POLY_NO_DRAW | CS_POLY_DELETE_PORTAL);
 
   light_info.cosinus_factor = poly.light_info.cosinus_factor;
   light_info.lightpatches = NULL;
@@ -288,7 +289,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : iBase(), csObject (),
   VectorArray.IncRef ();
 #ifdef DO_HW_UVZ
   uvz = NULL;
-  isClipped=false;
+  isClipped = false;
 #endif
 }
 
@@ -296,7 +297,7 @@ csPolygon3D::~csPolygon3D ()
 {
   if (txt_info) { txt_info->DecRef (); txt_info = NULL; }
   if (plane) { plane->DecRef (); plane = NULL; }
-  if (delete_portal) { delete portal; portal = NULL; }
+  if (flags.Check (CS_POLY_DELETE_PORTAL)) { delete portal; portal = NULL; }
   while (light_info.lightpatches)
     csWorld::current_world->lightpatch_pool->Free (light_info.lightpatches);
   VectorArray.DecRef ();
@@ -334,20 +335,22 @@ void csPolygon3D::Reset ()
 void csPolygon3D::SetCSPortal (csSector* sector)
 {
   if (portal && portal->GetSector () == sector) return;
-  if (portal && delete_portal) { delete portal; portal = NULL; }
+  if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
+  { delete portal; portal = NULL; }
   if (!sector) return;
   portal = new csPortal;
-  delete_portal = true;
+  flags.Set (CS_POLY_DELETE_PORTAL);
   portal->DisableSpaceWarping ();
   portal->SetSector (sector);
-  //portal->SetTexture (txtMM->get_texture_handle ());
+  //portal->SetTexture (texh->get_texture_handle ());
 }
 
 void csPolygon3D::SetPortal (csPortal* prt)
 {
-  if (portal && delete_portal) { delete portal; portal = NULL; }
+  if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
+  { delete portal; portal = NULL; }
   portal = prt;
-  delete_portal = true;
+  flags.Set (CS_POLY_DELETE_PORTAL);
 }
 
 void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
@@ -456,12 +459,12 @@ bool csPolygon3D::Covers (csPolygonInt* covered)
 
 void csPolygon3D::SetTexture (csTextureHandle* texture)
 {
-  txtMM = texture;
+  texh = texture;
 }
 
 iTextureHandle* csPolygon3D::GetTextureHandle ()
 {
-  return txtMM ? txtMM->GetTextureHandle () : (iTextureHandle*)NULL;
+  return texh ? texh->GetTextureHandle () : (iTextureHandle*)NULL;
 }
 
 void csPolygon3D::Poly3D::CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix)
@@ -592,10 +595,10 @@ void csPolygon3D::Finish ()
     CsPrintf (MSG_INTERNAL_ERROR, "No txt_info in polygon!\n");
     fatal_exit (0, false);
   }
-  lmi->Setup (this, txtMM);
+  lmi->Setup (this, texh);
   lmi->tex->SetLightMap (NULL);
   if (portal)
-    portal->SetTexture (txtMM->GetTextureHandle ());
+    portal->SetTexture (texh->GetTextureHandle ());
 
   if (flags.Check (CS_POLY_LIGHTING)
    && TEXW (lmi->tex) * TEXH (lmi->tex) < 1000000)
@@ -1551,8 +1554,8 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
   // the light frustum. There is no checking done if shadow frustums obscure
   // each other.
 
-  int i;
   csShadowFrustum* sf = lview.shadows.GetFirst ();
+  csFrustum *lf = lview.light_frustum;
   while (sf)
   {
     // First check if the plane of the shadow frustum is close to the plane
@@ -1562,6 +1565,23 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
       sf->relevant = false;
     else
     {
+      switch (csFrustum::Classify (
+        lf->GetVertices (), lf->GetNumVertices (),
+        sf->GetVertices (), sf->GetNumVertices ()))
+      {
+        case CS_FRUST_PARTIAL:
+        case CS_FRUST_INSIDE:
+          sf->relevant = true;
+          break;
+        case CS_FRUST_OUTSIDE:
+          sf->relevant = false;
+          break;
+        case CS_FRUST_COVERED:
+          return false;
+      }
+
+#if 0
+  int i;
       // Assume that the shadow frustum is relevant.
       sf->relevant = true;
 
@@ -1572,20 +1592,33 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
       bool fully_shadowed = true;
       for (i = lview.light_frustum->GetNumVertices () - 1; i >= 0; i--)
         if (!sf->Contains (lview.light_frustum->GetVertex (i)))
-	{
-	  fully_shadowed = false;
-	  break;
-	}
+        {
+          fully_shadowed = false;
+          break;
+        }
       if (fully_shadowed) return false;
 
+// The following test is buggy (but it is highly needed)
+#if 1
       // @@@ Replace with a less accurate but faster test.
-      if (!csFrustum::IsVisible (lview.light_frustum->GetVertices (),
-      	  lview.light_frustum->GetNumVertices (), sf->GetVertices (), sf->GetNumVertices ()))
-	sf->relevant = false;
+      sf->relevant = csFrustum::IsVisible (lview.light_frustum->GetVertices (),
+        lview.light_frustum->GetNumVertices (), sf->GetVertices (),
+        sf->GetNumVertices ());
+#endif
+#endif
     }
     sf = sf->next;
   }
   return true;
+}
+
+bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview)
+{
+  csPlane3 poly_plane = *GetPolyPlane ();
+  // First translate plane to center of frustum.
+  poly_plane.DD += poly_plane.norm * lview.light_frustum->GetOrigin ();
+  poly_plane.Invert ();
+  return MarkRelevantShadowFrustums (lview, poly_plane);
 }
 
 void csPolygon3D::CalculateLighting (csFrustumView *lview)
@@ -1619,7 +1652,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   if ((GetTextureType () == POLYTXT_LIGHTMAP)
    && !flags.Check (CS_POLY_FLATSHADING)
    && !lview->dynamic
-   && lmi && lmi->tex && lmi->tex->lm)
+   && lmi && lmi->tex && lmi->tex->lm && !lmi->lightmap_up_to_date)
   {
     // For lightmapped polygons we will compute the lighting of the
     // entire lightmap as a whole. This removes any problems that existed
@@ -1634,15 +1667,10 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
       VectorArray.SetLimit (4);
     poly = VectorArray.GetArray ();
 
-    if (!lmi->tex->GetLightmapBounds (lview, poly))
-    {
-      fill_lightmap = false;
-      goto poly_frust;
-    }
+    fill_lightmap = lmi->tex->GetLightmapBounds (lview, poly);
   }
   else
   {
-poly_frust:
     rectangle_frust = false;
     num_vertices = GetVertices ().GetNumVertices ();
     if (num_vertices > VectorArray.Limit ())
@@ -1697,17 +1725,12 @@ poly_frust:
   // csPortal::CalculateLighting() will also use it!!
   po = GetPortal ();
   if (po || new_lview.dynamic || (lmi && !lmi->lightmap_up_to_date))
-  {
-    csPlane3 poly_plane = *GetPolyPlane ();
-    // First translate plane to center of frustum.
-    poly_plane.DD += poly_plane.norm * center;
-    poly_plane.Invert ();
-    if (!MarkRelevantShadowFrustums (new_lview, poly_plane))
+    if (!MarkRelevantShadowFrustums (new_lview))
       return;
-  }
 
   // Update the lightmap given light and shadow frustums in new_lview.
-  if (fill_lightmap)
+  if (fill_lightmap
+   || GetLightMapInfo ()->tex->CollectShadows (lview, this))
     FillLightMap (new_lview);
 
   // If we aren't finished with the new_lview,
@@ -1732,6 +1755,11 @@ poly_frust:
     new_light_frustum = light_frustum->Intersect (poly, num_vertices);
     new_lview.light_frustum = new_light_frustum;
     if (!new_light_frustum) return;
+
+    // Mark the shadow frustums that hit THE polygon (and not the lightmap)
+    if (po || new_lview.dynamic || (lmi && !lmi->lightmap_up_to_date))
+      if (!MarkRelevantShadowFrustums (new_lview))
+        return;
   }
 
   if (po)
@@ -1751,11 +1779,39 @@ poly_frust:
   }
 }
 
+void csPolygon3D::CalculateDelayedLighting (csFrustumView *lview)
+{
+  csFrustum* light_frustum = lview->light_frustum;
+  csFrustum* new_light_frustum;
+  csLightMapped *lmi = GetLightMapInfo ();
+
+  // Bounding rectangle always has 4 vertices
+  int num_vertices = 4;
+  if (4 > VectorArray.Limit ())
+    VectorArray.SetLimit (4);
+  csVector3 *poly = VectorArray.GetArray ();
+
+  lmi->tex->GetLightmapBounds (lview, poly);
+
+  new_light_frustum = light_frustum->Intersect (poly, num_vertices);
+
+  // Check if light frustum intersects with the polygon
+  if (!new_light_frustum)
+    return;
+
+  csFrustumView new_lview = *lview;
+  new_lview.light_frustum = new_light_frustum;
+
+  // Update the lightmap given light and shadow frustums in new_lview.
+  FillLightMap (new_lview);
+}
+
 void csPolygon3D::CacheLightMaps (csPolygonSet* owner, int index)
 {
   if (orig_poly) return;
   csLightMapped* lmi = GetLightMapInfo ();
-  if (!lmi || lmi->tex->lm == NULL) return;
+  if (!lmi || lmi->tex->lm == NULL)
+    return;
   if (!lmi->lightmap_up_to_date)
   {
     lmi->lightmap_up_to_date = true;

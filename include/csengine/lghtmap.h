@@ -29,6 +29,7 @@ class csPolygon3D;
 class csLight;
 class csWorld;
 class Dumper;
+class csDelayedLightingInfo;
 
 /**
  * This is a shadow-map for a pseudo-dynamic light.
@@ -166,8 +167,8 @@ private:
   /// The hicolor cache ptr.
   void *cachedata;
 
-  /// Used when computing lightmaps to fill every lightmap only once
-  int last_frustum_id;
+  /// Used when computing lightmaps shared by several polygons
+  csDelayedLightingInfo *delayed_light_info;
 
   /**
    * Convert three lightmap tables to the right mixing mode.
@@ -248,9 +249,6 @@ public:
    */
   void Cache (csPolygonSet* owner, csPolygon3D* poly, int index,
     csWorld* world);
-
-  /// Set the last frustum id, used by lighting
-  void SetLastFrustumId(int val) { last_frustum_id = val; }
 
   /**
    * Convert the lightmaps to the correct mixing mode.

@@ -87,96 +87,94 @@ int FindIntersection(csCdTriangle *t1,csCdTriangle *t2,csVector3 line[2])
 void WalkTest::CreateColliders ()
 {
   csPolygon3D *p;
-  csPolygonSet *pb = new csPolygonSet ();
-  pb->SetName ("Player's Body");
+  plbody = new csPolygonSet ();
+  plbody->SetName ("Player's Body");
 
-  pb->AddVertex(-DX_2, OY,    -DZ_2);
-  pb->AddVertex(-DX_2, OY,    DZ_2);
-  pb->AddVertex(-DX_2, OY+DY, DZ_2);
-  pb->AddVertex(-DX_2, OY+DY, -DZ_2);
-  pb->AddVertex(DX_2,  OY,    -DZ_2);
-  pb->AddVertex(DX_2,  OY,    DZ_2);
-  pb->AddVertex(DX_2,  OY+DY, DZ_2);
-  pb->AddVertex(DX_2,  OY+DY, -DZ_2);
+  plbody->AddVertex(-DX_2, OY,    -DZ_2);
+  plbody->AddVertex(-DX_2, OY,    DZ_2);
+  plbody->AddVertex(-DX_2, OY+DY, DZ_2);
+  plbody->AddVertex(-DX_2, OY+DY, -DZ_2);
+  plbody->AddVertex(DX_2,  OY,    -DZ_2);
+  plbody->AddVertex(DX_2,  OY,    DZ_2);
+  plbody->AddVertex(DX_2,  OY+DY, DZ_2);
+  plbody->AddVertex(DX_2,  OY+DY, -DZ_2);
 
   // Left
-  p = pb->NewPolygon (0);
+  p = plbody->NewPolygon (0);
 
   p->AddVertex (0); p->AddVertex (1);
   p->AddVertex (2); p->AddVertex (3);
 
   // Right
-  p = pb->NewPolygon (0);
+  p = plbody->NewPolygon (0);
   p->AddVertex (4); p->AddVertex (5);
   p->AddVertex (6); p->AddVertex (7);
 
   // Bottom
-  p = pb->NewPolygon (0);
+  p = plbody->NewPolygon (0);
   p->AddVertex (0); p->AddVertex (1);
   p->AddVertex (5); p->AddVertex (4);
 
   // Top
-  p = pb->NewPolygon (0);
+  p = plbody->NewPolygon (0);
   p->AddVertex (3); p->AddVertex (2);
   p->AddVertex (6); p->AddVertex (7);
 
   // Front
-  p = pb->NewPolygon (0);
+  p = plbody->NewPolygon (0);
   p->AddVertex (1); p->AddVertex (5);
   p->AddVertex (6); p->AddVertex (2);
 
   // Back
-  p = pb->NewPolygon (0);
+  p = plbody->NewPolygon (0);
   p->AddVertex (0); p->AddVertex (4);
   p->AddVertex (7); p->AddVertex (3);
 
-  body = new csRAPIDCollider (pb);
-//  delete pb;
+  body = new csRAPIDCollider (plbody);
 
-  csPolygonSet *pl = new csPolygonSet ();
+  pllegs = new csPolygonSet ();
 
-  pl->AddVertex(-DX_2L, OYL,     -DZ_2L);
-  pl->AddVertex(-DX_2L, OYL,     DZ_2L);
-  pl->AddVertex(-DX_2L, OYL+DYL, DZ_2L);
-  pl->AddVertex(-DX_2L, OYL+DYL, -DZ_2L);
-  pl->AddVertex(DX_2L,  OYL,     -DZ_2L);
-  pl->AddVertex(DX_2L,  OYL,     DZ_2L);
-  pl->AddVertex(DX_2L,  OYL+DYL, DZ_2L);
-  pl->AddVertex(DX_2L,  OYL+DYL, -DZ_2L);
+  pllegs->AddVertex(-DX_2L, OYL,     -DZ_2L);
+  pllegs->AddVertex(-DX_2L, OYL,     DZ_2L);
+  pllegs->AddVertex(-DX_2L, OYL+DYL, DZ_2L);
+  pllegs->AddVertex(-DX_2L, OYL+DYL, -DZ_2L);
+  pllegs->AddVertex(DX_2L,  OYL,     -DZ_2L);
+  pllegs->AddVertex(DX_2L,  OYL,     DZ_2L);
+  pllegs->AddVertex(DX_2L,  OYL+DYL, DZ_2L);
+  pllegs->AddVertex(DX_2L,  OYL+DYL, -DZ_2L);
 
   // Left
-  p = pl->NewPolygon (0);
+  p = pllegs->NewPolygon (0);
 
   p->AddVertex (0); p->AddVertex (1);
   p->AddVertex (2); p->AddVertex (3);
 
   // Right
-  p = pl->NewPolygon (0);
+  p = pllegs->NewPolygon (0);
   p->AddVertex (4); p->AddVertex (5);
   p->AddVertex (6); p->AddVertex (7);
 
   // Bottom
-  p = pl->NewPolygon (0);
+  p = pllegs->NewPolygon (0);
   p->AddVertex (0); p->AddVertex (1);
   p->AddVertex (5); p->AddVertex (4);
 
   // Top
-  p = pl->NewPolygon (0);
+  p = pllegs->NewPolygon (0);
   p->AddVertex (3); p->AddVertex (2);
   p->AddVertex (6); p->AddVertex (7);
 
   // Front
-  p = pl->NewPolygon (0);
+  p = pllegs->NewPolygon (0);
   p->AddVertex (1); p->AddVertex (5);
   p->AddVertex (6); p->AddVertex (2);
 
   // Back
-  p = pl->NewPolygon (0);
+  p = pllegs->NewPolygon (0);
   p->AddVertex (0); p->AddVertex (4);
   p->AddVertex (7); p->AddVertex (3);
 
-  legs = new csRAPIDCollider(pl);
-//  delete pl;
+  legs = new csRAPIDCollider(pllegs);
 
   if (!body || !legs)
     do_cd = false;

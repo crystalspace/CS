@@ -37,6 +37,7 @@
 #include "iconfig.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
+
 #define VFS_ID "VFS:"
 
 // The global system variable
@@ -365,8 +366,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   // a VFS volume.
   Config = new csIniFile;
   VFS = (iVFS*)LoadPlugIn("crystalspace.kernel.vfs", CS_FUNCID_VFS, "iVFS", 0);
-  if (VFS)
-    VFS->IncRef();
 
   // Initialize configuration file
   if (iConfigName)
@@ -378,17 +377,13 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
       vol = "";
     if (vol != NULL)
     {
-      ConfigName = new char[strlen(iConfigName) + strlen(vol) + 1];
+      ConfigName = new char [strlen (iConfigName) + strlen (vol) + 1];
       sprintf(ConfigName, "%s%s", vol, iConfigName);
     }
     else
       Printf (MSG_WARNING,
 	"WARNING: Failed to load configuration file `%s'\n", iConfigName);
   }
-
-  Mouse.SetDoubleClickTime (
-    ConfigGetInt ("MouseDriver", "DoubleClickTime", 300),
-    ConfigGetInt ("MouseDriver", "DoubleClickDist", 2));
 
   // Collect all options from command line
   CollectOptions (argc, argv);
@@ -638,6 +633,10 @@ void csSystemDriver::SetSystemDefaults (csIniFile *Config)
 
   if ((val = GetOptionCL ("depth")))
     Depth = atoi (val);
+
+  Mouse.SetDoubleClickTime (
+    Config->GetInt ("MouseDriver", "DoubleClickTime", 300),
+    Config->GetInt ("MouseDriver", "DoubleClickDist", 2));
 }
 
 void csSystemDriver::Help (iConfig* Config)
@@ -1051,7 +1050,7 @@ bool csSystemDriver::ConfigSetFloat (const char *Section, const char *Key, float
 bool csSystemDriver::ConfigSave ()
 {
   if (!ConfigName) return false;
-  if (strncmp(VFS_ID, ConfigName, sizeof(VFS_ID) - 1) == 0)
+  if (strncmp (VFS_ID, ConfigName, sizeof (VFS_ID) - 1) == 0)
     return Config->SaveIfDirty (VFS, ConfigName + sizeof(VFS_ID) - 1);
   else
     return Config->SaveIfDirty (ConfigName);
@@ -1107,16 +1106,14 @@ void csSystemDriver::QueueFocusEvent (bool Enable)
 
 void csSystemDriver::QueueContextResizeEvent (void *info)
 {
-
   EventQueue.Put (new csEvent (Time(), csevBroadcast, 
-			       cscmdContextResize, info));
+    cscmdContextResize, info));
 }
 
 void csSystemDriver::QueueContextCloseEvent (void *info)
 {
-
   EventQueue.Put (new csEvent (Time(), csevBroadcast, 
-			       cscmdContextClose, info));
+    cscmdContextClose, info));
 }
 
 bool csSystemDriver::GetKeyState (int key)

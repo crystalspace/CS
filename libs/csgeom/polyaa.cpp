@@ -38,8 +38,6 @@ static float __calc_area (int n, csVector2 *p)
   return fabs (area / 2.0);
 }
 
-#define EPS   0.0001
-
 // No doubt static vars are !!!EVIL!!! :-) but for
 // the sake of performance's we still use them ...
 static csAAPFCBPixel PutPixel;
@@ -62,7 +60,7 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
   float a = __calc_area (iVertexCount, iVertices);
 
   // Check if polygon is hollow
-  if (a < EPS)
+  if (a < EPSILON)
     // this area is hollow
     return;
 
@@ -74,7 +72,7 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
   }
 
   // Check if polygon surface equals the visible rectangle surface
-  if (fabs (a - visarea) < EPS)
+  if (fabs (a - visarea) < EPSILON)
   {
     // this area is completely covered
     if (DrawBox)

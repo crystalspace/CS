@@ -199,17 +199,16 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   }
   else
   {
-    Scan.FogR = QRound (R * ((1 << pfmt.RedBits) - 1)) << pfmt.RedShift;
-    Scan.FogG = QRound (G * ((1 << pfmt.GreenBits) - 1)) << pfmt.GreenShift;
-    Scan.FogB = QRound (B * ((1 << pfmt.BlueBits) - 1)) << pfmt.BlueShift;
+    Scan.FogR = QRound (R * ((1 << pfmt.RedBits) - 1)) << (pfmt.RedShift - pixel_adjust);
+    Scan.FogG = QRound (G * ((1 << pfmt.GreenBits) - 1)) << (pfmt.GreenShift - pixel_adjust);
+    Scan.FogB = QRound (B * ((1 << pfmt.BlueBits) - 1)) << (pfmt.BlueShift - pixel_adjust);
 
     // halo intensity (0..255)
     Scan.FogDensity = QRound (iIntensity * 255);
     // Detect when the halo will possibly overflow
-    // @@@ FIXME: This is inaccurate if any of the masks are 0xff000000.
-    clamp = (Scan.FogR > pfmt.RedMask)
-         || (Scan.FogG > pfmt.GreenMask)
-         || (Scan.FogB > pfmt.BlueMask);
+    clamp = (Scan.FogR > (pfmt.RedMask >> pixel_adjust))
+         || (Scan.FogG > (pfmt.GreenMask >> pixel_adjust))
+         || (Scan.FogB > (pfmt.BlueMask >> pixel_adjust));
   }
 
   switch (pfmt.PixelBytes)

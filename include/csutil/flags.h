@@ -26,26 +26,39 @@ class csFlags
 {
 private:
   /// Set of flags
-  ULong flags;
+  unsigned flags;
 
 public:
   /// Constructor.
   csFlags () : flags (0) { }
 
   /// Initialize all flags to the given mask.
-  void Set (ULong value) { flags = value; }
+  void SetAll (unsigned value)
+  { flags = value; }
+
+  /// Set all given flags
+  void Set (unsigned mask)
+  { flags = (flags & ~mask) | mask; }
+
+  /// Reset all given flags
+  void Reset (unsigned mask)
+  { flags = (flags & ~mask); }
 
   /// Set all flags with the given mask.
-  void Set (ULong mask, ULong value) { flags = (flags & ~mask) | value; }
+  void Set (unsigned mask, unsigned value)
+  { flags = (flags & ~mask) | value; }
 
   /// Get flags.
-  ULong Get () { return flags; }
+  unsigned Get ()
+  { return flags; }
 
   /// Check if any of the given flags are set.
-  bool Check (ULong to_check) { return (flags & to_check) != 0; }
+  bool Check (unsigned mask)
+  { return (flags & mask) != 0; }
 
   /// Check if all the given flags are set.
-  bool CheckAll (ULong to_check) { return (flags & to_check) == to_check; }
+  bool CheckAll (unsigned mask)
+  { return (flags & mask) == mask; }
 };
 
 #endif /*_CS_FLAGS_H*/

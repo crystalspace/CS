@@ -270,7 +270,7 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
   rq.Parm.CreateWindow.Title = Title;
   if ((rc = PMcall (pmcmdCreateWindow, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
+    CsPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to driver?\n");
     return false;
   }
   WinHandle = rq.Parm.CreateWindow.Handle;

@@ -25,6 +25,20 @@
 class csTransform;
 
 /**
+ * Return values for csFrustum::Classify. The routine makes a difference
+ * whenever a polygon is fully outside the frustum, fully inside, fully
+ * covers the frustum or is partly inside, partly outside.
+ */
+/// The polygon is fully outside frustum
+#define CS_FRUST_OUTSIDE	0
+/// The polygon is fully inside frustum
+#define CS_FRUST_INSIDE		1
+/// The polygon fully covers the frustum
+#define CS_FRUST_COVERED	2
+/// The polygon is partially inside frustum
+#define CS_FRUST_PARTIAL	3
+
+/**
  * A general frustum. This consist of a center point (origin),
  * a frustum polygon in 3D space (relative to center point)
  * and a plane. The planes which go through the center and
@@ -37,12 +51,22 @@ class csTransform;
 class csFrustum
 {
 private:
+
+  /// The origin of this frustum
   csVector3 origin;
 
+  /**
+   * The polygon vertices for non-wide frustum.
+   * If not NULL, the frustum is a pyramid with origin in "origin"
+   * and with the basis given by this polygon.
+   */
   csVector3* vertices;
+  /// Number of vertices in frustum polygon
   int num_vertices;
+  /// Max number of vertices
   int max_vertices;
 
+  /// Back clipping plane
   csPlane3* backplane;
 
   /**
@@ -60,14 +84,21 @@ private:
    */
   bool mirrored;
 
+  /// The reference count for this frustum
+  int ref_count;
+
+  /// Clear the frustum
   void Clear ();
 
+  /// Ensure vertex array is able to hold at least "num" vertices
   void ExtendVertexArray (int num);
 
 public:
   /// Create a new empty frustum.
-  csFrustum (csVector3& o) : origin (o), vertices (NULL), num_vertices (0),
-  	max_vertices (0), backplane (NULL), wide (false), mirrored (false) { }
+  csFrustum (csVector3& o) : origin (o), vertices (NULL),
+    num_vertices (0), max_vertices (0), backplane (NULL),
+    wide (false), mirrored (false), ref_count (1)
+  { }
 
   /**
    * Create a frustum given a polygon and a backplane.
@@ -80,7 +111,7 @@ public:
   csFrustum (const csFrustum &copy);
 
   ///
-  virtual ~csFrustum () { Clear (); }
+  virtual ~csFrustum ();
 
   /// Set the origin of this frustum.
   void SetOrigin (csVector3& o) { origin = o; }
@@ -184,24 +215,11 @@ public:
 
   /**
    * Check if a polygon intersects with the frustum (i.e.
-   * is visible in the frustum). Returns true if visible.
+   * is visible in the frustum). Returns one of CS_FRUST_XXX values.
    * Frustum and polygon should be given relative to (0,0,0).
    */
-  static bool IsVisible (csVector3* frustum, int num_frust,
-  	csVector3* poly, int num_poly);
-
-  /**
-   * Check if a polygon intersects with the frustum.
-   * This function differs from IsVisible() in that it will
-   * only return true if the polygon intersects with the
-   * frustum. It will not return true if the polygon
-   * is completely inside the frustum or if the frustum is
-   * completely inside the polygon. This function is mainly
-   * useful when those above trivial cases are already
-   * accounted for.
-   */
-  static bool IsVisibleFull (csVector3* frustum, int num_frust,
-  	csVector3* poly, int num_poly);
+  static int Classify (csVector3* frustum, int num_frust,
+    csVector3* poly, int num_poly);
 
   /**
    * Check if a point (given relative to the origin of the frustum)
@@ -216,7 +234,7 @@ public:
    * from the average direction of the frustum.
    */
   static bool Contains (csVector3* frustum, int num_frust,
-  	const csVector3& point);
+    const csVector3& point);
 
   /**
    * Check if a point is inside a frustum. The point and
@@ -224,7 +242,7 @@ public:
    * checks if point is in front of given plane.
    */
   static bool Contains (csVector3* frustum, int num_frust,
-  	const csPlane3& plane, const csVector3& point);
+    const csPlane3& plane, const csVector3& point);
 
   /// Return true if frustum is empty.
   bool IsEmpty () const { return !wide && vertices == NULL; }
@@ -245,6 +263,11 @@ public:
    * Make the frustum empty.
    */
   void MakeEmpty ();
+
+  /// Increment reference counter
+  void IncRef () { ref_count++; }
+  /// Decrement reference counter
+  void DecRef () { if (!--ref_count) delete this; }
 };
 
 #endif // __CSFRUSTRUM_H__

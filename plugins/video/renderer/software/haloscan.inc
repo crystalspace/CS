@@ -40,12 +40,14 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
       if (a)
       {
         // Get the destination pixel from framebuffer
-        HALO_PIXTYPE d = PIXEL_PREPROC(*D);
+        // NOTE: d, dr, dg and db SHOULD be 32-bit,
+        // even for 16-bit modes due to possible overflow (HALO_CLAMP)
+        uint32 d = PIXEL_PREPROC (*D);
 
         // Compute destination R,G,B
-        HALO_PIXTYPE dr = d & HALO_RM;
-        HALO_PIXTYPE dg = d & HALO_GM;
-        HALO_PIXTYPE db = d & HALO_BM;
+        uint32 dr = d & HALO_RM;
+        uint32 dg = d & HALO_GM;
+        uint32 db = d & HALO_BM;
         // Apply alpha
         dr = dr + (a * (Scan.FogR - dr) >> 8);
         dg = dg + (a * (Scan.FogG - dg) >> 8);
@@ -66,7 +68,7 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
 #  endif
 #endif
         // Build new value and write into framebuffer
-        *D = PIXEL_POSTPROC(dr | dg | db);
+        *D = PIXEL_POSTPROC (dr | dg | db);
       }
       D++;
     }
@@ -79,12 +81,12 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
       if (a)
       {
         // Get the destination pixel from framebuffer
-        HALO_PIXTYPE d = PIXEL_PREPROC(*D);
+        uint32 d = PIXEL_PREPROC (*D);
 
         // Compute destination R,G,B
-        HALO_PIXTYPE dr = d & HALO_RM;
-        HALO_PIXTYPE dg = d & HALO_GM;
-        HALO_PIXTYPE db = d & HALO_BM;
+        uint32 dr = d & HALO_RM;
+        uint32 dg = d & HALO_GM;
+        uint32 db = d & HALO_BM;
         // Apply alpha
         dr = dr + (a * (Scan.FogR - dr) >> 8);
         dg = dg + (a * (Scan.FogG - dg) >> 8);
@@ -105,7 +107,7 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
 #  endif
 #endif
         // Build new value and write into framebuffer
-        *D = PIXEL_POSTPROC(dr | dg | db);
+        *D = PIXEL_POSTPROC (dr | dg | db);
       }
       D++;
       ax += delta;

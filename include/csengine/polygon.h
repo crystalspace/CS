@@ -50,17 +50,24 @@ struct iGraphics2D;
 struct iGraphics3D;
 
 /**
- * If CS_POLY_LIGHTING is set for a polygon then the polygon will be lit.
- * It is set by default.
+ * Additional polygon flags. These flags are private,
+ * unlike those defined in ipolygon.h
  */
-#define CS_POLY_LIGHTING	0x00000001
 
 /**
- * If CS_POLY_FLATSHADING is set for a polygon then the polygon will not
- * be texture mapped but instead it will be flat shaded (possibly with gouraud).
- * It is unset by default.
+ * If this flag is set this portal was allocated by this polygon
+ * and it should also be deleted by it.
  */
-#define CS_POLY_FLATSHADING	0x00000002
+#define CS_POLY_DELETE_PORTAL	0x80000000
+
+/**
+ * If this flag is true then this polygon will never be drawn.
+ * This is useful for polygons which have been split. The original
+ * unsplit polygon is still kept because it holds the shared
+ * information about the lighted texture and lightmaps (all split
+ * children refer to the original polygon for that).
+ */
+#define CS_POLY_NO_DRAW		0x40000000
 
 /// Texture type is lightmapped
 #define POLYTXT_LIGHTMAP	1
@@ -104,15 +111,15 @@ struct csPolygonLightInfo
  */
 class csPolygonTextureType
 {
+private:
+  /// Reference counter
+  uint32 ref_count;
+
 protected:
   /// Common constructor for derived classes
   csPolygonTextureType () { ref_count = 1; }
   /// Destructor is virtual to be able to delete derived objects
   virtual ~csPolygonTextureType () { }
-
-private:
-  /// Reference counter
-  int ref_count;
 
 public:
   /// Return a type for the kind of texturing used.
@@ -161,7 +168,7 @@ private:
 
 public:
   /// Setup for the given polygon and texture.
-  void Setup (csPolygon3D* poly3d, csTextureHandle* txtMM);
+  void Setup (csPolygon3D* poly3d, csTextureHandle* texh);
 
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () { return POLYTXT_LIGHTMAP; }
@@ -343,6 +350,7 @@ public:
 class csPolygon3D : public iBase, public csObject, public csPolygonInt
 {
   friend class Dumper;
+  friend class csPolyTexture;
 
 private:
   /// A table of indices into the vertices of the parent csPolygonSet (container).
@@ -369,12 +377,6 @@ private:
   csPortal* portal;
 
   /**
-   * If 'delete_portal' is true this portal was allocated by
-   * this Polygon and it should also be deleted by it.
-   */
-  bool delete_portal;
-
-  /**
    * The PolygonPlane for this polygon.
    */
   csPolyPlane* plane;
@@ -383,7 +385,7 @@ private:
    * The 3D engine texture reference (contains the handle as returned
    * by iTextureManager interface).
    */
-  csTextureHandle* txtMM;
+  csTextureHandle* texh;
 
   /**
    * General lighting information for this polygon.
@@ -394,7 +396,7 @@ private:
    * Texture type specific information for this polygon. Can be either
    * csLightMapped or csGouraudShaded.
    */
-  csPolygonTextureType* txt_info;
+  csPolygonTextureType *txt_info;
 
   /**
    * The original polygon. This is useful when a BSP tree
@@ -402,7 +404,16 @@ private:
    * original polygon that this polygon was split from.
    * If not split then this will be NULL.
    */
-  csPolygon3D* orig_poly;
+  csPolygon3D *orig_poly;
+
+  /**
+   * The texture share list. All polygons that share a single texture
+   * are linked using this field. For example, if some polygon was split
+   * multiple times by the BSP algorithm, all polygons that results
+   * from that split are linked through this field. The start of list is
+   * in "orig_poly" polygon.
+   */
+  csPolygon3D *txt_share_list;
 
   /**
    * Visibility number. If equal to csOctreeNode::pvs_cur_vis_nr then
@@ -429,6 +440,13 @@ private:
   void SetupHWUV();
 #endif
   
+  /**
+   * Same as CalculateLighting but called before light view destruction
+   * through callbacks and csPolyTexture::ProcessDelayedLightmaps ().
+   * Called only for lightmapped polygons with shared lightmap.
+   */
+  void CalculateDelayedLighting (csFrustumView *lview);
+
 public:
   /// Set of flags
   csFlags flags;
@@ -441,15 +459,6 @@ public:
   csVector3 *uvz;
   bool isClipped;
 #endif
-
-  /**
-   * If this flag is true then this polygon will never be drawn.
-   * This is useful for polygons which have been split. The original
-   * unsplit polygon is still kept because it holds the shared
-   * information about the lighted texture and lightmaps (all split
-   * children refer to the original polygon for that).
-   */
-  bool dont_draw;
 
   /**
    * Construct a new polygon with the given texture.
@@ -699,7 +708,7 @@ public:
   /**
    * Get the texture.
    */
-  csTextureHandle* GetCsTextureHandle () { return txtMM; }
+  csTextureHandle* GetCsTextureHandle () { return texh; }
 
   /**
    * Return true if this polygon or the texture it uses is transparent.
@@ -940,6 +949,11 @@ public:
   bool MarkRelevantShadowFrustums (csFrustumView& lview, csPlane3& plane);
 
   /**
+   * Same as above but takes polygon plane as 'plane' argument.
+   */
+  bool MarkRelevantShadowFrustums (csFrustumView& lview);
+
+  /**
    * Check visibility of this polygon with the given csFrustumView
    * and fill the lightmap if needed (this function calls FillLightMap ()).
    * This function will also traverse through a portal if so needed.
@@ -1094,6 +1108,13 @@ public:
     return lm ? lm->GetPolyTex () : NULL;
   }
 
+  /// Get next polygon in texture share list
+  csPolygon3D *GetNextShare ()
+  { return txt_share_list; }
+  /// Set next polygon in texture share list
+  void SetNextShare (csPolygon3D *next)
+  { txt_share_list = next; }
+
   CSOBJTYPE;
   DECLARE_IBASE;
 
@@ -1112,7 +1133,7 @@ public:
 
     /// Get the polygonset (container) that this polygons belongs to.
     virtual iPolygonSet *GetContainer ()
-    { return QUERY_INTERFACE(scfParent->GetParent(), iPolygonSet); }
+    { return (iPolygonSet *)scfParent->GetParent (); }
     /// Get the lightmap associated with this polygon
     virtual iLightMap *GetLightMap ()
     {

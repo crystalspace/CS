@@ -444,7 +444,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   {
     if (polygon[i]->GetType () != 1) continue;
     p = (csPolygon3D*)polygon[i];
-    if (p->dont_draw) continue;
+    if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
     p->CamUpdate ();
     if (p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
 	 	d->GetOrigin (), verts, num_verts)) //@@@Use pool for verts?
@@ -628,15 +628,16 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 
       clip = (csPolygon2D*)(render_pool->Alloc ());
       visible = false;
-      if ( !p->dont_draw &&
-           p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
-	 	  d->GetOrigin (), verts, num_verts) &&
-           p->DoPerspective (*d, verts, num_verts, clip, NULL,
-	 	  d->IsMirrored ())  &&
-           clip->ClipAgainst (d->view) )
+      if (!p->flags.Check (CS_POLY_NO_DRAW)
+       && p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
+                          d->GetOrigin (), verts, num_verts)
+       && p->DoPerspective (*d, verts, num_verts, clip, NULL,
+                            d->IsMirrored ())
+       && clip->ClipAgainst (d->view))
       {
         po = p->GetPortal ();
-	if (csWorld::current_world->IsPVSOnly ()) visible = true;
+	if (csWorld::current_world->IsPVSOnly ())
+          visible = true;
         else if (csSector::do_portals && po)
         {
 	  if (covtree)

@@ -189,6 +189,8 @@ bool csWorld::do_not_force_relight = false;
 bool csWorld::do_force_relight = false;
 bool csWorld::do_not_force_revis = false;
 bool csWorld::do_force_revis = false;
+bool csWorld::do_accurate_statlight = true;
+bool csWorld::do_accurate_dynlight = false;
 
 IMPLEMENT_CSOBJTYPE (csWorld,csObject);
 
@@ -728,6 +730,8 @@ void csWorld::ShineLights ()
     meter.Step();
   }
 
+  csPolyTexture::do_accurate_shadows = do_accurate_statlight;
+
   time_t start, stop;
   start = System->GetTime ();
   CsPrintf (MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ", light_count);
@@ -752,6 +756,8 @@ void csWorld::ShineLights ()
     stop = System->GetTime ();
     CsPrintf (MSG_INITIALIZATION, "(%.4f seconds)", (float)(stop-start)/1000.);
   }
+
+  csPolyTexture::do_accurate_shadows = do_accurate_dynlight;
 
   CsPrintf (MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors):\n  ", num_sectors);
   meter.SetTotal (num_sectors);
@@ -1264,44 +1270,49 @@ void csWorld::AdvanceSpriteFrames (time_t current_time)
 void csWorld::ReadConfig ()
 {
   if (!System) return;
-  csLightMap::SetLightCellSize (System->ConfigGetInt ("Lighting", "LIGHTMAP_SIZE", 16));
-  csLight::ambient_red = System->ConfigGetInt ("Lighting", "AMBIENT_RED", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_green = System->ConfigGetInt ("Lighting", "AMBIENT_GREEN", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_blue = System->ConfigGetInt ("Lighting", "AMBIENT_BLUE", DEFAULT_LIGHT_LEVEL);
+  csLightMap::SetLightCellSize (System->ConfigGetInt ("Lighting", "LightmapSize", 16));
 
-  int ambient_white = System->ConfigGetInt ("Lighting", "AMBIENT_WHITE", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_red = System->ConfigGetInt ("Lighting", "Ambient.Red", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_green = System->ConfigGetInt ("Lighting", "Ambient.Green", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_blue = System->ConfigGetInt ("Lighting", "Ambient.Blue", DEFAULT_LIGHT_LEVEL);
+  int ambient_white = System->ConfigGetInt ("Lighting", "Ambient.White", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_red += ambient_white;
   csLight::ambient_green += ambient_white;
   csLight::ambient_blue += ambient_white;
 
-  // Do not allow too black environments as software renderer hates it
+  // Do not allow too black environments since software renderer hates it
   if (csLight::ambient_red + csLight::ambient_green + csLight::ambient_blue < 6)
     csLight::ambient_red = csLight::ambient_green = csLight::ambient_blue = 2;
 
-  csSector::cfg_reflections = System->ConfigGetInt ("Lighting", "REFLECT", csSector::cfg_reflections);
-  csSector::do_radiosity = System->ConfigGetYesNo ("Lighting", "RADIOSITY", csSector::do_radiosity);
-  csWorld::use_new_radiosity = System->ConfigGetYesNo ("Lighting", "NEWRADIOSITY", csWorld::use_new_radiosity);
-  csPolyTexture::do_accurate_things = System->ConfigGetYesNo ("Lighting", "ACCURATE_THINGS", csPolyTexture::do_accurate_things);
-  csPolyTexture::do_accurate_things = System->ConfigGetYesNo ("Lighting", "ACCURATE_THINGS", csPolyTexture::do_accurate_things);
-  csPolyTexture::cfg_cosinus_factor = System->ConfigGetFloat ("Lighting", "COSINUS_FACTOR", csPolyTexture::cfg_cosinus_factor);
-  csSprite3D::do_quality_lighting = System->ConfigGetYesNo ("Lighting", "SPRITE_HIGHQUAL", csSprite3D::do_quality_lighting);
+  csSector::cfg_reflections = System->ConfigGetInt ("Lighting", "Reflections", csSector::cfg_reflections);
+  csPolyTexture::cfg_cosinus_factor = System->ConfigGetFloat ("Lighting", "CosinusFactor", csPolyTexture::cfg_cosinus_factor);
+  csSprite3D::do_quality_lighting = System->ConfigGetYesNo ("Lighting", "SpriteHighQual", csSprite3D::do_quality_lighting);
+  csSector::do_radiosity = System->ConfigGetYesNo ("Lighting", "Radiosity", csSector::do_radiosity);
+
+  csPolyTexture::do_accurate_things = System->ConfigGetYesNo ("Lighting",
+    "Shadows.Things", csPolyTexture::do_accurate_things);
+  do_accurate_statlight = System->ConfigGetYesNo ("Lighting",
+    "Shadows.AccurateStatic", do_accurate_statlight);
+  do_accurate_dynlight = System->ConfigGetYesNo ("Lighting",
+    "Shadows.AccurateDynamic", do_accurate_dynlight);
 
   // radiosity options
+  csWorld::use_new_radiosity = System->ConfigGetYesNo ("Lighting",
+    "Radiosity.Enable", csWorld::use_new_radiosity);
   csRadiosity::do_static_specular = System->ConfigGetYesNo ("Lighting",
-    "RADIOSITY_DO_STATIC_SPECULAR", csRadiosity::do_static_specular);
+    "Radiosity.DoStaticSpecular", csRadiosity::do_static_specular);
   csRadiosity::static_specular_amount = System->ConfigGetFloat ("Lighting",
-    "RADIOSITY_STATIC_SPECULAR_AMOUNT", csRadiosity::static_specular_amount);
+    "Radiosity.StaticSpecularAmount", csRadiosity::static_specular_amount);
   csRadiosity::static_specular_tightness = System->ConfigGetInt ("Lighting",
-    "RADIOSITY_STATIC_SPECULAR_TIGHTNESS", 
-    csRadiosity::static_specular_tightness);
+    "Radiosity.StaticSpecularTightness", csRadiosity::static_specular_tightness);
   csRadiosity::colour_bleed = System->ConfigGetFloat ("Lighting",
-    "RADIOSITY_COLOUR_BLEED", csRadiosity::colour_bleed);
+    "Radiosity.ColourBleed", csRadiosity::colour_bleed);
   csRadiosity::stop_priority = System->ConfigGetFloat ("Lighting",
-    "RADIOSITY_STOP_PRIORITY", csRadiosity::stop_priority);
+    "Radiosity.StopPriority", csRadiosity::stop_priority);
   csRadiosity::stop_improvement = System->ConfigGetFloat ("Lighting",
-    "RADIOSITY_STOP_IMPROVEMENT", csRadiosity::stop_improvement);
+    "Radiosity.StopImprovement", csRadiosity::stop_improvement);
   csRadiosity::stop_iterations = System->ConfigGetInt ("Lighting",
-    "RADIOSITY_STOP_ITERATIONS", csRadiosity::stop_iterations);
+    "Radiosity.StopIterations", csRadiosity::stop_iterations);
 }
 
 void csWorld::UnlinkSprite (csSprite* sprite)

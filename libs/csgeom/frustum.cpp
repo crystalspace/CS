@@ -20,35 +20,25 @@
 #include "csgeom/frustum.h"
 #include "csgeom/transfrm.h"
 
-void csFrustum::Clear ()
-{
-  delete [] vertices; vertices = NULL;
-  num_vertices = max_vertices = 0;
-  delete backplane; backplane = NULL;
-  wide = false;
-  mirrored = false;
-}
-
 csFrustum::csFrustum (csVector3& o, csVector3* verts, int num_verts,
-	csPlane3* backp)
+  csPlane3* backp)
 {
   origin = o;
   num_vertices = num_verts;
   max_vertices = num_verts;
   wide = false;
   mirrored = false;
+  ref_count = 1;
+
   if (verts)
   {
     vertices = new csVector3 [max_vertices];
     memcpy (vertices, verts, sizeof (csVector3) * num_vertices);
   }
-  else vertices = NULL;
+  else
+    vertices = NULL;
 
-  if (backp)
-  {
-    backplane = new csPlane3 (*backp);
-  }
-  else backplane = NULL;
+  backplane = backp ? new csPlane3 (*backp) : NULL;
 }
 
 csFrustum::csFrustum (const csFrustum &copy)
@@ -58,18 +48,31 @@ csFrustum::csFrustum (const csFrustum &copy)
   max_vertices = copy.max_vertices;
   wide = copy.wide;
   mirrored = copy.mirrored;
+  ref_count = 1;
+
   if (copy.vertices)
   {
     vertices = new csVector3 [max_vertices];
     memcpy (vertices, copy.vertices, sizeof (csVector3) * num_vertices);
   }
-  else vertices = NULL;
+  else
+    vertices = NULL;
 
-  if (copy.backplane)
-  {
-    backplane = new csPlane3 (*copy.backplane);
-  }
-  else backplane = NULL;
+  backplane = copy.backplane ? new csPlane3 (*copy.backplane) : NULL;
+}
+
+csFrustum::~csFrustum ()
+{
+  Clear ();
+}
+
+void csFrustum::Clear ()
+{
+  delete [] vertices; vertices = NULL;
+  num_vertices = max_vertices = 0;
+  delete backplane; backplane = NULL;
+  wide = false;
+  mirrored = false;
 }
 
 void csFrustum::SetBackPlane (csPlane3& plane)
@@ -357,65 +360,73 @@ bool csFrustum::Contains (csVector3* frustum, int num_frust, const csVector3& po
 }
 
 bool csFrustum::Contains (csVector3* frustum, int num_frust,
-	const csPlane3& plane, const csVector3& point)
+  const csPlane3& plane, const csVector3& point)
 {
   if (!csMath3::Visible (point, plane)) return false;
   int i, i1;
   i1 = num_frust-1;
   for (i = 0 ; i < num_frust ; i++)
   {
-    if (csMath3::WhichSide3D (point, frustum[i], frustum[i1]) > 0) return false;
+    if (csMath3::WhichSide3D (point, frustum[i], frustum[i1]) > 0)
+      return false;
     i1 = i;
   }
   return true;
 }
 
-bool csFrustum::IsVisible (csVector3* frustum, int num_frust,
-  	csVector3* poly, int num_poly)
+int csFrustum::Classify (csVector3* frustum, int num_frust,
+  csVector3* poly, int num_poly)
 {
-  int i;
+  // All poly vertices are inside frustum?
+  bool all_inside = true;
 
-  // If any of the polygon vertices is in the frustum then
-  // the polygon is visible.
-  for (i = 0 ; i < num_poly ; i++)
-    if (Contains (frustum, num_frust, poly[i])) return true;
-
-  // If any of the frustum vertices is in the polygon (reverse
-  // roles) then the polygon is visible.
-  for (i = 0 ; i < num_frust ; i++)
-    if (Contains (poly, num_poly, frustum[i])) return true;
-
-  return IsVisibleFull (frustum, num_frust, poly, num_poly);
-}
-
-bool csFrustum::IsVisibleFull (csVector3* frustum, int num_frust,
-  	csVector3* poly, int num_poly)
-{
-  int i1, j1, i, j;
-
-  // Here is the difficult case. We need to see if there is an
-  // edge from the polygon which intersects a frustum plane.
-  // If so then polygon is visible. Otherwise not.
-  csVector3 normal;
-  csVector3 isect;
-  float dist;
-  j1 = num_frust-1;
-  for (j = 0 ; j < num_frust ; j++)
+  // Loop through all planes that makes the frustum
+  for (int fv = 0, fvp = num_frust - 1; fv < num_frust; fvp = fv++)
   {
-    normal = frustum[j] % frustum[j1];
-    i1 = num_poly-1;
-    for (i = 0 ; i < num_poly ; i++)
+    // Find the equation of the Nth plane
+    // Since the origin of frustum is at (0,0,0) the plane equation
+    // has the form A*x + B*y + C*z = 0, where (A,B,C) is the plane normal.
+    csVector3 &v1 = frustum [fvp];
+    csVector3 &v2 = frustum [fv];
+    csVector3 fn = v1 % v2;
+
+    float prev_d = fn * poly [num_poly - 1];
+    for (int pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
     {
-      if (csIntersect3::Plane (poly[i], poly[i1],
-      	normal.x, normal.y, normal.z, 0, isect, dist))
+      // The distance from plane to polygon vertex
+      float d = fn * poly [pv];
+      if (all_inside && d < 0) all_inside = false;
+
+      if ((prev_d < 0 && d > 0)
+       || (prev_d > 0 && d < 0))
       {
-        if (Contains (frustum, num_frust, isect)) return true;
+        // If the segment intersects with the frustum plane somewhere
+        // between two limiting lines, we have the CS_FRUST_PARTIAL case.
+        csVector3 p = poly [pvp] - (poly [pv] - poly [pvp]) * (prev_d / (d - prev_d));
+        // If the vector product between both vectors making the frustum
+        // plane and the intersection point between polygon edge and plane
+        // have same sign, the intersection point is outside frustum
+        if ((poly [pvp] % p) * (poly [pv] % p) < 0)
+          return CS_FRUST_PARTIAL;
       }
-      i1 = i;
     }
-    j1 = j;
   }
-  return false;
+
+  if (all_inside) return CS_FRUST_INSIDE;
+
+  // Now we know that all polygon vertices are outside frustum and no polygon
+  // edge crosses the frustum. We should choose between CS_FRUST_OUTSIDE and
+  // CS_FRUST_COVERED cases. For this we check if all frustum vertices are
+  // inside the frustum created by polygon (reverse roles). In fact it is
+  // enough to check just the first vertex of frustum is outside polygon
+  // frustum: this lets us make the right decision.
+
+  for (int pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
+  {
+    csVector3 pn = poly [pvp] % poly [pv];
+    if (pn * frustum [0] < 0)
+      return CS_FRUST_OUTSIDE;
+  }
+
+  return CS_FRUST_COVERED;
 }
-
-

@@ -24,6 +24,7 @@
 #include "cssysdef.h"
 #include "csgfxldr/csimage.h"
 #include "csgfxldr/pngsave.h"
+#include "csutil/util.h"
 
 #include <string.h>
 
@@ -41,7 +42,6 @@ char *programname;
 static struct option long_options[] =
 {
   {"help", no_argument, 0, 'h'},
-  {"display", optional_argument, 0, 'D'},
   {"dither", no_argument, 0, 'd'},
   {"scale", required_argument, 0, 's'},
   {"mipmap", required_argument, 0, 'm'},
@@ -50,14 +50,15 @@ static struct option long_options[] =
   {"truecolor", no_argument, 0, 'c'},
   {"verbose", no_argument, 0, 'v'},
   {"version", no_argument, 0, 'V'},
+  {"save", no_argument, 0, 'S'},
+  {"display", optional_argument, 0, 'D'},
+  {"heightmap", optional_argument, 0, 'H'},
   {0, no_argument, 0, 0}
 };
 
 static struct
 {
   bool verbose;
-  bool save;
-  bool display;
   bool dither;
   bool paletted;
   bool truecolor;
@@ -65,18 +66,20 @@ static struct
   int displayW, displayH;
   int mipmap;
   bool transp;
+  int outputmode;
+  float hmscale;
 } opt =
 {
   false,
   true,
   false,
   false,
-  false,
-  false,
   0, 0,
   79, 24,
   -1,
-  false
+  false,
+  0,
+  1/500.0
 };
 // Dont move inside the struct!
 static RGBPixel transpcolor;
@@ -86,7 +89,6 @@ static int display_help ()
   printf ("Crystal Space Graphics File Loader test application v%s\n", programversion);
   printf ("Copyright (C) 2000 Andrew Zabolotny\n\n");
   printf ("Usage: %s {option/s} [image file] [...]\n\n", programname);
-  printf ("  -D   --display{=#,#} Display the image in ASCII format :-)\n");
   printf ("  -d   --dither        Apply Floyd-Steinberg dithering when reducing to 8 bpp\n");
   printf ("  -s   --scale=#,#     Re-scale the image to given size #\n");
   printf ("  -m   --mipmap=#      Create mipmap level # (=0,1,2,3) from image\n");
@@ -96,6 +98,11 @@ static int display_help ()
   printf ("  -h   --help          Display this help text\n");
   printf ("  -v   --verbose       Comment on what's happening\n");
   printf ("  -V   --version       Display program version\n");
+  printf ("------------------- Output options (reciprocally exclusive): ------------------\n");
+  printf ("  -S   --save          Output a PNG output image (default)\n");
+  printf ("  -D   --display{=#,#} Display the image in ASCII format :-)\n");
+  printf ("  -H   --heightmap{=#} Output a 3D heightmap in Crystal Space format\n");
+  printf ("                       An optional scale argument may be specified\n");
   return 1;
 }
 
@@ -126,6 +133,167 @@ static bool SavePNM (const char *fname, void *image, int w, int h, bool rgb)
 }
 #endif
 
+static bool output_picture (const char *fname, const char *suffix, iImage *ifile)
+{
+  char outname [MAXPATHLEN + 1];
+  strcpy (outname, fname);
+  char *eol = strchr (outname, 0);
+  while (eol > outname && *eol != '.') eol--;
+  if (eol == outname) eol = strchr (outname, 0);
+  strcpy (eol, suffix);
+  strcat (eol, ".png");
+  printf ("Saving output file %s\n", outname);
+
+  return
+#if 1
+    csSavePNG (outname, ifile);
+#else
+    SavePNM (outname, ifile->GetImageData (), ifile->GetWidth (), ifile->GetHeight (),
+       (ifile->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR));
+#endif
+}
+
+static bool display_picture (iImage *ifile)
+{
+  static char imgchr [] = " .,;+*oO";
+  ifile->Rescale (opt.displayW, opt.displayH);
+  RGBPixel *rgb = ifile->GetPalette ();
+  UByte *idx = (UByte *)ifile->GetImageData ();
+  for (int y = 0; y < opt.displayH; y++)
+  {
+    for (int x = 0; x < opt.displayW; x++)
+    {
+      RGBPixel &src = rgb [*idx++];
+      int gray = int (sqrt (src.red * src.red + src.green * src.green +
+        src.blue * src.blue) * 8 / 442);
+      putc (imgchr [gray], stdout);
+    }
+    putc ('\n', stdout);
+  }
+  return true;
+}
+
+static bool output_heightmap (const char *fname, iImage *ifile)
+{
+  char outname [MAXPATHLEN + 1];
+  strcpy (outname, fname);
+  char *eol = strchr (outname, 0);
+  while (eol > outname && *eol != '.') eol--;
+  if (eol == outname) eol = strchr (outname, 0);
+  strcpy (eol, ".csm");
+  printf ("Saving output file %s\n", outname);
+
+  FILE *f = fopen (outname, "w");
+  if (!f)
+  {
+    printf ("%s: cannot write file %s\n", programname, fname);
+    return false;
+  }
+
+  // Compute the intensity of each color
+  int w = ifile->GetWidth ();
+  int h = ifile->GetHeight ();
+  uint8 *img = (uint8 *)ifile->GetImageData ();
+
+  int height [257], tc;
+  RGBPixel *pal = ifile->GetPalette ();
+  height [256] = transpcolor.Intensity ();
+  for (int i = 0; i < 256; i++)
+    if (opt.transp && transpcolor.eq (pal [i]))
+      height [tc = i] = -1;
+    else
+      height [i] = pal [i].Intensity ();
+
+  // And now write the 3D file
+  *eol = 0;
+  splitpath (outname, NULL, 0, outname, sizeof (outname));
+  fprintf (f, "WORLD\n(\n  THING '%s'\n  (\n", outname);
+
+  int x, y;
+  int size = w * h;
+  int *idx = new int [size];
+  int src = 0, curidx = 0;
+  int px [3][3];
+  for (y = 0; y < h; y++)
+  {
+    px [0][0] = px [0][1] = px [0][2] =
+    px [1][0] = px [1][1] = px [1][2] = tc;
+    bool tr = (y > 0), br = (y < h - 1);
+    px [2][0] = tr ? img [src - w] : tc;
+    px [2][1] = img [src];
+    px [2][0] = br ? img [src + w] : tc;
+    for (x = 0; x < w; x++, src++)
+    {
+      px [0][0] = px [1][0]; px [1][0] = px [2][0];
+      px [0][1] = px [1][1]; px [1][1] = px [2][1];
+      px [0][2] = px [1][2]; px [1][2] = px [2][2];
+      if (x < w - 1)
+      {
+        px [2][0] = tr ? img [src - w + 1] : tc;
+        px [2][1] = img [src + 1];
+        px [2][2] = br ? img [src + w + 1] : tc;
+      }
+      else
+        px [2][0] = px [2][1] = px [2][2] = tc;
+
+      int pix = px [1][1];
+      if (height [pix] < 0)
+      {
+        // Check if all surrounding pixels are transparent
+        if (height [px [0][0]] >= 0
+         || height [px [1][0]] >= 0
+         || height [px [2][0]] >= 0
+         || height [px [0][1]] >= 0
+         || height [px [2][1]] >= 0
+         || height [px [0][2]] >= 0
+         || height [px [1][2]] >= 0
+         || height [px [2][2]] >= 0)
+          pix = 256;
+      }
+
+      if (height [pix] >= 0)
+      {
+        idx [src] = curidx++;
+        fprintf (f, "    VERTEX (%g,%g,%g)\n", (x - w / 2) / 10.0,
+          height [img [src]] * opt.hmscale, (h / 2 - y) / 10.0);
+      }
+      else
+        idx [src] = -1;
+    }
+  }
+
+  for (y = 1; y < h; y++)
+    for (x = 1; x < w; x++)
+    {
+      src = (y - 1) * w + x - 1;
+      int h00 = idx [src];
+      int h10 = idx [src + 1];
+      int h01 = idx [src + w];
+      int h11 = idx [src + w + 1];
+      if (h00 < 0 || h10 < 0 || h01 < 0 || h11 < 0)
+      {
+        if (h00 >= 0 && h10 >= 0 && h11 >= 0)
+          fprintf (f, "    POLYGON(VERTICES(%d,%d,%d))\n", h00, h10, h11);
+        else if (h00 >= 0 && h11 >= 0 && h01 >= 0)
+          fprintf (f, "    POLYGON(VERTICES(%d,%d,%d))\n", h00, h11, h01);
+        else if (h10 >= 0 && h11 >= 0 && h01 >= 0)
+          fprintf (f, "    POLYGON(VERTICES(%d,%d,%d))\n", h10, h11, h01);
+        else if (h00 >= 0 && h10 >= 0 && h01 >= 0)
+          fprintf (f, "    POLYGON(VERTICES(%d,%d,%d))\n", h00, h10, h01);
+      }
+      else
+        fprintf (f, "    POLYGON(VERTICES(%d,%d,%d)) POLYGON(VERTICES(%d,%d,%d))\n",
+          h00, h10, h11, h00, h11, h01);
+    }
+
+  delete idx;
+
+  fprintf (f, "  )\n)\n");
+  fclose (f);
+
+  return true;
+}
+
 static bool process_file (const char *fname)
 {
   printf ("Loading file %s\n", fname);
@@ -154,7 +322,8 @@ static bool process_file (const char *fname)
   fclose (f);
 
   int fmt;
-  if (opt.paletted)
+  if (opt.outputmode > 0
+   || opt.paletted)
     fmt = CS_IMGFMT_PALETTED8;
   else if (opt.truecolor)
     fmt = CS_IMGFMT_TRUECOLOR;
@@ -201,58 +370,24 @@ static bool process_file (const char *fname)
     sprintf (strchr (suffix, 0), "-m%d", opt.mipmap);
   }
 
-  if (opt.save)
+  bool success = false;
+  switch (opt.outputmode)
   {
-    char outname [MAXPATHLEN + 1];
-    strcpy (outname, fname);
-    char *eol = strchr (outname, 0);
-    while (eol > outname && *eol != '.') eol--;
-    if (eol == outname) eol = strchr (outname, 0);
-    strcpy (eol, suffix);
-    strcat (eol, ".png");
-    printf ("Saving output file %s\n", outname);
-
-#if 1
-    if (!csSavePNG (outname, ifile))
-      return false;
-#else
-    if (!SavePNM (outname, ifile->GetImageData (), ifile->GetWidth (), ifile->GetHeight (),
-         (ifile->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR))
-      return false;
-#endif
-  }
-
-  if (opt.display)
-  {
-    static char imgchr [] = " .,;+*oO";
-    ifile->Rescale (opt.displayW, opt.displayH);
-    RGBPixel *rgb;
-    UByte *idx = NULL;
-    bool truecolor = (ifile->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR;
-    if (truecolor)
-      rgb = (RGBPixel *)ifile->GetImageData ();
-    else
-    {
-      idx = (UByte *)ifile->GetImageData ();
-      rgb = ifile->GetPalette ();
-    }
-    for (int y = 0; y < opt.displayH; y++)
-    {
-      for (int x = 0; x < opt.displayW; x++)
-      {
-        RGBPixel &src = truecolor ? *rgb++ : rgb [*idx++];
-        int gray = int (sqrt (src.red * src.red + src.green * src.green +
-          src.blue * src.blue) * 8 / 442);
-        putc (imgchr [gray], stdout);
-      }
-      putc ('\n', stdout);
-    }
+    case 0:
+      success = output_picture (fname, suffix, ifile);
+      break;
+    case 1:
+      success = display_picture (ifile);
+      break;
+    case 2:
+      success = output_heightmap (fname, ifile);
+      break;
   }
 
   // Destroy the image object
   ifile->DecRef ();
 
-  return true;
+  return success;
 }
 
 int main (int argc, char **argv)
@@ -264,7 +399,7 @@ int main (int argc, char **argv)
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cd::s:m:t:hvV", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cd::s:m:t:DSH::hvV", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
@@ -280,8 +415,7 @@ int main (int argc, char **argv)
         opt.dither = true;
         break;
       case 'D':
-        opt.save = false;
-        opt.display = true;
+        opt.outputmode = 1;
         if (optarg &&
             sscanf (optarg, "%d,%d", &opt.displayW, &opt.displayH) != 2)
         {
@@ -320,6 +454,14 @@ int main (int argc, char **argv)
         {
           printf ("%s: bad mipmap level (%d): should be one of 0,1,2,3\n", programname, opt.mipmap);
           return -1;
+        }
+        break;
+      case 'H':
+        opt.outputmode = 2;
+        if (optarg)
+        {
+          sscanf (optarg, "%g", &opt.hmscale);
+          opt.hmscale *= 1/500.0;
         }
         break;
       case 'h':

@@ -133,6 +133,8 @@ WalkTest::WalkTest () :
   move_forward = false;
   cfg_draw_octree = 0;
 
+  plbody = pllegs = NULL;
+
   velocity.Set (0, 0, 0);
   angle.Set (0, 0, 0);
   angle_velocity.Set (0, 0, 0);
@@ -146,7 +148,6 @@ WalkTest::WalkTest () :
 WalkTest::~WalkTest ()
 {
   MyAppDestructor1();   // provided so app developer can delete as needed
-  if (World) World->DecRef ();
   if (collide_system) collide_system->DecRef ();
   delete wf;
   delete [] auto_script;
@@ -155,8 +156,9 @@ WalkTest::~WalkTest ()
   delete infinite_maze;
   delete huge_room;
   delete cslogo;
-  delete body;
-  delete legs;
+  delete plbody;
+  delete pllegs;
+  if (World) World->DecRef ();
   MyAppDestructor2();   // provided so app developer can delete as needed
 }
 
