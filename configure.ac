@@ -1532,10 +1532,8 @@ CS_CHECK_LIB_WITH([cal3d],
 AS_IF([test $cs_cv_libcal3d = yes],
     [CS_CHECK_BUILD([if cal3d is sufficiently recent], [cs_cv_cal3d_recent],
 	[AC_LANG_PROGRAM(
-	    [[#include <cal3d/cal3d.h>
-	    #include <cal3d/animcallback.h>]],
-	    [CalAnimationCallback* c = 0;
-	    c->AnimationComplete((CalModel*)0, (void*)0);])],
+	    [[#include <cal3d/cal3d.h>]],
+	    [CalCoreAnimation* p = 0; unsigned int n = p->getTrackCount();])],
 	[], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])], [], [],
 	[$cs_cv_libcal3d_cflags],

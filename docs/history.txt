@@ -23,6 +23,8 @@ chronological order.
 	- Jorrit added csSolidSpace class in csgeom. This is a class that will
 	  maintain a sparse 3D matrix of solid space. Currently untested
 	  and unused.
+	- Eric Sunshine upgraded configure.ac so that it demands the very
+	  latest CVS version of cal3d.
 22-Mar-2005
 	- Jorrit removed the slow RAPID and memory consuming collision
 	  detection plugin. OPCODE is now a lot better.
