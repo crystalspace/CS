@@ -26,15 +26,14 @@
 #include "csgfxldr/bmpimage.h"
 #include "cssys/csendian.h"
 
-//---------------------------------------------------------------------------
-
 bool RegisterBMP ()
 {
   static csBMPImageLoader loader;
   return csImageLoader::Register (&loader);
 }
 
-csImageFile* csBMPImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
+csImageFile* csBMPImageLoader::LoadImage (UByte* iBuffer, ULong iSize,
+  int iFormat)
 {
   CHK (ImageBMPFile* i = new ImageBMPFile (iFormat));
   if (i && !i->Load (iBuffer, iSize))
@@ -45,34 +44,49 @@ csImageFile* csBMPImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iForm
   return i;
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Some platforms require strict-alignment, which means that values of
+// primitive types must be accessed at memory locations which are multiples
+// of the size of those types.  For instance, a 'long' can only be accessed
+// at a memory location which is a multiple of four.  Consequently, the
+// following endian-conversion functions first copy the raw data into a
+// variable of the proper data type using memcpy() prior to attempting to
+// access it as the given type.
+//-----------------------------------------------------------------------------
 
-//-----------------
-// very private minihelpers
-class minihelp{
-public:
-UShort* us_endian( char* ptr ){ us = convert_endian( *((UShort*)ptr) ); return &us; }
-ULong* ul_endian( char* ptr ){ ul = convert_endian( *((ULong*)ptr) ); return &ul; }
-long* l_endian( char* ptr ){ l = convert_endian( *((long*)ptr) ); return &l; }
-ULong ul;
-UShort us;
-long l;
-} vpmh;
+static inline UShort us_endian(const UByte* ptr)
+{
+  UShort n;
+  memcpy(&n, ptr, sizeof(n));
+  return convert_endian(n);
+}
 
-#define BFTYPE(x)    vpmh.us_endian(((char *) (x)))
-#define BFSIZE(x)    vpmh.ul_endian(((char *) (x))+2)
-#define BFOFFBITS(x) vpmh.ul_endian(((char *) (x))+10)
-#define BISIZE(x)    vpmh.ul_endian(((char *) (x))+14)
-#define BIWIDTH(x)   vpmh.l_endian(((char *) (x))+18)
-#define BIHEIGHT(x)  vpmh.l_endian(((char *) (x))+22)
-#define BITCOUNT(x)  vpmh.us_endian(((char *) (x))+28)
-#define BICOMP(x)    vpmh.ul_endian (((char *) (x))+30)
-#define IMAGESIZE(x) vpmh.ul_endian(((char *) (x))+34)
-#define BICLRUSED(x) vpmh.ul_endian(((char *) (x))+46)
-#define BICLRIMP(x)  vpmh.ul_endian(((char *) (x))+50)
-#define BIPALETTE(x) (char *) (((char *) (x))+54)
+static inline ULong ul_endian(const UByte* ptr)
+{
+  ULong n;
+  memcpy(&n, ptr, sizeof(n));
+  return convert_endian(n);
+}
 
-//-----------------
+static inline long l_endian(const UByte* ptr)
+{
+  long n;
+  memcpy(&n, ptr, sizeof(n));
+  return convert_endian(n);
+}
+
+#define BFTYPE(x)    us_endian((x) +  0)
+#define BFSIZE(x)    ul_endian((x) +  2)
+#define BFOFFBITS(x) ul_endian((x) + 10)
+#define BISIZE(x)    ul_endian((x) + 14)
+#define BIWIDTH(x)   l_endian ((x) + 18)
+#define BIHEIGHT(x)  l_endian ((x) + 22)
+#define BITCOUNT(x)  us_endian((x) + 28)
+#define BICOMP(x)    ul_endian((x) + 30)
+#define IMAGESIZE(x) ul_endian((x) + 34)
+#define BICLRUSED(x) ul_endian((x) + 46)
+#define BICLRIMP(x)  ul_endian((x) + 50)
+#define BIPALETTE(x) ((x) + 54)
 
 // Type ID
 #define BM "BM" // Windows 3.1x, 95, NT, ...
@@ -103,60 +117,44 @@ long l;
 #define BI_BITFIELDS  3  // Bitfields
 #endif
 
-/*
-#define BFTYPE(x)    (UShort *)(((char *) (x)))
-#define BFSIZE(x)    (ULong *) (((char *) (x))+2)
-#define BFOFFBITS(x) (ULong *) (((char *) (x))+10)
-#define BISIZE(x)    (ULong *) (((char *) (x))+14)
-#define BIWIDTH(x)   (long *)  (((char *) (x))+18)
-#define BIHEIGHT(x)  (long *)  (((char *) (x))+22)
-#define BITCOUNT(x)  (UShort *)(((char *) (x))+28)
-#define BICOMP(x)    (ULong *) (((char *) (x))+30)
-#define IMAGESIZE(x) (ULong *) (((char *) (x))+34)
-#define BICLRUSED(x) (ULong *) (((char *) (x))+46)
-#define BICLRIMP(x)  (ULong *) (((char *) (x))+50)
-#define BIPALETTE(x) (char *)  (((char *) (x))+54)
-#define PALENT(x,i)  (char *)  (((ULong *)(x))+i)
-*/
-
 //---------------------------------------------------------------------------
 
 bool ImageBMPFile::Load (UByte* iBuffer, ULong iSize)
 {
-  if ((memcmp (iBuffer, BM, 2) == 0) && (*BISIZE(iBuffer)) == WinHSize)
+  if ((memcmp (iBuffer, BM, 2) == 0) && BISIZE(iBuffer) == WinHSize)
     return LoadWindowsBitmap (iBuffer, iSize);
   return false;
 }
 
 bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
 {
-  set_dimensions (*BIWIDTH(iBuffer), *BIHEIGHT(iBuffer));
+  set_dimensions (BIWIDTH(iBuffer), BIHEIGHT(iBuffer));
   const int bmp_size = Width * Height;
 
-  UByte *iPtr = iBuffer + *BFOFFBITS(iBuffer);
+  UByte *iPtr = iBuffer + BFOFFBITS(iBuffer);
 
   // The last scanline in BMP corresponds to the top line in the image
   int  buffer_y = Width * (Height - 1);
   bool blip     = false;
 
-  if ((*BITCOUNT(iBuffer)) == _256Color && (*BICLRUSED(iBuffer)))
+  if (BITCOUNT(iBuffer) == _256Color && BICLRUSED(iBuffer))
   {
     UByte    *buffer  = new UByte [bmp_size];
     RGBPixel *palette = new RGBPixel [256];
+    RGBPixel *pwork   = palette;
+    UByte    *inpal   = BIPALETTE(iBuffer);
 
-    // Get the palette first: suppose sizeof (RGBPixel) == sizeof (ULong)
-    for (int color = 0; color < 256; color++)
+    for (int color = 0; color < 256; color++, pwork++)
     {  
-      //We can't just copy the BMP palette to the palette structure, because
-      //in a Bitmap file, colors are not in RGB order!
-      palette[color].red   = *(BIPALETTE(iBuffer) + 4*color + 2);
-      palette[color].green = *(BIPALETTE(iBuffer) + 4*color + 1);
-      palette[color].blue  = *(BIPALETTE(iBuffer) + 4*color + 0);
-      palette[color].alpha = 0;
+      // Whacky BMP palette is in BGR order.
+      pwork->blue  = *inpal++;
+      pwork->green = *inpal++;
+      pwork->red   = *inpal++;
+      pwork->alpha = 0;
+      inpal++; // Skip unused byte.
     }
-    //memcpy (palette, BIPALETTE (iBuffer), 256 * sizeof (RGBPixel));
 
-    if ((*BICOMP(iBuffer)) == BI_RGB)
+    if (BICOMP(iBuffer) == BI_RGB)
     {
       // Read the pixels from "top" to "bottom"
       while (iPtr < iBuffer + iSize && buffer_y >= 0)
@@ -166,7 +164,7 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
         buffer_y -= Width;
       } /* endwhile */
     }
-    else if ((*BICOMP(iBuffer)) == BI_RLE8)
+    else if (BICOMP(iBuffer) == BI_RLE8)
     {
       // Decompress pixel data
       UByte rl, rl1, i;			// runlength
@@ -223,7 +221,7 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
     convert_pal8 (buffer, palette);
     return true;
   }
-  else if (!(*BICLRUSED(iBuffer)) && (*BITCOUNT(iBuffer)) == TRUECOLOR24)
+  else if (!BICLRUSED(iBuffer) && BITCOUNT(iBuffer) == TRUECOLOR24)
   {
     RGBPixel *buffer = new RGBPixel [bmp_size];
 
