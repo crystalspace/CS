@@ -1,3 +1,5 @@
+- IMPORTANT: fix bug with moving objects with dynavis AND frustvis.
+
 - Seperate the outline info from csObjectModel. An outline is not attached
   to a model but to an instance of a model (perhaps make
   csObjectModelInstance?).
