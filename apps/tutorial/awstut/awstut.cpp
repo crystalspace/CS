@@ -229,14 +229,10 @@ int main (int argc, char *argv[])
 
   // Initialize the main system. This will load all needed plug-ins
   // and initialize them.
-  if (!System->Initialize (argc, argv))
-  {
+  if (System->Initialize (argc, argv))
+    csDefaultRunLoop (System->object_reg);// Main loop.
+  else
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
-    exit (1);
-  }
-
-  // Main loop.
-  csDefaultRunLoop (System->object_reg);
 
   delete System;
   return 0;

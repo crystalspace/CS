@@ -28,6 +28,10 @@ The history order is reversed so that new features are at the top.
 	  USE_NEW_RENDERER makefile var.
 	- duhprey added missing SCF_CONSTRUCT_IBASE () in csRenderLoop 
 	  constructor
+	- Luca Cappa (groton@gmx.net) fixed a very small bug in awstut: in fact
+	  in the main (), if the Initialize() method would fail, there will be a
+	  memory leak due to the non-destruction of the awsTutorial class
+	  instance.
 11-Jun-2003
 	- Eric Sunshine removed an invocation of class_scfFinalize() from
 	  SCF_REGISTER_STATIC_CLASS() which should have been removed yesterday
