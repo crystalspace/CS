@@ -97,7 +97,7 @@ chronological order.
 	    - Updated aws/Jamfile to also apply -Wno-unused to skinpars.cpp.
 	    - Worked around bizarre preprocessor error on older MacOS/X
 	      installations where it fails to search CS/plugins/aws for headers
-	      #included by aws/skinpars.cpp (at least building outside the
+	      #included by aws/skinpars.cpp (at least when building outside the
 	      source tree).  Work-around in aws.mak and Jamfile involves
 	      explicitly adding -I$(SRCDIR)/plugins/aws to CFLAGS for
 	      skinpars.cpp.
