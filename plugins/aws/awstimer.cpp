@@ -34,18 +34,16 @@ awsTimer::awsTimer (iObjectRegistry *object_reg, iAwsComponent *comp) : awsSourc
   bSetup = false;
   stopped = true;
   vc = NULL;
+  eq = NULL;
 }
 
 awsTimer::~awsTimer ()
 {
   if (ehSetup)
   {
-    iEventQueue *eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (eq)
-    {
+    if (!stopped)
       eq->RemoveListener (&scfiEventHandler);
-      eq->DecRef ();
-    }
+    eq->DecRef ();
   }
   SCF_DEC_REF (vc);
 }
@@ -56,20 +54,15 @@ bool awsTimer::Setup ()
   {
     if (!ehSetup)
     {
-      iEventQueue *eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-      if (eq)
-      {
-        eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
-        eq->DecRef ();
-        ehSetup = true;
-      }
+      eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+      ehSetup = (eq != NULL);
     }
     if (!vc)
-    {
       vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-    }
+
     bSetup = ehSetup && (vc!=NULL);
   }
+
   return bSetup;
 }
 
@@ -81,7 +74,7 @@ bool awsTimer::SetTimer (csTicks nTicks)
 
 bool awsTimer::HandleEvent (iEvent &Event)
 {
-  if (bSetup && !stopped  && Event.Type == csevBroadcast && Event.Command.Code == cscmdPreProcess)
+  if (Event.Type == csevBroadcast && Event.Command.Code == cscmdPreProcess)
   {
     csTicks now = vc->GetCurrentTicks ();
     csTicks delta = now - start;
@@ -104,12 +97,15 @@ bool awsTimer::HandleEvent (iEvent &Event)
 void awsTimer::Stop ()
 {
   stopped = true;
+  if (ehSetup)
+    eq->RemoveListener (&scfiEventHandler);
 }
 
 bool awsTimer::Start ()
 {
   if (Setup())
   {
+    eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
     stopped = false;
     start = vc->GetCurrentTicks ();
   }

@@ -22,6 +22,7 @@
 
 #include "awsslot.h"
 #include "iutil/eventh.h"
+#include "iutil/eventq.h"
 #include "iutil/virtclk.h"
 #include "iutil/objreg.h"
 
@@ -40,6 +41,7 @@ class awsTimer : public awsSource
   csTicks start, nTicks;
 
   iVirtualClock *vc;
+  iEventQueue *eq;
   iObjectRegistry *object_reg;
 
   // try to set up everything needed
