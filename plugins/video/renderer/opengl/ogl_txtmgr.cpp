@@ -877,8 +877,13 @@ void csTextureManagerOpenGL::UnregisterTexture (csTextureHandleOpenGL *handle)
 
 void csTextureManagerOpenGL::Clear ()
 {
-  for (int i=0; i < textures.Length (); i++)
+  int i;
+  for (i=0; i < textures.Length (); i++)
     ((csTextureHandleOpenGL *)textures.Get (i))->Clear ();
+  for (i = 0; i < superLMs.Length(); i++)
+  {
+    superLMs[i]->DeleteTexture();
+  }
 
   csTextureManager::Clear ();
 }

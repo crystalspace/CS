@@ -1188,10 +1188,15 @@ void csGLTextureManager::AlterTargetFormat (const char *oldTarget,
 
 void csGLTextureManager::Clear()
 {
-  for (int i=0; i < textures.Length (); i++)
+  int i;
+  for (i=0; i < textures.Length (); i++)
   {
     csGLTextureHandle* tex = textures[i];
     if (tex) tex->Clear ();
+  }
+  for (i = 0; i < superLMs.Length(); i++)
+  {
+    superLMs[i]->DeleteTexture();
   }
 }
 

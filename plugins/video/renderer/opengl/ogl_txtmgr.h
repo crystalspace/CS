@@ -200,8 +200,6 @@ class csGLSuperLightmap : public iSuperLightmap
 
   /// Actually create the GL texture.
   void CreateTexture ();
-  /// Remove the GL texture.
-  void DeleteTexture ();
   /**
    * Free a lightmap. Will also delete the GL texture if no LMs are on 
    * this SLM.
@@ -212,6 +210,8 @@ public:
   GLuint texHandle;
   /// Dimensions of this SLM
   int w, h;
+  /// Remove the GL texture.
+  void DeleteTexture ();
 
   /// The texture manager that created this SLM.
   csTextureManagerOpenGL* txtmgr;

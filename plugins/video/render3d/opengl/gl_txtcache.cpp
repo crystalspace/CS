@@ -397,7 +397,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j,
                       i,
-                      /*txt_mm->TargetFormat ()*/GL_RGBA8 ,
+                      /*txt_mm->TargetFormat ()*/GL_RGBA8,
                       togl->get_width (),
                       togl->get_height(),
                       0,
