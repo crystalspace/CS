@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2004 by Jorrit Tyberghein
     With additions by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
@@ -301,6 +301,8 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   return true;
 }
 
+#define BENCHTIME 3000
+
 void CsBench::BenchMark (const char* name, const char* description)
 {
   Report ("================================================================");
@@ -309,7 +311,7 @@ void CsBench::BenchMark (const char* name, const char* description)
   vc->Advance ();
   csTicks current_time = vc->GetCurrentTicks ();
   int cnt = 0;
-  while (vc->GetCurrentTicks () < current_time+2000)
+  while (vc->GetCurrentTicks () < current_time+BENCHTIME)
   {
     cnt++;
 
@@ -335,8 +337,8 @@ void CsBench::BenchMark (const char* name, const char* description)
       	shotbuf->GetSize ());
     }
   }
-  Report ("Performance is %d frames in 5 seconds: %g fps",
-  	cnt, float (cnt) / 5.0f);
+  Report ("Performance is %d frames in %d seconds: %g fps",
+  	cnt, BENCHTIME / 1000, float (cnt * 1000) / float (BENCHTIME));
 
   // Due to some limitation in VFS we cannot let the stdrep plugin write
   // directly to a file in a zip archive. So at this point we copy the
