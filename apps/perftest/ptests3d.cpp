@@ -306,7 +306,6 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   draw = 0;
   mesh.num_vertices = (NUM_MULTIPOLTEST+1)*(NUM_MULTIPOLTEST/2+1);
   mesh.num_vertices_pool = 1;
-  mesh.num_materials = 1;
   mesh.num_triangles = NUM_MULTIPOLTEST*NUM_MULTIPOLTEST;
   mesh.triangles = new csTriangle [mesh.num_triangles];
   mesh.use_vertex_color = false;
@@ -319,8 +318,8 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   mesh.fxmode = CS_FX_COPY;
   mesh.morph_factor = 0;
   mesh.vertices[0] = new csVector3 [mesh.num_vertices];
-  mesh.texels[0][0] = new csVector2 [mesh.num_vertices];
-  mesh.mat_handle[0] = perftest->GetMaterial (0);
+  mesh.texels[0] = new csVector2 [mesh.num_vertices];
+  mesh.mat_handle = perftest->GetMaterial (0);
   int i;
   int x, y;
   float w = (g3d->GetWidth ()-20)/2;
@@ -333,7 +332,7 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       	w * float (x-NUM_MULTIPOLTEST/2) / float (NUM_MULTIPOLTEST/2),
       	h * float (y-NUM_MULTIPOLTEST/2) / float (NUM_MULTIPOLTEST/2) + h/2,
 	1.);
-      mesh.texels[0][0][i].Set (
+      mesh.texels[0][i].Set (
         float (x) / float (NUM_MULTIPOLTEST),
         float (y) / float (NUM_MULTIPOLTEST/2)
         );
@@ -367,7 +366,7 @@ Tester* MeshTester::NextTester ()
 {
   delete [] mesh.triangles;
   delete [] mesh.vertices[0];
-  delete [] mesh.texels[0][0];
+  delete [] mesh.texels[0];
   return new PixmapTester ();
 }
 

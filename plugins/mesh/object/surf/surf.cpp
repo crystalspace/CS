@@ -56,7 +56,7 @@ csSurfMeshObject::csSurfMeshObject (iMeshObjectFactory* factory)
   vis_cb = NULL;
   mesh.vertices[0] = NULL;
   mesh.vertex_colors[0] = NULL;
-  mesh.texels[0][0] = NULL;
+  mesh.texels[0] = NULL;
   mesh.triangles = NULL;
   mesh.vertex_fog = NULL;
   shapenr = 0;
@@ -70,7 +70,7 @@ csSurfMeshObject::~csSurfMeshObject ()
 {
   delete[] mesh.vertices[0];
   delete[] mesh.vertex_colors[0];
-  delete[] mesh.texels[0][0];
+  delete[] mesh.texels[0];
   delete[] mesh.triangles;
   delete[] mesh.vertex_fog;
 }
@@ -188,8 +188,8 @@ void csSurfMeshObject::GenerateSurface (G3DTriangleMesh& mesh)
   mesh.num_vertices = num_vertices;
   mesh.vertices[0] = new csVector3[num_vertices];
   memcpy (mesh.vertices[0], vertices, sizeof(csVector3)*num_vertices);
-  mesh.texels[0][0] = new csVector2[num_vertices];
-  memcpy (mesh.texels[0][0], uvverts, sizeof(csVector2)*num_vertices);
+  mesh.texels[0] = new csVector2[num_vertices];
+  memcpy (mesh.texels[0], uvverts, sizeof(csVector2)*num_vertices);
   mesh.vertex_colors[0] = new csColor[num_vertices];
   csColor* colors = mesh.vertex_colors[0];
   for (i = 0 ; i < num_vertices ; i++)
@@ -232,19 +232,18 @@ void csSurfMeshObject::SetupObject ()
     initialized = true;
     delete[] mesh.vertices[0];
     delete[] mesh.vertex_colors[0];
-    delete[] mesh.texels[0][0];
+    delete[] mesh.texels[0];
     delete[] mesh.triangles;
     delete[] mesh.vertex_fog;
     mesh.vertices[0] = NULL;
     mesh.vertex_colors[0] = NULL;
-    mesh.texels[0][0] = NULL;
+    mesh.texels[0] = NULL;
     mesh.triangles = NULL;
     mesh.vertex_fog = NULL;
 
     GenerateSurface (mesh);
     RecalcObjectBBox ();
     RecalcSurfaceNormal ();
-    mesh.num_materials = 1;
     mesh.morph_factor = 0;
     mesh.num_vertices_pool = 1;
     mesh.do_morph_texels = false;
@@ -380,7 +379,7 @@ bool csSurfMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
 
   material->Visit ();
-  mesh.mat_handle[0] = mat;
+  mesh.mat_handle = mat;
   mesh.use_vertex_color = true;
   mesh.fxmode = MixMode | CS_FX_GOURAUD;
   //mesh.do_clip = true;

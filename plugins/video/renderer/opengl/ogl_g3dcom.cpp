@@ -1460,7 +1460,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // if any of those are needed. When this is done 'verts' will
   // point to an array of camera vertices.
   csVector3* f1 = mesh.vertices[0];
-  csVector2* uv1 = mesh.texels[0][0];
+  csVector2* uv1 = mesh.texels[0];
   csColor* col1 = mesh.vertex_colors[0];
   csVector3* work_verts;
   csVector2* work_uv_verts;
@@ -1472,7 +1472,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     float tween_ratio = mesh.morph_factor;
     float remainder = 1 - tween_ratio;
     csVector3* f2 = mesh.vertices[1];
-    csVector2* uv2 = mesh.texels[1][0];
+    csVector2* uv2 = mesh.texels[1];
     csColor* col2 = mesh.vertex_colors[1];
     for (i = 0 ; i < mesh.num_vertices ; i++)
     {
@@ -1610,8 +1610,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   csTriangle *triangles = mesh.triangles;
 
   // Draw all triangles.
-  StartPolygonFX (mesh.mat_handle[0], mesh.fxmode);
-  csMaterialHandle* mat = (csMaterialHandle*)mesh.mat_handle[0];
+  StartPolygonFX (mesh.mat_handle, mesh.fxmode);
+  csMaterialHandle* mat = (csMaterialHandle*)mesh.mat_handle;
   bool multitex = mat->GetNumTextureLayers () > 0;
   bool colstate_enabled = false;
   bool do_gouraud = m_gouraud && work_colors;
@@ -1635,7 +1635,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     {
       // Fill flat color if renderer decide to paint it flat-shaded
       UByte r,g,b;
-      mesh.mat_handle[0]->GetTexture ()->GetMeanColor (r, g, b);
+      mesh.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
       flat_r = BYTE_TO_FLOAT (r);
       flat_g = BYTE_TO_FLOAT (g);
       flat_b = BYTE_TO_FLOAT (b);

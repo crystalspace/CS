@@ -1335,7 +1335,6 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
   G3DTriangleMesh mesh;
   mesh.morph_factor = 0;
   mesh.num_vertices_pool = 1;
-  mesh.num_materials = 1;
   mesh.do_mirror = icam->IsMirrored ();
   mesh.do_morph_texels = false;
   mesh.do_morph_colors = false;
@@ -1398,10 +1397,10 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     }
 
     c->GetMaterialWrapper ()->Visit ();
-    mesh.mat_handle[0] = c->GetMaterialHandle ();
+    mesh.mat_handle = c->GetMaterialHandle ();
     mesh.num_vertices = tess->GetNumVertices ();
     mesh.vertices[0] = tess->GetVertices ();
-    mesh.texels[0][0] = tess->GetTxtCoords ();
+    mesh.texels[0] = tess->GetTxtCoords ();
     mesh.vertex_colors[0] = tess->GetColors ();
     mesh.num_triangles = tess->GetNumTriangles ();
     mesh.triangles = tess->GetTriangles ();
@@ -1410,7 +1409,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     bool gouraud = !!c->lightmap;
     mesh.fxmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);
     mesh.use_vertex_color = gouraud;
-    if (mesh.mat_handle[0] == NULL)
+    if (mesh.mat_handle == NULL)
     {
       CsPrintf (MSG_STDOUT, "Warning! Curve without material!\n");
       continue;

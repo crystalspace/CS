@@ -429,7 +429,6 @@ void csDDGTerrainObject::Draw (iRenderView* rview, bool use_z_buf)
     g3dmesh.vertex_colors[0] = NULL;
     g3dmesh.morph_factor = 0;
     g3dmesh.num_vertices_pool = 1;
-    g3dmesh.num_materials = 1;
     g3dmesh.use_vertex_color = false;
     g3dmesh.do_morph_texels = false;
     g3dmesh.do_morph_colors = false;
@@ -453,13 +452,13 @@ void csDDGTerrainObject::Draw (iRenderView* rview, bool use_z_buf)
       if (_materialMap && _materialMap[i/2])
       {
 	_materialMap[i/2]->Visit ();
-	g3dmesh.mat_handle[0] = _materialMap[i/2]->GetMaterialHandle ();
+	g3dmesh.mat_handle = _materialMap[i/2]->GetMaterialHandle ();
       }
       // Render this block.
       // For software renderer we need to pass in a little bit at a time.
       g3dmesh.num_vertices = nd;  // Number of shared vertices for all triangles
       g3dmesh.vertices[0] = (csVector3*) &(vbuf->vbuf[n]);  // Vertex array
-      g3dmesh.texels[0][0] = (csVector2*) &(vbuf->tbuf[n]); // Uv coordinates
+      g3dmesh.texels[0] = (csVector2*) &(vbuf->tbuf[n]); // Uv coordinates
       g3dmesh.num_triangles = d; // Number of triangles
       g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);
       // Enable clipping for blocks that are not entirely within the

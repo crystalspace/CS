@@ -303,7 +303,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   // if any of those are needed. When this is done 'verts' will
   // point to an array of camera vertices.
   csVector3* f1 = mesh.vertices[0];
-  csVector2* uv1 = mesh.texels[0][0];
+  csVector2* uv1 = mesh.texels[0];
   csVector3* work_verts;
   csVector2* work_uv_verts;
   csColor* work_col;
@@ -317,7 +317,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     float tween_ratio = mesh.morph_factor;
     float remainder = 1 - tween_ratio;
     csVector3* f2 = mesh.vertices[1];
-    csVector2* uv2 = mesh.texels[1][0];
+    csVector2* uv2 = mesh.texels[1];
     csColor* col2 = NULL;
     if (mesh.use_vertex_color)
       col2 = mesh.vertex_colors[1];
@@ -388,14 +388,14 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   memset (&poly, 0, sizeof(poly));
 
   // Fill flat color if renderer decide to paint it flat-shaded
-  iTextureHandle* txt_handle = mesh.mat_handle[0]->GetTexture ();
+  iTextureHandle* txt_handle = mesh.mat_handle->GetTexture ();
   if (txt_handle)
     txt_handle->GetMeanColor (poly.flat_color_r,
       poly.flat_color_g, poly.flat_color_b);
 
   poly.use_fog = mesh.do_fog;
 
-  g3d->StartPolygonFX (mesh.mat_handle[0], mesh.fxmode);
+  g3d->StartPolygonFX (mesh.mat_handle, mesh.fxmode);
 
   // Draw all triangles.
   csTriangle* triangles = mesh.triangles;

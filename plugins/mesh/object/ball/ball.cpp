@@ -58,7 +58,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   top_normals = NULL;
   top_mesh.vertices[0] = NULL;
   top_mesh.vertex_colors[0] = NULL;
-  top_mesh.texels[0][0] = NULL;
+  top_mesh.texels[0] = NULL;
   top_mesh.triangles = NULL;
   top_mesh.vertex_fog = NULL;
   shapenr = 0;
@@ -76,7 +76,7 @@ csBallMeshObject::~csBallMeshObject ()
   delete[] top_normals;
   delete[] top_mesh.vertices[0];
   delete[] top_mesh.vertex_colors[0];
-  delete[] top_mesh.texels[0][0];
+  delete[] top_mesh.texels[0];
   delete[] top_mesh.triangles;
   delete[] top_mesh.vertex_fog;
 }
@@ -378,8 +378,8 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   mesh.num_vertices = num_vertices;
   mesh.vertices[0] = new csVector3[num_vertices];
   memcpy (mesh.vertices[0], vertices, sizeof(csVector3)*num_vertices);
-  mesh.texels[0][0] = new csVector2[num_vertices];
-  memcpy (mesh.texels[0][0], uvverts, sizeof(csVector2)*num_vertices);
+  mesh.texels[0] = new csVector2[num_vertices];
+  memcpy (mesh.texels[0], uvverts, sizeof(csVector2)*num_vertices);
   mesh.vertex_colors[0] = new csColor[num_vertices];
   csColor* colors = mesh.vertex_colors[0];
   for (i = 0 ; i < num_vertices ; i++)
@@ -402,13 +402,13 @@ void csBallMeshObject::SetupObject ()
     delete[] top_normals;
     delete[] top_mesh.vertices[0];
     delete[] top_mesh.vertex_colors[0];
-    delete[] top_mesh.texels[0][0];
+    delete[] top_mesh.texels[0];
     delete[] top_mesh.triangles;
     delete[] top_mesh.vertex_fog;
     top_normals = NULL;
     top_mesh.vertices[0] = NULL;
     top_mesh.vertex_colors[0] = NULL;
-    top_mesh.texels[0][0] = NULL;
+    top_mesh.texels[0] = NULL;
     top_mesh.triangles = NULL;
     top_mesh.vertex_fog = NULL;
 
@@ -421,7 +421,6 @@ void csBallMeshObject::SetupObject ()
     object_bbox.AddBoundingVertexSmart (csVector3 ( radiusx/2, -radiusy/2,  radiusz/2));
     object_bbox.AddBoundingVertexSmart (csVector3 (-radiusx/2,  radiusy/2,  radiusz/2));
     object_bbox.AddBoundingVertexSmart (csVector3 ( radiusx/2,  radiusy/2,  radiusz/2));
-    top_mesh.num_materials = 1;
     top_mesh.morph_factor = 0;
     top_mesh.num_vertices_pool = 1;
     top_mesh.do_morph_texels = false;
@@ -557,7 +556,7 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
 
   material->Visit ();
-  top_mesh.mat_handle[0] = mat;
+  top_mesh.mat_handle = mat;
   top_mesh.use_vertex_color = true;
   top_mesh.fxmode = MixMode | CS_FX_GOURAUD;
   //top_mesh.do_clip = true;

@@ -183,10 +183,9 @@ void csCubeMeshObject::SetupObject ()
     triangles[9].a = 6; triangles[9].b = 3; triangles[9].c = 2;
     triangles[10].a = 0; triangles[10].b = 1; triangles[10].c = 4;
     triangles[11].a = 1; triangles[11].b = 5; triangles[11].c = 4;
-    mesh.num_materials = 1;
     mesh.num_vertices = 8;
     mesh.vertices[0] = vertices;
-    mesh.texels[0][0] = uv;
+    mesh.texels[0] = uv;
     mesh.vertex_colors[0] = colors;
     mesh.morph_factor = 0;
     mesh.num_vertices_pool = 1;
@@ -324,7 +323,7 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
 
   factory->GetMaterialWrapper ()->Visit ();
-  mesh.mat_handle[0] = mat;
+  mesh.mat_handle = mat;
   mesh.use_vertex_color = true;
   mesh.fxmode = factory->GetMixMode () | CS_FX_GOURAUD;
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), mesh);

@@ -1017,25 +1017,25 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // Setup the structure for DrawTriangleMesh.
   if (force_otherskin)
   {
-    g3dmesh.mat_handle[0] = cstxt->GetMaterialHandle ();
+    g3dmesh.mat_handle = cstxt->GetMaterialHandle ();
     cstxt->Visit ();
   }
   else
   {
-    g3dmesh.mat_handle[0] = factory->cstxt->GetMaterialHandle ();
+    g3dmesh.mat_handle = factory->cstxt->GetMaterialHandle ();
     factory->cstxt->Visit ();
   }
   if (!vertex_colors) AddVertexColor (0, csColor (0, 0, 0));
   g3dmesh.num_vertices = num_verts_for_lod;
   g3dmesh.vertices[0] = verts;
-  g3dmesh.texels[0][0] = real_uv_verts;
+  g3dmesh.texels[0] = real_uv_verts;
   g3dmesh.vertex_colors[0] = vertex_colors;
   if (do_tween)
   {
     g3dmesh.morph_factor = tween_ratio;
     g3dmesh.num_vertices_pool = 2;
     g3dmesh.vertices[1] = real_tween_verts;
-    g3dmesh.texels[1][0] = real_uv_verts;
+    g3dmesh.texels[1] = real_uv_verts;
     g3dmesh.vertex_colors[1] = vertex_colors;
   }
   else
@@ -1043,7 +1043,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     g3dmesh.morph_factor = 0;
     g3dmesh.num_vertices_pool = 1;
   }
-  g3dmesh.num_materials = 1;
 
   g3dmesh.num_triangles = m->GetNumTriangles ();
   g3dmesh.triangles = m->GetTriangles ();

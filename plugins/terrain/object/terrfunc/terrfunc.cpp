@@ -65,7 +65,7 @@ csTerrBlock::~csTerrBlock ()
   {
     delete[] mesh[i].vertices[0];
     delete[] mesh[i].vertex_colors[0];
-    delete[] mesh[i].texels[0][0];
+    delete[] mesh[i].texels[0];
     delete[] mesh[i].vertex_fog;
     delete[] mesh[i].triangles;
     delete[] normals[i];
@@ -664,13 +664,13 @@ void csTerrFuncObject::ComputeLODLevel (
   dest.vertices[0] = new csVector3[dest.num_vertices];
   dest.vertex_fog = new G3DFogInfo[dest.num_vertices];
   dest.vertex_colors[0] = new csColor[dest.num_vertices];
-  dest.texels[0][0] = new csVector2[dest.num_vertices];
+  dest.texels[0] = new csVector2[dest.num_vertices];
   dest.num_vertices = 0;
   for (i = 0 ; i < source.num_vertices ; i++)
   {
     if (translate[i] != -1)
     {
-      dest.texels[0][0][dest.num_vertices] = source.texels[0][0][i];
+      dest.texels[0][dest.num_vertices] = source.texels[0][i];
       dest.vertex_fog[dest.num_vertices] = source.vertex_fog[i];
       dest.vertex_colors[0][dest.num_vertices] = source.vertex_colors[0][i];
       dest.vertices[0][dest.num_vertices++] = source.vertices[0][i];
@@ -799,13 +799,12 @@ void csTerrFuncObject::InitMesh (G3DTriangleMesh& mesh)
   mesh.vertex_colors[0] = NULL;
   delete[] mesh.vertices[0];
   mesh.vertices[0] = NULL;
-  delete[] mesh.texels[0][0];
-  mesh.texels[0][0] = NULL;
+  delete[] mesh.texels[0];
+  mesh.texels[0] = NULL;
   delete[] mesh.vertex_fog;
   mesh.vertex_fog = NULL;
   mesh.morph_factor = 0;
   mesh.num_vertices_pool = 1;
-  mesh.num_materials = 1;
   mesh.use_vertex_color = true;
   mesh.do_morph_texels = false;
   mesh.do_morph_colors = false;
@@ -818,7 +817,7 @@ void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
 {
   mesh.num_vertices = (gridx+1) * (gridy+1);
   mesh.vertices[0] = new csVector3[mesh.num_vertices];
-  mesh.texels[0][0] = new csVector2[mesh.num_vertices];
+  mesh.texels[0] = new csVector2[mesh.num_vertices];
   mesh.vertex_fog = new G3DFogInfo [mesh.num_vertices];
   mesh.vertex_colors[0] = new csColor[mesh.num_vertices];
   csVector3 tl = topleft;
@@ -854,7 +853,7 @@ void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
       //uv.x = uv.x * .999;// + .0005;
       //uv.y = uv.y * .999;// + .0005;
 #endif
-      mesh.texels[0][0][vtidx] = uv;
+      mesh.texels[0][vtidx] = uv;
       mesh.vertex_colors[0][vtidx].Set (1, 1, 1);
     }
   }
@@ -1023,9 +1022,9 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
         if (sqdist > lod_sqdist[2]) lod++;
         RecomputeLighting (lod, bx, by);
         G3DTriangleMesh* m = &block.mesh[lod];
-        m->mat_handle[0] = block.material->GetMaterialHandle ();
-        if (!m->mat_handle[0])
-          m->mat_handle[0] = block.material->GetMaterialHandle ();
+        m->mat_handle = block.material->GetMaterialHandle ();
+        if (!m->mat_handle)
+          m->mat_handle = block.material->GetMaterialHandle ();
         m->do_mirror = pCamera->IsMirrored ();
         //@@@ It would be good to do proper handling of this
 	//flag in the 3D renderer.

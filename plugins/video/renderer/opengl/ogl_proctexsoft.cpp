@@ -429,17 +429,14 @@ void csOpenGLProcSoftware::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
   G3DTriangleMesh cmesh;
   memcpy (&cmesh, &mesh, sizeof(G3DTriangleMesh));
-  dummyMaterial dmat[2];
-  cmesh.mat_handle[0] = &dmat[0];
-  cmesh.mat_handle[1] = &dmat[1];
-  for (int i = 0; i < mesh.num_materials; i++)
-  {
-    int idx = txts_vector->FindKey ((void*)mesh.mat_handle[i]->GetTexture ());
-    if (idx == -1)
-	dmat[i].handle=txts_vector->RegisterAndPrepare(mesh.mat_handle[i]->GetTexture ());
-    else
-      dmat[i].handle =(iTextureHandle*) txts_vector->Get (idx)->soft_txt;
-  }
+  dummyMaterial dmat;
+  cmesh.mat_handle = &dmat;
+  int idx = txts_vector->FindKey ((void*)mesh.mat_handle->GetTexture ());
+  if (idx == -1)
+    dmat.handle = txts_vector->RegisterAndPrepare (
+    	mesh.mat_handle->GetTexture ());
+  else
+    dmat.handle =(iTextureHandle*) txts_vector->Get (idx)->soft_txt;
   g3d->DrawTriangleMesh (cmesh);
 }
 

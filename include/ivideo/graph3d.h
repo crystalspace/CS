@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Written by Jorrit Tyberghein, Dan Ogles, and Gary Clark.
 
     This library is free software; you can redistribute it and/or
@@ -190,7 +190,8 @@ typedef G3DPolygonDP G3DPolygonDPF;
 
 /**
  * Don't test/write, write, test, write/test and only write to Z-buffer
- * respectively. The values below are sometimes used as bit masks, so don't change them!
+ * respectively. The values below are sometimes used as bit masks,
+ * so don't change them!
  */
 enum csZBufMode
 {
@@ -279,7 +280,6 @@ struct csTriangle
  * <ul>
  * <li>Object2camera transformation and perspective.
  * <li>Linear interpolation between two sets of vertices.
- * <li>Multiple texturing passes.
  * <li>Clipping.
  * <li>Whatever else DrawPolygonFX can do.
  * </ul>
@@ -291,16 +291,12 @@ struct G3DTriangleMesh
   {
     /// Maximum number of vertex pool, used for vertex weighting/morphing.
     MAX_VERTEXPOOL = 2,
-    /// Maximum number of materials, used to apply multiple pass.
-    MAX_MATERIAL = 2
   };
 
   /// Number of vertices for each pool.
   int num_vertices;
   /// Number of vertex sets, if > 1, morphing will be applied.
   int num_vertices_pool;
-  /// Number of material passes.
-  int num_materials;
 
   /// Number of triangles.
   int num_triangles;
@@ -333,8 +329,8 @@ struct G3DTriangleMesh
   UInt fxmode;
   float morph_factor;
   csVector3* vertices[MAX_VERTEXPOOL];
-  csVector2* texels[MAX_VERTEXPOOL][MAX_MATERIAL];
-  iMaterialHandle* mat_handle[MAX_MATERIAL];
+  csVector2* texels[MAX_VERTEXPOOL];
+  iMaterialHandle* mat_handle;
   /// Precalculated vertex color list.
   csColor* vertex_colors[MAX_VERTEXPOOL];
   /// Information for fogging the vertices.
