@@ -1039,9 +1039,11 @@ void csThingStatic::FillRenderMeshes (
 {
   //polyRenderers.DeleteAll ();
 
-  for (int i = 0; i < litPolys.Length (); i++)
+  for (int i = 0; i < (litPolys.Length () + unlitPolys.Length ()); i++)
   {
-    const csStaticPolyGroup& pg = *(litPolys[i]);
+    const csStaticPolyGroup& pg = 
+      (i < litPolys.Length ()) ? *(litPolys[i]) : 
+        *(unlitPolys[i - litPolys.Length ()]) ;
     csRenderMesh* rm = new csRenderMesh;
 
     csRef<iPolygonRenderer> polyRenderer;
@@ -1084,6 +1086,7 @@ void csThingStatic::FillRenderMeshes (
 
     rmeshes.Push (rm);
   }
+
 }
 #endif // CS_USE_NEW_RENDERER
 

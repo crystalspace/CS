@@ -440,7 +440,7 @@ struct DefaultFunction : public iTerrainHeightFunction
   { 
     SCF_CONSTRUCT_IBASE (0); 
   }
-  ~DefaultFunction () 
+  virtual ~DefaultFunction () 
   { 
     SCF_DESTRUCT_IBASE (); 
   }
