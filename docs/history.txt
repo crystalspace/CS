@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+21-May-2003
+	- Jorrit fixed the new csString::SubString() so that it is more
+	  efficient (no longer returns a new csString) and also documented
+	  that the substring is excluding the last char.
 20-May-2003
 	- Philip Wyett worked around problem of incorrect pathed cs_pyth.cpp
           being included in the cspython MSVC project file. Added variable

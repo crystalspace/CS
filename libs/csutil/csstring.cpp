@@ -181,18 +181,19 @@ csString &csString::Append (const char *iStr, size_t iCount)
   return *this;
 }
 
-csString csString::SubString (size_t x, size_t y)
+void csString::SubString (csString& sub, size_t x, size_t y)
 {
   if (x < 0 || x >= Size || y < 0 || y >= Size || y <= x) 
-    return csString("");
+  {
+    sub.Clear ();
+    return;
+  }
 
-  char * tmp = Data + x;
-  csString temp(tmp);
-  
-  y -= x;
-  temp.Truncate(y);
-
-  return temp;
+  size_t const NewSize = y - x;
+  sub.ExpandIfNeeded (NewSize);
+  strncpy (sub.Data, Data+x, NewSize);
+  sub.Data[NewSize] = '\0';
+  sub.Size = NewSize;
 }
 
 size_t csString::FindFirst (char c, size_t pos)

@@ -179,11 +179,15 @@ public:
   csString &Append (unsigned char c)
   { return Append(char(c)); }
 
-  /// SubString another string out of this one
-  csString SubString (size_t x, size_t y);
+  /**
+   * SubString another string out of this one. The result is placed
+   * in 'sub'. The substring is from 'f1' to 'f2' (excluding the
+   * char at 'f2' itself).
+   */
+  void SubString (csString& sub, size_t f1, size_t f2);
 
-  /// Find first c from pos
-  size_t FindFirst(const char c, size_t p = (size_t)-1);
+  /// Find first c from pos.
+  size_t FindFirst (const char c, size_t p = (size_t)-1);
 
 #define STR_APPEND(TYPE,FMT,SZ) csString& Append(TYPE n) \
   { char s[SZ]; cs_snprintf(s, SZ, #FMT, n); return Append(s); }
