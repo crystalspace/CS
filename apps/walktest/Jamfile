@@ -46,14 +46,13 @@ if $(GL.AVAILABLE) = "yes"
 CompileGroups softcanvas : walkall ;
 CompileGroups renderall  : walkall ;
 
-if ! [ Property build : projgen ]
-{
 Description walktest_static : "WalkTest demo (static build)" ;
 
 SubVariant static ;
 Application walktest_static : [ Wildcard *.cpp *.h ] :
   independent noinstall nohelp ;
+CFlags walktest_static : [ FDefines CS_STATIC_LINKED ] : nostatic ;
+MsvcDefine walktest_static : CS_STATIC_LINKED ;
 LinkWith walktest_static : csgeom csgfx cstool csutil ;
 LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;
 SubVariant ;
-}
