@@ -45,6 +45,8 @@ The history order is reversed so that new features are at the top.
 	      volatile.h defines.
 	    - Fixed line-termination problem in cspthrd.cpp where it contained
 	      an extra carriage return on each line.
+	- Eric Sunshine fixed bug in cs.mak where the "clean" target would
+	  invoke "rm -f" without any filenames.
 8-Oct-2002
 	- Eric Sunshine made the following changes:
 	    - Added the new makefile variable MKDIRS which, given a path
