@@ -4,6 +4,11 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a bug in alpha map support for DrawPixmap and software
 	  renderer when used on a 32-bit display. It was actually completely
 	  wrong.
+	- Eric Sunshine applied a couple simple patches from Jan Dvorak
+	  <johnydog@go.cz>:
+	    - Trivial documentation typo in Makefile.
+	    - Fixed texture resizing bug in mdl2spr (was using texture width
+	      in calculations where height should have been used).
 23-Nov-2000
 	- Martin Geisse did some clean-up work for dnapp.
 	- Martin also fixed a bug in csIniFile which crashed when the

@@ -48,7 +48,7 @@ define PSEUDOHELP
   echo $"  make drivers2d    Make all supported 2D graphics drivers$"
   echo $"  make drivers3d    Make all supported 3D graphics drivers (renderers)$"
   echo $"  make snddrivers   Make all supported sound drivers$"
-  echo $"  make netdrivers   Make all supported sound drivers$"
+  echo $"  make netdrivers   Make all supported network drivers$"
   echo $"  make depend       Make dependencies (recommended!)$"
   echo $"  make clean        Clean all files generated during build$"
   echo $"  make cleanlib     Clean all dynamic libraries$"
