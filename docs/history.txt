@@ -22,6 +22,8 @@ chronological order.
 	  'parent' of the root node was not set to 0. This could cause crashes
 	  in viewmesh (and in other apps too if there were moving objects).
 	- Wouter fixed an uninit variable in terrfunc.
+	- Jamest added iAws to swig wrapper, added missing cursor.h to swig 
+	  wrapper so that iGraphics2D.SetMouseCursor would not error out
 25-Nov-2003
 	- Eric Sunshine removed the ugly, semi-private, legacy name_VERSION and
 	  name_scfGetID() API which SCF_VERSION() created for each declared

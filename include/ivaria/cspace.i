@@ -97,6 +97,7 @@
 
 %{
 
+#include "iaws/aws.h"
 #include "imap/saver.h"
 #include "ivaria/reporter.h"
 #include "ivaria/dynamics.h"
@@ -125,6 +126,8 @@
 // If you have problems, first check if the interface in question is in
 // this list. Please keep the list sorted alphabetically.
 %define APPLY_FOR_EACH_INTERFACE
+	INTERFACE_APPLY(iAws)
+	INTERFACE_APPLY(iAwsKey)
 	INTERFACE_APPLY(iAudioStream)
 	INTERFACE_APPLY(iBase)
 	INTERFACE_APPLY(iBallState)
@@ -715,6 +718,8 @@ TYPEMAP_OUT_csWrapPtr
 %include "cstool/initapp.h"
 %typemap(default) const char * configName;
 
+%include "iaws/aws.h"
+
 %include "igeom/polymesh.h"
 %include "igeom/clip2d.h"
 %include "igeom/objmodel.h"
@@ -815,6 +820,7 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "ivideo/graph3d.h"
 %include "ivideo/graph2d.h"
+%include "ivideo/cursor.h"
 
 %ignore GetGlyphSize(uint8, int &, int &);
 %ignore GetGlyphBitmap(uint8, int &, int &);
