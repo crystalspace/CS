@@ -44,8 +44,8 @@ int csXMLShaderTech::textureUnits[shaderPass::TEXTUREMAX];
 int csXMLShaderTech::lastTexturesCount;
 
 csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) : 
-  xmltokens (parent->compiler->xmltokens), passes(0), currentPass(~0), 
-  passesCount(0)
+  passes(0), passesCount(0), currentPass(~0),
+  xmltokens (parent->compiler->xmltokens)
 {
   csXMLShaderTech::parent = parent;
 

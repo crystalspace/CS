@@ -23,7 +23,8 @@ chronological order.
 	  it was documented as accepting -1 for `count', but did not correctly
 	  handle the case.
 	- Wouter Wijngaards fixed compile errors in csbench.
-        - Philip Wyett fixed a compile error in prstex.cpp
+        - Philip Wyett fixed a compile error in prstex.cpp.
+        - Philip Wyett eliminated compiler warnings in xmlshader.cpp.
 19-Aug-2004
 	- Jorrit added support for key/value pairs to materials and textures
 	  in the loader.
