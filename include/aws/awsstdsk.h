@@ -9,7 +9,10 @@
  may not be privy to.
  ************************************************************************************/
 
-class awsStandardSink : public iAwSink
+#include "aws/iaws.h"
+#include "aws/awsslot.h"
+
+class awsStandardSink : public awsSink
 {
   /// Hides the source component
   static void Hide(void *sink, iAwsSource *source);

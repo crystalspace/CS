@@ -233,6 +233,9 @@ SCF_VERSION (iAwsSource, 0, 0, 1);
 
 struct iAwsSource : public iBase
 {      
+  /// Gets the component owner for this (sources are embedded)
+  virtual iAwsComponent *GetComponent()=0;
+
   /// Registers a slot for any one of the signals defined by a source.  Each sources's signals exist in it's own namespace
   virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal)=0;
 
@@ -279,7 +282,7 @@ struct iAwsComponent : public iAwsSource
     virtual bool GetProperty(char *name, void **parm)=0;
 
     /// Sets the property specified to whatever is in parm. Returns false if there's no such property.
-    virtual bool SetProperty(char *name, void **parm)=0;
+    virtual bool SetProperty(char *name, void *parm)=0;
 
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate()=0;

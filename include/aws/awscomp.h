@@ -82,6 +82,9 @@ public:
 
     /// Broadcasts a signal to all slots that are interested.
     virtual void Broadcast(unsigned long signal);
+
+    /// Returns component that this belongs to.
+    virtual iAwsComponent *GetComponent();
          
 public:
     /**
@@ -97,7 +100,7 @@ public:
     virtual bool GetProperty(char *name, void **parm);
 
     /// Sets the property specified, setting the proprty to whatever is in parm. Returns false if there's no such property.
-    virtual bool SetProperty(char *name, void **parm);
+    virtual bool SetProperty(char *name, void *parm);
 
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate();

@@ -227,6 +227,9 @@ public:
     /// Broadcasts a signal to all slots that are interested.
     virtual void Broadcast(unsigned long signal);
 
+    /// Get's component
+    iAwsComponent *GetComponent();
+
 public:
     /// Raises a window to the top.
     virtual void Raise();
@@ -255,7 +258,7 @@ public:
     bool GetProperty(char *name, void **parm);
 
     /// Sets properties for this window
-    bool SetProperty(char *name, void **parm);
+    bool SetProperty(char *name, void *parm);
 
 public:
     /// Event triggered when a window is about to be raised

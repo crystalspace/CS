@@ -107,6 +107,9 @@ public:
 
 class awsSource : public iAwsSource
 {
+   /// Owner
+   iAwsComponent *owner;
+
    /// contains a list of all slots that we have registered
    csBasicVector slots;
 
@@ -123,10 +126,13 @@ public:
     SCF_DECLARE_IBASE;
 
     /// Initializes a couple things.
-    awsSource();
+    awsSource(iAwsComponent *_owner);
 
     /// Does nothing
     virtual ~awsSource();
+
+    /// Gets the component owner for this (sources are embedded)
+    virtual iAwsComponent *GetComponent();
 
     /// Registers a slot for any one of the signals defined by a source.  Each sources's signals exist in it's own namespace
     virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal);

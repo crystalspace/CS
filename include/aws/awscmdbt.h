@@ -67,6 +67,12 @@ public:
     /// Get's the texture handle and the title, plus style if there is one.
     virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
 
+    /// Gets properties
+    bool GetProperty(char *name, void **parm);
+
+    /// Sets properties
+    bool SetProperty(char *name, void *parm);
+
     /// Returns the named TYPE of the component, like "Radio Button", etc.
     virtual char *Type();
 
