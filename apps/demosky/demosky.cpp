@@ -541,6 +541,8 @@ Flock::~Flock()
   for(i=0; i<nr; i++)
     spr[i]->DecRef();
   delete[] spr;
+  delete[] speed;
+  delete[] accel;
 }
 
 
