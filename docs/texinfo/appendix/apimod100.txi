@@ -1152,3 +1152,65 @@ dispose manually via @code{DecRef()}.
 @item
 @code{iHazeHullCreation::CreateCone()}
 @end itemize
+
+@subheading Render Buffer Changes
+
+Previously meshes provided render buffers via name, and these were mapped using
+@emph{name} <-> @emph{OpenGL} name mapping. But most meshes only provided a few
+standard-named buffers (such as, @samp{vertices}, @samp{texcoords}, etc.) and
+the mapping itself took some time (5%+ per frame). This has been reworked.
+
+Now, meshes can provide a set of 16 buffers in a fixed structure. Meshes can
+provide @samp{index}, @samp{position} (vertices), @samp{normal}, @samp{color},
+@samp{color_lighting} (pre-lit colors), @samp{texcoord0}, @samp{texcoord1},
+@samp{texcoord2}, @samp{texcoord3}, @samp{texcoord_lightmap}, @samp{generic0},
+@samp{generic1}, @samp{generic2}, @samp{generic3}, @samp{tangent} and
+@samp{binormal} buffers.  At the very least, meshes @emph{should} provide
+@samp{index}, @samp{position}, and if possible @samp{texcoord@emph{n}}. The old
+system with custom named buffers is also supported.
+
+Both kinds of buffers can be mapped, and the destinations for both kinds of
+buffers are the same (listed here): @samp{position}, @samp{normal},
+@samp{color}, @samp{primary color} (alias for @samp{color}), @samp{secondary
+color}, @samp{texture coordinate n} (where 0 <= n < texture units;
+@samp{texture coordinate} is alias for n = 0), and @samp{attribute n} (where 0
+<= n < 16).  Note that you can not map buffers of different kinds (the
+@samp{normal} and the custom buffers) to same destination; the result is
+undefined).
+
+The normal buffers are named @samp{position}, @samp{normal}, @samp{color},
+@samp{primary color}, @samp{lit color}, @samp{texture coordinate n} (where 0 <=
+n < 3), @samp{texture coordinate lightmap}, @samp{generic n} (where 0 <= n <
+3), @samp{binormal}, and @samp{tangent}. These appear in the
+@samp{source="@dots{}"} tag within the @sc{xml} shader description.
+
+Mapping of custom buffers is accomplished as so:
+
+@example
+<buffer
+  customsource="custombuffername"
+  destination="texture coordinate 1"
+/>
+@end example
+
+@noindent
+And, mapping of a normal buffer is done this way:
+
+@example
+<buffer
+  source="tangent"
+  destination="texture coordinate 2"
+/>
+@end example
+
+As a convenience, three buffers are mapped automatically by default (as long as
+the mesh provides them). They are:
+
+@itemize @bullet
+@item
+@samp{position} @result{} @samp{position}
+@item
+@samp{color} @result{} @samp{primary color}
+@item
+@samp{texture coordinate 0} @result{} @samp{texture coordinate 0}
+@end itemize

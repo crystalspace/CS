@@ -42,6 +42,12 @@ chronological order.
 	    iEmitFactoryState::CreateSphereTangent()
 	    iHazeHullCreation::CreateBox()
 	    iHazeHullCreation::CreateCone()
+	- Eric Sunshine added a section to apimod100.txi discussing Marten's
+	  changes to the render buffer architecture of 8-Jan-2005. The
+	  discussion is based upon an email of Marten's explaining his changes
+	  in some detail:
+	    http://article.gmane.org/gmane.comp.graphics.crystalspace.general/
+	         6447/
 5-Mar-2005
 	- res added some terrain-related interfaces to cspace.i.
 	- res made more -ansi -pedantic compile fixes on Win32. 
@@ -629,7 +635,7 @@ chronological order.
 		  <minnodesize x="..." y="..." z="..." />
 		</meta>
 	- res fixed viewmesh to compile with latest Cal3d.
-	- res fixed a crash in csGLVBOBuffer::FindEmptySlot() as per Martens
+	- res fixed a crash in csGLVBOBuffer::FindEmptySlot() as per Marten'ss
 	  instructions.
 	- Jorrit fixed a bug in csTiledCoverageBuffer->StatusNoDepth().
 	  Fixing this bug has a negative impact on PVS quality but it makes
