@@ -300,7 +300,7 @@ environment.
 
 @table @code
 @item CS/plugins/mesh/object
-Various mesh object implementations. @xref{MeshObject}
+Various mesh object implementations.  @xref{MeshObject}.
 @item CS/plugins/mesh/loader
 Loaders for the mesh objects.
 @end table

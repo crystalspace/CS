@@ -50,6 +50,7 @@ The @samp{DO_PNG} and @samp{DO_JPG} options are explained above.
 file loading. Do not disable @samp{DO_GIF} since all current level contain
 GIF files. It is not useful to disable @samp{DO_TGA} because it does not
 need any external library and it does not require much code in CS.
+@end table
 
 @node Unix Compiling, Unix Other2d3d, Unix Editing the Makefile, Unix
 @subsubsection Compiling on Unix

@@ -106,8 +106,8 @@ Also note that @file{flarge.zip} itself requires the file @file{stdtex.zip}
 which contains all the textures.
 
 Alternately, for the @file{walktest} program, you can edit its configuration
-file @file{data/config/cryst.cfg} and change the @samp{WorldFile=@dots{}} setting.  For
-example:
+file @file{data/config/cryst.cfg} and change the @samp{WorldFile=@dots{}}
+setting.  For example:
 
 @example
 Walktest.Settings.WorldFile = flarge
@@ -203,10 +203,10 @@ order to coordinate your efforts with those of other people.
 @item
 How does Crystal Space work?
 
-@strong{A1} If you want to know how you can use CS, you can look at the chapters
-describing the libraries of which CS consists, @xref{Libraries}. Or you can
-look at the plug-ins, @xref{Plug-In Drivers}. If you want to know how it
-works internally, @xref{Internals}.
+@strong{A1} If you want to know how you can use CS, you can look at the
+chapters describing the libraries of which CS consists, @xref{Libraries}.  Or
+you can look at the plug-ins, @xref{Plug-In Drivers}.  If you want to know how
+it works internally, @xref{Internals}.
 
 @strong{A2}: Read any other documentation related to this project as mentioned
 earlier in this @sc{faq}.
@@ -229,14 +229,13 @@ make commercial or shareware products using it.  For more details about what
 you can and cannot do, see the license, @ref{License}.
 
 @item
-How stable is the API for Crystal Space?
+How stable is the @sc{api} for Crystal Space?
 
-@strong{A}: This depends. If you use @sc{SCF} interfaces (i.e. interfaces
+@strong{A}: This depends. If you use @sc{scf} interfaces (i.e. interfaces
 defined in the @file{include} folder) then you should be relatively safe.
 In the future (for the 1.0 release) we will put more stuff in plugins which
-means they will be accessible through @sc{SCF} interfaces. So for now I
+means they will be accessible through @sc{scf} interfaces. So for now I
 would say that there are likely to be API changes. Note that we try to
 minimize that as much as possible and we also document them with every
 release to make the transition easier.
-
 @end itemize

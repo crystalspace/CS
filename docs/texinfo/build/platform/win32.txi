@@ -71,7 +71,7 @@ The complete Platform @sc{sdk} is available as part of Visual C++ (R), an
 @sc{msdn} Professional subscription, an @sc{msdn} Universal subscription, or
 from the following download site,
 @uref{http://www.microsoft.com/msdownload/platformsdk/setuplauncher.htm}. A
-low-cost @sc{SDK} CD will also be available from
+low-cost @sc{sdk cd} will also be available from
 @uref{http://developerstore.com}, starting in December 2000.
 @end quotation
 So, if you have VC++ you, probalby already have it too, even if you haven't

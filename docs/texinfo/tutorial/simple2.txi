@@ -14,7 +14,7 @@ one in which we're interested here is the 3D sprite mesh. A mesh
 factory is like a blue-print for a mesh (or sprite). It defines how the mesh
 looks and how it animates. Before you can use a mesh you need to have a
 mesh factory. Once you have a mesh factory you can create multiple
-meshes from this. @xref{MeshObject}
+meshes from this.  @xref{MeshObject}.
 
 In this example we are going to load a mesh factory from disk.  If you have
 the standard Crystal Space distribution then you have the file
