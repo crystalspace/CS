@@ -436,8 +436,6 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
     CreateNode (p, "material", ThingSides[s].pTex->GetTexturename());
     CreateNode (p, "lighting", "no");
   }
-
-  CreateNode (node, "moveable");
 }
 
 void CCSWorld::FindAdditionalTextures()

@@ -11,6 +11,7 @@ The history order is reversed so that new features are at the top.
 	  now deprecated). The thing mesh object plugin will not automatically
 	  detect if it is needed to switch to moveable or not. So setting
 	  this is no longer required.
+	- Jorrit removed <moveable/> output from map2cs.
 15-Jun-2003
         - Boyan added property "Image" that can be set in AWS component "Image 
 	  View".

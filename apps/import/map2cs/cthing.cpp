@@ -96,13 +96,6 @@ bool CCSThing::WriteAsPart(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector
 
   int i, j;
 
-  //If things are moveable, they need special tagging. (needed for scripting)
-  //if (IsMoveable())
-  //{
-  //  pWorld->WriteIndent();
-  //  fprintf(fd, "MOVEABLE ()\n");
-  //}
-
   //DocNode part = CreateNode (node, "part");
   //part->SetAttribute ("name", 
   //  csString().Format ("part_%s", GetName()));
