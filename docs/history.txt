@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+10-Jan-2001
+	- Eric Sunshine fixed a typo in win32.txi and made several other minor
+	  changes.
 9-Jan-2001
 	- Eric Sunshine fixed a problem in bmpimage.cpp which caused loading
 	  of BMP files on big-endian Solaris to fail.

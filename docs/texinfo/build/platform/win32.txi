@@ -56,8 +56,8 @@ documentation, samples or tools. Look at the @samp{Sources} section at
 @uref{http://www.multimania.com/noote/CrystalSpace}
 
 After installing a new DirectX @sc{sdk}, you must also make sure that it is
-used. Select @emph{Tools -> Options -> Directories}. For both libraries and
-headers the new DirectX directoy must appear before the older version's
+used. Select @emph{Tools/Options/Directories}. For both libraries and
+headers the new DirectX directory must appear before the older version's
 directory. So if they are not in the list, add them. If they appear after the
 older directories, move them on top of the list.
 
@@ -126,10 +126,10 @@ own application using CS.
 @node Win32 Workspace, Win32 User App, Win32 Rundemo, Win32
 @subsubsection Structure of the Workspace
 
-@emph{NOTE:} If you find bugs in the @sc{msvc} project or workspace files
+@emph{Note}: If you find bugs in the @sc{msvc} project or workspace files
 coming with Crystal Space, don't send fixes for these files to the
 developers. These files are generated automatically, so your fixes would be
-useless. Better send a description of the bug to the mailing list.
+useless. Better, send a description of the bug to the mailing list.
 
 The Crystal Space workspace is divided into several projects.  They all exist
 as separate project files (@file{*.dsp}).  All of them are being bound
@@ -154,7 +154,8 @@ separates their interface from the internals of the library and thus allows
 dynamic linking. In fact, some of the @emph{Libraries} also use @sc{scf}.
 The rule for the @sc{msvc} workspace is simple: The @emph{Plugins} are
 projects that build a dynamic library (@file{.DLL}). You can find more
-information in @ref{Plug-In Drivers}.
+information in the section of this manual dealing with plug-in modules.
+@xref{Plug-In Drivers}.
 
 The @emph{Applications} are programs using some of these libraries, so they
 produce @file{.EXE} files.
@@ -178,15 +179,16 @@ all plugins (@file{.DLL}) into this new directory.
 @item
 Set the include paths. Simply open one of the application projects coming
 with Crystal Space, for example @samp{Walktest},
-select @emph{Project Settings -> C/C++} and copy all command line options
+select @emph{Project Settings/C/C++} and copy all command line options
 that look like this: @samp{/I "../../anything"}.
 
 @item
 Add the CS libraries. If you are using the CS workspace, simply add
 dependencies to the CS projects. Otherwise you have to link to the
 @file{.LIB} files. To do this, either add these files to the project like
-source files or add them as command line options in @emph{Project Settings ->
-C/C++}. Note that if you add them like source files, you may not correctly
+source files or add them as command line options in
+@emph{Project Settings/C/C++}.
+Note that if you add them like source files, you may not correctly
 use the debug version of CS in debug builds and the release version in
 release builds.
 
@@ -326,16 +328,18 @@ current directory is, where the executable sits.)
 Q. @emph{I get the following (or similar) errors:}
 
 @example
-WARNING: could not load plugin `crystalspace.graphics3d.software'
-WARNING: failed to initialize plugin `crystalspace.engine.core'
+WARNING: could not load plugin
+  `crystalspace.graphics3d.software'
+WARNING: failed to initialize plugin
+  `crystalspace.engine.core'
 FATAL: No iGraphics3D plug-in loaded!
 FATAL: No iGraphics2D plug-in loaded!
 Error initializing system!
 @end example
 
-A. You probably did not compile everything. The @file{.EXE} file is not
-enough! You also have to compile all plug-ins you want to use. In the above
-example the software renderer is missing.
+A. You probably did not compile everything. Compiling only the @file{.EXE}
+file is not sufficient! You must also compile all plug-ins you want to use.
+In the above example the software renderer is missing.
 @end itemize
 
 @subsubheading Miscellaneous
