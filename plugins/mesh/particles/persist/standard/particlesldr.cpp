@@ -770,7 +770,7 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
           return 0;
         }
         mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-        state = SCF_QUERY_INTERFACE(fact, iParticlesObjectState);
+        state = SCF_QUERY_INTERFACE(mesh, iParticlesObjectState);
 	if (!state)
 	{
       	  synldr->ReportError (
