@@ -153,28 +153,68 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
     return ddgSuccess;
 }
 
-void csTerrain::Draw (csRenderView& /*rview*/, bool /*use_z_buf*/)
+void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 {
-#if 0
-//////////////////// OLD FUNCTION INITIALIZATION.
-  G3DPolygonDPFX poly;
+  bool modified = true;
+  /* Get matrices in OpenGL form
+  JORRIT:
+     this code is copied from the ogl_g3d renderer.
+  csMatrix3 orientation = o2c.GetO2T();
+    
+  // set up coordinate transform
+  GLfloat matrixholder[16];
 
-  bool moved = false;
-  static bool modified = true;
- 
-  memset (&poly, 0, sizeof(poly));
-  poly.inv_aspect = rview.inv_aspect;
-  poly.flat_color_r = 255;
-  poly.flat_color_g = 255;
-  poly.flat_color_b = 255;
-  poly.txt_handle = _textureMap->GetTextureHandle ();
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
-    false ? CS_ZBUF_USE : CS_ZBUF_FILL);
-  rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD)
-#endif
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+  // this zeroing is probably not needed, but I'm playing it safe in case
+  // this code is changed later... GJH
+  for (i=0; i<16; i++) matrixholder[i] = 0.0;
 
-  ////////////// HERE IS HOW DDG RENDERS THE TRIANGLE MESH PER TEXTURE
-	bool modified = true;
+  matrixholder[0] = 1.0;
+  matrixholder[5] = 1.0;
+  matrixholder[10] = 1.0;
+
+  matrixholder[0] = orientation.m11;
+  matrixholder[1] = orientation.m21;
+  matrixholder[2] = orientation.m31;
+
+  matrixholder[4] = orientation.m12;
+  matrixholder[5] = orientation.m22;
+  matrixholder[6] = orientation.m32;
+
+  matrixholder[8] = orientation.m13;
+  matrixholder[9] = orientation.m23;
+  matrixholder[10] = orientation.m33;
+
+  matrixholder[15] = 1.0;
+
+  csVector3 translation = o2c.GetO2TTranslation();
+
+  glMultMatrixf(matrixholder);
+
+  glTranslatef(-translation.x, -translation.y, -translation.z);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+
+  glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
+
+  glTranslatef(width2,height2,0);
+
+  for (i = 0 ; i < 16 ; i++)
+    matrixholder[i] = 0.0;
+  
+  matrixholder[0] = matrixholder[5] = matrixholder[10] = matrixholder[15] = 1.0;
+  
+  matrixholder[10] = 0.0;
+  matrixholder[11] = +1.0/aspect;
+  matrixholder[14] = -1.0/aspect;
+  matrixholder[15] = 0.0;
+
+  glMultMatrixf(matrixholder);
+
+*/
 	context->extractPlanes(context->frustrum());
 	// Optimize the mesh w.r.t. the current viewing location.
 	modified = mesh->calculate(context);
@@ -192,7 +232,7 @@ void csTerrain::Draw (csRenderView& /*rview*/, bool /*use_z_buf*/)
 		{
 			if ((bt = mesh->getBinTree(i)))
 			{
-				unsigned int v = 0;
+				s = 0;
 				// Render each triangle.
 				ci = bt->chain();
 				// Render each triangle.
@@ -200,167 +240,61 @@ void csTerrain::Draw (csRenderView& /*rview*/, bool /*use_z_buf*/)
 				{
 					ddgTNode *tn = (ddgTNode*) mesh->tcache()->get(ci);
  					if (drawTriangle(bt, tn->tindex(), vbuf) == ddgSuccess)
-						v++;
+						s++;
 					ci = tn->next();
 				}
-				bt->visTriangle(v);
+				bt->visTriangle(s);
 			}
 			i++;
 		}
 
 	}
 
-	// Render the vertex buffer piece by piece.
+    // Setup the structure for DrawTriangleMesh.
+    static G3DTriangleMesh g3dmesh;
+	static bool init = false;
+	if (!init)
+	{
+		g3dmesh.vertex_colors[0] = NULL;			 // pointer to array of csColor for color information.
+		g3dmesh.morph_factor = 0;
+		g3dmesh.num_vertices_pool = 1;
+		g3dmesh.num_textures = 1;
+		g3dmesh.use_vertex_color = true;
+		g3dmesh.do_clip = true;	// DEBUG THIS LATER
+		g3dmesh.do_mirror = rview.IsMirrored ();
+		g3dmesh.do_morph_texels = false;
+		g3dmesh.do_morph_colors = false;
+		g3dmesh.vertex_fog = NULL;
+		g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+		g3dmesh.fxmode = CS_FX_GOURAUD;
+		init = true;
+	}
+    g3dmesh.num_vertices = vbuf->num();	  // number of shared vertices for all triangles
+    // All the three below arrays have num_vertices elements.
+    g3dmesh.vertices[0] = (csVector3*) vbuf->vbuf; // pointer to array of csVector3 for all those verts
+    g3dmesh.texels[0][0] = (csVector2*) vbuf->tbuf;	 // pointer to array of csVector2 for uv coordinates
+
+	// Render the vertex buffer piece by piece (per texture).
 	i = 0;
+	s = 0;
 	while (i < mesh->getBinTreeNo())
 	{
-//		JORRIT: Switch textures here.
-//
-//			if (_textureMap && (i%2 == 0) && _textureMap[i/2])
-//				_textureMap[i/2]->activate();
+//	  if (_textureMap && (i%2 == 0) && _textureMap[i/2])
+// JORRIT:       g3dmesh.txt_handle[0] = _textureMap[i/2];
 
 		if ((bt = mesh->getBinTree(i)) && (bt->visTriangle() > 0))
 		{
 			// Render this bintree.
+            g3dmesh.num_triangles = bt->visTriangle(); // number of triangles
+            g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);	// pointer to array of csTriangle for all triangles
 
-			ddgAssert(s >= 0 && s + bt->visTriangle() <= vbuf->inum());
-/*
+            rview.g3d->DrawTriangleMesh (g3dmesh);
 
-	ALEX: Here you see how you can render a mesh of triangles
-	in CS. Note that a mesh can only have one texture so you
-	need to call DrawTriangleMesh for every texture you have.
-	It is best that you can collect as many triangles with that
-	texture together as you can. I don't know how your code
-	returns the triangles? Grouped per texture would be best.
-
-  // Setup the structure for DrawTriangleMesh.
-  G3DTriangleMesh mesh;
-  mesh.txt_handle[0] = _textureMap[i/2];
-  mesh.num_vertices = ALEX: number of shared vertices for all triangles
-  // All the three below arrays have num_vertices elements.
-  mesh.vertices[0] = ALEX: pointer to array of csVector3 for all those verts
-  mesh.texels[0][0] = ALEX: pointer to array of csVector2 for uv coordinates
-  mesh.vertex_colors[0] = ALEX: pointer to array of csColor for color information.
-  mesh.morph_factor = 0;
-  mesh.num_vertices_pool = 1;
-  mesh.num_textures = 1;
-
-  mesh.num_triangles = ALEX: number of triangles
-  mesh.triangles = ALEX: pointer to array of csTriangle for all triangles
-
-  mesh.use_vertex_color = true;
-  mesh.do_clip = true;	// DEBUG THIS LATER
-  mesh.do_mirror = rview.IsMirrored ();
-  mesh.do_morph_texels = false;
-  mesh.do_morph_colors = false;
-  mesh.vertex_fog = NULL;
-
-  mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-  mesh.fxmode = CS_FX_GOURAUD;
-  rview.g3d->DrawTriangleMesh (mesh);
-
-  //else
-	JORRIT: Here is how I render triangles in DDG.
-
-				Really render the vertex array.  Open GL example
-			if (s == 0)
-			{
-				glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-				glTexCoordPointer (2, GL_FLOAT, 0, vbuf->tbuf);
-			}
-			// Vertex array for rendering.
-			glEnableClientState (GL_VERTEX_ARRAY);
-			glVertexPointer ( 3, GL_FLOAT, 12, vbuf->vbuf); // 3 floats = 16 bytes.
-			glDrawElements(GL_TRIANGLES, bt->visTriangle()*3, GL_UNSIGNED_INT, &(vbuf->ibuf[s*3]));
-			if (bt->visTriangle() + s == vbuf->inum()/3)
-			{
-				glDisableClientState (GL_VERTEX_ARRAY);
-				glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-			}
-*/
 			s = s+bt->visTriangle();
 		}
 		i++;
 	}
 
-#if 0
-  ///////////////////// OLD CS TERRAIN CODE ///////////////////////
-  // Render
-  csVector3 *p1, *p2, *p3;
-  ddgVector2 t1, t2, t3;
-  // float  *c1, *c2, *c3;
-  ddgVBIndex i1, i2, i3;
-  csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
-  unsigned int i = vbuf->size();
-  while (i)
-  {
-    int rescount;
-    i--;
-
-    i3 = vbuf->ibuf[i*3];
-    i2 = vbuf->ibuf[i*3+1];
-    i1 = vbuf->ibuf[i*3+2];
-    // Camera space coords.
-    p1 = &(vbuf->vbuf[i1]);
-    p2 = &(vbuf->vbuf[i2]);
-    p3 = &(vbuf->vbuf[i3]);
-    // c1 = &(vbuf->cbuf[i1]);
-    // c2 = &(vbuf->cbuf[i2]);
-    // c3 = &(vbuf->cbuf[i3]);
-    t1 = &(vbuf->tbuf[i1]);
-    t2 = &(vbuf->tbuf[i2]);
-    t3 = &(vbuf->tbuf[i3]);
-
-    float iz;
-    float pz[3];
-    csVector2 triangle[3];
-    if (p1->z < SMALL_Z) continue;
-    pz[0] = 1 / p1->z;
-    iz = rview.aspect * pz[0];
-    triangle[0].x = p1->x * iz + rview.shift_x;
-    triangle[0].y = p1->y * iz + rview.shift_y;
-    if (p2->z < SMALL_Z) continue;
-    pz[1] = 1 / p2->z;
-    iz = rview.aspect * pz[1];
-    triangle[1].x = p2->x * iz + rview.shift_x;
-    triangle[1].y = p2->y * iz + rview.shift_y;
-    if (p3->z < SMALL_Z) continue;
-    pz[2] = 1 / p3->z;
-    iz = rview.aspect * pz[2];
-    triangle[2].x = p3->x * iz + rview.shift_x;
-    triangle[2].y = p3->y * iz + rview.shift_y;
-
-    if (!rview.view->Clip (triangle, 3, clipped_triangle, rescount))
-      continue;
-    poly.num = rescount;
-
-    poly.vertices[0].z = pz[0]; //p1->z;
-    poly.vertices[0].u = t1[0];
-    poly.vertices[0].v = t1[1];
-    poly.vertices[0].r = 1;//c1[0];
-    poly.vertices[0].g = 1;//c1[1];
-    poly.vertices[0].b = 1;//c1[2];
-
-    poly.vertices[1].z = pz[1]; //p2->z;
-    poly.vertices[1].u = t2[0];
-    poly.vertices[1].v = t2[1];
-    poly.vertices[1].r = 1;//c2[0];
-    poly.vertices[1].g = 1;//c2[1];
-    poly.vertices[1].b = 1;//c2[2];
-
-    poly.vertices[2].z = pz[2]; //p3->z;
-    poly.vertices[2].u = t3[0];
-    poly.vertices[2].v = t3[1];
-    poly.vertices[2].r = 1;//c3[0];
-    poly.vertices[2].g = 1;//c3[1];
-    poly.vertices[2].b = 1;//c3[2];
-      
-    PreparePolygonFX (&poly, clipped_triangle, rescount, triangle, true);
-    rview.g3d->DrawPolygonFX (poly);
-  }
-
-  rview.g3d->FinishPolygonFX ();
-#endif
 }
 
 // If we hit this terrain adjust our position to be on top of it.
