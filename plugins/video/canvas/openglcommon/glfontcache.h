@@ -102,13 +102,10 @@ public:
   virtual ~csGLFontCache ();
 
   /**
-   * Draw a string using OpenGL at x,y. It is assumed you have
-   * set up the render state using glColor.
+   * Draw a string using OpenGL, where the baseline starts at x,y. 
    */
-  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
-    const utf8_char* text);
-  //virtual void WriteStringBaseline (iFont *font, int x, int y, int fg, int bg, 
-  //  utf8_char* text);
+  virtual void WriteStringBaseline (iFont *font, int pen_x, int pen_y, 
+    int fg, int bg, const utf8_char* text);
 };
 
 #endif // __CS_CANVAS_OPENGLCOMMON_GLFONTCACHE_H__

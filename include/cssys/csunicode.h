@@ -56,11 +56,11 @@ typedef uint32 utf32_char;
 #define CS_UC_INVALID			0xFFFF
 
 /// Check whether a code is in the "high" or "low surrogate" range.
-#define CS_UC_IS_SURROGATE(C)		((C & 0xF800) == 0xD800)
+#define CS_UC_IS_SURROGATE(C)		((C & 0xFFFFF800) == 0x0000D800)
 /// Check whether a code is in the "high surrogate" range.
-#define CS_UC_IS_HIGH_SURROGATE(C)	((C & 0xFC00) == 0xDC00)
+#define CS_UC_IS_HIGH_SURROGATE(C)	((C & 0xFFFFFC00) == 0x0000DC00)
 /// Check whether a code is in the "low surrogate" range.
-#define CS_UC_IS_LOW_SURROGATE(C)	((C & 0xFC00) == 0xD800)
+#define CS_UC_IS_LOW_SURROGATE(C)	((C & 0xFFFFFC00) == 0x0000D800)
 
 /// Test whether a character code is invalid.
 #define CS_UC_IS_INVALID(C)		((C == CS_UC_INVALID) || (C == 0))

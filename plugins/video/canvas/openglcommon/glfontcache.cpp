@@ -254,8 +254,8 @@ bool csGLFontCache::ClipRect (float x, float y,
   return true;
 }
 
-void csGLFontCache::WriteString (iFont *font, int x, int y, int fg, int bg, 
-				 const utf8_char* text)
+void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y, 
+					 int fg, int bg, const utf8_char* text)
 {
   if (!text || !*text) return;
 
@@ -266,7 +266,7 @@ void csGLFontCache::WriteString (iFont *font, int x, int y, int fg, int bg,
 
     int fw, fh;
     font->GetDimensions ((char*)text, fw, fh);
-    G2D->DrawBox (x, y, fw, fh, bg);
+    G2D->DrawBox (pen_x, pen_y - font->GetAscent (), fw, fh, bg);
 
     G2D->statecache->Enable_GL_TEXTURE_2D ();
   }
@@ -280,11 +280,11 @@ void csGLFontCache::WriteString (iFont *font, int x, int y, int fg, int bg,
   KnownFont* knownFont = GetCachedFont (font);
   if (knownFont == 0) knownFont = CacheFont (font);
 
-  y = G2D->Height - y - maxheight;
-  if (y >= ClipY2) return;
+  pen_y = G2D->Height - pen_y/* - maxheight*/;
+  if (pen_y >= ClipY2) return;
 
   glPushMatrix ();
-  glTranslatef (x, y, 0);
+  glTranslatef (pen_x, pen_y, 0);
 
   G2D->statecache->Enable_GL_BLEND ();
   G2D->statecache->SetBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -361,6 +361,11 @@ void csGLFontCache::WriteString (iFont *font, int x, int y, int fg, int bg,
       }
     }
 
+    int x = pen_x + cacheData->left;
+    int y = pen_y + cacheData->top;
+
+    float x_left = x1;
+    x1 = x1 + cacheData->left;
     float x_right, x2 = x_right = x1 + cacheData->w;
     float tx1, tx2, ty1, ty2, y1, y2;
 
@@ -368,10 +373,10 @@ void csGLFontCache::WriteString (iFont *font, int x, int y, int fg, int bg,
     tx2 = cacheData->tx2;
     ty1 = cacheData->ty1;
     ty2 = cacheData->ty2;
-    y1 = 0.0;
-    y2 = maxheight;
+    y1 = -font->GetDescent ();
+    y2 = cacheData->top;
 
-    if (ClipRect (x, y, x1, y1, x2, y2, tx1, ty1, tx2, ty2))
+    if (ClipRect (pen_x, pen_y, x1, y1, x2, y2, tx1, ty1, tx2, ty2))
     {
       wtTexcoords[numverts].x = tx1;
       wtTexcoords[numverts].y = ty1;
@@ -398,7 +403,7 @@ void csGLFontCache::WriteString (iFont *font, int x, int y, int fg, int bg,
       numverts++;
     }
 
-    x1 = x_right;
+    x1 = x_left + cacheData->adv;
 
   }
 

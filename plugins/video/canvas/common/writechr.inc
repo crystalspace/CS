@@ -28,6 +28,9 @@
     WS_NAME - The name of routine (WriteString8 etc).
     WS_PIXTYPE - The type of a pixel (uint8, uint16, uint32)
     WS_ALPHA_AVAILABLE - Whether alpha blending is available
+    WS_A_R5G5B5,
+    WS_A_R5G6B5,
+    WS_A_R8G8B8 - Pixel format (only req. for alpha blending)
 */
 
 #ifdef WS_ALPHA_AVAILABLE
@@ -77,7 +80,7 @@
 
 #endif
 
-void WS_NAME (iFont *font, int x, int y,
+void WS_NAME (iFont *font, int pen_x, int pen_y,
   int fg, int bg, const utf8_char *text)
 {
   if (!font)
@@ -91,12 +94,9 @@ void WS_NAME (iFont *font, int x, int y,
 #endif
 
   int textLen = strlen ((char*)text);
-  int charW, charH;
+  int charW, charH, advance = 0;
   while (textLen > 0)
   {
-    if (x > ClipX2)
-      return;
-
     utf32_char glyph;
     int skip = csUnicodeTransform::UTF8Decode (text, textLen, glyph, 0);
     if (skip == 0) break;
@@ -108,6 +108,34 @@ void WS_NAME (iFont *font, int x, int y,
       (knownFont, glyph);
     charW = cacheData->w;
     charH = cacheData->h;
+
+    int y = pen_y - cacheData->top;
+    
+    // If we are advancing more than the last char was wide, we have to
+    // fill the 'gap' with bg.
+    advance += cacheData->left;
+    if (bg >= 0)
+    {
+      while (advance > 0)
+      {
+	if (pen_x > ClipX2)
+	  return;
+  
+	int cury = y;
+	for (int i = 0; i < charH; i++, cury++)
+	{
+	  if ((cury < ClipY1) || (cury >= ClipY2)) continue;
+	  register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (pen_x, cury);
+	  *VRAM = bg;
+	}
+	pen_x++; advance--;
+      }
+    }
+
+    int x = pen_x;
+    
+    if (x > ClipX2)
+      return;
 
     // If character is completely outside the clipping rectangle, continue
     if ((x + charW <= ClipX1) || (x >= ClipX2)
@@ -156,7 +184,10 @@ void WS_NAME (iFont *font, int x, int y,
 	  CharImageAlpha = p + lBytes;
 	  register uint8 CharLine = (*CharImageAlpha++) << shiftX;
 	  register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (lAbsX, cury);
-	  if (bg >= 0)
+	  // If we are advancing less than the last char was wide, the current
+	  // and last chars overlap. So we can't draw opaque, but have to draw
+	  // transparent instead.
+	  if ((bg >= 0) && (advance >= 0))
 	  {
 	    for (int j = lX; j < rX; j++)
 	    {
@@ -191,6 +222,7 @@ void WS_NAME (iFont *font, int x, int y,
 	      VRAM++;
 	      CharLine = (*CharImageAlpha++);
 	    } /* endfor */
+	    if (advance < 0) advance++;
 	  }
 	}
       }
@@ -208,7 +240,18 @@ void WS_NAME (iFont *font, int x, int y,
 	  {
 	    for (int j = lX; j < rX; j++)
 	    {
-	      *VRAM++ = (CharLine & 0x80) ? fg : bg;
+	      if (advance >= 0)
+	      {
+	        *VRAM++ = (CharLine & 0x80) ? fg : bg;
+	      }
+	      else
+	      {
+		if (CharLine & 0x80)
+		  *VRAM++ = fg;
+		else
+		  VRAM++;
+		advance++;
+	      }
 	      if ((j & 7) == 7)
 		CharLine = (*CharImage++);
 	      else
@@ -321,120 +364,10 @@ void WS_NAME (iFont *font, int x, int y,
 	} /* endfor */
       }
     } /* endif */
-    
-    x += charW;
-  }
-}
 
-void WS_NAME2 (iFont *font, int pen_x, int pen_y,
-  int fg, int bg, const utf8_char* text)
-{
-  if (!font)
-    return;
-
-  int charW, charH, advance=0, left, top, x, y;
-
-  for (uint8 c = *text; (c = *text); ++text)
-  {
-    pen_x += advance;
-
-    register uint8 *CharImage = font->GetGlyphBitmap (c, charW, charH, advance, left, top);
-    if (!CharImage)
-      continue;
-
-    x = pen_x + left;
-    y = pen_y - top;
-
-    if (x > ClipX2)
-      return;
-
-    // If character is completely outside the clipping rectangle, continue
-    if ((x + charW <= ClipX1) || (x >= ClipX2)
-     || (y + charH <= ClipY1) || (y >= ClipY2))
-      continue;
-
-    int cury = y;
-
-    // If character should not be clipped, go the fast path
-    if ((x < ClipX1) || (x + charW > ClipX2)
-     || (y < ClipY1) || (y + charH > ClipY2))
-    {
-      // Perform full clipping
-      int lX = x < ClipX1 ? ClipX1 - x : 0;
-      int rX = x + charW >= ClipX2 ? ClipX2 - x : charW;
-      int lBytes = lX >> 3;
-      int shiftX = lX & 7;
-      int bbl = (charW + 7) / 8; // bytes per line
-      int lAbsX = x + lX;
-      unsigned char *p = CharImage - bbl;
-      for (int i = 0; i < charH; i++, cury++)
-      {
-        p += bbl;
-        if ((cury < ClipY1) || (cury >= ClipY2)) continue;
-        CharImage = p + lBytes;
-        register char CharLine = (*CharImage++) << shiftX;
-        register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (lAbsX, cury);
-        if (bg >= 0)
-          for (int j = lX; j < rX; j++)
-          {
-            *VRAM++ = (CharLine & 0x80) ? fg : bg;
-            if ((j & 7) == 7)
-              CharLine = (*CharImage++);
-            else
-              CharLine += CharLine;
-          } /* endfor */
-        else
-          for (int j = lX; j < rX; j++)
-          {
-            if (CharLine & 0x80)
-              *VRAM++ = fg;
-            else
-              VRAM++;
-            if ((j & 7) == 7)
-              CharLine = (*CharImage++);
-            else
-              CharLine += CharLine;
-          } /* endfor */
-       }
-    }
-    else
-    {
-      for (int i = 0; i < charH; i++, cury++)
-      {
-        register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (x, cury);
-        register unsigned pixW = charW;
-        if (bg < 0)
-          while (pixW)
-          {
-            register unsigned char CharLine = *CharImage++;
-            register int pix;
-            for (pix = pixW < 8 ? pixW : 8, pixW -= pix; CharLine && pix; pix--)
-            {
-              if (CharLine & 0x80)
-                *VRAM++ = fg;
-              else
-                VRAM++;
-              // Addition is faster than shift, at least on i586+
-              CharLine += CharLine;
-            }
-            VRAM += pix;
-          }
-        else
-          while (pixW)
-          {
-            register unsigned char CharLine = *CharImage++;
-            register int pix;
-            for (pix = pixW < 8 ? pixW : 8, pixW -= pix; CharLine && pix; pix--)
-            {
-              *VRAM++ = (CharLine & 0x80) ? fg : bg;
-              // Addition is faster than shift, at least on i586+
-              CharLine += CharLine;
-            }
-            while (pix--)
-              *VRAM++ = bg;
-          }
-      } /* endfor */
-    } /* endif */
+    pen_x -= cacheData->left;
+    pen_x += MIN(cacheData->adv, charW);
+    advance += cacheData->adv - charW;
   }
 }
 

@@ -368,6 +368,7 @@ void csFontCache::UncacheGlyph (GlyphCacheData* cacheData)
 void csFontCache::WriteString (iFont *font, int x, int y, int fg, int bg, 
   const utf8_char* text)
 {
+  WriteStringBaseline (font, x, y + font->GetAscent (), fg, bg, text);
 }
 
 void csFontCache::WriteStringBaseline (iFont *font, int x, int y, int fg, int bg, 

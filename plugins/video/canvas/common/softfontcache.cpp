@@ -56,8 +56,7 @@ csSoftFontCache8::csSoftFontCache8 (csGraphics2D* G2D) : csSoftFontCache (G2D)
 {
 }
 
-#define WS_NAME csSoftFontCache8::WriteString
-#define WS_NAME2 csSoftFontCache8::WriteStringBaseline
+#define WS_NAME csSoftFontCache8::WriteStringBaseline
 #define WS_PIXTYPE uint8
 #include "writechr.inc"
 
@@ -67,8 +66,7 @@ csSoftFontCache16_NoAA::csSoftFontCache16_NoAA (csGraphics2D* G2D) : csSoftFontC
 {
 }
 
-#define WS_NAME csSoftFontCache16_NoAA::WriteString
-#define WS_NAME2 csSoftFontCache16_NoAA::WriteStringBaseline
+#define WS_NAME csSoftFontCache16_NoAA::WriteStringBaseline
 #define WS_PIXTYPE uint16
 #include "writechr.inc"
 
@@ -78,8 +76,7 @@ csSoftFontCache16_555::csSoftFontCache16_555 (csGraphics2D* G2D) : csSoftFontCac
 {
 }
 
-#define WS_NAME csSoftFontCache16_555::WriteString
-#define WS_NAME2 csSoftFontCache16_555::WriteStringBaseline
+#define WS_NAME csSoftFontCache16_555::WriteStringBaseline
 #define WS_PIXTYPE uint16
 #define WS_ALPHA_AVAILABLE
 #define WS_A_R5G5B5
@@ -91,8 +88,7 @@ csSoftFontCache16_565::csSoftFontCache16_565 (csGraphics2D* G2D) : csSoftFontCac
 {
 }
 
-#define WS_NAME csSoftFontCache16_565::WriteString
-#define WS_NAME2 csSoftFontCache16_565::WriteStringBaseline
+#define WS_NAME csSoftFontCache16_565::WriteStringBaseline
 #define WS_PIXTYPE uint16
 #define WS_ALPHA_AVAILABLE
 #define WS_A_R5G6B5
@@ -104,8 +100,7 @@ csSoftFontCache32::csSoftFontCache32 (csGraphics2D* G2D) : csSoftFontCache (G2D)
 {
 }
 
-#define WS_NAME csSoftFontCache32::WriteString
-#define WS_NAME2 csSoftFontCache32::WriteStringBaseline
+#define WS_NAME csSoftFontCache32::WriteStringBaseline
 #define WS_PIXTYPE uint32
 #define WS_ALPHA_AVAILABLE
 #define WS_A_R8G8B8

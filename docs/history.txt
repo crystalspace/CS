@@ -18,6 +18,10 @@ chronological order.
 	  AttachCollider methods to allow them to appear in API docs.
 	- res improved 'detection' of what font cache has to be used for 
 	  software canvases.
+	- res made the following changes:
+	    - WriteString() now wraps WriteStringBaseline() on all canvas.
+	    - The surrogate check macros in cssys/csunicode.h didn't honor 
+	      that characters can get wider than 16 bits.
 14-Aug-2003
 	- Jorrit added iSharedVariableListener. With this interface you can
 	  listen to a variable and get notified when its value changes.
