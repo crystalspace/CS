@@ -380,7 +380,7 @@ void csGLRender3D::SetupStencil ()
     statecache->SetShadeModel (GL_FLAT);
     SetZMode (CS_ZBUF_NONE);
 
-    statecache->Disable_GL_TEXTURE_2D;
+    statecache->Disable_GL_TEXTURE_2D ();
     if (color_enabled)
       glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     statecache->SetStencilFunc (GL_ALWAYS, 128, 128);
