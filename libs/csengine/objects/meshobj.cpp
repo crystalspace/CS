@@ -616,8 +616,6 @@ void csMeshFactoryWrapper::AddChild (iMeshFactoryWrapper* child)
   csMeshFactoryWrapper* c = child->GetPrivateObject ();
   // First we increase reference on the mesh to make sure it will
   // not get deleted by unlinking it from it's previous parent.
-  // We will also keep this incremented because the parent mesh
-  // now holds an additional reference to this child.
   c->IncRef ();
   if (c->parent)
   {
@@ -628,7 +626,8 @@ void csMeshFactoryWrapper::AddChild (iMeshFactoryWrapper* child)
   }
 
   c->parent = this;
-  children.Push (child);
+  children.Push (child); // here child will be IncRef'ed again, so we now do a:
+  c->DecRef ();
 }
 
 void csMeshFactoryWrapper::RemoveChild (iMeshFactoryWrapper* child)
