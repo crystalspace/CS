@@ -195,20 +195,25 @@ void PicView::CreateGui ()
 
 void PicView::LoadNextImage (size_t idx, int step)
 {
+  size_t startIdx = cur_idx;
+  csRef<iImage> ifile;
   iTextureManager* txtmgr = g3d->GetTextureManager();
 
   if (idx) cur_idx = idx;
-  if ((step < 0) && ((size_t)-step > cur_idx))
-    cur_idx = files->Length ()-1;
-  else
-    cur_idx += step;
-  if ((size_t)cur_idx >= files->Length ()) cur_idx = 0;
+  do
+  {
+    if ((step < 0) && ((size_t)-step > cur_idx))
+      cur_idx = files->Length ()-1;
+    else
+      cur_idx += step;
+    if ((size_t)cur_idx >= files->Length ()) cur_idx = 0;
 
-  csRef<iDataBuffer> buf (vfs->ReadFile (files->Get (cur_idx), false));
-  if (!buf) return;
-		
-  csRef<iImage> ifile (imgloader->Load (buf, 
-    txtmgr->GetTextureFormat ()));
+    csRef<iDataBuffer> buf (vfs->ReadFile (files->Get (cur_idx), false));
+    if (!buf) return;
+  		
+    ifile = imgloader->Load (buf, txtmgr->GetTextureFormat ());
+  }
+  while (!ifile.IsValid() && (cur_idx != startIdx));
   if (!ifile) return;
 
   delete pic;
