@@ -37,6 +37,8 @@ Short-term cleanups that need to be done:
 	  textured. I'm not sure why this is yet.
 	- A nice consequence of the new DrawTriangleMesh is that vertex
 	  fog should be a LOT faster.
+	- Eric Sunshine fixed a number of "variable may be used uninitialized"
+	  copilation warnings.
 15-Feb-2000
 	- Eric Sunshine worked around an OpenStep compiler bug which was
 	  triggeredy by ctLinkList.  The compiler generates unlinkable code
