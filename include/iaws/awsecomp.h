@@ -19,6 +19,7 @@
 *****************************************************************************/
 #include "iaws/aws.h"
 #include "iaws/awsparm.h"
+#include "iutil/event.h"
 
 class awsEmbeddedComponent : public iAwsComponent
 {
@@ -29,7 +30,12 @@ public:
   virtual ~awsEmbeddedComponent()
   { if (comp) comp->DecRef(); }
 
-public:
+ public:
+
+    /// Gets the component owner for this (sources are embedded)
+    virtual iAwsComponent *GetComponent()
+    {return this;}
+
     /// Registers a slot for a signal
     virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal)
     { return comp->RegisterSlot(slot, signal); }
@@ -45,7 +51,10 @@ public:
 public:
     /// Sets the embedded component.  MUST BE CALLED BEFORE ANY OTHER FUNCTION!
     virtual void Initialize(iAwsComponent *component)
-    { comp=component; }
+    { 
+      comp=component; 
+      if (comp) comp->IncRef ();
+    }
 
     /// Sets up component
     virtual bool Setup(iAws *wmgr, awsComponentNode *settings)
@@ -199,44 +208,97 @@ public:
 
 public:
     /// Triggered when the component needs to draw
-    virtual void OnDraw(csRect clip)=0;
+    virtual void OnDraw(csRect clip)
+    { comp->OnDraw (clip); }
 
     /// Triggered when the user presses a mouse button down
-    virtual bool OnMouseDown(int button, int x, int y)=0;
+    virtual bool OnMouseDown(int button, int x, int y)
+    { return comp->OnMouseDown (button, x, y); }
 
     /// Triggered when the user unpresses a mouse button
-    virtual bool OnMouseUp(int button, int x, int y)=0;
+    virtual bool OnMouseUp(int button, int x, int y)
+    { return comp->OnMouseUp (button, x, y); }
 
     /// Triggered when the user moves the mouse
-    virtual bool OnMouseMove(int button, int x, int y)=0;
+    virtual bool OnMouseMove(int button, int x, int y)
+    { return comp->OnMouseMove (button, x, y); }
 
     /// Triggered when the user clicks the mouse
-    virtual bool OnMouseClick(int button, int x, int y)=0;
+    virtual bool OnMouseClick(int button, int x, int y)
+    { return comp->OnMouseClick (button, x, y); }
 
     /// Triggered when the user double clicks the mouse
-    virtual bool OnMouseDoubleClick(int button, int x, int y)=0;
+    virtual bool OnMouseDoubleClick(int button, int x, int y)
+    { return comp->OnMouseDoubleClick (button, x, y); }
 
     /// Triggered when this component loses mouse focus
-    virtual bool OnMouseExit()=0;
+    virtual bool OnMouseExit()
+    { return comp->OnMouseExit (); }
 
     /// Triggered when this component gains mouse focus
-    virtual bool OnMouseEnter()=0;
+    virtual bool OnMouseEnter()
+    { return comp->OnMouseEnter (); }
 
     /// Triggered when the user presses a key
-    virtual bool OnKeypress(int key, int modifiers)=0;
+    virtual bool OnKeypress(int key, int modifiers)
+    { return comp->OnKeypress (key, modifiers); }
 
     /// Triggered when the keyboard focus is lost
-    virtual bool OnLostFocus()=0;
+    virtual bool OnLostFocus()
+    { return comp->OnLostFocus (); }
 
     /// Triggered when the keyboard focus is gained
-    virtual bool OnGainFocus()=0;
+    virtual bool OnGainFocus()
+    { return comp->OnGainFocus (); }
+
+    /// Gets the layout manager for this component.
+    virtual awsLayoutManager *Layout()
+    { return comp->Layout ();}
+
+    /// Set the layout manager
+    virtual void SetLayout(awsLayoutManager *layoutMgr)
+    { comp->SetLayout(layoutMgr); }
+
+    /// get the components preferred size, used by layout manager
+    virtual csRect getPreferredSize()
+    { return comp->getPreferredSize (); }
+
+    /// get the components minimal size, used by layout manager
+    virtual csRect getMinimumSize()
+    { return comp->getMinimumSize (); }
+
+    /// get the components insets, used by layout manager
+    virtual csRect getInsets()
+    { return comp->getInsets (); }
+
+    /// does the component listen to events ?
+    virtual bool isDeaf()
+    { return comp->isDeaf (); }
+
+    /// let the component listen to events or not
+    virtual void SetDeaf (bool isDeaf)
+    { comp->SetDeaf (isDeaf); }
+
+    /// Triggered at the start of each frame
+    virtual bool OnFrame()
+    { return comp->OnFrame ();}
+
+    /// Triggered when a child is added to the parent (triggered on the child)
+    virtual void OnAdded()
+    { return comp->OnAdded ();}
+
+    /// Triggered when a component is resized by the layout manager.
+    virtual void OnResized()
+    { return comp->OnResized ();}
+
 };
 
 class awsEmbeddedComponentFactory : public iAwsComponentFactory
 {
+ protected:
     iAws *wmgr;
 
-public:
+ public:
     /// Calls register to register the component that it builds with the window manager
     awsEmbeddedComponentFactory(iAws *_wmgr)
     {
@@ -254,9 +316,9 @@ public:
     iAws *WindowManager() { return wmgr; }
 
     /// Registers this factory with the window manager
-    virtual void Register(char *type, char *name)
+    virtual void Register(char *type)
     {
-      wmgr->RegisterComponentFactory(this, name);
+      wmgr->RegisterComponentFactory(this, type);
     }
 
     /// Registers constants for the parser so that we can construct right.
