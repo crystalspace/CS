@@ -36,7 +36,7 @@ struct iString;
 struct iVFS;
 
 /**
- * Possible node types for documents.
+ * Possible node types for iDocumentNode.
  */
 enum csDocumentNodeType
 {
@@ -59,7 +59,7 @@ enum csDocumentNodeType
 SCF_VERSION (iDocumentAttributeIterator, 0, 0, 1);
 
 /**
- * An iterator over attributes.
+ * An iterator over iDocumentNode attributes.
  */
 struct iDocumentAttributeIterator : public iBase
 {
@@ -74,7 +74,7 @@ struct iDocumentAttributeIterator : public iBase
 SCF_VERSION (iDocumentAttribute, 0, 0, 1);
 
 /**
- * This represents an attribute for a document node.
+ * An attribute for an iDocumentNode.
  */
 struct iDocumentAttribute : public iBase
 {
@@ -82,7 +82,7 @@ struct iDocumentAttribute : public iBase
   virtual const char* GetName () const = 0;
   /// Get value of this attribute.
   virtual const char* GetValue () const = 0;
-  /// Get value of this attribute as int.
+  /// Get value of this attribute as integer.
   virtual int GetValueAsInt () const = 0;
   /// Get value of this attribute as float.
   virtual float GetValueAsFloat () const = 0;
@@ -101,7 +101,7 @@ struct iDocumentAttribute : public iBase
 SCF_VERSION (iDocumentNodeIterator, 0, 0, 1);
 
 /**
- * An iterator over nodes.
+ * An iterator over iDocumentNode.
  */
 struct iDocumentNodeIterator : public iBase
 {
@@ -116,7 +116,7 @@ struct iDocumentNodeIterator : public iBase
 SCF_VERSION (iDocumentNode, 0, 4, 0);
 
 /**
- * This represents a node in a document.
+ * Representation of a node in a document.
  */
 struct iDocumentNode : public iBase
 {
@@ -129,7 +129,7 @@ struct iDocumentNode : public iBase
    * Get the value of this node.
    * What this is depends on the type of the node:
    * <ul>
-   * <li>#CS_NODE_DOCUMENT: filename of the xml file
+   * <li>#CS_NODE_DOCUMENT: filename of the document file
    * <li>#CS_NODE_ELEMENT: name of the element
    * <li>#CS_NODE_COMMENT: comment text
    * <li>#CS_NODE_UNKNOWN: tag contents
@@ -142,7 +142,7 @@ struct iDocumentNode : public iBase
    * Set the value of this node.
    * What this is depends on the type of the node:
    * <ul>
-   * <li>#CS_NODE_DOCUMENT: filename of the xml file
+   * <li>#CS_NODE_DOCUMENT: filename of the document file
    * <li>#CS_NODE_ELEMENT: name of the element
    * <li>#CS_NODE_COMMENT: comment text
    * <li>#CS_NODE_UNKNOWN: tag contents
@@ -151,9 +151,9 @@ struct iDocumentNode : public iBase
    * </ul>
    */
   virtual void SetValue (const char* value) = 0;
-  /// Set value as int.
+  /// Set value to the string representation of an integer.
   virtual void SetValueAsInt (int value) = 0;
-  /// Set value as float.
+  /// Set value to the string representation of a float.
   virtual void SetValueAsFloat (float value) = 0;
 
   /// Get the parent.
@@ -180,24 +180,23 @@ struct iDocumentNode : public iBase
    * (CS_NODE_DOCUMENT is not allowed here for example).
    */
   virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
-  	iDocumentNode* before) = 0;
+  	iDocumentNode* before = 0) = 0;
 
   /**
-   * Get the value of a node. What this does is scan all child nodes
-   * and look for a node of type 'text'. It will return the text of that
-   * node.
+   * Get the value of a node.  Scans all child nodes and looks for a node of
+   * type 'text', and returns the text of that node.
    */
   virtual const char* GetContentsValue () = 0;
   /**
-   * Get the value of a node as int. What this does is scan all child nodes
-   * and look for a node of type 'text'. It will return the text of that
-   * node.
+   * Get the value of a node as an integer.  Scans all child nodes and looks
+   * for a node of type 'text', converts the text of that node to a number and
+   * returns the represented integer.
    */
   virtual int GetContentsValueAsInt () = 0;
   /**
-   * Get the value of a node as float. What this does is scan all child nodes
-   * and look for a node of type 'text'. It will return the text of that
-   * node.
+   * Get the value of a node as float.  Scans all child nodes and looks for a
+   * node of type 'text', converts the text of that node to a number and
+   * returns the represented floating point value.
    */
   virtual float GetContentsValueAsFloat () = 0;
 
@@ -207,11 +206,11 @@ struct iDocumentNode : public iBase
   virtual csRef<iDocumentAttributeIterator> GetAttributes () = 0;
   /// Get an attribute by name.
   virtual csRef<iDocumentAttribute> GetAttribute (const char* name) = 0;
-  /// Get an attribute value by name.
+  /// Get an attribute value by name as a string.
   virtual const char* GetAttributeValue (const char* name) = 0;
-  /// Get an attribute value by name.
+  /// Get an attribute value by name as an integer.
   virtual int GetAttributeValueAsInt (const char* name) = 0;
-  /// Get an attribute value by name.
+  /// Get an attribute value by name as a floating point value.
   virtual float GetAttributeValueAsFloat (const char* name) = 0;
 
   /// Remove an attribute.
@@ -221,9 +220,9 @@ struct iDocumentNode : public iBase
 
   /// Change or add an attribute.
   virtual void SetAttribute (const char* name, const char* value) = 0;
-  /// Change or add an attribute as int.
+  /// Change or add an attribute to a string representation of an integer.
   virtual void SetAttributeAsInt (const char* name, int value) = 0;
-  /// Change or add an attribute as float.
+  /// Change or add an attribute to a string representation of a float.
   virtual void SetAttributeAsFloat (const char* name, float value) = 0;
 };
 
@@ -232,11 +231,11 @@ struct iDocumentNode : public iBase
 SCF_VERSION (iDocument, 0, 1, 0);
 
 /**
- * This represents a document.
+ * Representation of a document containing a hierarchical structure of nodes.
  */
 struct iDocument : public iBase
 {
-  /// Clear the document fully.
+  /// Clear the document.
   virtual void Clear () = 0;
 
   /// Create a root node. This will clear the previous root node if any.
@@ -270,7 +269,7 @@ struct iDocument : public iBase
   virtual const char* Parse (iString* str) = 0;
 
   /**
-   * Parse document file from a char array.
+   * Parse document file from a null-terminated C-string.
    * This will clear the previous root node if any.
    * Returns NULL if all is ok. Otherwise it will return an error
    * string.
@@ -304,7 +303,7 @@ struct iDocument : public iBase
 SCF_VERSION (iDocumentSystem, 0, 0, 1);
 
 /**
- * The document system.
+ * An iDocument factory.
  */
 struct iDocumentSystem : public iBase
 {
@@ -315,4 +314,3 @@ struct iDocumentSystem : public iBase
 /** @} */
 
 #endif // __IUTIL_DOCUMENT_H__
-
