@@ -657,7 +657,8 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   top_mesh.mixmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
   vbufmgr->LockBuffer (vbuf,
-  	ball_vertices, ball_texels, ball_colors, num_ball_vertices, 0);
+  	ball_vertices, ball_texels, ball_colors, num_ball_vertices,
+	0, object_bbox);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), top_mesh);
   g3d->DrawTriangleMesh (top_mesh);
   vbufmgr->UnlockBuffer (vbuf);

@@ -542,6 +542,8 @@ void csGraphics3DOGLCommon::PerfTest ()
   int x, y, i, t;
   float fx, fy;
   i = 0;
+  csBox3 bbox;
+  bbox.StartBoundingBox ();
   for (y = 0; y <= res; y++)
   {
     fy = float (y) / float (res) - .5;
@@ -549,6 +551,7 @@ void csGraphics3DOGLCommon::PerfTest ()
     {
       fx = float (x) / float (res) - .5;
       vertices[i].Set (10.*fx, 10.*fy, z);
+      bbox.AddBoundingVertex (vertices[i]);
       texels[i].Set (0, 0);
       colors[i].Set (1, 0, 0);
       i++;
@@ -606,7 +609,7 @@ void csGraphics3DOGLCommon::PerfTest ()
 
   csRef<iVertexBuffer> vbuf (GetVertexBufferManager ()->CreateBuffer (0));
   GetVertexBufferManager ()->LockBuffer (vbuf, vertices, texels,
-    colors, num_vertices, 0);
+    colors, num_vertices, 0, bbox);
   mesh.buffers[0] = vbuf;
 
   if (compute_outer && !GLCaps.need_screen_clipping)
@@ -3405,9 +3408,10 @@ void csGraphics3DOGLCommon::SetupClippingPlanes (
     frust_origin.Set (0, 0, 0);
 }
 
-void csGraphics3DOGLCommon::ClassifyForClipTriangleMesh (
+bool csGraphics3DOGLCommon::ClassifyForClipTriangleMesh (
     int num_vertices,
     csVector3* vertices,
+    const csBox3& bbox,
     const csVector3& frust_origin, csPlane3* planes, int num_planes)
 {
   int i, j;
@@ -3417,6 +3421,21 @@ void csGraphics3DOGLCommon::ClassifyForClipTriangleMesh (
 
   int* ct = clipped_plane->GetArray ();
 
+  uint32 inmask, outmask;
+  int np;
+  inmask = 0;
+  csPlane3 fr[32];
+  // @@@ What is vertices are pre-transformed but bbox isn't?
+  csBox3 cbbox (bbox.Min ()-frust_origin, bbox.Max ()-frust_origin);
+  for (np = 0 ; np < num_planes ; np++)
+  {
+    inmask = 1 | (inmask<<1);
+    fr[np] = planes[np];
+    fr[np].Invert ();
+  }
+  bool vis = csIntersect3::BoxFrustum (cbbox, fr, inmask, outmask);
+  if (!vis) return false;
+
   // Check all original vertices and see if they are in frustum.
   // If not we set clipped_plane to the plane which causes the
   // vertex to go outside. If yes then clipped_plane = -1.
@@ -3424,15 +3443,20 @@ void csGraphics3DOGLCommon::ClassifyForClipTriangleMesh (
   {
     const csVector3& v = vertices[i];
     ct[i] = -1;
-    for (j = 0 ; j < num_planes ; j++)
+    uint32 m = outmask;
+    int j = 0;
+    while (m > 0)
     {
-      if (planes[j].Classify (v-frust_origin) >= 0)
+      if ((m & 1) && (planes[j].Classify (v-frust_origin) >= 0))
       {
 	ct[i] = j;
 	break;  // Not inside.
       }
+      m >>= 1;
+      j++;
     }
   }
+  return true;
 }
 
 void csGraphics3DOGLCommon::ClipTriangleMesh (
@@ -3763,7 +3787,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 
   csTrianglesPerMaterial *t = polbuf->GetFirst ();
   vbman->LockBuffer (vb, total_verts, total_texels, NULL,
-      total_verts_count, 0);
+      total_verts_count, 0, polbuf->GetBoundingBox ());
   bool something_was_drawn = false;
   while (t != NULL)
   {
@@ -3791,9 +3815,11 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       if (ci.how_clip == '0' || ci.use_lazy_clipping
         || ci.do_plane_clipping || ci.do_z_plane_clipping)
       {
-        ClassifyForClipTriangleMesh (
+        bool vis = ClassifyForClipTriangleMesh (
             total_verts_count, work_verts,
+	    polbuf->GetBoundingBox (),
             ci.frust_origin, ci.frustum_planes, ci.num_planes);
+        if (!vis) break;
       }
     }
     trimesh.triangles = t->triangles.GetArray ();
@@ -3829,7 +3855,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   if (m_renderstate.lighting && sln)
   {
     vbman->LockBuffer (vb, total_verts, total_lumels, NULL,
-          total_verts_count, 0);
+          total_verts_count, 0, polbuf->GetBoundingBox ());
     bool dirty = polbuf->superLM.GetLightmapsDirtyState ();
     bool modified = false;
     while (sln != NULL)
@@ -3854,19 +3880,21 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   if (mesh.do_fog)
   {
     vbman->LockBuffer (vb, polbuf->GetVertices (), NULL, NULL,
-      polbuf->GetVertexCount (), 0);
+      polbuf->GetVertexCount (), 0, polbuf->GetBoundingBox ());
     trimesh.triangles = polbuf->GetTriangles ();
     trimesh.num_triangles = polbuf->GetTriangleCount ();
     trimesh.do_fog = mesh.do_fog;
     trimesh.vertex_fog = mesh.vertex_fog;
+    bool vis = true;
     if (ci.how_clip == '0' || ci.use_lazy_clipping
         || ci.do_plane_clipping || ci.do_z_plane_clipping)
     {
-      ClassifyForClipTriangleMesh (
+      vis = ClassifyForClipTriangleMesh (
             polbuf->GetVertexCount (), polbuf->GetVertices (),
+	    polbuf->GetBoundingBox (),
             ci.frust_origin, ci.frustum_planes, ci.num_planes);
     }
-    FogDrawTriangleMesh (trimesh, false);
+    if (vis) FogDrawTriangleMesh (trimesh, false);
     vbman->UnlockBuffer (vb);
   }
 
@@ -4615,9 +4643,14 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     || ci.do_plane_clipping || ci.do_z_plane_clipping)
   {
     //ci.use_lazy_clipping = true;//@@@
-    if (setup) ClassifyForClipTriangleMesh (
+    if (setup)
+    {
+      bool vis = ClassifyForClipTriangleMesh (
         num_vertices, work_verts,
+	mesh.buffers[0]->GetBoundingBox (),
         ci.frust_origin, ci.frustum_planes, ci.num_planes);
+      if (!vis) return false;
+    }
     if (ci.use_lazy_clipping)
     {
       ClipTriangleMesh (
@@ -5003,9 +5036,14 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
     || ci.do_plane_clipping || ci.do_z_plane_clipping)
   {
     //ci.use_lazy_clipping = true;//@@@
-    if (setup) ClassifyForClipTriangleMesh (
+    if (setup)
+    {
+      bool vis = ClassifyForClipTriangleMesh (
         num_vertices, work_verts,
+	mesh.buffers[0]->GetBoundingBox (),
         ci.frust_origin, ci.frustum_planes, ci.num_planes);
+      if (!vis) return false;
+    }
     if (ci.use_lazy_clipping)
     {
       ClipTriangleMesh (
@@ -5379,9 +5417,14 @@ void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
     || ci.do_plane_clipping || ci.do_z_plane_clipping)
   {
     //ci.use_lazy_clipping = true;//@@@
-    if (setup) ClassifyForClipTriangleMesh (
+    if (setup)
+    {
+      bool vis = ClassifyForClipTriangleMesh (
         num_vertices, work_verts,
+	mesh.buffers[0]->GetBoundingBox (),
         ci.frust_origin, ci.frustum_planes, ci.num_planes);
+      if (!vis) return;
+    }
     if (ci.use_lazy_clipping)
     {
       ClipTriangleMesh (

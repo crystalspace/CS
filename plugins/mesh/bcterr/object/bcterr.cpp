@@ -1282,7 +1282,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
         end = current_lod->x_verts * current_lod->z_verts;
         owner->vbufmgr->LockBuffer(current_lod->mesh->buffers[0],
           current_lod->verts, current_lod->texels, current_lod->color,
-          (end + z2_end), 0);
+          (end + z2_end), 0, bbox);
       //}
       current_lod->mesh->clip_portal = clip_portal;
       current_lod->mesh->clip_portal = clip_plane;
@@ -1304,7 +1304,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
         end = default_lod->x_verts * default_lod->z_verts;
         owner->vbufmgr->LockBuffer(default_lod->mesh->buffers[0],
           default_lod->verts, default_lod->texels, default_lod->color,
-          (end + z2_end), 0);
+          (end + z2_end), 0, bbox);
       //}
       default_lod->mesh->clip_portal = clip_portal;
       default_lod->mesh->clip_portal = clip_plane;
@@ -1328,7 +1328,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
         end = owner->sys_inc * owner->sys_inc;  
         owner->vbufmgr->LockBuffer(draw_mesh.buffers[0],
           verts, texels, color,
-          end, 0);
+          end, 0, bbox);
       //}
       draw_mesh.clip_portal = clip_portal;
       draw_mesh.clip_portal = clip_plane;
@@ -1353,7 +1353,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
       //{
         owner->vbufmgr->LockBuffer(draw_mesh.buffers[0],
           verts, texels, color,
-          16, 0);
+          16, 0, bbox);
       //}
       draw_mesh.clip_portal = clip_portal;
       draw_mesh.clip_portal = clip_plane;

@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+14-Feb-2003
+	- Extended iVertexBuffer and iPolygonBuffer with a bounding box.
+	  The renderers can use this to optimize clipping.
+	- Fixed a bug in the OpenGL polybuffer implementation for things
+	  that don't have lightmaps.
+	- ClassifyForClipTriangleMesh() in OpenGL renderer now uses bounding
+	  box to avoid too many classify tests on vertices. Doesn't seem
+	  to give a dramatic fps improvement though.
 13-Feb-2003
 	- Added another trivial case to csRect::ClipLine() making it a little
 	  bit safer again.

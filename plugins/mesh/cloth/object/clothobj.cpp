@@ -250,7 +250,8 @@ bool csStuffObject::Draw(iRenderView *rview, iMovable*, csZBufMode zbufmode)
   mesh.use_vertex_color =true;
   mesh.mixmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
-  vbufmgr->LockBuffer (vbuf,vertices, texels, colors, num_vertices, 0);
+  vbufmgr->LockBuffer (vbuf,vertices, texels, colors, num_vertices, 0,
+  	object_bbox);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), mesh);
   g3d->DrawTriangleMesh (mesh);
   vbufmgr->UnlockBuffer (vbuf);

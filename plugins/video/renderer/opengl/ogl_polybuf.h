@@ -212,6 +212,8 @@ protected:
   int verticesCount;
   csGrowingArray<csTriangle> orig_triangles;
 
+  csBox3 bbox;
+
   /**
    * Search a superlightmap to fit the lighmap in the superLM list
    * if it can't find any it creates a new one.
@@ -296,6 +298,9 @@ public:
 
   /// Prepare.
   virtual void Prepare ();
+
+  /// Get the bounding box.
+  virtual const csBox3& GetBoundingBox () const { return bbox; }
 };
 
 /**

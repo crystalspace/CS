@@ -748,11 +748,13 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
   m.use_vertex_color = true;
   m.mixmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
+  const csBox3& b = factory->GetObjectBoundingBox ();
   vbufmgr->LockBuffer (vbuf,
   	factory->GetVertices (),
 	factory->GetTexels (),
 	do_manual_colors ? factory->GetColors () : lit_mesh_colors,
-	factory->GetVertexCount (), 0);
+	factory->GetVertexCount (), 0,
+	b);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), m);
   g3d->DrawTriangleMesh (m);
   vbufmgr->UnlockBuffer (vbuf);

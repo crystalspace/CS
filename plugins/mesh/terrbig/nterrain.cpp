@@ -36,7 +36,8 @@ nTerrainInfo::nTerrainInfo (iObjectRegistry *obj_reg)
   mesh = new G3DTriangleMesh;
   mesh->vertex_fog = NULL;
   mG3D = CS_QUERY_REGISTRY (obj_reg, iGraphics3D);
-  if (mG3D) {
+  if (mG3D)
+  {
   // @@@ priority should be a parameter.
     vbufmgr = mG3D->GetVertexBufferManager ();
     vbuf = vbufmgr->CreateBuffer (1);
@@ -54,25 +55,25 @@ nTerrainInfo::nTerrainInfo (iObjectRegistry *obj_reg)
 
 nTerrainInfo::~nTerrainInfo ()
 {
-  if (mesh->vertex_fog)
-    delete[] mesh->vertex_fog;
+  delete[] mesh->vertex_fog;
   delete mesh;
-  if (triangle_count) { delete [] triangles; }
-  if (vertex_count) {
-    delete [] vertices;
-	delete [] texels;
-    delete [] colors;
-  }
+  delete [] triangles;
+  delete [] vertices;
+  delete [] texels;
+  delete [] colors;
 }
 
 void nTerrainInfo::InitBuffer (const csVector3 &v, const csVector2 &t, const csColor &c, int p)
 {
-  if (vertex_size == 0) {
+  if (vertex_size == 0)
+  {
     vertices = new csVector3[2];
     texels = new csVector2[2];
     colors = new csColor[2];
     vertex_size = 2;
-  } else if (mG3D) {
+  }
+  else if (mG3D)
+  {
     delete [] mesh->vertex_fog;
     vbufmgr->UnlockBuffer(vbuf);
 	bufcount ++;
@@ -90,13 +91,16 @@ void nTerrainInfo::InitBuffer (const csVector3 &v, const csVector2 &t, const csC
 void nTerrainInfo::AddVertex (const csVector3 &v, const csVector2 &t, const csColor &c, int p)
 {
   CS_ASSERT (vertex_size >= 2);
-  if (v == vertices[vertex_count - 1] || v == vertices[vertex_count - 2]) {
+  if (v == vertices[vertex_count - 1] || v == vertices[vertex_count - 2])
+  {
     return;
   }
-  if (vertex_count+1 >= vertex_size) {
+  if (vertex_count+1 >= vertex_size)
+  {
     ResizeVertices ();
   }
-  if (p == parity) {
+  if (p == parity)
+  {
     vertices[vertex_count] = vertices[vertex_count - 2];
     texels[vertex_count] = texels[vertex_count - 2];
     colors[vertex_count] = colors[vertex_count - 2];
@@ -111,9 +115,10 @@ void nTerrainInfo::AddVertex (const csVector3 &v, const csVector2 &t, const csCo
   AddTriangle ();
 }
 
-void nTerrainInfo::EndBuffer (const csVector3 &v, const csVector2 &t, const csColor &c, iRenderView *rview)
+void nTerrainInfo::EndBuffer (const csVector3 &v, const csVector2 &t, const csColor &c, iRenderView *rview, const csBox3& bbox)
 {
-  if (vertex_count >= vertex_size) {
+  if (vertex_count >= vertex_size)
+  {
     ResizeVertices ();
   }
   vertices[vertex_count] = v;
@@ -122,8 +127,10 @@ void nTerrainInfo::EndBuffer (const csVector3 &v, const csVector2 &t, const csCo
   vertex_count ++;
   AddTriangle ();
 
-  if (mG3D) {
-    vbufmgr->LockBuffer(vbuf, vertices, texels, colors, vertex_count, bufcount);
+  if (mG3D)
+  {
+    vbufmgr->LockBuffer(vbuf, vertices, texels, colors, vertex_count, bufcount,
+      bbox);
     mesh->triangles = triangles;
     mesh->vertex_fog = new G3DFogInfo[vertex_count]; 
     mesh->buffers[0]=vbuf;
@@ -134,24 +141,32 @@ void nTerrainInfo::EndBuffer (const csVector3 &v, const csVector2 &t, const csCo
 
 void nTerrainInfo::AddTriangle ()
 {
-  if (triangle_count == triangle_size) {
-    if (triangle_size == 0) {
+  if (triangle_count == triangle_size)
+  {
+    if (triangle_size == 0)
+    {
       triangle_size = 1;
       triangles = new csTriangle[triangle_size];
-    } else {
+    }
+    else
+    {
       triangle_size <<= 1;
       csTriangle *ttmp = triangles;
       triangles = new csTriangle[triangle_size];
-      for (int i = 0; i < triangle_count; i++) {
+      for (int i = 0; i < triangle_count; i++)
+      {
         triangles[i] = ttmp[i];
       }
       delete [] ttmp;
     }
   }
-  if (triangle_parity) { // go counter-clockwise
+  if (triangle_parity)
+  { // go counter-clockwise
     triangles[triangle_count++] = csTriangle (vertex_count - 1,
       vertex_count - 2, vertex_count - 3);
-  } else { // go clockwise
+  }
+  else
+  { // go clockwise
     triangles[triangle_count++] = csTriangle (vertex_count - 3,
       vertex_count - 2, vertex_count - 1);
   }
@@ -190,18 +205,22 @@ void nTerrain::VerifyTreeNode(FILE *f, unsigned int level,
   {
     unsigned int right_ind = my * 2 + 1;
     VerifyTreeNode (f, level+1, parent, right_ind, my_ind, i, k, heightmap);
-    if (b->error < heightmap[(i+k)>>1].error) {
+    if (b->error < heightmap[(i+k)>>1].error)
+    {
       printf ("INVALID error between heightmap[%d].error = %f and hm[%d].error = %f\n", my_ind, b->error, right_ind, heightmap[right_ind].error);
     }
-    if (b->radius < heightmap[(i+k)>>1].radius) {
+    if (b->radius < heightmap[(i+k)>>1].radius)
+    {
       printf ("INVALID radius between heightmap[%d].radius = %f and hm[%d].radius = %f\n", my_ind, b->radius, right_ind, heightmap[right_ind].radius);
     }
     unsigned int left_ind = my * 2 + 0;
     VerifyTreeNode(f, level+1, parent, left_ind, my_ind, j, i, heightmap);
-    if (b->error < heightmap[(j+i)>>1].error) {
+    if (b->error < heightmap[(j+i)>>1].error)
+    {
       printf ("INVALID error between heightmap[%d].error = %f and hm[%d].error = %f\n", my_ind, b->error, left_ind, heightmap[left_ind].error);
     }
-    if (b->radius < heightmap[(j+i)>>1].radius) {
+    if (b->radius < heightmap[(j+i)>>1].radius)
+    {
       printf ("INVALID radius between heightmap[%d].radius = %f and hm[%d].radius = %f\n", my_ind, b->radius, left_ind, heightmap[left_ind].radius);
     }
   }
@@ -245,7 +264,8 @@ void nTerrain::BuildTree(FILE *f, nBlock *heightmap, unsigned int w)
   fwrite (&heightmap[NW], sizeof (nBlock), 1, f);
   fwrite (&heightmap[C], sizeof (nBlock), 1, f);
   unsigned int size = 0;
-  for (unsigned int i = 0, inc = 1; i < 2 * max_levels - 1; i ++, inc *= 2) {
+  for (unsigned int i = 0, inc = 1; i < 2 * max_levels - 1; i ++, inc *= 2)
+  {
     size += inc;
   }
 
@@ -268,7 +288,8 @@ csColor nTerrain::CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n)
   csVector3 li_center = movable->GetTransform().Other2This (li->GetCenter());
   csVector3 light_dir = v - li_center;
   float sq_dist = light_dir.SquaredNorm();
-  if (sq_dist < li->GetSquaredRadius ()) {
+  if (sq_dist < li->GetSquaredRadius ())
+  {
     
     csColor light_color = li->GetColor () * (256.0 / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (qsqrt (sq_dist));
@@ -279,7 +300,8 @@ csColor nTerrain::CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n)
     else
       cosinus = light_dir * n;
 
-    if (cosinus > 0) {
+    if (cosinus > 0)
+    {
       if (sq_dist >= SMALL_EPSILON) 
         cosinus *= qisqrt (sq_dist);
       if (cosinus < 1)
@@ -297,9 +319,11 @@ void nTerrain::BufferTreeNode(int p, nBlock *b)
   float mid = terrain_w / 2.0;
   csVector2 t = csVector2 ((b->pos.x + mid) / (float)terrain_w, 1.0 - (b->pos.z + mid) / (float)terrain_w);
   csColor c = csColor (1.0, 1.0, 1.0);
-  if (info->num_lights > 0) {
+  if (info->num_lights > 0)
+  {
     c = csColor (0.0, 0.0, 0.0);
-    for (int i = 0; i < info->num_lights; i ++) {
+    for (int i = 0; i < info->num_lights; i ++)
+    {
       iLight *li = info->light_list[i];
       c += CalculateLightIntensity (li, b->pos, b->norm);
     }
@@ -313,27 +337,32 @@ void nTerrain::ProcessTreeNode(iRenderView *rv, float kappa, unsigned int level,
   nBlock b = (nBlock *)hm->GetPointer(child + parent);
   if (level < 2 * max_levels - 1) {
     csSphere bs(b.pos, b.radius);
-    if (rv->TestBSphere (obj2cam, bs)) {
+    if (rv->TestBSphere (obj2cam, bs))
+    {
       float distance = (obj2cam * b.pos).SquaredNorm();
       float error_projection = (b.error / kappa + b.radius);
       error_projection *= error_projection;
-	  if (error_projection > distance) {
+      if (error_projection > distance)
+      {
         ProcessTreeNode (rv, kappa, level + 1, parent, branch, branch * 2 + 0);
         BufferTreeNode (level & 1, &b);
         ProcessTreeNode (rv, kappa, level + 1, parent, branch, branch * 2 + 1);
       } 
     }
-  } else {
+  }
+  else
+  {
     float distance = (obj2cam * b.pos).SquaredNorm();
     float error_projection = (b.error / kappa + b.radius);
     error_projection *= error_projection;
-	if (error_projection > distance) {
+    if (error_projection > distance)
+    {
       BufferTreeNode (level & 1, &b);
     } 
   }
 }
 
-void nTerrain::AssembleTerrain(iRenderView *rv, iMovable*m, nTerrainInfo *terrinfo)
+void nTerrain::AssembleTerrain(iRenderView *rv, iMovable*m, nTerrainInfo *terrinfo, const csBox3& bbox)
 {
   info = terrinfo;   
   movable = m;
@@ -348,7 +377,8 @@ void nTerrain::AssembleTerrain(iRenderView *rv, iMovable*m, nTerrainInfo *terrin
   max_levels = ilogb(terrain_w);
 
   unsigned int size = 0;
-  for (unsigned int i = 0, inc = 1; i < 2 * max_levels - 1; i ++, inc *= 2) {
+  for (unsigned int i = 0, inc = 1; i < 2 * max_levels - 1; i ++, inc *= 2)
+  {
     size += inc;
   }
   float kappa = error_metric_tolerance * 
@@ -380,7 +410,7 @@ void nTerrain::AssembleTerrain(iRenderView *rv, iMovable*m, nTerrainInfo *terrin
 
   info->EndBuffer (sw.pos, 
     csVector2 ((sw.pos.x + mid)/(float)terrain_w, 1.0 - (sw.pos.z + mid)/(float)terrain_w),
-    csColor (1.0, 1.0, 1.0), rv);
+    csColor (1.0, 1.0, 1.0), rv, bbox);
 }
 
 void nTerrain::SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
@@ -484,7 +514,8 @@ csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFac
 csBigTerrainObject::~csBigTerrainObject()
 {
   if (terrain) delete terrain;
-  if (info->light_list) {
+  if (info->light_list)
+  {
     delete [] info->light_list;
   }
   if (info)    delete info;
@@ -517,7 +548,8 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   uint8 *raw;
 
   raw = new uint8[input->GetSize()];
-  if (input->Read ((char *)raw, input->GetSize()) != input->GetSize ()) {
+  if (input->Read ((char *)raw, input->GetSize()) != input->GetSize ())
+  {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
     	"crystalspace.mesh.object.terrbig", 
 	"Unable to read from input file\n");
@@ -525,23 +557,27 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   }
   csRef<iImage> image (imageio->Load (raw, input->GetSize(), CS_IMGFMT_ANY));
   delete raw;
-  if (!image) {
+  if (!image)
+  {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
     	"crystalspace.mesh.object.terrbig", 
 	"Unable to load image file\n");
     return false;
   }
-  if (image->GetWidth () != image->GetHeight ()) {
+  if (image->GetWidth () != image->GetHeight ())
+  {
     image->Rescale (image->GetWidth (), image->GetWidth ());
   }
-  if (image->GetWidth () != ((1 << (csLog2 (image->GetWidth()))) + 1)) {
+  if (image->GetWidth () != ((1 << (csLog2 (image->GetWidth()))) + 1))
+  {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	    "crystalspace.mesh.object.terrbig",
 		"Unable to process image, must square and width 2^n+1");
     return false;
   }
   FILE *hmfp = fopen (hm, "wb");
-  if (!hmfp) {
+  if (!hmfp)
+  {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
     	"crystalspace.mesh.object.terrbig", 
 	"Unable to open %s for writing\n", hm);
@@ -550,20 +586,25 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   int size = image->GetSize ();
   int width = image->GetWidth ();
   nBlock *heightmap = new nBlock[size];
-  if (image->GetFormat () & CS_IMGFMT_PALETTED8) {
+  if (image->GetFormat () & CS_IMGFMT_PALETTED8)
+  {
     csRGBpixel *palette = image->GetPalette ();
     uint8 *data = (uint8 *)image->GetImageData ();
-    for (int i = 0; i < image->GetSize (); i ++) {
-	  heightmap[i].pos.x = (i % width - width/2) * scale.x;
+    for (int i = 0; i < image->GetSize (); i ++)
+    {
+      heightmap[i].pos.x = (i % width - width/2) * scale.x;
       heightmap[i].pos.y = ((float)palette[data[i]].Intensity()) / 255.0 * scale.y;
 	  heightmap[i].pos.z = (width/2 - i / width) * scale.z;
 	  heightmap[i].error = 0.0;
 	  heightmap[i].radius = 0.0;
     }
-  } else {
+  }
+  else
+  {
     csRGBpixel *data = (csRGBpixel *)image->GetImageData ();
-    for (int i = 0; i < image->GetSize (); i ++) {
-	  heightmap[i].pos.x = (i % width - width/2) * scale.x;
+    for (int i = 0; i < image->GetSize (); i ++)
+    {
+      heightmap[i].pos.x = (i % width - width/2) * scale.x;
       heightmap[i].pos.y = ((float)data[i].Intensity()) / 255.0 * scale.y;
 	  heightmap[i].pos.z = (width/2 - i / width) * scale.z;
 	  heightmap[i].error = 0.0;
@@ -571,7 +612,8 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
     }
   }
 
-  for  (int k = 0; k < size; k ++) {
+  for  (int k = 0; k < size; k ++)
+  {
     csVector3 up = (k-width < 0) ? 
 	  csVector3(0,0,0) : heightmap[k-width].pos - heightmap[k].pos;
     csVector3 dn = (k+width >= image->GetSize ()) ?  
@@ -586,16 +628,20 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   }
 
   int a, b, c, s, i, j;
-  for (a = c = 1, b = 2, s = 0; a != width-1; a = c = b, b *= 2, s = width) {
-    for (j = a; j < width-1; j += b) {
+  for (a = c = 1, b = 2, s = 0; a != width-1; a = c = b, b *= 2, s = width)
+  {
+    for (j = a; j < width-1; j += b)
+    {
 	  for (i = 0; i < width; i += b) {
 	    ComputeLod (heightmap, i, j, 0, a, s, width);
 	    ComputeLod (heightmap, j, i, a, 0, s, width);
 	  }
 	}
 
-    for (j = a; j < width-1; c = -c, j += b) {
-	  for (i = a; i < width-1; c = -c, i += b) {
+    for (j = a; j < width-1; c = -c, j += b)
+    {
+	  for (i = a; i < width-1; c = -c, i += b)
+	  {
 	    ComputeLod (heightmap, i, j, a, c, width, width);
 	  }
 	}
@@ -610,7 +656,8 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   heightmap[0].error = 0.0;
   heightmap[0].radius = width;
 
-  if (!terrain) {
+  if (!terrain)
+  {
     terrain = new nTerrain;
   }
   terrain->BuildTree (hmfp, heightmap, width);
@@ -624,14 +671,16 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
 
 bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *hm)
 {
-  if (w != ((1 << csLog2 (w)) + 1)) {
+  if (w != ((1 << csLog2 (w)) + 1))
+  {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	"crystalspace.mesh.object.terrbig",
 	"Unable to process image, must square and width 2^n+1");
     return false;
   }
   FILE *hmfp = fopen (hm, "wb");
-  if (!hmfp) {
+  if (!hmfp)
+  {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
 	"crystalspace.mesh.object.terrbig", 
 	"Unable to open %s for writing\n", hm);
@@ -642,7 +691,8 @@ bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *
   nBlock *heightmap = new nBlock[size];
 
   int k;
-  for (k = 0; k < size; k ++) {
+  for (k = 0; k < size; k ++)
+  {
     heightmap[k].pos.x = (k % w - w/2) * scale.x;
     heightmap[k].pos.y = data[k] * scale.y;
     heightmap[k].pos.z = (w/2 - k/w) * scale.z;
@@ -650,7 +700,8 @@ bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *
     heightmap[k].radius = 0.0;
   }
 
-  for (k = 0; k < size; k ++) {
+  for (k = 0; k < size; k ++)
+  {
     csVector3 up = (k-w < 0) ? 
 	  csVector3(0,0,0) : heightmap[k-w].pos - heightmap[k].pos;
     csVector3 dn = (k+w >= size) ?  
@@ -665,16 +716,21 @@ bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *
   }
 
   int a, b, c, s, i, j;
-  for (a = c = 1, b = 2, s = 0; a != w-1; a = c = b, b *= 2, s = w) {
-    for (j = a; j < w-1; j += b) {
-	  for (i = 0; i < w; i += b) {
+  for (a = c = 1, b = 2, s = 0; a != w-1; a = c = b, b *= 2, s = w)
+  {
+    for (j = a; j < w-1; j += b)
+    {
+	  for (i = 0; i < w; i += b)
+	  {
 	    ComputeLod (heightmap, i, j, 0, a, s, w);
 	    ComputeLod (heightmap, j, i, a, 0, s, w);
 	  }
 	}
 
-    for (j = a; j < w-1; c = -c, j += b) {
-	  for (i = a; i < w-1; c = -c, i += b) {
+    for (j = a; j < w-1; c = -c, j += b)
+    {
+	  for (i = a; i < w-1; c = -c, i += b)
+	  {
 	    ComputeLod (heightmap, i, j, a, c, w, w);
 	  }
 	}
@@ -689,7 +745,8 @@ bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *
   heightmap[0].error = 0.0;
   heightmap[0].radius = w;
 
-  if (!terrain) {
+  if (!terrain)
+  {
     terrain = new nTerrain;
   }
   terrain->BuildTree (hmfp, heightmap, w);
@@ -707,12 +764,15 @@ void csBigTerrainObject::ComputeLod (nBlock *heightmap, int i, int j, int di, in
   nBlock *l = &heightmap[i - di + (j - dj) * width];
   nBlock *r = &heightmap[i + di + (j + dj) * width];
   b->error = (float)fabs(b->pos.y - (l->pos.y + r->pos.y) / 2.0);
-  if (n) {
+  if (n)
+  {
     dj = (di + dj) / 2;
     di -= dj;
-    for (int k = 0; k < 4; k ++) {
+    for (int k = 0; k < 4; k ++)
+    {
       if ((i > 0 || di >= 0) && (i < (width-1) || di <= 0) &&
-          (j > 0 || dj >= 0) && (j < (width-1) || dj <= 0)) {
+          (j > 0 || dj >= 0) && (j < (width-1) || dj <= 0))
+      {
         nBlock *cp = &heightmap[i + di + (j + dj) * width];
         b->error = (b->error > cp->error) ? b->error : cp->error;
         float r = (b->pos - cp->pos).Norm() + cp->radius;
@@ -738,8 +798,7 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
   info->GetMesh()->vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
 }
 
-bool 
-csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   if (terrain)
   {
@@ -748,13 +807,18 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 	csReversibleTransform tr_o2c = cam->GetTransform ();
 	tr_o2c /= movable->GetFullTransform ();
     terrain->SetObjectToCamera(tr_o2c);
-    terrain->AssembleTerrain(rview, movable, info);
+    csBox3 bbox;
+    GetObjectBoundingBox (bbox);
+    terrain->AssembleTerrain(rview, movable, info, bbox);
 
     info->GetMesh()->do_mirror = rview->GetCamera()->IsMirrored();
-    if (info->num_lights > 0) {
+    if (info->num_lights > 0)
+    {
       info->GetMesh()->use_vertex_color = 1;
       info->GetMesh()->mixmode = CS_FX_COPY | CS_FX_GOURAUD;
-    } else {
+    }
+    else
+    {
       info->GetMesh()->use_vertex_color = 0;
       info->GetMesh()->mixmode = 0;
     }
@@ -778,10 +842,10 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
   return false;
 }
 
-void 
-csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable*)
+void csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable*)
 {
-  if (info->light_list) {
+  if (info->light_list)
+  {
     delete [] info->light_list;
   }
   info->num_lights = num_lights;
@@ -789,8 +853,7 @@ csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable*)
   memcpy (info->light_list, lis, sizeof (iLight *) * num_lights);
 }
 
-bool 
-csBigTerrainObject::Draw (iRenderView* rview, iMovable* m, csZBufMode zbufMode)
+bool csBigTerrainObject::Draw (iRenderView* rview, iMovable* m, csZBufMode zbufMode)
 {
   iGraphics3D* pG3D = rview->GetGraphics3D ();
   iCamera* pCamera = rview->GetCamera ();
@@ -806,39 +869,34 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable* m, csZBufMode zbufMode)
   return true;
 }
 
-void 
-csBigTerrainObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
+void csBigTerrainObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
   /* use the radius from the center */
   bbox.StartBoundingBox( csVector3( -1000, -1000, -1000 ) );
   bbox.AddBoundingVertexSmart( csVector3( 1000,  1000,  1000 ) );
 }
 
-void 
-csBigTerrainObject::GetRadius (csVector3& rad, csVector3& cent)
+void csBigTerrainObject::GetRadius (csVector3& rad, csVector3& cent)
 {
   /* use the radius from the center */
   rad = csVector3( 1000, 1000, 1000 );
   cent = csVector3( 0, 0, 0 );
 }
 
-bool 
-csBigTerrainObject::HitBeamOutline (const csVector3&, const csVector3&, csVector3&, float*)
+bool csBigTerrainObject::HitBeamOutline (const csVector3&, const csVector3&, csVector3&, float*)
 // csBigTerrainObject::HitBeamOutline (const csVector3& start, const csVector3& end, csVector3& isect, float* pr)
 {
 	return false;
 }
 
-bool 
-csBigTerrainObject::HitBeamObject (const csVector3&, const csVector3&, csVector3&, float*)
+bool csBigTerrainObject::HitBeamObject (const csVector3&, const csVector3&, csVector3&, float*)
 // csBigTerrainObject::HitBeamObject (const csVector3& start, const csVector3& end, csVector3& isect, float* pr)
 {
 	return false;
 
 }
 
-void 
-csBigTerrainObject::SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
+void csBigTerrainObject::SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
 {
   if (terrain) terrain->SetMaterialsList(matlist, nMaterials);
 	nTextures = nMaterials;

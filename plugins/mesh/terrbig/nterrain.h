@@ -93,7 +93,7 @@ public:
   /// Appends the vector, doubles up if parity is == to already stored
   void AddVertex (const csVector3 &v, const csVector2 &t, const csColor &c, int p);
   /// Appends a final vector onto the set (ignore parity):
-  void EndBuffer (const csVector3 &v, const csVector2 &t, const csColor &c, iRenderView *rview);
+  void EndBuffer (const csVector3 &v, const csVector2 &t, const csColor &c, iRenderView *rview, const csBox3& bbox);
  
 private:
   void AddTriangle ();
@@ -211,7 +211,8 @@ public:
   void BuildTree(FILE *f, nBlock *heightmap, unsigned int w);
 
   /// Assembles the terrain into the buffer when called by the engine.  
-  void AssembleTerrain(iRenderView *rv, iMovable* m, nTerrainInfo *terrinfo);
+  void AssembleTerrain(iRenderView *rv, iMovable* m, nTerrainInfo *terrinfo,
+  	const csBox3& bbox);
 
   /// Sets the object to camera transform
   void SetObjectToCamera(csReversibleTransform &o2c)

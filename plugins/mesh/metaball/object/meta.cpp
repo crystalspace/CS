@@ -805,7 +805,7 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   mesh.mixmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
   vbufmgr->LockBuffer (vbuf, mesh_vertices, mesh_texels,
-  	mesh_colors, num_mesh_vertices, 0);
+  	mesh_colors, num_mesh_vertices, 0, object_bbox);
   rview->CalculateFogMesh (G3D->GetObjectToCamera (), mesh);
   G3D->DrawTriangleMesh(mesh);
   vbufmgr->UnlockBuffer (vbuf);

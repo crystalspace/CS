@@ -2400,7 +2400,7 @@ bool csThing::DrawCurves (
         tess->GetTxtCoords (),
         tess->GetColors (),
         tess->GetVertexCount (),
-        0);
+        0, obj_bbox);
     rview->CalculateFogMesh (obj_cam, mesh);
     rview->GetGraphics3D ()->DrawTriangleMesh (mesh);
     vbufmgr->UnlockBuffer (vbuf);

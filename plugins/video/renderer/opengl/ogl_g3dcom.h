@@ -305,9 +305,11 @@ private:
 
   /**
    * Classify all vertices from a mesh for clipping (ClipTriangleMesh).
+   * Returns false if totally invisible.
    */
-  void ClassifyForClipTriangleMesh (
+  bool ClassifyForClipTriangleMesh (
     int num_vertices, csVector3* vertices,
+    const csBox3& bbox,
     const csVector3& frust_origin, csPlane3* planes, int num_planes);
 
   /**

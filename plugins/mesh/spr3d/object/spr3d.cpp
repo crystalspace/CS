@@ -1643,13 +1643,15 @@ bool csSprite3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   iVertexBufferManager* vbufmgr = g3d->GetVertexBufferManager ();
 
   CS_ASSERT (!vbuf->IsLocked ());
+  csBox3 bbox;
+  GetObjectBoundingBox (bbox);
   vbufmgr->LockBuffer (vbuf, vbuf_verts, vbuf_texels,
-  	vbuf_colors, vbuf_num_vertices, 0);
+  	vbuf_colors, vbuf_num_vertices, 0, bbox);
   if (vbuf_tween_verts)
   {
     CS_ASSERT (!vbuf_tween->IsLocked ());
     vbufmgr->LockBuffer (vbuf_tween, vbuf_tween_verts,
-    	vbuf_tween_texels, vbuf_tween_colors, vbuf_num_vertices, 0);
+    	vbuf_tween_texels, vbuf_tween_colors, vbuf_num_vertices, 0, bbox);
   }
 
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);

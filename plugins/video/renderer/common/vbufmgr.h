@@ -22,6 +22,7 @@
 #include "csutil/csvector.h"
 #include "csutil/ptrarr.h"
 #include "ivideo/vbufmgr.h"
+#include "csgeom/box.h"
 
 struct iObjectRegistry;
 class csVector3;
@@ -50,6 +51,8 @@ protected:
   iVertexBufferManager* mgr;
   /// Locked status.
   bool locked;
+  /// Bounding box.
+  csBox3 bbox;
 
 public:
   ///
@@ -82,9 +85,11 @@ public:
   }
   /// Get number of vertices.
   virtual int GetVertexCount () const { return num_verts; }
+  /// Get bounding box.
+  virtual const csBox3& GetBoundingBox () const { return bbox; }
   /// Set buffer.
   void SetBuffers (csVector3* verts, csVector2* texels,
-  	csColor* colors, int num_verts)
+  	csColor* colors, int num_verts, const csBox3& b)
   {
     csVertexBuffer::verts = verts;
     csVertexBuffer::texels = texels;
@@ -92,6 +97,7 @@ public:
     csVertexBuffer::num_verts = num_verts;
     for( int i=0; i<CS_VBUF_TOTAL_USERA; i++ )
       user[i] = NULL;
+    bbox = b;
   }
 
   void SetUserArray (int index, float* user, int num_components)
@@ -163,7 +169,8 @@ public:
   	csVector3* verts,
 	csVector2* texels,
 	csColor* colors,
-	int num_verts, int buf_number);
+	int num_verts, int buf_number,
+	const csBox3& bbox);
   virtual bool LockUserArray (iVertexBuffer* buf,
 		int index, float* user,
 		int num_components, int buf_number);
