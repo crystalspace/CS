@@ -312,18 +312,18 @@ bool Demo::Initialize (int argc, const char* const argv[],
     // Here we can't do the demo because no data file was given.
     // However we scan for possible data files and present them to the
     // user.
-    csRef<iStrVector> zips = myVFS->FindFiles ("/this/*");
+    csRef<iStringArray> zips = myVFS->FindFiles ("/this/*");
     int i;
     for (i = 0 ; i < zips->Length () ; i++)
     {
-      char* zip = zips->Get (i);
+      const char* zip = zips->Get (i);
       TestDemoFile (zip, myVFS, demos);
     }
     myVFS->Mount ("/tmp/csdemo_datadir", "$@data$/");
     zips = myVFS->FindFiles ("/tmp/csdemo_datadir/*");
     for (i = 0 ; i < zips->Length () ; i++)
     {
-      char* zip = zips->Get (i);
+      const char* zip = zips->Get (i);
       TestDemoFile (zip, myVFS, demos);
     }
     myVFS->Unmount ("/tmp/csdemo_datadir", 0);

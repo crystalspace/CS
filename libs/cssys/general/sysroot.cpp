@@ -19,14 +19,14 @@
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
-#include "csutil/scfstrv.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/util.h"
 
-csRef<iStrVector> csFindSystemRoots()
+csRef<iStringArray> csFindSystemRoots()
 {
-  scfStrVector* p = new scfStrVector(0);
-  p->Push(csStrNew("/"));
-  csRef<iStrVector> v(p);
+  scfStringArray* p = new scfStringArray(0);
+  p->Push("/");
+  csRef<iStringArray> v(p);
   p->DecRef();
   return v;
 }

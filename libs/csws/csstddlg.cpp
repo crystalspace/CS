@@ -535,7 +535,7 @@ void cspFileDialog::Reread ()
     // work on vfs
     csString fpath=path;
     fpath.Append(VFS_PATH_SEPARATOR);
-    csRef<iStrVector> filelist = vfs->FindFiles(fpath);
+    csRef<iStringArray> filelist = vfs->FindFiles(fpath);
 
     if (filelist->Length() != 0)
     {

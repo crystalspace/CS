@@ -259,7 +259,7 @@ void MD32spr::Main()
     md3Files = 0;
 
     for (i = 0; i < fileNames->Length(); i++) {
-      char *str = fileNames->Get(i);
+      const char *str = fileNames->Get(i);
       if(stristr(str,".md3"))
 	if(stristr(str,"head"))
 	  head = true;
@@ -275,7 +275,7 @@ void MD32spr::Main()
   }
 
   for (i = 0; i < fileNames->Length(); i++) {
-    char *str = fileNames->Get(i);
+    const char *str = fileNames->Get(i);
 
     /* If the user forgot to give the -player option we just process all .md3 files as generic models.
      * We will not read the animation.cfg and .skin files, so the player model will not work unles -player
@@ -353,7 +353,7 @@ void MD32spr::Main()
     vfs->ChDir(weaponPath);
     weaponFiles = vfs->FindFiles(weaponPath);
     for (i = 0; i < weaponFiles->Length(); i++) {
-      char *str = weaponFiles->Get(i);
+      const char *str = weaponFiles->Get(i);
       /* If this is an md3 file and it contains the weaponName, Init() it. */
       if (stristr(str, ".md3")) {
 	md3Model *tmpModel = new md3Model(object_reg);
@@ -412,7 +412,7 @@ bool MD32spr::ReadVfsDir()
   int i = 0;
 
   for (i = 0; i < fileNames->Length(); i++) {
-    str = fileNames->Get(i);
+    str = (char*)fileNames->Get(i);
 
     if (str) {
       if (player) {
@@ -1036,10 +1036,10 @@ void MD32spr::WriteTextures(const char *inPath, const char *outPath)
 {
   int i = 0;
   size_t fileSize;
-  csRef < iStrVector > files = vfs->FindFiles(inPath);
+  csRef <iStringArray> files = vfs->FindFiles(inPath);
   char fileName[100];
   for(i = 0; i < files->Length(); i++) {
-    char *str = files->Get(i);
+    char *str = (char*)files->Get(i);
 
     if(stristr(str,".jpg") || stristr(str, ".png") || stristr(str, ".bmp") || stristr(str, ".tga")) { 
       filename(str, fileName);

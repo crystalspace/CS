@@ -2999,14 +2999,14 @@ void Cs2Xml::ConvertDir (const char* vfspath, bool backup)
   if (strstr (vfspath, "/cache/") != 0) return;
   vfs->PushDir ();
   vfs->ChDir (vfspath);
-  csRef<iStrVector> files (vfs->FindFiles ("."));
+  csRef<iStringArray> files (vfs->FindFiles ("."));
   int i;
   for (i = 0 ; i < files->Length () ; i++)
   {
-    char* str = files->Get (i);
+    const char* str = files->Get (i);
 
     // Test if it is a dir (@@@ rather ugly test! Needs support in VFS).
-    csRef<iStrVector> recfiles (vfs->FindFiles (str));
+    csRef<iStringArray> recfiles (vfs->FindFiles (str));
     if (recfiles->Length () > 0 && strcmp (recfiles->Get (0), str) != 0)
     {
       ConvertDir (str, backup);

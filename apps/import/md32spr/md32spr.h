@@ -23,7 +23,7 @@
 
 #include "csutil/ref.h"
 #include "csutil/csstring.h"
-#include "csutil/csstrvec.h"
+#include "csutil/stringarray.h"
 #include "csutil/csvector.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"
@@ -35,6 +35,7 @@ struct iObjectRegistry;
 struct iFile;
 struct iDocumentNode;
 struct iVFS;
+struct iStringArray;
 class csParser;
 
 typedef enum ActionEnum {
@@ -197,8 +198,8 @@ class MD32spr {
  private:
   FILE *fp;
   csVector outputFileNames;
-  csRef<iStrVector> fileNames;
-  csRef < iStrVector > weaponFiles;
+  csRef<iStringArray> fileNames;
+  csRef <iStringArray> weaponFiles;
 
   csString weaponDir;
   csString outZipName;

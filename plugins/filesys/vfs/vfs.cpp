@@ -34,7 +34,7 @@
 #include "vfs.h"
 #include "csutil/archive.h"
 #include "csutil/util.h"
-#include "csutil/scfstrv.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
 #include "csutil/parray.h"
@@ -278,9 +278,9 @@ public:
   // Configuration section key
   char *ConfigKey;
   // The array of real paths/archives bound to this virtual path
-  csStrVector RPathV;
+  csStringArray RPathV;
   // The array of unexpanded real paths
-  csStrVector UPathV;
+  csStringArray UPathV;
   // The system interface
   iObjectRegistry *object_reg;
 
@@ -294,7 +294,7 @@ public:
   // Remove a real-world path
   bool RemoveRPath (const char *RealPath);
   // Find all files in a subpath
-  void FindFiles (const char *Suffix, const char *Mask, iStrVector *FileList);
+  void FindFiles (const char *Suffix, const char *Mask, iStringArray *FileList);
   // Find a file and return the appropiate csFile object
   iFile *Open (int Mode, const char *Suffix);
   // Delete a file
@@ -1115,7 +1115,7 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
 }
 
 void VfsNode::FindFiles (const char *Suffix, const char *Mask,
-  iStrVector *FileList)
+  iStringArray *FileList)
 {
   // Look through all RPathV's for file or directory
   int i;
@@ -1691,14 +1691,14 @@ bool csVFS::Exists (const char *Path) const
   return exists;
 }
 
-csRef<iStrVector> csVFS::MountRoot (const char *Path)
+csRef<iStringArray> csVFS::MountRoot (const char *Path)
 {
-  scfStrVector* outv = new scfStrVector;
+  scfStringArray* outv = new scfStringArray;
 
   csScopedMutexLock lock (mutex);
   if (Path != 0)
   {
-    csRef<iStrVector> roots = csFindSystemRoots();
+    csRef<iStringArray> roots = csFindSystemRoots();
     for (int i = 0, n = roots->Length(); i < n; i++)
     {
       char const* t = roots->Get(i);
@@ -1725,15 +1725,15 @@ csRef<iStrVector> csVFS::MountRoot (const char *Path)
     }
   }
 
-  csRef<iStrVector> v(outv);
+  csRef<iStringArray> v(outv);
   outv->DecRef ();
   return v;
 }
 
-csPtr<iStrVector> csVFS::FindFiles (const char *Path) const
+csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
 {
   csScopedMutexLock lock (mutex);
-  scfStrVector *fl = new scfStrVector;		// the output list
+  scfStringArray *fl = new scfStringArray;		// the output list
 
   if (Path != 0)
   {
@@ -1798,7 +1798,7 @@ csPtr<iStrVector> csVFS::FindFiles (const char *Path) const
     ArchiveCache->CheckUp ();
   }
 
-  csPtr<iStrVector> v(fl);
+  csPtr<iStringArray> v(fl);
   return v;
 }
 

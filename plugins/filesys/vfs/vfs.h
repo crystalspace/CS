@@ -21,8 +21,9 @@
 #define __CS_VFS_H__
 
 #include "csutil/cfgfile.h"
-#include "csutil/csstrvec.h"
+#include "csutil/csvector.h"
 #include "csutil/scopedmutexlock.h"
+#include "csutil/stringarray.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"		  
@@ -134,7 +135,7 @@ private:
   // The initialization file
   csConfigFile config;
   // Directory stack (used in PushDir () and PopDir ())
-  csStrVector dirstack;
+  csStringArray dirstack;
   // The pointer to system driver interface
   iObjectRegistry *object_reg;
 
@@ -169,7 +170,7 @@ public:
   virtual bool Exists (const char *Path) const;
 
   /// Find all files in a virtual directory and return an array of their names
-  virtual csPtr<iStrVector> FindFiles (const char *Path) const;
+  virtual csPtr<iStringArray> FindFiles (const char *Path) const;
   /// Replacement for standard fopen()
   virtual csPtr<iFile> Open (const char *FileName, int Mode);
   /**
@@ -195,7 +196,7 @@ public:
   virtual bool Unmount (const char *VirtualPath, const char *RealPath);
   
   /// Mount the root directory or directories 
-  virtual csRef<iStrVector> MountRoot (const char *VirtualPath);
+  virtual csRef<iStringArray> MountRoot (const char *VirtualPath);
 
   /// Save current configuration back into configuration file
   virtual bool SaveMounts (const char *FileName);

@@ -20,10 +20,10 @@
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
-#include "csutil/scfstrv.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/util.h"
 
-csRef<iStrVector> csFindSystemRoots()
+csRef<iStringArray> csFindSystemRoots()
 {
   int const lim = 199;
   char* buffer = new char[lim + 1];
@@ -35,10 +35,10 @@ csRef<iStrVector> csFindSystemRoots()
     len = GetLogicalDriveStrings(len, buffer);
   }
 
-  scfStrVector* p = new scfStrVector;
+  scfStringArray* p = new scfStringArray;
   for (char const* s = buffer; *s != '\0'; s += strlen(s) + 1)
-    p->Push(csStrNew(s));
-  csRef<iStrVector> v(p);
+    p->Push(s);
+  csRef<iStringArray> v(p);
   p->DecRef();
 
   delete[] buffer;

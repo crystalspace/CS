@@ -31,10 +31,10 @@
 class ceImageView;
 class csButton;
 struct iVFS;
-struct iStrVector;
 struct iImageIO;
 struct iObjectRegistry;
 struct iGraphics3D;
+struct iStringArray;
 
 enum
 {
@@ -58,7 +58,7 @@ public:
   csRef<iImageIO> image_loader;
   ceImageView* image_view;
   csWindow* image_window;
-  csRef<iStrVector> files;
+  csRef<iStringArray> files;
   int cur_idx;
   csButton* label1;
   csButton* label2;

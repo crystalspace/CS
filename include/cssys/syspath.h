@@ -23,7 +23,7 @@
 #include "csutil/array.h"
 #include "csutil/ref.h"
 #include "csutil/util.h"
-#include "iutil/strvec.h"
+#include "iutil/stringarray.h"
 
 /**\file
  * Paths helpers.
@@ -42,7 +42,7 @@ class csPluginPaths;
  * For instance in Unix it simply returns '/' but for Windows it may return a
  * list of available drive letters.
  */
-csRef<iStrVector> csFindSystemRoots();
+csRef<iStringArray> csFindSystemRoots();
 
 /**
  * Get the installation path.

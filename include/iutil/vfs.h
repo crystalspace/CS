@@ -28,7 +28,7 @@
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 #include "iutil/databuff.h"
-#include "iutil/strvec.h"
+#include "iutil/stringarray.h"
 
 /**
  * File time structure - used to query and set
@@ -197,7 +197,7 @@ struct iVFS : public iBase
    * Find all files in a virtual directory and return an array with their
    * names.
    */
-  virtual csPtr<iStrVector> FindFiles (const char *Path) const = 0;
+  virtual csPtr<iStringArray> FindFiles (const char *Path) const = 0;
 
   /**
    * Replacement for standard fopen().
@@ -237,7 +237,7 @@ struct iVFS : public iBase
    * Mount the root directory or directories beneath the given virtual path.
    * Returns a list of absolute virtual pathnames mounted by this operation.
    */
-  virtual csRef<iStrVector> MountRoot (const char *VirtualPath) = 0;
+  virtual csRef<iStringArray> MountRoot (const char *VirtualPath) = 0;
 
   /// Save current configuration back into configuration file
   virtual bool SaveMounts (const char *FileName) = 0;

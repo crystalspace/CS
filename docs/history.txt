@@ -5,6 +5,13 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's apears before the previous day's entry.  The individual changes
 for each given day, however, are in normal (ascending) chronological order.
 
+29-Jul-2003
+	- Jorrit made scfStringArray actually work by adding the needed
+	  SCF_CONSTRUCT stuff.
+	- Jorrit changed csFindSystemRoots() to return iStringArray instead
+	  of iStrVector.
+	- Jorrit changed iVFS->FindFiles() and MountRoot() to return
+	  iStringArray.
 28-Jul-2003
 	- Jorrit removed several csVector's throughout CS:
 	    - Replaced 'render_priorities' in the engine with csStringArray.

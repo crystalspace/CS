@@ -260,14 +260,14 @@ static void cmd_ls (char *args)
   else
     dir = VFS->GetCwd ();
 
-  csRef<iStrVector> fl (VFS->FindFiles (dir));
+  csRef<iStringArray> fl (VFS->FindFiles (dir));
   if (fl->Length() > 0)
   {
     bool nl = false;
 	int i;
     for (i = 0; i < fl->Length (); i++)
     {
-      char *fname = (char *)fl->Get (i);
+      const char *fname = fl->Get (i);
       if (fullpath)
       {
         csFileTime ft;
@@ -312,7 +312,7 @@ static void cmd_cp (char *args)
   if (!get2args ("cp", args, src, dst))
     return;
 
-  csRef<iStrVector> fl (VFS->FindFiles (src));
+  csRef<iStringArray> fl (VFS->FindFiles (src));
   int i;
   for (i = 0; i < fl->Length (); i++)
   {

@@ -327,3 +327,15 @@ use @code{iAWS::SetupCanvas} instead.
 @code{csPArray} has been removed in favor of @code{csArray}. So use
 @code{csArray<T*>} instead of @code{csPArray<T>}.
 
+@subheading csStrVector and iStrVector removed
+@cindex @code{csStrVector}
+@cindex @code{iStrVector}
+@cindex @code{csStringArray}
+@cindex @code{iStringArray}
+@cindex @code{FindFiles}
+@cindex @code{MountRoot}
+
+@code{csStrVector} has been removed in favor of @code{csStringArray}.
+This means that functions like @code{iVFS::MountRoot()} and
+@code{iVFS::FindFiles()} now return an @code{iStringArray}.
+
