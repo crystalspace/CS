@@ -593,11 +593,7 @@ int csNetworkSocket2::Send (char *buff, size_t size)
   {
     if (proto_type == SOCK_DGRAM) 
     {
-#ifdef WIN32
       result = sendto(socketfd,buff,size,0,(struct sockaddr *)&remote_addr,sizeof(struct sockaddr));
-#else
-      result = sendto(socketfd,buff,size,0,(struct sockaddr *)&remote_addr,sizeof(struct sockaddr));
-#endif
     } 
     else
     {
