@@ -104,12 +104,8 @@ bool PySimple::Initialize (int argc, const char* const argv[],
     return 0;
 
 //TODO Python HACK
-	csSector *room=world->CreateCsSector ("room");
+  csSector *room=world->CreateCsSector ("room");
   view = new csView (world, G3D);
-
-	is->Store("csTextureWrapper *", "unrmap.tmptr", tm);
-	is->Store("csSector *", "unrmap.roomptr", room);
-	is->Store("csView *", "unrmap.viewptr", view);
 
   if(!is->RunText("unrmap.Load('data/entry')"))
     return 0;
