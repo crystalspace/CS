@@ -28,6 +28,8 @@ chronological order.
 	- Eric Sunshine added an `unconditional' option to
 	  CS_JAMCONFIG_PROPERTY() which, when used, causes it to emit the Jam
 	  property using `=' rather than `?='.
+	- Jorrit fixed simpmap after res2k accidently changed partsys
+	  to some 'street' level.
 2-Feb-2004
 	- Eric Sunshine changed STREAMMAX and TEXTUREMAX constants in
 	  csXMLShaderCompiler::shaderPass from 'static const int' to 'enum'

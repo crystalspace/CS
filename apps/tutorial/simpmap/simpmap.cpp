@@ -151,7 +151,7 @@ bool Simple::LoadMap ()
 {
   // Set VFS current directory to the level we want to load.
   csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
-  VFS->ChDir ("/lev/street");
+  VFS->ChDir ("/lev/partsys");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
   {
