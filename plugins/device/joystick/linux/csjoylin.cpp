@@ -19,10 +19,12 @@
 #include "cssysdef.h"
 #include "csver.h"
 #include "csjoylin.h"
+#include "iutil/cmdline.h"
 #include "ivaria/reporter.h"
 #include "csutil/csstring.h"
 #include "csutil/array.h"
 
+#include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -35,6 +37,8 @@
 #define CS_LINUX_JOYSTICK_OLD_EVENTS
 
 CS_IMPLEMENT_PLUGIN;
+
+SCF_IMPLEMENT_FACTORY (csLinuxJoystick);
 
 SCF_IMPLEMENT_IBASE (csLinuxJoystick)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
@@ -80,24 +84,25 @@ bool csLinuxJoystick::HandleEvent (iEvent &)
 {
   struct js_event js;
 
-  for (int i=0; i < nJoy; i++)
+  for (int i = 0; i < nJoy; i++)
   {
-    while (read (joystick [i].fd, &js, sizeof(struct js_event)) == sizeof(struct js_event)) 
+    while (read (joystick [i].fd, &js, sizeof(struct js_event)) ==
+	   sizeof(struct js_event)) 
     {
       switch (js.type & ~JS_EVENT_INIT) 
       {
       case JS_EVENT_BUTTON:
-        //        DEBUG_BREAK;
         joystick[i].button[js.number] = js.value;
         EventOutlet->Joystick (i, js.number+1, js.value, -1, 0);
         break;
       case JS_EVENT_AXIS:
         joystick[i].axis[js.number] = js.value;
-#ifdef CS_LINUX_JOYSTICK_OLD_EVENTS
-        if (js.number < 2)
-          EventOutlet->Joystick (i, 0, 0, joystick[i].axis[0], (joystick[i].nAxes > 1 ? joystick[i].axis[1] : 0));
-#else
+#ifndef CS_LINUX_JOYSTICK_OLD_EVENTS
         EventOutlet->Joystick (i, 0, 0, js.number, js.value);
+#else
+        if (js.number < 2)
+          EventOutlet->Joystick (i, 0, 0, joystick[i].axis[0],
+	    (joystick[i].nAxes > 1 ? joystick[i].axis[1] : 0));
 #endif
         break;
       }
@@ -108,12 +113,13 @@ bool csLinuxJoystick::HandleEvent (iEvent &)
 
 bool csLinuxJoystick::Init ()
 {
-  // read list of devices
+  csRef<iCommandLineParser> cmdline (
+    CS_QUERY_REGISTRY (object_reg, iCommandLineParser));
+  bool const verbose = cmdline->GetOption("verbose") != 0;
+
   config.AddConfig (object_reg, CS_LINUX_JOYSTICK_CFG);
   csRef<iConfigIterator> it (config->Enumerate (CS_LINUX_JOYSTICK_KEY));
-
   csArray<int> fds;
-  int fd;
 
   nJoy=0;
   bHooked = false;
@@ -121,16 +127,19 @@ bool csLinuxJoystick::Init ()
 
   while (it->Next ())
   {
-    if ((fd = open (it->GetStr (), O_RDONLY)) < 0) 
+    int const fd = open (it->GetStr (), O_RDONLY);
+    if (fd >= 0) 
+    {
+      nJoy++;
+      fds.Push(fd);
+    }
+    else if (verbose || errno != ENOENT)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
               "Failed to open joystick device %s - error: %s\n",
               it->GetStr (),
               strerror (errno));
     }
-    else
-      nJoy++;
-    fds.Push(fd);
   }
 
   if (nJoy)
@@ -142,35 +151,31 @@ bool csLinuxJoystick::Init ()
     int n = 0;
     while (i.HasNext())
     {
-      fd = i.Next();
-      if (fd > -1)
-      {
-	unsigned char axes = 2;
-	unsigned char buttons = 2;
-	int version = 0x000800;
-	char name[128] = "Unknown";
+      int const fd = i.Next();
+      unsigned char axes = 2;
+      unsigned char buttons = 2;
+      int version = 0x000800;
+      char name[128] = "Unknown";
 
-	ioctl (fd, JSIOCGVERSION, &version);
-	ioctl (fd, JSIOCGAXES, &axes);
-	ioctl (fd, JSIOCGBUTTONS, &buttons);
-	ioctl (fd, JSIOCGNAME(128), name);
+      ioctl (fd, JSIOCGVERSION, &version);
+      ioctl (fd, JSIOCGAXES, &axes);
+      ioctl (fd, JSIOCGBUTTONS, &buttons);
+      ioctl (fd, JSIOCGNAME(128), name);
 
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-                "Joystick number %d (%s) has %d axes and %d buttons.\n"
-		"Driver version is %d.%d.%d.\n",
-		n + 1, name, axes, buttons,
-		version >> 16, (version >> 8) & 0xff, version & 0xff);
-        joystick[n].number = n;
-        joystick[n].fd = fd;
-        joystick[n].nButtons = buttons;
-        joystick[n].nAxes = axes;
-        joystick[n].axis = new int16[axes];
-        joystick[n].button = new int16[buttons];
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+              "Joystick number %d (%s) has %d axes and %d buttons.\n"
+	      "Driver version is %d.%d.%d.\n",
+	      n + 1, name, axes, buttons,
+	      version >> 16, (version >> 8) & 0xff, version & 0xff);
+      joystick[n].number = n;
+      joystick[n].fd = fd;
+      joystick[n].nButtons = buttons;
+      joystick[n].nAxes = axes;
+      joystick[n].axis = new int16[axes];
+      joystick[n].button = new int16[buttons];
 
-        // make device non blocking
-        fcntl(fd, F_SETFL, O_NONBLOCK);
-        n++;
-      }
+      fcntl(fd, F_SETFL, O_NONBLOCK);
+      n++;
     }
 
     // hook into eventqueue
@@ -227,6 +232,3 @@ void csLinuxJoystick::Report (int severity, const char* msg, ...)
   }
   va_end (arg);
 }
-
-SCF_IMPLEMENT_FACTORY (csLinuxJoystick);
-

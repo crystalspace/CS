@@ -19,6 +19,14 @@ chronological order.
 	  constants.
 	- Eric Sunshine removed duplicate definitions of CONST_INT64() and
 	  CONST_UINT64() from cstypes.h for MSVC.
+	- Eric Sunshine augmented joystick.cfg so that it also supports Linux
+	  2.6.x's /dev/input/js* devices in addition to the older 2.4.x
+	  /dev/js* devices.
+	- Eric Sunshine performed minor cleanup of csjoylin.cpp. Fixed problem
+	  where it was unnecessarily allocating space for joysticks which were
+	  not present. No longer reports about missing joystick devices (unless
+	  -verbose is specified); now only reports if a device malfunctioned
+	  for some reason.
 12-Oct-2004
 	- res changed the Win32 GL canvas to only employ the WGL pixel format
 	  check if really needed (e.g. multisampling was requested), otherwise
