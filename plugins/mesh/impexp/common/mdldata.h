@@ -31,9 +31,9 @@
   type Get##sing_name (int n) const;					\
   void Set##sing_name (int n, type);
 
-#define DECLARE_ARRAY_INTERFACE(type,sing_name,mult_name)		\
+#define DECLARE_ARRAY_INTERFACE(type,sing_name)		\
   DECLARE_ARRAY_INTERFACE_NONUM (type, sing_name)			\
-  int GetNum##mult_name () const;					\
+  int Get##sing_name##Count () const;					\
   void Add##sing_name (type obj);					\
   void Delete##sing_name (int n);
 
@@ -104,7 +104,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
-  DECLARE_ARRAY_INTERFACE (const csVector3&, Vertex, Vertices);
+  DECLARE_ARRAY_INTERFACE (const csVector3&, Vertex);
 
   /// constructor
   csModelDataObject ();
