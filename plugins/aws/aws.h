@@ -243,7 +243,7 @@ protected:
   void RegisterCommonComponents ();
 
   /// Performs transitioning on a window.
-  void PerformTransition(awsWindowTransition *t);
+  bool PerformTransition(awsWindowTransition *t);
 
 public:
   /// Instantiates a window based on a window definition.

@@ -48,10 +48,13 @@ const int proctex_width = 512;
 const int proctex_height = 512;
 const int DEBUG_MANAGER = false;
 
+static FILE *aws_log;
+
 // Implementation //////////////////////////////////////////////////////
 awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
 {
   factory->DecRef ();
+  fclose(aws_log);
 }
 
 awsManager::awsManager (iBase *p) :
@@ -72,6 +75,8 @@ awsManager::awsManager (iBase *p) :
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   scfiEventHandler = NULL;
+
+  aws_log = fopen("aws.log", "w");
 }
 
 awsManager::~awsManager ()
@@ -419,7 +424,7 @@ void awsManager::CreateTransitionEx(iAwsWindow *win, unsigned transition_type, f
   
 }
 
-void 
+bool 
 awsManager::PerformTransition(awsWindowTransition *t)
 {
   float dx, dy;
@@ -459,19 +464,23 @@ awsManager::PerformTransition(awsWindowTransition *t)
     case AWS_TRANSITION_SLIDE_OUT_RIGHT:  
     case AWS_TRANSITION_SLIDE_OUT_UP:
     case AWS_TRANSITION_SLIDE_OUT_DOWN:
-      // Fix frame back to start
-      t->win->Move(t->win->Frame().xmin-t->start.xmin,
-	           t->win->Frame().ymin-t->start.ymin);
-
       // Hide window (an out transition means out of view)
       t->win->Hide();
+
+      // Fix frame back to start
+      t->win->Move(t->start.xmin-t->win->Frame().xmin,
+	           t->start.ymin-t->win->Frame().ymin);
       
       break;
     }
 
     transitions.Delete(t);
     delete t;
-    return;
+
+    fprintf(aws_log, "returning false from transition.\n");
+    fflush(aws_log);
+
+    return false;
   }
   else
   {
@@ -481,8 +490,7 @@ awsManager::PerformTransition(awsWindowTransition *t)
       t->morph=1.0;
   }
 
-  
-  
+  return true;
 }
 
 
@@ -515,6 +523,8 @@ bool awsManager::WindowIsDirty (iAwsWindow *win)
 {
   int i;
 
+  if (win->isHidden ()) return false;
+
   for (i = 0; i < dirty.Count (); ++i)
     if (win->Overlaps (dirty.RectAt (i))) return true;
 
@@ -525,14 +535,16 @@ bool awsManager::WindowIsInTransition(iAwsWindow *win, bool perform_transition)
 {
   int i;
 
+  if (win->isHidden ()) return false;
+
   for(i = 0; i < transitions.Length(); ++i)
   {
     awsWindowTransition *t = (awsWindowTransition *)transitions[i];
 
     if (t->win==win)
     {
-      if (perform_transition) PerformTransition(t);
-      return true;
+      if (perform_transition) return PerformTransition(t);
+      else return true;
     }
   }
 
@@ -659,11 +671,13 @@ void awsManager::Redraw ()
   while (curwin)
   {
     if (
-      (!curwin->isHidden ()) &&
-      (   WindowIsInTransition(curwin, true) /* MUST COME BEFORE OTHERS! */
-       || WindowIsDirty (curwin) 
-       || (flags & AWSF_AlwaysRedrawWindows) 
-      ))
+        (   WindowIsInTransition(curwin, true) /* MUST COME BEFORE OTHERS! */
+         || WindowIsDirty (curwin) 
+         || (flags & AWSF_AlwaysRedrawWindows) 
+        )
+
+	&& (!curwin->isHidden ())              /* MUST COME LAST! */
+       )
     {
       curwin->SetRedrawTag (redraw_tag);
       if (flags & AWSF_AlwaysRedrawWindows) Mark (curwin->Frame ());
