@@ -2022,7 +2022,7 @@ AS_IF([test $ac_cv_sizeof_long = 8],
 #------------------------------------------------------------------------------
 # Check if the type wchar_t is available and determine its size.  It might be
 # built-in, or it might come from the wchar.h header file.  Also determine
-# availability of wsclen().
+# availability of wsclen() and fputws().
 #------------------------------------------------------------------------------
 AC_LANG_PUSH([C++])
 
@@ -2041,6 +2041,9 @@ AS_IF([test $cs_type_wchar_t = yes],
 	#endif]])
     CS_HEADER_PROPERTY([CS_WCHAR_T_SIZE], [$ac_cv_sizeof_wchar_t])],
     [CS_HEADER_PROPERTY([CS_USE_FAKE_WCHAR_TYPE])])
+
+AS_IF([test $cs_type_wchar_t = yes],
+    [AC_CHECK_FUNC([fputws], [CS_HEADER_PROPERTY([CS_HAVE_FPUTWS])], [])])
 
 AC_LANG_POP([C++])
 

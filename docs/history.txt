@@ -19,6 +19,9 @@ chronological order.
 	  handles upon closing of the renderer. This should fix the problem
 	  where texture handles were deleted after the GL context closed (this
 	  had no apparent side effects on Win32, but lead to a crash on OS/X).
+	- res augmented configure to check for fputws().
+	- res changed the generic csPrintf() implementation to use fputws(),
+	  if available.
 5-Apr-2004
 	- Peter Amstutz added the iVosApi interface to the csvosa3dl plugin.
 	  This interface allows the application to access the underlying

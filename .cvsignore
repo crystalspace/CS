@@ -8,6 +8,7 @@
 cache.mak*
 config.*
 config.mak*
+autom4te.cache
 Jamconfig
 Jamfile
 Makefile

@@ -20,6 +20,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include "cssysdef.h"
+#include "csutil/csstring.h"
+#include "csutil/csuctransform.h"
 #include "csutil/sysfunc.h"
 
 // Replacement for printf(); exact same prototype/functionality as printf()
@@ -27,19 +29,52 @@ int csPrintf(char const* str, ...)
 {
   va_list args;
   va_start (args, str);
-  int const rc = vprintf(str, args);
+  int const rc = csPrintfV (str, args);
   va_end (args);
   return rc;
+}
+
+static int csFPutStr (FILE* file, const char* str)
+{
+#ifdef CS_HAVE_FPUTWS
+  size_t wstrSize = strlen (str) + 1;
+  CS_ALLOC_STACK_ARRAY(wchar_t, wstr, wstrSize);
+  
+  csUnicodeTransform::UTF8toWC (wstr, wstrSize, (utf8_char*)str, (size_t)-1);
+    
+  return fputws (wstr, file);
+#else
+  // Use a cheap UTF8-to-ASCII conversion.
+  const utf8_char* ch = (utf8_char*)str;
+  
+  int n = 0;
+  while (*ch != 0)
+  {
+    utf8_char type = *ch & 0xc0;
+    
+    if (type <= 0x40)
+      fputc ((char)*ch, file);
+    else if (type == 0x80)
+      fputc ('?', file);
+      
+    ch++; n++;
+  }
+  
+  return n;
+#endif
 }
 
 // Replacement for vprintf()
 int csPrintfV(char const* str, va_list args)
 {
-  return vprintf(str, args);
+  csString temp;
+  temp.FormatV (str, args);
+  
+  return csFPutStr (stdout, temp);
 }
 
 int csFPutErr (const char* str)
 {
-  return fputs (str, stderr);
+  return csFPutStr (stderr, str);
 }
 
