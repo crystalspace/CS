@@ -19,16 +19,16 @@
 #ifndef __CS_AWS_AV3DTXTM_H__
 #define __CS_AWS_AV3DTXTM_H__
 
-# include "csutil/array.h"
-# include "ivideo/txtmgr.h"
-# include "ivideo/material.h"
-# include "iengine/material.h"
-# include "ivideo/texture.h"
-# include "iengine/texture.h"
-# include "ivideo/graph3d.h"
-# include "ivideo/graph2d.h"
-# include "csgfx/rgbpixel.h"
-# include "igraphic/image.h"
+#include "csutil/array.h"
+#include "ivideo/txtmgr.h"
+#include "ivideo/material.h"
+#include "iengine/material.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "csgfx/rgbpixel.h"
+#include "igraphic/image.h"
 
 class csTexture;
 class csTextureManager;
@@ -60,19 +60,19 @@ protected:
   /// The original image object.
   iImage *image;
 
-  /// Texture usage flags: 2d/3d/etc
+  /// Texture usage flags: 2d/3d/etc.
   int flags;
 
-  /// Texture for mipmap levels 0..3
+  /// Texture for mipmap levels (0..3).
   csTexture *tex[4];
 
-  /// Texture cache for-internal-use pointer
+  /// Texture cache for-internal-use pointer.
   void *cachedata;
 
   /// Does color 0 mean "transparent" for this texture?
   bool transp;
 
-  /// The transparent color
+  /// The transparent color.
   csRGBpixel transp_color;
 
   /// Mean color used when texture mapping is disabled.
@@ -84,7 +84,7 @@ public:
   ///
   virtual ~csTextureHandle ();
 
-  /// Get texture usage flags
+  /// Get texture usage flags.
   int GetFlags () { return flags; }
 
   /// Release the original image (iImage) as given by the engine.
@@ -93,7 +93,7 @@ public:
   /// Create all mipmapped bitmaps from the first level.
   virtual void CreateMipmaps ();
 
-  /// Get the texture at the corresponding mipmap level (0..3)
+  /// Get the texture at the corresponding mipmap level (0..3).
   csTexture *get_texture (int mipmap)
   {
     return (mipmap >= 0) && (mipmap < 4) ? tex[mipmap] : 0;
@@ -105,19 +105,18 @@ public:
    */
   void AdjustSizePo2 ();
 
-  /// Get the transparent color as a RGB pixel
+  /// Get the transparent color as a RGB pixel.
   csRGBpixel *get_transparent () { return &transp_color; }
 
-  /// Create a new texture object (should be implemented by heirs)
+  /// Create a new texture object (should be implemented by heirs).
   virtual csTexture *NewTexture (iImage *Image) = 0;
 
-  /// Compute the mean color for the just-created texture
+  /// Compute the mean color for the just-created texture.
   virtual void ComputeMeanColor () = 0;
 
-  ///--------------------- iTextureHandle implementation ----------------------
   SCF_DECLARE_IBASE;
 
-  /// Enable transparent color
+  /// Enable transparent color.
   virtual void SetKeyColor (bool Enable);
 
   /// Set the transparent color.
@@ -129,7 +128,7 @@ public:
    */
   virtual bool GetKeyColor ();
 
-  /// Get the transparent color
+  /// Get the transparent color.
   virtual void GetKeyColor (uint8 &r, uint8 &g, uint8 &b);
 
   /**
@@ -146,15 +145,17 @@ public:
   /// Get the mean color.
   virtual void GetMeanColor (uint8 &r, uint8 &g, uint8 &b);
 
-  /// Get data associated internally with this texture by texture cache
+  /// Get data associated internally with this texture by texture cache.
   virtual void *GetCacheData () { return cachedata; }
 
-  /// Set data associated internally with this texture by texture cache
+  /// Set data associated internally with this texture by texture cache.
   virtual void SetCacheData (void *d) { cachedata = d; }
 
-  /// Get the csTextureHandle object associated with the texture handle
+  /// Get the csTextureHandle object associated with the texture handle.
   virtual void *GetPrivateObject ()
-  { return (csTextureHandle *)this; }
+  {
+    return (csTextureHandle *)this;
+  }
 
   /**
    * Query if the texture has an alpha channel.<p>
@@ -165,8 +166,8 @@ public:
 
   virtual iGraphics2D* GetCanvas ()
   {
-    csRef<iGraphics2D> g = SCF_QUERY_INTERFACE (image, iGraphics2D); 
-  	return (iGraphics2D*)g;
+    csRef<iGraphics2D> g = SCF_QUERY_INTERFACE (image, iGraphics2D);
+    return (iGraphics2D*)g;
   }
 };
 
@@ -188,25 +189,25 @@ public:
 class csTexture
 {
 protected:
-  /// The parent csTextureHandle object
+  /// The parent csTextureHandle object.
   csTextureHandle *parent;
 
-  /// Width and height
+  /// Width and height.
   int w, h;
 
-  /// log2 (width) and log2 (height)
+  /// log2 (width) and log2 (height).
   int shf_w, shf_h;
 
-  /// (1 << log2 (width)) - 1 and (1 << log2 (height)) - 1
+  /// (1 << log2 (width)) - 1 and (1 << log2 (height)) - 1.
   int and_w, and_h;
 
-  /// Compute shf_x and and_x values
+  /// Compute shf_x and and_x values.
   void compute_masks ();
 public:
-  /// Create a csTexture object
+  /// Create a csTexture object.
   csTexture (csTextureHandle *Parent);
 
-  /// Destroy the texture object
+  /// Destroy the texture object.
   virtual ~csTexture ();
 
   ///
@@ -227,7 +228,7 @@ public:
   ///
   int get_h_mask () { return and_h; }
 
-  /// Query image size (alas we can't do (h << shf_w))
+  /// Query image size (alas we can't do (h << shf_w)).
   int get_size () { return w * h; }
 
   ///
@@ -255,16 +256,16 @@ protected:
    */
   bool texture_layer_translate[4];
 
-  /// The flat color of the material
+  /// The flat color of the material.
   csRGBpixel flat_color;
 
-  /// Material reflection parameters
+  /// Material reflection parameters.
   float diffuse, ambient, reflection;
 
   /// Original material.
   iMaterial *material;
 
-  /// Parent texture manager
+  /// Parent texture manager.
   csTextureManager *texman;
 public:
   ///
@@ -291,7 +292,6 @@ public:
     return texture_layer_translate[idx];
   }
 
-  //--------------------- iMaterialHandle implementation ----------------------
   SCF_DECLARE_IBASE;
 
   /**
@@ -346,7 +346,7 @@ protected:
   /// List of textures.
   csTexVector textures;
 
-  // Private class used to keep a list of objects derived from csMaterialHandle
+  // Private class used to keep a list of objects derived from csMaterialHandle.
   typedef csArray<csMaterialHandle*> csMatVector;
 
   /// List of materials.
@@ -366,10 +366,10 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  /// Initialize the texture manager
+  /// Initialize the texture manager.
   csTextureManager (iObjectRegistry *object_reg, iGraphics2D *iG2D);
 
-  /// Destroy the texture manager
+  /// Destroy the texture manager.
   virtual ~csTextureManager ();
 
   /**
@@ -378,13 +378,13 @@ public:
    */
   void UnregisterMaterial (csMaterialHandle *handle);
 
-  /// Clear (free) all textures
+  /// Clear (free) all textures.
   virtual void Clear () { textures.DeleteAll (); materials.DeleteAll (); }
 
-  /// Toggle verbose mode
+  /// Toggle verbose mode.
   virtual void SetVerbose (bool enable) { verbose = enable; }
 
-  /// Free all images associated with textures
+  /// Free all images associated with textures.
   virtual void FreeImages ();
 
   /**
@@ -411,14 +411,12 @@ public:
   virtual csPtr<iMaterialHandle> RegisterMaterial (iTextureHandle *txthandle);
 
   /**
-   * Default stub implementation until the
-   * material system is actually working.
+   * Default stub implementation until the material system is actually working.
    */
   virtual void PrepareMaterials ();
 
   /**
-   * Default stub implementation until the
-   * material system is actually working.
+   * Default stub implementation until the material system is actually working.
    */
   virtual void FreeMaterials ();
 };
