@@ -1,0 +1,8 @@
+SubDir TOP plugins video render3d shaderplugins softshader ;
+
+Plugin softshader
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith softshader : csgeom csgfx cssys csutil ;
+
+Help softshader : "Crystal Space Graphics3d Shaderplugin for software renderer" ;
