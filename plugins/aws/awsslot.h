@@ -99,6 +99,10 @@ class awsSink :
 
   /// Parameter to pass to triggers
   void *parm;
+
+  /// Last error code
+  unsigned int sink_err;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -116,6 +120,9 @@ public:
   virtual void RegisterTrigger (
                 char *name,
                 void (*Trigger) (void *, iAwsSource *));
+
+  /// Gets the last error code
+  virtual unsigned int GetError() { return sink_err; }
 };
 
 /// This is the signal source implementation, subclassed by all components.

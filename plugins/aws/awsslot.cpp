@@ -1,6 +1,7 @@
 #include "cssysdef.h"
 #include "awsslot.h"
 #include "awsadler.h"
+#include "iaws/awsdefs.h"
 #include <string.h>
 
 #define callRefMemberFunction(object, ptrToMember)  ((object).*(ptrToMember))
@@ -76,7 +77,7 @@ iAwsSink *awsSinkManager::CreateSink (void *parm)
 
 ///////////////////////////////////// Signal Sinks //////////////////////////////////////////////////////////
 awsSink::awsSink (void *p) :
-  parm(p)
+parm(p), sink_err(0)
 {
   SCF_CONSTRUCT_IBASE (NULL);
 }
@@ -90,6 +91,8 @@ unsigned long awsSink::GetTriggerID (char *_name)
   unsigned long name = NameToId (_name);
   int i;
 
+  sink_err=0;
+
   for (i = 0; i < triggers.Length (); ++i)
   {
     TriggerMap *tm = (TriggerMap *)triggers[i];
@@ -97,12 +100,19 @@ unsigned long awsSink::GetTriggerID (char *_name)
     if (tm->name == name) return i;
   }
 
+  sink_err = AWS_ERR_SINK_TRIGGER_NOT_FOUND;
   return 0;
 }
 
 void awsSink::HandleTrigger (int trigger, iAwsSource *source)
 {
-  if (triggers.Length () == 0) return ;
+  sink_err = 0;
+
+  if (triggers.Length () == 0) 
+  {
+    sink_err = AWS_ERR_SINK_NO_TRIGGERS;
+    return ;
+  }
 
   void (*Trigger) (void *, iAwsSource *) =
     (((TriggerMap *) (triggers[trigger]))->trigger);
@@ -113,6 +123,7 @@ void awsSink::RegisterTrigger (
   char *name,
   void (*Trigger) (void *, iAwsSource *))
 {
+  sink_err = 0;
   triggers.Push (new TriggerMap (NameToId (name), Trigger));
 }
 
