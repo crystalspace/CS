@@ -207,7 +207,7 @@
 // efficient as it could be ergo...heres a better solution.
 #ifdef COMP_VC
 #define memcpy fast_mem_copy
-static __inline void* fast_mem_copy(void* dest, const void* src, __int32 count)
+static inline void* fast_mem_copy(void* dest, const void* src, int count)
 {
   __asm
   {
