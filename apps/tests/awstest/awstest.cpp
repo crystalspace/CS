@@ -401,7 +401,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   iAwsWindow *test4 = aws->CreateWindowFrom("Layout Test");
   iAwsWindow *test5 = aws->CreateWindowFrom("Form1");
 
-  test3->SetEngineView(wview);
+  test3->SetProperty("view", wview);
 
   if (test)  test->Show();
   if (test3) test3->Show();
