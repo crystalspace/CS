@@ -24,28 +24,39 @@
 #include "csphyzik/ctvector.h"
 #include "csphyzik/phyztype.h"
 
-// A ctPointObj is the parent class of anything which acts like a point,
-// including point-masses and points (connectors) on larger objects.  Its
-// basic function is to retrieve its position and velocity, and allow
-// point forces and impulses to be applied.
-//
-class ctPointObj {
+/**
+ * A ctPointObj is the parent class of anything which acts like a point,
+ * including point-masses and points (connectors) on larger objects.  Its
+ * basic function is to retrieve its position and velocity, and allow
+ * point forces and impulses to be applied.
+ */
+class ctPointObj 
+{
  public:
-  ctPointObj() {}
-  virtual ~ctPointObj() {}
-  virtual ctVector3 pos() = 0;
-  virtual ctVector3 vel() = 0;  // The derivative of pos() wrt time
+  ctPointObj () {}
+  virtual ~ctPointObj () {}
+  virtual ctVector3 pos () = 0;
+
+  /// The derivative of pos() wrt time
+  virtual ctVector3 vel () = 0;
 
   virtual void apply_force(ctVector3 force) = 0;
 };
 
-class ctConstPoint : public ctPointObj {
+class ctConstPoint : public ctPointObj 
+{
   ctVector3 x;
  public:
-  ctConstPoint(ctVector3 pt) {x = pt;}
+  ctConstPoint (ctVector3 pt) 
+  { x = pt; }
+
   ~ctConstPoint() {}
-  ctVector3 pos() { return x; }
-  ctVector3 vel() { return ctVector3(0.0, 0.0, 0.0); }
+
+  ctVector3 pos () 
+  { return x; }
+
+  ctVector3 vel () 
+  { return ctVector3(0.0, 0.0, 0.0); }
 
   void apply_force(ctVector3 /*force*/) {}
 };

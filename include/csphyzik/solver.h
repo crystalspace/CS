@@ -18,8 +18,8 @@
 
 */
 
-#ifndef CTSOLVER_H
-#define CTSOLVER_H
+#ifndef __CT_SOLVER_H__
+#define __CT_SOLVER_H__
 
 #include "csphyzik/phyztype.h"
 #include "csphyzik/ctvector.h"
@@ -30,69 +30,71 @@ class ctDynamicEntity;
 
 // abstract classes
 
-// parent of classes that implement different algorithms and methods
-// to solve physical motion problems
-// responsible for calculating the change in state wrt time 
-// uses forces list and current state to do this.
+/**
+ * parent of classes that implement different algorithms and methods
+ * to solve physical motion problems
+ * responsible for calculating the change in state wrt time 
+ * uses forces list and current state to do this.
+ */
 class ctSolver
 {
 public:
-	virtual void solve( real t ) = 0;
-	virtual void init(){};
+  virtual void solve ( real t ) = 0;
+  virtual void init () {};
 
 };
 
 
-// calc accel of a simple body affected by simple forces and torques.
+/// calc accel of a simple body affected by simple forces and torques.
 class ctSimpleDynamicsSolver : public ctSolver
 {
 public:
-	ctSimpleDynamicsSolver( ctDynamicEntity &pde ): de( pde ){};
-	virtual void solve( real t );
+  ctSimpleDynamicsSolver ( ctDynamicEntity &pde )
+    : de( pde ) {};
+  virtual void solve ( real t );
 
 protected:
-	ctDynamicEntity &de;  // body this solver acts on
+  /// body this solver acts on
+  ctDynamicEntity &de;  
 
 };
 
-// parent of solver for articulated bodies
+/// parent of solver for articulated bodies
 class ctArticulatedSolver : public ctSolver
 {
 public:
-	// relative to it's body frame
-	virtual ctVector3 get_linear_a()= 0;
-	virtual ctVector3 get_angular_a() = 0;
-  virtual void apply_impulse( ctVector3 impulse_point,
+  /// relative to it's body frame
+  virtual ctVector3 get_linear_a () = 0;
+  virtual ctVector3 get_angular_a () = 0;
+  virtual void apply_impulse ( ctVector3 impulse_point,
 			      ctVector3 impulse_vector ) = 0;
 
-  virtual void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
+  virtual void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv, 
+					 const ctVector3 &impulse_point,
 			      const ctVector3 &unit_length_impulse_vector ) = 0;
 
 };
 
 
-// tries to reach a goal by applying it's own forces and torques
+/// tries to reach a goal by applying it's own forces and torques
 class ctGoalSolver : public ctSolver
 {
 public:
-	void set_goal( const ctVector3 &pgoal ){ goal = pgoal; }
+  void set_goal ( const ctVector3 &pgoal ){ goal = pgoal; }
 
 protected:
-	ctVector3 goal;
+  ctVector3 goal;
 
 };
 
-// IK or Inverse dyanmics parents
+/// IK or Inverse dyanmics parents
 class ctArticulatedGoalSolver : public ctArticulatedSolver
 {
 public:
-	void set_goal( const ctVector3 &pgoal ){ goal = pgoal; }
+  void set_goal ( const ctVector3 &pgoal ){ goal = pgoal; }
 
 protected:
-	ctVector3 goal;
-
-
-
+  ctVector3 goal;
 };
 
-#endif
+#endif // __CT_SOLVER_H__

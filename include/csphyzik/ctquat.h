@@ -18,8 +18,8 @@
 
 */
 
-#ifndef CTQUATERNION_H
-#define CTQUATERNION_H
+#ifndef __CTQUATERNION_H__
+#define __CTQUATERNION_H__
 
 #include "csgeom/quaterni.h"
 #include "csphyzik/ctvector.h"
@@ -27,28 +27,37 @@
 
 class ctQuaternion : public csQuaternion {
  public:
-  ctQuaternion(real r, real x, real y, real z) : csQuaternion(r, x, y, z) {}
-  ctQuaternion(ctVector3 x) : csQuaternion(csVector3(x[0], x[1], x[2])) {}
+  ctQuaternion (real r, real x, real y, real z) 
+    : csQuaternion ( r, x, y, z ) {}
+
+  ctQuaternion (ctVector3 x) 
+    : csQuaternion ( csVector3(x[0], x[1], x[2]) ) {}
+
 #ifdef __CRYSTALSPACE__
-  ctQuaternion(csVector3 x) : csQuaternion(csVector3(x[0], x[1], x[2])) {}
+  ctQuaternion(csVector3 x) 
+    : csQuaternion ( csVector3(x[0], x[1], x[2]) ) {}
 #endif
-  ctQuaternion(csQuaternion q) : csQuaternion(q.r, q.x, q.y, q.z) {}
-  ctQuaternion() {}
-  ~ctQuaternion() {}
 
-  ctMatrix3 to_matrix();
-  void      from_matrix(ctMatrix3& M);
+  ctQuaternion(csQuaternion q) 
+    : csQuaternion ( q.r, q.x, q.y, q.z ) {}
 
-  // Just like the other Rotate, but with ctVector3, not csVector3
-  ctVector3 Rotate(ctVector3 pt) {
-    ctQuaternion p(pt);
-    ctQuaternion qConj(r, -x, -y, -z);
+  ctQuaternion () {}
+  ~ctQuaternion () {}
 
-    p = ctQuaternion(*this * p);
+  ctMatrix3 to_matrix ();
+  void from_matrix (ctMatrix3& M);
+
+  /// Just like the other Rotate, but with ctVector3, not csVector3
+  ctVector3 Rotate (ctVector3 pt) 
+  {
+    ctQuaternion p (pt);
+    ctQuaternion qConj (r, -x, -y, -z);
+
+    p = ctQuaternion (*this * p);
     p *= qConj;
-    return ctVector3(p.x, p.y, p.z);
+    return ctVector3 (p.x, p.y, p.z);
   }
 };
 
-#endif // CTQUATERNION_H
+#endif // __CTQUATERNION_H__
 

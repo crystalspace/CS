@@ -32,25 +32,28 @@ class ctForce
 {
 public:
 
-	// defaults with inertial reference frame 
-	ctForce();
-	// use supplied referece frame
-	ctForce( ctReferenceFrame &rf );
-	virtual ~ctForce();
+  /// defaults with inertial reference frame 
+  ctForce();
+  /// use supplied referece frame
+  ctForce( ctReferenceFrame &rf );
+  virtual ~ctForce();
 
-	// apply this force to the given body.  Adds F and Torque components to pe
-	// overload this and add new functionality for new forces
-	virtual ctVector3 apply_F( ctDynamicEntity& /*pe*/ ){ return *( new ctVector3() );}
+  /**
+   * apply this force to the given body.  Adds F and Torque components to pe
+   * overload this and add new functionality for new forces
+   */
+  virtual ctVector3 apply_F ( ctDynamicEntity& /*pe*/ )
+  { return *( new ctVector3() );}
 
-	// generic magnitude and direction to be used by all forces
-	void set_magnitude( real m ){ magnitude = m; }
-	void set_direction( ctVector3 d ){ direction = d; }
+  /// generic magnitude and direction to be used by all forces
+  void set_magnitude ( real m ){ magnitude = m; }
+  void set_direction ( ctVector3 d ){ direction = d; }
 
-	real magnitude;
-	ctVector3 direction;
-	ctVector3 origin;
-	ctReferenceFrame &RF;
+  real magnitude;
+  ctVector3 direction;
+  ctVector3 origin;
+  ctReferenceFrame &RF;
 	
 };
 
-#endif
+#endif // __CT_FORCE_H__

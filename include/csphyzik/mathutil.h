@@ -31,15 +31,15 @@
 #endif
 #define degree_to_rad( A ) ( 2.0*A*PI/360.0 )
 
-// calc rotation matrix from a rotation of an angle around a vector 
-void R_from_vector_and_angle( ctVector3 pvec, real pangle, ctMatrix3 &pR );
+/// calc rotation matrix from a rotation of an angle around a vector 
+void R_from_vector_and_angle ( ctVector3 pvec, real pangle, ctMatrix3 &pR );
 
-// return angle between two vectors
-real angle_diff( ctVector3 v1, ctVector3 v2 ); 
+/// return angle between two vectors
+real angle_diff ( ctVector3 v1, ctVector3 v2 ); 
 
-// takes real's as args
-// return max
-real mu_max( int pnum, ... );
-real sign( real pval );
+/// takes real's as args
+/// return max
+real mu_max ( int pnum, ... );
+real sign ( real pval );
 
 #endif

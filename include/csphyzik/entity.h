@@ -18,8 +18,8 @@
 
 */
 
-#ifndef ctEntity_H
-#define ctEntity_H
+#ifndef __CT_ENTITY_H__
+#define __CT_ENTITY_H__
 
 #include <stdarg.h>
 
@@ -28,42 +28,36 @@
 #include "csphyzik/linklist.h"
 #include "csphyzik/refframe.h"
 
-// flags
-#define CTF_NOREWIND 0x1
-
 class ctSolver;
 class ctPhysicalEntity;
+
+
+// flags
+#define CTF_NOREWIND 0x1
 
 // parent class of all physical bodies ( or even some non-physical ones... )
 class ctEntity
 {
-protected:
-  int state_offset;
-
-  // object responsible for calculating the change in state wrt time 
-  // uses forces list and current state to do this.
-  ctSolver *solver;
-
-  ctLinkList<ctForce> forces;   // list of all forces affecting this object
-
  public:
 /*
-**      Constructors/destructors/statics
+**  Constructors/destructors/statics
 */
   ctEntity();
   virtual ~ctEntity();
 
 /*
-**      Member functions
+**  Member functions
 */
+  /**
+   * Compute the derivative of this body's state vector ( position,
+   * velocity... ) from applied forces.  Just passes control to the
+   * ctSolver for this object.
+   */
+  virtual void solve ( real t );
 
-  // Compute the derivative of this body's state vector ( position,
-  // velocity... ) from applied forces.  Just passes control to the
-  // ctSolver for this object.
-  virtual void solve( real t );
-
-  // Set the class responsible for solving change in state wrt time.
-  void set_solver( ctSolver *pslv ){ solver = pslv; }
+  /// Set the class responsible for solving change in state wrt time.
+  void set_solver ( ctSolver *pslv )
+  { solver = pslv; }
 
   //**********  ODE interface ****************
   // Init values that will influence the calculation of the change in state.
@@ -92,14 +86,28 @@ protected:
   virtual ctPhysicalEntity *get_collidable_entity(){ return NULL; }
 
   // Stereotype of funcs to replace flags array
-  virtual bool will_rewind() { return !(flags & CTF_NOREWIND); }
-  virtual void set_rewind(bool dorewind) {
+  virtual bool will_rewind () { return !(flags & CTF_NOREWIND); }
+  virtual void set_rewind (bool dorewind) 
+  {
     flags &= ~CTF_NOREWIND;
     if(!dorewind) flags |= CTF_NOREWIND;
   }
 
-  // flags
+  /// flags
   unsigned long flags;
+
+protected:
+  int state_offset;
+
+  /**
+   * object responsible for calculating the change in state wrt time 
+   * uses forces list and current state to do this.
+   */
+  ctSolver *solver;
+
+  /// list of all forces affecting this object
+  ctLinkList<ctForce> forces;  
+
 };
 
-#endif
+#endif // __CT_ENTITY_H__

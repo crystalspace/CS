@@ -39,7 +39,6 @@ OdeSolver::~OdeSolver()
 {
   if (dy) delete [] dy;
   if (Iy) delete [] Iy;
-
 }
 
 

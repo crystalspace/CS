@@ -5,7 +5,7 @@
 
 //extern "C"
 //{
-void linear_solve( real **A, int dim, double *x, double *b );
+void linear_solve ( real **A, int dim, double *x, double *b );
 //}
 
 

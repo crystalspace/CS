@@ -18,96 +18,141 @@
 
 */
 
-#ifndef ctPtMass_H
-#define ctPtMass_H
+#ifndef __CT_PTMASS_H__
+#define __CT_PTMASS_H__
 
 #include "csphyzik/point.h"
 #include "csphyzik/entity.h"
 
 // This is an Aristotelean (i.e. F=mv) point.
-class ctDampedPointMass : public ctPointObj, public ctEntity {
- protected:
-  real      m;
+class ctDampedPointMass : public ctPointObj, public ctEntity 
+{
+
+ public:
+  void set_mass (int newmass) 
+  { m = newmass; }
+
+  real mass (void) 
+  { return m; }
+
+  /// ctPointObj methods
+  ctVector3 pos () 
+  { return x; }
+
+  ctVector3 vel () 
+  { return v; }
+
+  void apply_force (ctVector3 force) 
+  { v += force / m; }
+
+  /// ctEntity methods
+  void init_state () 
+  { v = ctVector3(0,0,0); }
+
+  int get_state_size () 
+  { return 3; }
+
+  int set_state (real *sa) 
+  {
+    printf ("Set_state!\n");
+    sa[0] = x[0]; sa[1] = x[1]; sa[2] = x[2];
+    return get_state_size ();
+  }
+
+  int get_state (real *sa) 
+  {
+    printf ("Get_state!\n");
+    x[0] = sa[0]; x[1] = sa[1]; x[2] = sa[2];
+    return get_state_size ();
+  }
+  int set_delta_state (real *sa) 
+  {
+    printf ("Set_delta_state!\n");
+    sa[0] = v[0]; sa[1] = v[1]; sa[2] = v[2];
+    return get_state_size ();
+  } 
+
+protected:
+  real m;
   ctVector3 x;
 
   // Temp vars for dealing with derivatives & solver
   ctVector3 v;
- public:
-  void set_mass(int newmass) { m = newmass; }
-  real mass(void) { return m; }
-
-  // ctPointObj methods
-  ctVector3 pos() { return x; }
-  ctVector3 vel() { return v; }
-  void apply_force(ctVector3 force) { v += force / m; }
-
-  // ctEntity methods
-  void init_state() { v = ctVector3(0,0,0); }
-  int get_state_size() { return 3; }
-  int set_state(real *sa) {
-    printf("Set_state!\n");
-    sa[0] = x[0]; sa[1] = x[1]; sa[2] = x[2];
-    return get_state_size();
-  }
-  int get_state(real *sa) {
-    printf("Get_state!\n");
-    x[0] = sa[0]; x[1] = sa[1]; x[2] = sa[2];
-    return get_state_size();
-  }
-  int set_delta_state(real *sa) {
-    printf("Set_delta_state!\n");
-    sa[0] = v[0]; sa[1] = v[1]; sa[2] = v[2];
-    return get_state_size();
-  }
 };
 
 // This is a Newtonian (i.e. F=ma) point.
-class ctPointMass : public ctPointObj, public ctEntity {
- protected:
+class ctPointMass : public ctPointObj, public ctEntity 
+{
+ public:
+  ctPointMass (real mass) 
+    : m(mass), x(ctVector3(0.0, 0.0, 0.0)), v(ctVector3(0.0, 0.0, 0.0))  {}
+
+  ctPointMass (ctVector3 pos = ctVector3(0.0, 0.0, 0.0),
+	       ctVector3 vel = ctVector3(0.0, 0.0, 0.0), real mass = 1.0)
+    : m(mass), x(pos), v(vel) {}
+
+  ~ctPointMass() {}
+
+  real mass (void) 
+  { return m; }
+
+  void set_mass (int newmass) 
+  { m = newmass; }
+
+  /// ctPointObj methods
+  ctVector3 pos () 
+  { return x; }
+
+  ctVector3 vel () 
+  { return v; }
+
+  void apply_force (ctVector3 force) 
+  { F += force / m; }
+
+  void set_pos (ctVector3 pos) 
+  { x = pos; }
+
+  void set_vel (ctVector3 vel) 
+  { v = vel; }
+
+  void set_force (ctVector3 force) 
+  { F = force; }
+
+  /// ctEntity methods
+  void init_state () 
+  { F[0] = F[1] = F[2] = 0.0; }
+
+  int  get_state_size () 
+  { return 6; }
+
+  int  set_state(real *sa) 
+  {
+    sa[0] = x[0]; sa[1] = x[1]; sa[2] = x[2];
+    sa[3] = v[0]; sa[4] = v[1]; sa[5] = v[2];
+    return get_state_size();
+  }
+
+  int  get_state(const real *sa) 
+  {
+    x[0] = sa[0]; x[1] = sa[1]; x[2] = sa[2];
+    v[0] = sa[3]; v[1] = sa[4]; v[2] = sa[5];
+    return get_state_size();
+  }
+
+  int set_delta_state(real *sa) 
+  {
+    sa[0] = v[0]; sa[1] = v[1]; sa[2] = v[2];
+    sa[3] = F[0]; sa[4] = F[1]; sa[5] = F[2];
+    return get_state_size();
+  }
+
+protected:
   real      m;
   ctVector3 x;
   ctVector3 v;
 
   // Temp vars for dealing with derivatives & solver
   ctVector3 F;
- public:
-  ctPointMass(real mass) : m(mass), x(ctVector3(0.0, 0.0, 0.0)),
-    v(ctVector3(0.0, 0.0, 0.0))  {}
-  ctPointMass(ctVector3 pos = ctVector3(0.0, 0.0, 0.0),
-	      ctVector3 vel = ctVector3(0.0, 0.0, 0.0), real mass = 1.0)
-    : m(mass), x(pos), v(vel) {}
-  ~ctPointMass() {}
-
-  real mass(void) { return m; }
-  void set_mass(int newmass) { m = newmass; }
-
-  // ctPointObj methods
-  ctVector3 pos() { return x; }
-  ctVector3 vel() { return v; }
-  void apply_force(ctVector3 force) { F += force / m; }
-
-  void set_pos(ctVector3 pos) { x = pos; }
-  void set_vel(ctVector3 vel) { v = vel; }
-  void set_force(ctVector3 force) { F = force; }
-
-  // ctEntity methods
-  void init_state() { F[0] = F[1] = F[2] = 0.0; }
-  int  get_state_size() { return 6; }
-  int  set_state(real *sa) {
-    sa[0] = x[0]; sa[1] = x[1]; sa[2] = x[2];
-    sa[3] = v[0]; sa[4] = v[1]; sa[5] = v[2];
-    return get_state_size();
-  }
-  int  get_state(const real *sa) {
-    x[0] = sa[0]; x[1] = sa[1]; x[2] = sa[2];
-    v[0] = sa[3]; v[1] = sa[4]; v[2] = sa[5];
-    return get_state_size();
-  }
-  int set_delta_state(real *sa) {
-    sa[0] = v[0]; sa[1] = v[1]; sa[2] = v[2];
-    sa[3] = F[0]; sa[4] = F[1]; sa[5] = F[2];
-    return get_state_size();
-  }
 };
 
-#endif // ctPtMass_H
+#endif // __CT_PTMASS_H__

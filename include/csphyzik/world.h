@@ -38,9 +38,9 @@ enum errorcode { WORLD_NOERR, WORLD_ERR_NULLPARAMETER, WORLD_ERR_NOODE,
 #define STATE_RESIZE_EXTRA 256
 
 class ctForce;
-
 // State-alloc tracking structure:
-class AllocNode {
+class AllocNode 
+{
  public:
   int offset;
   int size;
@@ -50,64 +50,77 @@ class ctWorld : public ctEntity
 {
 public:
 
-  ctWorld();
-  virtual ~ctWorld();  //!me delete _lists and ode
+  ctWorld ();
+  /// !me delete _lists and ode
+  virtual ~ctWorld ();  
 
-  void calc_delta_state( real t, const real y[], real ydot[] );
+  void calc_delta_state ( real t, const real y[], real ydot[] );
 
-  // evolve the state of the system.  calc forces, determine new v, etc..
-  errorcode evolve( real t1, real t2 );
+  /// evolve the state of the system.  calc forces, determine new v, etc..
+  errorcode evolve ( real t1, real t2 );
 
-  // rewind the state of the system to the time just before evolve was called.
-  // pass in the correct time frame.
-  errorcode rewind( real t1, real t2 );  
+  /**
+   * Rewind the state of the system to the time just before evolve was called.
+   * pass in the correct time frame.
+   */
+  errorcode rewind ( real t1, real t2 );  
 
- // maximum number of times to back-up in an evolve loop.
-  void set_max_time_subdivisions( long pmt ){ max_time_subdivisions = pmt; }
+  /// Maximum number of times to back-up in an evolve loop.
+  void set_max_time_subdivisions ( long pmt )
+  { max_time_subdivisions = pmt; }
 
-  void register_catastrophe_manager( ctCatastropheManager *pcm );
+  void register_catastrophe_manager ( ctCatastropheManager *pcm );
   
-  void solve( real t );
-  errorcode add_entity( ctEntity *pe );
-  errorcode add_enviro_force( ctForce *f );
+  void solve ( real t );
+  errorcode add_entity ( ctEntity *pe );
+  errorcode add_enviro_force ( ctForce *f );
 
-  errorcode delete_entity( ctEntity *pb );
+  errorcode delete_entity ( ctEntity *pb );
 
-  // set the ODE solver used to evolve the system
-  void set_ODE_solver( OdeSolver *pode ){ 
+  /// set the ODE solver used to evolve the system
+  void set_ODE_solver ( OdeSolver *pode )
+  { 
     if( ode_to_math ) delete ode_to_math;
     ode_to_math = pode; 
   }
 
-  // apply the given function to all physical entities in the system.
-  void apply_function_to_body_list( void(*fcn)( ctEntity *pe ) );
+  /// Apply the given function to all physical entities in the system.
+  void apply_function_to_body_list ( void(*fcn)( ctEntity *pe ) );
 
-  // This function evaluates dydt().  By overriding it in child classes,
-  // ctWorld objects that use nondefault derivatives (like catastrophes,
-  // constraints, and certain forces) can be created.
-  virtual void dydt_eval(real t, const real y[], real dy[]);
+  /**
+   * This function evaluates dydt().  By overriding it in child classes,
+   * ctWorld objects that use nondefault derivatives (like catastrophes,
+   * constraints, and certain forces) can be created.
+   */
+  virtual void dydt_eval (real t, const real y[], real dy[]);
 
-  // collision response routines and utils
-  void resolve_collision( ctCollidingContact *cont );
-  ctVector3 get_relative_v( ctPhysicalEntity *body_a, ctPhysicalEntity *body_b, const ctVector3 &the_p );
+  /// Collision response routines and utils
+  void resolve_collision ( ctCollidingContact *cont );
+  ctVector3 get_relative_v 
+   ( ctPhysicalEntity *body_a, ctPhysicalEntity *body_b, const ctVector3 &the_p );
 
-  virtual int get_state_size() { return 0; }
-  // Add this body's state to the state vector buffer passed in. 
-  virtual int set_state( real * ){return 0;}
-  // download state from buffer into this entity
-  virtual int get_state( const real * ){return 0;}
-  // add change in state vector over time to state buffer parameter.
-  virtual int set_delta_state( real * ){return 0;}
+  virtual int get_state_size () 
+  { return 0; }
+  /// Add this body's state to the state vector buffer passed in.
+  virtual int set_state ( real * )
+  { return 0; }
+  /// download state from buffer into this entity
+  virtual int get_state ( const real * )
+  { return 0; }
+  /// add change in state vector over time to state buffer parameter.
+  virtual int set_delta_state ( real * )
+  { return 0; }
 
-  // Static state-alloc stuff
-  int            state_size;
+  /// Static state-alloc stuff
+  int state_size;
   csDLinkList free_blocks;
   csDLinkList used_blocks;
 
-  //**********  State vector interface *********
-  virtual int  state_alloc(int size);
-  virtual void state_free(int offset);
-  virtual int  state_realloc(int offset, int newsize) {
+  ///**********  State vector interface *********
+  virtual int  state_alloc (int size);
+  virtual void state_free (int offset);
+  virtual int  state_realloc (int offset, int newsize) 
+  {
     int newloc = state_alloc(newsize);
     if(!newloc) return 0;
     // Okay, got state-space -- free old loc, return new one
@@ -115,64 +128,74 @@ public:
     return newloc;
   }
 
-  // State-alloc helper functions
+  /// State-alloc helper functions
 
-  // Removes a block from the used_blocks list
-  // Returns the block if successful, 0 if a block with that offset
-  //   wasn't found.
-  AllocNode *sa_make_unused(int offset);
+  /**
+   * Removes a block from the used_blocks list.
+   * Returns the block if successful, 0 if a block with that offset
+   * wasn't found.
+   */
+  AllocNode *sa_make_unused (int offset);
 
-  // Adds a block at its appropriate place in the used_blocks list
-  // Returns true if successful, false otherwise
-  bool       sa_make_used(AllocNode *block);
+  /**
+   * Adds a block at its appropriate place in the used_blocks list
+   * Returns true if successful, false otherwise
+   */
+  bool sa_make_used (AllocNode *block);
 
 protected:
-  // take a step forward in time
+  /// take a step forward in time
   errorcode do_time_step( real t1, real t2 );
 
-  // take state values( position, velocity, orientation, ... ) from 
-  // this world's entities and put them into the array
-  void load_state( real *state_array );
+  /**
+   * Take state values( position, velocity, orientation, ... ) from 
+   * this world's entities and put them into the array.
+   */
+  void load_state ( real *state_array );
 
-  // take state values from array and reintegrate them into ctEntity 
-  // structures of this world.  the reverse operation of load_state.
-  // state_array must have been filled out by load_state.
-  void reintegrate_state( const real *state_array );
+  /**
+   * Take state values from array and reintegrate them into ctEntity 
+   * structures of this world.  The reverse operation of load_state.
+   * State_array must have been filled out by load_state.
+   */
+  void reintegrate_state ( const real *state_array );
 
-  // put first derivative of all world entities into state 
-  void load_delta_state( real *state_array );
+  /// Put first derivative of all world entities into state 
+  void load_delta_state ( real *state_array );
 
-  void init_state();
+  void init_state ();
 
-  void collide();
+  void collide ();
 
-  void resize_state_vector( long new_size );
+  void resize_state_vector ( long new_size );
 
-  // the current state of the world. as in finite state machine state
+  /// The current state of the world, as in finite state machine state
   worldstate fsm_state;  
   real rewound_from;
 
   ctLinkList<ctEntity> body_list;
   ctLinkList<ctForce> enviro_force_list;
   ctLinkList<ctCatastropheManager> catastrophe_list;
-  
-  OdeSolver *ode_to_math;  // would an equation by any other name smell as sweet?
 
-  // state vectors for ODE interface
-  real *y_save;  // used to save state so it can be rewound to pre-ODE state
+  /// Would an equation by any other name smell as sweet?
+  OdeSolver *ode_to_math;  
+
+  /// State vectors for ODE interface
+
+  /// Used to save state so it can be rewound to pre-ODE state
+  real *y_save;  
   real *y0;
   real *y1;
 
-  //!me should be a per "group" member ( when groups are implemented )
-  // indicate if there was a catstrophe last frame
+  /// !me should be a per "group" member ( when groups are implemented )
+  /// indicate if there was a catstrophe last frame
   bool was_catastrophe_last_frame;
 
-  // maximum number of times to back-up in an evolve loop.
-  long max_time_subdivisions;  
+  /// Maximum number of times to back-up in an evolve loop.
+  long max_time_subdivisions;
 
   long y_save_size;
   long max_state_size;
-
 };
 
 

@@ -32,34 +32,43 @@ class ctCollidingContact
 {
 public:
 
-  ctCollidingContact() :
-    contact_p(0), ea(0), eb(0), n(0)
+  ctCollidingContact() : contact_p(0), ea(0), eb(0), n(0)
   {
     body_b = NULL;
     restitution = 1.0;
     next = NULL;
   }
 
-  // set body_b to NULL if it is an immovable object. e.g. the ground.
-  ctEntity *body_a;  // body a.  one of the bodies in a collision. ingnored for "next" contacts
-  ctEntity *body_b;  // body b.  other body involved in the contact
+  /// body a. One of the bodies in a collision. Ignored for "next" contacts
+  ctEntity *body_a; 
 
-  ctVector3 contact_p;  // point of contact in world coords
-	
-	ctVector3 ea;  // edge direction for a
-	ctVector3 eb;  // edge direction for b
+  /**
+   * body b.  Other body involved in the contact
+   * Set body_b to NULL if it is an immovable object. e.g. the ground.
+   */
+  ctEntity *body_b;
+  
+  /// point of contact in world coords
+  ctVector3 contact_p; 
+  /// edge direction for a
+  ctVector3 ea;  
+  /// edge direction for b
+  ctVector3 eb;  
 
-  //!me bad code: fix it.  Should be enumed types
-	bool vf;  // true if it is a vertex-face collision. false if edge edge
+  ///!me bad code: fix it.  Should be enumed types
+  /// true if it is a vertex-face collision. false if edge edge
+  bool vf; 
 
-  // pointed away from body b, towards body a
-  ctVector3 n;   // collision normal
+  /// Collision normal pointed away from body b, towards body a
+  ctVector3 n;    
 
-  // coefficent of restitution.  what % of v bounces back. +ve
-  // should be a number between 0.0 and 1.0
+  /**
+   * Coefficent of restitution.  What % of v bounces back. +ve
+   * should be a number between 0.0 and 1.0
+   */
   real restitution;  
 
-  // link to next contact
+  /// link to next contact
   ctCollidingContact *next;
 
 };
@@ -69,28 +78,31 @@ class ctContact
 {
 public:
 
-  ctContact() :
-    contact_p(0), ea(0), eb(0), n(0)
+  ctContact() : contact_p(0), ea(0), eb(0), n(0)
   {
     body_b = NULL;
     next = NULL;
   }
 
-  // set body_b to NULL if it is an immovable object. e.g. the ground.
-  ctRigidBody *body_a;  // body a.  one of the bodies in a collision. ingnored for "next" contacts
-  ctRigidBody *body_b;  // body b.  other body involved in the contact
+  /// body a.  One of the bodies in a collision. ingnored for "next" contacts
+  ctRigidBody *body_a; 
 
-  ctVector3 contact_p;  // point of contact in world coords
-	
-	ctVector3 ea;  // edge direction for a
-	ctVector3 eb;  // edge direction for b
+  /// body b.  other body involved in the contact
+  /// Set body_b to NULL if it is an immovable object. e.g. the ground.
+  ctRigidBody *body_b; 
 
-	bool vf;
+  /// point of contact in world coords
+  ctVector3 contact_p;  
+  /// edge direction for a
+  ctVector3 ea;  
+  /// edge direction for b
+  ctVector3 eb;  
 
-  // pointed away from body b, towards body a
-  ctVector3 n;   // collision normal
+  bool vf;
 
-  // link to next contact
+  /// Collision normal pointed away from body b, towards body a
+  ctVector3 n; 
+  /// link to next contact
   ctContact *next;
 
 };

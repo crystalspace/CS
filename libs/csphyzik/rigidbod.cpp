@@ -46,16 +46,16 @@ ctRigidBody::~ctRigidBody()
 
 ctRigidBody *ctRigidBody::new_ctRigidBody()
 {
-ctReferenceFrame *rf = new ctReferenceFrame();
-ctDeltaReferenceFrame *drf = new ctDeltaReferenceFrame();
+  ctReferenceFrame *rf = new ctReferenceFrame();
+  ctDeltaReferenceFrame *drf = new ctDeltaReferenceFrame();
 
   return new ctRigidBody( *rf, *drf );
 
 }
 ctRigidBody *ctRigidBody::new_ctRigidBody( coord x, coord y, coord z )
 {
-ctReferenceFrame *rf = new ctReferenceFrame();
-ctDeltaReferenceFrame *drf = new ctDeltaReferenceFrame();
+  ctReferenceFrame *rf = new ctReferenceFrame();
+  ctDeltaReferenceFrame *drf = new ctDeltaReferenceFrame();
 
   (void) x;
   (void) y;
@@ -223,12 +223,12 @@ void ctRigidBody::set_m( real pm )
 
 void ctRigidBody::apply_impulse( ctVector3 jx, ctVector3 jv )
 {
-real mass = get_m();
+  real mass = get_m();
   
   P += jv;
   dRF.v = P * (( mass > MIN_REAL ) ? 1.0/mass : MAX_REAL);
 
-  L += jx % jv;
+  L += (jx) % jv;
 
   ctMatrix3 I_inv_world = get_I_inv_world();
   dRF.w = I_inv_world * L;

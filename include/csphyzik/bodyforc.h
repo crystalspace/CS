@@ -31,14 +31,15 @@ class ctPhysicalEntity;
 class ctNBodyForce : public ctForce
 {
 public:
-	ctLinkList<ctPhysicalEntity> body_vector;  
+  ctLinkList<ctPhysicalEntity> body_vector;  
 
-	ctNBodyForce();
-	ctNBodyForce( ctReferenceFrame &rf );
-	virtual ~ctNBodyForce();
+  ctNBodyForce ();
+  ctNBodyForce ( ctReferenceFrame &rf );
+  virtual ~ctNBodyForce ();
 
-	// add another body that this force works on
-	virtual void add_body( ctPhysicalEntity *bod ){ body_vector.add_link( bod ); }
+  // add another body that this force works on
+  virtual void add_body ( ctPhysicalEntity *bod )
+  { body_vector.add_link( bod ); }
 };
 
 #endif

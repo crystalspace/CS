@@ -29,6 +29,7 @@
 #include "csparser/csloader.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
+#include "ifontsrv.h"
 
 #include "csphyzik/phyziks.h"
 #include "csgeom/math3d.h"
@@ -39,7 +40,7 @@
 // hit del key to create a swinging chain
 // hit tab key for a mass on a spring
 
-Phyztest *Sys;
+
 
 
 //------------------------------------------------- We need the 3D engine -----
@@ -50,6 +51,7 @@ REGISTER_STATIC_LIBRARY (engine)
 
 // The physics world.  Main object for physics stuff
 ctWorld phyz_world;
+Phyztest *Sys;
 
 // data for mass on spring demo
 csSprite3D *bot = NULL;
@@ -101,9 +103,9 @@ csSprite3D *add_test_sprite( csSpriteTemplate *tmpl, csSector *aroom, csView *vi
   tsprt->SetTemplate( tmpl );
   view->GetEngine ()->sprites.Push (tsprt);
   tsprt->GetMovable ().SetSector (aroom);
-  csMatrix3 m; m.Identity ();
+  csXScaleMatrix3 m (2);
   tsprt->GetMovable ().SetTransform (m);
-  tsprt->GetMovable ().SetPosition (csVector3( 0, 10, 0 ));    // only matters for root in chain demo
+  tsprt->GetMovable ().SetPosition (csVector3( 0, 0, 0 ));    // only matters for root in chain demo
   tsprt->GetMovable ().UpdateMove ();
   tsprt->SetAction ("default");
   tsprt->InitSprite ();
@@ -121,12 +123,15 @@ Phyztest::Phyztest ()
   dynlight = NULL;
   motion_flags = 0;
   cdsys = NULL;
+  courierFont = NULL;
 }
 
 Phyztest::~Phyztest ()
 {
   if (cdsys) cdsys->DecRef ();
   delete view;
+  if (courierFont)
+    courierFont->DecRef ();
 }
 
 void cleanup ()
@@ -158,6 +163,16 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     exit (1);
   }
 
+  iFontServer *fs = G3D->GetDriver2D()->GetFontServer ();
+  if (fs)
+    courierFont = fs->LoadFont (CSFONT_COURIER);
+  else
+  {
+    Printf (MSG_FATAL_ERROR, "No font plugin!\n");
+    cleanup ();
+    exit (1);
+  }
+
   cdsys = LOAD_PLUGIN (Sys, "crystalspace.colldet.rapid", "CollDet", iCollideSystem);
 
   // Some commercials...
@@ -172,7 +187,9 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
 
-  if( !csLoader::LoadLibraryFile (engine, "/lib/std/library" ) ){
+
+  if ( !csLoader::LoadLibraryFile (engine, "/lib/std/library" ) )
+  {
     Printf (MSG_INITIALIZATION, "LIBRARY NOT LOADED!...\n");
     Shutdown = true;
     return false;
@@ -183,53 +200,53 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   room = engine->CreateCsSector ("room");
   csPolygon3D* p;
   p = room->NewPolygon (tm);
-  p->AddVertex (-5, 5, 5);
-  p->AddVertex (5, 5, 5);
-  p->AddVertex (5, 5, -5);
-  p->AddVertex (-5, 5, -5);
+  p->AddVertex (-5, -5, 5);//1
+  p->AddVertex (5, -5, 5);//2
+  p->AddVertex (5, -5, -5);//3
+  p->AddVertex (-5, -5, -5);//4
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = room->NewPolygon (tm);
-  p->AddVertex (-5, 17, -5);
-  p->AddVertex (5, 17, -5);
-  p->AddVertex (5, 17, 5);
-  p->AddVertex (-5, 17, 5);
+  p->AddVertex (-5, 5, -5);//5
+  p->AddVertex (5, 5, -5);//6
+  p->AddVertex (5, 5, 5);//7
+  p->AddVertex (-5, 5, 5);//8
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = room->NewPolygon (tm);
-  p->AddVertex (-5, 17, 5);
-  p->AddVertex (5, 17, 5);
-  p->AddVertex (5, 5, 5);
-  p->AddVertex (-5, 5, 5);
+  p->AddVertex (-5, 5, 5);//9
+  p->AddVertex (5, 5, 5);//10
+  p->AddVertex (5, -5, 5);//11
+  p->AddVertex (-5, -5, 5);//12
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = room->NewPolygon (tm);
-  p->AddVertex (5, 17, 5);
-  p->AddVertex (5, 17, -5);
-  p->AddVertex (5, 5, -5);
-  p->AddVertex (5, 5, 5);
+  p->AddVertex (5, 5, 5);//13
+  p->AddVertex (5, 5, -5);//14
+  p->AddVertex (5, -5, -5);//15
+  p->AddVertex (5, -5, 5);//16
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = room->NewPolygon (tm);
-  p->AddVertex (-5, 17, -5);
-  p->AddVertex (-5, 17, 5);
-  p->AddVertex (-5, 5, 5);
-  p->AddVertex (-5, 5, -5);
+  p->AddVertex (-5, 5, -5);//17
+  p->AddVertex (-5, 5, 5);//18
+  p->AddVertex (-5, -5, 5);//19
+  p->AddVertex (-5, -5, -5);//20
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = room->NewPolygon (tm);
-  p->AddVertex (5, 17, -5);
-  p->AddVertex (-5, 17, -5);
-  p->AddVertex (-5, 5, -5);
-  p->AddVertex (5, 5, -5);
+  p->AddVertex (5, 5, -5);//21
+  p->AddVertex (-5, 5, -5);//22
+  p->AddVertex (-5, -5, -5);//23
+  p->AddVertex (5, -5, -5);//24
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   csStatLight* light;
-  light = new csStatLight (-3, 7, 0, 10, 1, 0, 0, false);
+  light = new csStatLight (-3, -4, 0, 10, 1, 0, 0, false);
   room->AddLight (light);
-  light = new csStatLight (3, 7, 0, 10, 0, 0, 1, false);
+  light = new csStatLight (3, -4, 0, 10, 0, 0, 1, false);
   room->AddLight (light);
-  light = new csStatLight (0, 7, -3, 10, 0, 1, 0, false);
+  light = new csStatLight (0, -4, -3, 10, 0, 1, 0, false);
   room->AddLight (light);
 
   iPolygonMesh* mesh = QUERY_INTERFACE (room, iPolygonMesh);
@@ -252,10 +269,11 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   // easier.
   view = new csView (engine, G3D);
   view->SetSector (room);
-  view->GetCamera ()->SetPosition (csVector3 (0, 8, -4));
+  view->GetCamera ()->SetPosition (csVector3 (0, 0, -4));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
 
   txtmgr->SetPalette ();
+  write_colour = txtmgr->FindRGB (255, 150, 100);
   return true;
 }
 
@@ -286,13 +304,15 @@ void Phyztest::NextFrame ()
     view->GetCamera ()->Move (VEC_BACKWARD * 4.0f * speed);
 
   // add a chain
-  if (GetKeyState (CSKEY_DEL) && !chain_added ){
-    
-
- //   CsPrintf (MSG_DEBUG_0, "adding chain\n");
+  if (GetKeyState (CSKEY_DEL) && !chain_added )
+  {
+    // CsPrintf (MSG_DEBUG_0, "adding chain\n");
     // use box template
-    csSpriteTemplate* bxtmpl = (csSpriteTemplate*)view->GetEngine ()->sprite_templates.FindByName ("box");
-    if (!bxtmpl){     
+
+    csSpriteTemplate* bxtmpl = (csSpriteTemplate*)
+      view->GetEngine ()->sprite_templates.FindByName ("box");
+    if (!bxtmpl)
+    {  
       Printf (MSG_INITIALIZATION, "couldn't load template 'box'\n");
       return;
     }
@@ -303,22 +323,27 @@ void Phyztest::NextFrame ()
     ctArticulatedBody *ab_parent;
     ctArticulatedBody *ab_child;
     // each link of chain has a rigid body 
-    ctRigidBody *rb = add_test_body( ctVector3( 0.0,8.0,0.0 ));
-    // which is used in the creation of an articulated body ( linked to others via a joint )
+    ctRigidBody *rb = add_test_body( ctVector3( 0.0, 0.0, 0.0 ));
+    // which is used in the creation of an articulated body 
+    // ( linked to others via a joint )
     ab_parent = new ctArticulatedBody( rb );
-    // the world only needs to have a pointer to the root of the articulated body tree.
+    // the world only needs to have a pointer to the root of the 
+    // articulated body tree.
     phyz_world.add_entity( ab_parent );
-    ab_parent->make_grounded();  // make the root fixed to the world. can be non-rooted as well
+    // make the root fixed to the world. can be non-rooted as well
+    ab_parent->make_grounded(); 
   
     // add all the links that will be seen swinging.
-    for( i = 0; i < NUM_LINKS; i++ ){
-      // position is irrelevent. it will be determined by root offset and joint angles
-      rb = add_test_body( ctVector3( 0.0,1.0,0.0 ) );  
+    for( i = 0; i < NUM_LINKS; i++ )
+    {
+      // position is irrelevent. 
+      // It will be determined by root offset and joint angles
+      rb = add_test_body( ctVector3( 0.0, 0.0, 0.0 ) );  
       ab_child = new ctArticulatedBody( rb );
       // link this body to the previous one.  first 2 vectors are joint offsets, 
       // the 3rd is the line the joint revolves around
       ctVector3 joint_offset( 0, -0.1, 0 );
-      ctVector3 joint_action( 0,0,1 );
+      ctVector3 joint_action( 0, 0, 1 );
       ab_parent->link_revolute( ab_child, joint_offset, joint_offset, joint_action );
   
       // make something to draw
@@ -332,49 +357,59 @@ void Phyztest::NextFrame ()
     // rotate them so we can see some action.
     chain[0]->ab->rotate_around_axis( degree_to_rad(80) );
     //!me uncomment if you have a good frame-rate
-  // chain[2]->ab->rotate_around_axis( degree_to_rad(60) );
+    chain[2]->ab->rotate_around_axis( degree_to_rad(60) );
     chain_added = true;
   }
 
   // simple mass on a spring demo
-  if( GetKeyState (CSKEY_TAB) && bot == NULL ){
-    // add a sprite
-    csSpriteTemplate* tmpl = (csSpriteTemplate*)view->GetEngine ()->sprite_templates.FindByName ("box");
-    if (!tmpl){     
-      Printf (MSG_INITIALIZATION, "couldn't load template 'bot'\n");
-      return;
-    }
-    bot = new csSprite3D(view->GetEngine ());
-    bot->SetTemplate( tmpl );
-    view->GetEngine ()->sprites.Push (bot);
-    bot->GetMovable ().SetSector (room);
-    m.Identity (); //m = m * 2.0;
-    bot->GetMovable ().SetTransform (m);
-    bot->GetMovable ().SetPosition (csVector3( 0, 10, 0 ));
-    bot->GetMovable ().UpdateMove ();
-    bot->SetAction ("default");
-    bot->InitSprite ();
 
-    // add the rigidbody physics object
-    rb_bot = ctRigidBody::new_ctRigidBody();
+  if ( GetKeyState (CSKEY_TAB))
+  {
+    if  ( bot == NULL )
+    {
+      // add a sprite
+      csSpriteTemplate* tmpl = (csSpriteTemplate*)
+	view->GetEngine ()->sprite_templates.FindByName ("box");
+      if (!tmpl)
+      {     
+	Printf (MSG_INITIALIZATION, "couldn't load template 'bot'\n");
+	return;
+      }
+
+      bot = new csSprite3D(view->GetEngine ());
+      bot->SetTemplate( tmpl );
+      view->GetEngine ()->sprites.Push (bot);
+      bot->GetMovable ().SetSector (room);
+      bot->SetAction ("default");
+      bot->InitSprite ();
+
+
+      // add the rigidbody physics object
+      rb_bot = ctRigidBody::new_ctRigidBody();
+      rb_bot->calc_simple_I_tensor( 0.2, 0.4, 0.2 );
+      phyz_world.add_entity( rb_bot );
+      (void)new csRigidSpaceTimeObj( cdsys, bot, rb_bot );
+    }
+
+    csXScaleMatrix3 m (10);
+    bot->GetMovable ().SetTransform (m);
+    bot->GetMovable ().SetPosition (csVector3( 0, 0, 0 ));
+    bot->GetMovable ().UpdateMove ();
     rb_bot->set_m( 15.0 );
-    rb_bot->set_pos(ctVector3(0,10,0));
-    rb_bot->set_v( ctVector3( 1.0,0, 0));
-    rb_bot->calc_simple_I_tensor( 0.2,0.4, 0.2 );
-    phyz_world.add_entity( rb_bot );
+    rb_bot->set_pos (ctVector3 (0.0, 0.0, 0));
+    rb_bot->set_v ( ctVector3( 0.4, 0.0, 0));
 
     // create a spring force object and add it to our test body
     ctSpringF *sf = new ctSpringF( rb_bot, ctVector3( 0, 0.2, 0 ) , NULL, ctVector3( 0,12, 0 ) );
-    sf->set_rest_length( 0 );
-    sf->set_magnitude( 300.0 );
-  //  rb_bot->add_force( sf );
-    ctVector3 rotaxisz( 0,0,1 );
-    ctVector3 rotaxisy( 0,1,0 );
+    sf->set_rest_length( 2 );
+    sf->set_magnitude( 50.0 );
+    rb_bot->add_force( sf );
+    ctVector3 rotaxisz( 0, 0, 1 );
+    ctVector3 rotaxisy( 0, 1, 0 );
  
     rb_bot->rotate_around_line( rotaxisy, degree_to_rad(45) );  
     rb_bot->rotate_around_line( rotaxisz, degree_to_rad(60) );
-    rb_bot->set_angular_v( ctVector3( 0,0,0) );
-    (void)new csRigidSpaceTimeObj( cdsys, bot, rb_bot );
+    rb_bot->set_angular_v( ctVector3 ( 1.0, 0, 0) );
   }
   
   // Move the dynamic light around.
@@ -383,12 +418,28 @@ void Phyztest::NextFrame ()
   dynlight->Move (room, cos (angle)*3, 17, sin (angle)*3);
   dynlight->Setup ();
 */
+
   // evolve the physics world by time step.  Slowed down by 4x due to speed of demo objects
   //!me phyz_world.evolve( 0, 0.25*elapsed_time / 1000.0 );  //!me .25 needed to balance test samples..
   csRigidSpaceTimeObj::evolve_system( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine );
 
+  // Add a boost
+  if (rb_bot && GetKeyState (CSKEY_ENTER))
+      rb_bot->apply_impulse (ctVector3 (0,1,0), ctVector3 (0,10,0));
+
+  // evolve the physics world by time step.  
+  // Slowed down by 4x due to speed of demo objects
+  // !me .25 needed to balance test samples..
+  // !me phyz_world.evolve( 0, 0.25*elapsed_time / 1000.0 );  
+
+  csRigidSpaceTimeObj::evolve_system
+    ( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine );
+
+
+
   // if we have a spring and mass demo started
-  if( bot ){
+  if ( bot )
+  {
     csVector3 new_p = rb_bot->get_pos();
     csLight* lights[2];
     int num_lights = engine->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
@@ -397,19 +448,23 @@ void Phyztest::NextFrame ()
   }
  
   // if we have a swinging chain demo started
-  if( chain_added == true ){
+  if ( chain_added == true )
+  {
     csLight* lights[2];
     csVector3 new_p;
     int num_lights;
 
     // update position and orientation of all sprites for the chain.
-    // queries the physics world for rigidbody data then sets the sprites properties accordingly
-    for( i = 0; i < NUM_LINKS; i++ ){
-      if( chain[i] != NULL ){
+    // queries the physics world for rigidbody data then sets the sprites
+    // properties accordingly
+    for( i = 0; i < NUM_LINKS; i++ )
+    {
+      if ( chain[i] != NULL )
+      {
         //  get the position of this link
         new_p = chain[i]->rb->get_pos();
-  //      CsPrintf (MSG_DEBUG_0, "chain pos %d = %f, %f, %f\n",
-    //      i, new_p.x, new_p.y, new_p.z);
+	//  CsPrintf (MSG_DEBUG_0, "chain pos %d = %f, %f, %f\n",
+	//            i, new_p.x, new_p.y, new_p.z);
         chain[i]->sprt->GetMovable ().SetPosition ( new_p );
         
         M = chain[i]->rb->get_R();   // get orientation for this link
@@ -423,8 +478,9 @@ void Phyztest::NextFrame ()
         m *= M_scale;
         chain[i]->sprt->GetMovable ().SetTransform(m);
 	chain[i]->sprt->GetMovable ().UpdateMove ();
+
         num_lights = engine->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
-              chain[i]->sprt->UpdateLighting (lights, num_lights);      
+              chain[i]->sprt->UpdateLighting (lights, num_lights); 
       }
     }
   }
@@ -434,6 +490,31 @@ void Phyztest::NextFrame ()
 
   view->Draw ();
 
+  if (rb_bot && G3D->BeginDraw (CSDRAW_2DGRAPHICS))
+  {
+    ctVector3 p = rb_bot->get_pos ();
+    ctVector3 F = rb_bot->get_F ();
+    ctVector3 av = rb_bot->get_angular_v ();
+    ctVector3 lv = rb_bot->get_v ();
+    ctVector3 T = rb_bot->get_torque ();
+    ctVector3 P = rb_bot->get_P ();
+    ctVector3 L = rb_bot->get_angular_P ();
+    WriteShadow (ALIGN_LEFT, 10, 10, write_colour, 
+		 "pos: %.2f, %.2f, %.2f", p.x, p.y, p.z);
+    WriteShadow (ALIGN_LEFT, 10, 20, write_colour, 
+		 "Frc: %.2f, %.2f, %.2f", F.x, F.y, F.z);
+    WriteShadow (ALIGN_LEFT, 10, 30, write_colour, 
+		 "Tqe: %.2f, %.2f, %.2f", T.x, T.y, T.z);
+    WriteShadow (ALIGN_LEFT, 10, 40, write_colour, 
+		 "  P: %.2f, %.2f, %.2f", P.x, P.y, P.z);
+    WriteShadow (ALIGN_LEFT, 10, 50, write_colour, 
+		 " lv: %.2f, %.2f, %.2f", lv.x, lv.y, lv.z);
+    WriteShadow (ALIGN_LEFT, 10, 60, write_colour, 
+		 "  L: %.2f, %.2f, %.2f", L.x, L.y, L.z);
+    WriteShadow (ALIGN_LEFT, 10, 70, write_colour, 
+		 " av: %.2f, %.2f, %.2f", av.x, av.y, av.z);
+
+  }
   // Drawing code ends here.
   G3D->FinishDraw ();
   // Print the final output.
@@ -450,8 +531,56 @@ bool Phyztest::HandleEvent (iEvent &Event)
     Shutdown = true;
     return true;
   }
-
+  if ((Event.Type == csevBroadcast) && 
+      (Event.Command.Code == cscmdContextResize))
+    view->GetCamera()->SetPerspectiveCenter (G3D->GetWidth()/2, G3D->GetHeight()/2);
   return false;
+}
+void Phyztest::Write(int align,int x,int y,int fg,int bg,char *str,...)
+{
+  va_list arg;
+  char b[256], *buf = b;
+
+  va_start (arg,str);
+  int l = vsprintf (buf, str, arg);
+  va_end (arg);
+
+  if (align != ALIGN_LEFT)
+  {
+    int rb = 0;
+
+    if (align == ALIGN_CENTER)
+    {
+      int where;
+      sscanf (buf, "%d%n", &rb,&where);
+      buf += where + 1;
+      l -= where + 1;
+    }
+
+    int w, h;
+    courierFont->GetDimensions (buf, w, h);
+
+    switch(align)
+    {
+      case ALIGN_RIGHT:  x -= w; break;
+      case ALIGN_CENTER: x = (x + rb - w) / 2; break;
+    }
+  }
+
+  G2D->Write (courierFont, x, y, fg, bg, buf);
+}
+
+void Phyztest::WriteShadow (int align,int x,int y,int fg,char *str,...)
+{
+  char buf[256];
+
+  va_list arg;
+  va_start (arg, str);
+  vsprintf (buf, str, arg);
+  va_end (arg);
+
+  Write (align, x+1, y-1, 0, -1, buf);
+  Write (align, x, y, fg, -1, buf);
 }
 
 /*---------------------------------------------------------------------*
@@ -480,9 +609,9 @@ int main (int argc, char* argv[])
 
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
+  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
   System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
   System->RequestPlugin ("crystalspace.engine.core:Engine");
-
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!Sys->Initialize (argc, argv, NULL))

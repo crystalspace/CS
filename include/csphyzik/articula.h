@@ -38,109 +38,138 @@ class ctArticulatedBody : public ctPhysicalEntity
 {
 public:
 
-	//!me this should be in ctJoint
-	static void set_joint_friction( double pfrict = DEFAULT_JOINT_FRICTION );
+  //!me this should be in ctJoint
+  static void set_joint_friction ( double pfrict = DEFAULT_JOINT_FRICTION );
 
-	// debug var
-	int tag;
+  // debug var
+  int tag;
 
-	ctArticulatedBody();
-	ctArticulatedBody( ctRigidBody *phandle );
+  ctArticulatedBody ();
+  ctArticulatedBody ( ctRigidBody *phandle );
 
-	virtual ~ctArticulatedBody();
+  virtual ~ctArticulatedBody ();
 
-	/// return reference frame for this handle ( to world )
-	ctReferenceFrame *get_handle_RF(){ if( handle ) return handle->get_RF(); else return NULL; }
+  /// return reference frame for this handle ( to world )
+  ctReferenceFrame *get_handle_RF ()
+  { if ( handle ) return handle->get_RF (); else return NULL; }
 
-	/// return the physical body that is the root of this articulated figure
-	ctRigidBody *get_handle(){ return handle; }
+  /// return the physical body that is the root of this articulated figure
+  ctRigidBody *get_handle ()
+  { return handle; }
 
-	/// rotate this link around it's axis by ptheta radians.
-	void rotate_around_axis( real ptheta );
+  /// rotate this link around it's axis by ptheta radians.
+  void rotate_around_axis ( real ptheta );
 
-	/// link two bodies together with a revolute joint.
-	/// pin_joint_offset is the offset from the inboard( parent ) link to joint 
-	/// pout_joint_offset is from the outbaord (child) link to the joint.
-	/// all offsets are directed from a link's C.O.M. to the joint
-	void link_revolute( ctArticulatedBody *child, ctVector3 &pin_joint_offset, ctVector3 &pout_joint_offset, ctVector3 &pjoint_axis );
+  /**
+   * link two bodies together with a revolute joint.
+   * pin_joint_offset is the offset from the inboard( parent ) link to joint 
+   * pout_joint_offset is from the outbaord (child) link to the joint.
+   * all offsets are directed from a link's C.O.M. to the joint
+   */
+  void link_revolute ( ctArticulatedBody *child, ctVector3 &pin_joint_offset, 
+		       ctVector3 &pout_joint_offset, ctVector3 &pjoint_axis );
 
-	void link_joint( ctJoint *jnt, ctArticulatedBody *child );
+  void link_joint ( ctJoint *jnt, ctArticulatedBody *child );
 
-	virtual void apply_given_F( ctForce &frc );
+  virtual void apply_given_F ( ctForce &frc );
 
-	// compute force and torque from all forces acting on this articulated body
-	// that includeds this handle and all children down to the leaf nodes. 
-	void apply_forces( real t );
+  /**
+   * compute force and torque from all forces acting on this articulated body
+   * that includeds this handle and all children down to the leaf nodes. 
+   */
+  void apply_forces ( real t );
 
   virtual void apply_impulse( ctVector3 impulse_point,
 			      ctVector3 impulse_vector );
 
-  // impulse_point is point of collision in world frame
-  virtual void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
-			      const ctVector3 &unit_length_impulse_vector );
+  /// impulse_point is point of collision in world frame
+  virtual void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv, 
+    const ctVector3 &impulse_point, const ctVector3 &unit_length_impulse_vector );
 
-	virtual void init_state();
+  virtual void init_state ();
 
-	// methods for state to and from integrator
-	virtual int get_state_size();
-	virtual int set_state( real *sa );
-	virtual int get_state( const real *sa );
-	virtual int set_delta_state( real *state_array ); 
+  // methods for state to and from integrator
+  virtual int get_state_size ();
+  virtual int set_state ( real *sa );
+  virtual int get_state ( const real *sa );
+  virtual int set_delta_state ( real *state_array ); 
 
-	// state methods for all children.  just need to call these for root and
-	// it will recurse down and call standard state methods appropriately for
-	// all children
-	int set_state_links( real *sa );
-	int get_state_links( const real *sa );
-	int set_delta_state_links( real *state_array );
+  /**
+   * state methods for all children.  just need to call these for root and
+   * it will recurse down and call standard state methods appropriately for
+   * all children
+   */
+  int set_state_links ( real *sa );
+  int get_state_links ( const real *sa );
+  int set_delta_state_links ( real *state_array );
 	
-	/// ungrounded articulated bodies are not staticaly attached to the world frame
-	void make_grounded(){ is_grounded = true; };
-	void make_ungrounded(){ is_grounded = false; };
+  /// ungrounded articulated bodies are not staticaly attached to the world frame
+  void make_grounded ()
+  { is_grounded = true; };
 
-	/// this articulated body is attached to some other entity.  
-	/// it will respond to the accelerations of the entity it is attached to.
-	void attach_to_entity( ctKinematicEntity *pattache ){ is_grounded = true;  attached_to = pattache; };
-	void detattached_from_entity(){ is_grounded = false;  attached_to = NULL; };	
+  void make_ungrounded ()
+  { is_grounded = false; };
 
-	/// forward dynamics algorithm.  The default solver.
-	ctFeatherstoneAlgorithm *install_featherstone_solver();
+  /**
+   * this articulated body is attached to some other entity.  
+   * it will respond to the accelerations of the entity it is attached to.
+   */
+  void attach_to_entity ( ctKinematicEntity *pattache )
+  { is_grounded = true;  attached_to = pattache; };
 
-	/// inverse kinematics algorithm.  set the goal after this
-	ctInverseKinematics *install_IK_solver();
+  void detattached_from_entity ()
+  { is_grounded = false;  attached_to = NULL; };
 
-	// propagates velocities from base link to ends of articulated bodies
-	// also calculates T_fg and r_fg
-	void compute_link_velocities();
+  /// forward dynamics algorithm.  The default solver.
+  ctFeatherstoneAlgorithm *install_featherstone_solver ();
 
-	// calculate relative frame of reference from parent
-	void calc_relative_frame();
+  /// inverse kinematics algorithm.  set the goal after this
+  ctInverseKinematics *install_IK_solver ();
 
-	void update_links();
+  /**
+   * propagates velocities from base link to ends of articulated bodies
+   * also calculates T_fg and r_fg
+   */
+  void compute_link_velocities();
+
+  /// calculate relative frame of reference from parent
+  void calc_relative_frame ();
+
+  void update_links();
 
   friend class ctFeatherstoneAlgorithm;
   friend class ctInverseKinematics;
   friend class ctJoint;
 protected:
+  /// rigid body for the root of this articulated body
+  ctRigidBody *handle;	
+  /// joint attaching this body to parent. NULL if root
+  ctJoint *inboard_joint; 
+  /// children 
+  ctLinkList<ctArticulatedBody> outboard_links;
+  /// is it fixed to the world frame?
+  bool is_grounded;  
 
-	ctRigidBody *handle;	// rigid body for the root of this articulated body
-	ctJoint *inboard_joint;  // joint attaching this body to parent. NULL if root
-	ctLinkList<ctArticulatedBody> outboard_links;  // children 
+  ctKinematicEntity *attached_to;
 
-	bool is_grounded;  // is it fixed to the world frame?
+  // work variables
 
-	ctKinematicEntity *attached_to;
+  /**
+   * Calculated in compute_link_velocities.
+   * coord transfrom matrix, not rotation, from inboard link
+   */
+  ctMatrix3 T_fg;
 
-	// work variables
+  /**
+   * Frame to this frame. Vector from center of inboard frame to this frame 
+   * in this frame's coords
+   */
+  ctVector3 r_fg; 
 
-	// calculated in compute_link_velocities
-	ctMatrix3 T_fg; // coord transfrom matrix, not rotation, from inboard link
-					// frame to this frame
-	ctVector3 r_fg; // vector from center of inboard frame to this frame in this
-					// frame's coords
-
-  // angular and linear velocity calculated in this bodies frame.
-  // calculated in compute_link_velocities 
+  /**
+   * Angular and linear velocity calculated in this bodies frame.
+   * Calculated in compute_link_velocities.
+   */ 
   ctVector3 w_body;
   ctVector3 v_body;
 

@@ -6,6 +6,7 @@
 #include "csphyzik/ctcat.h"
 #include "csengine/collider.h"
 #include "icollide.h"
+#include "isystem.h"
 
 class csEngine;
 class csSprite3D;
@@ -23,13 +24,9 @@ enum collisionresult { COL_DONOTHING, COL_SPHEREIMPULSE, COL_DIRECTIONAL_IMPULSE
 class csSpaceTimeObj
 {
 public:
+  sttype what_type;
 
-	sttype what_type;
-
-
-
-	csSpaceTimeObj();
-
+  csSpaceTimeObj();
 };
 
 class csRigidSpaceTimeObj : public csSpaceTimeObj
@@ -37,21 +34,23 @@ class csRigidSpaceTimeObj : public csSpaceTimeObj
 public:
   friend class ctLameCollisionCatastrophe;
 
-	static csRigidSpaceTimeObj *space_time_continuum[ MAX_SPACE_TIME_NUM ];
-	static long continuum_end;
+  static csRigidSpaceTimeObj *space_time_continuum[ MAX_SPACE_TIME_NUM ];
+  static long continuum_end;
 
-  static void evolve_system( real t1, real t2, ctWorld *time_world, csEngine *space_engine );
+  static void evolve_system ( real t1, real t2, 
+			      ctWorld *time_world, csEngine *space_engine );
 
-	csCollider *col;
-	csSprite3D *sprt;
-	ctRigidBody *rb;
+  csCollider *col;
+  csSprite3D *sprt;
+  ctVector3 prev_pos;
+  ctRigidBody *rb;
   
   csCollisionPair cd_contact[MAX_COL_PER_STO];
   int num_collisions;
 
-	ctCollidingContact *contact;
+  ctCollidingContact *contact;
 
-	csRigidSpaceTimeObj( iCollideSystem* cdsys, csSprite3D *psprt, ctRigidBody *prb );
+  csRigidSpaceTimeObj( iCollideSystem* cdsys, csSprite3D *psprt, ctRigidBody *prb );
 
 protected:
   static void update_space();
@@ -63,7 +62,6 @@ protected:
 class ctLameCollisionCatastrophe : public ctCatastropheManager
 {
 public: 
-  
   // check for a catastrophe and return a real indicating the "magnitude"
   // of the worst ( bigger number ) catastrophe.  Return 0 for no catastrophe
   virtual real check_catastrophe();

@@ -18,8 +18,8 @@
 
 */
 
-#ifndef QUATRIGIDBODYCONNECTOR_H
-#define QUATRIGIDBODYCONNECTOR_H
+#ifndef __CT_QUATRIGIDBODYCONNECTOR_H__
+#define __CT_QUATRIGIDBODYCONNECTOR_H__
 
 #include "csphyzik/phyztype.h"
 #include "csphyzik/entity.h"
@@ -29,22 +29,25 @@
 
 class ctQuatRigidBody;
 
-class ctQuatRigidBodyConnector : public ctPointObj {
+class ctQuatRigidBodyConnector : public ctPointObj 
+{
   ctQuatRigidBody *rigid;
-  ctVector3        r;     // Offset from center of mass
+  /// Offset from center of mass
+  ctVector3 r;
+     
  public:
-  ctQuatRigidBodyConnector(ctQuatRigidBody *rb, ctVector3 offset);
+  ctQuatRigidBodyConnector (ctQuatRigidBody *rb, ctVector3 offset);
   ~ctQuatRigidBodyConnector() {}
 
-  ctVector3 pos();
-  ctVector3 vel();
+  ctVector3 pos ();
+  ctVector3 vel ();
 
-  void apply_force(ctVector3 F);
+  void apply_force (ctVector3 F);
 
-  int num_state_vars();
-  int state_index(int i);
-  ctVector3 dp(int i);
-  ctVector3 dpdot(int i);
+  int num_state_vars ();
+  int state_index (int i);
+  ctVector3 dp (int i);
+  ctVector3 dpdot (int i);
 };
 
-#endif // QUATRIGIDBODYCONNECTOR_H
+#endif // __CT_QUATRIGIDBODYCONNECTOR_H__

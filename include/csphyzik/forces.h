@@ -18,111 +18,126 @@
 
 */
 
-#ifndef CT_THEFORCES_H
-#define CT_THEFORCES_H
+#ifndef __CT_THEFORCES_H__
+#define __CT_THEFORCES_H__
 
 #include "csphyzik/phyzent.h"
 #include "csphyzik/bodyforc.h"
 
 class ctDynamicEntity;
 
-// magnitude = g.  g = 9.81 for earth gravity
+/// magnitude = g.  g = 9.81 for earth gravity
 class ctGravityF : public ctForce
 {
 public:
-	
-	ctGravityF( real pg = 9.81*M_PER_WORLDUNIT, ctVector3 pd = ctVector3( 0.0, -1.0, 0.0 ) );
-	ctGravityF( ctReferenceFrame &rf, real pg = 9.81*M_PER_WORLDUNIT, ctVector3 pd = ctVector3( 0.0, -1.0, 0.0 ) );
-	virtual ctVector3 apply_F( ctDynamicEntity &pe );
+  ctGravityF ( real pg = 9.81*M_PER_WORLDUNIT, 
+	       ctVector3 pd = ctVector3( 0.0, -1.0, 0.0 ) );
+
+  ctGravityF ( ctReferenceFrame &rf, real pg = 9.81*M_PER_WORLDUNIT, 
+	       ctVector3 pd = ctVector3( 0.0, -1.0, 0.0 ) );
+
+  virtual ctVector3 apply_F ( ctDynamicEntity &pe );
 
 };
 
-// f = -kv
-//!me really simplified right now..... should take surface area into account
-//!me would be cool to simulate falling paper and leaves
+/**
+ * f = -kv
+ *!me really simplified right now..... should take surface area into account
+ *!me would be cool to simulate falling paper and leaves
+ */
 class ctAirResistanceF : public ctForce
 {
 public:
 	
-	ctAirResistanceF( real pk = DEFAULT_AIR_RESISTANCE );
-	virtual ctVector3 apply_F( ctDynamicEntity &pe );
+  ctAirResistanceF ( real pk = DEFAULT_AIR_RESISTANCE );
+
+  virtual ctVector3 apply_F( ctDynamicEntity &pe );
 
 };
 
-// just an applied torque
+/// just an applied torque
 class ctTorqueF : public ctForce
 {
 public:
-	ctTorqueF( ctVector3 dir, real pm );
-	virtual ctVector3 apply_F( ctDynamicEntity &pe );
+  ctTorqueF ( ctVector3 dir, real pm );
+  virtual ctVector3 apply_F ( ctDynamicEntity &pe );
 
 };
 
 class ctAppliedF : public ctForce
 {
 public:
-	ctAppliedF( ctVector3 dir, real pm );
-	virtual ctVector3 apply_F( ctDynamicEntity &pe );
+  ctAppliedF ( ctVector3 dir, real pm );
+  virtual ctVector3 apply_F ( ctDynamicEntity &pe );
 
 
 };
 
-// spring attached to two bodies or inertial reference frame.
+/// spring attached to two bodies or inertial reference frame.
 class ctSpringF : public ctNBodyForce
 {
 protected:
-	ctLinkList<ctVector3> attachment_point_vector;
-	real rest_length;
+  ctLinkList<ctVector3> attachment_point_vector;
+  real rest_length;
 	
 public:
-	// body b2 can be NULL to indicate it is attached to the immovable world
-	ctSpringF( ctPhysicalEntity *b1, ctVector3 p1, ctPhysicalEntity *b2, ctVector3 p2 )
-	{
-		body_vector.add_link( b1 );
-		attachment_point_vector.add_link( new ctVector3(p1) );
-		body_vector.add_link( b2 );
-		attachment_point_vector.add_link( new ctVector3(p2) );
-		rest_length = 1;
-	}
+  /// body b2 can be NULL to indicate it is attached to the immovable world
+  ctSpringF ( ctPhysicalEntity *b1, ctVector3 p1, 
+	      ctPhysicalEntity *b2, ctVector3 p2 )
+  {
+    body_vector.add_link( b1 );
+    attachment_point_vector.add_link( new ctVector3(p1) );
+    body_vector.add_link( b2 );
+    attachment_point_vector.add_link( new ctVector3(p2) );
+    rest_length = 1;
+  }
 	
-	~ctSpringF(){ 
-		attachment_point_vector.delete_link( attachment_point_vector.get_first() );
-		attachment_point_vector.delete_link( attachment_point_vector.get_first() );
-	}
+  ~ctSpringF ()
+  { 
+    attachment_point_vector.delete_link ( attachment_point_vector.get_first() );
+    attachment_point_vector.delete_link ( attachment_point_vector.get_first() );
+  }
 
-	void set_rest_length( real len ){ rest_length = len; }
+  /// Set Rest Length of spring
+  void set_rest_length( real len )
+  { rest_length = len; }
 
-	virtual ctVector3 apply_F( ctDynamicEntity &pe );
+  virtual ctVector3 apply_F ( ctDynamicEntity &pe );
 
-	//!me expand to include 3+ bodies on one spring
-	virtual void add_body( ctPhysicalEntity *bod ){ if( body_vector.get_size() < 2 ) body_vector.add_link( bod ); }
+  //!me expand to include 3+ bodies on one spring
+  virtual void add_body ( ctPhysicalEntity *bod )
+  { if ( body_vector.get_size () < 2 ) body_vector.add_link( bod ); }
 };
 
 
-// 1/r^2 force. ( G * M1 * m2 ) / ( r^2 ) 
-// a gravity well.  gravitational attraction between bodies.
-// add bodies to this force that will exert force on bodies that have this force
-// included in their force list.
-//!me right now an object passing too close to the discontinuity will get accelerated
-// way to fast and energy will NOT be conserved.  This could be fixed using R-K 
-// method with adaptive step-sizing or some happy horse-shit like that.
+/**
+ * 1/r^2 force. ( G * M1 * m2 ) / ( r^2 ) 
+ * a gravity well.  gravitational attraction between bodies.
+ * add bodies to this force that will exert force on bodies that have this force
+ * included in their force list.
+ * !me right now an object passing too close to the discontinuity will get 
+ * accelerated way to fast and energy will NOT be conserved.  This could be 
+ * fixed using R-K  method with adaptive step-sizing or some happy horse-shit 
+ * like that.
+ */
+
 class ctGravityWell : public ctNBodyForce
 {
 public:
-	ctGravityWell( ctPhysicalEntity *BIG_mass )
-	{
-		magnitude = PHYZ_CONSTANT_G; 
-		body_vector.add_link( BIG_mass );
-	}
+  ctGravityWell( ctPhysicalEntity *BIG_mass )
+  {
+    magnitude = PHYZ_CONSTANT_G; 
+    body_vector.add_link( BIG_mass );
+  }
 
-	//!me clean up
-	virtual ~ctGravityWell(){ 
-	}
+  //!me clean up
+  virtual ~ctGravityWell()
+  { }
 
-	virtual ctVector3 apply_F( ctDynamicEntity &pe );
+  virtual ctVector3 apply_F ( ctDynamicEntity &pe );
 
 protected:
 	
 };
 
-#endif
+#endif // __CT_THEFORCES_H__

@@ -18,43 +18,53 @@
 
 */
 
-#ifndef CTIK_H
-#define CTIK_H
+#ifndef __CT_IK_H__
+#define __CT_IK_H__
 
 #include "csphyzik/solver.h"
 
-// max joint speed
-// anything greater than 2 leads to bad results for long chains
+/**
+ * max joint speed
+ * anything greater than 2 leads to bad results for long chains
+ */
 #define DEFAULT_MAX_QV 0.5;
 
 class ctArticulatedBody;
 
-// no dynamics here.  Calc velocities to move the end effector to it's goal
-//!me really just a quick hack right now to demonstrate solver abstraction
+/**
+ * no dynamics here.  Calc velocities to move the end effector to it's goal
+ *!me really just a quick hack right now to demonstrate solver abstraction
+ */
 class ctInverseKinematics : public ctArticulatedGoalSolver
 {
 public:
-	ctInverseKinematics( ctArticulatedBody &pab ) : ab( pab ){ max_qv = DEFAULT_MAX_QV; };
-	virtual void solve( real t );
+  ctInverseKinematics( ctArticulatedBody &pab ) 
+    : ab( pab ) { max_qv = DEFAULT_MAX_QV; };
 
-	// values relative to it's body frame
-	ctVector3 get_linear_a(){ return ctVector3(0.0, 0.0, 0.0); }
-	ctVector3 get_angular_a(){ return ctVector3(0.0, 0.0, 0.0); }
+  virtual void solve( real t );
 
-  void apply_impulse( ctVector3 /*impulse_point*/,
-    ctVector3 /*impulse_vector*/ ){};
+  // values relative to it's body frame
+  ctVector3 get_linear_a ()
+  { return ctVector3(0.0, 0.0, 0.0); }
 
-  void get_impulse_m_and_I_inv( real* /*pm*/, ctMatrix3* /*pI_inv*/, 
-                                const ctVector3& /*impulse_point*/,
-			                    const ctVector3& /*impulse_vector*/ ){}
+  ctVector3 get_angular_a ()
+  { return ctVector3(0.0, 0.0, 0.0); }
+
+  void apply_impulse ( ctVector3 /*impulse_point*/, ctVector3 /*impulse_vector*/ )
+  {};
+
+  void get_impulse_m_and_I_inv ( real* /*pm*/, ctMatrix3* /*pI_inv*/, 
+				 const ctVector3& /*impulse_point*/,
+				 const ctVector3& /*impulse_vector*/ ) {}
 
 
 protected:
-	void solve_IK( real t, ctVector3 &the_goal, ctVector3 &end_effector );
-	void compute_joint_angle( real t, ctVector3 &the_goal, ctVector3 &end_effector );
-	ctArticulatedBody &ab;
-	real max_qv;
+  void solve_IK ( real t, ctVector3 &the_goal, ctVector3 &end_effector );
+  void compute_joint_angle ( real t, 
+			     ctVector3 &the_goal, ctVector3 &end_effector );
+  ctArticulatedBody &ab;
+  real max_qv;
 
 };
 
-#endif
+#endif // __CT_IK_H__

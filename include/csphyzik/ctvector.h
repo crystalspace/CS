@@ -18,8 +18,8 @@
 
 */
 
-#ifndef CT_VECTOR
-#define CT_VECTOR
+#ifndef __CT_VECTOR__
+#define __CT_VECTOR__
 
 // very annoying that I can't use templates.  
 // Crystal Space people have some beef with templates.
@@ -41,56 +41,60 @@ class ctMatrix3;
 class ctVectorTranspose3 
 {
 public:
-  ctVectorTranspose3(){
-    elements[0] = elements[1] = elements[2] = 0.0;
-  }
+  ctVectorTranspose3 ()
+  { elements[0] = elements[1] = elements[2] = 0.0; }
 
-  ctVectorTranspose3( real pfirst, real psecond, real pthird )
+  ctVectorTranspose3 ( real pfirst, real psecond, real pthird )
   {
-
     elements[0] = pfirst;
     elements[1] = psecond;
     elements[2] = pthird;
-
   }
 
-  void set( real pfirst, real psecond, real pthird ){
+  void set ( real pfirst, real psecond, real pthird )
+  {
     elements[0] = pfirst;
     elements[1] = psecond;
     elements[2] = pthird;
-
   }
 
-  void set( int pnum, real *pele ){
-    for( int idx = 0; idx < pnum; idx++ ){
+  void set ( int pnum, real *pele )
+  {
+    for( int idx = 0; idx < pnum; idx++ )
+    {
       elements[idx] = *pele;
       pele++;
     }
   }
 
-  void set( real *pele ){
-    for( int idx = 0; idx < 3; idx++ ){
+  void set ( real *pele )
+  {
+    for ( int idx = 0; idx < 3; idx++ )
+    {
       elements[idx] = *pele;
       pele++;
     }
   }
 
-  real operator[](const int index) const { return elements[index]; } 
-  real& operator[](const int index) { return elements[index]; }
+  real operator[] (const int index) const 
+  { return elements[index]; } 
 
-  ctVectorTranspose3 operator*( const real pk ) { 
+  real& operator[] (const int index) 
+  { return elements[index]; }
+
+  ctVectorTranspose3 operator* ( const real pk ) 
+  { 
     ctVectorTranspose3 scaled;
     for( int idx = 0; idx < 3; idx++ ) 
       scaled.elements[idx] = elements[idx] * pk;  
     return scaled;
   }
   
-  void operator*=(const real p) {
-    for (int idx=0; idx<3; ++idx) elements[idx] *= p;
-  }
-  void operator/=(const real p) {
-    for (int idx=0; idx<3; ++idx) elements[idx] /= p;
-  }
+  void operator*= (const real p) 
+  { for (int idx=0; idx<3; ++idx) elements[idx] *= p; }
+
+  void operator/= (const real p) 
+  { for (int idx=0; idx<3; ++idx) elements[idx] /= p; }
 
   real operator* ( const ctVector3 &bs );
 
@@ -146,47 +150,52 @@ public:
 class ctVector3
 {
 public:
-  ctVector3( real pval = 0.0 ){
-    elements[0] = elements[1] = elements[2] = pval;
-  }
+  ctVector3 ( real pval = 0.0 )
+  { elements[0] = elements[1] = elements[2] = pval; }
 
-  ctVector3( real pone, real ptwo, real pthree ){
+  ctVector3 ( real pone, real ptwo, real pthree )
+  {
     elements[0] = pone;
     elements[1] = ptwo;
     elements[2] = pthree;
   }
 
-  real operator[](const int index) const { return elements[index]; } 
-  real& operator[](const int index) { return elements[index]; }
+  real operator[] ( const int index ) const 
+  { return elements[index]; } 
 
-  ctVectorTranspose3 transpose(){
+  real& operator[] (const int index) 
+  { return elements[index]; }
+
+  ctVectorTranspose3 transpose ()
+  {
     ctVectorTranspose3 trans;
-    trans.set( elements );
+    trans.set ( elements );
     return trans;
   }
 
   // return length of this vector
   //real length();
-  real Norm();
+  real Norm ();
 
   // return a vector of unit length in same direction as this vector
-  ctVector3 Unit();
-  void Normalize();
+  ctVector3 Unit ();
+  void Normalize ();
 
   // set all elements to zero
-  void zero(){
-    for( int idx = 0; idx < 3; idx++ ) elements[idx] = 0.0;
-  }
+  void zero ()
+  { for( int idx = 0; idx < 3; idx++ ) elements[idx] = 0.0; }
 
   // this = this + x
-  void add( const ctVector3 & px ){
+  void add ( const ctVector3 & px )
+  {
     elements[0] += px.elements[0];
     elements[1] += px.elements[1];
     elements[2] += px.elements[2];
   }
 
   // this = x + y
-  void add2(const ctVector3 & px, const ctVector3 & py){
+  void add2 (const ctVector3 & px, const ctVector3 & py)
+  {
     elements[0] = px.elements[0] + py.elements[0];  
     elements[1] = px.elements[1] + py.elements[1];  
     elements[2] = px.elements[2] + py.elements[2];  
@@ -194,128 +203,144 @@ public:
   }
 
   // dest = x + y
-  void add3(ctVector3 & pdest, const ctVector3 & px, const ctVector3 & py){
+  void add3 (ctVector3 & pdest, const ctVector3 & px, const ctVector3 & py)
+  {
     pdest.elements[0] = px.elements[0] + py.elements[0];  
     pdest.elements[1] = px.elements[1] + py.elements[1];  
     pdest.elements[2] = px.elements[2] + py.elements[2];  
   }
   
-  void add_scaled( ctVector3 & padme, real pk ){
+  void add_scaled ( ctVector3 & padme, real pk )
+  {
     elements[0] += pk*padme.elements[0];    
     elements[1] += pk*padme.elements[1];    
     elements[2] += pk*padme.elements[2];    
   }
 
-  void add_scaled( real pk, ctVector3 & padme ){
+  void add_scaled ( real pk, ctVector3 & padme )
+  {
     elements[0] += pk*padme.elements[0];    
     elements[1] += pk*padme.elements[1];    
     elements[2] += pk*padme.elements[2];    
   }
 
-  void operator+=(const ctVector3 & p){
-    for( int idx = 0; idx < 3; idx++ ) elements[idx] += p.elements[idx];  }
+  void operator += (const ctVector3 & p)
+  { for ( int idx = 0; idx < 3; idx++ ) elements[idx] += p.elements[idx]; }
 
-  ctVector3 operator+( const ctVector3 & p) const {
+  ctVector3 operator+ ( const ctVector3 & p) const 
+  {
     ctVector3 sum;
-    for( int idx = 0; idx < 3; idx++ ) 
+    for ( int idx = 0; idx < 3; idx++ ) 
       sum.elements[idx] = elements[idx] + p.elements[idx];  
     return sum;
   }
 
   // this = this - x
-  void subtract( const ctVector3 & px ){
-    for( int idx = 0; idx < 3; idx++ )  elements[idx] -= px.elements[idx]; }
+  void subtract ( const ctVector3 & px )
+  { for( int idx = 0; idx < 3; idx++ )  elements[idx] -= px.elements[idx]; }
 
   // this = x - y
-  void subtract2(const ctVector3 & px, const ctVector3 & py) {
-    for( int idx = 0; idx < 3; idx++ ) {
+  void subtract2 (const ctVector3 & px, const ctVector3 & py) 
+  {
+    for( int idx = 0; idx < 3; idx++ )
       elements[idx] = px.elements[idx] - py.elements[idx];
-    }
   }
 
   // dest = x - y
-  void subtract3(ctVector3 & pdest, const ctVector3 & px,
-		 const ctVector3 & py){
-    for( int idx = 0; idx < 3; idx++ ) {
+  void subtract3 ( ctVector3 & pdest, const ctVector3 & px, const ctVector3 & py)
+  {
+    for( int idx = 0; idx < 3; idx++ )
       pdest.elements[idx] = px.elements[idx] - py.elements[idx];
-    }
   }
 
-  void operator-=(const ctVector3 & p) {
-    for( int idx = 0; idx < 3; idx++ ) elements[idx] -= p.elements[idx];
-  }
+  void operator-= ( const ctVector3 & p ) 
+  { for( int idx = 0; idx < 3; idx++ ) elements[idx] -= p.elements[idx]; }
 
-  ctVector3 operator-(const ctVector3 & p){
+  ctVector3 operator- (const ctVector3 & p )
+  {
     ctVector3 sum;
     for( int idx = 0; idx < 3; idx++ ) 
       sum.elements[idx] = elements[idx] - p.elements[idx];  
     return sum;
   }
 
-  ctVector3 operator-(const ctVector3 & p) const {
+  ctVector3 operator- (const ctVector3 & p) const 
+  {
     ctVector3 sum;
     for( int idx = 0; idx < 3; idx++ ) 
       sum.elements[idx] = elements[idx] - p.elements[idx];  
     return sum;
   }
 
-  ctVector3 operator-(){
+  ctVector3 operator-()
+  {
     ctVector3 sum;
     for( int idx = 0; idx < 3; idx++ ) 
       sum.elements[idx] = -elements[idx];
     return sum;
   }
 
-  ctVector3 operator-() const {
+  ctVector3 operator-() const 
+  {
     ctVector3 sum;
     for( int idx = 0; idx < 3; idx++ ) 
       sum.elements[idx] = -elements[idx];
     return sum;
   }
 
-  real operator*( const ctVector3 & p ){
+  real operator*( const ctVector3 & p )
+  {
     real dotp = 0.0;
-    for( int idx = 0; idx < 3; idx++ ) dotp += elements[idx] * p.elements[idx]; 
+    for ( int idx = 0; idx < 3; idx++ ) dotp += elements[idx] * p.elements[idx]; 
     return dotp;
   }
 
-  real operator*( const ctVector3 & p ) const {
+  real operator*( const ctVector3 & p ) const 
+  {
     real dotp = 0.0;
-    for( int idx = 0; idx < 3; idx++ ) dotp += elements[idx] * p.elements[idx]; 
+    for ( int idx = 0; idx < 3; idx++ ) dotp += elements[idx] * p.elements[idx]; 
     return dotp;
   }
 
-  ctVector3 operator*( const real pk ) { 
+  ctVector3 operator*( const real pk ) 
+  { 
+    ctVector3 scaled;
+    for ( int idx = 0; idx < 3; idx++ ) 
+      scaled.elements[idx] = elements[idx] * pk;  
+    return scaled;
+  }
+
+  ctVector3 operator* ( const real pk ) const 
+  { 
     ctVector3 scaled;
     for( int idx = 0; idx < 3; idx++ ) 
       scaled.elements[idx] = elements[idx] * pk;  
     return scaled;
   }
 
-  ctVector3 operator*( const real pk ) const { 
-    ctVector3 scaled;
-    for( int idx = 0; idx < 3; idx++ ) 
-      scaled.elements[idx] = elements[idx] * pk;  
-    return scaled;
-  }
-
-  ctVector3 operator/( const real pk ) { 
+  ctVector3 operator/ ( const real pk ) 
+  { 
     ctVector3 scaled;
     for( int idx = 0; idx < 3; idx++ ) 
       scaled.elements[idx] = elements[idx] / pk;  
     return scaled;
   }
 
-  void operator*=(const real p) { for (int idx=0; idx<3; ++idx) elements[idx] *= p;} 
-  void operator/=(const real p) { for (int idx=0; idx<3; ++idx) elements[idx] /= p;}
+  void operator*= ( const real p ) 
+  { for (int idx=0; idx<3; ++idx) elements[idx] *= p; }
  
-  void Cross(const ctVector3 & px, const ctVector3 & py){
+  void operator/= ( const real p ) 
+  { for (int idx=0; idx<3; ++idx) elements[idx] /= p; }
+ 
+  void Cross (const ctVector3 & px, const ctVector3 & py)
+  {
     elements[0] = px.elements[1]*py.elements[2] - px.elements[2]*py.elements[1];
     elements[1] = px.elements[2]*py.elements[0] - px.elements[0]*py.elements[2];
     elements[2] = px.elements[0]*py.elements[1] - px.elements[1]*py.elements[0];
   }
 
-  ctVector3 operator%( const ctVector3 & py ) const {
+  ctVector3 operator% ( const ctVector3 & py ) const  
+  {
     ctVector3 xross;
     xross.elements[0] = elements[1]*py.elements[2] - elements[2]*py.elements[1];
     xross.elements[1] = elements[2]*py.elements[0] - elements[0]*py.elements[2];
@@ -323,13 +348,16 @@ public:
     return xross;
   }
 
-  ctMatrix3 operator*( const ctVectorTranspose3 &pvt );
+  ctMatrix3 operator* ( const ctVectorTranspose3 &pvt );
 
-  int get_dimension(){ return 3; }
+  int get_dimension ()
+  { return 3; }
 
-  real *get_elements(){ return elements; }
+  real *get_elements () 
+  { return elements; }
 
-  void debug_print(){
+  void debug_print()
+  {
     DEBUGLOGF( "%lf, ", elements[0] );
     DEBUGLOGF( "%lf, ", elements[1] );
     DEBUGLOGF( "%lf\n", elements[2] );
@@ -341,32 +369,37 @@ protected:
 
 };
 
-inline real ctVector3::Norm() {
-  return sqrt( elements[0]*elements[0] + elements[1]*elements[1] + elements[2]*elements[2]);
+inline real ctVector3::Norm () 
+{
+  return sqrt(   elements[0]*elements[0] 
+	       + elements[1]*elements[1] 
+	       + elements[2]*elements[2] );
 }
 
-inline ctVector3 ctVector3::Unit() {
-  return ((*this)/this->Norm() );
+inline ctVector3 ctVector3::Unit () 
+{
+  return ( (*this)/this->Norm() );
 }
 
 
 
-inline real ctVectorTranspose3::operator*( const ctVector3 &pv )
+inline real ctVectorTranspose3::operator* ( const ctVector3 &pv )
 { 
-real dotp = 0.0;
-  for( int idx = 0; idx < 3; idx++ ) dotp += elements[idx] * pv[idx]; 
+  real dotp = 0.0;
+  for ( int idx = 0; idx < 3; idx++ ) 
+    dotp += elements[idx] * pv[idx]; 
   return dotp;
 }
 
-inline void ctVector3::Normalize() {
-real len;
-  len = this->Norm();
-  if( len > MIN_REAL )
+inline void ctVector3::Normalize() 
+{
+  real len;
+  len = this->Norm ();
+  if ( len > MIN_REAL )
     *this /= len;
-  
 }
 
-#endif
+#endif // !__CRYSTALSPACE__
 
 
-#endif
+#endif // __CT_VECTOR__

@@ -50,19 +50,21 @@ ctNBodyForce::ctNBodyForce()
 
 }
 
-ctNBodyForce::ctNBodyForce( ctReferenceFrame &ref ) : ctForce( ref )
+ctNBodyForce::ctNBodyForce( ctReferenceFrame &ref ) 
+  : ctForce( ref )
 {
 }
 
 ctNBodyForce::~ctNBodyForce()
 {
-ctPhysicalEntity *pe;
+  ctPhysicalEntity *pe;
 	
-	pe = body_vector.get_first();
-	while( pe ){
-		body_vector.delete_link( pe );
-		pe = body_vector.get_next();
-	}
+  pe = body_vector.get_first();
+  while ( pe )
+  {
+    body_vector.delete_link( pe );
+    pe = body_vector.get_next();
+  }
 
 /*	for( int i = 0; i < body_vector.get_size(); i++ ){
 		pe = body_vector[i];

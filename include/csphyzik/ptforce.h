@@ -18,14 +18,15 @@
 
 */
 
-#ifndef PHYZ_PTFORCE_H
-#define PHYZ_PTFORCE_H
+#ifndef __CT_PTFORCE_H__
+#define __CT_PTFORCE_H__
 
 // This is a force which acts on a ctPointObj, which may or may not be a
 // ctEntity.  The class is intended to act on point-masses and connectors.
-class ctPointForce {
+class ctPointForce 
+{
  public:
   virtual void apply(ctPointObj* point) = 0;
 };
 
-#endif // PHYZ_PTFORCE_H
+#endif // __CT_PTFORCE_H__

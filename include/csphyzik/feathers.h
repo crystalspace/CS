@@ -39,78 +39,90 @@ class ctArticulatedBody;
 class ctFeatherstoneAlgorithm : public ctArticulatedSolver
 {
 public:
-	ctFeatherstoneAlgorithm( ctArticulatedBody &pab ) : ab( pab ){ sIsQsZIc_computed = false; };
+  ctFeatherstoneAlgorithm ( ctArticulatedBody &pab ) 
+    : ab( pab ){ sIsQsZIc_computed = false; };
 
-	// do it!  Apply algorithm to solve for motions
-	virtual void solve( real t );
+  /// do it!  Apply algorithm to solve for motions
+  virtual void solve ( real t );
 
-	//	void init();
+  //	void init();
 
-	// the algorithm result used by ctArticulatedBody::set_delta_state
-	// this values are relative to it's body frame
-	ctVector3 get_linear_a(){ ctVector3 aret( a[3], a[4], a[5] ); return aret; }
-	ctVector3 get_angular_a(){ ctVector3 aret( a[0], a[1], a[2] ); return aret; }
+  /**
+   * The algorithm result used by ctArticulatedBody::set_delta_state
+   * this values are relative to it's body frame
+   */
+  ctVector3 get_linear_a()
+  { ctVector3 aret( a[3], a[4], a[5] ); return aret; }
 
-  /// can use this to impart and impulse to this object.
-  /// impulse_point is vector from center of body to point of collision in 
-  /// world coordinates.  impulse_vector is in world coords
-  void apply_impulse( ctVector3 impulse_point,
-			      ctVector3 impulse_vector );
+  ctVector3 get_angular_a()
+  { ctVector3 aret( a[0], a[1], a[2] ); return aret; }
 
-  // calculate virtual mass and behaviour for an impulse applied at a point
-  // impulse_point is point of collision in world frame
-  void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
-    const ctVector3 &unit_length_impulse_vector );
+  /**
+   * can use this to impart and impulse to this object.
+   * impulse_point is vector from center of body to point of collision in 
+   * world coordinates.  impulse_vector is in world coords
+   */
+  void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector );
+
+  /**
+   * Calculate virtual mass and behaviour for an impulse applied at a point
+   * impulse_point is point of collision in world frame.
+   */
+  void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv, 
+    const ctVector3 &impulse_point, const ctVector3 &unit_length_impulse_vector );
 
 protected:
 
-	void fsolve_grounded( real t );
-	void fsolve_floating( real t );
+  void fsolve_grounded ( real t );
+  void fsolve_floating ( real t );
 
-	void init_link();
+  void init_link ();
 
-	void compute_Ia_Za();
+  void compute_Ia_Za ();
 
-	void compute_joint_a();
+  void compute_joint_a ();
 
-  void impulse_to_v();
+  void impulse_to_v ();
 
-  void test_impulse_response();
+  void test_impulse_response ();
 
-  void propagate_impulse();
+  void propagate_impulse ();
 
-  void zero_Ja_help();
+  void zero_Ja_help ();
 
-  void zero_Ja();
+  void zero_Ja ();
 
-	// the articulated body we are solving motions for
-	ctArticulatedBody &ab;
+  /// The articulated body we are solving motions for
+  ctArticulatedBody &ab;
 
-	// work variables
+  // work variables
 	
-	ctSpatialVector a;
+  ctSpatialVector a;
 
-	// spatial inertia matrix
-	ctSpatialMatrix Ia;
+  /// spatial inertia matrix
+  ctSpatialMatrix Ia;
 
-	// bias vector or zero acceleration vector
-    //  [ -m_i g_i - F_externaly_applied            ]   !note! negated!  
-    //  [ w_i x I_i w_i - Torque_externally_applied ]
-	ctSpatialVector Za;  // some other symbol in featherstone's book ( P? )
+  /**
+   * bias vector or zero acceleration vector
+   *  [ -m_i g_i - F_externaly_applied            ]   !note! negated!  
+   *  [ w_i x I_i w_i - Torque_externally_applied ]
+   * some other symbol in featherstone's book ( P? )
+   */
+  ctSpatialVector Za;  
 
-	// spatial coriolus force
-	ctSpatialVector c;
+  /// spatial coriolus force
+  ctSpatialVector c;
 
-	// spatial tranform from link i-1 to i
-	ctSpatialMatrix gXf;
+  /// spatial tranform from link i-1 to i
+  ctSpatialMatrix gXf;
 
 
-	// compute once per algo
-	real sIs;
-	real QsZIc;
-	bool sIsQsZIc_computed;
+  /// compute once per algo
+  real sIs;
+  real QsZIc;
+  bool sIsQsZIc_computed;
 
-  // used for calculating impulse response
+  /// used for calculating impulse response
   ctSpatialVector Ja;
   ctSpatialVector dv;
 
