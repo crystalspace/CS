@@ -318,6 +318,12 @@ void csBezier::Normal (csVector3& vec, double u, double v)
   vec.z = point[2];
 }
 
+void csBezier::AddBoundingPolygons (csBspContainer* container)
+{
+  // @@@ To be implemented.
+}
+
+//------------------------------------------------------------------
 
 csBezierTemplate::csBezierTemplate ()
   : csCurveTemplate () 

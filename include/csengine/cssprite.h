@@ -549,7 +549,7 @@ public:
    * Calculate a bounding box for this sprite in world space and add
    * the resulting polygons to the given container.
    */
-  void AddBoundingBox (csBspContainer* container);
+  void AddBoundingPolygons (csBspContainer* container);
 
   /**
    * Fill the static mesh with the current sprite

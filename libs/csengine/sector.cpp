@@ -624,7 +624,7 @@ void csSector::Draw (csRenderView& rview)
         {
           csSprite3D* sp3d = (csSprite3D*)sprites[i];
 	  sp3d->MarkInvisible ();
-	  sp3d->AddBoundingBox (spr_container);
+	  sp3d->AddBoundingPolygons (spr_container);
         }
 	static_tree->AddDynamicPolygons (spr_container->GetPolygons (),
           spr_container->GetNumPolygons ());

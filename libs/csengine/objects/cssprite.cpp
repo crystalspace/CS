@@ -554,7 +554,7 @@ void csSprite3D::UpdateDeferedLighting ()
   }
 }
 
-void csSprite3D::AddBoundingBox (csBspContainer* container)
+void csSprite3D::AddBoundingPolygons (csBspContainer* container)
 {
   csBox3 b;
   if (skeleton_state)

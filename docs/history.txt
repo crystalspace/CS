@@ -12,6 +12,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+5-Jan-2000
+	- Some further changes on support for curves in visibility system
+	  (unfinished).
 4-Jan-2000
 	- Improved style a bit in new planeclp.h.
 	- Started work on including curved surfaces to the visibility

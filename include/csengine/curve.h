@@ -30,6 +30,7 @@
 #include "csobject/csobject.h"
 
 struct iTextureHandle;
+class csBspContainer;
 
 /**
  * Vertex resulting from a tesselated curve.
@@ -158,6 +159,13 @@ public:
   ///
   void CacheLightMaps (csPolygonSet* owner, int index);
   
+  /**
+   * Add polygons to csBspContainer so that the following condition
+   * is true: if curve is visible then any of the added polygons should
+   * be visible.
+   */
+  virtual void AddBoundingPolygons (csBspContainer* container) = 0;
+
   CSOBJTYPE;
 };
 
@@ -256,6 +264,8 @@ public:
   virtual bool IsLightable ();
   virtual void PosInSpace (csVector3& vec, double u, double v);
   virtual void Normal (csVector3& vec, double u, double v);
+
+  virtual void AddBoundingPolygons (csBspContainer* container);
 
   CSOBJTYPE;
 };
