@@ -136,21 +136,10 @@ bool csBallFactorySaver::Initialize (iSystem* system)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-void csBallFactorySaver::WriteDown (iBase* obj, iStrVector *str,
+void csBallFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
   iEngine* /*engine*/)
 {
-  iFactory *fact = QUERY_INTERFACE (this, iFactory);
-  char buf[MAXLINE];
-  char name[MAXLINE];
-  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf(buf, "MESHOBJ '%s' (\n", name);
-  str->Push(strnew(buf));
-  csFindReplace(name, fact->QueryClassID (), "saver", "loader", MAXLINE);
-  sprintf(buf, "  PLUGIN ('%s')\n", name);
-  str->Push(strnew(buf));
-  str->Push(strnew("  PARAMS ()\n"));
-  str->Push(strnew(")\n"));
-  fact->DecRef();
+  // no params
 }
 
 //---------------------------------------------------------------------------
