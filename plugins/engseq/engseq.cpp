@@ -119,10 +119,12 @@ public:
   {
     if (sectorpar)
       sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (params), iSector);
+#ifndef CS_USE_NEW_RENDERER
     if (density < 0.001)
       sector->DisableFog ();
     else
       sector->SetFog (density, color);
+#endif // CS_USE_NEW_RENDERER
     if (sectorpar)
       sector = NULL;
   }
@@ -145,6 +147,7 @@ public:
   virtual void Do (float time, iBase*)
   {
     float density = (1-time) * start_density + time * end_density;
+#ifndef CS_USE_NEW_RENDERER
     if (density < 0.001)
       sector->DisableFog ();
     else
@@ -155,6 +158,7 @@ public:
       color.blue = (1-time) * start_col.blue + time * end_col.blue;
       sector->SetFog (density, color);
     }
+#endif // CS_USE_NEW_RENDERER
   }
 };
 
@@ -193,6 +197,7 @@ public:
   {
     if (sectorpar)
       sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (params), iSector);
+#ifndef CS_USE_NEW_RENDERER
     csFog* fog = sector->GetFog ();
 
     FadeFogInfo* fi = new FadeFogInfo ();
@@ -205,6 +210,7 @@ public:
     fi->sector = sector;
     eseqmgr->FireTimedOperation (dt, duration, fi);
     fi->DecRef ();
+#endif // CS_USE_NEW_RENDERER
     if (sectorpar)
       sector = NULL;
   }
