@@ -1,0 +1,11 @@
+Turn off palette entries for chunks which don't use them.
+
+Decrease splatting usage with distance (flat color from palette, single draw?).
+
+Better chunking or triangulation?
+
+Alpha clipping on the card?
+
+Multiple material maps or individual coverages per material (vs only 1 or 0)
+
+Perlin noise disturbance to the alpha map.
