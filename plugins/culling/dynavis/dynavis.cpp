@@ -1755,11 +1755,11 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
     csRef<iString> rc (dbghelp->UnitTest ());
     if (rc)
     {
-      delete kdtree;
+      kdtree->DecRef();
       return csPtr<iString> (rc);
     }
   }
-  delete kdtree;
+  kdtree->DecRef();
 
   csCoverageBuffer* covbuf = new csCoverageBuffer (640, 480);
   dbghelp = SCF_QUERY_INTERFACE (covbuf, iDebugHelper);
@@ -1768,11 +1768,11 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
     csRef<iString> rc (dbghelp->UnitTest ());
     if (rc)
     {
-      delete covbuf;
+      covbuf->DecRef();
       return csPtr<iString> (rc);
     }
   }
-  delete covbuf;
+  covbuf->DecRef();
 
   csTiledCoverageBuffer* tcovbuf = new csTiledCoverageBuffer (640, 480);
   dbghelp = SCF_QUERY_INTERFACE (tcovbuf, iDebugHelper);
@@ -1781,11 +1781,11 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
     csRef<iString> rc (dbghelp->UnitTest ());
     if (rc)
     {
-      delete tcovbuf;
+      tcovbuf->DecRef();
       return csPtr<iString> (rc);
     }
   }
-  delete tcovbuf;
+  tcovbuf->DecRef();
 
   return NULL;
 }
