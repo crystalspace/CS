@@ -47,7 +47,7 @@ class csConfigDocument : public iConfigFile
     char* cachedStringValue;
     char* cachedComment;
 
-    KeyInfo () : cachedStringValue(0), cachedComment(0) {}
+    KeyInfo (int foo = 0) : cachedStringValue(0), cachedComment(0) {}
     KeyInfo (const KeyInfo& other)
     {
       cachedStringValue = csStrNew (other.cachedStringValue);
