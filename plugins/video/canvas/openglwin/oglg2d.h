@@ -19,7 +19,7 @@
 #ifndef __SYSG2D_H__
 #define __SYSG2D_H__
 
-#include <gl/gl.h>
+#include <GL/gl.h>
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "video/canvas/openglcommon/gl2d_font.h"

@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include <windows.h>
-#include <gl/gl.h>
+#include <GL/gl.h>
 
 #include "csutil/scf.h"
 #include "oglg2d.h"
