@@ -144,6 +144,15 @@ public:
   virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
   virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
 
+  virtual uint8 *GetGlyphAlphaBitmap (uint8, int&, int&)
+  {
+    return NULL;
+  }
+  virtual uint8 *GetGlyphAlphaBitmap (uint8, int&, int&, int&, int&, int&)
+  {
+    return NULL;
+  }
+
   /**
    * Return the width and height of text written with this font.
    */
