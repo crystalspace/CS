@@ -28,7 +28,6 @@
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
 #include "iutil/event.h"
-#include "iutil/strvec.h"
 #include "iutil/virtclk.h"
 #include "cswseng.h"
 #include "iengine/camera.h"

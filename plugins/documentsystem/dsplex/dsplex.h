@@ -32,7 +32,7 @@ private:
   csRef<iDocumentSystem> defaultDocSys;
   csRefArray<iDocumentSystem> orderedlist;
   csRefArray<iDocumentSystem> autolist;
-  csRef<iStrVector> classlist;
+  csRef<iStringArray> classlist;
   csRef<iPluginManager> plugin_mgr;
 
   csRef<iDocumentSystem> LoadNextPlugin (int num);

@@ -34,7 +34,6 @@
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "iutil/cmdline.h"
-#include "iutil/strvec.h"
 #include "cstool/initapp.h"
 #include "ivaria/reporter.h"
 

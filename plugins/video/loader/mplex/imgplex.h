@@ -39,7 +39,7 @@ class csMultiplexImageIO : public iImageIO
   csRefArray<iImageIO> list;
   csVector formats;
   csConfigAccess config;
-  csRef<iStrVector> classlist;
+  csRef<iStringArray> classlist;
   csRef<iPluginManager> plugin_mgr;
   bool global_dither;
 

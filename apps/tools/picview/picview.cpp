@@ -28,7 +28,6 @@
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
 #include "iutil/event.h"
-#include "iutil/strvec.h"
 #include "picview.h"
 #include "imesh/object.h"
 #include "imesh/thing/polygon.h"

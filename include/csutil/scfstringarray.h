@@ -31,7 +31,7 @@ class scfStringArray : public iStringArray
 public:
   SCF_DECLARE_IBASE;
 
-  /// Create a iStrVector from scratch.
+  /// Create a iStringArray from scratch.
   scfStringArray (int iLimit = 16, int iDelta = 16) : v (iLimit, iDelta)
   { SCF_CONSTRUCT_IBASE (0); }
 

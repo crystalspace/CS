@@ -23,19 +23,18 @@
 #include "cssys/csshlib.h"
 #include "cssys/sysfunc.h"
 #include "csutil/csstring.h"
-#include "csutil/csstrvec.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/physfile.h"
 #include "csutil/scfstr.h"
-#include "csutil/scfstrv.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "iutil/document.h"
 
-static void AppendStrVecString (iStrVector*& strings, const char* str)
+static void AppendStrVecString (iStringArray*& strings, const char* str)
 {
   if (!strings)
   {
-    strings = new scfStrVector ();
+    strings = new scfStringArray ();
   }
   strings->Push (csStrNew (str));
 }
@@ -76,9 +75,9 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
 }
   
 // Scan a directory for .csplugin files
-void InternalScanPluginDir (iStrVector*& messages,
+void InternalScanPluginDir (iStringArray*& messages,
 			    const char* dir, 
-			    csRef<iStrVector>& plugins,
+			    csRef<iStringArray>& plugins,
 			    bool recursive)
 {
   struct dirent* de;
@@ -102,7 +101,7 @@ void InternalScanPluginDir (iStrVector*& messages,
 	  if (recursive && (strcmp (de->d_name, ".") != 0)
 	    && (strcmp (de->d_name, "..") != 0))
 	  {
-	    iStrVector* subdirMessages = 0;
+	    iStringArray* subdirMessages = 0;
 	    
 	    csString scffilepath;
 	    scffilepath << dir << PATH_SEPARATOR << de->d_name;
@@ -126,32 +125,32 @@ void InternalScanPluginDir (iStrVector*& messages,
   }
 }
 
-csRef<iStrVector> csScanPluginDir (const char* dir, 
-				   csRef<iStrVector>& plugins,
+csRef<iStringArray> csScanPluginDir (const char* dir, 
+				   csRef<iStringArray>& plugins,
 				   bool recursive)
 {
-  iStrVector* messages = 0;
+  iStringArray* messages = 0;
 
   if (!plugins)
-    plugins.AttachNew (new scfStrVector ());
+    plugins.AttachNew (new scfStringArray ());
 
   InternalScanPluginDir (messages, dir, plugins, 
     recursive);
 	 
-  return csPtr<iStrVector> (messages);
+  return csPtr<iStringArray> (messages);
 }
 
-csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs, 
-				    csRef<iStrVector>& plugins)
+csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs, 
+				    csRef<iStringArray>& plugins)
 {
-  iStrVector* messages = 0;
+  iStringArray* messages = 0;
 
   if (!plugins)
-    plugins.AttachNew (new scfStrVector ());
+    plugins.AttachNew (new scfStringArray ());
 
   for (int i = 0; i < dirs->GetCount (); i++)
   {
-    iStrVector* dirMessages = 0;
+    iStringArray* dirMessages = 0;
     InternalScanPluginDir (dirMessages, (*dirs)[i].path, plugins, 
       (*dirs)[i].scanRecursive);
     
@@ -172,5 +171,5 @@ csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs,
     }
   }
 	 
-  return csPtr<iStrVector> (messages);
+  return csPtr<iStringArray> (messages);
 }

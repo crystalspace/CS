@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
-#include "iutil/strvec.h"
+#include "iutil/stringarray.h"
 #include "csutil/csstring.h"
 #include "csutil/csvector.h"
 #include "csutil/array.h"
@@ -37,7 +37,7 @@ typedef csArray<csModelConverterFormat const *> csModelConverterFormatVector;
 class csModelConverterMultiplexer : iModelConverter
 {
 private:
-  csRef<iStrVector> classlist;
+  csRef<iStringArray> classlist;
   csRefArray<iModelConverter> Converters;
   csRef<iPluginManager> plugin_mgr;
 
@@ -98,7 +98,7 @@ bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // collect converter plugins
-  classlist = csPtr<iStrVector> (
+  classlist = csPtr<iStringArray> (
       iSCF::SCF->QueryClassList ("crystalspace.modelconverter."));
 
   return true;

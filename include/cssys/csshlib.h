@@ -35,7 +35,6 @@
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "iutil/string.h"
-#include "iutil/strvec.h"
 
 typedef void* csLibraryHandle;
 
@@ -95,8 +94,8 @@ bool csGetLoadLibraryVerbose();
  * \remark \p plugins can be 0, a string vector will be created in this case.
  * \return If any errors occured, a vector of error descriptions.
  */
-csRef<iStrVector> csScanPluginDir (const char* dir, 
-				   csRef<iStrVector>& plugins,
+csRef<iStringArray> csScanPluginDir (const char* dir, 
+				   csRef<iStringArray>& plugins,
 				   bool recursive = true);
 
 /**
@@ -104,8 +103,8 @@ csRef<iStrVector> csScanPluginDir (const char* dir,
  * Accepts the same parameters as csScanPluginDir(), with the exception of
  * \p dirs.
  */				
-csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs, 
-				    csRef<iStrVector>& plugins);
+csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs, 
+				    csRef<iStringArray>& plugins);
 
 /**
  * Query plugin metadata.

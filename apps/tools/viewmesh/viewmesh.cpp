@@ -59,7 +59,6 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "iutil/vfs.h"
-#include "csutil/csstrvec.h"
 #include "iutil/cache.h"
 #include "csutil/nulcache.h"
 

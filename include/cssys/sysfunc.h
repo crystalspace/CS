@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include "csutil/ref.h"
 #include "csutil/csstring.h"
-#include "iutil/strvec.h"
 
 struct iObjectRegistry;
 struct iConfigFile;

@@ -30,7 +30,6 @@
 #include "iutil/document.h"
 #include "iutil/vfs.h"
 #include "iutil/databuff.h"
-#include "iutil/strvec.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
 #include "csgeom/transfrm.h"

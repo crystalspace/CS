@@ -23,8 +23,8 @@
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "iutil/event.h"
-#include "iutil/strvec.h"
 #include "iutil/objreg.h"
+#include "iutil/stringarray.h"
 #include "csutil/refarr.h"
 #include "csutil/util.h"
 #include "ivaria/reporter.h"
@@ -38,7 +38,7 @@ class csSoundLoaderMultiplexer : public iSoundLoader
 {
 private:
   csRefArray<iSoundLoader> Loaders;
-  csRef<iStrVector> list;
+  csRef<iStringArray> list;
   csRef<iPluginManager> plugin_mgr;
 
   bool LoadNextPlugin ();
@@ -95,7 +95,7 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // grab the sound loader list
-  list = csPtr<iStrVector> (
+  list = csPtr<iStringArray> (
     iSCF::SCF->QueryClassList ("crystalspace.sound.loader."));
   int i = 0;
   while (i < list->Length())

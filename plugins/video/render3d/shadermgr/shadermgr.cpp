@@ -132,7 +132,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY(objectreg, iPluginManager);
 
-  csRef<iStrVector> classlist (csPtr<iStrVector> 
+  csRef<iStringArray> classlist (csPtr<iStringArray> 
     (iSCF::SCF->QueryClassList("crystalspace.render3d.shader.")));
   int const nmatches = classlist->Length();
   if(nmatches != 0)

@@ -12,6 +12,15 @@ for each given day, however, are in normal (ascending) chronological order.
 	  of iStrVector.
 	- Jorrit changed iVFS->FindFiles() and MountRoot() to return
 	  iStringArray.
+	- Jorrit removed all other usages of csStrVector (viewmesh, demo,
+	  iAwsParmList, win32/loadlib.cpp, csws cspFileDialog, input console,
+	  and OpenGL renderer).
+	  In case of iAwsParmList the csStrVector was also
+	  replaced with the more correct iStringArray (i.e. SCF interface).
+	- Jorrit removed all other usages of iStrVector and scfStrVector
+	  (csScanPluginsDir and related, iSCF (QueryClassList)).
+	- Jorrit finally removed csStrVector, iStrVector, and scfStrVector.
+	- Jorrit also fixed the python plugin for all latest changes.
 28-Jul-2003
 	- Jorrit removed several csVector's throughout CS:
 	    - Replaced 'render_priorities' in the engine with csStringArray.

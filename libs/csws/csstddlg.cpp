@@ -35,7 +35,8 @@
 #include "csutil/csstring.h"
 #include "ivaria/reporter.h"
 #include "iutil/vfs.h"
-#include "iutil/strvec.h"
+#include "csutil/stringarray.h"
+#include "iutil/stringarray.h"
 
 #define MSGBOX_TEXTURE "csws::MessageBoxIcons"
 
@@ -501,8 +502,8 @@ void cspFileDialog::Reread ()
   } /* endwhile */
 
   int i,n;
-  csStrVector dirs;
-  csStrVector files;
+  csStringArray dirs;
+  csStringArray files;
 
   if (!usevfs)
   {
@@ -561,7 +562,7 @@ void cspFileDialog::Reread ()
     }
   }
 
-  dirs.QuickSort (csStrVector::CASE_INSENSITIVE);
+  dirs.Sort (csStringArray::CaseInsensitiveCompare);
   for (i = 0, n = dirs.Length(); i < n; i++)
   {
     csListBoxItem *lbi = new csListBoxItem (dp, dirs.Get(i));
@@ -569,7 +570,7 @@ void cspFileDialog::Reread ()
     lbi->SetOffset (level * 6);
   }
 
-  files.QuickSort (csStrVector::CASE_INSENSITIVE);
+  files.Sort (csStringArray::CaseInsensitiveCompare);
   for (i = 0, n = files.Length(); i < n; i++)
     (void)new csListBoxItem (fp, files.Get(i));
 

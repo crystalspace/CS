@@ -39,7 +39,6 @@
 #include "csmouse.h"
 #include "csgfxppl.h"
 #include "csutil/cseventq.h"
-#include "csutil/csstrvec.h"
 #include "csutil/array.h"
 #include "csutil/cfgacc.h"
 #include "iutil/eventh.h"

@@ -26,7 +26,6 @@
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "iutil/strvec.h"
 #include "iutil/objreg.h"
 #include <ctype.h>
 

@@ -23,7 +23,7 @@
 #include "csgeom/cspoint.h"
 #include "csutil/scfstr.h"
 #include "csutil/csvector.h"
-#include "csutil/csstrvec.h"
+#include "iutil/stringarray.h"
 
 SCF_VERSION (iAwsParmList, 0, 0, 2);
 
@@ -47,7 +47,7 @@ struct iAwsParmList : public iBase
   /// Adds a vector to the parmeter list
   virtual void AddBasicVector(const char *name, csBasicVector* value)=0;
   /// Adds a string vector to the parmeter list
-  virtual void AddStringVector(const char *name, csStrVector* value)=0;
+  virtual void AddStringVector(const char *name, iStringArray* value)=0;
   /// Adds a rect to the parmeter list
   virtual void AddRect(const char *name, csRect *value)=0;
   /// Adds a point to the parmeter list
@@ -88,7 +88,7 @@ struct iAwsParmList : public iBase
    * Returns the string vector named "name" in value.  True if it was found,
    * otherwise false.
    */
-  virtual bool GetStringVector(const char *name, csStrVector **value)=0;
+  virtual bool GetStringVector(const char *name, iStringArray **value)=0;
   /**
    * Returns the rect named "name" in value.  True if it was found, otherwise
    * false.

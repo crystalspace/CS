@@ -6,7 +6,7 @@
 # include "csgeom/cspoint.h"
 # include "csutil/scfstr.h"
 # include "csutil/csvector.h"
-# include "csutil/csstrvec.h"
+# include "iutil/stringarray.h"
 
 /***********************************************************************************
  * Provides support for safely passing named parameters through to different functions
@@ -41,7 +41,7 @@ public:
       bool b;
       iString *s;
       csBasicVector *bv;
-      csStrVector *sv;
+      iStringArray *sv;
       csRect *r;
       csPoint *p;
       void *v;
@@ -78,7 +78,7 @@ public:
   virtual void AddBasicVector (const char *name, csBasicVector *value);
 
   /// Adds a string vector to the parmeter list
-  virtual void AddStringVector (const char *name, csStrVector *value);
+  virtual void AddStringVector (const char *name, iStringArray *value);
 
   /// Adds a rect to the parmeter list
   virtual void AddRect (const char *name, csRect *value);
@@ -108,7 +108,7 @@ public:
   virtual bool GetBasicVector (const char *name, csBasicVector **value);
 
   /// Returns the string vector named "name" in value.  True if it was found, otherwise false.
-  virtual bool GetStringVector (const char *name, csStrVector **value);
+  virtual bool GetStringVector (const char *name, iStringArray **value);
 
   /// Returns the rect named "name" in value.  True if it was found, otherwise false.
   virtual bool GetRect (const char *name, csRect **value);

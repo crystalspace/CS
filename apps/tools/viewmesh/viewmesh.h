@@ -22,7 +22,7 @@
 #include <stdarg.h>
 
 #include "csws/csws.h"
-#include "csutil/csstrvec.h"
+#include "csutil/stringarray.h"
 
 struct iEngine;
 struct iLoader;
@@ -52,7 +52,7 @@ private:
 
   csMenu *menu;
   csWindow *dialog;
-  csStrVector stateslist;
+  csStringArray stateslist;
   enum { movenormal, moveorigin, rotateorigin } cammode;
 
   void UpdateSpritePosition(csTicks elapsed);

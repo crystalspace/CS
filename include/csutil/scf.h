@@ -589,7 +589,7 @@ struct iFactory : public iBase
 //----------------------------------------------- Client-side functions -----//
 
 struct iDocument;
-struct iStrVector;
+struct iStringArray;
 
 /// Type of factory function which creates an instance of an SCF class.
 typedef void* (*scfFactoryFunc)(iBase*);
@@ -840,7 +840,7 @@ struct iSCF : public iBase
    * the returned list is empty.  It is the caller's responsibility to invoke
    * DecRef() on the returned list when the list is no longer needed.
    */
-  virtual iStrVector* QueryClassList (char const* pattern) = 0;
+  virtual iStringArray* QueryClassList (char const* pattern) = 0;
 
   /**
    * Scan a specified native path for plugins and auto-register them.

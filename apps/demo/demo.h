@@ -22,7 +22,7 @@
 #include <stdarg.h>
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
-#include "csutil/csstrvec.h"
+#include "csutil/stringarray.h"
 
 struct iEngine;
 struct iSector;
@@ -69,11 +69,11 @@ public:
 
   int do_demo;
   int selected_demo;
-  csStrVector demos;
+  csStringArray demos;
   int first_y;	// First y location where list of demo files start.
 
 private:
-  void GfxWrite (int x, int y, int fg, int bg, char *str, ...);
+  void GfxWrite (int x, int y, int fg, int bg, const char *str, ...);
   void FileWrite (iFile* file, char *str, ...);
 
   void DrawEditInfo ();

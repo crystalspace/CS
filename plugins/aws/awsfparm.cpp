@@ -119,7 +119,7 @@ void awsParmList::AddBasicVector (const char *name, csBasicVector *value)
   parms.Push (pi);
 }
 
-void awsParmList::AddStringVector (const char *name, csStrVector *value)
+void awsParmList::AddStringVector (const char *name, iStringArray *value)
 {
   parmItem *pi = new parmItem;
 
@@ -228,7 +228,7 @@ bool awsParmList::GetBasicVector (const char *name, csBasicVector **value)
   return false;
 }
 
-bool awsParmList::GetStringVector (const char *name, csStrVector **value)
+bool awsParmList::GetStringVector (const char *name, iStringArray **value)
 {
   parmItem *pi = FindParm (name, STRINGVECTOR);
 

@@ -24,7 +24,7 @@
 #include "ivaria/conout.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/csstrvec.h"
+#include "csutil/stringarray.h"
 
 /**
  * This is the standard command-line handler with history and
@@ -33,7 +33,7 @@
 class csConsoleInput : iConsoleInput
 {
   // The command history
-  csStrVector History;
+  csStringArray History;
   int HistoryPos;
   // Max lines in history
   int MaxLines;

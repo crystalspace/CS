@@ -56,7 +56,6 @@
 #include "imesh/object.h"
 #include "imap/reader.h"
 #include "imap/parser.h"
-#include "iutil/strvec.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/event.h"
@@ -67,7 +66,7 @@
 #include "iutil/cmdline.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
-#include "csutil/csstrvec.h"
+#include "csutil/stringarray.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
 #include "qsqrt.h"
@@ -133,7 +132,7 @@ static bool DemoEventHandler (iEvent& ev)
   }
 }
 
-static void TestDemoFile (const char* zip, iVFS* myVFS, csStrVector& demos)
+static void TestDemoFile (const char* zip, iVFS* myVFS, csStringArray& demos)
 {
   csRef<iDataBuffer> realpath_db (myVFS->GetRealPath (zip));
   char* realpath = (char*)(realpath_db->GetData ());
@@ -351,7 +350,7 @@ static csVector2 map_br (1000, -1000);
 static int map_selpoint = 0;
 static char map_selpath[255] = { 0 };
 
-void Demo::GfxWrite (int x, int y, int fg, int bg, char *str, ...)
+void Demo::GfxWrite (int x, int y, int fg, int bg, const char *str, ...)
 {
   va_list arg;
   char buf[256];

@@ -21,6 +21,7 @@
 #include "csjoylin.h"
 #include "ivaria/reporter.h"
 #include "csutil/csstring.h"
+#include "csutil/csvector.h"
 
 #include <fcntl.h>
 #include <unistd.h>

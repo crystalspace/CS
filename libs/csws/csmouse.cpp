@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
 #include "csws/csmouse.h"
 #include "csws/csapp.h"

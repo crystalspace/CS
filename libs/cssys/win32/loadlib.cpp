@@ -26,17 +26,16 @@
 #include <sys/cygwin.h>
 #endif
 #include "csutil/csstring.h"
-#include "csutil/csstrvec.h"
 #include "csutil/physfile.h"
 #include "csutil/scfstr.h"
-#include "csutil/scfstrv.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/strhash.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "iutil/document.h"
 #include <windows.h>
 
-static csStrVector ErrorMessages;
+static csStringArray ErrorMessages;
 
 #define LOADLIBEX_FLAGS		    LOAD_WITH_ALTERED_SEARCH_PATH
 
@@ -74,8 +73,8 @@ csLibraryHandle csLoadLibrary (const char* iName)
    GetEnvironmentVariable("PATH", OLD_PATH, 4096);
    if (cygwin_conv_to_win32_path ("/bin/",DLLDIR))
    {
-     ErrorMessages.Push(csStrNew(
-       "LoadLibraryEx() '/bin/' Cygwin/Win32 path conversion failed."));
+     ErrorMessages.Push(
+       "LoadLibraryEx() '/bin/' Cygwin/Win32 path conversion failed.");
      delete[] DLLDIR;
      delete[] OLD_PATH;
      return 0;
@@ -99,7 +98,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
     csString s;
     s << "LoadLibraryEx(" << dllPath << ") error " << (int)errorCode << ": "
       << buf;
-    ErrorMessages.Push (csStrNew(s));
+    ErrorMessages.Push (s);
     LocalFree (buf);
     return 0;
   }
@@ -111,7 +110,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
   {
     csString s;
     s << dllPath << ": DLL does not export \"plugin_compiler\".";
-    ErrorMessages.Push (csStrNew(s));
+    ErrorMessages.Push (s);
     FreeLibrary ((HMODULE)handle);
     return 0;
   }
@@ -121,7 +120,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
     csString s;
     s << dllPath << ": plugin compiler does not match application compiler: "
       << plugin_compiler << " != " CS_COMPILER_NAME;
-    ErrorMessages.Push (csStrNew(s));
+    ErrorMessages.Push (s);
     FreeLibrary ((HMODULE)handle);
     return 0;
   }
@@ -165,18 +164,18 @@ void csPrintLibraryError (const char *iModule)
   }
 }
 
-static void AppendStrVecString (iStrVector*& strings, const char* str)
+static void AppendStrVecString (iStringArray*& strings, const char* str)
 {
   if (!strings)
   {
-    strings = new scfStrVector ();
+    strings = new scfStringArray ();
   }
   strings->Push (csStrNew (str));
 }
 
 static void AppendWin32Error (const char* text,
 			      DWORD errorCode,
-			      iStrVector*& strings)
+			      iStringArray*& strings)
 {
   char *buf;
 
@@ -356,9 +355,9 @@ inline static void AddLower (csStringHash& hash, const char* str)
   hash.Register (tmp, id++);
 }
 
-void InternalScanPluginDir (iStrVector*& messages,
+void InternalScanPluginDir (iStringArray*& messages,
 			    const char* dir, 
-			    csRef<iStrVector>& plugins,
+			    csRef<iStringArray>& plugins,
 			    bool recursive)
 {
   csStringHash files;
@@ -490,7 +489,7 @@ void InternalScanPluginDir (iStrVector*& messages,
       fullPath.Clear();
       fullPath << dir << PATH_SEPARATOR << dirs.Request (id);
 
-      iStrVector* subdirMessages = 0;
+      iStringArray* subdirMessages = 0;
       InternalScanPluginDir (subdirMessages, fullPath, plugins,
 	recursive);
       
@@ -507,32 +506,32 @@ void InternalScanPluginDir (iStrVector*& messages,
   }
 }
 
-csRef<iStrVector> csScanPluginDir (const char* dir, 
-				   csRef<iStrVector>& plugins,
+csRef<iStringArray> csScanPluginDir (const char* dir, 
+				   csRef<iStringArray>& plugins,
 				   bool recursive)
 {
-  iStrVector* messages = 0;
+  iStringArray* messages = 0;
 
   if (!plugins)
-    plugins.AttachNew (new scfStrVector ());
+    plugins.AttachNew (new scfStringArray ());
 
   InternalScanPluginDir (messages, dir, plugins,  
     recursive);
 	 
-  return csPtr<iStrVector> (messages);
+  return csPtr<iStringArray> (messages);
 }
 
-csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs, 
-				    csRef<iStrVector>& plugins)
+csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs, 
+				    csRef<iStringArray>& plugins)
 {
-  iStrVector* messages = 0;
+  iStringArray* messages = 0;
 
   if (!plugins)
-    plugins.AttachNew (new scfStrVector ());
+    plugins.AttachNew (new scfStringArray ());
 
   for (int i = 0; i < dirs->GetCount (); i++)
   {
-    iStrVector* dirMessages = 0;
+    iStringArray* dirMessages = 0;
     InternalScanPluginDir (dirMessages, (*dirs)[i].path, 
       plugins, (*dirs)[i].scanRecursive);
     
@@ -553,5 +552,5 @@ csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs,
     }
   }
 	 
-  return csPtr<iStrVector> (messages);
+  return csPtr<iStringArray> (messages);
 }

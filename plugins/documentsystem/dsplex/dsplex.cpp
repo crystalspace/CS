@@ -27,7 +27,7 @@
 #include "iutil/databuff.h"
 #include "iutil/plugin.h"
 #include "iutil/objreg.h"
-#include "iutil/strvec.h"
+#include "iutil/stringarray.h"
 #include "iutil/vfs.h"
 
 #include "dsplex.h"
@@ -306,7 +306,7 @@ bool csMplexDocumentSystem::Initialize (iObjectRegistry* object_reg)
       defaultDocSys = SCF_QUERY_INTERFACE (b, iDocumentSystem);
     }
 
-    classlist = csPtr<iStrVector> (
+    classlist = csPtr<iStringArray> (
       iSCF::SCF->QueryClassList (DSCLASSPREFIX));
     return true;
   }

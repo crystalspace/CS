@@ -54,7 +54,7 @@
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
-#include "csutil/csstrvec.h"
+#include "csutil/stringarray.h"
 #include "csutil/util.h"
 #include "csgfx/rgbpixel.h"
 #include "qsqrt.h"
@@ -811,7 +811,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
   const char *sGL_VERSION    = (const char *)glGetString (GL_VERSION);
   const char *sGL_EXTENSIONS = (const char *)glGetString (GL_EXTENSIONS);
 
-  csStrVector oglconfigs;
+  csStringArray oglconfigs;
 
   csRef<iConfigIterator> it (config->Enumerate (OGLCONFIGS_PREFIX));
   while (it->Next ())
@@ -824,7 +824,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
     else
       oglconfig.Append(key, dot - key); // Drop the '.' and all that follows.
 
-    if (oglconfigs.FindKey (oglconfig.GetData()) == -1)
+    if (oglconfigs.Find (oglconfig.GetData()) == -1)
     {
       bool apply = true;
       int count = 0;

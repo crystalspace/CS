@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "imgplex.h"
 #include "iutil/plugin.h"
-#include "iutil/strvec.h"
+#include "iutil/stringarray.h"
 #include "csgfx/csimage.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -62,7 +62,7 @@ bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
     csRef<iPluginManager> plugin_mgr (
     	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
-    iStrVector* classlist =
+    iStringArray* classlist =
       iSCF::SCF->QueryClassList ("crystalspace.graphic.image.io.");
     int const nmatches = classlist->Length();
     if (nmatches != 0)

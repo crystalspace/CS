@@ -201,7 +201,7 @@
 	INTERFACE_APPLY(iStreamIterator)
 	INTERFACE_APPLY(iStreamFormat)
 	INTERFACE_APPLY(iString)
-	INTERFACE_APPLY(iStrVector)
+	INTERFACE_APPLY(iStringArray)
 	INTERFACE_APPLY(iTextureHandle)
 	INTERFACE_APPLY(iTextureList)
 	INTERFACE_APPLY(iTextureManager)
@@ -788,7 +788,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "iutil/csinput.h"
 %include "iutil/cfgfile.h"
 %include "iutil/cfgmgr.h"
-%include "iutil/strvec.h"
+%include "iutil/stringarray.h"
 %include "iutil/document.h"
 
 %include "csutil/xmltiny.h"

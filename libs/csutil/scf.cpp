@@ -25,7 +25,7 @@
 #include "csutil/memfile.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/scfstrv.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/scopedmutexlock.h"
 #include "csutil/strset.h"
 #include "csutil/util.h"
@@ -88,7 +88,7 @@ public:
     const char* context = 0);
   virtual scfInterfaceID GetInterfaceID (const char *iInterface);
   virtual void Finish ();
-  virtual iStrVector* QueryClassList (char const* pattern);
+  virtual iStringArray* QueryClassList (char const* pattern);
   virtual bool RegisterPlugin (const char* path);
 };
 
@@ -433,14 +433,14 @@ static void scfScanPlugins (csPluginPaths* pluginPaths, const char* context)
   if (pluginPaths)
   {
     // Search plugins in pluginpaths
-    csRef<iStrVector> plugins;
+    csRef<iStringArray> plugins;
 
     int i, j;
     for (i = 0; i < pluginPaths->GetCount(); i++)
     {
       if (plugins) plugins->DeleteAll();
 
-      csRef<iStrVector> messages = 
+      csRef<iStringArray> messages = 
 	csScanPluginDir ((*pluginPaths)[i].path, plugins, 
 	  (*pluginPaths)[i].scanRecursive);
 
@@ -600,7 +600,7 @@ void csSCF::RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode,
       // For backward compatibility, we build a comma-delimited dependency
       // string from the individual dependency nodes.  In the future,
       // iSCF::GetClassDependencies() should be updated to return an
-      // iStrVector, rather than a simple comma-delimited string.
+      // iStringArray, rather than a simple comma-delimited string.
       csString depend;
       csRef<iDocumentNode> depnode = classnode->GetNode("requires");
       if (depnode)
@@ -884,9 +884,9 @@ scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)
   return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
 }
 
-iStrVector* csSCF::QueryClassList (char const* pattern)
+iStringArray* csSCF::QueryClassList (char const* pattern)
 {
-  scfStrVector* v = new scfStrVector();
+  scfStringArray* v = new scfStringArray();
 
   csScopedMutexLock lock (mutex);
   int const rlen = ClassRegistry->Length();
@@ -900,6 +900,6 @@ iStrVector* csSCF::QueryClassList (char const* pattern)
         v->Push(csStrNew(s));
     }
   }
-  csRef<iStrVector> iv (SCF_QUERY_INTERFACE(v, iStrVector));
+  csRef<iStringArray> iv (SCF_QUERY_INTERFACE(v, iStringArray));
   return iv;	// Will do DecRef() but that's ok in this case.
 }

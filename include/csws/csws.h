@@ -28,8 +28,6 @@
  * \page CSWSHierachy Current CrystalSpace Windowing System class hierarchy
  * <pre>
  *   |--[ csRect ]			// Rectangle
- *   |--[ csVector ]            	// Vector of some objects (FreeItem = NOP)
- *   |    |--[ csStrVector ]    	// Vector of strings (FreeItem = delete[])
  *   |--[ csGraphicsPipeline ]  	// Deferred drawing pipeline
  *   +--[ csComponent ]         	// Windowing System component
  *        |--[ csMouse ]		// Mouse cursor
@@ -66,7 +64,6 @@
 // Forward declarations
 class csRect;
 class csVector;
-class csStrVector;
 class csEventQueue;
 class csGraphicsPipeline;
 class csComponent;
@@ -102,7 +99,6 @@ struct iEvent;
 // Include all Windowing System components
 #include "csgeom/csrect.h"		// Rectangle class
 #include "csutil/csvector.h"		// Vector of objects
-#include "csutil/csstrvec.h"		// Vector of string objects
 #include "csutil/csevent.h"		// Event class
 #include "csutil/cseventq.h"		// Event Queue class
 #include "csutil/csinput.h"		// Keyboard codes
