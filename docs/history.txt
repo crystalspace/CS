@@ -48,14 +48,16 @@ The history order is reversed so that new features are at the top.
 	  "install" target to fail because no .csplugin file was present (lack
 	  of .csplugin is correct since this is a Python plugin, not a CS
 	  plugin).  This is not a "clean" solution to the _cspace.so problem,
-	  and it we should devise a better one, but it works well enough for
-	  the interim.
+	  and we should devise a better one, but it works well enough for the
+	  interim.
 	- res fixed a memory leak in csPluginPaths::AddOnce().
-	- res fixed a memory leak when using csStringHashIterator - upon 
-	  construction a new csGlobalHashIterator was created, but not deleted 
-	  on destruction (more exactly, csStringHashIterator lacked a 
+	- res fixed a memory leak when using csStringHashIterator - upon
+	  construction a new csGlobalHashIterator was created, but not deleted
+	  on destruction (more exactly, csStringHashIterator lacked a
 	  destructor.)
-    - Reed Hedges fixed cxXWindow::SetTitle()
+	- Reed Hedges fixed csXWindow::SetTitle() so that it actually sets the
+	  window title on each invocation, whereas in the past it only worked
+	  correctly if it was called before the window was created.
 9-Jul-2003
 	- Jorrit fixed PlaceMesh() so that it now uses
 	  engine->GetNearbyObjects(). That makes it a lot more efficient
@@ -86,18 +88,18 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine reverted the reversion of glrender.mak and applied a
 	  small patch so that it can build files from the renderer/common
 	  directory.  Also patched gl_render3d.mak.
-	- res worked around the 'double keypad key event' problem on Win32. 
-	  Upon reception of a 'keydown' message for such keys, CS enqueues a 
-	  key event; however, Windows generates another message containing the 
-	  keycode translated to a character. 
+	- res worked around the 'double keypad key event' problem on Win32.
+	  Upon reception of a 'keydown' message for such keys, CS enqueues a
+	  key event; however, Windows generates another message containing the
+	  keycode translated to a character.
 	- res attempted to update & fix cs-config on win32.
 	- res fixed a usage of GetLongPath() in instpath.cpp. Replaced it with
 	  a call to csExpandPath().
 7-Jul-2003
-	- Peter Amstutz changed iDataBuffer so that it can be instructed 
+	- Peter Amstutz changed iDataBuffer so that it can be instructed
 	  not to delete the underlying buffer when iDataBuffer is freed.
-	- Peter Amstutz fixed csPolygon3DStatic so that the object plane 
-	  (polygon normal) is updated if necessary when GetObjectPlane() 
+	- Peter Amstutz fixed csPolygon3DStatic so that the object plane
+	  (polygon normal) is updated if necessary when GetObjectPlane()
 	  is called.
 	- Eric Sunshine removed some errant DecRef() invocations from the
 	  "pixmap" how-to which were pointed out by Jacob Gostylo
@@ -114,19 +116,19 @@ The history order is reversed so that new features are at the top.
 5-Jul-2003
         - Boyan removed circular reference between ds3d render and listener
           which prevent to unload ds3d plugin.
-	- Marten added so that NR use gl*Pointer when there are no 
+	- Marten added so that NR use gl*Pointer when there are no
 	  glAttributePointer extension available.
 	- res added a home-grown GetLongPathName() surrogate for older Windows
 	  versions, where it's unsupported.  This was pointed out by Paul G.
 4-Jul-2003
-	- res committed fixes from Oktal for some circular #include 
+	- res committed fixes from Oktal for some circular #include
 	  dependencies in the new renderer.
 	- res fixed a wrong #include in anonrndbuf.cpp.
-	- res fixed a typo in syspath.h, slightly changed a few comments 
+	- res fixed a typo in syspath.h, slightly changed a few comments
 	  there, and also fixed a comment in gradient.h.
 	- res added a missing pair of quotes to the crystal.fgd "light" entry.
 	- res fixed the map2cs mechanism for removal of polys with certain
-	  textures. This didn't work with Hammer maps due to a 
+	  textures. This didn't work with Hammer maps due to a
 	  lowercase/uppercase mismatch.
 	- res fixed a bug in map2cs where 'invisible' (and thus unused)
 	  textures nevertheless appeared in texture & material list.
