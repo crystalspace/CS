@@ -117,12 +117,17 @@ bool csCubeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csCubeFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  synldr = CS_QUERY_PLUGIN (plugin_mgr, iSyntaxService);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
-    synldr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.syntax.loader.service.text", 
-			     CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+  {
+    synldr = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.syntax.loader.service.text", 
+	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    object_reg->Register (synldr);
+  }
+  else synldr->IncRef ();
 
-  return synldr;
+  return synldr != NULL;
 }
 
 iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine,
@@ -232,10 +237,15 @@ bool csCubeFactorySaver::Initialize (iObjectRegistry* object_reg)
   csCubeFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   if (!synldr)
-    synldr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.syntax.loader.service.text", 
-			     CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+  {
+    synldr = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.syntax.loader.service.text", 
+	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    object_reg->Register (synldr);
+  }
+  else synldr->IncRef ();
 
-  return synldr;
+  return synldr != NULL;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */

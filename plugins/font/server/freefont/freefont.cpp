@@ -88,7 +88,8 @@ bool csFreeTypeServer::Initialize (iObjectRegistry *object_reg)
     return false;
   }
 
-  VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  VFS->IncRef ();
   ftconfig.AddConfig(object_reg, "config/freetype.cfg");
  
   defaultSize = ftconfig->GetInt ("Freetype.Settings.Size", 10);

@@ -975,12 +975,11 @@ csEditFont::csEditFont(csApp *iApp, const char *fromfile)
   /// taken from csfont plugin...
 
   /*  @@@ need to be able to get VFS names
-  iVFS *VFS = CS_QUERY_PLUGIN (System, iVFS);
+  iVFS *VFS = CS_QUERY_REGISTRY (System->object_reg, iVFS);
   iDataBuffer *fntfile = VFS->ReadFile (fromfile);
-  VFS->DecRef ();
   if (!fntfile)
   {
-    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_WARNING,
+    csReport (System->object_reg, CS_REPORTER_SEVERITY_WARNING,
 	"crystalspace.application.csfedit",
     	"Could not read font file %s.", fromfile);
     return;

@@ -356,8 +356,7 @@ void csPerfStats::WriteSummaryStats ()
 void csPerfStats::WriteMainHeader ()
 {
   StatEntry *entry = new StatEntry ();
-  iGraphics3D *g3d = CS_QUERY_PLUGIN_ID (plugin_mgr,
-  	CS_FUNCID_VIDEO, iGraphics3D);
+  iGraphics3D *g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d) abort ();
   iGraphics2D *g2d = g3d->GetDriver2D ();
   csGraphics3DCaps *caps = g3d->GetCaps ();
@@ -430,7 +429,6 @@ void csPerfStats::WriteMainHeader ()
     CS_ASSERT (entry->len <= len_guess);
 
     statvec->Push (entry);
-    g3d->DecRef ();
 }
 
 void csPerfStats::WriteSubSummary ()
@@ -596,7 +594,7 @@ bool csPerfStats::WriteFile ()
   statvec = NULL;
   head_section->framevec = NULL;
 
-  iVFS *vfs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  iVFS *vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!vfs) 
     return false;
 
@@ -608,7 +606,6 @@ bool csPerfStats::WriteFile ()
 
   delete [] buffer;
   delete [] f_buf;
-  vfs->DecRef ();
 
   return true;
 }

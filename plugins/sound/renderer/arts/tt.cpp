@@ -99,15 +99,16 @@ int main(int argc, const char* const args[])
   }
 
   iObjectRegistry* object_reg = sys.GetObjectRegistry ();
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // get a soundloader
-  iSoundLoader *pLoader = CS_QUERY_PLUGIN_ID (plugin_mgr,
-  	"SoundLoader", iSoundLoader);
+  iSoundLoader *pLoader = CS_QUERY_REGISTRY (object_reg, iSoundLoader);
+  if (pLoader) pLoader->IncRef ();
   // we read the soundata the CS way, that is through VFS
-  iVFS *pVFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
+  iVFS *pVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (pVFS) pVFS->IncRef ();
   // well, since we want to try our renderer, we should request it now
-  iSoundRender *pSR = CS_QUERY_PLUGIN (plugin_mgr, iSoundRender);
+  iSoundRender *pSR = CS_QUERY_REGISTRY (object_reg, iSoundRender);
+  if (pSR) pSR->IncRef ();
   
   // load the sound
   iDataBuffer *db = pVFS->ReadFile (args[1]);

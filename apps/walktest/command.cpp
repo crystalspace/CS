@@ -478,7 +478,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
 bool csCommandProcessor::start_script (const char* scr)
 {
   bool ok = false;
-  iVFS* v = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  iVFS* v = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (v)
   {
     if (v->Exists (scr))
@@ -495,7 +495,6 @@ bool csCommandProcessor::start_script (const char* scr)
         ok = true;
       }
     }
-    v->DecRef();
   }
   return ok;
 }

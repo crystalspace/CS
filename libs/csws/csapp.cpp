@@ -62,11 +62,11 @@ csApp::csAppPlugin::csAppPlugin (csApp *iParent)
 
 bool csApp::csAppPlugin::Initialize (iObjectRegistry *object_reg)
 {
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  app->VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  app->VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!app->VFS) return false;
+  app->VFS->IncRef ();
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q != 0)
   {
     app->EventOutlet = q->GetEventOutlet();
@@ -200,17 +200,19 @@ bool csApp::Initialize ()
   WindowListWidth = ScreenWidth / 3;
   WindowListHeight = ScreenWidth / 6;
 
-  config.AddConfig(object_reg, "/config/csws.cfg");
+  config.AddConfig (object_reg, "/config/csws.cfg");
 
-  FontServer = CS_QUERY_PLUGIN_ID (plugin_mgr,
-  	CS_FUNCID_FONTSERVER, iFontServer);
+  FontServer = CS_QUERY_REGISTRY (object_reg, iFontServer);
+  FontServer->IncRef ();
   DefaultFont = FontServer->LoadFont (CSFONT_COURIER);
   DefaultFontSize = 8;
 
-  ImageLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
+  ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
   if (!ImageLoader)
     Printf (CS_REPORTER_SEVERITY_WARNING,
       "No image loader. Loading images will fail.\n");
+  else
+    ImageLoader->IncRef ();
 
   // Now initialize all skin slices
   InitializeSkin ();

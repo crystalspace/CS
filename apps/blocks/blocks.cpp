@@ -111,28 +111,14 @@ void Blocks::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-#define  QUERY_PLUG_ID(myPlug, funcid, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFace); \
+#define  QUERY_REG(myPlug, iFace, errMsg) \
+  myPlug = CS_QUERY_REGISTRY (object_reg, iFace); \
   if (!myPlug) \
   { \
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
     return -1; \
-  }
-
-#define  QUERY_PLUG(myPlug, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN (plugin_mgr, iFace); \
-  if (!myPlug) \
-  { \
-    Sys->Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
-    return -1; \
-  }
-
-#define  QUERY_PLUG_NM(myPlug, funcid, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFace); \
-  if (!myPlug) \
-  { \
-    Sys->Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
-  }
+  } \
+  else myPlug->IncRef ();
 
 Blocks* Sys = NULL;
 iPluginManager* plugin_mgr = NULL;
@@ -2346,8 +2332,7 @@ void Blocks::InitEngine ()
   InitDemoRoom ();
   Sys->engine->Prepare ();
 
-  iSoundRender *snd = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_SOUND,
-  	iSoundRender);
+  iSoundRender *snd = CS_QUERY_REGISTRY (object_reg, iSoundRender);
   if (snd)
   {
     // Load the blocks.zip library where sound refs are stored
@@ -2360,8 +2345,6 @@ void Blocks::InitEngine ()
       backsound = w->GetSound ()->Play (true);
       w->DecRef ();
     }
-    
-    snd->DecRef (); 
   }
 }
 
@@ -3256,9 +3239,8 @@ int main (int argc, char* argv[])
 
   Sys->thing_type = Sys->engine->GetThingType ();
 
-  QUERY_PLUG_ID (Sys->myVFS, CS_FUNCID_VFS, iVFS, "No iVFS plugin!");
-  QUERY_PLUG_NM (Sys->myNetDrv, CS_FUNCID_NETDRV, iNetworkDriver,
-  	"No iNetworkDriver plugin!");
+  QUERY_REG (Sys->myVFS, iVFS, "No iVFS plugin!");
+  QUERY_REG (Sys->myNetDrv, iNetworkDriver, "No iNetworkDriver plugin!");
 
   // Get a font handle
   Sys->font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);

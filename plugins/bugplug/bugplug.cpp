@@ -148,15 +148,18 @@ void csBugPlug::SetupPlugin ()
 {
   if (initialized) return;
 
-  if (!Engine)
-    Engine = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_ENGINE, iEngine);
+  if (!Engine) Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!Engine)
   {
     // No engine. It is possible that we are working with the iso-engine.
   }
+  else Engine->IncRef ();
 
   if (!G3D)
-    G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
+  {
+    G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    if (G3D) G3D->IncRef ();
+  }
   if (!G3D)
   {
     initialized = true;
@@ -173,7 +176,10 @@ void csBugPlug::SetupPlugin ()
   }
 
   if (!VFS)
-    VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  {
+    VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+    if (VFS) VFS->IncRef ();
+  }
   if (!VFS)
   {
     printf ("No VFS!\n");
@@ -181,7 +187,10 @@ void csBugPlug::SetupPlugin ()
   }
 
   if (!Conout)
-    Conout = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_CONSOLE, iConsoleOutput);
+  {
+    Conout = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
+    if (Conout) Conout->IncRef ();
+  }
 
   ReadKeyBindings ("/config/bugplug.cfg");
 

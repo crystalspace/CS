@@ -135,6 +135,7 @@ bool csGraphics3DInfinite::Initialize (iObjectRegistry *r)
     NULL, iGraphics2D);
   if (!G2D)
     return false;
+  object_reg->Register (G2D);
 
   texman = new csTextureManagerInfinite (object_reg, G2D, config);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);

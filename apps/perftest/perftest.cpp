@@ -199,12 +199,13 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     exit (1);
   }
 
-  ImageLoader = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
+  ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
   if (!ImageLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No image loader plugin!");
     return false;
   }
+  ImageLoader->IncRef ();
 
   myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!myVFS)
@@ -320,10 +321,10 @@ void PerfTest::SetupFrame ()
   {
     if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-    iConsoleOutput *Console = CS_QUERY_PLUGIN_ID (plugin_mgr,
-    	CS_FUNCID_CONSOLE, iConsoleOutput);
+    iConsoleOutput *Console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
     if (Console)
     {
+      Console->IncRef ();
       Console->Clear ();
       Console->DecRef ();
     }

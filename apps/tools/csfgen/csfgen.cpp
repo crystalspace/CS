@@ -121,14 +121,13 @@ static bool Convert (const char *fontfile)
   if (opt.verbose)
     printf ("Loading font %s, size = %d\n", fontfile, opt.fontsize);
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-
-  iFontServer *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_FONTSERVER, iFontServer);
+  iFontServer *fs = CS_QUERY_REGISTRY (object_reg, iFontServer);
   if (!fs)
   {
     printf ("Font server plugin has not been loaded.\n");
     return false;
   }
+  fs->IncRef ();
 
   iFont *font = fs->LoadFont (fontfile);
   if (font == NULL)

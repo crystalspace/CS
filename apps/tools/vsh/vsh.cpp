@@ -526,13 +526,13 @@ int main (int argc, char *argv [])
   if (!csInitializer::Initialize (object_reg))
     return -1;
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
     fprintf (stderr, "Cannot load iVFS plugin\n");
     return -1;
   }
+  VFS->IncRef ();
 
   printf ("Welcome to Virtual Shell\n"
           "Type \"help\" to get a short description of commands\n"

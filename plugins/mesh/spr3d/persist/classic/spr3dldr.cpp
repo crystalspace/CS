@@ -174,7 +174,8 @@ bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -731,7 +732,8 @@ bool csSprite3DFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -895,7 +897,8 @@ bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -1006,7 +1009,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_APPLY_MOTION:
 	{
 	  csScanStr (params, "%s", str);
-	  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
+	  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS (plugin_mgr, 
 		"crystalspace.motion.manager.default", "MotionManager",
 		iMotionManager);
 	  if (!motman) 
@@ -1081,7 +1084,8 @@ bool csSprite3DSaver::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 

@@ -187,11 +187,17 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
 {
   csThingLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  synldr = CS_QUERY_PLUGIN (plugin_mgr, iSyntaxService);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
-    synldr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.syntax.loader.service.text", 
-			     CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
-  return synldr;
+  {
+    synldr = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.syntax.loader.service.text", 
+	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    object_reg->Register (synldr);
+  }
+  else
+    synldr->IncRef ();
+  return synldr != NULL;
 }
 
 class ThingLoadInfo
@@ -611,11 +617,17 @@ bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
 {
   csPlaneLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  synldr = CS_QUERY_PLUGIN (plugin_mgr, iSyntaxService);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
-    synldr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.syntax.loader.service.text", 
-			     CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
-  return synldr;
+  {
+    synldr = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.syntax.loader.service.text", 
+	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    object_reg->Register (synldr);
+  }
+  else
+    synldr->IncRef ();
+  return synldr != NULL;
 }
 
 iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,

@@ -337,7 +337,16 @@ bool csPluginLoader::LoadPlugins ()
     if (VFS && r.FuncID && strcmp (r.FuncID, CS_FUNCID_VFS) == 0)
       continue;
     iBase *plg = plugin_mgr->LoadPlugin (r.ClassID, r.FuncID, NULL, 0);
-    if (plg) plg->DecRef ();
+    if (plg)
+    {
+      // @@@ The following register to the object registry is a temporary
+      // hack. This is the right class to register the objects but we
+      // need to be more clever about the tag we register with. Currently
+      // we just register everything as default which is not very nice.
+      object_reg->Register (plg);
+
+      plg->DecRef ();
+    }
   }
 
   // flush all removed config files

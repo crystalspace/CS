@@ -26,16 +26,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "iengine/engine.h"
-#include "ivaria/reporter.h"
-#include "ivaria/stdrep.h"
-#include "ivaria/conout.h"
 #include "iutil/vfs.h"
-#include "igraphic/imageio.h"
-#include "ivideo/fontserv.h"
-#include "imap/parser.h"
 #include "iutil/plugin.h"
 #include "csutil/cseventq.h"
 #include "csutil/cmdline.h"
@@ -54,6 +45,25 @@
 #include "iutil/eventq.h"
 #include "iutil/cmdline.h"
 #include "iutil/cfgmgr.h"
+#include "isound/renderer.h"
+#include "isound/loader.h"
+#include "inetwork/driver.h"
+#include "igraphic/imageio.h"
+#include "ivideo/fontserv.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "imap/services.h"
+#include "imap/parser.h"
+#include "imesh/crossbld.h"
+#include "imesh/mdlconv.h"
+#include "iengine/motion.h"
+#include "iengine/engine.h"
+#include "ivaria/iso.h"
+#include "ivaria/conin.h"
+#include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
+#include "ivaria/conout.h"
+#include "ivaria/perfstat.h"
 
 static SysSystemDriver* global_sys = NULL;
 static bool config_done = false;
@@ -202,6 +212,7 @@ bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
   	  CS_FUNCID_VFS, iVFS);
     if (!VFS)
       return false;
+    object_reg->Register (VFS);
   }
 
   iConfigManager* Config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
@@ -271,93 +282,7 @@ bool csInitializer::RequestPlugins (iObjectRegistry* object_reg,
 bool csInitializer::Initialize (iObjectRegistry* object_reg)
 {
   if (!config_done) SetupConfigManager (object_reg, NULL);
-
-  bool rc = global_sys->Initialize ();
-  if (!rc) return false;
-
-  // Setup the object registry.
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-
-  iGraphics3D* g3d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO,
-  	iGraphics3D);
-  if (g3d)
-  {
-    object_reg->Register (g3d);
-    if (g3d->GetDriver2D ())
-      object_reg->Register (g3d->GetDriver2D ());
-    g3d->DecRef ();
-  }
-  else
-  {
-    iGraphics2D* g2d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_CANVAS,
-  	iGraphics2D);
-    if (g2d) { object_reg->Register (g2d); g2d->DecRef (); }
-  }
-
-  iEngine* engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
-  if (engine)
-  {
-    object_reg->Register (engine);
-    engine->DecRef ();
-  }
-
-  iVFS* vfs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
-  if (vfs)
-  {
-    object_reg->Register (vfs);
-    vfs->DecRef ();
-  }
-  
-  iConsoleOutput* console = CS_QUERY_PLUGIN_ID (plugin_mgr,
-  	CS_FUNCID_CONSOLE, iConsoleOutput);
-  if (console)
-  {
-    object_reg->Register (console);
-    console->DecRef ();
-  }
-
-  iLoader* loader = CS_QUERY_PLUGIN_ID (plugin_mgr,
-  	CS_FUNCID_LVLLOADER, iLoader);
-  if (loader)
-  {
-    object_reg->Register (loader);
-    loader->DecRef ();
-  }
-
-  iImageIO* imloader = CS_QUERY_PLUGIN_ID (plugin_mgr,
-  	CS_FUNCID_IMGLOADER, iImageIO);
-  if (imloader)
-  {
-    object_reg->Register (imloader);
-    imloader->DecRef ();
-  }
-
-  iFontServer* fntsvr = CS_QUERY_PLUGIN_ID (plugin_mgr,
-  	CS_FUNCID_FONTSERVER, iFontServer);
-  if (fntsvr)
-  {
-    object_reg->Register (fntsvr);
-    fntsvr->DecRef ();
-  }
-
-  iReporter* reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER,
-  	iReporter);
-  if (reporter)
-  {
-    object_reg->Register (reporter);
-    reporter->DecRef ();
-  }
-
-  iStandardReporterListener* stdrep = CS_QUERY_PLUGIN (plugin_mgr,
-  	iStandardReporterListener);
-  if (stdrep)
-  {
-    stdrep->SetDefaults ();
-    object_reg->Register (stdrep);
-    stdrep->DecRef ();
-  }
-
-  return true;
+  return global_sys->Initialize ();
 }
 
 bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,

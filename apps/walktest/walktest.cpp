@@ -1099,7 +1099,7 @@ void CaptureScreen ()
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "The 2D graphics driver does not support screen shots");
     return;
   }
-  iImageIO *imageio = CS_QUERY_PLUGIN (Sys->plugin_mgr, iImageIO);
+  iImageIO *imageio = CS_QUERY_REGISTRY (Sys->object_reg, iImageIO);
   if (imageio)
   {
     iDataBuffer *db = imageio->Save (img, "image/png");
@@ -1111,7 +1111,6 @@ void CaptureScreen ()
 		"There was an error while writing screen shot");
       db->DecRef ();
     }
-    imageio->DecRef ();
   }
   img->DecRef ();
 }
@@ -1356,8 +1355,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
   if (myConsole) 
     myConsole->IncRef ();
-  mySound = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_SOUND, iSoundRender);
-  myMotionMan = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_MOTION, iMotionManager);
+  mySound = CS_QUERY_REGISTRY (object_reg, iSoundRender);
+  if (mySound) mySound->IncRef ();
+  myMotionMan = CS_QUERY_REGISTRY (object_reg, iMotionManager);
+  if (myMotionMan) myMotionMan->IncRef ();
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space version %s (%s).", CS_VERSION, CS_RELEASE_DATE);
@@ -1413,12 +1414,13 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetVerbose (true);
 
   // Find the engine plugin and query the csEngine object from it...
-  Engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
+  Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!Engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     return false;
   }
+  Engine->IncRef ();
 
   // Find the level loader plugin
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
@@ -1430,28 +1432,32 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   LevelLoader->IncRef ();
 
   // Find the model converter plugin
-  ModelConverter = CS_QUERY_PLUGIN (plugin_mgr, iModelConverter);
+  ModelConverter = CS_QUERY_REGISTRY (object_reg, iModelConverter);
   if (!ModelConverter)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No model converter plugin!");
     return false;
   }
+  ModelConverter->IncRef ();
 
   // Find the model crossbuilder plugin
-  CrossBuilder = CS_QUERY_PLUGIN (plugin_mgr, iCrossBuilder);
+  CrossBuilder = CS_QUERY_REGISTRY (object_reg, iCrossBuilder);
   if (!CrossBuilder)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No model crossbuilder plugin!");
     return false;
   }
+  CrossBuilder->IncRef ();
 
   // performance statistics module, also takes care of fps
-  perf_stats = CS_QUERY_PLUGIN (plugin_mgr, iPerfStats);
+  perf_stats = CS_QUERY_REGISTRY (object_reg, iPerfStats);
   if (!perf_stats)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
     	"No iPerfStats plugin: you will have no performance statistics!");
   }
+  else
+    perf_stats->IncRef ();
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -1646,9 +1652,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   {
     myConsole->SetVisible (false);
     myConsole->AutoUpdate (false);
-    ConsoleInput = CS_QUERY_PLUGIN (plugin_mgr, iConsoleInput);
+    ConsoleInput = CS_QUERY_REGISTRY (object_reg, iConsoleInput);
     if (ConsoleInput)
     {
+      ConsoleInput->IncRef ();
       ConsoleInput->Bind (myConsole);
       ConsoleInput->SetPrompt ("cs# ");
       csCommandProcessor::PerformCallback* cb =

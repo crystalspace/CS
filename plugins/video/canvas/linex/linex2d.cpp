@@ -100,12 +100,10 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
   screen_num = xwin->GetScreen ();
 
   // Do a trick: unload the system font server since its useless for us
-  iComponent *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_FONTSERVER,
-  	iComponent);
+  iComponent *fs = (iFontServer*)(CS_QUERY_REGISTRY (object_reg, iFontServer));
   if (fs)
   {
     plugin_mgr->UnloadPlugin (fs);
-    fs->DecRef ();
   }
   // Also DecRef the FontServer since csGraphics2D::Initialize IncRef'ed it
   if (FontServer)

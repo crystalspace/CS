@@ -103,9 +103,9 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
 {
   csSimpleConsole::object_reg = object_reg;
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
+  G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!G3D) return false;
+  G3D->IncRef ();
   G2D = G3D->GetDriver2D ();
 
   FrameWidth = G2D->GetWidth ();

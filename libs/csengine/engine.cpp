@@ -627,16 +627,18 @@ bool csEngine::Initialize (iObjectRegistry* object_reg)
   csEngine::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-  if (!(G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D)))
+  if (!(G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D)))
   {
     // If there is no G3D then we still allow initialization of the
     // engine because it might be useful to use the engine stand-alone
     // (i.e. for calculating lighting and so on).
     Warn ("No 3D driver!");
   }
+  else G3D->IncRef ();
 
-  if (!(VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS)))
+  if (!(VFS = CS_QUERY_REGISTRY (object_reg, iVFS)))
     return false;
+  VFS->IncRef ();
 
   if (G3D)
     G2D = G3D->GetDriver2D ();
@@ -644,15 +646,18 @@ bool csEngine::Initialize (iObjectRegistry* object_reg)
     G2D = NULL;
 
   // don't check for failure; the engine can work without the image loader
-  ImageLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
+  ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
   if (!ImageLoader)
     Warn ("No image loader. Loading images will fail.");
+  else
+    ImageLoader->IncRef ();
 
   // Reporter is optional.
-  Reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
+  Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (Reporter) Reporter->IncRef ();
 
   // Tell event queue that we want to handle broadcast events
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q != 0)
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
   
@@ -1918,7 +1923,8 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
 
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, classId, "MeshObj",
   	iMeshObjectType);
-  if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, "MeshObj", iMeshObjectType);
+  if (!type)
+    type = CS_LOAD_PLUGIN (plugin_mgr, classId, "MeshObj", iMeshObjectType);
   if (!type) return NULL;
   iMeshObjectFactory* fact = type->NewFactory ();
   if (!fact) return NULL;

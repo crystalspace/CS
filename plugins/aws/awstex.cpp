@@ -57,39 +57,28 @@ awsTextureManager::Initialize(iObjectRegistry* obj_reg)
   if (!obj_reg) printf("aws-debug:  bad obj_reg (%s)\n", __FILE__);
   if (!object_reg) printf("aws-debug:  bad object_reg (%s)\n", __FILE__);
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-
-  if (!plugin_mgr)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.awsprefs",
-        	"could not load the plugin manager. This is a fatal error.");
-
-    return;
-  }
+  loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
+  vfs    = CS_QUERY_REGISTRY (object_reg, iVFS);
   
-  loader = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
-  vfs    = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_VFS, iVFS);
-  
-  //loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
-
   if (!loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.awsprefs",
       	"could not load the image loader plugin. This is a fatal error.");
   }
+  loader->IncRef ();
 
   if (!vfs)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.awsprefs",
       	"could not load the VFS plugin. This is a fatal error.");
-
-    if(!vfs->Mount("/aws", "./data/awsdef.zip"))
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.awsprefs",
-        	"could not mount the default aws skin (awsdef.zip)aws.");
-    }
   }
-  
+  vfs->IncRef ();
+
+  if (!vfs->Mount("/aws", "./data/awsdef.zip"))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.awsprefs",
+      	"could not mount the default aws skin (awsdef.zip)aws.");
+  }
 }
 
 iTextureHandle * 

@@ -146,7 +146,8 @@ bool csBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csBallFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -190,7 +191,8 @@ bool csBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csBallFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -222,12 +224,19 @@ bool csBallLoader::Initialize (iObjectRegistry* object_reg)
 {
   csBallLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
-  synldr = CS_QUERY_PLUGIN (plugin_mgr, iSyntaxService);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
-    synldr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.syntax.loader.service.text", 
-			     CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
-  return synldr;
+  {
+    synldr = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.syntax.loader.service.text", 
+	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    object_reg->Register (synldr);
+  }
+  else
+    synldr->IncRef ();
+  return synldr != NULL;
 }
 
 iBase* csBallLoader::Parse (const char* string, iEngine* engine,
@@ -399,12 +408,19 @@ bool csBallSaver::Initialize (iObjectRegistry* object_reg)
 {
   csBallSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
-  synldr = CS_QUERY_PLUGIN (plugin_mgr, iSyntaxService);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
-    synldr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.syntax.loader.service.text", 
-			     CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
-  return synldr;
+  {
+    synldr = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.syntax.loader.service.text", 
+	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    object_reg->Register (synldr);
+  }
+  else
+    synldr->IncRef ();
+  return synldr != NULL;
 }
 
 void csBallSaver::WriteDown (iBase* obj, iStrVector *str,

@@ -86,22 +86,6 @@ void Demo::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-#define  QUERY_PLUG(myPlug, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN (plugin_mgr, iFace); \
-  if (!myPlug) \
-  { \
-    Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
-    return -1; \
-  }
-
-#define  QUERY_PLUG_ID(myPlug, funcid, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFace); \
-  if (!myPlug) \
-  { \
-    Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
-    return -1; \
-  }
-
 Demo::Demo ()
 {
   engine = NULL;

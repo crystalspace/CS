@@ -875,7 +875,7 @@ int main (int argc, char *argv[])
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
-  System.myG2D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics2D);
+  System.myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   // Now load the canvas plugin
   if (!System.myG2D)
   {
@@ -889,8 +889,11 @@ int main (int argc, char *argv[])
       strcat (tmp, canvas);
       canvas = tmp;
     }
-    System.myG2D = CS_LOAD_PLUGIN (plugin_mgr, canvas, CS_FUNCID_CANVAS, iGraphics2D);
+    System.myG2D = CS_LOAD_PLUGIN (plugin_mgr,
+    	canvas, CS_FUNCID_CANVAS, iGraphics2D);
+    object_reg->Register (System.myG2D);
   }
+  else System.myG2D->IncRef ();
 
   if (!System.myG2D)
   {

@@ -354,12 +354,11 @@ iMeshWrapper *wallmesh = engine->CreateSectorWallsMesh (room, "walls");
 
   if (pVideoFormat)
   {
-    iVFS *pVFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
+    iVFS *pVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
     if (pVFS)
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Opening the video file.");
       iFile *pFile = pVFS->Open ("/this/data/video.avi", VFS_FILE_READ);
-      pVFS->DecRef ();
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Scanning the video file.");
       if (pFile && pVideoFormat->Load (pFile))
       {

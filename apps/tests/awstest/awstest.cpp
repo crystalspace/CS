@@ -72,22 +72,14 @@
 
 //-----------------------------------------------------------------------------
 
-#define  QUERY_PLUG(myPlug, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN (plugin_mgr, iFace); \
+#define  QUERY_REG(myPlug, iFace, errMsg) \
+  myPlug = CS_QUERY_REGISTRY (object_reg, iFace); \
   if (!myPlug) \
   { \
     Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
     return false; \
-  }
-
-#define  QUERY_PLUG_ID(myPlug, funcid, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFace); \
-  if (!myPlug) \
-  { \
-    Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
-    return false; \
-  }
-
+  } \
+  else myPlug->IncRef ();
 
 extern awsTest *System;
 
@@ -206,18 +198,19 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   // Load the engine plugin.
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading engine...\n");
-  engine = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.engine.3d", CS_FUNCID_ENGINE, iEngine);
-      
+  engine = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.engine.3d",
+  	CS_FUNCID_ENGINE, iEngine);
   if (!engine)
   {
     Report(CS_REPORTER_SEVERITY_ERROR, "Could not load the engine plugin!\n");
     return false;
   }
+  object_reg->Register (engine);
     
-  QUERY_PLUG_ID(myG3D, CS_FUNCID_VIDEO, iGraphics3D, "Couldn't load iGraphics3D plugin !\n");
-  QUERY_PLUG(myG2D, iGraphics2D, "Couldn't load  iGraphics2D plugin !\n");
-  QUERY_PLUG_ID(myVFS, CS_FUNCID_VFS, iVFS, "Couldn't load  iVFS plugin !\n");
-  QUERY_PLUG_ID(myConsole, CS_FUNCID_CONSOLE, iConsoleOutput, "Couldn't load iConsoleOutput plugin !\n");
+  QUERY_REG (myG3D, iGraphics3D, "Couldn't load iGraphics3D plugin !\n");
+  QUERY_REG (myG2D, iGraphics2D, "Couldn't load  iGraphics2D plugin !\n");
+  QUERY_REG (myVFS, iVFS, "Couldn't load  iVFS plugin !\n");
+  QUERY_REG (myConsole, iConsoleOutput, "Couldn't load iConsoleOutput plugin !\n");
   
   // Load AWS
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading AWS...\n");
@@ -236,6 +229,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!\n");
     return false;
   }
+  object_reg->Register (loader);
  
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();

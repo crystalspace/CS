@@ -1769,36 +1769,38 @@ csLoader::~csLoader()
   delete Stats;
 }
 
-#define GET_PLUGIN(var, func, intf, msgname)	\
-  var = CS_QUERY_PLUGIN_ID(plugin_mgr, func, intf);
+#define GET_PLUGIN(var, intf, msgname)	\
+  var = CS_QUERY_REGISTRY(object_reg, intf); \
+  if (var) var->IncRef ();
 
 bool csLoader::Initialize(iObjectRegistry *object_Reg)
 {
   csLoader::object_reg = object_Reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-  GET_PLUGIN (Reporter, CS_FUNCID_REPORTER, iReporter, "reporter");
+  GET_PLUGIN (Reporter, iReporter, "reporter");
 
   ReportNotify("Initializing loader plug-in ");
   loaded_plugins.plugin_mgr = plugin_mgr;
 
   // get the virtual file system plugin
-  VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
     ReportNotify (
       "Failed to initialize the loader: No VFS plugin.");
     return false;
   }
+  VFS->IncRef ();
 
   // get all optional plugins
-  GET_PLUGIN (ImageLoader, CS_FUNCID_IMGLOADER, iImageIO, "image-loader");
-  GET_PLUGIN (SoundLoader, CS_FUNCID_SNDLOADER, iSoundLoader, "sound-loader");
-  GET_PLUGIN (Engine, CS_FUNCID_ENGINE, iEngine, "engine");
-  GET_PLUGIN (G3D, CS_FUNCID_VIDEO, iGraphics3D, "video-driver");
-  GET_PLUGIN (SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound-driver");
-  GET_PLUGIN (ModelConverter, CS_FUNCID_CONVERTER, iModelConverter, "model-converter");
-  GET_PLUGIN (CrossBuilder, CS_FUNCID_CROSSBUILDER, iCrossBuilder, "model-crossbuilder");
+  GET_PLUGIN (ImageLoader, iImageIO, "image-loader");
+  GET_PLUGIN (SoundLoader, iSoundLoader, "sound-loader");
+  GET_PLUGIN (Engine, iEngine, "engine");
+  GET_PLUGIN (G3D, iGraphics3D, "video-driver");
+  GET_PLUGIN (SoundRender, iSoundRender, "sound-driver");
+  GET_PLUGIN (ModelConverter, iModelConverter, "model-converter");
+  GET_PLUGIN (CrossBuilder, iCrossBuilder, "model-crossbuilder");
 
   return true;
 }

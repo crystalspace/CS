@@ -48,7 +48,7 @@ csConfigAccess::~csConfigAccess()
   }
 }
 
-void csConfigAccess::AddConfig(iObjectRegistry *object_reg, const char *fname,
+void csConfigAccess::AddConfig (iObjectRegistry *object_reg, const char *fname,
   bool vfs, int priority)
 {
   csConfigAccess::object_reg = object_reg;
@@ -56,17 +56,10 @@ void csConfigAccess::AddConfig(iObjectRegistry *object_reg, const char *fname,
   iVFS* VFS = NULL;
   if (vfs)
   {
-    // @@@ We cannot use CS_QUERY_REGISTRY here to get the pointer
-    // to iVFS since this function is called very early even before
-    // VFS is added to the object registry. In the future we have
-    // to see if we cannot avoid this.
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (
-	object_reg, iPluginManager);
-    VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+    VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
     //CS_ASSERT (VFS != NULL);
   }
-  ConfigFiles.Push(cfgmgr->AddDomain (fname, VFS, priority));
-  if (VFS) VFS->DecRef ();
+  ConfigFiles.Push (cfgmgr->AddDomain (fname, VFS, priority));
 }
 
 iConfigFile *csConfigAccess::operator->()

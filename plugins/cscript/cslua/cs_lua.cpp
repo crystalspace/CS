@@ -4368,9 +4368,7 @@ static void *SwigiObjectRegistryToiBase(void *ptr) {
 }
 
 static iEngine * iObjectRegistry_Query_iEngine(iObjectRegistry *self) {
-      iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (self,
-      	iPluginManager);
-      return CS_QUERY_PLUGIN(plugin_mgr, iEngine);
+      return CS_QUERY_REGISTRY(self, iEngine);
     }
 static int
 wrap_iObjectRegistry_Query_iEngine(lua_State *L)
@@ -4386,9 +4384,7 @@ wrap_iObjectRegistry_Query_iEngine(lua_State *L)
 }
 
 static iGraphics3D * iObjectRegistry_Query_iGraphics3D(iObjectRegistry *self) {
-      iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (self,
-      	iPluginManager);
-      return CS_QUERY_PLUGIN(plugin_mgr, iGraphics3D);
+      return CS_QUERY_REGISTRY(self, iGraphics3D);
     }
 static int
 wrap_iObjectRegistry_Query_iGraphics3D(lua_State *L)

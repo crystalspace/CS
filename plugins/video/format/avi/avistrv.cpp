@@ -81,11 +81,12 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 
   nStream = nStreamNumber;
   csAVIStreamVideo::object_reg = object_reg;
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   if (pG3D) pG3D->DecRef ();
-  pG3D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics3D);
+  pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (pG3D) pG3D->IncRef ();
   if (pG2D) pG2D->DecRef ();
-  pG2D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics2D);
+  pG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  if (pG2D) pG2D->IncRef ();
 
   pIA->w = 0;
   pIA->h = 0;

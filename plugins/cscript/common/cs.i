@@ -425,15 +425,11 @@ public:
   {
     iEngine* Query_iEngine()
     {
-      iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (self,
-      	iPluginManager);
-      return CS_QUERY_PLUGIN(plugin_mgr, iEngine);
+      return CS_QUERY_REGISTRY (self, iEngine);
     }
     iGraphics3D* Query_iGraphics3D()
     {
-      iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (self,
-      	iPluginManager);
-      return CS_QUERY_PLUGIN(plugin_mgr, iGraphics3D);
+      return CS_QUERY_REGISTRY (self, iGraphics3D);
     }
     void Print(int mode, const char* format) {
       printf (format); 

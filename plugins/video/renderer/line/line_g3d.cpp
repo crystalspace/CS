@@ -138,6 +138,7 @@ bool csGraphics3DLine::Initialize (iObjectRegistry *r)
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;
+  object_reg->Register (G2D);
 
   texman = new csTextureManagerLine (object_reg, G2D, config);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);

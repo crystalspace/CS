@@ -271,6 +271,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;
+  object_reg->Register (G2D);
 
   txtmgr = new csTextureManagerOpenGL (object_reg, G2D, config, this);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);

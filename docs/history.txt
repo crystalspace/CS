@@ -1,5 +1,45 @@
 The history order is reversed so that new features are at the top.
 
+12-Oct-2001
+	- Fixed a bug in AWS where it would try to load something
+	  from VFS ONLY if VFS could NOT be loaded. I think it should
+	  be the opposite rather :-)
+	- Avoided nearly all usage of CS_QUERY_PLUGIN and CS_QUERY_PLUGIN_ID
+	  in CS. The reason CS_QUERY_PLUGIN is bad is that it queries the
+	  plugin manager based on interface but there is no way to control
+	  which plugin it will return if there happen to be more plugins
+	  that implement the same interface. The reason CS_QUERY_PLUGIN_ID is
+	  bad is that we want to remove the FUNCID's that are now used in
+	  the plugin manager. The object registry is designed to replace
+	  the need for FUNCID's.
+	  Most CS_QUERY_PLUGIN and CS_QUERY_PLUGIN_ID calls have been replaced
+	  with CS_QUERY_REGISTRY. Keep in mind that CS_QUERY_PLUGIN increases
+	  the reference count of the returned plugin while CS_QUERY_REGISTRY
+	  doesn't! So take care of those IncRef()/DecRef() calls.
+	  Note that at this moment CS_QUERY_PLUGIN and CS_QUERY_PLUGIN_ID
+	  cannot yet be removed because it is still needed in some specific
+	  cases and also to initialize the object registry itself. However,
+	  this is due to change soon when csPluginLoader will become
+	  responsible for registring loaded plugins with the right tag to
+	  the object registry.
+	- Modified csPluginLoader so it registers all loaded plugins with
+	  the object registry. Note that all plugins will be registered
+	  with the NULL tag which is not good but a temporary solution until
+	  we have a more clever way to find out which tag to use from within
+	  csPluginLoader. This means that all plugins loaded by
+	  csInitializer::RequestPlugins() will be registered (as it uses
+	  csPluginLoader).
+	  Note! If you manually load plugins using CS_LOAD_PLUGIN after
+	  csInitializer::RequestPlugins() then these will not automatically be
+	  registered. If you want to do that (which can be important for
+	  some of the standard plugins like iGraphics3D, iConsoleOutput, ...)
+	  then you must register them manually.
+	- Philip Wyett did the following:
+	    - Added 'WIN32_LEAN_AND_MEAN' to remove rarely used Windows
+	      stuff. This works for all Windows compilers.
+	    - Replaced defines for PI, M_PI, and M_PI_2 with static const
+	      floats to increase efficiency. For castle this gives an
+	      improvement of 14 -> 19 FPS which is nothing to sneer at!
 11-Oct-2001
 	- Moved the plugin manager implementation out of the system driver
 	  into csPluginManager (in csutil/plugmgr.h). Modified
@@ -36,6 +76,67 @@ The history order is reversed so that new features are at the top.
 	  more obfuscated and convoluted than originally suspected.
 	- Eric Sunshine fixed the bizarre declaration of csInvalidStringID
 	  in strset.h which was pointed out by Heiko Jakob <buffalo@the7lg.de>.
+	- Christopher Nelson did the following:
+	    - Made a few minor corrections to awstest.
+	    - Made the control images look better.
+	    - Took the csPoint object out of cslayout.h in CSWS and moved it
+	      into this file, since it is useful and I don't need all the
+	      cslayout stuff.
+	    - Added a copy constructor and Set function for csPoint objects
+	      to csPoint.
+	    - Added the ability to get Points in skin definitions.
+	    - Added the ability to get Int's in skin definitions.
+	    - Added new awsPointKey key.
+	    - Fixed redraw bug in windows which caused children to disappear.
+	    - Added new functionality to awsWindow which lets you specify
+	      exactly where the controls go on the window's face, relative to
+	      the top, right frame point.
+	    - Added functionality for buttons, which lets you set the alpha
+	      level of the global texture for buttons. This causes buttons to
+	      have a more "liquid" appearance when used with textures.
+	      This does nothing for textureless skin definitions.
+	    - Added LookupPointKey to AwsPrefs def.
+	    - Modified the interface to AwsPrefs to add LookupPointKey support.
+	    - Made some more changes to allow rects in the skin definition.
+	    - Added more window functionality: you can now the rectangle where
+	      window controls will appear on a window. Remember that these are
+	      relative to the top, right corner. Currently awsWindows don't
+	      check for vaild control rects, so if you mess up you'll only
+	      know it when you see that the rects are not where you thought.
+	      Look at awstest.def for an example.
+	    - Added 3d-ish buttons for the controls. These are drawn around
+	      the rects, and behave exactly as you expect. Realize, though,
+	      that they currently do nothing other than look pretty.
+	    - Modified default images so that they work with the skin
+	      definition properly.  
+	    - Modified skin def to put the images in the right place. Note
+	      that if you don't like the way windows look you can change a
+	      number of things about them already, including their colors and
+	      where and how big controls are, and what they look like.
+	    - Modified event handler to use depth-first traversal so that
+	      embedded children get a chance to see the message before their
+	      parents. While this may make the critical path for event
+	      handling longer, it's the only realistic way i can see for proper
+	      functioning of nested components, and especially embedded nested
+	      components.
+	    - Fixed a bug in resizing that would make the controls disappear.
+	    - Fixed a bug in event handling that kept MouseEnter and MouseExit
+	      from happening.
+	    - Added a mouse focused event to awsCmdButton to illustrate how
+	      this works. When the mouse is over a button, it now draws a
+	      dotted-boxed line around the text.
+	    - Totally revamped the signal/slot system so that it can work like
+	      the document I sent out says. There were a few changes needed. I
+	      also tore out uses of the unholy csDlinkList. please note that
+	      the parser does not yet support this architecture. I also have
+	      to finish making the iAwsSinkManager into a plugin, which is not
+	      yet done.  
+	    - Fixed references here and there and fixed the test def file a
+	      litte bit.
+	- Jorge Acereda fixes a bug in Blocks:
+	  Pressing cursor up/down keys while loading crashed the application
+	  due to a divide by zero error. This fix ignores events at screen
+	  initialization time.
 10-Oct-2001
 	- Slight optimization in csSector::IntersectSegment() where it
 	  would transform back the intersection point even if there
@@ -67,6 +168,49 @@ The history order is reversed so that new features are at the top.
 	  from most of CS.
 	- Slightly updated the simple.txi tutorial. Work in progress though.
 	- Philip Wyett did a few fixes that Jorrit forgot to do.
+	- Christopher Nelson did the following:
+	    - Fixed an irritating bug that caused nested controls to not be
+	      able to get their settings by implementing a recursive storage
+	      system based on a novel idea called mid-rule parsing actions.
+	      I was previously unaware of their existence.  
+	    - Fixed a forever recursion bug in the child draw loop.
+	      csDLinkList is evil, methinks, since it is a circular list.  
+	    - Miscellaneous minor bug fixes here and there.
+	    - Also fixed draw bug in awsCmdButton so that it draws the right
+	      side of the button properly.
+	    - Apparently introduced another forever recursion bug somewhere,
+	      but I think I know where that is.  
+	    - Improved the look of awsCmdButtons.
+	    - Cleaned up some debugging output.
+	    - Fixed bug where children of windows wouldn't move with them
+	      properly.
+	    - Added functionality to button so that it now does text and gets
+	      the frame and alpha types from the definition. Buttons don't
+	      look half-bad, actually.
+	    - Fixed small bug related to centering of text.
+	    - Fixed a bug related to the awsTexture manager. It seems that
+	      textures must ALWAYS be registered with the CS_TEXTURE3D flag in
+	      order to work. Therefore, I fixed that problem, and also fixed a
+	      couple of other stupid bugs (like not calling Prepare...)
+	    - Added images to window to see how they look. Still need to
+	      surround them with buttons. Also need to fix windows getting
+	      messages ahead of children. That will break things in the
+	      future. Also need to add user interface for adding keys into a
+	      specific level for run-time component controls.
+	    - Fixed another dumb bug by getting rid of DLinkList entirely.
+	      Components now rely on csBasicVector. Repeat after me:
+	      csDLinkList is evil, csDLinkList is the antichrist.
+	    - Took out some more debugging stuff. unfortunately, I have some
+	      odd debugging something somewhere, so there are transparent
+	      lines through windows when they get fragmented.  
+	    - Implemented full draw functionality for buttons. Well, almost
+	      full. Haven't implemented the icon drawing function, but
+	      textures are now active.
+	    - Added some more functionality for windows, so they now get
+	      their options from the definition.
+	    - Made some changes in the definition file and the default
+	      textures file. Made them a little bit different.
+	- Martin Geisse removed ptlab since it is no longer needed.
 9-Oct-2001
 	- Removed iSystem::GetObjectRegistry().
 	- The object registry is now a parameter to the system driver and

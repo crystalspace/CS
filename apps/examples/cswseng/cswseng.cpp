@@ -364,23 +364,26 @@ bool ceCswsEngineApp::Initialize ()
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.cswseng", "No iEngine plugin!");
     abort ();
   }
+  engine->IncRef ();
 
-  LevelLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.cswseng", "No iLoader plugin!");
     abort ();
   }
+  LevelLoader->IncRef ();
   
-  pG3D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics3D);
+  pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  pG3D->IncRef ();
   // Disable double buffering since it kills performance
   pG3D->GetDriver2D ()->DoubleBuffer (false);
   iTextureManager* txtmgr = pG3D->GetTextureManager ();
@@ -403,7 +406,8 @@ bool ceCswsEngineApp::Initialize ()
   // Change to other directory before doing Prepare()
   // because otherwise precalc_info file will be written into MazeD.zip
   // The /tmp dir is fine for this.
-  VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  VFS->IncRef ();
   VFS->ChDir ("/tmp");
 
   // Now prepare the engine
@@ -411,10 +415,11 @@ bool ceCswsEngineApp::Initialize ()
 
   txtmgr->SetPalette ();
 
-  Console = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_CONSOLE, iConsoleOutput);
+  Console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
   if (Console)
   {
     // Tell the console to shut up so that Printf() won't clobber CSWS
+    Console->IncRef ();
     Console->SetVisible (false);
     Console->AutoUpdate (false);
   }

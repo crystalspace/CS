@@ -105,22 +105,24 @@ csFancyConsole::~csFancyConsole ()
 bool csFancyConsole::Initialize (iObjectRegistry *object_reg) 
 {
   csFancyConsole::object_reg = object_reg;
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-  VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
     return false;
+  VFS->IncRef ();
 
   csConfigAccess ini(object_reg, "/config/fancycon.cfg");
   char const* baseclass = ini->GetStr("FancyConsole.General.Superclass",
     "crystalspace.console.output.standard");
-  base = CS_LOAD_PLUGIN(plugin_mgr, baseclass, 0, iConsoleOutput);
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  base = CS_LOAD_PLUGIN (plugin_mgr, baseclass, 0, iConsoleOutput);
   if (!base)
     return false;
 
-  G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
+  G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!G3D)
     return false;
+  G3D->IncRef ();
   G2D = G3D->GetDriver2D ();
   G2D->IncRef ();
 
@@ -149,10 +151,8 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
           system_ready = true;
 	  if (!pix_loaded)
 	  {
-	    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-	    	iPluginManager);
-            ImageLoader = CS_QUERY_PLUGIN_ID (plugin_mgr,
-	    	CS_FUNCID_IMGLOADER, iImageIO);
+            ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
+	    if (ImageLoader) ImageLoader->IncRef ();
 	    LoadPix ();
 	    pix_loaded = true;
 	  }

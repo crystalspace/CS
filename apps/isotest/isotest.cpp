@@ -198,12 +198,13 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (plugin_mgr, iIsoEngine);
+  engine = CS_QUERY_REGISTRY (object_reg, iIsoEngine);
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No IsoEngine plugin!");
     return false;
   }
+  engine->IncRef ();
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
@@ -247,9 +248,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     exit (1);
   }
 
-  iFontServer *fsvr = CS_QUERY_PLUGIN(plugin_mgr, iFontServer);
+  iFontServer *fsvr = CS_QUERY_REGISTRY (object_reg, iFontServer);
   font = fsvr->LoadFont(CSFONT_LARGE);
-  fsvr->DecRef();
 
   // Setup the texture manager
   iTextureManager* txtmgr = myG3D->GetTextureManager ();

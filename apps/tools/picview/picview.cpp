@@ -145,8 +145,10 @@ bool PicViewApp::Initialize ()
     	"crystalspace.application.picview", "No image loader plugin!");
     abort ();
   }
+  object_reg->Register (image_loader);
   
-  pG3D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics3D);
+  pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  pG3D->IncRef ();
   // Disable double buffering since it kills performance
   pG3D->GetDriver2D ()->DoubleBuffer (false);
   iTextureManager* txtmgr = pG3D->GetTextureManager ();
@@ -158,7 +160,8 @@ bool PicViewApp::Initialize ()
   // Change to other directory before doing Prepare()
   // because otherwise precalc_info file will be written into MazeD.zip
   // The /tmp dir is fine for this.
-  VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  VFS->IncRef ();
   VFS->ChDir ("/tmp");
   files = VFS->FindFiles ("/this/*");
   cur_idx = 0;

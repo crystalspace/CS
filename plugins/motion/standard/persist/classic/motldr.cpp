@@ -106,12 +106,13 @@ bool csMotionLoader::Initialize (iObjectRegistry* object_reg)
 {
   csMotionLoader::object_reg=object_reg;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  vfs = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_VFS, iVFS );
+  vfs = CS_QUERY_REGISTRY (object_reg, iVFS );
   if (!vfs)
   {
 	printf("Motion Loader: Virtual file system not loaded.. aborting\n");
 	return false;
   }
+  vfs->IncRef ();
   motman = CS_QUERY_PLUGIN_CLASS(plugin_mgr, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
   if (!motman)
   {

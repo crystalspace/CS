@@ -315,14 +315,13 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
         {
 	  float hscale, hshift;
 	  csScanStr (pParams, "%s,%f,%f\n", pStr, &hscale, &hshift);
-	  iVFS* vfs = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
+	  iVFS* vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 	  if (!vfs)
 	  {
 	    printf ("No VFS!\n");
 	    exit (0);
 	  }
-	  iImageIO* loader = CS_QUERY_PLUGIN_ID (plugin_mgr,
-	  	CS_FUNCID_IMGLOADER, iImageIO);
+	  iImageIO* loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
 	  if (!loader)
 	  {
 	    printf ("No image loader!\n");
@@ -345,8 +344,6 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	  iTerrainState->SetHeightMap (ifile, hscale, hshift);
 	  ifile->DecRef ();
 	  buf->DecRef ();
-	  loader->DecRef ();
-	  vfs->DecRef ();
 	}
 	break;
     }

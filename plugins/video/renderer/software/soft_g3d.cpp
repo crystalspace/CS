@@ -79,6 +79,7 @@ bool csGraphics3DSoftware::Initialize (iObjectRegistry *object_reg)
   if (!driver)
     driver = config->GetStr ("Video.Software.Canvas", CS_SOFTWARE_2D_DRIVER);
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, NULL, iGraphics2D);
+  if (G2D) object_reg->Register (G2D);
   return G2D ? true : false;
 }
 

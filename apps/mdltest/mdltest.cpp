@@ -401,19 +401,21 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
   kbd->IncRef();
 
-  crossbuilder = CS_QUERY_PLUGIN_ID (plugin_mgr, "CrossBuilder", iCrossBuilder);
+  crossbuilder = CS_QUERY_REGISTRY (object_reg, iCrossBuilder);
   if (!crossbuilder)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iCrossBuilder plugin!");
     abort ();
   }
+  crossbuilder->IncRef ();
 
-  converter = CS_QUERY_PLUGIN_ID (plugin_mgr, "Converter", iModelConverter);
+  converter = CS_QUERY_REGISTRY (object_reg, iModelConverter);
   if (!converter)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iModelConverter plugin!");
     abort ();
   }
+  converter->IncRef ();
 
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!vfs)
@@ -423,12 +425,13 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
   vfs->IncRef ();
 
-  iImageIO *imageio = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
+  iImageIO *imageio = CS_QUERY_REGISTRY (object_reg, iImageIO);
   if (!imageio)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iModelConverter plugin!\n");
     abort ();
   }
+  imageio->IncRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))

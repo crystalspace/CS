@@ -99,14 +99,19 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
 
   // Get the font server: A missing font server is NOT an error
   if (!FontServer)
-    FontServer = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_FONTSERVER,
-    	iFontServer);
+  {
+    FontServer = CS_QUERY_REGISTRY (object_reg, iFontServer);
+    if (FontServer) FontServer->IncRef ();
+  }
 #ifdef CS_DEBUG
   if (!FontServer)
+  {
     printf (
       "WARNING: Canvas driver couldn't find a font server plugin!\n"
       "This is normal if you don't want one (warning displays only in "
       "debug mode)\n");
+    fflush (stdout);
+  }
 #endif
 
   Palette = new csRGBpixel [256];

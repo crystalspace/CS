@@ -151,9 +151,8 @@ void csDefaultFontServer::NotifyDelete (csDefaultFont *font)
 
 csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
 {
-  iVFS *VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
+  iVFS *VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   iDataBuffer *fntfile = VFS->ReadFile (file);
-  VFS->DecRef ();
   if (!fntfile)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

@@ -563,14 +563,13 @@ int main (int argc, char *argv[])
   if (optind >= argc)
     return display_help ();
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-
-  ImageLoader = CS_QUERY_PLUGIN (plugin_mgr, iImageIO);
+  ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
   if (!ImageLoader)
   {
     printf("could not load image loader");
     return -1;
   }
+  ImageLoader->IncRef ();
   ImageLoader->SetDithering (opt.dither);
 
   for (; optind < argc; ++optind)
