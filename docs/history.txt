@@ -11,6 +11,10 @@ chronological order.
 	- Eric Sunshine performed another round of size_t-related cleanups.
 	- Eric Sunshine converted csObjectModelManager in dynavis to use
 	  csHash<> rather than the deprecated csHashMap.
+	- Eric Sunshine fixed bug in awsGridBagLayout where it leaked every
+	  awsGridBagConstraints object which it allocated.
+	- Eric Sunshine converted awsGridBagLayout to use csHash<> rather than
+	  the deprecated csHashMap.
 29-Mar-2005
 	- Jorrit disabled the new `clearWithBox' rule in gldrivers.xml
 	  because it breaks screen clearing on his nVidia card. If this is

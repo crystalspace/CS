@@ -19,6 +19,8 @@
 #ifndef __CS_AWS_GBC_H__
 #define __CS_AWS_GBC_H__
 
+#include "csgeom/csrect.h"
+
 struct awsGridBagConstraints
 {
   enum
@@ -305,7 +307,14 @@ struct awsGridBagConstraints
     int ipadx,
     int ipady);
 
-  awsGridBagConstraints *Clone ();
+  /// Copy constructor.
+  awsGridBagConstraints(awsGridBagConstraints const&);
+
+  /// Assignment operator.
+  awsGridBagConstraints& operator=(awsGridBagConstraints const&);
+
+  /// Assign the values of a different constraint object to this one.
+  void Assign(awsGridBagConstraints const&);
 };
 
 #endif // __CS_AWS_GBC_H__

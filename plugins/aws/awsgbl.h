@@ -22,7 +22,7 @@
 #include "iaws/aws.h"
 #include "awslayot.h"
 #include "awsgbc.h"
-#include "csutil/hashmap.h"
+#include "csutil/hash.h"
 #include "awscomp.h"
 
 /**
@@ -84,11 +84,11 @@ private:
   };
 
   /**
-   * This hashtable maintains the association between a component and
+   * This hash table maintains the association between a component and
    * its gridbag constraints. The Keys in comptable are the components
    * and thevalues are the instances of GridBagConstraints.
    */
-  csHashMap comptable;
+  csHash<awsGridBagConstraints,iAwsComponent*> comptable;
 
   /**
    * This field holds a gridbag constraints instance containing the

@@ -20,17 +20,13 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "awslayot.h"
-#include "awsgbl.h"
 #include "awsgbc.h"
+#include "awsgbl.h"
+#include "awslayot.h"
+#include "csgeom/math.h"
 #include "iaws/awsdefs.h"
 
-const int MAXINT = 0xeffffff;
-
-inline int max (int i, int j)
-{
-  return i > j ? i : j;
-}
+const int GBS_MAXINT = 0xeffffff;
 
 awsGridBagConstraints::awsGridBagConstraints ()
   : gridx (GBS_RELATIVE),
@@ -73,24 +69,35 @@ awsGridBagConstraints::awsGridBagConstraints (
 {
 }
 
-awsGridBagConstraints *awsGridBagConstraints::Clone ()
+awsGridBagConstraints::awsGridBagConstraints(awsGridBagConstraints const& c)
 {
-  return new awsGridBagConstraints (
-    gridx,
-    gridy,
-    gridwidth,
-    gridheight,
-    weightx,
-    weighty,
-    anchor,
-    fill,
-    insets,
-    ipadx,
-    ipady);
+  Assign(c);
+}
+
+awsGridBagConstraints&
+awsGridBagConstraints::operator=(awsGridBagConstraints const& c)
+{
+  Assign(c);
+  return *this;
+}
+
+void awsGridBagConstraints::Assign (awsGridBagConstraints const& c)
+{
+  gridx      = c.gridx;
+  gridy      = c.gridy;
+  gridwidth  = c.gridwidth;
+  gridheight = c.gridheight;
+  weightx    = c.weightx;
+  weighty    = c.weighty;
+  anchor     = c.anchor;
+  fill       = c.fill;
+  insets     = c.insets;
+  ipadx      = c.ipadx;
+  ipady      = c.ipady;
 }
 
 awsGridBagLayout::GridBagLayoutInfo::GridBagLayoutInfo ()
-  : width (0),
+  : width  (0),
     height (0),
     startx (0),
     starty (0)
@@ -205,63 +212,30 @@ void awsGridBagLayout::setConstraints (
   iAwsComponent *cmp,
   awsGridBagConstraints &constraints)
 {
-  /// Check if the component exists.
-  awsGridBagConstraints *p = CS_STATIC_CAST (
-    awsGridBagConstraints *,
-    comptable.Get ((csHashKey) cmp));
-
-  /// Kill it if so.
-  if (p)
-    comptable.DeleteAll ((csHashKey) cmp);
-
-  /// Add in the new constraints.
-  comptable.Put ((csHashKey) cmp, constraints.Clone ());
+  comptable.DeleteAll (cmp);
+  comptable.Put (cmp, constraints);
 }
 
 awsGridBagConstraints awsGridBagLayout::getConstraints (iAwsComponent *cmp)
 {
-  awsGridBagConstraints *constraints = CS_STATIC_CAST (
-      awsGridBagConstraints *,
-      comptable.Get ((csHashKey) cmp));
-
-  if (constraints == 0)
-  {
-    setConstraints (cmp, defaultConstraints);
-    constraints = (awsGridBagConstraints *)comptable.Get ((csHashKey) cmp);
-  }
-
-  return awsGridBagConstraints (
-    constraints->gridx,
-    constraints->gridy,
-    constraints->gridwidth,
-    constraints->gridheight,
-    constraints->weightx,
-    constraints->weighty,
-    constraints->anchor,
-    constraints->fill,
-    constraints->insets,
-    constraints->ipadx,
-    constraints->ipady);
+  awsGridBagConstraints* c = lookupConstraints(cmp);
+  CS_ASSERT(c != 0);
+  return *c;
 }
 
 awsGridBagConstraints *awsGridBagLayout::lookupConstraints (
   iAwsComponent *cmp)
 {
-  awsGridBagConstraints *constraints = CS_STATIC_CAST (
-    awsGridBagConstraints *,
-    comptable.Get ((csHashKey) cmp));
-
-  if (constraints == 0)
-  {
-    setConstraints (cmp, defaultConstraints);
-    constraints = (awsGridBagConstraints *)comptable.Get ((csHashKey) cmp);
-  }
-  return constraints;
+  if (!comptable.In(cmp))
+    setConstraints(cmp, defaultConstraints);
+  awsGridBagConstraints* c = comptable.GetElementPointer(cmp);
+  CS_ASSERT(c != 0);
+  return c;
 }
 
 void awsGridBagLayout::removeConstraints (iAwsComponent *cmp)
 {
-  comptable.DeleteAll ((csHashKey) cmp);
+  comptable.DeleteAll (cmp);
 }
 
 csPoint awsGridBagLayout::getLayoutOrigin ()
@@ -410,7 +384,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo (
     {
       px = 0;
       for (i = curY; i < (curY + curHeight); i++)
-        px = max(px, xMax[i]);
+        px = csMax(px, xMax[i]);
 
       curX = px - curX - 1;
       if (curX < 0) curX = 0;
@@ -419,7 +393,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo (
     {
       py = 0;
       for (i = curX; i < (curX + curWidth); i++)
-        py = max(py, yMax[i]);
+        py = csMax(py, yMax[i]);
 
       curY = py - curY - 1;
       if (curY < 0) curY = 0;
@@ -515,7 +489,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo (
 
     px = 0;
     for (i = curY; i < (curY + curHeight); i++)
-      px = max(px, xMax[i]);
+      px = csMax(px, xMax[i]);
 
     curX = px - curX - 1;
     if (curX < 0)
@@ -530,7 +504,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo (
 
       py = 0;
       for (i = curX; i < (curX + curWidth); i++)
-        py = max(py, yMax[i]);
+        py = csMax(py, yMax[i]);
 
       curY = py - curY - 1;
       if (curY < 0) curY = 0;
@@ -587,9 +561,9 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo (
    *<p>
    * Distribute the minimun widths and weights:
    */
-  nextSize = MAXINT;
+  nextSize = GBS_MAXINT;
 
-  for (i = 1; i != MAXINT; i = nextSize, nextSize = MAXINT)
+  for (i = 1; i != GBS_MAXINT; i = nextSize, nextSize = GBS_MAXINT)
   {
     for (compindex = 0; compindex < comps.Length(); ++compindex)
     {
