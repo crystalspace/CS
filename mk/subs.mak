@@ -13,6 +13,7 @@ ifneq ($(LIBRARY_SUBMAKEFILES),)
 endif
 
 ifeq ($(PLUGINS_SUBMAKEFILES),)
+  PLUGINS += video/renderer video/canvas  # These are not optional.
   ifeq ($(USE_PLUGINS),yes)
     PLUGINS += $(PLUGINS.DYNAMIC)
   endif

@@ -25,6 +25,10 @@ The history order has been reversed so that new features are at the top.
 	  not see what had been typed.  Now the input line is preserved.
 	- Eric Sunshine fixed a bug in csSimpleInput where it would corrupt
 	  memory when Delete was pressed at the end of the input line.
+	- Eric Sunshine changed the location of inclusion of `video/renderer' &
+	  `video/canvas' in the PLUGINS variable.  These items used to be
+	  specified in user.mak.  However, since they are not optional, it did
+	  not make sense to place them in a user-configurable file.
 20-Mar-2001:
 	- Philip Wyett altered his email address in the docs.
 	- Wouter Wijngaards added the following methods to explosion
