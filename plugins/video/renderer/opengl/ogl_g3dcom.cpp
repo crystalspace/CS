@@ -473,15 +473,9 @@ void csGraphics3DOGLCommon::Close ()
     return;
 
   // we should remove all texture handles before we kill the graphics context
-  if (txtmgr)
-    delete txtmgr;
-  txtmgr = NULL;
-  if (texture_cache)
-    delete texture_cache;
-  texture_cache = NULL;
-  if (lightmap_cache)
-    delete lightmap_cache;
-  lightmap_cache = NULL;
+  delete txtmgr; txtmgr = NULL;
+  delete texture_cache; texture_cache = NULL;
+  delete lightmap_cache; lightmap_cache = NULL;
 
   if (m_fogtexturehandle)
   {
@@ -1744,7 +1738,7 @@ void csGraphics3DOGLCommon::ClearCache ()
   // We will clear lightmap cache since when unloading a world lightmaps
   // become invalid. We won't clear texture cache since texture items are
   // cleaned up individually when an iTextureHandle's RefCount reaches zero.
-  lightmap_cache->Clear ();
+  if (lightmap_cache) lightmap_cache->Clear ();
 }
 
 void csGraphics3DOGLCommon::DumpCache ()

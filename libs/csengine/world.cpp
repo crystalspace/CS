@@ -711,6 +711,7 @@ bool csWorld::HandleEvent (iEvent &Event)
 
 void csWorld::Clear ()
 {
+  if (G3D) G3D->ClearCache ();
   halos.DeleteAll ();
   collections.DeleteAll ();
   while (sprites.Length () > 0)

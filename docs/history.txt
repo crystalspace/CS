@@ -1,6 +1,22 @@
 The history order has been reversed so that new features are at the top.
 
+2-Sep-2000
+	- Fixed bug in csWorld::Clear() where that function would forget
+	  to clear the texture cache in G3D. This could result in crashes
+	  when reloading a world in OpenGL for example.
+	- Added a test in OpenGL to prevent ClearCache() from crashing
+	  when it was called at destruction time.
+	- Changed fatal error 'Light 'xxx' not found' into a warning.
+	  This makes sure that old levels that still use the old
+	  collection syntax will work (but without the light in the
+	  collection).
+	- Added ObjectView window to levtool. This contains all objects
+	  in the world in a csTree component. Currently this list is only
+	  a subset. It will be completed later.
+	- Martin Geisse added a patch to the VC project files from Mark
+	  Welch.
 1-Sep-2000
+	- Robert Bate updated the Mac port projects a little.
 	- Fixed a bug in the WalkTest entity system which could cause
 	  crashes at exit (especially with flarge).
 	- Made csEntityList a csVector. It appears that csPObject's can

@@ -594,11 +594,9 @@ csCollection* csLoader::load_collection (char* name, char* buf)
           ScanStr (params, "%s", str);
 	  csStatLight* l = World->FindLight (str);
           if (!l)
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Light '%s' not found!\n", str);
-            fatal_exit (0, false);
-          }
-          collection->AddObject ((csObject*)l);
+            CsPrintf (MSG_WARNING, "Light '%s' not found!\n", str);
+	  else
+	    collection->AddObject ((csObject*)l);
         }
         break;
       case TOKEN_SECTOR:
