@@ -38,8 +38,6 @@ csSprite2D::~csSprite2D ()
 
 void csSprite2D::Draw (csRenderView& rview)
 {
-  int i;
-
   if (!cstxt)
   {
     CsPrintf (MSG_FATAL_ERROR, "Error! Trying to draw a 2D sprite with no texture!\n");
