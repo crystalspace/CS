@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Genmesh, MeshObject Ball, MeshObject Spr3D, MeshObject
+@node MeshObject Genmesh, MeshObject Ball, MeshObject SprCal3D, MeshObject
 @subsection Genmesh Mesh Object
 @cindex MeshObject
 @cindex 3D Sprite
