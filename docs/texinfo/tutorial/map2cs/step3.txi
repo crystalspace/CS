@@ -12,9 +12,10 @@ the following template:
 @example
 Map2CS.TextureSettings.DefaultTexture = liquids/bubbles
 Map2CS.TextureSettings.wad1 = D:\Crystal\Wads\cstex_1.wad
-Map2CS.TextureSettings.wad2 = E:\Sierra\HalfLife\valve\xeno.wad
-Map2CS.TextureSettings.wad3 = E:\Sierra\HalfLife\valve\liquids.wad
-Map2CS.TextureSettings.wad4 = E:\Sierra\HalfLife\valve\texpack.wad
+Map2CS.TextureSettings.wad2 = E:\Sierra\HalfLife\valve\halflife.wad
+Map2CS.TextureSettings.wad3 = E:\Sierra\HalfLife\valve\xeno.wad
+Map2CS.TextureSettings.wad4 = E:\Sierra\HalfLife\valve\liquids.wad
+Map2CS.TextureSettings.wad5 = E:\Sierra\HalfLife\valve\texpack.wad
 Map2CS.TextureSettings.pk1 = D:\Games\Quake3A\baseq3\pak0.pk3
 Map2CS.TextureSettings.pk2 = D:\Games\Quake3A\baseq3\mapmedia.pk3
 
