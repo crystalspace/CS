@@ -325,7 +325,7 @@ bool CMapBrush::IsInside(CdVector3& v)
 void CMapBrush::IntersectWithPlane(CMapTexturedPlane* pIntersectplane,
                                    CMapPolygon& Poly)
 {
-  Poly.SetErrorInfo(m_Line, -1);
+  Poly.SetErrorInfo(m_Line, (size_t)-1);
   Poly.Create(pIntersectplane, m_Planes, this);
 }
 
