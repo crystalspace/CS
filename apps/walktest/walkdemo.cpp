@@ -1507,7 +1507,7 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
       iPortal* portalBack = portalPolyBack->CreatePortal (room);
       portalBack->GetFlags ().Set (CS_PORTAL_ZFILL);
       portalBack->GetFlags ().Set (CS_PORTAL_CLIPDEST);
-      portalBack->SetWarp (view->GetCamera ()->GetTransform ().GetO2T (), pos, topos);
+      portalBack->SetWarp (view->GetCamera ()->GetTransform ().GetO2T (), -pos, -topos);
       thingBack->DecRef ();
     }
   }

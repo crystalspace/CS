@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+3-Jan-2001
+	- Fixed a bug with the portal console command so that the
+	  portal back to the original level is now correct.
 2-Jan-2001
 	- Fixed software renderer after 'res' broke it.
 	- Fixed csparser after 'res' broke it.
