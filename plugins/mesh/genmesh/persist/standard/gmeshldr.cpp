@@ -571,8 +571,8 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
       csVector3 vertex = gfact->GetVertices()[i];
       csVector2 texel = gfact->GetTexels()[i];
       synldr->WriteVector(triaNode, &vertex);
-      triaNode->SetAttributeAsInt("u", texel.x);
-      triaNode->SetAttributeAsInt("v", texel.y);
+      triaNode->SetAttributeAsFloat("u", texel.x);
+      triaNode->SetAttributeAsFloat("v", texel.y);
     }
 
     //Write Triangle Tags
