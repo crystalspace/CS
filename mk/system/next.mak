@@ -1,9 +1,6 @@
 # This is an include file for all the makefiles which describes system specific
 # settings. Also have a look at mk/user.mak.
 
-# Loadable modules not currently supported.
-override USE_DLL=no
-
 # Choose which drivers you want to build/use
 DRIVERS=cs2d/next2d cs3d/software csnetdrv/null csnetdrv/sockets \
   csnetman/null csnetman/simple cssnddrv/null cssndrdr/null
@@ -184,5 +181,6 @@ ifeq ($(MAKESECTION),configure)
 
 .PHONY: configure
 configure:
+	@echo override USE_DLL = no>>config.mak
 
 endif # ifeq ($(MAKESECTION),configure)

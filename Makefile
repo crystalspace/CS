@@ -14,10 +14,12 @@ TARGET=unknown
 SYSMAKEFILE=mk/system/unknown.mak
 USE_DLL=yes
 MODE=optimize
+USE_NASM=no
 # The following two symbols are intended to be used in "echo" commands
 # System-dependent makefiles can override them
 "='
 |=|
+-include config.mak
 
 # The initial driver and application targets help text
 DRVHELP = echo $"The following Crystal Space drivers can be built:$"
@@ -26,7 +28,6 @@ LIBHELP = echo $"The following Crystal Space libraries can be built:$"
 
 MAKESECTION=rootdefines
 include mk/user.mak
--include config.mak
 include mk/common.mak
 include mk/subs.mak
 
@@ -94,7 +95,7 @@ doc api clean cleanlib cleandep:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@
 
 # Create volatile.h before anything other if it does not exist
-Makefile: include/volatile.h
+mk/user.mak: include/volatile.h
 include/volatile.h: $(SYSMAKEFILE) $(LIBRARY_SUBMAKEFILES) \
 	$(DRIVER_SUBMAKEFILES) $(APPLICATION_SUBMAKEFILES)
 	@echo $",------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
@@ -121,7 +122,7 @@ amiga unknown win32vc:
 	@echo "+==================================================================="
 	@echo "| System-dependent configuration pass."
 	@echo "+==================================================================="
-	@$(MAKE) --no-print-directory -f mk/system/$@.mak configure MAKESECTION=configure
+	@$(MAKE) --no-print-directory -f mk/system/$@.mak MAKESECTION=configure
 	@echo "+==================================================================="
 	@echo "| Makefiles are now configured for $(DESCRIPTION.$@)."
 	@echo "+==================================================================="

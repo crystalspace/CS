@@ -19,9 +19,6 @@ OS=DOS
 # Compiler
 COMP=GCC
 
-# Always override "USE_DLL" to "no" even if specified from command line
-override USE_DLL=no
-
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
 #------------------------------------------------------------------ defines ---#
@@ -132,5 +129,6 @@ ifeq ($(MAKESECTION),configure)
 
 configure:
 	@bin/dosconf.bat
+	@echo override USE_DLL = no>>config.mak
 
 endif # ifeq ($(MAKESECTION),configure)

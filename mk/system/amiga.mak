@@ -3,9 +3,6 @@
 
 # Amiga port, using GCC
 
-# Not supported for the moment.
-override USE_DLL=no
-
 # Choose which drivers you want to build/use
 DRIVERS=cs3d/software cs2d/x2d csnetdrv/null csnetdrv/sockets \
   csnetman/null csnetman/simple cssnddrv/null cssndrdr/null \
@@ -162,5 +159,6 @@ ifeq ($(MAKESECTION),configure)
 # In the future, this will be used to generate a config.mak file.
 
 configure:
+	@echo override USE_DLL = no>>config.mak
 
 endif # ifeq ($(MAKESECTION),configure)
