@@ -20,7 +20,6 @@
 #include "csutil/scf.h"
 #include "cs2d/ddraw61/g2d.h"
 #include "cssys/win32/directdetection.h"
-//#include "cssys/win32/win32itf.h"
 #include "isystem.h"
 
 DirectDetection DDetection;
@@ -163,7 +162,7 @@ void CreateIdentityPalette(RGBpaletteEntry *p)
 extern DirectDetection DDetection;
 extern DirectDetectionDevice * DirectDevice;
 
-csGraphics2DDDraw6::csGraphics2DDDraw6(iBase *iParent, bool bUses3D) : 
+csGraphics2DDDraw6::csGraphics2DDDraw6(iBase *iParent) : 
   csGraphics2D (),
   m_hWnd(NULL),
   m_bDisableDoubleBuffer(false),
@@ -178,7 +177,7 @@ csGraphics2DDDraw6::csGraphics2DDDraw6(iBase *iParent, bool bUses3D) :
   m_nDepth(-1),
   m_nGraphicsReady(true),
   m_bLocked(false),
-  m_bUses3D(bUses3D)
+  m_bUses3D(true)
 {
   CONSTRUCT_IBASE (iParent);
 }
@@ -198,10 +197,10 @@ bool csGraphics2DDDraw6::Initialize(iSystem *pSystem)
 
   iWin32SystemDriver* piWin32System = QUERY_INTERFACE (System, iWin32SystemDriver);
   // Get the creation parameters //
-  if (piWin32System))
+  if (piWin32System)
   {
-      piWin32System->GetInstance (&m_hInstance);
-      piWin32System->GetCmdShow (&m_nCmdShow);
+      m_hInstance = piWin32System->GetInstance ();
+      m_nCmdShow  = piWin32System->GetCmdShow ();
       piWin32System->DecRef ();
   }
   else
@@ -209,8 +208,8 @@ bool csGraphics2DDDraw6::Initialize(iSystem *pSystem)
       sys_fatalerror ("csGraphics2DDDraw6::Open(QI) -- iSystem passed does not support iWin32SystemDriver.");
   }
 
-  System->GetDepthSetting(m_nDepth);
-  
+  System->GetSettings(Width, Height, m_nDepth, FullScreen);
+
   // Create the DirectDraw device //
   if (!m_bUses3D)
   {
@@ -656,7 +655,7 @@ void csGraphics2DDDraw6::FinishDraw ()
   else m_nActivePage = 0;
 }
 
-HRESULT csGraphics2DDDraw6::SetColorPalette()
+void csGraphics2DDDraw6::SetColorPalette()
 {
   HRESULT ret;
   
@@ -690,11 +689,7 @@ HRESULT csGraphics2DDDraw6::SetColorPalette()
       SelectPalette(dc, oldPal, FALSE);
       ReleaseDC(NULL, dc);
     }
-
-    return ret;
   }
-  
-  return DD_OK;
 }
 
 bool csGraphics2DDDraw6::BeginDraw()
@@ -741,23 +736,23 @@ bool csGraphics2DDDraw6::SetMousePosition (int x, int y)
   return true;
 }
 
-void csGraphics2DDDraw3::GetDirectDrawDriver (LPDIRECTDRAW4* lplpDirectDraw)
+void csGraphics2DDDraw6::GetDirectDrawDriver (LPDIRECTDRAW4* lplpDirectDraw)
 {
   *lplpDirectDraw = m_lpDD4;
 }
 
-void csGraphics2DDDraw3::GetDirectDrawPrimary (LPDIRECTDRAWSURFACE4* lplpDirectDrawPrimary)
+void csGraphics2DDDraw6::GetDirectDrawPrimary (LPDIRECTDRAWSURFACE4* lplpDirectDrawPrimary)
 {
   *lplpDirectDrawPrimary = m_lpddsPrimary;
 }
 
-void csGraphics2DDDraw3::GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE4* lplpDirectDrawBackBuffer)
+void csGraphics2DDDraw6::GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE4* lplpDirectDrawBackBuffer)
 {
   *lplpDirectDrawBackBuffer = m_lpddsBack;
 }
 
 extern DirectDetectionDevice* DirectDevice;
-void csGraphics2DDDraw3::GetDirectDetection (IDirectDetectionInternal** lplpDDetection)
+void csGraphics2DDDraw6::GetDirectDetection (IDirectDetectionInternal** lplpDDetection)
 {
   *lplpDDetection = static_cast<IDirectDetectionInternal*>(DirectDevice);
 }

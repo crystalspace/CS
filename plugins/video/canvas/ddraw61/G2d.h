@@ -23,15 +23,15 @@
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/win32/win32itf.h"
-#include "cs2d/ddraw61/xg2d.h"
+#include "cs2d/ddraw61/ig2d.h"
 
 /// Windows version.
-class csGraphics2DDDraw6 : public csGraphics2D
+class csGraphics2DDDraw6 : public csGraphics2D, public iGraphics2DDDraw6
 {
 public:
   DECLARE_IBASE;
 
-  csGraphics2DDDraw6(iSystem* piSystem, bool bUses3D);
+  csGraphics2DDDraw6(iBase *iParent);
   virtual ~csGraphics2DDDraw6(void);
   
   virtual bool Initialize (iSystem *pSystem);
@@ -45,7 +45,6 @@ public:
  
   virtual bool BeginDraw();
   virtual void FinishDraw();
-  virtual HRESULT SetColorPalette();
   
   virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
   virtual bool SetMousePosition (int x, int y);

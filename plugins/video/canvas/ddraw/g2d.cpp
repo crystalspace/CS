@@ -182,7 +182,7 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
   m_nGraphicsReady(true),
   m_bLocked(false),
   m_piWin32System(NULL)
-  //m_bUses3D(bUses3D)
+  m_bUses3D(true)
 {
   CONSTRUCT_IBASE (iParent);
 }
