@@ -188,13 +188,13 @@ submakefiles contained one level deep in the @file{libs/} directory (i.e.
 
 @example
 (~/CS)% ls libs/*/*.mak
-libs/cs2d/cs2d.mak              libs/csparser/csparser.mak
-libs/cs3d/cs3d.mak              libs/csphyzik/csphyzik.mak
-libs/csengine/csengine.mak      libs/cssfxldr/cssfxldr.mak
-libs/csgame/csgame.mak          libs/cssys/cssys.mak
-libs/csgeom/csgeom.mak          libs/csterr/csterr.mak
-libs/csgfxldr/csgfxldr.mak      libs/cstools/cstools.mak
-libs/csinput/csinput.mak        libs/csutil/csutil.mak
+libs/cs2d/cs2d.mak              libs/csphyzik/csphyzik.mak
+libs/cs3d/cs3d.mak              libs/cssfxldr/cssfxldr.mak
+libs/csengine/csengine.mak      libs/cssys/cssys.mak
+libs/csgame/csgame.mak          libs/csterr/csterr.mak
+libs/csgeom/csgeom.mak          libs/cstools/cstools.mak
+libs/csgfxldr/csgfxldr.mak      libs/csutil/csutil.mak
+libs/csparser/csparser.mak
 @end example
 
 Submakefiles for applications located last, using the search mask

@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+17-Apr-2000
+	- Eric Sunshine removed all references to the obsolete csInput library
+	  from the documentation and from the makefiles ("$(CSINPUT.LIB)").
 16-Apr-2000
 	- Eric Sunshine completed Phase Seven of Eric's Big Documentation
 	  Overhaul(tm).

@@ -63,8 +63,6 @@ than actually linking with a library.
 @item
 @code{csengine}
 @item
-@code{csinput}
-@item
 @code{csparser}
 @item
 @code{csscript}
@@ -99,8 +97,3 @@ All communication between level 3 libraries happens through @sc{scf}
 interfaces.  Those are defined in the @file{CS/include} directory.  That is
 the @emph{only} way to communicate on level 3.  @file{csengine} can use level
 3 libraries only through @sc{scf}.
-
-@file{csinput} has a special role.  Though sitting logically at level 4, it
-can and must be included in some 2D drivers and some system specific modules,
-because these module will generate the events that are being distributed be
-@file{csinput}.

@@ -197,9 +197,6 @@ The graphics loader library.  Routines to support loading various graphic file
 formats and put them internally in the same format.  This library supports
 @sc{jpg}, @sc{gif}, @sc{tga}, @sc{png}, and @sc{bmp}.
 
-@item CS/libs/csinput
-The input library (mouse, keyboard, joystick, etc.).
-
 @item CS/libs/csnetdrv
 Network drivers.  The only existing driver is a @sc{bsd} socket-based
 @sc{tcp/ip} driver.

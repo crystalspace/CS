@@ -51,10 +51,6 @@ nicely integrated with Crystal Space.  It is also platform independent.
 dependent stuff (non-graphics and non-sound related) is in this library.
 
 @item
-@emph{Input System} (library: csinput) An input library (mouse,
-keyboard, joystick, etc.).
-
-@item
 @emph{World Parser} (library: csparser) A library which parses
 @sc{ascii} world files and creates a world in the 3D Engine.
 
