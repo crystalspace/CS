@@ -20,6 +20,11 @@ chronological order.
             ./configure RANLIB=my-ranlib
 	  Also removed the MacOS/X-specific work-around for this problem from
 	  macosx.jam.
+	- Eric Sunshine restored the MacOS/X-specific Jam 2.4 RANLIB
+	  work-around in macosx.jam. This will allow external projects to work
+	  correctly with the latest macosx.jam even if those projects have not
+	  updated their configure scripts to emit an unconditional RANLIB
+	  value.
 14-Sep-2004
 	- Eric Sunshine fixed bug in msvcgen.jam's LinkWith override where it
 	  did not distinguish between release and debug libraries & linker

@@ -24,7 +24,12 @@ APPLICATION.CONSOLE.LFLAGS += "-framework AppKit -framework Foundation" ;
 PLUGIN.LFLAGS += "-bundle -framework AppKit -framework Foundation" ;
 MACOSX_ENVIRONMENT = "export MACOSX_DEPLOYMENT_TARGET=10.2" ;
 
-# MacOS/X Panther expects us to use the -s option with ranlib.
+# Jambase in Jam 2.4 has a bug where it incorrectly defines RANLIB as "" for
+# MacOS/X, and this bogus value will override a RANLIB set via ?= in Jamconfig,
+# by a configure script, thus we must give RANLIB an appropriate value here if
+# we find that it has the bogus value.  Jam 2.5 does not contain this bug.
+# Furthermore, MacOS/X Panther expects us to use the -s option with ranlib.
+if ! $(RANLIB) { RANLIB = "ranlib" ; }
 RANLIB += "-s" ;
 
 # Experience seems to indicate that library scanning misbehaves on MacOS/X with
