@@ -381,9 +381,11 @@ bool CSWriter::CombineTriangle (Lib3dsMesh* mesh, csDPlane*& plane, int* poly,
   points[2] = newpointmap[ppoints[2]];
 
   // this holds the numbers of the 2 shared vertices
-  facenum sharedfaces[2];
-  // this is the number of the vertice that is left on the triangle
+  facenum sharedvertices[2];
+  // this is the number of the vertex that is left on the triangle
   facenum nonshared = 0;
+  // this is the number of the vertex that is left on the first triangle
+  facenum nonshared2 = 0;
   
   bool found=false;
   int i, i2;
@@ -397,11 +399,13 @@ bool CSWriter::CombineTriangle (Lib3dsMesh* mesh, csDPlane*& plane, int* poly,
       if (poly[i2]==points[i])
       {
 	int tp = poly[ (i2+1) % plen ];
+	nonshared2 = poly[ (i2+2) % plen];
+
 	if (tp == points[ (i+1) % 3 ] )
 	{
 	  found=true;
-	  sharedfaces[0]=poly[i2];
-	  sharedfaces[1]=tp;
+	  sharedvertices[0]=poly[i2];
+	  sharedvertices[1]=tp;
 	  // you can write i+2 instead of i-1 (in fact it avoids errors where
 	  // i==0
 	  nonshared = points[ (i+2) % 3 ];
@@ -410,8 +414,8 @@ bool CSWriter::CombineTriangle (Lib3dsMesh* mesh, csDPlane*& plane, int* poly,
 	else if (tp == points[ (i+2) % 3 ])
 	{
 	  found=true;
-	  sharedfaces[0]=poly[i2];
-	  sharedfaces[1]=tp;
+	  sharedvertices[0]=poly[i2];
+	  sharedvertices[1]=tp;
 	  nonshared = points[ (i+1) % 3 ];
 	  goto pointfound;
 	}
@@ -444,24 +448,73 @@ printf ("dist:%g\n", dist);
   }
 #endif
 
-  // check if the poly shares 3 vertices
+  // Check if the poly shares 3 vertices.
   int p;
   for (p=0; p < plen; p++)
   {
     if (poly[p]==nonshared)
     {
-      printf ("Warning!!! object '%s' contains a face that overlapps another"
+      printf ("Warning!!! object '%s' contains a face that overlaps another"
 	  "face!\n", mesh->name);
       used[trinum]=true;
       return false;
     }
   }
 
+  // For every edge of the original triangle we calculate a plane
+  // that is orthogonal to the plane of the triangle itself.
+  csDPlane p0, p1, p2;
+  csDMath3::CalcNormal (p0.norm,
+	vectors[nonshared2], vectors[sharedvertices[0]],
+	vectors[nonshared2]+plane->norm);
+  p0.DD = -p0.norm * vectors[nonshared2];
+  csDMath3::CalcNormal (p1.norm,
+	vectors[sharedvertices[1]], vectors[nonshared2],
+	vectors[sharedvertices[1]]+plane->norm);
+  p1.DD = -p1.norm * vectors[sharedvertices[1]];
+  csDMath3::CalcNormal (p2.norm,
+	vectors[sharedvertices[0]], vectors[sharedvertices[1]],
+	vectors[sharedvertices[0]]+plane->norm);
+  p2.DD = -p2.norm * vectors[sharedvertices[0]];
+
+  // Now classify the nonshared vertex to these three planes. Classification
+  // will basically return >0 if vertex is on positive side of plane and
+  // <0 otherwise.
+  double class0 = p0.Classify (vectors[nonshared]);
+  double class1 = p1.Classify (vectors[nonshared]);
+  double class2 = p2.Classify (vectors[nonshared]);
+  int class_sign0 = class0 < 0 ? -1 : 1;
+  int class_sign1 = class1 < 0 ? -1 : 1;
+  int class_sign2 = class2 < 0 ? -1 : 1;
+
+  // To result in a convex polygon the sign of class0 and class1
+  // must be the same. The reason is that we want the nonshared
+  // vertex to be in between the two planes that start from nonshared2
+  // and go through the two shared vertices. Since these planes
+  // are created thus that everything inside the triangle has same
+  // sign we also have to check for same sign here.
+  if (class_sign0 != class_sign1)
+  {
+    // Resulting combination is not convex.
+    return false;
+  }
+  
+  // Check if the nonshared vertex is in the first triangle. If this
+  // happens we have a partial overlap which is also not good.
+  // We can check this when all classifications have same sign.
+  if (class_sign0 == class_sign1 && class_sign1 == class_sign2)
+  {
+    printf ("Warning!!! object '%s' contains a face that partially overlaps another"
+	  "face!\n", mesh->name);
+    //@@@used[trinum]=true; Should I set used in this case?
+    return false;
+  }
+
   // combine the triangle with the poly (insert the nonshared triangle point
   // between the 2 shared points in the poly
   for (p=0; p < plen; p++)
   {
-    if (poly[p]==sharedfaces[0])
+    if (poly[p]==sharedvertices[0])
       break;
   }
   plen++;

@@ -19,6 +19,9 @@ The history order is reversed so that new features are at the top.
 	  the part of the polygon buffer that will actually be needed.
 	  This optimization brings the performance of the XOR buffer
 	  rather close to the c-buffer now.
+	- Modified 3ds2lev so that the triangle combiner is more robust.
+	  It now detects better if two triangles are on same plane
+	  and also checks if resulting polygon is convex.
 25-Apr-2002
 	- Removed the 'togglecull' and 'togglexor' commands from BugPlug.
 	  Instead added the ability to have arguments with bugplug commands
