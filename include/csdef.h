@@ -62,16 +62,16 @@
 // PI - These changes add more flexiblity and offer improvements
 // on both low and high end systems in varying performance instances
 #ifndef PI
-  static const float PI = 4.0f * (float) atan (1.0f);
+  const float PI = 4.0f * (float) atan (1.0f);
 #endif
 #ifndef HALF_PI
-  static const float HALF_PI = 0.5f * PI;	// PI / 2
+  const float HALF_PI = 0.5f * PI;	// PI / 2
 #endif
 #ifndef TWO_PI
-	static const float TWO_PI = 2.0f * PI;
+	const float TWO_PI = 2.0f * PI;
 #endif
 #ifndef INV_TWO_PI
-	static const float INV_TWO_PI = 1.0f / TWO_PI;
+	const float INV_TWO_PI = 1.0f / TWO_PI;
 #endif
 
 #undef EPSILON
