@@ -1,5 +1,45 @@
 The history order is reversed so that new features are at the top.
 
+16-Nov-2001
+	- Removed csDebuggingGraph::AddInterface() and instead added
+	  a 'bool scf' parameter to AddObject().
+	- Rewrote the graph debugging tool to also allow adding of links
+	  between objects that don't exist (yet). Also added timestamp's
+	  to object and link creation in order to better evaluate
+	  strange situations like a link being created before some object
+	  was added and so on.
+	- Removed the 'exact' mode from the csDebuggingGraph. The mode
+	  is now always exact.
+	- Since the output from csDebuggingGraph is now a little bit more
+	  complex here follows a little explanation:
+	    R(0) 00A136D8(r1,t17) csObject(ps) (fil.cpp,111) #p=0 #c=97
+	      C(20) 00A280C8(r5,t18) csObject(txt.jpg) (fil.cpp,111) #p=1 #c=0
+	        P(19) 00A136D8(r1,t17) csObject(ps) (REF)
+	      C(23) 00A02190(r2,-t21) csObject(mat) (BAD LINK!)
+	  Every line corresponds with an object. The first character is either
+	  'R' (root), 'C' (child), or 'P' (parent) depending on the type
+	  of link it is. The number directly after this type is the timestamp
+	  when the link was created (not the object!).
+	  After that follows the pointer to the object in hexadecimal notation.
+	  Directly after this (between brackets) is the ref count 'r...' (only
+	  for SCF objects) and the timestamp 't...' when the object was
+	  created. If there is a '-' in front of the 't...' then the object
+	  is currently deleted again.
+	  After this follows the user-defined description of the object.
+	  Then there are three possibilities:
+	    - (REF): the object is a valid link but it already expanded
+	      elsewhere in the graph. In that case you can find the
+	      expansion of that object by looking for the pointer again.
+	      In the example above (REF) occurs for the reference to the
+	      parent since we are already in the expansion of the parent.
+	    - (BAD LINK!) this is a link to an object that no longer exists.
+	      This is an error situation and most often indicates a bug
+	      in the code (or else a bug in the placement of the DG_...
+	      macros).
+	    - Otherwise the file and linenumber where the object was added
+	      to the debug graph is shown and the number of parents and
+	      children. The object is then expanded to show all its
+	      parents and children.
 15-Nov-2001
 	- Added DG_ADDI and csDebuggingGraph::AddInterface() with which you
 	  can add an SCF interface (instance of iBase) to the debug graph.

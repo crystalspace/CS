@@ -30,9 +30,9 @@ struct iObjectRegistry;
 // to be called with a valid object registry.
 #if defined(CS_DEBUG) && defined(CS_USE_GRAPHDEBUG)
 #define DG_ADD(obj,desc) \
-  csDebuggingGraph::AddObject(NULL,(void*)(obj),__FILE__,__LINE__,desc)
+  csDebuggingGraph::AddObject(NULL,(void*)(obj),false,__FILE__,__LINE__,desc)
 #define DG_ADDI(obj,desc) \
-  csDebuggingGraph::AddInterface(NULL,(iBase*)(obj),__FILE__,__LINE__,desc)
+  csDebuggingGraph::AddObject(NULL,(void*)(obj),true,__FILE__,__LINE__,desc)
 #define DG_DESCRIBE0(obj,desc) \
   csDebuggingGraph::AttachDescription(NULL,(void*)(obj),desc)
 #define DG_DESCRIBE1(obj,desc,a) \
@@ -80,38 +80,20 @@ class csDebuggingGraph
 {
 public:
   /**
-   * Set the mode to use for debugging the graph. One mode
-   * is not exact which means that this class will keep the graph
-   * correctly in sync independent of the functions that are called.
-   * i.e. in this mode when RemoveObject() is called the object will
-   * automatically be unlinked from its parents and children so the
-   * graph is always ok.<p>
-   * If 'exact' is true however (default), the graph will only do the
-   * operations requested. i.e. removing an object will not automatically
-   * remove the links. RemoveParent() has to be called explicitely. In this
-   * mode it is possible that the tree will not be correct and the
-   * dump will show this.<p>
+   * Initialize the debugging graph.
    * Special note! In debug mode (CS_DEBUG) this function will put the
    * pointer to the object registry in iSCF::object_reg. That way we
    * can use this debugging functionality in places where the object
    * registry is not available.
    */
-  static void SetupGraph (iObjectRegistry* object_reg, bool exact);
+  static void SetupGraph (iObjectRegistry* object_reg);
 
   /**
    * Add a new object to the debug graph and link to its parent.
+   * If 'scf' is true 'object' is an iBase.
    */
   static void AddObject (iObjectRegistry* object_reg,
-  	void* object, char* file, int linenr,
-  	char* description, ...);
-
-  /**
-   * Add a new object to the debug graph and link to its parent.
-   * This version is for an iBase interface. If you use this then
-   * the dump will also show ref count.
-   */
-  static void AddInterface (iObjectRegistry* object_reg,
-  	iBase* object, char* file, int linenr,
+  	void* object, bool scf, char* file, int linenr,
   	char* description, ...);
 
   /**
@@ -121,9 +103,7 @@ public:
   	void* object, char* description, ...);
 
   /**
-   * Remove an object from the debug tree. This will automatically
-   * unlink the object from all its parents and children unless
-   * we are in 'exact' mode.
+   * Remove an object from the debug tree.
    */
   static void RemoveObject (iObjectRegistry* object_reg,
   	void* object, char* file, int linenr);

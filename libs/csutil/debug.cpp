@@ -31,16 +31,19 @@
 
 struct csDGEL
 {
-  void* object;
-  bool scf;		// Is true 'object' is an iBase.
-  bool used;
+  void* object;		// Pointer to the object.
+  bool scf;		// If true 'object' is an iBase.
+  bool used;		// If true the object is currently allocated.
+  uint32 timestamp;	// Timestamp of last allocation.
   char* description;
   char* file;
   int linenr;
   int num_parents;
-  csDGEL** parents;
+  csDGEL** parents;	// Pointer to parents.
+  uint32* p_stamps;	// Pointer to array of timestamps for parent creation.
   int num_children;
-  csDGEL** children;
+  csDGEL** children;	// Pointer to children.
+  uint32* c_stamps;	// Pointer to array of timestamps for child creation.
   bool marker;
 
   csDGEL ()
@@ -48,47 +51,65 @@ struct csDGEL
     object = NULL;
     scf = false;
     used = false;
+    timestamp = 0;
     description = NULL;
     file = NULL;
     num_parents = 0;
     parents = NULL;
+    p_stamps = NULL;
     num_children = 0;
     children = NULL;
+    c_stamps = NULL;
   }
   void Clear ()
   {
     delete[] description; description = NULL;
     delete[] file; file = NULL;
     delete[] parents; parents = NULL; num_parents = 0;
+    delete[] p_stamps; p_stamps = NULL;
     delete[] children; children = NULL; num_children = 0;
+    delete[] c_stamps; c_stamps = NULL;
   }
   ~csDGEL ()
   {
     Clear ();
   }
 
-  void AddChild (csDGEL* child)
+  void AddChild (csDGEL* child, uint32 timestamp)
   {
     if (!children)
+    {
+      CS_ASSERT (c_stamps == NULL);
       children = new csDGEL*[1];
+      c_stamps = new uint32[1];
+    }
     else
     {
+      CS_ASSERT (c_stamps != NULL);
       csDGEL** new_children = new csDGEL*[num_children+1];
+      uint32* new_c_stamps = new uint32[num_children+1];
       memcpy (new_children, children, sizeof (csDGEL*)*num_children);
-      delete[] children;
-      children = new_children;
+      memcpy (new_c_stamps, c_stamps, sizeof (uint32)*num_children);
+      delete[] children; children = new_children;
+      delete[] c_stamps; c_stamps = new_c_stamps;
     }
-    children[num_children++] = child;
+    children[num_children] = child;
+    c_stamps[num_children++] = timestamp;
   }
   void RemoveChild (csDGEL* child)
   {
-    if (!children) return;
+    if (!children)
+    {
+      CS_ASSERT (c_stamps == NULL);
+      return;
+    }
+    CS_ASSERT (c_stamps != NULL);
     if (num_children == 1)
     {
       if (child == children[0])
       {
-        delete[] children;
-	children = NULL;
+        delete[] children; children = NULL;
+	delete[] c_stamps; c_stamps = NULL;
 	num_children = 0;
       }
       return;
@@ -97,32 +118,48 @@ struct csDGEL
     for (i = 0 ; i < num_children ; i++)
     {
       if (child != children[i])
-	children[j++] = children[i];
+      {
+	children[j] = children[i];
+	c_stamps[j++] = c_stamps[i];
+      }
     }
     num_children = j;
   }
-  void AddParent (csDGEL* parent)
+  void AddParent (csDGEL* parent, uint32 timestamp)
   {
     if (!parents)
+    {
+      CS_ASSERT (p_stamps == NULL);
       parents = new csDGEL*[1];
+      p_stamps = new uint32[1];
+    }
     else
     {
+      CS_ASSERT (p_stamps != NULL);
       csDGEL** new_parents = new csDGEL*[num_parents+1];
+      uint32* new_p_stamps = new uint32[num_parents+1];
       memcpy (new_parents, parents, sizeof (csDGEL*)*num_parents);
-      delete[] parents;
-      parents = new_parents;
+      memcpy (new_p_stamps, p_stamps, sizeof (uint32)*num_parents);
+      delete[] parents; parents = new_parents;
+      delete[] p_stamps; p_stamps = new_p_stamps;
     }
-    parents[num_parents++] = parent;
+    parents[num_parents] = parent;
+    p_stamps[num_parents++] = timestamp;
   }
   void RemoveParent (csDGEL* parent)
   {
-    if (!parents) return;
+    if (!parents)
+    {
+      CS_ASSERT (p_stamps == NULL);
+      return;
+    }
+    CS_ASSERT (p_stamps != NULL);
     if (num_parents == 1)
     {
       if (parent == parents[0])
       {
-        delete[] parents;
-	parents = NULL;
+        delete[] parents; parents = NULL;
+	delete[] p_stamps; p_stamps = NULL;
 	num_parents = 0;
       }
       return;
@@ -131,7 +168,10 @@ struct csDGEL
     for (i = 0 ; i < num_parents ; i++)
     {
       if (parent != parents[i])
-	parents[j++] = parents[i];
+      {
+	parents[j] = parents[i];
+	p_stamps[j++] = p_stamps[i];
+      }
     }
     num_parents = j;
   }
@@ -143,7 +183,7 @@ public:
   int num_els;
   int max_els;
   csDGEL** els;
-  bool exact;
+  uint32 last_timestamp;
 
   csDebugGraph ()
   {
@@ -151,7 +191,7 @@ public:
     num_els = 0;
     max_els = 100;
     els = new csDGEL* [max_els];
-    exact = true;
+    last_timestamp = 1;
   }
   virtual ~csDebugGraph ()
   {
@@ -168,29 +208,13 @@ public:
     num_els = 0;
     max_els = 100;
     els = new csDGEL* [max_els];
+    last_timestamp = 1;
   }
 
-  csDGEL* AddEl ()
+  csDGEL* AddEl (void* object)
   {
     if (num_els >= max_els)
     {
-      // First check if there isn't a free element we can use before
-      // extending the array. This only happens if we are not in
-      // exact mode.
-      if (!exact)
-      {
-        int i;
-        for (i = 0 ; i < num_els ; i++)
-        {
-          if (!els[i]->used)
-	  {
-	    els[i]->Clear ();
-	    els[i]->used = true;
-	    els[i]->object = NULL;
-	    return els[i];
-	  }
-        }
-      }
       max_els += 100;
       csDGEL** new_els = new csDGEL* [max_els];
       memcpy (new_els, els, sizeof (csDGEL*) * num_els);
@@ -200,23 +224,18 @@ public:
 
     csDGEL* el = new csDGEL ();
     els[num_els++] = el;
-    el->used = true;
+    el->used = false;
+    el->object = object;
     return el;
   }
 
-  csDGEL* FindEl (void* object, bool all = false)
+  csDGEL* FindEl (void* object)
   {
-    int i, last_i = -1;
-    // First we see if there isn't an object that is in use.
+    int i;
     for (i = 0 ; i < num_els ; i++)
     {
-      if (els[i]->object == object)
-        if (els[i]->used) return els[i];
-	else last_i = i;
+      if (els[i]->object == object) return els[i];
     }
-    // If 'all' is true we see if we found any other entry that
-    // is not used and return the last one.
-    if (all && last_i != -1) return els[last_i];
     return NULL;
   }
 
@@ -240,17 +259,16 @@ static csDebugGraph* SetupDebugGraph (iObjectRegistry* object_reg)
 
 //-----------------------------------------------------------------------------
 
-void csDebuggingGraph::SetupGraph (iObjectRegistry* object_reg, bool exact)
+void csDebuggingGraph::SetupGraph (iObjectRegistry* object_reg)
 {
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
-  dg->exact = exact;
+  SetupDebugGraph (object_reg);
 #ifdef CS_DEBUG
   iSCF::SCF->object_reg = object_reg;
 #endif
 }
 
 void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
-	void* object, char* file, int linenr,
+	void* object, bool scf, char* file, int linenr,
   	char* description, ...)
 {
 #ifdef CS_DEBUG
@@ -258,9 +276,44 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
 #endif
   CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+
   csDGEL* el = dg->FindEl (object);
-  CS_ASSERT (el == NULL);	// Object should not occur!
-  el = dg->AddEl ();
+  if (el)
+  {
+    // The element is already there. This either means that
+    // the object was freed first and now a new object happens
+    // to be allocated on the same position (this is a valid
+    // situation), or else it means that the object is allocated
+    // twice! This is not a valid situation because it means
+    // that DG_ADD or DG_ADDI is used with a missing DG_REM
+    // in between.
+    if (el->used)
+    {
+      printf ("ERROR! Object is added twice to the debug graph!\n");
+      printf ("%p %s", el->object, el->description);
+      fflush (stdout);
+      CS_ASSERT (false);
+      return;
+    }
+
+    // Reinitialize the element. We will also clear the list of
+    // parents and children here since this is a new element and the
+    // previous lists are certainly invalid. Note that it is possible
+    // that other elements still point to this element from a previous
+    // incarnation. That case can be detected with the timestamp: timestamp
+    // of this creation will be bigger than the timestamp of the creation
+    // of the link to this item. The Dump will show this anomaly.
+    el->Clear ();
+  }
+  else
+  {
+    // We have a new element.
+    el = dg->AddEl (object);
+  }
+
+  el->used = true;
+  el->timestamp = dg->last_timestamp++;
+  el->scf = scf;
 
   if (description)
   {
@@ -273,38 +326,6 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
   }
   else el->description = NULL;
 
-  el->object = object;
-  el->scf = false;
-  el->file = file ? csStrNew (file) : NULL;
-  el->linenr = linenr;
-}
-
-void csDebuggingGraph::AddInterface (iObjectRegistry* object_reg,
-	iBase* object, char* file, int linenr,
-  	char* description, ...)
-{
-#ifdef CS_DEBUG
-  if (!object_reg) object_reg = iSCF::SCF->object_reg;
-#endif
-  CS_ASSERT (object_reg != NULL);
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
-  csDGEL* el = dg->FindEl ((void*)object);
-  CS_ASSERT (el == NULL);	// Object should not occur!
-  el = dg->AddEl ();
-
-  if (description)
-  {
-    char buf[1000];
-    va_list arg;
-    va_start (arg, description);
-    vsprintf (buf, description, arg);
-    va_end (arg);
-    el->description = csStrNew (buf);
-  }
-  else el->description = NULL;
-
-  el->object = (void*)object;
-  el->scf = true;
   el->file = file ? csStrNew (file) : NULL;
   el->linenr = linenr;
 }
@@ -317,8 +338,21 @@ void csDebuggingGraph::AttachDescription (iObjectRegistry* object_reg,
 #endif
   CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+
   csDGEL* el = dg->FindEl (object);
-  CS_ASSERT (el != NULL);
+  if (el == NULL)
+  {
+    printf ("ERROR! Cannot find object %p to add description:\n'", object);
+    va_list arg;
+    va_start (arg, description);
+    vprintf (description, arg);
+    va_end (arg);
+    printf ("'\n");
+    fflush (stdout);
+    CS_ASSERT (false);
+    return;
+  }
+
   delete[] el->description;
   if (description)
   {
@@ -342,26 +376,23 @@ void csDebuggingGraph::RemoveObject (iObjectRegistry* object_reg,
   (void)file;
   (void)linenr;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+
   csDGEL* el = dg->FindEl (object);
   if (!el)
   {
-    printf ("Suspicious! Cannot find element for object %p!\n", object);
+    printf ("ERROR! Cannot find element for object %p!\n", object);
     fflush (stdout);
+    CS_ASSERT (false);
     return;
   }
-  if (!dg->exact)
+  if (!el->used)
   {
-    // Unlink from parents and children.
-    int i;
-    for (i = 0 ; i < el->num_parents ; i++)
-    {
-      el->parents[i]->RemoveChild (el);
-    }
-    for (i = 0 ; i < el->num_children ; i++)
-    {
-      el->children[i]->RemoveParent (el);
-    }
+    printf ("ERROR! Element for object %p is not allocated!\n", object);
+    fflush (stdout);
+    CS_ASSERT (false);
+    return;
   }
+
   el->used = false;
 }
 
@@ -374,10 +405,13 @@ void csDebuggingGraph::AddParent (iObjectRegistry* object_reg,
   CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   csDGEL* p_el = dg->FindEl (parent);
+  // If parent could not be found. Create a dummy place holder for later.
+  if (!p_el) p_el = dg->AddEl (parent);
   csDGEL* c_el = dg->FindEl (child);
-  CS_ASSERT (p_el != NULL);
-  CS_ASSERT (c_el != NULL);
-  c_el->AddParent (p_el);
+  // If child could not be found. Create a dummy place holder for later.
+  if (!c_el) c_el = dg->AddEl (child);
+
+  c_el->AddParent (p_el, dg->last_timestamp++);
 }
 
 void csDebuggingGraph::AddChild (iObjectRegistry* object_reg,
@@ -389,10 +423,13 @@ void csDebuggingGraph::AddChild (iObjectRegistry* object_reg,
   CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   csDGEL* p_el = dg->FindEl (parent);
+  // If parent could not be found. Create a dummy place holder for later.
+  if (!p_el) p_el = dg->AddEl (parent);
   csDGEL* c_el = dg->FindEl (child);
-  CS_ASSERT (p_el != NULL);
-  CS_ASSERT (c_el != NULL);
-  p_el->AddChild (c_el);
+  // If child could not be found. Create a dummy place holder for later.
+  if (!c_el) c_el = dg->AddEl (child);
+
+  p_el->AddChild (c_el, dg->last_timestamp++);
 }
 
 void csDebuggingGraph::RemoveParent (iObjectRegistry* object_reg,
@@ -403,10 +440,11 @@ void csDebuggingGraph::RemoveParent (iObjectRegistry* object_reg,
 #endif
   CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
-  csDGEL* p_el = dg->FindEl (parent, true);
-  csDGEL* c_el = dg->FindEl (child, true);
-  if (!p_el) return;
-  if (!c_el) return;
+  csDGEL* c_el = dg->FindEl (child);
+  if (!c_el) return;	// Nothing to do if child is not there.
+  csDGEL* p_el = dg->FindEl (parent);
+  if (!p_el) return;	// Nothing to do if parent doesn't exist either.
+
   c_el->RemoveParent (p_el);
 }
 
@@ -418,10 +456,11 @@ void csDebuggingGraph::RemoveChild (iObjectRegistry* object_reg,
 #endif
   CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
-  csDGEL* p_el = dg->FindEl (parent, true);
-  csDGEL* c_el = dg->FindEl (child, true);
-  if (!p_el) return;
-  if (!c_el) return;
+  csDGEL* p_el = dg->FindEl (parent);
+  if (!p_el) return;	// Nothing to do.
+  csDGEL* c_el = dg->FindEl (child);
+  if (!c_el) return;	// Nothing to do.
+
   p_el->RemoveChild (c_el);
 }
 
@@ -459,7 +498,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
   }
 
   printf ("====================================================\n");
-  printf ("Total number of objects in graph: %d\n", cnt);
+  printf ("Total number of used objects in graph: %d\n", cnt);
 
   // Find the first unmarked object and dump it.
   i = 0;
@@ -476,8 +515,11 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
   fflush (stdout);
 }
 
-static void DumpSubTree (int indent, const char* type, csDGEL* el)
+static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
+	csDGEL* el)
 {
+  // link_timestamp is the timestamp when the link was created.
+
   char spaces[1000];
   int ind = indent;
   if (ind > 999) ind = 999;
@@ -498,20 +540,38 @@ static void DumpSubTree (int indent, const char* type, csDGEL* el)
   // Show the ref count if it is an scf interface. If the object
   // is no longer used then show '?' instead of ref count to avoid
   // calling an invalid pointer.
+  printf ("%s%s(%d) %p(", spaces, type, link_timestamp, el->object);
   if (el->scf)
   {
     if (el->used)
-      printf ("%s%s %p(r%d) %s", spaces, type, el->object,
-    	  ((iBase*)(el->object))->GetRefCount (), el->description);
+      printf ("r%d,", ((iBase*)(el->object))->GetRefCount ());
     else
-      printf ("%s%s %p(r?) %s", spaces, type, el->object, el->description);
+      printf ("r?,-");
   }
-  else
-    printf ("%s%s %p %s", spaces, type, el->object, el->description);
+  else if (!el->used)
+    printf ("-");
+  printf ("t%d) %s", el->timestamp, el->description);
+
+  // If the object is used but the link to this object was created
+  // BEFORE the object (i.e. timestamps) then this is at least very
+  // suspicious and is also marked as such.
+  if (el->used && link_timestamp > 0 && link_timestamp < el->timestamp)
+  {
+    printf (" (SUSPICIOUS!)");
+  }
 
   if (el->marker || *type == 'P' || !el->used)
   {
-    printf ("%s\n", el->used ? (el->marker ? " (REF)" : "") : " (BAD LINK!)");
+    if (el->used)
+    {
+      if (el->marker)
+        printf (" (REF)\n");
+      else
+        printf ("\n");
+    }
+    else
+      printf (" (BAD LINK!)\n");
+
     if (*type != 'P') el->marker = true;
   }
   else
@@ -522,11 +582,11 @@ static void DumpSubTree (int indent, const char* type, csDGEL* el)
     int i;
     for (i = 0 ; i < el->num_parents ; i++)
     {
-      DumpSubTree (indent+2, "P", el->parents[i]);
+      DumpSubTree (indent+2, "P", el->p_stamps[i], el->parents[i]);
     }
     for (i = 0 ; i < el->num_children ; i++)
     {
-      DumpSubTree (indent+2, "C", el->children[i]);
+      DumpSubTree (indent+2, "C", el->c_stamps[i], el->children[i]);
     }
   }
   fflush (stdout);
@@ -609,7 +669,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
     }
     else if (!local_els[i]->marker)
     {
-      DumpSubTree (0, "R", local_els[i]);
+      DumpSubTree (0, "R", 0, local_els[i]);
     }
   }
 
