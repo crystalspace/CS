@@ -37,9 +37,9 @@ LIB.SIMPLEVP = $(foreach d,$(DEP.SIMPLEVP),$($d.LIB))
 
 #TO_INSTALL.EXE += $(SIMPLEVP.EXE)
 
-MSVC.DSP += simplevp
-DSP.simplevp.NAME = simplevp
-DSP.simplevp.TYPE = appcon
+MSVC.DSP += SIMPLEVP
+DSP.SIMPLEVP.NAME = simplevp
+DSP.SIMPLEVP.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
