@@ -318,7 +318,7 @@ void ddgHeightMap::canyonize(float f )
 		for (unsigned c = 0; c < _cols; c++ )
 		{
 			unsigned int d = get(r,c);
-            unsigned int d2 = (unsigned int)ddgUtil::clamp(pow(d,f),0,0xFFFF);
+            unsigned int d2 = (unsigned int)ddgUtil::clamp(pow(d,(unsigned int)f),0,0xFFFF);
 			set(r,c,d2);
 		}
 }
