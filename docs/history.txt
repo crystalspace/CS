@@ -4,6 +4,7 @@ The history order is reversed so that new features are at the top.
 	- Applied a patch from Peter Amstutz <tetron@student.umass.edu>
 	  which allows csMovable to operate nicely even if there is no
 	  attached mesh object (i.e. mesh object == NULL).
+	- Bumped up version to 0.93.
 12-Dec-2001
 	- Bumped up version for pending 0.92 release.
 	- Added GetLogicalParent() and SetLogicalParent() functions
