@@ -28,7 +28,6 @@
 #include "csgeom/matrix3.h"
 
 class csEngine;
-class csView;
 struct iMaterialWrapper;
 struct iTextureManager;
 struct iFont;
@@ -39,6 +38,7 @@ struct iMeshFactoryWrapper;
 struct iSector;
 struct iMeshWrapper;
 struct iDynLight;
+struct iView;
 
 class KeyMapping
 {
@@ -305,7 +305,7 @@ private:
 public:
   iMeshObjectType* thing_type;
   csEngine* engine;
-  csView* view;
+  iView* view;
   iTextureManager* txtmgr;
   static int white, black, red;
 

@@ -1208,6 +1208,12 @@ void csSector::eiSector::AddMesh (iMeshWrapper *pMesh)
   scfParent->AddMesh (pMesh->GetPrivateObject ());
 }
 
+iMeshWrapper *csSector::eiSector::FindMesh (const char *name)
+{
+  csMeshWrapper *mw = scfParent->GetMesh (name);
+  return mw ? &mw->scfiMeshWrapper : NULL;
+}
+
 int csSector::eiSector::GetTerrainCount ()
 {
   return scfParent->GetNumberTerrains ();
@@ -1216,6 +1222,12 @@ int csSector::eiSector::GetTerrainCount ()
 iTerrainWrapper *csSector::eiSector::GetTerrain (int n)
 {
   return &scfParent->GetTerrain (n)->scfiTerrainWrapper;
+}
+
+iTerrainWrapper *csSector::eiSector::FindTerrain (const char *name)
+{
+  csTerrainWrapper *tw = scfParent->GetTerrain (name);
+  return tw ? &tw->scfiTerrainWrapper : NULL;
 }
 
 void csSector::eiSector::AddTerrain (iTerrainWrapper *pTerrain)

@@ -44,11 +44,12 @@
 #include "iengine/ptextype.h"
 #include "iengine/sector.h"
 #include "iengine/movable.h"
+#include "iengine/polygon.h"
 #include "imap/parser.h"
 
 #include "csengine/engine.h"
 #include "csengine/sector.h"
-#include "csengine/polytext.h"
+// #include "csengine/polytext.h"
 #include "csengine/light.h"
 #include "csengine/textrans.h"
 #include "csengine/csview.h"
@@ -356,7 +357,7 @@ Blocks::~Blocks ()
 {
   if (dynlight) dynlight->DecRef ();
   if (engine) engine->Clear ();
-  delete view;
+  if (view) view->DecRef ();;
   delete keyconf_menu;
 #if defined(BLOCKS_NETWORKING)
   TerminateConnection();
@@ -1087,8 +1088,8 @@ void Blocks::start_horizontal_move (int dx, int dy)
 void Blocks::HandleCameraMovement ()
 {
   csVector3 pos = cam_move_dist*cam_move_src + (1-cam_move_dist)*cam_move_dest;
-  view->GetCamera ()->SetPosition (pos);
-  view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
+  view->GetCamera ()->GetTransform ().SetOrigin (pos);
+  view->GetCamera ()->GetTransform ().LookAt (view_origin-pos, cam_move_up);
 }
 
 void Blocks::HandleGameOverKey (int key, bool /*shift*/, bool /*alt*/,
@@ -1125,7 +1126,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
   {
     if (cam_move_dist) return;
     cam_move_dist = 1;
-    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    cam_move_src = view->GetCamera ()->GetTransform ().GetO2TTranslation ();
     cur_hor_dest = (cur_hor_dest-1+4)%4;
     cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
     cam_move_up = csVector3 (0, 1, 0);
@@ -1138,7 +1139,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
   {
     if (cam_move_dist) return;
     cam_move_dist = 1;
-    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    cam_move_src = view->GetCamera ()->GetTransform ().GetO2TTranslation ();
     cur_hor_dest = (cur_hor_dest+1)%4;
     cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
     cam_move_up = csVector3 (0, 1, 0);
@@ -1151,7 +1152,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
   {
     if (cam_move_dist) return;
     cam_move_dist = 1;
-    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    cam_move_src = view->GetCamera ()->GetTransform ().GetO2TTranslation ();
     if (cur_ver_dest > 0) cur_ver_dest--;
     cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
     cam_move_up = csVector3 (0, 1, 0);
@@ -1160,7 +1161,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
   {
     if (cam_move_dist) return;
     cam_move_dist = 1;
-    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    cam_move_src = view->GetCamera ()->GetTransform ().GetO2TTranslation ();
     if (cur_ver_dest < 2) cur_ver_dest++;
     cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
     cam_move_up = csVector3 (0, 1, 0);
@@ -1169,7 +1170,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
   {
     if (cam_move_dist) return;
     cam_move_dist = 1;
-    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    cam_move_src = view->GetCamera ()->GetTransform ().GetO2TTranslation ();
     cam_move_dest = cam_move_src + .3 * (view_origin - cam_move_src);
     cam_move_up = csVector3 (0, 1, 0);
   }
@@ -1177,7 +1178,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
   {
     if (cam_move_dist) return;
     cam_move_dist = 1;
-    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    cam_move_src = view->GetCamera ()->GetTransform ().GetO2TTranslation ();
     cam_move_dest = cam_move_src - .3 * (view_origin - cam_move_src);
     cam_move_up = csVector3 (0, 1, 0);
   }
@@ -1743,9 +1744,9 @@ void Blocks::HandleMovement (cs_time elapsed_time)
     if (screen == SCREEN_STARTUP) s = demo_room;
     else s = room;
     if (player1->fog_density)
-      s->GetPrivateObject ()->SetFog (player1->fog_density, csColor (0, 0, 0));
+      s->SetFog (player1->fog_density, csColor (0, 0, 0));
     else
-      s->GetPrivateObject ()->DisableFog ();
+      s->DisableFog ();
     return;
   }
 
@@ -2013,9 +2014,9 @@ void Blocks::ChangePlaySize (int new_size)
   player1->zone_dim = new_size;
   WriteConfig ();
   InitGameRoom ();
-  room->GetPrivateObject ()->InitLightMaps (false);
+  room->InitLightMaps (false);
   room->ShineLights ();
-  room->GetPrivateObject ()->CreateLightMaps (Gfx3D);
+  room->CreateLightMaps (Gfx3D);
 }
 
 void Blocks::StartKeyConfig ()
@@ -2122,14 +2123,18 @@ void Blocks::InitGameRoom ()
   Sys->add_hrast (2, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
   Sys->add_hrast (2, (player1->zone_dim)-1, CUBE_DIM/2, CUBE_DIM/2, 0);
 
-  room->GetPrivateObject ()->AddLight (new csStatLight (-3, 5, 0, 10, .8, .4, .4, false));
-  room->GetPrivateObject ()->AddLight (new csStatLight (3, 5, 0, 10, .4, .4, .8, false));
-  room->GetPrivateObject ()->AddLight (new csStatLight (0, 5, -3, 10, .4, .8, .4, false));
-  room->GetPrivateObject ()->AddLight (new csStatLight (0, 5, 3, 10, .8, .4, .8, false));
-  room->GetPrivateObject ()->AddLight (new csStatLight (0, (ZONE_HEIGHT-3-3)*CUBE_DIM+1, 0,
-  	CUBE_DIM*10, .5, .5, .5, false));
-  room->GetPrivateObject ()->AddLight (new csStatLight (0, (ZONE_HEIGHT-3+3)*CUBE_DIM+1, 0,
-  	CUBE_DIM*10, .5, .5, .5, false));
+  room->AddLight (engine->CreateLight (NULL,
+    csVector3(-3, 5, 0), 10, csColor(.8, .4, .4), false));
+  room->AddLight (engine->CreateLight (NULL,
+    csVector3(3, 5, 0), 10, csColor(.4, .4, .8), false));
+  room->AddLight (engine->CreateLight (NULL,
+    csVector3(0, 5, -3), 10, csColor(.4, .8, .4), false));
+  room->AddLight (engine->CreateLight (NULL,
+    csVector3(0, 5, 3), 10, csColor(.8, .4, .8), false));
+  room->AddLight (engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3-3) *
+    CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false));
+  room->AddLight (engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3+3) *
+    CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false));
 }
 
 void Blocks::InitDemoRoom ()
@@ -2151,7 +2156,8 @@ void Blocks::InitDemoRoom ()
 
   walls_state->DecRef ();
 
-  demo_room->GetPrivateObject ()->AddLight (new csStatLight (0, 0, -2, 10, .4, .4, .4, false));
+  demo_room->AddLight (engine->CreateLight (NULL, csVector3 (0, 0, -2),
+    10, csColor (.4, .4, .4), false));
 
   float char_width = CUBE_DIM*4.;
   float offset_x = -char_width * (6/2)+CUBE_DIM*2;
@@ -2209,15 +2215,15 @@ void Blocks::StartDemo ()
   dynlight->QueryLight ()->SetSector (demo_room);
   dynlight->Setup ();
 
-  view->scfiView.SetSector (demo_room);
+  view->SetSector (demo_room);
   csVector3 pos (0, 3, -5);
-  view->GetCamera ()->SetPosition (pos);
+  view->GetCamera ()->GetTransform ().SetOrigin (pos);
   cam_move_up = csVector3 (0, 1, 0);
-  view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
+  view->GetCamera ()->GetTransform ().LookAt (view_origin-pos, cam_move_up);
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 
   player1->fog_density = 1;
-  demo_room->GetPrivateObject ()->SetFog (player1->fog_density, csColor (0, 0, 0));
+  demo_room->SetFog (player1->fog_density, csColor (0, 0, 0));
 
   InitMainMenu ();
   menu_hor_old_menu = NULL;
@@ -2252,7 +2258,7 @@ void Blocks::StartNewGame ()
     iMeshWrapper* cube = room->GetMesh (i);
     if (!strncmp (cube->QueryObject ()->GetName (), "cube", 4))
     {
-      room->GetPrivateObject ()->UnlinkMesh (cube->GetPrivateObject ());
+      room->RemoveMesh (cube);
       cube->DecRef ();
     }
     else
@@ -2263,12 +2269,12 @@ void Blocks::StartNewGame ()
   Sys->StartNewShape ();
 
   cam_move_up = csVector3 (0, 1, 0);
-  view->SetSector (room->GetPrivateObject ());
+  view->SetSector (room);
   Sys->HandleCameraMovement ();
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 
   player1->fog_density = 1;
-  room->GetPrivateObject ()->SetFog (player1->fog_density, csColor (0, 0, 0));
+  room->SetFog (player1->fog_density, csColor (0, 0, 0));
 }
 
 void Blocks::removePlanesVisual (States* player)
@@ -2281,7 +2287,7 @@ void Blocks::removePlanesVisual (States* player)
         { // Physically remove it.
           char temp[20];
           sprintf (temp, "cubeAt%d%d%d", x, y, z);
-	  iMeshWrapper* th = &(room->GetPrivateObject ()->GetMesh (temp)->scfiMeshWrapper);
+	  iMeshWrapper* th = room->FindMesh (temp);
 	  th->GetMovable ()->ClearSectors ();
 	  th->GetMovable ()->UpdateMove ();
         }
@@ -2345,8 +2351,7 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
 	  player1->set_cube (x, y, z-1, player1->get_cube (x, y, z));
           sprintf (temp, "cubeAt%d%d%d", x, y, z);
 
-  	  csMeshWrapper *mw = room->GetPrivateObject ()->GetMesh (temp);
-	  t = mw ? &mw->scfiMeshWrapper : NULL;
+  	  t = room->FindMesh (temp);
           if (t)
 	  {
             sprintf (temp, "cubeAt%d%d%d", x, y, z-1);
@@ -2376,8 +2381,7 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
 	sprintf (temp, "cubeAt%d%d%d", x, y, z);
         // Only if there is a thing at that certain position, or less
 	// then CUBE_DIM lower.
-	csMeshWrapper *mw = room->GetPrivateObject ()->GetMesh (temp);
-	t = mw ? &mw->scfiMeshWrapper : NULL;
+	t = room->FindMesh (temp);
 	if (t)
 	{
           t->GetMovable ()->MovePosition (csVector3 (0, -elapsed_fall, 0));
@@ -3061,7 +3065,7 @@ int main (int argc, char* argv[])
   // manually creating a camera and a clipper but it makes things a little
   // easier.
 
-  Sys->view = new csView (Sys->engine, Gfx3D);
+  Sys->view = Sys->engine->CreateView (Gfx3D);
 
   // Create our world.
   Sys->Printf (MSG_INITIALIZATION, "Creating world!...\n");

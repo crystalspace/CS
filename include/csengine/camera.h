@@ -23,6 +23,7 @@
 #include "csgeom/transfrm.h"
 #include "iengine/camera.h"
 #include "csengine/planeclp.h"
+#include "csengine/sector.h"
 
 class csSector;
 class csPolygon3D;
@@ -342,36 +343,42 @@ public:
   {
     DECLARE_EMBEDDED_IBASE (csCamera);
     virtual csCamera* GetPrivateObject ()
-    {
-      return scfParent;
-    }
-    virtual float GetFOV () { return scfParent->GetFOV (); }
-    virtual float GetInvFOV () { return scfParent->GetInvFOV (); }
-    virtual float GetFOVAngle () { return scfParent->GetFOVAngle (); }
-    virtual float GetShiftX () { return scfParent->GetShiftX (); }
-    virtual float GetShiftY () { return scfParent->GetShiftY (); }
+    { return scfParent; }
+
+    virtual int GetFOV ()
+    { return scfParent->GetFOV (); }
+    virtual float GetInvFOV ()
+    { return scfParent->GetInvFOV (); }
+    virtual float GetFOVAngle ()
+    { return scfParent->GetFOVAngle (); }
+    virtual void SetFOV (int a, int width)
+    { scfParent->SetFOV (a, width); }
+    virtual void SetFOVAngle (float a, int width)
+    { scfParent->SetFOVAngle (a, width); }
+
+    virtual float GetShiftX ()
+    { return scfParent->GetShiftX (); }
+    virtual float GetShiftY ()
+    { return scfParent->GetShiftY (); }
+    virtual void SetPerspectiveCenter (float x, float y)
+    { scfParent->SetPerspectiveCenter (x, y); }
+
     virtual csOrthoTransform& GetTransform ()
     { return *(csOrthoTransform*)scfParent; }
-    virtual void SetPosition (const csVector3& v)
-    {
-      scfParent->SetPosition (v);
-    }
     virtual void MoveWorld (const csVector3& v, bool cd = true)
-    {
-      scfParent->MoveWorld (v, cd);
-    }
+    { scfParent->MoveWorld (v, cd); }
     virtual void Move (const csVector3& v, bool cd = true)
-    {
-      scfParent->Move (v, cd);
-    }
+    { scfParent->Move (v, cd); }
     virtual void MoveWorldUnrestricted (const csVector3& v)
-    {
-      scfParent->MoveWorldUnrestricted (v);
-    }
+    { scfParent->MoveWorldUnrestricted (v); }
     virtual void MoveUnrestricted (const csVector3& v)
-    {
-      scfParent->MoveUnrestricted (v);
-    }
+    { scfParent->MoveUnrestricted (v); }
+
+    virtual iSector* GetSector ()
+    { return scfParent->GetSector () ? &scfParent->GetSector()->scfiSector : NULL; }
+    virtual void SetSector (iSector *s)
+    { scfParent->SetSector (s->GetPrivateObject ()); }
+
     virtual void Correct (int n)
     {
       scfParent->Correct (n);
@@ -389,7 +396,6 @@ public:
       if (scfParent->fp) { pl = *scfParent->fp; return scfParent->use_farplane; }
       else return false;
     }
-    virtual iSector* GetSector ();
     virtual long GetCameraNumber ()
     {
       return scfParent->GetCameraNumber ();

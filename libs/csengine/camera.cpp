@@ -173,9 +173,3 @@ void csCamera::ComputeDefaultAngle (int width)
   float inv_disp_radius = qisqrt (rview_fov*rview_fov + disp_width*disp_width);
   default_fov_angle = 2. * acos (disp_width * inv_disp_radius) * (360./(2.*M_PI));
 }
-
-iSector* csCamera::Camera::GetSector ()
-{
-  return &scfParent->GetSector ()->scfiSector;
-}
-

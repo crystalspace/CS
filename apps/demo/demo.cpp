@@ -783,7 +783,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
 
   view = engine->CreateView (G3D);
   view->SetSector (room);
-  view->GetCamera ()->SetPosition (csVector3 (0, 0, -900));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -900));
   view->GetCamera ()->GetTransform ().RotateThis (csVector3 (0, 1, 0), .8);
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
 
@@ -915,7 +915,7 @@ void Demo::NextFrame ()
       np->GetInterpolatedPosition (pos);
       np->GetInterpolatedUp (up);
       np->GetInterpolatedForward (forward);
-      view->GetCamera ()->SetPosition (pos);
+      view->GetCamera ()->GetTransform ().SetOrigin (pos);
       view->GetCamera ()->GetTransform ().LookAt (forward.Unit (), up.Unit ());
     }
   }

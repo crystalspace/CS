@@ -26,6 +26,8 @@
 #include "csutil/cscolor.h"
 #include "iengine/sector.h"
 #include "ivideo/graph3d.h"
+#include "iengine/mesh.h"
+#include "iengine/terrain.h"
 
 class csEngine;
 class csStatLight;
@@ -530,23 +532,33 @@ public:
     virtual void AddTerrain (iTerrainWrapper *pTerrain);
     virtual void AddLight (iStatLight *light);
     virtual iStatLight *FindLight (float x, float y, float z, float dist);
+    virtual void InitLightMaps (bool do_cache)
+    { scfParent->InitLightMaps (do_cache); }
     virtual void ShineLights ()
-    {
-      scfParent->ShineLights ();
-    }
+    { scfParent->ShineLights (); }
     virtual void ShineLights (iMeshWrapper* mesh)
-    {
-      scfParent->ShineLights (mesh);
-    }
+    { scfParent->ShineLights (mesh); }
+    virtual void CreateLightMaps (iGraphics3D* g3d)
+    { scfParent->CreateLightMaps (g3d); }
+    virtual void CacheLightMaps ()
+    { scfParent->CacheLightMaps (); }
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes,
   	bool do_terrain)
-    {
-      scfParent->CalculateSectorBBox (bbox, do_meshes, do_terrain);
-    }
+    { scfParent->CalculateSectorBBox (bbox, do_meshes, do_terrain); }
     virtual CS_ID GetID () { return scfParent->GetID (); }
     virtual bool HasFog () { return scfParent->HasFog (); }
     virtual csFog *GetFog () { return &scfParent->fog; }
+    virtual void SetFog (float density, const csColor& color)
+    { scfParent->SetFog (density, color); }
+    virtual void DisableFog ()
+    { scfParent->DisableFog (); }
     virtual int GetRecLevel () { return scfParent->draw_busy; }
+    virtual iTerrainWrapper *FindTerrain (const char *name);
+    virtual iMeshWrapper *FindMesh (const char *name);
+    virtual void RemoveMesh (iMeshWrapper *pMesh)
+    { scfParent->UnlinkMesh (pMesh->GetPrivateObject ()); }
+    virtual void RemoveTerrain (iTerrainWrapper *pTerrain)
+    { scfParent->UnlinkTerrain (pTerrain->GetPrivateObject ()); }
   } scfiSector;
   friend struct eiSector;
 };

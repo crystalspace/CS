@@ -48,24 +48,30 @@ struct iCamera : public iBase
 {
   /// Ugly@@@.
   virtual csCamera* GetPrivateObject () = 0;
+
   ///
-  virtual float GetFOV () = 0;
+  virtual int GetFOV () = 0;
   ///
   virtual float GetInvFOV () = 0;
   ///
   virtual float GetFOVAngle () = 0;
   ///
+  virtual void SetFOV (int a, int width) = 0;
+  ///
+  virtual void SetFOVAngle (float a, int width) = 0;
+
+  ///
   virtual float GetShiftX () = 0;
   ///
   virtual float GetShiftY () = 0;
+  ///
+  virtual void SetPerspectiveCenter (float x, float y) = 0;
+
   /**
-   * Sets the absolute position of the camera inside the sector.
-   * Vector 'v' is in world space coordinates. This function does
-   * not check if the vector is really in the current sector. In
-   * fact it is legal to set the position outside the sector
-   * boundaries.
+   * Get the transform corresponding to this camera. In this transform,
+   * 'other' is world space and 'this' is camera space.
    */
-  virtual void SetPosition (const csVector3& v) = 0;
+  virtual csOrthoTransform& GetTransform () = 0;
   /**
    * Moves the camera a relative amount in world coordinates.
    * If 'cd' is true then collision detection with objects and things
@@ -73,12 +79,10 @@ struct iCamera : public iBase
    * (but portals will still be correctly checked).
    */
   virtual void MoveWorld (const csVector3& v, bool cd = true) = 0;
-
   /**
    * Moves the camera a relative amount in camera coordinates.
    */
   virtual void Move (const csVector3& v, bool cd = true) = 0;
-
   /**
    * Moves the camera a relative amount in world coordinates,
    * ignoring portals and walls. This is used by the wireframe
@@ -87,7 +91,6 @@ struct iCamera : public iBase
    * sector boundaries.
    */
   virtual void MoveWorldUnrestricted (const csVector3& v) = 0;
-
   /**
    * Moves the camera a relative amount in camera coordinates,
    * ignoring portals and walls. This is used by the wireframe
@@ -97,16 +100,16 @@ struct iCamera : public iBase
    */
   virtual void MoveUnrestricted (const csVector3& v) = 0;
 
+  /// Get the current sector.
+  virtual iSector* GetSector () = 0;
+  /// Move to another sector.
+  virtual void SetSector (iSector*) = 0;
+
   /**
    * Eliminate roundoff error by snapping the camera orientation to a
    * grid of density n
    */
   virtual void Correct (int n) = 0;
-
-  /**
-   * Get the transform corresponding to this camera.
-   */
-  virtual csOrthoTransform& GetTransform () = 0;
 
   /// Return true if space is mirrored.
   virtual bool IsMirrored () = 0;
@@ -120,11 +123,6 @@ struct iCamera : public iBase
    * drawing.
    */
   virtual bool GetFarPlane (csPlane3& pl) = 0;
-
-  /**
-   * Get the current sector.
-   */
-  virtual iSector* GetSector () = 0;
 
   /**
    * Get the camera number. This number is changed for every new camera

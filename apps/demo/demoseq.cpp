@@ -296,7 +296,7 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time elapsed_time)
     }
     else
     {
-      camera->SetPosition (pos);
+      camera->GetTransform ().SetOrigin (pos);
       camera->GetTransform ().LookAt (forward.Unit (), up.Unit ());
     }
     if (!do_path)
@@ -357,7 +357,7 @@ void DemoSequenceManager::DebugPositionObjects (iCamera* camera,
       }
       else
       {
-        camera->SetPosition (pos);
+        camera->GetTransform ().SetOrigin (pos);
         camera->GetTransform ().LookAt (forward.Unit (), up.Unit ());
       }
     }
