@@ -81,7 +81,7 @@ triggers are used to define interactions and other special actions on
 objects and other objects in the world.
 
 @subsubheading Texture Specification Section
-@cindex Texture Specification (Map File)
+@cindex textures Specification (Map File)
 
 Here is an example texture specification section:
 
@@ -115,7 +115,7 @@ procedural textures predefined in Crystal Space: @samp{fire}, @samp{water},
 @samp{dots}, and @samp{plasma}.
 
 @subsubheading Material Specification Section
-@cindex Material Specification (Map File)
+@cindex materials (Map File)
 
 Materials are very important in Crystal Space. Almost all objects will
 use materials to define the surface characteristics of their geometry.
@@ -162,3 +162,70 @@ that uses the @samp{plasma} texture. The layer is scaled 10 times in both
 @samp{plasma} texture will be repeated when needed (i.e. if the surface
 on which this material is used is large). Note that not all renderers
 support layered materials. In that case the second layer will be ignored.
+
+@subsubheading Effects Section
+@cindex effects (Map File)
+
+With effects you can describe more advanced texture and material
+effects (think shaders). The documentation for this section is not up-to-date
+since the entire effect/shader system is still work in progress.
+
+@subsubheading Sounds Section
+@cindex sounds (Map File)
+
+Todo.
+
+@subsubheading Variable Section
+@cindex variables (Map File)
+
+Todo.
+
+@subsubheading Render Priority Section
+@cindex render priorities (Map File)
+
+Render priorities are important for deciding when to render objects.
+When placing objects in a sector you place them in some render priority
+queue (@pxref{HOWTO Render Priorities}).
+
+Here is an example render priority section. It is also the default
+render priority section. i.e. if you don't specify render priorities you
+will get at least @samp{sky}, @samp{wall}, @samp{object}, and @samp{alpha}:
+
+@example
+<renderpriorities>
+    <priority name="sky">
+        <level>1</level>
+        <sort>NONE</sort>
+    </priority>
+    <priority name="wall">
+        <level>2</level>
+        <sort>NONE</sort>
+    </priority>
+    <priority name="object">
+        <level>3</level>
+        <sort>NONE</sort>
+    </priority>
+    <priority name="alpha">
+        <level>4</level>
+        <sort>BACK2FRONT</sort>
+    </priority>
+</renderpriorities>
+@end example
+
+@subsubheading Plugin Section
+@cindex plugin section (Map File)
+
+The plugin section is purely for conveniance later. Normally when creating
+mesh objects you have to specify the @sc{scf} class name of the loader
+which will parse the @sc{xml} data for that mesh object. This is a long
+name. The plugin section allows you to define shorter names for those
+plugins. Here is an example where names are defined for the thing,
+spr3d, and spr3dfact plugins:
+
+@example
+<plugins>
+    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+    <plugin name="spr3dFact">crystalspace.mesh.loader.factory.sprite.3d</plugin>
+    <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
+</plugins>
+@end example
