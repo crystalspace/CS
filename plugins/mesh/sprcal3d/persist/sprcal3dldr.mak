@@ -1,4 +1,4 @@
-DESCRIPTION.sprcal3dldr = Cal3D sprite mesh plugin
+DESCRIPTION.sprcal3dldr = Cal3D sprite mesh loader plugin
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
