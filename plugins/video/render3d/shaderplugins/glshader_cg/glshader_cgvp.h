@@ -23,8 +23,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
 
-#include "cg/cg.h"
-#include "cg/cgGL.h"
+#include "Cg/cg.h"
+#include "Cg/cgGL.h"
 
 class csShaderGLCGVP : public iShaderProgram
 {
