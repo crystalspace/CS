@@ -1990,14 +1990,27 @@ public:
 #ifdef CS_USE_NEW_RENDERER
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
+  private:
+    csSprite3DMeshObject* parent;
+
   public:
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
+    eiShaderVariableAccessor (csSprite3DMeshObject* p)
+    {
+      SCF_CONSTRUCT_IBASE (0);
+      parent = p;
+    }
+    virtual ~eiShaderVariableAccessor ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
+    SCF_DECLARE_IBASE;
     virtual void PreGetValue (csShaderVariable* variable)
     {
-      scfParent->PreGetShaderVariableValue (variable);
+      parent->PreGetShaderVariableValue (variable);
     }
-  } scfiShaderVariableAccessor;
+  };
   friend class eiShaderVariableAccessor;
+  csRef<eiShaderVariableAccessor> scfiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
 #endif // CS_USE_NEW_RENDERER

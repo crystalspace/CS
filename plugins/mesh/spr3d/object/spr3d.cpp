@@ -873,8 +873,6 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DState)
 #ifndef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
-#else
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShaderVariableAccessor)
 #endif // CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
   {
@@ -908,9 +906,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #else
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::eiShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE (csSprite3DMeshObject::eiShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 #endif // CS_USE_NEW_RENDERER
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::LODControl)
@@ -950,8 +948,6 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
 #ifndef CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#else
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
 #endif // CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
   logparent = 0;
@@ -1028,8 +1024,6 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
 #ifndef CS_USE_NEW_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#else
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
 #endif // CS_USE_NEW_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
   SCF_DESTRUCT_IBASE ();
@@ -1306,17 +1300,18 @@ void csSprite3DMeshObject::SetupObject ()
     colors_name = strings->Request ("colors");
     indices_name = strings->Request ("indices");
   
+    scfiShaderVariableAccessor.AttachNew (new eiShaderVariableAccessor (this));
     csShaderVariable* sv;
     sv = svcontext.GetVariableAdd (vertices_name);
-    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
     sv = svcontext.GetVariableAdd (normals_name);
-    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
     sv = svcontext.GetVariableAdd (texcoords_name);
-    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
     sv = svcontext.GetVariableAdd (colors_name);
-    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
     sv = svcontext.GetVariableAdd (indices_name);
-    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
   
 #endif // CS_USE_NEW_RENDERER
 
