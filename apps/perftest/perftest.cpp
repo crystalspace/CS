@@ -129,6 +129,8 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     return false;
   }
+  myG3D->IncRef ();
+
   iGraphics2D* myG2D = myG3D->GetDriver2D ();
   iNativeWindow* nw = myG2D->GetNativeWindow ();
   if (nw) nw->SetTitle ("Crystal Space Graphics Performance Tester");
@@ -154,6 +156,7 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
     return false;
   }
+  myVFS->IncRef ();
 
   // Setup the texture manager
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
