@@ -4,7 +4,7 @@ if $(CMD.MAKEINFO)
 {
   Texi2Info manualinfo : cs-unix.txi : info : info manual ;
   FLAGS.MAKEINFO on manualinfo += --output=crystal.info ;
-  Help manualinfo : "user manual in info format" ;
+  Help manualinfo : "user manual in Info format" ;
 }
   
 if $(CMD.TEXI2HTML)
@@ -12,25 +12,25 @@ if $(CMD.TEXI2HTML)
   TEXI2HTML.INIT = [ ConcatDirs $(TOP) docs support texi2html.init ] ;
   FLAGS.TEXI2HTML on manualhtml += -init_file=$(TEXI2HTML.INIT) -prefix=cs ;
   Texi2HTML manualhtml : cs-unix.txi : html manual ;
-  Help manualhtml : "user manual in html format" ;
+  Help manualhtml : "user manual in HTML format" ;
 }
 
 if $(CMD.TEXI2DVI)
 {
   Texi2DVI manualdvi : cs-unix.txi : dvi manual ;
-  Help manualdvi : "user manual in dvi format" ;
+  Help manualdvi : "user manual in DVI format" ;
 }
 
 if $(CMD.TEXI2DVI) && $(CMD.DVIPS)
 {
   Texi2PS manualps : cs-unix.txi : ps manual ;
-  Help manualps : "user manual in ps format" ;
+  Help manualps : "user manual in PS format" ;
 }
 
 if $(CMD.TEXI2DVI) && $(CMD.DVIPDF)
 {
   Texi2PDF manualpdf : cs-unix.txi : pdf manual ;
-  Help manualpdf : "user manual in pdf format" ;
+  Help manualpdf : "user manual in PDF format" ;
 }
 
 if $(PERL)
