@@ -53,51 +53,67 @@ int csCrystalBall::csTriNode::Add (const csCrystalBallVec *normal,
 	mc->Normalize (); // now the point lies on the unit sphere
 	divider = vTP->Push ((void*)mc);
 
-	bool bNew=false, bOld=false;
+	bool bNew = false, bOld = false;
 
 	// now decide which triangle the old and the new point(s) will go into
-	if ((bOld=(Classify (*n, tri1, tri2, divider, vTP) == INSIDE)))
+  bOld = Classify (*n, tri1, tri2, divider, vTP);
+	if (bOld == INSIDE)
+  {
 	  // contains the original points
 	  AddChild (new csTriNode (this, from, len));
+  }
 	else
-	if ((bNew=(Classify (*normal, tri1, tri2, divider, vTP) == INSIDE)))
-	{
-	  csTriNode *tnode = new csTriNode (this, from+len, 0);
-	  AddChild (tnode); // contains the new point
-	  nPos = tnode->Add (normal, tri1, tri2, divider, vP, vTP);
-	}
-	else
-	  AddChild (new csTriNode (this, from+len+1, 0)); // remains empty
+  {
+    bNew = Classify (*normal, tri1, tri2, divider, vTP);
+    if (bNew == INSIDE)
+    {
+      csTriNode *tnode = new csTriNode (this, from+len, 0);
+      AddChild (tnode); // contains the new point
+      nPos = tnode->Add (normal, tri1, tri2, divider, vP, vTP);
+    }
+    else
+      AddChild (new csTriNode (this, from+len+1, 0)); // remains empty
+  }
 
-	if (!bOld && (bOld=(Classify (*n, tri2, tri3, divider, vTP) == INSIDE)))
+  bOld = Classify (*n, tri2, tri3, divider, vTP);
+	if (!bOld && bOld == INSIDE)
+  {
 	  // contains the original points
 	  AddChild (new csTriNode (this, from, len));
+  }
 	else
-	if (!bNew && (bNew=(Classify (*normal, tri2, tri3, divider, vTP)
-		== INSIDE)))
-	{
-	  csTriNode *tnode = new csTriNode (this, from+len, 0);
-	  // contains the new point
-	  AddChild (new csTriNode (this, from+len, 1));
-	  nPos = tnode->Add (normal, tri2, tri3, divider, vP, vTP);
-	}
-	else
-	  AddChild (new csTriNode (this, from+len+1, 0)); // remains empty
+  {
+    bNew = Classify (*normal, tri2, tri3, divider, vTP);
+    if (!bNew && bNew == INSIDE)
+    {
+      csTriNode *tnode = new csTriNode (this, from+len, 0);
+      // contains the new point
+      AddChild (new csTriNode (this, from+len, 1));
+      nPos = tnode->Add (normal, tri2, tri3, divider, vP, vTP);
+    }
+    else
+      AddChild (new csTriNode (this, from+len+1, 0)); // remains empty
+  }
 
-	if (!bOld && (bOld=(Classify (*n, tri3, tri1, divider, vTP) == INSIDE)))
+  bOld = Classify (*n, tri3, tri1, divider, vTP);
+	if (!bOld && bOld == INSIDE)
+  {
 	  // contains the original points
 	  AddChild (new csTriNode (this, from, len));
+  }
 	else
-	if (!bNew && (bNew=(Classify (*normal, tri3, tri1, divider, vTP)
-		== INSIDE)))
-	{
-	  csTriNode *tnode = new csTriNode (this, from+len, 0);
-	  // contains the new point
-	  AddChild (new csTriNode (this, from+len, 1));
-	  nPos = tnode->Add (normal, tri3, tri1, divider, vP, vTP);
-	}
-	else
-	  AddChild (new csTriNode (this, from+len+1, 0)); // remains empty
+  {
+    bNew = Classify (*normal, tri3, tri1, divider, vTP);
+    if (!bNew && bNew== INSIDE)
+    {
+      csTriNode *tnode = new csTriNode (this, from+len, 0);
+      // contains the new point
+      AddChild (new csTriNode (this, from+len, 1));
+      nPos = tnode->Add (normal, tri3, tri1, divider, vP, vTP);
+    }
+    else
+      AddChild (new csTriNode (this, from+len+1, 0)); // remains empty
+  }
 
       }
     }
