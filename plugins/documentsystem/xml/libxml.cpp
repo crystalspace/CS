@@ -29,9 +29,18 @@ static inline float String2Float (const char* string)
   return val;
 }
 
-// XXX XXX XXX XXX @@@ FIXME FIXME This is very bad, but CS illegally keeps
-// some refs to strings which make it crash if we don't start to leak here...
-#define xmlFree(x)
+static inline const char* GetXmlText (xmlNodePtr node)
+{
+  // this is not that nice but using the libxml2 functions is not an option
+  // because they construct new strings
+  for (xmlNodePtr n = node; n!=NULL; n=n->next)
+  {
+    if (n->type == XML_TEXT_NODE)
+      return (const char*) n->content;
+  }
+
+  return "";
+}
 
 //---------------------------------------------------------------------------
 
@@ -39,33 +48,22 @@ class csXMLAttribute : public iDocumentAttribute
 {
 public:
   SCF_DECLARE_IBASE;
-  csXMLAttribute (xmlNodePtr node, xmlAttrPtr attr, const xmlChar* name);
+  csXMLAttribute (xmlNodePtr node, xmlAttrPtr attr);
   virtual ~csXMLAttribute ();
 
   virtual const char* GetName ()
   { return (const char*) attr->name; }
   virtual const char* GetValue ()
   { 
-    xmlFree (temptext);
-    temptext = xmlGetProp (node, name);
-    
-    return (const char*) temptext;
+    return (const char*) GetXmlText (attr->children);
   }
   virtual int GetValueAsInt ()
   { 
-    xmlChar* val = xmlGetProp (node, name);
-    int i = String2Int((const char*) val);
-    xmlFree(val);
-    
-    return i;
+    return String2Int(GetValue());
   }
   virtual float GetValueAsFloat ()
   { 
-    xmlChar* val = xmlGetProp (node, name);
-    float f = String2Float ((const char*) val);
-    xmlFree(val);
-        
-    return f;
+    return String2Float (GetValue());
   }
 
   virtual void SetValue (const char* value)
@@ -103,8 +101,6 @@ public:
 private:
   xmlNodePtr node;
   xmlAttrPtr attr;
-  xmlChar* name;
-  xmlChar* temptext;
 };
 
 class csXMLAttributeIterator : public iDocumentAttributeIterator
@@ -124,8 +120,7 @@ public:
     if (attr)
       attr = attr->next;
 
-    return csPtr<iDocumentAttribute> (new csXMLAttribute (node, csattr,
-	  attr->name));
+    return csPtr<iDocumentAttribute> (new csXMLAttribute (node, csattr));
   }
 
 private:
@@ -150,18 +145,14 @@ SCF_IMPLEMENT_IBASE_END
 
 //---------------------------------------------------------------------------
 
-csXMLAttribute::csXMLAttribute (xmlNodePtr newnode, xmlAttrPtr newattr,
-    const xmlChar* newname)
-  : node(newnode), attr(newattr), name(NULL), temptext(NULL)
+csXMLAttribute::csXMLAttribute (xmlNodePtr newnode, xmlAttrPtr newattr)
+  : node(newnode), attr(newattr)
 {
   SCF_CONSTRUCT_IBASE(0);
-  name = xmlStrdup (newname);
 }
 
 csXMLAttribute::~csXMLAttribute ()
 {
-  xmlFree(name);
-  xmlFree(temptext);
 }
 
 SCF_IMPLEMENT_IBASE (csXMLAttribute)
@@ -210,7 +201,6 @@ public:
   virtual csDocumentNodeType GetType ();
   virtual bool Equals (iDocumentNode* other)
   { 
-    printf ("Equals...\n");
     return false;
   }
   virtual const char* GetValue ()
@@ -251,11 +241,15 @@ public:
     if (!node)
       return NULL;
 
-    xmlFree(temptext2);
-    temptext2 = xmlNodeGetContent (node);
-    printf ("GetContents of '%s': %s\n", node->name, temptext2);
+    for (xmlNodePtr n = node->children; n != NULL; n=n->next)
+    {
+      if (n->type == XML_TEXT_NODE)
+      {
+	return (const char*) n->content;
+      }
+    }
 
-    return (const char*) temptext2;
+    return NULL;
   }
   virtual int GetContentsValueAsInt ()
   { return String2Int (GetContentsValue()); }
@@ -287,8 +281,6 @@ public:
 
 private:
   xmlNodePtr node;
-  xmlChar* temptext1;
-  xmlChar* temptext2;
 };
 
 SCF_IMPLEMENT_IBASE (csXMLDocumentNode)
@@ -296,15 +288,13 @@ SCF_IMPLEMENT_IBASE (csXMLDocumentNode)
 SCF_IMPLEMENT_IBASE_END
 
 csXMLDocumentNode::csXMLDocumentNode (xmlNodePtr newnode)
-    : node(newnode), temptext1(NULL), temptext2(NULL)
+    : node(newnode)
 {
   SCF_CONSTRUCT_IBASE(0);
 }
 
 csXMLDocumentNode::~csXMLDocumentNode ()
 {
-  xmlFree (temptext1);
-  xmlFree (temptext2);
 }
 
 csDocumentNodeType csXMLDocumentNode::GetType ()
@@ -328,20 +318,17 @@ csDocumentNodeType csXMLDocumentNode::GetType ()
 
 csRef<iDocumentNode> csXMLDocumentNode::GetNode (const char* name)
 {
-  printf ("GetNode: '%s'\n", name);
   for (xmlNodePtr p=node->children; p!=NULL; p=p->next)
   {
     if (p->name && strcmp (name, (const char*) p->name) == 0)
       return csPtr<iDocumentNode> (new csXMLDocumentNode(p));
   }
 
-  printf ("NULL!\n");
   return NULL;
 }
 
 csRef<iDocumentNodeIterator> csXMLDocumentNode::GetNodes (const char* name)
 {
-  printf ("GetNodes: '%s'\n", name);
   for (xmlNodePtr p=node->children; p!=NULL; p=p->next)
   {                                                            
     if (p->name && strcmp (name, (const char*) p->name) == 0)  
@@ -362,8 +349,7 @@ csRef<iDocumentAttribute> csXMLDocumentNode::GetAttribute (const char* name)
   for (xmlAttrPtr attr = node->properties; attr != NULL; attr = attr->next)
   {                                                                          
     if (attr->name && strcmp (name, (const char*) attr->name) == 0)
-      return csPtr<iDocumentAttribute> (new csXMLAttribute (node, attr,
-	    attr->name));
+      return csPtr<iDocumentAttribute> (new csXMLAttribute (node, attr));
   }
 
   return NULL;
@@ -380,11 +366,15 @@ const char* csXMLDocumentNode::GetAttributeValue (const char* name)
   if (!node)
     return NULL;
 
-  xmlFree (temptext1);
-  temptext1 = xmlGetProp (node, (const xmlChar*) name);
-  printf ("GetProp: %s - %s - '%s'\n", node->name, name, temptext1);
+  for (xmlAttrPtr attr = node->properties; attr!=NULL; attr=attr->next)
+  {
+    if (attr->name && strcmp(name, (const char*) attr->name) == 0)
+    {
+      return GetXmlText (attr->children);
+    }
+  }
 
-  return (const char*) temptext1;
+  return NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -400,7 +390,6 @@ csRef<iDocumentNode> csXMLDocumentNodeIterator::Next ()
     return NULL;
         
   xmlNodePtr temp = node;
-  printf ("NextNode. '%s'\n", node->name);
   node = node->next;
 
   return csPtr<iDocumentNode> (new csXMLDocumentNode(temp));
@@ -451,7 +440,6 @@ csXMLDocument::~csXMLDocument ()
 {
   if (doc)
   {
-    printf ("freeing Document...\n");
     xmlFreeDoc(doc);
   }
 }
@@ -461,8 +449,6 @@ csRef<iDocumentNode> csXMLDocument::GetRoot ()
   if (!doc->doc)
     return NULL;
 
-  printf ("GetRoot!\n");
-  
   // Not nice but seems this is needed in object oriented C
   xmlNodePtr rootnode = (xmlNodePtr) doc;
   return csPtr<iDocumentNode> (new csXMLDocumentNode (rootnode));
@@ -502,9 +488,6 @@ SCF_IMPLEMENT_IBASE_END
 csXMLDocumentSystem::csXMLDocumentSystem(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
-  printf ("XMLDOC Create:%p IDoc: %p\n", this, (iDocumentSystem*) this);
-  csRef<iDocumentSystem> docsys = SCF_QUERY_INTERFACE (this, iDocumentSystem);
-  printf ("Query: %p\n", (iDocumentSystem*) docsys);
 }
 
 csXMLDocumentSystem::~csXMLDocumentSystem ()
