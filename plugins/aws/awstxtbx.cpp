@@ -316,6 +316,7 @@ awsTextBox::OnKeypress(int key, int modifiers)
       
           text->Append(scfString(str));
           cursor++;
+          Broadcast(signalChanged);
         } // end if ignore
       } // end if is printable
     } // end default case

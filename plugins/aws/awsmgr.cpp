@@ -744,7 +744,7 @@ awsManager::CheckFocus(iAwsComponent *cmp, iEvent &Event)
             Event.Type = et;
           }
 
-          if (Event.Type == csevMouseClick)
+          if (Event.Type == csevMouseDown)
           {
             if (keyb_focus != cmp)
             {
