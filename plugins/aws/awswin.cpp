@@ -247,6 +247,9 @@ awsWindow::OnMouseMove(int button, int x, int y)
     
     if (!marked)
       WindowManager()->Mark(Frame());
+  
+    WindowManager()->InvalidateUpdateStore();
+
   } else if (moving_mode)
   {
     int delta_x = x-last_x;
@@ -293,7 +296,8 @@ awsWindow::OnMouseMove(int button, int x, int y)
     // Mark changed pos
     WindowManager()->Mark(dirty1);
     WindowManager()->Mark(dirty2);
-    
+
+    WindowManager()->InvalidateUpdateStore();
   }
   return false;
 }

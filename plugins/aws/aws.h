@@ -47,6 +47,16 @@ class awsManager : public iAws
    *  holds an infinite amount of optimal rectangular regions.
    */
    csRectRegion dirty;
+
+  /** This is the update store.  The update store contains all of the regions
+   *  that actually contain anything useful, and thus the only regions that 
+   *  need to be thrown to the screen.  The store must be cleared and rethrown
+   *  during window move operations.
+   */
+   csRectRegion updatestore;
+
+   /// True if the update store needs to be cleared and updated.
+   bool updatestore_dirty;
    
   /** This is the maximum frame for any window, because it's the size of our
    * canvas, be it the virtual one or otherwise. 
@@ -163,6 +173,9 @@ public:
 
     /// Mark a section of the screen clean.
     virtual void       Unmark(csRect &rect);
+
+    /// Tell the system to rebuild the update store
+    virtual void       InvalidateUpdateStore();
 
     /// Capture all mouse events until release is called, no matter where the mouse is
     virtual void       CaptureMouse();

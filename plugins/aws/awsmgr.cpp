@@ -16,7 +16,8 @@ awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
   factory->DecRef ();
 }
 
-awsManager::awsManager(iBase *p):prefmgr(NULL), 
+awsManager::awsManager(iBase *p):prefmgr(NULL),
+               updatestore_dirty(true), 
                top(NULL), ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
                UsingDefaultContext(false), DefaultContextInitialized(false)
 {
@@ -214,6 +215,13 @@ awsManager::Unmark(csRect &rect)
   dirty.Exclude(rect);  
 }
 
+void
+awsManager::InvalidateUpdateStore()
+{
+  updatestore_dirty=true;
+}
+
+
 bool
 awsManager::WindowIsDirty(awsWindow *win)
 {
@@ -228,10 +236,41 @@ awsManager::WindowIsDirty(awsWindow *win)
 void
 awsManager::Print(iGraphics3D *g3d)
 {
-  g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
+  if (updatestore_dirty)
+  {
+   g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
   		  0,0,512,480,//g3d->GetWidth(), g3d->GetHeight(),
 		  0,0,512,480,0);
-  
+
+   awsWindow *curwin=top;
+   
+   updatestore.makeEmpty();
+
+   // Get all frames into the store.
+   while(curwin)
+   {
+      updatestore.Include(curwin->Frame());
+      curwin = curwin->WindowBelow();
+   }
+
+   updatestore_dirty=false;
+
+  }
+  else
+  {
+    int i;
+    for(i=0; i<updatestore.Count(); ++i)
+    {
+
+      csRect r(updatestore.RectAt(i));
+
+      g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
+  		  r.xmin,r.ymin,r.xmax,r.ymax,
+		  r.xmin,r.ymin,r.xmax,r.ymax,
+                  0);
+
+    }
+  }
 }
 
 void       
@@ -256,6 +295,10 @@ awsManager::Redraw()
    
    /******* The following code is only executed if there is something to redraw *************/
    
+   if (updatestore_dirty && UsingDefaultContext)
+     ptG2D->DrawBox(0,0,512,480,erasefill);
+
+
    awsWindow *curwin=top, *oldwin = 0;
    
    // check to see if any part of this window needs redrawn
@@ -283,29 +326,45 @@ awsManager::Redraw()
           
         for(i=0; i<dirty.Count(); ++i)
         {
-          // Find out if we need to erase.
-          csRect lo(dirty.RectAt(i));
           csRect dr(dirty.RectAt(i));
-          lo.Subtract(curwin->Frame());
 
-          if (!lo.IsEmpty())            
-            ptG2D->DrawBox(dr.xmin, dr.ymin, dr.xmax, dr.ymax, erasefill);
+          // Find out if we need to erase.
+          if (!UsingDefaultContext)
+          {
+            csRect lo(dr);
+            lo.Subtract(curwin->Frame());
+
+            if (!lo.IsEmpty())            
+              ptG2D->DrawBox(dr.xmin-1, dr.ymin-1, dr.xmax+1, dr.ymax+1, erasefill);
+          }
           
           RedrawWindow(curwin, dr);
         }
       }
       curwin=curwin->WindowAbove();
    }
+  
+   //int i;
 
-   // Reset the dirty region
-   dirty.makeEmpty();
-
+   // Debug code: draw boxes around dirty regions
+   /*for(i=0; i<dirty.Count(); ++i)
+   {
+          csRect dr(dirty.RectAt(i));
+          ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmax, dr.ymin, GetPrefMgr()->GetColor(AC_WHITE));
+          ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmin, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+          ptG2D->DrawLine(dr.xmin, dr.ymax, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+          ptG2D->DrawLine(dr.xmax, dr.ymin, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+   }*/
+   
    // This only needs to happen when drawing to the default context.
    if (UsingDefaultContext)
    {
      ptG3D->FinishDraw ();
      ptG3D->Print (&bounds);
    }
+
+   // Reset the dirty region
+   dirty.makeEmpty();
 
    // done with the redraw!
 }
