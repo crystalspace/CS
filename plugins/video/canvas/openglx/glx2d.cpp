@@ -155,6 +155,10 @@ bool csGraphics2DGLX::Open(char *Title)
   CsPrintf (MSG_INITIALIZATION, "Video driver GL/X version ");
   if (glXIsDirect(dpy,active_GLContext))
     CsPrintf (MSG_INITIALIZATION, "(direct renderer) ");
+# ifdef DO_SHM
+  if (do_shm)
+    CsPrintf (MSG_INITIALIZATION, "(XSHM) ");
+# endif
 
   // Set loop callback
   UnixSystem->SetLoopCallback (ProcessEvents, this);
