@@ -12714,7 +12714,6 @@ sub B_COEF () { $cspacec::B_COEF }
 sub R_COEF_SQ () { $cspacec::R_COEF_SQ }
 sub G_COEF_SQ () { $cspacec::G_COEF_SQ }
 sub B_COEF_SQ () { $cspacec::B_COEF_SQ }
-sub CS_REQUEST_END () { $cspacec::CS_REQUEST_END }
 sub MAX_OUTPUT_VERTICES () { $cspacec::MAX_OUTPUT_VERTICES }
 sub CS_CLIP_OUTSIDE () { $cspacec::CS_CLIP_OUTSIDE }
 sub CS_CLIP_INSIDE () { $cspacec::CS_CLIP_INSIDE }
