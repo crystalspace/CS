@@ -2,8 +2,15 @@ SubDir TOP plugins cscript cspython ;
 
 if $(PYTHON.AVAILABLE) = "yes"
 {
+  if $(CMD.SWIG)
+  {
+    Swig cs_pyth.cpp : include/ivaria/cspace.i : 
+		       include/ivaria/pythpre.i include/ivaria/pythpost.i : 
+		       -python -c++ -shadow -Iinclude/ ;
+  }
   Plugin cspython : cs_pyth.cpp cspython.h cspython.cpp pytocs.h pytocs.cpp ;
   LinkWith cspython : $(dep.cspython) ;
   ExternalLibs cspython : PYTHON ;
   Help cspython : "Crystal Script Python plug-in" ;
 }
+SubDir TOP plugins cscript cspython ;
