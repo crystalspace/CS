@@ -12,36 +12,35 @@ The history order is reversed so that new features are at the top.
 	  experience trouble, please attempt to satisfy the link requirements
 	  by editing the makefiles or pythmod_setup.py, rather than disabling
 	  code in win32.cpp.)
-        - Philip Wyett fixed inconsistent swig -I flag in make build
-          and aligning it with jam build. cs_pyth.cpp will now be identical
-          whether make or jam built.
-	- Keith Fulton added /apps/tools/partedit particle system editor.
- 	  This is still unfinished but should at least run.  Code was by
-	  Peter Holko, who is still working on it.
+        - Philip Wyett fixed inconsistent swig -I flag in make build and
+	  aligning it with jam build.  cs_pyth.cpp will now be identical
+	  whether make or jam built.
+	- Keith Fulton added /apps/tools/partedit particle system editor.  This
+	  is still unfinished but should at least run.  Code was by Peter
+	  Holko, who is still working on it.
 21-Jul-2003
 	- Oktal added missing doxygen comment at the top of csSymbolTable.
         - Philip Wyett removed CVS conflict data from gl_render3d.cpp.
-	- Jorrit removed a comment about csPDelArray<T> being deprecated
-	  from the documentation. csArray<T> nor csRefArray<T> can provide
-	  the functionality given by csPDelArray<T>.
+	- Jorrit removed a comment about csPDelArray<T> being deprecated from
+	  the documentation.  csArray<T> nor csRefArray<T> can provide the
+	  functionality given by csPDelArray<T>.
 	- Jorrit fixed the include file in the collision detection howto and
 	  also replaced the use of SCF_QUERY_INTERFACE for the iPolygonMesh
 	  with the proper usage of GetObjectModel().
 	- Jorrit added a few references towards individual HOWTO's from the
 	  rest of the documentation.
 	- Jorrit replaced all occurances of NULL in the documentation with 0.
-	  This same replacement has been done on the source code some time
-	  ago.
+	  This same replacement has been done on the source code some time ago.
 	- Jorrit fixed the ensocket documentation to use csRef.
-	- Jorrit replaced several NULL occurances with 0 throughout the
-	  CS sources.
-	- Philip Wyett removed some old LUA link related code from
-	  win32 gcc makefile.
-	- Philip Wyett fixed ds3d linking on Win32 GCC. This method
-	  works for both MinGW and Cygwin.
-	- Philip Wyett performed a temp removal and replace with null
-	  on win32 wc.background colour in cssys. This allows pythmod to
-	  successfully build with Cygwin.
+	- Jorrit replaced several NULL occurances with 0 throughout the CS
+	  sources.
+	- Philip Wyett removed some old LUA link related code from win32 gcc
+	  makefile.
+	- Philip Wyett fixed ds3d linking on Win32 GCC.  This method works for
+	  both MinGW and Cygwin.
+	- Philip Wyett performed a temp removal and replace with null on win32
+	  wc.background colour in cssys.  This allows pythmod to successfully
+	  build with Cygwin.
 	- Keith Fulton fixed csStringArray to handle item removal without
 	  crashing.
 20-Jul-2003
@@ -67,8 +66,8 @@ The history order is reversed so that new features are at the top.
 	  checking to the symbols hashmap iterator.
 	- Oktal moved csSymbolTable from csgfx to csutil.
 19-Jul-2003
-	- Jorrit added howto about adding game data to Crystal Space objects
-	  in map files.
+	- Jorrit added howto about adding game data to Crystal Space objects in
+	  map files.
 	- Oktal finished implementing the new renderer shader variable system.
 	  The API is now fully implemented, and there are no compile errors
 	  (except possibly the shader plugin .cpp's, which I can't test since
@@ -84,16 +83,16 @@ The history order is reversed so that new features are at the top.
 	      array of material handles.
 	    - Added an overloaded function iShaderBranch::GetSymbolTable(int)
 	      to get an extension symbol table without selecting it.
-	    - Rewrote the implementations of iShaderBranch::AddChild to make
-	      it add children to all symbol tables, not just the selected one.
+	    - Rewrote the implementations of iShaderBranch::AddChild to make it
+	      add children to all symbol tables, not just the selected one.
 	- Oktal implemented no-op GetSymbolTable(int) in csMaterial (fixed
 	  new renderer compile error).
 18-Jul-2003
-	- Anders Stenberg fixed compile errors introduced by Oktal. New
-	  renderer should compile, although variable functionality is
-	  crippled. (Results in lighting failure.)
-	- Keith Fulton committed some additional accessor functions to
-	  iPath and csPath.
+	- Anders Stenberg fixed compile errors introduced by Oktal.  New
+	  renderer should compile, although variable functionality is crippled.
+	  (Results in lighting failure.)
+	- Keith Fulton committed some additional accessor functions to iPath
+	  and csPath.
 	- Jorrit added a new csRadixSorter class. This class implements the
 	  radix sort algorithm which is O(n) but only works on integers.
 	  It needs up to 4 passes to sort a table of integers. I did some
@@ -104,63 +103,63 @@ The history order is reversed so that new features are at the top.
 	    - 100000 almost sorted numbers: radix roughly 3 times faster.
 	    - 100000 almost equal numbers: radix roughly 2 times slower.
 	  So in almost all cases radix clearly beats qsort.
-	- Jorrit reverted a change Peter Amstutz did 7-July. He then changed
-	  the thing plugin so that the normal is automatically recomputed
-	  when needed. However it seems that that is not working properly
-	  for some reason. With that fix enabled the rotating cubes in the
-	  mirrored room (flarge) no longer work properly. Need to further
-	  investigate for a good fix.
+	- Jorrit reverted a change Peter Amstutz did 7-July.  He then changed
+	  the thing plugin so that the normal is automatically recomputed when
+	  needed.  However it seems that that is not working properly for some
+	  reason.  With that fix enabled the rotating cubes in the mirrored
+	  room (flarge) no longer work properly.  Need to further investigate
+	  for a good fix.
 17-Jul-2003
         - Philip Wyett fixed broken glrender3d makefile. OBJ.GLRENDER3D should
           have had OUT.GLRENDER3D not DIR.GLRENDER3D.
-	- Jorrit committed a patch from Anders Reggestad to the spiral
-	  particle system. Here is his log: This is more or less a complete
-	  rewrite of the not working spiral system thats currently in CS. The
-	  old system have big problems with bbox, and when outside view for a
-	  period of time the whole thing will explode when entering view
-	  again. (Particle systems isn't updated when out of view, nice
+	- Jorrit committed a patch from Anders Reggestad to the spiral particle
+	  system.  Here is his log: This is more or less a complete rewrite of
+	  the not working spiral system thats currently in CS.  The old system
+	  have big problems with bbox, and when outside view for a period of
+	  time the whole thing will explode when entering view again.
+	  (Particle systems isn't updated when out of view, nice
 	  optimalization, but fatal for the old spiral system.) Rewrote the
-	  system to rebuild when reentering view (Like done in the fountain
-	  and explotion system). Added some new parameters to control the
-	  look of the system.
-	  Anders was also so nice to update the documentation for his changes.
-	  If only everyone would do that!
-        - Philip Wyett fixed rlsstencil makefile and rlsstencil.csplugin is
-          now cleaned correctly.        
+	  system to rebuild when reentering view (Like done in the fountain and
+	  explotion system).  Added some new parameters to control the look of
+	  the system.  Anders was also so nice to update the documentation for
+	  his changes.  If only everyone would do that!
+        - Philip Wyett fixed rlsstencil makefile and rlsstencil.csplugin is now
+	  cleaned correctly.
 	- Oktal fixed the compile errors in the new renderer shader variable
 	  system, and recommitted it. The API is in place but not fully
 	  implemented.
 	- Oktal fixed bug in material.h: #ifdef instead of #ifndef.
 16-Jul-2003
 	- Anders Stenberg made the following new renderer additions and fixes:
-	  - Made AWS work. (Added some stub functions to comply with interface 
-	    definition. Seems like it works.)
-	  - Added CLAMP and NOFILTER flags to textures, as well as loader for 
-	    them in csparser.
-	  - Added several return value checks, to avoid some cases of broken 
-	    level/shader leading to crash. (Still lots of cases left. Need to 
-	    do some _real_ error checking/reporting here.)
-	  - Added a flag to CreateRenderBuffer to specify that a render buffer 
-	    is to be used for indices, and updated affected mesh plugins.
-	  - Disabled VBO support by default, since no nvidia cards seem to 
-	    cope with it. (Driver bug or wrong implementation?)
-	  - Made shaders check if an appropriate renderer is the current one. 
-	    (I.e. GL shaders won't load if the software renderer is used.)
-	  - Fixed broken loading of variables. (Maybe stupid since it will 
-	    soon be totally replaced, but I needed it for some tests.
-	  - Fixed bug with transform not beeing updated in some cases where 
-	    it should.
-	  - Added "rendertarget" and "fullscreenquad" render steps.
+	    - Made AWS work.  (Added some stub functions to comply with
+	      interface definition.  Seems like it works.)
+	    - Added CLAMP and NOFILTER flags to textures, as well as loader for
+	      them in csparser.
+	    - Added several return value checks, to avoid some cases of broken
+	      level/shader leading to crash.  (Still lots of cases left.  Need
+	      to do some _real_ error checking/reporting here.)
+	    - Added a flag to CreateRenderBuffer to specify that a render
+	      buffer is to be used for indices, and updated affected mesh
+	      plugins.
+	    - Disabled VBO support by default, since no nvidia cards seem to
+	      cope with it.  (Driver bug or wrong implementation?)
+	    - Made shaders check if an appropriate renderer is the current one.
+	      (i.e. GL shaders won't load if the software renderer is used.)
+	    - Fixed broken loading of variables.  (Maybe stupid since it will
+	      soon be totally replaced, but I needed it for some tests.
+	    - Fixed bug with transform not beeing updated in some cases where
+	      it should.
+	    - Added "rendertarget" and "fullscreenquad" render steps.
 	- Anders Stenberg added software implementation of new renderer. 
 	  (Pretty much just a hack to use a copy of the old renderer. No 
 	  makefiles included, so someone who knows what they're doing should 
-	  create some. )
+	  create some.)
         - Philip Wyett changed an ASSERT () call to CS_ASSERT () in
           'gl_renderbuffer.h'.
-        - Philip Wyett added a note to disable 'Video.OpenGL.Caps.Stencil'
-          in 'opengl.cfg' if not supported by the users hardware or they
-          are experiencing crashes. Also added the ATI Radeon (r100) owners
-          running Linux (DRI) as a known case where this should be done.
+        - Philip Wyett added a note to disable 'Video.OpenGL.Caps.Stencil' in
+	  'opengl.cfg' if not supported by the users hardware or they are
+	  experiencing crashes.  Also added the ATI Radeon (r100) owners
+	  running Linux (DRI) as a known case where this should be done.
 15-Jul-2003
 	- Christopher Nelson removed the procedural texture support from
 	  AWS entirely.  This means that a user must do all the construction
