@@ -2,8 +2,18 @@ SubDir TOP plugins cscript csperl5 ;
 
 if $(PERL5.AVAILABLE) = "yes"
 {
-  Help csperl5 : "Crystal Script Perl5 plug-in" ;
-  
+  # @@@ FIXME: This scheme of creating a file which includes
+  # csperlxs_fallback.inc fails when it comes to project file creation, since
+  # the project file needs to reference an existing file.  To fix, the fallback
+  # file should exist at all times, but should be utilized only when needed,
+  # such as when ExtUtils is unavailable or when creating a project file.
+
+  rule PerlEmbedGlueFile
+  {
+    MakeLocate $(<) : $(LOCATE_TARGET) ;
+    Clean csperl5clean : $(<) ;
+  }
+
   if $(PERL5.EXTUTILS.EMBED.AVAILABLE) = "yes"
   {
     if $(PERL5.DYNALOADER.AVAILABLE) = "yes"
@@ -31,38 +41,32 @@ if $(PERL5.AVAILABLE) = "yes"
     }
   }
 
+  local targetdir ;
+  local target = [ FGristFiles cswigpl5.inc ] ;
+
   if $(CMD.SWIG)
   {
-    # for details and comments look at the cspython Jamfile
-    local target = cswigpl5.inc ;
-    local sources = [ FGristFiles cspace.i ] ;
-
-    SEARCH on $(sources) = $(TOP)/include/ivaria ;
-    HDRGRIST on $(sources) = $(HDRGRIST) ;
-    HDRSEARCH on $(sources) = 
-      $(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
-    HDRRULE on $(sources) = HeaderRule ;
-    HDRSCAN on $(sources) = $(SWIG.HDRPATTERN) ;
-    SWIG.FLAGS on $(target) += -perl5 -c++ -v -shadow -const -I$(TOP)/include 
-			       -module cspace ;
-		    
-    Swig $(target) : $(sources) ;
+    targetdir = $(LOCATE_TARGET) ;
+    Swig $(target) [ FGristFiles cspace.pm ] :
+      [ FGristFiles cspace.i ] :
+      perl5 :
+      -c++ -shadow -const -module cspace :
+      [ ConcatDirs $(TOP) include ] :
+      [ ConcatDirs $(TOP) include ivaria ] :
+      [ ConcatDirs $(TOP) scripts perl5 ] ;
+  }
+  else
+  {
+    targetdir = [ ConcatDirs $(TOP) scripts perl5 ] ;
   }
 
   local perlxs = [ FGristFiles csperlxs.c ] ;
   PerlEmbedGlueFile $(perlxs) ;
-  LOCATE on $(perlxs) = $(LOCATE_TARGET) ;
-  SEARCH on $(perlxs) = $(LOCATE_TARGET) ;
   
-  FILES = csperl5.cpp csperl5.h cswigpl5.cpp csperlxs.c ;
-  
-  Plugin csperl5
-	  : $(FILES)
-  ;
-  CFlags csperl5 :
-    -I$(TOP)/scripts/perl5 $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
-  LinkWith csperl5 : cstool csgeom csutil ;
+  Help csperl5 : "Crystal Script Perl5 plug-in" ;
+  Plugin csperl5 : $(perlxs) csperl5.cpp csperl5.h cswigpl5.cpp ;
+  LinkWith csperl5 : cstool csgfx csgeom csutil ;
   ExternalLibs csperl5 : PERL5 ;
-  Clean clean : $(perlxs) ;
-  Clean csperl5clean : $(perlxs) ;
+  CFlags csperl5 :
+    [ FIncludes $(targetdir) ] $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
 }

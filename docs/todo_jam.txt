@@ -7,11 +7,6 @@ L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
 * - Completed
 
-[H] Auto-generated Swig files should be generated into the build directory
-    rather than the source tree, since the source tree might be read-only or
-    shared.  We should provide rules to copy the generated files back to the
-    source tree upon explicit request so that they can be committed to the CVS
-    respository if desired.
 [H] When Bison and Flex are installed, the generated MSVC project file for AWS
     incorrectly mentions skinlex.ll and skinpars.yy, rather than skinlex.cpp
     and skinpars.cpp from the source directory.
@@ -89,6 +84,11 @@ W - Wishlist (the build also works without this feature)
     Jam with a message telling that you should rerun configure, or at least
     emit a big warning?
 
+[*] Auto-generated Swig files should be generated into the build directory
+    rather than the source tree, since the source tree might be read-only or
+    shared.  We should provide rules to copy the generated files back to the
+    source tree upon explicit request so that they can be committed to the CVS
+    respository if desired.
 [*] The MSVC-generated project file for csutil is missing all of the sources
     (and headers) from the cssys directory.
 [*] Make handling of files in subdirs more robust (this is a about handling

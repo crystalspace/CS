@@ -104,6 +104,29 @@ chronological order.
 	  big) and this will greatly increase the efficiency of frustvis
 	  (and especially in combination with the optimization above).
 	- Jorrit also changed Dynavis in a similar manner.
+	- Eric Sunshine made the following Swig-related changes to the Jam
+	  build system:
+	    - Re-designed and re-wrote the Swig rule almost completely from
+	      scratch.  It is now much more functional, thus allowing
+	      near-duplicated code invoked manually by callers to be
+	      eliminated.
+	    - Fixed the Swig rule so that it now emits generated files to the
+	      build directory rather than the source directory, since the
+	      source directory might be read-only or shared.
+	    - The Swig rule now publishes a "$(tag)swig" pseduo-target for each
+	      client which allows production of the Swig-generated files by
+	      explicit user request.  Likewise, it publishes a
+	      "$(tag)swigclean" target which removes the generated files.
+	    - The Swig rule now optionally publishes a "$(tag)freeze"
+	      pseudo-target which copies the generated files back to the source
+	      tree at explicit user request.
+	    - Fixed the Swig rule so that, upon explicit request, it writes
+	      files to the source tree at the _correct_ locations, rather than
+	      placing them in completely foreign positions.
+	    - Fixed cspython/Jamfile and csperl5/Jamfile to take advantage of
+	      these new facilities so that they no longer emit generated files
+	      to the source tree, which was broken behavior since that
+	      directory migth be read-only or shared.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.

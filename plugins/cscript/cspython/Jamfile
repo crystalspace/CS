@@ -2,33 +2,31 @@ SubDir TOP plugins cscript cspython ;
 
 if $(PYTHON.AVAILABLE) = "yes"
 {
-  Help cspython : "Crystal Script Python plug-in" ;
-  
-  if $(CMD.SWIG)
-  {
-    # We need to work a bit on our own, because we create cs_pyth.cpp from
-    # cspace.i instead of cspace.cpp.
-    local target = [ FGristFiles cs_pyth.cpp ] ;
-    local sources = [ FGristFiles cspace.i ] ;
-    
-    # Source files are not in current directory.
-    SEARCH on $(sources) = $(TOP)/include/ivaria ;
-        
-    # Scan for special swig includes.
-    HDRGRIST on $(sources) = $(HDRGRIST) ;
-    HDRSEARCH on $(sources) =
-      $(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
-    HDRRULE on $(sources) = HeaderRule ;
-    HDRSCAN on $(sources) = $(SWIG.HDRPATTERN) ;
-    SWIG.FLAGS on $(target) += -python -c++ -shadow -I$(TOP)/include ;
+  local target = cs_pyth.cpp ;
 
-    Swig $(target) : $(sources) ;
+  if ! $(MSVCGEN_CONFIG) # Ugly, but we must take msvcgen.jam into account.
+  {
+    target = [ FGristFiles $(target) ] ;
+
+    if $(CMD.SWIG)
+    {
+      Swig $(target) [ FGristFiles cspace.py ] :
+        [ FGristFiles cspace.i ] :
+        python :
+	-c++ -shadow :
+	[ ConcatDirs $(TOP) include ] :
+	[ ConcatDirs $(TOP) include ivaria ] :
+	$(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] ;
+    }
+    else
+    {
+      SEARCH on $(target) = $(SEARCH_SOURCE) ;
+    }
   }
-  
-  Plugin cspython : 
-      cs_pyth.cpp cspython.h cspython.cpp pytocs.h pytocs.cpp
-  ;
+
+  Help cspython : "Crystal Script Python plug-in" ;
+  Plugin cspython : $(target) cspython.h cspython.cpp pytocs.h pytocs.cpp ;
   LinkWith cspython : cstool csgfx csgeom csutil ;
   ExternalLibs cspython : PYTHON ;
-  CFlags cspython : -DSWIG_GLOBAL ;
+  CFlags cspython : -DSWIG_GLOBAL $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
 }
