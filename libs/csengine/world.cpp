@@ -1868,7 +1868,7 @@ iThing *csWorld::CreateThing (const char *iName, iSector *iParent)
   csThing *thing = new csThing (this);
   thing->SetName (iName);
   csSector *sector = iParent->GetPrivateObject ();
-  thing->SetSector (sector);
+  thing->GetMovable ().SetSector (sector);
   sector->AddThing (thing);
   iThing *p = QUERY_INTERFACE (thing, iThing);
   thing->DecRef ();

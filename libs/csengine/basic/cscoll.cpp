@@ -38,35 +38,35 @@ void csCollection::Transform ()
 {
   for (int i = 0 ; i < objects.Length() ; i++)
     if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->Transform ();
+      ((csThing*)(objects[i]))->UpdateMove ();
 }
 
 void csCollection::SetPosition (csSector* home, const csVector3& pos)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
     if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->SetPosition (home, pos);
+      ((csThing*)(objects[i]))->GetMovable ().SetPosition (home, pos);
 }
 
 void csCollection::SetTransform (const csMatrix3& matrix)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
     if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->SetTransform (matrix);
+      ((csThing*)(objects[i]))->GetMovable ().SetTransform (matrix);
 }
 
 void csCollection::MovePosition (const csVector3& rel)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
     if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->MovePosition (rel);
+      ((csThing*)(objects[i]))->GetMovable ().MovePosition (rel);
 }
 
 void csCollection::Transform (csMatrix3& matrix)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
     if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->Transform (matrix);
+      ((csThing*)(objects[i]))->GetMovable ().Transform (matrix);
 }
 
 //---------------------------------------------------------------------------

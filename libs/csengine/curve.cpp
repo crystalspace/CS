@@ -641,6 +641,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
 
 void csCurve::SetObject2World (csReversibleTransform* o2w) 
 { 
+  if (!lightmap) return;	// Return if there is no lightmap yet.
   int lm_width = lightmap->GetWidth ();
   int lm_height = lightmap->GetHeight ();
 

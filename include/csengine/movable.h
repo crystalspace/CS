@@ -20,7 +20,8 @@
 #define MOVABLE_H
 
 #include "csgeom/transfrm.h"
-#include "csobject/nobjvec.h"
+#include "csutil/csvector.h"
+#include "imovable.h"
 
 class csSector;
 
@@ -31,13 +32,13 @@ class csSector;
  * through portals). This class itself does not have geometry.
  * It is only responsible for managing movement.
  */
-class csMovable
+class csMovable : public iBase
 {
 private:
   /// World to object transformation.
   csReversibleTransform obj;
   /// List of sectors.
-  csNamedObjVector sectors;
+  csVector sectors;
 
 public:
   /**
@@ -79,7 +80,7 @@ public:
   /**
    * Get list of sectors for this entity.
    */
-  csNamedObjVector& GetSectors ()
+  csVector& GetSectors ()
   {
     return sectors;
   }
@@ -89,6 +90,14 @@ public:
    * (conveniance function).
    */
   csSector* GetSector (int idx) { return (csSector*)GetSectors ()[idx]; }
+
+  /**
+   * Return true if we are placed in a sector.
+   */
+  bool InSector ()
+  {
+    return sectors.Length () > 0;
+  }
 
   /**
    * Set the transformation vector and sector to move to
@@ -120,6 +129,50 @@ public:
    * Relative transform.
    */
   void Transform (csMatrix3& matrix);
+
+  DECLARE_IBASE;
+
+  //------------------------- iMovable interface -------------------------------
+  struct eiMovable : public iMovable
+  {
+    DECLARE_EMBEDDED_IBASE (csMovable);
+    virtual void SetSector (iSector* sector);
+    virtual void ClearSectors ()
+    {
+      scfParent->ClearSectors ();
+    }
+    virtual void AddSector (iSector* sector);
+    virtual csVector& GetSectors ()
+    {
+      return scfParent->GetSectors ();
+    }
+    virtual iSector* GetSector (int idx);
+    virtual bool InSector ()
+    {
+      return scfParent->InSector ();
+    }
+    virtual void SetPosition (iSector* home, const csVector3& v);
+    virtual void SetTransform (const csMatrix3& matrix)
+    {
+      scfParent->SetTransform (matrix);
+    }
+    virtual void SetTransform (const csReversibleTransform& t)
+    {
+      scfParent->SetTransform (t);
+    }
+    virtual csReversibleTransform& GetTransform ()
+    {
+      return scfParent->GetTransform ();
+    }
+    virtual void MovePosition (const csVector3& v)
+    {
+      scfParent->MovePosition (v);
+    }
+    virtual void Transform (csMatrix3& matrix)
+    {
+      scfParent->Transform (matrix);
+    }
+  } scfiMovable;
 };
 
 #endif /*MOVABLE_H*/

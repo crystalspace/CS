@@ -1373,7 +1373,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
 
   csLoaderStat::things_loaded++;
 
-  thing->SetSector (sec);
+  thing->GetMovable ().SetSector (sec);
   csReversibleTransform obj;
   csMaterialWrapper* material = NULL;
   bool is_convex = false;
@@ -1611,12 +1611,12 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
 
   if (is_convex || thing->GetFog ().enabled)
     thing->flags.Set (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
-  thing->SetTransform (obj);
+  thing->GetMovable ().SetTransform (obj);
 
   if (!(flags & CS_LOADER_NOCOMPRESS))
     thing->CompressVertices ();
   if (!(flags & CS_LOADER_NOTRANSFORM))
-    thing->Transform ();
+    thing->UpdateMove ();
 
   return thing;
 }
@@ -1654,12 +1654,12 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
 
   char* xname;
 
-   csThing* thing = new csThing(World) ;
+  csThing* thing = new csThing (World) ;
   thing->SetName (name);
 
   csLoaderStat::things_loaded++;
   PSLoadInfo info;
-  thing->SetSector (sec);
+  thing->GetMovable ().SetSector (sec);
 
   csReversibleTransform obj;
   long cmd;
@@ -1740,7 +1740,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
         }
         break;
       case TOKEN_KEY:
-        load_key(params, thing);
+        load_key (params, thing);
         break;
       default:
         ps_process (*thing, sec, info, cmd, xname, params);
@@ -1756,11 +1756,11 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
   if (info.do_hard_trans)
     thing->HardTransform (info.hard_trans);
 
-  thing->SetTransform (obj);
+  thing->GetMovable ().SetTransform (obj);
   if (!(flags & CS_LOADER_NOCOMPRESS))
     thing->CompressVertices ();
   if (!(flags & CS_LOADER_NOTRANSFORM))
-    thing->Transform ();
+    thing->UpdateMove ();
   if (is_convex || thing->GetFog ().enabled)
     thing->flags.Set (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
 

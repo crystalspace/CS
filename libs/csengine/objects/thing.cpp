@@ -50,7 +50,8 @@ IMPLEMENT_EMBEDDED_IBASE (csThing::eiThing)
   IMPLEMENTS_INTERFACE (iThing)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csThing::csThing (csWorld* world) : csPolygonSet (world), obj(), tree_bbox (NULL)
+csThing::csThing (csWorld* world) : csPolygonSet (world), movable (),
+	tree_bbox (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiThing);
   center_idx = -1;
@@ -86,26 +87,18 @@ void csThing::SetConvex (bool c)
   }
 }
 
-void csThing::Transform ()
+void csThing::UpdateMove ()
 {
   int i;
   if (!bbox) CreateBoundingBox ();
   for (i = 0 ; i < num_vertices ; i++)
-    wor_verts[i] = obj.This2Other (obj_verts[i]);
+    wor_verts[i] = movable.GetTransform ().This2Other (obj_verts[i]);
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     csPolygon3D* p = GetPolygon3D (i);
-    p->ObjectToWorld (obj);
+    p->ObjectToWorld (movable.GetTransform ());
   }
-  UpdateInPolygonTrees ();
-}
-
-void csThing::SetPosition (csSector* home, const csVector3& pos)
-{
-  obj.SetOrigin (pos);
-  sector = home;
-
-  UpdateCurveTransform();
+  UpdateCurveTransform ();
   UpdateInPolygonTrees ();
 }
 
@@ -116,29 +109,11 @@ void csThing::UpdateCurveTransform()
   {
     csCurve* c = curves.Get (i);
  
-    csReversibleTransform o2w = obj.GetInverse();
+    csReversibleTransform o2w = movable.GetTransform ().GetInverse();
     c->SetObject2World (&o2w);
   }
 }
 
-
-void csThing::SetTransform (const csMatrix3& matrix)
-{
-  obj.SetT2O (matrix);
-  UpdateCurveTransform ();
-}
-
-void csThing::MovePosition (const csVector3& rel)
-{
-  obj.Translate (rel);
-  UpdateCurveTransform ();
-}
-
-void csThing::Transform (csMatrix3& matrix)
-{
-  obj.SetT2O (matrix * obj.GetT2O ());
-  UpdateCurveTransform ();
-}
 
 void csThing::CreateLightMaps (iGraphics3D* g3d)
 {
@@ -189,7 +164,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 
   // Calculate tesselation resolution
   csVector3 wv = curves_center;
-  csVector3 world_coord = obj.This2Other (wv);
+  csVector3 world_coord = movable.GetTransform ().This2Other (wv);
   csVector3 camera_coord = rview.Other2This (world_coord);
 
   if (camera_coord.z >= SMALL_Z)
@@ -202,7 +177,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   // Create the combined transform of object to camera by
   // combining object to world and world to camera.
   csReversibleTransform obj_cam = rview;
-  obj_cam /= obj;
+  obj_cam /= movable.GetTransform ();
   rview.g3d->SetObjectToCamera (&obj_cam);
   rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
   rview.g3d->SetPerspectiveAspect (rview.GetFOV ());
@@ -331,7 +306,7 @@ void csThing::DrawInt (csRenderView& rview, bool use_z_buf)
     if (num_vertices>0)
     {
       csVector3 wv = wor_verts[0];
-      csVector3 world_coord = obj.This2Other (wv);
+      csVector3 world_coord = movable.GetTransform ().This2Other (wv);
       csVector3 camera_coord = rview.Other2This (world_coord);
   
       if (camera_coord.z > 0.0001)
@@ -474,7 +449,7 @@ void csThing::RealCheckFrustum (csFrustumView& lview)
     
     if (!lview.dynamic)
     {
-      csReversibleTransform o2w = obj.GetInverse();
+      csReversibleTransform o2w = movable.GetTransform ().GetInverse();
       c->SetObject2World (&o2w);
     }
     
@@ -490,7 +465,7 @@ void csThing::InitLightMaps (bool do_cache)
   for (i = 0 ; i < polygons.Length () ; i++)
     polygons.Get (i)->InitLightMaps (this, do_cache, i);
   for (i = 0 ; i < GetNumCurves () ; i++)
-    curves.Get (i)->InitLightMaps (this, GetSector (),
+    curves.Get (i)->InitLightMaps (this, movable.GetSector (0),
 	do_cache, polygons.Length ()+i);
 }
 
@@ -634,9 +609,9 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
   {
     csCurveTemplate *pt = tpl->GetCurve (i);
     csCurve *p = pt->MakeCurve ();
-    p->SetName(pt->GetName ());
+    p->SetName (pt->GetName ());
     p->SetParent (this);
-    p->SetSector( GetSector() );
+    p->SetSector (movable.GetSector (0));
 
     if (!pt->GetMaterialWrapper ()) p->SetMaterialWrapper (default_material);
     for (j = 0 ; j < pt->NumVertices () ; j++)
@@ -675,7 +650,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl, csMaterialList* matList,
 void csThing::UpdateInPolygonTrees ()
 {
   // If thing has not been placed in a sector we do nothing here.
-  if (!sector) return;
+  if (!movable.InSector ()) return;
 
   // If we are not in a sector which has a polygon tree
   // then we don't really update. We should consider if this is
@@ -684,18 +659,20 @@ void csThing::UpdateInPolygonTrees ()
   // efficient to do it this way when the thing is currently
   // moving in normal convex sectors.
   csPolygonTree* tree = NULL;
-  tree = sector->GetStaticTree ();
+  // @@@ What if we are in more than one sector? To be done later
+  // when this becomes possible.
+  tree = movable.GetSector (0)->GetStaticTree ();
   if (!tree) return;
 
   csBox3 b;
   GetBoundingBox (b);
 
   //csTransform trans = csTransform (m_obj2world, m_world2obj * -v_obj2world);
-  csReversibleTransform trans = obj.GetInverse ();
+  csReversibleTransform trans = movable.GetTransform ().GetInverse ();
   tree_bbox.Update (b, trans, this);
 
   // Here we need to insert in trees where this thing lives.
-  tree = sector->GetStaticTree ();
+  tree = movable.GetSector (0)->GetStaticTree ();
   if (tree)
   {
     // Temporarily increase reference to prevent free.
@@ -705,15 +682,3 @@ void csThing::UpdateInPolygonTrees ()
   }
 }
 
-
-//---------------------------------------------------------------------------
-
-void csThing::eiThing::SetPosition (const csVector3 &iPos)
-{
-  scfParent->obj.SetOrigin (iPos);
-}
-
-void csThing::eiThing::SetPosition (iSector *iSec)
-{
-  iSec->GetPrivateObject ()->AddThing (scfParent);
-}

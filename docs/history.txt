@@ -1,5 +1,25 @@
 The history order has been reversed so that new features are at the top.
 
+27-Aug-2000
+	- Made new iMovable interface and let csMovable implement it (through
+	  embedding).
+	- Changed csThing to use the new csMovable. This has the following
+	  implecations with regards to the API for moving things: the
+	  functions, SetSector(sector), GetSector(), SetPosition(),
+	  SetTransform(), GetTransform(), MovePosition(), And Transform(matrix)
+  	  are all gone and have moved to the csMovable. This means that
+	  for example:
+	    thing->SetSector(sector);
+	  becomes:
+	    thing->GetMovable ().SetSector (sector);
+	  In addition Transform() itself has been renamed to UpdateMove().
+	  You must call UpdateMove() after doing a change to the csMovable
+	  so that internal data structures are updated correctly.
+	  Note: GetSector() now has an index parameter telling which sector
+	  to take. To get the old behaviour just use 0 as index.
+	- Changed iThing to use the new iMovable.
+	- changed csNamedObjVector to csVector (in csMovable) because
+	  csNamedObjVector deletes the children at destruction.
 26-Aug-2000
 	- Added a new csMovable class which encapsulates moving entities.
 	  It does not hold geometry but everything needed to do the

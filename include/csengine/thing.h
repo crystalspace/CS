@@ -23,8 +23,10 @@
 #include "csengine/polyset.h"
 #include "csengine/bspbbox.h"
 #include "csengine/rview.h"
+#include "csengine/movable.h"
 #include "csutil/flags.h"
 #include "ithing.h"
+#include "imovable.h"
 
 class csSector;
 class csWorld;
@@ -82,11 +84,8 @@ struct iGraphics3D;
 class csThing : public csPolygonSet
 {
 private:
-  /// World to object transformation.
-  csReversibleTransform obj;
-
-  /// csSector where this polyset belongs (pointer to 'this' if it is a sector).
-  csSector* sector;
+  /// Position in the world.
+  csMovable movable;
 
   /// If convex, this holds the index to the center vertex.
   int center_idx;
@@ -127,16 +126,23 @@ public:
   /// Destructor.
   virtual ~csThing ();
 
-  /// Set the sector for this thing.
-  void SetSector (csSector* sector)
-  {
-    //csPolygonSet::SetSector (sector);
-    csThing::sector = sector;
-    UpdateInPolygonTrees ();
-  }
+  /**
+   * Get the movable instance for this thing.
+   * It is very important to call UpdateMove()
+   * after doing any kind of modification to this movable
+   * to make sure that internal data structures are
+   * correctly updated.
+   */
+  csMovable& GetMovable () { return movable; }
 
-  /// Return the sector that this polygonset belongs to.
-  csSector* GetSector () { return sector; }
+  /**
+   * Update transformations after the thing has moved
+   * (through updating the movable instance).
+   * This MUST be done after you change the movable otherwise
+   * some of the internal data structures will not be updated
+   * correctly.
+   */
+  void UpdateMove ();
 
   /**
    * Set convexity flag of this thing. You should call this instead
@@ -183,46 +189,6 @@ public:
    * coordinates and not in object space as one could expect!
    */
   void Merge (csThing* other);
-
-  /**
-   * Set the transformation vector and sector to move thing to
-   * some position.
-   */
-  void SetPosition (csSector* home, const csVector3& v);
-
-  /**
-   * Set the transformation matrix to rotate the thing in some
-   * orientation.
-   */
-  void SetTransform (const csMatrix3& matrix);
-
-  /**
-   * Set the world to object tranformation.
-   */
-  void SetTransform (const csReversibleTransform& t) { obj = t; }
-
-  /**
-   * Get the world to object tranformation.
-   */
-  csReversibleTransform& GetTransform () { return obj; }
-
-  /**
-   * Relative move.
-   */
-  void MovePosition (const csVector3& v);
-
-  /**
-   * Relative transform.
-   */
-  void Transform (csMatrix3& matrix);
-
-  /**
-   * Really do the transformation. This should be called
-   * after calling any of the set_move, set_transform, move or
-   * transform functions. Ideally it should only be called
-   * when the thing is visible.
-   */
-  void Transform ();
 
   /**
    * Prepare the lightmaps for all polys so that they are suitable
@@ -305,7 +271,7 @@ public:
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csPolygonSet);
 
-  //------------------------- iSector interface --------------------------------
+  //------------------------- iThing interface --------------------------------
   struct eiThing : public iThing
   {
     DECLARE_EMBEDDED_IBASE (csThing);
@@ -314,13 +280,17 @@ public:
     virtual csThing *GetPrivateObject ()
     { return scfParent; }
 
-    /// Set the position of the thing
-    virtual void SetPosition (const csVector3 &iPos);
-    /// Set the sector of the thing
-    virtual void SetPosition (iSector *iSec);
-    /// Set the transformation matrix to rotate the thing in some orientation.
-    virtual void SetTransform (const csMatrix3 &iMatrix)
-    { scfParent->SetTransform (iMatrix); }
+    /// Get the movable for this thing.
+    virtual iMovable* GetMovable ()
+    {
+      csMovable* movable = &(scfParent->GetMovable ());
+      return QUERY_INTERFACE (movable, iMovable);
+    }
+    /// Update the thing after doing a move.
+    virtual void UpdateMove ()
+    {
+      scfParent->UpdateMove ();
+    }
   } scfiThing;
   friend struct eiThing;
 };

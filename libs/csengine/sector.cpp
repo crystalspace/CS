@@ -217,7 +217,7 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
   static_thing = new csThing (world);
   static_thing->SetName ("__static__");
 
-  static_thing->SetSector (this);
+  static_thing->GetMovable ().SetSector (this);
   csThing* sp = first_thing;
   csThing* sp_prev = NULL;
   while (sp)
@@ -305,7 +305,7 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
   csThing* th = GetFirstThing ();
   while (th)
   {
-    th->Transform ();
+    th->UpdateMove ();
     th = (csThing*)(th->GetNext ());
   }
   

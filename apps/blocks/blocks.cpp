@@ -574,14 +574,14 @@ void Blocks::add_pillar (int x, int y)
   csThing* pillar;
   pillar = new csThing (world);
   pillar->SetName ("pillar");
-  pillar->SetSector (room);
+  pillar->GetMovable ().SetSector (room);
   pillar->flags.Set (CS_ENTITY_MOVEABLE, 0);
   pillar->MergeTemplate (pillar_tmpl, pillar_mat, 1);
   room->AddThing (pillar);
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM);
-  pillar->SetPosition (room, v);
-  pillar->Transform ();
+  pillar->GetMovable ().SetPosition (room, v);
+  pillar->UpdateMove ();
 }
 
 void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
@@ -589,16 +589,16 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
   csThing* vrast;
   vrast = new csThing (world);
   vrast->SetName ("vrast");
-  vrast->SetSector (room);
+  vrast->GetMovable ().SetSector (room);
   vrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
   vrast->MergeTemplate (vrast_tmpl, raster_mat, 1);
   room->AddThing (vrast);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
-  vrast->Transform (rot);
-  vrast->SetPosition (room, v);
-  vrast->Transform ();
+  vrast->GetMovable ().Transform (rot);
+  vrast->GetMovable ().SetPosition (room, v);
+  vrast->UpdateMove ();
 }
 
 void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
@@ -606,16 +606,16 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   csThing* hrast;
   hrast = new csThing (world);
   hrast->SetName ("hrast");
-  hrast->SetSector (room);
+  hrast->GetMovable ().SetSector (room);
   hrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
   hrast->MergeTemplate (hrast_tmpl, raster_mat, 1);
   room->AddThing (hrast);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
-  hrast->Transform (rot);
-  hrast->SetPosition (room, v);
-  hrast->Transform ();
+  hrast->GetMovable ().Transform (rot);
+  hrast->GetMovable ().SetPosition (room, v);
+  hrast->UpdateMove ();
 }
 
 void Blocks::ChangeThingMaterial (csThing* thing, csMaterialWrapper* mat)
@@ -696,7 +696,7 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
   csThing* cube;
   cube = new csThing (world);
   cube->SetName ("cubexxx");
-  cube->SetSector (room);
+  cube->GetMovable ().SetSector (room);
   cube->flags.Set (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
   csVector3 shift (
   	(dx-shift_rotate.x)*CUBE_DIM,
@@ -743,8 +743,8 @@ csThing* Blocks::add_cube_thing (csSector* sect, float dx, float dy, float dz,
   csThing* cube = create_cube_thing (dx, dy, dz, tmpl);
   sect->AddThing (cube);
   csVector3 v (x, y, z);
-  cube->SetPosition (sect, v);
-  cube->Transform ();
+  cube->GetMovable ().SetPosition (sect, v);
+  cube->UpdateMove ();
   cube->InitLightMaps (false);
   room->ShineLights (cube);
   cube->CreateLightMaps (Gfx3D);
@@ -1668,9 +1668,9 @@ void Blocks::HandleGameMovement (cs_time elapsed_time)
   {
     csThing* t = cube_info[i].thing;
     if (do_rot)
-      t->Transform (rot);
-    t->MovePosition (csVector3 (dx, -elapsed_fall, dy));
-    t->Transform ();
+      t->GetMovable ().Transform (rot);
+    t->GetMovable ().MovePosition (csVector3 (dx, -elapsed_fall, dy));
+    t->UpdateMove ();
     reset_vertex_colors (t);
     room->ShineLights (t);
   }
@@ -1784,8 +1784,8 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
     float z = 5. - cos (angle)*3.;
 
     csVector3 v (x, y, z);
-    menus[i]->SetPosition (demo_room, v);
-    menus[i]->Transform ();
+    menus[i]->GetMovable ().SetPosition (demo_room, v);
+    menus[i]->UpdateMove ();
   }
   // Move the old menu item away.
   if ((ABS (menu_hor_trans) > SMALL_EPSILON) &&
@@ -1797,8 +1797,8 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
     float y = 3. + sin (angle)*3.;
     float z = 5. - cos (angle)*3.;
     csVector3 v (x, y, z);
-    menu_hor_old_menu->SetPosition (demo_room, v);
-    menu_hor_old_menu->Transform ();
+    menu_hor_old_menu->GetMovable ().SetPosition (demo_room, v);
+    menu_hor_old_menu->UpdateMove ();
   }
   else if (menu_hor_old_menu)
   {
@@ -1817,10 +1817,10 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
     csVector3 v (x, y, z);
     demo_room->AddThing (arrow_left);
     demo_room->AddThing (arrow_right);
-    arrow_left->SetPosition (demo_room, v);
-    arrow_right->SetPosition (demo_room, v);
-    arrow_left->Transform ();
-    arrow_right->Transform ();
+    arrow_left->GetMovable ().SetPosition (demo_room, v);
+    arrow_right->GetMovable ().SetPosition (demo_room, v);
+    arrow_left->UpdateMove ();
+    arrow_right->UpdateMove ();
   }
   else
   {
@@ -2282,8 +2282,8 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
 	t = room->GetThing (temp);
 	if (t)
 	{
-          t->MovePosition (csVector3 (0, -elapsed_fall, 0));
-          t->Transform ();
+          t->GetMovable ().MovePosition (csVector3 (0, -elapsed_fall, 0));
+          t->UpdateMove ();
           reset_vertex_colors (t);
           room->ShineLights (t);
 	}

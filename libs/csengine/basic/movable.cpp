@@ -19,11 +19,25 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csengine/movable.h"
+#include "csengine/sector.h"
+#include "isector.h"
 
 //---------------------------------------------------------------------------
 
+IMPLEMENT_IBASE (csMovable)
+  IMPLEMENTS_INTERFACE (iBase)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iMovable)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csMovable::eiMovable)
+  IMPLEMENTS_INTERFACE (iMovable)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+
 csMovable::csMovable ()
 {
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiMovable);
 }
 
 csMovable::~csMovable ()
@@ -49,5 +63,28 @@ void csMovable::MovePosition (const csVector3& rel)
 void csMovable::Transform (csMatrix3& matrix)
 {
   obj.SetT2O (matrix * obj.GetT2O ());
+}
+
+//--------------------------------------------------------------------------
+
+void csMovable::eiMovable::SetSector (iSector* sector)
+{
+  scfParent->SetSector (sector->GetPrivateObject ());
+}
+
+void csMovable::eiMovable::AddSector (iSector* sector)
+{
+  scfParent->AddSector (sector->GetPrivateObject ());
+}
+
+void csMovable::eiMovable::SetPosition (iSector* home, const csVector3& v)
+{
+  scfParent->SetPosition (home->GetPrivateObject (), v);
+}
+
+iSector* csMovable::eiMovable::GetSector (int idx)
+{
+  csSector* sect = (csSector*)scfParent->GetSectors ()[idx];
+  return QUERY_INTERFACE (sect, iSector);
 }
 
