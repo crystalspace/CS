@@ -317,7 +317,7 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
     {
       camera_fov = fov;
       camera_pixels = fov_pixels;
-      float lambda = fov_pixels / ( 2.0f * tanf (fov / 360.0f * PI));
+      float lambda = (float)(fov_pixels / (2.0 * tan (fov / 360.0 * PI)));
       csShaderVariable* sv = dynDomain->GetVariable (scale_name);
       sv->SetValue (1.0f / (lambda * particle_radius * 3));
     }

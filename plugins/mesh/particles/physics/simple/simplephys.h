@@ -24,7 +24,7 @@
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
 #include "imesh/particles.h"
-#include "csutil/rng.h"
+#include "csutil/randomgen.h"
 
 /**
  * This is an abstract implementation of iParticlePhysics. It can be

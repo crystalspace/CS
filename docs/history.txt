@@ -11,6 +11,20 @@ chronological order.
 	  system.
 	- Eric Sunshine eliminated some unnecessary $(addprefix) invocations
 	  from bugplug.mak.
+	- Eric Sunshine converted particles.mak, particlesldr.mak, and
+	  partphys_simple.mak to the new-style makefile which emits its working
+	  files to a custom subdirectory of $(OUT).
+	- Eric Sunshine removed some highly questionable and unnecessary
+	  implicit rule goop from particles.mak and partphys_simple.mak.
+	- Eric Sunshine fixed formatting of 'help' messages from particles.mak,
+	  particlesldr.mak, and partphys_simple.mak.
+	- Eric Sunshine eliminated bogus cssys reference from particles.mak.
+	- Eric Sunshine ported particles.cpp to MacOS/X by eliminating
+	  invocation of unportable tanf().
+	- Eric Sunshine fixed particles/simplephys.h to #include
+	  csutil/randomgen.h rather than the deprecated csutil/rng.h.
+	- Eric Sunshine added particles, particlesldr, and partphys_simple
+	  plugins to user.mak.
 10-Jan-2004
 	- res added a facility to draw meshes with less render buffer juggling
 	  etc. required from the client.
