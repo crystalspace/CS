@@ -116,7 +116,9 @@ gl3dclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/gl3d.dep
 $(OUTOS)/gl3d.dep: $(SRC.GL3D)
-	$(DO.DEP1) $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.GL3D) $(DO.DEP2)
+	$(DO.DEP1) \
+	-DGL_VERSION_1_1 $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.GL3D) \
+	$(DO.DEP2)
 else
 -include $(OUTOS)/gl3d.dep
 endif
