@@ -12,6 +12,10 @@ chronological order.
 	- Wouter fixed up the terrain texture caching to use the 
 	  CacheManager. Instead of a cachedir, put cache="yes" to
 	  use caching.
+	- Jorrit did another optimization to Dynavis. This time the target was
+	  TestRectangle() in the coverage buffer. Optimized this routine by
+	  splitting the coverage buffer test and the depth test. Both tests
+	  can then be written a lot more efficient.
 	- Wouter changed the texture generation <heightmap> and <slope> 
 	  statements, as well as the terrfunc <heightmap> statement to
 	  accept a <flipx>yesno</flipx> and/or a <flipy> attribute.

@@ -541,8 +541,15 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     float sx = camera->GetShiftX ();
     float sy = camera->GetShiftY ();
     float max_depth;
+#define DO_OUTLINE_TEST 0
+#if DO_OUTLINE_TEST
+    csPoly2D outline;
+    if (node_bbox.ProjectBoxAndOutline (camtrans, fov, sx, sy, sbox,
+    	outline, min_depth, max_depth))
+#else
     if (node_bbox.ProjectBox (camtrans, fov, sx, sy, sbox,
     	min_depth, max_depth))
+#endif
     {
 #     ifdef CS_DEBUG
       if (do_state_dump)
@@ -562,23 +569,18 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
         vis = false;
         goto end;
       }
-#if 0
+#if DO_OUTLINE_TEST
       else
       {
-        csPoly2D outline;
-        if (node_bbox.ProjectOutline (camtrans, fov, sx, sy, outline,
-		min_depth, max_depth))
-        {
-          // @@@ VPT tracking for nodes!!!
-          rc = tcovbuf->TestPolygon (outline.GetVertices (),
+        // @@@ VPT tracking for nodes!!!
+        rc = tcovbuf->TestPolygon (outline.GetVertices (),
 	  	outline.GetVertexCount (), min_depth);
 
-          if (!rc)
-          {
-            hist->reason = INVISIBLE_TESTRECT;
-            vis = false;
-            goto end;
-          }
+        if (!rc)
+        {
+          hist->reason = INVISIBLE_TESTRECT;
+          vis = false;
+          goto end;
         }
       }
 #endif

@@ -208,9 +208,32 @@ public:
   void PushFullVLine (int x);
 
   /**
+   * Perform all operations in a tile and render them on the coverage_cache.
+   */
+  void PerformOperations ();
+
+  /**
    * Flush all operations in a tile and render them on the coverage_cache.
+   * This is the same as PerformOperations() except that the operations
+   * are also cleared.
    */
   void FlushOperations ();
+
+  /**
+   * Perform all operations in a tile and only update the fvalue. This
+   * version can be used if you know the tile is full.
+   */
+  void PerformOperationsOnlyFValue (csTileCol& fvalue);
+
+  /**
+   * Flush all operations in a tile and only update the fvalue. This
+   * version can be used if you know the tile is full.
+   * This is the same as PerformOperationsOnlyFValue() except that
+   * the operations are also cleared.
+   */
+  void FlushOperationsOnlyFValue (csTileCol& fvalue);
+
+  //-----------------------------------------------------------------
 
   /**
    * Flush all operations in a tile given the fvalue from the
@@ -266,21 +289,42 @@ public:
    */
   void FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth);
 
+  //-----------------------------------------------------------------
+
   /**
    * Perform a non-modifying flush and return true if Flush would
    * have affected the coverage buffer.
    */
-  bool TestFlush (csTileCol& fvalue, float mindepth);
+  bool TestCoverageFlush (csTileCol& fvalue, float mindepth,
+  	bool& do_depth_test);
 
   /**
    * Version of TestFlush that handles the case where the tile is full.
    */
-  bool TestFlushForFull (csTileCol& fvalue, float mindepth);
+  bool TestCoverageFlushForFull (csTileCol& fvalue, float mindepth,
+  	bool& do_depth_test);
 
   /**
    * General TestFlush version (least efficient).
    */
-  bool TestFlushGeneral (csTileCol& fvalue, float maxdepth);
+  bool TestCoverageFlushGeneral (csTileCol& fvalue, float maxdepth,
+  	bool& do_depth_test);
+
+  //-----------------------------------------------------------------
+
+
+  /**
+   * Perform a non-modifying flush and return true if Flush would
+   * have affected the coverage buffer.
+   */
+  bool TestDepthFlush (csTileCol& fvalue, float mindepth);
+
+  /**
+   * General TestFlush version (least efficient).
+   */
+  bool TestDepthFlushGeneral (csTileCol& fvalue, float maxdepth);
+
+  //-----------------------------------------------------------------
 
   /**
    * Test if a given rectangle with exactly the size of this tile
@@ -296,15 +340,32 @@ public:
    * Test if a given rectangle is visible. The rectangle is defined
    * as a set of full vertical columns from 'start' to 'end'.
    */
-  bool TestRect (int start, int end, float testdepth);
+  bool TestDepthRect (int start, int end, float testdepth);
 
   /**
    * Test if a given rectangle is visible. The rectangle is defined
    * as the vertical mask from 'start' to 'end' horizontally (inclusive
    * range).
    */
-  bool TestRect (const csTileCol& vermask, int start, int end,
+  bool TestDepthRect (const csTileCol& vermask, int start, int end,
   	float testdepth);
+
+  /**
+   * Test if a given rectangle is visible. The rectangle is defined
+   * as a set of full vertical columns from 'start' to 'end'.
+   */
+  bool TestCoverageRect (int start, int end, float testdepth,
+  	bool& do_depth_test);
+
+  /**
+   * Test if a given rectangle is visible. The rectangle is defined
+   * as the vertical mask from 'start' to 'end' horizontally (inclusive
+   * range).
+   */
+  bool TestCoverageRect (const csTileCol& vermask, int start, int end,
+  	float testdepth, bool& do_depth_test);
+
+  //-----------------------------------------------------------------
 
   /**
    * Test if a given point is visible in this tile. Coordinates
