@@ -75,6 +75,8 @@ chronological order.
 	- Eric Sunshine added a few more command aliases to vsh.
 	- res added a csCallStack implementation for systems supporting
 	  backtrace().
+	- res added -E to the debug linker flags to allow the 
+	  backtrace_symbols() function to obtain symbols in all cases.
 17-Dec-2004
 	- Peter Amstutz updated the csvosa3dl plugin to compile with
 	  the current VOS CVS code.

@@ -1,4 +1,4 @@
-#                                               -*- Autoconf -*-
+d#                                               -*- Autoconf -*-
 #==============================================================================
 # Copyright (C)2003,2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
@@ -704,6 +704,16 @@ CS_CHECK_BUILD_FLAGS([if -shared is accepted], [cs_cv_prog_link_shared],
 CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
     [CS_CREATE_TUPLE([-Wl,-soname,foobar])], [C++],
     [CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if linker recognizes -E which is specified in debug mode to allow the
+# backtrace() callstack creation code to obtain symbols in all cases.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([if -E is accepted], [cs_cv_prog_link_E], [],
+    [CS_CREATE_TUPLE([-Wl,-E])], [C++],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.debug], [-Wl,-E], [+])])
 
 
 
