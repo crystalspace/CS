@@ -7,6 +7,12 @@ The history order is reversed so that new features are at the top.
 	  lighting modifies a lightmap no new texture will be generated but
 	  instead the old cached lightmap state will be reused (using
 	  glTexSubImage2D).
+	- Philip Wyett updated map2cs tutorial with path to cstex_1.wad.
+	- Wouter Wijngaards fixed texture generation to be sure of good
+	  computation (made constant a float instead of int).
+	- Wouter also fixed the slopefunction so it now is much more robust
+	  in several respects. The values it returns can be pretty large,
+	  say in 0.. 4xterrainheight or so.
 17-May-2001
 	- Fixed Blocks so it compiles again.
 	- Did an experimental optimization. CS will now keep the lightmap
