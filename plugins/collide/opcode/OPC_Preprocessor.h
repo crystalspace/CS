@@ -13,6 +13,11 @@
 #define __ICEPREPROCESSOR_H__
 
 	// Check platform
+        #define BOOL  bool
+        #define FALSE false
+        #define TRUE  true
+
+ 
 	#if defined( _WIN32 ) || defined( WIN32 )
 		#pragma message("Compiling on Windows...")
 		#define PLATFORM_WINDOWS
@@ -26,11 +31,7 @@
 		#define COMPILER_VISUAL_CPP
 	#else
 		#pragma message("Compiling with unknown compiler...")
-                 #define BOOL  bool
-        #define FALSE false
-        #define TRUE  true
-
-
+       
 	#endif
 
 	// Check compiler options
