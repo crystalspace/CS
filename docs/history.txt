@@ -4,6 +4,15 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 18-Apr-2003
+	- Oktal added the PicoGUI server plugin. PicoGUI is a small
+	  client/server GUI architecture, and the server plugin will allow
+	  clients to be drawn on the CrystalSpace 2D canvas. A client plugin
+	  is in development, which will allow clients to be written in CS.
+	  It doesn't actually work yet, but it'll only build if libpgserver
+	  is found, and there are no compiler errors (or segfaults!)
+	  I wanted to commit this due to popular demand, before I leave
+	  on holiday for a week. The demanders can have a play and see
+	  if they can fix it.
 	- Started a document describing which parts of Crystal Space are
 	  thread-safe and which are not.
 	- Made SCF class loading/unloading thread-safe. This means
