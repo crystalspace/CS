@@ -55,7 +55,7 @@ struct iBase
 
 struct iSCF:public iBase
 {
-  void* scfCreateInstance(const char *iClassID, const char *iInterfaceID,
+  void* CreateInstance(const char *iClassID, const char *iInterfaceID,
     int iVersion);
 };
 int MakeVersion(int version0, int version1, int version2);
