@@ -14,3 +14,8 @@ done
 [ -d $CURDIR/debian/tmp/usr/lib/crystalspace/data/mdltest ] \
 || mkdir $CURDIR/debian/tmp/usr/lib/crystalspace/data/mdltest
 cp $CURDIR/CS/data/mdltest/?o* $CURDIR/debian/tmp/usr/lib/crystalspace/data/mdltest
+
+[ ! -f $CURDIR/debian/tmp/usr/lib/crystalspace/data/config/csbumptest.cfg ] && \
+cp $CURDIR/CS/data/config/csbumptest.cfg $CURDIR/debian/tmp/usr/lib/crystalspace/data/config
+[ ! -f $CURDIR/debian/tmp/usr/lib/crystalspace/data/config/csdemo.cfg ] && \
+cp $CURDIR/CS/data/config/csdemo.cfg $CURDIR/debian/tmp/usr/lib/crystalspace/data/config
