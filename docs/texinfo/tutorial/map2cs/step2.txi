@@ -3,7 +3,7 @@
 @subsection Step 2: Configuring Worldcraft
 
 Configuring WorldCraft sometimes is a pain.  But there is one consolation:
-Configuring WorldCraft for use with Half-Life isn't any either.
+Configuring WorldCraft for use with Half-Life isn't any fun either.
 
 @itemize @bullet
 @item

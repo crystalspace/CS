@@ -5,6 +5,7 @@ The history order is reversed so that new features are at the top.
 	  which would cause crashes when firing missiles in walktest.
 	- Fixed a similar bug in the snow, emit, fire, fountain, and spiral
 	  particle systems. Only rain appeared to be ok for some reason.
+	- Fixed a small type in the map2cs tutorial.
 26-Nov-2002
 	- Fixed a bug in the software renderer when materials are used without
 	  textures. Reported by groton.
