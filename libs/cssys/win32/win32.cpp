@@ -100,7 +100,6 @@ private:
   UINT oldCP;
 
   void SetWinCursor (HCURSOR);
-  iEventOutlet* GetEventOutlet();
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
   static LRESULT CALLBACK CBTProc (int nCode, WPARAM wParam, LPARAM lParam);
@@ -121,6 +120,8 @@ public:
   void AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args);
   virtual HWND GetApplicationWindow();
+
+  iEventOutlet* GetEventOutlet();
 
   /**
    * Handle a keyboard-related Windows message.
@@ -295,6 +296,25 @@ bool csPlatformShutdown(iObjectRegistry* r)
   return true;
 }
 
+BOOL WINAPI ConsoleHandlerRoutine (DWORD dwCtrlType)
+{
+  switch (dwCtrlType)
+  {
+    case CTRL_CLOSE_EVENT:
+    case CTRL_LOGOFF_EVENT:
+    case CTRL_SHUTDOWN_EVENT:
+      {
+	if (GLOBAL_ASSISTANT != 0)
+	{
+	  GLOBAL_ASSISTANT->GetEventOutlet()->ImmediateBroadcast (
+	    cscmdQuit, 0);
+	  return TRUE;
+	}
+      }
+  }
+  return FALSE;
+}
+
 Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   ApplicationActive (true),
   ModuleHandle (0),
@@ -352,7 +372,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
       (NTheader->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_CUI);
   }
 
-/*
+  /*
     - console apps won't do anything about their console... yet. 
     - GUI apps will open a console window if desired.
    */
@@ -365,6 +385,16 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
       freopen("CONOUT$", "a", stdout);
       freopen("CONIN$", "a", stdin);
     }
+  }
+
+  /*
+    In case we're a console app, set up a control handler so
+    console window closing, user logoff and system shutdown
+    cause CS to properly shut down.
+   */
+  if (is_console_app || console_window || cmdline_help_wanted)
+  {
+    SetConsoleCtrlHandler (&ConsoleHandlerRoutine, TRUE);
   }
 
   // experimental UC stuff.
