@@ -127,6 +127,7 @@ class csShadow;
 #define DEBUGCMD_COUNTERREMOVE	1044	// Remove all counters.
 #define DEBUGCMD_COUNTERFREEZE	1045	// Freeze all counters.
 #define DEBUGCMD_SHADOWDEBUG	1046	// Toggle shadow debugging
+#define DEBUGCMD_DEBUGCMD   	1047	// Send a debug command to a plugin
 /**
  * For key mappings.
  */
@@ -369,6 +370,8 @@ private:
   /// Process a command after finishing edit mode.
   void ExitEditMode ();
 
+  /// Send a debug command to a plugin
+  void DebugCmd (const char* cmd);
 public:
   SCF_DECLARE_IBASE;
 

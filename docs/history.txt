@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	      configuration files in user manual.
 	    - Corrected several mark-up bloofles in various .txi documents.
 	    - Eliminated TeX `hbox' warnings.
+	- res enhanced bugplug with a command to send debug commands to
+	  arbitrary plugins. Syntax is: debugcmd <classID> <command>
 2-Jul-2003
 	- Eric Sunshine fixed some spelling errors in the user manual pointed
 	  out by Vincent Knecht <vince@iefr.ath.cx>: existance -> existence

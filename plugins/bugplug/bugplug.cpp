@@ -816,6 +816,11 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_VISCULCMD:
         VisculCmd (args);
         break;
+      case DEBUGCMD_DEBUGCMD:
+	{
+	  DebugCmd (args);
+	  break;
+	}
       case DEBUGCMD_ENGINESTATE:
 	{
 	  csRef<iDebugHelper> dbghelp (
@@ -1505,6 +1510,54 @@ void csBugPlug::ExitEditMode ()
   }
 }
 
+void csBugPlug::DebugCmd (const char* cmd)
+{
+  char* cmdstr = csStrNew (cmd);
+  char* params;
+  char* space = strchr (cmdstr, ' ');
+  if (space == 0)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "debugcmd syntax: <plugin> <command>");
+  }
+  else
+  {
+    params = space + 1;
+    *space = 0;
+
+    csRef<iPluginManager> plugmgr = 
+      CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    CS_ASSERT (plugmgr);
+    csRef<iComponent> comp =
+      CS_QUERY_PLUGIN_CLASS (plugmgr, cmdstr, iComponent);
+    if (!comp)
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	"Could not load plugin '%s' for debug command execution.",
+	cmdstr);
+    }
+    else
+    {
+      csRef<iDebugHelper> dbghelp = 
+	SCF_QUERY_INTERFACE (comp, iDebugHelper);
+      if (!dbghelp)
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Plugin '%s' doesn't support debug command execution.",
+	  cmdstr);
+      }
+      else
+      {
+	bool res = dbghelp->DebugCommand (params);
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Debug command execution %s.",
+	  res ? "succesful" : "failed");
+      }
+    }
+  }
+  delete[] cmdstr;
+}
+
 int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
 	bool& ctrl)
 {
@@ -1624,6 +1677,7 @@ int csBugPlug::GetCommandCode (const char* cmd, char* args)
   if (!strcmp (cmd, "counterfreeze"))	return DEBUGCMD_COUNTERFREEZE;
   if (!strcmp (cmd, "counterremove"))	return DEBUGCMD_COUNTERREMOVE;
   if (!strcmp (cmd, "shadowdebug"))	return DEBUGCMD_SHADOWDEBUG;
+  if (!strcmp (cmd, "debugcmd"))	return DEBUGCMD_DEBUGCMD;
 
   return DEBUGCMD_UNKNOWN;
 }
