@@ -332,7 +332,7 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 }
 
 
- iMeshObjectFactory *csStuffObject::GetFactory () const
+ csPtr<iMeshObjectFactory> csStuffObject::GetFactory () const
  { return factory; };
  void csStuffObject::UpdateLighting (iLight **,int, iMovable *) {
   SetupMesh();
@@ -377,7 +377,7 @@ StuffFactory::~StuffFactory() {};
 
 bool StuffFactory::Initialize(iObjectRegistry* iO_R) { object_reg=iO_R; return true; };
 
-iMeshObject* StuffFactory::NewInstance() {
+csPtr<iMeshObject> StuffFactory::NewInstance() {
 
 csStuffObject *obj = new csStuffObject((iMeshObjectFactory*) this);
 bool initOk = obj->Initialize(object_reg);
@@ -421,7 +421,7 @@ StuffMeshObjectType::~StuffMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* StuffMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> StuffMeshObjectType::NewFactory ()
 {
   StuffFactory* cm = new StuffFactory (this);
   cm->Initialize(object_reg);
