@@ -13,6 +13,8 @@ chronological order.
 	- Jorrit fixed the iSectorList implementation in
 	  iMovable->GetSectors() so that it is now safe to remove sectors
 	  from the returned list.
+	- Jorrit fixed the camera so that it only fires the sector listeners
+	  if the sector really changes.
 8-Jul-2004
 	- Jorrit fixed a compile error in partgen.
         - Matze changed some jam/configure things:

@@ -155,6 +155,7 @@ public:
    */
   void SetSector (iSector *s)
   {
+    if (sector == s) return;
     sector = s;
     cameranr = cur_cameranr++;
     FireCameraSectorListeners (sector);

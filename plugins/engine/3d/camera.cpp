@@ -126,6 +126,7 @@ void csCamera::MoveWorld (const csVector3 &v, bool cd)
     else
     {
       sector = new_sector;
+      cameranr = cur_cameranr++;
       FireCameraSectorListeners (sector);
     }
   }
