@@ -180,8 +180,8 @@ file.
 The classes @code{SysSystemDriver}, and @code{csSystemDriver}, and
 the interface @code{iSystem} have been removed. All the functionality
 that used to be present in the system driver has moved to smaller
-components (plugin manager, event queue, config manager, commandline parser,
-virtual clock, etc.).
+components (plugin manager, event queue, configuration manager, commandline
+parser, virtual clock, etc.).
 
 There is now a new concept called the @dfn{object registry} which is
 the central repository where all objects can register themselves.
@@ -197,7 +197,7 @@ all the new concepts very clearly.
 @subheading Removal of Function @sc{id}'s
 
 Function ID's (a concept of the old plugin system) have been removed.
-This has an effect on config files where you now must replace things
+This has an effect on configuration files where you now must replace things
 like:
 
 @example
@@ -238,14 +238,14 @@ imgldr->DecRef ();
 @cindex Level Loading
 
 The level loader is now a plugin. Make sure you have it loaded by putting the
-following in your config file:
+following in your configuration file:
 
 @example
 System.PlugIns.iLoader = crystalspace.level.loader
 @end example
 
 @noindent
-Or you can add @samp{CS_REQUEST_LEVELLOADER} to the list of requested pluging
+Or you can add @samp{CS_REQUEST_LEVELLOADER} to the list of requested plugin
 in the call to @code{csInitializer::RequestPlugins()}.  Then you can get the
 level loader with:
 
