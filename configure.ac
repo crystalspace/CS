@@ -2195,19 +2195,17 @@ AS_IF([test $enable_memory_tracker = yes],
 
 
 #------------------------------------------------------------------------------
-# Determine if leakguards should be enabled.
+# Determine if leak guard should be enabled.
 #------------------------------------------------------------------------------
-AC_MSG_CHECKING([whether to use leakguards])
-AC_ARG_ENABLE([leakguards],
-    [AC_HELP_STRING([--enable-leakguards],
-	[enable the leak guard protection which will show
-	all objects that were not freed at program exit (default NO)])],
-    [], [enable_leakguards=no])
-AC_MSG_RESULT([$enable_leakguards])
-CS_EMIT_BUILD_PROPERTY([LEAKGUARDS],
-    [$enable_leakguards])
-AS_IF([test $enable_leakguards = yes],
-    [CS_HEADER_PROPERTY([CS_LEAKGUARDS])])
+AC_MSG_CHECKING([whether to use leak guard])
+AC_ARG_ENABLE([leak-guard],
+    [AC_HELP_STRING([--enable-leak-guard],
+	[enable the leak guard protection which warns about objects not freed
+	at program exit (default NO)])],
+    [], [enable_leak_guard=no])
+AC_MSG_RESULT([$enable_leak_guard])
+AS_IF([test $enable_leak_guard = yes],
+    [CS_HEADER_PROPERTY([CS_USE_LEAK_GUARD])])
 
 
 

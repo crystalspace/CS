@@ -13,6 +13,12 @@ chronological order.
 	  debug or optimize mode. This means that debug and optimize mode
 	  are now again compatible given the same leakguards option.
 	  Re-enabled the leakguard in csShaderVariable.
+	- Eric Sunshine made the following changes:
+	    - configure.ac no longer uselessly emits the Jam variable
+	      LEAKGUARDS.
+	    - Renamed control macro CS_LEAKGUARDS to CS_USE_LEAK_GUARD.
+	    - Renamed configure.ac option --enable-leakguards to
+	      --enable-leak-guard.
 28-Aug-2004
 	- Jorrit removed the leakguard from csShaderVariable since somehow
 	  it prevents combination of optimize and debug plugins.

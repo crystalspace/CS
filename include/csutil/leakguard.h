@@ -19,7 +19,7 @@
 #ifndef __CS_LEAKGUARD_H__
 #define __CS_LEAKGUARD_H__
 
-#ifdef CS_LEAKGUARDS
+#ifdef CS_USE_LEAK_GUARD
 #define CS_LEAKGUARD_DECLARE(m) \
 struct csLeakGuard \
 { \
