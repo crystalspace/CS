@@ -47,4 +47,12 @@ MsvcGenConfig CRYSTAL.LFLAGS.DEBUG ;
 MsvcGenConfig CRYSTAL.LIBS.DEBUG : 
   "libcstool_d.lib libcsgfx_d.lib libcsgeom_d.lib libcsutil_d.lib" ;
 
+# Set project-specific compiler and linker options for msvcgen.
+#MsvcGenConfig MSVC.CFLAGS : "/D \"MY_DEFINE\"" ;
+#MsvcGenConfig MSVC.CFLAGS_DEBUG : "/D \"MY_DEBUG_DEFINE\"" ;
+#MsvcGenConfig MSVC.LFLAGS : "/libpath:\"my\\lib\\path\"" ;
+#MsvcGenConfig MSVC.LFLAGS_DEBUG : "/libpath:\"my\\debuglib\\path\"" ;
+#MsvcGenConfig MSVC.LIBRARY : supercool.lib ;
+#MsvcGenConfig MSVC.LIBRARY_DEBUG : supercooldebug.lib ;
+
 SubInclude TOP src ;
