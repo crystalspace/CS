@@ -58,35 +58,6 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p )
 	return p;
 }
 
-#ifdef TIXML_USE_STL
-/*static*/ bool TiXmlBase::StreamWhiteSpace( TIXML_ISTREAM * in, TIXML_STRING * tag )
-{
-	for( ;; )
-	{
-		if ( !in->good() ) return false;
-
-		int c = in->peek();
-		if ( !IsWhiteSpace( c ) )
-			return true;
-		*tag += in->get();
-	}
-}
-
-/*static*/ bool TiXmlBase::StreamTo( TIXML_ISTREAM * in, int character, TIXML_STRING * tag )
-{
-	while ( in->good() )
-	{
-		int c = in->peek();
-		if ( c == character )
-			return true;
-
-		in->get();
-		*tag += c;
-	}
-	return false;
-}
-#endif
-
 const char* TiXmlBase::ReadName( const char* p, char* name)
 {
 	char* pname = name;
@@ -351,66 +322,6 @@ const char* TiXmlBase::ReadText(	const char* p,
 	return p + strlen( endTag );
 }
 
-#ifdef TIXML_USE_STL
-
-void TiDocument::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
-{
-	// The basic issue with a document is that we don't know what we're
-	// streaming. Read something presumed to be a tag (and hope), then
-	// identify it, and call the appropriate stream method on the tag.
-	//
-	// This "pre-streaming" will never read the closing ">" so the
-	// sub-tag can orient itself.
-
-	if ( !StreamTo( in, '<', tag ) ) 
-	{
-		SetError( TIXML_ERROR_PARSING_EMPTY );
-		return;
-	}
-
-	while ( in->good() )
-	{
-		int tagIndex = tag->length();
-		while ( in->good() && in->peek() != '>' )
-		{
-			int c = in->get();
-			(*tag) += (char) c;
-		}
-
-		if ( in->good() )
-		{
-			// We now have something we presume to be a node of 
-			// some sort. Identify it, and call the node to
-			// continue streaming.
-			TiDocumentNode* node = Identify( tag->c_str() + tagIndex );
-
-			if ( node )
-			{
-				node->StreamIn( in, tag );
-				bool isElement = node->ToElement() != 0;
-				delete node;
-				node = 0;
-
-				// If this is the root element, we're done. Parsing will be
-				// done by the >> operator.
-				if ( isElement )
-				{
-					return;
-				}
-			}
-			else
-			{
-				SetError( TIXML_ERROR );
-				return;
-			}
-		}
-	}
-	// We should have returned sooner.
-	SetError( TIXML_ERROR );
-}
-
-#endif
-
 const char* TiDocument::Parse( const char* p )
 {
 	// Parse away, at the document level. Since a document
@@ -525,112 +436,6 @@ TiDocumentNode* TiDocumentNode::Identify( const char* p )
 	return returnNode;
 }
 
-#ifdef TIXML_USE_STL
-
-void TiXmlElement::StreamIn (TIXML_ISTREAM * in, TIXML_STRING * tag)
-{
-	// We're called with some amount of pre-parsing. That is, some of "this"
-	// element is in "tag". Go ahead and stream to the closing ">"
-	while( in->good() )
-	{
-		int c = in->get();
-		(*tag) += (char) c ;
-		
-		if ( c == '>' )
-			break;
-	}
-
-	if ( tag->length() < 3 ) return;
-
-	// Okay...if we are a "/>" tag, then we're done. We've read a complete tag.
-	// If not, identify and stream.
-
-	if (    tag->at( tag->length() - 1 ) == '>' 
-		 && tag->at( tag->length() - 2 ) == '/' )
-	{
-		// All good!
-		return;
-	}
-	else if ( tag->at( tag->length() - 1 ) == '>' )
-	{
-		// There is more. Could be:
-		//		text
-		//		closing tag
-		//		another node.
-		for ( ;; )
-		{
-			StreamWhiteSpace( in, tag );
-
-			// Do we have text?
-			if ( in->peek() != '<' )
-			{
-				// Yep, text.
-				TiXmlText text( "" );
-				text.StreamIn( in, tag );
-
-				// What follows text is a closing tag or another node.
-				// Go around again and figure it out.
-				continue;
-			}
-
-			// We now have either a closing tag...or another node.
-			// We should be at a "<", regardless.
-			if ( !in->good() ) return;
-			//assert( in->peek() == '<' );
-			int tagIndex = tag->length();
-
-			bool closingTag = false;
-			bool firstCharFound = false;
-
-			for( ;; )
-			{
-				if ( !in->good() )
-					return;
-
-				int c = in->peek();
-				
-				if ( c == '>' )
-					break;
-
-				*tag += c;
-				in->get();
-
-				if ( !firstCharFound && c != '<' && !IsWhiteSpace( c ) )
-				{
-					firstCharFound = true;
-					if ( c == '/' )
-						closingTag = true;
-				}
-			}
-			// If it was a closing tag, then read in the closing '>' to clean up the input stream.
-			// If it was not, the streaming will be done by the tag.
-			if ( closingTag )
-			{
-				int c = in->get();
-				//assert( c == '>' );
-				*tag += c;
-
-				// We are done, once we've found our closing tag.
-				return;
-			}
-			else
-			{
-				// If not a closing tag, id it, and stream.
-				const char* tagloc = tag->c_str() + tagIndex;
-				TiDocumentNode* node = Identify( tagloc );
-				if ( !node )
-					return;
-				node->StreamIn( in, tag );
-				delete node;
-				node = 0;
-
-				// No return: go around from the beginning: text, closing tag, or node.
-			}
-		}
-	}
-}
-#endif
-
 const char* TiXmlElement::Parse( const char* p )
 {
 	p = SkipWhiteSpace( p );
@@ -715,7 +520,9 @@ const char* TiXmlElement::Parse( const char* p )
 				if ( document ) document->SetError( TIXML_ERROR_PARSING_ELEMENT );
 				return 0;
 			}
-			SetAttributeRegistered (attrib.Name(), attrib.Value());
+			GetAttributeRegistered (attrib.Name()).
+				TakeOverValue (attrib.Value());
+			attrib.TakeOverValue (NULL);
 		}
 	}
 	attributeSet.set.ShrinkBestFit ();
@@ -799,24 +606,6 @@ const char* TiXmlElement::ReadValue( const char* p )
 }
 
 
-#ifdef TIXML_USE_STL
-void TiXmlUnknown::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
-{
-	while ( in->good() )
-	{
-		int c = in->get();	
-		(*tag) += c;
-
-		if ( c == '>' )
-		{
-			// All is well.
-			return;		
-		}
-	}
-}
-#endif
-
-
 const char* TiXmlUnknown::Parse( const char* p )
 {
 	TiDocument* document = GetDocument();
@@ -843,26 +632,6 @@ const char* TiXmlUnknown::Parse( const char* p )
 		return p+1;
 	return p;
 }
-
-#ifdef TIXML_USE_STL
-void TiXmlComment::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
-{
-	while ( in->good() )
-	{
-		int c = in->get();	
-		(*tag) += c;
-
-		if ( c == '>' 
-			 && tag->at( tag->length() - 2 ) == '-'
-			 && tag->at( tag->length() - 3 ) == '-' )
-		{
-			// All is well.
-			return;		
-		}
-	}
-}
-#endif
-
 
 const char* TiXmlComment::Parse( const char* p )
 {
@@ -924,13 +693,17 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 	{
 		++p;
 		end = "\'";
-		p = TiXmlBase::ReadText( p, &value, false, end);
+		char* pvalue;
+		p = TiXmlBase::ReadText( p, &pvalue, false, end);
+		value = pvalue;
 	}
 	else if ( *p == '"' )
 	{
 		++p;
 		end = "\"";
-		p = TiXmlBase::ReadText( p, &value, false, end);
+		char* pvalue;
+		p = TiXmlBase::ReadText( p, &pvalue, false, end);
+		value = pvalue;
 	}
 	else
 	{
@@ -948,21 +721,6 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 	}
 	return p;
 }
-
-#ifdef TIXML_USE_STL
-void TiXmlText::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
-{
-	while ( in->good() )
-	{
-		int c = in->peek();	
-		if ( c == '<' )
-			return;
-
-		(*tag) += c;
-		in->get();
-	}
-}
-#endif
 
 const char* TiXmlText::Parse( const char* p )
 {
@@ -994,23 +752,6 @@ const char* TiXmlCData::Parse( const char* p )
 		return p;
 	return 0;
 }
-
-#ifdef TIXML_USE_STL
-void TiXmlDeclaration::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
-{
-	while ( in->good() )
-	{
-		int c = in->get();
-		(*tag) += c;
-
-		if ( c == '>' )
-		{
-			// All is well.
-			return;
-		}
-	}
-}
-#endif
 
 const char* TiXmlDeclaration::Parse( const char* p )
 {

@@ -25,8 +25,6 @@ distribution.
 #include "tinyxml.h"
 
 
-#ifndef TIXML_USE_STL
-
 #ifndef TIXML_STRING_INCLUDED
 #define TIXML_STRING_INCLUDED
 
@@ -228,4 +226,4 @@ public :
 } ;
 
 #endif	// TIXML_STRING_INCLUDED
-#endif	// TIXML_USE_STL
+

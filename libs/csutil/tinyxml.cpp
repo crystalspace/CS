@@ -489,20 +489,19 @@ void TiXmlElement::SetAttribute( TiDocument* document,
 }
 
 
-void TiXmlElement::SetAttributeRegistered (const char * reg_name,
-	const char * value)
+TiDocumentAttribute& TiXmlElement::GetAttributeRegistered (
+	const char * reg_name)
 {
 	int nodeidx = attributeSet.FindExact (reg_name);
 	if (nodeidx != -1)
 	{
-		attributeSet.set[nodeidx].SetValue (value);
-		return;
+		return attributeSet.set[nodeidx];
 	}
 
 	TiDocumentAttribute at;
 	int idx = attributeSet.set.Push (at);
 	attributeSet.set[idx].SetName (reg_name);
-	attributeSet.set[idx].SetValue (value);
+	return attributeSet.set[idx];
 }
 
 void TiXmlElement::SetAttribute (TiDocument* document,
@@ -510,7 +509,7 @@ void TiXmlElement::SetAttribute (TiDocument* document,
 {
 	csStringID name_id = document->strings.Request (name);
 	const char* reg_name = document->strings.Request (name_id);
-	SetAttributeRegistered (reg_name, value);
+	GetAttributeRegistered (reg_name).SetValue (value);
 }
 
 void TiXmlElement::Print( FILE* cfile, int depth ) const
@@ -608,7 +607,8 @@ TiDocumentNode* TiXmlElement::Clone() const
 	for (i = 0 ; i < attributeSet.set.Length () ; i++)
 	{
 	  const TiDocumentAttribute& attrib = attributeSet.set[i];
-	  clone->SetAttributeRegistered (attrib.Name (), attrib.Value ());
+	  clone->GetAttributeRegistered (attrib.Name ()).
+	  	SetValue (attrib.Value ());
 	}
 
 	TiDocumentNode* node = 0;
@@ -990,19 +990,6 @@ int TiDocumentAttributeSet::FindExact (const char * reg_name) const
   }
   return -1;
 }
-
-#ifdef TIXML_USE_STL	
-TIXML_ISTREAM & operator >> (TIXML_ISTREAM & in, TiDocumentNode & base)
-{
-	TIXML_STRING tag;
-	tag.reserve( 8 * 1000 );
-	base.StreamIn( &in, &tag );
-
-	base.Parse( tag.c_str() );
-	return in;
-}
-#endif
-
 
 TIXML_OSTREAM & operator<< (TIXML_OSTREAM & out, const TiDocumentNode & base)
 {

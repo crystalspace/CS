@@ -12,6 +12,8 @@ The history order is reversed so that new features are at the top.
 	  from an ID to a string is now fast too.
 	- Attribute names are now stored in a string set in the TinyXML
 	  parser. This again removes a lot of memory usage.
+	- Parsing of attributes in TinyXML faster: less new/delete.
+	- Cleaned up TinyXML code a bit. Still messy though.
 11-Mar-2003
 	- Fixed a leak in the prepare textures code of regions. It was
 	  forgetting to reset the image pointer to NULL. This means

@@ -25,9 +25,6 @@ distribution.
 #include "cssysdef.h"
 #include "tinyxml.h"
 
-#ifndef TIXML_USE_STL
-
-
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -264,5 +261,3 @@ bool TiXmlString::operator > (const TiXmlString & compare) const
 	return false;
 }
 
-
-#endif	// TIXML_USE_STL
