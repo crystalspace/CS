@@ -21,33 +21,17 @@
 #include "csutil/csstring.h"
 #include "csutil/hashmap.h"
 #include "csutil/csppulse.h"
-#include "csengine/sector.h"
-#include "csengine/thing.h"
-#include "csengine/meshobj.h"
-#include "csengine/polygon.h"
-#include "csengine/pol2d.h"
-#include "csengine/polytext.h"
-#include "csengine/polytmap.h"
-#include "csengine/cscoll.h"
-#include "csengine/light.h"
-#include "csengine/camera.h"
-#include "csengine/engine.h"
-#include "csengine/stats.h"
-#include "csengine/cbuffer.h"
-#include "csengine/bspbbox.h"
-#include "csengine/cbufcube.h"
-#include "csengine/bsp.h"
-#include "csengine/octree.h"
+#include "iutil/vfs.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
-#include "iengine/texture.h"
-#include "iutil/vfs.h"
-#include "iengine/statlght.h"
-#include "iengine/viscull.h"
+#include "csengine/cbufcube.h"
+#include "csengine/engine.h"
+#include "csengine/sector.h"
+#include "csengine/polygon.h"
+#include "csengine/light.h"
 #include "iengine/rview.h"
-#include "iengine/light.h"
 
 // Option variable: render portals?
 bool csSector::do_portals = true;
@@ -209,13 +193,19 @@ void csSector::RelinkMesh (iMeshWrapper* mesh)
 
 void csSector::UseCuller (const char* meshname)
 {
+  // if there is already a culler in use, do nothing
   if (culler_mesh) return;
-  iMeshWrapper* cul_mesh = meshes.FindByName (meshname);
-  if (!cul_mesh) return;
-  culler_mesh = cul_mesh;
+
+  // find the culler with the given name
+  culler_mesh = meshes.FindByName (meshname);
+  if (!culler_mesh) return;
+
+  // query the culler interface from it
   culler = SCF_QUERY_INTERFACE_FAST (culler_mesh->GetMeshObject (),
   	iVisibilityCuller);
   if (!culler) return;
+
+  // load cache data
   char cachename[256];
   sprintf (cachename, "%s_%s", GetName (), meshname);
   culler->Setup (cachename);

@@ -191,9 +191,7 @@ public:
   //----------------------------------------------------------------------
 
   iMeshList* GetMeshes ()
-  {
-    return &(meshes.scfiMeshList);
-  }
+    { return &(meshes.scfiMeshList); }
 
   /**
    * Prepare a mesh for rendering. This function is called for all meshes that
@@ -221,7 +219,8 @@ public:
   /**
    * Get the list of lights in this sector.
    */
-  csLightList& GetLights () { return lights; }
+  iLightList* GetLights ()
+    { return &lights.scfiLightList; }
 
   //----------------------------------------------------------------------
   // Visibility Stuff
@@ -421,42 +420,33 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csSector);
 
     virtual csSector *GetPrivateObject ()
-    { return (csSector*)scfParent; }
+      { return (csSector*)scfParent; }
     virtual iObject *QueryObject()
-    { return scfParent; }
-    virtual int GetRecLevel () const { return scfParent->draw_busy; }
+      { return scfParent; }
+    virtual int GetRecLevel () const
+      { return scfParent->draw_busy; }
     virtual void SetVisibilityCuller (const char *Name)
-    {
-      scfParent->UseCuller (Name);
-    }
+      { scfParent->UseCuller (Name); }
     virtual iVisibilityCuller* GetVisibilityCuller () const
-    {
-      return scfParent->GetVisibilityCuller ();
-    }
-
+      { return scfParent->GetVisibilityCuller (); }
     virtual iMeshList* GetMeshes ()
-    {
-      return &(scfParent->meshes.scfiMeshList);
-    }
+      { return scfParent->GetMeshes (); }
     virtual iLightList* GetLights ()
-    {
-      return &(scfParent->lights.scfiLightList);
-    }
-
+      { return scfParent->GetLights (); }
     virtual void ShineLights ()
-    { scfParent->ShineLights (); }
+      { scfParent->ShineLights (); }
     virtual void ShineLights (iMeshWrapper* mesh)
-    { scfParent->ShineLights (mesh); }
-
+      { scfParent->ShineLights (mesh); }
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const
-    { scfParent->CalculateSectorBBox (bbox, do_meshes); }
-
-    virtual bool HasFog () const { return scfParent->HasFog (); }
-    virtual csFog *GetFog () const { return &scfParent->fog; }
+      { scfParent->CalculateSectorBBox (bbox, do_meshes); }
+    virtual bool HasFog () const
+      { return scfParent->HasFog (); }
+    virtual csFog *GetFog () const
+      { return &scfParent->fog; }
     virtual void SetFog (float density, const csColor& color)
-    { scfParent->SetFog (density, color); }
+      { scfParent->SetFog (density, color); }
     virtual void DisableFog ()
-    { scfParent->DisableFog (); }
+      { scfParent->DisableFog (); }
     virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect);
     virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
@@ -464,7 +454,7 @@ public:
     virtual iSector* FollowSegment (csReversibleTransform& t,
   	csVector3& new_position, bool& mirror, bool only_portals = false);
     virtual void Draw (iRenderView* rview)
-    { scfParent->Draw (rview); }
+      { scfParent->Draw (rview); }
   } scfiSector;
   friend struct eiSector;
 };
