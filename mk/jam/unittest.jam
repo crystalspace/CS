@@ -151,13 +151,13 @@ if $(UNITTEST_VERBOSE) = yes
 ##
 rule UnitTest
 {
-  local module = $(1) ;
+  local mod = $(1) ;
   local testdir = $(2) ;
   local exts = $(3) ;
   if ! $(testdir) { testdir = t ; }
   if ! $(exts) { exts = .t ; }
 
-  local test_clean = [ UnitTestNameClean $(module) ] ;
+  local test_clean = [ UnitTestNameClean $(mod) ] ;
   local oldsubdir = $(SUBDIR_TOKENS) ;
 
   SubDir TOP $(oldsubdir) $(testdir)  ;
@@ -204,9 +204,9 @@ rule UnitTest
     Clean $(test_clean) : $(tests_obj) ;
 
     # Create the driver for "check_module".
-    UnitTestDriver $(module) : $(tests_obj) ;
+    UnitTestDriver $(mod) : $(tests_obj) ;
     # Dynamically create the drivers for all parent directories.
-    UnitTestDynamicTargets $(module) : $(tests_obj) : $(oldsubdir) ;
+    UnitTestDynamicTargets $(mod) : $(tests_obj) : $(oldsubdir) ;
   }
 
   SubDir TOP $(oldsubdir) ;
@@ -252,13 +252,13 @@ rule UnitTest
 #   not provided, then it defaults to `module'.
 rule UnitTestDriver
 {
-  local module = $(1) ;
+  local mod = $(1) ;
   local objs = $(2) ;
   local owner = $(3) ;
-  if ! $(owner) { owner = $(module) ; }
+  if ! $(owner) { owner = $(mod) ; }
 
-  local test_name  = [ UnitTestNameTest  $(module) ] ;
-  local test_clean = [ UnitTestNameClean $(module) ] ;
+  local test_name  = [ UnitTestNameTest  $(mod) ] ;
+  local test_clean = [ UnitTestNameClean $(mod) ] ;
 
   # This is the low-level target name by which a unit testing driver program is
   # known. We only create the target the first time we are called at a
@@ -266,10 +266,10 @@ rule UnitTestDriver
   # subsequent invocations, we merely add the new objects files to the existing
   # driver.
 
-  local test_driver = $(module)_unittest ;
-  if ! $($(module)_UNITTESTS)
+  local test_driver = $(mod)_unittest ;
+  if ! $($(mod)_UNITTESTS)
   {
-    $(module)_UNITTESTS = $(test_driver) ;
+    $(mod)_UNITTESTS = $(test_driver) ;
 
     # Create the actual driver program represented by the `test_driver' target.
     local test_driver_target =
@@ -351,7 +351,7 @@ rule UnitTestCommonObj
 #   same directories.)
 rule UnitTestDynamicTargets
 {
-  local module = $(1) ;
+  local mod = $(1) ;
   local objs = $(2) ;
   local subdir_tokens = $(3) ;
 
@@ -363,20 +363,20 @@ rule UnitTestDynamicTargets
   local deepest_name  = [ UnitTestNameTest  $(subdir_tokens:J=_) ] ;
   local deepest_clean = [ UnitTestNameClean $(subdir_tokens:J=_) ] ;
   NotFile $(deepest_name) $(deepest_clean) ;
-  Depends $(deepest_name)  : [ UnitTestNameTest  $(module) ] ;
-  Depends $(deepest_clean) : [ UnitTestNameClean $(module) ] ;
+  Depends $(deepest_name)  : [ UnitTestNameTest  $(mod) ] ;
+  Depends $(deepest_clean) : [ UnitTestNameClean $(mod) ] ;
 
   # For each parent directory of `module', synthesize a driver target.
   local tokens = [ FReverse $(subdir_tokens) ] ;
   tokens = $(tokens[2-]) ;
   while $(tokens)
   {
-    UnitTestDynamicTarget $(module) : $(objs) : [ FReverse $(tokens) ] ;
+    UnitTestDynamicTarget $(mod) : $(objs) : [ FReverse $(tokens) ] ;
     tokens = $(tokens[2-]) ;
   }
 
   # Synthesize a "check_all" target which incorporates all tests projectwide.
-  UnitTestDynamicTarget $(module) : $(objs) : : all ;
+  UnitTestDynamicTarget $(mod) : $(objs) : : all ;
 }
 
 # UnitTestDynamicTarget module : objs : dir_tokens [ : dyn_module ]
@@ -387,16 +387,16 @@ rule UnitTestDynamicTargets
 #   which case the target name becomes "check_dyn_module".
 rule UnitTestDynamicTarget
 {
-  local module = $(1) ;
+  local mod = $(1) ;
   local objs = $(2) ;
   local dir_tokens = $(3) ;
-  local dyn_module = $(4) ;
-  if ! $(dyn_module) { dyn_module = $(dir_tokens:J=_) ; }
+  local dyn_mod = $(4) ;
+  if ! $(dyn_mod) { dyn_mod = $(dir_tokens:J=_) ; }
 
   local olddir = $(SUBDIR_TOKENS) ;
   SubDir TOP $(dir_tokens) ;
 
-  local test_driver = [ UnitTestDriver $(dyn_module) : $(objs) : $(module) ] ;
+  local test_driver = [ UnitTestDriver $(dyn_mod) : $(objs) : $(mod) ] ;
 
   # Use module_UNITTESTS to remember that this dynamically synthesized driver
   # has a relation to `module'. This information is needed later when clients
@@ -406,7 +406,7 @@ rule UnitTestDynamicTarget
   # incorporate module's test objects.  This is what the UnitTestCFlags,
   # UnitTestLFlags, and UnitTestLibDepends rules do.
 
-  $(module)_UNITTESTS += $(test_driver) ;
+  $(mod)_UNITTESTS += $(test_driver) ;
 
   SubDir TOP $(olddir) ;
 }
@@ -437,10 +437,10 @@ rule UnitTestCFlags
 #   objects.
 rule UnitTestLFlags
 {
-  local module    = $(1) ;
+  local mod       = $(1) ;
   local flags     = $(2) ;
   local options   = $(3) ;
-  local unittests = $($(module)_UNITTESTS) ;
+  local unittests = $($(mod)_UNITTESTS) ;
   local u ;
   for u in $(unittests)
   {
@@ -454,9 +454,9 @@ rule UnitTestLFlags
 #   test objects.
 rule UnitTestLibDepends
 {
-  local module    = $(1) ;
+  local mod       = $(1) ;
   local libs      = $(2) ;
-  local unittests = $($(module)_UNITTESTS) ;
+  local unittests = $($(mod)_UNITTESTS) ;
   local u ;
   for u in $(unittests)
   {
