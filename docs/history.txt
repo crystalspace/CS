@@ -3,7 +3,8 @@ The history order is reversed so that new features are at the top.
 3-Nov-2001
 	- Jorge Acereda changed csLoadLibrary() in unix.cpp to call 
 	  dlopen() always, so that csPrintLibraryError() can get the
-	  correct error message with dlerror().
+	  correct error message with dlerror(). Also fixed an unaccuracy
+	  in csGetTicks() and changed it to use sysconf() correctly.
 2-Nov-2001
 	- the new viemesh is ready: you can now select state and rotate around
 	  and the possibility to load material/texture libs and meshes with gui
