@@ -230,9 +230,9 @@ void csSpriteTemplate::GenerateLOD ()
   csLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
 
 //// DEBUG CODE ////
-for (i = 0 ; i < GetNumTexels() ; i++)
+//for (i = 0 ; i < GetNumTexels() ; i++)
 //translate [i] = (i + 1) % GetNumTexels();
-translate [i] = i;
+//translate [i] = i;
 ////////////////////
 
   for (i = 0 ; i < frames.Length () ; i++)
@@ -257,16 +257,15 @@ translate [i] = i;
   }
 
 //// DEBUG CODE ////
-for (i = 0 ; i < GetNumTexels() ; i++)
-{
+//for (i = 0 ; i < GetNumTexels() ; i++)
+//{
 // THIS LINE MAKES WEIRD LIGHTING EFFECTS
-texel_to_vertex [(i + 1) % GetNumTexels()] = i;
+//texel_to_vertex [(i + 1) % GetNumTexels()] = i;
 // THIS LINE HAS NO EFFECT
-texel_to_normal [(i + 1) % GetNumTexels()] = i;
-}
+//texel_to_normal [(i + 1) % GetNumTexels()] = i;
+//}
 ////////////////////
 
-/*
   if (texel_to_normal != NULL)
   {
     CHK (int* ttn = new int [GetNumTexels()]);
@@ -283,7 +282,6 @@ texel_to_normal [(i + 1) % GetNumTexels()] = i;
     CHK (delete [] texel_to_vertex);
     texel_to_vertex = ttv;
   }
-*/
 
   CHK (delete [] translate);
   CHK (delete verts);
@@ -1156,8 +1154,18 @@ void csSprite3D::Draw (csRenderView& rview)
   // @@@ This should only be done when aspect changes...
   rview.g3d->SetPerspectiveAspect (rview.aspect);
 
-  csVector3* obj_verts = cframe->GetVertices ()->GetVertices ();
-  csVector3* tween_verts = next_frame->GetVertices ()->GetVertices ();
+  // BAD - ignores texel_to arrays
+  //csVector3* obj_verts = cframe->GetVertices ()->GetVertices ();
+  //csVector3* tween_verts = next_frame->GetVertices ()->GetVertices ();
+
+  CHK ( csVector3* obj_verts   = new csVector3 [tpl->GetNumTexels()]; )
+  CHK ( csVector3* tween_verts = new csVector3 [tpl->GetNumTexels()]; )
+  for ( i = 0 ; i < tpl->GetNumTexels() ; i++ )
+  {
+    obj_verts   [i] = tpl->GetVertex (cframe,     i);
+    tween_verts [i] = tpl->GetVertex (next_frame, i);
+  }
+
   bool do_tween = false;
   if (!skeleton_state && tween_ratio) do_tween = true;
 
@@ -1273,6 +1281,9 @@ void csSprite3D::Draw (csRenderView& rview)
 
   if (draw_callback2)
     draw_callback2 (this, &rview, myOwner);
+
+  CHK (delete [] obj_verts);
+  CHK (delete [] tween_verts);
 }
 
 
@@ -1360,8 +1371,18 @@ void csSprite3D::Draw (csRenderView& rview)
   //CHK ( object_vertices = new csVector3 [tpl->GetNumTexels()]; )
   //for (i = 0; i < tpl->GetNumTexels(); i++)
     //object_vertices[i] = tpl->GetVertex(cframe, i);
-  csVector3* obj_verts = cframe->GetVertices ()->GetVertices ();
-  csVector3* tween_verts = next_frame->GetVertices ()->GetVertices ();
+
+  // UNCLEAN!  UNCLEAN!  Ignores texel_to arrays in csSpriteTemplate
+  //csVector3* obj_verts = cframe->GetVertices ()->GetVertices ();
+  //csVector3* tween_verts = next_frame->GetVertices ()->GetVertices ();
+
+  CHK ( csVector3* obj_verts   = new csVector3 [tpl->GetNumTexels()]; )
+  CHK ( csVector3* tween_verts = new csVector3 [tpl->GetNumTexels()]; )
+  for ( i = 0 ; i < tpl->GetNumTexels() ; i++ )
+  {
+    obj_verts   [i] = tpl->GetVertex (cframe,     i);
+    tween_verts [i] = tpl->GetVertex (next_frame, i);
+  }
 
   if (skeleton_state)
     skeleton_state->Transform (tr_o2c, obj_verts, tr_verts.GetArray ());
@@ -1559,6 +1580,9 @@ void csSprite3D::Draw (csRenderView& rview)
 
   if (!rview.callback)
     rview.g3d->FinishPolygonFX ();
+
+  CHK (delete [] obj_verts);
+  CHK (delete [] tween_verts);
 }
 #endif
 
