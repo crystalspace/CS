@@ -1126,8 +1126,8 @@ chronological order.
 	  portals.
 	- Eric Sunshine removed 8-bit characters from rendermeshlist.h and
 	  rendermeshlist.cpp.
-	- Eric Sunshine bug in bfdplugins.cpp where it assumed the `errmsg'
-	  variable would be null but was in fact unassigned.
+	- Eric Sunshine fixed bug in bfdplugins.cpp where it assumed the
+	  `errmsg' variable would be null, but was in fact unassigned.
 	- Jorrit added three torus objects from stenciltest to r3dtest.
 	- Eric Sunshine fixed errors in glshader_fixed.mak where the SRC and
 	  INC variables were not respecting SRCDIR.
