@@ -54,7 +54,7 @@ class SendPacket : public iNetworkPacket
 
   void SetData (char d []) { data = d; }
 
-  virtual bool Read (csDataStream &stream) { return false; }
+  virtual bool Read (csDataStream &st, iNetworkSocket2 *so) { return false; }
   virtual char* Write (size_t &size)
   {
     size = strlen (data);
@@ -84,7 +84,7 @@ class RecvPacket : public iNetworkPacket
 
   const char* GetData () { return data; }
 
-  virtual bool Read (csDataStream &stream)
+  virtual bool Read (csDataStream &stream, iNetworkSocket2 *sock)
   {
     while (stream.ReadInt8 (data [position])) position++;
     if (position >= strlen (testdata))
@@ -115,7 +115,7 @@ bool HandleEvent (iEvent &ev)
   return true;
 }
 
-int main (int argc, char *argv[]/*, char *env[]*/)
+int main (int argc, char *argv[])
 {
   objreg = csInitializer::CreateEnvironment (argc, argv);
   if (! objreg)
