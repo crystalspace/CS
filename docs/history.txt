@@ -1,9 +1,12 @@
 The history order is reversed so that new features are at the top.
 
 17-Feb-2003
-	- Christian Bayle made debian package build ok, but it remains some 
-	  problems with csdemo that is not installed by make install
-	  and segfault in walktest -video=software (building with gcc3.2.2)
+	- Christian Bayle made debian package build ok, but it remains some
+	  problems with csdemo that is not installed by make install and
+	  segfault in walktest -video=software (building with gcc3.2.2)
+	- Eric Sunshine fixed problem reported by <groton@gmx.net> where
+	  awstxtbx.cpp could invoke cursor-- even when cursor==0 when DEL was
+	  pressed.
 16-Feb-2003
 	- Christian Bayle did some other debian related changes.
 15-Feb-2003

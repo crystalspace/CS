@@ -469,7 +469,7 @@ bool awsTextBox::OnKeypress (int key, int Char, int)
       break;
 
     case CSKEY_DEL:
-      if (cursor == text->Length ()) cursor--;
+      if (cursor > 0 && cursor == text->Length ()) cursor--;
       if (cursor - start < 5) start = cursor - 5;
       if (start < 0) start = 0;
       if (text && (text->Length () > 1))
