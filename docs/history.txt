@@ -26,6 +26,7 @@ chronological order.
 	  time the mesh is rendered.
 	- res changed the generic step to have material SVs override shader 
 	  SVs.
+	- res fixed wxtest to build as a console app on Win32.
 21-Sep-2004
 	- Eric Sunshine fixed a bug in the "subsystem"-related change to
 	  msvcgen/project6x.tlib on 19-Sep-2004 which caused the linker's /out:

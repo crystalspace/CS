@@ -60,6 +60,23 @@
 
 CS_IMPLEMENT_APPLICATION
 
+#if defined(CS_PLATFORM_WIN32)
+
+#ifndef SW_SHOWNORMAL
+#define SW_SHOWNORMAL 1
+#endif
+
+/*
+  WX provides WinMain(), but not main(), which is required for console apps.
+ */
+int main (int argc, const char* const argv[])
+{
+  return retval = WinMain (GetModuleHandle (0), 0, GetCommandLineA (), 
+    SW_SHOWNORMAL);
+}
+
+#endif
+
 //-----------------------------------------------------------------------------
 
 
