@@ -310,10 +310,10 @@ struct csGraphics3DCaps
 };
 
 
-#ifndef CS_USE_NEW_RENDERER
-
 //===========================================================================
-// Not for new renderer!
+// Not for new renderer! @@@NR@@@
+// The stuff below is either to be ported to new renderer or else
+// it will be removed.
 //===========================================================================
 
 #define CS_FOG_FRONT  0
@@ -566,8 +566,6 @@ struct G3DPolygonMesh
   G3DFogInfo* vertex_fog;
 };
 
-#endif
-
 SCF_VERSION (iGraphics3D, 5, 2, 0);
 
 /**
@@ -735,7 +733,6 @@ struct iGraphics3D : public iBase
   /// Get a renderstate value.
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const = 0;
 
-#ifdef CS_USE_NEW_RENDERER
   /**
    * Create a renderbuffer.
    * \param size Size of the buffer in bytes.
@@ -783,7 +780,13 @@ struct iGraphics3D : public iBase
 
   /// Controls shadow drawing
   virtual void SetShadowState (int state) = 0;
-#else
+
+  //=========================================================================
+  // Below this line are all functions that are not yet implemented by
+  // the new renderer or are not going to be implemented ever. In the
+  // last case they will be removed as soon as we permanently switch
+  // to the new renderer. @@@NR@@@
+  //=========================================================================
   /// Debugging only: get a pointer to Z-buffer at some location
   virtual uint32 *GetZBuffAt (int x, int y) = 0;
 
@@ -905,7 +908,6 @@ struct iGraphics3D : public iBase
    */
   virtual bool IsLightmapOK (int lmw, int lmh, 
     int lightCellSize) = 0;
-#endif // CS_USE_NEW_RENDERER
 };
 
 /** @} */

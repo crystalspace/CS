@@ -26,9 +26,7 @@
 #include <GL/gl.h>
 #endif
 
-#ifdef CS_USE_NEW_RENDERER
 #include "video/canvas/openglcommon/glextmanager.h"
-#endif // CS_USE_NEW_RENDERER
 
 #define IMPLEMENT_CACHED_BOOL( name ) \
   bool enabled_##name; \
@@ -154,19 +152,15 @@ public:
     enabled_GL_LIGHTING = glIsEnabled (GL_LIGHTING);
     enabled_GL_ALPHA_TEST = glIsEnabled (GL_ALPHA_TEST);
     enabled_GL_TEXTURE_2D[0] = glIsEnabled (GL_TEXTURE_2D);
-#ifdef CS_USE_NEW_RENDERER
     enabled_GL_TEXTURE_1D[0] = glIsEnabled (GL_TEXTURE_1D);
     enabled_GL_TEXTURE_3D[0] = glIsEnabled (GL_TEXTURE_3D);
     enabled_GL_TEXTURE_CUBE_MAP[0] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
-#endif // CS_USE_NEW_RENDERER
     for (i = 1 ; i < MAX_LAYER ; i++)
     {
       enabled_GL_TEXTURE_2D[i] = enabled_GL_TEXTURE_2D[0];
-#ifdef CS_USE_NEW_RENDERER
       enabled_GL_TEXTURE_1D[i] = enabled_GL_TEXTURE_1D[0];
       enabled_GL_TEXTURE_3D[i] = enabled_GL_TEXTURE_3D[0];
       enabled_GL_TEXTURE_CUBE_MAP[i] = enabled_GL_TEXTURE_CUBE_MAP[0];
-#endif // CS_USE_NEW_RENDERER
     }
 
     memset( boundtexture, 0, 32*sizeof(GLuint) );
@@ -181,14 +175,10 @@ public:
   IMPLEMENT_CACHED_BOOL (GL_POLYGON_OFFSET_FILL)
   IMPLEMENT_CACHED_BOOL (GL_LIGHTING)
   IMPLEMENT_CACHED_BOOL (GL_ALPHA_TEST)
-#ifdef CS_USE_NEW_RENDERER
   IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_1D)
-#endif
   IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_2D)
-#ifdef CS_USE_NEW_RENDERER
   IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_3D)
   IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_CUBE_MAP)
-#endif
   IMPLEMENT_CACHED_PARAMETER_2 (glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref)
   IMPLEMENT_CACHED_PARAMETER_2 (glBlendFunc, BlendFunc, GLenum, blend_source, GLenum, blend_destination)
   IMPLEMENT_CACHED_PARAMETER_1 (glCullFace, CullFace, GLenum, cull_mode)

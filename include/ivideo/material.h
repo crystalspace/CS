@@ -30,11 +30,9 @@
 #include "csutil/strset.h"
 #include "csutil/strhash.h"
 
-#ifdef CS_USE_NEW_RENDERER
-  #include "ivideo/rndbuf.h"
-  #include "ivideo/rendermesh.h"
-  #include "ivideo/shader/shader.h"
-#endif
+#include "ivideo/rndbuf.h"
+#include "ivideo/rendermesh.h"
+#include "ivideo/shader/shader.h"
 
 /// Default material `diffuse' parameter
 #define CS_DEFMAT_DIFFUSE 0.7f
@@ -93,13 +91,8 @@ SCF_VERSION (iMaterial, 0, 0, 6);
  * plays same role related to iMaterialHandle as iImage plays
  * related to iTextureHandle.
  */
-#ifndef CS_USE_NEW_RENDERER
-struct iMaterial : public iBase
-#else
 struct iMaterial : public iShaderBranch
-#endif
 {
-#ifdef CS_USE_NEW_RENDERER
   /**
    * Associate a shader with a shader type
    */
@@ -109,7 +102,6 @@ struct iMaterial : public iShaderBranch
    * Get shader associated with a shader type
    */
   virtual iShaderWrapper* GetShader (csStringID type) = 0;
-#endif
 
 #ifndef CS_USE_NEW_RENDERER
   /**
@@ -177,12 +169,10 @@ SCF_VERSION (iMaterialHandle, 0, 0, 2);
  */
 struct iMaterialHandle : public iBase
 {
-#ifdef CS_USE_NEW_RENDERER
   /**
    * Get shader associated with a shader type
    */
   virtual iShaderWrapper* GetShader (csStringID type) = 0;
-#endif
 
   /**
    * Get a texture from the material.

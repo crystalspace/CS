@@ -76,7 +76,6 @@ struct iTextureHandle : public iBase
    */
   virtual void GetOriginalDimensions (int& mw, int& mh) = 0;
 
-#ifdef CS_USE_NEW_RENDERER
   // CHANGED TO ADD SUPPORT FOR CUBEMAPS AND 3D TEXTURES
   // done by Phil Aumayr (phil@rarebyte.com)
   enum { CS_TEX_IMG_1D = 0, CS_TEX_IMG_2D, CS_TEX_IMG_3D, CS_TEX_IMG_CUBEMAP };
@@ -87,6 +86,7 @@ struct iTextureHandle : public iBase
          CS_TEXTURE_CUBE_POS_Y, CS_TEXTURE_CUBE_NEG_Y,
          CS_TEXTURE_CUBE_POS_Z, CS_TEXTURE_CUBE_NEG_Z };
 
+#ifdef CS_USE_NEW_RENDERER
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
    * If the texture was registered just for 2D usage, mipmap levels above

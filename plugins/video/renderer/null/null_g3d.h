@@ -271,6 +271,26 @@ public:
   virtual void DrawPixmap (iTextureHandle*, int, int, int, int, int, int,
     int, int, uint8);
 
+  //========================================================================
+  // All stuff below is only to be compatible with the NR api.
+  //========================================================================
+  virtual csPtr<iRenderBuffer> CreateRenderBuffer (int, 
+    csRenderBufferType, csRenderBufferComponentType, 
+    int, bool) { return 0; }
+  virtual void SetBufferState (csVertexAttrib*,
+  	iRenderBuffer**, int count) { }
+  virtual void SetTextureState (int*, iTextureHandle**,
+  	int) { }
+  virtual void DrawMesh (csRenderMesh*) { }
+  virtual void SetWriteMask (bool, bool, bool, bool) { }
+  virtual void GetWriteMask (bool &, bool &, bool &,
+	bool &) const { }
+  virtual void SetZMode (csZBufMode) { }
+  virtual void EnableZOffset () { }
+  virtual void DisableZOffset () { }
+  virtual void SetShadowState (int) { }
+  //========================================================================
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DNull);

@@ -7,6 +7,24 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 7-Sep-2003
+	- Jorrit performed a lot of changes to unify the new and old
+	  renderer branches:
+  	    - iGraphics3D now has all functions from both new and old
+	      renderer. Old renderers now implement the new functionality
+	      (but empty) and new renderers now implement the old
+	      functionality.
+	    - iMaterial->GetShader()/SetShader() ported to new renderer.
+	      Similarly for iMaterialHandle.
+	    - Ported various enums and defines from new renderer to old
+	      renderer.
+	    - Enabled the new renderer stuff in the OpenGL statecache for the
+	      old renderer too.
+	    - iMaterial is now a shader branch in old renderer too.
+	    - The end result of these changes is that all new renderer
+	      specific plugins now compile with old renderer enabled. The
+	      desired end result of my changes is that the CS_USE_NEW_RENDERER
+	      flag will be removed and all plugins will automatically function
+	      for both old and new renderer. We're not there yet though...
         - acraig fixed a problem in sprcal3d where it was using the old
           renderer iLight::GetSquaredRadius() function that no longer exists.
 6-Sep-2003
@@ -14,7 +32,8 @@ chronological order.
 	- Anders Stenberg did the following changes to the new renderer:
 	    - Fixed various bugs regarding texture switch reduction
 	    - Made sure cubemaps honor the NOFILTER flag
-	    - Worked around a problem with textures being prepared multiple times
+	    - Worked around a problem with textures being prepared multiple
+	      times.
 	    - Added a new standard texture ("standardtex normalization map")
 	    - Added support for setting up GL lighting with gl_fixed_vp
 	    - Updated lighting shaders to support per pixel lighting (no 
@@ -23,8 +42,8 @@ chronological order.
 	    - Removed all calls connected to vertex lighting from iGraphics3D
 	    - Made sure shadermanager grabbed texture handle instead of wrapper 
 	      since textures added by the renderer doesn't have wrappers
-	    - Changed shadow shader mixmode from add to copy. No point in blending 
-	      since the output is masked anyway.
+	    - Changed shadow shader mixmode from add to copy. No point in
+	      blending since the output is masked anyway.
 5-Sep-2003
 	- Jorrit changed R3D_RENDERSTATEOPTION to G3D_RENDERSTATEOPTION for the
 	  new renderer.

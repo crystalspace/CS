@@ -27,10 +27,8 @@
 #include "iengine/material.h"
 #include "ivideo/effects/efdef.h"
 
-#ifdef CS_USE_NEW_RENDERER
-  #include "csengine/engine.h"
-  #include "csutil/symtable.h"
-#endif
+#include "csengine/engine.h"
+#include "csutil/symtable.h"
 
 struct iTextureWrapper;
 struct iTextureManager;
@@ -105,14 +103,12 @@ private:
   iEffectDefinition* effect;
 #endif
 
-#ifdef CS_USE_NEW_RENDERER
-  /// Shader assoiciated with material
+  /// Shader associated with material
   csHashMap* shaders;
-
   csSymbolTable symtab;
-
   csEngine* engine;
 
+#ifdef CS_USE_NEW_RENDERER
   csShaderVariable* GetVar (csStringID name, bool create = false);
 #endif
 
@@ -187,25 +183,28 @@ public:
 
   //--------------------- iMaterial implementation ---------------------
 
-#ifdef CS_USE_NEW_RENDERER
   /// Associate a shader with a shader type
   virtual void SetShader (csStringID type, iShaderWrapper* shader);
   /// Get shader associated with a shader type
   virtual iShaderWrapper* GetShader (csStringID type);
 
-  virtual void AddChild (iShaderBranch *c) {
+  virtual void AddChild (iShaderBranch *c)
+  {
     csRef<iShaderWrapper> w = SCF_QUERY_INTERFACE (c, iShaderWrapper);
     if (w) w->SelectMaterial (this);
     symtab.AddChild (c->GetSymbolTable ());
   }
   virtual void AddVariable (csShaderVariable *v)
-    { symtab.SetSymbol (v->GetName (), v); }
+  {
+    symtab.SetSymbol (v->GetName (), v);
+  }
   virtual csShaderVariable* GetVariable (csStringID name)
-    { return (csShaderVariable *) symtab.GetSymbol (name); }
+  {
+    return (csShaderVariable *) symtab.GetSymbol (name);
+  }
   virtual csSymbolTable* GetSymbolTable () { return & symtab; }
   virtual csSymbolTable* GetSymbolTable (int i) { return & symtab; }
   virtual void SelectSymbolTable (int i) {}
-#endif
 
 #ifndef CS_USE_NEW_RENDERER
   /// Set effect.

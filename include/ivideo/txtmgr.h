@@ -73,17 +73,15 @@ struct iLightMap;
  * is not set) this flag does not matter - 2D textures do not use mipmaps.
  */
 #define CS_TEXTURE_NOMIPMAPS		0x00000008
-#ifdef CS_USE_NEW_RENDERER
 /**
-* This texture will not be tiled, and color lookups outside the 0..1 range 
-* will be clamped to the edge of the texture.
-*/
+ * This texture will not be tiled, and color lookups outside the 0..1 range 
+ * will be clamped to the edge of the texture.
+ */
 #define CS_TEXTURE_CLAMP		0x00000010
 /**
-* This texture will not be filtered, even if texture filtering is available.
-*/
+ * This texture will not be filtered, even if texture filtering is available.
+ */
 #define CS_TEXTURE_NOFILTER		0x00000020
-#endif // CS_USE_NEW_RENDERER
 /** @} */
 
 SCF_VERSION (iRendererLightmap, 1, 0, 0);

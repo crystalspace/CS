@@ -279,6 +279,9 @@ public:
   //--------------------- iMaterialHandle implementation ----------------------
   SCF_DECLARE_IBASE;
 
+  /// Dummy for new renderer. @@@NR@@@
+  virtual iShaderWrapper* GetShader (csStringID) { return 0; }
+
   /**
    * Get a texture from the material.
    */
