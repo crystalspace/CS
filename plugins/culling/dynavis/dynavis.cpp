@@ -272,7 +272,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 
   // For coverage testing.
   csBox2 sbox;
-  float min_depth;
+  float min_depth = 0;
 
   csVisReason reason = VISIBLE;
   bool vis = true;
@@ -590,7 +590,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
   // For coverage test.
   csBox2 sbox;
-  float min_depth;
+  float min_depth = 0;
 
   if (!obj->visobj->IsVisible ())
   {
