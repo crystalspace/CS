@@ -70,11 +70,13 @@ CS_CSUTIL_EXPORT csPluginPaths* csGetPluginPaths (const char* argv0);
 CS_CSUTIL_EXPORT char* csExpandPath (const char* path);
 
 /**
- * Return the absolute path of the executable.
+ * Return the absolute path of the executable.  For MacOS/X, returns the
+ * absolute path of the executable within the Cocoa application wrapper.
  * \remark May return the empty string if some problem prevents determination
  *   of the application's path.
  * \remark This function is primarily intended for very low-level use before 
- *   or during the initialization of CS core components.
+ *   or during the initialization of CS core components. After initialization,
+ *   it is often more convenient to invoke iCommandLineParser::GetAppPath().
  * \param argv0 The first element of the argv[] array passed to main().  On
  *   many platforms, this is the only way to determine the actual location of
  *   the executable.
@@ -88,9 +90,8 @@ CS_CSUTIL_EXPORT csString csGetAppPath (const char* argv0);
  * \remark May return the empty string if some problem prevents determination
  *   of the application's directory.
  * \remark This function is primarily intended for very low-level use before 
- *   or during the initialization of CS core components. Past this point,
- *   applications and plugins should rather use 
- *   iCommandLineParser::GetAppDir().
+ *   or during the initialization of CS core components. After initialization,
+ *   it is often more convenient to invoke iCommandLineParser::GetAppDir().
  * \param argv0 The first element of the argv[] array passed to main().  On
  *   many platforms, this is the only way to determine the actual location of
  *   the executable.
@@ -107,6 +108,10 @@ CS_CSUTIL_EXPORT csString csGetAppDir (const char* argv0);
  * "Resources" directory within the Cocoa application wrapper.
  * \remark May return the empty string if some problem prevents determination
  *   of the resource path.
+ * \remark This function is primarily intended for very low-level use before 
+ *   or during the initialization of CS core components. After initialization,
+ *   it is often more convenient to invoke
+ *   iCommandLineParser::GetResourceDir().
  * \param argv0 The first element of the argv[] array passed to main().  On
  *   many platforms, this is the only way to determine the actual location of
  *   the resources.
