@@ -37,6 +37,7 @@ private:
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
+  csRef<iVFS> vfs;
 
   iMaterialWrapper * LoadMaterialTag(iSpriteCal3DFactoryState *newspr,
 				     iDocumentNode* node,

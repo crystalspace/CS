@@ -118,6 +118,7 @@ bool csSpriteCal3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   csSpriteCal3DFactoryLoader::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  vfs    = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   xmltokens.Register ("path",           XMLTOKEN_PATH);
   xmltokens.Register ("scale",          XMLTOKEN_SCALE);
@@ -222,7 +223,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	const char *file = child->GetAttributeValue("file");
 	if (file)
 	{
-	  if (!newspr->LoadCoreSkeleton(file))
+	  if (!newspr->LoadCoreSkeleton(vfs,file))
 	  {
 	    newspr->ReportLastError();
 	    return 0;
@@ -254,7 +255,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	float max_vel = child->GetAttributeValueAsFloat("max_vel");
 	if (file)
 	{
-	  int animID = newspr->LoadCoreAnimation(file,
+	  int animID = newspr->LoadCoreAnimation(vfs,file,
 	    name,
 	    type,
 	    base_vel,
@@ -294,7 +295,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    mat = LoadMaterialTag(newspr,child,ldr_context,def_matl);
 	  }
-	  int mesh_index = newspr->LoadCoreMesh(file,name,attach,mat);
+	  int mesh_index = newspr->LoadCoreMesh(vfs,file,name,attach,mat);
           if (mesh_index == -1)
 	  {
 	    newspr->ReportLastError();
@@ -315,7 +316,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
                 const char *morph_name = childchild->GetAttributeValue("name");
                 if (morph_file)
                 {
-                  int morph_index = newspr->LoadCoreMorphTarget(mesh_index,morph_file,morph_name);
+                  int morph_index = newspr->LoadCoreMorphTarget(vfs,mesh_index,morph_file,morph_name);
                   if (morph_index == -1)
                   {
                     newspr->ReportLastError();

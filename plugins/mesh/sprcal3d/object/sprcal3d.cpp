@@ -145,14 +145,27 @@ void csSpriteCal3DMeshObjectFactory::SetBasePath(const char *path)
   basePath = path;
 }
 
-bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton(const char *filename)
+bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton(iVFS *vfs,const char *filename)
 {
   csString path(basePath);
   path.Append(filename);
-  return calCoreModel.loadCoreSkeleton((const char *)path);
+  csRef<iDataBuffer> file = vfs->ReadFile (path);
+  if (file)
+  {
+      CalCoreSkeleton *skel = CalLoader::loadCoreSkeleton ((void *)file->GetData() );
+      if (skel)
+      {
+        calCoreModel.setCoreSkeleton (skel);
+        return true;
+      }
+      else
+        return false;
+  }
+  else
+    return false;
 }
 
-int  csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(const char *filename,
+int  csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(iVFS *vfs,const char *filename,
 						       const char *name,
 						       int type,
 						       float base_vel, 
@@ -161,72 +174,95 @@ int  csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(const char *filename,
 {
   csString path(basePath);
   path.Append(filename);
-  int id = calCoreModel.loadCoreAnimation((const char *)path);
-  if (id != -1)
+  csRef<iDataBuffer> file = vfs->ReadFile (path);
+  if (file)
   {
-    csCal3DAnimation *an = new csCal3DAnimation;
-    an->name          = name;
-    an->type          = type;
-    an->base_velocity = base_vel;
-    an->min_velocity  = min_vel;
-    an->max_velocity  = max_vel;
+    CalCoreAnimation *anim = CalLoader::loadCoreAnimation((void*)file->GetData() );
+    if (anim)
+    {
+      int id = calCoreModel.addCoreAnimation(anim);
+      if (id != -1)
+      {
+        csCal3DAnimation *an = new csCal3DAnimation;
+        an->name          = name;
+        an->type          = type;
+        an->base_velocity = base_vel;
+        an->min_velocity  = min_vel;
+        an->max_velocity  = max_vel;
+        an->index = anims.Push(an);
 
-    an->index = anims.Push(an);
-
-    std::string str(name);
-    calCoreModel.addAnimHelper(str,id);
+        std::string str(name);
+        calCoreModel.addAnimHelper(str,id);
+      }
+      return id;
+    }
+    return -1;
   }
-  return id;
+  return -1;
 }
 
-int csSpriteCal3DMeshObjectFactory::LoadCoreMesh(const char *filename,
+int csSpriteCal3DMeshObjectFactory::LoadCoreMesh(iVFS *vfs,const char *filename,
 						  const char *name,
 						  bool attach,
 						  iMaterialWrapper *defmat)
 {
   csString path(basePath);
   path.Append(filename);
-
-  csCal3DMesh *mesh = new csCal3DMesh;
-  mesh->index = calCoreModel.loadCoreMesh((const char *)path);
-  if (mesh->index == -1)
+  csRef<iDataBuffer> file = vfs->ReadFile (path);
+  if (file)
   {
-    delete mesh;
-    return false;
+    csCal3DMesh *mesh = new csCal3DMesh;
+    CalCoreMesh *coremesh = CalLoader::loadCoreMesh((void*)file->GetData() );
+    if (coremesh)
+    {
+      mesh->index = calCoreModel.addCoreMesh(coremesh);
+      if (mesh->index == -1)
+      {
+        delete mesh;
+        return false;
+      }
+      mesh->name              = name;
+      mesh->attach_by_default = attach;
+      mesh->default_material  = defmat;
+
+      submeshes.Push(mesh);
+
+      return mesh->index;
+    }
+    else
+      return -1;
   }
-  mesh->name              = name;
-  mesh->attach_by_default = attach;
-  mesh->default_material  = defmat;
-
-  submeshes.Push(mesh);
-
-  return mesh->index;
+  else
+    return -1;
 }
 
-int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget(int mesh_index,
+int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget(iVFS *vfs,int mesh_index,
 							const char *filename,
 							const char *name)
 {
-    if(mesh_index < 0|| submeshes.Length() <= mesh_index)
-    {
-      return -1;
-    }
+  if(mesh_index < 0|| submeshes.Length() <= mesh_index)
+  {
+    return -1;
+  }
 
-    csString path(basePath);
-    path.Append(filename);
-
-//    CalLoader loader;
-    CalCoreMesh *p_core_mesh = CalLoader::loadCoreMesh((const char *)path);
-    if(p_core_mesh == 0)
+  csString path(basePath);
+  path.Append(filename);
+  csRef<iDataBuffer> file = vfs->ReadFile (path);
+  if (file)
+  {
+    CalCoreMesh *core_mesh = CalLoader::loadCoreMesh((void *)file->GetData() );
+    if(core_mesh == 0)
       return -1;
     
-    int morph_index = calCoreModel.getCoreMesh(mesh_index)->addAsMorphTarget(p_core_mesh);
+    int morph_index = calCoreModel.getCoreMesh(mesh_index)->addAsMorphTarget(core_mesh);
     if(morph_index == -1)
     {
       return -1;
     }
     submeshes[mesh_index]->morph_target_name.Push(name);
     return morph_index;
+  }
+  return -1;
 }
 
 int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
@@ -979,6 +1015,7 @@ void csSpriteCal3DMeshObject::ClearAllAnims()
   {
     csCal3DAnimation *pop = active_anims.Pop();
     ClearAnimCycle(pop->index,0);  // do not delete pop because ptr is shared with factory
+    active_weights.Pop();
   }
 }
 
@@ -994,10 +1031,16 @@ bool csSpriteCal3DMeshObject::AddAnimCycle(const char *name, float weight, float
   if (idx == -1)
     return false;
 
+  AddAnimCycle(idx,weight,delay);
+  return true;
+}
+
+bool csSpriteCal3DMeshObject::AddAnimCycle(int idx, float weight, float delay)
+{
   calModel.getMixer()->blendCycle(idx,weight,delay);
 
   active_anims.Push(factory->anims[idx]);
-
+  active_weights.Push(weight);
   return true;
 }
 
@@ -1015,6 +1058,33 @@ bool csSpriteCal3DMeshObject::ClearAnimCycle(const char *name, float delay)
   ClearAnimCycle(idx,delay);
 
   return true;
+}
+
+int csSpriteCal3DMeshObject::GetActiveAnimCount()
+{
+  return active_anims.Length();
+}
+
+int csSpriteCal3DMeshObject::GetActiveAnims(char *buffer,int max_length)
+{
+  int count=0,i;
+
+  for (i=0; i<active_anims.Length() && count<max_length-1; i++)
+  {
+    buffer[count++] = active_anims[i]->index;
+    buffer[count++] = (char)active_weights[i];  // will not work for % weights, but only for weights >= 1.
+  }
+  return i==active_anims.Length();  // true if successful
+}
+
+void csSpriteCal3DMeshObject::SetActiveAnims(const char *buffer,int anim_count)
+{
+  ClearAllAnims();
+
+  for (int i=0; i<anim_count; i++)
+  {
+    AddAnimCycle(buffer[i*2],buffer[i*2+1],0);
+  }
 }
 
 bool csSpriteCal3DMeshObject::SetAnimAction(const char *name, float delayIn, float delayOut)

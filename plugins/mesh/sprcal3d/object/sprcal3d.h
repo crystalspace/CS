@@ -128,10 +128,10 @@ public:
   void SetBasePath(const char *path);
   void SetRenderScale(float scale) { renderScale=scale; }
   float GetRenderScale() { return renderScale; }
-  bool LoadCoreSkeleton(const char *filename);
-  int  LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel);
-  int LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat);
-  int LoadCoreMorphTarget(int mesh_index,const char *filename,const char *name);
+  bool LoadCoreSkeleton(iVFS *vfs,const char *filename);
+  int  LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel);
+  int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,bool attach,iMaterialWrapper *defmat);
+  int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,const char *name);
   int AddMorphAnimation(const char *name);
   bool AddMorphTarget(int morphanimation_index,const char *mesh_name, const char *morphtarget_name);
   bool AddCoreMaterial(iMaterialWrapper *mat);
@@ -266,14 +266,14 @@ public:
     virtual float GetRenderScale()
     { return scfParent->GetRenderScale(); }
 
-    virtual bool LoadCoreSkeleton(const char *filename)
-    { return scfParent->LoadCoreSkeleton(filename); }
+    virtual bool LoadCoreSkeleton(iVFS *vfs,const char *filename)
+    { return scfParent->LoadCoreSkeleton(vfs,filename); }
 
-    virtual int LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel)
-    { return scfParent->LoadCoreAnimation(filename,name,type,base_vel,min_vel,max_vel); }
+    virtual int LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel)
+    { return scfParent->LoadCoreAnimation(vfs,filename,name,type,base_vel,min_vel,max_vel); }
 
-    virtual int LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat)
-    { return scfParent->LoadCoreMesh(filename,name,attach,defmat); }
+    virtual int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,bool attach,iMaterialWrapper *defmat)
+    { return scfParent->LoadCoreMesh(vfs,filename,name,attach,defmat); }
 
     virtual int AddMorphAnimation(const char *name)
     { return scfParent->AddMorphAnimation(name); }
@@ -281,8 +281,8 @@ public:
     virtual bool AddMorphTarget(int morphanimation_index,const char *mesh_name, const char *morphtarget_name)
     { return scfParent->AddMorphTarget(morphanimation_index,mesh_name, morphtarget_name); }
  
-    virtual int LoadCoreMorphTarget(int mesh_index,const char *filename,const char *name)
-    { return scfParent->LoadCoreMorphTarget(mesh_index,filename,name); }
+    virtual int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,const char *name)
+    { return scfParent->LoadCoreMorphTarget(vfs,mesh_index,filename,name); }
 	    
     virtual bool AddCoreMaterial(iMaterialWrapper *mat)
     { return scfParent->AddCoreMaterial(mat); }
@@ -361,6 +361,7 @@ private:
   CalModel calModel;
   float last_update_time;
   csArray<csCal3DAnimation*> active_anims;
+  csArray<float>             active_weights;
 
 #ifndef CS_USE_NEW_RENDERER
   iVertexBufferManager* vbufmgr;
@@ -528,8 +529,12 @@ public:
   void ClearAllAnims();
   bool SetAnimCycle(const char *name, float weight);
   bool AddAnimCycle(const char *name, float weight, float delay);
+  bool AddAnimCycle(int idx, float weight, float delay);
   void ClearAnimCycle(int idx, float delay);
   bool ClearAnimCycle(const char *name, float delay);
+  int  GetActiveAnimCount();
+  int  GetActiveAnims(char *buffer,int max_length);
+  void SetActiveAnims(const char *buffer,int anim_count);
   bool SetAnimAction(const char *name, float delayIn, float delayOut);
   bool SetVelocity(float vel);
   void SetLOD(float lod);
@@ -572,11 +577,26 @@ public:
     {
 	return scfParent->AddAnimCycle(name,weight,delay);
     }
+    bool AddAnimCycle(int idx, float weight, float delay)
+    {
+      return scfParent->AddAnimCycle(idx,weight,delay);
+    }
     virtual bool ClearAnimCycle(const char *name, float delay)
     {
 	return scfParent->ClearAnimCycle(name,delay);
     }
-
+    virtual int  GetActiveAnimCount()
+    {
+      return scfParent->GetActiveAnimCount();
+    }
+    virtual int  GetActiveAnims(char *buffer,int max_length)
+    {
+      return scfParent->GetActiveAnims(buffer,max_length);
+    }
+    virtual void SetActiveAnims(const char *buffer,int anim_count)
+    {
+      scfParent->SetActiveAnims(buffer,anim_count);
+    }
     virtual bool SetAnimAction(const char *name, float delayIn, float delayOut)
     {
 	return scfParent->SetAnimAction(name,delayIn,delayOut);

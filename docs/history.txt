@@ -12,6 +12,8 @@ chronological order.
 	  potentially bogus directory named "-p" which older versions of
 	  "mkdir" create.
 	- jamest changed swig wrapper to better support csBox* objects
+	- Keith updated sprcal3d and sprcal3dldr to use VFS and vfs paths.
+	  CVS of cal3d as of *today* is required to use this.
 6-Dec-2003
 	- Eric Sunshine augmented checks for cslibs-config, nasm, and
 	  sdl-config to use AC_CHECK_TOOLS() rather than AC_CHECK_PROGS() in

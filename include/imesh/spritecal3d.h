@@ -33,7 +33,7 @@ struct iMeshWrapper;
 struct iMeshObjectFactory;
 struct iRenderView;
 struct iRenderView;
-
+struct iVFS;
 
 
 SCF_VERSION (iSpriteCal3DFactoryState, 0, 0, 3);
@@ -67,7 +67,7 @@ struct iSpriteCal3DFactoryState : public iBase
   /**
    * This loads the supplied file as the skeleton data for the sprite.
    */
-  virtual bool LoadCoreSkeleton(const char *filename) = 0;
+  virtual bool LoadCoreSkeleton(iVFS *vfs,const char *filename) = 0;
 
   /**
    * This function sets the scale by which the mesh will be multiplied when
@@ -83,7 +83,7 @@ struct iSpriteCal3DFactoryState : public iBase
   /**
    * This loads the supplied file as one animation action for the sprite.
    */
-  virtual int  LoadCoreAnimation(const char *filename,
+  virtual int  LoadCoreAnimation(iVFS *vfs,const char *filename,
 				 const char *name,
 				 int type,
 				 float base_velocity,
@@ -100,7 +100,7 @@ struct iSpriteCal3DFactoryState : public iBase
    * later.
    * defmat is the material which should be used when the object is created, if any.
    */
-  virtual int LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat) = 0;
+  virtual int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,bool attach,iMaterialWrapper *defmat) = 0;
 
   /**
    * This adds a mesh as a morph target of another mesh.
@@ -111,7 +111,7 @@ struct iSpriteCal3DFactoryState : public iBase
    *
    * @return The index of the morph target.
    */
-  virtual int LoadCoreMorphTarget(int mesh_index,const char *filename,const char *name) = 0;
+  virtual int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,const char *name) = 0;
   
   /**
    * This adds a new morph animation.
@@ -237,10 +237,36 @@ struct iSpriteCal3DState : public iBase
   virtual bool AddAnimCycle(const char *name, float weight, float delay) = 0;
 
   /**
+   * Uses the specified index directly to add the anim cycle.
+   */
+  virtual bool AddAnimCycle(int idx, float weight, float delay) = 0;
+
+  /**
    * This removes the specified anim from the current blend set over the period
    * of time specifed by "delay" parm in seconds.
    */
   virtual bool ClearAnimCycle(const char *name, float delay) = 0;
+
+  /**
+   * Returns the count of currently playing animation cycles.  This should
+   * be used to allocate the buffer required by GetActiveAnims below.  2 bytes
+   * per active anim are required.
+   */
+  virtual int  GetActiveAnimCount() = 0;
+
+  /**
+   * Fills the supplied buffer with the information to reconstruct the exact
+   * animation mix currently playing in the model.  It does NOT include
+   * any non-repeating actions.  Those must be handled separately, due to
+   * the timing issues.
+   */
+  virtual int  GetActiveAnims(char *buffer,int max_length) = 0;
+
+  /**
+   * Uses the supplied buffer (created by GetActiveAnims) to recreate an
+   * exact mix of animation cycles and weights.
+   */
+  virtual void SetActiveAnims(const char *buffer,int anim_count) = 0;
 
   /**
    * This adds a non-looping animation to the blend set for the cal3d Mixer.
