@@ -8,6 +8,10 @@ The history order has been reversed so that new features are at the top.
 	      seems strange that the opengl driver has this setting.
 	    - Sets glviewport in the back buffer 3d driver within the
 	      begin/finish draw calls.
+	- Eric Sunshine fixed csQuadTree3D so that it compiles on NextStep.
+	  The embedded node_pos_info class was triggering a compiler bug (for
+	  some reason).  Also added some missing 'const' qualifiers and
+	  cleaned up the files.
 3-Jul-2000
 	- Seth Galbraith cut skybox in half to save 200 KB for Squawk.
 	- Andrew Zabolotny did the following changes:

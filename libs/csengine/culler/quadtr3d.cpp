@@ -1,29 +1,28 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
     Copyright (C) 2000 by Wouter Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
+#include "csengine/quadtr3d.h"
+#include "csengine/world.h" /* for CsPrintf() -- bleh */
 #include "csgeom/frustum.h"
 #include "csgeom/poly2d.h"
-#include "csengine/quadtr3d.h"
-#include "csengine/world.h"
 #include "isystem.h"
-
 
 /// computes 2**x
 static int Pow2(int x)
@@ -35,19 +34,61 @@ static int Pow2(int x)
 }
 
 
-csQuadTree3D :: node_pos_info :: node_pos_info(void)
+/// This contains the info that designates thr position of a particular node.
+class q3d_node_pos_info
+{
+public:
+  /// Index into states array; the offset -1 denotes the root node.
+  int offset;
+  /// Index into byte. [0..3]
+  int bytepos;
+  /// Depth into tree 1==root
+  int depth;
+  /// Width and height of square plane of nodes.
+  int plane_size;
+  /// Index in array where the node's at depth are located
+  int plane_start;
+  /**
+   * Coordinates of the node in it's plane.
+   * Integer in the plane of leaves at node_depth.
+   * <p>
+   * Note that these values are redundant.
+   *  <li>offset = plane_start + (node_y * plane_size + node_x) / 4
+   *  <li>bytepos = (node_y * plane_size + node_x) % 4
+   *  <li>plane_size = 2**(depth-1)
+   *  <li>plane_start = (4**(depth-1) -1 ) / 3
+   * But it is easier to pass these values along.
+   */
+  int node_x, node_y;
+
+  /// Bounding box of the node.  Note: not correctly computed at this time.
+  csBox3 bounds;
+  /// Frustum for the node
+  csFrustum *frust;
+
+  /// Construct a pos info, uninitialized.
+  q3d_node_pos_info();
+  /// Copy constructor
+  q3d_node_pos_info(const q3d_node_pos_info&);
+  /// Delete the node_pos, delete frustum as well
+  ~q3d_node_pos_info();
+  /// Clear the q3d_node_pos_info, to point to root node.
+  void set_root(csQuadTree3D*);
+};
+
+q3d_node_pos_info::q3d_node_pos_info()
 {
   // uninited. Call set_root!
   frust = 0;
 }
 
 
-csQuadTree3D :: node_pos_info :: ~node_pos_info(void)
+q3d_node_pos_info::~q3d_node_pos_info()
 {
   delete frust;
 }
 
-void csQuadTree3D :: node_pos_info :: set_root(csQuadTree3D *tree)
+void q3d_node_pos_info::set_root(csQuadTree3D *tree)
 {
   // init to point to root state.
   offset = -1;
@@ -61,7 +102,7 @@ void csQuadTree3D :: node_pos_info :: set_root(csQuadTree3D *tree)
   frust = new csFrustum(tree->GetCenter(), tree->GetCorners(), 4);
 }
 
-csQuadTree3D :: node_pos_info :: node_pos_info(const node_pos_info &copy)
+q3d_node_pos_info::q3d_node_pos_info(const q3d_node_pos_info &copy)
 {
   offset = copy.offset;
   bytepos = copy.bytepos;
@@ -75,13 +116,13 @@ csQuadTree3D :: node_pos_info :: node_pos_info(const node_pos_info &copy)
 }
 
 
-csQuadTree3D :: csQuadTree3D (const csVector3& start_center, 
+csQuadTree3D::csQuadTree3D (const csVector3& start_center,
     const csVector3 startcorners[4],
     const csBox3& bounding_box, int the_depth)
 {
   int k, i;
   bbox = bounding_box;
-  max_depth= the_depth;
+  max_depth = the_depth;
   root_state = CS_QUAD3D_EMPTY;
   center = start_center;
 
@@ -122,13 +163,13 @@ csQuadTree3D :: csQuadTree3D (const csVector3& start_center,
   {
     states = new unsigned char[state_size];
     /// and every node is EMPTY at the start
-    memset(states, CS_QUAD3D_ALL_EMPTY, state_size);  
+    memset(states, CS_QUAD3D_ALL_EMPTY, state_size);
   }
   else states = NULL;
 }
 
 
-csQuadTree3D :: ~csQuadTree3D ()
+csQuadTree3D::~csQuadTree3D ()
 {
   delete[] states;
   int i;
@@ -137,16 +178,16 @@ csQuadTree3D :: ~csQuadTree3D ()
 }
 
 
-void csQuadTree3D :: CallChildren(quad_traverse_func func, csQuadTree3D* pObj, 
-  node_pos_info *parent_pos, void *data)
+void csQuadTree3D::CallChildren(quad_traverse_func func, csQuadTree3D* pObj,
+  q3d_node_pos_info *parent_pos, void *data)
 {
   int retval[4];
   pObj->CallChildren(func, pObj, parent_pos, data, retval);
 }
 
 
-void csQuadTree3D :: CallChildren(quad_traverse_func func, csQuadTree3D* pObj,  
-  node_pos_info *parent_pos, void *data, int retval[4])
+void csQuadTree3D::CallChildren(quad_traverse_func func, csQuadTree3D* pObj,
+  q3d_node_pos_info *parent_pos, void *data, int retval[4])
 {
   if(parent_pos->depth >= pObj->max_depth)
   {
@@ -160,12 +201,12 @@ void csQuadTree3D :: CallChildren(quad_traverse_func func, csQuadTree3D* pObj,
   child_v = sizes[1][parent_pos->depth];
 
   // make a copy of parent position, and adjust values.
-  // during recursion only depth times will there be a node_pos_info on stack.
-  // say 20 deep, times 28 bytes -> only 560 bytes.
-  node_pos_info child_pos(*parent_pos);
+  // during recursion only depth times will there be a q3d_node_pos_info on
+  // stack.  say 20 deep, times 28 bytes -> only 560 bytes.
+  q3d_node_pos_info child_pos(*parent_pos);
   child_pos.depth = parent_pos->depth+1;
   child_pos.plane_size = parent_pos->plane_size << 1;
-  child_pos.plane_start = parent_pos->plane_start + 
+  child_pos.plane_start = parent_pos->plane_start +
     (parent_pos->plane_size * parent_pos->plane_size) / 4;
   int child_x = parent_pos->node_x << 1;
   int child_y = parent_pos->node_y << 1;
@@ -206,13 +247,13 @@ void csQuadTree3D :: CallChildren(quad_traverse_func func, csQuadTree3D* pObj,
       // Then the rest is filled in.
       switch(childnr)
       {
-        case 0 /*topleft*/ : 
+        case 0 /*topleft*/ :
           child_verts[0] = parent_verts[0]; break;
-        case 1 /*topright*/ : 
+        case 1 /*topright*/ :
 	  child_verts[0] = parent_verts[0] + child_u; break;
-        case 2 /*bottomleft*/ : 
+        case 2 /*bottomleft*/ :
 	  child_verts[0] = parent_verts[0] + child_v; break;
-        case 3 /*bottomright*/ : 
+        case 3 /*bottomright*/ :
 	  child_verts[0] = parent_verts[0] + child_u + child_v; break;
         default: CsPrintf(MSG_FATAL_ERROR, "QuadTree3D: Unknown child\n");
       }
@@ -238,7 +279,7 @@ void csQuadTree3D :: CallChildren(quad_traverse_func func, csQuadTree3D* pObj,
 static const int node_masks[4] = {0xC0, 0x30, 0x0C, 0x03};
 static const int node_shifts[4] = {6, 4, 2, 0};
 
-int csQuadTree3D :: GetNodeState(int offset, int bytepos)
+int csQuadTree3D::GetNodeState(int offset, int bytepos) const
 {
   if(offset > state_size)
   {
@@ -254,7 +295,13 @@ int csQuadTree3D :: GetNodeState(int offset, int bytepos)
 }
 
 
-void csQuadTree3D :: SetNodeState(int offset, int bytepos, int newstate)
+int csQuadTree3D::GetNodeState(q3d_node_pos_info *pos) const
+{
+  return GetNodeState(pos->offset, pos->bytepos);
+}
+
+
+void csQuadTree3D::SetNodeState(int offset, int bytepos, int newstate)
 {
   if(offset > state_size)
   {
@@ -273,25 +320,30 @@ void csQuadTree3D :: SetNodeState(int offset, int bytepos, int newstate)
 }
 
 
-void csQuadTree3D :: MakeEmpty()
+void csQuadTree3D::SetNodeState(q3d_node_pos_info *pos, int newstate)
 {
-  root_state = CS_QUAD3D_EMPTY;
-  if(states)
-    memset(states, CS_QUAD3D_ALL_EMPTY, state_size);  
+  SetNodeState(pos->offset, pos->bytepos, newstate);
 }
 
 
-int csQuadTree3D :: mark_node_func (csQuadTree3D* pObj,
-  int node_state, node_pos_info *node_pos, void* data)
+void csQuadTree3D::MakeEmpty()
 {
-  (void)node_state;
+  root_state = CS_QUAD3D_EMPTY;
+  if(states)
+    memset(states, CS_QUAD3D_ALL_EMPTY, state_size);
+}
+
+
+int csQuadTree3D::mark_node_func (csQuadTree3D* pObj,
+  int /*node_state*/, q3d_node_pos_info *node_pos, void* data)
+{
   pObj->SetNodeState(node_pos, (int)data);
   return (int)data;
 }
 
 
-int csQuadTree3D :: insert_polygon_func (csQuadTree3D* pObj, 
-  int node_state, node_pos_info *node_pos, void* data)
+int csQuadTree3D::insert_polygon_func (csQuadTree3D* pObj,
+  int node_state, q3d_node_pos_info *node_pos, void* data)
 {
   struct poly_info& info = *(struct poly_info*)data;
   if(node_state == CS_QUAD3D_UNKNOWN)
@@ -313,7 +365,7 @@ int csQuadTree3D :: insert_polygon_func (csQuadTree3D* pObj,
   }
 
   /// perhaps none of the node is covered?
-  if (covered == CS_FRUST_OUTSIDE) 
+  if (covered == CS_FRUST_OUTSIDE)
     return CS_QUAD3D_NOCHANGE;
 
   ///----------------------------------------------------
@@ -321,7 +373,7 @@ int csQuadTree3D :: insert_polygon_func (csQuadTree3D* pObj,
   ///----------------------------------------------------
 
   if(0)
-  printf("quadtree3d at %d Checking node %d+%d %d,%d (%d)\n", node_pos->depth, 
+  printf("quadtree3d at %d Checking node %d+%d %d,%d (%d)\n", node_pos->depth,
     node_pos->offset, node_pos->bytepos, node_pos->node_x, node_pos->node_y,
     node_state);
 
@@ -334,11 +386,11 @@ int csQuadTree3D :: insert_polygon_func (csQuadTree3D* pObj,
       pObj->SetNodeState(node_pos, CS_QUAD3D_FULL);
     /// mark children (if any) as unknown, since they should not be reached.
     if(node_pos->depth < pObj->max_depth)
-      pObj->CallChildren(&csQuadTree3D::mark_node_func, pObj, 
+      pObj->CallChildren(&csQuadTree3D::mark_node_func, pObj,
         node_pos, (void*)CS_QUAD3D_UNKNOWN);
     return CS_QUAD3D_CERTAINCHANGE;
   }
-  
+
   /// So we are sure that a part of the node is covered.
     int old_node_state = node_state;
     // so it overlaps a bit.
@@ -346,7 +398,7 @@ int csQuadTree3D :: insert_polygon_func (csQuadTree3D* pObj,
     {
       // mark children as empty now, since they should be empty, and
       // can be reached now...
-      pObj->CallChildren(&csQuadTree3D::mark_node_func, pObj, 
+      pObj->CallChildren(&csQuadTree3D::mark_node_func, pObj,
         node_pos, (void*)CS_QUAD3D_EMPTY);
     }
     // this node is partially covered.
@@ -357,14 +409,14 @@ int csQuadTree3D :: insert_polygon_func (csQuadTree3D* pObj,
     if(node_pos->depth < pObj->max_depth)
     {
       int retval[4];
-      pObj->CallChildren(&csQuadTree3D::insert_polygon_func, pObj, 
+      pObj->CallChildren(&csQuadTree3D::insert_polygon_func, pObj,
         node_pos, data, retval);
       /// @@@ the polygon could have caused a child to become FULL and thus
       /// all children could be FULL now, in which case we should be FULL too.
       return pObj->GetPolygonResult(retval);
     }
-    /// no children, return value for change, either 
-    /// EMPTY->PARTIAL (certain change) or 
+    /// no children, return value for change, either
+    /// EMPTY->PARTIAL (certain change) or
     /// PARTIAL->PARTIAL (possible change)
     if(old_node_state == CS_QUAD3D_EMPTY)
       return CS_QUAD3D_CERTAINCHANGE;
@@ -372,7 +424,7 @@ int csQuadTree3D :: insert_polygon_func (csQuadTree3D* pObj,
 }
 
 
-int csQuadTree3D :: GetPolygonResult(int retval[4])
+int csQuadTree3D::GetPolygonResult(int retval[4]) const
 {
   // returns the max change.
   // since NOCHANGE(0) < POSSIBLECHANGE(1) < CERTAINCHANGE(2)
@@ -384,7 +436,7 @@ int csQuadTree3D :: GetPolygonResult(int retval[4])
 }
 
 
-int csQuadTree3D :: InsertPolygon (csVector3* verts, int num_verts,
+int csQuadTree3D::InsertPolygon (csVector3* verts, int num_verts,
   const csBox3& pol_bbox)
 {
   struct poly_info info;
@@ -392,13 +444,13 @@ int csQuadTree3D :: InsertPolygon (csVector3* verts, int num_verts,
   info.num_verts = num_verts;
   info.pol_bbox = &pol_bbox;
   info.test_only = false;
-  node_pos_info start_pos;
+  q3d_node_pos_info start_pos;
   start_pos.set_root(this);
   return insert_polygon_func(this, root_state, &start_pos, (void*)&info);
 }
 
 
-int csQuadTree3D :: TestPolygon (csVector3* verts, int num_verts,
+int csQuadTree3D::TestPolygon (csVector3* verts, int num_verts,
   const csBox3& pol_bbox)
 {
   struct poly_info info;
@@ -406,13 +458,13 @@ int csQuadTree3D :: TestPolygon (csVector3* verts, int num_verts,
   info.num_verts = num_verts;
   info.pol_bbox = &pol_bbox;
   info.test_only = true;
-  node_pos_info start_pos;
+  q3d_node_pos_info start_pos;
   start_pos.set_root(this);
   return insert_polygon_func(this, root_state, &start_pos, (void*)&info);
 }
 
 
-int csQuadTree3D :: GetTestPointResult(int retval[4])
+int csQuadTree3D::GetTestPointResult(int retval[4]) const
 {
   /// returns UNKNOWN if all retval are UNKNOWN.
   /// returns PARTIAL if at least one is PARTIAL, or
@@ -435,8 +487,8 @@ int csQuadTree3D :: GetTestPointResult(int retval[4])
 }
 
 
-int csQuadTree3D :: test_point_func (csQuadTree3D* pObj, 
-  int node_state, node_pos_info *node_pos, void* data)
+int csQuadTree3D::test_point_func (csQuadTree3D* pObj,
+  int node_state, q3d_node_pos_info *node_pos, void* data)
 {
   if(node_state == CS_QUAD3D_UNKNOWN)
   {
@@ -454,17 +506,17 @@ int csQuadTree3D :: test_point_func (csQuadTree3D* pObj,
 }
 
 
-int csQuadTree3D :: TestPoint (const csVector3& point)
+int csQuadTree3D::TestPoint (const csVector3& point)
 {
-  node_pos_info start_pos;
+  q3d_node_pos_info start_pos;
   start_pos.set_root(this);
   return test_point_func(this, root_state, &start_pos, (void*)&point);
 }
 
 
-void csQuadTree3D :: Print(void)
+void csQuadTree3D::Print()
 {
-  printf("csQuadTree3D depth %d, statesize %d, root_state %d\n", 
+  printf("csQuadTree3D depth %d, statesize %d, root_state %d\n",
     max_depth, state_size, root_state);
   if(!states)
     return;
@@ -499,8 +551,8 @@ void csQuadTree3D :: Print(void)
 }
 
 
-int csQuadTree3D :: propagate_func (csQuadTree3D* pObj, 
-  int node_state, node_pos_info *node_pos, void* data)
+int csQuadTree3D::propagate_func (csQuadTree3D* pObj,
+  int node_state, q3d_node_pos_info *node_pos, void* data)
 {
   int newstate = (int)data;
   if(newstate != CS_QUAD3D_UNKNOWN)
@@ -514,16 +566,16 @@ int csQuadTree3D :: propagate_func (csQuadTree3D* pObj,
 }
 
 
-void csQuadTree3D :: Propagate(void)
+void csQuadTree3D::Propagate()
 {
-  node_pos_info start_pos;
+  q3d_node_pos_info start_pos;
   start_pos.set_root(this);
   propagate_func(this, root_state, &start_pos, (void*)CS_QUAD3D_UNKNOWN);
 }
 
 
-int csQuadTree3D :: sift_func (csQuadTree3D* pObj, 
-  int node_state, node_pos_info *node_pos, void* data)
+int csQuadTree3D::sift_func (csQuadTree3D* pObj,
+  int node_state, q3d_node_pos_info *node_pos, void* data)
 {
   if(node_pos->depth >= pObj->max_depth) // this is a leaf
     return node_state;
@@ -537,15 +589,15 @@ int csQuadTree3D :: sift_func (csQuadTree3D* pObj,
 }
 
 
-void csQuadTree3D :: Sift(void)
+void csQuadTree3D::Sift()
 {
-  node_pos_info start_pos;
+  q3d_node_pos_info start_pos;
   start_pos.set_root(this);
   sift_func(this, root_state, &start_pos, 0);
 }
 
 
-static bool CheckRow(int plane_start, int start_nr, int w, 
+static bool CheckRow(int plane_start, int start_nr, int w,
   unsigned char *states)
 // checks a sequence of nodes if all are FULL
 // plane start is start of plane,
@@ -590,7 +642,7 @@ static bool CheckRow(int plane_start, int start_nr, int w,
   return true;
 }
 
-bool csQuadTree3D :: TestRectangle(int depth, int x, int y, int w, int h)
+bool csQuadTree3D::TestRectangle(int depth, int x, int y, int w, int h)
 {
   if(depth==1) // if this is root node
     return (root_state == CS_QUAD3D_FULL);
@@ -604,5 +656,3 @@ bool csQuadTree3D :: TestRectangle(int depth, int x, int y, int w, int h)
       return false;
   return true;
 }
-
-
