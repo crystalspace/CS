@@ -15,10 +15,17 @@ Short-term cleanups that need to be done:
 
 28-Jul-1999
 	- Fixed fog in OpenGL. One-layered fog works now.
-	- Clipping portals are no longer automatic. There is now a CLIP() keyword
-	  which you can use to indicate a portal that clips geometry in the
-	  destination sector.
+	- Clipping portals are no longer automatic. There is now a CLIP()
+	  keyword which you can use to indicate a portal that clips
+	  geometry in the destination sector.
 	- Changed behaviour of csIntersect3::Plane() back to old.
+	- Fixed testing for endian correctness for import routines. Loading
+	  3DS files now works for Solaris.
+	- Fixed OpenGL volumetric fog so that it supports multiple layers.
+	- Fixed OpenGL volumetric fog so that it works for DrawPolygonFX as
+	  well. This fixes sprites and curves. It works but there seem
+	  to be a little problems yet. I'm not sure but it seems as if the
+	  sprites drawn using fog stand out a little.
 27-Jul-1999
 	- Added csWorld::EnableLightingCache() with which you can disable
 	  the lighting cache (and thus saving of lightmaps to precalc.zip).
