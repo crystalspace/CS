@@ -22,6 +22,12 @@ The history order is reversed so that new features are at the top.
 	- According to some suggestions by Luca Pancallo I fixed viewmesh
 	  so the light placement there is better. This makes the viewed
 	  models look nicer.
+	- Protected the csEventQueue implementation in csutil so that it
+	  is now safe in the sense that an event handler can call
+	  RemoveListener() without disrupting event handling itself. The
+	  problem was that the event handler is busy in the loop calling
+	  HandleEvent() on all the event handlers. Having an event handler
+	  delete itself while in the loop could cause various problems.
 10-Oct-2001
 	- Slight optimization in csSector::IntersectSegment() where it
 	  would transform back the intersection point even if there

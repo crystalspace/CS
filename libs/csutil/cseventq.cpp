@@ -30,7 +30,8 @@ SCF_IMPLEMENT_IBASE (csEventQueue)
 SCF_IMPLEMENT_IBASE_END
 
 csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
-  Registry(r), EventQueue(0), evqHead(0), evqTail(0), Length(0), SpinLock(0)
+  Registry(r), EventQueue(0), evqHead(0), evqTail(0), Length(0), SpinLock(0),
+  busy_looping (0), delete_occured (false)
 {
   SCF_CONSTRUCT_IBASE (0);
   Resize (iLength);
@@ -40,6 +41,9 @@ csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
 
 csEventQueue::~csEventQueue ()
 {
+  // We don't allow deleting the event queue from within an event handler.
+  CS_ASSERT (busy_looping <= 0);
+
   Clear();
   if (EventQueue)
     delete[] EventQueue;
@@ -127,15 +131,39 @@ void csEventQueue::Resize (size_t iLength)
   Unlock ();
 }
 
-void csEventQueue::Notify(iEvent& e) const
+void csEventQueue::StartLoop ()
+{
+  busy_looping++;
+}
+
+void csEventQueue::EndLoop ()
+{
+  busy_looping--;
+  if (busy_looping <= 0 && delete_occured)
+  {
+    // We are no longer in a loop and a delete occured so here
+    // we really clean up the entries in the listener array.
+    delete_occured = false;
+    for (int i = Listeners.Length() - 1; i >= 0; i--)
+    {
+      Listener const& listener = Listeners[i];
+      if (!listener.object)
+        Listeners.Delete (i);
+    }
+  }
+}
+
+void csEventQueue::Notify (iEvent& e)
 {
   int i;
+  StartLoop ();
   for (i = Listeners.Length() - 1; i >= 0; i--)
   {
     Listener const& listener = Listeners[i];
-    if ((listener.trigger & CSMASK_Nothing) != 0)
-      listener.object->HandleEvent(e);
+    if (listener.object && (listener.trigger & CSMASK_Nothing) != 0)
+      listener.object->HandleEvent (e);
   }
+  EndLoop ();
 }
 
 void csEventQueue::Process ()
@@ -176,16 +204,19 @@ void csEventQueue::Dispatch (iEvent& e)
 {
   int const evmask = 1 << e.Type;
   bool const canstop = ((e.Flags & CSEF_BROADCAST) == 0);
+  StartLoop ();
   int i, n;
   for (i = 0, n = Listeners.Length(); i < n; i++)
   {
     Listener const& l = Listeners[i];
-    if ((l.trigger & evmask) != 0 && l.object->HandleEvent(e) && canstop)
+    if ((l.trigger & evmask) != 0 && l.object && l.object->HandleEvent(e)
+    	&& canstop)
       break;
   }
+  EndLoop ();
 }
 
-int csEventQueue::FindListener(iEventHandler* listener) const
+int csEventQueue::FindListener (iEventHandler* listener) const
 {
   int i;
   for (i = Listeners.Length() - 1; i >= 0; i--)
@@ -197,30 +228,39 @@ int csEventQueue::FindListener(iEventHandler* listener) const
   return -1;
 }
 
-void csEventQueue::RegisterListener(iEventHandler* listener, unsigned int trigger)
+void csEventQueue::RegisterListener (iEventHandler* listener,
+	unsigned int trigger)
 {
-  int const n = FindListener(listener);
+  int const n = FindListener (listener);
   if (n >= 0)
     Listeners[n].trigger = trigger;
   else
   {
     Listener l = { listener, trigger };
-    Listeners.Push(l);
-    listener->IncRef();
+    Listeners.Push (l);
+    listener->IncRef ();
   }
 }
 
-void csEventQueue::RemoveListener(iEventHandler* listener)
+void csEventQueue::RemoveListener (iEventHandler* listener)
 {
   int const n = FindListener(listener);
   if (n >= 0)
   {
     Listeners[n].object->DecRef();
-    Listeners.Delete(n);
+    // Only delete the entry in the vector if we're not in a loop.
+    if (busy_looping <= 0)
+      Listeners.Delete(n);
+    else
+    {
+      Listeners[n].object = NULL;
+      delete_occured = true;
+    }
   }
 }
 
-void csEventQueue::ChangeListenerTrigger(iEventHandler* l, unsigned int trigger)
+void csEventQueue::ChangeListenerTrigger (iEventHandler* l,
+	unsigned int trigger)
 {
   int const n = FindListener(l);
   if (n >= 0)

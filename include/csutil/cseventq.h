@@ -87,6 +87,11 @@ private:
   volatile size_t Length;
   // Protection against multiple threads accessing same event queue
   volatile int SpinLock;
+  // Protection against delete while looping through the listeners.
+  int busy_looping;
+  // If a delete happened while busy_looping is true we set the
+  // following to true.
+  bool delete_occured;
   // Registered listeners.
   ListenerVector Listeners;
   // Array of allocated event outlets.
@@ -103,7 +108,13 @@ private:
   // Find a particular listener index; return -1 if listener is not registered.
   int FindListener(iEventHandler*) const;
   // Notify listeners of CSMASK_Nothing.
-  void Notify(iEvent&) const;
+  void Notify(iEvent&);
+
+  // Start a loop. The purpose of this function is to protect
+  // against modifications to the Listeners array while this array
+  // is being processed.
+  void StartLoop ();
+  void EndLoop ();
 
 public:
   SCF_DECLARE_IBASE;
