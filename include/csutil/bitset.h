@@ -66,10 +66,14 @@ public:
   }
 
   /// Create bit set of given size
-  csBitSet (unsigned iBitCount) : bit_count (iBitCount)
+  csBitSet (unsigned iBitCount) :
+    bit_count (iBitCount), byte_count (0), bits (NULL)
   {
-    byte_count = (iBitCount + BITS_PER_BYTE - 1) / BITS_PER_BYTE;
-    bits = (unsigned char *)malloc (byte_count);
+    if (iBitCount > 0)
+    {
+      byte_count = (iBitCount + BITS_PER_BYTE - 1) / BITS_PER_BYTE;
+      bits = (unsigned char *)calloc (1, byte_count);
+    }
   }
 
   /// Destroy the bit array
@@ -88,8 +92,24 @@ public:
   void Resize (unsigned iBitCount)
   {
     bit_count = iBitCount;
+    unsigned old_bytes = byte_count;
     byte_count = (iBitCount + BITS_PER_BYTE - 1) / BITS_PER_BYTE;
-    bits = (unsigned char *)realloc (bits, byte_count);
+    if (byte_count > 0)
+    {
+      if (!bits)
+        bits = (unsigned char *)calloc (1, byte_count);
+      else
+      {
+        bits = (unsigned char *)realloc (bits, byte_count);
+        if (byte_count > old_bytes)
+          memset (bits + old_bytes, 0, byte_count - old_bytes);
+      }
+    }
+    else if (bits)
+    {
+      free (bits);
+      bits = NULL;
+    }
   }
 
   /// Get a pointer to entire array for custom manipulations
