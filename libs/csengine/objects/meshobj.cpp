@@ -268,7 +268,7 @@ void csMeshWrapper::DrawShadow (iRenderView* rview, iLight* light)
 void csMeshWrapper::DrawLight (iRenderView* rview, iLight* light)
 {
   if (draw_test && in_light) 
-    meshobj->DrawLight (rview, &movable.scfiMovable, zbufMode);
+    meshobj->DrawLight (rview, &movable.scfiMovable, zbufMode, light);
 }
 #endif // CS_USE_NEW_RENDERER
 

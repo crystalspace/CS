@@ -737,9 +737,9 @@ void csSector::Draw (iRenderView *rview)
       csRef<iLightList> seclights = secs->Get(i)->GetLights ();
       for (int j = seclights->GetCount() - 1; j >= 0; j --)
       {
-	// Sphere check against rview before adding it.
-	csSphere s = csSphere (seclights->Get(j)->GetCenter (), 
-		  seclights->Get(j)->GetRadius());
+        // Sphere check against rview before adding it.
+        csSphere s = csSphere (seclights->Get(j)->GetCenter (), 
+        seclights->Get(j)->GetRadius());
         if (rview->TestBSphere (rview->GetCamera()->GetTransform(), s))
 	      alllights.Add (seclights->Get(j));
         else { 
@@ -815,7 +815,6 @@ void csSector::Draw (iRenderView *rview)
 void csSector::DrawZ (iRenderView* rview)
 {
   PrepareDraw (rview);
-  iCamera *icam = rview->GetCamera ();
   int i;
 
   // Mark visible objects.
@@ -862,10 +861,6 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
     iMeshWrapper *sp = objects[i];
     if (sp) 
     {
-      r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
-      //set the light-parameters
-      r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-      	light->GetCenter ());
       sp->DrawShadow (rview, light);
     }
   }
@@ -878,29 +873,6 @@ void csSector::DrawLight (iRenderView* rview, iLight* light)
     iMeshWrapper *sp = objects[i];
     if (sp)
     {
-      csColor color = light->GetColor ();
-      float diffuse, specular, ambient;
-      csRGBpixel matcolor;
-
-      sp->GetMeshObject()->GetMaterialWrapper()->GetMaterial()->GetReflection (diffuse,ambient, specular);
-      sp->GetMeshObject()->GetMaterialWrapper()->GetMaterial()->GetFlatColor(matcolor, false);
-      color.red *= (matcolor.red/255);
-      color.green *= (matcolor.green/255);
-      color.blue *= (matcolor.blue/255);
-
-      r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
-      //set the light-parameters
-      r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-      	light->GetCenter ());
-      //set this to be lightcolor * diffuse material
-      r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE,
-      	csVector3 (color.red, color.green, color.blue)*diffuse);
-      r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR,
-        csVector3 (color.red, color.green, color.blue)*specular);
-
-      r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
-      	light->GetAttenuationVector() );
-      
       sp->DrawLight (rview, light);
     }
   }
