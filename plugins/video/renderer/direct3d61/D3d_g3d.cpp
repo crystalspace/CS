@@ -87,7 +87,9 @@ struct D3DTLVERTEX2
 // lame Utils
 //
 
-#ifdef PROC_INTEL
+// quick fix, this was causing foging problems
+//#ifdef PROC_INTEL
+#if 0
 // This will only work for positive values.
 // float cmp greater
 inline bool FLOATCMPG(float a, float b)
@@ -816,10 +818,6 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
     m_bMultiTexture = true;
   else
     m_bMultiTexture = false;
-
-  // Currently, Multitexturing will break DrawPolygonFX, so I temporarily disabled it,
-  // I hope it will be fixed soon. - Thomas Hieber 12.02.2000
-  m_bMultiTexture = false;
 
   // start up with minimum settings
   m_bRenderTransparent = false;
@@ -1707,18 +1705,21 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
       m_alpha = 1.0f;
       m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
       m_States.SetSrcBlend(D3DBLEND_ZERO);
+	  m_States.SetAlphaBlendEnable(true);
       break;
     case CS_FX_MULTIPLY2:
       //Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
       m_alpha = 1.0f;
       m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
       m_States.SetSrcBlend(D3DBLEND_DESTCOLOR);
+	  m_States.SetAlphaBlendEnable(true);
       break;
     case CS_FX_ADD:
       //Color = 1 * DEST + 1 * SRC = DEST + SRC
       m_alpha = 1.0f;
       m_States.SetDstBlend(D3DBLEND_ONE);
       m_States.SetSrcBlend(D3DBLEND_ONE);
+	  m_States.SetAlphaBlendEnable(true);
       break;
     case CS_FX_ALPHA:
       //Color = Alpha * DEST + (1-Alpha) * SRC 
@@ -1729,12 +1730,14 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
       m_alpha = float (255 - (mode & CS_FX_MASK_ALPHA)) / 255.0;
       m_States.SetDstBlend(D3DBLEND_INVSRCALPHA);
       m_States.SetSrcBlend(D3DBLEND_SRCALPHA);
+	  m_States.SetAlphaBlendEnable(true);
       break;
     case CS_FX_TRANSPARENT:
       //Color = 1 * DEST + 0 * SRC = DEST
       m_alpha = 1.0f;
       m_States.SetDstBlend(D3DBLEND_ONE);
       m_States.SetSrcBlend(D3DBLEND_ZERO);
+	  m_States.SetAlphaBlendEnable(true);
       break;
     case CS_FX_COPY:
     default:
