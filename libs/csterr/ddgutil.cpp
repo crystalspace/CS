@@ -17,13 +17,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 // For timing info.
-#ifndef WIN32
+#include "sysdef.h"
+#ifdef WIN32
+#include <time.h>
+#elif OS_MACOS
+#include <time.h>
+#else
 #include <sys/types.h>
 #include <sys/times.h>
-#else
-#include <time.h>
 #endif
-#include "sysdef.h"
 #include "csterr/ddgutil.h"
 
 // ----------------------------------------------------------------------
