@@ -407,12 +407,6 @@ STDMETHODIMP csNetworkDriverSockets::Kill(DWORD dwID)
 		dwLastError = CS_NET_DRV_ERR_CANNOT_CLOSE;
 		return S_FALSE;
 	}
-	#elif defined(OS_OS2)
-	if(soclose(Socket[dwID]))
-	{
-		dwLastError = CS_NET_DRV_ERR_CANNOT_CLOSE;
-		return S_FALSE;
-	}
 	#else
 	if(close(Socket[dwID]))
 	{
