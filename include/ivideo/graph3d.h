@@ -274,18 +274,28 @@ enum G3D_FOGMETHOD
   (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
 /** @} */
 
+/**
+ * Describes how to deal with alpha values in textures.
+ */
 struct csAlphaMode
 {
+  /// How to handle alpha
   enum AlphaType
   {
+    /// Ignore alpha
     alphaNone = 1,
+    /// Binary alpha (pixels with alpha >0.5 are drawn, all others not)
     alphaBinary,
+    /// 'Smooth' alpha (colors are mixed based on a pixel's alpha value)
     alphaSmooth
   };
+  /// Whether 'automatic alpha mode' should be used.
   bool autoAlphaMode;
   union
   {
+    /// Alpha mode to use when autoAlphaMode is \p false
     AlphaType alphaType;
+    /// Texture to retrieve the alpha mode from when autoAlphaMode is \p true
     csStringID autoModeTexture;
   };
 };

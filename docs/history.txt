@@ -15,6 +15,13 @@ chronological order.
 	  	- auto: select font based on size of display, similar like
 		  what simple output console does.
 		- select the specified font.
+	- res updated spr2d to work with NR.
+	- res made some changes to how the render mesh holders work internally.
+	- res added some documentation to csRenderMesh, csAlphaMode, the
+	  render mesh holders and csRenderBufLock.
+	- res changed csRenderMesh to have the db_mesh_name member not only in
+	  debug mode (mostly for binary compatibility between debug/release
+	  binaries).
 23-Mar-2004
 	- Anders Stenberg brought stencil shadows back to life in NR.
 	  They should get along well with stencil clipping.

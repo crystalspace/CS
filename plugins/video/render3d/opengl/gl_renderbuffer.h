@@ -33,7 +33,8 @@ class csGLRenderBuffer : public iRenderBuffer
 protected:
   friend class csGLGraphics3D;
 
-  int size, compcount, compSize, stride, offset;
+  size_t size;
+  int compcount, compSize, stride, offset;
   csRenderBufferType type;
   csRenderBufferComponentType comptype;
   GLenum compGLType;

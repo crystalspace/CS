@@ -20,9 +20,18 @@
 #ifndef __CS_CSTOOL_RBUFLOCK_H__
 #define __CS_CSTOOL_RBUFLOCK_H__
 
+/**\file
+ * Helper class for convenient locking/unlocking of an iRenderBuffer.
+ */
+
 #include "csutil/ref.h"
 #include "ivideo/rndbuf.h"
 
+/**
+ * Helper class for convenient locking/unlocking of an iRenderBuffer.
+ * The contents can be accessed either directly or array-style in typed
+ * way.
+ */
 template <class T>
 class csRenderBufferLock
 {
@@ -33,17 +42,24 @@ class csRenderBufferLock
   
   csRenderBufferLock() {}
 public:
+  /**
+   * Construct the helper.
+   */
   csRenderBufferLock (iRenderBuffer* buf, 
     csRenderBufferLockType lock = CS_BUF_LOCK_NORMAL) : buffer(buf),
     lockType(lock), isLocked(false)
   {
   }
   
+  /**
+   * Destruct the helper. Automatically unlocks the buffer if it was locked.
+   */
   ~csRenderBufferLock()
   {
     Unlock();
   }
   
+  /// Lock the renderbuffer. Returns a pointer to the contained data.
   T* Lock ()
   {
     if (!isLocked)
@@ -54,6 +70,7 @@ public:
     return lockBuf;
   }
   
+  /// Unlock the renderbuffer.
   void Unlock ()
   {
     if (isLocked)
@@ -63,11 +80,13 @@ public:
     }
   }
   
+  /// Retrieve a pointer to the contained data.
   operator T* ()
   {
     return Lock();
   }
 
+  /// Retrieve an item in the render buffer.
   T& operator [] (int n)
   {
     return *(Lock() + n);

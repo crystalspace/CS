@@ -20,14 +20,23 @@
 #ifndef __CS_CSTOOL_RENDERMESHHOLDER_H__
 #define __CS_CSTOOL_RENDERMESHHOLDER_H__
 
+/**\file
+ * Helper classes to retrieve unused csRenderMeshes and arrays of them.
+ */
+
 #include "csextern.h"
 
 #include "csutil/array.h"
+#include "csutil/blockallocator.h"
 #include "csutil/garray.h"
 
 struct csRenderMesh;
 
-/// @@@ Document me!
+/**
+ * Helper class to retrieve an unused csRenderMesh.
+ * Manages a list of csRenderMesh structures and returns one which has its
+ * \a inUse member set to false.
+ */
 class CS_CSTOOL_EXPORT csRenderMeshHolderSingle
 {
   csArray<csRenderMesh*> meshes;
@@ -36,22 +45,32 @@ public:
   csRenderMeshHolderSingle ();
   ~csRenderMeshHolderSingle ();
 
-  csRenderMesh*& GetUnusedMesh();
+  /**
+   * Retrieve a csRenderMesh whose \a inUse member is set to false.
+   * \param created \a True if a new csRenderMesh was allocated, \a False
+   *  if one was reused. Can be used to determine whether all or only a
+   *  subset of the csRenderMesh values have to be initialized.
+   */
+  csRenderMesh*& GetUnusedMesh (bool& created);
 };
 
-/// @@@ Document me!
+/**
+ * Helper class to retrieve an unused array of csRenderMesh*.
+ * Manages a list of csRenderMesh* array and returns one whose first contained
+ * csRenderMesh has it's \a inUse member set to false (the assumption is that 
+ * when one mesh is unused, all are).
+ */
 class CS_CSTOOL_EXPORT csRenderMeshHolderMultiple
 {
-  struct rmHolder
-  {
-    csDirtyAccessArray<csRenderMesh*> renderMeshes;
-  };
-  csArray<rmHolder*> rmHolderList;
+  csArray<csDirtyAccessArray<csRenderMesh*>*> rmHolderList;
   int rmHolderListIndex;
 public:
   csRenderMeshHolderMultiple ();
   ~csRenderMeshHolderMultiple ();
 
+  /**
+   * Retrieve an unused array of csRenderMesh*.
+   */
   csDirtyAccessArray<csRenderMesh*>& GetUnusedMeshes ();
 };
 

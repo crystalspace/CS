@@ -91,6 +91,12 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   current_lod = 1;
   current_features = 0;
   uvani = 0;
+#ifdef CS_USE_NEW_RENDERER
+  vertices_dirty = true;
+  texels_dirty = true;
+  colors_dirty = true;
+  indicesSize = (size_t)-1;
+#endif
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
@@ -218,6 +224,9 @@ void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     vertices[i].color = vertices[i].color_init + color;
     vertices[i].color.Clamp (2, 2, 2);
   }
+#ifdef CS_USE_NEW_RENDERER
+  colors_dirty = true;
+#endif
 }
 
 void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
@@ -463,27 +472,46 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
     UpdateLighting (relevant_lights, movable);
   }
 
-  csRenderMesh*& rm = rmHolder.GetUnusedMesh();
-
-  csReversibleTransform tr_o2c = camera->GetTransform ();
-  //tr_o2c.
-
+  csReversibleTransform temp = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
+    temp /= movable->GetFullTransform ();
 
-  rm->inUse = true;
+  int clip_portal, clip_plane, clip_z_plane;
+  csSphere sphere;
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  sphere.SetRadius (max_radius);
+  if (!rview->ClipBSphere (temp, sphere, clip_portal, clip_plane, 
+    clip_z_plane))
+  {
+    n = 0;
+    return 0;
+  }
+
+  csReversibleTransform tr_o2c;
+  tr_o2c.SetO2TTranslation (-temp.Other2This (csVector3 (0.0f)));
+
+  bool meshCreated;
+  csRenderMesh*& rm = rmHolder.GetUnusedMesh(meshCreated);
+  if (meshCreated)
+  {
+    rm->meshtype = CS_MESHTYPE_TRIANGLEFAN;// CS_MESHTYPE_TRIANGLES;
+    rm->material = material;
+    rm->variablecontext = svcontext;
+    rm->geometryInstance = this;
+  }
+  
   rm->mixmode = MixMode;
-  rm->clip_portal = 0;//clip_portal;
-  rm->clip_plane = 0;//clip_plane;
-  rm->clip_z_plane = 0;//clip_z_plane;
+  rm->clip_portal = clip_portal;
+  rm->clip_plane = clip_plane;
+  rm->clip_z_plane = clip_z_plane;
   rm->do_mirror = camera->IsMirrored ();
-  rm->meshtype = CS_MESHTYPE_TRIANGLES;
   rm->indexstart = 0;
-  rm->indexend = (vertices.Length() - 2) * 3;
-  rm->material = material;
-  rm->object2camera = movable->GetFullTransform();
-  rm->variablecontext = svcontext;
-  rm->geometryInstance = this;
+  rm->indexend = (vertices.Length()/* - 2*/)/* * 3*/;
+  rm->inUse = true;
+  rm->object2camera = tr_o2c;
+
   n = 1; 
   return &rm; 
 #endif
@@ -497,31 +525,40 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
   const csStringID name = variable->GetName ();
   if (name == index_name)
   {
-    if (!index_buffer.IsValid())
+    size_t indexSize = sizeof (uint) * (vertices.Length()/* - 2*/)/* * 3*/;
+    if (!index_buffer.IsValid() || 
+      (indicesSize != indexSize))
     {
       index_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
-	sizeof (uint) * (vertices.Length() - 2) * 3, CS_BUF_STATIC, 
+	indexSize, CS_BUF_DYNAMIC, 
 	CS_BUFCOMP_UNSIGNED_INT, 1, true));
+      variable->SetValue (index_buffer);
 
       csRenderBufferLock<uint> indexLock (index_buffer);
       uint* ptr = indexLock;
 
-      for (int i = 2; i < vertices.Length(); i++)
+      for (int i = 0/*2*/; i < vertices.Length(); i++)
       {
-	*ptr++ = 0;
-	*ptr++ = i - 1;
 	*ptr++ = i;
+	//*ptr++ = i - 1;
+	//*ptr++ = i;
       }
+      indicesSize = indexSize;
     }
-    variable->SetValue (index_buffer);
   }
   else if (name == texel_name)
   {
-    if (!texel_buffer.IsValid())
+    if (texels_dirty)
     {
-      texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
-	sizeof (float) * vertices.Length() * 2, CS_BUF_STATIC, 
-	CS_BUFCOMP_FLOAT, 2, true));
+      size_t texelSize = sizeof (float) * vertices.Length() * 2;
+      if (!texel_buffer.IsValid() ||
+	(texel_buffer->GetSize() != texelSize))
+      {
+	texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+	  texelSize, CS_BUF_STATIC, 
+	  CS_BUFCOMP_FLOAT, 2, true));
+	variable->SetValue (texel_buffer);
+      }
 
       csRenderBufferLock<csVector2> texelLock (texel_buffer);
 
@@ -531,16 +568,22 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
 	v.x = vertices[i].u;
 	v.y = vertices[i].v;
       }
+      texels_dirty = false;
     }
-    variable->SetValue (texel_buffer);
   }
   else if (name == color_name)
   {
-    if (!color_buffer.IsValid())
+    if (colors_dirty)
     {
-      color_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
-	sizeof (float) * vertices.Length() * 3, CS_BUF_STATIC, 
-	CS_BUFCOMP_FLOAT, 3, true));
+      size_t color_size = sizeof (float) * vertices.Length() * 3;
+      if (!color_buffer.IsValid() ||
+	(color_buffer->GetSize() != color_size))
+      {
+	color_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+	  color_size, CS_BUF_STATIC, 
+	  CS_BUFCOMP_FLOAT, 3, true));
+	variable->SetValue (color_buffer);
+      }
 
       csRenderBufferLock<csColor> colorLock (color_buffer);
 
@@ -548,26 +591,31 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       {
 	colorLock[i] = vertices[i].color;
       }
+      colors_dirty = false;
     }
-    variable->SetValue (color_buffer);
   }
   else if (name == vertex_name)
   {
-    if (!vertex_buffer.IsValid())
+    if (vertices_dirty)
     {
-      vertex_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
-	sizeof (float) * vertices.Length() * 3, CS_BUF_STATIC, 
-	CS_BUFCOMP_FLOAT, 3, true));
+      size_t vertices_size = sizeof (float) * vertices.Length() * 3;
+      if (!vertex_buffer.IsValid() ||
+	(vertex_buffer->GetSize() != vertices_size))
+      {
+	vertex_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+	  vertices_size, CS_BUF_STATIC, 
+	  CS_BUFCOMP_FLOAT, 3, true));
+	variable->SetValue (vertex_buffer);
+      }
 
       csRenderBufferLock<csVector3> vertexLock (vertex_buffer);
 
       for (int i = 0; i < vertices.Length(); i++)
       {
-	vertexLock[i].Set (vertices[i].pos.x, vertices[i].pos.y,
-	  0.0f);
+	vertexLock[i].Set (vertices[i].pos.x, vertices[i].pos.y, 0.0f);
       }
+      vertices_dirty = false;
     }
-    variable->SetValue (vertex_buffer);
   }
 }
 #endif
@@ -603,6 +651,11 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
     vertices [i].color.Set (1, 1, 1);
     vertices [i].color_init.Set (1, 1, 1);
   }
+#ifdef CS_USE_NEW_RENDERER
+  vertices_dirty = true;
+  texels_dirty = true;
+  colors_dirty = true;
+#endif
   scfiObjectModel.ShapeChanged ();
 }
 
@@ -640,6 +693,9 @@ void csSprite2DMeshObject::Particle::SetColor (const csColor& col)
   if (!scfParent->lighting)
     for (i = 0 ; i < vertices.Length () ; i++)
       vertices[i].color = col;
+#ifdef CS_USE_NEW_RENDERER  
+  scfParent->colors_dirty = true;
+#endif
 }
 
 void csSprite2DMeshObject::Particle::AddColor (const csColor& col)
@@ -651,6 +707,9 @@ void csSprite2DMeshObject::Particle::AddColor (const csColor& col)
   if (!scfParent->lighting)
     for (i = 0 ; i < vertices.Length () ; i++)
       vertices[i].color = vertices[i].color_init;
+#ifdef CS_USE_NEW_RENDERER  
+  scfParent->colors_dirty = true;
+#endif
 }
 
 void csSprite2DMeshObject::Particle::ScaleBy (float factor)
@@ -659,6 +718,9 @@ void csSprite2DMeshObject::Particle::ScaleBy (float factor)
   int i;
   for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos *= factor;
+#ifdef CS_USE_NEW_RENDERER
+  scfParent->vertices_dirty = true;
+#endif
   scfParent->scfiObjectModel.ShapeChanged ();
 }
 
@@ -668,6 +730,9 @@ void csSprite2DMeshObject::Particle::Rotate (float angle)
   int i;
   for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos.Rotate (angle);
+#ifdef CS_USE_NEW_RENDERER
+  scfParent->vertices_dirty = true;
+#endif
   scfParent->scfiObjectModel.ShapeChanged ();
 }
 

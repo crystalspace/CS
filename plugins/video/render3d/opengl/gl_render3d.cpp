@@ -307,7 +307,7 @@ void csGLGraphics3D::SetMixMode (uint mode)
       statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE);
       break;
     case CS_FX_ALPHA:
-      // Color = Alpha * DEST + (1-Alpha) * SRC
+      // Color = Alpha * SRC + (1-Alpha) * DEST
       statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       break;
     case CS_FX_TRANSPARENT:
@@ -1597,6 +1597,10 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
   indexBufSV->GetValue (iIndexbuf);
   CS_ASSERT(iIndexbuf);
   csGLRenderBuffer* indexbuf = (csGLRenderBuffer*)iIndexbuf;
+  
+  const size_t indexCompsBytes = indexbuf->compcount * indexbuf->compSize;
+  CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= indexbuf->size);
+  CS_ASSERT((indexCompsBytes * mymesh->indexend) <= indexbuf->size);
 
   GLenum primitivetype = GL_TRIANGLES;
   switch (mymesh->meshtype)
@@ -1699,13 +1703,15 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
     SetMirrorMode (mymesh->do_mirror);
 
 
+  const uint mixmode = mymesh->mixmode;
+  //statecache->SetShadeModel ((mixmode & CS_FX_GOURAUD) ? GL_SMOOTH : GL_FLAT);
   statecache->SetShadeModel (GL_SMOOTH);
 
   void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
   if (bufData != (void*)-1)
   {
-    if ((mymesh->mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
-      SetMixMode (mymesh->mixmode);
+    if ((mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
+      SetMixMode (mixmode);
     else
       SetAlphaType (mymesh->alphaType);
 
@@ -1733,15 +1739,15 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
     }
 
     float alpha = 1.0f;
-    if ((mymesh->mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
-      alpha = (float)(mymesh->mixmode & CS_FX_MASK_ALPHA) / 255.0f;
+    if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
+      alpha = (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
     glColor4f (1.0f, 1.0f, 1.0f, alpha);
     glDrawElements (
       primitivetype,
       mymesh->indexend - mymesh->indexstart,
       indexbuf->compGLType,
       ((uint8*)bufData) +
-	(indexbuf->compcount * indexbuf->compSize * mymesh->indexstart));
+	(indexCompsBytes * mymesh->indexstart));
 
     indexbuf->Release();
   }

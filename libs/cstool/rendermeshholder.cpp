@@ -22,7 +22,7 @@
 
 #include "cstool/rendermeshholder.h"
 #include "ivideo/rendermesh.h"
-  
+
 csRenderMeshHolderSingle::csRenderMeshHolderSingle ()
 {
   lastMesh = meshes.Push (new csRenderMesh);
@@ -38,8 +38,9 @@ csRenderMeshHolderSingle::~csRenderMeshHolderSingle ()
   }
 }
 
-csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh()
+csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created)
 {
+  created = false;
   if (meshes[lastMesh]->inUse == true)
   {
     lastMesh = -1;
@@ -56,6 +57,7 @@ csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh()
     if (lastMesh == -1)
     {
       lastMesh = meshes.Push (new csRenderMesh);
+      created = true;
     }
   }
 
@@ -66,18 +68,18 @@ csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh()
 
 csRenderMeshHolderMultiple::csRenderMeshHolderMultiple ()
 {
-  rmHolderList.Push (new rmHolder);
-  rmHolderListIndex = 0;
+  rmHolderListIndex = rmHolderList.Push (
+    new csDirtyAccessArray<csRenderMesh*>);
 }
 
 csRenderMeshHolderMultiple::~csRenderMeshHolderMultiple ()
 {
   while (rmHolderList.Length() > 0)
   {
-    rmHolder* holder = rmHolderList.Pop();
-    for (int j = 0; j < holder->renderMeshes.Length(); j++)
+    csDirtyAccessArray<csRenderMesh*>* holder = rmHolderList.Pop();
+    for (int j = 0; j < holder->Length(); j++)
     {
-      csRenderMesh* rm = holder->renderMeshes[j];
+      csRenderMesh* rm = (*holder)[j];
       CS_ASSERT (rm->inUse == false);
       delete rm;
     }
@@ -88,16 +90,16 @@ csRenderMeshHolderMultiple::~csRenderMeshHolderMultiple ()
 csDirtyAccessArray<csRenderMesh*>& 
 csRenderMeshHolderMultiple::GetUnusedMeshes()
 {
-  rmHolder *rmH = rmHolderList[rmHolderListIndex];
+  csDirtyAccessArray<csRenderMesh*>* rmH = rmHolderList[rmHolderListIndex];
 
-  if (rmH->renderMeshes.Length() > 0 && rmH->renderMeshes[0]->inUse)
+  if (rmH->Length() > 0 && (*rmH)[0]->inUse)
   {
     rmHolderListIndex = -1;
     //find an empty rmH
     for(int i = 0; i < rmHolderList.Length(); i++)
     {
       rmH = rmHolderList[i];
-      if ((rmH->renderMeshes.Length() == 0) || !rmH->renderMeshes[0]->inUse)
+      if ((rmH->Length() == 0) || !(*rmH)[0]->inUse)
       {
         rmHolderListIndex = i;
         break;
@@ -105,10 +107,10 @@ csRenderMeshHolderMultiple::GetUnusedMeshes()
     }
     if (rmHolderListIndex == -1)
     {
-      rmH = new rmHolder;
+      rmH = new csDirtyAccessArray<csRenderMesh*>;
       rmHolderListIndex = rmHolderList.Push (rmH);
     }
   }
 
-  return rmH->renderMeshes;
+  return *rmH;
 }

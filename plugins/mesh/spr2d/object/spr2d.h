@@ -81,10 +81,13 @@ protected:
   csRenderMeshHolderSingle rmHolder;
   static csStringID vertex_name, texel_name, color_name, index_name;
   csRef<iRenderBuffer> vertex_buffer;
+  bool vertices_dirty;
   csRef<iRenderBuffer> texel_buffer;
+  bool texels_dirty;
   csRef<iRenderBuffer> color_buffer;
+  bool colors_dirty;
   csRef<iRenderBuffer> index_buffer;
- 
+  size_t indicesSize;
 #endif
 
 private:
