@@ -95,6 +95,8 @@ The history order is reversed so that new features are at the top.
 	  invoke the makefile target `show' and set the makefile variable `V'
 	  to the name of the variable of interest.  For instance, to display
 	  the expansion of $(SRC.SOFT3D), invoke "make show V=SRC.SOFT3D".
+	- Eric Sunshine eliminated a couple compilation warnings reported by
+	  MSVC in 3dsload.cpp.
 13-Jun-2001
 	- Increased robustness of the Spider in BugPlug a little. If there
 	  are no sectors it will not start hunting. There is also a timeout
