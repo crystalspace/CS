@@ -58,6 +58,7 @@ MSVC.PLUGINS.REQUIRED =         \
   sound/loader/mod              \
   sound/loader/ogg              \
   sound/renderer/ds3d           \
+  sound/renderer/openal         \
   sound/renderer/software       \
   video/canvas/ddraw            \
   video/canvas/openglwin        \
