@@ -18,7 +18,7 @@ include mk/common.mak
 
 #--------------- Several definitions to make this file compiler-independent ---#
 # Flags for C compiler to direct output to the rule target
-CFLAGS.@ = -o $@ -c
+CFLAGS.@ = -o $@
 # Flags for linker to direct output to the rule target
 LFLAGS.@ = -o $@
 # Flags for indicating to linker an additional library path
