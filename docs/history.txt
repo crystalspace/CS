@@ -12,6 +12,14 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+14-Jul-99:
+	- Added a lot of config file variables for collision detection and
+	  speed of the new movement system. Almost everything can be configured
+	  now (movement speed, acceleration, jump speed, dimensions of body
+	  and legs, ...). See docs/config.txt (or cryst.cfg) for a list.
+13-Jul-99:
+	- Fixed bug in ClipToPlane() which is only used for portals on
+	  things. This bug could cause flickering polygons.
 12-Jul-99:
 	- New 'dumpvis' command. This command takes the current view
 	  and dumps information for the rendering process. You will
@@ -25,6 +33,21 @@ Short-term cleanups that need to be done:
 	  course).
 	- Moved a lot of the include files from libs/*.h to include/*.h
 	  This includes csengine, csobject, csutil, and cscom.
+	- Made csloader a little bit more robust.
+	- Change from Andrew Zabolotny to remove automatic store of USE_NASM
+	  into config.mak. This has been done so that config scripts (see
+	  bin/dosconf.bat) can automatically detect whenever NASM is
+	  installed or not and write their own settings of USE_NASM into
+	  config.mak. If NASM is not autodetected by "make configure", you
+	  will have to add manually "USE_NASM=yes" to config.mak in order
+	  to use NASM.
+	- Andrew also updated the 32-bit NASM routines:
+	  draw_scanline_map_zfil, mmx_draw_scanline_map_zfil,
+	  draw_scanline_map_zuse, draw_scanline_map_alpha50,
+	  draw_scanline_tex_zfil, mmx_draw_scanline_tex_zfil,
+	  draw_scanline_fog and draw_scanline_fog_view.
+	  No more separate RGB and BGR fog versions! Now it should work for
+	  any pixel encoding with just one routine.
 11-Jul-99:
 	- Thomas Hieber fixed/enabled mipmapping again in the Direct3D
 	  renderer. This also improves performance a little.
