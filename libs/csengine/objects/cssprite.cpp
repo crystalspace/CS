@@ -1116,7 +1116,7 @@ void csSprite3D::Draw (csRenderView& rview)
     csVector3 wor_center = movable.GetTransform ().This2Other (obj_center);
     csVector3 cam_origin = rview.GetOrigin ();
     float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
-    level_of_detail /= wor_sq_dist;
+    level_of_detail /= MAX (wor_sq_dist, SMALL_EPSILON);
 
     // reduce LOD based on feild-of-view
     float aspect = 2 * tan (rview.GetFOVAngle () * M_PI / 360);
