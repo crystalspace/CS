@@ -8102,6 +8102,9 @@ class csPixelFormat(_object):
     __swig_setmethods__["BlueMask"] = _cspace.csPixelFormat_BlueMask_set
     __swig_getmethods__["BlueMask"] = _cspace.csPixelFormat_BlueMask_get
     if _newclass:BlueMask = property(_cspace.csPixelFormat_BlueMask_get, _cspace.csPixelFormat_BlueMask_set)
+    __swig_setmethods__["AlphaMask"] = _cspace.csPixelFormat_AlphaMask_set
+    __swig_getmethods__["AlphaMask"] = _cspace.csPixelFormat_AlphaMask_get
+    if _newclass:AlphaMask = property(_cspace.csPixelFormat_AlphaMask_get, _cspace.csPixelFormat_AlphaMask_set)
     __swig_setmethods__["RedShift"] = _cspace.csPixelFormat_RedShift_set
     __swig_getmethods__["RedShift"] = _cspace.csPixelFormat_RedShift_get
     if _newclass:RedShift = property(_cspace.csPixelFormat_RedShift_get, _cspace.csPixelFormat_RedShift_set)
@@ -8111,6 +8114,9 @@ class csPixelFormat(_object):
     __swig_setmethods__["BlueShift"] = _cspace.csPixelFormat_BlueShift_set
     __swig_getmethods__["BlueShift"] = _cspace.csPixelFormat_BlueShift_get
     if _newclass:BlueShift = property(_cspace.csPixelFormat_BlueShift_get, _cspace.csPixelFormat_BlueShift_set)
+    __swig_setmethods__["AlphaShift"] = _cspace.csPixelFormat_AlphaShift_set
+    __swig_getmethods__["AlphaShift"] = _cspace.csPixelFormat_AlphaShift_get
+    if _newclass:AlphaShift = property(_cspace.csPixelFormat_AlphaShift_get, _cspace.csPixelFormat_AlphaShift_set)
     __swig_setmethods__["RedBits"] = _cspace.csPixelFormat_RedBits_set
     __swig_getmethods__["RedBits"] = _cspace.csPixelFormat_RedBits_get
     if _newclass:RedBits = property(_cspace.csPixelFormat_RedBits_get, _cspace.csPixelFormat_RedBits_set)
@@ -8120,6 +8126,9 @@ class csPixelFormat(_object):
     __swig_setmethods__["BlueBits"] = _cspace.csPixelFormat_BlueBits_set
     __swig_getmethods__["BlueBits"] = _cspace.csPixelFormat_BlueBits_get
     if _newclass:BlueBits = property(_cspace.csPixelFormat_BlueBits_get, _cspace.csPixelFormat_BlueBits_set)
+    __swig_setmethods__["AlphaBits"] = _cspace.csPixelFormat_AlphaBits_set
+    __swig_getmethods__["AlphaBits"] = _cspace.csPixelFormat_AlphaBits_get
+    if _newclass:AlphaBits = property(_cspace.csPixelFormat_AlphaBits_get, _cspace.csPixelFormat_AlphaBits_set)
     __swig_setmethods__["PalEntries"] = _cspace.csPixelFormat_PalEntries_set
     __swig_getmethods__["PalEntries"] = _cspace.csPixelFormat_PalEntries_get
     if _newclass:PalEntries = property(_cspace.csPixelFormat_PalEntries_get, _cspace.csPixelFormat_PalEntries_set)
