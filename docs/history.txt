@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Aug-2004
+        - Philip Wyett eliminated the redefinition of _POSIX_C_SOURCE warning
+          within the CS Python plugin.
 13-Aug-2004
 	- Eric Sunshine propagated Frank's sprcal3d changes to the R0_98 branch
 	  so that it works with the latest CVS version of cal3d. This should

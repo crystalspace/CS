@@ -17,6 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "stdarg.h"
+#include <stdarg.h>
+
 void PythonToCS_stderr(char *format, va_list va);
 void PythonToCS_stdout(char *format, va_list va);
