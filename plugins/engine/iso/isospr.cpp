@@ -78,28 +78,28 @@ void csIsoSprite::MovePosition(const csVector3& delta)
 }
 
 #define INTERPOLATE1_S(var) \
-  g3dpoly->var [i]= inpoly_##var## [vt]+ \
-    t * (inpoly_##var## [vt2]- inpoly_##var## [vt]);
+  g3dpoly->var [i]= inpoly_##var [vt]+ \
+    t * (inpoly_##var [vt2]- inpoly_##var [vt]);
 
 #define INTERPOLATE1(var,component) \
-  g3dpoly->var [i].component = inpoly_##var## [vt].component + \
-    t * (inpoly_##var## [vt2].component - inpoly_##var## [vt].component);
+  g3dpoly->var [i].component = inpoly_##var [vt].component + \
+    t * (inpoly_##var [vt2].component - inpoly_##var [vt].component);
 
 #define INTERPOLATE_S(var) \
 { \
-  float v1 = inpoly_##var## [edge_from [0]] + \
-    t1 * (inpoly_##var## [edge_to [0]] - inpoly_##var## [edge_from [0]]); \
-  float v2 = inpoly_##var## [edge_from [1]] + \
-    t2 * (inpoly_##var## [edge_to [1]] - inpoly_##var## [edge_from [1]]); \
+  float v1 = inpoly_##var [edge_from [0]] + \
+    t1 * (inpoly_##var [edge_to [0]] - inpoly_##var [edge_from [0]]); \
+  float v2 = inpoly_##var [edge_from [1]] + \
+    t2 * (inpoly_##var [edge_to [1]] - inpoly_##var [edge_from [1]]); \
   g3dpoly->var [i] = v1 + t * (v2 - v1); \
 }
 
 #define INTERPOLATE(var,component) \
 { \
-  float v1 = inpoly_##var## [edge_from [0]].component + \
-    t1 * (inpoly_##var## [edge_to [0]].component - inpoly_##var## [edge_from [0]].component); \
-  float v2 = inpoly_##var## [edge_from [1]].component + \
-    t2 * (inpoly_##var## [edge_to [1]].component - inpoly_##var## [edge_from [1]].component); \
+  float v1 = inpoly_##var [edge_from [0]].component + \
+    t1 * (inpoly_##var [edge_to [0]].component - inpoly_##var [edge_from [0]].component); \
+  float v2 = inpoly_##var [edge_from [1]].component + \
+    t2 * (inpoly_##var [edge_to [1]].component - inpoly_##var [edge_from [1]].component); \
   g3dpoly->var [i].component = v1 + t * (v2 - v1); \
 }
 
