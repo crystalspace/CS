@@ -189,9 +189,9 @@ void csSoundSourceSoftware::Prepare(float BaseVolume) {
 #define READLEFTSAMP        ((int)(Input[2*i])-NullSample)
 #define READRIGHTSAMP       ((int)(Input[2*i+1])-NullSample)
 
-#define WRITEMONOSAMP(x)    Output[i]+=(x)*(CalcVolL+CalcVolR)/2;
-#define WRITELEFTSAMP(x)    Output[2*i]+=(x)*CalcVolL;
-#define WRITERIGHTSAMP(x)   Output[2*i+1]+=(x)*CalcVolR;
+#define WRITEMONOSAMP(x)    Output[i]+=(stype)((x)*(CalcVolL+CalcVolR)/2);
+#define WRITELEFTSAMP(x)    Output[2*i]+=(stype)((x)*CalcVolL);
+#define WRITERIGHTSAMP(x)   Output[2*i+1]+=(stype)((x)*CalcVolR);
 
 #define READMONO3D          int samp=READMONOSAMP;
 #define READSTEREO3D        int samp=(READLEFTSAMP+READRIGHTSAMP)/2;
@@ -199,7 +199,7 @@ void csSoundSourceSoftware::Prepare(float BaseVolume) {
 #define WRITEMONO3D         WRITEMONOSAMP(samp);
 #define WRITESTEREO3D       {WRITELEFTSAMP(samp); WRITERIGHTSAMP(samp);}
 
-#define LOOP                for (unsigned long i=0;i<NumSamples;i++)
+#define LOOP                for (long i=0;i<NumSamples;i++)
 
 #define ADDTOBUFFER_BITS {                                              \
   stype *Input = (stype*)Source;                                        \
