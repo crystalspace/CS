@@ -87,7 +87,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '28';
+my $PROG_VERSION = '29';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -131,15 +131,15 @@ my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 #        human-readable name for this task and is used in status messages.  The
 #        key "action" is a human-readable verb which describes the action
 #        performed by this target.  It is combined with the value of the "name"
-#        key to construct an informative diagnositc message.  The key "make" is
-#        the Makefile target which is invoked to generate this particular set
+#        key to construct an informative diagnositc message.  The key "build"
+#        is the build command which is invoked to generate this particular set
 #        of files.  The key "newdirs" refers to an array of directory names
 #        into which files are generated for this target.  This key should only
 #        be present if new files are created by this target.  The key "olddirs"
 #        refers to an array of existing directories where these files are
 #        stored in the CVS repository.  If "newdirs" is omitted, then the
 #        directories mentioned by "olddirs" are those containing files modified
-#        in-place by the makefile target, rather than generated anew in a
+#        in-place by the build command, rather than generated anew in a
 #        different location.  If both "newdirs" and "olddirs" are present, then
 #        entries in "newdirs" must correspond to entries in "olddirs", and each
 #        directory in "newdirs" must exactly mirror the layout and hierarchy of
@@ -182,24 +182,23 @@ my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 # For write-access, SourceForge requires SSH access.
 $ENV{'CVS_RSH'} = 'ssh';
 
-# Ensure that Doxygen and Swig can be found.
+# Ensure that Doxygen, Swig, and Jam can be found.
 $ENV{'PATH'} =
     '/home/groups/c/cr/crystal/bin:' .
     '/home/groups/c/cr/crystal/swig/bin:' .
     $ENV{'PATH'} .
     ':/usr/local/bin';
 
-# The Visual-C++ DSW and DSP generation process is a bit too noisy.
-$ENV{'MSVC_QUIET'} = 'yes';
-
 # This is just plain ugly.  The SourceForge CVS server is so mis-configured
 # that it drops the connection any time the (admittedly) large Swig-generated
-# CS/scripts/perl5/cswigpl5.inc is committed to the repository even though
-# this script is running on a local SourceForge machine.  To work around the
-# problem, we enable compression in order send less information to the CVS
-# server, under the assumption that the huge file size is what is triggering
-# the server to drop the connection.  Enabling compression seems to side-step
-# the problem.
+# CS/scripts/perl5/cswigpl5.inc is committed to the repository even though this
+# script is running on a local SourceForge machine.  (This also happens with
+# other files, but seems most frequent with the large ones, such as
+# cswigpl5.inc.) To work around the problem, we enable compression in order
+# send less information to the CVS server, under the assumption that the huge
+# file size is what is triggering the server to drop the connection.  Enabling
+# compression helps to side-step the problem some of the time (which is better
+# than nothing).
 my $CVSFLAGS = '-z9';
 
 my $PROJECT_ROOT = 'CS';
@@ -216,35 +215,35 @@ my @BINARY = ('(?i)\.(dsw|dsp)$');
 my @TARGETS =
     ({ 'name'    => 'Visual-C++ DSW and DSP files',
        'action'  => 'Repairing',
-       'make'    => 'msvc6gen',
-       'newdirs' => ['out/mk/msvcgen/visualc6'],
+       'build'    => 'jam msvc6gen',
+       'newdirs' => ['out/mk/visualc6'],
        'olddirs' => ['mk/visualc6'],
        'log'     => 'Automated Visual-C++ DSW and DSP project file repair.' },
      { 'name'    => 'Visual-C++ SLN and VCPROJ files',
        'action'  => 'Repairing',
-       'make'    => 'msvc7gen',
-       'newdirs' => ['out/mk/msvcgen/visualc7'],
+       'build'    => 'jam msvc7gen',
+       'newdirs' => ['out/mk/visualc7'],
        'olddirs' => ['mk/visualc7'],
        'log'     =>
 	   'Automated Visual-C++ SLN and VCPROJ project file repair.'},
      { 'name'    => 'Texinfo files',
        'action'  => 'Repairing @node and @menu directives in',
-       'make'    => 'repairdoc',
+       'build'    => 'jam repairdoc',
        'olddirs' => ['docs/texinfo'],
        'log'     => 'Automated Texinfo @node and @menu repair.' },
      { 'name'    => 'Swig Python files',
        'action'  => 'Repairing',
-       'make'    => 'swigpythinst',
+       'build'    => 'jam pythonfreeze',
        'olddirs' => ['plugins/cscript/cspython', 'scripts/python'],
        'log'     => 'Automated Swig Python file repair.' },
      { 'name'    => 'Swig Perl5 files',
        'action'  => 'Repairing',
-       'make'    => 'swigperl5inst',
+       'build'    => 'jam perl5freeze',
        'olddirs' => ['scripts/perl5'],
        'log'     => 'Automated Swig Perl5 file repair.' },
      { 'name'    => 'User\'s Manual',
        'action'  => 'Generating',
-       'make'    => 'manualhtml',
+       'build'    => 'jam manualhtml',
        'newdirs' => ['out/docs/html/manual'],
        'olddirs' => ['docs/html/manual'],
        'log'     => 'Automated Texinfo to HTML conversion.',
@@ -256,7 +255,7 @@ my @TARGETS =
 	         'sh docs/support/annotate/transform.sh ~T' }},
      { 'name'    => 'Public API Reference',
        'action'  => 'Generating',
-       'make'    => 'apihtml',
+       'build'    => 'jam apihtml',
        'newdirs' => ['out/docs/html/api'],
        'olddirs' => ['docs/html/api'],
        'log'     => 'Automated API reference generation.',
@@ -268,7 +267,7 @@ my @TARGETS =
 	         'sh docs/support/annotate/transform.sh ~T' }},
 #      { 'name'    => 'Developer API Reference',
 #        'action'  => 'Generating',
-#        'make'    => 'apidevhtml',
+#        'build'    => 'jam apidevhtml',
 #        'newdirs' => ['out/docs/html/apidev'],
 #        'export'  =>
 # 	   { 'dir'    => 'apidev',
@@ -297,36 +296,43 @@ my @ARCHIVERS =
 my $TESTING = undef;
 my $CONV_DIR = temporary_name($TEMPDIR);
 my $CAPTURED_OUTPUT = '';
-my $MAKE = 'make';
 
 # In order to invoke the various actions performed by this script, the project
 # needs to be configured, however the SourceForge shell machine does not have
-# compilers installed, thus we can not configure the project with the
+# compilers installed, thus we can not configure the project with the Autoconf
 # "configure" script.  Instead, we fake up project configuration by creating a
-# minimal config.mak and Makefile.
-my $CONFIGURE = "cat << EOF > config.mak\n" .
-    "TARGET = unix\n" .
-    "TARGET_MAKEFILE = libs/csutil/unix/unix.mak\n" .
-    "SRCDIR = .\n" .
-    "USE_PLUGINS = yes\n" .
-    "CMD.MKDIR = mkdir\n" .
-    "CMD.MKDIRS = mkdir -p\n" .
-    "CMD.DOXYGEN = doxygen\n" .
-    "CMD.TEXI2DVI = texi2dvi\n" .
-    "CMD.DVIPS = dvips\n" .
-    "CMD.MAKEFINFO = makeinfo\n" .
-    "PROC = UNKNOWN\n" .
-    "OS = UNIX\n" .
-    "COMP = GCC\n" .
-    "MODE = optimize\n" .
-    "CMD.SWIG = swig\n" .
-    "PERL = perl\n" .
-    "PERL5.AVAILABLE = yes\n" .
-    "PYTHON.AVAILABLE = yes\n" .
-    "PLUGINS.DYNAMIC += cscript/cspython\n" .
-    "PLUGINS.DYNAMIC += cscript/csperl5\n" .
+# minimal Jamconfig and Jamfile.
+my $CONFIGURE = "cat << EOF > Jamconfig\n" .
+    "CMD.C++ ?= \"g++\" ;\n" .
+    "CMD.CC ?= \"gcc\" ;\n" .
+    "CMD.DOXYGEN ?= \"doxygen\" ;\n" .
+    "CMD.DVIPS ?= \"dvips\" ;\n" .
+    "CMD.LINK ?= \"\$(CMD.C++)\" ;\n" .
+    "CMD.MAKEINFO ?= \"makeinfo\" ;\n" .
+    "CMD.MKDIR ?= \"mkdir\" ;\n" .
+    "CMD.MKDIRS ?= \"mkdir -p\" ;\n" .
+    "CMD.OBJC ?= \"gcc\" ;\n" .
+    "CMD.OBJC++ ?= \"g++\" ;\n" .
+    "CMD.SWIG ?= \"swig\" ;\n" .
+    "CMD.TEXI2DVI ?= \"texi2dvi\" ;\n" .
+    "JAM ?= \"jam\" ;\n" .
+    "JAMCONFIG_READ ?= \"yes\" ;\n" .
+    "MODE ?= \"optimize\" ;\n" .
+    "MSVCGEN_SILENT ?= \"yes\" ;\n" .
+    "PACKAGE_COPYRIGHT ?= \n" .
+    "  \"Copyright (C)1998-2004 Jorrit Tyberghein and others\" ;\n" .
+    "PACKAGE_HOMEPAGE ?= \"http://crystal.sourceforge.net/\" ;\n" .
+    "PACKAGE_LONGNAME ?= \"Crystal Space\" ;\n" .
+    "PACKAGE_NAME ?= \"crystal\" ;\n" .
+    "PACKAGE_VERSION_LIST ?= 0 97 ;\n" .
+    "PERL ?= \"perl\" ;\n" .
+    "PERL5.AVAILABLE ?= \"yes\" ;\n" .
+    "PYTHON ?= \"python\" ;\n" .
+    "PYTHON.AVAILABLE ?= \"yes\" ;\n" .
+    "TARGET.OS ?= \"UNIX\" ;\n" .
+    "USE_PLUGINS ?= \"yes\" ;\n" .
     "EOF\n" .
-    "sed 's/\@SET_MAKE\@//;s/\@top_srcdir\@/./' < Makefile.in > Makefile\n";
+    "sed 's/\@top_srcdir\@/./;s/\@top_builddir\@//' < Jamfile.in > Jamfile\n";
 
 my @SCRIPT_OPTIONS = (
     'test!'     => \$TESTING,
@@ -615,16 +621,16 @@ sub cvs_commit {
 }
 
 #------------------------------------------------------------------------------
-# Perform all tasks by invoking the appropriate Makefile target of each task.
-# Note that the makefile system is first configured before running the
-# makefile targets since they will not work prior to configuration.
+# Perform all tasks by invoking the appropriate build command of each task.
+# Note that the build system is first configured before running the commands
+# since they will not work prior to configuration.
 #------------------------------------------------------------------------------
 sub run_tasks {
     print "Configuring project.\n";
     run_command($CONFIGURE);
     foreach my $target (@TARGETS) {
 	print "$target->{'action'} $target->{'name'}.\n";
-	run_command("$MAKE $target->{'make'}");
+	run_command($target->{'build'});
     }
 }
 

@@ -11,7 +11,6 @@ W - Wishlist (the build also works without this feature)
     plugin works).
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
-[H] The `jobber' script on SourceForge should use jam instead of make.
 [H] Write complete documentation about the Jam build system for the CS user
     manual.
 
@@ -81,6 +80,7 @@ W - Wishlist (the build also works without this feature)
     with a message telling that you should rerun configure, or at least emit a
     big warning?
 
+[*] The `jobber' script on SourceForge should use jam instead of make.
 [*] msvcgen.jam: The command line for creating a project and workspace files
     frequently overflows Jam's command-line length limit, causing it to abort
     rudely.  This happens easily, even with moderately sized projects, such as
