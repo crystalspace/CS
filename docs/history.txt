@@ -10,7 +10,10 @@ The history order is reversed so that new features are at the top.
 	  <Gersh> DeSigna: in awswin.cpp's OnMouseMove function, change 
           the return false to a return true. 
           (It was not possible to tell if aws deals with a move event if 
-           the mouse is over a window) 
+          the mouse is over a window).
+	- Jorrit fixed a bug in registrycfg.cpp. If SetStr() was called
+	  with a 0 value then it would cause a crash. Now it does the
+	  correct thing which is deleting the key.
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:

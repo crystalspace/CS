@@ -361,7 +361,10 @@ bool csRegistryConfig::InternalSetValue (const char* Key,
 
 void csRegistryConfig::SetStr (const char *Key, const char *Val)
 {
-  InternalSetValue (Key, REG_SZ, Val, strlen (Val) + 1);
+  if (Val == 0)
+    DeleteKey (Key);
+  else
+    InternalSetValue (Key, REG_SZ, Val, strlen (Val) + 1);
 }
 
 void csRegistryConfig::SetInt (const char *Key, int Value)
