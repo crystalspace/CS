@@ -8,6 +8,8 @@ chronological order.
 
 24-Aug-2003
 	- Luca added the CSTOOL library dependency to maya2spr makefile.
+	- Luca reverted his latest commit because the cstool library is not 
+	  required by maya2spr.
 22-Aug-2003
 	- Oktal fixed a couple of typos in the Perl plugin, and fixed a bit of
 	  const correctness in iScriptObject.
