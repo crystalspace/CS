@@ -266,8 +266,10 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 	th = thhack;
       }
 
+      int src_mode = GL_RGB16;
       if (transp && !(txt && txt->KeyColorSet ()))
       {
+        src_mode = GL_RGBA;
 	int pixels = tw * th;
 	csRGBpixel *_src = src;
 	while (pixels--)
@@ -283,7 +285,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
       }
 
       // now that the texture has been generated, send it to openGL
-      glTexImage2D (GL_TEXTURE_2D, mipmaplevel, 4, tw, th,
+      glTexImage2D (GL_TEXTURE_2D, mipmaplevel, /*4*/src_mode, tw, th,
 		    0, GL_RGBA, GL_UNSIGNED_BYTE, src);
 
       // shrink down to the next mipmap level
@@ -307,8 +309,10 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
       tw = txt->get_width ();
       th = txt->get_height ();
       src = txt->get_image_data ();
+      int src_mode = GL_RGB16;
       if (transp && !txt->KeyColorSet ())
       {
+        src_mode = GL_RGBA;
 	int pixels = tw * th;
 	csRGBpixel *_src = src;
 	while (pixels--)
@@ -322,7 +326,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 	}
 	txt->KeyColorSet (true);
       }
-      glTexImage2D (GL_TEXTURE_2D, 0, 4, tw, th,
+      glTexImage2D (GL_TEXTURE_2D, 0, /*4*/src_mode, tw, th,
 		    0, GL_RGBA, GL_UNSIGNED_BYTE, src);
     }
   }
