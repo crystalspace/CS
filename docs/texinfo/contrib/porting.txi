@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Porting, , CVS Guide, Contributing
-@section Porting to a New Platorm
+@section Porting to a New Platform
 @cindex Porting
 
 This section provides information useful to developers who wish to port
