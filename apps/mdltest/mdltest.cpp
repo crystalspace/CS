@@ -344,7 +344,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   const char *Filename = cmdline->GetName (0);
   iModelData *Model = Filename ? ImportModel (Filename) : CreateDefaultModel (tm2);
-  Model->MergeObjects ();
+  Model->MergeObjects (true);
 
 //  Model->LoadImages (vfs, imageio, g3d->GetTextureManager ()->GetTextureFormat ());
   imageio->DecRef ();

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "cstool/mdldata.h"
 #include "csutil/nobjvec.h"
+#include "csutil/objiter.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "iengine/texture.h"
@@ -65,6 +66,14 @@ SCF_DECLARE_FAST_INTERFACE (iModelDataObject);
 SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
 SCF_DECLARE_FAST_INTERFACE (iModelDataVertices);
 SCF_DECLARE_FAST_INTERFACE (iModelDataAction);
+
+CS_DECLARE_OBJECT_ITERATOR (csModelDataObjectIterator, iModelDataObject);
+CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
+CS_DECLARE_OBJECT_ITERATOR (csModelDataActionIterator, iModelDataAction);
+CS_DECLARE_OBJECT_ITERATOR (csModelDataTextureIterator, iModelDataTexture);
+CS_DECLARE_OBJECT_ITERATOR (csModelDataMaterialIterator, iModelDataMaterial);
+
+CS_TYPEDEF_GROWING_ARRAY (csIntArray, int);
 
 //----------------------------------------------------------------------------
 
@@ -388,70 +397,61 @@ void csModelDataObject::MergeCopyObject (iModelDataObject *obj)
   ver->DecRef ();
 
   // copy all polygons
-  iObjectIterator *it = obj->QueryObject ()->GetIterator ();
-  while (!it->IsFinished ())
+  csModelDataPolygonIterator *polyit = new csModelDataPolygonIterator (obj->QueryObject ());
+  while (!polyit->IsFinished ())
   {
-    iModelDataPolygon *poly = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
-	iModelDataPolygon);
-    if (poly)
-    {
-      iModelDataPolygon *NewPoly = new csModelDataPolygon ();
-      scfiObject.ObjAdd (NewPoly->QueryObject ());
+    iModelDataPolygon *poly = polyit->Get ();
+    iModelDataPolygon *NewPoly = new csModelDataPolygon ();
+    scfiObject.ObjAdd (NewPoly->QueryObject ());
 
-      int i;
-      for (i=0; i<poly->GetVertexCount (); i++)
-      {
-        NewPoly->AddVertex (
-	  poly->GetVertex (i) + VertexOffset,
-	  poly->GetNormal (i) + NormalOffset,
-	  poly->GetColor (i) + ColorOffset,
-	  poly->GetTexel (i) + TexelOffset);
-      }
-      NewPoly->SetMaterial (poly->GetMaterial ());
-      NewPoly->DecRef ();
+    int i;
+    for (i=0; i<poly->GetVertexCount (); i++)
+    {
+      NewPoly->AddVertex (
+      poly->GetVertex (i) + VertexOffset,
+      poly->GetNormal (i) + NormalOffset,
+      poly->GetColor (i) + ColorOffset,
+      poly->GetTexel (i) + TexelOffset);
     }
-    it->Next ();
+    NewPoly->SetMaterial (poly->GetMaterial ());
+    NewPoly->DecRef ();
+
+    polyit->Next ();
   }
-  it->DecRef ();
+  delete polyit;
 
   // build the action mapping
   csActionVector ActionMap1, ActionMap2;
 
-  it = scfiObject.GetIterator ();
-  while (!it->IsFinished ())
+  csModelDataActionIterator *actit = new csModelDataActionIterator (&scfiObject);
+  while (!actit->IsFinished ())
   {
-    iModelDataAction *Action = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
-      iModelDataAction);
-    if (Action)
-    {
-      ActionMap1.Push (Action);
-      ActionMap2.Push (NULL);
-      scfiObject.ObjRemove (Action->QueryObject ());
-      Action->DecRef ();
-    }
-    it->Next ();
-  }
-  it->DecRef ();
+    iModelDataAction *Action = actit->Get ();
 
-  it = obj->QueryObject ()->GetIterator ();
-  while (!it->IsFinished ())
-  {
-    iModelDataAction *Action = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
-      iModelDataAction);
-    if (Action)
-    {
-      int n = ActionMap1.GetIndexByName (Action->QueryObject ()->GetName ());
-      if (n == -1) {
-        ActionMap1.Push (NULL);
-        ActionMap2.Push (Action);
-      } else {
-        ActionMap2.Replace (n, Action);
-      }
-      Action->DecRef ();
-    }
-    it->Next ();
+    ActionMap1.Push (Action);
+    ActionMap2.Push (NULL);
+    scfiObject.ObjRemove (Action->QueryObject ());
+
+    actit->Next ();
   }
-  it->DecRef ();
+  delete actit;
+
+  actit = new csModelDataActionIterator (obj->QueryObject ());
+  while (!actit->IsFinished ())
+  {
+    iModelDataAction *Action = actit->Get ();
+
+    int n = ActionMap1.GetIndexByName (Action->QueryObject ()->GetName ());
+    if (n == -1) {
+      ActionMap1.Push (NULL);
+      ActionMap2.Push (Action);
+    } else {
+      ActionMap2.Replace (n, Action);
+    }
+
+    actit->Next ();
+  }
+  delete actit;
 
   // merge the actions
   for (int i=0; i<ActionMap1.Length (); i++)
@@ -468,7 +468,7 @@ void csModelDataObject::MergeCopyObject (iModelDataObject *obj)
     if (Action1) {
       if (Action2) {
         // merge two actions
-	CS_ASSERT (("Merging two animated objects currently not supported", false));
+	CS_ASSERT (("Action conflict detection missed a conflict!!!", false));
       } else {
         // merge action 1 and the default frame of object 2
 	MergeAction (NewAction, Action1, obj->GetDefaultVertices (), false);
@@ -568,69 +568,205 @@ csModelData::csModelData ()
 
 void csModelData::LoadImages (iVFS *vfs, iImageIO *io, int Format)
 {
-  iObjectIterator *it = scfiObject.GetIterator ();
-  while (!it->IsFinished ())
+  csModelDataTextureIterator it (&scfiObject);
+  while (!it.IsFinished ())
   {
-    iModelDataTexture *tex = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
-      iModelDataTexture);
-    if (tex)
-      tex->LoadImage (vfs, io, Format);
-    it->Next ();
+    it.Get ()->LoadImage (vfs, io, Format);
+    it.Next ();
   }
-  it->DecRef ();
 }
 
 void csModelData::RegisterTextures (iTextureList *tm)
 {
-  iObjectIterator *it = scfiObject.GetIterator ();
-  while (!it->IsFinished ())
+  csModelDataTextureIterator it (&scfiObject);
+  while (!it.IsFinished ())
   {
-    iModelDataTexture *tex = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
-      iModelDataTexture);
-    if (tex)
-      tex->Register (tm);
-    it->Next ();
+    it.Get ()->Register (tm);
+    it.Next ();
   }
-  it->DecRef ();
 }
 
 void csModelData::RegisterMaterials (iMaterialList *ml)
 {
-  iObjectIterator *it = scfiObject.GetIterator ();
-  while (!it->IsFinished ())
+  csModelDataMaterialIterator it (&scfiObject);
+  while (!it.IsFinished ())
   {
-    iModelDataMaterial *mat = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
-      iModelDataMaterial);
-    if (mat)
-      mat->Register (ml);
-    it->Next ();
+    it.Get ()->Register (ml);
+    it.Next ();
   }
-  it->DecRef ();
+}
+
+CS_DECLARE_TYPED_VECTOR_NODELETE (csModelDataMaterialVector, iModelDataMaterial);
+
+static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
+{
+/*
+  @@@ untested, thus disabled.
+
+  csModelDataActionIterator it (obj1->QueryObject ());
+  while (!it.IsFinished ())
+  {
+    iModelDataAction *Action = it.Get ();
+
+    iModelDataAction *Action2 = CS_GET_NAMED_CHILD_OBJECT_FAST (obj2->QueryObject (),
+      iModelDataAction, Action->QueryObject ()->GetName ());
+
+    if (Action2)
+    {
+      Action2->DecRef ();
+      return true;
+    }
+    it.Next ();
+  }
+*/
+
+  return false;
+}
+
+static bool CheckMaterialConflict (iModelDataObject *obj1, iModelDataObject *obj2)
+{
+/*
+  @@@ untested, thus disabled.
+
+  csModelDataMaterialVector mat1, mat2;
+
+  {
+    csModelDataPolygonIterator it (obj1->QueryObject ());
+    while (!it.IsFinished ())
+    {
+      iModelDataPolygon *poly = it.Get ();
+      if (poly->GetMaterial ()) mat1.Push (poly->GetMaterial ());
+      it.Next ();
+    }
+  }
+
+  {
+    csModelDataPolygonIterator it (obj2->QueryObject ());
+    while (!it.IsFinished ())
+    {
+      iModelDataPolygon *poly = it.Get ();
+      if (poly->GetMaterial ()) mat2.Push (poly->GetMaterial ());
+      it.Next ();
+    }
+  }
+
+  for (int i=0; i<mat1.Length (); i++)
+  {
+    iModelDataMaterial *m1 = mat1.Get (i);
+    for (int j=0; j<mat2.Length (); j++)
+    {
+      if (mat2.Get (j) != m1)
+        return true;
+    }
+  }
+*/
+  return false;
+}
+
+static bool CheckMaterialConflict (iModelDataObject *obj1)
+{
+  iModelDataMaterial *mat = NULL;
+
+  csModelDataPolygonIterator it = (obj1->QueryObject ());
+  while (!it.IsFinished ())
+  {
+    iModelDataMaterial *mat2 = it.Get ()->GetMaterial ();
+
+    if (mat2)
+      if (!mat) mat = mat2;
+    else if (mat != mat2)
+      return true;
+
+    it.Next ();
+  }
+
+  return false;
 }
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csModelDataObjectVector, iModelDataObject);
 
-void csModelData::MergeObjects ()
+void csModelData::MergeObjects (bool MultiTexture)
 {
-  csModelDataObjectVector Objects;
+  csModelDataObjectVector OldObjects, NewObjects;
 
   while (1)
   {
     iModelDataObject *obj = CS_GET_CHILD_OBJECT_FAST ((&scfiObject), iModelDataObject);
     if (!obj) break;
-    Objects.Push (obj);
+    OldObjects.Push (obj);
     scfiObject.ObjRemove (obj->QueryObject ());
   }
 
-  iModelDataObject *NewObject = new csModelDataObject ();
-  scfiObject.ObjAdd (NewObject->QueryObject ());
-
-  while (Objects.Length () > 0)
+  while (OldObjects.Length () > 0)
   {
-    iModelDataObject *obj = Objects.Pop ();
-    NewObject->MergeCopyObject (obj);
+    iModelDataObject *obj = OldObjects.Pop ();
+
+    // look if we can merge this object with an existing one
+    for (int i=0; i<NewObjects.Length (); i++)
+    {
+      iModelDataObject *obj2 = NewObjects.Get (i);
+      if ((MultiTexture || !CheckMaterialConflict (obj, obj2)) &&
+        !CheckActionConflict (obj, obj2))
+      {
+        obj2->MergeCopyObject (obj);
+	break;
+      }
+    }
+    if (i == NewObjects.Length ())
+    {
+      iModelDataObject *NewObject = new csModelDataObject ();
+      scfiObject.ObjAdd (NewObject->QueryObject ());
+      NewObject->MergeCopyObject (obj);
+      NewObject->DecRef ();
+    }
     obj->DecRef ();
   }
+}
 
-  NewObject->DecRef ();
+void csModelData::SplitObjectsByMaterial ()
+{
+/*
+  csModelDataObjectVector OldObjects, NewObjects;
+
+  while (1)
+  {
+    iModelDataObject *obj = CS_GET_CHILD_OBJECT_FAST ((&scfiObject), iModelDataObject);
+    if (!obj) break;
+    OldObjects.Push (obj);
+    scfiObject.ObjRemove (obj->QueryObject ());
+  }
+
+  while (OldObjects.Length () > 0)
+  {
+    iModelDataObject *obj = OldObjects.Pop ();
+
+    if (!CheckMaterialConflict (obj)) {
+      scfiObject.ObjAdd (obj->QueryObject ());
+    } else {
+      csModelDataMaterialVector NewMaterials;
+      csModelDataObjectVector NewObjects;
+      csIntArray PolygonToNewObject;
+
+      csModelDataPolygonIterator it (obj->QueryObject ());
+      while (!it.IsFinished ())
+      {
+        iModelDataPolygon *poly = it.Get ();
+
+        int n = NewMaterials.Find (poly->GetMaterial ());
+        if (n == -1) {
+          PolygonToNewObject.Push (NewObjects.Length ());
+          iModelDataObject *newobj = new csModelDataObject ();
+          scfiObject.ObjAdd (newobj->QueryObject ());
+          NewMaterials.Push (poly->GetMaterial ());
+          NewObjects.Push (newobj);
+        } else {
+          PolygonToNewObject.Push (n);
+        }
+
+        it.Next ();
+      }
+    }
+    obj->DecRef ();
+  }
+*/
 }

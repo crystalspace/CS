@@ -142,7 +142,13 @@ struct iObject : public iBase
 
 SCF_VERSION (iObjectIterator, 0, 0, 1);
 
-/// This is an iterator for child objects of a csObject.
+/**
+ * This is an iterator for child objects of a csObject. Note that this
+ * iterator only contains type-independent functionality and is therefore
+ * a bit complicated to use (i.e. you'll have to do a lot of
+ * SCF_QUERY_INTERFACE_CALLS if you use it directly). Check out typed object
+ * iterators instead.
+ */
 struct iObjectIterator : public iBase
 {
   /// Move forward

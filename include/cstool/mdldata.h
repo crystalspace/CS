@@ -300,8 +300,16 @@ public:
   void RegisterTextures (iTextureList *tl);
   /// Register all materials using the given material list
   void RegisterMaterials (iMaterialList *ml);
-  /// Merge all contained mesh objects into a single one
-  void MergeObjects ();
+  /**
+   * Merge all contained mesh objects into a single one. If 'MultiTexture'
+   * is true then objects with different textures may be merged.
+   */
+  void MergeObjects (bool MultiTexture);
+  /**
+   * Split objects using more than one material into objects with only
+   * a single material.
+   */
+  void SplitObjectsByMaterial ();
 };
 
 #endif // __MDLDATA_H__
