@@ -320,7 +320,7 @@ csPolygon3D* csPolygonSet::NewPolygon (csTextureHandle* texture)
 
 iPolygon3D *csPolygonSet::PolySet::CreatePolygon (const char *iName)
 {
-  csPolygon3D *p = new csPolygon3D (NULL);
+  csPolygon3D *p = new csPolygon3D ( (csTextureHandle*)NULL);
   p->SetName (iName);
   p->SetSector (scfParent->sector);
   scfParent->AddPolygon (p);

@@ -32,6 +32,7 @@
 #include "csengine/polytext.h"
 #include "csengine/octree.h"
 #include "ipolygon.h"
+#include "csengine/material.h"
 
 class csSector;
 class StatLight;
@@ -402,10 +403,11 @@ private:
   csPolyPlane* plane;
 
   /*
-   * The 3D engine texture reference (contains the handle as returned
-   * by iTextureManager interface).
+   * The material, this contains the texturehandle, the 3D engine texture 
+   * reference (contains the handle as returned
+   * by iTextureManager interface). And more.
    */
-  csTextureHandle* texh;
+  csMaterial* material;
 
   /**
    * General lighting information for this polygon.
@@ -481,7 +483,13 @@ public:
 #endif
 
   /**
+   * Construct a new polygon with the given material. 
+   */
+  csPolygon3D (csMaterial *mat);
+
+  /**
    * Construct a new polygon with the given texture.
+   * This will create a new material specifically for this polygon.
    * If the texture is NULL the polygon is untextured (or you can
    * set the texture later using the SetTexture method).
    */
@@ -728,7 +736,17 @@ public:
   /**
    * Get the texture.
    */
-  csTextureHandle* GetCsTextureHandle () { return texh; }
+  csTextureHandle* GetCsTextureHandle () {return material->GetTextureHandle();}
+
+  /**
+   * Set the material
+   */
+  void SetMaterial(csMaterial *mat);
+
+  /**
+   * Get the material
+   */
+  inline csMaterial *GetMaterial() const {return material;}
 
   /**
    * Return true if this polygon or the texture it uses is transparent.

@@ -218,12 +218,49 @@ IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::Poly3D)
   IMPLEMENTS_INTERFACE (iPolygon3D)
 IMPLEMENT_EMBEDDED_IBASE_END
 
+
+csPolygon3D::csPolygon3D (csMaterial* mat) : csObject (),
+  csPolygonInt (), vertices (4)
+{
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
+  material = mat;
+
+  txt_info = NULL;
+  txt_share_list = NULL;
+
+  plane = NULL;
+
+  portal = NULL;
+
+  sector = NULL;
+  orig_poly = NULL;
+  txt_share_list = NULL;
+
+  flags.SetAll (CS_POLY_LIGHTING);
+
+  light_info.cosinus_factor = -1;
+  light_info.lightpatches = NULL;
+  light_info.dyn_dirty = true;
+  light_info.flat_color.red = 0;
+  light_info.flat_color.green = 0;
+  light_info.flat_color.blue = 0;
+
+  SetTextureType (POLYTXT_LIGHTMAP);
+
+  VectorArray.IncRef ();
+#ifdef DO_HW_UVZ
+  uvz = NULL;
+  isClipped=false;
+#endif
+}
+
 csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
   csPolygonInt (), vertices (4)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
-  texh = texture;
+  material = new csMaterial();
   if (texture) SetTexture (texture);
 
   txt_info = NULL;
@@ -269,7 +306,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : iBase(), csObject (),
   plane = poly.plane;
   plane->IncRef ();
 
-  texh = poly.texh;
+  material = poly.material;
 
   poly.flags.Set (CS_POLY_NO_DRAW);
   orig_poly = poly.orig_poly ? poly.orig_poly : &poly;
@@ -459,12 +496,13 @@ bool csPolygon3D::Overlaps (csPolygonInt* overlapped)
 
 void csPolygon3D::SetTexture (csTextureHandle* texture)
 {
-  texh = texture;
+  material->SetTextureHandle(texture);
 }
 
 iTextureHandle* csPolygon3D::GetTextureHandle ()
 {
-  return texh ? texh->GetTextureHandle () : (iTextureHandle*)NULL;
+  return material->GetTextureHandle() ? 
+    material->GetTextureHandle()->GetTextureHandle () : (iTextureHandle*)NULL;
 }
 
 void csPolygon3D::Poly3D::CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix)
@@ -598,10 +636,10 @@ void csPolygon3D::Finish ()
     CsPrintf (MSG_INTERNAL_ERROR, "No txt_info in polygon!\n");
     fatal_exit (0, false);
   }
-  lmi->Setup (this, texh);
+  lmi->Setup (this, material->GetTextureHandle());
   lmi->tex->SetLightMap (NULL);
   if (portal)
-    portal->SetTexture (texh->GetTextureHandle ());
+    portal->SetTexture (material->GetTextureHandle()->GetTextureHandle ());
 
   if (flags.Check (CS_POLY_LIGHTING)
    && TEXW (lmi->tex) * TEXH (lmi->tex) < 1000000)
