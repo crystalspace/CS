@@ -35,6 +35,21 @@ struct iTextureManager;
 struct iRenderBufferManager;
 struct iLightingManager;
 
+
+
+/**\name iRender3D::BeginDraw() flags
+ * @{ */
+/// We're going to draw 2D graphics
+#define CSDRAW_2DGRAPHICS   0x00000001
+/// We're going to draw 3D graphics
+#define CSDRAW_3DGRAPHICS   0x00000002
+/// Clear Z-buffer ?
+#define CSDRAW_CLEARZBUFFER 0x00000010
+/// Clear frame buffer ?
+#define CSDRAW_CLEARSCREEN  0x00000020
+/** @} */
+
+
 class csRender3dCaps
 {
 };
