@@ -186,13 +186,6 @@ Various other commands.
 This command only works for the top-level thing. It indicates that the
 thing can possibly move around. If you don't set this option then it is
 illegal to later move the thing.
-@item VISTREE(boolean)
-This command only works for the top-level thing. It indicates that this
-thing will have an octree + mini-bsp trees. This is used for visibility
-culling. Usually only big things will have VISTREE and usually there is
-only one thing in a sector which has this flag set. In this case you probably
-want to use the @samp{CULLER} keyword in the sector to indicate that
-this thing is the one containing the visibility culling information.
 @item FASTMESH(boolean)
 This command only works for the top-level thing. It indicates that this
 mesh will be rendered using a faster technique. At this moment this is

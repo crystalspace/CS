@@ -14,6 +14,18 @@ The history order is reversed so that new features are at the top.
 	  old culler and PVS.
 	- The parser will now give an error if 'culler' or 'vistree' is
 	  used in a map file.
+	- Some documentation updates:
+	    - Extended apimod96.txi with information about octree removal.
+	    - Removed section about csParser. It is gone.
+	    - Extended apimod96.txi with information about the XML format.
+	    - Removed documentation about obsolete octree based commands
+	      in walktest.
+	    - Fixed dirhier.txi for the octree removal. Added mention
+	      of frustvis.
+	    - Fixed the feature list.
+	    - Updated the viscull.txi document a bit. But this still needs
+	      more work for Dynavis and Frustvis.
+	    - Removed mention of VISTREE from thing mesh object documentation.
 13-Dec-2002
         - Andreas Busch cleaned up some old/unused prototypes and outdated
           comments in walktest/handle_keys.

@@ -32,13 +32,26 @@ called @code{iMeshObject::GetObjectModel()} which will return an instance of
 
 A similar change has happened in the @code{iVisibilityObject} interface.
 
-@subheading csParser changes
-@cindex @code{csParser}
+@subheading XML
+@cindex @sc{xml}
+
+The map format has changed to @sc{xml}. Use the @file{cs2xml} tool to
+convert old maps like this (with a real path to a zip file):
+
+@example
+  cs2xml data/oldlevel.zip
+@end example
+
+or (with a @sc{vfs} path):
+
+@example
+  cs2xml /this/mydata/sprite1
+@end example
+
+@subheading csGetObject and csGetCommand
 @cindex @code{csGetObject()}
 
-Functions like @code{csGetObject()} and @code{csGetCommand()} which
-were used to implement parsing functionalities in CS have now been put
-into the @code{csParser} class.
+The old parser is gone. We switched to @sc{xml}.
 
 @subheading Fast @sc{scf} Interfaces
 @cindex @code{SCF_QUERY_INTERFACE_FAST}
@@ -118,5 +131,21 @@ The interpretation of the matrix used in the @samp{hardmove} tag
 for mesh factories (@samp{meshfact}) has been inverted so it is more
 logical and also corresponds with the wah @samp{hardmove} is interpreted
 for mesh objects (@samp{meshobj}).
+
+@subheading Octree Removal
+
+The old octree culler is now completely gone. Instead you should use
+@emph{Dynavis} now. If you still have an old level that uses this culler
+then you can try to convert it using the @file{levtool} utility but this
+is only a temporary measure. It is a lot better to design the level with
+@emph{Dynavis} in mind. To convert an old level do this:
+
+@example
+  levtool -dynavis old_level.zip
+@end example
+
+Note that the statements @samp{culler} and @samp{vistree} are no longer
+supported in world files. The loader will give an error if it finds them.
+
 
 

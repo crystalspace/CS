@@ -17,10 +17,13 @@ system is listed here it does not necessarily mean that it is 100% supported:
 
 @itemize @bullet
 @item
-BeOS
+BeOS (unmaintained)
 
 @item
-@sc{dos}, win32 (Windows 9x/NT/ME/2000/XP)
+@sc{dos} (unmaintained)
+
+@item
+win32 (Windows 9x/NT/ME/2000/XP)
 
 @item
 FreeBSD, NetBSD
@@ -35,7 +38,7 @@ MacOS/X, MacOS/X Server 1.0 (Rhapsody)
 OPENSTEP, NeXTSTEP
 
 @item
-@sc{os/2}
+@sc{os/2} (unmaintained)
 @end itemize
 
 @noindent
@@ -83,7 +86,7 @@ events (queues, cords, outlets)
 user input
 
 @item
-md5 signatures
+@sc{md5} signatures
 
 @item
 random number generator
@@ -137,9 +140,6 @@ image loaders (@sc{bmp}, @sc{gif}, @sc{jpg}, @sc{png}, @sc{sgi}, @sc{tga},
 
 @item
 portals and sectors
-
-@item
-polygon trees (@sc{bsp}, octree)
 
 @item
 lighting (static, pseudo-dynamic, dynamic, halos, shadows, radiosity)
@@ -203,7 +203,7 @@ pull-down console
 network sockets
 
 @item
-collision detection (using @sc{rapig})
+collision detection (using @sc{rapid} or @sc{opcode})
 
 @item
 bitmapped and vector fonts

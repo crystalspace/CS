@@ -106,16 +106,12 @@ libraries (csutil, csgeom, csgfxldr).  The 3D engine exports a number of
 @table @code
 @item CS/libs/csengine/basic
 Collections, movable sector list, polygon edges
-@item CS/libs/csengine/culler
-Visibility culling
 @item CS/libs/csengine/light
 Lighting system
 @item CS/libs/csengine/objects
 Things and mesh objects
 @item CS/libs/csengine/polygon
 Polygons and portals
-@item CS/libs/csengine/polytree
-BSP trees and octrees
 @end table
 
 @item CS/libs/csgeom
@@ -229,6 +225,8 @@ visibility culling plug-ins
 @table @code
 @item CS/plugins/culling/dynavis
 Dynavis visibility culling system
+@item CS/plugins/culling/frustvis
+Frustvis visibility culling system (default culler if no other is selected)
 @end table
 
 @item CS/plugins/device

@@ -323,14 +323,6 @@ Clear all pseudo-dynamic lights in the world to black.
 Set the color for the selected pseudo-dynamic light to @var{r}, @var{g},
 @var{b}.
 
-@item db_osolid
-Debug command to create things from all solid space node boundaries for
-the octree.
-
-@item db_curleaf
-Debug command to find the octree leaf where the camera is located and
-then show the dimensions of this leaf on standard output.
-
 @item record
 Start/stop recording camera movement. If you have a previous recording in
 memory then a the new camera movements will be appended.
