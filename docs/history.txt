@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+31-Jan-2003
+	- res fixed MSVC assertion in csString::Collapse() if the string
+	  contains characters >= 0x80
 30-Jan-2003
 	- Matthias Braun made plugin makefiles using the CFLAGS from external
 	  libraries (3ds, mikmod, ogg/vorbis, openal, ode plugins)
