@@ -530,7 +530,14 @@ void csGraphics2DGLX::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
 
   glShadeModel(GL_FLAT);
   glEnable(GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
+  glColor4f(1.,1.,1.,1.);
+  if (txt_mm->get_transparent())
+  {
+    glEnable (GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  }
+  else
+    glDisable (GL_BLEND);
   glDisable (GL_DEPTH_TEST);
   glBindTexture(GL_TEXTURE_2D,texturehandle);
   
