@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp apps/tutorial/simplevp
 
 simplevp.EXE = simplevp$(EXE)
-INC.simplevp = $(wildcard apps/tutorial/simplevp/*.h)
-SRC.simplevp = $(wildcard apps/tutorial/simplevp/*.cpp)
+INC.simplevp = $(wildcard apps/examples/simplevp/*.h)
+SRC.simplevp = $(wildcard apps/examples/simplevp/*.cpp)
 OBJ.simplevp = $(addprefix $(OUT)/,$(notdir $(SRC.simplevp:.cpp=$O)))
 DEP.simplevp = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.simplevp = $(foreach d,$(DEP.simplevp),$($d.LIB))
