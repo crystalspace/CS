@@ -7,7 +7,12 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 22-Sep-2004
-	- PK added #include <ivaria/ode.h> to CS/apps/tutorial/phystut/phystut.h.
+	- Jorrit changed the loader so that it only prints certain
+	  notifications if -verbose is given on the commandline. These
+	  notifications have to do with materials being loaded differently
+	  in case they are not found on the requested location.
+	- PK added #include <ivaria/ode.h> to
+	  CS/apps/tutorial/phystut/phystut.h.
 	- PK moved the following files from cstool to plugin/proctex/standard:
 	    - prdots.cpp   / prdots.h
 	    - prfire.cpp   / prfire.h
@@ -32,6 +37,8 @@ chronological order.
 	  msvcgen/project6x.tlib on 19-Sep-2004 which caused the linker's /out:
 	  option to be omitted from the generated project files. This caused
 	  built .exe and .dll resources to be deposited in the wrong location.
+	- Jorrit changed lighter and cslight to look for a "world" file
+	  with ChDirAuto() so they can load worlds from VFS more easily.
 	- Eric Sunshine fixed logic flaw in the re-written (18-Sep-2004)
 	  csGetConfigPath() for MacOS/X in which it would sometimes return the
 	  incorrect path.

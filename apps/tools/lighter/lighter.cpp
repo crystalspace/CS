@@ -196,7 +196,7 @@ bool Lighter::SetMapDir (const char* map_dir)
   csRef<iVFS> myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   csStringArray paths;
   paths.Push ("/lev/");
-  if (!myVFS->ChDirAuto (map_dir, &paths))
+  if (!myVFS->ChDirAuto (map_dir, &paths, 0, "world"))
     return Report ("Error setting directory '%s'!", map_dir);
   return true;
 }

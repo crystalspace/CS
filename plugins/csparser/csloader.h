@@ -698,6 +698,8 @@ public:
   /********** iLoader implementation **********/
   SCF_DECLARE_IBASE;
 
+  static bool do_verbose;
+
   // system driver
   iObjectRegistry* object_reg;
   // virtual file system

@@ -68,6 +68,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
+#include "iutil/cmdline.h"
 #include "imesh/thing.h"
 #include "imesh/nullmesh.h"
 #include "imesh/mdlconv.h"
@@ -138,8 +139,9 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
   if (mat)
     return mat;
 
-  loader->ReportNotify ("Could not find material '%s'. "
-    "Creating new material using texture with that name", filename);
+  if (csLoader::do_verbose)
+    loader->ReportNotify ("Could not find material '%s'. "
+      "Creating new material using texture with that name", filename);
   iTextureWrapper* tex = FindTexture (filename);
   if (tex)
   {
@@ -177,8 +179,9 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
   if (mat)
     return mat;
 
-  loader->ReportNotify ("Could not find material '%s'. "
-    "Creating new material using texture with that name", name);
+  if (csLoader::do_verbose)
+    loader->ReportNotify ("Could not find material '%s'. "
+      "Creating new material using texture with that name", name);
   iTextureWrapper* tex = FindNamedTexture (name,filename);
   if (tex)
   {
@@ -266,8 +269,9 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
 
   if (!result)
   {
-    loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
-      name);
+    if (csLoader::do_verbose)
+      loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
+        name);
     csRef<iTextureWrapper> rc = loader->LoadTexture (name, name);
     if (region) region->QueryObject ()->ObjAdd (rc->QueryObject ());
     result = rc;
@@ -289,9 +293,11 @@ iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
 
   if (!result)
   {
-    loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
-      name);
-    csRef<iTextureWrapper> rc = loader->LoadTexture (name, filename, 2, 0, false, false);
+    if (csLoader::do_verbose)
+      loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
+        name);
+    csRef<iTextureWrapper> rc = loader->LoadTexture (name, filename, 2, 0,
+      false, false);
     if (region)
       region->QueryObject ()->ObjAdd (rc->QueryObject ());
     result = rc;
@@ -335,8 +341,9 @@ iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
   if (mat)
     return mat;
 
-  loader->ReportNotify ("Could not find material '%s'. "
-    "Creating new material using texture with that name", name);
+  if (csLoader::do_verbose)
+    loader->ReportNotify ("Could not find material '%s'. "
+      "Creating new material using texture with that name", name);
   iTextureWrapper* tex = FindTexture (name);
   if (tex)
   {
@@ -374,8 +381,9 @@ iMaterialWrapper* ThreadedLoaderContext::FindNamedMaterial (const char* name,
   if (mat)
     return mat;
 
-  loader->ReportNotify ("Could not find material '%s'. "
-    "Creating new material using texture with that name", name);
+  if (csLoader::do_verbose)
+    loader->ReportNotify ("Could not find material '%s'. "
+      "Creating new material using texture with that name", name);
   iTextureWrapper* tex = FindNamedTexture (name,filename);
   if (tex)
   {
@@ -462,8 +470,9 @@ iTextureWrapper* ThreadedLoaderContext::FindTexture (const char* name)
 
   if (!result)
   {
-    loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
-      name);
+    if (csLoader::do_verbose)
+      loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
+        name);
     csRef<iTextureWrapper> rc = loader->LoadTexture (name, name);
     if (region) region->QueryObject ()->ObjAdd (rc->QueryObject ());
     result = rc;
@@ -485,8 +494,9 @@ iTextureWrapper* ThreadedLoaderContext::FindNamedTexture (const char* name,
 
   if (!result)
   {
-    loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
-      name);
+    if (csLoader::do_verbose)
+      loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
+        name);
     csRef<iTextureWrapper> rc = loader->LoadTexture (name, filename);
     if (region) region->QueryObject ()->ObjAdd (rc->QueryObject ());
     result = rc;
@@ -495,6 +505,8 @@ iTextureWrapper* ThreadedLoaderContext::FindNamedTexture (const char* name,
 }
 
 //---------------------------------------------------------------------------
+
+bool csLoader::do_verbose = false;
 
 void csLoader::ReportError (const char* id, const char* description, ...)
 {
@@ -950,6 +962,7 @@ csLoader::csLoader (iBase *p)
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   object_reg = 0;
+  do_verbose = false;
 }
 
 csLoader::~csLoader()
@@ -972,6 +985,10 @@ csLoader::~csLoader()
 bool csLoader::Initialize (iObjectRegistry *object_Reg)
 {
   csLoader::object_reg = object_Reg;
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  do_verbose = cmdline->GetOption ("verbose") != 0;
+
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
@@ -1454,7 +1471,8 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
           break;
         case XMLTOKEN_SHADERS:
 #ifdef CS_USE_NEW_RENDERER
-          ParseShaderList (ldr_context, child);
+          if (!ParseShaderList (ldr_context, child))
+	    return false;
 #endif //CS_USE_NEW_RENDERER
           break;
 	case  XMLTOKEN_VARIABLELIST:
@@ -3625,9 +3643,10 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	    if (!csIsPowerOf2 (cellsize) )
 	    {
 	      int newcellsize = csFindNearestPowerOf2(cellsize);
-	      ReportNotify ("lightmap cell size %d "
-	        "is not a power of two, using %d", 
-	        cellsize, newcellsize);
+	      if (do_verbose)
+	        ReportNotify ("lightmap cell size %d "
+	          "is not a power of two, using %d", 
+	          cellsize, newcellsize);
 	      cellsize = newcellsize;
 	    }
 	    csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
@@ -3645,7 +3664,10 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	  }
 	  else
 	  {
-	    ReportNotify ("bogus lightmap cell size %d", cellsize);
+	    SyntaxService->ReportError (
+ 	          "crystalspace.maploader.parse.settings",
+	          child, "Bogus lightmap cell size %d", cellsize);
+	    return false;
 	  }
         }
 	break;
@@ -3660,7 +3682,9 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	  }
 	  else
 	  {
-	    ReportNotify ("bogus maximum lightmap size %dx%d", max[0], max[1]);
+	    SyntaxService->ReportError (
+ 	          "crystalspace.maploader.parse.settings",
+	          child, "Bogus maximum lightmap size %dx%d", max[0], max[1]);
 	    return false;
 	  }
         }
@@ -5000,7 +5024,7 @@ bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
   if(!shaderMgr)
   {
     ReportNotify ("iShaderManager not found, ignoring shaders!");
-    return false;
+    return true;
   }
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
