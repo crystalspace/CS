@@ -23,6 +23,7 @@
 #include "csgeom/plane3.h"
 #include "csgeom/matrix3.h"
 #include "csutil/garray.h"
+#include "csutil/refarr.h"
 #include "plugins/video/renderer/common/vbufmgr.h"
 #include "ivideo/graph3d.h"
 #include "csutil/cscolor.h"
@@ -38,11 +39,10 @@ struct Indexes
 
 class csVertexIndexArrayNode
 {
-  public:
-    CS_DECLARE_GROWING_ARRAY(indices,Indexes);
+public:
+  CS_DECLARE_GROWING_ARRAY(indices,Indexes);
 };
 
-typedef iPolygonTexture* iPolyTex_p;
 typedef csVertexIndexArrayNode* csIndexVertex;
 
 class csTrianglesPerMaterial
@@ -59,7 +59,6 @@ public:
   CS_DECLARE_GROWING_ARRAY(vertices,csIndexVertex);
   CS_DECLARE_GROWING_ARRAY(triangles,csTriangle);
 
-  CS_DECLARE_GROWING_ARRAY(infoPolygons,iPolyTex_p);
   CS_DECLARE_GROWING_ARRAY(texels, csVector2);
   CS_DECLARE_GROWING_ARRAY(verticesPoints, csVector3);
 
@@ -70,14 +69,12 @@ public:
 
   void ClearVertexArray();
   void CopyTrianglesGrowToTriangles();
-  void CopyInfoPolygons();
 
   /// Return the number of triangles
   int TriangleCount() { return numTriangles;};
 };
 
 
-//class TrianglesNode;
 class TrianglesNode
 {
 public:
@@ -102,23 +99,23 @@ public:
 };
 
 
-/**This class stores triangles thatcould share the same superlightmap
+/**
+ * This class stores triangles thatcould share the same superlightmap
  */
-
 class csTrianglesPerSuperLightmap
 {
 public:
   /// triangles which shares the same superlightmap
-  CS_DECLARE_GROWING_ARRAY(triangles,csTriangle);
+  CS_DECLARE_GROWING_ARRAY (triangles, csTriangle);
 
   /// Vertices of those triangles
-  CS_DECLARE_GROWING_ARRAY(vertices,csVector3);
+  CS_DECLARE_GROWING_ARRAY (vertices, csVector3);
 
   /// texels of those triangles
-  CS_DECLARE_GROWING_ARRAY(texels,csVector2);
+  CS_DECLARE_GROWING_ARRAY (texels, csVector2);
 
   /// The lightmaps in the superlightmap
-  CS_DECLARE_GROWING_ARRAY(lightmaps,iPolyTex_p);
+  csRefArray<iPolygonTexture> lightmaps;
 
   /**
    * Array for keeping which csFogInfo indexescorresponds to every
@@ -131,7 +128,7 @@ public:
    * if it was an original vertex (Basically it stores original
    * vertices indices).
    */
-  CS_DECLARE_GROWING_ARRAY(fogInfo, int);
+  CS_DECLARE_GROWING_ARRAY (fogInfo, int);
 
   /**
    * Auxiliary array for vertices: because we want to create as few
@@ -139,8 +136,8 @@ public:
    * same coordinates but
    * different lightmap coordinates
    */
-  CS_DECLARE_GROWING_ARRAY(vertexIndices,csIndexVertex);
-  CS_DECLARE_GROWING_ARRAY(rectangles, csRect);
+  CS_DECLARE_GROWING_ARRAY (vertexIndices, csIndexVertex);
+  CS_DECLARE_GROWING_ARRAY (rectangles, csRect);
 
   //SuperLightmap Id.
   int slId;
@@ -247,9 +244,6 @@ protected:
 
   CS_DECLARE_GROWING_ARRAY (normals, csVector3);
 
-  //It stores the lightmaps already stored in some SuperLightMap
-  CS_DECLARE_GROWING_ARRAY (lightmapArray, iPolyTex_p);
-
   csVector3 * vertices;
   int matCount;
   int verticesCount;
@@ -304,8 +298,6 @@ public:
 
   int GetUVCount(TrianglesSuperLightmapNode* t);
   int GetUVCount(TrianglesNode* t);
-
-  //iPolyTex_p* GetLightMaps(TrianglesNode* t);
 
   /// Gets the number of materials of the mesh
   virtual int GetMaterialCount() const { return matCount;}

@@ -129,25 +129,6 @@ CS_IMPLEMENT_STATIC_VAR (Get_clipped_user13, ogl_g3dcom_clipped_user, ())
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_user14, ogl_g3dcom_clipped_user, ())
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_user15, ogl_g3dcom_clipped_user, ())
 
-///Array for clipping polygon meshes with lightmaps
-CS_TYPEDEF_GROWING_ARRAY (ogl_g3dcom_clipped_lightmaps, iPolyTex_p);
-CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmaps, ogl_g3dcom_clipped_lightmaps, ())
-/// Array for clipping.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_triangles, csTriangle);
-CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_triangles, ogl_g3dcom_clipped_lightmap_triangles, ())
-/// Array for clipping.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_translate, int);
-CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_translate, ogl_g3dcom_clipped_lightmap_translate, ())
-/// Array for clipping.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_texels, csVector2);
-CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_texels, ogl_g3dcom_clipped_lightmap_texels, ())
-/// Array for clipping.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_fog, csColor);
-CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_fog, ogl_g3dcom_clipped_lightmap_fog, ())
-/// Array for clipping
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_fog_texels, csVector2);
-CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_fog_texels, ogl_g3dcom_clipped_lightmap_fog_texels, ())
-
 CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo1, csClipInfo, [100])
 CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo2, csClipInfo, [100])
 CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo3, csClipInfo, [100])
@@ -167,13 +148,6 @@ static ogl_g3dcom_clipped_fog *clipped_fog = NULL;
 static ogl_g3dcom_clipped_user *clipped_user[CS_VBUF_TOTAL_USERA] = {
   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
-
-static ogl_g3dcom_clipped_lightmaps *clipped_lightmaps = NULL;
-static ogl_g3dcom_clipped_lightmap_triangles *clipped_lightmap_triangles = NULL;
-static ogl_g3dcom_clipped_lightmap_translate *clipped_lightmap_translate = NULL;
-static ogl_g3dcom_clipped_lightmap_texels *clipped_lightmap_texels = NULL;
-static ogl_g3dcom_clipped_lightmap_fog *clipped_lightmap_fog = NULL;
-static ogl_g3dcom_clipped_lightmap_fog_texels *clipped_lightmap_fog_texels = NULL;
 
 /*=========================================================================
  Method implementations
@@ -292,13 +266,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
     clipped_user[13] = Get_clipped_user13();
     clipped_user[14] = Get_clipped_user14();
     clipped_user[15] = Get_clipped_user15();
-
-    clipped_lightmaps = Get_clipped_lightmaps ();
-    clipped_lightmap_triangles = Get_clipped_lightmap_triangles();
-    clipped_lightmap_translate = Get_clipped_lightmap_translate();
-    clipped_lightmap_texels = Get_clipped_lightmap_texels();
-    clipped_lightmap_fog = Get_clipped_lightmap_fog();
-    clipped_lightmap_fog_texels = Get_clipped_lightmap_fog_texels();
   }
 
   // See note above.
@@ -315,12 +282,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   clipped_fog->IncRef ();
   for( int i=0; i<CS_VBUF_TOTAL_USERA; i++ )
     clipped_user[i]->IncRef ();
-
-  clipped_lightmap_triangles->IncRef();
-  clipped_lightmap_translate->IncRef();
-  clipped_lightmap_texels->IncRef();
-  clipped_lightmap_fog->IncRef();
-  clipped_lightmap_fog_texels->IncRef();
 
   // Are we going to use the inverted orthographic projection matrix?
   inverted = false;
@@ -353,14 +314,6 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   int i;
   for (i=0 ; i<CS_VBUF_TOTAL_USERA ; i++)
     clipped_user[i]->DecRef ();
-
-  clipped_lightmap_triangles->DecRef();
-  clipped_lightmap_translate->DecRef();
-  clipped_lightmap_texels->DecRef();
-  clipped_lightmap_fog->DecRef();
-  clipped_lightmap_fog = NULL;
-  clipped_lightmap_fog_texels->DecRef();
-  clipped_lightmap_fog_texels = NULL;
 }
 
 void csGraphics3DOGLCommon::Report (int severity, const char* msg, ...)

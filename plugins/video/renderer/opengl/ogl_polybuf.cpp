@@ -123,8 +123,8 @@ csTrianglesPerMaterial::csTrianglesPerMaterial(int numVertex)
 {
   numVertices = 0;
   numTriangles = 0;
-  vertices.SetLimit(numVertex);
-  verticesPoints.SetLimit(numVertex);
+  vertices.SetLimit (numVertex);
+  verticesPoints.SetLimit (numVertex);
   int i;
   for(i = 0; i < numVertex; i++) vertices[i] = NULL;
 
@@ -169,20 +169,6 @@ void csTrianglesPerMaterial::ClearVertexArray()
 
 }
 
-void csTrianglesPerMaterial::CopyInfoPolygons()
-{
-  /*triangleInfo = new csTriangleInfo[numTriangles];
-  int i;
-
-  triangleInfo = infoPolygons.GetArray();
-  for(i = 0; i < numTriangles; i++)
-     delete infoPolygons[i];
-
-  infoPolygons.SetLength(0);
-  */
-}
-
-
 csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap()
 {
   region = new csSubRectangles (
@@ -219,22 +205,16 @@ csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap(int numVertex)
   isUnlit = false;
 }
 
-csTrianglesPerSuperLightmap::~csTrianglesPerSuperLightmap()
+csTrianglesPerSuperLightmap::~csTrianglesPerSuperLightmap ()
 {
   int i;
-  for(i = 0; i < numLightmaps; i++)
-    lightmaps[i]->DecRef();
   int numIndices = vertexIndices.Length();
-  for(i = 0; i < numIndices; i++)
+  for (i = 0 ; i < numIndices ; i++)
   {
-    if(vertexIndices[i] != NULL)
-    {
-      delete vertexIndices[i];
-    }
+    delete vertexIndices[i];
   }
-  if(cacheData) cacheData->Clear();
+  if (cacheData) cacheData->Clear();
   delete region;
-
 }
 
 
@@ -286,9 +266,8 @@ void TrianglesSuperLightmapList::Add(TrianglesSuperLightmapNode* t)
   numElems++;
 }
 
-
-
-/** Search a superlightmap to fit the lighmap in the superLM list
+/**
+ * Search a superlightmap to fit the lighmap in the superLM list
  * if it can't find any creates a new one.
  * The case that the polygon has no superlightmap is supported too.
  * If the polygontexture has no lightmap it means its not lighted,
@@ -350,11 +329,11 @@ int csTriangleArrayPolygonBuffer::AddSingleVertex (csTrianglesPerMaterial* pol,
      * to a vertex that has the same uv's
      */
     int j;
-    for(j = 0; j < pol->vertices[verts[i]]->indices.Length(); j++)
+    for (j = 0; j < pol->vertices[verts[i]]->indices.Length(); j++)
     {
       indexVert = pol->vertices[verts[i]]->indices[j].vertex;
       int uvIndex = pol->vertices[verts[i]]->indices[j].uv;
-      //let's see if this vertex has the same uv's
+      // Let's see if this vertex has the same uv's.
       if (uv == pol->texels[uvIndex]) break;
       indexVert = -1;
     }
@@ -373,7 +352,7 @@ int csTriangleArrayPolygonBuffer::AddSingleVertex (csTrianglesPerMaterial* pol,
   {
     Indexes ind;
     pol->verticesPoints.Push(vertices[verts[i]]);
-    ind.vertex = pol->verticesPoints.Length() - 1; // this is the index!!
+    ind.vertex = pol->verticesPoints.Length() - 1; // This is the index!!
     pol->texels.Push (uv);
     ind.uv = pol->texels.Length() - 1;
     pol->vertices[verts[i]]->indices.Push(ind);
@@ -483,8 +462,6 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
     triangle.c = AddSingleVertex (pol, verts, i+1, uv[2]);
 
     pol->triangles.Push (triangle);
-    pol->infoPolygons.Push (poly_texture);
-    if (poly_texture) poly_texture->IncRef();
 
     pol->numTriangles++;
   }
@@ -596,7 +573,6 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
   triSuperLM->rectangles.Push (rect);
   triSuperLM->numLightmaps++;
   triSuperLM->lightmaps.Push (poly_texture);
-  poly_texture->IncRef ();
 }
 
 void csTriangleArrayPolygonBuffer::MarkLightmapsDirty()
@@ -650,7 +626,7 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
       poly_texture, mat_index, poly_normal);
     TrianglesNode* tNode = new TrianglesNode ();
     tNode->info = pol;
-    polygons.Add(tNode);
+    polygons.Add (tNode);
 
     matCount ++;
   }

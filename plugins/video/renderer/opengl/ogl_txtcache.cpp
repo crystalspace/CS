@@ -625,7 +625,8 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
   //Check if the superLightmap is already in the cache
 
   csRect* rectangleArray = s->rectangles.GetArray();
-  iPolygonTexture** lmArray = s->lightmaps.GetArray();
+  const csRefArray<iPolygonTexture>& lmArray = s->lightmaps;
+  //iPolygonTexture** lmArray = s->lightmaps.GetArray();
 
   int i;
   int numLightmaps = s->numLightmaps;
