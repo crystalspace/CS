@@ -59,6 +59,14 @@ The history order has been reversed so that new features are at the top.
 	      invoked.
 	    - Fixed memory leaks of strings and other objects.
 	    - Now uses 'delete[]' where appropriate rather than 'delete'.
+	- Eric Sunshine fixed the csClear plugin so that it is now entirely
+	  self-contained (linkage-wise) by patching the makefile to link the
+	  plugin against all libraries which it references.
+	- Eric Sunshine was finally able to remove the special-case NeXT-
+	  specific makefile hack from scfreg.mak which was needed because some
+	  plugins (specifically csclear and csnsmgr) were not self-contained.
+	- Eric Sunshine patched bin/makefile.py so that it tries just a little
+	  bit harder to keep the generated makefile under 80 columns.
 19-May-2000
 	- Alex Pfaffe did various changes to terrain engine again.
 	- Various small changes to csTerrain to help Alex integrate his
