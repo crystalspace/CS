@@ -216,7 +216,7 @@
 // Defines that this platform supports hardware memory-mapped i/o
 #define CS_HAS_MEMORY_MAPPED_IO 1
 
-// Windows specific memory-mapped I/O stuff.
+/// Windows specific memory-mapped I/O stuff.
 struct mmioInfo
 {
     /// Handle to the mapped file 
@@ -224,6 +224,9 @@ struct mmioInfo
 
     /// Handle to the mapping
     HANDLE hFileMapping;
+    
+    /// Whether to close the handles
+    bool close;
   
     /// Base pointer to the data
     unsigned char *data;
@@ -520,4 +523,12 @@ extern "C" __declspec(dllexport) \
 const char* plugin_compiler() { return CS_COMPILER_NAME; }
 
 #endif // !CS_STATIC_LINKED
+
+// printf() replacements, to deal with UTF-8 correctly on all Windowses
+//#define		printf		_cs_printf
+//#define		vprintf		_cs_vprintf
+
+//extern int _cs_vprintf (const char* format, va_list args);
+//extern int _cs_printf (const char* format, ...);
+
 #endif // __CS_CSOSDEFS_H__

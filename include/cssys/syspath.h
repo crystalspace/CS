@@ -210,4 +210,7 @@ public:
   { return paths[n]; }
 };
 
+/** @} */
+/** @} */
+
 #endif

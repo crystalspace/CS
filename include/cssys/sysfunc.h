@@ -114,7 +114,7 @@ csString csGetUsername();
 /**
  * Get a platform-specific config object.
  * The data is stored in a platform-specific manner - e.g. in "Documents and
- * Settings\Application Data" on Windows, or $HOME on Unix.
+ * Settings\\Application Data" on Windows, or $HOME on Unix.
  * \param key Used to distinguish different stored configurations.
  * \return A config 'file'. Might return 0 on some platforms or in case an
  *   error occured.

@@ -89,7 +89,6 @@ bool csGetLoadLibraryVerbose();
  * native file names and their respective metadata.
  * \param dir Directory to scan.
  * \param plugins Native file names.
- * \param metadata Metadata.
  * \param recursive Recursively scan all subdirectories.
  * \remark It is the responsibility of the caller to do any cleaning
  *   of \p metadata and \p plugins, if desired.
@@ -110,7 +109,11 @@ csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs,
 
 /**
  * Query plugin metadata.
- * \remark 
+ * \remark \p fullPath should either be a string retrieved from 
+ *   csScanPluginDir() or csScanPluginDirs(), or a fully qualified native
+ *   path of the plugin binary, however the suffix should ALWAYS be 
+ *   .csplugin, regardless of the actual file binary suffix. This will
+ *   guarantee that this function will work as expected across all platforms.
  */
 csRef<iString> csGetPluginMetadata (const char* fullPath, 
 				    csRef<iDocument>& metadata);
