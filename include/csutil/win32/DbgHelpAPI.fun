@@ -27,6 +27,14 @@ FUNC_GROUP_BEGIN(SymSupport)
     PSTR ImageName, PSTR ModuleName, uint64 BaseOfDll, DWORD SizeOfDll))
 FUNC_GROUP_END
 
+FUNC_GROUP_BEGIN(Minidump)
+  FUNC(BOOL, MiniDumpWriteDump, (HANDLE hProcess, DWORD ProcessId, 
+    HANDLE hFile, int/*MINIDUMP_TYPE*/ DumpType, 
+    PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam, 
+    PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam, 
+    PMINIDUMP_CALLBACK_INFORMATION CallbackParam))
+FUNC_GROUP_END
+
 #undef FUNC_GROUP_BEGIN
 #undef FUNC_GROUP_END
 #undef FUNC

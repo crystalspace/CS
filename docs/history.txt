@@ -22,6 +22,9 @@ chronological order.
 	- res augmented configure to check for fputws().
 	- res changed the generic csPrintf() implementation to use fputws(),
 	  if available.
+	- res added a small helper class to create minidumps on Win32.
+	- res augmented the Win32 assistant to allow user-defined exception
+	  handlers.
 5-Apr-2004
 	- Peter Amstutz added the iVosApi interface to the csvosa3dl plugin.
 	  This interface allows the application to access the underlying

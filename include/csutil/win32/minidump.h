@@ -17,36 +17,26 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */	
 
-class cswinCacheDLL;
+/**\file
+ * Helper to write minidumps on Win32.
+ */
+ 
+#include "csutil/ref.h"
+#include "iutil/vfs.h"
 
-class CS_CSUTIL_EXPORT CS_API_NAME
+#include "csutil/win32/DbgHelpAPI.h"
+ 
+/**
+ * Helper to write minidumps on Win32.
+ */
+class CS_CSUTIL_EXPORT cswinMinidumpWriter
 {
-private:
-  static cswinCacheDLL* dll;
-  static bool dllLoaded;
-  static int refCount;
-
-  static bool Available ();
 public:
-  // A refcount mechanism is used to determine when to unload
-  // the DLL.
-  static void IncRef();
-  static void DecRef();
-
-  #define FUNC_GROUP_BEGIN(name)	    \
-    private: static bool name ## _avail;    \
-    public: static bool name ## Available() \
-    {					    \
-      return Available() && name ## _avail; \
-    }
-  #define FUNC_GROUP_END
-  #define FUNC(ret, name, args)		    \
-    typedef ret (WINAPI* PFN ## name) args;
-  #include CS_API_FUNCTIONS
-
-  #define FUNC_GROUP_BEGIN(name)	    
-  #define FUNC_GROUP_END
-  #define FUNC(ret, name, args)		    \
-    static PFN ## name name;
-  #include CS_API_FUNCTIONS
+  /**
+   * Write a dump of the current state of the process.
+   * \return The filename where the dump was written to. Is created in a
+   *  location for temp files.
+   */
+  static const char* WriteMinidump (
+    PMINIDUMP_EXCEPTION_INFORMATION except = 0);
 };

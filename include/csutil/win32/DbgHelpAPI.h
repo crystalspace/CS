@@ -160,6 +160,164 @@ struct IMAGEHLP_STACK_FRAME
 typedef IMAGEHLP_STACK_FRAME* PIMAGEHLP_STACK_FRAME;
 typedef void* PIMAGEHLP_CONTEXT;
 
+struct MINIDUMP_EXCEPTION_INFORMATION 
+{  
+  DWORD ThreadId;  
+  PEXCEPTION_POINTERS ExceptionPointers;  
+  BOOL ClientPointers;
+};
+typedef MINIDUMP_EXCEPTION_INFORMATION* PMINIDUMP_EXCEPTION_INFORMATION;
+
+struct MINIDUMP_USER_STREAM 
+{  
+  ULONG32 Type;  
+  ULONG BufferSize;  
+  PVOID Buffer;
+};
+typedef MINIDUMP_USER_STREAM* PMINIDUMP_USER_STREAM;
+                                                    
+struct MINIDUMP_USER_STREAM_INFORMATION 
+{  
+  ULONG UserStreamCount;  
+  PMINIDUMP_USER_STREAM UserStreamArray;
+};
+typedef MINIDUMP_USER_STREAM_INFORMATION* PMINIDUMP_USER_STREAM_INFORMATION;
+
+enum MINIDUMP_CALLBACK_TYPE
+{
+  ModuleCallback, 
+  ThreadCallback, 
+  ThreadExCallback, 
+  IncludeThreadCallback, 
+  IncludeModuleCallback
+};
+
+struct MINIDUMP_THREAD_CALLBACK 
+{  
+  ULONG ThreadId;  
+  HANDLE ThreadHandle;  
+  CONTEXT Context;  
+  ULONG SizeOfContext;  
+  ULONG64 StackBase;  
+  ULONG64 StackEnd;
+};
+typedef MINIDUMP_THREAD_CALLBACK* PMINIDUMP_THREAD_CALLBACK;
+
+struct MINIDUMP_THREAD_EX_CALLBACK 
+{  
+  ULONG ThreadId;  
+  HANDLE ThreadHandle;  
+  CONTEXT Context;  
+  ULONG SizeOfContext;  
+  ULONG64 StackBase;  
+  ULONG64 StackEnd;  
+  ULONG64 BackingStoreBase;  
+  ULONG64 BackingStoreEnd;
+};
+typedef MINIDUMP_THREAD_EX_CALLBACK* PMINIDUMP_THREAD_EX_CALLBACK;
+
+#include <winver.h>
+
+struct MINIDUMP_MODULE_CALLBACK 
+{  
+  PWCHAR FullPath;  
+  ULONG64 BaseOfImage;  
+  ULONG SizeOfImage;  
+  ULONG CheckSum;  
+  ULONG TimeDateStamp;  
+  VS_FIXEDFILEINFO VersionInfo;  
+  PVOID CvRecord;  
+  ULONG SizeOfCvRecord;  
+  PVOID MiscRecord;  
+  ULONG SizeOfMiscRecord;
+};
+typedef MINIDUMP_MODULE_CALLBACK* PMINIDUMP_MODULE_CALLBACK;
+
+struct MINIDUMP_INCLUDE_THREAD_CALLBACK 
+{  
+  ULONG ThreadId;
+};
+typedef MINIDUMP_INCLUDE_THREAD_CALLBACK* PMINIDUMP_INCLUDE_THREAD_CALLBACK;
+
+struct MINIDUMP_INCLUDE_MODULE_CALLBACK 
+{  
+  ULONG64 BaseOfImage;
+};
+typedef MINIDUMP_INCLUDE_MODULE_CALLBACK* PMINIDUMP_INCLUDE_MODULE_CALLBACK;
+
+
+struct MINIDUMP_CALLBACK_INPUT	     
+{  
+  ULONG ProcessId;  
+  HANDLE ProcessHandle;  
+  ULONG CallbackType;  
+  union 
+  {    
+    MINIDUMP_THREAD_CALLBACK Thread;    
+    MINIDUMP_THREAD_EX_CALLBACK ThreadEx;    
+    MINIDUMP_MODULE_CALLBACK Module;    
+    MINIDUMP_INCLUDE_THREAD_CALLBACK IncludeThread;    
+    MINIDUMP_INCLUDE_MODULE_CALLBACK IncludeModule;  
+  };
+};
+typedef MINIDUMP_CALLBACK_INPUT* PMINIDUMP_CALLBACK_INPUT;
+
+enum MODULE_WRITE_FLAGS
+{
+  ModuleWriteModule 			= 0x0001, 
+  ModuleWriteDataSeg 			= 0x0002, 
+  ModuleWriteMiscRecord 		= 0x0004, 
+  ModuleWriteCvRecord 			= 0x0008, 
+  ModuleReferencedByMemory 		= 0x0010
+};
+
+enum THREAD_WRITE_FLAGS
+{
+  ThreadWriteThread 			= 0x0001, 
+  ThreadWriteStack 			= 0x0002, 
+  ThreadWriteContext 			= 0x0004, 
+  ThreadWriteBackingStore 		= 0x0008, 
+  ThreadWriteInstructionWindow 		= 0x0010, 
+  ThreadWriteThreadData 		= 0x0020
+};
+
+struct MINIDUMP_CALLBACK_OUTPUT 
+{  
+  union 
+  {    
+    ULONG ModuleWriteFlags;    
+    ULONG ThreadWriteFlags;  
+  };
+}; 
+typedef MINIDUMP_CALLBACK_OUTPUT* PMINIDUMP_CALLBACK_OUTPUT;
+
+
+typedef BOOL (CALLBACK* MINIDUMP_CALLBACK_ROUTINE) (PVOID CallbackParam, 
+  const PMINIDUMP_CALLBACK_INPUT CallbackInput, 
+  PMINIDUMP_CALLBACK_OUTPUT CallbackOutput);
+
+struct MINIDUMP_CALLBACK_INFORMATION 
+{  
+  MINIDUMP_CALLBACK_ROUTINE CallbackRoutine;  
+  PVOID CallbackParam;
+};
+typedef MINIDUMP_CALLBACK_INFORMATION* PMINIDUMP_CALLBACK_INFORMATION;
+
+enum MINIDUMP_TYPE
+{
+  MiniDumpNormal			  = 0x0000, 
+  MiniDumpWithDataSegs			  = 0x0001, 
+  MiniDumpWithFullMemory		  = 0x0002, 
+  MiniDumpWithHandleData		  = 0x0004, 
+  MiniDumpFilterMemory			  = 0x0008, 
+  MiniDumpScanMemory			  = 0x0010, 
+  MiniDumpWithUnloadedModules		  = 0x0020, 
+  MiniDumpWithIndirectlyReferencedMemory  = 0x0040, 
+  MiniDumpFilterModulePaths		  = 0x0080, 
+  MiniDumpWithProcessThreadData		  = 0x0100, 
+  MiniDumpWithPrivateReadWriteMemory	  = 0x0200
+};
+
 #define CS_API_NAME		DbgHelp
 #define CS_API_FUNCTIONS	"include/csutil/win32/DbgHelpAPI.fun"
 
