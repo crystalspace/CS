@@ -22,6 +22,8 @@ chronological order.
 	  was missing in a variable expansion.
 	- Jorrit fixed a bug in the thing mesh object which he introduced
 	  yesterday. This bug caused weird stripes on lightmapped polygons.
+	- Duhprey made the software renderer compile with NR, but broke the
+	  polyrenderer 
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it
