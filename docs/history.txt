@@ -91,6 +91,8 @@ The history order is reversed so that new features are at the top.
 	      dynamically, thus this is no longer the responsibility of
 	      cspython.mak.
 	    - Added copious documentation to all of the configuration scripts.
+	- Eric Sunshine eliminated several compilation warnings throughout the
+	  project.
 28-Sep-2002
 	- Fixed a new bug with iSector->HitBeam() in octree based
 	  levels.
