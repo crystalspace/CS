@@ -101,21 +101,39 @@ void csThing::SetPosition (csSector* home, const csVector3& pos)
 {
   obj.SetOrigin (pos);
   sector = home;
+
+  UpdateCurveTransform();
 }
+
+void csThing::UpdateCurveTransform()
+{
+  // since obj has changed (possibly) we need to tell all of our curves
+  for (int i = 0 ; i < GetNumCurves () ; i++)
+  {
+    csCurve* c = curves.Get (i);
+ 
+    csReversibleTransform o2w = obj.GetInverse();
+    c->SetObject2World (&o2w);
+  }
+}
+
 
 void csThing::SetTransform (const csMatrix3& matrix)
 {
   obj.SetT2O (matrix);
+  UpdateCurveTransform ();
 }
 
 void csThing::MovePosition (const csVector3& rel)
 {
   obj.Translate (rel);
+  UpdateCurveTransform ();
 }
 
 void csThing::Transform (csMatrix3& matrix)
 {
   obj.SetT2O (matrix * obj.GetT2O ());
+  UpdateCurveTransform ();
 }
 
 void csThing::CreateLightMaps (iGraphics3D* g3d)
@@ -436,7 +454,13 @@ void csThing::RealCheckFrustum (csFrustumView& lview)
   for (i = 0 ; i < GetNumCurves () ; i++)
   {
     csCurve* c = curves.Get (i);
-    c->SetObject2World(new csTransform(obj.GetT2O(), obj.GetT2OTranslation()));
+    
+    if (!lview.dynamic)
+    {
+      csReversibleTransform o2w = obj.GetInverse();
+      c->SetObject2World (&o2w);
+    }
+    
     lview.curve_func ((csObject*)c, &lview);
   }
 

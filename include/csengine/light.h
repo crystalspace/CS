@@ -459,6 +459,9 @@ private:
   /// List of shadow frustums.
   csFrustumList shadows;
 
+  /// frustum of where the visible light hits (for use with curves)
+  csFrustum *light_frustum;
+
 private:
   /**
    * Create an empty light patch (infinite frustum).

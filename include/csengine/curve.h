@@ -114,7 +114,24 @@ private:
 
   // Object to world transformation (Needed by CalculateLighting & 
   // ShineDynLight)
-  csTransform* _o2w;
+  csReversibleTransform* _o2w;
+
+  /**
+   * Position Buffer: this is an array which coordinates u,v lightmap
+   * pixel coordinates to the position on the curve in world space
+   * coordinates.  
+   * i.e. in a 10x10 lightmap uv2World[5][5] is the world space coordinate
+   *   of the lightmap texel 5,5 on the lightmap
+   */
+  csVector3* _uv2World;
+
+  /**
+   * Normal Buffer: this is an array which coordinates u,v lightmap
+   * pixel coordinates to the normal of the curve  
+   * i.e. in a 10x10 lightmap uv2Normal[5][5] is the normal vector which
+   * corresponds to the lightmap texel 5,5 on the lightmap
+   */
+  csVector3* _uv2Normal;
 
 public:
   /// The polygon set parent.
@@ -127,13 +144,15 @@ public:
 public:
   ///
   csCurve (csCurveTemplate* parent_tmpl) : csObject (), cstxt (NULL),
-  	parent_template (parent_tmpl), lightpatches(NULL), _o2w(NULL),
-  	parent (NULL), lightmap (NULL), lightmap_up_to_date (false) {} 
+  	parent_template (parent_tmpl), lightpatches(NULL), _o2w (NULL),
+	_uv2World (NULL), _uv2Normal (NULL), parent  (NULL),
+	lightmap (NULL), lightmap_up_to_date (false) {} 
   ///
   virtual ~csCurve ();
 
 
-  void SetObject2World (csTransform* o2w) { if (_o2w) delete _o2w; _o2w = o2w; }
+  void SetObject2World (csReversibleTransform* o2w);
+  
   ///
   void SetParent (csPolygonSet* p) { parent = p; }
 
@@ -144,6 +163,8 @@ public:
 
   /// Get the lightmap.
   csLightMap* GetLightMap () { return lightmap; }
+
+  void CalcUVBuffers();
 
   /**
    * Tesselate this curve with the given resolution.

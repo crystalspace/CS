@@ -311,11 +311,14 @@ csLightPatch::csLightPatch ()
   vertices = NULL;
   polygon = NULL;
   light = NULL;
+  light_frustum = NULL;
 }
 
 csLightPatch::~csLightPatch ()
 {
   delete [] vertices;
+  if (light_frustum)
+    delete light_frustum;
   RemovePatch ();
 }
 
@@ -325,6 +328,11 @@ void csLightPatch::RemovePatch ()
   if (curve) curve->UnlinkLightPatch (this);
   if (light) light->UnlinkLightpatch (this);
   shadows.DeleteFrustums ();
+  if (light_frustum)
+  {
+    delete light_frustum;
+    light_frustum = NULL;
+  }
 }
 
 void csLightPatch::Initialize (int n)

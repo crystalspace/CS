@@ -246,6 +246,8 @@ csCurve::~csCurve ()
     csWorld::current_world->lightpatch_pool->Free (lightpatches);
   delete _o2w;
   delete lightmap;
+  delete[] _uv2World;
+  delete[] _uv2Normal;
 }
 
 // Default IsLightable returns false, because we don't know how to calculate
@@ -268,7 +270,7 @@ void csCurve::Normal (csVector3& /*vec*/, double /*u*/, double /*v*/)
 }
 
 // #define CURVE_LM_SIZE 32
-#define CURVE_LM_SIZE 64
+#define CURVE_LM_SIZE (8 - 2) /*this is the real value - 2*/
 
 void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
 {
@@ -280,11 +282,15 @@ void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
   csSector* sector = owner->GetSector ();
   if (!sector) sector = (csSector*)owner;
   sector->GetAmbientColor (r, g, b);
-  lightmap->Alloc (CURVE_LM_SIZE, CURVE_LM_SIZE, r, g, b);
+  lightmap->Alloc (CURVE_LM_SIZE*csLightMap::lightcell_size, 
+                   CURVE_LM_SIZE*csLightMap::lightcell_size, r, g, b);
 
   if (!do_cache) { lightmap_up_to_date = false; return; }
   if (csWorld::do_force_relight) lightmap_up_to_date = false;
-  else if (!lightmap->ReadFromCache (CURVE_LM_SIZE, CURVE_LM_SIZE, owner, this, false, index, csWorld::current_world))
+  else 
+    if (!lightmap->ReadFromCache ( CURVE_LM_SIZE*csLightMap::lightcell_size,
+           CURVE_LM_SIZE*csLightMap::lightcell_size, owner, this, false, 
+           index, csWorld::current_world))
     lightmap_up_to_date = true;
   else lightmap_up_to_date = true;
 }
@@ -344,9 +350,11 @@ bool csCurve::RecalculateDynamicLights ()
 void csCurve::ShineDynLight (csLightPatch* lp)
 {
   CS_ASSERT(_o2w);
+  CS_ASSERT(_uv2World);
+  CS_ASSERT(_uv2Normal);
 
-  int lm_width = lightmap->GetWidth () - 2;
-  int lm_height = lightmap->GetHeight () - 2;
+  int lm_width = lightmap->GetWidth ();
+  int lm_height = lightmap->GetHeight ();
 
   csDynLight *light = lp->light;
 
@@ -365,23 +373,20 @@ void csCurve::ShineDynLight (csLightPatch* lp)
   csVector3 pos;
   csVector3 normal;
   float d;
-  float u, v;
   int ui, vi;
   int uv;
-  for (ui = 0 ; ui <= lm_width ; ui++)
+  for (ui = 0 ; ui < lm_width - 1; ui++)
   {
-    u = ((float)ui)/(float)lm_width;
-    for (vi = 0 ; vi <= lm_height ; vi++)
+    for (vi = 0 ; vi < lm_height - 1; vi++)
     {
-      v = ((float)vi)/(float)lm_height;
       uv = vi*(lm_width + 2) + ui;
-      PosInSpace (pos, u, v);
-      pos = _o2w->Other2This(pos);
+
+      pos = _uv2World[uv];
 
       // is the point contained within the light frustrum? 
-      //if (!lp->lview.light_frustum->Contains(pos - lview.light_frustum->GetOrigin()))
+      if (!lp->light_frustum->Contains(pos - lp->light_frustum->GetOrigin()))
         // No, skip it
-        //continue;
+        continue;
 
       // if we have any shadow frustrums
       if (sf != NULL)
@@ -402,7 +407,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
       d = csSquaredDist::PointPoint (light->GetCenter (), pos);
       if (d >= light->GetSquaredRadius ()) continue;
       d = FastSqrt (d);
-      Normal (normal, u, v);
+      normal = _uv2Normal[uv];
       float cosinus = (pos-light->GetCenter ())*normal;
       cosinus /= d;
       cosinus += cosfact;
@@ -464,14 +469,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
       sf = sf->next;
     }
 
-    /*
-    int i, mi;
-    for (i = 0 ; i < lp->num_vertices ; i++)
-    {
-      mi = lview.mirror ? lp->num_vertices-i-1 : i;
-      //lp->vertices[i] = lview.frustum[mi] + lview.center;
-      lp->vertices[i] = lview.light_frustum->GetVertex (mi);
-    }*/
+    lp->light_frustum = new csFrustum(*lview.light_frustum);
 
     MakeDirtyDynamicLights ();
   }
@@ -479,6 +477,12 @@ void csCurve::CalculateLighting (csFrustumView& lview)
   {
     if (!lightmap || lightmap_up_to_date) 
       return;
+
+    // if our UV buffers have not been intialized, create them
+    if (!_uv2World)
+    {
+      CalcUVBuffers();
+    }
 
     int lm_width = lightmap->GetWidth () - 2;
     int lm_height = lightmap->GetHeight () - 2;
@@ -602,6 +606,52 @@ void csCurve::CalculateLighting (csFrustumView& lview)
   }
 }
 
+void csCurve::SetObject2World (csReversibleTransform* o2w) 
+{ 
+  int lm_width = lightmap->GetWidth ();
+  int lm_height = lightmap->GetHeight ();
+
+  // current index into buffers
+  int uv;
+  
+  // if there was already an object to world transform specified
+  if (_o2w) 
+  {
+    // untransform our buffers
+    for(int ui=0; ui < lm_width - 1; ui++)
+    {
+      for(int vi=0; vi < lm_height - 1; vi++)
+      {
+        uv = vi*lm_width + ui;
+
+        _uv2World[uv] = _o2w->This2Other(_uv2World[uv]);
+//        _uv2Normal[uv] = _o2w->This2OtherRelative(_uv2Normal[uv]);
+      }
+    }
+    
+    delete _o2w; 
+  }
+  
+  // intialize the new transform
+  _o2w = new csReversibleTransform(*o2w);
+
+  if (_uv2World)
+  {
+    // transform our uv2World buffer
+    for(int ui=0; ui < lm_width - 1; ui++)
+    {
+      for(int vi=0; vi < lm_height - 1; vi++)
+      {
+        uv = vi*lm_width + ui;
+
+        _uv2World[uv] = _o2w->Other2This(_uv2World[uv]);
+//        _uv2Normal[uv] = _o2w->Other2ThisRelative(_uv2Normal[uv]);
+      }
+    }
+  }
+}
+
+
 void csCurve::CacheLightMaps (csPolygonSet* owner, int index)
 {
   if (!lightmap) return;
@@ -611,6 +661,51 @@ void csCurve::CacheLightMaps (csPolygonSet* owner, int index)
     lightmap->Cache (owner, NULL, index, csWorld::current_world);
   }
   lightmap->ConvertToMixingMode ();
+}
+
+void csCurve::CalcUVBuffers()
+{
+  if (_uv2World)
+    delete[] _uv2World;
+  if (_uv2Normal)
+    delete[] _uv2Normal;
+
+  int lm_width = lightmap->GetWidth ();
+  int lm_height = lightmap->GetHeight ();
+
+  _uv2World = new csVector3[lm_width * lm_height];
+  _uv2Normal = new csVector3[lm_width * lm_height];
+
+  // our texture space coordinates
+  float u,v;
+  int uv;
+
+  // now loop over every texel in the lightmap
+  for (int ui = 0 ; ui < lm_width - 1; ui++)
+  {
+    // calculate the real u coordinate in texture space
+    u = ((float)ui)/(float)lm_width;
+    for (int vi = 0 ; vi < lm_height - 1; vi++)
+    {
+      uv = vi*lm_width + ui;
+
+      // calculate the real v coordinate in texture space
+      v = ((float)vi)/(float)lm_height;
+
+      // ask our curve to find the object space coordinate at u,v
+      PosInSpace (_uv2World[uv], u, v);
+      
+      // ask our curve to find the normal at u,v
+      Normal (_uv2Normal[uv], u, v);
+
+      // if we have an object to world transformation, use it
+      if (_o2w)
+      {
+        _uv2World[uv] = _o2w->Other2This(_uv2World[uv]);
+//        _uv2Normal[uv] = _o2w->Other2ThisRelative(_uv2Normal[uv]);
+      }
+    }
+  }
 }
 
 

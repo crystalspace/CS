@@ -86,6 +86,12 @@ private:
   /// Pointer to the Thing Template which it derived from
   csThingTemplate* ParentTemplate;
 
+  /**
+   * Utility function to be called whenever obj changes which updates
+   * object to world transform in all of the curves
+   */
+  void UpdateCurveTransform();
+
 public:
   /// Set of flags
   csFlags flags;

@@ -3,6 +3,8 @@ The history order has been reversed so that new features are at the top.
 23-Jun-2000
 	- Made tweening default again for sprites. Also added missing
 	  initialization of the tween setting in sprite templates.
+	- Received a new patch from Travis McIntosh to speed up dynamic
+	  lighting for curved surfaces.
 22-Jun-2000
 	- Got a new patch from Travis McIntosh.  This patch finished
 	  dynamic lighting for curved surfaces. Still a bit slow but it

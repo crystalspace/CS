@@ -200,7 +200,10 @@ public:
   csReversibleTransform (const csTransform& t) :
     csTransform (t) { m_t2o = m_o2t.GetInverse (); }
 
-  /**
+  csReversibleTransform (const csReversibleTransform& t) :
+    csTransform (t) { m_t2o = t.m_t2o; }
+
+   /**
    * Get 'this' to 'other' transformation matrix.
    */
   inline const csMatrix3& GetT2O () const { return m_t2o; }
