@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SIMPLE_H
-#define SIMPLE_H
+#ifndef __CS_PYSIMP_H__
+#define __CS_PYSIMP_H__
 
 #include <stdarg.h>
 #include "cssys/sysdriv.h"
@@ -29,21 +29,22 @@ class csView;
 class csWorld;
 class csDynLight;
 
-class Simple : public SysSystemDriver
+class PySimple : public SysSystemDriver
 {
+  typedef SysSystemDriver superclass;
 public:
   csView* view;
   csWorld* world;
   int motion_flags;
 
 public:
-  Simple ();
-  virtual ~Simple ();
+  PySimple ();
+  virtual ~PySimple ();
 
   virtual bool Initialize (int argc, char *argv[], const char *iConfigName);
   virtual void NextFrame (time_t elapsed_time, time_t current_time);
   virtual bool HandleEvent (csEvent &Event);
 };
 
-#endif // SIMPLE_H
+#endif // __CS_PYSIMP_H__
 

@@ -19,7 +19,8 @@
 #include "sysdef.h"
 #include "cssys/system.h"
 #include "csutil/inifile.h"
-#include "apps/simple/simple.h"
+#include "csutil/scanstr.h"
+#include "pysimp.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/csview.h"
@@ -38,14 +39,14 @@ REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------
 
-Simple::Simple ()
+PySimple::PySimple ()
 {
   view = NULL;
   world = NULL;
   motion_flags = 0;
 }
 
-Simple::~Simple ()
+PySimple::~PySimple ()
 {
   if(view)
     delete view;
@@ -57,9 +58,9 @@ void cleanup ()
   delete System;
 }
 
-bool Simple::Initialize (int argc, char *argv[], const char *iConfigName)
+bool PySimple::Initialize (int argc, char *argv[], const char *iConfigName)
 {
-  if (!csSystemDriver::Initialize (argc, argv, iConfigName))
+  if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
   // Find the pointer to world plugin
@@ -73,7 +74,7 @@ bool Simple::Initialize (int argc, char *argv[], const char *iConfigName)
   World->DecRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ("Simple Crystal Space Application"))
+  if (!Open ("Simple Crystal Space Python Application"))
   {
     Printf (MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
@@ -81,7 +82,7 @@ bool Simple::Initialize (int argc, char *argv[], const char *iConfigName)
   }
 
   // Some commercials...
-  Printf (MSG_INITIALIZATION, "Simple Crystal Space Application version 0.1.\n");
+  Printf (MSG_INITIALIZATION, "Simple Crystal Space Python Application version 0.1.\n");
   iTextureManager* txtmgr = G3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
@@ -91,8 +92,6 @@ bool Simple::Initialize (int argc, char *argv[], const char *iConfigName)
 
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
-
-//  csTextureHandle* tm = csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
 
   iScript* is = CREATE_INSTANCE("crystalspace.script.python", iScript);
   is->Initialize(this);
@@ -105,22 +104,7 @@ bool Simple::Initialize (int argc, char *argv[], const char *iConfigName)
   if(!is->RunText("import unrmap"))
     return 0;
     
-/*  csStatLight* light;
-  light = new csStatLight (-3, 5, 0, 10, 1, 0, 0, false);
-  room->AddLight (light);
-  light = new csStatLight (3, 5, 0, 10, 0, 0, 1, false);
-  room->AddLight (light);
-  light = new csStatLight (0, 5, -3, 10, 0, 1, 0, false);
-  room->AddLight (light);*/
-
   world->Prepare ();
-
-  // Create a dynamic light.
-//  angle = 0;
-//  dynlight = new csDynLight (cos (angle)*3, 17, sin (angle)*3, 7, 1, 0, 0);
-//  world->AddDynLight (dynlight);
-//  dynlight->SetSector (room);
-//  dynlight->Setup ();
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
@@ -133,15 +117,13 @@ bool Simple::Initialize (int argc, char *argv[], const char *iConfigName)
   view->GetCamera ()->SetPosition (csVector3 (0, 5, 0));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
   
-//  view=world->view;
-
   txtmgr->AllocPalette ();
   return true;
 }
 
-void Simple::NextFrame (time_t elapsed_time, time_t current_time)
+void PySimple::NextFrame (time_t elapsed_time, time_t current_time)
 {
-  SysSystemDriver::NextFrame (elapsed_time, current_time);
+  superclass::NextFrame (elapsed_time, current_time);
 
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
@@ -159,20 +141,11 @@ void Simple::NextFrame (time_t elapsed_time, time_t current_time)
   if (GetKeyState (CSKEY_DOWN))
     view->GetCamera ()->Move (VEC_BACKWARD * 4 * speed);
 
-  // Move the dynamic light around.
-/*  angle += elapsed_time * 0.4 / 1000.;
-  while (angle >= 2.*3.1415926) angle -= 2.*3.1415926;
-  dynlight->Move (room, cos (angle)*3, 17, sin (angle)*3);
-  dynlight->Setup ();*/
-
   // Tell 3D driver we're going to display 3D things.
   if (!G3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
 
   if(view)
     view->Draw ();
-
-  // Start drawing 2D graphics.
-  //if (!System->G2D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
   // Drawing code ends here.
   G3D->FinishDraw ();
@@ -180,9 +153,9 @@ void Simple::NextFrame (time_t elapsed_time, time_t current_time)
   G3D->Print (NULL);
 }
 
-bool Simple::HandleEvent (csEvent &Event)
+bool PySimple::HandleEvent (csEvent &Event)
 {
-  if (SysSystemDriver::HandleEvent (Event))
+  if (superclass::HandleEvent (Event))
     return true;
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
@@ -208,10 +181,12 @@ void debug_dump ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
+  ScanStr("",""); // Force linker to include this since soft3d requires it.
+
   srand (time (NULL));
 
   // Create our main class.
-  System = new Simple ();
+  System = new PySimple ();
   // temp hack until we find a better way
   csWorld::System = System;
 
