@@ -27,17 +27,11 @@ CMD.DLLWRAP ?= dllwrap ;
 USE_DLLWRAP ?= no ;
 
 NASM.FLAGS += -f win32 -DEXTERNC_UNDERSCORE ;
-CCFLAGS += -pipe [ FIncludes /usr/include/directx ] ;
-C++FLAGS += -pipe [ FIncludes /usr/include/directx ] ;
+CCFLAGS += -pipe ;
+C++FLAGS += -pipe ;
 LINKLIBS += -L/usr/lib/w32api -lgdi32 -lshell32 ;
-PLUGIN.LFLAGS += -mwindows -mconsole ;
+PLUGIN.LFLAGS += -mwindows ;
 WINDRES.FLAGS = --use-temp-file ;
-
-WAVEOUT.AVAILABLE = yes ;
-if ! $(MSVCGEN_CONFIG)
-{
-WAVEOUT.LFLAGS = -lwinmm ;
-}
 
 if "$(USE_DLLWRAP)" = "yes"
 {

@@ -1396,6 +1396,19 @@ CS_CHECK_BUILD([for DirectX], [cs_cv_libdirectx],
 
 
 #------------------------------------------------------------------------------
+# Check for the Windows Multimedia library, used by the 'sndwaveout' plugin.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for waveout], [cs_cv_libwaveout],
+    [AC_LANG_PROGRAM(
+	[[#include <windows.h>
+	#include <mmsystem.h>]],
+	[waveOutOpen(0, 0, 0, 0, 0, 0)])],
+    [CS_CREATE_TUPLE([],[],[-lwinmm])], 
+    [], [CS_EMIT_BUILD_RESULT([cs_cv_libwaveout], [WAVEOUT])])
+
+
+
+#------------------------------------------------------------------------------
 # Check for zlib.  In addition to the standard installed locations, we also
 # search CS/libs/zlib*.
 #------------------------------------------------------------------------------

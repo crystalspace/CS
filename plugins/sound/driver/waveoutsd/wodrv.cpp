@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include "csutil/scf.h"
+#include "csutil/csuctransform.h"
 #include "isound/renderer.h"
 #include "iutil/cfgfile.h"
 #include "iutil/objreg.h"
@@ -30,6 +31,8 @@
 #include "iutil/eventq.h"
 #include "ivaria/reporter.h"
 #include "wodrv.h"
+
+#include "csutil/win32/wintools.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -110,6 +113,8 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Wave-Out Sound Driver selected.");
   ActivateSoundProc = false;
 
+  CheckError ("blah", WAVERR_BADFORMAT);
+
   // store pointer to sound renderer
   if (!render) return false;
   SoundRender = render;
@@ -147,9 +152,9 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   // initialize sound output.
   // @@@ must this be called from within another thread for multi-processor
   // support?
-  MMRESULT res = waveOutOpen(&WaveOut, WAVE_MAPPER, &Format,
+  MMRESULT res = waveOutOpen (&WaveOut, WAVE_MAPPER, &Format,
     (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
-  CheckError("waveOutOpen", res);
+  CheckError ("waveOutOpen", res);
 
   // Store old volume and set full volume because the software sound renderer
   // will apply volume internally. If this device does not allow volume
@@ -315,52 +320,59 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
   SoundProcLocked = false;
 }
 
-const char *csSoundDriverWaveOut::GetMMError(MMRESULT r) {
-  static char err[MAXERRORLENGTH];
+const char *csSoundDriverWaveOut::GetMMError (MMRESULT r) 
+{
+  switch (r) 
+  {
+    case MMSYSERR_NOERROR:
+      return "no MM error";
 
-  switch (r) {
-  case MMSYSERR_NOERROR:
-    return "no MM error";
+    case MMSYSERR_ALLOCATED:
+      return "resource already allocated by an other program";
 
-  case MMSYSERR_ALLOCATED:
-    return "resource already allocated by an other program";
+    case MMSYSERR_BADDEVICEID:
+      return "bad device";
 
-  case MMSYSERR_BADDEVICEID:
-    return "bad device";
+    case MMSYSERR_NODRIVER:
+      return "there is no device";
 
-  case MMSYSERR_NODRIVER:
-    return "there is no device";
+    case MMSYSERR_NOMEM:
+      return "unable to allocate memory";
 
-  case MMSYSERR_NOMEM:
-    return "unable to allocate memory";
-
-/*  case WAVERR_BADFORMAT:
-    return "unsupported audio format";
-
-  case WAVERR_SYNC:
-    return "synchronous device without WAVE_ALLOWSYNC flag";
-
-  case MMSYSERR_INVALHANDLE:
-    return "invalid device handle";
-
-  case WAVERR_STILLPLAYING:
-    return "still playing this sound block";*/
-
-  default:
-    //return "unknown MM error";
-    waveOutGetErrorText(r, err, sizeof(err));
-
-    return err;
+    default:
+      {
+	static char err[MAXERRORLENGTH * CS_UC_MAX_UTF8_ENCODED];
+	if (cswinIsWinNT ())
+	{
+	  static WCHAR wideErr[MAXERRORLENGTH];
+          waveOutGetErrorTextW (r, wideErr, 
+	    sizeof (wideErr) / sizeof (WCHAR));
+	  csUnicodeTransform::WCtoUTF8 ((utf8_char*)err, 
+	    sizeof (err) / sizeof (char), wideErr, (size_t)-1);
+	}
+	else
+	{
+	  static char ansiErr[MAXERRORLENGTH];
+          waveOutGetErrorTextA (r, ansiErr, 
+	    sizeof (ansiErr) / sizeof (char));
+	  wchar_t* wideErr = cswinAnsiToWide (ansiErr);
+	  csUnicodeTransform::WCtoUTF8 ((utf8_char*)err, 
+	    sizeof (err) / sizeof (char), wideErr, (size_t)-1);
+	  delete[] wideErr;
+	}
+	return err;
+      }
   }
 }
 
 bool csSoundDriverWaveOut::CheckError(const char *action, MMRESULT code)
 {
-  if (code != MMSYSERR_NOERROR) {
+  if (code != MMSYSERR_NOERROR) 
+  {
     if (code != LastError)
     {
       Report (CS_REPORTER_SEVERITY_ERROR,
-	"%s: %.8x %s .", action, code, GetMMError(code));
+	"%s: %.8x %s .", action, code, GetMMError (code));
       LastError = code;
     }
     return false;

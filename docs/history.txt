@@ -24,6 +24,16 @@ chronological order.
 	  the awsfreeze rule construction (but not for the main plugin rule).
 	- Eric Sunshine fixed bug in csperl5/Jamfile where it failed to run
 	  Swig to create cswigpl5.inc, upon which the csperl5 plugin depends.
+	- res removed the hard-coded WAVEOUTSND settings from win32.jam and
+	  instead added a configure check.
+	- res also changed win32.jam to not add /usr/include/directx  as an
+	  include dir to CCFLAGS resp. C++FLAGS, as this directory is already
+	  checked for in the DirectX configure test.
+	- res changed the PLUGIN.LFLAGS value to only include -mwindows. 
+	  (The old line "-mwindows -mconsole" was self-contradicting as it 
+	  first set the "GUI subsystem", then the "console subsystem" flags.)
+	- res fixed the waveout sound driver to convert error descriptions from
+	  the system to UTF-8.
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.
