@@ -93,8 +93,8 @@ inline
 void
 UnMemoryMapFile(mmioInfo *platform, char *filename)
 {
-  if (platform->data != -1)
-    munmap(platform->data, file_size);
+  if (platform->data != 0)
+    munmap(platform->data, platform->file_size);
 
   if (platform->hMappedFile != -1)
     close(platform->hMappedFile);
