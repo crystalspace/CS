@@ -59,6 +59,19 @@ struct iNetworkSocket2 : public iBase
   virtual int SetSocketReuse (bool reuse) = 0;
 
   /**
+   * Sets the broadcast option on socket if broadcast is true, otherwise the
+   * broadcast option is unset. Returns CS_NET_SOCKET_NOERROR if there is no
+   * error. Function working only for UDP socket type.
+   */
+  virtual int SetSocketBroadcast( bool broadcast) = 0;
+
+  /**
+   * Sets the broadcast port and address (defaul "255.255.255.255" means broadcast to all).
+     Returns CS_NET_SOCKET_NOERROR if there is no error.
+     Function working only for UDP socket type.
+   */
+  virtual int SetBroadcastOptions(int port, const char* addr = "255.255.255.255") = 0;
+  /**
    * Connect to the hostname host on port port.  Returns CS_NET_SOCKET_NOERROR
    * if there is no error.
    */

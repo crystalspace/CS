@@ -59,7 +59,9 @@ enum csNetworkSocketError
   /// Unable to resolve address
   CS_NET_SOCKET_CANNOT_RESOLVE,
   /// Unable to connect
-  CS_NET_SOCKET_CANNOT_CONNECT
+  CS_NET_SOCKET_CANNOT_CONNECT,
+  /// Unable to set broadcast option or failed to set broadcast port and address
+  CS_NET_SOCKET_BROADCAST_ERROR
 };
 
 #endif // __CS_INETWORK_SOCKETERR_H__

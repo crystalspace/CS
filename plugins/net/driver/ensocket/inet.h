@@ -43,6 +43,8 @@ class csNetworkSocket2 : public iNetworkSocket2
   virtual bool IsConnected() const;
   virtual int SetSocketBlock( bool block );
   virtual int SetSocketReuse( bool reuse );
+  virtual int SetSocketBroadcast( bool broadcast);
+  virtual int SetBroadcastOptions(int port, const char* addr);
   virtual int Connect( char const* host, int port );
   virtual int Send( char const* buff, size_t size );
   virtual int Recv( char* buff, size_t size );
@@ -64,8 +66,10 @@ class csNetworkSocket2 : public iNetworkSocket2
   bool socket_ready;
   bool connected;
   bool blocking;
+  bool broadcasting;
   struct sockaddr_in local_addr;
   struct sockaddr_in remote_addr;
+  struct sockaddr_in broadcast_addr;
 
   virtual int SELECT( int fds, fd_set* readfds, fd_set* writefds,
     fd_set* exceptfds );

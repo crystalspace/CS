@@ -110,6 +110,7 @@ csNetworkSocket2::csNetworkSocket2 (iBase *parent, int sock_type, SOCKET sock)
   buffer_nread = 0;
   connected = false;
   blocking = true;
+  broadcasting = false;
   last_error = CS_NET_SOCKET_NOERROR;
 
   if (sock != (SOCKET)-1)
@@ -177,6 +178,50 @@ int csNetworkSocket2::SetSocketReuse (bool reuse)
       last_error = CS_NET_SOCKET_NOERROR;
     else
       last_error = CS_NET_SOCKET_CANNOT_SETREUSE;
+  }
+  else
+    last_error = CS_NET_SOCKET_NOTCONNECTED;
+  return last_error;
+}
+
+int csNetworkSocket2::SetSocketBroadcast (bool broadcast)
+{
+  if (socketfd)
+  {
+    if(proto_type != SOCK_DGRAM)
+    {
+      last_error = CS_NET_SOCKET_BROADCAST_ERROR;
+    }
+    else
+    {
+      broadcasting = broadcast;
+      char const flag = (broadcast ? 0x00 : 0xff);
+      if (setsockopt(socketfd,SOL_SOCKET,SO_BROADCAST,&flag,sizeof(flag)) == 0)
+        last_error = CS_NET_SOCKET_NOERROR;
+      else
+        last_error = CS_NET_SOCKET_BROADCAST_ERROR;
+    }
+  }
+  else
+    last_error = CS_NET_SOCKET_NOTCONNECTED;
+  return last_error;
+}
+
+int csNetworkSocket2::SetBroadcastOptions (int port, const char* addr)
+{
+  if (socketfd)
+  {
+    if(proto_type != SOCK_DGRAM)
+    {
+      last_error = CS_NET_SOCKET_BROADCAST_ERROR;
+    }
+    else
+    {
+      local_addr.sin_family = AF_INET;
+      local_addr.sin_port = htons(port);
+      local_addr.sin_addr.s_addr = inet_addr(addr);
+      last_error = CS_NET_SOCKET_NOERROR;
+    }
   }
   else
     last_error = CS_NET_SOCKET_NOTCONNECTED;
@@ -377,8 +422,14 @@ int csNetworkSocket2::Send (char const* buff, size_t size)
   else // (connected || proto_type == SOCK_DGRAM)
   {
     if (proto_type == SOCK_DGRAM)
-      result = sendto(socketfd, buff, size, 0, (struct sockaddr*)&remote_addr,
-        sizeof(struct sockaddr));
+    {
+      if(broadcasting)
+       result = sendto(socketfd, buff, size, 0, (struct sockaddr*)&broadcast_addr,
+          sizeof(struct sockaddr));
+      else
+       result = sendto(socketfd, buff, size, 0, (struct sockaddr*)&remote_addr,
+          sizeof(struct sockaddr));
+    }
     else
       result = send(socketfd, buff, size, 0);
 
