@@ -354,6 +354,231 @@ void csPolyTexture::InitLightmaps ()
 {
 }
 
+/*
+ *  Added by Denis Dmitriev for correct lightmaps shining. This code above draws perfectly (like perfect
+ *  texture mapping -- I mean most correctly) anti-aliased polygon on lightmap and adjusts it according
+ *  to the actual polygon shape on the texture
+ */
+#define EPS   0.0001
+
+float calc_area (int n, csVector2 *p)
+{
+  float area=0;
+
+  for (int i=0,j;i<n;i++)
+  {
+    if (i!=n-1)
+      j = i+1;
+    else
+      j = 0;
+
+    area += (p[i].y+p[j].y)*(p[i].x-p[j].x);
+  }
+
+  area /= 2.0;
+  return fabs (area);
+}
+
+static int __texture_width;
+static unsigned char *__texture;
+
+struct __rect
+{
+  float left, right;
+  float top, bottom;
+};
+
+static void (*__draw_func)(int, int, float);
+
+static void lixel_intensity (int x, int y, float density)
+{
+  int addr=x+y*__texture_width;
+
+  if (density>=1.0)
+    density=1.0;
+
+  __texture[addr] = 255*density;
+}
+
+static void correct_results (int x, int y, float density)
+{
+  if (density<EPS||density>=1-EPS)
+    return;
+
+  int addr=x+y*__texture_width;
+  float res=__texture[addr]/density;
+  if (res>255)
+    res=255;
+  __texture[addr]=res;
+}
+
+/* I was interested in these values */
+static int max_depth=0,depth=0;
+
+static void poly_fill (int n, csVector2 *p2d, __rect &visible)
+{
+  depth++;
+
+  if (depth>max_depth)
+    max_depth=depth;
+
+  // how_to_divide:
+  //   0 -- horizontal
+  //   1 -- vertical
+
+  int height=visible.bottom-visible.top;
+  int width=visible.right-visible.left;
+
+  float a=calc_area (n,p2d);
+  if (fabs (a-height*width)<EPS)
+  {
+    // this area is completely covered
+
+    int x=visible.left,y=visible.top;
+    for (int i=0 ; i<height ; i++)
+      for (int j=0 ; j<width ; j++)
+	__draw_func (j+x, i+y, 1);
+    depth--;
+    return;
+  }
+  else
+    if (fabs (a)<EPS)
+    {
+      // this area is hollow
+      depth--;
+      return;
+    }
+
+  if (height==1&&width==1)
+  {
+    int x=visible.left, y=visible.top;
+    __draw_func (x, y, a);
+
+    depth--;
+    return;
+  }
+
+  int sub_x = visible.left+width/2;
+  int sub_y = visible.top+height/2;
+
+  int how_to_divide=1;
+
+  if (height>width) how_to_divide=0;
+
+  int n2[2];
+  csVector2 *p2[2];
+
+  p2[0] = new csVector2[n+1];
+  p2[1] = new csVector2[n+1];
+
+  n2[0]=n2[1]=0;
+
+  if (how_to_divide)
+  {
+    // dividing vertically
+    // (p[0] -- left poly, p[1] -- right poly)
+
+    int i=0,where_are_we=p2d[0].x>sub_x;
+
+    p2[where_are_we][n2[where_are_we]++]=p2d[0];
+
+    for (int _=1,prev=0;_<=n;_++)
+    {
+      if (_==n) i=0;
+      else i=_;
+
+      int now_we_are=p2d[i].x>sub_x;
+
+      if (now_we_are==where_are_we)
+      {
+	if (i)
+	  p2[where_are_we][n2[where_are_we]++]=p2d[i];
+      }
+      else
+      {
+	float y=(p2d[prev].y*(p2d[i].x-sub_x)+p2d[i].y*(sub_x-p2d[prev].x))/(p2d[i].x-p2d[prev].x);
+	csVector2 p(sub_x,y);
+
+	p2[0][n2[0]++]=p2[1][n2[1]++]=p;
+
+	if (i)
+	  p2[now_we_are][n2[now_we_are]++]=p2d[i];
+      }
+
+      where_are_we=now_we_are;
+      prev=i;
+    }
+
+    __rect v;
+    v.left=visible.left;
+    v.right=sub_x;
+    v.top=visible.top;
+    v.bottom=visible.bottom;
+
+    poly_fill (n2[0],p2[0],v);
+
+    v.left=sub_x;
+    v.right=visible.right;
+
+    poly_fill (n2[1],p2[1],v);
+  }
+  else
+  {
+    // dividing horizontally
+    // (p[0] -- top poly, p[1] -- bottom poly)
+
+    int i=0,where_are_we=p2d[0].y>sub_y;
+
+    p2[where_are_we][n2[where_are_we]++]=p2d[0];
+
+    for (int _=1,prev=0;_<=n;_++)
+    {
+      if (_==n) i=0;
+      else i=_;
+
+      int now_we_are=p2d[i].y>sub_y;
+
+      if (now_we_are==where_are_we)
+      {
+	if (i)
+	  p2[where_are_we][n2[where_are_we]++]=p2d[i];
+      }
+      else
+      {
+	float x=(p2d[prev].x*(p2d[i].y-sub_y)+p2d[i].x*(sub_y-p2d[prev].y))/(p2d[i].y-p2d[prev].y);
+        csVector2 p(x,sub_y);
+
+	p2[0][n2[0]++]=p2[1][n2[1]++]=p;
+
+	if(i)
+	  p2[now_we_are][n2[now_we_are]++]=p2d[i];
+      }
+
+      where_are_we=now_we_are;
+      prev=i;
+    }
+
+    __rect v;
+    v.left=visible.left;
+    v.right=visible.right;
+    v.top=visible.top;
+    v.bottom=sub_y;
+
+    poly_fill (n2[0],p2[0],v);
+
+    v.top=sub_y;
+    v.bottom=visible.bottom;
+
+    poly_fill (n2[1],p2[1],v);
+  }
+
+  delete[] p2[0];
+  delete[] p2[1];
+
+  depth--;
+}
+
+/* Modified by me to add nice lightmaps recalculations -- D.D. */
 void csPolyTexture::ShineLightmaps (csLightView& lview)
 {
   if (!lm) return;
@@ -445,10 +670,27 @@ void csPolyTexture::ShineLightmaps (csLightView& lview)
   // frustrum is actually a clipped version of the polygon).
   csVector2* f_uv = NULL;
 
+  // Our polygon on its own texture space. Weird, isn't it? ;)
+  csVector2* rp = NULL;
+  int rpv=0;
+
   if (lview.frustrum)
   {
     int mi;
     CHK (f_uv = new csVector2 [lview.num_frustrum]);
+
+    rpv=polygon->GetNumVertices();
+    CHK (rp = new csVector2 [rpv]);
+
+    csVector3 projector;
+
+    for(i=0;i<rpv;i++)
+    {
+      projector=pl->m_world2tex * (polygon->Vcam(i) +lview.center - pl->v_world2tex);
+      rp[i].x=(projector.x*ww-Imin_u) / (mipmap_size)+0.5;
+      rp[i].y=(projector.y*hh-Imin_v) / (mipmap_size)+0.5;
+    }
+
     for (i = 0 ; i < lview.num_frustrum ; i++)
     {
       if (lview.mirror) mi = lview.num_frustrum-i-1;
@@ -456,17 +698,18 @@ void csPolyTexture::ShineLightmaps (csLightView& lview)
 
       // T = Mwt * (W - Vwt)
       v1 = pl->m_world2tex * (lview.frustrum[mi] + lview.center - pl->v_world2tex);
-      f_uv[i].x = (v1.x*ww-Imin_u) / mipmap_size;
-      f_uv[i].y = (v1.y*hh-Imin_v) / mipmap_size;
+      f_uv[i].x = (v1.x*ww-Imin_u) / (mipmap_size) + 0.5;
+      f_uv[i].y = (v1.y*hh-Imin_v) / (mipmap_size) + 0.5;
       if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
       if (f_uv[i].y > maxy) maxy = f_uv[MaxIndex = i].y;
+
       DB ((MSG_DEBUG_0, "    %d: frust:(%f,%f,%f) f_uv:(%f,%f) ", i, lview.frustrum[mi].x, lview.frustrum[mi].y, lview.frustrum[mi].z, f_uv[i].x, f_uv[i].y));
       DB ((MSG_DEBUG_0, "frust+lcenter:(%f,%f,%f)\n", lview.frustrum[mi].x+lview.center.x, lview.frustrum[mi].y+lview.center.y, lview.frustrum[mi].z+lview.center.z));
     }
   }
   else
   {
-    /* hm, what else? but something else has to exist (or we'll run into crush few statements later) */
+    /* hm, what else? but something else has to exist (or we'll run into crash few statements later) */
     return;
   }
 
@@ -474,103 +717,32 @@ void csPolyTexture::ShineLightmaps (csLightView& lview)
   float g200d = lview.g * NORMAL_LIGHT_LEVEL / light->GetRadius ();
   float b200d = lview.b * NORMAL_LIGHT_LEVEL / light->GetRadius ();
 
-  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
-  float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
-  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
-  int xL, xR;
+  __texture_width=lw;
+  __texture=(unsigned char*)calloc(lh,lw);
 
-  sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
-  scanL2 = scanR2 = MaxIndex;
-  sy = fyL = fyR = (QRound (ceil(f_uv[scanL2].y))>lh-1)?lh-1:QRound (ceil(f_uv[scanL2].y));
+  __rect vis={0,lw,0,lh};
 
-  for ( ; ; )
+  __draw_func=lixel_intensity;
+  poly_fill(lview.num_frustrum,f_uv,vis);
+  __draw_func=correct_results;
+  poly_fill(rpv,rp,vis);
+  
+  uv=0;
+  for (int __uv,sy=0;sy<lh;sy++)
   {
-    //-----
-    // We have reached the next segment. Recalculate the slopes.
-    //-----
-    bool leave;
-    do
+    for (u=0;u<lw;u++,uv++)
     {
-      leave = true;
-      if (sy <= fyR)
-      {
-        // Check first if polygon has been finished
-a:      if (scanR2 == MinIndex) goto finish;
-        scanR1 = scanR2;
-        scanR2 = (scanR2 + 1) % lview.num_frustrum;
+       __uv=uv;
 
-        if(fabs(f_uv[scanR2].y-f_uv[MaxIndex].y)<0.00001)
+        if (!__texture[__uv])
         {
-          // oops! we have a flat bottom!
-          goto a;
+          if (sy==lh-1) __uv-=lw;
+          if (u==lw-1) __uv--;
+
+          if (!__texture[__uv]) continue;
         }
 
-        fyR = QRound(floor(f_uv[scanR2].y));
-
-        float dyR = (f_uv[scanR1].y - f_uv[scanR2].y);
-	sxR = f_uv[scanR1].x;
-        if (dyR != 0)
-        {
-          dxR = (f_uv[scanR2].x - sxR) / dyR;
-	  // horizontal pixel correction
-          sxR += dxR * (f_uv[scanR1].y - ((float)sy));
-        }
-	else dxR = 0;
-        leave = false;
-      }
-      if (sy <= fyL)
-      {
-b:      if (scanL2 == MinIndex) goto finish;
-        scanL1 = scanL2;
-        scanL2 = (scanL2 - 1 + lview.num_frustrum) % lview.num_frustrum;
-
-        if(fabs(f_uv[scanL2].y-f_uv[MaxIndex].y)<0.00001)
-        {
-          // oops! we have a flat bottom!
-          goto b;
-        }
-
-        fyL = QRound(floor(f_uv[scanL2].y));
-        float dyL = (f_uv[scanL1].y - f_uv[scanL2].y);
-	sxL = f_uv[scanL1].x;
-        if (dyL != 0)
-        {
-          dxL = (f_uv[scanL2].x - sxL) / dyL;
-          // horizontal pixel correction
-          sxL += dxL * (f_uv[scanL1].y - ((float)sy));
-        }
-	else dxL = 0;
-        leave = false;
-      }
-    }
-    while (!leave);
-
-    // Find the trapezoid top (or bottom in inverted Y coordinates)
-    int fin_y;
-    if (fyL > fyR) fin_y = fyL;
-    else fin_y = fyR;
-
-    while (sy >= fin_y)
-    {
-      // Compute the rounded screen coordinates of horizontal strip
-
-      float _l=sxL,_r=sxR;
-
-      if(_r>_l) {float _=_r; _r=_l; _l=_;}
-		
-      xL = QRound (ceil(_l))+1;
-      xR = QRound (floor(_r));
-
-/*    xL = QRound (_l)+1;
-      xR = QRound (_r);
-      if (xR > xL) { int xswap = xR; xR = xL; xL = xswap; }*/
-
-      if (xR < 0) xR = 0;
-      if (xL > lw) xL = lw;
-
-      for (u = xR; u < xL ; u++)
-      {
-        uv = sy*lw+u;
+        float lightness=__texture[__uv]/255.0;
 
         ru = u  << mipmap_shift;
         rv = sy << mipmap_shift;
@@ -593,16 +765,16 @@ b:      if (scanL2 == MinIndex) goto finish;
           // This is the inverse portal warping transformation required
           // to transform the end point back to original world space
           // coordinates.
-          //v3 = ( info[i].m_warp ) * v2 - ( info[i].v_warp );
+          // v3 = ( info[i].m_warp ) * v2 - ( info[i].v_warp );
           v3 = v2;
 
           // Use the original center of the light here because we need to check
           // for blocking things starting in the original sector before
           // any space warping occured.
           csPolygon3D* p;
-	  csVector3 path_end = lview.beam2source * v3;
+	        csVector3 path_end = lview.beam2source * v3;
           rc = light->GetSector ()->BlockingThings (light->GetCenter (),
-	    path_end, &p, light->GetSector () == polygon->GetSector ());
+	          path_end, &p, light->GetSector () == polygon->GetSector ());
           if (!rc || p == polygon || p->GetParent () == polygon->GetParent ())
 	  {
 	    rc = false;
@@ -633,7 +805,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 	  if (dyn)
 	  {
 	    dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
-	    l1 = l1 + QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl));
+	    l1 = l1 + lightness*QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl));
 	    if (l1 > 255) l1 = 255;
 	    mapR[uv] = l1;
 	  }
@@ -641,19 +813,19 @@ b:      if (scanL2 == MinIndex) goto finish;
 	  {
 	    if (lview.r > 0)
 	    {
-	      l1 = l1 + QRound (cosinus * r200d*(light->GetRadius () - d));
+	      l1 = l1 + lightness*QRound (cosinus * r200d*(light->GetRadius () - d));
 	      if (l1 > 255) l1 = 255;
 	      mapR[uv] = l1;
 	    }
 	    if (lview.g > 0 && mapG)
 	    {
-	      l2 = mapG[uv] + QRound (cosinus * g200d*(light->GetRadius () - d));
+	      l2 = mapG[uv] + lightness*QRound (cosinus * g200d*(light->GetRadius () - d));
 	      if (l2 > 255) l2 = 255;
 	      mapG[uv] = l2;
 	    }
 	    if (lview.b > 0 && mapB)
 	    {
-	      l3 = mapB[uv] + QRound (cosinus * b200d*(light->GetRadius () - d));
+	      l3 = mapB[uv] + lightness*QRound (cosinus * b200d*(light->GetRadius () - d));
 	      if (l3 > 255) l3 = 255;
 	      mapB[uv] = l3;
 	    }
@@ -668,18 +840,12 @@ b:      if (scanL2 == MinIndex) goto finish;
         //else if (v == lh-1 && (u & 1)) { mapR[uv] = 255; mapG[uv] = 0; mapB[uv] = 255; }
         //else if (u == v) { mapR[uv] = 255; mapG[uv] = 255; mapB[uv] = 0; }
         //else if (u == lh-1-v) { mapR[uv] = 0; mapG[uv] = 255; mapB[uv] = 255; }
-      }
-
-      if(!sy) goto finish;
-      sxL += dxL;
-      sxR += dxR;
-      sy--;
     }
   }
 
-finish:
-
-  if (f_uv) CHKB (delete [] f_uv);
+  CHKB (delete [] f_uv);
+  free (__texture);
+  CHKB (delete [] rp);
 
   if (dyn && first_time)
   {
@@ -697,6 +863,7 @@ finish:
   }
 }
 
+/* Modified by me to correct some lightmap's border problems -- D.D. */
 void csPolyTexture::ShineDynLightmap (csLightPatch* lp)
 {
   int lw = (w>>mipmap_shift)+2;		// @@@ DON'T NEED TO GO TO 'W', 'W_ORIG' SHOULD BE SUFFICIENT!
@@ -794,7 +961,8 @@ void csPolyTexture::ShineDynLightmap (csLightPatch* lp)
 
   sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
   scanL2 = scanR2 = MaxIndex;
-  sy = fyL = fyR = (QRound (f_uv[scanL2].y)>lh-1)?lh-1:QRound (f_uv[scanL2].y);
+//  sy = fyL = fyR = (QRound (f_uv[scanL2].y)>lh-1)?lh-1:QRound (f_uv[scanL2].y);
+  sy = fyL = fyR = (QRound (ceil(f_uv[scanL2].y))>lh-1)?lh-1:QRound (ceil(f_uv[scanL2].y));
 
   for ( ; ; )
   {
@@ -808,11 +976,20 @@ void csPolyTexture::ShineDynLightmap (csLightPatch* lp)
       if (sy <= fyR)
       {
         // Check first if polygon has been finished
-        if (scanR2 == MinIndex) goto finish;
+a:      if (scanR2 == MinIndex) goto finish;
         scanR1 = scanR2;
         scanR2 = (scanR2 + 1) % lp->num_vertices;
 
-        fyR = QRound(f_uv[scanR2].y);
+        if(fabs(f_uv[scanR2].y-f_uv[MaxIndex].y)<EPS)
+        {
+          // oops! we have a flat bottom!
+          goto a;
+        }
+/*      if (scanR2 == MinIndex) goto finish;
+        scanR1 = scanR2;
+        scanR2 = (scanR2 + 1) % lp->num_vertices;
+*/
+        fyR = QRound(floor(f_uv[scanR2].y));
         float dyR = (f_uv[scanR1].y - f_uv[scanR2].y);
 	sxR = f_uv[scanR1].x;
         if (dyR != 0)
@@ -826,10 +1003,20 @@ void csPolyTexture::ShineDynLightmap (csLightPatch* lp)
       }
       if (sy <= fyL)
       {
+b:      if (scanL2 == MinIndex) goto finish;
         scanL1 = scanL2;
         scanL2 = (scanL2 - 1 + lp->num_vertices) % lp->num_vertices;
 
-        fyL = QRound(f_uv[scanL2].y);
+        if(fabs(f_uv[scanL2].y-f_uv[MaxIndex].y)<EPS)
+        {
+          // oops! we have a flat bottom!
+          goto b;
+        }
+
+/*      scanL1 = scanL2;
+        scanL2 = (scanL2 - 1 + lp->num_vertices) % lp->num_vertices;
+*/
+        fyL = QRound(floor(f_uv[scanL2].y));
         float dyL = (f_uv[scanL1].y - f_uv[scanL2].y);
 	sxL = f_uv[scanL1].x;
         if (dyL != 0)
@@ -852,10 +1039,17 @@ void csPolyTexture::ShineDynLightmap (csLightPatch* lp)
     while (sy >= fin_y)
     {
       // Compute the rounded screen coordinates of horizontal strip
-      xL = QRound (sxL)+1;
+      float _l=sxL,_r=sxR;
+
+      if(_r>_l) {float _=_r; _r=_l; _l=_;}
+		
+      xL = QRound (ceil(_l))+1;
+      xR = QRound (floor(_r));
+
+/*    xL = QRound (sxL)+1;
       xR = QRound (sxR);
       if (xR > xL) { int xswap = xR; xR = xL; xL = xswap; }
-
+*/
       if (xR < 0) xR = 0;
       if (xL > lw) xL = lw;
 

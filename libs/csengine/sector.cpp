@@ -694,7 +694,6 @@ void* csSector::ShinePolygons (csPolygonParentInt*, csPolygonInt** polygon, int 
 void csSector::ShineLightmaps (csLightView& lview)
 {
   if (draw_busy >= cfg_reflections) return;
-  int i;
 
   draw_busy++;
   csVector3* old;
@@ -705,12 +704,16 @@ void csSector::ShineLightmaps (csLightView& lview)
   csLightView new_lview;
   new_lview.Copy (lview);
 
+  /* Don't think it's necessary with new lightmaps shining. This code moves *
+   *  shadows somehow, and this is not correct. -- D.D.                     */
+#if 0
   // First we slightly expand the frustrum. This is to make sure that
   // boundary cases are also catched correctly.
   if (new_lview.frustrum)
   {
     // First calculate the center point of the frustrum. We will
     // expand around that point.
+    int i;
     csVector3 minf, maxf, cent;
     minf.x = minf.y = minf.z = 1000000;
     maxf.x = maxf.y = maxf.z = -1000000;
@@ -727,8 +730,9 @@ void csSector::ShineLightmaps (csLightView& lview)
 
     // Scale the frustrum.
     for (i = 0 ; i < lview.num_frustrum ; i++)
-      new_lview.frustrum[i] = (lview.frustrum[i]-cent) * 1.15 + cent;
+      new_lview.frustrum[i] = (lview.frustrum[i]-cent) * 1.00 + cent;
   }
+#endif
 
   if (light_frame_number != current_light_frame_number)
   {
