@@ -46,7 +46,7 @@ chronological order.
 	  far the mesh is from the camera. By default CS will register
 	  EVERY mesh and child mesh to the visibility cullers. So even
 	  for a hierarchical mesh it will register all meshes in that
-	  hierarchy seperatelly. For normal hierarchical meshes this makes
+	  hierarchy seperately. For normal hierarchical meshes this makes
 	  sense as it is possible for a child to be visible while the parent
 	  is not (i.e. imagine the hand mesh of an actor to be visible but
 	  all the rest obscured). However, for static lod this doesn't make
@@ -57,11 +57,11 @@ chronological order.
 	  the parent mesh to the culler. If the parent mesh is considered
 	  visible then it will itself find out which child meshes are relevant
 	  for the given camera position and then call make them visible
-	  in turn. By doing that static lod meshes causes a LOT less
+	  in turn. Doing that static lod meshes causes a LOT less
 	  overhead in the visibility culler and it also makes the handling
 	  of static lod meshes a bit easier. In case a hierarhical mesh
-	  is used as a child of a static lod mesh then when the hierarchical
-	  mesh is considered visible for the given distance to the camera
+	  is used as a child of a static lod mesh, when the hierarchical
+	  mesh is considered visible for the given distance to the camera,
 	  then the entire hierarchy is made visible. In this sense
 	  a hierarchical mesh as part of a static lod will be culled entirely
 	  or not (as opposed to each individual child which normally happens
