@@ -106,7 +106,7 @@ protected:
    * overlap both variables to get one compound value.
    */
   uint MixMode;
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
   /// Common constructor for derived classes
   csPolyTexType ();
