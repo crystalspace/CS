@@ -69,6 +69,7 @@ chronological order.
 	- res fixed a few 64bit portability issues in csutil reported by VC7.
 	- res removed the unused csSymbolTable class.
 	- Jorrit updated the MeshAnim HOWTO about automatic lighting.
+	- res made some small optimizations to csHash<>.
 29-Jan-2004
 	- Eric Sunshine made the following changes to clean up after Matze
 	  changed the return type of csGetConfigDir(), csGetResourceDir(),

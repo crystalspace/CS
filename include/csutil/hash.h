@@ -100,7 +100,7 @@ private:
     CS_ASSERT (Modulo);
 
     int elen = Elements.Length ();
-    Elements.SetLength (Modulo, csArray<Element> (1, 7));
+    Elements.SetLength (Modulo);
 
     for (int i = 0; i < elen; i++)
     {
@@ -192,7 +192,8 @@ public:
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
-    for (int i = values.Length () - 1; i >= 0; i--)
+    const int len = values.Length ();
+    for (int i = 0; i < len; ++i)
       if (KeyHandler::CompareKeys (values[i].key, key)) 
 	return true;
 
@@ -204,9 +205,13 @@ public:
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
-    for (int i = values.Length () - 1; i >= 0; i--)
-      if (KeyHandler::CompareKeys (values[i].key, key)) 
-	return values[i].value;
+    const int len = values.Length ();
+    for (int i = 0; i < len; ++i)
+    {
+      const Element& v = values[i];
+      if (KeyHandler::CompareKeys (v.key, key)) 
+	return v.value;
+    }
 
     static const T zero (0);
     return zero;
