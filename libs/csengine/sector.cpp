@@ -285,7 +285,7 @@ public:
   virtual void ObjectVisible (iVisibilityObject *visobject,
     iMeshWrapper *mesh)
   {
-    if (0==privMeshlist)
+    if (privMeshlist == 0)
       return;
 
     csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
