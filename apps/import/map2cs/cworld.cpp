@@ -931,6 +931,11 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
         fprintf(m_fd, "<lighting>no</lighting>");
       }
 
+      if (Alpha < 100)
+      {
+        fprintf(m_fd, "<alpha>%g</alpha>", Alpha);
+      }
+
       if (Mirror || Alpha<100 || !Solid)
       {
         //We have a special case, where we need to turn this polygon into a portal.
@@ -939,11 +944,6 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
 
 	WriteIndent();
         fprintf(m_fd, "<portal><sector>%s</sector>", targetsector);
-
-        if (Alpha < 100)
-        {
-          fprintf(m_fd, "<alpha>%g</alpha>", Alpha);
-        }
 
         if ( Mirror )
         {

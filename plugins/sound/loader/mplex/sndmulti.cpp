@@ -25,6 +25,8 @@
 #include "iutil/event.h"
 #include "iutil/strvec.h"
 #include "iutil/objreg.h"
+#include "csutil/refarr.h"
+#include "csutil/util.h"
 #include "ivaria/reporter.h"
 #include "csutil/csvector.h"
 
@@ -35,8 +37,11 @@ CS_IMPLEMENT_PLUGIN
 class csSoundLoaderMultiplexer : public iSoundLoader
 {
 private:
-  csVector Loaders;
+  csRefArray<iSoundLoader> Loaders;
+  csRef<iStrVector> list;
+  csRef<iPluginManager> plugin_mgr;
 
+  bool LoadNextPlugin ();
 public:
   SCF_DECLARE_IBASE;
 
@@ -50,7 +55,7 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   // Load a sound file from the raw data.
-  virtual csPtr<iSoundData> LoadSound(void *Data, unsigned long Size) const;
+  virtual csPtr<iSoundData> LoadSound(void *Data, unsigned long Size);
 
   struct eiComponent : public iComponent
   {
@@ -84,72 +89,98 @@ csSoundLoaderMultiplexer::csSoundLoaderMultiplexer(iBase *iParent)
 
 csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer()
 {
-  for (long i=0; i<Loaders.Length(); i++)
-  {
-    iSoundLoader *ldr=(iSoundLoader*)(Loaders.Get(i));
-    ldr->DecRef();
-  }
+  if (list) list->DeleteAll ();
+  list = NULL;
+  plugin_mgr = NULL;
 }
 
 bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
 {
-  csRef<iReporter> reporter (CS_QUERY_REGISTRY (object_reg, iReporter));
-  if (reporter)
-    reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "crystalspace.sound.loader.mplex",
-      "Initializing sound loading multiplexer...\n"
-      "  Looking for sound loader modules:");
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-  iStrVector* list = iSCF::SCF->QueryClassList ("crystalspace.sound.loader.");
-  int const nmatches = list->Length();
-  csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-  if (nmatches != 0)
+  // grab the sound loader list
+  list = csPtr<iStrVector> (
+    iSCF::SCF->QueryClassList ("crystalspace.sound.loader."));
+  int i = 0;
+  while (i < list->Length())
   {
-    int i;
-    csVector pushback;
-
-    for (i = 0; i < nmatches; i++)
+    char const* classname = list->Get(i);
+    if (!strcasecmp (classname, MY_CLASSNAME))
     {
-      char const* classname = list->Get(i);
-      if (strcasecmp (classname, MY_CLASSNAME))
-      {
-	if (reporter)
-          reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      		"crystalspace.sound.loader.mplex",
-	  	"  %s", classname);
-        csRef<iSoundLoader> ldr (CS_LOAD_PLUGIN (plugin_mgr, classname,
-		iSoundLoader));
-        if (ldr)
-	{
-	  // ok the following is a bit hacky, but since the mp3 loader skips junk until
-	  // it finds something useful chances are high it finds some "good" header the
-	  // bigger the input gets, so we give all other loaders a chance to look at it
-	  // first
-	  if (strstr (classname, "mp3"))
-	    pushback.Push (ldr);
-	  else
-	    Loaders.Push(ldr);
-	  ldr->IncRef ();	// Prevent smart pointer release.
-	}
-      }
+      list->Delete(i);
     }
-    for (i=0; i < pushback.Length (); i++)
-      Loaders.Push((iSoundLoader*)pushback.Get (i));
+    else if (strstr (classname, "mp3") && (i < (list->Length() - 1)))
+    {
+      // ok the following is a bit hacky, but since the mp3 loader skips junk until
+      // it finds something useful chances are high it finds some "good" header the
+      // bigger the input gets, so we give all other loaders a chance to look at it
+      // first
+      list->Push (csStrNew (classname));
+      list->Delete (i);
+    }
+    else
+      i++;
   }
-  list->DecRef();
+  return true;
+}
+
+bool csSoundLoaderMultiplexer::LoadNextPlugin ()
+{
+  if (!list) return false;
+  csRef<iSoundLoader> plugin;
+  while (list && !plugin)
+  {
+    char const* classname = list->Get(0);
+    plugin = CS_LOAD_PLUGIN (plugin_mgr, classname, iSoundLoader);
+    if (plugin)
+    {
+      // remember the plugin
+      Loaders.Push (plugin);
+    }
+    list->Delete (0);
+    if (list->Length() == 0)
+    {
+      list = NULL;
+      plugin_mgr = NULL;
+    }
+  }
   return true;
 }
 
 csPtr<iSoundData> csSoundLoaderMultiplexer::LoadSound (
-	void *Data, unsigned long Size) const
+	void *Data, unsigned long Size) 
 {
-  for (long i=0;i<Loaders.Length();i++)
+  bool consecutive = false; // set to true if we searched the list completely.
+  do
   {
-    iSoundLoader *Ldr=(iSoundLoader*)(Loaders.Get(i));
-    csRef<iSoundData> snd (Ldr->LoadSound(Data, Size));
-    if (snd)
-      return csPtr<iSoundData> (snd);
-  }
-  return 0;
+    int i;
+    for (i=Loaders.Length(); (i--)>0; ) 
+      // i is decremented after comparison but before we use it below;
+      //  hence it goes from Laoders.Length()-1 to 0
+    {
+      csRef<iSoundLoader> ldr = Loaders.Get(i);
+      csRef<iSoundData> snd (ldr->LoadSound(Data, Size));
+      if (snd)
+      {
+	/*
+	  move used plugin to the bottom of the list.
+	  the idea is that some formats are used more
+	  commonly than other formats and that those
+	  plugins are asked first. 
+	 */
+	if ((Loaders.Length()-i) > 4)
+	  // keep a 'top 4'; no need to shuffle the list
+	  // when a plugin is already one of the first asked
+	{
+	  Loaders.Push (ldr);
+	  Loaders.Delete (i);
+	}
+	return csPtr<iSoundData> (snd);
+      }
+      // if we just loaded a plugin only check that.
+      if (consecutive) break;
+    }
+    consecutive = true;
+  } while (LoadNextPlugin());
+  return NULL;
 }

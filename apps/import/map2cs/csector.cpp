@@ -221,7 +221,7 @@ bool CCSSector::Write(CIWorld* pIWorld)
           pWorld->WriteIndent();
           fprintf(fd, "<texmap><plane>%s</plane></texmap>\n", pPolygon->GetBaseplane()->GetName());
           pWorld->WriteIndent();
-          fprintf(fd, "<portal>%s</portal>\n", pPortal->GetTargetSector()->GetName());
+          fprintf(fd, "<portal><sector>%s</sector></portal>\n", pPortal->GetTargetSector()->GetName());
 	  pWorld->Unindent();
           pWorld->WriteIndent();
           fprintf(fd, "</p>\n"); //End of Polygon

@@ -24,20 +24,30 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
+#include "iutil/plugin.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
+#include "csutil/refarr.h"
+
 /**
  * Through this plugin you can load/save a set of different formats.
  * It works by loading other plzugins and transfers execution to them.
  */
-
 class csMultiplexImageIO : public iImageIO
 {
  protected:
-  csVector list, formats;
+  csRefArray<iImageIO> list;
+  csVector formats;
   csConfigAccess config;
+  csRef<iStrVector> classlist;
+  csRef<iPluginManager> plugin_mgr;
 
   void StoreDesc (const csVector& format);
+  /**
+   * load the next plugin in the class list
+   * returns true if more plugins are in the list
+   */
+  bool LoadNextPlugin ();
 
  public:
   SCF_DECLARE_IBASE;

@@ -23,6 +23,7 @@
 #include "csutil/csstring.h"
 #include "csutil/csvector.h"
 #include "csutil/ptrarr.h"
+#include "csutil/refarr.h"
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -31,14 +32,18 @@
 
 #define MY_CLASSNAME	"crystalspace.modelconverter.multiplexer"
 
-typedef csPArray<iModelConverter> csModelConverterVector;
 typedef csPArray<const csModelConverterFormat> csModelConverterFormatVector;
 
 class csModelConverterMultiplexer : iModelConverter
 {
+private:
+  csRef<iStrVector> classlist;
+  csRefArray<iModelConverter> Converters;
+  csRef<iPluginManager> plugin_mgr;
+
+  bool LoadNextPlugin ();
 public:
   SCF_DECLARE_IBASE;
-  csModelConverterVector Converters;
   csModelConverterFormatVector Formats;
 
   /// constructor
@@ -48,8 +53,8 @@ public:
   virtual ~csModelConverterMultiplexer ();
 
   bool Initialize (iObjectRegistry *object_reg);
-  virtual int GetFormatCount () const;
-  virtual const csModelConverterFormat *GetFormat (int idx) const;
+  virtual int GetFormatCount ();
+  virtual const csModelConverterFormat *GetFormat (int idx);
   virtual csPtr<iModelData> Load (uint8* Buffer, uint32 Size);
   virtual csPtr<iDataBuffer> Save (iModelData*, const char *Format);
 
@@ -87,81 +92,130 @@ csModelConverterMultiplexer::csModelConverterMultiplexer (iBase *p)
 
 csModelConverterMultiplexer::~csModelConverterMultiplexer ()
 {
+  if (classlist) classlist->DeleteAll ();
   // don't delete the elements of the 'formats' vector. We don't own them!
-
-  while (Converters.Length () > 0)
-  {
-    iModelConverter *conv = Converters.Pop ();
-    conv->DecRef ();
-  }
+  classlist = NULL;
+  plugin_mgr = NULL;
 }
 
 bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
 {
   int i, j;
-  csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-  // @@@ collect converter plugins
-  iStrVector* classlist =
-      iSCF::SCF->QueryClassList ("crystalspace.modelconverter.");
-  int const nmatches = classlist->Length();
-  for (i = 0; i < nmatches; i++)
-  {
-    char const* classname = classlist->Get(i);
-    if (!strcasecmp (classname, MY_CLASSNAME)) continue;
-
-    csRef<iModelConverter> ldr (CS_LOAD_PLUGIN (plugin_mgr, classname,
-    	iModelConverter));
-    if (ldr)
-    {
-      Converters.Push(ldr);
-      ldr->IncRef ();	// Avoid smart pointer release.
-    }
-  }
-  classlist->DecRef ();
-
-  for (i=0; i<Converters.Length (); i++)
-  {
-    iModelConverter *mconv = Converters.Get(i);
-    for (j=0; j<mconv->GetFormatCount (); j++)
-      Formats.Push (mconv->GetFormat (j));
-  }
+  // collect converter plugins
+  classlist = csPtr<iStrVector> (
+      iSCF::SCF->QueryClassList ("crystalspace.modelconverter."));
 
   return true;
 }
 
-int csModelConverterMultiplexer::GetFormatCount () const
+bool csModelConverterMultiplexer::LoadNextPlugin ()
 {
+  csRef<iModelConverter> plugin;
+  if (classlist && !plugin)
+  {
+    char const* classname = NULL;
+    do
+    {
+      if (classname) classlist->Delete (0);
+      if (classlist->Length() == 0)
+      {
+	classlist = NULL;
+	plugin_mgr = NULL;
+	return false;
+      }
+      classname = classlist->Get(0);
+    } while (!strcasecmp (classname, MY_CLASSNAME));
+    
+    plugin = CS_LOAD_PLUGIN (plugin_mgr, classname, iModelConverter);
+    if (plugin)
+    {
+      // remember the plugin
+      Converters.Push (plugin);
+      // and load its description, since we gonna return it on request
+      int i;
+      for (i=0; i<plugin->GetFormatCount (); i++)
+	Formats.Push (plugin->GetFormat (i));
+    }
+    classlist->Delete (0);
+  }
+  return true;
+}
+
+int csModelConverterMultiplexer::GetFormatCount ()
+{
+  while (LoadNextPlugin ());
   return Formats.Length ();
 }
 
-const csModelConverterFormat *csModelConverterMultiplexer::GetFormat (int idx) const
+const csModelConverterFormat *csModelConverterMultiplexer::GetFormat (int idx)
 {
+  while (LoadNextPlugin ());
   return Formats.Get (idx);
 }
 
 csPtr<iModelData> csModelConverterMultiplexer::Load (uint8* Buffer, uint32 Size)
 {
-  int i;
-  for (i=0; i<Converters.Length (); i++)
+  bool consecutive = false; // set to true if we searched the list completely.
+  do
   {
-    csRef<iModelData> mdl (Converters.Get(i)->Load (Buffer, Size));
-    if (mdl)
-      return csPtr<iModelData> (mdl);
-  }
+    int i;
+    for (i=Converters.Length(); (i--)>0; ) 
+      // i is decremented after comparison but before we use it below;
+      //  hence it goes from Converters.Length()-1 to 0
+    {
+      csRef<iModelConverter> conv = Converters.Get(i);
+      csRef<iModelData> mdl (conv->Load (Buffer, Size));
+      if (mdl)
+      {
+	/*
+	  move used plugin to the bottom of the list.
+	  the idea is that some formats are used more
+	  commonly than other formats and that those
+	  plugins are asked first. 
+	 */
+	if ((Converters.Length()-i) > 4)
+	  // keep a 'top 4'; no need to shuffle the list
+	  // when a plugin is already one of the first asked
+	{
+	  Converters.Push (conv);
+	  Converters.Delete (i);
+	}
+	return csPtr<iModelData> (mdl);
+      }
+      // if we just loaded a plugin only check that.
+      if (consecutive) break;
+    }
+    consecutive = true;
+  } while (LoadNextPlugin());
   return NULL;
 }
 
 csPtr<iDataBuffer> csModelConverterMultiplexer::Save (iModelData *mdl,
 	const char *Format)
 {
-  int i;
-  for (i=0; i<Converters.Length (); i++)
+  bool consecutive = false; // set to true if we searched the list completely.
+  do
   {
-    csRef<iDataBuffer> dbuf (Converters.Get(i)->Save (mdl, Format));
-    if (dbuf)
-      return csPtr<iDataBuffer> (dbuf);
-  }
+    int i;
+    for (i=Converters.Length(); (i--)>0; ) 
+    {
+      csRef<iModelConverter> conv = Converters.Get(i);
+      csRef<iDataBuffer> dbuf (conv->Save (mdl, Format));
+      if (dbuf)
+      {
+	if ((Converters.Length()-i) > 4)
+	{
+	  Converters.Push (conv);
+	  Converters.Delete (i);
+	}
+	return csPtr<iDataBuffer> (dbuf);
+      }
+      // if we just loaded a plugin only check that.
+      if (consecutive) break;
+    }
+    consecutive = true;
+  } while (LoadNextPlugin());
   return NULL;
 }

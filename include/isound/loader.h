@@ -33,7 +33,7 @@ SCF_VERSION (iSoundLoader, 1, 0, 1);
 struct iSoundLoader : public iBase
 {
   /// Create a sound object from raw input data.
-  virtual csPtr<iSoundData> LoadSound(void *Data, unsigned long Size) const = 0;
+  virtual csPtr<iSoundData> LoadSound(void *Data, unsigned long Size) = 0;
 };
 
 #endif // __CS_ISOUND_LOADER_H__

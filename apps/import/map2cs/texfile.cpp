@@ -73,27 +73,10 @@ CTextureFile::~CTextureFile()
   delete m_pImage;
 }
 
+extern iImageIO* ImageLoader;
+
 void CTextureFile::SetOriginalData(char* Data, int Size)
 {
-  static bool IL_Loaded = false;
-  static iImageIO* ImageLoader = 0;
-  if (!IL_Loaded)
-  {
-    IL_Loaded = true;
-
-    csRef<iImageIO> il = SCF_CREATE_INSTANCE(
-    	"crystalspace.graphic.image.io.multiplex", iImageIO);
-    if (il.IsValid())
-    {
-      csRef<iComponent> Plugin (SCF_QUERY_INTERFACE (il, iComponent));
-      if (Plugin.IsValid() && Plugin->Initialize(0))
-      {
-        ImageLoader = il;
-        ImageLoader->IncRef();
-      }
-    }
-  }
-
   m_OriginalData.SetData(Data, Size);
   if (Data && Size && ImageLoader)
   {

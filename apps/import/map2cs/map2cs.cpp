@@ -27,11 +27,18 @@
 #include "cworld.h"
 #include "wad3file.h"
 #include "csutil/scf.h"
+#include "iutil/plugin.h"
 #include "csutil/cfgfile.h"
 #include "cstool/initapp.h"
 #include "iutil/objreg.h"
+#include "igraphic/imageio.h"
+#include "iutil/comp.h"
 
 CS_IMPLEMENT_APPLICATION
+
+//@@@ yup, global vars are ugly.
+bool IL_Loaded = false;
+iImageIO* ImageLoader = 0;
 
 void PrintSyntax()
 {
@@ -44,11 +51,21 @@ void PrintSyntax()
   printf("             using config data in sample.cfg\n");
 }
 
-int main( int argc, char *argv[ ])
+int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
 {
-  // this is required for the image loader
-  csRef<iObjectRegistry> object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+  csRef<iImageIO> il = CS_LOAD_PLUGIN (plugin_mgr,
+    "crystalspace.graphic.image.io.multiplex", iImageIO);
+  if (!il)
+  {
+    printf ("Couldn't load image multiplexer!\n");
+    return 1;
+  }
+  else
+  {
+   ImageLoader = il;
+  }
 
   printf("\nmap2cs version 0.97, Copyright (C) 1999-2000 by Thomas Hieber\n");
   printf("                     Copyright (C) 1999-2003 by Jorrit Tyberghein "
@@ -99,7 +116,18 @@ int main( int argc, char *argv[ ])
 
   printf("done.");
 
+  return 0;
+}
+
+int main (int argc, char *argv[])
+{
+  // this is required for the image loader
+  csRef<iObjectRegistry> object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return false;
+
+  int ret = appMain (object_reg, argc, argv);
+  
   csInitializer::DestroyApplication (object_reg);
 
-  return 0;
+  return ret;
 }

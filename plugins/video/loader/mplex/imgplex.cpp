@@ -25,6 +25,7 @@
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+#include "csutil/util.h"
 
 #define MY_CLASSNAME "crystalspace.graphic.image.io.multiplex"
 
@@ -54,44 +55,22 @@ csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
 
 csMultiplexImageIO::~csMultiplexImageIO ()
 {
-  int i;
-  for (i=0; i < list.Length (); i++)
-    ((iImageIO*)list.Get (i))->DecRef ();
+  if (classlist) classlist->DeleteAll ();
+  classlist = NULL;
+  plugin_mgr = NULL;
 }
 
 bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
 {
   if (object_reg)
   {
-    csRef<iPluginManager> plugin_mgr (
-    	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+    plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-    iStrVector* classlist =
-      iSCF::SCF->QueryClassList ("crystalspace.graphic.image.io.");
-    int const nmatches = classlist->Length();
-    if (nmatches != 0)
-    {
-      int i;
-      for (i = 0; i < nmatches; i++)
-      {
-	char const* classname = classlist->Get(i);
-        if (strcasecmp (classname, MY_CLASSNAME))
-        {
-	  csRef<iImageIO> plugin (
-	  	CS_LOAD_PLUGIN (plugin_mgr, classname, iImageIO));
-	  if (plugin)
-	  {
-	    // remember the plugin
-	    list.Push (plugin);
-	    // and load its description, since we gonna return it on request
-	    StoreDesc (plugin->GetDescription ());
-	    plugin->IncRef ();	// Avoid smart pointer release.
-	  }
-        }
-      }
-    }
-    classlist->DecRef();
-    //return (list.Length() > 0);
+    // query registry for image plugins...
+    classlist = csPtr<iStrVector> (
+      iSCF::SCF->QueryClassList ("crystalspace.graphic.image.io."));
+    // but don't load them yet
+
     return true;
   }
   return false;
@@ -105,21 +84,78 @@ void csMultiplexImageIO::StoreDesc (const csVector& format)
     formats.Push ((csSome)format.Get (i));
 }
 
+bool csMultiplexImageIO::LoadNextPlugin ()
+{
+  csRef<iImageIO> plugin;
+  while (classlist && !plugin)
+  {
+    char const* classname = NULL;
+    do
+    {
+      if (classname) classlist->Delete (0);
+      if (classlist->Length() == 0)
+      {
+	classlist = NULL;
+	plugin_mgr = NULL;
+	return false;
+      }
+      classname = classlist->Get(0);
+    } while (!strcasecmp (classname, MY_CLASSNAME));
+    
+    plugin = CS_LOAD_PLUGIN (plugin_mgr, classname, iImageIO);
+    if (plugin)
+    {
+      // remember the plugin
+      list.Push (plugin);
+      // and load its description, since we gonna return it on request
+      StoreDesc (plugin->GetDescription ());
+    }
+    classlist->Delete (0);
+  }
+  return true;
+}
+
 const csVector& csMultiplexImageIO::GetDescription ()
 {
+  // need all plugins.
+  while (LoadNextPlugin()); 
   return formats;
 }
 
 csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
-  int i;
-  for (i=0; i<list.Length(); i++)
+  bool consecutive = false; // set to true if we searched the list completely.
+  do
   {
-    iImageIO *pIO = (iImageIO*)list.Get(i);
-    csRef<iImage> img (pIO->Load(iBuffer, iSize, iFormat));
-    if (img)
-      return csPtr<iImage> (img);
-  }
+    int i;
+    for (i=list.Length(); (i--)>0; ) 
+      // i is decremented after comparison but before we use it below;
+      //  hence it goes from list.Length()-1 to 0
+    {
+      csRef<iImageIO> pIO = (iImageIO*)list.Get(i);
+      csRef<iImage> img (pIO->Load(iBuffer, iSize, iFormat));
+      if (img)
+      {
+	/*
+	  move used plugin to the bottom of the list.
+	  the idea is that some formats are used more
+	  commonly than other formats and that those
+	  plugins are asked first. 
+	 */
+	if ((list.Length()-i) > 4)
+	  // keep a 'top 4'; no need to shuffle the list
+	  // when a plugin is already one of the first asked
+	{
+	  list.Push (pIO);
+	  list.Delete (i);
+	}
+	return csPtr<iImage> (img);
+      }
+      // if we just loaded a plugin only check that.
+      if (consecutive) break;
+    }
+    consecutive = true;
+  } while (LoadNextPlugin());
   return NULL;
 }
 
@@ -139,27 +175,57 @@ csPtr<iDataBuffer> csMultiplexImageIO::Save (
   iImage *image, iImageIO::FileFormatDescription *format,
   const char* extraoptions)
 {
-  int i;
-  for (i=0; i<list.Length(); i++)
+  // same algortihm as in Load()
+  bool consecutive = false; 
+  do
   {
-    iImageIO *pIO = (iImageIO*)list.Get(i);
-    csRef<iDataBuffer> buf (pIO->Save(image, format, extraoptions));
-    if (buf)
-      return csPtr<iDataBuffer> (buf);
-  }
+    int i;
+    for (i=list.Length(); (i--)>0; ) 
+    {
+      csRef<iImageIO> pIO = (iImageIO*)list.Get(i);
+      csRef<iDataBuffer> buf (pIO->Save(image, format, extraoptions));
+      if (buf)
+      {
+	if ((list.Length()-i) > 4)
+	{
+	  list.Push (pIO);
+	  list.Delete (i);
+	}
+	return csPtr<iDataBuffer> (buf);
+      }
+      // if we just loaded a plugin only check that.
+      if (consecutive) break;
+    }
+    consecutive = true;
+  } while (LoadNextPlugin());
   return NULL;
 }
 
 csPtr<iDataBuffer> csMultiplexImageIO::Save (iImage *image, const char *mime,
   const char* extraoptions)
 {
-  int i;
-  for (i=0; i<list.Length(); i++)
+  // same algortihm as in Load()
+  bool consecutive = false; 
+  do
   {
-    iImageIO *pIO = (iImageIO*)list.Get(i);
-    csRef<iDataBuffer> buf (pIO->Save(image, mime, extraoptions));
-    if (buf)
-      return csPtr<iDataBuffer> (buf);
-  }
+    int i;
+    for (i=list.Length(); (i--)>0; ) 
+    {
+      csRef<iImageIO> pIO = (iImageIO*)list.Get(i);
+      csRef<iDataBuffer> buf (pIO->Save(image, mime, extraoptions));
+      if (buf)
+      {
+	if ((list.Length()-i) > 4)
+	{
+	  list.Push (pIO);
+	  list.Delete (i);
+	}
+	return csPtr<iDataBuffer> (buf);
+      }
+      // if we just loaded a plugin only check that.
+      if (consecutive) break;
+    }
+    consecutive = true;
+  } while (LoadNextPlugin());
   return NULL;
 }
