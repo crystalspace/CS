@@ -259,57 +259,66 @@ bool Lighter::Initialize (int argc, const char* const argv[],
 
   engine->SetLightingCacheMode (CS_ENGINE_CACHE_WRITE);
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-
-  char map_dir[255];
-  const char* val = cmdline->GetName ();
-  if (!val)
+  int idx = 0;
+  for (;;)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Please give a level (either a zip file or a VFS dir)!");
-    Cleanup ();
-    exit (1);
-  }
-  cmdline->DecRef ();
-  // if an absolute path is given, copy it. Otherwise prepend "/lev/".
-  if (val[0] == '/')
-    strcpy (map_dir, val);
-  else
-    sprintf (map_dir, "/lev/%s", val);
-
-  // Check the map and mount it if required
-  char tmp [100];
-  sprintf (tmp, "%s/", map_dir);
-  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  if (!VFS)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
-    exit (-1);
-  }
-
-  if (!VFS->Exists (map_dir))
-  {
-    char *name = strrchr (map_dir, '/');
-    if (name)
+    char map_dir[512];
+    iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	  iCommandLineParser);
+    const char* val = cmdline->GetName (idx);
+    cmdline->DecRef ();
+    if (!val)
     {
-      name++;
-      const char *valfiletype = "zip";
-      sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
-	name, valfiletype, name, valfiletype, name, valfiletype );
-      VFS->Mount (map_dir, tmp);
+      if (idx > 0)
+      {
+	// We already have one map so it is sufficient here.
+	break;
+      }
+      Report (CS_REPORTER_SEVERITY_ERROR,
+    	  "Please give a level (either a zip file or a VFS dir)!");
+      Cleanup ();
+      exit (1);
     }
-  }
+    // if an absolute path is given, copy it. Otherwise prepend "/lev/".
+    if (val[0] == '/')
+      strcpy (map_dir, val);
+    else
+      sprintf (map_dir, "/lev/%s", val);
 
-  // Set VFS current directory to the level we want to load.
-  VFS->ChDir (map_dir);
-  VFS->DecRef ();
-  // Load the level file which is called 'world'.
-  if (!loader->LoadMapFile ("world"))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't load level '%s'!", map_dir);
-    Cleanup ();
-    exit (1);
+    // Check the map and mount it if required
+    char tmp [100];
+    sprintf (tmp, "%s/", map_dir);
+    iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+    if (!VFS)
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
+      exit (-1);
+    }
+
+    if (!VFS->Exists (map_dir))
+    {
+      char *name = strrchr (map_dir, '/');
+      if (name)
+      {
+        name++;
+        const char *valfiletype = "zip";
+        sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
+	  name, valfiletype, name, valfiletype, name, valfiletype );
+        VFS->Mount (map_dir, tmp);
+      }
+    }
+
+    // Set VFS current directory to the level we want to load.
+    VFS->ChDir (map_dir);
+    VFS->DecRef ();
+    // Load the level file which is called 'world'.
+    if (!loader->LoadMapFile ("world", idx == 0))	// Only clear engine for first level.
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't load level '%s'!", map_dir);
+      Cleanup ();
+      exit (1);
+    }
+    idx++;
   }
 
   csGfxProgressMeter* meter = new csGfxProgressMeter (320);
