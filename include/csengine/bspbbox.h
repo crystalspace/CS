@@ -161,7 +161,7 @@ public:
   /**
    * Not implemented yet! @@@
    */
-  bool Covers (csPolygonInt* /*covered*/) { return false; }
+  bool Overlaps (csPolygonInt* /*overlapped*/) { return false; }
 };
 
 /**

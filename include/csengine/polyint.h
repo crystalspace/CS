@@ -167,13 +167,13 @@ public:
 
   /**
    * Compare this polygon to the other one. If there exists
-   * a position in space where this polygon would cover the other
+   * a position in space where this polygon would overlap the other
    * then return true. The other polygon is not guaranteed to
    * have the same type but it is guaranteed to be part of the
    * same set of added polygon then this one. So the type should
    * always be known.
    */
-  virtual bool Covers (csPolygonInt* covered) = 0;
+  virtual bool Overlaps (csPolygonInt* overlapped) = 0;
 };
 
 /**

@@ -419,15 +419,15 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
   np2->Finish ();
 }
 
-bool csPolygon3D::Covers (csPolygonInt* covered)
+bool csPolygon3D::Overlaps (csPolygonInt* overlapped)
 {
-  if (covered->GetType () != 1) return true; // @@@ NOT IMPLEMENTED YET!
-  csPolygon3D* totest = (csPolygon3D*)covered;
+  if (overlapped->GetType () != 1) return true; // @@@ NOT IMPLEMENTED YET!
+  csPolygon3D* totest = (csPolygon3D*)overlapped;
 
   // Algorithm: if any of the vertices of the 'totest' polygon
   // is facing away from the front of this polygon (i.e. the vertex
   // cannot see this polygon) then there is a chance that this polygon
-  // covers the other. If this is not the case then we can return false
+  // overlaps the other. If this is not the case then we can return false
   // already. Otherwise we have to see that the 'totest' polygon is
   // itself not facing away from this polygon. To test that we see if
   // there is a vertex of this polygon that is in front of the 'totest'

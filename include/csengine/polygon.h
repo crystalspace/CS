@@ -1035,10 +1035,10 @@ public:
   	const csPlane3& plane);
 
   /**
-   * Check if this polygon covers the other polygon from any viewpoint
-   * in space.
+   * Check if this polygon (partially) overlaps the other polygon
+   * from some viewpoint in space.
    */
-  bool Covers (csPolygonInt* covered);
+  bool Overlaps (csPolygonInt* overlapped);
 
   /**
    * Return 1 to indicate to the BSP tree routines that

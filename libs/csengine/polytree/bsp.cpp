@@ -234,7 +234,7 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
 	int num)
 {
   int i;
-  if (!Covers (polygons, num))
+  if (!Overlaps (polygons, num))
   {
     // We have a convex set.
     // First we test if all polygons are coplanar. In that case

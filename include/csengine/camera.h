@@ -94,6 +94,8 @@ public:
 
   /// Get the default FOV for new cameras.
   static int GetDefaultFOV () { return default_aspect; }
+  /// Get the default inverse FOV for new cameras.
+  static float GetDefaultInvFOV () { return default_inv_aspect; }
 
   /// Set the FOV for this camera.
   virtual void SetFOV (int a) { aspect = a; inv_aspect = 1.0f / a; }

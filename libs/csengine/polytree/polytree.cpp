@@ -94,7 +94,7 @@ void csPolygonTree::AddObject (csPolyTreeObject* obj)
   stub->IncRef ();
 }
 
-bool csPolygonTree::Covers (csPolygonInt** polygons, int num)
+bool csPolygonTree::Overlaps (csPolygonInt** polygons, int num)
 {
   // Don't compute this if more than six vertices (overhead).
   // Return true in this case so that the tree build routine assumes
@@ -105,7 +105,7 @@ bool csPolygonTree::Covers (csPolygonInt** polygons, int num)
     for (j = 0 ; j < num ; j++)
       if (i != j)
       {
-        if (polygons[i]->Covers (polygons[j])) return true;
+        if (polygons[i]->Overlaps (polygons[j])) return true;
       }
 
   // None of the polygons covers the other.

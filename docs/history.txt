@@ -34,6 +34,16 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine enhanced CS_ASSERT() so that it now prints a useful
 	  error message before breaking into the debugger or crashing the
 	  application, instead of dying silently.
+	- Added csCamera::GetDefaultInvFOV() too. Fixed MazeD and csgame
+	  for the csCamera changes.
+	- Changed csPolygon3D::Covers() to csPolygon3D::Overlaps() as
+	  this is actually what the function is calculating (and needs
+	  to calculate). Suggested by Norman Kramer.
+	- Added new csHashMap class to csutil. This is the first version of
+	  a new hashtable class that can be used for several things.
+	  This is untested code right now.
+	- Norman Kramer changed config for Glide to access Glide section
+	  instead of Glide2x.
 1-Jun-2000
 	- Experiment with new octree generation method. Instead of only
 	  favoring a center with few splits I also try to favor centers which
