@@ -109,7 +109,7 @@ equality against @samp{csArrayItemNotFound}:
 @example
 csArray<@dots{}> a;
 int index = a.Find (@dots{});
-if (i >= 0)
+if (index >= 0)
 @{
   /* Item found */
   @dots{}
@@ -126,7 +126,7 @@ Has to be replaced with:
 @example
 csArray<@dots{}> a;
 size_t index = a.Find (@dots{});
-if (i != csArrayItemNotFound)
+if (index != csArrayItemNotFound)
 @{
   /* Item found */
   @dots{}
