@@ -1339,7 +1339,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
  
   // Now we need to correct the cosinus factor so that it
   // really represents a cosinus.
-  float inv_distance = 1./distance;
+  float inv_distance = 1./sqrt(distance);
   path *= inv_distance;
   cosdestangle *= inv_distance;
   
