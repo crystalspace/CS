@@ -13,9 +13,9 @@ chronological order.
 	  which will try to measure quality of occluders. Not enabled at
 	  the moment.
 	- Jorrit optimized Dynavis by allowing to use a coverage buffer that
-	  is smaller in size then the screen. This can give very small
+	  is smaller in size than the screen. This can give very small
 	  visibility culling errors but that should be rare (and not wider
-	  or taller then a pixel).
+	  or taller than a pixel).
 	- Jorrit added a new config file for Dynavis where you can set
 	  various options (like for example the amount of coverage buffer
 	  reduction).
@@ -60,7 +60,7 @@ chronological order.
 	  at least the 2004/06/28 version of Cal3D since this is required by
 	  Keith's changes to sprcal3d.
 	- Jorrit optimized Dynavis a bit. Removed an unneeded optimization that
-	  caused more overhead then it is worth and also considerably cleaned
+	  caused more overhead than it is worth and also considerably cleaned
 	  up the loop for FlushGeneral(). Overall this gives about a 6-8%
 	  speedup on my system.
 	- res made the following changes:
