@@ -726,6 +726,7 @@ void csWorld::Clear ()
   things.DeleteAll ();
   skies.DeleteAll ();
   sprite_templates.DeleteAll ();
+  curve_templates.DeleteAll ();
   thing_templates.DeleteAll ();
   sectors.DeleteAll ();
   camera_positions.DeleteAll ();
@@ -1824,6 +1825,7 @@ bool csWorld::DeleteLibrary (const char *iName)
   DELETE_ALL_OBJECTS (collections, csCollection)
   DELETE_ALL_OBJECTS (sprites, csSprite)
   DELETE_ALL_OBJECTS (sprite_templates, csSpriteTemplate)
+  DELETE_ALL_OBJECTS (curve_templates, csCurveTemplate)
   DELETE_ALL_OBJECTS (thing_templates, csThing)
   DELETE_ALL_OBJECTS (sectors, csSector)
   DELETE_ALL_OBJECTS ((*textures), csTextureWrapper)

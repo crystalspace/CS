@@ -413,6 +413,12 @@ public:
   csNamedObjVector thing_templates;
 
   /**
+   * List of curve templates (bezier templates). This vector contains objects of
+   * type csCurveTemplate*.
+   */
+  csNamedObjVector curve_templates;
+
+  /**
    * List of all sprites in the world. This vector contains objects
    * of type csSprite*. Use UnlinkSprite() and RemoveSprite()
    * to unlink and/or remove sprites from this list. These functions

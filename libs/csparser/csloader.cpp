@@ -1398,6 +1398,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
         csCurveTemplate* ct = load_beziertemplate (name, params,
 	    info.default_material, info.default_texlen,
 	    ps.GetCurveVertices ());
+	World->curve_templates.Push (ct);
 	csCurve* p = ct->MakeCurve ();
 	p->SetName (ct->GetName ());
 	p->SetParent (&ps);
