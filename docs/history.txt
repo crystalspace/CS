@@ -17,6 +17,11 @@ chronological order.
 	  issue.
 	    http://www.w3.org/TR/REC-xml/#sec-white-space
 	    http://www.xml.com/axml/notes/AllWSAlways.html
+	- Eric Sunshine worked around a problem reported by Phil Wyett on
+	  Solaris where the configure.ac sizeof(wchar_t) check bombed. The
+	  libstdc++ could not be found when the sizeof() test program was
+	  run. Apparently, Solaris does not search /usr/local/lib (where
+	  resides libstdc++) by default.
 25-Oct-2004
 	- Jorrit disabled VBO by default now. It gives too many problems
 	  (both on ATI and nVidia). Having this option on by default can

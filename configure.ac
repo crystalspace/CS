@@ -881,6 +881,13 @@ AS_IF([test $cs_cv_prog_cxx_debug != no],
 # compilers search there by default.  Some compiler, on the other hand,
 # complain if it is already in the built-in search path, and we would like to
 # avoid the complaint, if possible.
+#
+# Furthermore, add a -L entry to LDFLAGS for /usr/local/lib if present.
+# Finally, add /usr/local/lib to LD_LIBRARY_PATH if present since not all
+# platforms do so by default. This will allow some tests to succeed which would
+# otherwise fail. An example is the sizeof(wchar_t) check on Solaris, which
+# attempts to run a test program. Without augmenting LD_LIBRARY_PATH, the test
+# program would fail to run, citing inability to locate libstdc++.so.
 #------------------------------------------------------------------------------
 AS_IF([test -d /usr/local/include],
     [CS_CHECK_BUILD_FLAGS([if -I/usr/local/include is usable],
@@ -897,7 +904,9 @@ AS_IF([test $cs_cv_prog_cxx_local_include = yes],
 
 AS_IF([test -d /usr/local/lib],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-L/usr/local/lib], [+])
-    LDFLAGS="$LDFLAGS -L/usr/local/lib"])
+    LDFLAGS="$LDFLAGS -L/usr/local/lib"
+    LD_LIBRARY_PATH="$LD_LIBRARY_PATH$PATH_SEPARATOR/usr/local/lib"
+    export LD_LIBRARY_PATH])
 
 
 
