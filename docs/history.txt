@@ -84,6 +84,8 @@ chronological order.
 	  this as an embedded struct there was a circular reference.
 	- Jorrit fixed circular ref between simpleformerloader and loader.
 	  This fixes the remaining ref leaks in terrain and terrainf levels.
+	- Jorrit but the unused csBlockBuilder class in #if 0 in bruteblock
+	  terrain.
 18-Aug-2004
 	- Jorrit fixed the NR null renderer so that it also returns a
 	  valid iPolygonRenderer instance on calling

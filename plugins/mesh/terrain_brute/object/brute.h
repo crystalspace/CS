@@ -131,6 +131,8 @@ public:
 };
 
 
+#if 0
+// The block builder is not currently used.
 class csBlockBuilder : public csRunnable
 {
 private:
@@ -211,6 +213,7 @@ public:
   virtual void DecRef() {refcount--;}
   virtual int GetRefCount() {return refcount;}
 };
+#endif
 
 class csTerrainObject : public iMeshObject
 {
@@ -249,7 +252,7 @@ private:
   float block_minsize;
   int block_res;
 
-  csBlockBuilder *builder;
+  //csBlockBuilder *builder;
   csRef<csThread> buildthread;
 
   csRef<iTerraFormer> terraformer;
