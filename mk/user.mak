@@ -152,6 +152,7 @@ endif
 
 PLUGINS.DYNAMIC += documentsystem/binary
 PLUGINS.DYNAMIC += documentsystem/xmltiny
+PLUGINS.DYNAMIC += documentsystem/xmlread
 PLUGINS.DYNAMIC += documentsystem/dsplex
 
 #PLUGINS.DYNAMIC += video/render3d/opengl

@@ -1,0 +1,218 @@
+/*
+    Copyright (C) 2002 by Jorrit Tyberghein
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __XRPRIV_H__
+#define __XRPRIV_H__
+
+#include "iutil/document.h"
+#include "xr.h"
+
+/**
+ * This is an SCF compatible wrapper for an attribute iterator.
+ */
+struct csXmlReadAttributeIterator : public iDocumentAttributeIterator
+{
+private:
+  int current;
+  int count;
+  TrXmlElement* parent;
+
+public:
+  csXmlReadAttributeIterator (TrDocumentNode* parent);
+  virtual ~csXmlReadAttributeIterator () { }
+
+  SCF_DECLARE_IBASE;
+
+  virtual bool HasNext ();
+  virtual csRef<iDocumentAttribute> Next ();
+};
+
+/**
+ * This is an SCF compatible wrapper for an attribute in XmlRead.
+ */
+struct csXmlReadAttribute : public iDocumentAttribute
+{
+private:
+  TrDocumentAttribute* attr;
+
+public:
+  csXmlReadAttribute ()
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    attr = NULL;
+  }
+
+  csXmlReadAttribute (TrDocumentAttribute* attr)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    csXmlReadAttribute::attr = attr;
+  }
+
+  virtual ~csXmlReadAttribute ()
+  {
+  }
+
+  SCF_DECLARE_IBASE;
+
+  virtual const char* GetName ()
+  {
+    return attr->Name ();
+  }
+
+  virtual const char* GetValue ()
+  {
+    return attr->Value ();
+  }
+
+  virtual int GetValueAsInt ()
+  {
+    return attr->IntValue ();
+  }
+
+  virtual float GetValueAsFloat ()
+  {
+    const char* val = attr->Value ();
+    float f;
+    sscanf (val, "%f", &f);
+    return f;
+  }
+
+  virtual void SetName (const char*) { }
+  virtual void SetValue (const char*) { }
+  virtual void SetValueAsInt (int) { }
+  virtual void SetValueAsFloat (float) { }
+};
+
+/**
+ * This is an SCF compatible wrapper for a node iterator.
+ */
+struct csXmlReadNodeIterator : public iDocumentNodeIterator
+{
+private:
+  csXmlReadDocumentSystem* sys;
+  TrDocumentNode* current;
+  TrDocumentNodeChildren* parent;
+  char* value;
+
+public:
+  csXmlReadNodeIterator (csXmlReadDocumentSystem* sys,
+	TrDocumentNodeChildren* parent, const char* value);
+  virtual ~csXmlReadNodeIterator () { delete[] value; }
+
+  SCF_DECLARE_IBASE;
+
+  virtual bool HasNext ();
+  virtual csRef<iDocumentNode> Next ();
+};
+
+/**
+ * This is an SCF compatible wrapper for a node in XmlRead.
+ */
+struct csXmlReadNode : public iDocumentNode
+{
+private:
+  friend class csXmlReadDocumentSystem;
+  TrDocumentNode* node;
+  TrDocumentNodeChildren* node_children;
+  // We keep a reference to 'sys' to avoid it being cleaned up too early.
+  // We need 'sys' for the pool.
+  csRef<csXmlReadDocumentSystem> sys;
+  csXmlReadNode* next_pool;	// Next element in pool.
+
+  csXmlReadNode (csXmlReadDocumentSystem* sys);
+
+  TrDocumentAttribute* GetAttributeInternal (const char* name);
+
+public:
+  virtual ~csXmlReadNode ();
+
+  TrDocumentNode* GetTiNode () { return node; }
+  void SetTiNode (TrDocumentNode* node)
+  {
+    csXmlReadNode::node = node;
+    node_children = node->ToDocumentNodeChildren ();
+  }
+
+  SCF_DECLARE_IBASE;
+
+  virtual csDocumentNodeType GetType ();
+  virtual bool Equals (iDocumentNode* other);
+  virtual const char* GetValue ();
+  virtual void SetValue (const char*) { }
+  virtual void SetValueAsInt (int) { }
+  virtual void SetValueAsFloat (float) { }
+
+  virtual csRef<iDocumentNode> GetParent ();
+
+  virtual csRef<iDocumentNodeIterator> GetNodes ();
+  virtual csRef<iDocumentNodeIterator> GetNodes (const char* value);
+  virtual csRef<iDocumentNode> GetNode (const char* value);
+  virtual void RemoveNode (const csRef<iDocumentNode>&) { }
+  virtual void RemoveNodes () { }
+  virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType,
+  	iDocumentNode*) { return NULL; }
+
+  virtual const char* GetContentsValue ();
+  virtual int GetContentsValueAsInt ();
+  virtual float GetContentsValueAsFloat ();
+
+  virtual csRef<iDocumentAttributeIterator> GetAttributes ();
+  virtual csRef<iDocumentAttribute> GetAttribute (const char* name);
+  virtual int GetAttributeValueAsInt (const char* name);
+  virtual float GetAttributeValueAsFloat (const char* name);
+  virtual const char* GetAttributeValue (const char* name);
+  virtual void RemoveAttribute (const csRef<iDocumentAttribute>&) { }
+  virtual void RemoveAttributes () { }
+  virtual void SetAttribute (const char*, const char*) { }
+  virtual void SetAttributeAsInt (const char*, int) { }
+  virtual void SetAttributeAsFloat (const char*, float) { }
+};
+
+/**
+ * This is an SCF compatible wrapper for a document in XmlRead.
+ */
+class csXmlReadDocument : public iDocument
+{
+private:
+  csRef<iDocumentNode> root;
+  // We keep a reference to 'sys' to avoid it being cleaned up too early.
+  csRef<csXmlReadDocumentSystem> sys;
+
+public:
+  csXmlReadDocument (csXmlReadDocumentSystem* sys);
+  virtual ~csXmlReadDocument ();
+
+  SCF_DECLARE_IBASE;
+
+  virtual void Clear ();
+  virtual csRef<iDocumentNode> CreateRoot ();
+
+  virtual csRef<iDocumentNode> GetRoot ();
+  virtual const char* Parse (iFile* file);
+  virtual const char* Parse (iDataBuffer* buf);
+  virtual const char* Parse (iString* str);
+  virtual const char* Parse (const char* buf);
+  virtual const char* Write (iFile*) { return "Read-only!"; }
+  virtual const char* Write (iString*) { return "Read-only!"; }
+  virtual const char* Write (iVFS*, const char*) { return "Read-only!"; }
+
+  virtual int Changeable () { return CS_CHANGEABLE_NEVER; }
+};
+
+#endif // __XRPRIV_H__
+

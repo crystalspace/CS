@@ -10,6 +10,14 @@ The history order is reversed so that new features are at the top.
 	- Put back uint. It is still used a lot.
 	- Cleaned up the tinyxml code a lot. At least the ugly warnings
 	  are now gone completely. Also removed all stuff CS doesn't need.
+	- Made a new 'xmlread' plugin. This is a variant of TinyXML which
+	  only supports reading. Because of that it will be able to do
+	  several optimizations in data structures that are not possible
+	  in the general version (these optimizations are currently not
+	  done yet). To use this the simplest way is to add
+	  the following line to your application config:
+	  System.Plugins.iDocumentSystem = crystalspace.documentsystem.xmlread
+	  Walktest already has this line now.
 	- res added CONSTI64() and CONSTUI64() macros to cstypes.h for 
 	  specifying 64bit constants on all platforms.
 1-Apr-2003
