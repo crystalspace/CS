@@ -7,6 +7,11 @@ The history order is reversed so that new features are at the top.
 	  Load times using the binary format are a LOT better.
 	- David Asbell also extended the viewmesh application so that it
 	  can now save 3D sprites to the binary format.
+	- Fixed a very weird construction in AWS where the destructor
+	  of the superclass was called explicitely like this:
+	  	this->super::~super().
+	  This causes problems on some compilers and I don't see the
+	  need for this either.
 3-Jul-2002
 	- Added non-functional iEngine->GetVisibleObjects(). The purpose
 	  of this routine will be to return all potentially visible objects
