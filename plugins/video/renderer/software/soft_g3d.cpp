@@ -2503,8 +2503,7 @@ bool csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       do_gouraud = value;
       break;
     case G3DRENDERSTATE_GAMMACORRECTION:
-      Gamma = value;
-      texman->SetGamma (value / 65536.);
+      texman->SetGamma ((Gamma = value) / 65536.);
       if (tcache) tcache->Clear ();
       break;
     default:
@@ -2549,7 +2548,7 @@ long csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op)
     case G3DRENDERSTATE_GOURAUDENABLE:
       return do_gouraud;
     case G3DRENDERSTATE_GAMMACORRECTION:
-      return QInt16 (Gamma);
+      return Gamma;
     default:
       return 0;
   }
