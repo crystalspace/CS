@@ -54,22 +54,22 @@
       <texture>andrew_marble4.jpg</texture>
       <shaderparam name="tex normal" type="texture">blobbyDOT3.png</shaderparam>
       <shaderparam name="texture scale" type="vector2">16,16</shaderparam>
-      <shader type="diffuse">splatting_bump</shader>
-      <!-- <shader type="diffuse">splatting_scattering</shader> -->
+      <!-- <shader type="diffuse">splatting_bump</shader> -->
+      <shader type="diffuse">splatting_scattering</shader>
     </material>
     <material name="Stone">
       <texture>stone4.gif</texture>
       <shaderparam name="tex normal" type="texture">blobbyDOT3.png</shaderparam>
       <shaderparam name="texture scale" type="vector2">8,8</shaderparam>
-      <shader type="diffuse">splatting_bump</shader>
-      <!-- <shader type="diffuse">splatting_scattering</shader> -->
+      <!-- <shader type="diffuse">splatting_bump</shader> -->
+      <shader type="diffuse">splatting_scattering</shader>
     </material>
     <material name="Grass">
       <texture>grass.png</texture>
       <shaderparam name="tex normal" type="texture">grassDOT3.png</shaderparam>
       <shaderparam name="texture scale" type="vector2">16,16</shaderparam>
-      <shader type="diffuse">splatting_bump</shader>
-      <!-- <shader type="diffuse">splatting_scattering</shader> -->
+      <!-- <shader type="diffuse">splatting_bump</shader> -->
+      <shader type="diffuse">splatting_scattering</shader>
     </material>
   </materials>
 
@@ -162,7 +162,7 @@
       <params>
         <factory>skydome</factory>
         <radius x="500000" y="500000" z="500000" />
-        <numrim>16</numrim>
+        <numrim>256</numrim>
         <reversed>yes</reversed>
         <material>ScatterSky</material>
         <color red="0" green="0" blue="0" />
