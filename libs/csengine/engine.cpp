@@ -71,7 +71,11 @@
 #include "ivideo/graph3d.h"
 #include "igeom/clip2d.h"
 
-
+#if defined(CS_USE_NEW_RENDERER)
+#include "ivideo/rendersteps/irenderstep.h"
+#include "ivideo/rendersteps/irsfact.h"
+#include "ivideo/rendersteps/igeneric.h"
+#endif
 
 //---------------------------------------------------------------------------
 void csEngine::Report (const char *description, ...)
