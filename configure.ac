@@ -1260,7 +1260,7 @@ CS_CHECK_LIB_WITH([SDL],
     [AC_LANG_PROGRAM([#include <SDL/SDL.h>],
 	[SDL_Init(0);])], [], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libSDL], [SDL])
-	    CS_MAKEFILE_PROPERTY([HAS_CAL3D], [yes])])
+	    CS_MAKEFILE_PROPERTY([HAS_SDL], [yes])])
 
 
 #------------------------------------------------------------------------------

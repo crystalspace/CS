@@ -19933,7 +19933,7 @@ fi
 
 fi
 
-	    cs_makefile_text="${cs_makefile_text}HAS_CAL3D = yes
+	    cs_makefile_text="${cs_makefile_text}HAS_SDL = yes
 "
 else
   :
