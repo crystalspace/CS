@@ -79,7 +79,7 @@ awsGroupFrame::SetProperty(char *name, void *parm)
   {
     iString *s = (iString *)(parm);
 
-    if (s)
+    if (s && s->Length())
     {
       if (caption) caption->DecRef();
       caption=s;
