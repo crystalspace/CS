@@ -778,6 +778,7 @@ void csGraphics2DDDraw3::SetFor3D(bool For3D)
   m_bUses3D = For3D;
 }
 
+/*
 void csGraphics2DDDraw3::DrawPixmap8 (csGraphics2D *This, iTextureHandle *hTex, 
                                       int sx, int sy, int sw, int sh,
                                       int tx, int ty, int tw, int th)
@@ -825,3 +826,4 @@ void csGraphics2DDDraw3::DrawPixmap32 (csGraphics2D *This, iTextureHandle *hTex,
   (void) tw;
   (void) th;
 }
+*/
