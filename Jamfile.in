@@ -30,9 +30,12 @@ Clean distclean : Jamconfig Jamfile
 		  [ Wildcard *.cex ] ;
 CleanDir distclean : autom4te.cache ;
 Depends distclean : clean ;
+
 # When build directory differs from source directory, also remove `include'
 # directory created by configure.
-if $(TOP) != "."
+conftmpfiles = [ GLOB include : * ] ;
+conftmpfiles = [ Filter $(conftmpfiles:BS) : . .. volatile.h ] ;
+if ! $(conftmpfiles)
 {
   CleanDir distclean : include ;
 }

@@ -45,6 +45,16 @@ chronological order.
 	  cspace.i at user request.
 	- Eric Sunshine augmented msvcgen/required.mak to ensure that null3d
 	  renderer is included in wkstypical and wksall.
+	- Eric Sunshine made the Jam 'distclean' rule safer.  If the build
+	  directory differs from the source directory, then 'distclean'
+	  attempts to remove the 'include' directory which is created by the
+	  configure script.  If the build and source directories are the same,
+	  then it deletes only volatile.h from include (since it would be
+	  incorrect to delete all of CS/include).  Previously, though, the
+	  logic for detecting if the build directory differed from the source
+	  directory was flawed, and it was possible to fool it into deleting
+	  the entire CS/include.  Now, 'distclean' deletes the 'include'
+	  directory if and only if the directory contains one file: volatile.h.
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it
