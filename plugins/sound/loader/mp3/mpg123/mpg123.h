@@ -14,12 +14,18 @@
 # undef WIN32
 # define WIN32
 
+#pragma warning(disable:4244)   // conversion from 'double' to 'float'
+#pragma warning(disable:4514)   // Removal of unreferenced inline function
+
+
 # define NEW_DCT9
 
 # undef MPG123_REMOTE           /* Get rid of this stuff for Win32 */
 #endif
 
+#ifndef M_PI
 # define M_PI       3.14159265358979323846
+#endif
 # define M_SQRT2	1.41421356237309504880
 
 #define byte unsigned char
