@@ -236,7 +236,7 @@ public:
   void Normalize ();
 
   /// Query if the vector is zero
-  inline bool IsZero (double precision = SMALL_EPSILON) const
+  inline bool IsZero (float precision = SMALL_EPSILON) const
   { return (ABS(x) < precision) && (ABS(y) < precision)
             && (ABS(z) < precision);
   }
