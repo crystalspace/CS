@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein and Dan Ogles.
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998 by Dan Ogles.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
+#include "csgeom/subrec.h"
 
 #include <GL/gl.h>
 
@@ -38,7 +40,7 @@
 //----------------------------------------------------------------------------//
 
 /// Unload a texture cache element (common for both caches)
-void OpenGLCache::Unload (csGLCacheData *d)
+void OpenGLTextureCache::Unload (csTxtCacheData *d)
 {
   if (d->next)
     d->next->prev = d->prev;
@@ -56,16 +58,8 @@ void OpenGLCache::Unload (csGLCacheData *d)
   num--;
   total_size -= d->Size;
 
-  if (type == CS_TEXTURE)
-  {
-    iTextureHandle *texh = (iTextureHandle *)d->Source;
-    if (texh) texh->SetCacheData (NULL);
-  }
-  else if (type == CS_LIGHTMAP)
-  {
-    iLightMap *lm = (iLightMap *)d->Source;
-    if (lm) lm->SetCacheData (NULL);
-  }
+  iTextureHandle *texh = (iTextureHandle *)d->Source;
+  if (texh) texh->SetCacheData (NULL);
 
   delete d;
 }
@@ -73,27 +67,24 @@ void OpenGLCache::Unload (csGLCacheData *d)
 #define Printf system->Printf
 //----------------------------------------------------------------------------//
 
-OpenGLCache::OpenGLCache (int max_size, csCacheType type, int bpp)
+OpenGLTextureCache::OpenGLTextureCache (int max_size, int bpp)
 {
-  OpenGLCache::type = type;
-  OpenGLCache::bpp = bpp;
+  OpenGLTextureCache::bpp = bpp;
   cache_size = max_size;
   num = 0;
   head = tail = NULL;
   total_size = 0;
 }
 
-OpenGLCache::~OpenGLCache ()
+OpenGLTextureCache::~OpenGLTextureCache ()
 {
   Clear ();
 }
 
-void OpenGLCache::cache_texture (iTextureHandle *txt_handle)
+void OpenGLTextureCache::Cache (iTextureHandle *txt_handle)
 {
-  if (type != CS_TEXTURE)
-    return;
-
-  csGLCacheData *cached_texture = (csGLCacheData *)txt_handle->GetCacheData ();
+  csTxtCacheData *cached_texture = (csTxtCacheData *)
+  	txt_handle->GetCacheData ();
   if (cached_texture)
   {
     // move unit to front (MRU)
@@ -139,7 +130,7 @@ void OpenGLCache::cache_texture (iTextureHandle *txt_handle)
     num++;
     total_size += size;
 
-    cached_texture = new csGLCacheData;
+    cached_texture = new csTxtCacheData;
 
     cached_texture->next = head;
     cached_texture->prev = NULL;
@@ -156,115 +147,7 @@ void OpenGLCache::cache_texture (iTextureHandle *txt_handle)
   }
 }
 
-void OpenGLCache::cache_lightmap (iPolygonTexture *polytex)
-{
-  csGLCacheData *cached_texture;
-
-  iLightMap *piLM = polytex->GetLightMap ();
-
-  if (type != CS_LIGHTMAP || piLM == NULL)
-    return;
-
-  int width = piLM->GetWidth ();
-  int height = piLM->GetHeight ();
-  int size = width * height * (bpp / 8);
-
-  // If lightmap has changed, we don't uncache it but instead
-  // we leave it in place and just reload the new data.
-  bool reload_data = false;
-  cached_texture = (csGLCacheData *)piLM->GetCacheData ();
-  if (polytex->RecalculateDynamicLights () && cached_texture)
-  {
-    reload_data = true;
-    //Unload (cached_texture);
-    //cached_texture = NULL;
-  }
-
-  if (cached_texture)
-  {
-    // move unit to front (MRU)
-    if (cached_texture != head)
-    {
-      if (cached_texture->prev)
-        cached_texture->prev->next = cached_texture->next;
-      else
-        head = cached_texture->next;
-      if (cached_texture->next)
-        cached_texture->next->prev = cached_texture->prev;
-      else
-        tail = cached_texture->prev;
-
-      cached_texture->prev = NULL;
-      cached_texture->next = head;
-      if (head)
-        head->prev = cached_texture;
-      else
-        tail = cached_texture;
-      head = cached_texture;
-    }
-    if (reload_data)
-      Load (cached_texture, true);              // Reload it.
-  }
-  else
-  {
-    // unit is not in memory. load it into the cache
-    while (total_size + size >= cache_size)
-      // out of memory. remove units from bottom of list.
-      Unload (tail);
-
-    // now load the unit.
-    num++;
-    total_size += size;
-
-    cached_texture = new csGLCacheData;
-
-    cached_texture->next = head;
-    cached_texture->prev = NULL;
-    if (head)
-      head->prev = cached_texture;
-    else
-      tail = cached_texture;
-    head = cached_texture;
-    cached_texture->Source = piLM;
-    cached_texture->Size = size;
-
-    piLM->SetCacheData (cached_texture);
-    Load (cached_texture);              // load it.
-
-    // Precalculate the lm offsets relative to the original texture.
-    int lmwidth = piLM->GetWidth ();
-    int lmrealwidth = piLM->GetRealWidth ();
-    int lmheight = piLM->GetHeight ();
-    int lmrealheight = piLM->GetRealHeight ();
-    float scale_u = (float) (lmrealwidth) / (float) (lmwidth);
-    float scale_v = (float) (lmrealheight) / (float) (lmheight);
-
-    float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
-    polytex->GetTextureBox (lightmap_low_u, lightmap_low_v,
-                        lightmap_high_u, lightmap_high_v);
-
-    // lightmap fudge factor
-    lightmap_low_u -= 0.125;
-    lightmap_low_v -= 0.125;
-    lightmap_high_u += 0.125;
-    lightmap_high_v += 0.125;
-
-    if (lightmap_high_u <= lightmap_low_u)
-      cached_texture->lm_scale_u = scale_u;       // @@@ Is this right?
-    else
-      cached_texture->lm_scale_u = scale_u / (lightmap_high_u - lightmap_low_u);
-
-    if (lightmap_high_v <= lightmap_low_v)
-      cached_texture->lm_scale_v = scale_v;       // @@@ Is this right?
-    else
-      cached_texture->lm_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
-
-    cached_texture->lm_offset_u = lightmap_low_u;
-    cached_texture->lm_offset_v = lightmap_low_v;
-  }
-}
-
-void OpenGLCache::Clear ()
+void OpenGLTextureCache::Clear ()
 {
   while (head)
     Unload (head);
@@ -275,26 +158,14 @@ void OpenGLCache::Clear ()
   CS_ASSERT (!num);
 }
 
-//----------------------------------------------------------------------------//
-
-OpenGLTextureCache::OpenGLTextureCache(int size, int bitdepth)
-  : OpenGLCache (size, CS_TEXTURE, bitdepth)
-{
-}
-
-OpenGLTextureCache::~OpenGLTextureCache ()
-{
-  Clear ();
-}
-
 void OpenGLTextureCache::Uncache (iTextureHandle *texh)
 {
-  csGLCacheData *cached_texture = (csGLCacheData *)texh->GetCacheData ();
+  csTxtCacheData *cached_texture = (csTxtCacheData *)texh->GetCacheData ();
   if (cached_texture)
     Unload (cached_texture);
 }
 
-void OpenGLTextureCache::Load (csGLCacheData *d, bool reload)
+void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 {
   iTextureHandle *txt_handle = (iTextureHandle *)d->Source;
   csTextureHandle *txt_mm = (csTextureHandle *)txt_handle->GetPrivateObject ();
@@ -461,9 +332,58 @@ void OpenGLTextureCache::Load (csGLCacheData *d, bool reload)
 }
 
 //----------------------------------------------------------------------------//
-OpenGLLightmapCache::OpenGLLightmapCache(int size, int bitdepth)
-  : OpenGLCache(size,CS_LIGHTMAP,bitdepth)
+
+csSuperLightMap::csSuperLightMap ()
 {
+  region = new csSubRectangles (
+  	csRect (0, 0, SUPER_LM_SIZE, SUPER_LM_SIZE)); // @@@ Make configurable.
+  head = tail = NULL;
+}
+
+csSuperLightMap::~csSuperLightMap ()
+{
+  Clear ();
+  glDeleteTextures (1, &Handle);
+  delete region;
+}
+
+csLMCacheData* csSuperLightMap::Alloc (int w, int h)
+{
+  csRect r;
+  if (region->Alloc (w, h, r))
+  {
+    csLMCacheData* cdata = new csLMCacheData ();
+    cdata->super_lm_rect = r;
+    cdata->Handle = Handle;
+    cdata->next = head;
+    cdata->prev = NULL;
+    if (head) head->prev = cdata;
+    head = cdata;
+    return cdata;
+  }
+  return NULL;
+}
+
+void csSuperLightMap::Clear ()
+{
+  region->Clear ();
+  while (head)
+  {
+    iLightMap* lm = (iLightMap *)head->Source;
+    if (lm) lm->SetCacheData (NULL);
+    csLMCacheData* h = head->next;
+    delete head;
+    head = h;
+  }
+  tail = NULL;
+}
+
+//----------------------------------------------------------------------------//
+
+OpenGLLightmapCache::OpenGLLightmapCache ()
+{
+  cur_lm = 0;
+  initialized = false;
 }
 
 OpenGLLightmapCache::~OpenGLLightmapCache ()
@@ -471,32 +391,112 @@ OpenGLLightmapCache::~OpenGLLightmapCache ()
   Clear ();
 }
 
-void OpenGLLightmapCache::Load (csGLCacheData *d, bool reload)
+void OpenGLLightmapCache::Setup ()
 {
-  iLightMap *lightmap_info = (iLightMap *)d->Source;
-  int lmwidth = lightmap_info->GetWidth ();
-  int lmheight = lightmap_info->GetHeight ();
-  unsigned char* lm_data = lightmap_info->GetMapData ();
-
-  GLuint lightmaphandle;
-  if (reload)
+  if (initialized) return;
+  initialized = true;
+  int i;
+  for (i = 0 ; i < SUPER_LM_NUM ; i++)
   {
-    lightmaphandle = d->Handle;
-    glBindTexture (GL_TEXTURE_2D, lightmaphandle);
-    glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, lmwidth, lmheight, GL_RGBA,
-      GL_UNSIGNED_BYTE, lm_data);
-  }
-  else
-  {
+    GLuint lightmaphandle;
     glGenTextures (1, &lightmaphandle);
-    d->Handle = lightmaphandle;
+    suplm[i].Handle = lightmaphandle;
     glBindTexture (GL_TEXTURE_2D, lightmaphandle);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D (GL_TEXTURE_2D, 0, 3, lmwidth, lmheight, 0, GL_RGBA,
-      GL_UNSIGNED_BYTE, lm_data);
+    glTexImage2D (GL_TEXTURE_2D, 0, 3, SUPER_LM_SIZE, SUPER_LM_SIZE,
+		    0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   }
+}
+
+void OpenGLLightmapCache::Clear ()
+{
+  cur_lm = 0;
+  int i;
+  for (i = 0 ; i < SUPER_LM_NUM ; i++)
+  {
+    suplm[i].Clear ();
+  }
+}
+
+void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
+{
+  Setup ();
+  csLMCacheData* clm;
+
+  iLightMap* piLM = polytex->GetLightMap ();
+  if (piLM == NULL) return;
+
+  // If lightmap has changed, we don't uncache it but instead
+  // we leave it in place and just reload the new data.
+  clm = (csLMCacheData *)piLM->GetCacheData ();
+  if (polytex->RecalculateDynamicLights () && clm)
+  {
+    Load (clm);
+  }
+  else if (!clm)
+  {
+    int lmwidth = piLM->GetWidth ();
+    int lmheight = piLM->GetHeight ();
+    for (;;)
+    {
+      clm = suplm[cur_lm].Alloc (lmwidth, lmheight);
+      if (clm) break;
+      // No room in this super lightmap. Try the next one.
+      // @@@ This is not really optimal. We should at least try a
+      // few older super-lightmaps first.
+      cur_lm = (cur_lm+1)%SUPER_LM_NUM;
+printf ("New cur_lm=%d\n", cur_lm); fflush (stdout);
+      // First free all lightmaps previously in this super lightmap.
+      suplm[cur_lm].Clear ();
+    }
+    piLM->SetCacheData (clm);
+    clm->Source = piLM;
+    clm->super_lm_idx = cur_lm;
+    Load (clm);
+
+    float lm_low_u, lm_low_v, lm_high_u, lm_high_v;
+    polytex->GetTextureBox (lm_low_u, lm_low_v, lm_high_u, lm_high_v);
+
+    // lightmap fudge factor
+    lm_low_u -= 0.125;
+    lm_low_v -= 0.125;
+    lm_high_u += 0.125;
+    lm_high_v += 0.125;
+
+    if (lm_high_u <= lm_low_u)
+      clm->lm_scale_u = 1.;       // @@@ Is this right?
+    else
+      clm->lm_scale_u = 1. / (lm_high_u - lm_low_u);
+
+    if (lm_high_v <= lm_low_v)
+      clm->lm_scale_v = 1.;       // @@@ Is this right?
+    else
+      clm->lm_scale_v = 1. / (lm_high_v - lm_low_v);
+
+    // Calculate position in super texture.
+    float dlm = 1. / float (SUPER_LM_SIZE);
+    float sup_u = float (clm->super_lm_rect.xmin) * dlm;
+    float sup_v = float (clm->super_lm_rect.ymin) * dlm;
+    clm->lm_scale_u = clm->lm_scale_u * float (lmwidth) * dlm;
+    clm->lm_scale_v = clm->lm_scale_v * float (lmheight) * dlm;
+    clm->lm_offset_u = lm_low_u - sup_u / clm->lm_scale_u;
+    clm->lm_offset_v = lm_low_v - sup_v / clm->lm_scale_v;
+  }
+}
+
+void OpenGLLightmapCache::Load (csLMCacheData *d)
+{
+  iLightMap* lightmap_info = d->Source;
+  int lmwidth = lightmap_info->GetWidth ();
+  int lmheight = lightmap_info->GetHeight ();
+  unsigned char* lm_data = lightmap_info->GetMapData ();
+
+  glBindTexture (GL_TEXTURE_2D, d->Handle);
+  csRect& r = d->super_lm_rect;
+  glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
+  	lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
 }
 

@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein and Dan Ogles.
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998 by Dan Ogles.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,46 +21,42 @@
 #define __GL_TEXTURECACHE_H__
 
 #include "csutil/scf.h"
+#include "csgeom/csrect.h"
 #include <GL/gl.h>
 
 struct iLightMap;
 struct iTextureHandle;
 struct iPolygonTexture;
 struct iSystem;
+class csSubRectangles;
 
-///
-struct csGLCacheData
+/**
+ * Cache element for a texture. This element will be stored
+ * in the OpenGL texture cache and is also kept with the polygon
+ * itself.
+ */
+struct csTxtCacheData
 {
-  /// the size of this texture/lightmap
+  /// The size of this texture.
   long Size;
-  /// iTextureHandle if texture, iLightMap if lightmap.
-  void *Source;
-  /// GL texture handle
+  /// iTextureHandle.
+  iTextureHandle* Source;
+  /// GL texture handle.
   GLuint Handle;
-  /// linked list
-  csGLCacheData *next, *prev;
-  /**
-   * If lightmap then this contains the precalculated scale and offset
-   * for the lightmap relative to the texture.
-   */
-  float lm_offset_u, lm_scale_u;
-  float lm_offset_v, lm_scale_v;
+  /// Linked list.
+  csTxtCacheData *next, *prev;
 };
 
-///
-enum csCacheType
-{
-  CS_TEXTURE, CS_LIGHTMAP
-};
-
-///
-class OpenGLCache
+/**
+ * This is the OpenGL texture cache.
+ */
+class OpenGLTextureCache
 {
 protected:
-  ///
-  csCacheType type;
+  bool rstate_bilinearmap;
+
   /// the head and tail of the cache data
-  csGLCacheData *head, *tail;
+  csTxtCacheData *head, *tail;
 
   /// the maximum size of the cache
   long cache_size;
@@ -69,67 +66,115 @@ protected:
   long total_size;
 
 public:
-  /// takes the maximum size of the cache
-  OpenGLCache (int max_size, csCacheType type, int bpp);
+  /// Takes the maximum size of the cache.
+  OpenGLTextureCache (int max_size, int bpp);
   ///
-  virtual ~OpenGLCache ();
+  ~OpenGLTextureCache ();
 
-  ///
-  void cache_texture (iTextureHandle *texture);
+  /// Make sure this texture is active in OpenGL.
+  void Cache (iTextureHandle *texture);
+  /// Remove an individual texture from cache.
+  void Uncache (iTextureHandle *texh);
 
-  ///
-  void cache_lightmap (iPolygonTexture *polytex);
-  ///
+  /// Clear the cache.
   void Clear ();
-
-  ///
-  void ReportStats ();
-
-protected:
-  ///
-  int bpp;
-
-  ///
-  virtual void Load (csGLCacheData *d, bool reload = false) = 0;
-  ///
-  void Unload (csGLCacheData *d);
-};
-
-///
-class OpenGLTextureCache : public OpenGLCache
-{
-  bool rstate_bilinearmap;
-
-public:
-  ///
-  OpenGLTextureCache (int size, int bitdepth);
-  ///
-  virtual ~OpenGLTextureCache ();
 
   ///
   void SetBilinearMapping (bool m) { rstate_bilinearmap = m; }
   ///
   bool GetBilinearMapping () { return rstate_bilinearmap; }
-  /// Remove an individual texture from cache
-  virtual void Uncache (iTextureHandle *texh);
 
 protected:
+  int bpp;
+
+  /// Really load the texture in OpenGL memory.
+  void Load (csTxtCacheData *d, bool reload = false);
   ///
-  virtual void Load (csGLCacheData *d, bool reload = false);
+  void Unload (csTxtCacheData *d);
 };
 
-///
-class OpenGLLightmapCache : public OpenGLCache
+#define SUPER_LM_SIZE 256
+#define SUPER_LM_NUM 10
+
+/**
+ * Cache data for lightmap. This is stored in one of the super
+ * lightmaps and also kept with the lightmap itself.
+ */
+struct csLMCacheData
+{
+  /// iLightMap.
+  iLightMap* Source;
+  /// GL texture handle.
+  GLuint Handle;
+  /// Linked list.
+  csLMCacheData *next, *prev;
+  /**
+   * This contains the precalculated scale and offset
+   * for the lightmap relative to the texture.
+   */
+  float lm_offset_u, lm_scale_u;
+  float lm_offset_v, lm_scale_v;
+
+  /**
+   * The following is a rectangle in the larger
+   * super lightmap. super_lm_idx is the index of the super lightmap.
+   */
+  csRect super_lm_rect;
+  int super_lm_idx;
+};
+
+/**
+ * This class represents a super-lightmap.
+ * A super-lightmap is a collection of smaller lightmaps that
+ * fit together in one big texture.
+ */
+class csSuperLightMap
 {
 public:
-  ///
-  OpenGLLightmapCache (int size, int bitdepth);
-  ///
-  virtual ~OpenGLLightmapCache ();
+  /// A class holding all the free regions in this texture.
+  csSubRectangles* region;
+  /// An OpenGL texture handle.
+  GLuint Handle;
+  /// the head and tail of the cache data
+  csLMCacheData *head, *tail;
 
-protected:
+  csSuperLightMap ();
+  ~csSuperLightMap ();
+
+  /// Try to allocate a lightmap here. Return NULL on failure.
+  csLMCacheData* Alloc (int w, int h);
+  /// Clear all lightmaps in this super lightmap.
+  void Clear ();
+};
+
+/**
+ * Cache for OpenGL lightmaps. This cache keeps a number of
+ * super lightmaps. Every super lightmaps holds a number of lightmaps.
+ */
+class OpenGLLightmapCache
+{
+private:
+  /// A number of super-lightmaps to contain all other lightmaps.
+  csSuperLightMap suplm[SUPER_LM_NUM];	// @@@ Make configurable.
+  /// Current super lightmap.
+  int cur_lm;
+  /// If true then setup is ok.
+  bool initialized;
+
+  void Load (csLMCacheData *d);
+  void Setup ();
+
+public:
   ///
-  virtual void Load (csGLCacheData *d, bool reload = false);
+  OpenGLLightmapCache ();
+  ///
+  ~OpenGLLightmapCache ();
+
+  /// Cache a lightmap.
+  void Cache (iPolygonTexture *polytex);
+  /// Clear the entire lightmap cache.
+  void Clear ();
 };
 
 #endif // __GL_TEXTURECACHE_H__
+

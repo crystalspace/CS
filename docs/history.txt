@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+22-May-2001
+	- Implemented improved OpenGL lightmap cache. There is now the notion
+	  of a super-lightmap which is a collection of smaller lightmaps.
+	  At this moment there are 10 super lightmaps of 256x256. In the
+	  future this will be configurable. Even though the engine currently
+	  does not sort on lightmap yet, there is already a performance
+	  improvement. Because of this change the OpenGL renderer no longer
+	  requires that lightmaps are converted to power of two dimensions.
+	  This is not needed since the lightmaps are now put in a larger
+	  texture. This saves a lot of space too. For example, if you would
+	  have a 33x33 lightmap then the old OpenGL renderer would convert
+	  this to a 64x64 lightmap. This is nearly four times too big!
+	  At this moment there is still some waste though. This is caused
+	  by the (currently unoptimized) csSubRectangles class.
 21-May-2001
 	- Added non-functional emit loader/saver which Wouter can complete.
 	- Wouter worked on emit loader. I did a small enhancement too.
@@ -8,6 +22,15 @@ The history order is reversed so that new features are at the top.
 	  Note however that the algorithm used in csSubRectangles is not
 	  very sophisticated. It is a start to see how far we go. Optimization
 	  can come later.
+	- Wouter Wijngaards made a new particle systems demo level in cvs.
+	- Wouter also did several fixes to the emit particle system including
+	  an unititialized variable. Also it would not function correctly
+	  with very low fps.
+	- Wouter Fixed a bug in spiral particle system. It forgot to do
+	  SetNumber(max) on the Newtonian parent system.
+	- Martin Geisse committed a remake of the WAV loader by
+	  Andreas Höfler.
+	- Norman Kramer added missing CSGEOM to link with glx2d.
 20-May-2001
 	- Philip Wyett started a big overhaul of CS/Visual C++ docs.
 	- Wouter Wijngaards added an emittor particle system. This is a very

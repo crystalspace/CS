@@ -316,7 +316,7 @@ void csOpenGLProcSoftware::Print (csRect *area)
   glDisable (GL_DEPTH_TEST);
   glDisable (GL_ALPHA_TEST);
 
-  csGLCacheData *tex_data = (csGLCacheData*) tex->GetCacheData();
+  csTxtCacheData *tex_data = (csTxtCacheData*) tex->GetCacheData();
   if (tex_data)
   {
     // Texture is in tha cache, update texture directly.

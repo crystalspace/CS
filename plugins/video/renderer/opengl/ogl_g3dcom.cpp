@@ -128,7 +128,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   Caps.maxTexHeight = 1024;
   Caps.maxTexWidth = 1024;
   Caps.fog = G3DFOGMETHOD_VERTEX;
-  Caps.NeedsPO2Maps = true;
+  Caps.NeedsPO2Maps = false;
   Caps.MaxAspectRatio = 32768;
   GLCaps.need_screen_clipping = false;
   GLCaps.use_stencil = false;
@@ -212,7 +212,7 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
   Caps.maxTexHeight = config->GetInt("Video.OpenGL.Caps.maxTexHeight", 1024);
   Caps.maxTexWidth = config->GetInt("Video.OpenGL.Caps.maxTexWidth", 1024);
   Caps.fog = G3DFOGMETHOD_VERTEX;
-  Caps.NeedsPO2Maps = config->GetBool("Video.OpenGL.Caps.NeedsPO2Maps", true);
+  Caps.NeedsPO2Maps = config->GetBool("Video.OpenGL.Caps.NeedsPO2Maps", false);
   Caps.MaxAspectRatio = config->GetInt("Video.OpenGL.Caps.MaxAspectRatio", 
     32768);
   GLCaps.use_stencil = config->GetBool ("Video.OpenGL.Caps.Stencil", false);
@@ -697,7 +697,7 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
 
   int max_cache_size = 1024*1024*16; // 32mb combined cache
   texture_cache = new OpenGLTextureCache (max_cache_size, 24);
-  lightmap_cache = new OpenGLLightmapCache (max_cache_size, 24);
+  lightmap_cache = new OpenGLLightmapCache ();
   texture_cache->SetBilinearMapping (config->GetBool
         ("Video.OpenGL.EnableBilinearMap", true));
 
@@ -1055,7 +1055,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   csMaterialHandle* mat_handle = (csMaterialHandle*)queue.mat_handle;
   iTextureHandle* txt_handle = NULL;
   csTextureHandleOpenGL *txt_mm = NULL;
-  csGLCacheData *texturecache_data = NULL;
+  csTxtCacheData *texturecache_data = NULL;
   GLuint texturehandle = 0;
   bool multimat = false;
   bool tex_transp = false;
@@ -1070,7 +1070,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     // Initialize our static drawing information and cache
     // the texture in the texture cache (if this is not already the case).
     CacheTexture (queue.mat_handle);
-    texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
+    texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
     texturehandle = texturecache_data->Handle;
   }
 
@@ -1175,8 +1175,8 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
       iTextureHandle* txt_handle = layer->txt_handle;
       csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
     	  txt_handle->GetPrivateObject ();
-      csGLCacheData *texturecache_data;
-      texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
+      csTxtCacheData *texturecache_data;
+      texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
       //tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
       GLuint texturehandle = texturecache_data->Handle;
       glBindTexture (GL_TEXTURE_2D, texturehandle);
@@ -1242,6 +1242,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     // The following blend function is configurable.
     glBlendFunc (m_config_options.m_lightmap_src_blend,
 		 m_config_options.m_lightmap_dst_blend);
+    GLuint prev_lightmaphandle = 0;
     for (j = 0 ; j < queue.num_lightmaps ; j++)
     {
       // find lightmap information, if any
@@ -1251,14 +1252,16 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
       {
         // Initialize our static drawing information and cache
         // the lightmap.
-        if (m_renderstate.lighting)
-          lightmap_cache->cache_lightmap (tex);
+        lightmap_cache->Cache (tex);
 
-        csGLCacheData *lightmapcache_data = (csGLCacheData *)
+        csLMCacheData *lightmapcache_data = (csLMCacheData *)
       	  thelightmap->GetCacheData ();
         GLuint lightmaphandle = lightmapcache_data->Handle;
-
-        glBindTexture (GL_TEXTURE_2D, lightmaphandle);
+	if (prev_lightmaphandle != lightmaphandle)
+	{
+          glBindTexture (GL_TEXTURE_2D, lightmaphandle);
+	  prev_lightmaphandle = lightmaphandle;
+	}
         float lm_scale_u = lightmapcache_data->lm_scale_u;
         float lm_scale_v = lightmapcache_data->lm_scale_v;
         float lm_offset_u = lightmapcache_data->lm_offset_u;
@@ -2387,7 +2390,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     iTextureHandle* txt_handle = mesh.mat_handle->GetTexture ();
     csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
     	txt_handle->GetPrivateObject ();
-    csGLCacheData *cachedata = (csGLCacheData *)txt_mm->GetCacheData ();
+    csTxtCacheData *cachedata = (csTxtCacheData *)txt_mm->GetCacheData ();
     texturehandle = cachedata->Handle;
     if (txt_handle)
       has_alpha = txt_handle->GetKeyColor () || txt_handle->GetAlphaMap ();
@@ -2504,8 +2507,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       iTextureHandle* txt_handle = layer->txt_handle;
       csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
       	txt_handle->GetPrivateObject ();
-      csGLCacheData *texturecache_data;
-      texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
+      csTxtCacheData *texturecache_data;
+      texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
       //tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
       GLuint texturehandle = texturecache_data->Handle;
       glBindTexture (GL_TEXTURE_2D, texturehandle);
@@ -2631,18 +2634,18 @@ void csGraphics3DOGLCommon::CacheTexture (iMaterialHandle *imat_handle)
 {
   csMaterialHandle* mat_handle = (csMaterialHandle*)imat_handle;
   iTextureHandle* txt_handle = mat_handle->GetTexture ();
-  texture_cache->cache_texture (txt_handle);
+  texture_cache->Cache (txt_handle);
   // Also cache all textures used in the texture layers.
   int i;
   for (i = 0 ; i < mat_handle->GetNumTextureLayers () ; i++)
-    texture_cache->cache_texture (mat_handle->GetTextureLayer (i)->txt_handle);
+    texture_cache->Cache (mat_handle->GetTextureLayer (i)->txt_handle);
 }
 
 void csGraphics3DOGLCommon::CacheTexture (iPolygonTexture *texture)
 {
   CacheTexture (texture->GetMaterialHandle ());
   if (m_renderstate.lighting)
-    lightmap_cache->cache_lightmap (texture);
+    lightmap_cache->Cache (texture);
 }
 
 bool csGraphics3DOGLCommon::SetRenderState (G3D_RENDERSTATEOPTION op, long value)
@@ -2966,8 +2969,8 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   bool tex_transp;
   int poly_alpha = poly.alpha;
 
-  csGLCacheData *texturecache_data;
-  texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
+  csTxtCacheData *texturecache_data;
+  texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
   tex_transp = txt_mm->GetKeyColor ();
   GLuint texturehandle = texturecache_data->Handle;
 
@@ -2999,7 +3002,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     glColor4f (flat_r, flat_g, flat_b, 0.);
   }
 
-  csGLCacheData *lightmapcache_data = (csGLCacheData *)thelightmap->GetCacheData ();
+  csLMCacheData *lightmapcache_data = (csLMCacheData *)thelightmap->GetCacheData ();
   GLuint lightmaphandle = lightmapcache_data->Handle;
 
   // configure lightmap for texture unit 1
@@ -3130,11 +3133,11 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   } /* endif */
 
   // cache the texture if we haven't already.
-  texture_cache->cache_texture (hTex);
+  texture_cache->Cache (hTex);
 
   // Get texture handle
   csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)hTex->GetPrivateObject ();
-  GLuint texturehandle = ((csGLCacheData *)txt_mm->GetCacheData ())->Handle;
+  GLuint texturehandle = ((csTxtCacheData *)txt_mm->GetCacheData ())->Handle;
 
   // as we are drawing in 2D, we disable some of the commonly used features
   // for fancy 3D drawing

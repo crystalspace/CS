@@ -130,10 +130,10 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
     if (persistent)
     {
       // cache the texture if we haven't already.
-      texture_cache->cache_texture (tex_mm);
+      texture_cache->Cache (tex_mm);
 
       // Get texture handle
-      GLuint texturehandle = ((csGLCacheData *)tex_mm->GetCacheData ())->Handle;
+      GLuint texturehandle = ((csTxtCacheData *)tex_mm->GetCacheData ())->Handle;
       glShadeModel (GL_FLAT);
       glEnable (GL_TEXTURE_2D);
       glColor4f (1.,1.,1.,1.);
@@ -211,7 +211,7 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
   glDisable (GL_DITHER);
   glDisable (GL_ALPHA_TEST);
 
-  csGLCacheData *tex_data = (csGLCacheData*) tex_mm->GetCacheData();
+  csTxtCacheData *tex_data = (csTxtCacheData*) tex_mm->GetCacheData();
 
   if (tex_data)
   {
