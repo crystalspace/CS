@@ -31,7 +31,9 @@ int csLight:: ambient_red = CS_DEFAULT_LIGHT_LEVEL;
 int csLight:: ambient_green = CS_DEFAULT_LIGHT_LEVEL;
 int csLight:: ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
 
-float csLight::influenceIntensity = 1/256;
+#ifdef CS_USE_NEW_RENDERER
+  float csLight::influenceIntensity = 1/256;
+#endif
 
 SCF_IMPLEMENT_IBASE_EXT(csLight)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLight)
@@ -194,7 +196,9 @@ void csLight::SetRadius (float radius)
   inv_dist = 1 / dist;
   lightnr++;
 
+#ifdef CS_USE_NEW_RENDERER
   CalculateInfluenceRadius ();
+#endif
 }
 
 void csLight::SetColor (const csColor& col) 

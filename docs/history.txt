@@ -1,6 +1,8 @@
 The history order is reversed so that new features are at the top.
 
 19-Feb-2003
+	- Mårten Svanfeldt fixed a bug introduced when adding the new light-parameters
+	  for the new renderer due to a missing #ifdef CS_USE_NEW_RENDERER
 	- Mårten Svanfeldt changed the way lights are handled in new renderer
 	    - Lights now have a influence radius which is different from the
 	      normal radius. Influence radius is the distance at which the light
