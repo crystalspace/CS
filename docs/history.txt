@@ -13,7 +13,19 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+13-Sep-1999
+	- Added djgpp.html doc from Seth Galbraith.
+	  Seth also updated tutorial.html.
+	- Small patch to unix glide driver from Stephan Goetter.
+	- Added sprite selection code from David Durant.
+	  Use mouse button 3 to select a sprite.
 12-Sep-1999
+	- Fixed sprite visibility handling with octree/c-buffer and also
+	  made somewhat more optimal. There is still a problem with skeletal
+	  sprites. The bounding box is probably not computed correctly.
+	- All AddVertex() routines in csgeom now return the index of the last
+	  added vertex.
+	- Optimized csBspPolygon handling for octrees.
 	- Eric Sunshine rewrote MazeEditor::LoadWorld() so that it integrates
 	  correctly with VFS and can once again load worlds.
 	- Eric Sunshine worked around an OpenStep 4.2 compiler bug which was
@@ -21,6 +33,11 @@ Short-term cleanups that need to be done:
 	  an inline method in a class calls another inline method which the
 	  compiler has not yet seen a declaration for.
 11-Sep-1999
+	- Fixed bug in handling of dynamic polygons (used for sprite
+	  visibility detection with octree/bsptree). This means that sprites
+	  now work in a sector using octree visibility. Visibility testing
+	  is still not correct though. There are cases where sprites are
+	  considered visible when they are not or the other way around.
 	- Andrew Zabolotny integrated his Virtual File System (VFS) into
 	  Crystal Space.  This was a major update to CS, and involved many
 	  modifications to many portions of the system.
@@ -111,6 +128,8 @@ Short-term cleanups that need to be done:
 	- AddVertexSmart() is now deprecated. It is still there and can be
 	  used. However, it is better (read faster) to use AddVertex()
 	  and then do CompressVertices() afterwards (for things and sectors).
+	- Changed STATBSP to use octree in all cases (this will automatically
+	  revert to bsp tree if the number of bsp polygons is too low).
 9-Sep-1999
 	- Brandon Ehle found another case where 0 size allocation happens.
 	  Fixed!
