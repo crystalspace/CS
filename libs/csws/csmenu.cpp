@@ -944,6 +944,8 @@ void csMenu::PlaceItems ()
 void csMenu::SetState (int mask, bool enable)
 {
   int oldstate = state;
+  csComponent *oldfocused = parent->focused;
+
   csComponent::SetState (mask, enable);
   if (((oldstate ^ state) & CSS_FOCUSED) && !enable
    && (MenuStyle & CSMS_HIDEINACTIVE))
@@ -953,8 +955,8 @@ void csMenu::SetState (int mask, bool enable)
   {
     if ((mask & (CSS_FOCUSED | CSS_VISIBLE))
      && enable
-     && (parent->focused != this))
-      oldparentfocus = parent->focused;
+     && (oldfocused != this))
+      oldparentfocus = oldfocused;
     if (current)
       current->Invalidate ();
   } /* endif */

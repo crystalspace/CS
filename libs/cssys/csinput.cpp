@@ -53,12 +53,13 @@ void csKeyboardDriver::Reset ()
 
 void csKeyboardDriver::do_key (int iKey, int iChar, bool iDown)
 {
-  int smask = (GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-            | (GetKeyState (CSKEY_CTRL) ? CSMASK_CTRL : 0)
-            | (GetKeyState (CSKEY_ALT) ? CSMASK_ALT : 0);
+  int smask = (iDown && !GetKeyState (iKey)) ? CSMASK_FIRST : 0;
 
-  if (iDown && !GetKeyState (iKey))
-    smask |= CSMASK_FIRST;
+  SetKeyState (iKey, iDown);
+
+  smask |= (GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
+         | (GetKeyState (CSKEY_CTRL) ? CSMASK_CTRL : 0)
+         | (GetKeyState (CSKEY_ALT) ? CSMASK_ALT : 0);
 
   if (iChar < 0)
   {
@@ -72,7 +73,6 @@ void csKeyboardDriver::do_key (int iKey, int iChar, bool iDown)
       iChar = (iKey >= 32 && iKey <= 255) ? iKey : 0;
   }
 
-  SetKeyState (iKey, iDown);
   System->EventQueue.Put (new csEvent (System->GetTime (),
     iDown ? csevKeyDown : csevKeyUp, iKey, iChar, smask));
 }

@@ -31,9 +31,9 @@
 #define CSBS_NODEFAULTBORDER	0x00000004
 /// Is this button selectable?
 #define CSBS_SELECTABLE		0x00000008
-/// Do not activate button when clicked by mouse
+/// Do not focus button when clicked by mouse
 #define CSBS_NOMOUSEFOCUS	0x00000010
-/// Do not activate button when activated with keyboard
+/// Do not focus button when activated with keyboard
 #define CSBS_NOKEYBOARDFOCUS	0x00000020
 /**
  * Button is a multi-choose button<p>

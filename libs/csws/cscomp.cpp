@@ -244,9 +244,12 @@ bool csComponent::SetFocused (csComponent *comp)
 
     if (!comp->GetState (CSS_VISIBLE))
       comp->SetState (CSS_VISIBLE, true);
-    focused = comp;
     if (GetState (CSS_FOCUSED))
+      // csComponent::SetState will set our `focused' field
       comp->SetState (CSS_FOCUSED, true);
+    else
+      // Directly set the focused component
+      focused = comp;
     csComponent *newdefault = GetDefault ();
     if (newdefault != olddefault)
     {
@@ -1349,6 +1352,11 @@ void csComponent::SetState (int mask, bool enable)
     state |= mask;
   else
     state &= ~mask;
+
+  // If our focused status is set, update parent `focused' field
+  if ((mask & CSS_FOCUSED)
+   && parent)
+    parent->focused = this;
 
   // Propagate focused flag through all child windows
   if (((oldstate ^ state) & CSS_FOCUSED)

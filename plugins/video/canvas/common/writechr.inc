@@ -33,6 +33,7 @@ void csGraphics2D::WR_NAME (csGraphics2D *This, int x, int y, int fg, int bg,
 {
   unsigned char c;
   int charW, charH;
+
   for (c = *text; (c = *text); ++text, x += charW)
   {
     if (x > This->ClipX2)
@@ -58,26 +59,23 @@ void csGraphics2D::WR_NAME (csGraphics2D *This, int x, int y, int fg, int bg,
       int lBytes = lX >> 3;
       int shiftX = lX & 7;
       int bbl = (charW + 7) / 8; // bytes per line
-      x += lX;
+      int lAbsX = x + lX;
       unsigned char *p = CharImage - bbl;
       for (int i = 0; i < charH; i++, cury++)
       {
         p += bbl;
         if ((cury < This->ClipY1) || (cury >= This->ClipY2)) continue;
         CharImage = p + lBytes;
-        register char CharLine = (*CharImage) << shiftX;
-        register WR_PIXTYPE *VRAM = (WR_PIXTYPE *)This->GetPixelAt (x, cury);
+        register char CharLine = (*CharImage++) << shiftX;
+        register WR_PIXTYPE *VRAM = (WR_PIXTYPE *)This->GetPixelAt (lAbsX, cury);
         if (bg >= 0)
           for (int j = lX; j < rX; j++)
           {
-            if (CharLine & 0x80)
-              *VRAM++ = fg;
-            else
-              *VRAM++ = bg;
+            *VRAM++ = (CharLine & 0x80) ? fg : bg;
             if ((j & 7) == 7)
-              CharLine = (*++CharImage);
+              CharLine = (*CharImage++);
             else
-              CharLine <<= 1;
+              CharLine += CharLine;
           } /* endfor */
         else
           for (int j = lX; j < rX; j++)
@@ -87,45 +85,48 @@ void csGraphics2D::WR_NAME (csGraphics2D *This, int x, int y, int fg, int bg,
             else
               VRAM++;
             if ((j & 7) == 7)
-              CharLine = (*++CharImage);
+              CharLine = (*CharImage++);
             else
-              CharLine <<= 1;
+              CharLine += CharLine;
           } /* endfor */
        }
     }
     else
     {
-      register char CharLine = *CharImage;
-      bool CharNotOnByteBound = charW & 7;
       for (int i = 0; i < charH; i++, cury++)
       {
         register WR_PIXTYPE *VRAM = (WR_PIXTYPE *)This->GetPixelAt (x, cury);
+        register unsigned pixW = charW;
         if (bg < 0)
-          for (int j = 0; j < charW; j++)
+          while (pixW)
           {
-            if (CharLine & 0x80)
-              *VRAM++ = fg;
-            else
-              VRAM++;
-            if ((j & 7) == 7)
-              CharLine = *++CharImage;
-            else
-              CharLine <<= 1;
+            register unsigned char CharLine = *CharImage++;
+            register int pix;
+            for (pix = pixW < 8 ? pixW : 8, pixW -= pix; CharLine && pix; pix--)
+            {
+              if (CharLine & 0x80)
+                *VRAM++ = fg;
+              else
+                VRAM++;
+              // Addition is faster than shift, at least on i586+
+              CharLine += CharLine;
+            }
+            VRAM += pix;
           }
         else
-          for (int j = 0; j < charW; j++)
+          while (pixW)
           {
-            if (CharLine & 0x80)
-              *VRAM++ = fg;
-            else
+            register unsigned char CharLine = *CharImage++;
+            register int pix;
+            for (pix = pixW < 8 ? pixW : 8, pixW -= pix; CharLine && pix; pix--)
+            {
+              *VRAM++ = (CharLine & 0x80) ? fg : bg;
+              // Addition is faster than shift, at least on i586+
+              CharLine += CharLine;
+            }
+            while (pix--)
               *VRAM++ = bg;
-            if ((j & 7) == 7)
-              CharLine = *++CharImage;
-            else
-              CharLine <<= 1;
-          } /* endfor */
-        if (CharNotOnByteBound)
-          CharLine = *++CharImage;
+          }
       } /* endfor */
     } /* endif */
   }

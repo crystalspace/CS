@@ -50,6 +50,7 @@ class G2DTestSystemDriver : public SysSystemDriver
     stTestLineDraw,
     stTestLinePerf,
     stTestTextDraw,
+    stTestTextDraw2,
     stPause,
     stWaitKey
   };
@@ -66,7 +67,7 @@ class G2DTestSystemDriver : public SysSystemDriver
   // some handy colors
   int white, yellow, green, red, blue, black, gray, dsteel;
   // Last pressed key
-  int lastkey, lastkey2, lastkey3;
+  int lastkey, lastkey2, lastkey3, lastkey4;
   // Switch backbuffer while waiting for a key
   bool SwitchBB;
 
@@ -95,6 +96,7 @@ private:
   void DrawLineTest ();
   void DrawLinePerf ();
   void DrawTextTest ();
+  void DrawTextTest2 ();
 };
 
 G2DTestSystemDriver::G2DTestSystemDriver () : SysSystemDriver ()
@@ -119,6 +121,9 @@ void G2DTestSystemDriver::EnterState (appState newstate, int arg)
       break;
     case stTestTextDraw:
       lastkey3 = 0;
+      break;
+    case stTestTextDraw2:
+      lastkey4 = 0;
       break;
     case stWaitKey:
       lastkey = 0;
@@ -155,6 +160,7 @@ void G2DTestSystemDriver::NextFrame ()
     case stTestLineDraw:
     case stTestLinePerf:
     case stTestTextDraw:
+    case stTestTextDraw2:
     {
       if (!G2D->BeginDraw ())
         break;
@@ -219,9 +225,16 @@ void G2DTestSystemDriver::NextFrame ()
         case stTestTextDraw:
           DrawTextTest ();
           if (lastkey3)
-            ;//EnterState ();
+            EnterState (stTestTextDraw2);
           else
             EnterState (stTestTextDraw);
+          break;
+        case stTestTextDraw2:
+          DrawTextTest2 ();
+          if (lastkey4)
+            ;//EnterState ();
+          else
+            EnterState (stTestTextDraw2);
           break;
         default:
           break;
@@ -302,6 +315,9 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
             break;
           case stTestTextDraw:
             lastkey3 = Event.Key.Char;
+            break;
+          case stTestTextDraw2:
+            lastkey4 = Event.Key.Char;
             break;
           default:
             break;
@@ -452,16 +468,18 @@ void G2DTestSystemDriver::ResizeContext ()
 void G2DTestSystemDriver::DrawBackBufferText ()
 {
   G2D->SetFontID (csFontItalic);
-  WriteCentered (0,-16*4, white, -1, "DOUBLE BACK BUFFER TEST");
+  WriteCentered (0,-16*5, white, -1, "DOUBLE BACK BUFFER TEST");
   G2D->SetFontID (csFontPolice);
-  WriteCentered (0,-16*2, gray,  -1, "Now graphics canvas is in double-backbuffer mode");
-  WriteCentered (0,-16*1, gray,  -1, "You should see how background quickly switches");
-  WriteCentered (0, 16*0, gray,  -1, "between yellow and red colors.");
+  WriteCentered (0,-16*3, gray,  -1, "Now graphics canvas is in double-backbuffer mode");
+  WriteCentered (0,-16*2, gray,  -1, "You should see how background quickly switches");
+  WriteCentered (0,-16*1, gray,  -1, "between yellow and red colors.");
 
-  WriteCentered (0, 16*2, white, -1, "At the same time the text should stay still.");
-  WriteCentered (0, 16*3, gray,  -1, "If all these statements are correct, then the");
-  WriteCentered (0, 16*4, gray,  -1, "current canvas plugin have correctly implemented");
-  WriteCentered (0, 16*5, gray,  -1, "double-backbuffer support.");
+  WriteCentered (0, 16*0, white, -1, "At the same time the text should stay still.");
+  WriteCentered (0, 16*1, gray,  -1, "If all these statements are correct, then the");
+  WriteCentered (0, 16*2, gray,  -1, "current canvas plugin have correctly implemented");
+  WriteCentered (0, 16*3, gray,  -1, "double-backbuffer support.");
+
+  WriteCentered (0, 16*5, green, -1, "BACK BUFFER NUMBER %d", G2D->GetPage ());
 }
 
 void G2DTestSystemDriver::DrawBackBufferON ()
@@ -660,6 +678,55 @@ void G2DTestSystemDriver::DrawTextTest ()
       float x = sx + rng.Get () * sw;
       float y = sy + rng.Get () * sh;
       G2D->Write (x, y, colors [rng.Get (4)], black, text);
+      char_count += cc;
+    }
+    G2D->PerformExtension ("flush");
+    delta_time = Time () - start_time;
+  } while (delta_time < 500);
+  float perf = char_count * (1000.0 / delta_time);
+  G2D->SetFontID (csFontPolice);
+  WriteCentered (0, 16*1, green, black, " Performance: %20.1f characters/second ", perf);
+}
+
+void G2DTestSystemDriver::DrawTextTest2 ()
+{
+  // Draw a grid of lines so that transparent text background will be visible
+  int w = G2D->GetWidth ();
+  int h = G2D->GetHeight ();
+  for (int x = 0; x < w; x += 4)
+  {
+    G2D->DrawLine (x, 0, x + 50, h, dsteel);
+    G2D->DrawLine (w - x, 0, w - x - 50, h, dsteel);
+  }
+
+  G2D->SetFontID (csFontItalic);
+  WriteCentered (0,-16*4, white, -1, "TEXT DRAWING TEST");
+
+  G2D->SetFontID (csFontPolice);
+  WriteCentered (0,-16*2,   gray, black, "This is a benchmark of text drawing");
+  WriteCentered (0,-16*1,   gray, black, "with transparent background");
+
+  G2D->SetFontID (csFontCourier);
+  int sx = 0, sy = h / 2 + 48, sw = w, sh = h / 2 - 48;
+  G2D->DrawBox (sx, sy, sw, sh, dsteel);
+  const char *text = "Crystal Space rulez";
+  int tw = G2D->GetTextWidth (G2D->GetFontID (), text);
+  int cc = strlen (text);
+
+  // Test text drawing performance for 1/4 seconds
+  int colors [4] = { red, green, blue, yellow };
+  sx += 20; sw -= 40 + tw;
+  sy += 10; sh -= 20 + G2D->GetTextHeight (G2D->GetFontID ());
+  csRandomGen rng (Time ());
+  cs_time start_time = Time (), delta_time;
+  int char_count = 0;
+  do
+  {
+    for (int i = 0; i < 2000; i++)
+    {
+      float x = sx + rng.Get () * sw;
+      float y = sy + rng.Get () * sh;
+      G2D->Write (x, y, colors [rng.Get (4)], -1, text);
       char_count += cc;
     }
     G2D->PerformExtension ("flush");

@@ -32,15 +32,15 @@
 #include <SDL_thread.h>
 
 
-// If you want to enable "drawing thread" functionality. This 
+// If you want to enable "drawing thread" functionality. This
 // includes NICE ALPHA mouse cursors for ANY SDL mode.
 
-// HOWEVER, IT BRINGS A SLOWDOWN. DO NOT APPLY THIS, UNLESS YOUR MACHINE 
+// HOWEVER, IT BRINGS A SLOWDOWN. DO NOT APPLY THIS, UNLESS YOUR MACHINE
 // IS FAST ENOUGH. BUT IF YOUR MACHINE IS FAST, THIS OPTION IS RECOMMENDED.
 // YOU CAN APPLY IT SAFELY - THE SLOWDOWN DOES NOT DEPEND ON SCENE COMPLEXITY.
 
 // The slowdown is caused by copying buffer screen THREE TIMES. However,
-// if you want to apply some nice 2d effects later to this driver, this 
+// if you want to apply some nice 2d effects later to this driver, this
 // is the necessary thing.
 
 #define SHADE_BUF 0
@@ -90,94 +90,94 @@ static int hotspot[12][2]=
 
 static int Sinitialized=0;
 #define INIT_SF(name)\
-    S##name = SDL_CreateRGBSurface (\
-        SDL_SRCALPHA, 32,32,32,0xFF0000, 0xFF00, 0xFF, 0xFF000000\
-    );\
-    SDL_LockSurface(S##name);\
-    memcpy(S##name->pixels,name,4096);\
-    SDL_UnlockSurface(S##name);
+  S##name = SDL_CreateRGBSurface (\
+      SDL_SRCALPHA, 32,32,32,0xFF0000, 0xFF00, 0xFF, 0xFF000000\
+  );\
+  SDL_LockSurface(S##name);\
+  memcpy(S##name->pixels,name,4096);\
+  SDL_UnlockSurface(S##name);
 
 #define DEINIT_SF(name)\
-    SDL_FreeSurface (\
-        S##name\
-    );
-    
+  SDL_FreeSurface (\
+      S##name\
+  );
+
 static void init_surfaces()
 {
-    if (Sinitialized) 
-      { Sinitialized++;return; }
-    
-    INIT_SF(arrow_tga)
-    INIT_SF(cross_tga)
-    INIT_SF(hglass1_tga)
-    INIT_SF(hglass2_tga)
-    INIT_SF(lrarrow_tga)
-    INIT_SF(magnify_tga)
-    INIT_SF(move_tga)
-    INIT_SF(pen_tga)
-    INIT_SF(s1arrow_tga)
-    INIT_SF(s2arrow_tga)
-    INIT_SF(stop_tga)
-    INIT_SF(udarrow_tga)
-    
-    Sinitialized=1;
+  if (Sinitialized)
+    { Sinitialized++;return; }
+
+  INIT_SF(arrow_tga)
+  INIT_SF(cross_tga)
+  INIT_SF(hglass1_tga)
+  INIT_SF(hglass2_tga)
+  INIT_SF(lrarrow_tga)
+  INIT_SF(magnify_tga)
+  INIT_SF(move_tga)
+  INIT_SF(pen_tga)
+  INIT_SF(s1arrow_tga)
+  INIT_SF(s2arrow_tga)
+  INIT_SF(stop_tga)
+  INIT_SF(udarrow_tga)
+
+  Sinitialized=1;
 }
 
 static void deinit_surfaces()
 {
-    if (--Sinitialized) 
-      return;
-    
-    DEINIT_SF(arrow_tga)
-    DEINIT_SF(cross_tga)
-    DEINIT_SF(hglass1_tga)
-    DEINIT_SF(hglass2_tga)
-    DEINIT_SF(lrarrow_tga)
-    DEINIT_SF(magnify_tga)
-    DEINIT_SF(move_tga)
-    DEINIT_SF(pen_tga)
-    DEINIT_SF(s1arrow_tga)
-    DEINIT_SF(s2arrow_tga)
-    DEINIT_SF(stop_tga)
-    DEINIT_SF(udarrow_tga)
+  if (--Sinitialized)
+    return;
+
+  DEINIT_SF(arrow_tga)
+  DEINIT_SF(cross_tga)
+  DEINIT_SF(hglass1_tga)
+  DEINIT_SF(hglass2_tga)
+  DEINIT_SF(lrarrow_tga)
+  DEINIT_SF(magnify_tga)
+  DEINIT_SF(move_tga)
+  DEINIT_SF(pen_tga)
+  DEINIT_SF(s1arrow_tga)
+  DEINIT_SF(s2arrow_tga)
+  DEINIT_SF(stop_tga)
+  DEINIT_SF(udarrow_tga)
 }
 
 static int drawing_thread(void *_owner)
 {
-    csGraphics2DSDL *owner = (csGraphics2DSDL *)_owner;
-    
-    owner->shutdown=0;
-    
-    while(owner->opened)
+  csGraphics2DSDL *owner = (csGraphics2DSDL *)_owner;
+
+  owner->shutdown=0;
+
+  while(owner->opened)
+  {
+    SDL_LockMutex(owner->th_lock);
+    SDL_LockSurface(owner->screen);
+    memcpy(owner->screen->pixels,owner->membuffer,owner->size_mem);
+    SDL_UnlockSurface(owner->screen);
+    SDL_UnlockMutex(owner->th_lock);
+    if (Scurrent)
     {
-        SDL_LockMutex(owner->th_lock);
-        SDL_LockSurface(owner->screen);        
-        memcpy(owner->screen->pixels,owner->membuffer,owner->size_mem);
-        SDL_UnlockSurface(owner->screen);
-        SDL_UnlockMutex(owner->th_lock);        
-        if (Scurrent)
-        {
-            SDL_Rect dst;
-            int x,y;
-            
-            SDL_GetMouseState(&x, &y);
-            
-            dst.x = (Sint16)x-hotspot[cursorNo][0];
-            dst.y = (Sint16)y-hotspot[cursorNo][1];      
-            dst.w = dst.h = 32;
-            
-            SDL_BlitSurface(Scurrent, NULL, owner->screen, &dst);
-            
-            if (Scurrent == Shglass1_tga)
-              Scurrent = Shglass2_tga; else
-            if (Scurrent == Shglass2_tga)
-              Scurrent = Shglass1_tga;    
-        }       
-        SDL_Flip(owner->screen); 
-    }                                                             
-    
-    owner->shutdown=1;
-    return 0;
+      SDL_Rect dst;
+      int x,y;
+
+      SDL_GetMouseState(&x, &y);
+
+      dst.x = (Sint16)x-hotspot[cursorNo][0];
+      dst.y = (Sint16)y-hotspot[cursorNo][1];
+      dst.w = dst.h = 32;
+
+      SDL_BlitSurface(Scurrent, NULL, owner->screen, &dst);
+
+      if (Scurrent == Shglass1_tga)
+        Scurrent = Shglass2_tga; else
+      if (Scurrent == Shglass2_tga)
+        Scurrent = Shglass1_tga;
+    }
+    SDL_Flip (owner->screen);
+  }
+
+  owner->shutdown=1;
+  return 0;
 }
 #endif
 
@@ -185,33 +185,33 @@ static int drawing_thread(void *_owner)
 csGraphics2DSDL::csGraphics2DSDL(iBase *iParent) : csGraphics2D ()
 {
     CONSTRUCT_IBASE (iParent);
-    EventOutlet = NULL;  
+    EventOutlet = NULL;
 }
 
 //fixup:
-//  This function increases reference counter for sdl2d.so. This is 
+//  This function increases reference counter for sdl2d.so. This is
 //  necessary to keep all dependent libraries in memory. For example,
 //  sdl2d.so may load pthread.so. Thus, pthread sets "hook-on-exit",
-//  but the code of pthread.so becomes unavailable on program exit 
+//  but the code of pthread.so becomes unavailable on program exit
 //  (after sdl2d.so is unloaded), and program ends with "Segmentation
-//  Fault". Increasing reference counter (via dlopen) fixes this problem 
-//  - the library sdl2d.so with all dependent libraries stays open until 
-//  the main program exits. Of course, this is not the best solution, 
+//  Fault". Increasing reference counter (via dlopen) fixes this problem
+//  - the library sdl2d.so with all dependent libraries stays open until
+//  the main program exits. Of course, this is not the best solution,
 //  that's why the function is marked "fixup".
 
 void csGraphics2DSDL::fixlibrary()
 {
 #ifdef OS_LINUX
     Dl_info dlip;
-  
+
     dladdr(sdl2d_GetClassTable,&dlip);
     dlopen(dlip.dli_fname,RTLD_NOW);
 
-    CsPrintf (MSG_INITIALIZATION, "Library %s locked.\n",dlip.dli_fname);  
+    CsPrintf (MSG_INITIALIZATION, "Library %s locked.\n",dlip.dli_fname);
 #else
-    CsPrintf (MSG_INITIALIZATION, 
+    CsPrintf (MSG_INITIALIZATION,
               "WARNING: Your operating system is not tested\n"
-              "         yet with sdl2d video driver!\n");    
+              "         yet with sdl2d video driver!\n");
 #endif
 }
 
@@ -223,15 +223,15 @@ bool csGraphics2DSDL::Initialize (iSystem *pSystem)
     Font = 0;
     Memory = NULL;
     opened = false;
-  
+
     // SDL Starts here
 
     CsPrintf (MSG_INITIALIZATION, "Crystal Space SDL version.\n");
-  
+
     //fixup:
     //make library persistent
     fixlibrary();
-   
+
     CsPrintf (MSG_INITIALIZATION,  "Defaults to %dx%dx%d resolution.\n", Width, Height, Depth);
 
     Memory = NULL;
@@ -239,7 +239,7 @@ bool csGraphics2DSDL::Initialize (iSystem *pSystem)
 #if SHADE_BUF
     cursorNo = csmcNone;
 #endif
-  
+
     switch (Depth)
     {
       case 8:
@@ -268,18 +268,18 @@ bool csGraphics2DSDL::Initialize (iSystem *pSystem)
         pfmt.PalEntries = 0;
         pfmt.PixelBytes = 4;
         break;
-      default:   
+      default:
         CsPrintf (MSG_FATAL_ERROR, "Pixel depth %d not supported\n", Depth);
     }
-  
-    return true; 
+
+    return true;
 }
 
 csGraphics2DSDL::~csGraphics2DSDL(void)
 {
     // Destroy your graphic interface
-    Memory = NULL;  
-    Close(); 
+    Memory = NULL;
+    Close();
     if (EventOutlet)
       EventOutlet->DecRef ();
 }
@@ -287,37 +287,37 @@ csGraphics2DSDL::~csGraphics2DSDL(void)
 bool csGraphics2DSDL::Open(const char *Title)
 {
   if (opened) return false;
-  
+
   // Open your graphic interface
-  if (!csGraphics2D::Open (Title)) return false;  
-  
+  if (!csGraphics2D::Open (Title)) return false;
+
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_NOPARACHUTE) < 0) {
     CsPrintf (MSG_FATAL_ERROR, "Couldn't initialize SDL: %s\n", SDL_GetError());
     exit (1);
   }
-  
+
   screen = SDL_SetVideoMode(Width,Height,Depth,SDL_SWSURFACE);
   if (screen == NULL) {
     CsPrintf (MSG_FATAL_ERROR, "Couldn't set %dx%dx%d video mode: %s\n",
                                Width, Height, Depth, SDL_GetError());
     return false;
-  }  
-      
-  SDL_WM_SetCaption(Title, NULL);  
+  }
+
+  SDL_WM_SetCaption(Title, NULL);
   SDL_EnableKeyRepeat(250, 30);
   SDL_ShowCursor(0);
-  
-#if SHADE_BUF  
+
+#if SHADE_BUF
   cursorNo = csmcNone;
   *((char **)&Memory) = new char[(size_mem=Width*Height*screen->format->BytesPerPixel)+128];
-  *((char **)&membuffer) = new char[(size_mem=Width*Height*screen->format->BytesPerPixel)+128];  
+  *((char **)&membuffer) = new char[(size_mem=Width*Height*screen->format->BytesPerPixel)+128];
   init_surfaces();
   Scurrent = NULL;
   th_lock = SDL_CreateMutex();
   SDL_CreateThread(drawing_thread, (void *)this);
 #else
   *((void **)&Memory) = screen->pixels;
-#endif  
+#endif
 
   switch (Depth)
   {
@@ -351,19 +351,19 @@ bool csGraphics2DSDL::Open(const char *Title)
       _WriteString = WriteString32;
       _GetPixelAt = GetPixelAt32;
       break;
-    default:   
+    default:
       CsPrintf (MSG_FATAL_ERROR, "Pixel depth %d not supported\n", Depth);
   }
 
   pfmt.complete ();
-  Clear(0);  
+  Clear(0);
   System->CallOnEvents (this, CSMASK_Nothing);
 
   if (!EventOutlet)
     EventOutlet = System->CreateEventOutlet (this);
-    
-  opened=true;  
-  
+
+  opened=true;
+
   return true;
 }
 
@@ -372,16 +372,16 @@ void csGraphics2DSDL::Close(void)
   if (!opened) return;
   // Close your graphic interface
   opened=false;
-  
-#if SHADE_BUF    
-  while(!shutdown) 
-    SDL_Delay(1);
-#endif    
 
-  SDL_Quit();  
+#if SHADE_BUF
+  while(!shutdown)
+    SDL_Delay(1);
+#endif
+
+  SDL_Quit();
   csGraphics2D::Close ();
-  
-#if SHADE_BUF  
+
+#if SHADE_BUF
   delete[] ((char *)Memory);
   delete[] ((char *)membuffer);
   SDL_DestroyMutex(th_lock);
@@ -391,8 +391,8 @@ void csGraphics2DSDL::Close(void)
 
 struct keyconv_t
 {
-    SDLKey key_sdl;
-    int key_cs;
+  SDLKey key_sdl;
+  int key_cs;
 };
 
 int csGraphics2DSDL::translate_key (SDL_Event *ev)
@@ -408,7 +408,7 @@ int csGraphics2DSDL::translate_key (SDL_Event *ev)
       I SDLK_KP_ENTER    l CSKEY_ENTER             J
       I SDLK_CLEAR       l CSKEY_BACKSPACE         J
       I SDLK_BACKSPACE   l CSKEY_BACKSPACE         J
-      
+
       I SDLK_UP          l CSKEY_UP                J
       I SDLK_KP8         l CSKEY_UP                J
       I SDLK_DOWN        l CSKEY_DOWN              J
@@ -417,17 +417,17 @@ int csGraphics2DSDL::translate_key (SDL_Event *ev)
       I SDLK_KP4         l CSKEY_LEFT              J
       I SDLK_RIGHT       l CSKEY_RIGHT             J
       I SDLK_KP6         l CSKEY_RIGHT             J
-      
+
       I SDLK_PAGEUP      l CSKEY_PGUP              J
       I SDLK_PAGEDOWN    l CSKEY_PGDN              J
       I SDLK_INSERT      l CSKEY_INS               J
       I SDLK_DELETE      l CSKEY_DEL               J
       I SDLK_HOME        l CSKEY_HOME              J
       I SDLK_END         l CSKEY_END               J
-      
+
       I SDLK_LSHIFT      l CSKEY_SHIFT             J
       I SDLK_RSHIFT      l CSKEY_SHIFT             J
-      
+
       I SDLK_LCTRL       l CSKEY_CTRL              J
       I SDLK_RCTRL       l CSKEY_CTRL              J
 
@@ -435,7 +435,7 @@ int csGraphics2DSDL::translate_key (SDL_Event *ev)
       I SDLK_RALT        l CSKEY_ALT               J
       I SDLK_LMETA       l CSKEY_ALT               J
       I SDLK_RMETA       l CSKEY_ALT               J
-      
+
       I SDLK_KP_PLUS     l CSKEY_PADPLUS           J
       I SDLK_KP_MINUS    l CSKEY_PADMINUS          J
       I SDLK_KP_MULTIPLY l CSKEY_PADMULT           J
@@ -454,7 +454,7 @@ int csGraphics2DSDL::translate_key (SDL_Event *ev)
       I SDLK_F10         l CSKEY_F10               J
       I SDLK_F11         l CSKEY_F11               J
       I SDLK_F12         l CSKEY_F12               J
-      
+
       default            l                       //J
           (((int)(ev->key.keysym.sym))<256)?     //J
             (int)(ev->key.keysym.sym):           //J
@@ -469,7 +469,7 @@ bool csGraphics2DSDL::HandleEvent (iEvent &/*Event*/)
 {
   SDL_Event ev;
   while ( SDL_PollEvent(&ev) )
-  { 
+  {
     switch (ev.type)
     {
       case SDL_KEYDOWN:
@@ -480,7 +480,7 @@ bool csGraphics2DSDL::HandleEvent (iEvent &/*Event*/)
 
           if (key >= 0)
             EventOutlet->Key (key, -1, down);
-          
+
           break;
       }
       case SDL_MOUSEMOTION:
@@ -489,13 +489,13 @@ bool csGraphics2DSDL::HandleEvent (iEvent &/*Event*/)
           break;
       }
       case SDL_MOUSEBUTTONDOWN:
-      case SDL_MOUSEBUTTONUP:      
-      {          
+      case SDL_MOUSEBUTTONUP:
+      {
           int btn = (ev.button.button==1)?1:
                     (ev.button.button==2)?3:
                     (ev.button.button==3)?2:
                                           0;
-            
+
           if (btn)
             EventOutlet->Mouse ( btn, (bool)(ev.type==SDL_MOUSEBUTTONDOWN),
                                  ev.button.x, ev.button.y);
@@ -512,15 +512,14 @@ void csGraphics2DSDL::Print (csRect *area)
 #if SHADE_BUF
   SDL_LockMutex(th_lock);
   memcpy(membuffer,Memory,size_mem);
-  SDL_UnlockMutex(th_lock);  
+  SDL_UnlockMutex(th_lock);
 #else
   if ((!area)||
        ((area->xmin==0)&&(area->xmax==Width)&&
         (area->ymin==0)&&(area->ymax==Height)))
     SDL_Flip(screen);
   else
-    SDL_UpdateRect(screen, area->xmin,              area->ymin, 
-                           area->xmax - area->xmin, area->ymax - area->ymin);
+    SDL_UpdateRect(screen, area->xmin, area->ymin, area->Width (), area->Height ());
 #endif
 }
 
@@ -545,44 +544,46 @@ bool csGraphics2DSDL::PerformExtension(const char* args)
 
 bool csGraphics2DSDL::BeginDraw()
 {
-    if (!Memory) return false;
-    bool ret = csGraphics2D::BeginDraw();
-#if !SHADE_BUF    
-    SDL_LockSurface(screen);
-#endif    
-    return ret;
+  if (!Memory)
+    return false;
+  if (!csGraphics2D::BeginDraw ())
+    return false;
+#if !SHADE_BUF
+  SDL_LockSurface (screen);
+#endif
+  return true;
 }
 void csGraphics2DSDL::FinishDraw()
 {
-#if !SHADE_BUF    
-    SDL_UnlockSurface(screen);
+#if !SHADE_BUF
+  SDL_UnlockSurface (screen);
 #endif
-    csGraphics2D::FinishDraw();
+  csGraphics2D::FinishDraw ();
 }
 
 bool csGraphics2DSDL::SetMousePosition (int x, int y)
 {
-    SDL_WarpMouse((Uint16)x,(Uint16)y);
-    return true;
+  SDL_WarpMouse ((Uint16)x,(Uint16)y);
+  return true;
 }
 
 bool csGraphics2DSDL::SetMouseCursor (csMouseCursorID iShape)
 {
-    if (iShape == csmcNone)
-    {      
-#if SHADE_BUF    
-        cursorNo = csmcNone;
+  if (iShape == csmcNone)
+  {
+#if SHADE_BUF
+    cursorNo = csmcNone;
 #endif
-        SDL_ShowCursor(0);
-        return true;
-    }
-    else
-    {
+    SDL_ShowCursor (0);
+    return true;
+  }
+  else
+  {
 #if SHADE_BUF
 #define I (iShape == (cursorNo =
 #define l ))?
 #define J :
-    Scurrent =     
+    Scurrent =
     I csmcArrow     l Sarrow_tga    J
     I csmcLens      l Smagnify_tga  J
     I csmcCross     l Scross_tga    J
@@ -596,26 +597,26 @@ bool csGraphics2DSDL::SetMouseCursor (csMouseCursorID iShape)
     I csmcWait      l Shglass1_tga  J
     I 12            l NULL          J
                       NULL;
-    
-    if (cursorNo>=12) cursorNo=0;
-    if (cursorNo<0) cursorNo=0;
+
+    if (cursorNo >= 12) cursorNo = 0;
+    if (cursorNo < 0) cursorNo = 0;
 #undef I
 #undef l
 #undef J
-        return !! Scurrent;
-#else    
-        //fixup:
-        SDL_ShowCursor(0);
+      return !! Scurrent;
+#else
+    //fixup:
+    SDL_ShowCursor (0);
     return false;
-#endif    
-    }
+#endif
+  }
 }
 
 //fixup: for SDL
 int main(int argc,char *argv)
 {
-    (void)argc;
-    (void)argv;
-    fprintf(stderr,"sdl2d: unexpected entry to main()\n");
-    return 0;
+  (void)argc;
+  (void)argv;
+  fprintf(stderr,"sdl2d: unexpected entry to main()\n");
+  return 0;
 }
