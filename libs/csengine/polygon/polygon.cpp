@@ -1544,10 +1544,13 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   csVector3 *poly;
   int num_vertices;
 
+  csLightMapped *lmi = GetLightMapInfo ();
+
   // Calculate the new frustum for this polygon.
   if ((GetTextureType () == POLYTXT_LIGHTMAP)
    && !flags.Check (CS_POLY_FLATSHADING)
-   && !lview->dynamic)
+   && !lview->dynamic
+   && lmi && lmi->tex && lmi->tex->lm)
   {
     // For lightmapped polygons we will compute the lighting of the
     // entire lightmap as a whole. This removes any problems that existed
@@ -1555,7 +1558,6 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
 
     // We will use the "responsability grid" rectangle instead of polygon
     // since we need to calculate the lighing for the whole lightmap.
-    csLightMapped *lmi = GetLightMapInfo ();
     // Bounding rectangle always has 4 vertices
     num_vertices = 4;
     if (4 > VectorArray.Limit ())
@@ -1619,7 +1621,6 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   // FillLightMap() will use this information and
   // csPortal::CalculateLighting() will also use it!!
   po = GetPortal ();
-  csLightMapped* lmi = GetLightMapInfo ();
   if (po || new_lview.dynamic || (lmi && !lmi->lightmap_up_to_date))
   {
     csPlane3 poly_plane = *GetPolyPlane ();

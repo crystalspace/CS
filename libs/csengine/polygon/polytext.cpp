@@ -207,9 +207,8 @@ void csPolyTexture::InitLightMaps ()
 bool csPolyTexture::GetLightmapBounds (csFrustumView *lview, csVector3 *bounds)
 {
   // Take care not to fill same lightmap twice
-  if (!lm
-   || (lm->last_lview == lview
-    && lm->last_lighting_cookie == csLight::lighting_cookie))
+  if (lm->last_lview == lview
+   && lm->last_lighting_cookie == csLight::lighting_cookie)
     return false;
   lm->last_lview = lview;
   lm->last_lighting_cookie = csLight::lighting_cookie;
