@@ -203,17 +203,15 @@ float csCurve::GetScreenBoundingBox (const csTransform& obj2cam,
   }
   else
   {
-    oneCorner.x = cbox.MaxX () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
-    oneCorner.y = cbox.MaxY () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
+    camtrans.Perspective (cbox.Max (), oneCorner);
     boundingBox.StartBoundingBox (oneCorner);
-    oneCorner.x = cbox.MinX () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
-    oneCorner.y = cbox.MinY () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
+    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+    camtrans.Perspective (v, oneCorner);
     boundingBox.AddBoundingVertexSmart (oneCorner);
-    oneCorner.x = cbox.MinX () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
-    oneCorner.y = cbox.MinY () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
+    camtrans.Perspective (cbox.Min (), oneCorner);
     boundingBox.AddBoundingVertexSmart (oneCorner);
-    oneCorner.x = cbox.MaxX () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
-    oneCorner.y = cbox.MaxY () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
+    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+    camtrans.Perspective (v, oneCorner);
     boundingBox.AddBoundingVertexSmart (oneCorner);
   }
 

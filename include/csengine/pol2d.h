@@ -47,41 +47,21 @@ public:
   /**
    * Compute the perspective transformation of a 3D vertex and add it to the polygon.
    */
-  void AddPerspective (const csVector3& v) { AddPerspective (v.x, v.y, v.z); }
-
-  /**
-   * Compute the perspective transformation of a 3D vertex and add it to the polygon.
-   */
-  void AddPerspective (float x, float y, float z);
+  void AddPerspective (const csVector3& v);
 
   /**
    * Compute the perspective transformation of a 3D vertex and add it to the polygon.
    * This version computes unit perspective correction for which aspect ratio
    * is one and shift_x and shift_y are zero.
    */
-  void AddPerspectiveUnit (float x, float y, float z);
-
-  /**
-   * Compute the perspective transformation of a 3D vertex and add it to the polygon.
-   * This version computes unit perspective correction for which aspect ratio
-   * is one and shift_x and shift_y are zero.
-   */
-  void AddPerspectiveUnit (const csVector3& v) { AddPerspectiveUnit (v.x, v.y, v.z); }
+  void AddPerspectiveUnit (const csVector3& v);
 
   /**
    * Compute the perspective transformation of a 3D vertex and add it to the polygon.
    * This version computes perspective correction for a given aspect
    * ratio and given shift value.
    */
-  void AddPerspectiveAspect (float x, float y, float z, float ratio, float shift);
-
-  /**
-   * Compute the perspective transformation of a 3D vertex and add it to the polygon.
-   * This version computes perspective correction for a given aspect
-   * ratio and given shift value.
-   */
-  void AddPerspectiveAspect (const csVector3& v, float ratio, float shift)
-  { AddPerspectiveAspect (v.x, v.y, v.z, ratio, shift); }
+  void AddPerspectiveAspect (const csVector3& v, float ratio, float shift);
 
   /**
    * Draw the polygon (wireframe version).

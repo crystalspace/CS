@@ -49,6 +49,7 @@ class csWorld;
 class Dumper;
 class csLight;
 class csCBuffer;
+class csQuadTree3D;
 class csCoverageMaskTree;
 class csCovMaskLUT;
 class csPoly2DPool;
@@ -325,6 +326,9 @@ private:
   /// Current number of processed polygons.
   static int cur_process_polygons;
 
+  /// Optional 3D quadtree used for culling.
+  csQuadTree3D* quad3d;
+
   /// Optional c-buffer used for rendering.
   csCBuffer* c_buffer;
 
@@ -451,6 +455,16 @@ public:
   {
     return cur_process_polygons >= max_process_polygons;
   }
+
+  /**
+   * Enable/disable 3D quadtree.
+   */
+  void EnableQuad3D (bool en);
+
+  /**
+   * Return 3D quadtree (or NULL if not used).
+   */
+  csQuadTree3D* GetQuad3D () { return quad3d; }
 
   /**
    * Enable/disable c-buffer.
@@ -811,6 +825,7 @@ private:
     iGraphics2D *G2D;
     iGraphics3D *G3D;
     csCBuffer* c_buffer;
+    csQuadTree3D* quad3d;
     csCoverageMaskTree* covtree;
     /// Creates a world state by copying the relevant data members
     csWorldState (csWorld *this_world);

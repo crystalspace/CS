@@ -35,6 +35,7 @@
 #include "csengine/stats.h"
 #include "csengine/csppulse.h"
 #include "csengine/cbuffer.h"
+#include "csengine/quadtr3d.h"
 #include "csengine/covtree.h"
 #include "csengine/bspbbox.h"
 #include "csengine/terrain.h"
@@ -599,6 +600,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   csOctreeNode* onode = (csOctreeNode*)node;
 
   csCBuffer* c_buffer;
+  csQuadTree3D* quad3d;
   csCoverageMaskTree* covtree;
   csRenderView* rview = (csRenderView*)data;
   static csPolygon2D persp;
@@ -613,6 +615,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 
   c_buffer = csWorld::current_world->GetCBuffer ();
   covtree = csWorld::current_world->GetCovtree ();
+  //quad3d = csWorld::current_world->GetQuad3D ();
   int num_array;
   otree->GetConvexOutline (onode, pos, array, num_array);
   if (num_array)
@@ -894,6 +897,7 @@ void csSector::Draw (csRenderView& rview)
 
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
+  //csQuadTree3D* quad3d = csWorld::current_world->GetQuad3D ();
   if (c_buffer || covtree)
   {
     //-----

@@ -1,5 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
+13-Jul-2000
+	- Removed 'solidbsp' command from documentation.
+	- Added SetMainFrustum to csQuadTree3D to change the frustum for an
+	  already created csQuadTree3D.
+	- Started work on using csQuadTree3D as a 3D visibility culler.
+	  Not finished.
+	- Added csCamera::Perspective() which calculates the perspective
+	  projection for a 3D point given a camera.
+	- Added csCamera::InvPerspective() which calculates the inverse
+	  perspective projection for a 2D point (with a given Z).
+	- Removed the csPolygon2D::AddPerspective... versions that take x,y,z
+	  parameter and only kept the csVector3 ones.
+	- Added PROCEDURAL and PERSISTENT keywords to textures in the world
+	  file. With these you can make a texture procedural. If you make a
+	  texture PERSISTENT as well as PROCEDURAL you can render on parts
+	  of the texture and the previous contents will still be there.
 12-Jul-2000
 	- Added new csHashSet class. This is a class that you can use
 	  to add objects and to test if some object is already in the

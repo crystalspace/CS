@@ -45,6 +45,7 @@
 #include "csengine/stats.h"
 #include "csengine/cspmeter.h"
 #include "csengine/cbuffer.h"
+#include "csengine/quadtr3d.h"
 #include "csengine/lppool.h"
 #include "csengine/covtree.h"
 #include "csengine/particle.h"
@@ -294,6 +295,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   G2D = NULL;
   textures = NULL;
   c_buffer = NULL;
+  quad3d = NULL;
   covcube = NULL;
   cbufcube = NULL;
   covtree = NULL;
@@ -461,6 +463,7 @@ void csWorld::Clear ()
   delete textures; textures = NULL;
   textures = new csTextureList ();
   delete c_buffer; c_buffer = NULL;
+  delete quad3d; quad3d = NULL;
   delete covtree; covtree = NULL;
   delete render_pol2d_pool;
   render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory());
@@ -486,11 +489,35 @@ void csWorld::EnableLightingCache (bool en)
   if (!do_lighting_cache) do_force_relight = true;
 }
 
+void csWorld::EnableQuad3D (bool en)
+{
+  if (en)
+  {
+    delete covtree; covtree = NULL;
+    delete c_buffer; c_buffer = NULL;
+    if (quad3d) return;
+    csVector3 corners[4];
+    corners[0].Set (-1, -1, 1);
+    corners[1].Set (1, -1, 1);
+    corners[2].Set (1, 1, 1);
+    corners[3].Set (-1, 1, 1);
+    csBox3 bbox;
+    quad3d = new csQuadTree3D (csVector3 (0, 0, 0),
+    	corners, bbox, 5);
+  }
+  else
+  {
+    delete quad3d;
+    quad3d = NULL;
+  }
+}
+
 void csWorld::EnableCBuffer (bool en)
 {
   if (en)
   {
     delete covtree; covtree = NULL;
+    delete quad3d; quad3d = NULL;
     if (c_buffer) return;
     c_buffer = new csCBuffer (0, frame_width-1, frame_height);
   }
@@ -506,6 +533,7 @@ void csWorld::EnableCovtree (bool en)
   if (en)
   {
     delete c_buffer; c_buffer = NULL;
+    delete quad3d; quad3d = NULL;
     if (covtree) return;
     csBox2 box (0, 0, frame_width, frame_height);
     if (!covtree_lut)
@@ -1035,6 +1063,20 @@ void csWorld::Draw (csCamera* c, csClipper* view)
     c_buffer->Initialize ();
     c_buffer->InsertPolygon (view->GetClipPoly (), view->GetNumVertices (), true);
   }
+  else if (quad3d)
+  {
+    csVector3 corners[4];
+    c->InvPerspective (csVector2 (0, 0), 1, corners[0]);
+    corners[0] = c->Camera2World (corners[0]);
+    c->InvPerspective (csVector2 (frame_width-1, 0), 1, corners[1]);
+    corners[1] = c->Camera2World (corners[1]);
+    c->InvPerspective (csVector2 (frame_width-1, frame_height-1), 1, corners[2]);
+    corners[2] = c->Camera2World (corners[2]);
+    c->InvPerspective (csVector2 (0, frame_height-1), 1, corners[3]);
+    corners[3] = c->Camera2World (corners[3]);
+    quad3d->SetMainFrustum (c->GetOrigin (), corners);
+    quad3d->MakeEmpty ();
+  }
   else if (covtree)
   {
     covtree->MakeEmpty ();
@@ -1113,7 +1155,21 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   tr_manager.NewFrame ();
 
   if (c_buffer) c_buffer->Initialize ();
-  if (covtree) covtree->MakeEmpty ();
+  else if (quad3d)
+  {
+    csVector3 corners[4];
+    c->InvPerspective (csVector2 (0, 0), 1, corners[0]);
+    corners[0] = c->Camera2World (corners[0]);
+    c->InvPerspective (csVector2 (frame_width-1, 0), 1, corners[1]);
+    corners[1] = c->Camera2World (corners[1]);
+    c->InvPerspective (csVector2 (frame_width-1, frame_height-1), 1, corners[2]);
+    corners[2] = c->Camera2World (corners[2]);
+    c->InvPerspective (csVector2 (0, frame_height-1), 1, corners[3]);
+    corners[3] = c->Camera2World (corners[3]);
+    quad3d->SetMainFrustum (c->GetOrigin (), corners);
+    quad3d->MakeEmpty ();
+  }
+  else if (covtree) covtree->MakeEmpty ();
 
   csSector* s = c->GetSector ();
   cur_process_polygons = 0;
@@ -1696,6 +1752,11 @@ void csWorld::Resize ()
     EnableCovtree (false); 
     EnableCovtree (true); 
   }
+  if (quad3d) 
+  { 
+    EnableQuad3D (false); 
+    EnableQuad3D (true); 
+  }
 }
 
 csWorld::csWorldState::csWorldState (csWorld *w)
@@ -1703,6 +1764,7 @@ csWorld::csWorldState::csWorldState (csWorld *w)
   world    = w;
   c_buffer = w->c_buffer;
   covtree  = w->covtree;
+  quad3d   = w->quad3d;
   G2D      = w->G2D;
   G3D      = w->G3D;
   resize   = false;
@@ -1711,12 +1773,14 @@ csWorld::csWorldState::csWorldState (csWorld *w)
 csWorld::csWorldState::~csWorldState ()
 {
   if (c_buffer) delete c_buffer;
+  if (quad3d)   delete quad3d;
   if (covtree)  delete covtree;
 }
 
 void csWorld::csWorldState::Activate ()
 {
   world->c_buffer     = c_buffer;
+  world->quad3d       = quad3d;
   world->covtree      = covtree;
   world->frame_width  = G3D->GetWidth ();
   world->frame_height = G3D->GetHeight ();
@@ -1726,6 +1790,7 @@ void csWorld::csWorldState::Activate ()
     world->Resize ();
 
     c_buffer = world->c_buffer;
+    quad3d   = world->quad3d;
     covtree  = world->covtree;
     resize   = false;
   }

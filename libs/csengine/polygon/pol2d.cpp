@@ -43,57 +43,39 @@ csPolygon2DFactory* csPolygon2DFactory::SharedFactory()
   return &p;
 }
 
-void csPolygon2D::AddPerspective (float x, float y, float z)
+void csPolygon2D::AddPerspective (const csVector3& v)
 {
   if (num_vertices >= max_vertices)
     MakeRoom (max_vertices+5);
 
-  float iz = csWorld::current_world->current_camera->GetFOV ()/z;
-  float px, py;
-
-  px = x * iz + csWorld::current_world->current_camera->GetShiftX ();
-  py = y * iz + csWorld::current_world->current_camera->GetShiftY ();
-  vertices[num_vertices].x = px;
-  vertices[num_vertices].y = py;
-
+  csWorld::current_world->current_camera->Perspective (v, vertices[num_vertices]);
+  bbox.AddBoundingVertex (vertices[num_vertices]);
   num_vertices++;
-  bbox.AddBoundingVertex (px, py);
 }
 
-void csPolygon2D::AddPerspectiveUnit (float x, float y, float z)
+void csPolygon2D::AddPerspectiveUnit (const csVector3& v)
 {
   if (num_vertices >= max_vertices)
     MakeRoom (max_vertices+5);
 
-  float iz = 1./z;
-  float px, py;
-
-  px = x * iz;
-  py = y * iz;
-
-  vertices[num_vertices].x = px;
-  vertices[num_vertices].y = py;
-
+  float iz = 1./v.z;
+  vertices[num_vertices].x = v.x * iz;
+  vertices[num_vertices].y = v.y * iz;
+  bbox.AddBoundingVertex (vertices[num_vertices]);
   num_vertices++;
-  bbox.AddBoundingVertex (px, py);
 }
 
-void csPolygon2D::AddPerspectiveAspect (float x, float y, float z,
+void csPolygon2D::AddPerspectiveAspect (const csVector3& v,
 	float ratio, float shift)
 {
   if (num_vertices >= max_vertices)
     MakeRoom (max_vertices+5);
 
-  float iz = ratio/z;
-  float px, py;
-
-  px = x * iz + shift;
-  py = y * iz + shift;
-  vertices[num_vertices].x = px;
-  vertices[num_vertices].y = py;
-
+  float iz = ratio/v.z;
+  vertices[num_vertices].x = v.x * iz + shift;
+  vertices[num_vertices].y = v.y * iz + shift;
+  bbox.AddBoundingVertex (vertices[num_vertices]);
   num_vertices++;
-  bbox.AddBoundingVertex (px, py);
 }
 
 

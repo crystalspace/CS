@@ -180,12 +180,14 @@ TOKEN_DEF_START
   TOKEN_DEF (OPENING)
   TOKEN_DEF (ORIG)
   TOKEN_DEF (ORIGIN)
+  TOKEN_DEF (PERSISTENT)
   TOKEN_DEF (PLANE)
   TOKEN_DEF (POLYGON)
   TOKEN_DEF (PORTAL)
   TOKEN_DEF (POSITION)
   TOKEN_DEF (PRIMARY_ACTIVE)
   TOKEN_DEF (PRIMARY_INACTIVE)
+  TOKEN_DEF (PROCEDURAL)
   TOKEN_DEF (RADIUS)
   TOKEN_DEF (RAIN)
   TOKEN_DEF (ROOM)
@@ -2502,6 +2504,8 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
     TOKEN_TABLE (FILE)
     TOKEN_TABLE (MIPMAP)
     TOKEN_TABLE (DITHER)
+    TOKEN_TABLE (PROCEDURAL)
+    TOKEN_TABLE (PERSISTENT)
   TOKEN_TABLE_END
 
   long cmd;
@@ -2515,6 +2519,12 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   {
     switch (cmd)
     {
+      case TOKEN_PERSISTENT:
+        flags |= CS_TEXTURE_PROC_PERSISTENT;
+        break;
+      case TOKEN_PROCEDURAL:
+        flags |= CS_TEXTURE_PROC;
+        break;
       case TOKEN_TRANSPARENT:
         do_transp = true;
         ScanStr (params, "%f,%f,%f", &transp.red, &transp.green, &transp.blue);

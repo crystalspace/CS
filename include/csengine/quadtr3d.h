@@ -227,6 +227,12 @@ public:
   /// Destroy quadtree
   ~csQuadTree3D();
 
+  /**
+   * Set the main frustum.
+   */
+  void SetMainFrustum (const csVector3& start_center,
+  	const csVector3 startcorners[4]);
+
   /// Is the tree full?
   bool IsFull () const { return root_state == CS_QUAD3D_FULL; }
 

@@ -177,6 +177,25 @@ csQuadTree3D::~csQuadTree3D ()
     delete[] sizes[i];
 }
 
+void csQuadTree3D::SetMainFrustum (const csVector3& start_center,
+    const csVector3 startcorners[4])
+{
+  int k, i;
+  center = start_center;
+
+  for(i=0; i<4; i++)
+    corners[i] = startcorners[i];
+
+  /// fill the sizes lookup table.
+  for(i=0; i<4; i++)
+  {
+    int next = (i+1) % 4;
+    sizes[i][0] = corners[next] - corners[i];
+    for(k = 1; k<=max_depth; k++)
+      sizes[i][k] = sizes[i][k-1] / 2.0f;
+  }
+}
+
 
 void csQuadTree3D::CallChildren(quad_traverse_func func, csQuadTree3D* pObj,
   q3d_node_pos_info *parent_pos, void *data)

@@ -31,6 +31,7 @@
 #include "csengine/stats.h"
 #include "csengine/dumper.h"
 #include "csengine/cbuffer.h"
+#include "csengine/quadtr3d.h"
 #include "csengine/thing.h"
 #include "csengine/covtree.h"
 #include "csengine/bspbbox.h"
@@ -552,6 +553,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   int i;
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
+  //csQuadTree3D* quad3d = csWorld::current_world->GetQuad3D ();
   bool visible;
   csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
   csPolygon2D* clip;
@@ -579,13 +581,8 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	tbb = (csPolyTreeBBox*)(th->GetPolyTreeObject ());
       }
 
-//@@@ Don't remove this debug code until we fully debugged
-//the bounding box of skeletal sprites!
-//bool bspsp_debug = true;
-
       // If the object is already marked visible then we don't have
       // to do any of the other processing for this polygon.
-//if (bspsp_debug || !sp->IsVisible ())
       if (!obj_vis)
       {
 	// Since we have a csBspPolygon we know that the poly tree object
@@ -615,18 +612,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  }
 	  else if (c_buffer->TestPolygon (clip->GetVertices (),
 	  	clip->GetNumVertices ()))
-	  {
-//	    if (bspsp_debug)
-//	    {
-//	      clip->Draw (d->g2d, d->g3d->GetTextureManager ()->FindRGB (255, 0, 0));
-//	    }
 	    mark_vis = true;
-	  }
-//	  else
-//	    if (bspsp_debug)
-//	    {
-//	      clip->Draw (d->g2d, d->g3d->GetTextureManager ()->FindRGB (0, 0, 255));
-//	    }
         }
 	if (mark_vis)
 	{
