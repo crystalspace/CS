@@ -17,187 +17,197 @@ SCF_IMPLEMENT_IBASE(awsListBox)
   SCF_IMPLEMENTS_INTERFACE(awsComponent)
 SCF_IMPLEMENT_IBASE_END
 
-const int awsListBox::fsBump   = 0x0;
-const int awsListBox::fsSimple = 0x1;
-const int awsListBox::fsRaised = 0x2;
-const int awsListBox::fsSunken = 0x3;
-const int awsListBox::fsFlat   = 0x4;
-const int awsListBox::fsNone   = 0x5;
+const int awsListBox:: fsBump = 0x0;
+const int awsListBox:: fsSimple = 0x1;
+const int awsListBox:: fsRaised = 0x2;
+const int awsListBox:: fsSunken = 0x3;
+const int awsListBox:: fsFlat = 0x4;
+const int awsListBox:: fsNone = 0x5;
 
-const int awsListBox::ctList = 0x0;
-const int awsListBox::ctTree = 0x1;
+const int awsListBox:: ctList = 0x0;
+const int awsListBox:: ctTree = 0x1;
 
-const int awsListBox::signalSelected=0x1;
-const int awsListBox::signalScrolled=0x2;
+const int awsListBox:: signalSelected = 0x1;
+const int awsListBox:: signalScrolled = 0x2;
 
-const int alignLeft=0;
-const int alignCenter=1;
-const int alignRight=2;
+const int alignLeft = 0;
+const int alignCenter = 1;
+const int alignRight = 2;
 
-const int hsTreeBox=0;
-const int hsState=1;
-const int hsRow=2;
+const int hsTreeBox = 0;
+const int hsState = 1;
+const int hsRow = 2;
 
 //////////////////////////////////////////////////////////////////////////
-// awsListRow implementation
-//
 
-awsListRow::~awsListRow()
+// awsListRow implementation
+
+//
+awsListRow::~awsListRow ()
 {
-  if (cols)
-    delete [] cols;
+  if (cols) delete[] cols;
 }
 
-int
-awsListRow::GetHeight(iAwsPrefManager *pm, int colcount)
+int awsListRow::GetHeight (iAwsPrefManager *pm, int colcount)
 {
-  int minheight=0;
+  int minheight = 0;
   int i;
 
-  for (i=0; i<colcount; ++i)
+  for (i = 0; i < colcount; ++i)
   {
-    int th=cols[i].GetHeight(pm);
+    int th = cols[i].GetHeight (pm);
 
-    if ( th > minheight)
-      minheight=th;
+    if (th > minheight) minheight = th;
   }
 
   return minheight;
 }
 
-
 //////////////////////////////////////////////////////////////////////////
+
 // awsListItem implementation
-//
 
-awsListItem::~awsListItem()
+//
+awsListItem::~awsListItem ()
 {
-  SCF_DEC_REF(text);
-  SCF_DEC_REF(image);
+  SCF_DEC_REF (text);
+  SCF_DEC_REF (image);
 }
 
-int
-awsListItem::GetHeight(iAwsPrefManager *pm)
+int awsListItem::GetHeight (iAwsPrefManager *pm)
 {
-  int ih=0, iw=0;
-  int th=0, tw=0;
+  int ih = 0, iw = 0;
+  int th = 0, tw = 0;
 
-  if (image) image->GetOriginalDimensions(iw, ih);
-  if (text)  pm->GetDefaultFont()->GetDimensions(text->GetData(), tw, th);
+  if (image) image->GetOriginalDimensions (iw, ih);
+  if (text) pm->GetDefaultFont ()->GetDimensions (text->GetData (), tw, th);
 
-  if (ih > th) return ih;
-  else return th;
+  if (ih > th)
+    return ih;
+  else
+    return th;
 }
 
 //////////////////////////////////////////////////////////////////////////
-// awsListBox implementation
-//
 
-awsListBox::awsListBox():is_down(false), mouse_is_over(false),
-is_switch(false), was_down(false),
-bkg(NULL), highlight(NULL),
-tree_collapsed(NULL), tree_expanded(NULL),
-tree_hline(NULL), tree_vline(NULL),
-frame_style(0), alpha_level(92), hi_alpha_level(128),
-control_type(0), ncolumns(1), sel(NULL), map(NULL),
-map_size(0), map_dirty(true), scroll_start(0), drawable_count(0)
+// awsListBox implementation
+
+//
+awsListBox::awsListBox () :
+  is_down(false),
+  mouse_is_over(false),
+  is_switch(false),
+  was_down(false),
+  bkg(NULL),
+  highlight(NULL),
+  tree_collapsed(NULL),
+  tree_expanded(NULL),
+  tree_hline(NULL),
+  tree_vline(NULL),
+  frame_style(0),
+  alpha_level(92),
+  hi_alpha_level(128),
+  control_type(0),
+  ncolumns(1),
+  sel(NULL),
+  map(NULL),
+  map_size(0),
+  map_dirty(true),
+  scroll_start(0),
+  drawable_count(0)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  actions.Register("InsertItem", &InsertItem);
-  actions.Register("DeleteItem", &DeleteItem);
-  actions.Register("GetSelectedItem", &GetSelectedItem);
-  actions.Register("ClearList", &ClearList);
+  actions.Register ("InsertItem", &InsertItem);
+  actions.Register ("DeleteItem", &DeleteItem);
+  actions.Register ("GetSelectedItem", &GetSelectedItem);
+  actions.Register ("ClearList", &ClearList);
 }
 
-awsListBox::~awsListBox()
+awsListBox::~awsListBox ()
 {
 }
 
-char *
-awsListBox::Type()
+char *awsListBox::Type ()
 {
   return "List Box";
 }
 
-bool
-awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
+bool awsListBox::Setup (iAws *_wmgr, awsComponentNode *settings)
 {
-  iString   *tn1=NULL, *tn2=NULL;
+  iString *tn1 = NULL, *tn2 = NULL;
   char buf[64];
   int i;
   int sb_h, sb_w;
-  int border=3;
-  int min=0, max=0, change=1, bigchange=1;
+  int border = 3;
+  int min = 0, max = 0, change = 1, bigchange = 1;
 
-  if (!awsComponent::Setup(_wmgr, settings)) return false;
+  if (!awsComponent::Setup (_wmgr, settings)) return false;
 
-  iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
+  iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
-  pm->LookupIntKey("OverlayTextureAlpha", alpha_level); // global get
-  pm->LookupIntKey("ScrollBarHeight", sb_h);
-  pm->LookupIntKey("ScrollBarWidth", sb_w);
-  pm->GetInt(settings, "Style", frame_style);
-  pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
-  pm->GetInt(settings, "HiAlpha", hi_alpha_level);
-  pm->GetInt(settings, "Columns", ncolumns);
-  pm->GetInt(settings, "Type", control_type);
-  pm->GetInt(settings, "DefaultSortCol", sortcol);
+  pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);  // global get
+  pm->LookupIntKey ("ScrollBarHeight", sb_h);
+  pm->LookupIntKey ("ScrollBarWidth", sb_w);
+  pm->GetInt (settings, "Style", frame_style);
+  pm->GetInt (settings, "Alpha", alpha_level);            // local overrides, if present.
+  pm->GetInt (settings, "HiAlpha", hi_alpha_level);
+  pm->GetInt (settings, "Columns", ncolumns);
+  pm->GetInt (settings, "Type", control_type);
+  pm->GetInt (settings, "DefaultSortCol", sortcol);
 
-  tree_collapsed = pm->GetTexture("TreeCollapsed");
-  tree_expanded = pm->GetTexture("TreeExpanded");
-  tree_vline = pm->GetTexture("TreeVertLine");
-  tree_hline = pm->GetTexture("TreeHorzLine");
-  tree_chke = pm->GetTexture("TreeChkUnmarked");
-  tree_chkf = pm->GetTexture("TreeChkMarked");
-  tree_grpe = pm->GetTexture("TreeGrpUnmarked");
-  tree_grpf = pm->GetTexture("TreeGrpMarked");
+  tree_collapsed = pm->GetTexture ("TreeCollapsed");
+  tree_expanded = pm->GetTexture ("TreeExpanded");
+  tree_vline = pm->GetTexture ("TreeVertLine");
+  tree_hline = pm->GetTexture ("TreeHorzLine");
+  tree_chke = pm->GetTexture ("TreeChkUnmarked");
+  tree_chkf = pm->GetTexture ("TreeChkMarked");
+  tree_grpe = pm->GetTexture ("TreeGrpUnmarked");
+  tree_grpf = pm->GetTexture ("TreeGrpMarked");
 
-  pm->GetString(settings, "Background", tn1);
-  pm->GetString(settings, "Highlight", tn2);
+  pm->GetString (settings, "Background", tn1);
+  pm->GetString (settings, "Highlight", tn2);
 
   switch (frame_style)
   {
-  case fsBump:
-    border=5;
-    break;
-  case fsSimple:
-    border=1;
-    break;
+    case fsBump:    border = 5; break;
+    case fsSimple:  border = 1; break;
   }
 
-  rows.SetSortCol(sortcol);
+  rows.SetSortCol (sortcol);
 
-  if (tn1) bkg=pm->GetTexture(tn1->GetData(), tn1->GetData());
-  else bkg=pm->GetTexture("Texture");
+  if (tn1)
+    bkg = pm->GetTexture (tn1->GetData (), tn1->GetData ());
+  else
+    bkg = pm->GetTexture ("Texture");
 
-  if (tn2) highlight=pm->GetTexture(tn2->GetData(), tn2->GetData());
+  if (tn2) highlight = pm->GetTexture (tn2->GetData (), tn2->GetData ());
 
   // Make sure we have at least one column
-  ncolumns=(ncolumns<1 ? 1 : ncolumns);
+  ncolumns = (ncolumns < 1 ? 1 : ncolumns);
 
   // Create new column region.
   columns = new awsListColumn[ncolumns];
-  memset(columns, 0, sizeof(awsListColumn) * ncolumns);
+  memset (columns, 0, sizeof (awsListColumn) * ncolumns);
 
   // Get user prefs for the column headers
-  for (i=0; i<ncolumns; ++i)
+  for (i = 0; i < ncolumns; ++i)
   {
-    cs_snprintf(buf, 64, "Column%dImg", i);
-    pm->GetString(settings, buf, tn1);
-    cs_snprintf(buf, 64, "Column%dBkg", i);
-    pm->GetString(settings, buf, tn2);
-    cs_snprintf(buf, 64, "Column%dCaption", i);
-    pm->GetString(settings, buf, columns[i].caption);
-    cs_snprintf(buf, 64, "Column%dWidth", i);
-    pm->GetInt(settings, buf, columns[i].width);
-    cs_snprintf(buf, 64, "Column%dAlign", i);
-    pm->GetInt(settings, buf, columns[i].align);
+    cs_snprintf (buf, 64, "Column%dImg", i);
+    pm->GetString (settings, buf, tn1);
+    cs_snprintf (buf, 64, "Column%dBkg", i);
+    pm->GetString (settings, buf, tn2);
+    cs_snprintf (buf, 64, "Column%dCaption", i);
+    pm->GetString (settings, buf, columns[i].caption);
+    cs_snprintf (buf, 64, "Column%dWidth", i);
+    pm->GetInt (settings, buf, columns[i].width);
+    cs_snprintf (buf, 64, "Column%dAlign", i);
+    pm->GetInt (settings, buf, columns[i].align);
 
     if (tn1)
-      columns[i].image = pm->GetTexture(tn1->GetData(), tn1->GetData());
+      columns[i].image = pm->GetTexture (tn1->GetData (), tn1->GetData ());
 
     if (tn2)
-      columns[i].bkg = pm->GetTexture(tn2->GetData(), tn2->GetData());
+      columns[i].bkg = pm->GetTexture (tn2->GetData (), tn2->GetData ());
   }
 
   // Setup embedded scrollbar
@@ -205,152 +215,156 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
 
   awsKeyFactory sbinfo;
 
-  sbinfo.Initialize(new scfString("vertscroll"), new scfString("Scroll Bar"));
+  sbinfo.Initialize (
+      new scfString ("vertscroll"),
+      new scfString ("Scroll Bar"));
 
-  sbinfo.AddRectKey(new scfString("Frame"),
-                    csRect(Frame().Width()-sb_w-1, border, Frame().Width()-1, Frame().Height()-1));
+  sbinfo.AddRectKey (
+      new scfString ("Frame"),
+      csRect (
+        Frame ().Width () - sb_w - 1,
+        border,
+        Frame ().Width () - 1,
+        Frame ().Height () - 1));
 
-  sbinfo.AddIntKey(new scfString("Orientation"), awsScrollBar::sboVertical);
+  sbinfo.AddIntKey (new scfString ("Orientation"), awsScrollBar::sboVertical);
 
-  scrollbar->SetWindow(Window());
-  scrollbar->SetParent(this);
-  scrollbar->Setup(_wmgr, sbinfo.GetThisNode());
+  scrollbar->SetWindow (Window ());
+  scrollbar->SetParent (this);
+  scrollbar->Setup (_wmgr, sbinfo.GetThisNode ());
 
-  scrollbar->SetProperty("Change", &change);
-  scrollbar->SetProperty("BigChange", &bigchange);
-  scrollbar->SetProperty("Max", &max);
-  scrollbar->SetProperty("Min", &min);
+  scrollbar->SetProperty ("Change", &change);
+  scrollbar->SetProperty ("BigChange", &bigchange);
+  scrollbar->SetProperty ("Max", &max);
+  scrollbar->SetProperty ("Min", &min);
 
   // Setup trigger
-  sink = new awsSink(this);
+  sink = new awsSink (this);
 
-  sink->RegisterTrigger("ScrollChanged", &ScrollChanged);
+  sink->RegisterTrigger ("ScrollChanged", &ScrollChanged);
 
-  slot = new awsSlot();
+  slot = new awsSlot ();
 
-  slot->Connect(scrollbar, awsScrollBar::signalChanged, sink, sink->GetTriggerID("ScrollChanged"));
+  slot->Connect (
+      scrollbar,
+      awsScrollBar::signalChanged,
+      sink,
+      sink->GetTriggerID ("ScrollChanged"));
 
   return true;
 }
 
-bool
-awsListBox::GetProperty(char *name, void **parm)
+bool awsListBox::GetProperty (char *name, void **parm)
 {
-  if (awsComponent::GetProperty(name, parm)) return true;
+  if (awsComponent::GetProperty (name, parm)) return true;
 
   return false;
 }
 
-bool
-awsListBox::SetProperty(char *name, void *parm)
+bool awsListBox::SetProperty (char *name, void *parm)
 {
-  if (awsComponent::SetProperty(name, parm)) return true;
+  if (awsComponent::SetProperty (name, parm)) return true;
 
   return false;
 }
 
-void
-awsListBox::ScrollChanged(void *sk, iAwsSource *source)
+void awsListBox::ScrollChanged (void *sk, iAwsSource *source)
 {
   awsListBox *lb = (awsListBox *)sk;
-  float *curval=0;
+  float *curval = 0;
 
-  source->GetComponent()->GetProperty("Value", (void **)&curval);
+  source->GetComponent ()->GetProperty ("Value", (void **) &curval);
 
-  lb->UpdateMap();
-  lb->scroll_start=(int)*curval;
-  if (lb->scroll_start>lb->map_size-lb->drawable_count)
-    lb->scroll_start=lb->map_size-lb->drawable_count;
+  lb->UpdateMap ();
+  lb->scroll_start = (int) *curval;
+  if (lb->scroll_start > lb->map_size - lb->drawable_count)
+    lb->scroll_start = lb->map_size - lb->drawable_count;
 
-  if (lb->scroll_start<0)
-    lb->scroll_start=0;
+  if (lb->scroll_start < 0) lb->scroll_start = 0;
 
-  lb->Invalidate();
+  lb->Invalidate ();
 }
 
-void
-awsListBox::UpdateMap()
+void awsListBox::UpdateMap ()
 {
   int map_size_m1;
 
   if (map_dirty)
   {
-    int start=0;
+    int start = 0;
 
-    map_dirty=false;
-    map_size=0;
-    if (map)
-      delete [] map;
+    map_dirty = false;
+    map_size = 0;
+    if (map) delete[] map;
 
     // Traverse once for the count of visible items
-    map_size = CountVisibleItems(&rows);
+    map_size = CountVisibleItems (&rows);
     map = new awsListRow *[map_size];
 
     // Set the scroll bar's max position
-    map_size_m1 = map_size-1;
-    scrollbar->SetProperty("Max", &map_size_m1);
+    map_size_m1 = map_size - 1;
+    scrollbar->SetProperty ("Max", &map_size_m1);
 
     // Map out items
-    MapVisibleItems(&rows, start, map);
+    MapVisibleItems (&rows, start, map);
   }
 }
 
-int
-awsListBox::CountVisibleItems(awsListRowVector *v)
+int awsListBox::CountVisibleItems (awsListRowVector *v)
 {
   int i;
-  int count=0;
-  for (i=0; i<v->Length(); ++i)
+  int count = 0;
+  for (i = 0; i < v->Length (); ++i)
   {
-      awsListRow *r = (awsListRow *)((*v)[i]);
+    awsListRow *r = (awsListRow *) ((*v)[i]);
 
-      // count one for this item
-      ++count;
-      if (r->children && r->expanded)
-        count+=CountVisibleItems(r->children);
+    // count one for this item
+    ++count;
+    if (r->children && r->expanded)
+      count += CountVisibleItems (r->children);
   }
 
   return count;
 }
 
-void
-awsListBox::MapVisibleItems(awsListRowVector *v, int &start, awsListRow **map)
+void awsListBox::MapVisibleItems (
+  awsListRowVector *v,
+  int &start,
+  awsListRow **map)
 {
   int i;
-  for (i=0; i<v->Length(); ++i)
+  for (i = 0; i < v->Length (); ++i)
   {
-      awsListRow *r = (awsListRow *)((*v)[i]);
+    awsListRow *r = (awsListRow *) ((*v)[i]);
 
-      map[start++]=r;
+    map[start++] = r;
 
-      if (r->children && r->expanded)
-        MapVisibleItems(r->children, start, map);
+    if (r->children && r->expanded)
+      MapVisibleItems (r->children, start, map);
   }
 }
 
-static
-int
-DoFindItem(awsListRowVector *v, iString *text, bool with_delete)
+static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
 {
-  int i=v->Find(text);
+  int i = v->Find (text);
 
   if (i)
   {
-    if (with_delete)
-      v->Delete(i, true);
+    if (with_delete) v->Delete (i, true);
 
     return i;
   }
   else
   {
     int j;
-    for (i=0; i<v->Length(); ++i)
+    for (i = 0; i < v->Length (); ++i)
     {
-      awsListRow *r = (awsListRow *)((*v)[i]);
-      if (r->children && (j=DoFindItem(r->children,text,with_delete))>=0)
+      awsListRow *r = (awsListRow *) ((*v)[i]);
+      if (
+        r->children &&
+        (j = DoFindItem (r->children, text, with_delete)) >= 0)
       {
-        if (with_delete)
-          r->children->Delete(j, true);
+        if (with_delete) r->children->Delete (j, true);
 
         return j;
       }
@@ -360,30 +374,25 @@ DoFindItem(awsListRowVector *v, iString *text, bool with_delete)
   return -1;
 }
 
-static
-void
-DoRecursiveClearList(awsListRowVector *v)
+static void DoRecursiveClearList (awsListRowVector *v)
 {
   int i;
 
-  for (i=0; i<v->Length(); ++i)
+  for (i = 0; i < v->Length (); ++i)
   {
-    awsListRow *r = (awsListRow *)((*v)[i]);
+    awsListRow *r = (awsListRow *) ((*v)[i]);
     if (r->children)
     {
-      DoRecursiveClearList(r->children);
+      DoRecursiveClearList (r->children);
       delete r->children;
     }
-
   }
 
-  v->DeleteAll(true);
+  v->DeleteAll (true);
 }
 
-
 /////////////// Scripted Actions /////////////////////////////////////////////////////////////
-void
-awsListBox::InsertItem(void *owner, iAwsParmList &parmlist)
+void awsListBox::InsertItem (void *owner, iAwsParmList &parmlist)
 {
   awsListBox *lb = (awsListBox *)owner;
 
@@ -393,145 +402,141 @@ awsListBox::InsertItem(void *owner, iAwsParmList &parmlist)
 
   // Create a new row and zero it out.
   awsListRow *row = new awsListRow;
-  memset(row, 0 , sizeof(awsListRow));
+  memset (row, 0, sizeof (awsListRow));
 
   // Create a new set of columns and zero them out.
   row->cols = new awsListItem[lb->ncolumns];
-  memset(row->cols, 0, sizeof(awsListItem) * lb->ncolumns);
+  memset (row->cols, 0, sizeof (awsListItem) * lb->ncolumns);
 
-  parmlist.GetInt("parent", (int *)&(row->parent));
-  parmlist.GetBool("selectable", &(row->selectable));
+  parmlist.GetInt ("parent", (int *) &(row->parent));
+  parmlist.GetBool ("selectable", &(row->selectable));
 
   /* Fill in the columns by looking for several parameters:
    *   textX, imageX, txtalignX, imgalignX, statefulX, stateX, groupstateX,
    *   selectableX
    */
-  for (i=0; i<lb->ncolumns; ++i)
+  for (i = 0; i < lb->ncolumns; ++i)
   {
-    cs_snprintf(buf, 50, "text%d", i);
-    if (parmlist.GetString(buf, &(row->cols[i].text)))
-      row->cols[i].text->IncRef();
+    cs_snprintf (buf, 50, "text%d", i);
+    if (parmlist.GetString (buf, &(row->cols[i].text)))
+      row->cols[i].text->IncRef ();
 
-    cs_snprintf(buf, 50, "image%d", i);
-    if (parmlist.GetString(buf, &str))
-      row->cols[i].image = lb->WindowManager()->GetPrefMgr()->GetTexture(str->GetData(), str->GetData());
+    cs_snprintf (buf, 50, "image%d", i);
+    if (parmlist.GetString (buf, &str))
+      row->cols[i].image = lb->WindowManager ()->GetPrefMgr ()->GetTexture (
+          str->GetData (),
+          str->GetData ());
 
-    cs_snprintf(buf, 50, "stateful%d", i);
-    parmlist.GetBool(buf, &(row->cols[i].has_state));
+    cs_snprintf (buf, 50, "stateful%d", i);
+    parmlist.GetBool (buf, &(row->cols[i].has_state));
 
-    cs_snprintf(buf, 50, "state%d", i);
-    parmlist.GetBool(buf, &(row->cols[i].state));
+    cs_snprintf (buf, 50, "state%d", i);
+    parmlist.GetBool (buf, &(row->cols[i].state));
 
-    cs_snprintf(buf, 50, "groupstate%d", i);
-    parmlist.GetBool(buf, &(row->cols[i].group_state));
+    cs_snprintf (buf, 50, "groupstate%d", i);
+    parmlist.GetBool (buf, &(row->cols[i].group_state));
 
-    cs_snprintf(buf, 50, "aligntxt%d", i);
-    parmlist.GetInt(buf, &(row->cols[i].txt_align));
+    cs_snprintf (buf, 50, "aligntxt%d", i);
+    parmlist.GetInt (buf, &(row->cols[i].txt_align));
 
-    cs_snprintf(buf, 50, "alignimg%d", i);
-    parmlist.GetInt(buf, &(row->cols[i].txt_align));
+    cs_snprintf (buf, 50, "alignimg%d", i);
+    parmlist.GetInt (buf, &(row->cols[i].txt_align));
   }
 
   // Add the item
   if (row->parent)
   {
-    if (row->parent->children==NULL)
+    if (row->parent->children == NULL)
     {
-      row->parent->children = new awsListRowVector();
-      row->parent->children->SetSortCol(lb->sortcol);
+      row->parent->children = new awsListRowVector ();
+      row->parent->children->SetSortCol (lb->sortcol);
     }
 
-
-    row->parent->children->Push(row);
+    row->parent->children->Push (row);
   }
-  else lb->rows.Push(row);
+  else
+    lb->rows.Push (row);
 
   // Pass back the id of this row, in case they want it.
-  parmlist.AddInt("id", (int)row);
+  parmlist.AddInt ("id", (int)row);
 
-  lb->map_dirty=true;
+  lb->map_dirty = true;
 }
 
-void
-awsListBox::DeleteItem(void *owner, iAwsParmList &parmlist)
+void awsListBox::DeleteItem (void *owner, iAwsParmList &parmlist)
 {
   awsListBox *lb = (awsListBox *)owner;
 
   int i;
-  iString *str=NULL;
-
+  iString *str = NULL;
 
   // Try and find out what they're searching for
-  if (!parmlist.GetString("text", &str))
-    if (!parmlist.GetString("id", &str))
-      return;
+  if (!parmlist.GetString ("text", &str))
+    if (!parmlist.GetString ("id", &str)) return ;
 
-  i=DoFindItem(&lb->rows, str, true);
+  i = DoFindItem (&lb->rows, str, true);
 
   // Pass back the result, in case they want it
-  parmlist.AddInt("result", (int)i);
+  parmlist.AddInt ("result", (int)i);
 
-  lb->map_dirty=true;
+  lb->map_dirty = true;
 }
 
-
-void
-awsListBox::GetSelectedItem(void *owner, iAwsParmList &parmlist)
+void awsListBox::GetSelectedItem (void *owner, iAwsParmList &parmlist)
 {
   awsListBox *lb = (awsListBox *)owner;
   int i;
   char buf[50];
 
   //bool state[lb->ncolumns];
-  bool *state = new bool [lb->ncolumns];
+  bool *state = new bool[lb->ncolumns];
+
   //iString *str[lb->ncolumns];
-  iString **str = new iString* [lb->ncolumns];
+  iString **str = new iString *[lb->ncolumns];
 
   //bool usedt[lb->ncolumns], useds[lb->ncolumns];
-  bool *usedt = new bool [lb->ncolumns];
-  bool *useds = new bool [lb->ncolumns];
+  bool *usedt = new bool[lb->ncolumns];
+  bool *useds = new bool[lb->ncolumns];
 
-  for (i=0; i<lb->ncolumns; ++i)
+  for (i = 0; i < lb->ncolumns; ++i)
   {
-    usedt[i]=false;
-    useds[i]=false;
+    usedt[i] = false;
+    useds[i] = false;
   }
-
 
   // check if they want the text or state or what. then return those in the parmlist
-  for (i=0; i<lb->ncolumns; ++i)
+  for (i = 0; i < lb->ncolumns; ++i)
   {
-    cs_snprintf(buf, 50, "text%d", i);
-    if (parmlist.GetString(buf, &str[i]))
+    cs_snprintf (buf, 50, "text%d", i);
+    if (parmlist.GetString (buf, &str[i]))
     {
-      str[i]=lb->sel->cols[i].text;
-      usedt[i]=true;
+      str[i] = lb->sel->cols[i].text;
+      usedt[i] = true;
     }
 
-    cs_snprintf(buf, 50, "state%d", i);
-    if (parmlist.GetBool(buf, &state[i]))
+    cs_snprintf (buf, 50, "state%d", i);
+    if (parmlist.GetBool (buf, &state[i]))
     {
-      state[i]=lb->sel->cols[i].state;
-      useds[i]=true;
+      state[i] = lb->sel->cols[i].state;
+      useds[i] = true;
     }
-
   }
 
-  parmlist.Clear();
+  parmlist.Clear ();
 
   // return parmlist
-  for (i=0; i<lb->ncolumns; ++i)
+  for (i = 0; i < lb->ncolumns; ++i)
   {
     if (usedt[i])
     {
-      cs_snprintf(buf, 50, "text%d", i);
-      parmlist.AddString(buf, str[i]);
+      cs_snprintf (buf, 50, "text%d", i);
+      parmlist.AddString (buf, str[i]);
     }
 
     if (useds[i])
     {
-      cs_snprintf(buf, 50, "state%d", i);
-      parmlist.AddBool(buf, state[i]);
+      cs_snprintf (buf, 50, "state%d", i);
+      parmlist.AddBool (buf, state[i]);
     }
   }
 
@@ -541,48 +546,43 @@ awsListBox::GetSelectedItem(void *owner, iAwsParmList &parmlist)
   delete usedt;
 }
 
-void
-awsListBox::ClearList(void *owner, iAwsParmList &)
+void awsListBox::ClearList (void *owner, iAwsParmList &)
 {
   awsListBox *lb = (awsListBox *)owner;
 
-  DoRecursiveClearList(&lb->rows);
+  DoRecursiveClearList (&lb->rows);
 
-  lb->map_dirty=true;
+  lb->map_dirty = true;
 }
 
-bool
-awsListBox::Execute(char *action, iAwsParmList &parmlist)
+bool awsListBox::Execute (char *action, iAwsParmList &parmlist)
 {
-  if (awsComponent::Execute(action, parmlist)) return true;
+  if (awsComponent::Execute (action, parmlist)) return true;
 
-  actions.Execute(action, this, parmlist);
+  actions.Execute (action, this, parmlist);
 
   return false;
 }
 
-void
-awsListBox::ClearGroup()
+void awsListBox::ClearGroup ()
 {
   csEvent Event;
 
   Event.Type = csevGroupOff;
 
   int i;
-  for (i=0; i<Parent()->GetChildCount(); ++i)
+  for (i = 0; i < Parent ()->GetChildCount (); ++i)
   {
-    iAwsComponent *cmp = Parent()->GetChildAt(i);
+    iAwsComponent *cmp = Parent ()->GetChildAt (i);
 
-    if (cmp && cmp!=this)
-      cmp->HandleEvent(Event);
+    if (cmp && cmp != this) cmp->HandleEvent (Event);
   }
 }
 
-bool
-awsListBox::RecursiveClearPeers(awsListItem *itm, awsListRow *row)
+bool awsListBox::RecursiveClearPeers (awsListItem *itm, awsListRow *row)
 {
   int i;
-  for (i=0; i<ncolumns; ++i)
+  for (i = 0; i < ncolumns; ++i)
   {
     // If this is it, then clear it's friends
     if (&(row->cols[i]) == itm)
@@ -590,9 +590,9 @@ awsListBox::RecursiveClearPeers(awsListItem *itm, awsListRow *row)
       if (row->parent)
       {
         int j;
-        for (j=0; j<row->parent->children->Length(); ++j)
+        for (j = 0; j < row->parent->children->Length (); ++j)
         {
-          awsListRow *crow = (awsListRow *)row->parent->children->Get(j);
+          awsListRow *crow = (awsListRow *)row->parent->children->Get (j);
           crow->cols[i].state = false;
         }
       }
@@ -605,11 +605,10 @@ awsListBox::RecursiveClearPeers(awsListItem *itm, awsListRow *row)
       int j;
 
       // Search through list for this guy, and clear his peers
-      for (j=0; j<row->children->Length(); ++j)
+      for (j = 0; j < row->children->Length (); ++j)
       {
-        awsListRow *crow = (awsListRow *)row->children->Get(j);
-        if (RecursiveClearPeers(itm, crow))
-          return true;
+        awsListRow *crow = (awsListRow *)row->children->Get (j);
+        if (RecursiveClearPeers (itm, crow)) return true;
       } // end for j (number of rows)
     }
   }
@@ -617,290 +616,289 @@ awsListBox::RecursiveClearPeers(awsListItem *itm, awsListRow *row)
   return false;
 }
 
-void
-awsListBox::ClearPeers(awsListItem *itm)
+void awsListBox::ClearPeers (awsListItem *itm)
 {
   int j;
 
   // Search through list for this guy, and clear his peers
-  for (j=0; j<rows.Length(); ++j)
+  for (j = 0; j < rows.Length (); ++j)
   {
     awsListRow *row = (awsListRow *)rows[j];
-    if (RecursiveClearPeers(itm, row))
-      return;
-
-  } // end for j (number of rows)
+    if (RecursiveClearPeers (itm, row)) return ;
+  }     // end for j (number of rows)
 }
 
-void
-awsListBox::ClearHotspots()
+void awsListBox::ClearHotspots ()
 {
   int i;
-  for (i=0; i<hotspots.Length(); ++i)
+  for (i = 0; i < hotspots.Length (); ++i)
   {
     awsListHotspot *hs = (awsListHotspot *)hotspots[i];
     delete hs;
   }
 
-  hotspots.SetLength(0);
+  hotspots.SetLength (0);
 }
 
-bool
-awsListBox::HandleEvent(iEvent& Event)
+bool awsListBox::HandleEvent (iEvent &Event)
 {
-  if (awsComponent::HandleEvent(Event)) return true;
+  if (awsComponent::HandleEvent (Event)) return true;
 
   switch (Event.Type)
   {
-  case csevGroupOff:
-    if (is_down && is_switch)
-    {
-      is_down=false;
-      Invalidate();
-    }
-    return true;
-    break;
+    case csevGroupOff:
+      if (is_down && is_switch)
+      {
+        is_down = false;
+        Invalidate ();
+      }
+
+      return true;
+      break;
   }
 
   return false;
 }
 
-int
-awsListBox::GetRowDepth(awsListRow *row)
+int awsListBox::GetRowDepth (awsListRow *row)
 {
-  int depth=0;
-  awsListRow *cur=row->parent;
+  int depth = 0;
+  awsListRow *cur = row->parent;
 
   // Find out how deep we are.
   while (cur)
   {
     ++depth;
-    cur=cur->parent;
+    cur = cur->parent;
   }
 
   return depth;
 }
 
-bool
-awsListBox::IsLastChild(awsListRow *row)
+bool awsListBox::IsLastChild (awsListRow *row)
 {
-  awsListRow *v=row->parent;
+  awsListRow *v = row->parent;
   int i;
 
   if (!v)
   {
-    i=rows.Find(row);
-    return i==rows.Length()-1;
+    i = rows.Find (row);
+    return i == rows.Length () - 1;
   }
   else
   {
-    i= v->children->Find(row);
-    return i==v->children->Length()-1;
+    i = v->children->Find (row);
+    return i == v->children->Length () - 1;
   }
 }
 
-void
-awsListBox::OnDraw(csRect clip)
+void awsListBox::OnDraw (csRect clip)
 {
+  iGraphics2D *g2d = WindowManager ()->G2D ();
 
-  iGraphics2D *g2d = WindowManager()->G2D();
   //iGraphics3D *g3d = WindowManager()->G3D();
-
-  int hi2   = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT2);
-  int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);
+  int hi2 = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT2);
+  int lo2 = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW2);
   int i;
-  int border=3;
+  int border = 3;
   int sb_w, sb_h;
 
-  WindowManager()->GetPrefMgr()->LookupIntKey("ScrollBarHeight", sb_h);
-  WindowManager()->GetPrefMgr()->LookupIntKey("ScrollBarWidth", sb_w);
+  WindowManager ()->GetPrefMgr ()->LookupIntKey ("ScrollBarHeight", sb_h);
+  WindowManager ()->GetPrefMgr ()->LookupIntKey ("ScrollBarWidth", sb_w);
 
-  ClearHotspots();
+  ClearHotspots ();
 
   aws3DFrame frame3d;
 
-  frame3d.Draw(WindowManager(), Window(), Frame(), frame_style, bkg, alpha_level);
+  frame3d.Draw (
+      WindowManager (),
+      Window (),
+      Frame (),
+      frame_style,
+      bkg,
+      alpha_level);
 
   switch (frame_style)
   {
-  case fsBump:
-    border=5;
-    break;
-  case fsSimple:
-    border=1;
-    break;
+    case fsBump:    border = 5; break;
+    case fsSimple:  border = 1; break;
   }
 
+  int starty = Frame ().ymin + border;
+  int startx = Frame ().xmin + border;
 
-  int starty=Frame().ymin+border;
-  int startx=Frame().xmin+border;
+  int x = startx, y = starty;
+  int hch = 15;
 
-  int x=startx, y=starty;
-  int hch=15;
-
-  for (i=0; i<ncolumns; ++i)
+  for (i = 0; i < ncolumns; ++i)
   {
     if (columns[i].caption)
     {
       int tw, th, tx, ty, mcc;
       int hcw;
 
-      if (i==ncolumns-1)
-        hcw = Frame().xmax-x-border-sb_w;
+      if (i == ncolumns - 1)
+        hcw = Frame ().xmax - x - border - sb_w;
       else
         hcw = columns[i].width;
 
-      mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(columns[i].caption->GetData(), hcw-5);
+      mcc = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetLength (
+          columns[i].caption->GetData (),
+          hcw - 5);
 
-      scfString tmp(columns[i].caption->GetData());
-      tmp.Truncate(mcc);
+      scfString tmp (columns[i].caption->GetData ());
+      tmp.Truncate (mcc);
 
       // Get the size of the text
-      WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(tmp.GetData(), tw, th);
+      WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
+          tmp.GetData (),
+          tw,
+          th);
 
       // Calculate the center
-      ty = (hch>>1) - (th>>1);
+      ty = (hch >> 1) - (th >> 1);
 
       switch (columns[i].align)
       {
-      case alignRight:
-        tx = hcw-tw-2;
-        break;
+        case alignRight:  tx = hcw - tw - 2; break;
 
-      case alignCenter:
-        tx = (hcw>>1) -  (tw>>1);
-        break;
+        case alignCenter: tx = (hcw >> 1) - (tw >> 1); break;
 
-      default:
-        tx = 2;
-        break;
+        default:          tx = 2; break;
       }
 
       // Draw the text
-      g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
-                 x+tx,
-                 y+ty,
-                 WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
-                 -1,
-                 tmp.GetData());
+      g2d->Write (
+          WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+          x + tx,
+          y + ty,
+          WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
+          -1,
+          tmp.GetData ());
 
-      g2d->DrawLine(x, y, x+hcw, y, hi2);
-      g2d->DrawLine(x, y, x, y+hch, hi2);
-      g2d->DrawLine(x, y+hch, x+hcw, y+hch, lo2);
-      g2d->DrawLine(x+hcw, y, x+hcw, y+hch, lo2);
+      g2d->DrawLine (x, y, x + hcw, y, hi2);
+      g2d->DrawLine (x, y, x, y + hch, hi2);
+      g2d->DrawLine (x, y + hch, x + hcw, y + hch, lo2);
+      g2d->DrawLine (x + hcw, y, x + hcw, y + hch, lo2);
     }
 
     // Next column
-    x+=columns[i].width;
+    x += columns[i].width;
   }
 
   // Setup y in proper place.
-  y+=hch+2;
+  y += hch + 2;
 
   // Fix drawable count
-  drawable_count=0;
+  drawable_count = 0;
 
   // Now begin to draw actual list
-  if (rows.Length())
+  if (rows.Length ())
   {
     awsListRow *row;
     awsListRow *start;
 
-    bool stop_drawing=false;
-    bool draw_this_time=true;
+    bool stop_drawing = false;
+    bool draw_this_time = true;
 
-    UpdateMap();
+    UpdateMap ();
 
-    if (map==NULL)
+    if (map == NULL)
       start = (awsListRow *)rows[0];
     else
       start = map[scroll_start];
 
-    row=start;
+    row = start;
 
-    while (stop_drawing==false)
+    while (stop_drawing == false)
     {
       if (draw_this_time)
       {
-         // Reset row start point
-         x=startx;
-         stop_drawing=DrawItemsRecursively(row,x,y,border,GetRowDepth(row),IsLastChild(row));
+        // Reset row start point
+        x = startx;
+        stop_drawing = DrawItemsRecursively (
+            row,
+            x,
+            y,
+            border,
+            GetRowDepth (row),
+            IsLastChild (row));
       }
 
-      draw_this_time=true;
+      draw_this_time = true;
 
       // Find parent of current row.  If there is no parent, then go to the next row item.
-      awsListRow *parent=row->parent;
+      awsListRow *parent = row->parent;
 
-      if (parent==NULL)
+      if (parent == NULL)
       { // Get next item from main list
-        int i=rows.Find(row);
+        int i = rows.Find (row);
 
         // This should never occur
-        if (i==-1)
+        if (i == -1)
         {
-          printf("awslistbox: bug: couldn't find current row!\n");
-          return;
+          printf ("awslistbox: bug: couldn't find current row!\n");
+          return ;
         }
         else
           ++i;
 
         // If we're done, leave
-        if (i>=rows.Length())
+        if (i >= rows.Length ())
           break;
         else
-          row=(awsListRow *)rows[i];
-
+          row = (awsListRow *)rows[i];
       } // end if no parent.
       else
       {
-        int i=parent->children->Find(row);
+        int i = parent->children->Find (row);
 
         // This should never occur
-        if (i==-1)
+        if (i == -1)
         {
-          printf("awslistbox: bug: couldn't find current row!\n");
-          return;
+          printf ("awslistbox: bug: couldn't find current row!\n");
+          return ;
         }
         else
           ++i;
 
-        if (i>=parent->children->Length())
+        if (i >= parent->children->Length ())
         {
-          row=parent;
-          draw_this_time=false;
+          row = parent;
+          draw_this_time = false;
         }
         else
-          row=(awsListRow *)parent->children->Get(i);
-
+          row = (awsListRow *)parent->children->Get (i);
       }
+    }   // end while draw items recursively
+    scrollbar->SetProperty ("PageSize", &drawable_count);
 
-    } // end while draw items recursively
+    int adjusted_max = map_size - 1 - drawable_count;
+    if (adjusted_max < 1) adjusted_max = 1;
 
-    scrollbar->SetProperty("PageSize", &drawable_count);
-
-    int adjusted_max=map_size-1-drawable_count;
-    if (adjusted_max<1)
-      adjusted_max=1;
-
-    scrollbar->SetProperty("Max", (void *)&adjusted_max);
-
-  }  // end if there are any rows to draw
+    scrollbar->SetProperty ("Max", (void *) &adjusted_max);
+  }     // end if there are any rows to draw
 }
-bool
-awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, int depth, bool last_child)
-{
-  iGraphics2D *g2d = WindowManager()->G2D();
-  iGraphics3D *g3d = WindowManager()->G3D();
 
-  int ith=row->GetHeight(WindowManager()->GetPrefMgr(), ncolumns);
+bool awsListBox::DrawItemsRecursively (
+  awsListRow *row,
+  int &x,
+  int &y,
+  int border,
+  int depth,
+  bool last_child)
+{
+  iGraphics2D *g2d = WindowManager ()->G2D ();
+  iGraphics3D *g3d = WindowManager ()->G3D ();
+
+  int ith = row->GetHeight (WindowManager ()->GetPrefMgr (), ncolumns);
   int i;
 
-  int tbh=0, tbw=0;
-  int orgx=x;
+  int tbh = 0, tbw = 0;
+  int orgx = x;
 
   // Find out if we need to leave now.
-  if (y+ith > Frame().ymax) return true;
+  if (y + ith > Frame ().ymax) return true;
 
   // Count how many we've drawn
   ++drawable_count;
@@ -909,441 +907,530 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
   if (row->children && depth)
   {
     // When it's a child AND has children...
-    tree_expanded->GetOriginalDimensions(tbw, tbh);
-    g3d->DrawPixmap((row->expanded ? tree_expanded : tree_collapsed),
-                    x+2+(tbw*(depth+1)), y,
-                    tbw, tbh, 0,0, tbw, tbh);
+    tree_expanded->GetOriginalDimensions (tbw, tbh);
+    g3d->DrawPixmap (
+        (row->expanded ? tree_expanded : tree_collapsed),
+        x + 2 + (tbw * (depth + 1)),
+        y,
+        tbw,
+        tbh,
+        0,
+        0,
+        tbw,
+        tbh);
 
-    g3d->DrawPixmap(tree_hline, x+2+(tbw*depth), y, tbw, tbh, 0,0, tbw, tbh);
+    g3d->DrawPixmap (
+        tree_hline,
+        x + 2 + (tbw * depth),
+        y,
+        tbw,
+        tbh,
+        0,
+        0,
+        tbw,
+        tbh);
 
     if (last_child)
-      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith>>1, 0,0, tbw, tbh);
+      g3d->DrawPixmap (
+          tree_vline,
+          x + 2 + (tbw * depth),
+          y,
+          tbw,
+          ith >> 1,
+          0,
+          0,
+          tbw,
+          tbh);
     else
-      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith+2, 0,0, tbw, tbh);
+      g3d->DrawPixmap (
+          tree_vline,
+          x + 2 + (tbw * depth),
+          y,
+          tbw,
+          ith + 2,
+          0,
+          0,
+          tbw,
+          tbh);
 
     // Create hot spot for expand/collapse
     awsListHotspot *hs = new awsListHotspot;
 
     hs->obj = row;
     hs->type = hsTreeBox;
-    hs->r.Set(x+2+(tbw*(depth+1)), y, x+2+(tbw*(depth+1))+tbw, y+tbh);
+    hs->r.Set (
+        x + 2 + (tbw * (depth + 1)),
+        y,
+        x + 2 + (tbw * (depth + 1)) + tbw,
+        y + tbh);
 
-    hotspots.Push(hs);
-
+    hotspots.Push (hs);
   }
   else if (row->children)
   {
     // Draw tree box if needed
-    tree_expanded->GetOriginalDimensions(tbw, tbh);
-    g3d->DrawPixmap((row->expanded ? tree_expanded : tree_collapsed),
-                    x+2, y, tbw, tbh, 0,0, tbw, tbh);
+    tree_expanded->GetOriginalDimensions (tbw, tbh);
+    g3d->DrawPixmap (
+        (row->expanded ? tree_expanded : tree_collapsed),
+        x + 2,
+        y,
+        tbw,
+        tbh,
+        0,
+        0,
+        tbw,
+        tbh);
 
     // Create hot spot for expand/collapse
     awsListHotspot *hs = new awsListHotspot;
 
     hs->obj = row;
     hs->type = hsTreeBox;
-    hs->r.Set(x+2, y, x+2+tbw, y+tbh);
+    hs->r.Set (x + 2, y, x + 2 + tbw, y + tbh);
 
-    hotspots.Push(hs);
+    hotspots.Push (hs);
   }
   else if (depth)
   {
     // Draw child lines if needed and figure out where to draw stuff at.
-    tree_expanded->GetOriginalDimensions(tbw, tbh);
-    g3d->DrawPixmap(tree_hline, x+2+(tbw*depth), y, tbw, tbh, 0,0, tbw, tbh);
+    tree_expanded->GetOriginalDimensions (tbw, tbh);
+    g3d->DrawPixmap (
+        tree_hline,
+        x + 2 + (tbw * depth),
+        y,
+        tbw,
+        tbh,
+        0,
+        0,
+        tbw,
+        tbh);
 
     if (last_child)
-      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith>>1, 0,0, tbw, tbh);
+      g3d->DrawPixmap (
+          tree_vline,
+          x + 2 + (tbw * depth),
+          y,
+          tbw,
+          ith >> 1,
+          0,
+          0,
+          tbw,
+          tbh);
     else
-      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith+2, 0,0, tbw, tbh);
+      g3d->DrawPixmap (
+          tree_vline,
+          x + 2 + (tbw * depth),
+          y,
+          tbw,
+          ith + 2,
+          0,
+          0,
+          tbw,
+          tbh);
   }
 
   // Draw columns
-  for (i=0; i<ncolumns; ++i)
+  for (i = 0; i < ncolumns; ++i)
   {
-    int tw=0, th=0, tx=0, ty=0, mcc; // text width, height, position, max len.
-    int cw;         // column width
-
-    int iw=0, ih=0; // stateful image width and height
-    int iws=0;      // stateful image spacer
-
-    int iiw=0, iih=0; // item image width and height
-    int iix=0, iiy=0; // item image x and y
-    int iiws=0;       // item image spacer
-
-    iTextureHandle *si=0; // stateful image
+    int tw = 0, th = 0, tx = 0, ty = 0, mcc;  // text width, height, position, max len.
+    int cw;                 // column width
+    int iw = 0, ih = 0;     // stateful image width and height
+    int iws = 0;            // stateful image spacer
+    int iiw = 0, iih = 0;   // item image width and height
+    int iix = 0, iiy = 0;   // item image x and y
+    int iiws = 0;           // item image spacer
+    iTextureHandle *si = 0; // stateful image
 
     // Text to truncate
-    scfString tmp(row->cols[i].text->GetData());
+    scfString tmp (row->cols[i].text->GetData ());
 
     // Get column width
-    if (i==ncolumns-1)
-      cw = Frame().xmax-x-border;
-    else if (i==0 && depth && row->children)
-      cw = columns[i].width-(tbw*(depth+2));
-    else if (i==0 && row->children)
-      cw = columns[i].width-(tbw*depth);
-    else if (i==0 && depth)
-      cw = columns[i].width-(tbw*(depth+1));
+    if (i == ncolumns - 1)
+      cw = Frame ().xmax - x - border;
+    else if (i == 0 && depth && row->children)
+      cw = columns[i].width - (tbw * (depth + 2));
+    else if (i == 0 && row->children)
+      cw = columns[i].width - (tbw * depth);
+    else if (i == 0 && depth)
+      cw = columns[i].width - (tbw * (depth + 1));
     else
       cw = columns[i].width;
 
     // If this has state, get the size of the state image
-    if (row->cols[i].has_state)
-      tree_chke->GetOriginalDimensions(iw, ih);
+    if (row->cols[i].has_state) tree_chke->GetOriginalDimensions (iw, ih);
 
     // If this has an image, get the size of the image
     if (row->cols[i].image)
-      row->cols[i].image->GetOriginalDimensions(iiw, iih);
+      row->cols[i].image->GetOriginalDimensions (iiw, iih);
 
     // Get the size of the text and truncate it
     if (row->cols[i].text)
     {
-      mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(row->cols[i].text->GetData(), cw-5-iw);
+      mcc = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetLength (
+          row->cols[i].text->GetData (),
+          cw - 5 - iw);
 
-      tmp.Truncate(mcc);
+      tmp.Truncate (mcc);
 
       // Get the size of the text
-      WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(tmp.GetData(), tw, th);
+      WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
+          tmp.GetData (),
+          tw,
+          th);
 
       // Calculate the center
-      ty = (ith>>1) - (th>>1);
-    } // end if text is good
+      ty = (ith >> 1) - (th >> 1);
+    }   // end if text is good
 
     // Perform alignment of text/state
     switch (row->cols[i].txt_align)
     {
-    case alignRight:
-      tx = cw-tw-2;
-      iws=-iw+2;
-      break;
+      case alignRight:
+        tx = cw - tw - 2;
+        iws = -iw + 2;
+        break;
 
-    case alignCenter:
-      tx = (cw>>1) -  ((tw+iw)>>1);
-      break;
+      case alignCenter:
+        tx = (cw >> 1) - ((tw + iw) >> 1);
+        break;
 
-    default:
-      if (i==0 && depth && row->children)      tx = 2+(tbw*(depth+2));
-      else if (row->children && i==0)               tx = 2+tbw;
-      else if (depth && i==0)                       tx = 2+(tbw*(depth+1));
-      else                                          tx = 2;
+      default:
+        if (i == 0 && depth && row->children)
+          tx = 2 + (tbw * (depth + 2));
+        else if (row->children && i == 0)
+          tx = 2 + tbw;
+        else if (depth && i == 0)
+          tx = 2 + (tbw * (depth + 1));
+        else
+          tx = 2;
 
-      iws = iw+2;
-      break;
-    } // end switch text alignment
-
+        iws = iw + 2;
+        break;
+    }   // end switch text alignment
     if (row->cols[i].image)
     {
       // Perform alignment of image
       switch (row->cols[i].img_align)
       {
-      case alignRight:
-        iix = cw-iiw-2;
+        case alignRight:
+          iix = cw - iiw - 2;
 
-        // adjust spacer if needed
-        if (row->cols[i].text && row->cols[i].txt_align==alignRight)
-        {
-          iiws=iws;
-          iws-=iiw+2;
-        }
-        else
-          iiws=-iw+2;
+          // adjust spacer if needed
+          if (row->cols[i].text && row->cols[i].txt_align == alignRight)
+          {
+            iiws = iws;
+            iws -= iiw + 2;
+          }
+          else
+            iiws = -iw + 2;
 
-        break;
+          break;
 
-      case alignCenter:
-        iix = (cw>>1) -  ((iiw+iw+tw)>>1);
-        tx+=iiw+2;
-        break;
+        case alignCenter:
+          iix = (cw >> 1) - ((iiw + iw + tw) >> 1);
+          tx += iiw + 2;
+          break;
 
-      default:
-        if (i==0 && depth && row->children)      iix = 2+(tbw*(depth+2));
-        else if (row->children && i==0)               iix = 2+tbw;
-        else if (depth && i==0)                       iix = 2+(tbw*(depth+1));
-        else                                          iix = 2;
+        default:
+          if (i == 0 && depth && row->children)
+            iix = 2 + (tbw * (depth + 2));
+          else if (row->children && i == 0)
+            iix = 2 + tbw;
+          else if (depth && i == 0)
+            iix = 2 + (tbw * (depth + 1));
+          else
+            iix = 2;
 
-        // Adjust spacer
-        if (row->cols[i].text && row->cols[i].txt_align==alignRight)
-        {
-          iiws=iws;
-          iws+=iiw+2;
-        }
-        else
-          iiws=iw+2;
+          // Adjust spacer
+          if (row->cols[i].text && row->cols[i].txt_align == alignRight)
+          {
+            iiws = iws;
+            iws += iiw + 2;
+          }
+          else
+            iiws = iw + 2;
 
-        break;
+          break;
       } // end switch text alignment
 
       // Draw image
-      g3d->DrawPixmap(row->cols[i].image,
-                      x+iix+iiws, y+iiy,
-                      (cw < iiw ? cw : iiw), (ith < iih ? ith : iiw),
-                      0,0, iiw, iih);
-
-    } // end if there's an image
-
+      g3d->DrawPixmap (
+          row->cols[i].image,
+          x + iix + iiws,
+          y + iiy,
+          (cw < iiw ? cw : iiw),
+          (ith < iih ? ith : iiw),
+          0,
+          0,
+          iiw,
+          iih);
+    }   // end if there's an image
     if (row->cols[i].text)
     {
       // Draw the text
-      g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
-                 x+tx+iws,
-                 y+ty,
-                 WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
-                 -1,
-                 tmp.GetData());
-    } // end if text is good
+      g2d->Write (
+          WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+          x + tx + iws,
+          y + ty,
+          WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
+          -1,
+          tmp.GetData ());
+    }   // end if text is good
 
     // Draw state if there is some
     if (row->cols[i].has_state)
     {
       if (row->cols[i].group_state)
       {
-        if (row->cols[i].state) si=tree_grpf;
-        else                    si=tree_grpe;
+        if (row->cols[i].state)
+          si = tree_grpf;
+        else
+          si = tree_grpe;
       }
       else
       {
-        if (row->cols[i].state) si=tree_chkf;
-        else                    si=tree_chke;
+        if (row->cols[i].state)
+          si = tree_chkf;
+        else
+          si = tree_chke;
       }
 
-      g3d->DrawPixmap(si, x+tx, y, iw, ih, 0,0, iw, ih);
+      g3d->DrawPixmap (si, x + tx, y, iw, ih, 0, 0, iw, ih);
 
       // Create hot spot for expand/collapse
       awsListHotspot *hs = new awsListHotspot;
 
       hs->obj = &(row->cols[i]);
       hs->type = hsState;
-      hs->r.Set(x+tx, y, x+tx+iw, y+ih);
+      hs->r.Set (x + tx, y, x + tx + iw, y + ih);
 
-      hotspots.Push(hs);
-    } // end if stateful
+      hotspots.Push (hs);
+    }   // end if stateful
 
     // Next column
-    x+=columns[i].width;
-
-  } // end for i (number of cols)
+    x += columns[i].width;
+  }     // end for i (number of cols)
 
   // Create hot spot for this row
   awsListHotspot *hs = new awsListHotspot;
 
   hs->obj = row;
   hs->type = hsRow;
-  hs->r.Set(Frame().xmin+border, y, Frame().xmax-border, y+ith);
+  hs->r.Set (Frame ().xmin + border, y, Frame ().xmax - border, y + ith);
 
-  hotspots.Push(hs);
+  hotspots.Push (hs);
 
   // Draw the highlight, if we're highlighted
-  if (sel==row)
+  if (sel == row)
   {
     int hw, hh;
 
     if (highlight)
     {
-      highlight->GetOriginalDimensions(hw, hh);
-      g3d->DrawPixmap(highlight, Frame().xmin+border, y-1, Frame().Width()-(border*2), ith+2, 0,0,hw,hh, hi_alpha_level);
+      highlight->GetOriginalDimensions (hw, hh);
+      g3d->DrawPixmap (
+          highlight,
+          Frame ().xmin + border,
+          y - 1,
+          Frame ().Width () - (border * 2),
+          ith + 2,
+          0,
+          0,
+          hw,
+          hh,
+          hi_alpha_level);
     }
   }
 
   // next row.
-  y+=ith+(ith>>2);
+  y += ith + (ith >> 2);
 
   // Draw children
   if (row->children && row->expanded)
   {
-    for (i=0; i<row->children->Length(); ++i)
+    for (i = 0; i < row->children->Length (); ++i)
     {
-      int cx=orgx;
-      awsListRow *newrow = (awsListRow *)row->children->Get(i);
+      int cx = orgx;
+      awsListRow *newrow = (awsListRow *)row->children->Get (i);
 
-      if (DrawItemsRecursively(newrow, cx, y, border, (depth ? depth+2 : depth+1), (i==row->children->Length()-1 ? true : false)))
+      if (
+        DrawItemsRecursively (
+            newrow,
+            cx,
+            y,
+            border,
+            (depth ? depth + 2 : depth + 1),
+            (i == row->children->Length () - 1 ? true : false)))
         return true;
     }
   }
-
-
 
   // false means that we've not yet hit the bottom of the barrel.
   return false;
 }
 
-bool
-awsListBox::OnMouseDown(int /*button*/,int x,int y)
+bool awsListBox::OnMouseDown (int
+
+/*button*/, int x, int y)
 {
   int i;
 
-  for (i=0; i<hotspots.Length(); ++i)
+  for (i = 0; i < hotspots.Length (); ++i)
   {
     awsListHotspot *hs = (awsListHotspot *)hotspots[i];
-    if (hs->r.Contains(x, y))
+    if (hs->r.Contains (x, y))
     {
       switch (hs->type)
       {
-      case hsTreeBox:
-        {
-          awsListRow *row =(awsListRow *)hs->obj;
-          if (row->expanded) row->expanded=false;
-          else row->expanded=true;
+        case hsTreeBox:
+          {
+            awsListRow *row = (awsListRow *)hs->obj;
+            if (row->expanded)
+              row->expanded = false;
+            else
+              row->expanded = true;
 
-          map_dirty=true;
-          Invalidate();
-          return true;
-        }
-        break;
+            map_dirty = true;
+            Invalidate ();
+            return true;
+          }
+          break;
 
-      case hsState:
-        {
-          awsListItem *itm =(awsListItem *)hs->obj;
+        case hsState:
+          {
+            awsListItem *itm = (awsListItem *)hs->obj;
 
-          if (itm->group_state)
-            ClearPeers(itm);
+            if (itm->group_state) ClearPeers (itm);
 
-          if (itm->state) itm->state=false;
-          else itm->state=true;
+            if (itm->state)
+              itm->state = false;
+            else
+              itm->state = true;
 
-          Invalidate();
-          return true;
-        }
-        break;
+            Invalidate ();
+            return true;
+          }
+          break;
 
-      case hsRow:
-        {
-          awsListRow *row =(awsListRow *)hs->obj;
-          sel=row;
-          Broadcast(awsListBox::signalSelected);
-          Invalidate();
-          return true;
-        }
-        break;
-
-
+        case hsRow:
+          {
+            awsListRow *row = (awsListRow *)hs->obj;
+            sel = row;
+            Broadcast (awsListBox::signalSelected);
+            Invalidate ();
+            return true;
+          }
+          break;
       } // end switch type
-    } // end if contains
-  } // end for
-
+    }   // end if contains
+  }     // end for
   return false;
 }
 
-bool
-awsListBox::OnMouseUp(int ,int ,int )
+bool awsListBox::OnMouseUp (int, int, int)
 {
   return false;
 }
 
-bool
-awsListBox::OnMouseMove(int ,int ,int )
+bool awsListBox::OnMouseMove (int, int, int)
 {
   return false;
 }
 
-bool
-awsListBox::OnMouseClick(int ,int ,int )
+bool awsListBox::OnMouseClick (int, int, int)
 {
   return false;
 }
 
-bool
-awsListBox::OnMouseDoubleClick(int ,int ,int )
+bool awsListBox::OnMouseDoubleClick (int, int, int)
 {
   return false;
 }
 
-bool
-awsListBox::OnMouseExit()
+bool awsListBox::OnMouseExit ()
 {
-  mouse_is_over=false;
-  Invalidate();
+  mouse_is_over = false;
+  Invalidate ();
 
-  if (is_down && !is_switch)
-    is_down=false;
+  if (is_down && !is_switch) is_down = false;
 
   return true;
 }
 
-bool
-awsListBox::OnMouseEnter()
+bool awsListBox::OnMouseEnter ()
 {
-  mouse_is_over=true;
-  Invalidate();
+  mouse_is_over = true;
+  Invalidate ();
   return true;
 }
 
-bool
-awsListBox::OnKeypress(int ,int )
+bool awsListBox::OnKeypress (int, int)
 {
   return false;
 }
 
-bool
-awsListBox::OnLostFocus()
+bool awsListBox::OnLostFocus ()
 {
   return false;
 }
 
-bool
-awsListBox::OnGainFocus()
+bool awsListBox::OnGainFocus ()
 {
   return false;
 }
 
-void
-awsListBox::OnAdded()
+void awsListBox::OnAdded ()
 {
-  AddChild(scrollbar, (Parent()->Layout()!=NULL));
+  AddChild (scrollbar, (Parent ()->Layout () != NULL));
 }
 
-void 
-awsListBox::OnResized()
+void awsListBox::OnResized ()
 {
-  int w = scrollbar->Frame().Width(),
-      h = scrollbar->Frame().Width();
+  int w = scrollbar->Frame ().Width (), h = scrollbar->Frame ().Width ();
 
+  scrollbar->Frame ().SetPos (Frame ().xmax - w - 1, Frame ().ymin + 2);
+  scrollbar->Frame ().xmax = Frame ().xmax - 1;
+  scrollbar->Frame ().ymax = Frame ().ymax - 2;
 
-  scrollbar->Frame().SetPos(Frame().xmax-w-1, Frame().ymin+2);
-  scrollbar->Frame().xmax=Frame().xmax-1;
-  scrollbar->Frame().ymax=Frame().ymax-2;
-
-  scrollbar->OnResized();
+  scrollbar->OnResized ();
 }
-
 
 /************************************* Command Button Factory ****************/
 SCF_IMPLEMENT_IBASE(awsListBoxFactory)
   SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
 SCF_IMPLEMENT_IBASE_END
 
-awsListBoxFactory::awsListBoxFactory(iAws *wmgr):awsComponentFactory(wmgr)
+awsListBoxFactory::awsListBoxFactory (iAws *wmgr) :
+  awsComponentFactory(wmgr)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  Register("List Box");
-  RegisterConstant("lbfsBump",  awsListBox::fsBump);
-  RegisterConstant("lbfsSunken", awsListBox::fsSunken);
-  RegisterConstant("lbfsRaised",  awsListBox::fsRaised);
-  RegisterConstant("lbfsSimple", awsListBox::fsSimple);
-  RegisterConstant("lbfsFlat", awsListBox::fsFlat);
-  RegisterConstant("lbfsNone",  awsListBox::fsNone);
+  Register ("List Box");
+  RegisterConstant ("lbfsBump", awsListBox::fsBump);
+  RegisterConstant ("lbfsSunken", awsListBox::fsSunken);
+  RegisterConstant ("lbfsRaised", awsListBox::fsRaised);
+  RegisterConstant ("lbfsSimple", awsListBox::fsSimple);
+  RegisterConstant ("lbfsFlat", awsListBox::fsFlat);
+  RegisterConstant ("lbfsNone", awsListBox::fsNone);
 
-  RegisterConstant("lbtTree", awsListBox::ctTree);
-  RegisterConstant("lbtList",  awsListBox::ctList);
+  RegisterConstant ("lbtTree", awsListBox::ctTree);
+  RegisterConstant ("lbtList", awsListBox::ctList);
 
-  RegisterConstant("lbAlignLeft", alignLeft);
-  RegisterConstant("lbAlignRight",  alignRight);
-  RegisterConstant("lbAlignCenter",  alignCenter);
+  RegisterConstant ("lbAlignLeft", alignLeft);
+  RegisterConstant ("lbAlignRight", alignRight);
+  RegisterConstant ("lbAlignCenter", alignCenter);
 
-  RegisterConstant("signalListBoxSelectionChanged",  awsListBox::signalSelected);
-  RegisterConstant("signalListBoxScrolled",  awsListBox::signalScrolled);
+  RegisterConstant (
+    "signalListBoxSelectionChanged",
+    awsListBox::signalSelected);
+  RegisterConstant ("signalListBoxScrolled", awsListBox::signalScrolled);
 }
 
-awsListBoxFactory::~awsListBoxFactory()
+awsListBoxFactory::~awsListBoxFactory ()
 {
   // empty
 }
 
-iAwsComponent *
-awsListBoxFactory::Create()
+iAwsComponent *awsListBoxFactory::Create ()
 {
   return new awsListBox;
 }
-
-

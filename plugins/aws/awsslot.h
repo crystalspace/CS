@@ -1,5 +1,5 @@
 #ifndef __AWS_SLOT_H__
-#define __AWS_SLOT_H__
+# define __AWS_SLOT_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -18,10 +18,9 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-
-#include "iaws/aws.h"
-#include "iutil/comp.h"
-#include "csutil/csvector.h"
+# include "iaws/aws.h"
+# include "iutil/comp.h"
+# include "csutil/csvector.h"
 
 /*********************************************************************************************************************
 *                                                                                                                    *
@@ -32,56 +31,67 @@
 *********************************************************************************************************************/
 
 /// This is the sink manager, which controls all registered sinks.
-class awsSinkManager : public iAwsSinkManager
+class awsSinkManager :
+  public iAwsSinkManager
 {
   struct SinkMap
   {
     unsigned long name;
-    iAwsSink     *sink;
+    iAwsSink *sink;
 
-    SinkMap(unsigned long n, iAwsSink *s):name(n), sink(s) {};
+    SinkMap (unsigned long n, iAwsSink *s)
+    :
+    name(n),
+    sink(s)
+    {
+    };
   };
 
   csBasicVector sinks;
-
 public:
   SCF_DECLARE_IBASE;
 
-  awsSinkManager(iBase *p);
-  virtual ~awsSinkManager();
+  awsSinkManager (iBase *p);
+  virtual ~awsSinkManager ();
 
-  bool Initialize(iObjectRegistry *sys);
-
+  bool Initialize (iObjectRegistry *sys);
 public:
   /// Registers a sink by name for lookup.
-  virtual void RegisterSink(char *name, iAwsSink *sink);
+  virtual void RegisterSink (char *name, iAwsSink *sink);
 
   /// Finds a sink by name for connection.
-  virtual iAwsSink* FindSink(char *name);
+  virtual iAwsSink *FindSink (char *name);
 
-   /// Create a new embeddable sink, with parm as the void * passed into the triggers.
-  virtual iAwsSink *CreateSink(void *parm);
-
-
+  /// Create a new embeddable sink, with parm as the void * passed into the triggers.
+  virtual iAwsSink *CreateSink (void *parm);
 public:
   // Implement iComponent interface.
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(awsSinkManager);
-    virtual bool Initialize(iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
+    virtual bool Initialize (iObjectRegistry *p)
+    {
+      return scfParent->Initialize (p);
+    }
+  }
+  scfiComponent;
 };
 
 /// This is the implementation of a signal sink.  It handles trigger registration and dispatch.
-class awsSink : public iAwsSink
+class awsSink :
+  public iAwsSink
 {
   struct TriggerMap
   {
     unsigned long name;
-    void (*trigger)(void *, iAwsSource *);
+    void (*trigger) (void *, iAwsSource *);
 
-    TriggerMap(unsigned long n, void (*t)(void *, iAwsSource *)):name(n), trigger(t) {};
+    TriggerMap (unsigned long n, void (*t) (void *, iAwsSource *))
+    :
+    name(n),
+    trigger(t)
+    {
+    };
   };
 
   /// List of triggers registered.
@@ -89,63 +99,63 @@ class awsSink : public iAwsSink
 
   /// Parameter to pass to triggers
   void *parm;
-
 public:
   SCF_DECLARE_IBASE;
 
   /// P is the parm that is passed to triggers
-  awsSink(void *p);
-  virtual ~awsSink();
+  awsSink (void *p);
+  virtual ~awsSink ();
 
   /// Maps a trigger name to a trigger id
-  virtual unsigned long GetTriggerID(char *name);
+  virtual unsigned long GetTriggerID (char *name);
 
   /// Handles trigger events
-  virtual void HandleTrigger(int trigger, iAwsSource *source);
+  virtual void HandleTrigger (int trigger, iAwsSource *source);
 
   /// A sink should call this to register trigger events
-  virtual void RegisterTrigger(char *name, void (*Trigger)(void *, iAwsSource *));
-
+  virtual void RegisterTrigger (
+                char *name,
+                void (*Trigger) (void *, iAwsSource *));
 };
 
 /// This is the signal source implementation, subclassed by all components.
-class awsSource : public iAwsSource
+class awsSource :
+  public iAwsSource
 {
-   /// Owner
-   iAwsComponent *owner;
+  /// Owner
+  iAwsComponent *owner;
 
-   /// contains a list of all slots that we have registered
-   csBasicVector slots;
+  /// contains a list of all slots that we have registered
+  csBasicVector slots;
 
-   struct SlotSignalMap
-   {
-      /// The slot that's registered
-      iAwsSlot *slot;
+  struct SlotSignalMap
+  {
+    /// The slot that's registered
+    iAwsSlot *slot;
 
-      /// The signal it's registered for
-      unsigned long signal;
-   };
-
+    /// The signal it's registered for
+    unsigned long signal;
+  };
 public:
-    SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
-    /// Initializes a couple things.
-    awsSource(iAwsComponent *_owner);
+  /// Initializes a couple things.
+  awsSource (iAwsComponent *_owner);
 
-    /// Does nothing
-    virtual ~awsSource();
+  /// Does nothing
+  virtual ~awsSource ();
 
-    /// Gets the component owner for this (sources are embedded)
-    virtual iAwsComponent *GetComponent();
+  /// Gets the component owner for this (sources are embedded)
+  virtual iAwsComponent *GetComponent ();
 
-    /// Registers a slot for any one of the signals defined by a source.  Each sources's signals exist in it's own namespace
-    virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal);
+  /// Registers a slot for any one of the signals defined by a source.  Each sources's signals exist in it's own namespace
+  virtual bool RegisterSlot (iAwsSlot *slot, unsigned long signal);
 
-    /// Unregisters a slot for a signal.
-    virtual bool UnregisterSlot(iAwsSlot *slot, unsigned long signal);
+  /// Unregisters a slot for a signal.
+  virtual bool UnregisterSlot (iAwsSlot *slot, unsigned long signal);
 
-    /// Broadcasts a signal to all slots that are interested.
-    virtual void Broadcast(unsigned long signal);
+  /// Broadcasts a signal to all slots that are interested.
+  virtual void Broadcast (unsigned long signal);
 };
 
 /**********************************************************************************************************************
@@ -157,46 +167,57 @@ public:
 *  from EVERY source that emits it.                                                                                   *
 *                                                                                                                     *
 **********************************************************************************************************************/
-class awsSlot : public iAwsSlot
+class awsSlot :
+  public iAwsSlot
 {
-   /// The sink that this slot manages.
+  /// The sink that this slot manages.
 
-
-   /** A mapping between signals and triggers.  One signal may map to multiple triggers, or
+  /** A mapping between signals and triggers.  One signal may map to multiple triggers, or
     * vice versa.  The mapping list is traversed everytime there is a signal emitted.  All
     * mappings are evaluated and if they qualify, are activated. Note that a slot may be
     * connected to multiple sources, but that it routes based on signal, NOT source. */
-   struct SignalTriggerMap
-   {
-     unsigned long signal;
-     unsigned long trigger;
-     iAwsSink     *sink;
-     unsigned long refs;
+  struct SignalTriggerMap
+  {
+    unsigned long signal;
+    unsigned long trigger;
+    iAwsSink *sink;
+    unsigned long refs;
 
-     SignalTriggerMap(unsigned long s, iAwsSink *sk, unsigned long t, unsigned long r):signal(s), trigger(t), sink(sk), refs(r) {};
-   };
+    SignalTriggerMap (unsigned long s, iAwsSink *sk, unsigned long t, unsigned long r)
+    :
+    signal(s),
+    trigger(t),
+    sink(sk),
+    refs(r)
+    {
+    };
+  };
 
-   csBasicVector stmap;
-
+  csBasicVector stmap;
 public:
   SCF_DECLARE_IBASE;
 
   /// Does nothing
-  awsSlot();
+  awsSlot ();
 
   /// Also does nothing
-  virtual ~awsSlot();
+  virtual ~awsSlot ();
 
   /// Creates a connection from the source:signal to the sink:trigger specified.
-  virtual void Connect(iAwsSource *source, unsigned long signal, iAwsSink *sink, unsigned long trigger);
+  virtual void Connect (
+                iAwsSource *source,
+                unsigned long signal,
+                iAwsSink *sink,
+                unsigned long trigger);
 
   /// Disconnects the slot from a signal source, also properly unmaps a signal::trigger binding.
-  virtual void Disconnect(iAwsSource *source, unsigned long signal, iAwsSink *sink, unsigned long trigger);
+  virtual void Disconnect (
+                iAwsSource *source,
+                unsigned long signal,
+                iAwsSink *sink,
+                unsigned long trigger);
 
   /// Emit a signal to activate all necessary triggers.
-  virtual void Emit(iAwsSource &source, unsigned long signal);
+  virtual void Emit (iAwsSource &source, unsigned long signal);
 };
-
-
 #endif
-

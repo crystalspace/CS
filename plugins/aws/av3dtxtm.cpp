@@ -15,7 +15,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include <math.h>
 #include <stdarg.h>
 
@@ -41,33 +40,34 @@ csTexture::~csTexture ()
   DG_REM (this);
 }
 
-//---------------------------------------------------------- csTextureHandle -----//
-
-SCF_IMPLEMENT_IBASE (csTextureHandle)
-  SCF_IMPLEMENTS_INTERFACE (iTextureHandle)
+//----------------------------------------------------- csTextureHandle -----//
+SCF_IMPLEMENT_IBASE(csTextureHandle)
+  SCF_IMPLEMENTS_INTERFACE(iTextureHandle)
 SCF_IMPLEMENT_IBASE_END
 
-csTextureHandle::csTextureHandle (iImage* Image, int Flags)
+csTextureHandle::csTextureHandle (
+  iImage *Image,
+  int Flags)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   DG_ADDI (this, NULL);
   DG_TYPE (this, "csTextureHandle");
-
   (image = Image)->IncRef ();
   DG_LINK (this, image);
   flags = Flags;
 
-  tex [0] = tex [1] = tex [2] = tex [3] = NULL;
+  tex[0] = tex[1] = tex[2] = tex[3] = NULL;
 
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
 
   if (image->HasKeycolor ())
   {
-    int r,g,b;
-    image->GetKeycolor (r,g,b);
+    int r, g, b;
+    image->GetKeycolor (r, g, b);
     SetKeyColor (r, g, b);
   }
+
   cachedata = NULL;
 }
 
@@ -79,16 +79,17 @@ csTextureHandle::~csTextureHandle ()
     if (tex[i])
     {
       DG_UNLINK (this, tex[i]);
-      delete tex [i];
+      delete tex[i];
     }
   }
+
   DG_REM (this);
   FreeImage ();
 }
 
 void csTextureHandle::FreeImage ()
 {
-  if (!image) return;
+  if (!image) return ;
   DG_UNLINK (this, image);
   image->DecRef ();
   image = NULL;
@@ -96,7 +97,7 @@ void csTextureHandle::FreeImage ()
 
 void csTextureHandle::CreateMipmaps ()
 {
-  if (!image) return;
+  if (!image) return ;
 
   csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
 
@@ -107,18 +108,20 @@ void csTextureHandle::CreateMipmaps ()
     if (tex[i])
     {
       DG_UNLINK (this, tex[i]);
-      delete tex [i];
+      delete tex[i];
     }
   }
 
   // @@@ Jorrit: removed the following IncRef() because I can really
+
   // see no reason for it and it seems to be causing memory leaks.
 #if 0
   // Increment reference counter on image since NewTexture() expects
+
   // a image with an already incremented reference counter
   image->IncRef ();
 #endif
-  tex [0] = NewTexture (image);
+  tex[0] = NewTexture (image);
   DG_LINK (this, tex[0]);
 
   // 2D textures uses just the top-level mipmap
@@ -129,13 +132,13 @@ void csTextureHandle::CreateMipmaps ()
     iImage *i2 = i1->MipMap (1, tc);
     iImage *i3 = i2->MipMap (1, tc);
 
-    tex [1] = NewTexture (i1);
+    tex[1] = NewTexture (i1);
     DG_LINK (this, tex[1]);
     i1->DecRef ();
-    tex [2] = NewTexture (i2);
+    tex[2] = NewTexture (i2);
     DG_LINK (this, tex[2]);
     i2->DecRef ();
-    tex [3] = NewTexture (i3);
+    tex[3] = NewTexture (i3);
     DG_LINK (this, tex[3]);
     i3->DecRef ();
   }
@@ -177,7 +180,7 @@ void csTextureHandle::GetMeanColor (uint8 &r, uint8 &g, uint8 &b)
   b = mean_color.blue;
 }
 
-bool csTextureHandle::GetMipMapDimensions (int mipmap, int& w, int& h)
+bool csTextureHandle::GetMipMapDimensions (int mipmap, int &w, int &h)
 {
   csTexture *txt = get_texture (mipmap);
   if (txt)
@@ -186,15 +189,16 @@ bool csTextureHandle::GetMipMapDimensions (int mipmap, int& w, int& h)
     h = txt->get_height ();
     return true;
   }
+
   return false;
 }
 
 void csTextureHandle::AdjustSizePo2 ()
 {
-  int newwidth  = image->GetWidth();
-  int newheight = image->GetHeight();
+  int newwidth = image->GetWidth ();
+  int newheight = image->GetHeight ();
 
-  if (!csIsPowerOf2(newwidth))
+  if (!csIsPowerOf2 (newwidth))
     newwidth = csFindNearestPowerOf2 (image->GetWidth ()) / 2;
 
   if (!csIsPowerOf2 (newheight))
@@ -205,12 +209,13 @@ void csTextureHandle::AdjustSizePo2 ()
 }
 
 //----------------------------------------------------- csMaterialHandle -----//
-
-SCF_IMPLEMENT_IBASE (csMaterialHandle)
-  SCF_IMPLEMENTS_INTERFACE (iMaterialHandle)
+SCF_IMPLEMENT_IBASE(csMaterialHandle)
+  SCF_IMPLEMENTS_INTERFACE(iMaterialHandle)
 SCF_IMPLEMENT_IBASE_END
 
-csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
+csMaterialHandle::csMaterialHandle (
+  iMaterial *m,
+  csTextureManager *parent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   DG_ADDI (this, NULL);
@@ -225,32 +230,37 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
       texture->IncRef ();
       DG_LINK (this, texture);
     }
+
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
     num_texture_layers = material->GetTextureLayerCount ();
     if (num_texture_layers > 4) num_texture_layers = 4;
+
     int i;
-    for (i = 0 ; i < num_texture_layers ; i++)
+    for (i = 0; i < num_texture_layers; i++)
     {
       texture_layers[i] = *(material->GetTextureLayer (i));
-      texture_layer_translate[i] =
-	texture_layers[i].uscale != 1 ||
-	texture_layers[i].vscale != 1 ||
-	texture_layers[i].ushift != 0 ||
-	texture_layers[i].vshift != 0;
+      texture_layer_translate[i] = texture_layers[i].uscale != 1 ||
+        texture_layers[i].vscale != 1 ||
+        texture_layers[i].ushift != 0 ||
+        texture_layers[i].vshift != 0;
     }
   }
   (texman = parent)->IncRef ();
 }
 
-csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
+csMaterialHandle::csMaterialHandle (
+  iTextureHandle *t,
+  csTextureManager *parent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   DG_ADDI (this, NULL);
   DG_TYPE (this, "csMaterialHandle");
   material = NULL;
   num_texture_layers = 0;
-  diffuse = 0.7; ambient = 0; reflection = 0;
+  diffuse = 0.7;
+  ambient = 0;
+  reflection = 0;
   if ((texture = t) != 0)
   {
     DG_LINK (this, texture);
@@ -274,6 +284,7 @@ void csMaterialHandle::FreeMaterial ()
     DG_UNLINK (this, texture);
     SCF_DEC_REF (texture);
   }
+
   if (material)
   {
     material->DecRef ();
@@ -285,24 +296,24 @@ void csMaterialHandle::Prepare ()
 {
   if (material)
   {
-    if (texture != material->GetTexture())
+    if (texture != material->GetTexture ())
     {
       DG_UNLINK (this, texture);
-      SCF_DEC_REF(texture);
+      SCF_DEC_REF (texture);
       texture = material->GetTexture ();
       if (texture)
       {
         texture->IncRef ();
-	DG_LINK (this, texture);
+        DG_LINK (this, texture);
       }
     }
+
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
   }
 }
 
 //------------------------------------------------------------ csTexture -----//
-
 void csTexture::compute_masks ()
 {
   shf_w = csLog2 (w);
@@ -312,14 +323,15 @@ void csTexture::compute_masks ()
 }
 
 //----------------------------------------------------- csTextureManager -----//
-
-SCF_IMPLEMENT_IBASE (csTextureManager)
-  SCF_IMPLEMENTS_INTERFACE (iTextureManager)
+SCF_IMPLEMENT_IBASE(csTextureManager)
+  SCF_IMPLEMENTS_INTERFACE(iTextureManager)
 SCF_IMPLEMENT_IBASE_END
 
-csTextureManager::csTextureManager (iObjectRegistry* object_reg,
-	iGraphics2D *iG2D)
-	: textures (16, 16), materials (16, 16)
+csTextureManager::csTextureManager (
+  iObjectRegistry *object_reg,
+  iGraphics2D *iG2D) :
+    textures(16, 16),
+    materials(16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   csTextureManager::object_reg = object_reg;
@@ -328,21 +340,22 @@ csTextureManager::csTextureManager (iObjectRegistry* object_reg,
   pfmt = *iG2D->GetPixelFormat ();
 }
 
-csTextureManager::~csTextureManager()
+csTextureManager::~csTextureManager ()
 {
   Clear ();
-    printf("Texture manager now going bye byes...\n"); //@@@ Debugging. MHV
+  printf ("Texture manager now going bye byes...\n"); //@@@ Debugging. MHV
 }
 
-void csTextureManager::read_config (iConfigFile* /*config*/)
+void csTextureManager::read_config (iConfigFile *
+
+/*config*/ )
 {
 }
 
 void csTextureManager::FreeImages ()
 {
   int i;
-  for (i = 0 ; i < textures.Length () ; i++)
-    textures.Get (i)->FreeImage ();
+  for (i = 0; i < textures.Length (); i++) textures.Get (i)->FreeImage ();
 }
 
 int csTextureManager::GetTextureFormat ()
@@ -352,16 +365,30 @@ int csTextureManager::GetTextureFormat ()
 
 int csTextureManager::FindRGB (int r, int g, int b)
 {
-  if (r > 255) r = 255; else if (r < 0) r = 0;
-  if (g > 255) g = 255; else if (g < 0) g = 0;
-  if (b > 255) b = 255; else if (b < 0) b = 0;
-  return
-    ((r >> (8-pfmt.RedBits))   << pfmt.RedShift) |
-    ((g >> (8-pfmt.GreenBits)) << pfmt.GreenShift) |
-    ((b >> (8-pfmt.BlueBits))  << pfmt.BlueShift);
+  if (r > 255)
+    r = 255;
+  else if (r < 0)
+    r = 0;
+  if (g > 255)
+    g = 255;
+  else if (g < 0)
+    g = 0;
+  if (b > 255)
+    b = 255;
+  else if (b < 0)
+    b = 0;
+  return ((r >> (8 - pfmt.RedBits)) << pfmt.RedShift) |
+    ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift) |
+      ((b >> (8 - pfmt.BlueBits)) << pfmt.BlueShift);
 }
 
-void csTextureManager::ReserveColor (int /*r*/, int /*g*/, int /*b*/)
+void csTextureManager::ReserveColor (int
+
+/*r*/, int
+
+/*g*/, int
+
+/*b*/ )
 {
 }
 
@@ -373,23 +400,26 @@ void csTextureManager::ResetPalette ()
 {
 }
 
-iMaterialHandle* csTextureManager::RegisterMaterial (iMaterial* material)
+iMaterialHandle *csTextureManager::RegisterMaterial (iMaterial *material)
 {
   if (!material) return NULL;
+
   csMaterialHandle *mat = new csMaterialHandle (material, this);
   materials.Push (mat);
   return mat;
 }
 
-iMaterialHandle* csTextureManager::RegisterMaterial (iTextureHandle* txthandle)
+iMaterialHandle *csTextureManager::RegisterMaterial (
+  iTextureHandle *txthandle)
 {
   if (!txthandle) return NULL;
+
   csMaterialHandle *mat = new csMaterialHandle (txthandle, this);
   materials.Push (mat);
   return mat;
 }
 
-void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
+void csTextureManager::UnregisterMaterial (csMaterialHandle *handle)
 {
   int idx = materials.Find (handle);
   if (idx >= 0) materials.Delete (idx);
@@ -398,8 +428,7 @@ void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
 void csTextureManager::PrepareMaterials ()
 {
   int i;
-  for (i = 0; i < materials.Length (); i++)
-    materials.Get (i)->Prepare ();
+  for (i = 0; i < materials.Length (); i++) materials.Get (i)->Prepare ();
 }
 
 void csTextureManager::FreeMaterials ()

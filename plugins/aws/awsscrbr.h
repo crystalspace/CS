@@ -1,5 +1,6 @@
 #ifndef __AWS_SCROLL_BAR_H__
-#define __AWS_SCROLL_BAR_H__
+# define __AWS_SCROLL_BAR_H__
+
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
 
@@ -17,13 +18,14 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-#include "awscomp.h"
-#include "awscmdbt.h"
-#include "awstimer.h"
+# include "awscomp.h"
+# include "awscmdbt.h"
+# include "awstimer.h"
 
 class awsSliderButton;
 
-class awsScrollBar : public awsComponent
+class awsScrollBar :
+  public awsComponent
 {
   /// True when button is down, false if up
   bool is_down;
@@ -94,17 +96,14 @@ class awsScrollBar : public awsComponent
 
   /// Amount to move scroll bar when scroll area clicked
   float value_page_delta;
-
 protected:
-
-  bool awsScrollBar::HandleClicking (int btn,int x,int y);
+  bool awsScrollBar:: HandleClicking (int btn, int x, int y);
   bool captured;
-  public:
-  awsScrollBar();
-  virtual ~awsScrollBar();
+public:
+  awsScrollBar ();
+  virtual ~awsScrollBar ();
 
   /******** scrollbar orientation ***********/
-
   static const int sboVertical;
   static const int sboHorizontal;
 
@@ -114,99 +113,100 @@ protected:
   static const int signalChanged;
 
   /// Trigger called when inc button is clicked
-  static void IncClicked(void *sk, iAwsSource *source);
+  static void IncClicked (void *sk, iAwsSource *source);
 
   /// Trigger called when dec button is clicked
-  static void DecClicked(void *sk, iAwsSource *source);
+  static void DecClicked (void *sk, iAwsSource *source);
 
-  static void TickTock(void *sk, iAwsSource *source);
-  static void KnobTick(void *sk, iAwsSource *source);
+  static void TickTock (void *sk, iAwsSource *source);
+  static void KnobTick (void *sk, iAwsSource *source);
 
   /// Trigger called when area above/left of knob button is clicked
-  static void DecPageClicked(void *sk, iAwsSource *source);
+  static void DecPageClicked (void *sk, iAwsSource *source);
 
   /// Trigger called when area below/right of knob button is clicked
-  static void IncPageClicked(void *sk, iAwsSource *source);
-
+  static void IncPageClicked (void *sk, iAwsSource *source);
 public:
   /// Get's the texture handle and the title, plus style if there is one.
-  virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
 
   /// Gets properties
-  bool GetProperty(char *name, void **parm);
+  bool GetProperty (char *name, void **parm);
 
   /// Sets properties
-  bool SetProperty(char *name, void *parm);
+  bool SetProperty (char *name, void *parm);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
-  virtual char *Type();
-
+  virtual char *Type ();
 public:
   SCF_DECLARE_IBASE;
 
   /// Triggered when the component needs to draw
-  virtual void OnDraw(csRect clip);
+  virtual void OnDraw (csRect clip);
 
   /// Triggered when the user presses a mouse button down
-  virtual bool OnMouseDown(int button, int x, int y);
+  virtual bool OnMouseDown (int button, int x, int y);
 
   /// Triggered when the user unpresses a mouse button
-  virtual bool OnMouseUp(int button, int x, int y);
+  virtual bool OnMouseUp (int button, int x, int y);
 
   /// Triggered when the user moves the mouse
-  virtual bool OnMouseMove(int button, int x, int y);
+  virtual bool OnMouseMove (int button, int x, int y);
 
   /// Triggered when the user clicks the mouse
-  virtual bool OnMouseClick(int button, int x, int y);
+  virtual bool OnMouseClick (int button, int x, int y);
 
   /// Triggered when the user double clicks the mouse
-  virtual bool OnMouseDoubleClick(int button, int x, int y);
+  virtual bool OnMouseDoubleClick (int button, int x, int y);
 
   /// Triggered when this component loses mouse focus
-  virtual bool OnMouseExit();
+  virtual bool OnMouseExit ();
 
   /// Triggered when this component gains mouse focus
-  virtual bool OnMouseEnter();
+  virtual bool OnMouseEnter ();
 
   /// Triggered when the user presses a key
-  virtual bool OnKeypress(int key, int modifiers);
+  virtual bool OnKeypress (int key, int modifiers);
 
   /// Triggered when the keyboard focus is lost
-  virtual bool OnLostFocus();
+  virtual bool OnLostFocus ();
 
   /// Triggered when the keyboard focus is gained
-  virtual bool OnGainFocus();
+  virtual bool OnGainFocus ();
 
   /// Adds in the inc and dec buttons appropriately
-  virtual void OnAdded();
+  virtual void OnAdded ();
 
   /// Fixes the inc and dec buttons for layouts.
-  virtual void OnResized();
+  virtual void OnResized ();
 };
 
-class awsScrollBarFactory : public awsComponentFactory
+class awsScrollBarFactory :
+  public awsComponentFactory
 {
 public:
   SCF_DECLARE_IBASE;
 
   /// Calls register to register the component that it builds with the window manager
-  awsScrollBarFactory(iAws *wmgr);
+  awsScrollBarFactory (iAws *wmgr);
 
   /// Does nothing
-  virtual ~awsScrollBarFactory();
+  virtual ~awsScrollBarFactory ();
 
   /// Returns a newly created component of the type this factory handles.
-  virtual iAwsComponent *Create();
+  virtual iAwsComponent *Create ();
 };
 
-class awsSliderButton : public awsCmdButton
+class awsSliderButton :
+  public awsCmdButton
 {
- protected:
-
+protected:
   // the timer we use for repeated firing of "clicked" signal
   awsTimer *timer;
+
   // signals if we have captured the mouse
   bool captured;
+
   // fire the signal every nTick milliseconds
   csTicks nTicks;
 
@@ -214,51 +214,48 @@ class awsSliderButton : public awsCmdButton
   iAwsSlot *tick_slot;
 
   /**************** signal handlers ************************/
-  static void TickTock(void *sk, iAwsSource *);
-  
- public:
+  static void TickTock (void *sk, iAwsSource *);
+public:
   SCF_DECLARE_IBASE_EXT (awsCmdButton);
 
-  awsSliderButton();
-  virtual ~awsSliderButton();
+  awsSliderButton ();
+  virtual ~awsSliderButton ();
 
   // Get's the texture handle and the title, plus style if there is one.
-  virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
 
   // Gets properties
-  bool GetProperty(char *name, void **parm);
+  bool GetProperty (char *name, void **parm);
 
   // Sets properties
-  bool SetProperty(char *name, void *parm);
+  bool SetProperty (char *name, void *parm);
 
   // Returns the named TYPE of the component, like "Radio Button", etc.
-  virtual char *Type();
+  virtual char *Type ();
 
-  virtual bool OnMouseDown(int btn, int x, int y);
-  virtual bool OnMouseUp(int btn, int x, int y);
-  virtual bool OnMouseMove(int button, int x, int y);
-  virtual bool OnMouseClick(int ,int ,int );
-  virtual bool OnMouseDoubleClick(int ,int ,int );
-
- public:
+  virtual bool OnMouseDown (int btn, int x, int y);
+  virtual bool OnMouseUp (int btn, int x, int y);
+  virtual bool OnMouseMove (int button, int x, int y);
+  virtual bool OnMouseClick (int, int, int);
+  virtual bool OnMouseDoubleClick (int, int, int);
+public:
   // mouse position while capturing in progress
   int last_x, last_y;
 };
 
-class awsSliderButtonFactory : public awsCmdButtonFactory
+class awsSliderButtonFactory :
+  public awsCmdButtonFactory
 {
- public:
+public:
   SCF_DECLARE_IBASE_EXT (awsCmdButtonFactory);
 
   // Calls register to register the component that it builds with the window manager
-  awsSliderButtonFactory(iAws *wmgr);
+  awsSliderButtonFactory (iAws *wmgr);
 
   // Does nothing
-  virtual ~awsSliderButtonFactory();
+  virtual ~awsSliderButtonFactory ();
 
   // Returns a newly created component of the type this factory handles.
-  virtual iAwsComponent *Create();
+  virtual iAwsComponent *Create ();
 };
-
 #endif
-

@@ -16,12 +16,11 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #ifndef __NULL_TXT_H__
-#define __NULL_TXT_H__
+# define __NULL_TXT_H__
 
-#include "video/renderer/common/txtmgr.h"
-#include "igraphic/image.h"
+# include "video/renderer/common/txtmgr.h"
+# include "igraphic/image.h"
 
 class csTextureManagerNull;
 
@@ -30,12 +29,12 @@ class csTextureManagerNull;
  * RGB values into palette indices. The following macros defines
  * the number of bits to use for encoding R, G and B values.
  */
-#define RGB2PAL_BITS_R	5
-#define RGB2PAL_BITS_G	5
-#define RGB2PAL_BITS_B	5
+# define RGB2PAL_BITS_R  5
+# define RGB2PAL_BITS_G  5
+# define RGB2PAL_BITS_B  5
 
 /// The prefered distances to use for the color matching.
-#define PREFERED_DIST	2000000
+# define PREFERED_DIST 2000000
 
 /**
  * A class containing a colormap. A object of this class is used
@@ -49,14 +48,13 @@ public:
    * An RGB value has four bytes: R, G, B, unused.
    * So there are 256*4 bytes in this array.
    */
-  csRGBpixel palette [256];
+  csRGBpixel palette[256];
 
   /// Colors which are allocated.
-  bool alloc [256];
+  bool alloc[256];
 
   /// Constructor
-  csColorMapNull ()
-  { memset (alloc, sizeof (alloc), 0); }
+  csColorMapNull () { memset (alloc, sizeof (alloc), 0); }
 
   /// Find a value in the colormap and return the color index.
   int find_rgb (int r, int g, int b, int *d = NULL);
@@ -65,8 +63,10 @@ public:
   int alloc_rgb (int r, int g, int b, int dist);
 
   /// Get a palette entry
-  inline csRGBpixel &operator [] (int idx)
-  { return palette [idx]; }
+  inline csRGBpixel & operator [] (int idx)
+  {
+    return palette[idx];
+  }
 
   /// Compute number of free palette entries
   int FreeEntries ();
@@ -79,18 +79,22 @@ public:
  * colormap. The private colormap is common for all mipmapped variants.
  * The colormap is stored inside the parent csTextureHandle object.
  */
-class csTextureNull : public csTexture
+class csTextureNull :
+  public csTexture
 {
 public:
   /// The bitmap
   uint8 *bitmap;
+
   /// The alpha map (NULL if no alphamap)
   uint8 *alphamap;
+
   /// The image (temporary storage)
   iImage *image;
 
   /// Create a csTexture object
-  csTextureNull (csTextureHandle *Parent, iImage *Image) : csTexture (Parent)
+  csTextureNull (csTextureHandle *Parent, iImage *Image) :
+  csTexture(Parent)
   {
     bitmap = NULL;
     alphamap = NULL;
@@ -99,22 +103,28 @@ public:
     h = Image->GetHeight ();
     compute_masks ();
   }
+
   /// Destroy the texture
-  virtual ~csTextureNull ()
-  { delete [] bitmap; delete [] alphamap; if (image) image->DecRef (); }
+  virtual~csTextureNull ()
+  {
+    delete[] bitmap;
+    delete[] alphamap;
+    if (image) image->DecRef ();
+  }
+
   /// Return a pointer to texture data
-  uint8 *get_bitmap ()
-  { return bitmap; }
+  uint8 *get_bitmap ()  { return bitmap; }
+
   /// Return a pointer to alpha map data
-  uint8 *get_alphamap ()
-  { return alphamap; }
+  uint8 *get_alphamap ()  { return alphamap; }
 };
 
 /**
  * csTextureHandleNull represents a texture and all its mipmapped
  * variants.
  */
-class csTextureHandleNull : public csTextureHandle
+class csTextureHandleNull :
+  public csTextureHandle
 {
 protected:
   /**
@@ -129,7 +139,7 @@ protected:
   uint16 *pal2glob8;
 
   /// The private palette
-  csRGBpixel palette [256];
+  csRGBpixel palette[256];
 
   /// Number of used colors in palette
   int palette_size;
@@ -142,10 +152,13 @@ protected:
 
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor ();
-
 public:
   /// Create the mipmapped texture object
-  csTextureHandleNull (csTextureManagerNull *txtmgr, iImage *image, int flags);
+  csTextureHandleNull (
+    csTextureManagerNull *txtmgr,
+    iImage *image,
+    int flags);
+
   /// Destroy the object and free all associated storage
   virtual ~csTextureHandleNull ();
 
@@ -158,14 +171,16 @@ public:
   void remap_texture (csTextureManager *texman);
 
   /// Query the private texture colormap
-  csRGBpixel *GetColorMap () { return palette; }
+  csRGBpixel *GetColorMap ()  { return palette; }
+
   /// Query the number of colors in the colormap
-  int GetColorMapSize () { return palette_size; }
+  int GetColorMapSize ()  { return palette_size; }
 
   /// Query palette -> native format table
   void *GetPaletteToGlobal () { return pal2glob; }
+
   /// Query palette -> 16-bit values table for 8-bit modes
-  uint16 *GetPaletteToGlobal8 () { return pal2glob8; }
+  uint16 *GetPaletteToGlobal8 ()  { return pal2glob8; }
 
   /**
    * Query if the texture has an alpha channel.<p>
@@ -173,7 +188,9 @@ public:
    * and of the fact whenever the renderer supports alpha maps at all.
    */
   virtual bool GetAlphaMap ()
-  { return !!((csTextureNull *)get_texture (0))->get_alphamap (); }
+  {
+    return !!((csTextureNull *)get_texture (0))->get_alphamap ();
+  }
 
   /// Prepare the texture for usage
   virtual void Prepare ();
@@ -186,14 +203,15 @@ public:
  * a lot of work regarding palette management and the creation
  * of lots of lookup tables.
  */
-class csTextureManagerNull : public csTextureManager
+class csTextureManagerNull :
+  public csTextureManager
 {
 private:
   /// How strong texture manager should push 128 colors towards a uniform palette
   int uniform_bias;
 
   /// Which colors are locked in the global colormap
-  bool locked [256];
+  bool locked[256];
 
   /// true if palette has already been computed
   bool palette_ok;
@@ -206,7 +224,6 @@ private:
 
   /// We need a pointer to the 2D driver
   iGraphics2D *G2D;
-
 public:
   /// The global colormap (used in 256-color modes)
   csColorMapNull cmap;
@@ -218,8 +235,11 @@ public:
   uint16 *GlobalCMap;
 
   ///
-  csTextureManagerNull (iObjectRegistry *object_reg,
-  	iGraphics2D *iG2D, iConfigFile *config);
+  csTextureManagerNull (
+    iObjectRegistry *object_reg,
+    iGraphics2D *iG2D,
+    iConfigFile *config);
+
   ///
   virtual ~csTextureManagerNull ();
 
@@ -262,16 +282,20 @@ public:
 
   ///
   virtual void PrepareTextures ();
+
   ///
-  virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
+  virtual iTextureHandle *RegisterTexture (iImage *image, int flags);
+
   ///
-  virtual void UnregisterTexture (csTextureHandleNull* handle);
+  virtual void UnregisterTexture (csTextureHandleNull *handle);
+
   /// Clear the palette (including all reserved colors)
   virtual void ResetPalette ();
+
   /// Reserve a color in palette (if any)
   virtual void ReserveColor (int r, int g, int b);
+
   /// Really allocate the palette on the system.
   virtual void SetPalette ();
 };
-
 #endif // __NULL_TXT_H__

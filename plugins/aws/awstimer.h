@@ -16,25 +16,25 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #ifndef _AWSTIMER_H_
-#define _AWSTIMER_H_
+# define _AWSTIMER_H_
 
-#include "awsslot.h"
-#include "iutil/eventh.h"
-#include "iutil/eventq.h"
-#include "iutil/virtclk.h"
-#include "iutil/objreg.h"
+# include "awsslot.h"
+# include "iutil/eventh.h"
+# include "iutil/eventq.h"
+# include "iutil/virtclk.h"
+# include "iutil/objreg.h"
 
-class awsTimer : public awsSource
+class awsTimer :
+  public awsSource
 {
- protected:
-
-
+protected:
   // eventhandler has been set up ?
   bool ehSetup;
+
   // everything ready to go ?
   bool bSetup;
+
   // flag to halt the ticker
   bool stopped;
 
@@ -46,8 +46,7 @@ class awsTimer : public awsSource
 
   // try to set up everything needed
   bool Setup ();
-
- public:
+public:
   static const int signalTick;
 
   SCF_DECLARE_IBASE;
@@ -62,10 +61,12 @@ class awsTimer : public awsSource
 
   struct eiEventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE (awsTimer);
-    virtual bool HandleEvent (iEvent &Event){return scfParent->HandleEvent (Event);}
-  } scfiEventHandler;
-
+    SCF_DECLARE_EMBEDDED_IBASE(awsTimer);
+    virtual bool HandleEvent (iEvent &Event)
+    {
+      return scfParent->HandleEvent (Event);
+    }
+  }
+  scfiEventHandler;
 };
-
 #endif

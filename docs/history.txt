@@ -10,6 +10,8 @@ The history order is reversed so that new features are at the top.
 	- Little code reformatting of libs/csutil/cfgmgr.cpp.
 	- Reverted 'res' change to enginep.mak since it breaks loading
 	  of the engine plugin on MingW at least.
+	- Completely reformatted the AWS source code using the GC utility.
+	  Now the source of AWS finally conforms to CS coding style rules.
 14-Feb-2002
 	- Fixed new gridbag constraints in AWS so that it is an enum
 	  (static const int is not legal in C++) and also renamed

@@ -15,20 +15,19 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #ifndef __TXTMGR_H__
-#define __TXTMGR_H__
+# define __TXTMGR_H__
 
-#include "csutil/csvector.h"
-#include "csutil/typedvec.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/material.h"
-#include "iengine/material.h"
-#include "ivideo/texture.h"
-#include "iengine/texture.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "csgfx/rgbpixel.h"
+# include "csutil/csvector.h"
+# include "csutil/typedvec.h"
+# include "ivideo/txtmgr.h"
+# include "ivideo/material.h"
+# include "iengine/material.h"
+# include "ivideo/texture.h"
+# include "iengine/texture.h"
+# include "ivideo/graph3d.h"
+# include "ivideo/graph2d.h"
+# include "csgfx/rgbpixel.h"
 
 class csTexture;
 class csTextureManager;
@@ -55,7 +54,8 @@ struct iObjectRegistry;
  * memory occupied by the original textures, but it also means you
  * cannot call TextureManager::Prepare() again.
  */
-class csTextureHandle : public iTextureHandle
+class csTextureHandle :
+  public iTextureHandle
 {
 protected:
   /// The original image object.
@@ -65,21 +65,23 @@ protected:
   int flags;
 
   /// Texture for mipmap levels 0..3
-  csTexture *tex [4];
+  csTexture *tex[4];
 
   /// Texture cache for-internal-use pointer
   void *cachedata;
 
   /// Does color 0 mean "transparent" for this texture?
   bool transp;
+
   /// The transparent color
   csRGBpixel transp_color;
+
   /// Mean color used when texture mapping is disabled.
   csRGBpixel mean_color;
-
 public:
   ///
   csTextureHandle (iImage *Image, int Flags);
+
   ///
   virtual ~csTextureHandle ();
 
@@ -94,7 +96,9 @@ public:
 
   /// Get the texture at the corresponding mipmap level (0..3)
   csTexture *get_texture (int mipmap)
-  { return (mipmap >= 0) && (mipmap < 4) ? tex [mipmap] : 0; }
+  {
+    return (mipmap >= 0) && (mipmap < 4) ? tex[mipmap] : 0;
+  }
 
   /**
    * Adjusts the textures size, to ensure some restrictions like
@@ -103,11 +107,10 @@ public:
   void AdjustSizePo2 ();
 
   /// Get the transparent color as a RGB pixel
-  csRGBpixel *get_transparent ()
-  { return &transp_color; }
+  csRGBpixel *get_transparent ()  { return &transp_color; }
 
   /// Create a new texture object (should be implemented by heirs)
-  virtual csTexture* NewTexture (iImage *Image) = 0;
+  virtual csTexture *NewTexture (iImage *Image) = 0;
 
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor () = 0;
@@ -135,8 +138,8 @@ public:
    * This function is only valid if the texture has been registered
    * for 3D usage.
    */
-  virtual bool GetMipMapDimensions (int mm, int& w, int& h);
-  virtual void GetOriginalDimensions (int& w, int& h)
+  virtual bool GetMipMapDimensions (int mm, int &w, int &h);
+  virtual void GetOriginalDimensions (int &w, int &h)
   {
     GetMipMapDimensions (0, w, h);
   }
@@ -145,28 +148,22 @@ public:
   virtual void GetMeanColor (uint8 &r, uint8 &g, uint8 &b);
 
   /// Get data associated internally with this texture by texture cache
-  virtual void *GetCacheData ()
-  { return cachedata; }
+  virtual void *GetCacheData () { return cachedata; }
+
   /// Set data associated internally with this texture by texture cache
-  virtual void SetCacheData (void *d)
-  { cachedata = d; }
+  virtual void SetCacheData (void *d) { cachedata = d; }
 
   /// Get the csTextureHandle object associated with the texture handle
-  virtual void *GetPrivateObject ()
-  { return (csTextureHandle *)this; }
-
-  virtual iGraphics3D *GetProcTextureInterface ()
-  { return NULL; }
-
-  virtual void ProcTextureSync () {};
+  virtual void *GetPrivateObject ()               { return (csTextureHandle *)this; }
+  virtual iGraphics3D *GetProcTextureInterface () { return NULL; }
+  virtual void ProcTextureSync ()                 { };
 
   /**
    * Query if the texture has an alpha channel.<p>
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
-  virtual bool GetAlphaMap ()
-  { return false; }
+  virtual bool GetAlphaMap () { return false; }
 };
 
 /**
@@ -189,71 +186,90 @@ class csTexture
 protected:
   /// The parent csTextureHandle object
   csTextureHandle *parent;
+
   /// Width and height
   int w, h;
+
   /// log2(width) and log2(height)
   int shf_w, shf_h;
+
   /// (1 << log2(width)) - 1 and (1 << log2(height)) - 1
   int and_w, and_h;
 
   /// Compute shf_x and and_x values
   void compute_masks ();
-
 public:
   /// Create a csTexture object
   csTexture (csTextureHandle *Parent);
+
   /// Destroy the texture object
   virtual ~csTexture ();
 
   ///
-  int get_width () { return w; }
+  int get_width ()  { return w; }
+
   ///
   int get_height () { return h; }
+
   ///
-  int get_w_shift () { return shf_w; }
+  int get_w_shift ()  { return shf_w; }
+
   ///
-  int get_h_shift () { return shf_h; }
+  int get_h_shift ()  { return shf_h; }
+
   ///
   int get_w_mask () { return and_w; }
+
   ///
   int get_h_mask () { return and_h; }
+
   /// Query image size (alas we can't do (h << shf_w))
   int get_size () { return w * h; }
+
   ///
-  csTextureHandle *get_parent () { return parent; }
+  csTextureHandle *get_parent ()  { return parent; }
 };
 
 /**
  * This class is the top-level representation of a material.
  */
-class csMaterialHandle : public iMaterialHandle
+class csMaterialHandle :
+  public iMaterialHandle
 {
 protected:
   /// A texture.
   iTextureHandle *texture;
+
   /// Numer of texture layers.
   int num_texture_layers;
+
   /// Texture layers.
   csTextureLayer texture_layers[4];
+
   /**
    * Flags that indicate if the texture layer needs translating
    * relative to the base texture.
    */
   bool texture_layer_translate[4];
+
   /// The flat color of the material
   csRGBpixel flat_color;
+
   /// Material reflection parameters
   float diffuse, ambient, reflection;
+
   /// Original material.
   iMaterial *material;
+
   /// Parent texture manager
   csTextureManager *texman;
-
 public:
   ///
-  csMaterialHandle (iMaterial* material, csTextureManager *parent);
+  csMaterialHandle (iMaterial *material, csTextureManager *parent);
+
   ///
-  csMaterialHandle (iTextureHandle* texture, csTextureManager *parent);
+  csMaterialHandle (iTextureHandle *texture, csTextureManager *parent);
+
   ///
   virtual ~csMaterialHandle ();
 
@@ -262,11 +278,15 @@ public:
 
   /// Get the number of texture layers.
   int GetTextureLayerCount () { return num_texture_layers; }
+
   /// Get a texture layer.
-  csTextureLayer* GetTextureLayer (int idx) { return &texture_layers[idx]; }
+  csTextureLayer *GetTextureLayer (int idx) { return &texture_layers[idx]; }
+
   /// Returns true if texture layer needs translation.
   bool TextureLayerTranslated (int idx)
-  { return texture_layer_translate[idx]; }
+  {
+    return texture_layer_translate[idx];
+  }
 
   //--------------------- iMaterialHandle implementation ----------------------
   SCF_DECLARE_IBASE;
@@ -280,14 +300,20 @@ public:
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor) { oColor = flat_color; }
+  virtual void GetFlatColor (csRGBpixel &oColor)  { oColor = flat_color; }
 
   /**
    * Get light reflection parameters for this material.
    */
-  virtual void GetReflection (float &oDiffuse, float &oAmbient,
+  virtual void GetReflection (
+    float &oDiffuse,
+    float &oAmbient,
     float &oReflection)
-  { oDiffuse = diffuse; oAmbient = ambient; oReflection = reflection; }
+  {
+    oDiffuse = diffuse;
+    oAmbient = ambient;
+    oReflection = reflection;
+  }
 
   /**
    * Prepare this material. The material wrapper (remembered during
@@ -303,10 +329,10 @@ public:
  * Each 3D driver should derive a texture manager class from this one
  * and implement the missing functionality.
  */
-class csTextureManager : public iTextureManager
+class csTextureManager :
+  public iTextureManager
 {
 protected:
-
   CS_DECLARE_TYPED_VECTOR_NODELETE (csTexVector, csTextureHandle);
 
   /// List of textures.
@@ -326,7 +352,6 @@ protected:
 
   /// Read configuration values from config file.
   virtual void read_config (iConfigFile *config);
-
 public:
   /// Pixel format.
   csPixelFormat pfmt;
@@ -334,7 +359,8 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Initialize the texture manager
-  csTextureManager (iObjectRegistry* object_reg, iGraphics2D *iG2D);
+  csTextureManager (iObjectRegistry *object_reg, iGraphics2D *iG2D);
+
   /// Destroy the texture manager
   virtual ~csTextureManager ();
 
@@ -342,18 +368,14 @@ public:
    * Called from csMaterialHandle destructor to notify parent texture
    * manager that a material is going to be destroyed.
    */
-  void UnregisterMaterial (csMaterialHandle* handle);
+  void UnregisterMaterial (csMaterialHandle *handle);
 
   /// Clear (free) all textures
-  virtual void Clear ()
-  {
-    textures.DeleteAll ();
-    materials.DeleteAll ();
-  }
+  virtual void Clear () { textures.DeleteAll (); materials.DeleteAll (); }
 
   /// Toggle verbose mode
-  virtual void SetVerbose (bool enable)
-  { verbose = enable; }
+  virtual void SetVerbose (bool enable) { verbose = enable; }
+
   /// Free all images associated with textures
   virtual void FreeImages ();
 
@@ -365,16 +387,20 @@ public:
    * bits that fit the CS_IMGFMT_MASK mask matters.
    */
   virtual int GetTextureFormat ();
+
   /**
    * Return the index for some color. This works in 8-bit
    * (returns an index in the 256-color table) and in 15/16-bit
    * (returns a 15/16-bit encoded RGB value).
    */
   virtual int FindRGB (int r, int g, int b);
+
   /// Clear the palette (including all reserved colors)
   virtual void ResetPalette ();
+
   /// Reserve a color in palette (if any)
   virtual void ReserveColor (int r, int g, int b);
+
   /// Really allocate the palette on the system.
   virtual void SetPalette ();
 
@@ -384,13 +410,13 @@ public:
    * by calling DecRef on it enough times. If you want to keep the input
    * material make sure you have called IncRef yourselves.
    */
-  virtual iMaterialHandle* RegisterMaterial (iMaterial* material);
+  virtual iMaterialHandle *RegisterMaterial (iMaterial *material);
 
   /**
    * Register a material based on a texture handle. This is a short-cut
    * to quickly make materials based on a single texture.
    */
-  virtual iMaterialHandle* RegisterMaterial (iTextureHandle* txthandle);
+  virtual iMaterialHandle *RegisterMaterial (iTextureHandle *txthandle);
 
   /**
    * Default stub implementation until the
@@ -404,5 +430,4 @@ public:
    */
   virtual void FreeMaterials ();
 };
-
 #endif // __TXTMGR_H__

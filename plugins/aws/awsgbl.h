@@ -1,85 +1,85 @@
 #ifndef __AWS_GRIDBAG_LAYOUT__
-#define __AWS_GRIDBAG_LAYOUT__
+# define __AWS_GRIDBAG_LAYOUT__
 
-#include "iaws/aws.h"
-#include "awslayot.h"
-#include "awsgbc.h"
-#include "csutil/hashmap.h"
-
+# include "iaws/aws.h"
+# include "awslayot.h"
+# include "awsgbc.h"
+# include "csutil/hashmap.h"
 
 /** GridBag layout ala Java AWT/Swing.  It tries to stay as close as possible 
  * to the original within the limits of AWS's grammar.
  */
-class awsGridBagLayout : public awsLayoutManager
+class awsGridBagLayout :
+  public awsLayoutManager
 {
 public:
-   /**
+  /**
      * The maximum number of grid positions (both horizontally and
      * vertically) that can be laid out by the grid bag layout.
      */
-    static const int MAXGRIDSIZE;
+  static const int MAXGRIDSIZE;
 
-    /**
+  /**
      * The smallest grid that can be laid out by the grid bag layout.
      */
-    static const int MINSIZE ;
+  static const int MINSIZE;
 
-   /** 
+  /** 
      * Preferred size of grid.
      */
-    static const int PREFERREDSIZE;
-
+  static const int PREFERREDSIZE;
 private:
-	struct GridBagLayoutInfo
-	{
-	  /// number of cells horizontally, vertically 
-	  int width, height;		
+  struct GridBagLayoutInfo
+  {
+    /// number of cells horizontally, vertically
+    int width, height;
 
-	  /// starting point for layout 
-	  int startx, starty;	
-	  
-	  /// largest minWidth in each column 
-	  int *minWidth;		
+    /// starting point for layout
+    int startx, starty;
 
-	  /// largest minHeight in each row 
-	  int *minHeight;		
+    /// largest minWidth in each column
+    int *minWidth;
 
-	  /// largest weight in each column 
-	  double *weightX;		
+    /// largest minHeight in each row
+    int *minHeight;
 
-	  /// largest weight in each row 
-	  double *weightY;		
+    /// largest weight in each column
+    double *weightX;
 
-	  /// Builds a new default layout
-	  GridBagLayoutInfo();
-	  /// Destroy this layout properly
-	  ~GridBagLayoutInfo();
+    /// largest weight in each row
+    double *weightY;
 
-	  /// Shallow copy
-	  void Set(GridBagLayoutInfo &l2);
+    /// Builds a new default layout
+    GridBagLayoutInfo();
 
-	  /// Deep copy
-	  GridBagLayoutInfo *Clone();
-	};
+    /// Destroy this layout properly
+    ~GridBagLayoutInfo();
 
-	/**
+    /// Shallow copy
+    void Set (GridBagLayoutInfo &l2);
+
+    /// Deep copy
+    GridBagLayoutInfo *Clone ();
+  };
+
+  /**
      * This hashtable maintains the association between
      * a component and its gridbag constraints.
      * The Keys in comptable are the components and the
      * values are the instances of GridBagConstraints.
      */
-	csHashMap comptable;
+  csHashMap comptable;
 
-	/**
+  /**
      * This field holds a gridbag constraints instance
      * containing the default values, so if a component
      * does not have gridbag constraints associated with
      * it, then the component will be assigned a
      * copy of the <code>defaultConstraints</code>.
      */
-	awsGridBagConstraints defaultConstraints;
+  awsGridBagConstraints defaultConstraints;
 
-	/**
+  /**
      * This field holds tha layout information
      * for the gridbag.  The information in this field
      * is based on the most recent validation of the
@@ -89,9 +89,9 @@ private:
      * the gridbag or if there are components, they have
      * not yet been validated.
      */
-    GridBagLayoutInfo *layoutInfo;
+  GridBagLayoutInfo *layoutInfo;
 
-	/**
+  /**
      * This field holds the overrides to the column minimum
      * width.  If this field is non-null the values are
      * applied to the gridbag after all of the minimum columns
@@ -101,11 +101,11 @@ private:
      * the number of elements in columnWidth.
      */
   int *columnWidths;
-  
+
   /// length of column widths
   int columnWidthsLength;
 
-   /**
+  /**
      * This field holds the overrides to the row minimum
      * heights.  If this field is non-null the values are
      * applied to the gridbag after all of the minimum row
@@ -118,7 +118,6 @@ private:
 
   /// length of column widths
   int rowHeightsLength;
-
 
   /**
      * This field holds the overrides to the column weights.
@@ -136,7 +135,7 @@ private:
   /// length of columnWeigths
   int columnWeightsLength;
 
-    /**
+  /**
      * This field holds the overrides to the row weights.
      * If this field is non-null the values are
      * applied to the gridbag after all of the rows
@@ -151,29 +150,31 @@ private:
 
   /// length of rowWeights
   int rowWeightsLength;
-	
-	
 public:
-	/** Constructs a gridbag layout.  Note that columns and rows have a fixed
+  /** Constructs a gridbag layout.  Note that columns and rows have a fixed
 	 * percentage size that does not change.
 	 */
-	awsGridBagLayout(iAwsComponent *o);
+  awsGridBagLayout (iAwsComponent *o);
 
+  /** Adds a component into this GridBagLayout */
+  virtual csRect AddComponent (
+                  iAwsPrefManager *pm,
+                  awsComponentNode *settings,
+                  iAwsComponent *cmp);
 
-	/** Adds a component into this GridBagLayout */
-	virtual csRect AddComponent(iAwsPrefManager *pm, awsComponentNode *settings, iAwsComponent *cmp);
+  /** Lays out components properly */
+  virtual void LayoutComponents ();
 
-	/** Lays out components properly */
-        virtual void LayoutComponents();
-
-	/**
+  /**
           * Sets the constraints for the specified component in this layout.
           * @param       comp the component to be modified.
 	  * @param       constraints the constraints to be applied.
 	  */
-	void setConstraints(iAwsComponent *cmp, awsGridBagConstraints &constraints);
+  void setConstraints (
+        iAwsComponent *cmp,
+        awsGridBagConstraints &constraints);
 
-    /**
+  /**
      * Gets the constraints for the specified component.  A copy of
      * the actual <code>GridBagConstraints</code> object is returned.
      * @param       comp the component to be queried.
@@ -181,32 +182,32 @@ public:
      *                  grid bag layout; a copy of the actual constraint
      *                  object is returned.
      */
-    awsGridBagConstraints getConstraints(iAwsComponent *cmp);
+  awsGridBagConstraints getConstraints (iAwsComponent *cmp);
 
-	/**
+  /**
      * Retrieves the constraints for the specified component.
      * The return value is not a copy, but is the actual
      * <code>GridBagConstraints</code> object used by the layout mechanism.
      * @param       comp the component to be queried
      * @return      the contraints for the specified component.
      */
-    awsGridBagConstraints *lookupConstraints(iAwsComponent *cmp);
+  awsGridBagConstraints *lookupConstraints (iAwsComponent *cmp);
 
-    /**
+  /**
      * Removes the constraints for the specified component in this layout
      * @param       comp the component to be modified.
      */
-    void removeConstraints(iAwsComponent *cmp);
+  void removeConstraints (iAwsComponent *cmp);
 
-    /**
+  /**
      * Determines the origin of the layout grid.
      * Most applications do not call this method directly.
      * @return     the origin of the cell in the top-left
      *                    corner of the layout grid.
      */
-    csPoint getLayoutOrigin ();
+  csPoint getLayoutOrigin ();
 
-    /**
+  /**
      * Determines column widths and row heights for the layout grid.
      * <p>
      * Most applications do not call this method directly.
@@ -214,9 +215,9 @@ public:
      *                       of the layout columns and
      *                       the heights of the layout rows.
      */
-    void getLayoutDimensions (int **row, int **col);
+  void getLayoutDimensions (int **row, int **col);
 
-	/**
+  /**
      * Determines the weights of the layout grid's columns and rows.
      * Weights are used to calculate how much a given column or row
      * stretches beyond its preferred size, if the layout has extra
@@ -227,9 +228,9 @@ public:
      *                    horizontal weights of the layout columns
      *                    and the vertical weights of the layout rows.
      */
-    void getLayoutWeights (double **row, double **col);
+  void getLayoutWeights (double **row, double **col);
 
-    /**
+  /**
      * Determines which cell in the layout grid contains the point
      * specified by <code>(x,&nbsp;y)</code>. Each cell is identified
      * by its column index (ranging from 0 to the number of columns
@@ -250,26 +251,26 @@ public:
      *             in the layout grid contains the point
      *             (<i>x</i>,&nbsp;<i>y</i>).
      */
-    csPoint location(int x, int y);
+  csPoint location (int x, int y);
 
-
-    /**
+  /**
      * Adds the specified component to the layout, using the specified
      * constraint object.
      * @param      comp         the component to be added.
      * @param      constraints  an object that determines how
      *                              the component is added to the layout.
      */
-    void addLayoutComponent(iAwsComponent *cmp, awsGridBagConstraints &constraints);
+  void addLayoutComponent (
+        iAwsComponent *cmp,
+        awsGridBagConstraints &constraints);
 
-    /**
+  /**
      * Removes the specified component from this layout.
      * <p>
      * Most applications do not call this method directly.
      * @param    comp   the component to be removed.
      */
-    void removeLayoutComponent(iAwsComponent *cmp);
-
+  void removeLayoutComponent (iAwsComponent *cmp);
 protected:
   /**
    * Fill in an instance of the above structure for the current set
@@ -283,27 +284,23 @@ protected:
    * This also caches the minsizes for all the children when they are
    * first encountered (so subsequent loops don't need to ask again).
    */
-  GridBagLayoutInfo* GetLayoutInfo(iAwsComponent *parent, int sizeflag);
+  GridBagLayoutInfo *GetLayoutInfo (iAwsComponent *parent, int sizeflag);
 
-
-  
   /**
    * Adjusts the x, y, width, and height fields to the correct
    * values depending on the constraint geometry and pads.
    */
-  void AdjustForGravity(awsGridBagConstraints *constraints, csRect r);
+  void AdjustForGravity (awsGridBagConstraints *constraints, csRect r);
 
   /**
    * Figure out the minimum size of the
    * master based on the information from GetLayoutInfo()
    */
-  csRect GetMinSize(iAwsComponent *parent, GridBagLayoutInfo *info);
+  csRect GetMinSize (iAwsComponent *parent, GridBagLayoutInfo *info);
 
   /**
    * Lay out the grid
    */
-  void ArrangeGrid(iAwsComponent *parent);
-
+  void ArrangeGrid (iAwsComponent *parent);
 };
-
 #endif

@@ -11,50 +11,52 @@ SCF_IMPLEMENT_IBASE(awsLabel)
   SCF_IMPLEMENTS_INTERFACE(awsComponent)
 SCF_IMPLEMENT_IBASE_END
 
-const int awsLabel::signalClicked=0x1;
+const int awsLabel:: signalClicked = 0x1;
+const int awsLabel:: alignLeft = 0x0;
+const int awsLabel:: alignRight = 0x1;
+const int awsLabel:: alignCenter = 0x2;
 
-const int awsLabel::alignLeft=0x0;
-const int awsLabel::alignRight=0x1;
-const int awsLabel::alignCenter=0x2;
-
-awsLabel::awsLabel():is_down(false), mouse_is_over(false), alignment(0),
-                     caption(NULL)
+awsLabel::awsLabel () :
+  is_down(false),
+  mouse_is_over(false),
+  alignment(0),
+  caption(NULL)
 {
-  SetFlag(AWSF_CMP_ALWAYSERASE);
+  SetFlag (AWSF_CMP_ALWAYSERASE);
 }
 
-awsLabel::~awsLabel()
-{ }
-
-char *
-awsLabel::Type()
-{ return "Label"; }
-
-bool
-awsLabel::Setup(iAws *_wmgr, awsComponentNode *settings)
+awsLabel::~awsLabel ()
 {
- if (!awsComponent::Setup(_wmgr, settings)) return false;
-
- iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
-
- pm->GetString(settings, "Caption", caption);
- pm->GetInt(settings, "Align", alignment);
-
- return true;
 }
 
-bool
-awsLabel::GetProperty(char *name, void **parm)
+char *awsLabel::Type ()
 {
-  if (awsComponent::GetProperty(name, parm)) return true;
+  return "Label";
+}
 
-  if (strcmp("Caption", name)==0)
+bool awsLabel::Setup (iAws *_wmgr, awsComponentNode *settings)
+{
+  if (!awsComponent::Setup (_wmgr, settings)) return false;
+
+  iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
+
+  pm->GetString (settings, "Caption", caption);
+  pm->GetInt (settings, "Align", alignment);
+
+  return true;
+}
+
+bool awsLabel::GetProperty (char *name, void **parm)
+{
+  if (awsComponent::GetProperty (name, parm)) return true;
+
+  if (strcmp ("Caption", name) == 0)
   {
     char *st = NULL;
 
-    if (caption) st=caption->GetData();
+    if (caption) st = caption->GetData ();
 
-    iString *s = new scfString(st);
+    iString *s = new scfString (st);
     *parm = (void *)s;
     return true;
   }
@@ -62,26 +64,25 @@ awsLabel::GetProperty(char *name, void **parm)
   return false;
 }
 
-bool
-awsLabel::SetProperty(char *name, void *parm)
+bool awsLabel::SetProperty (char *name, void *parm)
 {
-  if (awsComponent::SetProperty(name, parm)) return true;
+  if (awsComponent::SetProperty (name, parm)) return true;
 
-  if (strcmp("Caption", name)==0)
+  if (strcmp ("Caption", name) == 0)
   {
-    iString *s = (iString *)(parm);
+    iString *s = (iString *) (parm);
 
-    if (s && s->Length())
+    if (s && s->Length ())
     {
-      if (caption) caption->DecRef();
-      caption=s;
-      caption->IncRef();
-      Invalidate();
-    } 
+      if (caption) caption->DecRef ();
+      caption = s;
+      caption->IncRef ();
+      Invalidate ();
+    }
     else
     {
-      if (caption) caption->DecRef();
-      caption=NULL;
+      if (caption) caption->DecRef ();
+      caption = NULL;
     }
 
     return true;
@@ -90,125 +91,113 @@ awsLabel::SetProperty(char *name, void *parm)
   return false;
 }
 
-
-void
-awsLabel::OnDraw(csRect clip)
+void awsLabel::OnDraw (csRect clip)
 {
-  iGraphics2D *g2d = WindowManager()->G2D();
+  iGraphics2D *g2d = WindowManager ()->G2D ();
 
-   // Draw the caption, if there is one
-   if (caption)
+  // Draw the caption, if there is one
+  if (caption)
+  {
+    int tw, th, tx, ty, mcc;
+
+    mcc = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetLength (
+        caption->GetData (),
+        Frame ().Width ());
+
+    scfString tmp (caption->GetData ());
+    tmp.Truncate (mcc);
+
+    // Get the size of the text
+    WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
+        tmp.GetData (),
+        tw,
+        th);
+
+    // Calculate the center
+    ty = (Frame ().Height () >> 1) - (th >> 1);
+
+    switch (alignment)
     {
-      int tw, th, tx, ty, mcc;
+      case alignRight:  tx = Frame ().Width () - tw; break;
 
-      mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(caption->GetData(), Frame().Width());
+      case alignCenter: tx = (Frame ().Width () >> 1) - (tw >> 1); break;
 
-      scfString tmp(caption->GetData());
-      tmp.Truncate(mcc);
-
-      // Get the size of the text
-      WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(tmp.GetData(), tw, th);
-
-      // Calculate the center
-      ty = (Frame().Height()>>1) - (th>>1);
-
-      switch(alignment)
-      {
-      case alignRight:
-        tx = Frame().Width()-tw;
-        break;
-
-      case alignCenter:
-        tx = (Frame().Width()>>1) -  (tw>>1);
-        break;
-
-      default:
-        tx = 0;
-        break;
-      }
-
-      // Draw the text
-      g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
-                 Frame().xmin+tx+is_down,
-                 Frame().ymin+ty+is_down,
-                 WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
-                 -1,
-                 tmp.GetData());
-
+      default:          tx = 0; break;
     }
+
+    // Draw the text
+    g2d->Write (
+        WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+        Frame ().xmin + tx + is_down,
+        Frame ().ymin + ty + is_down,
+        WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
+        -1,
+        tmp.GetData ());
+  }
 }
 
-bool
-awsLabel::OnMouseDown(int ,int ,int )
+bool awsLabel::OnMouseDown (int, int, int)
 {
-  is_down=true;
+  is_down = true;
+
   //Invalidate();
   return false;
 }
 
-bool
-awsLabel::OnMouseUp(int ,int ,int )
+bool awsLabel::OnMouseUp (int, int, int)
 {
-  if (is_down)
-    Broadcast(signalClicked);
+  if (is_down) Broadcast (signalClicked);
 
-  is_down=false;
+  is_down = false;
+
   //Invalidate();
   return false;
 }
 
-bool
-awsLabel::OnMouseMove(int ,int ,int )
+bool awsLabel::OnMouseMove (int, int, int)
 {
   return false;
 }
 
-bool
-awsLabel::OnMouseClick(int ,int ,int )
+bool awsLabel::OnMouseClick (int, int, int)
 {
   return false;
 }
 
-bool
-awsLabel::OnMouseDoubleClick(int ,int ,int )
+bool awsLabel::OnMouseDoubleClick (int, int, int)
 {
   return false;
 }
 
-bool
-awsLabel::OnMouseExit()
+bool awsLabel::OnMouseExit ()
 {
-  mouse_is_over=false;
+  mouse_is_over = false;
+
   //Invalidate();
-
-  if (is_down)
-    is_down=false;
+  if (is_down) is_down = false;
 
   return true;
 }
 
-bool
-awsLabel::OnMouseEnter()
+bool awsLabel::OnMouseEnter ()
 {
-  mouse_is_over=true;
+  mouse_is_over = true;
+
   //Invalidate();
   return true;
 }
 
-bool
-awsLabel::OnKeypress(int ,int )
+bool awsLabel::OnKeypress (int, int)
 {
   return false;
 }
 
-bool
-awsLabel::OnLostFocus()
+bool awsLabel::OnLostFocus ()
 {
   return false;
 }
 
-bool
-awsLabel::OnGainFocus()
+bool awsLabel::OnGainFocus ()
 {
   return false;
 }
@@ -218,25 +207,24 @@ SCF_IMPLEMENT_IBASE(awsLabelFactory)
   SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
 SCF_IMPLEMENT_IBASE_END
 
-awsLabelFactory::awsLabelFactory(iAws *wmgr):awsComponentFactory(wmgr)
+awsLabelFactory::awsLabelFactory (iAws *wmgr) :
+  awsComponentFactory(wmgr)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  Register("Label");
-  RegisterConstant("signalLabelClicked",  awsLabel::signalClicked);
+  Register ("Label");
+  RegisterConstant ("signalLabelClicked", awsLabel::signalClicked);
 
-  RegisterConstant("lblAlignLeft",  awsLabel::alignLeft);
-  RegisterConstant("lblAlignRight",  awsLabel::alignRight);
-  RegisterConstant("lblAlignCenter",  awsLabel::alignCenter);
+  RegisterConstant ("lblAlignLeft", awsLabel::alignLeft);
+  RegisterConstant ("lblAlignRight", awsLabel::alignRight);
+  RegisterConstant ("lblAlignCenter", awsLabel::alignCenter);
 }
 
-awsLabelFactory::~awsLabelFactory()
+awsLabelFactory::~awsLabelFactory ()
 {
- // empty
+  // empty
 }
 
-iAwsComponent *
-awsLabelFactory::Create()
+iAwsComponent *awsLabelFactory::Create ()
 {
- return new awsLabel;
+  return new awsLabel;
 }
-

@@ -6,29 +6,36 @@
 
 #include <string.h>
 
-void
-awsActionDispatcher::Register(char *name, void (Action)(void *owner, iAwsParmList &parmlist))
+void awsActionDispatcher::Register (
+  char *name,
+  void (Action) (void *owner, iAwsParmList &parmlist))
 {
-  awsActionMap *map = new awsActionMap();
+  awsActionMap *map = new awsActionMap ();
 
-  map->name=aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)name, strlen(name));
+  map->name = aws_adler32 (
+      aws_adler32 (0, NULL, 0),
+      (unsigned char *)name,
+      strlen (name));
   map->Action = Action;
 
-  actions.Push(map);
+  actions.Push (map);
 }
 
-void
-awsActionDispatcher::Execute(char *action, void *owner, iAwsParmList &parmlist)
+void awsActionDispatcher::Execute (
+  char *action,
+  void *owner,
+  iAwsParmList &parmlist)
 {
-  unsigned long name = aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)action, strlen(action));
+  unsigned long name = aws_adler32 (
+      aws_adler32 (0, NULL, 0),
+      (unsigned char *)action,
+      strlen (action));
 
   int i;
-  for(i=0; i<actions.Length(); ++i)
+  for (i = 0; i < actions.Length (); ++i)
   {
     awsActionMap *map = (awsActionMap *)actions[i];
 
-    if (name==map->name)
-      map->Action(owner,parmlist);
+    if (name == map->name) map->Action (owner, parmlist);
   }
 }
-

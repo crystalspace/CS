@@ -14,55 +14,59 @@ SCF_IMPLEMENT_IBASE(awsGroupFrame)
   SCF_IMPLEMENTS_INTERFACE(awsComponent)
 SCF_IMPLEMENT_IBASE_END
 
-const int awsGroupFrame::fsBump =0x0;
-const int awsGroupFrame::fsSimple =0x1;
-const int awsGroupFrame::fsRaised =0x2;
-const int awsGroupFrame::fsSunken =0x3;
-const int awsGroupFrame::fsFlat =0x4;
-const int awsGroupFrame::fsNone =0x5;
+const int awsGroupFrame:: fsBump = 0x0;
+const int awsGroupFrame:: fsSimple = 0x1;
+const int awsGroupFrame:: fsRaised = 0x2;
+const int awsGroupFrame:: fsSunken = 0x3;
+const int awsGroupFrame:: fsFlat = 0x4;
+const int awsGroupFrame:: fsNone = 0x5;
 
-const int awsGroupFrame::signalClicked=0x1;
+const int awsGroupFrame:: signalClicked = 0x1;
 
-awsGroupFrame::awsGroupFrame():frame_style(0), alpha_level(96), bkg(NULL), caption(NULL)
+awsGroupFrame::awsGroupFrame () :
+  frame_style(0),
+  alpha_level(96),
+  bkg(NULL),
+  caption(NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
-awsGroupFrame::~awsGroupFrame()
-{}
-
-char *
-awsGroupFrame::Type()
-{ return "Group Frame"; }
-
-bool
-awsGroupFrame::Setup(iAws *_wmgr, awsComponentNode *settings)
+awsGroupFrame::~awsGroupFrame ()
 {
- if (!awsComponent::Setup(_wmgr, settings)) return false;
-
- iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
-
- pm->LookupIntKey("OverlayTextureAlpha", alpha_level);
- pm->GetInt(settings, "Style", frame_style);
- pm->GetString(settings, "Caption", caption);
-
- bkg=pm->GetTexture("Texture");
-
- return true;
 }
 
-bool
-awsGroupFrame::GetProperty(char *name, void **parm)
+char *awsGroupFrame::Type ()
 {
-  if (awsComponent::GetProperty(name, parm)) return true;
+  return "Group Frame";
+}
 
-  if (strcmp("Caption", name)==0)
+bool awsGroupFrame::Setup (iAws *_wmgr, awsComponentNode *settings)
+{
+  if (!awsComponent::Setup (_wmgr, settings)) return false;
+
+  iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
+
+  pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);
+  pm->GetInt (settings, "Style", frame_style);
+  pm->GetString (settings, "Caption", caption);
+
+  bkg = pm->GetTexture ("Texture");
+
+  return true;
+}
+
+bool awsGroupFrame::GetProperty (char *name, void **parm)
+{
+  if (awsComponent::GetProperty (name, parm)) return true;
+
+  if (strcmp ("Caption", name) == 0)
   {
     char *st = NULL;
 
-    if (caption) st=caption->GetData();
+    if (caption) st = caption->GetData ();
 
-    iString *s = new scfString(st);
+    iString *s = new scfString (st);
     *parm = (void *)s;
     return true;
   }
@@ -70,26 +74,25 @@ awsGroupFrame::GetProperty(char *name, void **parm)
   return false;
 }
 
-bool
-awsGroupFrame::SetProperty(char *name, void *parm)
+bool awsGroupFrame::SetProperty (char *name, void *parm)
 {
-  if (awsComponent::SetProperty(name, parm)) return true;
+  if (awsComponent::SetProperty (name, parm)) return true;
 
-  if (strcmp("Caption", name)==0)
+  if (strcmp ("Caption", name) == 0)
   {
-    iString *s = (iString *)(parm);
+    iString *s = (iString *) (parm);
 
-    if (s && s->Length())
+    if (s && s->Length ())
     {
-      if (caption) caption->DecRef();
-      caption=s;
-      caption->IncRef();
-      Invalidate();
+      if (caption) caption->DecRef ();
+      caption = s;
+      caption->IncRef ();
+      Invalidate ();
     }
     else
     {
-      if (caption) caption->DecRef();
-      caption=NULL;
+      if (caption) caption->DecRef ();
+      caption = NULL;
     }
 
     return true;
@@ -98,15 +101,19 @@ awsGroupFrame::SetProperty(char *name, void *parm)
   return false;
 }
 
-void
-awsGroupFrame::OnDraw(csRect clip)
+void awsGroupFrame::OnDraw (csRect clip)
 {
-
-  iGraphics2D *g2d = WindowManager()->G2D();
+  iGraphics2D *g2d = WindowManager ()->G2D ();
 
   aws3DFrame frame3d;
 
-  frame3d.Draw(WindowManager(), Window(), Frame(), frame_style, bkg, alpha_level);
+  frame3d.Draw (
+      WindowManager (),
+      Window (),
+      Frame (),
+      frame_style,
+      bkg,
+      alpha_level);
 
   // Draw the caption, if there is one
   if (caption)
@@ -114,79 +121,72 @@ awsGroupFrame::OnDraw(csRect clip)
     int tw, th, tx, ty;
 
     // Get the size of the text
-    WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(caption->GetData(), tw, th);
+    WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
+        caption->GetData (),
+        tw,
+        th);
 
     // Calculate the center
-    tx = 10; //(Frame().Width()>>1) -  (tw>>1);
+    tx = 10;  //(Frame().Width()>>1) -  (tw>>1);
     ty = 8;   //(Frame().Height()>>1) - (th>>1);
 
     // Draw the text
-    g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
-               Frame().xmin+tx,
-               Frame().ymin+ty,
-               WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
-               -1,
-               caption->GetData());
-
+    g2d->Write (
+        WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+        Frame ().xmin + tx,
+        Frame ().ymin + ty,
+        WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
+        -1,
+        caption->GetData ());
   }
 }
 
-bool
-awsGroupFrame::OnMouseDown(int ,int ,int )
+bool awsGroupFrame::OnMouseDown (int, int, int)
 {
   return false;
 }
 
-bool
-awsGroupFrame::OnMouseUp(int ,int ,int )
+bool awsGroupFrame::OnMouseUp (int, int, int)
 {
   return false;
 }
 
-bool
-awsGroupFrame::OnMouseMove(int ,int ,int )
+bool awsGroupFrame::OnMouseMove (int, int, int)
 {
   return false;
 }
 
-bool
-awsGroupFrame::OnMouseClick(int ,int ,int )
+bool awsGroupFrame::OnMouseClick (int, int, int)
 {
   return false;
 }
 
-bool
-awsGroupFrame::OnMouseDoubleClick(int ,int ,int )
+bool awsGroupFrame::OnMouseDoubleClick (int, int, int)
 {
   return false;
 }
 
-bool
-awsGroupFrame::OnMouseExit()
+bool awsGroupFrame::OnMouseExit ()
 {
   return false;
 }
 
-bool
-awsGroupFrame::OnMouseEnter()
+bool awsGroupFrame::OnMouseEnter ()
 {
   return false;
 }
 
-bool
-awsGroupFrame::OnKeypress(int ,int )
+bool awsGroupFrame::OnKeypress (int, int)
 {
   return false;
 }
 
-bool
-awsGroupFrame::OnLostFocus()
+bool awsGroupFrame::OnLostFocus ()
 {
   return false;
 }
 
-bool
-awsGroupFrame::OnGainFocus()
+bool awsGroupFrame::OnGainFocus ()
 {
   return false;
 }
@@ -196,28 +196,28 @@ SCF_IMPLEMENT_IBASE(awsGroupFrameFactory)
   SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
 SCF_IMPLEMENT_IBASE_END
 
-awsGroupFrameFactory::awsGroupFrameFactory(iAws *wmgr):awsComponentFactory(wmgr)
+awsGroupFrameFactory::awsGroupFrameFactory (
+  iAws *wmgr) :
+    awsComponentFactory(wmgr)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  Register("Group Frame");
-  RegisterConstant("gfsBump",  awsGroupFrame::fsBump);
-  RegisterConstant("gfsSimple", awsGroupFrame::fsSimple);
-  RegisterConstant("gfsSunken",  awsGroupFrame::fsSunken);
-  RegisterConstant("gfsRaised", awsGroupFrame::fsRaised);
-  RegisterConstant("gfsFlat", awsGroupFrame::fsFlat);
-  RegisterConstant("gfsNone", awsGroupFrame::fsNone);
+  Register ("Group Frame");
+  RegisterConstant ("gfsBump", awsGroupFrame::fsBump);
+  RegisterConstant ("gfsSimple", awsGroupFrame::fsSimple);
+  RegisterConstant ("gfsSunken", awsGroupFrame::fsSunken);
+  RegisterConstant ("gfsRaised", awsGroupFrame::fsRaised);
+  RegisterConstant ("gfsFlat", awsGroupFrame::fsFlat);
+  RegisterConstant ("gfsNone", awsGroupFrame::fsNone);
 
-  RegisterConstant("signalGroupFrameClicked",  awsGroupFrame::signalClicked);
+  RegisterConstant ("signalGroupFrameClicked", awsGroupFrame::signalClicked);
 }
 
-awsGroupFrameFactory::~awsGroupFrameFactory()
+awsGroupFrameFactory::~awsGroupFrameFactory ()
 {
- // empty
+  // empty
 }
 
-iAwsComponent *
-awsGroupFrameFactory::Create()
+iAwsComponent *awsGroupFrameFactory::Create ()
 {
- return new awsGroupFrame;
+  return new awsGroupFrame;
 }
-

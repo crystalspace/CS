@@ -17,15 +17,15 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "awstimer.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"
 
-const int awsTimer::signalTick=0x1;
+const int awsTimer:: signalTick = 0x1;
 
-awsTimer::awsTimer (iObjectRegistry *object_reg, iAwsComponent *comp) : awsSource (comp)
+awsTimer::awsTimer (iObjectRegistry *object_reg, iAwsComponent *comp) :
+  awsSource(comp)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
@@ -41,10 +41,10 @@ awsTimer::~awsTimer ()
 {
   if (ehSetup)
   {
-    if (!stopped)
-      eq->RemoveListener (&scfiEventHandler);
+    if (!stopped) eq->RemoveListener (&scfiEventHandler);
     eq->DecRef ();
   }
+
   SCF_DEC_REF (vc);
 }
 
@@ -57,10 +57,10 @@ bool awsTimer::Setup ()
       eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
       ehSetup = (eq != NULL);
     }
-    if (!vc)
-      vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
-    bSetup = ehSetup && (vc!=NULL);
+    if (!vc) vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+
+    bSetup = ehSetup && (vc != NULL);
   }
 
   return bSetup;
@@ -81,34 +81,35 @@ bool awsTimer::HandleEvent (iEvent &Event)
 
     if (delta >= nTicks)
     {
-      // fire 
+      // fire
       Broadcast (signalTick);
 
       // if we're not too far behind, switch to next pulse
+
       // otherwise we'll have to jump far to the current time
       start += nTicks;
-      if (now - start >= nTicks)
-        start = now;
+      if (now - start >= nTicks) start = now;
     }
   }
+
   return false;
 }
 
 void awsTimer::Stop ()
 {
   stopped = true;
-  if (ehSetup)
-    eq->RemoveListener (&scfiEventHandler);
+  if (ehSetup) eq->RemoveListener (&scfiEventHandler);
 }
 
 bool awsTimer::Start ()
 {
-  if (Setup())
+  if (Setup ())
   {
     eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
     stopped = false;
     start = vc->GetCurrentTicks ();
   }
+
   return bSetup;
 }
 
@@ -117,12 +118,12 @@ bool awsTimer::IsRunning ()
   return !stopped;
 }
 
-SCF_IMPLEMENT_IBASE (awsTimer)
-  SCF_IMPLEMENTS_INTERFACE (iAwsSource)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE(awsTimer)
+  SCF_IMPLEMENTS_INTERFACE(iAwsSource)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (awsTimer::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 

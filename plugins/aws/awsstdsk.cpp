@@ -4,59 +4,58 @@
 
 #include <stdio.h>
 
-
-void
-awsStandardSink::Hide(void *sink, iAwsSource *source)
+void awsStandardSink::Hide (void *sink, iAwsSource *source)
 {
-  (void) sink;
-  iAwsComponent *c = source->GetComponent();
+  (void)sink;
 
-  c->Hide();
+  iAwsComponent *c = source->GetComponent ();
+
+  c->Hide ();
 }
 
-void
-awsStandardSink::Show(void *sink, iAwsSource *source)
+void awsStandardSink::Show (void *sink, iAwsSource *source)
 {
-  (void) sink;
-  iAwsComponent *c = source->GetComponent();
+  (void)sink;
 
-  c->Show();
+  iAwsComponent *c = source->GetComponent ();
+
+  c->Show ();
 }
 
-void
-awsStandardSink::HideWindow(void *sink, iAwsSource *source)
+void awsStandardSink::HideWindow (void *sink, iAwsSource *source)
 {
-  (void) sink;
-  iAwsComponent *c = source->GetComponent();
+  (void)sink;
 
-  if (strcmp(c->Type(), "Window")==0)
+  iAwsComponent *c = source->GetComponent ();
+
+  if (strcmp (c->Type (), "Window") == 0)
   {
-    c->Hide();
+    c->Hide ();
   }
   else
   {
-    if (c->Window()) c->Window()->Hide();
+    if (c->Window ()) c->Window ()->Hide ();
   }
 }
 
-void
-awsStandardSink::Invalidate(void *sink, iAwsSource *source)
+void awsStandardSink::Invalidate (void *sink, iAwsSource *source)
 {
-  (void) sink;
-  iAwsComponent *c = source->GetComponent();
+  (void)sink;
 
-  c->Invalidate();
+  iAwsComponent *c = source->GetComponent ();
+
+  c->Invalidate ();
 }
 
-awsStandardSink::awsStandardSink():awsSink(NULL)
+awsStandardSink::awsStandardSink () :
+  awsSink(NULL)
 {
-  RegisterTrigger("Show", Show);
-  RegisterTrigger("Hide", Hide);
-  RegisterTrigger("HideWindow", HideWindow);
-  RegisterTrigger("Invalidate", Invalidate);
+  RegisterTrigger ("Show", Show);
+  RegisterTrigger ("Hide", Hide);
+  RegisterTrigger ("HideWindow", HideWindow);
+  RegisterTrigger ("Invalidate", Invalidate);
 }
 
-awsStandardSink::~awsStandardSink()
+awsStandardSink::~awsStandardSink ()
 {
-
 }

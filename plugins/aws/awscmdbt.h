@@ -1,5 +1,6 @@
- #ifndef __AWS_COMMAND_BUTTON_H__
- #define __AWS_COMMAND_BUTTON_H__
+#ifndef __AWS_COMMAND_BUTTON_H__
+# define __AWS_COMMAND_BUTTON_H__
+
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
 
@@ -17,135 +18,128 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-#include "awscomp.h"
+# include "awscomp.h"
 
-
-class awsCmdButton : public awsComponent
+class awsCmdButton :
+  public awsComponent
 {
- protected:
-   /// True when button is down, false if up
-   bool is_down;
+protected:
+  /// True when button is down, false if up
+  bool is_down;
 
-   /// True if the component has the mouse over it
-   bool mouse_is_over;
+  /// True if the component has the mouse over it
+  bool mouse_is_over;
 
-   /// True if this acts as a push-button switch (like tool-bar mode)
-   bool is_switch;
+  /// True if this acts as a push-button switch (like tool-bar mode)
+  bool is_switch;
 
-   /// True if button was down, and button is in switch mode (toggle=yes)
-   bool was_down;
-   
-   /** Multipurpose: holds the texture and image bitmaps for normal and toolbar buttons, also
+  /// True if button was down, and button is in switch mode (toggle=yes)
+  bool was_down;
+
+  /** Multipurpose: holds the texture and image bitmaps for normal and toolbar buttons, also
     * holds the normal, highlighted, and clicked images for bitmap buttons.
     */
-   iTextureHandle *tex[3];
+  iTextureHandle *tex[3];
 
-   /// Flags for frame style.
-   int frame_style;
+  /// Flags for frame style.
+  int frame_style;
 
-   /// Alpha level for this component
-   int alpha_level;
+  /// Alpha level for this component
+  int alpha_level;
 
-   /// Caption text for this component
-   iString *caption;
-
+  /// Caption text for this component
+  iString *caption;
 protected:
-   void ClearGroup();
-
+  void ClearGroup ();
 public:
-    awsCmdButton();
-    virtual ~awsCmdButton();
+  awsCmdButton ();
+  virtual ~awsCmdButton ();
 
-   /******* Frame Styles **********************/
+  /******* Frame Styles **********************/
 
-   /// A "normal" button.  Is textured if there is a background texture.
-   static const int fsNormal;
+  /// A "normal" button.  Is textured if there is a background texture.
+  static const int fsNormal;
 
-   /// A toolbar button.  Cannot have text, only an image.
-   static const int fsToolbar;
+  /// A toolbar button.  Cannot have text, only an image.
+  static const int fsToolbar;
 
-   /// A button entirely drawn from bitmap images.  Must specify normal, focused and clicked.
-   static const int fsBitmap;
+  /// A button entirely drawn from bitmap images.  Must specify normal, focused and clicked.
+  static const int fsBitmap;
 
-   /******* Signals **********************/
+  /******* Signals **********************/
 
-   /// An up and down motion for the button
-   static const int signalClicked;
-
-
+  /// An up and down motion for the button
+  static const int signalClicked;
 public:
-    /// Get's the texture handle and the title, plus style if there is one.
-    virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
+  /// Get's the texture handle and the title, plus style if there is one.
+  virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
 
-    /// Gets properties
-    bool GetProperty(char *name, void **parm);
+  /// Gets properties
+  bool GetProperty (char *name, void **parm);
 
-    /// Sets properties
-    bool SetProperty(char *name, void *parm);
+  /// Sets properties
+  bool SetProperty (char *name, void *parm);
 
-    /// Returns the named TYPE of the component, like "Radio Button", etc.
-    virtual char *Type();
-
+  /// Returns the named TYPE of the component, like "Radio Button", etc.
+  virtual char *Type ();
 public:
-    SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
-    bool HandleEvent(iEvent& Event);
+  bool HandleEvent (iEvent &Event);
 
-    /// Gets how big this button should ideally be.
-    csRect getPreferredSize();
+  /// Gets how big this button should ideally be.
+  csRect getPreferredSize ();
 
-    /// Gets the smallest this button can be.
-    csRect getMinimumSize();
+  /// Gets the smallest this button can be.
+  csRect getMinimumSize ();
 
-    /// Triggered when the component needs to draw
-    virtual void OnDraw(csRect clip);
+  /// Triggered when the component needs to draw
+  virtual void OnDraw (csRect clip);
 
-    /// Triggered when the user presses a mouse button down
-    virtual bool OnMouseDown(int button, int x, int y);
+  /// Triggered when the user presses a mouse button down
+  virtual bool OnMouseDown (int button, int x, int y);
 
-    /// Triggered when the user unpresses a mouse button
-    virtual bool OnMouseUp(int button, int x, int y);
+  /// Triggered when the user unpresses a mouse button
+  virtual bool OnMouseUp (int button, int x, int y);
 
-    /// Triggered when the user moves the mouse
-    virtual bool OnMouseMove(int button, int x, int y);
+  /// Triggered when the user moves the mouse
+  virtual bool OnMouseMove (int button, int x, int y);
 
-    /// Triggered when the user clicks the mouse
-    virtual bool OnMouseClick(int button, int x, int y);
+  /// Triggered when the user clicks the mouse
+  virtual bool OnMouseClick (int button, int x, int y);
 
-    /// Triggered when the user double clicks the mouse
-    virtual bool OnMouseDoubleClick(int button, int x, int y);
+  /// Triggered when the user double clicks the mouse
+  virtual bool OnMouseDoubleClick (int button, int x, int y);
 
-    /// Triggered when this component loses mouse focus
-    virtual bool OnMouseExit();
+  /// Triggered when this component loses mouse focus
+  virtual bool OnMouseExit ();
 
-    /// Triggered when this component gains mouse focus
-    virtual bool OnMouseEnter();
+  /// Triggered when this component gains mouse focus
+  virtual bool OnMouseEnter ();
 
-    /// Triggered when the user presses a key
-    virtual bool OnKeypress(int key, int modifiers);
+  /// Triggered when the user presses a key
+  virtual bool OnKeypress (int key, int modifiers);
 
-    /// Triggered when the keyboard focus is lost
-    virtual bool OnLostFocus();
+  /// Triggered when the keyboard focus is lost
+  virtual bool OnLostFocus ();
 
-    /// Triggered when the keyboard focus is gained
-    virtual bool OnGainFocus();
-
+  /// Triggered when the keyboard focus is gained
+  virtual bool OnGainFocus ();
 };
 
-class awsCmdButtonFactory : public awsComponentFactory
+class awsCmdButtonFactory :
+  public awsComponentFactory
 {
 public:
-    SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
-    /// Calls register to register the component that it builds with the window manager
-    awsCmdButtonFactory(iAws *wmgr);
+  /// Calls register to register the component that it builds with the window manager
+  awsCmdButtonFactory (iAws *wmgr);
 
-    /// Does nothing
-    virtual ~awsCmdButtonFactory();
+  /// Does nothing
+  virtual ~awsCmdButtonFactory ();
 
-    /// Returns a newly created component of the type this factory handles.
-    virtual iAwsComponent *Create();
+  /// Returns a newly created component of the type this factory handles.
+  virtual iAwsComponent *Create ();
 };
-
 #endif
-

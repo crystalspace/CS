@@ -1,75 +1,89 @@
 #ifndef __AWS_GRIDBAG_CONSTRAINTS__
-#define __AWS_GRIDBAG_CONSTRAINTS__
+# define __AWS_GRIDBAG_CONSTRAINTS__
 
 struct awsGridBagConstraints
 {
   enum
   {
-    GBS_RELATIVE = -1,
+    GBS_RELATIVE  = -1,
+
     /**
      * Specify that this component is the 
      * last component in its column or row. 
      */
     GBS_REMAINDER = 0,
+
     /**
      * Do not resize the component. 
      */
-    GBS_NONE = 0,
+    GBS_NONE      = 0,
+
     /**
      * Resize the component both horizontally and vertically. 
      */
-    GBS_BOTH = 1,
+    GBS_BOTH      = 1,
+
     /**
      * Resize the component horizontally but not vertically. 
      */
-    GBS_HORIZONTAL = 2,
+    GBS_HORIZONTAL= 2,
+
     /**
      * Resize the component vertically but not horizontally. 
      */
-    GBS_VERTICAL = 3,
+    GBS_VERTICAL  = 3,
+
     /**
      * Put the component in the center of its display area.
      */
-    GBS_CENTER = 10,
+    GBS_CENTER    = 10,
+
     /**
      * Put the component at the top of its display area,
      * centered horizontally. 
      */
-    GBS_NORTH = 11,
+    GBS_NORTH     = 11,
+
     /**
      * Put the component at the top-right corner of its display area. 
      */
     GBS_NORTHEAST = 12,
+
     /**
      * Put the component on the right side of its display area, 
      * centered vertically.
      */
-    GBS_EAST = 13,
+    GBS_EAST      = 13,
+
     /**
      * Put the component at the bottom-right corner of its display area. 
      */
     GBS_SOUTHEAST = 14,
+
     /**
      * Put the component at the bottom of its display area, centered 
      * horizontally. 
      */
-    GBS_SOUTH = 15,
+    GBS_SOUTH     = 15,
+
     /**
      * Put the component at the bottom-left corner of its display area. 
      */
     GBS_SOUTHWEST = 16,
+
     /**
      * Put the component on the left side of its display area, 
      * centered vertically.
      */
-    GBS_WEST = 17,
+    GBS_WEST      = 17,
+
     /**
      * Put the component at the top-left corner of its display area. 
      */
     GBS_NORTHWEST = 18
   };
 
-   /**
+  /**
      * Specifies the cell at the left of the component's display area, 
      * where the leftmost cell has <code>gridx=0</code>. The value 
      * <code>RELATIVE</code> specifies that the component be placed just 
@@ -81,7 +95,7 @@ struct awsGridBagConstraints
      */
   int gridx;
 
-   /**
+  /**
      * Specifies the cell at the top of the component's display area, 
      * where the topmost cell has <code>gridy=0</code>. The value 
      * <code>RELATIVE</code> specifies that the component be placed just 
@@ -93,7 +107,7 @@ struct awsGridBagConstraints
      */
   int gridy;
 
-   /**
+  /**
      * Specifies the number of cells in a row for the component's 
      * display area. 
      * <p>
@@ -105,7 +119,7 @@ struct awsGridBagConstraints
      */
   int gridwidth;
 
-   /**
+  /**
      * Specifies the number of cells in a column for the component's 
      * display area. 
      * <p>
@@ -117,7 +131,7 @@ struct awsGridBagConstraints
      */
   int gridheight;
 
-   /**
+  /**
      * Specifies how to distribute extra horizontal space. 
      * <p>
      * The grid bag layout manager calculates the weight of a column to 
@@ -135,7 +149,7 @@ struct awsGridBagConstraints
      */
   double weightx;
 
-   /**
+  /**
      * Specifies how to distribute extra vertical space. 
      * <p>
      * The grid bag layout manager calculates the weight of a row to be 
@@ -153,7 +167,7 @@ struct awsGridBagConstraints
      */
   double weighty;
 
-   /**
+  /**
      * This field is used when the component is smaller than its display 
      * area. It determines where, within the display area, to place the 
      * component. Possible values are <code>CENTER</code>, 
@@ -164,7 +178,7 @@ struct awsGridBagConstraints
      */
   int anchor;
 
-   /**
+  /**
      * This field is used when the component's display area is larger 
      * than the component's requested size. It determines whether to 
      * resize the component, and if so, how. 
@@ -189,7 +203,7 @@ struct awsGridBagConstraints
      */
   int fill;
 
-   /**
+  /**
      * This field specifies the external padding of the component, the 
      * minimum amount of space between the component and the edges of its 
      * display area. 
@@ -198,7 +212,7 @@ struct awsGridBagConstraints
      */
   csRect insets;
 
-   /**
+  /**
      * This field specifies the internal padding of the component, how much 
      * space to add to the minimum width of the component. The width of 
      * the component is at least its minimum width plus 
@@ -208,7 +222,7 @@ struct awsGridBagConstraints
      */
   int ipadx;
 
-   /**
+  /**
      * This field specifies the internal padding, that is, how much 
      * space to add to the minimum height of the component. The height of 
      * the component is at least its minimum height plus 
@@ -218,53 +232,56 @@ struct awsGridBagConstraints
      */
   int ipady;
 
-   /**
+  /**
      * Temporary place holder for the x coordinate.
      */
   int tempX;
-   /**
+
+  /**
      * Temporary place holder for the y coordinate.
      * @serial
      */
   int tempY;
-   /**
+
+  /**
      * Temporary place holder for the Width of the component.
      */
   int tempWidth;
-   /**
+
+  /**
      * Temporary place holder for the Height of the component.
      */
   int tempHeight;
-   /**
+
+  /**
      * The minimum width of the component.  It is used to calculate
      * <code>ipady</code>, where the default will be 0.
      */
   int minWidth;
-   /**
+
+  /**
      * The minimum height of the component. It is used to calculate
      * <code>ipadx</code>, where the default will be 0.
      */
   int minHeight;
-
 public:
-   /**
+  /**
      * Creates a <code>GridBagConstraint</code> object with 
      * all of its fields set to their default value. 
      */
-  awsGridBagConstraints ();
-  
+  awsGridBagConstraints();
+
   /**
     * Creates a <code>GridBagConstraints</code> object with
     * all of its fields set to the passed-in arguments.
     */
-  awsGridBagConstraints(int gridx, int gridy,
-                     int gridwidth, int gridheight,
-                     double weightx, double weighty,
-                     int anchor, int fill,
-                     csRect insets, int ipadx, int ipady);
+  awsGridBagConstraints
+    (
+      int gridx, int gridy, int gridwidth, int gridheight, double weightx,
+        double weighty, int anchor, int fill, csRect insets, int ipadx, int
+          ipady
+    );
 
-  awsGridBagConstraints *Clone();
-
+  awsGridBagConstraints *Clone ();
 };
-
 #endif

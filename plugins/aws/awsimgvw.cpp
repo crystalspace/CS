@@ -14,156 +14,149 @@ SCF_IMPLEMENT_IBASE(awsImageView)
   SCF_IMPLEMENTS_INTERFACE(awsComponent)
 SCF_IMPLEMENT_IBASE_END
 
-const int awsImageView::signalClicked=0x1;
-const int awsImageView::signalMouseDown=0x2;
-const int awsImageView::signalMouseUp=0x3;
-const int awsImageView::signalMouseMoved=0x4;
+const int awsImageView:: signalClicked = 0x1;
+const int awsImageView:: signalMouseDown = 0x2;
+const int awsImageView:: signalMouseUp = 0x3;
+const int awsImageView:: signalMouseMoved = 0x4;
 
-const int awsImageView::fsBump =0x0;
-const int awsImageView::fsSimple =0x1;
-const int awsImageView::fsRaised =0x2;
-const int awsImageView::fsSunken =0x3;
-const int awsImageView::fsFlat =0x4;
-const int awsImageView::fsNone =0x5;
+const int awsImageView:: fsBump = 0x0;
+const int awsImageView:: fsSimple = 0x1;
+const int awsImageView:: fsRaised = 0x2;
+const int awsImageView:: fsSunken = 0x3;
+const int awsImageView:: fsFlat = 0x4;
+const int awsImageView:: fsNone = 0x5;
 
-
-awsImageView::awsImageView():is_down(false), mouse_is_over(false),
-                             was_down(false), img(NULL),
-                             frame_style(0), alpha_level(92)
-
+awsImageView::awsImageView () :
+  is_down(false),
+  mouse_is_over(false),
+  was_down(false),
+  img(NULL),
+  frame_style(0),
+  alpha_level(92)
 {
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
-awsImageView::~awsImageView()
+awsImageView::~awsImageView ()
 {
 }
 
-char *
-awsImageView::Type()
-{ return "Image View"; }
-
-bool
-awsImageView::Setup(iAws *_wmgr, awsComponentNode *settings)
+char *awsImageView::Type ()
 {
-if (!awsComponent::Setup(_wmgr, settings)) return false;
-
- iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
-
- pm->LookupIntKey("OverlayTextureAlpha", alpha_level); // global get
- pm->GetInt(settings, "Style", frame_style);
- pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
- img=pm->GetTexture("Texture");
-
- return true;
+  return "Image View";
 }
 
-bool
-awsImageView::GetProperty(char *name, void **parm)
+bool awsImageView::Setup (iAws *_wmgr, awsComponentNode *settings)
 {
-  if (awsComponent::GetProperty(name, parm)) return true;
+  if (!awsComponent::Setup (_wmgr, settings)) return false;
+
+  iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
+
+  pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);  // global get
+  pm->GetInt (settings, "Style", frame_style);
+  pm->GetInt (settings, "Alpha", alpha_level);            // local overrides, if present.
+  img = pm->GetTexture ("Texture");
+
+  return true;
+}
+
+bool awsImageView::GetProperty (char *name, void **parm)
+{
+  if (awsComponent::GetProperty (name, parm)) return true;
 
   return false;
 }
 
-bool
-awsImageView::SetProperty(char *name, void *parm)
+bool awsImageView::SetProperty (char *name, void *parm)
 {
-  if (awsComponent::SetProperty(name, parm)) return true;
+  if (awsComponent::SetProperty (name, parm)) return true;
 
   return false;
 }
 
-void
-awsImageView::OnDraw(csRect clip)
+void awsImageView::OnDraw (csRect clip)
 {
   aws3DFrame frame3d;
 
-  frame3d.Draw(WindowManager(), Window(), Frame(), frame_style, img, alpha_level);
+  frame3d.Draw (
+      WindowManager (),
+      Window (),
+      Frame (),
+      frame_style,
+      img,
+      alpha_level);
 }
 
-bool
-awsImageView::OnMouseDown(int , int , int )
+bool awsImageView::OnMouseDown (int, int, int)
 {
-  Broadcast(signalMouseDown);
+  Broadcast (signalMouseDown);
 
-  was_down=is_down;
+  was_down = is_down;
 
-  if (is_down==false)
-    is_down=true;
+  if (is_down == false) is_down = true;
 
-  Invalidate();
+  Invalidate ();
   return true;
 }
 
-bool
-awsImageView::OnMouseUp(int ,int ,int )
+bool awsImageView::OnMouseUp (int, int, int)
 {
-  Broadcast(signalMouseUp);
+  Broadcast (signalMouseUp);
 
   if (is_down)
   {
-    Broadcast(signalClicked);
-    is_down=false;
+    Broadcast (signalClicked);
+    is_down = false;
   }
 
-  Invalidate();
+  Invalidate ();
   return true;
 }
 
-bool
-awsImageView::OnMouseMove(int ,int ,int )
+bool awsImageView::OnMouseMove (int, int, int)
 {
-  Broadcast(signalMouseMoved);
+  Broadcast (signalMouseMoved);
   return false;
 }
 
-bool
-awsImageView::OnMouseClick(int ,int ,int )
-{
-  return false;
-}
-
-bool
-awsImageView::OnMouseDoubleClick(int ,int ,int )
+bool awsImageView::OnMouseClick (int, int, int)
 {
   return false;
 }
 
-bool
-awsImageView::OnMouseExit()
+bool awsImageView::OnMouseDoubleClick (int, int, int)
 {
-  mouse_is_over=false;
-  Invalidate();
+  return false;
+}
 
-  if (is_down)
-    is_down=false;
+bool awsImageView::OnMouseExit ()
+{
+  mouse_is_over = false;
+  Invalidate ();
+
+  if (is_down) is_down = false;
 
   return true;
 }
 
-bool
-awsImageView::OnMouseEnter()
+bool awsImageView::OnMouseEnter ()
 {
-  mouse_is_over=true;
-  Invalidate();
+  mouse_is_over = true;
+  Invalidate ();
   return true;
 }
 
-bool
-awsImageView::OnKeypress(int ,int )
+bool awsImageView::OnKeypress (int, int)
 {
   return false;
 }
 
-bool
-awsImageView::OnLostFocus()
+bool awsImageView::OnLostFocus ()
 {
   return false;
 }
 
-bool
-awsImageView::OnGainFocus()
+bool awsImageView::OnGainFocus ()
 {
   return false;
 }
@@ -173,31 +166,35 @@ SCF_IMPLEMENT_IBASE(awsImageViewFactory)
   SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
 SCF_IMPLEMENT_IBASE_END
 
-awsImageViewFactory::awsImageViewFactory(iAws *wmgr):awsComponentFactory(wmgr)
+awsImageViewFactory::awsImageViewFactory (
+  iAws *wmgr) :
+    awsComponentFactory(wmgr)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  Register("Image View");
-  RegisterConstant("ivfsBump",  awsImageView::fsBump);
-  RegisterConstant("ivfsSimple", awsImageView::fsSimple);
-  RegisterConstant("ivfsRaised",  awsImageView::fsRaised);
-  RegisterConstant("ivfsSunken",  awsImageView::fsSunken);
-  RegisterConstant("ivfsFlat",  awsImageView::fsFlat);
-  RegisterConstant("ivfsNone",  awsImageView::fsNone);
+  Register ("Image View");
+  RegisterConstant ("ivfsBump", awsImageView::fsBump);
+  RegisterConstant ("ivfsSimple", awsImageView::fsSimple);
+  RegisterConstant ("ivfsRaised", awsImageView::fsRaised);
+  RegisterConstant ("ivfsSunken", awsImageView::fsSunken);
+  RegisterConstant ("ivfsFlat", awsImageView::fsFlat);
+  RegisterConstant ("ivfsNone", awsImageView::fsNone);
 
-  RegisterConstant("signalImageViewClicked",  awsImageView::signalClicked);
-  RegisterConstant("signalImageViewMouseUp",  awsImageView::signalMouseUp);
-  RegisterConstant("signalImageViewMouseDown",  awsImageView::signalMouseDown);
-  RegisterConstant("signalImageViewMouseMoved",  awsImageView::signalMouseMoved);
+  RegisterConstant ("signalImageViewClicked", awsImageView::signalClicked);
+  RegisterConstant ("signalImageViewMouseUp", awsImageView::signalMouseUp);
+  RegisterConstant (
+    "signalImageViewMouseDown",
+    awsImageView::signalMouseDown);
+  RegisterConstant (
+    "signalImageViewMouseMoved",
+    awsImageView::signalMouseMoved);
 }
 
-awsImageViewFactory::~awsImageViewFactory()
+awsImageViewFactory::~awsImageViewFactory ()
 {
- // empty
+  // empty
 }
 
-iAwsComponent *
-awsImageViewFactory::Create()
+iAwsComponent *awsImageViewFactory::Create ()
 {
- return new awsImageView;
+  return new awsImageView;
 }
-
