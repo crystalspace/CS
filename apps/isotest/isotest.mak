@@ -32,7 +32,7 @@ INC.ISOTEST = $(wildcard apps/isotest/*.h)
 SRC.ISOTEST = $(wildcard apps/isotest/*.cpp)
 OBJ.ISOTEST = $(addprefix $(OUT),$(notdir $(SRC.ISOTEST:.cpp=$O)))
 DEP.ISOTEST = \
-  CSPARSER CSENGINE CSGEOM CSGFX CSSYS CSUTIL CSOBJECT CSFX
+  CSPARSER CSFX CSENGINE CSGEOM CSFX CSGFX CSSYS CSUTIL CSOBJECT
 LIB.ISOTEST = $(foreach d,$(DEP.ISOTEST),$($d.LIB))
 #CFG.ISOTEST = data/config/isotest.cfg
 
