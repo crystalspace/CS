@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tutorial/r3dtest
+vpath %.cpp apps/tests/r3dtest
 
 R3DTEST.EXE = r3dtest$(EXE)
 INC.R3DTEST = $(wildcard apps/tests/r3dtest/*.h)
