@@ -33,18 +33,9 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY:  glcommon2dclean
-
-# Chain rules
-clean: glcommon2dclean
-
-
 $(OUT)%$O: libs/cs2d/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLX2D)
  
-glcommon2dclean:
-	$(RM) $(GLX2D)
-
 ifdef DO_DEPEND
 depend: $(OUTOS)glcommon2d.dep
 $(OUTOS)glcommon2d.dep: $(SRC.GLCOMMON2D)
