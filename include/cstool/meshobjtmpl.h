@@ -101,6 +101,7 @@ public:
    */
   virtual csRenderMesh** GetRenderMeshes (int& num)
   {
+    num = 0;
     return 0;
   }
 

@@ -14,6 +14,10 @@ chronological order.
 	  is that this system turned out much too complex. Instead portals
 	  will be implemented by a special mesh object that is managed
 	  by the engine itself.
+	- Jorrit changed csPortalContainer so that now implements iMeshObject
+	  (through csMeshObject).
+	- Jorrit fixed a bug in csMeshObject->GetRenderMeshes(). It didn't
+	  set 'num' to 0.
 19-Sep-2003
 	- Eric Sunshine added the new CS_MSG_ERROR() Autoconf macro.  This is A
 	  convenience wrapper for AC_MSG_ERROR() which invokes AC_CACHE_SAVE()

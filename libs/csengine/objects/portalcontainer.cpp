@@ -25,16 +25,59 @@
 // ---------------------------------------------------------------------------
 // csMeshWrapper
 // ---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csPortalContainer)
+SCF_IMPLEMENT_IBASE_EXT(csPortalContainer)
   SCF_IMPLEMENTS_INTERFACE (iPortalContainer)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
-csPortalContainer::csPortalContainer ()
+csPortalContainer::csPortalContainer (iEngine* engine)
+	: csMeshObject (engine)
 {
-  SCF_CONSTRUCT_IBASE (0);
 }
 
 csPortalContainer::~csPortalContainer ()
 {
+}
+
+//--------------------- For iMeshObject ------------------------------//
+
+bool csPortalContainer::DrawTest (iRenderView* rview, iMovable* movable)
+{
+  (void)rview;
+  (void)movable;
+  return false;
+}
+
+bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
+  	csZBufMode zbufMode)
+{
+  (void)rview;
+  (void)movable;
+  (void)zbufMode;
+  return false;
+}
+
+void csPortalContainer::HardTransform (const csReversibleTransform& t)
+{
+  (void)t;
+}
+
+bool csPortalContainer::HitBeamOutline (const csVector3& start,
+  	const csVector3& end, csVector3& isect, float* pr)
+{
+  (void)start;
+  (void)end;
+  (void)isect;
+  (void)pr;
+  return false;
+}
+
+bool csPortalContainer::HitBeamObject (const csVector3& start,
+	const csVector3& end, csVector3& isect, float* pr)
+{
+  (void)start;
+  (void)end;
+  (void)isect;
+  (void)pr;
+  return false;
 }
 
