@@ -13,6 +13,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+25-Jul-1999
+	- Eric Sunshine worked around a variable redeclaration error in the
+	  new md2.cpp file.  This problem affected older C++ compilers in
+	  which the life time of a variable declared in a for(;;) statement is
+	  not limited to the for(;;) statement, but instead extends beyond it.
 23-Jul-1999
 	- Small optimization in WhichSide3D (made inline). This could
 	  be important for the lighting routines which use this function
@@ -93,9 +98,6 @@ Short-term cleanups that need to be done:
 	  useful default setup (set up transformations in skeleton template).
 	- Fixed lighting for sprites which are not touched by any light.
 	- Fixed bug with delete[] being called too much with skeleton sprites.
-	- Jorrit fixed a compilation problem in Eric Sunshine's changes from
-	  yesterday, which the NextStep compiler did not catch.  He also fixed
-	  the ndrvdem makefile which failed to mention csapputil.
 	- Did some minor fixes on the changes from Eric Sunshine.
 	- For more fun, Jorrit extended the 'addskel' command so that you
 	  can now give a negative width. In that case the real width at every
@@ -105,7 +107,7 @@ Short-term cleanups that need to be done:
 	- Renamed BOOL to COMBOOL for compatiblity problems with BOOL on
 	  some systems (like IRIX, MacOS/X Server, OpenStep, and NextStep).
 	- Eric Sunshine made these changes:
-	    - Eric Sunshine made drawing optimizations to csProgressMeter and
+	    - Made drawing optimizations to csProgressMeter and
 	      csProgressPulse.  In many cases the impact of these
 	      optimizations on drawing performance is quite dramatic.
 	    - Fixed a new compilation warning in cssprite.cpp.
