@@ -523,7 +523,7 @@ void csLightFlareHalo::ProcessFlareComponent (
   csVector2 clipped_poly2d[MAX_OUTPUT_VERTICES];
   csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
 
-  uint8 clip_result = engine.top_clipper->Clip (
+  uint8 clip_result = engine.top_clipper->GetClipper ()->Clip (
       HaloPoly,
       4,
       clipped_poly2d,
