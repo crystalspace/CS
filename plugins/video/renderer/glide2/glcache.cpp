@@ -10,43 +10,359 @@
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+    
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// GLIDECACHE.CPP
-// GlideTextureCache and GlideLightmapCache implementation file
-// Written by xtrochu and Nathaniel
-
+// HICACHE.CPP
+// Hi-color texture/lightmap cache
+// An abstract class: derive the specific class from this class
+// Written by Dan Ogles
 #include "sysdef.h"
 #include "cssys/system.h"
-#include "cs3d/glide2/g3dglide.h"
-#include "cs3d/glide2/glcache.h"
-#include "cs3d/glide2/glidelib.h"
+#include "gl_txtmgr.h"
+#include "glcache.h"
+#include "glidelib.h"
+#include "itexture.h"
+#include "ipolygon.h"
 #include "ilghtmap.h"
 
-#include "glide.h"
+IMPLEMENT_IBASE (csGlideTextureCache)
+IMPLEMENT_IBASE_END
 
-GlideTextureCache::GlideTextureCache(TMUInfo *t, int bpp, TextureMemoryManager *man)
-: HighColorCache(t->memory_size, HIGHCOLOR_TEXCACHE, bpp,man)
+csGlideTextureCache::csGlideTextureCache (TMUInfo *tmu, int bpp, TextureMemoryManager * tm)
 {
-  m_tmu = t;
+    CONSTRUCT_IBASE (NULL);
+    m_tmu = tmu;
+    cache_size= m_tmu->memory_size;
+    num=0;
+    total_size=0;
+    head=tail=NULL;
+    this->bpp = bpp;
+    manager = tm;
 }
 
-void GlideTextureCache::Dump()
+csGlideTextureCache::~csGlideTextureCache()
 {
-  //CsPrintf (MSG_CONSOLE, "Textures in the cache: %d\n", num);
-  //CsPrintf (MSG_CONSOLE, "Total size: %ld bytes\n", total_size);
-  int mean;
-  if (num == 0) mean = 0;
-  else mean = total_size/num;
-  //CsPrintf (MSG_CONSOLE, "Bytes per texture: %d\n", mean);
-  //CsPrintf (MSG_CONSOLE, "Fragmentation of Memory: %d\n",manager->getFragmentationState());
+    Clear();
 }
 
-void GlideTextureCache::Load(csGlideCacheData *d)
+void csGlideTextureCache::Add(iTextureHandle *texture, bool alpha)
+{
+  int size = 0;
+  for (int c =0; c<4; c++)
+  {
+    int width, height;
+    if (texture->GetMipMapDimensions( c, width, height ))
+      size += width * height;
+  }
+
+  size *= alpha ? 1 : bpp/8;
+
+  csGlideCacheData *cached_texture = (csGlideCacheData *)texture->GetCacheData ();
+  
+  if (cached_texture)
+  {
+    // move unit to front (MRU)
+    if(cached_texture != head)
+    {
+      if(cached_texture->prev) cached_texture->prev->next = cached_texture->next;
+      else head = cached_texture->next;
+      if(cached_texture->next) cached_texture->next->prev = cached_texture->prev;
+      else tail = cached_texture->prev;
+
+      cached_texture->prev = NULL;
+      cached_texture->next = head;
+      if(head) head->prev = cached_texture;
+      else tail = cached_texture;
+      head = cached_texture;
+    }
+  }
+  else
+  {
+    // unit is not in memory. load it into the cache
+    while((total_size + size >= cache_size)&&(manager->hasFreeSpace(size)))
+    {
+      // out of memory. remove units from bottom of list.
+      cached_texture = tail;
+
+      iTextureHandle *texh = (iTextureHandle *)cached_texture->pSource;
+      total_size -= cached_texture->lSize;
+      num--;
+
+      texh->SetCacheData (NULL);
+      Unload(cached_texture);          // unload it.
+    }
+    
+    // now load the unit.
+    num++;
+    total_size += size;
+
+    CHK (cached_texture = new csGlideCacheData);
+
+    cached_texture->next = head;
+    cached_texture->prev = NULL;
+    if(head) head->prev = cached_texture;
+    else tail = cached_texture;
+    head = cached_texture;
+    cached_texture->pSource = texture;
+    cached_texture->lSize = size;
+    cached_texture->texhnd.type = alpha ? CS_GLIDE_ALPHACACHE : CS_GLIDE_TEXCACHE;
+
+    texture->SetCacheData (cached_texture);
+
+    Load(cached_texture);       // load it.
+  }
+}
+
+void csGlideTextureCache::Add(iPolygonTexture *polytex)
+{
+  iLightMap *piLM = polytex->GetLightMap ();
+  if (!piLM) return;
+
+  int width = piLM->GetWidth();
+  int height = piLM->GetHeight();
+  int size = width*height*(bpp/8);
+
+  csGlideCacheData *cached_texture = (csGlideCacheData *)piLM->GetCacheData ();
+    
+  if (polytex->RecalculateDynamicLights() && cached_texture)
+  {
+    piLM->SetCacheData (NULL);
+    num--;
+    total_size -= cached_texture->lSize;
+    
+    Unload(cached_texture);          // unload it.
+    cached_texture = NULL;
+  }
+
+  if (cached_texture)
+  {
+    // move unit to front (MRU)
+    if(cached_texture != head)
+    {
+      if(cached_texture->prev) cached_texture->prev->next = cached_texture->next;
+      else head = cached_texture->next;
+      if(cached_texture->next) cached_texture->next->prev = cached_texture->prev;
+      else tail = cached_texture->prev;
+
+      cached_texture->prev = NULL;
+      cached_texture->next = head;
+      if(head) head->prev = cached_texture;
+      else tail = cached_texture;
+      head = cached_texture;
+    }
+  }
+  else
+  {
+    // unit is not in memory. load it into the cache
+    while(total_size + size >= cache_size)
+    {
+      // out of memory. remove units from bottom of list.
+      cached_texture = tail;
+      iLightMap *ilm = (iLightMap *)cached_texture->pSource;
+      assert( ilm );
+
+      ilm->SetCacheData(NULL);
+
+      num--;
+      total_size -= cached_texture->lSize;
+      
+      Unload(cached_texture);          // unload it.
+            
+    }
+    
+    // now load the unit.
+    num++;
+    total_size += size;
+
+    CHK (cached_texture = new csGlideCacheData);
+
+    cached_texture->next = head;
+    cached_texture->prev = NULL;
+    if(head) head->prev = cached_texture;
+    else tail = cached_texture;
+    head = cached_texture;
+    cached_texture->pSource = piLM;
+    cached_texture->lSize = size;
+    cached_texture->texhnd.type = CS_GLIDE_LITCACHE;
+    
+    piLM->SetCacheData(cached_texture);
+    
+    Load(cached_texture);       // load it.
+  }
+}
+
+void csGlideTextureCache::Clear()
+{
+  while(head)
+  {
+    csGlideCacheData *n = head;
+    head = head->next;
+    if (n->texhnd.type & ( CS_GLIDE_TEXCACHE|CS_GLIDE_ALPHACACHE ) ){
+      iTextureHandle *texh = (iTextureHandle *)n->pSource;
+      texh->SetCacheData (NULL);
+    }
+    else
+    {
+      iLightMap *texh = (iLightMap *)n->pSource;
+      texh->SetCacheData (NULL);
+    }
+    Unload(n);
+  }    
+
+  head = tail = NULL;
+  total_size = 0;
+  num = 0;
+}
+
+bool csGlideTextureCache::CalculateTexData ( int width, int height, float wfak, float hfak, 
+                                        GrLOD_t *lod, int nLod, csGlideCacheData *d)
+{
+  bool succ=true;
+  int texwidth, texheight;
+  int lodoff;
+  GrAspectRatio_t aspectRatio;
+  GrLOD_t lodlevels[]= { GR_LOD_256, 
+                         GR_LOD_128, 
+			 GR_LOD_64, 
+			 GR_LOD_32, 
+			 GR_LOD_16, 
+			 GR_LOD_8, 
+			 GR_LOD_4,
+			 GR_LOD_2,
+			 GR_LOD_1,
+			 -1,-1,-1,-1 };
+  
+  if(width>=height)
+  {
+    switch(width/height)
+    {
+    case 1:
+      aspectRatio = GR_ASPECT_1x1;
+      texwidth    = int(256. * wfak);
+      texheight   = int(256. * hfak);
+      break;
+    case 2:
+      aspectRatio = GR_ASPECT_2x1;
+      texwidth    = int(256. * wfak);
+      texheight   = int(128. * hfak);
+      break;
+    case 4:
+      aspectRatio = GR_ASPECT_4x1;
+      texwidth    = int(256. * wfak);
+      texheight   = int(64. * hfak);
+      break;
+    case 8:
+      aspectRatio = GR_ASPECT_8x1;
+      texwidth    = int(256. * wfak);
+      texheight   = int(32. * hfak);
+      break;
+    default:
+      succ=false;
+      break;
+    }
+  }
+  else if(height>width)
+  {
+    switch(height/width)
+    {
+    case 2:
+      aspectRatio = GR_ASPECT_1x2;
+      texwidth    = int(128. * wfak);
+      texheight   = int(256. * hfak);
+      break;
+    case 4:
+      aspectRatio = GR_ASPECT_1x4;
+      texwidth    = int(64. * wfak);
+      texheight   = int(256. * hfak);
+      break;
+    case 8:
+      aspectRatio = GR_ASPECT_1x8;
+      texwidth    = int(32. * wfak);
+      texheight   = int(256. * hfak);
+      break;
+    default:
+      succ=false;
+      break;
+    }
+  }
+  
+  if (succ)
+  {
+    d->texhnd.info.aspectRatio = aspectRatio;
+    d->texhnd.width            = texwidth;
+    d->texhnd.height           = texheight;
+  }
+  else
+  {
+    //Printf(MSG_CONSOLE,"GlideError : Texture Ratio: (%dx%d)\n",width,height);
+    return false;
+  }
+
+  switch(MAX(width,height))
+  {
+  case 256:
+    lodoff=0;
+    break;
+  case 128:
+    lodoff=1;
+    break;
+  case 64:
+    lodoff=2;
+    break;
+  case 32:
+    lodoff=3;
+    break;
+  case 16:
+    lodoff=4;
+    break;
+  case 8:
+    lodoff=5;
+    break;
+  case 4:
+    lodoff=6;
+    break;
+  case 2:
+    lodoff=7;
+    break;
+  case 1:
+    lodoff=8;
+    break;
+  default:
+    succ=false;
+    break;
+  }
+
+  if (succ)
+  {
+    memcpy( lod, (lodlevels+lodoff), nLod * sizeof(GrLOD_t));
+    d->texhnd.info.largeLod = lod[0];
+    d->texhnd.info.smallLod = lod[ MIN( nLod-1, 8 - lodoff ) ];
+  }
+  else
+  {
+    //CsPrintf(MSG_CONSOLE,"GlideError : Can't compute lod-level because tex-size is not pow of 2 (actual size is: (%dx%d))\n",width,height);
+    return false;
+  }
+
+  return succ;
+}
+
+void csGlideTextureCache::Unload ( csGlideCacheData *d )
+{
+  if ( d == head ) head = d->next;
+  if ( d == tail ) tail = d->prev;
+  if ( d->prev ) d->prev->next = d->next;
+  if ( d->next ) d->next->prev = d->prev;
+  manager->freeSpaceMem ( d->mempos );
+  delete d->mempos;
+  delete d;
+}
+ 
+void csGlideTextureCache::LoadTex(csGlideCacheData *d)
 {
 
   iTextureHandle* txt_handle = (iTextureHandle*)d->pSource;
@@ -98,60 +414,7 @@ void GlideTextureCache::Load(csGlideCacheData *d)
   }
 }
 
-void GlideTextureCache::Unload(csGlideCacheData *d)
-{
-  manager->freeSpaceMem(d->mempos);
-  delete d->mempos;
-  delete d;
-}
-
-csGlideCacheData * GlideTextureCache::LoadHalo(char *data)
-{
-  CHK (csGlideCacheData *d = new csGlideCacheData);
-
-  GrLOD_t lod;
-  d->texhnd.loaded = false;
-  if (CalculateTexData ( 128, 128, 1.0, 1.0, &lod, 1, d ))
-  {
-    d->texhnd.tmu = m_tmu;
-    d->texhnd.info.format=GR_TEXFMT_ARGB_4444;
-    d->texhnd.info.data=data;
-    d->texhnd.size = GlideLib_grTexTextureMemRequired(GR_MIPMAPLEVELMASK_BOTH,&d->texhnd.info);
-    d->mempos=manager->allocSpaceMem(d->texhnd.size);
-    d->texhnd.loadAddress = d->mempos->offset+m_tmu->minAddress;
-  
-    GlideLib_grTexDownloadMipMap(d->texhnd.tmu->tmu_id, d->texhnd.loadAddress, GR_MIPMAPLEVELMASK_BOTH, &d->texhnd.info);
-
-    d->texhnd.loaded = true;
-  }
-  return d;
-}
-
-void GlideTextureCache::UnloadHalo(csGlideCacheData *d)
-{
-      manager->freeSpaceMem(d->mempos);
-      delete d->mempos;
-      delete d;
-}
-
-GlideLightmapCache::GlideLightmapCache(TMUInfo *t,TextureMemoryManager*man)
-: HighColorCache(t->memory_size, HIGHCOLOR_LITCACHE, 16,man)
-{
-  m_tmu = t;
-}
-
-void GlideLightmapCache::Dump()
-{
-  //CsPrintf (MSG_CONSOLE, "Lightmaps in the cache: %d\n", num);
-  //CsPrintf (MSG_CONSOLE, "Total size: %ld bytes\n", total_size);
-  int mean;
-  if (num == 0) mean = 0;
-  else mean = total_size/num;
-  //CsPrintf (MSG_CONSOLE, "Bytes per lightmap: %d\n", mean);
-  //CsPrintf (MSG_CONSOLE, "Fragmentation of Memory: %d\n",manager->getFragmentationState());
-}
-
-void GlideLightmapCache::Load(csGlideCacheData *d)
+void csGlideTextureCache::LoadLight (csGlideCacheData *d)
 {
 
   iLightMap *piLM = QUERY_INTERFACE (d->pSource, iLightMap);
@@ -219,11 +482,67 @@ void GlideLightmapCache::Load(csGlideCacheData *d)
   piLM->DecRef ();
 }
 
-
-void GlideLightmapCache::Unload(csGlideCacheData *d)
+void csGlideTextureCache::LoadAlpha (csGlideCacheData *d)
 {
-  manager->freeSpaceMem(d->mempos);
-  delete d->mempos;
-  delete d;
+
+  iTextureHandle* txt_handle = (iTextureHandle*)d->pSource;
+  csGlideAlphaMap* txt_mm = (csGlideAlphaMap*)txt_handle->GetPrivateObject ();
+  
+  int width, height;  
+  txt_mm->GetMipMapDimensions (0, width, height );
+
+  GrLOD_t lod;
+  d->texhnd.loaded = false;
+ 
+  if (CalculateTexData ( width, height, 1.0, 1.0, &lod, 1, d ))
+  {
+    d->texhnd.info.format=GR_TEXFMT_ALPHA_8;
+    d->texhnd.tmu = m_tmu;
+    d->texhnd.info.data=(unsigned char*)txt_mm->GetMipMapData( 0 );
+    d->texhnd.size = GlideLib_grTexTextureMemRequired(GR_MIPMAPLEVELMASK_BOTH,&d->texhnd.info);
+
+    d->mempos=manager->allocSpaceMem(d->texhnd.size);
+    d->texhnd.loadAddress = d->mempos->offset+m_tmu->minAddress;
+
+    GlideLib_grTexDownloadMipMapLevel(d->texhnd.tmu->tmu_id,
+                                      d->texhnd.loadAddress,
+                                      lod,
+                                      d->texhnd.info.largeLod,
+                                      d->texhnd.info.aspectRatio,
+                                      d->texhnd.info.format,
+                                      GR_MIPMAPLEVELMASK_BOTH,
+                                      d->texhnd.info.data);
+    d->texhnd.loaded = true;
+    
+  }
 }
 
+void csGlideTextureCache::Load (csGlideCacheData *d)
+{
+  switch ( d->texhnd.type )
+  {
+  case CS_GLIDE_TEXCACHE:
+    LoadTex ( d );
+    break;
+  case CS_GLIDE_LITCACHE:
+    LoadLight ( d );
+    break;
+  case CS_GLIDE_ALPHACACHE:
+    LoadAlpha ( d );
+    break;
+  default:
+    // wtf ?
+    break;
+  }
+}
+
+void csGlideTextureCache::Dump ()
+{
+  //CsPrintf (MSG_CONSOLE, "Textures in the cache: %d\n", num);
+  //CsPrintf (MSG_CONSOLE, "Total size: %ld bytes\n", total_size);
+  int mean;
+  if (num == 0) mean = 0;
+  else mean = total_size/num;
+  //CsPrintf (MSG_CONSOLE, "Bytes per texture: %d\n", mean);
+  //CsPrintf (MSG_CONSOLE, "Fragmentation of Memory: %d\n",manager->getFragmentationState());
+}

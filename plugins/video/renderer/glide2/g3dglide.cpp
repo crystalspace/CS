@@ -59,8 +59,10 @@
 #else //Is there another platform Glide runs on?
 #endif
 
-#include "cs3d/glide2/glidelib.h"
-#include "cs3d/glide2/g3dglide.h"
+#include "glidelib.h"
+#include "g3dglide.h"
+#include "alphamap.h"
+#include "gl_halo.h"
 
 //
 // Interface table definition
@@ -378,7 +380,8 @@ int csGraphics3DGlide2x::SelectBoard(GrHwConfiguration & hwconfig)
 
 csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
     m_pTextureCache(NULL),
-    m_pLightmapCache(NULL)
+    m_pLightmapCache(NULL),
+    m_pAlphamapCache(NULL)
 {
   CONSTRUCT_IBASE (iParent);
 
@@ -431,9 +434,11 @@ csGraphics3DGlide2x::~csGraphics3DGlide2x()
   if (m_verts)
     delete [] m_verts;
   if (m_pTextureCache)
-    CHKB (delete m_pTextureCache);
+    m_pTextureCache->DecRef ();
   if (m_pLightmapCache)
-    CHKB (delete m_pLightmapCache);
+    m_pLightmapCache->DecRef ();
+  if (m_pAlphamapCache)
+    m_pAlphamapCache->DecRef ();
   if (config)
     CHKB (delete config);
   if (txtmgr)
@@ -500,8 +505,21 @@ bool csGraphics3DGlide2x::Initialize (iSystem *iSys)
 
   // generate fogtable
   guFogGenerateExp( fogtable, 0.02f );
-  CHK (m_pTextureCache = new GlideTextureCache(&m_TMUs[0], 16, new FixedTextureMemoryManager(m_TMUs[0].memory_size)));
-  CHK (m_pLightmapCache = new GlideLightmapCache(&m_TMUs[1],new FixedTextureMemoryManager(m_TMUs[1].memory_size)));
+
+  FixedTextureMemoryManager *pTMM = new FixedTextureMemoryManager (m_TMUs[0].memory_size);
+  CHK (m_pTextureCache = new csGlideTextureCache ( &m_TMUs[0], 16, pTMM ));
+  if ( m_iMultiPass )
+  {
+    m_pLightmapCache = m_pTextureCache;
+    m_pTextureCache->IncRef ();
+  }
+  else
+  {
+    pTMM = new FixedTextureMemoryManager (m_TMUs[1].memory_size);
+    CHK (m_pLightmapCache = new csGlideTextureCache ( &m_TMUs[1], 16, pTMM ));
+  }
+  m_pAlphamapCache = m_pTextureCache;
+  m_pTextureCache->IncRef ();
 
   return true;
 }
@@ -1146,7 +1164,7 @@ void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
   {
     csTextureMMGlide* txt_mm = (csTextureMMGlide*)handle->GetPrivateObject ();
     csGlideCacheData* tcache;
-    m_pTextureCache->Add (handle);
+    m_pTextureCache->Add (handle, false);
     tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
 
     m_thTex = ( tcache ? &tcache->texhnd : NULL );
@@ -1299,7 +1317,7 @@ void csGraphics3DGlide2x::DrawPolygonFX (G3DPolygonDPFX& poly)
 void csGraphics3DGlide2x::CacheTexture (iPolygonTexture *texture)
 {
   iTextureHandle* txt_handle = texture->GetTextureHandle ();
-  m_pTextureCache->Add (txt_handle);
+  m_pTextureCache->Add (txt_handle, false);
   m_pLightmapCache->Add (texture);
 }
 
@@ -1470,352 +1488,10 @@ void csGraphics3DGlide2x::CloseFogObject (CS_ID /*id*/)
 
 iHalo *csGraphics3DGlide2x::CreateHalo (float r, float g, float b, unsigned char *alpha, int width, int height)
 {
-  if (m_bHaloEffect)
-  {
-    csHaloDrawer halo (m_piG2D, r, g, b);
-    csG3DHardwareHaloInfo* retval = new csG3DHardwareHaloInfo ();
-    unsigned long *lpbuf = halo.GetBuffer ();
-
-    CHK (unsigned short *mem = new unsigned short [128*128]);
-
-    // Warning : convertion maybe a bit bugged
-    for (int j=0; j<128; j++)
-    {
-      unsigned short *lpL = &mem[j<<7]; // j * 128
-      unsigned long *p = &lpbuf[j<<7]; // j * 128
-      for(int i=0; i<128; i++)
-      {
-        int a, r, g, b;
-        a=(*p>>24)>>4;
-        r=((*p&0x00FF0000)>>16)>>4;
-        g=((*p&0x0000FF00)>>8)>>4;
-        b=(*p&0x000000FF)>>4;
-        *lpL = (a << 12) | (r << 8) | (g << 4) | b;
-        lpL++;
-        p++;
-      }
-    }
-
-    retval->halo = m_pTextureCache->LoadHalo ((char *)mem);
-
-    delete [] mem;
-    delete [] lpbuf;
-
-    return (iHalo*)new csGlideHalo ( r, g, b, alpha, width, height, this, retval );
-  }
-  return NULL;
+  csGlideAlphaMap *am = new csGlideAlphaMap( alpha, width, height );
+  int w, h;
+  am->GetMipMapDimensions( 0, w, h );
+  csGlideHalo *halo = new csGlideHalo ( r, g, b, w, h, this, am );
+  return halo;
 }
 
-/*
-void csGraphics3DGlide2x::DestroyHalo(csHaloHandle haloInfo)
-{
-  if(haloInfo != NULL)
-  {
-    m_pTextureCache->UnloadHalo(((csG3DHardwareHaloInfo*)haloInfo)->halo);
-    delete (csG3DHardwareHaloInfo*)haloInfo;
-  }
-}
-*/
-
-bool csGraphics3DGlide2x::TestHalo (csVector3* pCenter)
-{
-  if (m_bHaloEffect)
-  {
-    if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0  ) 
-      return false;
-/*
-    int izz = QInt24 (1.0f / pCenter->z);
-    HRESULT hRes = S_OK;
-      
-    unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
-        
-    // first, do a z-test to make sure the halo is visible
-    if (izz < (int)zb)
-      hRes = S_FALSE;
-*/
-    return true;
-  }
-  return false;
-};
-
-/////////////
-
-// csHaloDrawer implementation //
-
-csGraphics3DGlide2x::csHaloDrawer::csHaloDrawer(iGraphics2D* iG2D, float r, float g, float b)
-{
-  mpBuffer = NULL;
-  (m_piG2D = iG2D)->IncRef();
-
-  mWidth = m_piG2D->GetWidth ();
-  mHeight = m_piG2D->GetHeight ();
-
-  int dim = 128;
-
-  // point variables
-  int x=0;
-  int y=dim/2;
-  // decision variable
-  int d = 1 - y;
-
-  mpBuffer = new unsigned long[dim*dim];
-  memset(mpBuffer, 0, dim*dim*sizeof(unsigned long));
-
-  mBufferWidth = dim;
-  mDim = dim;
-  
-  mRed = r; mGreen = b; mBlue = b;
-  mx = my = dim / 2;
-
-  ////// Draw the outer rim //////
-
-  drawline_outerrim(-y, y, x);
-  
-  while (true)
-  {
-    if (d < 0)
-      d += 2 * x + 3;
-    else
-    {
-      d += 2 * (x - y) + 5;
-      y--;
-      if (y <= x)
-        break;
-
-      drawline_outerrim(-x, x, y);
-      drawline_outerrim(-x, x, -y);
-    }
-    x++;
-
-    drawline_outerrim(-y, y, x);
-    drawline_outerrim(-y, y, -x);
-  }
-
-  ////// Draw the inner core /////
-
-  x=0;
-  y=dim/3;
-  d = 1 - y;
-
-  mDim = (int)((double)dim/1.5);
-
-  mRatioRed = (r - (r/3.f)) / y;
-  mRatioGreen = (g - (g/3.f)) / y;
-  mRatioBlue = (b - (b/3.f)) / y;
-
-  drawline_innerrim(-y, y, x);
-  
-  while (true)
-  {
-    if (d < 0)
-      d += 2 * x + 3;
-    else
-    {
-      d += 2 * (x - y) + 5;
-      y--;
-      if (y <= x)
-        break;
-
-      drawline_innerrim(-x, x, y);
-      drawline_innerrim(-x, x, -y);
-    }
-    x++;
-    drawline_innerrim(-y, y, x);
-    drawline_innerrim(-y, y, -x);
-  }
-
-  ///// Draw the vertical lines /////
-  
-  // DAN: this doesn't look right yet.
-#if 0
-  int y1, y2;
-
-  // the vertical line has a constant height, 
-  // until the halo itself is of a constant height,
-  // at which point the vertical line decreases.
-  
-  y1 = my - mWidth/10;
-  y2 = my + mWidth/10;
-  
-  if (dim < mWidth / 6)
-  {
-    int q = mWidth/6 - dim;
-    y1 += q;
-    y2 -= q;
-  }
-
-  drawline_vertical(mx, y1, y2);
-#endif
-}
-
-csGraphics3DGlide2x::csHaloDrawer::~csHaloDrawer()
-{
-  m_piG2D->DecRef ();
-}
-
-void csGraphics3DGlide2x::csHaloDrawer::drawline_vertical(int /*x*/, int y1, int y2)
-{
-  int i;
-  unsigned long* buf;
-
-  int r = (int)(mRed/2.5f * 256.0f);
-  int g = (int)(mGreen/2.5f * 256.0f);
-  int b = (int)(mBlue/2.5f * 256.0f);
-
-  int c = (r << 16) | (g << 8) | b;
-
-  while (y1 < y2)
-  {
-    buf = &mpBuffer[(mx-1) + (mBufferWidth * y1++)];
-    
-    for(i=0; i<3; i++)
-    {
-      buf[i] = c;    
-    }
-  }
-}
-
-void csGraphics3DGlide2x::csHaloDrawer::drawline_outerrim(int x1, int x2, int y)
-{
-  if (x1 == x2) return;
-
-  int r = (int)(mRed / 3.5f * 256.0f);
-  int g = (int)(mGreen / 3.5f * 256.0f);
-  int b = (int)(mBlue / 3.5f * 256.0f);
- 
-  int a = QInt((r + g + b) / 3);
-
-  // stopx makes sure we don't overrdraw when drawing the inner core. 
-  // maybe there's something faster than a sqrt... - DAN
-  // @@@ JORRIT: had to make some changes to prevent overflows!
-  float sq = (mDim/3.0)*(mDim/3.0) - ((double)y*(double)y);
-  int stopx = 0;
-  if (sq > 0) stopx = (int)sqrt (sq);
-
-  unsigned long* bufy;
-
-  x1 += mx;
-  x2 += mx;
-  y += my;
-
-  bufy = &mpBuffer[y * mBufferWidth];
-
-//  unsigned short p;
-
-  if (stopx)
-  {    
-    while (x1 <= (mx - stopx) + 2)
-    { 
-      bufy[x1++] = (a << 24) | (r << 16) | (g << 8) | b;
-    }
-
-    x1 = mx + stopx - 2;
-    
-    while (x1 <= x2)
-    { 
-      bufy[x1++] = (a << 24) | (r << 16) | (g << 8) | b;
-    }
-  }
-  else
-  {
-    while (x1 <= x2)
-    {
-      bufy[x1++] = (a << 24) | (r << 16) | (g << 8) | b;
-    }  
-  }
-}
-
-void csGraphics3DGlide2x::csHaloDrawer::drawline_innerrim(int x1, int x2, int y)
-{
-  float w2 = x2 - x1;
-  unsigned long* bufy;
-
-  x1 += mx;
-  x2 += mx;
-  y += my;
-
-  if (y >= mHeight || y <= 0) return;
-  bufy = &mpBuffer[y * mBufferWidth];
-
-  if (w2 == 0.0f) return;
-  w2 /= 2.0f;
-
-  int halfx = x1 + (int)w2;
-
-  float ir, ig, ib, ia;
-
-  float rlow = mRed / 4.5f;
-  float glow = mGreen / 4.5f;
-  float blow = mBlue / 4.5f;
-  
-  if (y <= my)
-  {
-    int iy = y - (my - (mDim / 2));
-
-    ir = (iy * mRatioRed + rlow) * 256;
-    ig = (iy * mRatioGreen + glow) * 256;
-    ib = (iy * mRatioBlue + blow) * 256;    
-    ia = (ir + ig + ib) / 3.0f;     
-  }
-  else
-  {
-    int iy = (my + (mDim/2)) - y;
-
-    ir = (iy * mRatioRed + rlow) * 256;
-    ig = (iy * mRatioGreen + glow) * 256;
-    ib = (iy * mRatioBlue + blow) * 256;
-    ia = (ir + ig + ib) / 3.0f;
-  }
-
-  float r = rlow * 256;
-  float g = glow * 256;
-  float b = blow * 256;
-  float a = (r + g + b) / 3.0f;
-
-  if (a < 0) a = 0;
- 
-  if (ir > 245) ir = 245;
-  if (ig > 245) ig = 245;
-  if (ib > 245) ib = 245;
-  if (ia > 250) ia = 250;
-
-  float rdelta = (ir - r) / w2;
-  float gdelta = (ig - g) / w2;
-  float bdelta = (ib - b) / w2;
-  float adelta = (ia - a) / w2;
- 
-  int br, bg, bb;
-
-  unsigned short p;
-  int inta;
-
-  while (x1 <= halfx)
-  {
-    p = bufy[x1];
-    
-    inta = QInt(a);
-
-    br = QInt(r);
-    bg = QInt(g);
-    bb = QInt(b);
-
-    bufy[x1++] = (inta << 24) | (br << 16) | (bg << 8) | bb;
-
-    r += rdelta; g+=gdelta; b+=bdelta; a+=adelta;
-  }
-
-  while(x1 <= x2)
-  {
-    p = bufy[x1];
-    
-    inta = QInt(a);
-
-    br = QInt(r);
-    bg = QInt(g);
-    bb = QInt(b);
-
-    bufy[x1++] = (inta << 24) | (br << 16) | (bg << 8) | bb;
-
-    r -= rdelta; g -= gdelta; b -= bdelta; a -= adelta;
-  }
-}

@@ -31,15 +31,14 @@
 #include "iplugin.h"
 #include "ipolygon.h"
 #include "icamera.h"
-#include "cs3d/glide2/glcache.h"
-#include "cs3d/glide2/gl_txtmgr.h"
+#include "glcache.h"
+#include "gl_txtmgr.h"
 #include "cs3d/common/dtmesh.h"
-#include "glidhalo.h"
+#include "gl_halo.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 
-class GlideTextureCache;
-class GlideLightmapCache;
+class csGlideTextureCache;
 
 /// the Glide implementation of the Graphics3D class.
 class csGraphics3DGlide2x  : public iGraphics3D
@@ -47,9 +46,7 @@ class csGraphics3DGlide2x  : public iGraphics3D
 friend class csGlideHalo;
 private:
   /// the texture cache.
-  GlideTextureCache *m_pTextureCache;
-  /// the lightmap cache.
-  GlideLightmapCache *m_pLightmapCache;
+  csGlideTextureCache *m_pTextureCache, *m_pLightmapCache, *m_pAlphamapCache;
   /// texturehandler for FX polygon drawing
   TextureHandler *m_thTex;
   /// vertex array for FX polygon drawing
@@ -272,48 +269,9 @@ public:
   virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
   virtual void CloseFogObject (CS_ID id);
 
-  //  virtual csHaloHandle CreateHalo(float r, float g, float b);
   virtual iHalo *CreateHalo(float iR, float iG, float iB, unsigned char *iAlpha, int iWidth, int iHeight );
-  //  virtual void DestroyHalo (csHaloHandle haloInfo);
-  //  virtual void DrawHalo (csVector3* pCenter, float fIntensity, iHalo* haloInfo);
-  virtual bool TestHalo (csVector3* pCenter);
 
-  virtual float GetZbuffValue( int x, int y ) { return 0.0f; }
-
-  /// Actually draws a halo the the screen.
-  class csHaloDrawer
-  {
-  public:
-    ///
-    csHaloDrawer(iGraphics2D* iG2D, float r, float g, float b);
-    ///
-    ~csHaloDrawer();
-
-    unsigned long* GetBuffer() { return mpBuffer; }
-    
-  private:
-
-    /// the width and height of the graphics context
-    int mWidth, mHeight;
-    /// the 2D graphics context.
-    iGraphics2D* m_piG2D;
-    /// the size to be drawn (the diameter of the halo)
-    int mDim;
-    /// the color of the halo
-    float mRed, mGreen, mBlue;
-    /// the ratio of the color intensity vs the radius
-    float mRatioRed, mRatioGreen, mRatioBlue;
-    /// the center coords.
-    int mx, my;
-    /// the buffer.
-    unsigned long* mpBuffer;
-    /// the width of the buffer.
-    int mBufferWidth;
-
-    void drawline_vertical(int x, int y1, int y2);
-    void drawline_outerrim(int x1, int x2, int y);
-    void drawline_innerrim(int x1, int x2, int y);
-  };
+  virtual float GetZbuffValue( int x, int y ) { return (float)(2<<16); }
 
 private:
   /// board selected
