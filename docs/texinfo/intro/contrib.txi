@@ -122,6 +122,11 @@ faster (but he forgot to rename it to @code{find_rgb_slow_somewhat_faster()}.
 :-)
 
 @item
+Anders Stenberg
+
+Anders added the ODE based dynamics plugin to CS.
+
+@item
 Tor Andersson (@email{d97ta@@efd.lth.se})
 
 Tor contributed some textures.  He also donated code for reading several file
@@ -298,6 +303,11 @@ Slavik Levtchenko (@email{Smirnov@@bbs.math.spbu.ru})
 Slavik created the current Watcom port with 16-bit display support.
 
 @item
+Marc Haisenko
+
+Marc fixed a bug in AWS radio buttons.
+
+@item
 Markus F.X.J. Oberhumer (@email{k3040e4@@wildsau.idv-edu.uni-linz.ac.at})
 
 Markus provided a small patch for the X11 port.
@@ -367,6 +377,11 @@ extension.
 Jeff Lundin (@email{jlundin@@fz.ml.org})
 
 Jeff helped with the @sc{djgpp} port.
+
+@item
+Philip Walls (@email{malverian@@lockless.dyndns.org})
+
+Philip added software cursor drawing to the SVGALIB canvas.
 
 @item
 Philipp Spoth (@email{Spoeth@@t-online.de})
@@ -540,6 +555,11 @@ Nicholas Francis (@email{nicholasfrancis@@iname.com})
 Nicholas made a few contributions to MazeD.
 
 @item
+Chris Forno (@email{jcore@@users.sourceforge.net})
+
+Chris worked on documentation a lot.
+
+@item
 Christian Bayle (@email{christian.bayle@@rd.francetelecom.com})
 
 Christian Bayle contributed scripts to make a Debian package for @sc{cs}.
@@ -654,6 +674,11 @@ others then proceeded to implement.
 @end itemize
 
 @item
+Erik Namtvedt
+
+Erik contributed the new ensocket networking driver for Crystal Space.
+
+@item
 Wolfgang Lehrach (@email{wolfg_l@@pro-net.co.uk})
 
 Wolfgang wrote a Doom to Crystal Space convertor in Java.  It is included in
@@ -760,6 +785,11 @@ LaTeX documentation. Later Brandon worked on a cal3d convertor for Crystal Space
 and a motion manager plugin.
 
 @item
+Oriol Esteve
+
+Oriol fixed the OpenGL lightmap alignment bug.
+
+@item
 Toni Asco Gonzalez (@email{e3445510@@est.fib.upc.es})
 
 Toni implemented a faster version of DrawPolygonMesh() for OpenGL. He also
@@ -827,6 +857,11 @@ related broadcast events. Peter also sent in a few smaller patches.
 Peter Donald (@email{donaldp@@lion.cs.latrobe.edu.au})
 
 Peter fixed the sound drivers for @sc{scf} and also fixed some bugs.
+
+@item
+Noah Falk
+
+Noah did some huge changes to @sc{aws}.
 
 @item
 Noah ``angelbob'' L. Gibbs (@email{angelbob@@users.sourceforge.net})
