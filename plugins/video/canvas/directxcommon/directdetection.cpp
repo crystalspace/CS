@@ -477,13 +477,6 @@ bool DirectDetection::checkDevices2D ()
   //Free the library.
   FreeLibrary (libraryHandle);
 
-    ReportResult (CS_REPORTER_SEVERITY_WARNING, 
-      "test",
-      0x80000001);
-    ReportResult (CS_REPORTER_SEVERITY_ERROR, 
-      "test",
-      0x80000002);
-
   if (Devices == NULL)
   {
     ReportResult (CS_REPORTER_SEVERITY_WARNING, 
