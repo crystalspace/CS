@@ -28,6 +28,7 @@ chronological order.
 	  that case the first mesh factory in that library will be shown.
         - res fixed the or_lighting shader to respect the alpha of the vertex
           colors again.
+        - Squee did some more work on cssaver.          
 2-Dec-2004
 	- Eric Sunshine fixed the various extension checks in glextmanager.h so
 	  that they won't crash if glGetString(GL_EXTENSIONS) and/or
