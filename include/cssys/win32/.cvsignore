@@ -1,6 +1,7 @@
 freetype.h
 fterrid.h
 ftnameid.h
+ioapi.h
 jconfig.h
 jerror.h
 jinclude.h
@@ -13,11 +14,15 @@ lualib.h
 mikmod.h
 png.h
 pngconf.h
+unzip.h
 zconf.h
 zlib.h
+zip.h
 cal3d
 divx
+divx4
 freetype
+freetype2
 lib3ds
 ogg
 vorbis
