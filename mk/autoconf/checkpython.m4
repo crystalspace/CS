@@ -41,6 +41,7 @@ AC_PREREQ([2.56])
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_PYTHON],
     [AC_REQUIRE([CS_CHECK_PTHREAD])
+    CS_CHECK_SUPPRESS_LONG_DOUBLE_WARNINGS
 
     AC_ARG_WITH([python],
 	[AC_HELP_STRING([--]m4_if([$1],[without],[with],[without])[-python],
@@ -61,6 +62,8 @@ AC_DEFUN([CS_CHECK_PYTHON],
 	    cs_cv_pybase_cflags=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
 		'import distutils.sysconfig; \
 		print "-I" + distutils.sysconfig.get_python_inc()'])
+	    cs_cv_pybase_cflags="$cs_cv_pybase_cflags \
+		$cs_prog_cxx_ignore_long_double"
 
 	    # Depending upon platform and installation, link library might
 	    # reside in "${prefix}/lib", "get_python_lib()/config", or
@@ -131,3 +134,18 @@ AC_DEFUN([CS_EMIT_CHECK_PYTHON],
     CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON], [$3])
     CS_EMIT_BUILD_PROPERTY([PYTHON.MODULE_EXT], [$cs_cv_python_ext],
 	[], [], [$3])])
+
+
+
+#------------------------------------------------------------------------------
+# CS_CHECK_SUPPRESS_LONG_DOUBLE_WARNINGS
+#	Some Python installations on MacOS/X uses of 'long double' in the
+#	headers which cause excessive warnings from the compiler. Check if
+#	those warnings can be suppressed.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_SUPPRESS_LONG_DOUBLE_WARNINGS],
+    [CS_CHECK_BUILD_FLAGS([how to suppress 'long double' warnings],
+	[cs_cv_prog_cxx_ignore_long_double],
+	[CS_CREATE_TUPLE([-Wno-long-double])], [C++],
+	[cs_prog_cxx_ignore_long_double="$cs_cv_prog_cxx_ignore_long_double"],
+	[cs_prog_cxx_ignore_long_double=''])])

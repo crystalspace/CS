@@ -16,6 +16,11 @@ chronological order.
 	  might not be mentioned in the user's PATH. The default list of extra
 	  directories searched includes /usr/local/bin and /sw/bin (where Fink
 	  on MacOS/X installs programs).
+	- Eric Sunshine added a test to checkpython.py to figure out how to
+	  suppress warnings about `long double' when #including Python headers,
+	  since some installations on MacOS/X emit excessive warnings over
+	  which we have no control (since the problem is in the Python
+	  headers).
 6-Dec-2004
 	- Eric Sunshine changed the Library, ConstructLibraryTarget, and
 	  ConstructLibraryLinkTarget rules in library.jam so that they forcibly
