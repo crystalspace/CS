@@ -125,7 +125,7 @@ public:
   	float fov, int color);
 
   /// Start a series of DrawPolygonFX
-  virtual void StartPolygonFX (iTextureHandle*, UInt) { }
+  virtual void StartPolygonFX (iMaterialHandle*, UInt) { }
 
   /// Finish a series of DrawPolygonFX
   virtual void FinishPolygonFX () { }

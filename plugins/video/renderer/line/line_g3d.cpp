@@ -251,7 +251,7 @@ void csGraphics3DLine::DrawPolygon (G3DPolygonDP& poly)
   int i, color;
 
   UByte flat_r, flat_g, flat_b;
-  poly.txt_handle->GetMeanColor (flat_r, flat_g, flat_b);
+  poly.mat_handle->GetTexture ()->GetMeanColor (flat_r, flat_g, flat_b);
 
   if (flat_r < 50 && flat_g < 50 && flat_b < 50)
     color = texman->FindRGB (50, 50, 50);
@@ -273,8 +273,8 @@ void csGraphics3DLine::DrawPolygonFX (G3DPolygonDPFX& poly)
   int i, color;
 
   UByte flat_r, flat_g, flat_b;
-  if (poly.txt_handle)
-    poly.txt_handle->GetMeanColor (flat_r, flat_g, flat_b);
+  if (poly.mat_handle)
+    poly.mat_handle->GetTexture ()->GetMeanColor (flat_r, flat_g, flat_b);
   else
   {
     flat_r = poly.flat_color_r;

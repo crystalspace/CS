@@ -62,7 +62,7 @@ public:
   
   iMaterialHandle* GetMaterial (int idx)
   {
-    return material[idx];
+    return materials[idx];
   }
 };
 

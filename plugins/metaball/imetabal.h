@@ -26,7 +26,7 @@
 
 class csIniFile;
 struct iGraphics3D;
-struct iTextureHandle;
+struct iMaterialHandle;
 
 struct MetaParameters
 {
@@ -71,8 +71,8 @@ struct iMetaBalls : public iPlugIn
   /// Set where the metaballs are to be rendered
   virtual void SetContext (iGraphics3D *g3d) = 0;
 
-  /// Set texture to be environmentally mapped
-  virtual void SetTexture (iTextureHandle *tex) = 0;
+  /// Set material to be environmentally mapped
+  virtual void SetMaterial (iMaterialHandle *mat) = 0;
 
   /// Do it
   virtual bool Draw () = 0;

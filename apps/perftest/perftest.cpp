@@ -69,9 +69,8 @@ iMaterialHandle* PerfTest::LoadMaterial (char* file)
   iTextureHandle* texture = txtmgr->RegisterTexture (image, CS_TEXTURE_3D);
   if (!texture) exit (-1);
   image->DecRef ();
-  csMaterial* mat = new csMaterial ();
-  mat->SetTextureHandle (@@@
-  return texture;
+  iMaterialHandle* mat = txtmgr->RegisterMaterial (texture);
+  return mat;
 }
 
 bool PerfTest::Initialize (int argc, const char* const argv[],
@@ -96,10 +95,10 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   txtmgr->ResetPalette ();
 
   // Initialize textures.
-  texture[0] = LoadTexture ("/lib/std/stone4.gif");
-  texture[1] = LoadTexture ("/lib/std/mystone2.gif");
-  texture[2] = LoadTexture ("/lib/std/andrew_marble4.gif");
-  texture[3] = LoadTexture ("/lib/std/andrew_wood.gif");
+  materials[0] = LoadMaterial ("/lib/std/stone4.gif");
+  materials[1] = LoadMaterial ("/lib/std/mystone2.gif");
+  materials[2] = LoadMaterial ("/lib/std/andrew_marble4.gif");
+  materials[3] = LoadMaterial ("/lib/std/andrew_wood.gif");
   txtmgr->PrepareTextures ();
 
   // Allocate a uniformly distributed in R,G,B space palette for console

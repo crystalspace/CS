@@ -216,7 +216,7 @@ void csMetaBalls::DrawSomething(void)
 bool csMetaBalls::Draw ()
 {
   alpha += mp.d_alpha;
-  poly->txt_handle = th;
+  poly->mat_handle = th;
   G3D->StartPolygonFX(th, CS_FX_COPY | CS_FX_GOURAUD);
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
   DrawSomething();

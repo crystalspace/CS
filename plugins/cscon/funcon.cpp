@@ -24,6 +24,7 @@
 #include "igraph2d.h"
 #include "isystem.h"
 #include "itxtmgr.h"
+#include "imater.h"
 #include "cssys/csevent.h"
 #include "csutil/csrect.h"
 #include "csutil/scf.h"
@@ -404,8 +405,8 @@ void funConsole::PrepPix (csIniFile *ini, const char *sect,
       if (image)
       {
 	iTextureHandle* txt = tm->RegisterTexture ( image, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS );
-	@@@@@@@@@@@@ NEED A MATERIAL HERE!!??
-	border.mat = 
+	iMaterialHandle* mat = tm->RegisterMaterial (txt);
+	border.mat = mat;
 	image->DecRef();
 
 	border.offx = ini->GetInt (sect, "x", 0);
@@ -415,10 +416,10 @@ void funConsole::PrepPix (csIniFile *ini, const char *sect,
 	if (border.do_keycolor)
         {
 	  int r,g,b;
-	  const char *kc = ini->GetStr (sect, "keycolor", "0,0,0");
-	  sscanf (kc, "%d,%d,%d", &r, &g, &b);
-	  border.kr = r; border.kg = g; border.kb = b;
-	  border.txt->SetKeyColor (border.kr, border.kg, border.kb);
+	  const char *kc = ini->GetStr( sect, "keycolor", "0,0,0" );
+	  sscanf( kc, "%d,%d,%d", &r, &g, &b );
+	  border.kr=r; border.kg=g; border.kb=b;
+	  border.mat->GetTexture ()->SetKeyColor ( border.kr, border.kg, border.kb );
 	}
 
 	border.do_stretch = ini->GetYesNo (sect, "do_stretch", false);

@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "igraph3d.h"
+#include "imater.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "apps/perftest/ptests3d.h"
@@ -302,7 +303,7 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   draw = 0;
   mesh.num_vertices = (NUM_MULTIPOLTEST+1)*(NUM_MULTIPOLTEST/2+1);
   mesh.num_vertices_pool = 1;
-  mesh.num_textures = 1;
+  mesh.num_materials = 1;
   mesh.num_triangles = NUM_MULTIPOLTEST*NUM_MULTIPOLTEST;
   mesh.triangles = new csTriangle [mesh.num_triangles];
   mesh.use_vertex_color = false;
@@ -374,7 +375,7 @@ void PixmapTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   draw = 0;
   inc_w = g3d->GetWidth ()/10;
   inc_h = g3d->GetHeight ()/10;
-  texture = perftest->GetMaterial (0);
+  texture = perftest->GetMaterial (0)->GetTexture ();
   texture->GetMipMapDimensions (0, tex_w, tex_h);
 }
 
@@ -403,7 +404,7 @@ void MultiTexturePixmapTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   inc_h = g3d->GetHeight ()/10;
   for (int i = 0; i < 4; i++)
   {
-    tex[i].texture = perftest->GetMaterial (i);
+    tex[i].texture = perftest->GetMaterial (i)->GetTexture ();
     tex[i].texture->GetMipMapDimensions (0, tex[i].tex_w, tex[i].tex_h);
   }
 }

@@ -26,13 +26,13 @@
 #include "csgeom/math3d.h"
 #include "imetabal.h"
 
-class csTextureHandle;
+class csMaterialHandle;
 class csIniFile;
 struct G3DPolygonDPFX;
 struct iSystem;
 struct iGraphics3D;
 struct iGraphics2D;
-struct iTextureHandle;
+struct iMaterialHandle;
 
 struct GridCell
 {
@@ -65,7 +65,7 @@ class csMetaBalls : public iMetaBalls
   csIniFile *Config;
   iGraphics3D *G3D;
   iSystem *Sys;
-  iTextureHandle *th;
+  iMaterialHandle *th;
   G3DPolygonDPFX* poly;
 
   MetaBall *meta_balls;
@@ -81,7 +81,7 @@ public:
   virtual bool Initialize (iSystem *sys);
   virtual void SetMetaBallDefaults (csIniFile *Config);
   virtual void SetContext (iGraphics3D *g3d);
-  virtual void SetTexture (iTextureHandle *tex)
+  virtual void SetMaterial (iMaterialHandle *tex)
   { th = tex; }
 
   virtual void SetNumberMetaBalls (int number);

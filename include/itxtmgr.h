@@ -177,6 +177,12 @@ struct iTextureManager : public iBase
   virtual iMaterialHandle* RegisterMaterial (iMaterial* material) = 0;
 
   /**
+   * Register a material based on a texture handle. This is a short-cut
+   * to quickly make materials based on a single texture.
+   */
+  virtual iMaterialHandle* RegisterMaterial (iTextureHandle* txthandle) = 0;
+
+  /**
    * Unregister a material.
    */
   virtual void UnregisterMaterial (iMaterialHandle* handle) = 0;

@@ -232,6 +232,9 @@ public:
   /// Release the original material (iMaterial).
   void FreeMaterial ();
 
+  ///
+  void SetTexture (iTextureHandle* texture) { csMaterialMM::texture = texture; }
+
   ///---------------------- iMaterialHandle implementation ----------------------
   DECLARE_IBASE;
 
@@ -365,6 +368,12 @@ public:
    * material system is actually working.
    */
   virtual iMaterialHandle* RegisterMaterial (iMaterial* material);
+
+  /**
+   * Default stub implementation until the
+   * material system is actually working.
+   */
+  virtual iMaterialHandle* RegisterMaterial (iTextureHandle* txthandle);
 
   /**
    * Default stub implementation until the

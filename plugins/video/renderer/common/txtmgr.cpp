@@ -164,8 +164,11 @@ csMaterialMM::csMaterialMM (iMaterial* material)
 {
   CONSTRUCT_IBASE (NULL);
   csMaterialMM::material = material;
-  material->IncRef ();
-  texture = material->GetTexture ();
+  if (material)
+  {
+    material->IncRef ();
+    texture = material->GetTexture ();
+  }
 }
 
 csMaterialMM::~csMaterialMM ()
@@ -252,6 +255,15 @@ iMaterialHandle* csTextureManager::RegisterMaterial (iMaterial* material)
 {
   if (!material) return NULL;
   csMaterialMM* mat = new csMaterialMM (material);
+  materials.Push (mat);
+  return mat;
+}
+
+iMaterialHandle* csTextureManager::RegisterMaterial (iTextureHandle* txthandle)
+{
+  if (!txthandle) return NULL;
+  csMaterialMM* mat = new csMaterialMM (NULL);
+  mat->SetTexture (txthandle);
   materials.Push (mat);
   return mat;
 }
