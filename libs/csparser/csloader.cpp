@@ -454,7 +454,11 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
         CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
 	tx2_len = 1;
       }
-      ppl->SetTextureSpace (tx_orig, tx1, tx1_len, tx2, tx2_len);
+      if ((tx1-tx_orig) < SMALL_EPSILON)
+        CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
+      else if ((tx2-tx_orig) < SMALL_EPSILON)
+        CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
+      else ppl->SetTextureSpace (tx_orig, tx1, tx1_len, tx2, tx2_len);
     }
     else
     {
@@ -2236,7 +2240,11 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
         CsPrintf (MSG_WARNING, "Bad texture specification for POLYGON '%s'\n", polyname);
 	tx2_len = 1;
       }
-      poly3d->SetTextureSpace (tx_orig.x, tx_orig.y, tx_orig.z,
+      if ((tx1-tx_orig) < SMALL_EPSILON)
+        CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
+      else if ((tx2-tx_orig) < SMALL_EPSILON)
+        CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
+      else poly3d->SetTextureSpace (tx_orig.x, tx_orig.y, tx_orig.z,
                                tx1.x, tx1.y, tx1.z, tx1_len,
                                tx2.x, tx2.y, tx2.z, tx2_len);
     }
@@ -2247,7 +2255,9 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
       CsPrintf (MSG_WARNING, "Bad texture specification for POLYGON '%s'\n", polyname);
       tx1_len = 1;
     }
-    poly3d->SetTextureSpace (tx_orig.x, tx_orig.y, tx_orig.z,
+    if ((tx1-tx_orig) < SMALL_EPSILON)
+      CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
+    else poly3d->SetTextureSpace (tx_orig.x, tx_orig.y, tx_orig.z,
                              tx1.x, tx1.y, tx1.z, tx1_len);
   }
   else if (plane_name[0])
