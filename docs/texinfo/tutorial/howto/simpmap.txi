@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Simple Map Example, , HOWTO Create Your Own Plugin, HOWTO
+@node HOWTO Simple Map Example, HOWTO Use custom font, HOWTO Create Your Own Plugin, HOWTO
 @subsection Simple Map Example
 @cindex @code{iImage}
 
