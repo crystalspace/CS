@@ -120,7 +120,7 @@ public:
    * fully contained in the polygon. But all other
    * cases are tested.
    */
-  bool Intersect (csVector2* poly, int num_poly)
+  bool Intersect (csVector2* poly, int num_poly) const
   {
     return Intersect (minbox, maxbox, poly, num_poly);
   }
