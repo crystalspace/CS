@@ -26,8 +26,6 @@
 #undef  CS_DISABLE_MODULE_LOCKING
 #include "csutil/csvector.h"
 
-IMPLEMENT_DEFAULT_COM(Base)
-
 csVector::csVector (int ilimit, int ithreshold)
 {
   root = (csSome *)malloc ((limit = ilimit) * sizeof (csSome));
