@@ -1,6 +1,9 @@
 The history order is reversed so that new features are at the top.
 
 18-Feb-2003
+  - Philip Wyett removed commiter related info from flex skeleton file to
+    remove it from being generated into skinlex.cpp and creating cvs changes
+    and conflict.
 	- Applied a patch from Anders Reggestad <anders@pvv.ntnu.no> which
 	  does the following:
 	    - Fixed the windows implementation of csGetTicks() so it is
