@@ -95,7 +95,8 @@ struct iTerrFuncState : public iBase
   /// Set the normal function to use for the terrain.
   virtual void SetNormalFunction (iTerrainNormalFunction* func) = 0;
   /// Use the given iImage to get a height function from.
-  virtual void SetHeightMap (iImage* im, float hscale, float hshift) = 0;
+  virtual void SetHeightMap (iImage* im, float hscale, float hshift,
+    bool flipx=false, bool flipy=false) = 0;
   /// Get the function to use for the terrain.
   virtual iTerrainHeightFunction* GetHeightFunction () const = 0;
   /// Get the normal function to use for the terrain.

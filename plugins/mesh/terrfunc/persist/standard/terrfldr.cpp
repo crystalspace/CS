@@ -344,6 +344,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_HEIGHTMAP:
         {
 	  float hscale = 1, hshift = 0;
+	  bool flipx = false, flipy = false;
 	  csRef<iDocumentNode> imgnode = child->GetNode ("image");
 	  if (!imgnode)
 	  {
@@ -357,6 +358,12 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
 	  if (scalenode) hscale = scalenode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> shiftnode = child->GetNode ("shift");
 	  if (shiftnode) hshift = shiftnode->GetContentsValueAsFloat ();
+          csRef<iDocumentNode> flipxnode = child->GetNode ("flipx");
+          if(flipxnode)
+            flipx = (strcmp(flipxnode->GetContentsValue(),"yes")==0);
+          csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
+          if(flipynode)
+            flipy = (strcmp(flipynode->GetContentsValue(),"yes")==0);
 
 	  csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
 	  if (!vfs)
@@ -392,7 +399,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
 		child, "Error reading image '%s'!", imgname);
 	    return 0;
 	  }
-	  terrstate->SetHeightMap (ifile, hscale, hshift);
+	  terrstate->SetHeightMap (ifile, hscale, hshift, flipx, flipy);
 	}
 	break;
       default:

@@ -43,10 +43,12 @@ struct PrsHeightMapData : public iGenerateImageFunction
   csRGBpixel* p;
   float hscale, hshift;
   bool slope;
+  bool flipx, flipy;
   SCF_DECLARE_IBASE;
 
   PrsHeightMapData (bool s) : slope (s)
   {
+    flipx=false; flipy=false;
     SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~PrsHeightMapData ()
@@ -110,6 +112,8 @@ float PrsHeightMapData::GetHeight (float x, float y)
 
 float PrsHeightMapData::GetValue (float x, float y)
 {
+  if(flipx) x = 1.f-x;
+  if(flipy) y = 1.f-y;
   if (slope) return GetSlope (x, y);
   else return GetHeight (x, y);
 }
@@ -139,6 +143,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
         {
 	  csGenerateImageValueFunc* vf = new csGenerateImageValueFunc ();
 	  float hscale = 1, hshift = 0;
+	  bool flipx = false, flipy = false;
 	  csRef<iDocumentNode> imagenode = child->GetNode ("image");
 	  if (!imagenode)
 	  {
@@ -153,6 +158,12 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	  csRef<iDocumentNode> shiftnode = child->GetNode ("shift");
 	  if (shiftnode)
 	    hshift = shiftnode->GetContentsValueAsFloat ();
+	  csRef<iDocumentNode> flipxnode = child->GetNode ("flipx");
+	  if(flipxnode)
+	    flipx = (strcmp(flipxnode->GetContentsValue(),"yes")==0);
+	  csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
+	  if(flipynode)
+	    flipy = (strcmp(flipynode->GetContentsValue(),"yes")==0);
 
 	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
 	  if (!img) return 0;
@@ -165,6 +176,8 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
   	  data->p = (csRGBpixel*)(img->GetImageData ());
   	  data->hscale = hscale;
   	  data->hshift = hshift;
+	  data->flipx = flipx;
+	  data->flipy = flipy;
 	  vf->SetFunction (data);
 	  data->DecRef ();
 	  v = vf;
@@ -174,6 +187,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
         {
 	  csGenerateImageValueFunc* vf = new csGenerateImageValueFunc ();
 	  float hscale = 1, hshift = 0;
+	  bool flipx = false, flipy = false;
 	  csRef<iDocumentNode> imagenode = child->GetNode ("image");
 	  if (!imagenode)
 	  {
@@ -188,6 +202,12 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	  csRef<iDocumentNode> shiftnode = child->GetNode ("shift");
 	  if (shiftnode)
 	    hshift = shiftnode->GetContentsValueAsFloat ();
+	  csRef<iDocumentNode> flipxnode = child->GetNode ("flipx");
+	  if(flipxnode)
+	    flipx = (strcmp(flipxnode->GetContentsValue(),"yes")==0);
+	  csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
+	  if(flipynode)
+	    flipy = (strcmp(flipynode->GetContentsValue(),"yes")==0);
 	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
 	  if (!img) return 0;
 	  PrsHeightMapData* data = new PrsHeightMapData (true);
@@ -199,6 +219,8 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
   	  data->p = (csRGBpixel*)(img->GetImageData ());
   	  data->hscale = hscale;
   	  data->hshift = hshift;
+	  data->flipx = flipx;
+	  data->flipy = flipy;
 	  vf->SetFunction (data);
 	  data->DecRef ();
 	  v = vf;

@@ -441,6 +441,7 @@ struct HeightMapData : public iTerrainHeightFunction
   float w, h;	// Image width and height.
   csRGBpixel* p;
   float hscale, hshift;
+  bool flipx, flipy;
   SCF_DECLARE_IBASE;
 
   HeightMapData () : im (0) { SCF_CONSTRUCT_IBASE (0); }
@@ -457,6 +458,8 @@ SCF_IMPLEMENT_IBASE_END
 
 float HeightMapData::GetHeight (float x, float y)
 {
+  if(flipx) x = 1.0f-x;
+  if(flipy) y = 1.0f-y;
   float dw = fmod (x*(w-1), 1.0f);
   float dh = fmod (y*(h-1), 1.0f);
   int ix = int (x*(w-1));
@@ -484,7 +487,8 @@ float HeightMapData::GetHeight (float x, float y)
   return col * hscale + hshift;
 }
 
-void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift)
+void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift,
+  bool flipx, bool flipy)
 {
   HeightMapData* data = new HeightMapData ();
   data->im = im;
@@ -495,6 +499,8 @@ void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift)
   data->p = (csRGBpixel*)im->GetImageData ();
   data->hscale = hscale;
   data->hshift = hshift;
+  data->flipx = flipx;
+  data->flipy = flipy;
   data->im->IncRef ();
   SetHeightFunction (data);
   data->DecRef ();

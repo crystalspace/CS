@@ -304,7 +304,8 @@ public:
     normal_func = func;
     initialized = false;
   }
-  void SetHeightMap (iImage* im, float hscale, float hshift);
+  void SetHeightMap (iImage* im, float hscale, float hshift, bool flipx,
+    bool flipy);
 
   /// Setup the number of blocks in the terrain.
   void SetResolution (int x, int y)
@@ -623,9 +624,10 @@ public:
     {
       scfParent->SetNormalFunction (func);
     }
-    virtual void SetHeightMap (iImage* im, float hscale, float hshift)
+    virtual void SetHeightMap (iImage* im, float hscale, float hshift,
+      bool flipx, bool flipy)
     {
-      scfParent->SetHeightMap (im, hscale, hshift);
+      scfParent->SetHeightMap (im, hscale, hshift, flipx, flipy);
     }
     virtual iTerrainHeightFunction* GetHeightFunction () const
     {
