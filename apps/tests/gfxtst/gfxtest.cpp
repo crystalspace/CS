@@ -406,13 +406,14 @@ static bool process_file (const char *fname)
 
   if (opt.scaleX > 0)
   {
-    if (opt.scaleY == -1)
+    int scaleY = opt.scaleY;
+    if (scaleY == -1)
     {
-      opt.scaleY = (ifile->GetHeight () * opt.scaleX) / ifile->GetWidth ();
+      scaleY = (ifile->GetHeight () * opt.scaleX) / ifile->GetWidth ();
     }
-    printf ("Rescaling image to %d x %d\n", opt.scaleX, opt.scaleY);
-    ifile->Rescale (opt.scaleX, opt.scaleY);
-    sprintf (strchr (suffix, 0), "-s%dx%d", opt.scaleX, opt.scaleY);
+    printf ("Rescaling image to %d x %d\n", opt.scaleX, scaleY);
+    ifile->Rescale (opt.scaleX, scaleY);
+    sprintf (strchr (suffix, 0), "-s%dx%d", opt.scaleX, scaleY);
   }
 
   if (opt.mipmap >= 0)
