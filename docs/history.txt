@@ -11,6 +11,8 @@ chronological order.
           odedynamics with the following features:
 	    - Strict ODE-like joint interfaces
 	    - AMotor joint functionality added
+	- Eric Sunshine fixed bug in simpleformer where a void function was
+	  attempting to return a value.
 15-Mar-2005
 	- Eric Sunshine renamed csQint8(), csQint16(), and csQint24() to
 	  csQfixed8(), csQfixed16(), and csQfixed24(), respectively, in order

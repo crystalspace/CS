@@ -129,9 +129,10 @@ public:
     {
       scfParent->SetHeightmap (heightmap);
     }
-    virtual void SetHeightmap (float* data, unsigned int width, unsigned int height)
+    virtual void SetHeightmap (float* data, unsigned int width,
+			       unsigned int height)
     {
-      return scfParent->SetHeightmap (data, width, height);
+      scfParent->SetHeightmap (data, width, height);
     }
     virtual void SetScale (csVector3 scale)
     {
@@ -313,4 +314,3 @@ public:
 };
 
 #endif // __CS_SIMPLEFORMER_H__
-
