@@ -188,6 +188,9 @@ private:
 
   /// Do the actual work for FinishDraw ()
   void FinishDrawImp ();
+
+  /// Force redraw of the specified rectangle
+  void Invalidate (csRect &rect);
 };
 
 #endif // __CSGFXPPL_H__

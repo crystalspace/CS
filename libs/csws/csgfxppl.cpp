@@ -59,7 +59,6 @@ csGraphicsPipeline::csGraphicsPipeline (iSystem *System)
     FrameHeight = G2D->GetHeight ();
   }
   RefreshRect.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
-  bFullRedraw = false;
 }
 
 csGraphicsPipeline::~csGraphicsPipeline ()
@@ -247,6 +246,14 @@ void csGraphicsPipeline::ClearZbuffer (int x1, int y1, int x2, int y2)
   G3D->DrawPolygon (poly);
 }
 
+void csGraphicsPipeline::Invalidate (csRect &rect)
+{
+  if (rect.IsEmpty ())
+    return;
+  INCLUDE_MIN_POINT (rect.xmin, rect.ymin);
+  INCLUDE_MAX_POINT (rect.xmax, rect.ymax);
+}
+
 void csGraphicsPipeline::StartFrame (int iCurPage)
 {
   CurPage = iCurPage;
@@ -337,7 +344,7 @@ void csGraphicsPipeline::FinishDraw ()
   FinishDrawImp ();
 
   if (!RefreshRect.IsEmpty ())
-    G3D->Print (bFullRedraw ? NULL : &RefreshRect);
+    G3D->Print (&RefreshRect);
   DrawMode = 0;
 
   // Clear refresh rectangle now

@@ -78,10 +78,6 @@ protected:
   virtual bool InitialSetup (int argc, const char* const argv[],
     const char *iConfigName, const char* iDataDir);
 
-  /// Force redrawing of full screen
-  void ForceFullRedraw (bool bFull)
-  { GfxPpl->bFullRedraw = bFull; }
-  
 public:
   /// The system driver
   cswsSystemDriver *System;
@@ -317,6 +313,10 @@ public:
   /// Begin drawing: users of CSWS should NEVER invoke G2D/G3D->BeginDraw!
   void pplBeginDraw (unsigned mode)
   { GfxPpl->BeginDraw (mode); }
+
+  /// Force blitting of the respective rectangle at the end of frame
+  void pplInvalidate (csRect &rect)
+  { GfxPpl->Invalidate (rect); }
 
 protected:
   /// Initialize configuration data: load csws.cfg
