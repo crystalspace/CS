@@ -477,7 +477,7 @@ void awsWindow::OnDraw (csRect clip)
   iGraphics2D *g2d = WindowManager ()->G2D ();
 
   awsPanel::OnDraw(clip);
-  if(style == fsNormal)
+  if(style == fsNormal && !(frame_options & foNoBorder))
   {
     csRect r = Frame();
     csRect insets = frame_drawer.GetInsets(fsNormal);
@@ -643,7 +643,7 @@ csRect awsWindow::getInsets ()
     r.ymin += title_bar_height;
   if(menu)
     r.ymin += menu->Frame().Height();
-  if(style == fsNormal)
+  if(style == fsNormal && !(frame_options & foNoBorder))
   {
     csRect more_insets = frame_drawer.GetInsets(fsSunken);
     r.xmin += more_insets.xmin;
@@ -710,6 +710,7 @@ awsComponentFactory(wmgr)
   RegisterConstant ("wfoNoDrag", awsWindow::foNoDrag);
   RegisterConstant ("wfoRoundBorder", awsWindow::foRoundBorder);
   RegisterConstant ("wfoBeveledBorder", awsWindow::foBeveledBorder);
+  RegisterConstant ("wfoNoBorder", awsWindow::foNoBorder);
   RegisterConstant ("wfoDontCaptureMouseMove", awsWindow::foDontCaptureMouseMove);
 
 }

@@ -34,6 +34,9 @@ The history order is reversed so that new features are at the top.
 	  registered is inside a static plugin, no message is emitted.
 	- res removed csGetResourcePath () from winsyspath.cpp - it is in
 	  resdir.cpp already.
+	- DeSigna implemented awsWindow::foNoBorder, which existed as
+	  a name, but unaccessable from skin definitions and unhandled
+	  in the code.
 21-Jun-2003
         - Philip Wyett updated win32.mak to reflect changes/additions in
           the general cssys library affecting MSVC port(s).
