@@ -101,7 +101,7 @@ iEffectDefinition* csEffectServer::GetEffect(const char *s)
 {
   for(int ni = 0; ni < effects->Length(); ni++)
   {
-    if(stricmp(s,((iEffectDefinition*)(effects->Get(ni)))->GetName()) == 0)
+    if(strcmp(s,((iEffectDefinition*)(effects->Get(ni)))->GetName()) == 0)
       //is this, return it
       return (iEffectDefinition*)(effects->Get(ni));
   }
