@@ -108,9 +108,10 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
 
   end_draw_poly ();
 
+  //******** This negates the clearance of the z buffer for this region... why ????
   // copy the tex into lower left corner
-  g3d->DrawPixmap (tex, 0, 0, width, height, 0, 0,
-		   width, height);
+//    g3d->DrawPixmap (tex, 0, 0, width, height, 0, 0,
+//  		   width, height);
   glViewport(0,0,width,height);
 
   return true;
