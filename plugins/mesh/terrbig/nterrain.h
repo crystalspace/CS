@@ -199,6 +199,18 @@ class nTerrain
   /// List of textures
   iMaterialHandle **materials;
   
+  /// Color mappings for terrain tile texturing. (RGB)
+  csRGBVector rgb_colors;
+
+  /// Color mappings for terrain tile texturing. (8-Bit palettized)
+  csVector  pal_colors;
+
+  // Must be a power of two, otherwise things get stupid.
+  int map_scale;
+
+  // Map mode, whether we are looking up stuff in rgb_colors or pal_colors.
+  int map_mode;
+  
 private:
   /// Calculates the binary logarithm of n
   int ilogb (unsigned n) 
@@ -404,6 +416,26 @@ public:
   void SetCameraOrigin(const csVector3 &camv)
   { cam=camv; }
 
+  /// Set the materials list, copies the passed in list.
+  void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials)
+  {
+    int i;
+    if (materials) delete [] materials;
+
+    materials = new iMaterialHandle *[nMaterials];
+    for(i=0; i<nMaterials; ++i)
+      materials[i]=matlist[i];
+
+    // @@@ Should I incref each material?  Then decref on closing?
+  }
+
+  iMaterialHandle **GetMaterialsList()
+  {
+    return materials;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////
+
   /** Map materials to their colors in the image map.  The matmap is a handle to
    * an iFile that holds the text mapping information of color to material.  The 
    * terrtex is the image that contains the actual false-color map of texture 
@@ -415,9 +447,6 @@ public:
   {
     char mode[128];
     char matname[512];
-
-    csRGBVector rgb_colors;
-    csVector  pal_colors;
     
     char *data = new char[matmap->GetSize()];
     matmap->Read(data, matmap->GetSize());
@@ -428,12 +457,6 @@ public:
 
     const MAP_MODE_RGB = 0;
     const MAP_MODE_8BIT = 1;
-
-    // Must be a power of two.
-    int map_scale;
-
-    // Map mode
-    int map_mode=0;
     
     while(index<matmap->GetSize())
     {
@@ -475,6 +498,17 @@ public:
     else pal_colors.QuickSort();
   }
 
+public:
+  nTerrain():max_levels(0), error_metric_tolerance(0.5), 
+	     info(NULL), hm(NULL), materials(NULL), 
+	     map_scale(0), map_mode(0) {}
+
+  ~nTerrain()
+  {
+    if (hm) delete hm;
+    if (materials) delete [] materials;
+  }
+
 };
 
 
@@ -512,9 +546,6 @@ private:
 
   /// Render information structure
   nTerrainInfo *info;
-
-  /// List of materials that we use for this terrain
-  iMaterialHandle **materials;
 
   /// Number of textures
   unsigned short nTextures;

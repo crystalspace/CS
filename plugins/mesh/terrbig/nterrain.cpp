@@ -32,7 +32,7 @@ SCF_IMPLEMENT_IBASE_END
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL), nTextures(1), materials(NULL)
+csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL), nTextures(1)
 {
   SCF_CONSTRUCT_IBASE (NULL)
 
@@ -50,7 +50,6 @@ csBigTerrainObject::~csBigTerrainObject()
     delete [] info->triq;
     delete info;
   }
-  if (materials) delete [] materials;
 }
 
 void 
@@ -83,7 +82,7 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
   for(i=0; i<nTextures; ++i)
   {
     info->mesh[i].triangles = info->triq[i].triangles.GetArray();
-    info->mesh[i].mat_handle = materials[i];
+    info->mesh[i].mat_handle = terrain->GetMaterialsList()[i];
     info->mesh[i].morph_factor = 0;
     info->mesh[i].num_vertices_pool = 1;
     info->mesh[i].use_vertex_color = false;
@@ -186,14 +185,7 @@ csBigTerrainObject::HitBeamObject (const csVector3& start, const csVector3& end,
 void 
 csBigTerrainObject::SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials)
 {
-  int i;
-  if (materials) delete [] materials;
-
-  materials = new iMaterialHandle *[nMaterials];
-  for(i=0; i<nMaterials; ++i)
-    materials[i]=matlist[i];
-
-  // @@@ Should I incref each material?  Then decref on closing?
+  if (terrain) terrain->SetMaterialsList(matlist, nMaterials);
 }
 
 
