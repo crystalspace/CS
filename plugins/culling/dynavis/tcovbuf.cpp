@@ -119,6 +119,9 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
 {
   int i;
 
+  if (queue_tile_empty)
+    MakeEmpty ();
+
   if (tile_full)
   {
     // Special case. Only update the fvalue since the tile itself
@@ -311,6 +314,32 @@ bool csCoverageTile::TestFullRect (float testdepth)
   }
 }
 
+bool csCoverageTile::TestPoint (int x, int y, float testdepth)
+{
+  CS_ASSERT (x >= 0 && x < 32);
+  CS_ASSERT (y >= 0 && y < 64);
+
+  // First check for depth.
+  int xd = x >> 3;	// Depth x coordinate.
+  int yd = y >> 3;	// Depth y coordinate.
+  float d = depth[(yd << 2) + xd];
+  if (testdepth <= d)
+  {
+    // Visible regardless of coverage.
+    return true;
+  }
+
+  if (tile_full)
+  {
+    // If tile is full we know we are not visible because depth
+    // has already been checked.
+    return false;
+  }
+
+  const csBits64& c = coverage[x];
+  return c.TestBit (y);
+}
+
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csTiledCoverageBuffer)
@@ -381,11 +410,6 @@ void csTiledCoverageBuffer::Initialize ()
 void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 	int yfurther)
 {
-int orig_x1 = x1;
-int orig_y1 = y1;
-int orig_x2 = x2;
-int orig_y2 = y2;
-
   y2 += yfurther;
 
   if (y2 < 0 || y1 >= height)
@@ -1046,8 +1070,7 @@ bool csTiledCoverageBuffer::TestPoint (const csVector2& point, float min_depth)
   int tx = xi >> 5;
 
   csCoverageTile* tile = GetTile (tx, ty);
-  //@@@ DO NOT USE FULLRECT FOR A SINGLE POINT!
-  return tile->TestFullRect (min_depth);
+  return tile->TestPoint (xi & 31, yi & 63, min_depth);
 }
 
 static void DrawZoomedPixel (iGraphics2D* g2d, int x, int y, int col, int zoom)
@@ -1107,94 +1130,31 @@ static float rnd (int totrange, int leftpad, int rightpad)
   return float (((rand () >> 4) % (totrange-leftpad-rightpad)) + leftpad);
 }
 
-bool csTiledCoverageBuffer::Debug_ExtensiveTest (int num_iterations,
-	csVector2* verts, int& num_verts)
-{
-#if 0
-  int i;
-  for (i = 0 ; i < num_iterations ; i++)
-  {
-    num_verts = ((rand () >> 4) % 1)+3;
-    switch (num_verts)
-    {
-      case 3:
-        verts[0].Set (rnd (width, -100, 20), rnd (height, -100, -100));
-        verts[1].Set (rnd (width, -100, 20), rnd (height, -100, -100));
-        verts[2].Set (rnd (width, -100, 20), rnd (height, -100, -100));
-        break;
-      case 4:
-        // @@@ TODO!
-	break;
-    }
-    csBox2Int bbox;
-    InitializePolygonBuffer ();
-    DrawPolygon (verts, num_verts, bbox);
-    XORSweep ();
-
-    int r;
-    for (r = 0 ; r < numrows ; r++)
-    {
-      uint32* row = &buffer[(r<<w_shift)+width-2];
-      if (*row) return false;
-    }
-  }
-#endif
-  return true;
-}
-
 #define COV_ASSERT(test,msg) \
   if (!(test)) \
   { \
     str.Format ("csTiledCoverageBuffer failure (%d,%s): %s\n", int(__LINE__), \
     	#msg, #test); \
-    return false; \
+    return rc; \
   }
-
-bool csTiledCoverageBuffer::Debug_TestOneIteration (csString& str)
-{
-  csVector2 poly[6];
-  csBox2 bbox;
-
-  //============================
-  // The first part of this test is designed to test the coverage
-  // part of the coverage buffer alone. The depth buffer itself is ignored.
-  // To do this all polygons are inserted with 0.0 depth value and all
-  // polygons are tested with 1.0 depth value.
-  //============================
-  Initialize ();
-
-  // The following case produced a bug in early instantiations of the
-  // coverage buffer.
-  bbox.Set (-11.9428, -163.295, 193.562, 24.843);
-  COV_ASSERT (TestRectangle (bbox, 8.33137) == true, b);
-
-  return true;
-}
 
 iString* csTiledCoverageBuffer::Debug_UnitTest ()
 {
   Setup (640, 480);
 
   scfString* rc = new scfString ();
-  if (!Debug_TestOneIteration (rc->GetCsString ()))
-  {
-    return rc;
-  }
+  csString& str = rc->GetCsString ();
 
-  csVector2 verts[6];
-  int num_verts;
-  if (!Debug_ExtensiveTest (10000, verts, num_verts))
-  {
-    rc->GetCsString ().Append ("csTiledCoverageBuffer failure:\n");
-    csString sub;
-    int i;
-    for (i = 0 ; i < num_verts ; i++)
-    {
-      sub.Format ("  (%g,%g)\n", verts[i].x, verts[i].y);
-      rc->GetCsString ().Append (sub);
-    }
-    return rc;
-  }
+  Initialize ();
+  COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
+  csVector2 poly[4];
+  poly[0].Set (50, 50);
+  poly[1].Set (300, 50);
+  poly[2].Set (300, 300);
+  poly[3].Set (50, 300);
+  InsertPolygon (poly, 4, 10.0);
+  COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
+  COV_ASSERT (TestPoint (csVector2 (100, 100), 15) == false, "tp");
 
   rc->DecRef ();
   return NULL;
@@ -1205,14 +1165,7 @@ csTicks csTiledCoverageBuffer::Debug_Benchmark (int num_iterations)
   Setup (640, 480);
 
   csTicks start = csGetTicks ();
-  scfString* rc = new scfString ();
-  int i;
-  for (i = 0 ; i < num_iterations ; i++)
-  {
-    Debug_TestOneIteration (rc->GetCsString ());
-  }
   csTicks end = csGetTicks ();
-  rc->DecRef ();
   return end-start;
 }
 

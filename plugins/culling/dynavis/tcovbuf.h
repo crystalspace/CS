@@ -177,6 +177,12 @@ public:
    * visible.
    */
   bool TestFullRect (float testdepth);
+
+  /**
+   * Test if a given point is visible in this tile. Coordinates
+   * are given relative to top-left coordinate of this tile.
+   */
+  bool TestPoint (int x, int y, float testdepth);
 };
 
 /**
@@ -205,10 +211,6 @@ private:
   // DrawLine() will update these values.
   int* dirty_left;
   int* dirty_right;
-
-  bool Debug_ExtensiveTest (int num_iterations, csVector2* verts,
-  	int& num_verts);
-  bool Debug_TestOneIteration (csString& str);
 
   /**
    * Draw a line on the coverage buffer.

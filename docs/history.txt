@@ -13,6 +13,10 @@ The history order is reversed so that new features are at the top.
 	- Further fixes on Dynavis. Doesn't crash now but culls incorrectly.
 	- Enabled more plugins in win32gcc.mak since mingw installation
 	  now has the needed libraries (or soon will have at least).
+	- Started implementing unit tester in the tiled coverage buffer.
+	- Implemented TestPoint() in the tiled coverage buffer, doesn't work
+	  properly yet. So the unit tester will fail now.
+	- Fixed a bug in the tiled coverage buffer.
 12-Jun-2002
 	- Enabled stencil again in opengl.cfg. For some reason it
 	  was disabled.

@@ -65,6 +65,13 @@ public:
     else
       b1 ^= 1<<b;
   }
+  inline bool TestBit (int b) const
+  {
+    if (b >= 32)
+      return !!(b2 & (1<<(b-32)));
+    else
+      return !!(b1 & (1<<b));
+  }
   inline void Empty ()
   {
     b1 = 0;

@@ -939,6 +939,20 @@ iString* csDynaVis::Debug_UnitTest ()
   }
   delete covbuf;
 
+  csTiledCoverageBuffer* tcovbuf = new csTiledCoverageBuffer (640, 480);
+  dbghelp = SCF_QUERY_INTERFACE (tcovbuf, iDebugHelper);
+  if (dbghelp)
+  {
+    iString* rc = dbghelp->UnitTest ();
+    dbghelp->DecRef ();
+    if (rc)
+    {
+      delete tcovbuf;
+      return rc;
+    }
+  }
+  delete tcovbuf;
+
   return NULL;
 }
 
