@@ -75,6 +75,10 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() { locked = false; }
 
+  virtual bool IsDiscarded() { return false; }
+
+  virtual void CanDiscard(bool value) {}
+
   /// Get type of buffer (where it's located)
   virtual CS_RENDERBUFFER_TYPE GetBufferType() { return type; }
 
