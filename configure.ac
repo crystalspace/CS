@@ -297,6 +297,7 @@ AS_IF([test $cs_cv_prog_makedep_ok = yes],
 AC_CHECK_PROGS([PERL], [perl5 perl])
 AS_IF([test -n "$PERL"],
     [CS_BUILD_PROPERTY([PERL5.AVAILABLE], [yes])
+    CS_BUILD_PROPERTY([CMD.PERL5], [$PERL])
     CS_BUILD_PROPERTY([PERL5], [$PERL])
     CS_BUILD_PROPERTY([PERL], [$PERL])
 
@@ -304,28 +305,17 @@ AS_IF([test -n "$PERL"],
 	[AS_IF([AC_RUN_LOG([$PERL -MExtUtils::Embed -e 0 1>&2])],
 	    [cs_cv_perl_mod_embed=yes], [cs_cv_perl_mod_embed=no])])
     AS_IF([test $cs_cv_perl_mod_embed = yes],
+	[CS_BUILD_PROPERTY([PERL5.EXTUTILS.EMBED.AVAILABLE], [yes])]
 	[AC_CACHE_CHECK([for perl DynaLoader module],
 	    [cs_cv_perl_mod_dynaloader],
 	    [AS_IF([AC_RUN_LOG([$PERL -MDynaLoader -e 0 1>&2])],
-		[cs_cv_perl_mod_dynaloader=yes],
-		[cs_cv_perl_mod_dynaloader=no])])
-	AS_IF([test $cs_cv_perl_mod_dynaloader = yes],
-	    [AC_CONFIG_COMMANDS([include/csperlxs.inc],
-		[$PERL -MExtUtils::Embed -e xsinit -- -o include/csperlxs.inc \
-		-std DynaLoader cspace 1>&2],
-		[PERL=${PERL-perl}
-		AS_MKDIR_P([include])])
-	    CS_HEADER_PROPERTY([CS_PERL5_XSINC],
-		[AS_ESCAPE(["csperlxs.inc"])])])
-	cs_cv_perl_cflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ccopts])`
+		[CS_BUILD_PROPERTY([PERL5.DYNALOADER.AVAILABLE], [yes])])])]
+	[cs_cv_perl_cflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ccopts])`
 	cs_cv_perl_lflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ldopts])`],
 
 	# ExtUtils::Embed absent.
 	[AC_MSG_NOTICE([Recommend you install the latest release of Perl 5.])
 	AC_MSG_NOTICE([http://www.perl.org/])
-	CS_HEADER_PROPERTY([CS_PERL5_XSINC],
-	    [AS_ESCAPE(["cssys/csperlxs_fallback.inc"])])
-
 	AC_CACHE_CHECK([for perl Config module], [cs_cv_perl_mod_config],
 	    [AS_IF([AC_RUN_LOG([$PERL -MConfig -e 0 1>&2])],
 		[cs_cv_perl_mod_config=yes], [cs_cv_perl_mod_config=no])])

@@ -3689,6 +3689,10 @@ if test -n "$PERL"; then
 "
     cs_jamconfig_text="${cs_jamconfig_text}PERL5.AVAILABLE ?= \"yes\" ;
 "
+    cs_makefile_text="${cs_makefile_text}CMD.PERL5 = $PERL
+"
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.PERL5 ?= \"$PERL\" ;
+"
     cs_makefile_text="${cs_makefile_text}PERL5 = $PERL
 "
     cs_jamconfig_text="${cs_jamconfig_text}PERL5 ?= \"$PERL\" ;
@@ -3717,7 +3721,11 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_perl_mod_embed" >&5
 echo "${ECHO_T}$cs_cv_perl_mod_embed" >&6
     if test $cs_cv_perl_mod_embed = yes; then
-  echo "$as_me:$LINENO: checking for perl DynaLoader module" >&5
+  cs_makefile_text="${cs_makefile_text}PERL5.EXTUTILS.EMBED.AVAILABLE = yes
+"
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.EXTUTILS.EMBED.AVAILABLE ?= \"yes\" ;
+"
+	echo "$as_me:$LINENO: checking for perl DynaLoader module" >&5
 echo $ECHO_N "checking for perl DynaLoader module... $ECHO_C" >&6
 if test "${cs_cv_perl_mod_dynaloader+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -3727,21 +3735,15 @@ else
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  cs_cv_perl_mod_dynaloader=yes
-else
-  cs_cv_perl_mod_dynaloader=no
+  cs_makefile_text="${cs_makefile_text}PERL5.DYNALOADER.AVAILABLE = yes
+"
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.DYNALOADER.AVAILABLE ?= \"yes\" ;
+"
 fi
 
 fi
 echo "$as_me:$LINENO: result: $cs_cv_perl_mod_dynaloader" >&5
 echo "${ECHO_T}$cs_cv_perl_mod_dynaloader" >&6
-	if test $cs_cv_perl_mod_dynaloader = yes; then
-            ac_config_commands="$ac_config_commands include/csperlxs.inc"
-
-	    cs_header_text="${cs_header_text}#define CS_PERL5_XSINC \"csperlxs.inc\"
-"
-fi
-
 	cs_cv_perl_cflags=`{ (echo "$as_me:$LINENO: \$PERL -MExtUtils::Embed -e ccopts") >&5
   ($PERL -MExtUtils::Embed -e ccopts) 2>&5
   ac_status=$?
@@ -3758,9 +3760,6 @@ else
 echo "$as_me: Recommend you install the latest release of Perl 5." >&6;}
 	{ echo "$as_me:$LINENO: http://www.perl.org/" >&5
 echo "$as_me: http://www.perl.org/" >&6;}
-	cs_header_text="${cs_header_text}#define CS_PERL5_XSINC \"cssys/csperlxs_fallback.inc\"
-"
-
 	echo "$as_me:$LINENO: checking for perl Config module" >&5
 echo $ECHO_N "checking for perl Config module... $ECHO_C" >&6
 if test "${cs_cv_perl_mod_config+set}" = set; then
@@ -23285,32 +23284,6 @@ cat >>$CONFIG_STATUS <<_ACEOF
 # INIT-COMMANDS section.
 #
 
-PERL=${PERL-perl}
-		{ if test -n "$as_mkdir_p"; then
-    $as_mkdir_p include
-  else
-    as_dir=include
-    as_dirs=
-    while test ! -d "$as_dir"; do
-      as_dirs="$as_dir $as_dirs"
-      as_dir=`(dirname "$as_dir") 2>/dev/null ||
-$as_expr X"$as_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-         X"$as_dir" : 'X\(//\)[^/]' \| \
-         X"$as_dir" : 'X\(//\)$' \| \
-         X"$as_dir" : 'X\(/\)' \| \
-         .     : '\(.\)' 2>/dev/null ||
-echo X"$as_dir" |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
-  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
-  	  /^X\(\/\/\)$/{ s//\1/; q; }
-  	  /^X\(\/\).*/{ s//\1/; q; }
-  	  s/.*/./; q'`
-    done
-    test ! -n "$as_dirs" || mkdir $as_dirs
-  fi || { { echo "$as_me:$LINENO: error: cannot create directory include" >&5
-echo "$as_me: error: cannot create directory include" >&2;}
-   { (exit 1); exit 1; }; }; }
-
 cs_header_text='$cs_header_text' cs_dir=`(dirname include/volatile.h) 2>/dev/null ||
 $as_expr Xinclude/volatile.h : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
          Xinclude/volatile.h : 'X\(//\)[^/]' \| \
@@ -23435,7 +23408,6 @@ do
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "Jamfile" ) CONFIG_FILES="$CONFIG_FILES Jamfile" ;;
-  "include/csperlxs.inc" ) CONFIG_COMMANDS="$CONFIG_COMMANDS include/csperlxs.inc" ;;
   "include/volatile.h" ) CONFIG_COMMANDS="$CONFIG_COMMANDS include/volatile.h" ;;
   "config.mak" ) CONFIG_COMMANDS="$CONFIG_COMMANDS config.mak" ;;
   "Jamconfig" ) CONFIG_COMMANDS="$CONFIG_COMMANDS Jamconfig" ;;
@@ -23827,8 +23799,6 @@ ac_abs_top_srcdir=`cd "$ac_dir" && cd $ac_top_srcdir && pwd`
   { echo "$as_me:$LINENO: executing $ac_dest commands" >&5
 echo "$as_me: executing $ac_dest commands" >&6;}
   case $ac_dest in
-    include/csperlxs.inc ) $PERL -MExtUtils::Embed -e xsinit -- -o include/csperlxs.inc \
-		-std DynaLoader cspace 1>&2 ;;
     include/volatile.h ) echo $ECHO_N "$cs_header_text$ECHO_C" > $tmp/tcache
 	if diff include/volatile.h $tmp/tcache >/dev/null 2>&1; then
   { echo "$as_me:$LINENO: include/volatile.h is unchanged" >&5

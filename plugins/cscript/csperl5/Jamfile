@@ -1,5 +1,35 @@
 SubDir TOP plugins cscript csperl5 ;
 
+if $(CMD.PERL5)
+{
+  if $(PERL5.EXTUTILS.EMBED.AVAILABLE) = "yes"
+  {
+    if $(PERL5.DYNALOADER.AVAILABLE) = "yes"
+    {
+      actions PerlEmbedGlueFile
+      {
+        $(CMD.PERL5) -MExtUtils::Embed -e xsinit -- \
+        -o $(<) -std DynaLoader cspace
+      }
+    }
+    else
+    {
+      actions PerlEmbedGlueFile
+      {
+        $(CMD.PERL5) -MExtUtils::Embed -e xsinit -- \
+        -o $(<) -std cspace
+      }
+    }
+  }
+  else
+  {
+    actions PerlEmbedGlueFile
+    {
+      echo '#include "csperlxs_fallback.inc"' > $(<)
+    }
+  }
+}
+
 if $(PERL5.AVAILABLE) = "yes"
 {
   if $(CMD.SWIG)
@@ -18,6 +48,10 @@ if $(PERL5.AVAILABLE) = "yes"
 		    
     Swig $(target) : $(sources) ;
   }
+
+  local perlxs = [ FGristFiles csperlxs.c ] ;
+  PerlEmbedGlueFile $(perlxs) ;
+  LOCATE on $(perlxs) = $(SUBDIR) ;
   
   FILES = csperl5.cpp csperl5.h cswigpl5.cpp csperlxs.c ;
   

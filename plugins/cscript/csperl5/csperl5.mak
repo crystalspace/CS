@@ -1,5 +1,6 @@
 DESCRIPTION.csperl5 = Crystal Space Perl5 scripting plugin
 DESCRIPTION.csperl5dist = $(DESCRIPTION.csperl5) interim files
+DESCRIPTION.swigperl5gen = $(DESCRIPTION.csperl5) (forcibly)
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION), rootdefines)
@@ -22,6 +23,9 @@ csperl5clean:
 	$(MAKE_CLEAN)
 csperl5distclean:
 	$(MAKE_CLEAN)
+swigperl5gen:
+	$(MAKE_TARGET)
+	
 
 endif
 
@@ -44,9 +48,7 @@ SRC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.cpp))
 OBJ.CSPERL5 = $(addprefix $(OUT)/,$(notdir $(SRC.CSPERL5:.cpp=$O)))
 DEP.CSPERL5 = CSTOOL CSGEOM CSSYS CSUTIL CSSYS CSUTIL
 
-PERLXSI.DEP = config.mak
-PERLXSI.DIR = $(OUTDERIVED)
-PERLXSI.C = $(PERLXSI.DIR)/csperlxs.c
+PERLXSI.C = $(SRCDIR)/plugins/cscript/csperl5/csperlxs.c
 PERLXSI.O = $(OUT)/$(notdir $(PERLXSI.C:.c=$O))
 
 SWIG.I = $(SRCDIR)/include/ivaria/cspace.i
@@ -54,7 +56,7 @@ SWIG.MOD = cspace
 SWIG.PERL5.PM = $(SRCDIR)/scripts/perl5/$(SWIG.MOD).pm
 SWIG.PERL5.C = $(SRCDIR)/plugins/cscript/csperl5/cswigpl5.inc
 SWIG.PERL5.CPP = $(SRCDIR)/plugins/cscript/csperl5/cswigpl5.cpp
-SWIG.PERL5.O = $(OUT)/$(notdir $(SWIG.PERL5.C:.cpp=$O))
+SWIG.PERL5.O = $(OUT)/$(notdir $(SWIG.PERL5.CPP:.cpp=$O))
 SWIG.PERL5.DLL = $(SRCDIR)/scripts/perl5/$(SWIG.MOD)$(DLL)
 SWIG.PERL5.DOC = $(SRCDIR)/scripts/perl5/cs_wrap.doc
 
@@ -104,6 +106,21 @@ $(CSPERL5): $(OBJ.CSPERL5) $(LIB.CSPERL5) $(PERLXSI.O) $(SWIG.PERL5.DLL)
 $(OUT)/%$O: $(SRCDIR)/plugins/cscript/csperl5/%.cpp
 	$(DO.COMPILE.CPP) $(PERL5.CFLAGS)
 
+ifeq ($(PERL5.EXTUTILS.EMBED.AVAILABLE),yes)
+  ifeq ($(PERL5.DYNALOADER.AVAILABLE),yes)
+    PERLXSI.MK = $(CMD.PERL5) -MExtUtils::Embed -e xsinit -- \
+    -o $(PERLXSI.C) -std DynaLoader cspace
+  else
+    PERLXSI.MK = $(CMD.PERL5) -MExtUtils::Embed -e xsinit -- \
+    -o $(PERLXSI.C) -std cspace
+  endif
+else
+  PERLXSI.MK = echo "\#include \"csperlxs_fallback.inc\"" > $(PERLXSI.C)
+endif
+
+$(PERLXSI.C):
+	$(PERLXSI.MK)
+
 $(PERLXSI.O): $(PERLXSI.C)
 	$(DO.COMPILE.C) $(PERL5.CFLAGS)
 
@@ -132,16 +149,19 @@ $(CEX.CSPERL5): $(CIN.CSPERL5)
 	$(PERL5) $(CIN.CSPERL5) \
 	$"CFLAGS=$(PERL5.CFLAGS)$" $"LFLAGS=$(PERL5.LFLAGS)$" > $@
 
+swigperl5gen: swigperl5clean $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
+
 clean: csperl5clean
 distclean: csperl5distclean
 
 csperl5clean:
-	$(RM) $(CSPERL5) $(OBJ.CSPERL5) $(PERLXSI.O) \
+	$(RM) $(CSPERL5) $(OBJ.CSPERL5) $(PERLXSI.O) $(PERLXSI.C) \
 	$(CSPERL5.PM) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
 
-csperl5distclean: csperl5clean
-	$(RM) $(SWIG.PERL5.DOC) $(SWIG.PERL5.C) $(SWIG.PERL5.PM) \
-	include/csperlxs.inc
+swigperl5clean:
+	$(RM) $(SWIG.PERL5.DOC) $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
+
+csperl5distclean: csperl5clean swigperl5clean
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csperl5.dep

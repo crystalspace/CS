@@ -55,8 +55,8 @@
 %rename(__or_ass__)	*::operator|=;
 %rename(__xor_ass__)	*::operator^=;
 
-%rename(and)		*::operator&&;
-%rename(or)		*::operator||;
+//%rename(and)		*::operator&&;
+//%rename(or)		*::operator||;
 
 #if 0
   %extend T
@@ -267,9 +267,9 @@
   ptr = new array_type [cnt];
   for (int i = 0; i < cnt; i++)
   {
-    SV *or = av_shift (av);
-    SV *o = SvRV (or);
-    SvREFCNT_dec (or);
+    SV *oref = av_shift (av);
+    SV *o = SvRV (oref);
+    SvREFCNT_dec (oref);
     if (! sv_isa (o, #base_type))
     {
       croak ("%s", "Array must contain " #base_type "'s");
