@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Mathew Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2003 by Mathew Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,21 +27,21 @@
  * Create a csHashMap key from an iEvent.
  * Used internally by csInputBinder.
  */
-extern csHashKey csHashComputeEvent (iEvent &ev);
+csHashKey csHashComputeEvent (iEvent const&);
 
 /**
- * Bind an input event to a pointer to a variable,
- * so that that variable will reflect the state of a given key, button or axis.
+ * Bind an input event to a pointer to a variable so that that variable will
+ * reflect the state of a given key, button or axis.
  */
 class csInputBinder : public iInputBinder
 {
- private:
+private:
   csHashMap Hash;
 
- protected:
-  inline bool HandleEvent (iEvent &ev);
+protected:
+  bool HandleEvent (iEvent&);
 
- public:
+public:
   SCF_DECLARE_IBASE;
 
   /**
@@ -51,7 +51,7 @@ class csInputBinder : public iInputBinder
   csInputBinder (iBase *parent = NULL, int size = 127);
 
   /**
-   * Destructor does UnbindAll automatically.
+   * Destructor invokes UnbindAll() automatically.
    */
   virtual ~csInputBinder ();
 
@@ -67,24 +67,24 @@ class csInputBinder : public iInputBinder
    * This class can be registered with the event queue:
    * iEventQueue::RegisterListener(this, CSMASK_Input);
    */
-  virtual iEventHandler* QueryHandler () { return & scfiEventHandler; }
+  virtual iEventHandler* QueryHandler () { return &scfiEventHandler; }
 
   /**
    * Bind a bool to a keyboard key or mouse or joystick button status.
    * If toggle is true, one press activates and the second deactivates.
    * Otherwise, keydown activates and keyup deactivates.
    */
-  virtual void Bind (iEvent &ev, iInputBinderBoolean *var, bool toggle = false);
+  virtual void Bind (iEvent&, iInputBinderBoolean*, bool toggle = false);
 
   /**
-   * Bind two int's to the x and y axes of a mouse or joystick.
+   * Bind two integers to the x and y axes of a mouse or joystick.
    */
-  virtual void Bind (iEvent &ev, iInputBinderPosition *var);
+  virtual void Bind (iEvent&, iInputBinderPosition*);
 
   /**
    * Remove a binding.
    */
-  virtual bool Unbind (iEvent &ev);
+  virtual bool Unbind (iEvent&);
 
   /**
    * Remove all bindings.
@@ -92,24 +92,25 @@ class csInputBinder : public iInputBinder
   virtual bool UnbindAll();
 };
 
-/// Represents the position of a mouse
-/// or joystick axis, shared between plugins.
+/**
+ * Represents the position of a mouse or joystick axis, shared between modules.
+ */
 class csInputBinderPosition : public iInputBinderPosition
 {
- private:
+private:
   /// The internally held value of the position.
   int p;
 
- public:
+public:
   SCF_DECLARE_IBASE;
 
-  /// Initialize Constructor.
+  /// Initialize constructor.
   csInputBinderPosition (int pp) : p (pp)
     { SCF_CONSTRUCT_IBASE (NULL); }
-  /// Empty Constructor.
+  /// Empty constructor.
   csInputBinderPosition () : p (0)
     { SCF_CONSTRUCT_IBASE (NULL); }
-  /// Copy Constructor.
+  /// Copy constructor.
   csInputBinderPosition (iInputBinderPosition *pp) : p (pp->Get ())
     { SCF_CONSTRUCT_IBASE (NULL); }
   /// Destructor.
@@ -121,24 +122,26 @@ class csInputBinderPosition : public iInputBinderPosition
   virtual int Get () const { return p; }
 };
 
-/// Represents the up or down state of a keyboard key
-/// or a mouse or joystick button, shared between plugins.
+/**
+ * Represents the up or down state of a keyboard key or a mouse or joystick
+ * button, shared between modules.
+ */
 class csInputBinderBoolean : public iInputBinderBoolean
 {
- private:
+private:
   /// The internally held state of the button.
   bool s;
 
- public:
+public:
   SCF_DECLARE_IBASE;
 
-  /// Initialize Constructor.
+  /// Initialize constructor.
   csInputBinderBoolean (bool ss) : s (ss)
     { SCF_CONSTRUCT_IBASE (NULL); }
-  /// Empty Constructor.
+  /// Empty constructor.
   csInputBinderBoolean () : s (0)
     { SCF_CONSTRUCT_IBASE (NULL); }
-  /// Copy Constructor.
+  /// Copy constructor.
   csInputBinderBoolean (iInputBinderBoolean *ss) : s (ss->Get ())
     { SCF_CONSTRUCT_IBASE (NULL); }
   /// Destructor.

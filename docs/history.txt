@@ -30,6 +30,19 @@ The history order is reversed so that new features are at the top.
 	  the given value == NULL. Previously it would crash there.
 	- Optimized TinyXML loader a tiny bit.
 	- Got a new energy.jpg from Boyan. Looks much better.
+	- Eric Sunshine made the following changes:
+	    - Corrected the Doxygen comments in iutil/binder.h and
+	      csutil/binder.h.
+	    - Removed useless `inline' and `extern' from csutil/binder.h.
+	    - Fixed problem in csutil/binder.cpp where it was not initializing
+	      its full set of instance variables.
+	    - Fixed logic bug in csEvBind where it failed to release its
+	      iInputBinderBoolean reference at destruction time.
+	    - Added explicit logic to csInputBinder::HandleEvent() to prevent
+	      it from ever treating an iInputBinderPosition as an
+	      iInputBinderBoolean (and vice versa) to ensure that it does not
+	      call methods of the one interface when actually dealing with a
+	      reference to the other.  (Beware of `union'.)
 12-Mar-2003
 	- Added csArray::ShrinkBestFit() routine. This routine will set
 	  the capacity of the array exactly to the current length. This

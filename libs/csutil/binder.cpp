@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Mathew Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2003 by Mathew Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -36,6 +36,8 @@ struct csEvBind
     p = pp;
     if (p) p->IncRef ();
     pos = true;
+    tgl = false;
+    up = false;
   }
   csEvBind (iInputBinderBoolean *bb, bool toggle)
   {
@@ -48,13 +50,13 @@ struct csEvBind
   ~csEvBind ()
   {
     if (pos)
-      if (p) p->DecRef ();
+      { if (p) p->DecRef (); }
     else
-      if (b) b->DecRef ();
+      { if (b) b->DecRef (); }
   }
 };
 
-csHashKey csHashComputeEvent (iEvent &ev)
+csHashKey csHashComputeEvent (iEvent const& ev)
 {
   switch (ev.Type)
   {
@@ -115,7 +117,7 @@ inline bool csInputBinder::HandleEvent (iEvent &ev)
     case csevKeyDown:
     case csevMouseDown:
     case csevJoystickDown:
-      if (pair->b)
+      if (!pair->pos && pair->b)
       {
         if (pair->tgl)
         {
@@ -133,7 +135,7 @@ inline bool csInputBinder::HandleEvent (iEvent &ev)
     case csevKeyUp:
     case csevMouseUp:
     case csevJoystickUp:
-      if (pair->b)
+      if (!pair->pos && pair->b)
       {
         if (pair->tgl)
           pair->up = true;
@@ -143,11 +145,17 @@ inline bool csInputBinder::HandleEvent (iEvent &ev)
       return true;
 
     case csevMouseMove:
-      //TODO
+      if (pair->pos)
+      {
+        //TODO
+      }
       return true;
 
     case csevJoystickMove:
-      //TODO
+      if (pair->pos)
+      {
+        //TODO
+      }
       return true;
 
     default:
