@@ -92,19 +92,6 @@ void GLGlyphSet::Load ()
   }
 }
 
-//-----------------------------------------------------// GLGlyphVector //----//
-
-GLFontCache::GLGlyphVector::~GLGlyphVector ()
-{
-  DeleteAll ();
-}
-
-bool GLFontCache::GLGlyphVector::FreeItem (void* Item)
-{
-  delete (GLGlyphSet *)Item;
-  return true;
-}
-
 //-------------------------------------------------------// GLFontCache //----//
 
 struct FontDeleteNotify : public iFontDeleteNotify
