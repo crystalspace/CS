@@ -164,8 +164,11 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TYPE)
   CS_TOKEN_DEF (UV)
   CS_TOKEN_DEF (UVA)
+  CS_TOKEN_DEF (UVEC)
+  CS_TOKEN_DEF (UV_SHIFT)
   CS_TOKEN_DEF (UP)
   CS_TOKEN_DEF (V)
+  CS_TOKEN_DEF (VVEC)
   CS_TOKEN_DEF (VERTEX)
   CS_TOKEN_DEF (VERTICES)
   CS_TOKEN_DEF (W)
@@ -812,6 +815,19 @@ void Cs2Xml::ParseFarPlane (char const* parent_token, csParser* parser,
   child->SetAttributeAsFloat ("b", b);
   child->SetAttributeAsFloat ("c", c);
   child->SetAttributeAsFloat ("d", d);
+}
+
+void Cs2Xml::ParseUVShift (char const* parent_token, csParser* parser,
+	csRef<iDocumentNode>& parent, char*& name, char* params,
+	char const* tokname)
+{
+  csRef<iDocumentNode> child;
+  float u, v;
+  csScanStr (params, "%f,%f", &u, &v);
+  child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  child->SetValue (tokname);
+  child->SetAttributeAsFloat ("u", u);
+  child->SetAttributeAsFloat ("v", v);
 }
 
 void Cs2Xml::ParseVector (char const* parent_token, csParser* parser,
@@ -2189,8 +2205,11 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (TYPE)
     CS_TOKEN_TABLE (UP)
     CS_TOKEN_TABLE (UV)
+    CS_TOKEN_TABLE (UVEC)
+    CS_TOKEN_TABLE (UV_SHIFT)
     CS_TOKEN_TABLE (UVA)
     CS_TOKEN_TABLE (V)
+    CS_TOKEN_TABLE (VVEC)
     CS_TOKEN_TABLE (VERTEX)
     CS_TOKEN_TABLE (VERTICES)
     CS_TOKEN_TABLE (W)
@@ -2262,6 +2281,8 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	break;
       case CS_TOKEN_C:
       case CS_TOKEN_W:
+      case CS_TOKEN_UVEC:
+      case CS_TOKEN_VVEC:
       case CS_TOKEN_FORWARD:
       case CS_TOKEN_UP:
       case CS_TOKEN_EULER:
@@ -2284,6 +2305,9 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
       case CS_TOKEN_SHIFT:
       case CS_TOKEN_CURVECENTER:
 	ParseVector (parent_token, parser, parent, name, params, tokname);
+	break;
+      case CS_TOKEN_UV_SHIFT:
+	ParseUVShift (parent_token, parser, parent, name, params, "uvshift");
 	break;
       case CS_TOKEN_CURVECONTROL:
 	ParseCurveControl (parent_token, parser, parent, name, params,
@@ -2508,9 +2532,7 @@ void Cs2Xml::ConvertDir (const char* vfspath, bool backup)
 
 bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
 {
-printf ("1: conf file '%s'\n", vfspath); fflush (stdout);
   if (!TestCSFile (vfspath)) return false;
-printf ("2: conf file '%s'\n", vfspath); fflush (stdout);
 
   printf ("Trying to convert '%s' ... \n", vfspath); fflush (stdout);
   csRef<iDataBuffer> buf (vfs->ReadFile (vfspath));
@@ -2637,7 +2659,6 @@ void Cs2Xml::Main ()
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   const char* val = cmdline->GetName ();
-  printf ("%s\n", val); fflush (stdout);
   if (!val)
   {
     ReportError ("Please give VFS world file name or name of the zip archive!");

@@ -91,6 +91,9 @@ public:
   void ParseFarPlane (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname);
+  void ParseUVShift (char const* parent_token, csParser* parser,
+	csRef<iDocumentNode>& parent, char*& name, char* params,
+	char const* tokname);
   void ParseVector (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname);

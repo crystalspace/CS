@@ -26,6 +26,7 @@ The history order is reversed so that new features are at the top.
 	  canvas to build correctly with Jaguar MacOS/X.
 	- Eric Sunshine fixed a bug he introduced into cs2xml yesterday.
 	  ParseGeneral() was not recognizing all known tokens.
+	- Fixed UVEC, VVEC, and UV_SHIFT conversion in cs2xml.
 17-Sep-2002
 	- Clarified some iMovable Doxygen comments.
 	- Fixed a serious bug in the csRef assignment operator for
