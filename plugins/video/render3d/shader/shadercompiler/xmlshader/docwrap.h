@@ -171,7 +171,7 @@ public:
 
   virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
   	iDocumentNode* before)
-  { return false; }
+  { return 0; }
 
   virtual const char* GetContentsValue ();
   virtual int GetContentsValueAsInt ();

@@ -389,7 +389,7 @@ csPtr<iBase> csFoliageFactoryLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_FOLIAGEPALETTE:
         if (!ParseFoliagePalette (child, state))
-	  return false;
+	  return 0;
 	break;
       default:
 	synldr->ReportBadToken (child);

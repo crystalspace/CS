@@ -42,9 +42,13 @@ chronological order.
 	- res removed some unnecessary members & methods from the NR GL 
 	  renderer lightmap code.
 	- Marten updated todo_newrenderer.txt. It needs some more checkup, but
-	  i don't have time to fix that right now.
-	- Eric Sunshine resolved a MIN/MAX #define conflict between csdef.h
-	  and <sys/param.h>. (bug #1066917)
+	  I don't have time to fix that right now.
+	- Eric Sunshine applied patch from Chris Kuethe <ckuethe@users.sf.net>
+	  to resolve a MIN/MAX #define conflict between csdef.h and
+	  <sys/param.h>. (bug #1066917)
+	- Eric Sunshine applied patch from Chris Kuethe <ckuethe@users.sf.net>
+	  to fix a couple places where 'false' was being returned incorrectly
+	  from methods declared as returning csRef<>/csPtr<>. (bug #1066948)
 14-Nov-2004
 	- Eric Sunshine updated cspace.i to take csPoly2D decomposition into
 	  account.
