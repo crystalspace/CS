@@ -453,7 +453,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
     if ((Mode & VFS_FILE_MODE) == VFS_FILE_READ)
       break;
     
-    char *lastps = strrchr (NameSuffix, VFS_PATH_SEPARATOR);
+    char *lastps = (char*)strrchr (NameSuffix, VFS_PATH_SEPARATOR);
     if (!lastps)
       break;
 

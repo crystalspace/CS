@@ -59,6 +59,10 @@ chronological order.
 	  <eidpers@comcast.net> which fixes a number of cases where classes
 	  were accidentally inheriting SCF interfaces privately, rather than
 	  publicly.
+	- Eric Sunshine applied patch from Randall Foreman
+	  <eidpers@comcast.net> which fixes a number of const versus non-const
+	  conflicts from the return value of strchr().  Eric also re-wrote some
+	  of the code to avoid these conflicts altogether.
 18-Dec-2003
 	- Jorrit added two new methods to iAwsComponent. One to set the
 	  preferred size and one to clear it again. This way one can forcibly

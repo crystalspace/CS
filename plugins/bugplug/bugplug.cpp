@@ -1587,7 +1587,7 @@ int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
 	bool& ctrl)
 {
   shift = alt = ctrl = false;
-  char* dash = strchr (keystring, '-');
+  char const* dash = strchr (keystring, '-');
   while (dash)
   {
     if (!strncmp (keystring, "shift", int (dash-keystring))) shift = true;
@@ -1638,16 +1638,20 @@ int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
   return keycode;
 }
 
-int csBugPlug::GetCommandCode (const char* cmd, char* args)
+int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
 {
-  char* spc = strchr (cmd, ' ');
+  char cmd[256];
+  char const* spc = strchr (cmdstr, ' ');
   if (spc)
   {
-    *spc = 0;
+    strncpy (cmd, cmdstr, spc - cmdstr);
     strcpy (args, spc+1);
   }
   else
+  {
+    strcpy(cmd, cmdstr);
     args[0] = 0;
+  }
 
   if (!strcmp (cmd, "debugenter"))	return DEBUGCMD_DEBUGENTER;
   if (!strcmp (cmd, "mouseenter"))	return DEBUGCMD_MOUSEENTER;
