@@ -277,6 +277,7 @@ void csLoader::ReportNotify (const char* description, ...)
   }
   else
   {
+    csPrintf ("crystalspace.maploader: ");
     csPrintfV (description, arg);
     csPrintf ("\n");
   }
@@ -1127,7 +1128,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
               case CS_TOKEN_MATRIX:
               {
                 csMatrix3 m;
-                if (!ParseMatrix (params2, m))
+		if (!SyntaxService->ParseMatrix (&parser, params2, m))
 		  return false;
 		transf->SetO2T (m);
                 break;
@@ -1135,8 +1136,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
               case CS_TOKEN_V:
               {
                 csVector3 v;
-                ParseVector (params2, v);
-		transf->SetO2TTranslation (v);
+                if (SyntaxService->ParseVector (&parser, params2, v))
+		  transf->SetO2TTranslation (v);
                 break;
               }
             }
@@ -1176,7 +1177,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
               case CS_TOKEN_MATRIX:
               {
 		csMatrix3 m;
-                if (!ParseMatrix (params2, m))
+                if (!SyntaxService->ParseMatrix (&parser, params2, m))
 		  return false;
                 tr.SetT2O (m);
                 break;
@@ -1184,8 +1185,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
               case CS_TOKEN_V:
               {
 		csVector3 v;
-                ParseVector (params2, v);
-		tr.SetOrigin (v);
+                if (SyntaxService->ParseVector (&parser, params2, v))
+		  tr.SetOrigin (v);
                 break;
               }
             }
@@ -1458,7 +1459,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
               case CS_TOKEN_MATRIX:
               {
 		csMatrix3 m;
-                if (!ParseMatrix (params2, m))
+                if (!SyntaxService->ParseMatrix (&parser, params2, m))
 		  return NULL;
                 tr.SetT2O (m);
                 break;
@@ -1466,8 +1467,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
               case CS_TOKEN_V:
               {
 		csVector3 v;
-                ParseVector (params2, v);
-		tr.SetOrigin (v);
+                if (SyntaxService->ParseVector (&parser, params2, v))
+		  tr.SetOrigin (v);
                 break;
               }
             }
@@ -1503,7 +1504,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
               case CS_TOKEN_MATRIX:
               {
                 csMatrix3 m;
-                if (!ParseMatrix (params2, m))
+                if (!SyntaxService->ParseMatrix (&parser, params2, m))
 		  return NULL;
                 mesh->GetMovable ()->SetTransform (m);
                 break;
@@ -1511,8 +1512,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
               case CS_TOKEN_V:
               {
                 csVector3 v;
-                ParseVector (params2, v);
-                mesh->GetMovable ()->SetPosition (v);
+                if (SyntaxService->ParseVector (&parser, params2, v))
+                  mesh->GetMovable ()->SetPosition (v);
                 break;
               }
             }
@@ -1758,7 +1759,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
               case CS_TOKEN_MATRIX:
               {
 		csMatrix3 m;
-                if (!ParseMatrix (params2, m))
+                if (!SyntaxService->ParseMatrix (&parser, params2, m))
 		  return false;
                 tr.SetT2O (m);
                 break;
@@ -1766,8 +1767,8 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
               case CS_TOKEN_V:
               {
 		csVector3 v;
-                ParseVector (params2, v);
-		tr.SetOrigin (v);
+                if (SyntaxService->ParseVector (&parser, params2, v))
+		  tr.SetOrigin (v);
                 break;
               }
             }
@@ -1795,7 +1796,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
               case CS_TOKEN_MATRIX:
               {
                 csMatrix3 m;
-                if (!ParseMatrix (params2, m))
+                if (!SyntaxService->ParseMatrix (&parser, params2, m))
 		  return false;
                 mesh->GetMovable ()->SetTransform (m);
                 break;
@@ -1803,8 +1804,8 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
               case CS_TOKEN_V:
               {
                 csVector3 v;
-                ParseVector (params2, v);
-                mesh->GetMovable ()->SetPosition (v);
+                if (SyntaxService->ParseVector (&parser, params2, v))
+                  mesh->GetMovable ()->SetPosition (v);
                 break;
               }
             }
@@ -2247,7 +2248,7 @@ SCF_EXPORT_CLASS_TABLE (csparser)
     "crystalspace.mesh.loader., "
     "crystalspace.engine.3d, crystalspace.graphics3d., "
     "crystalspace.sound.render., crystalspace.motion.manager., "
-    "crystalspace.mesh.crossbuilder, crystalspace.modelconverter.")
+    "crystalspace.mesh.crossbuilder, crystalspace.modelconverter. ")
 SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
@@ -2288,6 +2289,7 @@ csLoader::~csLoader()
   SCF_DEC_REF(SoundRender);
   SCF_DEC_REF(ModelConverter);
   SCF_DEC_REF(CrossBuilder);
+  SCF_DEC_REF(SyntaxService);
   delete Stats;
 }
 
@@ -2301,36 +2303,55 @@ iLoaderContext* csLoader::GetLoaderContext ()
   return ldr_context;
 }
 
-#define GET_PLUGIN(var, intf, msgname)	\
-  var = CS_QUERY_REGISTRY(object_reg, intf);
+#define GET_PLUGIN(var, intf, msgname)				\
+  var = CS_QUERY_REGISTRY(object_reg, intf);			\
+  if (!var) ReportNotify ("Could not get " msgname);
+
+#define GET_CRITICAL_PLUGIN(var, intf, msgname)			\
+  var = CS_QUERY_REGISTRY(object_reg, intf);			\
+  if (!var) { ReportError ("crystalspace.maploader",		\
+    "Failed to initialize the loader: "				\
+    "Could not get " msgname); return false; }
 
 bool csLoader::Initialize (iObjectRegistry *object_Reg)
 {
   csLoader::object_reg = object_Reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-  GET_PLUGIN (Reporter, iReporter, "reporter");
+  Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
   loaded_plugins.plugin_mgr = plugin_mgr;
 
   // get the virtual file system plugin
-  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  if (!VFS)
+  GET_CRITICAL_PLUGIN (VFS, iVFS, "VFS");
+  // get syntax services
+  SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  if (!SyntaxService)
   {
-    ReportError (
-	"crystalspace.maploader.novfs",
-	"Failed to initialize the loader: No VFS plugin.");
-    return false;
+    SyntaxService = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.syntax.loader.service.text", iSyntaxService);
+    if (!SyntaxService)
+    {
+      ReportError ("crystalspace.maploader",
+	"Could not load the syntax services!");
+      return false;
+    }
+    if (!object_reg->Register (SyntaxService, "iSyntaxService"))
+    {
+      ReportError ("crystalspace.maploader",
+	"Could not register the syntax services!");
+      return false;
+    }
   }
 
   // Get all optional plugins.
-  GET_PLUGIN (ImageLoader, iImageIO, "image-loader");
-  GET_PLUGIN (SoundLoader, iSoundLoader, "sound-loader");
+  GET_PLUGIN (ImageLoader, iImageIO, "image loader");
+  GET_PLUGIN (SoundLoader, iSoundLoader, "sound loader");
   GET_PLUGIN (Engine, iEngine, "engine");
-  GET_PLUGIN (G3D, iGraphics3D, "video-driver");
-  GET_PLUGIN (SoundRender, iSoundRender, "sound-driver");
-  GET_PLUGIN (ModelConverter, iModelConverter, "model-converter");
-  GET_PLUGIN (CrossBuilder, iCrossBuilder, "model-crossbuilder");
+  GET_PLUGIN (G3D, iGraphics3D, "video driver");
+  GET_PLUGIN (SoundRender, iSoundRender, "sound driver");
+  GET_PLUGIN (ModelConverter, iModelConverter, "model converter");
+  GET_PLUGIN (CrossBuilder, iCrossBuilder, "model crossbuilder");
 
   return true;
 }

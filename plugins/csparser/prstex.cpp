@@ -445,8 +445,8 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 			&layers[num_txt_layer].vshift);
 	        break;
 	      case CS_TOKEN_MIXMODE:
-	        layers[num_txt_layer].mode = ParseMixmode (params2);
-		if (layers[num_txt_layer].mode == (uint)~0)
+		if (!SyntaxService->ParseMixmode (&parser, params2, 
+		  layers[num_txt_layer].mode))
 		  return NULL;
 	        break;
 	    }

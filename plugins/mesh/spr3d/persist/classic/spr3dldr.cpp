@@ -173,6 +173,7 @@ csSprite3DFactoryLoader::~csSprite3DFactoryLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
   if (reporter) reporter->DecRef ();
+  SCF_DEC_REF (synldr);
 }
 
 bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -180,6 +181,7 @@ bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   csSprite3DFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
@@ -187,182 +189,6 @@ static bool load_quaternion (char* buf, csQuaternion &q)
 {
   csScanStr (buf, "%f,%f,%f,%f", &q.x, &q.y, &q.z, &q.r);
   return true;
-}
-
-static bool load_matrix (csParser* parser, iReporter* reporter, char* buf, csMatrix3 &m)
-{
-  CS_TOKEN_TABLE_START(commands)
-    CS_TOKEN_TABLE (IDENTITY)
-    CS_TOKEN_TABLE (ROT_X)
-    CS_TOKEN_TABLE (ROT_Y)
-    CS_TOKEN_TABLE (ROT_Z)
-    CS_TOKEN_TABLE (ROT)
-    CS_TOKEN_TABLE (SCALE_X)
-    CS_TOKEN_TABLE (SCALE_Y)
-    CS_TOKEN_TABLE (SCALE_Z)
-    CS_TOKEN_TABLE (SCALE)
-    CS_TOKEN_TABLE (Q)
-  CS_TOKEN_TABLE_END
-
-  char* params;
-  int cmd, num;
-  float angle;
-  float scaler;
-  float list[30];
-  const csMatrix3 identity;
-
-  while ((cmd = parser->GetCommand (&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_IDENTITY:
-        m = identity;
-        break;
-      case CS_TOKEN_ROT_X:
-        csScanStr (params, "%f", &angle);
-        m *= csXRotMatrix3 (angle);
-        break;
-      case CS_TOKEN_ROT_Y:
-        csScanStr (params, "%f", &angle);
-        m *= csYRotMatrix3 (angle);
-        break;
-      case CS_TOKEN_ROT_Z:
-        csScanStr (params, "%f", &angle);
-        m *= csZRotMatrix3 (angle);
-        break;
-      case CS_TOKEN_ROT:
-        csScanStr (params, "%F", list, &num);
-        if (num == 3)
-        {
-          m *= csXRotMatrix3 (list[0]);
-          m *= csZRotMatrix3 (list[2]);
-          m *= csYRotMatrix3 (list[1]);
-        }
-	else
-	{
-          ReportError (reporter,
-		"crystalspace.sprite3dloader.parse.matrix.badrotation",
-		"Badly formed rotation '%s'!", params);
-	  return false;
-	}
-        break;
-      case CS_TOKEN_SCALE_X:
-        csScanStr (params, "%f", &scaler);
-        m *= csXScaleMatrix3(scaler);
-        break;
-      case CS_TOKEN_SCALE_Y:
-        csScanStr (params, "%f", &scaler);
-        m *= csYScaleMatrix3(scaler);
-        break;
-      case CS_TOKEN_SCALE_Z:
-        csScanStr (params, "%f", &scaler);
-        m *= csZScaleMatrix3(scaler);
-        break;
-      case CS_TOKEN_SCALE:
-        csScanStr (params, "%F", list, &num);
-        if (num == 1)      // One scaler; applied to entire matrix.
-	  m *= list[0];
-        else if (num == 3) // Three scalers; applied to X, Y, Z individually.
-	  m *= csMatrix3 (list[0],0,0,0,list[1],0,0,0,list[2]);
-	else
-	{
-          ReportError (reporter,
-		"crystalspace.sprite3dloader.parse.matrix.badscale",
-		"Badly formed scale '%s'!", params);
-	  return false;
-	}
-        break;
-      case CS_TOKEN_Q:
-        csQuaternion quat;
-        load_quaternion(params, quat);
-        csMatrix3 quatmat(quat);
-        m*=quatmat;
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
-    // or the nine values of a 3x3 matrix.
-    csScanStr (buf, "%F", list, &num);
-    if (num == 1)
-      m = csMatrix3 () * list[0];
-    else if (num == 9)
-      m = csMatrix3 (
-        list[0], list[1], list[2],
-        list[3], list[4], list[5],
-        list[6], list[7], list[8]);
-    else
-    {
-      ReportError (reporter,
-		"crystalspace.sprite3dloader.parse.matrix.badmatrix",
-		"Badly formed matrix '%s'!", buf);
-      return false;
-    }
-  }
-  return true;
-}
-
-static bool load_vector (char* buf, csVector3 &v)
-{
-  csScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
-  return true;
-}
-
-static uint ParseMixmode (csParser* parser, iReporter* reporter, char* buf)
-{
-  CS_TOKEN_TABLE_START (modes)
-    CS_TOKEN_TABLE (COPY)
-    CS_TOKEN_TABLE (MULTIPLY2)
-    CS_TOKEN_TABLE (MULTIPLY)
-    CS_TOKEN_TABLE (ADD)
-    CS_TOKEN_TABLE (ALPHA)
-    CS_TOKEN_TABLE (TRANSPARENT)
-    CS_TOKEN_TABLE (KEYCOLOR)
-    CS_TOKEN_TABLE (TILING)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  uint Mixmode = 0;
-
-  while ((cmd = parser->GetObject (&buf, modes, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (reporter,
-		"crystalspace.sprite3dloader.parse.mixmode.badformat",
-		"Bad format while parsing mixmode!");
-      return ~0;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
-      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
-      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
-      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
-      case CS_TOKEN_ALPHA:
-	Mixmode &= ~CS_FX_MASK_ALPHA;
-	float alpha;
-        csScanStr (params, "%f", &alpha);
-	Mixmode |= CS_FX_SETALPHA(alpha);
-	break;
-      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
-      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
-      case CS_TOKEN_TILING: Mixmode |= CS_FX_TILING; break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    ReportError (reporter,
-		"crystalspace.sprite3dloader.parse.mixmode.badtoken",
-		"Token '%s' not found while parsing mixmodes!",
-		parser->GetLastOffender ());
-    return ~0;
-  }
-  return Mixmode;
 }
 
 bool csSprite3DFactoryLoader::LoadSkeleton (csParser* parser, 
@@ -432,7 +258,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (csParser* parser,
             switch (cmd)
             {
               case CS_TOKEN_MATRIX:
-                if (!load_matrix (parser, reporter, params2, m))
+		if (!synldr->ParseMatrix (parser, params2, m))
 		{
 		  con->DecRef ();
 		  return false;
@@ -449,7 +275,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (csParser* parser,
 	        break;
 	      }
               case CS_TOKEN_V:
-                load_vector (params2, v);
+		synldr->ParseVector (parser, params2, v);
 		break;
             }
           }
@@ -777,35 +603,6 @@ bool csSprite3DFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-static void WriteMixmode(csString& str, uint mixmode)
-{
-  str.Append("  MIXMODE (");
-  if(mixmode&CS_FX_COPY) str.Append(" COPY ()");
-  if(mixmode&CS_FX_ADD) str.Append(" ADD ()");
-  if(mixmode&CS_FX_MULTIPLY) str.Append(" MULTIPLY ()");
-  if(mixmode&CS_FX_MULTIPLY2) str.Append(" MULTIPLY2 ()");
-  if(mixmode&CS_FX_KEYCOLOR) str.Append(" KEYCOLOR ()");
-  if(mixmode&CS_FX_TILING) str.Append(" TILING ()");
-  if(mixmode&CS_FX_TRANSPARENT) str.Append(" TRANSPARENT ()");
-  if(mixmode&CS_FX_ALPHA) {
-    char buf[MAXLINE];
-    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str.Append(buf);
-  }
-  str.Append(")");
-}
-
-
-/// helper function to write a matrix
-static void WriteMatrix(const csMatrix3& m, csString& str)
-{
-  char buf[MAXLINE];
-  sprintf(buf, "MATRIX (%g,%g,%g,%g,%g,%g,%g,%g,%g)", m.m11, m.m12, m.m13,
-    m.m21, m.m22, m.m23, m.m31, m.m32, m.m33);
-  str.Append(buf);
-}
-
-
 void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
   csString& str)
 {
@@ -822,7 +619,7 @@ void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
   str.Append(")\n");
 
   str.Append("TRANSFORM (");
-  WriteMatrix(con->GetTransformation().GetO2T(), str);
+  str.Append (synldr->MatrixToText (con->GetTransformation().GetO2T(), 1, true));
   sprintf(buf, " V(%g,%g,%g))", con->GetTransformation().GetO2TTranslation().x,
     con->GetTransformation().GetO2TTranslation().y,
     con->GetTransformation().GetO2TTranslation().z);
@@ -932,6 +729,7 @@ csSprite3DLoader::~csSprite3DLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
   if (reporter) reporter->DecRef ();
+  SCF_DEC_REF (synldr);
 }
 
 bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
@@ -939,6 +737,7 @@ bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
   csSprite3DLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
@@ -1031,8 +830,8 @@ iBase* csSprite3DLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_MIXMODE:
         {
-	  uint mm = ParseMixmode (parser, reporter, params);
-	  if (mm == (uint)~0)
+	  uint mm;
+	  if (!synldr->ParseMixmode (parser, params, mm))
 	  {
 	    if (spr3dLook) spr3dLook->DecRef ();
 	    mesh->DecRef ();
@@ -1153,7 +952,7 @@ void csSprite3DSaver::WriteDown (iBase* obj, iFile *file)
 
   if(state->GetMixMode() != CS_FX_COPY)
   {
-    WriteMixmode(str, state->GetMixMode());
+    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0, true));
   }
   if(state->GetMaterialWrapper() != factstate->GetMaterialWrapper())
   {

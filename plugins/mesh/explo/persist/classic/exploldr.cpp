@@ -43,15 +43,6 @@
 CS_IMPLEMENT_PLUGIN
 
 CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (ADD)
-  CS_TOKEN_DEF (ALPHA)
-  CS_TOKEN_DEF (COPY)
-  CS_TOKEN_DEF (KEYCOLOR)
-  CS_TOKEN_DEF (TILING)
-  CS_TOKEN_DEF (MULTIPLY2)
-  CS_TOKEN_DEF (MULTIPLY)
-  CS_TOKEN_DEF (TRANSPARENT)
-
   CS_TOKEN_DEF (CENTER)
   CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (FACTORY)
@@ -178,32 +169,10 @@ bool csExplosionFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-#define MAXLINE 100 /* max number of chars per line... */
-
-static void WriteMixmode(csString& str, uint mixmode)
-{
-  str.Append("  MIXMODE (");
-  if(mixmode&CS_FX_COPY) str.Append(" COPY ()");
-  if(mixmode&CS_FX_ADD) str.Append(" ADD ()");
-  if(mixmode&CS_FX_MULTIPLY) str.Append(" MULTIPLY ()");
-  if(mixmode&CS_FX_MULTIPLY2) str.Append(" MULTIPLY2 ()");
-  if(mixmode&CS_FX_KEYCOLOR) str.Append(" KEYCOLOR ()");
-  if(mixmode&CS_FX_TILING) str.Append(" TILING ()");
-  if(mixmode&CS_FX_TRANSPARENT) str.Append(" TRANSPARENT ()");
-  if(mixmode&CS_FX_ALPHA)
-  {
-    char buf[MAXLINE];
-    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str.Append(buf);
-  }
-  str.Append(")");
-}
-
 void csExplosionFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
 {
   // nothing to do
 }
-
 
 //---------------------------------------------------------------------------
 
@@ -217,65 +186,15 @@ csExplosionLoader::csExplosionLoader (iBase* pParent)
 csExplosionLoader::~csExplosionLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
+  SCF_DEC_REF (synldr);
 }
 
 bool csExplosionLoader::Initialize (iObjectRegistry* object_reg)
 {
   csExplosionLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
-}
-
-static uint ParseMixmode (csParser* parser, char* buf)
-{
-  CS_TOKEN_TABLE_START (modes)
-    CS_TOKEN_TABLE (COPY)
-    CS_TOKEN_TABLE (MULTIPLY2)
-    CS_TOKEN_TABLE (MULTIPLY)
-    CS_TOKEN_TABLE (ADD)
-    CS_TOKEN_TABLE (ALPHA)
-    CS_TOKEN_TABLE (TRANSPARENT)
-    CS_TOKEN_TABLE (KEYCOLOR)
-    CS_TOKEN_TABLE (TILING)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  uint Mixmode = 0;
-
-  while ((cmd = parser->GetObject (&buf, modes, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      printf ("Expected parameters instead of '%s'!\n", buf);
-      return 0;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
-      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
-      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
-      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
-      case CS_TOKEN_ALPHA:
-	Mixmode &= ~CS_FX_MASK_ALPHA;
-	float alpha;
-        csScanStr (params, "%f", &alpha);
-	Mixmode |= CS_FX_SETALPHA(alpha);
-	break;
-      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
-      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
-      case CS_TOKEN_TILING: Mixmode |= CS_FX_TILING; break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    printf ("Token '%s' not found while parsing the modes!\n",
-    	parser->GetLastOffender ());
-    return 0;
-  }
-  return Mixmode;
 }
 
 iBase* csExplosionLoader::Parse (const char* string,
@@ -374,7 +293,9 @@ iBase* csExplosionLoader::Parse (const char* string,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        partstate->SetMixMode (ParseMixmode (parser, params));
+	uint mode;
+	if (synldr->ParseMixmode (parser, params, mode))
+          partstate->SetMixMode (mode);
 	break;
       case CS_TOKEN_LIGHTING:
         {
@@ -453,14 +374,18 @@ csExplosionSaver::csExplosionSaver (iBase* pParent)
 csExplosionSaver::~csExplosionSaver ()
 {
   SCF_DEC_REF (plugin_mgr);
+  SCF_DEC_REF (synldr);
 }
 
 bool csExplosionSaver::Initialize (iObjectRegistry* object_reg)
 {
   csExplosionSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
+
+#define MAXLINE	    80
 
 void csExplosionSaver::WriteDown (iBase* obj, iFile *file)
 {
@@ -477,7 +402,7 @@ void csExplosionSaver::WriteDown (iBase* obj, iFile *file)
 
   if(partstate->GetMixMode() != CS_FX_COPY)
   {
-    WriteMixmode(str, partstate->GetMixMode());
+    str.Append (synldr->MixmodeToText (partstate->GetMixMode(), 2, true));
   }
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
     QueryObject ()->GetName());

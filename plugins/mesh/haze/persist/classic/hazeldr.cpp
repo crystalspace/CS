@@ -43,15 +43,6 @@
 CS_IMPLEMENT_PLUGIN
 
 CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (ADD)
-  CS_TOKEN_DEF (ALPHA)
-  CS_TOKEN_DEF (COPY)
-  CS_TOKEN_DEF (KEYCOLOR)
-  CS_TOKEN_DEF (TILING)
-  CS_TOKEN_DEF (MULTIPLY2)
-  CS_TOKEN_DEF (MULTIPLY)
-  CS_TOKEN_DEF (TRANSPARENT)
-
   CS_TOKEN_DEF (DIRECTIONAL)
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (HAZEBOX)
@@ -126,67 +117,16 @@ csHazeFactoryLoader::csHazeFactoryLoader (iBase* pParent)
 csHazeFactoryLoader::~csHazeFactoryLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
+  SCF_DEC_REF (synldr);
 }
 
 bool csHazeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csHazeFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-
-static uint ParseMixmode (csParser *parser, char* buf)
-{
-  CS_TOKEN_TABLE_START (modes)
-    CS_TOKEN_TABLE (COPY)
-    CS_TOKEN_TABLE (MULTIPLY2)
-    CS_TOKEN_TABLE (MULTIPLY)
-    CS_TOKEN_TABLE (ADD)
-    CS_TOKEN_TABLE (ALPHA)
-    CS_TOKEN_TABLE (TRANSPARENT)
-    CS_TOKEN_TABLE (KEYCOLOR)
-    CS_TOKEN_TABLE (TILING)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  uint Mixmode = 0;
-
-  while ((cmd = parser->GetObject (&buf, modes, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      printf ("Expected parameters instead of '%s'!\n", buf);
-      return 0;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
-      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
-      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
-      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
-      case CS_TOKEN_ALPHA:
-	Mixmode &= ~CS_FX_MASK_ALPHA;
-	float alpha;
-        csScanStr (params, "%f", &alpha);
-	Mixmode |= CS_FX_SETALPHA(alpha);
-	break;
-      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
-      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
-      case CS_TOKEN_TILING: Mixmode |= CS_FX_TILING; break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    printf ("Token '%s' not found while parsing the modes!\n",
-    	parser->GetLastOffender ());
-    return 0;
-  }
-  return Mixmode;
-}
-
 
 static iHazeHull* ParseHull (csParser* parser, char* buf, 
 			     iHazeFactoryState *fstate, float &s)
@@ -310,7 +250,9 @@ iBase* csHazeFactoryLoader::Parse (const char* string,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        hazefactorystate->SetMixMode (ParseMixmode (parser, params));
+	uint mode;
+	if (synldr->ParseMixmode (parser, params, mode))
+          hazefactorystate->SetMixMode (mode);
 	break;
       case CS_TOKEN_ORIGIN:
         {
@@ -351,35 +293,18 @@ csHazeFactorySaver::csHazeFactorySaver (iBase* pParent)
 csHazeFactorySaver::~csHazeFactorySaver ()
 {
   SCF_DEC_REF (plugin_mgr);
+  SCF_DEC_REF (synldr);
 }
 
 bool csHazeFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csHazeFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
-
-static void WriteMixmode(csString& str, uint mixmode)
-{
-  str.Append("  MIXMODE (");
-  if(mixmode&CS_FX_COPY) str.Append(" COPY ()");
-  if(mixmode&CS_FX_ADD) str.Append(" ADD ()");
-  if(mixmode&CS_FX_MULTIPLY) str.Append(" MULTIPLY ()");
-  if(mixmode&CS_FX_MULTIPLY2) str.Append(" MULTIPLY2 ()");
-  if(mixmode&CS_FX_KEYCOLOR) str.Append(" KEYCOLOR ()");
-  if(mixmode&CS_FX_TILING) str.Append(" TILING ()");
-  if(mixmode&CS_FX_TRANSPARENT) str.Append(" TRANSPARENT ()");
-  if(mixmode&CS_FX_ALPHA)
-  {
-    char buf[MAXLINE];
-    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str.Append(buf);
-  }
-  str.Append(")");
-}
 
 /// write hull to string
 static void WriteHull(csString& str, iHazeHull *hull)
@@ -418,7 +343,7 @@ void csHazeFactorySaver::WriteDown (iBase* obj, iFile *file)
 
   if(hazestate->GetMixMode() != CS_FX_COPY)
   {
-    WriteMixmode(str, hazestate->GetMixMode());
+    str.Append (synldr->MixmodeToText (hazestate->GetMixMode(), 0, true));
   }
   sprintf(buf, "MATERIAL (%s)\n", hazestate->GetMaterialWrapper()->
     QueryObject()->GetName());
@@ -456,12 +381,14 @@ csHazeLoader::csHazeLoader (iBase* pParent)
 csHazeLoader::~csHazeLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
+  SCF_DEC_REF (synldr);
 }
 
 bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
 {
   csHazeLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
@@ -532,7 +459,9 @@ iBase* csHazeLoader::Parse (const char* string,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        hazestate->SetMixMode (ParseMixmode (parser, params));
+	uint mode;
+	if (synldr->ParseMixmode (parser, params, mode))
+          hazestate->SetMixMode (mode);
 	break;
       case CS_TOKEN_ORIGIN:
         {
@@ -597,7 +526,7 @@ void csHazeSaver::WriteDown (iBase* obj, iFile *file)
 
   if(state->GetMixMode() != CS_FX_COPY)
   {
-    WriteMixmode(str, state->GetMixMode());
+    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0, true));
   }
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject()->GetName());

@@ -150,6 +150,7 @@ csSprite2DFactoryLoader::~csSprite2DFactoryLoader ()
 {
   if (reporter) reporter->DecRef ();
   SCF_DEC_REF (plugin_mgr);
+  SCF_DEC_REF (synldr);
 }
 
 bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -157,63 +158,8 @@ bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   csSprite2DFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
-}
-
-static uint ParseMixmode (csParser *parser, iReporter* reporter, char* buf)
-{
-  CS_TOKEN_TABLE_START (modes)
-    CS_TOKEN_TABLE (COPY)
-    CS_TOKEN_TABLE (MULTIPLY2)
-    CS_TOKEN_TABLE (MULTIPLY)
-    CS_TOKEN_TABLE (ADD)
-    CS_TOKEN_TABLE (ALPHA)
-    CS_TOKEN_TABLE (TRANSPARENT)
-    CS_TOKEN_TABLE (KEYCOLOR)
-    CS_TOKEN_TABLE (TILING)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  uint Mixmode = 0;
-
-  while ((cmd = parser->GetObject (&buf, modes, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (reporter,
-		"crystalspace.sprite2dloader.parse.mixmode.badformat",
-		"Bad format while parsing mixmode!");
-      return ~0;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
-      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
-      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
-      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
-      case CS_TOKEN_ALPHA:
-	Mixmode &= ~CS_FX_MASK_ALPHA;
-	float alpha;
-        csScanStr (params, "%f", &alpha);
-	Mixmode |= CS_FX_SETALPHA(alpha);
-	break;
-      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
-      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
-      case CS_TOKEN_TILING: Mixmode |= CS_FX_TILING; break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    ReportError (reporter,
-		"crystalspace.sprite2dloader.parse.mixmode.badtoken",
-		"Token '%s' not found while parsing mixmodes!",
-		parser->GetLastOffender ());
-    return ~0;
-  }
-  return Mixmode;
 }
 
 static void ParseAnim (csParser* parser, iReporter* reporter, 
@@ -339,8 +285,8 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_MIXMODE:
         {
-	  uint mm = ParseMixmode (parser, reporter, params);
-	  if (mm == (uint)~0)
+	  uint mm;
+	  if (!synldr->ParseMixmode (parser, params, mm))
 	  {
 	    spr2dLook->DecRef ();
 	    fact->DecRef ();
@@ -374,6 +320,7 @@ csSprite2DFactorySaver::~csSprite2DFactorySaver ()
 {
   if (reporter) reporter->DecRef ();
   SCF_DEC_REF (plugin_mgr);
+  SCF_DEC_REF (synldr);
 }
 
 bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -381,29 +328,11 @@ bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
   csSprite2DFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
-
-static void WriteMixmode(csString& str, uint mixmode)
-{
-  str.Append("  MIXMODE (");
-  if(mixmode&CS_FX_COPY) str.Append(" COPY ()");
-  if(mixmode&CS_FX_ADD) str.Append(" ADD ()");
-  if(mixmode&CS_FX_MULTIPLY) str.Append(" MULTIPLY ()");
-  if(mixmode&CS_FX_MULTIPLY2) str.Append(" MULTIPLY2 ()");
-  if(mixmode&CS_FX_KEYCOLOR) str.Append(" KEYCOLOR ()");
-  if(mixmode&CS_FX_TILING) str.Append(" TILING ()");
-  if(mixmode&CS_FX_TRANSPARENT) str.Append(" TRANSPARENT ()");
-  if(mixmode&CS_FX_ALPHA)
-  {
-    char buf[MAXLINE];
-    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str.Append(buf);
-  }
-  str.Append(")");
-}
 
 void csSprite2DFactorySaver::WriteDown (iBase* obj, iFile * file)
 {
@@ -417,7 +346,7 @@ void csSprite2DFactorySaver::WriteDown (iBase* obj, iFile * file)
   str.Append(buf);
   if(state->GetMixMode() != CS_FX_COPY)
   {
-    WriteMixmode(str, state->GetMixMode());
+    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0, true));
   }
   sprintf(buf, "LIGHTING (%s)\n", state->HasLighting()?"true":"false");
   str.Append(buf);
@@ -439,6 +368,7 @@ csSprite2DLoader::~csSprite2DLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
   if (reporter) reporter->DecRef ();
+  SCF_DEC_REF (synldr);
 }
 
 bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
@@ -446,6 +376,7 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
   csSprite2DLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
@@ -522,8 +453,8 @@ iBase* csSprite2DLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_MIXMODE:
         {
-	  uint mm = ParseMixmode (parser, reporter, params);
-	  if (mm == (uint)~0)
+	  uint mm;
+	  if (!synldr->ParseMixmode (parser, params, mm))
 	  {
 	    if (spr2dLook) spr2dLook->DecRef ();
 	    mesh->DecRef ();
@@ -627,6 +558,7 @@ csSprite2DSaver::~csSprite2DSaver ()
 {
   SCF_DEC_REF (plugin_mgr);
   if (reporter) reporter->DecRef ();
+  SCF_DEC_REF (synldr);
 }
 
 bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
@@ -634,6 +566,7 @@ bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
   csSprite2DSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
@@ -656,7 +589,7 @@ void csSprite2DSaver::WriteDown (iBase* obj, iFile *file)
   str.Append(buf);
   if(state->GetMixMode() != CS_FX_COPY)
   {
-    WriteMixmode(str, state->GetMixMode());
+    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0, true));
   }
 
   csColoredVertices& vs = state->GetVertices();

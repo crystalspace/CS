@@ -22,6 +22,7 @@
 
 #include "imap/reader.h"
 #include "imap/writer.h"
+#include "imap/services.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
@@ -102,6 +103,7 @@ class csMetaBallLoader : public iLoaderPlugin
 private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService* synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -135,6 +137,7 @@ class csMetaBallSaver : public iSaverPlugin
 private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService* synldr;
 
 public:
   SCF_DECLARE_IBASE;

@@ -28,6 +28,7 @@
 #include "csgeom/quaterni.h"
 #include "iutil/plugin.h"
 #include "csutil/parser.h"
+#include "imap/services.h"
 
 class csGenerateImageTexture;
 class csGenerateImageValue;
@@ -74,6 +75,8 @@ private:
 
   /// the current parser
   csParser parser;
+  /// Parser for common stuff like MixModes
+  iSyntaxService* SyntaxService;
 
   class csLoaderStats
   {
@@ -128,10 +131,6 @@ private:
 
   /// -----------------------------------------------------------------------
 
-  /// Parse a matrix definition
-  bool ParseMatrix (char* buf, csMatrix3 &m);
-  /// Parse a vector definition
-  bool ParseVector (char* buf, csVector3 &v);
   /// Parse a quaternion definition
   bool ParseQuaternion (char* buf, csQuaternion &q);
   /// Parse a color definition
@@ -166,9 +165,6 @@ private:
   iSector* ParseSector (char* name, char* buf);
 
   /// -----------------------------------------------------------------------
-
-  /// parse a texture mixing mode specification
-  uint ParseMixmode (char* buf);
 
   /// For heightgen.
   csGenerateImageTexture* ParseHeightgenTexture (char* buf);

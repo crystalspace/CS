@@ -22,6 +22,7 @@
 
 #include "imap/reader.h"
 #include "imap/writer.h"
+#include "imap/services.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
@@ -39,6 +40,7 @@ private:
   iReporter* reporter;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService* synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -72,6 +74,7 @@ class csSprite2DFactorySaver : public iSaverPlugin
   iReporter* reporter;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService* synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -105,6 +108,7 @@ private:
   iReporter* reporter;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService* synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -139,6 +143,7 @@ private:
   iReporter* reporter;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService* synldr;
 
 public:
   SCF_DECLARE_IBASE;
