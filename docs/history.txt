@@ -10,7 +10,11 @@ The history order has been reversed so that new features are at the top.
 	  file.
 	- Alex Pfaffe fixed visibility determination for CS in the terrain
 	  engine.
+	- Fixed sndsoft.mak makefile after Paul Garceau broke it
+	  yesterday.
+	- Martin Geisse fixed a compiler warning in polyset.h.
 26-Jul-2000
+	- Paul Garceau fixed sndsoft.mak makefile for Win32/MingW.
 	- Started completing support for the rapid collision detection
 	  plugin and also completing support for the interfaces needed
 	  to do good collision detection. As soon as this is finished
