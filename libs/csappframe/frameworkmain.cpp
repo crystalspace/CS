@@ -37,7 +37,8 @@ int main (int argc, char* argv[])
   }
   // TODO: We may want to provide a way for the developer to disable
   // automatic help checking, but I can't think of a reason to do so.
-  else if ( csCommandLineHelper::CheckHelp (csApplicationFramework::GetObjectRegistry ()))
+  else if (csCommandLineHelper::CheckHelp (
+  	csApplicationFramework::GetObjectRegistry ()))
   {
     csCommandLineHelper::Help (csApplicationFramework::GetObjectRegistry ());
   }

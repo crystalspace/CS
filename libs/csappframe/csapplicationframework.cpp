@@ -24,7 +24,7 @@
 
 // Static 
 iObjectRegistry*  csApplicationFramework::mp_object_reg            = NULL;
-csApplicationFramework*       csApplicationFramework::m_Ptr                    = NULL;
+csApplicationFramework* csApplicationFramework::m_Ptr              = NULL;
 char*             csApplicationFramework::m_ApplicationStringName  = "user app";
 const char*       csApplicationFramework::m_FoundationStringName   = "crystalspace.libcsappframe";
 
@@ -32,8 +32,8 @@ const char*       csApplicationFramework::m_FoundationStringName   = "crystalspa
 
 csApplicationFramework::csApplicationFramework ()
 {
-  // It is a fatal error to have more than one csApplicationFramework derived class
-  // in an application.
+  // It is a fatal error to have more than one csApplicationFramework
+  // derived class in an application.
   CS_ASSERT ( NULL == m_Ptr );
   m_Ptr = this;
 }

@@ -32,13 +32,13 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 * \remarks
 * In order to properly use this class, you must derive a class from it and
 * provide a constructor and implementation for the OnInitialize() and
-* Application() methods. You may only have one csApplicationFramework derived object in
-* existence at any time (and generally, you will only have one such object
-* in your application). The library containing the implementation of this
+* Application() methods. You may only have one csApplicationFramework derived
+* object in existence at any time (and generally, you will only have one such
+* object in your application). The library containing the implementation of this
 * class contains an implementation of the main() function that controls the
-* use of this class. When using the csApplicationFramework class, do not provide your own
-* implementation of main(). In your source code create a global instance of
-* the overridden object, as follows:
+* use of this class. When using the csApplicationFramework class, do not
+* provide your own implementation of main(). In your source code create a
+* global instance of the overridden object, as follows:
 * \code
 * // Example.h
 * class myDerivedEngine : public csApplicationFramework
@@ -104,8 +104,8 @@ private:
   * \remarks
   * An application will have one and only one csApplicationFramework derived
   * object, a pointer to which will be stored in this private variable.
-  * This variable will be set by the csApplicationFramework constructor and cleared by
-  * the destructor.
+  * This variable will be set by the csApplicationFramework constructor and
+  * cleared by the destructor.
   * \warning
   * DO NOT ATTEMPT TO ALTER THIS VARIABLE IN ANY OTHER WAY OR THE
   * FRAMEWORK LIBRARY WILL CRASH.
@@ -130,9 +130,9 @@ private:
 
   /**
   * Constructor
-  * \remarks The csApplicationFramework constructor initializes framework application
-  * variables. You must call this constructor from your derived class'
-  * constructor.
+  * \remarks The csApplicationFramework constructor initializes framework
+  * application variables. You must call this constructor from your derived
+  * class' constructor.
   * \par
   * This constructor is protected to force the derived class to provide
   * its own constructor.
@@ -225,8 +225,8 @@ public:
   * \remarks
   * Using this implicit cast operator is a shorthand for calling
   * GetObjectRegistry(), and allows the developer to use his derived
-  * csApplicationFramework object as a parameter to any function (and some macros)
-  * which require an iObjectRegistry reference.
+  * csApplicationFramework object as a parameter to any function (and some
+  * macros) which require an iObjectRegistry reference.
   */
   operator iObjectRegistry* () { return mp_object_reg; }
 
