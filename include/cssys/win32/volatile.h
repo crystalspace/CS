@@ -13,8 +13,8 @@
   #define COMP_BC
   #define __NEED_GENERIC_ISDIR
 #else
-# if defined(__MINGW32__)
-// Don't need no stinkin' Generic ISDIR
+# if defined(__MINGW32__) || defined(__CYGWIN32__)
+// COMP_GCC has no need for Generic ISDIR
 #	define COMP_GCC
 # else
 #	define COMP_VC
@@ -38,7 +38,7 @@
 
 // if you don't want to use direct input, comment this out
 // keyboard handler will default to window message handling.
-#define DO_DINPUT_KEYBOARD
+// #define DO_DINPUT_KEYBOARD
 
 #if defined(COMP_VC)
 // #ifdef _DEBUG
