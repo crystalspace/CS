@@ -53,24 +53,28 @@ should need to compile Crystal Space with @sc{djgpp}:
 @noindent
 Compiled zip, jpeg and png libraries@*
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/dos/doslibs_0.94.zip}@*
-@emph{These are needed if the ``original'' libraries don't work.
+@emph{These are needed if the ``original'' libraries don't work.}
 Extract these files into your CS directory. This will result in
-a @sc{libs} directory in @sc{CS\libs\cssys\djgpp}.
+a @file{libs} directory in @file{CS\libs\cssys\djgpp}.
 
 @noindent
 @sc{nasm} (Netwide Assembler) for @sc{dos}@*
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/nasm/nasm-0.98e-bin-dos.zip}
-Install this and add an entry to your PATH environment variable, so it can be found.
+Install this and add an entry to your PATH environment variable, so it can be
+found.
 
 @noindent
 @sc{libdxe} (Dynamic Library Loader) for @sc{djgpp}@*
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/dos/dxe2_094.zip}
-Extract this into your @sc{djgpp} install directory and compile it @sc{djgpp\contrib\dxe2} by
-invoking
+Extract this into your @sc{djgpp} install directory and compile it
+@file{djgpp\contrib\dxe2} by invoking
+
 @example
 make
 @end example
+
 and after that do a
+
 @example
 make install
 @end example
@@ -128,8 +132,8 @@ then do @samp{make djgpp USE_PLUGINS=no} and after that @samp{make -k all}.
 
 @subsubheading Allegro
 
-If you use the Allegro graphics library (and want to use it in Crystal Space), you
-can use an alternative video driver.  For this, you will have to add the
+If you use the Allegro graphics library (and want to use it in Crystal Space),
+you can use an alternative video driver.  For this, you will have to add the
 following line to @file{CS/config.mak} after the configuration step.
 
 @example
@@ -138,9 +142,17 @@ USE_ALLEGRO = yes
 
 @subsubheading Platform
 
-I tested compilation on a WinNT4.0 sp6 system with cmd.exe as shell and on linux in a dosemu (where i had to fiddle with the configuration step - this is only for the adventurous people).
-Note that there are issues with djgpp and Win2k/WinXP. I did not try either so you are on 
-your own here, but be told there is a FAQ on www.delorie.com/djgpp regarding this issue.
+I tested compilation on a WinNT4.0 sp6 system with cmd.exe as shell and on
+linux in a dosemu (where i had to fiddle with the configuration step - this is
+only for the adventurous people).  Note that there are issues with djgpp and
+Win2k/WinXP.  I did not try either so you are on your own here, but be told
+there is a FAQ on www.delorie.com/djgpp regarding this issue.
 
 @subsubheading Compilation Notes
-You will note the @sc{-k} option in the make command above. This will prevent make to stop compilation if some subproject does not compile. In particular the sockets plugin will fail since there is no standard djgpp network package (there are a few out there but i tried only one and that did not compile :). Also, i did not try a compilation of Allegro, since i didnt have it installed (poor excuse, i know).
+
+You will note the @samp{-k} option in the make command above.  This will prevent
+make to stop compilation if some subproject does not compile.  In particular
+the sockets plugin will fail since there is no standard djgpp network package
+(there are a few out there but i tried only one and that did not compile :).
+Also, i did not try a compilation of Allegro, since i didnt have it installed
+(poor excuse, I know).
