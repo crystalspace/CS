@@ -475,10 +475,17 @@ void OpenGLLightmapCache::Load(csGLCacheData *d)
 //lmheight = floor(pow(2.0, ceil(log(lmheight)/log(2.0)) ) );
 //lmwidth = floor(pow(2.0, ceil(log(lmwidth)/log(2.0)) ) );
 
+#if NEW_LM_FORMAT
+  unsigned char *map_data = lightmap_info->GetMapData ();
+#else
   unsigned char *red_data = lightmap_info->GetMap (0);
   unsigned char *green_data = lightmap_info->GetMap (1);
   unsigned char *blue_data = lightmap_info->GetMap (2);
+#endif
 
+#if NEW_LM_FORMAT
+  unsigned char* lm_data = map_data;
+#else
   // @@@ Note @@@
   // The lightmap data used by Crystal Space is in another format
   // then the lightmap data needed by OpenGL. Maybe we should consider
@@ -496,7 +503,9 @@ void OpenGLLightmapCache::Load(csGLCacheData *d)
     *walkdata++ = *blue_data++;
     *walkdata++ = NORMAL_LIGHT_LEVEL;
   }
+#endif
 
+#if 0
   // Because our actual lightmap is a smaller lightmap in a larger
   // po2 texture we can have problems when using GL_LINEAR for
   // the GL_TEXTURE_MAG_FILTER and GL_TEXTURE_MIN_FILTER.
@@ -546,6 +555,7 @@ void OpenGLLightmapCache::Load(csGLCacheData *d)
     // Copy first row to last.
     for (i = 0 ; i < lmwidth*4 ; i++) lastrow[i] = firstrow[i];
   }
+#endif
 
   GLuint lightmaphandle;
   glGenTextures (1, &lightmaphandle);
@@ -566,7 +576,9 @@ void OpenGLLightmapCache::Load(csGLCacheData *d)
     //SysPrintf (MSG_DEBUG_0,"openGL error string: %s\n",gluErrorString(errtest) );
   }
 
+#if !NEW_LM_FORMAT
   delete [] lm_data;
+#endif
 
 /*
     CsPrintf(MSG_DEBUG_0,"caching lightmap in handle %d\n", lightmaphandle);

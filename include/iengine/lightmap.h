@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,7 +21,13 @@
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iLightMap, 0, 0, 1);
+// @@@ This is a temporary define to mark a transition in lightmap
+// format. The old format is rrrrrrrrrrrrrrrrgggggggggggggggbbbbbbbbbbbbbbbb.
+// The new format will be rgb0rgb0rgb0rgb0rgb0. The latter format is better
+// for hardware. Though it uses a little more memory.
+#define NEW_LM_FORMAT 1
+
+SCF_VERSION (iLightMap, 0, 0, 2);
 
 /**
  * The lightmap interface.
@@ -31,8 +37,13 @@ SCF_VERSION (iLightMap, 0, 0, 1);
  */
 struct iLightMap : public iBase
 {
+#if NEW_LM_FORMAT
+  /// Get light map data (format rgb0rgb0rgb0...).
+  virtual unsigned char *GetMapData () = 0;
+#else
   /// Get light map by index; 0 - red, 1 - green, 2 - blue
   virtual unsigned char *GetMap (int nMap) = 0;
+#endif
   /// Get lightmap width (could be adjusted to power of two)
   virtual int GetWidth () = 0;
   /// Get lightmap height (could be adjusted to power of two)
@@ -52,3 +63,4 @@ struct iLightMap : public iBase
 };
 
 #endif
+

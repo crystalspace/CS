@@ -102,11 +102,21 @@ public:
     Clear ();
     if (other.GetMap()) { 
       Alloc (size); 
+#if NEW_LM_FORMAT
+      UByte* m = other.GetMap ();
+#endif
       for(int i=0; i<size; i++)
       {
+#if NEW_LM_FORMAT
+	int lmi = i << 2;
+        GetRed()[i] = m[lmi];
+        GetGreen()[i] = m[lmi+1];
+        GetBlue()[i] = m[lmi+2];
+#else
         GetRed()[i] = other.GetRed()[i];
         GetGreen()[i] = other.GetGreen()[i];
         GetBlue()[i] = other.GetBlue()[i];
+#endif
       }
     }
   }
@@ -117,12 +127,23 @@ public:
     other.Clear ();
     if (GetMap()) { 
       other.Alloc (size); 
+#if NEW_LM_FORMAT
+      UByte* m = other.GetMap ();
+      for(int i=0; i<size; i++)
+      {
+	int lmi = i << 2;
+        m[lmi] = (unsigned char)GetRed()[i];
+        m[lmi+1] = (unsigned char)GetGreen()[i];
+        m[lmi+2] = (unsigned char)GetBlue()[i];
+      }
+#else
       for(int i=0; i<size; i++)
       {
         other.GetRed()[i] = (unsigned char)GetRed()[i];
         other.GetGreen()[i] = (unsigned char)GetGreen()[i];
         other.GetBlue()[i] = (unsigned char)GetBlue()[i];
       }
+#endif
     }
   }
 };

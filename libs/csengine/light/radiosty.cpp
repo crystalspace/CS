@@ -119,12 +119,22 @@ void csRadElement::GetTextureColour(int suv, int w, int h, csColor &avg,
   avg.red = 0.0f;
   avg.green = 0.0f;
   avg.blue = 0.0f;
+#if NEW_LM_FORMAT
+  UByte* m = texturemap->GetMap ();
+#endif
   for(int y=0; y<h; y++, suv += width - w)
     for(int x=0; x<w; x++, suv ++)
     {
+#if NEW_LM_FORMAT
+      int lmsuv = suv << 2;
+      avg.red += m[lmsuv];
+      avg.green += m[lmsuv+1];
+      avg.blue += m[lmsuv+2];
+#else
       avg.red += texturemap->GetRed()[suv];
       avg.green += texturemap->GetGreen()[suv];
       avg.blue += texturemap->GetBlue()[suv];
+#endif
     }
   avg *= 1.0f / float( w*h );
 }
@@ -171,6 +181,36 @@ void csRadElement::AddDelta(csRadElement *src, int suv, int ruv,
 }
 
 
+#if NEW_LM_FORMAT
+void csRadElement::CopyAndClearDelta()
+{
+  int res;
+  int uv;
+  UByte* lm = lightmap->GetMap ();
+  float* dm = deltamap->GetMap ();
+  for(uv=0; uv<size; uv++)
+  {
+    int lmuv = uv << 2;
+    // Red
+    res = lm[lmuv] + QRound(dm[uv]);
+    if (res > 255) res = 255; else if (res < 0) res = 0;
+    lm[lmuv] = res;
+    dm[uv] = 0.0;
+    // Green
+    res = lm[lmuv+1] + QRound(dm[uv+size]);
+    if (res > 255) res = 255; else if (res < 0) res = 0;
+    lm[lmuv+1] = res;
+    dm[uv+size] = 0.0;
+    // Blue
+    res = lm[lmuv+2] + QRound(dm[uv+size+size]);
+    if (res > 255) res = 255; else if (res < 0) res = 0;
+    lm[lmuv+2] = res;
+    dm[uv+size+size] = 0.0;
+  }
+
+  total_unshot_light = 0.0;
+}
+#else
 void csRadElement::CopyAndClearDelta()
 {
   int res;
@@ -194,6 +234,7 @@ void csRadElement::CopyAndClearDelta()
 
   total_unshot_light = 0.0;
 }
+#endif
 
 void csRadElement::GetDeltaSums(float &red, float &green, float &blue)
 {
@@ -240,11 +281,21 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
   int flatb = QRound(GetFlatColor().blue * 255.0);
   if(flatb > 255) flatb = 255; else if (flatb < 0) flatb = 0;
 
+#if NEW_LM_FORMAT
+  UByte* m = map->GetMap ();
+#endif
   for(uv=0; uv<size; uv++)
   {
+#if NEW_LM_FORMAT
+    int lmuv = uv << 2;
+    m[lmuv] = flatr;
+    m[lmuv+1] = flatr;
+    m[lmuv+2] = flatr;
+#else
     map->GetRed()[uv] = flatr;
     map->GetGreen()[uv] = flatg;
     map->GetBlue()[uv] = flatb;
+#endif
   }
 
   // get texture of element
@@ -277,6 +328,9 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
   // region of the texture map.
   int texelsperlumel_shift = lightcell_shift * 2;
   int lumel_uv = 0;
+#if NEW_LM_FORMAT
+  m = map->GetMap ();
+#endif
   for(int lumel_y = 0; lumel_y < height; lumel_y ++)
     for(int lumel_x = 0; lumel_x < width; lumel_x++, lumel_uv++)
     {
@@ -298,9 +352,16 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
 	  sumb += rgb[txt_idx].blue;
 	}
        // store averages
+#if NEW_LM_FORMAT
+       int lmlumel_uv = lumel_uv << 2;
+       m[lmlumel_uv] = sumr >> texelsperlumel_shift;
+       m[lmlumel_uv+1] = sumr >> texelsperlumel_shift;
+       m[lmlumel_uv+2] = sumr >> texelsperlumel_shift;
+#else
        map->GetRed()[lumel_uv] = sumr >> texelsperlumel_shift;
        map->GetGreen()[lumel_uv] = sumg >> texelsperlumel_shift;
        map->GetBlue()[lumel_uv] = sumb >> texelsperlumel_shift;
+#endif
     }
 
   /*
@@ -404,7 +465,13 @@ csRadPoly :: csRadPoly(csPolygon3D *original, csSector* sector)
 
   // all light in static map is unshot now, add it to delta. clear lightmap.
   deltamap->Copy(*lightmap, size);
+#if NEW_LM_FORMAT
+  memset( lightmap->GetMap(), 0, size*4);
+  // @@@ What about the fourth component? Doesn't this have to be 128 for
+  // OpenGL? Need to check that!!!
+#else
   memset( lightmap->GetMap(), 0, size*3);
+#endif
 
   // Initialize some necessary values
   Setup();
@@ -502,7 +569,13 @@ csRadCurve :: csRadCurve(csCurve *original, csSector* sector)
 
   // all light in static map is unshot now, add it to delta. clear lightmap.
   deltamap->Copy(*lightmap, size);
+#if NEW_LM_FORMAT
+  memset( lightmap->GetMap(), 0, size*4);
+  // @@@ What about the fourth component? Doesn't this have to be 128 for
+  // OpenGL? Need to check that!!!
+#else
   memset( lightmap->GetMap(), 0, size*3);
+#endif
 
   // Initialize some necessary values
   Setup();

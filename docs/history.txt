@@ -2,6 +2,21 @@ The history order is reversed so that new features are at the top.
 
 17-May-2001
 	- Fixed Blocks so it compiles again.
+	- Did an experimental optimization. CS will now keep the lightmap
+	  in another format which is more suitable for hardware. Instead
+	  of three seperate maps of red, green, and blue data we now have
+	  r,g,b,0 in one array. Disadvantage: 4 bytes per lightmap entry
+	  instead of 3. Advantage: no more need to convert the lightmap
+	  in OpenGL as this format can be used like that. This gives a speed
+	  up which is especially visible if there are dynamic lights and
+	  you are moving a lot (and there are lots of lightmaps). Otherwise
+	  it will not give a slow-down.
+	  The new format can be turned of by setting NEW_LM_FORMAT to 0
+	  in iengine/lightmap.h.
+	  WARNING! Lightmaps will have to be relalculated (-relight).
+	- Removed a bunch of code in OpenGL lightmap handling which used
+	  to be needed but now I can't see a difference in visual output.
+	  The code is between #if 0/#endif so I can revert if needed.
 16-May-2001
 	- Philip Wyett did a quick update to eliminate 3000 compiler warnings.
 	  Pragma'ed C4291 out, for time being, will come back to this.

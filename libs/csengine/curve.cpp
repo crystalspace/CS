@@ -92,10 +92,14 @@ csCurveTesselated::~csCurveTesselated ()
 
 void csCurveTesselated::UpdateColors (csLightMap* lightmap)
 {
-  csRGBLightMap& map = lightmap->GetRealMap ();
-  UByte* mapR = map.GetRed ();
-  UByte* mapG = map.GetGreen ();
-  UByte* mapB = map.GetBlue ();
+  csRGBLightMap& rgbmap = lightmap->GetRealMap ();
+#if NEW_LM_FORMAT
+  UByte* map = rgbmap.GetMap ();
+#else
+  UByte* mapR = rgbmap.GetRed ();
+  UByte* mapG = rgbmap.GetGreen ();
+  UByte* mapB = rgbmap.GetBlue ();
+#endif
   int lm_width = lightmap->GetWidth ();
   int lm_height = lightmap->GetWidth ();
 
@@ -107,6 +111,24 @@ void csCurveTesselated::UpdateColors (csLightMap* lightmap)
     int cx, cy;
     cx = QInt (controls[ct.a].x * (lm_width - 1));
     cy = QInt (controls[ct.a].y * (lm_height - 1));
+#if NEW_LM_FORMAT
+    lm_idx = (cy*lm_width + cx)<<2;
+    colors[ct.a].red = ((float)map[lm_idx])/256.;
+    colors[ct.a].green = ((float)map[lm_idx+1])/256.;
+    colors[ct.a].blue = ((float)map[lm_idx+2])/256.;
+    cx = QInt (controls[ct.b].x * (lm_width - 1));
+    cy = QInt (controls[ct.b].y * (lm_height - 1));
+    lm_idx = (cy*lm_width + cx)<<2;
+    colors[ct.b].red = ((float)map[lm_idx])/256.;
+    colors[ct.b].green = ((float)map[lm_idx+1])/256.;
+    colors[ct.b].blue = ((float)map[lm_idx+2])/256.;
+    cx = QInt (controls[ct.c].x * (lm_width - 1));
+    cy = QInt (controls[ct.c].y * (lm_height - 1));
+    lm_idx = (cy*lm_width + cx)<<2;
+    colors[ct.c].red = ((float)map[lm_idx])/256.;
+    colors[ct.c].green = ((float)map[lm_idx+1])/256.;
+    colors[ct.c].blue = ((float)map[lm_idx+2])/256.;
+#else
     lm_idx = cy*lm_width + cx;
     colors[ct.a].red = ((float)mapR[lm_idx])/256.;
     colors[ct.a].green = ((float)mapG[lm_idx])/256.;
@@ -123,6 +145,7 @@ void csCurveTesselated::UpdateColors (csLightMap* lightmap)
     colors[ct.c].red = ((float)mapR[lm_idx])/256.;
     colors[ct.c].green = ((float)mapG[lm_idx])/256.;
     colors[ct.c].blue = ((float)mapB[lm_idx])/256.;
+#endif
   }
 
   colors_valid = true;
@@ -388,9 +411,13 @@ void csCurve::ShineDynLight (csLightPatch* lp)
 
   csColor color = light->GetColor() * NORMAL_LIGHT_LEVEL;
 
+#if NEW_LM_FORMAT
+  UByte *map = lightmap->GetRealMap().GetMap ();
+#else
   UByte *mapR = lightmap->GetRealMap().GetRed();
   UByte *mapG = lightmap->GetRealMap().GetGreen();
   UByte *mapB = lightmap->GetRealMap().GetBlue();
+#endif
 
   int lval;
   float cosfact = csPolyTexture::cfg_cosinus_factor;
@@ -447,6 +474,27 @@ void csCurve::ShineDynLight (csLightPatch* lp)
 
       float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
+#if NEW_LM_FORMAT
+      int lmuv = uv << 2;
+      if (color.red > 0)
+      {
+        lval = map[lmuv] + QRound (color.red * brightness);
+        if (lval > 255) lval = 255;
+        map[lmuv] = lval;
+      }
+      if (color.green > 0)
+      {
+        lval = map[lmuv+1] + QRound (color.green * brightness);
+        if (lval > 255) lval = 255;
+        map[lmuv+1] = lval;
+      }
+      if (color.blue > 0)
+      {
+        lval = map[lmuv+2] + QRound (color.blue * brightness);
+        if (lval > 255) lval = 255;
+        map[lmuv+2] = lval;
+      }
+#else
       if (color.red > 0)
       {
         lval = mapR[uv] + QRound (color.red * brightness);
@@ -465,6 +513,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
         if (lval > 255) lval = 255;
         mapB[uv] = lval;
       }
+#endif
     }
   }
 
@@ -574,7 +623,11 @@ void csCurve::CalculateLighting (csFrustumView& lview)
 
     bool dyn = light->IsDynamic();
 
+#if NEW_LM_FORMAT
+    UByte *map;
+#else
     UByte *mapR, *mapG, *mapB;
+#endif
     csShadowMap* smap;
 
     /* initialize color to something to avoid compiler warnings */
@@ -587,16 +640,24 @@ void csCurve::CalculateLighting (csFrustumView& lview)
       {
         smap = lightmap->NewShadowMap(light, CURVE_LM_SIZE, CURVE_LM_SIZE );
       }
-  
+
+#if NEW_LM_FORMAT
+      map = smap->map;
+#else
       mapR = smap->map;
       mapG = NULL;
       mapB = NULL;
+#endif
     }
     else
     {
+#if NEW_LM_FORMAT
+      map = lightmap->GetStaticMap ().GetMap ();
+#else
       mapR = lightmap->GetStaticMap ().GetRed ();
       mapG = lightmap->GetStaticMap ().GetGreen ();
       mapB = lightmap->GetStaticMap ().GetBlue ();
+#endif
       color = linfo.GetColor () * NORMAL_LIGHT_LEVEL;
     }
 
@@ -646,13 +707,40 @@ void csCurve::CalculateLighting (csFrustumView& lview)
 
         if (dyn)
         {
+#if NEW_LM_FORMAT
+          lval = map[uv] + QRound (NORMAL_LIGHT_LEVEL * brightness);
+          if (lval > 255) lval = 255;
+          map[uv] = lval;
+#else
           lval = mapR[uv] + QRound (NORMAL_LIGHT_LEVEL * brightness);
           if (lval > 255) lval = 255;
           mapR[uv] = lval;
+#endif
         }
         else
         {
 	  csColor& col = linfo.GetColor ();
+#if NEW_LM_FORMAT
+	  int lmuv = uv << 2;
+          if (col.red > 0)
+          {
+            lval = map[lmuv] + QRound (color.red * brightness);
+            if (lval > 255) lval = 255;
+            map[lmuv] = lval;
+          }
+          if (col.green > 0)
+          {
+            lval = map[lmuv+1] + QRound (color.green * brightness);
+            if (lval > 255) lval = 255;
+            map[lmuv+1] = lval;
+          }
+          if (col.blue > 0)
+          {
+            lval = map[lmuv+2] + QRound (color.blue * brightness);
+            if (lval > 255) lval = 255;
+            map[lmuv+2] = lval;
+          }
+#else
           if (col.red > 0)
           {
             lval = mapR[uv] + QRound (color.red * brightness);
@@ -671,6 +759,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
             if (lval > 255) lval = 255;
             mapB[uv] = lval;
           }
+#endif
         }
       }
     }
