@@ -21,6 +21,12 @@ The history order is reversed so that new features are at the top.
 	  with 0 (which you should never do with floats!) it now uses an
 	  epsilon test instead.
 	- Replaced some code in Rapid with csVector3 instead of float[3].
+	- Fixed OPCODE plugin so it tests if the transforms to Collide()
+	  are actually given.
+	- Added a note to the docs that RAPID is not for commercial usage.
+	  Use OPCODE if you want commercial usage.
+	- Fixed three initialization errors in the OPCODE plugin which could
+	  cause a crash at exit (and actually did).
 16-Apr-2003
 	- Rhad altered the rapid triangle collision test to ignore
 	  degenerate triangles.

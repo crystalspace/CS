@@ -118,7 +118,19 @@ bool csOPCODECollideSystem::Collide (
   ColCache.Model0 = col1->m_pCollisionModel;
   ColCache.Model1 = col2->m_pCollisionModel;
   
-  csReversibleTransform NetTransform = *trans1 / *trans2;
+  csReversibleTransform NetTransform;
+  if (trans1 && trans2)
+  {
+    NetTransform = *trans1 / *trans2;
+  }
+  else if (trans1)
+  {
+    NetTransform = *trans1;
+  }
+  else if (trans2)
+  {
+    NetTransform = trans2->GetInverse ();;
+  }
   
   csMatrix3 m1 = NetTransform.GetO2T ();
   // csMatrix3 m2 = trans2->GetO2T ();
@@ -168,8 +180,8 @@ bool csOPCODECollideSystem::Collide (
       // UGLY: I know, it sucks to have to copy them by value, but then how can i be
       // sure that it would not be modified by the app until the GetCollisionPairs
       // calls use them?!
-      this->T1 = *trans1;
-      this->T2 = *trans2;
+      if (trans1) this->T1 = *trans1;
+      if (trans2) this->T2 = *trans2;
       //	int size = (int)(udword(TreeCollider.GetNbPairs()));
       //	N_pairs = size;
       return true;

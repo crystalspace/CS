@@ -63,6 +63,9 @@ SCF_IMPLEMENT_IBASE_END
 csOPCODECollider::csOPCODECollider (iPolygonMesh* mesh)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  m_pCollisionModel = NULL;
+  indexholder = NULL;
+  vertholder = NULL;
   transform.m[0][3] = 0;
   transform.m[1][3] = 0;
   transform.m[2][3] = 0;
