@@ -1,6 +1,8 @@
 #include "cssysdef.h"
 #include "awssktst.h"
 
+#include <stdio.h>
+
 awsTestSink::awsTestSink():sink(NULL)
 {  
 }
@@ -28,19 +30,19 @@ awsTestSink::SetSink(iAwsSink *s)
 void 
 awsTestSink::RedClicked(void *sink,   iAwsSource *source)
 {
-
+  printf("awstest: red button clicked, source: %p, owner: %p\n", source, sink);
 }
 
 void 
 awsTestSink::BlueClicked(void *sink,  iAwsSource *source)
 {
-
+  printf("awstest: blue button clicked, source: %p, owner: %p\n", source, sink);
 }
 
 
 void 
 awsTestSink::GreenClicked(void *sink, iAwsSource *source)
 {
-
+  printf("awstest: green button clicked, source: %p, owner: %p\n", source, sink);
 }
 
