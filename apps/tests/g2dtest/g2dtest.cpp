@@ -889,8 +889,7 @@ int main (int argc, char *argv[])
       strcat (tmp, canvas);
       canvas = tmp;
     }
-    System.myG2D = CS_LOAD_PLUGIN (plugin_mgr,
-    	canvas, CS_FUNCID_CANVAS, iGraphics2D);
+    System.myG2D = CS_LOAD_PLUGIN (plugin_mgr, canvas, iGraphics2D);
     object_reg->Register (System.myG2D);
   }
   else System.myG2D->IncRef ();

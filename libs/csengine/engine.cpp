@@ -1921,10 +1921,10 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
     }
   }
 
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, classId, "MeshObj",
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, classId,
   	iMeshObjectType);
   if (!type)
-    type = CS_LOAD_PLUGIN (plugin_mgr, classId, "MeshObj", iMeshObjectType);
+    type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
   if (!type) return NULL;
   iMeshObjectFactory* fact = type->NewFactory ();
   if (!fact) return NULL;
@@ -1983,9 +1983,9 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
 	iDataBuffer* input)
 {
   iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	loaderClassId, "MeshLdr", iLoaderPlugin);
+  	loaderClassId, iLoaderPlugin);
   if (!plug)
-    plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, "MeshLdr", iLoaderPlugin);
+    plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
   if (!plug)
     return NULL;
 
@@ -2012,10 +2012,9 @@ iMeshWrapper* csEngine::LoadMeshWrapper (
 {
   (void)classId;
   iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	loaderClassId, "MeshLdr", iLoaderPlugin);
+  	loaderClassId, iLoaderPlugin);
   if (!plug)
-    plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId,
-    	"MeshLdr", iLoaderPlugin);
+    plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
   if (!plug)
     return NULL;
 

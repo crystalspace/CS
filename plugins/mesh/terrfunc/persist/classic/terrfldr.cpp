@@ -106,12 +106,11 @@ iBase* csTerrFuncFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
   iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.terrfunc", "MeshObj",
-	iMeshObjectType);
+  	"crystalspace.mesh.object.terrfunc", iMeshObjectType);
   if (!pType)
   {
     pType = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.terrfunc",
-    	"MeshObj", iMeshObjectType);
+    	iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.terrfunc\n");
     if (!pType)
       return NULL;

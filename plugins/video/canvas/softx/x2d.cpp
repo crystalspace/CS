@@ -94,7 +94,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-  xwin = CS_LOAD_PLUGIN (plugin_mgr, CS_XWIN_SCF_ID, NULL, iXWindow);
+  xwin = CS_LOAD_PLUGIN_OLD (plugin_mgr, CS_XWIN_SCF_ID, NULL, iXWindow);
   if (!xwin)
     return false;
   dpy = xwin->GetDisplay ();
@@ -117,7 +117,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     if (XQueryExtension (dpy, CS_XEXT_SHM, 
 			&opcode, &first_event, &first_error))
     {
-      xshm = CS_LOAD_PLUGIN (plugin_mgr, CS_XEXT_SHM_SCF_ID, NULL, iXExtSHM);
+      xshm = CS_LOAD_PLUGIN_OLD (plugin_mgr, CS_XEXT_SHM_SCF_ID, NULL, iXExtSHM);
       if (xshm)
 	xshm->SetDisplayScreen (dpy, screen_num);
     }

@@ -121,8 +121,7 @@ bool csCubeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   if (!synldr)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", 
-	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    	"crystalspace.syntax.loader.service.text", iSyntaxService);
     object_reg->Register (synldr);
   }
   else synldr->IncRef ();
@@ -147,11 +146,11 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine,
   char str[255];
 
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.cube", "MeshObj", iMeshObjectType);
+  	"crystalspace.mesh.object.cube", iMeshObjectType);
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.cube",
-    	"MeshObj", iMeshObjectType);
+    	iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.cube\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
@@ -239,8 +238,7 @@ bool csCubeFactorySaver::Initialize (iObjectRegistry* object_reg)
   if (!synldr)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", 
-	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    	"crystalspace.syntax.loader.service.text", iSyntaxService);
     object_reg->Register (synldr);
   }
   else synldr->IncRef ();

@@ -140,11 +140,11 @@ iBase* csFireFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.fire", "MeshObj", iMeshObjectType);
+  	"crystalspace.mesh.object.fire", iMeshObjectType);
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.fire",
-    	"MeshObj", iMeshObjectType);
+    	iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.fire\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();

@@ -277,11 +277,11 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
   char str[255];
 
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
+  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType);
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.2d",
-    	"MeshObj", iMeshObjectType);
+    	iMeshObjectType);
   }
   if (!type)
   {

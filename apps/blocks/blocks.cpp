@@ -3240,7 +3240,8 @@ int main (int argc, char* argv[])
   Sys->thing_type = Sys->engine->GetThingType ();
 
   QUERY_REG (Sys->myVFS, iVFS, "No iVFS plugin!");
-  QUERY_REG (Sys->myNetDrv, iNetworkDriver, "No iNetworkDriver plugin!");
+  Sys->myNetDrv = CS_QUERY_REGISTRY (object_reg, iNetworkDriver);
+  if (Sys->myNetDrv) Sys->myNetDrv->IncRef ();
 
   // Get a font handle
   Sys->font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);

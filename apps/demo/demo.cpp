@@ -897,8 +897,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Load the engine plugin.
-  engine = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.engine.3d",
-			   CS_FUNCID_ENGINE, iEngine);
+  engine = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.engine.3d", iEngine);
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No engine!");

@@ -134,11 +134,11 @@ iBase* csSpiralFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.spiral", "MeshObj", iMeshObjectType);
+  	"crystalspace.mesh.object.spiral", iMeshObjectType);
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.spiral",
-    	"MeshObj", iMeshObjectType);
+    	iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.spiral\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();

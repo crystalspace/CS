@@ -142,11 +142,11 @@ iBase* csFountainFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.fountain", "MeshObj", iMeshObjectType);
+  	"crystalspace.mesh.object.fountain", iMeshObjectType);
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.fountain",
-    	"MeshObj", iMeshObjectType);
+    	iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.fountain\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();

@@ -137,11 +137,11 @@ iBase* csSnowFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.snow", "MeshObj", iMeshObjectType);
+  	"crystalspace.mesh.object.snow", iMeshObjectType);
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.snow",
-    	"MeshObj", iMeshObjectType);
+    	iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.snow\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();

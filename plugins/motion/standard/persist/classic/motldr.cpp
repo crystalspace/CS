@@ -113,7 +113,8 @@ bool csMotionLoader::Initialize (iObjectRegistry* object_reg)
 	return false;
   }
   vfs->IncRef ();
-  motman = CS_QUERY_PLUGIN_CLASS(plugin_mgr, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
+  motman = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.motion.manager.default", iMotionManager);
   if (!motman)
   {
 	printf("Motion Loader: Motion manager not loaded... aborting\n");
@@ -498,7 +499,8 @@ csMotionSaver::~csMotionSaver()
 void csMotionSaver::WriteDown ( iBase* /* obj */, iStrVector* /* string */, iEngine* /* engine */)
 {
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS(plugin_mgr, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
+  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.motion.manager.default", iMotionManager);
   if (motman)
   {
 	motman->DecRef();

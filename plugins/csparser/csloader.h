@@ -86,7 +86,7 @@ private:
     // Find a loader plugin record
     struct csLoaderPluginRec* FindPluginRec (const char* name);
     // Return the loader plugin from a record, possibly loading the plugin now
-    iLoaderPlugin* GetPluginFromRec (csLoaderPluginRec*, const char *FuncID);
+    iLoaderPlugin* GetPluginFromRec (csLoaderPluginRec*);
   public:
     iPluginManager* plugin_mgr;
 
@@ -97,7 +97,7 @@ private:
     // delete a plugin record
     virtual bool FreeItem (csSome Item);
     // find a plugin by its name or load it if it doesn't exist
-    iLoaderPlugin* FindPlugin (const char* Name, const char* FuncID);
+    iLoaderPlugin* FindPlugin (const char* Name);
     // add a new plugin record
     void NewPlugin (const char* ShortName, const char* ClassID);
   };

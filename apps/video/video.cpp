@@ -350,7 +350,7 @@ iMeshWrapper *wallmesh = engine->CreateSectorWallsMesh (room, "walls");
   // load the videoformat plugin
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading an iVideoFormat.");
   pVideoFormat = CS_LOAD_PLUGIN (plugin_mgr,
-    "crystalspace.video.format.avi", "VideoFormat", iStreamFormat);
+    "crystalspace.video.format.avi", iStreamFormat);
 
   if (pVideoFormat)
   {

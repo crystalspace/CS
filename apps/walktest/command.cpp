@@ -368,7 +368,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   else if (!strcasecmp (cmd, "lod"))
   {
     iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-    	"crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+    	"crystalspace.mesh.object.sprite.3d", iMeshObjectType);
     csVariant lod_level;
     GetConfigOption (type, "sprlod", lod_level);
     float f = lod_level.GetFloat ();
@@ -379,7 +379,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   else if (!strcasecmp (cmd, "sprlight"))
   {
     iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-    	"crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+    	"crystalspace.mesh.object.sprite.3d", iMeshObjectType);
     csVariant lqual;
     GetConfigOption (type, "sprlq", lqual);
     long l = lqual.GetLong ();

@@ -131,7 +131,7 @@ bool csGraphics3DInfinite::Initialize (iObjectRegistry *r)
   width = height = -1;
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  G2D = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graphics2d.infinite",
+  G2D = CS_LOAD_PLUGIN_OLD (plugin_mgr, "crystalspace.graphics2d.infinite",
     NULL, iGraphics2D);
   if (!G2D)
     return false;

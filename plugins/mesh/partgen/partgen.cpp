@@ -70,9 +70,9 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
+  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType);
   if (!type) type = CS_LOAD_PLUGIN (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
+  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType);
   spr_factory = type->NewFactory ();
   type->DecRef ();
   shapenr = 0;

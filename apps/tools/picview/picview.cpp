@@ -138,7 +138,7 @@ bool PicViewApp::Initialize ()
 
   image_loader = CS_LOAD_PLUGIN (plugin_mgr,
     "crystalspace.graphic.image.io.multiplex",
-    "ImgLdr", iImageIO);
+    iImageIO);
   if (!image_loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

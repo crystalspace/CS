@@ -191,8 +191,7 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   if (!synldr)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", 
-	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    	"crystalspace.syntax.loader.service.text", iSyntaxService);
     object_reg->Register (synldr);
   }
   else
@@ -621,8 +620,7 @@ bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
   if (!synldr)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", 
-	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    	"crystalspace.syntax.loader.service.text", iSyntaxService);
     object_reg->Register (synldr);
   }
   else

@@ -398,12 +398,10 @@ iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
   }
   
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  mesh_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, classId, "MeshObj", 
-				     iMeshObjectType);
+  mesh_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, classId, iMeshObjectType);
 
   if(!mesh_type) 
-    mesh_type = CS_LOAD_PLUGIN (plugin_mgr, classId,  "MeshObj", 
-				iMeshObjectType);
+    mesh_type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
   if(!mesh_type) 
     return NULL;
 

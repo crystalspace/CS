@@ -879,7 +879,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
       case CS_TOKEN_PLUGIN:
 	{
 	  csScanStr (params, "%s", str);
-	  plug = loaded_plugins.FindPlugin (str, "MeshLdr");
+	  plug = loaded_plugins.FindPlugin (str);
 	}
         break;
 
@@ -1519,7 +1519,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
       case CS_TOKEN_PLUGIN:
 	{
 	  csScanStr (params, "%s", str);
-	  plug = loaded_plugins.FindPlugin (str, "MeshLdr");
+	  plug = loaded_plugins.FindPlugin (str);
 	}
         break;
     }
@@ -1582,7 +1582,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
       case CS_TOKEN_PLUGIN:
 	{
 	  csScanStr (params, "%s", str);
-	  plug = loaded_plugins.FindPlugin (str, "Loader");
+	  plug = loaded_plugins.FindPlugin (str);
 	}
         break;
     }

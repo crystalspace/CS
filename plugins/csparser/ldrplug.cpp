@@ -90,25 +90,25 @@ csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPluginRec (
 }
 
 iLoaderPlugin* csLoader::csLoadedPluginVector::GetPluginFromRec (
-	csLoaderPluginRec *rec, const char *FuncID)
+	csLoaderPluginRec *rec)
 {
   if (!rec->Plugin)
     rec->Plugin = CS_LOAD_PLUGIN (plugin_mgr,
-    	rec->ClassID, FuncID, iLoaderPlugin);
+    	rec->ClassID, iLoaderPlugin);
   return rec->Plugin;
 }
 
 iLoaderPlugin* csLoader::csLoadedPluginVector::FindPlugin (
-	const char* Name, const char* FuncID)
+	const char* Name)
 {
   // look if there is already a loading record for this plugin
   csLoaderPluginRec* pl = FindPluginRec (Name);
   if (pl)
-    return GetPluginFromRec(pl, FuncID);
+    return GetPluginFromRec(pl);
 
   // create a new loading record
   NewPlugin (NULL, Name);
-  return GetPluginFromRec((csLoaderPluginRec*)Get(Length()-1), FuncID);
+  return GetPluginFromRec((csLoaderPluginRec*)Get(Length()-1));
 }
 
 void csLoader::csLoadedPluginVector::NewPlugin

@@ -155,11 +155,11 @@ iBase* csBallFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.ball", "MeshObj", iMeshObjectType);
+  	"crystalspace.mesh.object.ball", iMeshObjectType);
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.ball",
-    	"MeshObj", iMeshObjectType);
+    	iMeshObjectType);
   }
   if (!type)
   {
@@ -230,8 +230,7 @@ bool csBallLoader::Initialize (iObjectRegistry* object_reg)
   if (!synldr)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", 
-	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    	"crystalspace.syntax.loader.service.text", iSyntaxService);
     object_reg->Register (synldr);
   }
   else
@@ -414,8 +413,7 @@ bool csBallSaver::Initialize (iObjectRegistry* object_reg)
   if (!synldr)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", 
-	CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+    	"crystalspace.syntax.loader.service.text", iSyntaxService);
     object_reg->Register (synldr);
   }
   else

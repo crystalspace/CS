@@ -52,37 +52,37 @@ struct iComponent;
  */
 
 /// VFS plugin functionality identifier
-#define CS_FUNCID_VFS		"VFS"
+#define CS_FUNCID_VFS		"iVFS"
 /// Functionality ID for the video driver
-#define CS_FUNCID_VIDEO		"VideoDriver"
+#define CS_FUNCID_VIDEO		"iGraphics3D"
 /// Canvas plugin funcID (AKA 2D graphics driver)
-#define CS_FUNCID_CANVAS	"VideoCanvas"
+#define CS_FUNCID_CANVAS	"iGraphics2D"
 /// Sound renderer
-#define CS_FUNCID_SOUND		"SoundRender"
+#define CS_FUNCID_SOUND		"iSoundRender"
 /// Image loader
-#define CS_FUNCID_IMGLOADER	"ImageLoader"
+#define CS_FUNCID_IMGLOADER	"iImageIO"
 /// Sound loader
-#define CS_FUNCID_SNDLOADER	"SoundLoader"
+#define CS_FUNCID_SNDLOADER	"iSoundLoader"
 /// Image loader
-#define CS_FUNCID_LVLLOADER	"LevelLoader"
+#define CS_FUNCID_LVLLOADER	"iLoader"
 /// Font server
-#define CS_FUNCID_FONTSERVER "FontServer"
+#define CS_FUNCID_FONTSERVER	"iFontServer"
 /// Network driver
-#define CS_FUNCID_NETDRV	"NetDriver"
+#define CS_FUNCID_NETDRV	"iNetworkDriver"
 /// Console
-#define CS_FUNCID_CONSOLE	"Console.Output"
+#define CS_FUNCID_CONSOLE	"iConsoleOutput"
 /// 3D engine
-#define CS_FUNCID_ENGINE	"Engine"
+#define CS_FUNCID_ENGINE	"iEngine"
 /// Skeleton Animation
-#define CS_FUNCID_MOTION	"MotionManager"
+#define CS_FUNCID_MOTION	"iMotionManager"
 /// Reporting
-#define CS_FUNCID_REPORTER	"Reporter"
+#define CS_FUNCID_REPORTER	"iReporter"
 /// Model Importer
-#define CS_FUNCID_CONVERTER	"Converter"
+#define CS_FUNCID_CONVERTER	"iModelConverter"
 /// Model Crossbuilder
-#define CS_FUNCID_CROSSBUILDER "CrossBuilder"
+#define CS_FUNCID_CROSSBUILDER	"iCrossBuilder"
 /// Text Syntax Service
-#define CS_FUNCID_SYNTAXSERVICE "TextSyntaxService"
+#define CS_FUNCID_SYNTAXSERVICE "iSyntaxService"
 
 /**
  * Query a pointer to some plugin through the Plugin Manager interface.
@@ -114,8 +114,21 @@ struct iComponent;
  * matter which interface it implements, ask for some basic interface,
  * say iBase or iComponent.
  */
-#define CS_QUERY_PLUGIN_CLASS(Object,ClassID,FuncID,Interface)		\
+#define CS_QUERY_PLUGIN_CLASS(Object,ClassID,Interface)			\
   (Interface *)((Object)->QueryPlugin					\
+  (ClassID, #Interface, #Interface, VERSION_##Interface))
+
+/**
+ * Tell plugin manager driver to load a plugin.
+ * `Object' is a object that implements iPluginManager interface.
+ * `ClassID' is the class ID (`crystalspace.graphics3d.software').
+ * `Interface' is a interface name (iGraphics2D, iVFS and so on).
+ * @@@This is the OLD version of CS_LOAD_PLUGIN that still accepts a function
+ * ID. This version has not yet been removed because we still need it
+ * for now.
+ */
+#define CS_LOAD_PLUGIN_OLD(Object,ClassID,FuncID,Interface)		\
+  (Interface *)((Object)->LoadPlugin					\
   (ClassID, FuncID, #Interface, VERSION_##Interface))
 
 /**
@@ -124,16 +137,16 @@ struct iComponent;
  * `ClassID' is the class ID (`crystalspace.graphics3d.software').
  * `Interface' is a interface name (iGraphics2D, iVFS and so on).
  */
-#define CS_LOAD_PLUGIN(Object,ClassID,FuncID,Interface)			\
+#define CS_LOAD_PLUGIN(Object,ClassID,Interface)			\
   (Interface *)((Object)->LoadPlugin					\
-  (ClassID, FuncID, #Interface, VERSION_##Interface))
+  (ClassID, #Interface, #Interface, VERSION_##Interface))
 
 /**
  * Same as CS_LOAD_PLUGIN but don't bother asking for a interface.
  * This is useful for unconditionally loading plugins.
  */
-#define _CS_LOAD_PLUGIN(Object,ClassID,FuncID)				\
-  ((Object)->LoadPlugin (ClassID, FuncID, NULL, 0))
+#define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)			\
+  ((Object)->LoadPlugin (ClassID, "Bla@@@", NULL, 0))
 
 SCF_VERSION (iPluginManager, 0, 0, 1);
 

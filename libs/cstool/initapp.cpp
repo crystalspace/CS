@@ -213,8 +213,7 @@ bool csInitializer::SetupConfigManager (
   iVFS* VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
   if (!VFS)
   {
-    VFS = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.kernel.vfs",
-  	  CS_FUNCID_VFS, iVFS);
+    VFS = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.kernel.vfs", iVFS);
     if (!VFS)
       return false;
     r->Register (VFS);

@@ -493,11 +493,11 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
   imeshfactwrap->DecRef ();
 
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+  	"crystalspace.mesh.object.sprite.3d", iMeshObjectType);
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.3d",
-    	"MeshObj", iMeshObjectType);
+    	iMeshObjectType);
   }
   if (!type)
   {
@@ -1010,7 +1010,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	{
 	  csScanStr (params, "%s", str);
 	  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS (plugin_mgr, 
-		"crystalspace.motion.manager.default", "MotionManager",
+		"crystalspace.motion.manager.default",
 		iMotionManager);
 	  if (!motman) 
 	  { 

@@ -109,7 +109,7 @@ bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
     char const* classname = classlist->Get(i);
     if (!strcasecmp (classname, MY_CLASSNAME)) continue;
 
-    iModelConverter *ldr = CS_LOAD_PLUGIN (plugin_mgr, classname, 0, iModelConverter);
+    iModelConverter *ldr = CS_LOAD_PLUGIN_OLD (plugin_mgr, classname, 0, iModelConverter);
     if (ldr)
       Converters.Push(ldr);
   }

@@ -115,7 +115,7 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
   char const* baseclass = ini->GetStr("FancyConsole.General.Superclass",
     "crystalspace.console.output.standard");
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  base = CS_LOAD_PLUGIN (plugin_mgr, baseclass, 0, iConsoleOutput);
+  base = CS_LOAD_PLUGIN_OLD (plugin_mgr, baseclass, 0, iConsoleOutput);
   if (!base)
     return false;
 

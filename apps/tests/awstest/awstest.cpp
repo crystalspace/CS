@@ -198,8 +198,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   // Load the engine plugin.
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading engine...\n");
-  engine = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.engine.3d",
-  	CS_FUNCID_ENGINE, iEngine);
+  engine = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.engine.3d", iEngine);
   if (!engine)
   {
     Report(CS_REPORTER_SEVERITY_ERROR, "Could not load the engine plugin!\n");
@@ -214,7 +213,8 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   
   // Load AWS
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading AWS...\n");
-  aws = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.window.alternatemanager", "awsManager", iAws);
+  aws = CS_LOAD_PLUGIN(plugin_mgr,
+  	"crystalspace.window.alternatemanager", iAws);
   
   if (!aws)
   {
@@ -223,7 +223,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   }
     
   
-  loader = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.level.loader", CS_FUNCID_LVLLOADER, iLoader);
+  loader = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.level.loader", iLoader);
   if (!loader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!\n");

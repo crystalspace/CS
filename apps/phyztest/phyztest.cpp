@@ -312,7 +312,8 @@ bool Phyztest::Initialize (int argc, const char* const argv[],
     exit (1);
   }
 
-  cdsys = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.collisiondetection.rapid", "CollDet", iCollideSystem);
+  cdsys = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.collisiondetection.rapid",
+  	iCollideSystem);
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Phyztest Crystal Space Application version 0.1.");

@@ -285,7 +285,7 @@ bool csOpenGLProcSoftware::Prepare(
   alone_mode = alone_hint;
 
   // Get an instance of the software procedural texture renderer
-  iGraphics3D *soft_proc_g3d = CS_LOAD_PLUGIN (plugin_mgr, 
+  iGraphics3D *soft_proc_g3d = CS_LOAD_PLUGIN_OLD (plugin_mgr, 
     "crystalspace.graphics3d.software.offscreen", NULL, iGraphics3D);
   if (!soft_proc_g3d)
   {

@@ -265,11 +265,11 @@ iBase* csHazeFactoryLoader::Parse (const char* string,
   csVector3 a;
 
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.haze", "MeshObj", iMeshObjectType);
+  	"crystalspace.mesh.object.haze", iMeshObjectType);
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.haze",
-    	"MeshObj", iMeshObjectType);
+    	iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.haze\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();

@@ -1,5 +1,53 @@
 The history order is reversed so that new features are at the top.
 
+15-Oct-2001
+	- All func-id's are now changed so that they are equal to their
+	  interface name. Basically this means:
+	  	VFS -> iVFS
+		VideoDriver -> iGraphics3D
+		VideoCanvas -> iGraphics2D
+		SoundRender -> iSoundRender
+		ImageLoader -> iImageIO
+		SoundLoader -> iSoundLoader
+		LevelLoader -> iLoader
+		FontServer -> iFontServer
+		NetDriver -> iNetworkDriver
+		Console.Output -> iConsoleOutput
+		Console.Input -> iConsoleInput
+		Engine -> iEngine
+		MotionManager -> iMotionManager
+		Reporter -> iReporter
+		Converter -> iModelConverter
+		CrossBuilder -> iCrossBuilder
+		TextSyntaxService -> iSyntaxService
+	  This change was done in preparation for the removal of the
+	  function id's.
+	- All 'System.Plugins' entries in the config files have to be modified
+	  to the new func-id's above. For example, instead of:
+		System.Plugins.VideoDriver = crystalspace.graphics3d.software
+	  you will now have to say:
+		System.Plugins.iGraphics3D = crystalspace.graphics3d.software
+	- In the future loading plugins like above (with interface name) will
+	  mark them as the default plugin for that interface (using the
+	  object registry). So if you do
+	  	CS_QUERY_REGISTRY(object_reg, iGraphics3D);
+	  you will get the default plugin implementing iGraphics3D. If you
+	  want to load additional plugins implementing some interface but
+	  not mark them as default you can do this like this:
+	  	System.Plugins.iGraphics3D.Extra = ...
+	  This will put them in the object registry with the tag
+	  "iGraphics3D.Extra" (not at this moment though).
+	- CS_LOAD_PLUGIN no longer accepts the FuncID argument. Instead it
+	  will use the interface name as the FuncID. This conforms well
+	  with the rename of the FuncID's above. If you still want to load
+	  a plugin with another FuncID then you can temporarily use
+	  CS_LOAD_PLUGIN_OLD.
+	- Renamed the _CS_LOAD_PLUGIN (mark the additional underscore in
+	  front) to CS_LOAD_PLUGIN_ALWAYS. Also removed the FuncID parameter.
+	- Removed the FuncID parameter from CS_QUERY_PLUGIN_CLASS. Instead
+	  the interface name is used as the FuncID.
+	- Made networking driver optional in Blocks (it gave an error when
+	  this plugin wasn't present).
 14-Oct-2001
 	- The 'stdrep' plugin now depends on output console and
 	  reporter plugins in SCF. This means that it will be loaded

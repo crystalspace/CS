@@ -261,7 +261,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   {
     // Initialize the python plugin.
     iScript* is = CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.script.python", "Python", iScript);
+      "crystalspace.script.python", iScript);
     if (is)
     {
       // Load a python module (scripts/python/pysimp.py).
@@ -282,7 +282,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   {
     //Now try some lua scripting stuff
     iScript* is = CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.script.lua", "Lua", iScript);
+      "crystalspace.script.lua", iScript);
     if (is)
     {
       if (!is->LoadModule ("scripts/lua/pysimp.lua"))
