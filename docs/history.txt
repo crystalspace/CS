@@ -11,6 +11,8 @@ chronological order.
 	  With these functions it is possible to create portal container
 	  meshes.
 	- Jorrit fixed wrong header protector in cstool/meshobjtmpl.h.
+	- Anders Stenberg implemented operator/= for csDVector3, since it
+	  wasn't implemented by some reason, just declared in the header.
 20-Sep-2003
 	- Jorrit reverted nearly all his changes of yesterday. The only two
 	  changes that remain are the iPortalContainer object (but now
