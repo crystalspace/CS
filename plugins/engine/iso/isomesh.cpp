@@ -51,6 +51,7 @@ public:
 
   //----- iMovable -------------------------------
   virtual iMovable* GetParent () const {return 0;}
+  virtual void SetParent (iMovable* parent) { return; }
   virtual void SetSector (iSector* ) { updatenumber++; }
   virtual void ClearSectors () { updatenumber++; }
   virtual void AddSector (iSector* ) { updatenumber++; }
