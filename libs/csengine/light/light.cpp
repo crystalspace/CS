@@ -65,6 +65,7 @@ csLight::~csLight ()
 {
   if (flags.Check (CS_LIGHT_ACTIVEHALO))
     csWorld::current_world->RemoveHalo (this);
+  delete halo;
 }
 
 void csLight::SetHalo (csHalo *Halo)

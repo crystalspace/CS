@@ -112,6 +112,7 @@ void csParticleSystem :: AppendRectSprite(float width, float height,
   csMaterialWrapper *mat, bool lighted)
 {
   csSprite2D *part = new csSprite2D(this);
+  iParticle *pTicle;
   //csWorld::current_world->sprites.Push(part);
   csColoredVertices& vs = part->GetVertices();
   vs.SetLimit(4);
@@ -123,8 +124,10 @@ void csParticleSystem :: AppendRectSprite(float width, float height,
   part->SetLighting( lighted );
   part->SetColor( csColor(1.0, 1.0, 1.0) );
   part->SetMaterial (mat);
-  AppendParticle(QUERY_INTERFACE(part, iParticle));
+  AppendParticle(pTicle = QUERY_INTERFACE(part, iParticle));
+  pTicle->DecRef ();
   part->DecRef(); 
+  
 }
 
 
@@ -132,13 +135,15 @@ void csParticleSystem :: AppendRegularSprite(int n, float radius,
   csMaterialWrapper* mat, bool lighted)
 {
   csSprite2D *part = new csSprite2D(this);
+  iParticle *pTicle;
   //csWorld::current_world->sprites.Push(part);
   part->CreateRegularVertices(n, true);
   part->ScaleBy(radius);
   part->SetMaterial (mat);
   part->SetLighting( lighted );
   part->SetColor( csColor(1.0, 1.0, 1.0) );
-  AppendParticle(QUERY_INTERFACE(part, iParticle));
+  AppendParticle(pTicle = QUERY_INTERFACE(part, iParticle));
+  pTicle->DecRef ();
   part->DecRef(); 
 }
 
