@@ -19,10 +19,6 @@
 #ifndef __CS_THING_H__
 #define __CS_THING_H__
 
-#ifndef CS_USE_NEW_RENDERER
-#define	COMBINE_LIGHTMAPS
-#endif
-
 #include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
 #include "parrays.h"
@@ -49,11 +45,9 @@
 #include "iutil/dbghelp.h"
 #include "lghtmap.h"
 
-#ifdef COMBINE_LIGHTMAPS
 #include "csgeom/subrec2.h"
 #include "csgfx/memimage.h"
 #include "ivideo/txtmgr.h"
-#endif
 
 class csThing;
 class csThingStatic;
@@ -174,8 +168,61 @@ public:
   /// Full radius of object in object space.
   float max_obj_radius;
 
+  /// Static polys which share the same material
+  struct csStaticPolyGroup
+  {
+    iMaterialWrapper* material;
+    csArray<int> polys;
+
+    int numLitPolys;
+    int totalLumels;
+  };
+
+  struct StaticSuperLM;
+
+  /**
+   * Static polys which share the same material and fit on the same SLM 
+   * template.
+   */
+  struct csStaticLitPolyGroup : public csStaticPolyGroup
+  {
+    csArray<csSubRect2*> slmSubrects;
+    csArray<csRect> lmRects;
+    StaticSuperLM* staticSLM;
+  };
+
+  /// SLM template
+  struct StaticSuperLM
+  {
+    int width, height;
+    csSubRectangles2* rects;
+    int freeLumels;
+
+    StaticSuperLM (int w, int h) : width(w), height(h)    
+    {
+      rects = 0;
+      freeLumels = width * height;
+    }
+    ~StaticSuperLM()
+    {
+      delete rects;
+    }
+
+    csSubRectangles2* GetRects ()
+    {
+      if (rects == 0)
+      {
+	rects = new csSubRectangles2 (csRect (0, 0, width, height));
+      }
+      return rects;
+    }
+  };
+
   /// The array of static polygon data (csPolygon3DStatic).
   csPolygonStaticArray static_polygons;
+  csPDelArray<csStaticLitPolyGroup> litPolys;
+  csPDelArray<csStaticPolyGroup> unlitPolys;
+  csArray<StaticSuperLM*> superLMs;
 
   /**
    * Polygon indices to polygons that contain portals (optimization).
@@ -186,6 +233,7 @@ public:
 
   /// If true then this thing has been prepared (Prepare() function).
   bool prepared;
+  bool lmprepared;
 
   /**
    * This field describes how the light hitting polygons of this thing is
@@ -227,6 +275,17 @@ public:
    * later.
    */
   void Prepare ();
+  /**
+   * Sets up a layout of lightmaps on a super lightmap that all instances
+   * of this factory can reuse.
+   */
+  void PrepareLMLayout ();
+  /// Do the actual distribution.
+  void DistributePolyLMs (const csStaticPolyGroup& inputPolys,
+    csPDelArray<csStaticLitPolyGroup>& outputPolys, 
+    csStaticPolyGroup* rejectedPolys);
+  /// Delete LM distro information. Needed when adding/removing polys.
+  void UnprepareLMLayout ();
 
   /// Calculates the interpolated normals of all vertices
   void CalculateNormals ();
@@ -407,24 +466,6 @@ public:
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 };
 
-#ifdef COMBINE_LIGHTMAPS
-
-struct SuperLM;
-
-struct csPolyGroup
-{
-  iMaterialWrapper* material;
-  csArray<csPolygon3D*> polys;
-};
-
-struct csLitPolyGroup : public csPolyGroup
-{
-  csRefArray<iRendererLightmap> lightmaps;
-  csArray<csSubRect2*> slmSubrects;
-  SuperLM* thingTypeSLM;
-};
-#endif
-
 /**
  * A Thing is a set of polygons. A thing can be used for the
  * outside of a sector or else to augment the sector with
@@ -547,7 +588,20 @@ private:
   void ClearRenderMeshes ();
 #endif
 
-#ifdef COMBINE_LIGHTMAPS
+  /// A group of polys that share the same material.
+  struct csPolyGroup
+  {
+    iMaterialWrapper* material;
+    csArray<csPolygon3D*> polys;
+  };
+
+  /// Polys with the same material and the same SLM
+  struct csLitPolyGroup : public csPolyGroup
+  {
+    csRefArray<iRendererLightmap> lightmaps;
+    csRef<iSuperLightmap> SLM;
+  };
+
   csPDelArray<csLitPolyGroup> litPolys;
   csPDelArray<csPolyGroup> unlitPolys;
   bool lightmapsPrepared;
@@ -556,7 +610,6 @@ private:
   void PrepareLMs ();
   void ClearLMs ();
   void UpdateDirtyLMs ();
-#endif
 public:
   /**
    * How many times are we busy drawing this thing (recursive).
@@ -1083,62 +1136,6 @@ public:
   friend struct MeshObject;
 };
 
-#ifdef COMBINE_LIGHTMAPS
-
-struct SuperLM
-{
-  int width, height;
-  csSubRectangles2* rects;
-  int freeLumels;
-  csRef<iSuperLightmap> rendererSLM;
-
-  SuperLM (iGraphics3D* g3d, int w, int h) : width(w), height(h)    
-  {
-    rects = 0;
-    freeLumels = width * height;
-
-    rendererSLM = g3d->GetTextureManager ()->CreateSuperLightmap (w, h);
-  }
-  ~SuperLM()
-  {
-    delete rects;
-  }
-
-  csSubRectangles2* GetRects ()
-  {
-    if (rects == 0)
-    {
-      rects = new csSubRectangles2 (csRect (0, 0, width, height));
-    }
-    return rects;
-  }
-};
-
-struct csSuperLMArray
-{
-  int width, height;
-  int maxLumels;
-  csArray<SuperLM*> SLMs;
-
-  csSuperLMArray (int size) : width(size), height(size)    
-  {
-    maxLumels = width * height;
-  }
-
-  void Clear ()
-  {
-    for (int i = 0; i < SLMs.Length(); i++)
-    {
-      SuperLM* slm = SLMs[i];
-      delete slm;
-    }
-    SLMs.DeleteAll ();
-    maxLumels = width * height;
-  };
-};
-
-#endif
-
 /**
  * Thing type. This is the plugin you have to use to create instances
  * of csThing.
@@ -1169,16 +1166,7 @@ public:
   csBlockAllocator<csPolyTexture> blk_polytex;
   csBlockAllocator<csLightMap> blk_lightmap;
 
-#ifdef COMBINE_LIGHTMAPS
-  csPDelArray<csSuperLMArray> superLMs;
-  int minLightmapSize;
-  int maxLightmapSize;
-
-  void AllocLightmaps (const csPolyGroup& inputPolys,
-    csPDelArray<csLitPolyGroup>& outputPolys, 
-    csPolyGroup* rejectedPolys);
-  void FreeLightmaps (csPDelArray<csLitPolyGroup>& polys);
-#endif
+  int maxLightmapW, maxLightmapH;
 public:
   SCF_DECLARE_IBASE;
 

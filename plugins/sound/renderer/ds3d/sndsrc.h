@@ -34,7 +34,7 @@ public:
 
   csSoundSourceDS3D(iBase *scfParent);
   virtual ~csSoundSourceDS3D();
-  bool Initialize(csRef<csSoundRenderDS3D> srdr, csRef<csSoundHandleDS3D> hdl, int Mode3d,
+  bool Initialize(csSoundRenderDS3D* srdr, csSoundHandleDS3D* hdl, int Mode3d,
     long NumSamples);
 
   void Report (int severity, const char* msg, ...);

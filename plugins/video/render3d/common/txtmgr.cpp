@@ -188,17 +188,36 @@ bool csTextureHandle::GetMipMapDimensions (int mipmap, int& w, int& h)
 
 void csTextureHandle::AdjustSizePo2 ()
 {
-  int newwidth  = image->GetWidth();
-  int newheight = image->GetHeight();
+  int newwidth, newheight;
 
-  if (!csIsPowerOf2(newwidth))
-    newwidth = csFindNearestPowerOf2 (image->GetWidth ()) / 2;
-
-  if (!csIsPowerOf2 (newheight))
-    newheight = csFindNearestPowerOf2 (image->GetHeight ()) / 2;
+  CalculateNextBestPo2Size (image->GetWidth(), image->GetHeight(),
+    newwidth, newheight);
 
   if (newwidth != image->GetWidth () || newheight != image->GetHeight ())
     image->Rescale (newwidth, newheight);
+}
+
+void csTextureHandle::CalculateNextBestPo2Size (const int width, 
+						const int height, 
+						int& newWidth, 
+						int& newHeigth)
+{
+  newWidth = csFindNearestPowerOf2 (width);
+  if (newWidth != width)
+  {
+    int dU = newWidth - width;
+    int dD = width - (newWidth >> 1);
+    if (dD < dU)
+      newWidth >>= 1;
+  }
+  newHeigth = csFindNearestPowerOf2 (height);
+  if (newHeigth != height)
+  {
+    int dU = newHeigth - height;
+    int dD = height - (newHeigth >> 1);
+    if (dD < dU)
+      newHeigth >>= 1;
+  }
 }
 
 //----------------------------------------------------- csMaterialHandle -----//

@@ -76,7 +76,6 @@ protected:
   csRGBpixel transp_color;
   /// Mean color used when texture mapping is disabled.
   csRGBpixel mean_color;
-
 public:
   ///
   csTextureHandle (iImage *Image, int Flags);
@@ -164,6 +163,15 @@ public:
   { return false; }
 
   virtual iGraphics2D* GetCanvas () { return 0; }
+
+  /**
+   * Given a texture width and height, it tries to 'guesstimate' the po2 size
+   * that causes the least quality reduction: it calculates how many 
+   * rows/columns would be added/removed when sizing up/down, and takes the 
+   * one with the smaller number. In case of a tie, it'll size up. 
+   */
+  static void CalculateNextBestPo2Size (const int width, const int height,
+    int& newWidth, int& newHeigth);
 };
 
 /**

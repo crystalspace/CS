@@ -71,6 +71,33 @@ chronological order.
 	  system.
 	- Oktal updated fonteng.cpp in the PicoGUI server plugin to keep up-to-
 	  date with changes to the CS iFont interface.
+	- res made the following changes:
+	    - The DS3D plugin passed some parameters as csRef<>s. Changed to
+	      just pointers.
+	    - Changed the DS3D coop level to 'priority'. That's the highest in 
+	      DX8+ anyway, and is a bit 'nicer' than 'exclusive' for older
+	      DirectXs.
+	    - Thing's SLM layouting strategy has been changed; now, the 
+	      factory does the layouting once, and the mesh objects reuse the
+	      layout. 
+	    - Moved SLM dumping from Thing to renderer.
+	    - Enhanced bugplug's "debug command" feature; it now accepts
+	      a tag as a target name as well.
+	    - Changed non-PO2 resizing of the renderers: instead of blindly
+	      scaling up(GL) resp. down(SW), the direction with the least 
+	      quality loss is guestimated and chosen. Also, both renderers
+	      share that code; it's important that non-PO2 textures are resized
+	      to the same dimensions on all renderers, otherwise lightmapping
+	      won't work correctly across renderers.
+	    - Some NR plugins still had "render3d." in their class IDs; changed
+	      them to "graphics3d."
+	    - Lightmaps can now be transfered to glrender3d.
+	    - Typo fix in glfontcache.h.
+	    - Changed csHash<>::GlobalIterator so that it's actually useable.
+	    - Fixed VFS crashes: in csArchive, an array was a PDelArray<>,
+	      however, items were removed from this array and inserted into
+	      other arrays. The deletion of the data in the process caused
+	      trouble.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.

@@ -22,8 +22,9 @@
 #include "sndsrc.h"
 
 
-csSoundHandleDS3D::csSoundHandleDS3D(csRef<csSoundRenderDS3D> srdr, csRef<iSoundData> snd, float BufferLengthSeconds, bool LocalBuffer)
-: csSoundHandle(snd)
+csSoundHandleDS3D::csSoundHandleDS3D(csSoundRenderDS3D* srdr, iSoundData* snd, 
+				     float BufferLengthSeconds, 
+				     bool LocalBuffer) : csSoundHandle(snd)
 {
   SoundRender = srdr;
   Registered = true;

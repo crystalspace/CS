@@ -92,7 +92,7 @@ private:
 
   ArchiveEntryVector dir;	// Archive directory: chain head (sorted)
   csStringArray del;		// Files that should be deleted (sorted)
-  ArchiveEntryVector lazy;	// Lazy operations (unsorted)
+  csArray<ArchiveEntry*> lazy;	// Lazy operations (unsorted)
 
   char *filename;		// Archive file name
   FILE *file;			// Archive file pointer.

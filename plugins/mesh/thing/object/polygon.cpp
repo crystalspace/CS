@@ -608,7 +608,6 @@ bool csPolygon3DStatic::Finish ()
 {
   bool rc = true;
 
-#ifndef CS_USE_NEW_RENDERER
   if (thing_static->flags.Check (CS_ENTITY_NOLIGHTING))
     flags.Reset (CS_POLY_LIGHTING);
 
@@ -649,6 +648,7 @@ bool csPolygon3DStatic::Finish ()
     }
   }
 
+#ifndef CS_USE_NEW_RENDERER
 #endif // CS_USE_NEW_RENDERER
   return rc;
 }
@@ -1172,7 +1172,6 @@ void csPolygon3D::ObjectToWorld (
 
 void csPolygon3D::Finish ()
 {
-#ifndef CS_USE_NEW_RENDERER
   RefreshFromStaticData ();
 
   if (static_data->IsTextureMappingEnabled ())
@@ -1192,6 +1191,7 @@ void csPolygon3D::Finish ()
           int(ambient.green * 255.0f),
           int(ambient.blue * 255.0f));
 
+#ifndef CS_USE_NEW_RENDERER
       csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;
       if (!thing_type->G3D->IsLightmapOK (lm->GetRealWidth(), lm->GetRealHeight(),
 	lm->lightcell_size))
@@ -1200,10 +1200,9 @@ void csPolygon3D::Finish ()
          "for polygon '%s'", static_data->GetName());
         static_data->flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
       }
+#endif // CS_USE_NEW_RENDERER
     }
   }
-
-#endif // CS_USE_NEW_RENDERER
 }
 
 void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)

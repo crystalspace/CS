@@ -27,7 +27,10 @@
 #include "csutil/debug.h"
 #include "csutil/util.h"
 #include "iutil/cfgfile.h"
+#include "iutil/databuff.h"
+#include "iutil/vfs.h"
 #include "igraphic/image.h"
+#include "igraphic/imageio.h"
 #include "csgfx/memimage.h"
 #include "ivaria/reporter.h"
 #include "csgfx/xorpat.h"
@@ -393,16 +396,13 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   orig_width = image->GetWidth ();
   orig_height = image->GetHeight ();
 
-  int nwidth = orig_width;
-  int nheight = orig_height;
+  int nwidth;
+  int nheight;
 
   // In opengl all textures, even non-mipmapped textures are required
   // to be powers of 2.
-  if (!csIsPowerOf2(nwidth))
-    nwidth = csFindNearestPowerOf2 (nwidth);
-
-  if (!csIsPowerOf2 (nheight))
-    nheight = csFindNearestPowerOf2 (nheight);
+  CalculateNextBestPo2Size (orig_width, orig_height,
+    nwidth, nheight);
 
   // downsample textures, if requested, but not 2D textures
   if (!(flags & (CS_TEXTURE_2D)))
@@ -718,6 +718,13 @@ csTextureManagerOpenGL::csTextureManagerOpenGL (iObjectRegistry* object_reg,
 csTextureManagerOpenGL::~csTextureManagerOpenGL ()
 {
   csTextureManager::Clear ();
+
+  int i;
+  for (i = 0; i < superLMs.Length (); i++)
+  {
+    // In case we get destructed while SLM are still "in the wild."
+    superLMs[i]->txtmgr = 0;
+  }
 }
 
 void csTextureManagerOpenGL::read_config (iConfigFile *config)
@@ -873,8 +880,9 @@ void csTextureManagerOpenGL::FreeImages ()
 csPtr<iSuperLightmap> csTextureManagerOpenGL::CreateSuperLightmap(int w, 
 								  int h)
 {
-  return csPtr<iSuperLightmap> 
-    (new csGLSuperLightmap (w, h));
+  csGLSuperLightmap* slm = new csGLSuperLightmap (this, w, h);
+  superLMs.Push (slm);
+  return csPtr<iSuperLightmap> (slm);
 }
 
 void csTextureManagerOpenGL::GetMaxTextureSize (int& w, int& h, int& aspect)
@@ -882,6 +890,40 @@ void csTextureManagerOpenGL::GetMaxTextureSize (int& w, int& h, int& aspect)
   w = G3D->Caps.maxTexWidth;
   h = G3D->Caps.maxTexHeight;
   aspect = G3D->Caps.MaxAspectRatio;
+}
+
+void csTextureManagerOpenGL::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, 
+						 const char* dir)
+{
+  csString outfn;
+  for (int i = 0; i < superLMs.Length(); i++)
+  {
+    csRef<iImage> img = superLMs[i]->Dump ();
+    if (img)
+    {
+      csRef<iDataBuffer> buf = iio->Save (img, "image/png");
+      if (!buf)
+      {
+	G3D->Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Could not save super lightmap.");
+      }
+      else
+      {
+	outfn.Format ("%s%d.png", 
+	  dir, i);
+	if (!VFS->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+	{
+	  G3D->Report (CS_REPORTER_SEVERITY_WARNING,
+	    "Could not write to %s.", outfn.GetData ());
+	}
+	else
+	{
+	  G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    "Dumped %dx%d SLM to %s", superLMs[i]->w, superLMs[i]->h, outfn.GetData ());
+	}
+      }
+    }
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -1005,17 +1047,34 @@ void csGLRendererLightmap::GetMeanColor (float& r, float& g, float& b)
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csGLSuperLightmap)
+
+SCF_IMPLEMENT_IBASE_INCREF(csGLSuperLightmap)					
+SCF_IMPLEMENT_IBASE_GETREFCOUNT(csGLSuperLightmap)				
+SCF_IMPLEMENT_IBASE_QUERY(csGLSuperLightmap)
   SCF_IMPLEMENTS_INTERFACE(iSuperLightmap)
 SCF_IMPLEMENT_IBASE_END
 
-csGLSuperLightmap::csGLSuperLightmap (int width, int height) : RLMs(32)
+void csGLSuperLightmap::DecRef ()
+{
+  if (scfRefCount == 1)							
+  {
+    if (txtmgr != 0)
+      txtmgr->superLMs.Delete (this);
+    delete this;
+    return;								
+  }									
+  scfRefCount--;							
+}
+
+csGLSuperLightmap::csGLSuperLightmap (csTextureManagerOpenGL* txtmgr, 
+				      int width, int height) : RLMs(32)
 {
   SCF_CONSTRUCT_IBASE (0);
 
   w = width; h = height;
   texHandle = (GLuint)~0;
   numRLMs = 0;
+  csGLSuperLightmap::txtmgr = txtmgr;
 }
 
 csGLSuperLightmap::~csGLSuperLightmap ()

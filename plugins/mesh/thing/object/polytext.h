@@ -257,9 +257,7 @@ private:
   //csLightMapMapping* mapping;
   csPolyLightMapMapping* mapping;
   csPolyTextureMapping* tmapping;
-#ifdef COMBINE_LIGHTMAPS
   csRef<iRendererLightmap> rlm;
-#endif
 
   /// LightMap.
   csLightMap* lm;
@@ -372,11 +370,7 @@ public:
   }
   virtual iRendererLightmap* GetRendererLightmap () const
   {
-#ifdef COMBINE_LIGHTMAPS
     return rlm;
-#else
-    return 0;
-#endif
   }
 
   /// Check if dynamic lighting information should be recalculated

@@ -45,12 +45,13 @@
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
 #include "iutil/comp.h"
+#include "iutil/vfs.h"
+#include "imesh/thing/polygon.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
-#include "imesh/thing/polygon.h"
-#include "imesh/thing/lightmap.h" //@@@
 #include "ivideo/graph2d.h"
+#include "igraphic/imageio.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
@@ -164,6 +165,7 @@ SCF_IMPLEMENT_IBASE(csGraphics3DOGLCommon)
   SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEffectClient)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DOGLCommon::eiComponent)
@@ -172,6 +174,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DOGLCommon::eiEffectClient)
   SCF_IMPLEMENTS_INTERFACE (iEffectClient)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DOGLCommon::eiDebugHelper)
+  SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csGraphics3DOGLCommon::EventHandler)
@@ -203,6 +209,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEffectClient);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiDebugHelper);
 
   scfiEventHandler = 0;
 
@@ -458,9 +465,11 @@ bool csGraphics3DOGLCommon::NewInitialize ()
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
   verbose = (cmdline->GetOption ("verbose") != 0);
-  report_gl_errors = config->GetBool ("Video.OpenGL.ReportGLErrors"
+  report_gl_errors = config->GetBool ("Video.OpenGL.ReportGLErrors",
 #ifdef CS_DEBUG
-    , true
+    true
+#else
+    false
 #endif
     );
 
@@ -6514,7 +6523,7 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
   return true;
 }
 
-bool csGraphics3DOGLCommon::CheckGLError (char* call)
+bool csGraphics3DOGLCommon::CheckGLError (const char* call)
 {
   GLenum res = glGetError();
 
@@ -6524,37 +6533,85 @@ bool csGraphics3DOGLCommon::CheckGLError (char* call)
   }
   else
   {
-    char msg[64];
-    switch(res)
+    if (report_gl_errors)
     {
-      case GL_INVALID_ENUM:
-        strcpy (msg, "enum argument out of range");
-	break;
-      case GL_INVALID_VALUE:
-        strcpy (msg, "Numeric argument out of range");
-	break;
-      case GL_INVALID_OPERATION:
-	strcpy (msg, "Operation illegal in current state");
-	break;
-      case GL_STACK_OVERFLOW: 
-	strcpy (msg, "Command would cause a stack overflow");
-	break;
-      case GL_STACK_UNDERFLOW:
-	strcpy (msg, "Command would cause a stack undeflow");
-	break;
-      case GL_OUT_OF_MEMORY:
-	strcpy (msg, "Not enough memory left to execute command");
-	break;
-      case GL_TABLE_TOO_LARGE:
-	strcpy (msg, "The specified table is too large");
-	break;
-      default:
-	sprintf (msg, "unknown GL error %x", (unsigned int)res);
-	break;
+      char msg[64];
+      switch(res)
+      {
+	case GL_INVALID_ENUM:
+	  strcpy (msg, "enum argument out of range");
+	  break;
+	case GL_INVALID_VALUE:
+	  strcpy (msg, "Numeric argument out of range");
+	  break;
+	case GL_INVALID_OPERATION:
+	  strcpy (msg, "Operation illegal in current state");
+	  break;
+	case GL_STACK_OVERFLOW: 
+	  strcpy (msg, "Command would cause a stack overflow");
+	  break;
+	case GL_STACK_UNDERFLOW:
+	  strcpy (msg, "Command would cause a stack undeflow");
+	  break;
+	case GL_OUT_OF_MEMORY:
+	  strcpy (msg, "Not enough memory left to execute command");
+	  break;
+	case GL_TABLE_TOO_LARGE:
+	  strcpy (msg, "The specified table is too large");
+	  break;
+	default:
+	  sprintf (msg, "unknown GL error %x", (unsigned int)res);
+	  break;
+      }
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	"GL reported error for %s: %s", call, msg);
     }
-    Report (CS_REPORTER_SEVERITY_WARNING,
-      "GL reported error for %s: %s", call, msg);
     
     return false;
   }
 }
+
+bool csGraphics3DOGLCommon::DebugCommand (const char* cmdstr)
+{
+  CS_ALLOC_STACK_ARRAY(char, cmd, strlen (cmdstr) + 1);
+  strcpy (cmd, cmdstr);
+  char* param = 0;
+  char* space = strchr (cmdstr, ' ');
+  if (space)
+  {
+    param = space + 1;
+    *space = 0;
+  }
+
+  if (strcasecmp (cmd, "dump_slms") == 0)
+  {
+    csRef<iImageIO> imgsaver =
+      CS_QUERY_REGISTRY (object_reg, iImageIO);
+    if (!imgsaver)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "Could not get image saver.");
+      return false;
+    }
+
+    csRef<iVFS> vfs =
+      CS_QUERY_REGISTRY (object_reg, iVFS);
+    if (!vfs)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Could not get VFS.");
+      return false;
+    }
+
+    if (txtmgr)
+    {
+      const char* dir = 
+	((param != 0) && (*param != 0)) ? param : "/temp/slmdump/";
+      txtmgr->DumpSuperLightmaps (vfs, imgsaver, dir);
+    }
+
+    return true;
+  }
+  return false;
+}
+

@@ -109,9 +109,7 @@ void csPolyTexture::SetTextureMapping (csPolyTextureMapping* mapping)
 
 void csPolyTexture::SetRendererLightmap (iRendererLightmap* rlm)
 {
-#ifdef COMBINE_LIGHTMAPS
   csPolyTexture::rlm = rlm;
-#endif
 }
 
 csPolyTexture::~csPolyTexture ()

@@ -8,7 +8,7 @@
         <implementation>csGenericRSLoader</implementation>
         <description>Generic render loop step</description>
         <requires>
-          <class>crystalspace.render3d.</class>
+          <class>crystalspace.graphics3d.</class>
         </requires>
       </class>
       <class>
@@ -16,7 +16,7 @@
         <implementation>csGenericRSType</implementation>
         <description>Generic render loop step type</description>
         <requires>
-          <class>crystalspace.render3d.</class>
+          <class>crystalspace.graphics3d.</class>
         </requires>
       </class>
       <class>
@@ -24,7 +24,7 @@
         <implementation>csLightIterRSLoader</implementation>
         <description>Light iterator render loop step</description>
         <requires>
-          <class>crystalspace.render3d.</class>
+          <class>crystalspace.graphics3d.</class>
         </requires>
       </class>
       <class>
@@ -32,7 +32,7 @@
         <implementation>csLightIterRSType</implementation>
         <description>Light iterator render loop step type</description>
         <requires>
-          <class>crystalspace.render3d.</class>
+          <class>crystalspace.graphics3d.</class>
         </requires>
       </class>
       <class>
@@ -40,7 +40,7 @@
         <implementation>csTargetRSLoader</implementation>
         <description>Render target render loop step</description>
         <requires>
-          <class>crystalspace.render3d.</class>
+          <class>crystalspace.graphics3d.</class>
         </requires>
       </class>
       <class>
@@ -48,7 +48,7 @@
         <implementation>csTargetRSType</implementation>
         <description>Render target render loop step type</description>
         <requires>
-          <class>crystalspace.render3d.</class>
+          <class>crystalspace.graphics3d.</class>
         </requires>
       </class>
       <class>
@@ -56,7 +56,7 @@
         <implementation>csFullScreenQuadRSLoader</implementation>
         <description>Full screen quad render loop step</description>
         <requires>
-          <class>crystalspace.render3d.</class>
+          <class>crystalspace.graphics3d.</class>
         </requires>
       </class>
       <class>
@@ -64,7 +64,7 @@
         <implementation>csFullScreenQuadRSType</implementation>
         <description>Full screen quad render loop step type</description>
         <requires>
-          <class>crystalspace.render3d.</class>
+          <class>crystalspace.graphics3d.</class>
         </requires>
       </class>
     </classes>

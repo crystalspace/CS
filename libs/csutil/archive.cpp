@@ -84,6 +84,13 @@ csArchive::~csArchive ()
   delete [] filename;
   delete [] comment;
   if (file) fclose (file);
+
+  int i;
+  for (i = 0; i < lazy.Length (); i++)
+  {
+    ArchiveEntry* e = lazy[i];
+    delete e;
+  }
 }
 
 void csArchive::ReadDirectory ()

@@ -33,11 +33,18 @@ public:
   long buffer_writecursor;
   long buffer_length;
 
-  /// The writecursor needs to be read by new sources to syncronize to the current position.
+  /**
+   * The writecursor needs to be read by new sources to syncronize to the 
+   * current position.
+   */
   csRef<csMutex> mutex_WriteCursor;
 
-  /// The constructor for the Direct Sound 3D plugin's Sound Handle also takes the Buffer Length in seconds for streaming data sources.
-  csSoundHandleDS3D(csRef<csSoundRenderDS3D> srdr, csRef<iSoundData> snd,float BufferLengthSeconds,bool LocalBuffer);
+  /**
+   * The constructor for the Direct Sound 3D plugin's Sound Handle also takes 
+   * the Buffer Length in seconds for streaming data sources.
+   */
+  csSoundHandleDS3D(csSoundRenderDS3D* srdr, iSoundData* snd, 
+    float BufferLengthSeconds, bool LocalBuffer);
   // destructor
   ~csSoundHandleDS3D();
 
@@ -47,9 +54,15 @@ public:
   /// Create a source to eminate this sound from
   virtual csPtr<iSoundSource> CreateSource(int Mode3d);
 
-  /// Overriden because it calls UpdateCount and UpdateCount has altered functionality
+  /**
+   * Overriden because it calls UpdateCount and UpdateCount has altered 
+   * functionality
+   */
   void Update_Time(csTicks ElapsedTime);
-  /// Overriden.  Uses a source as a timer unless there are no playing sources, then uses the passed count.
+  /** 
+   * Overriden.  Uses a source as a timer unless there are no playing sources, 
+   * then uses the passed count.
+   */
   void UpdateCount(long NumSamples);
   /// Implimented to perform local buffer fills if needed
   virtual void StartStream(bool Loop);

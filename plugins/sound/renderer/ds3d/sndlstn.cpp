@@ -50,7 +50,7 @@ csSoundListenerDS3D::~csSoundListenerDS3D()
   }
 }
 
-bool csSoundListenerDS3D::Initialize(csRef<csSoundRenderDS3D> srdr) 
+bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D* srdr) 
 {
   Renderer = srdr;
 

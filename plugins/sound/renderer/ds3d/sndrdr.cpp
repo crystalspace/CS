@@ -128,7 +128,7 @@ bool csSoundRenderDS3D::Open()
       return false;
     }
 
-    DWORD dwLevel = DSSCL_EXCLUSIVE;
+    DWORD dwLevel = DSSCL_PRIORITY;
     r = AudioRenderer->SetCooperativeLevel(
       win32Assistant->GetApplicationWindow(), dwLevel);
     if (r != DS_OK)
@@ -161,10 +161,10 @@ bool csSoundRenderDS3D::Open()
     "crystalspace.sound.ds3d",
     "  Volume: %g\n", GetVolume());
 
-  BufferLengthSeconds=Config->GetFloat("Sound.ds3d.StreamingBufferLength",0.2);
-  BackgroundProcessing=Config->GetBool("Sound.ds3d.BackgroundProcessing",true);
-  MuteInBackground=Config->GetBool("Sound.ds3d.MuteInBackground",false);
-  LazySourceSync=Config->GetBool("Sound.ds3d.LazySourceSync",true);
+  BufferLengthSeconds = Config->GetFloat("Sound.ds3d.StreamingBufferLength", 0.2);
+  BackgroundProcessing = Config->GetBool("Sound.ds3d.BackgroundProcessing", true);
+  MuteInBackground = Config->GetBool("Sound.ds3d.MuteInBackground", true);
+  LazySourceSync = Config->GetBool("Sound.ds3d.LazySourceSync",true);
 
   // Set the first time
   LastTime = csGetTicks ();
@@ -363,7 +363,7 @@ void csSoundRenderDS3D::ThreadProc ()
   /* This should let us sleep a good amount, but not so much that the buffer can empty out
   *  even if the system is under high load and things are running slow.
   */
-  int sleeptime=(int)(BufferLengthSeconds*300);
+  int sleeptime = (int)(BufferLengthSeconds*300);
 
   while (bRunning)
   {

@@ -129,6 +129,7 @@ public:
    */
   bool MuteInBackground;
 
+
   /** If false, each handle will keep an internal sound buffer that is used when a source
    *   is added to a stream that's already playing.
    *  If true, a new source added to a playing stream will have an initial period of silence

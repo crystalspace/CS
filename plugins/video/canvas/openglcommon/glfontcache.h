@@ -32,7 +32,7 @@
   first drawn glyphs doesn't show up right (rather, instead of the
   expected texture content only the top left texel is drawn over the
   whole area of the glyph on-screen.) The problem does not appear if
-  glTexImage2D() is used. Hence this ugly hack, were super texture
+  glTexImage2D() is used. Hence this ugly hack, where super texture
   is stored in RAM, glyphs are written to it in RAM and the whole
   thing is uploaded at once.
   [res]

@@ -89,8 +89,6 @@ private:
 
   csRef<iBugPlug> bugplug;
 
-  static csGLStateCache* statecache;
-
   csGLExtensionManager *ext;
   csRef<csGLTextureCache> txtcache;
   csRef<csGLTextureManager> txtmgr;
@@ -206,6 +204,8 @@ private:
 
   iShaderPass* lastUsedShaderpass;
 public:
+  static csGLStateCache* statecache;
+
   SCF_DECLARE_IBASE;
 
   csGLRender3D (iBase *parent);
@@ -473,7 +473,30 @@ public:
   };
   csRef<EventHandler> scfiEventHandler;
 
+  ////////////////////////////////////////////////////////////////////
+  //                          iDebugHelper
+  ////////////////////////////////////////////////////////////////////
+  /// Execute a debug command.
+  virtual bool DebugCommand (const char* cmd);
 
+  struct eiDebugHelper : public iDebugHelper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
+    virtual int GetSupportedTests () const
+    { return 0; }
+    virtual csPtr<iString> UnitTest ()
+    { return 0; }
+    virtual csPtr<iString> StateTest ()
+    { return 0; }
+    virtual csTicks Benchmark (int num_iterations)
+    { return 0; }
+    virtual csPtr<iString> Dump ()
+    { return 0; }
+    virtual void Dump (iGraphics3D* g3d)
+    { }
+    virtual bool DebugCommand (const char* cmd)
+    { return scfParent->DebugCommand (cmd); }
+  } scfiDebugHelper;
 
 };
 

@@ -36,7 +36,7 @@ public:
   bool LoopStream;
 
   // constructor
-  csSoundHandle(csRef<iSoundData>);
+  csSoundHandle(iSoundData*);
   // destructor
   virtual ~csSoundHandle();
   // release the sound data

@@ -276,8 +276,29 @@ public:
     void Zero () { bucket = element = 0; }
     void Init () { size = hash->Elements[bucket].Length (); }
 
+    void FindItem ()
+    {
+      if (element >= size)
+      {
+	while (++bucket < hash->Elements.Length ())
+	{
+          Init ();
+	  if (size != 0)
+	  {
+	    element = 0;
+	    break;
+	  }
+	}
+      }
+    }
+
   protected:
-    GlobalIterator(const csHash<T> *hash0) : hash(hash0) { Zero (); Init (); }
+    GlobalIterator (const csHash<T> *hash0) : hash (hash0) 
+    { 
+      Zero (); 
+      Init (); 
+      FindItem ();
+    }
 
     friend class csHash<T>;
   public:
@@ -287,7 +308,7 @@ public:
     /// Returns a boolean indicating whether or not the hash has more elements.
     bool HasNext () const
     {
-      if (hash->Elements.IsEmpty ()) return false;
+      if (hash->Elements.Length () == 0) return false;
       return element < size || bucket < hash->Elements.Length ();
     }
 
@@ -295,12 +316,8 @@ public:
     const T& Next ()
     {
       const T &ret = hash->Elements[bucket][element].value;
-      if (++element >= hash->Elements[bucket].Length ())
-      {
-        element = 0;
-        bucket++;
-        Init ();
-      }
+      element++;
+      FindItem ();
       return ret;
     }
 

@@ -4,7 +4,7 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.render3d.shader.glarb</name>
+        <name>crystalspace.graphics3d.shader.glarb</name>
         <implementation>csGLShader_ARB</implementation>
         <description>OpenGL specific shaderprogram provider for Render3D</description>
       </class>

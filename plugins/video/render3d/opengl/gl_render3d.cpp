@@ -73,21 +73,22 @@ SCF_IMPLEMENT_FACTORY (csGLRender3D)
 
 
 SCF_IMPLEMENT_IBASE(csGLRender3D)
-SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShaderRenderInterface)
+  SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShaderRenderInterface)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiShaderRenderInterface)
-SCF_IMPLEMENTS_INTERFACE (iShaderRenderInterface)
+  SCF_IMPLEMENTS_INTERFACE (iShaderRenderInterface)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csGLRender3D::EventHandler)
-SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 
@@ -96,6 +97,7 @@ csGLRender3D::csGLRender3D (iBase *parent)
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiShaderRenderInterface);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiDebugHelper);
 
   frustum_valid = false;
 
@@ -692,7 +694,7 @@ bool csGLRender3D::Open ()
   if( !shadermgr )
   {
     shadermgr = csPtr<iShaderManager>
-      (CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.render3d.shadermanager", iShaderManager));
+      (CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.graphics3d.shadermanager", iShaderManager));
     object_reg->Register( shadermgr, "iShaderManager");
   }
 
@@ -1784,3 +1786,56 @@ void csGLRender3D::eiShaderRenderInterface::Initialize(iObjectRegistry *reg)
 {
   object_reg = reg;
 }
+
+////////////////////////////////////////////////////////////////////
+//                          iDebugHelper
+////////////////////////////////////////////////////////////////////
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiDebugHelper)
+  SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+bool csGLRender3D::DebugCommand (const char* cmdstr)
+{
+  CS_ALLOC_STACK_ARRAY(char, cmd, strlen (cmdstr) + 1);
+  strcpy (cmd, cmdstr);
+  char* param = 0;
+  char* space = strchr (cmdstr, ' ');
+  if (space)
+  {
+    param = space + 1;
+    *space = 0;
+  }
+
+  if (strcasecmp (cmd, "dump_slms") == 0)
+  {
+    csRef<iImageIO> imgsaver =
+      CS_QUERY_REGISTRY (object_reg, iImageIO);
+    if (!imgsaver)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "Could not get image saver.");
+      return false;
+    }
+
+    csRef<iVFS> vfs =
+      CS_QUERY_REGISTRY (object_reg, iVFS);
+    if (!vfs)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Could not get VFS.");
+      return false;
+    }
+
+    if (txtmgr)
+    {
+      const char* dir = 
+	((param != 0) && (*param != 0)) ? param : "/temp/slmdump/";
+      txtmgr->DumpSuperLightmaps (vfs, imgsaver, dir);
+    }
+
+    return true;
+  }
+  return false;
+}
+

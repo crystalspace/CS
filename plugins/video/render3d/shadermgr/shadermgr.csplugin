@@ -4,7 +4,7 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.render3d.shadermanager</name>
+        <name>crystalspace.graphics3d.shadermanager</name>
         <implementation>csShaderManager</implementation>
         <description>Shader manager</description>
       </class>

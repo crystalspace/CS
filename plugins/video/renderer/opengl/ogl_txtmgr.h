@@ -30,6 +30,9 @@
 class csGraphics3DOGLCommon;
 class csTextureManagerOpenGL;
 
+struct iVFS;
+struct iImageIO;
+
 /**
  * csTextureOpenGL is a class derived from csTexture that implements
  * all the additional functionality required by the OpenGL renderer.
@@ -142,17 +145,26 @@ public:
 
 class csGLSuperLightmap;
 
+/**
+ * A single lightmap on a super lightmap.
+ */
 class csGLRendererLightmap : iRendererLightmap
 {
   friend class csGLSuperLightmap;
   friend class csGraphics3DOGLCommon;
 
+  /// Texture coordinates (in pixels)
   csRect rect;
+  /// Texture coordinates ([0;1])
   float u1, v1, u2, v2;
+  /// The SLM this lightmap is a part of.
   csRef<csGLSuperLightmap> slm;
+  /// Raw lightmap data.
   csRGBpixel* data;
 
+  /// Has the mean light of this LM been calculated?
   bool mean_calculated;
+  /// Mean light of this LM
   float mean_r, mean_g, mean_b;
 public:
   SCF_DECLARE_IBASE;
@@ -160,42 +172,65 @@ public:
   csGLRendererLightmap ();
   virtual ~csGLRendererLightmap ();
 
+  /// Return the LM texture coords.
   virtual void GetRendererCoords (float& lm_u1, float& lm_v1, 
     float &lm_u2, float& lm_v2);
     
+  /// Return the LM texture coords, in pixels.
   virtual void GetSLMCoords (int& left, int& top, 
     int& width, int& height);
-    
+
+  /// Set the light data.
   virtual void SetData (csRGBpixel* data);
 
+  /// Set the size of a light cell.
   virtual void SetLightCellSize (int size);
 
+  /// Get the mean light of this LM.
   void GetMeanColor (float& r, float& g, float& b);
 };
 
+/**
+ * An OpenGL super lightmap.
+ */
 class csGLSuperLightmap : public iSuperLightmap
 {
   friend class csGLRendererLightmap;
-  friend class csGraphics3DOGLCommon;
 
-  GLuint texHandle;
-  int w, h;
+  /// Number of lightmaps on this SLM.
   int numRLMs;
 
+  /// Allocator for lightmaps on this SLM.
   csBlockAllocator<csGLRendererLightmap> RLMs;
 
+  /// Actually create the GL texture.
   void CreateTexture ();
+  /// Remove the GL texture.
   void DeleteTexture ();
+  /**
+   * Free a lightmap. Will also delete the GL texture if no LMs are on 
+   * this SLM.
+   */
   void FreeRLM (csGLRendererLightmap* rlm);
 public:
+  /// GL texture handle
+  GLuint texHandle;
+  /// Dimensions of this SLM
+  int w, h;
+
+  /// The texture manager that created this SLM.
+  csTextureManagerOpenGL* txtmgr;
+
   SCF_DECLARE_IBASE;
 
-  csGLSuperLightmap (int width, int height);
+  csGLSuperLightmap (csTextureManagerOpenGL* txtmgr, int width, int height);
   virtual ~csGLSuperLightmap ();
 
+  /// Add a lightmap.
   virtual csPtr<iRendererLightmap> RegisterLightmap (int left, int top, 
     int width, int height);
 
+  /// Dump the contents onto an image.
   virtual csPtr<iImage> Dump ();
 };
 
@@ -218,7 +253,6 @@ protected:
 
   void AlterTargetFormat (const char *oldTarget, const char *newTarget);
   void DetermineStorageSizes ();
-
 public:
   /// A pointer to the 3D driver object
   csGraphics3DOGLCommon *G3D;
@@ -231,6 +265,9 @@ public:
   float texture_filter_anisotropy;
   /// what bpp should textures have?
   int texture_bits;
+
+  /// All SLMs currently in use.
+  csArray<csGLSuperLightmap*> superLMs;
 
   static formatDescription glformats [];
   ///
@@ -261,9 +298,14 @@ public:
    */
   virtual void FreeImages ();
 
+  /// Create a new super light map.
   virtual csPtr<iSuperLightmap> CreateSuperLightmap(int w, int h);
   
+  /// Retrieve maximum texture size.
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
+
+  /// Dump all SLMs to image files.
+  void DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, const char* dir);
 };
 
 #define CS_GL_FORMAT_TABLE(var) \

@@ -1525,11 +1525,18 @@ void csBugPlug::DebugCmd (const char* cmd)
     params = space + 1;
     *space = 0;
 
-    csRef<iPluginManager> plugmgr = 
-      CS_QUERY_REGISTRY (object_reg, iPluginManager);
-    CS_ASSERT (plugmgr);
-    csRef<iComponent> comp =
-      CS_QUERY_PLUGIN_CLASS (plugmgr, cmdstr, iComponent);
+    csRef<iBase> comp;
+    comp = CS_QUERY_REGISTRY_TAG(object_reg, cmdstr);
+
+    if (comp == 0)
+    {
+      csRef<iPluginManager> plugmgr = 
+	CS_QUERY_REGISTRY (object_reg, iPluginManager);
+      CS_ASSERT (plugmgr);
+      csRef<iBase> comp =
+	CS_QUERY_PLUGIN_CLASS (plugmgr, cmdstr, iBase);
+    }
+
     if (!comp)
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY,

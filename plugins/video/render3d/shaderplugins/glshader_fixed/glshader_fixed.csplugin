@@ -4,7 +4,7 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.render3d.shader.glfixed</name>
+        <name>crystalspace.graphics3d.shader.glfixed</name>
         <implementation>csGLShader_FIXED</implementation>
         <description>OpenGL fixed function shader provider for Render3D</description>
       </class>

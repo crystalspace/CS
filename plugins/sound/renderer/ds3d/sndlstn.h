@@ -42,7 +42,7 @@ public:
   virtual void SetHeadSize (float size);
   virtual void SetEnvironment (csSoundEnvironment env);
 
-  bool Initialize(csRef<csSoundRenderDS3D> srdr);
+  bool Initialize(csSoundRenderDS3D* srdr);
   void Prepare();
 
 private:

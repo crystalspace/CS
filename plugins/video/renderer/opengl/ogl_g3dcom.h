@@ -249,10 +249,10 @@ public:
   void SetGlOrtho (bool inverted);
 
   /**
-   * Calls glGetError(). Returnms true if no error occured,
+   * Calls glGetError(). Returns true if no error occured,
    * otherwise false. Also reports the error if enabled by user.
    */
-  bool CheckGLError (char* call);
+  bool CheckGLError (const char* call);
 
 private:
   csRef<iEffectServer> effectserver;
@@ -868,6 +868,9 @@ public:
   /// Validate a technique
   bool Validate( iEffectDefinition* effect, iEffectTechnique* technique );
 
+  /// Execute a debug command.
+  virtual bool DebugCommand (const char* cmd);
+
   struct eiEffectClient : public iEffectClient
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);
@@ -893,6 +896,28 @@ public:
     SCF_DECLARE_IBASE;
     virtual bool HandleEvent (iEvent& ev) { return parent->HandleEvent (ev); }
   } * scfiEventHandler;
+
+  /// iDebugHelper implementation
+  struct eiDebugHelper : public iDebugHelper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);
+    virtual int GetSupportedTests () const
+    { return 0; }
+    virtual csPtr<iString> UnitTest ()
+    { return 0; }
+    virtual csPtr<iString> StateTest ()
+    { return 0; }
+    virtual csTicks Benchmark (int num_iterations)
+    { return 0; }
+    virtual csPtr<iString> Dump ()
+    { return 0; }
+  #ifndef CS_USE_NEW_RENDERER
+    virtual void Dump (iGraphics3D* g3d)
+    { }
+  #endif // CS_USE_NEW_RENDERER
+    virtual bool DebugCommand (const char* cmd)
+    { return scfParent->DebugCommand (cmd); }
+  } scfiDebugHelper;
 };
 
 #endif // __CS_OGL3DCOM_H__
