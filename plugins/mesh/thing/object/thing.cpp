@@ -81,6 +81,60 @@ CS_IMPLEMENT_PLUGIN
 
 //---------------------------------------------------------------------------
 
+class csPolygonHandle : public iPolygonHandle
+{
+private:
+  csWeakRef<iThingFactoryState> factstate;
+  csWeakRef<iMeshObjectFactory> factory;
+  csWeakRef<iThingState> objstate;
+  csWeakRef<iMeshObject> obj;
+  int index;
+
+public:
+  csPolygonHandle (
+	iThingFactoryState* factstate, iMeshObjectFactory* factory,
+	iThingState* objstate, iMeshObject* obj,
+	int index)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    csPolygonHandle::factstate = factstate;
+    csPolygonHandle::factory = factory;
+    csPolygonHandle::objstate = objstate;
+    csPolygonHandle::obj = obj;
+    csPolygonHandle::index = index;
+  }
+  virtual ~csPolygonHandle () { }
+
+  SCF_DECLARE_IBASE;
+
+  virtual iThingFactoryState* GetThingFactoryState () const
+  {
+    return factstate;
+  }
+  virtual iMeshObjectFactory* GetMeshObjectFactory () const
+  {
+    return factory;
+  }
+  virtual iThingState* GetThingState () const
+  {
+    return objstate;
+  }
+  virtual iMeshObject* GetMeshObject () const
+  {
+    return obj;
+  }
+  virtual int GetIndex () const
+  {
+    return index;
+  }
+};
+
+SCF_IMPLEMENT_IBASE(csPolygonHandle)
+  SCF_IMPLEMENTS_INTERFACE(iPolygonHandle)
+SCF_IMPLEMENT_IBASE_END
+
+//---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
@@ -1371,6 +1425,15 @@ const char* csThingStatic::GetPolygonName (int polygon_idx)
   return static_polygons[GetRealIndex (polygon_idx)]->GetName ();
 }
 
+csPtr<iPolygonHandle> csThingStatic::CreatePolygonHandle (int polygon_idx)
+{
+  return csPtr<iPolygonHandle> (new csPolygonHandle (
+	(iThingFactoryState*)this,
+	(iMeshObjectFactory*)this,
+	0, 0,
+	GetRealIndex (polygon_idx)));
+}
+
 void csThingStatic::SetPolygonMaterial (const csPolygonRange& range,
   	iMaterialWrapper* material)
 {
@@ -1952,13 +2015,26 @@ csPolygon3D *csThing::GetPolygon3D (const char *name)
   return idx >= 0 ? polygons.Get (idx) : 0;
 }
 
+csPtr<iPolygonHandle> csThing::CreatePolygonHandle (int polygon_idx)
+{
+  CS_ASSERT (polygon_idx >= 0);
+  return csPtr<iPolygonHandle> (new csPolygonHandle (
+	(iThingFactoryState*)(csThingStatic*)static_data,
+	(iMeshObjectFactory*)(csThingStatic*)static_data,
+	&scfiThingState,
+	&scfiMeshObject,
+	polygon_idx));
+}
+
 const csPlane3& csThing::GetPolygonWorldPlane (int polygon_idx)
 {
+  CS_ASSERT (polygon_idx >= 0);
   return polygons[polygon_idx]->GetWorldPlane ();
 }
 
 iMaterialWrapper* csThing::GetPolygonMaterial (int polygon_idx)
 {
+  CS_ASSERT (polygon_idx >= 0);
   return polygons[polygon_idx]->GetMaterial ();
 }
 

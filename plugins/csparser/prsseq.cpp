@@ -125,7 +125,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
   }
   else
   {
-    iBase* value = 0;
+    csRef<iBase> value;
     switch (partypeidx)
     {
       case PARTYPE_LIGHT:
@@ -176,8 +176,8 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	      meshname, seqname);
 	    return 0;
 	  }
-	  csRef<iThingState> st (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-		iThingState));
+	  csRef<iThingState> st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+		iThingState);
 	  if (!st)
 	  {
 	    SyntaxService->ReportError (
@@ -186,8 +186,8 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	      meshname, seqname);
 	    return 0;
 	  }
-	  value = (iBase*)st->GetPolygon (parname);
-	  if (!value)
+	  int poly_idx = st->GetFactory ()->FindPolygonByName (parname);
+	  if (poly_idx == -1)
 	  {
 	    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.sequenceparams", opnode,
@@ -195,6 +195,8 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	      parname, meshname, seqname);
 	    return 0;
 	  }
+	  csRef<iPolygonHandle> h = st->CreatePolygonHandle (poly_idx);
+	  value = (iBase*)h;
 	}
         break;
     }
@@ -396,8 +398,8 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	    error = true;
 	    return 0;
 	  }
-	  csRef<iThingState> st (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-		iThingState));
+	  csRef<iThingState> st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+		iThingState);
 	  if (!st)
 	  {
 	    SyntaxService->ReportError (
@@ -407,8 +409,8 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	    error = true;
 	    return 0;
 	  }
-	  iPolygon3D* polygon = st->GetPolygon (polyname);
-	  if (!polygon)
+	  int polygon = st->GetFactory ()->FindPolygonByName (polyname);
+	  if (polygon == -1)
 	  {
 	    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.sequenceparams", child,
@@ -418,7 +420,8 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	    return 0;
 	  }
 
-	  params->SetParameter (idx, (iBase*)polygon);
+	  csRef<iPolygonHandle> poly_handle = st->CreatePolygonHandle (polygon);
+	  params->SetParameter (idx, (iBase*)poly_handle);
 	  found_params++;
 	}
 	break;

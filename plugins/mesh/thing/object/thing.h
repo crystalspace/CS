@@ -460,6 +460,7 @@ public:
   virtual void SetPolygonName (const csPolygonRange& range,
   	const char* name);
   virtual const char* GetPolygonName (int polygon_idx);
+  virtual csPtr<iPolygonHandle> CreatePolygonHandle (int polygon_idx);
   virtual void SetPolygonMaterial (const csPolygonRange& range,
   	iMaterialWrapper* material);
   virtual iMaterialWrapper* GetPolygonMaterial (int polygon_idx);
@@ -952,6 +953,7 @@ public:
     return mixmode;
   }
 
+  csPtr<iPolygonHandle> CreatePolygonHandle (int polygon_idx);
   const csPlane3& GetPolygonWorldPlane (int polygon_idx);
   iMaterialWrapper* GetPolygonMaterial (int polygon_idx);
   void SetPolygonMaterial (const csPolygonRange& range,
@@ -1013,6 +1015,10 @@ public:
     virtual uint GetMixMode () const
     {
       return scfParent->GetMixMode ();
+    }
+    virtual csPtr<iPolygonHandle> CreatePolygonHandle (int polygon_idx)
+    {
+      return scfParent->CreatePolygonHandle (polygon_idx);
     }
     virtual const csPlane3& GetPolygonWorldPlane (int polygon_idx)
     {

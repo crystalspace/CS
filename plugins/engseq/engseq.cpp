@@ -50,7 +50,7 @@
 #include "imesh/partsys.h"
 #include "imesh/stars.h"
 #include "imesh/terrfunc.h"
-#include "imesh/thing/polygon.h"
+#include "imesh/thing/thing.h"
 #include "iengine/sharevar.h"
 #include "engseq.h"
 
@@ -324,7 +324,7 @@ private:
   csRef<iParameterESM> polygonpar;
   csRef<iParameterESM> materialpar;
   csRef<iMeshWrapper> mesh;
-  csRef<iPolygon3D> polygon;
+  csRef<iPolygonHandle> polygon;
   csRef<iMaterialWrapper> material;
 
 public:
@@ -341,7 +341,7 @@ public:
     if (polygonpar)
     {
       if (polygonpar->IsConstant ())
-        polygon = SCF_QUERY_INTERFACE (polygonpar->GetValue (), iPolygon3D);
+        polygon = SCF_QUERY_INTERFACE (polygonpar->GetValue (), iPolygonHandle);
       else
         OpSetMaterial::polygonpar = polygonpar;
     }
@@ -361,8 +361,21 @@ public:
     {
       if (polygonpar)
         polygon = SCF_QUERY_INTERFACE (polygonpar->GetValue (params),
-		iPolygon3D);
-      polygon->GetStaticData ()->SetMaterial (material);
+		iPolygonHandle);
+      int poly_idx = polygon->GetIndex ();
+      iThingState* ts = 0;//polygon->GetThingState ();
+      if (ts)
+      {
+        ts->SetPolygonMaterial (CS_POLYRANGE_SINGLE (poly_idx), material);
+      }
+      else
+      {
+        iThingFactoryState* tfs = polygon->GetThingFactoryState ();
+	if (tfs)
+	{
+	  tfs->SetPolygonMaterial (CS_POLYRANGE_SINGLE (poly_idx), material);
+	}
+      }
       if (polygonpar)
         polygon = 0;
     }

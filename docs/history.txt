@@ -6,6 +6,21 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-oct-2003
+	- Jorrit added iPolygonHandle. This is an SCF interface that can
+	  be used to represent a thing polygon in situations where an SCF
+	  interface is required. It is created by
+	  iThingFactoryState->CreatePolygonHandle() or
+	  iThingState->CreatePolygonHandle(). The handle is safe in the
+	  sense that it will automatically return 0 pointers in case the
+	  factory or instance is removed (uses weak references to do that).
+	- Jorrit changed the engine sequence manager to use the new
+	  iPolygonHandle instead of iPolygon3D.
+	- Jorrit changed the engine sequence manager so that it now sets the
+	  material on the instance polygon instead of the factory polygon.
+	- Jorrit moved an error if a thing has no polygons after converting
+	  everything to portals. This error complained if a part had no polygons
+	  but it should only complain if the entire thing has none.
 9-oct-2003
 	- Jorrit added the following new functions to iThingFactoryState:
 	    - FindPolygonByName (const char*)

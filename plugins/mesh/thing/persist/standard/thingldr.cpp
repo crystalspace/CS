@@ -1105,12 +1105,6 @@ Nag to Jorrit about this feature if you want it.");
     int i;
     for (i = polygons_to_delete.Length ()-1 ; i >= 0 ; i--)
       info.thing_fact_state->RemovePolygon (polygons_to_delete[i]);
-    if (info.thing_fact_state->GetPolygonCount () == 0)
-    {
-      synldr->ReportError ("crystalspace.thingloader.loadpart",
-	node, "No more polygons left after converting to portals! This is not supported!");
-      return false;
-    }
   }
 
   return true;
@@ -1153,6 +1147,12 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
   }
   else
   {
+    if (info.thing_fact_state->GetPolygonCount () == 0)
+    {
+      synldr->ReportError ("crystalspace.thingloader.loadpart",
+	node, "No more polygons left after converting to portals! This is not supported!");
+      return false;
+    }
     int i;
     for (i = 0 ; i < info.replace_materials.Length () ; i++)
     {

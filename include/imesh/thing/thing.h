@@ -34,6 +34,10 @@ struct iFrustumView;
 struct iMaterialWrapper;
 struct iMaterialList;
 struct iMovable;
+struct iMeshObject;
+struct iMeshObjectFactory;
+struct iThingState;
+struct iThingFactoryState;
 
 /**
  * A range structure for specifing polygon ranges.
@@ -104,6 +108,48 @@ struct csPolygonRange
 #define CS_THING_MOVE_NEVER 0
 #define CS_THING_MOVE_OCCASIONAL 2
 
+SCF_VERSION (iPolygonHandle, 0, 0, 1);
+
+/**
+ * This is an interface that can be used to represent a polygon in
+ * situations where a SCF object is required. Create an instance of
+ * this object using iThingFactoryState->CreatePolygonHandle() or
+ * iThingState->CreatePolygonHandle(). Note that this handle will make
+ * sure that the returned pointers are cleared if the thing or thing
+ * factory happens to be removed.
+ */
+struct iPolygonHandle : public iBase
+{
+  /**
+   * Get the factory state for this polygon. Or 0 if the factory is
+   * removed.
+   */
+  virtual iThingFactoryState* GetThingFactoryState () const = 0;
+
+  /**
+   * Get the mesh object factory for this polygon. Or 0 if the factory
+   * is removed.
+   */
+  virtual iMeshObjectFactory* GetMeshObjectFactory () const = 0;
+
+  /**
+   * Get the instance of this polygon. This can be 0 if this polygon handle
+   * was created from a factory or if the instance was removed.
+   */
+  virtual iThingState* GetThingState () const = 0;
+
+  /**
+   * Get the mesh object of this polygon. This can be 0 if this polygon handle
+   * was created from a factory or if the instance was removed.
+   */
+  virtual iMeshObject* GetMeshObject () const = 0;
+
+  /**
+   * Get the polygon index which this polygon handle represents.
+   */
+  virtual int GetIndex () const = 0;
+};
+
 
 SCF_VERSION (iThingFactoryState, 0, 2, 0);
 
@@ -154,10 +200,10 @@ struct iThingFactoryState : public iBase
    * Add a triangle.
    * <p>
    * By default the texture mapping is set so that the texture
-   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
-   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
-   * are 5 units seperated from each other then the texture will repeat exactly five
-   * times between v1 and v2).
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
+   * so that the texture tiles once for every unit (i.e. if you have the
+   * vertices v1 and v2 are 5 units seperated from each other then the texture
+   * will repeat exactly five times between v1 and v2).
    * \return the index of the created polygon.
    */
   virtual int AddTriangle (const csVector3& v1, const csVector3& v2,
@@ -167,10 +213,10 @@ struct iThingFactoryState : public iBase
    * for a thing so you should try to use these as much as possible.
    * <p>
    * By default the texture mapping is set so that the texture
-   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
-   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
-   * are 5 units seperated from each other then the texture will repeat exactly five
-   * times between v1 and v2).
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
+   * so that the texture tiles once for every unit (i.e. if you have the
+   * vertices v1 and v2 are 5 units seperated from each other then the texture
+   * will repeat exactly five times between v1 and v2).
    * \return the index of the created polygon.
    */
   virtual int AddQuad (const csVector3& v1, const csVector3& v2,
@@ -180,10 +226,10 @@ struct iThingFactoryState : public iBase
    * Add a general polygon.
    * <p>
    * By default the texture mapping is set so that the texture
-   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
-   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
-   * are 5 units seperated from each other then the texture will repeat exactly five
-   * times between v1 and v2).
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
+   * so that the texture tiles once for every unit (i.e. if you have the
+   * vertices v1 and v2 are 5 units seperated from each other then the texture
+   * will repeat exactly five times between v1 and v2).
    * \return the index of the created polygon.
    */
   virtual int AddPolygon (csVector3* vertices, int num) = 0;
@@ -192,10 +238,10 @@ struct iThingFactoryState : public iBase
    * Add a general polygon using vertex indices.
    * <p>
    * By default the texture mapping is set so that the texture
-   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
-   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
-   * are 5 units seperated from each other then the texture will repeat exactly five
-   * times between v1 and v2).
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
+   * so that the texture tiles once for every unit (i.e. if you have the
+   * vertices v1 and v2 are 5 units seperated from each other then the texture
+   * will repeat exactly five times between v1 and v2).
    * \return the index of the created polygon.
    */
   virtual int AddPolygon (int num, ...) = 0;
@@ -204,10 +250,10 @@ struct iThingFactoryState : public iBase
    * Add a box that can be seen from the outside. This will add six polygons.
    * <p>
    * By default the texture mapping is set so that the texture
-   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
-   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
-   * are 5 units seperated from each other then the texture will repeat exactly five
-   * times between v1 and v2).
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
+   * so that the texture tiles once for every unit (i.e. if you have the
+   * vertices v1 and v2 are 5 units seperated from each other then the texture
+   * will repeat exactly five times between v1 and v2).
    * \return the index of the first created polygon.
    */
   virtual int AddOutsideBox (const csVector3& bmin, const csVector3& bmax) = 0;
@@ -216,10 +262,10 @@ struct iThingFactoryState : public iBase
    * Add a box that can be seen from the inside. This will add six polygons.
    * <p>
    * By default the texture mapping is set so that the texture
-   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
-   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
-   * are 5 units seperated from each other then the texture will repeat exactly five
-   * times between v1 and v2).
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
+   * so that the texture tiles once for every unit (i.e. if you have the
+   * vertices v1 and v2 are 5 units seperated from each other then the texture
+   * will repeat exactly five times between v1 and v2).
    * \return the index of the first created polygon.
    */
   virtual int AddInsideBox (const csVector3& bmin, const csVector3& bmax) = 0;
@@ -234,10 +280,22 @@ struct iThingFactoryState : public iBase
 
   /**
    * Get the name of the specified polygon.
-   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created
-   * polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
    */
   virtual const char* GetPolygonName (int polygon_idx) = 0;
+
+  /**
+   * Create a polygon handle that can be used to refer to some polygon.
+   * This can be useful in situations where an SCF handle is required
+   * to be able to reference a polygon. The thing will not keep a reference
+   * to this handle so you are fully responsible for it after calling
+   * this function. The polygon handle created here will not have a mesh
+   * object or thing state set since it is created from the factory.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
+   */
+  virtual csPtr<iPolygonHandle> CreatePolygonHandle (int polygon_idx) = 0;
 
   /**
    * Set the material of all polygons in the given range.
@@ -249,8 +307,8 @@ struct iThingFactoryState : public iBase
 
   /**
    * Get the material for the specified polygon.
-   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created
-   * polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
    */
   virtual iMaterialWrapper* GetPolygonMaterial (int polygon_idx) = 0;
 
@@ -271,22 +329,22 @@ struct iThingFactoryState : public iBase
 
   /**
    * Get number of vertices for polygon.
-   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created
-   * polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
    */
   virtual int GetPolygonVertexCount (int polygon_idx) = 0;
 
   /**
    * Get a vertex from a polygon.
-   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created
-   * polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
    */
   virtual const csVector3& GetPolygonVertex (int polygon_idx, int vertex_idx) = 0;
 
   /**
    * Get table with vertex indices from polygon.
-   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created
-   * polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
    */
   virtual int* GetPolygonVertexIndices (int polygon_idx) = 0;
 
@@ -376,8 +434,8 @@ struct iThingFactoryState : public iBase
 
   /**
    * Get the texture space information for the specified polygon.
-   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created
-   * polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
    */
   virtual void GetPolygonTextureMapping (int polygon_idx,
   	csMatrix3& m, csVector3& v) = 0;
@@ -392,8 +450,8 @@ struct iThingFactoryState : public iBase
 
   /**
    * Check if texture mapping is enabled for the specified polygon.
-   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created
-   * polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
    */
   virtual bool IsPolygonTextureMappingEnabled (int polygon_idx) const = 0;
 
@@ -421,22 +479,22 @@ struct iThingFactoryState : public iBase
 
   /**
    * Get the flags of the specified polygon.
-   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created
-   * polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
    */
   virtual csFlags& GetPolygonFlags (int polygon_idx) = 0;
 
   /**
    * Get object space plane of the specified polygon.
-   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created
-   * polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
    */
   virtual const csPlane3& GetPolygonObjectPlane (int polygon_idx) = 0;
 
   /**
    * Return true if this polygon or the texture it uses is transparent.
-   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created
-   * polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
    */
   virtual bool IsPolygonTransparent (int polygon_idx) = 0;
 
@@ -593,14 +651,27 @@ struct iThingState : public iBase
   virtual uint GetMixMode () const = 0;
 
   /**
+   * Create a polygon handle that can be used to refer to some polygon.
+   * This can be useful in situations where an SCF handle is required
+   * to be able to reference a polygon. The thing will not keep a reference
+   * to this handle so you are fully responsible for it after calling
+   * this function.
+   * \param polygon_idx is a polygon index. #CS_POLYINDEX_LAST is NOT
+   * supported here!
+   */
+  virtual csPtr<iPolygonHandle> CreatePolygonHandle (int polygon_idx) = 0;
+
+  /**
    * Get world space plane of the specified polygon.
-   * \param polygon_idx is a polygon index. #CS_POLYINDEX_LAST is NOT supported here!
+   * \param polygon_idx is a polygon index. #CS_POLYINDEX_LAST is NOT
+   * supported here!
    */
   virtual const csPlane3& GetPolygonWorldPlane (int polygon_idx) = 0;
 
   /**
    * Get the material for the specified polygon.
-   * \param polygon_idx is a polygon index. #CS_POLYINDEX_LAST is NOT supported here!
+   * \param polygon_idx is a polygon index. #CS_POLYINDEX_LAST is NOT
+   * supported here!
    */
   virtual iMaterialWrapper* GetPolygonMaterial (int polygon_idx) = 0;
 
