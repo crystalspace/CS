@@ -1154,6 +1154,20 @@ follows a more natural calling convention.  Several @samp{iString} methods
 which were incorrectly returning raw @samp{iString*} or @samp{iString&} now
 correctly return @code{csRef<iString>}.
 
+In previous releases, @samp{csString} and at least one @samp{iString}
+implementation contained bugs where they would incorrectly and often
+indeterminately return a null pointer from @code{GetData()} and @samp{operator
+char const*} under certain circumstances if the string was empty.  This was
+buggy, undocumented, and incorrect behavior which occurred by accident, not by
+design; nor was it supported by the @sc{api}.  Projects which relied upon this
+buggy, accidental, and indeterminate behavior may define
+@samp{CSSTRING_BUGGY_NULL_RETURN} before including @file{csutil/csstring.h} in
+order to restore the old buggy behavior of incorrectly returning a null
+pointer.  This backward-compatibility measure is intended only as a temporary
+transitional aid; projects are strongly encouraged to correct their code
+rather than relying upon an accidental and buggy historic implementation
+artifact.
+
 @subheading csMD5 Changes
 
 A @code{csMD5(csString const&)} constructor was added to complement the

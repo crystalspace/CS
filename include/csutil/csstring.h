@@ -24,6 +24,20 @@
 #include "csextern.h"
 #include "snprintf.h"
 
+/** 
+ * Define CSSTRING_BUGGY_NULL_RETURN if your code relies upon the old buggy
+ * behavior where csString::GetData() and operator char* sometimes incorrectly
+ * and indeterminately returned a null pointer when the string was empty
+ * instead of a zero-length string.  Do not rely upon this backward-
+ * compatibility hack to be present in future release; it is intended only as a
+ * temporary transitional aid for projects which relied upon the buggy behavior
+ */
+#ifdef CSSTRING_BUGGY_NULL_RETURN
+#define CSSTRING_RETURN_DATA(X,F) (X)
+#else
+#define CSSTRING_RETURN_DATA(X,F) ((X) != 0 ? (X) : (F))
+#endif
+
 /**
  * This is a string class with a range of useful operators and typesafe
  * overloads.  May contain arbitary binary data, including null bytes.
@@ -114,14 +128,14 @@ public:
 
   /// Get a pointer to the null-terminated character array.
   char const* GetData () const
-  { return Data != 0 ? Data : ""; }
+  { return CSSTRING_RETURN_DATA(Data,""); }
 
   /**
    * Get a pointer to the null-terminated character array.  Warning: this is a
    * non-const pointer, so use this function with care!
    */
   char* GetData ()
-  { static char* highly_nasty = ""; return Data != 0 ? Data : highly_nasty; }
+  { return CSSTRING_RETURN_DATA(Data,(char*)""); }
 
   /// Query string length.  Length does not include null terminator.
   size_t Length () const
@@ -560,7 +574,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
 
   /// Return a pointer to the null-terminated character string.
   operator const char* () const
-  { return Data != 0 ? Data : ""; }
+  { return CSSTRING_RETURN_DATA(Data,""); }
 
   /// Check if two strings are equal.
   bool operator == (const csString& iStr) const

@@ -24,6 +24,13 @@ chronological order.
 	- Jorrit discovered that MeshTreeNode in the NR terrain engine
 	  was doing some SCF stuff for no reason at all (it didn't even
 	  inherit from iBase).
+	- Eric Sunshine added a backward-compatibility hack to csString to
+	  allow projects to recover the old, buggy, undocumented, accidental
+	  behavior where csString::GetData() and the (char const*) operator
+	  returned a null pointer instead of a zero-length string in certain
+	  indeterministic cases if the string was empty.  Projects should
+	  #define CSSTRING_BUGGY_NULL_RETURN before #including
+	  <csutil/csstring.h> to enable this temporary transitional hack.
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only
