@@ -31,6 +31,7 @@
 #import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/NSFileManager.h>
 #import <Foundation/NSProcessInfo.h>
+#import <Foundation/NSString.h>
 #import <Foundation/NSTimer.h>
 #import <Foundation/NSUserDefaults.h>
 
