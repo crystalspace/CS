@@ -330,9 +330,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	rview.g3d->DrawPolygonQuick (poly, gouraud);
       }
     }
-  rview.g3d->FinishPolygonQuick ();
+    rview.g3d->FinishPolygonQuick ();
 
-  CHK (delete [] poly.pi_texcoords);
+    CHK (delete [] poly.pi_texcoords);
   }
 }
 

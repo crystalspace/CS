@@ -1385,7 +1385,6 @@ void PreparePolygonQuick (G3DPolygon* g3dpoly, bool gouraud)
     else top = 2;
 
   int j;
-  CHK (g3dpoly->pi_texcoords = new G3DPolygon::poly_texture_def [64]);
   for (j = 0 ; j < g3dpoly->num ; j++)
   {
     float x = g3dpoly->vertices[j].sx;
@@ -1562,6 +1561,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
       g3dpoly.vertices[i].sx = vertices[i].x;
       g3dpoly.vertices[i].sy = vertices[i].y;
     }
+    CHK (g3dpoly.pi_texcoords = new G3DPolygon::poly_texture_def [64]);
     PreparePolygonQuick (&g3dpoly, po_colors != NULL);
     g3d->StartPolygonQuick (g3dpoly.txt_handle, po_colors != NULL);
     g3d->DrawPolygonQuick (g3dpoly, po_colors != NULL);
