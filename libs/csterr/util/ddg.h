@@ -43,6 +43,9 @@
 #endif
 //
 #if defined (COMP_GCC) || defined (DDG)
+#ifdef DDGSTREAM
+#include <strstream.h>
+#endif
 #include <stdlib.h>			// For exit() COMP_GCC
 #endif
 //
