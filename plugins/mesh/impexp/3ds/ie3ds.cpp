@@ -386,7 +386,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
   }
 }
 
-csPtr<iModelData> csModelConverter3ds::Load( uint8* buffer, uint32 size )
+csPtr<iModelData> csModelConverter3ds::Load( uint8* buffer, size_t size )
 {
   Lib3dsFile *p3dsFile;
   csModelData *pModelData;
@@ -577,7 +577,7 @@ bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,
   return true;
 }
 
-Lib3dsFile *csModelConverter3ds::LoadFileData( uint8* pBuffer, uint32 size )
+Lib3dsFile *csModelConverter3ds::LoadFileData( uint8* pBuffer, size_t size )
 {
   // This code is pulled from lib3ds
   Lib3dsFile *pFile;

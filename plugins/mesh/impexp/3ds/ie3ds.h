@@ -35,7 +35,7 @@ private:
 //  bool LoadMaterialData( iMaterial *pCSMaterial, Lib3dsMaterial *p3dsMaterial );
   bool LoadMeshObjectData( iModelDataObject *pData, Lib3dsMesh *p3dsMesh, Lib3dsMaterial* pCurMaterial );
 
-  Lib3dsFile * LoadFileData( uint8* Buffer, uint32 size );
+  Lib3dsFile * LoadFileData( uint8* Buffer, size_t size );
 
 public:
   SCF_DECLARE_IBASE;

@@ -22,6 +22,7 @@ chronological order.
 	    - Changed how RGB data is handled by simpleformer; treats the RGB
 	      triplet as a 24bit number (R is most significant) instead of
 	      computing the RGB intensity.
+	- res fixed some wrong types in ie3ds.
 3-Apr-2005
 	- Eric Sunshine updated csBlockAllocator<> so that it automatically
 	  destroys contained objects at its own destruction time rather than
