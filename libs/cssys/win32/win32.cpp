@@ -817,8 +817,8 @@ got_value:
   int len = strlen(oInstallPath);
   if(len == 0) return false;
   if( oInstallPath[len-1] == '/' || oInstallPath[len-1] == '\' )
-    return;
-  if(len+1 >= iBufferSize)
+    return true;
+  if(len+1 >= (int)iBufferSize)
   {
     strncpy(oInstallPath, "", iBufferSize); //make empty if possible
     return false;
