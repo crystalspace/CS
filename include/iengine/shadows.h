@@ -52,8 +52,6 @@ struct iShadowIterator : public iBase
   virtual iShadowBlock* GetCurrentShadowBlock () = 0;
   /// Return the shadow list for the next element.
   virtual iShadowBlock* GetNextShadowBlock () = 0;
-  /// Append the current shadow to some other shadow block.
-  virtual void AppendToShadowBlock (iShadowBlock* sb, bool copy = true) = 0;
 };
 
 SCF_VERSION (iShadowBlock, 0, 0, 1);

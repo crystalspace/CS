@@ -92,7 +92,7 @@ class csDelayedLightingInfo : public csFrustumViewCleanup
 
     csShadowIterator* GetShadowIterator ()
     {
-      return shadows.GetShadowIterator ();
+      return shadows.GetCsShadowIterator ();
     }
 
     ~LightViewInfo ()
@@ -600,7 +600,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   else
   {
     nsf = 0;
-    shadow_it = lview.shadows->GetShadowIterator ();
+    shadow_it = lview.shadows->GetCsShadowIterator ();
     while (shadow_it->HasNext ())
     {
       shadow_it->Next ();
@@ -1014,7 +1014,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 
 	// Check if the point on the polygon is shadowed. To do this
 	// we traverse all shadow frustums and see if it is contained in any of them.
-	csShadowIterator* shadow_it = lp->shadows.GetShadowIterator ();
+	csShadowIterator* shadow_it = lp->shadows.GetCsShadowIterator ();
 	bool shadow = false;
 	while (shadow_it->HasNext ())
 	{

@@ -82,9 +82,14 @@ void csFrustumView::StartNewShadowBlock ()
 
 //---------------------------------------------------------------------------
 
+IMPLEMENT_IBASE (csShadowBlock)
+  IMPLEMENTS_INTERFACE (iShadowBlock)
+IMPLEMENT_IBASE_END
+
 csShadowBlock::csShadowBlock (csSector* sect, int draw_busy,
 	int max_shadows, int delta) : shadows (max_shadows, delta)
 {
+  CONSTRUCT_IBASE (NULL);
   sector = sect;
   draw_busy = draw_busy;
 }
@@ -92,6 +97,7 @@ csShadowBlock::csShadowBlock (csSector* sect, int draw_busy,
 csShadowBlock::csShadowBlock (int max_shadows, int delta) :
 	shadows (max_shadows, delta)
 {
+  CONSTRUCT_IBASE (NULL);
   sector = NULL;
   draw_busy = -1;
 }
@@ -104,7 +110,7 @@ csShadowBlock::~csShadowBlock ()
 void csShadowBlock::AddRelevantShadows (csShadowBlock* source,
     	csTransform* trans)
 {
-  csShadowIterator* shadow_it = source->GetShadowIterator ();
+  csShadowIterator* shadow_it = source->GetCsShadowIterator ();
   while (shadow_it->HasNext ())
   {
     csShadowFrustum* csf = (csShadowFrustum*)shadow_it->Next ();
@@ -128,7 +134,7 @@ void csShadowBlock::AddRelevantShadows (csShadowBlock* source,
 
 void csShadowBlock::AddRelevantShadows (csShadowBlockList* source)
 {
-  csShadowIterator* shadow_it = source->GetShadowIterator ();
+  csShadowIterator* shadow_it = source->GetCsShadowIterator ();
   while (shadow_it->HasNext ())
   {
     csShadowFrustum* csf = (csShadowFrustum*)shadow_it->Next ();
@@ -143,7 +149,7 @@ void csShadowBlock::AddRelevantShadows (csShadowBlockList* source)
 
 void csShadowBlock::AddAllShadows (csShadowBlockList* source)
 {
-  csShadowIterator* shadow_it = source->GetShadowIterator ();
+  csShadowIterator* shadow_it = source->GetCsShadowIterator ();
   while (shadow_it->HasNext ())
   {
     csShadowFrustum* csf = (csShadowFrustum*)shadow_it->Next ();
@@ -158,7 +164,7 @@ void csShadowBlock::AddUniqueRelevantShadows (csShadowBlockList* source)
   int i;
   int cnt = shadows.Length ();
 
-  csShadowIterator* shadow_it = source->GetShadowIterator ();
+  csShadowIterator* shadow_it = source->GetCsShadowIterator ();
   while (shadow_it->HasNext ())
   {
     csShadowFrustum* csf = (csShadowFrustum*)shadow_it->Next ();
@@ -194,6 +200,22 @@ void csShadowBlock::UnlinkShadow (int idx)
   shadows.Delete (idx);
 }
 
+iSector* csShadowBlock::GetSector ()
+{
+  return &GetCsSector ()->scfiSector;
+}
+
+//---------------------------------------------------------------------------
+
+IMPLEMENT_IBASE (csShadowBlockList)
+  IMPLEMENTS_INTERFACE (iShadowBlockList)
+IMPLEMENT_IBASE_END
+
+csShadowBlockList::csShadowBlockList () : first (NULL), last (NULL)
+{
+  CONSTRUCT_IBASE (NULL);
+}
+
 //---------------------------------------------------------------------------
 
 csShadowFrustum::csShadowFrustum (const csShadowFrustum& orig)
@@ -204,6 +226,29 @@ csShadowFrustum::csShadowFrustum (const csShadowFrustum& orig)
 }
 
 //---------------------------------------------------------------------------
+
+IMPLEMENT_IBASE (csShadowIterator)
+  IMPLEMENTS_INTERFACE (iShadowIterator)
+IMPLEMENT_IBASE_END
+
+csShadowIterator::csShadowIterator (csShadowBlock* cur, bool onlycur,
+	int dir)
+{
+  CONSTRUCT_IBASE (NULL);
+  csShadowIterator::cur = cur;
+  csShadowIterator::onlycur = onlycur;
+  csShadowIterator::dir = dir;
+  first_cur = cur;
+  Reset ();
+}
+
+void csShadowIterator::Reset ()
+{
+  cur = first_cur;
+  if (cur) cur_num = cur->GetNumShadows ();
+  if (dir == 1) i = 0;
+  else i = cur_num-1;
+}
 
 csFrustum* csShadowIterator::Next ()
 {
@@ -227,7 +272,7 @@ csFrustum* csShadowIterator::Next ()
   return s;
 }
 
-csShadowBlock* csShadowIterator::GetCurrentShadowBlock ()
+csShadowBlock* csShadowIterator::GetCsCurrentShadowBlock ()
 {
   if (dir == -1)
   {
@@ -286,6 +331,16 @@ void csShadowIterator::DeleteCurrent ()
       cur->prev->UnlinkShadow (cur->prev->GetNumShadows ()-1);
     }
   }
+}
+
+iShadowBlock* csShadowIterator::GetCurrentShadowBlock ()
+{
+  return (iShadowBlock*)GetCsCurrentShadowBlock ();
+}
+
+iShadowBlock* csShadowIterator::GetNextShadowBlock ()
+{
+  return (iShadowBlock*)GetCsNextShadowBlock ();
 }
 
 //---------------------------------------------------------------------------

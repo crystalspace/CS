@@ -365,7 +365,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
 
   csDynLight *light = lp->light;
 
-  csShadowIterator* shadow_it = lp->shadows.GetShadowIterator ();
+  csShadowIterator* shadow_it = lp->shadows.GetCsShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
 
   csColor color = light->GetColor() * NORMAL_LIGHT_LEVEL;
@@ -459,7 +459,7 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
   csVector3 pos;
   int uv;
 
-  csShadowIterator* shadow_it = lview.shadows->GetShadowIterator ();
+  csShadowIterator* shadow_it = lview.shadows->GetCsShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
   
   int lm_width = lightmap->GetWidth ();

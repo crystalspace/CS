@@ -24,6 +24,7 @@
 #include "csengine/camera.h"
 #include "csutil/csvector.h"
 #include "iengine/irview.h"
+#include "iengine/shadows.h"
 
 class csMatrix3;
 class csVector3;
@@ -338,7 +339,7 @@ class csShadowBlock;
  * This iterator can work in two directions and also supports
  * deleting the current element in the iterator.
  */
-class csShadowIterator
+class csShadowIterator : public iShadowIterator
 {
   friend class csShadowBlockList;
   friend class csShadowBlock;
@@ -349,31 +350,37 @@ private:
   int i, cur_num;
   bool onlycur;
   int dir;	// 1 or -1 for direction.
-  inline csShadowIterator (csShadowBlock* cur, bool onlycur, int dir);
+  csShadowIterator (csShadowBlock* cur, bool onlycur, int dir);
   csShadowFrustum* cur_shad;
 
 public:
   /// Return true if there are further elements to process.
-  bool HasNext ()
+  virtual bool HasNext ()
   {
     return cur != NULL && i < cur_num && i >= 0;
   }
   /// Return the next element.
-  csFrustum* Next ();
+  virtual csFrustum* Next ();
   /// Get the user data for the last shadow.
-  void* GetUserData () { return cur_shad->GetUserData (); }
+  virtual void* GetUserData () { return cur_shad->GetUserData (); }
   /// Return if the last shadow is relevant or not.
-  bool IsRelevant () { return cur_shad->IsRelevant (); }
+  virtual bool IsRelevant () { return cur_shad->IsRelevant (); }
   /// Mark the last shadow as relevant.
-  void MarkRelevant (bool rel) { cur_shad->MarkRelevant (rel); }
+  virtual void MarkRelevant (bool rel) { cur_shad->MarkRelevant (rel); }
   /// Reset the iterator to start again from initial setup.
-  inline void Reset ();
+  virtual void Reset ();
   /// Delete the last element returned.
-  void DeleteCurrent ();
+  virtual void DeleteCurrent ();
   /// Return the shadow list for the 'current' element.
-  csShadowBlock* GetCurrentShadowBlock ();
+  virtual iShadowBlock* GetCurrentShadowBlock ();
   /// Return the shadow list for the 'next' element.
-  csShadowBlock* GetNextShadowBlock () { return cur; }
+  virtual iShadowBlock* GetNextShadowBlock ();
+  /// Return the shadow list for the 'current' element.
+  csShadowBlock* GetCsCurrentShadowBlock ();
+  /// Return the shadow list for the 'next' element.
+  csShadowBlock* GetCsNextShadowBlock () { return cur; }
+
+  DECLARE_IBASE;
 };
 
 /**
@@ -381,7 +388,7 @@ public:
  * on the shadow frustums so that it is possible and legal to put a single
  * shadow in several blocks.
  */
-class csShadowBlock
+class csShadowBlock : public iShadowBlock
 {
   friend class csShadowBlockList;
   friend class csShadowIterator;
@@ -394,7 +401,8 @@ private:
 
 public:
   /// Create a new empty list for a sector.
-  csShadowBlock (csSector* sector, int draw_busy, int max_shadows = 30, int delta = 30);
+  csShadowBlock (csSector* sector, int draw_busy, int max_shadows = 30,
+  	int delta = 30);
   /// Create a new empty list.
   csShadowBlock (int max_shadows = 30, int delta = 30);
 
@@ -476,39 +484,32 @@ public:
   }
 
   /// Get iterator to iterate over all shadows in this block.
-  csShadowIterator* GetShadowIterator (bool reverse = false)
+  csShadowIterator* GetCsShadowIterator (bool reverse = false)
   {
     return new csShadowIterator (this, true, reverse ? -1 : 1);
   }
 
+  /// Get iterator to iterate over all shadows in this block.
+  iShadowIterator* GetShadowIterator (bool reverse = false)
+  {
+    return (iShadowIterator*)(new csShadowIterator (this, true,
+    	reverse ? -1 : 1));
+  }
+
   /// Get Sector.
-  csSector* GetSector () { return sector; }
+  csSector* GetCsSector () { return sector; }
+  /// Get Sector.
+  virtual iSector* GetSector ();
   /// Get draw_busy for sector.
-  int GetDrawBusy () { return draw_busy; }
+  virtual int GetRecLevel () { return draw_busy; }
+
+  DECLARE_IBASE;
 };
-
-inline csShadowIterator::csShadowIterator (csShadowBlock* cur, bool onlycur,
-	int dir)
-{
-  csShadowIterator::cur = cur;
-  csShadowIterator::onlycur = onlycur;
-  csShadowIterator::dir = dir;
-  first_cur = cur;
-  Reset ();
-}
-
-inline void csShadowIterator::Reset ()
-{
-  cur = first_cur;
-  if (cur) cur_num = cur->GetNumShadows ();
-  if (dir == 1) i = 0;
-  else i = cur_num-1;
-}
 
 /**
  * A list of shadow blocks.
  */
-class csShadowBlockList
+class csShadowBlockList : public iShadowBlockList
 {
 private:
   csShadowBlock* first;
@@ -516,9 +517,9 @@ private:
 
 public:
   /// Create a new empty list.
-  csShadowBlockList () : first (NULL), last (NULL) { }
+  csShadowBlockList ();
   /// Destroy the list and all shadow blocks in it.
-  ~csShadowBlockList ()
+  virtual ~csShadowBlockList ()
   {
     DeleteAllShadows ();
   }
@@ -575,10 +576,21 @@ public:
   /**
    * Return an iterator to iterate over all shadows in this list.
    */
-  csShadowIterator* GetShadowIterator (bool reverse = false)
+  csShadowIterator* GetCsShadowIterator (bool reverse = false)
   {
     return new csShadowIterator (first, false, reverse ? -1 : 1);
   }
+
+  /**
+   * Return an iterator to iterate over all shadows in this list.
+   */
+  virtual iShadowIterator* GetShadowIterator (bool reverse = false)
+  {
+    return (iShadowIterator*)(new csShadowIterator (first, false,
+    	reverse ? -1 : 1));
+  }
+
+  DECLARE_IBASE;
 };
 
 class csFrustumView;

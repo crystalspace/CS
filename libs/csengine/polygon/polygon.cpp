@@ -1599,7 +1599,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
   // each other.
   int i, i1, j, j1;
 
-  csShadowIterator* shadow_it = lview.shadows->GetShadowIterator ();
+  csShadowIterator* shadow_it = lview.shadows->GetCsShadowIterator ();
   csFrustum *lf = lview.light_frustum;
 
   // Precalculate the normals for csFrustum::BatchClassify.

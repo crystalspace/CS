@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+15-Mar-2001
+	- Let csShadowIterator implement iShadowIterator.
+	- Let csShadowBlock implement iShadowBlock.
+	- Let csShadowBlockList implement iShadowBlockList.
 14-Mar-2001
 	- Fixed a bug in csRenderView. IncRef() should be DecRef(). Thanks
 	  to Norman Kramer for spotting this.

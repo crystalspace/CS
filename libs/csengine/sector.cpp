@@ -1042,7 +1042,7 @@ void* csSector::CheckFrustumPolygons (csSector*,
 //@@@ Needs to be part of sector?
 void CompressShadowFrustums (csShadowBlockList* list)
 {
-  csShadowIterator* shadow_it = list->GetShadowIterator (true);
+  csShadowIterator* shadow_it = list->GetCsShadowIterator (true);
   csFrustum* sf;
   if (!shadow_it->HasNext ()) { delete shadow_it; return; }
 
@@ -1051,13 +1051,13 @@ void CompressShadowFrustums (csShadowBlockList* list)
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
 
-  csSector* cur_sector = shadow_it->GetNextShadowBlock ()->GetSector ();
-  int cur_draw_busy = shadow_it->GetNextShadowBlock ()->GetDrawBusy ();
+  csSector* cur_sector = shadow_it->GetCsNextShadowBlock ()->GetCsSector ();
+  int cur_draw_busy = shadow_it->GetCsNextShadowBlock ()->GetRecLevel ();
   while (shadow_it->HasNext ())
   {
-    csShadowBlock* shadlist = shadow_it->GetNextShadowBlock ();
+    csShadowBlock* shadlist = shadow_it->GetCsNextShadowBlock ();
     sf = shadow_it->Next ();
-    if (shadlist->GetSector () != cur_sector || shadlist->GetDrawBusy () != cur_draw_busy)
+    if (shadlist->GetCsSector () != cur_sector || shadlist->GetRecLevel () != cur_draw_busy)
       break;
     bool vis;
     if (cb)

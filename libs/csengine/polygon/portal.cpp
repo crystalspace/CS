@@ -257,8 +257,8 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
     csShadowBlock* slist = lview.shadows->GetFirstShadowBlock ();
     while (slist)
     {
-      csShadowBlock* copy_slist = new csShadowBlock (slist->GetSector (),
-      	slist->GetDrawBusy ());
+      csShadowBlock* copy_slist = new csShadowBlock (slist->GetCsSector (),
+      	slist->GetRecLevel ());
       new_lview.shadows->AppendShadowBlock (copy_slist);
       copy_slist->AddRelevantShadows (slist, &warp_wor);
       slist = lview.shadows->GetNextShadowBlock (slist);
@@ -302,8 +302,8 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
     {
       copied_frustums = true; // Only set to true here
 
-      csShadowBlock* copy_slist = new csShadowBlock (slist->GetSector (),
-      	slist->GetDrawBusy ());
+      csShadowBlock* copy_slist = new csShadowBlock (slist->GetCsSector (),
+      	slist->GetRecLevel ());
       new_lview.shadows->AppendShadowBlock (copy_slist);
       copy_slist->AddRelevantShadows (slist);
 
