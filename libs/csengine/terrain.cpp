@@ -143,7 +143,6 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   // The DDG engine uses clipping agains 2 or 5 clipping planes
   // which match the true clipping planes as set by the projection
   // matrix.
-  const csMatrix3& orientation = rview.GetO2T ();
 
   const csVector3& translation = rview.GetO2TTranslation();
   // JORRIT: I need the camera's foward facing vector in world space.
