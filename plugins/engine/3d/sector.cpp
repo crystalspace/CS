@@ -130,6 +130,7 @@ csSector::csSector (csEngine *engine) : csObject()
   //portal_containers.SetSector (this);
   lights.SetSector (this);
   current_visnr = 0;
+  renderloop = 0;
 }
 
 csSector::~csSector ()
@@ -926,7 +927,9 @@ void csSector::Draw (iRenderView *rview)
 
   draw_busy--;
 #else
-  engine->GetCurrentDefaultRenderloop ()->Draw (rview, (iSector*)&scfiSector);
+  iRenderLoop* rl = renderloop;
+  if (!rl) rl = engine->GetCurrentDefaultRenderloop ();
+  rl->Draw (rview, (iSector*)&scfiSector);
 #endif // CS_USE_NEW_RENDERER
 }
 

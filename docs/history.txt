@@ -18,6 +18,12 @@ chronological order.
 	  (I don't know why that stuff was put in the render loop in the
 	  first place). Removed one version of Draw() from iRenderLoop. It
 	  is no longer needed now.
+	- Jorrit added iSector->GetRenderLoop() and SetRenderLoop(). With
+	  this function it is possible to set a different renderloop for
+	  one specific sector. If this is not set (default) then the default
+	  engine renderloop will be used.
+	- Jorrit added a new <renderloop> tag to the sector definition so
+	  that you can specify a renderloop for a sector in a world file.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.

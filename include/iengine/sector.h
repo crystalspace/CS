@@ -48,6 +48,7 @@ struct iObject;
 struct csFog;
 struct iGraphics3D;
 struct iRenderView;
+struct iRenderLoop;
 struct iFrustumView;
 struct iSector;
 struct iPortal;
@@ -103,7 +104,20 @@ struct iSector : public iBase
   /// @@@ Used by the engine to retrieve internal sector object (ugly)
   virtual csSector *GetPrivateObject () = 0;
   /// Get the iObject for this sector.
-  virtual iObject *QueryObject() = 0;
+  virtual iObject *QueryObject () = 0;
+
+  /**
+   * Set the renderloop to use for this sector. If this is not set then
+   * the default engine renderloop will be used.
+   */
+  virtual void SetRenderLoop (iRenderLoop* rl) = 0;
+
+  /**
+   * Get the renderloop for this sector. If this returns 0 then it
+   * means there is no specific renderloop for this sector. In that case
+   * the default renderloop in the engine will be used.
+   */
+  virtual iRenderLoop* GetRenderLoop () = 0;
 
   /// Has this sector fog?
   virtual bool HasFog () const = 0;

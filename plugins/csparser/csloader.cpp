@@ -4508,6 +4508,40 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_RENDERLOOP:
+#ifdef CS_USE_NEW_RENDERER
+	{
+	  const char* loopName = child->GetContentsValue ();
+	  if (loopName)
+	  {
+	    iRenderLoop* loop = 
+	      Engine->GetRenderLoopManager()->Retrieve (loopName);
+	    if (loop)
+	    {
+	      sector->SetRenderLoop (loop);
+	    }
+	    else
+	    {
+	      SyntaxService->Report (
+		"crystalspace.maploader.parse.sector",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"Render loop '%s' in sector '%s' not found",
+		loopName, secname);
+	    }
+	  }
+	  else
+	  {
+	    SyntaxService->Report (
+	      "crystalspace.maploader.parse.sector",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "Expected render loop name '%s' in sector '%s'",
+	      loopName, secname);
+	  }
+	}
+#endif
+	break;
       case XMLTOKEN_ADDON:
 	if (!LoadAddOn (ldr_context, child, sector))
 	  goto error;

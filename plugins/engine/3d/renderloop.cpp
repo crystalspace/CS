@@ -61,7 +61,6 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
   if (!shadermanager)
     shadermanager = CS_QUERY_REGISTRY (engine->object_reg, iShaderManager);
 
-  //if (s) s->Draw (&rview);
   if (s)
   {
     ((csRenderView*)rview)->SetupClipPlanes ();

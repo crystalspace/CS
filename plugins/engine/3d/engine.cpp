@@ -1751,7 +1751,9 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
 #if defined(CS_USE_NEW_RENDERER)
   csReversibleTransform camTransR = c->GetTransform();
   G3D->SetWorldToCamera (&camTransR);
-  defaultRenderLoop->Draw (&rview, s);
+  iRenderLoop* rl = s->GetRenderLoop ();
+  if (!rl) rl = defaultRenderLoop;
+  rl->Draw (&rview, s);
 #else
   if (s) s->Draw (&rview);
 #endif	// CS_USE_NEW_RENDERER

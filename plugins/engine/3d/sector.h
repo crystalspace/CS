@@ -147,6 +147,9 @@ private:
   /// Engine handle.
   csEngine* engine;
 
+  /// Optional renderloop.
+  iRenderLoop* renderloop;
+
   /// Fog information.
   csFog fog;
 
@@ -223,6 +226,11 @@ public:
    * Construct a sector. This sector will be completely empty.
    */
   csSector (csEngine*);
+
+  /// Set the renderloop for this sector.
+  void SetRenderLoop (iRenderLoop* rl) { renderloop = rl; }
+  /// Get the renderloop for this sector (or 0 in case of default).
+  iRenderLoop* GetRenderLoop () { return renderloop; }
 
   //----------------------------------------------------------------------
   // Mesh manipulation functions
@@ -492,6 +500,10 @@ public:
       { return (csSector*)scfParent; }
     virtual iObject *QueryObject()
       { return scfParent; }
+    virtual void SetRenderLoop (iRenderLoop* rl)
+      { scfParent->SetRenderLoop (rl); }
+    virtual iRenderLoop* GetRenderLoop ()
+      { return scfParent->GetRenderLoop (); }
     virtual int GetRecLevel () const
       { return scfParent->draw_busy; }
     virtual void IncRecLevel ()
