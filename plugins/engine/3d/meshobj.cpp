@@ -517,18 +517,15 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
                                                iMovable* mov,
 					       uint32 frustum_mask)
 {
-//  iMeshWrapper *meshwrap = &scfiMeshWrapper;
-
-  //int i;
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
-/*  i = draw_cb_vector.Length ()-1;
-  while (i >= 0)
+  size_t i = draw_cb_vector.Length ();
+  while (i > 0)
   {
-    iMeshDrawCallback* cb = draw_cb_vector.Get (i);
-    if (!cb->BeforeDrawing (meshwrap, rview)) return 0;
     i--;
-  }*/
+    iMeshDrawCallback* cb = draw_cb_vector.Get (i);
+    if (!cb->BeforeDrawing (&scfiMeshWrapper, rview)) return 0;
+  }
 
   /*draw_test = meshobj->DrawTest (rview, &movable.scfiMovable);
   if (draw_test)

@@ -54,6 +54,8 @@ chronological order.
 	  made it legal to omit the 'rule' argument, which allows Recurse to be
 	  invoked simply to retrieve a list of matching files (without being
 	  forced to apply a rule to each matching file).
+	- Jorrit fixed the NR so that it now also calls BeforeDrawing()
+	  callbacks before rendering a mesh. This was simply forgotten.
 12-Sep-2004
 	- Jorrit fixed genmesh so it compiles with OR again.
 	- Jorrit did some more work on gmeshanim. Still unfinished.
