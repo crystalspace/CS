@@ -25,7 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <cstool/initapp.h>
 #include <iutil/objreg.h>
-#include <ivaria\reporter.h>
+#include <ivaria/reporter.h>
 
 /**
 * Application framework class.

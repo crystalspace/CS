@@ -55,6 +55,9 @@ The history order is reversed so that new features are at the top.
 	  Delete() to provide for other functionality (like returning the
 	  object to a pool).
 	- Removed unused csDLinkList class.
+	- Changed a backslash in an include statement in the new
+	  application framework header to a slash. Backslashes in include
+	  files are not allowed.
 15-Apr-2003
 	- Fixed a bug in the thing plugin.  If the dynavis culler was already
 	  mentioned before all other objects in the sector then this could
