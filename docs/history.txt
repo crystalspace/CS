@@ -16,6 +16,12 @@ chronological order.
 	  out the new renderer first.
 	- Jorrit updated the FAQ. Removed a few outdated entries, fixed a
 	  few wrong statements, and clarified a few entries.
+	- Jorrit updated the wrong link to the related projects page in
+	  the documentation.
+	- Jorrit updated the features list in the documentation.
+	- Jorrit updated the collision detection howto to talk more about
+	  OPCODE plugin and also changed this in some other parts of the
+	  documentation.
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.

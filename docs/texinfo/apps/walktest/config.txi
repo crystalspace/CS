@@ -30,7 +30,7 @@ information. When this is on, there will be more information kept in
 systems that can catch a crash (currently only Unix).
 
 @item Walktest.Settings.CollDet = <yes/no>
-Enable/disable the collision detection code which is based on the RAPID
+Enable/disable the collision detection code which is based on the OPCODE
 library. It is enabled by default (@samp{yes}) and can also be controlled
 with the @code{-colldet}/@code{-nocolldet} commandline options or the
 @samp{colldet} console command.

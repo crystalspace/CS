@@ -34,7 +34,7 @@ There are already a number of projects using Crystal Space. For more
 information, please visit the Related Projects page: 
 
 @noindent
-@uref{http://crystal.sourceforge.net/drupal/node.php?id=10}
+@uref{http://crystal.sourceforge.net/tikiwiki/tiki-index.php?page=Related+Projects}
 
 Crystal Space includes both a hardware (OpenGL) and software 3D
 renderer. For decent performance in the software renderer, a reasonably

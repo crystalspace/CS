@@ -29,7 +29,7 @@ csRef<iPluginManager> plugmgr =
 csRef<iConfigManager> config =
   CS_QUERY_REGISTRY (object_reg, iConfigManager);
 const char* p = config->GetStr ("MyGame.Settings.CollDetPlugin",
-  	"crystalspace.collisiondetection.rapid");
+  	"crystalspace.collisiondetection.opcode");
 csRef<iCollideSystem> cd_sys =
   CS_LOAD_PLUGIN (plugmgr, p, iCollideSystem);
 if (!cd_sys)
@@ -221,11 +221,11 @@ void Player::Move (csVector3 move)
 This example is limited in that it will run into an infinite loop if the
 player walks into a corner, but it serves as an example.
 
-@subsubheading Limitation of RAPID
+@subsubheading Limitation of RAPID and OPCODE
 
-The current @sc{rapid} collision detection implementation has one
-important limitation. It assumes that the transform from object to world
-space will not change the size of the object. i.e. you cannot scale the
+The current @sc{rapid} and @sc{opcode} collision detection implementations
+have one important limitation. They assume that the transform from object
+to world space will not change the size of the object. i.e. you cannot scale the
 object using the object to world transformation (which is kept in the
 @samp{iMovable}) and expect collision detection to be ok. The only way
 aroud this limitation is to use @code{HardTransform()} to transform
