@@ -20,6 +20,9 @@ he history order is reversed so that new features are at the top.
 	      by Macintosh (and any other PowerPC-based computers).
 	- Eric Sunshine fixed csThing::SetCacheName() so that it once again
 	  compiles successfully on NextStep.
+	- Eric Sunshine fixed csLightPatchPool::Free() so that it now compiles
+	  on NextStep.  Compiler was making apparently bogus complaint about
+	  invocation of Free() in the parent class' parent class.
 13-Jan-2002
 	- Matze changed cs-config --version to only output major number, the
 	  --longversion outputs all

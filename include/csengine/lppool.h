@@ -35,8 +35,9 @@ class csLightPatchPool : public csLightPatchPoolHelper {
 public:
   void Free (void* o)
   {
-    ((csLightPatch *)o)->RemovePatch ();
-    csObjectPool::Free (o);
+    csLightPatch* p = (csLightPatch*)o;
+    p->RemovePatch ();
+    csLightPatchPoolHelper::Free (p);
   }
 };
 
