@@ -52,7 +52,7 @@ class csOggSoundData : public iSoundData
   };
 
 
- private:
+ public:
   struct cs_ov_callbacks
   {
     cs_ov_callbacks ();
