@@ -25,6 +25,7 @@
 
 struct iEngine;
 struct iSystem;
+struct iReporter;
 
 /**
  * Sprite 2D factory loader.
@@ -33,6 +34,7 @@ class csSprite2DFactoryLoader : public iLoaderPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
 public:
   /// Constructor.
@@ -59,6 +61,7 @@ class csSprite2DFactorySaver : public iSaverPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
 public:
   /// Constructor.
@@ -85,6 +88,7 @@ class csSprite2DLoader : public iLoaderPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
 public:
   /// Constructor.
@@ -111,6 +115,7 @@ class csSprite2DSaver : public iSaverPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
 public:
   /// Constructor.

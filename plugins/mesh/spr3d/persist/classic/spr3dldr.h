@@ -26,6 +26,7 @@
 struct iEngine;
 struct iSystem;
 struct iSkeletonLimb;
+struct iReporter;
 
 /**
  * Sprite 3D factory loader.
@@ -34,9 +35,10 @@ class csSprite3DFactoryLoader : public iLoaderPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
   // Load a skeleton.
-  bool LoadSkeleton (iSkeletonLimb* limb, char* buf);
+  bool LoadSkeleton (iReporter* reporter, iSkeletonLimb* limb, char* buf);
 
 public:
   /// Constructor.
@@ -63,6 +65,7 @@ class csSprite3DFactorySaver : public iSaverPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
   // Save a skeleton.
   void SaveSkeleton (iSkeletonLimb* limb, iStrVector *str);
@@ -92,6 +95,7 @@ class csSprite3DLoader : public iLoaderPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
 public:
   /// Constructor.
@@ -118,6 +122,7 @@ class csSprite3DSaver : public iSaverPlugIn
 {
 private:
   iSystem* sys;
+  iReporter* reporter;
 
 public:
   /// Constructor.

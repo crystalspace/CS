@@ -68,6 +68,7 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
 #include "imesh/thing/thing.h"
+#include "ivaria/reporter.h"
 
 //---------------------------------------------------------------------------
 
@@ -125,7 +126,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (DITHER)
   CS_TOKEN_DEF (DYNAMIC)
   CS_TOKEN_DEF (FILE)
-  CS_TOKEN_DEF (FILTER)
   CS_TOKEN_DEF (FOG)
   CS_TOKEN_DEF (FOR_2D)
   CS_TOKEN_DEF (FOR_3D)
@@ -204,6 +204,27 @@ CS_TOKEN_DEF_END
 
 //---------------------------------------------------------------------------
 
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    printf ("Error ID: %s\n", id);
+    printf ("Description: %s\n", buf);
+    fflush (stdout);
+  }
+  va_end (arg);
+}
+
 iMaterialWrapper *csLoader::FindMaterial (const char *iName)
 {
   iMaterialWrapper *mat = Engine->FindMaterial (iName, ResolveOnlyRegion);
@@ -219,10 +240,11 @@ iMaterialWrapper *csLoader::FindMaterial (const char *iName)
     mat->QueryObject()->SetName (iName);
     material->DecRef ();
     return mat;
-  } /* endif */
+  }
 
-  System->Printf (CS_MSG_WARNING, "Couldn't find material named '%s'!\n", iName);
-  fatal_exit (0, true);
+  ReportError (reporter,
+    "crystalspace.maploader.find.material",
+    "Could not find material named '%s'!", iName);
   return NULL;
 }
 
@@ -320,6 +342,7 @@ csGenerateImageValue* csLoader::heightgen_value_process (char* buf)
 	  float hscale, hshift;
           csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
 	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
+	  if (!img) return NULL;
 	  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
   	  data->im = img;
   	  data->iw = img->GetWidth ();
@@ -341,6 +364,7 @@ csGenerateImageValue* csLoader::heightgen_value_process (char* buf)
 	  float hscale, hshift;
           csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
 	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
+	  if (!img) return NULL;
 	  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
   	  data->im = img;
   	  data->iw = img->GetWidth ();
@@ -366,7 +390,9 @@ csGenerateImageValue* csLoader::heightgen_value_process (char* buf)
   }
   if (!v)
   {
-    System->Printf (CS_MSG_WARNING, "Problem with value specification!\n");
+    ReportError (reporter,
+	  "crystalspace.maploader.parse.heightgen",
+          "Problem with value specification!");
   }
   return v;
 }
@@ -415,6 +441,7 @@ csGenerateImageTexture* csLoader::heightgen_txt_process (char* buf)
 		imagename, &scale.x, &scale.y,
 		&offset.x, &offset.y);
 	  iImage* img = LoadImage (imagename, CS_IMGFMT_TRUECOLOR);
+	  if (!img) return NULL;
 	  csGenerateImageTextureSingle* ts =
 	  	new csGenerateImageTextureSingle ();
 	  ts->SetImage (img);
@@ -437,8 +464,9 @@ csGenerateImageTexture* csLoader::heightgen_txt_process (char* buf)
 	        tb->valuefunc = heightgen_value_process (params2);
 		if (!tb->valuefunc)
 		{
-		  System->Printf (CS_MSG_WARNING,
-		  	"Problem with returned value!\n");
+		  ReportError (reporter,
+		    "crystalspace.maploader.parse.heightgen",
+		    "Problem with returned value!");
 		  return NULL;
 		}
 	        break;
@@ -457,8 +485,9 @@ csGenerateImageTexture* csLoader::heightgen_txt_process (char* buf)
 	        	txt = heightgen_txt_process (params3);
 			if (!tb->valuefunc)
 			{
-			  System->Printf (CS_MSG_WARNING,
-			    "Problem with returned texture!\n");
+			  ReportError (reporter,
+			    "crystalspace.maploader.parse.heightgen",
+			    "Problem with returned texture!");
 			  return NULL;
 			}
 	        	break;
@@ -479,16 +508,16 @@ csGenerateImageTexture* csLoader::heightgen_txt_process (char* buf)
   }
   if (!t)
   {
-    System->Printf (CS_MSG_WARNING, "Problem with texture specification!\n");
+    ReportError (reporter,
+	    "crystalspace.maploader.parse.heightgen",
+	    "Problem with texture specification!");
   }
   return t;
 }
 
-void csLoader::heightgen_process (char* buf)
+bool csLoader::heightgen_process (char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
-    //CS_TOKEN_TABLE (HEIGHTMAP)
-    //CS_TOKEN_TABLE (LAYER)
     CS_TOKEN_TABLE (GENERATE)
     CS_TOKEN_TABLE (TEXTURE)
     CS_TOKEN_TABLE (SIZE)
@@ -532,8 +561,12 @@ void csLoader::heightgen_process (char* buf)
 	  iTextureHandle *TexHandle = G3D->GetTextureManager ()
 	  	->RegisterTexture (img, CS_TEXTURE_3D);
 	  if (!TexHandle)
-	    System->Printf (CS_MSG_WARNING,
-	    	"cannot create texture!");
+	  {
+	    ReportError (reporter,
+	      "crystalspace.maploader.parse.heightgen",
+	      "Cannot create texture!");
+	    return false;
+	  }
 	  iTextureWrapper *TexWrapper = Engine->GetTextureList ()
 	  	->NewTexture (TexHandle);
 	  TexWrapper->QueryObject ()->SetName (name);
@@ -553,8 +586,9 @@ void csLoader::heightgen_process (char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("a heightgen specification");
-    fatal_exit (0, false);
+    return false;
   }
+  return true;
 }
 
 UInt csLoader::ParseMixmode (char* buf)
@@ -579,8 +613,11 @@ UInt csLoader::ParseMixmode (char* buf)
   {
     if (!params)
     {
-      printf ("Expected parameters instead of '%s'!\n", buf);
-      return 0;
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing mixmode!",
+	  buf);
+      return ~0;
     }
     switch (cmd)
     {
@@ -601,14 +638,14 @@ UInt csLoader::ParseMixmode (char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("the modes");
-    return 0;
+    return ~0;
   }
   return Mixmode;
 }
 
 //---------------------------------------------------------------------------
 
-void csLoader::ResolvePortalSectors (iThingState *th)
+bool csLoader::ResolvePortalSectors (iThingState *th)
 {
   for (int i=0;  i < th->GetPolygonCount ();  i++)
   {
@@ -625,11 +662,13 @@ void csLoader::ResolvePortalSectors (iThingState *th)
         ResolveOnlyRegion);
       if (!snew)
       {
-        System->Printf (CS_MSG_WARNING, "Sector '%s' not found for portal in"
-          " polygon '%s/%s'!\n", stmp->QueryObject ()->GetName (),
+	ReportError (reporter,
+	  "crystalspace.maploader.load.portals",
+	  "Sector '%s' not found for portal in polygon '%s/%s'!",
+          stmp->QueryObject ()->GetName (),
           p->QueryObject ()->GetObjectParent ()->GetName (),
           p->QueryObject ()->GetName ());
-        fatal_exit (0, false);
+        return false;
       }
       portal->SetSector (snew);
       // This DecRef() is safe since we know this is supposed to be a dummy
@@ -638,6 +677,7 @@ void csLoader::ResolvePortalSectors (iThingState *th)
       stmp->DecRef();
     }
   }
+  return true;
 }
 
 bool csLoader::LoadMap (char* buf)
@@ -671,8 +711,10 @@ bool csLoader::LoadMap (char* buf)
   {
     if (!data)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing world!", buf);
+      return false;
     }
     long cmd;
     char* params;
@@ -683,25 +725,35 @@ bool csLoader::LoadMap (char* buf)
     {
       if (!params)
       {
-        System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n",
-		data);
-        fatal_exit (0, false);
+        ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing world!", data);
+        return false;
       }
       switch (cmd)
       {
         case CS_TOKEN_RENDERPRIORITIES:
 	  Engine->ClearRenderPriorities ();
-	  LoadRenderPriorities (params);
+	  if (!LoadRenderPriorities (params))
+	    return false;
 	  break;
         case CS_TOKEN_ADDON:
-	  LoadAddOn (params, (iEngine*)Engine);
+	  if (!LoadAddOn (params, (iEngine*)Engine))
+	    return false;
       	  break;
         case CS_TOKEN_MESHFACT:
           {
             iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
             if (!t)
 	      t = Engine->CreateMeshFactory(name);
-            LoadMeshObjectFactory (t, params);
+            if (!LoadMeshObjectFactory (t, params))
+	    {
+	      ReportError (reporter,
+	      	"crystalspace.maploader.load.meshfactory",
+		"Could not load mesh object factory '%s'!",
+		name);
+	      return false;
+	    }
           }
 	  break;
         case CS_TOKEN_TERRAINFACTORY:
@@ -710,7 +762,8 @@ bool csLoader::LoadMap (char* buf)
 		Engine->FindTerrainFactory (name);
             if (!terr)
 	      terr = Engine->CreateTerrainFactory(name);
-            LoadTerrainObjectFactory (terr, params);
+            if (!LoadTerrainObjectFactory (terr, params))
+	      return false;
           }
 	  break; 
         case CS_TOKEN_REGION:
@@ -725,10 +778,14 @@ bool csLoader::LoadMap (char* buf)
 	  break;
         case CS_TOKEN_SECTOR:
           if (!Engine->FindSector (name, ResolveOnlyRegion))
-            ParseSector (name, params);
+	  {
+            if (!ParseSector (name, params))
+	      return false;
+	  }
           break;
         case CS_TOKEN_COLLECTION:
-          ParseCollection (name, params);
+          if (!ParseCollection (name, params))
+	    return false;
           break;
 	case CS_TOKEN_MAT_SET:
           if (!LoadMaterials (params, name))
@@ -751,7 +808,8 @@ bool csLoader::LoadMap (char* buf)
             return false;
           break;
         case CS_TOKEN_LIBRARY:
-          LoadLibraryFile (name);
+          if (!LoadLibraryFile (name))
+	    return false;
           break;
         case CS_TOKEN_START:
         {
@@ -763,14 +821,15 @@ bool csLoader::LoadMap (char* buf)
           break;
         }
         case CS_TOKEN_KEY:
-          ParseKey (params, Engine->QueryObject());
+          if (!ParseKey (params, Engine->QueryObject()))
+	    return false;
           break;
       }
     }
     if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
       TokenError ("a map");
-      fatal_exit (0, false);
+      return false;
     }
   }
  
@@ -798,8 +857,9 @@ bool csLoader::LoadMap (char* buf)
 		Mesh->GetMeshObject(), iThingState);
         if (Thing)
         {
-          ResolvePortalSectors (Thing);
+          bool rc = ResolvePortalSectors (Thing);
 	  Thing->DecRef ();
+	  if (!rc) return false;
         }
       }
     }
@@ -820,7 +880,9 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   if (!buf || !buf->GetSize ())
   {
     if (buf) buf->DecRef ();
-    System->Printf (CS_MSG_WARNING, "Could not open map file \"%s\" on VFS!\n", file);
+    ReportError (reporter,
+	      "crystalspace.maploader.parse.map",
+    	      "Could not open map file '%s' on VFS!\n", file);
     return false;
   }
 
@@ -869,8 +931,10 @@ bool csLoader::LoadPlugins (char* buf)
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing plugin!", buf);
+      return false;
     }
     switch (cmd)
     {
@@ -883,7 +947,7 @@ bool csLoader::LoadPlugins (char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("plugin descriptors");
-    fatal_exit (0, false);
+    return false;
   }
 
   return true;
@@ -907,27 +971,31 @@ bool csLoader::LoadTextures (char* buf)
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING,
-      	"Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing textures!", buf);
+      return false;
     }
     switch (cmd)
     {
       case CS_TOKEN_TEXTURE:
-        ParseTexture (name, params);
+        if (!ParseTexture (name, params))
+	  return false;
         break;
       case CS_TOKEN_HEIGHTGEN:
-        heightgen_process (params);
+        if (!heightgen_process (params))
+	  return false;
         break;
       case CS_TOKEN_PROCTEX:
-        ParseProcTex (name, params);
+        if (!ParseProcTex (name, params))
+	  return false;
 	break;
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("textures");
-    fatal_exit (0, false);
+    return false;
   }
 
   return true;
@@ -947,20 +1015,23 @@ bool csLoader::LoadMaterials (char* buf, const char* prefix)
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing materials!", buf);
+      return false;
     }
     switch (cmd)
     {
       case CS_TOKEN_MATERIAL:
-        ParseMaterial (name, params, prefix);
+        if (!ParseMaterial (name, params, prefix))
+	  return false;
         break;
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("materials");
-    fatal_exit (0, false);
+    return false;
   }
 
   return true;
@@ -998,14 +1069,17 @@ bool csLoader::LoadLibrary (char* buf)
     {
       if (!params)
       {
-        System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", data);
+        ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing library!", data);
         return false;
       }
 
       switch (cmd)
       {
         case CS_TOKEN_ADDON:
-	  LoadAddOn (params, (iEngine*)Engine);
+	  if (!LoadAddOn (params, (iEngine*)Engine))
+	    return false;
       	  break;
         case CS_TOKEN_TEXTURES:
           // Append textures to engine.
@@ -1025,7 +1099,14 @@ bool csLoader::LoadLibrary (char* buf)
             iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
             if (!t)
 	      t = Engine->CreateMeshFactory(name);
-            LoadMeshObjectFactory (t, params);
+            if (!LoadMeshObjectFactory (t, params))
+	    {
+	      ReportError (reporter,
+	      	"crystalspace.maploader.load.library.meshfactory",
+		"Could not load mesh object factory '%s' in library!",
+		name);
+	      return false;
+	    }
           }
           break;
       }
@@ -1046,7 +1127,9 @@ bool csLoader::LoadLibraryFile (const char* fname)
   if (!buf || !buf->GetSize ())
   {
     if (buf) buf->DecRef ();
-    System->Printf (CS_MSG_WARNING, "Could not open library file \"%s\" on VFS!\n", fname);
+    ReportError (reporter,
+	      "crystalspace.maploader.parse.library",
+    	      "Could not open library file '%s' on VFS!\n", fname);
     return false;
   }
 
@@ -1079,8 +1162,10 @@ bool csLoader::LoadSounds (char* buf)
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing sounds!", buf);
+      return false;
     }
     switch (cmd)
     {
@@ -1093,13 +1178,16 @@ bool csLoader::LoadSounds (char* buf)
           filename = maybename;
         else if (cmd == CS_PARSERR_TOKENNOTFOUND)
         {
-          System->Printf (CS_MSG_WARNING, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
-          fatal_exit (0, false);
+          ReportError (reporter,
+	    "crystalspace.maploader.parse.badtoken",
+            "Unknown token '%s' found while parsing SOUND directive!",
+	    csGetLastOffender());
+	  return false;
         }
         iSoundWrapper *snd =
 	  GET_NAMED_CHILD_OBJECT (Engine->QueryObject (), iSoundWrapper, name);
         if (!snd)
-          LoadSound(name, filename);
+          LoadSound (name, filename);
       }
       break;
     }
@@ -1107,7 +1195,7 @@ bool csLoader::LoadSounds (char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("the list of sounds");
-    fatal_exit (0, false);
+    return false;
   }
 
   return true;
@@ -1210,8 +1298,9 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
   if (!databuff || !databuff->GetSize ())
   {
     if (databuff) databuff->DecRef ();
-    System->Printf (CS_MSG_WARNING,
-    	"Could not open mesh object file \"%s\" on VFS!\n", fname);
+    ReportError (reporter,
+	      "crystalspace.maploader.parse.meshfactory",
+    	      "Could not open mesh object file '%s' on VFS!\n", fname);
     return NULL;
   }
 
@@ -1226,8 +1315,11 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
   {
     if (!data)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing mesh factory!",
+	  buf);
+      return NULL;
     }
 
     iMeshFactoryWrapper* t = Engine->CreateMeshFactory(name);
@@ -1238,6 +1330,10 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
     }
     else
     {
+      ReportError (reporter,
+	      	"crystalspace.maploader.load.meshfactory",
+		"Could not load mesh object factory '%s' from file '%s'!",
+		name, fname);
       Engine->DeleteMeshFactory(name);
       databuff->DecRef ();
       return NULL;
@@ -1268,29 +1364,35 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing mesh factory!",
+	  buf);
+      return false;
     }
     switch (cmd)
     {
       case CS_TOKEN_ADDON:
-	LoadAddOn (params, stemp);
+	if (!LoadAddOn (params, stemp))
+	  return false;
       	break;
       case CS_TOKEN_PARAMS:
 	if (!plug)
 	{
-          System->Printf (CS_MSG_WARNING, "Could not load plugin '%s'!\n", str);
-          fatal_exit (0, false);
+          ReportError (reporter,
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin!");
+	  return false;
 	}
 	else
 	{
 	  iBase* mof = plug->Parse (params, Engine, stemp);
 	  if (!mof)
 	  {
-	    System->Printf (CS_MSG_WARNING,
-	    	"Plugin '%s' did not return a factory (mesh fact '%s')!\n",
-		str, stemp->QueryObject ()->GetName ());
-	    fatal_exit (0, false);
+            ReportError (reporter,
+	      "crystalspace.maploader.parse.plugin",
+              "Could not parse plugin!");
+	    return false;
 	  }
 	  else
 	  {
@@ -1313,8 +1415,10 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
 	  }
           else
           {
-            System->Printf (CS_MSG_WARNING, "Material `%s' not found!\n", str);
-            fatal_exit (0, true);
+            ReportError (reporter,
+	      "crystalspace.maploader.parse.unknownmaterial",
+              "Material '%s' not found!", str);
+	    return false;
           }
         }
         break;
@@ -1325,9 +1429,11 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
 	  converter* filedata = new converter;
 	  if (filedata->ivcon (str, true, false, NULL, VFS) == ERROR)
 	  {
-	    System->Printf (CS_MSG_WARNING, "Error loading file model '%s'!\n", str);
+            ReportError (reporter,
+	      "crystalspace.maploader.parse.loadingmodel",
+	      "Error loading file model '%s'!", str);
 	    delete filedata;
-	    fatal_exit (0, false);
+	    return false;
 	  }
   	  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System,
 	  	"crystalspace.mesh.object.sprite.3d", "MeshObj",
@@ -1358,7 +1464,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("a mesh factory");
-    fatal_exit (0, false);
+    return false;
   }
 
   return true;
@@ -1407,8 +1513,11 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing mesh object!",
+	  buf);
+      return false;
     }
     switch (cmd)
     {
@@ -1416,7 +1525,8 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	csScanStr (params, "%s", priority);
 	break;
       case CS_TOKEN_ADDON:
-	LoadAddOn (params, mesh);
+	if (!LoadAddOn (params, mesh))
+	  return false;
       	break;
       case CS_TOKEN_NOLIGHTING:
         mesh->GetFlags().Set (CS_ENTITY_NOLIGHTING);
@@ -1457,12 +1567,20 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
         mesh->GetFlags().Set (CS_ENTITY_CONVEX);
         break;
       case CS_TOKEN_KEY:
-        ParseKey (params, mesh->QueryObject());
+        if (!ParseKey (params, mesh->QueryObject()))
+	  return false;
         break;
       case CS_TOKEN_MESHOBJ:
         {
 	  iMeshWrapper* sp = Engine->CreateMeshObject (name);
-          LoadMeshObject (sp, params);
+          if (!LoadMeshObject (sp, params))
+	  {
+	    ReportError (reporter,
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not load mesh object '%s'!",
+		name);
+	    return false;
+	  }
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->AddChild (sp);
         }
@@ -1475,16 +1593,19 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
           {
             if (!params2)
             {
-              System->Printf (CS_MSG_WARNING,
-	      	"Expected parameters instead of '%s'!\n", params);
-              fatal_exit (0, false);
+	      ReportError (reporter,
+		"crystalspace.maploader.parse.badformat",
+		"Expected parameters instead of '%s' while parsing hardmove!",
+		params);
+	      return false;
             }
             switch (cmd)
             {
               case CS_TOKEN_MATRIX:
               {
 		csMatrix3 m;
-                ParseMatrix (params2, m);
+                if (!ParseMatrix (params2, m))
+		  return false;
                 tr.SetT2O (m);
                 break;
               }
@@ -1509,16 +1630,19 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
           {
             if (!params2)
             {
-              System->Printf (CS_MSG_WARNING,
-	      	"Expected parameters instead of '%s'!\n", params);
-              fatal_exit (0, false);
+	      ReportError (reporter,
+		"crystalspace.maploader.parse.badformat",
+		"Expected parameters instead of '%s' while parsing move!",
+		params);
+	      return false;
             }
             switch (cmd)
             {
               case CS_TOKEN_MATRIX:
               {
                 csMatrix3 m;
-                ParseMatrix (params2, m);
+                if (!ParseMatrix (params2, m))
+		  return false;
                 mesh->GetMovable ()->SetTransform (m);
                 break;
               }
@@ -1538,8 +1662,10 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
       case CS_TOKEN_PARAMS:
 	if (!plug)
 	{
-          System->Printf (CS_MSG_WARNING, "Could not load plugin '%s'!\n", str);
-          fatal_exit (0, false);
+          ReportError (reporter,
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin!");
+	  return false;
 	}
 	else
 	{
@@ -1553,7 +1679,10 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
           }
           else
           {
-            System->Printf (CS_MSG_WARNING, "Error parsing PARAM() in plugin '%s'!\n", str);
+            ReportError (reporter,
+	      "crystalspace.maploader.parse.plugin",
+              "Error parsing PARAM() in plugin '%s'!", str);
+	    return false;
           }
 	}
         break;
@@ -1569,7 +1698,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("a mesh object");
-    fatal_exit (0, false);
+    return false;
   }
 
   if (!priority[0]) strcpy (priority, "object");
@@ -1600,20 +1729,25 @@ bool csLoader::LoadTerrainObjectFactory (iTerrainFactoryWrapper* pWrapper,
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n",
-      	pBuf);
-      fatal_exit( 0, false );
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing terrain factory!",
+	  pBuf);
+      return false;
     }
     switch (cmd)
     {
       case CS_TOKEN_ADDON:
-	LoadAddOn (params, pWrapper);
+	if (!LoadAddOn (params, pWrapper))
+	  return false;
       	break;
       case CS_TOKEN_PARAMS:
 	if (!iPlugIn)
 	{
-          System->Printf( CS_MSG_WARNING, "Could not load plugin '%s'!\n", pStr );
-          fatal_exit (0, false);
+          ReportError (reporter,
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin '%s'!", pStr);
+	  return false;
 	}
 	else
 	{
@@ -1624,9 +1758,8 @@ bool csLoader::LoadTerrainObjectFactory (iTerrainFactoryWrapper* pWrapper,
           // If we couldn't get the factory leave.
 	  if (!pBaseFactory)
 	  {
-	    System->Printf (CS_MSG_WARNING,
-	    	"Plugin '%s' did not return a factory!\n", pStr);
-	    fatal_exit (0, false);
+	    // @@@ Use reporter
+	    return false;
 	  }
 	  else
 	  {
@@ -1650,7 +1783,7 @@ bool csLoader::LoadTerrainObjectFactory (iTerrainFactoryWrapper* pWrapper,
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("a terrain factory");
-    fatal_exit (0, false);
+    return false;
   }
 
   return true;
@@ -1679,23 +1812,29 @@ bool csLoader::LoadTerrainObject (iTerrainWrapper *pWrapper,
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n",
-      	pBuf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing terrain object!",
+	  pBuf);
+      return false;
     }
     switch (cmd)
     {
       case CS_TOKEN_KEY:
-        ParseKey (params, pWrapper->QueryObject());
+        if (!ParseKey (params, pWrapper->QueryObject()))
+	  return false;
         break;
       case CS_TOKEN_ADDON:
-	LoadAddOn (params, pWrapper);
+	if (!LoadAddOn (params, pWrapper))
+	  return false;
       	break;
       case CS_TOKEN_PARAMS:
         if (!iPlugIn)
         {
-          System->Printf( CS_MSG_WARNING, "Could not load plugin '%s'!\n", pStr );
-          fatal_exit (0, false);
+          ReportError (reporter,
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin '%s'!", pStr);
+	  return false;
         }
         else
         {
@@ -1706,9 +1845,8 @@ bool csLoader::LoadTerrainObject (iTerrainWrapper *pWrapper,
           // if we couldn't get the factory leave
 	  if (!iBaseObject)
 	  {
-	    System->Printf (CS_MSG_WARNING,
-	    	"Plugin '%s' did not return a factory!\n", pStr);
-	    fatal_exit (0, false);
+	    // @@@ Use reporter
+	    return false;
 	  }
 	  else
 	  {
@@ -1733,7 +1871,7 @@ bool csLoader::LoadTerrainObject (iTerrainWrapper *pWrapper,
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("a terrain object");
-    fatal_exit (0, false);
+    return false;
   }
 
   // add new terrain to sector
@@ -1763,16 +1901,21 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing add-on!",
+	  buf);
+      return false;
     }
     switch (cmd)
     {
       case CS_TOKEN_PARAMS:
 	if (!plug)
 	{
-          System->Printf (CS_MSG_WARNING, "Could not load plugin '%s'!\n", str);
-          fatal_exit (0, false);
+          ReportError (reporter,
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin!");
+	  return false;
 	}
 	else
 	{
@@ -1791,7 +1934,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("an add-on");
-    fatal_exit (0, false);
+    return false;
   }
 
   return true;
@@ -1813,8 +1956,11 @@ bool csLoader::LoadRenderPriorities (char* buf)
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing priority!",
+	  buf);
+      return false;
     }
     switch (cmd)
     {
@@ -1834,10 +1980,11 @@ bool csLoader::LoadRenderPriorities (char* buf)
 	}
 	else
 	{
-	  System->Printf (CS_MSG_WARNING,
-	  	"Unknown sorting attribute '%s' for the render priority!\n\
-Use BACK2FRONT, FRONT2BACK, or NONE\n", sorting);
-	  fatal_exit (0, false);
+          ReportError (reporter,
+	    "crystalspace.maploader.parse.priorities",
+	    "Unknown sorting attribute '%s' for the render priority!",
+	    sorting);
+	  return false;
 	}
 	Engine->RegisterRenderPriority (name, pri);
         break;
@@ -1847,7 +1994,7 @@ Use BACK2FRONT, FRONT2BACK, or NONE\n", sorting);
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("the render priorities");
-    fatal_exit (0, false);
+    return false;
   }
 
   return true;
@@ -1862,8 +2009,9 @@ iMeshWrapper * csLoader::LoadMeshObject (const char* fname)
   if (!databuff || !databuff->GetSize ())
   {
     if (databuff) databuff->DecRef ();
-    System->Printf (CS_MSG_WARNING,
-    	"Could not open mesh object file file \"%s\" on VFS!\n", fname);
+    ReportError (reporter,
+	      "crystalspace.maploader.parse.meshobject",
+    	      "Could not open mesh object file '%s' on VFS!\n", fname);
     return NULL;
   }
 
@@ -1878,13 +2026,23 @@ iMeshWrapper * csLoader::LoadMeshObject (const char* fname)
   {
     if (!data)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing mesh object!",
+	  buf);
+      return NULL;
     }
-
     
     iMeshWrapper* mesh = Engine->CreateMeshObject (name);
-    LoadMeshObject (mesh, buf);
+    if (!LoadMeshObject (mesh, buf))
+    {
+      mesh->DecRef ();
+      ReportError (reporter,
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not load mesh object '%s' from file '%s'!",
+		name, fname);
+      return NULL;
+    }
     return mesh;
   }
   databuff->DecRef ();
@@ -1953,6 +2111,8 @@ bool csLoader::Initialize(iSystem *iSys)
   System->Printf(CS_MSG_INITIALIZATION, "Initializing loader plug-in...\n");
   loaded_plugins.System = System;
 
+  reporter = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_REPORTER, iReporter);
+
   // get the virtual file system plugin
   GET_PLUGIN(VFS, CS_FUNCID_VFS, iVFS, "VFS", true);
   if (!VFS) return false;
@@ -1974,7 +2134,9 @@ void csLoader::SetMode (int iFlags)
 
 void csLoader::TokenError (const char *Object)
 {
-  System->Printf (CS_MSG_WARNING, "Token '%s' not found while parsing a %s!",
+  ReportError (reporter,
+    "crystalspace.maploader.parse.badtoken",
+    "Token '%s' not found while parsing a %s!",
     csGetLastOffender (), Object);
 }
 
@@ -2000,7 +2162,9 @@ iImage* csLoader::LoadImage (const char* name, int Format)
   if (!buf || !buf->GetSize ())
   {
     if (buf) buf->DecRef ();
-    System->Printf (CS_MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", name);
+    ReportError (reporter,
+	      "crystalspace.maploader.parse.image",
+    	      "Could not open image file '%s' on VFS!\n", name);
     return NULL;
   }
 
@@ -2009,7 +2173,10 @@ iImage* csLoader::LoadImage (const char* name, int Format)
 
   if (!ifile)
   {
-    System->Printf (CS_MSG_WARNING, "'%s': Cannot load image. Unknown format or wrong extension!\n",name);
+    ReportError (reporter,
+	      "crystalspace.maploader.parse.image",
+    	      "Could not load image '%s'. Unknown format or wrong extension!",
+	      name);
     return NULL;
   }
 
@@ -2036,7 +2203,11 @@ iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags,
 
   iTextureHandle *TexHandle = tm->RegisterTexture (Image, Flags);
   if (!TexHandle)
-    System->Printf(CS_MSG_WARNING, "cannot create texture from '%s'.", fname);
+  {
+    ReportError (reporter,
+	      "crystalspace.maploader.parse.texture",
+	      "Cannot create texture from '%s'!", fname);
+  }
 
   return TexHandle;
 }
@@ -2075,8 +2246,9 @@ iSoundData *csLoader::LoadSoundData(const char* filename) {
   iDataBuffer *buf = VFS->ReadFile (filename);
   if (!buf || !buf->GetSize ()) {
     if (buf) buf->DecRef ();
-    System->Printf (CS_MSG_WARNING,
-      "Cannot open sound file \"%s\" from VFS\n", filename);
+    ReportError (reporter,
+	      "crystalspace.maploader.parse.sound",
+	      "Cannot open sound file '%s' from VFS!", filename);
     return NULL;
   }
 
@@ -2085,8 +2257,12 @@ iSoundData *csLoader::LoadSoundData(const char* filename) {
   buf->DecRef ();
 
   // check for valid sound data
-  if (!Sound) System->Printf (CS_MSG_WARNING,
-    "Cannot create sound data from file \"%s\"!\n", filename);
+  if (!Sound)
+  {
+    ReportError (reporter,
+	      "crystalspace.maploader.parse.sound",
+	      "Cannot create sound data from file '%s'!\n", filename);
+  }
   else
     Stats->sounds_loaded++;
 
@@ -2103,7 +2279,11 @@ iSoundHandle *csLoader::LoadSound(const char* filename) {
   /* register the sound */
   iSoundHandle *hdl = SoundRender->RegisterSound(Sound);
   if (!hdl)
-    System->Printf (CS_MSG_WARNING, "Cannot register sound \"%s\"!\n", filename);
+  {
+    ReportError (reporter,
+	      "crystalspace.maploader.parse.sound",
+	      "Cannot register sound '%s'!", filename);
+  }
 
   return hdl;
 }
@@ -2173,7 +2353,12 @@ bool csLoader::ParseMatrix (char* buf, csMatrix3 &m)
           m *= csYRotMatrix3 (list[1]);
         }
         else
-	  System->Printf (CS_MSG_WARNING, "Badly formed rotation: '%s'\n", params);
+	{
+	  ReportError (reporter,
+	      "crystalspace.maploader.parse.matrix",
+	      "Badly formed rotation: '%s'!", params);
+	  return false;
+	}
         break;
       case CS_TOKEN_SCALE_X:
         csScanStr (params, "%f", &scaler);
@@ -2194,7 +2379,12 @@ bool csLoader::ParseMatrix (char* buf, csMatrix3 &m)
         else if (num == 3) // Three scalers; applied to X, Y, Z individually.
 	  m *= csMatrix3 (list[0],0,0,0,list[1],0,0,0,list[2]);
         else
-	  System->Printf (CS_MSG_WARNING, "Badly formed scale: '%s'\n", params);
+	{
+	  ReportError (reporter,
+	      "crystalspace.maploader.parse.matrix",
+	      "Badly formed scale: '%s'!", params);
+	  return false;
+	}
         break;
     }
   }
@@ -2211,7 +2401,12 @@ bool csLoader::ParseMatrix (char* buf, csMatrix3 &m)
         list[3], list[4], list[5],
         list[6], list[7], list[8]);
     else
-      System->Printf (CS_MSG_WARNING, "Badly formed matrix '%s'\n", buf);
+    {
+      ReportError (reporter,
+	      "crystalspace.maploader.parse.matrix",
+	      "Badly formed matrix: '%s'!", buf);
+      return false;
+    }
   }
   return true;
 }
@@ -2257,8 +2452,10 @@ iTextureWrapper* csLoader::ParseProcTex (char *name, char* buf)
       case CS_TOKEN_TYPE:
         if (pt)
 	{
-	  System->Printf (CS_MSG_WARNING,
-	  	"TYPE of proctex already specified!");
+	  ReportError (reporter,
+	      "crystalspace.maploader.parse.proctex",
+	      "TYPE of proctex already specified!");
+	  return NULL;
 	}
 	else
 	{
@@ -2272,8 +2469,9 @@ iTextureWrapper* csLoader::ParseProcTex (char *name, char* buf)
 	    pt = new csProcFire ();
 	  else
 	  {
-	    System->Printf (CS_MSG_FATAL_ERROR,
-	  	"Unknown TYPE '%s' of proctex!\n", params);
+	    ReportError (reporter,
+	      "crystalspace.maploader.parse.proctex",
+	      "Unknown TYPE '%s' of proctex!", params);
 	    return NULL;
 	  }
 	}
@@ -2289,8 +2487,9 @@ iTextureWrapper* csLoader::ParseProcTex (char *name, char* buf)
 
   if (pt == NULL)
   {
-    System->Printf (CS_MSG_FATAL_ERROR,
-	  	"TYPE of proctex not given!\n");
+    ReportError (reporter,
+	      "crystalspace.maploader.parse.proctex",
+	      "TYPE of proctex not given!");
     return NULL;
   }
 
@@ -2302,7 +2501,6 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (TRANSPARENT)
-    CS_TOKEN_TABLE (FILTER)
     CS_TOKEN_TABLE (FILE)
     CS_TOKEN_TABLE (MIPMAP)
     CS_TOKEN_TABLE (DITHER)
@@ -2329,8 +2527,12 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
         else if (strcasecmp (params, "no") == 0)
           flags &= ~CS_TEXTURE_2D;
         else
-          System->Printf (CS_MSG_WARNING,
-	  	"Warning! Invalid FOR_2D() value, 'yes' or 'no' expected\n");
+	{
+	  ReportError (reporter,
+	      "crystalspace.maploader.parse.texture",
+	      "Invalid FOR_2D() value, 'yes' or 'no' expected!");
+	  return NULL;
+	}
         break;
       case CS_TOKEN_FOR_3D:
         if (strcasecmp (params, "yes") == 0)
@@ -2338,8 +2540,12 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
         else if (strcasecmp (params, "no") == 0)
           flags &= ~CS_TEXTURE_3D;
         else
-          System->Printf (CS_MSG_WARNING,
-	  	"Warning! Invalid FOR_3D() value, 'yes' or 'no' expected\n");
+	{
+	  ReportError (reporter,
+	      "crystalspace.maploader.parse.texture",
+	      "Invalid FOR_3D() value, 'yes' or 'no' expected!");
+	  return NULL;
+	}
         break;
       case CS_TOKEN_PERSISTENT:
         flags |= CS_TEXTURE_PROC_PERSISTENT;
@@ -2349,12 +2555,8 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
         break;
       case CS_TOKEN_TRANSPARENT:
         do_transp = true;
-        csScanStr (params, "%f,%f,%f", &transp.red, &transp.green, &transp.blue);
-        break;
-      case CS_TOKEN_FILTER:
-        System->Printf (CS_MSG_WARNING,
-		"Warning! TEXTURE/FILTER statement is obsolete"
-                " and does not do anything!\n");
+        csScanStr (params, "%f,%f,%f", &transp.red, &transp.green,
+		&transp.blue);
         break;
       case CS_TOKEN_FILE:
         filename = params;
@@ -2365,8 +2567,12 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
         else if (strcasecmp (params, "no") == 0)
           flags |= CS_TEXTURE_NOMIPMAPS;
         else
-          System->Printf (CS_MSG_WARNING,
-	  	"Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
+	{
+	  ReportError (reporter,
+	      "crystalspace.maploader.parse.texture",
+	      "Invalid MIPMAP() value, 'yes' or 'no' expected!");
+	  return NULL;
+	}
         break;
       case CS_TOKEN_DITHER:
         if (strcasecmp (params, "yes") == 0)
@@ -2374,8 +2580,12 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
         else if (strcasecmp (params, "no") == 0)
           flags &= ~CS_TEXTURE_DITHER;
         else
-          System->Printf (CS_MSG_WARNING,
-	  	"Warning! Invalid DITHER() value, 'yes' or 'no' expected\n");
+	{
+	  ReportError (reporter,
+	      "crystalspace.maploader.parse.texture",
+	      "Invalid DITHER() value, 'yes' or 'no' expected!");
+	  return NULL;
+	}
         break;
     }
   }
@@ -2440,15 +2650,17 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
         texh = Engine->FindTexture (str, ResolveOnlyRegion);
         if (!texh)
         {
-          System->Printf (CS_MSG_WARNING,
-	  	"Cannot find texture `%s' for material `%s'\n", str, name);
+	  ReportError (reporter,
+	      "crystalspace.maploader.parse.material",
+	      "Cannot find texture '%s' for material `%s'\n", str, name);
 	  return NULL;
         }
         break;
       }
       case CS_TOKEN_COLOR:
         col_set = true;
-        ParseColor (params, col);
+        if (!ParseColor (params, col))
+	  return false;
         break;
       case CS_TOKEN_DIFFUSE:
         csScanStr (params, "%f", &diffuse);
@@ -2463,8 +2675,9 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 	{
 	  if (num_txt_layer >= 4)
 	  {
-            System->Printf (CS_MSG_WARNING,
-	  	"Only four texture layers supported!\n");
+	    ReportError (reporter,
+	      "crystalspace.maploader.parse.material",
+	      "Only four texture layers supported!\n");
 	    return NULL;
 	  }
 	  txt_layers[num_txt_layer] = NULL;
@@ -2489,8 +2702,9 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
                     txt_layers[num_txt_layer] = texh;
                   else
                   {
-                    System->Printf (CS_MSG_WARNING,
-		    	"Cannot find texture `%s' for material `%s'\n",
+		    ReportError (reporter,
+			"crystalspace.maploader.parse.material",
+		    	"Cannot find texture `%s' for material `%s'!",
 			str, name);
 		    return NULL;
                   }
@@ -2508,6 +2722,8 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 	        break;
 	      case CS_TOKEN_MIXMODE:
 	        layers[num_txt_layer].mode = ParseMixmode (params2);
+		if (layers[num_txt_layer].mode == (UInt)~0)
+		  return NULL;
 	        break;
 	    }
 	  }
@@ -2567,14 +2783,20 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing collection!",
+	  buf);
       return NULL;
     }
     str[0] = 0;
     switch (cmd)
     {
       case CS_TOKEN_ADDON:
-        System->Printf (CS_MSG_WARNING, "ADDON not yet supported in collection!\n");
+	ReportError (reporter,
+		"crystalspace.maploader.parse.collection",
+         	"ADDON not yet supported in collection!");
+	return NULL;
       	break;
       case CS_TOKEN_MESHOBJ:
         {
@@ -2594,7 +2816,12 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
           csScanStr (params, "%s", str);
 	  iStatLight* l = Engine->FindLight (str, ResolveOnlyRegion);
           if (!l)
-            System->Printf (CS_MSG_WARNING, "Light '%s' not found!\n", str);
+	  {
+	    ReportError (reporter,
+		"crystalspace.maploader.parse.collection",
+            	"Light '%s' not found!", str);
+	    return NULL;
+	  }
 	  else
 	    collection->AddObject (l->QueryObject ());
         }
@@ -2604,7 +2831,12 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
           csScanStr (params, "%s", str);
 	  iSector* s = Engine->FindSector (str, ResolveOnlyRegion);
           if (!s)
-            System->Printf (CS_MSG_WARNING, "Sector '%s' not found!\n", str);
+	  {
+	    ReportError (reporter,
+		"crystalspace.maploader.parse.collection",
+            	"Sector '%s' not found!", str);
+	    return NULL;
+	  }
 	  else
             collection->AddObject (s->QueryObject ());
         }
@@ -2615,7 +2847,12 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
 	  //@@@$$$ TODO: Collection in regions.
           iCollection* th = Engine->FindCollection(str, ResolveOnlyRegion);
           if (!th)
-            System->Printf (CS_MSG_WARNING, "Collection '%s' not found!\n", str);
+	  {
+	    ReportError (reporter,
+		"crystalspace.maploader.parse.collection",
+            	"Collection '%s' not found!", str);
+	    return NULL;
+	  }
 	  else
             collection->AddObject (th->QueryObject());
         }
@@ -2714,7 +2951,8 @@ iStatLight* csLoader::ParseStatlight (char* name, char* buf)
           dyn = true;
           break;
         case CS_TOKEN_KEY:
-          ParseKey (params, &Keys);
+          if (!ParseKey (params, &Keys))
+	    return false;
           break;
         case CS_TOKEN_HALO:
 	  str[0] = 0;
@@ -2862,8 +3100,10 @@ iKeyValuePair* csLoader::ParseKey (char* buf, iObject* pParent)
   }
   else
   {
-    System->Printf (CS_MSG_WARNING, "Illegal Syntax for KEY() command in line %d\n",
-    	csGetParserLine());
+    ReportError (reporter,
+		"crystalspace.maploader.parse.key",
+    	        "Illegal Syntax for KEY() command in line %d!",
+		csGetParserLine());
     return NULL;
   }
 }
@@ -2891,16 +3131,22 @@ iMapNode* csLoader::ParseNode (char* name, char* buf, iSector* sec)
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      break;
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing node!",
+	  buf);
+      return NULL;
     }
     switch (cmd)
     {
       case CS_TOKEN_ADDON:
-        System->Printf (CS_MSG_WARNING, "ADDON not yet supported in node!\n");
-      	break;
+	ReportError (reporter,
+		"crystalspace.maploader.parse.node",
+        	"ADDON not yet supported in node!");
+	return NULL;
       case CS_TOKEN_KEY:
-        ParseKey (params, pNode->QueryObject ());
+        if (!ParseKey (params, pNode->QueryObject ()))
+	  return false;
         break;
       case CS_TOKEN_POSITION:
         csScanStr (params, "%f,%f,%f", &x, &y, &z);
@@ -2945,26 +3191,40 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
   {
     if (!params)
     {
-      System->Printf (CS_MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      break;
+      ReportError (reporter,
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing sector!",
+	  buf);
+      return NULL;
     }
     switch (cmd)
     {
       case CS_TOKEN_ADDON:
-	LoadAddOn (params, sector);
+	if (!LoadAddOn (params, sector))
+	  return false;
       	break;
       case CS_TOKEN_CULLER:
 	if (!csScanStr (params, "%s", bspname))
 	{
-          System->Printf (CS_MSG_WARNING,
-	  	"CULLER expects the name of a mesh object!\n");
-	} else
+	  ReportError (reporter,
+		"crystalspace.maploader.parse.sector",
+	  	"CULLER expects the name of a mesh object!");
+	  return NULL;
+	}
+	else
           do_culler = true;
         break;
       case CS_TOKEN_MESHOBJ:
         {
 	  iMeshWrapper* mesh = Engine->CreateMeshObject(name);
-          LoadMeshObject (mesh, params);
+          if (!LoadMeshObject (mesh, params))
+	  {
+      	    ReportError (reporter,
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not load mesh object '%s' in sector '%s'!",
+		name, secname ? secname : "<noname>");
+	    return NULL; // @@@ Leak
+	  }
 	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
@@ -2973,20 +3233,27 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
       case CS_TOKEN_TERRAINOBJ:
         {
 	  iTerrainWrapper *terr = Engine->CreateTerrainObject(name);
-          LoadTerrainObject (terr, params, sector);
+          if (!LoadTerrainObject (terr, params, sector))
+	    return false;
         }
         break;
       case CS_TOKEN_LIGHT:
-        sector->AddLight ( ParseStatlight(name, params) );
+        {
+	  iStatLight* sl = ParseStatlight (name, params);
+	  if (!sl) return NULL; // @@@ Leak
+          sector->AddLight (sl);
+	}
         break;
       case CS_TOKEN_NODE:
         {
-          iMapNode *n = ParseNode(name, params, sector);
+          iMapNode *n = ParseNode (name, params, sector);
 	  if (n)
 	  {
             sector->QueryObject ()->ObjAdd (n->QueryObject ());
 	    n->DecRef ();
 	  }
+	  else
+	    return NULL; // @@@ Leak
 	}
         break;
       case CS_TOKEN_FOG:
@@ -2998,7 +3265,8 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
         break;
       case CS_TOKEN_KEY:
       {
-        ParseKey(params, sector->QueryObject());
+        if (!ParseKey (params, sector->QueryObject()))
+	  return false;
         break;
       }
     }

@@ -262,7 +262,7 @@ void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
       memcpy (oName, &iPathName [sl], maxl - sl + 1);
 }
 
-bool csFilenameMatches (const char *fName, const char *fMask)
+bool csGlobMatches (const char *fName, const char *fMask)
 {
   while (*fName || *fMask)
   {

@@ -826,7 +826,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
          || (strcmp (de->d_name, "..") == 0))
           continue;
 
-        if (!csFilenameMatches (de->d_name, Mask))
+        if (!csGlobMatches (de->d_name, Mask))
           continue;
 
         bool append_slash = isdir (tpath, de);
@@ -874,7 +874,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
         char *fname = a->GetFileName (iterator);
 	size_t fnl = strlen (fname);
 	if ((fnl >= sl) && (memcmp (fname, Suffix, sl) == 0)
-         && csFilenameMatches (fname, Mask))
+         && csGlobMatches (fname, Mask))
 	{
           size_t cur = sl;
 	  while (cur < fnl)

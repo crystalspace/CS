@@ -1,10 +1,33 @@
 The history order is reversed so that new features are at the top.
 
 27-Jun-2001
+	- Renamed csFilenameMatches() to csGlobMatches() because it is
+	  useful for more than just filenames (in csutil).
+	- Added a new 'reporter' plugin. This is going to be used for
+	  error reporting and message reporting in general. In order to use
+	  this reporter, the application has to load the plugin. When
+	  the reporter is present other plugins will use it to report
+	  errors. If no reporter plugin is present then no reporting
+	  will happen.
+	- Fully support the reporter plugin in spr2dldr.
+	- Fully support the reporter plugin in spr3dldr.
+	- WalkTest now loads the reporter plugin and uses it to test
+	  if the loading of the level succeeded.
+	- Fixed the level loader so that it now returns failure when
+	  loading mesh objects fail. The map loader will also report
+	  more errors to the reporter.
+	- Also fixed the map loader so that it will check for errors
+	  almost everywhere and return false/NULL if so.
+	- Martin Geisse added documentation about the changes to SCF,
+	  csObject and the pseudo-RTTI system to apimod19.
+	- Wouter Wijngaards removed maze from isotest as it corrupts display
+	  in opengl. Not sure why yet.
+	- Philip Wyett did a manual commit to ogl_g3dcom.cpp to stop VC
+	  bitching about a bad CR in the file.
 	- Eric Sunshine removed the now obsolete csevQuitLoop event.  This is
 	  not needed anymore since CSWS no longer invokes iSystem::Loop()
 	  recursively.
-	- Eric Sunshine removed the csSystemDriver::ExitLoop isntance variable
+	- Eric Sunshine removed the csSystemDriver::ExitLoop instance variable
 	  and all associated support code.
 	- Eric Sunshine removed the following outdated documents from the
 	  CS/docs/incoming directory: collide.txt, csupdate.txt, extmodel.txt,

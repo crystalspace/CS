@@ -104,6 +104,8 @@
 #define CS_FUNCID_ENGINE	"Engine"
 /// Skeleton Animation
 #define CS_FUNCID_MOTION	"MotionManager"
+/// Reporting
+#define CS_FUNCID_REPORTER	"Reporter"
 
 /**
  * Query a pointer to some plugin through the System interface.

@@ -865,6 +865,8 @@ bool MyApp::HandleEvent (iEvent &Event)
 @cindex @code{csMeshWrapper}
 @cindex @code{csEngine::NextFrame()}
 @cindex @code{iEngine::NextFrame()}
+@cindex @code{csFilenameMatches()}
+@cindex @code{csGlobMatches()}
 
 The @sc{scf} name of the 3D engine changed from:@*
 @code{crystalspace.engine.core}@*
@@ -879,3 +881,7 @@ Renamed @code{iPortal::GetPortal()} to @code{GetSector()} and
 
 Removed @code{csMeshWrapper::GetChildren()}.  Instead use
 @code{csMeshWrapper::AddChild()} and @code{csMeshWrapper::RemoveChild()}.
+
+Renamed @code{csFilenameMatches()} to @code{csGlobMatches()} (from
+@samp{csutil} library.
+

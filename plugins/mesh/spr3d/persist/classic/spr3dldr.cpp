@@ -37,6 +37,7 @@
 #include "iutil/object.h"
 #include "iengine/material.h"
 #include "iengine/motion.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -77,6 +78,27 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (VERTICES)
 CS_TOKEN_DEF_END
+
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    printf ("Error ID: %s\n", id);
+    printf ("Description: %s\n", buf);
+    fflush (stdout);
+  }
+  va_end (arg);
+}
 
 SCF_IMPLEMENT_IBASE (csSprite3DFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
@@ -119,19 +141,22 @@ SCF_EXPORT_CLASS_TABLE_END
 csSprite3DFactoryLoader::csSprite3DFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csSprite3DFactoryLoader::~csSprite3DFactoryLoader ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csSprite3DFactoryLoader::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
-static bool load_matrix (char* buf, csMatrix3 &m)
+static bool load_matrix (iReporter* reporter, char* buf, csMatrix3 &m)
 {
   CS_TOKEN_TABLE_START(commands)
     CS_TOKEN_TABLE (IDENTITY)
@@ -179,8 +204,13 @@ static bool load_matrix (char* buf, csMatrix3 &m)
           m *= csZRotMatrix3 (list[2]);
           m *= csYRotMatrix3 (list[1]);
         }
-        //else
-	  //@@@ Error handling!: CsPrintf (CS_MSG_WARNING, "Badly formed rotation: '%s'\n", params);
+	else
+	{
+          ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.matrix.badrotation",
+		"Badly formed rotation '%s'!", params);
+	  return false;
+	}
         break;
       case CS_TOKEN_SCALE_X:
         csScanStr (params, "%f", &scaler);
@@ -200,8 +230,13 @@ static bool load_matrix (char* buf, csMatrix3 &m)
 	  m *= list[0];
         else if (num == 3) // Three scalers; applied to X, Y, Z individually.
 	  m *= csMatrix3 (list[0],0,0,0,list[1],0,0,0,list[2]);
-        //else
-	  //@@@ Error handling!: CsPrintf (CS_MSG_WARNING, "Badly formed scale: '%s'\n", params);
+	else
+	{
+          ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.matrix.badscale",
+		"Badly formed scale '%s'!", params);
+	  return false;
+	}
         break;
     }
   }
@@ -217,8 +252,13 @@ static bool load_matrix (char* buf, csMatrix3 &m)
         list[0], list[1], list[2],
         list[3], list[4], list[5],
         list[6], list[7], list[8]);
-    //else
-      //@@@ Error handling!: CsPrintf (CS_MSG_WARNING, "Badly formed matrix '%s'\n", buf);
+    else
+    {
+      ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.matrix.badmatrix",
+		"Badly formed matrix '%s'!", buf);
+      return false;
+    }
   }
   return true;
 }
@@ -229,7 +269,7 @@ static bool load_vector (char* buf, csVector3 &v)
   return true;
 }
 
-static UInt ParseMixmode (char* buf)
+static UInt ParseMixmode (iReporter* reporter, char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -251,7 +291,9 @@ static UInt ParseMixmode (char* buf)
   {
     if (!params)
     {
-      printf ("Expected parameters instead of '%s'!\n", buf);
+      ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.mixmode.badformat",
+		"Bad format while parsing mixmode!");
       return 0;
     }
     switch (cmd)
@@ -272,14 +314,17 @@ static UInt ParseMixmode (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while parsing the modes!\n",
-    	csGetLastOffender ());
+    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.mixmode.badtoken",
+		"Token '%s' not found while parsing mixmodes!",
+		csGetLastOffender ());
     return 0;
   }
   return Mixmode;
 }
 
-bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
+bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
+	iSkeletonLimb* limb, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (LIMB)
@@ -304,8 +349,9 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
   {
     if (!params)
     {
-      //@@@ Error handling!
-      //CsPrintf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      ReportError (reporter,
+		"crystalspace.sprite3dfactoryloader.parse.skeleton.badformat",
+		"Bad format while parsing skeleton!");
       if (con) con->DecRef ();
       return false;
     }
@@ -316,9 +362,8 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
           iSkeletonConnection* newcon = limb->CreateConnection ();
 	  iSkeletonLimb* newlimb = SCF_QUERY_INTERFACE (newcon, iSkeletonLimb);
 	  if (name) newlimb->SetName (name);
-	  if (!LoadSkeleton (newlimb, params))
+	  if (!LoadSkeleton (reporter, newlimb, params))
 	  {
-	    //@@@
 	    if (con) con->DecRef ();
 	    return false;
 	  }
@@ -334,16 +379,20 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
           {
     	    if (!params2)
     	    {
-	      //@@@ Error handling!
-      	      //CsPrintf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-      	      //fatal_exit (0, false);
+	      ReportError (reporter,
+	       "crystalspace.sprite3dfactoryloader.parse.skeleton.badtransform",
+		"Bad format while parsing skeleton transform!");
 	      con->DecRef ();
 	      return false;
     	    }
             switch (cmd)
             {
               case CS_TOKEN_MATRIX:
-                load_matrix (params2, m);
+                if (!load_matrix (reporter, params2, m))
+		{
+		  con->DecRef ();
+		  return false;
+		}
 		break;
               case CS_TOKEN_V:
                 load_vector (params2, v);
@@ -355,9 +404,9 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
         }
 	else
 	{
-	  //@@@ Error handling!
-	  //CsPrintf (CS_MSG_FATAL_ERROR, "TRANSFORM not valid for this type of skeleton limb!\n");
-	  //fatal_exit (0, false);
+	  ReportError (reporter,
+	    "crystalspace.sprite3dfactoryloader.parse.skeleton.badtransform",
+	    "TRANSFORM not valid for this type of skeleton limb!");
 	  if (con) con->DecRef ();
 	  return false;
 	}
@@ -373,10 +422,10 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    //@@@ Error handling!
-    //CsPrintf (CS_MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite skeleton!\n",
-        //csGetLastOffender ());
-    //fatal_exit (0, false);
+    ReportError (reporter,
+		"crystalspace.sprite3dfactoryloader.parse.skeleton.badtoken",
+		"Token '%s' not found while parsing skeleton!",
+		csGetLastOffender ());
     if (con) con->DecRef ();
     return false;
   }
@@ -415,6 +464,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
 
   iMeshFactoryWrapper* imeshfactwrap = SCF_QUERY_INTERFACE (context,
   	iMeshFactoryWrapper);
+  CS_ASSERT (imeshfactwrap != NULL);
   imeshfactwrap->DecRef ();
 
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
@@ -423,7 +473,13 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
   {
     type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.sprite.3d",
     	"MeshObj", iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
+  }
+  if (!type)
+  {
+    ReportError (reporter,
+		"crystalspace.sprite3dfactoryloader.setup.objecttype",
+		"Could not load the sprite.3d mesh object plugin!");
+    return NULL;
   }
   iMeshObjectFactory* fact;
   // @@@ Temporary fix to allow to set actions for objects loaded
@@ -443,8 +499,9 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
   {
     if (!params)
     {
-      // @@@ Error handling!
-      printf ("No params!\n");
+      ReportError (reporter,
+		"crystalspace.sprite3dfactoryloader.parse.badformat",
+		"Bad format while parsing sprite3d factory!");
       fact->DecRef ();
       spr3dLook->DecRef ();
       return NULL;
@@ -457,8 +514,9 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
-            // @@@ Error handling!
-	    printf ("Can't find material!\n");
+	    ReportError (reporter,
+		"crystalspace.sprite3dfactoryloader.parse.unknownmaterial",
+		"Couldn't find material named '%s'", str);
 	    spr3dLook->DecRef ();
             fact->DecRef ();
             return NULL;
@@ -470,12 +528,11 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
 	{
 	  spr3dLook->EnableSkeletalAnimation ();
 	  iSkeleton* skeleton = spr3dLook->GetSkeleton ();
-	  iSkeletonLimb* skellimb = SCF_QUERY_INTERFACE (skeleton, iSkeletonLimb);
+	  iSkeletonLimb* skellimb = SCF_QUERY_INTERFACE (skeleton,
+	  	iSkeletonLimb);
 	  if (name) skellimb->SetName (name);
-	  if (!LoadSkeleton (skellimb, params))
+	  if (!LoadSkeleton (reporter, skellimb, params))
 	  {
-	    // @@@ Error handling!
-	    printf ("Bad skeleton!\n");
 	    spr3dLook->DecRef ();
 	    fact->DecRef ();
 	    return NULL;
@@ -489,13 +546,14 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
           act->SetName (name);
           int d;
           char fn[64];
-          while ((cmd = csGetObject (&params, tok_frameset, &name, &params2)) > 0)
+          while ((cmd = csGetObject (&params, tok_frameset, &name,
+	  	&params2)) > 0)
           {
             if (!params2)
             {
-	      //@@@ Error handling!
-              //CsPrintf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-	      printf ("Bad action!\n");
+	      ReportError (reporter,
+		"crystalspace.sprite3dfactoryloader.parse.action.badformat",
+		"Bad format while parsing ACTION!");
 	      spr3dLook->DecRef ();
 	      fact->DecRef ();
 	      return NULL;
@@ -507,10 +565,10 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
                 iSpriteFrame* ff = spr3dLook->FindFrame (fn);
                 if (!ff)
                 {
-	          //@@@ Error handling!
-                  //CsPrintf (CS_MSG_FATAL_ERROR, "Error! Trying to add a unknown frame '%s' in %s action !\n",
-                        //fn, act->GetName ());
-		  printf ("Bad frame!\n");
+	          ReportError (reporter,
+		    "crystalspace.sprite3dfactoryloader.parse.action.badframe",
+		    "Trying to add unknown frame '%s' to action '%s'!",
+		    fn, act->GetName ());
 		  spr3dLook->DecRef ();
 		  fact->DecRef ();
                   return NULL;
@@ -534,9 +592,9 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
           {
             if (!params2)
             {
-	      //@@@ Error handling!
-              //CsPrintf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-	      printf ("Error\n");
+	      ReportError (reporter,
+		"crystalspace.sprite3dfactoryloader.parse.frame.badformat",
+		"Bad format while parsing FRAME!");
 	      spr3dLook->DecRef ();
 	      fact->DecRef ();
 	      return NULL;
@@ -552,10 +610,10 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
                 }
                 else if (i >= spr3dLook->GetTexelCount ())
                 {
-		  //@@@ Error handling!
-                  //CsPrintf (CS_MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
-                    //fr->GetName ());
-	      	  printf ("Too many vertices!\n");
+	          ReportError (reporter,
+		    "crystalspace.sprite3dfactoryloader.parse.frame.vertices",
+		    "Trying to add too many vertices to frame '%s'!",
+		    fr->GetName ());
 		  spr3dLook->DecRef ();
 		  fact->DecRef ();
 		  return NULL;
@@ -568,20 +626,20 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
           }
           if (cmd == CS_PARSERR_TOKENNOTFOUND)
           {
-	    //@@@ Error handling!
-            //CsPrintf (CS_MSG_FATAL_ERROR, "Token '%s' not found while parsing frame '%s'!\n",
-                //fr->GetName (), csGetLastOffender ());
-	    printf ("Token not found!\n");
+	    ReportError (reporter,
+		"crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
+		"Token '%s' not found while parsing frame '%s'!",
+		csGetLastOffender (), fr->GetName ());
 	    spr3dLook->DecRef ();
 	    fact->DecRef ();
 	    return NULL;
           }
           if (i < spr3dLook->GetTexelCount ())
           {
-	    //@@@ Error handling!
-            //CsPrintf (CS_MSG_FATAL_ERROR, "Error! Too few vertices in frame '%s'! (%d %d)\n",
-                //fr->GetName (), i, state->GetTexelCount ());
-	    printf ("Too few vertices!\n");
+	    ReportError (reporter,
+		"crystalspace.sprite3dfactoryloader.parse.frame.vertices",
+		"Too few vertices in frame '%s'!",
+		fr->GetName ());
 	    spr3dLook->DecRef ();
 	    fact->DecRef ();
 	    return NULL;
@@ -606,8 +664,13 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
             case 0  :  spr3dLook->MergeNormals ();                  break;
             case 1  :  spr3dLook->MergeNormals (list[0]);           break;
             case 2  :  spr3dLook->MergeNormals (list[0], list[1]);  break;
-            //default :  CsPrintf (CS_MSG_WARNING, "Confused by SMOOTH options: '%s'\n", params);
-                       //CsPrintf (CS_MSG_WARNING, "no smoothing performed\n");
+	    default:
+	      ReportError (reporter,
+		"crystalspace.sprite3dfactoryloader.parse.badsmooth",
+		"Bad smooth option %s, use 0, 1, or 2!", num);
+	      spr3dLook->DecRef ();
+	      fact->DecRef ();
+	      return NULL;
           }
         }
         break;
@@ -630,15 +693,18 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
 csSprite3DFactorySaver::csSprite3DFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csSprite3DFactorySaver::~csSprite3DFactorySaver ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csSprite3DFactorySaver::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -787,15 +853,18 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
 csSprite3DLoader::csSprite3DLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csSprite3DLoader::~csSprite3DLoader ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csSprite3DLoader::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -804,7 +873,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ACTION)
-	CS_TOKEN_TABLE (APPLY_MOTION)
+    CS_TOKEN_TABLE (APPLY_MOTION)
     CS_TOKEN_TABLE (FACTORY)
     CS_TOKEN_TABLE (BASECOLOR)
     CS_TOKEN_TABLE (LIGHTING)
@@ -819,6 +888,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
   char str[255];
 
   iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
+  CS_ASSERT (imeshwrap != NULL);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
@@ -829,7 +899,9 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
   {
     if (!params)
     {
-      // @@@ Error handling!
+      ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.badformat",
+		"Bad format while parsing sprite3d!");
       if (spr3dLook) spr3dLook->DecRef ();
       return NULL;
     }
@@ -841,8 +913,9 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
-	    // @@@ Error handling!
-	    printf ("Can't find factory!\n");
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.unknownfactory",
+		"Couldn't find factory '%s'!", str);
 	    if (spr3dLook) spr3dLook->DecRef ();
 	    return NULL;
 	  }
@@ -875,8 +948,9 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
-            // @@@ Error handling!
-	    printf ("Can't find material!\n");
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.unknownmaterial",
+		"Couldn't find material '%s'!", str);
             mesh->DecRef ();
 	    if (spr3dLook) spr3dLook->DecRef ();
             return NULL;
@@ -885,41 +959,52 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        spr3dLook->SetMixMode (ParseMixmode (params));
+        spr3dLook->SetMixMode (ParseMixmode (reporter, params));
 	break;
-	  case CS_TOKEN_APPLY_MOTION:
+      case CS_TOKEN_APPLY_MOTION:
 	{
-	  csScanStr( params, "%s", str);
+	  csScanStr (params, "%s", str);
 	  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS( sys, 
-		"crystalspace.motion.manager.default","MotionManager",iMotionManager);
+		"crystalspace.motion.manager.default", "MotionManager",
+		iMotionManager);
 	  if (!motman) 
 	  { 
-		printf("Motion manager not loaded...\n"); 
-		return NULL; 
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.setup.motion.motionmanager",
+		"Could not find motion manager!");
+	    return NULL; 
 	  }
 	  motman->DecRef();
 	  if (!spr3dLook) 
 	  { 
-		printf("No Factory! Please define 'FACTORY' before 'APPLY_MOTION'\n"); 
-		return NULL; 
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		"No Factory! Please define 'FACTORY' before 'APPLY_MOTION'!"); 
+	    return NULL; 
 	  }
 	  iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
-	  iSkeletonLimbState *limb = SCF_QUERY_INTERFACE( skel_state, iSkeletonLimbState );
+	  iSkeletonLimbState *limb = SCF_QUERY_INTERFACE (skel_state,
+	  	iSkeletonLimbState );
 	  limb->DecRef();
 	  if (!(limb = limb->GetChildren()))
 	  { 
-		printf("Warning: Skeleton has no libs -- cannot apply motion\n");
-		break;
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.motion.nochildren",
+		"Skeleton has no libs. Cannot apply motion!");
+	    return NULL; 
 	  }
-	  iSkeletonConnectionState *con = SCF_QUERY_INTERFACE( limb, iSkeletonConnectionState );
-	  iSkeletonBone *bone = SCF_QUERY_INTERFACE ( con, iSkeletonBone );
+	  iSkeletonConnectionState *con = SCF_QUERY_INTERFACE (limb,
+	  	iSkeletonConnectionState );
+	  iSkeletonBone *bone = SCF_QUERY_INTERFACE (con, iSkeletonBone);
 	  if (!bone)
 	  {
-		printf("The skeleton has no bones!\n");
-		return NULL;
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.motion.nobones",
+		"The skeleton has no bones!");
+	    return NULL; 
 	  }
 	  motman->ApplyMotion( bone, name, str, true, false, 1.0, 0, false);
-	} // ApplyMotion ( skelbone, motion name, frameset name, loop, sweep, rate, time_offset, cached )
+	}
 	break;
       case CS_TOKEN_TWEEN:
 	{
@@ -941,15 +1026,18 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 csSprite3DSaver::csSprite3DSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csSprite3DSaver::~csSprite3DSaver ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csSprite3DSaver::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 

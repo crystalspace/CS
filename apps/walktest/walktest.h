@@ -395,6 +395,12 @@ public:
    */
   virtual void ParseKeyCmds ();
 
+  /**
+   * Check if there are errors and report them.
+   * Returns true if the application should exit (fatal error).
+   */
+  bool CheckErrors ();
+
   ///
   virtual void NextFrame ();
   ///

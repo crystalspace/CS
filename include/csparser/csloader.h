@@ -52,6 +52,7 @@ struct iSector;
 struct iStatLight;
 struct iKeyValuePair;
 struct iMapNode;
+struct iReporter;
 
 /**
  * The loader for Crystal Space maps.
@@ -131,10 +132,10 @@ class csLoader : public iLoader
   /// For heightgen.
   csGenerateImageValue* heightgen_value_process (char* buf);
   /// Parse and load a height texture
-  void heightgen_process (char* buf);
+  bool heightgen_process (char* buf);
 
   /// Resolve the portals of a thing
-  void ResolvePortalSectors (iThingState *Mesh);
+  bool ResolvePortalSectors (iThingState *Mesh);
 
   /// Load a Mesh Object Factory from the map file.
   bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact, char* buf);
@@ -216,6 +217,8 @@ public:
   iSystem *System;
   // virtual file system
   iVFS *VFS;
+  // The error reporter
+  iReporter* reporter;
   // image loader
   iImageIO *ImageLoader;
   // sound loader

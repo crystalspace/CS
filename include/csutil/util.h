@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 /// Return a random number.
-long csRndNum(long minRange, long maxRange);
+long csRndNum (long minRange, long maxRange);
 
 /**
  * Allocate a new char [] and copy the string into newly allocated storage.
@@ -37,7 +37,8 @@ extern char *csStrNew (const char *s);
  * a vector of numbers from 0 to m - 1; numbers never appears twice in vector.
  * Callback returns false for continuation and true to break the loop.
  */
-extern void csCombinations (int m, int n, bool (*callback) (int *vector, int count,
+extern void csCombinations (int m, int n,
+  bool (*callback) (int *vector, int count,
   void *arg), void *arg);
 
 /**
@@ -50,12 +51,14 @@ extern void csCombinations (int m, int n, bool (*callback) (int *vector, int cou
  * from root. Return a string allocated with csStrNew().
  */
 extern char *csExpandName (const char *iName);
+
 /**
  * Split a pathname into separate path and name. Path delimiters are either
  * '/', PATH_SEPARATOR and, for OS/2, MS-DOS and Win32 targets, ':'.
  */
 extern void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
   char *oName, size_t iNameSize);
+
 /**
  * This is a really simple function that does very nice
  * "filename against filemask" comparisons. It understands
@@ -64,7 +67,7 @@ extern void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
  * <p>
  * NOTE: If you want case-insensitive comparison, upcase strings first.
  */
-extern bool csFilenameMatches (const char *fName, const char *fMask);
+extern bool csGlobMatches (const char *fName, const char *fMask);
 
 /// Swap two integer variables
 static inline void csSwapInt (int &a, int &b)
@@ -89,7 +92,8 @@ static inline float csSquareFloat (float x)
 /// Byte swap 32 bit data.
 static inline unsigned long csByteSwap32bit( const unsigned long value )
 {
-  return ((value >> 24 ) & 0x000000FF ) | ((value >> 8) & 0x0000FF00) | ((value << 8) & 0x00FF0000) | (( value << 24) & 0xFF000000);
+  return ((value >> 24 ) & 0x000000FF ) | ((value >> 8) & 0x0000FF00)
+  	| ((value << 8) & 0x00FF0000) | (( value << 24) & 0xFF000000);
 }
 
 /// Byte swap 16 bit data.
@@ -99,12 +103,17 @@ static inline unsigned short csByteSwap16bit( const unsigned short value )
 }
 
 /// Byte swap 32 bit data in a buffer
-void csByteSwap32bitBuffer( register unsigned long* const place, register unsigned long count );
+void csByteSwap32bitBuffer( register unsigned long* const place,
+	register unsigned long count );
 
 /// Byte swap 16 bit data in a buffer
-void csByteSwap16bitBuffer( register unsigned short* const place, register unsigned long count );
+void csByteSwap16bitBuffer( register unsigned short* const place,
+	register unsigned long count );
 
-/// finds the smallest number that is a power of two and is larger or equal to n
+/**
+ * Finds the smallest number that is a power of two and is larger or
+ * equal to n.
+ */
 int csFindNearestPowerOf2 (int n);
 
 /// returns true if n is a power of two
@@ -124,6 +133,7 @@ static inline int csLog2 (int n)
  * But, do not copy 'search', instead replace that with 'replace' string.
  * max is size of dest.
  */
-void csFindReplace(char *dest, const char *src, const char *search,
+void csFindReplace (char *dest, const char *src, const char *search,
   const char *replace, int max);
+
 #endif // __UTIL_H__

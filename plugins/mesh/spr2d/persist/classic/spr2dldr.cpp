@@ -33,6 +33,7 @@
 #include "csutil/util.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -95,22 +96,46 @@ SCF_EXPORT_CLASS_TABLE (spr2dldr)
     "Crystal Space Sprite2D Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    printf ("Error ID: %s\n", id);
+    printf ("Description: %s\n", buf);
+    fflush (stdout);
+  }
+  va_end (arg);
+}
+
 csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csSprite2DFactoryLoader::~csSprite2DFactoryLoader ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csSprite2DFactoryLoader::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
-static UInt ParseMixmode (char* buf)
+static UInt ParseMixmode (iReporter* reporter, char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -132,7 +157,9 @@ static UInt ParseMixmode (char* buf)
   {
     if (!params)
     {
-      printf ("Expected parameters instead of '%s'!\n", buf);
+      ReportError (reporter,
+		"crystalspace.sprite2dloader.parse.mixmode.badformat",
+		"Bad format while parsing mixmode!");
       return 0;
     }
     switch (cmd)
@@ -153,14 +180,17 @@ static UInt ParseMixmode (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while parsing the modes!\n",
-    	csGetLastOffender ());
+    ReportError (reporter,
+		"crystalspace.sprite2dloader.parse.mixmode.badtoken",
+		"Token '%s' not found while parsing mixmodes!",
+		csGetLastOffender ());
     return 0;
   }
   return Mixmode;
 }
 
-static void ParseAnim (iSprite2DFactoryState* spr2dLook, const char *animname, char *buf)
+static void ParseAnim (iReporter* reporter, iSprite2DFactoryState* spr2dLook,
+	const char *animname, char *buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FRAME)
@@ -179,7 +209,9 @@ static void ParseAnim (iSprite2DFactoryState* spr2dLook, const char *animname, c
   {
     if (!params)
     {
-      printf ("Expected FRAME of '%s'!\n", buf);
+      ReportError (reporter,
+		"crystalspace.sprite2dfactoryloader.parse.badtoken",
+		"Expected FRAME instead of '%s'!", buf);
       return;
     }
     switch (cmd)
@@ -196,8 +228,10 @@ static void ParseAnim (iSprite2DFactoryState* spr2dLook, const char *animname, c
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while looking for animation FRAME tokens!\n",
-    	csGetLastOffender ());
+    ReportError (reporter,
+		"crystalspace.sprite2dfactoryloader.parse.badtoken",
+		"Token '%s' not found while parsing FRAME!",
+		csGetLastOffender ());
     return;
   }
 }
@@ -205,7 +239,6 @@ static void ParseAnim (iSprite2DFactoryState* spr2dLook, const char *animname, c
 iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
 	iBase* /* context */)
 {
-  // @@@ Implement MIXMODE
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (LIGHTING)
     CS_TOKEN_TABLE (MATERIAL)
@@ -224,7 +257,13 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
   {
     type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.sprite.2d",
     	"MeshObj", iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.sprite.2d\n");
+  }
+  if (!type)
+  {
+    ReportError (reporter,
+		"crystalspace.sprite2dfactoryloader.setup.objecttype",
+		"Could not load the sprite.2d mesh object plugin!");
+    return NULL;
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
@@ -236,7 +275,9 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
   {
     if (!params)
     {
-      // @@@ Error handling!
+      ReportError (reporter,
+		"crystalspace.sprite2dfactoryloader.parse.badformat",
+		"Bad format while parsing sprite2d factory!");
       fact->DecRef ();
       spr2dLook->DecRef ();
       return NULL;
@@ -249,7 +290,9 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
-            // @@@ Error handling!
+	    ReportError (reporter,
+		"crystalspace.sprite2dfactoryloader.parse.unknownmaterial",
+		"Couldn't find material named '%s'", str);
             fact->DecRef ();
 	    spr2dLook->DecRef ();
             return NULL;
@@ -265,11 +308,11 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
         }
 	break;
       case CS_TOKEN_MIXMODE:
-        spr2dLook->SetMixMode (ParseMixmode (params));
+        spr2dLook->SetMixMode (ParseMixmode (reporter, params));
 	break;
       case CS_TOKEN_UVANIMATION:
 	{
-	  ParseAnim (spr2dLook, name, params);
+	  ParseAnim (reporter, spr2dLook, name, params);
 	}
         break;
     }
@@ -283,15 +326,18 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
 csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csSprite2DFactorySaver::~csSprite2DFactorySaver ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csSprite2DFactorySaver::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -338,15 +384,18 @@ void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
 csSprite2DLoader::csSprite2DLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csSprite2DLoader::~csSprite2DLoader ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csSprite2DLoader::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -370,6 +419,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
   char str[255];
 
   iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
+  CS_ASSERT (imeshwrap != NULL);
   imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
@@ -381,7 +431,9 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
   {
     if (!params)
     {
-      // @@@ Error handling!
+      ReportError (reporter,
+		"crystalspace.sprite2dloader.parse.badformat",
+		"Bad format while parsing sprite2d!");
       if (spr2dLook) spr2dLook->DecRef ();
       return NULL;
     }
@@ -393,7 +445,9 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
-	    // @@@ Error handling!
+      	    ReportError (reporter,
+		"crystalspace.sprite2dloader.parse.unknownfactory",
+		"Couldn't find factory '%s'!", str);
 	    if (spr2dLook) spr2dLook->DecRef ();
 	    return NULL;
 	  }
@@ -409,7 +463,9 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
-            // @@@ Error handling!
+      	    ReportError (reporter,
+		"crystalspace.sprite2dloader.parse.unknownmaterial",
+		"Couldn't find material '%s'!", str);
             mesh->DecRef ();
 	    if (spr2dLook) spr2dLook->DecRef ();
             return NULL;
@@ -418,7 +474,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        spr2dLook->SetMixMode (ParseMixmode (params));
+        spr2dLook->SetMixMode (ParseMixmode (reporter, params));
 	break;
       case CS_TOKEN_VERTICES:
         {
@@ -481,7 +537,11 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 	  if (ani)
 	    spr2dLook->SetUVAnimation (str, type, loop);
 	  else
-	    printf ("UVAnimation \'%s\' not found.\n", str);
+    	  {
+	    ReportError (reporter,
+		"crystalspace.sprite2dloader.parse.uvanim",
+		"UVAnimation '%s' not found!", str);
+	  }
         }
         break;
     }
@@ -496,15 +556,18 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 csSprite2DSaver::csSprite2DSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  reporter = NULL;
 }
 
 csSprite2DSaver::~csSprite2DSaver ()
 {
+  if (reporter) reporter->DecRef ();
 }
 
 bool csSprite2DSaver::Initialize (iSystem* system)
 {
   sys = system;
+  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -564,5 +627,3 @@ void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str,
 
 //---------------------------------------------------------------------------
 
-
-//---------------------------------------------------------------------------

@@ -67,6 +67,7 @@
 #include "ivaria/collider.h"
 #include "iengine/motion.h"
 #include "ivaria/perfstat.h"
+#include "ivaria/reporter.h"
 #include "imap/parser.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
@@ -205,6 +206,38 @@ WalkTest::~WalkTest ()
   if (perf_stats) perf_stats->DecRef ();
   if (Engine) Engine->DecRef ();
   if (LevelLoader) LevelLoader->DecRef();
+}
+
+bool WalkTest::CheckErrors ()
+{
+  iReporter* reporter = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_REPORTER,
+  	iReporter);
+  if (!reporter) return false;
+  if (reporter->GetMessageCount () == 0) return false;
+  int i;
+  bool fatal = false;
+  for (i = 0 ; i < reporter->GetMessageCount () ; i++)
+  {
+    int severity = reporter->GetMessageSeverity (i);
+    if (severity == CS_REPORTER_SEVERITY_BUG ||
+    	severity == CS_REPORTER_SEVERITY_ERROR)
+      fatal = true;
+    int msgType;
+    if (severity == CS_REPORTER_SEVERITY_BUG)
+      msgType = CS_MSG_INTERNAL_ERROR;
+    else if (severity == CS_REPORTER_SEVERITY_ERROR)
+      msgType = CS_MSG_FATAL_ERROR;
+    else if (severity == CS_REPORTER_SEVERITY_WARNING)
+      msgType = CS_MSG_WARNING;
+    else
+      msgType = CS_MSG_CONSOLE;
+    Sys->Printf (msgType, "id: %s\nmsg: %s\n", reporter->GetMessageId (i),
+      reporter->GetMessageDescription (i));
+  }
+
+  reporter->Clear ();
+  reporter->DecRef ();
+  return fatal;
 }
 
 void WalkTest::SetSystemDefaults (iConfigManager *Config)
@@ -1137,10 +1170,15 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 //  Sys->Printf (CS_MSG_INITIALIZATION, "DONE\n");
 }
 
-void WalkTest::LoadLibraryData(void)
+void WalkTest::LoadLibraryData (void)
 {
   // Load the "standard" library
   LevelLoader->LoadLibraryFile ("/lib/std/library");
+  if (CheckErrors ())
+  {
+    cleanup ();
+    exit (0);
+  }
 }
 
 void WalkTest::Inititalize2DTextures ()
@@ -1179,8 +1217,11 @@ void WalkTest::Create2DSprites(void)
 }
 
 
-bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConfigName)
+bool WalkTest::Initialize (int argc, const char* const argv[],
+	const char *iConfigName)
 {
+  System->RequestPlugin ("crystalspace.utilities.reporter:Reporter");
+
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
   {
     Printf (CS_MSG_FATAL_ERROR, "Failed to initialize SysSystemDriver!\n");
@@ -1338,8 +1379,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     do_cd = true;
 
     // Load two textures that are used in the maze.
+    if (CheckErrors ()) return false;
     LevelLoader->LoadTexture ("txt", "/lib/std/stone4.gif");
+    if (CheckErrors ()) return false;
     LevelLoader->LoadTexture ("txt2", "/lib/std/mystone2.gif");
+    if (CheckErrors ()) return false;
 
     if (do_infinite)
     {
@@ -1423,7 +1467,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     // Load the map from the file.
     if (!LevelLoader->LoadMapFile ("world"))
     {
-      Printf (CS_MSG_FATAL_ERROR, "Loading of map failed!\n");
+      if (CheckErrors ()) return false;
       return false;
     }
 
