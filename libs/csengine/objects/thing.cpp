@@ -1650,7 +1650,7 @@ void csThing::PreparePolygonBuffer ()
         lmi->GetPolyTex ());
   }
 
-  delete[] MatPol;
+  delete[] matpol;
 }
 
 void csThing::GetTransformedBoundingBox (
