@@ -82,7 +82,7 @@ public:
       else ptr = list.head;
     }
     /// Assignment operator
-    const Iterator& operator= (const Iterator& r)
+    Iterator& operator= (const Iterator& r)
     { ptr = r.ptr; visited = r.visited; reversed = r.reversed; return *this; }
     /// Test if the Iterator is set to a valid element.
     bool HasCurrent() const
@@ -107,10 +107,10 @@ public:
     operator T*() const
     { return visited && ptr ? &ptr->data : 0; }
     /// Dereference operator (*).
-    T &operator *() const
+    T& operator *() const
     { CS_ASSERT(ptr != 0); return ptr->data; }
     /// Dereference operator (->).
-    T *operator->() const
+    T* operator->() const
     { return visited && ptr ? &ptr->data : 0; }
 
     /// Set iterator to non-existent element. HasCurrent() will return false.
@@ -120,22 +120,24 @@ public:
       visited = true;
     }
     /// Advance to next element and return it.
-    T* Next ()
+    T& Next ()
     {
       if (visited && ptr != 0)
         ptr = ptr->next;
       visited = true;
-      return *this;
+      CS_ASSERT(ptr != 0);
+      return ptr->data;
     }
     /// Backup to previous element and return it.
-    T* Previous()
+    T& Previous()
     {
       if (visited && ptr != 0)
         ptr = ptr->prev;
       visited = true;
-      return *this;
+      CS_ASSERT(ptr != 0);
+      return ptr->data;
     }
-    T* Prev() { return Previous(); } // Backward compatibility.
+    T& Prev() { return Previous(); } // Backward compatibility.
 
     /// Advance to next element and return it.
     Iterator& operator++()
@@ -158,7 +160,7 @@ public:
      * Return current element.
      * Warning! Assumes there is a current element!
      */
-    const T& FetchCurrent () const
+    T& FetchCurrent () const
     {
       CS_ASSERT(visited && ptr != 0);
       return ptr->data;
@@ -167,7 +169,7 @@ public:
      * Return next element but don't modify iterator.
      * Warning! Assumes there is a next element!
      */
-    const T& FetchNext () const
+    T& FetchNext () const
     {
       CS_ASSERT(ptr != 0);
       return visited ? ptr->next->data : ptr->data;
@@ -176,12 +178,12 @@ public:
      * Return previous element but don't modify iterator.
      * Warning! Assumes there is a previous element!
      */
-    const T& FetchPrevious () const
+    T& FetchPrevious () const
     {
       CS_ASSERT(ptr != 0);
       return visited ? ptr->prev->data : ptr->data;
     }
-    const T& FetchPrev () const { return FetchPrevious(); } // Backward compat.
+    T& FetchPrev () const { return FetchPrevious(); } // Backward compat.
 
   protected:
     friend class csList<T>;
@@ -196,37 +198,37 @@ public:
   };
 
   /// Assignment, shallow copy.
-  csList &operator=(const csList& other);
+  csList& operator=(const csList& other);
 
   /// Add an item first in list. Copy T into the listdata.
-  Iterator PushFront (const T & item);
+  Iterator PushFront (const T& item);
 
   /// Add an item last in list. Copy T into the listdata.
-  Iterator PushBack (const T & item);
+  Iterator PushBack (const T& item);
 
   /// Insert an item before the item the iterator is set to.
-  void InsertBefore(Iterator &it, const T & item);
+  void InsertBefore(Iterator& it, const T& item);
 
   /// Insert an item after the item the iterator is set to.
-  void InsertAfter(Iterator &it, const T & item);
+  void InsertAfter(Iterator& it, const T& item);
 
   /// Move an item (as iterator) before the item the iterator is set to.
-  void MoveBefore(const Iterator &it, const Iterator &item);
+  void MoveBefore(const Iterator& it, const Iterator& item);
 
   /// Move an item (as iterator) after the item the iterator is set to.
-  void MoveAfter(const Iterator &it, const Iterator &item);
+  void MoveAfter(const Iterator& it, const Iterator& item);
 
   /// Remove specific item by iterator.
-  void Delete (Iterator &it);
+  void Delete (Iterator& it);
 
   /// Empty an list.
   void DeleteAll();
 
   /// Return first element of the list.
-  const T& Front () const
+  T& Front () const
   { return head->data; }
   /// Return last element of the list.
-  const T& Last () const
+  T& Last () const
   { return tail->data; }
 
   /// Deletes the first element of the list.

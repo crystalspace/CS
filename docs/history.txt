@@ -53,6 +53,16 @@ chronological order.
 	        foo = i.Current(); while (i.HasNext()) { foo = i.Next(); }
             - Fixed a number of bugs where constructors were not initializing
 	      all member variables.
+	- Eric Sunshine made the following additional changes to csList<>:
+	    - The iterator methods Next() and Previous() now return references
+	      to the items rather than pointers (which was a strange
+	      choice). This makes them consistent with all other methods which
+	      provide item access, as well as with all other iterators in CS.
+	    - Unified and relaxed the 'const' vs. 'non-const' status of
+	      returned elements from various methods. Element retrieval methods
+	      now allow the elements to be modified by the client. This widens
+	      the scope of permissible operations on elements, thus making the
+	      class more useful.
 21-Oct-2004
 	- Eric Sunshine made the following changes to the DDS image loader:
 	    - Fixed bug in dds::Loader::ReadHeader() where it could/would
