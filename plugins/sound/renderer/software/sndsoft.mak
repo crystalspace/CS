@@ -81,7 +81,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDSOFT
 endif
 
-TO_INSTALL.CONFIG += data/config/sndsoft.cfg
+#TO_INSTALL.CONFIG += data/config/sndsoft.cfg
 DESCRIPTION.$(SNDSOFT) = $(DESCRIPTION.sndsoft)
 
 SRC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.cpp)
