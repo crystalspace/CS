@@ -199,6 +199,26 @@ void csGlideProcedural::SetClipper (csVector2* vertices, int num_vertices)
   g3d->SetClipper (vertices, num_vertices);
 }
 
+void csGlideProcedural::GetPerspectiveCenter (int& x, int& y)
+{ 
+  g3d->GetPerspectiveCenter (x, y); 
+}
+
+float csGlideProcedural::GetPerspectiveAspect ()
+{ 
+  return g3d->GetPerspectiveAspect (); 
+}
+
+void csGlideProcedural::GetObjectToCamera (csReversibleTransform& o2c)
+{ 
+  g3d->GetObjectToCamera (o2c); 
+}
+
+void csGlideProcedural::GetClipper (csVector2* vertices, int& num_vertices)
+{ 
+  g3d->GetClipper (vertices, num_vertices);
+}
+
 iGraphics2D *csGlideProcedural::GetDriver2D ()
 { 
   return g3d->GetDriver2D (); 
