@@ -108,11 +108,11 @@ uint32 csPGVideoDriver::ColorCS2PG (uint32 c)
 {
   //@@@: Kludge. Why is there no method in iGraphics2D to convert a color value
   //     back into R, G and B values?
-  uint8 r, g, b, or, og, ob;
-  Gfx2D->GetPixel (0, 0, or, og, ob);
+  uint8 r, g, b, olr, olg, olb;
+  Gfx2D->GetPixel (0, 0, olr, olg, olb);
   Gfx2D->DrawPixel (0, 0, c);
   Gfx2D->GetPixel (0, 0, r, g, b);
-  Gfx2D->DrawPixel (0, 0, Gfx2D->FindRGB (or, og, ob));
+  Gfx2D->DrawPixel (0, 0, Gfx2D->FindRGB (olr, olg, olb));
   return mkcolor (r, g, b);
 }
 

@@ -46,8 +46,8 @@ class csPicoGUIServer : public iGUIServer
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csPicoGUIServer);
-    bool Initialize (iObjectRegistry *or)
-      { return scfParent->Initialize (or); }
+    bool Initialize (iObjectRegistry *ior)
+      { return scfParent->Initialize (ior); }
   } scfiComponent;
   friend struct eiComponent;
 

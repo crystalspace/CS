@@ -4,6 +4,8 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 18-Apr-2003
+	- Micah fixed some compile errors in the pgserver plugin due to 'or'
+	  being a reserved symbol in g++ version 3.2.2
 	- Oktal added the PicoGUI server plugin. PicoGUI is a small
 	  client/server GUI architecture, and the server plugin will allow
 	  clients to be drawn on the CrystalSpace 2D canvas. A client plugin
