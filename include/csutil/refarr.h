@@ -178,10 +178,27 @@ public:
     return -1;
   }
 
+  /// The default ArrayCompareFunction for InsertSorted()
+  static int DefaultCompare (T *item1, T *item2)
+  {
+    if (item1 < item2) return -1;
+    else if (item1 > item2) return 1;
+    else return 0;
+  }
+
+  /// The default ArrayCompareKeyFunction for FindKey()
+  static int DefaultCompareKey (T *item1, void *item2)
+  {
+    if (item1 < item2) return -1;
+    else if (item1 > item2) return 1;
+    else return 0;
+  }
+
   /**
    * Find an element based on some key.
    */
-  int FindKey (void* key, ArrayCompareKeyFunction* comparekey) const
+  int FindKey (void* key,
+    ArrayCompareKeyFunction* comparekey = DefaultCompareKey) const
   {
     int i;
     for (i = 0 ; i < Length () ; i++)
@@ -277,7 +294,8 @@ public:
   /**
    * Find an element based on some key.
    */
-  int FindSortedKey (void* key, ArrayCompareKeyFunction* comparekey) const
+  int FindSortedKey (void* key,
+    ArrayCompareKeyFunction* comparekey = DefaultCompareKey) const
   {
     int l = 0, r = Length () - 1;
     while (l <= r)
@@ -299,7 +317,7 @@ public:
    * Insert an element at a sorted position.
    * Assumes array is already sorted.
    */
-  int InsertSorted (T* item, ArrayCompareFunction* compare)
+  int InsertSorted (T* item, ArrayCompareFunction* compare = DefaultCompare)
   {
     int m = 0, l = 0, r = Length () - 1;
     while (l <= r)
@@ -324,14 +342,15 @@ public:
   }
 
   /// Same but for all elements
-  void QuickSort (ArrayCompareFunction* compare)
+  void QuickSort (ArrayCompareFunction* compare = DefaultCompare)
   {
     if (count > 0)
       QuickSort (0, count - 1, compare);
   }
   
   /// Partially sort the array
-  void QuickSort (int Left, int Right, ArrayCompareFunction* compare)
+  void QuickSort (int Left, int Right,
+    ArrayCompareFunction* compare = DefaultCompare)
   {
   recurse:
     int i = Left, j = Right;

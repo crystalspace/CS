@@ -399,33 +399,73 @@ public:
   }
 
   /**
-   * Find an element based on some key.  Assumes that the array is sorted.
-   * If it is not sorted, then the result will not be meaningful.
+   * Get the portion of the array between low and high inclusive
    */
-  int FindSortedKey (void* key, ArrayCompareKeyFunction* comparekey) const
+  csArray<T> Section (int low, int high) const
   {
-    int l = 0, r = Length () - 1;
+    CS_ASSERT (low >= 0 && high < count && high >= low);
+    csArray<T> sect (high - low + 1);
+    for (int i = low; i <= high; i++) sect.Push (root[i]);
+    return sect;
+  }
+
+  /// The default ArraySortCompareFunction for Sort()
+  static int DefaultSortCompare (void const *item1, void const *item2)
+  {
+    if ((int) item1 < (int) item2) return -1;
+    else if ((int) item2 > (int) item1) return 1;
+    else return 0;
+  }
+
+  /// The default ArrayCompareFunction for InsertSorted()
+  static int DefaultCompare (T const &item1, T const &item2)
+  {
+    if (item1 < item2) return -1;
+    else if (item1 > item2) return 1;
+    else return 0;
+  }
+
+  /// The default ArrayCompareKeyFunction for FindKey()
+  static int DefaultCompareKey (T const &item1, void *item2)
+  {
+    if (item1 < item2) return -1;
+    else if (item1 > item2) return 1;
+    else return 0;
+  }
+
+  /**
+   * Find an element based on some key, using a csArrayCompareKeyFunction.
+   * The array must be sorted. Returns -1 if element does not exist.
+   */
+  int FindSortedKey (void* key, ArrayCompareKeyFunction* comparekey
+    = DefaultCompareKey, int *candidate = 0) const
+  {
+    int m = 0, l = 0, r = Length () - 1;
     while (l <= r)
     {
-      int m = (l + r) / 2;
+      m = (l + r) / 2;
       int cmp = comparekey (root [m], key);
 
       if (cmp == 0)
+      {
+        if (candidate) *candidate = -1;
         return m;
+      }
       else if (cmp < 0)
         l = m + 1;
       else
         r = m - 1;
     }
+    if (candidate) *candidate = m;
     return -1;
   }
 
   /**
-   * Insert an element at a sorted position.
+   * Insert an element at a sorted position, using a csArrayCompareFunction.
    * Assumes array is already sorted.
    */
-  int InsertSorted (T item, ArrayCompareFunction* compare,
-	int* equal_index = 0)
+  int InsertSorted (const T &item, ArrayCompareFunction* compare
+    = DefaultCompare, int* equal_index = 0)
   {
     int m = 0, l = 0, r = Length () - 1;
     while (l <= r)
@@ -454,7 +494,7 @@ public:
   /**
    * Sort array.
    */
-  void Sort (ArraySortCompareFunction* compare)
+  void Sort (ArraySortCompareFunction* compare = DefaultSortCompare)
   {
     qsort (root, Length (), sizeof (T), compare);
   }

@@ -301,11 +301,36 @@ public:
     return -1;
   }
 
+  /// The default ArraySortCompareFunction for Sort()
+  static int DefaultSortCompare (void const *item1, void const *item2)
+  {
+    if ((int) item1 < (int) item2) return -1;
+    else if ((int) item2 > (int) item1) return 1;
+    else return 0;
+  }
+
+  /// The default ArrayCompareFunction for InsertSorted()
+  static int DefaultCompare (T const *item1, T const *item2)
+  {
+    if (item1 < item2) return -1;
+    else if (item1 > item2) return 1;
+    else return 0;
+  }
+
+  /// The default ArrayCompareKeyFunction for FindKey()
+  static int DefaultCompareKey (T const *item1, void *item2)
+  {
+    if (item1 < item2) return -1;
+    else if (item1 > item2) return 1;
+    else return 0;
+  }
+
   /**
    * Find an element based on some key.
    * Assumes array is sorted.
    */
-  int FindSortedKey (void* key, ArrayCompareKeyFunction* comparekey) const
+  int FindSortedKey (void* key,
+    ArrayCompareKeyFunction* comparekey = DefaultCompareKey) const
   {
     int l = 0, r = Length () - 1;
     while (l <= r)
@@ -330,7 +355,7 @@ public:
    * to the index of a duplicate item (if found). If no such
    * duplicate item exists it will be set to -1.
    */
-  int InsertSorted (T* item, ArrayCompareFunction* compare,
+  int InsertSorted (T* item, ArrayCompareFunction* compare = DefaultCompare,
 	int* equal_index = 0)
   {
     int m = 0, l = 0, r = Length () - 1;
@@ -360,7 +385,7 @@ public:
   /**
    * Sort array.
    */
-  void Sort (ArraySortCompareFunction* compare)
+  void Sort (ArraySortCompareFunction* compare = DefaultSortCompare)
   {
     qsort (root, Length (), sizeof (T*), compare);
   }

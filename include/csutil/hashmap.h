@@ -19,6 +19,12 @@
 #ifndef __CS_HASHMAP_H__
 #define __CS_HASHMAP_H__
 
+#if 0 // let's not deprecate just yet :)
+#ifndef COMP_VC
+# warning Use of csHashMap is deprecated. Please csHash instead.
+#endif
+#endif
+
 #include "csutil/parray.h"
 #include "csutil/array.h"
 
@@ -182,6 +188,7 @@ public:
 /**
  * This is a general hashmap. You can put elements in this
  * map using a key.
+ * Deprecated. Use csHash or csGrowingHash instead.
  * Keys must not be unique. If a key is not unique then you
  * can iterate over all elements with the same key.
  */

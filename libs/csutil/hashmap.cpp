@@ -24,30 +24,6 @@
 
 //-----------------------------------------------------------------------------
 
-inline static csHashKey rotate_bits_right_3(csHashKey h)
-{
-  return (h >> 3) | (h << 29);
-}
-
-csHashKey csHashCompute(char const* s, int n)
-{
-  csHashKey h = 0;
-  char const* slim = s + n;
-  while (s < slim)
-    h = rotate_bits_right_3(h) + *s++;
-  return h;
-}
-
-csHashKey csHashCompute(char const* s)
-{
-  csHashKey h = 0;
-  while (*s != 0)
-    h = rotate_bits_right_3(h) + *s++;
-  return h;
-}
-
-//-----------------------------------------------------------------------------
-
 csGlobalHashIterator::csGlobalHashIterator (csHashMap *hm)
 {
   hash = hm;
