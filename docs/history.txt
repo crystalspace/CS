@@ -11,6 +11,17 @@ chronological order.
 	  of visual differences between walktest/NR and walktest/OR.
 	- Jorrit changed csSubRectangles2 to use a global block allocator
 	  instead of one allocator per instance.
+	- Jorrit changed Dynavis so that it no longer checks the model
+	  when it is inserted in dynavis but instead adds it to the queue
+	  of models that need to be checked. By doing that the operation of
+	  checking the model is delayed until the materials are prepared and
+	  this means that things prepare a lot more efficiently. The way it
+	  was before the checking of the object model would force a premature
+	  prepare of the thing (before materials are ready) which causes the
+	  thing to do only a partial prepare. This is inefficient as it will
+	  then have to do the prepare again later. Also for some reason it
+	  caused memory leaks. This is probably a bug in thing as there
+	  should be no leak on multiple prepare calls.
 12-Feb-2004
 	- Jorrit did several documentation enhancements:
 	    - Added a link to the new level building section in the

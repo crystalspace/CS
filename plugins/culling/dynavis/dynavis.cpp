@@ -328,7 +328,7 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
     visobj_wrap->caster = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iShadowCaster);
   }
-  model_mgr->CheckObjectModel (visobj_wrap->model, mesh);
+  AddObjectToUpdateQueue (visobj_wrap);
 
   csBox3 bbox;
   visobj_wrap->full_transform_identity = movable->IsFullTransformIdentity ();
