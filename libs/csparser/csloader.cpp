@@ -2085,6 +2085,7 @@ bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper,
     CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (PLUGIN)
     CS_TOKEN_TABLE (PARAMS)
+    CS_TOKEN_TABLE (KEY)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -2106,6 +2107,9 @@ bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper,
     }
     switch (cmd)
     {
+      case CS_TOKEN_KEY:
+        load_key (params, pWrapper);
+        break;
       case CS_TOKEN_ADDON:
 	LoadAddOn (params, &(pWrapper->scfiTerrainWrapper));
       	break;

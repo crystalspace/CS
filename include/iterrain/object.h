@@ -31,7 +31,7 @@ struct iRenderView;
 struct iTerrainObject;
 struct iTerrainObjectFactory;
 
-SCF_VERSION (iTerrainObject, 0, 0, 1);
+SCF_VERSION (iTerrainObject, 0, 0, 2);
 
 /**
  * This object represents a terrain mesh.
@@ -39,9 +39,15 @@ SCF_VERSION (iTerrainObject, 0, 0, 1);
 struct iTerrainObject : public iBase
 {
   /// Set a directional light.
-  virtual void SetDirLight ( csVector3& dirl, csColor& dirc) = 0;
+  virtual void SetDirLight (const csVector3& dirl, const csColor& dirc) = 0;
+  /// Get the directional light position.
+  virtual csVector3 GetDirLightPosition () const = 0;
+  /// Get the directional light color.
+  virtual csColor GetDirLightColor () const = 0;
   /// Disable directional light.
   virtual void DisableDirLight () = 0;
+  /// Return true if directional light is enabled.
+  virtual bool IsDirLightEnabled () const = 0;
 
   /**
    * Draw this terrain given a view and transformation.

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,11 +20,13 @@
 #define __IMESH_BALL_H__
 
 #include "csutil/scf.h"
+
 class csVector3;
+class csColor;
 
 struct iMaterialWrapper;
 
-SCF_VERSION (iBallState, 0, 0, 1);
+SCF_VERSION (iBallState, 0, 0, 2);
 
 /**
  * This interface describes the API for the ball mesh object.
@@ -54,6 +56,22 @@ struct iBallState : public iBase
   virtual void SetMixMode (UInt mode) = 0;
   /// Get mix mode.
   virtual UInt GetMixMode () = 0;
+  /// Set reversed mode (i.e. sphere visible from inside out).
+  virtual void SetReversed (bool r) = 0;
+  /// Get reversed mode.
+  virtual bool IsReversed () = 0;
+  /// Only show top half.
+  virtual void SetTopOnly (bool t) = 0;
+  /// Only top half.
+  virtual bool IsTopOnly () = 0;
+  /// Set lighting.
+  virtual void SetLighting (bool l) = 0;
+  /// Is lighting enabled.
+  virtual bool IsLighting () = 0;
+  /// Set the color to use. Will be added to the lighting values.
+  virtual void SetColor (const csColor& col) = 0;
+  /// Get the color.
+  virtual csColor GetColor () = 0;
 };
 
 #endif

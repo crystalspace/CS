@@ -46,6 +46,7 @@
 #include "csengine/covtree.h"
 #include "csengine/solidbsp.h"
 #include "csengine/meshobj.h"
+#include "csengine/terrobj.h"
 #include "csparser/impexp.h"
 #include "csutil/csrect.h"
 #include "csutil/scanstr.h"
@@ -111,6 +112,7 @@ WalkTest::WalkTest () :
   cslogo = NULL;
   engine = NULL;
   anim_sky = NULL;
+  anim_dirlight = NULL;
 
   wf = NULL;
   map_mode = MAP_OFF;
@@ -347,24 +349,36 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
     {
       case 0:
 	{
-          csXRotMatrix3 mat (anim_sky_speed * 2. * M_PI * (float)elapsed_time/1000.);
+          csXRotMatrix3 mat (anim_sky_speed * 2. * M_PI
+	  	* (float)elapsed_time/1000.);
           move.Transform (mat);
 	  break;
 	}
       case 1:
 	{
-          csYRotMatrix3 mat (anim_sky_speed * 2. * M_PI * (float)elapsed_time/1000.);
+          csYRotMatrix3 mat (anim_sky_speed * 2. * M_PI
+	  	* (float)elapsed_time/1000.);
           move.Transform (mat);
 	  break;
 	}
       case 2:
 	{
-          csZRotMatrix3 mat (anim_sky_speed * 2. * M_PI * (float)elapsed_time/1000.);
+          csZRotMatrix3 mat (anim_sky_speed * 2. * M_PI
+	  	* (float)elapsed_time/1000.);
           move.Transform (mat);
 	  break;
 	}
     }
     move.UpdateMove ();
+  }
+  // Move the directional light if any.
+  if (anim_dirlight)
+  {
+    csVector3 pos = anim_dirlight->GetTerrainObject ()->GetDirLightPosition ();
+    csColor col = anim_dirlight->GetTerrainObject ()->GetDirLightColor ();
+    csYRotMatrix3 mat (.05* 2. * M_PI * (float)elapsed_time/1000.);
+    pos = mat * pos;
+    anim_dirlight->GetTerrainObject ()->SetDirLight (pos, col);
   }
 
   // Update all busy entities.

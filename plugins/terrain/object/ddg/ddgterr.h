@@ -114,10 +114,24 @@ public:
   virtual void LoadMaterialGroup( const char *pName, int iStart, int iEnd );
 
   /// Set a directional light.
-//  virtual void SetDirLight (const csVector3& dirl, const csColor& dirc);
-  virtual void SetDirLight ( csVector3& dirl, csColor& dirc );
+  virtual void SetDirLight (const csVector3& dirl, const csColor& dirc);
+  /// Get the directional light position.
+  virtual csVector3 GetDirLightPosition () const
+  {
+    return dirlight;
+  };
+  /// Get the directional light color.
+  virtual csColor GetDirLightColor () const
+  {
+    return dircolor;
+  };
   /// Disable directional light.
   virtual void DisableDirLight ();
+  /// Is the directional light enabled.
+  virtual bool IsDirLightEnabled () const
+  {
+    return do_dirlight;
+  }
 
   /**
    * Draw this terrain given a view and transformation.

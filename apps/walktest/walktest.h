@@ -40,6 +40,8 @@ class csView;
 class csEngine;
 class csPixmap;
 class csWireFrameCam;
+class csMeshWrapper;
+class csTerrainWrapper;
 class PhysicsLibrary;
 class InfiniteMaze;
 class HugeRoom;
@@ -263,12 +265,13 @@ public:
 
   /// A pointer to a skybox to animate (if any).
   csMeshWrapper* anim_sky;
-
   /// Speed of this animation (with 1 meaning 1 full rotation in a second).
   float anim_sky_speed;
-
   /// Rotation direction (0=x, 1=y, 2=z)
   int anim_sky_rot;
+
+  /// A pointer to the terrain for which we animate the dirlight.
+  csTerrainWrapper* anim_dirlight;
 
   /// A sprite to display the Crystal Space Logo
   csPixmap* cslogo;

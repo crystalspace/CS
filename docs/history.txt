@@ -1,6 +1,42 @@
 The history order has been reversed so that new features are at the top.
 
+12-Apr-2001
+	- Philip Wyett fixed a couple of function declaration redefinition
+	  compile errors under VC6.
+	- Added support for 'KEY' nodes in terrain objects.
+	- Extended iTerrainObject with GetDirLightPosition(),
+	  GetDirLightColor(), and IsDirLightEnabled().
+	- Added new cmd_AnimateDirLight key command to WalkTest. This will
+	  animate a directional light for a terrain object.
+	- Added SetReversed(), IsReversed(), SetTopOnly(), and IsTopOnly()
+	  to the ball mesh plugin. With reversed mode you can let the
+	  triangles be visible from the inside instead of outside. With
+	  top-only only the top half of the sphere is generated. Using
+	  these two flags you can make a skydome. Also extended the ball
+	  loader with the keywords REVERSED and TOPONLY.
+	- In addition also added SetLighting() and IsLighting() and the
+	  LIGHTING keyword.
+	- Finally added SetColor() and GetColor() and COLOR keyword to set
+	  the base color for the ball.
+	- Added a new terrain engine. This one is a lot simpler than the
+	  DDG engine and is based on a function instead of a heightmap.
+	  You can of course use a function that reads from a heightmap. In
+	  the future there will be a conveniance function that does this.
+	  You can also optionally give a function that will return normals
+	  (for lighting). If you don't give such a function it will try
+	  to calculate the normals itself. The terrain engine supports
+	  LOD (four levels of LOD). You can divide the terrain in blocks.
+	  Every block has its own texture and has four levels of LOD.
+	  The terrain engine also supports dynamic directional lighting.
+	  Note that this is unfinished work. There are still some bugs in
+	  CS to solve (same bugs that make the DDG terrain engine not
+	  look nice) and better visibility testing is also needed.
+	  The default function for the terrain is a sin+cos function.
+	  Also LOD is not really implemented at the moment.
 11-Apr-2001
+	- Norman Kramer fixed ptlab.
+	- Norman Kramer fixed the video app so that it works completely
+	  through the new mesh object system.
 	- Wouter Wijngaards added an isometric engine plugin. This is only
 	  the first version and it still needs a lot of work. But it
 	  compiles and runs. There is an isometric engine plugin and

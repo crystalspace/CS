@@ -62,6 +62,12 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   top_mesh.triangles = NULL;
   top_mesh.vertex_fog = NULL;
   shapenr = 0;
+  reversed = false;
+  toponly = false;
+  do_lighting = true;
+  color.red = 0;
+  color.green = 0;
+  color.blue = 0;
 }
 
 csBallMeshObject::~csBallMeshObject ()
@@ -222,13 +228,16 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
       uvverts[num_vertices].Set (u, v);
       num_vertices++;
 
-      new_verticesB[j] = num_vertices;
-      vertices[num_vertices].Set (
-                         new_radius * cos (angle),
-                         -new_height,
-                         new_radius * sin (angle));
-      uvverts[num_vertices].Set (u, v);
-      num_vertices++;
+      if (!toponly)
+      {
+        new_verticesB[j] = num_vertices;
+        vertices[num_vertices].Set (
+                           new_radius * cos (angle),
+                           -new_height,
+                           new_radius * sin (angle));
+        uvverts[num_vertices].Set (u, v);
+        num_vertices++;
+      }
     }
 
     //-----
@@ -244,14 +253,17 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
       triangles[num_triangles].b = prev_verticesT[(j+1)%num];
       triangles[num_triangles].a = new_verticesT[(j+1)%num];
       num_triangles++;
-      triangles[num_triangles].a = prev_verticesB[j];
-      triangles[num_triangles].b = new_verticesB[(j+1)%num];
-      triangles[num_triangles].c = new_verticesB[j];
-      num_triangles++;
-      triangles[num_triangles].a = prev_verticesB[j];
-      triangles[num_triangles].b = prev_verticesB[(j+1)%num];
-      triangles[num_triangles].c = new_verticesB[(j+1)%num];
-      num_triangles++;
+      if (!toponly)
+      {
+        triangles[num_triangles].a = prev_verticesB[j];
+        triangles[num_triangles].b = new_verticesB[(j+1)%num];
+        triangles[num_triangles].c = new_verticesB[j];
+        num_triangles++;
+        triangles[num_triangles].a = prev_verticesB[j];
+        triangles[num_triangles].b = prev_verticesB[(j+1)%num];
+        triangles[num_triangles].c = new_verticesB[(j+1)%num];
+        num_triangles++;
+      }
     }
 
     //-----
@@ -260,7 +272,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     for (j = 0 ; j < num ; j++)
     {
       prev_verticesT[j] = new_verticesT[j];
-      prev_verticesB[j] = new_verticesB[j];
+      if (!toponly) prev_verticesB[j] = new_verticesB[j];
     }
   }
 
@@ -269,10 +281,14 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   vertices[num_vertices].Set (0, vert_radius, 0);
   uvverts[num_vertices].Set (.5, .5);
   num_vertices++;
-  int bottom_vertex = num_vertices;
-  vertices[num_vertices].Set (0, -vert_radius, 0);
-  uvverts[num_vertices].Set (.5, .5);
-  num_vertices++;
+  int bottom_vertex;
+  if (!toponly)
+  {
+    bottom_vertex = num_vertices;
+    vertices[num_vertices].Set (0, -vert_radius, 0);
+    uvverts[num_vertices].Set (.5, .5);
+    num_vertices++;
+  }
 
   //-----
   // Make the top triangle fan.
@@ -288,13 +304,14 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   //-----
   // Make the bottom triangle fan.
   //-----
-  for (j = 0 ; j < num ; j++)
-  {
-    triangles[num_triangles].a = bottom_vertex;
-    triangles[num_triangles].b = prev_verticesB[j];
-    triangles[num_triangles].c = prev_verticesB[(j+1)%num];
-    num_triangles++;
-  }
+  if (!toponly)
+    for (j = 0 ; j < num ; j++)
+    {
+      triangles[num_triangles].a = bottom_vertex;
+      triangles[num_triangles].b = prev_verticesB[j];
+      triangles[num_triangles].c = prev_verticesB[(j+1)%num];
+      num_triangles++;
+    }
 
   // Scale and shift all the vertices.
   normals = new csVector3[num_vertices];
@@ -305,6 +322,17 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     vertices[i].z *= radiusz/2;
     normals[i] = vertices[i].Unit ();
     vertices[i] += shift;
+  }
+
+  // Swap all triangles if needed.
+  if (reversed)
+  {
+    for (i = 0 ; i < num_triangles ; i++)
+    {
+      int s = triangles[i].a;
+      triangles[i].a = triangles[i].c;
+      triangles[i].c = s;
+    }
   }
 
   // Setup the mesh and normal array.
@@ -417,7 +445,9 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
   // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
   for (i = 0 ; i < top_mesh.num_vertices ; i++)
-    colors[i].Set (0, 0, 0);
+    colors[i] = color;
+  if (!do_lighting) return;
+    // @@@ it is not effiecient to do this all the time.
 
   // Do the lighting.
   csVector3 obj_center (0);

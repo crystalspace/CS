@@ -156,7 +156,7 @@ void csDDGTerrainObject::LoadMaterialGroup( const char *pName, int iStart, int i
   }
 
   int i;
-  char *pMatName = new char[256];
+  char pMatName[256];
 
   for (i = iStart ; i <= iEnd ; i++)
   {
@@ -195,7 +195,8 @@ void csDDGTerrainObject::AddMaterial( char *pName )
   iMatIndex++;
 }
 
-void csDDGTerrainObject::SetDirLight( csVector3& dirl, csColor& dirc)
+void csDDGTerrainObject::SetDirLight (const csVector3& dirl,
+	const csColor& dirc)
 {
   dirlight = dirl;
   dircolor = dirc;

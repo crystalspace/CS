@@ -32,6 +32,7 @@
 #include "csengine/csview.h"
 #include "csengine/wirefrm.h"
 #include "csengine/meshobj.h"
+#include "csengine/terrobj.h"
 #include "csengine/polygon.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
@@ -469,6 +470,13 @@ void WalkTest::ParseKeyCmds (csObject* src)
         anim_sky = ((csSector*)src)->GetMesh (name);
       }
     }
+    else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
+    {
+      if (src->GetType () == csTerrainWrapper::Type)
+      {
+        anim_dirlight = (csTerrainWrapper*)src;
+      }
+    }
     else if (!strcmp (kp->GetKey (), "entity_Door"))
     {
       if (src->GetType () == csMeshWrapper::Type)
@@ -560,6 +568,11 @@ void WalkTest::ParseKeyCmds ()
     {
       csMeshWrapper* sprite = sector->GetMesh (j);
       ParseKeyCmds (sprite);
+    }
+    for (j = 0 ; j < sector->GetNumberTerrains () ; j++)
+    {
+      csTerrainWrapper* terr = sector->GetTerrain (j);
+      ParseKeyCmds (terr);
     }
   }
 }

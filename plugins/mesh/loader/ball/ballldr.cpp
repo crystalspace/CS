@@ -44,13 +44,17 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MULTIPLY2)
   CS_TOKEN_DEF (MULTIPLY)
   CS_TOKEN_DEF (TRANSPARENT)
+  CS_TOKEN_DEF (LIGHTING)
 
+  CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (NUMRIM)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (MIXMODE)
   CS_TOKEN_DEF (RADIUS)
   CS_TOKEN_DEF (SHIFT)
+  CS_TOKEN_DEF (REVERSED)
+  CS_TOKEN_DEF (TOPONLY)
 CS_TOKEN_DEF_END
 
 IMPLEMENT_IBASE (csBallFactoryLoader)
@@ -223,6 +227,10 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
     CS_TOKEN_TABLE (RADIUS)
     CS_TOKEN_TABLE (SHIFT)
     CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (REVERSED)
+    CS_TOKEN_TABLE (TOPONLY)
+    CS_TOKEN_TABLE (LIGHTING)
+    CS_TOKEN_TABLE (COLOR)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -246,6 +254,34 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
     }
     switch (cmd)
     {
+      case CS_TOKEN_REVERSED:
+	{
+	  bool r;
+	  ScanStr (params, "%b", &r);
+	  ballstate->SetReversed (r);
+	}
+	break;
+      case CS_TOKEN_TOPONLY:
+	{
+	  bool r;
+	  ScanStr (params, "%b", &r);
+	  ballstate->SetTopOnly (r);
+	}
+	break;
+      case CS_TOKEN_LIGHTING:
+	{
+	  bool r;
+	  ScanStr (params, "%b", &r);
+	  ballstate->SetLighting (r);
+	}
+	break;
+      case CS_TOKEN_COLOR:
+	{
+	  csColor col;
+	  ScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
+	  ballstate->SetColor (col);
+	}
+	break;
       case CS_TOKEN_RADIUS:
 	{
 	  float x, y, z;
@@ -383,6 +419,15 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
   str->Push(strnew(buf));
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     GetPrivateObject()->GetName());
+  str->Push(strnew(buf));
+  if (!state->IsLighting ())
+    str->Push (strnew ("LIGHTING (no)\n"));
+  if (state->IsReversed ())
+    str->Push (strnew ("REVERSED (yes)\n"));
+  if (state->IsTopOnly ())
+    str->Push (strnew ("TOPONLY (yes)\n"));
+  csColor col = state->GetColor ();
+  sprintf(buf, "COLOR (%g,&g,&g)\n", col.red, col.green, col.blue);
   str->Push(strnew(buf));
 
   fact->DecRef();

@@ -43,6 +43,10 @@ private:
   UInt MixMode;
   csMeshCallback* vis_cb;
   void* vis_cbData;
+  bool reversed;
+  bool toponly;
+  bool do_lighting;
+  csColor color;
 
   int verts_circle;
   G3DTriangleMesh top_mesh;
@@ -115,6 +119,38 @@ public:
     else if (verts_circle >= 60) verts_circle = 59;
   }
   int GetRimVertices () const {return verts_circle;}
+  /// Set reversed mode (i.e. sphere visible from inside out).
+  void SetReversed (bool r)
+  {
+    reversed = r;
+    initialized = false;
+    shapenr++;
+  }
+  /// Get reversed mode.
+  bool IsReversed ()
+  {
+    return reversed;
+  }
+  /// Only show top half.
+  void SetTopOnly (bool t)
+  {
+    toponly = t;
+    initialized = false;
+    shapenr++;
+  }
+  /// Only top half.
+  bool IsTopOnly ()
+  {
+    return toponly;
+  }
+  /// Set lighting.
+  void SetLighting (bool l) { do_lighting = l; }
+  /// Is lighting enabled.
+  bool IsLighting () { return do_lighting; }
+  /// Set the color to use. Will be added to the lighting values.
+  void SetColor (const csColor& col) { color = col; }
+  /// Get the color.
+  csColor GetColor () { return color; }
 
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
@@ -175,9 +211,18 @@ public:
     {
       scfParent->material = material;
     }
-    virtual iMaterialWrapper* GetMaterialWrapper () { return scfParent->material; }
+    virtual iMaterialWrapper* GetMaterialWrapper ()
+    { return scfParent->material; }
     virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
     virtual UInt GetMixMode () { return scfParent->MixMode; }
+    virtual void SetReversed (bool r) { scfParent->SetReversed (r); }
+    virtual bool IsReversed () { return scfParent->IsReversed (); }
+    virtual void SetTopOnly (bool t) { scfParent->SetTopOnly (t); }
+    virtual bool IsTopOnly () { return scfParent->IsTopOnly (); }
+    virtual void SetLighting (bool l) { scfParent->SetLighting (l); }
+    virtual bool IsLighting () { return scfParent->IsLighting (); }
+    virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
+    virtual csColor GetColor () { return scfParent->GetColor (); }
   } scfiBallState;
   friend class BallState;
 };

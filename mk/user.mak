@@ -37,6 +37,7 @@ PLUGINS += mesh/object/spiral   mesh/loader/spiral
 PLUGINS += mesh/object/ball     mesh/loader/ball
 PLUGINS +=                      mesh/loader/thing
 PLUGINS += terrain/object/ddg   terrain/loader/ddg
+PLUGINS += terrain/object/terrfunc terrain/loader/terrfunc
 PLUGINS.DYNAMIC += video/renderer/line video/renderer/null video/renderer/inf
 PLUGINS.DYNAMIC += sound/loader
 PLUGINS.DYNAMIC += console/output/standard
