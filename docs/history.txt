@@ -30,6 +30,9 @@ Short-term cleanups that need to be done:
 	  number of times.
 	- Eric Sunshine moved standard.zip, shtlib_g.zip, and shtlib_m.zip
 	  from the CS directory into the CS/data directory.
+	- Eric Sunshine fixed a bug in the new polygon iterator, csPolyIt.
+	  It would crash with a BUS error if the world contained no sectors.
+	  This bug prevented MetaDemo and MazeD from launching.
 19-Sep-1999
 	- Moved LIGHTMAP_SIZE config value from softrdnr.cfg to cryst.cfg
 	  where it belongs.  It now works again.
