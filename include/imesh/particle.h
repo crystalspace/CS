@@ -23,6 +23,7 @@
 class csColor;
 class csVector3;
 class csReversibleTransform;
+class csZBufMode;
 struct iRenderView;
 struct iLight;
 
