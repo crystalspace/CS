@@ -30,6 +30,7 @@
 #include "iengine/movable.h"
 #include "iengine/sector.h"
 #include "igeom/clip2d.h"
+#include "iutil/cmdline.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
@@ -333,8 +334,44 @@ bool R3DTest::Initialize ()
   csRef<iMaterialWrapper> mat = engine->GetMaterialList ()->NewMaterial (shadow);
   mat->QueryObject ()->SetName ("shadow extruder");
 
+  csRef<iCommandLineParser> cmdline =
+    CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+
+  csString tmp;
+  const char* levelPath = "$@data$/r3dbox.zip";
+  const char* cmdlName = cmdline->GetName ();
+  if (cmdlName)
+  {
+    const char* dot = strrchr (cmdlName, '.');
+    if (strchr (cmdlName, PATH_SEPARATOR) || 
+      strchr (cmdlName, '/') || (dot && (strcasecmp (dot, ".zip") == 0)))
+    {
+      tmp << "$@";
+
+      static const char pathSep[3] = {PATH_SEPARATOR, '/', 0};
+      size_t len = (size_t)strlen (cmdlName);
+      size_t p, o = 0;
+      csString sCmdL (cmdlName);
+
+      csString s2;
+      while ((p = strcspn (cmdlName + o, pathSep)) < (len - o))
+      {
+	sCmdL.SubString (s2, o, p);
+	tmp << s2 << "$/";
+	o += (p + 1);
+      }
+      sCmdL.SubString (s2, o, len - o);
+      tmp << s2;
+    }
+    else
+    {
+      tmp.Format ("$@data$/%s.zip", cmdlName);
+    }
+    levelPath = tmp;
+  }
+
   // Change this path to something /Anders Stenberg
-  vfs->Mount ("/lev/testrender", "$@data$/r3dbox.zip");
+  vfs->Mount ("/lev/testrender", levelPath);
   vfs->ChDir ("/lev/testrender");
   if (!loader->LoadMapFile ("world", false))
   {
