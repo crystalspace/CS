@@ -398,7 +398,7 @@ public:
   Pump() { };
   virtual void Notify()
     {
-		s->PushFrame();
+    s->PushFrame();
     }
 };
 #endif
@@ -433,12 +433,16 @@ IMPLEMENT_APP(MyApp)
  *---------------------------------------------------------------------*/
   bool MyApp::OnInit(void)
 {
-	char** csargv;
+#if defined(wxUSE_UNICODE) && wxUSE_UNICODE
+  char** csargv;
     csargv = (char**)malloc(sizeof(char*) * argc);
-	for(int i = 0; i < argc; i++) {
-		csargv[i] = strdup(wxString(argv[i]).mb_str().data());
-	}
+  for(int i = 0; i < argc; i++) {
+    csargv[i] = strdup(wxString(argv[i]).mb_str().data());
+  }
   object_reg = csInitializer::CreateEnvironment (argc, csargv);
+#else
+  object_reg = csInitializer::CreateEnvironment (argc, argv);
+#endif
 
   simple = new Simple (object_reg);
   simple->Initialize ();
@@ -449,9 +453,9 @@ IMPLEMENT_APP(MyApp)
    than 20 ms to render a frame the framerate will be lower :-)
    You may wish to tweak this for your own application.  Note that
    this also lets you throttle the CPU usage of your app, because
-   the application will yield the CPU and wait for events in the 
-   time between when it completes rendering the current frame and 
-   the timer triggers the next frame. 
+   the application will yield the CPU and wait for events in the
+   time between when it completes rendering the current frame and
+   the timer triggers the next frame.
   */
 
   Pump* p = new Pump();
@@ -463,8 +467,8 @@ IMPLEMENT_APP(MyApp)
 }
 
 #ifdef USE_IDLE
-void MyApp::OnIdle() {	
-	simple->PushFrame();
+void MyApp::OnIdle() {
+  simple->PushFrame();
 }
 #endif
 
