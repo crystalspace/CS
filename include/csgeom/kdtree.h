@@ -134,8 +134,6 @@ private:
 
   iBase* userobject;		// An optional user object for this node.
 
-  bool obj_bbox_valid;		// If false obj_bbox is not valid.
-  csBox3 obj_bbox;		// Bbox of all objects in this node.
   csBox3 node_bbox;		// Bbox of the node itself.
 
   int split_axis;		// One of CS_KDTREE_AXIS?
@@ -194,13 +192,6 @@ private:
    * and split_location.
    */
   void DistributeLeafObjects ();
-
-  /**
-   * This function is called immediatelly after adding
-   * one object with the given bbox. It will update the
-   * bbox of the node correctly.
-   */
-  void UpdateBBox (const csBox3& bbox);
 
   /**
    * Traverse the tree from front to back. Every node of the
@@ -314,11 +305,6 @@ public:
    * Return the array of objects in this node.
    */
   csKDTreeChild** GetObjects () const { return objects; }
-
-  /**
-   * Return the bounding box of all objects in this node.
-   */
-  const csBox3& GetObjectBBox ();
 
   /**
    * Return the bounding box of the node itself (does not always contain

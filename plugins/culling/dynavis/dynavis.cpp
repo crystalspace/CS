@@ -155,22 +155,27 @@ void csVisibilityObjectWrapper::MovableChanged (iMovable* /*movable*/)
 
 //----------------------------------------------------------------------
 
+// Fast random generator. Only the 16 least significant
+// bits are guaranteed to be random.
+static unsigned int seed = 362436069;
+
+static inline unsigned int csFastrand ()
+{
+ static unsigned int b = 30903;
+ seed = b*(seed & 0xffff) + (seed>>16);
+ return seed;
+}
+
 // This function defines the amount to use for keeping
 // an object/node visible after it was marked visible
 // for some other reason.
-static int dist_history ()
+static inline int dist_history ()
 {
-  static int cnt = 0;
-  cnt++;
-  cnt = cnt & 7;
-  return 6+cnt;
+  return 6+(csFastrand () & 0x7);
 }
-static int dist_nowritequeue ()
+static inline int dist_nowritequeue ()
 {
-  static int cnt = 0;
-  cnt++;
-  cnt = cnt & 7;
-  return 12+cnt;
+  return 12+(csFastrand () & 0x7);
 }
 
 csDynaVis::csDynaVis (iBase *iParent)
@@ -544,7 +549,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     float sy = camera->GetShiftY ();
     float max_depth;
 #define DO_OUTLINE_TEST 0
-#define DO_WRITEQUEUE_TEST 1
+#define DO_WRITEQUEUE_TEST 0
 #if DO_OUTLINE_TEST
     static csPoly2D outline;
     outline.MakeEmpty ();

@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Nov-2003
+	- Jorrit did the following Dynavis changes:
+	    - Removed the write queue optimization for kdtree nodes again as
+	      it doesn't seem to do anything at all.
+	    - Removed the object bounding box for the kdtrees. This saves
+	      about 28 bytes per node and also makes building/updating
+	      the kdtree slightly faster. This also affects frustvis.
+	    - Replaced history culling and avoiding write queue flushes
+	      with a real fast random function instead of a counter.
 13-Nov-2003
 	- Keith Fulton committed updated versions of the scripts for 3ds Max
  	  exporting.  I've had these for two months and forgot to commit them
