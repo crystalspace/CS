@@ -300,6 +300,11 @@ bool csWorld::HandleEvent (csEvent &Event)
     {
       case cscmdSystemOpen:
       {
+        csGraphics3DCaps *caps = G3D->GetCaps ();
+        fogmethod = caps->fog;
+        NeedPO2Maps = caps->NeedsPO2Maps;
+        MaxAspectRatio = caps->MaxAspectRatio;
+
         frame_width = G3D->GetWidth ();
         frame_height = G3D->GetHeight ();
         if (csCamera::default_aspect == 0)
@@ -1088,7 +1093,7 @@ void csWorld::AddHalo (csLight* Light)
     return;
 
   // Check if light is not obscured by anything
-  float zv = G3D->GetZbuffValue (QRound (v.x), QRound (v.y));
+  float zv = G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
   if (v.z > zv)
     return;
 
@@ -1143,7 +1148,7 @@ bool csWorld::ProcessHalo (csLightHalo *Halo)
 
     if (top_clipper->IsInside (v.x, v.y))
     {
-      float zv = G3D->GetZbuffValue (QRound (v.x), QRound (v.y));
+      float zv = G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
       halo_vis = (v.z <= zv);
     }
 

@@ -405,7 +405,7 @@ void csGraphics2DGlideCommon::DecodeRGB ( UShort color, UByte& r, UByte& g, UByt
     b = ((color&pfmt.BlueMask) >> pfmt.BlueShift) << 3;
 }
 
-float csGraphics2DGlideCommon::GetZbuffValue (int x, int y)
+float csGraphics2DGlideCommon::GetZBuffValue (int x, int y)
 {
   GrLfbInfo_t lfbInfo;
   bool succ = GlideLib_grLfbLock ( GR_LFB_READ_ONLY | GR_LFB_NOIDLE,

@@ -46,10 +46,9 @@ const double TextureGamma      = 1.0; //can be from 0.01   to 1.0 (1.0= no effec
 ///////////////////////////////////
 D3DTextureCache::D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW pDDraw, 
                                  LPDIRECT3DDEVICE2 pDevice, int nBpp, bool bMipmapping,
-                                 G3D_CAPS* pRendercaps, int MaxAspectRatio)
+                                 csGraphics3DCaps *pRendercaps)
 : HighColorCache(nMaxSize, HIGHCOLOR_TEXCACHE, nBpp)
 {
-  ASSERT(MaxAspectRatio>0);
   ASSERT(pRendercaps);
   ASSERT(pDevice);
   ASSERT(pDDraw);
@@ -59,7 +58,6 @@ D3DTextureCache::D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW pDDr
   m_lpD3dDevice    = pDevice;
   m_bMipMapping    = bMipmapping;
   m_pRendercaps    = pRendercaps;
-  m_MaxAspectRatio = MaxAspectRatio;
   
   for (int i=0; i<256; i++)
   {
@@ -125,8 +123,8 @@ void D3DTextureCache::Load(csD3DCacheData *d)
   int NewWidth  = OriginalWidth;
   int NewHeight = OriginalHeight;
 
-  while (NewWidth/NewHeight > m_MaxAspectRatio) NewHeight += NewHeight;
-  while (NewHeight/NewWidth > m_MaxAspectRatio) NewWidth  += NewWidth;
+  while (NewWidth/NewHeight > m_pRendercaps->MaxAspectRatio) NewHeight += NewHeight;
+  while (NewHeight/NewWidth > m_pRendercaps->MaxAspectRatio) NewWidth  += NewWidth;
 
   if (NewWidth< m_pRendercaps->minTexWidth)  NewWidth  = m_pRendercaps->minTexWidth;
   if (NewHeight<m_pRendercaps->minTexHeight) NewHeight = m_pRendercaps->minTexHeight;

@@ -46,7 +46,7 @@ struct iGraphics2DGlide : public iBase
   /// Do we want to wait for a vertical retrace before we swap front and backbuffer ?
   virtual void SetVRetrace ( bool wait4vretrace )=0;
   virtual void ForceResolution ( int width, int height )=0;
-  virtual float GetZbuffValue (int x, int y)=0;
+  virtual float GetZBuffValue (int x, int y)=0;
 };
 
 #endif // __IGLIDE2D_H__

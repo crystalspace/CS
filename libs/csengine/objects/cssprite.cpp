@@ -1239,8 +1239,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // @@@ This should only be done when aspect changes...
   rview.g3d->SetPerspectiveAspect (rview.aspect);
 
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
+  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
 
   bool do_tween = false;
   if (!skeleton_state && tween_ratio) do_tween = true;

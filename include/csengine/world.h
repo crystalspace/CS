@@ -26,6 +26,7 @@
 #include "csengine/tranman.h"
 #include "csengine/halo.h"
 #include "csobject/csobject.h"
+#include "igraph3d.h"
 #include "isystem.h"
 #include "iworld.h"
 #include "iconfig.h"
@@ -54,7 +55,6 @@ class csCoverageMaskTree;
 class csCovMaskLUT;
 class csPoly2DPool;
 class csLightPatchPool;
-struct iGraphics3D;
 struct iSystem;
 struct iVFS;
 
@@ -251,6 +251,12 @@ public:
   csTransformationManager tr_manager;
   /// The 3D driver
   iGraphics3D* G3D;
+  // The fog mode this G3D implements
+  G3D_FOGMETHOD fogmethod;
+  // Does the 3D driver require power-of-two lightmaps?
+  bool NeedPO2Maps;
+  // Maximum texture aspect ratio
+  int MaxAspectRatio;
 
 private:
   /// Texture and color information object.

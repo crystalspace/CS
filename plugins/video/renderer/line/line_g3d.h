@@ -39,7 +39,10 @@ class csIniFile;
 class csGraphics3DLine : public iGraphics3D
 {
   /// Z Buffer mode to use while rendering next polygon.
-  G3DZBufMode z_buf_mode;
+  csZBufMode z_buf_mode;
+
+  /// Render capabilities
+  csGraphics3DCaps Caps;
 
   /// Width of display.
   int width;
@@ -104,20 +107,11 @@ public:
   /// Print the image in backbuffer
   virtual void Print (csRect *area);
 
-  /// Set the mode for the Z buffer used for drawing the next polygon.
-  virtual void SetZBufMode (G3DZBufMode mode);
-
   /// Draw the projected polygon with light and texture.
   virtual void DrawPolygon (G3DPolygonDP& poly);
 
   ///
   virtual void DrawPolygonDebug (G3DPolygonDP&) { }
-
-  /// Get the fog mode.
-  virtual G3D_FOGMETHOD GetFogMode () { return G3DFOGMETHOD_NONE; }
-
-  /// Get the fog mode.
-  virtual bool SetFogMode (G3D_FOGMETHOD) { return true; }
 
   ///
   virtual void OpenFogObject (CS_ID, csFog* ) { }
@@ -162,10 +156,11 @@ public:
    * Get the current driver's capabilities. Each driver implements their
    * own function.
    */
-  virtual void GetCaps (G3D_CAPS *caps);
+  virtual csGraphics3DCaps *GetCaps ()
+  { return &Caps; }
 
   /// Get address of Z-buffer at specific point.
-  virtual unsigned long *GetZBufPoint (int, int) { return NULL; }
+  virtual unsigned long *GetZBuffAt (int, int) { return NULL; }
 
   /// Dump the texture cache.
   virtual void DumpCache () { }
@@ -209,17 +204,8 @@ public:
   virtual iTextureManager *GetTextureManager ()
   { return texman; }
 
-  /// Returns true if this driver requires all maps to be PO2.
-  virtual bool NeedsPO2Maps () { return false; }
-  /// Returns the maximum aspect ratio of maps.
-  virtual int GetMaximumAspectRatio ()
-  { return 32768; }
-  /// Adjust to optimal texture size.
-  virtual void AdjustToOptimalTextureSize(int& w, int& h) 
-  {(void)w;(void)h;}
-
   /// Get Z-buffer value at given X,Y position
-  virtual float GetZbuffValue (int, int) { return 0; }
+  virtual float GetZBuffValue (int, int) { return 0; }
 
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float, float, float,

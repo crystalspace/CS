@@ -201,8 +201,11 @@ struct G3DPolygonDFP
   G3DPolyNormal normal;
 };
 
-/// Don't test/write, write, test, and write/test, respectively.
-enum G3DZBufMode
+/**
+ * Don't test/write, write, test, and write/test, respectively.
+ * The values below are sometimes used as bit masks, so don't change them!
+ */
+enum csZBufMode
 {
   CS_ZBUF_NONE = 0,
   CS_ZBUF_FILL = 1,
@@ -213,22 +216,34 @@ enum G3DZBufMode
 ///
 enum G3D_RENDERSTATEOPTION
 {
-  G3DRENDERSTATE_NOTHING,
-  G3DRENDERSTATE_ZBUFFERTESTENABLE,
-  G3DRENDERSTATE_ZBUFFERFILLENABLE,
+  /// Set Z-buffer fill/test/use mode (parameter is a csZBufMode)
+  G3DRENDERSTATE_ZBUFFERMODE,
+  /// Enable/disable dithering (parameter is a bool)
   G3DRENDERSTATE_DITHERENABLE,
-  G3DRENDERSTATE_SPECULARENABLE,
+  /// Enable/disable bi-linear mapping (parameter is a bool)
   G3DRENDERSTATE_BILINEARMAPPINGENABLE,
+  /// Enable/disable tri-linear mapping (parameter is a bool)
   G3DRENDERSTATE_TRILINEARMAPPINGENABLE,
+  /// Enable/disable transparent textures (parameter is a bool)
   G3DRENDERSTATE_TRANSPARENCYENABLE,
+  /// Enable/disable mip-mapping (parameter is a bool)
   G3DRENDERSTATE_MIPMAPENABLE,
+  /// Enable/disable textures (parameter is a bool)
   G3DRENDERSTATE_TEXTUREMAPPINGENABLE,
+  /// Enable/disable lighting (parameter is a bool)
   G3DRENDERSTATE_LIGHTINGENABLE,
+  /// Enable/disable interlacing (parameter is a bool)
   G3DRENDERSTATE_INTERLACINGENABLE,
+  /// Enable/disable MMX instructions usage (parameter is a bool)
   G3DRENDERSTATE_MMXENABLE,
+  /// Set perspective-correction interpolation step (parameter is a int)
   G3DRENDERSTATE_INTERPOLATIONSTEP,
+  /// Set maximal number of polygons per frame to draw (parameter is a int)
   G3DRENDERSTATE_MAXPOLYGONSTODRAW,
-  G3DRENDERSTATE_GOURAUDENABLE
+  /// Enable/disable Gouraud shading (parameter is a bool)
+  G3DRENDERSTATE_GOURAUDENABLE,
+  /// Gamma correction is passed as a fixed 16.16 value
+  G3DRENDERSTATE_GAMMACORRECTION
 };
 
 /// Bit flags for iGraphics3D::BeginDraw ()
@@ -242,41 +257,6 @@ enum G3D_RENDERSTATEOPTION
 #define CSDRAW_CLEARSCREEN  0x00000020
 
 ///
-enum G3D_COLORMODEL
-{
-  G3DCOLORMODEL_MONO,
-  G3DCOLORMODEL_RGB
-};
-
-///
-enum G3D_RASTERCAPS
-{
-  G3DRASTERCAPS_DITHER = 0x01,
-  G3DRASTERCAPS_SUBPIXEL = 0x02,
-  G3DRASTERCAPS_ZBUFFERLESSHSR = 0x04
-};
-
-///
-enum G3D_SHADECAPS
-{
-  G3DRASTERCAPS_FLAT = 1,
-  G3DRASTERCAPS_GOURAUD = 2,
-  G3DRASTERCAPS_PHONG = 4,
-  G3DRASTERCAPS_LIGHTMAP = 8
-};
-
-///
-enum G3D_FILTERCAPS
-{
-  G3DFILTERCAPS_LINEAR = 0x01,
-  G3DFILTERCAPS_LINEARMIPLINEAR = 0x02,
-  G3DFILTERCAPS_LINEARMIPNEAREST = 0x04,
-  G3DFILTERCAPS_MIPLINEAR = 0x08,
-  G3DFILTERCAPS_MIPNEAREST = 0x10,
-  G3DFILTERCAPS_NEAREST = 0x20
-};
-
-///
 enum G3D_FOGMETHOD
 {
   G3DFOGMETHOD_NONE = 0x00,
@@ -285,27 +265,14 @@ enum G3D_FOGMETHOD
 };
 
 ///
-struct G3D_PRIMCAPS
+struct csGraphics3DCaps
 {
-  G3D_RASTERCAPS RasterCaps;
-  bool canBlend;
-  G3D_SHADECAPS ShadeCaps;
-  bool PerspectiveCorrects;
-  G3D_FILTERCAPS FilterCaps;
-};
-
-///
-struct G3D_CAPS
-{
-  G3D_COLORMODEL ColorModel;
   bool CanClip;
-  bool SupportsArbitraryMipMapping;
-  int BitDepth;
-  int ZBufBitDepth;
   int minTexHeight, minTexWidth;
   int maxTexHeight, maxTexWidth;
-  G3D_PRIMCAPS PrimaryCaps;
   G3D_FOGMETHOD fog;
+  bool NeedsPO2Maps;
+  int MaxAspectRatio;
 };
 
 /**
@@ -405,7 +372,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 1, 0, 0);
+SCF_VERSION (iGraphics3D, 2, 0, 1);
 
 /**
  * This is the standard 3D graphics interface.
@@ -434,9 +401,6 @@ struct iGraphics3D : public iPlugIn
 
   /// Print the image in backbuffer
   virtual void Print (csRect *area) = 0;
-
-  /// Set the mode for the Z buffer used for drawing the next polygon.
-  virtual void SetZBufMode (G3DZBufMode mode) = 0;
 
   /// Draw the projected polygon with light and texture.
   virtual void DrawPolygon (G3DPolygonDP& poly) = 0;
@@ -500,12 +464,6 @@ struct iGraphics3D : public iPlugIn
    */
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) = 0;
 
-  /// Get the current fog mode (G3D_FOGMETHOD).
-  virtual G3D_FOGMETHOD GetFogMode () = 0;
-
-  /// Set the current fog mode as supported by this 3D rasterizer.
-  virtual bool SetFogMode (G3D_FOGMETHOD fogMethod) = 0;
-
   /**
    * Initiate a volumetric fog object. This function will be called
    * before front-facing and back-facing fog polygons are added to
@@ -545,10 +503,13 @@ struct iGraphics3D : public iPlugIn
    * Get the current driver's capabilities. Each driver implements their
    * own function.
    */
-  virtual void GetCaps (G3D_CAPS *caps) = 0;
+  virtual csGraphics3DCaps *GetCaps () = 0;
 
   /// Debugging only: get a pointer to Z-buffer at some location
-  virtual unsigned long *GetZBufPoint (int x, int y) = 0;
+  virtual unsigned long *GetZBuffAt (int x, int y) = 0;
+
+  /// Get Z-buffer value at given X,Y position
+  virtual float GetZBuffValue (int x, int y) = 0;
 
   /// Dump the texture cache.
   virtual void DumpCache () = 0;
@@ -592,26 +553,11 @@ struct iGraphics3D : public iPlugIn
    */
   virtual void SetClipper (csVector2* vertices, int num_vertices) = 0;
 
-  /** Adjust the given texture size to an optimal size. This will take into
-   *  consideration maximum sizes, limitations to power of two, max aspect
-   *  ratio and so on.
-   */
-  virtual void AdjustToOptimalTextureSize(int& w, int& h) = 0;
-  
-  /// Returns true if the driver needs PO2 lightmaps and texture maps
-  virtual bool NeedsPO2Maps () = 0;
-
-  /// Get the maximum aspect ratio of texture maps.
-  virtual int GetMaximumAspectRatio () = 0;
-
   /// Get the 2D driver: This does NOT increment the refcount of 2D driver!
   virtual iGraphics2D *GetDriver2D () = 0;
 
   /// Get the texture manager: do NOT increment the refcount of texture manager
   virtual iTextureManager *GetTextureManager () = 0;
-
-  /// Get Z-buffer value at given X,Y position
-  virtual float GetZbuffValue (int x, int y) = 0;
 
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,

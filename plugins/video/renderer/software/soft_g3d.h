@@ -93,7 +93,7 @@ class csGraphics3DSoftware : public iGraphics3D
   long dbg_current_polygon;
 
   /// Z Buffer mode to use while rendering next polygon.
-  G3DZBufMode z_buf_mode;
+  csZBufMode z_buf_mode;
 
   /// Alpha mask used for 16-bit mode.
   UShort alpha_mask;
@@ -159,8 +159,6 @@ class csGraphics3DSoftware : public iGraphics3D
   /// ScanProc_Alpha for 32 bpp modes
   static csDrawScanline* ScanProc_32_Alpha (csGraphics3DSoftware *This, int alpha);
 
-  G3D_FOGMETHOD fogMode;
-
   /// Look for a given fog buffer
   FogBuffer* find_fog_buffer (CS_ID id);
 
@@ -221,6 +219,9 @@ public:
    */
   bool ilace_fastmove;
 
+  /// Render capabilities
+  csGraphics3DCaps Caps;
+
   // An experimental filter feature.
   static int filter_bf;
 
@@ -251,9 +252,6 @@ public:
   /// Print the image in backbuffer
   virtual void Print (csRect *area);
 
-  /// Set the mode for the Z buffer used for drawing the next polygon.
-  virtual void SetZBufMode (G3DZBufMode mode);
-
   /// Draw the projected polygon with light and texture.
   virtual void DrawPolygon (G3DPolygonDP& poly);
 
@@ -264,14 +262,6 @@ public:
    * done.
    */
   virtual void DrawPolygonDebug (G3DPolygonDP& poly);
-
-  /// Get the fog mode.
-  virtual G3D_FOGMETHOD GetFogMode ()
-  { return fogMode; }
-
-  /// Get the fog mode.
-  virtual bool SetFogMode (G3D_FOGMETHOD fogm)
-  { fogMode = fogm; return true; }
 
   /**
    * Initiate a volumetric fog object. This function will be called
@@ -324,10 +314,11 @@ public:
    * Get the current driver's capabilities. Each driver implements their
    * own function.
    */
-  virtual void GetCaps (G3D_CAPS *caps);
+  virtual csGraphics3DCaps *GetCaps ()
+  { return &Caps; }
 
   /// Get address of Z-buffer at specific point
-  virtual unsigned long *GetZBufPoint(int x, int y)
+  virtual unsigned long *GetZBuffAt (int x, int y)
   { return z_buffer + x + y*width; }
 
   /// Dump the texture cache.
@@ -380,16 +371,8 @@ public:
   virtual iTextureManager *GetTextureManager ()
   { return texman; }
 
-  /// Returns true if this driver requires all maps to be PO2.
-  virtual bool NeedsPO2Maps () { return false; }
-  /// Returns the maximum aspect ratio of maps.
-  virtual int GetMaximumAspectRatio ()
-  { return 32768; }
-  virtual void AdjustToOptimalTextureSize(int& w, int& h) 
-  {(void)w;(void)h;}
-
   /// Get Z-buffer value at given X,Y position
-  virtual float GetZbuffValue (int x, int y);
+  virtual float GetZBuffValue (int x, int y);
 
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,

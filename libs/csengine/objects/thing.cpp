@@ -235,8 +235,8 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
       lm_width = c->lightmap->GetWidth ()-2;
       lm_height = c->lightmap->GetWidth ()-2;
     }
-    rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
-    rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
+    rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+      use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
     if (!rview.callback)
       rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0));
 

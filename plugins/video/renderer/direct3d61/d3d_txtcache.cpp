@@ -281,10 +281,9 @@ void D3DCache::Clear ()
 
 D3DTextureCache::D3DTextureCache (int nMaxSize, bool bHardware,
   LPDIRECTDRAW4 pDDraw, LPDIRECT3DDEVICE3 pDevice, int nBpp, bool bMipmapping,
-  G3D_CAPS* pRendercaps, int MaxAspectRatio)
+  csGraphics3DCaps *pRendercaps)
   : D3DCache (nMaxSize, CS_TEXTURE, nBpp)
 {
-  ASSERT(MaxAspectRatio>0);
   ASSERT(pRendercaps);
   ASSERT(pDevice);
   ASSERT(pDDraw);
@@ -294,7 +293,6 @@ D3DTextureCache::D3DTextureCache (int nMaxSize, bool bHardware,
   m_lpD3dDevice    = pDevice;
   m_bMipMapping    = bMipmapping;
   m_pRendercaps    = pRendercaps;
-  m_MaxAspectRatio = MaxAspectRatio;
 }
 
 void D3DTextureCache::Dump ()

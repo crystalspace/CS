@@ -281,20 +281,14 @@ csGraphics3DGlide3x::csGraphics3DGlide3x(iBase *iParent) :
   CONSTRUCT_IBASE (iParent);
 
   // default
-  m_Caps.ColorModel = G3DCOLORMODEL_RGB;
   m_Caps.CanClip = false;
-  m_Caps.SupportsArbitraryMipMapping = false;
-  m_Caps.BitDepth = 16;
-  m_Caps.ZBufBitDepth = 32;
   m_Caps.minTexHeight = 2;
   m_Caps.minTexWidth = 2;
   m_Caps.maxTexHeight = 256;
   m_Caps.maxTexWidth = 256;
-  m_Caps.PrimaryCaps.RasterCaps = G3DRASTERCAPS_SUBPIXEL;
-  m_Caps.PrimaryCaps.canBlend = true;
-  m_Caps.PrimaryCaps.ShadeCaps = G3DRASTERCAPS_LIGHTMAP;
-  m_Caps.PrimaryCaps.PerspectiveCorrects = true;
-  m_Caps.PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
+  m_Caps.fog = G3DFOGMETHOD_NONE;
+  m_Caps.NeedsPO2Maps = true;
+  m_Caps.MaxAspectRatio = 8;
 
 /*
   rstate_dither = false;
@@ -615,11 +609,6 @@ void csGraphics3DGlide3x::FinishDraw ()
 void csGraphics3DGlide3x::Print (csRect* rect)
 {
   m_piG2D->Print( rect );
-}
-
-/// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-void csGraphics3DGlide3x::SetZBufMode (G3DZBufMode mode)
-{
 }
 
 #define SNAP (( float ) ( 3L << 18 ))
@@ -957,14 +946,6 @@ void csGraphics3DGlide3x::ClearCache(void)
   if(m_pLightmapCache) m_pLightmapCache->Clear();
 }
 
-void csGraphics3DGlide3x::GetCaps(G3D_CAPS *caps)
-{
-  if (!caps)
-    return;
-
-  memcpy(caps, &m_Caps, sizeof(G3D_CAPS));
-}
-
 void csGraphics3DGlide3x::DrawLine (csVector3& v1, csVector3& v2, int color)
 {
   ASSERT( m_pCamera );
@@ -1012,14 +993,11 @@ void csGraphics3DGlide3x::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
   switch (op)
   {
 /*
-  case G3DRENDERSTATE_ZBUFFERTESTENABLE:
+  case G3DRENDERSTATE_ZBUFFERMODE:
     if (val)
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
     else
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
-  break;
-
-  case G3DRENDERSTATE_ZBUFFERFILLENABLE:
     if (val)
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE);
     else

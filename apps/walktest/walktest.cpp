@@ -92,7 +92,7 @@ void DrawZbuffer ()
   {
     int gi_pixelbytes = System->G2D->GetPixelBytes ();
 
-    ULong *zbuf = Gfx3D->GetZBufPoint(0, y);
+    ULong *zbuf = Gfx3D->GetZBuffAt (0, y);
 
     if (zbuf)
       if (gi_pixelbytes == 4)
@@ -984,7 +984,13 @@ void DoGravity (csVector3& pos, csVector3& vel)
 
 void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
 {
-  (void)elapsed_time; (void)current_time;
+  static time_t prev_time = 0;
+
+  // If the time interval is too big, limit to something reasonable
+  // This will help a little for software OpenGL :-)
+  elapsed_time = current_time - prev_time;
+  if (elapsed_time > 250)
+    prev_time = current_time - (elapsed_time = 250);
 
   CLights::LightIdle (); // SJI
 
@@ -996,7 +1002,7 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
       player_spawned=true;
     }
 
-    for (int repeats = 0 ; repeats < (elapsed_time/25.0 + 0.5); repeats++)
+    for (; elapsed_time >= 25; elapsed_time -= 25, prev_time += 25)
     {
       if (move_3d)
       {

@@ -61,14 +61,13 @@ private:
   ///
   LPDIRECT3DDEVICE2 m_lpD3dDevice;
 
-  G3D_CAPS* m_pRendercaps;
-  int       m_MaxAspectRatio;
+  csGraphics3DCaps *m_pRendercaps;
 
 public:
   ///
   D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW pDDraw, 
                   LPDIRECT3DDEVICE2 pDevice, int nBpp, bool bMipmapping,
-		  G3D_CAPS* pRendercaps, int MaxAspectRatio);
+		  csGraphics3DCaps *pRendercaps);
   ///
   virtual void Dump();
   

@@ -637,7 +637,8 @@ void csPolygon3D::CreateLightMaps (iGraphics3D* g3d)
   if (!lmi || !lmi->tex->lm) return;
 
   if (lmi->tex->lm)
-    lmi->tex->lm->ConvertFor3dDriver (g3d->NeedsPO2Maps (), g3d->GetMaximumAspectRatio ());
+    lmi->tex->lm->ConvertFor3dDriver (csWorld::current_world->NeedPO2Maps,
+      csWorld::current_world->MaxAspectRatio);
 }
 
 void csPolygon3D::SetTextureSpace (csPolyTxtPlane* txt_pl)

@@ -655,7 +655,7 @@ void csSector::Draw (csRenderView& rview)
   }
   else if (HasFog ())
   {
-    if ((fogmethod = rview.g3d->GetFogMode ()) == G3DFOGMETHOD_VERTEX)
+    if ((fogmethod = csWorld::current_world->fogmethod) == G3DFOGMETHOD_VERTEX)
     {
       CHK (csFogInfo* fog_info = new csFogInfo ());
       fog_info->next = rview.fog_info;

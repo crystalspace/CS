@@ -277,23 +277,14 @@ csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6 (iBase *iParent) :
   CONSTRUCT_IBASE (iParent);
 
   // default
-  m_Caps.ColorModel = G3DCOLORMODEL_RGB;
   m_Caps.CanClip = false;
-  m_Caps.SupportsArbitraryMipMapping = false;
-  m_Caps.BitDepth = 16;
-  m_Caps.ZBufBitDepth = 32;
   m_Caps.minTexHeight = 2;
   m_Caps.minTexWidth = 2;
   m_Caps.maxTexHeight = 2048;
   m_Caps.maxTexWidth = 2048;
-  m_Caps.PrimaryCaps.RasterCaps = G3DRASTERCAPS_SUBPIXEL;
-  m_Caps.PrimaryCaps.canBlend = true;
-  m_Caps.PrimaryCaps.ShadeCaps = G3DRASTERCAPS_LIGHTMAP;
-  m_Caps.PrimaryCaps.PerspectiveCorrects = true;
-  m_Caps.PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
-  m_Caps.fog = G3D_FOGMETHOD(0);
-
-  m_MaxAspectRatio = 1; 
+  m_Caps.fog = G3DFOGMETHOD_VERTEX;
+  m_Caps.NeedsPO2Maps = true;
+  m_Caps.MaxAspectRatio = 1; 
 
   zdist_mipmap1 = 12;
   zdist_mipmap2 = 24;
@@ -508,7 +499,6 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   dwZBufferBitDepth = ddpfTest.dwRGBBitCount;
   SysPrintf (MSG_INITIALIZATION, " %d-bit Z-Buffer depth selected\n", dwZBufferBitDepth);
  
-  m_Caps.ZBufBitDepth = dwZBufferBitDepth;
   m_Caps.minTexHeight = lpD3dDeviceDesc->dwMinTextureHeight;
   m_Caps.minTexWidth  = lpD3dDeviceDesc->dwMinTextureWidth;
   m_Caps.maxTexHeight = lpD3dDeviceDesc->dwMaxTextureHeight;
@@ -518,12 +508,12 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   {
     SysPrintf (MSG_INITIALIZATION, " Warning: Your Direct3D Device supports only square textures!\n");
     SysPrintf (MSG_INITIALIZATION, "          This is a potential performance hit!\n");
-    m_MaxAspectRatio = 1;
+    m_Caps.MaxAspectRatio = 1;
   }
   else
   {
     SysPrintf (MSG_INITIALIZATION, "Your Direct3D Device also supports non square textures - that's good.\n");
-    m_MaxAspectRatio = 32768;
+    m_Caps.MaxAspectRatio = 32768;
   }
 
   memset(&ddsd, 0, sizeof(ddsd));
@@ -798,12 +788,12 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   // Here is the "Assertion failed!"-bug I get on my machine
   if (m_iTypeLightmap != 0)
   {
-    CHK (m_pTextureCache = new D3DTextureCache (dwFree/2, m_bIsHardware, m_lpDD4, m_lpd3dDevice2, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps, m_MaxAspectRatio));
+    CHK (m_pTextureCache = new D3DTextureCache (dwFree/2, m_bIsHardware, m_lpDD4, m_lpd3dDevice2, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps));
     CHK (m_pLightmapCache = new D3DLightMapCache(dwFree/2, m_bIsHardware, m_lpDD4, m_lpd3dDevice2, m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount));
   }
   else
   {
-    CHK (m_pTextureCache = new D3DTextureCache(dwFree, m_bIsHardware, m_lpDD4, m_lpd3dDevice2, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps, m_MaxAspectRatio));
+    CHK (m_pTextureCache = new D3DTextureCache(dwFree, m_bIsHardware, m_lpDD4, m_lpd3dDevice2, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps));
     m_pLightmapCache = NULL;
   }
   
@@ -1156,25 +1146,6 @@ void csGraphics3DDirect3DDx6::FinishDraw ()
   }
   m_nDrawMode = 0;
 }
-
-void csGraphics3DDirect3DDx6::SetZBufMode(G3DZBufMode mode)
-{
-  if (mode==m_ZBufMode) 
-    return;
-  
-  m_ZBufMode = mode;
-  
-  if (mode == CS_ZBUF_TEST)
-    VERIFY_RESULT( m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE), DD_OK );
-  else
-    VERIFY_RESULT( m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE), DD_OK );
-  
-  if (mode == CS_ZBUF_FILL)      // write-only
-  m_States.SetZFunc(D3DCMP_ALWAYS);
-  else 
-    m_States.SetZFunc(D3DCMP_LESSEQUAL);
-}
-
 
 void csGraphics3DDirect3DDx6::DumpCache()
 {
@@ -2078,14 +2049,6 @@ void csGraphics3DDirect3DDx6::BatchDrawPolygonFX(G3DPolygonDPFX& poly)
   // TODO/FIXME : implemente fog
 }
 
-void csGraphics3DDirect3DDx6::GetCaps(G3D_CAPS *caps)
-{
-  if (!caps)
-    return;
-  
-  memcpy(caps, &m_Caps, sizeof(G3D_CAPS));
-}
-
 void csGraphics3DDirect3DDx6::DrawLine (csVector3& v1, csVector3& v2, float aspect, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
@@ -2129,23 +2092,11 @@ bool csGraphics3DDirect3DDx6::SetRenderState(G3D_RENDERSTATEOPTION option, long 
 {
   switch (option)
   {
-    case G3DRENDERSTATE_NOTHING:
+    case G3DRENDERSTATE_ZBUFFERMODE:
+      m_States.SetZFunc (value & CS_ZBUF_TEST ? D3DCMP_LESSEQUAL : D3DCMP_ALWAYS);
+      VERIFY_RESULT (m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_ZWRITEENABLE,
+        (value & CS_ZBUF_FILL) ? TRUE : FALSE), DD_OK);
       break;
-    
-    case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      if (value)
-        m_States.SetZFunc(D3DCMP_LESSEQUAL);
-      else
-        m_States.SetZFunc(D3DCMP_ALWAYS);
-      break;
-    
-    case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      if (value)
-        VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE), DD_OK);
-      else
-        VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE), DD_OK);
-      break;
-    
     case G3DRENDERSTATE_DITHERENABLE:
       if(value)
         VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DITHERENABLE, TRUE), DD_OK);
@@ -2183,17 +2134,18 @@ bool csGraphics3DDirect3DDx6::SetRenderState(G3D_RENDERSTATEOPTION option, long 
 
 long csGraphics3DDirect3DDx6::GetRenderState(G3D_RENDERSTATEOPTION op)
 {
-  DWORD d3d_value;
+  DWORD d3d_value, mode;
   switch(op)
   {
-    case G3DRENDERSTATE_NOTHING:
-      return 0;
-    case G3DRENDERSTATE_ZBUFFERTESTENABLE:
+    case G3DRENDERSTATE_ZBUFFERMODE:
+      mode = 0;
       VERIFY_RESULT(m_lpd3dDevice2->GetRenderState(D3DRENDERSTATE_ZFUNC, &d3d_value), DD_OK);
-      return (bool)(D3DCMP_LESSEQUAL & d3d_value);
-    case G3DRENDERSTATE_ZBUFFERFILLENABLE:
+      if (d3d_value & D3DCMP_LESSEQUAL)
+        mode |= CS_ZBUF_TEST;
       VERIFY_RESULT(m_lpd3dDevice2->GetRenderState(D3DRENDERSTATE_ZWRITEENABLE, &d3d_value), DD_OK);
-      return (bool)(TRUE & d3d_value);
+      if (d3d_value & TRUE)
+        mode |= CS_ZBUF_FILL;
+      return mode;
     case G3DRENDERSTATE_DITHERENABLE:
       VERIFY_RESULT(m_lpd3dDevice2->GetRenderState(D3DRENDERSTATE_DITHERENABLE, &d3d_value), DD_OK);
       return (d3d_value == TRUE)?true:false;
@@ -2227,10 +2179,10 @@ void csGraphics3DDirect3DDx6::SetClipper (csVector2* vertices, int num_vertices)
 
 void csGraphics3DDirect3DDx6::AdjustToOptimalTextureSize(int& w, int& h)
 {
-  if (w / h > m_MaxAspectRatio)
-    h = w / m_MaxAspectRatio;
-  if (h / w > m_MaxAspectRatio)
-    w = h / m_MaxAspectRatio;
+  if (w / h > m_Caps.MaxAspectRatio)
+    h = w / m_Caps.MaxAspectRatio;
+  if (h / w > m_Caps.MaxAspectRatio)
+    w = h / m_Caps.MaxAspectRatio;
   if (w < m_Caps.minTexWidth)
     w  = m_Caps.minTexWidth;
   if (h < m_Caps.minTexHeight)

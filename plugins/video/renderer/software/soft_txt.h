@@ -100,7 +100,10 @@ protected:
    */
   void *pal2glob;
 
-  /// The private palette
+  /// The private palette for this texture (compressed a little)
+  UByte *orig_palette;
+
+  /// The private palette (with gamma applied)
   RGBPixel palette [256];
 
   /// Number of used colors in palette
@@ -124,18 +127,23 @@ public:
    * colormap and the global colormap; in truecolor modes we just build
    * a [color index] -> [truecolor value] conversion table.
    */
-  void remap_texture (csTextureManager *texman);
+  void remap_texture (csTextureManagerSoftware *texman);
 
   /// Query the private texture colormap
   RGBPixel *GetColorMap () { return palette; }
   /// Query the number of colors in the colormap
   int GetColorMapSize () { return palette_size; }
+  /// Get original colormap (packed)
+  void GetOriginalColormap (RGBPixel *oPalette, int &oCount);
 
   /// Query palette -> native format table
   void *GetPaletteToGlobal () { return pal2glob; }
 
   /// Override GetMipMapData() to return palette if (mm == -1)
   virtual void *GetMipMapData (int mm);
+
+  /// Apply gamma correction to private palette
+  void ApplyGamma (UByte *GammaTable);
 };
 
 /**
@@ -214,6 +222,12 @@ public:
   /// The inverse colormap (for 8-bit modes)
   UByte *inv_cmap;
 
+  /// The translation table for applying gamma
+  UByte GammaTable [256];
+
+  /// Texture gamma
+  float Gamma;
+
   ///
   csTextureManagerSoftware (iSystem *iSys, iGraphics2D *iG2D, csIniFile *config);
   ///
@@ -244,6 +258,9 @@ public:
    * it will not be installed on the display).
    */
   void compute_palette ();
+
+  /// Set gamma correction value.
+  void SetGamma (float iGamma);
 
   /// Read configuration values from config file.
   virtual void read_config (csIniFile *config);

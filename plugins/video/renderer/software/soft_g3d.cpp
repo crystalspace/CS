@@ -170,11 +170,17 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 
   dbg_max_polygons_to_draw = 2000000000;        // After 2 billion polygons we give up :-)
 
-  fogMode = G3DFOGMETHOD_ZBUFFER;
-  //fogMode = G3DFOGMETHOD_VERTEX;
-
   z_buffer = NULL;
   line_table = NULL;
+
+  Caps.CanClip = false;
+  Caps.minTexHeight = 2;
+  Caps.minTexWidth = 2;
+  Caps.maxTexHeight = 1024;
+  Caps.maxTexWidth = 1024;
+  Caps.fog = G3DFOGMETHOD_ZBUFFER;
+  Caps.NeedsPO2Maps = false;
+  Caps.MaxAspectRatio = 32768;
 
   csScan_Initialize ();
 }
@@ -216,7 +222,8 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   do_smaller_rendering = config->GetYesNo ("Hardware", "SMALLER", false);
   SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE,
     config->GetYesNo ("Hardware", "INTERLACING", false));
-
+  SetRenderState (G3DRENDERSTATE_GAMMACORRECTION,
+    QInt16 (config->GetFloat ("Hardware", "GAMMA", 1.0)));
   mipmap_coef = config->GetFloat ("TextureManager", "MIPMAP_COEF", 1.3);
 
   return true;
@@ -773,11 +780,6 @@ void csGraphics3DSoftware::Print (csRect *area)
     do_interlaced ^= 1;
 }
 
-void csGraphics3DSoftware::SetZBufMode (G3DZBufMode mode)
-{
-  z_buf_mode = mode;
-}
-
 #define SMALL_D 0.01
 
 /**
@@ -899,7 +901,14 @@ void csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
     if ((fabs (poly.vertices [i].sx - poly.vertices [i - 1].sx)
        + fabs (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
+
+    if (poly.vertices[i].sx < 0 || poly.vertices[i].sx > width)
+      return;
   }
+
+  // If the polygon exceeds the screen, it is a engine failure
+  if (max_y > height || min_y < 0)
+    return;
 
   // if this is a 'degenerate' polygon, skip it.
   if (num_vertices < 3)
@@ -1690,8 +1699,6 @@ void csGraphics3DSoftware::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fo
 
   if (poly.num < 3)
     return;
-  if (fogMode == G3DFOGMETHOD_VERTEX)
-    return;
 
   float M = 0, N = 0, O = 0;
   if (fog_type == CS_FOG_FRONT || fog_type == CS_FOG_BACK)
@@ -2452,47 +2459,8 @@ bool csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
 {
   switch (op)
   {
-    case G3DRENDERSTATE_NOTHING:
-      return true;
-    case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      if (value)
-      {
-         if (z_buf_mode == CS_ZBUF_TEST)
-           return true;
-         if (z_buf_mode == CS_ZBUF_NONE)
-           z_buf_mode = CS_ZBUF_TEST;
-         else if (z_buf_mode == CS_ZBUF_FILL)
-           z_buf_mode = CS_ZBUF_USE;
-      }
-      else
-      {
-         if (z_buf_mode == CS_ZBUF_FILL)
-           return true;
-         if (z_buf_mode == CS_ZBUF_USE)
-           z_buf_mode = CS_ZBUF_FILL;
-         else if (z_buf_mode == CS_ZBUF_TEST)
-           z_buf_mode = CS_ZBUF_NONE;
-      }
-      break;
-    case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      if (value)
-      {
-        if (z_buf_mode == CS_ZBUF_FILL)
-          return true;
-        if (z_buf_mode == CS_ZBUF_NONE)
-          z_buf_mode = CS_ZBUF_FILL;
-        else if (z_buf_mode == CS_ZBUF_TEST)
-          z_buf_mode = CS_ZBUF_USE;
-      }
-      else
-      {
-        if (z_buf_mode == CS_ZBUF_TEST)
-          return true;
-        if (z_buf_mode == CS_ZBUF_USE)
-          z_buf_mode = CS_ZBUF_TEST;
-        else if (z_buf_mode == CS_ZBUF_FILL)
-          z_buf_mode = CS_ZBUF_NONE;
-      }
+    case G3DRENDERSTATE_ZBUFFERMODE:
+      z_buf_mode = csZBufMode (value);
       break;
     case G3DRENDERSTATE_DITHERENABLE:
       texman->dither_textures = value;
@@ -2542,6 +2510,10 @@ bool csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
     case G3DRENDERSTATE_GOURAUDENABLE:
       do_gouraud = value;
       break;
+    case G3DRENDERSTATE_GAMMACORRECTION:
+      texman->SetGamma (value / 65536.);
+      if (tcache) tcache->Clear ();
+      break;
     default:
       return false;
   }
@@ -2553,12 +2525,8 @@ long csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op)
 {
   switch (op)
   {
-    case G3DRENDERSTATE_NOTHING:
-      return 0;
-    case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      return (bool)(z_buf_mode & CS_ZBUF_TEST);
-    case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      return (bool)(z_buf_mode & CS_ZBUF_FILL);
+    case G3DRENDERSTATE_ZBUFFERMODE:
+      return z_buf_mode;
     case G3DRENDERSTATE_DITHERENABLE:
       return texman->dither_textures;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
@@ -2587,31 +2555,11 @@ long csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op)
       return dbg_max_polygons_to_draw;
     case G3DRENDERSTATE_GOURAUDENABLE:
       return do_gouraud;
+    case G3DRENDERSTATE_GAMMACORRECTION:
+      return QInt16 (texman->Gamma);
     default:
       return 0;
   }
-}
-
-void csGraphics3DSoftware::GetCaps(G3D_CAPS *caps)
-{
-  if (!caps)
-    return;
-
-  caps->ColorModel = G3DCOLORMODEL_RGB;
-  caps->CanClip = false;
-  caps->SupportsArbitraryMipMapping = true;
-  caps->BitDepth = pfmt.PixelBytes * 8;
-  caps->ZBufBitDepth = 32;
-  caps->minTexHeight = 2;
-  caps->minTexWidth = 2;
-  caps->maxTexHeight = 1024;
-  caps->maxTexWidth = 1024;
-  caps->PrimaryCaps.RasterCaps = G3DRASTERCAPS_SUBPIXEL;
-  caps->PrimaryCaps.canBlend = true;
-  caps->PrimaryCaps.ShadeCaps = G3DRASTERCAPS_LIGHTMAP;
-  caps->PrimaryCaps.PerspectiveCorrects = true;
-  caps->PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
-  caps->fog = G3D_FOGMETHOD((int)G3DFOGMETHOD_ZBUFFER);
 }
 
 void csGraphics3DSoftware::ClearCache()
@@ -2674,7 +2622,7 @@ void csGraphics3DSoftware::DrawLine (csVector3& v1, csVector3& v2, float fov, in
   G2D->DrawLine (px1, py1, px2, py2, color);
 }
 
-float csGraphics3DSoftware::GetZbuffValue (int x, int y)
+float csGraphics3DSoftware::GetZBuffValue (int x, int y)
 {
   unsigned long zbf = z_buffer [x + y * width];
   if (!zbf) return 0;

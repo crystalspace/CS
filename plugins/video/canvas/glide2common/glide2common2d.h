@@ -131,7 +131,7 @@ public:
   /// Force resolution
   virtual void ForceResolution ( int w, int h )
   { Width = w; Height = h; }
-  virtual float GetZbuffValue (int x, int y);
+  virtual float GetZBuffValue (int x, int y);
 };
 
 #endif

@@ -46,9 +46,9 @@ class csGraphics3DOpenGL : public iGraphics3D
 private:
   // set proper GL flags based on ZBufMode.  This is usually
   // utilized just before a polygon is drawn; it is not
-  // done when the Z-buffer mode is set in SetRasterCaps because
+  // done when the Z-buffer mode is set in SetRenderState because
   // other routines may modify the GL flags between a call
-  // to SetRasterCaps and the call to the polygon
+  // to SetRenderState and the call to the polygon
   // drawing routine
   void SetGLZBufferFlags();
 
@@ -97,7 +97,10 @@ private:
 
 protected:
   /// Z Buffer mode to use while rendering next polygon.
-  G3DZBufMode z_buf_mode;
+  csZBufMode z_buf_mode;
+
+  /// Render capabilities
+  csGraphics3DCaps Caps;
 
   /// Width of display.
   int width;
@@ -221,9 +224,6 @@ public:
   /// Print the image in backbuffer
   virtual void Print (csRect *area);
 
-  /// Set the mode for the Z buffer used for drawing the next polygon.
-  virtual void SetZBufMode (G3DZBufMode mode);
-
   /// Draw the projected polygon with light and texture.
   virtual void DrawPolygon (G3DPolygonDP& poly);
 
@@ -271,10 +271,12 @@ public:
    * Get the current driver's capabilities. Each driver implements their
    * own function.
    */
-  virtual void GetCaps (G3D_CAPS *caps);
+  virtual csGraphics3DCaps *GetCaps ()
+  { return &Caps; }
 
   /// Get address of Z-buffer at specific point
-  virtual unsigned long *GetZBufPoint(int x, int y);
+  virtual unsigned long *GetZBuffAt (int, int)
+  { return NULL; }
 
   /// Dump the texture cache.
   virtual void DumpCache ();
@@ -324,24 +326,6 @@ public:
   virtual iTextureManager *GetTextureManager ()
   { return txtmgr; }
 
-  /// Returns true if this driver requires all maps to be PO2.
-  virtual bool NeedsPO2Maps ()
-  { return true; }
-  /// Returns the maximum aspect ratio of maps.
-  virtual int GetMaximumAspectRatio ()
-  { return 32768; }
-
-  virtual void AdjustToOptimalTextureSize(int& w, int& h) 
-  {(void)w;(void)h;}
-
-  /// Get the fog mode.
-  virtual G3D_FOGMETHOD GetFogMode ()
-  { return G3DFOGMETHOD_VERTEX; }
-
-  /// Get the fog mode.
-  virtual bool SetFogMode (G3D_FOGMETHOD fogm)
-  { if (fogm == G3DFOGMETHOD_VERTEX) return true; else return false; }
-
   /**
    * Initiate a volumetric fog object. This function will be called
    * before front-facing and back-facing fog polygons are added to
@@ -382,7 +366,7 @@ public:
   virtual void CloseFogObject (CS_ID id);
 	  
   /// Get Z-buffer value at given X,Y position
-  virtual float GetZbuffValue (int x, int y);
+  virtual float GetZBuffValue (int x, int y);
 
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,

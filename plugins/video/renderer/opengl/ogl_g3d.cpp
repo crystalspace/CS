@@ -131,6 +131,14 @@ csGraphics3DOpenGL::csGraphics3DOpenGL (iBase * iParent):G2D (NULL), System (NUL
 
   config = new csIniFile ("opengl.cfg");
 
+  Caps.CanClip = false;
+  Caps.minTexHeight = 2;
+  Caps.minTexWidth = 2;
+  Caps.maxTexHeight = 1024;
+  Caps.maxTexWidth = 1024;
+  Caps.fog = G3DFOGMETHOD_VERTEX;
+  Caps.NeedsPO2Maps = true;
+  Caps.MaxAspectRatio = 32768;
 
   // default extension state is for all extensions to be OFF
   ARB_multitexture = false;
@@ -451,11 +459,6 @@ void csGraphics3DOpenGL::Print (csRect * area)
 {
   G2D->Print (area);
   // glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void csGraphics3DOpenGL::SetZBufMode (G3DZBufMode mode)
-{
-  z_buf_mode = mode;
 }
 
 #define SMALL_D 0.01
@@ -1074,86 +1077,44 @@ bool csGraphics3DOpenGL::SetRenderState (G3D_RENDERSTATEOPTION op, long value)
 {
   switch (op)
   {
-  case G3DRENDERSTATE_NOTHING:
-    break;
-
-  case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-    if (value)
-    {
-      if (z_buf_mode == CS_ZBUF_TEST)
-	return true;
-      if (z_buf_mode == CS_ZBUF_NONE)
-	z_buf_mode = CS_ZBUF_TEST;
-      else if (z_buf_mode == CS_ZBUF_FILL)
-	z_buf_mode = CS_ZBUF_USE;
-    }
-    else
-    {
-      if (z_buf_mode == CS_ZBUF_FILL)
-	return true;
-      if (z_buf_mode == CS_ZBUF_USE)
-	z_buf_mode = CS_ZBUF_FILL;
-      else if (z_buf_mode == CS_ZBUF_TEST)
-	z_buf_mode = CS_ZBUF_NONE;
-    }
-    break;
-  case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-    if (value)
-    {
-      if (z_buf_mode == CS_ZBUF_FILL)
-	return true;
-      if (z_buf_mode == CS_ZBUF_NONE)
-	z_buf_mode = CS_ZBUF_FILL;
-      else if (z_buf_mode == CS_ZBUF_TEST)
-	z_buf_mode = CS_ZBUF_USE;
-    }
-    else
-    {
-      if (z_buf_mode == CS_ZBUF_TEST)
-	return true;
-      if (z_buf_mode == CS_ZBUF_USE)
-	z_buf_mode = CS_ZBUF_TEST;
-      else if (z_buf_mode == CS_ZBUF_FILL)
-	z_buf_mode = CS_ZBUF_NONE;
-    }
-    break;
-  case G3DRENDERSTATE_DITHERENABLE:
-    m_renderstate.dither = value;
-    break;
-  case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-    texture_cache->SetBilinearMapping (value);
-    break;
-  case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-    m_renderstate.trilinearmap = value;
-    break;
-  case G3DRENDERSTATE_TRANSPARENCYENABLE:
-    m_renderstate.alphablend = value;
-    break;
-  case G3DRENDERSTATE_MIPMAPENABLE:
-    m_renderstate.mipmap = value;
-    break;
-  case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-    m_renderstate.textured = value;
-    break;
-    // XAVIER: unhandled cases in enumerated switch (just to keep gcc
-    // happy)
-  case G3DRENDERSTATE_MMXENABLE:
-    return false;
-  case G3DRENDERSTATE_INTERLACINGENABLE:
-    return false;
-  case G3DRENDERSTATE_LIGHTINGENABLE:
-    m_renderstate.lighting = value;
-    break;
-  case G3DRENDERSTATE_GOURAUDENABLE:
-    m_renderstate.gouraud = value;
-    break;
-  case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
-    dbg_max_polygons_to_draw = value;
-    if (dbg_max_polygons_to_draw < 0)
-      dbg_max_polygons_to_draw = 0;
-    break;
-  default:
-    return false;
+    case G3DRENDERSTATE_ZBUFFERMODE:
+      z_buf_mode = value;
+      break;
+    case G3DRENDERSTATE_DITHERENABLE:
+      m_renderstate.dither = value;
+      break;
+    case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
+      texture_cache->SetBilinearMapping (value);
+      break;
+    case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
+      m_renderstate.trilinearmap = value;
+      break;
+    case G3DRENDERSTATE_TRANSPARENCYENABLE:
+      m_renderstate.alphablend = value;
+      break;
+    case G3DRENDERSTATE_MIPMAPENABLE:
+      m_renderstate.mipmap = value;
+      break;
+    case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
+      m_renderstate.textured = value;
+      break;
+    case G3DRENDERSTATE_MMXENABLE:
+      return false;
+    case G3DRENDERSTATE_INTERLACINGENABLE:
+      return false;
+    case G3DRENDERSTATE_LIGHTINGENABLE:
+      m_renderstate.lighting = value;
+      break;
+    case G3DRENDERSTATE_GOURAUDENABLE:
+      m_renderstate.gouraud = value;
+      break;
+    case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
+      dbg_max_polygons_to_draw = value;
+      if (dbg_max_polygons_to_draw < 0)
+        dbg_max_polygons_to_draw = 0;
+      break;
+    default:
+      return false;
   }
 
   return true;
@@ -1163,59 +1124,33 @@ long csGraphics3DOpenGL::GetRenderState (G3D_RENDERSTATEOPTION op)
 {
   switch (op)
   {
-  case G3DRENDERSTATE_NOTHING:
-    return 0;
-  case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-    return (bool) (z_buf_mode & CS_ZBUF_TEST);
-  case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-    return (bool) (z_buf_mode & CS_ZBUF_FILL);
-  case G3DRENDERSTATE_DITHERENABLE:
-    return m_renderstate.dither;
-  case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-    return texture_cache->GetBilinearMapping ();
-  case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-    return m_renderstate.trilinearmap;
-  case G3DRENDERSTATE_TRANSPARENCYENABLE:
-    return m_renderstate.alphablend;
-  case G3DRENDERSTATE_MIPMAPENABLE:
-    return m_renderstate.mipmap;
-  case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-    return m_renderstate.textured;
-  case G3DRENDERSTATE_MMXENABLE:
-    return 0;
-  case G3DRENDERSTATE_INTERLACINGENABLE:
-    return false;
-  case G3DRENDERSTATE_LIGHTINGENABLE:
-    return m_renderstate.lighting;
-  case G3DRENDERSTATE_GOURAUDENABLE:
-    return m_renderstate.gouraud;
-  case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
-    return dbg_max_polygons_to_draw;
-  default:
-    return 0;
+    case G3DRENDERSTATE_ZBUFFERMODE:
+      return z_buf_mode;
+    case G3DRENDERSTATE_DITHERENABLE:
+      return m_renderstate.dither;
+    case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
+      return texture_cache->GetBilinearMapping ();
+    case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
+      return m_renderstate.trilinearmap;
+    case G3DRENDERSTATE_TRANSPARENCYENABLE:
+      return m_renderstate.alphablend;
+    case G3DRENDERSTATE_MIPMAPENABLE:
+      return m_renderstate.mipmap;
+    case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
+      return m_renderstate.textured;
+    case G3DRENDERSTATE_MMXENABLE:
+      return 0;
+    case G3DRENDERSTATE_INTERLACINGENABLE:
+      return false;
+    case G3DRENDERSTATE_LIGHTINGENABLE:
+      return m_renderstate.lighting;
+    case G3DRENDERSTATE_GOURAUDENABLE:
+      return m_renderstate.gouraud;
+    case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
+      return dbg_max_polygons_to_draw;
+    default:
+      return 0;
   }
-}
-
-void csGraphics3DOpenGL::GetCaps (G3D_CAPS * caps)
-{
-  if (!caps)
-    return;
-
-  caps->ColorModel = G3DCOLORMODEL_RGB;
-  caps->CanClip = false;
-  caps->SupportsArbitraryMipMapping = true;
-  caps->BitDepth = 24;
-  caps->ZBufBitDepth = 16;
-  caps->minTexHeight = 2;
-  caps->minTexWidth = 2;
-  caps->maxTexHeight = 1024;
-  caps->maxTexWidth = 1024;
-  caps->PrimaryCaps.RasterCaps = G3DRASTERCAPS_SUBPIXEL;
-  caps->PrimaryCaps.canBlend = true;
-  caps->PrimaryCaps.ShadeCaps = G3DRASTERCAPS_LIGHTMAP;
-  caps->PrimaryCaps.PerspectiveCorrects = true;
-  caps->PrimaryCaps.FilterCaps = G3D_FILTERCAPS ((int) G3DFILTERCAPS_NEAREST | (int) G3DFILTERCAPS_MIPNEAREST);
-  caps->fog = G3DFOGMETHOD_VERTEX;
 }
 
 void csGraphics3DOpenGL::ClearCache ()
@@ -1538,15 +1473,7 @@ bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 #endif
 }
 
-long unsigned int *csGraphics3DOpenGL::GetZBufPoint (int x, int y)
-{
-  static long unsigned int zval;
-  zval = (unsigned long) (16777216.0 * GetZbuffValue (x, y));
-
-  return &zval;
-}
-
-float csGraphics3DOpenGL::GetZbuffValue (int x, int y)
+float csGraphics3DOpenGL::GetZBuffValue (int x, int y)
 {
   GLfloat zvalue;
   glReadPixels (x, height - y - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zvalue);

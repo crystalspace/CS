@@ -114,7 +114,7 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
   int m_nHalfWidth,  m_nHalfHeight;
   
   /// The current read/write settings for the Z-buffer.
-  G3DZBufMode m_ZBufMode;
+  csZBufMode m_ZBufMode;
   
   /// The current drawing mode (2D/3D)
   int m_nDrawMode;
@@ -142,10 +142,7 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
   bool  m_textured;
 
   /// Capabilities of the renderer.
-  G3D_CAPS m_Caps;
-
-  //Maximum possible aspect ratio for the renderer.
-  int m_MaxAspectRatio;
+  csGraphics3DCaps m_Caps;
 
   /// Current transformation from world to camera.
   csTransform m_o2c;
@@ -226,9 +223,6 @@ public:
   /// End the frame and do a page swap.
   virtual void FinishDraw ();
   
-  /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-  virtual void SetZBufMode (G3DZBufMode mode);
-  
   /// Draw the projected polygon with light and texture.
   virtual void DrawPolygon (G3DPolygonDP& poly);
   /// Draw debug poly
@@ -253,7 +247,8 @@ public:
   void UncacheTexture (iTextureHandle *texture);
   
   /// Get the capabilities of this driver: NOT IMPLEMENTED.
-  virtual void GetCaps(G3D_CAPS *caps);
+  virtual csGraphics3DCaps *GetCaps ()
+  { return &m_Caps; }
   
   /// Dump the texture cache.
   virtual void DumpCache(void);
@@ -273,7 +268,7 @@ public:
   virtual long GetRenderState (G3D_RENDERSTATEOPTION);
   
   /// Get a z-buffer point
-  virtual unsigned long *GetZBufPoint(int, int) { return NULL; }
+  virtual unsigned long *GetZBuffAt (int, int) { return NULL; }
   
   /// Get the width
   virtual int GetWidth () { return m_nWidth; }
@@ -309,19 +304,7 @@ public:
    *  consideration maximum sizes, limitations to power of two, max aspect
    *  ratio and so on.
    */
-  virtual void AdjustToOptimalTextureSize(int& w, int& h);
-
-  /// Returns true if the driver needs PO2 lightmaps and texture maps
-  virtual bool NeedsPO2Maps(void) { return true; }
-  ///
-  virtual int GetMaximumAspectRatio () { return m_MaxAspectRatio; }
-  
-  /// Get the fog mode.
-  virtual G3D_FOGMETHOD GetFogMode () { return G3DFOGMETHOD_VERTEX; }
-
-  /// Get the fog mode.
-  virtual bool SetFogMode (G3D_FOGMETHOD fogm)
-  { return (fogm == G3DFOGMETHOD_VERTEX); }
+  void AdjustToOptimalTextureSize(int& w, int& h);
 
   /// Get the ITextureManager.
   virtual iTextureManager *GetTextureManager ()
@@ -338,7 +321,7 @@ public:
   { return m_piG2D; }
 
   /// Get Z-buffer value at given X,Y position
-  virtual float GetZbuffValue (int /*x*/, int /*y*/)
+  virtual float GetZBuffValue (int /*x*/, int /*y*/)
   { return 0; }
 
   /// Create a halo of the specified color and return a handle.

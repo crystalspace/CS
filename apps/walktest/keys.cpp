@@ -2227,19 +2227,14 @@ bool WalkTest::HandleEvent (csEvent &Event)
       }
       else if (Event.Mouse.Button == 2)
       {
-        unsigned long* zb = System->G3D->GetZBufPoint(Event.Mouse.x, Event.Mouse.y);
+        csVector3 v;
+        v.z = System->G3D->GetZBuffValue(Event.Mouse.x, Event.Mouse.y);
+        v.x = (Event.Mouse.x-FRAME_WIDTH/2) * v.z / view->GetCamera ()->aspect;
+        v.y = (FRAME_HEIGHT-1-Event.Mouse.y-FRAME_HEIGHT/2) * v.z / view->GetCamera ()->aspect;
+        csVector3 vw = view->GetCamera ()->Camera2World (v);
 
-        if (zb)
-        {
-          csVector3 v;
-          v.z = 1. / (((float)*zb)/(256.*65536.));
-          v.x = (Event.Mouse.x-FRAME_WIDTH/2) * v.z / view->GetCamera ()->aspect;
-          v.y = (FRAME_HEIGHT-1-Event.Mouse.y-FRAME_HEIGHT/2) * v.z / view->GetCamera ()->aspect;
-          csVector3 vw = view->GetCamera ()->Camera2World (v);
-
-          Sys->Printf (MSG_CONSOLE, "LMB down : z_buf=%ld cam:(%f,%f,%f) world:(%f,%f,%f)\n", zb, v.x, v.y, v.z, vw.x, vw.y, vw.z);
-          Sys->Printf (MSG_DEBUG_0, "LMB down : z_buf=%ld cam:(%f,%f,%f) world:(%f,%f,%f)\n", zb, v.x, v.y, v.z, vw.x, vw.y, vw.z);
-        }
+        Sys->Printf (MSG_CONSOLE, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
+        Sys->Printf (MSG_DEBUG_0, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
 
         extern csVector2 coord_check_vector;
         coord_check_vector.x = Event.Mouse.x;

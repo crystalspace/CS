@@ -188,8 +188,8 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   poly.flat_color_g = 255;
   poly.flat_color_b = 255;
   poly.txt_handle = _textureMap->GetTextureHandle ();
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);//false /*use_z_buf*/);
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
+  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+    false /*use_z_buf*/ ? CS_ZBUF_USE : CS_ZBUF_FILL);
   rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD);
   grview = &rview;
 

@@ -28,6 +28,7 @@
 #include "isystem.h"
 #include "iimage.h"
 #include "lightdef.h"
+#include "qint.h"
 
 #define SysPrintf System->Printf
 
@@ -132,17 +133,35 @@ csTextureMMSoftware::csTextureMMSoftware (iImage *image, int flags) :
   pal2glob = NULL;
   if (flags & CS_TEXTURE_3D)
     AdjustSizePo2 ();
+  orig_palette = NULL;
 }
 
 csTextureMMSoftware::~csTextureMMSoftware ()
 {
   delete [] (UByte *)pal2glob;
+  delete [] orig_palette;
 }
 
 csTexture *csTextureMMSoftware::NewTexture (iImage *Image)
 {
   return new csTextureSoftware (this, Image);
 }
+
+void csTextureMMSoftware::ApplyGamma (UByte *GammaTable)
+{
+  if (!orig_palette)
+    return;
+
+  UByte *src = orig_palette;
+  RGBPixel *dst = palette;
+  for (int i = palette_size; i > 0; i--)
+  {
+    dst->red   = GammaTable [*src++];
+    dst->green = GammaTable [*src++];
+    dst->blue  = GammaTable [*src++];
+    dst++;
+  }
+} 
 
 void csTextureMMSoftware::ComputeMeanColor ()
 {
@@ -189,7 +208,7 @@ void csTextureMMSoftware::ComputeMeanColor ()
   // Compute the mean color from the palette
   RGBPixel *src = palette;
   unsigned r = 0, g = 0, b = 0;
-  for (i = 0; i < palette_size; i++)
+  for (i = palette_size; i > 0; i--)
   {
     RGBPixel pix = *src++;
     r += pix.red;
@@ -199,33 +218,60 @@ void csTextureMMSoftware::ComputeMeanColor ()
   mean_color.red   = r / palette_size;
   mean_color.green = g / palette_size;
   mean_color.blue  = b / palette_size;
+
+  // Now allocate the orig palette and compress the texture palette there
+  src = palette;
+  delete [] orig_palette;
+  orig_palette = new UByte [palette_size * 3];
+  UByte *dst = orig_palette;
+  for (i = palette_size; i > 0; i--)
+  {
+    *dst++ = src->red;
+    *dst++ = src->green;
+    *dst++ = src->blue;
+    src++;
+  }
 }
 
-void csTextureMMSoftware::remap_texture (csTextureManager *texman)
+void csTextureMMSoftware::GetOriginalColormap (RGBPixel *oPalette, int &oCount)
+{
+  oCount = palette_size;
+  UByte *src = orig_palette;
+  RGBPixel *dst = oPalette;
+  for (int i = palette_size; i > 0; i--)
+  {
+    dst->red   = *src++;
+    dst->green = *src++;
+    dst->blue  = *src++;
+    dst++;
+  }
+}
+
+void csTextureMMSoftware::remap_texture (csTextureManagerSoftware *texman)
 {
   int i;
-  csTextureManagerSoftware *txm = (csTextureManagerSoftware *)texman;
+  ApplyGamma (texman->GammaTable);
   switch (texman->pfmt.PixelBytes)
   {
     case 1:
       delete [] (UByte *)pal2glob;
       pal2glob = new UByte [palette_size * sizeof (UByte)];
       for (i = 0; i < palette_size; i++)
-        ((UByte *)pal2glob) [i] = txm->cmap.find_rgb (palette [i].red,
+        ((UByte *)pal2glob) [i] = texman->cmap.find_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       break;
     case 2:
       delete [] (UShort *)pal2glob;
       pal2glob = new UByte [palette_size * sizeof (UShort)];
       for (i = 0; i < palette_size; i++)
-        ((UShort *)pal2glob) [i] = txm->encode_rgb (palette [i].red,
+        ((UShort *)pal2glob) [i] = texman->encode_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       break;
     case 4:
       delete [] (ULong *)pal2glob;
       pal2glob = new UByte [palette_size * sizeof (ULong)];
       for (i = 0; i < palette_size; i++)
-        ((ULong *)pal2glob) [i] = txm->encode_rgb (palette [i].red,
+        ((ULong *)pal2glob) [i] = texman->encode_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
       break;
   }
@@ -265,6 +311,20 @@ csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
   G2D = iG2D;
   inv_cmap = NULL;
   texman = this;
+}
+
+void csTextureManagerSoftware::SetGamma (float iGamma)
+{
+  Gamma = iGamma;
+  int i;
+  for (i = 0; i < 256; i++)
+    GammaTable [i] = QRound (255 * pow (i / 255.0, Gamma));
+  // Remap all textures according to the new colormap.
+  if (truecolor)
+    for (i = 0; i < textures.Length (); i++)
+      ((csTextureMMSoftware*)textures.Get (i))->remap_texture (this);
+  else if (textures.Length ())
+    SetPalette ();
 }
 
 void csTextureManagerSoftware::SetPixelFormat (csPixelFormat &PixelFormat)
@@ -413,11 +473,13 @@ void csTextureManagerSoftware::compute_palette ()
   for (int t = textures.Length () - 1; t >= 0; t--)
   {
     csTextureMMSoftware *txt = (csTextureMMSoftware *)textures [t];
-    RGBPixel *colormap = txt->GetColorMap ();
-    int colormapsize = txt->GetColorMapSize ();
+    RGBPixel colormap [256];
+    int colormapsize;
+    txt->GetOriginalColormap (colormap, colormapsize);
+    RGBPixel *cmap = colormap;
     if (txt->GetTransparent ())
-      colormap++, colormapsize--;
-    csQuantizeCount (colormap, colormapsize);
+      cmap++, colormapsize--;
+    csQuantizeCount (cmap, colormapsize);
   }
 
   // Introduce the uniform colormap bias into the histogram
@@ -474,8 +536,6 @@ void csTextureManagerSoftware::PrepareTextures ()
   for (i = 0; i < textures.Length (); i++)
   {
     csTextureMM *txt = textures.Get (i);
-    if (!pfmt.PalEntries)
-      txt->ApplyGamma ();
     txt->CreateMipmaps ();
   }
 
@@ -503,8 +563,6 @@ void csTextureManagerSoftware::PrepareTexture (iTextureHandle *handle)
   if (!handle) return;
 
   csTextureMMSoftware *txt = (csTextureMMSoftware *)handle->GetPrivateObject ();
-  if (!pfmt.PalEntries)
-    txt->ApplyGamma ();
   txt->CreateMipmaps ();
   txt->remap_texture (this);
 }

@@ -51,8 +51,6 @@ class csTextureMM : public iTextureHandle
 protected:
   /// The original image object.
   iImage *image;
-  /// Gamma already applied?
-  bool gamma_aplied;
 
   /// Texture usage flags: 2d/3d/etc
   int flags;
@@ -104,9 +102,6 @@ public:
 
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor () = 0;
-
-  /// Apply gamma to the base image. NOP if called second time.
-  void ApplyGamma ();
 
   ///---------------------- iTextureHandle implementation ----------------------
   DECLARE_IBASE;
@@ -252,16 +247,7 @@ protected:
   /// Read configuration values from config file.
   virtual void read_config (csIniFile *config);
 
-  /// Compute the gamma table
-  void compute_gamma_table ();
-
 public:
-  /// The translation table for applying gamma
-  UByte GammaTable [256];
-
-  /// Texture gamma
-  float Gamma;
-
   /// Pixel format.
   csPixelFormat pfmt;
 

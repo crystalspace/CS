@@ -633,16 +633,8 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
   bool debug = false;
   bool mirror = rview->IsMirrored ();
 
-  if (use_z_buf)
-  {
-    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
-    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
-  }
-  else
-  {
-    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, false);
-    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
-  }
+  rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+    use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   if (poly->GetTextureType () == POLYTXT_GOURAUD
    || poly->CheckFlags (CS_POLY_FLATSHADING))
@@ -854,8 +846,7 @@ void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
   g3dpoly.normal.C = Cc;
   g3dpoly.normal.D = Dc;
 
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
+  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
   g3d->DrawFogPolygon (id, g3dpoly, fogtype);
 }
 

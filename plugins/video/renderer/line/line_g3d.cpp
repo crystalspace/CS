@@ -78,6 +78,15 @@ csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 
   clipper = NULL;
   texman = NULL;
+
+  Caps.CanClip = false;
+  Caps.minTexHeight = 2;
+  Caps.minTexWidth = 2;
+  Caps.maxTexHeight = 1024;
+  Caps.maxTexWidth = 1024;
+  Caps.fog = G3DFOGMETHOD_NONE;
+  Caps.NeedsPO2Maps = false;
+  Caps.MaxAspectRatio = 32768;
 }
 
 csGraphics3DLine::~csGraphics3DLine ()
@@ -225,11 +234,6 @@ void csGraphics3DLine::Print (csRect *area)
   G2D->Print (area);
 }
 
-void csGraphics3DLine::SetZBufMode (G3DZBufMode mode)
-{
-  z_buf_mode = mode;
-}
-
 void csGraphics3DLine::DrawPolygon (G3DPolygonDP& poly)
 {
   if (poly.num < 3)
@@ -286,47 +290,8 @@ bool csGraphics3DLine::SetRenderState (G3D_RENDERSTATEOPTION op,
 {
   switch (op)
   {
-    case G3DRENDERSTATE_NOTHING:
-      return true;
-    case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      if (value)
-      {
-         if (z_buf_mode == CS_ZBUF_TEST)
-           return true;
-         if (z_buf_mode == CS_ZBUF_NONE)
-           z_buf_mode = CS_ZBUF_TEST;
-         else if (z_buf_mode == CS_ZBUF_FILL)
-           z_buf_mode = CS_ZBUF_USE;
-      }
-      else
-      {
-         if (z_buf_mode == CS_ZBUF_FILL)
-           return true;
-         if (z_buf_mode == CS_ZBUF_USE)
-           z_buf_mode = CS_ZBUF_FILL;
-         else if (z_buf_mode == CS_ZBUF_TEST)
-           z_buf_mode = CS_ZBUF_NONE;
-      }
-      break;
-    case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      if (value)
-      {
-        if (z_buf_mode == CS_ZBUF_FILL)
-          return true;
-        if (z_buf_mode == CS_ZBUF_NONE)
-          z_buf_mode = CS_ZBUF_FILL;
-        else if (z_buf_mode == CS_ZBUF_TEST)
-          z_buf_mode = CS_ZBUF_USE;
-      }
-      else
-      {
-        if (z_buf_mode == CS_ZBUF_TEST)
-          return true;
-        if (z_buf_mode == CS_ZBUF_USE)
-          z_buf_mode = CS_ZBUF_TEST;
-        else if (z_buf_mode == CS_ZBUF_FILL)
-          z_buf_mode = CS_ZBUF_NONE;
-      }
+    case G3DRENDERSTATE_ZBUFFERMODE:
+      z_buf_mode = value;
       break;
     default:
       return false;
@@ -339,37 +304,11 @@ long csGraphics3DLine::GetRenderState (G3D_RENDERSTATEOPTION op)
 {
   switch (op)
   {
-    case G3DRENDERSTATE_NOTHING:
-      return 0;
-    case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      return (bool)(z_buf_mode & CS_ZBUF_TEST);
-    case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      return (bool)(z_buf_mode & CS_ZBUF_FILL);
+    case G3DRENDERSTATE_ZBUFFERMODE:
+      return z_buf_mode;
     default:
       return 0;
   }
-}
-
-void csGraphics3DLine::GetCaps (G3D_CAPS *caps)
-{
-  if (!caps)
-    return;
-
-  caps->ColorModel = G3DCOLORMODEL_RGB;
-  caps->CanClip = false;
-  caps->SupportsArbitraryMipMapping = true;
-  caps->BitDepth = 8;
-  caps->ZBufBitDepth = 32;
-  caps->minTexHeight = 2;
-  caps->minTexWidth = 2;
-  caps->maxTexHeight = 1024;
-  caps->maxTexWidth = 1024;
-  caps->PrimaryCaps.RasterCaps = G3DRASTERCAPS_SUBPIXEL;
-  caps->PrimaryCaps.canBlend = true;
-  caps->PrimaryCaps.ShadeCaps = G3DRASTERCAPS_LIGHTMAP;
-  caps->PrimaryCaps.PerspectiveCorrects = true;
-  caps->PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
-  caps->fog = G3D_FOGMETHOD((int)G3DFOGMETHOD_NONE);
 }
 
 void csGraphics3DLine::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)

@@ -28,12 +28,6 @@
 #include "isystem.h"
 #include "lightdef.h"
 
-/// This is not too good from theoretical point of view,
-/// however I do not see other efficient solutions. An alternative could
-/// be to store such a pointer into each csTextureMM, but this is definitely
-/// a waste of memory.
-static csTextureManager *texman = NULL;
-
 //---------------------------------------------------------- csTextureMM -----//
 
 IMPLEMENT_IBASE (csTextureMM)
@@ -52,7 +46,6 @@ csTextureMM::csTextureMM (iImage* Image, int Flags)
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
   cachedata = NULL;
-  gamma_aplied = false;
 }
 
 csTextureMM::~csTextureMM ()
@@ -165,38 +158,6 @@ void csTextureMM::AdjustSizePo2 ()
     image->Rescale (newwidth, newheight);
 }
 
-void csTextureMM::ApplyGamma ()
-{
-  if (gamma_aplied || !image)
-    return;
-  gamma_aplied = true;
-
-  if (texman->Gamma == 1.0)
-    return;
-
-  RGBPixel *src = NULL;
-  int pixels = 0;
-  switch (image->GetFormat () & CS_IMGFMT_MASK)
-  {
-    case CS_IMGFMT_TRUECOLOR:
-      src = (RGBPixel *)image->GetImageData ();
-      pixels = image->GetWidth () * image->GetHeight ();
-      break;
-    case CS_IMGFMT_PALETTED8:
-      src = image->GetPalette ();
-      pixels = 256;
-      break;
-  }
-  if (!src) return;
-  while (pixels--)
-  {
-    src->red   = texman->GammaTable [src->red];
-    src->green = texman->GammaTable [src->green];
-    src->blue  = texman->GammaTable [src->blue];
-    src++;
-  }
-}
-
 //------------------------------------------------------------ csTexture -----//
 
 void csTexture::compute_masks ()
@@ -216,12 +177,9 @@ IMPLEMENT_IBASE_END
 csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D *iG2D)
   : textures (16, 16)
 {
-  texman = this;
-
   System = iSys;
   verbose = false;
 
-  Gamma = 1.0;
   pfmt = *iG2D->GetPixelFormat ();
 }
 
@@ -232,8 +190,6 @@ csTextureManager::~csTextureManager()
 
 void csTextureManager::read_config (csIniFile *config)
 {
-  Gamma = config->GetFloat ("TextureManager", "GAMMA", 1.0);
-  compute_gamma_table ();
 }
 
 void csTextureManager::FreeImages ()
@@ -245,12 +201,6 @@ void csTextureManager::FreeImages ()
 int csTextureManager::GetTextureFormat ()
 {
   return CS_IMGFMT_TRUECOLOR;
-}
-
-void csTextureManager::compute_gamma_table ()
-{
-  for (int i = 0; i < 256; i++)
-    GammaTable [i] = QRound (255 * pow (i / 255.0, Gamma));
 }
 
 int csTextureManager::FindRGB (int r, int g, int b)

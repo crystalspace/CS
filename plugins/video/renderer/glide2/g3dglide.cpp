@@ -392,21 +392,14 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
   m_piGlide2D = NULL;
   
   // default
-  m_Caps.ColorModel = G3DCOLORMODEL_RGB;
   m_Caps.CanClip = false;
-  m_Caps.SupportsArbitraryMipMapping = false;
-  m_Caps.BitDepth = 16;
-  m_Caps.ZBufBitDepth = 32;
   m_Caps.minTexHeight = 2;
   m_Caps.minTexWidth = 2;
   m_Caps.maxTexHeight = 256;
   m_Caps.maxTexWidth = 256;
-  m_Caps.PrimaryCaps.RasterCaps = G3DRASTERCAPS_SUBPIXEL;
-  m_Caps.PrimaryCaps.canBlend = true;
-  m_Caps.PrimaryCaps.ShadeCaps = G3DRASTERCAPS_LIGHTMAP;
-  m_Caps.PrimaryCaps.PerspectiveCorrects = true;
-  m_Caps.PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
   m_Caps.fog = G3DFOGMETHOD_VERTEX;
+  m_Caps.NeedsPO2Maps = true;
+  m_Caps.MaxAspectRatio = 8;
   
   m_renderstate.dither = false;
   m_renderstate.bilinearmap = true;
@@ -754,15 +747,14 @@ void csGraphics3DGlide2x::ClearBufferUnderTop ()
                            GR_COMBINE_OTHER_NONE,FXFALSE);
    
    grConstantColorValue ( 0xffff0000 ); 
-   G3DZBufMode mode=m_ZBufMode;
 
-   m_ZBufMode = CS_ZBUF_NONE;
    grDepthMask ( FXTRUE );
    grDepthBufferFunction ( GR_CMP_NOTEQUAL );
    grDepthBufferMode ( GR_DEPTHBUFFER_WBUFFER_COMPARE_TO_BIAS );
    grDepthBiasLevel ( 0 );
    GlideLib_grDrawPlanarPolygonVertexList (4,v);
-   SetZBufMode (mode);
+   // Restore Z-buffer mode
+   SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, m_ZBufMode);
    grGlideSetState ( &state );
 }
 
@@ -781,24 +773,6 @@ void csGraphics3DGlide2x::Print(csRect* rect)
 }
 
 /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
-void csGraphics3DGlide2x::SetZBufMode (G3DZBufMode mode)
-{
-  if (mode==m_ZBufMode) 
-    return;
-  
-  m_ZBufMode = mode;
-  
-  if (mode & CS_ZBUF_TEST)
-    GlideLib_grDepthMask (FXFALSE);
-  else
-    GlideLib_grDepthMask (FXTRUE);    
-  
-  if (mode & CS_ZBUF_FILL)      // write-only
-    GlideLib_grDepthBufferFunction (GR_CMP_ALWAYS);    
-  else 
-    GlideLib_grDepthBufferFunction (GR_CMP_LEQUAL);    
-}
-
 #define SNAP (( float ) ( 3L << 18 ))
 
 void csGraphics3DGlide2x::RenderPolygonSinglePass (GrVertex * verts, int num, bool haslight,
@@ -1385,12 +1359,6 @@ void csGraphics3DGlide2x::ClearCache (void)
   if (m_pLightmapCache) m_pLightmapCache->Clear ();
 }
 
-void csGraphics3DGlide2x::GetCaps (G3D_CAPS *caps)
-{
-  if (caps)
-    memcpy (caps, &m_Caps, sizeof(G3D_CAPS));
-}
-
 void csGraphics3DGlide2x::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z) return ;
@@ -1425,24 +1393,21 @@ void csGraphics3DGlide2x::DrawLine (csVector3& v1, csVector3& v2, float fov, int
 
 bool csGraphics3DGlide2x::SetRenderState (G3D_RENDERSTATEOPTION option, long value)
 {
-  G3DZBufMode newzmode = m_ZBufMode;
   switch (option)
   {
-    case G3DRENDERSTATE_NOTHING:
-      return true;
+    case G3DRENDERSTATE_ZBUFFERMODE:
+      m_ZBufMode = value;
 
-    case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      newzmode = (G3DZBufMode)(newzmode & ~CS_ZBUF_TEST);
-      newzmode = (G3DZBufMode)(newzmode | value ? CS_ZBUF_TEST : CS_ZBUF_NONE);
-      SetZBufMode ( newzmode );
+      if (mode & CS_ZBUF_TEST)
+        GlideLib_grDepthMask (FXFALSE);
+      else
+        GlideLib_grDepthMask (FXTRUE);    
+      if (mode & CS_ZBUF_FILL)      // write-only
+        GlideLib_grDepthBufferFunction (GR_CMP_ALWAYS);
+      else 
+        GlideLib_grDepthBufferFunction (GR_CMP_LEQUAL);
       break;
       
-    case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      newzmode = (G3DZBufMode)(newzmode & ~CS_ZBUF_FILL);
-      newzmode = (G3DZBufMode)(newzmode | value ? CS_ZBUF_FILL : CS_ZBUF_NONE);
-      SetZBufMode ( newzmode );
-      break;
-    
     case G3DRENDERSTATE_DITHERENABLE:
 /*
     if(value)
@@ -1486,12 +1451,8 @@ long csGraphics3DGlide2x::GetRenderState (G3D_RENDERSTATEOPTION op)
 {
   switch(op)
   {
-    case G3DRENDERSTATE_NOTHING:
-      return 0;
-    case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      return (bool)(m_ZBufMode & CS_ZBUF_TEST);
-    case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      return (bool)(m_ZBufMode & CS_ZBUF_FILL);
+    case G3DRENDERSTATE_ZBUFFERMODE:
+      return m_ZBufMode;
     case G3DRENDERSTATE_DITHERENABLE:
       return false;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
@@ -1509,11 +1470,6 @@ long csGraphics3DGlide2x::GetRenderState (G3D_RENDERSTATEOPTION op)
     default:
       return 0;
   }
-}
-
-unsigned long *csGraphics3DGlide2x::GetZBufPoint (int, int)
-{
-  return NULL;
 }
 
 void csGraphics3DGlide2x::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
@@ -1539,9 +1495,9 @@ iHalo *csGraphics3DGlide2x::CreateHalo (float r, float g, float b, unsigned char
   return halo;
 }
 
-float csGraphics3DGlide2x::GetZbuffValue ( int x, int y )
+float csGraphics3DGlide2x::GetZBuffValue ( int x, int y )
 {
-  float z = m_piGlide2D->GetZbuffValue (x, y);
+  float z = m_piGlide2D->GetZBuffValue (x, y);
 //  printf("%g\n", z);
   return z;
 }
