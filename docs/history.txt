@@ -1,13 +1,34 @@
 The history order has been reversed so that new features are at the top.
 
+8-May-2000
+	- Eric Sunshine re-enabled -kb flag and re-added CRLF line terminators
+	  for all .dsp files so that they will work even from CVS snapshot
+	  which is created on a Unix machine.
 7-May-2000
 	- More work on PVS. Still not working properly though.
 	- Started working on saving and loading of octree and PVS.
 	  This will help debugging this thing as computing it is
 	  time consuming.
+	- Eric Sunshine pored through the project several times to correct
+	  problems caused by relocation of 2D, 3D, and sound drivers from
+	  CS/libs to CS/plugins.  He updated source, headers, makefiles,
+	  scripts, and documentation.  The directories which were relocated at
+	  this time were:
+	      libs/cs2d --> plugins/video/canvas
+	      libs/cs3d --> plugins/video/renderer
+	      libs/cssnddrv --> plugins/sound/driver
+	      libs/cssndrdr --> plugins/sound/renderer
+	- Eric Sunshine fixed csnetman.mak so that it properly classifies
+	  itself as a plug-in module rather than driver.
+	- Eric Sunshine fixed several additional compilation warnings which
+	  were recently introduced into the project.
+	- Eric Sunshine fixed an error in the mingw.mak makefile.
 6-May-2000
 	- Fixed several bugs in PVS and routines used by PVS. It finally
 	  starts to resemble doing PVS work for real.
+	- Eric Sunshine fixed a bug in the 'depend' target of openglx/glide.
+	- Eric Sunshine added ugly debug_dump() and cleanup() to scfreg.cpp
+	  for glooky Linux system driver.
 5-May-2000
 	- Andrew Zabolotny removed some relatively expensive unneeded
 	  code from lighting routines which should make lighting (both
@@ -30,6 +51,17 @@ The history order has been reversed so that new features are at the top.
 	- Further debug work on PVS. Still not working properly though.
 	- Wouter Wijngaards updated radiosity. It is still buggy though.
 	- Fixed bug in csPoly3D::ProjectXPlane (and Y/Z).
+	- Eric Sunshine fixed a bug in cs2d/common/scrshot.cpp where it was
+	  applying an incorrect cast to the abstract "Data" which it was about
+	  to delete[].  But was pointed out by samuel@metalang.softnet.co.uk.
+	- Eric Sunshine eliminated several newly introduced compilation
+	  warnings from the project.
+	- Eric Sunshine performed the (hopefully) final unification and
+	  correction of the DDraw naming problems/conflicts.  To summarize:
+	    - Unified on name "csddraw" everywhere.
+	    - Removed old duplicate, legacy names from g3d and scf.cfg which
+	      referred to same driver by multiple names.
+	    - Makes proper use of SOFTWARE_2D_DRIVER everywhere.
 4-May-2000
 	- Chris Bruner did some various cleanups in some files.
 	- Borland Ehle did an attempt to unify makefile for all Win32
