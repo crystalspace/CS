@@ -3375,6 +3375,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  perfect. This needs a small design change.
 	- Cleaned up sector.h and removed some of the obsolete fields.
 	- Removed sector argument from csSector::Prepare().
+	- Release of 0.18r001.
 19-Feb-2001
 	- Norman Kramer changed all csSector::GetNumberXxx() to GetNumXxx().
 	- Martin Geisse modified the system driver to use the config
