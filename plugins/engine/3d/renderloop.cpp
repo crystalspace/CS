@@ -71,7 +71,6 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
     int oldClipType = rview->GetGraphics3D()->GetClipType();
 
     csShaderVarStack &varStack = shadermanager->GetShaderVariableStack ();
-    shadermanager->PushVariables (varStack);
 
     s->IncRecLevel ();
     s->PrepareDraw (rview);
@@ -82,7 +81,6 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
       steps[i]->Perform (rview, s, varStack);
     }
     s->DecRecLevel ();
-    shadermanager->PopVariables (varStack);
 
     rview->GetGraphics3D()->SetClipper (oldClipper, oldClipType);
 

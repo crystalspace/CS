@@ -8,7 +8,7 @@
       <buffer source="normal" destination="normal"/>
       <vp plugin="glfixed">
         <fixedvp>  
-          <texgen type="reflection" mapping="cube" />
+          <texgen type="reflection" mapping="cube" layer="0" />
           <!--<ambient/>-->
         </fixedvp>
       </vp>

@@ -33,6 +33,17 @@ chronological order.
 	- res fixed screen clearing with delayed swap.
 	- res fixed msvcgen/config.jam to not contain dxguid.lib in the DirectX
 	  libs list. This lib is not used by CS.
+	- res made delayed swapping runtime-switchable. Configuration setting 
+	  is "Video.OpenGL.DelaySwap".
+	- res enabled VBO by default. New VBO management code is worth some
+	  more wide-spread testing.
+	- res fixed a missing "layer" attribute in water.xml.
+	- res fixed the "world2camera transform" SV not being available to
+	  shaders when it should be. Fixes crash in waterdemo.
+	- res ported Anders Reggestad's last fix to xmlread. Fixes an infinite
+	  loop.
+	- res changed the XML plugins to strip whitespaces before <![CDATA[
+	  elements, fixes some shader parsing issues.
 1-Apr-2005
 	- Eric Sunshine fixed some unportable uses of #warning directives in
 	  the public CS headers. (#warning is not part of the C++ standard)

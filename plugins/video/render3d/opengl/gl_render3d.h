@@ -110,8 +110,6 @@ public:
     csVector2 *iVertices, int iVertCount);
 };
 
-#define DELAYED_SWAP
-
 class csGLGraphics3D : public iGraphics3D
 {
 private:
@@ -328,6 +326,7 @@ private:
   // shading, or color.
   void Draw2DPolygon (csVector2* poly, int num_poly, const csPlane3& normal);
 
+  bool enableDelaySwap;
   bool wantToSwap;
   int delayClearFlags;
   void SwapIfNeeded();

@@ -191,6 +191,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
   {
     shaderManager = CS_QUERY_REGISTRY (objreg, iShaderManager);
   }
+  shaderManager->PushVariables (stacks);
 
   iMaterial *material = 0;
   iShaderVariableContext* lastMeshContext = 0;
@@ -246,6 +247,8 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
     material->PopVariables (stacks);
     shader->PopVariables (stacks);
   }
+
+  shaderManager->PopVariables (stacks);
 }
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
@@ -373,8 +376,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   	+ visible_meshes_index;
   iShaderVariableContext** sameShaderMeshSvcs = mesh_svc.GetArray ()
   	+ visible_meshes_index;
-  int prev_visible_meshes_index = visible_meshes_index;
-  visible_meshes_index += (int)num;
+  size_t prev_visible_meshes_index = visible_meshes_index;
+  visible_meshes_index += num;
   meshlist->GetSortedMeshes (sameShaderMeshes, imeshes_scratch.GetArray());
   for (size_t i = 0; i < num; i++)
     sameShaderMeshSvcs[i] = imeshes_scratch[i]->GetSVContext();

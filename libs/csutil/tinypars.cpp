@@ -441,7 +441,8 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
         return 0;
       }
 
-      p = cdataNode->Parse( document, orig_p );
+      p = cdataNode->Parse( document, p );
+      // don't care about whitespace before <![CDATA[ -> don't use orig_p
 
       if ( !cdataNode->Blank() )
         LinkEndChild( cdataNode );

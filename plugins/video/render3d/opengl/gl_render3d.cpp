@@ -1022,8 +1022,19 @@ bool csGLGraphics3D::Open ()
   cache_clip_plane = -1;
   cache_clip_z_plane = -1;
 
+  const char* r2tBackendStr;
+  r2tBackendStr = "framebuffer";
   r2tbackend = new csGLRender2TextureFramebuf (this);
   
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Render-to-texture backend: %s",
+      r2tBackendStr);
+
+  enableDelaySwap = config->GetBool ("Video.OpenGL.DelaySwap", true);
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Delayed buffer swapping: %s",
+      enableDelaySwap ? "enabled" : "disabled");
+
   return true;
 }
 
@@ -1097,11 +1108,10 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     clearMask = GL_COLOR_BUFFER_BIT;
   else if (doStencilClear)
     clearMask = GL_STENCIL_BUFFER_BIT;
-#ifndef DELAYED_SWAP
-  glClear (clearMask);
-#else
-  delayClearFlags = clearMask;
-#endif
+  if (!enableDelaySwap)
+    glClear (clearMask);
+  else
+    delayClearFlags = clearMask;
 
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
@@ -1228,14 +1238,15 @@ void csGLGraphics3D::Print (csRect const* area)
     vboManager->ResetFrameStats ();
   }
 
-#ifdef DELAYED_SWAP
-  if (area == 0)
+  if (enableDelaySwap)
   {
-    wantToSwap = true;
-    return;
+    if (area == 0)
+    {
+      wantToSwap = true;
+      return;
+    }
+    SwapIfNeeded();
   }
-  SwapIfNeeded();
-#endif
   G2D->Print (area);
 }
 
@@ -2228,7 +2239,8 @@ void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,
 
 void csGLGraphics3D::SwapIfNeeded()
 {
-#ifdef DELAYED_SWAP
+  if (!enableDelaySwap) return;
+
   if (wantToSwap)
   {
     G2D->Print (0);
@@ -2239,7 +2251,6 @@ void csGLGraphics3D::SwapIfNeeded()
       delayClearFlags = 0;
     }
   }
-#endif
 }
 
 void csGLGraphics3D::SetupClipPortals ()

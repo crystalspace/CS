@@ -431,7 +431,8 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
         return 0;
       }
 
-      p = cdataNode->Parse( document, orig_p );
+      p = cdataNode->Parse( document, p ); 
+      // don't care about whitespace before <![CDATA[ -> don't use orig_p
 
       if ( !cdataNode->Blank() )
         lastChild = LinkEndChild( lastChild, cdataNode );
@@ -460,6 +461,9 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
         }
       }
     }
+
+    orig_p = p;
+
     p = SkipWhiteSpace( p );
   }
 

@@ -99,7 +99,7 @@ private:
   csDirtyAccessArray<csRenderMesh*> visible_meshes;
   csDirtyAccessArray<iMeshWrapper*> imeshes_scratch;
   csDirtyAccessArray<iShaderVariableContext*> mesh_svc;
-  int visible_meshes_index;	// First free index in the visible meshes.
+  size_t visible_meshes_index;	// First free index in the visible meshes.
 
   static csStringID o2c_matrix_name;
   static csStringID o2c_vector_name;
