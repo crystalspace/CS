@@ -109,18 +109,246 @@ should have a @emph{Solution Explorer} window which looks like the image below.
 
 @subsubheading Step 3 - Setting Crystal Space @sc{paths} inside @sc{msvc}.
 
+First thing we need todo is point MSVC to both Crystal Spaces @file{include} and both the release and debug build @file{libs} directories, so it may access them at compile/link time. Select @emph{Tools} from the @emph{File menu} and then @emph{Options}@dots{} You will now be presented with the @emph{Options} dialog box, which can be seen below.
+
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap6}
 @end ifnotinfo
+
+Click @emph{Projects} folder of the @emph{Options} dialog. Now click on @emph{VC++ Directories}.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap7}
 @end ifnotinfo
 
+Lets first add the path to the location of the Crystal Space @file{include} directory. Select @emph{Include files} in the @emph{Show directories} for drop down menu. Next click on the @emph{New Line} button (folder beneath the drop down menu). Click the browse button (button with three dots) on the right hand side, enabling you to select the Crystal Space @emph{include} directory - wherever it is on your system. See the image below for an example of it set.
+
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap8}
 @end ifnotinfo
 
+To set the paths to the Crystal Space lib files, you must remember you need to add two - one pointing to the location where the release libs are and another to where the debug libs are located. In the @emph{Show directories} for drop down menu, now select @emph{Library files}. Follow the same browse and selection procedure as you used when adding the @file{include} path, adding the following paths - adjusting for where you have Crystal Space located on your system.
+
+@noindent
+@file{CS\mk\visualc7\csrelease\bin\libs\}
+
+@noindent
+@file{CS\mk\visualc7\csdebug\bin\libs\}
+
+See image below for an example of these set.
+
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap9}
 @end ifnotinfo
+
+Once done, click on the @emph{OK} button and return to the MSVC IDE.
+
+@subsubheading Step 4 - Setting Preprocessor Definitions in MSVC.
+
+Crystal Space essentially has three preprocessor definitions which MUST be set in-order to successfully compile and link your application. They are @code{WIN32_VOLATILE}, which is added whether the build is release or debug. @code{__CRYSTAL_SPACE__}, which is also set whether the build is release or debug. And finally @code{CS_RELEASE} or @code{CS_DEBUG}, which is added as you may guess @code{CS_RELEASE} in the settings for release builds and @code{CS_DEBUG} in the settings for debug builds.
+
+To set the preprocessor definitions for your project. Select your project in the @emph{Workspace} window. See area highlighted in blue in the image below. Now, from the @emph{Project} menu select @emph{Properties}. Alternatively, you can right click on the highlighted area in the @emph{Workspace} and then click on @emph{Properties} - both ways work.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap5}
+@end ifnotinfo
+
+Once you have clicked on @emph{Properties}. You will then be presented with the @emph{Properties} dialog box, which can be seen in the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap10}
+@end ifnotinfo
+
+Open the C/C++ folder and select @emph{Preprocessor}. Insert the appropriate definitions in the @emph{Preprocessor Definitions} text box i.e. for a debug build @code{WIN32_VOLATILE}, @code{__CRYSTAL_SPACE__} and @code{CS_DEBUG}, making sure to seperate with semi-colons. Alternatively, you can click the elipsis (@dots{}) button to pull up an easier view. An example of the ones entered for a debug build can be seen in the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap11}
+@end ifnotinfo
+
+Open the C/C++ folder and select @emph{Preprocessor}. Insert the appropriate definitions in the @emph{Preprocessor Definitions} text box i.e. for a release build @code{WIN32_VOLATILE}, @code{__CRYSTAL_SPACE__} and @code{CS_RELEASE}, making sure to seperate with semi-colons. Alternatively, you can click the elipsis (@dots{}) button to pull up an easier view. An example the ones entered for a release build can be seen in the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap12}
+@end ifnotinfo
+
+Once done, click on the OK button and return to the MSVC IDE.
+
+@subsubheading Step 5 - Setting Run-Time Library Used with Crystal Space Applications.
+
+As in step 4 we need to change one or more project settings. Select your project in the @emph{Workspace} window. See area highlighted in blue in the image below. Now, from the @emph{Project} menu select @emph{Properties}. Alternatively, you can right click on the highlighted area in the @emph{Workspace} and then click on @emph{Properties} - both ways work.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap5}
+@end ifnotinfo
+
+Once you have clicked on @emph{Properties}, you will be presented with the @emph{Properties} dialog box once again.
+
+Open the C/C++ folder and select @emph{Code Generation}. Crystal Space uses the Multithreaded DLL run-time internally, so to avoid conflict and errors applications should use the same.
+
+For debug builds you need to select @emph{Debug Multithreaded DLL} from the @emph{Runtime Library} drop down menu. As can be seen in the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap13}
+@end ifnotinfo
+
+For release builds you need to select @emph{Multithreaded DLL} from the @emph{Runtime Library} drop down menu. As can be seen in the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap14}
+@end ifnotinfo
+
+Once done, click on the @emph{OK} button and return to the MSVC IDE.
+
+@subsubheading Step 6 - Setting the Crystal Space static libs to link with.
+
+When compiling Crystal Space in release and debug mode, you will end up with the following static libs, some of which you may require at some point in your own applications if you use the functionality contained within a given library.
+
+Crystal Space debug library names (the @emph{_d} indicates a debug CS library):
+
+@file{libcssys_d.lib} @file{libcsengine_d.lib} @file{libcsutil_d.lib} @file{libcsgeom_d.lib} @file{libcsgfx_d.lib} @file{libcstool_d.lib} @file{libcsws_d.lib}
+
+Crystal Space release library names:
+
+@file{libcssys.lib} @file{libcsengine.lib} @file{libcsutil.lib} @file{libcsgeom.lib} @file{libcsgfx.lib} @file{libcstool.lib} @file{libcsws.lib}
+
+To add the necessary libraries to link our application. As in step 4 we need to change one or more project settings. Select your project in the @emph{Workspace} window. See area highlighted in blue in the image below. Now, from the @emph{Project} menu select @emph{Properties}. Alternatively, you can right click on the highlighted area in the @emph{Workspace} and then click on @emph{Properties} - both ways work.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap5}
+@end ifnotinfo
+
+For our application we need only need link with a few of the available Crystal Space static libraries. Open the @emph{Linker} folder and select @emph{Input}. In the text box @emph{Additional Dependencies} add the Crystal Space libraries as named below into the box with those already there.
+
+Debug:
+
+@file{libcssys_d.lib} @file{libcsutil_d.lib} @file{libcsgeom_d.lib} @file{libcsgfx_d.lib} @file{libcstool_d.lib}
+
+See image below for example of debug build link settings.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap15}
+@end ifnotinfo
+
+Release:
+
+@file{libcssys.lib} @file{libcsutil.lib} @file{libcsgeom.lib} @file{libcsgfx.lib} @file{libcstool.lib}
+
+See image below for example of release build link settings.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap16}
+@end ifnotinfo
+
+Finally, click on @emph{OK} to return to the MSVC IDE and then build the project.
+
+@subsubheading Commonly encountered problems.
+
+@itemize @bullet
+@item
+@strong{Q.} I get the following error:
+
+@example
+----------Configuration: simple1 - Win32 Release----------
+Compiling...
+simple1.cpp
+C:\CS\INCLUDE\platform.h(26) : fatal error C1083:
+  Cannot open include file: 'volatile.h': No such file or directory
+Error executing cl.exe.
+
+simple1.exe - 1 error(s), 0 warning(s)
+@end example
+
+@strong{A.} Repeat @emph{Step 4} - You seem to have not set one or more of the preprocessor definitions correctly.
+
+@item
+@strong{Q.} I get the following link errors:
+
+@example
+----------Configuration: simple1 - Win32 Release----------
+Compiling...
+simple1.cpp
+Linking...
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: void __thiscall csReversibleTransform::RotateThis(
+    class csVector3 const &,float)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static struct iSCF *  iSCF::SCF"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: __thiscall csView::csView(
+    struct iEngine *,struct iGraphics3D *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static bool __cdecl csInitializer::OpenApplication(
+    struct iObjectRegistry *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static void __cdecl csCommandLineHelper::Help(
+    struct iObjectRegistry *,struct iCommandLineParser *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static bool __cdecl csCommandLineHelper::CheckHelp(
+    struct iObjectRegistry *,struct iCommandLineParser *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static bool __cdecl csInitializer::SetupEventHandler(
+    struct iObjectRegistry *,
+    bool (__cdecl*)(struct iEvent &),unsigned int)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static bool __cdecl csInitializer::RequestPlugins(
+  struct iObjectRegistry *,...)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "bool __cdecl csDefaultRunLoop(struct iObjectRegistry *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static void __cdecl csInitializer::DestroyApplication(
+    struct iObjectRegistry *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static struct iObjectRegistry * __cdec
+   csInitializer::CreateEnvironment(
+   int,char const * const * const)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "int __cdecl csPrintf(char const *,...)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "int __cdecl csPrintfV(char const *,char *)"
+MSVCRT.lib(crtexe.obj) : error LNK2001:
+  unresolved external symbol _main
+Release/simple1.exe : fatal error LNK1120: 14 unresolved externals
+Error executing link.exe.
+
+simple1.exe - 15 error(s), 0 warning(s)
+@end example
+
+@strong{A.} This would indicate that you have forgotten to add the Crystal Space static libraries to link with. Work through @emph{Step 6} again and re-check the settings you have entered.
+
+@item
+@strong{Q.} I get the following link errors:
+
+@example
+----------Configuration: simple1 - Win32 Release----------
+Compiling...
+simple1.cpp
+Linking...
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _strchr already defined in LIBC.lib(strchr.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _strstr already defined in LIBC.lib(strstr.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _tolower already defined in LIBC.lib(tolower.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _strncpy already defined in LIBC.lib(strncpy.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _free already defined in LIBC.lib(free.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _memmove already defined in LIBC.lib(memmove.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _realloc already defined in LIBC.lib(realloc.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _malloc already defined in LIBC.lib(malloc.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _strncmp already defined in LIBC.lib(strncmp.obj)
+LINK : warning LNK4098: defaultlib "MSVCRT" conflicts with use
+  of other libs; use /NODEFAULTLIB:library
+Release/simple1.exe : fatal error LNK1169: one or more multiply
+  defined symbols found
+Error executing link.exe.
+
+simple1.exe - 10 error(s), 1 warning(s)
+@end example
+
+@strong{A.} This or similar LNK2005 errors, tend to indicate that you have forgotten to set the correct run-time library in the project settings. Work through @emph{Step 5} again and make sure you have your project set to @emph{Debug Multithreaded DLL} or @emph{Multithreaded DLL} for debug and release builds respectively.
+@end itemize
