@@ -3,6 +3,12 @@ The history order has been reversed so that new features are at the top.
 11-Apr-2000
 	- Andrew Zabolotny added a SciTech MGL 2D driver (unfinished, won't
 	  compile).
+	- Eric Sunshine created a custom PHP script (cvssnap.php) which allows
+	  people to access the daily CVS snapshots via HTTP.  Previously they
+	  were only accessible via FTP.  Thus, CVS snapshots may now be
+	  accessed via these URLs:
+	      http://crystal.sourceforge.net/cvs-snapshots/
+	      ftp://crystal.sourceforge.net/pub/crystal/cvs-snapshots/
 10-Apr-2000
 	- Added 'DETAIL' keyword for THING and SIXFACE and CS_ENTITY_DETAIL
 	  flag to csThing. With this keyword you can indicate detail objects
