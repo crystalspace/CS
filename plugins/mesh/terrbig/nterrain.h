@@ -141,6 +141,9 @@ class nTerrain
   /// The transform to get object to camera space.
   csOrthoTransform obj2cam;
 
+  /// Stored movable
+  iMovable* movable;
+
   /// This is the camera position, in object space.
   csVector3 cam;
 
@@ -175,7 +178,7 @@ class nTerrain
   void WriteTreeNode(FILE *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, nBlock *);
 
   /// Calculates the insensity and color at a given vertex for a given light
-  csColor CalculateLightIntensity (iLight *li, iMovable *m, csVector3 v, csVector3 n);
+  csColor CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n);
 
   /// Buffers the node passed into it for later drawing, bounds are needed to generate all the verts.
   void BufferTreeNode(int p, nBlock *b);
@@ -209,7 +212,7 @@ public:
   void BuildTree(FILE *f, nBlock *heightmap, unsigned int w);
 
   /// Assembles the terrain into the buffer when called by the engine.  
-  void AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo);
+  void AssembleTerrain(iRenderView *rv, iMovable* m, nTerrainInfo *terrinfo);
 
   /// Sets the object to camera transform
   void SetObjectToCamera(csReversibleTransform &o2c)

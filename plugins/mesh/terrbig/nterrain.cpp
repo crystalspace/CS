@@ -258,10 +258,10 @@ void nTerrain::BuildTree(FILE *f, nBlock *heightmap, unsigned int w)
   */
 }
 
-csColor nTerrain::CalculateLightIntensity (iLight *li, iMovable *m, csVector3 v, csVector3 n)
+csColor nTerrain::CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n)
 {
   csColor color (0.0, 0.0, 0.0);
-  csVector3 li_center = m->GetTransform().Other2This (li->GetCenter());
+  csVector3 li_center = movable->GetTransform().Other2This (li->GetCenter());
   csVector3 light_dir = v - li_center;
   float sq_dist = light_dir.SquaredNorm();
   if (sq_dist < li->GetSquaredRadius ()) {
@@ -297,33 +297,12 @@ void nTerrain::BufferTreeNode(int p, nBlock *b)
     c = csColor (0.0, 0.0, 0.0);
     for (int i = 0; i < info->num_lights; i ++) {
       iLight *li = info->light_list[i];
-      // c += CalculateLightIntensity (li, m, b->pos, b->norm);
+      c += CalculateLightIntensity (li, b->pos, b->norm);
     }
     c.Clamp (2., 2., 2.);
   }
   info->AddVertex (v, t, c, p);
 }
-
-/*
-void nTerrain::ProcessTreeNode(iRenderView *rv, float kappa, unsigned int level, unsigned int parent, unsigned int child, unsigned int branch)
-{
-  nBlock b = (nBlock *)hm->GetPointer(child + parent);
-  csSphere bs(b.pos, b.radius);
-  float distance = (obj2cam * b.pos).SquaredNorm();
-  float error_projection = (b.error / kappa + b.radius);
-  // Squared
-  error_projection *= error_projection;
-  if (rv->TestBSphere (obj2cam, bs) && error_projection > distance) {
-    if (level < 2 * max_levels - 1) {
-      ProcessTreeNode (rv, kappa, level + 1, parent, branch, branch * 2 + 0);
-	}
-    BufferTreeNode (level & 1, &b);
-    if (level < 2 * max_levels - 1) {
-      ProcessTreeNode (rv, kappa, level + 1, parent, branch, branch * 2 + 1);
-	}
-  } 
-}
-*/
 
 void nTerrain::ProcessTreeNode(iRenderView *rv, float kappa, unsigned int level, unsigned int parent, unsigned int child, unsigned int branch)
 {
@@ -350,9 +329,10 @@ void nTerrain::ProcessTreeNode(iRenderView *rv, float kappa, unsigned int level,
   }
 }
 
-void nTerrain::AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
+void nTerrain::AssembleTerrain(iRenderView *rv, iMovable*m, nTerrainInfo *terrinfo)
 {
   info = terrinfo;   
+  movable = m;
 
   nBlock sw = (nBlock *)hm->GetPointer(0);
   nBlock se = (nBlock *)hm->GetPointer(1);
@@ -547,6 +527,12 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   if (image->GetWidth () != image->GetHeight ()) {
     image->Rescale (image->GetWidth (), image->GetWidth ());
   }
+  if (image->GetWidth () != ((1 << (ilogb (image->GetWidth()))) + 1)) {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	    "crystalspace.mesh.object.terrbig",
+		"Unable to process image, must square and width 2^n+1");
+    return false;
+  }
   FILE *hmfp = fopen (hm, "wb");
   if (!hmfp) {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
@@ -676,7 +662,7 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 	csReversibleTransform tr_o2c = cam->GetTransform ();
 	tr_o2c /= movable->GetFullTransform ();
     terrain->SetObjectToCamera(tr_o2c);
-    terrain->AssembleTerrain(rview, info);
+    terrain->AssembleTerrain(rview, movable, info);
 
     info->GetMesh()->do_mirror = rview->GetCamera()->IsMirrored();
     if (info->num_lights > 0) {
@@ -686,6 +672,20 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
       info->GetMesh()->use_vertex_color = 0;
       info->GetMesh()->mixmode = 0;
     }
+
+	csVector3 radius;
+	csSphere sphere;
+    GetRadius (radius, sphere.GetCenter());
+	float max_radius = (radius.x > radius.y) ? radius.x : radius.y;
+	max_radius = (max_radius > radius.z) ? max_radius : radius.z;
+	sphere.SetRadius (max_radius);
+	int clip_portal, clip_plane, clip_z_plane;
+	if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
+	  clip_z_plane) == false)
+	  return false;
+	info->GetMesh()->clip_portal = clip_portal;
+	info->GetMesh()->clip_plane = clip_plane;
+	info->GetMesh()->clip_z_plane = clip_z_plane;
     return true;
   }
 
@@ -698,7 +698,6 @@ csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable*)
   if (info->light_list) {
     delete [] info->light_list;
   }
-
   info->num_lights = num_lights;
   info->light_list = new iLight*[num_lights];
   memcpy (info->light_list, lis, sizeof (iLight *) * num_lights);
@@ -716,6 +715,7 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable* m, csZBufMode zbufMode)
   pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zbufMode );
   info->GetMesh()->mat_handle = terrain->GetMaterialsList()[0]->GetMaterialHandle();
   terrain->GetMaterialsList()[0]->Visit ();
+  rview->CalculateFogMesh (tr_o2c, *info->GetMesh());
   pG3D->DrawTriangleMesh(*info->GetMesh());
   return true;
 }
