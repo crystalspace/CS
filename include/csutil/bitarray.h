@@ -178,7 +178,7 @@ public:
   csBitArray (const csBitArray &that) :
     mpStore(0), mSingleWord(0), mLength(0), mNumBits(0)
   {
-    *this = that;
+    *this = that; // Invokes this->operator=().
   }
 
   /// Destructor.
@@ -354,9 +354,7 @@ public:
    */
   bool AreSomeBitsSet (size_t pos, size_t count) const
   {
-    CS_ASSERT (pos < mNumBits);
-    CS_ASSERT ((pos + count) < mNumBits);
-    
+    CS_ASSERT (pos + count < mNumBits);
     while (count > 0)
     {
       size_t index = GetIndex (pos);
@@ -388,6 +386,40 @@ public:
 
     Trim();
     return *this;
+  }
+
+  /**
+   * Delete from the array \a count bits starting at \a pos, making the array
+   * shorter.
+   */
+  void Delete(size_t pos, size_t count)
+  {
+    if (count > 0)
+    {
+      size_t dst = pos;
+      size_t src = pos + count;
+      CS_ASSERT(src <= mNumBits);
+      size_t ntail = mNumBits - src;
+      while (ntail-- > 0)
+	Set(dst++, IsBitSet(src++));
+      mNumBits -= count;
+      Trim();
+    }
+  }
+
+  /**
+   * Return a new bit array containing a slice \a count bits in length from
+   * this array starting at \a pos. Does not modify this array.
+   */
+  csBitArray Slice(size_t pos, size_t count) const
+  {
+    CS_ASSERT(pos + count <= mNumBits);
+    csBitArray a(count);
+    // Slow, but simple and effective.
+    for (size_t i = pos, o = 0; i < pos + count; i++)
+      if (IsBitSet(i))
+	a.SetBit(o++);
+    return a;
   }
 
   /// Return the full array.
