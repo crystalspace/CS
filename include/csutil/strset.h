@@ -65,7 +65,7 @@ class CS_CSUTIL_EXPORT csStringSet
   friend class csStringSetIterator;
 
   csStringHash Registry;
-  csHash<const char*, csStringID> reverse_mapping;	// Mapping from ID to string.
+  csHash<const char*, csStringID> reverse_mapping; // ID to string mapping.
   csStringID IDCounter;
 public:
   /// Constructor
@@ -77,17 +77,22 @@ public:
    * Request the ID for the given string. Create a new ID
    * if the string was never requested before.
    */
-  csStringID Request (const char *s);
+  csStringID Request (const char*);
 
   /**
    * Request the string for a given ID. Return 0 if the string
    * has not been requested (yet).
    */
-  const char* Request (csStringID id) const;
+  char const* Request (csStringID) const;
+
+  /**
+   * Check if the set contains a particular string.
+   */
+  bool Contains(char const*) const;
 
   /**
    * Delete all stored strings. When new strings are registered again, new
-   * ID values will be used, not the old ones reused.
+   * ID values will be used; the old ID's will not be re-used.
    */
   void Clear ();
 };

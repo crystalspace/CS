@@ -51,17 +51,26 @@ class csSCF : public iSCF
 {
 private:
   csRef<csMutex> mutex;
+  bool verbose;
 
   csStringSet contexts;
   csStringID staticContextID;
+  csStringSet scannedDirs;
 
-  char const* GetContextName(csStringID s)
-  { return s != csInvalidStringID ? contexts.Request(s) : "<unknown>"; }
-  void RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
-    const char* context = 0);
 #ifdef CS_REF_TRACKER
   csRefTracker* refTracker;
 #endif
+
+  char const* GetContextName(csStringID s)
+  { return s != csInvalidStringID ? contexts.Request(s) : "{none}"; }
+  char const* GetContextName(char const* s)
+  { return s != 0 ? s : "{none}"; }
+  void RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
+    const char* context = 0);
+  void ScanPluginsInt(csPluginPaths*, char const* context);
+
+  friend void scfInitialize (csPluginPaths*, bool);
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -69,9 +78,12 @@ public:
   csStringSet InterfaceRegistry;
   
   /// constructor
-  csSCF ();
+  csSCF (bool);
   /// destructor
   virtual ~csSCF ();
+
+  bool IsVerbose() const { return verbose; }
+  void SetVerbose(bool v) { verbose = v; }
 
   virtual void RegisterClasses (iDocument*, const char* context = 0);
   virtual void RegisterClasses (char const*, const char* context = 0);
@@ -108,7 +120,7 @@ class scfSharedLibrary;
 
 static class csStringSet* libraryNames = 0; 
 static char const* get_library_name(csStringID s)
-{ return s != csInvalidStringID ? libraryNames->Request(s) : "<unknown>"; }
+{ return s != csInvalidStringID ? libraryNames->Request(s) : "{none}"; }
 
 class scfLibraryVector : public csPDelArray<scfSharedLibrary>
 {
@@ -184,7 +196,12 @@ scfSharedLibrary::scfSharedLibrary (csStringID libraryName, const char *core)
 
   RefCount = 0;
   LibraryName = libraryName;
-  const char* lib = libraryNames->Request (LibraryName);
+  const char* lib = get_library_name(LibraryName);
+
+  if (PrivateSCF->IsVerbose())
+    csPrintfErr("SCF_NOTIFY: loading plugin %s to satisfy request for %s\n",
+      lib, core);
+
   LibraryHandle = csLoadLibrary (lib);
 
   if (LibraryHandle != 0)
@@ -194,8 +211,7 @@ scfSharedLibrary::scfSharedLibrary (csStringID libraryName, const char *core)
     initFunc = (scfInitFunc)csGetLibrarySymbol(LibraryHandle, sym);
     if (!initFunc)
     {
-      csPrintfErr ("SCF ERROR: '%s' doesn't export '%s'\n", 
-	lib, sym.GetData ());
+      csPrintfErr("SCF_ERROR: '%s' doesn't export '%s'\n", lib, sym.GetData());
       csPrintLibraryError (sym);
     }
     sym.Clear ();
@@ -203,8 +219,7 @@ scfSharedLibrary::scfSharedLibrary (csStringID libraryName, const char *core)
     finisFunc = (scfFinisFunc)csGetLibrarySymbol(LibraryHandle, sym);
     if (!finisFunc)
     {
-      csPrintfErr ("SCF ERROR: '%s' doesn't export '%s'\n", 
-	lib, sym.GetData ());
+      csPrintfErr("SCF_ERROR: '%s' doesn't export '%s'\n", lib, sym.GetData());
       csPrintLibraryError (sym);
     }
     if (initFunc && finisFunc)
@@ -220,6 +235,9 @@ scfSharedLibrary::~scfSharedLibrary ()
   {
     if (initFunc && finisFunc)
       finisFunc();
+    if (PrivateSCF->IsVerbose())
+      csPrintfErr("SCF_NOTIFY: unloading plugin %s\n",
+	get_library_name(LibraryName));
     csUnloadLibrary (LibraryHandle);
   }
 }
@@ -331,7 +349,7 @@ scfFactory::~scfFactory ()
 #ifdef CS_DEBUG
   // Warn user about unreleased instances of this class
   if (scfRefCount)
-    fprintf (stderr, "SCF WARNING: %d unreleased instances of class %s!\n",
+    csPrintfErr("SCF WARNING: %d unreleased instances of class %s!\n",
       scfRefCount, ClassID);
 #endif
 
@@ -371,14 +389,13 @@ void scfFactory::IncRef ()
 	  csPrintLibraryError(sym);
       }
     }
-      
 
     if (!Library->ok () || CreateFunc == 0)
     {
       Library = 0;
       return; // Signify that IncRef() failed by _not_ incrementing count.
     }
-    
+
     Library->IncRef ();
   }
 #endif
@@ -391,8 +408,8 @@ void scfFactory::DecRef ()
 #ifdef CS_DEBUG
   if (scfRefCount == 0)
   {
-    fprintf (stderr, "SCF WARNING: Extra calls to scfFactory::DecRef () for "
-      "class %s\n", ClassID);
+    csPrintfErr("SCF WARNING: extra invocations of scfFactory::DecRef() "
+      "for class %s\n", ClassID);
     return;
   }
 #endif
@@ -481,7 +498,7 @@ SCF_IMPLEMENT_IBASE (csSCF);
 #endif
 SCF_IMPLEMENT_IBASE_END;
 
-static void scfScanPlugins (csPluginPaths* pluginPaths, const char* context)
+void csSCF::ScanPluginsInt (csPluginPaths* pluginPaths, const char* context)
 {
 #ifndef CS_STATIC_LINKED
 
@@ -493,35 +510,41 @@ static void scfScanPlugins (csPluginPaths* pluginPaths, const char* context)
     size_t i, j;
     for (i = 0; i < pluginPaths->GetCount(); i++)
     {
-      if (plugins) plugins->DeleteAll();
+      csPluginPath const& pathrec = (*pluginPaths)[i];
+      if (verbose)
+      {
+	char const* x = scannedDirs.Contains(pathrec.path) ? "re-" : "";
+	csPrintfErr("SCF_NOTIFY: %sscanning plugin directory: %s "
+	  "(context `%s'; recursive %s)\n", x, pathrec.path,
+	  GetContextName(pathrec.type),
+	  pathrec.scanRecursive ? "yes" : "no");
+      }
 
-      csRef<iStringArray> messages = 
-	csScanPluginDir ((*pluginPaths)[i].path, plugins, 
-	  (*pluginPaths)[i].scanRecursive);
+      if (plugins)
+	plugins->DeleteAll();
+
+      csRef<iStringArray> messages =
+	csScanPluginDir (pathrec.path, plugins, pathrec.scanRecursive);
+      scannedDirs.Request(pathrec.path);
 
       if ((messages != 0) && (messages->Length() > 0))
       {
-	fprintf (stderr,
-	  "The following issue(s) came up while scanning '%s':",
-	  (*pluginPaths)[i].path);
-
+	csPrintfErr("SCF_WARNING: the following issue(s) arose while "
+	  "scanning '%s':", pathrec.path);
 	for (j = 0; j < messages->Length(); j++)
-	{
-	  fprintf(stderr,
-	    " %s\n", messages->Get (j));
-	}
+	  csPrintfErr(" %s\n", messages->Get (j));
       }
 
       csRef<iDocument> metadata;
       csRef<iString> msg;
       for (j = 0; j < plugins->Length(); j++)
       {
-	msg = csGetPluginMetadata (plugins->Get (j), metadata);
+	char const* plugin = plugins->Get(j);
+	msg = csGetPluginMetadata (plugin, metadata);
 	if (msg != 0)
 	{
-	  fprintf (stderr,
-	    "Error retrieving metadata for %s: %s\n",
-	    plugins->Get (j), msg->GetData ());
+	  csPrintfErr("SCF_ERROR: metadata retrieval error for %s: %s\n",
+	    plugin, msg->GetData ());
 	}
 	// It is possible for an error or warning message to be generated even
 	// when metadata is also obtained.  Likewise, it is possible for no
@@ -534,35 +557,49 @@ static void scfScanPlugins (csPluginPaths* pluginPaths, const char* context)
 	// legal for non-CS libraries to exist alongside CS plugins in the
 	// scanned directories.
 	if (metadata)
-	{
-	  PrivateSCF->RegisterClasses (plugins->Get (j), metadata, 
-	    context ? context : (*pluginPaths)[i].type);
-	}
+	  RegisterClasses(plugin, metadata, context ? context : pathrec.type);
       }
     }
   }
 #endif
 }
 
-void scfInitialize (csPluginPaths* pluginPaths)
+void scfInitialize (csPluginPaths* pluginPaths, bool verbose)
 {
   if (!PrivateSCF)
-    PrivateSCF = new csSCF ();
+    PrivateSCF = new csSCF (verbose);
+  else if (verbose && !PrivateSCF->IsVerbose())
+    PrivateSCF->SetVerbose(verbose);
+  PrivateSCF->ScanPluginsInt (pluginPaths, 0);
+}
 
-  scfScanPlugins (pluginPaths, 0);
+static bool check_verbosity(int argc, char const* const argv[])
+{
+  bool verbose = false;
+  for (int i = 1; i < argc; ++i)
+  {
+    char const* s = argv[i];
+    if (*s == '-')
+    {
+      do { ++s; } while (*s == '-');
+      if (strcmp(s, "verbose") == 0)
+      {
+	verbose = true;
+	break;
+      }
+    }
+  }
+  return verbose;
 }
 
 void scfInitialize (int argc, const char* const argv[])
 {
   csPluginPaths* pluginPaths = csGetPluginPaths (argv[0]);
-
-  scfInitialize (pluginPaths);
-
+  scfInitialize (pluginPaths, check_verbosity(argc, argv));
   delete pluginPaths;
 }
 
-			       
-csSCF::csSCF () : 
+csSCF::csSCF (bool v) : verbose(v),
 #ifdef CS_REF_TRACKER
   refTracker(0), 
 #endif
@@ -642,11 +679,14 @@ void csSCF::RegisterClasses (char const* pluginPath,
 	if (scfnode.IsValid())
 	  RegisterClassesInt (pluginPath, scfnode, context);
 	else
-	  fprintf(stderr, "csSCF::RegisterClasses: Missing <scf> node.\n");
+	  csPrintfErr("SCF_ERROR: missing <scf> node in metadata for %s "
+	    "in context `%s'\n", pluginPath != 0 ? pluginPath : "{unknown}",
+	    GetContextName(context));
       }
       else
-        fprintf(stderr,
-	  "csSCF::RegisterClasses: Missing root <plugin> node.\n");
+        csPrintfErr("SCF_ERROR: missing root <plugin> node in metadata "
+	  "for %s in context `%s'\n",
+	  pluginPath != 0 ? pluginPath : "{unknown}", GetContextName(context));
     }
   }
 }
@@ -660,6 +700,22 @@ static char const* get_node_value(csRef<iDocumentNode> parent, char const* key)
 void csSCF::RegisterClassesInt(char const* pluginPath, iDocumentNode* scfnode, 
 			       const char* context)
 {
+  bool const seen = libraryNames->Contains(pluginPath);
+
+  if (verbose)
+  {
+    char const* s = pluginPath != 0 ? pluginPath : "{unknown}";
+    char const* c = GetContextName(context);
+    if (!seen)
+      csPrintfErr("SCF_NOTIFY: registering plugin %s in context `%s'\n", s, c);
+    else
+      csPrintfErr("SCF_NOTIFY: ignoring duplicate plugin registration %s "
+        "in context `%s'\n", s, c);
+  }
+
+  if (seen)
+    return;			// *** RETURN: Do not re-register ***
+
   csRef<iDocumentNode> classesnode = scfnode->GetNode("classes");
   if (classesnode)
   {
@@ -724,8 +780,7 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
       object->DecRef ();
 
       if (!instance)
-        fprintf (stderr,
-	  "SCF_WARNING: factory returned a null instance for %s\n"
+	csPrintfErr("SCF_WARNING: factory returned a null instance for %s\n"
 	  "\tif error messages are not self explanatory, recompile CS with "
 	  "CS_DEBUG\n", iClassID);
     }
@@ -764,14 +819,20 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   size_t idx;
   csStringID contextID = 
     context ? contexts.Request (context) : csInvalidStringID;
+
+  if (verbose)
+    csPrintfErr("SCF_NOTIFY: registering class %s in context `%s' (from %s)\n",
+      iClassID, GetContextName(context), iLibraryName);
+
   if ((idx = ClassRegistry->FindClass(iClassID)) != (size_t)-1)
   {
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
     if (ContextClash (cf->classContext, contextID))
     {
-      fprintf (stderr, "SCF_WARNING: class %s (in %s) has already been "
-	"registered in the same context '%s' (in %s)\n",
-        iClassID, iLibraryName, context, get_library_name(cf->LibraryName));
+      csPrintfErr("SCF_WARNING: class %s (from %s) has already been "
+        "registered in the same context `%s' (in %s)\n",
+        iClassID, iLibraryName, GetContextName(context),
+	get_library_name(cf->LibraryName));
     }
     else
     {
@@ -786,16 +847,17 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
       if (cf->classContext != staticContextID)
       {
 	// @@@ some way to have this warning in non-debug builds would be nice.
-	fprintf (stderr, "SCF_NOTIFY: class %s (in %s) has already been "
-	  "registered in a different context: '%s' vs. '%s' (in %s); this "
+	csPrintfErr("SCF_NOTIFY: class %s (from %s) has already been "
+	  "registered in a different context: '%s' vs. '%s' (from %s); this "
 	  "message appears only in debug builds\n",
-	  iClassID, iLibraryName, context, GetContextName(cf->classContext),
-          get_library_name(cf->LibraryName));
+	  iClassID, iLibraryName, GetContextName(context),
+	  GetContextName(cf->classContext), get_library_name(cf->LibraryName));
       }
     #endif
     }
     return false;
   }
+
   scfFactory* factory = new scfFactory (iClassID, iLibraryName, iFactoryClass,
     0, iDesc, Dependencies, contextID);
   ClassRegistry->Push (factory);
@@ -810,14 +872,19 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
   size_t idx;
   csStringID contextID = 
     context ? contexts.Request (context) : csInvalidStringID;
+
+  if (verbose)
+    csPrintfErr("SCF_NOTIFY: registering class %s in context `%s' "
+      "(statically linked)\n", iClassID, GetContextName(context));
+
   if ((idx = ClassRegistry->FindClass(iClassID)) != (size_t)-1)
   {
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
     if (ContextClash (cf->classContext, contextID))
     {
-      fprintf (stderr, "SCF_WARNING: class %s (statically linked) has already "
-	"been registered in the same context '%s' (in %s)\n",
-	iClassID, context, get_library_name(cf->LibraryName));
+      csPrintfErr("SCF_WARNING: class %s (statically linked) has already been "
+	"registered in the same context `%s' (from %s)\n",
+	iClassID, GetContextName(context), get_library_name(cf->LibraryName));
     }
     else
     {
@@ -832,16 +899,17 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
       if (cf->classContext != staticContextID)
       {
 	// @@@ some way to have this warning in non-debug builds would be nice.
-	fprintf (stderr, "SCF_NOTIFY: class %s (statically linked) has "
-          "already been registered in a different context: '%s' vs. '%s' (in "
-          "%s); this message appears only in debug builds\n",
-	  iClassID, context, GetContextName(cf->classContext),
+	csPrintfErr("SCF_NOTIFY: class %s (statically linked) has already "
+	  "been registered in a different context: '%s' vs. '%s' (from %s); "
+	  "this message appears only in debug builds\n",
+	  iClassID, GetContextName(context), GetContextName(cf->classContext),
 	  get_library_name(cf->LibraryName));
       }
     #endif
     }
     return false;
   }
+
   scfFactory* factory =
     new scfFactory (iClassID, 0, 0, Func, Desc, Dependencies, contextID);
   ClassRegistry->Push (factory);
@@ -898,24 +966,24 @@ void csSCF::ScanPluginsPath (const char* path, bool recursive,
 {
   csPluginPaths paths;
   paths.AddOnce (path, recursive);
-  scfScanPlugins (&paths, context);
+  ScanPluginsInt (&paths, context);
 }
 
 bool csSCF::RegisterPlugin (const char* path)
 {
   csRef<iDocument> metadata;
   csRef<iString> msg;
+  if (verbose)
+    csPrintfErr("SCF_NOTIFY: registering plugin %s (no context)\n", path);
 
   if ((msg = csGetPluginMetadata (path, metadata)) != 0)
   {
-    fprintf (stderr,
-      "SCF_ERROR: couldn't retrieve metadata for '%s': %s\n", 
+    csPrintfErr("SCF_ERROR: couldn't retrieve metadata for '%s': %s\n", 
       path, msg->GetData ());
     return false;
   }
 
   RegisterClasses (path, metadata);
-
   return true;
 }
 
@@ -957,9 +1025,8 @@ csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
   {
     scfFactory *cf = ClassRegistry->Get (idx);
     if (cf->LibraryName != csInvalidStringID)
-      csGetPluginMetadata (libraryNames->Request (cf->LibraryName), metadata);
+      csGetPluginMetadata (get_library_name(cf->LibraryName), metadata);
   }
-
 #endif
   return metadata;
 }

@@ -50,6 +50,11 @@ const char* csStringSet::Request (csStringID id) const
   return reverse_mapping.Get (id, 0);
 }
 
+bool csStringSet::Contains (char const* s) const
+{
+  return Registry.Request(s) != csInvalidStringID;
+}
+
 void csStringSet::Clear ()
 {
   Registry.Clear ();
@@ -70,4 +75,3 @@ csStringID csStringSetIterator::Next ()
 {
   return hashIt->Next();
 }
-
