@@ -2579,7 +2579,6 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
-  mfactwrap->IncRef ();	// Ref count for Add().
   fact->SetLogicalParent (mfactwrap);
   return csPtr<iMeshFactoryWrapper> (&mfactwrap->scfiMeshFactoryWrapper);
 }
@@ -2595,7 +2594,6 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (const char *name)
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper ();
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
-  mfactwrap->IncRef ();	// Ref count for Add().
   return csPtr<iMeshFactoryWrapper> (&mfactwrap->scfiMeshFactoryWrapper);
 }
 
@@ -2759,6 +2757,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
 
   iMeshWrapper *imw = &(meshwrap->scfiMeshWrapper);
   GetMeshes ()->Add (imw);
+  imw->DecRef (); // the ref is now stored in the MeshList
   if (sector)
   {
     meshwrap->GetMovable ().SetSector (sector);
@@ -2771,7 +2770,6 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   if (!mof)
   {
     GetMeshes ()->Remove (imw);
-    meshwrap->DecRef ();
     return 0;
   }
 
@@ -2789,7 +2787,6 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   iMeshWrapper *mesh = factory->CreateMeshWrapper ();
   if (name) mesh->QueryObject ()->SetName (name);
   GetMeshes ()->Add (mesh);
-  mesh->IncRef ();	// Ref count for the engine.
   if (sector)
   {
     mesh->GetMovable ()->SetSector (sector);
@@ -2810,7 +2807,6 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   csMeshWrapper *meshwrap = new csMeshWrapper (NULL, mesh);
   if (name) meshwrap->SetName (name);
   GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
-  meshwrap->IncRef ();	// Ref count for the engine.
   if (sector)
   {
     meshwrap->GetMovable ().SetSector (sector);
@@ -2827,7 +2823,6 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (const char *name)
   csMeshWrapper *meshwrap = new csMeshWrapper (NULL);
   if (name) meshwrap->SetName (name);
   GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
-  meshwrap->IncRef ();	// Ref count for the engine.
   return csPtr<iMeshWrapper> (&meshwrap->scfiMeshWrapper);
 }
 
