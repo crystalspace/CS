@@ -108,7 +108,7 @@ so that it also works with the Windows port. Dan made the Direct3D port for
 Windows! He greatly enhanced the Windows port and also added 16-bit support for
 Windows. His greatest work up to now is converting the 3D and 2D graphics
 subsystems to COM. He thus provided the foundations for the COM system (also on
-non-Windows platforms) which Crystal Space is now using. He also
+non-Windows platforms) which Crystal Space was using in the past. He also
 contributed the Halo code to Crystal Space.<P>
 
 <A HREF="mailto:r.blum@advertainment.com">Robert Blum</A> patched Dan Ogles
@@ -131,7 +131,8 @@ rewrote the DJGPP port (non-Allegro) to use 16-bit and also support more
 video modes. He recently ported almost all assembly to NASM and wrote a few
 new routines. He also improved speed of fog and alpha transparency a lot. He
 is also responsible for the current Makefile system. Andrew is also the
-author of VFS (Virtual File System).<P>
+author of VFS (Virtual File System). His latest achievement is converting
+the COM subsystem in CS to a new SCF system.<P>
 
 <A HREF="mailto:jlilley@empathy.com">John Lilley</A> manages the Crystal Space
 Texture Archive at <A HREF="http://www.empathy.com" TARGET="_top">Texture Archive</A>.<P>
@@ -192,10 +193,10 @@ the BMP loader class. He also optimized and helped optimize several key-function
 in the engine pipeline. For example, he managed
 to nearly DOUBLE the speed of the assembler scanline drawers!!!<P>
 
-<A HREF="mailto:AlexPfaffe@csi.com">Alex Pfaffe</A> integrated Crystal Space with
+<A HREF="mailto:ddg@oz.net">Alex Pfaffe</A> integrated Crystal Space with
 the VCOLLIDE library for collision detection. Later he removed VCOLLIDE and used
-RAPID instead. He then rewrote RAPID to work better with Crystal Space. He is
-now busy working on the ROAM landscape engine which we will integrate with CS soon.<P>
+RAPID instead. He then rewrote RAPID to work better with Crystal Space. He
+also contributed the ROAM landscape engine which is now integrated with CS.<P>
 
 <A HREF="mailto:434961@cepsz.unizar.es">Antonio Gascon</A> presented me a few notes
 which allowed me to optimize a few matrix inversions away.<P>
@@ -247,14 +248,17 @@ source of suggestions and bug reports :-) Seth also updated the DOS/DJGPP
 documentation and the tutorial. He also wrote the Squawk demo (using
 the skybox). Seth also fixed the csCamera and csView classes so that the FOV
 is no longer static and it is also possible to recenter each view
-seperatelly.<P>
+seperatelly. Seth added sprite vertex tweening and new lighting attenuation
+settings.<P>
 
 <A HREF="mailto:gsteenss@eps.agfa.be">Gert Steenssens</A> wrote the Linux drivers
 for the sound system and he also converted the SVGALIB driver to COM. He also
 helped develop the Linux/Glide and OpenGL ports.<P>
 
 <A HREF="mailto:mlong@custom.net">Michael Dale Long</A> helped fixing the Glide
-port and contributed some other small fixes.<P>
+port and contributed some other small fixes. He is also the author of the
+Crystal Clear project which is now included in CS. Crystal Clear serves as
+a game layer on top of Crystal Space.<P>
 
 <A HREF="mailto:haussman@cthulhu.engr.sgi.com">Gary Haussmann</A> wrote the OpenGL
 port and the importers for 3DS and MD2 models.<p>
@@ -325,7 +329,8 @@ used so that CS can load 3DS, MDL, ... objects directly.<P>
 the Windows port.<P>
 
 <A HREF="mailto:shor@cse.cuhk.edu.hk">Siu-Hang</A> updated MazeD to add
-functionality for sector, portals, lights, textures, ...<P>
+functionality for sector, portals, lights, textures, ... He also added
+a speedup to the calculation of the palette at startup.<P>
 
 <A HREF="mailto:ddurant@novametrix.com">David Durant</A> added code for
 sprite selection to WalkTest.<P>
@@ -334,6 +339,25 @@ sprite selection to WalkTest.<P>
 
 <A HREF="mailto:jhudso1@gl.umbc.edu">Jonathan Hudson</A> fixed a bug
 in the BMP reader so that it is no longer upside-down.<P>
+
+<A HREF="mailto:fragdance@hotmail.com">FragDance Galore</A> contributed
+a WAL/SGI loader and also added initial support for alpha maps to the texture
+loaders.<P>
+
+<A HREF="mailto:azverkan@yahoo.com">Brandon Ehle</A> added a new plug-in system
+to CS. He also contributed cspython for scripting. Using that cspython he wrote
+an Unreal map to CS convertor. Brandon also added project files for Borland 4.<P>
+
+<A HREF="mailto:scott@geekland.cx">Scott Wood</A> sent patches to allow
+CS to compile on Alpha machines.<P>
+
+<A HREF="mailto:pkocmid@atlas.cz">Petr Kocmid</A> helped fixing Windows Glide.<P>
+
+<A HREF="mailto:sg17@irz301.inf.tu-dresden.de">Stephan Goetter</A> added makefile
+targets for full dynamic linking.</A>
+
+<A HREF="mailto:mewert99@yahoo.com">Michael Ewert</A> added a physics library
+to Crystal Space and also a test application. His library is the csphyzik library.<P>
 
 &nbsp;<P>&nbsp;<P>
 
