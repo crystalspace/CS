@@ -1,5 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
+5-Dec-2000
+	- Started work on csRegion class. Not functional at the moment.
 4-Dec-2000
 	- Norman Kramer implemented farplane culling for sprites.
 3-Dec-2000
