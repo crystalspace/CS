@@ -19,6 +19,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+23-May-99:
+	- Added FLATCOL and GOURAUD commands to POLYGON to specify a polygon
+	  which needs gouraud shading instead of texturing.
 21-May-99:
 	- Denis Dmitriev sent me a patch which dramatically improves the
 	  quality of precalculated lightmaps. No more black borders, and
@@ -42,6 +45,10 @@ Short-term cleanups that need to be done:
 	  3D rasterizer to properly support the various transparent polygon
 	  modes that CS has (semi-transparent textures and alpha transparency).
 	- *** Release of 0.13_011 ***
+	- Added support for flat-shading triangles (for curves and sprites)
+	  with or without gouraud shading. Also started changing spelling
+	  of gouroud to gouraud. Note that gouraud shaded polygon objects
+	  still have a bug. I'm investigating this.
 20-May-99:
 	- Various changes to the Unix OpenGL 2D driver from Gary Haussmann.
 	  2D text should be much better now. He also added support for drawing
