@@ -192,11 +192,11 @@ public:
     int StepFastIterations ()
     { return scfParent->StepFastIterations (); }
     void EnableQuickStep (bool enable)
-    { return scfParent->EnableQuickStep (enable); }
+    { scfParent->EnableQuickStep (enable); }
     bool QuickStepEnabled ()
     { return scfParent->QuickStepEnabled (); }
     void SetQuickStepIterations (int iter)
-    { return scfParent->SetQuickStepIterations (iter); }
+    { scfParent->SetQuickStepIterations (iter); }
     int QuickStepIterations ()
     { return scfParent->QuickStepIterations (); }
     void EnableFrameRate (bool enable)

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Sep-2004
+	- Eric Sunshine fixed a couple methods in odedynam which were returning
+	  a value despite being declared as returning void. Reported by Brendon
+	  Costa.
 16-Sep-2004
 	- Jorrit fixed several cases in the loader where it would crash
 	  in case checkDupes was true and the object that it was loading
