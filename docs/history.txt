@@ -100,6 +100,8 @@ chronological order.
 	      trouble.
 	- res fixed some makefiles to allow compilation from non-source root
 	  directories.
+	- res fixed the glrender3d Jamfile to link against the "render3d 
+	  common" stuff.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.
