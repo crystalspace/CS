@@ -35,8 +35,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cssys $(sort $(dir $(SRC.SYS_CSSYS)))
-vpath %.c   libs/cssys $(sort $(dir $(SRC.SYS_CSSYS)))
+vpath %.cpp libs/cssys $(filter-out libs/cssys/general/, $(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
+vpath %.c   libs/cssys $(filter-out libs/cssys/general/, $(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
 
 INC.CSSYS = $(wildcard include/cssys/*.h)
 SRC.CSSYS = $(wildcard libs/cssys/*.cpp $(SRC.SYS_CSSYS))
