@@ -18,6 +18,8 @@ chronological order.
 	  pseudo-events.
 	- Eric Sunshine upgraded the cal3d check in configure.ac so that it
 	  checks for the very recent version required by CS.
+	- Matze fixed a small bug in vfs so that it doesn't crash if vfs.cfg is
+	  missing.                                                             	  
 24-Aug-2003
 	- Luca added the CSTOOL library dependency to maya2spr makefile.
 	- Luca reverted his latest commit because the cstool library is not

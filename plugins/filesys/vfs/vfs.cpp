@@ -1470,6 +1470,8 @@ bool csVFS::Initialize (iObjectRegistry *object_reg)
   char vfsconfigpath [CS_MAXPATHLEN + 1];
 
   char* confpath = csGetConfigPath ();
+  if(!confpath)
+	return false;
   strcpy (vfsconfigpath, confpath);
   size_t len = strlen(vfsconfigpath);
   vfsconfigpath[len]=PATH_SEPARATOR;
