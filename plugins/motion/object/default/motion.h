@@ -26,7 +26,7 @@
 
 struct csMotionFrame
 {
-  cs_time keyframe;
+  int keyframe;
 
   int *qlinks;
   int numqlinks;
@@ -58,10 +58,19 @@ struct csAppliedFrame
   iSkeletonBone **vaffector;
 };
 
+struct csFrameSet {
+
+  unsigned int name;
+  int numframes;
+  int totaltime;
+  csMotionFrame *frames;
+  
+};
+
 DECLARE_TYPED_VECTOR( csAppliedFrameVector, csAppliedFrame );
 
 ///
-class csMotion:public iMotion
+class csMotion : public iMotion
 {
 public:
   char* name;
@@ -77,8 +86,7 @@ public:
   csVector3* translate;
   int numtranslate;
 
-  csMotionFrame* frames;
-  int numframes;
+  DECLARE_TYPED_VECTOR( csFrameSetVector, csFrameSet ) framesets;
 
   DECLARE_IBASE;
 
@@ -96,6 +104,8 @@ public:
   virtual bool AddAnim (const csMatrix3 &mat);
   ///
   virtual bool AddAnim (const csVector3 &vec);
+  
+  virtual void AddFrameSet( const char *name, int time );
   
   virtual int AddFrame (int frametime);
   ///
@@ -125,24 +135,32 @@ public:
 
 struct csAppliedMotion
 {
-  char *name;
   iSkeletonBone *skel;
   csMotion* curmotion;
-  cs_time curtime;
+  int curframeset;
+  int curtime;
+  int totaltime;  // Total time for complete cycle
   int numframes;
   int curframe;
+  int nextframe;
+  bool Reverse;
+  bool Loop;
+  bool Sweep;
+  float Rate;
   csAppliedFrameVector frames;
 };
 
 DECLARE_TYPED_VECTOR(csAppliedMotionVector,csAppliedMotion); 
 
 ///
-class csMotionManager:public iMotionManager
+class csMotionManager : public iMotionManager
 {
   csMotionVector motions;
   csAppliedMotionVector skels;
+  csAppliedMotionVector cache;
   cs_time oldtime;
   iSystem* iSys;
+  
 public:
   DECLARE_IBASE;
 
@@ -160,24 +178,82 @@ public:
   }
   ///
   virtual iMotion* AddMotion (const char* name);
-  ///
-  virtual bool ApplyMotion(iSkeletonBone *skel, const char* motion, int time);
-  ///
+
+  virtual void DeleteMotion (const char* name );
+  
+  /// Apply motion returns an index to the new motion for use with the motion control API
+  /// If the cache flag is set then the compiled motion is cached rather than being
+  /// active.
+  virtual int ApplyMotion(iSkeletonBone *skel, const char* motion, 
+	const char *frameset, bool reverse, bool loop, bool sweep, float rate, 
+	int start_time, bool cache);
+	
+  /// If the skeletal structure for a sprite is modified, then the compiled
+  /// will become invalid. Recompile motion 'purifies' the motion so
+  /// that it can be used with the sprite again. This applies to active
+  /// sprites as well. This assumes the sprite in question still exists.
+  virtual void RecompileMotion( int idx, bool cached );
+
+  /// Reserve motion takes an active motion and places it on the cached list.
+  virtual int ReserveMotion( int idx );
+  /// Restore motion takes a cached motion and places it on the active list.
+  virtual int RestoreMotion( int idx );
+  /// Delete motion. If cache is true then the motion is delete from the cached list
+  /// otherwise it is deleted from the active motions list. 
+  virtual void DeleteAppliedMotion( int motion_index, bool cache);
+  
+  virtual void SetActiveMotion( int idx, bool reverse, bool loop, bool sweep, float rate ) 
+  { 
+	skels[idx]->Reverse = reverse; 
+	skels[idx]->Loop = loop;
+	skels[idx]->Sweep = sweep;
+	skels[idx]->Rate = rate;
+  }
+  virtual void SetCachedMotion( int idx, bool reverse, bool loop, bool sweep, float rate, int time )
+  {
+	cache[idx]->Reverse = reverse;
+	cache[idx]->Loop = loop;
+	cache[idx]->Sweep = sweep;
+	cache[idx]->Rate = rate;
+	cache[idx]->curtime = time;
+  }
+  
+  virtual void SetReverse( int idx, bool reverse ) { skels[idx]->Reverse = reverse; }
+  
+  virtual void SetLoop( int idx, bool loop ) { skels[idx]->Loop = loop; }
+
+  virtual void SetSweep( int idx, bool sweep ) { skels[idx]->Sweep = sweep; }
+  
+  virtual void SetRate( int idx, float rate) { skels[idx]->Rate = rate; }
+  
+  virtual void SetTime( int idx, int time) { skels[idx]->curtime = time; }
+
+  virtual bool GetReverse( int idx ) { return skels[idx]->Reverse; }
+  
+  virtual bool GetLoop( int idx ) { return skels[idx]->Loop; }
+  
+  virtual bool GetSweep( int idx ) { return skels[idx]->Sweep; }
+  
+  virtual float GetRate( int idx ) { return skels[idx]->Rate; }
+  
+  virtual int GetTime( int idx ) { return skels[idx]->curtime; }
+
   virtual void UpdateAll();
 
   virtual void UpdateAll(int time);
   ///
+  
   csMotion* FindClassByName (const char* name);
-
   void UpdateTransform(iSkeletonBone *bone, csQuaternion *quat);
   void UpdateTransform(iSkeletonBone *bone, csMatrix3 *mat);
   void UpdateTransform(iSkeletonBone *bone, csVector3 *vec);
-  void UpdateAppliedFrame(csAppliedFrame *fr);
+  void UpdateAppliedFrame(csAppliedFrame *fr, csAppliedFrame *next);
   bool UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime);
   void CompileMotion( csAppliedMotion *motion );
 };
 
 iSkeletonBone *FindBone( iSkeletonBone *bone, unsigned int hash );
+int FindFrameSet( csMotion *mot, unsigned int hash );
 
 #endif
 

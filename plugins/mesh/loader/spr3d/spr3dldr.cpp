@@ -887,7 +887,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	break;
 	  case CS_TOKEN_APPLY_MOTION:
 	{
-	  ScanStr( params, "%s", str );
+	  ScanStr( params, "%s", str);
 	  iMotionManager *motman = QUERY_PLUGIN_CLASS( sys, 
 		"crystalspace.motion.manager.default","MotionManager",iMotionManager);
 	  if (!motman) 
@@ -898,7 +898,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	  motman->DecRef();
 	  if (!spr3dLook) 
 	  { 
-		printf("No Factory! Please define 'FACTORY' before 'MOTION'\n"); 
+		printf("No Factory! Please define 'FACTORY' before 'APPLY_MOTION'\n"); 
 		return NULL; 
 	  }
 	  iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
@@ -906,8 +906,8 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	  limb->DecRef();
 	  if (!(limb = limb->GetChildren()))
 	  { 
-		printf("Skeleton has no libs -- cannot apply motion\n");
-		return NULL;
+		printf("Warning: Skeleton has no libs -- cannot apply motion\n");
+		break;
 	  }
 	  iSkeletonConnectionState *con = QUERY_INTERFACE( limb, iSkeletonConnectionState );
 	  iSkeletonBone *bone = QUERY_INTERFACE ( con, iSkeletonBone );
@@ -916,8 +916,8 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 		printf("The skeleton has no bones!\n");
 		return NULL;
 	  }
-	  motman->ApplyMotion( bone, str,0 );
-	}
+	  motman->ApplyMotion( bone, name, str, false, true, false, 1.0, 0, false);
+	} // ApplyMotion ( skelbone, motion name, frameset name, reverse, loop, sweep, rate, time_offset, cached )
 	break;
       case CS_TOKEN_TWEEN:
 	{

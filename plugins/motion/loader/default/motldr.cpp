@@ -37,6 +37,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF(EULER)
   CS_TOKEN_DEF(FILE)
   CS_TOKEN_DEF(FRAME)
+  CS_TOKEN_DEF(ACTIONSET)
   CS_TOKEN_DEF(QLINK)
   CS_TOKEN_DEF(MLINK)
   CS_TOKEN_DEF(VLINK)
@@ -231,7 +232,8 @@ iMotion* csMotionLoader::LoadMotion (const char* fname )
 
   char *name, *data;
   char *buf = **databuff;
-	long cmd;
+  long cmd;
+  
 
   if ((cmd=csGetObject (&buf, tokens, &name, &data)) > 0)
   {
@@ -272,6 +274,7 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ANIM)
     CS_TOKEN_TABLE (FRAME)
+	CS_TOKEN_TABLE (ACTIONSET)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (tok_anim)
@@ -337,11 +340,18 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
 		  }
 		  break;
 	    default:
-	      sys->Printf (MSG_FATAL_ERROR, "Expected MATRIX or Q instead of '%s'!\n", buf);
+	      sys->Printf (MSG_FATAL_ERROR, "Expected MATRIX, Q, or V instead of '%s'!\n", buf);
 	      fatal_exit (0, false);
 	  }     
         }
         break;
+	  case CS_TOKEN_ACTIONSET:
+	{
+	  int ttim;
+	  ScanStr( params, "%d", &ttim );
+	  mot->AddFrameSet(name, ttim);	   
+	}
+	break;
       case CS_TOKEN_FRAME:
 	{
 	  int frametime,link;
@@ -374,7 +384,8 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
 	    	fatal_exit (0, false);
 		}
 	  }
-    }
+    } // case CS_TOKEN_FRAME
+	
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
