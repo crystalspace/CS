@@ -46,8 +46,8 @@ struct iLightingInfo;
 struct iShadowReceiver;
 struct iObject;
 struct iPortalContainer;
+struct csRenderMesh;
 class csFlags;
-class csRenderMesh;
 
 /** \name Meshwrapper flags
  * @{ */

@@ -1197,6 +1197,33 @@ void csGLTextureManager::UnregisterMaterial (csGLMaterialHandle* handle)
   if (idx >= 0) materials.DeleteIndex (idx);
 }
 
+void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
+{
+  csGLStateCache* statecache = csGLGraphics3D::statecache;
+
+  if (csGLGraphics3D::ext->CS_GL_ARB_multitexture)
+  {
+    int oldTU = -1;
+    for (int u = 0; u < statecache->maxLayers; u++)
+    {
+      if (statecache->GetTexture (target, u) == texture)
+      {
+	if (oldTU == -1)
+	  oldTU = statecache->GetActiveTU ();
+	statecache->SetActiveTU (u);
+	statecache->SetTexture (target, 0);
+      }
+    }
+    if (oldTU != -1)
+      statecache->SetActiveTU (oldTU);
+  }
+  else
+  {
+    if (statecache->GetTexture (target) == texture)
+      statecache->SetTexture (target, 0);
+  }
+}
+
 csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
 	int flags)
 {
@@ -1580,8 +1607,9 @@ void csGLSuperLightmap::DeleteTexture ()
 {
   if (texHandle != (GLuint)~0)
   {
-    csGLGraphics3D::statecache->SetTexture (
-      GL_TEXTURE_2D, 0);
+    /*csGLGraphics3D::statecache->SetTexture (
+      GL_TEXTURE_2D, 0);*/
+    csGLTextureManager::UnsetTexture (GL_TEXTURE_2D, texHandle);
 
     glDeleteTextures (1, &texHandle);
     texHandle = (GLuint)~0;

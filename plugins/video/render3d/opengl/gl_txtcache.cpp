@@ -59,6 +59,16 @@ void csGLTextureCache::Unload (csTxtCacheData *d)
   else
     head = d->next;
 
+  csGLTextureHandle *txt_mm = (csGLTextureHandle *)
+    d->Source->GetPrivateObject ();
+  if (txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
+    csGLTextureManager::UnsetTexture (GL_TEXTURE_1D, d->Handle);
+  else if (txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
+    csGLTextureManager::UnsetTexture (GL_TEXTURE_2D, d->Handle);
+  else if (txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
+    csGLTextureManager::UnsetTexture (GL_TEXTURE_3D, d->Handle);
+  else if (txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
+    csGLTextureManager::UnsetTexture (GL_TEXTURE_CUBE_MAP, d->Handle);
   glDeleteTextures (1, &d->Handle);
   d->Handle = 0;
 
@@ -168,7 +178,6 @@ void csGLTextureCache::Uncache (iTextureHandle *texh)
 
 void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
 {
- 
   iTextureHandle *txt_handle = (iTextureHandle *)d->Source;
   csGLTextureHandle *txt_mm = (csGLTextureHandle *)
     txt_handle->GetPrivateObject ();
@@ -176,14 +185,13 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
   if (reload)
   {
     if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
-      glBindTexture (GL_TEXTURE_1D, d->Handle);
+      G3D->statecache->SetTexture (GL_TEXTURE_1D, d->Handle);
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
-      glBindTexture (GL_TEXTURE_2D, d->Handle);
+      G3D->statecache->SetTexture (GL_TEXTURE_2D, d->Handle);
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
-      glBindTexture (GL_TEXTURE_3D, d->Handle);
+      G3D->statecache->SetTexture (GL_TEXTURE_3D, d->Handle);
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
-      glBindTexture (GL_TEXTURE_CUBE_MAP, d->Handle);
-
+      G3D->statecache->SetTexture (GL_TEXTURE_CUBE_MAP, d->Handle);
   }
   else
   {
@@ -194,7 +202,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
     if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
     {
-      glBindTexture (GL_TEXTURE_1D, d->Handle);
+      G3D->statecache->SetTexture (GL_TEXTURE_1D, d->Handle);
       if (txt_mm->flags & CS_TEXTURE_CLAMP)
       {
         glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -220,7 +228,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
     }
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
     {
-      glBindTexture (GL_TEXTURE_2D, d->Handle);
+      G3D->statecache->SetTexture (GL_TEXTURE_2D, d->Handle);
       if (txt_mm->flags & CS_TEXTURE_CLAMP)
       {
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -252,7 +260,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
     {
       glEnable (GL_TEXTURE_3D);
-      glBindTexture (GL_TEXTURE_3D, d->Handle);
+      G3D->statecache->SetTexture (GL_TEXTURE_3D, d->Handle);
       if (txt_mm->flags & CS_TEXTURE_CLAMP)
       {
         glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -283,7 +291,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
     }
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
     {
-      glBindTexture (GL_TEXTURE_CUBE_MAP, d->Handle);
+      G3D->statecache->SetTexture (GL_TEXTURE_CUBE_MAP, d->Handle);
       // @@@ Temporarily disabled, although I don't know if REPEAT
       // makes sense with cubemaps.
       /*if (txt_mm->flags & CS_TEXTURE_CLAMP)
@@ -347,10 +355,6 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       }
       else
       {
-	/*
-	  @@@ Compress keycolored images to COMPRESSED_RGBA_S3TC_DXT1_EXT?
-	  (1-bit alpha)
-	 */
 	G3D->ext->glCompressedTexImage2DARB (
 	  GL_TEXTURE_2D, 
 	  i, 

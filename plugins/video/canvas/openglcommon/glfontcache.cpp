@@ -279,9 +279,9 @@ bool csGLFontCache::ClipRect (float x, float y,
   return true;
 }
 
-void csGLFontCache::FlushArrays (int& numverts, int bgVertOffset, 
-				 int& numBgVerts, const int fg, 
-				 const int bg)
+void csGLFontCache::FlushArrays (GLuint texture, int& numverts, 
+				 int bgVertOffset, int& numBgVerts, 
+				 const int fg, const int bg)
 {
   if (numverts != 0)
   {
@@ -294,6 +294,7 @@ void csGLFontCache::FlushArrays (int& numverts, int bgVertOffset,
       G2D->setGLColorfromint (fg);
     }
 
+    G2D->statecache->SetTexture (GL_TEXTURE_2D, texture);
     glDrawArrays(GL_QUADS, 0, numverts);
     numverts = 0;
     numBgVerts = 0;
@@ -368,16 +369,14 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
       (GLGlyphCacheData*)GetCacheData (knownFont, glyph, flags);
     if (cacheData == 0)
     {
-      G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
-      FlushArrays (numverts, bgVertOffset, numBgVerts, fg, bg);
+      FlushArrays (lastTexture, numverts, bgVertOffset, numBgVerts, fg, bg);
       cacheData = (GLGlyphCacheData*)CacheGlyphUnsafe (knownFont, glyph, 
 	flags);
     }
     if (!cacheData->hasGlyph)
     {
       // fall back to the default glyph (CS_FONT_DEFAULT_GLYPH)
-      G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
-      FlushArrays (numverts, bgVertOffset, numBgVerts, fg, bg);
+      FlushArrays (lastTexture, numverts, bgVertOffset, numBgVerts, fg, bg);
       cacheData = (GLGlyphCacheData*)CacheGlyph (knownFont, 
 	CS_FONT_DEFAULT_GLYPH, flags);
       if (!cacheData->hasGlyph) continue;
@@ -386,8 +385,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
     GLuint newHandle = textures[cacheData->texNum].handle;
     if (lastTexture != newHandle) 
     {
-      G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
-      FlushArrays (numverts, bgVertOffset, numBgVerts, fg, bg);
+      FlushArrays (lastTexture, numverts, bgVertOffset, numBgVerts, fg, bg);
       lastTexture = newHandle;
     }
 
@@ -540,8 +538,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
     }
   }
 
-  G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
-  FlushArrays (numverts, bgVertOffset, numBgVerts, fg, bg);
+  FlushArrays (lastTexture, numverts, bgVertOffset, numBgVerts, fg, bg);
 
   if(vaenabled == GL_FALSE)
     glDisableClientState(GL_VERTEX_ARRAY);

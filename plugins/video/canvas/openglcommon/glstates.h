@@ -28,84 +28,125 @@
 
 #include "video/canvas/openglcommon/glextmanager.h"
 
-#define IMPLEMENT_CACHED_BOOL( name ) \
+#define IMPLEMENT_CACHED_BOOL(name) \
   bool enabled_##name; \
-  void Enable_##name () { \
-    if( !enabled_##name ) { \
+  void Enable_##name () \
+  { \
+    if (!enabled_##name) \
+    { \
       enabled_##name = true;  \
-      glEnable( name ); \
+      glEnable (name); \
     } \
   } \
-  void Disable_##name () { \
-    if( enabled_##name ) { \
+  void Disable_##name () \
+  { \
+    if (enabled_##name) { \
       enabled_##name = false;  \
-      glDisable( name ); \
+      glDisable (name); \
     } \
   } \
-  bool IsEnabled_##name () const { \
+  bool IsEnabled_##name () const \
+  { \
     return enabled_##name; \
   }
 
-#define MAX_LAYER 16
+//#define MAX_LAYER 16
 
-#define IMPLEMENT_CACHED_BOOL_LAYER( name ) \
-  bool enabled_##name[MAX_LAYER]; \
-  void Enable_##name (int l = 0) { \
-    if( !enabled_##name[l] ) { \
+#define IMPLEMENT_CACHED_BOOL_LAYER(name) \
+  bool enabled_##name[maxLayers]; \
+  void Enable_##name (int l = 0) \
+  { \
+    if (!enabled_##name[l]) \
+    { \
       enabled_##name[l] = true;  \
-      glEnable( name ); \
+      glEnable (name); \
     } \
   } \
-  void Disable_##name (int l = 0) { \
-    if( enabled_##name[l] ) { \
+  void Disable_##name (int l = 0) \
+  { \
+    if (enabled_##name[l]) \
+    { \
       enabled_##name[l] = false;  \
-      glDisable( name ); \
+      glDisable (name); \
     } \
   } \
-  bool IsEnabled_##name (int l = 0) const { \
+  bool IsEnabled_##name (int l = 0) const \
+  { \
     return enabled_##name[l]; \
   }
 
-#define IMPLEMENT_CACHED_PARAMETER_1( func, name, type1, param1 ) \
-  type1 parameter_##param1; \
-  void Set##name (type1 param1, bool forced = false) { \
-    if( forced || (param1 != parameter_##param1) ) { \
-      parameter_##param1 = param1;  \
-      func( param1 ); \
+#define IMPLEMENT_CACHED_BOOL_CURRENTLAYER(name) \
+  bool enabled_##name[maxLayers]; \
+  void Enable_##name () \
+  { \
+    if (!enabled_##name[currentUnit]) \
+    { \
+      enabled_##name[currentUnit] = true;  \
+      glEnable (name); \
     } \
   } \
-  void Get##name (type1 & param1) { \
+  void Disable_##name () \
+  { \
+    if (enabled_##name[currentUnit]) \
+    { \
+      enabled_##name[currentUnit] = false;  \
+      glDisable (name); \
+    } \
+  } \
+  bool IsEnabled_##name () const \
+  { \
+    return enabled_##name[currentUnit]; \
+  }
+
+#define IMPLEMENT_CACHED_PARAMETER_1(func, name, type1, param1) \
+  type1 parameter_##param1; \
+  void Set##name (type1 param1, bool forced = false) \
+  { \
+    if (forced || (param1 != parameter_##param1)) \
+    { \
+      parameter_##param1 = param1;  \
+      func (param1); \
+    } \
+  } \
+  void Get##name (type1 & param1) \
+  { \
     param1 = parameter_##param1;  \
   }
 
-#define IMPLEMENT_CACHED_PARAMETER_2( func, name, type1, param1, type2, param2 ) \
+#define IMPLEMENT_CACHED_PARAMETER_2(func, name, type1, param1, type2, param2) \
   type1 parameter_##param1; \
   type2 parameter_##param2; \
-  void Set##name (type1 param1, type2 param2, bool forced = false) { \
-    if( forced || (param1 != parameter_##param1) || (param2 != parameter_##param2) ) { \
+  void Set##name (type1 param1, type2 param2, bool forced = false) \
+  { \
+    if (forced || (param1 != parameter_##param1) || (param2 != parameter_##param2)) \
+    { \
       parameter_##param1 = param1;  \
       parameter_##param2 = param2;  \
-      func( param1, param2 ); \
+      func (param1, param2); \
     } \
   } \
-  void Get##name (type1 & param1, type2 & param2) { \
+  void Get##name (type1 & param1, type2 & param2) \
+  { \
     param1 = parameter_##param1;  \
     param2 = parameter_##param2;  \
   }
 
-#define IMPLEMENT_CACHED_PARAMETER_3( func, name, type1, param1, type2, param2, type3, param3 ) \
+#define IMPLEMENT_CACHED_PARAMETER_3(func, name, type1, param1, type2, param2, type3, param3) \
   type1 parameter_##param1; \
   type2 parameter_##param2; \
   type3 parameter_##param3; \
-  void Set##name (type1 param1, type2 param2, type3 param3, bool forced = false) { \
-    if( forced || (param1 != parameter_##param1) || (param2 != parameter_##param2) || (param3 != parameter_##param3) ) { \
+  void Set##name (type1 param1, type2 param2, type3 param3, bool forced = false) \
+  { \
+    if (forced || (param1 != parameter_##param1) || (param2 != parameter_##param2) || (param3 != parameter_##param3)) \
+    { \
       parameter_##param1 = param1;  \
       parameter_##param2 = param2;  \
       parameter_##param3 = param3;  \
-      func( param1, param2, param3 ); \
+      func (param1, param2, param3); \
     } \
   } \
-  void Get##name (type1 &param1, type2 & param2, type3 & param3) { \
+  void Get##name (type1 &param1, type2 & param2, type3 & param3) \
+  { \
     param1 = parameter_##param1;  \
     param2 = parameter_##param2;  \
     param3 = parameter_##param3;  \
@@ -121,28 +162,33 @@
 class csGLStateCache
 {
 public:
-  csGLStateCache ()
+  const static int maxLayers = 16;
+
+  csGLExtensionManager* extmgr;
+
+  csGLStateCache (csGLExtensionManager* extmgr)
   {
+    csGLStateCache::extmgr = extmgr;
   }
   
   /// Init cache
   void InitCache()
   {
     int i;
-    glGetIntegerv( GL_ALPHA_TEST_FUNC, (GLint*)&parameter_alpha_func );
-    glGetFloatv( GL_ALPHA_TEST_REF, &parameter_alpha_ref );
-    glGetIntegerv( GL_BLEND_SRC, (GLint*)&parameter_blend_source );
-    glGetIntegerv( GL_BLEND_DST, (GLint*)&parameter_blend_destination );
-    glGetIntegerv( GL_CULL_FACE_MODE, (GLint*)&parameter_cull_mode );
-    glGetIntegerv( GL_DEPTH_FUNC, (GLint*)&parameter_depth_func );
-    glGetBooleanv( GL_DEPTH_WRITEMASK, &parameter_depth_mask );
-    glGetIntegerv( GL_SHADE_MODEL, (GLint*)&parameter_shade_model );
-    glGetIntegerv( GL_STENCIL_FUNC, (GLint*)&parameter_stencil_func );
-    glGetIntegerv( GL_STENCIL_VALUE_MASK, (GLint*)&parameter_stencil_mask );
-    glGetIntegerv( GL_STENCIL_REF, &parameter_stencil_ref );
-    glGetIntegerv( GL_STENCIL_FAIL, (GLint*)&parameter_stencil_fail );
-    glGetIntegerv( GL_STENCIL_PASS_DEPTH_FAIL, (GLint*)&parameter_stencil_zfail );
-    glGetIntegerv( GL_STENCIL_PASS_DEPTH_PASS, (GLint*)&parameter_stencil_zpass );
+    glGetIntegerv (GL_ALPHA_TEST_FUNC, (GLint*)&parameter_alpha_func);
+    glGetFloatv (GL_ALPHA_TEST_REF, &parameter_alpha_ref);
+    glGetIntegerv (GL_BLEND_SRC, (GLint*)&parameter_blend_source);
+    glGetIntegerv (GL_BLEND_DST, (GLint*)&parameter_blend_destination);
+    glGetIntegerv (GL_CULL_FACE_MODE, (GLint*)&parameter_cull_mode);
+    glGetIntegerv (GL_DEPTH_FUNC, (GLint*)&parameter_depth_func);
+    glGetBooleanv (GL_DEPTH_WRITEMASK, &parameter_depth_mask);
+    glGetIntegerv (GL_SHADE_MODEL, (GLint*)&parameter_shade_model);
+    glGetIntegerv (GL_STENCIL_FUNC, (GLint*)&parameter_stencil_func);
+    glGetIntegerv (GL_STENCIL_VALUE_MASK, (GLint*)&parameter_stencil_mask);
+    glGetIntegerv (GL_STENCIL_REF, &parameter_stencil_ref);
+    glGetIntegerv (GL_STENCIL_FAIL, (GLint*)&parameter_stencil_fail);
+    glGetIntegerv (GL_STENCIL_PASS_DEPTH_FAIL, (GLint*)&parameter_stencil_zfail);
+    glGetIntegerv (GL_STENCIL_PASS_DEPTH_PASS, (GLint*)&parameter_stencil_zpass);
     enabled_GL_DEPTH_TEST = glIsEnabled (GL_DEPTH_TEST);
     enabled_GL_BLEND = glIsEnabled (GL_BLEND);
     enabled_GL_DITHER = glIsEnabled (GL_DITHER);
@@ -151,19 +197,20 @@ public:
     enabled_GL_POLYGON_OFFSET_FILL = glIsEnabled (GL_POLYGON_OFFSET_FILL);
     enabled_GL_LIGHTING = glIsEnabled (GL_LIGHTING);
     enabled_GL_ALPHA_TEST = glIsEnabled (GL_ALPHA_TEST);
-    enabled_GL_TEXTURE_2D[0] = glIsEnabled (GL_TEXTURE_2D);
     enabled_GL_TEXTURE_1D[0] = glIsEnabled (GL_TEXTURE_1D);
+    enabled_GL_TEXTURE_2D[0] = glIsEnabled (GL_TEXTURE_2D);
     enabled_GL_TEXTURE_3D[0] = glIsEnabled (GL_TEXTURE_3D);
     enabled_GL_TEXTURE_CUBE_MAP[0] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
-    for (i = 1 ; i < MAX_LAYER ; i++)
+    for (i = 1 ; i < maxLayers; i++)
     {
-      enabled_GL_TEXTURE_2D[i] = enabled_GL_TEXTURE_2D[0];
       enabled_GL_TEXTURE_1D[i] = enabled_GL_TEXTURE_1D[0];
+      enabled_GL_TEXTURE_2D[i] = enabled_GL_TEXTURE_2D[0];
       enabled_GL_TEXTURE_3D[i] = enabled_GL_TEXTURE_3D[0];
       enabled_GL_TEXTURE_CUBE_MAP[i] = enabled_GL_TEXTURE_CUBE_MAP[0];
     }
 
-    memset( boundtexture, 0, 32*sizeof(GLuint) );
+    memset (boundtexture, 0, maxLayers * sizeof (GLuint));
+    currentUnit = 0;
   }
 
   // Standardized caches
@@ -175,10 +222,10 @@ public:
   IMPLEMENT_CACHED_BOOL (GL_POLYGON_OFFSET_FILL)
   IMPLEMENT_CACHED_BOOL (GL_LIGHTING)
   IMPLEMENT_CACHED_BOOL (GL_ALPHA_TEST)
-  IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_1D)
-  IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_2D)
-  IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_3D)
-  IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_CUBE_MAP)
+  IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_1D)
+  IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_2D)
+  IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_3D)
+  IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_CUBE_MAP)
   IMPLEMENT_CACHED_PARAMETER_2 (glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref)
   IMPLEMENT_CACHED_PARAMETER_2 (glBlendFunc, BlendFunc, GLenum, blend_source, GLenum, blend_destination)
   IMPLEMENT_CACHED_PARAMETER_1 (glCullFace, CullFace, GLenum, cull_mode)
@@ -189,23 +236,46 @@ public:
   IMPLEMENT_CACHED_PARAMETER_3 (glStencilOp, StencilOp, GLenum, stencil_fail, GLenum, stencil_zfail, GLenum, stencil_zpass)
 
   // Special caches
-  GLuint boundtexture[32]; // 32 max texture layers
-  void SetTexture( GLenum target, GLuint texture, int layer = 0 )
+  GLuint boundtexture[maxLayers]; // 32 max texture layers
+  int currentUnit;
+  void SetTexture (GLenum target, GLuint texture)
   {
-    if (texture != boundtexture[layer])
+    if (texture != boundtexture[currentUnit])
     {
-      boundtexture[layer] = texture;
+      boundtexture[currentUnit] = texture;
       glBindTexture (target, texture);
     }
   }
-  GLuint GetTexture( GLenum target, int layer = 0 )
+  GLuint GetTexture (GLenum target)
   {
-    return boundtexture[layer];
+    return boundtexture[currentUnit];
+  }
+  GLuint GetTexture (GLenum target, int unit)
+  {
+    return boundtexture[unit];
+  }
+  /**
+   * Set active texture unit. Doesn't check whether the multitexture ext is
+   * actually supported, this must be done in calling code.
+   */
+  void SetActiveTU (int unit)
+  {
+    if (currentUnit != unit)
+    {
+      extmgr->glActiveTextureARB (GL_TEXTURE0_ARB + unit);
+      extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB + unit);
+      currentUnit = unit;
+    }
+  }
+  int GetActiveTU ()
+  {
+    return currentUnit;
   }
 };
 
 #undef IMPLEMENT_CACHED_BOOL
 #undef IMPLEMENT_CACHED_BOOL_LAYER
+#undef IMPLEMENT_CACHED_BOOL_CURRENTLAYER
 #undef IMPLEMENT_CACHED_PARAMETER_1
 #undef IMPLEMENT_CACHED_PARAMETER_2
 #undef IMPLEMENT_CACHED_PARAMETER_3

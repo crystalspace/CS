@@ -238,6 +238,16 @@ void csBugPlug::SetupPlugin ()
     Report (CS_REPORTER_SEVERITY_ERROR, "No G2D!");
     return;
   }
+  iFontServer* fntsvr = G2D->GetFontServer ();
+  if (fntsvr)
+  {
+    fnt = fntsvr->GetFont (0);
+    if (fnt == 0)
+    {
+      fnt = fntsvr->LoadFont (CSFONT_COURIER);
+    }
+    CS_ASSERT (fnt != 0);    
+  }
 
   if (!VFS) VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
@@ -1382,16 +1392,9 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 
   if (process_next_key || process_next_mouse)
   {
-    G3D->BeginDraw (CSDRAW_2DGRAPHICS);
-    iFontServer* fntsvr = G2D->GetFontServer ();
-    if (fntsvr)
+    if (fnt)
     {
-      csRef<iFont> fnt (fntsvr->GetFont (0));
-      if (fnt == 0)
-      {
-        fnt = fntsvr->LoadFont (CSFONT_COURIER);
-      }
-      CS_ASSERT (fnt != 0);
+      G3D->BeginDraw (CSDRAW_2DGRAPHICS);
       int fw, fh;
       fnt->GetMaxSize (fw, fh);
       int sh = G2D->GetHeight ();
@@ -1410,16 +1413,9 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 
   if (edit_mode)
   {
-    G3D->BeginDraw (CSDRAW_2DGRAPHICS);
-    iFontServer* fntsvr = G2D->GetFontServer ();
-    if (fntsvr)
+    if (fnt)
     {
-      csRef<iFont> fnt (fntsvr->GetFont (0));
-      if (fnt == 0)
-      {
-        fnt = fntsvr->LoadFont (CSFONT_COURIER);
-      }
-      CS_ASSERT (fnt != 0);
+      G3D->BeginDraw (CSDRAW_2DGRAPHICS);
       int fw, fh;
       fnt->GetMaxSize (fw, fh);
       int sw = G2D->GetWidth ();
@@ -1450,15 +1446,9 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 
   if (do_fps)
   {
-    G3D->BeginDraw (CSDRAW_2DGRAPHICS);
-    iFontServer* fntsvr = G2D->GetFontServer ();
-    if (fntsvr)
+    if (fnt)
     {
-      csRef<iFont> fnt (fntsvr->GetFont (0));
-      if (fnt == 0)
-      {
-        fnt = fntsvr->LoadFont (CSFONT_COURIER);
-      }
+      G3D->BeginDraw (CSDRAW_2DGRAPHICS);
       int sh = G2D->GetHeight ();
       int fw, fh;
       fnt->GetMaxSize (fw, fh);
@@ -1493,11 +1483,21 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
   return false;
 }
 
+bool csBugPlug::HandleSystemOpen (iEvent* event)
+{
+  return false;
+}
+
+bool csBugPlug::HandleSystemClose (iEvent* event)
+{
+  fnt = 0;
+  return false;
+}
+
 void csBugPlug::EnterEditMode (int cmd, const char* msg, const char* def)
 {
   if (edit_mode) return;
-  iFontServer* fntsvr = G2D->GetFontServer ();
-  if (!fntsvr) return;	// No edit mode if no font server
+  if (!fnt) return;	// No edit mode if no font server
   edit_mode = true;
   strcpy (msg_string, msg);
   if (def) edit_string.Replace (def);// strcpy (edit_string, def);
@@ -2049,6 +2049,14 @@ bool csBugPlug::HandleEvent (iEvent& event)
     {
       return HandleEndFrame (event);
     }
+    if (event.Command.Code == cscmdSystemOpen)
+    {
+      return HandleSystemOpen (&event);
+    }
+    if (event.Command.Code == cscmdSystemClose)
+    {
+      return HandleSystemClose (&event);
+    }
   }
 
   return false;
@@ -2355,14 +2363,8 @@ void csBugPlug::ShowCounters ()
   if (counters.Length () == 0) return;
 
   G3D->BeginDraw (CSDRAW_2DGRAPHICS);
-  iFontServer* fntsvr = G2D->GetFontServer ();
-  if (!fntsvr) return;
-  csRef<iFont> fnt (fntsvr->GetFont (0));
-  if (fnt == 0)
-  {
-    fnt = fntsvr->LoadFont (CSFONT_COURIER);
-  }
-  CS_ASSERT (fnt != 0);
+  if (!fnt) return;
+
   int fw, fh;
   fnt->GetMaxSize (fw, fh);
   int sh = G2D->GetHeight ();

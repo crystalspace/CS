@@ -155,6 +155,7 @@ csGenericRenderStep::csGenericRenderStep (
   shadertype = 0;
   zOffset = false;
   zmode = CS_ZBUF_USE;
+  currentSettings = false;
 }
 
 csGenericRenderStep::~csGenericRenderStep ()
@@ -168,6 +169,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
                                         int num)
 {
   if (num == 0) return;
+  ToggleStepSettings (g3d, true);
   csArray<iShaderVariableContext*> dynDomain;
   if (!shaderManager)
   {
@@ -199,11 +201,6 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
   iGraphics3D* g3d = rview->GetGraphics3D();
 
-  if (zOffset)
-    g3d->EnableZOffset ();
-
-  g3d->SetZMode (zmode);
-
   // This is a work array we use for getting all meshes.
   csArray<csRenderMesh*> meshes;
   sector->GetVisibleMeshes (rview)->GetSortedMeshList (meshes);
@@ -219,6 +216,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
     
     if (mesh->portal) 
     {
+      ToggleStepSettings (g3d, false);
       mesh->portal->Draw (rview);
     }
     else 
@@ -251,9 +249,28 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
     }
   }
 
-  if (zOffset)
-    g3d->DisableZOffset ();
-};
+  ToggleStepSettings (g3d, false);
+}
+
+void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d, 
+					      bool settings)
+{
+  if (settings != currentSettings)
+  {
+    if (settings)
+    {
+      if (zOffset)
+	g3d->EnableZOffset ();
+      g3d->SetZMode (zmode);
+    }
+    else
+    {
+      if (zOffset)
+	g3d->DisableZOffset ();
+    }
+    currentSettings = settings;
+  }
+}
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 				   iLight* light)

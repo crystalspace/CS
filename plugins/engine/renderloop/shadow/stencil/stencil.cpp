@@ -21,6 +21,7 @@
 #include "csutil/scf.h"
 #include "csutil/garray.h"
 #include "csutil/flags.h"
+#include "csutil/xmltiny.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
 #include "csgeom/pmtools.h"
@@ -810,6 +811,10 @@ iShader* csStencilShadowType::GetShadow ()
     // csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadowdebug.xml");
     csRef<iDocumentSystem> docsys (
       CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
+    if (docsys == 0)
+    {
+      docsys.AttachNew (new csTinyDocumentSystem ());
+    }
     csRef<iDocument> shaderDoc = docsys->CreateDocument ();
     shaderDoc->Parse (buf);
 

@@ -91,7 +91,6 @@ private:
 
   csRef<iBugPlug> bugplug;
 
-  csGLExtensionManager *ext;
   csRef<csGLTextureCache> txtcache;
   csRef<csGLTextureManager> txtmgr;
 
@@ -199,12 +198,14 @@ private:
   iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
   bool vertattribenabled[16]; // @@@ Hardcoded max number of attributes
   bool vertattribenabled100[16]; // @@@ Hardcoded max number of attributes (for conventional)
-  iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
+  //iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
   bool texunitenabled[16]; // @@@ Hardcoded max number of units
+  GLuint texunittarget[16]; // @@@ Hardcoded max number of units
 
 
 public:
   static csGLStateCache* statecache;
+  static csGLExtensionManager* ext;
 
   SCF_DECLARE_IBASE;
 
@@ -246,7 +247,6 @@ public:
   /// Activate a texture
   bool ActivateTexture (iTextureHandle *txthandle, int unit = 0);
   /// Activate a texture (Should probably handled some better way)
-  bool ActivateTexture (iMaterialHandle *mathandle, int layer, int unit = 0);
   void DeactivateTexture (int unit = 0);
   virtual void SetTextureState (int* units, iTextureHandle** textures,
   	int count);

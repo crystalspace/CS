@@ -268,7 +268,7 @@ bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticDomains)
 
   //get a statecache
   csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
-  g2d->PerformExtension("getstatecache", &statecache);
+  g2d->PerformExtension ("getstatecache", &statecache);
 
   //get extension-object
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
@@ -306,8 +306,7 @@ void csGLShaderFFP::Activate ()
   for(int i = 0; i < texlayers.Length(); ++i)
   {
     mtexlayer* layer = &texlayers[i];
-    ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
-    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + i);
+    statecache->SetActiveTU (i);
 
     if(ext->CS_GL_ARB_texture_env_combine || 
       ext->CS_GL_EXT_texture_env_combine)
@@ -348,10 +347,9 @@ void csGLShaderFFP::Activate ()
 
 void csGLShaderFFP::Deactivate()
 {
-  for (int i=maxlayers-1; i>=0; --i)
+  for (int i=maxlayers - 1; i>=0; --i)
   {
-    ext->glActiveTextureARB(GL_TEXTURE0_ARB+i);
-    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB+i);
+    statecache->SetActiveTU (i);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   }
 }

@@ -981,6 +981,9 @@ bool csGraphics3DOGLCommon::NewOpen ()
   else
     statecache->Disable_GL_DITHER ();
 
+  // @@@ A bit hacky...
+  statecache->extmgr->InitGL_ARB_multitexture ();
+
   if (config->GetBool ("Video.OpenGL.HintPerspectiveFast", false))
     glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
   else
@@ -4904,8 +4907,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       if (ARB_multitexture && (ARB_texture_env_combine
           || EXT_texture_env_combine))
       {
-        glActiveTextureARB((GLenum) (GL_TEXTURE0_ARB + l) );
-        glClientActiveTextureARB( (GLenum) (GL_TEXTURE0_ARB + l) );
+	statecache->SetActiveTU (l);
       }
 
       if (layer_data->ccsource == ED_SOURCE_FOG)
@@ -4961,13 +4963,13 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
       if (layer_data->inputtex==-1)
       {
-        statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle, l);
-        statecache->Enable_GL_TEXTURE_2D (l);
+        statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+        statecache->Enable_GL_TEXTURE_2D ();
       }
       else if (layer_data->inputtex==-2)
       {
-        statecache->SetTexture (GL_TEXTURE_2D, lightmap, l);
-        statecache->Enable_GL_TEXTURE_2D (l);
+        statecache->SetTexture (GL_TEXTURE_2D, lightmap);
+        statecache->Enable_GL_TEXTURE_2D ();
       }
       else if (layer_data->inputtex==0)
       {
@@ -4998,8 +5000,8 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         csTxtCacheData *cachedata = (csTxtCacheData *)txt_mm->GetCacheData ();
         texturehandle = cachedata->Handle;
 
-        statecache->SetTexture (GL_TEXTURE_2D, texturehandle, l);
-        statecache->Enable_GL_TEXTURE_2D (l);
+        statecache->SetTexture (GL_TEXTURE_2D, texturehandle);
+        statecache->Enable_GL_TEXTURE_2D ();
       }
 
       if (ARB_texture_env_combine || EXT_texture_env_combine)
@@ -5046,10 +5048,9 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   {
     for (l=maxlayers-1 ; l>=0 ; l--)
     {
-      glActiveTextureARB ((GLenum) (GL_TEXTURE0_ARB+l));
-      glClientActiveTextureARB ((GLenum) (GL_TEXTURE0_ARB+l));
+      statecache->SetActiveTU (l);
       if (l>0)
-        statecache->Disable_GL_TEXTURE_2D (l);
+        statecache->Disable_GL_TEXTURE_2D ();
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
   }

@@ -66,9 +66,9 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
   pfmt.PalEntries = 0;
   pfmt.complete ();
 
-  statecache = new csGLStateCache();
-
   ext.Initialize (object_reg, this);
+
+  statecache = new csGLStateCache (&ext);
 
   depthBits = config->GetInt ("Video.OpenGL.DepthBits", 32);
   multiSamples = config->GetInt ("Video.OpenGL.MultiSamples", 0);
@@ -131,6 +131,14 @@ bool csGraphics2DGLCommon::Open ()
     n = sscanf (version, "%d.%d.%d", &vMajor, &vMinor, &vRelease);
     if (n >= 2)
     {
+      // Sanity check
+      if ((vMajor < 1) || ((vMajor == 1) && (vMinor < 1)))
+      {
+	reporter->Report (CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.canvas.openglcommon",
+	  "OpenGL >= 1.1 is required, but only %d.%d is present.",
+	  vMajor, vMinor);
+      }
       if ((vMajor >= 1) || ((vMajor == 1) && (vMinor >= 2)))
       {
 	//ext.InitGL_version_1_2 ();

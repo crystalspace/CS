@@ -83,7 +83,7 @@ private:
   csRef<iShaderManager> shaderManager;
   iObjectRegistry *objreg;
 
-
+  bool currentSettings;
 public:
   SCF_DECLARE_IBASE;
 
@@ -105,6 +105,9 @@ public:
 
   inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 
     csRenderMesh** meshes, int num);
+
+  /// Enables/disables z offset and z mode as needed
+  inline void ToggleStepSettings (iGraphics3D* g3d, bool settings);
 };
 
 

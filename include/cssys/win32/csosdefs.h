@@ -65,7 +65,9 @@
   #endif
 #endif
 
+#ifndef WINVER
 #define WINVER 0x0400
+#endif
 
 // So many things require this. IF you have an issue with something defined
 // in it then undef that def here.

@@ -63,15 +63,12 @@
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
-
-csGLStateCache* csGLGraphics3D::statecache;
-
+csGLStateCache* csGLGraphics3D::statecache = 0;
+csGLExtensionManager* csGLGraphics3D::ext = 0;
 
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
-
-
 
 SCF_IMPLEMENT_IBASE(csGLGraphics3D)
   SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
@@ -137,7 +134,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
     vertattrib[i] = 0;
     vertattribenabled[i] = false;
     vertattribenabled100[i] = false;
-    texunit[i] = 0;
+    texunittarget[i] = 0;
     texunitenabled[i] = false;
   }
 //  lastUsedShaderpass = 0;
@@ -382,7 +379,8 @@ void csGLGraphics3D::SetupStencil ()
     bool oldz = statecache->IsEnabled_GL_DEPTH_TEST ();
     if (oldz) statecache->Disable_GL_DEPTH_TEST ();
 
-    statecache->Disable_GL_TEXTURE_2D ();
+    bool tex2d = statecache->IsEnabled_GL_TEXTURE_2D ();
+    if (tex2d) statecache->Disable_GL_TEXTURE_2D ();
     if (color_red_enabled || color_green_enabled || color_blue_enabled ||
       alpha_enabled)
       glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
@@ -416,6 +414,7 @@ void csGLGraphics3D::SetupStencil ()
     glMatrixMode (GL_PROJECTION);
     glPopMatrix ();
     if (oldz) statecache->Enable_GL_DEPTH_TEST ();
+    if (tex2d) statecache->Enable_GL_TEXTURE_2D ();
   }
 }
 
@@ -694,7 +693,7 @@ bool csGLGraphics3D::Open ()
     true, iConfigManager::ConfigPriorityPlugin);
 
   textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias",
-    -0.5);
+    -0.3f);
 
   if (!G2D->Open ())
   {
@@ -720,7 +719,7 @@ bool csGLGraphics3D::Open ()
   // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_EXT_texture3D ();
-  ext->InitGL_EXT_texture_compression_s3tc ();
+  //ext->InitGL_EXT_texture_compression_s3tc (); // not used atm
   ext->InitGL_ARB_vertex_buffer_object ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
@@ -758,7 +757,7 @@ bool csGLGraphics3D::Open ()
   }
 
   txtcache = csPtr<csGLTextureCache> (new csGLTextureCache (
-  	1024*1024*64, this));
+  	1024*1024*64, this)); // @@@ hardcoded cache size
   txtmgr.AttachNew (new csGLTextureManager (
   	object_reg, GetDriver2D (), config, this, txtcache));
 
@@ -766,6 +765,26 @@ bool csGLGraphics3D::Open ()
   statecache->Enable_GL_CULL_FACE ();
   statecache->SetCullFace (GL_FRONT);
 
+  // Set up texture LOD bias.
+  if (ext->CS_GL_EXT_texture_lod_bias)
+  {
+    if (ext->CS_GL_ARB_multitexture)
+    {
+      int texUnits;
+      glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
+      for (int u = texUnits - 1; u >= 0; u--)
+      {
+	statecache->SetActiveTU (u);
+	glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
+	  GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
+      }
+    }
+    else
+    {
+      glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
+	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
+    }
+  }
 
   string_vertices = strings->Request ("vertices");
   string_texture_coordinates = strings->Request ("texture coordinates");
@@ -1037,6 +1056,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
     }
     statecache->Disable_GL_ALPHA_TEST ();
+    if (ext->CS_GL_ARB_multitexture)
+      statecache->SetActiveTU (0);
 
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
@@ -1296,8 +1317,7 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
 	    int unit = attrib - CS_VATTRIB_TEXCOORD0;
 	    if (ext->CS_GL_ARB_multitexture)
 	    {
-	      ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-	      ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	      statecache->SetActiveTU (unit);
 	    }
 	    else if (unit != 0) return false;
 	    glTexCoordPointer (buffer->GetComponentCount (), 
@@ -1357,8 +1377,7 @@ void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
 	  int unit = attrib - CS_VATTRIB_TEXCOORD0;
 	  if (ext->CS_GL_ARB_multitexture)
 	  {
-	    ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-	    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	    statecache->SetActiveTU (unit);
 	  }
 	  else if (unit != 0) break;
 	  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
@@ -1394,7 +1413,7 @@ void csGLGraphics3D::SetBufferState (csVertexAttrib* attribs,
 
 bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 {
-  bool bind = true;
+  /*bool bind = true;
   if (texunit[unit] == txthandle)
   {
     if (texunitenabled[unit])
@@ -1405,12 +1424,11 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   }
 
   if (bind && texunit[unit])
-    DeactivateTexture (unit);
+    DeactivateTexture (unit);*/
 
   if (ext->CS_GL_ARB_multitexture)
   {
-    ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+    statecache->SetActiveTU (unit);
   }
   else if (unit != 0) return false;
 
@@ -1421,125 +1439,29 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   switch (gltxthandle->target)
   {
     case iTextureHandle::CS_TEX_IMG_1D:
-      statecache->Enable_GL_TEXTURE_1D (unit);
-      if (bind)
-        statecache->SetTexture (GL_TEXTURE_1D, texHandle, unit);
-      texunit[unit] = txthandle;
-      texunitenabled[unit] = true;
+      statecache->Enable_GL_TEXTURE_1D ();
+      statecache->SetTexture (GL_TEXTURE_1D, texHandle);
       break;
     case iTextureHandle::CS_TEX_IMG_2D:
-      statecache->Enable_GL_TEXTURE_2D (unit);
-      if (bind)
-        statecache->SetTexture (GL_TEXTURE_2D, texHandle, unit);
-      if (ext->CS_GL_EXT_texture_lod_bias)
-      {
-        glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	  GL_TEXTURE_LOD_BIAS_EXT, (int) textureLodBias); //big hack
-      }
-      texunit[unit] = txthandle;
-      texunitenabled[unit] = true;
+      statecache->Enable_GL_TEXTURE_2D ();
+      statecache->SetTexture (GL_TEXTURE_2D, texHandle);
       break;
     case iTextureHandle::CS_TEX_IMG_3D:
-      statecache->Enable_GL_TEXTURE_3D (unit);
-      if (bind)
-        statecache->SetTexture (GL_TEXTURE_3D, texHandle, unit);
-      texunit[unit] = txthandle;
-      texunitenabled[unit] = true;
+      statecache->Enable_GL_TEXTURE_3D ();
+      statecache->SetTexture (GL_TEXTURE_3D, texHandle);
       break;
     case iTextureHandle::CS_TEX_IMG_CUBEMAP:
-      statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
-      if (bind)
-        statecache->SetTexture (GL_TEXTURE_CUBE_MAP, texHandle, unit);
-      texunit[unit] = txthandle;
-      texunitenabled[unit] = true;
+      statecache->Enable_GL_TEXTURE_CUBE_MAP ();
+      statecache->SetTexture (GL_TEXTURE_CUBE_MAP, texHandle);
       break;
     default:
+      DeactivateTexture (unit);
       return false;
   }
+  texunitenabled[unit] = true;
+  texunittarget[unit] = gltxthandle->target;
   return true;
 }
-
-bool csGLGraphics3D::ActivateTexture (iMaterialHandle *mathandle, int layer,
-	int unit)
-{
-  // @@@ deal with multiple textures
-  iTextureHandle* txthandle = 0;
-  csMaterialHandle* mathand = (csMaterialHandle*)mathandle;
-  if(layer == 0)
-  {
-    txthandle = mathand->GetTexture();
-    if (!txthandle)
-      return false;
-  }
-  else return false;
-
-  bool bind = true;
-  if (texunit[unit] == txthandle)
-  {
-    if (texunitenabled[unit])
-      return true;
-    // @@@ Doesn't bind sometimes when it should if the following line
-    // is uncommented.
-    //bind = false;
-  }
-
-  if (bind && texunit[unit])
-    DeactivateTexture (unit);
-
-  if (ext->CS_GL_ARB_multitexture)
-  {
-    ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
-  }
-  else if (unit != 0) return false;
-
-  txtcache->Cache (txthandle);
-  csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
-    txthandle->GetPrivateObject ();
-  csTxtCacheData *cachedata =
-    (csTxtCacheData *)gltxthandle->GetCacheData ();
-
-  switch (gltxthandle->target)
-  {
-    case iTextureHandle::CS_TEX_IMG_1D:
-      statecache->Enable_GL_TEXTURE_1D (unit);
-      if (bind)
-        statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle );
-      texunit[unit] = txthandle;
-      texunitenabled[unit] = true;
-      break;
-    case iTextureHandle::CS_TEX_IMG_2D:
-      statecache->Enable_GL_TEXTURE_2D (unit);
-      if (bind)
-        statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle );
-      if (ext->CS_GL_EXT_texture_lod_bias)
-      {
-        glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	  GL_TEXTURE_LOD_BIAS_EXT, (int) textureLodBias); //big hack
-      }
-      texunit[unit] = txthandle;
-      texunitenabled[unit] = true;
-      break;
-    case iTextureHandle::CS_TEX_IMG_3D:
-      statecache->Enable_GL_TEXTURE_3D (unit);
-      if (bind)
-        statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle );
-      texunit[unit] = txthandle;
-      texunitenabled[unit] = true;
-      break;
-    case iTextureHandle::CS_TEX_IMG_CUBEMAP:
-      statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
-      if (bind)
-        statecache->SetTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
-      texunit[unit] = txthandle;
-      texunitenabled[unit] = true;
-      break;
-    default:
-      return false;
-  }
-  return true;
-}
-
 
 void csGLGraphics3D::DeactivateTexture (int unit)
 {
@@ -1548,30 +1470,23 @@ void csGLGraphics3D::DeactivateTexture (int unit)
 
   if (ext->CS_GL_ARB_multitexture)
   {
-    ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+    statecache->SetActiveTU (unit);
   }
   else if (unit != 0) return;
 
-  csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
-    texunit[unit]->GetPrivateObject ();
-  switch (gltxthandle->target)
+  switch (texunittarget[unit])
   {
     case iTextureHandle::CS_TEX_IMG_1D:
-      statecache->Disable_GL_TEXTURE_1D (unit);
-      //glBindTexture (GL_TEXTURE_1D, 0);
+      statecache->Disable_GL_TEXTURE_1D ();
       break;
     case iTextureHandle::CS_TEX_IMG_2D:
-      statecache->Disable_GL_TEXTURE_2D (unit);
-      //glBindTexture (GL_TEXTURE_2D, 0);
+      statecache->Disable_GL_TEXTURE_2D ();
       break;
     case iTextureHandle::CS_TEX_IMG_3D:
-      statecache->Disable_GL_TEXTURE_3D (unit);
-      //glBindTexture (GL_TEXTURE_3D, 0);
+      statecache->Disable_GL_TEXTURE_3D ();
       break;
     case iTextureHandle::CS_TEX_IMG_CUBEMAP:
-      statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
-      //glBindTexture (GL_TEXTURE_CUBE_MAP, 0);
+      statecache->Disable_GL_TEXTURE_CUBE_MAP ();
       break;
   }
   texunitenabled[unit] = false;
@@ -1581,17 +1496,16 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 	int count)
 {
   int i;
+  int unit = 0;
   for (i = 0 ; i < count ; i++)
   {
-    int unit = units[i];
+    unit = units[i];
     iTextureHandle* txt = textures[i];
     if (txt)
       ActivateTexture (txt, unit);
     else
       DeactivateTexture (unit);
   }
-  ext->glActiveTextureARB(GL_TEXTURE0_ARB);
-  ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
 }
 
 void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
@@ -1705,17 +1619,19 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
 
     if (current_zmode == CS_ZBUF_MESH)
     {
-      if (mymesh->z_buf_mode != CS_ZBUF_MESH)
+      CS_ASSERT (mymesh->z_buf_mode != CS_ZBUF_MESH);
+      SetZMode (mymesh->z_buf_mode, true);
+/*      if (mymesh->z_buf_mode != CS_ZBUF_MESH)
       {
         SetZMode (mymesh->z_buf_mode, true);
       } else {
         // Should do some real reporting here. :)
         csPrintf ("Bwaaaah! Meshes can't have zmesh zmode. You deserve some spanking!\n");
         return;
-      }
+      }*/
     }
 
-    glColor4f (1, 1, 1, 1);
+    glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
     glDrawElements (
       primitivetype,
       mymesh->indexend - mymesh->indexstart,

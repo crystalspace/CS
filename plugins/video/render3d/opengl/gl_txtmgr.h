@@ -498,6 +498,11 @@ public:
    */
   void UnregisterMaterial (csGLMaterialHandle* handle);
 
+  /**
+   * Helper function to make sure a texture isn't selected on any TU.
+   * Useful when deleting a texture.
+   */
+  static void UnsetTexture (GLenum target, GLuint texture);
 
   SCF_DECLARE_IBASE;
   /**

@@ -11,6 +11,27 @@ chronological order.
 	- Steven Geens fixed a very fatal typo in sprcal3dstate.
 	- Steven Geens added a fast way to check the sockets of a cal3d sprite
 	  in viewmesh.
+	- res made the following changes:
+	  - Enclosed the 'WINVER' #definition in win32/csosdefs.h in an 
+	    #ifdef, so an already (possibly user-)defined WINVER doesn't cause 
+	    problems.
+	  - csRenderMesh was forward declared as 'class' at some places, 
+	    causing problems with VC7.
+	  - Changed bugplug so the font used for text output is cached.
+	  - Fixed the stencil plugin to fall back to a TinyXML docsys if no 
+	    iDocumentSystem is present for shader loading.
+	  - Changed the generic render step to restore zOffset and zmode after
+	    drawing a portal.
+	  - The GL canvases now do a sanity check for the minimum required
+	    OpenGL 1.1.
+	  - Changed the GL font cache to change texture a bit less often.
+	  - The currently active TU is now also managed by the GL state manager.
+	  - The GL state manager doesn't accept a TU parameter to SetTexture()
+	    etc any more. Those functions now always use the currently selected
+	    TU.
+	  - Changed the NR GL ActivateTexture() to be a bit more sane. It also
+	    tracked the currently bound texture, something the state manager 
+	    already did.
 2-Jan-2004
 	- Jorrit added an optimization to the portal container so that
 	  a more optimal transfrom from camera->2D is used in case no

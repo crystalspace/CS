@@ -35,13 +35,13 @@
 #include "csutil/cscolor.h"
 #include "ivideo/rndbuf.h"
 
+struct csRenderMesh;
 class csMatrix3;
 class csVector3;
 class csVector2;
 class csPlane3;
 class csRect;
 class csReversibleTransform;
-class csRenderMesh;
 
 struct iGraphics2D;
 struct iPolygonBuffer;

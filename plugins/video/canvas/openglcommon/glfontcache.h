@@ -89,8 +89,8 @@ class csGLFontCache : public csFontCache
   csDirtyAccessArray<csVector2> wtVerts2d;
   csDirtyAccessArray<csVector2> wtTexcoords;
 
-  inline void FlushArrays (int& numverts, int bgVertsOffset, 
-    int& numBgVerts, const int fg, const int bg);
+  inline void FlushArrays (GLuint texture, int& numverts, 
+    int bgVertsOffset, int& numBgVerts, const int fg, const int bg);
 protected:
   virtual GlyphCacheData* InternalCacheGlyph (KnownFont* font,
     utf32_char glyph, uint flags);

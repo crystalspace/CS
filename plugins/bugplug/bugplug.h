@@ -50,6 +50,7 @@ struct iObjectRegistry;
 struct iPluginManager;
 struct iMaterialWrapper;
 struct iRegion;
+struct iFont;
 
 class csMatrix3;
 class csVector3;
@@ -176,6 +177,7 @@ private:
   csRef<iConsoleOutput> Conout;
   csRef<iVFS> VFS;
   csRef<iVirtualClock> vc;
+  csRef<iFont> fnt;
   bool initialized;
   csConfigAccess config;
   /**
@@ -331,6 +333,10 @@ private:
   bool HandleStartFrame (iEvent& event);
   /// End of frame.
   bool HandleEndFrame (iEvent& event);
+  /// Open system.
+  bool HandleSystemOpen (iEvent* event);
+  /// Close system.
+  bool HandleSystemClose (iEvent* event);
 
   /// Execute mouse button one.
   void MouseButton1 (iCamera* camera);
