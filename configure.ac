@@ -987,7 +987,8 @@ CS_CHECK_BUILD([for DirectX], [cs_cv_libdirectx],
 # search CS/libs/zlib*.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([z], [AC_LANG_PROGRAM([#include <zlib.h>], [zlibVersion()])],
-    [$srcdir/libs/zlib*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libz], [ZLIB])])
+    [$srcdir/libs/zlib*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libz], [ZLIB])],
+    [AC_MSG_ERROR([zlib is essential for building CS.])])
 
 
 
