@@ -582,8 +582,6 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   if (!lm) return;
   csStatLight* light = (csStatLight*)lview.l;
 
-  csQuadcube* qc = csWorld::current_world->GetQuadcube ();
-
   int lw = lm->GetWidth (); // @@@ DON'T NEED TO GO TO PO2 SIZES
   int lh = lm->GetHeight ();
 
@@ -789,6 +787,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 	  bool shadow = false;
 #define QUADTREE_SHADOW 0
 #if QUADTREE_SHADOW
+	  csQuadcube* qc = csWorld::current_world->GetQuadcube ();
 	  int state = qc->TestPoint (v2-light_frustrum->GetOrigin ());
 	  if (state == CS_QUAD_FULL)
 	  {
