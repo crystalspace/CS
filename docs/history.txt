@@ -6,33 +6,29 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-19-Mar-2004
-	- Keith Fulton fixed very obvious bug in RecalcBoundingBox where
-	  old bbox was not cleared out before new points were added.
-	- Keith also added a skeleton update as soon as an anim cycle is
-	  added, which makes the bbox update. This enables accurate colliders
-	  to be created.
 18-Mar-2004
 	- Anders Stenberg changed the terraformer interface a bit (made Sample
 	  functions return pointers to data instead of filling out supplied
 	  preallocated blocks). Also made it actually work, at least to some
 	  degree.
-	- res augmented csappframe with the DLL goop. Also changed it to not
-	  implement main(). The startup code is now in 
-	  csApplicationFramework::Main() and has to be called explicitly by
-	  the application.
-	- res augmented csgeom with the DLL goop.
-	- res fixed an oversight from adding DLL goop to csgfx.
-	- res augmented cstool with the DLL goop.
+	- res augmented csappframe with CS_CSAPPFRAME_EXPORT. Also changed it
+	  to not implement main(). The startup code is now in
+	  csApplicationFramework::Main() and has to be called explicitly by the
+	  client.
+	- res augmented csgeom CS_CSGEOM_EXPORT.
+	- res fixed an oversight from adding CS_CSGEOM_EXPORT to csgfx.
+	- res augmented cstool with CS_CSTOOL_EXPORT.
 	- res removed the csImage::dither variable.
 	- res fixed csutil/tree.h. csTree is purely inline but was declared as
-	  dllexport, causing missing symbols when csTree was used elsewhere.
+	  CS_CSUTIL_EXPORT, causing missing symbols when csTree was used
+	  elsewhere.
 	- res hacked around the fact that cs_static_var_cleanup was defined in
 	  the app/plugins but used in the libs by using only one 
-	  cs_static_var_cleanup (contained in csutil) when building dynamic
-	  libs.
-	- res changed the nada reftracker to being not dllexported.
-	- res augmented csws with the DLL goop.
+	  cs_static_var_cleanup (contained in csutil) when building shared
+	  libraries.
+	- res changed the nada reftracker to being not exported via
+	  CS_CSUTIL_EXPORT.
+	- res augmented csws with CS_CSWS_EXPORT.
 	- res removed a superflouos csTriangle from the ASE plugin.
 	- Jorrit added better error reporting to walktest in order to find
 	  out why CS is now broken.
@@ -55,10 +51,10 @@ chronological order.
 	- Jorrit modified the engine to respect CS_ENTITY_NOHITBEAM when
 	  calculating intersections.
 	- Jorrit fixed the visibility cullers so that they now respect the
-	  CS_ENTITY_INVISIBLEMESH flag when doing visibility culling. Previously
-	  the engine had to do that later on after the visibility culler did
-	  its job. This even fixes a bug with Dynavis where an invisible mesh
-	  would still contribute to culling.
+	  CS_ENTITY_INVISIBLEMESH flag when doing visibility
+	  culling. Previously the engine had to do that later on after the
+	  visibility culler did its job. This even fixes a bug with Dynavis
+	  where an invisible mesh would still contribute to culling.
 	- Jorrit did a significant change in the way visibility of child
 	  meshes is handled. A child mesh is no longer considered to be
 	  automatically invisible when the parent is invisible. You have to
@@ -66,17 +62,24 @@ chronological order.
 	- Jorrit added a -silent commandline option for the standard reporter
 	  listener plugin. If you give that option then it will no longer
 	  pop up the yellow messages for warnings at startup.
+	- Keith Fulton fixed very obvious bug in
+	  csSpriteCal3DMeshObject::RecalcBoundingBox() where old bbox was not
+	  cleared out before new points were added.
+	- Keith Fulton added a skeleton update as soon as an animation cycle is
+	  added, which makes the bbox update. This enables accurate colliders
+	  to be created.
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
 	- Eric Sunshine fixed copy/paste error in terraformer loader makefile
 	  which broke it.  DIR.SIMPLEFORMERLDR referenced the wrong path.  Also
 	  fixed formatting of help message.  Added appropriate SubInclude
 	  invocation to its parent Jamfile to ensure that it gets built.
-	- John Harger added macros for DLL creation in libcsutil. So far I have
-	  tested it on MSVC 7.1 and it has worked without error. 
+	- John Harger exported functions in csutil, via CS_CSUTIL_EXPORT, to
+	  make csutil viable for compilation as a shared library.  So far I
+	  have tested it on MSVC 7.1 and it has worked without error.
 	- res removed '#define CS_CSUTIL_LIB' from the csutil sources. The idea
 	  is to #define with a compiler (resp. preprocessor) option.
-	- res augmented libcsgfx with the DLL goop.
+	- res augmented libcsgfx with CS_CSGFX_EXPORT.
 16-Mar-2004
 	- Jorrit fixed a bug in iSector->HitBeamPortals(). It would not
 	  initialize the mesh to 0 which could cause bad errors in some
