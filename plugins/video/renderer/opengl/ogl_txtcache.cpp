@@ -337,7 +337,7 @@ void OpenGLTextureCache::Uncache (iTextureHandle *texh)
 
   csGLCacheData *n = cached_texture->next;
   if (n && n->next)
-    n->next->prev = cached_texture->prev;
+    n->prev = cached_texture->prev;
   else
     tail = cached_texture->prev;
   if (cached_texture->prev)
