@@ -117,7 +117,6 @@ the_libs=""
 show_libs=""
 show_cflags=""
 show_cxxflags=""
-show_makevars=""
 
 while test $# -gt 0; do
   case $1 in
@@ -130,17 +129,18 @@ while test $# -gt 0; do
 	exit 0
 	;;
     --version)
-      echo $version
-      exit 0
-      ;;
+        echo $version
+        exit 0
+        ;;
     --cflags)
-      show_cflags=true
-      ;;
+        show_cflags=true
+        ;;
     --cxxflags)
 	show_cxxflags=true
 	;;
     --makevars)
-	show_makevars=true
+	makevars
+	exit 0
 	;;
     --libs)
 	show_libs=true
@@ -170,8 +170,8 @@ while test $# -gt 0; do
 	addlib "-lcsphyzik"
 	;;
     *)
-      usage 1 1>&2
-      ;;
+        usage 1 1>&2
+        ;;
   esac
   shift
 done
@@ -196,9 +196,6 @@ if test -n "$show_libs"; then
     the_libs="-L${libdir} $the_libs ${syslibs}"
 
     echo "$the_libs"
-fi
-if test -n "$show_makevars"; then
-	makevars
 fi
 
 exit 0
