@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "simple1.h"
+#include "simplept.h"
 #include "cstool/csview.h"
 #include "csgfx/memimage.h"
 #include "csutil/cscolor.h"

@@ -20,7 +20,7 @@
 #include "cssys/system.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
-#include "simple1.h"
+#include "simplept.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
