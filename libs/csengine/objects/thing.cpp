@@ -974,7 +974,7 @@ int csThing::FindPolygonIndex (iPolygon3D *polygon) const
   return polygons.Find (p);
 }
 
-csPolygon3D *csThing::NewPolygon (csMaterialWrapper *material)
+csPolygon3D *csThing::NewPolygon (iMaterialWrapper *material)
 {
   csPolygon3D *p = new csPolygon3D (material);
   AddPolygon (p);
@@ -1487,8 +1487,7 @@ void csThing::PreparePolygonBuffer ()
   for (i = 0; i < polygons.Length (); i++)
   {
     matpol[i].poly = GetPolygon3D (i);
-    matpol[i].mat = &(matpol[i].poly->GetMaterialWrapper ()
-    	->scfiMaterialWrapper);
+    matpol[i].mat = matpol[i].poly->GetMaterialWrapper ();
   }
 
   //-----
@@ -2830,12 +2829,12 @@ void csThing::MergeTemplate (
     iPolygon3D *pt = tpl->GetPolygon (i);
     csPolygon3D *p;
     iMaterialWrapper *mat = pt->GetMaterial ();
-    p = NewPolygon (mat->GetPrivateObject ());  //@@@
+    p = NewPolygon (mat);
     p->SetName (pt->QueryObject ()->GetName ());
 
     iMaterialWrapper *wrap = pt->GetMaterial ();
     if (!wrap && default_material)
-      p->SetMaterial (default_material->GetPrivateObject ());
+      p->SetMaterial (default_material);
 
     int *idx = pt->GetVertexIndices ();
     for (j = 0; j < pt->GetVertexCount (); j++)
@@ -2873,12 +2872,12 @@ void csThing::ReplaceMaterials (iMaterialList *matList, const char *prefix)
   for (i = 0; i < GetPolygonCount (); i++)
   {
     csPolygon3D *p = GetPolygon3D (i);
-    const char *txtname = p->GetMaterialWrapper ()->GetName ();
+    const char *txtname = p->GetMaterialWrapper ()->QueryObject ()->GetName ();
     char *newname = new char[strlen (prefix) + strlen (txtname) + 2];
     sprintf (newname, "%s_%s", prefix, txtname);
 
-    iMaterialWrapper *th = matList->FindByName (newname);
-    if (th != NULL) p->SetMaterial (th->GetPrivateObject ());
+    iMaterialWrapper *mw = matList->FindByName (newname);
+    if (mw != NULL) p->SetMaterial (mw);
     delete[] newname;
   }
 }
@@ -2929,7 +2928,7 @@ iPolygon3D *csThing::ThingState::GetPolygon (const char *name)
 
 iPolygon3D *csThing::ThingState::CreatePolygon (const char *iName)
 {
-  csPolygon3D *p = new csPolygon3D ((csMaterialWrapper *)NULL);
+  csPolygon3D *p = new csPolygon3D ((iMaterialWrapper *)NULL);
   if (iName) p->SetName (iName);
   scfParent->AddPolygon (p);
 

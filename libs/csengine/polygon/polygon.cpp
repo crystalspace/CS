@@ -35,8 +35,10 @@
 #include "csgeom/poly3d.h"
 #include "qint.h"
 #include "qsqrt.h"
-#include "ivideo/texture.h"
 #include "iengine/texture.h"
+#include "iengine/material.h"
+#include "ivideo/texture.h"
+#include "ivideo/material.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/graph3d.h"
 
@@ -122,7 +124,7 @@ csPolyTexLightMap::~csPolyTexLightMap ()
   if (txt_plane) txt_plane->DecRef ();
 }
 
-void csPolyTexLightMap::Setup (csPolygon3D *poly3d, csMaterialWrapper *mat)
+void csPolyTexLightMap::Setup (csPolygon3D *poly3d, iMaterialWrapper *mat)
 {
   tex->SetPolygon (poly3d);
   tex->SetMaterialHandle (mat->GetMaterialHandle ());
@@ -281,8 +283,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
   SCF_IMPLEMENTS_INTERFACE(iPolygon3D)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csPolygon3D::csPolygon3D (
-  csMaterialWrapper *material) :
+csPolygon3D::csPolygon3D (iMaterialWrapper *material) :
     csObject(),
     vertices(4)
 {
@@ -651,7 +652,7 @@ bool csPolygon3D::Overlaps (csPolygon3D *overlapped)
   return false;
 }
 
-void csPolygon3D::SetMaterial (csMaterialWrapper *material)
+void csPolygon3D::SetMaterial (iMaterialWrapper *material)
 {
   csPolygon3D::material = material;
 }

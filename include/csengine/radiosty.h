@@ -337,7 +337,7 @@ private:
 protected:
   /// return the material handle for this polygon
   virtual iMaterialWrapper * GetMaterialWrapper ()
-  { return &(polygon->GetMaterialWrapper ())->scfiMaterialWrapper; }
+  { return polygon->GetMaterialWrapper (); }
 
   /// return the flat color for the polygons texture
   virtual csColor GetFlatColor() const;

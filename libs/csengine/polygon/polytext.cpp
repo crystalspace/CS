@@ -28,10 +28,11 @@
 #include "csengine/lppool.h"
 #include "csengine/engine.h"
 #include "csengine/lghtmap.h"
+#include "iengine/texture.h"
 #include "csutil/bitset.h"
 #include "csutil/debug.h"
 #include "ivideo/texture.h"
-#include "iengine/texture.h"
+#include "ivideo/material.h"
 #include "ivideo/graph3d.h"
 
 

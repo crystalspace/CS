@@ -21,6 +21,7 @@ The history order is reversed so that new features are at the top.
 	  iEngine->GetMaxLightmapAspectRatio().
 	- csPolygon3D class no longer requires access to csEngine and csLight
 	  classes.
+	- csPolygon3D now uses iMaterialWrapper instead of csMaterialWrapper.
 	- Eric Sunshine removed the unmaintained, unfinished and unused
 	  scripts/swig directory.  Tagged the files with "UNMAINTAINED" in
 	  order to simplify the task of recovering them from the Attic if

@@ -27,7 +27,6 @@
 #include "csgeom/polyidx.h"
 #include "csengine/polyplan.h"
 #include "csengine/portal.h"
-#include "csengine/material.h"
 #include "iengine/sector.h"
 #include "imesh/thing/ptextype.h"
 #include "csengine/thing.h"
@@ -36,7 +35,6 @@
 
 class csFrustumView;
 class csFrustumContext;
-class csMaterialWrapper;
 class csPolyPlane;
 class csPolyTxtPlane;
 class csPolygon2D;
@@ -50,6 +48,7 @@ struct iLight;
 struct iGraphics2D;
 struct iGraphics3D;
 struct iCacheManager;
+struct iMaterialWrapper;
 
 /**
  * Structure containing lighting information valid
@@ -357,7 +356,7 @@ private:
 
 public:
   /// Setup for the given polygon and material.
-  void Setup (csPolygon3D* poly3d, csMaterialWrapper* math);
+  void Setup (csPolygon3D* poly3d, iMaterialWrapper* math);
 
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () { return POLYTXT_LIGHTMAP; }
@@ -501,7 +500,7 @@ private:
    * The material, this contains the texture handle,
    * the flat color (if no texture) and other parameters.
    */
-  csMaterialWrapper* material;
+  iMaterialWrapper* material;
 
   /**
    * General lighting information for this polygon.
@@ -552,7 +551,7 @@ public:
   /**
    * Construct a new polygon with the given material.
    */
-  csPolygon3D (csMaterialWrapper *mat);
+  csPolygon3D (iMaterialWrapper *mat);
 
   /**
    * Construct a new polygon and copy from the given polygon.
@@ -822,12 +821,12 @@ public:
    * until finally csEngine::Prepare() is called (which in the end
    * calls Finish() for every polygon).
    */
-  void SetMaterial (csMaterialWrapper* material);
+  void SetMaterial (iMaterialWrapper* material);
 
   /**
    * Get the material.
    */
-  csMaterialWrapper* GetMaterialWrapper () { return material; }
+  iMaterialWrapper* GetMaterialWrapper () { return material; }
 
   /**
    * Return true if this polygon or the texture it uses is transparent.
@@ -1257,20 +1256,11 @@ public:
     { return scfParent->GetMaterialHandle (); }
     virtual void SetMaterial (iMaterialWrapper* mat)
     {
-      scfParent->SetMaterial (
-        ((csMaterialWrapper::MaterialWrapper*)(mat))->scfParent);
+      scfParent->SetMaterial (mat);
     }
     virtual iMaterialWrapper* GetMaterial ()
     {
-      // @@@ Not efficient. In future we need to store iMaterialWrapper
-      // directly.
-      if (!scfParent->GetMaterialWrapper ()) return NULL;
-      else
-      {
-        csRef<iMaterialWrapper> wrap (SCF_QUERY_INTERFACE (
-	  scfParent->GetMaterialWrapper (), iMaterialWrapper));
-	return wrap;	// This will DecRef() but that's ok in this case.
-      }
+      return scfParent->GetMaterialWrapper ();
     }
 
     virtual int GetVertexCount ()

@@ -34,7 +34,6 @@
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
-#include "csengine/material.h"	// @@@
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/object.h"
@@ -507,7 +506,7 @@ public:
   void AddPolygon (csPolygon3D* spoly);
 
   /// Create a new polygon in this thing and add it.
-  csPolygon3D* NewPolygon (csMaterialWrapper* material);
+  csPolygon3D* NewPolygon (iMaterialWrapper* material);
 
   /// Get the number of polygons in this thing.
   int GetPolygonCount ()
