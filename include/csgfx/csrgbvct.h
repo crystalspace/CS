@@ -21,7 +21,7 @@
 #ifndef __CS_RGB_VECTOR_H__
 #define __CS_RGB_VECTOR_H__
 
-#include "array.h"
+#include "csutil/array.h"
 #include "csgfx/rgbpixel.h"
 
 /**
