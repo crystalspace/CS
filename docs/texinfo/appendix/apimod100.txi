@@ -283,17 +283,17 @@ global namespace.
 @item
 @code{longlong2double()} @result{} @code{csLongLongToDouble()}
 @item
-@code{MemEntry} @result @code{csMemTrackerEntry}
+@code{MemEntry} @result{} @code{csMemTrackerEntry}
 @item
 @code{MemoryMapFile()} @result{} @code{csMemoryMapFile()}
 @item
 @code{MemoryMapWindow()} @result{} @code{csMemoryMapWindow()}
 @item
-@code{MemTrackerInfo} @result @code{csMemTrackerInfo}
+@code{MemTrackerInfo} @result{} @code{csMemTrackerInfo}
 @item
-@code{MemTrackerModule} @result @code{csMemTrackerModule}
+@code{MemTrackerModule} @result{} @code{csMemTrackerModule}
 @item
-@code{MemTrackerRegistry} @result @code{csMemTrackerRegistry}
+@code{MemTrackerRegistry} @result{} @code{csMemTrackerRegistry}
 @item
 @code{MKDIR()} @result{} @code{CS_MKDIR()}
 @item
