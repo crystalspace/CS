@@ -202,6 +202,16 @@ PLUGIN.POSTFLAGS=-mwindows -mconsole
 DO.SHARED.PLUGIN.CORE = \
   dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
 
+# uncomment the following to enable workaround for dllwrap bug
+#ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
+#  DLLWRAPWRAP = bash bin/dllwrapwrap.sh
+#else
+#  DLLWRAPWRAP = bin/dllwrapwrap.sh
+#endif
+
+#DO.SHARED.PLUGIN.CORE = \
+#  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
+
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
 # and the console will not start minimized if a shortcut says it should
