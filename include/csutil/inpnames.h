@@ -32,6 +32,7 @@
 
 struct iEvent;
 
+// @@@ Document me
 class CS_CSUTIL_EXPORT csInputDefinition
 {
 protected:

@@ -40,6 +40,10 @@ chronological order.
 	- Eric Sunshine added help messages for the all, apps, libs, plugins,
 	  clean, and distclean pseudo-targets.  Also fixed some other minor
 	  aesthetic problems with the output of "jam help".
+	- res made the following changes:
+	    - Added doxygen documentation for macro-generated csString members.
+	    - Fixed doxygen doc for CS_INITIALIZE_PLATFORM_APPLICATION.
+	    - Fixed some compiler errors in minidump.cpp.
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support

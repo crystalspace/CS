@@ -627,13 +627,23 @@ PREDEFINED             = "CS_GNUC_PRINTF(a,b)=" \
 			 "UCTF_CONVERTER(a,b,c,d,e)=inline static size_t a \
 			   (d* dest, size_t destSize, \
 			    const b* source, size_t srcSize = (size_t)-1) {}"
-
+			 
 # If the MACRO_EXPANSION and EXPAND_PREDEF_ONLY tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
 # The macro definition that is found in the sources will be used. 
 # Use the PREDEFINED tag if you want to use a different macro definition. 
 
-EXPAND_AS_DEFINED      = 
+EXPAND_AS_DEFINED      =  STR_APPEND		\
+			  STR_REPLACE		\
+			  STR_FORMAT		\
+			  STR_FORMAT_INT	\
+			  STR_FORMAT_FLOAT	\
+			  STR_PADLEFT		\
+			  STR_PADRIGHT		\
+			  STR_PADCENTER		\
+			  STR_ASSIGN		\
+			  STR_SHIFT		\
+			  STR_OP_APPEND
 
 #---------------------------------------------------------------------------
 # Configuration::addtions related to external references   

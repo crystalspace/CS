@@ -19,6 +19,10 @@
 #ifndef __CS_CSSTRING_H__
 #define __CS_CSSTRING_H__
 
+/**\file
+ * String utility class
+ */
+
 #include <stdarg.h>
 #include <ctype.h>
 #include "csextern.h"
@@ -350,16 +354,21 @@ public:
   size_t FindLast (char c, size_t p = (size_t)-1) const;
 
 #define STR_APPEND(TYPE,FMT,SZ) csString& Append(TYPE n) \
-  { char s[SZ]; cs_snprintf(s, SZ, #FMT, n); return Append(s); }
-  STR_APPEND(short, %hd, 32)
-  STR_APPEND(unsigned short, %hu, 32)
-  STR_APPEND(int, %d, 32)
-  STR_APPEND(unsigned int, %u, 32)
-  STR_APPEND(long, %ld, 32)
-  STR_APPEND(unsigned long, %lu, 32)
-  STR_APPEND(float, %g, 64)
-  STR_APPEND(double, %g, 64)
+  { char s[SZ]; cs_snprintf(s, SZ, FMT, n); return Append(s); }
+  //@{
+  /**
+   * Append the value, in formatted form, to this string.
+   */
+  STR_APPEND(short, "%hd", 32)
+  STR_APPEND(unsigned short, "%hu", 32)
+  STR_APPEND(int, "%d", 32)
+  STR_APPEND(unsigned int, "%u", 32)
+  STR_APPEND(long, "%ld", 32)
+  STR_APPEND(unsigned long, "%lu", 32)
+  STR_APPEND(float, "%g", 64)
+  STR_APPEND(double, "%g", 64)
 #undef STR_APPEND
+  //@}
 
 #if !defined(CS_USE_FAKE_BOOL_TYPE)
   /// Append a boolean (as a number -- 1 or 0) to this string.
@@ -390,6 +399,11 @@ public:
 
 #define STR_REPLACE(TYPE) \
 csString& Replace (TYPE s) { Size = 0; return Append(s); }
+  //@{
+  /**
+   * Replace contents of this string with the value in formatted form.
+   * \remarks Internally uses the various flavours of Append().
+   */
   STR_REPLACE(char)
   STR_REPLACE(unsigned char)
   STR_REPLACE(short)
@@ -404,7 +418,8 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_REPLACE(bool)
 #endif
 #undef STR_REPLACE
-
+  //@}
+  
   /**
    * Check if another string is equal to this one.
    * \param iStr Other string.
@@ -562,26 +577,30 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    */
   csString& FormatV(const char* format, va_list args);
 
-#define STR_FORMAT(TYPE,FMT,SZ) \
+#define STR_FORMAT(TYPE) \
   static csString Format (TYPE v);
-  STR_FORMAT(short, %hd, 32)
-  STR_FORMAT(unsigned short, %hu, 32)
-  STR_FORMAT(int, %d, 32)
-  STR_FORMAT(unsigned int, %u, 32)
-  STR_FORMAT(long, %ld, 32)
-  STR_FORMAT(unsigned long, %lu, 32)
-  STR_FORMAT(float, %g, 64)
-  STR_FORMAT(double, %g, 64)
+  //@{
+  /**
+   * Format this value using a sprintf() formatting directive.
+   */
+  STR_FORMAT(short)
+  STR_FORMAT(unsigned short)
+  STR_FORMAT(int)
+  STR_FORMAT(unsigned int)
+  STR_FORMAT(long)
+  STR_FORMAT(unsigned long)
+  STR_FORMAT(float)
+  STR_FORMAT(double)
 #undef STR_FORMAT
 
-#define STR_FORMAT_INT(TYPE,FMT) \
+#define STR_FORMAT_INT(TYPE) \
   static csString Format (TYPE v, int width, int prec=0);
-  STR_FORMAT_INT(short, hd)
-  STR_FORMAT_INT(unsigned short, hu)
-  STR_FORMAT_INT(int, d)
-  STR_FORMAT_INT(unsigned int, u)
-  STR_FORMAT_INT(long, ld)
-  STR_FORMAT_INT(unsigned long, lu)
+  STR_FORMAT_INT(short)
+  STR_FORMAT_INT(unsigned short)
+  STR_FORMAT_INT(int)
+  STR_FORMAT_INT(unsigned int)
+  STR_FORMAT_INT(long)
+  STR_FORMAT_INT(unsigned long)
 #undef STR_FORMAT_INT
 
 #define STR_FORMAT_FLOAT(TYPE) \
@@ -589,6 +608,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_FORMAT_FLOAT(float)
   STR_FORMAT_FLOAT(double)
 #undef STR_FORMAT_FLOAT
+  //@}
 
   /**
    * Pad to a specified size with leading characters.
@@ -603,9 +623,12 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   /// Return a copy of this string formatted with PadLeft().
   csString AsPadLeft (size_t NewSize, char PadChar = ' ') const;
 
-  // Return a new left-padded string representation of a basic type.
 #define STR_PADLEFT(TYPE) \
   static csString PadLeft (TYPE v, size_t iNewSize, char iChar=' ');
+  //@{
+  /** 
+   * Return a new left-padded string representation of a basic type.
+   */
   STR_PADLEFT(const csString&)
   STR_PADLEFT(const char*)
   STR_PADLEFT(char)
@@ -622,6 +645,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_PADLEFT(bool)
 #endif
 #undef STR_PADLEFT
+  //@}
 
   /**
    * Pad to a specified size with trailing characters.
@@ -636,9 +660,12 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   /// Return a copy of this string formatted with PadRight().
   csString AsPadRight (size_t NewSize, char PadChar = ' ') const;
 
-  // Return a new right-padded string representation of a basic type.
 #define STR_PADRIGHT(TYPE) \
   static csString PadRight (TYPE v, size_t iNewSize, char iChar=' ');
+  //@{
+  /**
+   * Return a new right-padded string representation of a basic type.
+   */
   STR_PADRIGHT(const csString&)
   STR_PADRIGHT(const char*)
   STR_PADRIGHT(char)
@@ -655,6 +682,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_PADRIGHT(bool)
 #endif
 #undef STR_PADRIGHT
+  //@}
 
   /**
    * Pad to a specified size with leading and trailing characters so as to
@@ -672,9 +700,12 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   /// Return a copy of this string formatted with PadCenter().
   csString AsPadCenter (size_t NewSize, char PadChar = ' ') const;
 
-  // Return a new left+right padded string representation of a basic type.
 #define STR_PADCENTER(TYPE) \
   static csString PadCenter (TYPE v, size_t iNewSize, char iChar=' ');
+  //@{
+  /**
+   * Return a new left+right padded string representation of a basic type.
+   */
   STR_PADCENTER(const csString&)
   STR_PADCENTER(const char*)
   STR_PADCENTER(char)
@@ -691,10 +722,14 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_PADCENTER(bool)
 #endif
 #undef STR_PADCENTER
+  //@}
 
-  // Assign a string to another.
 #define STR_ASSIGN(TYPE) \
 const csString& operator = (TYPE s) { return Replace (s); }
+  //@{
+  /**
+   * Assign a formatted value to this string.
+   */
   STR_ASSIGN(const csString&)
   STR_ASSIGN(const char*)
   STR_ASSIGN(char)
@@ -711,24 +746,31 @@ const csString& operator = (TYPE s) { return Replace (s); }
   STR_ASSIGN(bool)
 #endif
 #undef STR_ASSIGN
+  //@}
 
-#define STR_APPEND(TYPE) csString &operator += (TYPE s) { return Append (s); }
-  STR_APPEND(const csString&)
-  STR_APPEND(const char*)
-  STR_APPEND(char)
-  STR_APPEND(unsigned char)
-  STR_APPEND(short)
-  STR_APPEND(unsigned short)
-  STR_APPEND(int)
-  STR_APPEND(unsigned int)
-  STR_APPEND(long);
-  STR_APPEND(unsigned long)
-  STR_APPEND(float)
-  STR_APPEND(double)
+#define STR_OP_APPEND(TYPE) \
+  csString &operator += (TYPE s) { return Append (s); }
+  //@{
+  /**
+   * Append a formatted value to this string.
+   */
+  STR_OP_APPEND(const csString&)
+  STR_OP_APPEND(const char*)
+  STR_OP_APPEND(char)
+  STR_OP_APPEND(unsigned char)
+  STR_OP_APPEND(short)
+  STR_OP_APPEND(unsigned short)
+  STR_OP_APPEND(int)
+  STR_OP_APPEND(unsigned int)
+  STR_OP_APPEND(long)
+  STR_OP_APPEND(unsigned long)
+  STR_OP_APPEND(float)
+  STR_OP_APPEND(double)
 #ifndef CS_USE_FAKE_BOOL_TYPE
-  STR_APPEND(bool)
+  STR_OP_APPEND(bool)
 #endif
-#undef STR_APPEND
+#undef STR_OP_APPEND
+  //@}
 
   /// Add another string to this one and return the result as a new string.
   csString operator + (const csString &iStr) const
@@ -814,9 +856,16 @@ inline csString operator + (const csString& iStr1, const char* iStr2)
   return iStr1.Clone ().Append (iStr2);
 }
 
-// Handy shift operators.  For example: s << "Hi " << name << "; see " << foo;
 #define STR_SHIFT(TYPE) \
   inline csString &operator << (csString &s, TYPE v) { return s.Append (v); }
+//@{
+/** 
+ * Shift operator.  
+ * For example: 
+ * \example
+ * s << "Hi " << name << "; see " << foo;
+ * \endexample
+ */
 STR_SHIFT(const csString&)
 STR_SHIFT(const char*)
 STR_SHIFT(char)
@@ -833,5 +882,6 @@ STR_SHIFT(double)
 STR_SHIFT(bool)
 #endif
 #undef STR_SHIFT
+//@}
 
 #endif // __CS_CSSTRING_H__

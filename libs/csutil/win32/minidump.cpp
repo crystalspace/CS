@@ -214,8 +214,8 @@ const char* cswinMinidumpWriter::WriteMinidump (
 
   char heapFN[MAX_PATH];
   char rangeFN[MAX_PATH];
-  HANDLE hHeapDump;
-  HANDLE hHeapRanges;
+  HANDLE hHeapDump = INVALID_HANDLE_VALUE;
+  HANDLE hHeapRanges = INVALID_HANDLE_VALUE;
   int rangeCount = 0;
 
   if (dumpHeap)
@@ -236,9 +236,31 @@ const char* cswinMinidumpWriter::WriteMinidump (
 
     HANDLE snap = CreateToolhelp32Snapshot (TH32CS_SNAPHEAPLIST, 0);
 
-    CollectHeapInfo (snap, hHeapDump, hHeapRanges, rangeCount);
+    if ((hHeapRanges != INVALID_HANDLE_VALUE) && 
+      (hHeapDump != INVALID_HANDLE_VALUE) &&
+      (snap != INVALID_HANDLE_VALUE))
+    {
+      CollectHeapInfo (snap, hHeapDump, hHeapRanges, rangeCount);
 
-    CloseHandle (snap);
+      CloseHandle (snap);
+    }
+    else
+    {
+      if (hHeapRanges != INVALID_HANDLE_VALUE) 
+      {
+	CloseHandle (hHeapRanges);
+	DeleteFileA (rangeFN);
+      }
+      if (hHeapDump != INVALID_HANDLE_VALUE) 
+      {
+	CloseHandle (hHeapDump);
+	DeleteFileA (heapFN);
+      }
+      if (snap != INVALID_HANDLE_VALUE) 
+	CloseHandle (snap);
+
+      dumpHeap = false;
+    }
   }
 
   char dumpFN[MAX_PATH];

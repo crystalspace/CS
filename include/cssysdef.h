@@ -298,7 +298,11 @@
  * \remark NB: It is invoked in csInitializer::CreateEnvironment().
  */
 #ifndef CS_INITIALIZE_PLATFORM_APPLICATION
-#  define CS_INITIALIZE_PLATFORM_APPLICATION
+#  define CS_INITIALIZE_PLATFORM_APPLICATION	/* */
+/*
+  This definition may seem odd, but it's here for doxygen's sake, which
+  apparently fails to document empty macro definitions.
+ */
 #endif
 
 #if !defined(CS_BUILD_SHARED_LIBS)
