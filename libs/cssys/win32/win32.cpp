@@ -83,6 +83,9 @@ private:
   bool is_console_app;
   /// is command line help requested?
   bool cmdline_help_wanted;
+  /// use our own message loop
+  bool use_own_message_loop;
+
   HCURSOR m_hCursor;
   csRef<iEventOutlet> EventOutlet;
   csRef<csWin32KeyboardDriver> kbdDriver;
@@ -120,6 +123,11 @@ public:
   void AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args);
   virtual HWND GetApplicationWindow();
+  virtual LRESULT ProcessMessage(HWND hWnd, UINT message,
+      WPARAM wParam, LPARAM lParam);
+
+  virtual void UseOwnMessageLoop(bool ownmsgloop);
+  virtual bool HasOwnMessageLoop();
 
   iEventOutlet* GetEventOutlet();
 
@@ -355,6 +363,8 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   console_window = false;
 #endif
 
+  use_own_message_loop = true;
+
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
   console_window = cmdline->GetBoolOption ("console", console_window);
 
@@ -562,21 +572,24 @@ bool Win32Assistant::HandleEvent (iEvent& e)
 
   if (e.Command.Code == cscmdPreProcess)
   {
-    MSG msg;
-    /*
-      [res] *W versions of the message queue functions exist,
-      but they don't seem to make a difference.
-     */
-    while (PeekMessage (&msg, 0, 0, 0, PM_NOREMOVE))
+    if(use_own_message_loop)
     {
-      if (!GetMessage (&msg, 0, 0, 0))
+      MSG msg;
+      /*
+        [res] *W versions of the message queue functions exist,
+        but they don't seem to make a difference.
+      */
+      while (PeekMessage (&msg, 0, 0, 0, PM_NOREMOVE))
       {
-        iEventOutlet* outlet = GetEventOutlet();
-        outlet->Broadcast (cscmdQuit);
-        return true;
+        if (!GetMessage (&msg, 0, 0, 0))
+        {
+          iEventOutlet* outlet = GetEventOutlet();
+          outlet->Broadcast (cscmdQuit);
+          return true;
+        }
+        TranslateMessage (&msg);
+        DispatchMessage (&msg);
       }
-      TranslateMessage (&msg);
-      DispatchMessage (&msg);
     }
     return true;
   }
@@ -913,6 +926,22 @@ void Win32Assistant::AlertV (HWND window, int type, const char* title,
 HWND Win32Assistant::GetApplicationWindow()
 {
   return ApplicationWnd;
+}
+
+LRESULT Win32Assistant::ProcessMessage(HWND hWnd, UINT message,
+                            WPARAM wParam, LPARAM lParam)
+{
+  return WindowProc(hWnd, message, wParam, lParam);
+}
+
+void Win32Assistant::UseOwnMessageLoop(bool ownmsgloop)
+{
+  use_own_message_loop = ownmsgloop;
+}
+
+bool Win32Assistant::HasOwnMessageLoop()
+{
+  return use_own_message_loop;
 }
 
 bool Win32Assistant::HandleKeyMessage (HWND hWnd, UINT message, 
