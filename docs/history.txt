@@ -52,6 +52,10 @@ The history order is reversed so that new features are at the top.
 	    - Minor re-writing of some paragraphs.
 	- Fixed a small error in project.txi where it refered to the
 	  non installed CS as installed CS.
+	- 'Fixed' -infinite option for walktest by making it a bit simpler.
+	  Note that the performance is not very good when creating new
+	  rooms. This is something that will have to be looked into later.
+	  But at least it no longer crashes.
 22-Oct-2001
 	- Fixed a bug in the 'addghost' console command. It would fail
 	  if you used it more than once.

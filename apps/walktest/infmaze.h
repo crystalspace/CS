@@ -88,6 +88,8 @@ public:
 class LV
 {
 public:
+  LV () : next (NULL), lv (NULL), ctxt (NULL) { }
+
   LV* next;
   iFrustumView* lv;
   csFrustumContext* ctxt;

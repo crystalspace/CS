@@ -217,18 +217,18 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
     	iLightingProcessInfo);
     if (linfo)
     {
-      linfo->DecRef ();
-      if (!linfo->IsDynamic ())
+      if (false && !linfo->IsDynamic ())
       {
         // If we want to shine light through this portal but it doesn't
         // really exist yet then we remember the csFrustumView for later.
         LV* lv = new LV ();
         lv->next = lviews;
-          lviews = lv;
+        lviews = lv;
         lv->lv = fv;
         // Make a copy of the current context and remember it.
         lv->ctxt = fv->CopyFrustumContext ();
       }
+      linfo->DecRef ();
     }
     fv->DecRef ();
     return false;
