@@ -64,6 +64,9 @@ CS_IMPLEMENT_APPLICATION
 
 #define VIEWMESH_COMMAND_LOADMESH 77701
 #define VIEWMESH_STATES_SELECT_START  77800
+#define VIEWMESH_COMMAND_CAMMODE1 77711
+#define VIEWMESH_COMMAND_CAMMODE2 77712
+#define VIEWMESH_COMMAND_CAMMODE3 77713
 
 //-----------------------------------------------------------------------------
 
@@ -77,6 +80,7 @@ ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
   g3d = NULL;
   menu = NULL;
   dialog = NULL;
+  cammode = movenormal;
 }
 
 ViewMesh::~ViewMesh ()
@@ -146,6 +150,15 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  StartModal (dialog, NULL);
 	  return true;
 	}
+	case VIEWMESH_COMMAND_CAMMODE1:
+	  cammode = movenormal;
+	  return true;
+	case VIEWMESH_COMMAND_CAMMODE2:
+	  cammode = moveorigin;
+	  return true;
+	case VIEWMESH_COMMAND_CAMMODE3:
+	  cammode = rotateorigin;
+	  return true;
 	case cscmdStopModal:
 	{
 	  char filename[1024];
@@ -243,9 +256,9 @@ void ViewMesh::ConstructMenu()
 
   // Camer Mode
   csMenu *cammode = new csMenu(NULL);
-  (void)new csMenuItem(cammode, "Normal Movement");
-  (void)new csMenuItem(cammode, "Look to Origin");
-  (void)new csMenuItem(cammode, "Rotate");
+  (void)new csMenuItem(cammode, "Normal Movement", VIEWMESH_COMMAND_CAMMODE1);
+  (void)new csMenuItem(cammode, "Look to Origin", VIEWMESH_COMMAND_CAMMODE2);
+  (void)new csMenuItem(cammode, "Rotate", VIEWMESH_COMMAND_CAMMODE3);
   (void)new csMenuItem(menu, "Camera Mode", cammode);
 
   (void)new csMenuItem(menu,"~Quit", cscmdQuit);
@@ -265,18 +278,48 @@ void ViewMesh::Draw()
   if (!dialog && !menu->GetState(CSS_VISIBLE))
   {
     iCamera* c = view->GetCamera();
-    if (GetKeyState (CSKEY_RIGHT))
-      c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
-    if (GetKeyState (CSKEY_LEFT))
-      c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
-    if (GetKeyState (CSKEY_PGUP))
-      c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
-    if (GetKeyState (CSKEY_PGDN))
-      c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
-    if (GetKeyState (CSKEY_UP))
-      c->Move (VEC_FORWARD * 4 * speed);
-    if (GetKeyState (CSKEY_DOWN))
-      c->Move (VEC_BACKWARD * 4 * speed);
+    switch (cammode)
+    {
+      case movenormal:
+    	if (GetKeyState (CSKEY_RIGHT))
+	  c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
+	if (GetKeyState (CSKEY_LEFT))
+	  c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
+	if (GetKeyState (CSKEY_PGUP))
+	  c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
+	if (GetKeyState (CSKEY_PGDN))
+	  c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
+	if (GetKeyState (CSKEY_UP))
+	  c->Move (VEC_FORWARD * 4 * speed);
+	if (GetKeyState (CSKEY_DOWN))
+	  c->Move (VEC_BACKWARD * 4 * speed);
+	break;
+      case moveorigin:
+	{
+	  csVector3 orig = c->GetTransform().GetOrigin();
+	
+	  if (GetKeyState (CSKEY_DOWN))
+	    c->GetTransform().SetOrigin (orig + VEC_BACKWARD * 4 * speed);
+	  if (GetKeyState (CSKEY_UP))
+	    c->GetTransform().SetOrigin (orig + VEC_FORWARD * 4 * speed);
+	  if (GetKeyState (CSKEY_LEFT))
+	    c->GetTransform().SetOrigin (orig + VEC_LEFT * 4 * speed);
+	  if (GetKeyState (CSKEY_RIGHT))
+	    c->GetTransform().SetOrigin (orig + VEC_RIGHT * 4 * speed);
+	  if (GetKeyState (CSKEY_PGUP))
+	    c->GetTransform().SetOrigin (orig + VEC_UP * 4 * speed);
+	  if (GetKeyState (CSKEY_PGDN))
+	    c->GetTransform().SetOrigin (orig + VEC_DOWN * 4 * speed);
+	  c->GetTransform().LookAt (
+	      csVector3(0,10,0)-c->GetTransform().GetOrigin(), 
+	      csVector3(1,-1,1) );
+  	  break;
+	}
+      case rotateorigin:
+	break;
+      default:
+	break;
+    }	
   }
     
   csApp::Draw();

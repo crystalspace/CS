@@ -48,6 +48,7 @@ private:
   csMenu *menu;
   csWindow *dialog;
   csStrVector stateslist;
+  enum { movenormal, moveorigin, rotateorigin } cammode;
 public:
   ViewMesh (iObjectRegistry *object_reg, csSkin &Skin);
   virtual ~ViewMesh ();
