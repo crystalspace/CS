@@ -78,12 +78,10 @@ void init_sig ()
 
 //------------------------------------------------------ The System driver ---//
 
-BEGIN_INTERFACE_TABLE (SysSystemDriver)
-  IMPLEMENTS_COMPOSITE_INTERFACE (System)
-  IMPLEMENTS_COMPOSITE_INTERFACE (UnixSystemDriver)
-END_INTERFACE_TABLE ()
-
-IMPLEMENT_UNKNOWN_NODELETE (SysSystemDriver)
+IMPLEMENT_IBASE (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iSystem)
+  IMPLEMENTS_INTERFACE (iUnixSystemDriver)
+IMPLEMENT_IBASE_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver (), Callback (NULL)
 {
@@ -148,25 +146,19 @@ void SysSystemDriver::Sleep (int SleepTime)
 
 //------------------------------------------------------ XUnixSystemDriver ---//
 
-IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED (SysSystemDriver, UnixSystemDriver)
-
-STDMETHODIMP SysSystemDriver::XUnixSystemDriver::GetExtSettings (int &SimDepth,
+void SysSystemDriver::GetExtSettings (int &SimDepth,
   bool &UseSHM, bool &HardwareCursor)
 {
-  METHOD_PROLOGUE (SysSystemDriver, UnixSystemDriver)
-  SimDepth = pThis->SimDepth;
-  UseSHM = pThis->UseSHM;
-  HardwareCursor = pThis->HardwareCursor;
-  return S_OK;
+  SimDepth = this->SimDepth;
+  UseSHM = this->UseSHM;
+  HardwareCursor = this->HardwareCursor;
 }
 
-STDMETHODIMP SysSystemDriver::XUnixSystemDriver::SetLoopCallback
+void SysSystemDriver::SetLoopCallback
   (LoopCallback Callback, void *Param)
 {
-  METHOD_PROLOGUE(SysSystemDriver, UnixSystemDriver)
-  pThis->Callback = Callback;
-  pThis->CallbackParam = Param;
-  return S_OK;
+  this->Callback = Callback;
+  this->CallbackParam = Param;
 }
 
 //------------------------------------------------------ SysKeyboardDriver ---//

@@ -989,18 +989,18 @@ void csGraphics2DXLib::ProcessEvents (void *Param)
     {
       case ButtonPress:
         state = ((XButtonEvent*)&event)->state;
-        Self->UnixSystem->MouseEvent (button_mapping [event.xbutton.button],
+        Self->System->QueueMouseEvent (button_mapping [event.xbutton.button],
           true, event.xbutton.x, event.xbutton.y,
           ((state & ShiftMask) ? CSMASK_SHIFT : 0) |
 	  ((state & Mod1Mask) ? CSMASK_ALT : 0) |
 	  ((state & ControlMask) ? CSMASK_CTRL : 0));
           break;
       case ButtonRelease:
-        Self->UnixSystem->MouseEvent (button_mapping [event.xbutton.button],
+        Self->System->QueueMouseEvent (button_mapping [event.xbutton.button],
           false, event.xbutton.x, event.xbutton.y, 0);
         break;
       case MotionNotify:
-        Self->UnixSystem->MouseEvent (0, false,
+        Self->System->QueueMouseEvent (0, false,
 	  event.xbutton.x, event.xbutton.y, 0);
         break;
       case KeyPress:
@@ -1071,11 +1071,11 @@ void csGraphics2DXLib::ProcessEvents (void *Param)
           case XK_F12:        key = CSKEY_F12; break;
           default:            break;
         }
-	Self->UnixSystem->KeyboardEvent (key, down);
+	Self->System->QueueKeyEvent (key, down);
         break;
       case FocusIn:
       case FocusOut:
-        Self->UnixSystem->FocusEvent (event.type == FocusIn);
+        Self->System->QueueFocusEvent (event.type == FocusIn);
         break;
       case Expose:
       {
