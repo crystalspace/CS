@@ -389,7 +389,7 @@ bool Simple::Initialize ()
 
 
   layer1->SetStateFloat( efserver->RequestString("texture source"), 1);
-  layer1->SetStateFloat( efserver->RequestString("texture coordinate source"), 1);
+  layer1->SetStateFloat( efserver->RequestString("texture coordinate source"), efserver->RequestString("mesh"));
   //layer1->SetStateString( efserver->RequestString("color source 1") , efserver->RequestString("texture color"));
   layer1->SetStateString( efserver->RequestString("color source 1") , efserver->RequestString("vertex color"));
   layer1->SetStateString( efserver->RequestString("color operation") , efserver->RequestString("use source 1"));
