@@ -82,18 +82,6 @@ CS_IMPLEMENT_PLUGIN
 #define ENUM_CURRENT_SETTINGS       ((DWORD)-1)
 #endif
 
-#ifdef CS_DEBUG
- /*
-   hack: in fs mode, the window is topmost, means above every other
-   window, all the time. but when debugging it is really annoying to have 
-   a black window in front of your face instead of the IDE... 
-   note: this hack causes taskbar flickering when "always on top"  is enabled
-   and auto-hide is disabled.
-  */
-# undef  HWND_TOPMOST
-# define HWND_TOPMOST HWND_TOP
-#endif
-
 static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 {
   LPVOID lpMsgBuf;
