@@ -264,7 +264,7 @@ public:
    */
   int GetNumberSkies ()
   {
-    return things.Length ();
+    return skies.Length ();
   }
 
   /**
