@@ -72,6 +72,10 @@ chronological order.
 	  target.
 	- Eric Sunshine fixed aws/Jamfile so that it utilizes the portable
 	  FIncludes rule rather than hard-coding -I directives.
+	- Eric Sunshine changed the Copy rule in helper.jam so that it
+	  overrides Jambase's default value of $(CP) "cp -f" to avoid using the
+	  -f flag, since older platforms do not support it.  Also removed the
+	  obsolete SearchSubdir rule.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.

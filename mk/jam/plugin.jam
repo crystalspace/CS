@@ -13,9 +13,6 @@ GRISTMETA ?= pluginmeta ;
 ##    generator.
 ##    You can specify the noinstall option if you don't want that an install
 ##    target is created.
-##    Don't specify any extensions for the plugin. If you have sourcefiles in
-##    subdirectories, then you'll need to use the SearchSubdir rule. Don't
-##    mention the subdirectory name again for the sourcefiles.
 ##    Options:
 ##	noinstall: Don't setup a default installation target.
 ##	independent: The target will not be made a dependency of the plugins

@@ -6,7 +6,10 @@ SED ?= sed ;
 DEEPCOPY ?= "cp -R" ;
 DELTREE ?= "rm -rf" ;
 
-##  IncludeDir [target : ] directories
+# The -f option to `cp' is not supported on older platforms.
+if "$(CP)" = "cp -f" { CP = "cp" ; }
+
+##  IncludeDir [ target : ] directories
 ##    Description: Is used to specify the location of header files for a
 ##    target or the whole project if no target is given.
 ##    This rule will automatically generate the -I compiler flags and makes
@@ -37,11 +40,6 @@ rule IncludeDir
       HDRS += $(<) ;
     }
   }   
-}
-
-rule SearchSubdir
-{
-    echo "Warning: SearchSubDir is deprecated now (just delete it from your Jamfile)" ;
 }
 
 ##  Wildcard [ dir : ] patterns
@@ -155,6 +153,8 @@ rule RemoveDups
   return $(result) ;
 } 
 
+##  Reverse list
+##    Reverse the order of items in the list.
 rule Reverse
 {
   local result ;
@@ -203,14 +203,16 @@ rule ConcatDirs
 }
 
 ##  Copy target : source
-##    Copy source file to target.
+##    Copy source to target.
 actions Copy
 {
+  $(RM) $(<)
   $(CP) $(>) $(<)
 }
 
+##  Move target : source
+##    Move (or rename) source to target.
 actions ignore Move
 {
   $(MV) $(>) $(<)
 }
-

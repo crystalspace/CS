@@ -17,9 +17,6 @@ if "$(EXEMODE)" = "711" { EXEMODE = "+x" ; }
 ##    intended to be used on commandline)
 ##    Some notes: You should not add the .exe extension to the appname - jam
 ##    will do that on win32.
-##    If you have sourcefiles in subdirectories, then you'll need to use the
-##    SearchSubdir rule. Never specify sourcefiles with paths, only specify
-##    the filenames.
 ##    Options:
 ##	console: Create a console application
 ##	noinstall: Don't setup a default installation target.
