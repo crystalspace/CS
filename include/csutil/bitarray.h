@@ -152,7 +152,7 @@ public:
   friend class BitProxy;
 
   /**
-   * Defalut constructor.
+   * Default constructor.
    */
   csBitArray () : mpStore(0), mSingleWord(0), mLength(0), mNumBits(0)
   {
