@@ -56,6 +56,9 @@ The history order is reversed so that new features are at the top.
 	  Apple/NeXT ports are now 100% API clean (that is, they now use only
 	  public AppKit API).
 	- Eric Sunshine eliminated the unmaintained `ggi' and `mgl2d' canvases.
+	- Wouter Wijngaards commented out -ldl on the LIBS line of the sdl
+	  canvas. The SDL canvas works (--canvas=sdl2d option) for me on
+	  mingw, SDL 1.2.0. Even gives a 4% speedup, over regular plugin :-)
 2-Jul-2001
 	- Removed the bad and global 'thisclass' pointer from the Python
 	  plugin.  Removed the 'GetSystem()' call from 'cs.i'.  The Python
