@@ -13,6 +13,30 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+17-Dec-1999
+	- Moved CVS to SourceForge!
+	- Michael Dale Long merged CrystalClear updates into the new
+	  SourceForge CVS tree. Added a few more updates to the cctest
+	  movement code. Cleaned out some older entity include files.
+	  Update CrystalClear and cctest for new Entity interfaces.
+	  Added more tolerant world loader code to cctest. Continued work
+	  on Entity code.
+	- Michael also added fixes from Brandon for makefile.py.
+	- Michael added a 2D sprite display fix thanks to FragDance.
+16-Dec-1999
+	- Further work on coverage mask tree. It is almost working now.
+	  I still have performance problems and occasional bugs. The
+	  performance troubles are not surprising since the main function
+	  is not good yet.
+15-Dec-1999
+	- Further work on coverage mask tree stuff.
+	- Moved GetConvexOutline from the csOctree class to the
+	  csBox3 class.
+14-Dec-1999
+	- Solved several bugs in the coverage mask tree implementation
+	  (it is almost starting to work now).
+	- Made several significant optimizations to the handling of the
+	  masks.
 12-Dec-1999
 	- Norman Kramer added support for subrenderers for Mesa.
 	- Norman also changed shared object name to match the name
