@@ -85,7 +85,7 @@ The history order has been reversed so that new features are at the top.
 	      released, and DoubleClick is generated when mouse is pressed.
 	      Well, this is so for historical reasons - most GUIs uses
 	      mouse this way.
-
+	      ---
 	      Also note that the behaviour of double clicks event has
 	      slightly changed: now DoubleClick is emmited *in addition*
 	      to MouseDown rather than *instead* like it was before. That is,
@@ -94,7 +94,7 @@ The history order has been reversed so that new features are at the top.
 	      occured; these events are additional and are introduced just
 	      to help the programmer to track these conditions; in general
 	      he could do it himself by using timer, remembering position etc.
-
+	      ---
 	      This has a slight impact on some seldom-encountered code
 	      sequences: if before to catch absolutely all mousedown
 	      events you had to catch both MouseDown and MouseDoubleClick
@@ -125,6 +125,8 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed video.mak so that the `vid' target only appears
 	  in the application list if the platform is also able to build
 	  video-related plugins.  Also fixed formatting of help message.
+	- Eric Sunshine fixed several compilation problems in MazeD and CSWS.
+	  Also resolved some const vs. non-const problems in these modules.
 30-Jan-2001
 	- Norman Kramer did further work on the video plugins:
 	    - Removed some debug code and a stupid comment.

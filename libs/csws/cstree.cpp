@@ -569,6 +569,7 @@ void csTreeBox::SetStyle (int iStyle, csTreeFrameStyle iFrameStyle)
   csScrollBarFrameStyle sbsty;
   switch (FrameStyle)
   {
+    default:
     case cstfsNone:
       BorderWidth = BorderHeight = 0;
       sbsty = cssfsThinRect;
@@ -927,7 +928,7 @@ bool csTreeBox::HandleEvent (iEvent &Event)
           } /* endif */
           return true;
         case cscmdTreeItemSizeChangeNotify:
-          SetState (CSS_TREEBOX_PLACEITEMS, this);
+          SetState (CSS_TREEBOX_PLACEITEMS, true);
           return true;
         case cscmdTreeStartTracking:
           if (!app->MouseOwner)
