@@ -54,11 +54,12 @@ chronological order.
 	    VFS.Mount.lib/materials = materials.zip
 	  In this case, "/lib" _is_ a valid VFS path, despite the fact that
 	  there is no physical mount at that location. Jorrit's change caused
-	  it reject ChDir("/lib") even though it should have been accepted. An
-	  obvious place where this error manifested was in 'vsh'. It became
-	  impossible to "cd /lib", "cd /lev", and even "cd /", or to change to
-	  any other directory which was entirely virtual. The problem almost
-	  certainly impacted other portions of the project, as well.
+	  it to reject ChDir("/lib") even though it should have been
+	  accepted. An obvious place where this error manifested was in
+	  'vsh'. It became impossible to "cd /lib", "cd /lev", and even "cd /",
+	  or to change to any other directory which was entirely virtual. The
+	  problem almost certainly impacted other portions of the project, as
+	  well.
 	- Eric Sunshine added csVFS::CheckIfMounted(). This provides
 	  replacement functionality for the reverted change to ChDir().
 	  ChDirAuto() now uses CheckIfMounted() rather than relying on the
