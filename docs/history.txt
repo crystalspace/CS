@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 20-Jun-2003
 	- Marten fixed an error in the inline assembly in tcovbuf.cpp 
 	  which prevented it from compiling on msvc6
+	- Jorrit fixed a compile error in thing with relation to the new
+	  renderer.
         - Duhprey fixed missing new way to handle zbuf mode.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:

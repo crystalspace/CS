@@ -800,6 +800,7 @@ void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
   cent = b.GetCenter ();
 }
 
+#ifdef CS_USE_NEW_RENDERER
 iRenderBuffer* csThingStatic::GetRenderBuffer (csStringID name)
 {
   // @@@ Smells like a hash may be useful here.
@@ -918,6 +919,7 @@ void csThingStatic::FillRenderMeshes (csGrowingArray<csRenderMesh*>& rmeshes,
 
 //  csHashMap mat_rms;
 }
+#endif // CS_USE_NEW_RENDERER
 
 //----------------------------------------------------------------------------
 
