@@ -89,7 +89,7 @@
 #endif
 #endif
 
-#if defined(__OS2__)||defined(__EMX__)||defined(sun)
+#if defined(__NeXT__) || defined(__APPLE__) || defined(__OS2__)||defined(__EMX__)||defined(sun)
 #include <string.h>
 #endif
 

@@ -24,6 +24,15 @@
 extern "C" {
 #endif
 
+#if defined(__NeXT__) || defined(__APPLE__)
+// NeXT already has a valid getopt; avoid link errors.
+#define getopt __getopt
+#define optarg __optarg
+#define opterr __opterr
+#define optind __optind
+#define optopt __optopt
+#endif
+
 /* For communication from `getopt' to the caller.
    When `getopt' finds an option that takes an argument,
    the argument value is returned here.
