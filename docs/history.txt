@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+27-Aug-2001
+	- Michael Voase did the following:
+            - Fixed walktest crasher in line 3d caused
+	      by proctex (ignoring PrepareAnim() failure)
 26-Aug-2001
 	- Norman Kramer fixed compilation error in csrectrg.cpp.
 	- Eric Sunshine made the following changes to the project:
