@@ -123,25 +123,6 @@ protected:
   float maxy;
 
 public:
-  /// Initialize this box to empty.
-  csBox () : minx( CS_BOUNDINGBOX_MAXVALUE), miny( CS_BOUNDINGBOX_MAXVALUE),
-	     maxx(-CS_BOUNDINGBOX_MAXVALUE), maxy(-CS_BOUNDINGBOX_MAXVALUE) {}
-
-  /// Initialize this box with one point.
-  csBox (const csVector2& v) : minx(v.x), miny(v.y), maxx(v.x), maxy(v.y) {}
-
-  /// Initialize this box with the given values.
-  csBox (float x1, float y1, float x2, float y2) :
-    minx(x1), miny(y1), maxx(x2), maxy(y2)
-  { if (Empty ()) StartBoundingBox (); }
-
-  /// Sets the bounds of the box with the given values.
-  void Set (float x1, float y1, float x2, float y2)
-  {
-    if (x1>x2 || y1>y2) StartBoundingBox();
-    else { minx = x1;  miny = y1;  maxx = x2;  maxy = y2; }
-  }
-
   ///
   float MinX () const { return minx; }
   ///
@@ -219,6 +200,39 @@ public:
   {
     if (v.x < minx) minx = v.x; else if (v.x > maxx) maxx = v.x;
     if (v.y < miny) miny = v.y; else if (v.y > maxy) maxy = v.y;
+  }
+
+  ///-----
+  /// Maintenance Note: The csBox constructors and Set() appear at this point
+  /// in the file, rather than earlier, in order to appease the OpenStep 4.2
+  /// compiler.  Specifically, the problem is that the compiler botches code
+  /// generation if an unseen method (which is later declared inline) is
+  /// called from within another inline method.  For instance, if the
+  /// constructors were listed at the top of the file, rather than here, the
+  /// compiler would see calls to Empty() and StartBoundingBox() before seeing
+  /// declarations for them.  In such a situation, the buggy compiler
+  /// generated a broken object file.  The simple work-around of textually
+  /// reorganizing the file ensures that the declarations for Empty() and
+  /// StartBoundingBox() are seen before they are called.
+  ///-----
+
+  /// Initialize this box to empty.
+  csBox () : minx( CS_BOUNDINGBOX_MAXVALUE), miny( CS_BOUNDINGBOX_MAXVALUE),
+	     maxx(-CS_BOUNDINGBOX_MAXVALUE), maxy(-CS_BOUNDINGBOX_MAXVALUE) {}
+
+  /// Initialize this box with one point.
+  csBox (const csVector2& v) : minx(v.x), miny(v.y), maxx(v.x), maxy(v.y) {}
+
+  /// Initialize this box with the given values.
+  csBox (float x1, float y1, float x2, float y2) :
+    minx(x1), miny(y1), maxx(x2), maxy(y2)
+  { if (Empty ()) StartBoundingBox (); }
+
+  /// Sets the bounds of the box with the given values.
+  void Set (float x1, float y1, float x2, float y2)
+  {
+    if (x1>x2 || y1>y2) StartBoundingBox();
+    else { minx = x1;  miny = y1;  maxx = x2;  maxy = y2; }
   }
 
   /// Compute the union of two bounding boxes.
