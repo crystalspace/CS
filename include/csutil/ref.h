@@ -45,7 +45,7 @@ public:
    * the referenced object by assuming that its IncRef() method has already
    * been called, and invokes its DecRef() method upon destruction.
    */
-  explicit csRef (T* newobj) : obj (newobj) { }
+  explicit csRef (T* newobj) : obj (newobj) {}
   
   /**
    * Smart pointer copy constructor.
@@ -66,38 +66,10 @@ public:
   }
 
   /**
-   * Assign another object to this smart pointer.
+   * Assign a raw object reference to this smart pointer.  This function
+   * calls the object's IncRef() method.
    */
-  void Assign (csRef const& other)
-  {
-    if (obj != other.obj)
-    {
-      if (obj) obj->DecRef();
-      obj = other.obj;
-      if (obj) obj->IncRef();
-    }
-  }
-
-  /**
-   * Assign a raw object reference to this smart pointer.  
-   * This function assumes that the object's IncRef() method
-   * has already been called on behalf of the smart pointer.
-   */
-  void Take (T* newobj)
-  {
-    if (obj != newobj)
-    {
-      if (obj)
-	obj->DecRef ();
-      obj = newobj;
-    }
-  }
-
-  /**
-   * Assign a raw object reference to this smart pointer.
-   * This function calls the object's IncRef method.
-   */
-  void Assign (T* newobj)
+  csRef& operator = (T* newobj)
   {
     if (obj != newobj)
     {
@@ -110,12 +82,25 @@ public:
   }
 
   /**
-   * Assign another object to this smart pointer via the assignment operator.
+   * Assign another object to this smart pointer.
    */
   csRef& operator = (csRef const& other)
   {
-    Assign (other);
+    this->operator=(other.obj);
     return *this;
+  }
+
+  /**
+   * Transfer ownership of a raw object reference to this smart pointer.
+   * This function assumes that the object's IncRef() method has already
+   * been called on behalf of the smart pointer.  The smart pointer is
+   * responsible for invoking DecRef() at destruction time.
+   */
+  void Take (T* newobj)
+  {
+    if (obj)		// It is assumed that newobj already has an extra
+      obj->DecRef();	// reference, thus we can safely DecRef() old obj even
+    obj = newobj;	// if (obj == newobj).
   }
 
   /// Dereference underlying object.
@@ -139,4 +124,3 @@ public:
 };
 
 #endif // __CSREF_H__
-

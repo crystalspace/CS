@@ -42,6 +42,10 @@ The history order is reversed so that new features are at the top.
 	  pointer so that you cannot misuse the assign anymore.
 	- Removed the 'bool' cast for csRef because this was
 	  ambigious.
+	- Eric Sunshine added csRef::operator=(T*).  Eliminated all Assign()
+	  methods since they were subsumed by the equivalent functionality of
+	  the assignment operators.  Fixed reference-counting bug in
+	  csRef::Take().
 30-Jul-2002
 	- Added simple csRefCount class which does reference counting
 	  without the need for iBase.
