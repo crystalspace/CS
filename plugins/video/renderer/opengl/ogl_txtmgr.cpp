@@ -181,91 +181,6 @@ bool csTextureHandleOpenGL::FindFormatType ()
 	  != targetFormat; i++);
 	formatidx = i;
 
-	int pixels = image->GetWidth () * image->GetHeight ();
-	csRGBpixel *_src = (csRGBpixel *)image->GetImageData ();
-
-	while (pixels--)
-	{
-	  // By default, every csRGBpixel initializes its alpha component to
-	  // 255. Thus, we should just drop to zero alpha for transparent
-	  // pixels, if any.
-	  if (transp_color.eq (*_src)) _src->alpha = 0;
-	  _src++;
-	}
-
-	// Now we draw borders inside all keycolored areas.
-	// This removes the halos of keycolor when using bilinear filtering
-	int h, rows, w, cols;
-	h = rows = image->GetHeight ();
-	w = image->GetWidth();
-	_src = (csRGBpixel *)image->GetImageData ();
-	while (rows--)
-	{
-	  cols = w;
-	  while (cols--)
-	  {
-	    if (!_src[(rows*w)+cols].alpha)
-	    {
-	      int n=0, r=0, g=0, b=0, xl, xr, yt, yb;
-	      if (!cols)
-	      {
-		xl = w-1;
-		xr = 1;
-	      }
-	      else if (cols==w-1)
-	      {
-		xl = cols-1;
-		xr = 0;
-	      }
-	      else
-	      {
-		xl = cols-1;
-		xr = cols+1;
-	      }
-
-	      if (!rows)
-	      {
-		yt = h-1;
-		yb = 1;
-	      }
-	      else if (rows==h-1)
-	      {
-		yt = rows-1;
-		yb = 0;
-	      }
-	      else
-	      {
-		yt = rows-1;
-		yb = rows+1;
-	      }
-
-#define CHECK_PIXEL(d) { \
-  if (_src[(d)].alpha) \
-  { \
-    n++; \
-    r+=_src[(d)].red; \
-    g+=_src[(d)].green; \
-    b+=_src[(d)].blue; \
-        } \
-}
-	      CHECK_PIXEL((yt*w)+xl);
-	      CHECK_PIXEL((yt*w)+cols);
-	      CHECK_PIXEL((yt*w)+xr);
-	      CHECK_PIXEL((rows*w)+xl);
-	      CHECK_PIXEL((rows*w)+xr);
-	      CHECK_PIXEL((yb*w)+xl);
-	      CHECK_PIXEL((yb*w)+cols);
-	      CHECK_PIXEL((yb*w)+xr);
-#undef CHECK_PIXEL
-	      if (n)
-	      {
-		_src[(rows*w)+cols].red = r / n;
-		_src[(rows*w)+cols].green = g / n;
-		_src[(rows*w)+cols].blue = b / n;
-	      }
-	    }
-	  }
-	}
       }
     }
 
@@ -502,6 +417,7 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   }
 
   // Determine the format and type of the source we gonna transform the data to
+  PrepareKeycolor ();
   FindFormatType ();
   CreateMipmaps ();
 }
@@ -584,21 +500,35 @@ void csTextureHandleOpenGL::ComputeMeanColor (int w, int h, csRGBpixel *src)
 {
   int pixels = w * h;
   unsigned r = 0, g = 0, b = 0;
-  int count = pixels;
   CS_ASSERT (pixels > 0);
+  int count = pixels;
+  pixels = 0;
   has_alpha = false;
   while (count--)
   {
     csRGBpixel &pix = *src++;
-    r += pix.red;
-    g += pix.green;
-    b += pix.blue;
-    if (pix.alpha < 255)
+    if (!transp || pix.alpha)
+    {
+      r += pix.red;
+      g += pix.green;
+      b += pix.blue;
+      if (pix.alpha < 255)
+	has_alpha = true;
+      pixels++;
+    }
+    else
+    {
       has_alpha = true;
+    }
   }
-  mean_color.red   = r / pixels;
-  mean_color.green = g / pixels;
-  mean_color.blue  = b / pixels;
+  if (pixels)
+  {
+    mean_color.red   = r / pixels;
+    mean_color.green = g / pixels;
+    mean_color.blue  = b / pixels;
+  }
+  else
+    mean_color.red = mean_color.green = mean_color.blue = 0;
 }
 
 bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h)
@@ -666,6 +596,108 @@ void csTextureHandleOpenGL::UpdateTexture ()
 {
   if (G3D->texture_cache)
     G3D->texture_cache->Uncache (this);
+}
+
+void csTextureHandleOpenGL::PrepareKeycolor ()
+{
+  if (!transp) return;
+
+  int pixels = image->GetWidth () * image->GetHeight ();
+  csRGBpixel *_src = (csRGBpixel *)image->GetImageData ();
+
+  while (pixels--)
+  {
+    // By default, every csRGBpixel initializes its alpha component to
+    // 255. Thus, we should just drop to zero alpha for transparent
+    // pixels, if any.
+    if (transp_color.eq (*_src)) _src->alpha = 0;
+    _src++;
+  }
+
+  // Now we draw borders inside all keycolored areas.
+  // This removes the halos of keycolor when using bilinear filtering
+  int h, rows, w, cols;
+  h = rows = image->GetHeight ();
+  w = image->GetWidth();
+  
+  _src = (csRGBpixel *)image->GetImageData ();
+  ComputeMeanColor (w, h, _src);
+
+  while (rows--)
+  {
+    cols = w;
+    while (cols--)
+    {
+      if (!_src[(rows*w)+cols].alpha)
+      {
+	int n=0, r=0, g=0, b=0, xl, xr, yt, yb;
+	if (!cols)
+	{
+	  xl = w-1;
+	  xr = 1;
+	}
+	else if (cols==w-1)
+	{
+	  xl = cols-1;
+	  xr = 0;
+	}
+	else
+	{
+	  xl = cols-1;
+	  xr = cols+1;
+	}
+
+	if (!rows)
+	{
+	  yt = h-1;
+	  yb = 1;
+	}
+	else if (rows==h-1)
+	{
+	  yt = rows-1;
+	  yb = 0;
+	}
+	else
+	{
+	  yt = rows-1;
+	  yb = rows+1;
+	}
+
+#define CHECK_PIXEL(d) \
+	{ \
+	  if (_src[(d)].alpha) \
+	  { \
+	    n++; \
+	    r += _src[(d)].red; \
+	    g += _src[(d)].green; \
+	    b += _src[(d)].blue; \
+	  } \
+	}
+
+	CHECK_PIXEL((yt*w)+xl);
+	CHECK_PIXEL((yt*w)+cols);
+	CHECK_PIXEL((yt*w)+xr);
+	CHECK_PIXEL((rows*w)+xl);
+	CHECK_PIXEL((rows*w)+xr);
+	CHECK_PIXEL((yb*w)+xl);
+	CHECK_PIXEL((yb*w)+cols);
+	CHECK_PIXEL((yb*w)+xr);
+#undef CHECK_PIXEL
+	if (n)
+	{
+	  _src[(rows*w)+cols].red = r / n;
+	  _src[(rows*w)+cols].green = g / n;
+	  _src[(rows*w)+cols].blue = b / n;
+	}
+	else
+	{
+	  _src[(rows*w)+cols].red = mean_color.red;
+	  _src[(rows*w)+cols].green = mean_color.green;
+	  _src[(rows*w)+cols].blue = mean_color.blue;
+	}
+      }
+    }
+  }
 }
 
 //---------------------------------------------------------------------------

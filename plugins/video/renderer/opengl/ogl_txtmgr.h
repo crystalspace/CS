@@ -71,6 +71,7 @@ protected:
   bool FindFormatType ();
   bool transform (iImage *Image, csTextureOpenGL *tex);
   void ShowFormat ();
+  void PrepareKeycolor ();
 
   class texVector : public csVector
   {
