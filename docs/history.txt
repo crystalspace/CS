@@ -8,6 +8,8 @@ chronological order.
 
 10-Jun-2004
 	- res fixed the OR renderers for the recent DrawSimpleMesh() changes.
+	- res fixed the Fixed FP plugin to reset the multitexturing setup on
+	  deactivation.
 9-Jun-2004
 	- Jorrit fixed a bug in the engine where it would ignore (and not
 	  cache) lighting generated for hierarchical objects. This would
