@@ -145,7 +145,7 @@ bool Loader::ReadHeader ()
 
   readpos = source;
 
-  delete[] header;
+  delete header;
   header = new Header;
   header->magic = GetUInt32();
   header->size = GetUInt32();
@@ -198,8 +198,10 @@ bool Loader::ReadHeader ()
   }
 
   // Calculate Positions of the image Data
+  int nmips = GetMipmapCount();
+  if (nmips == 0) nmips = 1;
   delete[] positions;
-  positions = new uint8* [GetMipmapCount()];
+  positions = new uint8* [nmips];
   positions[0] = readpos;
   uint32 add;
   if (header->flags & FLAG_LINEARSIZE)
@@ -215,9 +217,9 @@ bool Loader::ReadHeader ()
     else
       add = header->width * header->height;
   }
-  for (i=1;i<GetMipmapCount();i++)
+  for (i = 1; i < nmips; i++)
   {
-    positions[i] = positions[i-1]+add;
+    positions[i] = positions[i - 1] + add;
     if (format == FORMAT_RGBA || format == FORMAT_RGB)
       add /= 4;
     else if (format == FORMAT_DXT1)
@@ -225,10 +227,10 @@ bool Loader::ReadHeader ()
     else
       add = MAX(add/4, 16);
   }
-  if ((size_t)(positions[GetMipmapCount() - 1] - positions[0] + add) > sourcelen)
+  if ((size_t)(positions[nmips - 1] - positions[0] + add) > sourcelen)
   {
-    printf ("DDS Image too small Needs:%u Has: %lu.\n",
-	(unsigned int)(positions[GetMipmapCount()] - positions[0] + add),
+    printf ("DDS Image too small: needs %u bytes; contains only %lu.\n",
+	(unsigned int)(positions[nmips] - positions[0] + add),
 	(unsigned long)sourcelen);
     return false;
   }
@@ -278,12 +280,12 @@ void Loader::CheckFormat ()
   {
     if (header->pixelformat.flags & FLAG_ALPHAPIXEL)
     {
-      //blocksize = GetWidth() * GetHeight() * header->pixelformat.bitdepth * 4;
+      //blocksize = GetWidth()*GetHeight() * header->pixelformat.bitdepth * 4;
       format = FORMAT_RGBA;
     }
     else
     {
-      //blocksize = GetWidth() * GetHeight() * header->pixelformat.bitdepth * 3;
+      //blocksize = GetWidth()*GetHeight() * header->pixelformat.bitdepth * 3;
       format = FORMAT_RGB;
       //bpp = 3;
     }
@@ -294,8 +296,8 @@ void Loader::CheckFormat ()
   depth = header->depth ? header->depth : 1;
 }
 
-bool Loader::Decompress (csRGBpixel* buffer, uint8* source, int width, int height,
-			 uint32 planesize)
+bool Loader::Decompress (csRGBpixel* buffer, uint8* source,
+			 int width, int height, uint32 planesize)
 {
   switch (format)
   {
@@ -367,7 +369,6 @@ void Loader::DecompressRGBA (csRGBpixel* buffer, uint8* source, int, int,
       buffer++;
     }
   }
-  //memcpy (buffer, source, (size_t) size);
 }
 
 void Loader::DecompressDXT1 (csRGBpixel* buffer, uint8* source, 
@@ -386,7 +387,6 @@ void Loader::DecompressDXT1 (csRGBpixel* buffer, uint8* source,
     {
       for (x = 0; x < Width; x += 4) 
       {
-
 	color_0 = little_endian_short (*((uint16*)Temp)); 
 	color_1 = little_endian_short (*((uint16*)Temp+1));
 	bitmask = little_endian_long (((uint32*)Temp)[1]);
@@ -401,7 +401,6 @@ void Loader::DecompressDXT1 (csRGBpixel* buffer, uint8* source,
 	colours[1].g = COLOR565_GREEN(color_1);
 	colours[1].b = COLOR565_BLUE(color_1);
 	colours[1].a = 0xFF;
-
 
 	if (color_0 > color_1) 
 	{
@@ -454,15 +453,13 @@ void Loader::DecompressDXT1 (csRGBpixel* buffer, uint8* source,
       }
     }
   }
-
-  return;
 }
 
 void Loader::DecompressDXT2(csRGBpixel* buffer, uint8* source, int width,
 			    int height, uint32 planesize)
 {
   // Can do color & alpha same as dxt3, but color is pre-multiplied
-  //   so the result will be wrong unless corrected.
+  // so the result will be wrong unless corrected.
   DecompressDXT3(buffer, source, width, height, planesize);
   CorrectPremult (buffer, planesize);
 }
@@ -511,22 +508,16 @@ void Loader::DecompressDXT3(csRGBpixel* buffer, uint8* source,
 
 	// Four-color block: derive the other two colors.
 	// 00 = color_0, 01 = color_1, 10 = color_2, 11	= color_3
-	  // These 2-bit codes correspond to the 2-bit fields
-	  // stored in the 64-bit block.
-	  colours[2].b = (2 * colours[0].b + colours[1].b
-	      + 1) / 3;
-	colours[2].g = (2 * colours[0].g + colours[1].g
-	    + 1) / 3;
-	colours[2].r = (2 * colours[0].r + colours[1].r
-	    + 1) / 3;
+	// These 2-bit codes correspond to the 2-bit fields
+	// stored in the 64-bit block.
+	colours[2].b = (2 * colours[0].b + colours[1].b + 1) / 3;
+	colours[2].g = (2 * colours[0].g + colours[1].g + 1) / 3;
+	colours[2].r = (2 * colours[0].r + colours[1].r + 1) / 3;
 	colours[2].a = 0xFF;
 
-	colours[3].b = (colours[0].b + 2 * colours[1].b
-	    + 1) / 3;
-	colours[3].g = (colours[0].g + 2 * colours[1].g
-	    + 1) / 3;
-	colours[3].r = (colours[0].r + 2 * colours[1].r
-	    + 1) / 3;
+	colours[3].b = (colours[0].b + 2 * colours[1].b + 1) / 3;
+	colours[3].g = (colours[0].g + 2 * colours[1].g + 1) / 3;
+	colours[3].r = (colours[0].r + 2 * colours[1].r + 1) / 3;
 	colours[3].a = 0xFF;
 
 	k = 0;
@@ -559,19 +550,16 @@ void Loader::DecompressDXT3(csRGBpixel* buffer, uint8* source,
 	    word >>= 4;
 	  }
 	}
-
       }
     }
   }
-
-  return;
 }
 
 void Loader::DecompressDXT4 (csRGBpixel* buffer, uint8* source, 
 			     int width, int height, uint32 planesize)
 {
   // Can do color & alpha same as dxt5, but color is pre-multiplied
-  //   so the result will be wrong unless corrected.
+  // so the result will be wrong unless corrected.
   DecompressDXT5 (buffer, source, width, height, planesize);
   CorrectPremult (buffer, planesize);
 }
@@ -617,19 +605,16 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, uint8* source,
 
 	// Four-color block: derive the other two colors.
 	// 00 = color_0, 01 = color_1, 10 = color_2, 11	= color_3
-	  // These 2-bit codes correspond to the 2-bit fields
-	  // stored in the 64-bit block.
+	// These 2-bit codes correspond to the 2-bit fields
+	// stored in the 64-bit block.
 	colours[2].b = (2 * colours[0].b + colours[1].b + 1) / 3;
 	colours[2].g = (2 * colours[0].g + colours[1].g + 1) / 3;
 	colours[2].r = (2 * colours[0].r + colours[1].r + 1) / 3;
 	colours[2].a = 0xFF;
 
-	colours[3].b = (colours[0].b + 2 * colours[1].b
-	    + 1) / 3;
-	colours[3].g = (colours[0].g + 2 * colours[1].g
-	    + 1) / 3;
-	colours[3].r = (colours[0].r + 2 * colours[1].r
-	    + 1) / 3;
+	colours[3].b = (colours[0].b + 2 * colours[1].b + 1) / 3;
+	colours[3].g = (colours[0].g + 2 * colours[1].g + 1) / 3;
+	colours[3].r = (colours[0].r + 2 * colours[1].r + 1) / 3;
 	colours[3].a = 0xFF;
 
 	k = 0;
@@ -637,7 +622,6 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, uint8* source,
 	{
 	  for (i = 0; i < 4; i++, k++) 
 	  {
-
 	    Select = (bitmask & (0x03 << k*2)) >> k*2;
 	    const Color8888& col = colours[Select];
 
@@ -655,21 +639,21 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, uint8* source,
 	{
 	  // 8-alpha block:  derive the other six alphas.
 	  // Bit code 000 = alpha_0, 001 = alpha_1, others are interpolated.
-	  alphas[2] = (6 * alphas[0] + 1 * alphas[1] + 3) / 7;    // bit code 010
-	  alphas[3] = (5 * alphas[0] + 2 * alphas[1] + 3) / 7;    // bit code 011
-	  alphas[4] = (4 * alphas[0] + 3 * alphas[1] + 3) / 7;    // bit code 100
-	  alphas[5] = (3 * alphas[0] + 4 * alphas[1] + 3) / 7;    // bit code 101
-	  alphas[6] = (2 * alphas[0] + 5 * alphas[1] + 3) / 7;    // bit code 110
-	  alphas[7] = (1 * alphas[0] + 6 * alphas[1] + 3) / 7;    // bit code 111
+	  alphas[2] = (6 * alphas[0] + 1 * alphas[1] + 3) / 7; // bit code 010
+	  alphas[3] = (5 * alphas[0] + 2 * alphas[1] + 3) / 7; // bit code 011
+	  alphas[4] = (4 * alphas[0] + 3 * alphas[1] + 3) / 7; // bit code 100
+	  alphas[5] = (3 * alphas[0] + 4 * alphas[1] + 3) / 7; // bit code 101
+	  alphas[6] = (2 * alphas[0] + 5 * alphas[1] + 3) / 7; // bit code 110
+	  alphas[7] = (1 * alphas[0] + 6 * alphas[1] + 3) / 7; // bit code 111
 	}
 	else 
 	{
 	  // 6-alpha block.
 	  // Bit code 000 = alpha_0, 001 = alpha_1, others are interpolated.
-	  alphas[2] = (4 * alphas[0] + 1 * alphas[1] + 2) / 5;    // Bit code 010
-	  alphas[3] = (3 * alphas[0] + 2 * alphas[1] + 2) / 5;    // Bit code 011
-	  alphas[4] = (2 * alphas[0] + 3 * alphas[1] + 2) / 5;    // Bit code 100
-	  alphas[5] = (1 * alphas[0] + 4 * alphas[1] + 2) / 5;    // Bit code 101
+	  alphas[2] = (4 * alphas[0] + 1 * alphas[1] + 2) / 5; // Bit code 010
+	  alphas[3] = (3 * alphas[0] + 2 * alphas[1] + 2) / 5; // Bit code 011
+	  alphas[4] = (2 * alphas[0] + 3 * alphas[1] + 2) / 5; // Bit code 100
+	  alphas[5] = (1 * alphas[0] + 4 * alphas[1] + 2) / 5; // Bit code 101
 	  alphas[6] = 0x00;
 	  // Bit code 110
 	  alphas[7] = 0xFF;
@@ -677,7 +661,7 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, uint8* source,
 	}
 
 	// Note: Have to separate the next two loops,
-	//      it operates on a 6-byte system.
+	// it operates on a 6-byte system.
 
 	// First three bytes
 	bits = little_endian_long (*((int32*)alphamask));

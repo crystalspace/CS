@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Oct-2004
+	- Eric Sunshine made the following changes to the DDS image loader:
+	    - Fixed bug in dds::Loader::ReadHeader() where it could/would
+	      attempt to allocate zero bytes, and then unconditionally store a
+	      value in the first element of the allocated array, as if the
+	      zero-sized allocation was valid.
+	    - Fixed bug in dds::Loader::ReadHeader() where it could/would
+	      illegally access element -1 of its positions[] member.
+	    - Fixed `delete' vs. `delete[]' mixup in dds::Loader::ReadHeader().
+	    - Fixed bug in csDDSImageFile::Load() where it was leaking a
+	      csDDSImageFile for each mipmap.
 20-Oct-2004
 	- Jorrit fixed a critical bug in VFS. In case you tried to
 	  call VFS->Sync() while there were still references to open files

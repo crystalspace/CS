@@ -125,7 +125,8 @@ bool csDDSImageFile::Load (dds::Loader* loader)
     csRGBpixel* img = loader->LoadMipmap(i);
     if (!img)
       return false;
-    csDDSImageFile* image = new csDDSImageFile (object_reg, Format);
+    csRef<csDDSImageFile> image;
+    image.AttachNew(new csDDSImageFile (object_reg, Format));
     int newW = loader->GetWidth() >> (i+1);
     newW = MAX(newW, 1);
     int newH = loader->GetHeight() >> (i+1);
@@ -140,9 +141,8 @@ bool csDDSImageFile::Load (dds::Loader* loader)
 
 csPtr<iImage> csDDSImageFile::MipMap (int step, csRGBpixel* transp)
 {
-  if (step==0 || step>mipmapcount || transp)
+  if (step == 0 || step > mipmapcount || transp)
     return csImageFile::MipMap (step, transp);
-
   return csPtr<iImage> (mipmaps[step-1]);
 }
 
