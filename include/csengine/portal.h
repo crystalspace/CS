@@ -117,6 +117,8 @@ public:
   virtual bool PointOnPolygon (const csVector3& point,
   	iMovable* movable = 0);
 
+  void CastShadows (iMovable* movable, iFrustumView* fview);
+
   bool IntersectRay (const csVector3 &start, const csVector3 &end) const;
   bool IntersectSegmentPlane (const csVector3 &start, const csVector3 &end,
     csVector3 &isect, float *pr) const;

@@ -26,6 +26,7 @@
 #include "csgeom/pmtools.h"
 #include "csengine/portal.h"
 #include "cstool/meshobjtmpl.h"
+#include "iengine/shadcast.h"
 
 /**
  * A helper class for iPolygonMesh implementations used by csPortalContainer.
@@ -113,7 +114,8 @@ private:
 /**
  * This is a container class for portals.
  */
-class csPortalContainer : public csMeshObject, public iPortalContainer
+class csPortalContainer : public csMeshObject, public iPortalContainer,
+	public iShadowReceiver
 {
 private:
   csRefArray<csPortal> portals;
@@ -180,6 +182,9 @@ public:
   csPortalContainerPolyMeshHelper scfiPolygonMeshCD;
   //------------------- LOD iPolygonMesh implementation ---------------
   csPortalContainerPolyMeshHelper scfiPolygonMeshLOD;
+
+  //-------------------For iShadowReceiver ----------------------------//
+  virtual void CastShadows (iMovable* movable, iFrustumView* fview);
 
   //-------------------For iPortalContainer ----------------------------//
   virtual iPortal* CreatePortal (csVector3* vertices, int num);

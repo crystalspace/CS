@@ -28,6 +28,8 @@ chronological order.
 	  hit but that polygon was not a portal then the intersection point
 	  was not correctly set. This bug could cause the explosion in walktest
 	  to not appear from time to time.
+	- Jorrit changed portal container so that it implements iShadowReceiver.
+	  This fixes lighting for the new portals.
 30-Sep-2003
 	- Jorrit fixed a bug in thing polygon mesh helper where it would not
 	  clean up old data if the thing changes and at the same time the

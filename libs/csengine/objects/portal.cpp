@@ -30,6 +30,11 @@
 #include "iengine/light.h"
 #include "iengine/movable.h"
 
+typedef csDirtyAccessArray<csVector3> portal_VectorArray;
+CS_IMPLEMENT_STATIC_VAR (GetStaticVectorArray, portal_VectorArray,())
+
+static portal_VectorArray *VectorArray = 0;
+
 SCF_IMPLEMENT_IBASE(csPortal)
   SCF_IMPLEMENTS_INTERFACE(iPortal)
 SCF_IMPLEMENT_IBASE_END
@@ -42,6 +47,8 @@ csPortal::csPortal (csPortalContainer* parent)
   filter_b = 1;
   max_sector_visit = 5;
   csPortal::parent = parent;
+
+  VectorArray = GetStaticVectorArray ();
 }
 
 csPortal::~csPortal ()
@@ -231,6 +238,56 @@ bool csPortal::PointOnPolygon (const csVector3& v,
   }
 
   return true;
+}
+
+void csPortal::CastShadows (iMovable* movable, iFrustumView* fview)
+{
+  // @@@ Warping portals currently don't support lights that go through.
+  if (flags.Check (CS_PORTAL_WARP)) return;
+
+  csFrustumContext *old_ctxt = fview->GetFrustumContext ();
+  csFrustum *light_frustum = old_ctxt->GetLightFrustum ();
+  const csVector3 &center = light_frustum->GetOrigin ();
+
+  // If plane is not visible then return (backface culling).
+  if (!csMath3::Visible (center, world_plane))
+    return;
+  // Compute the distance from the center of the light
+  // to the plane of the polygon.
+  float dist_to_plane = world_plane.Distance (center);
+  // If distance is too small or greater than the radius of the light
+  // then we have a trivial case (no hit).
+  if ((dist_to_plane < SMALL_EPSILON)
+    || dist_to_plane >= fview->GetRadius ())
+    return ;
+
+  fview->CreateFrustumContext ();
+  csFrustumContext *new_ctxt = fview->GetFrustumContext ();
+
+  int num_vertices = vertex_indices.Length ();
+  if (num_vertices > VectorArray->Length ())
+    VectorArray->SetLength (num_vertices);
+
+  csVector3 *poly = VectorArray->GetArray ();
+
+  csDirtyAccessArray<csVector3>* vt = parent->GetWorldVertices ();
+  int j;
+  if (old_ctxt->IsMirrored ())
+    for (j = 0; j < num_vertices; j++)
+      poly[j] = (*vt)[vertex_indices[num_vertices - j - 1]] - center;
+  else
+    for (j = 0; j < num_vertices; j++)
+      poly[j] = (*vt)[vertex_indices[j]] - center;
+
+  // @@@ Check if this isn't a memory leak.
+  new_ctxt->SetNewLightFrustum (light_frustum->Intersect (
+      poly, num_vertices));
+  if (new_ctxt->GetLightFrustum ())
+  {
+    CheckFrustum (fview, movable->GetTransform (), 0);
+  }
+
+  fview->RestoreFrustumContext (old_ctxt);
 }
 
 bool csPortal::IntersectRay (const csVector3 &start,

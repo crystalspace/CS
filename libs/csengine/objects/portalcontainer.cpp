@@ -95,6 +95,7 @@ void csPortalContainerPolyMeshHelper::Cleanup ()
 
 SCF_IMPLEMENT_IBASE_EXT(csPortalContainer)
   SCF_IMPLEMENTS_INTERFACE (iPortalContainer)
+  SCF_IMPLEMENTS_INTERFACE (iShadowReceiver)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 csPortalContainer::csPortalContainer (iEngine* engine) :
@@ -800,6 +801,23 @@ void csPortalContainer::DrawOnePortal (
     g3d->ClosePortal ();
 }
 
+//------------------- For iShadowReceiver ----------------------------//
+
+void csPortalContainer::CastShadows (iMovable* movable, iFrustumView* fview)
+{
+  Prepare ();
+
+  const csReversibleTransform& movtrans = movable->GetFullTransform ();
+  ObjectToWorld (movable, movtrans);
+
+  int i;
+  for (i = 0 ; i < portals.Length () ; i++)
+  {
+    csPortal *p = portals[i];
+    p->CastShadows (movable, fview);
+  }
+}
+
 //--------------------- For iMeshObject ------------------------------//
 
 bool csPortalContainer::DrawTest (iRenderView* rview, iMovable* movable)
@@ -861,6 +879,7 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
   const csReversibleTransform& movtrans = movable->GetFullTransform ();
 
   int i;
+  //@@@@@@@@@@@@@@@@@ OPTIMIZE for the case when clipping is not needed.
   if (true)
   {
     for (i = 0 ; i < portals.Length () ; i++)
