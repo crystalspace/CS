@@ -4277,7 +4277,12 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   }
 
   iPortal* portal;
-  destSector = ldr_context->FindSector (destSectorName.GetData ());
+  // If autoresolve is true we clear the sector since we want the callback
+  // to be used.
+  if (autoresolve)
+    destSector = 0;
+  else
+    destSector = ldr_context->FindSector (destSectorName.GetData ());
   csRef<iMeshWrapper> mesh;
   if (container_mesh)
   {

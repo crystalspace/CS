@@ -10,6 +10,11 @@ chronological order.
 	- Jorrit finished the implementation of csBSPTree.
 	- Jorrit implemented back2front for genmesh. This new feature works
 	  only in NR mode. OR will ignore this.
+	- Jorrit fixed the autoresolve keyword so that it avoids searching
+	  the sector when the keyword is given. i.e. previously if you used
+	  autoresolve but the destination sector was already present then
+	  the autoresolve keyword would not do anything because the callback
+	  would not be created.
 5-Apr-2004
 	- Peter Amstutz added the iVosApi interface to the csvosa3dl plugin.
 	  This interface allows the application to access the underlying

@@ -751,7 +751,13 @@ bool csThingLoader::ParsePoly3d (
 	      flags, do_mirror, do_warp, msv,
 	      m_w, v_w_before, v_w_after, &destSectorName, autoresolve))
     {
-      iSector* destSector = ldr_context->FindSector (destSectorName.GetData ());
+      iSector* destSector;
+      // If autoresolve is true we clear the sector since we want the callback
+      // to be used.
+      if (autoresolve)
+        destSector = 0;
+      else
+        destSector = ldr_context->FindSector (destSectorName.GetData ());
       int cnt = thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST);
       csVector3* portal_verts = new csVector3[cnt];
       int i;
