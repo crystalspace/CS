@@ -43,6 +43,8 @@ chronological order.
 	- Jorrit also changed the array parameter in iShader to const.
 	  To do that I had to move the adding of the dynamic domain to the
 	  caller.
+	- Jorrit reverted the optimization to avoid the construction of
+	  the dynDomain array. It was wrong.
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during
