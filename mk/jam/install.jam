@@ -18,11 +18,9 @@
 #
 #============================================================================
 
-COPYDIRS ?= "cp -R" ;
-
 INSTALL ?= "install" ;
 INSTALL_PROGRAM ?= $(INSTALL) ;
-INSTALL_DATA ?= "$(INSTALL) -m644" ;
+INSTALL_DATA ?= "$(INSTALL) -m 644" ;
 
 # set some paths
 appdatadir ?= [ ConcatDirs $(datadir) $(PACKAGE_NAME) ] ;
@@ -175,10 +173,10 @@ Help install : "Install $(PACKAGE_INSTALL_NAME)" ;
 
 actions Install1
 {
-  $(INSTALL_APP) $(INSTALLFLAGS) $(>) $(<) ;
+  $(INSTALL_APP) $(INSTALLFLAGS) $(>) $(<)
 }
 
 actions CopyDirs
 {
-  $(COPYDIRS) $(>) $(<)
+  $(DEEPCOPY) $(>) $(<)
 }
