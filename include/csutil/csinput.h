@@ -23,9 +23,7 @@
 
 /**
  * These are the low-level implementations of generic classes of input devices
- * like keyboard, mouse, and joystick.  System-dependent code should inherit
- * system-specific classes from those defined below, implementing as much
- * functionality as possible.
+ * like keyboard, mouse, and joystick.
  */
 
 #include "csutil/scf.h"
