@@ -111,6 +111,11 @@ private:
   bool ClearGen3D(EmitterList *elist);
   bool UpdateGen3D(EmitterList *elist,Emitter3DState *emitter_state);
 
+
+  void SaveEmitter3DStateRecursive(Emitter3DState *emitter_state,Emitters use_emitter);
+  void SaveEmitter3DStateToFile(Emitter3DState *emitter_state);
+  bool SaveEmitterToFile();
+
 public:
   PartEdit (iObjectRegistry* object_reg);
   ~PartEdit ();

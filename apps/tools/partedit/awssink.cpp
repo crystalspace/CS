@@ -147,6 +147,8 @@ awsSink::awsSink() : wmgr(0)
 
   InitialPositionData.iawscomponent_InitialPosition=0;
   InitialPositionData.settings_changed=false;
+
+
 }
 
 awsSink::~awsSink()
@@ -949,6 +951,10 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetFSTextBox",&AwsSetFSTextBox);
 
 
+    sink->RegisterTrigger("RegisterAgingMoments",&RegisterAgingMoments);
+    sink->RegisterTrigger("RegisterLoadSaveSelection",&RegisterLoadSave);
+
+
   }
   FreeScrollData.iawscomponent_AssociatedTextBox=NULL;
 }
@@ -1147,7 +1153,25 @@ void awsSink::SectionListSelectionChanged(void *sk, iAwsSource *source)
       else
         asink->FieldAccelerationData.iawscomponent_FieldAccel->Hide();
       break;
+    case SECTION_LOADSAVE:
+      if (asink->SectionState[i])
+      {
+        asink->LoadSaveData.iawscomponent_LoadSave->Show();
+        asink->LoadSaveData.iawscomponent_LoadSave->Raise();
+        asink->LoadSaveData.settings_changed=true;
+      }
+      else
+        asink->LoadSaveData.iawscomponent_LoadSave->Hide();
+      break;
     case SECTION_AGING_MOMENTS:
+      if (asink->SectionState[i])
+      {
+        asink->AgingMomentsData.iawscomponent_AgingMoments->Show();
+        asink->AgingMomentsData.iawscomponent_AgingMoments->Raise();
+      }
+      else
+        asink->AgingMomentsData.iawscomponent_AgingMoments->Hide();
+      break;
     default:
       printf("Unhandled section state change %d.\n",i);
       break;
@@ -3887,6 +3911,11 @@ void awsSink::AwsSetFSTextBox(void *sk, iAwsSource *source)
     asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Value",&value_as_float);
   }
 }
+
+
+IMPLEMENT_REGISTER_FUNCTION(RegisterLoadSave,LoadSaveData.iawscomponent_LoadSave)
+IMPLEMENT_REGISTER_FUNCTION(RegisterAgingMoments,AgingMomentsData.iawscomponent_AgingMoments)
+
 
 
 void awsSink::SetVFS(csRef<iVFS> newvfs)

@@ -72,6 +72,57 @@ window "SectionSelection"
   }	
 }
 
+window "LoadSaveNotAvailable"
+{
+  Frame: (350,0) - (700,75)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Load/Save Particle System State"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterLoadSaveSelection
+  }
+  
+  component "LoadSaveNALabel1" is "Label"
+  {
+	Frame: (0,0) - (338,12)
+	Caption: "The Load/Save Menu is not yet available."
+  }
+  component "LoadSaveNALabel2" is "Label"
+  {
+	Frame: (0,14) - (338,26)
+	Caption: "If you are running in debug mode, the save state of the"
+  }
+  component "LoadSaveNALabel3" is "Label"
+  {
+	Frame: (0,28) - (338,40)
+	Caption: "current system has been dumped to the console."
+  }
+}
+
+window "AgingNotAvailable"
+{
+  Frame: (350,0) - (650,45)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Aging Moments"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterAgingMoments
+  }
+  
+  component "AgingNALabel1" is "Label"
+  {
+	Frame: (0,0) - (288,12)
+	Caption: "The Aging Moments Menu is not yet available."
+  }
+}
+
+
+
+
 window "GraphicSelection"
 {
   Frame: (0,125) - (150,470)

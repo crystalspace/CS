@@ -54,6 +54,17 @@ typedef struct st_FieldState {
   bool active;
 } FieldState;
 
+typedef struct st_AgingMomentsState {
+
+  int moment_count;
+
+} AgingMomentsState;
+
+
+typedef struct st_LoadSaveFileState {
+  bool commandqueued;
+  bool loading;
+} LoadSaveFileState;
 
 enum Sections {
   SECTION_GRAPHIC = 0,
@@ -528,9 +539,13 @@ class awsSink
   } AttractorData;
 
   struct st_AgingMomentsData {
+    iAwsComponent *iawscomponent_AgingMoments;
   } AgingMomentsData;
 
   struct st_LoadSaveData {
+    iAwsComponent *iawscomponent_LoadSave;
+    LoadSaveFileState state;
+    bool settings_changed;
   } LoadSaveData;
 
   /*  The iAwsComponent interface to the left sidebar (Section Selection Menu)
@@ -1347,6 +1362,11 @@ private:
 
   static void FreeScrollSetComponent(bool floatval,void *value_pointer,iAwsComponent *associated,bool *invalidate_pointer);
 
+  /// Static callback to handle Load/Save option window registration during .def file parsing.
+  static void RegisterLoadSave(void *sk, iAwsSource *source);
+  /// Static callback to handle Aging Moments option window registration during .def file parsing.
+  static void RegisterAgingMoments(void *sk, iAwsSource *source);
+
 
 public:
   awsSink();
@@ -1411,6 +1431,13 @@ public:
   AttractorState *GetAttractorState();
   void SetAttractorState(AttractorState *source);
   void UpdateAttractorStateDisplay();
+
+
+  bool LoadSaveStateChanged() { return LoadSaveData.settings_changed; };
+  void ClearLoadSaveStateChanged() { LoadSaveData.settings_changed=false; };
+  LoadSaveFileState *GetLoadSaveState() { return &(LoadSaveData.state); } ;
+//  void SetLoadSaveState(LoadSaveFileState *source);
+//  void UpdateLoadSaveStateDisplay();
 
 
   void SetVFS(csRef<iVFS> newvfs);

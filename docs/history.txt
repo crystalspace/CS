@@ -11,6 +11,17 @@ chronological order.
 	  RecreateParticleSystem() member function of partedit.  This fixes 
 	  the crash when switching graphics since the last commit (oops!).
 	- Rhad fixed partedit to shut down cleanly when the window is closed.
+	- Rhad added functionality to partedit to dump xml readable (mostly)
+	  by emitloader.  This output is dumped to the console at the moment.
+	  Placeholder windows have been added to the Aging Moments and 
+	  Load/Save screens indicating they are not yet complete.
+	  - At this point I am going to work on revising the UI layout so
+	    that it hopefully ends up less complicated (in code at least)
+	    and more functional (from a user perspective).
+	  - The emitloader plugin does not appear to be able to handle mix
+	    emitters with more than one child emitter.  The whole point of
+	    mix emitters is to use multiple child emitters, so this makes
+	    mix emitters unusable with the loader.
 24-Oct-2003
 	- res re-enabled a couple of MSVC warnings and fixed some occurences
 	  of VC warnings in the source.
