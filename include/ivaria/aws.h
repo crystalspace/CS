@@ -156,7 +156,7 @@ public:
   virtual iFont *GetFont(char *filename)=0;
 
   /// Gets a texture from the global AWS cache
-  virtual iTextureHandle *GetTexture(char *name, char *filename)=0;
+  virtual iTextureHandle *GetTexture(char *name, char *filename=NULL)=0;
 
   /// Sets the texture manager that the preference manager uses
   virtual void SetTextureManager(iTextureManager *txtmgr)=0;
