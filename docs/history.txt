@@ -18,6 +18,7 @@ chronological order.
 	  number of sectors that are drawn in case bugplug is present
 	  and -verbose commandline option is given.
 	- Anders made brute block terrain plugin honour the movable transform
+	- res fixed some bogus ARB code in the terrain shaders.
 23-May-2004
 	- Eric Sunshine fixed ambiguous assignment from csRef<> to csWeakRef<>
 	  in csEngine::GetEngineSequenceManager().  Reported by David

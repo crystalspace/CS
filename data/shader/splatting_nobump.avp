@@ -75,15 +75,11 @@ DP4 oPos.w, mvp[3], iPos;
 # Pass tangent light to FP
 # MOV oLightDir, tangLight;
 
-RCP scale.x, texscale.x;
-RCP scale.y, texscale.y;
-ADD scale.z, scale.z, -scale.z;
-SGE scale.w, scale.x, scale.x;
 # Pass normal map and diffuse map scaled by parameter
-#MUL oNormal, scale, iTex0;
-MUL oTex, scale, iTex0;
+#MUL oNormal, texscale, iTex0;
+MUL oTex, texscale, iTex0;
 
-MUL oSplat, iTex0;
+MOV oSplat, iTex0;
 
 DP4 objEye.x, mvi[0], eyePos;
 DP4 objEye.y, mvi[1], eyePos;

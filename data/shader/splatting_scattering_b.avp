@@ -60,7 +60,7 @@
       # Pass normal map and diffuse map scaled by parameter
       MUL oTex, texscale, iTex0;
 
-      MUL oSplat, iTex0;
+      MOV oSplat, iTex0;
       
       ###
       # Find distance from eye to vertex (down the Y)
