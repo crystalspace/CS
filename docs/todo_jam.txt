@@ -75,7 +75,7 @@ W - Wishlist (the build also works without this feature)
 [*] Introduce a new rule named Description and change all invocations of the
     Help rule (except the ones using the "verbatim" option) to invocations of
     the Description rule throughout the project.  Next, remove the "verbatim"
-    option from the Help rule and make the Help rule to _always_ treat its
+    option from the Help rule and make the Help rule _always_ treat its
     argument as verbatim. Also eliminate the anomaly where Help is hard-coded
     to prepend "Build the" to the incoming text.  Then, augment the
     Application, Library, Plugin, and ShellScript rules to invoke Help
