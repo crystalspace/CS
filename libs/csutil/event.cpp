@@ -43,7 +43,7 @@ void csKeyEventHelper::GetModifiers (const iEvent* event,
   memset (&modifiers, 0, sizeof (modifiers));
 
   const void* mod;
-  uint32 modSize;
+  size_t modSize;
   if (event->Retrieve ("keyModifiers", mod, modSize) != csEventErrNone) 
     return;
   memcpy (&modifiers, mod, MIN (sizeof (modifiers), modSize));
