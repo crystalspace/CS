@@ -4,6 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 7-Apr-2003
+        - Boyan added key/value pair to iSoundWrapper.
 	- Reverted endian changes from res because they break compile
 	  with MSYS.
 	- Changed several modules in CS to use the virtual clock instead
@@ -408,7 +409,7 @@ The history order is reversed so that new features are at the top.
 	  especially when it is opening (move close to the door).
 	- Matze added support for 64 bit integers to Crystal Space. You can
 	  use the int64 and uint64 type now.
-	- Mårten Svanfeldt fixed:
+	- Marten Svanfeldt fixed:
 	    - Rendering in new renderer after Jorrits changes to thing
 	    - Made some performance-increases by caching and reducing state-
 	      changes in new opengl renderer.
