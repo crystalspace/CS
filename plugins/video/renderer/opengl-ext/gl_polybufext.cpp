@@ -37,6 +37,7 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
+#include "gl_polybufext.h"
 #include "csutil/util.h"
 #include "imesh/thing/polygon.h"
 #include "qint.h"
@@ -65,19 +66,20 @@ void csPolygonBufferEXT::AddMaterial (iMaterialHandle* mat_handle)
 {
 }
 
-int csPolygonBufferEXT::GetMaterialCount ()
+int csPolygonBufferEXT::GetMaterialCount () const
+{
+ return 0;
+}
+
+iMaterialHandle* csPolygonBufferEXT::GetMaterial (int idx) const
 {
 }
 
-iMaterialHandle* csPolygonBufferEXT::GetMaterial (int idx)
+int csPolygonBufferEXT::GetVertexCount() const
 {
 }
 
-int csPolygonBufferEXT::GetVertexCount()
-{
-}
-
-csVector3* csPolygonBufferEXT::GetVertices()
+csVector3* csPolygonBufferEXT::GetVertices() const
 {
 }
 

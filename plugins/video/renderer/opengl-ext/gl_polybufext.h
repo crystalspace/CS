@@ -33,6 +33,10 @@
  * Preprocessor Includes
  * ----------------------------------------------------------------- */
 
+#include "ivideo/vbufmgr.h"
+
+struct iGraphics3D;
+
 struct csPolygonBufferEXT : public iPolygonBuffer
 {
   csPolygonBufferEXT(iGraphics3D *g3d);
