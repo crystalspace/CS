@@ -26,9 +26,13 @@
  * \addtogroup geom_utils
  * @{ */
 
+// These are also defined in math2d.h
+#ifndef __CS_POLY_MACROS__
+#define __CS_POLY_MACROS__
 #define CS_POLY_IN 1
 #define CS_POLY_ON 0
 #define CS_POLY_OUT -1
+#endif
 
 #include "csgeom/vector2.h"
 #include "csgeom/segment.h"
