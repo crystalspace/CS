@@ -44,6 +44,7 @@ protected:
   void deleteRect(int);
   bool chopEdgeIntersection(csRect&, csRect&);
   void fragmentRect(csRect&, csRect&, bool testedContains, bool testedEdge);
+  void fragmentContainedRect(csRect &r1, csRect &r2);
 
 public:
   /// Constructor.

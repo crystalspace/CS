@@ -342,8 +342,12 @@ void csRectRegion::Include(csRect &rect)
   } // end for
 }
 
+#if 0
 void 
 csRectRegion::Exclude(csRect &rect)
 {
 
 }
+
+#endif
+
