@@ -32,14 +32,15 @@
 #include "igraph3d.h"
 #include "itxtmgr.h"
 
-IMPLEMENT_CSOBJTYPE (csTerrain,csObject);
+IMPLEMENT_CSOBJTYPE (csTerrain, csObject);
 
-csTerrain::csTerrain () : csObject()
+csTerrain::csTerrain () : csObject ()
 {
   heightMap = NULL;
   mesh = NULL;
   vbuf = NULL;
   _materialMap = NULL;
+  do_dirlight = false;
 }
 
 csTerrain::~csTerrain ()
@@ -50,13 +51,20 @@ csTerrain::~csTerrain ()
   delete _materialMap;
 }
 
-void csTerrain::SetDetail( unsigned int detail)
+void csTerrain::SetDetail (unsigned int detail)
 {
-  mesh->minDetail(detail);
-  mesh->maxDetail((unsigned int)(detail*1.1));
-  mesh->absMaxDetail((unsigned int)(detail * 1.25));
-  mesh->nearClip(.1);
-  mesh->farClip(1000.0);
+  mesh->minDetail (detail);
+  mesh->maxDetail ((unsigned int)(detail*1.1));
+  mesh->absMaxDetail ((unsigned int)(detail * 1.25));
+  mesh->nearClip (.1);
+  mesh->farClip (1000.0);
+}
+
+void csTerrain::SetDirLight (const csVector3& dirl, const csColor& dirc)
+{
+  dirlight = dirl;
+  dircolor = dirc;
+  do_dirlight = true;
 }
 
 int csTerrain::GetNumMaterials ()
@@ -77,14 +85,14 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
   context->clipbox ()->min.set (0, 0, 0.1);
   int fw = csWorld::current_world->G3D->GetWidth ();
   int fh = csWorld::current_world->G3D->GetHeight ();
-  context->clipbox()->max.set (fw, fh, 1000);
+  context->clipbox ()->max.set (fw, fh, 1000);
 
   vbuf = new ddgVArray ();
 
   mesh->init (context);
 
-  vbuf->size((mesh->absMaxDetail()*4*12)/10);
-  vbuf->renderMode(true,false,false);
+  vbuf->size ((mesh->absMaxDetail ()*4*12)/10);
+  vbuf->renderMode (true, false, false);
   vbuf->init ();
   vbuf->reset ();
 
@@ -92,7 +100,7 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
   // ranging from 0 to rows and 0 to cols.
   // CS wants them to range from 0 to 1.
   _pos = csVector3 (0,0,0);
-  _size = csVector3 (heightMap->cols(),
+  _size = csVector3 (heightMap->cols (),
       mesh->wheight (mesh->absMaxHeight ()), heightMap->rows ());
 
   // This is  code that allocates the texture array for the terrain.
@@ -120,7 +128,7 @@ static int lut[24] = {0,1,2,3,4,5,6,7,8,9,10,11,0,1,2,3,4,5,6,7,8,9,10,11};
  */
 bool csTerrain::drawTriangle (ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf)
 {
-  if ( !bt->visible(tvc))
+  if (!bt->visible (tvc))
     return ddgFailure;
 
   static ddgVector3 p[3];
@@ -128,9 +136,9 @@ bool csTerrain::drawTriangle (ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf)
   ddgVBIndex bufindex[3] = {0,0,0};
 
   ddgTriIndex tv[3];
-  tv[0] = bt->parent(tvc),
-  tv[2] = mesh->v0(tvc),
-  tv[1] = mesh->v1(tvc);
+  tv[0] = bt->parent (tvc),
+  tv[2] = mesh->v0 (tvc),
+  tv[1] = mesh->v1 (tvc);
 
   int i, j;
   for (i = 0; i < 3; i++)
@@ -141,7 +149,7 @@ bool csTerrain::drawTriangle (ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf)
     // See if the current entry is in the MRUCache.
     while (j > (int)end)
     {
-      ddgAssert(j>=0 && j < _MRUsize*2);
+      ddgAssert (j>=0 && j < _MRUsize*2);
       if (_MRUvertex[lut[j]] == tv[i])
       {
         bufindex[i] = _MRUindex[lut[j]];
@@ -152,10 +160,10 @@ bool csTerrain::drawTriangle (ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf)
     if (ddgInvalidBufferIndex == bufindex[i])
     {
       // We could just call.
-      bt->vertex(tv[i],&p[i]);
-      bt->textureC(tv[i],&(t[i]));
+      bt->vertex (tv[i],&p[i]);
+      bt->textureC (tv[i],&(t[i]));
       // Push the vertex.
-      bufindex[i] = vbuf->pushVT(&p[i],&t[i]);
+      bufindex[i] = vbuf->pushVT (&p[i],&t[i]);
       if (_MRUinuse < _MRUsize) _MRUinuse++;
 
       if (_MRUcursor==_MRUsize-1)
@@ -170,19 +178,20 @@ bool csTerrain::drawTriangle (ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf)
   }
 
   // Record that these vertices are in the buffer.
-  vbuf->pushTriangle(bufindex[0],bufindex[1],bufindex[2]);
+  vbuf->pushTriangle (bufindex[0], bufindex[1], bufindex[2]);
 
   return ddgSuccess;
 }
 
 static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
+static DECLARE_GROWING_ARRAY (color_verts, csColor);
 
 void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 {
   bool modified = true;
-  // Get matrices in OpenGL form
 
   unsigned int i = 0, s = 0, d = 0, n = 0, nd = 0;
+  unsigned int j;
   ddgTBinTree *bt;
 
   // Currently the CS version of the terrain engine uses a clipping
@@ -235,6 +244,7 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   {
     vbuf->reset ();
     // Update the vertex buffers.
+    i = 0;
     while (i < mesh->getBinTreeNo ())
     {
       if ((bt = mesh->getBinTree (i)))
@@ -254,13 +264,13 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 	  n = vbuf->num();
 	  do 
 	  {
- 	    if (drawTriangle(bt, tindex, vbuf) == ddgSuccess)
+ 	    if (drawTriangle (bt, tindex, vbuf) == ddgSuccess)
 	      v++;
 	    tindex = bt->nextInMesh (tindex, &end);
 	  }
 	  while (end);
 
-	  n = vbuf->num() - n;
+	  n = vbuf->num () - n;
 	}
 	bt->visTriangle (v);
 	bt->uniqueVertex (n);
@@ -302,7 +312,7 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   static bool init = false;
   if (!init)
   {
-    g3dmesh.vertex_colors[0] = NULL;			 // pointer to array of csColor for color information.
+    g3dmesh.vertex_colors[0] = NULL;
     g3dmesh.morph_factor = 0;
     g3dmesh.num_vertices_pool = 1;
     g3dmesh.num_materials = 1;
@@ -320,26 +330,45 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   s = 0;
   n = 0;
   nd = 0;
-  while (i < mesh->getBinTreeNo())
+  while (i < mesh->getBinTreeNo ())
   {
-    d = mesh->getBinTree(i)->visTriangle() + mesh->getBinTree(i+1)->visTriangle();
+    d = mesh->getBinTree (i)->visTriangle () + mesh->getBinTree (i+1)->visTriangle ();
     if (d > 0)
     {
-      nd = mesh->getBinTree(i)->uniqueVertex() + mesh->getBinTree(i+1)->uniqueVertex();
+      nd = mesh->getBinTree (i)->uniqueVertex () + mesh->getBinTree (i+1)->uniqueVertex ();
       if (_materialMap && _materialMap[i/2])
-	    g3dmesh.mat_handle[0] = _materialMap[i/2]->GetMaterialHandle ();
+	g3dmesh.mat_handle[0] = _materialMap[i/2]->GetMaterialHandle ();
       // Render this block.
       // For software renderer we need to pass in a little bit at a time.
-      g3dmesh.num_vertices = nd;	  // number of shared vertices for all triangles
-      g3dmesh.vertices[0] = (csVector3*) &(vbuf->vbuf[n]); // pointer to array of csVector3 for all those verts
-      g3dmesh.texels[0][0] = (csVector2*) &(vbuf->tbuf[n]);	 // pointer to array of csVector2 for uv coordinates
-      g3dmesh.num_triangles = d; // number of triangles
-      g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);	// pointer to array of csTriangle for all triangles
-      // Enable clipping for blocks that are not entirely within the view frustrum.
+      g3dmesh.num_vertices = nd;  // Number of shared vertices for all triangles
+      g3dmesh.vertices[0] = (csVector3*) &(vbuf->vbuf[n]);  // Vertex array
+      g3dmesh.texels[0][0] = (csVector2*) &(vbuf->tbuf[n]); // Uv coordinates
+      g3dmesh.num_triangles = d; // Number of triangles
+      g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);
+      // Enable clipping for blocks that are not entirely within the
+      // view frustrum.
       g3dmesh.do_clip =
-		mesh->getBinTree(i)->treeVis() != ddgIN ||
-	        mesh->getBinTree(i+1)->treeVis() != ddgIN;
-      if (nd > (unsigned int)fog_verts.Limit ()) fog_verts.SetLimit (nd);
+		mesh->getBinTree (i)->treeVis () != ddgIN ||
+	        mesh->getBinTree (i+1)->treeVis () != ddgIN;
+
+      // @@@ This is not the good way to do this as it is slow.
+      // The lighting information must be recalculated only when needed.
+      // Here we calculate it again every time.
+      //if (do_dirlight)
+      //{
+        //if (nd > (unsigned int)color_verts.Limit ())
+          //color_verts.SetLimit (nd);
+        //g3dmesh.vertex_colors[0] = color_verts.GetArray ();
+        //g3dmesh.fxmode = CS_FX_GOURAUD;
+      //}
+      //else
+      //{
+        //g3dmesh.vertex_colors[0] = NULL;
+        //g3dmesh.fxmode = 0;
+      //}
+
+      if (nd > (unsigned int)fog_verts.Limit ())
+        fog_verts.SetLimit (nd);
       g3dmesh.vertex_fog = fog_verts.GetArray ();
 
       extern void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
@@ -350,7 +379,8 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
         rview.callback (&rview, CALLBACK_MESH, (void*)&g3dmesh);
       else
         rview.g3d->DrawTriangleMesh (g3dmesh);
-      // Increment the starting offset by the number of triangles that were in this block.
+      // Increment the starting offset by the number of triangles that
+      // were in this block.
       s += d;
       n += nd;
     }
@@ -359,7 +389,7 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 }
 
 // If we hit this terrain adjust our position to be on top of it.
-int csTerrain::CollisionDetect( csTransform *transform )
+int csTerrain::CollisionDetect (csTransform *transform)
 {
   float h;
   // Translate us into terrain coordinate space.

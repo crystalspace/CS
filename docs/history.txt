@@ -1,6 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
 17-Aug-2000
+	- Did some cleanup on terrain.cpp and also started support
+	  for directional lights. i.e. a directional light is a light
+	  with no position (only a direction) and infinite radius.
+	  This will be one way to (dynamically) light the terrain.
+	  In the future we will also add real lightmapping support
+	  (which will allow shadows for buildings and objects on the
+	  landscape). This directional lighting is not working yet.
 	- Made the perfstat plugin optional for walktest.
 	- Some fixes to csphyzik from Michael Ewert.
 	- Increased far clipping plane in csTerrain::SetDetail() and
