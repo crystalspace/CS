@@ -1824,7 +1824,15 @@ void csThing::GetBoundingBox (iMovable* movable, csBox3& box)
 
 void csThing::PolyMesh::Setup ()
 {
-  if (polygons || alloc_vertices) return;	// Already set up.
+  if (polygons || alloc_vertices)
+  {
+    // Already set up. First we check if the object vertex array
+    // is still valid (if it is not a copy).
+    if (alloc_vertices)
+      return;
+    if (vertices == scfParent->obj_verts)
+      return;
+  }
   vertices = NULL;
 
   // Count the number of needed polygons and vertices.

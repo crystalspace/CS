@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+30-Dec-2001
+	- Fixed iPolygonMesh implementation in csThing so that it will
+	  check if the parent array of object-space vertices is still
+	  valid. If not it will recompute.
 28-Dec-2001
 	- Small change to the scripting cs.i file so that it no longer
 	  includes from plugins/csscript/cspython.
