@@ -83,7 +83,9 @@ works.
 @subsubheading Considerations Before Creating a Procedural Texture
 
 First a warning: Procedural textures are quite expensive to utilize so if they
-are to be used at all, use them sparingly.
+are to be used at all, use them sparingly. Drawing on a procedural texture
+is in the best case as slow as drawing on screen. Depending on the special
+features you request for this texture via flags, things can even be worse.
 
 For the most part procedural textures are useful if you intend for the texture
 images' content to respond to the user and where it would be impossible or too
@@ -113,6 +115,11 @@ If you can get away with having a set of textures devoted specifically to the
 procedural texture subsystem or none at all this is a big performance bonus on
 some configurations, while incurring no performance penalty on others.  So I
 would strongly recommend setting this flag under these circumstances.
+
+When using this flag, the texture manager used by the procedural texture may
+or may not be different from the main texture manager. So you have to test
+for this. Without this flag, they are always the same (but this may be a
+major performance hit).
 
 @itemize @bullet
 @item
@@ -182,9 +189,14 @@ Do I require the procedural texture buffer to be persistent between frames?
 
 Flag: @code{CS_TEXTURE_PROC_PERSISTENT}
 
-If you require that what you render into the texture buffer still be there
-when you come back to render into it you must set this flag to guarantee this
-to be the case for all implementations.
+If you only want to redraw part of the texture, you can normally pass the
+desired rectangle to the @code{Print()} function. However, if the area you
+want to redraw is not rectangular, for example if you want to write some
+text over the existing texture, you have to use this flag. This will
+guarantee that whatever you draw on the texture, it will still be there when
+you start to draw on the texture again. In the example you would use this
+flag, then draw the text on the existing texture and, if possible, pass a
+rectangle that fits the size of the text to @code{Print()}.
 
 @itemize @bullet
 @item
@@ -219,15 +231,16 @@ Naturally, it would be better if you did not specify mip-mapping, as this
 would be very expensive to do each time you update the procedural texture, so
 if you can possibly avoid it, do so by specifying
 @samp{CS_TEXTURE_NOMIPMAPPING}.  Otherwise the next best approach is to
-specify it to mip map on sync.  You can command to refresh mip mapping with
-the method @code{iTexturehandle->ProcTextureSync()}.
-
+specify it to mip map on sync. This means that mipmaps won't be calculated
+automatically, but you must tell the texture to do this. You can command to
+refresh mip mapping with the method @code{iTexturehandle->ProcTextureSync()}.
+If none of these flags is specified, mipmapping is done automatically.
 
 @item
 What about visibility considerations?
 
 Hopefully this issue should not arise, because it would be unwise to refresh
-procedural textures each frame automatically when the texture is visible
+procedural textures each frame automatically when the texture is not visible
 (Although @samp{dtsimple} pretty much does so.)  Also the procedural textures
 are all implemented at the graphics driver level and the engine (which has all
 the visibility determination code) doesn't know anything about procedural
