@@ -445,7 +445,7 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
     
     GLuint texturehandle = 0;
     iTextureHandle* txt_handle = NULL;
-    csRef<csMaterialHandle> mathand ( (csMaterialHandle*)mesh->GetMaterialHandle());
+    csRef<csGLMaterialHandle> mathand ( (csGLMaterialHandle*)mesh->GetMaterialHandle());
     if(layer->texnum == 0)
     {
       txt_handle = mathand->GetTexture();
