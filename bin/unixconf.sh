@@ -109,13 +109,12 @@ rm -f conftest.cpp conftest.o
 echo "%xdefine TEST" >conftest.asm
 
 # Check if NASM is installed and if it has the right version
-[ -z "${NASM}" ] && NASM=`which nasm 2>&1 | grep -v "[Nn]o"`
+NASMBIN=`which nasm 2>&1 | grep -v "[Nn]o"`
 
-if [ -n "${NASM}" ]; then
-  echo "NASM = "`basename ${NASM}`
+if [ -n "${NASMBIN}" ]; then
   # Well, we really should check here for obj format...
   # but we'll use ELF as it really doesn't matter
-  ${NASM} -f elf conftest.asm -o conftest.o 2>/dev/null && echo "NASM.INSTALLED = yes"
+  ${NASMBIN} -f elf conftest.asm -o conftest.o 2>/dev/null && echo "NASM.INSTALLED = yes"
 fi
 
 # Remove dummy remains
