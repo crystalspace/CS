@@ -18,6 +18,7 @@ chronological order.
 	  releasing the vertex indices from the block allocators. This caused
 	  simple1 to crash at exit due to an assert in csBlockAllocator.
 	- Jorrit forgot to remove some instances of FASTMESH.
+	- Jorrit removed an unused field from csPolygon3DStatic.
 13-Oct-2003
 	- Eric Sunshine eliminated several compilation warnings from Walktest.
 	- Jorrit fixed phystut for the latest polygon changes.

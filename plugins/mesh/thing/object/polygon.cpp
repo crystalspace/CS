@@ -67,7 +67,6 @@ csPolygon3DStatic::csPolygon3DStatic ()
 {
   VectorArray = GetStaticVectorArray();
   thing_static = 0;
-  plane_obj_need_update = true;
 
   material = 0;
   name = 0;
@@ -493,7 +492,6 @@ void csPolygon3DStatic::ComputeNormal ()
 
   // By default the world space normal is equal to the object space normal.
   polygon_data.plane_obj.Set (A, B, C, D);
-  plane_obj_need_update = false;
   thing_static->scfiObjectModel.ShapeChanged ();
 }
 
@@ -782,13 +780,11 @@ void csPolygon3DStatic::SetTextureSpace (
 
 void csPolygon3DStatic::SetVertex (int idx, int v)
 {
-  plane_obj_need_update = true;
   polygon_data.vertices[idx] = v;
 }
 
 int csPolygon3DStatic::AddVertex (int v)
 {
-  plane_obj_need_update = true;
   if (v >= thing_static->GetVertexCount ())
   {
     thing_static->thing_type->Bug (

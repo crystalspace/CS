@@ -92,9 +92,6 @@ private:
    */
   csPolygonRenderData polygon_data;
 
-  /// True if the object space plane equation needs updating.
-  bool plane_obj_need_update;
-
   /**
    * The material, this contains the texture handle,
    * the flat color (if no texture) and other parameters.
@@ -289,7 +286,6 @@ public:
    */
   csPlane3& GetObjectPlane ()
   { 
-    //if (plane_obj_need_update) ComputeNormal();
     return polygon_data.plane_obj;
   }
 
