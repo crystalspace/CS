@@ -632,6 +632,8 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 void csBugPlug::EnterEditMode (int cmd, const char* msg, const char* def)
 {
   if (edit_mode) return;
+  iFontServer* fntsvr = G2D->GetFontServer ();
+  if (!fntsvr) return;	// No edit mode if no font server
   edit_mode = true;
   strcpy (msg_string, msg);
   if (def) strcpy (edit_string, def);

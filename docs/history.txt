@@ -21,6 +21,8 @@ The history order is reversed so that new features are at the top.
 	  much better results for newsky.zip.
 	- Did a VERY small optimization to the octree traversal code with
 	  regards to selecting front2back/back2front modes.
+	- BugPlug will now also work for apps that don't have a font
+	  server. But a lot of functionality will not work.
 13-Jun-2001
 	- Increased robustness of the Spider in BugPlug a little. If there
 	  are no sectors it will not start hunting. There is also a timeout

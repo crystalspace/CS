@@ -23,6 +23,7 @@
 #include "cstypes.h"
 #include "csutil/scf.h"
 
+class csVector3;
 class csSector;
 class csColor;
 class csBox3;
