@@ -54,6 +54,7 @@ chronological order.
 	  could use in a mesh will now also set the equivalent
 	  CS_POlYMESH_... flags in all polygon meshes associated with that mesh.
 	- Jorrit added support for <closed> and <convex> to factories too.
+	- Jorrit changed api mod documentation for latest polymesh change.
 4-Sep-2003
 	- Peter Amstutz fixed the csPolyTexture destructor (part of
 	  the thing plugin) to not try to deallocate the lightmap

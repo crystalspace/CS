@@ -263,6 +263,9 @@ base mesh), and that those meshes can be overridden by user-defined meshes
 (e.g. if the collision detection mesh needs to have a shape different from 
 the visible mesh.) 
 
+In @code{iPolygonMesh} the @code{IsDeformable()} method has been replaced
+with the more general @code{GetFlags()}.
+
 @subheading Iterator Changes
 @cindex @code{iVisibilityObjectIterator}
 @cindex @code{iLightIterator}
