@@ -492,8 +492,8 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   // IMPORTANT OPT!!! CACHE THIS ARRAY IN EACH ENTITY!
   mesh.polygons = new csPolygonDPM [GetNumPolygons ()];
   mesh.mat_handle = new iMaterialHandle* [GetNumPolygons ()];
-  mesh.plane = new G3DTexturePlane [GetNumPolygons ()];
   mesh.normal = new csPlane3 [GetNumPolygons ()];
+  mesh.plane = new G3DTexturePlane [GetNumPolygons ()];
   mesh.poly_texture = new iPolygonTexture* [GetNumPolygons ()];
   for (i = 0 ; i < GetNumPolygons () ; i++)
   {
