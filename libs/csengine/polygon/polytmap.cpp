@@ -142,7 +142,7 @@ void csPolyTxtPlane::WorldToCamera (
   // Mct = Mwt * Mcw
   // Vct = Mwc * (Vwt - Vwc)
 
-  (void) vertex1;
+  //(void) vertex1;
 
   m_cam2tex = m_world2tex;
   m_cam2tex *= t.GetT2O ();
@@ -164,7 +164,7 @@ void csPolyTxtPlane::ObjectToWorld (
   // Mwt = Mot * Mwo
   // Vwt = Mow * Vot - Vow
 
-  (void) vertex1;
+  //  (void) vertex1;
 
   m_world2tex = m_obj2tex;
   m_world2tex *= obj.GetO2T ();
