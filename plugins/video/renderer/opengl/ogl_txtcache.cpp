@@ -88,8 +88,8 @@ void csLMCacheDataQueue::Clear()
 }
 
 //------------------------------------------------------------------------//
-void* csSLMCacheData::Alloc(int w, int h, SourceData s, csSubRectangles* r,
-      GLuint Handle)
+void* csSLMCacheData::Alloc(int /*w*/, int /*h*/, SourceData s, csSubRectangles* /*r*/,
+                            GLuint /*Handle*/)
 {
    source = s.superLMDataSource;
    source->cacheData = this;
