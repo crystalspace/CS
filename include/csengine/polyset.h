@@ -419,7 +419,11 @@ public:
   void CreateBoundingBox ();
 
   /// Get the oriented bounding box created by CreateBoundingBox().
-  csPolygonSetBBox* GetBoundingBox () { return bbox; }
+  csPolygonSetBBox* GetBoundingBox ()
+  {
+    if (!bbox) CreateBoundingBox ();
+    return bbox;
+  }
 
   /**
    * Get the bounding box in object space for this polygon set.
