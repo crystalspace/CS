@@ -30,6 +30,9 @@
 #    abstraction and generalization, are all future possibilities.  There is
 #    a lot of room for improvement.
 #
+# TODO
+#    Possibly generate bz2 and zip archives in addition to gz.
+#
 #------------------------------------------------------------------------------
 import commands, glob, grp, os, string, sys, tempfile, time
 
@@ -61,7 +64,7 @@ moduledir = "CS"
 ownergroup = "crystal"
 packprefix = "cs-"
 snapdir = "/home/groups/ftp/pub/crystal/cvs-snapshots"
-keepsnaps = 8
+keepsnaps = 4
 
 #------------------------------------------------------------------------------
 # Snapshot Class
@@ -79,9 +82,10 @@ class Snapshot:
         self.packext = ".tgz"
         self.packname = self.packbase + self.packext
         self.packtemplate = packprefix + "????-??-??.*" + self.packext
-        self.linkname = packprefix + "current-snapshot" + self.packext
+        self.packlinkname = packprefix + "current-snapshot" + self.packext
         self.diffext = ".diff.gz"
         self.diffname = self.packbase + self.diffext
+        self.difflinkname = packprefix + "current-snapshot" + self.diffext
 
     def log(self, msg):
         s = msg + "\n"
@@ -203,11 +207,14 @@ class Snapshot:
         self.makedirectory(self.workdir)
         self.makedirectory(self.builddir)
 
-    def linkcurrent(self):
-        self.log("Linking current package to: " + self.linkname)
-        if os.path.exists(self.linkname):
-            os.remove(self.linkname)
-        os.symlink(self.packname, self.linkname)
+    def makelink(self, desc, source, linkname):
+        savedir = os.getcwd()
+        os.chdir(snapdir)
+        self.log("Linking current " + desc + " to: " + linkname)
+        if os.path.exists(linkname):
+            os.remove(linkname)
+        os.symlink(source, linkname)
+        os.chdir(savedir)
                             
     def dobulk(self):
         self.log("Retrieving module: " + cvsmodule)
@@ -220,8 +227,8 @@ class Snapshot:
                 if self.run("mv " + self.packname + " " + snapdir):
                     if os.path.exists(self.diffname):
                         self.run("mv " + self.diffname + " " + snapdir)
-                    os.chdir(snapdir)
-                    self.linkcurrent()
+                        self.makelink("diff", self.diffname, self.difflinkname)
+                    self.makelink("package", self.packname, self.packlinkname)
                     self.purgeold()
 
     def doall(self):
@@ -236,6 +243,7 @@ class Snapshot:
                 self.dobulk()
             except Exception, e:
                 self.log("A fatal exception occurred: " + str(e))
+            os.chdir(snapdir)
             self.purgetransient()
         finally:
             self.log("END: " + self.timestamp())
