@@ -442,7 +442,7 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
           }
           break;
         default:
-          int i=0;
+          //int i=0;
 	  break;
       }
 
