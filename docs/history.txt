@@ -6,16 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Aug-2003
+	- Eric Sunshine fixed bug in bfdplugins.cpp.  csGetPluginMetaData()
+	  was leaking `buf' if errors occurred.
 24-Aug-2003
 	- Luca added the CSTOOL library dependency to maya2spr makefile.
 	- Luca reverted his latest commit because the cstool library is not 
 	  required by maya2spr.
-	- Marten Svanfeldt commited a change to the cullers. Now 
+	- Marten Svanfeldt commited a change to the cullers. Now
 	  VisTest(iRenderView) takes an additional parameter, a callback to be
-	  called for all visible objects. The visnr have also been made internal
-	  to the culler (it is used to optimize culling). With the current
-	  renderer/engine implementation this callback sets a number on each
-	  mesh to be used when creating the rendering meshlist.
+	  called for all visible objects. The visnr have also been made
+	  internal to the culler (it is used to optimize culling). With the
+	  current renderer/engine implementation this callback sets a number on
+	  each mesh to be used when creating the rendering meshlist.
 	- Oktal applied a patch to cssocket from Ladislav Foldyna:
 	    - Adds an option called "loop" which controls whether multicast
 	      packets are echoed back to the host which sent them.
@@ -24,7 +27,7 @@ chronological order.
 	    - Adds an overloaded function iNetworkConnection::Receive with
 	      and extra output parameter, "from", which gives the packet's
 	      originator's identifier, which makes multicast actually useful.
-	- Marten Svanfeldt removed all traces of culling in new renderer/engine 
+	- Marten Svanfeldt removed all traces of culling in new renderer/engine
 	  for new renderer to make it compile with the above cullerchanges.
 	  Note that it didn't work anyway. A new implementation is being
 	  developed at the moment, but it will be a little while before it is
@@ -75,10 +78,11 @@ chronological order.
 	- Oktal fixed a couple of typos in the Perl plugin, and fixed a bit of
 	  const correctness in iScriptObject.
 21-Aug-2003
-	- Jorrit fixed a bug in the mesh-sphere intersection code (ODE). The bug
-	  was that intersection with triangles used <0. But that means something
-	  can slip between two triangles if you are unlucky. Fixed this by
-	  using < SMALL_EPSILON instead. Also cleaned up the code a lot.
+	- Jorrit fixed a bug in the mesh-sphere intersection code (ODE). The
+	  bug was that intersection with triangles used <0. But that means
+	  something can slip between two triangles if you are unlucky. Fixed
+	  this by using < SMALL_EPSILON instead. Also cleaned up the code a
+	  lot.
 	- Jorrit optimized ODE mesh-box intersection code using the polygon
 	  tree.
 	- Jorrit optimized ODE mesh-box and mesh-sphere by avoiding the

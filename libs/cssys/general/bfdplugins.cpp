@@ -51,12 +51,8 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
 
   if (!metadata)
   {
-    /*
-      TinyXML documents hold references to the document system.
-      So we have to create a new csTinyDocumentSystem (). Using just
-      'csTinyDocumentSystem docsys' would result in a crash when the
-      documents try to DecRef() to already destructed document system.
-     */
+    // Since TinyXML documents maintain references to the document system, we
+    // must allocate the document system via the heap, rather than the stack.
     csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
       (new csTinyDocumentSystem ());
     metadata = docsys->CreateDocument ();
@@ -87,13 +83,17 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
         {
           int size = bfd_section_size (abfd, sect);
           char *buf = (char *) malloc (size + 1);
-          if (! buf) errmsg = "can't allocate memory for metadata";
-          else if (! bfd_get_section_contents (abfd, sect, buf, 0, size))
-            errmsg = "libbfd can't get section contents";
+          if (!buf)
+	    errmsg = "can't allocate memory for metadata";
           else
-          {
-            buf[size] = 0;
-            errmsg = metadata->Parse (buf);
+	  {
+	    if (! bfd_get_section_contents (abfd, sect, buf, 0, size))
+	      errmsg = "libbfd can't get section contents";
+	    else
+	    {
+	      buf[size] = 0;
+	      errmsg = metadata->Parse (buf);
+	    }
             free (buf);
           }
         }
