@@ -1,3 +1,24 @@
 @c -*-texinfo-*-
 @node WinCVS Tutorial Step 1, WinCVS Tutorial Step 2, WinCVS Tutorial, WinCVS Tutorial
 @subsection Step 1: Getting the Software
+
+@subsubheading WinCVS Client
+
+The WinCVS client is as Crystal Space, open source and presently is an under development
+piece of software. A latest stable release of the WinCVS client can be obtained from
+the WinCVS website:
+
+@uref{http://www.wincvs.org}
+
+@subsubheading Secure Shell (SSH)
+
+@file{NOTE: The Secure Shell (SSH) software should only be downloaded/installed by those
+who have been granted Crystal Space CVS server write access by either Jorrit Tyberghein
+or Eric Sunshine, the Crystal Space project administrators.}
+
+Secure Shell software comes in a variety of forms and increasingly some open source
+SSH projects. However, for use with WinCVS, other CS developers and myself have found
+one version to work and work well. The package @file{ssh-1.2.14-win32.exe} can be downloaded
+by using the following web link:
+
+@uref{http://www.redeye-entertainment.co.uk/downloads/cs/ssh-1.2.14-win32.exe}
