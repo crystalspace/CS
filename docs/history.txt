@@ -31,6 +31,15 @@ The history order is reversed so that new features are at the top.
 	    - Added several new useful methods.
 	    - Generally cleaned up and unified the code.
 	- Updated documentation about the new csArray class.
+	- Added iPolygonBuffer->Prepare() function to make it easier to
+	  manage optimal super lightmap calculation.
+	- Fixed a bug in csGrowingArray<T>->SetLimit(). It would not
+	  adjust the length of the array if the new limit was smaller than
+	  the length.
+	- Now lightmaps are sorted on biggest dimension before we start
+	  choosing a super lightmap. By doing this we can significantly
+	  reduce the number of needed super lightmaps for some of the larger
+	  objects.
 	- Anders Stenberg added first version of CG shader plugin.  It can
 	  currently handle both vertex and fragment programs, and use textures
 	  supplied by the material.  Shader variables can be bound to CG

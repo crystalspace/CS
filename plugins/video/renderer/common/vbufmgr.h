@@ -123,6 +123,8 @@ public:
   // go in subclass.
 
   SCF_DECLARE_IBASE;
+
+  virtual void Prepare () { }
 };
 
 /**

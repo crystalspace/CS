@@ -81,7 +81,7 @@ struct iVertexBuffer : public iBase
   virtual int GetVertexCount () const = 0;
 };
 
-SCF_VERSION (iPolygonBuffer, 0, 0, 3);
+SCF_VERSION (iPolygonBuffer, 0, 1, 0);
 
 /**
  * This interface represents a black-box polygon buffer.
@@ -144,6 +144,12 @@ struct iPolygonBuffer : public iBase
 
   /// Clear all polygons, materials, and vertex array.
   virtual void Clear () = 0;
+
+  /**
+   * After adding everything and before using this polygon buffer you
+   * should call Prepare().
+   */
+  virtual void Prepare () = 0;
 
   /**
    * Sets the polygon buffer as dirty.

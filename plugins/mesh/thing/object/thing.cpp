@@ -1597,6 +1597,7 @@ void csThing::PreparePolygonBuffer ()
   }
 
   delete[] matpol;
+  polybuf->Prepare ();
 }
 #endif // CS_USE_NEW_RENDERER
 

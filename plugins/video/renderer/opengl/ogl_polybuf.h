@@ -143,6 +143,18 @@ public:
 
 
 /**
+ * This structure has enough information so that we can later
+ * construct the super lightmaps.
+ */
+struct csLmQueue
+{
+  iPolygonTexture* polytext;
+  csVector2* uv;	// Texture coordinates.
+  int num_uv;
+  int vt_idx;		// Index to continue adding lumels.
+};
+
+/**
  * This implementation is optimized to use glDrawElements.
  * It groups polygons per materials
  */
@@ -162,9 +174,19 @@ private:
    */
   int AddSingleVertexLM (const csVector2& uvLightmap, int& cur_vt_idx);
 
+  // Queue with lightmaps we still have to process.
+  csGrowingArray<csLmQueue> lmqueue;
+
+  void ClearLmQueue ();
+  void AddLmQueue (iPolygonTexture* polytext, const csVector2* uv,
+		  int num_uv, int vt_idx);
+  void ProcessLmQueue (iPolygonTexture* polytext, const csVector2* uv,
+		  int num_uv, int vt_idx);
+
 public:
   // SuperLightMap list.
   TrianglesSuperLightmapList superLM;
+
 protected:
   // Mesh triangles grouped by material list.
   TrianglesList polygons;
@@ -264,6 +286,9 @@ public:
 
   /// Marks the polygon buffer as affected by any light
   virtual void MarkLightmapsDirty();
+
+  /// Prepare.
+  virtual void Prepare ();
 };
 
 /**

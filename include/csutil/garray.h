@@ -97,6 +97,7 @@ public:
     if ((limit = inlimit) != 0)
       root = (T*)realloc (root, limit * sizeof (T));
     else if (root) { free (root); root = NULL; }
+    if (count > limit) count = limit;
   }
 
   /// Set vector length to n.

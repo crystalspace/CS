@@ -138,7 +138,6 @@ csTriangleArrayPolygonBuffer::csTriangleArrayPolygonBuffer (
   unlitPolysSL = NULL;
 }
 
-
 csTriangleArrayPolygonBuffer::~csTriangleArrayPolygonBuffer ()
 {
   Clear ();
@@ -242,10 +241,35 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
 
   pol->matIndex = mat_index;
 
+  AddLmQueue (poly_texture, uv, num_vertices, old_cur_vt_idx);
+}
 
+void csTriangleArrayPolygonBuffer::ClearLmQueue ()
+{
+  int i;
+  for (i = 0 ; i < lmqueue.Length () ; i++)
+  {
+    delete[] lmqueue[i].uv;
+  }
+  lmqueue.SetLimit (0);
+}
 
-//poly_texture, num_vertices, old_cur_vt_idx, uv
+void csTriangleArrayPolygonBuffer::AddLmQueue (iPolygonTexture* polytext,
+	const csVector2* uv, int num_uv, int vt_idx)
+{
+  csLmQueue q;
+  q.polytext = polytext;
+  q.uv = new csVector2[num_uv];
+  memcpy (q.uv, uv, num_uv * sizeof (csVector2));
+  q.num_uv = num_uv;
+  q.vt_idx = vt_idx;
+  lmqueue.Push (q);
+}
 
+void csTriangleArrayPolygonBuffer::ProcessLmQueue (
+	iPolygonTexture* poly_texture,
+	const csVector2* uv, int num_uv, int vt_idx)
+{
   // Lightmap handling.
   csRect rect;
   csTrianglesPerSuperLightmap* triSuperLM = SearchFittingSuperLightmap (
@@ -314,14 +338,16 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
    * created)
    */
   csVector2 uvLightmap[100];	// @@@ HARDCODED.
-  for (i = 0 ; i < num_vertices ; i++)
+  int i;
+  for (i = 0 ; i < num_uv ; i++)
   {
     uvLightmap[i].x = (uv[i].x - lm_offset_u) * lm_scale_u;
     uvLightmap[i].y = (uv[i].y - lm_offset_v) * lm_scale_v;
   }
-  cur_vt_idx = old_cur_vt_idx;
+  int cur_vt_idx = vt_idx;
+  csTriangle triangle;
   triangle.a = AddSingleVertexLM (uvLightmap[0], cur_vt_idx);
-  for (i = 1; i < num_vertices - 1; i++)
+  for (i = 1; i < num_uv - 1; i++)
   {
     triangle.b = AddSingleVertexLM (uvLightmap[i], cur_vt_idx);
     triangle.c = AddSingleVertexLM (uvLightmap[i+1], cur_vt_idx);
@@ -334,16 +360,42 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
   triSuperLM->lm_info.Push (lm->GetMapData ());
 }
 
-void csTriangleArrayPolygonBuffer::MarkLightmapsDirty()
+static int sort_lmqueue (const void* p1, const void* p2)
 {
-  superLM.MarkLightmapsDirty();
+  csLmQueue* lmq1 = (csLmQueue*)p1;
+  csLmQueue* lmq2 = (csLmQueue*)p2;
+  iLightMap* lm = lmq1->polytext->GetLightMap();
+  int w1, h1, w2, h2;
+  if (lm)
+  {
+    w1 = lm->GetWidth();
+    h1 = lm->GetHeight();
+  }
+  else
+  {
+    w1 = 0;
+    h1 = 0;
+  }
+  lm = lmq2->polytext->GetLightMap();
+  if (lm)
+  {
+    w2 = lm->GetWidth();
+    h2 = lm->GetHeight();
+  }
+  else
+  {
+    w2 = 0;
+    h2 = 0;
+  }
+
+  int d1 = MAX (w1, h1);
+  int d2 = MAX (w2, h2);
+  if (d1 > d2) return -1;
+  else if (d1 < d2) return 1;
+  return 0;
 }
 
-void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
-  const csPlane3& poly_normal,
-  int mat_index,
-  const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
-  iPolygonTexture* poly_texture)
+void csTriangleArrayPolygonBuffer::Prepare ()
 {
 #if 0
 // Debug stuff for printing out statistics information.
@@ -383,6 +435,29 @@ return;
 }
 #endif
 
+  qsort (lmqueue.GetArray (), lmqueue.Length (), sizeof (csLmQueue),
+		  sort_lmqueue);
+
+  int i;
+  for (i = 0 ; i < lmqueue.Length () ; i++)
+  {
+    csLmQueue& q = lmqueue[i];
+    ProcessLmQueue (q.polytext, q.uv, q.num_uv, q.vt_idx);
+  }
+  ClearLmQueue ();
+}
+
+void csTriangleArrayPolygonBuffer::MarkLightmapsDirty()
+{
+  superLM.MarkLightmapsDirty();
+}
+
+void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
+  const csPlane3& poly_normal,
+  int mat_index,
+  const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
+  iPolygonTexture* poly_texture)
+{
   /*
    * We have to:
    * Generate triangles
@@ -476,6 +551,8 @@ void csTriangleArrayPolygonBuffer::Clear ()
   delete[] vertices; vertices = NULL;
   materials.DeleteAll ();
   delete unlitPolysSL;
+  unlitPolysSL = NULL;
+  ClearLmQueue ();
 }
 
 csTriangleArrayVertexBufferManager::csTriangleArrayVertexBufferManager
