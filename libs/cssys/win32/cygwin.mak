@@ -97,7 +97,7 @@ CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -pipe -fvtable-thunks
 ifneq ($(shell gcc --version),3.1)
 # -fvtable-thunks is no longer supported by GCC 3.1 so
 # we will test remove it until GCC 3.1 final is in Cygwin
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -pipe
+CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -pipe -fvtable-thunks
 endif
 
 # Flags for the compiler which are used when optimizing.
