@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 28-Jul-2004
+	- Erotoman added MEL script for exporting Maya models
 	- Eric Sunshine fixed csjava/Jamfile so that it constructs the
 	  shared-library name correctly on all supported platforms:
 	    MacOS/X : libcsjava.jnilib
