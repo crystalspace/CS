@@ -332,7 +332,7 @@ void csSimpleConsole::Print (csRect* area)
 #define WRITE(x,y,fc,bc,s,changed)				\
   {								\
     Gfx2D->Write (x, y, fc, bc, s);				\
-    if (changed && area != 0)					\
+    if ((changed) && area)					\
     {								\
       int tw;							\
       System->piGI->GetTextWidth (tw, console_font, s);		\
@@ -344,7 +344,7 @@ void csSimpleConsole::Print (csRect* area)
   {								\
     Gfx2D->Write (x + 1, y + 1, bc, -1, s);			\
     Gfx2D->Write (x, y, fc, -1, s);				\
-    if (changed && area != 0)					\
+    if ((changed) && area)					\
     {								\
       int tw;							\
       System->piGI->GetTextWidth (tw, console_font, s);		\
@@ -409,7 +409,7 @@ void csSimpleConsole::Print (csRect* area)
       else
       {
         Gfx2D->Clear (console_bg);
-        if (dblbuff && area != 0)
+        if (dblbuff && area)
           area->Union (0, 0, System->FrameWidth - 1, System->FrameHeight - 1);
         for (i = 0; i < lastline; i++)
           WRITE (1, th * i, console_fg, -1, Line [i], false);
