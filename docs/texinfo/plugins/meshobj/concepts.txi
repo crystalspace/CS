@@ -117,4 +117,6 @@ while the engine controls the @emph{when}.  This is not completely true,
 though.  The Mesh Object implementation itself must do some parts of the
 visibility testing on its own.  For example, far plane clipping, and testing if
 the bounding box of the object is visible on screen are all the responsibility
-of the Mesh Object.
+of the Mesh Object (but it can use the engine for help on calculating these
+things).
+

@@ -55,4 +55,8 @@ Crystal Space supports.
 @importss{plugins,meshobj,rain.txi}
 @importss{plugins,meshobj,explo.txi}
 @importss{plugins,meshobj,spiral.txi}
+@importss{plugins,meshobj,haze.txi}
+@importss{plugins,meshobj,terrfunc.txi}
+@importss{plugins,meshobj,thing.txi}
+@importss{plugins,meshobj,metaball.txi}
 

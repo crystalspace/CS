@@ -1,0 +1,19 @@
+@c -*-texinfo-*-
+@node MeshObject Haze, MeshObject Spr3D, Writing MeshObjects, MeshObject
+@subsection Haze Mesh Object
+@cindex MeshObject
+@cindex Haze
+@cindex Volumetric Light
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iTerrFuncState}
+
+@emph{Written by Jorrit Tyberghein,
+(@email{jorrit.tyberghein@@uz.kuleuven.ac.be}).}
+
+@strong{DOCUMENTATION NOT UP-TO-DATE}
+
+This mesh object represents a 'haze' which is a bit like
+volumetric light.
+

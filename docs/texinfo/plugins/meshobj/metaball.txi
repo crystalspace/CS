@@ -1,0 +1,17 @@
+@c -*-texinfo-*-
+@node MeshObject Metaball, MeshObject Spr3D, Writing MeshObjects, MeshObject
+@subsection Metaball Mesh Object
+@cindex MeshObject
+@cindex Metaballs
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iTerrFuncState}
+
+@emph{Written by Jorrit Tyberghein,
+(@email{jorrit.tyberghein@@uz.kuleuven.ac.be}).}
+
+@strong{DOCUMENTATION NOT UP-TO-DATE}
+
+This mesh object represents metaballs.
+

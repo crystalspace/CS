@@ -1,0 +1,17 @@
+@c -*-texinfo-*-
+@node MeshObject TerrFunc, MeshObject Spr3D, Writing MeshObjects, MeshObject
+@subsection Terrain Mesh Object
+@cindex MeshObject
+@cindex Terrain Engine
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iTerrFuncState}
+
+@emph{Written by Jorrit Tyberghein,
+(@email{jorrit.tyberghein@@uz.kuleuven.ac.be}).}
+
+@strong{DOCUMENTATION NOT UP-TO-DATE}
+
+This mesh object represents a landscape engine.
+

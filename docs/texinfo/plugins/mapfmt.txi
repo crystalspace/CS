@@ -87,6 +87,8 @@
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
+@strong{WARNING: This document needs updating!}
+
 The next couple sections of this document describe the format of the standard
 Crystal Space map file.  The first section describes the syntax of the file.
 The second section contains extra discussions and hints regarding the map file

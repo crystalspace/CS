@@ -40,6 +40,9 @@ The history order is reversed so that new features are at the top.
 	- Updated the glossary. Added several new entries and fixed
 	  several old entries.
 	- Updated the FAQ.
+	- Updated the mesh object documentation. Added new sections for
+	  'thing', 'haze', 'terrfunc', and 'metaball' mesh objects but
+	  these sections are still empty.
 18-Oct-2001
 	- Michael Voase shifted water and fire proctex down to the basement.
 	- Removed usage of cs_snprintf in cfgfile.cpp and
