@@ -31,7 +31,7 @@ vpath %.cpp libs/csgfx
 INC.CSGFX = include/csgfx/csimage.h \
   include/csgfx/quantize.h include/csgfx/inv_cmap.h \
   include/csgfx/memimage.h include/csgfx/bumpmap.h
-SRC.CSGFX = libs/csgfx/csimage.cpp libs/csgfx/imgload.cpp \
+SRC.CSGFX = libs/csgfx/csimage.cpp \
   libs/csgfx/quantize.cpp libs/csgfx/inv_cmap.cpp \
   libs/csgfx/memimage.cpp libs/csgfx/bumpmap.cpp
 
