@@ -62,6 +62,7 @@ csTextureCacheSoftware::csTextureCacheSoftware (csTextureManagerSoftware *TexMan
 {
   head = tail = NULL;
   texman = TexMan;
+  frameno = 0;
   Clear ();
   bytes_per_texel = texman->pfmt.PixelBytes;
   if (texman->pfmt.PixelBytes == 1)
@@ -152,6 +153,7 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (
         tail = cached_texture;
       head = cached_texture;
     }
+    cached_texture->frameno = frameno;
   }
   else
   {
@@ -165,15 +167,54 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (
     total_size += bitmap_size;
 
     // Free lightmaps until we have less than cache_size bytes for the cache
+
     while (tail && (total_size > cache_size))
     {
       // Total size of textures in cache is too high. Remove the last one.
       cached_texture = tail;
-      tail = tail->prev;
-      if (tail)
-        tail->next = NULL;
+
+      // thanks John Carmack: we miss you :-)
+      // A possible improvement for the texture cache algorithm could be the
+      // following: the problem with it currently is that it always frees the
+      // least-recently-used texture, no matter when it was allocated. For
+      // levels where all the textures visible in one frame do not fit in the
+      // cache this is extremely ugly: the textures are computed all in chain
+      // again and again because each new textures pushes the least recently
+      // used (but also generated during this frame) texture out of cache and
+      // so on. This could be improved by adding a "frame number" to each
+      // texture, and to check if LRU texture has same frame number as the
+      // current one; if so, we should free the MOSTLY allocated texture
+      // instead. This way, we'll compute just several textures on each
+      // frame instead of doing it for ALL of them.
+      if (cached_texture->frameno == frameno)
+#if 1
+        // Hmm... this proven to work much better ... WHY??? :-)
+        cached_texture = head;
+#else
+      {
+        // Try to find the closest (by size) texture cached this frame
+        int need_size = total_size - cache_size;
+        int nearest_size = tail->size;
+        for (SoftwareCachedTexture *cur = head; cur != tail; cur = cur->next)
+          if (((cur->size >= need_size)
+            && (cur->size < nearest_size))
+           || ((nearest_size < need_size)
+            && (nearest_size < cur->size)))
+          {
+            cached_texture = cur;
+            nearest_size = cur->size;
+          }
+      }
+#endif
+
+      if (cached_texture->prev)
+        cached_texture->prev->next = cached_texture->next;
       else
-        head = NULL;
+        head = cached_texture->next;
+      if (cached_texture->next)
+        cached_texture->next->prev = cached_texture->prev;
+      else
+        tail = cached_texture->prev;
 
       total_textures--;
       total_size -= cached_texture->size;
@@ -182,6 +223,7 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (
     }
 
     CHK (cached_texture = new SoftwareCachedTexture (MipMap, pt));
+    cached_texture->frameno = frameno;
 
     int margin_size = H_MARGIN * bitmap_w * bytes_per_texel;
     UByte *data = new UByte [bitmap_size];

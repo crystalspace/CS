@@ -69,6 +69,9 @@ public:
   /// Mipmap level for this texture
   int mipmap;
 
+  /// The frame number this unit was allocated at
+  int frameno;
+
   /// Initialize the lighted texture object
   SoftwareCachedTexture (int MipMap, iPolygonTexture *Source)
   {
@@ -117,6 +120,9 @@ protected:
   csTextureManagerSoftware *texman;
 
 public:
+  /// Current frame number
+  int frameno;
+
   /// Initialize the texture cache
   csTextureCacheSoftware (csTextureManagerSoftware *TexMan);
   /// Destroy all lightmaps

@@ -781,6 +781,8 @@ void csGraphics3DSoftware::Print (csRect *area)
   G2D->Print (area);
   if (do_interlaced != -1)
     do_interlaced ^= 1;
+  if (tcache)
+    tcache->frameno++;
 }
 
 #define SMALL_D 0.01
