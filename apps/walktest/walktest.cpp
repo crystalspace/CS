@@ -108,10 +108,10 @@ INTERFACE_ID_VAR (csDoor);
 INTERFACE_ID_VAR (csRotatingObject);
 INTERFACE_ID_VAR (csLightObject);
 INTERFACE_ID_VAR (iSoundWrapper);
-INTERFACE_ID_VAR (iTerrainWrapper);
+//INTERFACE_ID_VAR (iTerrainWrapper);
 INTERFACE_ID_VAR (iLight);
 //INTERFACE_ID_VAR (iMeshWrapper);
-INTERFACE_ID_VAR (iKeyValuePair);
+//INTERFACE_ID_VAR (iKeyValuePair);
 
 char WalkTest::map_dir [100];
 bool WalkTest::move_3d = false;
@@ -1561,11 +1561,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 
   // Load a few sounds.
 #ifdef DO_SOUND
-  iSoundWrapper *w = GET_NAMED_CHILD_OBJECT (engine->QueryObject (),
+  iSoundWrapper *w = GET_NAMED_CHILD_OBJECT_FAST (engine->QueryObject (),
     iSoundWrapper, "boom.wav");
   wMissile_boom = w ? w->GetSound () : NULL;
 
-  w = GET_NAMED_CHILD_OBJECT (engine->QueryObject (),
+  w = GET_NAMED_CHILD_OBJECT_FAST (engine->QueryObject (),
     iSoundWrapper, "whoosh.wav");
   wMissile_whoosh = w ? w->GetSound () : NULL;
 #endif

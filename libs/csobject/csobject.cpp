@@ -298,7 +298,8 @@ void csObject::ObjRemoveAll ()
     ObjRemove (children->obj[0]);
 }
 
-void* csObject::GetChild (int TypeID, const char *Name, bool fn) const
+void* csObject::GetChild (int InterfaceID, int Version,
+	const char *Name, bool fn) const
 {
   if (!children)
     return NULL;
@@ -306,18 +307,21 @@ void* csObject::GetChild (int TypeID, const char *Name, bool fn) const
   if (fn)
   {
     iObject *obj = GetChild(Name);
-    return obj ? obj->QueryObjectType (TypeID) : NULL;
+    return obj ? obj->QueryInterface (InterfaceID, Version) : NULL;
   }
 
   for (int i = 0; i < children->count; i++)
   {
-    void *obj = children->obj[i]->QueryObjectType (TypeID);
+    void *obj = children->obj[i]->QueryInterface (InterfaceID, Version);
     if (!obj)
       continue;
 
     if (Name && strcmp(children->obj[i]->GetName (), Name))
+    {
+      obj->DecRef ();
       continue;
-  
+    }
+ 
     return obj;
   }
 

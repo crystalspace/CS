@@ -78,6 +78,9 @@ extern INTERFACE_ID_VAR (iCameraPosition);
 extern INTERFACE_ID_VAR (iPolyTxtPlane);
 extern INTERFACE_ID_VAR (iStatLight);
 extern INTERFACE_ID_VAR (iMaterialHandle);
+extern INTERFACE_ID_VAR (iTerrainWrapper);
+extern INTERFACE_ID_VAR (iTerrainFactoryWrapper);
+extern INTERFACE_ID_VAR (iKeyValuePair);
 
 extern INTERFACE_ID_VAR (csPolyTxtPlane);
 extern INTERFACE_ID_VAR (csCollection);
@@ -87,7 +90,9 @@ extern INTERFACE_ID_VAR (csCurveTemplate);
 extern INTERFACE_ID_VAR (csSector);
 extern INTERFACE_ID_VAR (csTextureWrapper);
 extern INTERFACE_ID_VAR (csMaterialWrapper);
-
+extern INTERFACE_ID_VAR (csCollider);
+extern INTERFACE_ID_VAR (csRadPoly);
+extern INTERFACE_ID_VAR (csRadCurve);
 
 DECLARE_OBJECT_TYPE (iEngine)
 DECLARE_OBJECT_TYPE (csEngine)

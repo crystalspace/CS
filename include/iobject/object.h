@@ -24,26 +24,55 @@
 
 struct iObjectIterator;
 
-/// You can use this macro to get a child object from a csObject
-#define GET_CHILD_OBJECT(object,type)				\
-  ((type*)(object)->GetChild (OBJECT_TYPE_ID(type)))
+/**
+ * You can use this macro to get a child object from a csObject. The returned
+ * object will be IncRef'ed.
+ */
+#define GET_CHILD_OBJECT(object,Interface)				\
+  ((Interface*)(object)->GetChild (					\
+    iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface))
 
 /**
- * You can use this macro to get a child object with
- * the given name from a csObject.
+ * You can use this macro to get a child object from a csObject. The returned
+ * object will be IncRef'ed. This version requires a correctly set-up interface
+ * ID variable.
  */
-#define GET_NAMED_CHILD_OBJECT(object,type,name)				\
-  ((type*)(object)->GetChild (OBJECT_TYPE_ID(type), name))
+#define GET_CHILD_OBJECT_FAST(object,Interface)				\
+  ((Interface*)(object)->GetChild (scfID_##Interface, VERSION_##Interface))
 
 /**
- * same as GET_CHILD_OBJECT, but stops at the first object with the given
- * name, even if it does not implement the requested type.
+ * You can use this macro to get a child object with the given name and
+ * interface from a csObject. The returned object will be IncRef'ed.
  */
-#define GET_FIRST_NAMED_CHILD_OBJECT(object,type,name)				\
-  ((type*)(object)->GetChild (OBJECT_TYPE_ID(type), name, true))
+#define GET_NAMED_CHILD_OBJECT(object,Interface,name)			\
+  ((Interface*)(object)->GetChild (iSCF::SCF->GetInterfaceID		\
+    (#Interface), VERSION_##Interface, name))
+
+/**
+ * You can use this macro to get a child object with the given name and
+ * interface from a csObject. The returned object will be IncRef'ed. This
+ * version requires a correctly set-up interface ID variable.
+ */
+#define GET_NAMED_CHILD_OBJECT_FAST(object,Interface,name)		\
+  ((Interface*)(object)->GetChild (scfID_##Interface, VERSION_##Interface, name))
+
+/**
+ * This is the same as GET_CHILD_OBJECT, but stops at the first object with
+ * the given name, even if it does not implement the requested interface.
+ */
+#define GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)		\
+  ((Interface*)(object)->GetChild (iSCF::SCF->GetInterfaceID		\
+    (#Interface), VERSION_##Interface, name, true))
+
+/**
+ * This is the same as GET_CHILD_OBJECT_FAST, but stops at the first object with
+ * the given name, even if it does not implement the requested interface.
+ */
+#define GET_FIRST_NAMED_CHILD_OBJECT_FAST(object,Interface,name)	\
+  ((Interface*)(object)->GetChild (scfID_##Interface, VERSION_##Interface, name, true))
 
 
-SCF_VERSION (iObject, 0, 0, 2);
+SCF_VERSION (iObject, 0, 1, 0);
 
 /**
  * This interface is an SCF interface for encapsulating csObject.
@@ -75,15 +104,17 @@ struct iObject : public iBase
   virtual void ObjRemoveAll () = 0;
 
   /**
-   * Look for a child object that implements the given type. You can
+   * Look for a child object that implements the given interface. You can
    * optionally pass a name to look for. If FirstName is true then the
    * method will stop at the first object with the requested name, even
    * if it did not implement the requested type. Note that the returned
    * object may only be cast to the requested type, no other type, not
-   * even iObject!
+   * even iObject! <p>
+   * 
+   * Note that the returned object will be IncRef'ed.
    */
-  virtual void* GetChild (int TypeID, const char *Name = NULL,
-    bool FirstName = false) const = 0;
+  virtual void* GetChild (int iInterfaceID, int iVersion,
+    const char *Name = NULL, bool FirstName = false) const = 0;
 
   /// Return the first child object with the given name
   virtual iObject *GetChild (const char *Name) const = 0;

@@ -29,6 +29,10 @@ IMPLEMENT_CSOBJTYPE (csCollider, csObject);
 IMPLEMENT_OBJECT_INTERFACE (csCollider)
 IMPLEMENT_OBJECT_INTERFACE_END
 
+IMPLEMENT_IBASE_EXT (csCollider)
+  IMPLEMENTS_INTERFACE (csCollider)
+IMPLEMENT_IBASE_EXT_END
+
 csCollider::csCollider (csObject& parent,
 	iCollideSystem* collide_system,
 	iPolygonMesh* mesh)
@@ -81,6 +85,6 @@ bool csCollider::Collide (csCollider& otherCollider,
 
 csCollider* csCollider::GetCollider (csObject &object) 
 {
-  return GET_CHILD_OBJECT (&object, csCollider);
+  return GET_CHILD_OBJECT_FAST (&object, csCollider);
 }
 

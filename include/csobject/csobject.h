@@ -129,15 +129,17 @@ public:
   virtual void ObjRemoveAll ();
 
   /**
-   * Look for a child object that implements the given type. You can
+   * Look for a child object that implements the given interface. You can
    * optionally pass a name to look for. If FirstName is true then the
    * method will stop at the first object with the requested name, even
    * if it did not implement the requested type. Note that the returned
    * object may only be cast to the requested type, no other type, not
-   * even iObject!
+   * even iObject! <p>
+   * 
+   * Note that the returned object will be IncRef'ed.
    */
-  virtual void* GetChild (int TypeID, const char *Name = NULL,
-    bool FirstName = false) const;
+  virtual void* GetChild (int iInterfaceID, int iVersion,
+    const char *Name = NULL, bool FirstName = false) const;
 
   /// Return the first child object with the given name
   virtual iObject *GetChild (const char *Name) const;

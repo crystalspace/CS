@@ -357,13 +357,13 @@ csVector3 csRadElement::GetAvgNormal() const
 csRadElement* csRadElement::GetRadElement(csPolygon3D &object)
 { 
   // we are attached to the original polygon as a child.
-  return GET_CHILD_OBJECT (&object, csRadPoly);
+  return GET_CHILD_OBJECT_FAST (&object, csRadPoly);
 }
 
 csRadElement* csRadElement::GetRadElement(csCurve &object)
 { 
   // we are attached to the original curve as a child.
-  return GET_CHILD_OBJECT (&object, csRadCurve);
+  return GET_CHILD_OBJECT_FAST (&object, csRadCurve);
 }
 
 void csRadElement::ShowDeltaMap ()
@@ -392,6 +392,10 @@ IMPLEMENT_CSOBJTYPE(csRadPoly, csObject);
 
 IMPLEMENT_OBJECT_INTERFACE_EXT (csRadPoly, csRadElement)
 IMPLEMENT_OBJECT_INTERFACE_EXT_END
+
+IMPLEMENT_IBASE_EXT (csRadPoly)
+  IMPLEMENTS_INTERFACE (csRadPoly)
+IMPLEMENT_IBASE_EXT_END
 
 csRadPoly :: csRadPoly(csPolygon3D *original, csSector* sector)
 : csRadElement()
@@ -493,6 +497,10 @@ IMPLEMENT_CSOBJTYPE(csRadCurve, csObject);
 
 IMPLEMENT_OBJECT_INTERFACE_EXT (csRadCurve, csRadElement)
 IMPLEMENT_OBJECT_INTERFACE_EXT_END
+
+IMPLEMENT_IBASE_EXT (csRadCurve)
+  IMPLEMENTS_INTERFACE (csRadCurve)
+IMPLEMENT_IBASE_EXT_END
 
 csRadCurve :: csRadCurve(csCurve *original, csSector* sector)
 : csRadElement()

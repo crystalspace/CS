@@ -1937,7 +1937,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (Sys->Sound)
     {
-      iSoundWrapper *sb = GET_NAMED_CHILD_OBJECT (Sys->view->GetEngine ()->
+      iSoundWrapper *sb = GET_NAMED_CHILD_OBJECT_FAST (Sys->view->GetEngine ()->
         QueryObject (), iSoundWrapper, arg);
       if (sb)
         sb->GetSound ()->Play();

@@ -349,75 +349,47 @@ iObject* csRegion::FindObject (const char* iName, const csIdType& type,
 
 iSector* csRegion::Region::FindSector (const char *iName)
 {
-  csSector* obj = GET_NAMED_CHILD_OBJECT(scfParent, csSector, iName);
-  if (!obj) return NULL;
-  return &obj->scfiSector;
+  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iSector, iName);
 }
 
 iMeshWrapper* csRegion::Region::FindMeshObject (const char *iName)
 {
-  csMeshWrapper* obj =
-    GET_NAMED_CHILD_OBJECT(scfParent, csMeshWrapper, iName);
-  if (!obj) return NULL;
-  return &obj->scfiMeshWrapper;
+  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMeshWrapper, iName);
 }
 
 iMeshFactoryWrapper* csRegion::Region::FindMeshFactory (const char *iName)
 {
-  csMeshFactoryWrapper* obj =
-    GET_NAMED_CHILD_OBJECT(scfParent, csMeshFactoryWrapper, iName);
-  if (!obj) return NULL;
-  return &obj->scfiMeshFactoryWrapper;
+  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMeshFactoryWrapper, iName);
 }
 
 iTerrainWrapper* csRegion::Region::FindTerrainObject (const char *iName)
 {
-  csTerrainWrapper* obj =
-    GET_NAMED_CHILD_OBJECT(scfParent, csTerrainWrapper, iName);
-  if (!obj)
-    return NULL;
-  return &obj->scfiTerrainWrapper;
+  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iTerrainWrapper, iName);
 }
 
 iTerrainFactoryWrapper* csRegion::Region::FindTerrainFactory (const char *iName)
 {
-  csTerrainFactoryWrapper* obj =
-    GET_NAMED_CHILD_OBJECT(scfParent, csTerrainFactoryWrapper, iName);
-  if (!obj)
-    return NULL;
-  return &obj->scfiTerrainFactoryWrapper;
+  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iTerrainFactoryWrapper, iName);
 }
 
 iTextureWrapper* csRegion::Region::FindTexture (const char *iName)
 {
-  csTextureWrapper* obj =
-    GET_NAMED_CHILD_OBJECT(scfParent, csTextureWrapper, iName);
-  if (!obj) return NULL;
-  return &obj->scfiTextureWrapper;
+  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iTextureWrapper, iName);
 }
 
 iMaterialWrapper* csRegion::Region::FindMaterial (const char *iName)
 {
-  csMaterialWrapper* obj =
-    GET_NAMED_CHILD_OBJECT(scfParent, csMaterialWrapper, iName);
-  if (!obj) return NULL;
-  return &obj->scfiMaterialWrapper;
+  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMaterialWrapper, iName);
 }
 
 iCameraPosition* csRegion::Region::FindCameraPosition (const char *iName)
 {
-  csCameraPosition* obj =
-    GET_NAMED_CHILD_OBJECT(scfParent, csCameraPosition, iName);
-  if (!obj) return NULL;
-  return &obj->scfiCameraPosition;
+  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iCameraPosition, iName);
 }
 
 iCollection* csRegion::Region::FindCollection (const char *iName)
 {
-  csCollection* obj =
-    GET_NAMED_CHILD_OBJECT(scfParent, csCollection, iName);
-  if (!obj) return NULL;
-  return &obj->scfiCollection;
+  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iCollection, iName);
 }
 
 bool csRegion::IsInRegion (iObject* iobj)

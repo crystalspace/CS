@@ -855,7 +855,7 @@ void move_ghost (csMeshWrapper* spr)
   }
 
   // Turn around at random intervals.
-  GhostSpriteInfo* gh_info = GET_CHILD_OBJECT(spr, GhostSpriteInfo);
+  GhostSpriteInfo* gh_info = GET_CHILD_OBJECT_FAST(spr, GhostSpriteInfo);
   if (rand () % 40 == 1) gh_info->dir = -gh_info->dir;
 
   // OpenStep compiler bug prevents Transform(GetYRotation()), which is why

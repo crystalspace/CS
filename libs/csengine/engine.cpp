@@ -385,6 +385,9 @@ INTERFACE_ID_VAR (iCameraPosition);
 INTERFACE_ID_VAR (iPolyTxtPlane);
 INTERFACE_ID_VAR (iStatLight);
 INTERFACE_ID_VAR (iMaterialHandle);
+INTERFACE_ID_VAR (iTerrainWrapper);
+INTERFACE_ID_VAR (iTerrainFactoryWrapper);
+INTERFACE_ID_VAR (iKeyValuePair);
 
 INTERFACE_ID_VAR (csPolyTxtPlane);
 INTERFACE_ID_VAR (csCollection);
@@ -394,6 +397,9 @@ INTERFACE_ID_VAR (csCurveTemplate);
 INTERFACE_ID_VAR (csSector);
 INTERFACE_ID_VAR (csTextureWrapper);
 INTERFACE_ID_VAR (csMaterialWrapper);
+INTERFACE_ID_VAR (csCollider);
+INTERFACE_ID_VAR (csRadPoly);
+INTERFACE_ID_VAR (csRadCurve);
 
 ALLOCATE_OBJECT_TYPE (iEngine)
 ALLOCATE_OBJECT_TYPE (csEngine)
@@ -635,6 +641,9 @@ bool csEngine::Initialize (iSystem* sys)
   INITIALIZE_INTERFACE_VAR (iPolyTxtPlane);
   INITIALIZE_INTERFACE_VAR (iStatLight);
   INITIALIZE_INTERFACE_VAR (iMaterialHandle);
+  INITIALIZE_INTERFACE_VAR (iTerrainWrapper);
+  INITIALIZE_INTERFACE_VAR (iTerrainFactoryWrapper);
+  INITIALIZE_INTERFACE_VAR (iKeyValuePair);
 
   INITIALIZE_INTERFACE_VAR (csPolyTxtPlane);
   INITIALIZE_INTERFACE_VAR (csCollection);
@@ -644,6 +653,9 @@ bool csEngine::Initialize (iSystem* sys)
   INITIALIZE_INTERFACE_VAR (csSector);
   INITIALIZE_INTERFACE_VAR (csTextureWrapper);
   INITIALIZE_INTERFACE_VAR (csMaterialWrapper);
+  INITIALIZE_INTERFACE_VAR (csCollider);
+  INITIALIZE_INTERFACE_VAR (csRadPoly);
+  INITIALIZE_INTERFACE_VAR (csRadCurve);
 
   if (!(G3D = QUERY_PLUGIN_ID (sys, CS_FUNCID_VIDEO, iGraphics3D)))
     return false;

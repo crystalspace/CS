@@ -158,8 +158,8 @@ void csNodeIterator::SkipWrongClassname ()
     while (!m_Iterator.IsFinished ())
     {
       csMapNode *pNode = GetNode ();
-      csKeyValuePair *KeyVal =
-        GET_NAMED_CHILD_OBJECT (pNode, csKeyValuePair, "classname");
+      iKeyValuePair *KeyVal =
+        GET_NAMED_CHILD_OBJECT_FAST (pNode, iKeyValuePair, "classname");
       if (!KeyVal || strcmp (KeyVal->GetValue (), m_Classname) != 0)
         m_Iterator.Next ();
       else

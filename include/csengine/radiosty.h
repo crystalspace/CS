@@ -323,6 +323,9 @@ public:
   DECLARE_OBJECT_INTERFACE;
 };
 
+
+SCF_VERSION (csRadPoly, 0, 0, 1);
+
 /**
  *  A radiosity polygon, containing lightmap patches, the lumels.
  *  Radiosity rendering specific info is kept here.
@@ -371,7 +374,11 @@ public:
                     GetCoverageMatrix(*lview, *shadow_matrix); }
   CSOBJTYPE;
   DECLARE_OBJECT_INTERFACE;
+  DECLARE_IBASE_EXT (csRadElement);
 };
+
+
+SCF_VERSION (csRadCurve, 0, 0, 1);
 
 /**
  *  A radiosity curve, containing lightmap patches, the lumels.
@@ -416,6 +423,7 @@ public:
 
   CSOBJTYPE;
   DECLARE_OBJECT_INTERFACE;
+  DECLARE_IBASE_EXT (csRadElement);
 };
 
 

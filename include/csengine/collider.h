@@ -29,6 +29,9 @@ struct iPolygonMesh;
 struct iCollideSystem;
 struct iCollider;
 
+
+SCF_VERSION (csCollider, 0, 0, 1);
+
 /**
  * This is a conveniance object that you can use in your own
  * games to attach an iCollider object (from the CD plugin system)
@@ -84,6 +87,7 @@ public:
 
   CSOBJTYPE;
   DECLARE_OBJECT_INTERFACE;
+  DECLARE_IBASE_EXT (csPObject);
 };
 
 #endif // __CS_COLLIDER_H__
