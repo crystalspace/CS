@@ -286,9 +286,9 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 
   // create the window.
   DWORD exStyle = 0;
-  DWORD style =  WINDOW_STYLE;
+  DWORD style = WINDOW_STYLE;
   if (!FullScreen)
-    style |= WS_CAPTION;
+    style |= WS_OVERLAPPEDWINDOW;
   if (FullScreen)
   {
     ChangeDisplaySettings(NULL,0);
