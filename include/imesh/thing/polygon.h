@@ -38,7 +38,7 @@ struct csPolyTextureMapping
 {
   csPolyTextureMapping() : fdu(0.0f), fdv(0.0f), Imin_u(0), Imin_v(0),
     Fmin_u(0.0f), Fmin_v(0.0f), Fmax_u(0.0f), Fmax_v(0.0f), shf_u(0),
-    w(0.0f), h(0.0f), w_orig(0.0f), 
+    w(0), h(0), w_orig(0), 
     lmu1(0.0f), lmv1(0.0f), lmu2(0.0f), lmv2(0.0f)
   {
   }
@@ -113,4 +113,3 @@ struct csPolyTextureMapping
 };
 
 #endif // __CS_THING_POLYGON_H__
-
