@@ -66,7 +66,6 @@ protected:
   iSystem* m_piSystem;
   void * memory;
   int memorysize;
-  float volume;
   int m_nFrequency;
   bool m_b16Bits;
   bool m_bStereo;
@@ -85,8 +84,6 @@ public:
   bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
   void Close();
   
-  void SetVolume(float vol);
-  float GetVolume();
   void LockMemory(void **mem, int *memsize);
   void UnlockMemory();
   bool IsBackground();

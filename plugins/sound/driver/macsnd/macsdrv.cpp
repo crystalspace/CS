@@ -186,6 +186,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, boo
   }
   
   GetDefaultOutputVolume( &mOutputVolume );
+  SetDefaultOutputVolume( 255 );
   
   return true;
 }
@@ -231,25 +232,6 @@ void csSoundDriverMac::Close()
   
   SetDefaultOutputVolume( mOutputVolume );
 }
-
-void csSoundDriverMac::SetVolume(float newVolume)
-{
-  long  theVolume;
-  
-  /*
-   *	Make sure the volume is between 0 and 1.
-   */
-  if (( newVolume < 0 ) || ( newVolume > 1 ))
-    return;
-  
-  /*
-   *	The mac volume is between 0 and 256 so scale up the passed in volume.
-   */
-  theVolume = newVolume * 256.0;
-  SetDefaultOutputVolume( theVolume );
-}
-
-float csSoundDriverMac::GetVolume() { return volume; }
 
 void csSoundDriverMac::LockMemory(void **mem, int *memsize)
 {

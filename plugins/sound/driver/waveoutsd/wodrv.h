@@ -31,51 +31,47 @@
 class csSoundDriverWaveOut : public iSoundDriver
 {
 public:
-	DECLARE_IBASE;
+  DECLARE_IBASE;
 	
-	csSoundDriverWaveOut(iBase *piBase);
+  csSoundDriverWaveOut(iBase *piBase);
 	
-	virtual ~csSoundDriverWaveOut();
+  virtual ~csSoundDriverWaveOut();
 
-	/// implementation of interface for iPlugin
-	virtual bool Initialize (iSystem *iSys);
-	
-	bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
-	void Close();
-	
-	void SetVolume(float vol);
-	float GetVolume();
-	void LockMemory(void **mem, int *memsize);
-	void UnlockMemory();
-	bool IsBackground();
-	bool Is16Bits();
-	bool IsStereo();
-	int GetFrequency();
-	bool IsHandleVoidSound();
+  // implementation of interface for iPlugin
+  virtual bool Initialize (iSystem *iSys);
+  virtual bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
+  virtual void Close();
+  virtual void LockMemory(void **mem, int *memsize);
+  virtual void UnlockMemory();
+  virtual bool IsBackground();
+  virtual bool Is16Bits();
+  virtual bool IsStereo();
+  virtual int GetFrequency();
+  virtual bool IsHandleVoidSound();
+
+  const char *GetMMError(MMRESULT code);
 	
 protected:
   // system driver
-  iSystem* m_piSystem;
+  iSystem *System;
 
   // config file
   iConfigFile *Config;
 
   // sound renderer
-  iSoundRender *m_piSoundRender;
+  iSoundRender *SoundRender;
 
   // sound memory
-  void * Memory;
+  void *Memory;
   int MemorySize;
 
-  // system volume (restored when the driver is closed)
-  unsigned long old_Volume;
-
-  // global volume setting
-  float volume;
   // sound format
-  int m_nFrequency;
-  bool m_b16Bits;
-  bool m_bStereo;
+  int Frequency;
+  bool Bit16;
+  bool Stereo;
+
+  // is the sound proc locked?
+  bool SoundProcLocked;
 
   // this function is called again and again in 'function' playback
   static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
@@ -84,11 +80,13 @@ protected:
   // this actually sends the sound data to wave-out (used by both of the above functions).
   void SoundProc(LPWAVEHDR OldHeader);
 
-  // wave-out device?
-  HWAVEOUT hwo;
-  // ???
-  HANDLE hThread;
-  DWORD dwThread;
+  // wave-out device
+  HWAVEOUT WaveOut;
+  // thread handle and ID
+  HANDLE ThreadHandle;
+  DWORD ThreadID;
+  // old system volume
+  DWORD OldVolume;
 };
 
 #endif	//__SOUND_DRIVER_WAVEOUT_H__

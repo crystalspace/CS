@@ -250,7 +250,6 @@ csSoundDriverOSS::csSoundDriverOSS(iBase *piBase)
   m_piSoundRender = NULL;
   memorysize = 0;
   memory = NULL;
-  volume = 1.0;
   block_size=0;
   block = 0;
   fragments = 0;
@@ -307,9 +306,6 @@ void csSoundDriverOSS::Close()
     memory=NULL;
     memorysize=0;
 }
-
-void csSoundDriverOSS::SetVolume(float vol) { volume = vol; }
-float csSoundDriverOSS::GetVolume() { return volume; }
 
 void csSoundDriverOSS::LockMemory(void **mem, int *memsize)
 {

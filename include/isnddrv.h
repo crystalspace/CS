@@ -39,10 +39,6 @@ struct iSoundDriver : public iPlugIn
   virtual bool Open (iSoundRender *render, int frequency, bool bit16, bool stereo) = 0;
   /// Close the sound render
   virtual void Close () = 0;
-  /// Set Volume [0, 1]
-  virtual void SetVolume (float vol) = 0;
-  /// Get Volume [0, 1]
-  virtual float GetVolume () = 0;
   /// Lock and Get Sound Memory Buffer
   virtual void LockMemory (void **mem, int *memsize) = 0;
   /// Unlock Sound Memory Buffer
