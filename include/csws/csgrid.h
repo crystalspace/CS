@@ -219,6 +219,11 @@ class csGridView : public csComponent
   csGridView* SplitX (int x, int iStyle = 0);
   csGridView* SplitY (int y, int iStyle = 0);
 
+  /**
+   * Restrict the area that this view can display.
+   */
+  void SetViewArea (const csRect& rc){ area.Set (rc.xmin, rc.ymin, rc.xmax, rc.ymax); col=area.xmin; row=area.ymin; }
+
   int ViewStyle;
   // if view was split and this is the newly created view, then this value tells us what part of the old area
   // this one covers - needed for resizing viewhierachy
