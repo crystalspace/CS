@@ -38,7 +38,6 @@ struct iReporter;
 class csFireFactoryLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
 public:
@@ -75,7 +74,6 @@ public:
 class csFireFactorySaver : public iSaverPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
 public:
@@ -107,10 +105,9 @@ public:
 class csFireLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
-  iReporter* reporter;
+  csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
   csStringHash xmltokens;
 
 public:
@@ -147,9 +144,8 @@ public:
 class csFireSaver : public iSaverPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;

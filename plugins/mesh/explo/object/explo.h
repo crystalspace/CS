@@ -47,8 +47,8 @@ protected:
   iEngine* light_engine;
   // Both pointers represent the same light but ilight points to the
   // iLight interface.
-  iDynLight* explight;
-  iLight* ilight;
+  csRef<iDynLight> explight;
+  csRef<iLight> ilight;
   csTicks light_fade;
   /// scaling of particles.
   bool scale_particles;

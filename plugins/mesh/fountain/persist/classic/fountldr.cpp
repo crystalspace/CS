@@ -137,50 +137,49 @@ csFountainFactoryLoader::csFountainFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csFountainFactoryLoader::~csFountainFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFountainFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csFountainFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
 csPtr<iBase> csFountainFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.fountain", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.fountain", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.fountain",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.fountain\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csFountainFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.fountain", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.fountain", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.fountain",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.fountain\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -190,18 +189,15 @@ csFountainFactorySaver::csFountainFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csFountainFactorySaver::~csFountainFactorySaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFountainFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csFountainFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
@@ -218,22 +214,15 @@ csFountainLoader::csFountainLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  synldr = NULL;
-  reporter = NULL;
 }
 
 csFountainLoader::~csFountainLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csFountainLoader::Initialize (iObjectRegistry* object_reg)
 {
   csFountainLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
@@ -279,9 +268,9 @@ csPtr<iBase> csFountainLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iParticleState* partstate = NULL;
-  iFountainState* fountstate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iFountainState> fountstate;
 
   csParser* parser = ldr_context->GetParser ();
 
@@ -291,8 +280,6 @@ csPtr<iBase> csFountainLoader::Parse (const char* string,
     if (!params)
     {
       // @@@ Error handling!
-      if (partstate) partstate->DecRef ();
-      if (fountstate) fountstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -367,8 +354,6 @@ csPtr<iBase> csFountainLoader::Parse (const char* string,
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
-	    if (partstate) partstate->DecRef ();
-	    if (fountstate) fountstate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -383,9 +368,6 @@ csPtr<iBase> csFountainLoader::Parse (const char* string,
 	  if (!mat)
 	  {
             // @@@ Error handling!
-            mesh->DecRef ();
-	    if (partstate) partstate->DecRef ();
-	    if (fountstate) fountstate->DecRef ();
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -413,8 +395,7 @@ csPtr<iBase> csFountainLoader::Parse (const char* string,
     }
   }
 
-  if (partstate) partstate->DecRef ();
-  if (fountstate) fountstate->DecRef ();
+  if (mesh) mesh->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -550,19 +531,15 @@ csFountainSaver::csFountainSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csFountainSaver::~csFountainSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
 }
 
 bool csFountainSaver::Initialize (iObjectRegistry* object_reg)
 {
   csFountainSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
@@ -570,9 +547,9 @@ bool csFountainSaver::Initialize (iObjectRegistry* object_reg)
 void csFountainSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
-  iFountainState *state = SCF_QUERY_INTERFACE (obj, iFountainState);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
+  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
+  csRef<iFountainState> state (SCF_QUERY_INTERFACE (obj, iFountainState));
   char buf[MAXLINE];
   char name[MAXLINE];
 
@@ -615,9 +592,6 @@ void csFountainSaver::WriteDown (iBase* obj, iFile *file)
   sprintf(buf, "FALLTIME (%g)\n", state->GetFallTime());
   str.Append(buf);
 
-  fact->DecRef();
-  partstate->DecRef();
-  state->DecRef();
   file->Write ((const char*)str, str.Length ());
 }
 

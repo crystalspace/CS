@@ -99,7 +99,7 @@ void csFireMeshObject::SetupObject ()
     radius = qsqrt (a*a + a*a);
 
     // create particles
-	int i;
+    int i;
     for (i=0 ; i < number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
@@ -129,8 +129,6 @@ csFireMeshObject::csFireMeshObject (iObjectRegistry* object_reg,
   swirl = 1;
   color_scale = 1;
   number = 40;
-  light = NULL;
-  dynlight = NULL;
   delete_light = false;
   light_engine = NULL;
   precalc_valid = false;
@@ -143,8 +141,6 @@ csFireMeshObject::~csFireMeshObject()
   {
     light_engine->RemoveDynLight (dynlight);
   }
-  if (dynlight) dynlight->DecRef ();
-  if (light) light->DecRef ();
   delete[] part_pos;
   delete[] part_speed;
   delete[] part_age;
@@ -153,7 +149,6 @@ csFireMeshObject::~csFireMeshObject()
 void csFireMeshObject::SetControlledLight (iLight *l)
 {
   light = l;
-  if (dynlight) dynlight->DecRef ();
   dynlight = SCF_QUERY_INTERFACE_SAFE (light, iDynLight);
 }
 
@@ -283,9 +278,8 @@ csPtr<iMeshObject> csFireMeshObjectFactory::NewInstance ()
 {
   csFireMeshObject* cm =
     new csFireMeshObject (object_reg, (iMeshObjectFactory*)this );
-  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
-  im->DecRef ();
-  return csPtr<iMeshObject> (im);
+  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
+  return csPtr<iMeshObject> (im);	// DecRef is ok.
 }
 
 //----------------------------------------------------------------------
@@ -319,8 +313,8 @@ csFireMeshObjectType::~csFireMeshObjectType ()
 csPtr<iMeshObjectFactory> csFireMeshObjectType::NewFactory ()
 {
   csFireMeshObjectFactory* cm = new csFireMeshObjectFactory (this, object_reg);
-  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
-  ifact->DecRef ();
-  return csPtr<iMeshObjectFactory> (ifact);
+  csRef<iMeshObjectFactory> ifact (
+  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
 }
 

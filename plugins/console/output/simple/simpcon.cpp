@@ -96,6 +96,13 @@ csSimpleConsole::~csSimpleConsole ()
   }
   FreeLineMessage ();
   FreeBuffer ();
+
+  // @@@@@@@@@@@@@@@@@@@@@@@@@ NEEDS DEBUGGING
+  // If console_font = NULL is moved AFTER the other two assignments
+  // then there will be a crash.
+  console_font = NULL;
+  G3D = NULL;
+  G2D = NULL;
 }
 
 bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
@@ -193,7 +200,7 @@ void csSimpleConsole::FreeBuffer ()
 {
   if (Line)
   {
-	int i;
+    int i;
     for (i = 0; i < LineMax; i++)
       delete [] Line [i];
     delete [] Line;

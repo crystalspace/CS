@@ -44,9 +44,8 @@ class csConstructionRule;
 class csGeneralTreeFactoryLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iReporter* reporter;
+  csRef<iReporter> reporter;
   csStringHash xmltokens;
 
   csConstructionGeometry* cg_straighttrunk;

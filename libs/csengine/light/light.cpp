@@ -459,7 +459,7 @@ csDynLight::~csDynLight ()
 {
   while (lightpatches)
     csEngine::current_engine->lightpatch_pool->Free (lightpatches);
-  csEngine::current_engine->RemoveDynLight (this);
+  //csEngine::current_engine->RemoveDynLight (this);
 }
 
 void csDynLight::Setup ()

@@ -463,7 +463,6 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
 csHazeMeshObject::~csHazeMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
-  if (ifactory) ifactory->DecRef ();
 }
 
 void csHazeMeshObject::SetupObject ()
@@ -1095,9 +1094,8 @@ csHazeMeshObjectFactory::~csHazeMeshObjectFactory ()
 csPtr<iMeshObject> csHazeMeshObjectFactory::NewInstance ()
 {
   csHazeMeshObject* cm = new csHazeMeshObject (this);
-  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
-  im->DecRef ();
-  return csPtr<iMeshObject> (im);
+  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
+  return csPtr<iMeshObject> (im);	// DecRef is ok here.
 }
 
 //----------------------------------------------------------------------
@@ -1131,8 +1129,8 @@ csHazeMeshObjectType::~csHazeMeshObjectType ()
 csPtr<iMeshObjectFactory> csHazeMeshObjectType::NewFactory ()
 {
   csHazeMeshObjectFactory* cm = new csHazeMeshObjectFactory (this);
-  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
-  ifact->DecRef ();
-  return csPtr<iMeshObjectFactory> (ifact);
+  csRef<iMeshObjectFactory> ifact (
+  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
 }
 

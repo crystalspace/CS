@@ -1671,6 +1671,7 @@ void csEngine::AddDynLight (csDynLight *dyn)
   dyn->SetPrev (NULL);
   if (first_dyn_lights) first_dyn_lights->SetPrev (dyn);
   first_dyn_lights = dyn;
+  dyn->IncRef ();
 }
 
 void csEngine::RemoveDynLight (csDynLight *dyn)
@@ -1682,6 +1683,7 @@ void csEngine::RemoveDynLight (csDynLight *dyn)
     first_dyn_lights = dyn->GetNext ();
   dyn->SetNext (NULL);
   dyn->SetPrev (NULL);
+  dyn->DecRef ();
 }
 
 iDynLight* csEngine::GetFirstDynLight () const

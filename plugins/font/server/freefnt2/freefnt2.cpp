@@ -121,7 +121,9 @@ bool csFreeType2Server::Initialize (iObjectRegistry *object_reg)
   csRef<iConfigIterator> fontenum (ftconfig->Enumerate (s));
   while (fontenum->Next ())
     if (fontenum->GetKey (true) [0] == '*')
-      LoadFont (fontenum->GetKey (true));
+    {
+      csRef<iFont> fnt (LoadFont (fontenum->GetKey (true)));
+    }
 
   return true;
 }
@@ -154,7 +156,6 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename)
     return NULL;
   }
   fonts.Put (font);
-  font->IncRef ();
   return font;
 }
 

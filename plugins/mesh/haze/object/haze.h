@@ -203,7 +203,7 @@ public:
 class csHazeMeshObject : public iMeshObject
 {
 private:
-  iMeshObjectFactory* ifactory;
+  csRef<iMeshObjectFactory> ifactory;
   iBase* logparent;
   csHazeMeshObjectFactory* factory;
 

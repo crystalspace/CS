@@ -156,22 +156,15 @@ csGeneralFactoryLoader::csGeneralFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
-  synldr = NULL;
 }
 
 csGeneralFactoryLoader::~csGeneralFactoryLoader ()
 {
-  if (synldr) synldr->DecRef ();
-  if (reporter) reporter->DecRef ();
-  if (plugin_mgr) plugin_mgr->DecRef ();
 }
 
 bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
@@ -220,8 +213,10 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 
   csParser* parser = ldr_context->GetParser ();
 
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.genmesh", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.genmesh", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.genmesh",
@@ -234,11 +229,9 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		"Could not load the general mesh object plugin!");
     return NULL;
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
-
-  iGeneralFactoryState* state = SCF_QUERY_INTERFACE (fact,
-  	iGeneralFactoryState);
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  csRef<iGeneralFactoryState> state (SCF_QUERY_INTERFACE (fact,
+  	iGeneralFactoryState));
 
   bool auto_normals = false;
   char* buf = (char*)string;
@@ -249,8 +242,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
       ReportError (reporter,
 		"crystalspace.genmeshfactoryloader.parse.badformat",
 		"Bad format while parsing general mesh factory!");
-      state->DecRef ();
-      fact->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -265,8 +256,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
       	    ReportError (reporter,
 		"crystalspace.genmeshfactoryloader.parse.unknownmaterial",
 		"Couldn't find material '%s'!", str);
-            state->DecRef ();
-            fact->DecRef ();
             return NULL;
 	  }
 	  state->SetMaterialWrapper (mat);
@@ -304,8 +293,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 	      ReportError (reporter,
 		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		"Bad format while parsing TRIANGLES for general mesh factory!");
-	      state->DecRef ();
-	      fact->DecRef ();
 	      return NULL;
             }
             switch (cmd)
@@ -316,8 +303,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 	          ReportError (reporter,
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		    "Too many TRIANGLES for a general mesh factory!");
-	          state->DecRef ();
-	          fact->DecRef ();
 	          return NULL;
 		}
 		int a, b, c;
@@ -335,8 +320,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		"crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
 		"Token '%s' not found while parsing triangles!",
 		parser->GetLastOffender ());
-	    state->DecRef ();
-	    fact->DecRef ();
 	    return NULL;
           }
 	}
@@ -353,8 +336,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 	      ReportError (reporter,
 		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		"Bad format while parsing NORMALS for general mesh factory!");
-	      state->DecRef ();
-	      fact->DecRef ();
 	      return NULL;
             }
             switch (cmd)
@@ -365,8 +346,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 	          ReportError (reporter,
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		    "Too many COLORS for a general mesh factory!");
-	          state->DecRef ();
-	          fact->DecRef ();
 	          return NULL;
 		}
 		float x, y, z;
@@ -382,8 +361,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		"crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
 		"Token '%s' not found while parsing normals!",
 		parser->GetLastOffender ());
-	    state->DecRef ();
-	    fact->DecRef ();
 	    return NULL;
           }
 	}
@@ -400,8 +377,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 	      ReportError (reporter,
 		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		"Bad format while parsing COLORS for general mesh factory!");
-	      state->DecRef ();
-	      fact->DecRef ();
 	      return NULL;
             }
             switch (cmd)
@@ -412,8 +387,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 	          ReportError (reporter,
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		    "Too many COLORS for a general mesh factory!");
-	          state->DecRef ();
-	          fact->DecRef ();
 	          return NULL;
 		}
 		float r, g, b;
@@ -429,8 +402,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		"crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
 		"Token '%s' not found while parsing colors!",
 		parser->GetLastOffender ());
-	    state->DecRef ();
-	    fact->DecRef ();
 	    return NULL;
           }
 	}
@@ -448,8 +419,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 	      ReportError (reporter,
 		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		"Bad format while parsing VERTICES for general mesh factory!");
-	      state->DecRef ();
-	      fact->DecRef ();
 	      return NULL;
             }
             switch (cmd)
@@ -460,8 +429,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 	          ReportError (reporter,
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		    "Too many VERTICES for a general mesh factory!");
-	          state->DecRef ();
-	          fact->DecRef ();
 	          return NULL;
 		}
 		float x, y, z, u, v;
@@ -478,8 +445,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		"crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
 		"Token '%s' not found while parsing vertices!",
 		parser->GetLastOffender ());
-	    state->DecRef ();
-	    fact->DecRef ();
 	    return NULL;
           }
 	}
@@ -490,15 +455,17 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
   if (auto_normals)
     state->CalculateNormals ();
 
-  state->DecRef ();
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.genmesh", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.genmesh", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.genmesh",
@@ -659,20 +626,15 @@ csGeneralFactorySaver::csGeneralFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csGeneralFactorySaver::~csGeneralFactorySaver ()
 {
-  if (reporter) reporter->DecRef ();
-  if (plugin_mgr) plugin_mgr->DecRef ();
 }
 
 bool csGeneralFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
@@ -691,24 +653,16 @@ csGeneralMeshLoader::csGeneralMeshLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  synldr = NULL;
-  plugin_mgr = NULL;
 }
 
 csGeneralMeshLoader::~csGeneralMeshLoader ()
 {
-  SCF_DEC_REF (reporter);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralMeshLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
@@ -737,8 +691,8 @@ csPtr<iBase> csGeneralMeshLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iGeneralMeshState* meshstate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iGeneralMeshState> meshstate;
 
   csParser* parser = ldr_context->GetParser ();
 
@@ -750,7 +704,6 @@ csPtr<iBase> csGeneralMeshLoader::Parse (const char* string,
       ReportError (reporter,
 		"crystalspace.genmeshloader.parse.badformat",
 		"Bad format while parsing general mesh object!");
-      if (meshstate) meshstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -785,7 +738,6 @@ csPtr<iBase> csGeneralMeshLoader::Parse (const char* string,
       	    ReportError (reporter,
 		"crystalspace.genmeshloader.parse.unknownfactory",
 		"Couldn't find factory '%s'!", str);
-	    if (meshstate) meshstate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -801,7 +753,6 @@ csPtr<iBase> csGeneralMeshLoader::Parse (const char* string,
       	    ReportError (reporter,
 		"crystalspace.genmeshloader.parse.unknownmaterial",
 		"Couldn't find material '%s'!", str);
-            mesh->DecRef ();
             return NULL;
 	  }
 	  meshstate->SetMaterialWrapper (mat);
@@ -813,8 +764,6 @@ csPtr<iBase> csGeneralMeshLoader::Parse (const char* string,
 	{
 	  ReportError (reporter, "crystalspace.genmeshloader.parse.mixmode",
 	  	"Error parsing mixmode!");
-	  if (meshstate) meshstate->DecRef ();
-	  mesh->DecRef ();
 	  return NULL;
 	}
         meshstate->SetMixMode (mm);
@@ -822,7 +771,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (const char* string,
     }
   }
 
-  if (meshstate) meshstate->DecRef ();
+  if (mesh) mesh->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -919,22 +868,15 @@ csGeneralMeshSaver::csGeneralMeshSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  synldr = NULL;
-  plugin_mgr = NULL;
 }
 
 csGeneralMeshSaver::~csGeneralMeshSaver ()
 {
-  SCF_DEC_REF (reporter);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralMeshSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
@@ -944,3 +886,4 @@ void csGeneralMeshSaver::WriteDown (iBase*, iFile*)
 {
   // @@@ Not implemented!
 }
+

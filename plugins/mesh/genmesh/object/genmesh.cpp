@@ -503,10 +503,9 @@ void csGenmeshMeshObjectFactory::SetupVertexBuffer ()
   {
     if (!vbufmgr)
     {
-      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+      csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
       // @@@ priority should be a parameter.
       vbufmgr = g3d->GetVertexBufferManager ();
-      g3d->DecRef ();
       vbufmgr->AddClient (&scfiVertexBufferManagerClient);
     }
     vbuf = vbufmgr->CreateBuffer (0);
@@ -651,9 +650,8 @@ void csGenmeshMeshObjectFactory::Invalidate ()
 csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
 {
   csGenmeshMeshObject* cm = new csGenmeshMeshObject (this);
-  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
-  im->DecRef ();
-  return csPtr<iMeshObject> (im);
+  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
+  return csPtr<iMeshObject> (im);	// DecRef is ok here.
 }
 
 void csGenmeshMeshObjectFactory::eiVertexBufferManagerClient::ManagerClosing ()
@@ -714,8 +712,8 @@ csPtr<iMeshObjectFactory> csGenmeshMeshObjectType::NewFactory ()
 {
   csGenmeshMeshObjectFactory* cm = new csGenmeshMeshObjectFactory (this,
   	object_reg);
-  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
-  ifact->DecRef ();
-  return csPtr<iMeshObjectFactory> (ifact);
+  csRef<iMeshObjectFactory> ifact (
+  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
 }
 

@@ -95,8 +95,6 @@ csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
   /// defaults
   has_light = false;
   light_sector = NULL;
-  explight = NULL;
-  ilight = NULL;
   scale_particles = false;
   push.Set (0, 0, 0);
   center.Set (0, 0, 0);
@@ -143,7 +141,6 @@ void csExploMeshObject::AddLight (iEngine *engine, iSector *sec, csTicks fade)
   explight = engine->CreateDynLight (center, 5, csColor (1, 1, 0));
   ilight = SCF_QUERY_INTERFACE (explight, iLight);
   ilight->SetSector (light_sector);
-  ilight->DecRef ();
   explight->Setup ();
 }
 
@@ -153,7 +150,6 @@ void csExploMeshObject::RemoveLight ()
   if (!has_light) return;
   has_light = false;
   light_engine->RemoveDynLight (explight);
-  explight->DecRef ();
   explight = NULL;
   ilight = NULL;
   light_sector = NULL;
@@ -189,9 +185,8 @@ csPtr<iMeshObject> csExploMeshObjectFactory::NewInstance ()
 {
   csExploMeshObject* cm =
     new csExploMeshObject (object_reg, (iMeshObjectFactory*)this);
-  iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
-  im->DecRef ();
-  return csPtr<iMeshObject> (im);
+  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
+  return csPtr<iMeshObject> (im);	// DecRef is ok here.
 }
 
 //----------------------------------------------------------------------
@@ -227,8 +222,8 @@ csPtr<iMeshObjectFactory> csExploMeshObjectType::NewFactory ()
 {
   csExploMeshObjectFactory* cm = new csExploMeshObjectFactory (this,
   	object_reg);
-  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
-  ifact->DecRef ();
-  return csPtr<iMeshObjectFactory> (ifact);
+  csRef<iMeshObjectFactory> ifact (
+  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
 }
 

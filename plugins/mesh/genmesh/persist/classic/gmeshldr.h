@@ -37,10 +37,9 @@ struct iSyntaxService;
 class csGeneralFactoryLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iReporter* reporter;
-  iSyntaxService *synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
 public:
@@ -77,9 +76,8 @@ public:
 class csGeneralFactorySaver : public iSaverPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  csRef<iReporter> reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -110,10 +108,9 @@ public:
 class csGeneralMeshLoader : public iLoaderPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService *synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
 public:
@@ -150,10 +147,9 @@ public:
 class csGeneralMeshSaver : public iSaverPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService *synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;

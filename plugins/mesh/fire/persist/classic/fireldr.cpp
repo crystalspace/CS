@@ -134,50 +134,49 @@ csFireFactoryLoader::csFireFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csFireFactoryLoader::~csFireFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFireFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csFireFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
 csPtr<iBase> csFireFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.fire", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.fire", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.fire",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.fire\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csFireFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.fire", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.fire", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.fire",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.fire\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -187,18 +186,15 @@ csFireFactorySaver::csFireFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csFireFactorySaver::~csFireFactorySaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFireFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csFireFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
@@ -215,22 +211,15 @@ csFireLoader::csFireLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  synldr = NULL;
-  reporter = NULL;
 }
 
 csFireLoader::~csFireLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csFireLoader::Initialize (iObjectRegistry* object_reg)
 {
   csFireLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
@@ -274,9 +263,9 @@ csPtr<iBase> csFireLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iParticleState* partstate = NULL;
-  iFireState* firestate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iFireState> firestate;
 
   csParser* parser = ldr_context->GetParser ();
 
@@ -286,8 +275,6 @@ csPtr<iBase> csFireLoader::Parse (const char* string,
     if (!params)
     {
       // @@@ Error handling!
-      if (partstate) partstate->DecRef ();
-      if (firestate) firestate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -357,8 +344,6 @@ csPtr<iBase> csFireLoader::Parse (const char* string,
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
-	    if (partstate) partstate->DecRef ();
-	    if (firestate) firestate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -374,9 +359,6 @@ csPtr<iBase> csFireLoader::Parse (const char* string,
 	  {
 	    printf ("Could not find material '%s'!\n", str);
             // @@@ Error handling!
-            mesh->DecRef ();
-	    if (partstate) partstate->DecRef ();
-	    if (firestate) firestate->DecRef ();
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -404,8 +386,7 @@ csPtr<iBase> csFireLoader::Parse (const char* string,
     }
   }
 
-  if (partstate) partstate->DecRef ();
-  if (firestate) firestate->DecRef ();
+  if (mesh) mesh->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -540,19 +521,15 @@ csFireSaver::csFireSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csFireSaver::~csFireSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
 }
 
 bool csFireSaver::Initialize (iObjectRegistry* object_reg)
 {
   csFireSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
@@ -560,9 +537,9 @@ bool csFireSaver::Initialize (iObjectRegistry* object_reg)
 void csFireSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
-  iFireState *state = SCF_QUERY_INTERFACE (obj, iFireState);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
+  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
+  csRef<iFireState> state (SCF_QUERY_INTERFACE (obj, iFireState));
   char buf[MAXLINE];
   char name[MAXLINE];
 
@@ -609,9 +586,6 @@ void csFireSaver::WriteDown (iBase* obj, iFile *file)
   sprintf(buf, "DROPSIZE (%g, %g)\n", sx, sy);
   str.Append(buf);
 
-  fact->DecRef();
-  partstate->DecRef();
-  state->DecRef();
   file->Write ((const char*)str, str.Length ());
 }
 

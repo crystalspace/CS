@@ -44,20 +44,9 @@ class csPtr
 private:
   friend class csRef<T>;
   T* obj;
-# ifdef CS_TEST_VOIDPTRUSAGE
-  // If assigned is false this pointer hasn't been assigned to a
-  // csRef yet. csRef will set this to 'true' when the csPtr is
-  // copied to a csRef.
-  bool assigned;
-# endif
 
 public:
-  csPtr (T* p) : obj (p)
-  {
-#   ifdef CS_TEST_VOIDPTRUSAGE
-    assigned = false;
-#   endif
-  }
+  csPtr (T* p) : obj (p) { }
 
 #ifdef CS_TEST_VOIDPTRUSAGE
   ~csPtr ()
@@ -67,7 +56,13 @@ public:
     // a function that returns a csPtr and not using the result
     // (or at least not assigning it to a csRef). This is a memory
     // leak and you should fix that.
-    CS_ASSERT (assigned == true);
+    CS_ASSERT (obj == (T*)0xffffffff);
+  }
+
+  csPtr (const csPtr<T>& copy)
+  {
+    obj = copy.obj;
+    ((csPtr<T>&)copy).obj = (T*)0xffffffff;
   }
 #endif
 
@@ -105,8 +100,11 @@ public:
   {
     obj = newobj.obj;
 #   ifdef CS_TEST_VOIDPTRUSAGE
-    ((csPtr<T>)newobj).assigned = true;
+    CS_ASSERT (newobj.obj != (T*)0xffffffff);
 #   endif
+    // The following line is outside the ifdef to make sure
+    // we have binary compatibility.
+    ((csPtr<T>&)newobj).obj = (T*)0xffffffff;
   }
 
   /**
@@ -148,8 +146,11 @@ public:
     // First assign and then DecRef() of old object!
     obj = newobj.obj;
 #   ifdef CS_TEST_VOIDPTRUSAGE
-    ((csPtr<T>)newobj).assigned = true;
+    CS_ASSERT (newobj.obj != (T*)0xffffffff);
 #   endif
+    // The following line is outside the ifdef to make sure
+    // we have binary compatibility.
+    ((csPtr<T>&)newobj).obj = (T*)0xffffffff;
     if (oldobj)
       oldobj->DecRef ();
     return *this;

@@ -38,7 +38,6 @@ struct iReporter;
 class csFountainFactoryLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
 public:
@@ -75,7 +74,6 @@ public:
 class csFountainFactorySaver : public iSaverPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
 public:
@@ -108,10 +106,9 @@ public:
 class csFountainLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
-  iReporter* reporter;
+  csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
   csStringHash xmltokens;
 
 public:
@@ -148,9 +145,8 @@ public:
 class csFountainSaver : public iSaverPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;

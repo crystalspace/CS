@@ -154,9 +154,7 @@ public:
   /// Sets the type of the font.
   virtual void SetFont (iFont *Font)
   {
-    if (console_font) console_font->DecRef ();
     console_font = Font;
-    if (console_font) console_font->IncRef ();
   }
 
   /// Get the current top line being displayed

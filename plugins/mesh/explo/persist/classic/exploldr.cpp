@@ -137,50 +137,49 @@ csExplosionFactoryLoader::csExplosionFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csExplosionFactoryLoader::~csExplosionFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csExplosionFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csExplosionFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
 csPtr<iBase> csExplosionFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.explosion", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.explosion", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.explosion",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.explosion\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Prevent smart pointer cleanup.
   return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csExplosionFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.explosion", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.explosion", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.explosion",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.explosion\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Prevent smart pointer cleanup.
   return csPtr<iBase> (fact);
 }
 
@@ -190,18 +189,15 @@ csExplosionFactorySaver::csExplosionFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csExplosionFactorySaver::~csExplosionFactorySaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csExplosionFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csExplosionFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
@@ -216,22 +212,15 @@ csExplosionLoader::csExplosionLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  synldr = NULL;
-  reporter = NULL;
 }
 
 csExplosionLoader::~csExplosionLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csExplosionLoader::Initialize (iObjectRegistry* object_reg)
 {
   csExplosionLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
@@ -278,9 +267,9 @@ csPtr<iBase> csExplosionLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iParticleState* partstate = NULL;
-  iExplosionState* explostate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iExplosionState> explostate;
 
   csParser* parser = ldr_context->GetParser ();
 
@@ -290,8 +279,6 @@ csPtr<iBase> csExplosionLoader::Parse (const char* string,
     if (!params)
     {
       // @@@ Error handling!
-      if (partstate) partstate->DecRef ();
-      if (explostate) explostate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -324,8 +311,6 @@ csPtr<iBase> csExplosionLoader::Parse (const char* string,
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
-	    if (partstate) partstate->DecRef ();
-	    if (explostate) explostate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -340,9 +325,6 @@ csPtr<iBase> csExplosionLoader::Parse (const char* string,
 	  if (!mat)
 	  {
             // @@@ Error handling!
-            mesh->DecRef ();
-	    if (partstate) partstate->DecRef ();
-	    if (explostate) explostate->DecRef ();
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -412,8 +394,7 @@ csPtr<iBase> csExplosionLoader::Parse (const char* string,
     }
   }
 
-  if (partstate) partstate->DecRef ();
-  if (explostate) explostate->DecRef ();
+  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -540,19 +521,15 @@ csExplosionSaver::csExplosionSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csExplosionSaver::~csExplosionSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
 }
 
 bool csExplosionSaver::Initialize (iObjectRegistry* object_reg)
 {
   csExplosionSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
@@ -562,9 +539,10 @@ bool csExplosionSaver::Initialize (iObjectRegistry* object_reg)
 void csExplosionSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
-  iExplosionState *explostate = SCF_QUERY_INTERFACE (obj, iExplosionState);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
+  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
+  csRef<iExplosionState> explostate (
+  	SCF_QUERY_INTERFACE (obj, iExplosionState));
   char buf[MAXLINE];
   char name[MAXLINE];
 
@@ -609,10 +587,6 @@ void csExplosionSaver::WriteDown (iBase* obj, iFile *file)
     sprintf(buf, "FADE (%d)\n", (int)fade_time);
     str.Append(buf);
   }
-
-  fact->DecRef();
-  partstate->DecRef();
-  explostate->DecRef();
 
   file->Write ((const char*)str, str.Length ());
 }

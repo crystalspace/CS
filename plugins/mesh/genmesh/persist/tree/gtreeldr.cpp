@@ -193,8 +193,6 @@ csGeneralTreeFactoryLoader::csGeneralTreeFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 
   co_tree = NULL;
   co_branch1 = NULL;
@@ -215,9 +213,6 @@ csGeneralTreeFactoryLoader::csGeneralTreeFactoryLoader (iBase* pParent)
 
 csGeneralTreeFactoryLoader::~csGeneralTreeFactoryLoader ()
 {
-  if (reporter) reporter->DecRef ();
-  if (plugin_mgr) plugin_mgr->DecRef ();
-
   delete co_tree;
   delete co_branch1;
   delete co_branch2;
@@ -557,7 +552,6 @@ void csGeneralTreeFactoryLoader::GenerateSmallBranch (
 bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralTreeFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
   csVector3 vt[100];
@@ -671,8 +665,10 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
 
   csParser* parser = ldr_context->GetParser ();
 
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.genmesh", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.genmesh", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.genmesh",
@@ -685,11 +681,9 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
 		"Could not load the general mesh object plugin!");
     return NULL;
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
-
-  iGeneralFactoryState* state = SCF_QUERY_INTERFACE (fact,
-  	iGeneralFactoryState);
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  csRef<iGeneralFactoryState> state (SCF_QUERY_INTERFACE (fact,
+  	iGeneralFactoryState));
 
   char* buf = (char*)string;
   while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
@@ -699,8 +693,6 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
       ReportError (reporter,
 		"crystalspace.gentreefactoryloader.parse.badformat",
 		"Bad format while parsing general mesh/tree factory!");
-      state->DecRef ();
-      fact->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -771,7 +763,7 @@ printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
   state->CalculateNormals ();
   delete construction;
 
-  state->DecRef ();
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -779,8 +771,10 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
 	iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.genmesh", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.genmesh", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.genmesh",
@@ -799,7 +793,6 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
 
   fact = type->NewFactory ();
   state = SCF_QUERY_INTERFACE (fact, iGeneralFactoryState);
-  type->DecRef ();
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
