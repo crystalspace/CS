@@ -15,6 +15,16 @@ Short-term cleanups that need to be done:
 5-Jan-2000
 	- Some further changes on support for curves in visibility system
 	  (unfinished).
+	- Eric Sunshine updated some out-of-date information in people.tex
+	  and added missing information.
+	- Eric Sunshine elmiminated some compilation warnings in world.cpp.
+	- Eric Sunshine worked around an OpenStep compiler bug which was
+	  triggered by the new csengine/planeclp.h file.  The compiler
+	  generates unlinkable code when an inline method calls another inline
+	  method which the compiler has not seen yet.  A simple textual
+	  reorganization of the file fixed the problem.
+	- Eric Sunshine eliminated signed vs. unsigned comparision compilation
+	  warnings in map2cs.
 4-Jan-2000
 	- Improved style a bit in new planeclp.h.
 	- Started work on including curved surfaces to the visibility
