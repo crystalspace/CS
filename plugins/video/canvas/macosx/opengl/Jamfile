@@ -6,6 +6,7 @@ Plugin glosx2d
 	: [ Wildcard *.cpp *.m *.h ]
 ;
 LinkWith glosx2d : canvascommon openglcommon osxcanvascommon cssys csutil ;
+ExternalLibs glosx2d : GL ;
 
 Help glosx2d : "Crystal Space MacOS/X OpenGL 2D driver" ;
 CompileGroups glosx2d :  drivers2d ;
