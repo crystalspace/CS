@@ -39,6 +39,8 @@ chronological order.
 	  priority always override the <factory> settings.
 	- res fixed csosdefs.h to only include <sys/param.h> in case configure
 	  detected it.
+	- res removed some unnecessary members & methods from the NR GL 
+	  renderer lightmap code.
 14-Nov-2004
 	- Eric Sunshine updated cspace.i to take csPoly2D decomposition into
 	  account.

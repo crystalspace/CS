@@ -374,13 +374,6 @@ private:
   csRect rect;
   /// The SLM this lightmap is a part of.
   csRef<csGLSuperLightmap> slm;
-  /// Raw lightmap data.
-  csRGBpixel* data;
-
-  /// Has the mean light of this LM been calculated?
-  bool mean_calculated;
-  /// Mean light of this LM
-  float mean_r, mean_g, mean_b;
 public:
   CS_LEAKGUARD_DECLARE (csGLRendererLightmap);
 
@@ -398,9 +391,6 @@ public:
 
   /// Set the size of a light cell.
   virtual void SetLightCellSize (int size);
-
-  /// Get the mean light of this LM.
-  void GetMeanColor (float& r, float& g, float& b);
 };
 
 /**

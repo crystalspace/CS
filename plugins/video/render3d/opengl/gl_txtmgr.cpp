@@ -1437,8 +1437,6 @@ void csGLRendererLightmap::DecRef ()
 csGLRendererLightmap::csGLRendererLightmap ()
 {
   SCF_CONSTRUCT_IBASE (0);
-  mean_calculated = false;
-  mean_r = mean_g = mean_b = 0.0f;
 }
 
 csGLRendererLightmap::~csGLRendererLightmap ()
@@ -1488,41 +1486,11 @@ void csGLRendererLightmap::SetData (csRGBpixel* data)
   glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
     rect.Width (), rect.Height (),
     GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-  csGLRendererLightmap::data = data;
-  mean_calculated = false;
 }
 
 void csGLRendererLightmap::SetLightCellSize (int size)
 {
   (void)size;
-}
-
-void csGLRendererLightmap::GetMeanColor (float& r, float& g, float& b)
-{
-  if (!mean_calculated)
-  {
-    mean_r = mean_g = mean_b = 0.0f;
-    csRGBpixel* p = data;
-    int n = rect.Width () * rect.Height ();
-    
-    for (int m = 0; m < n; m++)
-    {
-      mean_r += p->red;
-      mean_g += p->green;
-      mean_b += p->blue;
-      p++;
-    }
-
-    float f = 1.0f / ((float)n * 128.0f);
-    mean_r *= f;
-    mean_g *= f;
-    mean_b *= f;
-    mean_calculated = true;
-  }
-  r = mean_r;
-  g = mean_g;
-  b = mean_b;
 }
 
 //---------------------------------------------------------------------------
