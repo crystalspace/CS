@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit changed the generation of the light ID so that it is
 	  compatible again for pseudo dynamic lights. Otherwise too many
 	  maps had to be relit.
+	- Jorrit reverted the change to light ID generation because it
+	  doesn't help sufficiently.
 27-Feb-2005
 	- res applied (a variation of) patch #1152721, "Cygwin compatability 
 	  with _X and _C", from Michael D. Adams.
