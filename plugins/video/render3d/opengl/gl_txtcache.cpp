@@ -26,6 +26,8 @@
 #include "gl_render3d.h"
 #include "gl_txtcache.h"
 #include "gl_txtmgr.h"
+#include "glextmanager.h"
+#include "GL/glu.h"
 
 
 // need definitions of R24(), G24(), and B24()
@@ -220,92 +222,72 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
 
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
       rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR
                          : GL_NEAREST_MIPMAP_NEAREST);
 
-
-  for (int i=0; i < txt_mm->vTex.Length (); i++)
+  if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
   {
-    csGLTexture *togl = txt_mm->vTex[i];
-    if (togl->compressed == GL_FALSE)
+  }
+  else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
+  {
+    csGLTexture *togl = txt_mm->vTex[0];
+    gluBuild2DMipmaps (GL_TEXTURE_2D,
+                      togl->get_components (),
+                      togl->get_width (),
+                      togl->get_height (),
+                      txt_mm->SourceFormat (),
+                      txt_mm->SourceType (),
+                      togl->image_data );
+  }
+  else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
+  {
+    for (int i=0; i < txt_mm->vTex.Length (); i++)
     {
-      if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
+      csGLTexture *togl = txt_mm->vTex[i];
+      R3D->ext.glTexImage3DEXT (GL_TEXTURE_3D, 
+                    i,
+                    txt_mm->TargetFormat (),
+                    togl->get_width (),
+                    togl->get_height (),
+                    togl->get_depth (),
+                    0,
+                    txt_mm->SourceFormat (),
+                    txt_mm->SourceType (),
+                    togl->image_data);
+    }
+  }
+  else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
+  {
+    for (int i=0; i < txt_mm->vTex.Length (); i++)
+    {
+      csGLTexture *togl = txt_mm->vTex[i];
+      // TODO: load cubemaps into GL texture 
+
+      // >>= 3 == /= 8 ... turning bits per pixel int bytes per pixel
+      // componentcount
+
+      int compcount = csGLTextureManager::glformats[txt_mm->formatidx].components;
+      int cursize = togl->get_width() * togl->get_height () * compcount;
+
+      uint8 *data = togl->image_data;
+
+      int j;
+      for(j = 0; j < 6; j++)
       {
-        glTexImage1D (GL_TEXTURE_1D, 
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j,
                       i,
                       txt_mm->TargetFormat (),
                       togl->get_width (),
+                      togl->get_height(),
                       0,
                       txt_mm->SourceFormat (),
                       txt_mm->SourceType (),
-                      togl->image_data);
-      }
-      else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
-      {
-        glTexImage2D (GL_TEXTURE_2D, 
-                      i, 
-                      txt_mm->TargetFormat (),
-                      togl->get_width (), 
-                      togl->get_height (),
-                      0, 
-                      txt_mm->SourceFormat (), 
-                      txt_mm->SourceType (), 
-                      togl->image_data);
-      }
-      else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
-      {
-        R3D->ext.glTexImage3DEXT (GL_TEXTURE_3D, 
-                      i,
-                      txt_mm->TargetFormat (),
-                      togl->get_width (),
-                      togl->get_height (),
-                      togl->get_depth (),
-                      0,
-                      txt_mm->SourceFormat (),
-                      txt_mm->SourceType (),
-                      togl->image_data);
-      }
-      else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
-      {
-        // TODO: load cubemaps into GL texture 
+                      data);
 
-        // >>= 3 == /= 8 ... turning bits per pixel int bytes per pixel
-        // componentcount
-
-        int compcount = csGLTextureManager::glformats[txt_mm->formatidx].components;
-        int cursize = togl->get_width() * togl->get_height () * compcount;
-
-        uint8 *data = togl->image_data;
-
-        int j;
-        for(j = 0; j < 6; j++)
-        {
-          glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j,
-                        i,
-                        txt_mm->TargetFormat (),
-                        togl->get_width (),
-                        togl->get_height(),
-                        0,
-                        txt_mm->SourceFormat (),
-                        txt_mm->SourceType (),
-                        data);
-
-          data += cursize;
-        }
-
-        
+        data += cursize;
       }
     }
-    else
-      R3D->ext.glCompressedTexImage2DARB (GL_TEXTURE_2D, 
-                                          i,
-                                          (GLenum)togl->internalFormat,
-                                          togl->get_width (),
-                                          togl->get_height (),
-                                          0,
-                                          togl->size, 
-                                          togl->image_data);
   }
 }
 

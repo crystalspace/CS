@@ -51,13 +51,15 @@ public:
   GLint compressed;
   GLint internalFormat;
   GLint size;
-  int w, h, d;
+  int w, h, d, components;
    ///
   int get_width () { return w; }
   ///
   int get_height () { return h; }
 
   int get_depth () { return d; }
+
+  int get_components () { return components; } 
 
   uint8 *&get_image_data ()
   { return image_data; }

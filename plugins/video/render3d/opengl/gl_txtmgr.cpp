@@ -83,6 +83,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int 
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
 
+  mean_color.red = mean_color.green = mean_color.blue = 0;
   if (image->HasKeycolor ())
   {
     int r,g,b;
@@ -222,7 +223,7 @@ bool csGLTextureHandle::FindFormatType ()
 
     if (sourceFormat == GL_RGBA)
     {
-      if (!has_alpha)
+      if (!transp)
       {
 	if (!((*images)[0]->GetFormat () & CS_IMGFMT_ALPHA))
 	{
@@ -434,6 +435,7 @@ void csGLTextureHandle::SetTextureTarget(int target)
 
 void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, uint8 &blue)
 {
+  red = green = blue = 0;
 }
 
 void *csGLTextureHandle::GetCacheData ()
@@ -515,6 +517,7 @@ void csGLTextureHandle::CreateMipMaps()
   //  printf ("push 0\n");
   csGLTexture* ntex = NewTexture ((*images)[0], false);
   ntex->d = images->Length();
+  ntex->components = csGLTextureManager::glformats[formatidx].components;
   vTex.Push (ntex);
   DG_LINK (this, ntex);
 
@@ -528,7 +531,7 @@ void csGLTextureHandle::CreateMipMaps()
 
   int w = (*prevImages)[0]->GetWidth ();
   int h = (*prevImages)[0]->GetHeight ();
-  int nTex = 0;
+
 
   for (i=0; i < prevImages->Length(); i++)
   {
@@ -537,21 +540,19 @@ void csGLTextureHandle::CreateMipMaps()
   
   while (w != 1 || h != 1)
   {
-    nTex++;
-    //  printf ("make mipmap %d\n", nTex);
     for (i=0; i<prevImages->Length();i++)
     {
       csRef<iImage> cimg = (*prevImages)[i]->MipMap (1, tc);
       (*thisImages)[i] = cimg;
     }
 
-    //  printf ("push %d\n", nTex);
+
     csGLTexture* ntex = NewTexture ((*thisImages)[0], true);
     ntex->d = thisImages->Length();
     vTex.Push (ntex);
     DG_LINK (this, ntex);
-    //  printf ("transform %d\n", nTex);
-    transform (thisImages, vTex[nTex]);
+
+    transform (thisImages, ntex);
     w = (*thisImages)[0]->GetWidth ();
     h = (*thisImages)[0]->GetHeight ();
     for (i=0; i < prevImages->Length(); i++)
