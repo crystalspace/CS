@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Mar-2005
+	- Anders Stenberg fixed a bug in genmesh where a reference was used 
+	  erroneously. This caused genmeshes to get broken transforms under 
+	  seemingly random circumstances.
 30-Mar-2005
 	- Marten fixed a bug in haze-mesh.
 	- Eric Sunshine performed another round of size_t-related cleanups.
