@@ -15,7 +15,7 @@
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
 @copyright{} 1999, 2000, 2001 by Eric Sunshine.  Last updated
-19 February 2001.}
+23 October 2001.}
 
 Crystal Space was ported to MacOS/X Server, OpenStep, and NextStep by Eric
 Sunshine in February of 1999 and has been continuously maintained and updated
@@ -96,8 +96,8 @@ NextStep users can find pre-built binaries of @sc{gnu} @samp{make} at these
 locations:
 
 @noindent
-@uref{ftp://ftp.next.peak.org/pub/next/apps/devtools/make.3.76.1.NIHS.bs.tar.gz}@*
-@uref{ftp://ftp.next.peak.org/pub/next/apps/devtools/gnumake.3.74.b.NIHS.tar.gz}
+@uref{http://www.peak.org/next/apps/devtools/make.3.76.1.NIHS.bs.tar.gz}@*
+@uref{http://www.peak.org/next/apps/devtools/gnumake.3.74.b.NIHS.tar.gz}
 
 The source code for the latest version of @sc{gnu} @samp{make} can be
 downloaded from one of the standard @sc{gnu} mirror sites; a couple of which
@@ -184,17 +184,12 @@ gnutar xfz libpng*.tgz
 gnutar xfz zlib*.tgz
 @end example
 
-The standard library archive, @file{standard.zip}, is included with
-the Crystal Space package within the @file{CS/data} directory.  If it is
-missing, however, you may download it from the Crystal Space site
-(@pxref{Where to Get}) and place it in @file{CS/data} manually.  This file
-contains resources which are used by several Crystal Space demonstration
-programs.  Do not unpack this file; Crystal Space uses it as is.
-
-The standard texture archive, @file{stdtex.zip}, contains textures which are
-required by many of the example Crystal Space map files.  If this file is not
-already present in your @file{CS/data} directory, then you should download it
-and place it there.  As with @file{standard.zip}, do not unpack this file.
+The standard library archive, @file{standard.zip} and the standard texture
+archive, @file{stdtex.zip} are included with the Crystal Space package within
+the @file{CS/data} directory.  If these archives are missing from the
+distribution, then you need to obtain them via some mechanism.  These files
+contain resources which are used by several Crystal Space demonstration
+programs.  Do not unpack these files; Crystal Space uses them as-is.
 
 You will also need to have at least one @dfn{map} file in order to use the
 Crystal Space demonstration program, WalkTest.  Typically map files should be
@@ -202,13 +197,15 @@ placed within the @file{CS/data} directory.  As with other Crystal Space
 resources, map files are actually compressed archives which are used directly
 by the engine, thus you should not unpack these archives.
 
-The most commonly used map file is @file{flarge.zip} since it demonstrates many
-of the special features of the engine rather than focusing on merely one or two
-areas.  You can download @file{flarge.zip}, as well as several other example
-map files from the following location:
+The most commonly used map file is @file{flarge} since it demonstrates many of
+the special features of the engine rather than focusing on merely one or two
+areas.  This map is typically distributed as part of the Crystal Space package
+and can be found in the @file{CS/data/flarge} directory.  You can download
+additional example map files from the @file{levels} subdirectory at the
+download site:
 
 @noindent
-@uref{ftp://sunsite.dk/projects/crystal/cs019/levels/}
+@uref{ftp://sunsite.dk/projects/crystal/}
 
 @noindent
 Be sure to place the map files into the @file{CS/data} directory.
@@ -275,9 +272,9 @@ makes uses of these libraries, even though they are not an intrinsic part of
 the project itself.
 
 These instructions assume that you wish to build multi-architecture libraries.
-Adjust the @code{CC="..."} directive to reflect the architectures you wish to
-include in the generated libraries.  If you do not wish to generate
-multi-architecture libraries, then omit the @code{CC="..."} directive
+Adjust the @code{CC="@dots{}"} directive to reflect the architectures you wish
+to include in the generated libraries.  If you do not wish to generate
+multi-architecture libraries, then omit the @code{CC="@dots{}"} directive
 altogether.  The list of supported architectures varies between MacOS/X,
 MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
 @xref{NeXT Architectures}.
@@ -350,8 +347,8 @@ gnumake -k all
 @end example
 
 This can be a fairly time consuming operation.  If you would like to be more
-selective and only build the necessary drivers and a subset of the available
-applications, you can invoke their targets individually.
+selective and only build the necessary plug-in modules and a subset of the
+available applications, you can invoke their targets individually.
 
 For example, to build all plug-in modules, you could invoke this command:
 
@@ -359,28 +356,24 @@ For example, to build all plug-in modules, you could invoke this command:
 gnumake -k plugins # @r{Builds all plug-in modules.}
 @end example
 
-Or, for example, for even finer control, you could build only the WalkTest
-application and the plug-in modules which it most commonly requires.
+Or, for example, you could build only the WalkTest application and the plug-in
+modules which it most commonly requires.
 
 @example
-gnumake next2d    # @r{Builds the 2D graphics driver}
-gnumake walkall   # @r{Builds WalkTest and required plug-ins}
+gnumake walkall  # @r{Builds WalkTest and required plug-ins}
 @end example
 
 For finer control over which applications are built, you can invoke their
 targets directly.  For instance:
 
 @example
-gnumake walk  # @r{Builds @code{walktest}, the level exploration program}
-gnumake blks  # @r{Builds @code{blocks}, the 3D-Tetris style game}
-gnumake meta  # @r{Builds @code{metademo}, the MetaBalls demonstration}
-gnumake mzed  # @r{Builds @code{mazed}, the Crystal Space level editor}
+gnumake walk    # @r{Builds @code{walktest}, the map exploration program}
+gnumake blks    # @r{Builds @code{blocks}, the 3D-Tetris style game}
+gnumake next2d  # @r{Builds @code{next2d}, the Cocoa-based 2D driver}
 @end example
 
-These commands individually build some of the more prominent Crystal Space
-demonstration programs; the ones which perform the most interesting operations.
-@xref{Applications}.  All of these programs require the plug-in modules, so be
-sure to build those as well by invoking the @samp{plugins} makefile target as
+All programs require at least some plug-in modules to be present, so be sure to
+build those as well by invoking the @samp{plugins} makefile target as
 illustrated above if you have not already invoked the @samp{all} target.
 
 @node NeXT Running Programs, , NeXT Building, NeXT
@@ -393,8 +386,7 @@ several of the example programs and map files.
 
 You need to have one or more @dfn{map} files in order to run WalkTest.  These
 are the files which contain the maps and rooms which you can explore with
-WalkTest and edit with MazeD, the Crystal Space map (or ``maze'') editor.  The
-most commonly used example map file is @file{flarge.zip}.
+WalkTest.  The most commonly used example map file is @file{flarge}.
 
 @strong{Note}: It is not currently possible to launch the Crystal Space
 demonstration applications by double-clicking on them via the Finder on
@@ -410,14 +402,17 @@ administrative files.  This problem will be corrected in the future once a
 suitable work-around has been devised.  @emph{Therefore, at this time, all
 Crystal Space applications @strong{must} be launched from the command-line.}
 
-Before running the demonstration programs for the first time, you should locate
-the file @file{engine.cfg} in the @file{CS/data/config} directory.  This file
-contains parameters which control Crystal Space's lighting.
+Before running the demonstration programs for the first time, you should create
+a file named @file{user.cfg} in the @file{CS/data/config} directory.  You can
+use this file to increase the ambient light level used for map files since the
+default level is typically too dim on the Apple/@NeXT{} displays.  To correct
+this problem, edit @file{user.cfg} and add a line to it similar to the
+following:
 
-By default, the overall ambient light level specified in @file{engine.cfg} is
-often too dark for many MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and
-NextStep displays.  To correct this problem, edit @file{engine.cfg} and change
-the @samp{Engine.Lighting.Ambient.White} setting to a more appropriate value.
+@example
+Glboal.Engine.Lighting.Ambient.White = 70
+@end example
+
 Some potentially good choices for this setting are summarized below.  If these
 values do not work well for you, experiment with others until you find one
 which is suitable.
@@ -425,10 +420,10 @@ which is suitable.
 @quotation
 @multitable @columnfractions .25 .80
 @item @emph{Platform} @tab @emph{Setting}
-@item MacOS/X @tab @code{Engine.Lighting.Ambient.White=70}
-@item MacOS/X Server 1.0 @tab @code{Engine.Lighting.Ambient.White=70}
-@item OpenStep @tab @code{Engine.Lighting.Ambient.White=50}
-@item NextStep @tab @code{Engine.Lighting.Ambient.White=50}
+@item MacOS/X @tab @code{Glboal.Engine.Lighting.Ambient.White=70}
+@item MacOS/X Server 1.0 @tab @code{Glboal.Engine.Lighting.Ambient.White=70}
+@item OpenStep @tab @code{Glboal.Engine.Lighting.Ambient.White=50}
+@item NextStep @tab @code{Glboal.Engine.Lighting.Ambient.White=50}
 @end multitable
 @end quotation
 
@@ -446,7 +441,7 @@ As a general rule, you may find it useful to specify the @samp{--relight}
 option with newly downloaded maps, or at any other time that the lighting in a
 map seems to be somehow incorrect.
 
-To run WalkTest with a particular map (for instance, @file{flarge.zip}) for the
+To run WalkTest with a particular map (for instance, @file{flarge}) for the
 very first time, type:
 
 @example
@@ -460,17 +455,16 @@ you can type:
 walktest flarge
 @end example
 
-Once invoked, you will be able to explore the map file (@file{flarge.zip}) by
-using the navigation controls (@pxref{Walktest Keyboard}).  To explore a
-different map, substitute its name in place of @samp{flarge}.
+Once invoked, you will be able to explore the map file (@file{flarge}) by using
+the navigation controls (@pxref{Walktest Keyboard}).  To explore a different
+map, substitute its name in place of @samp{flarge}.
 
-Other interesting applications, such as Blocks, MetaBalls, and MazeD can be
-run with the following commands:
+Other interesting applications, such as Blocks or csDemo, can be run by typing
+the application's name at the command line:
 
 @example
 blocks
-metademo
-mazed
+csdemo
 @end example
 
 Finally, it is possible to use the Apple/@NeXT{} defaults system to inform

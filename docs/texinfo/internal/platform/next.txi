@@ -15,7 +15,7 @@
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
 @copyright{} 1999, 2000, 2001 by Eric Sunshine.  Last updated
-19 Februrary 2001.}
+23 October 2001.}
 
 Crystal Space was ported to MacOS/X Server, OpenStep, and NextStep by Eric
 Sunshine in February of 1999 and has been continuously maintained and updated
@@ -157,24 +157,26 @@ AppKit's @samp{NSApplication} (Cocoa and OpenStep) and @samp{Application}
 (NextStep) classes.  The files comprising this module are:
 
 @table @code
-@item NeXTSystemDriver.h
-Defines @samp{NeXTSystemDriver} and its subclass @samp{SysSystemDriver} which
-all ports of Crystal Space must supply.  This is the sole interface through
-which Crystal Space accesses platform-specific functionality.
+@item NeXTAssistant.h
+Two files share this name.  The first file resides in
+@file{CS/include/cssys/next} and declares the abstract @samp{iNeXTAssistant}
+interface.  This interface declares methods which may be useful to canvases, as
+well as methods which are used by the Objective-C application delegate.  The
+second file resides in @file{CS/libs/cssys/next/shared} and declares
+@samp{NeXTAssistant} which is a concrete subclass implementing the
+@samp{iNeXTAssistant} interface.
 
-@item NeXTSystemDriver.cpp
-Implements the C++ portion of the system driver, @samp{NeXTSystemDriver}, which
-is common to MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
+@item NeXTAssistant.cpp
+Concrete implementation of the @samp{iNeXTAssistant} interface.  This
+implementation is common to MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep,
+and NextStep.
 
 @item NeXTDelegate.m
 @itemx NeXTDelegate.h
-Implements the Objective-C portion of the system driver functionality.  This
-Objective-C class, @samp{NeXTDelegate}, acts as the delegate to the application
-object.  It is responsible for handling application-wide AppKit events and
-provides convenience facilities for event interpretation on behalf of plug-in
-modules such as 2D drivers which are the focus of keyboard and mouse events.
-Interfacing between the C++ and Objective-C portions of the system driver
-implementation is accomplished via a pure-C bridge.
+Implements an Objective-C application delegate.  It is responsible for handling
+application-wide AppKit events and provides convenience facilities for event
+interpretation on behalf of plug-in modules such as 2D drivers which are the
+focus of keyboard and mouse events.
 
 @item NeXTLoadLibrary.m
 @itemx NeXTLoadLibrary.h
@@ -212,8 +214,8 @@ wrapper allows the Objective-C @file{NeXTMenu} implementation to utilize the
 C++ configuration class.
 
 @item NeXTTime.cpp
-Platform-specific implementation of @code{iSystemDriver::Time()} which works
-with MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
+Platform-specific implementations of @code{csGetTicks()} and @code{csSleep()}
+which work with MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
 
 @item csosdefs.h
 Platform-specific definition of operating system services which allows Crystal
@@ -247,8 +249,8 @@ It is also the window's delegate object.
 An Objective-C subclass of the AppKit's @samp{NSView} (Cocoa and OpenStep) or
 @samp{View} (NextStep) class.  This is the view where the rendered scene from
 Crystal Space is actually displayed.  This class also forwards received
-keyboard and mouse events to the system driver for interpretation and handling
-via the @code{iSystem::PerformExtension("dispatchevent")} interface.
+keyboard and mouse events to the shared @samp{iNeXTAssistant} instance for
+interpretation and handling.
 
 @item NeXTFrameBuffer.h
 An abstract 2D frame buffer class which defines the interface of objects which
@@ -280,10 +282,10 @@ the application's run-loop.  With most ports of Crystal Space, this is not a
 problem since the main run-loop is generally implemented in this fashion:
 
 @example
-csSystemDriver::Loop()
+bool csDefaultRunLoop(iObjectRegistry*)
 @{
-  while (!Shutdown)
-    NextFrame(); // @r{Process events and render next frame.}
+  while (!shutdown)
+    event_queue->Process();
 @}
 @end example
 
@@ -292,29 +294,27 @@ programmer and is essentially a black-box.  The above mechanism is easily
 emulated with the AppKit using the following code:
 
 @example
-NeXTSystemDriver::Loop()
+bool csDefaultRunLoop(iObjectRegistry*)
 @{
   [NSApp run];
 @}
 @end example
 
 This code launches the AppKit's run-loop but does not address the problem of
-periodically invoking Crystal Space's @code{iSystem::NextFrame()} method.  To
-solve this problem @samp{NeXTDelegate} artifically injects
-@dfn{application-defined} events into the AppKit event queue and then triggers
-an invocation of @code{NextFrame()} for each such received event.  In
-particular, a single application-defined event is injected into the event queue
-in order to begin the process, and then an event is injected into the queue
-after each invocation of @code{NextFrame()}.
+periodically processing Crystal Space's event queue.  To solve this problem
+@samp{NeXTDelegate} artifically injects @dfn{application-defined} events into
+the AppKit event queue and then triggers an invocation of
+@code{iEventQueue::Process()} for each such received event.  In particular, a
+single application-defined event is injected into the event queue in order to
+begin the process, and then an event is injected into the queue after each
+invocation of @code{iEventQueue::Process()}.
 
-In the long run, it may be desirable to re-engineer Crystal Space so that it
-runs as a client in a surrounding application framework, rather than forcing
-the application environment into the subordinate position.  This would be more
-in line with today's ``windowed'' computing environments where most
-application specific functionality is contained within a generic application
-framework.  The current design is geared more toward outmoded command-line
-environments, such as @sc{dos} or Unix, where the program can simply take
-control of the entire environment without regard to other outside factors.
+Note that @code{csDefaultRunLoop()} is provided as a convenience for
+applications which do not otherwise supply their own run-loop.  Existing Cocoa,
+OpenStep, and NextStep applications which already employ the AppKit's black-box
+run-loop should not invoke @code{csDefaultRunLoop()}; but should instead
+arrange to have @code{iEventQueue::Process()} invoked on a periodic basis via
+some other mechanism.
 
 @node NeXT Video Optimization, NeXT Frame Buffer, NeXT Run-Loop, NeXT Details
 @subsubsection Video Optimization
@@ -333,16 +333,16 @@ not have direct access to the display hardware (except via the highly private
 @samp{NSDirectPalette}, and @samp{NSDirectScreen} classes which were presumably
 intended to allow lower-level access to the display hardware, however their
 interfaces were never fully developed.  With the advent of MacOS/X, Apple has
-introduced the CoreGraphics and OpenGL @sc{api}s which will hopefully provide
-much better video performance than that which was available in previous
-incarnations of the Apple/@NeXT{} platforms.
+introduced the CoreGraphics and OpenGL @sc{api}s which should provide much
+better video performance than that which was available in previous incarnations
+of the Apple/@NeXT{} platforms.
 
-Under MacOS/X Server 1.0 (Rhapsody) OpenStep, and NextStep, all drawing to the
-display is performed by a separate program called the @dfn{WindowServer}.
-Whenever an applications needs to draw to the screen, it actually sends drawing
-commands across an @sc{ipc} connection to the WindowServer and the WindowServer
-performs the drawing on the application's behalf.  This negatively impacts
-video performance in essentially three ways.
+Under MacOS/X, MacOS/X Server 1.0 (Rhapsody) OpenStep, and NextStep, all
+drawing to the display is performed by a separate program called the
+@dfn{WindowServer}.  Whenever an applications needs to draw to the screen, it
+actually sends drawing commands across an @sc{ipc} connection to the
+WindowServer, and the WindowServer performs the drawing on the application's
+behalf.  This negatively impacts video performance in essentially three ways.
 
 @itemize @bullet
 @item
@@ -390,8 +390,7 @@ Image samples are organized in a meshed format.
 Data for each pixel includes alpha information.
 
 @item
-12-bit @sc{rgb} data is stored in 16-bits with alpha nybble set to
-@code{0x0f}.@*
+12-bit @sc{rgb} data is stored in 16-bits with alpha nybble set to @code{0x0f}.
 24-bit @sc{rgb} data is stored in 32-bits with alpha byte set to @code{0xff}.
 
 @item
@@ -476,9 +475,9 @@ of configurations for image data.  In particular, these are:
 @end multitable
 @end quotation
 
-MacOS/X Server and OpenStep take a stab at providing more comprehensive color
-depth support, but in their current state, these facilities provide little
-additional assistance and, consequently, are not discussed further.
+MacOS/X Server 1.0 and OpenStep take a stab at providing more comprehensive
+color depth support, but in their current state, these facilities provide
+little additional assistance and, consequently, are not discussed further.
 
 At the lowest level, the WindowServer itself supports additional configurations
 and adjusts appropriately to the underlying hardware.  The high-level AppKit
@@ -494,11 +493,11 @@ discussed in the video optimizations section, @ref{NeXT Video Optimization}.
 In particular, for optimal performance, 12-bit and 24-bit data must include an
 alpha channel and all alpha bits must be set to one.
 
-Unfortunately Crystal Space is unable to produce image data in a format usable
-by the WindowServer when video performance is a concern.  This is unfortunate
-since it means that the AppKit-based 2D driver must, itself, massage the data
-into a format suitable to the AppKit and the WindowServer.  This can be a time
-consuming operation.
+Unfortunately the Crystal Space software renderer is unable to produce image
+data in a format usable by the WindowServer when video performance is a
+concern.  This is unfortunate since it means that the AppKit-based 2D driver
+must, itself, massage the data into a format suitable to the AppKit and the
+WindowServer.  This can be a time consuming operation.
 
 Crystal Space is unable to produce the proper image format for several reasons.
 
@@ -558,7 +557,7 @@ one frame-buffer to another.  (The double frame-buffer requirement is a
 limitation of the way in which many Crystal Space applications deal with the
 frame-buffer.  These applications expect that the frame-buffer data will remain
 valid and unmodified from frame to frame, thus massaging the data in-place is
-not a workable approach.) The benefit of the post-processing approach, on the
+not a workable approach.)  The benefit of the post-processing approach, on the
 other hand, is that it is much less fragile than parameterizing the renderer.
 @end itemize
 
