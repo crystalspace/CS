@@ -26,6 +26,8 @@ chronological order.
 	- Eric Sunshine updated msvcgen/workspaces.jam so that `isotest'
 	  appears only in wksnewrenderer, and not in wkstypical, since it is
 	  specific to the new renderer.
+	- Eric Sunshine augmented cspace.i so that it %ignores non-const
+	  csPoly3D::GetVertices(). This fixes build failure in csjava.
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:

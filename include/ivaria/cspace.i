@@ -762,6 +762,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "csgeom/math3d.h"
 
 %ignore csPoly3D::operator[];
+%ignore csPoly3D::GetVertices (); // Non-const.
 %include "csgeom/poly3d.h"
 
 %include "csgeom/tri.h"
