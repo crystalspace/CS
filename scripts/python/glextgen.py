@@ -6,8 +6,10 @@ footer = file ("glextfooter", "r")
 output = file ("glextmanager.h", "w")
 
 def writeConstant (const):
+    output.write ("#ifndef " + const.getAttribute ("name") + "\n")
     output.write (("#define " + const.getAttribute ("name") + \
-                   "\t" + const.getAttribute ("value") + "\n").expandtabs (75))
+                   "\t" + const.getAttribute ("value") + "\n").expandtabs (70))
+    output.write ("#endif\n")
 
 def writeFunctionType (func):
     output.write ("typedef " + func.getAttribute ("return"))

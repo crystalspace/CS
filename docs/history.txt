@@ -26,6 +26,10 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated several compilation warnings in
 	  gl_varbufmgr.cpp, and also replaced assert() inovcations with
 	  CS_ASSERT().
+	- Eric Sunshine fixed scripts/python/glextgen.py so that the
+	  synthesized file is more preprocessor-friendly (that it, the change
+	  eliminates thousands of warnings emitted by the preprocessor when
+	  processing the synthesized file).
 3-Nov-2002
 	- Changed DynaVis to use the new movable and object model
 	  listeners. This significantly speeds up rendering and walking
