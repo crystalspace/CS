@@ -317,6 +317,11 @@ void csGraphics2DGLX::Close(void)
   }
   // Close your graphic interface
   csGraphics2DGLCommon::Close ();
+  if (active_GLContext != NULL)
+  {
+    glXDestroyContext(dpy,active_GLContext);
+    active_GLContext = NULL;
+  }
 }
 
 
