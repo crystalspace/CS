@@ -1,21 +1,21 @@
 SubDir TOP plugins cscript cspython ;
 
-# disabled for now
 if $(PYTHON.AVAILABLE) = "yes"
 {
   if $(CMD.SWIG)
   {
     # We need to work a bit on our own, because we create cs_pyth.cpp from
-    # cspaci.i instead of cspace.cpp.
+    # cspace.i instead of cspace.cpp.
     local target = [ FGristFiles cs_pyth.cpp ] ;
     local sources = [ FGristFiles cspace.i ] ;
     
-    # source files are not in current directory
+    # Source files are not in current directory.
     SEARCH on $(sources) = $(TOP)/include/ivaria ;
         
-    # scan for special swig includes
+    # Scan for special swig includes.
     HDRGRIST on $(sources) = $(HDRGRIST) ;
-    HDRSEARCH on $(sources) = $(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
+    HDRSEARCH on $(sources) =
+      $(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
     HDRRULE on $(sources) = HeaderRule ;
     HDRSCAN on $(sources) = $(SWIG.HDRPATTERN) ;
     SWIG.FLAGS on $(target) += -python -c++ -shadow -I$(TOP)/include ;
