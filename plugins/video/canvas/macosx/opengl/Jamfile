@@ -1,6 +1,6 @@
 SubDir TOP plugins video canvas macosx opengl ;
 
-if $(TARGET.OS) = "MACOS_X" 
+if $(TARGET.OS) = "MACOS_X" && $(GL.AVAILABLE) = "yes"
 {
 Plugin glosx2d
 	: [ Wildcard *.cpp *.m *.h ]
