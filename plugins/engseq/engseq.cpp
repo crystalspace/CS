@@ -939,7 +939,7 @@ public:
     max = max_int;
     sequence = seq;
     eseqmgr  = seqmgr;
-    rg = new csRandomGen(csGetTicks()+(int)this);  // seed rng
+    rg = new csRandomGen(csGetTicks()+(intptr_t)this);  // seed rng
   }
   virtual ~OpRandomDelay ()
   {
