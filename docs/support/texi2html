@@ -532,7 +532,7 @@ $T2H_WORDS_EN =
 #  'About_Button' => 'About'
 };
 
-$T2H_WORD_DE =
+$T2H_WORDS_DE =
 {
  'ToC_Title' => 'Inhaltsverzeichniss',
  'Overview_Title' => 'Kurzes Inhaltsverzeichniss',
@@ -544,7 +544,7 @@ $T2H_WORD_DE =
  'section' => 'Abschnitt',
 };
 
-$T2H_WORD_NL =
+$T2H_WORDS_NL =
 {
  'ToC_Title' => 'Inhoudsopgave',
  'Overview_Title' => 'Korte inhoudsopgave',
@@ -556,7 +556,7 @@ $T2H_WORD_NL =
  'section' => 'sectie',
 };
 
-$T2H_WORD_ES =
+$T2H_WORDS_ES =
 {
  'ToC_Title' => '&iacute;ndice General',
  'Overview_Title' => 'Resumen del Contenido',
@@ -568,7 +568,7 @@ $T2H_WORD_ES =
  'section' => 'secci&oacute;n',
 };
 
-$T2H_WORD_NO =
+$T2H_WORDS_NO =
 {
  'ToC_Title' => 'Innholdsfortegnelse',
  'Overview_Title' => 'Kort innholdsfortegnelse',
@@ -580,7 +580,7 @@ $T2H_WORD_NO =
  'section' => 'avsnitt',
 };
 
-$T2H_WORD_PT =
+$T2H_WORDS_PT =
 {
  'ToC_Title' => 'Sum&aacute;rio',
  'Overview_Title' => 'Breve Sum&aacute;rio',

@@ -13,6 +13,9 @@ The history order is reversed so that new features are at the top.
 	  part contains all information that is static and could be in
 	  a factory. Several functions (like iThingState->CreatePolygon)
 	  will now return an iPolygon3DStatic instead of an iPolygon3D.
+	- Eric Sunshine fixed bug in texi2html reported by Vincent K.
+	  <vince@iefr.ath.cx> which caused language translation of "reserved
+	  words" to fail.
 18-Mar-2003
 	- Added two entries to the faq about scaled objects.
 	- Some Doxygen improvements on iMovable and iMeshWrapper.
