@@ -110,6 +110,9 @@ float BiCubicData (float* data, int width, int height, float x, float z)
     // Multiply with width.
     intZ *= width;
 
+    // Precalc weight function for 'j'.
+    float jweight = WeightFunction (j-1.0f-deltaZ);
+
     for (int i=0; i<4; ++i)
     {
       // Calculate integer position
@@ -122,8 +125,7 @@ float BiCubicData (float* data, int width, int height, float x, float z)
       float height = data[intX+intZ];
 
       // Weight the height using a cubic weight function
-      height *= WeightFunction (i-1.0f-deltaX) * 
-                WeightFunction (j-1.0f-deltaZ);
+      height *= WeightFunction (i-1.0f-deltaX) * jweight;
 
       // Add the weighted height to the result
       result += height;
