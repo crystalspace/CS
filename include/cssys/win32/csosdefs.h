@@ -168,6 +168,7 @@
 #undef min
 #undef max
 #undef DeleteFile
+#undef Yield
 
 /*
   LONG_PTR is used in the Win32 canvases, but it's only defined in newer 
