@@ -3,13 +3,17 @@ The history order is reversed so that new features are at the top.
 15-Feb-2003
 	- res checked if the image IO plugins work properly and fixed them
 	  if necessary:
-	  - TGA saving was botched
-	  - JNG saving didn't work right where sizeof(csRGBcolor) != 3
-	  - JNG loader works better with single-frame MNGs
-	  - BMP didn't honor the padding of scanlines to a multiple of 4
-	- res augmented gfxtest to add an alpha channel if none is present 
+	    - TGA saving was botched
+	    - JNG saving didn't work right where sizeof(csRGBcolor) != 3
+	    - JNG loader works better with single-frame MNGs
+	    - BMP didn't honor the padding of scanlines to a multiple of 4
+	- res augmented gfxtest to add an alpha channel if none is present.
  	- res changed csImageFile::convert_pal8() to ensure the image palette 
- 	  has at least 256 entries
+ 	  has at least 256 entries.
+	- Added 'openglcanvas' target which compiles the OpenGL canvas
+	  relevant for the given OS (similar to 'softcanvas').
+	- Make 'walkall' will now compile the OpenGL renderer instead of
+	  the software renderer.
 14-Feb-2003
 	- Extended iVertexBuffer and iPolygonBuffer with a bounding box.
 	  The renderers can use this to optimize clipping.

@@ -3414,7 +3414,7 @@ bool csGraphics3DOGLCommon::ClassifyForClipTriangleMesh (
     const csBox3& bbox,
     const csVector3& frust_origin, csPlane3* planes, int num_planes)
 {
-  int i, j;
+  int i;
 
   if (num_vertices > clipped_plane->Length ())
     clipped_plane->SetLength (num_vertices); // Used for original vertices.

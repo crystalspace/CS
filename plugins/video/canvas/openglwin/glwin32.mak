@@ -17,7 +17,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glwin32 glwin32clean
-all plugins drivers drivers2d: glwin32
+all openglcanvas plugins drivers drivers2d: glwin32
 
 glwin32:
 	$(MAKE_TARGET) MAKE_DLL=yes

@@ -18,9 +18,9 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: walktest walktestclean walkall
 
-walkall: walktest vfs soft3d softcanvas csfont csconin simpcon perfstat \
-  rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg csbmpimg reporter \
-  stdrep csparser frustvis bugplug sequence engseq
+walkall: walktest vfs gl3d openglcanvas effects csfont csconin simpcon \
+  rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg csbmpimg \
+  reporter stdrep csparser frustvis bugplug sequence engseq
 all apps: walktest
 walktest:
 	$(MAKE_APP)
