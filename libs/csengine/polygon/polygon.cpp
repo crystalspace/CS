@@ -1019,9 +1019,9 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     {
       int quad = MQUADRANT(epointx, epointy);
       int rquad = MQUADRANT(rpointx, rpointy);
-      if ((quad==0 && -epointx==epointy)||(quad==1 && epointx==epointy)) 
+      if ((quad==0 && -epointx==epointy)||(quad==1 && epointx==epointy))
         quad++;
-      if ((rquad==0 && -rpointx==rpointy)||(rquad==1 && rpointx==rpointy)) 
+      if ((rquad==0 && -rpointx==rpointy)||(rquad==1 && rpointx==rpointy))
         rquad++;
       while (quad != rquad)
       {
@@ -1035,9 +1035,9 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     {
       int quad = QUADRANT(epointx, epointy);
       int rquad = QUADRANT(rpointx, rpointy);
-      if ((quad==0 && epointx==epointy)||(quad==1 && -epointx==epointy)) 
+      if ((quad==0 && epointx==epointy)||(quad==1 && -epointx==epointy))
         quad++;
-      if ((rquad==0 && rpointx==rpointy)||(rquad==1 && -rpointx==rpointy)) 
+      if ((rquad==0 && rpointx==rpointy)||(rquad==1 && -rpointx==rpointy))
         rquad++;
       while (quad != rquad)
       {
@@ -1483,12 +1483,6 @@ void csPolygon2D::AddPerspective (float x, float y, float z)
   float iz = csCamera::aspect/z;
   float px, py;
 
-  if (num_vertices >= max_vertices)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "OVERFLOW add_perspective!\n");
-    fatal_exit (0, false);
-  }
-
   px = x * iz + csWorld::shift_x;
   py = y * iz + csWorld::shift_y;
   vertices[num_vertices].x = px;
@@ -1530,16 +1524,16 @@ void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* orig_triangle, bool
   if (g3dpoly->num == 3)
   {
     // Trivial case. The polygon is still a triangle.
-    return;
+    // @@@ HERE WE NEED TO FIND A TEST to see if the triangle is still the original
+    // unclipped triangle.
+    //return;
   }
 
-  //first we copy the first three texture coordinates to a local buffer to avoid that they
-  //are overwritten when interpolating.
+  // first we copy the first three texture coordinates to a local buffer
+  // to avoid that they are overwritten when interpolating.
   G3DTexturedVertex tritexcoords[3];
-  for (int i=0; i<3; i++)
-  {
-    tritexcoords[i] = g3dpoly->vertices[i];
-  }
+  for (int i = 0; i < 3; i++)
+    tritexcoords [i] = g3dpoly->vertices [i];
 
   // Now we have to find the u,v coordinates for every
   // point in the clipped polygon. We know we started
@@ -1549,66 +1543,78 @@ void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* orig_triangle, bool
   // First find the topmost triangle vertex
   int top;
   if (orig_triangle [0].y < orig_triangle [1].y)
-    if (orig_triangle [0].y < orig_triangle [2].y) top = 0;
-    else top = 2;
+    if (orig_triangle [0].y < orig_triangle [2].y)
+      top = 0;
+    else
+      top = 2;
   else
-    if (orig_triangle [1].y < orig_triangle [2].y) top = 1;
-    else top = 2;
+    if (orig_triangle [1].y < orig_triangle [2].y)
+      top = 1;
+    else
+      top = 2;
 
   int j;
+  int _vbl, _vbr;
+  if (top <= 0) _vbl = 2; else _vbl = top - 1;
+  if (top >= 2) _vbr = 0; else _vbr = top + 1;
   for (j = 0 ; j < g3dpoly->num ; j++)
   {
-    float x = g3dpoly->vertices[j].sx;
-    float y = g3dpoly->vertices[j].sy;
+    float x = g3dpoly->vertices [j].sx;
+    float y = g3dpoly->vertices [j].sy;
 
-    // Find the triangle left/right edges between which
-    // the given x,y point is located.
-    int vtl, vtr, vbl, vbr;
-    vtl = vtr = top;
-    vbl = (vtl + 1) % 3;
-    vbr = (vtl + 3 - 1) % 3;
-    if (y > orig_triangle [vbl].y)
+    // Find the original triangle top/left/bottom/right vertices
+    // between which the currently examined point is located.
+    // There are two possible major cases:
+    // A*       A*       When DrawPolygonQuick works, it will switch
+    //  |\       |\      start/final values and deltas ONCE (not more)
+    //  | \      | \     per triangle.On the left pictures this happens
+    //  |*X\     |  \    at the point B. This means we should "emulate"
+    //  |   *B   |   *B  this switch bytaking different start/final values
+    //  |  /     |*X/    for interpolation if examined point X is below
+    //  | /      | /     the point B.
+    //  |/       |/
+    // C*       C*  Fig.1 :-)
+    int vtl = top, vtr = top, vbl = _vbl, vbr = _vbr;
+    int ry = QRound (y);
+    if (ry > QRound (orig_triangle [vbl].y))
     {
       vtl = vbl;
-      vbl = (vbl + 1) % 3;
+      if (--vbl < 0) vbl = 2;
     }
-    else if (y > orig_triangle [vbr].y)
+    else if (ry > QRound (orig_triangle [vbr].y))
     {
       vtr = vbr;
-      vbr = (vbr + 3 - 1) % 3;
-    }
-    else
-    {
-      // The last two vertices of the triangle have the same height.
-      // @@@ I think we should interpolate by 'x' here but this fix at
-      // least eliminates most errors.
-      vtl = vbl;
-      vbl = (vbl + 1) % 3;
+      if (++vbr > 2) vbr = 0;
     }
 
-    // Now interpolate Z,U,V by Y
-    float tL = orig_triangle [vbl].y - orig_triangle [vtl].y;
-    if (tL) tL = (y - orig_triangle [vtl].y) / tL;
-    float tR = orig_triangle [vbr].y - orig_triangle [vtr].y;
-    if (tR) tR = (y - orig_triangle [vtr].y) / tR;
-    float xL = orig_triangle [vtl].x + tL * (orig_triangle [vbl].x - orig_triangle [vtl].x);
-    float xR = orig_triangle [vtr].x + tR * (orig_triangle [vbr].x - orig_triangle [vtr].x);
-    float tX = xR - xL;
+    // Now interpolate Z,U,V,R,G,B by Y
+    float tL, tR, xL, xR, tX;
+    if (QRound (orig_triangle [vbl].y) != QRound (orig_triangle [vtl].y))
+      tL = (y - orig_triangle [vtl].y) / (orig_triangle [vbl].y - orig_triangle [vtl].y);
+    else
+      tL = (x - orig_triangle [vtl].x) / (orig_triangle [vbl].x - orig_triangle [vtl].x);
+    if (QRound (orig_triangle [vbr].y) != QRound (orig_triangle [vtr].y))
+      tR = (y - orig_triangle [vtr].y) / (orig_triangle [vbr].y - orig_triangle [vtr].y);
+    else
+      tR = (x - orig_triangle [vtr].x) / (orig_triangle [vbr].x - orig_triangle [vtr].x);
+    xL = orig_triangle [vtl].x + tL * (orig_triangle [vbl].x - orig_triangle [vtl].x);
+    xR = orig_triangle [vtr].x + tR * (orig_triangle [vbr].x - orig_triangle [vtr].x);
+    tX = xR - xL;
     if (tX) tX = (x - xL) / tX;
 
 #   define INTERPOLATE(val,tl,bl,tr,br)	\
-        {					\
-          float vl,vr;				\
-          if (tl != bl)				\
-            vl = tl + (bl - tl) * tL;		\
-          else					\
-            vl = tl;				\
-          if (tr != br)				\
-            vr = tr + (br - tr) * tR;		\
-          else					\
-            vr = tr;				\
-          val = vl + (vr - vl) * tX;		\
-        }
+    {					\
+      float vl,vr;				\
+      if (tl != bl)				\
+        vl = tl + (bl - tl) * tL;		\
+      else					\
+        vl = tl;				\
+      if (tr != br)				\
+        vr = tr + (br - tr) * tR;		\
+      else					\
+        vr = tr;				\
+      val = vl + (vr - vl) * tX;		\
+    }
 
     // Calculate Z
     INTERPOLATE(g3dpoly->vertices [j].z,
@@ -1678,7 +1684,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
     	pp->GetNumVertices (), &pp->GetBoundingBox ()) != CS_POLY_OUT)
     {
       csPolygonSet* ps = (csPolygonSet*)(poly->GetParent ());
-      CsPrintf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n", 
+      CsPrintf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
         csNameObject::GetName(*ps), csNameObject::GetName(*poly));
       Dumper::dump (this, "csPolygon2D");
       Dumper::dump (poly);
@@ -1782,7 +1788,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
 
     for (int mipmaplevel = 0; mipmaplevel<4; mipmaplevel++)
     {
-      g3dpoly.poly_texture[mipmaplevel] = 
+      g3dpoly.poly_texture[mipmaplevel] =
         GetIPolygonTextureFromcsPolyTexture(poly->GetPolyTex(mipmaplevel));
     }
 
@@ -1801,7 +1807,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
     else
       if (FAILED (g3d->DrawPolygon (g3dpoly)))
       {
-        CsPrintf (MSG_STDOUT, "Drawing polygon '%s/%s' failed!\n", 
+        CsPrintf (MSG_STDOUT, "Drawing polygon '%s/%s' failed!\n",
                   csNameObject::GetName(*((csSector*)poly->GetParent ())),
                   csNameObject::GetName(*poly));
       }
