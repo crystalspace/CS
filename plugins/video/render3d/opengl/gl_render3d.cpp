@@ -748,7 +748,7 @@ bool csGLRender3D::Open ()
   shadermgr->AddVariable(shvar_light_0_attenuation);
 
 
-  if (false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if ( false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
@@ -1125,6 +1125,7 @@ void csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   case iTextureHandle::CS_TEX_IMG_2D:
     statecache->Enable_GL_TEXTURE_2D (unit);
     glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
+    glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, -2); //big hack
     texunit[unit] = txthandle;
     break;
   case iTextureHandle::CS_TEX_IMG_3D:

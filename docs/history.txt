@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 	  updated msvc_libs and the links too msvc_libs in the docs. 
 	- Eric Sunshine committed the CS/scripts/worldcraft/crystal.fgd
 	  submission from Leandro Ezequiel Lovisolo <lovisolo@datafull.com>.
+	- Marten Svanfeldt added a fix which improves quality in new renderer
+	  by texture-mipmap level biasing.
 1-Mar-2003
 	- Greg Block changed the makefile for the xml documentsystem plugin to
 	  not override the values for the link flags to use when linking libxml
