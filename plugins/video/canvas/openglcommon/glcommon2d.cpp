@@ -219,6 +219,13 @@ void csGraphics2DGLCommon::Write (int x, int y, int fg, int bg, const char *text
 			  bg, text, Font);
 }
 
+void csGraphics2DGLCommon::WriteChar (int x, int y, int fg, int bg, char c)
+{
+  char text[2];
+  text[0] = c;
+  text[1] = 0;
+  Write (x, y, fg, bg, text);
+}
 
 // This variable is usually NULL except when doing a screen shot:
 // in this case it is a temporarily allocated buffer for glReadPixels ()

@@ -448,8 +448,69 @@ struct iGraphics3D : public iPlugIn
   /// Close the 3D graphics display.
   virtual void Close () = 0;
 
+  /// Get the 2D driver: This does NOT increment the refcount of 2D driver!
+  virtual iGraphics2D *GetDriver2D () = 0;
+
   /// Change the dimensions of the display.
   virtual void SetDimensions (int width, int height) = 0;
+
+  /// Get drawing buffer width
+  virtual int GetWidth () = 0;
+  /// Get drawing buffer height
+  virtual int GetHeight () = 0;
+
+  /**
+   * Get the current driver's capabilities. Each driver implements their
+   * own function.
+   */
+  virtual csGraphics3DCaps *GetCaps () = 0;
+
+  /**
+   * Set center of projection for perspective projection.
+   * Center is set in screen space coordinates.
+   */
+  virtual void SetPerspectiveCenter (int x, int y) = 0;
+
+  /// Get perspective center.
+  virtual void GetPerspectiveCenter (int& x, int& y) = 0;
+
+  /**
+   * Set aspect ratio for perspective projection.
+   */
+  virtual void SetPerspectiveAspect (float aspect) = 0;
+
+  /// Get aspect ratio.
+  virtual float GetPerspectiveAspect () = 0;
+
+  /**
+   * Set world to camera transformation (currently only used by
+   * DrawTriangleMesh and DrawPolygonMesh).
+   */
+  virtual void SetObjectToCamera (csReversibleTransform* o2c) = 0;
+
+  /**
+   * Get world to camera transformation.
+   */
+  virtual void GetObjectToCamera (csReversibleTransform& o2c) = 0;
+
+  /**
+   * Set optional clipper to use. If vertices == null
+   * then there is no clipper.
+   * Currently only used by DrawTriangleMesh.
+   */
+  virtual void SetClipper (csVector2* vertices, int num_vertices) = 0;
+
+  /**
+   * Get clipper that was used. Make sure you have at least place for
+   * 64 vertices.
+   */
+  virtual void GetClipper (csVector2* vertices, int& num_vertices) = 0;
+
+  /// Debugging only: get a pointer to Z-buffer at some location
+  virtual unsigned long *GetZBuffAt (int x, int y) = 0;
+
+  /// Get Z-buffer value at given X,Y position
+  virtual float GetZBuffValue (int x, int y) = 0;
 
   /// Start a new frame (see CSDRAW_XXX bit flags)
   virtual bool BeginDraw (int DrawFlags) = 0;
@@ -459,6 +520,12 @@ struct iGraphics3D : public iPlugIn
 
   /// Print the image in backbuffer
   virtual void Print (csRect *area) = 0;
+
+  /// Set a renderstate value.
+  virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val) = 0;
+
+  /// Get a renderstate value.
+  virtual long GetRenderState (G3D_RENDERSTATEOPTION op) = 0;
 
   /// Draw the projected polygon with light and texture.
   virtual void DrawPolygon (G3DPolygonDP& poly) = 0;
@@ -470,10 +537,6 @@ struct iGraphics3D : public iPlugIn
    * done.
    */
   virtual void DrawPolygonDebug (G3DPolygonDP& poly) = 0;
-
-  /// Draw a line in camera space.
-  virtual void DrawLine (const csVector3& v1, const csVector3& v2,
-  	float fov, int color) = 0;
 
   /**
    * Prepare for drawing a series of Polygon FX which all use
@@ -557,23 +620,20 @@ struct iGraphics3D : public iPlugIn
    */
   virtual void CloseFogObject (CS_ID id) = 0;
 
-  /// Set a renderstate value.
-  virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val) = 0;
+  /// Draw a line in camera space.
+  virtual void DrawLine (const csVector3& v1, const csVector3& v2,
+  	float fov, int color) = 0;
 
-  /// Get a renderstate value.
-  virtual long GetRenderState (G3D_RENDERSTATEOPTION op) = 0;
+  /// Create a halo of the specified color and return a handle.
+  virtual iHalo *CreateHalo (float iR, float iG, float iB,
+    unsigned char *iAlpha, int iWidth, int iHeight) = 0;
 
-  /**
-   * Get the current driver's capabilities. Each driver implements their
-   * own function.
-   */
-  virtual csGraphics3DCaps *GetCaps () = 0;
+  /// Draw a sprite using a rectangle from given texture
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th) = 0;
 
-  /// Debugging only: get a pointer to Z-buffer at some location
-  virtual unsigned long *GetZBuffAt (int x, int y) = 0;
-
-  /// Get Z-buffer value at given X,Y position
-  virtual float GetZBuffValue (int x, int y) = 0;
+  /// Get the texture manager: do NOT increment the refcount of texture manager
+  virtual iTextureManager *GetTextureManager () = 0;
 
   /// Dump the texture cache.
   virtual void DumpCache () = 0;
@@ -587,66 +647,6 @@ struct iGraphics3D : public iPlugIn
    * (csPolygon3D destructor will do that).
    */
   virtual void RemoveFromCache (iPolygonTexture* poly_texture) = 0;
-
-  /// Get drawing buffer width
-  virtual int GetWidth () = 0;
-  /// Get drawing buffer height
-  virtual int GetHeight () = 0;
-
-  /**
-   * Set center of projection for perspective projection.
-   * Center is set in screen space coordinates.
-   */
-  virtual void SetPerspectiveCenter (int x, int y) = 0;
-
-  /// Get perspective center.
-  virtual void GetPerspectiveCenter (int& x, int& y) = 0;
-
-  /**
-   * Set aspect ratio for perspective projection.
-   */
-  virtual void SetPerspectiveAspect (float aspect) = 0;
-
-  /// Get aspect ratio.
-  virtual float GetPerspectiveAspect () = 0;
-
-  /**
-   * Set world to camera transformation (currently only used by
-   * DrawTriangleMesh and DrawPolygonMesh).
-   */
-  virtual void SetObjectToCamera (csReversibleTransform* o2c) = 0;
-
-  /**
-   * Get world to camera transformation.
-   */
-  virtual void GetObjectToCamera (csReversibleTransform& o2c) = 0;
-
-  /**
-   * Set optional clipper to use. If vertices == null
-   * then there is no clipper.
-   * Currently only used by DrawTriangleMesh.
-   */
-  virtual void SetClipper (csVector2* vertices, int num_vertices) = 0;
-
-  /**
-   * Get clipper that was used. Make sure you have at least place for
-   * 64 vertices.
-   */
-  virtual void GetClipper (csVector2* vertices, int& num_vertices) = 0;
-
-  /// Get the 2D driver: This does NOT increment the refcount of 2D driver!
-  virtual iGraphics2D *GetDriver2D () = 0;
-
-  /// Get the texture manager: do NOT increment the refcount of texture manager
-  virtual iTextureManager *GetTextureManager () = 0;
-
-  /// Create a halo of the specified color and return a handle.
-  virtual iHalo *CreateHalo (float iR, float iG, float iB,
-    unsigned char *iAlpha, int iWidth, int iHeight) = 0;
-
-  /// Draw a sprite using a rectangle from given texture
-  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th) = 0;
 
 };
 

@@ -175,12 +175,6 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
   }
 }
 
-void csOpenGLProcBackBuffer::DrawPixmap (iTextureHandle *hTex, int sx, 
-  int sy, int sw, int sh,int tx, int ty, int tw, int th)
-{
-  csGraphics3DOGLCommon::DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th); 
-}
-
 float csOpenGLProcBackBuffer::GetZBuffValue (int x, int y)
 {
   GLfloat zvalue;
@@ -250,16 +244,16 @@ csImageArea *csOpenGLProcBackBuffer2D::SaveArea (int x, int y, int w, int h)
 void csOpenGLProcBackBuffer2D::Write (int x, int y, int fg, int bg, 
 					 const char *str)
 { 
-  g2d->Write (x, height - y - g2d->GetTextHeight (font), fg, bg, str); 
+  g2d->Write (x, frame_height - height + y, fg, bg, str); 
 }
-
-
-void csOpenGLProcBackBuffer2D::WriteChar (int x, int y, 
-					     int fg, int bg, char c)
+//g2d->GetTextHeight (font)
+void csOpenGLProcBackBuffer2D::WriteChar (int x, int y, int fg, int bg, char c)
 {
-  g2d->WriteChar (x, height - y - g2d->GetTextHeight (font), fg, bg, c); 
+  char text[2];
+  text[0] = c;
+  text[1] = 0;
+  Write (x, y, fg, bg, text);
 }
-
 
 int csOpenGLProcBackBuffer2D::GetWidth ()
 { 

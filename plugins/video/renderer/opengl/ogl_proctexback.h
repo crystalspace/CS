@@ -81,8 +81,6 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
 
   virtual void Print (csRect *area);
 
-  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-			     int tx, int ty, int tw, int th);
   float GetZBuffValue (int x, int y);
 };
 
@@ -178,11 +176,9 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   virtual void SetRGB (int i, int r, int g, int b)
   { g2d->SetRGB (i, r, g, b); }
   ///
-  virtual void Write (int x, int y, int fg, int bg, const char *str);
-
-  ///
+  virtual void Write (int x, int y, int fg, int bg, const char *str)
+;
   virtual void WriteChar (int x, int y, int fg, int bg, char c);
-
   virtual int GetFontID ()
   { return g2d->GetFontID (); }
 

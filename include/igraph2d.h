@@ -163,11 +163,57 @@ struct iGraphics2D : public iPlugIn
 {
   /// Open the device.
   virtual bool Open (const char *Title) = 0;
+
   /// Close the device.
   virtual void Close () = 0;
 
+  /// Return the width of the framebuffer.
+  virtual int GetWidth () = 0;
+
+  /// Return the height of the framebuffer.
+  virtual int GetHeight () = 0;
+
+  /// Returns 'true' if the program is being run full-screen.
+  virtual bool GetFullScreen () = 0;
+
+  /// Get active videopage number (starting from zero)
+  virtual int GetPage () = 0;
+
+  /// Enable or disable double buffering; returns success status
+  virtual bool DoubleBuffer (bool Enable) = 0;
+
+  /// Get the double buffer state
+  virtual bool GetDoubleBufferState () = 0;
+
+  /// Return information about the pixel format.
+  virtual csPixelFormat *GetPixelFormat () = 0;
+
+ /**
+  * Return the number of bytes for every pixel.
+  * This function is equivalent to the PixelBytes field that
+  * you get from GetPixelFormat.
+  */
+  virtual int GetPixelBytes () = 0;
+
+ /**
+  * Return the number of palette entries that can be modified.
+  * This should return 0 if there is no palette (true color displays).
+  * This function is equivalent to the PalEntries field that you
+  * get from GetPixelFormat. It is just a little bit easier to obtain
+  * this way.
+  */
+
+  virtual int GetNumPalEntries () = 0;
+
+  /// Get the palette (if there is one)
+  virtual RGBPixel *GetPalette () = 0;
+
+  /// Set a color index to given R,G,B (0..255) values
+  virtual void SetRGB (int i, int r, int g, int b) = 0;
+
   /// Set clipping rectangle
   virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY) = 0;
+
   /// Retrieve clipping rectangle
   virtual void GetClipRect (int& nMinX, int& nMinY, int& nMaxX, int& nMaxY) = 0;
 
@@ -176,38 +222,40 @@ struct iGraphics2D : public iPlugIn
   * It should return S_OK if graphics context is ready.
   */
   virtual bool BeginDraw () = 0;
+
   /// This routine should be called when you finished drawing.
   virtual void FinishDraw () = 0;
 
   /// Flip video pages (or dump backbuffer into framebuffer).
   virtual void Print (csRect *pArea) = 0;
 
-  /// Get active videopage number (starting from zero)
-  virtual int GetPage () = 0;
-  /// Enable or disable double buffering; returns success status
-  virtual bool DoubleBuffer (bool Enable) = 0;
-  /// Get the double buffer state
-  virtual bool GetDoubleBufferState () = 0;
-
   /// Clear backbuffer.
   virtual void Clear (int color) = 0;
+
   /// Clear all video pages.
   virtual void ClearAll (int color) = 0;
 
   /// Draw a line.
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color) = 0;
+
   /// Draw a box
   virtual void DrawBox (int x, int y, int w, int h, int color) = 0;
+
  /**
   * Clip a line against given rectangle.
   * Function returns true if line is not visible.
   */
   virtual bool ClipLine (float& x1, float& y1, float& x2, float& y2,
     int xmin, int ymin, int xmax, int ymax) = 0;
+
   /// Draw a pixel.
   virtual void DrawPixel (int x, int y, int color) = 0;
+
   /// Returns the address of the pixel at the specified (x, y) coordinates.
   virtual unsigned char *GetPixelAt (int x, int y) = 0;
+
+  /// Query pixel R,G,B at given screen location
+  virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB) = 0;
 
  /**
   * Save a subarea of screen and return a handle to saved buffer.
@@ -215,10 +263,36 @@ struct iGraphics2D : public iPlugIn
   * the handle after usage or RestoreArea () it.
   */
   virtual csImageArea *SaveArea (int x, int y, int w, int h) = 0;
+
   /// Restore a subarea of screen saved with SaveArea()
   virtual void RestoreArea (csImageArea *Area, bool Free) = 0;
+
   /// Free storage allocated for a subarea of screen
   virtual void FreeArea (csImageArea *Area) = 0;
+
+  /// Write a text string into the back buffer
+  virtual void Write (int x, int y, int fg, int bg, const char *str) = 0;
+
+  /// Write a single character.
+  virtual void WriteChar (int x, int y, int fg, int bg, char c) = 0;
+
+  /// Gets the ID of current font.
+  virtual int GetFontID () = 0;
+
+  /// Sets the type of the font.
+  virtual void SetFontID (int FontID) = 0;
+
+  /// Set font size, return true on success
+  virtual bool SetFontSize (int FontSize) = 0;
+
+  /// Set currents font size, -1 if not detectable
+  virtual int GetFontSize () = 0;
+
+  /// Get the width of a string if it would be drawn with given font
+  virtual int GetTextWidth (int FontID, const char *text) = 0;
+
+  /// Get the height of given font
+  virtual int GetTextHeight (int FontID) = 0;
 
   /// Set mouse position (relative to top-left of CS window).
   virtual bool SetMousePosition (int x, int y) = 0;
@@ -232,21 +306,6 @@ struct iGraphics2D : public iPlugIn
   * should return "true".
   */
   virtual bool SetMouseCursor (csMouseCursorID iShape) = 0;
-  /// Set a color index to given R,G,B (0..255) values
-  virtual void SetRGB (int i, int r, int g, int b) = 0;
-  /// Write a text string into the back buffer
-  virtual void Write (int x, int y, int fg, int bg, const char *str) = 0;
-  /// Write a single character.
-  virtual void WriteChar (int x, int y, int fg, int bg, char c) = 0;
-
-  /// Gets the ID of current font.
-  virtual int GetFontID () = 0;
-  /// Sets the type of the font.
-  virtual void SetFontID (int FontID) = 0;
-  /// Set font size, return true on success
-  virtual bool SetFontSize (int FontSize) = 0;
-  /// Set currents font size, -1 if not detectable
-  virtual int GetFontSize () = 0;
 
  /**
   * Perform a system specific exension.
@@ -254,44 +313,6 @@ struct iGraphics2D : public iPlugIn
   * way currently.
   */
   virtual bool PerformExtension (const char *args) = 0;
-
- /**
-  * Return the number of bytes for every pixel.
-  * This function is equivalent to the PixelBytes field that
-  * you get from GetPixelFormat.
-  */
-  virtual int GetPixelBytes () = 0;
-
- /**
-  * Return information about the pixel format.
-  */
-  virtual csPixelFormat *GetPixelFormat () = 0;
-
-  /// Return the width of the framebuffer.
-  virtual int GetWidth () = 0;
-  /// Return the height of the framebuffer.
-  virtual int GetHeight () = 0;
-  /// Returns 'true' if the program is being run full-screen.
-  virtual bool GetFullScreen () = 0;
-
- /**
-  * Return the number of palette entries that can be modified.
-  * This should return 0 if there is no palette (true color displays).
-  * This function is equivalent to the PalEntries field that you
-  * get from GetPixelFormat. It is just a little bit easier to obtain
-  * this way.
-  */
-  virtual int GetNumPalEntries () = 0;
-  /// Get the palette (if there is one)
-  virtual RGBPixel *GetPalette () = 0;
-
-  /// Get the width of a string if it would be drawn with given font
-  virtual int GetTextWidth (int FontID, const char *text) = 0;
-  /// Get the height of given font
-  virtual int GetTextHeight (int FontID) = 0;
-
-  /// Query pixel R,G,B at given screen location
-  virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB) = 0;
 
   /// Do a screenshot: return a new iImage object
   virtual iImage *ScreenShot () = 0;
