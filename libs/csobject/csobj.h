@@ -42,47 +42,47 @@
  */ 
 class csObject : public csBase
 {
-  private:
-    ///
-    csObjTree* objtree;
+private:
+  ///
+  csObjTree* objtree;
 
 #ifdef __USE_CS_ID_CODE
-    ///
-    CS_ID csid_value;
+  ///
+  CS_ID csid_value;
 #endif
 
-    /// Set the parent csObject.  Not required.
-    virtual void SetObjectParent(csObject* parent) { (void)parent; }
+  /// Set the parent csObject.  Not required.
+  virtual void SetObjectParent (csObject* parent) { (void)parent; }
 
-  public:
-    ///
-    csObject();
-    ///
-    ~csObject();
-    ///
-    csObject(csObject& csobj);
+public:
+  ///
+  csObject ();
+  ///
+  virtual ~csObject ();
+  ///
+  csObject (csObject& csobj);
 
-    /// Returns the parent csObject.  Not required.
-    virtual csObject* GetObjectParent() { return NULL; }
+  /// Returns the parent csObject.  Not required.
+  virtual csObject* GetObjectParent () { return NULL; }
 
-    /// Return the first subobject instance of the given type
-    csObject* GetObject(const csIdType& objtype);
+  /// Return the first subobject instance of the given type
+  csObject* GetObject (const csIdType& objtype);
 
-    /// Return an iterator referencing all objects of the given type
-    csObjIterator ObjGet(const csIdType& objtype);
+  /// Return an iterator referencing all objects of the given type
+  csObjIterator ObjGet (const csIdType& objtype);
 
-    /// Attach a new csObject to the tree
-    void ObjAdd(csObject* obj);
+  /// Attach a new csObject to the tree
+  void ObjAdd (csObject* obj);
 
-    /// Removes the given object from the tree, without freeing the contents
-    void ObjRelease(csObject* obj);
+  /// Removes the given object from the tree, without freeing the contents
+  void ObjRelease (csObject* obj);
 
-    /// Deletes the given object, removing it from the object tree
-    void ObjRemove(csObject* obj);
+  /// Deletes the given object, removing it from the object tree
+  void ObjRemove (csObject* obj);
 
 #ifdef __USE_CS_ID_CODE
-    ///
-    CS_ID GetID() const { return csid_value; }
+  ///
+  CS_ID GetID () const { return csid_value; }
 #endif
   
   CSOBJTYPE;
