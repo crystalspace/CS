@@ -23,6 +23,7 @@
 #include "cstool/proctex.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
+#include "igraphic/imageio.h"
 #include "awscomp.h"
 #include "awswin.h"
 
@@ -61,6 +62,11 @@ class awsManager : public iAws
     *  bucket 0.
     */
    bool all_buckets_full;
+   
+  /** This is the maximum frame for any window, because it's the size of our
+   * canvas, be it the virtual one or otherwise. 
+   */
+   csRect frame;
 
    /// The current top window
    awsWindow   *top;
@@ -70,6 +76,9 @@ class awsManager : public iAws
 
    /// The 3d graphics context
    iGraphics3D *ptG3D;
+   
+   /// The system pointer, needed at odd times.
+   iSystem *System;
   
    /// Handle to our procedural texture, which the user can have us draw on.
    class awsCanvas : public csProcTexture
@@ -92,6 +101,10 @@ class awsManager : public iAws
         /// Get the iGraphics3D interface so that components can use it.
         iGraphics3D *G3D() 
         { return ptG3D; }
+	
+	/// Set dimensions of texture
+	void SetSize(int w, int h);
+
    };
 
    /// Procedural texture canvas instantiation
@@ -109,6 +122,9 @@ class awsManager : public iAws
    /// Contains the list of factory to ID mappings.
    csDLinkList component_factories;
 
+   /// Contains a reference to the image loader
+   iImageIO *ImageLoader;
+   
 public:
     SCF_DECLARE_IBASE;
 
@@ -166,11 +182,11 @@ public:
     virtual void SetDefaultContext();
 
     /// Get the iGraphics2D interface so that components can use it.
-    iGraphics2D *G2D() 
+    virtual iGraphics2D *G2D() 
     { return ptG2D; }
 
     /// Get the iGraphics3D interface so that components can use it.
-    iGraphics3D *G3D() 
+    virtual iGraphics3D *G3D() 
     { return ptG3D; }
 
  

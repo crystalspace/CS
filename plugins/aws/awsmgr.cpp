@@ -1,7 +1,10 @@
 #include "cssysdef.h"
 #include "aws.h"
+#include "awsprefs.h"
+#include "ivideo/txtmgr.h"
+#include <stdio.h>
 
-awsManager::awsManager(iBase *p)
+awsManager::awsManager(iBase *p):prefmgr(NULL),System(NULL)
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
@@ -14,10 +17,34 @@ awsManager::~awsManager()
 }
 
 bool 
-awsManager::Initialize(iSystem *sys)
-{
-  canvas.Initialize(sys);
-
+awsManager::Initialize(iSystem *system)
+{   
+  System=system;
+  
+  printf("aws-debug: getting image loader.\n");
+  ImageLoader = CS_QUERY_PLUGIN_ID(System, CS_FUNCID_IMGLOADER, iImageIO);
+  
+  if (!ImageLoader) 
+  {
+    System->Printf(CS_MSG_WARNING,"AWS could not find an image loader plugin.  This is a fatal error.\n");
+    return false;
+  }
+  
+  printf("aws-debug: getting preference manager.\n");  
+  iAwsPrefs *prefs =  SCF_CREATE_INSTANCE ("crystalspace.window.preferencemanager", iAwsPrefs);
+  
+  if (!prefs)
+  {
+    System->Printf(CS_MSG_WARNING,"AWS could not create an instance of the default preference manager.  This is a serious error.\n");
+    return false;
+  }
+  else
+  {
+    printf("aws-debug: setting the internal preference manager.\n");
+    SetPrefMgr(prefs);
+    prefs->DecRef();
+  }
+      
   return true;
 }
 
@@ -91,14 +118,28 @@ awsManager::SetContext(iGraphics2D *g2d, iGraphics3D *g3d)
    {
        ptG2D = g2d;
        ptG3D = g3d;
+       
+       frame.Set(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
    }
 }
 
 void 
 awsManager::SetDefaultContext()
 {
+  canvas.SetSize(512, 512);
+  canvas.SetKeyColor(255,0,255);
+  if (!canvas.Initialize(System))
+    printf("aws-debug: SetDefaultContext failed to initialize the memory canvas.\n");
+  else
+    printf("aws-debug: Memory canvas initialized!\n");
+      
   ptG2D = canvas.G2D();
   ptG3D = canvas.G3D();
+  
+  printf("aws-debug: G2D=%x G3D=%x\n", ptG2D, ptG3D);
+  //ptG2D->Clear(ptG3D->GetTextureManager()->FindRGB(255,0,255));
+  
+  
 }
 
 void
@@ -162,7 +203,12 @@ awsManager::Redraw()
    if (dirty[0].IsEmpty()) {
       return;
    }
-
+   
+   ptG2D->DrawLine(0,frame.ymax-20,frame.xmax,frame.ymax, 
+   			
+   
+   return;
+   
    awsWindow *curwin=top, *oldwin;
    
    // check to see if any part of this window needs redrawn
@@ -311,6 +357,11 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponent
 
 awsManager::awsCanvas::awsCanvas ()
 {
+  mat_w=512;
+  mat_h=512;
+  
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS | 
+    CS_TEXTURE_PROC_ALONE_HINT;
    
 }
 
@@ -322,3 +373,8 @@ void
 awsManager::awsCanvas::Animate (csTime current_time)
 {
 }
+
+void 
+awsManager::awsCanvas::SetSize(int w, int h)
+{  mat_w=w; mat_h=h; }
+

@@ -212,6 +212,15 @@ public:
 
 //////////////////////////////////  Preference Manager ////////////////////////////////////////////////////////////////
 
+const unsigned int COLOR_HIGHLIGHT  = 0;
+const unsigned int COLOR_SHADOW     = 1;
+const unsigned int COLOR_FILL 	    = 2;
+const unsigned int COLOR_DARKFILL   = 3;
+const unsigned int COLOR_TEXTFORE   = 4;
+const unsigned int COLOR_TEXTBACK   = 5;
+const unsigned int COLOR_TEXTDISABLED = 6;
+
+
 class awsPrefManager : public iAwsPrefs
 {
    /// list of window definitions
