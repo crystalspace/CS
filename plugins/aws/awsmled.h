@@ -28,43 +28,6 @@
 #include "csutil/csevent.h"
 #include "csutil/csvector.h"
 
-struct drawingContext
-{
-  iGraphics2D *g2d;
-  iGraphics3D *g3d;
-
-  /**
-   * Get minimal rectangle needed to display content.
-   * If maxExtend > -1 it is a constraint in x direction (xy=true) or y-direction (xy=false).
-   */
-  virtual void GetMinRect (drawingContext *dc, csRect &r, int maxExtend=-1, bool xy=true)=0;
-  /**
-   * Get optimal rectangle needed to display content.
-   * If maxExtend > -1 it is a constraint in x direction (xy=true) or y-direction (xy=false).
-   */
-  virtual void GetOptRect (drawingContext *dc, csRect &r, int maxExtend=-1, bool xy=true)=0;
-  /**
-   * Expose the data inside rectangle r. Return in r the minimum enclosing rectangle of your data.
-   */
-  virtual void Expose (drawingContext *dc, csRect &r)=0;
-  /**
-   * Answer the request above if you had content to be exposed. If content is NULL then use the
-   * content that is given to you in some other way.
-   */
-  virtual void WithData (void *content)=0;
-};
-
-struct textContext : public drawingContext
-{
-  int size;
-  int fgcolor, bgcolor;
-  csPoint pen;
-  bool blink;
-  bool underline;
-  bool bold;
-  bool italic;
-};
-
 class awsMultiLineEdit : public awsComponent
 {
  protected:
@@ -182,6 +145,8 @@ class awsMultiLineEdit : public awsComponent
   static void actReplaceRow (void *owner, iAwsParmList &parmlist);
   static void actGetRow (void *owner, iAwsParmList &parmlist);
   static void actGetRowCount (void *owner, iAwsParmList &parmlist);
+  static void actGetText (void *owner, iAwsParmList &parmlist);
+  static void actSetText (void *owner, iAwsParmList &parmlist);
   static void actClear (void *owner, iAwsParmList &parmlist);
 
 
