@@ -17,9 +17,10 @@ PARAM testDir   = { 0, 0, 0, 1 };
 ATTRIB iPos     = vertex.position;
 ATTRIB iNorm    = vertex.attrib[10];
 # Per vertex outputsOUTPUT 
-oPos     = result.position;
+OUTPUT oPos     = result.position;
 OUTPUT oTex0    = result.texcoord;
 # TemporariesTEMP tempPos;
+TEMP tempPos;
 TEMP tempNorm;
 TEMP lightDir;
 TEMP faceTest;
