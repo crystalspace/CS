@@ -1630,8 +1630,8 @@ AS_IF([test $cs_cv_libcal3d = yes],
     [CS_CHECK_BUILD([if cal3d is sufficiently recent], [cs_cv_cal3d_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <cal3d/cal3d.h>]],
-	    [CalLoader::loadCoreAnimation((void*)0,(CalCoreSkeleton*)0);
-	    CalModel m; m.getMixer()->getTimeFactor();])],
+	    [CalCoreSkeleton* s = (CalCoreSkeleton*)0;
+	    s->calculateBoundingBoxes((CalCoreModel*)0);])],
 	[], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])
 	    CS_MAKEFILE_PROPERTY([HAS_CAL3D], [yes])],

@@ -32,6 +32,10 @@ chronological order.
 	  than hard-coding 'flex' and 'bison'.
 	- Eric Sunshine relocated default definitions of SED, DEEPCOPY, and
 	  DELTREE into helper.jam from various other Jam files.
+	- Eric Sunshine mirgrated Keith Fulton's change to the Cal3D check from
+	  configure to configure.ac where it belongs so that it won't get
+	  clobbered the next time someone re-generates configure from
+	  configure.ac.
 1-Feb-2004
 	- Eric Sunshine applied a couple small patches from Randall Foreman
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration
