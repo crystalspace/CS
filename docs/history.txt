@@ -61,6 +61,9 @@ chronological order.
 	  (created by Bison 1.35) and define awslex(yystype), yet the generated
 	  skinpars.cpp (created by the installed Bison 1.875) would be
 	  expecting awslex(YYSTYPE).
+	- res removed references to the old gl*.cfg configs from glrender.mak.
+	- res disabled ARB_vertex_program ext in the GL driver db for GeForce
+	  MX and Go hardware (known to emulate it in software.)
 29-Feb-2004
 	- Eric Sunshine augmented the configure.ac Python check so that it can
 	  detect a working Python installation on MacOS/X despite the fact that
