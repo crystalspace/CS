@@ -13,6 +13,15 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+15-Nov-1999
+	- Eric Sunshine renamed the Python test program from cspythontest
+	  to pytest in order to appease DOS's 8.3 requirement.
+	- Eric Sunshine fixed the pytest makefile so that it only adds itself
+	  to the global list of makefile targets if haspythn.sh has detected
+	  that Python in installed.  Also fixed the 'tests' target so that
+	  it works in a more reasonable manner.
+	- Eric Sunshine fixed pytest so that it makes proper use of SCF and
+	  actually works in accordance with requirements of the system-driver.
 12-Nov-1999
 	- Brandon Ehle fixes cspython so that it works with SCF.
 	- Michael Dale Long did a major update of Crystal Clear to SCF.
