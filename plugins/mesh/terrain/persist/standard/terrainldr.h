@@ -26,7 +26,6 @@
 
 struct iObjectRegistry;
 struct iSyntaxService;
-struct iLoader;
 struct iVFS;
 
 /**
@@ -37,7 +36,6 @@ class csTerrainFactoryLoader : public iLoaderPlugin
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
-  csRef<iLoader> loader;
   csRef<iVFS> vfs;
   csStringHash xmltokens;
 
@@ -104,7 +102,6 @@ class csTerrainObjectLoader : public iLoaderPlugin
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
-  csRef<iLoader> loader;
   csRef<iVFS> vfs;
   csStringHash xmltokens;
 

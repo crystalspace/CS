@@ -81,7 +81,6 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
@@ -186,6 +185,7 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
         int height = child->GetAttributeValueAsInt ("height");
         if (imagefile != 0)
         {
+	  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
           csRef<iImage> map = loader->LoadImage (imagefile);
           if (map == 0) 
           {
@@ -301,7 +301,6 @@ bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
@@ -408,6 +407,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
         int height = child->GetAttributeValueAsInt ("height");
         if (imagefile != 0)
         {
+	  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
           csRef<iImage> map = loader->LoadImage(imagefile,CS_IMGFMT_PALETTED8);
           if (map == 0) 
           {

@@ -37,7 +37,6 @@ class csParticlesFactoryLoader : public iLoaderPlugin
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
-  csRef<iLoader> loader;
   csRef<iVFS> vfs;
   csStringHash xmltokens;
 
@@ -124,7 +123,6 @@ class csParticlesObjectLoader : public iLoaderPlugin
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
-  csRef<iLoader> loader;
   csRef<iVFS> vfs;
   csStringHash xmltokens;
 

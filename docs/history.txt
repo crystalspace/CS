@@ -75,6 +75,9 @@ chronological order.
 	  and so on).
 	- Jorrit fixed a bug in ODE plugin. It would use a csRef to
 	  an event handler but still use DecRef() later.
+	- Jorrit fixed circular ref between loader and the mesh loader plugins
+	  for particles and terrain. That partially fixes some of the ref leaks
+	  in terrain, terrainf, and particles levels (bot not all).
 18-Aug-2004
 	- Jorrit fixed the NR null renderer so that it also returns a
 	  valid iPolygonRenderer instance on calling

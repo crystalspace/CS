@@ -98,7 +98,6 @@ bool csParticlesFactoryLoader::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   xmltokens.Register ("color", XMLTOKEN_COLOR);
@@ -719,7 +718,6 @@ bool csParticlesObjectLoader::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
