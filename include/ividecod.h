@@ -29,6 +29,10 @@
 
 struct iMaterialHandle;
 struct iFile;
+struct iStream;
+struct iVideoStream;
+struct iAudioStream;
+struct iCodec;
 
 enum csStreamFormatCap
 {
@@ -49,6 +53,11 @@ enum csStreamFormatCap
    */
   CS_DYNAMIC_FRAMESIZE = 8
 };
+
+#define CS_STREAMTYPE_AUDIO 1
+#define CS_STREAMTYPE_VIDEO 2
+#define CS_STREAMTYPE_MIDI 3
+#define CS_STREAMTYPE_TEXT 4
 
 struct csStreamDescription
 {
@@ -72,7 +81,7 @@ struct csVideoStreamDescription : public csStreamDescription
   /**
    * Framecount or -1 if not available.
    */
-  long framecount;
+  SLong framecount;
   /**
    * Resolution or -1 if not available.
    */
@@ -84,7 +93,7 @@ struct csVideoStreamDescription : public csStreamDescription
   /**
    * duration in milliseconds or -1 if not available.
    */
-  long duration;
+  SLong duration;
 };
 
 struct csAudioStreamDescription : public csStreamDescription
@@ -96,7 +105,7 @@ struct csAudioStreamDescription : public csStreamDescription
   /**
    * duration in milliseconds or -1 if not available.
    */
-  long duration;
+  ULong duration;
 };
 
 SCF_VERSION (iStreamIterator, 0, 0, 1);
@@ -132,6 +141,11 @@ struct iStreamFormat : public iPlugIn
    * Load the videodata from the following source.
    */
   virtual bool Load (iFile *pVideoData) = 0;
+  /**
+   * Unload this video. All streams become invalid. This is automatically called by Load ().
+   * Prior to the final DecRef of this plugin you have to call this yourself.
+   */
+  virtual void Unload () = 0;
 };
 
 SCF_VERSION (iStream, 0, 0, 1);
@@ -208,17 +222,17 @@ struct iAudioStream : public iStream
  */
 
 /// formats for videodata
-#define CS_CODECFORMAT_RGB_CHANNEL
-#define CS_CODECFORMAT_RGBA_CHANNEL
-#define CS_CODECFORMAT_YUV_CHANNEL
-#define CS_CODECFORMAT_RGB_INTERLEAVED
-#define CS_CODECFORMAT_RGBA_INTERLEAVED
-#define CS_CODECFORMAT_YUV_INTERLEAVED
+#define CS_CODECFORMAT_RGB_CHANNEL       1
+#define CS_CODECFORMAT_RGBA_CHANNEL      2
+#define CS_CODECFORMAT_YUV_CHANNEL       3
+#define CS_CODECFORMAT_RGB_INTERLEAVED   4
+#define CS_CODECFORMAT_RGBA_INTERLEAVED  5
+#define CS_CODECFORMAT_YUV_INTERLEAVED   6
 
 /// formats for audiodata
 #define CS_CODECFORMAT_PCM
 
-struct csCodecDecsription
+struct csCodecDescription
 {
   /**
    * CODEC id
@@ -248,10 +262,10 @@ struct iCodec : public iBase
   /**
    * Send either video or audio stream description as input. The codec will cast it.
    */
-  virtual void Initialize (csStreamDescription *desc) = 0;
+  virtual bool Initialize (csStreamDescription *desc) = 0;
   virtual void GetCodecDescription (csCodecDescription &desc) = 0;
-  virtual bool Decode (char *indata, long inlength, void *&outdata) = 0;
-  virtual bool Encode (void *indata, char *outdata, long &outlength) = 0;
+  virtual bool Decode (char *indata, ULong inlength, void *&outdata) = 0;
+  virtual bool Encode (void *indata, char *outdata, ULong &outlength) = 0;
 };
 
 #endif
