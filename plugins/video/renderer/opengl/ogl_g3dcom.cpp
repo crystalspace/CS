@@ -3100,6 +3100,9 @@ void csGraphics3DOGLCommon::DrawPolygonDebug (G3DPolygonDP &/* poly */ )
 
 void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
 {
+  // Optionally set up clip portals that may be in use.
+  SetupClipPortals ();
+
   if (poly.num < 3) return;
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
@@ -5821,6 +5824,9 @@ float csGraphics3DOGLCommon::GetZBuffValue (int x, int y)
 
 void csGraphics3DOGLCommon::DrawPolygon (G3DPolygonDP & poly)
 {
+  // Optionally set up clip portals that may be in use.
+  SetupClipPortals ();
+
   if (z_buf_mode == CS_ZBUF_FILLONLY)
   {
     DrawPolygonZFill (poly.vertices, poly.num, poly.normal);

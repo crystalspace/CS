@@ -1305,7 +1305,8 @@ void csThing::DrawOnePolygon (
     }
 
     // First call OpenPortal() if needed.
-    if (po->flags.Check (CS_PORTAL_FLOAT))
+    bool use_float_portal = po->flags.Check (CS_PORTAL_FLOAT);
+    if (use_float_portal)
     {
       static G3DPolygonDFP g3dpoly;
       g3dpoly.num = poly->GetVertexCount ();
@@ -1320,7 +1321,18 @@ void csThing::DrawOnePolygon (
     // the maximum number that a sector is drawn (for mirrors).
     if (po->Draw (poly, &(p->scfiPolygon3D), d, keep_plane))
     {
-      if (filtered) poly->DrawFilled (d, p, keep_plane, zMode);
+      if (filtered)
+      {
+        //csZBufMode new_mode = zMode;
+        //switch (zMode)
+	//{
+	  //case CS_ZBUF_NONE: new_mode = CS_ZBUF_NONE; break;
+	  //case CS_ZBUF_TEST: new_mode = CS_ZBUF_TEST; break;
+	  //case CS_ZBUF_FILL: new_mode = CS_ZBUF_FILL; break;
+	  //case CS_ZBUF_USE: new_mode = CS_ZBUF_FILL; break;
+	//}
+        poly->DrawFilled (d, p, keep_plane, zMode);
+      }
       if (is_this_fog)
       {
         poly->AddFogPolygon (
@@ -1337,18 +1349,20 @@ void csThing::DrawOnePolygon (
       // into the others sector space (we cannot trust the Z-buffer here).
       if (po->flags.Check (CS_PORTAL_ZFILL))
         poly->FillZBuf (d, p, keep_plane);
-
-      // Make sure to close the portal again.
-      if (po->flags.Check (CS_PORTAL_FLOAT))
-      {
-	d->GetGraphics3D ()->ClosePortal ();
-      }
     }
     else
+    {
       poly->DrawFilled (d, p, camera_plane, zMode);
+    }
+
+    // Make sure to close the portal again.
+    if (use_float_portal)
+      d->GetGraphics3D ()->ClosePortal ();
   }
   else
+  {
     poly->DrawFilled (d, p, camera_plane, zMode);
+  }
 }
 
 void csThing::DrawPolygonArray (

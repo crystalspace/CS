@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+26-Mar-2003
+	- Fixed a bug with the new OpenPortal() implementation in OpenGL
+	  renderer. It was not setting/restoring the stencil in all
+	  cases.
 25-Mar-2003
 	- Changed API of OpenPortal() to accept a G3DPolygonDFP instead
 	  of a 2D polygon. I need z-information.
