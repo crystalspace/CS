@@ -325,6 +325,10 @@ csRectRegion::gatherFragments()
 
 void csRectRegion::Include(csRect &nrect)
 {
+  // Ignore an empty rect
+  if (nrect.IsEmpty())
+    return;
+
   // If there are no rects in the region, add this and leave.
   if (region_count == 0)
   {
@@ -419,6 +423,10 @@ void csRectRegion::Include(csRect &nrect)
 void 
 csRectRegion::Exclude(csRect &rect)
 {
+  // Ignore an empty rect
+  if (rect.IsEmpty())
+    return;
+
   // If there are no rects in the region, just leave.  
   if (region_count == 0)
     return;

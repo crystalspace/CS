@@ -104,7 +104,7 @@ awsTest::awsTest()
   view = NULL;
   message[0] = 0;
 
-//#ifdef 0
+#ifdef 0
 
   // This code is used to perform dry runs on the csrectregion code.
 
@@ -126,7 +126,7 @@ awsTest::awsTest()
     printf("\t%d,%d,%d,%d\n", r.xmin, r.ymin, r.xmax, r.ymax);
   }
 
-//#endif
+#endif
 
 }
 

@@ -547,10 +547,12 @@ awsWindow::OnDraw(csRect clip)
       close_button->GetOriginalDimensions(ctw, cth);
 
       // Draw min/max/close buttons
-      g3d->DrawPixmap(min_button, Frame().xmax-ctw-mxtw-mtw-8, Frame().ymin+toff+3, mtw, mth, 0,0, mtw, mth, 0);
-      g3d->DrawPixmap(max_button, Frame().xmax-ctw-mxtw-8, Frame().ymin+toff+3, mxtw, mth, 0,0, mxtw, mxth, 0);
-      g3d->DrawPixmap(close_button, Frame().xmax-ctw-6, Frame().ymin+toff+3, ctw, cth, 0,0, ctw, cth, 0);
+      g3d->DrawPixmap(min_button, Frame().xmax-(13*3)-8, Frame().ymin+toff+3, mtw, mth, 0,0, mtw, mth, 0);
+      g3d->DrawPixmap(max_button, Frame().xmax-(13*2)-8, Frame().ymin+toff+3, mxtw, mth, 0,0, mxtw, mxth, 0);
+      g3d->DrawPixmap(close_button, Frame().xmax-13-6, Frame().ymin+toff+3, ctw, cth, 0,0, ctw, cth, 0);
            
+      //Todo:  add in button locations for the window def.  That way we know right where to put them.
+
     } 
     break;
 
