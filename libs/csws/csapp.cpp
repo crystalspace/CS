@@ -325,10 +325,10 @@ void csApp::InitializeSkin ()
   skin->Initialize (this);
 }
 
-void csApp::GetFont (iFont *&oFont, int &oFontSize)
+void csApp::GetFont (iFont *&oFont)
 {
   oFont = DefaultFont;
-  oFontSize = DefaultFontSize;
+  //oFontSize = DefaultFontSize;
 }
 
 void csApp::PrintfV (int mode, char const* format, va_list args)

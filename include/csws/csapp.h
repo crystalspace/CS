@@ -230,7 +230,7 @@ public:
   virtual void Draw ();
 
   /// Return default font and font size
-  virtual void GetFont (iFont *&oFont, int &oFontSize);
+  virtual void GetFont (iFont *&oFont);
 
   /// Set application background style
   void SetBackgroundStyle (csAppBackgroundStyle iBackgroundStyle);

@@ -11,6 +11,8 @@ chronological order.
 	  use the correct texture target on a 'tex' instruction.
 	- Jorrit reverted a change res made to the sprite3d normal calculation
 	  on 7 August 2002. This change caused access to uninitialized memory.
+	- res fixed a crash in CSWS caused by csApp::GetFont() having a wrong
+	  prototype.
 12-Mar-2004
 	- res augmented configure.ac to look for the OpenAL, Cg, and CgGL
 	  libraries under a couple different names (differing by case) to
@@ -40,6 +42,10 @@ chronological order.
 	  the superclass (csImageFile) does that. Solved by overriding the
 	  destructor and FreeImage() and clearing the 'Image' pointer if
 	  destroy_image is not set. This fixes a bug with map2cs.
+	- res silenced some VC compiler warnings in regcomp.c.
+	- res fixed some constness issues on VC6 in the freefnt2 and fontplex
+	  plugins.
+	- res removed some unused stuff from csfont.
 	- duhprey removed collision detection for the sky in terrain
 	- John Harger fixed a the constants, the SUB and the PHASE instructions
 	  in the PS1 shader plugin for ATI cards.
