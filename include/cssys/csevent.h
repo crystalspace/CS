@@ -76,19 +76,28 @@ enum
 /// Network message events
 #define CSMASK_Network		(1 << csevNetwork)
 
+/// This mask identifies any keyboard event
+#define CSMASK_Keyboard \
+  (CSMASK_KeyDown | CSMASK_KeyUp)
+/// This mask identifies any mouse event
+#define CSMASK_Mouse \
+  (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp | CSMASK_MouseDoubleClick)
+/// This mask identifies any joystick event
+#define CSMASK_Joystick \
+  (CSMASK_JoystickMove | CSMASK_JoystickDown | CSMASK_JoystickUp)
+/// This mask identifies any input evemt
+#define CSMASK_Input \
+  (CSMASK_Keyboard | CSMASK_Mouse | CSMASK_Joystick)
+
 /// Some handy macros
 /// Check if a event is a keyboard event
-#define IS_KEYBOARD_EVENT(e)	((1 << (e).Type) & \
- (CSMASK_KeyDown | CSMASK_KeyUp))
+#define IS_KEYBOARD_EVENT(e)	((1 << (e).Type) & CSMASK_Keyboard)
 /// Check if a event is a mouse event
-#define IS_MOUSE_EVENT(e)	((1 << (e).Type) & \
- (CSMASK_MouseMove | CSMASK_MouseDown | \
-  CSMASK_MouseUp | CSMASK_MouseDoubleClick))
-#define IS_NETWORK_EVENT(e)	((1 << (e).Type) & \
-	(CSMASK_Network))
+#define IS_MOUSE_EVENT(e)	((1 << (e).Type) & CSMASK_Mouse)
 /// Check if a event is a joystick event
-#define IS_JOYSTICK_EVENT(e)	((1 << (e).Type) & \
- (CSMASK_JoystickMove | CSMASK_JoystickDown | CSMASK_JoystickUp))
+#define IS_JOYSTICK_EVENT(e)	((1 << (e).Type) & CSMASK_Joystick)
+/// Check if the event is a network event
+#define IS_NETWORK_EVENT(e)	((1 << (e).Type) & CSMASK_Network)
 
 /**
  * Modifier key masks
@@ -234,7 +243,10 @@ enum
 class csEvent : public csBase
 {
 public:
-  int Type;
+  unsigned char Type;		// Event type (one of csevXXX)
+  unsigned char Category;	// Event category (unused by CSWS)
+  unsigned char SubCategory;	// Finer granularity
+  unsigned char UnusedField;	// Reserved for Great Future Extensions
   long Time;			// Time when the event occured
   union
   {

@@ -25,6 +25,7 @@ csEvent::csEvent (long iTime, int eType, int kCode, int kModifiers)
 {
   Time = iTime;
   Type = eType;
+  Category = SubCategory = UnusedField = 0;
   Key.Code = kCode;
   Key.Modifiers = kModifiers;
 }
@@ -34,6 +35,7 @@ csEvent::csEvent (long iTime, int eType, int mx, int my,
 {
   Time = iTime;
   Type = eType;
+  Category = SubCategory = UnusedField = 0;
   Mouse.x = mx;
   Mouse.y = my;
   Mouse.Button = mButton;
@@ -45,6 +47,7 @@ csEvent::csEvent (long iTime, int eType, int jn, int jx, int jy,
 {
   Time = iTime;
   Type = eType;
+  Category = SubCategory = UnusedField = 0;
   Joystick.number = jn;
   Joystick.x = jx;
   Joystick.y = jy;
@@ -56,6 +59,7 @@ csEvent::csEvent (long iTime, int eType, int cCode, void *cInfo)
 {
   Time = iTime;
   Type = eType;
+  Category = SubCategory = UnusedField = 0;
   Command.Code = cCode;
   Command.Info = cInfo;
 }
