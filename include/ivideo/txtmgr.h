@@ -39,6 +39,7 @@ struct iImage;
 struct iTextureHandle;
 struct iMaterial;
 struct iMaterialHandle;
+struct iImageVector;
 
 /**\name Texture registration flags.
  * During texture registration you should tell
@@ -109,9 +110,15 @@ struct iTextureManager : public iBase
    *<p>
    * The texture is unregistered at destruction, i.e. as soon as the last
    * reference to the texture handle is released.
+   *<p>
+   * If CS_USE_NEW_RENDERER is enabled param target specifies the texture target.
+   * Defines for that can be found in ivideo/texture.h
+   *
    */
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags) = 0;
-
+#ifdef CS_USE_NEW_RENDERER
+  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image, int flags, int target) = 0;
+#endif
   /**
    * After all textures have been added, this function does all
    * needed calculations (palette, lookup tables, mipmaps, ...).

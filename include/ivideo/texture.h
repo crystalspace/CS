@@ -76,6 +76,50 @@ struct iTextureHandle : public iBase
    */
   virtual void GetOriginalDimensions (int& mw, int& mh) = 0;
 
+#ifdef CS_USE_NEW_RENDERER
+  // CHANGED TO ADD SUPPORT FOR CUBEMAPS AND 3D TEXTURES
+  // done by Phil Aumayr (phil@rarebyte.com)
+  enum { CS_TEX_IMG_1D = 1, CS_TEX_IMG_2D, CS_TEX_IMG_3D, CS_TEX_IMG_CUBEMAP };
+  /**
+   * Texture Depth Indices are used for Cubemap interface
+   */
+  enum { CS_TEXTURE_CUBE_POS_X = 0, CS_TEXTURE_CUBE_NEG_X, 
+         CS_TEXTURE_CUBE_POS_Y, CS_TEXTURE_CUBE_NEG_Y,
+         CS_TEXTURE_CUBE_POS_Z, CS_TEXTURE_CUBE_NEG_Z };
+
+  /**
+   * Get the dimensions for a given mipmap level (0 to 3).
+   * If the texture was registered just for 2D usage, mipmap levels above
+   * 0 will return false. Note that the result of this function will
+   * be the size that the renderer uses for this texture. In most cases
+   * this corresponds to the size that was used to create this texture
+   * but some renderers have texture size limitations (like power of two)
+   * and in that case the size returned here will be the corrected size.
+   * You can get the original image size with GetOriginalDimensions().
+   */
+  virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md) = 0;
+
+  /**
+   * Return the original dimensions of the image used to create this texture.
+   * This is most often equal to GetMipMapDimensions (0, mw, mh, md) but in
+   * some cases the texture will have been resized in order to accomodate
+   * hardware restrictions (like power of two and maximum texture size).
+   * This function returns the uncorrected coordinates.
+   */
+  virtual void GetOriginalDimensions (int& mw, int& mh, int &md) = 0;
+
+  /**
+   *Sets Texture Target. 
+   *This can either be CS_TEXTURE_1D, CS_TEXTURE_2D, CS_TEXTURE_3D, 
+   *CS_TEXTURE_CUBEMAP etc.
+   *With CS_TEXTURE_CUBEMAP, the depth index specifies the side 
+   *of the cubemap (CS_TEXTURE_CUBE_POS_X, CS_TEXTURE_CUBE_NEG_X,
+   *CS_TEXTURE_CUBE_POS_Y, etc.
+   */
+  virtual void SetTextureTarget(int target) = 0;
+
+#endif // CS_USE_NEW_RENDERER
+
   /// Get the mean color.
   virtual void GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) = 0;
 
