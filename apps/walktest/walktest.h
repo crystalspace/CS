@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef __WALKTEST_H
+#define __WALKTEST_H
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -187,8 +187,6 @@ public:
   virtual bool ParseArg (int argc, char* argv[], int& i);
   /// Override Help to show additional arguments help
   virtual void Help ();
-  /// Override DemoWrite for nice demo messaging
-  virtual void DemoWrite (const char* msg);
 
   /// Inits all the collision detection stuff
   virtual void InitWorld(csWorld* world, csCamera* /*camera*/);
@@ -253,4 +251,4 @@ extern void free_keymap ();
 /// Apply lights to all static objects (currently only sprites)
 void light_statics ();
 
-#endif // MAIN_H
+#endif // __WALKTEST_H

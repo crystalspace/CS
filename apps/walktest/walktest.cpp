@@ -18,14 +18,13 @@
 
 #define SYSDEF_ACCESS
 #include "sysdef.h"
+#include "walktest.h"
+#include "infmaze.h"
 #include "version.h"
 #include "qint.h"
 #include "cssys/common/system.h"
-#include "support/console.h"
-#include "support/command.h"
-#include "walktest/walktest.h"
-#include "walktest/infmaze.h"
-#include "walktest/scon.h"
+#include "apps/support/command.h"
+#include "csapputil/simpcons.h"
 #include "csparser/csloader.h"
 #include "csgeom/csrect.h"
 #include "csgeom/frustrum.h"
@@ -453,7 +452,7 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
   }
 
   if (!System->Console->IsActive ()
-   || ((SimpleConsole*)(System->Console))->IsTransparent ())
+   || ((csSimpleConsole*)(System->Console))->IsTransparent ())
   {
     // Tell Gfx3D we're going to display 3D things
     if (Gfx3D->BeginDraw (drawflags | CSDRAW_3DGRAPHICS) != S_OK)
@@ -501,10 +500,10 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
     if (do_light_frust && selected_light) ((csStatLight*)selected_light)->LightingFunc (show_frustrum);
   }
 
-  SimpleConsole* scon = (SimpleConsole*)System->Console;
+  csSimpleConsole* scon = (csSimpleConsole*)System->Console;
   scon->Print (NULL);
 
-  if (!System->Console->IsActive ())
+  if (!scon->IsActive ())
   {
     if (do_fps)
     {
@@ -1193,30 +1192,6 @@ struct DemoInfo
 DemoInfo* demo_info = NULL;
 
 /*
- * The routine to update the screen in demo mode.
- */
-void WalkTest::DemoWrite (const char* buf)
-{
-  if (Console)
-  {
-    if (Gfx2D)
-    {
-      VERIFY_SUCCESS (Gfx2D->BeginDraw ());
-      csRect area;
-      bool dblbuff;
-      Gfx2D->GetDoubleBufferState (dblbuff);
-      Gfx2D->Clear (0);
-      Console->PutText ("%s", buf);
-      Console->Print (&area);
-      if (dblbuff)
-        area.Union (0, 0, FRAME_WIDTH - 1, FRAME_HEIGHT - 1);
-      Gfx2D->FinishDraw ();
-      Gfx2D->Print (&area);
-    }
-  }
-}
-
-/*
  * Start the demo in the already open screen.
  */
 void start_demo ()
@@ -1242,9 +1217,9 @@ void start_demo ()
   txtmgr->Prepare ();
   txtmgr->AllocPalette ();
 
-  ((SimpleConsole *)System->Console)->SetupColors (txtmgr);
-  ((SimpleConsole *)System->Console)->SetMaxLines (1000);       // Some arbitrary high value.
-  ((SimpleConsole *)System->Console)->SetTransparent (0);
+  ((csSimpleConsole *)System->Console)->SetupColors (txtmgr);
+  ((csSimpleConsole *)System->Console)->SetMaxLines (1000);       // Some arbitrary high value.
+  ((csSimpleConsole *)System->Console)->SetTransparent (0);
 
   System->DemoReady = true;
 }
@@ -1389,7 +1364,7 @@ int main (int argc, char* argv[])
     config->GetYesNo ("WalkTest", "DEBUG", false));
 
   // Create console object for text and commands.
-  CHK (System->Console = new SimpleConsole ());
+  CHK (System->Console = new csSimpleConsole (Command::SharedInstance()));
 
   // Start the 'demo'. This is currently nothing more than
   // the display of all startup messages on the console.
@@ -1554,9 +1529,9 @@ int main (int argc, char* argv[])
   while (Sys->Time () < t) ;
 
   // Reinit console object for 3D engine use.
-  ((SimpleConsole *)System->Console)->SetupColors (txtmgr);
-  ((SimpleConsole *)System->Console)->SetMaxLines ();
-  ((SimpleConsole *)System->Console)->SetTransparent ();
+  ((csSimpleConsole *)System->Console)->SetupColors (txtmgr);
+  ((csSimpleConsole *)System->Console)->SetMaxLines ();
+  ((csSimpleConsole *)System->Console)->SetTransparent ();
   System->Console->Clear ();
 
   // Initialize our 3D view.
