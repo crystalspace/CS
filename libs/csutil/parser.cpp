@@ -25,10 +25,11 @@
 // A string containing white spaces (' ', '\t', '\n', '\r')
 static const char *kWhiteSpace = " \t\n\r";
 
-csParser::csParser ()
+csParser::csParser (bool allow_unknown_tokens)
 {
   ResetParserLine ();
   last_offender[0] = 0;
+  csParser::allow_unknown_tokens = allow_unknown_tokens;
 }
 
 void csParser::ResetParserLine ()
@@ -67,28 +68,54 @@ long csParser::GetObject (char **buf, csTokenVector * tokens, char **name,
 
   // find the token.
   // for now just use brute force.  Improve later.
-  int i=0;
-  for (i=0; i < tokens->Length ()-1; i++)
+  int i;
+  int toklen = SkipToken (*buf);
+  bool found_token = false;
+  for (i=0 ; i < tokens->Length ()-1 ; i++)
   {
-    if (!strncasecmp (tokens->Get (i)->token, *buf,
-    	strlen (tokens->Get (i)->token)))
+    csTokenDesc* d = tokens->Get (i);
+    if (d->len == toklen)
+      if (!strncasecmp (d->token, *buf, toklen))
+      {
+        found_token = true;
+        break;
+      }
+    else if (d->len > toklen)
     {
+      // We can stop the search here because the token table is sorted
+      // and we know there will be no more tokens with the same length
+      // as the one we are trying to parse.
       break;
     }
   }
 
-  if (i+1 == tokens->Length ())
+  if (found_token)
   {
-    char *p = strchr (*buf, '\n');
-    if (p) *p = 0;
-    strcpy (last_offender, *buf);
-    return CS_PARSERR_TOKENNOTFOUND;
+    // Skip the token.
+    *buf += toklen;
   }
-  // skip the token
-  *buf += strlen (tokens->Get (i)->token);
+  else
+  {
+    if (allow_unknown_tokens)
+    {
+      char old_c = (*buf)[toklen];
+      (*buf)[toklen] = 0;
+      strcpy (unknown_token, (*buf));
+      (*buf)[toklen] = old_c;
+      (*buf) += toklen;
+    }
+    else
+    {
+      char *p = strchr (*buf, '\n');
+      if (p) *p = 0;
+      strcpy (last_offender, *buf);
+      return CS_PARSERR_TOKENNOTFOUND;
+    }
+  }
+
   SkipCharacters (buf, kWhiteSpace);
 
-  // get optional name
+  // Get optional name.
   if (name)
     *name = GetSubText (buf, '\'', '\''); // single quotes
   SkipCharacters (buf, kWhiteSpace);
@@ -102,12 +129,30 @@ long csParser::GetObject (char **buf, csTokenVector * tokens, char **name,
       *data = GetSubText (buf, '(', ')');
   }
 
-  return tokens->Get (i)->id;
+  return found_token ? tokens->Get (i)->id : CS_PARSERR_TOKENNOTFOUND;
 }
 
 long csParser::GetCommand (char **buf, csTokenVector * tokens, char **params)
 {
   return GetObject (buf, tokens, NULL, params);
+}
+
+int csParser::SkipToken (char *buf)
+{
+  char ch;
+  int l = 0;
+  while ((ch = *buf) != 0)
+  {
+    if (!((ch >= 'a' && ch <= 'z') ||
+          (ch >= 'A' && ch <= 'Z') ||
+          (ch >= '0' && ch <= '9') ||
+	  ch == '_' || ch == '$'))
+      return l;
+    ++buf;                     // skip this character
+    l++;
+  }
+  // we must be at the end of the buffer if we get here
+  return l;
 }
 
 void csParser::SkipCharacters (char **buf, const char *toSkip)

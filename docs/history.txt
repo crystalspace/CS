@@ -5,6 +5,18 @@ The history order is reversed so that new features are at the top.
 	  Apparently the fix that I did yesterday for FrustVis has the
 	  wrong effect for DynaVis. I have no clue why but for the moment
 	  Dynavis seems to work for mirrored sectors.
+	- Added support for unknown tokens in csParser. If you construct
+	  csParser with allow_unknown_tokens equal to true then the parser
+	  will no longer consider an unknown token as an error.
+	- Optimized csParser by precalculating the length of the strings
+	  in the token table. This avoids strlen() at various points during
+	  the parsing process. It also avoids actually trying to compare
+	  tokens that are not equal. So this could avoid a lot of compares.
+	- Started work on a new 'levtool' application. One of the main
+	  purposes of this application will be a tool to convert an old-style
+	  octree using level to Dynavis. But more features will also be
+	  added like world file validation and things like that. At this
+	  moment this tool doesn't do much.
 8-Jul-2002
 	- Implemented CastShadows() in Dynavis. Not fully optimal yet
 	  (i.e. no culling is actually done except for frustum culling).

@@ -33,6 +33,8 @@ public:
   long	id;
   /// token to match
   char *token;
+  /// Store length for optimization.
+  int len;
 
   csTokenDesc () { id=0; token=NULL;  }
   ~csTokenDesc () { delete [] token; }
@@ -99,8 +101,8 @@ public:
     (void)Mode;
     csTokenDesc *td1 = (csTokenDesc*)Item1;
     csTokenDesc *td2 = (csTokenDesc*)Item2;
-    int l1 = (td1->token ? strlen(td1->token) : 0);
-    int l2 = (td2->token ? strlen(td2->token) : 0);
+    int l1 = td1->len;
+    int l2 = td2->len;
     return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
   }
   virtual int CompareKey (csSome Item1, csConstSome Key, int Mode=0) const
@@ -108,8 +110,8 @@ public:
     (void)Mode;
     csTokenDesc *td1 = (csTokenDesc*)Item1;
     csTokenDesc *td2 = (csTokenDesc*)Key;
-    int l1 = (td1->token ? strlen(td1->token) : 0);
-    int l2 = (td2->token ? strlen(td2->token) : 0);
+    int l1 = td1->len;
+    int l2 = td2->len;
     return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
   }
   csTokenVector *Push (int id, const char *name)
@@ -117,13 +119,14 @@ public:
     csTokenDesc *td = new csTokenDesc;
     td->id = id;
     td->token = (name ? csStrNew (name) : 0);
+    td->len = name ? strlen (name) : 0;
     InsertSorted (td);
     return this;
   }
 };
 
 /**
- * A set of macros for easier building of token tables. 
+ * A set of macros for easier building of token tables.
  */
 #define CS_TOKEN_DEF_START		\
   enum					\
@@ -147,21 +150,32 @@ public:
 #define CS_PARSERR_TOKENNOTFOUND	-1
 
 /**
- * Provides a set of functions to parse CS ASCII data (like worlds, 
+ * Provides a set of functions to parse CS ASCII data (like worlds,
  * sprites etc.)
  */
-class csParser 
+class csParser
 {
 private:
   char last_offender[255];
 
   int parser_line;
 
+  // If the following flag is true then we allow unknown tokens
+  // (i.e. they will not generate an error). The token name will
+  // be copied to 'unknown_token'. By default this is false.
+  bool allow_unknown_tokens;
+
+  // Name of an unknown token (if allow_unknown_tokens == true).
+  char unknown_token[255];
+
 public:
   /**
-   * Initialize the parser.
+   * Initialize the parser. If 'allow_unknown_tokens' is true then unknown
+   * tokens are allowed. It will still return CS_PARSERR_TOKENNOTFOUND
+   * in such case but the parsing will continue and the unknown token
+   * name can be retrieved with 'GetUnknownToken()'.
    */
-  csParser ();
+  csParser (bool allow_unknown_tokens = false);
 
   /**
    * Reset the line number of the line being parsed to line one.  This does not
@@ -181,24 +195,32 @@ public:
   char* GetLastOffender ();
 
   /**
+   * Get pointer to last unknown token. This is only valid if
+   * the parser was constructed with the allow_unknown_tokens flag to true.
+   */
+  const char* GetUnknownToken () { return unknown_token; }
+
+  /**
    * Get next token and his parameters.
    * Pass in a pointer to a buffer of text. This pointer is modified to point
    * to the text after the object description. The token id for the object is
    * returned. The name pointer will point to the optional name string in the
    * buffer. The data pointer will point to the optional data for the object.
-   * NULL can be passed for name/data if this information is not wanted. 
+   * NULL can be passed for name/data if this information is not wanted.
    * Otherwise the variables pointed to are ALWAYS modified; if the optional
-   * name/data is not present or an error occured retrieving the token the 
+   * name/data is not present or an error occured retrieving the token the
    * variables pointed to by name/data are set to NULL.
    * <i>The text buffer will get modified so BEWARE.</i>
    * <p><b>eg text</b>:
    * <pre>
    *   ROOM 'test room' ( 1, 2, 3 )
    * </pre>
-   * <p>returns CS_PARSERR_TOKENNOTFOUND on error.
+   * <p>returns CS_PARSERR_TOKENNOTFOUND on error (if the parser was
+   *    created with allow_unknown_tokens == true then this is not actually
+   *    an error).
    * <p>returns CS_PARSERR_EOF on EOF.
    */
-  long GetObject(char **buf, csTokenVector *tokens, char **name, char **data);
+  long GetObject (char **buf, csTokenVector *tokens, char **name, char **data);
 
   /**
    * Pass in a pointer to a buffer of text. This pointer is modified to point
@@ -217,8 +239,8 @@ public:
    *   LIGHT=1
    * </code>
    */
-  long GetCommand(char **buf, csTokenVector *tokens, char **params);
-  
+  long GetCommand (char **buf, csTokenVector *tokens, char **params);
+
   /**
    * Returns the string of text between the open and close characters.
    * Modifies the buffer. Moves the buffer pointer to after the last delimiter.
@@ -226,19 +248,24 @@ public:
    * Skips nested delimiters too.
    * <p><b>NOTE</b>: Should skip quoted text, does not at this time.
    */
-  char *GetSubText(char **buf, char open, char close);
-  
+  char *GetSubText (char **buf, char open, char close);
+
   /**
    * Skips any characters in the toSkip string.
    * Changes the buf pointer.
    */
-  void SkipCharacters(char **buf, const char *toSkip);
-  
+  void SkipCharacters (char **buf, const char *toSkip);
+
+  /**
+   * Returns the length of the next token in the buffer.
+   */
+  int SkipToken (char *buf);
+
   /**
    * Returns the string of text after a = up to the next
    * whitespace. Terminates the string and moves the buf pointer.
    */
-  char *GetAssignmentText(char **buf);
+  char *GetAssignmentText (char **buf);
 };
 
 #endif // __CS_PARSER_H__
