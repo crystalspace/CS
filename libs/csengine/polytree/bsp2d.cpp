@@ -15,20 +15,18 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "csengine/bsp2d.h"
 
 //---------------------------------------------------------------------------
-
 csSegmentArray::~csSegmentArray ()
 {
   DeleteAll ();
 }
 
 //---------------------------------------------------------------------------
-
-csBspNode2D::csBspNode2D () : segments (10, 10)
+csBspNode2D::csBspNode2D () :
+  segments(10, 10)
 {
   front = back = NULL;
 }
@@ -39,13 +37,12 @@ csBspNode2D::~csBspNode2D ()
   delete back;
 }
 
-void csBspNode2D::AddSegment (csSegment2* seg)
+void csBspNode2D::AddSegment (csSegment2 *seg)
 {
   segments.Push (seg);
 }
 
 //---------------------------------------------------------------------------
-
 csBspTree2D::csBspTree2D ()
 {
   root = NULL;
@@ -56,7 +53,7 @@ csBspTree2D::~csBspTree2D ()
   delete root;
 }
 
-void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
+void csBspTree2D::Add (csBspNode2D *node, csSegment2 *segment)
 {
   float c1 = node->splitter.Classify (segment->Start ());
   float c2 = node->splitter.Classify (segment->End ());
@@ -65,7 +62,9 @@ void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
   if (c1 == 0 && c2 == 0)
   {
     // Same plane.
+
     // Check if it is really the same plane or if the
+
     // direction is reversed.
     csPlane2 pl (*segment);
     if (csMath2::PlanesClose (pl, node->splitter))
@@ -113,8 +112,9 @@ void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
     csVector2 isect;
     float dist;
     csIntersect2::Plane (*segment, node->splitter, isect, dist);
-    csSegment2* segf = new csSegment2 ();
-    csSegment2* segb = new csSegment2 ();
+
+    csSegment2 *segf = new csSegment2 ();
+    csSegment2 *segb = new csSegment2 ();
     if (c1 < 0)
     {
       segb->Set (segment->Start (), isect);
@@ -148,7 +148,7 @@ void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
   }
 }
 
-void csBspTree2D::Add (csSegment2* segment)
+void csBspTree2D::Add (csSegment2 *segment)
 {
   if (root)
     Add (root, segment);
@@ -160,28 +160,38 @@ void csBspTree2D::Add (csSegment2* segment)
   }
 }
 
-void* csBspTree2D::Back2Front (const csVector2& pos, csTree2DVisitFunc* func,
-	void* data)
+void *csBspTree2D::Back2Front (
+  const csVector2 &pos,
+  csTree2DVisitFunc *func,
+  void *data)
 {
   return Back2Front (root, pos, func, data);
 }
 
-void* csBspTree2D::Front2Back (const csVector2& pos, csTree2DVisitFunc* func,
-	void* data)
+void *csBspTree2D::Front2Back (
+  const csVector2 &pos,
+  csTree2DVisitFunc *func,
+  void *data)
 {
   return Front2Back (root, pos, func, data);
 }
 
-void* csBspTree2D::Back2Front (csBspNode2D* node, const csVector2& pos,
-	csTree2DVisitFunc* func, void* data)
+void *csBspTree2D::Back2Front (
+  csBspNode2D *node,
+  const csVector2 &pos,
+  csTree2DVisitFunc *func,
+  void *data)
 {
   if (!node) return NULL;
-  void* rc;
 
-//@@@@@@ THIS VISIBILITY TEST IS REVERSED (also in Front2Back).
-//Check what the reason is for this.
+  void *rc;
+
+  //@@@@@@ THIS VISIBILITY TEST IS REVERSED (also in Front2Back).
+
+  //Check what the reason is for this.
 
   // Check if some polygon (just take the first) of the polygons array
+
   // is visible from the given point. If so, we are in front of this node.
   if (!csMath2::Visible (pos, node->splitter))
   {
@@ -203,16 +213,22 @@ void* csBspTree2D::Back2Front (csBspNode2D* node, const csVector2& pos,
     rc = Back2Front (node->back, pos, func, data);
     if (rc) return rc;
   }
+
   return NULL;
 }
 
-void* csBspTree2D::Front2Back (csBspNode2D* node, const csVector2& pos,
-	csTree2DVisitFunc* func, void* data)
+void *csBspTree2D::Front2Back (
+  csBspNode2D *node,
+  const csVector2 &pos,
+  csTree2DVisitFunc *func,
+  void *data)
 {
   if (!node) return NULL;
-  void* rc;
+
+  void *rc;
 
   // Check if some polygon (just take the first) of the polygons array
+
   // is visible from the given point. If so, we are in front of this node.
   if (!csMath2::Visible (pos, node->splitter))
   {
@@ -234,6 +250,7 @@ void* csBspTree2D::Front2Back (csBspNode2D* node, const csVector2& pos,
     rc = Front2Back (node->front, pos, func, data);
     if (rc) return rc;
   }
+
   return NULL;
 }
 

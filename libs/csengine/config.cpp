@@ -15,33 +15,36 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "csengine/engine.h"
 #include "csengine/sector.h"
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEngineConfig)
-  SCF_IMPLEMENTS_INTERFACE (iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE(csEngineConfig)
+  SCF_IMPLEMENTS_INTERFACE(iConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-static const csOptionDescription config_options [] =
+static const csOptionDescription
+  config_options[] =
 {
-  {  0, "fov",      "Field of Vision", CSVAR_LONG },
-  {  1, "rad",      "Pseudo-radiosity system", CSVAR_BOOL },
-  {  2, "cosfact",  "Cosinus factor for lighting", CSVAR_FLOAT },
-  {  3, "reflect",  "Max number of reflections for radiosity", CSVAR_LONG },
-  {  4, "recalc",   "Force/inhibit recalculation of cached information",
-                     CSVAR_BOOL },
-  {  5, "relight",  "Force/inhibit recalculation of lightmaps", CSVAR_BOOL },
-  {  6, "lightqual","Lighting quality", CSVAR_LONG },
-  {  7, "revis",    "Force/inhibit recalculation of visibility data",
-                     CSVAR_BOOL },
-  {  8, "radstep",  "Enable radiosity step-by-step", CSVAR_BOOL }
+  { 0, "fov", "Field of Vision", CSVAR_LONG },
+  { 1, "rad", "Pseudo-radiosity system", CSVAR_BOOL },
+  { 2, "cosfact", "Cosinus factor for lighting", CSVAR_FLOAT },
+  { 3, "reflect", "Max number of reflections for radiosity", CSVAR_LONG },
+  { 4, "recalc", "Force/inhibit recalculation of cached information",
+      CSVAR_BOOL },
+  { 5, "relight", "Force/inhibit recalculation of lightmaps", CSVAR_BOOL },
+  { 6, "lightqual", "Lighting quality", CSVAR_LONG },
+  { 7, "revis", "Force/inhibit recalculation of visibility data",
+      CSVAR_BOOL },
+  { 8, "radstep", "Enable radiosity step-by-step", CSVAR_BOOL }
 };
 const int NUM_OPTIONS =
-  (sizeof (config_options) / sizeof (config_options [0]));
+  (
+    sizeof (config_options) /
+    sizeof (config_options[0])
+  );
 
 static bool config_relight ()
 {
@@ -56,62 +59,89 @@ static void config_relight (bool flag)
     csEngine::lightcache_mode = CS_ENGINE_CACHE_READ;
 }
 
-static bool config_revis () { return csEngine::do_force_revis; }
+static bool config_revis ()
+{
+  return csEngine::do_force_revis;
+}
+
 static void config_revis (bool flag)
 {
   csEngine::do_force_revis = flag;
 }
 
-static bool config_recalc () { return config_relight() || config_revis(); }
+static bool config_recalc ()
+{
+  return config_relight () || config_revis ();
+}
+
 static void config_recalc (bool flag)
 {
   config_relight (flag);
-  config_revis   (flag);
+  config_revis (flag);
 }
 
-bool csEngineConfig::SetOption (int id, csVariant* value)
+bool csEngineConfig::SetOption (int id, csVariant *value)
 {
   switch (id)
   {
-    case 0:  csCamera::SetDefaultFOV (value->GetLong (),
-    	     scfParent->G3D->GetWidth ());
-             break;
-    case 1:  csSector::do_radiosity = value->GetBool (); break;
-    case 2:  csPolyTexture::cfg_cosinus_factor = value->GetFloat (); break;
-    case 3:  csSector::cfg_reflections = value->GetLong (); break;
-    case 4:  config_recalc  (value->GetBool ()); break;
-    case 5:  config_relight (value->GetBool ()); break;
-    case 6:  csEngine::lightmap_quality = value->GetLong (); break;
-    case 7:  config_revis   (value->GetBool ()); break;
-    case 8:  csEngine::do_rad_debug = value->GetBool (); break;
-    default: return false;
+    case 0:
+      csCamera::SetDefaultFOV (value->GetLong (), scfParent->G3D->GetWidth ());
+      break;
+    case 1:
+      csSector::do_radiosity = value->GetBool ();
+      break;
+    case 2:
+      csPolyTexture::cfg_cosinus_factor = value->GetFloat ();
+      break;
+    case 3:
+      csSector::cfg_reflections = value->GetLong ();
+      break;
+    case 4:
+      config_recalc (value->GetBool ());
+      break;
+    case 5:
+      config_relight (value->GetBool ());
+      break;
+    case 6:
+      csEngine::lightmap_quality = value->GetLong ();
+      break;
+    case 7:
+      config_revis (value->GetBool ());
+      break;
+    case 8:
+      csEngine::do_rad_debug = value->GetBool ();
+      break;
+    default:
+      return false;
   }
+
   return true;
 }
 
-bool csEngineConfig::GetOption (int id, csVariant* value)
+bool csEngineConfig::GetOption (int id, csVariant *value)
 {
   switch (id)
   {
-    case 0:  value->SetLong (csCamera::GetDefaultFOV ()); break;
-    case 1:  value->SetBool (csSector::do_radiosity); break;
-    case 2:  value->SetFloat (csPolyTexture::cfg_cosinus_factor); break;
-    case 3:  value->SetLong (csSector::cfg_reflections); break;
-    case 4:  value->SetBool (config_recalc ()); break;
-    case 5:  value->SetBool (config_relight()); break;
-    case 6:  value->SetLong (csEngine::lightmap_quality); break;
-    case 7:  value->SetBool (config_revis ()); break;
-    case 8:  value->SetBool (csEngine::do_rad_debug); break;
-    default: return false;
+    case 0:   value->SetLong (csCamera::GetDefaultFOV ()); break;
+    case 1:   value->SetBool (csSector::do_radiosity); break;
+    case 2:   value->SetFloat (csPolyTexture::cfg_cosinus_factor); break;
+    case 3:   value->SetLong (csSector::cfg_reflections); break;
+    case 4:   value->SetBool (config_recalc ()); break;
+    case 5:   value->SetBool (config_relight ()); break;
+    case 6:   value->SetLong (csEngine::lightmap_quality); break;
+    case 7:   value->SetBool (config_revis ()); break;
+    case 8:   value->SetBool (csEngine::do_rad_debug); break;
+    default:  return false;
   }
+
   return true;
 }
 
 bool csEngineConfig::GetOptionDescription (
-  int idx, csOptionDescription* option)
+  int idx,
+  csOptionDescription *option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS) return false;
   *option = config_options[idx];
   return true;
 }
-

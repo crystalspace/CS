@@ -15,7 +15,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "csengine/polyint.h"
 
@@ -27,27 +26,26 @@ csPolygonIntArray::csPolygonIntArray ()
 
 csPolygonIntArray::~csPolygonIntArray ()
 {
-  delete [] polygons;
+  delete[] polygons;
 }
 
-void csPolygonIntArray::AddPolygon (csPolygonInt* poly)
+void csPolygonIntArray::AddPolygon (csPolygonInt *poly)
 {
   if (!polygons)
   {
     max = 2;
-    polygons = new csPolygonInt* [max];
+    polygons = new csPolygonInt *[max];
   }
 
   if (num >= max)
   {
-    csPolygonInt** pp = new csPolygonInt* [max+3];
-    memcpy (pp, polygons, sizeof (csPolygonInt*)*max);
+    csPolygonInt **pp = new csPolygonInt *[max + 3];
+    memcpy (pp, polygons, sizeof (csPolygonInt *) * max);
     max += 3;
-    delete [] polygons;
+    delete[] polygons;
     polygons = pp;
   }
 
   polygons[num] = poly;
   num++;
 }
-

@@ -15,7 +15,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include <math.h>
 
 #include "cssysdef.h"
@@ -26,22 +25,24 @@
 #include "ivideo/txtmgr.h"
 
 //---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE_EXT (csTextureWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTextureWrapper)
-  SCF_IMPLEMENTS_INTERFACE (csTextureWrapper)
+SCF_IMPLEMENT_IBASE_EXT(csTextureWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iTextureWrapper)
+  SCF_IMPLEMENTS_INTERFACE(csTextureWrapper)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csTextureWrapper::TextureWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iTextureWrapper)
+  SCF_IMPLEMENTS_INTERFACE(iTextureWrapper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csTextureWrapper::csTextureWrapper (iImage* Image) :
-  csObject (), handle (NULL), flags (CS_TEXTURE_3D), use_callback (NULL)
+csTextureWrapper::csTextureWrapper (
+  iImage *Image) :
+    csObject(),
+    handle(NULL),
+    flags(CS_TEXTURE_3D),
+    use_callback(NULL)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
-
   (image = Image)->IncRef ();
   DG_LINK (this, image);
   UpdateKeyColorFromImage ();
@@ -50,7 +51,9 @@ csTextureWrapper::csTextureWrapper (iImage* Image) :
 }
 
 csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
-  csObject (), image (NULL), use_callback (NULL)
+  csObject(),
+  image(NULL),
+  use_callback(NULL)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
@@ -66,18 +69,19 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
   {
     flags = 0;
   }
+
   UpdateKeyColorFromHandle ();
 
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
-
 csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
-  csObject (t), flags (CS_TEXTURE_3D), use_callback (NULL)
+  csObject(t),
+  flags(CS_TEXTURE_3D),
+  use_callback(NULL)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
-
   (handle = t.handle)->IncRef ();
   DG_LINK (this, handle);
   (image = t.image)->IncRef ();
@@ -95,19 +99,30 @@ csTextureWrapper::~csTextureWrapper ()
     DG_UNLINK (this, handle);
     handle->DecRef ();
   }
+
   if (image)
   {
     DG_UNLINK (this, image);
     image->DecRef ();
   }
-  if (use_callback)
-    use_callback->DecRef ();
+
+  if (use_callback) use_callback->DecRef ();
 }
 
 void csTextureWrapper::SetImageFile (iImage *Image)
 {
-  if (Image) { Image->IncRef (); DG_LINK (this, Image); }
-  if (image) { DG_UNLINK (this, image); image->DecRef (); }
+  if (Image)
+  {
+    Image->IncRef ();
+    DG_LINK (this, Image);
+  }
+
+  if (image)
+  {
+    DG_UNLINK (this, image);
+    image->DecRef ();
+  }
+
   image = Image;
 
   UpdateKeyColorFromImage ();
@@ -115,13 +130,20 @@ void csTextureWrapper::SetImageFile (iImage *Image)
 
 void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
 {
-  if (image) { DG_UNLINK (this, image); image->DecRef (); image = NULL; }
+  if (image)
+  {
+    DG_UNLINK (this, image);
+    image->DecRef ();
+    image = NULL;
+  }
+
   if (tex) tex->DecRef ();
   if (handle)
   {
     DG_UNLINK (this, handle);
     handle->DecRef ();
   }
+
   handle = tex;
   DG_LINK (this, handle);
 
@@ -144,8 +166,7 @@ void csTextureWrapper::SetKeyColor (int red, int green, int blue)
 void csTextureWrapper::Register (iTextureManager *txtmgr)
 {
   // if we have no image, we cannot register it.
-  if (!image)
-    return;
+  if (!image) return ;
 
   // release old handle
   if (handle)
@@ -156,19 +177,25 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   }
 
   // Now we check the size of the loaded image. Having an image, that
+
   // is not a power of two will result in strange errors while
+
   // rendering. It is by far better to check the format of all textures
+
   // already while loading them.
   if (flags & CS_TEXTURE_3D)
   {
-    int Width  = image->GetWidth ();
+    int Width = image->GetWidth ();
     int Height = image->GetHeight ();
 
     if (!csIsPowerOf2 (Width) || !csIsPowerOf2 (Height))
+    {
       csEngine::current_engine->Warn (
-        "Inefficient texture image '%s' dimensions!\n"
-        "The width (%d) and height (%d) should be a power of two.\n",
-        GetName (), Width, Height);
+          "Inefficient texture image '%s' dimensions!\nThe width (%d) and height (%d) should be a power of two.\n",
+          GetName (),
+          Width,
+          Height);
+    }
   }
 
   handle = txtmgr->RegisterTexture (image, flags);
@@ -179,44 +206,89 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   }
 }
 
-iObject *csTextureWrapper::TextureWrapper::QueryObject()
-  { return scfParent; }
+iObject *csTextureWrapper::TextureWrapper::QueryObject ()
+{
+  return scfParent;
+}
+
 void csTextureWrapper::TextureWrapper::SetImageFile (iImage *Image)
-  { scfParent->SetImageFile (Image); }
-iImage* csTextureWrapper::TextureWrapper::GetImageFile ()
-  { return scfParent->GetImageFile (); }
+{
+  scfParent->SetImageFile (Image);
+}
+
+iImage *csTextureWrapper::TextureWrapper::GetImageFile ()
+{
+  return scfParent->GetImageFile ();
+}
+
 void csTextureWrapper::TextureWrapper::SetTextureHandle (iTextureHandle *tex)
-  { scfParent->SetTextureHandle (tex); }
-iTextureHandle* csTextureWrapper::TextureWrapper::GetTextureHandle ()
-  { return scfParent->GetTextureHandle (); }
-void csTextureWrapper::TextureWrapper::SetKeyColor (int red, int green, int blue)
-  { scfParent->SetKeyColor (red, green, blue); }
-void csTextureWrapper::TextureWrapper::GetKeyColor (int &red, int &green, int &blue)
-  { scfParent->GetKeyColor (red, green, blue); }
+{
+  scfParent->SetTextureHandle (tex);
+}
+
+iTextureHandle *csTextureWrapper::TextureWrapper::GetTextureHandle ()
+{
+  return scfParent->GetTextureHandle ();
+}
+
+void csTextureWrapper::TextureWrapper::SetKeyColor (
+  int red,
+  int green,
+  int blue)
+{
+  scfParent->SetKeyColor (red, green, blue);
+}
+
+void csTextureWrapper::TextureWrapper::GetKeyColor (
+  int &red,
+  int &green,
+  int &blue)
+{
+  scfParent->GetKeyColor (red, green, blue);
+}
+
 void csTextureWrapper::TextureWrapper::SetFlags (int flags)
-  { scfParent->SetFlags (flags); }
+{
+  scfParent->SetFlags (flags);
+}
+
 int csTextureWrapper::TextureWrapper::GetFlags ()
-  { return scfParent->GetFlags (); }
+{
+  return scfParent->GetFlags ();
+}
+
 void csTextureWrapper::TextureWrapper::Register (iTextureManager *txtmng)
-  { scfParent->Register (txtmng); }
-void csTextureWrapper::TextureWrapper::SetUseCallback (iTextureCallback* callback)
-  { scfParent->SetUseCallback (callback); }
-iTextureCallback* csTextureWrapper::TextureWrapper::GetUseCallback ()
-  { return scfParent->GetUseCallback (); }
+{
+  scfParent->Register (txtmng);
+}
+
+void csTextureWrapper::TextureWrapper::SetUseCallback (
+  iTextureCallback *callback)
+{
+  scfParent->SetUseCallback (callback);
+}
+
+iTextureCallback *csTextureWrapper::TextureWrapper::GetUseCallback ()
+{
+  return scfParent->GetUseCallback ();
+}
+
 void csTextureWrapper::TextureWrapper::Visit ()
-  { scfParent->Visit (); }
+{
+  scfParent->Visit ();
+}
 
 //------------------------------------------------------- csTextureList -----//
-
-SCF_IMPLEMENT_IBASE (csTextureList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTextureList)
+SCF_IMPLEMENT_IBASE(csTextureList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iTextureList)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csTextureList::TextureList)
-  SCF_IMPLEMENTS_INTERFACE (iTextureList)
+  SCF_IMPLEMENTS_INTERFACE(iTextureList)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csTextureList::csTextureList () : csTextureListHelper (16, 16)
+csTextureList::csTextureList () :
+  csTextureListHelper(16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureList);
@@ -239,22 +311,52 @@ iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
 }
 
 iTextureWrapper *csTextureList::TextureList::NewTexture (iImage *image)
-  { return scfParent->NewTexture (image); }
+{
+  return scfParent->NewTexture (image);
+}
+
 iTextureWrapper *csTextureList::TextureList::NewTexture (iTextureHandle *ith)
-  { return scfParent->NewTexture (ith); }
+{
+  return scfParent->NewTexture (ith);
+}
+
 int csTextureList::TextureList::GetCount () const
-  { return scfParent->Length (); }
+{
+  return scfParent->Length ();
+}
+
 iTextureWrapper *csTextureList::TextureList::Get (int n) const
-  { return scfParent->Get (n); }
+{
+  return scfParent->Get (n);
+}
+
 int csTextureList::TextureList::Add (iTextureWrapper *obj)
-  { return scfParent->Push (obj); }
+{
+  return scfParent->Push (obj);
+}
+
 bool csTextureList::TextureList::Remove (iTextureWrapper *obj)
-  { return scfParent->Delete (obj); }
+{
+  return scfParent->Delete (obj);
+}
+
 bool csTextureList::TextureList::Remove (int n)
-  { return scfParent->Delete (n); }
+{
+  return scfParent->Delete (n);
+}
+
 void csTextureList::TextureList::RemoveAll ()
-  { scfParent->DeleteAll (); }
+{
+  scfParent->DeleteAll ();
+}
+
 int csTextureList::TextureList::Find (iTextureWrapper *obj) const
-  { return scfParent->Find (obj); }
-iTextureWrapper *csTextureList::TextureList::FindByName (const char *Name) const
-  { return scfParent->FindByName (Name); }
+{
+  return scfParent->Find (obj);
+}
+
+iTextureWrapper *csTextureList::TextureList::FindByName (
+  const char *Name) const
+{
+  return scfParent->FindByName (Name);
+}

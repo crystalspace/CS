@@ -15,7 +15,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "qsqrt.h"
 #include "csgeom/sphere.h"
@@ -31,25 +30,28 @@
 #include "imesh/thing/portal.h"
 
 // ---------------------------------------------------------------------------
-// csMeshWrapper
-// ---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT (csMeshWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityObject)
-  SCF_IMPLEMENTS_INTERFACE (csMeshWrapper)
+// csMeshWrapper
+
+// ---------------------------------------------------------------------------
+SCF_IMPLEMENT_IBASE_EXT(csMeshWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVisibilityObject)
+  SCF_IMPLEMENTS_INTERFACE(csMeshWrapper)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iMeshWrapper)
+  SCF_IMPLEMENTS_INTERFACE(iMeshWrapper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::VisObject)
-  SCF_IMPLEMENTS_INTERFACE (iVisibilityObject)
+  SCF_IMPLEMENTS_INTERFACE(iVisibilityObject)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject* mesh)
-	: csObject ()
+csMeshWrapper::csMeshWrapper (
+  iMeshWrapper *theParent,
+  iMeshObject *mesh) :
+    csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
@@ -75,8 +77,8 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject* mesh)
   children.SetMesh (this);
 }
 
-csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent)
-	: csObject ()
+csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
+  csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
@@ -101,7 +103,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent)
   children.SetMesh (this);
 }
 
-void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
+void csMeshWrapper::SetMeshObject (iMeshObject *mesh)
 {
   if (mesh) mesh->IncRef ();
   if (csMeshWrapper::mesh) csMeshWrapper::mesh->DecRef ();
@@ -117,32 +119,33 @@ csMeshWrapper::~csMeshWrapper ()
 void csMeshWrapper::UpdateMove ()
 {
   int i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0; i < children.Length (); i++)
   {
-    iMeshWrapper* spr = children.Get (i);
+    iMeshWrapper *spr = children.Get (i);
     spr->GetMovable ()->UpdateMove ();
   }
 }
 
-void csMeshWrapper::MoveToSector (csSector* s)
+void csMeshWrapper::MoveToSector (csSector *s)
 {
   // Only add this mesh to a sector if the parent is the engine.
+
   // Otherwise we have a hierarchical object and in that case
+
   // the parent object controls this.
   if (!Parent) s->GetMeshes ()->Add (&scfiMeshWrapper);
 }
 
 void csMeshWrapper::RemoveFromSectors ()
 {
-  if (Parent) return;
+  if (Parent) return ;
 
   int i;
   const iSectorList *sectors = movable.GetSectors ();
-  for (i = 0 ; i < sectors->GetCount () ; i++)
+  for (i = 0; i < sectors->GetCount (); i++)
   {
-    iSector* ss = sectors->Get (i);
-    if (ss)
-      ss->GetMeshes ()->Remove (&scfiMeshWrapper);
+    iSector *ss = sectors->Get (i);
+    if (ss) ss->GetMeshes ()->Remove (&scfiMeshWrapper);
   }
 }
 
@@ -150,32 +153,35 @@ void csMeshWrapper::SetRenderPriority (long rp)
 {
   render_priority = rp;
 
-  if (Parent) return;
+  if (Parent) return ;
 
   int i;
   const iSectorList *sectors = movable.GetSectors ();
-  for (i = 0 ; i < sectors->GetCount () ; i++)
+  for (i = 0; i < sectors->GetCount (); i++)
   {
-    iSector* ss = sectors->Get (i);
+    iSector *ss = sectors->Get (i);
     if (ss) ss->GetPrivateObject ()->RelinkMesh (&scfiMeshWrapper);
   }
 }
 
 /// The list of lights that hit the mesh
-static CS_DECLARE_GROWING_ARRAY_REF (light_worktable, iLight*);
+static CS_DECLARE_GROWING_ARRAY_REF (light_worktable, iLight *);
 
-void csMeshWrapper::UpdateDeferedLighting (const csVector3& pos)
+void csMeshWrapper::UpdateDeferedLighting (const csVector3 &pos)
 {
-  const iSectorList* movable_sectors = movable.GetSectors ();
+  const iSectorList *movable_sectors = movable.GetSectors ();
   if (defered_num_lights && movable_sectors->GetCount () > 0)
   {
     if (defered_num_lights > light_worktable.Limit ())
       light_worktable.SetLimit (defered_num_lights);
 
-    iSector* sect = movable_sectors->Get (0);
+    iSector *sect = movable_sectors->Get (0);
     int num_lights = csEngine::current_iengine->GetNearbyLights (
-      sect, pos, defered_lighting_flags,
-      light_worktable.GetArray (), defered_num_lights);
+        sect,
+        pos,
+        defered_lighting_flags,
+        light_worktable.GetArray (),
+        defered_num_lights);
     UpdateLighting (light_worktable.GetArray (), num_lights);
   }
 }
@@ -186,40 +192,43 @@ void csMeshWrapper::DeferUpdateLighting (int flags, int num_lights)
   defered_lighting_flags = flags;
 }
 
-void csMeshWrapper::Draw (iRenderView* rview)
+void csMeshWrapper::Draw (iRenderView *rview)
 {
-  if (flags.Check (CS_ENTITY_INVISIBLE)) return;
+  if (flags.Check (CS_ENTITY_INVISIBLE)) return ;
   if (flags.Check (CS_ENTITY_CAMERA))
   {
     // Temporarily move the object to the camera.
-    csReversibleTransform& mov_trans = movable.GetTransform ();
+    csReversibleTransform &mov_trans = movable.GetTransform ();
     csVector3 old_movable_pos = mov_trans.GetOrigin ();
-    iCamera* orig_cam = rview->GetOriginalCamera ();
-    csOrthoTransform& orig_trans = orig_cam->GetTransform ();
+    iCamera *orig_cam = rview->GetOriginalCamera ();
+    csOrthoTransform &orig_trans = orig_cam->GetTransform ();
     csVector3 v = orig_trans.GetO2TTranslation ();
-    mov_trans.SetOrigin (mov_trans.GetOrigin ()+v);
+    mov_trans.SetOrigin (mov_trans.GetOrigin () + v);
     movable.UpdateMove ();
     DrawInt (rview);
     mov_trans.SetOrigin (old_movable_pos);
     movable.UpdateMove ();
   }
-  else DrawInt (rview);
+  else
+    DrawInt (rview);
 }
 
-void csMeshWrapper::DrawInt (iRenderView* rview)
+void csMeshWrapper::DrawInt (iRenderView *rview)
 {
-  iMeshWrapper* meshwrap = &scfiMeshWrapper;
+  iMeshWrapper *meshwrap = &scfiMeshWrapper;
   if (rview->GetCallback ())
   {
-    rview->CallCallback (CS_CALLBACK_MESH, (void*)&scfiMeshWrapper);
+    rview->CallCallback (CS_CALLBACK_MESH, (void *) &scfiMeshWrapper);
   }
-  if (draw_cb) if (!draw_cb->BeforeDrawing (meshwrap, rview)) return;
+
+  if (draw_cb)
+    if (!draw_cb->BeforeDrawing (meshwrap, rview)) return ;
 
   if (mesh->DrawTest (rview, &movable.scfiMovable))
   {
     if (rview->GetCallback ())
     {
-      rview->CallCallback (CS_CALLBACK_VISMESH, (void*)&scfiMeshWrapper);
+      rview->CallCallback (CS_CALLBACK_VISMESH, (void *) &scfiMeshWrapper);
     }
     else
     {
@@ -232,42 +241,45 @@ void csMeshWrapper::DrawInt (iRenderView* rview)
           last_anim_time = lt;
         }
       }
+
       UpdateDeferedLighting (movable.GetFullPosition ());
       mesh->Draw (rview, &movable.scfiMovable, zbufMode);
     }
   }
+
   int i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0; i < children.Length (); i++)
   {
-    iMeshWrapper* spr = children.Get (i);
+    iMeshWrapper *spr = children.Get (i);
     spr->Draw (rview);
   }
 }
 
-void csMeshWrapper::UpdateLighting (iLight** lights, int num_lights)
+void csMeshWrapper::UpdateLighting (iLight **lights, int num_lights)
 {
   defered_num_lights = 0;
+
   //if (num_lights <= 0) return;
   mesh->UpdateLighting (lights, num_lights, &movable.scfiMovable);
 
   int i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0; i < children.Length (); i++)
   {
-    iMeshWrapper* spr = children.Get (i);
+    iMeshWrapper *spr = children.Get (i);
     spr->UpdateLighting (lights, num_lights);
   }
 }
 
 void csMeshWrapper::PlaceMesh ()
 {
-  iSectorList* movable_sectors = movable.GetSectors ();
-  if (movable_sectors->GetCount () == 0) return;	// Do nothing
-
+  iSectorList *movable_sectors = movable.GetSectors ();
+  if (movable_sectors->GetCount () == 0) return ; // Do nothing
   csSphere sphere;
   csVector3 radius;
   mesh->GetRadius (radius, sphere.GetCenter ());
-  iSector* sector = movable_sectors->Get (0);
-  movable.SetSector (sector);	// Make sure all other sectors are removed
+
+  iSector *sector = movable_sectors->Get (0);
+  movable.SetSector (sector);                     // Make sure all other sectors are removed
 
   // Transform the sphere from object to world space.
   float max_radius = radius.x;
@@ -276,75 +288,98 @@ void csMeshWrapper::PlaceMesh ()
   sphere.SetRadius (max_radius);
   sphere = movable.GetFullTransform ().This2Other (sphere);
   max_radius = sphere.GetRadius ();
+
   float max_sq_radius = max_radius * max_radius;
 
   // @@@ This function only goes one level deep in portals. Should be fixed!
+
   // @@@ It would be nice if we could find a more optimal portal representation
+
   // for large sectors.
   int i, j;
-  iMeshList* ml = sector->GetMeshes ();
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  iMeshList *ml = sector->GetMeshes ();
+  for (i = 0; i < ml->GetCount (); i++)
   {
-    iMeshWrapper* mesh = ml->Get (i);
-    iThingState* thing = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (),
-	iThingState);
+    iMeshWrapper *mesh = ml->Get (i);
+    iThingState *thing = SCF_QUERY_INTERFACE_FAST (
+        mesh->GetMeshObject (),
+        iThingState);
     if (thing)
     {
       // @@@ This function will currently only consider portals on things
+
       // that cannot move.
       if (thing->GetMovingOption () == CS_THING_MOVE_NEVER)
       {
-        for (j = 0 ; j < thing->GetPortalCount () ; j++)
+        for (j = 0; j < thing->GetPortalCount (); j++)
         {
-	  iPortal* portal = thing->GetPortal (j);
-	  iSector* dest_sector = portal->GetSector ();
-	  if (movable_sectors->Find (dest_sector) == -1)
-	  {
-	    iPolygon3D* portal_poly = thing->GetPortalPolygon (j);
-	    const csPlane3& pl = portal_poly->GetWorldPlane ();
+          iPortal *portal = thing->GetPortal (j);
+          iSector *dest_sector = portal->GetSector ();
+          if (movable_sectors->Find (dest_sector) == -1)
+          {
+            iPolygon3D *portal_poly = thing->GetPortalPolygon (j);
+            const csPlane3 &pl = portal_poly->GetWorldPlane ();
 
-	    float sqdist = csSquaredDist::PointPlane (sphere.GetCenter (), pl);
-	    if (sqdist <= max_sq_radius)
-	    {
-	      // Plane of portal is close enough.
-	      // If N is the normal of the portal plane then we
-	      // can use that to calculate the point on the portal plane.
-	      csVector3 testpoint = sphere.GetCenter ()
-	    	  + pl.Normal ()*qsqrt (sqdist);
-	      if (portal_poly->PointOnPolygon (testpoint))
-	        movable_sectors->Add (dest_sector);
-	    }
-	  }
+            float sqdist = csSquaredDist::PointPlane (
+                sphere.GetCenter (),
+                pl);
+            if (sqdist <= max_sq_radius)
+            {
+              // Plane of portal is close enough.
+
+              // If N is the normal of the portal plane then we
+
+              // can use that to calculate the point on the portal plane.
+              csVector3 testpoint = sphere.GetCenter () + pl.Normal () * qsqrt (
+                  sqdist);
+              if (portal_poly->PointOnPolygon (testpoint))
+                movable_sectors->Add (dest_sector);
+            }
+          }
         }
       }
+
       thing->DecRef ();
     }
   }
 }
 
-int csMeshWrapper::HitBeamBBox (const csVector3& start,
-  const csVector3& end, csVector3& isect, float* pr)
+int csMeshWrapper::HitBeamBBox (
+  const csVector3 &start,
+  const csVector3 &end,
+  csVector3 &isect,
+  float *pr)
 {
   csBox3 b;
   mesh->GetObjectBoundingBox (b, CS_BBOX_MAX);
+
   csSegment3 seg (start, end);
   return csIntersect3::BoxSegment (b, seg, isect, pr);
 }
 
-bool csMeshWrapper::HitBeamOutline (const csVector3& start,
-  const csVector3& end, csVector3& isect, float* pr)
+bool csMeshWrapper::HitBeamOutline (
+  const csVector3 &start,
+  const csVector3 &end,
+  csVector3 &isect,
+  float *pr)
 {
   return mesh->HitBeamOutline (start, end, isect, pr);
 }
 
-bool csMeshWrapper::HitBeamObject (const csVector3& start,
-  const csVector3& end, csVector3& isect, float* pr)
+bool csMeshWrapper::HitBeamObject (
+  const csVector3 &start,
+  const csVector3 &end,
+  csVector3 &isect,
+  float *pr)
 {
   return mesh->HitBeamObject (start, end, isect, pr);
 }
 
-bool csMeshWrapper::HitBeam (const csVector3& start, const csVector3& end,
-	csVector3& isect, float* pr)
+bool csMeshWrapper::HitBeam (
+  const csVector3 &start,
+  const csVector3 &end,
+  csVector3 &isect,
+  float *pr)
 {
   csReversibleTransform trans = movable.GetFullTransform ();
   csVector3 startObj = trans.Other2This (start);
@@ -353,31 +388,35 @@ bool csMeshWrapper::HitBeam (const csVector3& start, const csVector3& end,
   if (HitBeamBBox (startObj, endObj, isect, NULL) > -1)
   {
     rc = HitBeamOutline (startObj, endObj, isect, pr);
-    if (rc)
-      isect = trans.This2Other (isect);
+    if (rc) isect = trans.This2Other (isect);
   }
+
   return rc;
 }
 
-void csMeshWrapper::HardTransform (const csReversibleTransform& t)
+void csMeshWrapper::HardTransform (const csReversibleTransform &t)
 {
   mesh->HardTransform (t);
+
   int i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0; i < children.Length (); i++)
   {
-    iMeshWrapper* spr = children.Get (i);
+    iMeshWrapper *spr = children.Get (i);
     spr->HardTransform (t);
   }
 }
 
-void csMeshWrapper::GetWorldBoundingBox (csBox3& cbox)
+void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
 {
   if (wor_bbox_movablenr != movable.GetUpdateNumber ())
   {
     wor_bbox_movablenr = movable.GetUpdateNumber ();
+
     csBox3 obj_bbox;
     mesh->GetObjectBoundingBox (obj_bbox, CS_BBOX_MAX);
+
     // @@@ Maybe it would be better to really calculate the bounding box
+
     // here instead of just transforming the object space bounding box?
     csReversibleTransform mt = movable.GetFullTransform ();
     wor_bbox.StartBoundingBox (mt.This2Other (obj_bbox.GetCorner (0)));
@@ -389,10 +428,11 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3& cbox)
     wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (6)));
     wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (7)));
   }
+
   cbox = wor_bbox;
 }
 
-void csMeshWrapper::GetRadius (csVector3& rad, csVector3& cent) const
+void csMeshWrapper::GetRadius (csVector3 &rad, csVector3 &cent) const
 {
   mesh->GetRadius (rad, cent);
   if (children.Length () > 0)
@@ -400,28 +440,34 @@ void csMeshWrapper::GetRadius (csVector3& rad, csVector3& cent) const
     float max_radius = rad.x;
     if (max_radius < rad.y) max_radius = rad.y;
     if (max_radius < rad.z) max_radius = rad.z;
+
     csSphere sphere (cent, max_radius);
     int i;
-    for (i = 0 ; i < children.Length () ; i++)
+    for (i = 0; i < children.Length (); i++)
     {
-      iMeshWrapper* spr = children.Get (i);
+      iMeshWrapper *spr = children.Get (i);
       csVector3 childrad, childcent;
       spr->GetRadius (childrad, childcent);
+
       float child_max_radius = childrad.x;
       if (child_max_radius < childrad.y) child_max_radius = childrad.y;
       if (child_max_radius < childrad.z) child_max_radius = childrad.z;
+
       csSphere childsphere (childcent, child_max_radius);
+
       // @@@ Is this the right transform?
       childsphere *= spr->GetMovable ()->GetTransform ();
       sphere += childsphere;
     }
+
     rad.Set (sphere.GetRadius (), sphere.GetRadius (), sphere.GetRadius ());
     cent.Set (sphere.GetCenter ());
   }
 }
 
 void csMeshWrapper::GetTransformedBoundingBox (
-	const csReversibleTransform& trans, csBox3& cbox)
+  const csReversibleTransform &trans,
+  csBox3 &cbox)
 {
   csBox3 box;
   mesh->GetObjectBoundingBox (box);
@@ -436,11 +482,13 @@ void csMeshWrapper::GetTransformedBoundingBox (
 }
 
 float csMeshWrapper::GetScreenBoundingBox (
-	const iCamera *camera, csBox2& sbox, csBox3& cbox)
+  const iCamera *camera,
+  csBox2 &sbox,
+  csBox3 &cbox)
 {
   csVector2 oneCorner;
-  csReversibleTransform tr_o2c = camera->GetTransform ()
-    	* movable.GetFullTransform ().GetInverse ();
+  csReversibleTransform tr_o2c = camera->GetTransform () *
+    movable.GetFullTransform ().GetInverse ();
   GetTransformedBoundingBox (tr_o2c, cbox);
 
   // if the entire bounding box is behind the camera, we're done
@@ -453,6 +501,7 @@ float csMeshWrapper::GetScreenBoundingBox (
   if (cbox.MinZ () <= 0)
   {
     // Mesh is very close to camera.
+
     // Just return a maximum bounding box.
     sbox.Set (-10000, -10000, 10000, 10000);
   }
@@ -460,6 +509,7 @@ float csMeshWrapper::GetScreenBoundingBox (
   {
     camera->Perspective (cbox.Max (), oneCorner);
     sbox.StartBoundingBox (oneCorner);
+
     csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
     camera->Perspective (v, oneCorner);
     sbox.AddBoundingVertexSmart (oneCorner);
@@ -473,26 +523,30 @@ float csMeshWrapper::GetScreenBoundingBox (
   return cbox.MaxZ ();
 }
 
-float csMeshWrapper::MeshWrapper::GetScreenBoundingBox (iCamera* camera,
-	csBox2& sbox, csBox3& cbox)
+float csMeshWrapper::MeshWrapper::GetScreenBoundingBox (
+  iCamera *camera,
+  csBox2 &sbox,
+  csBox3 &cbox)
 {
   return scfParent->GetScreenBoundingBox (camera, sbox, cbox);
 }
 
 // ---------------------------------------------------------------------------
-// csMeshFactoryWrapper
-// ---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT (csMeshFactoryWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshFactoryWrapper)
-  SCF_IMPLEMENTS_INTERFACE (csMeshFactoryWrapper)
+// csMeshFactoryWrapper
+
+// ---------------------------------------------------------------------------
+SCF_IMPLEMENT_IBASE_EXT(csMeshFactoryWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshFactoryWrapper)
+  SCF_IMPLEMENTS_INTERFACE(csMeshFactoryWrapper)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshFactoryWrapper::MeshFactoryWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iMeshFactoryWrapper)
+  SCF_IMPLEMENTS_INTERFACE(iMeshFactoryWrapper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csMeshFactoryWrapper::csMeshFactoryWrapper (iMeshObjectFactory* meshFact)
+csMeshFactoryWrapper::csMeshFactoryWrapper (
+  iMeshObjectFactory *meshFact)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
   csMeshFactoryWrapper::meshFact = meshFact;
@@ -516,7 +570,7 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
   if (meshFact) meshFact->DecRef ();
 }
 
-void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory* meshFact)
+void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
 {
   if (meshFact) meshFact->IncRef ();
   if (csMeshFactoryWrapper::meshFact)
@@ -524,17 +578,17 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory* meshFact)
   csMeshFactoryWrapper::meshFact = meshFact;
 }
 
-iMeshWrapper* csMeshFactoryWrapper::NewMeshObject ()
+iMeshWrapper *csMeshFactoryWrapper::NewMeshObject ()
 {
-  iMeshObject* basemesh = meshFact->NewInstance ();
-  iMeshWrapper* mesh = &(new csMeshWrapper (NULL, basemesh))->scfiMeshWrapper;
+  iMeshObject *basemesh = meshFact->NewInstance ();
+  iMeshWrapper *mesh = &(new csMeshWrapper (NULL, basemesh))->scfiMeshWrapper;
   basemesh->DecRef ();
 
   if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
   mesh->SetFactory (&scfiMeshFactoryWrapper);
 
   int i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0; i < children.Length (); i++)
   {
     iMeshFactoryWrapper *childfact = children.Get (i);
     iMeshWrapper *child = childfact->CreateMeshWrapper ();
@@ -543,24 +597,26 @@ iMeshWrapper* csMeshFactoryWrapper::NewMeshObject ()
     child->GetMovable ()->UpdateMove ();
     child->DecRef ();
   }
+
   return mesh;
 }
 
-void csMeshFactoryWrapper::HardTransform (const csReversibleTransform& t)
+void csMeshFactoryWrapper::HardTransform (const csReversibleTransform &t)
 {
   meshFact->HardTransform (t);
 }
 
 //--------------------------------------------------------------------------
-// csMeshList
-//--------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csMeshList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshList)
+// csMeshList
+
+//--------------------------------------------------------------------------
+SCF_IMPLEMENT_IBASE(csMeshList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshList)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshList::MeshList)
-  SCF_IMPLEMENTS_INTERFACE (iMeshList)
+  SCF_IMPLEMENTS_INTERFACE(iMeshList)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMeshList::csMeshList ()
@@ -570,31 +626,59 @@ csMeshList::csMeshList ()
 }
 
 int csMeshList::MeshList::GetCount () const
-  { return scfParent->Length (); }
+{
+  return scfParent->Length ();
+}
+
 iMeshWrapper *csMeshList::MeshList::Get (int n) const
-  { return scfParent->Get (n); }
+{
+  return scfParent->Get (n);
+}
+
 int csMeshList::MeshList::Add (iMeshWrapper *obj)
-  { scfParent->Push (obj); return true; }
+{
+  scfParent->Push (obj);
+  return true;
+}
+
 bool csMeshList::MeshList::Remove (iMeshWrapper *obj)
-  { scfParent->Delete (obj); return true; }
+{
+  scfParent->Delete (obj);
+  return true;
+}
+
 bool csMeshList::MeshList::Remove (int n)
-  { scfParent->Delete (n); return true; }
+{
+  scfParent->Delete (n);
+  return true;
+}
+
 void csMeshList::MeshList::RemoveAll ()
-  { scfParent->DeleteAll (); }
+{
+  scfParent->DeleteAll ();
+}
+
 int csMeshList::MeshList::Find (iMeshWrapper *obj) const
-  { return scfParent->Find (obj); }
+{
+  return scfParent->Find (obj);
+}
+
 iMeshWrapper *csMeshList::MeshList::FindByName (const char *Name) const
-  { return scfParent->FindByName (Name); }
+{
+  return scfParent->FindByName (Name);
+}
 
 //--------------------------------------------------------------------------
+
 // csMeshMeshList
-//--------------------------------------------------------------------------
 
+//--------------------------------------------------------------------------
 bool csMeshMeshList::PrepareItem (csSome item)
 {
   CS_ASSERT (mesh != NULL);
   csMeshList::PrepareItem (item);
-  iMeshWrapper *child = (iMeshWrapper*)item;
+
+  iMeshWrapper *child = (iMeshWrapper *)item;
 
   // unlink the mesh from the engine or another parent.
   iMeshWrapper *oldParent = child->GetParentContainer ();
@@ -612,22 +696,23 @@ bool csMeshMeshList::PrepareItem (csSome item)
 bool csMeshMeshList::FreeItem (csSome item)
 {
   CS_ASSERT (mesh != NULL);
-  ((iMeshWrapper*)item)->SetParentContainer (NULL);
-  ((iMeshWrapper*)item)->GetMovable ()->SetParent (NULL);
+  ((iMeshWrapper *)item)->SetParentContainer (NULL);
+  ((iMeshWrapper *)item)->GetMovable ()->SetParent (NULL);
   csMeshList::FreeItem (item);
   return true;
 }
 
 //--------------------------------------------------------------------------
-// csMeshFactoryList
-//--------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csMeshFactoryList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshFactoryList)
+// csMeshFactoryList
+
+//--------------------------------------------------------------------------
+SCF_IMPLEMENT_IBASE(csMeshFactoryList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshFactoryList)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshFactoryList::MeshFactoryList)
-  SCF_IMPLEMENTS_INTERFACE (iMeshFactoryList)
+  SCF_IMPLEMENTS_INTERFACE(iMeshFactoryList)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMeshFactoryList::csMeshFactoryList ()
@@ -637,31 +722,60 @@ csMeshFactoryList::csMeshFactoryList ()
 }
 
 int csMeshFactoryList::MeshFactoryList::GetCount () const
-  { return scfParent->Length (); }
+{
+  return scfParent->Length ();
+}
+
 iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::Get (int n) const
-  { return scfParent->Get (n); }
+{
+  return scfParent->Get (n);
+}
+
 int csMeshFactoryList::MeshFactoryList::Add (iMeshFactoryWrapper *obj)
-  { scfParent->Push (obj); return true; }
+{
+  scfParent->Push (obj);
+  return true;
+}
+
 bool csMeshFactoryList::MeshFactoryList::Remove (iMeshFactoryWrapper *obj)
-  { scfParent->Delete (obj); return true; }
+{
+  scfParent->Delete (obj);
+  return true;
+}
+
 bool csMeshFactoryList::MeshFactoryList::Remove (int n)
-  { scfParent->Delete (scfParent->Get (n)); return true; }
+{
+  scfParent->Delete (scfParent->Get (n));
+  return true;
+}
+
 void csMeshFactoryList::MeshFactoryList::RemoveAll ()
-  { scfParent->DeleteAll (); }
+{
+  scfParent->DeleteAll ();
+}
+
 int csMeshFactoryList::MeshFactoryList::Find (iMeshFactoryWrapper *obj) const
-  { return scfParent->Find (obj); }
-iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::FindByName (const char *Name) const
-  { return scfParent->FindByName (Name); }
+{
+  return scfParent->Find (obj);
+}
+
+iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::FindByName (
+  const char *Name) const
+{
+  return scfParent->FindByName (Name);
+}
 
 //--------------------------------------------------------------------------
+
 // csMeshFactoryFactoryList
-//--------------------------------------------------------------------------
 
+//--------------------------------------------------------------------------
 bool csMeshFactoryFactoryList::PrepareItem (csSome item)
 {
   CS_ASSERT (meshfact != NULL);
   csMeshFactoryList::PrepareItem (item);
-  iMeshFactoryWrapper *child = (iMeshFactoryWrapper*)item;
+
+  iMeshFactoryWrapper *child = (iMeshFactoryWrapper *)item;
 
   // unlink the factory from another possible parent.
   if (child->GetParentContainer ())
@@ -674,7 +788,7 @@ bool csMeshFactoryFactoryList::PrepareItem (csSome item)
 bool csMeshFactoryFactoryList::FreeItem (csSome item)
 {
   CS_ASSERT (meshfact != NULL);
-  ((iMeshFactoryWrapper*)item)->SetParentContainer (NULL);
+  ((iMeshFactoryWrapper *)item)->SetParentContainer (NULL);
   csMeshFactoryList::FreeItem (item);
   return true;
 }

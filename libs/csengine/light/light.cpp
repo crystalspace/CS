@@ -15,7 +15,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "csgeom/frustum.h"
 #include "csengine/cbufcube.h"
@@ -31,21 +30,28 @@
 #include "csengine/meshobj.h"
 #include "csutil/debug.h"
 
-int csLight::ambient_red = CS_DEFAULT_LIGHT_LEVEL;
-int csLight::ambient_green = CS_DEFAULT_LIGHT_LEVEL;
-int csLight::ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
-unsigned long csLight::last_light_id = 0;
+int csLight:: ambient_red = CS_DEFAULT_LIGHT_LEVEL;
+int csLight:: ambient_green = CS_DEFAULT_LIGHT_LEVEL;
+int csLight:: ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
+unsigned long csLight:: last_light_id = 0;
 
-SCF_IMPLEMENT_IBASE_EXT (csLight)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLight)
+SCF_IMPLEMENT_IBASE_EXT(csLight)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLight)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csLight::Light)
-  SCF_IMPLEMENTS_INTERFACE (iLight)
+  SCF_IMPLEMENTS_INTERFACE(iLight)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csLight::csLight (float x, float y, float z, float d,
-  float red, float green, float blue) : csObject()
+csLight::csLight (
+  float x,
+  float y,
+  float z,
+  float d,
+  float red,
+  float green,
+  float blue) :
+    csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLight);
   DG_TYPE (this, "csLight");
@@ -85,89 +91,147 @@ float csLight::GetBrightnessAtDistance (float d)
 {
   switch (attenuation)
   {
-    case CS_ATTN_NONE      : return 1;
-    case CS_ATTN_LINEAR    : return 1 - d * inv_dist;
-    case CS_ATTN_INVERSE   : return 1 / d;
-    case CS_ATTN_REALISTIC : return 1 / (d*d);
+    case CS_ATTN_NONE:      return 1;
+    case CS_ATTN_LINEAR:    return 1 - d * inv_dist;
+    case CS_ATTN_INVERSE:   return 1 / d;
+    case CS_ATTN_REALISTIC: return 1 / (d * d);
   }
+
   return 0;
 }
 
-csLight* csLight::Light::GetPrivateObject ()
-  { return scfParent; }
+csLight *csLight::Light::GetPrivateObject ()
+{
+  return scfParent;
+}
+
 unsigned long csLight::Light::GetLightID ()
-  { return scfParent->GetLightID (); }
-iObject *csLight::Light::QueryObject()
-  { return scfParent; }
-const csVector3& csLight::Light::GetCenter ()
-  { return scfParent->GetCenter (); }
-void csLight::Light::SetCenter (const csVector3& pos)
-  { scfParent->SetCenter (pos); }
+{
+  return scfParent->GetLightID ();
+}
+
+iObject *csLight::Light::QueryObject ()
+{
+  return scfParent;
+}
+
+const csVector3 &csLight::Light::GetCenter ()
+{
+  return scfParent->GetCenter ();
+}
+
+void csLight::Light::SetCenter (const csVector3 &pos)
+{
+  scfParent->SetCenter (pos);
+}
+
 iSector *csLight::Light::GetSector ()
-  { return &scfParent->GetSector ()->scfiSector; }
-void csLight::Light::SetSector (iSector* sector)
-  { scfParent->SetSector (sector ? sector->GetPrivateObject () : NULL); }
+{
+  return &scfParent->GetSector ()->scfiSector;
+}
+
+void csLight::Light::SetSector (iSector *sector)
+{
+  scfParent->SetSector (sector ? sector->GetPrivateObject () : NULL);
+}
+
 float csLight::Light::GetRadius ()
-  { return scfParent->GetRadius (); }
+{
+  return scfParent->GetRadius ();
+}
+
 float csLight::Light::GetSquaredRadius ()
-  { return scfParent->GetSquaredRadius (); }
+{
+  return scfParent->GetSquaredRadius ();
+}
+
 float csLight::Light::GetInverseRadius ()
-  { return scfParent->GetInverseRadius (); }
+{
+  return scfParent->GetInverseRadius ();
+}
+
 void csLight::Light::SetRadius (float r)
-  { scfParent->SetRadius (r); }
-const csColor& csLight::Light::GetColor ()
-  { return scfParent->GetColor (); }
-void csLight::Light::SetColor (const csColor& col)
-  { scfParent->SetColor (col); }
+{
+  scfParent->SetRadius (r);
+}
+
+const csColor &csLight::Light::GetColor ()
+{
+  return scfParent->GetColor ();
+}
+
+void csLight::Light::SetColor (const csColor &col)
+{
+  scfParent->SetColor (col);
+}
+
 int csLight::Light::GetAttenuation ()
-  { return scfParent->GetAttenuation (); }
+{
+  return scfParent->GetAttenuation ();
+}
+
 void csLight::Light::SetAttenuation (int a)
-  { scfParent->SetAttenuation (a); }
+{
+  scfParent->SetAttenuation (a);
+}
+
 float csLight::Light::GetBrightnessAtDistance (float d)
-  { return scfParent->GetBrightnessAtDistance (d); }
-
-iCrossHalo* csLight::Light::CreateCrossHalo (float intensity, float cross)
 {
-  csCrossHalo* halo = new csCrossHalo (intensity, cross);
+  return scfParent->GetBrightnessAtDistance (d);
+}
+
+iCrossHalo *csLight::Light::CreateCrossHalo (float intensity, float cross)
+{
+  csCrossHalo *halo = new csCrossHalo (intensity, cross);
   scfParent->SetHalo (halo);
-  iCrossHalo* ihalo = SCF_QUERY_INTERFACE_FAST (halo, iCrossHalo);
+
+  iCrossHalo *ihalo = SCF_QUERY_INTERFACE_FAST (halo, iCrossHalo);
   ihalo->DecRef ();
   return ihalo;
 }
 
-iNovaHalo* csLight::Light::CreateNovaHalo (int seed, int num_spokes,
-  	float roundness)
+iNovaHalo *csLight::Light::CreateNovaHalo (
+  int seed,
+  int num_spokes,
+  float roundness)
 {
-  csNovaHalo* halo = new csNovaHalo (seed, num_spokes, roundness);
+  csNovaHalo *halo = new csNovaHalo (seed, num_spokes, roundness);
   scfParent->SetHalo (halo);
-  iNovaHalo* ihalo = SCF_QUERY_INTERFACE_FAST (halo, iNovaHalo);
+
+  iNovaHalo *ihalo = SCF_QUERY_INTERFACE_FAST (halo, iNovaHalo);
   ihalo->DecRef ();
   return ihalo;
 }
 
-iFlareHalo* csLight::Light::CreateFlareHalo ()
+iFlareHalo *csLight::Light::CreateFlareHalo ()
 {
-  csFlareHalo* halo = new csFlareHalo ();
+  csFlareHalo *halo = new csFlareHalo ();
   scfParent->SetHalo (halo);
-  iFlareHalo* ihalo = SCF_QUERY_INTERFACE_FAST (halo, iFlareHalo);
+
+  iFlareHalo *ihalo = SCF_QUERY_INTERFACE_FAST (halo, iFlareHalo);
   ihalo->DecRef ();
   return ihalo;
 }
-
 
 //---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE_EXT (csStatLight)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iStatLight)
+SCF_IMPLEMENT_IBASE_EXT(csStatLight)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iStatLight)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csStatLight::eiStaticLight)
-  SCF_IMPLEMENTS_INTERFACE (iStatLight)
+  SCF_IMPLEMENTS_INTERFACE(iStatLight)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csStatLight::csStatLight (float x, float y, float z, float dist,
-  float red, float green, float blue, bool dynamic)
-  : csLight (x, y, z, dist, red, green, blue)
+csStatLight::csStatLight (
+  float x,
+  float y,
+  float z,
+  float dist,
+  float red,
+  float green,
+  float blue,
+  bool dynamic) :
+    csLight(x, y, z, dist, red, green, blue)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStatLight);
   DG_TYPE (this, "csStatLight");
@@ -179,57 +243,65 @@ csStatLight::~csStatLight ()
 {
 }
 
-static void node_light_func (csOctreeNode* node, csFrustumView* lview, bool vis)
+static void node_light_func (
+  csOctreeNode *node,
+  csFrustumView *lview,
+  bool vis)
 {
-  if (vis) return;
+  if (vis) return ;
   if (!vis)
   {
     // If this node is not visible we still have to mark all polygons
+
     // in this node as having no light.
-    csPolygonIntArray& pols = node->GetUnsplitPolygons ();
+    csPolygonIntArray &pols = node->GetUnsplitPolygons ();
     int i;
-    for (i = 0 ; i < pols.GetPolygonCount () ; i++)
+    for (i = 0; i < pols.GetPolygonCount (); i++)
     {
-      csPolygonInt* pi = pols.GetPolygon (i);
+      csPolygonInt *pi = pols.GetPolygon (i);
       if (pi->GetType () == 1)
       {
-        csPolygon3D* p = (csPolygon3D*)pi;
-	// If this polygon is the top-level polygon (i.e. base or original
-	// polygon) then we know the entire polygon is shadowed. In that
-	// case we have to do nothing.
-	if (p->GetBasePolygon () != p)
-	{
-	  // Otherwise we have to calculate lighting (but with vis set
-	  // to false).
-	  p->CalculateLightingStatic (lview, false);
-	}
+        csPolygon3D *p = (csPolygon3D *)pi;
+
+        // If this polygon is the top-level polygon (i.e. base or original
+
+        // polygon) then we know the entire polygon is shadowed. In that
+
+        // case we have to do nothing.
+        if (p->GetBasePolygon () != p)
+        {
+          // Otherwise we have to calculate lighting (but with vis set
+
+          // to false).
+          p->CalculateLightingStatic (lview, false);
+        }
       }
     }
   }
 }
 
-static void poly_light_func (csObject* obj, csFrustumView* lview, bool vis)
+static void poly_light_func (csObject *obj, csFrustumView *lview, bool vis)
 {
-  csPolygon3D* poly = (csPolygon3D*)obj;
-  csLightingPolyTexQueue* lptq = (csLightingPolyTexQueue*)
-  	(lview->GetUserdata ());
+  csPolygon3D *poly = (csPolygon3D *)obj;
+  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
+    (lview->GetUserdata ());
   if (lptq->IsDynamic ())
   {
-    if (!vis) return;
+    if (!vis) return ;
     poly->CalculateLightingDynamic (lview);
   }
   else
     poly->CalculateLightingStatic (lview, vis);
 }
 
-static void curve_light_func (csObject* obj, csFrustumView* lview, bool vis)
+static void curve_light_func (csObject *obj, csFrustumView *lview, bool vis)
 {
-  csCurve* curve = (csCurve*)obj;
-  csLightingPolyTexQueue* lptq = (csLightingPolyTexQueue*)
-  	(lview->GetUserdata ());
+  csCurve *curve = (csCurve *)obj;
+  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
+    (lview->GetUserdata ());
   if (lptq->IsDynamic ())
   {
-    if (!vis) return;
+    if (!vis) return ;
     curve->CalculateLightingDynamic (lview);
   }
   else
@@ -239,7 +311,7 @@ static void curve_light_func (csObject* obj, csFrustumView* lview, bool vis)
 void csStatLight::CalculateLighting ()
 {
   csFrustumView lview;
-  csFrustumContext* ctxt = lview.GetFrustumContext ();
+  csFrustumContext *ctxt = lview.GetFrustumContext ();
   lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
@@ -247,23 +319,26 @@ void csStatLight::CalculateLighting ()
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
-  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue (
-  	this, false, false);
+
+  csLightingPolyTexQueue *lptq = new csLightingPolyTexQueue (
+      this,
+      false,
+      false);
   lptq->SetColor (GetColor ());
   lview.SetUserdata (lptq);
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
-  sector->CheckFrustum ((iFrustumView*)&lview);
+  sector->CheckFrustum ((iFrustumView *) &lview);
 
   lptq->UpdateMaps (this, GetCenter (), GetColor ());
   lptq->DecRef ();
 }
 
-void csStatLight::CalculateLighting (iMeshWrapper* th)
+void csStatLight::CalculateLighting (iMeshWrapper *th)
 {
   csFrustumView lview;
-  csFrustumContext* ctxt = lview.GetFrustumContext ();
+  csFrustumContext *ctxt = lview.GetFrustumContext ();
   lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
@@ -272,21 +347,25 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue (
-    this, false, false);
+  csLightingPolyTexQueue *lptq = new csLightingPolyTexQueue (
+      this,
+      false,
+      false);
   lptq->SetColor (GetColor ());
   lview.SetUserdata (lptq);
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
+
   // @@@ Engine should not know about iThingState!!!
   if (th)
   {
-    iThingState* thing_state = SCF_QUERY_INTERFACE_FAST (th->GetMeshObject (),
-  	  iThingState);
+    iThingState *thing_state = SCF_QUERY_INTERFACE_FAST (
+        th->GetMeshObject (),
+        iThingState);
     if (thing_state)
     {
-      thing_state->CheckFrustum ((iFrustumView*)&lview, th->GetMovable ());
+      thing_state->CheckFrustum ((iFrustumView *) &lview, th->GetMovable ());
       thing_state->DecRef ();
     }
   }
@@ -295,29 +374,28 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
   lptq->DecRef ();
 }
 
-void csStatLight::RegisterLightMap (csLightMap* lmap)
+void csStatLight::RegisterLightMap (csLightMap *lmap)
 {
-  if (!dynamic) return;
+  if (!dynamic) return ;
 
   int i;
-  for (i = 0 ; i < lightmaps.Length () ; i++)
-    if (((csLightMap*)lightmaps[i]) == lmap)
-      return;
+  for (i = 0; i < lightmaps.Length (); i++)
+    if (((csLightMap *)lightmaps[i]) == lmap) return ;
   lightmaps.Push (lmap);
 }
 
-void csStatLight::SetColor (const csColor& col)
+void csStatLight::SetColor (const csColor &col)
 {
   csLight::SetColor (col);
+
   int i;
-  for (i = 0 ; i < lightmaps.Length () ; i++)
+  for (i = 0; i < lightmaps.Length (); i++)
   {
-    ((csLightMap*)lightmaps[i])->MakeDirtyDynamicLights ();
+    ((csLightMap *)lightmaps[i])->MakeDirtyDynamicLights ();
   }
 }
 
 //---------------------------------------------------------------------------
-
 csLightPatch::csLightPatch ()
 {
   next_poly = prev_poly = NULL;
@@ -332,7 +410,7 @@ csLightPatch::csLightPatch ()
 
 csLightPatch::~csLightPatch ()
 {
-  delete [] vertices;
+  delete[] vertices;
   if (light_frustum) light_frustum->DecRef ();
   RemovePatch ();
 }
@@ -354,26 +432,32 @@ void csLightPatch::Initialize (int n)
 {
   if (n > max_vertices)
   {
-    delete [] vertices;
+    delete[] vertices;
     max_vertices = n;
-    vertices = new csVector3 [max_vertices];
+    vertices = new csVector3[max_vertices];
   }
+
   num_vertices = n;
 }
 
 //---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE_EXT (csDynLight)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDynLight)
+SCF_IMPLEMENT_IBASE_EXT(csDynLight)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDynLight)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csDynLight::eiDynLight)
-  SCF_IMPLEMENTS_INTERFACE (iDynLight)
+  SCF_IMPLEMENTS_INTERFACE(iDynLight)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csDynLight::csDynLight (float x, float y, float z, float dist,
-  float red, float green, float blue)
-  : csLight (x, y, z, dist, red, green, blue)
+csDynLight::csDynLight (
+  float x,
+  float y,
+  float z,
+  float dist,
+  float red,
+  float green,
+  float blue) :
+    csLight(x, y, z, dist, red, green, blue)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDynLight);
   DG_TYPE (this, "csDynLight");
@@ -391,8 +475,9 @@ void csDynLight::Setup ()
 {
   while (lightpatches)
     csEngine::current_engine->lightpatch_pool->Free (lightpatches);
+
   csFrustumView lview;
-  csFrustumContext* ctxt = lview.GetFrustumContext ();
+  csFrustumContext *ctxt = lview.GetFrustumContext ();
   lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
@@ -401,52 +486,54 @@ void csDynLight::Setup ()
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue (
-  	this, true, false);
+  csLightingPolyTexQueue *lptq = new csLightingPolyTexQueue (
+      this,
+      true,
+      false);
   lptq->SetColor (GetColor ());
   lview.SetUserdata (lptq);
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
-  sector->CheckFrustum ((iFrustumView*)&lview);
+  sector->CheckFrustum ((iFrustumView *) &lview);
 
   lptq->DecRef ();
 }
 
-void csDynLight::SetColor (const csColor& col)
+void csDynLight::SetColor (const csColor &col)
 {
   csLight::SetColor (col);
-  csLightPatch* lp = lightpatches;
+
+  csLightPatch *lp = lightpatches;
   while (lp)
   {
     if (lp->GetPolygon ())
-      lp->GetPolygon()->MakeDirtyDynamicLights ();
+      lp->GetPolygon ()->MakeDirtyDynamicLights ();
     else
-      lp->GetCurve()->MakeDirtyDynamicLights ();
+      lp->GetCurve ()->MakeDirtyDynamicLights ();
 
     lp = lp->GetNextLight ();
   }
 }
 
-void csDynLight::UnlinkLightpatch (csLightPatch* lp)
+void csDynLight::UnlinkLightpatch (csLightPatch *lp)
 {
   lp->RemoveLightList (lightpatches);
 }
 
-void csDynLight::AddLightpatch (csLightPatch* lp)
+void csDynLight::AddLightpatch (csLightPatch *lp)
 {
   lp->AddLightList (lightpatches);
   lp->SetLight (this);
 }
 
 // --- csLightList -----------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (csLightList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightList)
+SCF_IMPLEMENT_IBASE(csLightList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightList)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csLightList::LightList)
-  SCF_IMPLEMENTS_INTERFACE (iLightList)
+  SCF_IMPLEMENTS_INTERFACE(iLightList)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csLightList::csLightList ()
@@ -455,33 +542,59 @@ csLightList::csLightList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightList);
 }
 
-iLight* csLightList::FindByID (unsigned long id) const
+iLight *csLightList::FindByID (unsigned long id) const
 {
   int i;
-  for (i = 0 ; i < Length () ; i++)
+  for (i = 0; i < Length (); i++)
   {
-    iLight* l = Get (i);
-    if (l->GetLightID () == id)
-      return l;
+    iLight *l = Get (i);
+    if (l->GetLightID () == id) return l;
   }
+
   return NULL;
 }
 
 int csLightList::LightList::GetCount () const
-  { return scfParent->Length (); }
+{
+  return scfParent->Length ();
+}
+
 iLight *csLightList::LightList::Get (int n) const
-  { return scfParent->Get (n); }
+{
+  return scfParent->Get (n);
+}
+
 int csLightList::LightList::Add (iLight *obj)
-  { return scfParent->Push (obj); }
+{
+  return scfParent->Push (obj);
+}
+
 bool csLightList::LightList::Remove (iLight *obj)
-  { return scfParent->Delete (obj); }
+{
+  return scfParent->Delete (obj);
+}
+
 bool csLightList::LightList::Remove (int n)
-  { return scfParent->Delete (n); }
+{
+  return scfParent->Delete (n);
+}
+
 void csLightList::LightList::RemoveAll ()
-  { scfParent->DeleteAll (); }
+{
+  scfParent->DeleteAll ();
+}
+
 int csLightList::LightList::Find (iLight *obj) const
-  { return scfParent->Find (obj); }
+{
+  return scfParent->Find (obj);
+}
+
 iLight *csLightList::LightList::FindByName (const char *Name) const
-  { return scfParent->FindByName (Name); }
+{
+  return scfParent->FindByName (Name);
+}
+
 iLight *csLightList::LightList::FindByID (unsigned long id) const
-  { return scfParent->FindByID (id); }
+{
+  return scfParent->FindByID (id);
+}

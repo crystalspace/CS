@@ -15,27 +15,28 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "csengine/cscoll.h"
 #include "csengine/thing.h"
 #include "csengine/engine.h"
 #include "csengine/sector.h"
 
-SCF_IMPLEMENT_IBASE (csCollection)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iCollection)
-  SCF_IMPLEMENTS_INTERFACE (csCollection)
+SCF_IMPLEMENT_IBASE(csCollection)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iCollection)
+  SCF_IMPLEMENTS_INTERFACE(csCollection)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csCollection::Collection)
-  SCF_IMPLEMENTS_INTERFACE (iCollection)
+  SCF_IMPLEMENTS_INTERFACE(iCollection)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csCollection::csCollection (csEngine* engine) :
-  csObject(), objects (8,8)
+csCollection::csCollection (
+  csEngine *engine) :
+    csObject(),
+    objects(8, 8)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiCollection);
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCollection);
 
   csCollection::engine = engine;
   engine->AddToCurrentRegion (this);
@@ -45,14 +46,14 @@ csCollection::~csCollection ()
 {
 }
 
-iObject* csCollection::FindObject (char* name)
+iObject *csCollection::FindObject (char *name)
 {
   int i;
-  for (i = 0 ; i < objects.Length() ; i++)
+  for (i = 0; i < objects.Length (); i++)
   {
-    iObject* obj = (iObject*)(objects[i]);
-    if (!strcmp ( obj->GetName (), name)) return obj;
+    iObject *obj = (iObject *) (objects[i]);
+    if (!strcmp (obj->GetName (), name)) return obj;
   }
+
   return NULL;
 }
-

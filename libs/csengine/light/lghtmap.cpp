@@ -15,7 +15,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "cssys/csendian.h"
 #include "csengine/lghtmap.h"
@@ -41,9 +40,10 @@ csShadowMap::~csShadowMap ()
   DG_REM (this);
 }
 
-void csShadowMap::Alloc (iLight* l, int w, int h)
+void csShadowMap::Alloc (iLight *l, int w, int h)
 {
   Light = l;
+
   int lw = csLightMap::CalcLightMapWidth (w);
   int lh = csLightMap::CalcLightMapHeight (h);
   csShadowMapHelper::Alloc (lw * lh);
@@ -57,12 +57,11 @@ void csShadowMap::Copy (const csShadowMap *source)
 }
 
 //---------------------------------------------------------------------------
+int csLightMap:: lightcell_size = 16;
+int csLightMap:: lightcell_shift = 4;
 
-int csLightMap::lightcell_size = 16;
-int csLightMap::lightcell_shift = 4;
-
-SCF_IMPLEMENT_IBASE (csLightMap)
-  SCF_IMPLEMENTS_INTERFACE (iLightMap)
+SCF_IMPLEMENT_IBASE(csLightMap)
+  SCF_IMPLEMENTS_INTERFACE(iLightMap)
 SCF_IMPLEMENT_IBASE_END
 
 csLightMap::csLightMap ()
@@ -86,6 +85,7 @@ csLightMap::~csLightMap ()
     delete first_smap;
     first_smap = smap;
   }
+
   static_lm.Clear ();
   real_lm.Clear ();
   DG_REM (this);
@@ -97,16 +97,16 @@ void csLightMap::SetLightCellSize (int size)
   lightcell_shift = csLog2 (size);
 }
 
-void csLightMap::DelShadowMap (csShadowMap* smap)
+void csLightMap::DelShadowMap (csShadowMap *smap)
 {
   first_smap = smap->next;
   DG_UNLINK (this, smap);
   delete smap;
 }
 
-csShadowMap *csLightMap::NewShadowMap (csLight* light, int w, int h)
+csShadowMap *csLightMap::NewShadowMap (csLight *light, int w, int h)
 {
-  csShadowMap* smap = new csShadowMap ();
+  csShadowMap *smap = new csShadowMap ();
   smap->Light = &light->scfiLight;
   smap->next = first_smap;
   first_smap = smap;
@@ -121,20 +121,21 @@ csShadowMap *csLightMap::NewShadowMap (csLight* light, int w, int h)
   return smap;
 }
 
-csShadowMap* csLightMap::FindShadowMap (csLight* light)
+csShadowMap *csLightMap::FindShadowMap (csLight *light)
 {
-  csShadowMap* smap = first_smap;
+  csShadowMap *smap = first_smap;
   while (smap)
   {
     if (smap->Light == &light->scfiLight) return smap;
     smap = smap->next;
   }
+
   return NULL;
 }
 
 void csLightMap::SetSize (int w, int h)
 {
-  rwidth  = lwidth  = csLightMap::CalcLightMapWidth (w);
+  rwidth = lwidth = csLightMap::CalcLightMapWidth (w);
   rheight = lheight = csLightMap::CalcLightMapHeight (h);
   lm_size = lwidth * lheight;
 }
@@ -148,17 +149,17 @@ void csLightMap::Alloc (int w, int h, int r, int g, int b)
   static_lm.Alloc (lm_size);
   real_lm.Alloc (lm_size);
 
-  csRGBpixel* map = static_lm.GetArray ();
+  csRGBpixel *map = static_lm.GetArray ();
   csRGBpixel def (r, g, b);
+
   // don't know why, but the previous implementation did this:
   def.alpha = 128;
 
   int i;
-  for (i=0; i<lm_size; i++)
-    map[i] = def;
+  for (i = 0; i < lm_size; i++) map[i] = def;
 }
 
-void csLightMap::CopyLightMap (csLightMap* source)
+void csLightMap::CopyLightMap (csLightMap *source)
 {
   lm_size = source->lm_size;
   static_lm.Copy (&source->static_lm);
@@ -192,10 +193,10 @@ void csLightMap::CopyLightMap (csLightMap* source)
 struct PolySave
 {
   char header[4];
-  int16 x1, y1, z1;	// Coordinate of vertex 1
-  int16 x2, y2, z2;	// Coordinate of vertex 2
-  int32 lm_size;		// Size of lightmap
-  int32 lm_cnt;		// Number of non-dynamic lightmaps (normally 3)
+  int16 x1, y1, z1;         // Coordinate of vertex 1
+  int16 x2, y2, z2;         // Coordinate of vertex 2
+  int32 lm_size;            // Size of lightmap
+  int32 lm_cnt;             // Number of non-dynamic lightmaps (normally 3)
 };
 
 struct LightSave
@@ -206,11 +207,15 @@ struct LightSave
 struct LightHeader
 {
   char header[4];
-  long dyn_cnt;		// Number of dynamic maps
+  long dyn_cnt;             // Number of dynamic maps
 };
 
-void CacheName (char *buf, char* prefix, int id,
-	unsigned long ident, char *suffix)
+void CacheName (
+  char *buf,
+  char *prefix,
+  int id,
+  unsigned long ident,
+  char *suffix)
 {
   if (id == 0)
     sprintf (buf, "%s%lu%s", prefix, ident, suffix);
@@ -218,23 +223,28 @@ void CacheName (char *buf, char* prefix, int id,
     sprintf (buf, "lm/%s%d_%lu%s", prefix, id, ident, suffix);
 }
 
-bool csLightMap::ReadFromCache (int id, int w, int h,
-  csObject* obj, bool isPolygon, csEngine* engine)
+bool csLightMap::ReadFromCache (
+  int id,
+  int w,
+  int h,
+  csObject *obj,
+  bool isPolygon,
+  csEngine *engine)
 {
   char buf[200];
   PolySave ps, pswanted;
   LightHeader lh;
   LightSave ls;
-  csLight* light;
+  csLight *light;
   int i;
 
-  csPolygon3D* poly = NULL;
-  csCurve* curve = NULL;
+  csPolygon3D *poly = NULL;
+  csCurve *curve = NULL;
 
   if (isPolygon)
-    poly = (csPolygon3D*)obj;
+    poly = (csPolygon3D *)obj;
   else
-    curve = (csCurve*)obj;
+    curve = (csCurve *)obj;
 
   SetSize (w, h);
 
@@ -253,36 +263,53 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
   {
     CacheName (buf, "C", id, curve->GetCurveID (), "");
   }
-  pswanted.lm_size = convert_endian (lm_size);
-  pswanted.lm_cnt = convert_endian ((int32)111);
 
-  iDataBuffer* data = engine->VFS->ReadFile (buf);
+  pswanted.lm_size = convert_endian (lm_size);
+  pswanted.lm_cnt = convert_endian ((int32) 111);
+
+  iDataBuffer *data = engine->VFS->ReadFile (buf);
   if (!data) return false;
 
   char *d = **data;
-  memcpy (ps.header, d, 4); d += 4;
-  memcpy (&ps.x1, d, sizeof (ps.x1)); d += sizeof (ps.x1);
-  memcpy (&ps.y1, d, sizeof (ps.y1)); d += sizeof (ps.y1);
-  memcpy (&ps.z1, d, sizeof (ps.z1)); d += sizeof (ps.z1);
-  memcpy (&ps.x2, d, sizeof (ps.x2)); d += sizeof (ps.x2);
-  memcpy (&ps.y2, d, sizeof (ps.y2)); d += sizeof (ps.y2);
-  memcpy (&ps.z2, d, sizeof (ps.z2)); d += sizeof (ps.z2);
-  memcpy (&ps.lm_size, d, sizeof (ps.lm_size)); d += sizeof (ps.lm_size);
-  memcpy (&ps.lm_cnt, d, sizeof (ps.lm_cnt)); d += sizeof (ps.lm_cnt);
+  memcpy (ps.header, d, 4);
+  d += 4;
+  memcpy (&ps.x1, d, sizeof (ps.x1));
+  d += sizeof (ps.x1);
+  memcpy (&ps.y1, d, sizeof (ps.y1));
+  d += sizeof (ps.y1);
+  memcpy (&ps.z1, d, sizeof (ps.z1));
+  d += sizeof (ps.z1);
+  memcpy (&ps.x2, d, sizeof (ps.x2));
+  d += sizeof (ps.x2);
+  memcpy (&ps.y2, d, sizeof (ps.y2));
+  d += sizeof (ps.y2);
+  memcpy (&ps.z2, d, sizeof (ps.z2));
+  d += sizeof (ps.z2);
+  memcpy (&ps.lm_size, d, sizeof (ps.lm_size));
+  d += sizeof (ps.lm_size);
+  memcpy (&ps.lm_cnt, d, sizeof (ps.lm_cnt));
+  d += sizeof (ps.lm_cnt);
 
   //-------------------------------
+
   // Check if cached item is still valid.
+
   //-------------------------------
-  if (strncmp (ps.header, pswanted.header, 4) != 0 || (
-	poly && (
-	ps.lm_cnt != pswanted.lm_cnt ||
-	ps.x1 != pswanted.x1 ||
-	ps.y1 != pswanted.y1 ||
-	ps.z1 != pswanted.z1 ||
-	ps.x2 != pswanted.x2 ||
-	ps.y2 != pswanted.y2 ||
-	ps.z2 != pswanted.z2 ||
-        ps.lm_size != pswanted.lm_size)))
+  if (
+    strncmp (ps.header, pswanted.header, 4) != 0 ||
+    (
+      poly &&
+      (
+        ps.lm_cnt != pswanted.lm_cnt ||
+        ps.x1 != pswanted.x1 ||
+        ps.y1 != pswanted.y1 ||
+        ps.z1 != pswanted.z1 ||
+        ps.x2 != pswanted.x2 ||
+        ps.y2 != pswanted.y2 ||
+        ps.z2 != pswanted.z2 ||
+        ps.lm_size != pswanted.lm_size
+      )
+    ))
   {
     // Invalid.
     data->DecRef ();
@@ -290,7 +317,9 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
   }
 
   //-------------------------------
+
   // The cached item is valid.
+
   //-------------------------------
   static_lm.Clear ();
 
@@ -301,37 +330,44 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
   data->DecRef ();
 
   //-------------------------------
+
   // Now load the dynamic data.
+
   //-------------------------------
   if (poly)
     CacheName (buf, "P", id, poly->GetPolygonID (), "_d");
   else
     CacheName (buf, "C", id, curve->GetCurveID (), "_d");
   data = engine->VFS->ReadFile (buf);
-  if (!data) return true;	// No dynamic data. @@@ Recalc dynamic data?
-
+  if (!data) return true;   // No dynamic data. @@@ Recalc dynamic data?
   d = **data;
-  memcpy (lh.header, d, 4); d += 4;
-  memcpy (&lh.dyn_cnt, d, 4); d += 4;
+  memcpy (lh.header, d, 4);
+  d += 4;
+  memcpy (&lh.dyn_cnt, d, 4);
+  d += 4;
   lh.dyn_cnt = convert_endian (lh.dyn_cnt);
 
   for (i = 0; i < lh.dyn_cnt; i++)
   {
-    memcpy (&ls.light_id, d, sizeof (ls.light_id)); d += sizeof (ls.light_id);
+    memcpy (&ls.light_id, d, sizeof (ls.light_id));
+    d += sizeof (ls.light_id);
     ls.light_id = convert_endian (ls.light_id);
 
     iStatLight *il = engine->FindLight (ls.light_id);
     if (il)
     {
       light = il->GetPrivateObject ();
-      csShadowMap* smap = NewShadowMap (light, w, h);
+
+      csShadowMap *smap = NewShadowMap (light, w, h);
       memcpy (smap->GetArray (), d, lm_size);
     }
     else
     {
       csEngine::current_engine->Warn (
-      	"Warning! Light (%ld) not found!\n", ls.light_id);
+          "Warning! Light (%ld) not found!\n",
+          ls.light_id);
     }
+
     d += lm_size;
   }
 
@@ -340,10 +376,14 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
   return true;
 }
 
-void csLightMap::Cache (int id, csPolygon3D* poly,
-	csCurve* curve, csEngine* engine)
+void csLightMap::Cache (
+  int id,
+  csPolygon3D *poly,
+  csCurve *curve,
+  csEngine *engine)
 {
-  (void) engine;
+  (void)engine;
+
   char buf[200];
   PolySave ps;
   long l;
@@ -364,46 +404,66 @@ void csLightMap::Cache (int id, csPolygon3D* poly,
   {
     CacheName (buf, "C", id, curve->GetCurveID (), "");
   }
+
   ps.lm_size = convert_endian (lm_size);
   ps.lm_cnt = 0;
-  ps.lm_cnt = 111;	// Dummy!
+  ps.lm_cnt = 111;          // Dummy!
   ps.lm_cnt = convert_endian (ps.lm_cnt);
 
   //-------------------------------
+
   // Write the normal lightmap data.
+
   //-------------------------------
-  iFile* cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
+  iFile *cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
   if (!cf)
   {
     engine->Warn ("Could not open '%s' for writing!\n", buf);
-    return;
+    return ;
   }
-  cf->Write (ps.header, 4);
-  s = ps.x1;      cf->Write ((char*)&s, sizeof (s));
-  s = ps.y1;      cf->Write ((char*)&s, sizeof (s));
-  s = ps.z1;      cf->Write ((char*)&s, sizeof (s));
-  s = ps.x2;      cf->Write ((char*)&s, sizeof (s));
-  s = ps.y2;      cf->Write ((char*)&s, sizeof (s));
-  s = ps.z2;      cf->Write ((char*)&s, sizeof (s));
-  l = ps.lm_size; cf->Write ((char*)&l, sizeof (l));
-  l = ps.lm_cnt;  cf->Write ((char*)&l, sizeof (l));
 
-  if (static_lm.GetArray ()) cf->Write ((char*)static_lm.GetArray (), lm_size*4);
+  cf->Write (ps.header, 4);
+  s = ps.x1;
+  cf->Write ((char *) &s, sizeof (s));
+  s = ps.y1;
+  cf->Write ((char *) &s, sizeof (s));
+  s = ps.z1;
+  cf->Write ((char *) &s, sizeof (s));
+  s = ps.x2;
+  cf->Write ((char *) &s, sizeof (s));
+  s = ps.y2;
+  cf->Write ((char *) &s, sizeof (s));
+  s = ps.z2;
+  cf->Write ((char *) &s, sizeof (s));
+  l = ps.lm_size;
+  cf->Write ((char *) &l, sizeof (l));
+  l = ps.lm_cnt;
+  cf->Write ((char *) &l, sizeof (l));
+
+  if (static_lm.GetArray ())
+    cf->Write ((char *)static_lm.GetArray (), lm_size * 4);
 
   // close the file
   cf->DecRef ();
 
   //-------------------------------
+
   // Write the dynamic data.
+
   //-------------------------------
   LightHeader lh;
 
-  csShadowMap* smap = first_smap;
+  csShadowMap *smap = first_smap;
   if (smap)
   {
     strcpy (lh.header, "DYNL");
     lh.dyn_cnt = 0;
-    while (smap) { lh.dyn_cnt++; smap = smap->next; }
+    while (smap)
+    {
+      lh.dyn_cnt++;
+      smap = smap->next;
+    }
+
     smap = first_smap;
 
     if (poly)
@@ -414,23 +474,26 @@ void csLightMap::Cache (int id, csPolygon3D* poly,
     if (!cf)
     {
       engine->Warn ("Could not open '%s' for writing!\n", buf);
-      return;
+      return ;
     }
+
     cf->Write (lh.header, 4);
     l = convert_endian (lh.dyn_cnt);
-    cf->Write ((char*)&l, 4);
+    cf->Write ((char *) &l, 4);
     while (smap)
     {
-      csLight* light = smap->Light->GetPrivateObject ();
+      csLight *light = smap->Light->GetPrivateObject ();
       if (smap->GetArray ())
       {
         LightSave ls;
-	ls.light_id = convert_endian (light->GetLightID ());
-        cf->Write ((char*)&ls.light_id, sizeof (ls.light_id));
-        cf->Write ((char*)(smap->GetArray ()), lm_size);
+        ls.light_id = convert_endian (light->GetLightID ());
+        cf->Write ((char *) &ls.light_id, sizeof (ls.light_id));
+        cf->Write ((char *)(smap->GetArray ()), lm_size);
       }
+
       smap = smap->next;
     }
+
     cf->DecRef ();
   }
 }
@@ -442,25 +505,30 @@ bool csLightMap::UpdateRealLightMap ()
   dyn_dirty = false;
 
   //---
-  // First copy the static lightmap to the real lightmap.
-  // Remember the real lightmap first so that we can see if
-  // there were any changes.
-  //---
 
+  // First copy the static lightmap to the real lightmap.
+
+  // Remember the real lightmap first so that we can see if
+
+  // there were any changes.
+
+  //---
   memcpy (real_lm.GetArray (), static_lm.GetArray (), 4 * lm_size);
 
   //---
+
   // Then add all pseudo-dynamic lights.
+
   //---
-  csLight* light;
-  csRGBpixel* map;
+  csLight *light;
+  csRGBpixel *map;
   float red, green, blue;
-  unsigned char* p, * last_p;
+  unsigned char *p, *last_p;
   int l, s;
 
   if (first_smap)
   {
-    csShadowMap* smap = first_smap;
+    csShadowMap *smap = first_smap;
 
     // Color mode.
     do
@@ -471,7 +539,7 @@ bool csLightMap::UpdateRealLightMap ()
       green = light->GetColor ().green;
       blue = light->GetColor ().blue;
       p = smap->GetArray ();
-      last_p = p+lm_size;
+      last_p = p + lm_size;
       do
       {
         s = *p++;
@@ -483,13 +551,11 @@ bool csLightMap::UpdateRealLightMap ()
         l = map->blue + QRound (blue * s);
         map->blue = l < 255 ? l : 255;
 
-	map++;
-      }
-      while (p < last_p);
+        map++;
+      } while (p < last_p);
 
       smap = smap->next;
-    }
-    while (smap);
+    } while (smap);
   }
 
   return true;
@@ -502,50 +568,64 @@ void csLightMap::ConvertToMixingMode ()
   mer = 0;
   meg = 0;
   meb = 0;
+
   csRGBpixel *map = static_lm.GetArray ();
-  for (i = 0 ; i < lm_size ; i++)
+  for (i = 0; i < lm_size; i++)
   {
     mer += map->red;
     meg += map->green;
     meb += map->blue;
     map++;
   }
-  mean_color.red   = mer/lm_size;
-  mean_color.green = meg/lm_size;
-  mean_color.blue  = meb/lm_size;
+
+  mean_color.red = mer / lm_size;
+  mean_color.green = meg / lm_size;
+  mean_color.blue = meb / lm_size;
 }
 
 // Only works for expanding a map.
-static void ResizeMap2 (csRGBpixel* old_map, int oldw, int oldh,
-		 csRGBpixel* new_map, int neww, int /*newh*/)
+static void ResizeMap2 (
+  csRGBpixel *old_map,
+  int oldw,
+  int oldh,
+  csRGBpixel *new_map,
+  int neww,
+  int
+
+  /*newh*/ )
 {
   int row;
-  for (row = 0 ; row < oldh ; row++)
-    memcpy (new_map+neww*row*4, old_map+oldw*row*4, oldw*4);
+  for (row = 0; row < oldh; row++)
+    memcpy (new_map + neww * row * 4, old_map + oldw * row * 4, oldw * 4);
 }
 
 // Only works for expanding a map.
-static void ResizeMap (unsigned char* old_map, int oldw, int oldh,
-		 unsigned char* new_map, int neww, int /*newh*/)
+static void ResizeMap (
+  unsigned char *old_map,
+  int oldw,
+  int oldh,
+  unsigned char *new_map,
+  int neww,
+  int
+
+  /*newh*/ )
 {
   int row;
-  for (row = 0 ; row < oldh ; row++)
-    memcpy (new_map+neww*row, old_map+oldw*row, oldw);
+  for (row = 0; row < oldh; row++)
+    memcpy (new_map + neww * row, old_map + oldw * row, oldw);
 }
 
 void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
 {
-  if (!requirePO2) return; // Nothing to do.
+  if (!requirePO2) return ; // Nothing to do.
   int oldw = lwidth, oldh = lheight;
 
-  lwidth  = csFindNearestPowerOf2 (lwidth);
+  lwidth = csFindNearestPowerOf2 (lwidth);
   lheight = csFindNearestPowerOf2 (lheight);
 
-  while (lwidth/lheight > maxAspect) lheight += lheight;
-  while (lheight/lwidth > maxAspect) lwidth  += lwidth;
-
-  if (oldw == lwidth && oldh == lheight)
-    return;	// Already ok, nothing to do.
+  while (lwidth / lheight > maxAspect) lheight += lheight;
+  while (lheight / lwidth > maxAspect) lwidth += lwidth;
+  if (oldw == lwidth && oldh == lheight) return ; // Already ok, nothing to do.
 
   // Move the old data to o_stat and o_real.
   csRGBMap o_stat, o_real;
@@ -556,19 +636,31 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
 
   // Allocate new data and transform old to new.
   static_lm.Alloc (lm_size);
-  ResizeMap2 (o_stat.GetArray (), oldw, oldh, static_lm.GetArray (), lwidth, lheight);
+  ResizeMap2 (
+    o_stat.GetArray (),
+    oldw,
+    oldh,
+    static_lm.GetArray (),
+    lwidth,
+    lheight);
 
   real_lm.Alloc (lm_size);
-  ResizeMap2 (o_real.GetArray (), oldw, oldh, real_lm.GetArray (), lwidth, lheight);
+  ResizeMap2 (
+    o_real.GetArray (),
+    oldw,
+    oldh,
+    real_lm.GetArray (),
+    lwidth,
+    lheight);
 
   // Convert all shadowmaps.
-  csShadowMap* smap = first_smap;
+  csShadowMap *smap = first_smap;
   while (smap)
   {
-    unsigned char* old_map = smap->GetArray ();
-    smap->TakeOver (new unsigned char [lm_size], smap->GetSize (), false);
+    unsigned char *old_map = smap->GetArray ();
+    smap->TakeOver (new unsigned char[lm_size], smap->GetSize (), false);
     ResizeMap (old_map, oldw, oldh, smap->GetArray (), lwidth, lheight);
-    delete [] old_map;
+    delete[] old_map;
     smap = smap->next;
   }
 }
@@ -577,4 +669,3 @@ csRGBpixel *csLightMap::GetMapData ()
 {
   return GetRealMap ().GetArray ();
 }
-

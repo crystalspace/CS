@@ -16,7 +16,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "csengine/arrays.h"
 #include "csengine/curve.h"
@@ -24,22 +23,21 @@
 #include "csengine/halo.h"
 
 //-------------------------------------------------------+ csCurvesArray +----//
-
 bool csCurvesArray::FreeItem (csSome Item)
 {
-  delete ((csCurve*)Item);
+  delete((csCurve *)Item);
   return true;
 }
 
 int csCurvesArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
-  (void) Mode;
+  (void)Mode;
+
   const char *name = ((csCurve *)Item)->GetName ();
   return name ? strcmp (name, (char *)Key) : -1;
 }
 
 //------------------------------------------------------+ csPolygonArray +----//
-
 csPolygonArray::~csPolygonArray ()
 {
   DeleteAll ();
@@ -47,31 +45,33 @@ csPolygonArray::~csPolygonArray ()
 
 bool csPolygonArray::FreeItem (csSome Item)
 {
-  delete (csPolygon3D *)(csPolygonInt *)Item;
+  delete(csPolygon3D *) (csPolygonInt *)Item;
   return true;
 }
 
 int csPolygonArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
-  (void) Mode;
-  const char *name = ((csPolygon3D *)(csPolygonInt *)Item)->GetName ();
+  (void)Mode;
+
+  const char *name = ((csPolygon3D *) (csPolygonInt *)Item)->GetName ();
   return name ? strcmp (name, (char *)Key) : -1;
 }
 
 csPolygon3D *csPolygonArray::Get (int iIndex) const
 {
-  return (csPolygon3D *)(csPolygonInt *)csVector::Get (iIndex);
+  return (csPolygon3D *) (csPolygonInt *)csVector::Get (iIndex);
 }
 
 //---------------------------------------------------------+ csHaloArray +----//
-
 bool csHaloArray::FreeItem (csSome Item)
 {
-  delete ((csLightHalo*)Item);
+  delete((csLightHalo *)Item);
   return true;
 }
 
-int csHaloArray::CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+int csHaloArray::CompareKey (csSome Item, csConstSome Key, int
+
+/*Mode*/ ) const
 {
   return ((csLightHalo *)Item)->Light == (csLight *)Key ? 0 : -1;
 }

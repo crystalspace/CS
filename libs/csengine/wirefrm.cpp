@@ -15,7 +15,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "cstypes.h"
 #include "qint.h"
@@ -28,14 +27,18 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 
-csWfColor::csWfColor (iTextureManager* txtmgr, int r, int g, int b)
+csWfColor::csWfColor (iTextureManager *txtmgr, int r, int g, int b)
 {
   csWfColor::r = r;
   csWfColor::g = g;
   csWfColor::b = b;
+
   int i;
-  for (i = 0 ; i < 16 ; i++)
-    col_idx[i] = txtmgr->FindRGB (r*(20-i)/20, g*(20-i)/20, b*(20-i)/20);
+  for (i = 0; i < 16; i++)
+    col_idx[i] = txtmgr->FindRGB (
+        r * (20 - i) / 20,
+        g * (20 - i) / 20,
+        b * (20 - i) / 20);
 }
 
 int csWfColor::GetColor (float z)
@@ -46,7 +49,6 @@ int csWfColor::GetColor (float z)
   return col_idx[zi];
 }
 
-
 csWfObject::csWfObject ()
 {
   next = prev = NULL;
@@ -56,44 +58,54 @@ csWfObject::~csWfObject ()
 {
 }
 
-bool csWfObject::Perspective (csCamera* c, csVector3& v, csVector2& persp, float radius, float& pradius)
+bool csWfObject::Perspective (
+  csCamera *c,
+  csVector3 &v,
+  csVector2 &persp,
+  float radius,
+  float &pradius)
 {
   csVector3 cam = c->Other2This (v);
   if (cam.z > SMALL_Z)
   {
-    float iz = c->GetFOV ()/cam.z;
+    float iz = c->GetFOV () / cam.z;
     persp.x = cam.x * iz + c->GetShiftX ();
     persp.y = csEngine::frame_height - 1 - (cam.y * iz + c->GetShiftY ());
     pradius = radius * iz;
     return true;
   }
-  else return false;
+  else
+    return false;
 }
 
-bool csWfObject::Orthographic (csCamera* c, int ortho,
-	csVector3& v, csVector2& persp)
+bool csWfObject::Orthographic (
+  csCamera *c,
+  int ortho,
+  csVector3 &v,
+  csVector2 &persp)
 {
-  const csVector3& o = c->GetOrigin ();
-  csVector3 v2 = (v-o)*20;
+  const csVector3 &o = c->GetOrigin ();
+  csVector3 v2 = (v - o) * 20;
   switch (ortho)
   {
-    case WF_ORTHO_X: persp.x = v2.y; persp.y = v2.z; break;
-    case WF_ORTHO_Y: persp.x = v2.x; persp.y = v2.z; break;
-    case WF_ORTHO_Z: persp.x = v2.x; persp.y = v2.y; break;
+    case WF_ORTHO_X:  persp.x = v2.y; persp.y = v2.z; break;
+    case WF_ORTHO_Y:  persp.x = v2.x; persp.y = v2.z; break;
+    case WF_ORTHO_Z:  persp.x = v2.x; persp.y = v2.y; break;
   }
-  persp.x += csEngine::frame_width/2;
-  persp.y += csEngine::frame_height/2;
+
+  persp.x += csEngine::frame_width / 2;
+  persp.y += csEngine::frame_height / 2;
   return true;
 }
 
-void csWfVertex::Draw (iGraphics3D* g, csCamera* c, int ortho)
+void csWfVertex::Draw (iGraphics3D *g, csCamera *c, int ortho)
 {
   if (ortho == WF_ORTHO_PERSP)
   {
     csVector2 persp;
     float rad;
     int r, px, py;
-    iGraphics2D* g2d;
+    iGraphics2D *g2d;
 
     if (Perspective (c, loc, persp, PLANE_VERTEX_RADIUS, rad))
     {
@@ -104,12 +116,17 @@ void csWfVertex::Draw (iGraphics3D* g, csCamera* c, int ortho)
       px = QInt (persp.x);
       py = QInt (persp.y);
       g2d = g->GetDriver2D ();
-      g2d->DrawLine (px-r, py-r, px+r, py+r, col);
-      g2d->DrawLine (px+r, py-r, px-r, py+r, col);
+      g2d->DrawLine (px - r, py - r, px + r, py + r, col);
+      g2d->DrawLine (px + r, py - r, px - r, py + r, col);
+
       //if (cross)
+
       //{
-        //g2d->DrawLine (px-r, py, px+r, py, col);
-        //g2d->DrawLine (px, py-r, px, py+r, col);
+
+      //g2d->DrawLine (px-r, py, px+r, py, col);
+
+      //g2d->DrawLine (px, py-r, px, py+r, col);
+
       //}
     }
   }
@@ -117,7 +134,7 @@ void csWfVertex::Draw (iGraphics3D* g, csCamera* c, int ortho)
   {
     csVector2 persp;
     int r, px, py;
-    iGraphics2D* g2d;
+    iGraphics2D *g2d;
 
     if (Orthographic (c, ortho, loc, persp))
     {
@@ -127,32 +144,42 @@ void csWfVertex::Draw (iGraphics3D* g, csCamera* c, int ortho)
       px = QInt (persp.x);
       py = QInt (persp.y);
       g2d = g->GetDriver2D ();
-      g2d->DrawLine (px-r, py-r, px+r, py+r, col);
-      g2d->DrawLine (px+r, py-r, px-r, py+r, col);
+      g2d->DrawLine (px - r, py - r, px + r, py + r, col);
+      g2d->DrawLine (px + r, py - r, px - r, py + r, col);
+
       //if (cross)
+
       //{
-        //g2d->DrawLine (px-r, py, px+r, py, col);
-        //g2d->DrawLine (px, py-r, px, py+r, col);
+
+      //g2d->DrawLine (px-r, py, px+r, py, col);
+
+      //g2d->DrawLine (px, py-r, px, py+r, col);
+
       //}
     }
   }
 }
 
-void csWfLine::Draw (iGraphics3D* g, csCamera* c, int ortho)
+void csWfLine::Draw (iGraphics3D *g, csCamera *c, int ortho)
 {
   if (ortho == WF_ORTHO_PERSP)
   {
     csVector3 cam1 = c->Other2This (v1);
     csVector3 cam2 = c->Other2This (v2);
-    g->DrawLine (cam1, cam2, c->GetFOV (), color->GetColor ((cam1.z+cam2.z)/2));
+    g->DrawLine (
+        cam1,
+        cam2,
+        c->GetFOV (),
+        color->GetColor ((cam1.z + cam2.z) / 2));
   }
   else
   {
     csVector2 p1, p2;
-    iGraphics2D* g2d = g->GetDriver2D ();
+    iGraphics2D *g2d = g->GetDriver2D ();
     Orthographic (c, ortho, v1, p1);
     Orthographic (c, ortho, v2, p2);
-    int col = color->GetColor (v1[ortho]+v2[ortho]);
+
+    int col = color->GetColor (v1[ortho] + v2[ortho]);
     g2d->DrawLine (p1.x, p1.y, p2.x, p2.y, col);
   }
 }
@@ -164,24 +191,26 @@ csWfPolygon::csWfPolygon ()
 
 csWfPolygon::~csWfPolygon ()
 {
-  if (vertices) delete [] vertices;
+  if (vertices) delete[] vertices;
 }
 
 void csWfPolygon::SetVertexCount (int n)
 {
   num_vertices = n;
-  delete [] vertices;
-  vertices = new csVector3 [num_vertices];
+  delete[] vertices;
+  vertices = new csVector3[num_vertices];
 }
 
-void csWfPolygon::SetVertex (int i, csVector3& v)
+void csWfPolygon::SetVertex (int i, csVector3 &v)
 {
   if (i >= num_vertices)
   {
     csEngine::current_engine->ReportBug (
-    	"Bad vertex number %d in csWfPolygon::set_vertex!", i);
+        "Bad vertex number %d in csWfPolygon::set_vertex!",
+        i);
     exit (-1);
   }
+
   vertices[i] = v;
 }
 
@@ -190,13 +219,14 @@ void csWfPolygon::Prepare ()
   A = 0;
   B = 0;
   C = 0;
+
   int i, i1;
   float x1, y1, z1, x, y, z;
 
-  csVector3 vmin (1000000,1000000,1000000);
-  csVector3 vmax (-1000000,-10000000,-1000000);
-  i1 = num_vertices-1;
-  for (i = 0 ; i < num_vertices ; i++)
+  csVector3 vmin (1000000, 1000000, 1000000);
+  csVector3 vmax (-1000000, -10000000, -1000000);
+  i1 = num_vertices - 1;
+  for (i = 0; i < num_vertices; i++)
   {
     x = vertices[i].x;
     y = vertices[i].y;
@@ -210,13 +240,13 @@ void csWfPolygon::Prepare ()
     x1 = vertices[i1].x;
     y1 = vertices[i1].y;
     z1 = vertices[i1].z;
-    A += (z1+z) * (y-y1);
-    B += (x1+x) * (z-z1);
-    C += (y1+y) * (x-x1);
+    A += (z1 + z) * (y - y1);
+    B += (x1 + x) * (z - z1);
+    C += (y1 + y) * (x - x1);
     i1 = i;
   }
 
-  float invd = qisqrt (A*A + B*B + C*C);
+  float invd = qisqrt (A * A + B * B + C * C);
 
   A *= invd;
   B *= invd;
@@ -225,19 +255,19 @@ void csWfPolygon::Prepare ()
   x = vertices[0].x;
   y = vertices[0].y;
   z = vertices[0].z;
-  D = -(A*x+B*y+C*z);
+  D = -(A * x + B * y + C * z);
 
-  center.x = (vmin.x+vmax.x)/2;
-  center.y = (vmin.y+vmax.y)/2;
-  center.z = (vmin.z+vmax.z)/2;
+  center.x = (vmin.x + vmax.x) / 2;
+  center.y = (vmin.y + vmax.y) / 2;
+  center.z = (vmin.z + vmax.z) / 2;
 }
 
-bool csWfPolygon::IsVisible (csCamera* camera)
+bool csWfPolygon::IsVisible (csCamera *camera)
 {
   return csPlane3::Classify (A, B, C, D, camera->GetOrigin ()) < 0;
 }
 
-void csWfPolygon::Draw (iGraphics3D* g, csCamera* c, int ortho)
+void csWfPolygon::Draw (iGraphics3D *g, csCamera *c, int ortho)
 {
   if (ortho == WF_ORTHO_PERSP)
   {
@@ -247,10 +277,10 @@ void csWfPolygon::Draw (iGraphics3D* g, csCamera* c, int ortho)
     csVector3 cen = c->Other2This (center);
     int col = color->GetColor (cen.z);
     int vcol = vcolor->GetColor (cen.z);
-    for (i = 0 ; i < num_vertices ; i++)
+    for (i = 0; i < num_vertices; i++)
     {
       cam1 = c->Other2This (vertices[i]);
-      cam2 = c->Other2This (vertices[(i+1)%num_vertices]);
+      cam2 = c->Other2This (vertices[(i + 1) % num_vertices]);
       g->DrawLine (cam1, cam2, c->GetFOV (), col);
       if (vis) g->DrawLine (cam1, cen, c->GetFOV (), vcol);
     }
@@ -260,19 +290,18 @@ void csWfPolygon::Draw (iGraphics3D* g, csCamera* c, int ortho)
     int i;
     csVector2 p1, p2;
     int col = color->GetColor (center[ortho]);
-    iGraphics2D* g2d = g->GetDriver2D ();
-    for (i = 0 ; i < num_vertices ; i++)
+    iGraphics2D *g2d = g->GetDriver2D ();
+    for (i = 0; i < num_vertices; i++)
     {
       Orthographic (c, ortho, vertices[i], p1);
-      Orthographic (c, ortho, vertices[(i+1)%num_vertices], p2);
+      Orthographic (c, ortho, vertices[(i + 1) % num_vertices], p2);
       g2d->DrawLine (p1.x, p1.y, p2.x, p2.y, col);
     }
   }
 }
 
 //=================================================================================================
-
-csWireFrame::csWireFrame (iTextureManager* txtmgr)
+csWireFrame::csWireFrame (iTextureManager *txtmgr)
 {
   objects = NULL;
   numObjects = 0;
@@ -290,7 +319,7 @@ csWireFrame::~csWireFrame ()
   Clear ();
   while (colors)
   {
-    csWfColor* n = colors->next;
+    csWfColor *n = colors->next;
     delete colors;
     colors = n;
   }
@@ -300,27 +329,29 @@ void csWireFrame::Clear ()
 {
   while (objects)
   {
-    csWfObject* n = objects->GetNext ();
+    csWfObject *n = objects->GetNext ();
     delete objects;
     objects = n;
   }
+
   numObjects = 0;
 }
 
-csWfColor* csWireFrame::FindColor (int r, int g, int b)
+csWfColor *csWireFrame::FindColor (int r, int g, int b)
 {
-  csWfColor* c = colors;
+  csWfColor *c = colors;
   while (c)
   {
     if (c->r == r && c->g == g && c->b == b) return c;
     c = c->next;
   }
+
   return NULL;
 }
 
-csWfColor* csWireFrame::RegisterColor (int r, int g, int b)
+csWfColor *csWireFrame::RegisterColor (int r, int g, int b)
 {
-  csWfColor* c = FindColor (r, g, b);
+  csWfColor *c = FindColor (r, g, b);
   if (c) return c;
   c = new csWfColor (txtmgr, r, g, b);
   c->next = colors;
@@ -328,9 +359,9 @@ csWfColor* csWireFrame::RegisterColor (int r, int g, int b)
   return c;
 }
 
-csWfVertex* csWireFrame::AddVertex (const csVector3& v)
+csWfVertex *csWireFrame::AddVertex (const csVector3 &v)
 {
-  csWfVertex* vt = new csWfVertex ();
+  csWfVertex *vt = new csWfVertex ();
   vt->SetLocation (v);
   vt->SetColor (white);
   vt->SetNext (objects);
@@ -342,9 +373,9 @@ csWfVertex* csWireFrame::AddVertex (const csVector3& v)
   return vt;
 }
 
-csWfLine* csWireFrame::AddLine (csVector3& v1, csVector3& v2)
+csWfLine *csWireFrame::AddLine (csVector3 &v1, csVector3 &v2)
 {
-  csWfLine* li = new csWfLine ();
+  csWfLine *li = new csWfLine ();
   li->SetLine (v1, v2);
   li->SetColor (white);
   li->SetNext (objects);
@@ -356,9 +387,9 @@ csWfLine* csWireFrame::AddLine (csVector3& v1, csVector3& v2)
   return li;
 }
 
-csWfPolygon* csWireFrame::AddPolygon ()
+csWfPolygon *csWireFrame::AddPolygon ()
 {
-  csWfPolygon* po = new csWfPolygon ();
+  csWfPolygon *po = new csWfPolygon ();
   po->SetColor (white);
   po->SetNext (objects);
   if (objects) objects->SetPrev (po);
@@ -369,9 +400,9 @@ csWfPolygon* csWireFrame::AddPolygon ()
   return po;
 }
 
-void csWireFrame::Draw (iGraphics3D* g, csCamera* c, int ortho)
+void csWireFrame::Draw (iGraphics3D *g, csCamera *c, int ortho)
 {
-  csWfObject* o = objects;
+  csWfObject *o = objects;
   while (o)
   {
     o->Draw (g, c, ortho);
@@ -379,9 +410,9 @@ void csWireFrame::Draw (iGraphics3D* g, csCamera* c, int ortho)
   }
 }
 
-void csWireFrame::Apply (void (*func)( csWfObject*, void*), void *param)
+void csWireFrame::Apply (void (*func) (csWfObject *, void *), void *param)
 {
-  csWfObject* o = objects;
+  csWfObject *o = objects;
   while (o)
   {
     func (o, param);
@@ -389,7 +420,7 @@ void csWireFrame::Apply (void (*func)( csWfObject*, void*), void *param)
   }
 }
 
-csWireFrameCam::csWireFrameCam (iTextureManager* txtmgr)
+csWireFrameCam::csWireFrameCam (iTextureManager *txtmgr)
 {
   wf = new csWireFrame (txtmgr);
   c = new csCamera ();
@@ -403,56 +434,80 @@ csWireFrameCam::~csWireFrameCam ()
 
 void csWireFrameCam::KeyUp (float speed, bool slow, bool fast)
 {
-  if (slow) c->MoveUnrestricted (speed*0.01f*CS_VEC_FORWARD);
-  else if (fast) c->MoveUnrestricted (speed*1.2f*CS_VEC_FORWARD);
-  else c->MoveUnrestricted (speed*0.6f*CS_VEC_FORWARD);
+  if (slow)
+    c->MoveUnrestricted (speed * 0.01f * CS_VEC_FORWARD);
+  else if (fast)
+    c->MoveUnrestricted (speed * 1.2f * CS_VEC_FORWARD);
+  else
+    c->MoveUnrestricted (speed * 0.6f * CS_VEC_FORWARD);
 }
 
 void csWireFrameCam::KeyDown (float speed, bool slow, bool fast)
 {
-  if (slow) c->MoveUnrestricted (speed*0.01f*CS_VEC_BACKWARD);
-  else if (fast) c->MoveUnrestricted (speed*1.2f*CS_VEC_BACKWARD);
-  else c->MoveUnrestricted (speed*0.6f*CS_VEC_BACKWARD);
+  if (slow)
+    c->MoveUnrestricted (speed * 0.01f * CS_VEC_BACKWARD);
+  else if (fast)
+    c->MoveUnrestricted (speed * 1.2f * CS_VEC_BACKWARD);
+  else
+    c->MoveUnrestricted (speed * 0.6f * CS_VEC_BACKWARD);
 }
 
 void csWireFrameCam::KeyLeftStrafe (float speed, bool slow, bool fast)
 {
-  if (slow) c->MoveUnrestricted (speed*0.01f*CS_VEC_LEFT);
-  else if (fast) c->MoveUnrestricted (speed*1.2f*CS_VEC_LEFT);
-  else c->MoveUnrestricted (speed*0.6f*CS_VEC_LEFT);
+  if (slow)
+    c->MoveUnrestricted (speed * 0.01f * CS_VEC_LEFT);
+  else if (fast)
+    c->MoveUnrestricted (speed * 1.2f * CS_VEC_LEFT);
+  else
+    c->MoveUnrestricted (speed * 0.6f * CS_VEC_LEFT);
 }
 
 void csWireFrameCam::KeyRightStrafe (float speed, bool slow, bool fast)
 {
-  if (slow) c->MoveUnrestricted (speed*0.01f*CS_VEC_RIGHT);
-  else if (fast) c->MoveUnrestricted (speed*1.2f*CS_VEC_RIGHT);
-  else c->MoveUnrestricted (speed*0.6f*CS_VEC_RIGHT);
+  if (slow)
+    c->MoveUnrestricted (speed * 0.01f * CS_VEC_RIGHT);
+  else if (fast)
+    c->MoveUnrestricted (speed * 1.2f * CS_VEC_RIGHT);
+  else
+    c->MoveUnrestricted (speed * 0.6f * CS_VEC_RIGHT);
 }
 
 void csWireFrameCam::KeyLeft (float speed, bool slow, bool fast)
 {
-  if (slow) c->RotateThis (CS_VEC_ROT_LEFT, speed * 0.005f);
-  else if (fast) c->RotateThis (CS_VEC_ROT_LEFT, speed * 0.2f);
-  else c->RotateThis (CS_VEC_ROT_LEFT, speed * 0.1f);
+  if (slow)
+    c->RotateThis (CS_VEC_ROT_LEFT, speed * 0.005f);
+  else if (fast)
+    c->RotateThis (CS_VEC_ROT_LEFT, speed * 0.2f);
+  else
+    c->RotateThis (CS_VEC_ROT_LEFT, speed * 0.1f);
 }
 
 void csWireFrameCam::KeyRight (float speed, bool slow, bool fast)
 {
-  if (slow) c->RotateThis (CS_VEC_ROT_RIGHT, speed * 0.005f);
-  else if (fast) c->RotateThis (CS_VEC_ROT_RIGHT, speed * 0.2f);
-  else c->RotateThis (CS_VEC_ROT_RIGHT, speed * 0.1f);
+  if (slow)
+    c->RotateThis (CS_VEC_ROT_RIGHT, speed * 0.005f);
+  else if (fast)
+    c->RotateThis (CS_VEC_ROT_RIGHT, speed * 0.2f);
+  else
+    c->RotateThis (CS_VEC_ROT_RIGHT, speed * 0.1f);
 }
 
 void csWireFrameCam::KeyPgUp (float speed, bool slow, bool fast)
 {
-  if (slow) c->RotateThis (CS_VEC_TILT_UP, speed * 0.005f);
-  else if (fast) c->RotateThis (CS_VEC_TILT_UP, speed * 0.2f);
-  else c->RotateThis (CS_VEC_TILT_UP, speed * 0.1f);
+  if (slow)
+    c->RotateThis (CS_VEC_TILT_UP, speed * 0.005f);
+  else if (fast)
+    c->RotateThis (CS_VEC_TILT_UP, speed * 0.2f);
+  else
+    c->RotateThis (CS_VEC_TILT_UP, speed * 0.1f);
 }
 
 void csWireFrameCam::KeyPgDn (float speed, bool slow, bool fast)
 {
-  if (slow) c->RotateThis (CS_VEC_TILT_DOWN, speed * 0.005f);
-  else if (fast) c->RotateThis (CS_VEC_TILT_DOWN, speed * 0.2f);
-  else c->RotateThis (CS_VEC_TILT_DOWN, speed * 0.1f);
+  if (slow)
+    c->RotateThis (CS_VEC_TILT_DOWN, speed * 0.005f);
+  else if (fast)
+    c->RotateThis (CS_VEC_TILT_DOWN, speed * 0.2f);
+  else
+    c->RotateThis (CS_VEC_TILT_DOWN, speed * 0.1f);
 }
