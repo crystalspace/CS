@@ -121,19 +121,19 @@ struct iTextureList : public iBase
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith) = 0;
 
   /// Return the number of textures in this list
-  virtual int GetTextureCount () const = 0;
+  virtual int GetCount () const = 0;
 
   /// Return a texture by index
   virtual iTextureWrapper *Get (int n) const = 0;
 
   /// Add a texture
-  virtual int AddTexture (iTextureWrapper *obj) = 0;
+  virtual int Add (iTextureWrapper *obj) = 0;
 
   /// Remove a texture
-  virtual bool RemoveTexture (iTextureWrapper *obj) = 0;
+  virtual bool Remove (iTextureWrapper *obj) = 0;
 
   /// Remove the nth texture
-  virtual bool RemoveTexture (int n) = 0;
+  virtual bool Remove (int n) = 0;
 
   /// Remove all textures
   virtual void RemoveAll () = 0;

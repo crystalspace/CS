@@ -135,6 +135,11 @@ csCameraPositionList::csCameraPositionList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCameraPositionList);
 }
 
+csCameraPositionList::~csCameraPositionList ()
+{
+  DeleteAll ();
+}
+
 bool csCameraPositionList::FreeItem (csSome Item)
 {
   iCameraPosition* campos = (iCameraPosition*)Item;
@@ -185,6 +190,11 @@ csCollectionList::csCollectionList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCollectionList);
 }
 
+csCollectionList::~csCollectionList ()
+{
+  DeleteAll ();
+}
+
 bool csCollectionList::FreeItem (csSome Item)
 {
   iCollection* collection = (iCollection*)Item;
@@ -218,6 +228,11 @@ int csCollectionList::CollectionList::Find (iCollection *collection) const
 { return scfParent->Find (collection); }
 
 //---------------------------------------------------------------------------
+
+csEngineMeshList::~csEngineMeshList ()
+{
+  DeleteAll ();
+}
 
 bool csEngineMeshList::FreeItem (csSome Item)
 {

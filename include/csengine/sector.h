@@ -62,6 +62,8 @@ public:
 
   /// constructor
   csLightList ();
+  /// destructor
+  ~csLightList ();
 
   /// Set the sector.
   void SetSector (csSector* s) { sector = s; }
@@ -510,6 +512,8 @@ public:
 
   /// constructor
   csSectorList (bool CleanupReferences);
+  /// destructor
+  ~csSectorList ();
 
   /// override FreeItem
   virtual bool FreeItem (csSome Item);
@@ -519,11 +523,11 @@ public:
   public:
     SCF_DECLARE_EMBEDDED_IBASE (csSectorList);
 
-    virtual int GetSectorCount () const;
+    virtual int GetCount () const;
     virtual iSector *Get (int n) const;
-    virtual int AddSector (iSector *obj);
-    virtual bool RemoveSector (iSector *obj);
-    virtual bool RemoveSector (int n);
+    virtual int Add (iSector *obj);
+    virtual bool Remove (iSector *obj);
+    virtual bool Remove (int n);
     virtual void RemoveAll ();
     virtual int Find (iSector *obj) const;
     virtual iSector *FindByName (const char *Name) const;

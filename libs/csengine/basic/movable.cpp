@@ -44,6 +44,11 @@ csMovableSectorList::csMovableSectorList ()
   movable = NULL;
 }
 
+csMovableSectorList::~csMovableSectorList ()
+{
+  DeleteAll ();
+}
+
 int csMovableSectorList::AddSector (iSector* sector)
 {
   int n = -1;
@@ -69,15 +74,15 @@ bool csMovableSectorList::FreeItem (void *item)
   return true;
 }
 
-int csMovableSectorList::SectorList::GetSectorCount () const
+int csMovableSectorList::SectorList::GetCount () const
   { return scfParent->Length (); }
 iSector *csMovableSectorList::SectorList::Get (int n) const
   { return scfParent->Get (n); }
-int csMovableSectorList::SectorList::AddSector (iSector *obj)
+int csMovableSectorList::SectorList::Add (iSector *obj)
   { return scfParent->AddSector (obj); }
-bool csMovableSectorList::SectorList::RemoveSector (iSector *obj)
+bool csMovableSectorList::SectorList::Remove (iSector *obj)
   { return scfParent->Delete (obj); }
-bool csMovableSectorList::SectorList::RemoveSector (int n)
+bool csMovableSectorList::SectorList::Remove (int n)
   { return scfParent->Delete (n); }
 void csMovableSectorList::SectorList::RemoveAll ()
   { scfParent->DeleteAll (); }

@@ -87,19 +87,19 @@ struct iMaterialList : public iBase
   virtual iMaterialWrapper *NewMaterial (iMaterialHandle *ith) = 0;
 
   /// Return the number of materials in this list
-  virtual int GetMaterialCount () const = 0;
+  virtual int GetCount () const = 0;
 
   /// Return a material by index
   virtual iMaterialWrapper *Get (int n) const = 0;
 
   /// Add a material
-  virtual int AddMaterial (iMaterialWrapper *obj) = 0;
+  virtual int Add (iMaterialWrapper *obj) = 0;
 
   /// Remove a material
-  virtual bool RemoveMaterial (iMaterialWrapper *obj) = 0;
+  virtual bool Remove (iMaterialWrapper *obj) = 0;
 
   /// Remove the nth material
-  virtual bool RemoveMaterial (int n) = 0;
+  virtual bool Remove (int n) = 0;
 
   /// Remove all materials
   virtual void RemoveAll () = 0;

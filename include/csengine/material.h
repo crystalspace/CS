@@ -229,11 +229,11 @@ public:
 
     virtual iMaterialWrapper* NewMaterial (iMaterial* material);
     virtual iMaterialWrapper* NewMaterial (iMaterialHandle *ith);
-    virtual int GetMaterialCount () const;
+    virtual int GetCount () const;
     virtual iMaterialWrapper *Get (int n) const;
-    virtual int AddMaterial (iMaterialWrapper *obj);
-    virtual bool RemoveMaterial (iMaterialWrapper *obj);
-    virtual bool RemoveMaterial (int n);
+    virtual int Add (iMaterialWrapper *obj);
+    virtual bool Remove (iMaterialWrapper *obj);
+    virtual bool Remove (int n);
     virtual void RemoveAll ();
     virtual int Find (iMaterialWrapper *obj) const;
     virtual iMaterialWrapper *FindByName (const char *Name) const;

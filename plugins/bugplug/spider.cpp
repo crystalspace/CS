@@ -53,14 +53,14 @@ bool csSpider::DrawTest (iRenderView* rview, iMovable*)
 bool csSpider::WeaveWeb (iEngine* engine)
 {
   if (wrap) { engine->GetMeshes ()->RemoveMesh (wrap); wrap = NULL; }
-  if (engine->GetSectors ()->GetSectorCount () <= 0) return false;
+  if (engine->GetSectors ()->GetCount () <= 0) return false;
   wrap = engine->CreateMeshWrapper (this, "_@Spider@_");
   iMovable* movable = wrap->GetMovable ();
   int i;
-  for (i = 0 ; i < engine->GetSectors ()->GetSectorCount () ; i++)
+  for (i = 0 ; i < engine->GetSectors ()->GetCount () ; i++)
   {
     iSector* sec = engine->GetSectors ()->Get (i);
-    movable->GetSectors ()->AddSector (sec);
+    movable->GetSectors ()->Add (sec);
   }
   movable->UpdateMove ();
   return true;

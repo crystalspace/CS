@@ -130,7 +130,7 @@ void csRegion::Region::DeleteAll ()
       if (!o) continue;
 
       o->GetPrivateObject ()->CleanupReferences ();
-      scfParent->engine->GetSectors ()->RemoveSector (o);
+      scfParent->engine->GetSectors ()->Remove (o);
       scfParent->ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
@@ -143,7 +143,7 @@ void csRegion::Region::DeleteAll ()
       iMaterialWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
       if (!o) continue;
 
-      scfParent->engine->GetMaterialList ()->RemoveMaterial (o);
+      scfParent->engine->GetMaterialList ()->Remove (o);
       scfParent->ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
@@ -156,7 +156,7 @@ void csRegion::Region::DeleteAll ()
       iTextureWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iTextureWrapper);
       if (!o) continue;
 
-      scfParent->engine->GetTextureList ()->RemoveTexture (o);
+      scfParent->engine->GetTextureList ()->Remove (o);
       scfParent->ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();

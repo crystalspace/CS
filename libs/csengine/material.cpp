@@ -240,15 +240,15 @@ iMaterialWrapper* csMaterialList::MaterialList::NewMaterial (iMaterial* material
   { return scfParent->NewMaterial (material); }
 iMaterialWrapper* csMaterialList::MaterialList::NewMaterial (iMaterialHandle *ith)
   { return scfParent->NewMaterial (ith); }
-int csMaterialList::MaterialList::GetMaterialCount () const
+int csMaterialList::MaterialList::GetCount () const
   { return scfParent->Length (); }
 iMaterialWrapper *csMaterialList::MaterialList::Get (int n) const
   { return scfParent->Get (n); }
-int csMaterialList::MaterialList::AddMaterial (iMaterialWrapper *obj)
+int csMaterialList::MaterialList::Add (iMaterialWrapper *obj)
   { return scfParent->Push (obj); }
-bool csMaterialList::MaterialList::RemoveMaterial (iMaterialWrapper *obj)
+bool csMaterialList::MaterialList::Remove (iMaterialWrapper *obj)
   { return scfParent->Delete (obj); }
-bool csMaterialList::MaterialList::RemoveMaterial (int n)
+bool csMaterialList::MaterialList::Remove (int n)
   { return scfParent->Delete (n); }
 void csMaterialList::MaterialList::RemoveAll ()
   { scfParent->DeleteAll (); }

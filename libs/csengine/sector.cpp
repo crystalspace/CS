@@ -73,6 +73,11 @@ csLightList::csLightList ()
   sector = NULL;
 }
 
+csLightList::~csLightList ()
+{
+  DeleteAll ();
+}
+
 bool csLightList::FreeItem (csSome Item)
 {
   iLight* light = (iLight*)Item;
@@ -1190,6 +1195,11 @@ csSectorList::csSectorList (bool cr)
   CleanupReferences = cr;
 }
 
+csSectorList::~csSectorList ()
+{
+  DeleteAll ();
+}
+
 bool csSectorList::FreeItem (csSome Item)
 {
   if (CleanupReferences)
@@ -1197,15 +1207,15 @@ bool csSectorList::FreeItem (csSome Item)
   return csSectorListHelper::FreeItem (Item);
 }
 
-int csSectorList::SectorList::GetSectorCount () const
+int csSectorList::SectorList::GetCount () const
   { return scfParent->Length (); }
 iSector *csSectorList::SectorList::Get (int n) const
   { return scfParent->Get (n); }
-int csSectorList::SectorList::AddSector (iSector *obj)
+int csSectorList::SectorList::Add (iSector *obj)
   { return scfParent->Push (obj); }
-bool csSectorList::SectorList::RemoveSector (iSector *obj)
+bool csSectorList::SectorList::Remove (iSector *obj)
   { return scfParent->Delete (obj); }
-bool csSectorList::SectorList::RemoveSector (int n)
+bool csSectorList::SectorList::Remove (int n)
   { return scfParent->Delete (n); }
 void csSectorList::SectorList::RemoveAll ()
   { scfParent->DeleteAll (); }

@@ -594,7 +594,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	{
 	  int enable_disable = -1;
 	  int i, j;
-	  for (i = 0 ; i < Engine->GetSectors ()->GetSectorCount () ; i++)
+	  for (i = 0 ; i < Engine->GetSectors ()->GetCount () ; i++)
 	  {
 	    iSector* sector = Engine->GetSectors ()->Get (i);
 	    iMeshList* ml = sector->GetMeshes ();
@@ -993,11 +993,11 @@ void csBugPlug::Dump (iEngine* engine)
   iMeshFactoryList* factories = engine->GetMeshFactories ();
   Report (CS_REPORTER_SEVERITY_DEBUG,
     "%d sectors, %d mesh factories, %d mesh objects",
-    sectors->GetSectorCount (),
+    sectors->GetCount (),
     factories->GetMeshFactoryCount (),
     meshes->GetMeshCount ());
   int i;
-  for (i = 0 ; i < sectors->GetSectorCount () ; i++)
+  for (i = 0 ; i < sectors->GetCount () ; i++)
   {
     iSector* sector = sectors->Get (i);
     Dump (sector);
@@ -1067,7 +1067,7 @@ void csBugPlug::Dump (iMeshWrapper* mesh)
     csReversibleTransform& trans = movable->GetTransform ();
     Dump (8, trans.GetOrigin (), "Movable origin");
     Dump (8, trans.GetO2T (), "Movable O2T");
-    int cnt = movable->GetSectors ()->GetSectorCount ();
+    int cnt = movable->GetSectors ()->GetCount ();
     int i;
     for (i = 0 ; i < cnt ; i++)
     {

@@ -2108,7 +2108,7 @@ void Blocks::ReplaceMenuItem (int idx, int menu_nr)
 
 void Blocks::ChangePlaySize (int new_size)
 {
-  engine->GetSectors ()->RemoveSector (room);
+  engine->GetSectors ()->Remove (room);
   player1->zone_dim = new_size;
   WriteConfig ();
   InitGameRoom ();

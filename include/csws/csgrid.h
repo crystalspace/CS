@@ -133,6 +133,8 @@ class csSparseGrid
   public:
     // Initialize the grid row set object
     csGridRowSet (int theRow) : csGridRow (theRow) {}
+    // destructor
+    virtual ~csGridRowSet () {DeleteAll ();}
     // Free a particular grid row object
     virtual bool FreeItem (csSome Item)
     {

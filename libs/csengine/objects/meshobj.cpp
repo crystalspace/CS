@@ -164,7 +164,7 @@ void csMeshWrapper::RemoveFromSectors ()
 
   int i;
   const iSectorList *sectors = movable.GetSectors ();
-  for (i = 0 ; i < sectors->GetSectorCount () ; i++)
+  for (i = 0 ; i < sectors->GetCount () ; i++)
   {
     iSector* ss = sectors->Get (i);
     if (ss)
@@ -180,7 +180,7 @@ void csMeshWrapper::SetRenderPriority (long rp)
 
   int i;
   const iSectorList *sectors = movable.GetSectors ();
-  for (i = 0 ; i < sectors->GetSectorCount () ; i++)
+  for (i = 0 ; i < sectors->GetCount () ; i++)
   {
     iSector* ss = sectors->Get (i);
     if (ss) ss->GetPrivateObject ()->RelinkMesh (this);
@@ -193,7 +193,7 @@ static CS_DECLARE_GROWING_ARRAY_REF (light_worktable, iLight*);
 void csMeshWrapper::UpdateDeferedLighting (const csVector3& pos)
 {
   const iSectorList* movable_sectors = movable.GetSectors ();
-  if (defered_num_lights && movable_sectors->GetSectorCount () > 0)
+  if (defered_num_lights && movable_sectors->GetCount () > 0)
   {
     if (defered_num_lights > light_worktable.Limit ())
       light_worktable.SetLimit (defered_num_lights);
@@ -282,7 +282,7 @@ void csMeshWrapper::UpdateLighting (iLight** lights, int num_lights)
 void csMeshWrapper::PlaceMesh ()
 {
   iSectorList* movable_sectors = movable.GetSectors ();
-  if (movable_sectors->GetSectorCount () == 0) return;	// Do nothing
+  if (movable_sectors->GetCount () == 0) return;	// Do nothing
 
   csSphere sphere;
   csVector3 radius;
@@ -336,7 +336,7 @@ void csMeshWrapper::PlaceMesh ()
 	      iSector* dest_sector = portal->GetSector ();
 	      if (movable_sectors->Find (dest_sector) == -1)
 	      {
-	        movable_sectors->AddSector (dest_sector);
+	        movable_sectors->Add (dest_sector);
 	      }
 	    }
 	  }
@@ -675,6 +675,11 @@ csMeshList::csMeshList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshList);
 }
 
+csMeshList::~csMeshList ()
+{
+  DeleteAll ();
+}
+
 bool csMeshList::FreeItem (csSome Item)
 {
   iMeshWrapper* mesh = (iMeshWrapper*)Item;
@@ -730,6 +735,11 @@ csMeshFactoryList::csMeshFactoryList ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryList);
+}
+
+csMeshFactoryList::~csMeshFactoryList ()
+{
+  DeleteAll ();
 }
 
 bool csMeshFactoryList::FreeItem (csSome Item)

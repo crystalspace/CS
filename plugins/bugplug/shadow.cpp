@@ -54,7 +54,7 @@ bool csShadow::DrawTest (iRenderView* rview, iMovable*)
   iMovable* shadow_movable = shadow_mesh->GetMovable ();
   iSector* sector = rview->GetCamera ()->GetSector ();
   int i;
-  for (i = 0 ; i < shadow_movable->GetSectors ()->GetSectorCount () ; i++)
+  for (i = 0 ; i < shadow_movable->GetSectors ()->GetCount () ; i++)
   {
     iSector* sec = shadow_movable->GetSectors ()->Get (i);
     if (sec == sector)
@@ -139,15 +139,15 @@ void csShadow::SetShadowMesh (iMeshWrapper* sh)
 bool csShadow::AddToEngine (iEngine* engine)
 {
   if (wrap) { engine->GetMeshes ()->RemoveMesh (wrap); wrap = NULL; }
-  if (engine->GetSectors ()->GetSectorCount () <= 0) return false;
+  if (engine->GetSectors ()->GetCount () <= 0) return false;
   wrap = engine->CreateMeshWrapper (this, "_@Shadow@_");
   wrap->SetRenderPriority (engine->GetAlphaRenderPriority ());
   iMovable* movable = wrap->GetMovable ();
   int i;
-  for (i = 0 ; i < engine->GetSectors ()->GetSectorCount () ; i++)
+  for (i = 0 ; i < engine->GetSectors ()->GetCount () ; i++)
   {
     iSector* sec = engine->GetSectors ()->Get (i);
-    movable->GetSectors ()->AddSector (sec);
+    movable->GetSectors ()->Add (sec);
   }
   movable->UpdateMove ();
   return true;

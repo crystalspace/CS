@@ -42,6 +42,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csMovableSectorList ();
+  ~csMovableSectorList ();
   void SetMovable (csMovable* mov) { movable = mov; }
 
   int AddSector (iSector* sec);
@@ -52,11 +53,11 @@ public:
   public:
     SCF_DECLARE_EMBEDDED_IBASE (csMovableSectorList);
 
-    virtual int GetSectorCount () const;
+    virtual int GetCount () const;
     virtual iSector *Get (int n) const;
-    virtual int AddSector (iSector *obj);
-    virtual bool RemoveSector (iSector *obj);
-    virtual bool RemoveSector (int n);
+    virtual int Add (iSector *obj);
+    virtual bool Remove (iSector *obj);
+    virtual bool Remove (int n);
     virtual void RemoveAll ();
     virtual int Find (iSector *obj) const;
     virtual iSector *FindByName (const char *Name) const;

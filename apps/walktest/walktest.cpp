@@ -1142,7 +1142,7 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 
     iPolygonMesh* mesh;
     /*
-    int sn = engine->GetSectors ()->GetSectorCount ();
+    int sn = engine->GetSectors ()->GetCount ();
     while (sn > 0)
     {
       sn--;

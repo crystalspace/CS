@@ -154,19 +154,19 @@ SCF_VERSION (iSectorList, 0, 0, 2);
 struct iSectorList : public iBase
 {
   /// Return the number of sectors in this list
-  virtual int GetSectorCount () const = 0;
+  virtual int GetCount () const = 0;
 
   /// Return a sector by index
   virtual iSector *Get (int n) const = 0;
 
   /// Add a sector
-  virtual int AddSector (iSector *obj) = 0;
+  virtual int Add (iSector *obj) = 0;
 
   /// Remove a sector
-  virtual bool RemoveSector (iSector *obj) = 0;
+  virtual bool Remove (iSector *obj) = 0;
 
   /// Remove the nth sector
-  virtual bool RemoveSector (int n) = 0;
+  virtual bool Remove (int n) = 0;
 
   /// Remove all sectors
   virtual void RemoveAll () = 0;

@@ -400,7 +400,7 @@ bool csLoader::LoadMap (char* buf)
   }
  
   int i,j;
-  for (i=0; i<Engine->GetSectors ()->GetSectorCount(); i++)
+  for (i=0; i<Engine->GetSectors ()->GetCount(); i++)
   {
     iSector *Sector = Engine->GetSectors ()->Get (i);
     if (ResolveOnlyRegion)
@@ -1874,7 +1874,7 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
 	  iLight* l = NULL;
 	  iSectorList* sl = Engine->GetSectors ();
 	  int i;
-	  for (i = 0 ; i < sl->GetSectorCount () ; i++)
+	  for (i = 0 ; i < sl->GetCount () ; i++)
 	  {
 	    iSector* sect = sl->Get (i);
 	    if ((!ResolveOnlyRegion) || (!Engine->GetCurrentRegion ()) ||

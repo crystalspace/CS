@@ -52,6 +52,8 @@ public:
 
   /// constructor
   csMeshList ();
+  /// destructor
+  ~csMeshList ();
 
   /// Override FreeItem
   virtual bool FreeItem (csSome Item);
@@ -105,6 +107,8 @@ public:
 
   /// constructor
   csMeshFactoryList ();
+  /// destructor
+  ~csMeshFactoryList ();
 
   /// override FreeItem
   virtual bool FreeItem (csSome Item);

@@ -141,18 +141,27 @@ public:
 };
 
 /**
- * Declare an object vector class which correctly handles the reference
- * count of the contained objects.
- */
-#define CS_DECLARE_OBJECT_VECTOR(NAME,TYPE)				\
-  CS_PRIVATE_DECLARE_OBJECT_VECTOR (NAME, TYPE)
-
-/**
  * Declare an object vector class which leaves the reference count of the
  * contained objects untouched.
  */
 #define CS_DECLARE_OBJECT_VECTOR_NOREF(NAME,TYPE)			\
   CS_PRIVATE_DECLARE_OBJECT_VECTOR_NOREF (NAME, TYPE)
+
+/**
+ * Declare an object vector class which contains overridable PrepareItem(),
+ * FreeItem() and PopItem() functions. The vector still leaves the RefCount
+ * of the contained objects untouched.
+ */
+#define CS_DECLARE_OBJECT_VECTOR(NAME,TYPE)				\
+  CS_PRIVATE_DECLARE_OBJECT_VECTOR (NAME, TYPE)
+
+/**
+ * Declare an object vector class which handles the reference count of the
+ * contained object correctly and also contains overridable PrepareItem(),
+ * FreeItem() and PopItem() functions.
+ */
+#define CS_DECLARE_RESTRICED_ACCESS_OBJECT_VECTOR(NAME,TYPE)		\
+  CS_PRIVATE_DECLARE_RESTRICED_ACCESS_OBJECT_VECTOR (NAME, TYPE)
 
 //----------------------------------------------------------------------------
 //--- implementation of the above macros follows -----------------------------
@@ -166,6 +175,10 @@ public:
   CS_PRIVATE_DECLARE_OBJECT_VECTOR_COMMON (				\
     CS_DECLARE_TYPED_VECTOR_NODELETE, NAME, TYPE)
 
+#define CS_PRIVATE_DECLARE_RESTRICTED_ACCESS_OBJECT_VECTOR(NAME,TYPE)	\
+  CS_PRIVATE_DECLARE_OBJECT_VECTOR_COMMON (				\
+    CS_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR, NAME, TYPE)
+
 #define CS_PRIVATE_DECLARE_OBJECT_VECTOR_COMMON(MACRO,NAME,TYPE)	\
   CS_BEGIN_TYPED_VECTOR (MACRO, NAME, TYPE)				\
   private:								\
@@ -174,6 +187,8 @@ public:
     NAME (int ilimit = 16, int ithreshold = 16) :			\
       NAME##_Helper (ilimit, ithreshold)				\
       {ObjVec.SetVector (this);}					\
+    virtual ~NAME ()							\
+      { DeleteAll (); }							\
     inline csNamedObjectVector *GetObjectVector ()			\
       { return &ObjVec; }						\
     inline const csNamedObjectVector *GetObjectVector () const		\

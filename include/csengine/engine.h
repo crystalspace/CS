@@ -244,6 +244,8 @@ public:
 
   /// constructor
   csCollectionList ();
+  /// destructor
+  ~csCollectionList ();
 
   /// Override FreeItem
   virtual bool FreeItem (csSome Item);
@@ -283,6 +285,8 @@ public:
 
   /// constructor
   csCameraPositionList ();
+  /// destructor
+  ~csCameraPositionList ();
 
   /// Override FreeItem
   virtual bool FreeItem (csSome Item);
@@ -315,6 +319,7 @@ public:
 class csEngineMeshList : public csMeshList
 {
 public:
+  ~csEngineMeshList ();
   virtual bool FreeItem (csSome Item);
   virtual void RemoveMesh (iMeshWrapper* mesh);
 };

@@ -207,15 +207,15 @@ iTextureWrapper *csTextureList::TextureList::NewTexture (iImage *image)
   { return scfParent->NewTexture (image); }
 iTextureWrapper *csTextureList::TextureList::NewTexture (iTextureHandle *ith)
   { return scfParent->NewTexture (ith); }
-int csTextureList::TextureList::GetTextureCount () const
+int csTextureList::TextureList::GetCount () const
   { return scfParent->Length (); }
 iTextureWrapper *csTextureList::TextureList::Get (int n) const
   { return scfParent->Get (n); }
-int csTextureList::TextureList::AddTexture (iTextureWrapper *obj)
+int csTextureList::TextureList::Add (iTextureWrapper *obj)
   { return scfParent->Push (obj); }
-bool csTextureList::TextureList::RemoveTexture (iTextureWrapper *obj)
+bool csTextureList::TextureList::Remove (iTextureWrapper *obj)
   { return scfParent->Delete (obj); }
-bool csTextureList::TextureList::RemoveTexture (int n)
+bool csTextureList::TextureList::Remove (int n)
   { return scfParent->Delete (n); }
 void csTextureList::TextureList::RemoveAll ()
   { scfParent->DeleteAll (); }

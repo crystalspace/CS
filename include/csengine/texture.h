@@ -206,11 +206,11 @@ public:
 
     virtual iTextureWrapper *NewTexture (iImage *image);
     virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
-    virtual int GetTextureCount () const;
+    virtual int GetCount () const;
     virtual iTextureWrapper *Get (int n) const;
-    virtual int AddTexture (iTextureWrapper *obj);
-    virtual bool RemoveTexture (iTextureWrapper *obj);
-    virtual bool RemoveTexture (int n);
+    virtual int Add (iTextureWrapper *obj);
+    virtual bool Remove (iTextureWrapper *obj);
+    virtual bool Remove (int n);
     virtual void RemoveAll ();
     virtual int Find (iTextureWrapper *obj) const;
     virtual iTextureWrapper *FindByName (const char *Name) const;

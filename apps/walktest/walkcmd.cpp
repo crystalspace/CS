@@ -616,7 +616,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 void WalkTest::ParseKeyCmds ()
 {
   int i;
-  for (i = 0 ; i < Engine->GetSectors ()->GetSectorCount () ; i++)
+  for (i = 0 ; i < Engine->GetSectors ()->GetCount () ; i++)
   {
     iSector* sector = Engine->GetSectors ()->Get (i);
     ParseKeyCmds (sector->QueryObject ());

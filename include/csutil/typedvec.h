@@ -48,7 +48,13 @@
  *      return references to the contained objects which let you assign
  *      them directly. This is not possible for iBase vectors, as it
  *      circumvents proper reference-counting.
- * </ul>
+ * </ul><p>
+ *
+ * IMPORTANT: When you create a subclass of a vector class and override
+ * FreeItem(), you must also override the destructor and call DeleteAll()
+ * (or delete the items manually) in it. Don't rely on the superclass to do
+ * this. Due to the way destruction works in C++, this would cause the
+ * *non-derived* FreeItem() to be called from the destructor.
  */
 
 /**
@@ -94,10 +100,24 @@
 /**
  * Construct a typed vector class called 'NAME', storing (TYPE*) objects.
  * The contained objects must be subclasses of iBase (this is not
- * checked by the compiler!!!)
+ * checked by the compiler!!!). The objects are IncRef'ed when added and
+ * DecRef'ed when removed. There is only one exeption: The Pop() function
+ * does not DecRef the object, so you should do that yourself. The reason
+ * is that at the time you call Pop(), you do usually not have a pointer
+ * to the object, so you can not IncRef() it before. <p>
  */
 #define CS_DECLARE_TYPED_IBASE_VECTOR(NAME,TYPE)			\
   CS_PRIVATE_DECLARE_TYPED_IBASE_VECTOR (NAME, TYPE)
+
+/**
+ * Construct a restricted-access vector class. Elements may not be assigned
+ * directly (use Replace() instead). The class contains functions called
+ * PrepareItem(), FreeItem() and PopItem(), each of which takes a void*
+ * as its parameter. These functions are called when items are added, removed
+ * or removed with Pop().
+ */
+#define CS_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR(NAME,TYPE)		\
+  CS_PRIVATE_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR (NAME, TYPE)
 
 /**
  * Begin the class definition of a typed vector. The 'macro' parameter
@@ -114,6 +134,12 @@
  * between CS_BEGIN_TYPED_VECTOR() and CS_FINISH_TYPED_VECTOR(), it will
  * not be called! (more exactly: It will not override the FreeTypedItem
  * that is defined by 'MACRO')
+ *
+ * EVEN MORE IMPORTANT: If you override FreeItem(), you *must* call
+ * DeleteAll() in the destructor of your derived class. Don't rely on the
+ * superclass to do this. Due to the way destruction works in C++, this
+ * would cause the *non-derived* FreeItem() to be called from the destructor.
+ * @@@
  */
 #define CS_BEGIN_TYPED_VECTOR(MACRO,NAME,TYPE)				\
   CS_PRIVATE_BEGIN_USER_VECTOR(MACRO,NAME,TYPE)
@@ -136,6 +162,76 @@
 //--- implementation of the above macros follows -----------------------------
 //----------------------------------------------------------------------------
 
+/**
+ * Subclass of csVector that restricts access to the contained objects. The
+ * contents of the vector may not be assigned directly anymore. For every
+ * added element, the PrepareItem() function is called. For every
+ * removed element, the FreeItem() function is called. The Pop() function
+ * is handled specially, and PopItem() it called. <p>
+ *
+ * All three functions may return false to abort the push/pop/remove operation.
+ */
+class csRestrictedAccessVector : public csVector
+{
+public:
+  virtual bool PrepareItem (csSome item)
+  { return true; }
+  virtual bool FreeItem (csSome item)
+  { return true; }
+  virtual bool PopItem (csSome item)
+  { return true; }
+
+  inline csRestrictedAccessVector (int lim, int thr) : csVector (lim, thr) {}
+  inline bool Delete (int n)
+  {
+    return csVector::Delete (n, true);
+  }
+  inline bool Delete (csSome what)
+  {
+    return csVector::Delete (what, true);
+  }
+  inline void DeleteAll ()
+  {
+    csVector::DeleteAll (true);
+  }
+  inline int Push (csSome what)
+  {
+    if (!PrepareItem (what)) return -1;
+    return csVector::Push(what); 
+  }
+  inline int PushSmart (csSome what)
+  {
+    int n = Find (what);
+    if (n != -1) return n;
+
+    if (!PrepareItem (what)) return -1;
+    return csVector::Push(what); 
+  }
+  inline bool Insert (int n, csSome Item)
+  {
+    if (!PrepareItem (Item)) return false;
+    return csVector::Insert (n, Item);
+  }
+  inline int InsertSorted (csSome Item, int *oEqual = NULL, int Mode = 0)
+  {
+    if (!PrepareItem (Item)) return -1;
+    return csVector::InsertSorted (Item, oEqual, Mode); 
+  }
+  inline bool Replace (int n, csSome what)
+  {
+    if (!PrepareItem (what)) return false;
+    return csVector::Replace (n, what, true);
+  }
+  inline csSome Pop ()
+  {
+    void *item = csVector::Pop ();
+    if (PopItem (item))
+      return item;
+    Push (item);
+    return NULL;
+  }
+};
+
 /*
  * Helper class for vectors that contain 'iBase' objects. It assumes that
  * the contained objects may be cast to 'iBase'. Note that it does not
@@ -146,57 +242,27 @@
  * Also, this means that CS_DECLARE_IBASE_VECTOR only has to cast from and to
  * (void*), which is always possible.  Theoretically, casting from and to iBase
  * is also always possible because the contained objects *must* be derived from
- * iBase.  Hwever, at the time CS_DECLARE_IBASE_VECTOR is used, this
+ * iBase. However, at the time CS_DECLARE_IBASE_VECTOR is used, this
  * inheritance may be unknown to the compiler because the class definition of
- * the contained class did not yet appear.
+ * the contained class did not yet appear. <p>
  */
-class csIBaseVector : public csVector
+class csIBaseVector : public csRestrictedAccessVector
 {
 public:
-  inline csIBaseVector (int lim, int thr) : csVector (lim, thr) {}
-  inline bool Delete (int n)
-  {
-    return csVector::Delete (n, true); 
-  }
-  inline bool Delete (csSome what)
-  {
-    return csVector::Delete (what, true); 
-  }
-  inline void DeleteAll ()
-  {
-    csVector::DeleteAll (true);
-  }
-  inline int Push (csSome what)
-  {
-    if (what) ((iBase*)what)->IncRef ();
-    return csVector::Push((csSome)what); 
-  }
-  inline int PushSmart (csSome what)
-  {
-    int n = Find (what);
-    if (n != -1) return n;
+  inline csIBaseVector (int lim, int thr) : csRestrictedAccessVector (lim, thr) {}
 
-    if (what) ((iBase*)what)->IncRef ();
-    return csVector::Push((csSome)what); 
-  }
-  inline bool Insert (int n, csSome Item)
+  virtual bool PrepareItem (csSome Item)
   {
-    if (Item) ((iBase*)Item)->IncRef ();
-    return csVector::Insert (n, (csSome)Item);
-  }
-  inline int InsertSorted (csSome Item, int *oEqual = NULL, int Mode = 0)
-  {
-    if (Item) ((iBase*)Item)->IncRef ();
-    return csVector::InsertSorted ((csSome)Item, oEqual, Mode); 
-  }
-  inline bool Replace (int n, csSome what)
-  {
-    if (what) ((iBase*)what)->IncRef ();
-    return csVector::Replace(n, (csSome)what, true);
+    ((iBase*)Item)->IncRef ();
+    return true;
   }
   virtual bool FreeItem (csSome Item)
   {
-    if (Item) ((iBase *)Item)->DecRef ();
+    ((iBase*)Item)->DecRef ();
+    return true;
+  }
+  virtual bool PopItem (csSome /*item*/)
+  {
     return true;
   }
 };
@@ -339,32 +405,21 @@ public:
     inline bool FreeTypedItem (TYPE *Item)                 \
     { Item->DecRef(); Item = NULL; return true; }          \
   CS_PRIVATE_FINISH_TYPED_VECTOR (TYPE)
-  
-/*
- * This is a special version of typed vectors that contain SCF objects. The
- * vector will correctly IncRef all added objects and DecRef all removed
- * objects. There is only one exeption: The Pop() function does not DecRef
- * the object, so you should do that yourself. The reason is that at the time
- * you call Pop(), you do usually not have a pointer to the object, so you can
- * not IncRef() it before. <p>
- *
- * Be careful with user-defined methods in typed vectors. Though the
- * vectors are type-safe to the outside, it is still possible to access
- * csVector members (type-unsafe!) from the inside, i.e. from your own methods.
- *
- * Usage:
- *   CS_PRIVATE_DECLARE_TYPED_IBASE_VECTOR (NAME, TYPE)
- *
- * Parameters:
- *   NAME - Name of the new vector class.
- *   TYPE - Data type to which this vector refer.
- *          The TYPE should be possible to cast to (void *) and back.
+
+/**
+ * This macro can be used to define restricted-access vectors. The vector
+ * class inherits from 'sclass'. See csRestrictedAccessVector for
+ * details.
  */
-#define CS_PRIVATE_DECLARE_TYPED_IBASE_VECTOR(NAME,TYPE)		\
-  class NAME : csIBaseVector						\
+#define CS_PRIVATE_DECLARE_TYPED_RESTR_ACC_VECTOR(NAME,TYPE,sclass)	\
+  class NAME : sclass							\
   {									\
-    typedef csIBaseVector superclass;					\
   protected:								\
+    typedef sclass superclass;						\
+    inline bool PrepareItem (csSome item)				\
+    { return superclass::PrepareItem (item); }				\
+    inline bool PopItem (csSome item)					\
+    { return superclass::PopItem (item); }				\
     inline bool FreeItem (csSome item)					\
     { return superclass::FreeItem (item); }				\
   public:								\
@@ -382,6 +437,31 @@ public:
     inline bool Replace (int n, TYPE *what)				\
     { return superclass::Replace(n, (csSome)what); }			\
   }
+
+#define CS_PRIVATE_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR(NAME,TYPE)	\
+  CS_PRIVATE_DECLARE_TYPED_RESTR_ACC_VECTOR (NAME, TYPE, csRestrictedAccessVector)
+
+#define CS_PRIVATE_DECLARE_TYPED_IBASE_VECTOR(NAME,TYPE)		\
+  CS_PRIVATE_DECLARE_TYPED_RESTR_ACC_VECTOR (NAME, TYPE, csIBaseVector)
+  
+/*
+ * This is a special version of typed vectors that contain SCF objects. The
+ * vector will correctly IncRef all added objects and DecRef all removed
+ * objects. There is only one exeption: The Pop() function does not DecRef
+ * the object, so you should do that yourself. The reason is that at the time
+ * you call Pop(), you do usually not have a pointer to the object, so you can
+ * not IncRef() it before. <p>
+ *
+ * Usage:
+ *   CS_PRIVATE_DECLARE_TYPED_RESTR_ACC_VECTOR (superclass, NAME, TYPE)
+ *
+ * Parameters:
+ *   superclass - The parent class. May be either csIBaseVector or
+ *                csRestrictedAccessVector.
+ *   NAME - Name of the new vector class.
+ *   TYPE - Data type to which this vector refer.
+ *          The TYPE should be possible to cast to (void *) and back.
+ */
 
 #define CS_PRIVATE_IMPLEMENT_TYPED_VECTOR_DELETE(NAME,TYPE)		\
   bool NAME::FreeTypedItem (TYPE *Item)					\
