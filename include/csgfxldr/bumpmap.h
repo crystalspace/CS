@@ -20,7 +20,7 @@
 #define __CS_BUMPMAP_H__
 
 #include "cstypes.h"
-class iImage;
+struct iImage;
 
 /** 
  * Bumpmap formats. The different hardware and software renderers may

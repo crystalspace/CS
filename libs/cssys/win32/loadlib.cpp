@@ -49,6 +49,6 @@ bool csUnloadLibrary (csLibraryHandle Handle)
   return FreeLibrary ((HMODULE)Handle)!=0;
 }
 
-void csPrintLibraryError (const char *iModule)
+void csPrintLibraryError (const char * /*iModule*/)
 {
 }
