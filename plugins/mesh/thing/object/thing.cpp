@@ -2996,10 +2996,7 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   csThing::lightmap_quality = cfg->GetInt (
       "Mesh.Thing.LightmapQuality", 3);
   if (csThingObjectType::do_verbose)
-  {
-    printf ("Lightmap quality=%d\n", csThing::lightmap_quality);
-    fflush (stdout);
-  }
+    Notify ("Lightmap quality=%d\n", csThing::lightmap_quality);
 
   return true;
 }
@@ -3104,10 +3101,7 @@ bool csThingObjectType::eiConfig::SetOption (int id, csVariant *value)
     case 1:
       csThing::lightmap_quality = value->GetLong ();
       if (csThingObjectType::do_verbose)
-      {
-        printf ("Lightmap quality=%d\n", csThing::lightmap_quality);
-        fflush (stdout);
-      }
+	scfParent->Notify ("Lightmap quality=%d\n", csThing::lightmap_quality);
       break;
     default:
       return false;

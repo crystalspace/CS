@@ -1372,3 +1372,11 @@ global namespace.
 @item
 @code{CONST_CAST()} @result{} @code{CS_CONST_CAST()}
 @end itemize
+
+@subheading Texture manager change
+@cindex @code{iTextureManager}
+@cindex @code{SetVerbose}
+
+The @code{iTextureManager::SetVerbose()} function has been removed. It
+was not useful.
+

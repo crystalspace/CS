@@ -9,6 +9,11 @@ chronological order.
 4-Mar-2004
 	- Eric Sunshine renamed the CS Java bindings package to
 	  com.crystalspace (was net.sourceforge.crystal).
+	- Jorrit fixed a 'verbose' message to use the reporter instead
+	  of printf in thing mesh plugin.
+	- Jorrit removed the iTextureManager->SetVerbose() function. This was
+	  not used and it is also better to handle this using -verbose
+	  commandline option if needed.
 3-Mar-2004
 	- Eric Sunshine added REGEX.AVAILABLE=no to msvcgen/required.mak to
 	  ensure that generic/regex.c gets included in csutil project file.

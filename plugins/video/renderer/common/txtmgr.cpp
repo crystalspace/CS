@@ -335,7 +335,6 @@ csTextureManager::csTextureManager (iObjectRegistry* object_reg,
 {
   SCF_CONSTRUCT_IBASE (0);
   csTextureManager::object_reg = object_reg;
-  verbose = false;
 
   pfmt = *iG2D->GetPixelFormat ();
 }

@@ -569,14 +569,6 @@ uint32 csSoftwareTextureManager::encode_rgb (int r, int g, int b)
 
 void csSoftwareTextureManager::PrepareTextures ()
 {
-  if (verbose)
-    G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Preparing textures (%s dithering)...",
-	dither_textures ? "with" : "no");
-
-  if (verbose)
-    G3D->Report (CS_REPORTER_SEVERITY_NOTIFY, "  Creating texture mipmaps...");
-
   int i;
 
   // Create mipmaps for all textures

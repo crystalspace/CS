@@ -41,7 +41,6 @@
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
-#include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "ivideo/fontserv.h"
@@ -304,9 +303,8 @@ bool Simple::Initialize ()
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-
   // Load a texture for our sprite.
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
   iTextureWrapper* txt = loader->LoadTexture ("spark",
     "/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
   if (txt == 0)

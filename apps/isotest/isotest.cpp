@@ -241,7 +241,6 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   // Setup the texture manager
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
-  txtmgr->SetVerbose (true);
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY,

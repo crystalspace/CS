@@ -134,7 +134,6 @@ In the source file @file{simple.cpp} we place the following:
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
-#include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "ivideo/fontserv.h"
@@ -458,10 +457,6 @@ bool Simple::Initialize ()
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
         "crystalspace.application.simple",
         "Simple Crystal Space Application version 0.1.");
-
-  // Setup the texture manager
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetVerbose (true);
 
   @dots{}
   // First disable the lighting cache. Our app is simple enough

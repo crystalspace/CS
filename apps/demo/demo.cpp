@@ -35,7 +35,6 @@
 #include "ivideo/natwin.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
-#include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
@@ -280,10 +279,6 @@ bool Demo::Initialize (int argc, const char* const argv[],
     Cleanup ();
     exit (1);
   }
-
-  // Setup the texture manager
-  iTextureManager* txtmgr = myG3D->GetTextureManager ();
-  txtmgr->SetVerbose (true);
 
   font = myG2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 

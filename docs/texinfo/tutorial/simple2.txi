@@ -62,6 +62,7 @@ bool Simple::Initialize()
   @dots{}
 
   // Load a texture for our sprite.
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
   iTextureWrapper* txt = loader->LoadTexture ("spark",
   	"/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
   if (txt == 0)

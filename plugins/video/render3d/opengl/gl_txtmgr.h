@@ -450,8 +450,6 @@ class csGLTextureManager : public iTextureManager
 
   csPixelFormat pfmt;
   
-  bool verbose;
-
   void AlterTargetFormat (const char *oldTarget, const char *newTarget);
 
   iObjectRegistry *object_reg;
@@ -586,13 +584,6 @@ public:
    * given to this texture manager.
    */
   virtual void FreeMaterials ();
-
-  /**
-   * Set verbose mode on/off. In verbose mode, texture manager will
-   * Printf() through the system driver during all initialization and
-   * preparation operations.
-   */
-  virtual void SetVerbose (bool vb);
 
   /**
    * Query the basic format of textures that can be registered with this

@@ -875,7 +875,6 @@ bool ViewMesh::Initialize ()
 
   // Setup the texture manager
   iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetVerbose (true);
 
   Printf (CS_REPORTER_SEVERITY_NOTIFY,
     "View Mesh version 0.1.");

@@ -1225,10 +1225,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Open the startup console
   start_console ();
 
-  // Set texture manager mode to verbose (useful for debugging)
-  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
-  txtmgr->SetVerbose (true);
-
   // Find the engine plugin and query the csEngine object from it...
   Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!Engine)

@@ -342,9 +342,6 @@ protected:
   ///
   iObjectRegistry *object_reg;
 
-  /// Verbose mode.
-  bool verbose;
-
   /// Read configuration values from config file.
   virtual void read_config (iConfigFile *config);
 public:
@@ -371,9 +368,6 @@ public:
     materials.DeleteAll ();
   }
 
-  /// Toggle verbose mode
-  virtual void SetVerbose (bool enable)
-  { verbose = enable; }
   /// Free all images associated with textures
   virtual void FreeImages ();
 

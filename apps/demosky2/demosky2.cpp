@@ -29,7 +29,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/natwin.h"
-#include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "ivaria/conout.h"
 #include "imesh/sprite2d.h"
@@ -202,10 +201,6 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
 	Cleanup ();
     exit (1);
   }
-
-  // Setup the texture manager
-  iTextureManager* txtmgr = myG3D->GetTextureManager ();
-  txtmgr->SetVerbose (true);
 
   font = myG2D->GetFontServer()->LoadFont(CSFONT_LARGE);
 

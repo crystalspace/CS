@@ -25,7 +25,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/natwin.h"
-#include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
 #include "iutil/event.h"
 #include "iutil/virtclk.h"
@@ -325,8 +324,6 @@ bool ceCswsEngineApp::Initialize ()
   pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   // Disable double buffering since it kills performance
   pG3D->GetDriver2D ()->DoubleBuffer (false);
-  iTextureManager* txtmgr = pG3D->GetTextureManager ();
-  txtmgr->SetVerbose (true);
 
   SetupDefaultWorld ();
 

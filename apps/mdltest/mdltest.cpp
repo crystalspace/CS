@@ -39,7 +39,6 @@
 #include "imesh/mdlconv.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
-#include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "ivideo/fontserv.h"
@@ -401,10 +400,6 @@ bool Simple::Initialize (const char *iConfigName)
     Cleanup ();
     exit (1);
   }
-
-  // Setup the texture manager
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetVerbose (true);
 
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "Simple Crystal Space Application version 0.1.");

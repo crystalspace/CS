@@ -320,7 +320,6 @@ bool Lighter::Initialize (int argc, const char* const argv[],
 
   // Setup the texture manager.
   iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetVerbose (true);
   color_bg = g2d->FindRGB (0, 0, 0);
   color_text = g2d->FindRGB (200, 220, 255);
   color_done = g2d->FindRGB (255, 0, 0);

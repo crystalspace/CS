@@ -135,8 +135,6 @@ bool PicViewApp::Initialize ()
   pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   // Disable double buffering since it kills performance
   pG3D->GetDriver2D ()->DoubleBuffer (false);
-  iTextureManager* txtmgr = pG3D->GetTextureManager ();
-  txtmgr->SetVerbose (true);
 
   // Change to other directory before doing Prepare()
   // because otherwise precalc_info file will be written into MazeD.zip

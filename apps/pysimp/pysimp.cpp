@@ -35,7 +35,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/natwin.h"
-#include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "ivaria/script.h"
 #include "imap/parser.h"
@@ -192,8 +191,6 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "Simple Crystal Space Python Application version 0.1.");
-  iTextureManager* txtmgr = myG3D->GetTextureManager ();
-  txtmgr->SetVerbose (true);
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.

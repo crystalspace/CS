@@ -120,7 +120,7 @@ struct iSuperLightmap : public iBase
   virtual iTextureHandle* GetTexture () = 0;
 };
 
-SCF_VERSION (iTextureManager, 2, 3, 1);
+SCF_VERSION (iTextureManager, 2, 3, 2);
 
 /**
  * This is the standard texture manager interface.
@@ -224,13 +224,6 @@ struct iTextureManager : public iBase
    * given to this texture manager.
    */
   virtual void FreeMaterials () = 0;
-
-  /**
-   * Set verbose mode on/off. In verbose mode, texture manager will
-   * Printf() through the system driver during all initialization and
-   * preparation operations.
-   */
-  virtual void SetVerbose (bool vb) = 0;
 
   /**
    * Query the basic format of textures that can be registered with this

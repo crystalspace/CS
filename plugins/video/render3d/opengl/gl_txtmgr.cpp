@@ -1093,7 +1093,6 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
 {
   SCF_CONSTRUCT_IBASE (0);
   csGLTextureManager::object_reg = object_reg;
-  verbose = false;
 
   csGLTextureManager::txtcache = txtcache;
 
@@ -1337,11 +1336,6 @@ void csGLTextureManager::FreeMaterials ()
     csGLMaterialHandle* mat = materials[i];
     if (mat) mat->FreeMaterial ();
   }
-}
-
-void csGLTextureManager::SetVerbose (bool vb)
-{
-  verbose = vb;
 }
 
 int csGLTextureManager::GetTextureFormat ()
