@@ -1,6 +1,6 @@
 <arbvp>
 <variablemap variable="STANDARD_LIGHT_0_POSITION" register="0"/>
-<streammap stream="vertices" attribute="0" />
+<streammap stream="shadow vertices" attribute="0" />
 <streammap stream="shadow normals" attribute="1" />
 <program>
 <![CDATA[!!ARBvp1.0
