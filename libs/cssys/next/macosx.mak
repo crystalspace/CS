@@ -32,7 +32,7 @@ NEXT.LIBS=
 NEXT.LFLAGS.GENERAL=
 NEXT.LFLAGS.EXE=-framework AppKit -framework Foundation
 NEXT.LFLAGS.EXE.CONSOLE=-framework Foundation
-NEXT.LFLAGS.DLL=-bundle
+NEXT.LFLAGS.DLL=-bundle -framework AppKit -framework Foundation
 NEXT.PLUGINS=video/renderer/opengl
 NEXT.SYSCONFIG=$(NEWLINE)libs/cssys/next/macosx.sh cc>>config.tmp
 
