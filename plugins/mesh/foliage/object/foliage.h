@@ -368,6 +368,14 @@ struct csFoliagePalette
   // @@@ TODO
 };
 
+/// A piece of generated foliage on the map.
+struct csGeneratedFoliage
+{
+  int type;		// Index into 'foliage_objects'.
+  float yrot;		// Rotation along the y-axis.
+  csVector3 pos;	// Position on the terrain.
+};
+
 /**
  * Factory for foliage meshes.
  */
@@ -413,6 +421,8 @@ private:
   csVector3 radius;
   csBox3 object_bbox;
   bool object_bbox_valid;
+  /// Calculate bounding box and radius.
+  void CalculateBBoxRadius ();
 
   // For polygon mesh.
   csMeshedPolygon* polygons;
@@ -423,8 +433,11 @@ private:
   csBox2 samplerRegion;
   csArray<csFoliagePalette> foliage_types;
 
-  /// Calculate bounding box and radius.
-  void CalculateBBoxRadius ();
+  // Generated foliage.
+  int genfoliage_res;	// Resolution at which we generate foliage.
+  csArray<csGeneratedFoliage>** genfoliage;
+  void ClearGeneratedFoliage ();
+  void GenerateFoliage ();
 
   /**
    * Setup this factory. This function will check if setup is needed.

@@ -537,14 +537,40 @@ csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (iMeshObjectType *pParent
   mesh_texels_dirty_flag = true;
   mesh_normals_dirty_flag = true;
   mesh_triangle_dirty_flag = true;
+
+  genfoliage_res = 256;
+  genfoliage = 0;
 }
 
 csFoliageMeshObjectFactory::~csFoliageMeshObjectFactory ()
 {
   scfiShaderVariableAccessor->DecRef ();
+  ClearGeneratedFoliage ();
+
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiFoliageFactoryState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_IBASE ();
+}
+
+void csFoliageMeshObjectFactory::ClearGeneratedFoliage ()
+{
+  if (genfoliage)
+  {
+    int i;
+    for (i = 0 ; i < genfoliage_res * genfoliage_res ; i++)
+    {
+      if (genfoliage[i])
+	delete genfoliage[i];
+    }
+    delete[] genfoliage;
+    genfoliage = 0;
+  }
+}
+
+void csFoliageMeshObjectFactory::GenerateFoliage ()
+{
+  ClearGeneratedFoliage ();
+  genfoliage = new csArray<csGeneratedFoliage>* [genfoliage_res*genfoliage_res];
 }
 
 void csFoliageMeshObjectFactory::CalculateBBoxRadius ()
