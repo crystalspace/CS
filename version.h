@@ -18,7 +18,9 @@
 #elif defined(OS_IRIX)
 #  define OS_VERSION "Irix"
 #elif defined(OS_NEXT)
-#  define OS_VERSION OS_NEXT_DESCRIPTION	/* Must come before OS_UNIX */
+#  define OS_VERSION OS_NEXT_DESCRIPTION    /* Must appear before OS_UNIX */
+#elif defined(OS_BE)
+#  define OS_VERSION "BeOS"                 /* Must appear before OS_UNIX */
 #elif defined(OS_UNIX)
 #  define OS_VERSION "Unix"
 #elif defined(OS_DOS)
@@ -31,8 +33,6 @@
 #  define OS_VERSION "Win32"
 #elif defined(OS_OS2)
 #  define OS_VERSION "OS/2"
-#elif defined(OS_BE)
-#  define OS_VERSION "BeOS"
 #elif defined(OS_UNKNOWN)
 #  define OS_VERSION "Unknown"
 #else
