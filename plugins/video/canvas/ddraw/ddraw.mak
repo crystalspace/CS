@@ -33,12 +33,12 @@ vpath %.cpp plugins/video/canvas/ddraw plugins/video/canvas/common \
   plugins/video/canvas/directxcommon
 
 ifeq ($(USE_PLUGINS),yes)
-  DDRAW2D = $(OUTDLL)ddraw2d$(DLL)
+  DDRAW2D = $(OUTDLL)/ddraw2d$(DLL)
   LIB.DDRAW2D = $(foreach d,$(DEP.DDRAW2D),$($d.LIB))
   LIB.DDRAW2D.SPECIAL = $(LFLAGS.l)ddraw
   TO_INSTALL.DYNAMIC_LIBS += $(DDRAW2D)
 else
-  DDRAW2D = $(OUT)$(LIB_PREFIX)ddraw2d$(LIB)
+  DDRAW2D = $(OUT)/$(LIB_PREFIX)ddraw2d$(LIB)
   DEP.EXE += $(DDRAW2D)
   LIBS.EXE += $(LFLAGS.l)ddraw
   SCF.STATIC += ddraw2d
@@ -49,7 +49,7 @@ INC.DDRAW2D = $(wildcard plugins/video/canvas/ddraw/*.h \
   $(wildcard plugins/video/canvas/directxcommon/*.h $(INC.COMMON.DRV2D)))
 SRC.DDRAW2D = $(wildcard plugins/video/canvas/ddraw/*.cpp \
   $(wildcard plugins/video/canvas/directxcommon/*.cpp $(SRC.COMMON.DRV2D)))
-OBJ.DDRAW2D = $(addprefix $(OUT),$(notdir $(SRC.DDRAW2D:.cpp=$O)))
+OBJ.DDRAW2D = $(addprefix $(OUT)/,$(notdir $(SRC.DDRAW2D:.cpp=$O)))
 DEP.DDRAW2D = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += DDRAW2D
@@ -74,11 +74,11 @@ ddraw2dclean:
 	$(RM) $(DDRAW2D) $(OBJ.DDRAW2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)ddraw2d.dep
-$(OUTOS)ddraw2d.dep: $(SRC.DDRAW2D)
+depend: $(OUTOS)/ddraw2d.dep
+$(OUTOS)/ddraw2d.dep: $(SRC.DDRAW2D)
 	$(DO.DEP)
 else
--include $(OUTOS)ddraw2d.dep
+-include $(OUTOS)/ddraw2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/renderer/null
 
 ifeq ($(USE_PLUGINS),yes)
-  NULL3D = $(OUTDLL)null3d$(DLL)
+  NULL3D = $(OUTDLL)/null3d$(DLL)
   LIB.NULL3D = $(foreach d,$(DEP.NULL3D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(NULL3D)
 else
-  NULL3D = $(OUT)$(LIB_PREFIX)null3d$(LIB)
+  NULL3D = $(OUT)/$(LIB_PREFIX)null3d$(LIB)
   DEP.EXE += $(NULL3D)
   SCF.STATIC += null3d
   TO_INSTALL.STATIC_LIBS += $(NULL3D)
@@ -50,7 +50,7 @@ SRC.NULL3D = $(wildcard plugins/video/renderer/null/*.cpp) \
   plugins/video/renderer/common/txtmgr.cpp \
   plugins/video/renderer/common/vbufmgr.cpp \
   plugins/video/renderer/common/polybuf.cpp
-OBJ.NULL3D = $(addprefix $(OUT),$(notdir $(SRC.NULL3D:.cpp=$O)))
+OBJ.NULL3D = $(addprefix $(OUT)/,$(notdir $(SRC.NULL3D:.cpp=$O)))
 DEP.NULL3D = CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 CFG.NULL3D = data/config/null3d.cfg
 
@@ -81,11 +81,11 @@ null3dclean:
 	$(RM) $(NULL3D) $(OBJ.NULL3D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)null3d.dep
-$(OUTOS)null3d.dep: $(SRC.NULL3D)
+dep: $(OUTOS)/null3d.dep
+$(OUTOS)/null3d.dep: $(SRC.NULL3D)
 	$(DO.DEP)
 else
--include $(OUTOS)null3d.dep
+-include $(OUTOS)/null3d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

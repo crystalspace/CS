@@ -27,10 +27,10 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/cstool libs/cstool/impexp
 
-CSTOOL.LIB = $(OUT)$(LIB_PREFIX)cstool$(LIB_SUFFIX)
+CSTOOL.LIB = $(OUT)/$(LIB_PREFIX)cstool$(LIB_SUFFIX)
 INC.CSTOOL = $(wildcard include/cstool/*.h)
 SRC.CSTOOL = $(wildcard libs/cstool/*.cpp)
-OBJ.CSTOOL = $(addprefix $(OUT),$(notdir $(SRC.CSTOOL:.cpp=$O)))
+OBJ.CSTOOL = $(addprefix $(OUT)/,$(notdir $(SRC.CSTOOL:.cpp=$O)))
 
 TO_INSTALL.STATIC_LIBS += $(CSTOOL.LIB)
 
@@ -56,11 +56,11 @@ cstoolclean:
 	-$(RM) $(CSTOOL.LIB) $(OBJ.CSTOOL)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)cstool.dep
-$(OUTOS)cstool.dep: $(SRC.CSTOOL)
+dep: $(OUTOS)/cstool.dep
+$(OUTOS)/cstool.dep: $(SRC.CSTOOL)
 	$(DO.DEP)
 else
--include $(OUTOS)cstool.dep
+-include $(OUTOS)/cstool.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

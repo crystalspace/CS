@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/rain/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  RAINLDR = $(OUTDLL)rainldr$(DLL)
+  RAINLDR = $(OUTDLL)/rainldr$(DLL)
   LIB.RAINLDR = $(foreach d,$(DEP.RAINLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(RAINLDR)
 else
-  RAINLDR = $(OUT)$(LIB_PREFIX)rainldr$(LIB)
+  RAINLDR = $(OUT)/$(LIB_PREFIX)rainldr$(LIB)
   DEP.EXE += $(RAINLDR)
   SCF.STATIC += rainldr
   TO_INSTALL.STATIC_LIBS += $(RAINLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.RAINLDR = $(wildcard plugins/mesh/rain/persist/classic/*.h)
 SRC.RAINLDR = $(wildcard plugins/mesh/rain/persist/classic/*.cpp)
-OBJ.RAINLDR = $(addprefix $(OUT),$(notdir $(SRC.RAINLDR:.cpp=$O)))
+OBJ.RAINLDR = $(addprefix $(OUT)/,$(notdir $(SRC.RAINLDR:.cpp=$O)))
 DEP.RAINLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += RAINLDR
@@ -59,11 +59,11 @@ rainldrclean:
 	-$(RM) $(RAINLDR) $(OBJ.RAINLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)rainldr.dep
-$(OUTOS)rainldr.dep: $(SRC.RAINLDR)
+dep: $(OUTOS)/rainldr.dep
+$(OUTOS)/rainldr.dep: $(SRC.RAINLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)rainldr.dep
+-include $(OUTOS)/rainldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

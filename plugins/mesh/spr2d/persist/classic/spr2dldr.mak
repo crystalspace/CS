@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/spr2d/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  SPR2DLDR = $(OUTDLL)spr2dldr$(DLL)
+  SPR2DLDR = $(OUTDLL)/spr2dldr$(DLL)
   LIB.SPR2DLDR = $(foreach d,$(DEP.SPR2DLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SPR2DLDR)
 else
-  SPR2DLDR = $(OUT)$(LIB_PREFIX)spr2dldr$(LIB)
+  SPR2DLDR = $(OUT)/$(LIB_PREFIX)spr2dldr$(LIB)
   DEP.EXE += $(SPR2DLDR)
   SCF.STATIC += spr2dldr
   TO_INSTALL.STATIC_LIBS += $(SPR2DLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.SPR2DLDR = $(wildcard plugins/mesh/spr2d/persist/classic/*.h)
 SRC.SPR2DLDR = $(wildcard plugins/mesh/spr2d/persist/classic/*.cpp)
-OBJ.SPR2DLDR = $(addprefix $(OUT),$(notdir $(SRC.SPR2DLDR:.cpp=$O)))
+OBJ.SPR2DLDR = $(addprefix $(OUT)/,$(notdir $(SRC.SPR2DLDR:.cpp=$O)))
 DEP.SPR2DLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SPR2DLDR
@@ -59,11 +59,11 @@ spr2dldrclean:
 	-$(RM) $(SPR2DLDR) $(OBJ.SPR2DLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)spr2dldr.dep
-$(OUTOS)spr2dldr.dep: $(SRC.SPR2DLDR)
+dep: $(OUTOS)/spr2dldr.dep
+$(OUTOS)/spr2dldr.dep: $(SRC.SPR2DLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)spr2dldr.dep
+-include $(OUTOS)/spr2dldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

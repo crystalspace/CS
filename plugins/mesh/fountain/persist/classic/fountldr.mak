@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/fountain/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  FOUNTLDR = $(OUTDLL)fountldr$(DLL)
+  FOUNTLDR = $(OUTDLL)/fountldr$(DLL)
   LIB.FOUNTLDR = $(foreach d,$(DEP.FOUNTLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(FOUNTLDR)
 else
-  FOUNTLDR = $(OUT)$(LIB_PREFIX)fountldr$(LIB)
+  FOUNTLDR = $(OUT)/$(LIB_PREFIX)fountldr$(LIB)
   DEP.EXE += $(FOUNTLDR)
   SCF.STATIC += fountldr
   TO_INSTALL.STATIC_LIBS += $(FOUNTLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.FOUNTLDR = $(wildcard plugins/mesh/fountain/persist/classic/*.h)
 SRC.FOUNTLDR = $(wildcard plugins/mesh/fountain/persist/classic/*.cpp)
-OBJ.FOUNTLDR = $(addprefix $(OUT),$(notdir $(SRC.FOUNTLDR:.cpp=$O)))
+OBJ.FOUNTLDR = $(addprefix $(OUT)/,$(notdir $(SRC.FOUNTLDR:.cpp=$O)))
 DEP.FOUNTLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += FOUNTLDR
@@ -59,11 +59,11 @@ fountldrclean:
 	-$(RM) $(FOUNTLDR) $(OBJ.FOUNTLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)fountldr.dep
-$(OUTOS)fountldr.dep: $(SRC.FOUNTLDR)
+dep: $(OUTOS)/fountldr.dep
+$(OUTOS)/fountldr.dep: $(SRC.FOUNTLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)fountldr.dep
+-include $(OUTOS)/fountldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

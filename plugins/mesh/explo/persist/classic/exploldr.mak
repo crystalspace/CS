@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/explo/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  EXPLOLDR = $(OUTDLL)exploldr$(DLL)
+  EXPLOLDR = $(OUTDLL)/exploldr$(DLL)
   LIB.EXPLOLDR = $(foreach d,$(DEP.EXPLOLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(EXPLOLDR)
 else
-  EXPLOLDR = $(OUT)$(LIB_PREFIX)exploldr$(LIB)
+  EXPLOLDR = $(OUT)/$(LIB_PREFIX)exploldr$(LIB)
   DEP.EXE += $(EXPLOLDR)
   SCF.STATIC += exploldr
   TO_INSTALL.STATIC_LIBS += $(EXPLOLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.EXPLOLDR = $(wildcard plugins/mesh/explo/persist/classic/*.h)
 SRC.EXPLOLDR = $(wildcard plugins/mesh/explo/persist/classic/*.cpp)
-OBJ.EXPLOLDR = $(addprefix $(OUT),$(notdir $(SRC.EXPLOLDR:.cpp=$O)))
+OBJ.EXPLOLDR = $(addprefix $(OUT)/,$(notdir $(SRC.EXPLOLDR:.cpp=$O)))
 DEP.EXPLOLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += EXPLOLDR
@@ -59,11 +59,11 @@ exploldrclean:
 	-$(RM) $(EXPLOLDR) $(OBJ.EXPLOLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)exploldr.dep
-$(OUTOS)exploldr.dep: $(SRC.EXPLOLDR)
+dep: $(OUTOS)/exploldr.dep
+$(OUTOS)/exploldr.dep: $(SRC.EXPLOLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)exploldr.dep
+-include $(OUTOS)/exploldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

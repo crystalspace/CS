@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp libs/csutil
 vpath %.c libs/csutil
 
-CSUTIL.LIB = $(OUT)$(LIB_PREFIX)csutil$(LIB_SUFFIX)
+CSUTIL.LIB = $(OUT)/$(LIB_PREFIX)csutil$(LIB_SUFFIX)
 INC.CSUTIL = $(wildcard include/csutil/*.h)
 SRC.CSUTIL = $(wildcard libs/csutil/*.cpp libs/csutil/*.c)
 OBJ.CSUTIL = \
-  $(addprefix $(OUT),$(notdir $(patsubst %.c,%$O,$(SRC.CSUTIL:.cpp=$O))))
+  $(addprefix $(OUT)/,$(notdir $(patsubst %.c,%$O,$(SRC.CSUTIL:.cpp=$O))))
 CFG.CSUTIL = scf.cfg data/config/mouse.cfg
 
 TO_INSTALL.ROOT += $(CFG.CSUTIL)
@@ -61,11 +61,11 @@ csutilclean:
 	-$(RM) $(CSUTIL.LIB) $(OBJ.CSUTIL)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csutil.dep
-$(OUTOS)csutil.dep: $(SRC.CSUTIL)
+dep: $(OUTOS)/csutil.dep
+$(OUTOS)/csutil.dep: $(SRC.CSUTIL)
 	$(DO.DEP)
 else
--include $(OUTOS)csutil.dep
+-include $(OUTOS)/csutil.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

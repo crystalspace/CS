@@ -55,11 +55,11 @@ ifeq ($(MAKESECTION),postdefines)
 #vpath %.m   $(NEXT.SOURCE_GLOSX2D_PATHS)
 
 ifeq ($(USE_PLUGINS),yes)
-  GLOSX2D = $(OUTDLL)glosx2d$(DLL)
+  GLOSX2D = $(OUTDLL)/glosx2d$(DLL)
   LIB.GLOSX2D = $(foreach d,$(DEP.GLOSX2D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(GLOSX2D)
 else
-  GLOSX2D = $(OUT)$(LIB_PREFIX)glosx2d$(LIB)
+  GLOSX2D = $(OUT)/$(LIB_PREFIX)glosx2d$(LIB)
   DEP.EXE += $(GLOSX2D)
   SCF.STATIC += glosx2d
   TO_INSTALL.STATIC_LIBS += $(GLOSX2D)
@@ -70,7 +70,7 @@ INC.GLOSX2D = $(wildcard $(INC.COMMON.DRV2D) $(INC.COMMON.DRV2D.OPENGL) \
 SRC.GLOSX2D = $(wildcard $(SRC.COMMON.DRV2D) $(SRC.COMMON.DRV2D.OPENGL) \
   $(addsuffix /*.cpp,$(NEXT.SOURCE_GLOSX2D_PATHS)) \
   $(addsuffix /*.m,$(NEXT.SOURCE_GLOSX2D_PATHS)))
-OBJ.GLOSX2D = $(addprefix $(OUT), \
+OBJ.GLOSX2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.GLOSX2D:.m=$O))))
 DEP.GLOSX2D = CSSYS CSUTIL
 
@@ -88,14 +88,14 @@ ifeq ($(MAKESECTION),targets)
 glosx2d: $(OUTDIRS) $(GLOSX2D)
 
 # Rule to make common OpenGL source
-$(OUT)%$O: plugins/video/canvas/openglcommon/%.cpp
+$(OUT)/%$O: plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLOSX2D)
 
 # Rules to make OSX sources
-$(OUT)%$O: plugins/video/canvas/macosx/opengl/%.cpp
+$(OUT)/%$O: plugins/video/canvas/macosx/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLOSX2D)
 
-$(OUT)%$O: plugins/video/canvas/macosx/opengl/%.m
+$(OUT)/%$O: plugins/video/canvas/macosx/opengl/%.m
 	$(DO.COMPILE.C) $(CFLAGS.GLOSX2D)
 
 $(GLOSX2D): $(OBJ.GLOSX2D) $(LIB.GLOSX2D)
@@ -107,11 +107,11 @@ glosx2dclean:
 	$(RM) $(GLOSX2D) $(OBJ.GLOSX2D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)glosx2d.dep
-$(OUTOS)glosx2d.dep: $(SRC.GLOSX2D)
+dep: $(OUTOS)/glosx2d.dep
+$(OUTOS)/glosx2d.dep: $(SRC.GLOSX2D)
 	$(DO.DEP1) $(CFLAGS.GLOSX2D) $(NEXT.HEADER_GLOSX2D_PATHS) $(DO.DEP2)
 else
--include $(OUTOS)glosx2d.dep
+-include $(OUTOS)/glosx2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

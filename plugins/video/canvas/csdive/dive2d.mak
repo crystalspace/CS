@@ -32,18 +32,18 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/canvas/csdive
 
 # Resource file for DIVE library
-DIVE2D.RES = $(OUTOS)libDIVE.res
+DIVE2D.RES = $(OUTOS)/libDIVE.res
 
 # Additional library which contains functions undefined in os2.a
-CSOS2.LIB = $(OUT)$(LIB_PREFIX)csos2$(LIB)
+CSOS2.LIB = $(OUT)/$(LIB_PREFIX)csos2$(LIB)
 
 # The 2D OS/2 DIVE driver
 ifeq ($(USE_PLUGINS),yes)
-  CSDIVE = $(OUTDLL)csdive$(DLL)
+  CSDIVE = $(OUTDLL)/csdive$(DLL)
   LIB.CSDIVE = $(foreach d,$(DEP.CSDIVE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSDIVE)
 else
-  CSDIVE = $(OUT)$(LIB_PREFIX)csdive$(LIB)
+  CSDIVE = $(OUT)/$(LIB_PREFIX)csdive$(LIB)
   DEP.EXE += $(DIVE2D.RES) $(CSDIVE) $(CSOS2.LIB)
   SCF.STATIC += csdive
   TO_INSTALL.STATIC_LIBS += $(CSDIVE)
@@ -52,7 +52,7 @@ endif
 INC.CSDIVE = $(wildcard plugins/video/canvas/csdive/*.h $(INC.COMMON.DRV2D))
 SRC.CSDIVE = $(wildcard plugins/video/canvas/csdive/*.cpp \
   plugins/video/canvas/common/pc-keys.cpp $(SRC.COMMON.DRV2D))
-OBJ.CSDIVE = $(addprefix $(OUT),$(notdir $(SRC.CSDIVE:.cpp=$O)))
+OBJ.CSDIVE = $(addprefix $(OUT)/,$(notdir $(SRC.CSDIVE:.cpp=$O)))
 DEP.CSDIVE = CSUTIL CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -78,11 +78,11 @@ csdiveclean:
 	$(RM) $(CSDIVE) $(OBJ.CSDIVE)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csdive.dep
-$(OUTOS)csdive.dep: $(SRC.CSDIVE)
+dep: $(OUTOS)/csdive.dep
+$(OUTOS)/csdive.dep: $(SRC.CSDIVE)
 	$(DO.DEP)
 else
--include $(OUTOS)csdive.dep
+-include $(OUTOS)/csdive.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

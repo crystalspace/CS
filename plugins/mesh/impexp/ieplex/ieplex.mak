@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/impexp/ieplex
 
 ifeq ($(USE_PLUGINS),yes)
-  IEPLEX = $(OUTDLL)ieplex$(DLL)
+  IEPLEX = $(OUTDLL)/ieplex$(DLL)
   LIB.IEPLEX = $(foreach d,$(DEP.IEPLEX),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(IEPLEX)
 else
-  IEPLEX = $(OUT)$(LIB_PREFIX)ieplex$(LIB)
+  IEPLEX = $(OUT)/$(LIB_PREFIX)ieplex$(LIB)
   DEP.EXE += $(IEPLEX)
   SCF.STATIC += ieplex
   TO_INSTALL.STATIC_LIBS += $(IEPLEX)
@@ -37,7 +37,7 @@ endif
 
 INC.IEPLEX = $(wildcard plugins/mesh/impexp/ieplex/*.h)
 SRC.IEPLEX = $(wildcard plugins/mesh/impexp/ieplex/*.cpp)
-OBJ.IEPLEX = $(addprefix $(OUT),$(notdir $(SRC.IEPLEX:.cpp=$O)))
+OBJ.IEPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.IEPLEX:.cpp=$O)))
 DEP.IEPLEX = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += IEPLEX
@@ -59,11 +59,11 @@ ieplexclean:
 	-$(RM) $(IEPLEX) $(OBJ.IEPLEX)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)ieplex.dep
-$(OUTOS)ieplex.dep: $(SRC.IEPLEX)
+dep: $(OUTOS)/ieplex.dep
+$(OUTOS)/ieplex.dep: $(SRC.IEPLEX)
 	$(DO.DEP)
 else
--include $(OUTOS)ieplex.dep
+-include $(OUTOS)/ieplex.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -4,6 +4,17 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a couple problems with csconf.mak.  First, it was
 	  using " instead of $".  It was using the hardcoded path "out/"
 	  instead of $(OUT).
+	- Eric Sunshine (hopefully) worked around a problem caused by buggy
+	  stat() on Win9x and WinME where a bogus result is returned if the
+	  path has a trailing slash.  This causes problems with the makefile
+	  dependency rules which depend upon $(OUTBASE), $(OUTOS), $(OUTPROC),
+	  or $(OUT), all of which end with a slash, since make thinks that
+	  those directories don't exist even when they are present.
+	  Consequently, make tries invoking $(MKDIR) on already-present
+	  directories.  The work-around was to redefine these variable so
+	  without the trailing slash.  Also updated all makefiles throughout
+	  the project to take into account that these variables are no longer
+	  defined with a trailing slash.
 6-Aug-2002
 	- Extended iXmlNode with functions to create and move nodes
 	  and attributes. Added iXmlDocument as a representation of a document.

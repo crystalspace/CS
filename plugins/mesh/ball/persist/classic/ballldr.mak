@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/ball/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  BALLLDR = $(OUTDLL)ballldr$(DLL)
+  BALLLDR = $(OUTDLL)/ballldr$(DLL)
   LIB.BALLLDR = $(foreach d,$(DEP.BALLLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(BALLLDR)
 else
-  BALLLDR = $(OUT)$(LIB_PREFIX)ballldr$(LIB)
+  BALLLDR = $(OUT)/$(LIB_PREFIX)ballldr$(LIB)
   DEP.EXE += $(BALLLDR)
   SCF.STATIC += ballldr
   TO_INSTALL.STATIC_LIBS += $(BALLLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.BALLLDR = $(wildcard plugins/mesh/ball/persist/classic/*.h)
 SRC.BALLLDR = $(wildcard plugins/mesh/ball/persist/classic/*.cpp)
-OBJ.BALLLDR = $(addprefix $(OUT),$(notdir $(SRC.BALLLDR:.cpp=$O)))
+OBJ.BALLLDR = $(addprefix $(OUT)/,$(notdir $(SRC.BALLLDR:.cpp=$O)))
 DEP.BALLLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += BALLLDR
@@ -59,11 +59,11 @@ ballldrclean:
 	-$(RM) $(BALLLDR) $(OBJ.BALLLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)ballldr.dep
-$(OUTOS)ballldr.dep: $(SRC.BALLLDR)
+dep: $(OUTOS)/ballldr.dep
+$(OUTOS)/ballldr.dep: $(SRC.BALLLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)ballldr.dep
+-include $(OUTOS)/ballldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

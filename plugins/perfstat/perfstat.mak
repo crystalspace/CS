@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/perfstat
 
 ifeq ($(USE_PLUGINS),yes)
-  PERFSTAT = $(OUTDLL)perfstat$(DLL)
+  PERFSTAT = $(OUTDLL)/perfstat$(DLL)
   LIB.PERFSTAT = $(foreach d,$(DEP.PERFSTAT),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(PERFSTAT)
 else
-  PERFSTAT = $(OUT)$(LIB_PREFIX)perfstat$(LIB)
+  PERFSTAT = $(OUT)/$(LIB_PREFIX)perfstat$(LIB)
   DEP.EXE += $(PERFSTAT)
   SCF.STATIC += perfstat
   TO_INSTALL.STATIC_LIBS += $(PERFSTAT)
@@ -44,7 +44,7 @@ endif
 
 INC.PERFSTAT = $(wildcard plugins/perfstat/*.h)
 SRC.PERFSTAT = $(wildcard plugins/perfstat/*.cpp)
-OBJ.PERFSTAT = $(addprefix $(OUT),$(notdir $(SRC.PERFSTAT:.cpp=$O)))
+OBJ.PERFSTAT = $(addprefix $(OUT)/,$(notdir $(SRC.PERFSTAT:.cpp=$O)))
 DEP.PERFSTAT = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += PERFSTAT
@@ -68,11 +68,11 @@ perfstatclean:
 	$(RM) $(PERFSTAT) $(OBJ.PERFSTAT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)perfstat.dep
-$(OUTOS)perfstat.dep: $(SRC.PERFSTAT)
+dep: $(OUTOS)/perfstat.dep
+$(OUTOS)/perfstat.dep: $(SRC.PERFSTAT)
 	$(DO.DEP)
 else
--include $(OUTOS)perfstat.dep
+-include $(OUTOS)/perfstat.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -28,10 +28,10 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csgfx
 
-CSGFX.LIB = $(OUT)$(LIB_PREFIX)csgfx$(LIB_SUFFIX)
+CSGFX.LIB = $(OUT)/$(LIB_PREFIX)csgfx$(LIB_SUFFIX)
 INC.CSGFX = $(wildcard include/csgfx/*.h)
 SRC.CSGFX = $(wildcard libs/csgfx/*.cpp)
-OBJ.CSGFX = $(addprefix $(OUT),$(notdir $(SRC.CSGFX:.cpp=$O)))
+OBJ.CSGFX = $(addprefix $(OUT)/,$(notdir $(SRC.CSGFX:.cpp=$O)))
 
 ifneq ($(USE_PLUGINS),yes)
   # When not using plugins, applications usually require this library since
@@ -64,11 +64,11 @@ csgfxclean:
 	-$(RM) $(CSGFX.LIB) $(OBJ.CSGFX)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csgfx.dep
-$(OUTOS)csgfx.dep: $(SRC.CSGFX)
+dep: $(OUTOS)/csgfx.dep
+$(OUTOS)/csgfx.dep: $(SRC.CSGFX)
 	$(DO.DEP)
 else
--include $(OUTOS)csgfx.dep
+-include $(OUTOS)/csgfx.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -33,18 +33,18 @@ vpath %.cpp plugins/sound/driver/coreaudio
 
 # The CoreAudio sound driver
 ifeq ($(USE_PLUGINS),yes)
-  CASNDDRV = $(OUTDLL)casnddrv$(DLL)
+  CASNDDRV = $(OUTDLL)/casnddrv$(DLL)
   LIB.CASNDDRV = $(foreach d,$(DEP.CASNDDRV),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CASNDDRV)
 else
-  CASNDDRV = $(OUT)$(LIB_PREFIX)casnddrv.a
+  CASNDDRV = $(OUT)/$(LIB_PREFIX)casnddrv.a
   DEP.EXE += $(CASNDDRV)
   SCF.STATIC += casnddrv
   TO_INSTALL.STATIC_LIBS += $(CASNDDRV)
 endif
 
 SRC.CASNDDRV = $(wildcard plugins/sound/driver/coreaudio/*.cpp)
-OBJ.CASNDDRV = $(addprefix $(OUT),$(notdir $(SRC.CASNDDRV:.cpp=$O)))
+OBJ.CASNDDRV = $(addprefix $(OUT)/,$(notdir $(SRC.CASNDDRV:.cpp=$O)))
 LIB.CASNDDRV.COREAUDIO = -framework CoreAudio
 DEP.CASNDDRV = CSUTIL CSSYS CSUTIL
 
@@ -65,11 +65,11 @@ casnddrvclean:
 	$(RM) $(CASNDDRV) $(OBJ.CASNDDRV)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)casnddrv.dep
-$(OUTOS)casnddrv.dep: $(SRC.CASNDDRV)
+dep: $(OUTOS)/casnddrv.dep
+$(OUTOS)/casnddrv.dep: $(SRC.CASNDDRV)
 	$(DO.DEP)
 else
--include $(OUTOS)casnddrv.dep
+-include $(OUTOS)/casnddrv.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

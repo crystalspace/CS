@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/terrfunc/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  TERRFLDR = $(OUTDLL)terrfldr$(DLL)
+  TERRFLDR = $(OUTDLL)/terrfldr$(DLL)
   LIB.TERRFLDR = $(foreach d,$(DEP.TERRFLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(TERRFLDR)
 else
-  TERRFLDR = $(OUT)$(LIB_PREFIX)terrfldr$(LIB)
+  TERRFLDR = $(OUT)/$(LIB_PREFIX)terrfldr$(LIB)
   DEP.EXE += $(TERRFLDR)
   SCF.STATIC += terrfldr
   TO_INSTALL.STATIC_LIBS += $(TERRFLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.TERRFLDR = $(wildcard plugins/mesh/terrfunc/persist/classic/*.h)
 SRC.TERRFLDR = $(wildcard plugins/mesh/terrfunc/persist/classic/*.cpp)
-OBJ.TERRFLDR = $(addprefix $(OUT),$(notdir $(SRC.TERRFLDR:.cpp=$O)))
+OBJ.TERRFLDR = $(addprefix $(OUT)/,$(notdir $(SRC.TERRFLDR:.cpp=$O)))
 DEP.TERRFLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += TERRFLDR
@@ -59,11 +59,11 @@ terrfldrclean:
 	-$(RM) $(TERRFLDR) $(OBJ.TERRFLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)terrfldr.dep
-$(OUTOS)terrfldr.dep: $(SRC.TERRFLDR)
+dep: $(OUTOS)/terrfldr.dep
+$(OUTOS)/terrfldr.dep: $(SRC.TERRFLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)terrfldr.dep
+-include $(OUTOS)/terrfldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

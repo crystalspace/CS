@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sequence
 
 ifeq ($(USE_PLUGINS),yes)
-  SEQUENCE = $(OUTDLL)sequence$(DLL)
+  SEQUENCE = $(OUTDLL)/sequence$(DLL)
   LIB.SEQUENCE = $(foreach d,$(DEP.SEQUENCE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SEQUENCE)
 else
-  SEQUENCE = $(OUT)$(LIB_PREFIX)sequence$(LIB)
+  SEQUENCE = $(OUT)/$(LIB_PREFIX)sequence$(LIB)
   DEP.EXE += $(SEQUENCE)
   SCF.STATIC += sequence
   TO_INSTALL.STATIC_LIBS += $(SEQUENCE)
@@ -44,7 +44,7 @@ endif
 
 INC.SEQUENCE = $(wildcard plugins/sequence/*.h)
 SRC.SEQUENCE = $(wildcard plugins/sequence/*.cpp)
-OBJ.SEQUENCE = $(addprefix $(OUT),$(notdir $(SRC.SEQUENCE:.cpp=$O)))
+OBJ.SEQUENCE = $(addprefix $(OUT)/,$(notdir $(SRC.SEQUENCE:.cpp=$O)))
 DEP.SEQUENCE = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SEQUENCE
@@ -68,11 +68,11 @@ sequenceclean:
 	$(RM) $(SEQUENCE) $(OBJ.SEQUENCE)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sequence.dep
-$(OUTOS)sequence.dep: $(SRC.SEQUENCE)
+dep: $(OUTOS)/sequence.dep
+$(OUTOS)/sequence.dep: $(SRC.SEQUENCE)
 	$(DO.DEP)
 else
--include $(OUTOS)sequence.dep
+-include $(OUTOS)/sequence.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

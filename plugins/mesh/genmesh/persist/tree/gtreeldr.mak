@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/genmesh/persist/tree
 
 ifeq ($(USE_PLUGINS),yes)
-  GTREELDR = $(OUTDLL)gtreeldr$(DLL)
+  GTREELDR = $(OUTDLL)/gtreeldr$(DLL)
   LIB.GTREELDR = $(foreach d,$(DEP.GTREELDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(GTREELDR)
 else
-  GTREELDR = $(OUT)$(LIB_PREFIX)gtreeldr$(LIB)
+  GTREELDR = $(OUT)/$(LIB_PREFIX)gtreeldr$(LIB)
   DEP.EXE += $(GTREELDR)
   SCF.STATIC += gtreeldr
   TO_INSTALL.STATIC_LIBS += $(GTREELDR)
@@ -37,7 +37,7 @@ endif
 
 INC.GTREELDR = $(wildcard plugins/mesh/genmesh/persist/tree/*.h)
 SRC.GTREELDR = $(wildcard plugins/mesh/genmesh/persist/tree/*.cpp)
-OBJ.GTREELDR = $(addprefix $(OUT),$(notdir $(SRC.GTREELDR:.cpp=$O)))
+OBJ.GTREELDR = $(addprefix $(OUT)/,$(notdir $(SRC.GTREELDR:.cpp=$O)))
 DEP.GTREELDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += GTREELDR
@@ -59,11 +59,11 @@ gtreeldrclean:
 	-$(RM) $(GTREELDR) $(OBJ.GTREELDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)gtreeldr.dep
-$(OUTOS)gtreeldr.dep: $(SRC.GTREELDR)
+dep: $(OUTOS)/gtreeldr.dep
+$(OUTOS)/gtreeldr.dep: $(SRC.GTREELDR)
 	$(DO.DEP)
 else
--include $(OUTOS)gtreeldr.dep
+-include $(OUTOS)/gtreeldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

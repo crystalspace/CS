@@ -24,7 +24,7 @@ LIB=.lib
 LIB_PREFIX=
 
 # Where to put the dynamic libraries on this system?
-OUTDLL=
+OUTDLL=.
 
 # We don't need separate directories for dynamic libraries
 OUTSUFX.yes=

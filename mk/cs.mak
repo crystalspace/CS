@@ -62,10 +62,13 @@ endif
 vpath %.cpp support/debug
 
 # Directory for object files
-OUTBASE=out/
-OUTOS=$(OUTBASE)$(OS)/
-OUTPROC=$(OUTOS)$(PROC)/
-OUT=$(OUTPROC)$(MODE)$(OUTSUFX.$(MAKE_DLL))/
+OUTBASE=out
+OUTOS=$(OUTBASE)/$(OS)
+OUTPROC=$(OUTOS)/$(PROC)
+OUT=$(OUTPROC)/$(MODE)$(OUTSUFX.$(MAKE_DLL))
+ifeq (,$(OUTDLL))
+OUTDLL=.
+endif
 ############################################
 
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
@@ -89,9 +92,9 @@ endif
 # Memory debugger
 ifdef MEMDBG
   # This should be filtered out
-  DEP.EXE += $(OUT)memdbg$O
+  DEP.EXE += $(OUT)/memdbg$O
   # This is here because it should be the latest on the command line
-  LIBS += $(OUT)memdbg$O
+  LIBS += $(OUT)/memdbg$O
 endif
 
 # Use $(^^) instead of $^ when you need all dependencies except libraries
@@ -166,7 +169,10 @@ dep: build.makedep
 endif
 
 # Directories for output files
-OUTDIRS = $(OUTBASE) $(OUTOS) $(OUTPROC) $(OUT) $(OUTDLL)
+OUTDIRS = $(OUTBASE) $(OUTOS) $(OUTPROC) $(OUT)
+ifneq (.,$(OUTDLL))
+OUTDIRS += $(OUTDLL)
+endif
 
 # The following include should make additional defines using above variables
 MAKESECTION = postdefines
@@ -193,30 +199,30 @@ distclean: clean
 	-$(RM) config.mak include/volatile.h
 
 clean:
-	-$(RMDIR) $(patsubst %/,%,$(OUTBASE))
-ifneq ($(strip $(OUTDLL)),)
-	-$(RMDIR) $(patsubst %/,%,$(OUTDLL))
+	-$(RMDIR) $(OUTBASE)
+ifneq (.,$(OUTDLL))
+	-$(RMDIR) $(OUTDLL)
 endif
 	-$(RM) $(wildcard *.txt) precalc.zip
 
 cleanlib:
 
 cleandep: $(OUTBASE) $(OUTOS)
-	-$(RM) $(OUTOS)*.dep
+	-$(RM) $(OUTOS)/*.dep
 
-$(OUT)%$O: %.cpp
+$(OUT)/%$O: %.cpp
 	$(DO.COMPILE.CPP)
 
-$(OUT)%$O: %.c
+$(OUT)/%$O: %.c
 	$(DO.COMPILE.C)
 
-$(OUT)%$O: %.S
+$(OUT)/%$O: %.S
 	$(DO.COMPILE.S)
 
-$(OUT)%$O: %.s
+$(OUT)/%$O: %.s
 	$(DO.COMPILE.S)
 
-$(OUT)%$O: %.asm
+$(OUT)/%$O: %.asm
 	$(DO.COMPILE.ASM)
 
 $(OUTDIRS):

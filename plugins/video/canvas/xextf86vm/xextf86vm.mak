@@ -35,12 +35,12 @@ LIB.XEXT86VM.SYSTEM += -L$(X11_PATH)/lib  \
   -lXxf86vm -lXext -lX11 $(X11_EXTRA_LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
-  XEXT86VM = $(OUTDLL)xext86vm$(DLL)
+  XEXT86VM = $(OUTDLL)/xext86vm$(DLL)
   LIB.XEXT86VM = $(foreach d,$(DEP.XEXT86VM),$($d.LIB))
   LIB.XEXT86VM.SPECIAL = $(LIB.XEXT86VM.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(XEXT86VM)
 else
-  XEXT86VM = $(OUT)$(LIB_PREFIX)xext86vm$(LIB)
+  XEXT86VM = $(OUT)/$(LIB_PREFIX)xext86vm$(LIB)
   DEP.EXE += $(XEXT86VM)
   LIBS.EXE += $(LIB.XEXT86VM.SYSTEM)
   SCF.STATIC += xext86vm
@@ -49,7 +49,7 @@ endif
 
 INC.XEXT86VM = $(wildcard plugins/video/canvas/xextf86vm/*.h)
 SRC.XEXT86VM = $(wildcard plugins/video/canvas/xextf86vm/*.cpp)
-OBJ.XEXT86VM = $(addprefix $(OUT),$(notdir $(SRC.XEXT86VM:.cpp=$O)))
+OBJ.XEXT86VM = $(addprefix $(OUT)/,$(notdir $(SRC.XEXT86VM:.cpp=$O)))
 DEP.XEXT86VM = CSUTIL CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -61,7 +61,7 @@ ifeq ($(MAKESECTION),targets)
 
 xext86vm: $(OUTDIRS) $(XEXT86VM)
 
-$(OUT)%$O: plugins/video/canvas/xextf86vm/%.cpp
+$(OUT)/%$O: plugins/video/canvas/xextf86vm/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.XEXT86VM)
 
 $(XEXT86VM): $(OBJ.XEXT86VM) $(LIB.XEXT86VM)
@@ -72,11 +72,11 @@ xext86vmclean:
 	$(RM) $(XEXT86VM) $(OBJ.XEXT86VM)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)xext86vm.dep
-$(OUTOS)xext86vm.dep: $(SRC.XEXT86VM)
+dep: $(OUTOS)/xext86vm.dep
+$(OUTOS)/xext86vm.dep: $(SRC.XEXT86VM)
 	$(DO.DEP1) $(CFLAGS.XEXT86VM) $(DO.DEP2)
 else
--include $(OUTOS)xext86vm.dep
+-include $(OUTOS)/xext86vm.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

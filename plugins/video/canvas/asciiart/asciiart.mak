@@ -39,12 +39,12 @@ endif
 
 # The 2D Ascii Art driver
 ifeq ($(USE_PLUGINS),yes)
-  ASCIIART = $(OUTDLL)asciiart$(DLL)
+  ASCIIART = $(OUTDLL)/asciiart$(DLL)
   LIB.ASCIIART = $(foreach d,$(DEP.ASCIIART),$($d.LIB))
   LIB.ASCIIART.SPECIAL = $(LIB.ASCIIART.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(ASCIIART)
 else
-  ASCIIART = $(OUT)$(LIB_PREFIX)asciiart$(LIB)
+  ASCIIART = $(OUT)/$(LIB_PREFIX)asciiart$(LIB)
   DEP.EXE += $(ASCIIART)
   LIBS.EXE += $(LIB.ASCIIART.SYSTEM)
   SCF.STATIC += asciiart
@@ -55,7 +55,7 @@ INC.ASCIIART = $(wildcard plugins/video/canvas/asciiart/*.h \
   $(INC.COMMON.DRV2D))
 SRC.ASCIIART = $(wildcard plugins/video/canvas/asciiart/*.cpp \
   $(SRC.COMMON.DRV2D))
-OBJ.ASCIIART = $(addprefix $(OUT),$(notdir $(SRC.ASCIIART:.cpp=$O)))
+OBJ.ASCIIART = $(addprefix $(OUT)/,$(notdir $(SRC.ASCIIART:.cpp=$O)))
 DEP.ASCIIART = CSUTIL CSSYS CSUTIL
 CFG.ASCIIART = data/config/asciiart.cfg
 
@@ -84,11 +84,11 @@ asciiartclean:
 	$(RM) $(ASCIIART) $(OBJ.ASCIIART)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)asciiart.dep
-$(OUTOS)asciiart.dep: $(SRC.ASCIIART)
+dep: $(OUTOS)/asciiart.dep
+$(OUTOS)/asciiart.dep: $(SRC.ASCIIART)
 	$(DO.DEP)
 else
--include $(OUTOS)asciiart.dep
+-include $(OUTOS)/asciiart.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

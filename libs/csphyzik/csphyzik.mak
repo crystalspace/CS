@@ -28,10 +28,10 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csphyzik libs/csphyzik/math
 
-CSPHYZIK.LIB = $(OUT)$(LIB_PREFIX)csphyzik$(LIB)
+CSPHYZIK.LIB = $(OUT)/$(LIB_PREFIX)csphyzik$(LIB)
 INC.CSPHYZIK = $(wildcard include/csphyzik/*.h)
 SRC.CSPHYZIK = $(wildcard libs/csphyzik/*.cpp libs/csphyzik/*/*.cpp)
-OBJ.CSPHYZIK = $(addprefix $(OUT),$(notdir $(SRC.CSPHYZIK:.cpp=$O)))
+OBJ.CSPHYZIK = $(addprefix $(OUT)/,$(notdir $(SRC.CSPHYZIK:.cpp=$O)))
 
 TO_INSTALL.STATIC_LIBS += $(CSPHYZIK.LIB)
 
@@ -57,11 +57,11 @@ csphyzikclean:
 	-$(RM) $(CSPHYZIK.LIB) $(OBJ.CSPHYZIK)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csphyzik.dep
-$(OUTOS)csphyzik.dep: $(SRC.CSPHYZIK)
+dep: $(OUTOS)/csphyzik.dep
+$(OUTOS)/csphyzik.dep: $(SRC.CSPHYZIK)
 	$(DO.DEP)
 else
--include $(OUTOS)csphyzik.dep
+-include $(OUTOS)/csphyzik.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

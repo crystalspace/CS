@@ -112,7 +112,7 @@ SRC.SYS_CSSYS=$(wildcard libs/cssys/be/*.cpp) \
   libs/cssys/general/sysinit.cpp
 
 # Where to put dynamic libraries on this system?
-OUTDLL=add-ons/
+OUTDLL=add-ons
 
 # The C compiler.
 CC=gcc -c

@@ -242,14 +242,14 @@ MAKEVERSIONINFO = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh
 
 #DO.SHARED.PLUGIN.CORE = \
-#  $(MAKEVERSIONINFO) $(OUT)$(@:$(DLL)=-version.rc) \
+#  $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
 #    "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
-#  $(MERGERES) $(OUT)$(@:$(DLL)=-rsrc.rc) "./" \
-#    $(OUT)$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
-#  $(COMPILE_RES) -i $(OUT)$(@:$(DLL)=-rsrc.rc) \
-#    -o $(OUT)$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
+#  $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) "./" \
+#    $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
+#  $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
+#    -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
 #  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
-#    $(OUT)$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) -mwindows
+#    $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) -mwindows
 DO.SHARED.PLUGIN.CORE = \
   $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
     $(L^) $(LIBS) $(LFLAGS) -mwindows
@@ -260,14 +260,14 @@ DO.SHARED.PLUGIN.CORE = \
 DO.SHARED.PLUGIN.CORE += -mconsole
 
 DO.LINK.EXE = \
-	$(MAKEVERSIONINFO) $(OUT)$(@:$(EXE)=-version.rc) \
+	$(MAKEVERSIONINFO) $(OUT)/$(@:$(EXE)=-version.rc) \
 	  "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
-	$(MERGERES) $(OUT)$(@:$(EXE)=-rsrc.rc) "./" \
-	  $(OUT)$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
-	$(COMPILE_RES) -i $(OUT)$(@:$(EXE)=-rsrc.rc) \
-	  -o $(OUT)$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
+	$(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) "./" \
+	  $(OUT)/$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
+	$(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) \
+	  -o $(OUT)/$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
 	$(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) \
-	  $(OUT)$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+	  $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
 DO.LINK.CONSOLE.EXE = $(DO.LINK.EXE)
 
 endif # ifeq ($(MAKESECTION),postdefines)

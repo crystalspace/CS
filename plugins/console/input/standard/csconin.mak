@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/console/input/standard
 
 ifeq ($(USE_PLUGINS),yes)
-  CSCONIN = $(OUTDLL)csconin$(DLL)
+  CSCONIN = $(OUTDLL)/csconin$(DLL)
   LIB.CSCONIN = $(foreach d,$(DEP.CSCONIN),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSCONIN)
 else
-  CSCONIN = $(OUT)$(LIB_PREFIX)csconin$(LIB)
+  CSCONIN = $(OUT)/$(LIB_PREFIX)csconin$(LIB)
   DEP.EXE += $(CSCONIN)
   SCF.STATIC += csconin
   TO_INSTALL.STATIC_LIBS += $(CSCONIN)
@@ -44,7 +44,7 @@ endif
 
 INC.CSCONIN = $(wildcard plugins/console/input/standard/*.h)
 SRC.CSCONIN = $(wildcard plugins/console/input/standard/*.cpp)
-OBJ.CSCONIN = $(addprefix $(OUT),$(notdir $(SRC.CSCONIN:.cpp=$O)))
+OBJ.CSCONIN = $(addprefix $(OUT)/,$(notdir $(SRC.CSCONIN:.cpp=$O)))
 DEP.CSCONIN = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += CSCONIN
@@ -68,11 +68,11 @@ csconinclean:
 	$(RM) $(CSCONIN) $(OBJ.CSCONIN)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csconin.dep
-$(OUTOS)csconin.dep: $(SRC.CSCONIN)
+dep: $(OUTOS)/csconin.dep
+$(OUTOS)/csconin.dep: $(SRC.CSCONIN)
 	$(DO.DEP)
 else
--include $(OUTOS)csconin.dep
+-include $(OUTOS)/csconin.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

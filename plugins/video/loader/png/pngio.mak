@@ -31,12 +31,12 @@ vpath %.cpp plugins/video/loader/png
 LIB.CSPNGIMG.LOCAL += $(PNG_LIBS) $(Z_LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
-  CSPNGIMG = $(OUTDLL)cspngimg$(DLL)
+  CSPNGIMG = $(OUTDLL)/cspngimg$(DLL)
   LIB.CSPNGIMG = $(foreach d,$(DEP.CSPNGIMG),$($d.LIB))
   LIB.CSPNGIMG.SPECIAL += $(LIB.CSPNGIMG.LOCAL)
   TO_INSTALL.DYNAMIC_LIBS += $(CSPNGIMG)
 else
-  CSPNGIMG = $(OUT)$(LIB_PREFIX)cspngimg$(LIB)
+  CSPNGIMG = $(OUT)/$(LIB_PREFIX)cspngimg$(LIB)
   DEP.EXE += $(CSPNGIMG)
   LIBS.EXE += $(LIB.CSPNGIMG.LOCAL)
   SCF.STATIC += cspngimg
@@ -46,7 +46,7 @@ endif
 INC.CSPNGIMG = $(wildcard plugins/video/loader/png/*.h)
 SRC.CSPNGIMG = $(wildcard plugins/video/loader/png/*.cpp)
 
-OBJ.CSPNGIMG = $(addprefix $(OUT),$(notdir $(SRC.CSPNGIMG:.cpp=$O)))
+OBJ.CSPNGIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSPNGIMG:.cpp=$O)))
 DEP.CSPNGIMG = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += CSPNGIMG
@@ -74,11 +74,11 @@ pngimgclean:
 	$(RM) $(CSPNGIMG) $(OBJ.CSPNGIMG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)pngimg.dep
-$(OUTOS)pngimg.dep: $(SRC.CSPNGIMG)
+dep: $(OUTOS)/pngimg.dep
+$(OUTOS)/pngimg.dep: $(SRC.CSPNGIMG)
 	$(DO.DEP)
 else
--include $(OUTOS)pngimg.dep
+-include $(OUTOS)/pngimg.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

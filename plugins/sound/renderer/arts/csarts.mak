@@ -36,7 +36,7 @@ MCOP.INCDIR = $(KDEDIR)/include/arts
 # a few variables for the testapp
 ARTSTEST.EXE = artstest$(EXE)
 SRC.ARTSTEST = $(CSARTS.DIR)/tt.cpp
-OBJ.ARTSTEST = $(addprefix $(OUT),$(notdir $(SRC.ARTSTEST:.cpp=$O)))
+OBJ.ARTSTEST = $(addprefix $(OUT)/,$(notdir $(SRC.ARTSTEST:.cpp=$O)))
 
 # Unlike CS interfaces, mcop interfaces need to be precompiled and are, in the end,
 # represemted by 3 classes (foo_skel, foo_stub, foo)
@@ -60,20 +60,20 @@ SRC.CSARTS.IMPL = $(wildcard $(CSARTS.DIR)/*_impl.cpp)
 # what follows are the source only needed by the csarts renderer itself
 SRC.CSARTS = $(filter-out $(SRC.CSARTS.IMPL) $(SRC.ARTSTEST), $(wildcard $(CSARTS.DIR)/*.cpp))
 
-OBJ.CSARTS.IDL = $(addprefix $(OUT),$(notdir $(SRC.CSARTS.IDL:.cc=$O)))
-OBJ.CSARTS.IMPL = $(addprefix $(OUT),$(notdir $(SRC.CSARTS.IMPL:.cpp=$O)))
+OBJ.CSARTS.IDL = $(addprefix $(OUT)/,$(notdir $(SRC.CSARTS.IDL:.cc=$O)))
+OBJ.CSARTS.IMPL = $(addprefix $(OUT)/,$(notdir $(SRC.CSARTS.IMPL:.cpp=$O)))
 
 # the others use the usual suffix
-OBJ.CSARTS = $(addprefix $(OUT),$(notdir $(SRC.CSARTS:.cpp=$O)))
+OBJ.CSARTS = $(addprefix $(OUT)/,$(notdir $(SRC.CSARTS:.cpp=$O)))
 
 # the lib that will be used by mcop and that ends up in a directory visible by mcop
-CSARTS.IMPL.LIB = $(OUT)$(LIB_PREFIX)csarts.la
+CSARTS.IMPL.LIB = $(OUT)/$(LIB_PREFIX)csarts.la
 
 # the iterface lib we'll link to our csarts renderer
-CSARTS.IDL.LIB  = $(OUT)$(LIB_PREFIX)csarts_idl$(LIB_SUFFIX)
+CSARTS.IDL.LIB  = $(OUT)/$(LIB_PREFIX)csarts_idl$(LIB_SUFFIX)
 
 # the csarts renderer plugin
-CSARTS  = $(OUTDLL)csarts$(DLL)
+CSARTS  = $(OUTDLL)/csarts$(DLL)
 
 # common lib we need to link
 LIB.CSARTS.COMMON = -lartsflow -lartsflow_idl -lmcop
@@ -122,16 +122,16 @@ $(CSARTS.IDL.LIB): $(OBJ.CSARTS.IDL)
 $(CSARTS.IMPL.LIB): $(CSARTS.LA.OBJ)
 	$(ARTS.LD) -o $(CSARTS.IMPL.LIB) $(ARTS.LDFLAGS) $(CSARTS.LA.OBJ)
 
-$(OUT)%.lo: $(CSARTS.DIR)/%.cc
+$(OUT)/%.lo: $(CSARTS.DIR)/%.cc
 	$(ARTS.CXX) -I$(MCOP.INCDIR) -c $^ -o $@
 
-$(OUT)%.lo: $(CSARTS.DIR)/%.cpp
+$(OUT)/%.lo: $(CSARTS.DIR)/%.cpp
 	$(ARTS.CXX) -I$(MCOP.INCDIR) -c $^ -o $@
 
-$(OUT)%$O: $(CSARTS.DIR)/%.cpp
+$(OUT)/%$O: $(CSARTS.DIR)/%.cpp
 	$(DO.COMPILE.CPP) -I$(MCOP.INCDIR)
 
-$(OUT)%$O: $(CSARTS.DIR)/%.cc
+$(OUT)/%$O: $(CSARTS.DIR)/%.cc
 	$(DO.COMPILE.CPP) -I$(MCOP.INCDIR)
 
 $(CSARTS.DIR)/%.h $(CSARTS.DIR)/%.cc: $(CSARTS.DIR)/%.idl
@@ -149,11 +149,11 @@ csartsinstall: $(CSARTS.IMPL.LIB)
 	$(ARTS.CP) $(CSARTS.DIR)/csarts.mcopclass $(MCOP.LIBDIR)/mcop/Arts
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csarts.dep
-$(OUTOS)csarts.dep: $(SRC.ARTSTEST)
+dep: $(OUTOS)/csarts.dep
+$(OUTOS)/csarts.dep: $(SRC.ARTSTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)csarts.dep
+-include $(OUTOS)/csarts.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

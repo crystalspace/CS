@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/haze/object
 
 ifeq ($(USE_PLUGINS),yes)
-  HAZE = $(OUTDLL)haze$(DLL)
+  HAZE = $(OUTDLL)/haze$(DLL)
   LIB.HAZE = $(foreach d,$(DEP.HAZE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(HAZE)
 else
-  HAZE = $(OUT)$(LIB_PREFIX)haze$(LIB)
+  HAZE = $(OUT)/$(LIB_PREFIX)haze$(LIB)
   DEP.EXE += $(HAZE)
   SCF.STATIC += haze
   TO_INSTALL.STATIC_LIBS += $(HAZE)
@@ -37,7 +37,7 @@ endif
 
 INC.HAZE = $(wildcard plugins/mesh/haze/object/*.h)
 SRC.HAZE = $(wildcard plugins/mesh/haze/object/*.cpp)
-OBJ.HAZE = $(addprefix $(OUT),$(notdir $(SRC.HAZE:.cpp=$O)))
+OBJ.HAZE = $(addprefix $(OUT)/,$(notdir $(SRC.HAZE:.cpp=$O)))
 DEP.HAZE = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += HAZE
@@ -59,11 +59,11 @@ hazeclean:
 	-$(RM) $(HAZE) $(OBJ.HAZE)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)haze.dep
-$(OUTOS)haze.dep: $(SRC.HAZE)
+dep: $(OUTOS)/haze.dep
+$(OUTOS)/haze.dep: $(SRC.HAZE)
 	$(DO.DEP)
 else
--include $(OUTOS)haze.dep
+-include $(OUTOS)/haze.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/crossbld
 
 ifeq ($(USE_PLUGINS),yes)
-  CROSSBLD = $(OUTDLL)crossbld$(DLL)
+  CROSSBLD = $(OUTDLL)/crossbld$(DLL)
   LIB.CROSSBLD = $(foreach d,$(DEP.CROSSBLD),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CROSSBLD)
 else
-  CROSSBLD = $(OUT)$(LIB_PREFIX)crossbld$(LIB)
+  CROSSBLD = $(OUT)/$(LIB_PREFIX)crossbld$(LIB)
   DEP.EXE += $(CROSSBLD)
   SCF.STATIC += crossbld
   TO_INSTALL.STATIC_LIBS += $(CROSSBLD)
@@ -37,7 +37,7 @@ endif
 
 INC.CROSSBLD = $(wildcard plugins/mesh/crossbld/*.h)
 SRC.CROSSBLD = $(wildcard plugins/mesh/crossbld/*.cpp)
-OBJ.CROSSBLD = $(addprefix $(OUT),$(notdir $(SRC.CROSSBLD:.cpp=$O)))
+OBJ.CROSSBLD = $(addprefix $(OUT)/,$(notdir $(SRC.CROSSBLD:.cpp=$O)))
 DEP.CROSSBLD = CSGEOM CSTOOL CSUTIL CSSYS CSUTIL CSGEOM
 
 MSVC.DSP += CROSSBLD
@@ -59,11 +59,11 @@ crossbldclean:
 	-$(RM) $(CROSSBLD) $(OBJ.CROSSBLD)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)crossbld.dep
-$(OUTOS)crossbld.dep: $(SRC.CROSSBLD)
+dep: $(OUTOS)/crossbld.dep
+$(OUTOS)/crossbld.dep: $(SRC.CROSSBLD)
 	$(DO.DEP)
 else
--include $(OUTOS)crossbld.dep
+-include $(OUTOS)/crossbld.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

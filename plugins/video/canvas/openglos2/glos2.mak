@@ -38,16 +38,16 @@ vpath %.cpp plugins/video/canvas/openglos2 plugins/video/canvas/openglcommon
 LIB.GLOS2.SYSTEM += -lopengl
 
 # Resource file for OS/2 OpenGL driver
-RES.GLOS2 = $(OUTOS)libGL.res
+RES.GLOS2 = $(OUTOS)/libGL.res
 
 # The 2D OS/2 OpenGL driver
 ifeq ($(USE_PLUGINS),yes)
-  GLOS2 = $(OUTDLL)glos2$(DLL)
+  GLOS2 = $(OUTDLL)/glos2$(DLL)
   LIB.GLOS2 = $(foreach d,$(DEP.GLOS2),$($d.LIB))
   LIB.GLOS2.SPECIAL = $(LIB.GLOS2.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(GLOS2)
 else
-  GLOS2 = $(OUT)$(LIB_PREFIX)glos2$(LIB)
+  GLOS2 = $(OUT)/$(LIB_PREFIX)glos2$(LIB)
   DEP.EXE += $(RES.GLOS2) $(GLOS2) $(CSOS2.LIB)
   LIBS.EXE += $(LIB.GLOS2.SYSTEM)
   SCF.STATIC += glos2
@@ -59,7 +59,7 @@ INC.GLOS2 = $(wildcard plugins/video/canvas/openglos2/*.h \
 SRC.GLOS2 = $(wildcard plugins/video/canvas/openglos2/*.cpp \
   plugins/video/canvas/common/pc-keys.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
-OBJ.GLOS2 = $(addprefix $(OUT),$(notdir $(SRC.GLOS2:.cpp=$O)))
+OBJ.GLOS2 = $(addprefix $(OUT)/,$(notdir $(SRC.GLOS2:.cpp=$O)))
 DEP.GLOS2 = CSUTIL CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -82,11 +82,11 @@ glos2clean:
 	$(RM) $(GLOS2) $(OBJ.GLOS2)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)glos2.dep
-$(OUTOS)glos2.dep: $(SRC.GLOS2)
+dep: $(OUTOS)/glos2.dep
+$(OUTOS)/glos2.dep: $(SRC.GLOS2)
 	$(DO.DEP)
 else
--include $(OUTOS)glos2.dep
+-include $(OUTOS)/glos2.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

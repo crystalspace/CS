@@ -27,11 +27,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/isoldr
 
 ifeq ($(USE_PLUGINS),yes)
-  ISOLOAD = $(OUTDLL)isoload$(DLL)
+  ISOLOAD = $(OUTDLL)/isoload$(DLL)
   LIB.ISOLOAD = $(foreach d,$(DEP.ISO),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(ISOLOAD)
 else
-  ISOLOAD = $(OUT)$(LIB_PREFIX)isoload$(LIB)
+  ISOLOAD = $(OUT)/$(LIB_PREFIX)isoload$(LIB)
   DEP.EXE += $(ISOLOAD)
   SCF.STATIC += isoload
   TO_INSTALL.STATIC_LIBS += $(ISOLOAD)
@@ -39,7 +39,7 @@ endif
 
 INC.ISOLOAD = $(wildcard plugins/isoldr/*.h)
 SRC.ISOLOAD = $(wildcard plugins/isoldr/*.cpp)
-OBJ.ISOLOAD = $(addprefix $(OUT),$(notdir $(SRC.ISOLOAD:.cpp=$O)))
+OBJ.ISOLOAD = $(addprefix $(OUT)/,$(notdir $(SRC.ISOLOAD:.cpp=$O)))
 DEP.ISOLOAD = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
 
 MSVC.DSP += ISOLOAD
@@ -61,11 +61,11 @@ isoloadclean:
 	-$(RM) $(ISOLOAD) $(OBJ.ISOLOAD)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)isoload.dep
-$(OUTOS)isoload.dep: $(SRC.ISOLOAD)
+dep: $(OUTOS)/isoload.dep
+$(OUTOS)/isoload.dep: $(SRC.ISOLOAD)
 	$(DO.DEP)
 else
--include $(OUTOS)isoload.dep
+-include $(OUTOS)/isoload.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

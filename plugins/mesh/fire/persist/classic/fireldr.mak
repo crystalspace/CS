@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/fire/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  FIRELDR = $(OUTDLL)fireldr$(DLL)
+  FIRELDR = $(OUTDLL)/fireldr$(DLL)
   LIB.FIRELDR = $(foreach d,$(DEP.FIRELDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(FIRELDR)
 else
-  FIRELDR = $(OUT)$(LIB_PREFIX)fireldr$(LIB)
+  FIRELDR = $(OUT)/$(LIB_PREFIX)fireldr$(LIB)
   DEP.EXE += $(FIRELDR)
   SCF.STATIC += fireldr
   TO_INSTALL.STATIC_LIBS += $(FIRELDR)
@@ -37,7 +37,7 @@ endif
 
 INC.FIRELDR = $(wildcard plugins/mesh/fire/persist/classic/*.h)
 SRC.FIRELDR = $(wildcard plugins/mesh/fire/persist/classic/*.cpp)
-OBJ.FIRELDR = $(addprefix $(OUT),$(notdir $(SRC.FIRELDR:.cpp=$O)))
+OBJ.FIRELDR = $(addprefix $(OUT)/,$(notdir $(SRC.FIRELDR:.cpp=$O)))
 DEP.FIRELDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += FIRELDR
@@ -59,11 +59,11 @@ fireldrclean:
 	-$(RM) $(FIRELDR) $(OBJ.FIRELDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)fireldr.dep
-$(OUTOS)fireldr.dep: $(SRC.FIRELDR)
+dep: $(OUTOS)/fireldr.dep
+$(OUTOS)/fireldr.dep: $(SRC.FIRELDR)
 	$(DO.DEP)
 else
--include $(OUTOS)fireldr.dep
+-include $(OUTOS)/fireldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

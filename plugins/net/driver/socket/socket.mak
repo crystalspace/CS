@@ -29,12 +29,12 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/net/driver/socket
 
 ifeq ($(USE_PLUGINS),yes)
-  CSSOCKET = $(OUTDLL)cssocket$(DLL)
+  CSSOCKET = $(OUTDLL)/cssocket$(DLL)
   LIB.CSSOCKET = $(foreach d,$(DEP.CSSOCKET),$($d.LIB))
   LIB.CSSOCKET.SPECIAL = $(LIBS.SOCKET.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(CSSOCKET)
 else
-  CSSOCKET = $(OUT)$(LIB_PREFIX)cssocket$(LIB)
+  CSSOCKET = $(OUT)/$(LIB_PREFIX)cssocket$(LIB)
   DEP.EXE += $(CSSOCKET)
   LIBS.EXE += $(LIBS.SOCKET.SYSTEM)
   SCF.STATIC += cssocket
@@ -43,7 +43,7 @@ endif
 
 INC.CSSOCKET = $(wildcard plugins/net/driver/socket/*.h)
 SRC.CSSOCKET = $(wildcard plugins/net/driver/socket/*.cpp)
-OBJ.CSSOCKET = $(addprefix $(OUT),$(notdir $(SRC.CSSOCKET:.cpp=$O)))
+OBJ.CSSOCKET = $(addprefix $(OUT)/,$(notdir $(SRC.CSSOCKET:.cpp=$O)))
 DEP.CSSOCKET = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += CSSOCKET
@@ -68,11 +68,11 @@ socketclean:
 	$(RM) $(CSSOCKET) $(OBJ.CSSOCKET)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)socket.dep
-$(OUTOS)socket.dep: $(SRC.CSSOCKET)
+depend: $(OUTOS)/socket.dep
+$(OUTOS)/socket.dep: $(SRC.CSSOCKET)
 	$(DO.DEP)
 else
--include $(OUTOS)socket.dep
+-include $(OUTOS)/socket.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

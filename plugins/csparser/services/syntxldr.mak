@@ -28,11 +28,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/csparser/services
 
 ifeq ($(USE_PLUGINS),yes)
-  CSSYNLDR = $(OUTDLL)cssynldr$(DLL)
+  CSSYNLDR = $(OUTDLL)/cssynldr$(DLL)
   LIB.CSSYNLDR = $(foreach d,$(DEP.CSSYNLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSSYNLDR)
 else
-  CSSYNLDR = $(OUT)$(LIB_PREFIX)cssynldr$(LIB)
+  CSSYNLDR = $(OUT)/$(LIB_PREFIX)cssynldr$(LIB)
   DEP.EXE += $(CSSYNLDR)
   SCF.STATIC += cssynldr
   TO_INSTALL.STATIC_LIBS += $(CSSYNLDR)
@@ -40,7 +40,7 @@ endif
 
 INC.CSSYNLDR = $(wildcard plugins/csparser/services/*.h)
 SRC.CSSYNLDR = $(wildcard plugins/csparser/services/*.cpp)
-OBJ.CSSYNLDR = $(addprefix $(OUT),$(notdir $(SRC.CSSYNLDR:.cpp=$O)))
+OBJ.CSSYNLDR = $(addprefix $(OUT)/,$(notdir $(SRC.CSSYNLDR:.cpp=$O)))
 DEP.CSSYNLDR = CSUTIL CSTOOL CSSYS CSUTIL CSGEOM CSTOOL
 
 MSVC.DSP += CSSYNLDR
@@ -62,11 +62,11 @@ cssynldrclean:
 	-$(RM) $(CSSYNLDR) $(OBJ.CSSYNLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)cssynldr.dep
-$(OUTOS)cssynldr.dep: $(SRC.CSSYNLDR)
+dep: $(OUTOS)/cssynldr.dep
+$(OUTOS)/cssynldr.dep: $(SRC.CSSYNLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)cssynldr.dep
+-include $(OUTOS)/cssynldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

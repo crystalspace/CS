@@ -34,11 +34,11 @@ vpath %.cpp plugins/physics/odedynam
 LIB.EXTERNAL.odedynam = -lode
 
 ifeq ($(USE_PLUGINS),yes)
-  odedynam = $(OUTDLL)odedynam$(DLL)
+  odedynam = $(OUTDLL)/odedynam$(DLL)
   LIB.odedynam = $(foreach d,$(DEP.odedynam),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(odedynam)
 else
-  odedynam = $(OUT)$(LIB_PREFIX)odedynam$(LIB)
+  odedynam = $(OUT)/$(LIB_PREFIX)odedynam$(LIB)
   DEP.EXE += $(odedynam)
   SCF.STATIC += odedynam
   TO_INSTALL.STATIC_LIBS += $(odedynam)
@@ -46,7 +46,7 @@ endif
 
 INC.odedynam = $(wildcard plugins/physics/odedynam/*.h)
 SRC.odedynam = $(wildcard plugins/physics/odedynam/*.cpp)
-OBJ.odedynam = $(addprefix $(OUT),$(notdir $(SRC.odedynam:.cpp=$O)))
+OBJ.odedynam = $(addprefix $(OUT)/,$(notdir $(SRC.odedynam:.cpp=$O)))
 DEP.odedynam = CSGEOM CSUTIL CSSYS
 
 MSVC.DSP += odedynam
@@ -71,11 +71,11 @@ odedynamclean:
 	$(RM) $(odedynam) $(OBJ.odedynam)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)odedynam.dep
-$(OUTOS)odedynam.dep: $(SRC.odedynam)
+dep: $(OUTOS)/odedynam.dep
+$(OUTOS)/odedynam.dep: $(SRC.odedynam)
 	$(DO.DEP)
 else
--include $(OUTOS)odedynam.dep
+-include $(OUTOS)/odedynam.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/culling/dynavis
 
 ifeq ($(USE_PLUGINS),yes)
-  DYNAVIS = $(OUTDLL)dynavis$(DLL)
+  DYNAVIS = $(OUTDLL)/dynavis$(DLL)
   LIB.DYNAVIS = $(foreach d,$(DEP.DYNAVIS),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(DYNAVIS)
 else
-  DYNAVIS = $(OUT)$(LIB_PREFIX)dynavis$(LIB)
+  DYNAVIS = $(OUT)/$(LIB_PREFIX)dynavis$(LIB)
   DEP.EXE += $(DYNAVIS)
   SCF.STATIC += dynavis
   TO_INSTALL.STATIC_LIBS += $(DYNAVIS)
@@ -44,7 +44,7 @@ endif
 
 INC.DYNAVIS = $(wildcard plugins/culling/dynavis/*.h)
 SRC.DYNAVIS = $(wildcard plugins/culling/dynavis/*.cpp)
-OBJ.DYNAVIS = $(addprefix $(OUT),$(notdir $(SRC.DYNAVIS:.cpp=$O)))
+OBJ.DYNAVIS = $(addprefix $(OUT)/,$(notdir $(SRC.DYNAVIS:.cpp=$O)))
 DEP.DYNAVIS = CSUTIL CSGEOM CSUTIL CSSYS CSUTIL CSSYS
 
 MSVC.DSP += DYNAVIS
@@ -68,11 +68,11 @@ dynavisclean:
 	$(RM) $(DYNAVIS) $(OBJ.DYNAVIS)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)dynavis.dep
-$(OUTOS)dynavis.dep: $(SRC.DYNAVIS)
+dep: $(OUTOS)/dynavis.dep
+$(OUTOS)/dynavis.dep: $(SRC.DYNAVIS)
 	$(DO.DEP)
 else
--include $(OUTOS)dynavis.dep
+-include $(OUTOS)/dynavis.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

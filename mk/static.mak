@@ -81,9 +81,9 @@
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-DIR.LIBREF = $(OUTBASE)derived
+DIR.LIBREF = $(OUTBASE)/derived
 SRC.LIBREF = $(DIR.LIBREF)/cslibref.cpp
-OBJ.LIBREF = $(addprefix $(OUT),$(notdir $(SRC.LIBREF:.cpp=$O)))
+OBJ.LIBREF = $(addprefix $(OUT)/,$(notdir $(SRC.LIBREF:.cpp=$O)))
 
 # List of resources to monitor for changes.  If any of these resources change,
 # then the file referenced by SRC.LIBREF will be regenerated.

@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/loader/sgi
 
 ifeq ($(USE_PLUGINS),yes)
-  CSSGIIMG = $(OUTDLL)cssgiimg$(DLL)
+  CSSGIIMG = $(OUTDLL)/cssgiimg$(DLL)
   LIB.CSSGIIMG = $(foreach d,$(DEP.CSSGIIMG),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSSGIIMG)
 else
-  CSSGIIMG = $(OUT)$(LIB_PREFIX)cssgiimg$(LIB)
+  CSSGIIMG = $(OUT)/$(LIB_PREFIX)cssgiimg$(LIB)
   DEP.EXE += $(CSSGIIMG)
   SCF.STATIC += cssgiimg
   TO_INSTALL.STATIC_LIBS += $(CSSGIIMG)
@@ -42,7 +42,7 @@ endif
 INC.CSSGIIMG = $(wildcard plugins/video/loader/sgi/*.h)
 SRC.CSSGIIMG = $(wildcard plugins/video/loader/sgi/*.cpp)
 
-OBJ.CSSGIIMG = $(addprefix $(OUT),$(notdir $(SRC.CSSGIIMG:.cpp=$O)))
+OBJ.CSSGIIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSSGIIMG:.cpp=$O)))
 DEP.CSSGIIMG = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += CSSGIIMG
@@ -66,11 +66,11 @@ sgiimgclean:
 	$(RM) $(CSSGIIMG) $(OBJ.CSSGIIMG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sgiimg.dep
-$(OUTOS)sgiimg.dep: $(SRC.CSSGIIMG)
+dep: $(OUTOS)/sgiimg.dep
+$(OUTOS)/sgiimg.dep: $(SRC.CSSGIIMG)
 	$(DO.DEP)
 else
--include $(OUTOS)sgiimg.dep
+-include $(OUTOS)/sgiimg.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

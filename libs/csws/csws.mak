@@ -27,10 +27,10 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csws libs/csws/skins/default
 
-CSWS.LIB = $(OUT)$(LIB_PREFIX)csws$(LIB_SUFFIX)
+CSWS.LIB = $(OUT)/$(LIB_PREFIX)csws$(LIB_SUFFIX)
 INC.CSWS = $(wildcard include/csws/*.h)
 SRC.CSWS = $(wildcard libs/csws/*.cpp libs/csws/skins/*/*.cpp)
-OBJ.CSWS = $(addprefix $(OUT),$(notdir $(SRC.CSWS:.cpp=$O)))
+OBJ.CSWS = $(addprefix $(OUT)/,$(notdir $(SRC.CSWS:.cpp=$O)))
 CFG.CSWS = data/config/csws.cfg
 
 TO_INSTALL.STATIC_LIBS += $(CSWS.LIB)
@@ -59,11 +59,11 @@ cswsclean:
 	-$(RM) $(CSWS.LIB) $(OBJ.CSWS)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csws.dep
-$(OUTOS)csws.dep: $(SRC.CSWS)
+dep: $(OUTOS)/csws.dep
+$(OUTOS)/csws.dep: $(SRC.CSWS)
 	$(DO.DEP)
 else
--include $(OUTOS)csws.dep
+-include $(OUTOS)/csws.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

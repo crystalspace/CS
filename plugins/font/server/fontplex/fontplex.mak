@@ -24,11 +24,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/font/server/fontplex
 
 ifeq ($(USE_PLUGINS),yes)
-  FONTPLEX = $(OUTDLL)fontplex$(DLL)
+  FONTPLEX = $(OUTDLL)/fontplex$(DLL)
   LIB.FONTPLEX = $(foreach d,$(DEP.FONTPLEX),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(FONTPLEX)
 else
-  FONTPLEX = $(OUT)$(LIB_PREFIX)fontplex$(LIB)
+  FONTPLEX = $(OUT)/$(LIB_PREFIX)fontplex$(LIB)
   DEP.EXE += $(FONTPLEX)
   SCF.STATIC += fontplex
   TO_INSTALL.STATIC_LIBS += $(FONTPLEX)
@@ -36,7 +36,7 @@ endif
 
 INC.FONTPLEX = $(wildcard plugins/font/server/fontplex/*.h)
 SRC.FONTPLEX = $(wildcard plugins/font/server/fontplex/*.cpp)
-OBJ.FONTPLEX = $(addprefix $(OUT),$(notdir $(SRC.FONTPLEX:.cpp=$O)))
+OBJ.FONTPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.FONTPLEX:.cpp=$O)))
 DEP.FONTPLEX = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += FONTPLEX
@@ -58,11 +58,11 @@ fontplexclean:
 	-$(RM) $(FONTPLEX) $(OBJ.FONTPLEX)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)fontplex.dep
-$(OUTOS)fontplex.dep: $(SRC.FONTPLEX)
+dep: $(OUTOS)/fontplex.dep
+$(OUTOS)/fontplex.dep: $(SRC.FONTPLEX)
 	$(DO.DEP)
 else
--include $(OUTOS)fontplex.dep
+-include $(OUTOS)/fontplex.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

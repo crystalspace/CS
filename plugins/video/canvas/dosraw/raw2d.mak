@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/canvas/dosraw
 
 ifeq ($(USE_PLUGINS),yes)
-  RAW2D = $(OUTDLL)dosraw$(DLL)
+  RAW2D = $(OUTDLL)/dosraw$(DLL)
   LIB.RAW2D = $(foreach d,$(DEP.RAW2D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(RAW2D)
 else
-  RAW2D = $(OUT)$(LIB_PREFIX)dosraw$(LIB)
+  RAW2D = $(OUT)/$(LIB_PREFIX)dosraw$(LIB)
   DEP.EXE += $(RAW2D)
   SCF.STATIC += dosraw
   TO_INSTALL.STATIC_LIBS += $(RAW2D)
@@ -44,7 +44,7 @@ endif
 
 INC.RAW2D = $(wildcard plugins/video/canvas/dosraw/*.h   $(INC.COMMON.DRV2D))
 SRC.RAW2D = $(wildcard plugins/video/canvas/dosraw/*.cpp $(SRC.COMMON.DRV2D))
-OBJ.RAW2D = $(addprefix $(OUT),$(notdir $(SRC.RAW2D:.cpp=$O)))
+OBJ.RAW2D = $(addprefix $(OUT)/,$(notdir $(SRC.RAW2D:.cpp=$O)))
 DEP.RAW2D = CSGEOM CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -64,11 +64,11 @@ dosrawclean:
 	$(RM) $(RAW2D) $(OBJ.RAW2D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)raw2d.dep
-$(OUTOS)raw2d.dep: $(SRC.RAW2D)
+dep: $(OUTOS)/raw2d.dep
+$(OUTOS)/raw2d.dep: $(SRC.RAW2D)
 	$(DO.DEP)
 else
--include $(OUTOS)raw2d.dep
+-include $(OUTOS)/raw2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

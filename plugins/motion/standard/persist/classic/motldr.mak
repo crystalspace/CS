@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/motion/standard/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  MOTLDR = $(OUTDLL)motldr$(DLL)
+  MOTLDR = $(OUTDLL)/motldr$(DLL)
   LIB.MOTLDR = $(foreach d,$(DEP.MOTLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(MOTLDR)
 else
-  MOTLDR = $(OUT)$(LIB_PREFIX)motldr$(LIB)
+  MOTLDR = $(OUT)/$(LIB_PREFIX)motldr$(LIB)
   DEP.EXE += $(MOTLDR)
   SCF.STATIC += motldr
   TO_INSTALL.STATIC_LIBS += $(MOTLDR)
@@ -41,7 +41,7 @@ endif
 
 INC.MOTLDR = $(wildcard plugins/motion/standard/persist/classic/*.h)
 SRC.MOTLDR = $(wildcard plugins/motion/standard/persist/classic/*.cpp)
-OBJ.MOTLDR = $(addprefix $(OUT),$(notdir $(SRC.MOTLDR:.cpp=$O)))
+OBJ.MOTLDR = $(addprefix $(OUT)/,$(notdir $(SRC.MOTLDR:.cpp=$O)))
 DEP.MOTLDR = CSGEOM CSSYS CSUTIL
 
 MSVC.DSP += MOTLDR
@@ -65,11 +65,11 @@ motldrclean:
 	$(RM) $(MOTLDR) $(OBJ.MOTLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)motldr.dep
-$(OUTOS)motldr.dep: $(SRC.MOTLDR)
+dep: $(OUTOS)/motldr.dep
+$(OUTOS)/motldr.dep: $(SRC.MOTLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)motldr.dep
+-include $(OUTOS)/motldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

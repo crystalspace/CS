@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/impexp/mdl
 
 ifeq ($(USE_PLUGINS),yes)
-  MDLIE = $(OUTDLL)mdlie$(DLL)
+  MDLIE = $(OUTDLL)/mdlie$(DLL)
   LIB.MDLIE = $(foreach d,$(DEP.MDLIE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(MDLIE)
 else
-  MDLIE = $(OUT)$(LIB_PREFIX)mdlie$(LIB)
+  MDLIE = $(OUT)/$(LIB_PREFIX)mdlie$(LIB)
   DEP.EXE += $(MDLIE)
   SCF.STATIC += mdlie
   TO_INSTALL.STATIC_LIBS += $(MDLIE)
@@ -37,7 +37,7 @@ endif
 
 INC.MDLIE = $(wildcard plugins/mesh/impexp/mdl/*.h)
 SRC.MDLIE = $(wildcard plugins/mesh/impexp/mdl/*.cpp)
-OBJ.MDLIE = $(addprefix $(OUT),$(notdir $(SRC.MDLIE:.cpp=$O)))
+OBJ.MDLIE = $(addprefix $(OUT)/,$(notdir $(SRC.MDLIE:.cpp=$O)))
 DEP.MDLIE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL CSUTIL CSGEOM
 
 MSVC.DSP += MDLIE
@@ -59,11 +59,11 @@ mdlieclean:
 	-$(RM) $(MDLIE) $(OBJ.MDLIE)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)mdlie.dep
-$(OUTOS)mdlie.dep: $(SRC.MDLIE)
+dep: $(OUTOS)/mdlie.dep
+$(OUTOS)/mdlie.dep: $(SRC.MDLIE)
 	$(DO.DEP)
 else
--include $(OUTOS)mdlie.dep
+-include $(OUTOS)/mdlie.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

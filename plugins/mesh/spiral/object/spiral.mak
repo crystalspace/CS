@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/spiral/object plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
-  SPIRAL = $(OUTDLL)spiral$(DLL)
+  SPIRAL = $(OUTDLL)/spiral$(DLL)
   LIB.SPIRAL = $(foreach d,$(DEP.SPIRAL),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SPIRAL)
 else
-  SPIRAL = $(OUT)$(LIB_PREFIX)spiral$(LIB)
+  SPIRAL = $(OUT)/$(LIB_PREFIX)spiral$(LIB)
   DEP.EXE += $(SPIRAL)
   SCF.STATIC += spiral
   TO_INSTALL.STATIC_LIBS += $(SPIRAL)
@@ -37,7 +37,7 @@ endif
 
 INC.SPIRAL = $(wildcard plugins/mesh/spiral/object/*.h plugins/mesh/partgen/*.h)
 SRC.SPIRAL = $(wildcard plugins/mesh/spiral/object/*.cpp plugins/mesh/partgen/*.cpp)
-OBJ.SPIRAL = $(addprefix $(OUT),$(notdir $(SRC.SPIRAL:.cpp=$O)))
+OBJ.SPIRAL = $(addprefix $(OUT)/,$(notdir $(SRC.SPIRAL:.cpp=$O)))
 DEP.SPIRAL = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SPIRAL
@@ -59,11 +59,11 @@ spiralclean:
 	-$(RM) $(SPIRAL) $(OBJ.SPIRAL)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)spiral.dep
-$(OUTOS)spiral.dep: $(SRC.SPIRAL)
+dep: $(OUTOS)/spiral.dep
+$(OUTOS)/spiral.dep: $(SRC.SPIRAL)
 	$(DO.DEP)
 else
--include $(OUTOS)spiral.dep
+-include $(OUTOS)/spiral.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

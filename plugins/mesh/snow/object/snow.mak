@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/snow/object plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
-  SNOW = $(OUTDLL)snow$(DLL)
+  SNOW = $(OUTDLL)/snow$(DLL)
   LIB.SNOW = $(foreach d,$(DEP.SNOW),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNOW)
 else
-  SNOW = $(OUT)$(LIB_PREFIX)snow$(LIB)
+  SNOW = $(OUT)/$(LIB_PREFIX)snow$(LIB)
   DEP.EXE += $(SNOW)
   SCF.STATIC += snow
   TO_INSTALL.STATIC_LIBS += $(SNOW)
@@ -37,7 +37,7 @@ endif
 
 INC.SNOW = $(wildcard plugins/mesh/snow/object/*.h plugins/mesh/partgen/*.h)
 SRC.SNOW = $(wildcard plugins/mesh/snow/object/*.cpp plugins/mesh/partgen/*.cpp)
-OBJ.SNOW = $(addprefix $(OUT),$(notdir $(SRC.SNOW:.cpp=$O)))
+OBJ.SNOW = $(addprefix $(OUT)/,$(notdir $(SRC.SNOW:.cpp=$O)))
 DEP.SNOW = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SNOW
@@ -59,11 +59,11 @@ snowclean:
 	-$(RM) $(SNOW) $(OBJ.SNOW)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)snow.dep
-$(OUTOS)snow.dep: $(SRC.SNOW)
+dep: $(OUTOS)/snow.dep
+$(OUTOS)/snow.dep: $(SRC.SNOW)
 	$(DO.DEP)
 else
--include $(OUTOS)snow.dep
+-include $(OUTOS)/snow.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -28,11 +28,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/aws
 
 ifeq ($(USE_PLUGINS),yes)
-  AWS = $(OUTDLL)aws$(DLL)
+  AWS = $(OUTDLL)/aws$(DLL)
   LIB.AWS = $(foreach d,$(DEP.AWS),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(AWS)
 else
-  AWS = $(OUT)$(LIB_PREFIX)aws$(LIB)
+  AWS = $(OUT)/$(LIB_PREFIX)aws$(LIB)
   DEP.EXE += $(AWS)
   SCF.STATIC += aws
   TO_INSTALL.STATIC_LIBS += $(AWS)
@@ -41,7 +41,7 @@ endif
 INC.AWS = $(wildcard plugins/aws/*.h) $(wildcard include/iaws/*.h)
 SRC.AWS = $(filter-out plugins/aws/sllex.cpp plugins/aws/slp.cpp, $(wildcard plugins/aws/*.cpp)) \
           plugins/aws/sllex.cpp plugins/aws/slp.cpp
-OBJ.AWS = $(addprefix $(OUT),$(notdir $(SRC.AWS:.cpp=$O)))
+OBJ.AWS = $(addprefix $(OUT)/,$(notdir $(SRC.AWS:.cpp=$O)))
 DEP.AWS = CSUTIL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
 
 TO_INSTALL.DATA += data/awsdef.zip
@@ -79,11 +79,11 @@ awsclean:
 	-$(RM) $(AWS) $(OBJ.AWS)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)aws.dep
-$(OUTOS)aws.dep: $(SRC.AWS)
+dep: $(OUTOS)/aws.dep
+$(OUTOS)/aws.dep: $(SRC.AWS)
 	$(DO.DEP)
 else
--include $(OUTOS)aws.dep
+-include $(OUTOS)/aws.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

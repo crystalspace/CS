@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/mplex plugins/sound/loader/common
 
 ifeq ($(USE_PLUGINS),yes)
-  SNDPLEX = $(OUTDLL)sndplex$(DLL)
+  SNDPLEX = $(OUTDLL)/sndplex$(DLL)
   LIB.SNDPLEX = $(foreach d,$(DEP.SNDPLEX),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDPLEX)
 else
-  SNDPLEX = $(OUT)$(LIB_PREFIX)sndplex$(LIB)
+  SNDPLEX = $(OUT)/$(LIB_PREFIX)sndplex$(LIB)
   DEP.EXE += $(SNDPLEX)
   SCF.STATIC += sndplex
   TO_INSTALL.STATIC_LIBS += $(SNDPLEX)
@@ -41,7 +41,7 @@ endif
 
 INC.SNDPLEX = $(wildcard plugins/sound/loader/mplex/*.h)
 SRC.SNDPLEX = $(wildcard plugins/sound/loader/mplex/*.cpp)
-OBJ.SNDPLEX = $(addprefix $(OUT),$(notdir $(SRC.SNDPLEX:.cpp=$O)))
+OBJ.SNDPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.SNDPLEX:.cpp=$O)))
 DEP.SNDPLEX = CSUTIL CSSYS CSUTIL
 CFG.SNDPLEX = data/config/sound.cfg
 
@@ -68,11 +68,11 @@ sndplexclean:
 	$(RM) $(SNDPLEX) $(OBJ.SNDPLEX)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sndplex.dep
-$(OUTOS)sndplex.dep: $(SRC.SNDPLEX)
+dep: $(OUTOS)/sndplex.dep
+$(OUTOS)/sndplex.dep: $(SRC.SNDPLEX)
 	$(DO.DEP)
 else
--include $(OUTOS)sndplex.dep
+-include $(OUTOS)/sndplex.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

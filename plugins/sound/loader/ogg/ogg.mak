@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/ogg
 
 ifeq ($(USE_PLUGINS),yes)
-  SNDOGG = $(OUTDLL)sndogg$(DLL)
+  SNDOGG = $(OUTDLL)/sndogg$(DLL)
   LIB.SNDOGG = $(foreach d,$(DEP.SNDOGG),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDOGG)
 else
-  SNDOGG = $(OUT)$(LIB_PREFIX)sndogg$(LIB)
+  SNDOGG = $(OUT)/$(LIB_PREFIX)sndogg$(LIB)
   DEP.EXE += $(SNDOGG)
   SCF.STATIC += sndogg
   TO_INSTALL.STATIC_LIBS += $(SNDOGG)
@@ -41,7 +41,7 @@ endif
 
 INC.SNDOGG = $(wildcard plugins/sound/loader/ogg/*.h)
 SRC.SNDOGG = $(wildcard plugins/sound/loader/ogg/*.cpp)
-OBJ.SNDOGG = $(addprefix $(OUT),$(notdir $(SRC.SNDOGG:.cpp=$O)))
+OBJ.SNDOGG = $(addprefix $(OUT)/,$(notdir $(SRC.SNDOGG:.cpp=$O)))
 DEP.SNDOGG = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SNDOGG
@@ -66,11 +66,11 @@ csoggclean:
 	$(RM) $(SNDOGG) $(OBJ.SNDOGG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sndogg.dep
-$(OUTOS)sndogg.dep: $(SRC.SNDOGG)
+dep: $(OUTOS)/sndogg.dep
+$(OUTOS)/sndogg.dep: $(SRC.SNDOGG)
 	$(DO.DEP)
 else
--include $(OUTOS)sndogg.dep
+-include $(OUTOS)/sndogg.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

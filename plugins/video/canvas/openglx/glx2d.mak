@@ -49,12 +49,12 @@ endif
 
 # The 2D GLX driver
 ifeq ($(USE_PLUGINS),yes)
-  GLX2D = $(OUTDLL)glx2d$(DLL)
+  GLX2D = $(OUTDLL)/glx2d$(DLL)
   LIB.GLX2D = $(foreach d,$(DEP.GLX2D),$($d.LIB))
   LIB.GLX2D.SPECIAL = $(LIB.GLX2D.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(GLX2D)
 else
-  GLX2D = $(OUT)$(LIB_PREFIX)glx2d$(LIB)
+  GLX2D = $(OUT)/$(LIB_PREFIX)glx2d$(LIB)
   DEP.EXE += $(GLX2D)
   LIBS.EXE += $(LIB.GLX2D.SYSTEM)
   SCF.STATIC += glx2d
@@ -65,7 +65,7 @@ INC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.h \
   $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D))
 SRC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
-OBJ.GLX2D = $(addprefix $(OUT),$(notdir $(SRC.GLX2D:.cpp=$O)))
+OBJ.GLX2D = $(addprefix $(OUT)/,$(notdir $(SRC.GLX2D:.cpp=$O)))
 DEP.GLX2D = CSUTIL CSSYS CSGEOM CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -77,10 +77,10 @@ ifeq ($(MAKESECTION),targets)
 
 glx2d: $(OUTDIRS) $(GLX2D)
 
-$(OUT)%$O: plugins/video/canvas/openglx/%.cpp
+$(OUT)/%$O: plugins/video/canvas/openglx/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLX2D)
 
-$(OUT)%$O: plugins/video/canvas/openglcommon/%.cpp
+$(OUT)/%$O: plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLX2D)
 
 $(GLX2D): $(OBJ.GLX2D) $(LIB.GLX2D)
@@ -91,11 +91,11 @@ glx2dclean:
 	$(RM) $(GLX2D) $(OBJ.GLX2D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)glx2d.dep
-$(OUTOS)glx2d.dep: $(SRC.GLX2D)
+dep: $(OUTOS)/glx2d.dep
+$(OUTOS)/glx2d.dep: $(SRC.GLX2D)
 	$(DO.DEP1) $(CFLAGS.GLX2D) $(DO.DEP2)
 else
--include $(OUTOS)glx2d.dep
+-include $(OUTOS)/glx2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

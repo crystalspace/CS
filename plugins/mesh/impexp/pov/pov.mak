@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/impexp/pov
 
 ifeq ($(USE_PLUGINS),yes)
-  POVIE = $(OUTDLL)povie$(DLL)
+  POVIE = $(OUTDLL)/povie$(DLL)
   LIB.POVIE = $(foreach d,$(DEP.POVIE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(POVIE)
 else
-  POVIE = $(OUT)$(LIB_PREFIX)povie$(LIB)
+  POVIE = $(OUT)/$(LIB_PREFIX)povie$(LIB)
   DEP.EXE += $(POVIE)
   SCF.STATIC += povie
   TO_INSTALL.STATIC_LIBS += $(POVIE)
@@ -37,7 +37,7 @@ endif
 
 INC.POVIE = $(wildcard plugins/mesh/impexp/pov/*.h)
 SRC.POVIE = $(wildcard plugins/mesh/impexp/pov/*.cpp)
-OBJ.POVIE = $(addprefix $(OUT),$(notdir $(SRC.POVIE:.cpp=$O)))
+OBJ.POVIE = $(addprefix $(OUT)/,$(notdir $(SRC.POVIE:.cpp=$O)))
 DEP.POVIE = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += POVIE
@@ -59,11 +59,11 @@ povieclean:
 	-$(RM) $(POVIE) $(OBJ.POVIE)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)povie.dep
-$(OUTOS)povie.dep: $(SRC.POVIE)
+dep: $(OUTOS)/povie.dep
+$(OUTOS)/povie.dep: $(SRC.POVIE)
 	$(DO.DEP)
 else
--include $(OUTOS)povie.dep
+-include $(OUTOS)/povie.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

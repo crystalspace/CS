@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/thing/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  THINGLDR = $(OUTDLL)thingldr$(DLL)
+  THINGLDR = $(OUTDLL)/thingldr$(DLL)
   LIB.THINGLDR = $(foreach d,$(DEP.THINGLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(THINGLDR)
 else
-  THINGLDR = $(OUT)$(LIB_PREFIX)thingldr$(LIB)
+  THINGLDR = $(OUT)/$(LIB_PREFIX)thingldr$(LIB)
   DEP.EXE += $(THINGLDR)
   SCF.STATIC += thingldr
   TO_INSTALL.STATIC_LIBS += $(THINGLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.THINGLDR = $(wildcard plugins/mesh/thing/persist/classic/*.h)
 SRC.THINGLDR = $(wildcard plugins/mesh/thing/persist/classic/*.cpp)
-OBJ.THINGLDR = $(addprefix $(OUT),$(notdir $(SRC.THINGLDR:.cpp=$O)))
+OBJ.THINGLDR = $(addprefix $(OUT)/,$(notdir $(SRC.THINGLDR:.cpp=$O)))
 DEP.THINGLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += THINGLDR
@@ -59,11 +59,11 @@ thingldrclean:
 	-$(RM) $(THINGLDR) $(OBJ.THINGLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)thingldr.dep
-$(OUTOS)thingldr.dep: $(SRC.THINGLDR)
+dep: $(OUTOS)/thingldr.dep
+$(OUTOS)/thingldr.dep: $(SRC.THINGLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)thingldr.dep
+-include $(OUTOS)/thingldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

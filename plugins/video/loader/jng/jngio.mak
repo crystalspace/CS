@@ -31,12 +31,12 @@ vpath %.cpp plugins/video/loader/jng
 LIB.CSJNGIMG.LOCAL += $(MNG_LIBS) $(Z_LIBS) $(JPG_LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
-  CSJNGIMG = $(OUTDLL)csjngimg$(DLL)
+  CSJNGIMG = $(OUTDLL)/csjngimg$(DLL)
   LIB.CSJNGIMG = $(foreach d,$(DEP.CSJNGIMG),$($d.LIB))
   LIB.CSJNGIMG.SPECIAL += $(LIB.CSJNGIMG.LOCAL)
   TO_INSTALL.DYNAMIC_LIBS += $(CSJNGIMG)
 else
-  CSJNGIMG = $(OUT)$(LIB_PREFIX)csjngimg$(LIB)
+  CSJNGIMG = $(OUT)/$(LIB_PREFIX)csjngimg$(LIB)
   DEP.EXE += $(CSJNGIMG)
   LIBS.EXE += $(LIB.CSJNGIMG.LOCAL)
   SCF.STATIC += csjngimg
@@ -46,7 +46,7 @@ endif
 INC.CSJNGIMG = $(wildcard plugins/video/loader/jng/*.h)
 SRC.CSJNGIMG = $(wildcard plugins/video/loader/jng/*.cpp)
 
-OBJ.CSJNGIMG = $(addprefix $(OUT),$(notdir $(SRC.CSJNGIMG:.cpp=$O)))
+OBJ.CSJNGIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSJNGIMG:.cpp=$O)))
 DEP.CSJNGIMG = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += CSJNGIMG
@@ -74,11 +74,11 @@ jngimgclean:
 	$(RM) $(CSJNGIMG) $(OBJ.CSJNGIMG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)jngimg.dep
-$(OUTOS)jngimg.dep: $(SRC.CSJNGIMG)
+dep: $(OUTOS)/jngimg.dep
+$(OUTOS)/jngimg.dep: $(SRC.CSJNGIMG)
 	$(DO.DEP)
 else
--include $(OUTOS)jngimg.dep
+-include $(OUTOS)/jngimg.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

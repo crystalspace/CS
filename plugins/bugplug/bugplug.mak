@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/bugplug
 
 ifeq ($(USE_PLUGINS),yes)
-  BUGPLUG = $(OUTDLL)bugplug$(DLL)
+  BUGPLUG = $(OUTDLL)/bugplug$(DLL)
   LIB.BUGPLUG = $(foreach d,$(DEP.BUGPLUG),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(BUGPLUG)
 else
-  BUGPLUG = $(OUT)$(LIB_PREFIX)bugplug$(LIB)
+  BUGPLUG = $(OUT)/$(LIB_PREFIX)bugplug$(LIB)
   DEP.EXE += $(BUGPLUG)
   SCF.STATIC += bugplug
   TO_INSTALL.STATIC_LIBS += $(BUGPLUG)
@@ -44,7 +44,7 @@ endif
 
 INC.BUGPLUG = $(wildcard plugins/bugplug/*.h)
 SRC.BUGPLUG = $(wildcard plugins/bugplug/*.cpp)
-OBJ.BUGPLUG = $(addprefix $(OUT),$(notdir $(SRC.BUGPLUG:.cpp=$O)))
+OBJ.BUGPLUG = $(addprefix $(OUT)/,$(notdir $(SRC.BUGPLUG:.cpp=$O)))
 DEP.BUGPLUG = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 CFG.BUGPLUG = data/config/bugplug.cfg
 
@@ -71,11 +71,11 @@ bugplugclean:
 	$(RM) $(BUGPLUG) $(OBJ.BUGPLUG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)bugplug.dep
-$(OUTOS)bugplug.dep: $(SRC.BUGPLUG)
+dep: $(OUTOS)/bugplug.dep
+$(OUTOS)/bugplug.dep: $(SRC.BUGPLUG)
 	$(DO.DEP)
 else
--include $(OUTOS)bugplug.dep
+-include $(OUTOS)/bugplug.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

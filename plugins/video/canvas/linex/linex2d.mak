@@ -35,12 +35,12 @@ LIB.LINEX2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 
 # The 2D Xlib driver
 ifeq ($(USE_PLUGINS),yes)
-  LINEX2D = $(OUTDLL)linex2d$(DLL)
+  LINEX2D = $(OUTDLL)/linex2d$(DLL)
   LIB.LINEX2D = $(foreach d,$(DEP.LINEX2D),$($d.LIB))
   LIB.LINEX2D.SPECIAL = $(LIB.LINEX2D.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(LINEX2D)
 else
-  LINEX2D = $(OUT)$(LIB_PREFIX)linex2d$(LIB)
+  LINEX2D = $(OUT)/$(LIB_PREFIX)linex2d$(LIB)
   DEP.EXE += $(LINEX2D)
   LIBS.EXE += $(LIB.LINEX2D.SYSTEM)
   SCF.STATIC += linex2d
@@ -50,7 +50,7 @@ endif
 INC.LINEX2D = $(wildcard plugins/video/canvas/linex/*.h   $(INC.COMMON.DRV2D))
 SRC.LINEX2D = $(wildcard plugins/video/canvas/linex/*.cpp $(SRC.COMMON.DRV2D))\
   plugins/video/canvas/common/x11-keys.cpp
-OBJ.LINEX2D = $(addprefix $(OUT),$(notdir $(SRC.LINEX2D:.cpp=$O)))
+OBJ.LINEX2D = $(addprefix $(OUT)/,$(notdir $(SRC.LINEX2D:.cpp=$O)))
 DEP.LINEX2D = CSUTIL CSSYS CSUTIL CSGEOM
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -62,7 +62,7 @@ ifeq ($(MAKESECTION),targets)
 
 linex2d: $(OUTDIRS) $(LINEX2D)
 
-$(OUT)%$O: plugins/video/canvas/linex/%.cpp
+$(OUT)/%$O: plugins/video/canvas/linex/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.LINEX2D)
 
 $(LINEX2D): $(OBJ.LINEX2D) $(LIB.LINEX2D)
@@ -73,11 +73,11 @@ linex2dclean:
 	$(RM) $(LINEX2D) $(OBJ.LINEX2D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)linex2d.dep
-$(OUTOS)linex2d.dep: $(SRC.LINEX2D)
+dep: $(OUTOS)/linex2d.dep
+$(OUTOS)/linex2d.dep: $(SRC.LINEX2D)
 	$(DO.DEP1) $(CFLAGS.LINEX2D) $(DO.DEP2)
 else
--include $(OUTOS)linex2d.dep
+-include $(OUTOS)/linex2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -56,11 +56,11 @@ vpath %.cpp $(NEXT.SOURCE_2D_PATHS)
 vpath %.m   $(NEXT.SOURCE_2D_PATHS)
 
 ifeq ($(USE_PLUGINS),yes)
-  NEXT2D = $(OUTDLL)next2d$(DLL)
+  NEXT2D = $(OUTDLL)/next2d$(DLL)
   LIB.NEXT2D = $(foreach d,$(DEP.NEXT2D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(NEXT2D)
 else
-  NEXT2D = $(OUT)$(LIB_PREFIX)next2d$(LIB)
+  NEXT2D = $(OUT)/$(LIB_PREFIX)next2d$(LIB)
   DEP.EXE += $(NEXT2D)
   SCF.STATIC += next2d
   TO_INSTALL.STATIC_LIBS += $(NEXT2D)
@@ -71,7 +71,7 @@ INC.NEXT2D = $(wildcard $(INC.COMMON.DRV2D) \
 SRC.NEXT2D = $(wildcard $(SRC.COMMON.DRV2D) \
   $(addsuffix /*.cpp,$(NEXT.SOURCE_2D_PATHS)) \
   $(addsuffix /*.m,$(NEXT.SOURCE_2D_PATHS)))
-OBJ.NEXT2D = $(addprefix $(OUT), \
+OBJ.NEXT2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.NEXT2D:.m=$O))))
 DEP.NEXT2D = CSSYS CSUTIL
 
@@ -92,11 +92,11 @@ next2dclean:
 	$(RM) $(NEXT2D) $(OBJ.NEXT2D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)next2d.dep
-$(OUTOS)next2d.dep: $(SRC.NEXT2D)
+dep: $(OUTOS)/next2d.dep
+$(OUTOS)/next2d.dep: $(SRC.NEXT2D)
 	$(DO.DEP1) $(NEXT.HEADER_2D_PATHS) $(DO.DEP2)
 else
--include $(OUTOS)next2d.dep
+-include $(OUTOS)/next2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/emit/object plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
-  EMIT = $(OUTDLL)emit$(DLL)
+  EMIT = $(OUTDLL)/emit$(DLL)
   LIB.EMIT = $(foreach d,$(DEP.EMIT),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(EMIT)
 else
-  EMIT = $(OUT)$(LIB_PREFIX)emit$(LIB)
+  EMIT = $(OUT)/$(LIB_PREFIX)emit$(LIB)
   DEP.EXE += $(EMIT)
   SCF.STATIC += emit
   TO_INSTALL.STATIC_LIBS += $(EMIT)
@@ -37,7 +37,7 @@ endif
 
 INC.EMIT = $(wildcard plugins/mesh/emit/object/*.h plugins/mesh/partgen/*.h)
 SRC.EMIT = $(wildcard plugins/mesh/emit/object/*.cpp plugins/mesh/partgen/*.cpp)
-OBJ.EMIT = $(addprefix $(OUT),$(notdir $(SRC.EMIT:.cpp=$O)))
+OBJ.EMIT = $(addprefix $(OUT)/,$(notdir $(SRC.EMIT:.cpp=$O)))
 DEP.EMIT = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += EMIT
@@ -59,11 +59,11 @@ emitclean:
 	-$(RM) $(EMIT) $(OBJ.EMIT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)emit.dep
-$(OUTOS)emit.dep: $(SRC.EMIT)
+dep: $(OUTOS)/emit.dep
+$(OUTOS)/emit.dep: $(SRC.EMIT)
 	$(DO.DEP)
 else
--include $(OUTOS)emit.dep
+-include $(OUTOS)/emit.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -34,12 +34,12 @@ CFLAGS.SDL2D += `sdl-config --cflags`
 LIB.SDL2D.SYSTEM += `sdl-config --libs` #-ldl
 
 ifeq ($(USE_PLUGINS),yes)
-  SDL2D = $(OUTDLL)sdl2d$(DLL)
+  SDL2D = $(OUTDLL)/sdl2d$(DLL)
   LIB.SDL2D = $(foreach d,$(DEP.SDL2D),$($d.LIB))
   LIB.SDL2D.SPECIAL = $(LIB.SDL2D.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(SDL2D)
 else
-  SDL2D = $(OUT)$(LIB_PREFIX)sdl2d$(LIB)
+  SDL2D = $(OUT)/$(LIB_PREFIX)sdl2d$(LIB)
   DEP.EXE += $(SDL2D)
   LIBS.EXE += $(LIB.SDL2D.SYSTEM)
   SCF.STATIC += sdl2d
@@ -48,7 +48,7 @@ endif
 
 INC.SDL2D = $(wildcard plugins/video/canvas/sdl/*.h   $(INC.COMMON.DRV2D))
 SRC.SDL2D = $(wildcard plugins/video/canvas/sdl/*.cpp $(SRC.COMMON.DRV2D))
-OBJ.SDL2D = $(addprefix $(OUT),$(notdir $(SRC.SDL2D:.cpp=$O)))
+OBJ.SDL2D = $(addprefix $(OUT)/,$(notdir $(SRC.SDL2D:.cpp=$O)))
 DEP.SDL2D = CSUTIL CSSYS CSUTIL CSGEOM
 
 MSVC.DSP += SDL2D
@@ -65,7 +65,7 @@ ifeq ($(MAKESECTION),targets)
 
 sdl2d: $(OUTDIRS) $(SDL2D)
 
-$(OUT)%$O: plugins/video/canvas/sdl/%.cpp
+$(OUT)/%$O: plugins/video/canvas/sdl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SDL2D)
 
 $(SDL2D): $(OBJ.SDL2D) $(LIB.SDL2D)
@@ -76,11 +76,11 @@ sdl2dclean:
 	$(RM) $(SDL2D) $(OBJ.SDL2D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sdl2d.dep
-$(OUTOS)sdl2d.dep: $(SRC.SDL2D)
+dep: $(OUTOS)/sdl2d.dep
+$(OUTOS)/sdl2d.dep: $(SRC.SDL2D)
 	$(DO.DEP1) $(CFLAGS.SDL2D) $(DO.DEP2)
 else
--include $(OUTOS)sdl2d.dep
+-include $(OUTOS)/sdl2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

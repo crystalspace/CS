@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/genmesh/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  GMESHLDR = $(OUTDLL)gmeshldr$(DLL)
+  GMESHLDR = $(OUTDLL)/gmeshldr$(DLL)
   LIB.GMESHLDR = $(foreach d,$(DEP.GMESHLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(GMESHLDR)
 else
-  GMESHLDR = $(OUT)$(LIB_PREFIX)gmeshldr$(LIB)
+  GMESHLDR = $(OUT)/$(LIB_PREFIX)gmeshldr$(LIB)
   DEP.EXE += $(GMESHLDR)
   SCF.STATIC += gmeshldr
   TO_INSTALL.STATIC_LIBS += $(GMESHLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.GMESHLDR = $(wildcard plugins/mesh/genmesh/persist/classic/*.h)
 SRC.GMESHLDR = $(wildcard plugins/mesh/genmesh/persist/classic/*.cpp)
-OBJ.GMESHLDR = $(addprefix $(OUT),$(notdir $(SRC.GMESHLDR:.cpp=$O)))
+OBJ.GMESHLDR = $(addprefix $(OUT)/,$(notdir $(SRC.GMESHLDR:.cpp=$O)))
 DEP.GMESHLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += GMESHLDR
@@ -59,11 +59,11 @@ gmeshldrclean:
 	-$(RM) $(GMESHLDR) $(OBJ.GMESHLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)gmeshldr.dep
-$(OUTOS)gmeshldr.dep: $(SRC.GMESHLDR)
+dep: $(OUTOS)/gmeshldr.dep
+$(OUTOS)/gmeshldr.dep: $(SRC.GMESHLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)gmeshldr.dep
+-include $(OUTOS)/gmeshldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

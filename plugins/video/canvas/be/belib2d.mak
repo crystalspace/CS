@@ -33,7 +33,7 @@ vpath %.cpp plugins/video/canvas/be
 
 # The 2D Belib driver
 ifeq ($(USE_PLUGINS),yes)
-  BE2D = $(OUTDLL)be2d$(DLL)
+  BE2D = $(OUTDLL)/be2d$(DLL)
   LIB.BE2D = $(foreach d,$(DEP.BE2D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(BE2D)
 else
@@ -45,7 +45,7 @@ endif
 
 INC.BE2D = $(wildcard plugins/video/canvas/be/*.h   $(INC.COMMON.DRV2D))
 SRC.BE2D = $(wildcard plugins/video/canvas/be/*.cpp $(SRC.COMMON.DRV2D))
-OBJ.BE2D = $(addprefix $(OUT),$(notdir $(SRC.BE2D:.cpp=$O)))
+OBJ.BE2D = $(addprefix $(OUT)/,$(notdir $(SRC.BE2D:.cpp=$O)))
 DEP.BE2D = CSUTIL CSSYS CSUTIL
 
 #MSVC.DSP += BE2D
@@ -73,11 +73,11 @@ be2dclean:
 	$(RM) $(BE2D) $(OBJ.BE2D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)be2d.dep
-$(OUTOS)be2d.dep: $(SRC.BE2D)
+dep: $(OUTOS)/be2d.dep
+$(OUTOS)/be2d.dep: $(SRC.BE2D)
 	$(DO.DEP)
 else
--include $(OUT)be2d.dep
+-include $(OUT)/be2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -33,12 +33,12 @@ CFLAGS.XEXTSHM += -I$(X11_PATH)/include
 LIB.XEXTSHM.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11
 
 ifeq ($(USE_PLUGINS),yes)
-  XEXTSHM = $(OUTDLL)xextshm$(DLL)
+  XEXTSHM = $(OUTDLL)/xextshm$(DLL)
   LIB.XEXTSHM = $(foreach d,$(DEP.XEXTSHM),$($d.LIB))
   LIB.XEXTSHM.SPECIAL = $(LIB.XEXTSHM.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(XEXTSHM)
 else
-  XEXTSHM = $(OUT)$(LIB_PREFIX)xextshm$(LIB)
+  XEXTSHM = $(OUT)/$(LIB_PREFIX)xextshm$(LIB)
   DEP.EXE += $(XEXTSHM)
   LIBS.EXE += $(LIB.XEXTSHM.SYSTEM)
   SCF.STATIC += xextshm
@@ -47,7 +47,7 @@ endif
 
 INC.XEXTSHM = $(wildcard plugins/video/canvas/xextshm/*.h)
 SRC.XEXTSHM = $(wildcard plugins/video/canvas/xextshm/*.cpp)
-OBJ.XEXTSHM = $(addprefix $(OUT),$(notdir $(SRC.XEXTSHM:.cpp=$O)))
+OBJ.XEXTSHM = $(addprefix $(OUT)/,$(notdir $(SRC.XEXTSHM:.cpp=$O)))
 DEP.XEXTSHM = CSUTIL CSSYS CSGEOM CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -59,7 +59,7 @@ ifeq ($(MAKESECTION),targets)
 
 xextshm: $(OUTDIRS) $(XEXTSHM)
 
-$(OUT)%$O: plugins/video/canvas/xextshm/%.cpp
+$(OUT)/%$O: plugins/video/canvas/xextshm/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.XEXTSHM)
 
 $(XEXTSHM): $(OBJ.XEXTSHM) $(LIB.XEXTSHM)
@@ -70,11 +70,11 @@ xextshmclean:
 	$(RM) $(XEXTSHM) $(OBJ.XEXTSHM)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)xextshm.dep
-$(OUTOS)xextshm.dep: $(SRC.XEXTSHM)
+dep: $(OUTOS)/xextshm.dep
+$(OUTOS)/xextshm.dep: $(SRC.XEXTSHM)
 	$(DO.DEP1) $(CFLAGS.XEXTSHM) $(DO.DEP2)
 else
--include $(OUTOS)xextshm.dep
+-include $(OUTOS)/xextshm.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

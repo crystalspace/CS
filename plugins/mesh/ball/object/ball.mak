@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/ball/object
 
 ifeq ($(USE_PLUGINS),yes)
-  BALL = $(OUTDLL)ball$(DLL)
+  BALL = $(OUTDLL)/ball$(DLL)
   LIB.BALL = $(foreach d,$(DEP.BALL),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(BALL)
 else
-  BALL = $(OUT)$(LIB_PREFIX)ball$(LIB)
+  BALL = $(OUT)/$(LIB_PREFIX)ball$(LIB)
   DEP.EXE += $(BALL)
   SCF.STATIC += ball
   TO_INSTALL.STATIC_LIBS += $(BALL)
@@ -37,7 +37,7 @@ endif
 
 INC.BALL = $(wildcard plugins/mesh/ball/object/*.h)
 SRC.BALL = $(wildcard plugins/mesh/ball/object/*.cpp)
-OBJ.BALL = $(addprefix $(OUT),$(notdir $(SRC.BALL:.cpp=$O)))
+OBJ.BALL = $(addprefix $(OUT)/,$(notdir $(SRC.BALL:.cpp=$O)))
 DEP.BALL = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += BALL
@@ -59,11 +59,11 @@ ballclean:
 	-$(RM) $(BALL) $(OBJ.BALL)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)ball.dep
-$(OUTOS)ball.dep: $(SRC.BALL)
+dep: $(OUTOS)/ball.dep
+$(OUTOS)/ball.dep: $(SRC.BALL)
 	$(DO.DEP)
 else
--include $(OUTOS)ball.dep
+-include $(OUTOS)/ball.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

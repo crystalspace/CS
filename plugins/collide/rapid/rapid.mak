@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/collide/rapid
 
 ifeq ($(USE_PLUGINS),yes)
-  RAPID = $(OUTDLL)rapid$(DLL)
+  RAPID = $(OUTDLL)/rapid$(DLL)
   LIB.RAPID = $(foreach d,$(DEP.RAPID),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(RAPID)
 else
-  RAPID = $(OUT)$(LIB_PREFIX)rapid$(LIB)
+  RAPID = $(OUT)/$(LIB_PREFIX)rapid$(LIB)
   DEP.EXE += $(RAPID)
   SCF.STATIC += rapid
   TO_INSTALL.STATIC_LIBS += $(RAPID)
@@ -37,7 +37,7 @@ endif
 
 INC.RAPID = $(wildcard plugins/collide/rapid/*.h)
 SRC.RAPID = $(wildcard plugins/collide/rapid/*.cpp)
-OBJ.RAPID = $(addprefix $(OUT),$(notdir $(SRC.RAPID:.cpp=$O)))
+OBJ.RAPID = $(addprefix $(OUT)/,$(notdir $(SRC.RAPID:.cpp=$O)))
 DEP.RAPID = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += RAPID
@@ -59,11 +59,11 @@ rapidclean:
 	-$(RM) $(RAPID) $(OBJ.RAPID)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)rapid.dep
-$(OUTOS)rapid.dep: $(SRC.RAPID)
+dep: $(OUTOS)/rapid.dep
+$(OUTOS)/rapid.dep: $(SRC.RAPID)
 	$(DO.DEP)
 else
--include $(OUTOS)rapid.dep
+-include $(OUTOS)/rapid.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

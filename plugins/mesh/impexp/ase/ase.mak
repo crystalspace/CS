@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/impexp/ase
 
 ifeq ($(USE_PLUGINS),yes)
-  ASEIE = $(OUTDLL)aseie$(DLL)
+  ASEIE = $(OUTDLL)/aseie$(DLL)
   LIB.ASEIE = $(foreach d,$(DEP.ASEIE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(ASEIE)
 else
-  ASEIE = $(OUT)$(LIB_PREFIX)aseie$(LIB)
+  ASEIE = $(OUT)/$(LIB_PREFIX)aseie$(LIB)
   DEP.EXE += $(ASEIE)
   SCF.STATIC += aseie
   TO_INSTALL.STATIC_LIBS += $(ASEIE)
@@ -37,7 +37,7 @@ endif
 
 INC.ASEIE = $(wildcard plugins/mesh/impexp/ase/*.h)
 SRC.ASEIE = $(wildcard plugins/mesh/impexp/ase/*.cpp)
-OBJ.ASEIE = $(addprefix $(OUT),$(notdir $(SRC.ASEIE:.cpp=$O)))
+OBJ.ASEIE = $(addprefix $(OUT)/,$(notdir $(SRC.ASEIE:.cpp=$O)))
 DEP.ASEIE = CSGEOM CSUTIL CSSYS CSTOOL CSGEOM CSUTIL
 
 MSVC.DSP += ASEIE
@@ -59,11 +59,11 @@ aseieclean:
 	-$(RM) $(ASEIE) $(OBJ.ASEIE)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)aseie.dep
-$(OUTOS)aseie.dep: $(SRC.ASEIE)
+dep: $(OUTOS)/aseie.dep
+$(OUTOS)/aseie.dep: $(SRC.ASEIE)
 	$(DO.DEP)
 else
--include $(OUTOS)aseie.dep
+-include $(OUTOS)/aseie.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

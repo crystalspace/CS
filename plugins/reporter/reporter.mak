@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/reporter
 
 ifeq ($(USE_PLUGINS),yes)
-  REPORTER = $(OUTDLL)reporter$(DLL)
+  REPORTER = $(OUTDLL)/reporter$(DLL)
   LIB.REPORTER = $(foreach d,$(DEP.REPORTER),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(REPORTER)
 else
-  REPORTER = $(OUT)$(LIB_PREFIX)reporter$(LIB)
+  REPORTER = $(OUT)/$(LIB_PREFIX)reporter$(LIB)
   DEP.EXE += $(REPORTER)
   SCF.STATIC += reporter
   TO_INSTALL.STATIC_LIBS += $(REPORTER)
@@ -44,7 +44,7 @@ endif
 
 INC.REPORTER = $(wildcard plugins/reporter/*.h)
 SRC.REPORTER = $(wildcard plugins/reporter/*.cpp)
-OBJ.REPORTER = $(addprefix $(OUT),$(notdir $(SRC.REPORTER:.cpp=$O)))
+OBJ.REPORTER = $(addprefix $(OUT)/,$(notdir $(SRC.REPORTER:.cpp=$O)))
 DEP.REPORTER = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += REPORTER
@@ -68,11 +68,11 @@ reporterclean:
 	$(RM) $(REPORTER) $(OBJ.REPORTER)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)reporter.dep
-$(OUTOS)reporter.dep: $(SRC.REPORTER)
+dep: $(OUTOS)/reporter.dep
+$(OUTOS)/reporter.dep: $(SRC.REPORTER)
 	$(DO.DEP)
 else
--include $(OUTOS)reporter.dep
+-include $(OUTOS)/reporter.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

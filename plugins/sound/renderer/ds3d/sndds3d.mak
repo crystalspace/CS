@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/renderer/ds3d
 
 ifeq ($(USE_PLUGINS),yes)
-  SNDDS3D = $(OUTDLL)sndds3d$(DLL)
+  SNDDS3D = $(OUTDLL)/sndds3d$(DLL)
   LIB.SNDDS3D = $(foreach d,$(DEP.SNDDS3D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDDS3D)
 else
-  SNDDS3D = $(OUT)$(LIB_PREFIX)sndds3d$(LIB)
+  SNDDS3D = $(OUT)/$(LIB_PREFIX)sndds3d$(LIB)
   DEP.EXE += $(SNDDS3D)
   SCF.STATIC += sndds3d
   TO_INSTALL.STATIC_LIBS += $(SNDDS3D)
@@ -43,7 +43,7 @@ INC.SNDDS3D = $(wildcard plugins/sound/renderer/ds3d/*.h) \
   $(wildcard plugins/sound/renderer/common/*.h)
 SRC.SNDDS3D = $(wildcard plugins/sound/renderer/ds3d/*.cpp) \
   $(wildcard plugins/sound/renderer/common/*.cpp)
-OBJ.SNDDS3D = $(addprefix $(OUT),$(notdir $(SRC.SNDDS3D:.cpp=$O)))
+OBJ.SNDDS3D = $(addprefix $(OUT)/,$(notdir $(SRC.SNDDS3D:.cpp=$O)))
 DEP.SNDDS3D = CSUTIL CSGEOM CSSYS CSUTIL
 
 MSVC.DSP += SNDDS3D
@@ -68,11 +68,11 @@ sndds3dclean:
 	$(RM) $(SNDDS3D) $(OBJ.SNDDS3D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sndds3d.dep
-$(OUTOS)sndds3d.dep: $(SRC.SNDDS3D)
+dep: $(OUTOS)/sndds3d.dep
+$(OUTOS)/sndds3d.dep: $(SRC.SNDDS3D)
 	$(DO.DEP)
 else
--include $(OUTOS)sndds3d.dep
+-include $(OUTOS)/sndds3d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/loader/bmp
 
 ifeq ($(USE_PLUGINS),yes)
-  CSBMPIMG = $(OUTDLL)csbmpimg$(DLL)
+  CSBMPIMG = $(OUTDLL)/csbmpimg$(DLL)
   LIB.CSBMPIMG = $(foreach d,$(DEP.CSBMPIMG),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSBMPIMG)
 else
-  CSBMPIMG = $(OUT)$(LIB_PREFIX)csbmpimg$(LIB)
+  CSBMPIMG = $(OUT)/$(LIB_PREFIX)csbmpimg$(LIB)
   DEP.EXE += $(CSBMPIMG)
   SCF.STATIC += csbmpimg
   TO_INSTALL.STATIC_LIBS += $(CSBMPIMG)
@@ -42,7 +42,7 @@ endif
 INC.CSBMPIMG = $(wildcard plugins/video/loader/bmp/*.h)
 SRC.CSBMPIMG = $(wildcard plugins/video/loader/bmp/*.cpp)
 
-OBJ.CSBMPIMG = $(addprefix $(OUT),$(notdir $(SRC.CSBMPIMG:.cpp=$O)))
+OBJ.CSBMPIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSBMPIMG:.cpp=$O)))
 DEP.CSBMPIMG = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += CSBMPIMG
@@ -66,11 +66,11 @@ bmpimgclean:
 	$(RM) $(CSBMPIMG) $(OBJ.CSBMPIMG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)bmpimg.dep
-$(OUTOS)bmpimg.dep: $(SRC.CSBMPIMG)
+dep: $(OUTOS)/bmpimg.dep
+$(OUTOS)/bmpimg.dep: $(SRC.CSBMPIMG)
 	$(DO.DEP)
 else
--include $(OUTOS)bmpimg.dep
+-include $(OUTOS)/bmpimg.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

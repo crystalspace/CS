@@ -23,11 +23,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/device/joystick/linux
 
 ifeq ($(USE_PLUGINS),yes)
-  JOYLIN = $(OUTDLL)csjoylin$(DLL)
+  JOYLIN = $(OUTDLL)/csjoylin$(DLL)
   LIB.JOYLIN = $(foreach d,$(DEP.JOYLIN),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(JOYLIN)
 else
-  JOYLIN = $(OUT)$(LIB_PREFIX)csjoylin$(LIB)
+  JOYLIN = $(OUT)/$(LIB_PREFIX)csjoylin$(LIB)
   DEP.EXE += $(JOYLIN)
   SCF.STATIC += csjoylin
   TO_INSTALL.STATIC_LIBS += $(JOYLIN)
@@ -35,7 +35,7 @@ endif
 
 INC.JOYLIN = $(wildcard plugins/device/joystick/linux/*.h)
 SRC.JOYLIN = $(wildcard plugins/device/joystick/linux/*.cpp)
-OBJ.JOYLIN = $(addprefix $(OUT),$(notdir $(SRC.JOYLIN:.cpp=$O)))
+OBJ.JOYLIN = $(addprefix $(OUT)/,$(notdir $(SRC.JOYLIN:.cpp=$O)))
 DEP.JOYLIN = CSUTIL CSSYS
 CFG.JOYLIN = data/config/joystick.cfg
 
@@ -61,11 +61,11 @@ joylinclean:
 	-$(RM) $(JOYLIN) $(OBJ.JOYLIN)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)joylin.dep
-$(OUTOS)joylin.dep: $(SRC.JOYLIN)
+dep: $(OUTOS)/joylin.dep
+$(OUTOS)/joylin.dep: $(SRC.JOYLIN)
 	$(DO.DEP)
 else
--include $(OUTOS)joylin.dep
+-include $(OUTOS)/joylin.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

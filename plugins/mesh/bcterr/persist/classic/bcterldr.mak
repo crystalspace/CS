@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/bcterr/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  BCTERRLDR = $(OUTDLL)bcterrldr$(DLL)
+  BCTERRLDR = $(OUTDLL)/bcterrldr$(DLL)
   LIB.BCTERRLDR = $(foreach d,$(DEP.BCTERRLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(BCTERRLDR)
 else
-  BCTERRLDR = $(OUT)$(LIB_PREFIX)bcterrldr$(LIB)
+  BCTERRLDR = $(OUT)/$(LIB_PREFIX)bcterrldr$(LIB)
   DEP.EXE += $(BCTERRLDR)
   SCF.STATIC += bcterrldr
   TO_INSTALL.STATIC_LIBS += $(BCTERRLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.BCTERRLDR = $(wildcard plugins/mesh/bcterr/persist/classic/*.h)
 SRC.BCTERRLDR = $(wildcard plugins/mesh/bcterr/persist/classic/*.cpp)
-OBJ.BCTERRLDR = $(addprefix $(OUT),$(notdir $(SRC.BCTERRLDR:.cpp=$O)))
+OBJ.BCTERRLDR = $(addprefix $(OUT)/,$(notdir $(SRC.BCTERRLDR:.cpp=$O)))
 DEP.BCTERRLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += BCTERRLDR
@@ -59,11 +59,11 @@ bcterrldrclean:
 	-$(RM) $(BCTERRLDR) $(OBJ.BCTERRLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)bcterrldr.dep
-$(OUTOS)bcterrldr.dep: $(SRC.BCTERRLDR)
+dep: $(OUTOS)/bcterrldr.dep
+$(OUTOS)/bcterrldr.dep: $(SRC.BCTERRLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)bcterrldr.dep
+-include $(OUTOS)/bcterrldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/renderer/line
 
 ifeq ($(USE_PLUGINS),yes)
-  LINE3D = $(OUTDLL)line3d$(DLL)
+  LINE3D = $(OUTDLL)/line3d$(DLL)
   LIB.LINE3D = $(foreach d,$(DEP.LINE3D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(LINE3D)
 else
-  LINE3D = $(OUT)$(LIB_PREFIX)line3d$(LIB)
+  LINE3D = $(OUT)/$(LIB_PREFIX)line3d$(LIB)
   DEP.EXE += $(LINE3D)
   SCF.STATIC += line3d
   TO_INSTALL.STATIC_LIBS += $(LINE3D)
@@ -54,7 +54,7 @@ SRC.LINE3D = $(wildcard plugins/video/renderer/line/*.cpp) \
   plugins/video/renderer/common/dpmesh.cpp \
   plugins/video/renderer/common/vbufmgr.cpp \
   plugins/video/renderer/common/polybuf.cpp
-OBJ.LINE3D = $(addprefix $(OUT),$(notdir $(SRC.LINE3D:.cpp=$O)))
+OBJ.LINE3D = $(addprefix $(OUT)/,$(notdir $(SRC.LINE3D:.cpp=$O)))
 DEP.LINE3D = CSGEOM CSGFX CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += LINE3D
@@ -81,11 +81,11 @@ line3dclean:
 	$(RM) $(LINE3D) $(OBJ.LINE3D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)line3d.dep
-$(OUTOS)line3d.dep: $(SRC.LINE3D)
+dep: $(OUTOS)/line3d.dep
+$(OUTOS)/line3d.dep: $(SRC.LINE3D)
 	$(DO.DEP)
 else
--include $(OUTOS)line3d.dep
+-include $(OUTOS)/line3d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

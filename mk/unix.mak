@@ -28,7 +28,7 @@ AR=ar
 ARFLAGS=cr
 
 # Where to put the dynamic libraries on this system?
-OUTDLL=
+OUTDLL=.
 
 # If we don't use -fpic we don't need separate output directories
 ifeq ($(CFLAGS.DLL),)

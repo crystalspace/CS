@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/impexp/3ds
 
 ifeq ($(USE_PLUGINS),yes)
-  IE3DS = $(OUTDLL)ie3ds$(DLL)
+  IE3DS = $(OUTDLL)/ie3ds$(DLL)
   LIB.IE3DS = $(foreach d,$(DEP.IE3DS),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(IE3DS)
 else
-  IE3DS = $(OUT)$(LIB_PREFIX)ie3ds$(LIB)
+  IE3DS = $(OUT)/$(LIB_PREFIX)ie3ds$(LIB)
   DEP.EXE += $(IE3DS)
   SCF.STATIC += ie3ds
   TO_INSTALL.STATIC_LIBS += $(IE3DS)
@@ -37,7 +37,7 @@ endif
 
 INC.IE3DS = $(wildcard plugins/mesh/impexp/3ds/*.h)
 SRC.IE3DS = $(wildcard plugins/mesh/impexp/3ds/*.cpp)
-OBJ.IE3DS = $(addprefix $(OUT),$(notdir $(SRC.IE3DS:.cpp=$O)))
+OBJ.IE3DS = $(addprefix $(OUT)/,$(notdir $(SRC.IE3DS:.cpp=$O)))
 DEP.IE3DS = CSUTIL CSSYS CSTOOL CSUTIL CSGEOM
 
 MSVC.DSP += IE3DS
@@ -60,11 +60,11 @@ ie3dsclean:
 	-$(RM) $(IE3DS) $(OBJ.IE3DS)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)ie3ds.dep
-$(OUTOS)ie3ds.dep: $(SRC.IE3DS)
+dep: $(OUTOS)/ie3ds.dep
+$(OUTOS)/ie3ds.dep: $(SRC.IE3DS)
 	$(DO.DEP)
 else
--include $(OUTOS)ie3ds.dep
+-include $(OUTOS)/ie3ds.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -39,12 +39,12 @@ CFLAGS.XWIN += -I$(X11_PATH)/include
 LIB.XWIN.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
-  XWIN = $(OUTDLL)xwin$(DLL)
+  XWIN = $(OUTDLL)/xwin$(DLL)
   LIB.XWIN = $(foreach d,$(DEP.XWIN),$($d.LIB))
   LIB.XWIN.SPECIAL = $(LIB.XWIN.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(XWIN)
 else
-  XWIN = $(OUT)$(LIB_PREFIX)xwin$(LIB)
+  XWIN = $(OUT)/$(LIB_PREFIX)xwin$(LIB)
   DEP.EXE += $(XWIN)
   LIBS.EXE += $(LIB.XWIN.SYSTEM)
   SCF.STATIC += xwin
@@ -55,7 +55,7 @@ INC.XWIN = $(wildcard plugins/video/canvas/xwindow/*.h)\
   plugins/video/canvas/common/scancode.h
 SRC.XWIN = $(wildcard plugins/video/canvas/xwindow/*.cpp) \
   plugins/video/canvas/common/x11-keys.cpp
-OBJ.XWIN = $(addprefix $(OUT),$(notdir $(SRC.XWIN:.cpp=$O)))
+OBJ.XWIN = $(addprefix $(OUT)/,$(notdir $(SRC.XWIN:.cpp=$O)))
 DEP.XWIN = CSUTIL CSSYS CSGEOM CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -67,7 +67,7 @@ ifeq ($(MAKESECTION),targets)
 
 xwin: $(OUTDIRS) $(XWIN)
 
-$(OUT)%$O: plugins/video/canvas/xwindow/%.cpp
+$(OUT)/%$O: plugins/video/canvas/xwindow/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.XWIN)
 
 $(XWIN): $(OBJ.XWIN) $(LIB.XWIN)
@@ -78,11 +78,11 @@ xwinclean:
 	$(RM) $(XWIN) $(OBJ.XWIN)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)xwin.dep
-$(OUTOS)xwin.dep: $(SRC.XWIN)
+dep: $(OUTOS)/xwin.dep
+$(OUTOS)/xwin.dep: $(SRC.XWIN)
 	$(DO.DEP1) $(CFLAGS.XWIN) $(DO.DEP2)
 else
--include $(OUTOS)xwin.dep
+-include $(OUTOS)/xwin.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/wav plugins/sound/loader/common
 
 ifeq ($(USE_PLUGINS),yes)
-  SNDWAV = $(OUTDLL)sndwav$(DLL)
+  SNDWAV = $(OUTDLL)/sndwav$(DLL)
   LIB.SNDWAV = $(foreach d,$(DEP.SNDWAV),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDWAV)
 else
-  SNDWAV = $(OUT)$(LIB_PREFIX)sndwav$(LIB)
+  SNDWAV = $(OUT)/$(LIB_PREFIX)sndwav$(LIB)
   DEP.EXE += $(SNDWAV)
   SCF.STATIC += sndwav
   TO_INSTALL.STATIC_LIBS += $(SNDWAV)
@@ -43,7 +43,7 @@ INC.SNDWAV = $(wildcard plugins/sound/loader/wav/*.h) \
   $(wildcard plugins/sound/loader/common/*.h)
 SRC.SNDWAV = $(wildcard plugins/sound/loader/wav/*.cpp) \
   $(wildcard plugins/sound/loader/common/*.cpp)
-OBJ.SNDWAV = $(addprefix $(OUT),$(notdir $(SRC.SNDWAV:.cpp=$O)))
+OBJ.SNDWAV = $(addprefix $(OUT)/,$(notdir $(SRC.SNDWAV:.cpp=$O)))
 DEP.SNDWAV = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SNDWAV
@@ -67,11 +67,11 @@ wavclean:
 	$(RM) $(SNDWAV) $(OBJ.SNDWAV)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sndwav.dep
-$(OUTOS)sndwav.dep: $(SRC.SNDWAV)
+dep: $(OUTOS)/sndwav.dep
+$(OUTOS)/sndwav.dep: $(SRC.SNDWAV)
 	$(DO.DEP)
 else
--include $(OUTOS)sndwav.dep
+-include $(OUTOS)/sndwav.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

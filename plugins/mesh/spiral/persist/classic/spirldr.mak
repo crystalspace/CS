@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/spiral/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  SPIRLDR = $(OUTDLL)spirldr$(DLL)
+  SPIRLDR = $(OUTDLL)/spirldr$(DLL)
   LIB.SPIRLDR = $(foreach d,$(DEP.SPIRLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SPIRLDR)
 else
-  SPIRLDR = $(OUT)$(LIB_PREFIX)spirldr$(LIB)
+  SPIRLDR = $(OUT)/$(LIB_PREFIX)spirldr$(LIB)
   DEP.EXE += $(SPIRLDR)
   SCF.STATIC += spirldr
   TO_INSTALL.STATIC_LIBS += $(SPIRLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.SPIRLDR = $(wildcard plugins/mesh/spiral/persist/classic/*.h)
 SRC.SPIRLDR = $(wildcard plugins/mesh/spiral/persist/classic/*.cpp)
-OBJ.SPIRLDR = $(addprefix $(OUT),$(notdir $(SRC.SPIRLDR:.cpp=$O)))
+OBJ.SPIRLDR = $(addprefix $(OUT)/,$(notdir $(SRC.SPIRLDR:.cpp=$O)))
 DEP.SPIRLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SPIRLDR
@@ -59,11 +59,11 @@ spirldrclean:
 	-$(RM) $(SPIRLDR) $(OBJ.SPIRLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)spirldr.dep
-$(OUTOS)spirldr.dep: $(SRC.SPIRLDR)
+dep: $(OUTOS)/spirldr.dep
+$(OUTOS)/spirldr.dep: $(SRC.SPIRLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)spirldr.dep
+-include $(OUTOS)/spirldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -34,11 +34,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/loader/mplex
 
 ifeq ($(USE_PLUGINS),yes)
-  IMGPLEX = $(OUTDLL)imgplex$(DLL)
+  IMGPLEX = $(OUTDLL)/imgplex$(DLL)
   LIB.IMGPLEX = $(foreach d,$(DEP.IMGPLEX),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(IMGPLEX)
 else
-  IMGPLEX = $(OUT)$(LIB_PREFIX)csimgplex$(LIB)
+  IMGPLEX = $(OUT)/$(LIB_PREFIX)csimgplex$(LIB)
   DEP.EXE += $(IMGPLEX)
   SCF.STATIC += imgplex
   TO_INSTALL.STATIC_LIBS += $(IMGPLEX)
@@ -46,7 +46,7 @@ endif
 
 INC.IMGPLEX = $(wildcard plugins/video/loader/mplex/*.h)
 SRC.IMGPLEX = $(wildcard plugins/video/loader/mplex/*.cpp)
-OBJ.IMGPLEX = $(addprefix $(OUT),$(notdir $(SRC.IMGPLEX:.cpp=$O)))
+OBJ.IMGPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.IMGPLEX:.cpp=$O)))
 DEP.IMGPLEX = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += IMGPLEX
@@ -70,11 +70,11 @@ imgplexclean:
 	$(RM) $(IMGPLEX) $(OBJ.IMGPLEX)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)imgplex.dep
-$(OUTOS)imgplex.dep: $(SRC.IMGPLEX)
+dep: $(OUTOS)/imgplex.dep
+$(OUTOS)/imgplex.dep: $(SRC.IMGPLEX)
 	$(DO.DEP)
 else
--include $(OUTOS)imgplex.dep
+-include $(OUTOS)/imgplex.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

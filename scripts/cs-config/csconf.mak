@@ -26,7 +26,7 @@ endif
 ifeq ($(MAKESECTION),postdefines)
 
 CSCONFIG.EXE = cs-config
-CSCONFIG.TMP = $(OUT)csconfig.tmp
+CSCONFIG.TMP = $(OUT)/csconfig.tmp
 
 TO_INSTALL.EXE	+= $(CSCONFIG.EXE)
 

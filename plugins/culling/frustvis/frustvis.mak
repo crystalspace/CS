@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/culling/frustvis
 
 ifeq ($(USE_PLUGINS),yes)
-  FRUSTVIS = $(OUTDLL)frustvis$(DLL)
+  FRUSTVIS = $(OUTDLL)/frustvis$(DLL)
   LIB.FRUSTVIS = $(foreach d,$(DEP.FRUSTVIS),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(FRUSTVIS)
 else
-  FRUSTVIS = $(OUT)$(LIB_PREFIX)frustvis$(LIB)
+  FRUSTVIS = $(OUT)/$(LIB_PREFIX)frustvis$(LIB)
   DEP.EXE += $(FRUSTVIS)
   SCF.STATIC += frustvis
   TO_INSTALL.STATIC_LIBS += $(FRUSTVIS)
@@ -44,7 +44,7 @@ endif
 
 INC.FRUSTVIS = $(wildcard plugins/culling/frustvis/*.h)
 SRC.FRUSTVIS = $(wildcard plugins/culling/frustvis/*.cpp)
-OBJ.FRUSTVIS = $(addprefix $(OUT),$(notdir $(SRC.FRUSTVIS:.cpp=$O)))
+OBJ.FRUSTVIS = $(addprefix $(OUT)/,$(notdir $(SRC.FRUSTVIS:.cpp=$O)))
 DEP.FRUSTVIS = CSUTIL CSGEOM CSUTIL CSSYS CSUTIL CSSYS
 
 MSVC.DSP += FRUSTVIS
@@ -68,11 +68,11 @@ frustvisclean:
 	$(RM) $(FRUSTVIS) $(OBJ.FRUSTVIS)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)frustvis.dep
-$(OUTOS)frustvis.dep: $(SRC.FRUSTVIS)
+dep: $(OUTOS)/frustvis.dep
+$(OUTOS)/frustvis.dep: $(SRC.FRUSTVIS)
 	$(DO.DEP)
 else
--include $(OUTOS)frustvis.dep
+-include $(OUTOS)/frustvis.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

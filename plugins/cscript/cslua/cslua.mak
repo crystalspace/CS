@@ -45,12 +45,12 @@ LIB.CSLUA.SYSTEM += $(LFLAGS.l)lua $(LFLAGS.l)lualib
 LIB.CSLUA.SYSTEM += $(LFLAGS.l)luaswig40
 
 ifeq ($(USE_PLUGINS),yes)
-  CSLUA = $(OUTDLL)cslua$(DLL)
+  CSLUA = $(OUTDLL)/cslua$(DLL)
   LIB.CSLUA = $(foreach d,$(DEP.CSLUA),$($d.LIB))
   LIB.CSLUA.LOCAL = $(LIB.CSLUA.SYSTEM)
 # TO_INSTALL.DYNAMIC_LIBS += $(CSLUA)
 else
-  CSLUA = $(OUT)$(LIB_PREFIX)cspy$(LIB)
+  CSLUA = $(OUT)/$(LIB_PREFIX)cspy$(LIB)
   DEP.EXE += $(CSLUA)
   LIBS.EXE += $(LIB.CSLUA.SYSTEM)
   SCF.STATIC += cslua
@@ -59,12 +59,12 @@ endif
 
 SWIG.INTERFACE = include/ivaria/cs.i
 SWIG.CSLUA = plugins/cscript/cslua/cs_lua.cpp
-SWIG.CSLUA.OBJ = $(addprefix $(OUT),$(notdir $(SWIG.CSLUA:.cpp=$O)))
+SWIG.CSLUA.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSLUA:.cpp=$O)))
 
 INC.CSLUA = $(wildcard plugins/cscript/cslua/*.h)
 SRC.CSLUA = \
   $(sort $(wildcard plugins/cscript/cslua/*.cpp) $(SWIG.CSLUA))
-OBJ.CSLUA = $(addprefix $(OUT),$(notdir $(SRC.CSLUA:.cpp=$O)))
+OBJ.CSLUA = $(addprefix $(OUT)/,$(notdir $(SRC.CSLUA:.cpp=$O)))
 DEP.CSLUA = CSGEOM CSSYS CSUTIL CSSYS
 
 MSVC.DSP += CSLUA
@@ -87,10 +87,10 @@ clean: csluaclean
 $(SWIG.CSLUA.OBJ): $(SWIG.CSLUA)
 	$(filter-out -W -Wunused -Wall,$(DO.COMPILE.CPP) $(CFLAGS.LUA))
 
-$(OUT)%$O: plugins/cscript/cslua/%.cpp
+$(OUT)/%$O: plugins/cscript/cslua/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.LUA)
 
-$(OUT)%$O: plugins/cscript/cslua/%.c
+$(OUT)/%$O: plugins/cscript/cslua/%.c
 	$(DO.COMPILE.C) $(CFLAGS.LUA)
 
 $(SWIG.CSLUA): $(SWIG.INTERFACE)
@@ -108,14 +108,14 @@ csluaclean:
 csluaswig: csluaswigclean cslua
 
 csluaswigclean:
-	-$(RM) $(CSLUA) $(SWIG.CSLUA) $(OUT)cs_lua.cpp
+	-$(RM) $(CSLUA) $(SWIG.CSLUA) $(OUT)/cs_lua.cpp
 
 ifdef DO_DEPEND
-dep: $(OUTOS)cslua.dep
-$(OUTOS)cslua.dep: $(SRC.CSLUA)
+dep: $(OUTOS)/cslua.dep
+$(OUTOS)/cslua.dep: $(SRC.CSLUA)
 	$(DO.DEP1) $(CFLAGS.LUA) $(DO.DEP2)
 else
--include $(OUTOS)cslua.dep
+-include $(OUTOS)/cslua.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/motion/standard/object
 
 ifeq ($(USE_PLUGINS),yes)
-  MOTION = $(OUTDLL)motion$(DLL)
+  MOTION = $(OUTDLL)/motion$(DLL)
   LIB.MOTION = $(foreach d,$(DEP.MOTION),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(MOTION)
 else
-  MOTION = $(OUT)$(LIB_PREFIX)motion$(LIB)
+  MOTION = $(OUT)/$(LIB_PREFIX)motion$(LIB)
   DEP.EXE += $(MOTION)
   SCF.STATIC += motion
   TO_INSTALL.STATIC_LIBS += $(MOTION)
@@ -41,7 +41,7 @@ endif
 
 INC.MOTION = $(wildcard plugins/motion/standard/object/*.h)
 SRC.MOTION = $(wildcard plugins/motion/standard/object/*.cpp)
-OBJ.MOTION = $(addprefix $(OUT),$(notdir $(SRC.MOTION:.cpp=$O)))
+OBJ.MOTION = $(addprefix $(OUT)/,$(notdir $(SRC.MOTION:.cpp=$O)))
 DEP.MOTION = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += MOTION
@@ -65,11 +65,11 @@ motionclean:
 	$(RM) $(MOTION) $(OBJ.MOTION)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)motion.dep
-$(OUTOS)motion.dep: $(SRC.MOTION)
+dep: $(OUTOS)/motion.dep
+$(OUTOS)/motion.dep: $(SRC.MOTION)
 	$(DO.DEP)
 else
--include $(OUTOS)motion.dep
+-include $(OUTOS)/motion.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

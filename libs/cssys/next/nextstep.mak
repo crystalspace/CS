@@ -78,8 +78,9 @@ include libs/cssys/next/next.mak
 NEXT.FRIEND=no
 
 ifeq ($(MAKESECTION),postdefines)
-PUBDLLSYM = $(OUTOS)$(basename $(notdir $@)).sym
+PUBDLLSYM = $(OUTOS)/$(basename $(notdir $@)).sym
 DO.SHARED.PLUGIN.POSTAMBLE += \
   ; echo "_$(basename $(notdir $@))_scfInitialize" > $(PUBDLLSYM) \
+  ; echo "_$(basename $(notdir $@))_scfFinalize" >> $(PUBDLLSYM) \
   ; $(STRIP) -s $(PUBDLLSYM) -u $(NEXT.STRIP_FLAGS) $@
 endif

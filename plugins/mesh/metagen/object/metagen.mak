@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/metagen/object
 
 ifeq ($(USE_PLUGINS),yes)
-  METAGEN = $(OUTDLL)metagen$(DLL)
+  METAGEN = $(OUTDLL)/metagen$(DLL)
   LIB.METAGEN = $(foreach d,$(DEP.METAGEN),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(METAGEN)
 else
-  METAGEN = $(OUT)$(LIB_PREFIX)metagen$(LIB)
+  METAGEN = $(OUT)/$(LIB_PREFIX)metagen$(LIB)
   DEP.EXE += $(METAGEN)
   SCF.STATIC += metagen
   TO_INSTALL.STATIC_LIBS += $(METAGEN)
@@ -44,7 +44,7 @@ endif
 
 INC.METAGEN = $(wildcard plugins/mesh/metagen/object/*.h)
 SRC.METAGEN = $(wildcard plugins/mesh/metagen/object/*.cpp)
-OBJ.METAGEN = $(addprefix $(OUT),$(notdir $(SRC.METAGEN:.cpp=$O)))
+OBJ.METAGEN = $(addprefix $(OUT)/,$(notdir $(SRC.METAGEN:.cpp=$O)))
 DEP.METAGEN = CSGEOM CSUTIL CSSYS
 
 MSVC.DSP += METAGEN
@@ -71,11 +71,11 @@ metagenclean:
 	$(RM) $(METAGEN) $(OBJ.METAGEN)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)metagen.dep
-$(OUTOS)metagen.dep: $(SRC.METAGEN)
+dep: $(OUTOS)/metagen.dep
+$(OUTOS)/metagen.dep: $(SRC.METAGEN)
 	$(DO.DEP)
 else
--include $(OUTOS)metagen.dep
+-include $(OUTOS)/metagen.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -26,11 +26,11 @@ vpath %.cpp plugins/video/format/codecs/opendivx
 
 LIB.EXTERNAL.ODIVX = -ldivxdecore
 ifeq ($(USE_PLUGINS),yes)
-  ODIVX = $(OUTDLL)odivx$(DLL)
+  ODIVX = $(OUTDLL)/odivx$(DLL)
   LIB.ODIVX = $(foreach d,$(DEP.ODIVX),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(ODIVX)
 else
-  ODIVX = $(OUT)$(LIB_PREFIX)odivx$(LIB)
+  ODIVX = $(OUT)/$(LIB_PREFIX)odivx$(LIB)
   DEP.EXE += $(ODIVX)
   SCF.STATIC += odivx
   TO_INSTALL.STATIC_LIBS += $(ODIVX)
@@ -38,7 +38,7 @@ endif
 
 INC.ODIVX = $(wildcard plugins/video/format/codecs/opendivx/*.h)
 SRC.ODIVX = $(wildcard plugins/video/format/codecs/opendivx/*.cpp)
-OBJ.ODIVX = $(addprefix $(OUT),$(notdir $(SRC.ODIVX:.cpp=$O)))
+OBJ.ODIVX = $(addprefix $(OUT)/,$(notdir $(SRC.ODIVX:.cpp=$O)))
 DEP.ODIVX = CSUTIL CSSYS
 CFG.ODIVX =
 
@@ -65,11 +65,11 @@ odivxclean:
 	-$(RM) $(ODIVX) $(OBJ.ODIVX)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)odivx.dep
-$(OUTOS)odivx.dep: $(SRC.ODIVX)
+dep: $(OUTOS)/odivx.dep
+$(OUTOS)/odivx.dep: $(SRC.ODIVX)
 	$(DO.DEP)
 else
--include $(OUTOS)odivx.dep
+-include $(OUTOS)/odivx.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/loader/tga
 
 ifeq ($(USE_PLUGINS),yes)
-  CSTGAIMG = $(OUTDLL)cstgaimg$(DLL)
+  CSTGAIMG = $(OUTDLL)/cstgaimg$(DLL)
   LIB.CSTGAIMG = $(foreach d,$(DEP.CSTGAIMG),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSTGAIMG)
 else
-  CSTGAIMG = $(OUT)$(LIB_PREFIX)cstgaimg$(LIB)
+  CSTGAIMG = $(OUT)/$(LIB_PREFIX)cstgaimg$(LIB)
   DEP.EXE += $(CSTGAIMG)
   SCF.STATIC += cstgaimg
   TO_INSTALL.STATIC_LIBS += $(CSTGAIMG)
@@ -42,7 +42,7 @@ endif
 INC.CSTGAIMG = $(wildcard plugins/video/loader/tga/*.h)
 SRC.CSTGAIMG = $(wildcard plugins/video/loader/tga/*.cpp)
 
-OBJ.CSTGAIMG = $(addprefix $(OUT),$(notdir $(SRC.CSTGAIMG:.cpp=$O)))
+OBJ.CSTGAIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSTGAIMG:.cpp=$O)))
 DEP.CSTGAIMG = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += CSTGAIMG
@@ -66,11 +66,11 @@ tgaimgclean:
 	$(RM) $(CSTGAIMG) $(OBJ.CSTGAIMG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)tgaimg.dep
-$(OUTOS)tgaimg.dep: $(SRC.CSTGAIMG)
+dep: $(OUTOS)/tgaimg.dep
+$(OUTOS)/tgaimg.dep: $(SRC.CSTGAIMG)
 	$(DO.DEP)
 else
--include $(OUTOS)tgaimg.dep
+-include $(OUTOS)/tgaimg.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

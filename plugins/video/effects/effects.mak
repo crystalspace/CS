@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/effects
 
 ifeq ($(USE_PLUGINS),yes)
-  EFFECTS = $(OUTDLL)effects$(DLL)
+  EFFECTS = $(OUTDLL)/effects$(DLL)
   LIB.EFFECTS = $(foreach d,$(DEP.EFFECTS),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(EFFECTS)
 else
-  EFFECTS = $(OUT)$(LIB_PREFIX)effects$(LIB)
+  EFFECTS = $(OUT)/$(LIB_PREFIX)effects$(LIB)
   DEP.EXE += $(EFFECTS)
   SCF.STATIC += effects
   TO_INSTALL.STATIC_LIBS += $(EFFECTS)
@@ -44,7 +44,7 @@ endif
 
 INC.EFFECTS = $(wildcard plugins/video/effects/*.h)
 SRC.EFFECTS = $(wildcard plugins/video/effects/*.cpp)
-OBJ.EFFECTS = $(addprefix $(OUT),$(notdir $(SRC.EFFECTS:.cpp=$O)))
+OBJ.EFFECTS = $(addprefix $(OUT)/,$(notdir $(SRC.EFFECTS:.cpp=$O)))
 DEP.EFFECTS = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 
 TO_INSTALL.CONFIG += $(CFG.EFFECTS)
@@ -70,11 +70,11 @@ effectsclean:
 	$(RM) $(EFFECTS) $(OBJ.EFFECTS)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)effects.dep
-$(OUTOS)effects.dep: $(SRC.EFFECTS)
+dep: $(OUTOS)/effects.dep
+$(OUTOS)/effects.dep: $(SRC.EFFECTS)
 	$(DO.DEP)
 else
--include $(OUTOS)effects.dep
+-include $(OUTOS)/effects.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

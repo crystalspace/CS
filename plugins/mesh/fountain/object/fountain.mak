@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/fountain/object plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
-  FOUNTAIN = $(OUTDLL)fountain$(DLL)
+  FOUNTAIN = $(OUTDLL)/fountain$(DLL)
   LIB.FOUNTAIN = $(foreach d,$(DEP.FOUNTAIN),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(FOUNTAIN)
 else
-  FOUNTAIN = $(OUT)$(LIB_PREFIX)fountain$(LIB)
+  FOUNTAIN = $(OUT)/$(LIB_PREFIX)fountain$(LIB)
   DEP.EXE += $(FOUNTAIN)
   SCF.STATIC += fountain
   TO_INSTALL.STATIC_LIBS += $(FOUNTAIN)
@@ -37,7 +37,7 @@ endif
 
 INC.FOUNTAIN = $(wildcard plugins/mesh/fountain/object/*.h plugins/mesh/partgen/*.h)
 SRC.FOUNTAIN = $(wildcard plugins/mesh/fountain/object/*.cpp plugins/mesh/partgen/*.cpp)
-OBJ.FOUNTAIN = $(addprefix $(OUT),$(notdir $(SRC.FOUNTAIN:.cpp=$O)))
+OBJ.FOUNTAIN = $(addprefix $(OUT)/,$(notdir $(SRC.FOUNTAIN:.cpp=$O)))
 DEP.FOUNTAIN = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += FOUNTAIN
@@ -59,11 +59,11 @@ fountclean:
 	-$(RM) $(FOUNTAIN) $(OBJ.FOUNTAIN)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)fount.dep
-$(OUTOS)fount.dep: $(SRC.FOUNTAIN)
+dep: $(OUTOS)/fount.dep
+$(OUTOS)/fount.dep: $(SRC.FOUNTAIN)
 	$(DO.DEP)
 else
--include $(OUTOS)fount.dep
+-include $(OUTOS)/fount.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

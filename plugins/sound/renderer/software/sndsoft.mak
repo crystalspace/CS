@@ -39,11 +39,11 @@ ifeq ($(OS),WIN32)
 endif
 
 ifeq ($(USE_PLUGINS),yes)
-  SNDSOFT = $(OUTDLL)sndsoft$(DLL)
+  SNDSOFT = $(OUTDLL)/sndsoft$(DLL)
   LIB.SNDSOFT = $(foreach d,$(DEP.SNDSOFT),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDSOFT)
 else
-  SNDSOFT = $(OUT)$(LIB_PREFIX)sndsoft$(LIB)
+  SNDSOFT = $(OUT)/$(LIB_PREFIX)sndsoft$(LIB)
   DEP.EXE += $(SNDSOFT)
   ifeq ($(OS),WIN32)
     ifeq ($(COMP),GCC)
@@ -60,7 +60,7 @@ INC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.h) \
   $(wildcard plugins/sound/renderer/common/*.h)
 SRC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.cpp) \
   $(wildcard plugins/sound/renderer/common/*.cpp)
-OBJ.SNDSOFT = $(addprefix $(OUT),$(notdir $(SRC.SNDSOFT:.cpp=$O)))
+OBJ.SNDSOFT = $(addprefix $(OUT)/,$(notdir $(SRC.SNDSOFT:.cpp=$O)))
 DEP.SNDSOFT = CSUTIL CSGEOM CSSYS CSUTIL
 
 MSVC.DSP += SNDSOFT
@@ -84,11 +84,11 @@ sndsoftclean:
 	$(RM) $(SNDSOFT) $(OBJ.SNDSOFT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sndsoft.dep
-$(OUTOS)sndsoft.dep: $(SRC.SNDSOFT)
+dep: $(OUTOS)/sndsoft.dep
+$(OUTOS)/sndsoft.dep: $(SRC.SNDSOFT)
 	$(DO.DEP)
 else
--include $(OUTOS)sndsoft.dep
+-include $(OUTOS)/sndsoft.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/thing/persist/impexp
 
 ifeq ($(USE_PLUGINS),yes)
-  THINGIE = $(OUTDLL)thingie$(DLL)
+  THINGIE = $(OUTDLL)/thingie$(DLL)
   LIB.THINGIE = $(foreach d,$(DEP.THINGIE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(THINGIE)
 else
-  THINGIE = $(OUT)$(LIB_PREFIX)thingie$(LIB)
+  THINGIE = $(OUT)/$(LIB_PREFIX)thingie$(LIB)
   DEP.EXE += $(THINGIE)
   SCF.STATIC += thingie
   TO_INSTALL.STATIC_LIBS += $(THINGIE)
@@ -37,7 +37,7 @@ endif
 
 INC.THINGIE = $(wildcard plugins/mesh/thing/persist/impexp/*.h)
 SRC.THINGIE = $(wildcard plugins/mesh/thing/persist/impexp/*.cpp)
-OBJ.THINGIE = $(addprefix $(OUT),$(notdir $(SRC.THINGIE:.cpp=$O)))
+OBJ.THINGIE = $(addprefix $(OUT)/,$(notdir $(SRC.THINGIE:.cpp=$O)))
 DEP.THINGIE = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += THINGIE
@@ -59,11 +59,11 @@ thingieclean:
 	-$(RM) $(THINGIE) $(OBJ.THINGIE)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)thingie.dep
-$(OUTOS)thingie.dep: $(SRC.THINGIE)
+dep: $(OUTOS)/thingie.dep
+$(OUTOS)/thingie.dep: $(SRC.THINGIE)
 	$(DO.DEP)
 else
--include $(OUTOS)thingie.dep
+-include $(OUTOS)/thingie.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/emit/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  EMITLDR = $(OUTDLL)emitldr$(DLL)
+  EMITLDR = $(OUTDLL)/emitldr$(DLL)
   LIB.EMITLDR = $(foreach d,$(DEP.EMITLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(EMITLDR)
 else
-  EMITLDR = $(OUT)$(LIB_PREFIX)emitldr$(LIB)
+  EMITLDR = $(OUT)/$(LIB_PREFIX)emitldr$(LIB)
   DEP.EXE += $(EMITLDR)
   SCF.STATIC += emitldr
   TO_INSTALL.STATIC_LIBS += $(EMITLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.EMITLDR = $(wildcard plugins/mesh/emit/persist/classic/*.h)
 SRC.EMITLDR = $(wildcard plugins/mesh/emit/persist/classic/*.cpp)
-OBJ.EMITLDR = $(addprefix $(OUT),$(notdir $(SRC.EMITLDR:.cpp=$O)))
+OBJ.EMITLDR = $(addprefix $(OUT)/,$(notdir $(SRC.EMITLDR:.cpp=$O)))
 DEP.EMITLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += EMITLDR
@@ -59,11 +59,11 @@ emitldrclean:
 	-$(RM) $(EMITLDR) $(OBJ.EMITLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)emitldr.dep
-$(OUTOS)emitldr.dep: $(SRC.EMITLDR)
+dep: $(OUTOS)/emitldr.dep
+$(OUTOS)/emitldr.dep: $(SRC.EMITLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)emitldr.dep
+-include $(OUTOS)/emitldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

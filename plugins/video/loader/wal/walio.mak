@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/loader/wal
 
 ifeq ($(USE_PLUGINS),yes)
-  CSWALIMG = $(OUTDLL)cswalimg$(DLL)
+  CSWALIMG = $(OUTDLL)/cswalimg$(DLL)
   LIB.CSWALIMG = $(foreach d,$(DEP.CSWALIMG),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSWALIMG)
 else
-  WALIMG = $(OUT)$(LIB_PREFIX)cswalimg$(LIB)
+  WALIMG = $(OUT)/$(LIB_PREFIX)cswalimg$(LIB)
   DEP.EXE += $(CSWALIMG)
   SCF.STATIC += cswalimg
   TO_INSTALL.STATIC_LIBS += $(CSWALIMG)
@@ -42,7 +42,7 @@ endif
 INC.CSWALIMG = $(wildcard plugins/video/loader/wal/*.h)
 SRC.CSWALIMG = $(wildcard plugins/video/loader/wal/*.cpp)
 
-OBJ.CSWALIMG = $(addprefix $(OUT),$(notdir $(SRC.CSWALIMG:.cpp=$O)))
+OBJ.CSWALIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSWALIMG:.cpp=$O)))
 DEP.CSWALIMG = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += CSWALIMG
@@ -66,11 +66,11 @@ walimgclean:
 	$(RM) $(CSWALIMG) $(OBJ.CSWALIMG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)walimg.dep
-$(OUTOS)walimg.dep: $(SRC.CSWALIMG)
+dep: $(OUTOS)/walimg.dep
+$(OUTOS)/walimg.dep: $(SRC.CSWALIMG)
 	$(DO.DEP)
 else
--include $(OUTOS)walimg.dep
+-include $(OUTOS)/walimg.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

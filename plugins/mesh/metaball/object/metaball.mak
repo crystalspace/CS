@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/metaball/object
 
 ifeq ($(USE_PLUGINS),yes)
-  METABALL = $(OUTDLL)metaball$(DLL)
+  METABALL = $(OUTDLL)/metaball$(DLL)
   LIB.METABALL = $(foreach d,$(DEP.METABALL),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(METABALL)
 else
-  METABALL = $(OUT)$(LIB_PREFIX)metaball$(LIB)
+  METABALL = $(OUT)/$(LIB_PREFIX)metaball$(LIB)
   DEP.EXE += $(METABALL)
   SCF.STATIC += metaball
   TO_INSTALL.STATIC_LIBS += $(METABALL)
@@ -44,7 +44,7 @@ endif
 
 INC.METABALL = $(wildcard plugins/mesh/metaball/object/*.h)
 SRC.METABALL = $(wildcard plugins/mesh/metaball/object/*.cpp)
-OBJ.METABALL = $(addprefix $(OUT),$(notdir $(SRC.METABALL:.cpp=$O)))
+OBJ.METABALL = $(addprefix $(OUT)/,$(notdir $(SRC.METABALL:.cpp=$O)))
 DEP.METABALL = CSGEOM CSUTIL CSSYS
 
 MSVC.DSP += METABALL
@@ -71,11 +71,11 @@ metaballclean:
 	$(RM) $(METABALL) $(OBJ.METABALL)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)metaball.dep
-$(OUTOS)metaball.dep: $(SRC.METABALL)
+dep: $(OUTOS)/metaball.dep
+$(OUTOS)/metaball.dep: $(SRC.METABALL)
 	$(DO.DEP)
 else
--include $(OUTOS)metaball.dep
+-include $(OUTOS)/metaball.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

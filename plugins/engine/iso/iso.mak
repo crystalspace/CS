@@ -27,11 +27,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/engine/iso
 
 ifeq ($(USE_PLUGINS),yes)
-  ISO = $(OUTDLL)iso$(DLL)
+  ISO = $(OUTDLL)/iso$(DLL)
   LIB.ISO = $(foreach d,$(DEP.ISO),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(ISO)
 else
-  ISO = $(OUT)$(LIB_PREFIX)iso$(LIB)
+  ISO = $(OUT)/$(LIB_PREFIX)iso$(LIB)
   DEP.EXE += $(ISO)
   SCF.STATIC += iso
   TO_INSTALL.STATIC_LIBS += $(ISO)
@@ -39,7 +39,7 @@ endif
 
 INC.ISO = $(wildcard plugins/engine/iso/*.h)
 SRC.ISO = $(wildcard plugins/engine/iso/*.cpp)
-OBJ.ISO = $(addprefix $(OUT),$(notdir $(SRC.ISO:.cpp=$O)))
+OBJ.ISO = $(addprefix $(OUT)/,$(notdir $(SRC.ISO:.cpp=$O)))
 DEP.ISO = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
 
 MSVC.DSP += ISO
@@ -61,11 +61,11 @@ isoclean:
 	-$(RM) $(ISO) $(OBJ.ISO)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)iso.dep
-$(OUTOS)iso.dep: $(SRC.ISO)
+dep: $(OUTOS)/iso.dep
+$(OUTOS)/iso.dep: $(SRC.ISO)
 	$(DO.DEP)
 else
--include $(OUTOS)iso.dep
+-include $(OUTOS)/iso.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

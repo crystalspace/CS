@@ -110,11 +110,11 @@ DOXYGEN_PUBAPI = docs/support/pubapi.dox
 DOXYGEN_DEVAPI = docs/support/devapi.dox
 
 # Root of the target directory hierarchy.
-OUT.DOC = $(OUTBASE)docs
+OUT.DOC = $(OUTBASE)/docs
 
 # Relative path which refers to main CS directory from within one of the
 # specific output directories, such as $(OUT.DOC.HTML).  The value of this
-# variable must reflect the value of $(OUT.DOC) and $(OUTBASE).
+# variable must reflect the value of $(OUT.DOC) and $(OUTBASE)/.
 OUT.DOC.UNDO = ../../..
 
 # This section is specially protected by DO_DOC in order to prevent the lengthy

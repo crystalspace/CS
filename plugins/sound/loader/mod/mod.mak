@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/mod
 
 ifeq ($(USE_PLUGINS),yes)
-  SNDMOD = $(OUTDLL)sndmod$(DLL)
+  SNDMOD = $(OUTDLL)/sndmod$(DLL)
   LIB.SNDMOD = $(foreach d,$(DEP.SNDMOD),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDMOD)
 else
-  SNDMOD = $(OUT)$(LIB_PREFIX)sndmod$(LIB)
+  SNDMOD = $(OUT)/$(LIB_PREFIX)sndmod$(LIB)
   DEP.EXE += $(SNDMOD)
   SCF.STATIC += sndmod
   TO_INSTALL.STATIC_LIBS += $(SNDMOD)
@@ -41,7 +41,7 @@ endif
 
 INC.SNDMOD = $(wildcard plugins/sound/loader/mod/*.h)
 SRC.SNDMOD = $(wildcard plugins/sound/loader/mod/*.cpp)
-OBJ.SNDMOD = $(addprefix $(OUT),$(notdir $(SRC.SNDMOD:.cpp=$O)))
+OBJ.SNDMOD = $(addprefix $(OUT)/,$(notdir $(SRC.SNDMOD:.cpp=$O)))
 DEP.SNDMOD = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SNDMOD
@@ -66,11 +66,11 @@ csmodclean:
 	$(RM) $(SNDMOD) $(OBJ.SNDMOD)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sndmod.dep
-$(OUTOS)sndmod.dep: $(SRC.SNDMOD)
+dep: $(OUTOS)/sndmod.dep
+$(OUTOS)/sndmod.dep: $(SRC.SNDMOD)
 	$(DO.DEP)
 else
--include $(OUTOS)sndmod.dep
+-include $(OUTOS)/sndmod.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -28,11 +28,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/csparser
 
 ifeq ($(USE_PLUGINS),yes)
-  CSPARSER = $(OUTDLL)csparser$(DLL)
+  CSPARSER = $(OUTDLL)/csparser$(DLL)
   LIB.CSPARSER = $(foreach d,$(DEP.CSPARSER),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSPARSER)
 else
-  CSPARSER = $(OUT)$(LIB_PREFIX)csparser$(LIB)
+  CSPARSER = $(OUT)/$(LIB_PREFIX)csparser$(LIB)
   DEP.EXE += $(CSPARSER)
   SCF.STATIC += csparser
   TO_INSTALL.STATIC_LIBS += $(CSPARSER)
@@ -40,7 +40,7 @@ endif
 
 INC.CSPARSER = $(wildcard plugins/csparser/*.h)
 SRC.CSPARSER = $(wildcard plugins/csparser/*.cpp)
-OBJ.CSPARSER = $(addprefix $(OUT),$(notdir $(SRC.CSPARSER:.cpp=$O)))
+OBJ.CSPARSER = $(addprefix $(OUT)/,$(notdir $(SRC.CSPARSER:.cpp=$O)))
 DEP.CSPARSER = CSUTIL CSTOOL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
 
 MSVC.DSP += CSPARSER
@@ -62,11 +62,11 @@ csparserclean:
 	-$(RM) $(CSPARSER) $(OBJ.CSPARSER)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csparser.dep
-$(OUTOS)csparser.dep: $(SRC.CSPARSER)
+dep: $(OUTOS)/csparser.dep
+$(OUTOS)/csparser.dep: $(SRC.CSPARSER)
 	$(DO.DEP)
 else
--include $(OUTOS)csparser.dep
+-include $(OUTOS)/csparser.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

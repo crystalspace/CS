@@ -32,12 +32,12 @@ ifeq ($(MAKESECTION),postdefines)
 LIB.SVGA2D.SYSTEM += -lvga -lvgagl
 
 ifeq ($(USE_PLUGINS),yes)
-  SVGA2D = $(OUTDLL)svga2d$(DLL)
+  SVGA2D = $(OUTDLL)/svga2d$(DLL)
   LIB.SVGA2D = $(foreach d,$(DEP.SVGA2D),$($d.LIB))
   LIB.SVGA2D.SPECIAL += $(LIB.SVGA2D.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(SVGA2D)
 else
-  SVGA2D = $(OUT)$(LIB_PREFIX)svga2d$(LIB)
+  SVGA2D = $(OUT)/$(LIB_PREFIX)svga2d$(LIB)
   DEP.EXE += $(SVGA2D)
   LIBS.EXE += $(LIB.SVGA2D.SYSTEM)
   SCF.STATIC += svga2d
@@ -46,7 +46,7 @@ endif
 
 INC.SVGA2D = $(wildcard plugins/video/canvas/svgalib/*.h   $(INC.COMMON.DRV2D))
 SRC.SVGA2D = $(wildcard plugins/video/canvas/svgalib/*.cpp $(SRC.COMMON.DRV2D))
-OBJ.SVGA2D = $(addprefix $(OUT),$(notdir $(SRC.SVGA2D:.cpp=$O)))
+OBJ.SVGA2D = $(addprefix $(OUT)/,$(notdir $(SRC.SVGA2D:.cpp=$O)))
 DEP.SVGA2D = CSUTIL CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -58,7 +58,7 @@ ifeq ($(MAKESECTION),targets)
 
 svgalib2d: $(OUTDIRS) $(SVGA2D)
 
-$(OUT)%$O: plugins/video/canvas/svgalib/%.cpp
+$(OUT)/%$O: plugins/video/canvas/svgalib/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SVGA2D)
 
 $(SVGA2D): $(OBJ.SVGA2D) $(LIB.SVGA2D)
@@ -69,11 +69,11 @@ svgalib2dclean:
 	$(RM) $(SVGA2D) $(OBJ.SVGA2D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)svgalib2d.dep
-$(OUTOS)svgalib2d.dep: $(SRC.SVGA2D)
+dep: $(OUTOS)/svgalib2d.dep
+$(OUTOS)/svgalib2d.dep: $(SRC.SVGA2D)
 	$(DO.DEP)
 else
--include $(OUTOS)svgalib2d.dep
+-include $(OUTOS)/svgalib2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -106,10 +106,10 @@ INSTALL_SCRIPTS.DESTFILES = \
   $(addprefix $(INSTALL_DIR)/,$(sort $(INSTALL_SCRIPTS.FILES)))
 
 INSTALL_LIB.DIR = $(INSTALL_DIR)/lib
-ifeq ($(strip $(OUTDLL)),)
-  INSTALL_DLL.DIR = $(INSTALL_LIB.DIR)
+ifneq (.,$(OUTDLL))
+  INSTALL_DLL.DIR = $(INSTALL_DIR)/$(OUTDLL)
 else
-  INSTALL_DLL.DIR = $(patsubst %/,%,$(INSTALL_DIR)/$(OUTDLL))
+  INSTALL_DLL.DIR = $(INSTALL_LIB.DIR)
 endif
 
 endif # ifeq ($(DO_INSTALL),yes)
@@ -134,7 +134,7 @@ $(INSTALL_DIR) $(INSTALL_DIR)/bin $(INSTALL_LIB.DIR) $(INSTALL_INCLUDE.DIR) \
 $(INSTALL_DIR)/data $(INSTALL_DIR)/data/config:
 	$(MKDIR)
 
-ifneq ($(strip $(OUTDLL)),)
+ifneq (.,$(OUTDLL))
 $(INSTALL_DLL.DIR):
 	$(MKDIR)
 endif

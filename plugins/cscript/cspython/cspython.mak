@@ -68,12 +68,12 @@ endif
 endif
 
 ifeq ($(USE_PLUGINS),yes)
-  CSPYTHON = $(OUTDLL)cspython$(DLL)
+  CSPYTHON = $(OUTDLL)/cspython$(DLL)
   LIB.CSPYTHON = $(foreach d,$(DEP.CSPYTHON),$($d.LIB))
   LIB.CSPYTHON.LOCAL = $(LIBS.CSPYTHON.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(CSPYTHON)
 else
-  CSPYTHON = $(OUT)$(LIB_PREFIX)cspy$(LIB)
+  CSPYTHON = $(OUT)/$(LIB_PREFIX)cspy$(LIB)
   DEP.EXE += $(CSPYTHON)
   LIBS.EXE += $(LIBS.CSPYTHON.SYSTEM)
   SCF.STATIC += cspython
@@ -84,14 +84,14 @@ TO_INSTALL.ROOT += python.cex
 
 SWIG.INTERFACE = include/ivaria/cs.i
 SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
-SWIG.CSPYTHON.OBJ = $(addprefix $(OUT),$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
+SWIG.CSPYTHON.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
 
 TRASH.CSPYTHON = $(wildcard $(addprefix scripts/python/,*.pyc *.pyo))
 
 INC.CSPYTHON = $(wildcard plugins/cscript/cspython/*.h)
 SRC.CSPYTHON = \
   $(sort $(wildcard plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON))
-OBJ.CSPYTHON = $(addprefix $(OUT),$(notdir $(SRC.CSPYTHON:.cpp=$O)))
+OBJ.CSPYTHON = $(addprefix $(OUT)/,$(notdir $(SRC.CSPYTHON:.cpp=$O)))
 DEP.CSPYTHON = CSGEOM CSSYS CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += CSPYTHON
@@ -114,10 +114,10 @@ clean: cspythonclean
 $(SWIG.CSPYTHON.OBJ): $(SWIG.CSPYTHON)
 	$(filter-out -W -Wunused -Wall,$(DO.COMPILE.CPP) $(CFLAGS.PYTHON))
 
-$(OUT)%$O: plugins/cscript/cspython/%.cpp
+$(OUT)/%$O: plugins/cscript/cspython/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PYTHON)
 
-$(OUT)%$O: plugins/cscript/cspython/%.c
+$(OUT)/%$O: plugins/cscript/cspython/%.c
 	$(DO.COMPILE.C) $(CFLAGS.PYTHON)
 
 $(SWIG.CSPYTHON): $(SWIG.INTERFACE)
@@ -146,14 +146,14 @@ cspythonclean:
 cspythonswig: cspythonswigclean cspython
 
 cspythonswigclean:
-	-$(RM) $(CSPYTHON) $(SWIG.CSPYTHON) $(OUT)cs_pyth.cpp
+	-$(RM) $(CSPYTHON) $(SWIG.CSPYTHON) $(OUT)/cs_pyth.cpp
 
 ifdef DO_DEPEND
-dep: $(OUTOS)cspython.dep
-$(OUTOS)cspython.dep: $(SRC.CSPYTHON)
+dep: $(OUTOS)/cspython.dep
+$(OUTOS)/cspython.dep: $(SRC.CSPYTHON)
 	$(DO.DEP1) $(CFLAGS.PYTHON) $(DO.DEP2)
 else
--include $(OUTOS)cspython.dep
+-include $(OUTOS)/cspython.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

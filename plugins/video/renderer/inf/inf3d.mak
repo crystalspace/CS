@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/renderer/inf
 
 ifeq ($(USE_PLUGINS),yes)
-  INF3D = $(OUTDLL)inf3d$(DLL)
+  INF3D = $(OUTDLL)/inf3d$(DLL)
   LIB.INF3D = $(foreach d,$(DEP.INF3D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(INF3D)
 else
-  INF3D = $(OUT)$(LIB_PREFIX)inf$(LIB)
+  INF3D = $(OUT)/$(LIB_PREFIX)inf$(LIB)
   DEP.EXE += $(INF3D)
   SCF.STATIC += inf3d
   TO_INSTALL.STATIC_LIBS += $(INF3D)
@@ -56,7 +56,7 @@ SRC.INF3D = $(wildcard plugins/video/renderer/inf/*.cpp \
   plugins/video/renderer/common/vbufmgr.cpp \
   plugins/video/renderer/common/polybuf.cpp \
   $(SRC.COMMON.DRV2D))
-OBJ.INF3D = $(addprefix $(OUT),$(notdir $(SRC.INF3D:.cpp=$O)))
+OBJ.INF3D = $(addprefix $(OUT)/,$(notdir $(SRC.INF3D:.cpp=$O)))
 DEP.INF3D = CSGEOM CSGFX CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += INF3D
@@ -83,11 +83,11 @@ inf3dclean:
 	$(RM) $(INF3D) $(OBJ.INF3D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)inf3d.dep
-$(OUTOS)inf3d.dep: $(SRC.INF3D)
+dep: $(OUTOS)/inf3d.dep
+$(OUTOS)/inf3d.dep: $(SRC.INF3D)
 	$(DO.DEP)
 else
--include $(OUTOS)inf3d.dep
+-include $(OUTOS)/inf3d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

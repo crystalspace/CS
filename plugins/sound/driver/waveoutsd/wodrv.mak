@@ -33,12 +33,12 @@ vpath %.cpp plugins/sound/driver/waveoutsd
 
 # The WaveOut sound driver
 ifeq ($(USE_PLUGINS),yes)
-  WOS = $(OUTDLL)sndwaveout$(DLL)
+  WOS = $(OUTDLL)/sndwaveout$(DLL)
   LIB.WOS = $(foreach d,$(DEP.WOS),$($d.LIB))
   LDFLAGS.WOS = $(LIBS.SOUND.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(WOS)
 else
-  WOS = $(OUT)$(LIB_PREFIX)sndwaveout$(LIB)
+  WOS = $(OUT)/$(LIB_PREFIX)sndwaveout$(LIB)
   DEP.EXE += $(WOS)
   LIBS.EXE += $(LIBS.SOUND.SYSTEM)
   SCF.STATIC += sndwaveout
@@ -47,7 +47,7 @@ endif
 
 INC.WOS = $(wildcard plugins/sound/driver/waveoutsd/*.h)
 SRC.WOS = $(wildcard plugins/sound/driver/waveoutsd/*.cpp)
-OBJ.WOS = $(addprefix $(OUT),$(notdir $(SRC.WOS:.cpp=$O)))
+OBJ.WOS = $(addprefix $(OUT)/,$(notdir $(SRC.WOS:.cpp=$O)))
 DEP.WOS = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += WOS
@@ -72,11 +72,11 @@ wosclean:
 	$(RM) $(WOS) $(OBJ.WOS)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)wos.dep
-$(OUTOS)wos.dep: $(SRC.WOS)
+dep: $(OUTOS)/wos.dep
+$(OUTOS)/wos.dep: $(SRC.WOS)
 	$(DO.DEP)
 else
--include $(OUTOS)wos.dep
+-include $(OUTOS)/wos.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

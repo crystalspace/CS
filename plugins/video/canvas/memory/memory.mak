@@ -33,7 +33,7 @@ vpath %.cpp plugins/video/canvas/memory
 
 # The 2D Memorylib driver
 ifeq ($(USE_PLUGINS),yes)
-  MEMORY = $(OUTDLL)memory$(DLL)
+  MEMORY = $(OUTDLL)/memory$(DLL)
   LIB.MEMORY = $(foreach d,$(DEP.MEMORY),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(MEMORY)
 else
@@ -45,7 +45,7 @@ endif
 
 INC.MEMORY = $(wildcard plugins/video/canvas/memory/*.h   $(INC.COMMON.DRV2D))
 SRC.MEMORY = $(wildcard plugins/video/canvas/memory/*.cpp $(SRC.COMMON.DRV2D))
-OBJ.MEMORY = $(addprefix $(OUT),$(notdir $(SRC.MEMORY:.cpp=$O)))
+OBJ.MEMORY = $(addprefix $(OUT)/,$(notdir $(SRC.MEMORY:.cpp=$O)))
 DEP.MEMORY = CSUTIL CSSYS
 
 MSVC.DSP += MEMORY
@@ -70,14 +70,14 @@ $(MEMORY): $(OBJ.MEMORY) $(LIB.MEMORY)
 	$(DO.PLUGIN) $(LIB.MEMORY.SYSTEM)
 
 memoryclean:
-	$(RM) $(MEMORY) $(OBJ.MEMORY) $(OUTOS)memory.dep
+	$(RM) $(MEMORY) $(OBJ.MEMORY) $(OUTOS)/memory.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)memory.dep
-$(OUTOS)memory.dep: $(SRC.MEMORY)
+dep: $(OUTOS)/memory.dep
+$(OUTOS)/memory.dep: $(SRC.MEMORY)
 	$(DO.DEP)
 else
--include $(OUT)memory.dep
+-include $(OUT)/memory.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

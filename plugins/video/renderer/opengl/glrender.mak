@@ -53,12 +53,12 @@ else
 endif
 
 ifeq ($(USE_PLUGINS),yes)
-  GL3D = $(OUTDLL)gl3d$(DLL)
+  GL3D = $(OUTDLL)/gl3d$(DLL)
   LIB.GL3D = $(foreach d,$(DEP.GL3D),$($d.LIB))
   LIB.GL3D.SPECIAL = $(LIB.GL3D.LOCAL)
   TO_INSTALL.DYNAMIC_LIBS += $(GL3D)
 else
-  GL3D = $(OUT)$(LIB_PREFIX)gl3d$(LIB)
+  GL3D = $(OUT)/$(LIB_PREFIX)gl3d$(LIB)
   DEP.EXE += $(GL3D)
   LIBS.EXE += $(LIB.GL3D.LOCAL)
   SCF.STATIC += gl3d
@@ -78,7 +78,7 @@ SRC.GL3D = $(wildcard plugins/video/renderer/opengl/*.cpp) \
   plugins/video/renderer/common/dpmesh.cpp \
   plugins/video/renderer/common/vbufmgr.cpp \
   plugins/video/renderer/common/polybuf.cpp
-OBJ.GL3D = $(addprefix $(OUT),$(notdir $(SRC.GL3D:.cpp=$O)))
+OBJ.GL3D = $(addprefix $(OUT)/,$(notdir $(SRC.GL3D:.cpp=$O)))
 DEP.GL3D = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
 CFG.GL3D = data/config/opengl.cfg
 
@@ -102,7 +102,7 @@ clean: gl3dclean
 
 gl3d: $(OUTDIRS) $(GL3D)
 
-$(OUT)%$O: plugins/video/renderer/opengl/%.cpp
+$(OUT)/%$O: plugins/video/renderer/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.GL3D)
 
 $(GL3D): $(OBJ.GL3D) $(LIB.GL3D)
@@ -114,11 +114,11 @@ gl3dclean:
 	$(RM) $(GL3D) $(OBJ.GL3D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)gl3d.dep
-$(OUTOS)gl3d.dep: $(SRC.GL3D)
+dep: $(OUTOS)/gl3d.dep
+$(OUTOS)/gl3d.dep: $(SRC.GL3D)
 	$(DO.DEP1) $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.GL3D) $(DO.DEP2)
 else
--include $(OUTOS)gl3d.dep
+-include $(OUTOS)/gl3d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

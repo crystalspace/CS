@@ -24,11 +24,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/font/server/csfont
 
 ifeq ($(USE_PLUGINS),yes)
-  CSFONT = $(OUTDLL)csfont$(DLL)
+  CSFONT = $(OUTDLL)/csfont$(DLL)
   LIB.CSFONT = $(foreach d,$(DEP.CSFONT),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSFONT)
 else
-  CSFONT = $(OUT)$(LIB_PREFIX)csfont$(LIB)
+  CSFONT = $(OUT)/$(LIB_PREFIX)csfont$(LIB)
   DEP.EXE += $(CSFONT)
   SCF.STATIC += csfont
   TO_INSTALL.STATIC_LIBS += $(CSFONT)
@@ -36,7 +36,7 @@ endif
 
 INC.CSFONT = $(wildcard plugins/font/server/csfont/*.h)
 SRC.CSFONT = $(wildcard plugins/font/server/csfont/*.cpp)
-OBJ.CSFONT = $(addprefix $(OUT),$(notdir $(SRC.CSFONT:.cpp=$O)))
+OBJ.CSFONT = $(addprefix $(OUT)/,$(notdir $(SRC.CSFONT:.cpp=$O)))
 DEP.CSFONT = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += CSFONT
@@ -59,11 +59,11 @@ csfontclean:
 	-$(RM) $(CSFONT) $(OBJ.CSFONT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csfont.dep
-$(OUTOS)csfont.dep: $(SRC.CSFONT)
+dep: $(OUTOS)/csfont.dep
+$(OUTOS)/csfont.dep: $(SRC.CSFONT)
 	$(DO.DEP)
 else
--include $(OUTOS)csfont.dep
+-include $(OUTOS)/csfont.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

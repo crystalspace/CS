@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/loader/gif
 
 ifeq ($(USE_PLUGINS),yes)
-  CSGIFIMG = $(OUTDLL)csgifimg$(DLL)
+  CSGIFIMG = $(OUTDLL)/csgifimg$(DLL)
   LIB.CSGIFIMG = $(foreach d,$(DEP.CSGIFIMG),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSGIFIMG)
 else
-  CSGIFIMG = $(OUT)$(LIB_PREFIX)csgifimg$(LIB)
+  CSGIFIMG = $(OUT)/$(LIB_PREFIX)csgifimg$(LIB)
   DEP.EXE += $(CSGIFIMG)
   SCF.STATIC += csgifimg
   TO_INSTALL.STATIC_LIBS += $(CSGIFIMG)
@@ -42,7 +42,7 @@ endif
 INC.CSGIFIMG = $(wildcard plugins/video/loader/gif/*.h)
 SRC.CSGIFIMG = $(wildcard plugins/video/loader/gif/*.cpp)
 
-OBJ.CSGIFIMG = $(addprefix $(OUT),$(notdir $(SRC.CSGIFIMG:.cpp=$O)))
+OBJ.CSGIFIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSGIFIMG:.cpp=$O)))
 DEP.CSGIFIMG = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += CSGIFIMG
@@ -66,11 +66,11 @@ gifimgclean:
 	$(RM) $(CSGIFIMG) $(OBJ.CSGIFIMG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)gifimg.dep
-$(OUTOS)gifimg.dep: $(SRC.CSGIFIMG)
+dep: $(OUTOS)/gifimg.dep
+$(OUTOS)/gifimg.dep: $(SRC.CSGIFIMG)
 	$(DO.DEP)
 else
--include $(OUTOS)gifimg.dep
+-include $(OUTOS)/gifimg.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

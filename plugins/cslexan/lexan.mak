@@ -28,11 +28,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/cslexan
 
 ifeq ($(USE_PLUGINS),yes)
-  CSLEXAN = $(OUTDLL)cslexan$(DLL)
+  CSLEXAN = $(OUTDLL)/cslexan$(DLL)
   LIB.CSLEXAN = $(foreach d,$(DEP.CSLEXAN),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSLEXAN)
 else
-  CSLEXAN = $(OUT)$(LIB_PREFIX)cslexan$(LIB)
+  CSLEXAN = $(OUT)/$(LIB_PREFIX)cslexan$(LIB)
   DEP.EXE += $(CSLEXAN)
   SCF.STATIC += cslexan
   TO_INSTALL.STATIC_LIBS += $(CSLEXAN)
@@ -40,7 +40,7 @@ endif
 
 INC.CSLEXAN = $(wildcard plugins/cslexan/*.h)
 SRC.CSLEXAN = $(wildcard plugins/cslexan/*.cpp)
-OBJ.CSLEXAN = $(addprefix $(OUT),$(notdir $(SRC.CSLEXAN:.cpp=$O)))
+OBJ.CSLEXAN = $(addprefix $(OUT)/,$(notdir $(SRC.CSLEXAN:.cpp=$O)))
 DEP.CSLEXAN = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += CSLEXAN
@@ -62,11 +62,11 @@ lexanclean:
 	-$(RM) $(CSLEXAN) $(OBJ.CSLEXAN)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)lexan.dep
-$(OUTOS)lexan.dep: $(SRC.CSLEXAN)
+dep: $(OUTOS)/lexan.dep
+$(OUTOS)/lexan.dep: $(SRC.CSLEXAN)
 	$(DO.DEP)
 else
--include $(OUTOS)lexan.dep
+-include $(OUTOS)/lexan.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

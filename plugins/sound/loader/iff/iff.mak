@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/iff plugins/sound/loader/common
 
 ifeq ($(USE_PLUGINS),yes)
-  SNDIFF = $(OUTDLL)sndiff$(DLL)
+  SNDIFF = $(OUTDLL)/sndiff$(DLL)
   LIB.SNDIFF = $(foreach d,$(DEP.SNDIFF),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDIFF)
 else
-  SNDIFF = $(OUT)$(LIB_PREFIX)sndiff$(LIB)
+  SNDIFF = $(OUT)/$(LIB_PREFIX)sndiff$(LIB)
   DEP.EXE += $(SNDIFF)
   SCF.STATIC += sndiff
   TO_INSTALL.STATIC_LIBS += $(SNDIFF)
@@ -43,7 +43,7 @@ INC.SNDIFF = $(wildcard plugins/sound/loader/iff/*.h) \
   $(wildcard plugins/sound/loader/common/*.h)
 SRC.SNDIFF = $(wildcard plugins/sound/loader/iff/*.cpp) \
   $(wildcard plugins/sound/loader/common/*.cpp)
-OBJ.SNDIFF = $(addprefix $(OUT),$(notdir $(SRC.SNDIFF:.cpp=$O)))
+OBJ.SNDIFF = $(addprefix $(OUT)/,$(notdir $(SRC.SNDIFF:.cpp=$O)))
 DEP.SNDIFF = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SNDIFF
@@ -67,11 +67,11 @@ iffclean:
 	$(RM) $(SNDIFF) $(OBJ.SNDIFF)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sndiff.dep
-$(OUTOS)sndiff.dep: $(SRC.SNDIFF)
+dep: $(OUTOS)/sndiff.dep
+$(OUTOS)/sndiff.dep: $(SRC.SNDIFF)
 	$(DO.DEP)
 else
--include $(OUTOS)sndiff.dep
+-include $(OUTOS)/sndiff.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

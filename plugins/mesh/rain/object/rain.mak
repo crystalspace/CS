@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/rain/object plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
-  RAIN = $(OUTDLL)rain$(DLL)
+  RAIN = $(OUTDLL)/rain$(DLL)
   LIB.RAIN = $(foreach d,$(DEP.RAIN),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(RAIN)
 else
-  RAIN = $(OUT)$(LIB_PREFIX)rain$(LIB)
+  RAIN = $(OUT)/$(LIB_PREFIX)rain$(LIB)
   DEP.EXE += $(RAIN)
   SCF.STATIC += rain
   TO_INSTALL.STATIC_LIBS += $(RAIN)
@@ -37,7 +37,7 @@ endif
 
 INC.RAIN = $(wildcard plugins/mesh/rain/object/*.h plugins/mesh/partgen/*.h)
 SRC.RAIN = $(wildcard plugins/mesh/rain/object/*.cpp plugins/mesh/partgen/*.cpp)
-OBJ.RAIN = $(addprefix $(OUT),$(notdir $(SRC.RAIN:.cpp=$O)))
+OBJ.RAIN = $(addprefix $(OUT)/,$(notdir $(SRC.RAIN:.cpp=$O)))
 DEP.RAIN = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += RAIN
@@ -59,11 +59,11 @@ rainclean:
 	-$(RM) $(RAIN) $(OBJ.RAIN)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)rain.dep
-$(OUTOS)rain.dep: $(SRC.RAIN)
+dep: $(OUTOS)/rain.dep
+$(OUTOS)/rain.dep: $(SRC.RAIN)
 	$(DO.DEP)
 else
--include $(OUTOS)rain.dep
+-include $(OUTOS)/rain.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

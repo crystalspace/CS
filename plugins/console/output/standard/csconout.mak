@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/console/output/standard
 
 ifeq ($(USE_PLUGINS),yes)
-  CSCONOUT = $(OUTDLL)csconout$(DLL)
+  CSCONOUT = $(OUTDLL)/csconout$(DLL)
   LIB.CSCONOUT = $(foreach d,$(DEP.CSCONOUT),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSCONOUT)
 else
-  CSCONOUT = $(OUT)$(LIB_PREFIX)csconout$(LIB)
+  CSCONOUT = $(OUT)/$(LIB_PREFIX)csconout$(LIB)
   DEP.EXE += $(CSCONOUT)
   SCF.STATIC += csconout
   TO_INSTALL.STATIC_LIBS += $(CSCONOUT)
@@ -37,7 +37,7 @@ endif
 
 INC.CSCONOUT = $(wildcard plugins/console/output/standard/*.h)
 SRC.CSCONOUT = $(wildcard plugins/console/output/standard/*.cpp)
-OBJ.CSCONOUT = $(addprefix $(OUT),$(notdir $(SRC.CSCONOUT:.cpp=$O)))
+OBJ.CSCONOUT = $(addprefix $(OUT)/,$(notdir $(SRC.CSCONOUT:.cpp=$O)))
 DEP.CSCONOUT = CSUTIL CSGEOM CSSYS CSUTIL
 
 MSVC.DSP += CSCONOUT
@@ -59,11 +59,11 @@ csconoutclean:
 	-$(RM) $(CSCONOUT) $(OBJ.CSCONOUT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csconout.dep
-$(OUTOS)csconout.dep: $(SRC.CSCONOUT)
+dep: $(OUTOS)/csconout.dep
+$(OUTOS)/csconout.dep: $(SRC.CSCONOUT)
 	$(DO.DEP)
 else
--include $(OUTOS)csconout.dep
+-include $(OUTOS)/csconout.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

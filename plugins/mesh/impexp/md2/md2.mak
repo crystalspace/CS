@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/impexp/md2
 
 ifeq ($(USE_PLUGINS),yes)
-  MD2IE = $(OUTDLL)md2ie$(DLL)
+  MD2IE = $(OUTDLL)/md2ie$(DLL)
   LIB.MD2IE = $(foreach d,$(DEP.MD2IE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(MD2IE)
 else
-  MD2IE = $(OUT)$(LIB_PREFIX)md2ie$(LIB)
+  MD2IE = $(OUT)/$(LIB_PREFIX)md2ie$(LIB)
   DEP.EXE += $(MD2IE)
   SCF.STATIC += md2ie
   TO_INSTALL.STATIC_LIBS += $(MD2IE)
@@ -37,7 +37,7 @@ endif
 
 INC.MD2IE = $(wildcard plugins/mesh/impexp/md2/*.h)
 SRC.MD2IE = $(wildcard plugins/mesh/impexp/md2/*.cpp)
-OBJ.MD2IE = $(addprefix $(OUT),$(notdir $(SRC.MD2IE:.cpp=$O)))
+OBJ.MD2IE = $(addprefix $(OUT)/,$(notdir $(SRC.MD2IE:.cpp=$O)))
 DEP.MD2IE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL CSUTIL CSGEOM
 
 MSVC.DSP += MD2IE
@@ -59,11 +59,11 @@ md2ieclean:
 	-$(RM) $(MD2IE) $(OBJ.MD2IE)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)md2ie.dep
-$(OUTOS)md2ie.dep: $(SRC.MD2IE)
+dep: $(OUTOS)/md2ie.dep
+$(OUTOS)/md2ie.dep: $(SRC.MD2IE)
 	$(DO.DEP)
 else
--include $(OUTOS)md2ie.dep
+-include $(OUTOS)/md2ie.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

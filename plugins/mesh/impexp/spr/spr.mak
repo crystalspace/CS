@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/impexp/spr
 
 ifeq ($(USE_PLUGINS),yes)
-  SPRIE = $(OUTDLL)sprie$(DLL)
+  SPRIE = $(OUTDLL)/sprie$(DLL)
   LIB.SPRIE = $(foreach d,$(DEP.SPRIE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SPRIE)
 else
-  SPRIE = $(OUT)$(LIB_PREFIX)sprie$(LIB)
+  SPRIE = $(OUT)/$(LIB_PREFIX)sprie$(LIB)
   DEP.EXE += $(SPRIE)
   SCF.STATIC += sprie
   TO_INSTALL.STATIC_LIBS += $(SPRIE)
@@ -37,7 +37,7 @@ endif
 
 INC.SPRIE = $(wildcard plugins/mesh/impexp/spr/*.h)
 SRC.SPRIE = $(wildcard plugins/mesh/impexp/spr/*.cpp)
-OBJ.SPRIE = $(addprefix $(OUT),$(notdir $(SRC.SPRIE:.cpp=$O)))
+OBJ.SPRIE = $(addprefix $(OUT)/,$(notdir $(SRC.SPRIE:.cpp=$O)))
 DEP.SPRIE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL CSUTIL CSGEOM
 
 MSVC.DSP += SPRIE
@@ -59,11 +59,11 @@ sprieclean:
 	-$(RM) $(SPRIE) $(OBJ.SPRIE)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sprie.dep
-$(OUTOS)sprie.dep: $(SRC.SPRIE)
+dep: $(OUTOS)/sprie.dep
+$(OUTOS)/sprie.dep: $(SRC.SPRIE)
 	$(DO.DEP)
 else
--include $(OUTOS)sprie.dep
+-include $(OUTOS)/sprie.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

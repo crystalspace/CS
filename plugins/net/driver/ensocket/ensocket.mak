@@ -29,12 +29,12 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/net/driver/ensocket
 
 ifeq ($(USE_PLUGINS),yes)
-  ENSOCKET = $(OUTDLL)ensocket$(DLL)
+  ENSOCKET = $(OUTDLL)/ensocket$(DLL)
   LIB.ENSOCKET = $(foreach d,$(DEP.ENSOCKET),$($d.LIB))
   LIB.ENSOCKET.SPECIAL = $(LIBS.SOCKET.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(ENSOCKET)
 else
-  ENSOCKET = $(OUT)$(LIB_PREFIX)ensocket$(LIB)
+  ENSOCKET = $(OUT)/$(LIB_PREFIX)ensocket$(LIB)
   DEP.EXE += $(ENSOCKET)
   LIBS.EXE += $(LIBS.SOCKET.SYSTEM)
   SCF.STATIC += ensocket
@@ -43,7 +43,7 @@ endif
 
 INC.ENSOCKET = $(wildcard plugins/net/driver/ensocket/*.h)
 SRC.ENSOCKET = $(wildcard plugins/net/driver/ensocket/*.cpp)
-OBJ.ENSOCKET = $(addprefix $(OUT),$(notdir $(SRC.ENSOCKET:.cpp=$O)))
+OBJ.ENSOCKET = $(addprefix $(OUT)/,$(notdir $(SRC.ENSOCKET:.cpp=$O)))
 DEP.ENSOCKET = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += ENSOCKET
@@ -68,11 +68,11 @@ ensocketclean:
 	$(RM) $(ENSOCKET) $(OBJ.ENSOCKET)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)ensocket.dep
-$(OUTOS)ensocket.dep: $(SRC.ENSOCKET)
+depend: $(OUTOS)/ensocket.dep
+$(OUTOS)/ensocket.dep: $(SRC.ENSOCKET)
 	$(DO.DEP)
 else
--include $(OUTOS)ensocket.dep
+-include $(OUTOS)/ensocket.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/stdrep
 
 ifeq ($(USE_PLUGINS),yes)
-  STDREP = $(OUTDLL)stdrep$(DLL)
+  STDREP = $(OUTDLL)/stdrep$(DLL)
   LIB.STDREP = $(foreach d,$(DEP.STDREP),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(STDREP)
 else
-  STDREP = $(OUT)$(LIB_PREFIX)stdrep$(LIB)
+  STDREP = $(OUT)/$(LIB_PREFIX)stdrep$(LIB)
   DEP.EXE += $(STDREP)
   SCF.STATIC += stdrep
   TO_INSTALL.STATIC_LIBS += $(STDREP)
@@ -44,7 +44,7 @@ endif
 
 INC.STDREP = $(wildcard plugins/stdrep/*.h)
 SRC.STDREP = $(wildcard plugins/stdrep/*.cpp)
-OBJ.STDREP = $(addprefix $(OUT),$(notdir $(SRC.STDREP:.cpp=$O)))
+OBJ.STDREP = $(addprefix $(OUT)/,$(notdir $(SRC.STDREP:.cpp=$O)))
 DEP.STDREP = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += STDREP
@@ -68,11 +68,11 @@ stdrepclean:
 	$(RM) $(STDREP) $(OBJ.STDREP)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)stdrep.dep
-$(OUTOS)stdrep.dep: $(SRC.STDREP)
+dep: $(OUTOS)/stdrep.dep
+$(OUTOS)/stdrep.dep: $(SRC.STDREP)
 	$(DO.DEP)
 else
--include $(OUTOS)stdrep.dep
+-include $(OUTOS)/stdrep.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

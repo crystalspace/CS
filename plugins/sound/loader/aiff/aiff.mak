@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/aiff plugins/sound/loader/common
 
 ifeq ($(USE_PLUGINS),yes)
-  SNDAIFF = $(OUTDLL)sndaiff$(DLL)
+  SNDAIFF = $(OUTDLL)/sndaiff$(DLL)
   LIB.SNDAIFF = $(foreach d,$(DEP.SNDAIFF),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDAIFF)
 else
-  SNDAIFF = $(OUT)$(LIB_PREFIX)sndaiff$(LIB)
+  SNDAIFF = $(OUT)/$(LIB_PREFIX)sndaiff$(LIB)
   DEP.EXE += $(SNDAIFF)
   SCF.STATIC += sndaiff
   TO_INSTALL.STATIC_LIBS += $(SNDAIFF)
@@ -43,7 +43,7 @@ INC.SNDAIFF = $(wildcard plugins/sound/loader/aiff/*.h) \
   $(wildcard plugins/sound/loader/common/*.h)
 SRC.SNDAIFF = $(wildcard plugins/sound/loader/aiff/*.cpp) \
   $(wildcard plugins/sound/loader/common/*.cpp)
-OBJ.SNDAIFF = $(addprefix $(OUT),$(notdir $(SRC.SNDAIFF:.cpp=$O)))
+OBJ.SNDAIFF = $(addprefix $(OUT)/,$(notdir $(SRC.SNDAIFF:.cpp=$O)))
 DEP.SNDAIFF = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SNDAIFF
@@ -67,11 +67,11 @@ aiffclean:
 	$(RM) $(SNDAIFF) $(OBJ.SNDAIFF)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sndaiff.dep
-$(OUTOS)sndaiff.dep: $(SRC.SNDAIFF)
+dep: $(OUTOS)/sndaiff.dep
+$(OUTOS)/sndaiff.dep: $(SRC.SNDAIFF)
 	$(DO.DEP)
 else
--include $(OUTOS)sndaiff.dep
+-include $(OUTOS)/sndaiff.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

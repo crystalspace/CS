@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/stars/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  STARLDR = $(OUTDLL)starldr$(DLL)
+  STARLDR = $(OUTDLL)/starldr$(DLL)
   LIB.STARLDR = $(foreach d,$(DEP.STARLDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(STARLDR)
 else
-  STARLDR = $(OUT)$(LIB_PREFIX)starldr$(LIB)
+  STARLDR = $(OUT)/$(LIB_PREFIX)starldr$(LIB)
   DEP.EXE += $(STARLDR)
   SCF.STATIC += starldr
   TO_INSTALL.STATIC_LIBS += $(STARLDR)
@@ -37,7 +37,7 @@ endif
 
 INC.STARLDR = $(wildcard plugins/mesh/stars/persist/classic/*.h)
 SRC.STARLDR = $(wildcard plugins/mesh/stars/persist/classic/*.cpp)
-OBJ.STARLDR = $(addprefix $(OUT),$(notdir $(SRC.STARLDR:.cpp=$O)))
+OBJ.STARLDR = $(addprefix $(OUT)/,$(notdir $(SRC.STARLDR:.cpp=$O)))
 DEP.STARLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += STARLDR
@@ -59,11 +59,11 @@ starldrclean:
 	-$(RM) $(STARLDR) $(OBJ.STARLDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)starldr.dep
-$(OUTOS)starldr.dep: $(SRC.STARLDR)
+dep: $(OUTOS)/starldr.dep
+$(OUTOS)/starldr.dep: $(SRC.STARLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)starldr.dep
+-include $(OUTOS)/starldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

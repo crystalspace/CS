@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/genmesh/object
 
 ifeq ($(USE_PLUGINS),yes)
-  GENMESH = $(OUTDLL)genmesh$(DLL)
+  GENMESH = $(OUTDLL)/genmesh$(DLL)
   LIB.GENMESH = $(foreach d,$(DEP.GENMESH),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(GENMESH)
 else
-  GENMESH = $(OUT)$(LIB_PREFIX)genmesh$(LIB)
+  GENMESH = $(OUT)/$(LIB_PREFIX)genmesh$(LIB)
   DEP.EXE += $(GENMESH)
   SCF.STATIC += genmesh
   TO_INSTALL.STATIC_LIBS += $(GENMESH)
@@ -37,7 +37,7 @@ endif
 
 INC.GENMESH = $(wildcard plugins/mesh/genmesh/object/*.h)
 SRC.GENMESH = $(wildcard plugins/mesh/genmesh/object/*.cpp)
-OBJ.GENMESH = $(addprefix $(OUT),$(notdir $(SRC.GENMESH:.cpp=$O)))
+OBJ.GENMESH = $(addprefix $(OUT)/,$(notdir $(SRC.GENMESH:.cpp=$O)))
 DEP.GENMESH = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += GENMESH
@@ -59,11 +59,11 @@ genmeshclean:
 	-$(RM) $(GENMESH) $(OBJ.GENMESH)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)genmesh.dep
-$(OUTOS)genmesh.dep: $(SRC.GENMESH)
+dep: $(OUTOS)/genmesh.dep
+$(OUTOS)/genmesh.dep: $(SRC.GENMESH)
 	$(DO.DEP)
 else
--include $(OUTOS)genmesh.dep
+-include $(OUTOS)/genmesh.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

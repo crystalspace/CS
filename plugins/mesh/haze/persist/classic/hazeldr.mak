@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/haze/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
-  HAZELDR = $(OUTDLL)hazeldr$(DLL)
+  HAZELDR = $(OUTDLL)/hazeldr$(DLL)
   LIB.HAZELDR = $(foreach d,$(DEP.HAZELDR),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(HAZELDR)
 else
-  HAZELDR = $(OUT)$(LIB_PREFIX)hazeldr$(LIB)
+  HAZELDR = $(OUT)/$(LIB_PREFIX)hazeldr$(LIB)
   DEP.EXE += $(HAZELDR)
   SCF.STATIC += hazeldr
   TO_INSTALL.STATIC_LIBS += $(HAZELDR)
@@ -37,7 +37,7 @@ endif
 
 INC.HAZELDR = $(wildcard plugins/mesh/haze/persist/classic/*.h)
 SRC.HAZELDR = $(wildcard plugins/mesh/haze/persist/classic/*.cpp)
-OBJ.HAZELDR = $(addprefix $(OUT),$(notdir $(SRC.HAZELDR:.cpp=$O)))
+OBJ.HAZELDR = $(addprefix $(OUT)/,$(notdir $(SRC.HAZELDR:.cpp=$O)))
 DEP.HAZELDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += HAZELDR
@@ -59,11 +59,11 @@ hazeldrclean:
 	-$(RM) $(HAZELDR) $(OBJ.HAZELDR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)hazeldr.dep
-$(OUTOS)hazeldr.dep: $(SRC.HAZELDR)
+dep: $(OUTOS)/hazeldr.dep
+$(OUTOS)/hazeldr.dep: $(SRC.HAZELDR)
 	$(DO.DEP)
 else
--include $(OUTOS)hazeldr.dep
+-include $(OUTOS)/hazeldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -27,10 +27,10 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csgeom
 
-CSGEOM.LIB = $(OUT)$(LIB_PREFIX)csgeom$(LIB_SUFFIX)
+CSGEOM.LIB = $(OUT)/$(LIB_PREFIX)csgeom$(LIB_SUFFIX)
 INC.CSGEOM = $(wildcard include/csgeom/*.h)
 SRC.CSGEOM = $(wildcard libs/csgeom/*.cpp)
-OBJ.CSGEOM = $(addprefix $(OUT),$(notdir $(SRC.CSGEOM:.cpp=$O)))
+OBJ.CSGEOM = $(addprefix $(OUT)/,$(notdir $(SRC.CSGEOM:.cpp=$O)))
 
 TO_INSTALL.STATIC_LIBS += $(CSGEOM.LIB)
 
@@ -57,11 +57,11 @@ csgeomclean:
 	-$(RM) $(CSGEOM.LIB) $(OBJ.CSGEOM)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csgeom.dep
-$(OUTOS)csgeom.dep: $(SRC.CSGEOM)
+dep: $(OUTOS)/csgeom.dep
+$(OUTOS)/csgeom.dep: $(SRC.CSGEOM)
 	$(DO.DEP)
 else
--include $(OUTOS)csgeom.dep
+-include $(OUTOS)/csgeom.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

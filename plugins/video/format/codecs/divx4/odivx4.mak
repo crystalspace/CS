@@ -26,11 +26,11 @@ vpath %.cpp plugins/video/format/codecs/divx4
 
 LIB.EXTERNAL.ODIVX4 = -ldivxdecore
 ifeq ($(USE_PLUGINS),yes)
-  ODIVX4 = $(OUTDLL)odivx4$(DLL)
+  ODIVX4 = $(OUTDLL)/odivx4$(DLL)
   LIB.ODIVX4 = $(foreach d,$(DEP.ODIVX4),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(ODIVX4)
 else
-  ODIVX4 = $(OUT)$(LIB_PREFIX)odivx4$(LIB)
+  ODIVX4 = $(OUT)/$(LIB_PREFIX)odivx4$(LIB)
   DEP.EXE += $(ODIVX4)
   SCF.STATIC += odivx4
   TO_INSTALL.STATIC_LIBS += $(ODIVX4)
@@ -38,7 +38,7 @@ endif
 
 INC.ODIVX4 = $(wildcard plugins/video/format/codecs/divx4/*.h)
 SRC.ODIVX4 = $(wildcard plugins/video/format/codecs/divx4/*.cpp)
-OBJ.ODIVX4 = $(addprefix $(OUT),$(notdir $(SRC.ODIVX4:.cpp=$O)))
+OBJ.ODIVX4 = $(addprefix $(OUT)/,$(notdir $(SRC.ODIVX4:.cpp=$O)))
 DEP.ODIVX4 = CSUTIL CSSYS
 CFG.ODIVX4 =
 
@@ -65,11 +65,11 @@ odivx4clean:
 	-$(RM) $(ODIVX4) $(OBJ.ODIVX4)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)odivx4.dep
-$(OUTOS)odivx4.dep: $(SRC.ODIVX4)
+dep: $(OUTOS)/odivx4.dep
+$(OUTOS)/odivx4.dep: $(SRC.ODIVX4)
 	$(DO.DEP)
 else
--include $(OUTOS)odivx4.dep
+-include $(OUTOS)/odivx4.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

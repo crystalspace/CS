@@ -32,11 +32,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/console/output/simple
 
 ifeq ($(USE_PLUGINS),yes)
-  SIMPCON = $(OUTDLL)simpcon$(DLL)
+  SIMPCON = $(OUTDLL)/simpcon$(DLL)
   LIB.SIMPCON = $(foreach d,$(DEP.SIMPCON),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SIMPCON)
 else
-  SIMPCON = $(OUT)$(LIB_PREFIX)simpcon$(LIB)
+  SIMPCON = $(OUT)/$(LIB_PREFIX)simpcon$(LIB)
   DEP.EXE += $(SIMPCON)
   SCF.STATIC += simpcon
   TO_INSTALL.STATIC_LIBS += $(SIMPCON)
@@ -44,7 +44,7 @@ endif
 
 INC.SIMPCON = $(wildcard plugins/console/output/simple/*.h)
 SRC.SIMPCON = $(wildcard plugins/console/output/simple/*.cpp)
-OBJ.SIMPCON = $(addprefix $(OUT),$(notdir $(SRC.SIMPCON:.cpp=$O)))
+OBJ.SIMPCON = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPCON:.cpp=$O)))
 DEP.SIMPCON = CSUTIL CSSYS CSUTIL CSGEOM
 CFG.SIMPCON = data/config/simpcon.cfg
 
@@ -71,11 +71,11 @@ simpconclean:
 	$(RM) $(SIMPCON) $(OBJ.SIMPCON)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)simpcon.dep
-$(OUTOS)simpcon.dep: $(SRC.SIMPCON)
+dep: $(OUTOS)/simpcon.dep
+$(OUTOS)/simpcon.dep: $(SRC.SIMPCON)
 	$(DO.DEP)
 else
--include $(OUTOS)simpcon.dep
+-include $(OUTOS)/simpcon.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

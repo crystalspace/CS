@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/spr3d/persist/binary
 
 ifeq ($(USE_PLUGINS),yes)
-  SPR3DBIN = $(OUTDLL)spr3dbin$(DLL)
+  SPR3DBIN = $(OUTDLL)/spr3dbin$(DLL)
   LIB.SPR3DBIN = $(foreach d,$(DEP.SPR3DBIN),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SPR3DBIN)
 else
-  SPR3DBIN = $(OUT)$(LIB_PREFIX)spr3dbin$(LIB)
+  SPR3DBIN = $(OUT)/$(LIB_PREFIX)spr3dbin$(LIB)
   DEP.EXE += $(SPR3DBIN)
   SCF.STATIC += spr3dbin
   TO_INSTALL.STATIC_LIBS += $(SPR3DBIN)
@@ -37,7 +37,7 @@ endif
 
 INC.SPR3DBIN = $(wildcard plugins/mesh/spr3d/persist/binary/*.h)
 SRC.SPR3DBIN = $(wildcard plugins/mesh/spr3d/persist/binary/*.cpp)
-OBJ.SPR3DBIN = $(addprefix $(OUT),$(notdir $(SRC.SPR3DBIN:.cpp=$O)))
+OBJ.SPR3DBIN = $(addprefix $(OUT)/,$(notdir $(SRC.SPR3DBIN:.cpp=$O)))
 DEP.SPR3DBIN = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SPR3DBIN
@@ -59,11 +59,11 @@ spr3dbinclean:
 	-$(RM) $(SPR3DBIN) $(OBJ.SPR3DBIN)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)spr3dbin.dep
-$(OUTOS)spr3dbin.dep: $(SRC.SPR3DBIN)
+dep: $(OUTOS)/spr3dbin.dep
+$(OUTOS)/spr3dbin.dep: $(SRC.SPR3DBIN)
 	$(DO.DEP)
 else
--include $(OUTOS)spr3dbin.dep
+-include $(OUTOS)/spr3dbin.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

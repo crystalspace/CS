@@ -56,7 +56,7 @@ OS_FAMILY = UNIX
 COMP = GCC
 
 # Plug-in component support.
-NEXT.PLUGIN_DIR = components/
+NEXT.PLUGIN_DIR = components
 NEXT.PLUGIN_EXT = .csplugin
 
 # None of the NeXT platforms can grok the assembly used by CS
@@ -207,10 +207,10 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),postdefines)
 
 # Add support for Objective-C (.m) source code.
-$(OUT)%$O: %.m
+$(OUT)/%$O: %.m
 	$(DO.COMPILE.M)
 
-OBJ.CSSYS = $(addprefix $(OUT),$(notdir \
+OBJ.CSSYS = $(addprefix $(OUT)/,$(notdir \
   $(subst .s,$O,$(subst .c,$O,$(subst .cpp,$O,$(SRC.CSSYS:.m=$O))))))
 
 vpath %.m libs/cssys $(filter-out libs/cssys/general/,$(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
@@ -285,7 +285,7 @@ ifeq ($(ROOTCONFIG),volatile)
 MAKE_VOLATILE_H += \
   $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp \
   $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp \
-  $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_DIR "$(NEXT.PLUGIN_DIR)"$">>volatile.tmp \
+  $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_DIR "$(NEXT.PLUGIN_DIR)/"$">>volatile.tmp \
   $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_EXT "$(NEXT.PLUGIN_EXT)"$">>volatile.tmp
 
 endif # ifeq ($(ROOTCONFIG),volatile)

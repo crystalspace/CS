@@ -34,11 +34,11 @@ CFLAGS.OGLGLIDE += -I/usr/include/glide -I/usr/local/glide/include
 LIB.OGLGLIDE.SYSTEM += -lglide2x
 
 ifeq ($(USE_PLUGINS),yes)
-  OGLGLIDE = $(OUTDLL)oglglide$(DLL)
+  OGLGLIDE = $(OUTDLL)/oglglide$(DLL)
   LIB.OGLGLIDE = $(foreach d,$(DEP.OGLGLIDE),$($d.LIB))
   LIB.OGLGLIDE.SPECIAL = $(LIB.OGLGLIDE.SYSTEM)
 else
-  OGLGLIDE = $(OUT)$(LIB_PREFIX)oglglide$(LIB)
+  OGLGLIDE = $(OUT)/$(LIB_PREFIX)oglglide$(LIB)
   DEP.EXE += $(OGLGLIDE)
   LIBS.EXE += $(LIB.OGLGLIDE.SYSTEM) $(CSUTIL.LIB) $(CSSYS.LIB)
   SCF.STATIC += oglglide
@@ -46,7 +46,7 @@ endif
 
 INC.OGLGLIDE = $(wildcard plugins/video/canvas/openglx/glide/*.h)
 SRC.OGLGLIDE = $(wildcard plugins/video/canvas/openglx/glide/*.cpp)
-OBJ.OGLGLIDE = $(addprefix $(OUT),$(notdir $(SRC.OGLGLIDE:.cpp=$O)))
+OBJ.OGLGLIDE = $(addprefix $(OUT)/,$(notdir $(SRC.OGLGLIDE:.cpp=$O)))
 DEP.OGLGLIDE = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -58,7 +58,7 @@ ifeq ($(MAKESECTION),targets)
 
 oglglide: $(OUTDIRS) $(OGLGLIDE)
 
-$(OUT)%$O: plugins/video/canvas/openglx/glide/%.cpp
+$(OUT)/%$O: plugins/video/canvas/openglx/glide/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.OGLGLIDE)
 
 $(OGLGLIDE): $(OBJ.OGLGLIDE) $(LIB.OGLGLIDE)
@@ -69,11 +69,11 @@ oglglideclean:
 	$(RM) $(OGLGLIDE) $(OBJ.OGLGLIDE)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)oglglide.dep
-$(OUTOS)oglglide.dep: $(SRC.OGLGLIDE)
+dep: $(OUTOS)/oglglide.dep
+$(OUTOS)/oglglide.dep: $(SRC.OGLGLIDE)
 	$(DO.DEP1) $(CFLAGS.OGLGLIDE) $(DO.DEP2)
 else
--include $(OUTOS)oglglide.dep
+-include $(OUTOS)/oglglide.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

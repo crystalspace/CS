@@ -33,12 +33,12 @@ vpath %.cpp plugins/video/canvas/ddraw8 plugins/video/canvas/common \
   plugins/video/canvas/directxcommon
 
 ifeq ($(USE_PLUGINS),yes)
-  DDRAW8 = $(OUTDLL)ddraw8$(DLL)
+  DDRAW8 = $(OUTDLL)/ddraw8$(DLL)
   LIB.DDRAW8 = $(foreach d,$(DEP.DDRAW8),$($d.LIB))
   LIB.DDRAW8.SPECIAL = $(LFLAGS.l)ddraw $(LFLAGS.l)dxguid
   TO_INSTALL.DYNAMIC_LIBS += $(DDRAW8)
 else
-  DDRAW8 = $(OUT)$(LIB_PREFIX)ddraw8$(LIB)
+  DDRAW8 = $(OUT)/$(LIB_PREFIX)ddraw8$(LIB)
   DEP.EXE += $(DDRAW8)
   LIBS.EXE += $(LFLAGS.l)ddraw8
   SCF.STATIC += ddraw8
@@ -49,7 +49,7 @@ INC.DDRAW8 = $(wildcard plugins/video/canvas/ddraw8/*.h \
   $(wildcard plugins/video/canvas/directxcommon/*.h $(INC.COMMON.DRV2D)))
 SRC.DDRAW8 = $(wildcard plugins/video/canvas/ddraw8/*.cpp \
   $(wildcard plugins/video/canvas/directxcommon/*.cpp $(SRC.COMMON.DRV2D)))
-OBJ.DDRAW8 = $(addprefix $(OUT),$(notdir $(SRC.DDRAW8:.cpp=$O)))
+OBJ.DDRAW8 = $(addprefix $(OUT)/,$(notdir $(SRC.DDRAW8:.cpp=$O)))
 DEP.DDRAW8 = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += DDRAW8
@@ -73,11 +73,11 @@ ddraw8clean:
 	$(RM) $(DDRAW8) $(OBJ.DDRAW8)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)ddraw8.dep
-$(OUTOS)ddraw8.dep: $(SRC.DDRAW8)
+depend: $(OUTOS)/ddraw8.dep
+$(OUTOS)/ddraw8.dep: $(SRC.DDRAW8)
 	$(DO.DEP)
 else
--include $(OUTOS)ddraw8.dep
+-include $(OUTOS)/ddraw8.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

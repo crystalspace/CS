@@ -29,11 +29,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/renderer/eax
 
 ifeq ($(USE_PLUGINS),yes)
-  SNDEAX = $(OUTDLL)sndeax$(DLL)
+  SNDEAX = $(OUTDLL)/sndeax$(DLL)
   LIB.SNDEAX = $(foreach d,$(DEP.SNDEAX),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDEAX)
 else
-  SNDEAX = $(OUT)$(LIB_PREFIX)sndeax$(LIB)
+  SNDEAX = $(OUT)/$(LIB_PREFIX)sndeax$(LIB)
   DEP.EXE += $(SNDEAX)
   SCF.STATIC += sndeax
   TO_INSTALL.STATIC_LIBS += $(SNDEAX)
@@ -43,7 +43,7 @@ INC.SNDEAX = $(wildcard plugins/sound/renderer/eax/*.h) \
   $(wildcard plugins/sound/renderer/common/*.h)
 SRC.SNDEAX = $(wildcard plugins/sound/renderer/eax/*.cpp) \
   $(wildcard plugins/sound/renderer/common/*.cpp)
-OBJ.SNDEAX = $(addprefix $(OUT),$(notdir $(SRC.SNDEAX:.cpp=$O)))
+OBJ.SNDEAX = $(addprefix $(OUT)/,$(notdir $(SRC.SNDEAX:.cpp=$O)))
 DEP.SNDEAX = CSUTIL CSGEOM CSSYS CSUTIL
 
 MSVC.DSP += SNDEAX
@@ -68,11 +68,11 @@ sndeaxclean:
 	$(RM) $(SNDEAX) $(OBJ.SNDEAX)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sndeax.dep
-$(OUTOS)sndeax.dep: $(SRC.SNDEAX)
+dep: $(OUTOS)/sndeax.dep
+$(OUTOS)/sndeax.dep: $(SRC.SNDEAX)
 	$(DO.DEP)
 else
--include $(OUTOS)sndeax.dep
+-include $(OUTOS)/sndeax.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

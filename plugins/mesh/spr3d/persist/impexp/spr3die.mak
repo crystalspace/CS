@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/spr3d/persist/impexp
 
 ifeq ($(USE_PLUGINS),yes)
-  SPR3DIE = $(OUTDLL)spr3die$(DLL)
+  SPR3DIE = $(OUTDLL)/spr3die$(DLL)
   LIB.SPR3DIE = $(foreach d,$(DEP.SPR3DIE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SPR3DIE)
 else
-  SPR3DIE = $(OUT)$(LIB_PREFIX)spr3die$(LIB)
+  SPR3DIE = $(OUT)/$(LIB_PREFIX)spr3die$(LIB)
   DEP.EXE += $(SPR3DIE)
   SCF.STATIC += spr3die
   TO_INSTALL.STATIC_LIBS += $(SPR3DIE)
@@ -37,7 +37,7 @@ endif
 
 INC.SPR3DIE = $(wildcard plugins/mesh/spr3d/persist/impexp/*.h)
 SRC.SPR3DIE = $(wildcard plugins/mesh/spr3d/persist/impexp/*.cpp)
-OBJ.SPR3DIE = $(addprefix $(OUT),$(notdir $(SRC.SPR3DIE:.cpp=$O)))
+OBJ.SPR3DIE = $(addprefix $(OUT)/,$(notdir $(SRC.SPR3DIE:.cpp=$O)))
 DEP.SPR3DIE = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SPR3DIE
@@ -59,11 +59,11 @@ spr3dieclean:
 	-$(RM) $(SPR3DIE) $(OBJ.SPR3DIE)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)spr3die.dep
-$(OUTOS)spr3die.dep: $(SRC.SPR3DIE)
+dep: $(OUTOS)/spr3die.dep
+$(OUTOS)/spr3die.dep: $(SRC.SPR3DIE)
 	$(DO.DEP)
 else
--include $(OUTOS)spr3die.dep
+-include $(OUTOS)/spr3die.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

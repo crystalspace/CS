@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/spr2d/object
 
 ifeq ($(USE_PLUGINS),yes)
-  SPR2D = $(OUTDLL)spr2d$(DLL)
+  SPR2D = $(OUTDLL)/spr2d$(DLL)
   LIB.SPR2D = $(foreach d,$(DEP.SPR2D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SPR2D)
 else
-  SPR2D = $(OUT)$(LIB_PREFIX)spr2d$(LIB)
+  SPR2D = $(OUT)/$(LIB_PREFIX)spr2d$(LIB)
   DEP.EXE += $(SPR2D)
   SCF.STATIC += spr2d
   TO_INSTALL.STATIC_LIBS += $(SPR2D)
@@ -37,7 +37,7 @@ endif
 
 INC.SPR2D = $(wildcard plugins/mesh/spr2d/object/*.h)
 SRC.SPR2D = $(wildcard plugins/mesh/spr2d/object/*.cpp)
-OBJ.SPR2D = $(addprefix $(OUT),$(notdir $(SRC.SPR2D:.cpp=$O)))
+OBJ.SPR2D = $(addprefix $(OUT)/,$(notdir $(SRC.SPR2D:.cpp=$O)))
 DEP.SPR2D = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SPR2D
@@ -59,11 +59,11 @@ spr2dclean:
 	-$(RM) $(SPR2D) $(OBJ.SPR2D)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)spr2d.dep
-$(OUTOS)spr2d.dep: $(SRC.SPR2D)
+dep: $(OUTOS)/spr2d.dep
+$(OUTOS)/spr2d.dep: $(SRC.SPR2D)
 	$(DO.DEP)
 else
--include $(OUTOS)spr2d.dep
+-include $(OUTOS)/spr2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
