@@ -77,7 +77,7 @@ struct iLoader : public iBase
    */
   virtual csPtr<iTextureHandle> LoadTexture (const char* Filename,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
-	iImage **image=0) = 0;
+	csRef<iImage>* image=0) = 0;
   /**
    * Load a texture as with LoadTexture() above and register it with the
    * engine. 'Name' is the name that the engine will use for the wrapper.

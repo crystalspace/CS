@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Mar-2005
+	- res removed a >= 0 comparison with an unsigned var from array.h.
+	- res fixed some wrong ref counting caused by iLoader->LoadTexture()
+	  taking an iImage**, not an csRef<iImage>*.
 23-Mar-2005
 	- res removed the Apache snprintf code.
 	- res fixed AWS after the recent 64bit compatibility changes. In 

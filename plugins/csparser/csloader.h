@@ -538,7 +538,7 @@ public:
 
   virtual csPtr<iImage> LoadImage (const char *fname, int Format);
   virtual csPtr<iTextureHandle> LoadTexture (const char* fname,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0, iImage **img=0);
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0, csRef<iImage>* img=0);
   virtual iTextureWrapper* LoadTexture (const char *name,
   	const char *fname,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,

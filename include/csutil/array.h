@@ -690,7 +690,7 @@ public:
    */
   csArray<T> Section (size_t low, size_t high) const
   {
-    CS_ASSERT (low >= 0 && high < count && high >= low);
+    CS_ASSERT (high < count && high >= low);
     csArray<T> sect (high - low + 1);
     for (size_t i = low; i <= high; i++) sect.Push (root[i]);
     return sect;

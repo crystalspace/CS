@@ -86,7 +86,7 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
 }
 
 csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
-	iTextureManager *tm, iImage **img)
+	iTextureManager *tm, csRef<iImage>* img)
 {
   if (!tm && G3D)
   {
@@ -134,7 +134,7 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   if (!Engine)
     return 0;
 
-  iImage *img;
+  csRef<iImage> img;
   csRef<iTextureHandle> TexHandle = LoadTexture (fname, Flags, tm, &img);
   if (!TexHandle)
     return 0;
