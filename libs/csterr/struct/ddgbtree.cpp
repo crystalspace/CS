@@ -246,7 +246,7 @@ float ddgTBinTree::heightByPos(unsigned int r, unsigned int c)
 	return _mesh->wheight(_rawHeight[tindex]);
 }
 
-inline unsigned int ddgTBinTree::vertex(ddgTriIndex tindex, ddgVector3 *vout)
+unsigned int ddgTBinTree::vertex(ddgTriIndex tindex, ddgVector3 *vout)
 {
 	*vout = ddgVector3(mrow(tindex),_mesh->wheight(_rawHeight[tindex]),mcol(tindex));
 

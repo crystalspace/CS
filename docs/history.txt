@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+29-May-2000
+	- Alex Pfaffe did some fixes on terrain engine. He also resynced
+	  with DDG. Various bug fixes and optimizations.
+	- Small fix to terrain engine (removal of bogus 'inline').
 28-May-2000
 	- Changed the way csPolyTree::ClassifyPoint() works. Instead
 	  of assuming space is open and testing six directions to prove
@@ -11,6 +15,21 @@ The history order has been reversed so that new features are at the top.
 	- Improved the solid space generator so that it is now much more
 	  likely to say that a node boundary is solid. This should improve
 	  PVS considerably.
+	- Added patch from Michael Ewert on csphyzik library. Here is his
+	  comment:
+	    "I made some good progress on csphysiks. I've got collision
+	    response working for articulated bodies quite nicely.
+	    This is an important milestone for me, and adds some
+	    very cool functionality.  One of the more common
+	    things that game developers get excited about when
+	    talking about physics packages is realistic response
+	    of characters to being shot or being hit with a 2x4,
+	    or other equally pleaseant events :)  Anyways, thats
+	    what I've got working now.
+	    I will update documentation and add a decent test app
+	    sometime in the near ( or not so near ) future, so
+	    other people can actually use this stuff."
+	- David Durant added myapp hook functionality.
 27-May-2000
 	- Worked a bit more on 'perftest'.
 26-May-2000
@@ -80,6 +99,10 @@ The history order has been reversed so that new features are at the top.
 	  flexibility.
 	- Eric Sunshine updated documentation to reflect fact that WalkTest
 	  now requires that new "rapid" plug-in exist at run-time.
+	- Frank O'Connor did some fixes to MSVC project files and
+	  added new RAPID plugin.
+	- Frank also removed a few warnings in OpenGL dynamic texture
+	  implementation.
 25-May-2000
 	- Moved initialization of 2D culler cube into CheckFrustum.
 	  This fixes radiosity. As it was now it simply could not work
