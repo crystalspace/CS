@@ -191,7 +191,7 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
 
   virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB);
 
-  virtual iImage *ScreenShot ()
+  virtual csPtr<iImage> ScreenShot ()
   { return g2d->ScreenShot(); }
 
   virtual iGraphics2D *CreateOffScreenCanvas

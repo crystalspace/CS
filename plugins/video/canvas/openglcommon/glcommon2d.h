@@ -129,7 +129,7 @@ public:
   virtual unsigned char *GetPixelAt (int x, int y);
 
   /// Do a screenshot: return a new iImage object
-  virtual iImage *ScreenShot ();
+  virtual csPtr<iImage> ScreenShot ();
 
   /**
    * Save a subarea of screen area into the variable Data.

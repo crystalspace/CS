@@ -92,7 +92,7 @@ struct iImage : public iBase
    * a pointer to a transparent color, the texels of that color are handled
    * differently.
    */
-  virtual iImage *MipMap (int step, csRGBpixel *transp) = 0;
+  virtual csPtr<iImage> MipMap (int step, csRGBpixel *transp) = 0;
 
   /// Set image file name
   virtual void SetName (const char *iName) = 0;
@@ -122,10 +122,10 @@ struct iImage : public iBase
   virtual void SetFormat (int iFormat) = 0;
 
   /// Create yet another image and copy this one into the new image.
-  virtual iImage *Clone () = 0;
+  virtual csPtr<iImage> Clone () = 0;
 
   /// Create a new image and copy a subpart of the actual image into the new image.
-  virtual iImage *Crop (int x, int y, int width, int height) = 0;
+  virtual csPtr<iImage> Crop (int x, int y, int width, int height) = 0;
 
   /// Check if all alpha values are "non-transparent" and if so, discard alpha
   virtual void CheckAlpha () = 0;
@@ -142,7 +142,7 @@ struct iImage : public iBase
    * give good results. On really blurry images values up to 1024 or 2048 can be 
    * used.
    */
-  virtual iImage *Sharpen (csRGBpixel *transp, int strength) = 0;
+  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) = 0;
 };
 
 #endif // __IGRAPHIC_IMAGE_H__

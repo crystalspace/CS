@@ -312,8 +312,8 @@ csRGBMap *csRadElement::ComputeTextureLumelSized ()
   iTextureWrapper *txthandle = mat->GetTextureWrapper ();
   txthandle->GetKeyColor (transr, transg, transb);
 
-  iImage *txtimage = txthandle->GetImageFile ();
-  iImage *rgbimage = txtimage->Clone ();
+  csRef<iImage> txtimage = txthandle->GetImageFile ();
+  csRef<iImage> rgbimage = txtimage->Clone ();
 
   rgbimage->SetFormat (CS_IMGFMT_TRUECOLOR);  // get rgb
   int txtw = rgbimage->GetWidth ();
@@ -377,7 +377,6 @@ csRGBMap *csRadElement::ComputeTextureLumelSized ()
   */
 
   // get rid of rgbimage
-  rgbimage->DecRef ();
   return map;
 }
 

@@ -66,10 +66,10 @@ public:
   virtual void SetFormat (int /*iFormat*/)
   {  }
   /// Create yet another image and copy this one into the new image.
-  virtual iImage *Clone ()
+  virtual csPtr<iImage> Clone ()
   { return NULL; }
   /// Create another image holding a subimage of current image
-  virtual iImage *Crop (int /*x*/, int /*y*/, int /*width*/, int /*height*/ )
+  virtual csPtr<iImage> Crop (int , int , int , int )
   { return NULL; }
 };
 

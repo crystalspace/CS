@@ -29,13 +29,11 @@ csBumpMap::csBumpMap (iImage* src, int fmt)
   format = fmt;
 
   /// Get the truecolor image.
-  iImage *rgbimage = src;
-  bool delete_rgb = false;
+  csRef<iImage> rgbimage = src;
   if (src->GetFormat () != CS_IMGFMT_TRUECOLOR)
   {
     rgbimage = src->Clone ();
     rgbimage->SetFormat (CS_IMGFMT_TRUECOLOR);
-    delete_rgb = true;
   }
 
   /// Now create the height bumpmap using the grayscale data of the image.
@@ -79,8 +77,6 @@ csBumpMap::csBumpMap (iImage* src, int fmt)
   }
 
   delete [] heightdata;
-  if (delete_rgb)
-    rgbimage->DecRef();
 }
 
 csBumpMap::~csBumpMap ()

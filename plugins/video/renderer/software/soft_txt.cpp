@@ -154,22 +154,23 @@ csTextureHandleSoftware::~csTextureHandleSoftware ()
   delete [] orig_palette;
 }
 
-csTexture *csTextureHandleSoftware::NewTexture (iImage *Image, bool ismipmap)
+csTexture *csTextureHandleSoftware::NewTexture (iImage *newImage, bool ismipmap)
 {
+  csRef<iImage> Image;
   if (ismipmap && texman->sharpen_mipmaps)
   { 
     csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
-    iImage *tmpimg = Image->Sharpen (tc, texman->sharpen_mipmaps);
-    Image = tmpimg;
+    Image = newImage->Sharpen (tc, texman->sharpen_mipmaps);
   }
   else
-    Image->IncRef ();
+    Image = newImage;
+
   csTexture *result;
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
     result = new csTextureSoftwareProc (this, Image);
   else
     result = new csTextureSoftware (this, Image);
-  Image->DecRef ();
+  
   return result;
 }
 

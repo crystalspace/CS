@@ -263,7 +263,7 @@ struct iGraphics2D : public iBase
   virtual bool PerformExtensionV (char const* command, va_list) = 0;
 
   /// Do a screenshot: return a new iImage object
-  virtual iImage *ScreenShot () = 0;
+  virtual csPtr<iImage> ScreenShot () = 0;
 
   /// Create an Off Screen Canvas
   virtual iGraphics2D *CreateOffScreenCanvas (int width, int height,

@@ -230,7 +230,7 @@ void csImageFile::Rescale (int newwidth, int newheight)
   Height = newheight;
 }
 
-iImage *csImageFile::MipMap (int steps, csRGBpixel *transp)
+csPtr<iImage> csImageFile::MipMap (int steps, csRGBpixel *transp)
 {
   if (steps < 0)
     return NULL;
@@ -241,11 +241,11 @@ iImage *csImageFile::MipMap (int steps, csRGBpixel *transp)
     return Clone ();
   }
 
-  csImageFile* nimg = NULL;
+  csRef<csImageFile> nimg = NULL;
 
   if (steps == 0)
   {
-    nimg = new csImageFile (Format);
+    nimg = csPtr<csImageFile> (new csImageFile (Format));
     nimg->set_dimensions (Width, Height);
 
     csRGBpixel *mipmap = new csRGBpixel [nimg->Width * nimg->Height];
@@ -280,15 +280,14 @@ iImage *csImageFile::MipMap (int steps, csRGBpixel *transp)
   }
   else
   {
-    csImageFile* simg = this;
-    simg->IncRef();
+    csRef<csImageFile> simg = this;
 
     int cur_w = Width;
     int cur_h = Height;
 
     while (steps && !((cur_w == 1) && (cur_h == 1)) )
     {
-      nimg = new csImageFile (Format);
+      nimg = csPtr<csImageFile> (new csImageFile (Format));
       nimg->set_dimensions (MAX(1, cur_w >> 1), MAX(1, cur_h >> 1));
 
       csRGBpixel *mipmap = new csRGBpixel [nimg->Width * nimg->Height];
@@ -321,7 +320,6 @@ iImage *csImageFile::MipMap (int steps, csRGBpixel *transp)
 	  break;
       }
 
-      simg->DecRef ();
       simg = nimg;
       steps--;
       cur_w = nimg->Width;
@@ -329,10 +327,11 @@ iImage *csImageFile::MipMap (int steps, csRGBpixel *transp)
     }
   }
 
-  return nimg;
+  nimg->IncRef ();
+  return csPtr<iImage> (nimg);
 }
 
-iImage *csImageFile::Sharpen (csRGBpixel *transp, int strength)
+csPtr<iImage> csImageFile::Sharpen (csRGBpixel *transp, int strength)
 {
 /*
 
@@ -354,9 +353,9 @@ iImage *csImageFile::Sharpen (csRGBpixel *transp, int strength)
     return Clone ();
 
   // we need an RGB version of ourselves
-  iImage *original = Clone ();
+  csRef<iImage> original = Clone ();
   original->SetFormat (CS_IMGFMT_TRUECOLOR | (Alpha?CS_IMGFMT_ALPHA:0) );
-  iImage *blurry = original->MipMap (0, transp);
+  csRef<iImage> blurry = original->MipMap (0, transp);
   
   csRGBpixel *result = new csRGBpixel [Width * Height];
   csRGBpixel *src_o = (csRGBpixel*)original->GetImageData ();
@@ -382,14 +381,12 @@ iImage *csImageFile::Sharpen (csRGBpixel *transp, int strength)
     src_b++;
   }
 
-  csImageFile *resimg = new csImageFile (Format);
+  csRef<csImageFile> resimg = csPtr<csImageFile> (new csImageFile (Format));
   resimg->set_dimensions (Width, Height);
   resimg->convert_rgba (result);
 
-  original->DecRef ();
-  blurry->DecRef ();
-
-  return resimg;
+  resimg->IncRef ();
+  return csPtr<iImage> (resimg);
 }
 
 static inline unsigned sqr (int x)
@@ -594,9 +591,9 @@ void csImageFile::SetFormat (int iFormat)
   }
 }
 
-iImage *csImageFile::Clone ()
+csPtr<iImage> csImageFile::Clone ()
 {
-  csImageFile* nimg = new csImageFile (Format);
+  csRef<csImageFile> nimg = csPtr<csImageFile> (new csImageFile (Format));
   nimg->Width = Width;
   nimg->Height = Height;
   nimg->fName = NULL;
@@ -635,13 +632,14 @@ iImage *csImageFile::Clone ()
     }
   }
 
-  return nimg;
+  nimg->IncRef ();
+  return csPtr<iImage> (nimg);
 }
 
-iImage *csImageFile::Crop ( int x, int y, int width, int height )
+csPtr<iImage> csImageFile::Crop ( int x, int y, int width, int height )
 {
   if ( x+width > Width || y+height > Height ) return NULL;
-  csImageFile* nimg = new csImageFile (Format);
+  csRef<csImageFile> nimg = csPtr<csImageFile> (new csImageFile (Format));
   nimg->Width = width;
   nimg->Height = height;
   nimg->fName = NULL;
@@ -684,6 +682,7 @@ iImage *csImageFile::Crop ( int x, int y, int width, int height )
     }
   }
 
-  return nimg;
+  nimg->IncRef ();
+  return csPtr<iImage> (nimg);
 }
 

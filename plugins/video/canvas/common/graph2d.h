@@ -249,7 +249,7 @@ public:
   virtual bool PerformExtensionV (char const* command, va_list);
 
   /// Do a screenshot: return a new iImage object
-  virtual iImage *ScreenShot ();
+  virtual csPtr<iImage> ScreenShot ();
 
   /// Create an off screen canvas
   virtual iGraphics2D *CreateOffScreenCanvas

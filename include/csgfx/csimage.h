@@ -141,7 +141,7 @@ public:
    * a pointer to a transparent color, the texels of that color are handled
    * differently.
    */
-  virtual iImage *MipMap (int step, csRGBpixel *transp);
+  virtual csPtr<iImage> MipMap (int step, csRGBpixel *transp);
 
   /// Set image file name
   virtual void SetName (const char *iName);
@@ -156,9 +156,9 @@ public:
   /// Convert the image to another format
   virtual void SetFormat (int iFormat);
   /// Create yet another image and copy this one into the new image.
-  virtual iImage *Clone ();
+  virtual csPtr<iImage> Clone ();
   /// Create another image and copy a subpart of this image into the new image.
-  virtual iImage *Crop (int x, int y, int width, int height);
+  virtual csPtr<iImage> Crop (int x, int y, int width, int height);
   /// Check if all alpha values are "non-transparent" and if so, discard alpha
   virtual void CheckAlpha ();
   /// check if image has a keycolour stored with it
@@ -166,7 +166,7 @@ public:
   /// get the keycolour stored with the image.
   virtual void GetKeycolor (int &r, int &g, int &b);
   /// Create a sharpened copy of the image
-  virtual iImage *Sharpen (csRGBpixel *transp, int strength);
+  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength);
 };
 
 #endif // __CS_IMAGE_H__

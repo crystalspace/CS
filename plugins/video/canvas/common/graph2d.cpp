@@ -661,7 +661,7 @@ void csGraphics2D::GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB)
   }
 }
 
-iImage *csGraphics2D::ScreenShot ()
+csPtr<iImage> csGraphics2D::ScreenShot ()
 {
   BeginDraw ();
   csScreenShot *ss = new csScreenShot (this);

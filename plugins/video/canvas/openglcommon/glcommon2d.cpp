@@ -413,7 +413,7 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
   if (gl_alphaTest) statecache->EnableState (GL_ALPHA_TEST);
 }
 
-iImage *csGraphics2DGLCommon::ScreenShot ()
+csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
 {
 #ifndef GL_VERSION_1_2
   if (pfmt.PixelBytes != 1 && pfmt.PixelBytes != 4)

@@ -590,7 +590,7 @@ void csTextureHandleOpenGL::CreateMipmaps ()
     // we do this down to 1x1 as opengl defines it
 
     iImage *prevImage = image;
-    iImage *thisImage;
+    csRef<iImage> thisImage;
 
     int w = prevImage->GetWidth ();
     int h = prevImage->GetHeight ();
@@ -607,9 +607,7 @@ void csTextureHandleOpenGL::CreateMipmaps ()
       thisImage = prevImage->MipMap (1, tc);
       if (txtmgr->sharpen_mipmaps)
       {
-	iImage *nimg = thisImage->Sharpen (tc, txtmgr->sharpen_mipmaps);
-	thisImage->DecRef ();
-	thisImage = nimg;
+	thisImage = thisImage->Sharpen (tc, txtmgr->sharpen_mipmaps);
       }
       //  printf ("push %d\n", nTex);
       csTexture* ntex = NewTexture (thisImage, true);
@@ -620,6 +618,7 @@ void csTextureHandleOpenGL::CreateMipmaps ()
       w = thisImage->GetWidth ();
       h = thisImage->GetHeight ();
       prevImage->DecRef ();
+      thisImage->IncRef ();
       prevImage = thisImage;
     }
 
