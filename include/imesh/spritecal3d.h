@@ -396,6 +396,9 @@ struct iSpriteCal3DState : public iBase
 
   /// find a named socket into the sprite.
   virtual iSpriteCal3DSocket* FindSocket (const char * name) const = 0;
+
+  /// Change the material on a named submesh.  Returns true if successful.
+  virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat) = 0;
 };
 
 #endif// __CS_IMESH_SPRITECAL3D_H__

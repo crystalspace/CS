@@ -807,6 +807,7 @@ public:
       : (csSpriteCal3DSocket*)0;
   }
 
+  bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat);
 
   struct SpriteCal3DState : public iSpriteCal3DState
   {
@@ -918,6 +919,10 @@ public:
 	  SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
 	    iSpriteCal3DSocket));
       return ifr;       // DecRef is ok here.
+    }
+    virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat)
+    {
+      return scfParent->SetMaterial(mesh_name,mat);
     }
 
   } scfiSpriteCal3DState;

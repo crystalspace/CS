@@ -1799,6 +1799,29 @@ csSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (iMeshWrapper *mesh) co
   return 0;
 }
 
+bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,iMaterialWrapper *mat)
+{
+  int idx = factory->FindMeshName(mesh_name);
+  if (idx == -1)
+    return false;
+
+  int i,j;
+  for (i=0; i<attached_ids.Length(); i++)
+  {
+    if (attached_ids[i] == idx)
+    {
+      CalMesh *mesh = calModel.getMesh(i);
+      for (j=0; j<mesh->getSubmeshCount(); j++)
+      {
+        mesh->getSubmesh(j)->setCoreMaterialId((int)mat);
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+
 //----------------------------------------------------------------------
 
 #ifdef CS_USE_NEW_RENDERER

@@ -12,6 +12,7 @@ chronological order.
 	- res updated the csfx* functions to use that facility on NR. 
 	- In csutil/inpnames.h|cpp, Oktal added functions csTypeOfInputDef and
 	  csParseJoystickDef.
+	- Keith added ability to override default material in sprcal3d mesh.
 9-Jan-2004
 	- Jorrit fixed a warning in memimage.cpp.  It was trying to delete a
 	  void* which is undefined.
