@@ -106,14 +106,20 @@ LFLAGS.DLL=-Zdll
 ifeq ($(USE_OMF),yes)
   O=.obj
   LIB=.lib
-  AR=emxomfar
-  ARFLAGS=cr
+  define AR
+	@rm -f $@
+	emxomfar
+  endef
+  ARFLAGS=-p32 cr
   CFLAGS.GENERAL += -Zomf
   LFLAGS.GENERAL += -Zomf
   NASMFLAGS.SYSTEM=-f obj
 else
   LIB=.a
-  AR=ar
+  define AR
+	@rm -f $@
+	ar
+  endef
   ARFLAGS=cr
   NASMFLAGS.SYSTEM=-f aout -DEXTERNC_UNDERSCORE
 endif
