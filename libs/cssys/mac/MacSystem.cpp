@@ -239,7 +239,7 @@ void SysSystemDriver::Loop(void)
 	bool	driverNeedsEvent = false;
 	bool	eventHandled;
 
-	piG2D = QUERY_INTERFACE(System, iMacGraphics);
+	piG2D = QUERY_INTERFACE(G2D, iMacGraphics);
 
 	if (piG2D) {
 		driverNeedsEvent = piG2D->DoesDriverNeedEvent();
