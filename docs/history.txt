@@ -62,6 +62,13 @@ chronological order.
 	  flags.  Instead, now uses the result of the new enable-exceptions
 	  configure.ac check, and takes advantage of the fact that each build
 	  system provides a portable way to specify preprocessor defines.
+	- Eric Sunshine added const and non-const operator[] methods to
+	  Opcode's Point class (OPC_Point.h).  This works around problem with
+	  Borland compiler where it considered the following code ambiguous:
+	    Point p; float x = p[0];
+	  Other compilers correctly apply Point's float* operator and then
+	  treat the returned result as an array.  Borland, however, was unable
+	  to choose if it should use the const or non-const float* operator.
 14-Jan-2004
 	- res changed glrender3d to not depend on GLU any more. Though a GLU
 	  header was #included, no GLU function was used anyway.
