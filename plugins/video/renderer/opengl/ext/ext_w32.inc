@@ -192,52 +192,6 @@ void csGraphics3DOGLCommon::DetectExtensions()
   }
 }
 
-/*
-// This function detects which extensions that is available on this platform. This function 
-// should be implemented on all OpenGL platforms (or maybe we should share this, move it
-// into ogl_g3d.cpp prehaps)
-void csGraphics3DOGLCommon::DetectExtensions()
-{
-  //The SysPrintf is just for debugging, but it writes which extensions you have into
-  //debug.txt. Made me jealous when I ran it on a TnT2 :-(
-  printf ("Detecting Win32 OpenGL extensions.\n");
-  const unsigned char *extensions;
-  char *currentextension;
-
-  extensions=glGetString(GL_EXTENSIONS);
-  if(!extensions) return;	//No luck, no extensions on this machine.
-
-  currentextension=strtok((char*)extensions," "); //Find the first substring
-  if(!currentextension) return; //Nope, just an empty string
-  while(1)
-  {
-    //Debugging
-    printf ("Found extension: %s\n",currentextension);
-
-    //Go through all the extension we know, and see if we find this one
-    for(int i=0;i<NUM_EXTENSIONS;i++)
-    {
-      if(!strcmp(currentextension,knownExtensions[i]))
-        break;
-    }
-
-    // i is now an index, so use it
-    switch (i)
-    {
-    case 0:
-      if(setupARBmultitexture())
-        printf("All procs found\n");
-      else
-        printf("Not all procs found\n");
-        ARB_multitexture=true;	//Flag that should be checked in renderer
-      break;
-    default:
-      break;
-    }
-    if(!(currentextension=strtok(0," "))) return;
-  }
-}
-*/
 // this tells the main ogl_g3d.cpp module not to define a 'default'
 #define _DEFINED_DETECTION_METHOD
 
