@@ -136,13 +136,62 @@ csMemoryMappedIO::GetPointer(unsigned int index)
 void 
 csMemoryMappedIO::CachePage(unsigned int page)
 {
+  unsigned int bucket = page % csmmioDefaultHashSize;
 
+  CacheBlock *cp;
+
+  if (cache.inactive)
+  {
+    // Re-use a page off the inactive block.
+    cp = cache.inactive;
+    cache.inactive=cp->next;
+
+    // Insert it into the bucket.
+    cp->next=cache.blocks[bucket];
+    cache.blocks[bucket]=cp;
+  }
+  else if (cache_block_count < cache_max_size)
+  {
+    cp = new CacheBlock;
+    ++cache_block_count;
+
+    // Insert it into the bucket.
+    cp->next=cache.blocks[bucket];
+    cache.blocks[bucket]=cp;
+  }
+  else
+  {
+    CacheBlock *block;
+   
+    // Find the least used block in this bucket.
+    cp=cache.blocks[bucket];
+    block=cp->next;
+
+    while(block)
+    { 
+      if (block->age < cp->age)
+        cp=block;
+
+      block=block->next;
+    }
+  }
+
+    
+  // Get the data for it.
+  cp->offset=page;
+  cp->age=0;
+    
+  fseek(mapped_file, page*block_size, SEEK_SET);
+  fread(cp->data, block_size, cache_block_size, mapped_file);
+  
 }
 
 void *
 csMemoryMappedIO::LookupIndex(unsigned int page, unsigned int index)
 {
+  unsigned int bucket = page % csmmioDefaultHashSize;
+
+  
 
   return NULL;
-
 }
