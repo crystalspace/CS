@@ -118,31 +118,35 @@ Note: To correctly build the CS Python plugin with Python version later than
 1.5.2 in @emph{CS\plugins\cscript\cspythoncs_pyth.cpp'} Now find the code lines
 49 - 55 inclusive  i.e.
 
+@example
 #ifdef __cplusplus
-extern "C" {
+extern "C" @{
 #endif
 #include "Python.h"
 #ifdef __cplusplus
-}
+@}
 #endif
+@end example
 
-The above 'extern "C"' will cause problems because MS put C++ 
+The above @emph{extern "C"} will cause problems because MS put C++ 
 template code right in the middle of MSVC's math.h and for that blows 
 out some nice errors. To avoid this edit the above to match the 
 following.
 
+@example
 //#ifdef __cplusplus
-//extern "C" {
+//extern "C" @{
 //#endif
 #include "Python.h"
 //#ifdef __cplusplus
-//}
+//@}
 //#endif
+@end example
 
 @subsubheading BisonFlex - Required
 
 The Alternate Window System (AWS) plugin will build correctly under MSVC.
-However, if you wish to make modifications to it's structure and/or lexer, it will
+However, if you wish to make modifications to it's structure and or lexer, it will
 require you re-generate @emph{sllex.cpp, slparse.cpp, slparse.cpp.h and slparse.h}.
 If you need todo this will require you have Bison and Flex on your system. The
 suggested and supported version can be obtained via the link below.
