@@ -14,6 +14,16 @@ The history order is reversed so that new features are at the top.
 	  NOTE: The function doesn't do anything useful yet! I have to
 	  continue implementation.
 	- Fixed the crossbld makefile so that it actually links.
+	- Haze Mesh: Implement HitBeamBBox.
+	- Michael Voase did the following:
+	  Sprite2D: Implement HitBeamBBox and
+	  HitBeamOutline. Modified SetupObject() to 
+	  always calculate the radius when the object
+	  is setup, reguardless of the lighting setting.
+	  Introduced a GetObjectBoundingBox method,
+	  but it is as yet invalid. More work to be done
+	  here yet. 
+	  Sprite3D: Tidying up HitBeam.
 17-Aug-2001
 	- Integrated a few patches from Matze Braun <matze@braunis.de>
 	  to make sure that CS compiles cleanly with gcc3.0. To enable
