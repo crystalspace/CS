@@ -601,7 +601,11 @@ void csWorld::PrepareTextures ()
 
   // First register all textures to the texture manager.
   for (int i = 0; i < textures->Length (); i++)
-    textures->Get (i)->Register (txtmgr);
+  {
+    csTextureHandle *csth = textures->Get (i);
+    if (!csth->GetTextureHandle ())
+      csth->Register (txtmgr);
+  }
 
   // Prepare all the textures.
   txtmgr->PrepareTextures ();
@@ -1674,8 +1678,8 @@ void csWorld::csWorldStateVector::Close (iGraphics2D *g2d)
 {
   // Hack-- with the glide back buffer implementations of procedural textures
   // circumstances are that many G3D can be associated with one G2D.
-  // It is impossible to tell which is which so destroy them both, and allow
-  // regeneration next time context is set to the surviving G3D associated
+  // It is impossible to tell which is which so destroy them all, and rely on
+  // regeneration the next time the context is set to the surviving G3Ds associated
   // with this G2D
   for (int i = 0; i < Length (); i++)
     if (((csWorldState*)root [i])->G2D == g2d)
@@ -1684,7 +1688,7 @@ void csWorld::csWorldStateVector::Close (iGraphics2D *g2d)
 
 void csWorld::csWorldStateVector::Resize (iGraphics2D *g2d)
 { 
-  // With the glide back buffer implementations of procedural textures
+  // With the glide back buffer implementation of procedural textures
   // circumstances are that many G3D can be associated with one G2D, so
   // we test for width and height also.
   for (int i = 0; i < Length (); i++)

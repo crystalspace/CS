@@ -38,8 +38,8 @@ EXPORT_CLASS_TABLE (soft3d)
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics3DSoftware)
-  IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics3D)
+  IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
 
@@ -79,17 +79,22 @@ bool csGraphics3DSoftware::Open (const char *Title)
     return false;
 
   bool bFullScreen = G2D->GetFullScreen ();
-  SysPrintf(MSG_INITIALIZATION, "Using %s mode %dx%d (internal rendering at %dx%d).\n",
-            bFullScreen ? "full screen" : "windowed", G2D->GetWidth (), G2D->GetHeight (), width, height);
+  SysPrintf(MSG_INITIALIZATION, 
+	    "Using %s mode %dx%d (internal rendering at %dx%d).\n",
+            bFullScreen ? "full screen" : "windowed", 
+	    G2D->GetWidth (), G2D->GetHeight (), width, height);
 
   if (pfmt.PixelBytes == 4)
-    SysPrintf (MSG_INITIALIZATION, "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
+    SysPrintf (MSG_INITIALIZATION, 
+	  "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
           pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
   else if (pfmt.PixelBytes == 2)
-    SysPrintf (MSG_INITIALIZATION, "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
-          pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
+    SysPrintf (MSG_INITIALIZATION, 
+	   "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
+	   pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
   else
-    SysPrintf (MSG_INITIALIZATION, "Using palette mode with 1 byte per pixel (256 colors).\n");
+    SysPrintf (MSG_INITIALIZATION, 
+	       "Using palette mode with 1 byte per pixel (256 colors).\n");
 
   return true;
 }

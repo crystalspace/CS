@@ -28,6 +28,7 @@ class csTextureMMSoftware;
 class csSoftProcTexture3D : public csGraphics3DSoftwareCommon, 
 			    public iSoftProcTexture
 {
+private:
   /// True when it is necessary to reprepare a texture each update.
   bool reprepare;
 

@@ -1,5 +1,14 @@
 The history order has been reversed so that new features are at the top.
-
+30-Jul-2000
+	- Samuel Humphreys did the following:
+            - Little re-organisation of dtsimple, improved comments
+            - Updated comments in dtsimp.cfg
+            - Added ability to create csTextureHandles from preprepared
+              iTextureHandles (in preparation for something new).
+            - Updated comments in csengine.cpp with regards multi-context support.
+            - Added a conditional to the delete [] Scan.GlobalCMap to prevent
+              destruction if this resource is shared in the software renderer
+              texture manager.
 28-Jul-2000
 	- Norman Kramer fixes the x2d canvas so that the title is set
 	  to the right window.

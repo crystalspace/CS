@@ -347,10 +347,10 @@ void csTextureMMSoftware::RemapProcToGlobalPalette (csTextureManagerSoftware *tx
 
   // If a proc texture was initialised without an image the palette size will be
   // very small, therefore force it to the max, so the whole new palette is 
-  // recognised by at least DrawPixmap
+  // recognised.
   palette_size = 256;
   SetupFromPalette ();
-  // Update tables with global palette
+  // Update remapping tables according to  global palette
   remap_texture ();
   t->proc_ok = true;
 }
@@ -402,6 +402,8 @@ iGraphics3D *csTextureMMSoftware::GetProcTextureInterface ()
       if (!texman->first_8bit_proc_tex)
       {
 	texman->first_8bit_proc_tex = stex;
+	// IncRef so that if this texture is destroyed individually, it doesnt
+	// destroy the shared resources
 	stex->IncRef ();
       }
     }
@@ -693,6 +695,9 @@ void csTextureManagerSoftware::PrepareTextures ()
   for (i = 0; i < textures.Length (); i++)
   {
     csTextureMM *txt = textures.Get (i);
+    if (((txt->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) &&
+	txt->get_texture (0))
+      continue;
     txt->CreateMipmaps ();
   }
 
@@ -717,7 +722,8 @@ void csTextureManagerSoftware::PrepareTextures ()
   if (main_txtmgr)
     main_txtmgr->ReprepareAloneProcs ();
 
-  delete [] Scan.GlobalCMap;
+  if (!proc_txtmgr)
+    delete [] Scan.GlobalCMap;
 }
 
 iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImage* image,
@@ -792,7 +798,7 @@ void csTextureManagerSoftware::SetPalette ()
 
 void csTextureManagerSoftware::ReprepareAloneProcs ()
 {
-  // Remap all textures according to the new colormap.
+  // Remap all proc textures according to the new colormap.
   for (int i = 0; i < textures.Length (); i++)
   {
     csTextureMMSoftware* txt = (csTextureMMSoftware*)textures.Get (i);

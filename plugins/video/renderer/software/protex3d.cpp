@@ -53,6 +53,7 @@ csSoftProcTexture3D::~csSoftProcTexture3D ()
     tcache = NULL;
     texman = NULL;
   }
+//    delete soft_tex_mm;
 }
 
 bool csSoftProcTexture3D::Initialize (iSystem *iSys)
@@ -90,7 +91,7 @@ bool csSoftProcTexture3D::Prepare
     return false;
   }
 
-  if (!alone_hint && (ipfmt->PixelBytes != 1))
+  if ((ipfmt->PixelBytes != 1) && !alone_hint)
     reprepare = true;
 
   if ((ipfmt->PixelBytes == 1) || !alone_hint)
@@ -111,7 +112,9 @@ bool csSoftProcTexture3D::Prepare
       NewInitialize ();
       if (!Open (NULL) || !NewOpen ())
 	return false;
-      csTextureManagerSoftware *main_txtmgr = (csTextureManagerSoftware*)parent_g3d->GetTextureManager();
+      csTextureManagerSoftware *main_txtmgr = (csTextureManagerSoftware*)
+	parent_g3d->GetTextureManager();
+      // Inform each texture manager aboout the other
       texman->SetMainTextureManager (main_txtmgr);
       main_txtmgr->SetProcTextureManager (texman);
     }
@@ -128,6 +131,7 @@ bool csSoftProcTexture3D::Prepare
 					      (RGBPixel*) buffer, false);
     soft_tex_mm = (csTextureMMSoftware *)
                   texman->RegisterTexture (im, CS_TEXTURE_2D | CS_TEXTURE_PROC);
+    texman->PrepareTexture (soft_tex_mm);
   }
 
   return true;
@@ -187,12 +191,12 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
   iImage *tex_image = new csImageMemory (width, height, 
 					 (RGBPixel*)buffer, false);
 
-  soft_tex_mm = (csTextureMMSoftware *) texman->RegisterTexture (tex_image,
+  csTextureMMSoftware *soft_mm = (csTextureMMSoftware *) texman->RegisterTexture (tex_image,
 						 CS_TEXTURE_PROC | CS_TEXTURE_2D);
-  texman->PrepareTexture ((iTextureHandle*)soft_tex_mm);
+  texman->PrepareTexture ((iTextureHandle*)soft_mm);
 
   // Return the software texture managers handle for this procedural texture.
-  return soft_tex_mm;
+  return soft_mm;
 }
 
 void csSoftProcTexture3D::ConvertMode ()

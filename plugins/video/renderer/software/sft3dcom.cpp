@@ -681,7 +681,7 @@ csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_32_Alpha
   return csScan_32_scan_map_fixalpha;
 }
 
-void csGraphics3DSoftwareCommon::Close()
+void csGraphics3DSoftwareCommon::Close ()
 {
   if ((width == height) && (width == -1))
     return;

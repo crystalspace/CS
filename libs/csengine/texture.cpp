@@ -32,7 +32,7 @@ csTextureHandle::csTextureHandle (iImage* Image) :
   csObject (), handle (NULL), flags (CS_TEXTURE_3D)
 {
   (image = Image)->IncRef ();
-  transp_r = -1;
+  key_col_r = -1;
 }
 
 csTextureHandle::csTextureHandle (csTextureHandle &th) :
@@ -40,13 +40,27 @@ csTextureHandle::csTextureHandle (csTextureHandle &th) :
 {
   flags = th.flags;
   (image = th.image)->IncRef ();
-  transp_r = th.transp_r;
-  transp_g = th.transp_g;
-  transp_b = th.transp_b;
+  key_col_r = th.key_col_r;
+  key_col_g = th.key_col_g;
+  key_col_b = th.key_col_b;
   handle = th.GetTextureHandle ();
   SetName (th.GetName ());
   if (handle)
-    SetKeyColor (transp_r, transp_g, transp_b);
+    SetKeyColor (key_col_r, key_col_g, key_col_b);
+}
+
+csTextureHandle::csTextureHandle (iTextureHandle *ith) :
+  csObject (), image (NULL)
+{
+  ith->IncRef ();
+  flags = ith->GetFlags ();
+  if (ith->GetKeyColor ())
+  {
+    UByte r, g, b;
+    ith->GetKeyColor (r, g, b);
+    SetKeyColor ((int)r, (int)g, (int)b);
+  }
+  handle = ith;
 }
 
 csTextureHandle::~csTextureHandle ()
@@ -71,14 +85,15 @@ void csTextureHandle::SetKeyColor (int red, int green, int blue)
       handle->SetKeyColor (red, green, blue);
     else
       handle->SetKeyColor (false);
-  transp_r = red;
-  transp_g = green;
-  transp_b = blue;
+  key_col_r = red;
+  key_col_g = green;
+  key_col_b = blue;
 }
 
 void csTextureHandle::Register (iTextureManager *txtmgr)
 {
-  if (handle) handle->DecRef ();
+  // smgh 22/07/00
+  //if (handle) handle->DecRef ();
 
   // Now we check the size of the loaded image. Having an image, that
   // is not a power of two will result in strange errors while
@@ -98,7 +113,7 @@ void csTextureHandle::Register (iTextureManager *txtmgr)
 
   handle = txtmgr->RegisterTexture (image, flags);
   if (handle)
-    SetKeyColor (transp_r, transp_g, transp_b);
+    SetKeyColor (key_col_r, key_col_g, key_col_b);
 }
 
 //-------------------------------------------------------- csTextureList -----//
@@ -111,6 +126,13 @@ csTextureList::~csTextureList ()
 csTextureHandle *csTextureList::NewTexture (iImage *image)
 {
   csTextureHandle *tm = new csTextureHandle (image);
+  Push (tm);
+  return tm;
+}
+
+csTextureHandle *csTextureList::NewTexture (iTextureHandle *ith)
+{
+  csTextureHandle *tm = new csTextureHandle (ith);
   Push (tm);
   return tm;
 }

@@ -40,7 +40,7 @@ private:
   /// The handle as returned by iTextureManager.
   iTextureHandle* handle;
   // key color
-  int transp_r, transp_g, transp_b;
+  int key_col_r, key_col_g, key_col_b;
 
 public:
   /// Texture registration flags
@@ -48,6 +48,14 @@ public:
 
   /// Construct a texture handle given a image file
   csTextureHandle (iImage* Image);
+
+  /**
+   * Construct a csTextureHandle from a pre-registered AND prepared texture 
+   * handle. The engine takes over responsibility for destroying the texture
+   * handle. To prevent this IncRef () the texture handle.
+   */
+  csTextureHandle (iTextureHandle *ith);
+
   /// Copy contstructor
   csTextureHandle (csTextureHandle &th);
   /// Release texture handle
@@ -66,7 +74,7 @@ public:
 
   /// Query the transparent color.
   void GetKeyColor (int &red, int &green, int &blue)
-  { red = transp_r; green = transp_g; blue = transp_b; }
+  { red = key_col_r; green = key_col_g; blue = key_col_b; }
 
   /// Register the texture with the texture manager
   void Register (iTextureManager *txtmng);
@@ -88,6 +96,10 @@ public:
 
   /// Create a new texture.
   csTextureHandle *NewTexture (iImage *image);
+
+  /// Create a engine wrapper for a pre-prepared iTextureHandle
+  /// The handle will be IncRefed
+  csTextureHandle *NewTexture (iTextureHandle *ith);
 
   /// Return texture by index
   csTextureHandle *Get (int idx)
