@@ -8,6 +8,9 @@
 #include <string.h>
 #include <stdio.h>
 
+struct iMeshObject;
+struct iVertexBufferManager;
+
 /*******************************************************************************************************************
  
    Some design notes and rationalizations.
@@ -22,7 +25,8 @@
 
  2. The algorithm basically follows "Visualization of Large Terrains Made Easy," except that there are not two trees,
  but one, and they are not interleaved.  Also, I don't use his error metric.  Also, instead of generating parity lists,
- I generate triangle fans.  The detail levels may not be quite as fine-tuned, but they are simple and fast.  
+ and triangle strips, I generate one large mesh.  The detail levels may not be quite as fine-tuned, but they are 
+ simple and fast.  
 
  *******************************************************************************************************************/
 
@@ -318,9 +322,9 @@ public:
     BuildTreeNode(f, 1, 0, 3, nRect(x+mid,y+mid,mid,mid), heightmap, w);
   }
 
-  /** Draws the terrain when called by the engine.  
+  /** Assembles the terrain into the buffer when called by the engine.  
    */
-  void DrawTerrain(iRenderView *rv)
+  void AssembleTerrain(iRenderView *rv)
   {
     // Clear mesh lists
     verts.MakeEmpty();
@@ -337,7 +341,94 @@ public:
     ProcessTreeNode(rv, 1, 0, 3, nRect(x+mid,y+mid,mid,mid));
   }
 
+public:
+  /// Sets the object to camera transform
+  void SetObjectToCamera(csReversibleTransform &o2c)
+  { obj2cam = o2c; }
 
+  /// Sets the camera origin
+  void SetCameraOrigin(csVector3 &camv)
+  { cam=camv; }
 };
+
+class csBigTerrainObject : public iMeshObject
+{
+private:
+  /// Pointer to the vertex buffer manager
+  iVertexBufferManager *vbufmgr;
+
+  /// Pointer to vertex buffer for this mesh.
+  iVertexBuffer *vbuf;
+
+  /// Pointer to factory that created this object.
+  iMeshObjectFactory *pFactory;
+
+  /// Pointer to terrain object
+  nTerrain *terrain;
+
+protected:
+  void SetupVertexBuffer (iVertexBuffer *&vbuf1);
+
+public:
+  ////////////////////////////// iMeshObject implementation ///////////////////////////
+  SCF_DECLARE_IBASE;
+
+  /// Returns a pointer to the factory that made this.
+  virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
+
+  /// Does some pre-draw work (buffers all vertices to be drawn, draw will render these.)
+  virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+
+  /// Update lighting on the terrain.
+  virtual void UpdateLighting (iLight** lights, int num_lights, iMovable* movable);
+
+  /// Draw the terrain.
+  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
+
+
+  virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
+  {
+    SCF_SET_REF (vis_cb, cb);
+  }
+
+  virtual iMeshObjectDrawCallback* GetVisibleCallback () const
+  {
+    return vis_cb;
+  }
+
+  /// Gets the bounding box for this terrain.
+  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+
+  /// Gets the radius and center of the terrain.
+  virtual void GetRadius (csVector3& rad, csVector3& cent);
+
+  /// For animation.
+  virtual void NextFrame (csTicks) { }
+
+  /// For dieing.
+  virtual bool WantToDie () const { return false; }
+
+  /// We don't support this.
+  virtual void HardTransform (const csReversibleTransform&) { }
+
+  /// Note that we don't support hard transforming.
+  virtual bool SupportsHardTransform () const { return false; }
+
+  /// Set logical parent.
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+
+  /// Get logical parent.
+  virtual iBase* GetLogicalParent () const { return logparent; }
+
+  /// Check if the terrain is hit by the given object space vector
+  virtual bool HitBeamOutline (const csVector3& start, const csVector3& end, csVector3& isect, float* pr);
+
+  /// Check exactly where the hit is.
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end, csVector3& isect, float* pr);
+
+  /// This may eventually return a changing number.
+  virtual long GetShapeNumber () const { return 1; }
+};
+
 
 #endif
