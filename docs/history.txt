@@ -29,6 +29,9 @@ The history order is reversed so that new features are at the top.
 	  that was causing it not to find the swigpythinst target, and then
 	  regenerated the Swig Python module to keep it up-to-date with my
 	  recent changes to the network API.
+	- Oktal changed the prototype of main() in perl5test to
+	  (int, char**) from (int, char**, char**) because that was causing
+	  it to fail linking on some platforms including Mingw.
 11-May-2003
 	- Oktal removed one of two instances of the same phony target,
 	  swigperl5gen, in the csperl5 makefile.

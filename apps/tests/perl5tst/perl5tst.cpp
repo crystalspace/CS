@@ -36,7 +36,7 @@ char testscript[] =
 "  $v = new cspace::csVector3 (4, 2, 0);\n"
 "  print join (' ', (split (' ', $text)) [$v->{x}, $v->{y}, $v->{z}]);\n";
 
-int main (int argc, char *argv[], char *env[])
+int main (int argc, char *argv[])
 {
   objreg = csInitializer::CreateEnvironment (argc, argv);
   if (! objreg)
