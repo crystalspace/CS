@@ -46,22 +46,23 @@ public:
   virtual void Clear ();
   virtual void AddPolygon (csPolygonRenderData* poly);
 
-  virtual void* Lock(csRenderBufferLockType lockType, 
-    bool samePointer = false) 
+  virtual void* Lock(csRenderBufferLockType lockType) 
   { return 0; }
   virtual void Release() {}
-  virtual void CopyToBuffer(const void *data, size_t length) {}
-  virtual void SetComponentCount (int count) {}
+  virtual void CopyInto (const void *data, size_t length) {}
   virtual int GetComponentCount () const { return 0; }
-  virtual void SetComponentType (csRenderBufferComponentType type) {}
   virtual csRenderBufferComponentType GetComponentType () const 
   { return CS_BUFCOMP_FLOAT; }
   virtual csRenderBufferType GetBufferType() const
   { return CS_BUF_STATIC; }
   virtual size_t GetSize() const { return 0; }
-  virtual void SetStride(int stride) {}
-  virtual int GetStride() const { return 0; }
-  virtual void SetOffset(int offset) {}
+  virtual size_t GetStride() const { return 0; }
+  virtual size_t GetElementDistance() const { return 0; }
+  virtual size_t GetOffset() const { return 0; }
   virtual uint GetVersion () {return 0;}
+  virtual iRenderBuffer* GetMasterBuffer () const { return 0; }
+  virtual bool IsIndexBuffer() const { return false; }
+  virtual size_t GetRangeStart() const { return 0; }
+  virtual size_t GetRangeEnd() const { return 0; }
 };
 

@@ -18,178 +18,16 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/scf.h"
+#include "csgfx/renderbuffer.h"
 
 #include "gl_render3d.h"
 #include "gl_renderbuffer.h"
 
-CS_LEAKGUARD_IMPLEMENT (csGLRenderBuffer);
 CS_LEAKGUARD_IMPLEMENT (csGLVBOBufferManager);
-
-SCF_IMPLEMENT_IBASE (csGLRenderBuffer)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBuffer)
-SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csGLVBOBufferManager)
 SCF_IMPLEMENT_IBASE_END
-
-static const size_t compSizes[] = 
-{
-  sizeof (char), sizeof (unsigned char), 
-  sizeof (short), sizeof (unsigned short),
-  sizeof (int), sizeof (unsigned int),
-  sizeof (float),
-  sizeof (double)
-};
-static const GLenum compGLtypes[] =
-{
-  GL_BYTE, GL_UNSIGNED_BYTE,
-  GL_SHORT, GL_UNSIGNED_SHORT,
-  GL_INT, GL_UNSIGNED_INT,
-  GL_FLOAT,
-  GL_DOUBLE
-};
-
-
-csGLRenderBuffer::csGLRenderBuffer (csGLVBOBufferManager * vbomgr, size_t size, 
-                                    csRenderBufferType type, 
-                                    csRenderBufferComponentType componentType, 
-                                    int componentCount, size_t rangeStart, 
-                                    size_t rangeEnd, bool copy)
-  : bufferType (type), comptype (componentType), bufferSize (size), 
-  compCount (componentCount), stride (0), offset (0),
-  vbooffset (0), rangeStart (rangeStart), rangeEnd (rangeEnd),
-  version (0), doCopy (copy), doDelete (false), isLocked (false),
-  isIndex (false), buffer (0), vboSlot (0), vbomgr (vbomgr)
-{
-  SCF_CONSTRUCT_IBASE (0);
-  compGLType = compGLtypes[componentType];
-  compSize = compSizes[componentType];
-
-  if (doCopy) 
-  {
-    buffer = new unsigned char[size];
-    doDelete = true;
-  }
-}
-
-csGLRenderBuffer::~csGLRenderBuffer ()
-{
-  if (vbomgr.IsValid ()) vbomgr->DeactivateBuffer (this);
-  if (doDelete) delete[] buffer;
-  buffer = 0;
-  SCF_DESTRUCT_IBASE ();
-}
-
-void* csGLRenderBuffer::Lock(csRenderBufferLockType lockType,
-                             bool samePointer)
-{
-  if (isLocked) return (void*)-1;
-
-  lastLock = lockType;
-  isLocked = true;
-  return (void*)buffer;
-}
-
-void csGLRenderBuffer::Release ()
-{
-  if (lastLock == CS_BUF_LOCK_NORMAL)
-  {
-    version++;
-  }
-  isLocked = false;
-}
-
-void csGLRenderBuffer::CopyToBuffer(const void *data, size_t length)
-{
-  version++;
-  if (doCopy)
-  {
-    memcpy (buffer, data, min(bufferSize, length));
-  }
-  else
-  {
-    buffer = (unsigned char*)data;
-  }
-}
-
-void csGLRenderBuffer::SetComponentType (csRenderBufferComponentType type)
-{
-  comptype = type;
-  compGLType = compGLtypes[type];
-  compSize = compSizes[type];
-}
-
-void csGLRenderBuffer::SetupSUBBuffers (int count, csRef<iRenderBuffer>* buffers)
-{
-  for(int i=1;i<count;i++) 
-  {
-    csGLRenderBufferSub *sub = new csGLRenderBufferSub (this);    
-    buffers[i].AttachNew (sub);
-  }
-}
-
-void* csGLRenderBuffer::RenderLock (csGLRenderBufferLockType type)
-{
-  if (vbomgr.IsValid ())
-  {
-    vbomgr->ActivateBuffer (this);
-    return (void*)(vbooffset + offset);
-  }
-  else return buffer + offset;
-}
-
-void csGLRenderBuffer::RenderRelease ()
-{
-  if (vbomgr.IsValid ()) vbomgr->DeactivateBuffer (this);
-}
-
-// subbuffer
-csGLRenderBufferSub::csGLRenderBufferSub (csGLRenderBuffer *buffer)
-  : csGLRenderBuffer (buffer->vbomgr, buffer->bufferSize, buffer->bufferType, 
-    buffer->comptype, buffer->compCount, buffer->rangeStart, buffer->rangeEnd, 
-    false)
-{ 
-  this->doCopy = true; //always copy subbuffers
-  this->doDelete = false; //never delete the data
-  this->isLocked = false;
-
-  owner = buffer;
-  this->buffer = owner->buffer;
-}
-
-
-//-----------------------------------------------------------------
-
-csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (size_t size, 
-  csRenderBufferType type, csRenderBufferComponentType componentType,
-  int componentCount, bool copy)
-{
- 
-  csGLRenderBuffer *buf = new csGLRenderBuffer (vboManager, size, type, 
-    componentType, componentCount, 0, 0, copy);
-  return csPtr<iRenderBuffer> (buf);
-}
-
-csPtr<iRenderBuffer> csGLGraphics3D::CreateIndexRenderBuffer (size_t size, 
-    csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd, bool copy)
-{
-  csGLRenderBuffer *buf = new csGLRenderBuffer (vboManager, size, type, 
-    componentType, 1, rangeStart, rangeEnd, copy);
-  buf->isIndex = true;
-  return csPtr<iRenderBuffer> (buf);
-}
-
-void csGLGraphics3D::CreateInterleavedRenderBuffers (size_t size,
-  csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers)
-{
-
-  csGLRenderBuffer *master = new csGLRenderBuffer (vboManager, size, type, 
-    CS_BUFCOMP_BYTE, 1, 0, 0, true);
-  buffers[0].AttachNew (master); 
-
-  master->SetupSUBBuffers (count, buffers);
-}
 
 //-----------------------------------------------------------------
 
@@ -256,7 +94,9 @@ csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext,
     "Setting up VBO buffers, VB: %s IB: %s",
     ByteFormat (vbSize).GetData(), ByteFormat (ibSize).GetData());
 
+  vertexBuffer.bufmgr = this;
   vertexBuffer.Setup (GL_ARRAY_BUFFER_ARB, vbSize, ext);
+  indexBuffer.bufmgr = this;
   indexBuffer.Setup (GL_ELEMENT_ARRAY_BUFFER_ARB, ibSize, ext);
 }
 
@@ -265,64 +105,86 @@ csGLVBOBufferManager::~csGLVBOBufferManager ()
   SCF_DESTRUCT_IBASE();
 }
 
-bool csGLVBOBufferManager::ActivateBuffer (csGLRenderBuffer *buffer)
+bool csGLVBOBufferManager::ActivateBuffer (iRenderBuffer *buffer)
 {
+  iRenderBuffer* master = buffer->GetMasterBuffer();
+  if (master != 0)
+    return ActivateBuffer (master);
+
   csGLVBOBufferSlot *slot = 0;
-  if (buffer->IsMasterBuffer ())
+  RenderBufferAux* auxData = bufferData.GetElementPointer (buffer);
+  if ((auxData != 0) && (auxData->vboSlot != 0) 
+    && (auxData->vboSlot->renderBuffer == buffer))
   {
-    if (buffer->vboSlot && buffer->vboSlot->renderBuffer == buffer)
+    slot = auxData->vboSlot;
+    //we already have a slot, use it
+    if (buffer->GetVersion() != slot->lastCachedVersion)
     {
-      slot = buffer->vboSlot;
-      //we already have a slot, use it
-      if (buffer->version != slot->lastCachedVersion)
-      {
-        Precache (buffer, slot);
-      }
-    }
-    else
-    {
-      //need a new slot
-      slot = FindEmptySlot (buffer->bufferSize, buffer->isIndex);
-      slot->AttachBuffer (buffer);
       Precache (buffer, slot);
     }
-    ActivateVBOSlot (slot);
   }
   else
   {
-    return ActivateBuffer (((csGLRenderBufferSub*)buffer)->owner);
+    //need a new slot
+    slot = FindEmptySlot (buffer->GetSize(), buffer->IsIndexBuffer());
+    AttachBuffer (slot, buffer);
+    Precache (buffer, slot);
   }
+  ActivateVBOSlot (slot);
   return true;
 }
 
-bool csGLVBOBufferManager::DeactivateBuffer (csGLRenderBuffer *buffer)
+bool csGLVBOBufferManager::DeactivateBuffer (iRenderBuffer *buffer)
 {
-  if (buffer->vboSlot)
+  iRenderBuffer* master = buffer->GetMasterBuffer();
+  if (master != 0)
+    return DeactivateBuffer (master);
+
+  RenderBufferAux* auxData = bufferData.GetElementPointer (buffer);
+  if ((auxData != 0) && (auxData->vboSlot != 0)
+    && (auxData->vboSlot->renderBuffer == buffer))
   {
-    DeactivateVBOSlot (buffer->vboSlot);
+    DeactivateVBOSlot (auxData->vboSlot);
   }
   return true;
 }
 
-void csGLVBOBufferManager::BufferRemoved (csGLRenderBuffer *buffer)
+void csGLVBOBufferManager::BufferRemoved (iRenderBuffer *buffer)
 {
-  if (buffer->vboSlot)
+  RenderBufferAux* auxData = bufferData.GetElementPointer (buffer);
+  if ((auxData != 0) && (auxData->vboSlot != 0)
+    && (auxData->vboSlot->renderBuffer == buffer))
   {
     DeactivateBuffer (buffer);
-    if (buffer->vboSlot->separateVBO)
+    if (auxData->vboSlot->separateVBO)
     {
-      ext->glDeleteBuffersARB (0, &buffer->vboSlot->vboID);
+      ext->glDeleteBuffersARB (0, &auxData->vboSlot->vboID);
     }
-    delete buffer->vboSlot;
-    buffer->vboSlot = 0;
-  }
-  
+    delete auxData->vboSlot;
+    auxData->vboSlot = 0;
+  }  
 }
 
 void csGLVBOBufferManager::DeactivateVBO ()
 {
   statecache->SetBufferARB (GL_ARRAY_BUFFER_ARB, 0);
   statecache->SetBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+}
+
+void* csGLVBOBufferManager::RenderLock (iRenderBuffer* buffer, 
+					csGLRenderBufferLockType type, 
+					GLenum& compGLType)
+{
+  ActivateBuffer (buffer);
+  RenderBufferAux* auxData = bufferData.GetElementPointer (buffer);
+  if (auxData == 0) return (void*)-1;
+  compGLType = auxData->compGLType;
+  return (void*)(auxData->vbooffset + buffer->GetOffset());
+}
+
+void csGLVBOBufferManager::RenderRelease (iRenderBuffer* buffer)
+{
+  DeactivateBuffer (buffer);
 }
 
 void csGLVBOBufferManager::ActivateVBOSlot (csGLVBOBufferSlot *slot)
@@ -344,16 +206,18 @@ void csGLVBOBufferManager::DeactivateVBOSlot (csGLVBOBufferSlot *slot)
   slot->locked = false;
 }
 
-void csGLVBOBufferManager::Precache (csGLRenderBuffer *buffer, 
+void csGLVBOBufferManager::Precache (iRenderBuffer *buffer, 
                                      csGLVBOBufferSlot *slot)
 {
   //slot must be active first
   ActivateVBOSlot (slot);
 
+  void* bufferData = buffer->Lock (CS_BUF_LOCK_READ);
   ext->glBufferSubDataARB (slot->vboTarget, slot->offset, 
-    buffer->bufferSize, buffer->buffer);
+    buffer->GetSize(), bufferData);
+  buffer->Release ();
 
-  slot->lastCachedVersion = buffer->version;
+  slot->lastCachedVersion = buffer->GetVersion();
 }
 
 csGLVBOBufferSlot* csGLVBOBufferManager::FindEmptySlot 
@@ -392,6 +256,32 @@ GLuint csGLVBOBufferManager::AllocateVBOBuffer (size_t size, bool ib)
   ext->glBufferDataARB (usage, size, 0, GL_DYNAMIC_DRAW_ARB);
   ext->glBindBufferARB (usage, 0);
   return vboid;
+}
+
+void csGLVBOBufferManager::DetachBuffer (csGLVBOBufferSlot *slot)
+{
+  RenderBufferAux* auxData = bufferData.GetElementPointer (
+    slot->renderBufferPtr);
+  if (auxData == 0) return;
+  slot->renderBuffer = 0;
+  slot->renderBufferPtr = 0;
+  slot->lastCachedVersion = 0;
+  bufferData.DeleteAll (slot->renderBufferPtr);
+}
+
+void csGLVBOBufferManager::AttachBuffer (csGLVBOBufferSlot *slot, 
+					 iRenderBuffer* buffer)
+{
+  RenderBufferAux auxData;
+  if ((slot->inUse) && (slot->renderBuffer != buffer))
+    DetachBuffer (slot);
+  slot->renderBuffer = buffer;
+  slot->renderBufferPtr = buffer;
+  auxData.vboSlot = slot;
+  auxData.vbooffset = slot->offset;
+  const csRenderBufferComponentType componentType = buffer->GetComponentType();
+  auxData.compGLType = compGLtypes[componentType];
+  bufferData.PutUnique (buffer, auxData);
 }
 
 void csGLVBOBufferManager::DumpStats ()
@@ -555,14 +445,14 @@ int VBOSlotCompare(csGLVBOBufferSlot* const& r1, csGLVBOBufferSlot* const& r2)
 }
 
 //helperstruct to method below
-struct slotSortStruct
+struct SlotSortStruct
 {
   csArray<csGLVBOBufferSlot*> slotList;
   size_t firstOffset;
   size_t lastOffset;
-  slotSortStruct() : firstOffset (0), lastOffset (0) {}
+  SlotSortStruct() : firstOffset (0), lastOffset (0) {}
 
-  static int CompareFunc (slotSortStruct* const& r1, slotSortStruct* const& r2)
+  static int CompareFunc (SlotSortStruct* const& r1, SlotSortStruct* const& r2)
   {
     if (r1->firstOffset < r2->firstOffset) return -1;
     else if (r1->firstOffset > r2->firstOffset) return -1;
@@ -570,7 +460,8 @@ struct slotSortStruct
   }
 };
 
-csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (size_t size, bool splitStarted)
+csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (
+  size_t size, bool splitStarted)
 {
   uint idx = GetIndexFromSize (size);
   CS_ASSERT (idx < VBO_NUMBER_OF_SLOTS);
@@ -598,7 +489,7 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (size_t si
 
       if (biggerSlot)
       {
-        biggerSlot->DeattachBuffer ();
+	bufmgr->DetachBuffer (biggerSlot);
 
         size_t currentOffset = biggerSlot->offset;
         //split biggerSlot
@@ -662,7 +553,7 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (size_t si
           csGLVBOBufferSlot* tmpSlot = slots[minIdx].head;
 
           //loop over all slots, try to map up "blocksToMerge" slots in order
-          csPDelArray<slotSortStruct> sortList;
+          csPDelArray<SlotSortStruct> sortList;
 
           while (tmpSlot && sortSlotidx < 0)
           {
@@ -672,7 +563,7 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (size_t si
               //check if we follow on any of the already existant slots
               for (j = 0; j<sortList.Length (); j++)
               {
-                slotSortStruct *t = sortList[j];
+                SlotSortStruct *t = sortList[j];
                 if (tmpSlot->offset == (sortList[j]->lastOffset+blocksize))
                 {
                   //follows directly
@@ -700,18 +591,18 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (size_t si
               //ok, don't follow, add it to a new pile
               if (!handled)
               {
-                slotSortStruct* st = new slotSortStruct;
+                SlotSortStruct* st = new SlotSortStruct;
                 st->firstOffset = st->lastOffset = tmpSlot->offset;
                 st->slotList.Push (tmpSlot);
-                sortList.InsertSorted (st, slotSortStruct::CompareFunc);
+                sortList.InsertSorted (st, SlotSortStruct::CompareFunc);
               }
 
               //then run through all slotSortStructs and merge them,
               //stop if we find one with enough slots to merge
               for (j = 0; j<sortList.Length ()-1; j++)
               {
-                slotSortStruct *s = sortList[j];
-                slotSortStruct *s2 = sortList[j+1];
+                SlotSortStruct* s = sortList[j];
+                SlotSortStruct* s2 = sortList[j+1];
                 if ((sortList[j]->lastOffset+blocksize) 
                      == sortList[j+1]->firstOffset)
                 {

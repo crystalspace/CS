@@ -23,6 +23,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
+#include "csgfx/renderbuffer.h"
 
 #include "gl_polyrender.h"
 #include "gl_render3d.h"
@@ -60,6 +61,7 @@ csGLPolygonRenderer::~csGLPolygonRenderer ()
 
 void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 {
+  csRef<iRenderBuffer> masterBuffer;
   if (renderBufferNum != polysNum)
   {
     int num_verts = 0, num_indices = 0, max_vc = 0;
@@ -78,42 +80,30 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 
 #define INTERLEAVE 1
 #if INTERLEAVE
+    static const csInterleavedBufferElement interleavedElements[3] =
+      {{CS_BUFCOMP_FLOAT, 3}, {CS_BUFCOMP_FLOAT, 2}, {CS_BUFCOMP_FLOAT, 2}};
     csRef<iRenderBuffer> buffers[3];
-    size_t compsize = sizeof (csVector3) + sizeof (csVector2)
-    	+ sizeof (csVector3);
-    int bufsize = num_verts * compsize;
-    parent->CreateInterleavedRenderBuffers (bufsize, CS_BUF_STATIC, 3, buffers);
+    masterBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (num_verts, 
+      CS_BUF_STATIC, 3, interleavedElements, buffers);
     vertex_buffer = buffers[0];
-    vertex_buffer->SetOffset (0);
-    vertex_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
-    vertex_buffer->SetComponentCount (3);
-    vertex_buffer->SetStride (compsize);
     texel_buffer = buffers[1];
-    texel_buffer->SetOffset (sizeof(csVector3));
-    texel_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
-    texel_buffer->SetComponentCount (2);
-    texel_buffer->SetStride (compsize);
     lmcoords_buffer = buffers[2];
-    lmcoords_buffer->SetOffset (sizeof(csVector3) + sizeof(csVector2));
-    lmcoords_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
-    lmcoords_buffer->SetComponentCount (2);
-    lmcoords_buffer->SetStride (compsize);
-    float* interleaved_data = (float*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
+    float* interleaved_data = (float*)masterBuffer->Lock (CS_BUF_LOCK_NORMAL);
 #else
-    vertex_buffer = parent->CreateRenderBuffer (num_verts*sizeof (csVector3), 
+    vertex_buffer = csRenderBuffer::CreateRenderBuffer (num_verts, 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     csVector3* vertices = (csVector3*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-    texel_buffer = parent->CreateRenderBuffer (num_verts*sizeof (csVector2), 
+    texel_buffer = csRenderBuffer::CreateRenderBuffer (num_verts, 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
     csVector2* texels = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-    lmcoords_buffer = parent->CreateRenderBuffer (num_verts*sizeof (csVector2), 
+    lmcoords_buffer = csRenderBuffer::CreateRenderBuffer (num_verts, 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
     csVector2* lmcoords = (csVector2*)lmcoords_buffer->Lock(CS_BUF_LOCK_NORMAL);
 #endif
 
-    index_buffer = parent->CreateIndexRenderBuffer (num_indices  * sizeof (int), 
+    index_buffer = csRenderBuffer::CreateIndexRenderBuffer (num_indices, 
       CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, num_verts - 1);
 
     int* indices = (int*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
@@ -200,7 +190,6 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
         csVector3 l = tex2lm.Other2This (t);
 	*interleaved_data++ = l.x;
 	*interleaved_data++ = l.y;
-	*interleaved_data++ = l.z;
 #else
         *vertices++ = vertex;
         csVector3 t = object2texture.Other2This (vertex);
@@ -227,19 +216,21 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     indexEnd = rbIndexEnd = iindex;
 
     renderBufferNum = polysNum;
+
+    index_buffer->Release ();
+  #if !INTERLEAVE
+    vertex_buffer->Release ();
+    texel_buffer->Release ();
+    lmcoords_buffer->Release ();
+  #else
+    masterBuffer->Release ();
+  #endif
   }
   else
   {
     indexStart = rbIndexStart;
     indexEnd = rbIndexEnd;
   }
-
-  index_buffer->Release ();
-  vertex_buffer->Release ();
-#if !INTERLEAVE
-  texel_buffer->Release ();
-  lmcoords_buffer->Release ();
-#endif
 }
 
 
@@ -299,8 +290,7 @@ bool csGLPolygonRenderer::BufferAccessor::UpdateNormals ()
       num_verts += poly->num_vertices;
     }
 
-    normal_buffer = renderer->parent->CreateRenderBuffer (
-      num_verts * sizeof (csVector3), 
+    normal_buffer = csRenderBuffer::CreateRenderBuffer (num_verts, 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
     memset (normals,0,num_verts*sizeof(csVector3));
@@ -353,8 +343,7 @@ bool csGLPolygonRenderer::BufferAccessor::UpdateBinormals ()
       num_verts += poly->num_vertices;
     }
 
-    binormal_buffer = renderer->parent->CreateRenderBuffer (
-      num_verts * sizeof (csVector3), 
+    binormal_buffer = csRenderBuffer::CreateRenderBuffer (num_verts, 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     csVector3* binormals = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
     memset (binormals,0,num_verts*sizeof(csVector3));
@@ -430,8 +419,7 @@ bool csGLPolygonRenderer::BufferAccessor::UpdateTangents ()
       num_verts += poly->num_vertices;
     }
 
-    tangent_buffer = renderer->parent->CreateRenderBuffer (
-      num_verts * sizeof (csVector3), 
+    tangent_buffer = csRenderBuffer::CreateRenderBuffer (num_verts, 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     csVector3* tangents = (csVector3*)tangent_buffer->Lock (CS_BUF_LOCK_NORMAL);
     memset (tangents,0,num_verts*sizeof(csVector3));

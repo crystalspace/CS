@@ -799,21 +799,6 @@ public:
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw,
     int sh, int tx, int ty, int tw, int th, uint8 Alpha);
 
-
-
-
-  /// Create a renderbuffer
-  virtual csPtr<iRenderBuffer> CreateRenderBuffer (size_t size, 
-    csRenderBufferType type, csRenderBufferComponentType componentType, 
-    int componentCount, bool copy = true);
-  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
-    csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd, bool copy = true);
-
-  /// Create interleaved renderbuffers
-  virtual void CreateInterleavedRenderBuffers (size_t size, 
-    csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers);
-
   /// Activate a vertex buffer
   bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   {

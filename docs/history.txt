@@ -10,6 +10,7 @@ chronological order.
 	- Eric Sunshine disabled CS_IEEE_DOUBLE_FORMAT for 64-bit Intel style
 	  platforms. This works around problem where csQint() failed on such
 	  platforms.
+	- res made render buffers renderer-independent.
 21-Feb-2005
 	- res tweaked the VC7 project files to disable manifest generation on
 	  VC8 (yay forward compatibility).

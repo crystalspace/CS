@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/renderbuffer.h"
 #include "csutil/sysfunc.h"
 #include "spr3d.h"
 #include "csgeom/polyclip.h"
@@ -2379,8 +2380,8 @@ void csSprite3DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
   {
     if (!vertices)
     {
-      vertices = factory->g3d->CreateRenderBuffer (
-        sizeof (csVector3)*final_num_vertices, CS_BUF_DYNAMIC,
+      vertices = csRenderBuffer::CreateRenderBuffer (
+        final_num_vertices, CS_BUF_DYNAMIC,
 		CS_BUFCOMP_FLOAT, 3);
     }
     if (tween_ratio > EPSILON)
@@ -2395,8 +2396,7 @@ void csSprite3DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
       }
     }
     else
-      vertices->CopyToBuffer (real_obj_verts, 
-	sizeof (csVector3) * final_num_vertices);
+      vertices->CopyInto (real_obj_verts, final_num_vertices);
       //vertices->CopyToBuffer(final_verts, sizeof (csVector3)*final_num_vertices);
     holder->SetRenderBuffer (CS_BUFFER_POSITION, vertices);
   }
@@ -2404,8 +2404,8 @@ void csSprite3DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
   {
     if (!normals)
     {
-      normals = factory->g3d->CreateRenderBuffer (
-        sizeof (csVector3)*final_num_vertices, CS_BUF_DYNAMIC,
+      normals = csRenderBuffer::CreateRenderBuffer (
+        final_num_vertices, CS_BUF_DYNAMIC,
 		CS_BUFCOMP_FLOAT, 3);
     }
     /*int tf_idx = cur_action->GetCsFrame (cur_frame)->GetAnmIndex ();
@@ -2440,41 +2440,40 @@ void csSprite3DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
       }
     }
     else
-      normals->CopyToBuffer (real_obj_norms, 
-	sizeof (csVector3) * final_num_vertices);
+      normals->CopyInto (real_obj_norms, final_num_vertices);
     holder->SetRenderBuffer (CS_BUFFER_NORMAL, normals);
   }
   else if (buffer == CS_BUFFER_TEXCOORD0)
   {
     if (!texcoords)
     {
-      texcoords = factory->g3d->CreateRenderBuffer (
-        sizeof (csVector2)*final_num_vertices, CS_BUF_DYNAMIC,
+      texcoords = csRenderBuffer::CreateRenderBuffer (
+        final_num_vertices, CS_BUF_DYNAMIC,
 		    CS_BUFCOMP_FLOAT, 2);
     }
-    texcoords->CopyToBuffer (final_texcoords, sizeof (csVector2)*final_num_vertices);
+    texcoords->CopyInto (final_texcoords, final_num_vertices);
     holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texcoords);
   }
   else if (buffer == CS_BUFFER_COLOR)
   {
     if (!colors)
     {
-      colors = factory->g3d->CreateRenderBuffer (
-        sizeof (csColor4)*final_num_vertices, CS_BUF_DYNAMIC,
+      colors = csRenderBuffer::CreateRenderBuffer (
+        final_num_vertices, CS_BUF_DYNAMIC,
 		    CS_BUFCOMP_FLOAT, 4);
     }
-    colors->CopyToBuffer (final_colors, sizeof (csColor4)*final_num_vertices);
+    colors->CopyInto (final_colors, final_num_vertices);
     holder->SetRenderBuffer (CS_BUFFER_COLOR, colors);
   }
   else if (buffer == CS_BUFFER_INDEX)
   {
     if (!indices)
     {
-      indices = factory->g3d->CreateIndexRenderBuffer (
-        sizeof (csTriangle)*final_num_triangles*12, CS_BUF_STATIC,
-		    CS_BUFCOMP_UNSIGNED_INT, 0, final_num_vertices - 1);
+      indices = csRenderBuffer::CreateIndexRenderBuffer (
+        final_num_triangles*3, CS_BUF_STATIC,
+	CS_BUFCOMP_UNSIGNED_INT, 0, final_num_vertices - 1);
     }
-    indices->CopyToBuffer (final_triangles, sizeof (csTriangle)*final_num_triangles);
+    indices->CopyInto (final_triangles, final_num_triangles * 3);
     holder->SetRenderBuffer (CS_BUFFER_INDEX, indices);
   }
 }

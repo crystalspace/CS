@@ -289,19 +289,27 @@ private:
 
   csZBufMode GetZModePass2 (csZBufMode mode);
 
-  csRef<csGLRenderBuffer> spec_renderBuffers[CS_VATTRIB_SPECIFIC_LAST-CS_VATTRIB_SPECIFIC_FIRST+1];
-  void AssignSpecBuffer (uint attr, csGLRenderBuffer* buffer)
+  csRef<iRenderBuffer> spec_renderBuffers[CS_VATTRIB_SPECIFIC_LAST-CS_VATTRIB_SPECIFIC_FIRST+1];
+  void AssignSpecBuffer (uint attr, iRenderBuffer* buffer)
   {
-    if (spec_renderBuffers[attr]) spec_renderBuffers[attr]->RenderRelease ();
+    if (spec_renderBuffers[attr]) 
+      RenderRelease (spec_renderBuffers[attr]);
+      //spec_renderBuffers[attr]->RenderRelease ();
     spec_renderBuffers[attr] = buffer;
   }
 
-  csRef<csGLRenderBuffer> gen_renderBuffers[CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1];
-  void AssignGenericBuffer (uint attr, csGLRenderBuffer* buffer)
+  csRef<iRenderBuffer> gen_renderBuffers[CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1];
+  void AssignGenericBuffer (uint attr, iRenderBuffer* buffer)
   {
-    if (gen_renderBuffers[attr]) gen_renderBuffers[attr]->RenderRelease ();
+    if (gen_renderBuffers[attr]) 
+      RenderRelease (gen_renderBuffers[attr]);
+      //gen_renderBuffers[attr]->RenderRelease ();
     gen_renderBuffers[attr] = buffer;
   }
+
+  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type, 
+    GLenum& compGLType);
+  void RenderRelease (iRenderBuffer* buffer);
 
 /*  iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
   bool vertattribenabled[16]; // @@@ Hardcoded max number of attributes
@@ -349,18 +357,6 @@ public:
   void SetAlphaType (csAlphaMode::AlphaType alphaType);
   void SetGlOrtho (bool inverted);
   float GetAspect () const { return aspect; }
-
-  /// Create a renderbuffer
-  virtual csPtr<iRenderBuffer> CreateRenderBuffer (size_t size, 
-    csRenderBufferType type, csRenderBufferComponentType componentType, 
-    int componentCount, bool copy = true);
-  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
-    csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd, bool copy = true);
-
-  /// Create interleaved renderbuffers
-  virtual void CreateInterleavedRenderBuffers (size_t size, 
-    csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers);
 
   /// Activate a vertex buffer
   bool ActivateBuffers (csRenderBufferHolder* holder, 

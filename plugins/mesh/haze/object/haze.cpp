@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/renderbuffer.h"
 #include "csgeom/math3d.h"
 #include "csgeom/poly2d.h"
 #include "cstool/rbuflock.h"
@@ -751,30 +752,30 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
     rview->GetCurrentFrameNumber());
   if (bufferCreated || (vertices.count < vertCount))
   {
-    vertices.buffer = g3d->CreateRenderBuffer (vertCount * sizeof (float) * 3,
+    vertices.buffer = csRenderBuffer::CreateRenderBuffer (vertCount,
       CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
   }
-  vertices.buffer->CopyToBuffer (GetTempVertices()->GetArray(), 
-    vertCount * sizeof (float) * 3);
+  vertices.buffer->CopyInto (GetTempVertices()->GetArray(), 
+    vertCount);
   HazeRenderBuffer& texels = renderBuffers.GetUnusedData (bufferCreated,
     rview->GetCurrentFrameNumber());
   if (bufferCreated || (texels.count < vertCount))
   {
-    texels.buffer = g3d->CreateRenderBuffer (vertCount * sizeof (float) * 2,
+    texels.buffer = csRenderBuffer::CreateRenderBuffer (vertCount,
       CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
   }
-  texels.buffer->CopyToBuffer (GetTempTexels()->GetArray(), 
-    vertCount * sizeof (float) * 2);
+  texels.buffer->CopyInto (GetTempTexels()->GetArray(), 
+    vertCount);
   HazeRenderBuffer& indices = indexBuffers.GetUnusedData (bufferCreated,
     rview->GetCurrentFrameNumber());
   if (bufferCreated || (indices.count < GetTempIndices()->Length()))
   {
-    indices.buffer = g3d->CreateIndexRenderBuffer (
-      GetTempIndices()->Length() * sizeof (uint), CS_BUF_STREAM, 
+    indices.buffer = csRenderBuffer::CreateIndexRenderBuffer (
+      GetTempIndices()->Length(), CS_BUF_STREAM, 
       CS_BUFCOMP_UNSIGNED_INT, 0, vertCount);
   }
-  indices.buffer->CopyToBuffer (GetTempIndices()->GetArray(), 
-    GetTempIndices()->Length() * sizeof (uint));
+  indices.buffer->CopyInto (GetTempIndices()->GetArray(), 
+    GetTempIndices()->Length());
 
   bool rmCreated;
   csRenderMesh*& rm = rmHolder.GetUnusedMesh (rmCreated, 

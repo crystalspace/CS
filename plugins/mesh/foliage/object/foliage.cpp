@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/renderbuffer.h"
 #include "csutil/util.h"
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
@@ -530,8 +531,8 @@ void csFoliageMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
         // Here we create a render buffer that copies the data
         // since we don't keep a local copy of the color buffer here.
         // (final 'true' parameter).
-        color_buffer = g3d->CreateRenderBuffer (
-          sizeof (csColor) * PROTO_VERTS, CS_BUF_STATIC,
+        color_buffer = csRenderBuffer::CreateRenderBuffer (
+          PROTO_VERTS, CS_BUF_STATIC,
           CS_BUFCOMP_FLOAT, 3, true);
       }
       mesh_colors_dirty_flag = false;
@@ -540,7 +541,7 @@ void csFoliageMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
       csColor colors[PROTO_VERTS];
       for (i = 0 ; i < PROTO_VERTS ; i++)
         colors[i] = factory_colors[i]+color;
-      color_buffer->CopyToBuffer (colors, sizeof (csColor) * PROTO_VERTS);
+      color_buffer->CopyInto (colors, PROTO_VERTS);
     }
     holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
   } 
@@ -723,12 +724,11 @@ void csFoliageMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       if (!normal_buffer)
       {
         // Create a buffer that doesn't copy the data.
-        normal_buffer = g3d->CreateRenderBuffer (
-          sizeof (csVector3)*PROTO_VERTS, CS_BUF_STATIC,
+        normal_buffer = csRenderBuffer::CreateRenderBuffer (
+          PROTO_VERTS, CS_BUF_STATIC,
           CS_BUFCOMP_FLOAT, 3, false);
       }
-      normal_buffer->CopyToBuffer (
-        normals, sizeof (csVector3)*PROTO_VERTS);
+      normal_buffer->CopyInto (normals, PROTO_VERTS);
     }
     holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
   }
@@ -757,11 +757,11 @@ void csFoliageMeshObjectFactory::PrepareBuffers ()
     if (!vertex_buffer)
     {
       // Create a buffer that doesn't copy the data.
-      vertex_buffer = g3d->CreateRenderBuffer (
-          sizeof(csVector3)*PROTO_VERTS, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+      vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+          PROTO_VERTS, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
           3);
     }
-    vertex_buffer->CopyToBuffer (vertices, sizeof(csVector3)*PROTO_VERTS);
+    vertex_buffer->CopyInto (vertices, PROTO_VERTS);
   }
   if (mesh_texels_dirty_flag)
   {
@@ -769,22 +769,21 @@ void csFoliageMeshObjectFactory::PrepareBuffers ()
     if (!texel_buffer)
     {
       // Create a buffer that doesn't copy the data.
-      texel_buffer = g3d->CreateRenderBuffer (
-          sizeof(csVector2)*PROTO_VERTS, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+      texel_buffer = csRenderBuffer::CreateRenderBuffer (
+          PROTO_VERTS, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
           2);
     }
-    texel_buffer->CopyToBuffer (texels, sizeof(csVector2)*PROTO_VERTS);
+    texel_buffer->CopyInto (texels, PROTO_VERTS);
   }
   if (mesh_triangle_dirty_flag)
   {
     mesh_triangle_dirty_flag = false;
     if (!index_buffer)
-      index_buffer = g3d->CreateIndexRenderBuffer (
-	sizeof(unsigned int)*PROTO_TRIS*3,
+      index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+	PROTO_TRIS*3,
               CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT,
               0, PROTO_VERTS-1);
-    index_buffer->CopyToBuffer (triangles,
-    	sizeof(unsigned int)*PROTO_TRIS*3);
+    index_buffer->CopyInto (triangles, PROTO_TRIS*3);
   }
 }
 

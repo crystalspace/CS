@@ -340,7 +340,7 @@ public:
       const size_t idx = i - 1;
       if (KeyHandler::CompareKeys (values[idx].key, key))
       {
-        values.DeleteIndex (idx);
+	values.DeleteIndexFast (idx);
         ret = true;
         Size--;
       }
@@ -360,7 +360,7 @@ public:
       if (KeyHandler::CompareKeys (values[idx].key, key) && 
 	(values[idx].value == value))
       {
-        values.DeleteIndex (idx);
+        values.DeleteIndexFast (idx);
         ret = true;
         Size--;
       }

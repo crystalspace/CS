@@ -17,6 +17,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
+#include "csgfx/renderbuffer.h"
 #include "csutil/sysfunc.h"
 #include "sprcal3d.h"
 #include "csgeom/polyclip.h"
@@ -2253,8 +2254,8 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetBuffer
       if ((index_buffer == 0) || (index_size < indexCount))
       {
 	// @@@ How often do those change?
-	index_buffer = meshobj->G3D->CreateIndexRenderBuffer (
-	  sizeof (uint) * indexCount, CS_BUF_DYNAMIC,
+	index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+	  indexCount, CS_BUF_DYNAMIC,
 	  CS_BUFCOMP_UNSIGNED_INT, 0, vertexCount - 1);
 	index_size = indexCount;
       }
@@ -2264,17 +2265,17 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetBuffer
 
       if ((vertex_buffer == 0) || (vertex_size < vertexCount))
       {
-	vertex_buffer = meshobj->G3D->CreateRenderBuffer (
-	  sizeof (float) * vertexCount * 3, CS_BUF_DYNAMIC,
+	vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+	  vertexCount, CS_BUF_DYNAMIC,
 	  CS_BUFCOMP_FLOAT, 3);
-	normal_buffer = meshobj->G3D->CreateRenderBuffer (
-	  sizeof (float) * vertexCount * 3, CS_BUF_DYNAMIC,
+	normal_buffer = csRenderBuffer::CreateRenderBuffer (
+	  vertexCount, CS_BUF_DYNAMIC,
 	  CS_BUFCOMP_FLOAT, 3);
-	texel_buffer = meshobj->G3D->CreateRenderBuffer (
-	  sizeof (float) * vertexCount * 2, CS_BUF_DYNAMIC,
+	texel_buffer = csRenderBuffer::CreateRenderBuffer (
+	  vertexCount, CS_BUF_DYNAMIC,
 	  CS_BUFCOMP_FLOAT, 2);
-	color_buffer = meshobj->G3D->CreateRenderBuffer (
-	  sizeof (float) * vertexCount * 3, CS_BUF_DYNAMIC,
+	color_buffer = csRenderBuffer::CreateRenderBuffer (
+	  vertexCount, CS_BUF_DYNAMIC,
 	  CS_BUFCOMP_FLOAT, 3);
 	vertex_size = vertexCount;
       }
@@ -2295,14 +2296,14 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetBuffer
                                       submesh,
                                       normals);
 
-      normal_buffer->CopyToBuffer (normals, sizeof (float) * vertexCount * 3);
+      normal_buffer->CopyInto (normals, vertexCount);
 
       float* texels = (float*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
       render->getTextureCoordinates (0, texels);
       texel_buffer->Release ();
 
-      color_buffer->CopyToBuffer (meshobj->meshes_colors[mesh][submesh],
-	                                sizeof (float) * vertexCount * 3);
+      color_buffer->CopyInto (meshobj->meshes_colors[mesh][submesh],
+	                                vertexCount);
 
       render->endRendering();
 

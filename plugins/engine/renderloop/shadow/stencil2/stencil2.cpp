@@ -27,6 +27,7 @@
 #include "csgeom/vector4.h"
 #include "csgeom/pmtools.h"
 #include "csgeom/math3d.h"
+#include "csgfx/renderbuffer.h"
 
 #include "iengine/rview.h"
 #include "iengine/camera.h"
@@ -103,23 +104,17 @@ void csStencil2ShadowCacheEntry::UpdateRenderBuffers(csArray<csVector3> & shadow
   int vertex_count = shadow_vertices.Length();
   int index_count = shadow_indeces.Length();
 
-  shadow_vertex_buffer = parent->g3d->CreateRenderBuffer (
-    sizeof (csVector3)*vertex_count, CS_BUF_DYNAMIC,
+  shadow_vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+    vertex_count, CS_BUF_DYNAMIC,
     CS_BUFCOMP_FLOAT, 3);
 
-  shadow_vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
-  shadow_vertex_buffer->CopyToBuffer(&shadow_vertices[0], sizeof (csVector3)*vertex_count);
+  shadow_vertex_buffer->CopyInto (&shadow_vertices[0], vertex_count);
 
-  active_index_buffer = parent->g3d->CreateIndexRenderBuffer (
-    sizeof (unsigned int)*index_count, CS_BUF_DYNAMIC,
+  active_index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+    index_count, CS_BUF_DYNAMIC,
     CS_BUFCOMP_UNSIGNED_INT, 0, index_count - 1);
 
-  active_index_buffer->Lock (CS_BUF_LOCK_NORMAL);
-  active_index_buffer->CopyToBuffer(&shadow_indeces[0], sizeof (unsigned int)*index_count);
-
-  active_index_buffer->Release ();
-  shadow_vertex_buffer->Release ();
-
+  active_index_buffer->CopyInto (&shadow_indeces[0], index_count);
 }
 
 void csStencil2ShadowCacheEntry::ObjectModelChanged (iObjectModel* model)

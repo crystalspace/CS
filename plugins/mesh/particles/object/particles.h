@@ -554,6 +554,7 @@ private:
 
   bool point_sprites;
 
+  csRef<iRenderBuffer> masterBuffer;
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> texcoord_buffer;

@@ -19,6 +19,7 @@
 
 
 #include "cssysdef.h"
+#include "csgfx/renderbuffer.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
@@ -138,17 +139,17 @@ void csParticleSystem::SetupBuffers (size_t part_sides)
   delete[] vertices;
   vertices = new csVector3 [VertexCount];
 
-  vertex_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*VertexCount, CS_BUF_DYNAMIC, 
+  vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+        VertexCount, CS_BUF_DYNAMIC, 
         CS_BUFCOMP_FLOAT, 3);
-  texel_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector2)*VertexCount, CS_BUF_DYNAMIC, 
+  texel_buffer = csRenderBuffer::CreateRenderBuffer (
+        VertexCount, CS_BUF_DYNAMIC, 
         CS_BUFCOMP_FLOAT, 2);
-  color_buffer = g3d->CreateRenderBuffer (
-        sizeof (csColor)*VertexCount, CS_BUF_DYNAMIC,
+  color_buffer = csRenderBuffer::CreateRenderBuffer (
+        VertexCount, CS_BUF_DYNAMIC,
         CS_BUFCOMP_FLOAT, 3);
-  index_buffer = g3d->CreateIndexRenderBuffer (
-        sizeof (unsigned int)*TriangleCount*3, CS_BUF_STATIC,
+  index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+        TriangleCount*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 0, VertexCount - 1);
 
   {
@@ -375,9 +376,9 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   iMaterialWrapper* m = sprite2ds[0]->GetMaterialWrapper ();
   m->Visit ();
 
-  vertex_buffer->CopyToBuffer (vertices, sizeof (csVector3) * VertexCount);
-  texel_buffer->CopyToBuffer (texels, sizeof (csVector2) * VertexCount);
-  color_buffer->CopyToBuffer (colors, sizeof (csColor) * VertexCount);
+  vertex_buffer->CopyInto (vertices, VertexCount);
+  texel_buffer->CopyInto (texels, VertexCount);
+  color_buffer->CopyInto (colors, VertexCount);
   //index_buffer->CopyToBuffer (triangles,
   //    	sizeof (unsigned int) * TriangleCount *3);
 

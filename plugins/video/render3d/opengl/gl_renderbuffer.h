@@ -23,6 +23,15 @@
 #include "ivideo/rndbuf.h"
 #include "csutil/leakguard.h"
 
+static const GLenum compGLtypes[CS_BUFCOMP_TYPECOUNT] =
+{
+  GL_BYTE, GL_UNSIGNED_BYTE,
+  GL_SHORT, GL_UNSIGNED_SHORT,
+  GL_INT, GL_UNSIGNED_INT,
+  GL_FLOAT,
+  GL_DOUBLE
+};
+
 struct csGLVBOBufferSlot;
 class csGLVBOBufferManager;
 
@@ -46,154 +55,8 @@ enum csGLRenderBufferLockType
   CS_GLBUF_RENDERLOCK_ELEMENTS
 };
 
+#if 0
 class csGLRenderBufferSub;
-
-SCF_VERSION (csGLRenderBuffer, 0, 2, 0);
-/**
- * Basic renderbuffer for OpenGL renderer.
- */
-class csGLRenderBuffer : public iRenderBuffer
-{
-public:
-  SCF_DECLARE_IBASE;
-  CS_LEAKGUARD_DECLARE (csGLRenderBuffer);
-
-  /**
-   * Constructor.
-   */
-  csGLRenderBuffer (csGLVBOBufferManager * vbomgr, size_t size, csRenderBufferType type, 
-    csRenderBufferComponentType componentType, int compoentcount, 
-    size_t rangeStart, size_t rangeEnd, bool copy);
-
-  /**
-   * Destructor
-   */
-  virtual ~csGLRenderBuffer ();
-
-  /**
-  * Lock the buffer to allow writing and give us a pointer to the data.
-  * The pointer will be (void*)-1 if there was some error.
-  * \param lockType The type of lock desired.
-  * \param samePointer Specifies whether the same pointer as last time should 
-  *  be returned (ie all the old data will be still there, useful if only
-  *  a part of the data is changed). However, setting this to 'true' may 
-  *  cause a performance penalty - specifically, if the data is currently in
-  *  use, the driver may have to wait until the buffer is available again.
-  */
-  virtual void* Lock(csRenderBufferLockType lockType, 
-    bool samePointer = false);
-
-  /// Releases the buffer. After this all writing to the buffer is illegal
-  virtual void Release();
-
-  /// Copy data to the render buffer.
-  virtual void CopyToBuffer(const void *data, size_t length);
-
-  /// Sets the number of components per element
-  virtual void SetComponentCount (int count)
-  {
-    compCount = count;
-  }
-
-  /// Gets the number of components per element
-  virtual int GetComponentCount () const
-  {
-    return compCount;
-  }
-
-  /// Sets the component type (float, int, etc)
-  virtual void SetComponentType (csRenderBufferComponentType type);
-
-  /// Gets the component type (float, int, etc)
-  virtual csRenderBufferComponentType GetComponentType () const 
-  {
-    return comptype;
-  }
-
-  /// Get type of buffer (static/dynamic)
-  virtual csRenderBufferType GetBufferType() const
-  {
-    return bufferType;
-  }
-
-  /// Get the size of the buffer (in bytes)
-  virtual size_t GetSize() const
-  {
-    return bufferSize;
-  }
-
-  /// Set the stride of buffer (in bytes)
-  virtual void SetStride(int stride)
-  {
-    this->stride = stride;
-  }
-
-  /// Get the stride of the buffer (in bytes)
-  virtual int GetStride() const 
-  {
-    return stride;
-  }
-
-  /// Get the offset of the buffer (in bytes)
-  virtual void SetOffset(int offset)
-  {
-    this->offset = offset;
-  }
-
-  /// Get version
-  virtual uint GetVersion ()
-  {
-    return version;
-  }
-
-  virtual bool IsMasterBuffer ()
-  {
-    return true;
-  }
-
-  // Get "subbuffers" for interleaved scheme
-  void SetupSUBBuffers (int count, csRef<iRenderBuffer>* buffers);
-
-  // Do a lock for rendering
-  virtual void* RenderLock (csGLRenderBufferLockType type);
-
-  virtual void RenderRelease ();
-
-protected:
-  csRenderBufferType bufferType; //hint about main usage
-  csRenderBufferComponentType comptype; //datatype for each component
-  
-  size_t bufferSize; //size in bytes
-  int compCount; //numer of components per element
-  int stride; //buffer stride
-  int offset; //offset from buffer start to data
-  int vbooffset; //offset from VBO-start
-
-  size_t rangeStart; //range start for index-buffer
-  size_t rangeEnd; //range end for index-buffer
-  
-  unsigned int version; //modification number
-
-  //"cached" values to speed up usage
-  GLenum compGLType;
-  size_t compSize;
-
-  bool doCopy; //should we copy data, or just use supplied buffer
-  bool doDelete; //if buffer should be deleted on deallocation
-  bool isLocked; //currently locked? (to prevent recursive locking)
-  bool isIndex; //if this is index-buffer
-
-  unsigned char *buffer; //buffer holding the data
-  csRenderBufferLockType lastLock; //last type of lock used
-
-  csGLVBOBufferSlot* vboSlot;
-  csWeakRef<csGLVBOBufferManager> vbomgr;
-
-  friend class csGLRenderBufferSub;
-  friend class csGLGraphics3D;
-  friend class csGLVBOBufferSlot;
-  friend class csGLVBOBufferManager;
-};
 
 class csGLRenderBufferSub : public csGLRenderBuffer
 {
@@ -222,16 +85,11 @@ public:
     return false;
   }
 
-  // Do a lock for rendering
-  void* RenderLock (csGLRenderBufferLockType type)
-  {
-    return ((unsigned char*)owner->RenderLock (type)) + offset;
-  }
-
 protected:
   csGLRenderBuffer *owner;
   friend class csGLVBOBufferManager;
 };
+#endif
 
 /**
  * Single slot in a VBO buffer. Holds content of precisely 0 or 1 renderbuffers.
@@ -241,30 +99,9 @@ struct csGLVBOBufferSlot
 public:
   csGLVBOBufferSlot()
     : vboTarget (GL_ARRAY_BUFFER_ARB), vboID (0), lastCachedVersion (0), offset (0),
-    listIdx (0), next (0), prev (0), inUse (false), locked (false), indexBuffer (false),
-    separateVBO (false)
+    listIdx (0), renderBufferPtr(0), next (0), prev (0), inUse (false), locked (false), 
+    indexBuffer (false), separateVBO (false)
   {
-  }
-
-  void AttachBuffer (csGLRenderBuffer* buffer)
-  {
-    if (inUse && buffer!=renderBuffer) DeattachBuffer ();
-
-    renderBuffer = buffer;
-    buffer->vboSlot = this;
-    buffer->vbooffset = offset;
-  }
-
-  void DeattachBuffer ()
-  {
-    if (renderBuffer.IsValid ())
-    {
-      renderBuffer->vboSlot = 0;
-      renderBuffer->vbooffset = 0;
-    }
-    renderBuffer = 0;
-    lastCachedVersion = 0;
-
   }
 
   GLenum vboTarget;   //opengl type, GL_ARRAY_BUFFER_ARB or GL_ELEMENT_ARRAY_BUFFER_ARB
@@ -274,7 +111,8 @@ public:
   size_t offset;                  //offset from start of buffer
   unsigned int listIdx; 
 
-  csWeakRef<csGLRenderBuffer> renderBuffer;
+  csWeakRef<iRenderBuffer> renderBuffer;
+  iRenderBuffer* renderBufferPtr; // Needed to find hash entry
 
   csGLVBOBufferSlot *next, *prev;
 
@@ -301,23 +139,26 @@ public:
    * Activate a buffer before rendering. Make sure it is cached and the VBObuffer
    * is activated
    */
-  bool ActivateBuffer (csGLRenderBuffer* buffer);
+  bool ActivateBuffer (iRenderBuffer* buffer);
 
   /**
    * Deactivate a buffer
    */
-  bool DeactivateBuffer (csGLRenderBuffer *buffer);
+  bool DeactivateBuffer (iRenderBuffer *buffer);
 
   /**
    * Buffer removed
    */
-  void BufferRemoved (csGLRenderBuffer *buffer);
+  void BufferRemoved (iRenderBuffer *buffer);
 
   /**
    * Make sure no VBO-buffer is activated
    */
   void DeactivateVBO ();
 
+  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type, 
+    GLenum& compGLType);
+  void RenderRelease (iRenderBuffer* buffer);
 
   // Dump stats about buffers to console
   void DumpStats ();
@@ -326,11 +167,19 @@ public:
   void ResetFrameStats ();
 
 protected:
+  struct RenderBufferAux
+  {
+    size_t vbooffset; //offset from VBO-start
+    //"cached" values to speed up usage
+    GLenum compGLType;
+    csGLVBOBufferSlot* vboSlot;
+  };
   csGLExtensionManager *ext; //extension manager
   csGLStateCache *statecache;
   csConfigAccess config;
   iObjectRegistry *object_reg;
   bool verbose, superVerbose;
+  csHash<RenderBufferAux, iRenderBuffer*> bufferData;
 
   enum
   {
@@ -339,7 +188,7 @@ protected:
   };
 
   // Precache buffer to specific slot
-  void Precache (csGLRenderBuffer* buffer, csGLVBOBufferSlot* slot);
+  void Precache (iRenderBuffer* buffer, csGLVBOBufferSlot* slot);
 
   // Activate bufferslot
   void ActivateVBOSlot (csGLVBOBufferSlot *slot);
@@ -363,12 +212,16 @@ protected:
     else vertexBuffer.TouchSlot (slot);
   }
 
+  void DetachBuffer (csGLVBOBufferSlot *slot);
+  void AttachBuffer (csGLVBOBufferSlot *slot, iRenderBuffer* buffer);
+ 
   struct csGLVBOBuffer;
   friend struct csGLVBOBuffer; // Borland/VC6: For access to VBO_NUMBER_OF_SLOTS.
   struct csGLVBOBuffer
   {
     ~csGLVBOBuffer();
 
+    csGLVBOBufferManager* bufmgr;
     GLuint vboID;
     GLenum vboTarget; //opengl type, GL_ARRAY_BUFFER_ARB or GL_ELEMENT_ARRAY_BUFFER_ARB
     size_t size; //total size (in bytes);
@@ -477,7 +330,8 @@ protected:
   {
     va_list arg;
     va_start (arg, msg);
-    csReportV (object_reg, severity, "crystalspace.graphics3d.opengl.vbo", msg, arg);
+    csReportV (object_reg, severity, "crystalspace.graphics3d.opengl.vbo", 
+      msg, arg);
     va_end (arg);
   }
 

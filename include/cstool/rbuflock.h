@@ -40,6 +40,7 @@ class csRenderBufferLock
   csRenderBufferLockType lockType;
   bool isLocked;
   T* lockBuf;
+  size_t bufOfs, bufStride;
   
   csRenderBufferLock() {}
 public:
@@ -48,7 +49,8 @@ public:
    */
   csRenderBufferLock (iRenderBuffer* buf, 
     csRenderBufferLockType lock = CS_BUF_LOCK_NORMAL) : buffer(buf),
-    lockType(lock), isLocked(false)
+    lockType(lock), isLocked(false), bufOfs(buf->GetOffset()),
+    bufStride(buf->GetElementDistance())
   {
   }
   
@@ -60,12 +62,15 @@ public:
     Unlock();
   }
   
-  /// Lock the renderbuffer. Returns a pointer to the contained data.
+  /**
+   * Lock the renderbuffer. Returns a pointer to the contained data.
+   * \remarks Watch the stride of the buffer.
+   */
   T* Lock ()
   {
     if (!isLocked)
     {
-      lockBuf = (T*)buffer->Lock (lockType);
+      lockBuf = (T*)((uint8*)buffer->Lock (lockType) + bufOfs);
       isLocked = true;
     }
     return lockBuf;
@@ -81,7 +86,10 @@ public:
     }
   }
   
-  /// Retrieve a pointer to the contained data.
+  /**
+   * Retrieve a pointer to the contained data.
+   * \remarks Watch the stride of the buffer.
+   **/
   operator T* ()
   {
     return Lock();
@@ -90,13 +98,13 @@ public:
   /// Retrieve an item in the render buffer.
   T& operator [] (size_t n)
   {
-    return *(Lock() + n);
+    return Get (n);
   }
 
   /// Retrieve an item in the render buffer.
   T& Get (size_t n)
   {
-    return *(Lock() + n);
+    return *((T*)((uint8*)Lock() + n * bufStride));
   }
 };
 

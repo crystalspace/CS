@@ -17,13 +17,14 @@
 */
 
 #include "cssysdef.h"
-
-
+#include "csutil/scf.h"
+#include "csgfx/renderbuffer.h"
 #include "cstool/anonrndbuf.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 
-csAnonRenderBufferManager::csAnonRenderBufferManager(iObjectRegistry *object_reg)
+csAnonRenderBufferManager::csAnonRenderBufferManager(
+  iObjectRegistry *object_reg)
 {
   this->object_reg = object_reg;
 }
@@ -37,7 +38,7 @@ csAnonRenderBufferManager::~csAnonRenderBufferManager()
   }
 }
 
-iRenderBuffer * csAnonRenderBufferManager::GetRenderBuffer(csStringID name)
+iRenderBuffer * csAnonRenderBufferManager::GetRenderBuffer (csStringID name)
 {
   for(size_t i = 0; i < anon_buffers.Length(); i++)
   {
@@ -47,7 +48,8 @@ iRenderBuffer * csAnonRenderBufferManager::GetRenderBuffer(csStringID name)
   return 0;
 }
 
-bool csAnonRenderBufferManager::AddRenderBuffer (const char *name, csRenderBufferComponentType component_type, int component_size, int numverts)
+bool csAnonRenderBufferManager::AddRenderBuffer (const char *name, 
+  csRenderBufferComponentType component_type, int component_size, int numverts)
 {
   csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
@@ -57,37 +59,8 @@ bool csAnonRenderBufferManager::AddRenderBuffer (const char *name, csRenderBuffe
   
   anonbuffer *newrb = new anonbuffer();
 
-  int size = 0;
-  switch (component_type)
-  {
-  case CS_BUFCOMP_BYTE:
-    size = sizeof(char);
-    break;
-  case CS_BUFCOMP_UNSIGNED_BYTE:
-    size = sizeof(unsigned char);
-    break;
-  case CS_BUFCOMP_SHORT:
-    size = sizeof(short);
-    break;
-  case CS_BUFCOMP_UNSIGNED_SHORT:
-    size = sizeof(unsigned short);
-    break;
-  case CS_BUFCOMP_INT:
-    size = sizeof(int);
-    break;
-  case CS_BUFCOMP_UNSIGNED_INT:
-    size = sizeof(unsigned int);
-    break;
-  case CS_BUFCOMP_FLOAT:
-    size = sizeof(float);
-    break;
-  case CS_BUFCOMP_DOUBLE:
-    size = sizeof(double);
-    break;
-  }
-  newrb->buf = g3d->CreateRenderBuffer (
-        size*component_size*(numverts), CS_BUF_STATIC,
-        component_type, component_size);
+  newrb->buf = csRenderBuffer::CreateRenderBuffer (
+        numverts, CS_BUF_STATIC, component_type, component_size);
  
   newrb->name = strings->Request (name);
   newrb->size = component_size;
@@ -95,7 +68,10 @@ bool csAnonRenderBufferManager::AddRenderBuffer (const char *name, csRenderBuffe
   return true;
 }
 
-bool csAnonRenderBufferManager::SetRenderBufferComponent (const char *name, int index, int component, float value)
+bool csAnonRenderBufferManager::SetRenderBufferComponent (const char *name, 
+							  int index, 
+							  int component, 
+							  float value)
 {
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -114,7 +90,10 @@ bool csAnonRenderBufferManager::SetRenderBufferComponent (const char *name, int 
   return true;
 }
 
-bool csAnonRenderBufferManager::SetRenderBufferComponent (const char *name, int index, int component, int value)
+bool csAnonRenderBufferManager::SetRenderBufferComponent (const char *name, 
+							  int index, 
+							  int component, 
+							  int value)
 {
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -133,7 +112,9 @@ bool csAnonRenderBufferManager::SetRenderBufferComponent (const char *name, int 
   return true;
 }
 
-bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, float *value, int numverts)
+bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, 
+						 float *value, 
+						 int numverts)
 {
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -147,11 +128,12 @@ bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, float *value,
   }
   if (i == anon_buffers.Length()) return false;
 
-  anon_buffers[i]->buf->CopyToBuffer (value, sizeof (float) * anon_buffers[i]->size * numverts);
+  anon_buffers[i]->buf->CopyInto (value, numverts);
   return true;
 }
 
-bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, int *value, int numverts)
+bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, 
+						 int *value, int numverts)
 {
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -165,7 +147,7 @@ bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, int *value, i
   }
   if (i == anon_buffers.Length()) return false;
 
-  anon_buffers[i]->buf->CopyToBuffer (value, sizeof (int) * anon_buffers[i]->size * numverts);
+  anon_buffers[i]->buf->CopyInto (value, numverts);
   return true;
 }
 

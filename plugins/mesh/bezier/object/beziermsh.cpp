@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/renderbuffer.h"
 #include "csutil/csendian.h"
 #include "csqint.h"
 #include "beziermsh.h"
@@ -928,12 +929,11 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
 	currentFrame);
       if (bufferCreated || (vertices.count < (tess->GetVertexCount () * 3)))
       {
-	vertices.buffer = g3d->CreateRenderBuffer (
-	  tess->GetVertexCount () * 3 * sizeof (float), CS_BUF_STREAM, 
+	vertices.buffer = csRenderBuffer::CreateRenderBuffer (
+	  tess->GetVertexCount (), CS_BUF_STREAM, 
 	  CS_BUFCOMP_FLOAT, 3);
       }
-      vertices.buffer->CopyToBuffer (tess->GetVertices(),
-	tess->GetVertexCount () * 3 * sizeof (float));
+      vertices.buffer->CopyInto (tess->GetVertices(), tess->GetVertexCount ());
 
       holder->SetRenderBuffer (CS_BUFFER_POSITION, vertices.buffer);
     }
@@ -943,12 +943,11 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
 	currentFrame);
       if (bufferCreated || (colors.count < (tess->GetVertexCount () * 3)))
       {
-	colors.buffer = g3d->CreateRenderBuffer (
-	  tess->GetVertexCount () * 3 * sizeof (float), CS_BUF_STREAM, 
+	colors.buffer = csRenderBuffer::CreateRenderBuffer (
+	  tess->GetVertexCount (), CS_BUF_STREAM, 
 	  CS_BUFCOMP_FLOAT, 3);
       }
-      colors.buffer->CopyToBuffer (tess->GetColors(),
-	tess->GetVertexCount () * 3 * sizeof (float));
+      colors.buffer->CopyInto (tess->GetColors(), tess->GetVertexCount ());
 
       holder->SetRenderBuffer (CS_BUFFER_COLOR, colors.buffer);
     }
@@ -958,12 +957,11 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
 	currentFrame);
       if (bufferCreated || (texcoords.count < (tess->GetVertexCount () * 2)))
       {
-	texcoords.buffer = g3d->CreateRenderBuffer (
-	  tess->GetVertexCount () * 2 * sizeof (float), CS_BUF_STREAM, 
+	texcoords.buffer = csRenderBuffer::CreateRenderBuffer (
+	  tess->GetVertexCount (), CS_BUF_STREAM, 
 	  CS_BUFCOMP_FLOAT, 2);
       }
-      texcoords.buffer->CopyToBuffer (tess->GetTxtCoords(),
-	tess->GetVertexCount () * 2 * sizeof (float));
+      texcoords.buffer->CopyInto (tess->GetTxtCoords(), tess->GetVertexCount ());
 
       holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texcoords.buffer);
     }
@@ -973,12 +971,11 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
 	currentFrame);
       if (bufferCreated || (indices.count < (tess->GetTriangleCount() * 3)))
       {
-	indices.buffer = g3d->CreateIndexRenderBuffer (
-	  tess->GetTriangleCount () * 3 * sizeof (uint), CS_BUF_STREAM, 
+	indices.buffer = csRenderBuffer::CreateIndexRenderBuffer (
+	  tess->GetTriangleCount () * 3, CS_BUF_STREAM, 
 	  CS_BUFCOMP_UNSIGNED_INT, 0, tess->GetVertexCount ());
       }
-      indices.buffer->CopyToBuffer (tess->GetTriangles(),
-	tess->GetTriangleCount () * 3 * sizeof (uint));
+      indices.buffer->CopyInto (tess->GetTriangles(), tess->GetTriangleCount ()*3);
 
       holder->SetRenderBuffer (CS_BUFFER_INDEX, indices.buffer);
     }

@@ -25,6 +25,7 @@
 
 #include "csgfx/csimgvec.h"
 #include "csgfx/memimage.h"
+#include "csgfx/renderbuffer.h"
 
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
@@ -812,7 +813,7 @@ bool csGLGraphics3D::Open ()
   if (mts == -1)
   {
     glGetIntegerv (GL_MAX_TEXTURE_SIZE, &mts);
-    if (mts == 0)
+    if (mts <= 0)
     {
       // There appears to be a bug in some OpenGL drivers where
       // getting the maximum texture size simply doesn't work. In that
@@ -1401,14 +1402,15 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_POSITION]);
   if (buffer) 
   {
-    csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
-    AssignSpecBuffer(CS_VATTRIB_POSITION, glbuffer);
-    data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+    AssignSpecBuffer (CS_VATTRIB_POSITION, buffer);
+    GLenum compType;
+    data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+      RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
     if (data != (void*)-1) 
     {
       statecache->SetVertexPointer (buffer->GetComponentCount (),
-        ((csGLRenderBuffer*)buffer)->compGLType, 
-        buffer->GetStride (), data);
+        compType, buffer->GetStride (), data);
       statecache->Enable_GL_VERTEX_ARRAY ();
     }
   }
@@ -1420,12 +1422,14 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_NORMAL]);
   if (buffer) 
   {
-    csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
-    AssignSpecBuffer(CS_VATTRIB_NORMAL, glbuffer);
-    data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+    AssignSpecBuffer (CS_VATTRIB_NORMAL, buffer);
+    GLenum compType;
+    data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+      RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
     if (data != (void*)-1) 
     {
-      statecache->SetNormalPointer (((csGLRenderBuffer*)buffer)->compGLType, 
+      statecache->SetNormalPointer (compType, 
         buffer->GetStride(), data);
       statecache->Enable_GL_NORMAL_ARRAY ();
     }
@@ -1438,14 +1442,15 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_COLOR]);
   if (buffer)
   {
-    csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
-    AssignSpecBuffer(CS_VATTRIB_COLOR, glbuffer);
-    data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+    AssignSpecBuffer (CS_VATTRIB_COLOR, buffer);
+    GLenum compType;
+    data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+      RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
     if (data != (void*)-1) 
     {
       statecache->SetColorPointer (buffer->GetComponentCount(),
-        ((csGLRenderBuffer*)buffer)->compGLType, 
-        buffer->GetStride (), data);
+        compType, buffer->GetStride (), data);
       statecache->Enable_GL_COLOR_ARRAY ();
     }
   }
@@ -1457,9 +1462,11 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0]);
   if (buffer)
   {
-    csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
-    AssignSpecBuffer(CS_VATTRIB_TEXCOORD0, glbuffer);
-    data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+    AssignSpecBuffer (CS_VATTRIB_TEXCOORD0, buffer);
+    GLenum compType;
+    data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+      RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
     if (data != (void*)-1)
     {
       if (ext->CS_GL_ARB_multitexture)
@@ -1467,8 +1474,7 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
         statecache->SetActiveTU (0);
       }
       statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-        ((csGLRenderBuffer*)buffer)->compGLType, 
-        buffer->GetStride (), data);
+        compType, buffer->GetStride (), data);
       statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
     }
   }
@@ -1489,15 +1495,16 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
       buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
       if (buffer)
       {
-        csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
-        AssignSpecBuffer(CS_VATTRIB_TEXCOORD0+i, glbuffer);
-        data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+        //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+        AssignSpecBuffer (CS_VATTRIB_TEXCOORD0+i, buffer);
+	GLenum compType;
+	data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+	  RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
         if (data != (void*)-1)
         {
           statecache->SetActiveTU (i);
           statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-            ((csGLRenderBuffer*)buffer)->compGLType, 
-            buffer->GetStride (), data);
+            compType, buffer->GetStride (), data);
           statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
         }
       }
@@ -1520,12 +1527,16 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
     iRenderBuffer *buffer = buffers[i];
     if (!buffer) continue;
 
-    csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+    //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
     
-    if (CS_VATTRIB_IS_GENERIC (att)) AssignGenericBuffer(att-CS_VATTRIB_GENERIC_FIRST, glbuffer);
-    else AssignSpecBuffer(att-CS_VATTRIB_SPECIFIC_FIRST, glbuffer);
+    if (CS_VATTRIB_IS_GENERIC (att)) 
+      AssignGenericBuffer (att-CS_VATTRIB_GENERIC_FIRST, buffer);
+    else 
+      AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);
 
-    void *data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    GLenum compType;
+    void *data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+      RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
 
     if (data == (void*)-1) return false;
 
@@ -1534,17 +1545,16 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
     case CS_VATTRIB_POSITION:
       statecache->Enable_GL_VERTEX_ARRAY ();
       statecache->SetVertexPointer (buffer->GetComponentCount (),
-        glbuffer->compGLType, buffer->GetStride (), data);
+        compType, buffer->GetStride (), data);
       break;
     case CS_VATTRIB_NORMAL:
       statecache->Enable_GL_NORMAL_ARRAY ();
-      statecache->SetNormalPointer (glbuffer->compGLType,
-        buffer->GetStride (), data);
+      statecache->SetNormalPointer (compType,buffer->GetStride (), data);
       break;
     case CS_VATTRIB_COLOR:
       statecache->Enable_GL_COLOR_ARRAY ();
       statecache->SetColorPointer (buffer->GetComponentCount (),
-        glbuffer->compGLType, buffer->GetStride (), data);
+        compType, buffer->GetStride (), data);
       break;
     default:
       if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
@@ -1557,13 +1567,13 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
         } 
         statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
         statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-          glbuffer->compGLType, buffer->GetStride (), data);
+          compType, buffer->GetStride (), data);
       }
       else if (CS_VATTRIB_IS_GENERIC(att) && ext->glEnableVertexAttribArrayARB)
       {
         ext->glEnableVertexAttribArrayARB (att);
         ext->glVertexAttribPointerARB(att, buffer->GetComponentCount (),
-          glbuffer->compGLType, false, buffer->GetStride (), data);
+          compType, false, buffer->GetStride (), data);
       }
       else
       {
@@ -1597,14 +1607,14 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
 
     for (i = 0; i < CS_VATTRIB_SPECIFIC_LAST-CS_VATTRIB_SPECIFIC_FIRST+1; i++)
     {
-      csGLRenderBuffer *b = spec_renderBuffers[i];
-      if (b) b->RenderRelease ();
+      iRenderBuffer *b = spec_renderBuffers[i];
+      if (b) RenderRelease (b);// b->RenderRelease ();
       spec_renderBuffers[i] = 0;
     }
     for (i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
     {
-      csGLRenderBuffer *b = gen_renderBuffers[i];
-      if (b) b->RenderRelease ();
+      iRenderBuffer *b = gen_renderBuffers[i];
+      if (b) RenderRelease (b);// b->RenderRelease ();
       gen_renderBuffers[i] = 0;
     }
   }
@@ -1617,7 +1627,7 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
       {
         if (gen_renderBuffers[att]) 
         {
-          gen_renderBuffers[att]->RenderRelease ();
+          RenderRelease (gen_renderBuffers[att]);
           gen_renderBuffers[att] = 0;
         }
       }
@@ -1625,7 +1635,7 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
       {
         if (spec_renderBuffers[att]) 
         {
-          spec_renderBuffers[att]->RenderRelease ();
+          RenderRelease (spec_renderBuffers[att]);
           spec_renderBuffers[att] = 0;
         }
       }
@@ -1789,13 +1799,13 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     indexBufSV->GetValue (iIndexbuf);
     CS_ASSERT(iIndexbuf);
   }
-  csGLRenderBuffer* indexbuf = (csGLRenderBuffer*)iIndexbuf;
   
-  const size_t indexCompsBytes = indexbuf->compSize;
+  const size_t indexCompsBytes = 
+    csRenderBufferComponentSizes[iIndexbuf->GetComponentType()];
   CS_ASSERT_MSG("Expecting index buffers to have only 1 component",
-    (indexbuf->compCount == 1));
-  CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= indexbuf->bufferSize);
-  CS_ASSERT((indexCompsBytes * mymesh->indexend) <= indexbuf->bufferSize);
+    (iIndexbuf->GetComponentCount() == 1));
+  CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= iIndexbuf->GetSize());
+  CS_ASSERT((indexCompsBytes * mymesh->indexend) <= iIndexbuf->GetSize());
 
   GLenum primitivetype = GL_TRIANGLES;
   switch (mymesh->meshtype)
@@ -1923,8 +1933,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   const uint mixmode = modes.mixmode;
   statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
 
-  
-  void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
+
+  GLenum compType;
+  void* bufData = //indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
+    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType);
   if (bufData != (void*)-1)
   {
     if ((mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
@@ -1959,11 +1971,11 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
       alpha = (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
     glColor4f (1.0f, 1.0f, 1.0f, alpha);
-    glDrawRangeElements (primitivetype, indexbuf->rangeStart, 
-      indexbuf->rangeEnd, mymesh->indexend - mymesh->indexstart,
-      indexbuf->compGLType, 
+    glDrawRangeElements (primitivetype, iIndexbuf->GetRangeStart(), 
+      iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+      compType, 
       ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
-    indexbuf->Release();
+    //indexbuf->Release();
   }
 
   if (mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) 
@@ -1971,7 +1983,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
     glDisable (GL_POINT_SPRITE_ARB);
   }
-  indexbuf->RenderRelease ();
+  //indexbuf->RenderRelease ();
+  RenderRelease (iIndexbuf);
   SetMirrorMode (false);
 }
 
@@ -2195,6 +2208,40 @@ void csGLGraphics3D::ClosePortal (bool use_zfill_portal)
     clipportal_floating--;
 }
 
+void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer, 
+				  csGLRenderBufferLockType type, 
+				  GLenum& compGLType)
+{
+  if (vboManager.IsValid())
+    return vboManager->RenderLock (buffer, type, compGLType);
+  else
+  {
+    void* data;
+    iRenderBuffer* master;
+    if ((master = buffer->GetMasterBuffer()) != 0)
+      data = master->Lock (CS_BUF_LOCK_READ);
+    else
+      data = buffer->Lock (CS_BUF_LOCK_READ);
+    if (data == (void*)-1) return (void*)-1;
+    compGLType = compGLtypes[buffer->GetComponentType()];
+    return ((uint8*)data + buffer->GetOffset());
+  }
+}
+
+void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
+{
+  if (vboManager.IsValid())
+    return vboManager->RenderRelease (buffer);
+  else
+  {
+    iRenderBuffer* master;
+    if ((master = buffer->GetMasterBuffer()) != 0)
+      master->Release();
+    else
+      buffer->Release();
+  }
+}
+
 void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,
 	const csPlane3& normal)
 {
@@ -2399,22 +2446,19 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
 
   if (scrapIndicesSize < mesh.indexCount)
   {
-    scrapIndices = CreateIndexRenderBuffer (mesh.indexCount * sizeof (uint),
+    scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (mesh.indexCount,
       CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT,
       0, mesh.vertexCount - 1);
     scrapIndicesSize = mesh.indexCount;
   }
   if (scrapVerticesSize < mesh.vertexCount)
   {
-    scrapVertices = CreateRenderBuffer (
-      mesh.vertexCount * sizeof (float) * 3,
-      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-    scrapTexcoords = CreateRenderBuffer (
-      mesh.vertexCount * sizeof (float) * 2,
-      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
-    scrapColors = CreateRenderBuffer (
-      mesh.vertexCount * sizeof (float) * 4,
-      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
+    scrapVertices = csRenderBuffer::CreateRenderBuffer (
+      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+    scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
+      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
+    scrapColors = csRenderBuffer::CreateRenderBuffer (
+      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
 
     scrapVerticesSize = mesh.vertexCount;
   }
@@ -2425,8 +2469,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   sv = scrapContext.GetVariableAdd (string_indices);
   if (mesh.indices)
   {
-    scrapIndices->CopyToBuffer (mesh.indices, 
-      mesh.indexCount * sizeof (uint));
+    scrapIndices->CopyInto (mesh.indices, mesh.indexCount);
     sv->SetValue (scrapIndices);
     scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
   }
@@ -2438,8 +2481,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   sv = scrapContext.GetVariableAdd (string_vertices);
   if (mesh.vertices)
   {
-    scrapVertices->CopyToBuffer (mesh.vertices, 
-      mesh.vertexCount * sizeof (csVector3));
+    scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
     scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
     if (useShader)
       sv->SetValue (scrapVertices);
@@ -2453,8 +2495,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   sv = scrapContext.GetVariableAdd (string_texture_coordinates);
   if (mesh.texcoords)
   {
-    scrapTexcoords->CopyToBuffer (mesh.texcoords, 
-      mesh.vertexCount * sizeof (csVector2));
+    scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
     scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
     if (useShader)
       sv->SetValue (scrapTexcoords);
@@ -2468,8 +2509,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   sv = scrapContext.GetVariableAdd (string_colors);
   if (mesh.colors)
   {
-    scrapColors->CopyToBuffer (mesh.colors, 
-      mesh.vertexCount * sizeof (csVector4));
+    scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
     scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
     if (useShader)
       sv->SetValue (scrapColors);

@@ -130,14 +130,6 @@ public:
   bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   long GetRenderState (G3D_RENDERSTATEOPTION op) const;
   bool SetOption (const char*, const char*);
-  csPtr<iRenderBuffer> CreateRenderBuffer (size_t size,
-    csRenderBufferType type, csRenderBufferComponentType componentType,
-    int componentCount, bool copy = true);
-  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
-    csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd, bool copy = true);
-  void CreateInterleavedRenderBuffers (size_t size, csRenderBufferType type,
-    int count, csRef<iRenderBuffer>* buffers);
   bool ActivateBuffers (csRenderBufferHolder* holder, 
     csRenderBufferName mapping[CS_VATTRIB_SPECIFIC_LAST+1])
   {

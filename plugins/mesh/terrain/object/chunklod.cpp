@@ -43,6 +43,7 @@
 
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"
+#include "csgfx/renderbuffer.h"
 
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
@@ -538,10 +539,10 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     if (!vertex_buffer) 
     {
       unsigned int len = vertices.Length();
-      vertex_buffer = pFactory->r3d->CreateRenderBuffer (
-	sizeof (csVector3) * len, CS_BUF_STATIC, 
+      vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+	len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
-      vertex_buffer->CopyToBuffer (vertices.GetArray(), len * sizeof (csVector3));
+      vertex_buffer->CopyInto (vertices.GetArray(), len);
     }
     return vertex_buffer;
   }
@@ -550,11 +551,11 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     if (!normal_buffer)
     {
       unsigned int len = normals.Length();
-      normal_buffer = pFactory->r3d->CreateRenderBuffer (
-	sizeof (csVector3) * len, CS_BUF_STATIC, 
+      normal_buffer = csRenderBuffer::CreateRenderBuffer (
+	len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
    
-      normal_buffer->CopyToBuffer (normals.GetArray(), len * sizeof (csVector3));
+      normal_buffer->CopyInto (normals.GetArray(), len);
     }
     return normal_buffer;
   }
@@ -563,11 +564,11 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     if (!tangent_buffer)
     {
       unsigned int len = tangents.Length();
-      tangent_buffer = pFactory->r3d->CreateRenderBuffer (
-	sizeof (csVector3) * len, CS_BUF_STATIC, 
+      tangent_buffer = csRenderBuffer::CreateRenderBuffer (
+	len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
    
-      tangent_buffer->CopyToBuffer (tangents.GetArray(), len * sizeof (csVector3));
+      tangent_buffer->CopyInto (tangents.GetArray(), len);
     }
     return tangent_buffer;
   }
@@ -576,11 +577,11 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     if (!binormal_buffer)
     {
       unsigned int len = binormals.Length();
-      binormal_buffer = pFactory->r3d->CreateRenderBuffer (
-	sizeof (csVector3) * len, CS_BUF_STATIC, 
+      binormal_buffer = csRenderBuffer::CreateRenderBuffer (
+	len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
 
-      binormal_buffer->CopyToBuffer (binormals.GetArray(), len * sizeof (csVector3));
+      binormal_buffer->CopyInto (binormals.GetArray(), len);
     }
     return binormal_buffer;
   }
@@ -590,11 +591,10 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     {
       unsigned int len = texcors.Length();
       {
-        texcors_buffer = pFactory->r3d->CreateRenderBuffer (
-	  sizeof (csVector2) * len, CS_BUF_STATIC, 
+        texcors_buffer = csRenderBuffer::CreateRenderBuffer (
+	  len, CS_BUF_STATIC, 
 	  CS_BUFCOMP_FLOAT, 2);
-	texcors_buffer->CopyToBuffer (texcors.GetArray(), 
-	  len * sizeof (csVector2));
+	texcors_buffer->CopyInto (texcors.GetArray(), len);
       }	
     }
     return texcors_buffer;
@@ -606,8 +606,8 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
       unsigned int len = vertices.Length();
       if (len < UCHAR_MAX) 
       {
-	index_buffer = pFactory->r3d->CreateIndexRenderBuffer (
-	  sizeof (unsigned char) * len, CS_BUF_STATIC, 
+	index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+	  len, CS_BUF_STATIC, 
 	  CS_BUFCOMP_UNSIGNED_BYTE, 0, vertices.Length() - 1);
         unsigned char *ibuf = (unsigned char *)index_buffer->Lock (
 		CS_BUF_LOCK_NORMAL);
@@ -617,8 +617,8 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
       } 
       else if (len < USHRT_MAX)  
       {
-	index_buffer = pFactory->r3d->CreateIndexRenderBuffer (
-	  sizeof (unsigned short) * len, CS_BUF_STATIC, 
+	index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+	  len, CS_BUF_STATIC, 
 	  CS_BUFCOMP_UNSIGNED_SHORT, 0, vertices.Length() - 1);
         unsigned short *ibuf = (unsigned short *)index_buffer->Lock (
 		CS_BUF_LOCK_NORMAL);
@@ -628,8 +628,8 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
       } 
       else
       {
-	index_buffer = pFactory->r3d->CreateIndexRenderBuffer (
-	  sizeof (unsigned int) * len, CS_BUF_STATIC, 
+	index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+	  len, CS_BUF_STATIC, 
 	  CS_BUFCOMP_UNSIGNED_INT, 0, vertices.Length() - 1);
         unsigned int *ibuf = (unsigned int *)index_buffer->Lock (
 		CS_BUF_LOCK_NORMAL);
@@ -1830,8 +1830,8 @@ void csChunkLodTerrainObject::MeshTreeNodeRBA::PreGetBuffer
       unsigned int len = colors.Length();
       if (!colorBuffer)
       {
-	colorBuffer = factory->r3d->CreateRenderBuffer (
-	  sizeof (csColor) * len, CS_BUF_DYNAMIC, 
+	colorBuffer = csRenderBuffer::CreateRenderBuffer (
+	  len, CS_BUF_DYNAMIC, 
 	  CS_BUFCOMP_FLOAT, 3);
       }
 
@@ -1842,7 +1842,7 @@ void csChunkLodTerrainObject::MeshTreeNodeRBA::PreGetBuffer
       obj->UpdateColors (colors, node->GetVertices(), node->GetNormals(), 
 	node->BBox(), newColors);
 
-      colorBuffer->CopyToBuffer (newColors, sizeof (csColor) * len);
+      colorBuffer->CopyInto (newColors, len);
 
       colorVersion = obj->colorVersion;
     }

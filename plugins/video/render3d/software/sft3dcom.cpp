@@ -19,6 +19,7 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
+#include "csgfx/renderbuffer.h"
 #include "csutil/sysfunc.h"
 #include "csqint.h"
 #include "csgeom/math2d.h"
@@ -42,7 +43,6 @@
 #include "iutil/plugin.h"
 #include "ivaria/reporter.h"
 
-#include "renderbuffer.h"
 #include "soft_polyrender.h"
 
 #if defined (CS_USE_MMX)
@@ -4321,20 +4321,20 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
 
   if (scrapIndicesSize < mesh.indexCount)
   {
-    scrapIndices = CreateIndexRenderBuffer (mesh.indexCount * sizeof (uint),
+    scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (mesh.indexCount,
       CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, 0);
     scrapIndicesSize = mesh.indexCount;
   }
   if (scrapVerticesSize < mesh.vertexCount)
   {
-    scrapVertices = CreateRenderBuffer (
-      mesh.vertexCount * sizeof (float) * 3,
+    scrapVertices = csRenderBuffer::CreateRenderBuffer (
+      mesh.vertexCount,
       CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3);
-    scrapTexcoords = CreateRenderBuffer (
-      mesh.vertexCount * sizeof (float) * 2,
+    scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
+      mesh.vertexCount,
       CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 2);
-    scrapColors = CreateRenderBuffer (
-      mesh.vertexCount * sizeof (float) * 4,
+    scrapColors = csRenderBuffer::CreateRenderBuffer (
+      mesh.vertexCount,
       CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 4);
 
     scrapVerticesSize = mesh.vertexCount;
@@ -4344,8 +4344,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   sv = scrapContext.GetVariableAdd (strings->Request ("indices"));
   if (mesh.indices)
   {
-    scrapIndices->CopyToBuffer (mesh.indices, 
-      mesh.indexCount * sizeof (uint));
+    scrapIndices->CopyInto (mesh.indices, mesh.indexCount);
     sv->SetValue (scrapIndices);
     scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
   }
@@ -4356,8 +4355,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   sv = scrapContext.GetVariableAdd (strings->Request ("vertices"));
   if (mesh.vertices)
   {
-    scrapVertices->CopyToBuffer (mesh.vertices, 
-      mesh.vertexCount * sizeof (csVector3));
+    scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
     ActivateBuffer (CS_VATTRIB_POSITION, scrapVertices);
     scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
   }
@@ -4368,8 +4366,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   sv = scrapContext.GetVariableAdd (strings->Request ("texture coordinates"));
   if (mesh.texcoords)
   {
-    scrapTexcoords->CopyToBuffer (mesh.texcoords, 
-      mesh.vertexCount * sizeof (csVector2));
+    scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
     ActivateBuffer (CS_VATTRIB_TEXCOORD, scrapTexcoords);
     scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
   }
@@ -4380,8 +4377,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   sv = scrapContext.GetVariableAdd (strings->Request ("colors"));
   if (mesh.colors)
   {
-    scrapColors->CopyToBuffer (mesh.colors, 
-      mesh.vertexCount * sizeof (csVector4));
+    scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
     scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
     ActivateBuffer (CS_VATTRIB_COLOR, scrapColors);
   }

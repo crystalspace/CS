@@ -91,7 +91,8 @@ SCF_VERSION (iImage, 2, 0, 1);
  *   <ul>
  *   <li>iImageIO::Load()
  *   </ul>
- * \sa csImageMemory, csImageManipulate, csImageTools
+ * \sa csImageMemory, csImageManipulate, csImageTools, csImageCubeMapMaker,
+ *   csImageVolumeMaker
  */
 struct iImage : public iBase
 {

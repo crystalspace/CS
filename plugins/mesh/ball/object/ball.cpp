@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/renderbuffer.h"
 #include "csgeom/math3d.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -498,55 +499,51 @@ void csBallMeshObject::UpdateBuffers()
 {
   if (ball_vertices_dirty_flag)
   {
-    vertex_buffer = g3d->CreateRenderBuffer (
-      sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC, 
+    vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+      num_ball_vertices, CS_BUF_STATIC, 
       CS_BUFCOMP_FLOAT, 3);
     ball_vertices_dirty_flag = false;
-    vertex_buffer->CopyToBuffer(ball_vertices, sizeof(csVector3)*num_ball_vertices);
+    vertex_buffer->CopyInto (ball_vertices, num_ball_vertices);
 
     bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
   }
   if (ball_texels_dirty_flag)
   {
-    texel_buffer = g3d->CreateRenderBuffer (
-      sizeof (csVector2)*num_ball_vertices, CS_BUF_STATIC, 
+    texel_buffer = csRenderBuffer::CreateRenderBuffer (
+      num_ball_vertices, CS_BUF_STATIC, 
       CS_BUFCOMP_FLOAT, 2);
     ball_texels_dirty_flag = false;
-    texel_buffer->CopyToBuffer (ball_texels,
-      sizeof (csVector2) * num_ball_vertices);
+    texel_buffer->CopyInto (ball_texels, num_ball_vertices);
 
     bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texel_buffer);
   }
   if (ball_normals_dirty_flag)
   {
-    normal_buffer = g3d->CreateRenderBuffer (
-      sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC,
+    normal_buffer = csRenderBuffer::CreateRenderBuffer (
+      num_ball_vertices, CS_BUF_STATIC,
       CS_BUFCOMP_FLOAT, 3);
     ball_normals_dirty_flag = false;
-    normal_buffer->CopyToBuffer (top_normals,
-      sizeof (csVector3)*num_ball_vertices);
+    normal_buffer->CopyInto (top_normals, num_ball_vertices);
 
     bufferHolder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
   }
   if (ball_colors_dirty_flag)
   {
-    color_buffer = g3d->CreateRenderBuffer (
-      sizeof (csColor)*num_ball_vertices, CS_BUF_STATIC,
+    color_buffer = csRenderBuffer::CreateRenderBuffer (
+      num_ball_vertices, CS_BUF_STATIC,
       CS_BUFCOMP_FLOAT, 3);
     ball_colors_dirty_flag = false;
-    color_buffer->CopyToBuffer (ball_colors,
-      sizeof (csColor) * num_ball_vertices);
+    color_buffer->CopyInto (ball_colors, num_ball_vertices);
 
     bufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
   }
   if (ball_triangle_dirty_flag)
   {
-    index_buffer = g3d->CreateIndexRenderBuffer (
-      sizeof (unsigned int)*ball_triangles*3, CS_BUF_STATIC,
+    index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+      ball_triangles*3, CS_BUF_STATIC,
       CS_BUFCOMP_UNSIGNED_INT, 0, num_ball_vertices - 1);
     ball_triangle_dirty_flag = false;
-    index_buffer->CopyToBuffer (ball_indices,
-      sizeof (unsigned int) * ball_triangles *3);
+    index_buffer->CopyInto (ball_indices, ball_triangles *3);
 
     bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
   }

@@ -33,7 +33,6 @@
 #include "csgfx/csimgvec.h" 
 #include "csgeom/plane3.h"
 #include "csqint.h"
-#include "null_renderbuffer.h"
 #include "null_render3d.h"
 
 #include "../common/normalizationcube.h"
@@ -385,38 +384,6 @@ bool csNullGraphics3D::SetOption (const char*, const char*)
 {
   return false;
 }
-
-csPtr<iRenderBuffer> csNullGraphics3D::CreateRenderBuffer (size_t size,
-  csRenderBufferType type, csRenderBufferComponentType componentType,
-  int componentCount, bool copy)
-{
-  return csPtr<iRenderBuffer> (new csSysRenderBuffer (
-    new char[size], size, type, componentType, componentCount));
-}
-
-csPtr<iRenderBuffer> csNullGraphics3D::CreateIndexRenderBuffer (size_t size, 
-  csRenderBufferType type, csRenderBufferComponentType componentType,
-  size_t rangeStart, size_t rangeEnd, bool copy)
-{
-  return csPtr<iRenderBuffer> (new csSysRenderBuffer (
-    new char[size], size, type, componentType, 1));
-}
-
-void csNullGraphics3D::CreateInterleavedRenderBuffers (size_t size, 
-  csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers)
-{
-  buffers[0].AttachNew (new csSysRenderBuffer 
-    (new char[size], size, type, CS_BUFCOMP_BYTE, 1));
-  for (int i = 1; i < count; i ++)
-  {
-    csSysRenderBuffer *interleaved = new csSysRenderBuffer (new char[size],
-      size, type, CS_BUFCOMP_BYTE, 1);
-    // interleaved->SetInterleaved ();
-    buffers[i].AttachNew (interleaved);
-  }
-}
-
-
 
 void csNullGraphics3D::SetTextureState (int*, iTextureHandle**, int)
 {

@@ -25,6 +25,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
 #include "csgeom/pmtools.h"
+#include "csgfx/renderbuffer.h"
 
 #include "iengine/rview.h"
 #include "iengine/camera.h"
@@ -119,8 +120,8 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
     entry->meshLightPos = meshlightpos;
     if (entry->shadow_index_buffer == 0) 
     { 
-      entry->shadow_index_buffer = parent->g3d->CreateIndexRenderBuffer (
-        sizeof (unsigned int)*triangle_count*12, CS_BUF_DYNAMIC,
+      entry->shadow_index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+        triangle_count*12, CS_BUF_DYNAMIC,
         CS_BUFCOMP_UNSIGNED_INT, 0, triangle_count*12); 
 	// @@@ Is the upper range correct?
     }
@@ -300,11 +301,11 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
     vertex_count = mesh->GetVertexCount ();
 	triangle_count = new_triangle_count;
 
-    shadow_vertex_buffer = parent->g3d->CreateRenderBuffer (
-       sizeof (csVector3)*new_triangle_count*3, CS_BUF_DYNAMIC,
+    shadow_vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+       new_triangle_count*3, CS_BUF_DYNAMIC,
        CS_BUFCOMP_FLOAT, 3);
-    shadow_normal_buffer = parent->g3d->CreateRenderBuffer (
-       sizeof (csVector3)*new_triangle_count*3, CS_BUF_DYNAMIC,
+    shadow_normal_buffer = csRenderBuffer::CreateRenderBuffer (
+       new_triangle_count*3, CS_BUF_DYNAMIC,
        CS_BUFCOMP_FLOAT, 3);
 
     csHash<EdgeInfo*> edge_stack(new_triangle_count*3);

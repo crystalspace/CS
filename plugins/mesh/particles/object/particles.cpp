@@ -37,6 +37,8 @@
 #include "csutil/randomgen.h"
 #include "csutil/util.h"
 
+#include "csgfx/renderbuffer.h"
+
 #include "csqsqrt.h"
 #include "csqint.h"
 
@@ -405,24 +407,19 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csRenderBufferName name)
   if (!vertex_buffer || buffer_length != point_data->Length ())
   {
     buffer_length = point_data->Length ();
+    static const csInterleavedBufferElement interleavedElements[2] =
+      {{CS_BUFCOMP_FLOAT, 3}, {CS_BUFCOMP_FLOAT, 4}};
     csRef<iRenderBuffer> buffers[2];
     int bufsize = (point_sprites ? buffer_length : buffer_length * 4);
-    pFactory->g3d->CreateInterleavedRenderBuffers (bufsize
-      * sizeof(csParticlesData), CS_BUF_DYNAMIC, 2, buffers);
+    masterBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (bufsize, CS_BUF_DYNAMIC, 2, 
+      interleavedElements, buffers);
     vertex_buffer = buffers[0];
-    vertex_buffer->SetOffset (0);
-    vertex_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
-    vertex_buffer->SetComponentCount (3);
     color_buffer = buffers[1];
-    color_buffer->SetOffset (sizeof(csVector3));
-    color_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
-    color_buffer->SetComponentCount (4);
-    texcoord_buffer = pFactory->g3d->CreateRenderBuffer (
-      sizeof (csVector2) * bufsize, CS_BUF_DYNAMIC,
+
+    texcoord_buffer = csRenderBuffer::CreateRenderBuffer (
+      bufsize, CS_BUF_DYNAMIC,
       CS_BUFCOMP_FLOAT, 2);
     csVector2 *texcoords = new csVector2 [bufsize];
-    vertex_buffer->SetStride (sizeof(i_vertex));
-    color_buffer->SetStride (sizeof(i_vertex));
     unsigned int *indices;
     size_t indices_size;
     if (point_sprites)
@@ -457,19 +454,17 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csRenderBufferName name)
         indices[j+5] = i + 3;
       }
     }
-    index_buffer = pFactory->g3d->CreateIndexRenderBuffer (
-        sizeof (unsigned int) * indices_size, CS_BUF_STATIC,
+    index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+        indices_size, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 0, bufsize - 1);
-    index_buffer->CopyToBuffer(indices, sizeof(unsigned int)*indices_size);
+    index_buffer->CopyInto (indices, indices_size);
     delete [] indices;
 
-    texcoord_buffer->CopyToBuffer (texcoords, sizeof(csVector2) * bufsize);
+    texcoord_buffer->CopyInto (texcoords, bufsize);
     delete [] texcoords;
   }
   if (name == CS_BUFFER_POSITION)
   {
-    void *data;
-    int size;
     if (point_sprites)
     {
       int len = point_data->Length ();
@@ -482,9 +477,6 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csRenderBufferName name)
         vertex.color = point.color;
         vertex_data.Put (i, vertex);
       }
-
-      data = vertex_data.GetArray ();
-      size = vertex_data.Length () * sizeof(i_vertex);
     }
     else
     {
@@ -508,12 +500,9 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csRenderBufferName name)
         vertex.color = point.color;
         vertex_data.Put (j+3, vertex);
       }
-
-      data = vertex_data.GetArray ();
-      size = vertex_data.Length () * sizeof(i_vertex);
     }
     // Vertex buffer is an interleaved buffer, so copy all the data into it
-    vertex_buffer->CopyToBuffer (data, size);
+    masterBuffer->CopyInto (vertex_data.GetArray (), vertex_data.Length ());
     return vertex_buffer;
   }
   else if (name == CS_BUFFER_COLOR)

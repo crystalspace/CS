@@ -24,6 +24,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/trimesh.h"
 #include "csgeom/trimeshlod.h"
 #include "csgfx/memimage.h"
+#include "csgfx/renderbuffer.h"
 #include "csutil/util.h"
 #include "csutil/memfile.h"
 #include "csutil/csendian.h"
@@ -478,8 +479,7 @@ void csTerrBlock::UpdateStaticLighting ()
       color_data = new csColor[num_mesh_vertices];
     UpdateBlockColors ();
     if (mesh_colors)
-      mesh_colors->CopyToBuffer (color_data,
-        sizeof(csVector3)*num_mesh_vertices);
+      mesh_colors->CopyInto (color_data, num_mesh_vertices);
   }
   else
   {
@@ -515,38 +515,34 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   {
     int num_mesh_vertices = (res+1)*(res+1);
     mesh_vertices = 
-      g3d->CreateRenderBuffer (
-      sizeof(csVector3)*num_mesh_vertices, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+      csRenderBuffer::CreateRenderBuffer (
+      num_mesh_vertices, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
       3);
-    mesh_vertices->CopyToBuffer (vertex_data,
-      sizeof(csVector3)*num_mesh_vertices);
+    mesh_vertices->CopyInto (vertex_data, num_mesh_vertices);
     //delete[] vertex_data;@@@ CD
     //vertex_data = 0;
 
     mesh_normals = 
-      g3d->CreateRenderBuffer (sizeof(csVector3)*num_mesh_vertices,
+      csRenderBuffer::CreateRenderBuffer (num_mesh_vertices,
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
       3);
-    mesh_normals->CopyToBuffer (normal_data,
-      sizeof(csVector3)*num_mesh_vertices);
+    mesh_normals->CopyInto (normal_data, num_mesh_vertices);
     delete[] normal_data;
     normal_data = 0;
 
     mesh_texcoords = 
-    g3d->CreateRenderBuffer (sizeof(csVector2)*num_mesh_vertices,
+    csRenderBuffer::CreateRenderBuffer (num_mesh_vertices,
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
       2);
-    mesh_texcoords->CopyToBuffer (texcoord_data,
-      sizeof(csVector2)*num_mesh_vertices);
+    mesh_texcoords->CopyInto (texcoord_data, num_mesh_vertices);
     delete[] texcoord_data;
     texcoord_data = 0;
 
     mesh_colors = 
-      g3d->CreateRenderBuffer (sizeof(csColor)*num_mesh_vertices,
+      csRenderBuffer::CreateRenderBuffer (num_mesh_vertices,
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
       3);
-    mesh_colors->CopyToBuffer (color_data,
-      sizeof(csColor)*num_mesh_vertices);
+    mesh_colors->CopyInto (color_data,num_mesh_vertices);
     if (!terr->staticlighting)
     {
       delete[] color_data;
@@ -1229,8 +1225,8 @@ void csTerrainObject::SetupObject ()
           {
             int idx = t+(r<<1)+(l<<2)+(b<<3);
             mesh_indices[idx] = 
-	      g3d->CreateIndexRenderBuffer (
-              sizeof(unsigned int)*block_res*block_res*2*3, 
+	      csRenderBuffer::CreateIndexRenderBuffer (
+              block_res*block_res*2*3, 
               CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT,
               0, (block_res+1) * (block_res+1) - 1);
             uint16 *indices = 

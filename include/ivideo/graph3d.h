@@ -728,51 +728,6 @@ struct iGraphics3D : public iBase
   virtual bool SetOption (const char*, const char*) = 0;
 
   /**
-   * Create a render buffer.
-   * \param size Size of the buffer in bytes.
-   * \param type Type of buffer; CS_BUF_DYNAMIC, CS_BUF_STATIC or 
-   *  CS_BUF_STREAM.
-   * \param componentType Components Types; CS_BUFCOMP_FLOAT, CS_BUFCOMP_INT,
-   *        etc
-   * \param componentCount Number of components per element (e.g. 4 for RGBA)
-   * \param copy if true (default) then this buffer will make a copy of the
-   *        data. Hardware vertex buffers and interleaved buffers will always
-   *        copy data.
-   */
-  virtual csPtr<iRenderBuffer> CreateRenderBuffer (size_t size, 
-    csRenderBufferType type, csRenderBufferComponentType componentType, 
-    int componentCount, bool copy = true) = 0;
-  /**
-   * Create an index buffer.
-   * \param size Size of the buffer in bytes.
-   * \param type Type of buffer; CS_BUF_DYNAMIC, CS_BUF_STATIC or 
-   *  CS_BUF_STREAM.
-   * \param componentType Components Types; usually CS_BUFCOMP_UNSIGNED_INT
-   * \param rangeStart Minimum index value that is expected to be written to 
-   *  the created buffer.
-   * \param rangeEnd Maximum index value that is expected to be written to 
-   *  the created buffer.
-   * \param copy if true (default) then this buffer will make a copy of the
-   *        data. Hardware vertex buffers and interleaved buffers will always
-   *        copy data.
-   */
-  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
-    csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd, bool copy = true) = 0;
-
-  /**
-   * Create an interleaved renderbuffer (You would use this then set stride to
-   * determine offset and stride of the interleaved buffer
-   * \param size size of the buffer in bytes
-   * \param type the type of render buffers you want
-   * \param count number of render buffers you want
-   * \param buffers an array of render buffer references that can hold
-   * at least 'count' render buffers.
-   */
-  virtual void CreateInterleavedRenderBuffers (size_t size, 
-    csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers) = 0;
-
-  /**
    * Activate the buffers in the default buffer holder.
    */
   virtual bool ActivateBuffers (csRenderBufferHolder* holder, 

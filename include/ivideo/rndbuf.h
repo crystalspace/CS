@@ -28,6 +28,7 @@
  * \addtogroup gfx3d
  * @{ */
 
+#include "csutil/scf.h"
 #include "csutil/strset.h"
 #include "csutil/refcount.h"
 
@@ -64,7 +65,9 @@ enum csRenderBufferComponentType
   CS_BUFCOMP_INT,
   CS_BUFCOMP_UNSIGNED_INT,
   CS_BUFCOMP_FLOAT,
-  CS_BUFCOMP_DOUBLE
+  CS_BUFCOMP_DOUBLE,
+
+  CS_BUFCOMP_TYPECOUNT
 };
 
 /**
@@ -75,15 +78,34 @@ enum csRenderBufferComponentType
 enum csRenderBufferLockType
 {
   CS_BUF_LOCK_NOLOCK,
-  CS_BUF_LOCK_NORMAL,
-  CS_BUF_LOCK_READ
+  CS_BUF_LOCK_READ,
+  CS_BUF_LOCK_NORMAL
 };
 
-SCF_VERSION (iRenderBuffer, 0, 0, 3);
+/**
+ * Sizes of individual buffer components in bytes.
+ */
+static const size_t csRenderBufferComponentSizes[CS_BUFCOMP_TYPECOUNT] = 
+{
+  sizeof (char), sizeof (unsigned char), 
+  sizeof (short), sizeof (unsigned short),
+  sizeof (int), sizeof (unsigned int),
+  sizeof (float),
+  sizeof (double)
+};
+
+SCF_VERSION (iRenderBuffer, 0, 1, 0);
 
 /**
- * This is a general buffer to be used by the renderer. It can ONLY be
- * created by the VB manager
+ * This is a general buffer.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>csRenderBuffer::CreateRenderBuffer()
+ *   <li>csRenderBuffer::CreateIndexRenderBuffer()
+ *   <li>csRenderBuffer::CreateInterleavedRenderBuffers()
+ *   </ul>
+ * \sa csRenderBuffer
  */
 struct iRenderBuffer : public iBase
 {
@@ -97,23 +119,21 @@ struct iRenderBuffer : public iBase
    *  cause a performance penalty - specifically, if the data is currently in
    *  use, the driver may have to wait until the buffer is available again.
    */
-  virtual void* Lock(csRenderBufferLockType lockType, 
-    bool samePointer = false) = 0;
+  virtual void* Lock(csRenderBufferLockType lockType/*, 
+    bool samePointer = false*/) = 0;
 
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() = 0;
 
-  /// Copy data to the render buffer.
-  virtual void CopyToBuffer(const void *data, size_t length) = 0;
-
-  /// Sets the number of components per element
-  virtual void SetComponentCount (int count) = 0;
+  /**
+   * Copy data to the render buffer.
+   * \remarks Does not work with interleaved buffer, copy to master buffer
+   *  instead.
+   */
+  virtual void CopyInto (const void *data, size_t elementCount) = 0;
 
   /// Gets the number of components per element
   virtual int GetComponentCount () const = 0;
-
-  /// Sets the component type (float, int, etc)
-  virtual void SetComponentType (csRenderBufferComponentType type) = 0;
 
   /// Gets the component type (float, int, etc)
   virtual csRenderBufferComponentType GetComponentType () const = 0;
@@ -124,17 +144,29 @@ struct iRenderBuffer : public iBase
   /// Get the size of the buffer (in bytes)
   virtual size_t GetSize() const = 0;
 
-  /// Set the stride of buffer (in bytes)
-  virtual void SetStride(int stride) = 0;
-
   /// Get the stride of the buffer (in bytes)
-  virtual int GetStride() const = 0;
+  virtual size_t GetStride() const = 0;
+
+  /// Get the distance between two elements (in bytes)
+  virtual size_t GetElementDistance() const = 0;
 
   /// Get the offset of the buffer (in bytes)
-  virtual void SetOffset(int offset) = 0;
+  virtual size_t GetOffset() const = 0;
 
   /// Get version
   virtual uint GetVersion () = 0;
+
+  /**
+   * Get the master buffer in case this is an interleaved buffer.
+   * The master buffer is the buffer that actually holds the data;
+   * while it can be used to retrieve or set data, it must not be
+   * used for actual rendering. Use the interleaved buffers instead.
+   */
+  virtual iRenderBuffer* GetMasterBuffer () const = 0;
+
+  virtual bool IsIndexBuffer() const = 0;
+  virtual size_t GetRangeStart() const = 0;
+  virtual size_t GetRangeEnd() const = 0;
 };
 
 /**

@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/renderbuffer.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
@@ -255,13 +256,13 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
 
   if (buffer == CS_BUFFER_INDEX)
   {
-    size_t indexSize = sizeof (uint) * vertices.Length();
+    size_t indexSize = vertices.Length();
     if (!index_buffer.IsValid() || 
       (indicesSize != indexSize))
     {
-      index_buffer.AttachNew (factory->g3d->CreateIndexRenderBuffer (
+      index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
 	indexSize, CS_BUF_DYNAMIC, 
-	CS_BUFCOMP_UNSIGNED_INT, 0, vertices.Length() - 1));
+	CS_BUFCOMP_UNSIGNED_INT, 0, vertices.Length() - 1);
       
       holder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
 
@@ -286,12 +287,12 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
       else
 	uvani_uv = uvani->GetVertices (texels_count);
 	  
-      size_t texelSize = sizeof (float) * texels_count * 2;
-      if (!texel_buffer.IsValid() || (size_t)texel_buffer->GetSize()
-      	!= texelSize)
+      size_t texelSize = texels_count;
+      if (!texel_buffer.IsValid() || (texel_buffer->GetSize()
+      	!= texelSize * sizeof(float) * 2))
       {
-	texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
-	  texelSize, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2));
+	texel_buffer = csRenderBuffer::CreateRenderBuffer (
+	  texelSize, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
 	holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texel_buffer);
       }
 
@@ -318,13 +319,13 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
   {
     if (colors_dirty)
     {
-      size_t color_size = sizeof (float) * vertices.Length() * 3;
-      if (!color_buffer.IsValid() ||
-	(size_t)color_buffer->GetSize() != color_size)
+      size_t color_size = vertices.Length();
+      if (!color_buffer.IsValid() || (color_buffer->GetSize() 
+	!= color_size * sizeof(float) * 2))
       {
-	color_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+	color_buffer = csRenderBuffer::CreateRenderBuffer (
 	  color_size, CS_BUF_STATIC, 
-	  CS_BUFCOMP_FLOAT, 3));
+	  CS_BUFCOMP_FLOAT, 3);
 	holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
       }
 
@@ -341,13 +342,13 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
   {
     if (vertices_dirty)
     {
-      size_t vertices_size = sizeof (float) * vertices.Length() * 3;
-      if (!vertex_buffer.IsValid() ||
-	(size_t)vertex_buffer->GetSize() != vertices_size)
+      size_t vertices_size = vertices.Length();
+      if (!vertex_buffer.IsValid() || (vertex_buffer->GetSize() 
+	!= vertices_size * sizeof(float) * 3))
       {
-	vertex_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+	vertex_buffer = csRenderBuffer::CreateRenderBuffer (
 	  vertices_size, CS_BUF_STATIC, 
-	  CS_BUFCOMP_FLOAT, 3));
+	  CS_BUFCOMP_FLOAT, 3);
 	holder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
       }
 

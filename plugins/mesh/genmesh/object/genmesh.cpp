@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/renderbuffer.h"
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
 #include "csgeom/frustum.h"
@@ -996,8 +997,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   {
     if (!sorted_index_buffer)
     {
-      sorted_index_buffer = g3d->CreateIndexRenderBuffer (
-      	sizeof (unsigned int)*factory->GetTriangleCount()*3,
+      sorted_index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+      	factory->GetTriangleCount()*3,
 	CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
     }
     if (num_sorted_mesh_triangles != factory->GetTriangleCount ())
@@ -1021,8 +1022,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     int i;
     for (i = 0 ; i < num_sorted_mesh_triangles ; i++)
       sorted_mesh_triangles[i] = factory_triangles[triidx[i]];
-    sorted_index_buffer->CopyToBuffer (sorted_mesh_triangles,
-    	sizeof (unsigned int)*num_sorted_mesh_triangles*3);
+    sorted_index_buffer->CopyInto (sorted_mesh_triangles, 
+      num_sorted_mesh_triangles*3);
 
     bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, sorted_index_buffer);
   }
@@ -1175,39 +1176,36 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBu
     if (buffer == CS_BUFFER_POSITION)
     {
       if (!vertex_buffer)
-        vertex_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+        vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+        num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       const csVector3* mesh_vertices = AnimControlGetVertices ();
       if (!mesh_vertices) mesh_vertices = factory->GetVertices ();
-      vertex_buffer->CopyToBuffer (
-        mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
+      vertex_buffer->CopyInto (mesh_vertices, num_mesh_vertices);
       holder->SetRenderBuffer (buffer, vertex_buffer);
       return;
     }
     if (buffer == CS_BUFFER_TEXCOORD0)
     {
       if (!texel_buffer)
-        texel_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC,
+        texel_buffer = csRenderBuffer::CreateRenderBuffer (
+        num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 2, false);
       const csVector2* mesh_texels = AnimControlGetTexels ();
       if (!mesh_texels) mesh_texels = factory->GetTexels ();
-      texel_buffer->CopyToBuffer (
-        mesh_texels, sizeof (csVector2)*num_mesh_vertices);
+      texel_buffer->CopyInto (mesh_texels, num_mesh_vertices);
       holder->SetRenderBuffer (buffer, texel_buffer);
       return;
     }
     if (buffer == CS_BUFFER_NORMAL)
     {
       if (!normal_buffer)
-        normal_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+        normal_buffer = csRenderBuffer::CreateRenderBuffer (
+        num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       const csVector3* mesh_normals = AnimControlGetNormals ();
       if (!mesh_normals) mesh_normals = factory->GetNormals ();
-      normal_buffer->CopyToBuffer (
-        mesh_normals, sizeof (csVector3)*num_mesh_vertices);
+      normal_buffer->CopyInto (mesh_normals, num_mesh_vertices);
       holder->SetRenderBuffer (buffer, normal_buffer);
       return;
     }
@@ -1233,8 +1231,8 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBu
         {
           // Recreate the render buffer only if the new data cannot fit inside
           //  the existing buffer.
-          color_buffer = g3d->CreateRenderBuffer (
-            sizeof (csColor) * num_lit_mesh_colors, 
+          color_buffer = csRenderBuffer::CreateRenderBuffer (
+            num_lit_mesh_colors, 
             do_lighting ? CS_BUF_DYNAMIC : CS_BUF_STATIC,
             CS_BUFCOMP_FLOAT, 3, false);
         }
@@ -1245,8 +1243,7 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBu
           do_lighting ? lit_mesh_colors : static_mesh_colors);
         else
           mesh_colors = do_lighting ? lit_mesh_colors : static_mesh_colors;
-        color_buffer->CopyToBuffer (mesh_colors,
-          sizeof (csColor) * num_lit_mesh_colors);
+        color_buffer->CopyInto (mesh_colors, num_lit_mesh_colors);
       }
       else
       {
@@ -1256,8 +1253,8 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBu
         {
           // Recreate the render buffer only if the new data cannot fit inside
           //  the existing buffer.
-          color_buffer = g3d->CreateRenderBuffer (
-            sizeof (csColor) * factory->GetVertexCount(), CS_BUF_STATIC,
+          color_buffer = csRenderBuffer::CreateRenderBuffer (
+            factory->GetVertexCount(), CS_BUF_STATIC,
             CS_BUFCOMP_FLOAT, 3, false);
         }
         mesh_colors_dirty_flag = false;
@@ -1266,8 +1263,7 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBu
           mesh_colors = AnimControlGetColors (factory->GetColors ());
         else
           mesh_colors = factory->GetColors ();
-        color_buffer->CopyToBuffer (mesh_colors,
-          sizeof (csColor) * factory->GetVertexCount());        
+        color_buffer->CopyInto (mesh_colors, factory->GetVertexCount());        
       }
     }
     holder->SetRenderBuffer (buffer, color_buffer);
@@ -1505,12 +1501,11 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, csR
     if (mesh_vertices_dirty_flag)
     {
       if (!vertex_buffer)
-        vertex_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+        vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+        num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_vertices_dirty_flag = false;
-      vertex_buffer->CopyToBuffer (
-        mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
+      vertex_buffer->CopyInto (mesh_vertices, num_mesh_vertices);
     }
     holder->SetRenderBuffer (buffer, vertex_buffer);
     return;
@@ -1520,12 +1515,11 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, csR
     if (mesh_texels_dirty_flag)
     {
       if (!texel_buffer)
-        texel_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC,
+        texel_buffer = csRenderBuffer::CreateRenderBuffer (
+        num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 2, false);
       mesh_texels_dirty_flag = false;
-      texel_buffer->CopyToBuffer (
-        mesh_texels, sizeof (csVector2)*num_mesh_vertices);
+      texel_buffer->CopyInto (mesh_texels, num_mesh_vertices);
     }
     holder->SetRenderBuffer (buffer, texel_buffer);
     return;
@@ -1535,12 +1529,11 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, csR
     if (mesh_normals_dirty_flag)
     {
       if (!normal_buffer)
-        normal_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+        normal_buffer = csRenderBuffer::CreateRenderBuffer (
+        num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_normals_dirty_flag = false;
-      normal_buffer->CopyToBuffer (
-        mesh_normals, sizeof (csVector3)*num_mesh_vertices);
+      normal_buffer->CopyInto (mesh_normals, num_mesh_vertices);
     }
     holder->SetRenderBuffer (buffer, normal_buffer);
     return;
@@ -1550,12 +1543,12 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, csR
     if (mesh_tangents_dirty_flag)
     {
       if (!tangent_buffer)
-        tangent_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+        tangent_buffer = csRenderBuffer::CreateRenderBuffer (
+        num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3);
       if (!binormal_buffer)
-        binormal_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+        binormal_buffer = csRenderBuffer::CreateRenderBuffer (
+        num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3);
       mesh_tangents_dirty_flag = false;
 
@@ -1565,10 +1558,8 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, csR
         mesh_triangles, num_mesh_vertices, mesh_vertices, mesh_normals, 
         mesh_texels, tangentData, bitangentData);
 
-      tangent_buffer->CopyToBuffer (tangentData, 
-        sizeof (csVector3) * num_mesh_vertices);
-      binormal_buffer->CopyToBuffer (bitangentData, 
-        sizeof (csVector3) * num_mesh_vertices);
+      tangent_buffer->CopyInto (tangentData, num_mesh_vertices);
+      binormal_buffer->CopyInto (bitangentData, num_mesh_vertices);
 
       delete[] tangentData;
     }
@@ -1581,13 +1572,11 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, csR
     if (mesh_triangle_dirty_flag)
     {
       if (!index_buffer)
-        index_buffer = g3d->CreateIndexRenderBuffer (
-        sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_STATIC,
+        index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+        num_mesh_triangles*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 0, num_mesh_vertices - 1);
       mesh_triangle_dirty_flag = false;
-      index_buffer->CopyToBuffer (
-        //ibuf, sizeof (unsigned int)*num_mesh_triangles*3);
-        mesh_triangles, sizeof (unsigned int)*num_mesh_triangles*3);
+      index_buffer->CopyInto (mesh_triangles, num_mesh_triangles*3);
     }
     holder->SetRenderBuffer (buffer, index_buffer);
     return;
