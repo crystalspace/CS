@@ -1273,6 +1273,28 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   return false;
 }
 
+void csGLGraphics3D::PrepareAsRenderTarget (csGLTextureHandle* tex_mm)
+{
+  // Texture was not used as a render target before.
+  // Make some necessary adjustments.
+  if (!tex_mm->was_render_target)
+  {
+    if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
+    {
+      if (ext->CS_GL_SGIS_generate_mipmap)
+      {
+	glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+      }
+      else
+      {
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+	  txtmgr->rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+      }
+    }
+    tex_mm->was_render_target = true;
+  }
+}
+
 void csGLGraphics3D::FinishDraw ()
 {
   SetMirrorMode (false);
@@ -1312,7 +1334,7 @@ void csGLGraphics3D::FinishDraw ()
       tex_mm->Precache ();
       //statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
       // Texture is in tha cache, update texture directly.
-      ActivateTexture (render_target);
+      ActivateTexture (tex_mm);
       /*
         Texture has a keycolor - so we need to deal specially with it
 	to make sure the keycolor gets transparent.
@@ -1350,24 +1372,7 @@ void csGLGraphics3D::FinishDraw ()
       }
       else
       {
-        // Texture was not used as a render target before.
-        // Make some necessary adjustments.
-        if (!tex_mm->was_render_target)
-        {
-          if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
-          {
-            if (ext->CS_GL_SGIS_generate_mipmap)
-            {
-              glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-            }
-            else
-            {
-              glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		txtmgr->rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-            }
-          }
-          tex_mm->was_render_target = true;
-        }
+	PrepareAsRenderTarget (tex_mm);
         glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0, viewheight-txt_h,
           txt_w, txt_h, 0);
       }
@@ -1616,27 +1621,13 @@ void csGLGraphics3D::SetBufferState (csVertexAttrib* attribs,
 
 bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 {
-  /*bool bind = true;
-  if (texunit[unit] == txthandle)
-  {
-    if (texunitenabled[unit])
-      return true;
-    // @@@ Doesn't bind sometimes when it should if the following line
-    // is uncommented.
-    //bind = false;
-  }
-
-  if (bind && texunit[unit])
-    DeactivateTexture (unit);*/
-
   if (ext->CS_GL_ARB_multitexture)
   {
     statecache->SetActiveTU (unit);
   }
   else if (unit != 0) return false;
 
-  csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
-    txthandle->GetPrivateObject ();
+  csGLTextureHandle* gltxthandle = (csGLTextureHandle*)txthandle;
   GLuint texHandle = gltxthandle->GetHandle ();
 
   switch (gltxthandle->target)

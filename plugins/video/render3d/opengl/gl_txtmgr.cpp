@@ -780,6 +780,22 @@ iGraphics2D* csGLTextureHandle::GetCanvas ()
   return canvas;
 }
 
+void csGLTextureHandle::Blit (int x, int y, int width,
+    int height, unsigned char const* data)
+{
+  // @@@ Keycolor not yet supported here!
+  
+  // Activate the texture.
+  Precache ();
+  G3D->ActivateTexture (this);
+  // Make sure mipmapping is ok.
+  G3D->PrepareAsRenderTarget (this);
+  // Do the copy.
+  glTexSubImage2D (GL_TEXTURE_2D, 0, x, y, 
+      width, height,
+      GL_RGBA, GL_UNSIGNED_BYTE, data);
+}
+
 void csGLTextureHandle::Load ()
 {
   if (Handle != 0) return;

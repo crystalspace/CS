@@ -118,6 +118,9 @@ public:
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor () = 0;
 
+  virtual void Blit (int x, int y, int width, int height,
+    unsigned char const* data) { }
+
   ///--------------------- iTextureHandle implementation ----------------------
   SCF_DECLARE_IBASE;
 

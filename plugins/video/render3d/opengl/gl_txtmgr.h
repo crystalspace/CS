@@ -233,6 +233,9 @@ public:
    */
   virtual void GetOriginalDimensions (int& mw, int& mh, int &md);
 
+  virtual void Blit (int x, int y, int width, int height,
+    unsigned char const* data);
+
   /**
    *Sets Texture Target. 
    *This can either be CS_TEXTURE_1D, CS_TEXTURE_2D, CS_TEXTURE_3D, 

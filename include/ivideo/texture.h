@@ -131,6 +131,13 @@ struct iTextureHandle : public iBase
    * CS_TEXTURE_CUBE_POS_Y, etc.
    */
   virtual void SetTextureTarget (int target) = 0;
+
+  /**
+   * Blit a memory block to this texture. Format of the image is RGBA
+   * in bytes. Row by row.
+   */
+  virtual void Blit (int x, int y, int width, int height,
+    unsigned char const* data) = 0;
 #endif // CS_USE_NEW_RENDERER
 
   /// Get the mean color.

@@ -6,12 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Oct-2004
+	- Jorrit added iTextureHandle->Blit() for new renderer. Only the
+	  NR OpenGL renderer implements this. This is a faster way to
+	  update (part of) a texture.
+	- Jorrit modified csProcAnimated to use the new Blit(). This
+	  should speed up JNG images a bit.
+	- Jorrit changed plasma and fire to use the new Blit().
 2-Oct-2004
 	- Rhad improved windows waveout sound driver performance through brute
 	  force threading.
-	- Added an event to trigger buffer filling instead of timeslice based
-	  filling.
-	- Background thread is now set to time critical priority.
+	- Rhad added an event to trigger buffer filling instead of timeslice
+	  based filling.
+	- Rhad: Background thread is now set to time critical priority.
 	- Rhad applied more fixes to software sound renderer.
 	  - Fixed crash when source was deleted while background thread was
 	    reading sound data related to the source.

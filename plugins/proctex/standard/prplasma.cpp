@@ -137,9 +137,6 @@ void csProcPlasma::Animate (csTicks current_time)
 
   int x, y;
 
-  g3d->SetRenderTarget (tex->GetTextureHandle ());
-  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-
   unsigned char* data = new unsigned char[4*mat_w*mat_h];
   uint8 curanim0, curanim1, curanim2, curanim3;
   /// draw texture
@@ -169,10 +166,17 @@ void csProcPlasma::Animate (csTicks current_time)
     curanim2 += lineincr2;
     curanim3 += lineincr3;
   }
+#ifdef CS_USE_NEW_RENDERER
+  tex->GetTextureHandle ()->Blit (0, 0, mat_w, mat_h, data);
+#else
+  g3d->SetRenderTarget (tex->GetTextureHandle ());
+  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
   g2d->Blit (0, 0, mat_w, mat_h, data);
+  g3d->FinishDraw ();
+#endif
+
   delete[] data;
 
-  g3d->FinishDraw ();
   anims0 += frameincr0;
   anims1 += frameincr1;
   anims2 += frameincr2;
