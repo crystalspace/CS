@@ -29,10 +29,12 @@
  * @{ */
 
 #include "csutil/scf.h"
+#include "ivideo/rendersteps/icontainer.h"
 
 struct iCamera;
 struct iClipper2D;
 struct iSector;
+struct iRenderStep;
 class csRenderView;
 
 /**
@@ -40,26 +42,16 @@ class csRenderView;
  */
 #define CS_DEFAULT_RENDERLOOP_NAME	"*default"
 
-SCF_VERSION (iRenderStep, 0, 0, 1);
-
-struct iRenderStep : public iBase
-{
-//  virtual void Perform (csRenderView* rview, csRenderMeshList* meshes) = 0;
-  virtual void Perform (csRenderView* rview, iSector* sector) = 0;
-};
- 
 SCF_VERSION (iRenderLoop, 0, 0, 3);
 
 /**
  * Render loop.
+ * \remark A render loop also exhibits an iRenderStepContainer interface.
  * \todo Add more step management methods.
  */
-struct iRenderLoop : public iBase
+struct iRenderLoop : public iRenderStepContainer
 {
   virtual void Draw (iCamera* c, iClipper2D* clipper) = 0;
-
-  virtual int AddStep (iRenderStep* step) = 0;
-  virtual int GetStepCount () = 0;
 };
 
 SCF_VERSION (iRenderLoopManager, 0, 0, 2);

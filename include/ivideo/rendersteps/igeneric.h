@@ -20,11 +20,30 @@
 #ifndef __CS_IVIDEO_RENDERSTEPS_IGENERIC_H__
 #define __CS_IVIDEO_RENDERSTEPS_IGENERIC_H__
 
+#include "iutil/strset.h"
+#include "ivideo/render3d.h"
+
 SCF_VERSION (iGenericRenderStep, 0, 0, 1);
 
+/**
+ * A generic render step.
+ */
 struct iGenericRenderStep : public iBase
 {
+  /// Set shader type.
+  virtual void SetShaderType (const char* type) = 0;
+  /// Get shader type.
+  virtual const char* GetShaderType () = 0;
 
+  /// Set Z offset flag.
+  virtual void SetZOffset (bool zOffset) = 0;
+  /// Get Z offset flag.
+  virtual bool GetZOffset () = 0;
+
+  /// Set Z buffer mode.
+  virtual void SetZBufMode (csZBufMode zmode) = 0;
+  /// Get Z buffer mode.
+  virtual csZBufMode GetZBufMode () = 0;
 };
 
 #endif

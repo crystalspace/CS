@@ -26,7 +26,3 @@
 // Plugin stuff
 
 CS_IMPLEMENT_PLUGIN
-
-
-
-

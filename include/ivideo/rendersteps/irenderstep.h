@@ -17,48 +17,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_IVIDEO_RENDERSTEPS_ITEXFACT_H__
-#define __CS_IVIDEO_RENDERSTEPS_ITEXFACT_H__
+#ifndef __CS_IVIDEO_RENDERSTEPS_IRENDERSTEP_H__
+#define __CS_IVIDEO_RENDERSTEPS_IRENDERSTEP_H__
 
-/**\file
- * Render step factory.
- */
+struct iRenderView;
+struct iSector;
 
-/**
- * \addtogroup gfx3d
- * @{ */
- 
-#include "csutil/scf.h"
+SCF_VERSION (iRenderStep, 0, 0, 1);
 
-struct iRenderStep;
-
-SCF_VERSION (iRenderStepFactory, 0, 0, 1);
-
-/**
- * Interface to a render step factory.
- */
-struct iRenderStepFactory : public iBase
+struct iRenderStep : public iBase
 {
-  /**
-   * Create a new render step with the selected parameters.
-   */
-  virtual csPtr<iRenderStep> Create () = 0;
+  virtual void Perform (iRenderView* rview, iSector* sector) = 0;
 };
-
-SCF_VERSION (iRenderStepType, 0, 0, 1);
-
-/**
- * Render step type.
- * Interface used to create instances of iRenderStepFactory.
- */
-struct iRenderStepType : public iBase
-{
-  /**
-   * Create a new instance of a render step factory.
-   */
-  virtual csPtr<iRenderStepFactory> NewFactory() = 0;
-};
-
-/** @} */
 
 #endif

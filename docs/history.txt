@@ -23,6 +23,8 @@ The history order is reversed so that new features are at the top.
 	- res augmented csInitializer::SetupConfigManager() to read user.cfg
 	  again for some backward compatibility. user.cfg has a lower priority
 	  than the platform-specific configuration.
+	- res completed the render loop loader. This includes that the default
+	  render steps have been moved to a plugin.
 10-Jun-2003
         - Philip Wyett eliminated signed/unsigned mismatch warning in
           function csString::SubString ().

@@ -19,16 +19,20 @@
 */
 
 #include "cssysdef.h"
+#include "csengine/renderloop.h"
+
+#ifdef CS_NR_ALTERNATE_RENDERLOOP
+
 #include "cssys/sysfunc.h"
 
 #include "iutil/objreg.h"
-
+#include "iutil/plugin.h"
 #include "iengine/material.h"
-#include "csgfx/rgbpixel.h"
-#include "csengine/renderloop.h"
-#include "csengine/engine.h"
+#include "ivideo/rendersteps/irsfact.h"
+#include "ivideo/rendersteps/igeneric.h"
 
-#ifdef CS_NR_ALTERNATE_RENDERLOOP
+#include "csgfx/rgbpixel.h"
+#include "csengine/engine.h"
 
 void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 {
@@ -39,205 +43,66 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   defaultRenderLoop->Draw (c, view);
 }
 
-//---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE(csLightIteratorRenderStep)
-SCF_IMPLEMENTS_INTERFACE(iRenderStep)
-SCF_IMPLEMENT_IBASE_END
-
-csLightIteratorRenderStep::csLightIteratorRenderStep (csRenderLoop* rl)
+csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 {
-  SCF_CONSTRUCT_IBASE (0);
+  csRef<iRenderLoop> loop = renderLoopManager->Create ();
 
-  csLightIteratorRenderStep::rl = rl;
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+
+  csRef<iRenderStepType> genType =
+    CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.renderloop.step.generic.type",
+      iRenderStepType);
+
+  csRef<iRenderStepFactory> genFact = genType->NewFactory ();
+
+  csRef<iRenderStep> step;
+  csRef<iGenericRenderStep> genStep;
+
+  step = genFact->Create ();
+  loop->AddStep (step);
+  genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
+  
+  genStep->SetShaderType ("ambient");
+  genStep->SetZBufMode (CS_ZBUF_USE);
+  genStep->SetZOffset (true);
+
+  csRef<iRenderStepType> liType =
+    CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.renderloop.step.lightiter.type",
+      iRenderStepType);
+
+  csRef<iRenderStepFactory> liFact = liType->NewFactory ();
+
+  step = liFact->Create ();
+  loop->AddStep (step);
+
+  csRef<iRenderStepContainer> liContainer =
+    SCF_QUERY_INTERFACE (step, iRenderStepContainer);
+
+  step = genFact->Create ();
+  liContainer->AddStep (step);
+
+  genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
+
+  genStep->SetShaderType ("diffuse");
+  genStep->SetZBufMode (CS_ZBUF_TEST);
+  genStep->SetZOffset (false);
+
+  return csPtr<iRenderLoop> (loop);
 }
-
-void csLightIteratorRenderStep::Perform (csRenderView* rview, iSector* sector)
-{
-  iRender3D* r3d = rl->engine->G3D;
-
-  r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, 
-    csVector3 (0, 0, 0));
-
-  iLightList* lights = sector->GetLights();
-
-  int nlights = lights->GetCount();
-
-  while (nlights-- > 0)
-  {
-    iLight* light = lights->Get (nlights);
-    const csVector3 lightPos = light->GetCenter ();
-
-    /* 
-    @@@ material specific diffuse/specular/ambient.
-    Realized as shader variables maybe?
-    */
-    csReversibleTransform camTransR = 
-      rview->GetCamera()->GetTransform();
-    r3d->SetObjectToCamera (&camTransR);
-
-    const csColor& color = light->GetColor ();
-    r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, 
-    csVector3 (color.red, color.green, color.blue));
-
-    r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
-    light->GetAttenuationVector ());
-    r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-    lightPos);
-
-    csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
-    if (rview->TestBSphere (camTransR, lightSphere))
-    {
-      int i;
-      for (i = 0; i < steps.Length(); i++)
-      {
-        steps[i]->Perform (rview, sector);
-      }
-    }
-  }
-}
-
-void csLightIteratorRenderStep::AddStep (iRenderStep* step)
-{
-  steps.Push (step);
-}
-
-//---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE(csGenericRenderStep)
-SCF_IMPLEMENTS_INTERFACE(iRenderStep)
-SCF_IMPLEMENT_IBASE_END
-
-csGenericRenderStep::csGenericRenderStep (csRenderLoop* rl, 
-  csStringID shadertype, bool firstpass, csZBufMode zmode)
-{
-  SCF_CONSTRUCT_IBASE (0);
-
-  csGenericRenderStep::rl = rl;
-
-  csGenericRenderStep::shadertype = shadertype;
-  csGenericRenderStep::firstpass = firstpass;
-  csGenericRenderStep::zmode = zmode;
-}
-
-void csGenericRenderStep::RenderMeshes (iRender3D* r3d,
-                                         iShader* shader, 
-                                         csRenderMesh** meshes, 
-                                         int num)
-{
-  if (num == 0) return;
-
-  iShaderTechnique *tech = shader->GetBestTechnique ();
-
-  for (int p=0; p<tech->GetPassCount (); p++)
-  {
-    iShaderPass *pass = tech->GetPass (p);
-    pass->Activate (0);
-
-    int j;
-    for (j = 0; j < num; j++)
-    {
-      csRenderMesh* mesh = meshes[j];
-
-      pass->SetupState (mesh);
-
-      uint mixsave = mesh->mixmode;
-      uint mixmode = pass->GetMixmodeOverride ();
-      if (mixmode != 0)
-        mesh->mixmode = mixmode;
-
-      rl->engine->G3D->DrawMesh (mesh);
-      mesh->mixmode = mixsave;
-
-      pass->ResetState ();
-    }
-    pass->Deactivate ();
-  }
-}
-
-void csGenericRenderStep::Perform (csRenderView* rview, iSector* sector)
-{
-  iRender3D* r3d = rl->engine->G3D;
-
-  if (firstpass)
-    r3d->EnableZOffset ();
-
-  r3d->SetZMode (zmode);
-
-  iSectorRenderMeshList* meshes = sector->GetRenderMeshes ();
-  int meshnum = meshes->GetCount();
-  CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, meshnum);
-  int numSSM = 0;
-  iShader* shader = 0;
-  iLightList* lights = sector->GetLights();
-
-  int i;
-
-  for (i = 0; i < meshnum; i++)
-  {
-    iMeshWrapper* mw;
-    iVisibilityObject* visobj;
-    csRenderMesh* mesh;
-    bool visible;
-    // @@@Objects outside the light's influence radius are 'lit' as well!
-    //if (!meshes->GetVisible (i, mw, visobj, mesh)) break;
-    meshes->Get (i, mw, visobj, mesh, &visible);
-    if (!visible) continue;
-    /*
-    @@@!!! That should of course NOT be necessary,
-    but otherwise there's some corruption (at least w/ genmesh).
-    Seems that it has some side effect we have to find out.
-    */
-    int n;
-    mw->GetRenderMeshes(n);
-
-    if (!mesh) continue;
-
-    mesh->material->Visit(); // @@@ here?
-    iShader* meshShader = mesh->material->GetMaterialHandle()->GetShader(shadertype);
-    if (meshShader != shader)
-    {
-      RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
-
-      shader = meshShader;
-      numSSM = 0;
-    }
-    sameShaderMeshes[numSSM++] = mesh;
-  }
-  if (numSSM != 0)
-  {
-    RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
-  }
-  if (firstpass)
-    r3d->DisableZOffset ();
-};
 
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(csRenderLoop)
   SCF_IMPLEMENTS_INTERFACE(iRenderLoop)
+  SCF_IMPLEMENTS_INTERFACE(iRenderStepContainer)
 SCF_IMPLEMENT_IBASE_END
 
 csRenderLoop::csRenderLoop (csEngine* engine)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   csRenderLoop::engine = engine;
-
-  csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (engine->object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
-
-  csRef<iRenderStep> tmp;
-  tmp.AttachNew (new csGenericRenderStep (this, 
-    strings->Request("ambient"), true, CS_ZBUF_USE));
-  steps.Push (tmp);
-  csRef<csLightIteratorRenderStep> itstep = 
-    new csLightIteratorRenderStep (this);
-  steps.Push (itstep);
-  tmp.AttachNew (new csGenericRenderStep (this,
-    strings->Request("diffuse"), false, CS_ZBUF_TEST));
-  itstep->AddStep (tmp);
 }
 
 void csRenderLoop::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
@@ -324,7 +189,7 @@ int csRenderLoop::AddStep (iRenderStep* step)
 
 int csRenderLoop::GetStepCount ()
 {
-  return steps.Length ();
+  return steps.Length();
 }
 
 //---------------------------------------------------------------------------

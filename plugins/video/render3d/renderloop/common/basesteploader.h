@@ -24,13 +24,14 @@
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "imap/reader.h"
+#include "imap/services.h"
 #include "csutil/ref.h"
 
-class csBaseRenderStepLoader : public iLoaderPlugin
+class csBaseRenderStepLoader : public iLoaderPlugin, public iComponent
 {
 protected:
   csRef<iObjectRegistry> object_reg;
-
+  csRef<iSyntaxService> synldr;
 public:
   SCF_DECLARE_IBASE;
 
@@ -41,14 +42,6 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
   	iBase* context) = 0;
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csBaseRenderStepLoader);
-
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };  
 
 #endif

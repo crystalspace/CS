@@ -20,6 +20,22 @@
           <class>crystalspace.render3d.</class>
         </requires>
       </class>
+      <class>
+        <name>crystalspace.renderloop.step.lightiter</name>
+        <implementation>csLightIterRSLoader</implementation>
+        <description>Light iterator render loop step</description>
+        <requires>
+          <class>crystalspace.render3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.lightiter.type</name>
+        <implementation>csLightIterRSType</implementation>
+        <description>Light iterator render loop step type</description>
+        <requires>
+          <class>crystalspace.render3d.</class>
+        </requires>
+      </class>
     </classes>
   </scf>
 </plugin>

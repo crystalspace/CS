@@ -17,84 +17,72 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_GENERIC_H__
-#define __CS_GENERIC_H__
+#ifndef __CS_LIGHTITER_H__
+#define __CS_LIGHTITER_H__
 
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
-#include "iengine/light.h"
 #include "iengine/renderloop.h"
 #include "ivideo/rendersteps/irenderstep.h"
-#include "ivideo/rendersteps/igeneric.h"
 #include "ivideo/rendersteps/ilightiter.h"
 #include "ivideo/shader/shader.h"
 
 #include "../common/basesteptype.h"
 #include "../common/basesteploader.h"
+#include "../common/parserenderstep.h"
 
-class csGenericRSType : public csBaseRenderStepType
+class csLightIterRSType : public csBaseRenderStepType
 {
 public:
-  csGenericRSType (iBase* p);
+  csLightIterRSType (iBase* p);
 
   virtual csPtr<iRenderStepFactory> NewFactory();
 };
 
-class csGenericRSLoader : public csBaseRenderStepLoader
+class csLightIterRSLoader : public csBaseRenderStepLoader
 {
+  csRenderStepParser rsp;
+
   csStringHash tokens;
-#define CS_TOKEN_ITEM_FILE "video/render3d/renderloop/stdsteps/generic.tok"
+#define CS_TOKEN_ITEM_FILE "video/render3d/renderloop/stdsteps/lightiter.tok"
 #include "cstool/tokenlist.h"
 
 public:
-  csGenericRSLoader (iBase* p);
+  csLightIterRSLoader (iBase* p);
+
+  virtual bool Initialize (iObjectRegistry* object_reg);
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, 
     iLoaderContext* ldr_context, 	
     iBase* context);
 };
 
-class csGenericRenderStepFactory : public iRenderStepFactory
+class csLightIterRenderStepFactory : public iRenderStepFactory
 {
   csRef<iObjectRegistry> object_reg;
 public:
   SCF_DECLARE_IBASE;
 
-  csGenericRenderStepFactory (iObjectRegistry* object_reg);
+  csLightIterRenderStepFactory (iObjectRegistry* object_reg);
 
   virtual csPtr<iRenderStep> Create ();
 };
 
-class csGenericRenderStep : public iRenderStep, 
-			    public iGenericRenderStep,
-			    public iLightRenderStep
+class csLightIterRenderStep : public iRenderStep, 
+			      public iLightIterRenderStep,
+			      public iRenderStepContainer
 {
 private:
-//  csRenderLoop* rl;
-  csStringID shadertype;
-  bool zOffset;
-  csZBufMode zmode;
-  csRef<iStringSet> strings;
-
-  inline void RenderMeshes (iRender3D* r3d, iShader* shader, 
-    csRenderMesh** meshes, int num);
+  csRefArray<iLightRenderStep> steps;
 public:
   SCF_DECLARE_IBASE;
 
-  csGenericRenderStep (iObjectRegistry* object_reg);
+  csLightIterRenderStep (iObjectRegistry* object_reg);
 
   virtual void Perform (iRenderView* rview, iSector* sector);
-  virtual void Perform (iRenderView* rview, iSector* sector,
-    iLight* light);
 
-  virtual void SetShaderType (const char* type);
-  virtual const char* GetShaderType ();
-
-  virtual void SetZOffset (bool zOffset);
-  virtual bool GetZOffset ();
-
-  virtual void SetZBufMode (csZBufMode zmode);
-  virtual csZBufMode GetZBufMode ();
+  virtual int AddStep (iRenderStep* step);
+  virtual int GetStepCount ();
 };
 
 

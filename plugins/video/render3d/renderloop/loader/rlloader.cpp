@@ -25,6 +25,8 @@
 #include "iengine/renderloop.h"
 #include "imap/services.h"
 #include "ivaria/reporter.h"
+#include "ivideo/rendersteps/irenderstep.h"
+#include "ivideo/rendersteps/icontainer.h"
 
 #include "rlloader.h"
 
@@ -66,31 +68,11 @@ bool csRenderLoopLoader::Initialize(iObjectRegistry *object_reg)
 bool csRenderLoopLoader::ParseRenderSteps (iRenderLoop* loop, 
 					   iDocumentNode* node)
 {
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    csStringID id = tokens.Request (child->GetValue ());
-    switch (id)
-    {
-      case XMLTOKEN_STEP:
-	{
-	  csRef<iRenderStep> step = rsp.Parse (object_reg, child);
-	  if (!step)
-	  {
-	    return false;
-	  }
-	  loop->AddStep (step);
-	}
-	break;
-      default:
-	if (synldr) synldr->ReportBadToken (child);
-	return false;
-    }
-  }
+  csRef<iRenderStepContainer> cont =
+    SCF_QUERY_INTERFACE (loop, iRenderStepContainer);
+  if (!cont) return false;
 
-  return true;
+  return rsp.ParseRenderSteps (cont, node);
 }
 
 csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node, 

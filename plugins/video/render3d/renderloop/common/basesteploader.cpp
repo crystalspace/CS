@@ -23,12 +23,8 @@
 
 SCF_IMPLEMENT_IBASE (csBaseRenderStepLoader);
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin);
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent);
-SCF_IMPLEMENT_IBASE_END;
-
-SCF_IMPLEMENT_EMBEDDED_IBASE(csBaseRenderStepLoader::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END;
+SCF_IMPLEMENT_IBASE_END;
 
 csBaseRenderStepLoader::csBaseRenderStepLoader (iBase *p)
 {
@@ -43,6 +39,8 @@ bool csBaseRenderStepLoader::Initialize(iObjectRegistry *object_reg)
 {
   csBaseRenderStepLoader::object_reg = object_reg;
 
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  
   return true;
 }
 

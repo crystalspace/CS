@@ -24,6 +24,7 @@
 #include "iutil/plugin.h"
 #include "iengine/engine.h"
 #include "iengine/renderloop.h"
+#include "ivideo/rendersteps/irenderstep.h"
 #include "imap/services.h"
 #include "imap/reader.h"
 #include "ivaria/reporter.h"
@@ -32,6 +33,8 @@
 
 bool csRenderStepParser::Initialize(iObjectRegistry *object_reg)
 {
+  tokens.Register ("step", XMLTOKEN_STEP);
+
   csRenderStepParser::object_reg = object_reg;
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   plugmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
@@ -99,3 +102,45 @@ csPtr<iRenderStep> csRenderStepParser::Parse (
 
   return csPtr<iRenderStep> (step);
 }
+
+bool csRenderStepParser::ParseRenderSteps (iRenderStepContainer* container, 
+					   iDocumentNode* node)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    csStringID id = tokens.Request (child->GetValue ());
+    switch (id)
+    {
+      case XMLTOKEN_STEP:
+	{
+	  csRef<iRenderStep> step = Parse (object_reg, child);
+	  if (!step)
+	  {
+	    return false;
+	  }
+	  int idx;
+	  if ((idx = container->AddStep (step)) < 0)
+	  {
+	    if (synldr)
+	    {
+	      synldr->ReportError (
+		"crystalspace.renderloop.steps.parser",
+		node,
+		"Render step container refused to add step. (%d)",
+		idx);
+	    }					  
+	  }
+	}
+	break;
+      default:
+	if (synldr) synldr->ReportBadToken (child);
+	return false;
+    }
+  }
+
+  return true;
+}
+

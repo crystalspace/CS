@@ -57,7 +57,7 @@ SRC.RLSSTD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/*.cpp)) \
   $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/../common/basestepfactory.cpp)) \
   $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/../common/basesteploader.cpp)) 
 OBJ.RLSSTD = $(addprefix $(OUT.RLSSTD)/,$(notdir $(SRC.RLSSTD:.cpp=$O)))
-DEP.RLSSTD = CSSYS CSUTIL
+DEP.RLSSTD = CSSYS CSUTIL CSGEOM
 
 OUTDIRS += $(OUT.RLSSTD)
 

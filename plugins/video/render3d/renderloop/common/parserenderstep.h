@@ -20,15 +20,26 @@
 #ifndef __CS_PARSERENDERSTEP_H__
 #define __CS_PARSERENDERSTEP_H__
 
+#include "csutil/strhash.h"
+#include "iutil/plugin.h"
+
 class csRenderStepParser
 {
   csRef<iObjectRegistry> object_reg;
   csRef<iSyntaxService> synldr;
   csRef<iPluginManager> plugmgr;
+
+  csStringHash tokens;
+  enum {
+    XMLTOKEN_STEP
+  };
+
 public:
   bool Initialize(iObjectRegistry *object_reg);
 
   csPtr<iRenderStep> Parse (iObjectRegistry* object_reg,
+    iDocumentNode* node);
+  bool ParseRenderSteps (iRenderStepContainer* container, 
     iDocumentNode* node);
 };
 

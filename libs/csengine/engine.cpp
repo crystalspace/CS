@@ -762,7 +762,7 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
 
 #if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
   renderLoopManager = new csRenderLoopManager (this);
-  defaultRenderLoop = renderLoopManager->Create ();
+  defaultRenderLoop = CreateDefaultRenderLoop ();
   renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
     defaultRenderLoop);
 #endif

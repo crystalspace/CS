@@ -25,7 +25,7 @@
 #include "iutil/objreg.h"
 #include "ivideo/rendersteps/irsfact.h"
 
-class csBaseRenderStepType : public iComponent, iRenderStepType
+class csBaseRenderStepType : public iComponent, public iRenderStepType
 {
 protected:
   csRef<iObjectRegistry> object_reg;
