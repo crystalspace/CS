@@ -9,6 +9,10 @@ chronological order.
 30-Nov-2003
 	- Eric Sunshine clarified and corrected comments in crystal.m4.  Also
 	  cleaned up m4 mis-quoting issues and generally improved formatting.
+	- Eric Sunshine fixed bug in cs-config/Jamfile where it neglected to
+	  export COMPILER.CFLAGS and COMPILER.C++FLAGS to generated cs-config
+	  script, with the result that cs-config's --cflags and -cxxflags
+	  options always returned the empty string.
 28-Nov-2003
 	- Daniel Fryer found a bug in the thing mesh plugin when adding
 	  polygon vertices one at a time. The vertex count was not correctly
