@@ -259,6 +259,12 @@ bool csWinThread::Wait ()
   return true;
 }
 
+void csWinThread::Yield ()
+{
+  if (running) Sleep(0);
+  // not sure about Cygwin here, it should use the Posix sched_yield()
+}
+
 bool csWinThread::Stop ()
 {
   if (running)

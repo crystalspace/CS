@@ -449,6 +449,11 @@ bool csPosixThread::Wait ()
   return !running;
 }
 
+void csPosixThread::Yield ()
+{
+  if (running) sched_yield();
+}
+
 char const* csPosixThread::GetLastError ()
 {
   return lasterr;

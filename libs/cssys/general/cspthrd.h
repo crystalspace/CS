@@ -58,6 +58,11 @@ class csPosixThread : public csThread
   virtual bool Wait ();
 
   /**
+   * Yield Thread frees CPU time if nothing to do.
+   */
+  virtual void Yield ();
+
+  /**
    * Return the last eror description and 0 if there was none.
    */
   virtual char const* GetLastError ();

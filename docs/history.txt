@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Dec-2003
+	 - Andreas Busch added Yield() to csThread for posix and win32.
 19-Dec-2003
 	- Eric Sunshine added the new method
 	  csInitializer::RequestPlugins(csArray<csPluginRequest> const&) to

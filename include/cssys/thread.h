@@ -103,6 +103,11 @@ public:
   virtual bool Wait () = 0;
 
   /**
+   * Yield Thread frees CPU time if nothing to do.
+   */
+  virtual void Yield () = 0;
+
+  /**
    * Return the last error description, else 0 if there was none.
    */
   virtual char const* GetLastError () = 0;
