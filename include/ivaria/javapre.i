@@ -140,9 +140,19 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
 	name  : type name, e.g. "iEngine *"
 	type  : type of pointer
 	clazz : class name, e.g. "net/sourceforge/crystal/iEngine"
+
+	In actual practice, 'ptr' is really of type SwigValueWrapper<csRef<T>>
+	or SwigValueWrapper<csPtr<T>>.  The SwigValueWrapper wrapper is added
+	automatically by Swig and is outside of our control.  SwigValueWrapper
+	has a cast operator which will return csRef<T>& (or csPtr<T>&), which
+	should allow us to assign a SwigValueWrapper to a csRef.
+	Unfortunately, unlike other compilers, however, MSVC considers
+	assignment of SwigValueWrapper to csRef ambiguous, so we must manually
+	invoke SwigValueWrapper's operator T& before actually assigning the
+	value to a csRef.  This hack is noted by "* explicit cast *".
 */
-%define TYPEMAP_OUT_csRef_BODY(ptr, name, type, clazz)
-	csRef<type> ref(ptr);
+%define TYPEMAP_OUT_csRef_BODY(ptr, name, type, wrapper, clazz)
+	csRef<type> ref((wrapper<type>&)ptr); /* explicit cast */
 	$result = _csRef_to_Java(csRef<iBase>(
 		(type *)ref), (void *)(type *)ref, name, clazz, jenv);
 %enddef
@@ -151,7 +161,7 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
 %define TYPEMAP_OUT_csRef(T)
 	%typemap(out) csRef<T>
 	{
-		TYPEMAP_OUT_csRef_BODY($1, #T " *", T, "net/sourceforge/crystal/" #T)
+		TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csRef, "net/sourceforge/crystal/" #T)
 	}
     %typemap(jni) csRef<T> "jobject";
     %typemap(jtype) csRef<T> #T;
@@ -164,7 +174,7 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
 %define TYPEMAP_OUT_csPtr(T)
 	%typemap(out) csPtr<T>
 	{
-		TYPEMAP_OUT_csRef_BODY($1, #T " *", T, "net/sourceforge/crystal/" #T)
+		TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csPtr, "net/sourceforge/crystal/" #T)
 	}
     //%typemap(out) csPtr<T> %{ $result = $1; %}
     %typemap(jni) csPtr<T> "jobject";

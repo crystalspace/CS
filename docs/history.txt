@@ -34,6 +34,11 @@ chronological order.
 	  wkswalkall to build with "Release" or "Debug", not with "Release_NR"
 	  (which is reserved for wksnewrenderer).  Defaulting to "Release_NR"
 	  for the project files used by most people was a Bad Thing.
+	- Eric Sunshine augmented the csRef<T> and csPtr<T> `out' typemaps in
+	  javapre.i, perlpre.i and pythpre.i to work around MSVC complaint
+	  about ambiguous assignment of SwigValueWrapper<csRef<T>> to csRef<T>
+	  (or SwigValueWrapper<csPtr<T>> to csRef<T>).  GCC, on the other hand
+	  did not have a problem such assignments.
 18-Mar-2004
 	- Anders Stenberg changed the terraformer interface a bit (made Sample
 	  functions return pointers to data instead of filling out supplied
