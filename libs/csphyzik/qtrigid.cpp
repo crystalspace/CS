@@ -18,10 +18,12 @@
 
 */
 
+#include <assert.h>
 #include "csphyzik/ctvector.h"
 #include "csphyzik/ctmatrix.h"
 #include "csphyzik/qtrigid.h"
 #include "csphyzik/ctquat.h"
+#include "csphyzik/qtrbconn.h"
 
 ctQuatRigidBody::ctQuatRigidBody(ctVector3 x, real M) {
   mass = M;
@@ -36,7 +38,7 @@ ctQuatRigidBody::ctQuatRigidBody(ctVector3 x, real M) {
   precalculated = false;
 }
 
-int ctQuatRigidBody::get_state(real *sa) {
+int ctQuatRigidBody::get_state(const real *sa) {
   pos[0] = sa[0];
   pos[1] = sa[1];
   pos[2] = sa[2];
@@ -95,6 +97,12 @@ int ctQuatRigidBody::set_delta_state(real *sa) {
   sa[11] = T[1];
   sa[12] = T[2];
   return get_state_size();
+}
+
+ctQuatRigidBodyConnector *ctQuatRigidBody::new_connector(ctVector3 offs) {
+  ctQuatRigidBodyConnector *ret = new ctQuatRigidBodyConnector(this, offs);
+  assert(ret);
+  return ret;
 }
 
 void ctQuatRigidBody::Precalculate() {
