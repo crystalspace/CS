@@ -547,12 +547,12 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygon& poly)
   // Select the right scanline drawing function.
   dscan = NULL;
 
-  int tex_transp, poly_alpha;
-  tex_transp = Scan::texture->get_transparent ();
+  bool tex_transp = Scan::texture->get_transparent ();
+  int poly_alpha;
   poly.polygon->GetAlpha (poly_alpha);
 
   // No texture mapping.
-  if (do_transp && (tex_transp != -1) || poly_alpha)
+  if (do_transp && (tex_transp) || poly_alpha)
     dscan = NULL;    
   else if (gi_pixelbytes == 4)
   {
@@ -910,8 +910,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
   // Select the right scanline drawing function.
   dscan = NULL;
 
-  int tex_transp, poly_alpha;
-  tex_transp = Scan::texture->get_transparent ();
+  bool tex_transp = Scan::texture->get_transparent ();
+  int poly_alpha;
   poly.polygon->GetAlpha (poly_alpha);
 
   if (gi_pixelbytes == 2)
@@ -921,7 +921,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
     {
       if (z_buf_mode == ZBuf_Use)
         dscan = Scan16::draw_scanline_z_buf_map;
-      else if (do_transp && tex_transp != -1)
+      else if (do_transp && tex_transp)
         dscan = Scan16::draw_scanline_transp_map;
       else if (do_transp && poly_alpha)
       {
@@ -1040,7 +1040,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
         }
       }
     }
-    else if (do_transp && tex_transp != -1)
+    else if (do_transp && tex_transp)
     {
       if (Scan::tmap2)
         dscan = Scan::draw_scanline_transp_map;

@@ -49,7 +49,7 @@ csTextureMM::csTextureMM (IImageFile* image)
   t1 = t2 = t3 = t4 = t2d = NULL;
 
   usage = NULL;
-  transp_idx = -1;
+  istransp = false;
 
   ifile = image;
   ifile->AddRef ();
@@ -70,7 +70,7 @@ void csTextureMM::create_blended_mipmap (csTextureManager* tex, unsigned char* b
 {
   if (!ifile) return;
   IImageFile* if2;
-  bool tran = get_transparent () != -1;
+  bool tran = get_transparent ();
   if (tran)
   {
     // Just copy.
@@ -134,7 +134,7 @@ void csTextureMM::create_mipmap_bitmap (csTextureManager* tex, int steps, unsign
 {
   if (!ifile) return;
   IImageFile* if2;
-  bool tran = get_transparent () != -1;
+  bool tran = get_transparent ();
   if (tran || tex->mipmap_nice == MIPMAP_UGLY) ifile->MipMap (steps, &if2);
   else if (tex->mipmap_nice == MIPMAP_DEFAULT) ifile->MipMap (steps, NULL, NULL, &if2);
   else ifile->MipMap (steps, &csTextureManager::mipmap_filter_1, &csTextureManager::mipmap_filter_2, &if2);
@@ -233,10 +233,10 @@ void csTextureMM::free_usage_table ()
 // This function must be called BEFORE color remapping.
 void csTextureMM::set_transparent (int red, int green, int blue)
 {
-  transp_red = red;
-  transp_green = green;
-  transp_blue = blue;
-  transp_idx = 0;
+  transp_color.red = red;
+  transp_color.green = green;
+  transp_color.blue = blue;
+  istransp = true;
 }
 
 csTexture* csTextureMM::get_texture (int lev)

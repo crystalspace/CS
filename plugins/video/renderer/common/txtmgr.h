@@ -54,9 +54,9 @@ protected:
   /// A sorted table with all used colors in the image.
   ImageColorInfo* usage;
   /// Transparent color
-  int transp_red, transp_green, transp_blue;
-  /// Transparent (-1 if not, 0 if transparency used).
-  int transp_idx;
+  RGBPixel transp_color;
+  /// Does color 0 mean "transparent" for this texture?
+  bool istransp;
   /// Mean color used when texture mapping is disabled.
   csColor mean_color;
   /// Mean color index
@@ -135,12 +135,12 @@ public:
   /// Set the transparent color.
   void set_transparent (int red, int green, int blue);
 
-  /// Get the transparent index (-1 if no transparency, 0 if transparency).
-  int get_transparent () { return transp_idx; }
+  /// Query color 0 status (true - transparent; false - opaque)
+  bool get_transparent () { return istransp; }
 
   /// Get the transparent color
   void get_transparent (int &red, int &green, int &blue)
-  { red = transp_red; green = transp_green; blue = transp_blue; }
+  { red = transp_color.red; green = transp_color.green; blue = transp_color.blue; }
 
   /// Get the mean color index.
   int get_mean_color_idx () { return mean_idx; }

@@ -26,7 +26,7 @@
 
 IMPLEMENT_COMPOSITE_UNKNOWN (csTextureMM, TextureHandle)
 
-IMPLEMENT_GET_PROPERTY (GetTransparent, transp_idx, int, csTextureMM, TextureHandle)
+IMPLEMENT_GET_PROPERTY (GetTransparent, istransp, bool, csTextureMM, TextureHandle)
 IMPLEMENT_GET_PROPERTY (GetMeanColor, mean_idx, int, csTextureMM, TextureHandle)
 IMPLEMENT_GET_PROPERTY (GetNumberOfColors, usage->get_num_colors(), int, csTextureMM, TextureHandle)
  

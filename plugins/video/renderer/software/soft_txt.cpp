@@ -135,19 +135,17 @@ void csTextureMMSoftware::convert_to_internal_global (csTextureManagerSoftware* 
 {
   int s;
   imfile->GetSize (s);
-  RGBPixel* bmsrc;
+  RGBPixel *bmsrc;
   imfile->GetImageData (&bmsrc);
-  int r, g, b;
-  while (s > 0)
-  {
-    r = bmsrc->red;
-    g = bmsrc->green;
-    b = bmsrc->blue;
-    if (transp_idx != -1 && r == transp_red && g == transp_green && b == transp_blue) *bm++ = 0;
-    else *bm++ = tex->find_rgb (r, g, b);
-    bmsrc++;
-    s--;
-  }
+  if (get_transparent ())
+    for (; s > 0; s--, bmsrc++)
+      if (transp_color == *bmsrc)
+        *bm++ = 0;
+      else
+        *bm++ = tex->find_rgb (bmsrc->red, bmsrc->green, bmsrc->blue);
+  else
+    for (; s > 0; s--, bmsrc++)
+      *bm++ = tex->find_rgb (bmsrc->red, bmsrc->green, bmsrc->blue);
 }
 
 void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware* tex,
@@ -157,18 +155,16 @@ void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware* t
   imfile->GetSize (s);
   RGBPixel* bmsrc;
   imfile->GetImageData (&bmsrc);
-  int r, g, b;
-  ULong* bml = (ULong*)bm;
-  while (s > 0)
-  {
-    r = bmsrc->red;
-    g = bmsrc->green;
-    b = bmsrc->blue;
-    if (transp_idx != -1 && r == transp_red && g == transp_green && b == transp_blue) *bml++ = 0;
-    else *bml++ = (r<<16)|(g<<8)|b;
-    bmsrc++;
-    s--;
-  }
+  ULong *bml = (ULong*)bm;
+  if (get_transparent ())
+    for (; s > 0; s--, bmsrc++)
+      if (transp_color == *bmsrc)
+        *bml++ = 0;
+      else
+        *bml++ = (bmsrc->red << 16) | (bmsrc->green << 8) | bmsrc->blue;
+  else
+    for (; s > 0; s--, bmsrc++)
+      *bml++ = (bmsrc->red << 16) | (bmsrc->green << 8) | bmsrc->blue;
 }
 
 void csTextureMMSoftware::convert_to_internal_private (csTextureManagerSoftware* tex,
@@ -177,18 +173,16 @@ void csTextureMMSoftware::convert_to_internal_private (csTextureManagerSoftware*
   int s;
   imfile->GetSize (s);
   RGBPixel* bmsrc;
-  int r, g, b;
   imfile->GetImageData (&bmsrc);
-  while (s > 0)
-  {
-    r = bmsrc->red;
-    g = bmsrc->green;
-    b = bmsrc->blue;
-    if (transp_idx != -1 && r == transp_red && g == transp_green && b == transp_blue) *bm++ = 0;
-    else *bm++ = priv_cmap->find_rgb (r, g, b);
-    bmsrc++;
-    s--;
-  }
+  if (get_transparent ())
+    for (; s > 0; s--, bmsrc++)
+      if (transp_color == *bmsrc)
+        *bm++ = 0;
+      else
+        *bm++ = priv_cmap->find_rgb (bmsrc->red, bmsrc->green, bmsrc->blue);
+  else
+    for (; s > 0; s--, bmsrc++)
+      *bm++ = priv_cmap->find_rgb (bmsrc->red, bmsrc->green, bmsrc->blue);
 }
 
 void csTextureMMSoftware::remap_texture (csTextureManager* new_palette)
@@ -197,14 +191,20 @@ void csTextureMMSoftware::remap_texture (csTextureManager* new_palette)
   csTextureManagerSoftware* psoft = (csTextureManagerSoftware*)new_palette;
 
   if (for_2d ())
-    if (psoft->get_display_depth () == 8) remap_palette_global (psoft, true);
-    else if (psoft->get_display_depth () == 16) remap_texture_16 (psoft);
-    else remap_texture_32 (psoft);
+    if (psoft->get_display_depth () == 8)
+      remap_palette_global (psoft, true);
+    else if (psoft->get_display_depth () == 16)
+      remap_texture_16 (psoft);
+    else
+      remap_texture_32 (psoft);
 
   if (for_3d ())
-    if (psoft->txtMode == TXT_GLOBAL) remap_palette_global (psoft);
-    else if (psoft->txtMode == TXT_24BIT) remap_palette_24bit (psoft);
-    else remap_palette_private (psoft);
+    if (psoft->txtMode == TXT_GLOBAL)
+      remap_palette_global (psoft);
+    else if (psoft->txtMode == TXT_24BIT)
+      remap_palette_24bit (psoft);
+    else
+      remap_palette_private (psoft);
 }
 
 void csTextureMMSoftware::remap_palette_global (csTextureManagerSoftware* new_palette, bool do_2d)
@@ -219,33 +219,32 @@ void csTextureMMSoftware::remap_palette_global (csTextureManagerSoftware* new_pa
   CHK (trans = new int [num_col]);
   for (i = 0 ; i < num_col ; i++)
   {
-    if (get_transparent () != -1 && get_usage(i).red == transp_red &&
-        get_usage(i).green == transp_green && get_usage(i).blue == transp_blue)
+    if (get_transparent () && (transp_color == get_usage (i)))
       trans[i] = 0;
     else
-      trans[i] = ((csTextureManagerSoftware*)new_palette)->find_rgb (get_usage(i).red, get_usage(i).green,
-                                                          get_usage(i).blue);
+      trans[i] = ((csTextureManagerSoftware*)new_palette)->find_rgb
+        (get_usage (i).red, get_usage (i).green, get_usage (i).blue);
   }
 
-  int w, h;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
   RGBPixel* src;
   ifile->GetImageData (&src);
 
-  unsigned char* dest;
-  if (do_2d) dest = t2d->get_bitmap8 ();
-  else dest = t1->get_bitmap8 ();
+  unsigned char *dest, *last;
+  if (do_2d)
+    dest = t2d->get_bitmap8 ();
+  else
+    dest = t1->get_bitmap8 ();
+  int size;
+  ifile->GetSize (size);
+  last = dest + size;
 
-  int x, y;
-  for (y = 0 ; y < h ; y++)
-    for (x = 0 ; x < w ; x++)
-    {
-      for (i = 0 ; i < num_col ; i++)
-        if (src->red == get_usage(i).red && src->green == get_usage(i).green && src->blue == get_usage(i).blue) break;
-      *dest++ = trans[i];
-      src++;
-    }
+  for (; dest < last; dest++, src++)
+  {
+    for (i = 0 ; i < num_col ; i++)
+      if (*src == get_usage(i))
+        break;
+    *dest = trans[i];
+  }
 
   CHK (delete [] trans);
 }
@@ -253,7 +252,8 @@ void csTextureMMSoftware::remap_palette_global (csTextureManagerSoftware* new_pa
 void csTextureMMSoftware::remap_palette_private (csTextureManagerSoftware* new_palette)
 {
   compute_color_usage ();
-  if (!usage) return;
+  if (!usage)
+    return;
 
   int* trans;
   int num_col = usage->get_num_colors ();
@@ -290,15 +290,11 @@ void csTextureMMSoftware::remap_palette_private (csTextureManagerSoftware* new_p
   }
   for (i = 0 ; i < num_col ; i++)
   {
-    if (get_transparent () != -1 && get_usage(i).red == transp_red &&
-        get_usage(i).green == transp_green && get_usage(i).blue == transp_blue)
-      trans[i] = 0;
+    if (get_transparent () && (transp_color == get_usage (i)))
+      trans [i] = 0;
     else
-      trans[i] = priv_cmap->alloc_rgb (
-                     get_usage(i).red,
-                     get_usage(i).green,
-                     get_usage(i).blue,
-                     dist);
+      trans [i] = priv_cmap->alloc_rgb (get_usage(i).red, get_usage(i).green,
+        get_usage(i).blue, dist);
     dist += ddist;
   }
 
@@ -315,7 +311,10 @@ void csTextureMMSoftware::remap_palette_private (csTextureManagerSoftware* new_p
     for (x = 0 ; x < w ; x++)
     {
       for (i = 0 ; i < num_col ; i++)
-        if (src->red == get_usage(i).red && src->green == get_usage(i).green && src->blue == get_usage(i).blue) break;
+        if (src->red == get_usage(i).red
+         && src->green == get_usage(i).green
+         && src->blue == get_usage(i).blue)
+          break;
       *dest++ = trans[i];
       src++;
     }
@@ -324,72 +323,75 @@ void csTextureMMSoftware::remap_palette_private (csTextureManagerSoftware* new_p
 
   // Make a table to convert the private colormap to the global colormap.
   for (i = 0 ; i < num_col ; i++)
-    priv_cmap->priv_to_global[i] = ((csTextureManagerSoftware*)new_palette)->find_rgb (
-                priv_cmap->rgb_values[(i<<2)+0],
-                priv_cmap->rgb_values[(i<<2)+1],
-                priv_cmap->rgb_values[(i<<2)+2]);
+    priv_cmap->priv_to_global[i] =
+      ((csTextureManagerSoftware*)new_palette)->find_rgb (
+         priv_cmap->rgb_values[(i<<2)+0],
+         priv_cmap->rgb_values[(i<<2)+1],
+         priv_cmap->rgb_values[(i<<2)+2]);
 }
 
 void csTextureMMSoftware::remap_palette_24bit (csTextureManagerSoftware*)
 {
   compute_color_usage ();
-  if (!usage) return;
+  if (!usage)
+    return;
 
-  int w, h;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
+  int size;
+  ifile->GetSize (size);
   RGBPixel* src;
   ifile->GetImageData (&src);
-  ULong* dest = t1->get_bitmap32 ();
+  ULong *dest = t1->get_bitmap32 ();
+  ULong *last = dest + size;
 
   // Map the texture to the RGB palette.
-  int x, y;
-  for (y = 0 ; y < h ; y++)
-    for (x = 0 ; x < w ; x++)
-    {
-      *dest++ = (src->red<<16) | (src->green<<8) | src->blue;
-      src++;
-    }
+  for (; dest < last; src++)
+    *dest++ = (src->red << 16) | (src->green << 8) | src->blue;
 }
 
 void csTextureMMSoftware::remap_texture_16 (csTextureManagerSoftware* new_palette)
 {
-  int w, h, r, g, b;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
-  RGBPixel* src;
+  int size;
+  ifile->GetSize (size);
+  RGBPixel *src;
   ifile->GetImageData (&src);
-  UShort* dest = t2d->get_bitmap16 ();
-  int x, y;
-  for (y = 0 ; y < h ; y++)
-    for (x = 0 ; x < w ; x++)
-    {
-      r = src->red;
-      g = src->green;
-      b = src->blue;
-      *dest++ = new_palette->find_color (r, g, b);
-      src++;
-    }
+  UShort *dest = t2d->get_bitmap16 ();
+  UShort *last = dest + size;
+  UShort black = new_palette->get_almost_black ();
+  if (get_transparent ())
+    for (; dest < last; src++, dest++)
+      if (transp_color == *src)
+        *dest = 0;
+      else
+      {
+        UShort texel = new_palette->find_color (src->red, src->green, src->blue);
+        *dest = texel ? texel : black;
+      }
+  else
+    for (; dest < last; src++, dest++)
+      *dest = new_palette->find_color (src->red, src->green, src->blue);
 }
 
 void csTextureMMSoftware::remap_texture_32 (csTextureManagerSoftware* new_palette)
 {
-  int w, h, r, g, b;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
+  int size;
+  ifile->GetSize (size);
   RGBPixel* src;
   ifile->GetImageData (&src);
-  ULong* dest = t2d->get_bitmap32 ();
-  int x, y;
-  for (y = 0 ; y < h ; y++)
-    for (x = 0 ; x < w ; x++)
-    {
-      r = src->red;
-      g = src->green;
-      b = src->blue;
-      *dest++ = new_palette->find_color (r, g, b);
-      src++;
-    }
+  ULong *dest = t2d->get_bitmap32 ();
+  ULong *last = dest + size;
+  ULong black = new_palette->get_almost_black ();
+  if (get_transparent ())
+    for (; dest < last; src++, dest++)
+      if (transp_color == *src)
+        *dest = 0;
+      else
+      {
+        ULong texel = new_palette->find_color (src->red, src->green, src->blue);
+        *dest = texel ? texel : black;
+      }
+  else
+    for (; dest < last; src++, dest++)
+      *dest = new_palette->find_color (src->red, src->green, src->blue);
 }
 
 //---------------------------------------------------------------------------
@@ -822,19 +824,18 @@ void csTextureManagerSoftware::create_lt_palette ()
   lt_palette_table = lt_pal->true_to_pal;
 
   int i;
-  int r, g, b;
 
 #ifdef SLOW_create_lt_palette
-  int tr,tg,tb;
-  for (tr=0; tr<num_red; tr++)
+  int tr, tg, tb, r, g, b;
+  for (tr = 0; tr < num_red; tr++)
   {
-    for (tg=0; tg<num_green; tg++)
+    for (tg = 0; tg < num_green; tg++)
     {
-      for (tb=0; tb<num_blue; tb++)
+      for (tb = 0; tb < num_blue; tb++)
       {
-        r = tr<<(8-pfmt.RedBits);
-        g = tg<<(8-pfmt.GreenBits);
-        b = tb<<(8-pfmt.BlueBits);
+        r = tr << (8 - pfmt.RedBits);
+        g = tg << (8 - pfmt.GreenBits);
+        b = tb << (8 - pfmt.BlueBits);
         lt_palette_table[encode_rgb (r,g,b)] = find_rgb_slow(r, g, b);
       }
     }
@@ -864,12 +865,7 @@ void csTextureManagerSoftware::create_lt_palette ()
 #endif
 
   for (i = 0 ; i < 256 ; i++)
-  {
-    r = pal[i].red;
-    g = pal[i].green;
-    b = pal[i].blue;
-    lt_pal->pal_to_true[i] = encode_rgb (r, g, b);
-  }
+    lt_pal->pal_to_true[i] = encode_rgb (pal[i].red, pal[i].green, pal[i].blue);
 }
 
 void csTextureManagerSoftware::compute_palette ()
@@ -901,28 +897,24 @@ void csTextureManagerSoftware::compute_palette ()
       csTextureMMSoftware* txt = (csTextureMMSoftware*)textures[t];
       if (i < txt->get_num_colors ())
       {
-        alloc_rgb (
-                     txt->get_usage (i).red,
-                     txt->get_usage (i).green,
-                     txt->get_usage (i).blue,
-                     prefered_dist);
+        alloc_rgb (txt->get_usage (i).red,
+                   txt->get_usage (i).green,
+                   txt->get_usage (i).blue,
+                   prefered_dist);
         if (!truecolor && mixing == MIX_TRUE_RGB)
         {
-          alloc_rgb (
-                       txt->get_usage (i).red+dist,
-                       txt->get_usage (i).green,
-                       txt->get_usage (i).blue,
-                       prefered_col_dist);
-          alloc_rgb (
-                       txt->get_usage (i).red,
-                       txt->get_usage (i).green+dist,
-                       txt->get_usage (i).blue,
-                       prefered_col_dist);
-          alloc_rgb (
-                       txt->get_usage (i).red,
-                       txt->get_usage (i).green,
-                       txt->get_usage (i).blue+dist,
-                       prefered_col_dist);
+          alloc_rgb (txt->get_usage (i).red + dist,
+                     txt->get_usage (i).green,
+                     txt->get_usage (i).blue,
+                     prefered_col_dist);
+          alloc_rgb (txt->get_usage (i).red,
+                     txt->get_usage (i).green + dist,
+                     txt->get_usage (i).blue,
+                     prefered_col_dist);
+          alloc_rgb (txt->get_usage (i).red,
+                     txt->get_usage (i).green,
+                     txt->get_usage (i).blue + dist,
+                     prefered_col_dist);
         }
       }
     }
@@ -1193,13 +1185,19 @@ void csTextureManagerSoftware::compute_light_tables ()
 
   if (verbose) SysPrintf (MSG_INITIALIZATION, "Computing all needed tables...\n");
 
-  if (txtMode == TXT_PRIVATE) create_lt_truergb_private ();
-  else if (mixing == MIX_TRUE_RGB) create_lt_truergb ();
-  if (truecolor) create_lt_white16 ();
-  else create_lt_white8 ();
-  if (!truecolor) create_lt_alpha ();
+  if (txtMode == TXT_PRIVATE)
+    create_lt_truergb_private ();
+  else if (mixing == MIX_TRUE_RGB)
+    create_lt_truergb ();
+  if (truecolor)
+    create_lt_white16 ();
+  else
+    create_lt_white8 ();
+  if (!truecolor)
+    create_lt_alpha ();
 
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE\n");
+  if (verbose)
+    SysPrintf (MSG_INITIALIZATION, "DONE\n");
 }
 
 void csTextureManagerSoftware::alloc_palette ()
@@ -1233,6 +1231,34 @@ void csTextureManagerSoftware::alloc_palette ()
     white_color = 255;
     black_color = 0;
   }
+}
+
+int csTextureManagerSoftware::get_almost_black ()
+{
+  // Since color 0 is used for transparent, prepare an "almost-black"
+  // color to use instead of opaque black texels.
+  switch (pfmt.PixelBytes)
+  {
+    case 1:
+      // find_color cares about color 0 in 8-bit mode
+      return find_color (0, 0, 0);
+    case 2:
+    {
+      // Since the green channel usually has most bits (in all of
+      // 5:5:5, 5:6:5 and 6:6:4 encodings), set a "1" in the LSB
+      // of that channel and rest bits to zero
+      return (1 << pfmt.GreenShift);
+    }
+    case 4:
+    {
+      // Since the human eye is less sensible to blue than to
+      // other colors, we set a 1 in LSB of blue channel, and
+      // all other bits to zero.
+      return (1 << pfmt.BlueShift);
+    }
+  }
+  // huh ?!
+  return 0;
 }
 
 STDMETHODIMP csTextureManagerSoftware::Initialize ()

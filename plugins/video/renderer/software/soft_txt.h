@@ -526,6 +526,9 @@ public:
 	   pil->green[g>>16] |
 	   pil->blue[b>>16];
   }
+
+  /// Query the "almost-black" color used for opaque black in transparent textures
+  int get_almost_black ();
 };
 
 
