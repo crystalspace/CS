@@ -4,6 +4,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine instructed Doxygen to ignore include/volatile.h.  Since
 	  its contents are specific to each person's installation, thus it does
 	  not belong in the generated documentation.
+	- Eric Sunshine changed the jng plugin so that MNG_DLL is defined only
+	  for MSVC.  This was done in preparation for the new csmingwlibs
+	  package.
 27-Feb-2003
 	- res fixed the "shifted alpha map" bug in the software renderer.
 	- Marten Svanfeldt once again fiddled with the light/shadow culling. 

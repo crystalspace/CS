@@ -39,9 +39,6 @@ extern "C"
 #undef INT32
 }
 
-#if !defined(__CYGWIN__)
-#define MNG_DLL
-#endif
 #define MNG_NO_CMS
 #define MNG_SUPPORT_FULL
 #define MNG_ACCESS_CHUNKS
