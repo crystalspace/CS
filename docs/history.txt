@@ -23,6 +23,9 @@ chronological order.
 	  jobber.pl, for instance, which could be fooled into thinking that the
 	  project files were outdated if the wildcard operation returned the
 	  same list of files in different orders on different runs.
+	- Eric Sunshine updated msvcgen/workspaces.jam so that `isotest'
+	  appears only in wksnewrenderer, and not in wkstypical, since it is
+	  specific to the new renderer.
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:

@@ -32,6 +32,7 @@ MsvcGenWorkspace typical : :
   glshader_ps1
   grpnrall
   "grp.+_(?!typical$)"
+  isotest
   nullrender3d
   render3dcommon
   shadermgr
