@@ -1,6 +1,25 @@
 The history order has been reversed so that new features are at the top.
 
 14-Aug-2000
+	- Norman Kramer added sound NULL driver entry.
+	- Norman also made soundloader load on startup.
+	- Norman added section [Driver] to sound.cfg to override the
+	  default sounddriver that is selected.
+	- Norman made DiscardBuffer in isnddata.h pure virtual. Otherwise
+	  sndloader could not be loaded (linker thinks its a real class
+	  otherwise and demands a nonexistant constructor).
+	- Norman added sound entries to mk/user.mak.
+	- Norman added missing isndrdr.h include to OSS driver.
+	- Norman added soundloader makefile. Corrected SCF stuff, and
+	  made Data member in soundwav an unsigned char (in the sound
+	  loaders).
+	- Norman added csgeom to sndsoft.mak makefile and removed all
+	  warnings about float to something conversion.
+        - Norman added overriding of system default sounddriver by the
+	  entry in [Driver] in /config/sound.cfg and made the SoundData
+	  object the parent of soundsource object at creation, thus you
+	  can decref your sounddata object after creation of soundsource
+	  if you dont need it around nowhere else.
 	- Moved call to GetElapsedTime in walktest after the call
 	  to SysSystemDriver::NextFrame(). Otherwise the current time
 	  would not be valid the first time.
@@ -35,6 +54,7 @@ The history order has been reversed so that new features are at the top.
 	  the rendering of the terrain itself it works reasonably well.
 	- Implemented support for fog in terrain engine.
 13-Aug-2000
+	- Martin Geisse committed a big redesign to the sound system.
 	- Fixed a big memory leak in dynamic objects in polygon trees
 	  (i.e. sprites in a STATBSP level). Whenever a sprite moved
 	  it would add six polygons to the bounding box. This ever growing
