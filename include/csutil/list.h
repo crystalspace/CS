@@ -96,6 +96,12 @@ public:
     T *operator->() const
     { return &ptr->data; }
 
+    /// Sets iterator to an invalid element
+    inline void Clear ()
+    {
+      ptr = NULL;
+    }
+
     inline Iterator operator++(int)
     { 
       ptr = ptr->next;
@@ -233,6 +239,9 @@ template <class T> typename csList<T>::Iterator csList<T>::PushFront (const T& i
 template <class T> void csList<T>::Delete (Iterator it)
 {
   csListElement* el = it.ptr;
+
+  if (!el)
+    return;
 
   // Fix the pointers of the 2 surrounding elements
   if (el->prev)
