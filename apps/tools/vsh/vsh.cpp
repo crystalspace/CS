@@ -624,7 +624,7 @@ int main (int argc, char *argv [])
   while (!ShutDown)
   {
     char command [999];
-    csPrintf (CS_ANSI_FI CS_ANSI_FY "%s " CS_ANSI_FI_OFF 
+    csPrintf (CS_ANSI_FI CS_ANSI_FM "%s " CS_ANSI_FI_OFF 
       CS_ANSI_FG "#" CS_ANSI_RST " ", VFS->GetCwd ());
     fflush (stdout);
     if (!fgets (command, sizeof(command), stdin))
