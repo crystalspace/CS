@@ -327,6 +327,20 @@ public:
   	bool is_dynavis);
 
   /**
+   * Clone a document but change flags of all things in the process.
+   */
+  void CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
+  	int op, int minsize, int maxsize, int minpoly, int maxpoly,
+	float global_area);
+
+  /**
+   * Clone a document but change flags of all things in the process.
+   */
+  void CloneAndChangeFlags (iDocument* doc, iDocument* newdoc,
+  	int op, int minsize, int maxsize, int minpoly, int maxpoly,
+	float global_area);
+
+  /**
    * Clone a node and children.
    */
   void CloneNode (iDocumentNode* from, iDocumentNode* to);

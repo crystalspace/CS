@@ -31,6 +31,7 @@
 LevelWriter::LevelWriter ()
     : p3dsFile(NULL), newpointmap(NULL), vectors(NULL), planes(NULL)
 {
+  flags = 0;
   xml = csPtr<csTinyDocumentSystem> (new csTinyDocumentSystem);
 }
 

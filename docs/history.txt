@@ -34,6 +34,12 @@ The history order is reversed so that new features are at the top.
 	  non-bool value for coverage buffer insertion.
 	- Fixed a crash bug in iso engine. An IncRef() was recently
 	  removed.
+	- <goodoccluder> was not parsed correctly.
+	- Implemented -flaggood, -flagbad, and -flagclear options for
+	  levtool. With these options you can control the placement
+	  of <goodoccluder> and <badoccluder> in things. Check out
+	  ./levtool -help for more info on how to use these options.
+	- Javier Santos fixed an initialization bug in 3ds2lev.
 9-Dec-2002
 	- Fixed a bug in Dynavis where it would consider polygons as possible
 	  occluders even if Z very close to 0. This could cause bad overflow.

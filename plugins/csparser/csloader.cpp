@@ -675,6 +675,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("forward", XMLTOKEN_FORWARD);
   xmltokens.Register ("for2d", XMLTOKEN_FOR2D);
   xmltokens.Register ("for3d", XMLTOKEN_FOR3D);
+  xmltokens.Register ("goodoccluder", XMLTOKEN_GOODOCCLUDER);
   xmltokens.Register ("halo", XMLTOKEN_HALO);
   xmltokens.Register ("hardmove", XMLTOKEN_HARDMOVE);
   xmltokens.Register ("heightgen", XMLTOKEN_HEIGHTGEN);

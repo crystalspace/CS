@@ -38,6 +38,21 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
+#define OP_LIST 1
+#define OP_DYNAVIS 2
+#define OP_VALIDATE 3
+#define OP_SPLITUNIT 4
+#define OP_SPLITGEOM 5
+#define OP_SPLITPOLY 6
+#define OP_COMPRESS 7
+#define OP_ANALYZE 8
+#define OP_ANALYZEP 9
+#define OP_FLAGCLEAR 10
+#define OP_FLAGGOOD 11
+#define OP_FLAGBAD 12
+
+//-----------------------------------------------------------------------------
+
 void LevTool::ReportError (const char* description, ...)
 {
   va_list arg;
@@ -1101,6 +1116,115 @@ void LevTool::CloneAndSplitDynavis (iDocument* doc, iDocument* newdoc,
   CloneAndSplitDynavis (root, newroot, is_dynavis);
 }
 
+static int cnt;
+
+void LevTool::CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
+  	int op, int minsize, int maxsize, int minpoly, int maxpoly,
+	float global_area)
+{
+  const char* parentvalue = node->GetValue ();
+
+  bool is_world = !strcmp (parentvalue, "world");
+  bool is_sector = !strcmp (parentvalue, "sector");
+  bool is_meshobj = !strcmp (parentvalue, "meshobj");
+  bool is_root = !strcmp (parentvalue, "");
+  if (!is_root && !is_sector && !is_world && !is_meshobj)
+  {
+    CloneNode (node, newnode);
+    return;
+  }
+
+  // First copy the world or sector name and attributes.
+  newnode->SetValue (node->GetValue ());
+  csRef<iDocumentAttributeIterator> atit = node->GetAttributes ();
+  while (atit->HasNext ())
+  {
+    csRef<iDocumentAttribute> attr = atit->Next ();
+    newnode->SetAttribute (attr->GetName (), attr->GetValue ());
+  }
+
+  bool is_thing = is_meshobj && IsMeshAThing (node);
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    const char* value = child->GetValue ();
+    if (op != OP_FLAGBAD && is_thing && child->GetType () == CS_NODE_ELEMENT &&
+    	!strcmp (value, "goodoccluder"))
+    {
+    }
+    else if (op != OP_FLAGGOOD && is_thing
+    	&& child->GetType () == CS_NODE_ELEMENT &&
+    	!strcmp (value, "badoccluder"))
+    {
+    }
+    else if (child->GetType () == CS_NODE_ELEMENT &&
+    	    ((is_sector && !strcmp (value, "meshobj")) ||
+             (is_root && !strcmp (value, "world")) ||
+             (is_world && !strcmp (value, "sector"))))
+    {
+      csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
+      	child->GetType ());
+      CloneAndChangeFlags (child, newchild, op, minsize, maxsize,
+      	minpoly, maxpoly, global_area);
+    }
+    else
+    {
+      csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
+      	child->GetType ());
+      CloneNode (child, newchild);
+    }
+  }
+  if (is_thing)
+  {
+    ltThing* th = NULL;
+    int i;
+    for (i = 0 ; i < things.Length () ; i++)
+    {
+      th = (ltThing*)things.Get (i);
+      if (th->GetMeshNode ()->Equals (node)) break;
+    }
+
+    if (th->GetPolygonCount () < minpoly || th->GetPolygonCount () > maxpoly)
+      return;
+
+    const csBox3& b = th->GetBoundingBox ();
+    float area = (b.MaxX () - b.MinX ()) *
+		     (b.MaxY () - b.MinY ()) *
+		     (b.MaxZ () - b.MinZ ());
+    area = pow (area, 1./3.);
+    int where = int (100 * (area / global_area));
+    if (where < minsize || where > maxsize)
+      return;
+
+    if (op == OP_FLAGGOOD)
+    {
+      csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
+      	  CS_NODE_ELEMENT);
+      newchild->SetValue ("goodoccluder");
+      cnt++;
+    }
+    else if (op == OP_FLAGBAD)
+    {
+      csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
+      	  CS_NODE_ELEMENT);
+      newchild->SetValue ("badoccluder");
+      cnt++;
+    }
+  }
+}
+
+void LevTool::CloneAndChangeFlags (iDocument* doc, iDocument* newdoc,
+  	int op, int minsize, int maxsize, int minpoly, int maxpoly,
+	float global_area)
+{
+  csRef<iDocumentNode> root = doc->GetRoot ();
+  csRef<iDocumentNode> newroot = newdoc->CreateRoot ();
+  CloneAndChangeFlags (root, newroot, op, minsize, maxsize, minpoly, maxpoly,
+  	global_area);
+}
+
 void LevTool::CloneNode (iDocumentNode* from, iDocumentNode* to)
 {
   to->SetValue (from->GetValue ());
@@ -1284,16 +1408,6 @@ LevTool::~LevTool ()
   }
 }
 
-#define OP_LIST 1
-#define OP_DYNAVIS 2
-#define OP_VALIDATE 3
-#define OP_SPLITUNIT 4
-#define OP_SPLITGEOM 5
-#define OP_SPLITPOLY 6
-#define OP_COMPRESS 7
-#define OP_ANALYZE 8
-#define OP_ANALYZEP 9
-
 //----------------------------------------------------------------------------
 
 // @@@ TODO: support hardmove!
@@ -1337,6 +1451,19 @@ void LevTool::Main ()
     printf ("              for efficiency.\n");
     printf ("              -minsize=<percent>: Only split polygons larger than the given\n");
     printf ("              percentage. Default 20%%.\n");
+    printf ("  -flagclear: Clear all goodoccluder/badoccluder flags.\n");
+    printf ("  -flaggood:  Add goodoccluder flag for all things that satisfy\n");
+    printf ("              conditions defined by the following flags:\n");
+    printf ("              -minsize=<percent>: mimium object size (default 10%%).\n");
+    printf ("              -maxsize=<percent>: maximum object size (default 100%%).\n");
+    printf ("              -minpoly=<number>: minimum number of polygons (default 1).\n");
+    printf ("              -maxpoly=<number>: maximum number of polygons (default 50).\n");
+    printf ("  -flagbad:   Add badoccluder flag for all things that satisfy\n");
+    printf ("              conditions defined by the following flags:\n");
+    printf ("              -minsize=<percent>: mimium object size (default 0%%).\n");
+    printf ("              -maxsize=<percent>: maximum object size (default 3%%).\n");
+    printf ("              -minpoly=<number>: minimum number of polygons (default 6).\n");
+    printf ("              -maxpoly=<number>: maximum number of polygons (default 1000000000).\n");
     exit (0);
   }
 
@@ -1349,14 +1476,43 @@ void LevTool::Main ()
   if (cmdline->GetOption ("splitgeom")) op = OP_SPLITGEOM;
   if (cmdline->GetOption ("splitpoly")) op = OP_SPLITPOLY;
   if (cmdline->GetOption ("compress")) op = OP_COMPRESS;
+  if (cmdline->GetOption ("flagclear")) op = OP_FLAGCLEAR;
+  if (cmdline->GetOption ("flaggood")) op = OP_FLAGGOOD;
+  if (cmdline->GetOption ("flagbad")) op = OP_FLAGBAD;
 
-  int minsize = 20;
+  int minsize, maxsize;
+  int minpoly, maxpoly;
+  switch (op)
+  {
+    case OP_FLAGGOOD:
+      minsize = 10;
+      maxsize = 120;
+      minpoly = 1;
+      maxpoly = 50;
+      break;
+    case OP_FLAGBAD:
+      minsize = 0;
+      maxsize = 3;
+      minpoly = 6;
+      maxpoly = 1000000000;
+      break;
+    default:
+      minsize = 20;
+      maxsize = 120;
+      minpoly = 0;
+      maxpoly = 1000000000;
+      break;
+  }
+
   {
     const char* minsize_arg = cmdline->GetOption ("minsize");
-    if (minsize_arg != NULL)
-    {
-      sscanf (minsize_arg, "%d", &minsize);
-    }
+    if (minsize_arg != NULL) sscanf (minsize_arg, "%d", &minsize);
+    const char* maxsize_arg = cmdline->GetOption ("maxsize");
+    if (maxsize_arg != NULL) sscanf (maxsize_arg, "%d", &maxsize);
+    const char* minpoly_arg = cmdline->GetOption ("minpoly");
+    if (minpoly_arg != NULL) sscanf (minpoly_arg, "%d", &minpoly);
+    const char* maxpoly_arg = cmdline->GetOption ("maxpoly");
+    if (maxpoly_arg != NULL) sscanf (maxpoly_arg, "%d", &maxpoly);
   }
 
   const char* val = cmdline->GetName ();
@@ -1722,6 +1878,42 @@ void LevTool::Main ()
         }
 
 	CloneAndSplitDynavis (doc, newdoc, false);
+        error = newdoc->Write (vfs, filename);
+	if (error != NULL)
+	{
+	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  return;
+	}
+      }
+      break;
+
+    case OP_FLAGBAD:
+    case OP_FLAGGOOD:
+    case OP_FLAGCLEAR:
+      {
+	AnalyzePluginSection (doc);
+	FindAllThings (doc);
+	csRef<iDocument> newdoc = xml->CreateDocument ();
+
+	csBox3 global_bbox;
+	global_bbox.StartBoundingBox ();
+	int i;
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  th->CreateBoundingBox ();
+	  global_bbox += th->GetBoundingBox ();
+	}
+
+	float global_area = (global_bbox.MaxX () - global_bbox.MinX ()) *
+		     (global_bbox.MaxY () - global_bbox.MinY ()) *
+		     (global_bbox.MaxZ () - global_bbox.MinZ ());
+	global_area = pow (global_area, 1./3.);
+
+	cnt = 0;
+	CloneAndChangeFlags (doc, newdoc, op, minsize, maxsize,
+		minpoly, maxpoly, global_area);
+	if (op != OP_FLAGCLEAR) printf ("%d things flagged!\n", cnt);
         error = newdoc->Write (vfs, filename);
 	if (error != NULL)
 	{
