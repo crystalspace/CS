@@ -102,7 +102,6 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Options::
 * Applications::
 * Tutorials::
-* Concepts::
 * Anatomy:: Project Anatomy
 * Libraries::
 * Plug-In Drivers:: Plug-In Modules and Drivers
@@ -129,7 +128,6 @@ For a list of available topics, see the
 @imports{options,chapter.txi}
 @imports{apps,chapter.txi}
 @imports{tutorial,chapter.txi}
-@imports{concepts,chapter.txi}
 @imports{anatomy,chapter.txi}
 @imports{libs,chapter.txi}
 @imports{plugins,chapter.txi}

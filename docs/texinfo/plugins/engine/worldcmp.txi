@@ -1,0 +1,83 @@
+@c -*-texinfo-*-
+@node World Components, World File Format, VFS, Anatomy
+@subsection Components of a World
+@cindex World, Components
+
+This section describes the objects used to build a world.  This is useful to
+understand the format of the Crystal Space world file as described in the next
+section.  To understand this you should know the basics of the @ref{Portal
+Engine}.  This section describes the compenents of the world independent from
+the file format, so it is also useful if you want to build a world from within
+your program.
+
+Some objects appear in the world file but are not described here, like the
+@dfn{skydome}.  Rather than being core components of the world as described
+here, such objects are shortcuts for creating complex structures out of the
+core components.
+
+The world is built up from the following objects:
+
+@itemize @bullet
+@item
+@dfn{Sectors}, @dfn{Things} and @dfn{Polygons}.  For details, see the portal
+engine discussion (@pxref{Portal Engine}).  Things are also @dfn{keylist}
+objects (defined below).  There are also @dfn{Curves}, which are similar to
+Things except that they support a special type of @sc{lod} (@dfn{Level of
+Detail}).  All these objects are based on @dfn{Vertices}.
+
+@item
+@dfn{Texture Planes}.  These planes define the complete set of information for
+texture mapping and can be shared by several polygons.  This improves
+performance.
+
+@item
+@emph{Sprites}.  Depending on the structure of your program it is more or less
+useful to define sprites directly in the world file, because your program
+might have little control over them.  You'll then want to use @dfn{Nodes}
+instead.  @xref{3D Sprites}.
+
+@item
+@dfn{Thing Templates} and @dfn{Sprite Templates}.  These templates can be
+shared by several Things or Sprites to save some memory.
+
+@item
+@dfn{Collection Objects}.  These are simply groups of other objects.
+
+@item
+@dfn{Light Sources}.  There are different ways how light is applied to objects
+to increase performance.  @xref{Lighting}.
+
+@item
+@dfn{Keylist objects}.  Keylist objects hold a list of
+@{@var{key},@var{value}@} tuples to describe their behaviour.  Key/value
+tuples are represented by a pair of string.  If you have built levels for
+Quake before, you are probably familiar with this concept from Quake's
+@dfn{Entities}.  There are two types of Keylist objects: @dfn{Things} bind a
+key list to world geometry; and @dfn{Nodes} bind a key list to a single point
+in space.  In theory it is up to your program as to how these key-value tuples
+are interpreted.  However, Crystal Space has set some standards to make life
+easier for level designers and also to make levels as portable as possible
+between different Crystal Space games.  @xref{Keylist Standards}.
+
+@item
+@emph{Particle Systems}. @@@@@@FIXME: @emph{Document this.}
+
+@item
+@@@@@@FIXME: @emph{Anything missing?}
+@end itemize
+
+@anchor{Keylist Standards}
+@subsubheading Keylist Standards
+@cindex Keylist Standards
+
+This section describes some guidelines for key/value tuples in @emph{Things}
+and @emph{Nodes}.
+
+The most important key is the @samp{classname} key.  It tells the program the
+type of an object.  All the following guidelines are set for special object
+classes.  If you don't agree with them, you should use different classnames.
+
+The following classnames are standardized:
+
+@noindent
+@@@@@@FIXME: @emph{Write this.}
