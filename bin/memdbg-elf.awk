@@ -2,9 +2,10 @@
 #
 # This script is intended to extract all useful information from output of
 #
-# nm -f sysv --numeric-sort --debug-syms
+# objdump --stabs
 #
-# command. This is known to work with a.out format.
+# command. This is known to work only with GNU binutils
+# and ELF executable format.
 
 # Function that converts from hexadecimal to decimal
 function hexval (str)
@@ -23,33 +24,19 @@ function hexval (str)
   return val
 }
 
-# Function that removes all spaces at the end of string
-function striplastspc (str)
-{
-  gsub (/[ 	]*$/, "", str)
-  return str
-}
-
-# Function that removes all spaces at the start and end of string
-function stripspc (str)
-{
-  gsub (/^[ 	]*/, "", str)
-  gsub (/[ 	]*$/, "", str)
-  return str
-}
-
 # The startup function that performs initialization
 BEGIN {
-  FS = "|";
+  FS = " ";
   modname = ""; modaddr = -1;
   funname = ""; funaddr = -1;
   labname = ""; labaddr = -1;
+  baseaddr = 0;
 }
 
 # Lines with Type == "SO" contain information about source files
-/\| *SO *\|/{
-  ma = hexval($2)
-  mn = striplastspc($1)
+$2 == "SO" {
+  ma = hexval($5)
+  mn = $7
   if (ma == modaddr)
     modname = modname mn
   else
@@ -58,19 +45,19 @@ BEGIN {
 }
 
 # The lines with Type == "FUN" contain information about functions
-/\| *FUN *\|/{
+$2 == "FUN" {
   if (modaddr != -1)
   {
     printf "S %x %s\n", modaddr, modname
     modaddr = -1
   }
 
-  funaddr = hexval($2)
+  funaddr = hexval($5)
   if (labaddr == funaddr)
     funname = labname
   else
   {
-    funname = striplastspc($1)
+    funname = $7
     if (colidx = index (funname, ":"))
       funname = substr (funname, 1, colidx - 1)
   }
@@ -78,14 +65,15 @@ BEGIN {
 
 # The lines with Type == "SLINE" contain information
 # about source code line addresses
-/\| *SLINE *\|/{
+$2 == "SLINE" {
   if (funaddr != -1)
   {
     printf "F %x %s\n", funaddr, funname
+    baseaddr = funaddr
     funaddr = -1
   }
 
-  addr = hexval($2)
-  line = hexval($5)
+  addr = hexval($5) + baseaddr
+  line = $4
   printf "L %x %d\n", addr, line
 }

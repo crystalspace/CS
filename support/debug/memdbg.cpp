@@ -21,8 +21,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <ctype.h>
-//#include <io.h>
 
 #include "sysdef.h"
 #include "memdbg.h"
@@ -122,7 +120,14 @@ static void output (const char *format, ...)
   va_end (args);
 
   if (mdbLog)
-    fprintf (mdbLog, outbuff);
+  {
+    if (fprintf (mdbLog, outbuff) < 0)
+    {
+      // Some runtimes (e.g. DJGPP) closes all opened files before exiting
+      mdbLog = fopen ("memdbg.log", "a");
+      fprintf (mdbLog, outbuff);
+    }
+  }
   else
     printf (outbuff);
 }
@@ -431,7 +436,7 @@ void mdbLoadMap ()
     *eos = 0;
 
     char rectype = *tmp++;
-    address addr;
+    address addr = 0;
     if (rectype != 'O')
     {
       tmp += strspn (tmp, " \t");
@@ -590,7 +595,7 @@ void mdbLoadMap ()
   // Open debugger log file
   if (mdbFlags & MDF_LOGFILE)
   {
-    mdbLog = fopen ("memdbg.log", "w+");
+    mdbLog = fopen ("memdbg.log", "w");
     fprintf (mdbLog, "-------------- Memory debugger session started --------------\n");
   }
   output ("Loaded info on %d source files, %d functions, %d lines of code.\n",

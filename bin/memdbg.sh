@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Usage: memdb.sh [debug-executable] {memdbg-options}
 #
@@ -44,8 +44,35 @@
 # Full throttle:	aslbLfdv
 #
 
+NM=/emx/bin/nm
+
+# Find a tool along the PATH and type an error message if it is not found
+find ( )
+{
+	[ -z "`eval echo \\$$1`" ] && eval $1=`$which $2`
+
+	if [ -z "`eval echo \\$$1`" ]; then
+		echo "ERROR: The $2 tool is required to run this script,"
+		echo "       but cannot be found along your PATH. Either"
+		echo "       set the $1 variable to point to it, or add"
+		echo "       its path to the PATH variable."
+		exit
+	fi
+}
+
+# Find a tool and check if it is a GNU tool
+findgnu ( )
+{
+	find $*
+	if [ -z "`eval \\$$1 --version | grep GNU`" ]; then
+		echo "WARNING: GNU $2 required for this script to work!"
+		echo "         The script will attempt to run existing $1,"
+		echo "         but good results are not guaranteed."
+	fi
+}
+
 if [ -z "$*" ]; then
-	echo "No executable filename given"
+	echo "ERROR: No executable filename given"
 	exit
 fi
 
@@ -53,15 +80,53 @@ mapfile="memdbg.map"
 executable=$1
 shift
 options=$*
-
 [ -z "$options" ] && options="aslbL"
+
+# Some horrible which's will output lots of garbage
+# instead of silently returning an empty string
+which="type -path"
+
+#
+# First some system-specific issues.
+#
+# On ELF systems (Linux, Solaris) debugging symbols are put in a separate
+# .stabs section of executable. Unfortunately, nm does not display the contents
+# of .stabs section, thus we're forced to use GNU objdump on such systems.
+#
+
+findgnu AWK gawk
+
+# Try to find a suitable method for building the map file
+case `uname` in
+	Linux* | Solaris*)
+		find CXXFILT c++filt
+		findgnu OBJDUMP objdump
+		filter="awk -f bin/memdbg-elf.awk"
+		dumpsym="$OBJDUMP --stabs"
+		;;
+	OS/2 | OS2*)
+		find CXXFILT c++filt
+		findgnu NM nm
+		filter="awk -f bin/memdbg.awk"
+		dumpsym="$NM -anf sysv"
+		;;
+	*)
+		# This is supposed to be the most working method
+		CXXFILT=cat
+		findgnu OBJDUMP objdump
+		filter="awk -f bin/memdbg-d.awk"
+		dumpsym="$OBJDUMP --debugging"
+		;;
+esac
 
 # If map file is older than executable, build it
 if [ ! -f $mapfile -o $executable -nt $mapfile ]; then
 	echo "Building map file $mapfile ..."
-	nm --numeric-sort -f sysv --debug-syms --demangle $executable | \
-	awk -f bin/memdbg.awk -v OPTIONS=$options >$mapfile
+	echo "O $options" >$mapfile
+	$dumpsym $executable | $filter | $CXXFILT >>$mapfile
 	echo "done."
 fi
 
+# If executable name contains no path, prepend ./
+[ -z "`echo $executable | grep /`" ] && executable=./$executable
 $executable

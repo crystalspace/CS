@@ -51,7 +51,7 @@ of file name / function name / line number information.
 used to do with the old memory debugger (that used CHK() macros). You just
 work as usual and if you need the memory debugger, you recompile with the
 MEMDBG variable set to 1, for example this way:
-<blockquote><font color="#99FF99">make walk MODE=debug MEMDBG=1</font></blockquote>
+<blockquote><font color="#99FF99">make walk mode=debug MEMDBG=1</font></blockquote>
 This will just compile memdbg.cpp and link all other object files and libraries
 with this one. Linking against this file automatically enables the memory
 debugger.
@@ -72,63 +72,79 @@ case is significant!):
 <b><font color="#33CCFF"><font size=+1>a</font></font></b></dt>
 
 <dd>
-<font color="#99FF99">Fill memory after allocation with garbage?<br>
-This is highly recommended as it is not too expensive but allows to detect
-cases when memory is used without being initialized first.</font></dd>
+<font color="#99FF99">Fill memory after allocation with garbage?</font></dd>
+
+<dd>
+<font color="#99FF99">This is highly recommended as it is not too expensive
+but allows to detect cases when memory is used without being initialized
+first.</font></dd>
 
 <dt>
 <b><font color="#33CCFF"><font size=+1>f</font></font></b></dt>
 
 <dd>
 <font color="#99FF99">Do we want to fill freed memory with garbage and
-leave it non-freed?<br>
-WARNING: This is quite expensive in memory terms!</font></dd>
+leave it non-freed?</font></dd>
+
+<dd>
+<font color="#99FF99">WARNING: This is quite expensive in memory terms!</font></dd>
 
 <dt>
 <b><font color="#33CCFF"><font size=+1>d</font></font></b></dt>
 
 <dd>
 <font color="#99FF99">Do we want debugger breakpoints when detecting serious
-erros?<br>
-The debugger will break inside operator new or delete right before exiting
-back to user program. By stepping a few you can detect the place where
-error occured.</font></dd>
+erros?</font></dd>
+
+<dd>
+<font color="#99FF99">The debugger will break inside operator new or delete
+right before exiting back to user program. By stepping a few you can detect
+the place where error occured.</font></dd>
 
 <dt>
 <b><font color="#33CCFF"><font size=+1>v</font></font></b></dt>
 
 <dd>
 <font color="#99FF99">Do we want memory debugger to print an information
-string each time new or delete is called?<br>
-It is recommended you to redirect stdout when using this flag as output
-to console will immensely slow down your program.</font></dd>
+string each time new or delete is called?</font></dd>
+
+<dd>
+<font color="#99FF99">It is recommended you to redirect stdout when using
+this flag as output to console will immensely slow down your program.</font></dd>
 
 <dt>
 <b><font color="#33CCFF"><font size=+1>s</font></font></b></dt>
 
 <dd>
-<font color="#99FF99">Do we want a summary sheet at the end of program?<br>
-The sheet will list the summary number of memory allocations, memory frees,
-the peak memory consumption and lots of other useful information.</font></dd>
+<font color="#99FF99">Do we want a summary sheet at the end of program?</font></dd>
+
+<dd>
+<font color="#99FF99">The sheet will list the summary number of memory
+allocations, memory frees, the peak memory consumption and lots of other
+useful information.</font></dd>
 
 <dt>
 <b><font color="#33CCFF"><font size=+1>l</font></font></b></dt>
 
 <dd>
 <font color="#99FF99">Do we want a list of unfreed memory blocks at the
-end of program?<br>
-The list will also contain the location where the corresponding memory
-block was allocated.</font></dd>
+end of program?</font></dd>
+
+<dd>
+<font color="#99FF99">The list will also contain the location where the
+corresponding memory block was allocated.</font></dd>
 
 <dt>
 <b><font color="#33CCFF"><font size=+1>b</font></font></b></dt>
 
 <dd>
-<font color="#99FF99">Detect writes past the block bounds?<br>
-This is implemented by allocating slightly bigger blocks than actually
-requested, and by filling those inter-block spaces with some well-known
-value. When block is freed, the space between blocks is checked to contains
-same well-known value.</font></dd>
+<font color="#99FF99">Detect writes past the block bounds?</font></dd>
+
+<dd>
+<font color="#99FF99">This is implemented by allocating slightly bigger
+blocks than actually requested, and by filling those inter-block spaces
+with some well-known value. When block is freed, the space between blocks
+is checked to contains same well-known value.</font></dd>
 
 <dt>
 <b><font color="#33CCFF"><font size=+1>L</font></font></b></dt>
@@ -169,7 +185,12 @@ If you get such text:
 |&nbsp;&nbsp;&nbsp;&nbsp; 239|&nbsp;&nbsp; 0x87f50|unknown (0x10189)</font></pre>
 </dl>
 This means that the map file is either incorrect, or does not contain location
-information about the above addresses.
+information about the above addresses. However, this does not invalidate
+the usefulness of the memory debugger, it just makes reading of the log
+file more complex. Usually each compiler system provides a way to find
+out the source module and the line number that is closest to given address;
+for GNU set of development tools this is done with the addr2line tool;
+you also can do it with gdb.
 <h2>
 Map file format</h2>
 Map file has a very simple format. Currently the map file is created by
@@ -188,8 +209,10 @@ that line:
 <b><font color="#33CCFF"><font size=+1>O [string]</font></font></b></dt>
 
 <dd>
-<font color="#99FF99">Memory Debugger [O]ptions.<br>
-Example: O aslbL</font></dd>
+<font color="#99FF99">Memory Debugger [O]ptions.</font></dd>
+
+<dd>
+<font color="#99FF99">Example: O aslbL</font></dd>
 
 <dt>
 <b><font color="#33CCFF"><font size=+1>S [hexnum] [string]</font></font></b></dt>
@@ -197,8 +220,10 @@ Example: O aslbL</font></dd>
 <dd>
 <font color="#99FF99">[S]ource module start. The [hexnum] parameter defines
 the start address of the object module in hexadecimal; the [string] is
-just the source file name.<br>
-Example: S 10038 /home/andy/CS/memdbg/test.cpp</font></dd>
+just the source file name.</font></dd>
+
+<dd>
+<font color="#99FF99">Example: S 10038 /home/andy/CS/memdbg/test.cpp</font></dd>
 
 <dt>
 <b><font color="#33CCFF"><font size=+1>F [hexnum] [string]</font></font></b></dt>
@@ -216,8 +241,10 @@ the hexadecimal function address; the [string] is the function name.</font></dd>
 <dd>
 <font color="#99FF99">This denotes a line number. The [hexnum] parameter
 is the hexadecimal address of the line, the [decnum] is the line number
-(in decimal).<br>
-Example: L 10071 11</font></dd>
+(in decimal).</font></dd>
+
+<dd>
+<font color="#99FF99">Example: L 10071 11</font></dd>
 
 <dt>
 <b><font color="#33CCFF"><font size=+1>D [hexnum] [hexnum] A|F</font></font></b></dt>
@@ -228,9 +255,8 @@ by memdbg.sh script, it is inserted manually by you using a editor. The
 first hexadecimal number is the address of memory block, the second is
 the address inside your executable, A or F means to invoke a debug breakpoint
 either during allocation of free of that block. On x86 this is the `int
-3' instruction.<br>
-This feature can be used to track very specific bugs... I'll let your imagination
-work here :-)</font></dd>
+3' instruction. This feature can be used to track very specific bugs...
+I'll let your imagination work here :-)</font></dd>
 
 <dd>
 <font color="#99FF99">Example: D 32b70 10370 A</font></dd>
@@ -246,10 +272,27 @@ Here are some technical details about the functioning of the memory debugger.
 This can help understand you more detailed how it works, and I think this
 can help you use the debugger in a more productive fashion (also it will
 help you to not expect wonders from memory debugger :-)
+<br>In each new() or delete() call, we check whenever we have been initialized.
+If not, we call the initialization function that parses the .map file,
+sets the debugging options and so on. When program exits (this is done
+by declaring a dummy static variable at the very end of memory debugger
+module and the shutdown function being called from his destructor) the
+memory debugger checks for unfreed memory block, displays statistics and
+so on.
 <br>The only trick used in memory debugger is used to get the address from
-where new/delete has been called. All CPUs that I know of (except maybe
-IBM 360/370 :-) use a stack for passing arguments, and the same stack is
-used to push the return address. Since all machines uses a top-to-bottom
+where new/delete has been called.&nbsp;<b> </b>This is a processor-dependent
+issue, alas we can't do it in a platform-independent way. To support doing
+this on different platforms we define a macro called <b>GET_CALL_ADDRESS(x).
+</b>We
+pass the first argument of the procedure we're invoking <b>GET_CALL_ADDRESS</b>
+from and we get the address from were we were called in a variable called
+<b>'addr'.
+</b>Here
+are details on how we're doing it on different platforms:
+<h3>
+Intel x86</h3>
+These processors use a stack for passing arguments, and the same stack
+is used to push the return address. Since all machines uses a top-to-bottom
 stack (i.e. stack increases in the direction of lower addresses), and also
 since ANSI C standard requires that the addresses of function arguments
 increase (that is, if you're defining a function void some(int a, int b)
@@ -274,16 +317,22 @@ This is embedded into a macro that looks like this:
 <pre><font color="#99FF99">#define GET_CALL_ADDRESS(firstarg)&nbsp; \
 &nbsp; address addr = ((address *)&amp;firstarg) [-1];</font></pre>
 </dl>
-(`address' is a shortcut for `void *' type). In the case that on some machine
-getting the return address is somewhat different, we'll have to define
-a different GET_CALL_ADDRESS macro and nothing more.
-<br>In each new() or delete() call, we check whenever we have been initialized.
-If not, we call the initialization function that parses the .map file,
-sets the debugging options and so on. When program exits (this is done
-by declaring a dummy static variable at the very end of memory debugger
-module and the shutdown function being called from his destructor) the
-memory debugger checks for unfreed memory block, displays statistics and
-so on.</dl>
+(`address' is a shortcut for `void *' type).
+<h3>
+An almost cross-platform solution</h3>
+Fortunately for us, GCC versions above 2.8.0 have a extremely useful for
+our goals built-in function called __builtin_return_address. If we invoke
+it with the (0) argument, it returns right what we need: the address from
+where our procedure was called. Thus, an almost-cross-platform <b>GET_CALL_ADDRESS</b>
+is implemented this way:
+<dl>
+<pre><font color="#99FF99">#if (__GNUC__ >= 2) &amp;&amp; (__GNUC_MINOR__ >= 8)
+#&nbsp; define GET_CALL_ADDRESS(firstarg)&nbsp; \
+&nbsp;&nbsp;&nbsp;&nbsp; address addr = (address)__builtin_return_address (0);
+#endif</font></pre>
+</dl>
+Thus, if you can't get memdbg to work, you should find a newer GCC; this
+should always help.</dl>
 
 </body>
 </html>

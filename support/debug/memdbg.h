@@ -53,7 +53,7 @@ typedef void *address;
 #endif
 
 /**
- * This is a trick that should work on most platforms.
+ * This is a trick that should work on many platforms.
  * Since the standard C calling convention says that the address of
  * function arguments should increase from first to last argument, we
  * suppose that the previous machine word on stack contains the return
@@ -63,12 +63,23 @@ typedef void *address;
  * |ret|arg0|arg1|...|
  * +---+----+----+---+
  *
- * By going N bytes backward from the address of arg0 (where N is the
- * size of the address) and taking N bytes we should be able to get the
+ * By going sizeof (address) bytes backward from the address of arg0
+ * and taking the value found there we should be able to get the
  * return address.
+ *
+ * GCC versions above 2.8.0 have a extremely useful function in this
+ * regard. It is fully platform-independent, thus we prefer it over
+ * other methods.
  */
-#define GET_CALL_ADDRESS(firstarg)		\
-  address addr = ((address *)&firstarg) [-1];
+#if (__GNUC__ >= 2) && (__GNUC_MINOR__ >= 8)
+#  define GET_CALL_ADDRESS(firstarg)		\
+     address addr = (address)__builtin_return_address (0);
+#elif defined (PROC_INTEL)
+#  define GET_CALL_ADDRESS(firstarg)		\
+     address addr = ((address *)&firstarg) [-1];
+#else
+#  error "Please define a GET_CALL_ADDRESS macro suitable for your platform!"
+#endif
 
 /******************************************************************************
  ************************* Memory debugger mode flags *************************
