@@ -2,7 +2,7 @@
 
 # test for socklen_t
 cat << EOF > comptest.cpp
-#include <unistd.h>"
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #define BSD_COMP 1
