@@ -72,9 +72,10 @@ public:
 	// change orientation
 	virtual void rotate_around_line( ctVector3 &paxis, real ptheta );
 	ctVector3 get_v(){ return v; }
-	void set_v( const ctVector3 &pv ){ v = pv; }
+  // virtual because v is calculated from P ( momentum ) in rigid bodies
+	virtual void set_v( const ctVector3 &pv );
 	void set_pos( real px, real py, real pz ){ ctVector3 poff( px, py, pz ); RF.set_offset( poff ); }
-	virtual void set_angular_v( const ctVector3 &pw ){ w = pw; }
+  virtual void set_angular_v( const ctVector3 &pw );
 	ctVector3 get_angular_v(){ return w; }
 	
 	ctVector3 get_F(){ return F; }
@@ -105,13 +106,12 @@ public:
 	
 	ctReferenceFrame *get_RF(){ return &RF; }
 
+protected:
 
 	ctVector3 v;
 	ctVector3 w;
-
-protected:
-
-	//!me gotta try to garauntee that this is not modified in the middle
+	
+  //!me gotta try to garauntee that this is not modified in the middle
 	// of an ODE run.......
 	//bool use_ODE;
 	
