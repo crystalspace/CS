@@ -26,34 +26,40 @@ for @file{simple.h}:
 #define __SIMPLE_H__
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 
 struct iEngine;
 struct iLoader;
 struct iGraphics3D;
 struct iKeyboardDriver;
+struct iVirtualClock;
+struct iObjectRegistry;
+struct iEvent;
 struct iSector;
 struct iView;
 
-class Simple : public SysSystemDriver
+class Simple
 @{
-  typedef SysSystemDriver superclass;
 private:
+  iObjectRegistry* object_reg;
   iEngine* engine;
   iLoader* loader;
   iGraphics3D* g3d;
   iKeyboardDriver* kbd;
+  iVirtualClock* vc;
   iSector* room;
   iView* view;
  
+  static bool SimpleEventHandler (iEvent& ev);
+  bool HandleEvent (iEvent& ev);
+  void SetupFrame ();
+  void FinishFrame ();
+
 public:
   Simple ();
-  virtual ~Simple ();
+  ~Simple ();
 
-  virtual bool Initialize (int argc, const char* const argv[],
-    const char *iConfigName);
-  virtual bool HandleEvent (iEvent&);
-  virtual void NextFrame ();
+  bool Initialize (int argc, const char* const argv[]);
+  void Start ();
 @};
 
 #endif // __SIMPLE_H__
@@ -63,7 +69,8 @@ Similarly for @file{simple.cpp}:
 
 @example
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
+#include "iutil/vfs.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
@@ -72,157 +79,63 @@ Similarly for @file{simple.cpp}:
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
+#include "iutil/virtclk.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
+#include "iengine/statlght.h"
 #include "iengine/texture.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
-#include "imesh/object.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
+#include "imesh/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
+#include "ivideo/fontserv.h"
+#include "igraphic/imageio.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
+#include "csutil/cmdhelp.h"
 
 CS_IMPLEMENT_APPLICATION
 
-Simple *System;
+//-----------------------------------------------------------------------------
+
+// The global pointer to simple
+Simple *simple;
 
 Simple::Simple ()
 @{
-  view = NULL;
   engine = NULL;
   loader = NULL;
   g3d = NULL;
   kbd = NULL;
+  vc = NULL;
+  view = NULL;
 @}
 
 Simple::~Simple ()
 @{
-  if (view) view->DecRef ();
+  if (vc) vc->DecRef ();
   if (engine) engine->DecRef ();
   if (loader) loader->DecRef();
   if (g3d) g3d->DecRef ();
   if (kbd) kbd->DecRef ();
+  if (view) view->DecRef ();
+  csInitializer::DestroyApplication (object_reg);
 @}
 
-void Cleanup ()
+void Simple::SetupFrame ()
 @{
-  csPrintf ("Cleaning up...\n");
-  delete System;
-@}
-
-bool Simple::Initialize (int argc, const char* const argv[],
-  const char *iConfigName)
-@{
-  if (!superclass::Initialize (argc, argv, iConfigName))
-    return false;
-
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-  csInitializeApplication (object_reg);
-
-  // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  if (!engine)
-  @{
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"No iEngine plugin!");
-    exit (1);
-  @}
-  engine->IncRef ();
-
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (!loader)
-  @{
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"No iLoader plugin!");
-    exit (1);
-  @}
-  loader->IncRef ();
-
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  if (!g3d)
-  @{
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"No iGraphics3D plugin!");
-    exit (1);
-  @}
-  g3d->IncRef ();
-
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
-  if (!kbd)
-  @{
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"No iKeyboardDriver plugin!");
-    exit (1);
-  @}
-  kbd->IncRef();
-
-  // Open the main system. This will open all the previously
-  // loaded plug-ins.
-  if (!Open ())
-  @{
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"Error opening system!");
-    Cleanup ();
-    exit (1);
-  @}
-
-  // Setup the texture manager
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetVerbose (true);
-
-  // Initialize the texture manager
-  txtmgr->ResetPalette ();
-
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
-	"Simple Crystal Space Application version 0.1.");
-
-  view = new csView (engine, g3d);
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (pos);
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  txtmgr->SetPalette ();
-  return true;
-@}
-
-bool Simple::HandleEvent (iEvent& Event)
-@{
-  if (superclass::HandleEvent (Event))
-    return true;
-
-  if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
-  @{
-    iEventQueue* q =
-      CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
-    return true;
-  @}
-
-  return false;
-@}
-
-void Simple::NextFrame ()
-@{
-  superclass::NextFrame ();
-  // First get elapsed time from the system driver.
-  csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  // First get elapsed time from the virtual clock.
+  csTicks elapsed_time = vc->GetElapsedTicks ();
   
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
@@ -242,60 +155,171 @@ void Simple::NextFrame ()
     c->Move (VEC_BACKWARD * 4 * speed);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (
-      engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-      return;
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+    return;
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+@}
 
-  // Drawing code ends here.
+void Simple::FinishFrame ()
+@{
   g3d->FinishDraw ();
-  // Display the final output.
   g3d->Print (NULL);
 @}
 
-/*---------------*
- * Main function
- *---------------*/
-int main (int argc, char* argv[])
+bool Simple::HandleEvent (iEvent& ev)
 @{
-  srand (time (NULL));
-
-  // Create our main class.
-  System = new Simple ();
-
-  // We want at least the minimal set of plugins
-  System->RequestPlugin (
-    "crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin (
-    "crystalspace.font.server.default:FontServer");
-  System->RequestPlugin (
-    "crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin (
-    "crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin (
-    "crystalspace.engine.3d:Engine");
-  System->RequestPlugin (
-    "crystalspace.level.loader:LevelLoader");
-
-  // Initialize the main system. This will load all needed plug-ins
-  // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   @{
-    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"Error initializing system!");
-    Cleanup ();
-    exit (1);
+    simple->SetupFrame ();
+    return true;
+  @}
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  @{
+    simple->FinishFrame ();
+    return true;
+  @}
+  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
+  @{
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+    @{
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    @}
+    return true;
   @}
 
-  // Main loop.
-  System->Loop ();
+  return false;
+@}
 
-  // Cleanup.
-  Cleanup ();
+bool Simple::SimpleEventHandler (iEvent& ev)
+@{
+  return simple->HandleEvent (ev);
+@}
 
+bool Simple::Initialize (int argc, const char* const argv[])
+@{
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
+
+  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
+  if (!csInitializer::RequestPlugins (object_reg,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_REPORTER,
+	CS_REQUEST_REPORTERLISTENER,
+	CS_REQUEST_END))
+  @{
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple",
+	"Can't initialize plugins!");
+    return false;
+  @}
+
+  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
+  @{
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple",
+	"Can't initialize event handler!");
+    return false;
+  @}
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  @{
+    csCommandLineHelper::Help (object_reg);
+    return false;
+  @}
+
+  // The virtual clock.
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  if (!vc)
+  @{
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple",
+	"Can't find the virtual clock!");
+    return false;
+  @}
+
+  // Find the pointer to engine plugin
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  if (!engine)
+  @{
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple",
+	"No iEngine plugin!");
+    return false;
+  @}
+
+  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  if (!loader)
+  @{
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple",
+    	"No iLoader plugin!");
+    return false;
+  @}
+
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (!g3d)
+  @{
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple",
+    	"No iGraphics3D plugin!");
+    return false;
+  @}
+
+  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  if (!kbd)
+  @{
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple",
+    	"No iKeyboardDriver plugin!");
+    return false;
+  @}
+
+  // Open the main system. This will open all the previously loaded plug-ins.
+  if (!csInitializer::OpenApplication (object_reg))
+  @{
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple",
+    	"Error opening system!");
+    return false;
+  @}
+
+  view = new csView (engine, g3d);
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
+  txtmgr->SetPalette ();
+  return true;
+@}
+
+void Simple::Start ()
+@{
+  csDefaultRunLoop (object_reg);
+@}
+
+/*---------------------------------------------------------------------*
+ * Main function
+ *---------------------------------------------------------------------*/
+int main (int argc, char* argv[])
+@{
+  simple = new Simple ();
+
+  if (simple->Initialize (argc, argv))
+    simple->Start ();
+
+  delete simple;
   return 0;
 @}
 @end example
@@ -325,30 +349,23 @@ the virtual filesystem. To do this we first add the following code
 right before the creation of the view:
 
 @example
-bool Simple::Initialize (int argc, const char* const argv[],
-  const char *iConfigName)
+bool Simple::Initialize (int argc, const char* const argv[])
 @{
   @dots{}
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
-  	"Simple Crystal Space Application version 0.1.");
 
   // Set VFS current directory to the level we want to load.
+  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   VFS->ChDir ("/lev/flarge");
+  VFS->DecRef ();
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple",
     	"Couldn't load level!");
-    Cleanup ();
-    exit (1);
+    return false;
   @}
-
   engine->Prepare ();
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
-  	"Loaded.");
 
   @dots{}
 @end example
@@ -399,10 +416,10 @@ Then add the following somewhere before the creation of the view:
 @example
   // Find the starting position in this level.
   csVector3 pos (0, 0, 0);
-  if (engine->GetCameraPositionCount () > 0)
+  if (engine->GetCameraPositions ()->GetCount () > 0)
   @{
     // There is a valid starting position defined in the level file.
-    iCameraPosition* campos = engine->GetCameraPosition (0);
+    iCameraPosition* campos = engine->GetCameraPositions ()->Get (0);
     room = engine->GetSectors ()->FindByName (campos->GetSector ());
     pos = campos->GetPosition ();
   @}
@@ -415,10 +432,9 @@ Then add the following somewhere before the creation of the view:
   if (!room)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple",
       	"Can't find a valid starting position!");
-    Cleanup ();
-    exit (1);
+    return false;
   @}
 @end example
 
@@ -428,6 +444,13 @@ then the map didn't define a starting position. In that case we will
 assume there is a sector called 'room' and we will start the camera
 at (0,0,0) in that sector. But otherwise we will use the first
 starting position defined in the map.
+
+Then you also have to modify the call to @code{SetOrigin()} so that
+it reads:
+
+@example
+  view->GetCamera ()->GetTransform ().SetOrigin (pos);
+@end example
 
 This is all. After adding this code this application will now load
 the 'flarge' map and display it so you can run around in this level.

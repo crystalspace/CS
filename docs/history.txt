@@ -14,6 +14,9 @@ The history order is reversed so that new features are at the top.
 	- Updated the simple1 tutorial in code to make it look cleaner.
 	- Updated the simple1 tutorial documentation. Simple2 tutorial is
 	  still outdated though.
+	- Updated the simple2 and simpmap tutorials in code similar to
+	  simple1.
+	- Updated the simple2 and simpmap tutorial documentation.
 18-Oct-2001
 	- Michael Voase shifted water and fire proctex down to the basement.
 	- Removed usage of cs_snprintf in cfgfile.cpp and
