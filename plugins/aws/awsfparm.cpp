@@ -1,28 +1,46 @@
+/*
+    Copyright (C) ???
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include <string.h>
+
 #include "cssysdef.h"
 #include "awsfparm.h"
 #include "awsadler.h"
 
-#include <string.h>
+const int awsParmList::INT = 0;
+const int awsParmList::FLOAT = 1;
+const int awsParmList::STRING = 2;
+const int awsParmList::STRINGVECTOR = 3;
+const int awsParmList::RECT = 4;
+const int awsParmList::POINT = 5;
+const int awsParmList::BOOL = 6;
+const int awsParmList::VOPAQUE = 7;
 
-const int awsParmList:: INT = 0;
-const int awsParmList:: FLOAT = 1;
-const int awsParmList:: STRING = 2;
-const int awsParmList:: STRINGVECTOR = 3;
-const int awsParmList:: RECT = 4;
-const int awsParmList:: POINT = 5;
-const int awsParmList:: BOOL = 6;
-const int awsParmList:: VOPAQUE = 7;
-
-SCF_IMPLEMENT_IBASE(awsParmList)
-  SCF_IMPLEMENTS_INTERFACE(iAwsParmList)
+SCF_IMPLEMENT_IBASE (awsParmList)
+  SCF_IMPLEMENTS_INTERFACE (iAwsParmList)
 SCF_IMPLEMENT_IBASE_END
 
 static unsigned long NameToID (const char *name)
 {
   return aws_adler32 (
-      aws_adler32 (0, 0, 0),
-      (unsigned char *)name,
-      strlen (name));
+    aws_adler32 (0, 0, 0),
+    (unsigned char *)name,
+    strlen (name));
 }
 
 awsParmList::awsParmList ()
@@ -32,22 +50,24 @@ awsParmList::awsParmList ()
 
 awsParmList::~awsParmList ()
 {
-  SCF_DESTRUCT_IBASE();
+  SCF_DESTRUCT_IBASE ();
 }
 
 awsParmList::parmItem * awsParmList::FindParm (const char *_name, int type)
 {
-  unsigned long name = NameToID(_name);
-  int i;
+  unsigned long name = NameToID (_name);
 
-  for (i = 0; i < parms.Length(); ++i)
+  int i;
+  for (i = 0; i < parms.Length (); ++i)
   {
     parmItem *item = parms[i];
 
-    if (item->name == name && item->type == type) return item;
+    if (item->name == name && item->type == type)
+      return item;
   }
   return 0;
 }
+
 void awsParmList::Clear ()
 {
   parms.DeleteAll ();
@@ -92,7 +112,7 @@ void awsParmList::AddString (const char *name, const char* value)
 
   pi->name = NameToID (name);
   pi->type = STRING;
-  pi->parm.s = new scfString(value);
+  pi->parm.s = new scfString (value);
 
   parms.Push (pi);
 }
@@ -150,7 +170,6 @@ bool awsParmList::GetInt (const char *name, int *value)
     *value = pi->parm.i;
     return true;
   }
-
   return false;
 }
 
@@ -163,7 +182,6 @@ bool awsParmList::GetFloat (const char *name, float *value)
     *value = pi->parm.f;
     return true;
   }
-
   return false;
 }
 
@@ -176,7 +194,6 @@ bool awsParmList::GetBool (const char *name, bool *value)
     *value = pi->parm.b;
     return true;
   }
-
   return false;
 }
 
@@ -189,7 +206,6 @@ bool awsParmList::GetString (const char *name, iString **value)
     *value = pi->parm.s;
     return true;
   }
-
   return false;
 }
 
@@ -202,7 +218,6 @@ bool awsParmList::GetStringVector (const char *name, iStringArray **value)
     *value = pi->parm.sv;
     return true;
   }
-
   return false;
 }
 
@@ -215,7 +230,6 @@ bool awsParmList::GetRect (const char *name, csRect **value)
     *value = pi->parm.r;
     return true;
   }
-
   return false;
 }
 
@@ -228,7 +242,6 @@ bool awsParmList::GetPoint (const char *name, csPoint **value)
     *value = pi->parm.p;
     return true;
   }
-
   return false;
 }
 
@@ -241,7 +254,5 @@ bool awsParmList::GetOpaque (const char *name, void **value)
     *value = pi->parm.v;
     return true;
   }
-
   return false;
 }
-

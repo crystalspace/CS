@@ -10,6 +10,7 @@ chronological order.
 	- res added the creation of a global string set to InitApplication().
 	  Previously, code to create such string set could be found at multiple
 	  places throughout CS.
+        - Philip Wyett continued a general cleanup of CS code formatting.
 3-Jan-2004
         - Philip Wyett continued a general cleanup of CS code formatting.
 	- Steven Geens fixed a very fatal typo in sprcal3dstate.

@@ -146,7 +146,9 @@ bool awsCmdButton::SetProperty (const char *name, void *parm)
     }
     else
     {
-      if (caption) caption->DecRef ();
+      if (caption)
+        caption->DecRef ();
+
       caption = 0;
     }
     return true;
@@ -175,7 +177,9 @@ bool awsCmdButton::SetProperty (const char *name, void *parm)
     }
     else
     {
-      if (((bool)parm) == is_down) return true;
+      if (((bool)parm) == is_down)
+        return true;
+
       is_down = (bool)parm;
     }
     Invalidate ();
@@ -254,7 +258,7 @@ void awsCmdButton::OnDraw (csRect clip)
         else if (can_raise)
           showing_style = fsRaised;
         else
-        showing_style = fsFlat;
+          showing_style = fsFlat;
       }
       frame_drawer.Draw (frame, showing_style, Window ()->Frame ());
     }
