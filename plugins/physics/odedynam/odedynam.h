@@ -110,14 +110,21 @@ public:
   void Step (float stepsize);
 
   static void NearCallback (void *data, dGeomID o1, dGeomID o2);
-  static int CollideFunction (dGeomID o1, dGeomID o2, int flags,
+  static int CollideMeshMesh (dGeomID mesh1, dGeomID mesh2, int flags,
+  	dContactGeom *contact, int skip);
+  static int CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
+  	dContactGeom *contact, int skip);
+  static int CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   	dContactGeom *contact, int skip);
   static dColliderFn* CollideSelector (int num)
   {
-    if (num==geomclassnum)
-      return &CollideFunction;
-    else
-      return NULL;
+    if (num == geomclassnum)
+      return &CollideMeshMesh;
+    if (num == dBoxClass)
+      return &CollideMeshBox;
+    if (num == dSphereClass)
+      return &CollideMeshSphere;
+    return NULL;
   }
   static void GetAABB (dGeomID g, dReal aabb[6]);
 
@@ -204,16 +211,16 @@ public:
   bool MakeStatic (void);
   bool MakeDynamic (void);
 
-  bool AttachColliderMesh (iPolygonMesh* mesh,
-  	csOrthoTransform& trans, float friction, float density,
+  bool AttachColliderMesh (iMeshWrapper* mesh,
+  	const csOrthoTransform& trans, float friction, float density,
 	float elasticity);
   bool AttachColliderCylinder (float length, float radius,
-  	csOrthoTransform& trans, float friction, float density,
+  	const csOrthoTransform& trans, float friction, float density,
 	float elasticity);
   bool AttachColliderBox (csVector3 size,
-  	csOrthoTransform& trans, float friction, float density,
+  	const csOrthoTransform& trans, float friction, float density,
 	float elasticity);
-  bool AttachColliderSphere (float radius, csVector3 offset,
+  bool AttachColliderSphere (float radius, const csVector3 &offset,
   	float friction, float density, float elasticity);
 
   void SetPosition (const csVector3& trans);

@@ -25,6 +25,8 @@
 #include "ivaria/collider.h"
 #include "igeom/polymesh.h"
 #include "iengine/engine.h"
+#include "imesh/object.h"
+#include "csgeom/obb.h"
 
 #include "odedynam.h"
 
@@ -74,7 +76,7 @@ csODEDynamics::csODEDynamics (iBase* parent)
   object_reg = NULL;
 
   dGeomClass c;
-  c.bytes = sizeof (colliderdata);
+  c.bytes = sizeof (iMeshWrapper *);
   c.collider = &CollideSelector;
   c.aabb = &GetAABB;
   c.aabb_test = 0;
@@ -139,18 +141,18 @@ csReversibleTransform GetGeomTransform (dGeomID id)
 {
   const dReal* pos = dGeomGetPosition (id);
   const dReal* mat = dGeomGetRotation (id);
+  /* Need to use the inverse in this case */
   csMatrix3 rot;
-  rot.m11 = mat[0];	rot.m12 = mat[1];	rot.m13 = mat[2];
-  rot.m21 = mat[4];	rot.m22 = mat[5];	rot.m23 = mat[6];
-  rot.m31 = mat[8];	rot.m32 = mat[9];	rot.m33 = mat[10];
+  rot.m11 = mat[0];	rot.m12 = mat[4];	rot.m13 = mat[8];
+  rot.m21 = mat[1];	rot.m22 = mat[5];	rot.m23 = mat[9];
+  rot.m31 = mat[2];	rot.m32 = mat[6];	rot.m33 = mat[10];
   return csReversibleTransform (rot, csVector3 (pos[0], pos[1], pos[2]));
 }
 
-int csODEDynamics::CollideFunction (dGeomID o1, dGeomID o2, int flags,
+int csODEDynamics::CollideMeshMesh (dGeomID o1, dGeomID o2, int flags,
 	dContactGeom *contact, int skip)
 {
   return 0;
-
   // TODO: Implement collision for meshes 
   // (old code left, but not even close to working)
   /*colliderdata* cd1 = (colliderdata*)dGeomGetClassData (o1);
@@ -202,27 +204,161 @@ int csODEDynamics::CollideFunction (dGeomID o1, dGeomID o2, int flags,
   return i;*/
 }
 
+/* defined in ode */
+extern int dCollideBP (const dxGeom *o1, const dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
+
+CS_TYPEDEF_GROWING_ARRAY(csPolyMeshList, csMeshedPolygon);
+
+int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
+	dContactGeom *outcontacts, int skip)
+{
+  int N = flags & 0xFF;
+
+  // rotate everything so that box is axis aligned.
+  dVector3 sides;
+  dGeomBoxGetLengths (box, sides);
+  // box is symetric.
+  csVector3 aabb(sides[0]/2, sides[1]/2, sides[2]);
+  csBox3 boxbox(aabb, -aabb);
+  csReversibleTransform boxt = GetGeomTransform (box);
+
+  iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
+  if (!m) { return 0; }
+  iPolygonMesh *p = SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh);
+  if (!p) { return 0; }
+  csVector3 *vertex_table = p->GetVertices ();
+  csMeshedPolygon *polygon_list = p->GetPolygons ();
+
+  csReversibleTransform mesht = GetGeomTransform (mesh);
+
+  csPolyMeshList polycollide;
+  // test for overlap
+  int i, j, k;
+  for (i = 0; i < p->GetPolygonCount(); i ++) {
+    csBox3 polybox;
+    for (j = 0; j < polygon_list[i].num_vertices; j ++) {
+      polybox.AddBoundingVertex (boxt * (vertex_table[polygon_list[i].vertices[j]] / mesht));
+    }
+    // aabb poly against aabb box for overlap.
+    // Full collision later will weed out the rest;
+    if (polybox.Overlap (boxbox)) {
+      polycollide.Push (polygon_list[i]);
+    }
+  }
+  int outcount = 0;
+  // the value of N should be large, just in case.
+  for (i = 0; i < polycollide.Length() && outcount < N; i ++) {
+    csPlane3 plane(vertex_table[polycollide[i].vertices[0]] / mesht,
+      vertex_table[polycollide[i].vertices[1]] / mesht,
+      vertex_table[polycollide[i].vertices[2]] / mesht);
+    plane.Normalize ();
+    // dCollideBP only works if box center is on the outside of the plane
+    if (plane.Classify (boxt.GetOrigin()) < 0) {
+      continue;
+    } 
+    dGeomID odeplane = dCreatePlane(0,plane.norm.x, plane.norm.y, plane.norm.z,
+      -plane.DD);
+    dContactGeom tempcontacts[5];
+    int count = dCollideBP (box, odeplane, 5, tempcontacts, sizeof (dContactGeom));
+    dGeomDestroy (odeplane);
+    for (j = 0; j < count; j ++) {
+      dContactGeom *c = &tempcontacts[j];
+      csVector3 contactpos(c->pos[0], c->pos[1], c->pos[2]);
+      // make sure the point lies inside the polygon
+      for (k = 0; k < polycollide[i].num_vertices-1; k ++) {
+        csPlane3 edgeplane(mesht * vertex_table[polycollide[i].vertices[k]] / mesht,
+          mesht * vertex_table[polycollide[i].vertices[k+1]] / mesht,
+          mesht * vertex_table[polycollide[i].vertices[k+1]] / mesht - plane.Normal());
+        edgeplane.Normalize();
+        if (edgeplane.Classify (contactpos) < 0) {
+          c->depth = -1;
+          break;
+        }
+      }
+      if (c->depth >= 0) {
+        dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
+        out->pos[0] = c->pos[0];
+        out->pos[1] = c->pos[1];
+        out->pos[2] = c->pos[2];
+        out->normal[0] = c->normal[0];
+        out->normal[1] = c->normal[1];
+        out->normal[2] = c->normal[2];
+        out->depth = c->depth;
+        out->g1 = mesh;
+        out->g2 = box;
+        outcount ++;
+      }
+    }
+  }
+  return outcount;
+}
+
+int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
+	dContactGeom *outcontacts, int skip)
+{
+  int N = flags & 0xFF;
+  const dReal *pos = dGeomGetPosition (sphere);
+  csVector3 center(pos[0], pos[1], pos[2]);
+  dReal rad = dGeomSphereGetRadius (sphere); 
+  iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
+  if (!m) { return 0; }
+  iPolygonMesh *p = SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh);
+  if (!p) { return 0; }
+  csVector3 *vertex_table = p->GetVertices ();
+  csMeshedPolygon *polygon_list = p->GetPolygons ();
+
+  csReversibleTransform mesht = GetGeomTransform (mesh);
+
+  int outcount = 0;
+  for (int i = 0; i < p->GetPolygonCount() && outcount < N; i ++) {
+    csPlane3 plane(vertex_table[polygon_list[i].vertices[0]] / mesht,
+      vertex_table[polygon_list[i].vertices[1]] / mesht,
+      vertex_table[polygon_list[i].vertices[2]] / mesht);
+    plane.Normalize();
+    if (plane.Classify (center) < 0) {
+      continue;
+    }
+
+    float depth = rad - plane.Distance (center);
+    if (depth < 0) {
+      continue;
+    }
+
+    for (int j = 0; j < polygon_list[i].num_vertices-1; j ++) {
+      csPlane3 edgeplane(vertex_table[polygon_list[i].vertices[j]] / mesht,
+        vertex_table[polygon_list[i].vertices[j+1]] / mesht,
+        vertex_table[polygon_list[i].vertices[j+1]] / mesht - plane.Normal());
+      edgeplane.Normalize();	
+      if (edgeplane.Classify (center) < 0) {
+        depth = -1;
+        break;
+      }
+    }
+    if (depth < 0) {
+      continue;
+    }
+    dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
+    csVector3 cpos = center - (plane.Normal() * rad);
+    out->pos[0] = cpos.x;
+    out->pos[1] = cpos.y;
+    out->pos[2] = cpos.z;
+    out->normal[0] = -plane.Normal().x;
+    out->normal[1] = -plane.Normal().y;
+    out->normal[2] = -plane.Normal().z;
+    out->depth = depth;
+    outcount ++;
+  }
+  return outcount;
+}
+
 void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
 {
-  // TODO: Add a tighter AABB-calculation 
-  //       based on the "real" AABB and the rotation
-  colliderdata* cd = (colliderdata*)dGeomGetClassData (g);
-  dReal dista = sqrt (
-  	cd->aabb[0]*cd->aabb[0]+
-	cd->aabb[2]*cd->aabb[2]+
-	cd->aabb[4]*cd->aabb[4]);
-  dReal distb = sqrt (cd->aabb[1]*cd->aabb[1]+
-  	cd->aabb[3]*cd->aabb[3]+
-	cd->aabb[5]*cd->aabb[5]);
-  dReal max = dista>distb?dista:distb;
-  const dReal* pos = dGeomGetPosition (g);
-
-  aabb[0] = pos[0]-max;
-  aabb[1] = pos[0]+max;
-  aabb[2] = pos[1]-max;
-  aabb[3] = pos[1]+max;
-  aabb[4] = pos[2]-max;
-  aabb[5] = pos[2]+max;
+  iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (g);
+  csBox3 box;
+  m->GetWorldBoundingBox (box);
+  aabb[0] = box.MinX(); aabb[1] = box.MaxX();
+  aabb[2] = box.MinY(); aabb[3] = box.MaxY();
+  aabb[4] = box.MinZ(); aabb[5] = box.MaxZ();
 }
 
 csODEDynamicSystem::csODEDynamicSystem ()
@@ -333,45 +469,60 @@ bool csODERigidBody::MakeDynamic ()
   return true;
 }
 
-bool csODERigidBody::AttachColliderMesh (iPolygonMesh *mesh,
-	csOrthoTransform &trans, float friction, float density,
+bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
+	const csOrthoTransform &trans, float friction, float density,
 	float elasticity)
 {
-  // TODO: Implement this. Left old code
+  dMass m, om;
+  dMassSetZero (&m);
 
+  dGeomID id = dCreateGeomTransform (dynsys->GetSpaceID());
+  dGeomTransformSetCleanup (id, 1);
 
-  /*
-  dGeomID id = dCreateGeom (csODEDynamics::GetGeomClassNum());
+  dGeomID gid = dCreateGeom (csODEDynamics::GetGeomClassNum());
+  // dSpaceAdd (dynsys->GetSpaceID(), gid);
+  iMeshWrapper **gdata = (iMeshWrapper **)dGeomGetClassData (gid);
+  *gdata = mesh;
+  dGeomTransformSetGeom (id, gid);
+
+  csOBB b;
+  iPolygonMesh *p = SCF_QUERY_INTERFACE (mesh->GetMeshObject(), iPolygonMesh);
+  b.FindOBB (p->GetVertices(), p->GetVertexCount());
+  dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(), b.MaxZ()-b.MinZ());
+
+  dMatrix3 mat;
+  mat[0] = b.GetMatrix().m11; mat[1] = b.GetMatrix().m12; mat[2] = b.GetMatrix().m13;
+  mat[3] = b.GetMatrix().m21; mat[4] = b.GetMatrix().m22; mat[5] = b.GetMatrix().m23;
+  mat[6] = b.GetMatrix().m31; mat[7] = b.GetMatrix().m32; mat[8] = b.GetMatrix().m33;
+
+  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
+  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
+  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  dGeomSetRotation (gid, mat);
+  dMassRotate (&m, mat);
+
+  dGeomSetPosition (gid,
+	trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+  dMassTranslate (&m,
+  	trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+  dBodyGetMass (bodyID, &om);
+  dMassAdd (&om, &m);
+
+  dBodySetMass (bodyID, &om);
+  
   dGeomSetBody (id, bodyID);
   ids.Push (id);
-  dGeomGroupAdd (groupID, id);
-  dSpaceAdd (dynsys->GetSpaceID(),id);
 
-  colliderdata* cd = (colliderdata*) dGeomGetClassData (id);
-  *cd = colliderdata (dynsys->GetCollideSystem (),
-  	dynsys->GetCollideSystem ()->CreateCollider (collidermesh), friction);
+  float *f = new float[2];
+  f[0] = friction;
+  f[1] = elasticity;
+  dGeomSetData (id, (void*)f);
 
-  for (int i=0; i<collidermesh->GetVertexCount (); i++)
-  {
-    if (collidermesh->GetVertices()[i].x > cd->aabb[0])
-      cd->aabb[0] = collidermesh->GetVertices()[i].x;
-    if (collidermesh->GetVertices()[i].x < cd->aabb[1])
-      cd->aabb[1] = collidermesh->GetVertices()[i].x;
-    if (collidermesh->GetVertices()[i].y > cd->aabb[2])
-      cd->aabb[2] = collidermesh->GetVertices()[i].y;
-    if (collidermesh->GetVertices()[i].y < cd->aabb[3])
-      cd->aabb[3] = collidermesh->GetVertices()[i].y;
-    if (collidermesh->GetVertices()[i].z > cd->aabb[4])
-      cd->aabb[4] = collidermesh->GetVertices()[i].z;
-    if (collidermesh->GetVertices()[i].z < cd->aabb[5])
-      cd->aabb[5] = collidermesh->GetVertices()[i].z;
-   }
-  */
-  return false;
+  return true;
 }
 
 bool csODERigidBody::AttachColliderCylinder (float length, float radius,
-	csOrthoTransform& trans, float friction, float density,
+	const csOrthoTransform& trans, float friction, float density,
 	float elasticity)
 {
   dMass m, om;
@@ -417,7 +568,7 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
 }
 
 bool csODERigidBody::AttachColliderBox (csVector3 size,
-	csOrthoTransform& trans, float friction, float density,
+	const csOrthoTransform& trans, float friction, float density,
 	float elasticity)
 {
   dMass m, om;
@@ -462,7 +613,7 @@ bool csODERigidBody::AttachColliderBox (csVector3 size,
   return true;
 }
 
-bool csODERigidBody::AttachColliderSphere (float radius, csVector3 offset,
+bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset,
 	float friction, float density, float elasticity)
 {
   dMass m, om;
@@ -875,11 +1026,12 @@ void csODEJoint::BuildJoint ()
         pos = transform.GetOrigin();
         dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
         rot = transform.GetO2T();
-        if (transConstraint[0]) {
+        if (rotConstraint[0]) {
           BuildHinge (rot.Col1(), minAngle.x, maxAngle.x);
-        } else if (transConstraint[1]) {
+        } else if (rotConstraint[1]) {
+printf ("rot.Col2(%f %f %f)\n", rot.Col2().x, rot.Col2().y, rot.Col2().z);
           BuildHinge (rot.Col2(), minAngle.y, maxAngle.y);
-        } else if (transConstraint[2]) {
+        } else if (rotConstraint[2]) {
           BuildHinge (rot.Col3(), minAngle.z, maxAngle.z);
         }
         // TODO: insert some mechanism for bounce, erp and cfm
@@ -891,8 +1043,8 @@ void csODEJoint::BuildJoint ()
         dJointSetHinge2Anchor (jointID, pos.x, pos.y, pos.z);
         rot = transform.GetO2T();
 
-        if (transConstraint[0]) {
-          if (transConstraint[1]) {
+        if (rotConstraint[0]) {
+          if (rotConstraint[1]) {
             BuildHinge2 (rot.Col2(), minAngle.y, maxAngle.y,
              rot.Col1(), minAngle.x, maxAngle.x);
           } else {

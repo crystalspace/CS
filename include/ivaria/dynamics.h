@@ -112,17 +112,17 @@ struct iRigidBody : public iBase
   virtual bool MakeDynamic (void) = 0;
 
   /// Add a collider with a associated friction coefficient
-  virtual bool AttachColliderMesh (iPolygonMesh* mesh,
-  	csOrthoTransform& trans, float friction, float density,
+  virtual bool AttachColliderMesh (iMeshWrapper* mesh,
+  	const csOrthoTransform& trans, float friction, float density,
 	float elasticity) = 0;
   /// Cylinder orientated along its local z axis
   virtual bool AttachColliderCylinder (float length, float radius,
-  	csOrthoTransform& trans, float friction, float density,
+  	const csOrthoTransform& trans, float friction, float density,
 	float elasticity) = 0;
   virtual bool AttachColliderBox (csVector3 size,
-  	csOrthoTransform& trans, float friction, float density,
+  	const csOrthoTransform& trans, float friction, float density,
 	float elasticity) = 0;
-  virtual bool AttachColliderSphere (float radius, csVector3 offset,
+  virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
   	float friction, float density, float elasticity) = 0;
 
   /// Set the position
