@@ -60,14 +60,22 @@ chronological order.
 	  changes.
 	- Jorrit renamed iThingFactoryState->SetTextureMappingEnabled() to
 	  SetPolygonTextureMappingEnabled() to be more consistent.
-	- Jorrit added a new version of iThingFactoryState->SetPolygonFlags() that
-	  also accepts a mask.
+	- Jorrit added a new version of iThingFactoryState->SetPolygonFlags()
+	  that also accepts a mask.
 	- Jorrit added iThingFactoryState->GetPolygonVertexIndices().
-	- Jorrit added CS_POLYINDEX_LAST which can be used to get information about
-	  the last created polygon in all functions that accept a single polygon
-	  index. In case of AddInsideBox() and AddOutsideBox() this will actually
-	  return the index of the last polygon of that box.
+	- Jorrit added CS_POLYINDEX_LAST which can be used to get information
+	  about the last created polygon in all functions that accept a single
+	  polygon index.  In case of AddInsideBox() and AddOutsideBox() this
+	  will actually return the index of the last polygon of that box.
 	- Jorrit converted thing loader to the new API.
+	- Eric Sunshine fixed Texinfo syntax error in apimod98.txi.  Also
+	  re-wrapped to fit within 79 column.
+	- Eric Sunshine added warning about libbfd's GPL license to
+	  apimod98.txi.
+	- Eric Sunshine corrected several mark-up and formatting problems in
+	  apimod98.txi.
+	- Eric Sunshine eliminated TeX `underfull hbox' warnings from
+	  apimod98.txi and simple.txi.
 8-Oct-2003
 	- Jorrit fixed keycolor rendering in the old OpenGL renderer in case
 	  DrawPolygonMesh was used (fastmesh).

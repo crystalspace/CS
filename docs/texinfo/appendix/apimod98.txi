@@ -98,8 +98,9 @@ use @code{GetFactory()}.
 @code{iThingState::GetVertexC()} has been removed. It is no longer possible
 to get camera space information from a thing.
 
-The interface @code{iPolygon3D} is completely removed. The @code{iThingFactoryState} now
-contains a lot of new functions to create and manipulate polygons. Here is an example:
+The interface @samp{iPolygon3D} is completely removed.  The
+@samp{iThingFactoryState} now contains a lot of new functions to create and
+manipulate polygons.  Here is an example:
 
 First the old code:
 
@@ -138,8 +139,8 @@ Here the new code:
   state->SetPolygonMaterial (CS_POLYRANGE_ALL, mat);
 @end example
 
-If you want to add a box that can be seen from the inside (typically a room) then
-you can do it like this:
+If you want to add a box that can be seen from the inside (typically a room)
+then you can do it like this:
 
 @example
   state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
@@ -152,16 +153,17 @@ you can do it like this:
 @cindex @code{iPolyTexGouraud}
 @cindex @code{iPolyTexFlat}
 @cindex @code{iPolyTexLightMap}
-@cindex shading
+@cindex Shading
 
 The following interfaces have been removed: @samp{iPolyTexNone},
 @samp{iPolyTexGouraud}, @samp{iPolyTexFlat}, and  @samp{iPolyTexLightMap}.
 The combined @sc{api} from @samp{iPolyTexNone} and the @samp{iPolyTexLightMap}
-have moved to @code{iThingFactoryState}.
+have moved to @samp{iThingFactoryState}.
 
 It is no longer possible to set mixmode and alpha for individual polygons
-Instead use the new @code{iThingState::SetMixMode()} function to set the mixmode globally.
-If needed you will have to seperate the transparent polygon in a seperate thing mesh.
+Instead use the new @code{iThingState::SetMixMode()} function to set the
+mixmode globally.  If needed you will have to seperate the transparent polygon
+in a seperate thing mesh.
 
 It is also no longer possible to get camera space information from polygons.
 
@@ -201,8 +203,8 @@ Removed @samp{iPolyTxtPlane} interface.
 Several methods in @samp{iPortal} have changed slightly. For example,
 @code{SetMirror()} now expects a plane instead of a polygon.
 
-In the map loader the syntax for specifying warp vectors for portals has changed
-from @samp{v} to @samp{wv} and @samp{w} to @samp{ww}.
+In the map loader the syntax for specifying warp vectors for portals has
+changed from @samp{v} to @samp{wv} and @samp{w} to @samp{ww}.
 
 Portals in thing have been removed completely! Instead there is now a seperate
 portal container object which belongs in the engine (otherwise it is just
@@ -539,7 +541,7 @@ now deprecated.
 
 Posting an @samp{iEvent} via @code{iEventQueue::Post()} or
 @code{iEventOutlet::Post()} must now @code{DecRef()} the @samp{iEvent} after
-the posting the event, since @code{iEventQueue} will @code{IncRef()} the event
+the posting the event, since @samp{iEventQueue} will @code{IncRef()} the event
 for itself (that is, it will claim its own reference, rather than inheriting
 the reference from the caller as it did in the past).  As with all reference
 counting, rather than manually invoking @code{DecRef()}, the client is
@@ -843,6 +845,15 @@ required at the time of writing:
 @code{EMBED_META = yes}
 @end table
 
+@emph{Warning}: Meta-information embedding on Unix is accomplished via the
+@file{libbfd} library which carries a @sc{gpl} license.  This license is
+incompatible with Crystal Space's @sc{lgpl} license.  Unlike the @sc{lgpl}
+which is compatible with closed-source projects, the @sc{gpl} license is not.
+For this reason, embedding is disabled by default on Unix, and must be enabled
+explicitly with the @file{configure} script's
+@samp{--enable-meta-info-embedding} option.  Enable this option on Unix only if
+you are certain that your project is compatible with the @sc{gpl} license.
+
 The @file{scfreg} tool whose job was to manipulate the monolithic @sc{scf}
 plugin-registry database, @file{scf.cfg}, has been eliminated since it is no
 longer required.
@@ -874,14 +885,14 @@ Several @samp{iString} methods which were incorrectly returning raw
 @subheading csMD5 Changes
 
 A @code{csMD5(csString const&)} constructor was added to complement the
-existing @code{csMD5{char const*)} constructor.  The new method
+existing @code{csMD5(char const*)} constructor.  The new method
 @code{csMD5::Digest:HexString()} returns a hexadecimal string representation of
 the @sc{md5} digest using lowercase hexadecimal characters.
 @code{csMD5::Digest::HEXString()} returns uppercase hexadecimal characters.
 
 @subheading Beam Intersection Changes
 
-@code{IntersectSegment} for @code{iThingFactoryState} and @code{iThingState}
+@code{IntersectSegment()} for @samp{iThingFactoryState} and @samp{iThingState}
 has been removed. Use @code{iMeshObject::HitBeamObject()} instead.
 
 @code{iMeshObject::HitBeamObject()} now has an optional polygon index
@@ -895,9 +906,8 @@ to @code{HitBeamPortals()}. It additionally returns a polygon index.
 Same for @code{iPortal::HitBeam()} which has also been renamed
 to @code{HitBeamPortals()}.
 
-@code{iCamera::GetHit()} has been removed. It is completely equivalent
-to @code{iSector::HitBeamPortals()}.
+@code{iCamera::GetHit()} has been removed.  Instead, use the completely
+equivalent function @code{iSector::HitBeamPortals()}.
 
 @code{iVisibilityCuller::IntersectSegment()} now returns a polygon index
 instead of a portal.
-
