@@ -4,6 +4,10 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 01-Juj-2003
+	- HangDude 
+	   - moved anonrndbuf.h from csutil to cstool (on Jorrit's request)
+	   - added LGPL notice
+	   - updated genmesh because of that change
 	- res fixed rlsstencil.mak which got messed up when the plugin name
 	  was changed.
 29-Jun-2003
