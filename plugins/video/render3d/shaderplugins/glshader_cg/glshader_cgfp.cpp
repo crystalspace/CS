@@ -131,6 +131,12 @@ void csShaderGLCGFP::Activate(iShaderPass* current, csRenderMesh* mesh)
 
 void csShaderGLCGFP::Deactivate(iShaderPass* current, csRenderMesh* mesh)
 {
+  for (int i = 0; i < texturemap.Length(); ++i)
+    cgGLDisableTextureParameter (((texturemapentry*)texturemap.Get(i))->parameter);
+  // @@@ HACK! Probably we should handle all states ourselves
+  for (int i = 0; i < 4; ++i)
+    statecache->Disable_GL_TEXTURE_2D (i);
+
   cgGLDisableProfile (cgGetProgramProfile (program));
 }
 
@@ -325,6 +331,7 @@ bool csShaderGLCGFP::Prepare()
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE (r3d, iShaderRenderInterface);
   
   txtcache = (iGLTextureCache*) sri->GetPrivateObject ("txtcache");
+  r3d->GetDriver2D ()->PerformExtension("getstatecache", &statecache);
 
   return LoadProgramStringToGL(programstring);
 }

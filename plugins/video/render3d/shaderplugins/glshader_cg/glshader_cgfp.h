@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "CG/cg.h"
 #include "CG/cgGL.h"
 
+class csGLStateCache;
 struct iGLTextureCache;
 
 class csShaderGLCGFP : public iShaderProgram
@@ -62,6 +63,7 @@ private:
   csRef<iObjectRegistry> object_reg;
   CGcontext context;
   iGLTextureCache* txtcache;
+  csGLStateCache* statecache;
 
   CGprogram program;
 
