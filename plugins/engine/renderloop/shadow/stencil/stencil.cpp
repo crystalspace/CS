@@ -538,7 +538,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   // but just in case, no need to draw if no edges are drawn
   if (edge_start < index_range) 
   {
-    //shadowWrapper->SelectMaterial (0);
+    // shadowWrapper->SelectMaterial (0);
     pass->SetupState (&rmesh);
     if (shadowCacheEntry->ShadowCaps())
     {
@@ -620,12 +620,12 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   
   if (lightBehindCamera)
   {
-    planes[0].Set (camPos, cameraYVec, cameraXVec);
+    planes[4].Set (camPos, cameraYVec, cameraXVec);
     //planes[5] = csPlane3 (lightPos, cameraYVec, cameraXVec);
   }
   else
   {
-    planes[0].Set (camPos, cameraXVec,cameraYVec );
+    planes[4].Set (camPos, cameraXVec,cameraYVec );
     //planes[5] = csPlane3 (lightPos, cameraXVec,cameraYVec );
   }
 
@@ -841,7 +841,7 @@ iShader* csStencilShadowType::GetShadow ()
     }
     csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
     csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadow.xml");
-    //csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadowdebug.xml");
+    // csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadowdebug.xml");
     if (!shadow->Load (buf))
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Unable to load shadow shader");
