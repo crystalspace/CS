@@ -35,8 +35,8 @@ actions GenerateWin32VersionRc
 // This file is generated automatically.
 
 1 VERSIONINFO
-FILEVERSION $(PACKAGE.VERSION.LIST[1]), $(PACKAGE.VERSION.LIST[2]), $(PACKAGE.VERSION.LIST[3]), $(PACKAGE.VERSION.LIST[4])
-PRODUCTVERSION $(PACKAGE.VERSION.LIST[1]), $(PACKAGE.VERSION.LIST[2]), $(PACKAGE.VERSION.LIST[3]), $(PACKAGE.VERSION.LIST[4])
+FILEVERSION $(PACKAGE_VERSION.LIST[1]), $(PACKAGE_VERSION.LIST[2]), $(PACKAGE_VERSION.LIST[3]), $(PACKAGE_VERSION.LIST[4])
+PRODUCTVERSION $(PACKAGE_VERSION.LIST[1]), $(PACKAGE_VERSION.LIST[2]), $(PACKAGE_VERSION.LIST[3]), $(PACKAGE_VERSION.LIST[4])
 #ifdef CS_DEBUG
 FILEFLAGS 0x1
 #else
@@ -47,17 +47,17 @@ FILEFLAGS 0x0
   {
     BLOCK "040904E4"
     {
-      VALUE "ProductName", "$(PACKAGE.NAME)"
-      VALUE "ProductVersion", "$(PACKAGE.VERSION)"
-      VALUE "FileVersion", "$(PACKAGE.VERSION)"
-      VALUE "LegalCopyright", "$(PACKAGE.COPYRIGHT)"
+      VALUE "ProductName", "$(PACKAGE_NAME)"
+      VALUE "ProductVersion", "$(PACKAGE_VERSION)"
+      VALUE "FileVersion", "$(PACKAGE_VERSION)"
+      VALUE "LegalCopyright", "$(PACKAGE_COPYRIGHT)"
       VALUE "FileDescription", "$(DESCRIPTION)"
 #ifdef CS_DEBUG
       VALUE "Comments", "Debug build"
 #else
       VALUE "Comments", "Release build"
 #endif
-      VALUE "WWW", "$(PACKAGE.HOMEPAGE)"
+      VALUE "WWW", "$(PACKAGE_HOMEPAGE)"
     }
   }
 }
@@ -148,15 +148,15 @@ rule MakeVersionRc
 {
   # normalize version list
   local v1, v2, v3, v4 ;
-  v1 = $(PACKAGE.VERSION.LIST[1]) ;
+  v1 = $(PACKAGE_VERSION.LIST[1]) ;
   if ! $(v1) { v1 = 0 ; }
-  v2 = $(PACKAGE.VERSION.LIST[2]) ;
+  v2 = $(PACKAGE_VERSION.LIST[2]) ;
   if ! $(v2) { v2 = 0 ; }
-  v3 = $(PACKAGE.VERSION.LIST[3]) ;
+  v3 = $(PACKAGE_VERSION.LIST[3]) ;
   if ! $(v3) { v3 = 0 ; }
-  v4 = $(PACKAGE.VERSION.LIST[4]) ;
+  v4 = $(PACKAGE_VERSION.LIST[4]) ;
   if ! $(v4) { v4 = 0 ; }
-  PACKAGE.VERSION.LIST on $(<) = $(v1) $(v2) $(v3) $(v4) ;
+  PACKAGE_VERSION.LIST on $(<) = $(v1) $(v2) $(v3) $(v4) ;
       
   DESCRIPTION on $(<) = $($(>)_help) ;
       
