@@ -571,6 +571,9 @@ public:
     const T& Next()
     { return array.Get(currentelem++); }
 
+    /** Reset the array to the first element */
+    void Return()
+    { currentelem = 0; }
   protected:
     Iterator(const csArray<T, ElementHandler>& newarray)
 	: currentelem(0), array(newarray)
