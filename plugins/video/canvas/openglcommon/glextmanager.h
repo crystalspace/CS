@@ -12207,7 +12207,7 @@ private:
   bool tested_CS_GL_ARB_vertex_buffer_object;
 
 public:
-  csGLExtensionManager (): object_reg(NULL)
+  csGLExtensionManager (): object_reg(0)
   {
     extstrGL = 0;
 #ifdef __WIN32__
@@ -16908,4 +16908,3 @@ public:
 #undef EXTMGR_REPORT_INIT_RESULT
 
 #endif // __CS_GLEXTENSIONMANAGER_H__
-
