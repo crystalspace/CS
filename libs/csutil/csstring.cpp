@@ -189,6 +189,8 @@ csString &csString::LTrim()
 
 csString &csString::RTrim()
 {
+  if (Size == 0) return *this;
+
   for(int i = Size - 1; i >= 0; i--)
   {
     if (!isspace (Data[i]))
@@ -207,6 +209,8 @@ csString &csString::Trim()
 
 csString &csString::Collapse()
 {
+  if (Size == 0) return *this;
+
   size_t start = (size_t) -1;
   Trim();
   for (size_t i = 1; i < Size - 1; i++)
