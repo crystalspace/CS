@@ -174,7 +174,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),postdefines)
 
 # How to make a shared AKA dynamic library
-DO.SHARED.PLUGIN = dllwrap $(LFLAGS.DLL) -o $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
+DO.SHARED.PLUGIN = dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
