@@ -57,28 +57,20 @@ csRef<iDocument> csTinyDocumentSystem::CreateDocument ()
   return doc;
 }
 
-static int cnt = 0;
 csTinyXmlNode* csTinyDocumentSystem::Alloc ()
 {
-return new csTinyXmlNode (this);
-#if 0
   if (pool)
   {
     csTinyXmlNode* n = pool;
     pool = n->next_pool;
     n->scfRefCount = 1;
-printf ("from pool %p (scfParent=%p sys=%p next_pool=%p)\n", n,
-	n->scfParent, n->sys, n->next_pool); fflush (stdout);
     return n;
   }
   else
   {
     csTinyXmlNode* n = new csTinyXmlNode (this);
-cnt++;
-printf ("from new %p, total alloc %d (ref=%d)\n", n, cnt, n->scfRefCount); fflush (stdout);
     return n;
   }
-#endif
 }
 
 csTinyXmlNode* csTinyDocumentSystem::Alloc (TiDocumentNode* node)
@@ -90,12 +82,8 @@ csTinyXmlNode* csTinyDocumentSystem::Alloc (TiDocumentNode* node)
 
 void csTinyDocumentSystem::Free (csTinyXmlNode* n)
 {
-delete n;
-#if 0
-printf ("free %p pool=%p\n", n, pool); fflush (stdout);
   n->next_pool = pool;
   pool = n;
-#endif
 }
 
 //------------------------------------------------------------------------
@@ -179,16 +167,10 @@ SCF_IMPLEMENT_IBASE_END
 
 //------------------------------------------------------------------------
 
-//SCF_IMPLEMENT_IBASE_INCREF(csTinyXmlNode)
-void csTinyXmlNode::IncRef ()
-{
-  scfRefCount++;
-//printf ("+++incref %p (ref %d)\n", this, scfRefCount); fflush (stdout);
-}
+SCF_IMPLEMENT_IBASE_INCREF(csTinyXmlNode)
 void csTinyXmlNode::DecRef ()
 {
   scfRefCount--;
-//printf ("---decref %p (ref %d)\n", this, scfRefCount); fflush (stdout);
   if (scfRefCount <= 0)
   {
     if (scfParent) scfParent->DecRef ();
@@ -485,7 +467,7 @@ SCF_IMPLEMENT_IBASE_END
 csTinyXmlDocument::csTinyXmlDocument (csTinyDocumentSystem* sys)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  csTinyXmlDocument::sys = sys;
+  csTinyXmlDocument::sys = sys;	// Increase ref.
 }
 
 csTinyXmlDocument::~csTinyXmlDocument ()
