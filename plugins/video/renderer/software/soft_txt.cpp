@@ -830,49 +830,6 @@ void csTextureManagerSoftware::compute_palette ()
   if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE\n");
 }
 
-int csTextureManagerSoftware::find_rgb_map (int r, int g, int b, int map_type, int l)
-{
-  int nr = r, ng = g, nb = b;
-
-  switch (map_type)
-  {
-    case TABLE_WHITE_HI:
-      nr = (NORMAL_LIGHT_LEVEL+l)*r / NORMAL_LIGHT_LEVEL;
-      ng = (NORMAL_LIGHT_LEVEL+l)*g / NORMAL_LIGHT_LEVEL;
-      nb = (NORMAL_LIGHT_LEVEL+l)*b / NORMAL_LIGHT_LEVEL;
-      break;
-    case TABLE_WHITE:
-      nr = l*r / NORMAL_LIGHT_LEVEL;
-      ng = l*g / NORMAL_LIGHT_LEVEL;
-      nb = l*b / NORMAL_LIGHT_LEVEL;
-      break;
-    case TABLE_RED_HI:
-      nr = (NORMAL_LIGHT_LEVEL+l)*r / NORMAL_LIGHT_LEVEL;
-      break;
-    case TABLE_GREEN_HI:
-      ng = (NORMAL_LIGHT_LEVEL+l)*g / NORMAL_LIGHT_LEVEL;
-      break;
-    case TABLE_BLUE_HI:
-      nb = (NORMAL_LIGHT_LEVEL+l)*b / NORMAL_LIGHT_LEVEL;
-      break;
-    case TABLE_RED:
-      if (use_rgb) nr = l*r / NORMAL_LIGHT_LEVEL;
-      else nr = r+l*NORMAL_LIGHT_LEVEL/256;
-      break;
-    case TABLE_GREEN:
-      if (use_rgb) ng = l*g / NORMAL_LIGHT_LEVEL;
-      else ng = g+l*NORMAL_LIGHT_LEVEL/256;
-      break;
-    case TABLE_BLUE:
-      if (use_rgb) nb = l*b / NORMAL_LIGHT_LEVEL;
-      else nb = b+l*NORMAL_LIGHT_LEVEL/256;
-      break;
-  }
-  return truecolor ? encode_rgb_safe (nr, ng, nb) : find_rgb (nr, ng, nb);
-  //return truecolor ? encode_rgb_safe (nr, ng, nb) :
-    //(accurate_rgb_mapper ? find_rgb_slow (nr, ng, nb) : find_rgb (nr, ng, nb));
-}
-
 void csTextureManagerSoftware::create_lt_white16 ()
 {
   CHK (delete lt_white16);
@@ -1060,6 +1017,49 @@ void csTextureManagerSoftware::create_lt_alpha ()
       b = (pal[i].blue*250 + pal[j].blue*750) / 1000;
       lt_alpha->alpha_map25[i][j] = find_rgb (r, g, b);
     }
+}
+
+int csTextureManagerSoftware::find_rgb_map (int r, int g, int b, int map_type, int l)
+{
+  int nr = r, ng = g, nb = b;
+
+  switch (map_type)
+  {
+    case TABLE_WHITE_HI:
+      nr = (NORMAL_LIGHT_LEVEL+l)*r / NORMAL_LIGHT_LEVEL;
+      ng = (NORMAL_LIGHT_LEVEL+l)*g / NORMAL_LIGHT_LEVEL;
+      nb = (NORMAL_LIGHT_LEVEL+l)*b / NORMAL_LIGHT_LEVEL;
+      break;
+    case TABLE_WHITE:
+      nr = l*r / NORMAL_LIGHT_LEVEL;
+      ng = l*g / NORMAL_LIGHT_LEVEL;
+      nb = l*b / NORMAL_LIGHT_LEVEL;
+      break;
+    case TABLE_RED_HI:
+      nr = (NORMAL_LIGHT_LEVEL+l)*r / NORMAL_LIGHT_LEVEL;
+      break;
+    case TABLE_GREEN_HI:
+      ng = (NORMAL_LIGHT_LEVEL+l)*g / NORMAL_LIGHT_LEVEL;
+      break;
+    case TABLE_BLUE_HI:
+      nb = (NORMAL_LIGHT_LEVEL+l)*b / NORMAL_LIGHT_LEVEL;
+      break;
+    case TABLE_RED:
+      if (use_rgb) nr = l*r / NORMAL_LIGHT_LEVEL;
+      else nr = r+l*NORMAL_LIGHT_LEVEL/256;
+      break;
+    case TABLE_GREEN:
+      if (use_rgb) ng = l*g / NORMAL_LIGHT_LEVEL;
+      else ng = g+l*NORMAL_LIGHT_LEVEL/256;
+      break;
+    case TABLE_BLUE:
+      if (use_rgb) nb = l*b / NORMAL_LIGHT_LEVEL;
+      else nb = b+l*NORMAL_LIGHT_LEVEL/256;
+      break;
+  }
+  return truecolor ? encode_rgb_safe (nr, ng, nb) : find_rgb (nr, ng, nb);
+  //return truecolor ? encode_rgb_safe (nr, ng, nb) :
+    //(accurate_rgb_mapper ? find_rgb_slow (nr, ng, nb) : find_rgb (nr, ng, nb));
 }
 
 void csTextureManagerSoftware::compute_light_tables ()
