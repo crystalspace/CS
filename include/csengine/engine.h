@@ -944,7 +944,7 @@ public:
   virtual iMaterialWrapper* CreateMaterial (const char *iName, iTextureWrapper* texture);
 
   /// Create a empty sector with given name.
-  virtual iSector *CreateSector (const char *iName, bool link = true);
+  virtual iSector *CreateSector (const char *iName);
 
   /// Return the list of sectors
   virtual iSectorList *GetSectors ()

@@ -2399,15 +2399,12 @@ iMeshWrapper *csEngine::CreateSectorWallsMesh (
   return CreateSectorWallsMesh (sector->GetPrivateObject (), iName);
 }
 
-iSector *csEngine::CreateSector (const char *iName, bool link)
+iSector *csEngine::CreateSector (const char *iName)
 {
   iSector *sector = &(new csSector (this))->scfiSector;
   sector->QueryObject ()->SetName (iName);
-  if (link)
-  {
-    sectors.Push (sector);
-    sector->DecRef ();
-  }
+  sectors.Push (sector);
+  sector->DecRef ();
 
   return sector;
 }

@@ -305,9 +305,8 @@ struct iEngine : public iBase
   	iTextureWrapper* texture) = 0;
   /**
    * Create a empty sector with given name.
-   * If link == true (default) the sector will be linked to the engine.
    */
-  virtual iSector *CreateSector (const char *name, bool link = true) = 0;
+  virtual iSector *CreateSector (const char *name) = 0;
 
   /**
    * Conveniance function to create the thing containing the

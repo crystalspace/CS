@@ -40,6 +40,9 @@ The history order is reversed so that new features are at the top.
 	  from other regions.
 	- Added iLoader::ResolveCurrentRegionOnly() function to return the
 	  current value of the ResolveCurrentRegion flag in the loader.
+	- Removed the 'link' parameter from iEngine::CreateSector(). Since
+	  this hack is no longer needed sectors are now always linked
+	  to the engine as they should.
 20-Feb-2002
 	- Added SetMaximumSectorVisit() and GetMaximumSectorVisit() functions
 	  to iPortal. With this you can control how many times the same
