@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    Automated Processing, Publishing, and CVS Update Script
-#    Copyright (C) 2000,2001 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000,2001,2002 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -84,10 +84,10 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '13';
+my $PROG_VERSION = '14';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
-my $COPYRIGHT = "Copyright (C) 2000,2001 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
+my $COPYRIGHT = "Copyright (C) 2000,2001,2002 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 #------------------------------------------------------------------------------
 # Configuration Section
@@ -151,7 +151,15 @@ my $COPYRIGHT = "Copyright (C) 2000,2001 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 #        base package name used when generating downloadable packages via
 #        ARCHIVERS (below).  When published, the base package name is combined
 #        with the archiver's file extension and placed within the appropriate
-#        subdirectory of PACKAGE_DIR.
+#        subdirectory of PACKAGE_DIR.  The key "appear" controls the appearance
+#        of the directory in the generated package.  For example, when
+#        packaging the directory "out/docs/html", it should actually appear as
+#        "CS/docs/html" in the downloadable package.  The
+#        "browseable-postprocess" key allows specification of a post-processing
+#        step for the documentation which is being made available for online
+#        browsing.  The value of this key is any valid shell command.  If the
+#        meta-token ~T appears in the command, the path of the directory which
+#        is being published is interpolated into the command in its place.
 #    ARCHIVERS - A list of archiver records.  Each arechiver is used to
 #        generate a package from an input directory.  Each archiver record is
 #        a dictionary which contains the following keys.  The key "name"
@@ -196,7 +204,6 @@ my $BROWSEABLE_DIR = "$PUBLIC_DOC_DIR/online";
 my $PACKAGE_DIR = "$PUBLIC_DOC_DIR/download";
 my $OWNER_GROUP = 'crystal';
 my $PLATFORM = 'linux';
-#my $TEMPDIR = '/tmp';
 my $TEMPDIR = '/home/groups/c/cr/crystal';
 my @BINARY = ('(?i)\.(dsw|dsp)$');
 
@@ -221,7 +228,9 @@ my @TARGETS =
        'export' =>
 	   { 'dir'    => 'manual',
 	     'name'   => 'csmanual-html',
-	     'appear' => "$PROJECT_ROOT/docs/html" }},
+	     'appear' => "$PROJECT_ROOT/docs/html",
+	     'browseable-postprocess' =>
+	         'sh docs/support/annotate/transform.sh ~T' }},
      { 'name'   => 'Public API Reference',
        'action' => 'Generating',
        'make'   => 'pubapi',
@@ -231,7 +240,9 @@ my @TARGETS =
        'export' =>
 	   { 'dir'    => 'pubapi',
 	     'name'   => 'cspubapi-html',
-	     'appear' => "$PROJECT_ROOT/docs/pubapi" }});
+	     'appear' => "$PROJECT_ROOT/docs/pubapi",
+	     'browseable-postprocess' =>
+	         'sh docs/support/annotate/transform.sh ~T' }});
 
 my @ARCHIVERS =
     ({ 'name' => 'gzip',
@@ -597,6 +608,29 @@ sub apply_diffs {
 }
 
 #------------------------------------------------------------------------------
+# Interpolate a value into a string in place of a token.
+#------------------------------------------------------------------------------
+sub interpolate {
+    local $_ = $_[0];
+    my ($token, $value) = @_[1..2];
+    s/$token/$value/g or expire("Interpolation of $token in $_");
+    $_[0] = $_;
+}
+
+#------------------------------------------------------------------------------
+# Post-process a browseable directory if requested.
+#------------------------------------------------------------------------------
+sub postprocess_browseable {
+    my ($export, $dir) = @_;
+    return unless exists $export->{'browseable-postprocess'};
+    print "Post-processing.\n";
+
+    my $cmd = $export->{'browseable-postprocess'};
+    interpolate($cmd, '~T', $dir);
+    run_command($cmd);
+}
+
+#------------------------------------------------------------------------------
 # Publish a browseable copy of the generated files.
 #------------------------------------------------------------------------------
 sub publish_browseable {
@@ -614,6 +648,7 @@ sub publish_browseable {
 	print "Preparing.\n";
 	run_command("cp -r \"$src\" \"$new_dir\"");
 	change_group_deep($OWNER_GROUP, "$new_dir");
+	postprocess_browseable($target->{'export'}, $new_dir);
     
 	print "Installing.\n";
 	rename_file($dst, $old_dir) if -e $dst;
@@ -622,16 +657,6 @@ sub publish_browseable {
 	print "Cleaning.\n";
 	rmtree($old_dir);
     }
-}
-
-#------------------------------------------------------------------------------
-# Interpolate a value into a string in place of a token.
-#------------------------------------------------------------------------------
-sub interpolate {
-    local $_ = $_[0];
-    my ($token, $value) = @_[1..2];
-    s/$token/$value/g or expire("Interpolation of $token in $_");
-    $_[0] = $_;
 }
 
 #------------------------------------------------------------------------------
