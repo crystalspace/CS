@@ -22,6 +22,10 @@ rule LinkWith
   DEPENDS $($(<)_TARGET) : $(libs) ;
   NEEDLIBS on $($(<)_TARGET) += $(libs) ;
 
+  if $($(<)_TYPE) = library
+  {
+    LibDepends $(<) : $(>) ;   
+  }
   if $($(<)_TYPE) = plugin
   {
     $(<)_static.NEEDLIBS += $(>) ;
