@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+8-Nov-2001
+	- Jorge Acereda fixed a leak in ieplex.cpp where the result of a
+	  SCF::QueryClassList() wasn't DecRef()ed.
 7-Nov-2001
 	- Eric Sunshine fixed simpcon.cpp so that it now uses an octal
 	  character constant for cursor assignment, rather than using an 8-bit
