@@ -102,13 +102,9 @@ void Dumper::dump (csPolygon3D* p)
   CsPrintf (MSG_DEBUG_0, "    num_vertices=%d  max_vertices=%d\n", p->num_vertices, p->max_vertices);
   if (p->portal)
   {
-    if (p->portal->PortalType () == PORTAL_CS)
-    {
-      csPortalCS* csp = (csPortalCS*)p->portal;
-      CsPrintf (MSG_DEBUG_0, "    Polygon is a CS portal to sector '%s'.\n", 
-                csNameObject::GetName(*(csp->GetSector())) );
-    }
-    else CsPrintf (MSG_DEBUG_0, "    Polygon is an unknown portal.\n");
+    csPortal* portal = p->portal;
+    CsPrintf (MSG_DEBUG_0, "    Polygon is a CS portal to sector '%s'.\n", 
+                csNameObject::GetName(*(portal->GetSector())) );
     CsPrintf (MSG_DEBUG_0, "    Alpha=%d\n", p->GetAlpha ());
   }
   int i;

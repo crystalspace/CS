@@ -205,12 +205,11 @@ int csBeing::FindSectors ( csVector3 v, csVector3 d, csSector *s, csSector **sa 
     csPolygon3D* p = (csPolygon3D*) s->GetPolygon (i);
     csPortal* portal = p->GetPortal ();
     // Handle only portals.
-    if (portal != NULL && portal->PortalType () == PORTAL_CS)
+    if (portal != NULL)
     {
-      csPortalCS *pcs = (csPortalCS*)portal;
       if (p->GetPlane ()->SquaredDistance (v) < size)
       {
-        sa[c] = pcs->GetSector ();
+        sa[c] = portal->GetSector ();
         c++;
       }
     }

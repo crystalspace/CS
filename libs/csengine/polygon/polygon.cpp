@@ -214,18 +214,13 @@ void csPolygon3D::SetColor (int i, float r, float g, float b)
 
 void csPolygon3D::SetCSPortal (csSector* sector)
 {
-  if (portal && portal->PortalType () == PORTAL_CS)
-  {
-    if (((csPortalCS*)portal)->GetSector () == sector) return;
-  }
+  if (portal && portal->GetSector () == sector) return;
   if (portal && delete_portal) { CHK (delete portal); portal = NULL; }
   if (!sector) return;
-  csPortalCS* csp;
-  CHK (csp = new csPortalCS);
-  portal = (csPortal*)csp;
+  CHK (portal = new csPortal);
   delete_portal = true;
   portal->DisableSpaceWarping ();
-  csp->SetSector (sector);
+  portal->SetSector (sector);
   //portal->SetTexture (txtMM->get_texture_handle ());
 }
 
@@ -1412,7 +1407,7 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
       // by other shadow frustrums.
       // We also give the polygon plane to MarkRelevantShadowFrustrums so that
       // all shadow frustrums which start at the same plane are discarded as well.
-      // FillLightmap() will use this information and csPortalCS::CalculateLighting()
+      // FillLightmap() will use this information and csPortal::CalculateLighting()
       // will also use it!!
       csPlane poly_plane = *GetPolyPlane ();
       poly_plane.DD += poly_plane.norm * center;	// First translate plane to center of frustrum.
@@ -1428,7 +1423,7 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
         {
           // If there is no portal we simulate radiosity by creating
 	  // a dummy portal for this polygon which reflects light.
-	  csPortalCS mirror;
+	  csPortal mirror;
 	  mirror.SetSector (GetSector ());
 	  mirror.SetAlpha (10);
 	  float r, g, b;

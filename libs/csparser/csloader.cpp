@@ -3659,7 +3659,7 @@ bool CSLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
         csPolygon3D* p = (csPolygon3D*)(ps->GetPolygon (i));
         if (p && p->GetPortal ())
         {
-          csPortalCS* portal = (csPortalCS*)(p->GetPortal ());
+          csPortal* portal = p->GetPortal ();
           csSector *stmp = portal->GetSector ();
           csSector *snew = (csSector*)(world->sectors).FindByName(
                                        csNameObject::GetName(*stmp) );
