@@ -948,6 +948,9 @@ Optional Packages:
   --with-libcal3d=dir     specify location of libcal3d if not detected
                           automatically; searches dir, dir/include, and
                           dir/lib
+  --with-libSDL=dir       specify location of libSDL if not detected
+                          automatically; searches dir, dir/include, and
+                          dir/lib
 
 Some influential environment variables:
   CC          C compiler command
@@ -2781,31 +2784,12 @@ echo $ECHO_N "checking if bison version >= 1.35... $ECHO_C" >&6
 if test "${cs_cv_prog_bison_version_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-
-cs_prog_bison_is_version=
-cs_prog_bison_min_version=
-cs_prog_bison_is_suffix=
-cs_prog_bison_min_suffix=
-cs_prog_bison_is_suffix_done=
-cs_prog_bison_min_suffix_done=
-
-
-
-test -z $cs_prog_bison_is_version && cs_prog_bison_is_version=`$BISONBIN -V | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
-test -n "$cs_prog_bison_is_version" && test -z $cs_prog_bison_is_suffix_done  && { cs_prog_bison_is_suffix_done=yes ; cs_prog_bison_is_suffix= ; }
-
-
-
-
-
-test -z $cs_prog_bison_min_version && cs_prog_bison_min_version=`echo 1.35 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
-test -n "$cs_prog_bison_min_version" && test -z $cs_prog_bison_min_suffix_done  && { cs_prog_bison_min_suffix_done=yes ; cs_prog_bison_min_suffix= ; }
-
-
-cs_prog_bison_is_ver_1=`echo ${cs_prog_bison_is_version}${cs_prog_bison_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_bison_is_ver_2=`echo ${cs_prog_bison_is_version}${cs_prog_bison_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_bison_min_ver_1=`echo $cs_prog_bison_min_version${cs_prog_bison_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_bison_min_ver_2=`echo $cs_prog_bison_min_version${cs_prog_bison_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+  cs_prog_bison_is_version=`$BISONBIN -V | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+cs_prog_bison_min_version=`echo 1.35 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+cs_prog_bison_is_ver_1=`echo $cs_prog_bison_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_bison_is_ver_2=`echo $cs_prog_bison_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_bison_min_ver_1=`echo $cs_prog_bison_min_version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_bison_min_ver_2=`echo $cs_prog_bison_min_version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
 cs_cv_prog_bison_version_ok=''
 test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_is_ver_1" ">=" "$cs_prog_bison_min_ver_1" >/dev/null || cs_cv_prog_bison_version_ok=no ; }
 test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_min_ver_1" ">=" "$cs_prog_bison_is_ver_1" >/dev/null || cs_cv_prog_bison_version_ok=yes ; }
@@ -3258,41 +3242,14 @@ echo $ECHO_N "checking if swig version >= 1.3.14... $ECHO_C" >&6
 if test "${cs_cv_prog_swig_version_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-
-cs_prog_swig_is_version=
-cs_prog_swig_min_version=
-cs_prog_swig_is_suffix=
-cs_prog_swig_min_suffix=
-cs_prog_swig_is_suffix_done=
-cs_prog_swig_min_suffix_done=
-
-
-
-
-test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIGBIN -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
-test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && { cs_prog_swig_is_suffix_done=yes ; cs_prog_swig_is_suffix= ; }
-
-test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIGBIN -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
-test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && { cs_prog_swig_is_suffix_done=yes ; cs_prog_swig_is_suffix=.0 ; }
-
-
-
-
-
-
-test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.14 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
-test -n "$cs_prog_swig_min_version" && test -z $cs_prog_swig_min_suffix_done  && { cs_prog_swig_min_suffix_done=yes ; cs_prog_swig_min_suffix= ; }
-
-test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.14 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
-test -n "$cs_prog_swig_min_version" && test -z $cs_prog_swig_min_suffix_done  && { cs_prog_swig_min_suffix_done=yes ; cs_prog_swig_min_suffix=.0 ; }
-
-
-cs_prog_swig_is_ver_1=`echo ${cs_prog_swig_is_version}${cs_prog_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_swig_is_ver_2=`echo ${cs_prog_swig_is_version}${cs_prog_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_swig_is_ver_3=`echo ${cs_prog_swig_is_version}${cs_prog_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_swig_min_ver_1=`echo $cs_prog_swig_min_version${cs_prog_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_swig_min_ver_2=`echo $cs_prog_swig_min_version${cs_prog_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_swig_min_ver_3=`echo $cs_prog_swig_min_version${cs_prog_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+  cs_prog_swig_is_version=`$SWIGBIN -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\|\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\|\.[0-9][0-9]*\).*/\1/'`
+cs_prog_swig_min_version=`echo 1.3.14 | sed '/[0-9][0-9]*\.[0-9][0-9]*\|\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\|\.[0-9][0-9]*\).*/\1/'`
+cs_prog_swig_is_ver_1=`echo $cs_prog_swig_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\|\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\|\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_swig_is_ver_2=`echo $cs_prog_swig_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\|\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\|\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_swig_is_ver_3=`echo $cs_prog_swig_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\|\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\|\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_swig_min_ver_1=`echo $cs_prog_swig_min_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\|\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\|\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_swig_min_ver_2=`echo $cs_prog_swig_min_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\|\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\|\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_swig_min_ver_3=`echo $cs_prog_swig_min_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\|\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\|\.\([0-9][0-9]*\).*/\3/'`
 cs_cv_prog_swig_version_ok=''
 test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_is_ver_1" ">=" "$cs_prog_swig_min_ver_1" >/dev/null || cs_cv_prog_swig_version_ok=no ; }
 test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_min_ver_1" ">=" "$cs_prog_swig_is_ver_1" >/dev/null || cs_cv_prog_swig_version_ok=yes ; }
@@ -19533,6 +19490,454 @@ else
   :
 fi
 
+
+
+#------------------------------------------------------------------------------
+# Check for SDL
+#------------------------------------------------------------------------------
+# XXX: We should use sdl-config...
+
+# Check whether --with-libSDL or --without-libSDL was given.
+if test "${with_libSDL+set}" = set; then
+  withval="$with_libSDL"
+
+fi;
+
+    if test -z "$with_libSDL"; then
+  with_libSDL=yes
+fi
+
+    if test "$with_libSDL" != no; then
+  # If --with-lib value is same as cached value, then assume other
+	 # cached values are also valid; otherwise, ignore all cached values.
+	if test "$with_libSDL" != "$cs_cv_with_libSDL"; then
+  cs_ignore_cache=yes
+else
+  cs_ignore_cache=no
+fi
+
+
+	if test $with_libSDL != yes; then
+  cs_check_lib_paths=$with_libSDL
+else
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+fi
+
+
+	cs_check_lib_flags=''
+    for cs_lib_item in $cs_check_lib_paths
+    do
+	case $cs_lib_item in
+	    *\|*)
+    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_check_incdir=''
+else
+  if test "$1" = filler; then
+  cs_check_incdir=''
+else
+  cs_check_incdir=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_check_libdir=''
+else
+  if test "$1" = filler; then
+  cs_check_libdir=''
+else
+  cs_check_libdir=$1
+fi
+
+	shift
+fi
+
+		if test -n "$cs_check_incdir"; then
+  cs_check_lib_cflag="-I$cs_check_incdir"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_check_libdir"; then
+  cs_check_lib_lflag="-L$cs_check_libdir"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "SDL"; then
+  cs_check_lib_libs="-lSDL"
+else
+  cs_check_lib_libs=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	    *)  if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "SDL"; then
+  cs_check_lib_libs="-lSDL"
+else
+  cs_check_lib_libs=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "SDL"; then
+  cs_check_lib_libs="-lSDL"
+else
+  cs_check_lib_libs=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	esac
+    done
+
+	if test "$cs_ignore_cache" != yes; then
+  echo "$as_me:$LINENO: checking for libSDL" >&5
+echo $ECHO_N "checking for libSDL... $ECHO_C" >&6
+if test "${cs_cv_libSDL+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <SDL/SDL.h>
+int
+main ()
+{
+SDL_Init(0);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libSDL=yes
+		cs_cv_libSDL_cflags=$cs_build_cflags
+		cs_cv_libSDL_lflags=$cs_build_lflags
+		cs_cv_libSDL_libs=$cs_build_libs
+else
+  cs_cv_libSDL=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_libSDL" >&5
+echo "${ECHO_T}$cs_cv_libSDL" >&6
+else
+  echo "$as_me:$LINENO: checking for libSDL" >&5
+echo $ECHO_N "checking for libSDL... $ECHO_C" >&6
+	    ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <SDL/SDL.h>
+int
+main ()
+{
+SDL_Init(0);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libSDL=yes
+		cs_cv_libSDL_cflags=$cs_build_cflags
+		cs_cv_libSDL_lflags=$cs_build_lflags
+		cs_cv_libSDL_libs=$cs_build_libs
+else
+  cs_cv_libSDL=no
+fi
+
+	    echo "$as_me:$LINENO: result: $cs_cv_libSDL" >&5
+echo "${ECHO_T}$cs_cv_libSDL" >&6
+fi
+
+    if test $cs_cv_libSDL = yes; then
+  :
+else
+  cs_cv_libSDL_cflags=''
+	cs_cv_libSDL_lflags=''
+	cs_cv_libSDL_libs=''
+	:
+fi
+
+else
+  cs_cv_libSDL=no
+fi
+
+    cs_cv_with_libSDL="$with_libSDL"
+
+    if test "$cs_cv_libSDL" = yes; then
+  if test "$cs_cv_libSDL" = yes; then
+  cs_makefile_text="${cs_makefile_text}SDL.AVAILABLE = yes
+"
+    cs_jamconfig_text="${cs_jamconfig_text}SDL.AVAILABLE ?= \"yes\" ;
+"
+	cs_result_cflags=`echo x$cs_cv_libSDL_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_result_lflags=`echo x$cs_cv_libSDL_lflags $cs_cv_libSDL_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	if test -n "$cs_result_cflags"; then
+  cs_makefile_text="${cs_makefile_text}SDL.CFLAGS = $cs_result_cflags
+"
+    cs_jamconfig_text="${cs_jamconfig_text}SDL.CFLAGS ?= \"$cs_result_cflags\" ;
+"
+fi
+
+	if test -n "$cs_result_lflags"; then
+  cs_makefile_text="${cs_makefile_text}SDL.LFLAGS = $cs_result_lflags
+"
+    cs_jamconfig_text="${cs_jamconfig_text}SDL.LFLAGS ?= \"$cs_result_lflags\" ;
+"
+fi
+
+fi
+
+	    cs_makefile_text="${cs_makefile_text}HAS_CAL3D = yes
+"
+else
+  :
+fi
 
 
 
