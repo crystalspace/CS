@@ -148,6 +148,11 @@ findcexfile()
 	fi
     done
 
+    if test -f "$CRYSTAL/bin/$1.cex"; then
+	CEXFILE="$CRYSTAL/bin/$1.cex"
+	return
+    fi
+    
     if test -f "$CRYSTAL/$1.cex"; then
 	CEXFILE="$CRYSTAL/$1.cex"
 	return
