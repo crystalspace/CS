@@ -171,6 +171,35 @@ The history order has been reversed so that new features are at the top.
 	      inclusion of cssysdef.h.
 	    - Removed references to obsolete "null" sound driver from makefiles
 	      and documentation.
+5-Nov-2000
+	- Norman Kramer added comments to layout classes in CSWS.
+3-Nov-2000
+	- Brandon Ehle added the INCLUDESPRITE command in the world
+	  file so that external sprite templates can be included. By default
+	  the extension for these is .css.
+	- Andrew Zabolotny fixed font drawing in OpenGL canvas (this was
+	  not my bug, it is a very old bug - glBindTexture() cannot be
+	  invoked between glBegin() and glEnd() -- it just happened my
+	  changes to trigger that bug, previously it was triggered by fonts
+	  occupying more than one texture).
+	- Andrew Zabolotny also tried to fix OpenGL halos but failed: I'm
+	  not sure, maybe the software OpenGL I have here does not support
+	  alpha textures properly. Will continue at home with TNT2.
+2-Nov-2000
+	- Andrew Zabolotny did the following changes:
+	    - Replaced the csInsets object with the standard CSWS rectangle
+	      csRect.
+	    - Replaced the csVector2 with a new small class csPoint. There
+	      is no need to use csVector2: first it uses floats for x,y
+	      and second it pulls a lot of unneeded code from csgeom.
+	    - Made csLayout a fully transparent class (CSS_TRANSPARENT).
+	      Now the real window background is seen through the layouts,
+	      e.g. try "cswstest -skin=Colorful".
+	    - Re-indented code to match better CS coding standards.
+	- Robert Bate did some fixes on the Macintosh port.
+1-Nov-2000
+	- Wouter Wijngaards reintroduced ReadFntFile from csfont.cpp. This
+	  function had disappeared by a previous change from Andrew.
 31-Oct-2000
 	- Philip Wyett fixed the CSWS VC project file after Andrew's
 	  changes.
