@@ -164,7 +164,7 @@ struct iVFS : public iBase
   /// Replacement for standard fopen()
   virtual iFile *Open (const char *FileName, int Mode) = 0;
   /**
-   * Get an entire file at once. You should delete[] returned data
+   * Get an entire file at once. You should DecRef() returned data
    * after usage. This is more effective than opening files and reading
    * the file in blocks.  Note that the returned buffer is always null-
    * terminated (so that it can be conveniently used with string functions)
