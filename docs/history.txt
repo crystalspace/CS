@@ -40,6 +40,7 @@ The history order is reversed so that new features are at the top.
 	  upcoming Phase Three of the elimination of the monolithic scf.cfg.
 	- res updated some render loop interfaces.
 	- res fixed the light attenuation choices in the Hammer fgd script.
+	- Jorrit forgot to replace a few NULL -> 0.
 3-June-2003
 	- Philipp Aumayr fixed the fancycon bug, where the borders
 	  were visibile in SW but not in GL mode. (wrong mixmode at line

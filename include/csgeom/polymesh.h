@@ -52,13 +52,13 @@ public:
    */
   csPolygonMesh ()
   {
-    SCF_CONSTRUCT_IBASE (NULL);
+    SCF_CONSTRUCT_IBASE (0);
     deformable = false;
     change_nr = 0;
-    vt = NULL;
+    vt = 0;
     vt_count = 0;
     delete_vt = false;
-    po = NULL;
+    po = 0;
     po_count = 0;
     delete_po = false;
   }

@@ -78,7 +78,7 @@ NuppelWriter::NuppelWriter(int width, int height,
   compressBuffer = new unsigned char [width*height+(width*height)/2];
   yuvBuffer = new unsigned char [width*height+(width*height)/2];
   memset (yuvBuffer, 0, width*height+(width*height)/2);
-  rgbBuffer = NULL;//new uint8 [width * height * 3];
+  rgbBuffer = 0;//new uint8 [width * height * 3];
   lzoTmp = new unsigned char [LZO1X_MEM_COMPRESS];
   InitLookupTable();
 

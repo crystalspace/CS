@@ -1563,13 +1563,13 @@ void csSector::DrawLight (iRenderView* rview, iLight* light, bool drawAfter)
     bugplug->ResetCounter ("Activates");
   const csRefArray<iShader> &shader_list = shmgr->GetShaders ();
   for (i = 0; i < shader_list.Length(); i ++) {
-	if (shader_sort.Get ((csHashKey)((iShader*)shader_list[i])) == NULL) { continue; }
+	if (shader_sort.Get ((csHashKey)((iShader*)shader_list[i])) == 0) { continue; }
     iShaderTechnique *tech = shader_list[i]->GetBestTechnique ();
 
     for (int p=0; p<tech->GetPassCount (); p++)
     {
       iShaderPass *pass = tech->GetPass (p);
-      pass->Activate (NULL);
+      pass->Activate (0);
       csHashIterator iter (&shader_sort, (csHashKey)((iShader*)shader_list[i]));
       while (iter.HasNext ()) {
         csRenderMesh *mesh = (csRenderMesh *)iter.Next();

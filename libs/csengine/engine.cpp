@@ -428,7 +428,7 @@ void csLightIt::Reset ()
 {
   sector_idx = -1;
   light_idx = 0;
-  current_light = NULL;
+  current_light = 0;
 }
 
 iLight *csLightIt::FetchNext ()
@@ -461,20 +461,20 @@ iLight *csLightIt::FetchNext ()
 
 bool csLightIt::HasNext ()
 {
-  if (current_light != NULL) return true;
+  if (current_light != 0) return true;
   current_light = FetchNext ();
-  return current_light != NULL;
+  return current_light != 0;
 }
 
 iLight *csLightIt::Next ()
 {
-  if (current_light == NULL)
+  if (current_light == 0)
   {
     current_light = FetchNext ();
   }
 
   iLight* l = current_light;
-  current_light = NULL;
+  current_light = 0;
   return l;
 }
 
@@ -513,7 +513,7 @@ void csSectorIt::Reset ()
   delete recursive_it;
   recursive_it = 0;
   has_ended = false;
-  current_sector = NULL;
+  current_sector = 0;
 }
 
 iSector *csSectorIt::FetchNext ()
@@ -547,20 +547,20 @@ iSector *csSectorIt::FetchNext ()
 
 bool csSectorIt::HasNext ()
 {
-  if (current_sector != NULL) return true;
+  if (current_sector != 0) return true;
   current_sector = FetchNext ();
-  return current_sector != NULL;
+  return current_sector != 0;
 }
 
 iSector *csSectorIt::Next ()
 {
-  if (current_sector == NULL)
+  if (current_sector == 0)
   {
     current_sector = FetchNext ();
   }
 
   iSector* s = current_sector;
-  current_sector = NULL;
+  current_sector = 0;
   return s;
 }
 

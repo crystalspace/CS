@@ -1465,8 +1465,8 @@ public:
   {
     speedfactor = speed;
     // If SetAction is called while an OverrideAction is in progress,
-    // this NULL overrides the override, so this action will keep going.
-    last_action = NULL;
+    // this 0 overrides the override, so this action will keep going.
+    last_action = 0;
 
     loopaction = loop;
     fullstop = false;

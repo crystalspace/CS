@@ -1127,7 +1127,7 @@ LRESULT Win32Assistant::CBTProc (int nCode, WPARAM wParam, LPARAM lParam)
   case HCBT_ACTIVATE:
     {
       // The MBs we request always have just ibe button (OK)
-      HWND Button = FindWindowEx ((HWND)wParam, 0, "Button", NULL);
+      HWND Button = FindWindowEx ((HWND)wParam, 0, "Button", 0);
       if (Button)
         SetWindowText (Button, GLOBAL_ASSISTANT->msgOkMsg);
       LRESULT ret = CallNextHookEx (GLOBAL_ASSISTANT->msgBoxOkChanger,
