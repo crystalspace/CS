@@ -54,6 +54,7 @@ CSCONFIG.RDATE   := $(shell sed -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/!d'  -e 's
 # Unfortunately, such cases are not currently handled.
 CSCONFIG.LFLAGS.DLL  = $(subst $@,$$@,$(LFLAGS.DLL))
 CSCONFIG.LFLAGS.EXE  = $(subst $@,$$@,$(LFLAGS.EXE))
+CSCONFIG.LFLAGS.GENERAL = $(subst $@,$$@,$(LFLAGS.GENERAL))
 CSCONFIG.LINK.PLUGIN = $(subst $@,$$@,$(LINK.PLUGIN))
 CSCONFIG.DO.SHARED.PLUGIN.PREAMBLE  = \
   $(subst $@,$$@,$(DO.SHARED.PLUGIN.PREAMBLE))
@@ -96,7 +97,7 @@ $(CSCONFIG.EXE): $(CSCONFIG.DEP)
 	@echo $"if test -r "$${prefix}/lib"; then$"	>> cs-config
 	@echo $"  libdir="$${prefix}/lib"$"		>> cs-config
 	@echo $"fi$"					>> cs-config
-	@echo $"syslibs="$(LIBS.EXE)"$"			>> cs-config
+	@echo $"syslibs="$(LIBS.EXE) $(LFLAGS.GENERAL)"$" >> cs-config
 	@echo $"common_cflags="$(CFLAGS)"$"		>> cs-config
 	@echo $"common_cxxflags="$(CFLAGS)"$"		>> cs-config
 	@echo $"$"					>> cs-config
