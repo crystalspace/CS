@@ -259,7 +259,6 @@
 // CS Util
 #ifndef NO_CSUTIL
 #include "csutil/bitarray.h"
-#include "csutil/bitset.h"
 #include "csutil/cfgacc.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
@@ -285,7 +284,6 @@
 #include "csutil/garray.h"
 #include "csutil/tree.h"
 #include "csutil/hashmap.h"
-#include "csutil/intarray.h"
 #include "csutil/memfile.h"
 #include "csutil/mmapio.h"
 #include "csutil/nobjvec.h"
