@@ -141,6 +141,20 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
+      csRef<iStatLight> o (SCF_QUERY_INTERFACE (obj, iStatLight));
+      if (!o) continue;
+
+      engine->RemoveLight (o);
+      ObjRemove (obj);
+      copy[i] = 0;
+    }
+  }
+
+  for (i = 0; i < copy.Length (); i++)
+  {
+    if (copy[i])
+    {
+      iObject *obj = copy[i];
       csRef<iMeshWrapper> o (SCF_QUERY_INTERFACE (obj, iMeshWrapper));
       if (!o) continue;
 

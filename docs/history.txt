@@ -54,6 +54,7 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed motion loader after his latest changes.
 	- Wouter fixed reference leaks in Aws for iGraphics2D/3D and font
 	  manager.
+	- Jorrit fixed a bug in the region code. It didn't remove lights.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,
