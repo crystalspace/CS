@@ -174,7 +174,7 @@ class nTerrain
   
   /// Does the work of tree building, heightmap is the height data (0..1), w is the edge length of the heightmap, which must be square.
   void VerifyTreeNode(FILE *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, nBlock *);
-  void WriteTreeNode(FILE *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, nBlock *);
+  void WriteTreeNode(FILE *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, nBlock *, nBlock **);
 
   /// Calculates the insensity and color at a given vertex for a given light
   csColor CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n);

@@ -28,6 +28,7 @@
 #include "qsqrt.h"
 #include "nterrain.h"
 
+
 ///////////////////////////// SCF stuff ///////////////////////////////////////////////////////////////////////
 CS_IMPLEMENT_PLUGIN
 
@@ -226,24 +227,24 @@ void nTerrain::VerifyTreeNode(FILE *f, unsigned int level,
   }
 }
 
-void nTerrain::WriteTreeNode(FILE *f, unsigned int level,
-	unsigned int parent, unsigned int my, 
+void nTerrain::WriteTreeNode(FILE *f, unsigned int level, unsigned int my, 
 	unsigned int i, unsigned int j, unsigned int k,
-	nBlock *heightmap)
+	nBlock *heightmap, nBlock **storage)
 {
   unsigned int my_ind = (j+k)>>1;
-  nBlock *b = &heightmap[my_ind];
+  storage[my] = &heightmap[my_ind];
+
+  // Store the block in the file.
+  // fseek(f, (parent + my)*sizeof(nBlock), SEEK_SET);
+  // fwrite(b, sizeof(nBlock), 1, f);
 
   if (level < 2 * max_levels - 1)
   {
-    unsigned int right_ind = my * 2 + 1;
-    WriteTreeNode (f, level+1, parent, right_ind, my_ind, i, k, heightmap);
     unsigned int left_ind = my * 2 + 0;
-    WriteTreeNode(f, level+1, parent, left_ind, my_ind, j, i, heightmap);
+    WriteTreeNode(f, level+1, left_ind, my_ind, j, i, heightmap, storage);
+    unsigned int right_ind = my * 2 + 1;
+    WriteTreeNode (f, level+1, right_ind, my_ind, i, k, heightmap, storage);
   }
-  // Store the block in the file.
-  fseek(f, (parent + my)*sizeof(nBlock), SEEK_SET);
-  fwrite(b, sizeof(nBlock), 1, f);
 }
 
 void nTerrain::BuildTree(FILE *f, nBlock *heightmap, unsigned int w)
@@ -264,15 +265,32 @@ void nTerrain::BuildTree(FILE *f, nBlock *heightmap, unsigned int w)
   fwrite (&heightmap[NW], sizeof (nBlock), 1, f);
   fwrite (&heightmap[C], sizeof (nBlock), 1, f);
   unsigned int size = 0;
-  for (unsigned int i = 0, inc = 1; i < 2 * max_levels - 1; i ++, inc *= 2)
+  unsigned int i, inc = 1;
+  for (i = 0; i < 2 * max_levels - 1; i ++)
   {
     size += inc;
+    inc *= 2;
   }
+  size ++;
 
-  WriteTreeNode(f, 1, 0 * size + 4, 1, C, SW, SE, heightmap); 
-  WriteTreeNode(f, 1, 1 * size + 4, 1, C, SE, NE, heightmap); 
-  WriteTreeNode(f, 1, 2 * size + 4, 1, C, NE, NW, heightmap); 
-  WriteTreeNode(f, 1, 3 * size + 4, 1, C, NW, SW, heightmap); 
+  nBlock **storage = new nBlock*[size];
+  WriteTreeNode(f, 1, 1, C, SW, SE, heightmap, storage); 
+  for (i = 1; i < size; i ++) {
+    fwrite (storage[i], sizeof (nBlock), 1, f);
+  }
+  WriteTreeNode(f, 1, 1, C, SE, NE, heightmap, storage); 
+  for (i = 1; i < size; i ++) {
+    fwrite (storage[i], sizeof (nBlock), 1, f);
+  }
+  WriteTreeNode(f, 1, 1, C, NE, NW, heightmap, storage); 
+  for (i = 1; i < size; i ++) {
+    fwrite (storage[i], sizeof (nBlock), 1, f);
+  }
+  WriteTreeNode(f, 1, 1, C, NW, SW, heightmap, storage); 
+  for (i = 1; i < size; i ++) {
+    fwrite (storage[i], sizeof (nBlock), 1, f);
+  }
+  delete [] storage;
 
   /*
   VerifyTreeNode(f, 1, 0 * size + 4, 1, C, SW, SE, heightmap); 
@@ -291,8 +309,8 @@ csColor nTerrain::CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n)
   if (sq_dist < li->GetSquaredRadius ())
   {
     
-    csColor light_color = li->GetColor () * (256.0 / CS_NORMAL_LIGHT_LEVEL)
-      * li->GetBrightnessAtDistance (qsqrt (sq_dist));
+    csColor light_color = li->GetColor () * (256.0 / CS_NORMAL_LIGHT_LEVEL);
+      // * li->GetBrightnessAtDistance (qsqrt (sq_dist));
 
     float cosinus;
     if (sq_dist < SMALL_EPSILON) 
@@ -317,7 +335,8 @@ void nTerrain::BufferTreeNode(int p, nBlock *b)
 {
   csVector3 v = b->pos;
   float mid = terrain_w / 2.0;
-  csVector2 t = csVector2 ((b->pos.x + mid) / (float)terrain_w, 1.0 - (b->pos.z + mid) / (float)terrain_w);
+  // csVector2 t = csVector2 ((b->pos.x + mid) / (float)terrain_w, 1.0 - (b->pos.z + mid) / (float)terrain_w);
+  csVector2 t = csVector2 ((b->pos.x + mid)/4, (float)terrain_w - (b->pos.z + mid)/4);
   csColor c = csColor (1.0, 1.0, 1.0);
   if (info->num_lights > 0)
   {
@@ -327,7 +346,7 @@ void nTerrain::BufferTreeNode(int p, nBlock *b)
       iLight *li = info->light_list[i];
       c += CalculateLightIntensity (li, b->pos, b->norm);
     }
-    c.Clamp (2., 2., 2.);
+    c.Clamp (1.0, 1.0, 1.0);
   }
   info->AddVertex (v, t, c, p);
 }
@@ -575,28 +594,16 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
 		"Unable to process image, must square and width 2^n+1");
     return false;
   }
-  FILE *hmfp = fopen (hm, "wb");
-  if (!hmfp)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
-    	"crystalspace.mesh.object.terrbig", 
-	"Unable to open %s for writing\n", hm);
-    return false;
-  }
-  int size = image->GetSize ();
-  int width = image->GetWidth ();
-  nBlock *heightmap = new nBlock[size];
+
+  float *image_data = new float [image->GetSize()];
+
   if (image->GetFormat () & CS_IMGFMT_PALETTED8)
   {
     csRGBpixel *palette = image->GetPalette ();
     uint8 *data = (uint8 *)image->GetImageData ();
     for (int i = 0; i < image->GetSize (); i ++)
     {
-      heightmap[i].pos.x = (i % width - width/2) * scale.x;
-      heightmap[i].pos.y = ((float)palette[data[i]].Intensity()) / 255.0 * scale.y;
-	  heightmap[i].pos.z = (width/2 - i / width) * scale.z;
-	  heightmap[i].error = 0.0;
-	  heightmap[i].radius = 0.0;
+      image_data[i] = ((float)palette[data[i]].Intensity()) / 255.0;
     }
   }
   else
@@ -604,69 +611,13 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
     csRGBpixel *data = (csRGBpixel *)image->GetImageData ();
     for (int i = 0; i < image->GetSize (); i ++)
     {
-      heightmap[i].pos.x = (i % width - width/2) * scale.x;
-      heightmap[i].pos.y = ((float)data[i].Intensity()) / 255.0 * scale.y;
-	  heightmap[i].pos.z = (width/2 - i / width) * scale.z;
-	  heightmap[i].error = 0.0;
-	  heightmap[i].radius = 0.0;
+      image_data[i] = ((float)data[i].Intensity()) / 255.0 * scale.y;
     }
   }
 
-  for  (int k = 0; k < size; k ++)
-  {
-    csVector3 up = (k-width < 0) ? 
-	  csVector3(0,0,0) : heightmap[k-width].pos - heightmap[k].pos;
-    csVector3 dn = (k+width >= image->GetSize ()) ?  
-	  csVector3 (0,0,0) : heightmap[k+width].pos - heightmap[k].pos;
-    csVector3 lt = (k%width == 0) ? 
-	  csVector3 (0,0,0) : heightmap[k-1].pos - heightmap[k].pos;
-    csVector3 rt = ((k+1)%width == 0) ? 
-	  csVector3 (0,0,0) : heightmap[k+1].pos - heightmap[k].pos;
-
-    heightmap[k].norm = (up + dn + lt + rt) / 4.0;
-    heightmap[k].norm.Normalize ();
-  }
-
-  int a, b, c, s, i, j;
-  for (a = c = 1, b = 2, s = 0; a != width-1; a = c = b, b *= 2, s = width)
-  {
-    for (j = a; j < width-1; j += b)
-    {
-	  for (i = 0; i < width; i += b) {
-	    ComputeLod (heightmap, i, j, 0, a, s, width);
-	    ComputeLod (heightmap, j, i, a, 0, s, width);
-	  }
-	}
-
-    for (j = a; j < width-1; c = -c, j += b)
-    {
-	  for (i = a; i < width-1; c = -c, i += b)
-	  {
-	    ComputeLod (heightmap, i, j, a, c, width, width);
-	  }
-	}
-  }
-
-  heightmap[(width-1)*width].error = 0.0;
-  heightmap[(width-1)*width].radius = width;
-  heightmap[width-1+(width-1)*width].error = 0.0;
-  heightmap[width-1+(width-1)*width].radius = width;
-  heightmap[width-1].error = 0.0;
-  heightmap[width-1].radius = width;
-  heightmap[0].error = 0.0;
-  heightmap[0].radius = width;
-
-  if (!terrain)
-  {
-    terrain = new nTerrain;
-  }
-  terrain->BuildTree (hmfp, heightmap, width);
-  delete [] heightmap;
-  fclose (hmfp);
-
-  terrain->SetHeightMapFile (hm);
-  InitMesh (info);
-  return true;
+  bool retval = ConvertArrayToMapFile (image_data, image->GetWidth(), hm);
+  delete [] image_data;
+  return retval;
 }
 
 bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *hm)
@@ -689,7 +640,6 @@ bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *
   int size = w * w;
 
   nBlock *heightmap = new nBlock[size];
-
   int k;
   for (k = 0; k < size; k ++)
   {
@@ -702,16 +652,14 @@ bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *
 
   for (k = 0; k < size; k ++)
   {
-    csVector3 up = (k-w < 0) ? 
-	  csVector3(0,0,0) : heightmap[k-w].pos - heightmap[k].pos;
-    csVector3 dn = (k+w >= size) ?  
-	  csVector3 (0,0,0) : heightmap[k+w].pos - heightmap[k].pos;
-    csVector3 lt = (k%w - (k-1)%w != 1) ? 
-	  csVector3 (0,0,0) : heightmap[k-1].pos - heightmap[k].pos;
-    csVector3 rt = ((k+1)%w - k%w != 1) ? 
-	  csVector3 (0,0,0) : heightmap[k+1].pos - heightmap[k].pos;
+    const float up = (k-w < 0) ? 0.0 : heightmap[k-w].pos.y;
+    const float dn = (k+w >= size) ?  0.0 : heightmap[k+w].pos.y;
+    const float lt = (k%w == 0) ?  0.0 : heightmap[k-1].pos.y;
+    const float rt = ((k+1)%w == 0) ?  0.0 : heightmap[k+1].pos.y;
 
-    heightmap[k].norm = (up + dn + lt + rt) / 4.0;
+    heightmap[k].norm.x = (up - dn);
+    heightmap[k].norm.y = (lt - rt);
+    heightmap[k].norm.z = 4 / w;
     heightmap[k].norm.Normalize ();
   }
 
@@ -720,20 +668,20 @@ bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *
   {
     for (j = a; j < w-1; j += b)
     {
-	  for (i = 0; i < w; i += b)
-	  {
-	    ComputeLod (heightmap, i, j, 0, a, s, w);
-	    ComputeLod (heightmap, j, i, a, 0, s, w);
-	  }
-	}
+      for (i = 0; i < w; i += b)
+      {
+        ComputeLod (heightmap, i, j, 0, a, s, w);
+        ComputeLod (heightmap, j, i, a, 0, s, w);
+      }
+    }
 
     for (j = a; j < w-1; c = -c, j += b)
     {
-	  for (i = a; i < w-1; c = -c, i += b)
-	  {
-	    ComputeLod (heightmap, i, j, a, c, w, w);
-	  }
-	}
+      for (i = a; i < w-1; c = -c, i += b)
+      {
+        ComputeLod (heightmap, i, j, a, c, w, w);
+      }
+    }
   }
 
   heightmap[(w-1)*w].error = 0.0;
@@ -755,6 +703,7 @@ bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *
 
   terrain->SetHeightMapFile (hm);
   InitMesh (info);
+
   return true;
 }
 
