@@ -139,8 +139,12 @@ public:
     }
   }
 
-  /// Truncate array to specified number of elements.
-  void Truncate(int n)
+  /**
+   * Truncate array to specified number of elements. The new number of
+   * elements cannot exceed the current number of elements. Use SetLength()
+   * for a more general way to enlarge the array.
+   */
+  void Truncate (int n)
   {
     CS_ASSERT(n >= 0);
     CS_ASSERT(n <= count);
@@ -149,6 +153,28 @@ public:
       for (int i = n; i < count; i++)
         DestroyElement(i);
       SetLengthUnsafe(n);
+    }
+  }
+
+  /**
+   * Set the actual number of items in this array. This can be used to
+   * shrink an array (works like Truncate() then in which case it will properly
+   * destroy all truncated objects) or to enlarge an array in which case
+   * it will properly set the new capacity and construct all new items
+   * based on the given item.
+   */
+  void SetLength (int n, T const& what)
+  {
+    if (n <= count)
+    {
+      Truncate (n);
+    }
+    else
+    {
+      int old_len = Length ();
+      SetCapacity (n);
+      for (int i = old_len ; i < n ; i++)
+        ConstructElement (i, what);
     }
   }
 
@@ -180,22 +206,15 @@ public:
   }
 
   /**
-   * Set vector capacity to 'n' elements.
-   * This will correctly construct new items with the default constructor
-   * if the new capacity is higher then the old, and it will properly destruct
-   * items if the new capacity is lower.
+   * Set vector capacity to approximately 'n' elements.  Never sets the
+   * capacity to fewer than the current number of elements in the array.  See
+   * Truncate() or SetLength() if you need to adjust the number of actual
+   * array elements.
    */
   void SetCapacity (int n)
   {
     if (n > Length())
-    {
-      int old_len = Length ();
       SetLengthUnsafe(n);
-      int i;
-      for (i = old_len ; i < n ; i++)
-        ConstructElement (i, T ());
-    }
-    else Truncate (n);
   }
 
   /**

@@ -49,7 +49,53 @@ struct csHashElement
 /// a vector of csHashElements
 typedef csArray<csHashElement> csHashBucket;
 /// a vector of csHashBuckets
-typedef csPDelArray<csHashBucket> csHashBucketVector;
+typedef csArray<csHashBucket> csHashBucketVector;
+
+/**
+ * An iterator to iterate over all elements in the hashmap.
+ * When you have an open iterator you should not alter the
+ * hashmap that this object iterates over. The only safe
+ * operation that you can do is to call 'Delete' on this
+ * iterator to delete one element from the map. The iterator
+ * will correctly point to the next element then.
+ */
+class csGlobalHashIterator
+{
+  friend class csHashMap;
+  friend class csHashIteratorReversible;
+
+private:
+  /// Next bucket we are iterating over. NULL if no more elements.
+  csHashBucket* bucket;
+  /// index of next item in bucket.
+  int element_index;
+  /// Current bucket index in hashmap.
+  uint32 bucket_index;
+  /// Pointer to the hashmap.
+  csHashMap* hash;
+
+private:
+  /// Go to next element.
+  void GotoNextElement ();
+
+public:
+  /**
+   * Constructor for an iterator to iterate over all elements in a hashmap.
+   * Note that you should not do changes on the hashmap when you have
+   * open iterators.
+   */
+  csGlobalHashIterator (csHashMap* hash);
+
+  /// Is there a next element in this iterator?
+  bool HasNext ();
+  /// Get the next element.
+  csHashObject Next ();
+  /**
+   * Delete next element and fetches new one.
+   * @@@ Not implemented yet!
+   */
+  void DeleteNext ();
+};
 
 /**
  * An iterator to iterate over elements in the hashmap.
@@ -122,6 +168,7 @@ public:
 class csHashMap
 {
   friend class csHashIterator;
+  friend class csGlobalHashIterator;
   friend class csHashMapReversible;
 
 private:
@@ -198,6 +245,11 @@ public:
    * Delete all objects from this map.
    */
   void DeleteAll ();
+
+  /**
+   * Dump statistics about bucket quality.
+   */
+  void DumpStats ();
 };
 
 /**

@@ -14,6 +14,14 @@ The history order is reversed so that new features are at the top.
 	  was not doing that which made the routine not better than
 	  SetLengthUnsafe(). In addition SetCapacity() can now also decrease
 	  the capacity (it will behave like Truncate() in that case).
+	- Restored csArray::SetCapacity() to old behaviour and added a new
+	  function csArray::SetLength() that allows to shrink or enlarge
+	  the actual number of elements in the array with proper construction
+	  and destruction. Also avoids the need for a default constructor
+	  by using the copy constructor to construct new items in SetLength().
+	- Optimized csHashMap again.
+	- Added csGlobalHashIterator to iterate over all elements in a hashmap.
+	  This is more efficient then using csHashIterator for this.
 24-Apr-2003
 	- Eric Sunshine made the following changes:
 	    - Improved robustness of --with-x check for Darwin/Macintosh, since

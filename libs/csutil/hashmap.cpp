@@ -48,6 +48,55 @@ csHashKey csHashCompute(char const* s)
 
 //-----------------------------------------------------------------------------
 
+csGlobalHashIterator::csGlobalHashIterator (csHashMap *hm)
+{
+  hash = hm;
+  bucket = NULL;
+  element_index = 0;
+  bucket_index = (uint32)-1;
+  GotoNextElement ();
+}
+
+bool csGlobalHashIterator::HasNext ()
+{
+  return bucket && bucket->Length () > 0;
+}
+
+void csGlobalHashIterator::GotoNextElement ()
+{
+  element_index++;
+  if (!bucket || element_index >= bucket->Length ())
+  {
+    // Next bucket.
+    bucket_index++;
+    uint32 const nbuckets = (uint32)hash->Buckets.Length();
+    while (bucket_index < nbuckets && (hash->Buckets[bucket_index].Length()==0))
+      bucket_index++;
+    if (bucket_index >= nbuckets)
+      bucket = NULL;	// The end
+    else
+    {
+      bucket = &(hash->Buckets[bucket_index]);
+      element_index = 0;
+    }
+  }
+}
+
+csHashObject csGlobalHashIterator::Next ()
+{
+  if (bucket == NULL) return NULL;
+  csHashObject obj = ((*bucket)[element_index]).object;
+  GotoNextElement ();
+  return obj;
+}
+
+void csGlobalHashIterator::DeleteNext ()
+{
+  // @@@ Not yet implemented.
+}
+
+//-----------------------------------------------------------------------------
+
 csHashIterator::csHashIterator (csHashMap *hm)
 {
   hash = hm;
@@ -63,7 +112,7 @@ csHashIterator::csHashIterator (csHashMap *hm, csHashKey hkey)
   uint32 idx = hkey % hm->NumBuckets;
 
   hash = hm;
-  bucket = hm->Buckets[idx]; // NULL if bucket is empty.
+  bucket = &(hm->Buckets[idx]); // NULL if bucket is empty.
   element_index = -1;
   current_bucket = NULL;
   current_index = -1;
@@ -75,7 +124,7 @@ csHashIterator::csHashIterator (csHashMap *hm, csHashKey hkey)
 
 bool csHashIterator::HasNext ()
 {
-  return bucket != NULL;
+  return bucket && bucket->Length () > 0;
 }
 
 void csHashIterator::GotoNextElement ()
@@ -86,14 +135,13 @@ void csHashIterator::GotoNextElement ()
     // Next bucket.
     bucket_index++;
     uint32 const nbuckets = (uint32)hash->Buckets.Length();
-    while (bucket_index < nbuckets && (!hash->Buckets[bucket_index]
-	    || hash->Buckets[bucket_index]->Length()==0))
+    while (bucket_index < nbuckets && (hash->Buckets[bucket_index].Length()==0))
       bucket_index++;
     if (bucket_index >= nbuckets)
       bucket = NULL;	// The end
     else
     {
-      bucket = hash->Buckets[bucket_index];
+      bucket = &(hash->Buckets[bucket_index]);
       element_index = 0;
     }
   }
@@ -142,7 +190,7 @@ uint32 csHashMap::prime_table[] =
 csHashMap::csHashMap (uint32 size)
 {
   NumBuckets = size;
-  Buckets.SetLength (size);
+  Buckets.SetLength (size, csHashBucket ());
   hash_elements = 0;
 }
 
@@ -167,17 +215,17 @@ uint32 csHashMap::FindLargerPrime (uint32 num)
 void csHashMap::ChangeBuckets (uint32 newsize)
 {
 //printf ("Extend from %d to %d (hash_elements=%d)\n", NumBuckets, newsize, hash_elements);
-  Buckets.SetLength (newsize);
+  Buckets.SetLength (newsize, csHashBucket ());
   int i;
   // Only go up to old size.
   uint32 old_NumBuckets = NumBuckets;
   NumBuckets = newsize;
   for (i = 0 ; i < old_NumBuckets ; i++)
   {
-    csHashBucket* bucket = Buckets[i];
-    if (!bucket) continue;
+    csHashBucket& bucket = Buckets[i];
+    if (bucket.Length () == 0) continue;
     csHashBucket b;
-    bucket->TransferTo (b);
+    bucket.TransferTo (b);
     int bucket_len = b.Length ();
     int j;
     for (j = 0 ; j < bucket_len ; j++)
@@ -186,22 +234,15 @@ void csHashMap::ChangeBuckets (uint32 newsize)
       uint32 new_idx =  el.key % NumBuckets;
       PutInternal (new_idx, el.key, el.object);
     }
-    if (bucket->Length () == 0) Buckets.Put (i, NULL);
   }
 }
 
 void csHashMap::PutInternal (uint32 idx, csHashKey key, csHashObject object)
 {
-  csHashBucket* bucket = Buckets[idx];
-  if (!bucket)
-  {
-    bucket = new csHashBucket ();
-    Buckets.Put (idx, bucket);
-  }
-
-  int i = bucket->Push (csHashElement ());
-  (*bucket)[i].key = key;
-  (*bucket)[i].object = object;
+  csHashBucket& bucket = Buckets[idx];
+  int i = bucket.Push (csHashElement ());
+  bucket[i].key = key;
+  bucket[i].object = object;
 }
 
 void csHashMap::Put (csHashKey key, csHashObject object)
@@ -209,19 +250,19 @@ void csHashMap::Put (csHashKey key, csHashObject object)
   uint32 idx = key % NumBuckets;
   PutInternal (idx, key, object);
   hash_elements++;
-  if (NumBuckets < 10000 && hash_elements > NumBuckets*4)
+  if (NumBuckets < 20000 && hash_elements > NumBuckets*4)
     ChangeBuckets (FindLargerPrime (NumBuckets*4));
 }
 
 csHashObject csHashMap::Get (csHashKey key) const
 {
   uint32 idx = key % NumBuckets;
-  csHashBucket* bucket = Buckets[idx];
-  if (!bucket) return NULL;
+  const csHashBucket& bucket = Buckets[idx];
   int i;
-  for (i = 0 ; i < bucket->Length () ; i++)
+  int len = bucket.Length ();
+  for (i = 0 ; i < len ; i++)
   {
-    csHashElement& element = bucket->Get(i);
+    const csHashElement& element = bucket[i];
     if (element.key == key) return element.object;
   }
   return NULL;
@@ -230,15 +271,14 @@ csHashObject csHashMap::Get (csHashKey key) const
 void csHashMap::Delete (csHashKey key, csHashObject object)
 {
   uint32 idx = key % NumBuckets;
-  csHashBucket* bucket = Buckets[idx];
-  if (!bucket) return;
+  csHashBucket& bucket = Buckets[idx];
   int i;
-  for (i = bucket->Length ()-1 ; i >= 0 ; i--)
+  for (i = bucket.Length ()-1 ; i >= 0 ; i--)
   {
-    csHashElement& element = bucket->Get(i);
+    csHashElement& element = bucket.Get (i);
     if (element.key == key && element.object == object)
     {
-      bucket->DeleteIndex (i);
+      bucket.DeleteIndex (i);
       hash_elements--;
       break;
     }
@@ -248,15 +288,14 @@ void csHashMap::Delete (csHashKey key, csHashObject object)
 void csHashMap::DeleteAll (csHashKey key)
 {
   uint32 idx = key % NumBuckets;
-  csHashBucket* bucket = Buckets[idx];
-  if (!bucket) return;
+  csHashBucket& bucket = Buckets[idx];
   uint32 i;
-  for (i = bucket->Length () ; i-- > 0 ; )
+  for (i = bucket.Length () ; i-- > 0 ; )
   {
-    csHashElement& element = bucket->Get(i);
+    csHashElement& element = bucket.Get (i);
     if (element.key == key)
     {
-      bucket->DeleteIndex (i);
+      bucket.DeleteIndex (i);
       hash_elements--;
     }
   }
@@ -267,9 +306,36 @@ void csHashMap::DeleteAll ()
   uint32 b;
   for (b = Buckets.Length () ; b-- > 0 ; )
   {
-    Buckets.Put (b, NULL);
+    Buckets[b].DeleteAll ();
   }
   hash_elements = 0;
+}
+
+void csHashMap::DumpStats ()
+{
+  int i;
+  int count_null = 0;
+  int count_empty_but_not_null = 0;
+  int count_elements = 0;
+  int max_elements = 0;
+  for (i = 0 ; i < NumBuckets ; i++)
+  {
+    csHashBucket& bucket = Buckets[i];
+    if (bucket.Length () == 0)
+    {
+      count_empty_but_not_null++;
+    }
+    else
+    {
+      count_elements += bucket.Length ();
+      if (bucket.Length () > max_elements)
+	max_elements = bucket.Length ();
+    }
+  }
+  printf ("buckets=%d null=%d empty=%d el=%d/%d max_el=%d avg_el=%g\n",
+    NumBuckets, count_null, count_empty_but_not_null,
+    count_elements, hash_elements, max_elements,
+    float (count_elements) / float (NumBuckets));
 }
 
 //-----------------------------------------------------------------------------
