@@ -28,6 +28,8 @@ The history order is reversed so that new features are at the top.
 	  adding his own typemaps like those found in Swig's typemaps.i file
 	  (since typemaps.i doesn't define typemaps for strings), and added
 	  lots of nice comments to perlpre.i and perlpost.i.
+	- Oktal fixed a couple of nasty typos (XSRETURN_SV and sv_setpvn)
+	  in the Perl Swig module.
 1-June-2003
 	- Philip Wyett started adding MSVC 7 external app HOWTO screenshot
 	  images.

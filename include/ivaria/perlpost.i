@@ -44,7 +44,9 @@
       croak ("No such instance method %s in object", prop);
 
     if (val) sv_setsv (* valp, val);
-    XSRETURN_SV (* valp);
+
+    ST (0) = * valp;
+    XSRETURN (1);
   }
 %}
 
@@ -142,7 +144,8 @@
     iObjectRegistry *reg = (iObjectRegistry *) SvIV (reg_obj);
     SvREFCNT_dec (reg_obj);
 
-    for (int ok = 1, arg = 1; ok; arg += 4)
+    bool ok = true;
+    for (int arg = 1; ok; arg += 4)
     {
       SV *plug_sv = ST (arg);
       SV *iface_sv = ST (arg + 1);
@@ -280,7 +283,7 @@
 {
   if (argvi >= items) { EXTEND (sp, 1); }
   $result = sv_newmortal ();
-  sv_setpvn ($result, * ($1));
+  sv_setpv ($result, * ($1));
   argvi++;
 }
 %typemap(in) char *& INOUT = char *& INPUT;
@@ -444,7 +447,8 @@
 
     SV *rv = newRV ((SV *) av);
     SvREFCNT_dec ((SV *) av);
-    XSRETURN_SV (rv);
+    ST (0) = rv;
+    XSRETURN (1);
   }
 %}
 
@@ -738,7 +742,8 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
     }
     SV *rv = newRV ((SV *) hv);
     SvREFCNT_dec ((SV *) hv);
-    XSRETURN_SV (rv);
+    ST (0) = rv;
+    XSRETURN (1);
   }
 %}
 
