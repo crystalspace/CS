@@ -259,7 +259,7 @@ void csGraphics2DAA::Print (csRect const* area)
           alt_state = down;
         if (event == CSKEY_CTRL)
           ctrl_state = down;
-        EventOutlet->Key (event, -1, down);
+        EventOutlet->Key (event, 0, down);
       }
     }
 }

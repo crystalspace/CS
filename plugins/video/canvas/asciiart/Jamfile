@@ -1,10 +1,10 @@
 SubDir TOP plugins video canvas asciiart ;
 
-if $(LIBAA.AVAILABLE) = "yes"
+if $(AALIB.AVAILABLE) = "yes"
 {
 Description asciiart : "Ascii Art driver" ;
 Plugin asciiart : [ Wildcard *.cpp *.h ] ;
 LinkWith asciiart : canvascommon csutil ;
-ExternalLibs asciiart : LIBAA ;
+ExternalLibs asciiart : AALIB ;
 CompileGroups asciiart : drivers2d ;
 }

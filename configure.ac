@@ -1326,7 +1326,7 @@ AS_IF([test $cs_cv_libode_recent = yes],
 	[cs_cv_libode_opcode=no])
 
 AS_IF([test $cs_cv_libode_recent = yes],
-    [CS_CHECK_BUILD([if extern "C" is needed with libode],
+    [CS_CHECK_BUILD([if libode requires extern "C"],
 	[cs_cv_libode_extern_c],
 	[AC_LANG_PROGRAM(
 	    [[#include <ode/ode.h>
@@ -1707,6 +1707,21 @@ AS_IF([test $cs_cv_libdivxdecore4 != yes],
 
 
 #------------------------------------------------------------------------------
+# Check for Ascii Art library (aalib).
+#------------------------------------------------------------------------------
+AC_CHECK_TOOLS([AALIBCONFIG], [aalib-config])
+AC_CACHE_CHECK([for AAlib], [cs_cv_libaa],
+    [AS_IF([test -n "$AALIBCONFIG"],
+	[cs_cv_libaa=yes
+	cs_cv_libaa_cflags=`AC_RUN_LOG([$AALIBCONFIG --cflags])`
+	cs_cv_libaa_lflags=''
+	cs_cv_libaa_libs=`AC_RUN_LOG([$AALIBCONFIG --libs])`
+	CS_EMIT_BUILD_RESULT([cs_cv_libaa], [AALIB])],
+	[cs_cv_libaa=no])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if regular expressions are available.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
@@ -1946,7 +1961,8 @@ AS_IF([test $cs_cv_sys_socket = yes],
 	#endif
 	#if HAVE_NETDB_H
 	#include <netdb.h>
-	#endif]])])
+	#endif
+	]])])
 
 
 
