@@ -640,6 +640,14 @@ iSystem* sys = @dots{};
 iVFS* vfs = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_VFS, iVFS);
 @end example
 
+@subheading @code{csEngine::NextFrame()} removed
+@cindex @code{csEngine::NextFrame()}
+@cindex @code{iEngine::NextFrame()}
+
+@code{csEngine::NextFrame()} and @code{iEngine::NextFrame()} are removed.
+This is now done automatically in @code{csEngine::Draw()} and it is no
+longer needed to manually call it.
+
 @subheading @sc{ddg} Terrain Engine Removed
 @cindex @sc{ddg} Terrain Engine
 
