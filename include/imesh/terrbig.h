@@ -48,6 +48,12 @@ struct iTerrBigState : public iBase
    * and saves it into hm.  It will also load the file.
    */
   virtual bool ConvertImageToMapFile (iFile *image, iImageIO *imageio, const char *hm) = 0;
+  /**
+   * Same as ConvertImageToMapFile but works from a raw floating point array
+   * the incoming float should be size width * width.  Width should be a value
+   * 2^n+1
+   */
+  virtual bool ConvertArrayToMapFile (float *data, int width,  const char *hm) = 0;
   /// Set the materials list, copies the passed in list.
   virtual void SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials) = 0;
 };
