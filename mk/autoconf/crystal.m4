@@ -103,11 +103,8 @@ AS_IF([test "$cs_sdk" = yes && test "$enable_cstest" = yes],
     [CS_CHECK_BUILD([if Crystal Space SDK is usable], [cs_cv_crystal_sdk],
 	[AC_LANG_PROGRAM(
 	    [#include <cssysdef.h>
-	    #include <csutil/scf.h>
-	    #include <stdio.h>
-	    #include <stdlib.h>],
-	    [scfInitialize(0,0);
-	    iSCF::SCF->Finish();])],
+	    #include <csutil/csstring.h>],
+	    [csString s; s << "Crystal Space";])],
 	[CS_CREATE_TUPLE([$CRYSTAL_CFLAGS],[],[$CRYSTAL_LIBS])], [C++],
 	[], [cs_sdk=no])])
 
