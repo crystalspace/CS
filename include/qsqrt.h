@@ -77,13 +77,13 @@ static inline float qsqrt (float x)
 		"fmul	%%st\n"			// x h 1.5 a a*a
 		"fmulp	%%st(3)\n"		// x a*a*h 1.5 a
 		"fxch\n"			// x a*a*h a 1.5
-		"fsubrp	%%st(2)\n"		// x 1.5-a*a*h a
+		"fsubp  %%st,%%st(2)\n"		// x 1.5-a*a*h a
 		"fmulp	%%st(1)\n"		// x a
 		"fmulp	%%st(1)\n"		// a
 	: "=&t" (ret), "+m" (x) : "m" (0.5F), "m" (1.5F)
 	: "eax", "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)"
   );
-  return -ret;
+  return ret;
 }
 
 /**
@@ -115,12 +115,12 @@ static inline float qisqrt (float x)
 		"fmul	%%st\n"			// h 1.5 a a*a
 		"fmulp	%%st(3)\n"		// a*a*h 1.5 a
 		"fxch\n"			// a*a*h a 1.5
-		"fsubrp	%%st(2)\n"		// 1.5-a*a*h a
+		"fsubp  %%st,%%st(2)\n"		// 1.5-a*a*h a
 		"fmulp	%%st(1)\n"		// a
 	: "=t" (ret), "+m" (x) : "m" (0.5F), "m" (1.5F)
 	: "eax", "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)"
   );
-  return -ret;
+  return ret;
 }
 
 #elif !defined (CS_NO_QSQRT) && defined (COMP_MSVC)
