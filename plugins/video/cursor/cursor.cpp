@@ -416,7 +416,7 @@ uint8 csCursor::GetTransparency (const char *name) const
   return 0;
 }
 
-csRGBcolor* csCursor::GetKeyColor (const char *name) const
+const csRGBcolor* csCursor::GetKeyColor (const char *name) const
 {
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci && ci->hasKeyColor) return &ci->keycolor;

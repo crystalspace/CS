@@ -22,6 +22,7 @@ chronological order.
 	  any more for a cursor.
 	- res changed iCursor->ParseConfigFile () to accept an iConfigFile*
 	  instead of a VFS file name.
+	- res made iCursor->GetKeyColor() return a const pointer.
 4-Oct-2004
 	- res fixed xmlshader to correctly deal with shader conditionals 
 	  in text.

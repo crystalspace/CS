@@ -107,9 +107,10 @@ struct iCursor : public iBase
   
   /**
    * Get key colour of the specified cursor.
-   * Returns default 0,0,0 if there is no cursor with this name
+   * Returns default 0 if the cursor has no keycolor set or there is no 
+   * cursor with this name
    */
-  virtual csRGBcolor* GetKeyColor (const char *name) const = 0;
+  virtual const csRGBcolor* GetKeyColor (const char *name) const = 0;
 
   /**
    * Get the foreground color of the cursor.  These will only

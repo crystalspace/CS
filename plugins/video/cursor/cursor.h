@@ -132,7 +132,7 @@ public:
   /// Get the transparency transparency of the specified cursor.  
   virtual uint8 GetTransparency (const char *name) const;
   /// Get key colour of the specified cursor.
-  virtual csRGBcolor* GetKeyColor (const char *name) const;
+  virtual const csRGBcolor* GetKeyColor (const char *name) const;
   /**
    * Get the foreground color of the cursor.  These will only be used when 
    * in OS mode on systems which only support monochrome cursors
