@@ -141,7 +141,7 @@ void csSharedLODMesh::CreateMesh (int new_x_verts, int new_z_verts, int edge_res
   mesh->vertex_fog = NULL;
   mesh->num_vertices_pool = 1;
   mesh->morph_factor = 0;
-  mesh->use_vertex_color = false;
+  mesh->use_vertex_color = true;
   mesh->do_morph_texels = false;
   mesh->do_morph_colors = false;
   mesh->do_fog = true;
@@ -296,67 +296,89 @@ csBCTerrBlock::~csBCTerrBlock ()
   if (buf)
     buf->DecRef ();
   if (draw_mesh.vertex_fog) delete draw_mesh.vertex_fog;
+  if (large_tri) delete [] large_tri;
+  if (verts) delete [] verts;
+  if (normals) delete [] normals;
+  if (texels) delete [] texels;
+  if (color) delete [] color;
 }
 
 void csBCTerrBlock::SetupBaseMesh ()
 {
   if (!controlpoint) return;
   if (!owner) return;
-  int i, j, hor_length, pos;
-  float u, v;
-  csVector3 *work;
-  work = controlpoint;
+  int i, j, hor_length, pos, size, a;
+  float u, v, divu, divv;
+  csVector3 temp[4];
+  size = owner->sys_inc * owner->sys_inc;
+  verts = new csVector3[size];
+  verts = new csVector3[size];
+  normals = new csVector3[size];
+  texels = new csVector2[size];
+  color = new csColor[size];
   hor_length = owner->hor_length;
   pos = 0;
 
-  v = 0.0;
-  for (i = 0; i < 4; i++)
+  divu = owner->sys_inc - 1;
+  divv = divu;
+  for (i = 0; i < owner->sys_inc; i++)
   {
-    u = 0.0;
-    for (j = 0; j < 4; j++)
+    v = (float)i / divv;
+    temp[0] = BezierControlCompute (v, controlpoint, owner->hor_length);
+    temp[1] = BezierControlCompute (v, &controlpoint[1], owner->hor_length);
+    temp[2] = BezierControlCompute (v, &controlpoint[2], owner->hor_length);
+    temp[3] = BezierControlCompute (v, &controlpoint[3], owner->hor_length);
+    for (j = 0; j < owner->sys_inc; j++)
     {
-      verts[pos] = work[j];
+      u = (float)j / divu;
+      verts[pos] = BezierCompute (u, temp);
       if (j == 3) u = 1.0f;
       if (i == 3) v = 1.0f;
       texels[pos].Set (u,v);
       color[pos].Set (1,1,1);
       normals[pos].Set(1,1,1);
-      pos++;
-      u += (1.0f / 3.0f);
-    }
-    work += hor_length;
-    v += (1.0f / 3.0f);
+      pos++;      
+    }    
+  }
+  for (i = 0; i < size; i++)
+  {
+    texels[i].x = texels[i].x * owner->correct_du +
+      owner->correct_su;
+    texels[i].y = texels[i].y * owner->correct_dv +
+      owner->correct_sv;
   }
   draw_mesh.mat_handle = material->GetMaterialHandle ();
   owner->SetupVertexBuffer (buf, buf);
-  if (buf)
+  /*if (buf)
   {
     if (owner->vbufmgr)
       owner->vbufmgr->LockBuffer(buf,
-        verts, texels, NULL,
-        16, 0);
-  }
+        verts, texels, color,
+        size, 0);
+  }*/
   small_tri[0].a = 0;
-  small_tri[0].b = 12;
-  small_tri[0].c = 3;
-  small_tri[1].a = 12;
-  small_tri[1].b = 15;
-  small_tri[1].c = 3;
+  small_tri[0].b = (owner->sys_inc - 1) * owner->sys_inc;
+  small_tri[0].c = owner->sys_inc - 1;
+  small_tri[1].a = (owner->sys_inc - 1) * owner->sys_inc;
+  small_tri[1].b = size - 1;
+  small_tri[1].c = owner->sys_inc - 1;
   pos = 0;
-  int a;
-  for (i = 0; i < 3; i++)
+  size = (owner->sys_inc - 1);
+  size *= (size * 2);  
+  large_tri = new csTriangle[size];
+  for (i = 0; i < (owner->sys_inc - 1); i++)
   {
-    for (j = 0; j < 3; j++)
+    for (j = 0; j < (owner->sys_inc - 1); j++)
     {
       a = (4 * i) + j;
       large_tri[pos].a = a;
       large_tri[pos].b = a + 4;
       large_tri[pos].c = a + 1;
-      pos += 1;
+      pos++;
       large_tri[pos].a = a + 4;
       large_tri[pos].b = a + 4 + 1;
       large_tri[pos].c = a + 1;
-      pos += 1;
+      pos++;
     }
   }
 }
@@ -453,6 +475,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   edge_res = nowner->factory_state->GetMaxEdgeResolution ();
   end = default_lod->x_verts * default_lod->z_verts;
   edges = edge_res;
+  work = cntrl + (nowner->hor_length * 3); // lower control points
 
   // up
   //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation up");
@@ -472,7 +495,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
       u = u / u_add;
       if (u < 0.0f) u = 0.0f;
       if (u > 1.0f) u = 1.0f;
-      default_lod->texels[pos].Set ( 0.0, u);
+      default_lod->texels[pos].Set ( 0.0, u );
       //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u : 0.0 v: %f", u );
       default_lod->color[pos] = work_mesh->color[i];
       pos++;
@@ -487,7 +510,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
     default_lod->verts[pos] = cntrl[0];
     default_lod->normals[pos].Set (0,1,0);
     default_lod->texels[pos].Set ( 0, 0);
-    default_lod->color[pos].Set (1,1,1);
+    default_lod->color[pos].Set (1.,1.,1.);
     u = u_add;
     pos += 1;
     x1_end = 1;
@@ -497,7 +520,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
       //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
       default_lod->normals[pos].Set (0,1,0);
       default_lod->texels[pos].Set ( 0, u);
-      default_lod->color[pos].Set (1,1,1);
+      default_lod->color[pos].Set (1.,1.,1.);
       x1_end++;
       pos++;
       u += u_add;
@@ -505,14 +528,11 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
     default_lod->verts[pos] = cntrl[3];
     default_lod->normals[pos].Set (0,1,0);
     default_lod->texels[pos].Set ( 0, 1);
-    default_lod->color[pos].Set (1,1,1);
+    default_lod->color[pos].Set (1.,1.,1.);
     x1_end++;
-  }
-  work = cntrl + (nowner->hor_length * 3); // lower control points
+  }  
   // right
   //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation right");
-
-
   u_add = 1.0 / (edges + 1.0);
   pos = end + x1_end;
   default_lod->verts[pos] = cntrl[3];
@@ -622,6 +642,23 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
     default_lod->color[pos].Set (1,1,1);
     z2_end++;
   }
+  
+  for (i = end; i < (end + z2_end); i++)
+  {
+    default_lod->texels[i].x = (default_lod->texels[i].x * owner->correct_du) +
+      owner->correct_su;
+    default_lod->texels[i].y = (default_lod->texels[i].y * owner->correct_dv) +
+      owner->correct_sv;
+    //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","edge u: %f v: %f",
+      //default_lod->texels[i].x, default_lod->texels[i].y);
+  }
+  /*for (i = end; i < (end + z2_end); i++)
+  {
+    default_lod->texels[i].x = default_lod->texels[i].x * owner->correct_dv +
+      owner->correct_sv;
+    default_lod->texels[i].y = default_lod->texels[i].y * owner->correct_du +
+      owner->correct_su;
+  }*/
   if (default_lod->mesh->triangles != triangles) csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Triangles r fucked up?");
   //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Addition");
 
@@ -1244,16 +1281,19 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
       else
         draw_mesh.buffers[0] = buf;
       //if (!buf->IsLocked ())
-      //{
+      //{        
+        end = owner->sys_inc * owner->sys_inc;  
         owner->vbufmgr->LockBuffer(draw_mesh.buffers[0],
           verts, texels, color,
-          16, 0);
+          end, 0);
       //}
       draw_mesh.clip_portal = clip_portal;
       draw_mesh.clip_portal = clip_plane;
       draw_mesh.clip_portal = clip_z_plane;
-      draw_mesh.triangles = &large_tri[0];
-      draw_mesh.num_triangles = 18;
+      draw_mesh.triangles = large_tri;
+      end = owner->sys_inc - 1;
+      end *= (end * 2);
+      draw_mesh.num_triangles = end;
       rview->CalculateFogMesh(camtrans, draw_mesh);
       pG3D->DrawTriangleMesh(draw_mesh);
       owner->vbufmgr->UnlockBuffer (draw_mesh.buffers[0]);
@@ -1355,13 +1395,65 @@ csBCTerrObject::csBCTerrObject (iObjectRegistry* object_reg,
   vis_cb = NULL;
   collision = NULL;
   initheight = false;
-  flattenheight = false;
   toph = 0.0;
   righth = 0.0;
   downh = 0.0;
   lefth = 0.0;
   vis = false;
+  sys_inc = 4;
+  prebuilt = false;
+  CorrectSeams (0,0);
 }
+
+csBCTerrObject::~csBCTerrObject ()
+{
+  // int x, z;
+  if (control_points) delete [] control_points;
+  if (blocks) delete [] blocks;
+  if (vis_cb) vis_cb->DecRef ();
+}
+
+void csBCTerrObject::Build ()
+{
+  if (!initialized)
+  {
+    if (prebuilt)
+    {
+      SetupMesh ();
+      BuildCullMesh ();
+      initialized = true;
+    }
+  }
+}
+
+void csBCTerrObject::CorrectSeams (int tw, int th)
+{
+  if (object_reg)
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Terr","x %d, y %d", tw, th);
+  correct_tw = tw;
+  correct_th = th;
+  if (tw)
+  {
+    correct_du = 1. - 2. / float (tw);
+    correct_su = 1. / float (tw);
+  }
+  else
+  {
+    correct_du = 1;
+    correct_su = 0;
+  }
+  if (th)
+  {
+    correct_dv = 1. - 2. / float (th);
+    correct_sv = 1. / float (th);
+  }
+  else
+  {
+    correct_dv = 1;
+    correct_sv = 0;
+  }
+}
+
 
 int csBCTerrObject::HeightTest (csVector3 *point)
 {
@@ -1385,13 +1477,69 @@ int csBCTerrObject::HeightTestExt (csVector3 *point)
   return 0;
 }
 
-csBCTerrObject::~csBCTerrObject ()
+void csBCTerrObject::PreBuild ()
 {
-  // int x, z;
-  if (control_points) delete [] control_points;
-  if (blocks) delete [] blocks;
-  if (vis_cb) vis_cb->DecRef ();
+  csVector2* size;
+  csVector3* work;
+  float x, z, last_x, last_z, rat_x, rat_z;
+  // rat = ratio
+  int x_size, z_size, i, j, new_size;
+  if ( (x_blocks <= 0) || (z_blocks <= 0) ) return;
+  size = factory_state->GetSize (); // get block size
+  x = size->x / 3.0; // x axis increments
+  z = size->y / 3.0; // z axis increments
+  x_size = (3 * x_blocks) + 1; // # of x control points
+  z_size = (3 * z_blocks) + 1; // # of z control points
+  new_size = x_size * z_size;
+  control_points = new csVector3[new_size];
+  hor_length = x_size;  
+  control_points[0] = topleft;
+
+  last_z = topleft.z;
+  work = control_points;
+  for (i = 0; i < z_size; i++)
+  {
+    last_x = topleft.x;
+    rat_z = (topleft.z - last_z) / (z_blocks * size->y);
+    //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Control Points: New Set");
+    for (j = 0; j < x_size; j++)
+    {
+      work->x = last_x;
+      work->z = last_z;
+      rat_x = (last_x - topleft.x) / (x_blocks * size->x);
+      // get y value
+      work->y = topleft.y;
+      //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Control Points: %f %f %f", work->x, work->y, work->z);
+      last_x += x;
+      work += 1;
+    }
+    last_z -= z;
+  }  
+  prebuilt = true;
 }
+
+void csBCTerrObject::SetControlPoint (const csVector3 point,
+    const int iter)
+{
+  int size;
+  if (!prebuilt) return;
+  if (initialized) return; // need to rebuild, wait on implementation
+  size = ((3 * x_blocks) + 1) * ((3 * z_blocks) + 1);
+  if ((size <= iter) && (iter >=0) ) 
+    control_points[iter] = point;
+}
+
+void csBCTerrObject::SetControlPointHeight (const float height,
+    const int iter)
+{
+  int size;
+  if (!prebuilt) return;
+  if (initialized) return; // need to rebuild, wait on implementation
+  size = ((3 * x_blocks) + 1) * ((3 * z_blocks) + 1);
+  if ((size <= iter) && (iter >=0) )
+    control_points[iter].y = height;
+}
+
 
 bool csBCTerrObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
@@ -1578,13 +1726,8 @@ bool csBCTerrObject::HitBeamObject (const csVector3& start, const csVector3& end
  */
 void csBCTerrObject::SetHeightMap (iImage* im)
 {
-  int x, z;
   if ( (x_blocks < 1) || (z_blocks < 1) ) return;
-  x = (3 * x_blocks) + 1;
-  z = (3 * z_blocks) + 1;
-  int new_size = x * z;
-  control_points = new csVector3[new_size];
-  hor_length = x;
+  if (!prebuilt) return;
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Setup: Control Points");
   SetupControlPoints (im);
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Setup: Mesh");
@@ -1673,48 +1816,84 @@ int csBCTerrObject::GetHeightFromImage (iImage* im, float x, float z)
 void csBCTerrObject::FlattenSides ()
 {
   int x_size, z_size, i, end;
+  float y;
+  if (!prebuilt) return;
   x_size = (3 * x_blocks) + 1; // # of x control points
   z_size = (3 * z_blocks) + 1;
   end = x_size * z_size;
-  /*if (flattenheight)
+  
+  control_points[0].y = topleft.y;
+  control_points[x_size - 1].y = topleft.y; 
+  control_points[(z_size -1) * x_size].y = topleft.y; 
+  control_points[end - 1].y = topleft.y; 
+  if (!initheight)
   {
-    // flatten colinearally
+    toph = topleft.y;
+    righth = topleft.y;
+    downh = topleft.y;
+    lefth = topleft.y;    
   } else
-  {
-    if (initheight)
+  {    
+    float max;
+    max = toph;
+    if (righth > max ) max = righth;
+    if (downh > max ) max = downh;
+    if (lefth > max ) max = lefth;
+    if (btop && (bright || bleft) )
     {
-      // flatten sides by value
-    } else
-    {*/
-      // flatten sides by topleft value
-      float y = topleft.y;
-      // top
-      for (i = 0; i < x_size; i++)
-      {
-        control_points[i].y = y;
-      }
-      // right
-      for (i = (x_size - 1); i < (end); i += x_size)
-      {
-        control_points[i].y = y;
-      }
-      // down
-      for (i = ((z_size - 1) * x_size); i < end; i++)
-      {
-        control_points[i].y = y;
-      }
-      // left
-      for (i = 0; i < end; i += x_size)
-      {
-        control_points[i].y = y;
-      }
-  /*  }
-  }*/
-}
+      toph = max;
+    }
+    if (bright && (btop || bdown))
+    {
+      righth = max;
+    }
+    if (bdown && (bright || bleft))
+    {  
+      downh = max;     
+    }
+    if (bleft && (btop || bdown))
+    {
+      lefth = max;
+    }
+  }
 
-/*int num_vertices;
-   int* vertices;
-*/
+  // top
+  if (btop)
+  {  
+    y = toph;    
+    for (i = 0; i < (x_size); i++)
+    {
+      control_points[i].y = y;
+    }
+  }
+  // right
+  if (bright)
+  {    
+    y = righth;
+    for (i = (x_size - 1 ); i < end; i += x_size)
+    {
+      control_points[i].y = y;
+    }
+  }
+  // down
+  if (bdown)
+  { 
+    y = downh;   
+    for (i = ((z_size - 1) * x_size); i < end; i++)
+    {
+      control_points[i].y = y;
+    }
+  }
+  // left
+  if (bleft)
+  {
+    y = lefth;    
+    for (i = 0; i < end; i += x_size)
+    {
+      control_points[i].y = y;
+    }
+  }
+}
 
 void csBCTerrObject::BuildCullMesh ()
 {
@@ -1773,6 +1952,7 @@ void csBCTerrObject::SetupControlPoints (iImage* im)
     }
     last_z -= z;
   }
+  prebuilt = true;
   FlattenSides ();
 }
 /*
@@ -1852,6 +2032,14 @@ bool csBCTerrObject::ComputeSharedMesh (csSharedLODMesh* mesh, csVector3* cntrl_
       u += uv->x;
     }
     v += uv->y;
+  }
+  int end = mesh->x_verts * mesh->z_verts;
+  for (i = 0; i < end; i++)
+  {
+    mesh->texels[i].x = mesh->texels[i].x * correct_du +
+      correct_su;
+    mesh->texels[i].y = mesh->texels[i].y * correct_dv +
+      correct_sv;
   }
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","!!!!Interior Vertexes: END!!!!");
   //CS_ASSERT( count == (mesh->x_verts * mesh->z_verts));

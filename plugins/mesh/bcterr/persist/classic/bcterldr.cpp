@@ -54,6 +54,14 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TOPLEFT)
   CS_TOKEN_DEF (HEIGHTMAP)
   CS_TOKEN_DEF (GROUPMATERIAL)
+  CS_TOKEN_DEF (CORRECTSEAMS)
+  CS_TOKEN_DEF (C)
+  CS_TOKEN_DEF (H)
+  CS_TOKEN_DEF (BC)
+  CS_TOKEN_DEF (BH)
+  CS_TOKEN_DEF (BUILD)
+  CS_TOKEN_DEF (FLATTEN)
+  CS_TOKEN_DEF (DOFLATTEN)
 CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csBCTerrFactoryLoader)
@@ -274,6 +282,14 @@ iBase* csBCTerrLoader::Parse (const char* pString,
     CS_TOKEN_TABLE (HEIGHTMAP)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (GROUPMATERIAL)
+    CS_TOKEN_TABLE (CORRECTSEAMS)    
+    CS_TOKEN_TABLE (C)
+    CS_TOKEN_TABLE (H)
+    CS_TOKEN_TABLE (BC)
+    CS_TOKEN_TABLE (BH)
+    CS_TOKEN_TABLE (BUILD)
+    CS_TOKEN_TABLE (FLATTEN)
+    CS_TOKEN_TABLE (DOFLATTEN)
   CS_TOKEN_TABLE_END
   
   char *pName;
@@ -283,7 +299,9 @@ iBase* csBCTerrLoader::Parse (const char* pString,
 
   iMeshObject* iTerrObj = NULL;
   iBCTerrState* iState = NULL;
+  iTerrFuncState* iTerrFunc = NULL;
   int group_iter = 0;
+  int cp_iter = 0;
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Loader","Parse");
   csParser* parser = ldr_context->GetParser ();
   char* pBuf = (char*)pString;
@@ -307,6 +325,7 @@ iBase* csBCTerrLoader::Parse (const char* pString,
         }
         iTerrObj = iFactory->GetMeshObjectFactory()->NewInstance();
         iState = SCF_QUERY_INTERFACE (iTerrObj, iBCTerrState);
+        iTerrFunc = SCF_QUERY_INTERFACE (iTerrObj, iTerrFuncState);
       }
       break;
       case CS_TOKEN_SIZE:
@@ -316,7 +335,70 @@ iBase* csBCTerrLoader::Parse (const char* pString,
         if (iState)
         {
           iState->SetSize (x, z);
+          iState->PreBuild ();
         }
+      }
+      break;
+      case CS_TOKEN_BUILD:
+      {
+        if (iState)
+          iState->Build ();
+      }
+      break;
+      case CS_TOKEN_FLATTEN:
+      {
+        float t, r, d, l;
+        csScanStr (pParams, "%f, %f, %f, %f", &t, &d, &l, &r);
+        if (iState)
+          iState->SetFlattenHeight (t, d,l,r);
+      }
+      break;
+      case CS_TOKEN_DOFLATTEN:
+      {
+        bool t, r, d, l;
+        csScanStr (pParams, "%b, %b, %b, %b", &t, &d, &l, &r);
+        if (iState)
+          iState->DoFlatten (t, d,l,r);
+      }
+      break;
+      case CS_TOKEN_C:
+      {
+        csVector3 cp;
+        csScanStr (pParams, "%f, %f, %f", &cp.x, &cp.y, &cp.z);
+        if (iState)
+        {
+          iState->SetControlPoint (cp, cp_iter);
+          cp_iter++;
+        }
+      }
+      break;
+      case CS_TOKEN_H:
+      {
+        float h;
+        csScanStr (pParams, "%f", &h);
+        if (iState)
+        {
+          iState->SetControlPointHeight (h, cp_iter);
+          cp_iter++;
+        }
+      }
+      break;
+      case CS_TOKEN_BC:
+      {
+        csVector3 cp;
+        int x, z;
+        csScanStr (pParams, "%d, %d, %f, %f, %f", &x, &z, &cp.x, &cp.y, &cp.z);
+        if (iState)
+          iState->SetControlPoint (cp, x, z);
+      }
+      break;
+      case CS_TOKEN_BH:
+      {
+        float h;
+        int x, z;
+        csScanStr (pParams, "%d, %d, %f", &x, &z, &h );
+        if (iState)
+          iState->SetControlPointHeight (h, x, z);
       }
       break;
       case CS_TOKEN_TOPLEFT:
@@ -376,6 +458,16 @@ iBase* csBCTerrLoader::Parse (const char* pString,
           iState->SetBlockMaterial (x, z, mat);					
         }
         
+      }
+      break;
+      case CS_TOKEN_CORRECTSEAMS:
+      {
+        int x, y;
+        csScanStr (pParams, "%d,%d", &x, &y, pStr);
+        if (iTerrFunc)
+        {
+          iTerrFunc->CorrectSeams (x, y);
+        }
       }
       break;
       case CS_TOKEN_GROUPMATERIAL:

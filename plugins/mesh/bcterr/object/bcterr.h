@@ -80,12 +80,12 @@ public:
 
   G3DTriangleMesh draw_mesh;
   csTriangle small_tri[2];
-  csTriangle large_tri[18];
+  csTriangle* large_tri;
   iVertexBuffer* buf;
-  csVector3 verts[16];
-  csVector3 normals[16];
-  csVector2 texels[16];
-  csColor color[16];
+  csVector3* verts;
+  csVector3* normals;
+  csVector2* texels;
+  csColor* color;
 
   //bool vis;
   char max_LOD; // max user lod
@@ -168,11 +168,6 @@ public:
 class csBCTerrObject : public iMeshObject
 {
 private:
-  // should we flatten colinearally?
-  bool flattenheight, initheight;
-  // flatten to this height if not colinearally
-  float  toph, righth, downh, lefth;   
-
   void SetupControlPoints (iImage* im);
   int GetHeightFromImage (iImage* im, float x, float z);
   void FlattenSides ();
@@ -188,8 +183,18 @@ public:
   csBox3 bbox;
   csVector3 radius;
 
+  // flatten info
+  bool btop, bright, bdown, bleft, initheight;
+  // flatten to this height if not colinearally
+  float  toph, righth, downh, lefth;
+  
+  // correctseams info
+  int correct_tw, correct_th;
+  float correct_du, correct_su, correct_dv, correct_sv;
+
   BCPolyMesh culling_mesh;
   bool vis;
+  int sys_inc;
 
   csVector3* control_points;
   csBCCollisionQuad *collision;
@@ -197,7 +202,7 @@ public:
 
   csVector3 topleft;
   int x_blocks, z_blocks, hor_length;
-  bool initialized;
+  bool initialized, prebuilt;
 
   csBCTerrObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   virtual ~csBCTerrObject ();
@@ -211,6 +216,11 @@ public:
   int HeightTest (csVector3 *point);
   int HeightTestExt (csVector3 *point);
   void FreeSharedLOD (const csVector3 point);
+  void PreBuild ();
+  void SetControlPoint (const csVector3 point, const int iter);
+  void SetControlPointHeight (const float height, const int iter);
+  void CorrectSeams (int tw, int th);
+  void Build ();
 
 
   ///--------------------- iMeshObject implementation ---------------------
@@ -258,7 +268,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csBCTerrObject);
     virtual void SetSize ( int x, int z)
     {
-      if (!scfParent->initialized)
+      if (!scfParent->initialized && !scfParent->prebuilt)
       {
         scfParent->x_blocks = x;
         scfParent->z_blocks = z;
@@ -322,6 +332,58 @@ public:
     }
     virtual void CollideRay (const csVector3 start, csVector3 &end)
     {
+    }
+    virtual void SetControlPoint (const csVector3 point, int iter)
+    {
+      scfParent->SetControlPoint (point, iter);
+    }
+    virtual void SetControlPoint (const csVector3 point, const int x,
+          const int z) 
+    {
+      int size;
+      size = ((z - 1)* scfParent->hor_length) + x; 
+      scfParent->SetControlPoint (point, size);
+    }
+    virtual void SetControlPointHeight (const float height, const iter) 
+    {
+      scfParent->SetControlPointHeight (height, iter);
+    }
+    virtual void SetControlPointHeight (const float height, const int x,
+          const int z)
+    {
+      int size;
+      size = ((z - 1)* scfParent->hor_length) + x;
+      scfParent->SetControlPointHeight (height, size);
+    }
+    virtual void SetFlattenHeight (const float up, const float down,
+          const float left, const float right)
+    {
+      scfParent->initheight = true;
+      scfParent->toph = up;
+      scfParent->righth = right;
+      scfParent->downh = down;
+      scfParent->lefth = left;
+    }
+    virtual void DoFlatten (const bool up, const bool down,
+          const bool left, const bool right) 
+    {
+      scfParent->btop = up;
+      scfParent->bdown = down;
+      scfParent->bleft = left;
+      scfParent->bright = right;
+    }
+    virtual void SetSystemInc (const int inc) 
+    {
+      if (inc > 4)
+        scfParent->sys_inc = inc; 
+    }
+    virtual void PreBuild ()
+    {
+      scfParent->PreBuild ();
+    }
+    virtual void Build ()
+    {
+      scfParent->Build ();
     }
   } scfiBCTerrState;
   
@@ -454,6 +516,7 @@ public:
     }
     virtual void CorrectSeams (int tw, int th)
     {
+      scfParent->CorrectSeams (tw, th);
       return;
     }
     virtual void GetCorrectSeams (int& tw, int& th) const
