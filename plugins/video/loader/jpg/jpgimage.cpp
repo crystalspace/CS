@@ -224,8 +224,8 @@ csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescrip
   } /* endswitch */
 
   // compression options
-  int quality = 80;
-  bool progressive = false;
+  volatile int quality = 80;
+  volatile bool progressive = false;
 
   /*
      parse output options.

@@ -212,10 +212,11 @@ bool Loader::ReadHeader ()
     else
       add = MAX(add/4, 16);
   }
-  if ((positions[GetMipmapCount()] - positions[0]) + add > sourcelen)
+  if ((size_t)(positions[GetMipmapCount()] - positions[0] + add) > sourcelen)
   {
-    printf ("DDS Image too small Needs:%u Has: %d.\n",
-	(positions[GetMipmapCount()] - positions[0])+add, sourcelen);
+    printf ("DDS Image too small Needs:%u Has: %lu.\n",
+	(unsigned int)(positions[GetMipmapCount()] - positions[0] + add),
+	(unsigned long)sourcelen);
     return false;
   }
     

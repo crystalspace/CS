@@ -934,7 +934,6 @@ bool csBezierMesh::DrawTest (iRenderView *rview, iMovable *movable)
 
 bool csBezierMesh::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 {
-  iCamera *icam = rview->GetCamera ();
   DrawCurves (rview, movable, zMode);
   return true;                                  // @@@@ RETURN correct vis info
 }
@@ -1086,7 +1085,7 @@ void csBezierMesh::MergeTemplate (
   csVector3 *shift,
   csMatrix3 *transform)
 {
-  int i, j;
+  int i;
 
   //TODO should merge? take averages or something?
   static_data->curves_center = tpl->GetCurvesCenter ();

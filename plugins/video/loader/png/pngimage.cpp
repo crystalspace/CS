@@ -161,7 +161,7 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     return NULL;
 
   int compress = 6;
-  bool interlace = false;
+  volatile bool interlace = false;
   /*
      parse output options.
      options are a comma-separated list and can be either
@@ -478,7 +478,7 @@ nomem2:
     png_set_packing (png);
 
   volatile enum { imgRGB, imgPAL, imgGrayAlpha } ImageType;
-  int keycolor_index = -1;
+  volatile int keycolor_index = -1;
 
   switch (color_type)
   {
