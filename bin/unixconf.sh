@@ -67,6 +67,7 @@ fi
 
 CXX=`basename ${CXX}`
 echo "CXX = ${CXX} -c"
+echo "CC = ${CXX} -c"
 echo "LINK = ${CXX}"
 
 # Create a dummy C++ program

@@ -1,6 +1,55 @@
 The history order has been reversed so that new features are at the top.
 
 2-Oct-2000
+	- Andrew Zabolotny did the following changes to CS:
+	    - Overhauled the csIniFile class. There is now a new
+	      iConfigFile interface which is implemented by csIniFile. It
+	      is highly recommended all libraries and plugins to work
+	      through this interface rather than using csIniFile
+	      directly. Removed some exotic csIniFile methods such as
+	      saving and loading the config file to/from a csString,
+	      overhauled the iterators (they are exposed through
+	      interfaces now as well).
+	      This is a preparation to excluding csIniFile usage from
+	      plugins. The iSystem interface will expose a method to
+	      create iConfigFile objects, this will avoid duplicate code
+	      in main executable and plugins. Also the ConfigGetXXX
+	      methods will go away from iSystem, instead there will be
+	      an GetConfig() method to retrieve the basic iConfigFile object.
+	    - Implemented a new interface iDataBuffer which is meant as an
+	      extremely lightweight data container (as opposed to
+	      csString). The interface is meant for exchanging abstract
+	      data between plugins. For example:
+		... iVFS *vfs;
+		iDataBuffer *data = vfs->ReadFile (filename);
+		... data->GetData ();
+		... data->GetSize ();
+		data->DecRef ();
+	      Another example:
+		iDataBuffer *path = vfs->ExpandPath ("../test");
+		printf ("Expanded path: %s\n", **path);
+		path->DecRef ();
+	    - Added minimal locale support to Unix systemdriver
+	      (setlocale (LC_XXX, "")) because without that XFree4.0 won't
+	      (always) display national characters. If your specific Unix
+	      doesn't have <locale.h> see the instructions in unix.cpp...
+	      basically if we find that there are such systems we rather
+	      should add detection of setlocale to unixconf.sh.
+	    - Added Xsetlocale() to all X11 canvas drivers. I don't know
+	      whenever this is really required but it won't hurt in any
+	      case, and for some languages this could help.
+	    - I did all said above related to iConfigFile. Namely the
+	      iSystem interface has been changed: removed all the
+	      GetConfigXXX() methods; instead (the simplest but dirty way)
+	      you can just use GetConfig()->GetXXX() instead of older
+	      GetConfigXXX(); a better way is to first store the GetConfig()
+	      aside, then use the variable multiple times to query all the
+	      needed values. All the plugins and applications have been
+	      updated to accomodate this new change; of course I maybe
+	      forgot something so if you get compilation errors you have
+	      to check first if the old GetConfigXXX method is used (and
+	      proceed as above if so) and second check if the "icfgfile.h"
+	      file is included at the top of source file.
 	- Fixed compile bug in Blocks that I caused by a change yesterday.
 	- Fixed similar compile bug in dtsimple.
 	- Fixed engine plugin so that it is again enginep.so.
