@@ -175,7 +175,7 @@ void aws3DFrame::Draw (
 	  break;
 	  
   case fsBitmap:
-	  DrawFlatBackground(todraw, bfill);
+	  //DrawFlatBackground(todraw, bfill);
 	  if(bkg)
 		  DrawTexturedBackground(todraw_txt, bkg, bkg_alpha, bkg_align);
 	  if(ovl)
