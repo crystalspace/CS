@@ -62,17 +62,7 @@ static struct
   int mipmap;
   bool transp;
   RGBPixel transpcolor;
-} opt =
-{
-  false,
-  true,
-  false,
-  false,
-  0, 0,
-  80, 24,
-  -1,
-  false
-};
+} opt;
 
 static int display_help ()
 {
@@ -212,12 +202,27 @@ static bool process_file (const char *fname)
   return true;
 }
 
+static void init_opts()
+{
+  opt.verbose = false;
+  opt.save = true;
+  opt.display = false;
+  opt.paletted = false;
+  opt.scaleX = 0;
+  opt.scaleY = 0;
+  opt.displayW = 80;
+  opt.displayH = 24;
+  opt.mipmap = -1;
+  opt.transp = false;
+}
+
 int main (int argc, char **argv)
 {
 #if defined (__EMX__)	// Expand wildcards on OS/2+GCC+EMX
   _wildcard (&argc, &argv);
 #endif
 
+  init_opts();
   programname = argv [0];
 
   int c;
