@@ -654,7 +654,7 @@ bool csBallMeshObject::HitBeamOutline (const csVector3& start,
     {
       if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
 		csSquaredDist::PointPoint (start, end));
-       
+
       return true;
     }
   }
@@ -666,13 +666,13 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
 {
   // This is the slow version. Use for an accurate hit on the object.
   // It will cycle through every triangle in the mesh serching for the
-  // closest intersection. Slower, but returns the closest hit. 
+  // closest intersection. Slower, but returns the closest hit.
   // Usegae is optional.
-  
+
   csSegment3 seg (start, end);
   int i, max = top_mesh.num_triangles;
   float tot_dist = csSquaredDist::PointPoint (start, end);
-  float dist, temp; 
+  float dist, temp;
   float itot_dist = 1 / tot_dist;
   dist = temp = tot_dist;
   csVector3 *vrt = ball_vertices, tmp;
@@ -718,7 +718,7 @@ static void GetGradientColor(float **gradient, float val, csColor& col)
   while( gradient[entry] && (gradient[entry][0] < val) ) entry++;
   if(gradient[entry] == NULL)
   {
-    if(entry>0) col.Set( gradient[entry-1][1], gradient[entry-1][2], 
+    if(entry>0) col.Set( gradient[entry-1][1], gradient[entry-1][2],
       gradient[entry-1][3]);
     else col.Set(0,0,0);
     return;
@@ -744,7 +744,7 @@ static void GetGradientColor(float **gradient, float val, csColor& col)
    // col.red, col.green,  col.blue);
 }
 
-void csBallMeshObject::ApplyVertGradient(float horizon_height, 
+void csBallMeshObject::ApplyVertGradient(float horizon_height,
   float zenith_height, float**gradient)
 {
   SetupObject();
@@ -760,7 +760,7 @@ void csBallMeshObject::ApplyVertGradient(float horizon_height,
   }
 }
 
-void csBallMeshObject::ApplyLightSpot(const csVector3& position, float size, 
+void csBallMeshObject::ApplyLightSpot(const csVector3& position, float size,
   float**gradient)
 {
   /// compute position on the sphere.

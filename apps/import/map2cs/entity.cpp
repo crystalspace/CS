@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -92,7 +92,7 @@ bool CMapEntity::Read(CMapParser* pParser, CMapFile* pMap)
     }
     else if (strcmp(Buffer, "}") == 0)
     {
-      //OK, we are done with this entity and it looks like 
+      //OK, we are done with this entity and it looks like
       //everything is ok
       finished = true;
     }
@@ -100,10 +100,10 @@ bool CMapEntity::Read(CMapParser* pParser, CMapFile* pMap)
     {
       //Now this seems to be a key/ value pair
       strcpy(Key, Buffer);
-      if (!pParser->GetNextToken(Buffer)) 
+      if (!pParser->GetNextToken(Buffer))
       {
         pParser->ReportError("Format error. Keys and values for entities must"
-                             "always come in pairs. Found no match for key \"%s\"", 
+                             "always come in pairs. Found no match for key \"%s\"",
                              Key);
         return false;
       }
@@ -183,7 +183,7 @@ bool CMapEntity::GetTripleNumValueOfKey(const char* key, double& v1, double& v2,
 const char* CMapEntity::GetClassname()
 {
   const char* classname = GetValueOfKey("classname");
-  if (classname) 
+  if (classname)
   {
     return classname;
   }
@@ -203,7 +203,7 @@ const char* CMapEntity::GetName()
 bool CMapEntity::GetOrigin(CdVector3& v)
 {
   const char* origin = GetValueOfKey("origin");
-  if (origin) 
+  if (origin)
   {
     double x, y, z;
     char dummy;

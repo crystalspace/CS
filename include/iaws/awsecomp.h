@@ -1,18 +1,18 @@
  #ifndef __AWS_EMBEDDED_COMPONENT_H__
  #define __AWS_EMBEDDED_COMPONENT_H__
 /**************************************************************************
-    Copyright (C) 2001 by Christopher Nelson 
-    
+    Copyright (C) 2001 by Christopher Nelson
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -22,10 +22,10 @@
 class awsEmbeddedComponent : public iAwsComponent
 {
   iAwsComponent *comp;
- 
+
 public:
   awsEmbeddedComponent() :comp(NULL) {}
-  virtual ~awsEmbeddedComponent() 
+  virtual ~awsEmbeddedComponent()
   { if (comp) comp->DecRef(); }
 
 public:
@@ -40,7 +40,7 @@ public:
     /// Broadcasts a signal to all slots that are interested.
     virtual void Broadcast(unsigned long signal)
     { comp->Broadcast(signal); }
-         
+
 public:
     /// Sets the embedded component.  MUST BE CALLED BEFORE ANY OTHER FUNCTION!
     virtual void Initialize(iAwsComponent *component)
@@ -49,7 +49,7 @@ public:
     /// Sets up component
     virtual bool Setup(iAws *wmgr, awsComponentNode *settings)
     { return comp->Setup(wmgr, settings); }
-       
+
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
     virtual bool HandleEvent(iEvent& Event)
     {
@@ -96,7 +96,7 @@ public:
     /// Executes scriptable actions for this window
     virtual bool Execute(char *action, awsParmList &parmlist)
     { return comp->Execute(action, parmlist); }
-    
+
     /// Sets the flag (can handle multiple simultaneous sets)
     virtual void SetFlag(unsigned int flag)
     { comp->SetFlag(flag); }
@@ -104,7 +104,7 @@ public:
     /// Clears the flag (can handle multiple simultaneous clears)
     virtual void ClearFlag(unsigned int flag)
     { comp->ClearFlag(flag); }
-    
+
     /// Returns the current state of the flags
     virtual unsigned int Flags()
     { return comp->Flags(); }
@@ -132,7 +132,7 @@ public:
     /// Returns the state of the hidden flag
     virtual bool isHidden()
     { return comp->isHidden(); }
-    
+
     /// Hides a component
     virtual void Hide()
     { comp->Hide(); }
@@ -144,7 +144,7 @@ public:
     /// Get's the unique id of this component.
     virtual unsigned long GetID()
     { return comp->GetID(); }
-    
+
     /// Set's the unique id of this component. Note: only to be used by window manager.
     virtual void SetID(unsigned long _id)
     { comp->SetID(_id); }
@@ -169,12 +169,12 @@ public:
     /// Get's a specific child
     virtual iAwsComponent *GetChildAt(int i)
     { return comp->GetChildAt(i); }
-    
+
     /// Returns true if this component has children
     virtual bool HasChildren()
     { return comp->HasChildren(); }
 
-    /** Get's this components idea of the window manager.  
+    /** Get's this components idea of the window manager.
       * Should be used internally by the component ONLY,
       * or by embedding classes. */
     iAws *WindowManager()
@@ -195,17 +195,17 @@ public:
     /// Sets the parent component of this component;
     virtual void SetParent(iAwsComponent *parent)
     { comp->SetParent(parent); }
-    
+
 public:
     /// Triggered when the component needs to draw
     virtual void OnDraw(csRect clip)=0;
 
     /// Triggered when the user presses a mouse button down
     virtual bool OnMouseDown(int button, int x, int y)=0;
-    
-    /// Triggered when the user unpresses a mouse button 
+
+    /// Triggered when the user unpresses a mouse button
     virtual bool OnMouseUp(int button, int x, int y)=0;
-    
+
     /// Triggered when the user moves the mouse
     virtual bool OnMouseMove(int button, int x, int y)=0;
 
@@ -223,7 +223,7 @@ public:
 
     /// Triggered when the user presses a key
     virtual bool OnKeypress(int key, int modifiers)=0;
-    
+
     /// Triggered when the keyboard focus is lost
     virtual bool OnLostFocus()=0;
 
@@ -234,7 +234,7 @@ public:
 class awsEmbeddedComponentFactory : public iAwsComponentFactory
 {
     iAws *wmgr;
-  
+
 public:
     /// Calls register to register the component that it builds with the window manager
     awsEmbeddedComponentFactory(iAws *_wmgr)

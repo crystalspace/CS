@@ -1,6 +1,6 @@
 //
 //  GLOSXDriver2D.h
-//  
+//
 //
 //  Created by mreda on Tue Oct 30 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -29,22 +29,22 @@ class GLOSXDriver2D : public csGraphics2DGLCommon, public OSXDriver2D {
 public:
     // Constructor
     GLOSXDriver2D(iBase *p);
-    
+
     // Destructor
     virtual ~GLOSXDriver2D();
-    
+
     // Plugin initialization
     virtual bool Initialize (iObjectRegistry *reg);
-    
+
     // Open the window/switch to fullscreen as necessary
     virtual bool Open();
-    
+
     // Close drawing operations
     virtual void Close();
-    
+
     // Set window title
     virtual void SetTitle(char *title);
-                        
+
     // Flip video page (or dump to framebuffer)
     virtual void Print(csRect *area = NULL);
 
@@ -53,13 +53,13 @@ public:
 
     // Enable/disable canvas resize
     virtual void AllowResize(bool allow);
-    
+
     // Resize the canvas
     virtual bool Resize(int w, int h);
-    
+
     // Toggle between fullscreen/windowed mode
     virtual bool ToggleFullscreen();
-    
+
 protected:
 
     // Set up the function pointers for drawing based on the current Depth

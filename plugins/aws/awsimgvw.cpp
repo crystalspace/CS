@@ -25,11 +25,11 @@ const int awsImageView::fsRaised =0x2;
 const int awsImageView::fsSunken =0x3;
 
 
-awsImageView::awsImageView():is_down(false), mouse_is_over(false), 
+awsImageView::awsImageView():is_down(false), mouse_is_over(false),
                              was_down(false), img(NULL),
                              frame_style(0), alpha_level(92)
-                             
-{ 
+
+{
 }
 
 awsImageView::~awsImageView()
@@ -37,7 +37,7 @@ awsImageView::~awsImageView()
 }
 
 char *
-awsImageView::Type() 
+awsImageView::Type()
 { return "Image View"; }
 
 bool
@@ -46,16 +46,16 @@ awsImageView::Setup(iAws *_wmgr, awsComponentNode *settings)
 if (!awsComponent::Setup(_wmgr, settings)) return false;
 
  iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
- 
+
  pm->LookupIntKey("OverlayTextureAlpha", alpha_level); // global get
  pm->GetInt(settings, "Style", frame_style);
  pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
  img=pm->GetTexture("Texture");
- 
+
  return true;
 }
 
-bool 
+bool
 awsImageView::GetProperty(char *name, void **parm)
 {
   if (awsComponent::GetProperty(name, parm)) return true;
@@ -63,15 +63,15 @@ awsImageView::GetProperty(char *name, void **parm)
   return false;
 }
 
-bool 
+bool
 awsImageView::SetProperty(char *name, void *parm)
 {
   if (awsComponent::SetProperty(name, parm)) return true;
-  
+
   return false;
 }
 
-void 
+void
 awsImageView::OnDraw(csRect clip)
 {
   aws3DFrame frame3d;
@@ -79,7 +79,7 @@ awsImageView::OnDraw(csRect clip)
   frame3d.Draw(WindowManager(), Window(), Frame(), frame_style, img, alpha_level);
 }
 
-bool 
+bool
 awsImageView::OnMouseDown(int , int , int )
 {
   Broadcast(signalMouseDown);
@@ -88,12 +88,12 @@ awsImageView::OnMouseDown(int , int , int )
 
   if (is_down==false)
     is_down=true;
-  
+
   Invalidate();
   return true;
 }
-    
-bool 
+
+bool
 awsImageView::OnMouseUp(int ,int ,int )
 {
   Broadcast(signalMouseUp);
@@ -103,11 +103,11 @@ awsImageView::OnMouseUp(int ,int ,int )
     Broadcast(signalClicked);
     is_down=false;
   }
-  
+
   Invalidate();
   return true;
 }
-    
+
 bool
 awsImageView::OnMouseMove(int ,int ,int )
 {
@@ -127,7 +127,7 @@ awsImageView::OnMouseDoubleClick(int ,int ,int )
   return false;
 }
 
-bool 
+bool
 awsImageView::OnMouseExit()
 {
   mouse_is_over=false;
@@ -135,7 +135,7 @@ awsImageView::OnMouseExit()
 
   if (is_down)
     is_down=false;
-  
+
   return true;
 }
 
@@ -152,14 +152,14 @@ awsImageView::OnKeypress(int ,int )
 {
   return false;
 }
-    
+
 bool
 awsImageView::OnLostFocus()
 {
   return false;
 }
 
-bool 
+bool
 awsImageView::OnGainFocus()
 {
   return false;
@@ -192,6 +192,6 @@ awsImageViewFactory::~awsImageViewFactory()
 iAwsComponent *
 awsImageViewFactory::Create()
 {
- return new awsImageView; 
+ return new awsImageView;
 }
 

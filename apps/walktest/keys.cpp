@@ -753,7 +753,7 @@ iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh,
   iMeshWrapper *nextMesh;
   csBox2 screenBoundingBox;
   csBox3 bbox3;
-  
+
   if (baseMesh)
   {
     closestMesh = baseMesh;

@@ -11,7 +11,7 @@
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-	
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -168,9 +168,9 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
     glBindTexture (GL_TEXTURE_2D, texturehandle);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
 		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
   }
 
@@ -185,9 +185,9 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
       glTexImage2D (GL_TEXTURE_2D, i, txt_mm->TargetFormat (), togl->get_width (), togl->get_height (),
 		    0, txt_mm->SourceFormat (), txt_mm->SourceType (), togl->image_data);
     else
-      csGraphics3DOGLCommon::glCompressedTexImage2DARB (GL_TEXTURE_2D, i, (GLenum)togl->internalFormat, 
-							togl->get_width (), togl->get_height (), 0, 
-							togl->size, togl->image_data); 
+      csGraphics3DOGLCommon::glCompressedTexImage2DARB (GL_TEXTURE_2D, i, (GLenum)togl->internalFormat,
+							togl->get_width (), togl->get_height (), 0,
+							togl->size, togl->image_data);
   }
 }
 

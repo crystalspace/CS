@@ -100,7 +100,7 @@ void csParticleSystem::RemoveParticles ()
   shapenr++;
 }
 
-void csParticleSystem::AppendRectSprite (float width, float height, 
+void csParticleSystem::AppendRectSprite (float width, float height,
   iMaterialWrapper *mat, bool lighted)
 {
   iMeshObject* sprmesh = spr_factory->NewInstance ();
@@ -129,7 +129,7 @@ void csParticleSystem::AppendRectSprite (float width, float height,
 }
 
 
-void csParticleSystem::AppendRegularSprite (int n, float radius, 
+void csParticleSystem::AppendRegularSprite (int n, float radius,
   iMaterialWrapper* mat, bool lighted)
 {
   iMeshObject* sprmesh = spr_factory->NewInstance ();
@@ -143,7 +143,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
 
   AppendParticle (part);
   part->DecRef ();
-  sprmesh->DecRef (); 
+  sprmesh->DecRef ();
   state->DecRef ();
   shapenr++;
 }
@@ -387,7 +387,7 @@ void csNewtonianParticleSystem::Update (csTicks elapsed_time)
     // resulting newpos = a*dt^2 + v*dt + oldposition (i.e. paraboloid).
     part_speed[i] += part_accel[i] * delta_t; // (1)
     move = part_speed[i] * delta_t; // (2)
-    GetParticle (i)->MovePosition (move); 
+    GetParticle (i)->MovePosition (move);
   }
 }
 

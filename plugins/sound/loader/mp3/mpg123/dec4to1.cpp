@@ -122,7 +122,7 @@ int synth_4to1(real *bandPtr,int channel,unsigned char *out,int *pnt)
   short *samples = (short *) (out + *pnt);
 
   real *b0,(*buf)[0x110];
-  int clip = 0; 
+  int clip = 0;
   int bo1;
 
   if(!channel) {
@@ -226,7 +226,7 @@ int synth_4to1(real *bandPtr,int channel,unsigned char *out,int *pnt)
 #endif
     }
   }
-  
+
   *pnt += 32;
 
   return clip;

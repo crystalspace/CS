@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998 by Ayal Zwi Pinkus
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -67,7 +67,7 @@ private:
 
   // binary coefficients for a 2nd degree polynomial
   static double bincoeff[3];
-  
+
   // This should be approx. less than 82K
   static double bernsteinMap[LUT_SIZE];
   static double bernsteinDuMap[LUT_SIZE];
@@ -82,13 +82,13 @@ public:
   static double BernsteinAt(double u, int j, double v, int k);
 
   /**
-   * Evaluate the derivite of the Berstein polynomial defined by j & k with 
+   * Evaluate the derivite of the Berstein polynomial defined by j & k with
    * respect to u at coordinates u, v
    */
   static double BernsteinDuAt(double u, int j, double v, int k);
 
   /**
-   * Evaluate the derivite of the Berstein polynomial defined by j & k with 
+   * Evaluate the derivite of the Berstein polynomial defined by j & k with
    * respect to v at coordinates u, v
    */
   static double BernsteinDvAt(double u, int j, double v, int k);
@@ -101,7 +101,7 @@ public:
    * Formula:                      /2\/2\
    * vtx = sum(j=0->2) sum(k=0->2) \j/\k/ u^j(1-u)^(2-j) v^k(1-v)^(2-k)*P_jk
    */
-  static csVector3 GetNormal(double** aControls, int u, 
+  static csVector3 GetNormal(double** aControls, int u,
                              int v, int resolution);
 
   /**
@@ -115,22 +115,22 @@ public:
    * to a control point on the curve in the u and v directions respectively at
    * the given resolution
    */
-  static csVector3 GetPoint(double** aControls, int u, int v, int resolution, 
+  static csVector3 GetPoint(double** aControls, int u, int v, int resolution,
                             double *map = NULL);
 
   /**
-   * Find the texture coordinates at u, v where u, v are integers 
-   * representing an index to a control point on the curve in the u and v 
+   * Find the texture coordinates at u, v where u, v are integers
+   * representing an index to a control point on the curve in the u and v
    * directions respectively at the given resolution
    */
-  static csVector2 GetTextureCoord(double** aControls, int u, int v, 
+  static csVector2 GetTextureCoord(double** aControls, int u, int v,
                                    int resolution, double *map = NULL);
 
                             /**
    * Find the point at u,v where u and v a the parametric coordinates on the
    * curve
    */
-  static csVector3 GetPoint(double** aControls, double u, double v, 
+  static csVector3 GetPoint(double** aControls, double u, double v,
                             double (*func)(double, int, double, int) = NULL );
 };
 

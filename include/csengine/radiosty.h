@@ -92,7 +92,7 @@ public:
   void Copy (csRGBFloatLightMap& other, int size)
   {
     Clear ();
-    if (other.map) { Alloc (size); memcpy (map, other.map, 
+    if (other.map) { Alloc (size); memcpy (map, other.map,
       size * 3 * sizeof(float)); }
   }
 
@@ -100,8 +100,8 @@ public:
   void Copy (csRGBMap& other, int size)
   {
     Clear ();
-    if (other.GetArray()) { 
-      Alloc (size); 
+    if (other.GetArray()) {
+      Alloc (size);
       csRGBpixel* m = other.GetArray ();
 	  int i;
       for(i=0; i<size; i++)
@@ -117,8 +117,8 @@ public:
   void CopyTo (csRGBMap& other, int size)
   {
     other.Clear ();
-    if (GetMap()) { 
-      other.Alloc (size); 
+    if (GetMap()) {
+      other.Alloc (size);
       csRGBpixel* m = other.GetArray ();
 	  int i;
       for(i=0; i<size; i++)
@@ -138,18 +138,18 @@ public:
 class csRadElement : public csObject {
 protected:
   float area;
-  
+
   float total_unshot_light; // diffuse * area * avg_delta_level
 
 public://@@@
   csLightMap *csmap;
-  
+
 protected:
   int width, height, size;
-  
+
   /// ptr to static lightmap of polygon
   csRGBMap *lightmap;
- 
+
   /// the change to this lightmap, unshot light.
   csRGBFloatLightMap *deltamap;
 
@@ -159,19 +159,19 @@ protected:
    * values later.
    */
   csRGBMap* copy_lightmap;
- 
+
   /// the area of one lumel of the polygon
   float one_lumel_area;
 
   /// values for loop detection, last shooting priority and repeats
-  float last_shoot_priority; 
+  float last_shoot_priority;
   int num_repeats;
 
 protected:
 
   /// return the material handle
   virtual iMaterialWrapper* GetMaterialWrapper () = 0;
-  
+
   /// return the flat color value
   virtual csColor GetFlatColor() const = 0;
 
@@ -189,7 +189,7 @@ public:
 
   /// get area size of element, precomputed
   inline float GetArea() const { return area; }
-  
+
   /// Get diffuse reflection value for element. 0.55-0.75 is nice.
   inline float GetDiffuse() const { return 0.7; }
 
@@ -198,13 +198,13 @@ public:
 
   /// get height of lightmap and deltamap
   inline int GetHeight() const { return height; }
-  
+
   /// get size of lightmap and deltamap
   inline int GetSize() const { return size; }
 
   /// check if a delta lumel is zero
   inline bool DeltaIsZero(int suv)
-  { return !(deltamap->GetRed()[suv] || deltamap->GetGreen()[suv] || 
+  { return !(deltamap->GetRed()[suv] || deltamap->GetGreen()[suv] ||
       deltamap->GetBlue()[suv] ); }
 
   /// return the sector of this element
@@ -215,20 +215,20 @@ public:
 
   /// return the average normal for this element
   csVector3 GetAvgNormal() const;
-  
+
   /// check if a patch has zero delta
   bool DeltaIsZero(int suv, int w, int h);
-  
+
   /// Get avg texture colour for a patch.
   void GetTextureColour(int suv, int w, int h, csColor &avg,
     csRGBMap *texturemap);
-  
+
   /// Cap every delta in patch to value.
   void CapDelta(int suv, int w, int h, float max);
-  
+
   /// Get the summed delta of a patch
   void GetSummedDelta(int suv, int w, int h, csColor& sum);
-  
+
   /// get the delta map
   inline csRGBFloatLightMap* GetDeltaMap() { return deltamap; }
 
@@ -246,39 +246,39 @@ public:
 
   /// Get last shooting priority of this radpoly
   inline float GetLastShootingPriority() { return last_shoot_priority;}
-  
+
   /// Set last shooting priority
   inline void SetLastShootingPriority(float val) {last_shoot_priority=val;}
 
   /// Get number of repeats shooting at the same priority for this poly.
   inline int GetRepeatCount() { return num_repeats; }
-  
+
   /// Increment the number of repeats of shooting at same priority by one.
   inline void IncNumRepeats() {num_repeats++;}
 
   /// Get world coordinates for a lumel
   virtual void Lumel2World(csVector3& res, int x, int y) = 0;
-  
+
   /// get area of one lumel in world space
   inline float GetOneLumelArea() const { return one_lumel_area; }
 
 
   /// Populates the shadow coverage Matrix for this element
-  virtual void GetCoverageMatrix(csFrustumView* lview, 
+  virtual void GetCoverageMatrix(csFrustumView* lview,
                                  csCoverageMatrix* shadow_matrix) = 0;
 
-  /** 
+  /**
    * computes new priority value, summing the light unshot.
-   * Note: Do no touch the variable total_unshot_light without 
+   * Note: Do no touch the variable total_unshot_light without
    * doing a list->Delete(this), beforehand.
    */
   void ComputePriority();
-  
-  /** 
+
+  /**
    * Add a fraction to delta map of lumel from given source RadPoly.
    * suv is index in src, ruv is index in maps of this poly.
    */
-  void AddDelta(csRadElement *src, int suv, int ruv, float fraction, 
+  void AddDelta(csRadElement *src, int suv, int ruv, float fraction,
     const csColor& filtercolor);
 
   /**
@@ -290,8 +290,8 @@ public:
     deltamap->GetBlue()[ruv] += value.blue;
   }
 
-  /** 
-   * light has been shot, copy delta to lightmap, clear delta, 
+  /**
+   * light has been shot, copy delta to lightmap, clear delta,
    * recompute priority. (this radpoly may not be in list as
    * the total_unshot_light value changes).
    */
@@ -302,8 +302,8 @@ public:
    */
   void GetDeltaSums(float &red, float &green, float &blue);
 
-  /** 
-   *  Add ambient value to deltamap 
+  /**
+   *  Add ambient value to deltamap
    */
   void ApplyAmbient(int red, int green, int blue);
 
@@ -327,7 +327,7 @@ SCF_VERSION (csRadPoly, 0, 0, 1);
  *  A radiosity polygon, containing lightmap patches, the lumels.
  *  Radiosity rendering specific info is kept here.
  */
-class csRadPoly : public csRadElement 
+class csRadPoly : public csRadElement
 {
 private:
   csPolygon3D* polygon;
@@ -349,8 +349,8 @@ public:
   csRadPoly(csPolygon3D *original, csSector* sector);
   ~csRadPoly();
 
-  /// get normal vector for polygon 
-  const csVector3& GetNormal(int x, int y) const 
+  /// get normal vector for polygon
+  const csVector3& GetNormal(int x, int y) const
   { (void)x; (void)y; return polygon->GetPolyPlane()->Normal();}
 
   /// get original csPolgyon3D for this radpoly
@@ -365,7 +365,7 @@ public:
   csSector* GetSector () const { return sector; }
 
   /// Populates the shadow coverage Matrix for this element
-  virtual void GetCoverageMatrix(csFrustumView* lview, 
+  virtual void GetCoverageMatrix(csFrustumView* lview,
                                  csCoverageMatrix* shadow_matrix)
   {
       (void)lview;
@@ -399,7 +399,7 @@ protected:
   /// return the flat color for the polygons texture
   virtual csColor GetFlatColor() const
   {
-    /// @@@ I'm not sure why curves don't have a flat color, so for now 
+    /// @@@ I'm not sure why curves don't have a flat color, so for now
     /// @@@ just return a default color of mid-gray
     return csColor(0.5, 0.5, 0.5);
   }
@@ -419,7 +419,7 @@ public:
   csSector* GetSector () const { return sector; }
 
   /// Populates the shadow coverage Matrix for this element
-  virtual void GetCoverageMatrix(csFrustumView* /*(lview*/, 
+  virtual void GetCoverageMatrix(csFrustumView* /*(lview*/,
                                  csCoverageMatrix* /*shadow_matrix*/)
   { /* @@@ curve->GetCoverageMatrix(*lview, *shadow_matrix); */ }
 
@@ -435,13 +435,13 @@ private:
   csRadElement *element;
 
   csRadTree *left, *right;
-  
+
   /// deletes this node which must have non-null left and right subtrees.
   void DelNode();
-  
+
   /// Returns Leftmost node in this tree, parent is also stored or NULL
   csRadTree* FindLeftMost(csRadTree*& parent);
-  
+
   /// Returns rightost node in this tree, parent is also stored or NULL
   csRadTree* FindRightMost(csRadTree*& parent);
 
@@ -464,7 +464,7 @@ public:
 
   /// get node priority
   inline float GetPriority() { return element->GetPriority(); }
-  
+
   /// traverse tree in in-order (from low to high), calling func(element).
   void TraverseInOrder( void (*func)( csRadElement * ) );
 };
@@ -483,7 +483,7 @@ private:
 public:
   /// create
   csRadList();
-  
+
   /// delete, also deletes all elements!
   ~csRadList();
 
@@ -492,15 +492,15 @@ public:
 
   /// Delete an element
   void DeleteElement(csRadElement *e);
-  
+
   /// get element with highest priority. It is also deleted.
   csRadElement *PopHighest();
 
   /// print list on output
   void Print();
-  
+
   /// traverse in some order.
-  void Traverse( void (*func)( csRadElement * ) ) 
+  void Traverse( void (*func)( csRadElement * ) )
   { if(tree) tree->TraverseInOrder(func); }
 
   /// get the number of elements in the list
@@ -518,16 +518,16 @@ public:
    * when true static specular gloss is applied, giving extra light.
    */
   static bool do_static_specular;
-  /// amount of specular to add 0..1 is a sane setting. 
+  /// amount of specular to add 0..1 is a sane setting.
   static float static_specular_amount;
-  /** 
+  /**
    *  Bigger value gives smaller highlight. Try between 0..10.
    *  The value is the 2log(n), where n is the usual highlightsize used
    *  with specular highlighting in other programs.
    */
   static int static_specular_tightness;
 
-  /** Multiplier for amount of texture colour used. 
+  /** Multiplier for amount of texture colour used.
    *  regular value is 1.0, smaller will be darker, larger will make
    *  surroundings blend eachothers colours more.
    *  0.0 means not to use texture colouring.
@@ -544,7 +544,7 @@ public:
   static float stop_improvement;
   /// max number of iterations, after that amount of polygons processed stop.
   static int stop_iterations;
-  
+
   /**
    * light will be shot from n by n lumels.
    */
@@ -587,7 +587,7 @@ private:
   /// area of source patch visible for lighting
   float source_patch_area;
   /// index into source maps
-  int src_uv; 
+  int src_uv;
   /// x, y of source lumel
   int src_x, src_y;
   /// texture map of source polygon - reasonably quick to compute, saves

@@ -219,7 +219,7 @@ static iModelDataVertices *InterpolateVertices (iModelDataVertices *v1,
   for (i=0; i<v1->GetTexelCount (); i++)
     ver->AddTexel (v1->GetTexel (i) +
       (v2->GetTexel (i) - v1->GetTexel (i)) * Position);
-  
+
   return ver;
 }
 
@@ -343,7 +343,7 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
       }
     }
 
-    iModelDataVertices *MergedVertices = 
+    iModelDataVertices *MergedVertices =
         new csModelDataVertices (Frame1, Frame2);
     Frame1->DecRef ();
     Frame2->DecRef ();
@@ -410,7 +410,7 @@ static bool CheckMaterialConflict (iModelDataObject *obj1)
       if (!mat) mat = mat2;
       else {
         if (mat != mat2)
-          return true; 
+          return true;
       }
     }
 
@@ -539,7 +539,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
     if (Action1 && Action1->GetTotalTime () > EPSILON) {
       if (Action2 && Action2->GetTotalTime () > EPSILON) {
         float total = MergeTimes (Action1->GetTotalTime (), Action2->GetTotalTime ());
-        
+
 	if (total<0)
 	{
           // this should not happen
@@ -771,7 +771,7 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
     obj##IndexTable->Push (Polygon->Get##obj (j));			\
     Polygon->Set##obj (j, obj##IndexTable->Length () - 1);		\
   }
-        
+
           int n;
           CS_MDLTOOL_HELPER (Vertex);
           CS_MDLTOOL_HELPER (Normal);

@@ -63,7 +63,7 @@ public:
       rows[i][i] = scl;
     }
   }
-  
+
   ctMatrixN ( const ctMatrixN &pM )
   {
     int i,j;
@@ -108,7 +108,7 @@ public:
   { return rows; }
 
   void identity ()
-  { 
+  {
 	int i, j;
     for(i = 0; i < dimen; i++ )
     {
@@ -121,10 +121,10 @@ public:
   real *operator[] ( const int index )
   { return rows[index]; }
 
-  real *operator[] ( const int index ) const 
+  real *operator[] ( const int index ) const
   { return rows[index]; }
 
-  ctMatrixN get_transpose () const 
+  ctMatrixN get_transpose () const
   {
     ctMatrixN Mret;
 	int idx, idy;
@@ -148,7 +148,7 @@ public:
     }
   }
 
-  ctMatrixN operator* ( const ctMatrixN &MM ) const 
+  ctMatrixN operator* ( const ctMatrixN &MM ) const
   {
     ctMatrixN Mret;
 	int idr, idc, adder;
@@ -163,7 +163,7 @@ public:
     return Mret;
   }
 
-  ctMatrixN operator* ( const real pk ) const 
+  ctMatrixN operator* ( const real pk ) const
   {
     ctMatrixN Mret;
 	int idr, idc;
@@ -280,7 +280,7 @@ public:
   {
     real *x;
     real *b;
-    int idx;  
+    int idx;
     b = (real *)malloc( sizeof( real )*dimen );
     x = px;
 
@@ -299,7 +299,7 @@ public:
     {
       for(j = 0; j < dimen; j++)
       {
-        logf( "%f :: ", rows[i][j] ); 
+        logf( "%f :: ", rows[i][j] );
       }
       logf( "\n" );
     }
@@ -312,7 +312,7 @@ class ctMatrix3 : public ctMatrix
 protected:
   real rows[3][3];
 
-  real cofactor(int i, int j) 
+  real cofactor(int i, int j)
   {
     real sign = ((i + j) % 2) ? -1 : 1;
 
@@ -327,7 +327,7 @@ protected:
     return sign * C;
   }
 
-  real determinant() 
+  real determinant()
   {
     return rows[0][0]*rows[1][1]*rows[2][2] + rows[0][1]*rows[1][2]*rows[2][0]
       + rows[0][2]*rows[1][0]*rows[2][1] - rows[0][0]*rows[1][2]*rows[2][1]
@@ -348,14 +348,14 @@ public:
     real p10, real p11, real p12,
     real p20, real p21, real p22 )
   {
-    rows[0][0] = p00; 
-    rows[0][1] = p01; 
+    rows[0][0] = p00;
+    rows[0][1] = p01;
     rows[0][2] = p02;
-    rows[1][0] = p10; 
-    rows[1][1] = p11; 
+    rows[1][0] = p10;
+    rows[1][1] = p11;
     rows[1][2] = p12;
-    rows[2][0] = p20; 
-    rows[2][1] = p21; 
+    rows[2][0] = p20;
+    rows[2][1] = p21;
     rows[2][2] = p22;
   }
 
@@ -364,7 +364,7 @@ public:
 	    real p20, real p21, real p22 );
 
   void identity()
-  { 
+  {
     rows[0][0] = rows[1][1] = rows[2][2] = 1.0;
     rows[0][1] = rows[0][2] = rows[1][0] = 0.0;
     rows[1][2] = rows[2][0] = rows[2][1] = 0.0;
@@ -373,10 +373,10 @@ public:
   real *operator[]( const int index )
   { return (real *)(rows[index]); }
 
-  real *operator[]( const int index ) const 
+  real *operator[]( const int index ) const
   { return (real *)(rows[index]); }
 
-  ctMatrix3 get_transpose () const 
+  ctMatrix3 get_transpose () const
   {
     ctMatrix3 Mret;
 	int idx, idy;
@@ -386,7 +386,7 @@ public:
     return Mret;
   }
 
-  void put_transpose( ctMatrix3 &Mret ) const 
+  void put_transpose( ctMatrix3 &Mret ) const
   {
 	int idx, idy;
     for (idx = 0; idx < 3; idx++)
@@ -395,7 +395,7 @@ public:
   }
 
   /// I think that's what this is called... M * A * M_transpose
-  void similarity_transform( ctMatrix3 &Mret, const ctMatrix3 &pA ) const 
+  void similarity_transform( ctMatrix3 &Mret, const ctMatrix3 &pA ) const
   {
 	int idr, idc, adder;
     for (idr = 0; idr < 3; idr++)
@@ -403,8 +403,8 @@ public:
       {
         Mret[idr][idc] = 0.0;
         for (adder = 0; adder < 3; adder++)
-          Mret[idr][idc] += ( rows[idr][0]*pA[0][adder] + 
-                              rows[idr][1]*pA[1][adder] + 
+          Mret[idr][idc] += ( rows[idr][0]*pA[0][adder] +
+                              rows[idr][1]*pA[1][adder] +
                               rows[idr][2]*pA[2][adder] ) *
                               rows[idc][adder];
       }
@@ -423,7 +423,7 @@ public:
     }
   }
 
-  ctVector3 operator* ( const ctVector3 &pv ) 
+  ctVector3 operator* ( const ctVector3 &pv )
   {
     ctVector3 rv(0,0,0);
     int idx, idx2;
@@ -433,7 +433,7 @@ public:
     return rv;
   }
 
-  ctVector3 operator* ( const ctVector3 &pv ) const 
+  ctVector3 operator* ( const ctVector3 &pv ) const
   {
     ctVector3 rv( 0,0,0);
     int idx, idx2;
@@ -443,7 +443,7 @@ public:
     return rv;
   }
 
-  ctMatrix3 operator* ( const ctMatrix3 &MM ) const 
+  ctMatrix3 operator* ( const ctMatrix3 &MM ) const
   {
     ctMatrix3 Mret;
 	int idr, idc, adder;
@@ -458,7 +458,7 @@ public:
     return Mret;
   }
 
-  ctMatrix3 operator* ( const real pk ) const 
+  ctMatrix3 operator* ( const real pk ) const
   {
     ctMatrix3 Mret;
 	int idr, idc;
@@ -576,7 +576,7 @@ public:
     real *b;
     real *x;
     int idx, idy;
-    
+
     b = (real *)malloc( sizeof( real )*3 );
     A = (real **)malloc( sizeof( real * )*3 );
 //    x = px.get_elements();
@@ -600,13 +600,13 @@ public:
     free( A );
   }
 
-  ctMatrix3 inverse () 
+  ctMatrix3 inverse ()
   {
     ctMatrix3 inv;
     real det = determinant();
 
     int i,j;
-    for(i = 0; i < 3; i++) 
+    for(i = 0; i < 3; i++)
       for(j = 0; j < 3; j++)
 	inv[i][j] = cofactor (j,i) / det;
 
@@ -619,7 +619,7 @@ public:
     for (i = 0; i < dimen; i++)
     {
       for (j = 0; j < dimen; j++)
-        DEBUGLOGF( "%f :: ", rows[i][j] ); 
+        DEBUGLOGF( "%f :: ", rows[i][j] );
       DEBUGLOG( "\n" );
     }
   }
@@ -630,16 +630,16 @@ inline void ctMatrix3::set ( real p00, real p01, real p02,
 			     real p10, real p11, real p12,
 			     real p20, real p21, real p22 )
 {
-  rows[0][0] = p00; 
-  rows[0][1] = p01; 
+  rows[0][0] = p00;
+  rows[0][1] = p01;
   rows[0][2] = p02;
-  rows[1][0] = p10; 
-  rows[1][1] = p11; 
+  rows[1][0] = p10;
+  rows[1][1] = p11;
   rows[1][2] = p12;
-  rows[2][0] = p20; 
-  rows[2][1] = p21; 
+  rows[2][0] = p20;
+  rows[2][1] = p21;
   rows[2][2] = p22;
-  
+
 }
 
 /*
@@ -652,15 +652,15 @@ inline void ctMatrix3::orthonormalize()
 */
 inline void ctMatrix3::orthonormalize ()
 {
-  real len = sqrt (  rows[0][0] * rows[0][0]  
-		   + rows[0][1] * rows[0][1]  
-		   + rows[0][2] * rows[0][2] ); 
-  
+  real len = sqrt (  rows[0][0] * rows[0][0]
+		   + rows[0][1] * rows[0][1]
+		   + rows[0][2] * rows[0][2] );
+
   rows[0][0] /= len;   rows[0][1] /= len;   rows[0][2] /= len;
-  
-  real abdot =   rows[1][0] * rows[0][0] 
-               + rows[1][1] * rows[0][1] 
-               + rows[1][2] * rows[0][2]; 
+
+  real abdot =   rows[1][0] * rows[0][0]
+               + rows[1][1] * rows[0][1]
+               + rows[1][2] * rows[0][2];
 
   rows[1][0] -= rows[0][0] * abdot;
   rows[1][1] -= rows[0][1] * abdot;

@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -115,7 +115,7 @@ void csHazeHull::ComputeEdges()
     for(j=i; j<total_vert; j++)
     {
       /// i <= j
-      if(matrix[ i*total_vert + j ] != 0) 
+      if(matrix[ i*total_vert + j ] != 0)
         total_edge++;
     }
   /// fill edgept tables.
@@ -128,7 +128,7 @@ void csHazeHull::ComputeEdges()
     for(j=i; j<total_vert; j++)
     {
       /// i <= j
-      if(matrix[ i*total_vert + j ] != 0) 
+      if(matrix[ i*total_vert + j ] != 0)
       {
         edgept1[edge_now] = i;
         edgept2[edge_now] = j;
@@ -144,7 +144,7 @@ void csHazeHull::ComputeEdges()
   if(pol_edges)
   {
     for(p=0; p<total_poly; p++)
-      delete[] pol_edges[p]; 
+      delete[] pol_edges[p];
     delete[] pol_edges;
   }
   pol_edges = new int* [total_poly];
@@ -168,7 +168,7 @@ void csHazeHull::ComputeEdges()
 }
 
 
-void csHazeHull::ComputeOutline(iHazeHull *hull, const csVector3& campos, 
+void csHazeHull::ComputeOutline(iHazeHull *hull, const csVector3& campos,
   int& numv, int*& pts)
 {
   // create some temporary arrays
@@ -325,8 +325,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeHullCone::HazeHullCone)
   SCF_IMPLEMENTS_INTERFACE (iHazeHullCone)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-/// static helper to fill 
-static void ConeFillVerts(csVector3 *verts, int nr_sides, 
+/// static helper to fill
+static void ConeFillVerts(csVector3 *verts, int nr_sides,
   const csVector3& pos, float radius)
 {
   int i;
@@ -708,7 +708,7 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 
 void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
   const csVector3& campos, csReversibleTransform& tr_o2c, float fov, float shx,
-  float shy, int &layer_num, int *& layer_poly, csVector3 *& layer_pts, 
+  float shy, int &layer_num, int *& layer_poly, csVector3 *& layer_pts,
   csVector2 *&layer_uvs)
 {
   int i;
@@ -799,7 +799,7 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 
   // additional test if origin inside the outline
   csVector2* incheck = new csVector2[layer_num];
-  for(i=0; i<layer_num; i++) 
+  for(i=0; i<layer_num; i++)
   {
     incheck[i].x = layer_pts[layer_num-1 - i].x;
     incheck[i].y = layer_pts[layer_num-1 - i].y;
@@ -835,19 +835,19 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
       quality);
 
 #if 0
-    // debug drawing of the outline 
+    // debug drawing of the outline
     iGraphics2D *g2d = g3d->GetDriver2D();
     int m2dy = g2d->GetHeight();
-    g2d->DrawLine(scr_orig.x, m2dy-scr_orig.y, scr_orig.x+1, 
+    g2d->DrawLine(scr_orig.x, m2dy-scr_orig.y, scr_orig.x+1,
       m2dy-scr_orig.y+1, -1);
     // only outline
-    //g2d->DrawLine( layer_pts[i].x, layer_pts[i].y, 
+    //g2d->DrawLine( layer_pts[i].x, layer_pts[i].y,
       //layer_pts[nexti].x, layer_pts[nexti].y, -1);
     // show direction of lines (from black to white)
     float midx = (layer_pts[i].x + layer_pts[nexti].x)*0.5;
     float midy = (layer_pts[i].y + layer_pts[nexti].y)*0.5;
     g2d->DrawLine( layer_pts[i].x, m2dy-layer_pts[i].y, midx, m2dy-midy, 0);
-    g2d->DrawLine( midx, m2dy-midy, layer_pts[nexti].x, 
+    g2d->DrawLine( midx, m2dy-midy, layer_pts[nexti].x,
       m2dy-layer_pts[nexti].y, -1);
 #endif
   }
@@ -883,11 +883,11 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
       float midx = (layer_pts2[i].x + layer_pts2[nexti].x)*0.5;
       float midy = (layer_pts2[i].y + layer_pts2[nexti].y)*0.5;
       g2d->DrawLine( layer_pts2[i].x, m2dy-layer_pts2[i].y, midx, m2dy-midy, 0);
-      g2d->DrawLine( midx, m2dy-midy, layer_pts2[nexti].x, 
+      g2d->DrawLine( midx, m2dy-midy, layer_pts2[nexti].x,
         m2dy-layer_pts2[nexti].y, -1);
     }
 #endif
-    
+
     /// got  this outline, draw between hull to hull2
     if(layer_num != layer_num2) {
       printf("haze: outlines differ for hull %d,%d!\n", layer_num, layer_num2);
@@ -939,8 +939,8 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 }
 
 
-void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d, 
-  iMaterialHandle *mat, int num_sides, csVector3* pts, csVector2* uvs, 
+void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
+  iMaterialHandle *mat, int num_sides, csVector3* pts, csVector2* uvs,
         float layer_scale, float quality)
 {
   /// only triangles
@@ -984,7 +984,7 @@ void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
   pts[1] = oldpos1;
   uvs[1] = olduv1;
 }
-  
+
 void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
   float shiftx, float shifty, const csVector3& objpos, csVector3& scrpos)
 {
@@ -995,7 +995,7 @@ void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
   scrpos.y = scrpos.y * inv_z + shifty;
 }
 
-void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d, 
+void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
   iMaterialHandle *mat, int num, const csVector3* pts, const csVector2* uvs)
 {
   g3dpolyfx.use_fog = false;

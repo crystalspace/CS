@@ -185,7 +185,7 @@ void csRect::AddAdjanced (const csRect &rect)
     Set (tmp);
 }
 
-void 
+void
 csRect::Join (const csRect &rect)
 {
 
@@ -196,7 +196,7 @@ csRect::Join (const csRect &rect)
   ymax = MAX(rect.ymax, ymax);
 }
 
-void 
+void
 csRect::Outset(int n)
   {
     xmin-=n;
@@ -205,7 +205,7 @@ csRect::Outset(int n)
     ymax+=n;
   }
 
-void 
+void
 csRect::Inset(int n)
   {
     xmin+=n;

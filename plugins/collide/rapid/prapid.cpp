@@ -135,7 +135,7 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
     m_pCollisionModel = new csCdModel (tri_count);
     if (!m_pCollisionModel)
       return;
-    
+
     for (i = 0; i < polycnt ; i++)
     {
       csMeshedPolygon& p = polygons[i];
@@ -146,7 +146,7 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
       for (v = 2; v < p.num_vertices; v++)
       {
         m_pCollisionModel->AddTriangle (vertices[vidx[v - 1]],
-                                        vertices[vidx[v]], 
+                                        vertices[vidx[v]],
                                         vertices[vidx[0]]);
         object_bbox.AddBoundingVertex (vertices[vidx[v]]);
       }
@@ -172,8 +172,8 @@ csRapidCollider::~csRapidCollider ()
   CD_contact.DecRef ();
 }
 
-bool csRapidCollider::Collide (csRapidCollider &otherCollider, 
-                               const csReversibleTransform *pTransform1, 
+bool csRapidCollider::Collide (csRapidCollider &otherCollider,
+                               const csReversibleTransform *pTransform1,
                                const csReversibleTransform *pTransform2)
 {
   csRapidCollider *pRAPIDCollider2 = (csRapidCollider *)&otherCollider;
@@ -181,12 +181,12 @@ bool csRapidCollider::Collide (csRapidCollider &otherCollider,
 
   // JTY: also skip objects with m_pCollisionModel NULL. This fixes
   // a bug with bezier curves and collision detection.
-  if (!m_pCollisionModel || 
+  if (!m_pCollisionModel ||
       !pRAPIDCollider2->m_pCollisionModel) return 0;
 
   // I don't know, why this is commented out. I need to elaborate this
   // further. thieber 2000-02-19
-  //  csRapidCollider::firstHit = true; 
+  //  csRapidCollider::firstHit = true;
 
   // call the low level collision detection routine.
 
@@ -953,7 +953,7 @@ int csRapidCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
 
     if ((rc = CollideRecursive (b1->m_pChild1, b2, cR, cT)) != false)
       return rc;
-	
+
     rot_transp = b1->m_pChild0->m_Rotation.GetTranspose ();
     cR = rot_transp * R;
     cT = rot_transp * (T - b1->m_pChild0->m_Translation);
@@ -968,10 +968,10 @@ int csRapidCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
 
     cR = R * b2->m_pChild1->m_Rotation;
     cT = ( R * b2->m_pChild1->m_Translation) + T;
-	
+
     if ((rc = CollideRecursive (b1, b2->m_pChild1, cR, cT)) != false)
       return rc;
-	
+
     cR = R * b2->m_pChild0->m_Rotation;
     cT = ( R * b2->m_pChild0->m_Translation) + T;
 
@@ -1018,9 +1018,9 @@ bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2)
 
   csRapidCollider::trianglesTested++;
 
-  bool f = ::tri_contact(i1, i2, i3, 
-                         pBox2->m_pTriangle->p1, 
-                         pBox2->m_pTriangle->p2, 
+  bool f = ::tri_contact(i1, i2, i3,
+                         pBox2->m_pTriangle->p1,
+                         pBox2->m_pTriangle->p2,
                          pBox2->m_pTriangle->p3);
 
   if (f)
@@ -1034,12 +1034,12 @@ bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2)
   return false;
 }
 
-const csVector3 &csRapidCollider::GetRadius() const 
+const csVector3 &csRapidCollider::GetRadius() const
 {
   return GetBbox()->GetRadius();
 }
 
-const csCdBBox* csRapidCollider::GetBbox(void) const 
+const csCdBBox* csRapidCollider::GetBbox(void) const
 {
   return m_pCollisionModel->GetTopLevelBox();
 }

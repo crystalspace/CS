@@ -58,7 +58,7 @@ struct iBeHelper : public iBase
    */
   virtual bool BeginUI() = 0;
 
-  /** 
+  /**
    * Ask the Crystal Space event-loop to terminate.
    */
   virtual bool Quit() = 0;

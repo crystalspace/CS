@@ -67,7 +67,7 @@ struct WALHeader
 } _WALHeader;
 
 
-static iImageIO::FileFormatDescription formatlist[1] = 
+static iImageIO::FileFormatDescription formatlist[1] =
 {
   {"image/wal", "8 bit, palettized", CS_IMAGEIO_LOAD}
 };
@@ -95,7 +95,7 @@ iImage *csWALImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
     delete i;
     return NULL;
   }
-  return i;    
+  return i;
 }
 
 void csWALImageIO::SetDithering (bool)
@@ -123,7 +123,7 @@ bool ImageWALFile::Load (uint8* iBuffer, uint32 iSize)
   head.offsets [3] = little_endian_long (head.offsets [3]);
 
   Format &= ~CS_IMGFMT_ALPHA;
-  
+
   // There's no id-tag in .WAL files, so the only way I know to check
   // if it's a wal, is to use this method. Hope it works
   uint32 chkfilesize = head.offsets [3] + ((head.height / 8) * (head.width / 8));

@@ -88,7 +88,7 @@ bool csSoundRenderEAX::Initialize(iObjectRegistry *r)
   return true;
 }
 
-csSoundRenderEAX::~csSoundRenderEAX() 
+csSoundRenderEAX::~csSoundRenderEAX()
 {
   if (scfiEventHandler)
   {
@@ -110,7 +110,7 @@ bool csSoundRenderEAX::Open()
     reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"crystalspace.sound.eax",
 	"SoundRender EAX selected");
-  
+
   HRESULT r;
   if (!AudioRenderer)
   {
@@ -128,7 +128,7 @@ bool csSoundRenderEAX::Open()
       if (reporter) reporter->DecRef ();
       return false;
     }
-  
+
     DWORD dwLevel = DSSCL_EXCLUSIVE;
     r = AudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel);
     if (r != DS_OK)
@@ -170,7 +170,7 @@ bool csSoundRenderEAX::Open()
   vc->DecRef ();
   LastTime = ct;
   if (reporter) reporter->DecRef ();
-  
+
   return true;
 }
 

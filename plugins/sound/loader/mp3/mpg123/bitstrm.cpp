@@ -34,7 +34,7 @@ void csBitstreamInfo::SetPointer (long backstep)
   wordpointer = bsbuf + skipsize - backstep;
   if (backstep)
     memcpy (wordpointer, bsbufold+framesize-backstep, backstep);
-  index = 0; 
+  index = 0;
 }
 
 void csBitstreamInfo::Back (int number_of_bits)
@@ -44,7 +44,7 @@ void csBitstreamInfo::Back (int number_of_bits)
   index    &= 0x7;
 }
 
-int csBitstreamInfo::GetOffset () 
+int csBitstreamInfo::GetOffset ()
 {
   return (-index)&0x7;
 }
@@ -66,7 +66,7 @@ unsigned int csBitstreamInfo::GetBits (int number_of_bits)
   rval |= wordpointer[1];
   rval <<= 8;
   rval |= wordpointer[2];
-  
+
   rval <<= index;
   rval &= 0xffffff;
 

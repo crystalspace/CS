@@ -50,7 +50,7 @@ void make_decode_tables(long scaleval)
   real *costab;
   int idx;
 
-  
+
   for(i=0;i<5;i++)
   {
     kr=0x10>>i; divv=0x40>>i;
@@ -127,7 +127,7 @@ void make_conv16to8_table(int mode)
         c1 = 127 - (int) (log( 1.0 - 255.0 * (double) i*mul / 32768.0 ) * m);
       else
         c1 = 255 - (int) (log( 1.0 + 255.0 * (double) i*mul / 32768.0 ) * m);
-      if(c1 < 0 || c1 > 255) 
+      if(c1 < 0 || c1 > 255)
 	fprintf(stderr,"Converror %d %d\n",i,c1);
       if(c1 == 0)
         c1 = 2;

@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998,2000 by Jorrit Tyberghein
     DirectDetection.cpp: implementation of the DirectDetection class.
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -48,7 +48,7 @@ void SystemFatalError (char *str, HRESULT hRes)
     DWORD dwResult;
     dwResult = FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
       NULL, hRes, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL);
-  
+
     if (dwResult != 0)
     {
       szMsg = new char [strlen ((const char*)lpMsgBuf) + strlen (str) + strlen (szStdMessage) + 1];
@@ -56,7 +56,7 @@ void SystemFatalError (char *str, HRESULT hRes)
       strcat (szMsg, szStdMessage);
       strcat (szMsg, (const char*)lpMsgBuf);
       LocalFree (lpMsgBuf);
-      
+
       MessageBox (NULL, szMsg, "Fatal Error", MB_OK | MB_TOPMOST);
       delete szMsg;
 
@@ -97,14 +97,14 @@ DirectDetection::~DirectDetection ()
 DirectDetectionDevice * DirectDetection::findBestDevice2D ()
 {
   DirectDetectionDevice * cur = Devices;
-  
+
   while (cur != NULL)
   {
     // in fact we just need primary device
     if (cur->Only2D && cur->IsPrimary2D) return cur;
     cur = cur->next;
   }
-  
+
   return NULL;
 }
 
@@ -114,7 +114,7 @@ DirectDetectionDevice *DirectDetection::findBestDevice3D (bool fscreen)
   DirectDetectionDevice *ret = NULL;
   DirectDetectionDevice *cur = Devices;
   int poids = 0;
-  
+
   while (cur != NULL)
   {
     // This device have 3d device
@@ -132,7 +132,7 @@ DirectDetectionDevice *DirectDetection::findBestDevice3D (bool fscreen)
       if (cur->ZBuffer) curpoids += 50;
       if (cur->AlphaBlend && cur->AlphaBlendType == 1) curpoids += 50;
       if (cur->AlphaBlend && cur->AlphaBlendType == 2) curpoids += 25;
-      
+
       // is better and support windowed mode if display is not fullscreen ?
       if (curpoids > poids && (!fscreen ? cur->Windowed : true))
       {
@@ -142,7 +142,7 @@ DirectDetectionDevice *DirectDetection::findBestDevice3D (bool fscreen)
     }
     cur = cur->next;
   }
-  
+
   return ret;
 }
 
@@ -150,13 +150,13 @@ DirectDetectionDevice *DirectDetection::findBestDevice3D (bool fscreen)
 int DirectDetection::addDevice (DirectDetection2D *dd2d)
 {
   DirectDetectionDevice *ddd = new DirectDetectionDevice ();
-  
+
   memcpy ((DirectDetection2D *)ddd, dd2d, sizeof (DirectDetection2D));
   ddd->Only2D = true;
 
   ddd->next = Devices;
   Devices = ddd;
-  
+
   return 0;
 }
 
@@ -164,13 +164,13 @@ int DirectDetection::addDevice (DirectDetection2D *dd2d)
 int DirectDetection::addDevice (DirectDetection3D *dd3d)
 {
   DirectDetectionDevice * ddd = new DirectDetectionDevice ();
-  
+
   memcpy ((DirectDetection3D *)ddd, dd3d, sizeof (DirectDetection3D));
   ddd->Only2D = false;
 
   ddd->next = Devices;
   Devices = ddd;
-  
+
   return 0;
 }
 
@@ -184,10 +184,10 @@ static HRESULT WINAPI DirectDetectionD3DEnumCallback (LPGUID lpGuid,
     DirectDetection * ddetect;
     DirectDetection2D * dd2d;
   } *toy = (struct toy *)lpContext;
-  
+
   DirectDetection *ddetect = toy->ddetect;
   DirectDetection3D dd3d (toy->dd2d);
-  
+
   // don't accept software devices.
   // eventually this will be an option.
   if (!lpHWDesc->dcmColorModel) return D3DENUMRET_OK;
@@ -205,7 +205,7 @@ static HRESULT WINAPI DirectDetectionD3DEnumCallback (LPGUID lpGuid,
     ZeroMemory (&dd3d.Guid3D, sizeof (GUID));
     dd3d.IsPrimary3D = false;
   }
-  
+
   // whether this is hardware or not.
   if (lpHWDesc->dcmColorModel)
   {
@@ -217,14 +217,14 @@ static HRESULT WINAPI DirectDetectionD3DEnumCallback (LPGUID lpGuid,
     dd3d.Hardware = false;
     CopyMemory (&dd3d.Desc3D, lpHELDesc, sizeof (D3DDEVICEDESC));
   }
-  
+
   // does this driver to texture-mapping?
   dd3d.Perspective =
     (dd3d.Desc3D.dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_PERSPECTIVE) ? true : false;
-  
+
   // z-buffer?
   dd3d.ZBuffer = dd3d.Desc3D.dwDeviceZBufferBitDepth ? true : false;
-  
+
   // alpha transparency?
   if ((dd3d.Desc3D.dpcTriCaps.dwSrcBlendCaps & D3DPBLENDCAPS_SRCCOLOR)
    && (dd3d.Desc3D.dpcTriCaps.dwDestBlendCaps & D3DPBLENDCAPS_DESTCOLOR))
@@ -238,7 +238,7 @@ static HRESULT WINAPI DirectDetectionD3DEnumCallback (LPGUID lpGuid,
     dd3d.AlphaBlend = true;
     dd3d.AlphaBlendType = 2;
   }
-  
+
   if ((dd3d.Desc3D.dpcTriCaps.dwSrcBlendCaps & D3DPBLENDCAPS_SRCALPHA)
    && (dd3d.Desc3D.dpcTriCaps.dwDestBlendCaps & D3DPBLENDCAPS_INVSRCCOLOR))
   {
@@ -247,13 +247,13 @@ static HRESULT WINAPI DirectDetectionD3DEnumCallback (LPGUID lpGuid,
 
   // is hi-color?
   dd3d.HighColor = (dd3d.Desc3D.dwDeviceRenderBitDepth & DDBD_16) ? true : false;
-  
+
   // can load textures into video-memory?
   dd3d.VideoMemoryTexture = (dd3d.Desc3D.dwDevCaps & D3DDEVCAPS_TEXTUREVIDEOMEMORY) ? true : false;
-  
+
   // add this device
   ddetect->addDevice (&dd3d);
-  
+
   return (D3DENUMRET_OK);
 }
 
@@ -270,15 +270,15 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
 
   if (FAILED (hRes = DirectDrawCreate (lpGUID, &pDD, NULL)))
     SystemFatalError ("Can't create DirectDraw device", hRes);
-  
+
   ZeroMemory (&DriverCaps, sizeof (DDCAPS));
   DriverCaps.dwSize = sizeof (DDCAPS);
   ZeroMemory (&HELCaps, sizeof (DDCAPS));
   HELCaps.dwSize = sizeof (DDCAPS);
-  
+
   if (FAILED (hRes = pDD->GetCaps (&DriverCaps, &HELCaps)))
     SystemFatalError ("Can't get device capabilities for DirectDraw device", hRes);
-  
+
   // some informations about device
   dd2d.DeviceName2D = _strdup (lpDriverName);
   dd2d.DeviceDescription2D = _strdup (lpDriverDescription);
@@ -292,11 +292,11 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
     ZeroMemory (&dd2d.Guid2D, sizeof (GUID));
     dd2d.IsPrimary2D = true;
   }
-  
+
   // can enable a 3d device
   if (DriverCaps.dwCaps & DDCAPS_3D)
     dd2d.Can3D = true;
-  
+
   // can run in windowed mode
 #if (DIRECTDRAW_VERSION < 0x0600)
   if (DriverCaps.dwCaps & DDCAPS_GDI)
@@ -304,18 +304,18 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
   if (DriverCaps.dwCaps2 & DDCAPS2_CANRENDERWINDOWED)
 #endif
     dd2d.Windowed = true;
-  
+
   // can have mipmapped surfaces
   if (DriverCaps.ddsCaps.dwCaps & DDSCAPS_MIPMAP)
     dd2d.Mipmap = true;
-  
+
   // can have textured surfaces
   if (DriverCaps.ddsCaps.dwCaps & DDSCAPS_TEXTURE)
     dd2d.Texture = true;
-  
+
   // add this device
   ddetect->addDevice (&dd2d);
-  
+
   pDD->Release ();
 
   return DDENUMRET_OK;
@@ -344,7 +344,7 @@ bool DirectDetection::checkDevices3D ()
           DirectDetection * ddetect;
           DirectDetection2D * dd2d;
         } toy = {this, cur};
-        
+
         LPGUID pGuid = NULL;
         if (!cur->IsPrimary2D) pGuid = &cur->Guid2D;
 
@@ -355,10 +355,10 @@ bool DirectDetection::checkDevices3D ()
         lpDD->QueryInterface (IID_IDirect3D, (LPVOID *)&lpD3D);
         if (FAILED (hRes = lpD3D->EnumDevices (DirectDetectionD3DEnumCallback, (LPVOID *)&toy)))
           SystemFatalError ("Error when enumerating Direct3D devices.", hRes);
-        
+
         lpD3D->Release ();
         lpDD->Release ();
-      }  
+      }
       cur = cur->next;
     }
   }
@@ -372,7 +372,7 @@ bool DirectDetection::checkDevices2D ()
   HRESULT hRes;
   if (FAILED (hRes = DirectDrawEnumerate (DirectDetectionDDrawEnumCallback, this)))
     SystemFatalError ("Error when enumerating DirectDraw devices.", hRes);
-  
+
   return true;
 }
 
@@ -380,7 +380,7 @@ bool DirectDetection::checkDevices2D ()
 bool DirectDetection::Have2DDevice ()
 {
   DirectDetectionDevice * cur = Devices;
-  
+
   while (cur)
   {
     if (cur->Only2D && cur->IsPrimary2D) return true;
@@ -394,7 +394,7 @@ bool DirectDetection::Have2DDevice ()
 bool DirectDetection::Have3DDevice ()
 {
   DirectDetectionDevice * cur = Devices;
-  
+
   while (cur)
   {
     if (!cur->Only2D && cur->Can3D) return true;

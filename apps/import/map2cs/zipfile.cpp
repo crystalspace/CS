@@ -11,7 +11,7 @@ bool CZipFile::AddFile(const char* originalname, const char* zipname)
     printf("Can't find file '%s'!\n", originalname);
     return false;
   }
-  
+
   //Check the size of the file.
   fseek(fd, 0, SEEK_END); //Seek to end of file
   int size = ftell(fd);   //Check current position
@@ -43,7 +43,7 @@ bool CZipFile::AddFile(const char* originalname, const char* zipname)
   assert(totalread==size);
 
   return true;
-}                            
+}
 
 bool CZipFile::AddData(const char* Data, int Size, const char* zipname)
 {
@@ -64,7 +64,7 @@ bool CZipFile::AddData(const char* Data, int Size, const char* zipname)
   }
 
   return true;
-}                            
+}
 
 bool CZipFile::AddData(CBinaryData* pData, const char* zipname)
 {

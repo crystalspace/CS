@@ -128,13 +128,13 @@ int csColorMap::FreeEntries ()
 //---------------------------------------------------- csTextureSoftProc -----//
 
 csTextureSoftwareProc::~csTextureSoftwareProc ()
-{ 
+{
   if (texG3D) texG3D->DecRef ();
 }
 
 //---------------------------------------------------- csTextureHandleSoftware ---//
 
-csTextureHandleSoftware::csTextureHandleSoftware (csTextureManagerSoftware *texman, 
+csTextureHandleSoftware::csTextureHandleSoftware (csTextureManagerSoftware *texman,
   iImage *image, int flags) : csTextureHandle (image, flags)
 {
   pal2glob = NULL;
@@ -177,14 +177,14 @@ void csTextureHandleSoftware::ApplyGamma (uint8 *GammaTable)
     dst->blue  = GammaTable [*src++];
     dst++;
   }
-} 
+}
 
 void csTextureHandleSoftware::ComputeMeanColor ()
 {
   int i;
 
-  // If the procedural textures are not running fully at 8bit and so do not have 
-  // their own texture manager the procedural textures update the iImage, so we 
+  // If the procedural textures are not running fully at 8bit and so do not have
+  // their own texture manager the procedural textures update the iImage, so we
   // avoid destroying them here.
   bool destroy_image = ((flags & CS_TEXTURE_PROC) != CS_TEXTURE_PROC);
 
@@ -338,7 +338,7 @@ void csTextureHandleSoftware::remap_texture ()
 
 void csTextureHandleSoftware::RemapProcToGlobalPalette (csTextureManagerSoftware *txtmgr)
 {
-  // This instance of the texture manager is fully 8bit and is either managing 
+  // This instance of the texture manager is fully 8bit and is either managing
   // all the textures in the system or just a set of proc textures.
   csTextureSoftwareProc* t = (csTextureSoftwareProc*)tex[0];
 
@@ -362,7 +362,7 @@ void csTextureHandleSoftware::RemapProcToGlobalPalette (csTextureManagerSoftware
   t->image = NULL;
 
   // If a proc texture was initialised without an image the palette size will be
-  // very small, therefore force it to the max, so the whole new palette is 
+  // very small, therefore force it to the max, so the whole new palette is
   // recognised.
   palette_size = 256;
   SetupFromPalette ();
@@ -390,7 +390,7 @@ iGraphics3D *csTextureHandleSoftware::GetProcTextureInterface ()
   if (!((csTextureSoftwareProc*)tex[0])->texG3D)
   {
     csSoftProcTexture3D *stex = new csSoftProcTexture3D (texman->G3D);
-    void *imd = ((csTextureSoftware*) tex[0])->image ? 
+    void *imd = ((csTextureSoftware*) tex[0])->image ?
       ((csTextureSoftware*) tex[0])->image->GetImageData () : NULL;
     if (!stex->Prepare (texman, this, imd,
 			((csTextureSoftware*) tex[0])->bitmap))
@@ -398,8 +398,8 @@ iGraphics3D *csTextureHandleSoftware::GetProcTextureInterface ()
     else
     {
       ((csTextureSoftwareProc*)tex[0])->texG3D = stex;
-      if (((flags & CS_TEXTURE_PROC_ALONE_HINT) == 
-	   CS_TEXTURE_PROC_ALONE_HINT) && 
+      if (((flags & CS_TEXTURE_PROC_ALONE_HINT) ==
+	   CS_TEXTURE_PROC_ALONE_HINT) &&
 	  !texman->first_8bit_proc_tex &&
 	  (texman->pfmt.PixelBytes != 1))
       {
@@ -444,7 +444,7 @@ static uint8 *GenLightmapTable (int bits)
 }
 
 csTextureManagerSoftware::csTextureManagerSoftware (iObjectRegistry *object_reg,
-  csGraphics3DSoftwareCommon *iG3D, iConfigFile *config) 
+  csGraphics3DSoftwareCommon *iG3D, iConfigFile *config)
   : csTextureManager (object_reg, iG3D->GetDriver2D())
 {
   alpha_tables = NULL;
@@ -516,7 +516,7 @@ void csTextureManagerSoftware::read_config (iConfigFile *config)
 
 csTextureManagerSoftware::~csTextureManagerSoftware ()
 {
-  SCF_DEC_REF (first_8bit_proc_tex); 
+  SCF_DEC_REF (first_8bit_proc_tex);
   if (main_txtmgr == NULL)
   {
     delete [] Scan.GlobalCMap;
@@ -744,9 +744,9 @@ void csTextureManagerSoftware::PrepareTextures ()
 iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImage* image,
   int flags)
 {
-  if (!image) 
+  if (!image)
   {
-    G3D->Report(CS_REPORTER_SEVERITY_BUG, 
+    G3D->Report(CS_REPORTER_SEVERITY_BUG,
       "BAAAD!!! csTextureManagerOpenGL::RegisterTexture with NULL image!");
 
     image = csCreateXORPatternImage(32, 32, 5);
@@ -813,7 +813,7 @@ void csTextureManagerSoftware::Reprepare8BitProcs ()
   for (i = 0; i < textures.Length (); i++)
   {
     csTextureHandleSoftware* txt = (csTextureHandleSoftware*)textures.Get (i);
-    if ((txt->GetFlags() & (CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT)) 
+    if ((txt->GetFlags() & (CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT))
 	== (CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT))
       ((csTextureHandleSoftware*)txt)->RemapProcToGlobalPalette (proc_txtmgr);
   }

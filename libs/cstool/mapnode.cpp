@@ -84,7 +84,7 @@ csNodeIterator::csNodeIterator (iSector* pSector, const char* classname)
 {
   Reset (pSector, Classname);
 }
-  
+
 csNodeIterator::~csNodeIterator ()
 {
   if (CurrentNode) CurrentNode->DecRef ();

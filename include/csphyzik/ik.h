@@ -38,7 +38,7 @@ class ctArticulatedBody;
 class ctInverseKinematics : public ctArticulatedGoalSolver
 {
 public:
-  ctInverseKinematics( ctArticulatedBody &pab ) 
+  ctInverseKinematics( ctArticulatedBody &pab )
     : ab( pab ) { max_qv = DEFAULT_MAX_QV; };
 
   virtual void solve( real t );
@@ -53,14 +53,14 @@ public:
   void apply_impulse ( ctVector3 /*impulse_point*/, ctVector3 /*impulse_vector*/ )
   {};
 
-  void get_impulse_m_and_I_inv ( real* /*pm*/, ctMatrix3* /*pI_inv*/, 
+  void get_impulse_m_and_I_inv ( real* /*pm*/, ctMatrix3* /*pI_inv*/,
 				 const ctVector3& /*impulse_point*/,
 				 const ctVector3& /*impulse_vector*/ ) {}
 
 
 protected:
   void solve_IK ( real t, ctVector3 &the_goal, ctVector3 &end_effector );
-  void compute_joint_angle ( real t, 
+  void compute_joint_angle ( real t,
 			     ctVector3 &the_goal, ctVector3 &end_effector );
   ctArticulatedBody &ab;
   real max_qv;

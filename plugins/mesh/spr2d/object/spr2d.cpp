@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -87,7 +87,7 @@ void csSprite2DMeshObject::SetupObject ()
     {
       csSprite2DVertex& v = vertices[i];
       bbox_2d.AddBoundingVertexSmart(v.pos);
-      if (!lighting) 
+      if (!lighting)
       {
         // If there is no lighting then we need to copy the color_init
         // array to color.
@@ -383,7 +383,7 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
   {
     vertices [i].pos.y = cos (angle);
     vertices [i].pos.x = sin (angle);
-    if (setuv) 
+    if (setuv)
     {
       // reuse sin/cos values and scale to [0..1]
       vertices [i].u = vertices [i].pos.x / 2.0f + 0.5f;
@@ -595,7 +595,7 @@ void csSprite2DMeshObject::uvAnimationControl::Advance (csTicks current_time)
 
   if (oldframeindex != frameindex)
     frame = ani->GetFrame (frameindex);
-    
+
 }
 
 const csVector2 *csSprite2DMeshObject::uvAnimationControl::GetVertices (int &num)
@@ -619,9 +619,9 @@ void csSprite2DMeshObject::CheckBeam (const csVector3& start,
   // coords, which are conveniently located at z=0.
   // The transformation matrix is stored and used again if the
   // start vector for the beam is in the same position. MHV.
-  
+
   if (start == cached_start) return;
-  cached_start.Set (start); 
+  cached_start.Set (start);
   csVector3 pl2 = pl * qisqrt (sqr);
   csVector3 v1( pl2.z, 0, -pl2.x);
   sqr = v1*v1;

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -68,7 +68,7 @@ void csIsoCell::AddSprite(iIsoSprite *sprite, const csVector3& pos)
   newnode->right = NULL;
   sprite->IncRef ();
 
-  if(!parent) 
+  if(!parent)
   {
     /// inserted becomes the new root
     root = newnode;
@@ -110,7 +110,7 @@ void csIsoCell::RemoveSprite(iIsoSprite *sprite, const csVector3& pos)
       parent->left = p->left;
     else parent->right = p->left;
   }
-  else 
+  else
   {
     /// p has both left and right subtrees
     /// since possibly some drawpart with the same y can be in
@@ -150,7 +150,7 @@ void csIsoCell::Draw(iIsoRenderView *rview)
   if(root) TraverseInOrder(root, renderfunc, (void*)rview);
 }
 
-void csIsoCell::TraversePost(csIsoCellNode *tree, 
+void csIsoCell::TraversePost(csIsoCellNode *tree,
   void (*func)(csIsoCellNode *, void *), void *data)
 {
   if(tree->left) TraversePost(tree->left, func, data);
@@ -158,7 +158,7 @@ void csIsoCell::TraversePost(csIsoCellNode *tree,
   func(tree, data);
 }
 
-void csIsoCell::TraverseInOrder(csIsoCellNode *tree, 
+void csIsoCell::TraverseInOrder(csIsoCellNode *tree,
   void (*func)(csIsoCellNode *, void *), void *data)
 {
   if(tree->left) TraverseInOrder(tree->left, func, data);

@@ -42,13 +42,13 @@ protected:
   int state_offset;
 
   /**
-   * object responsible for calculating the change in state wrt time 
+   * object responsible for calculating the change in state wrt time
    * uses forces list and current state to do this.
    */
   ctSolver *solver;
 
   /// list of all forces affecting this object
-  ctLinkList<ctForce> forces;  
+  ctLinkList<ctForce> forces;
 
  public:
 /*
@@ -77,7 +77,7 @@ protected:
   virtual void init_state() {}
   // Return the size of this enities state vector
   virtual int get_state_size() { return 0; }
-  // Add this body's state to the state vector buffer passed in. 
+  // Add this body's state to the state vector buffer passed in.
   virtual int set_state( real *sa ) = 0;
   // download state from buffer into this entity
   virtual int get_state( const real *sa ) = 0;
@@ -99,7 +99,7 @@ protected:
 
   // Stereotype of funcs to replace flags array
   virtual bool will_rewind () { return !(flags & CTF_NOREWIND); }
-  virtual void set_rewind (bool dorewind) 
+  virtual void set_rewind (bool dorewind)
   {
     flags &= ~CTF_NOREWIND;
     if(!dorewind) flags |= CTF_NOREWIND;

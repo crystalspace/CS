@@ -27,7 +27,7 @@ PLUGINS+=video/format/avi
 #PLUGINS+=video/format/codecs/opendivx
 
 # Uncomment the following to build SDL 2D driver
-#PLUGINS+=video/canvas/sdl 
+#PLUGINS+=video/canvas/sdl
 
 # Uncomment the following to build sound drivers
 #PLUGINS+=sound/driver/oss sound/renderer/software
@@ -56,7 +56,7 @@ ifeq ($(MAKESECTION),defines)
 include mk/unix.mak
 
 # Extra libraries needed on this system.
-LIBS.EXE+=$(LFLAGS.l)dl $(LFLAGS.l)m  
+LIBS.EXE+=$(LFLAGS.l)dl $(LFLAGS.l)m
 
 # Socket library
 LIBS.SOCKET.SYSTEM=

@@ -6,12 +6,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -801,7 +801,7 @@ static void WriteMatrix(const csMatrix3& m, iStrVector* str)
 }
 
 
-void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb, 
+void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
   iStrVector* str)
 {
   iSkeletonConnection* con = SCF_QUERY_INTERFACE (limb, iSkeletonConnection);
@@ -810,7 +810,7 @@ void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
   str->Push(csStrNew("VERTICES ("));
   for(i=0; i<limb->GetVertexCount(); i++)
   {
-    sprintf(buf, "%d%s", limb->GetVertices()[i], 
+    sprintf(buf, "%d%s", limb->GetVertices()[i],
       (i==limb->GetVertexCount()-1)?"":",");
     str->Push(csStrNew(buf));
   }
@@ -819,7 +819,7 @@ void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
   str->Push(csStrNew("TRANSFORM ("));
   WriteMatrix(con->GetTransformation().GetO2T(), str);
   sprintf(buf, " V(%g,%g,%g))", con->GetTransformation().GetO2TTranslation().x,
-    con->GetTransformation().GetO2TTranslation().y, 
+    con->GetTransformation().GetO2TTranslation().y,
     con->GetTransformation().GetO2TTranslation().z);
   str->Push(csStrNew(buf));
 
@@ -886,11 +886,11 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str)
   }
 
   iSkeleton *skeleton = state->GetSkeleton();
-  if(skeleton) 
+  if(skeleton)
   {
     iSkeletonLimb* skellimb = SCF_QUERY_INTERFACE (skeleton, iSkeletonLimb);
     iSkeletonLimb* skelp = skellimb;
-    while(skelp) 
+    while(skelp)
     {
       sprintf(buf, "SKELETON '%s' (\n", skelp->GetName());
       str->Push(csStrNew(buf));
@@ -1035,34 +1035,34 @@ iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
       case CS_TOKEN_APPLY_MOTION:
 	{
 	  csScanStr (params, "%s", str);
-	  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS (plugin_mgr, 
+	  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
 		"crystalspace.motion.manager.default",
 		iMotionManager);
-	  if (!motman) 
-	  { 
+	  if (!motman)
+	  {
       	    ReportError (reporter,
 		"crystalspace.sprite3dloader.setup.motion.motionmanager",
 		"Could not find motion manager!");
-	    return NULL; 
+	    return NULL;
 	  }
 	  motman->DecRef();
-	  if (!spr3dLook) 
-	  { 
+	  if (!spr3dLook)
+	  {
       	    ReportError (reporter,
 		"crystalspace.sprite3dloader.parse.motion.missingfactory",
-		"No Factory! Please define 'FACTORY' before 'APPLY_MOTION'!"); 
-	    return NULL; 
+		"No Factory! Please define 'FACTORY' before 'APPLY_MOTION'!");
+	    return NULL;
 	  }
 	  iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
 	  iSkeletonLimbState *limb = SCF_QUERY_INTERFACE (skel_state,
 	  	iSkeletonLimbState );
 	  limb->DecRef();
 	  if (!(limb = limb->GetChildren()))
-	  { 
+	  {
       	    ReportError (reporter,
 		"crystalspace.sprite3dloader.parse.motion.nochildren",
 		"Skeleton has no libs. Cannot apply motion!");
-	    return NULL; 
+	    return NULL;
 	  }
 	  iSkeletonConnectionState *con = SCF_QUERY_INTERFACE (limb,
 	  	iSkeletonConnectionState );
@@ -1072,7 +1072,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
       	    ReportError (reporter,
 		"crystalspace.sprite3dloader.parse.motion.nobones",
 		"The skeleton has no bones!");
-	    return NULL; 
+	    return NULL;
 	  }
           iMotionTemplate* motion=motman->FindMotionByName(str);
 	  if (!motion)
@@ -1080,7 +1080,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
       	    ReportError (reporter,
 		"crystalspace.sprite3dloader.parse.motion.nomotion",
 		"The motion '%s' does not exist!", str);
-	    return NULL; 
+	    return NULL;
 	  }
           iMotionController* mc=motman->AddController(bone);
           mc->SetMotion(motion);

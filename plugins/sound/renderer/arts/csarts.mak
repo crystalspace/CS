@@ -55,7 +55,7 @@ SRC.CSARTS.IDL = $(IDL.CSARTS:.idl=.cc)
 # Next we will need the implementation sources for the interfaces.
 # We introduce the convention, that the implementation sources are named *_impl.cpp.
 # We keep track of them explicitly because we'll send them through libtool.
-SRC.CSARTS.IMPL = $(wildcard $(CSARTS.DIR)/*_impl.cpp) 
+SRC.CSARTS.IMPL = $(wildcard $(CSARTS.DIR)/*_impl.cpp)
 
 # what follows are the source only needed by the csarts renderer itself
 SRC.CSARTS = $(filter-out $(SRC.CSARTS.IMPL) $(SRC.ARTSTEST), $(wildcard $(CSARTS.DIR)/*.cpp))
@@ -110,7 +110,7 @@ csartstest: csarts $(ARTSTEST.EXE)
 
 clean: csartsclean
 
-$(ARTSTEST.EXE): $(OBJ.ARTSTEST) $(LIB.CSARTS) 
+$(ARTSTEST.EXE): $(OBJ.ARTSTEST) $(LIB.CSARTS)
 	$(DO.LINK.CONSOLE.EXE) -L$(MCOP.LIBDIR)
 
 $(CSARTS): $(OBJ.CSARTS) $(LIB.CSARTS)
@@ -138,7 +138,7 @@ $(CSARTS.DIR)/%.h $(CSARTS.DIR)/%.cc: $(CSARTS.DIR)/%.idl
 	mcopidl -I$(MCOP.INCDIR) $(<<)
 	mv $(basename $(@F)).* $(CSARTS.DIR)
 
-csartsclean: 
+csartsclean:
 	$(ARTS.RM) $(CSARTS.IMPL.LIB)
 	$(ARTS.RM) $(CSARTS.LA.OBJ)
 	-$(RM) $(CSARTS.IDL.LIB) $(CSARTS) $(OBJ.CSARTS) $(OBJ.CSARTS.IDL) \
@@ -147,7 +147,7 @@ csartsclean:
 csartsinstall: $(CSARTS.IMPL.LIB)
 	$(ARTS.CP) $(CSARTS.IMPL.LIB) $(MCOP.LIBDIR)
 	$(ARTS.CP) $(CSARTS.DIR)/csarts.mcopclass $(MCOP.LIBDIR)/mcop/Arts
-	
+
 ifdef DO_DEPEND
 dep: $(OUTOS)csarts.dep
 $(OUTOS)csarts.dep: $(SRC.ARTSTEST)

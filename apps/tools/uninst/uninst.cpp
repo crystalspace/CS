@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
- 
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
- 
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -187,7 +187,7 @@ int try_delete_dirs()
     ///        use   int remove(char*) from stdio.
     /// both return -1 on failure, 0 on success.
     /// (and for both the directory must be empty on Linux)
-    if( remove(dp->name) == 0 ) 
+    if( remove(dp->name) == 0 )
     {
       dp->deleted = 1;
       succeed = 1;

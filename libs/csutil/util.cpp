@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -342,7 +342,7 @@ int csFindNearestPowerOf2 (int n)
 bool csIsPowerOf2 (int n)
 {
   if (n <= 0)
-    return false; 
+    return false;
   return !(n & (n - 1));	// (n-1) ^ n >= n;
 }
 
@@ -369,22 +369,22 @@ void csFindReplace(char *dest, const char *src, const char *search,
     sizeleft -= beforelen;
     if(sizeleft <= 0) { destpos[0]=0; return; }
     strncpy(destpos, srcpos, beforelen);
-    destpos += beforelen; 
+    destpos += beforelen;
     srcpos += beforelen;
     destpos[0]=0;
     // add replacement
     sizeleft -= replacelen;
     if(sizeleft <= 0) { destpos[0]=0; return; }
-    strcpy(destpos, replace); 	
+    strcpy(destpos, replace);
     destpos += replacelen;
     // skip replaced string
-    srcpos += searchlen; 			
+    srcpos += searchlen;
   }
   // add remainder of string
   int todo = strlen(srcpos);
   sizeleft -= todo;
   if(sizeleft <= 0) { destpos[0]=0; return; }
-  strcpy(destpos, srcpos); 	
+  strcpy(destpos, srcpos);
   destpos += todo;
   destpos[0]=0;
 }

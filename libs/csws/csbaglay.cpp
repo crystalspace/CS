@@ -67,7 +67,7 @@ void csGridBagLayout::RemoveLayoutComponent (csComponent* comp)
 {
   // force matrix recalc
   ClearCachedData();
-  
+
   csLayout2::RemoveLayoutComponent (comp);
 }
 
@@ -148,7 +148,7 @@ int csGridBagLayout::CalcPrefSize (CellInfo* cells, int xCnt, int yCnt, int _arr
     for (y = 0; y != yCnt; ++y)
       if (CELL_AT(x,y).prefSize > maxColSize)
 	maxColSize = CELL_AT(x,y).prefSize;
-		
+
     prefered += maxColSize;
   }
 
@@ -196,7 +196,7 @@ void csGridBagLayout::LayoutCells (CellInfo* cells, int xCnt, int yCnt,
 
       spaceUsed += colSize;
     }
-    actualSpaceUsed = outterSize; // all space is cosumed when 
+    actualSpaceUsed = outterSize; // all space is cosumed when
     // extra-space is absent
   }
   else
@@ -235,17 +235,17 @@ void csGridBagLayout::LayoutCells (CellInfo* cells, int xCnt, int yCnt,
     }
 
     // equation should hold true : "extraSpace * yCnt == sum"
-    // now redistribute extra space among all cesll in each columns using, 
-    // giving each column a fraction of space which corresponds to column's 
+    // now redistribute extra space among all cesll in each columns using,
+    // giving each column a fraction of space which corresponds to column's
     // "totalSpace" value's relation with the "sum"
 
-    int spaceUsed = 0; 
+    int spaceUsed = 0;
     actualSpaceUsed = 0;
     for (x = 0; x != xCnt; ++x)
     {
       int extraSpaceForCol = (int)(sum != 0 ? (extraSpace * (colSpaces[x] / sum )) : 0.0);
       // elimniate round-off errors at the expence of last column
-      if (x == xCnt - 1 && hasStrechedCells) 
+      if (x == xCnt - 1 && hasStrechedCells)
         extraSpaceForCol = extraSpace - spaceUsed;
       int spaceForCol = (int)(prefColSizes[x] + extraSpaceForCol);
       actualSpaceUsed += spaceForCol;
@@ -261,7 +261,7 @@ void csGridBagLayout::LayoutCells (CellInfo* cells, int xCnt, int yCnt,
 
   // center grid w/respect to bounds of outter component
   int curPos = (outterSize - actualSpaceUsed) / 2;
-  
+
   for (x = 0; x != xCnt; ++x)
   {
     for (y = 0; y != yCnt; ++y)
@@ -360,8 +360,8 @@ void csGridBagLayout::InitCellFromHolder (CellHolder& holder)
     hCell.cellSpan = holder.actualWidth;
     vCell.cellSpan = holder.actualHeight;
 
-    // non-zero weights are applied to the last 
-    // cell of the area covered by component 
+    // non-zero weights are applied to the last
+    // cell of the area covered by component
     // (this is how AWT's csGridBagLayout behaves!)
 
     int x = holder.x + holder.actualWidth  - 1;
@@ -449,7 +449,7 @@ void csGridBagLayout::CreateMatrix ()
     if (c.gridx != csGridBagConstraint::RELATIVE) nextX = c.gridx;
     if (c.gridy != csGridBagConstraint::RELATIVE) nextY = c.gridy;
 
-    // TBD:: handle situations when grix - give, but gridy is RELATIVE, 
+    // TBD:: handle situations when grix - give, but gridy is RELATIVE,
     //       and v.v. (should use vert/horiz scanning for not-used cells)
 
     while (usedCellsHash.Get (GetCellCode (nextX,nextY)))
@@ -516,17 +516,17 @@ void csGridBagLayout::CreateMatrix ()
         usedCellsHash.Put (GetCellCode (nextX, y), (csHashObject)pHolder);
     // adjust estimated dimensions of the matrix (grid)
 
-    if (nextX + width  > mColCount) 
+    if (nextX + width  > mColCount)
       mColCount = nextX + width;
 
-    if (nextY + height > mRowCount) 
+    if (nextY + height > mRowCount)
       mRowCount = nextY + height;
 
     // move on to next cell
 
-    if (c.gridwidth == csGridBagConstraint::REMAINDER) 
-    { 
-      nextX = 0; ++nextY; 
+    if (c.gridwidth == csGridBagConstraint::REMAINDER)
+    {
+      nextX = 0; ++nextY;
     }
     else
     {
@@ -559,8 +559,8 @@ void csGridBagLayout::CreateMatrix ()
       int actualHeight = h.constr->gridheight;
       int x = h.x, y = h.y;
 
-      // extend widths/heights if given as relative/REMAINDER by 
-      // traversing grid until end is reached or cell occupied by 
+      // extend widths/heights if given as relative/REMAINDER by
+      // traversing grid until end is reached or cell occupied by
       // anther component is encountered
 
       if (h.constr->gridwidth == csGridBagConstraint::RELATIVE
@@ -571,7 +571,7 @@ void csGridBagLayout::CreateMatrix ()
         while (x < mColCount)
         {
           CellHolder* pHolder = (CellHolder*)usedCellsHash.Get (GetCellCode(x,y));
-          if (!pHolder || (pHolder && pHolder->constr != h.constr) ) 
+          if (!pHolder || (pHolder && pHolder->constr != h.constr) )
             break;
           ++x;
         }
@@ -627,7 +627,7 @@ void csGridBagLayout::SetComponentLocations ()
       CellInfo& vCell = mpVertCellInfos  [x * mRowCount + y]; // -/-
       if (hCell.comp != NULL)
 	hCell.comp->SetRect (hCell.finalCompPos, vCell.finalCompPos,
-          hCell.finalCompPos + hCell.finalCompSize, 
+          hCell.finalCompPos + hCell.finalCompSize,
           vCell.finalCompPos + vCell.finalCompSize);
     }
 }

@@ -432,7 +432,7 @@ bool csLoader::LoadMap (char* buf)
       return false;
     }
   }
- 
+
   int i,j;
   for (i=0; i<Engine->GetSectors ()->GetCount(); i++)
   {
@@ -659,7 +659,7 @@ bool csLoader::LoadLibraryFile (const char* fname)
   bool retcode = LoadLibrary (**buf);
 
   buf->DecRef ();
-  
+
   return retcode;
 }
 
@@ -2707,7 +2707,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
         {
           csFog *f = sector->GetFog ();
           f->enabled = true;
-          csScanStr (params, "%f,%f,%f,%f", 
+          csScanStr (params, "%f,%f,%f,%f",
 		     &f->red, &f->green, &f->blue, &f->density);
         }
         break;

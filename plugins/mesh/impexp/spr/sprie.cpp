@@ -48,7 +48,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csModelConverterSPR);
     virtual bool Initialize (iObjectRegistry *object_reg)
-    { 
+    {
       return scfParent->Initialize (object_reg);
     }
   } scfiComponent;
@@ -66,7 +66,7 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_FACTORY (csModelConverterSPR)
 
 SCF_EXPORT_CLASS_TABLE (sprie)
-  SCF_EXPORT_CLASS (csModelConverterSPR, 
+  SCF_EXPORT_CLASS (csModelConverterSPR,
     "crystalspace.modelconverter.spr",
     "SPR Model Converter")
 SCF_EXPORT_CLASS_TABLE_END
@@ -109,7 +109,7 @@ iModelData *csModelConverterSPR::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
 
 /*
   Purpose:
-   
+
     csModelConverterSPR::Save() writes a standard CS SPR file.
 
   Modified:

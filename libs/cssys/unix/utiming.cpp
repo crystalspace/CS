@@ -30,7 +30,7 @@ csTicks csGetTicks ()
 #ifdef _SC_CLK_TCK
   static clock_t clktck = 0;
   if (clktck == 0)
-    clktck = sysconf(_SC_CLK_TCK);  
+    clktck = sysconf(_SC_CLK_TCK);
 #else
 #define clktck CLK_TCK
 #endif

@@ -161,7 +161,7 @@ void csStatic::Draw ()
           while ((len += GetTextSize (s)) <= bound.Width () && *++t)
             s [0] = *t;
           if (*t)
-          { 
+          {
             starts [lines] = t;
             lines++;
           }
@@ -176,7 +176,7 @@ void csStatic::Draw ()
           rowstart = 0; rowend = MIN (lines, lines_avail);
           line = rowend - 1;
           break;
-        case CSSTA_BOTTOM:  
+        case CSSTA_BOTTOM:
           rowstart = lines_avail - MIN (lines_avail, lines); rowend = lines_avail;
           line = lines - 1;
           break;
@@ -192,12 +192,12 @@ void csStatic::Draw ()
       for (i = rowend - 1; i >= rowstart; i--, line--)
       {
         if (line < lines - 1)
-          if (*(starts [line + 1] - 1) == '\n') 
+          if (*(starts [line + 1] - 1) == '\n')
             *(starts [line + 1] - 1) = '\0';
 	 else
 	   *(starts [line + 1]) = '\0';
         t = starts [line];
-	
+
         switch (TextAlignment & CSSTA_HALIGNMASK)
         {
           case CSSTA_LEFT:    x = 0; break;
@@ -207,7 +207,7 @@ void csStatic::Draw ()
         y = i * fonth;
         Text (x, y, textcolor, -1, t);
       }
-      
+
       delete [] p;
       delete [] starts;
     }

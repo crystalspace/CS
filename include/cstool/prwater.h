@@ -33,7 +33,7 @@ private:
   int *palette;
   /// number of colours in palette
   int palsize;
-  
+
   /// whole texture arrays..
   signed char *image;
   /// nr of arrays
@@ -43,7 +43,7 @@ private:
 
   /// make my palette, max nr of colours
   void MakePalette (int max);
-  /// HSI to RGB csColor 
+  /// HSI to RGB csColor
   void SetHSI (csColor& col, float H, float S, float I);
   /// get image val of x,y (wraps)
   signed char& GetImage (int im, int x, int y);

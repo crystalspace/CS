@@ -204,7 +204,7 @@ SCF_IMPLEMENT_IBASE (csSkelLimbState)
   SCF_IMPLEMENTS_INTERFACE (iSkeletonLimbState)
 SCF_IMPLEMENT_IBASE_END
 
-csSkelLimbState::csSkelLimbState (): 
+csSkelLimbState::csSkelLimbState ():
   next (NULL), tmpl (NULL), vertices (NULL), num_vertices (0),
   children (NULL), name (NULL), data (NULL)
 {

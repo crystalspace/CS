@@ -160,7 +160,7 @@ struct iReporter : public iBase
   /**
    * Report error.
    */
-  void CS_GNUC_PRINTF (3, 4) 
+  void CS_GNUC_PRINTF (3, 4)
       ReportError (const char* msgId, const char* description, ...)
   {
     va_list arg;
@@ -244,7 +244,7 @@ public:
       csPrintf("\n");
     }
   }
-    
+
   static void CS_GNUC_PRINTF (5, 6)
       Report(iObjectRegistry* reg, int severity, char const* msgId,
       char const* description, ...)

@@ -48,7 +48,7 @@ protected:
   // Texture wrapper.
   iTextureWrapper* tex;
   // Dimensions of texture.
-  int mat_w, mat_h; 
+  int mat_w, mat_h;
   // Procedural G3D and G2D.
   iGraphics3D* ptG3D;
   iGraphics2D* ptG2D;
@@ -126,7 +126,7 @@ public:
     key_green = green;
     key_blue = blue;
   }
-  
+
   /**
    * Animate this texture. Subclasses of csProcTexture must implement
    * this to implement some kind of animation on the procedural texture.

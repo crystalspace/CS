@@ -42,7 +42,7 @@ private:
   iVirtualClock* vc;
   iSector* room;
   iView* view;
- 
+
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();

@@ -39,7 +39,7 @@ else
 endif
 
 INC.AWS = $(wildcard plugins/aws/*.h) $(wildcard include/iaws/*.h)
-SRC.AWS = $(wildcard plugins/aws/*.cpp) 
+SRC.AWS = $(wildcard plugins/aws/*.cpp)
 OBJ.AWS = $(addprefix $(OUT),$(notdir $(SRC.AWS:.cpp=$O)))
 DEP.AWS = CSUTIL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
 

@@ -69,7 +69,7 @@ private:
     // Overrided Get() to avoid typecasts
     csPlugin *Get (int idx)
     { return (csPlugin *)csVector::Get (idx); }
-    
+
     virtual bool FreeItem (csSome Item)
     { delete (csPlugin*)Item; return true; }
   };

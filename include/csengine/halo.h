@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -28,7 +28,7 @@
 class csEngine;
 struct iMaterialWrapper;
 
-/** 
+/**
  * This is the basic class for all types of halos.
  * The csLight class contains a pointer to a object derived from this class.
  */
@@ -159,17 +159,17 @@ public:
   csFlareHalo();
   ///
   ~csFlareHalo();
-  /** 
+  /**
    * Add a visual component to the flare.
    * give position, size, image and mixmode.
    * The component is added at the end of the list - to be displayed last.
    */
-  void AddComponent(float pos, float w, float h, uint mode, 
+  void AddComponent(float pos, float w, float h, uint mode,
     iMaterialWrapper *image);
   /// Get the list of component
   csFlareComponent *GetComponents() const {return components;}
-  /** 
-   * Generate this halo's alpha map. 
+  /**
+   * Generate this halo's alpha map.
    * Not used for this halo (returns NULL) since the halo consists of
    * multiple images.
    */
@@ -180,7 +180,7 @@ public:
   struct FlareHalo : public iFlareHalo
   {
     SCF_DECLARE_EMBEDDED_IBASE (csFlareHalo);
-    virtual void AddComponent (float pos, float w, float h, uint mode, 
+    virtual void AddComponent (float pos, float w, float h, uint mode,
       iMaterialWrapper *image)
     {
       scfParent->AddComponent (pos, w, h, mode, image);
@@ -231,22 +231,22 @@ public:
    */
   bool IsVisible(csEngine const& engine, csVector3& v);
 
-  /** 
+  /**
    * add up elapsed time, and returns new intensity, given the current
-   * halo intensity. Give whether halo is currently visible for fading in 
+   * halo intensity. Give whether halo is currently visible for fading in
    * and out. returns true if intensity >0, returns false if intensity <= 0,
    * when the halo is completely faded out.
    * Called by Process.
    */
-  bool ComputeNewIntensity(csTicks ElapsedTime, float& hintensity, 
+  bool ComputeNewIntensity(csTicks ElapsedTime, float& hintensity,
     bool halo_vis);
 };
 
 /**
- * This class is used to keep track of visible Flares. 
+ * This class is used to keep track of visible Flares.
  * It is a subclass of csLightHalo, and - to the engine - behaves the same.
  */
-class csLightFlareHalo : public csLightHalo 
+class csLightFlareHalo : public csLightHalo
 {
   /// size of halos on the screen
   int halosize;

@@ -75,7 +75,7 @@ OBJ.GLOSX2D = $(addprefix $(OUT), \
 DEP.GLOSX2D = CSSYS CSUTIL
 
 # Define constants to indicate where OpenGL headers/framework are
-CFLAGS.GLOSX2D = -DCS_OPENGL_PATH=OpenGL 
+CFLAGS.GLOSX2D = -DCS_OPENGL_PATH=OpenGL
 LIB.GLOSX2D.OPENGL = $(LIBS.OPENGL.SYSTEM)
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -14,7 +14,7 @@ const bool AWS_COMP_DEBUG=false;
 
 
 awsComponent::awsComponent():wmgr(NULL), win(NULL), parent(NULL), children(NULL), flags(0), signalsrc(this)
-{  
+{
 }
 
 awsComponent::~awsComponent()
@@ -28,7 +28,7 @@ awsComponent::~awsComponent()
       for(i=0; i<GetChildCount(); ++i)
       {
         item = GetChildAt(i);
-          
+
         awsComponent *cmp = (awsComponent *)item;
 
         cmp->DecRef();
@@ -38,7 +38,7 @@ awsComponent::~awsComponent()
    }
 }
 
-csRect& 
+csRect&
 awsComponent::Frame()
 { return frame; }
 
@@ -46,17 +46,17 @@ char *
 awsComponent::Type()
 { return "Component"; }
 
-bool 
+bool
 awsComponent::isHidden()
 { return Flags() & AWSF_CMP_HIDDEN; }
 
-void 
+void
 awsComponent::SetFlag(unsigned int flag)
 {
  flags |= flag;
 }
 
-void 
+void
 awsComponent::ClearFlag(unsigned int flag)
 {
  flags &= (~flag);
@@ -66,18 +66,18 @@ unsigned int
 awsComponent::Flags()
 { return flags; }
 
-unsigned long 
+unsigned long
 awsComponent::GetID()
 { return id; }
 
-void 
+void
 awsComponent::SetID(unsigned long _id)
 { id = _id; }
 
-bool 
+bool
 awsComponent::HasChildren()
 { return children!=NULL; }
-   
+
 iAws *
 awsComponent::WindowManager()
 { return wmgr; }
@@ -90,11 +90,11 @@ iAwsComponent *
 awsComponent::Parent()
 { return parent; }
 
-void 
+void
 awsComponent::SetWindow(iAwsWindow *_win)
 { win = _win; }
 
-void 
+void
 awsComponent::SetParent(iAwsComponent *_parent)
 { parent = _parent; }
 
@@ -102,40 +102,40 @@ iAwsComponent *
 awsComponent::GetComponent()
 { return this; }
 
-    
+
 /**
  *  This function is normally called automatically by the window manager.  You may call it manually if you wish, but
- * there's little reason to do so.  
+ * there's little reason to do so.
  **************************************************************************************************************/
-bool 
+bool
 awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
 {
   if (wmgr) return false;
 
   wmgr = _wmgr;
-  
+
   if (AWS_COMP_DEBUG)
     printf("aws-debug: setting up awsComponent (%s).\n", Type());
-  
-  if (settings) 
+
+  if (settings)
   {
-  
+
    iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
-     
+
    pm->GetRect(settings, "Frame", frame);
-   
+
    if (AWS_COMP_DEBUG)
      printf("aws-debug: Frame is: (%d,%d)-(%d,%d)\n", frame.xmin, frame.ymin, frame.xmax, frame.ymax);
-   
+
    // Children are automatically filled in by the windowmanager.
-   
+
   }
 
   return true;
 
 }
 
-bool 
+bool
 awsComponent::GetProperty(char *name, void **parm)
 {
   if (strcmp("Frame", name)==0)
@@ -154,9 +154,9 @@ awsComponent::GetProperty(char *name, void **parm)
   return false;
 }
 
-bool 
+bool
 awsComponent::SetProperty(char *name, void *parm)
-{  
+{
   if (strcmp("Frame", name)==0)
   {
     csRect *r = (csRect *)(parm);
@@ -164,11 +164,11 @@ awsComponent::SetProperty(char *name, void *parm)
     Frame().Set(*r);
     return true;
   }
-  
+
   return false;
 }
 
-bool 
+bool
 awsComponent::Execute(char *action, iAwsParmList &parmlist)
 {
   if (strcmp("MoveTo", action)==0)
@@ -205,10 +205,10 @@ awsComponent::Execute(char *action, iAwsParmList &parmlist)
     if (parmlist.GetRect("Rect", &r))
     {
       bool result= Overlaps(*r);
-      parmlist.AddBool("Result", result); 
+      parmlist.AddBool("Result", result);
     }
     return true;
-  } 
+  }
 
   return false;
 }
@@ -219,16 +219,16 @@ awsComponent::Invalidate()
   WindowManager()->Mark(frame);
 }
 
-void 
+void
 awsComponent::Invalidate(csRect area)
 {
   WindowManager()->Mark(area);
 }
 
-bool 
+bool
 awsComponent::HandleEvent(iEvent& Event)
 {
- 
+
   switch(Event.Type)
   {
   case csevMouseMove:
@@ -260,19 +260,19 @@ awsComponent::HandleEvent(iEvent& Event)
 
   case csevFrameStart:
     return OnFrame();
-    
+
   }
 
   return false;
 }
 
-bool 
+bool
 awsComponent::Overlaps(csRect &r)
 {
   return frame.Intersects(r);
 }
 
-void 
+void
 awsComponent::AddChild(iAwsComponent *child, bool owner)
 {
   (void)owner;
@@ -285,9 +285,9 @@ awsComponent::AddChild(iAwsComponent *child, bool owner)
    // Create a new child list if the current one does not exist.
    if (children==NULL)
      children = new csBasicVector();
-   
+
    children->Push(child);
-   
+
    // Modify the child's rectangle to be inside and relative to the parent's rectangle.
    child->Frame().Move(Frame().xmin, Frame().ymin);
 
@@ -295,7 +295,7 @@ awsComponent::AddChild(iAwsComponent *child, bool owner)
    child->OnAdded();
 }
 
-void 
+void
 awsComponent::RemoveChild(iAwsComponent *child)
 {
    int i;
@@ -313,7 +313,7 @@ awsComponent::GetChildCount()
 {
   if (children)
     return children->Length();
-  else 
+  else
     return 0;
 }
 
@@ -326,29 +326,29 @@ awsComponent::GetChildAt(int i)
     return NULL;
 }
 
-void 
+void
 awsComponent::Hide()
 {
   if (Flags()&AWSF_CMP_HIDDEN) return;
-  else 
+  else
   {
     SetFlag(AWSF_CMP_HIDDEN);
     WindowManager()->Mark(Frame());
   }
 }
 
-void 
+void
 awsComponent::Show()
 {
   if (!(Flags()&AWSF_CMP_HIDDEN)) return;
-  else 
+  else
   {
     ClearFlag(AWSF_CMP_HIDDEN);
     WindowManager()->Mark(Frame());
   }
 }
 
-void 
+void
 awsComponent::MoveChildren(int delta_x, int delta_y)
 {
   // If we have no children, go away.
@@ -358,7 +358,7 @@ awsComponent::MoveChildren(int delta_x, int delta_y)
   for(i=0; i<GetChildCount(); ++i)
   {
     iAwsComponent *child = GetChildAt(i);
-    
+
     if (child->HasChildren())
       child->MoveChildren(delta_x, delta_y);
 
@@ -367,81 +367,81 @@ awsComponent::MoveChildren(int delta_x, int delta_y)
 
 }
 
-bool 
+bool
 awsComponent::RegisterSlot(iAwsSlot *slot, unsigned long signal)
 {
   return signalsrc.RegisterSlot(slot, signal);
 }
 
-bool 
+bool
 awsComponent::UnregisterSlot(iAwsSlot *slot, unsigned long signal)
 {
   return signalsrc.UnregisterSlot(slot, signal);
-} 
+}
 
-void 
+void
 awsComponent::Broadcast(unsigned long signal)
 {
   signalsrc.Broadcast(signal);
 }
 
 void awsComponent::OnDraw(csRect )
-{ 
+{
   return;
 }
 
 bool awsComponent::OnMouseDown(int ,int ,int )
-{ 
+{
   return false;
 }
 
 bool awsComponent::OnMouseUp(int ,int ,int )
-{ 
+{
   return false;
 }
 
 bool awsComponent::OnMouseMove(int ,int ,int )
-{ 
+{
   return false;
 }
 
 bool awsComponent::OnMouseClick(int ,int ,int )
-{ 
+{
   return false;
 }
 
 bool awsComponent::OnMouseDoubleClick(int ,int ,int )
-{ 
+{
   return false;
 }
 
 bool awsComponent::OnMouseExit()
-{ 
+{
   return false;
 }
 
 bool awsComponent::OnMouseEnter()
-{ 
+{
   return false;
 }
 
 bool awsComponent::OnKeypress(int ,int )
-{ 
-  return false; 
+{
+  return false;
 }
 
 bool awsComponent::OnLostFocus()
-{ 
+{
   return false;
 }
 
 bool awsComponent::OnGainFocus()
-{ 
+{
   return false;
 }
 
 bool awsComponent::OnFrame()
-{ 
+{
   return false;
 }
 
@@ -455,7 +455,7 @@ void awsComponent::OnAdded()
 /**
   *  A factory is simply a class that knows how to build your component.  Although components aren't required to have
   * a factory, they will not be able to be instantiated through the template functions and window definitions if they
-  * don't.  In any case, a factory is remarkably simple to build.  All you need to do is to inherit from 
+  * don't.  In any case, a factory is remarkably simple to build.  All you need to do is to inherit from
   * awsComponentFactory and call register with the window manager and the named type of the component.  That's it.
   */
 awsComponentFactory::awsComponentFactory(iAws *_wmgr)
@@ -477,7 +477,7 @@ awsComponentFactory::Register(char *name)
   wmgr->RegisterComponentFactory(this, name);
 }
 
-void 
+void
 awsComponentFactory::RegisterConstant(char *name, int value)
 {
   wmgr->GetPrefMgr()->RegisterConstant(name, value);

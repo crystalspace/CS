@@ -45,7 +45,7 @@ public:
 
   csSoundRenderSoftware(iBase *piBase);
   virtual ~csSoundRenderSoftware();
-	
+
   // implementation of iComponent
   virtual bool Initialize (iObjectRegistry *object_reg);
 
@@ -91,7 +91,7 @@ public:
   // memory of the sound driver
   void *memory;
   int memorysize;
-	
+
   // the global listener object
   csSoundListener *Listener;
 

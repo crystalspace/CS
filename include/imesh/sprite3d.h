@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2000-2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -42,25 +42,25 @@ struct iRenderView;
 #define CS_SPR_LIGHTING_RANDOM 3
 
 /**
- * Use the global value for determining which lighting level is used by the 
+ * Use the global value for determining which lighting level is used by the
  * sprite.
  */
 #define CS_SPR_LIGHT_GLOBAL 0
 
 /**
- * Use the sprites template lighting quality value for determining which 
+ * Use the sprites template lighting quality value for determining which
  * lighting level is used by the sprite.
  */
 #define CS_SPR_LIGHT_TEMPLATE 1
 
 /**
- * Use the lighting quality value local to the sprite for determining which 
+ * Use the lighting quality value local to the sprite for determining which
  * lighting level is used by the sprite.
  */
 #define CS_SPR_LIGHT_LOCAL 2
 
 /**
- * Use the global value for determining if LOD is used by the 
+ * Use the global value for determining if LOD is used by the
  * sprite, and what level it should be used at.
  */
 #define CS_SPR_LOD_GLOBAL 0
@@ -232,7 +232,7 @@ struct iSprite3DFactoryState : public iBase
   /// Get lighting quality (one of CS_SPR_LIGHTING_*).
   virtual int GetLightingQuality () const = 0;
   /**
-   * Sets which lighting config variable that all new sprites created 
+   * Sets which lighting config variable that all new sprites created
    * from this template will use.
    * The options are:
    * <ul>
@@ -246,7 +246,7 @@ struct iSprite3DFactoryState : public iBase
   virtual int GetLightingQualityConfig () const = 0;
 
   /**
-   * Sets which lod config variable that all new sprites created 
+   * Sets which lod config variable that all new sprites created
    * from this template will use.
    * The options are:
    * <ul>
@@ -343,7 +343,7 @@ struct iSprite3DState : public iBase
    * Returns the lighting quality level used by this sprite.
    * See SPR_LIGHTING_* macros defined in this header for the different types
    * of lighting.
-   */ 
+   */
   virtual int GetLightingQuality () = 0;
 
   /**
@@ -378,7 +378,7 @@ struct iSprite3DState : public iBase
    * </ul>
    */
   virtual void SetLodLevelConfig (int config_flag) = 0;
-   
+
   /**
    * Returns what this sprite is using for determining the lighting quality.
    */

@@ -18,7 +18,7 @@ private:
 public:
   csSoundSource_impl ();
   virtual ~csSoundSource_impl ();
-  
+
   void calculateBlock (unsigned long samples);
   virtual std::vector<float> * Data();
   virtual void Data(const std::vector<float>& newValue);
@@ -56,17 +56,17 @@ class cs3DEffect_impl : public cs3DEffect_skel, public StdSynthModule
     DistFactor = 1.0f;
   }
   void calculateBlock (unsigned long samples);
-  void SetHeadSize (float HeadSize) 
-  { 
-    headSize = HeadSize/2.f; 
+  void SetHeadSize (float HeadSize)
+  {
+    headSize = HeadSize/2.f;
     recalc = 1;
   }
   void SetOrientation (float upX, float upY, float upZ, float frontX, float frontY, float frontZ)
-  { 
-    this->upX = upX; this->upY = upY; this->upZ = upZ; 
-    this->frontX = frontX; this->frontY = frontY; this->frontZ = frontZ; 
+  {
+    this->upX = upX; this->upY = upY; this->upZ = upZ;
+    this->frontX = frontX; this->frontY = frontY; this->frontZ = frontZ;
     recalc = 1;
-  } 
+  }
   void SetListenerPosition (float posX, float posY, float posZ)
   {
     lposX = posX; lposY = posY, lposZ = posZ;

@@ -193,7 +193,7 @@ void csPerfStats::ResetStats ()
 }
 
 void csPerfStats::SetResolution (int iMilSecs)
-{ 
+{
   resolution = iMilSecs;
   frame_start = csGetTicks ();
   frame_count = 0;
@@ -308,9 +308,9 @@ void csPerfStats::FinishSection ()
 }
 
 void csPerfStats::SetOutputFile (const char *Name, bool summary)
-{ 
-  file_name = csStrNew (Name); 
-  statlog_section = this; 
+{
+  file_name = csStrNew (Name);
+  statlog_section = this;
   statvec = new StatVector (30, 100);
   if (!summary)
   {
@@ -325,7 +325,7 @@ void csPerfStats::SaveStats ()
   if  (statlog_section != this)
     WriteSubSummary ();
 
-  WriteSummaryStats (); 
+  WriteSummaryStats ();
 
   if  (statlog_section == this)
   {
@@ -340,23 +340,23 @@ void csPerfStats::WriteSummaryStats ()
 {
 
   StatEntry *entry = new StatEntry ();
-  char buf [] = 
+  char buf [] =
     "\n%sTotal Time   : %f"
     "\n%sTotal Frames : %d"
     "\n%sMean FPS     : %f"
     "\n%sHighest FPS  : %f"
     "\n%sLowest FPS   : %f\n";
 
-  // Shouldnt get numbers as big as 20 chars. as sprintf format defaults 
+  // Shouldnt get numbers as big as 20 chars. as sprintf format defaults
   // to 6 decimal places (at least on linux)
   int len_guess = strlen (buf) + (20 + indent)*5;
   entry->buf = new char[len_guess];
 
   sprintf (entry->buf, buf,
-	   margin, ((float)total_time)/1000.0f, 
-	   margin, frame_num, 
-	   margin, mean_fps, 
-	   margin, highest_fps, 
+	   margin, ((float)total_time)/1000.0f,
+	   margin, frame_num,
+	   margin, mean_fps,
+	   margin, highest_fps,
 	   margin, lowest_fps);
 
   entry->len = strlen (entry->buf) + 1;
@@ -387,7 +387,7 @@ void csPerfStats::WriteMainHeader ()
 #else
   char endianness [] = "little";
 #endif
-  char buf [] = 
+  char buf [] =
 "===========================================================================\n"
 "Crystal Space Version %s (%s)\n"
 "===========================================================================\n"
@@ -423,8 +423,8 @@ void csPerfStats::WriteMainHeader ()
     int len_guess = strlen (buf) + 18*15;
     entry->buf = new char [len_guess];
 
-    sprintf (entry->buf, buf, 
-	     CS_VERSION, CS_RELEASE_DATE, 
+    sprintf (entry->buf, buf,
+	     CS_VERSION, CS_RELEASE_DATE,
 	     g3d->GetWidth (), g3d->GetHeight (),
 	     caps->CanClip ? "yes" : "no",
 	     caps->minTexWidth, caps->minTexHeight,
@@ -454,7 +454,7 @@ void csPerfStats::WriteSubSummary ()
     char buf [] = "\n%sSummary Subsection '%s'\n%s------------------";
     int len_guess = strlen(buf) + strlen (name) + indent*2;
     entry->buf = new char [len_guess];
-    sprintf (entry->buf, buf, 
+    sprintf (entry->buf, buf,
 	     margin, name,
 	     margin);
     entry->len = strlen (entry->buf)+1;
@@ -483,7 +483,7 @@ void csPerfStats::WriteSubBegin ()
 void csPerfStats::WriteFrameHeader ()
 {
   StatEntry *entry = new StatEntry ();
-  char buf [] = 
+  char buf [] =
 "\n"
 "---------------------------------------------------------------------------\n"
 "Frame    FPS\n"
@@ -517,7 +517,7 @@ bool csPerfStats::WriteFile ()
   int f_buf_len;
 
   // Here the reason for writing to a buffer first is to format the frame
-  // number and fps's origins to the same between entries.  
+  // number and fps's origins to the same between entries.
   // Suggestions for a better way?
   if (head_section->frame_by_frame)
   {
@@ -570,7 +570,7 @@ bool csPerfStats::WriteFile ()
     int j = 0, frame_count = resolution;
     StatEntry* se = NULL;
     if (j < (statvec_num - 2))
-    {      
+    {
       se = (StatEntry*)statvec->Get (j);
       j++;
     }
@@ -610,7 +610,7 @@ bool csPerfStats::WriteFile ()
   head_section->framevec = NULL;
 
   iVFS *vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
-  if (!vfs) 
+  if (!vfs)
     return false;
 
   // Is there a limit to the size of buffer which can be written at once?

@@ -35,11 +35,11 @@ public:
 
   /// Write a text string into the back buffer
   void Write (iFont *font, int x, int y, int fg, int bg,const char *str);
-  
+
   /// Draw a pixmap
   void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha = 0);
 };
-      
-      
+
+
 #endif

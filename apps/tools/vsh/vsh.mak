@@ -32,7 +32,7 @@ VSH.EXE = vsh$(EXE)
 INC.VSH =
 SRC.VSH = apps/tools/vsh/vsh.cpp
 OBJ.VSH = $(addprefix $(OUT),$(notdir $(SRC.VSH:.cpp=$O)))
-DEP.VSH = CSUTIL CSGFX CSTOOL CSSYS CSUTIL CSSYS CSGEOM 
+DEP.VSH = CSUTIL CSGFX CSTOOL CSSYS CSUTIL CSSYS CSGEOM
 LIB.VSH = $(foreach d,$(DEP.VSH),$($d.LIB))
 
 TO_INSTALL.EXE += $(VSH.EXE)

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998,2000 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -69,7 +69,7 @@ bool csCdModel::AddTriangle (const csVector3 &p1, const csVector3 &p2,
  * There are <n> csCdTriangle structures in an array starting at <t>.
  *
  * We are told that the mean point is <mp> and the orientation
- * for the parent box will be <or>.  The split axis is to be the 
+ * for the parent box will be <or>.  The split axis is to be the
  * vector given by <ax>.
  *
  * <or>, <ax>, and <mp> are model space coordinates.
@@ -83,33 +83,33 @@ bool csCdModel::BuildHierarchy ()
   m_NumBoxesAlloced = m_NumTriangles * 2;
   m_pBoxes = new csCdBBox [m_NumBoxesAlloced];
   if (!m_pBoxes) return false;
-  
+
   // Determine initial orientation, mean point, and splitting axis.
-  int i; 
+  int i;
   Accum _M;
-  
+
   // Should never be allocated at this point, but this is safer.
   delete[] Moment::stack;
   Moment::stack = new Moment[m_NumTriangles];
 
   if (!Moment::stack)
   {
-    delete [] m_pBoxes; 
+    delete [] m_pBoxes;
     m_pBoxes = NULL;
     return false;
   }
 
-  // first collect all the moments, and obtain the area of the 
+  // first collect all the moments, and obtain the area of the
   // smallest nonzero area triangle.
   float Amin = 0.0;
   int zero = 0;
   int nonzero = 0;
   for (i = 0; i < m_NumTriangles; i++)
   {
-    Moment::stack [i].compute (m_pTriangles[i].p1, 
-                               m_pTriangles[i].p2, 
+    Moment::stack [i].compute (m_pTriangles[i].p1,
+                               m_pTriangles[i].p2,
                                m_pTriangles[i].p3);
- 
+
     if (Moment::stack[i].A == 0.0)
       zero = 1;
     else
@@ -152,9 +152,9 @@ bool csCdModel::BuildHierarchy ()
   int *t = new int [m_NumTriangles];
   if (t == 0)
   {
-    delete [] Moment::stack; 
+    delete [] Moment::stack;
     Moment::stack = NULL;
-    delete [] m_pBoxes; 
+    delete [] m_pBoxes;
     m_pBoxes = NULL;
     delete [] t;
     return false;
@@ -166,12 +166,12 @@ bool csCdModel::BuildHierarchy ()
   csCdBBox *pool = m_pBoxes + 1;
   if (!m_pBoxes[0].BuildBBoxTree(t, m_NumTriangles, m_pTriangles, pool))
   {
-    delete [] m_pBoxes; 
+    delete [] m_pBoxes;
     m_pBoxes = NULL;
     delete [] t;
     return false;
   }
-  
+
   // free the moment list
   delete [] Moment::stack;
   Moment::stack = NULL;
@@ -183,8 +183,8 @@ bool csCdModel::BuildHierarchy ()
 }
 
 bool csCdBBox::BuildBBoxTree (
-	int* TriangleIndices, 
-	int NumTriangles, 
+	int* TriangleIndices,
+	int NumTriangles,
 	csCdTriangle* Triangles,
 	csCdBBox*& box_pool)
 {
@@ -198,7 +198,7 @@ bool csCdBBox::BuildBBoxTree (
 
   if (NumTriangles == 1)
     return SetLeaf(&Triangles[TriangleIndices[0]]);
-  
+
   // walk along the triangles for the box, and do the following:
   //   1. collect the max and min of the vertices along the axes of <or>.
   //   2. decide which group the triangle goes in, performing appropriate swap.
@@ -208,12 +208,12 @@ bool csCdBBox::BuildBBoxTree (
   csMatrix3 C;
 
   float axdmp;
-  int n1 = 0;  // The number of triangles in group 1.  
+  int n1 = 0;  // The number of triangles in group 1.
   // Group 2 will have n - n1 triangles.
 
   // project approximate mean point onto splitting axis, and get coord.
   axdmp = (m_Rotation.m11 * m_Translation.x +
-           m_Rotation.m21 * m_Translation.y + 
+           m_Rotation.m21 * m_Translation.y +
            m_Rotation.m31 * m_Translation.z);
 
   _M1.clear ();
@@ -229,24 +229,24 @@ bool csCdBBox::BuildBBoxTree (
     csCdTriangle *ptr = &Triangles[CurrentTriangleIndex];
 
     c = m_Rotation.GetTranspose () * ptr->p1;
-    csMath3::SetMinMax (c, minval, maxval); 
+    csMath3::SetMinMax (c, minval, maxval);
 
     c = m_Rotation.GetTranspose () * ptr->p2;
-    csMath3::SetMinMax (c, minval, maxval); 
+    csMath3::SetMinMax (c, minval, maxval);
 
     c = m_Rotation.GetTranspose () * ptr->p3;
-    csMath3::SetMinMax (c, minval, maxval); 
+    csMath3::SetMinMax (c, minval, maxval);
 
     // grab the mean point of the in'th triangle, project
     // it onto the splitting axis (1st column of m_Rotation) and
     // see where it lies with respect to axdmp.
-     
+
     Moment::stack[CurrentTriangleIndex].mean (&c);
 
-    if ((( m_Rotation.m11 * c.x + 
-           m_Rotation.m21 * c.y + 
+    if ((( m_Rotation.m11 * c.x +
+           m_Rotation.m21 * c.y +
            m_Rotation.m31 * c.z) < axdmp)
-	  && ((NumTriangles!=2)) || ((NumTriangles==2) && (i==0)))    
+	  && ((NumTriangles!=2)) || ((NumTriangles==2) && (i==0)))
     {
       // accumulate first and second order moments for group 1
       _M1.moment (Moment::stack[CurrentTriangleIndex]);
@@ -275,7 +275,7 @@ bool csCdBBox::BuildBBoxTree (
     // equal parts, and proceed.
 
     n1 = NumTriangles/2;
-      
+
     // now recompute accumulated stuff
     _M1.clear ();
     _M2.clear ();
@@ -285,7 +285,7 @@ bool csCdBBox::BuildBBoxTree (
 
   // With the max and min data, determine the center point and dimensions
   // of the parent box.
-  c = (minval + maxval) * 0.5f; 
+  c = (minval + maxval) * 0.5f;
   m_Translation = m_Rotation * c;
 
   // delta.
@@ -312,7 +312,7 @@ bool csCdBBox::BuildBBoxTree (
     }
 
     m_pChild0->m_Rotation = tR;
-    if (!m_pChild0->BuildBBoxTree (TriangleIndices, n1, 
+    if (!m_pChild0->BuildBBoxTree (TriangleIndices, n1,
                                      Triangles, box_pool))
     {
       return false;
@@ -331,7 +331,7 @@ bool csCdBBox::BuildBBoxTree (
   m_pChild0->m_Translation = m_Rotation.GetTranspose () * c;
 
   if ((NumTriangles-n1) > 1)
-  {      
+  {
     _M2.mean (&m_pChild1->m_Translation);
     _M2.covariance (&C);
     int nn = SortedEigen(C, tR);
@@ -341,9 +341,9 @@ bool csCdBBox::BuildBBoxTree (
       // unable to find an orientation.  We'll just pick identity.
       tR.Identity ();
     }
-      
+
     m_pChild1->m_Rotation = m_Rotation;
-    if (!m_pChild1->BuildBBoxTree(TriangleIndices + n1, NumTriangles - n1, 
+    if (!m_pChild1->BuildBBoxTree(TriangleIndices + n1, NumTriangles - n1,
                                     Triangles, box_pool))
     {
       return false;
@@ -357,7 +357,7 @@ bool csCdBBox::BuildBBoxTree (
 
   C = m_pChild1->m_Rotation;
   m_pChild1->m_Rotation = m_Rotation.GetTranspose () * C;
- 
+
   c = m_pChild1->m_Translation - m_Translation;
   m_pChild1->m_Translation = m_Rotation.GetTranspose () * c;
 
@@ -371,7 +371,7 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
   // The minor axis is normal to the triangle.
   // The in-between axis is determine by these two.
 
-  // this->m_Rotation, this->m_Radius, and 
+  // this->m_Rotation, this->m_Radius, and
   // this->m_Translation are set herein.
 
   m_pChild0 = NULL;
@@ -382,7 +382,7 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
 
   csVector3 u12 = pTriangle->p1 - pTriangle->p2;
   float d12 = u12 * u12;
- 
+
   csVector3 u23 = pTriangle->p2 - pTriangle->p3;
   float d23 = u23 * u23;
 
@@ -401,13 +401,13 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
       a0 = u12;
       sv = d12;
     }
-    else 
+    else
     {
       a0 = u31;
       sv = d31;
     }
   }
-  else 
+  else
   {
     if (d23 > d23)
     {
@@ -434,8 +434,8 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
   m_Rotation.m21 = a0.y; m_Rotation.m22 = a1.y; m_Rotation.m23 = a2.y;
   m_Rotation.m31 = a0.z; m_Rotation.m32 = a1.z; m_Rotation.m33 = a2.z;
 
-  // Now compute the maximum and minimum extents of each vertex 
-  // along each of the box axes.  From this we will compute the 
+  // Now compute the maximum and minimum extents of each vertex
+  // along each of the box axes.  From this we will compute the
   // box center and box dimensions.
   csVector3 c = m_Rotation.GetTranspose () * pTriangle->p1;
   csVector3 minval = c, maxval = c;
@@ -445,7 +445,7 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
 
   c = m_Rotation.GetTranspose () * pTriangle->p3;
   csMath3::SetMinMax (c, minval, maxval);
- 
+
   // With the max and min data, determine the center point and dimensions
   // of the box
   c = (minval + maxval) * 0.5f;

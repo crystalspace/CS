@@ -62,13 +62,13 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
     if (result == ERROR_SUCCESS)
     {
       result = RegQueryValueEx(
-	m_pKey, 
-	pValueName, 
+	m_pKey,
+	pValueName,
 	0,
 	&dwType,
 	(unsigned char *)oInstallPath,
 	&bufSize);
- 
+
       if (ERROR_SUCCESS == result)
       {
 	goto got_value;
@@ -78,7 +78,7 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
 
   //@@@ might try GetModuleFilename(NULL,...) here for application's directory
 
-  // perhaps current drive/dir? 
+  // perhaps current drive/dir?
   if (1)
   {
     FILE *test = fopen("scf.cfg", "r");
@@ -92,7 +92,7 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
   }
 
   // nothing helps, use default
-  // which is C:\Program Files\Crystal\ 
+  // which is C:\Program Files\Crystal\
   strncpy(oInstallPath, "C:\\Program Files\\Crystal\\", iBufferSize);
 
 got_value:

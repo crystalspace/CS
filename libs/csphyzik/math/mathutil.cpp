@@ -58,8 +58,8 @@ ctVector3 Tz = pvec/pvec.Norm();
 ctVector3 Tx;
 ctVector3 Ty;
 
-  
-  // if Tz ~=( 0,1,0 ) then Y%Tz will be erroneous 
+
+  // if Tz ~=( 0,1,0 ) then Y%Tz will be erroneous
 if( fabs( Tz[1] - 1.0 ) < VEC_X_NORM_THRESHOLD ){
   Ty = Tz % ctVector3( 1,0,0 );
   Ty.Normalize();
@@ -72,11 +72,11 @@ if( fabs( Tz[1] - 1.0 ) < VEC_X_NORM_THRESHOLD ){
   Ty = Tz%Tx;
 }
 
-// rotation to line up zxy? axis with vector 
+// rotation to line up zxy? axis with vector
 // transform from vector body space to world space
 ctMatrix3 T_vw(	Tx[0], Ty[0], Tz[0],
                   Tx[1], Ty[1], Tz[1],
-                  Tx[2], Ty[2], Tz[2] );  
+                  Tx[2], Ty[2], Tz[2] );
 
 
 real cs = cos( theta );
@@ -113,18 +113,18 @@ ctVector3 Tz;
 ctMatrix3 T;
 	T.set(	Tx[0], Tx[1], Tx[2],
 				Ty[0], Ty[1], Ty[2],
-				Tz[0], Tz[1], Tz[2] );  
+				Tz[0], Tz[1], Tz[2] );
 
 real cs = cos( theta );
 real ss = sin( theta );
 ctMatrix3 TRot;
-	TRot.set(	1.0, 0.0, 0.0, 
+	TRot.set(	1.0, 0.0, 0.0,
 				0.0, cs, -ss,
 				0.0, ss, cs);
 
 	// tranform to rotation space, rotate around x axis, then transform back
 	// to world space.
-	pR = T.get_transpose() * TRot * T; 
+	pR = T.get_transpose() * TRot * T;
 
 }
 */
@@ -137,13 +137,13 @@ real angle_diff ( ctVector3 v1, ctVector3 v2 )
 
   v1.Normalize ();
   v2.Normalize ();
-	
+
   vxross = v2 % v1;
 
   angle_abs = acos( v1*v2 );
 
   angle_abs *= sign( mu_max( 3, vxross[0], vxross[1], vxross[2] ) );
-	
+
   return angle_abs;
 }
 
@@ -162,7 +162,7 @@ real mu_max ( int pnum, ... )
   real max_so_far = 0.0;
 
   va_start ( parg, pnum );
-	
+
   while ( pnum )
   {
     next_real = va_arg( parg, real );

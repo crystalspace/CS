@@ -217,7 +217,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
     MessageBox (NULL, "CreateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
     ExitProcess (1);
   }
-  if (!DuplicateHandle (GetCurrentProcess(), ((SysSystemDriver*)System)->m_hEvent, 
+  if (!DuplicateHandle (GetCurrentProcess(), ((SysSystemDriver*)System)->m_hEvent,
                         GetCurrentProcess (), &hEvent [1], 0, FALSE, DUPLICATE_SAME_ACCESS))
   {
     MessageBox (NULL, "DuplicateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
@@ -492,8 +492,8 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
     // @@@ if we are started from the command prompt, is there a way
     //     to use that console ?
     AllocConsole();
-    freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
-    freopen("CONOUT$", "a", stdout); // Redirect stdout to console   
+    freopen("CONOUT$", "a", stderr); // Redirect stderr to console
+    freopen("CONOUT$", "a", stdout); // Redirect stdout to console
   }
 
   registry = r;
@@ -862,8 +862,8 @@ void Win32Assistant::Win32Assistant (iConfigManager *Config)
   if (console_window)
   {
     AllocConsole();
-    freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
-    freopen("CONOUT$", "a", stdout); // Redirect stdout to console   
+    freopen("CONOUT$", "a", stderr); // Redirect stderr to console
+    freopen("CONOUT$", "a", stdout); // Redirect stdout to console
   }
 #endif
 }
@@ -920,14 +920,14 @@ void Win32Assistant::DisableConsole ()
 {
   if (console_window) {
     console_window = false;
-    freopen("_conout.txt", "a", stderr); 
-    freopen("_conout.txt", "a", stdout); 
+    freopen("_conout.txt", "a", stderr);
+    freopen("_conout.txt", "a", stdout);
     FreeConsole();
-    
+
     struct tm *now;
     time_t aclock;
-    time( &aclock );                 
-    now = localtime( &aclock );  
+    time( &aclock );
+    now = localtime( &aclock );
     printf("====== %s", asctime(now));
  }
 }

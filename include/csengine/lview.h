@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -169,7 +169,7 @@ public:
    * a copy is made and the shadows are transformed.
    */
   void AddRelevantShadows (csShadowBlock* source, csTransform* trans = NULL);
-  
+
   /**
    * Copy all relevant shadow frustums from another shadow block
    * into this block. The frustums are not really copied but a new
@@ -178,21 +178,21 @@ public:
    */
   virtual void AddRelevantShadows (iShadowBlock* source,
   	csTransform* trans = NULL);
-  
+
   /**
    * Copy all relevant shadow frustums from another shadow block list
    * into this block. The frustums are not really copied but a new
    * reference is kept.
    */
   void AddRelevantShadows (csShadowBlockList* source);
-  
+
   /**
    * Copy all relevant shadow frustums from another shadow block list
    * into this block. The frustums are not really copied but a new
    * reference is kept.
    */
   virtual void AddRelevantShadows (iShadowBlockList* source);
-  
+
   /**
    * Copy all shadow frustums from another shadow block list
    * into this block. The frustums are not really copied but a new
@@ -213,14 +213,14 @@ public:
    * but a new reference is kept.
    */
   void AddUniqueRelevantShadows (csShadowBlockList* source);
-  
+
   /**
    * Add unique shadows. Only add relevant shadow frustums that are not
    * already in the current list. The frustums are not really copied
    * but a new reference is kept.
    */
   virtual void AddUniqueRelevantShadows (iShadowBlockList* source);
-  
+
   /**
    * Add a new frustum and return a reference.
    * The frustum will have the specified number of vertices but the

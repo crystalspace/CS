@@ -95,7 +95,7 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
   xwin = CS_LOAD_PLUGIN (plugin_mgr, XWIN_SCF_ID, iXWindow);
   if (!xwin)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
+    Report (CS_REPORTER_SEVERITY_ERROR,
 	    "Could not create an instance of %s\n", XWIN_SCF_ID);
     return false;
   }
@@ -158,7 +158,7 @@ bool csGraphics2DLineXLib::Open()
 
   if (!xwin->Open ())
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
+    Report (CS_REPORTER_SEVERITY_ERROR,
 	    "Failed to open the X-Window!");
     return false;
   }
@@ -463,15 +463,15 @@ bool csGraphics2DLineXLib::Resize (int width, int height)
 }
 
 void csGraphics2DLineXLib::SetFullScreen (bool yesno)
-{ 
-  csGraphics2D::SetFullScreen (yesno); 
-  xwin->SetFullScreen (yesno); 
+{
+  csGraphics2D::SetFullScreen (yesno);
+  xwin->SetFullScreen (yesno);
 }
 
 void csGraphics2DLineXLib::AllowResize (bool iAllow)
-{ 
-  AllowResizing = iAllow; 
-  xwin->AllowResize (iAllow); 
+{
+  AllowResizing = iAllow;
+  xwin->AllowResize (iAllow);
 }
 
 //--------------------------------------------- The dummy font server --------//

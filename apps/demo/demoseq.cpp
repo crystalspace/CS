@@ -187,7 +187,7 @@ void DemoSequenceManager::TimeWarp (csTicks dt, bool restart)
     seqmgr->TimeWarp (dt, false);
     return;
   }
-  
+
   seqmgr->TimeWarp (dt, false);
   if (seqmgr->IsEmpty ())
   {

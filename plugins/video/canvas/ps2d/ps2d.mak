@@ -65,7 +65,7 @@ ps2d: $(OUTDIRS) $(PS2LIB2D)
 
 $(OUT)%$O: plugins/video/canvas/ps2d/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PS2D)
- 
+
 $(PS2LIB2D): $(OBJ.PS2LIB2D) $(DEP.PS2D)
 	$(DO.PLUGIN) $(LIBS.LOCAL.PS2D)
 

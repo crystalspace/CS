@@ -1174,12 +1174,12 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
     /// make blending tables
     if(!is_for_procedural_textures) /// if this is not procedural manager
     {
-      csScan_CalcBlendTables (Scan.BlendingTable, o_rbits = pfmt.RedBits, 
+      csScan_CalcBlendTables (Scan.BlendingTable, o_rbits = pfmt.RedBits,
         o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
     }
-    else 
+    else
     {
-      csScan_CalcBlendTables (Scan.BlendingTableProc, o_rbits = pfmt.RedBits, 
+      csScan_CalcBlendTables (Scan.BlendingTableProc, o_rbits = pfmt.RedBits,
         o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
     }
 }
@@ -1270,15 +1270,15 @@ void csGraphics3DSoftwareCommon::Close ()
     fog_buffers = n;
   }
   if (!partner)
-  { 
-    delete tcache; 
-    tcache = NULL; 
+  {
+    delete tcache;
+    tcache = NULL;
     texman->Clear();
     texman->DecRef(); texman = NULL;
     vbufmgr->DecRef (); vbufmgr = NULL;
   }
-  if (clipper) 
-  { 
+  if (clipper)
+  {
     clipper->DecRef ();
     clipper = NULL;
     cliptype = CS_CLIPPER_NONE;
@@ -1575,7 +1575,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
     // the above does not catch cases like this:
     // p1   p2   p3
     // x----x----x    a degenerated hexagon :)  norman
-    // p6   p5   p4   
+    // p6   p5   p4
   }
 
   if (((min_y + EPSILON) < 0) ||
@@ -2235,7 +2235,7 @@ texr_done:
     Scan.PrivateCMap = tex_mm->GetPaletteToGlobal8 ();
     Scan.BlendTable = NULL;
     // array to select blend tables from
-    unsigned char **BlendingTable = Scan.BlendingTable; 
+    unsigned char **BlendingTable = Scan.BlendingTable;
     switch (mode & CS_FX_MASK_MIXMODE)
     {
       case CS_FX_ADD:
@@ -2789,7 +2789,7 @@ void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
 
   Scan.BlendTable = NULL;
   // array to select blend tables from
-  unsigned char **BlendingTable = Scan.BlendingTable; 
+  unsigned char **BlendingTable = Scan.BlendingTable;
   if(is_for_procedural_textures) // proc manager uses its own blend tables
     BlendingTable = Scan.BlendingTableProc;
   pqinfo.drawline = NULL;
@@ -2797,7 +2797,7 @@ void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
 
   if (pqinfo.textured && Scan.AlphaMap)
   {
-    int scan_index = 
+    int scan_index =
       (z_buf_mode == CS_ZBUF_USE) ? SCANPROC_PI_TEX_ALPHA_ZUSE :
       (z_buf_mode == CS_ZBUF_FILL) ? SCANPROC_PI_TEX_ALPHA_ZFIL :
       (z_buf_mode == CS_ZBUF_TEST) ? SCANPROC_PI_TEX_ALPHA_ZTEST :

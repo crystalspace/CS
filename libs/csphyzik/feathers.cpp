@@ -21,7 +21,7 @@
 //!me last readable version before optimization in Crystal Space 15.002
 
 // this algorithm largely taken from Brian Mirtich's master thesis.
-// original algorithm is Dr. Featherstone's.  
+// original algorithm is Dr. Featherstone's.
 // ( his book is much harder to understand ).
 
 
@@ -70,7 +70,7 @@ void ctFeatherstoneAlgorithm::fsolve_grounded ( real t )
 
     //!me this is kind of reverse order than in Mirtch's thesis.
     //!me should have a queu here then add queu to stack.
-    //!me shouldn't matter, except that Mirtch specifically used 
+    //!me shouldn't matter, except that Mirtch specifically used
     //!me that order....
     out_link = current_ab->outboard_links.get_first();
 	  while( out_link ){
@@ -80,7 +80,7 @@ void ctFeatherstoneAlgorithm::fsolve_grounded ( real t )
   }*/
   //!me opt end
 
-  // only modify Ia and Za for links 2 to n 
+  // only modify Ia and Za for links 2 to n
   // ugh, this is a bit ugly with this nested while, should be a better way
   out_link = ab.outboard_links.get_first ();
   while( out_link )
@@ -103,7 +103,7 @@ void ctFeatherstoneAlgorithm::fsolve_grounded ( real t )
     // or it accelerates according to some other object it is attached to
   }
   else
-  { 
+  {
     //!me optimize
     ctVector3 angular_v = ab.attached_to->get_angular_v();
     ctVector3 angular_a = ab.attached_to->get_angular_a();
@@ -138,7 +138,7 @@ void ctFeatherstoneAlgorithm::fsolve_floating( real t )
   // propagate velocity of links ( w & v ) from base to leaves
   // also computes T_fg and r_fg
   ab.compute_link_velocities();
-	
+
   // initialize values for each articulated body/joint
   init_link();
 //!me opt init_link();
@@ -151,7 +151,7 @@ void ctFeatherstoneAlgorithm::fsolve_floating( real t )
 
     //!me this is kind of reverse order than in Mirtch's thesis.
     //!me should have a queu here then add queu to stack.
-    //!me shouldn't matter, except that Mirtch specifically used 
+    //!me shouldn't matter, except that Mirtch specifically used
     //!me that order....
     out_link = current_ab->outboard_links.get_first();
 	  while( out_link ){
@@ -162,7 +162,7 @@ void ctFeatherstoneAlgorithm::fsolve_floating( real t )
 //!me opt end
 
 
-  // modify Ia and Za for all links ( start by calling compute_Ia_Za on 
+  // modify Ia and Za for all links ( start by calling compute_Ia_Za on
   // link 1 ( not 0 ) )
   out_link = ab.outboard_links.get_first();
   while ( out_link )
@@ -173,7 +173,7 @@ void ctFeatherstoneAlgorithm::fsolve_floating( real t )
   }
 
   // compute joint and spatial acceleration of links
-	
+
   // linear a and alpha for link 0 is calculated by solving for spatial a:
   // Ia*a = -Za
   Ia.solve( a, Za*(-1.0) );
@@ -188,8 +188,8 @@ void ctFeatherstoneAlgorithm::fsolve_floating( real t )
   }
 }
 
-// init values before processing with featherstone of each articulated body 
-// init applied force and coriolous force for this link 
+// init values before processing with featherstone of each articulated body
+// init applied force and coriolous force for this link
 void ctFeatherstoneAlgorithm::init_link ()
 {
   ctArticulatedBody *out_link;
@@ -202,18 +202,18 @@ void ctFeatherstoneAlgorithm::init_link ()
   gXf.form_spatial_transformation( ab.T_fg, ab.r_fg );
 
   pe_g = ab.handle;
-  
+
   if ( pe_g == NULL )
     return;
 
   // calc spatial inertia
-  Ia.form_spatial_I( pe_g->get_I(), pe_g->get_m() ); 
-	
+  Ia.form_spatial_I( pe_g->get_I(), pe_g->get_m() );
+
   // applied force and torque + centripital force goes into here.
-  // -applied because this is actualy force and torque needed to 
+  // -applied because this is actualy force and torque needed to
   // keep link from NOT accelerating.
   Za.set_a( pe_g->get_T()*(-pe_g->get_F()));
-  Za.set_b( ab.w_body % (pe_g->get_I() * ab.w_body) - (pe_g->get_T()*pe_g->get_torque()) );  
+  Za.set_b( ab.w_body % (pe_g->get_I() * ab.w_body) - (pe_g->get_T()*pe_g->get_torque()) );
 
   jnt = ab.inboard_joint;
 
@@ -273,14 +273,14 @@ void ctFeatherstoneAlgorithm::compute_Ia_Za ()
     out_link_solver->compute_Ia_Za();
     out_link = ab.outboard_links.get_next();
   }
-  // unwinding recursive stack starting here 
+  // unwinding recursive stack starting here
   // from link n to link 2
 
   ctSpatialMatrix fXg;
   // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
   ab.T_fg.put_transpose ( Mwork );
   Mwork.mult_v ( vwork, ab.r_fg );
-  vwork *= -1.0; 
+  vwork *= -1.0;
   fXg.form_spatial_transformation ( Mwork, vwork );
 
   jnt = ab.inboard_joint;
@@ -290,7 +290,7 @@ void ctFeatherstoneAlgorithm::compute_Ia_Za ()
   ab_f = jnt->inboard;
   if ( ab_f == NULL || ab_f->solver == NULL )
     return;
-	
+
   svr_f = (ctFeatherstoneAlgorithm *)ab_f->solver;
 
   ctSpatialVector s = jnt->get_spatial_joint_axis ();
@@ -311,7 +311,7 @@ void ctFeatherstoneAlgorithm::compute_Ia_Za ()
   sMwork.subtract2 ( Ia, innerM );
   fXg.mult_M ( innerM, sMwork );
   innerM *= gXf;
-  svr_f->Ia += innerM; 
+  svr_f->Ia += innerM;
 
   // force from any robot motors are factored in here.  also joint friction
   // external_f = -((!s)*(Za + Ia*c ));
@@ -333,7 +333,7 @@ void ctFeatherstoneAlgorithm::compute_Ia_Za ()
   return;
 }
 
-// Final step of featherstone algorithm.  
+// Final step of featherstone algorithm.
 // Compute joint accelerations and spatial accel
 void ctFeatherstoneAlgorithm::compute_joint_a ()
 {
@@ -342,7 +342,7 @@ void ctFeatherstoneAlgorithm::compute_joint_a ()
   ctFeatherstoneAlgorithm *prev_link_solver;
   ctFeatherstoneAlgorithm *out_link_solver;
   ctSpatialVector svwork, gXfa;
- 
+
   jnt = ab.inboard_joint;
   prev_link_solver = (ctFeatherstoneAlgorithm *) jnt->inboard->solver;
 
@@ -377,7 +377,7 @@ void ctFeatherstoneAlgorithm::compute_joint_a ()
   }
 }
 
-// used to see what the effect of a "test" impulse is upon the velocity 
+// used to see what the effect of a "test" impulse is upon the velocity
 // of one link
 void ctFeatherstoneAlgorithm::test_impulse_response ()
 {
@@ -397,7 +397,7 @@ void ctFeatherstoneAlgorithm::test_impulse_response ()
       // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
       ab.T_fg.put_transpose ( Mwork );
       Mwork.mult_v ( vwork, ab.r_fg );
-      vwork *= -1.0; 
+      vwork *= -1.0;
       fXg.form_spatial_transformation ( Mwork, vwork );
 
       // calc impulse transfered to parent
@@ -410,10 +410,10 @@ void ctFeatherstoneAlgorithm::test_impulse_response ()
       in_feather->test_impulse_response ();
     }
   }
-  
+
   // so go back down and calc v changes from impulses
   // as the stack unwinds on path from root to impulse link
-  
+
   // root gets special treatment
   if ( ab.inboard_joint == NULL )
   {
@@ -425,7 +425,7 @@ void ctFeatherstoneAlgorithm::test_impulse_response ()
   else
   {
     // instantaneous change in joint acceleration
-    real dqv;  
+    real dqv;
     ctSpatialVector s = ab.inboard_joint->get_spatial_joint_axis ();
 
     dqv = !s*( 1.0L/sIs )*( Ia*gXf*in_feather->dv + Ja )*(-1.0);
@@ -440,13 +440,13 @@ void ctFeatherstoneAlgorithm::impulse_to_v ()
 {
   ctFeatherstoneAlgorithm *in = (ctFeatherstoneAlgorithm *)(ab.inboard_joint->inboard->solver);
   // instantaneous change in joint acceleration
-  real dqv;  
+  real dqv;
   ctSpatialVector s = ab.inboard_joint->get_spatial_joint_axis ();
 
   dqv = !s*( 1.0L/sIs )*( Ia*gXf*in->dv + Ja )*(-1.0);
   dv = gXf*in->dv + s*dqv;
 
-  ab.inboard_joint->qv += dqv; 
+  ab.inboard_joint->qv += dqv;
 
   ctArticulatedBody *out_link = ab.outboard_links.get_first ();
   ctFeatherstoneAlgorithm *out_link_solver;
@@ -462,7 +462,7 @@ void ctFeatherstoneAlgorithm::propagate_impulse ()
 {
   ctArticulatedBody *inboard_link;
   ctFeatherstoneAlgorithm *in_feather;
-  
+
   if ( ab.inboard_joint != NULL )
   {
     inboard_link = ab.inboard_joint->inboard;
@@ -475,7 +475,7 @@ void ctFeatherstoneAlgorithm::propagate_impulse ()
       // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
       ab.T_fg.put_transpose ( Mwork );
       Mwork.mult_v ( vwork, ab.r_fg );
-      vwork *= -1.0; 
+      vwork *= -1.0;
       fXg.form_spatial_transformation ( Mwork, vwork );
 
       // calc impulse transfered to parent
@@ -489,18 +489,18 @@ void ctFeatherstoneAlgorithm::propagate_impulse ()
       return;
     }
   }
-  
+
   // we have reached the root, so go back down and calc v changes from impulses
   if ( ab.is_grounded )
     dv.zero();
   else
   {
     Ia.solve( dv, Ja*(-1.0) );
-    // !me 27May2000 added this_to_world rb transform... 
+    // !me 27May2000 added this_to_world rb transform...
     // is that right?  Or should I use spatial trasform..
     //!me tests look totally correct...
-    ab.handle->add_v ( ab.handle->get_this_to_world ()*ctVector3 ( dv[3], dv[4], dv[5] ) ); 
-    ab.handle->add_angular_v ( ab.handle->get_this_to_world ()*ctVector3 ( dv[0], dv[1], dv[2] ) ); 
+    ab.handle->add_v ( ab.handle->get_this_to_world ()*ctVector3 ( dv[3], dv[4], dv[5] ) );
+    ab.handle->add_angular_v ( ab.handle->get_this_to_world ()*ctVector3 ( dv[0], dv[1], dv[2] ) );
   }
   ctArticulatedBody *out_link = ab.outboard_links.get_first ();
   ctFeatherstoneAlgorithm *out_link_solver;
@@ -548,7 +548,7 @@ void ctFeatherstoneAlgorithm::zero_Ja ()
 //!me normal...  kinda wierd.
 //!me So I stray from Mirtich here and use world coords instead of coll frame.
 //!me looks like things are working... needs some testing to make sure it all works
-void ctFeatherstoneAlgorithm::apply_impulse ( ctVector3 impulse_point, 
+void ctFeatherstoneAlgorithm::apply_impulse ( ctVector3 impulse_point,
 					      ctVector3 impulse_vector )
 {
   ctMatrix3 iR = ab.handle->get_world_to_this ();
@@ -564,12 +564,12 @@ void ctFeatherstoneAlgorithm::apply_impulse ( ctVector3 impulse_point,
 }
 
 // calculate virtual mass and behaviour for an impulse applied at a point
-void ctFeatherstoneAlgorithm::get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv, 
+void ctFeatherstoneAlgorithm::get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv,
    const ctVector3 &impulse_point, const ctVector3 &impulse_vector )
 {
   // theory is that I can calculate what the mass and the inertia tensor is
   // based on how this articulated body responds to a test impulse...
-  // Mirtich uses 3 orthogonal test impulses... but he is doing some kind of 
+  // Mirtich uses 3 orthogonal test impulses... but he is doing some kind of
   // continuous "collision integration".  I think I can get away with just one test
   //!me I'll may have to do some special magic for friction...
   ctVector3 test_j = impulse_vector;
@@ -591,8 +591,8 @@ void ctFeatherstoneAlgorithm::get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_
   ctVector3 dw_world = iRt*dv.get_a();
   ctVector3 r_x_i = -ir%impulse_vector;
 
-  // discontinuity if ir and impulse are same direction.... 
-  // I think I_inv is really ignored by collision response code 
+  // discontinuity if ir and impulse are same direction....
+  // I think I_inv is really ignored by collision response code
   // in that case so safe to do this...
   //!me todo: work through equations and confirm above statement
   if( r_x_i*r_x_i < MIN_REAL )
@@ -600,9 +600,9 @@ void ctFeatherstoneAlgorithm::get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_
   else
   {
     // obtained by solving dw = Ia^-1(r x J)  for Ia^-1
-    // !me this sucker comes away looking just like unmodified I... 
+    // !me this sucker comes away looking just like unmodified I...
     // wierd, everything seems to work out
-    // !me in the end however, tests look totaly accurate. 
+    // !me in the end however, tests look totaly accurate.
     *pI_inv = ctMatrix3(dw_world*r_x_i/(r_x_i*r_x_i));
   }
 }

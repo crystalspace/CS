@@ -49,8 +49,8 @@ public:
   csSoftProcTexture3D (iBase *iParent);
   virtual ~csSoftProcTexture3D ();
 
-  bool Prepare (csTextureManagerSoftware *main_texman, 
-		csTextureHandleSoftware *tex_mm, 
+  bool Prepare (csTextureManagerSoftware *main_texman,
+		csTextureHandleSoftware *tex_mm,
 		void *buffer, uint8 *bitmap);
   virtual void Print (csRect *area);
 
@@ -58,16 +58,16 @@ public:
    * The entry interface for other than software drivers..
    * implementation of iSoftProcTexture.
    */
-  virtual iTextureHandle *CreateOffScreenRenderer 
-    (iGraphics3D *parent_g3d, iGraphics3D *partner_g3d, int width, int height, 
+  virtual iTextureHandle *CreateOffScreenRenderer
+    (iGraphics3D *parent_g3d, iGraphics3D *partner_g3d, int width, int height,
      void *buffer, csPixelFormat *ipfmt, int flags);
   /// Converts mode from alone to shared.
 
   struct eiSoftProcTexture : public iSoftProcTexture
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoftProcTexture3D);
-    virtual iTextureHandle *CreateOffScreenRenderer 
-    (iGraphics3D *parent_g3d, iGraphics3D *partner_g3d, int width, int height, 
+    virtual iTextureHandle *CreateOffScreenRenderer
+    (iGraphics3D *parent_g3d, iGraphics3D *partner_g3d, int width, int height,
      void *buffer, csPixelFormat *ipfmt, int flags)
     { return scfParent->CreateOffScreenRenderer(parent_g3d, partner_g3d,
       width, height, buffer, ipfmt, flags); }

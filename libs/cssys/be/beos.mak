@@ -65,7 +65,7 @@ CFLAGS.INCLUDE=$(CFLAGS.I). $(CFLAGS.I)include $(CFLAGS.I)libs \
  $(CFLAGS.I)apps $(CFLAGS.I)support $(CFLAGS.I)libs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall -Wno-multichar -Wno-ctor-dtor-privacy 
+CFLAGS.GENERAL=-Wall -Wno-multichar -Wno-ctor-dtor-privacy
 
 # Flags for the compiler which are used when optimizing.
 # *NOTE* Must disable schedule-insns2 optimization since it causes QInt() to

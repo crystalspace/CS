@@ -1,5 +1,5 @@
 // casnddrv.cpp
-// CoreAudio (MacOS X) Sound Driver for Crystal Space 
+// CoreAudio (MacOS X) Sound Driver for Crystal Space
 //
 // Created by mreda on Sun Nov 11 2001.
 // Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -24,7 +24,7 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY(csSoundDriverCoreAudio);
 
 SCF_EXPORT_CLASS_TABLE(casnddrv)
-	SCF_EXPORT_CLASS (csSoundDriverCoreAudio, "crystalspace.sound.driver.coreaudio", 
+	SCF_EXPORT_CLASS (csSoundDriverCoreAudio, "crystalspace.sound.driver.coreaudio",
                             "Crystal Space CoreAudio Sound driver for MacOS X")
 SCF_EXPORT_CLASS_TABLE_END
 
@@ -40,7 +40,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 // CoreAudio IO proc
 static OSStatus AudioProc(AudioDeviceID inDevice, const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
-                            const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData, 
+                            const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
                             const AudioTimeStamp *inOutputTime, void *inClientData);
 
 
@@ -74,13 +74,13 @@ bool csSoundDriverCoreAudio::Open(iSoundRender *render, int freq, bool bit16, bo
 {
     // Report driver information
     csReport(reg, CS_REPORTER_SEVERITY_NOTIFY, CS_SOUND_DRIVER,
-            CS_PLATFORM_NAME " CoreAudio sound driver for Crystal Space " 
+            CS_PLATFORM_NAME " CoreAudio sound driver for Crystal Space "
             CS_VERSION_NUMBER "\nWritten by Matt Reda <mreda@mac.com>");
-            
+
     OSStatus status;
     UInt32 propertySize, bufferSize;		// bufferSize is in bytes
     AudioStreamBasicDescription outStreamDesc;
-    
+
     // Get output device
     propertySize = sizeof(audioDevice);
     status = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &propertySize, &audioDevice);
@@ -90,14 +90,14 @@ bool csSoundDriverCoreAudio::Open(iSoundRender *render, int freq, bool bit16, bo
     // Set buffer size
     propertySize = sizeof(bufferSize);
     bufferSize = SAMPLES_PER_BUFFER * sizeof(float);
-    status = AudioDeviceSetProperty(audioDevice, NULL, 0, false, 
+    status = AudioDeviceSetProperty(audioDevice, NULL, 0, false,
                                         kAudioDevicePropertyBufferSize, propertySize, &bufferSize);
     if (status != 0)
         return false;
-        
+
     // Get stream information
     propertySize = sizeof(outStreamDesc);
-    status = AudioDeviceGetProperty(audioDevice, 0, false, kAudioDevicePropertyStreamFormat, 
+    status = AudioDeviceGetProperty(audioDevice, 0, false, kAudioDevicePropertyStreamFormat,
                                         &propertySize, &outStreamDesc);
     if (status != 0)
         return false;
@@ -116,12 +116,12 @@ bool csSoundDriverCoreAudio::Open(iSoundRender *render, int freq, bool bit16, bo
     status = AudioDeviceAddIOProc(audioDevice, AudioProc, this);
     if (status != 0)
         return false;
-        
+
     // Begin playback
     status = AudioDeviceStart(audioDevice, AudioProc);
     if (status != 0)
         return false;
-    
+
     // Indicate that Initialization has completed
     isPlaying = true;
 
@@ -139,14 +139,14 @@ void csSoundDriverCoreAudio::Close()
         status = AudioDeviceStop(audioDevice, AudioProc);
         if (status != 0)
             return;
-            
+
         status = AudioDeviceRemoveIOProc(audioDevice, AudioProc);
         if (status != 0)
             return;
-            
+
         free(memory);
         memorySize = 0;
-            
+
         isPlaying = false;
     };
 }
@@ -162,7 +162,7 @@ void csSoundDriverCoreAudio::LockMemory(void **mem, int *memsize)
 
 
 // UnlockMemory
-void csSoundDriverCoreAudio::UnlockMemory() 
+void csSoundDriverCoreAudio::UnlockMemory()
 {
     // Do nothing
 }
@@ -170,38 +170,38 @@ void csSoundDriverCoreAudio::UnlockMemory()
 
 // IsBackground
 // Return true to indicate driver can play in background
-bool csSoundDriverCoreAudio::IsBackground() 
-{ 
-    return true; 
+bool csSoundDriverCoreAudio::IsBackground()
+{
+    return true;
 }
 
 // Is16Bits
 // Return whether or not driver is set up for 16 bit playback
-bool csSoundDriverCoreAudio::Is16Bits() 
-{ 
-    return is16Bit; 
+bool csSoundDriverCoreAudio::Is16Bits()
+{
+    return is16Bit;
 }
 
 // IsStereo
 // Indicate whether the driver is set up for stereo playback
-bool csSoundDriverCoreAudio::IsStereo() 
-{ 
-    return isStereo; 
+bool csSoundDriverCoreAudio::IsStereo()
+{
+    return isStereo;
 }
 
 // GetFrequency
 // Return playback frequency
 int csSoundDriverCoreAudio::GetFrequency()
-{ 
-    return frequency; 
+{
+    return frequency;
 }
 
 
 // IsHandleVoidSound
 // Return false to indicate driver needs input to create silence
-bool csSoundDriverCoreAudio::IsHandleVoidSound() 
-{ 
-    return false; 
+bool csSoundDriverCoreAudio::IsHandleVoidSound()
+{
+    return false;
 }
 
 
@@ -211,11 +211,11 @@ void csSoundDriverCoreAudio::CreateSamples(float *buffer)
 {
     // Create new samples
     soundRender->MixingFunction();
-    
+
     // Copy and scale Crystal Space samples to the floats that CoreAudio can use
     float scaleFactor = 1.0f / SHRT_MAX;
     for (int i = 0; i < SAMPLES_PER_BUFFER; i++)
-        buffer[i] = memory[i] * scaleFactor; 
+        buffer[i] = memory[i] * scaleFactor;
 };
 
 
@@ -223,14 +223,14 @@ void csSoundDriverCoreAudio::CreateSamples(float *buffer)
 // AudioProc
 // Create samples in output buffer - that will be played automatically
 static OSStatus AudioProc(AudioDeviceID inDevice, const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
-                            const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData, 
+                            const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
                             const AudioTimeStamp *inOutputTime, void *inClientData)
 {
     csSoundDriverCoreAudio *driver = (csSoundDriverCoreAudio *) inClientData;
     float *buffer = (float *) outOutputData->mBuffers[0].mData;
 
     driver->CreateSamples(buffer);
-    
+
     return 0;
 };
 

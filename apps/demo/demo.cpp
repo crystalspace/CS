@@ -287,8 +287,8 @@ void Demo::SetupMaterials ()
   LoadMaterial ("th_ship", "/data/demo/textures/shiptex.jpg");
 }
 
-static void SetTexSpace (iPolygon3D* poly, 
-  int size, const csVector3& orig, const csVector3& upt, float ulen, 
+static void SetTexSpace (iPolygon3D* poly,
+  int size, const csVector3& orig, const csVector3& upt, float ulen,
   const csVector3& vpt, float vlen)
 {
   csVector3 texorig = orig;
@@ -530,7 +530,7 @@ void Demo::SetupSector ()
   starbox->SetZBufMode(CS_ZBUF_NONE);
   starbox->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
   starbox->GetFlags().Set(CS_ENTITY_NOSHADOWS | CS_ENTITY_NOLIGHTING);
-    //CS_ENTITY_CAMERA | CS_ENTITY_NOSHADOWS | 
+    //CS_ENTITY_CAMERA | CS_ENTITY_NOSHADOWS |
     //CS_ENTITY_NOLIGHTING);
   iStarsState *starstate = SCF_QUERY_INTERFACE( starbox->GetMeshObject(),
     iStarsState);
@@ -542,7 +542,7 @@ void Demo::SetupSector ()
   starstate->DecRef();
   mf->DecRef();
   starbox->DecRef();
-  
+
 }
 
 void Demo::SetupObjects ()
@@ -613,7 +613,7 @@ void Demo::SetupObjects ()
   clouds->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   bs->DecRef ();
   clouds->DecRef ();
- 
+
   // Create fighters.
   iMeshWrapper* spr3d;
   iSprite3DState* s3d;
@@ -646,7 +646,7 @@ void Demo::SetupObjects ()
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
-  
+
   tail = LoadObject ("FighterTail2",
   	"/data/demo/objects/fightertail",
   	"crystalspace.mesh.object.fire",
@@ -655,7 +655,7 @@ void Demo::SetupObjects ()
   tail->SetZBufMode (CS_ZBUF_TEST);
   spr3d->GetChildren ()->Add (tail);
   tail->DecRef ();
-  
+
   spr3d->DecRef ();
 
   spr3d = engine->CreateMeshWrapper (
@@ -667,7 +667,7 @@ void Demo::SetupObjects ()
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
-  
+
   tail = LoadObject ("ShuttleTail",
   	"/data/demo/objects/shuttletail",
   	"crystalspace.mesh.object.fire",
@@ -676,7 +676,7 @@ void Demo::SetupObjects ()
   tail->SetZBufMode (CS_ZBUF_TEST);
   spr3d->GetChildren ()->Add (tail);
   tail->DecRef ();
-  
+
   spr3d->DecRef ();
 
   spr3d = engine->CreateMeshWrapper (
@@ -688,7 +688,7 @@ void Demo::SetupObjects ()
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
-  
+
   tail = LoadObject ("ShuttleTail2",
   	"/data/demo/objects/shuttletail2",
   	"crystalspace.mesh.object.fire",
@@ -697,7 +697,7 @@ void Demo::SetupObjects ()
   tail->SetZBufMode (CS_ZBUF_TEST);
   spr3d->GetChildren ()->Add (tail);
   tail->DecRef ();
-  
+
   spr3d->DecRef ();
 
   // Create laser.
@@ -819,7 +819,7 @@ void Demo::SetupObjects ()
   spr3d->DecRef ();
 
   //=====
-  
+
   iMeshWrapper* spr2d;
   iSprite2DState* s2d;
   iParticle* part;
@@ -831,11 +831,11 @@ void Demo::SetupObjects ()
   s2d = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iSprite2DState);
   s2d->CreateRegularVertices (4, true);
   s2d->DecRef ();
-  
+
   part = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
   part->ScaleBy (3);
   part->DecRef ();
-  
+
   spr2d->DecRef ();
 
   spr2d = engine->CreateMeshWrapper (
@@ -846,13 +846,13 @@ void Demo::SetupObjects ()
   s2d = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iSprite2DState);
   s2d->CreateRegularVertices (4, true);
   s2d->DecRef ();
-  
+
   part = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
   part->ScaleBy (3);
   part->DecRef ();
-  
+
   spr2d->DecRef ();
-  
+
 }
 
 static bool DemoEventHandler (iEvent& ev)
@@ -1079,9 +1079,9 @@ void Demo::SetupFrame ()
 
   // since no time has passed, the animated screen image stays the same.
   // avoid drawing this, it will only fill up queues and cause jerky
-  // movement on some hardware/drivers. 
+  // movement on some hardware/drivers.
   if(elapsed_time == 0) return;
- 
+
   // Now rotate the camera according to keyboard state
   csReversibleTransform& camtrans = view->GetCamera ()->GetTransform ();
   if (map_enabled < MAP_EDIT)
@@ -1909,7 +1909,7 @@ int main (int argc, char* argv[])
     Cleanup ();
     exit (1);
   }
- 
+
   // Main loop.
   csDefaultRunLoop(System->object_reg);
 

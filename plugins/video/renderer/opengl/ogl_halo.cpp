@@ -45,7 +45,7 @@ class csOpenGLHalo : public iHalo
 public:
   SCF_DECLARE_IBASE;
 
-  csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha, 
+  csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
     int iWidth, int iHeight, csGraphics3DOGLCommon *iG3D);
 
   virtual ~csOpenGLHalo ();

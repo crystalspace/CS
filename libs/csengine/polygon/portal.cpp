@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -173,7 +173,7 @@ void csPortal::SetWarp (const csMatrix3& m_w, const csVector3& v_w_before, const
   // If the three colunms of the transformation matrix are taken
   // as vectors, V1, V2, and V3, then V1 x V2 = ( + or - ) V3.
   // The result is positive for non-mirroring transforms, and
-  // negative for mirroring transforms.  Thus, (V1 x V2) * V3 
+  // negative for mirroring transforms.  Thus, (V1 x V2) * V3
   // will equal +1 or -1, depending on whether the transform is
   // mirroring.
   csMatrix3 m = warp_obj.GetO2T ();
@@ -294,7 +294,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     G3D->SetNearPlane (cp);
   else
     G3D->ResetNearPlane ();
-  
+
   if (flags.Check (CS_PORTAL_WARP))
   {
     iCamera* inewcam = rview->CreateNewCamera ();

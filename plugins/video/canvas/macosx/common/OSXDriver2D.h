@@ -1,6 +1,6 @@
 //
 //  OSXDriver2D.h
-//  
+//
 //
 //  Created by mreda on Wed Oct 31 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -37,10 +37,10 @@ public:
 
     // Initialize 2D plugin
     virtual bool Initialize(iObjectRegistry *reg);
-    
+
     // Open graphics system (set mode, open window, etc)
     virtual bool Open();
-    
+
     // Close graphics system
     virtual void Close();
 
@@ -49,10 +49,10 @@ public:
 
     // Pure virtual function - the driver must invlude code to handle resizing
     virtual bool Resize(int w, int h) = 0;
-        
+
     // Handle an event
     virtual bool HandleEvent(iEvent &ev);
-    
+
     // Dispatch an event to the assistant
     inline void DispatchEvent(NeXTEvent ev, NeXTView view);
 
@@ -71,7 +71,7 @@ public:
             SCF_CONSTRUCT_IBASE(NULL);
             parent = p;
         };
-        
+
         SCF_DECLARE_IBASE;
         virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
     } * scfiEventHandler;
@@ -79,13 +79,13 @@ public:
 protected:
     // Initialize pixel format for 16 bit depth
     void Initialize16();
-    
+
     // Initialize pixel format for 32 bit depth
     void Initialize32();
-    
+
     // Switch to fullscreen mode
     bool EnterFullscreenMode();
-    
+
     // Switch out of fullscreen mode, to mode stored in originalMode
     void ExitFullscreenMode();
 
@@ -96,13 +96,13 @@ protected:
 
     CFDictionaryRef originalMode;		// Original display mode
     bool inFullscreenMode;			// Flag to indicate that we have correctly switched to fs mode
-    
-    int origWidth, origHeight;			// It is necessary to keep the original values so the can be 
+
+    int origWidth, origHeight;			// It is necessary to keep the original values so the can be
                                                 // restored when switching modes
-    
+
     OSXDelegate2D delegate;			// Delegate for ObjC stuff
     csGraphics2D *canvas;			// Canvas (parent class)
-    
+
     iNeXTAssistant *assistant;			// Assistant for dispatching events
     iObjectRegistry *objectReg;			// Object registry
 };

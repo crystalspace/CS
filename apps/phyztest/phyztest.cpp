@@ -76,7 +76,7 @@ Phyztest *System;
 // data for mass on spring demo
 iMeshWrapper *bot = NULL;
 ctRigidBody *rb_bot = NULL;
-  
+
 // data for swinging chain demo
 bool chain_added = false;
 
@@ -88,7 +88,7 @@ public:
   {
     sprt = psprt;
     rb = prb;
-    ab = pab;   
+    ab = pab;
   }
 
   iMeshWrapper *sprt;         // mesh that represents a link
@@ -118,7 +118,7 @@ ctRigidBody *add_test_body (ctVector3 ppos)
 iMeshWrapper *add_test_mesh (iMeshFactoryWrapper *tmpl, iSector *aroom, iView *view)
 {
   iMeshWrapper *tsprt;
-  
+
   tsprt = view->GetEngine ()->CreateMeshWrapper (tmpl, NULL);
   tsprt->GetMovable ()->SetSector (aroom);
   csXScaleMatrix3 m (2);
@@ -337,18 +337,18 @@ bool Phyztest::Initialize (int argc, const char* const argv[],
   }
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
- 
+
   room = engine->CreateSector ("room");
   iMeshWrapper *wallmw = engine->CreateSectorWallsMesh (room,"walls");
   iThingState* walls = SCF_QUERY_INTERFACE (wallmw->GetMeshObject (), iThingState);
-  csVector3 
+  csVector3
     f1 (-5,  5,  5),
-    f2 (5,  5,  5), 
-    f3 (5, -5,  5), 
-    f4 (-5, -5,  5), 
+    f2 (5,  5,  5),
+    f3 (5, -5,  5),
+    f4 (-5, -5,  5),
     b1 (-5,  5, -5),
-    b2 (5,  5, -5), 
-    b3 (5, -5, -5), 
+    b2 (5,  5, -5),
+    b3 (5, -5, -5),
     b4 (-5, -5, -5);
 
   iPolygon3D* p = walls->CreatePolygon ("back");
@@ -413,12 +413,12 @@ bool Phyztest::Initialize (int argc, const char* const argv[],
   light = engine->CreateLight (NULL, csVector3 (0, -4, -3), 10, csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
   light->DecRef ();
-  
+
   iMeshWrapper *mw = room->GetMeshes ()->Get (0);
   iPolygonMesh* mesh = SCF_QUERY_INTERFACE (mw->GetMeshObject (), iPolygonMesh);
   room_collwrap = new csColliderWrapper (mw->QueryObject (), cdsys, mesh);
   mesh->DecRef ();
-  
+
   engine->Prepare ();
 
   Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
@@ -444,7 +444,7 @@ void Phyztest::SetupFrame ()
   current_time = vc->GetCurrentTicks ();
 
   int i;
-  csMatrix3 m; 
+  csMatrix3 m;
   ctMatrix3 M;
 
   // Now rotate the camera according to keyboard state
@@ -472,48 +472,48 @@ void Phyztest::SetupFrame ()
     iMeshFactoryWrapper* bxtmpl = view->GetEngine ()->GetMeshFactories ()
       ->FindByName ("box");
     if (!bxtmpl)
-    {  
+    {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "couldn't load template 'box'");
       return;
     }
 
     // root of chain.  invisible (no mesh)
-    // this body doesn't rotate or translate if it is rooted. 
+    // this body doesn't rotate or translate if it is rooted.
     iMeshWrapper *sprt;
     ctArticulatedBody *ab_parent;
     ctArticulatedBody *ab_child;
-    // each link of chain has a rigid body 
+    // each link of chain has a rigid body
     ctRigidBody *rb = add_test_body (ctVector3 (0.0, 0.0, 0.0));
-    // which is used in the creation of an articulated body 
+    // which is used in the creation of an articulated body
     // (linked to others via a joint)
     ab_parent = new ctArticulatedBody (rb);
-    // the world only needs to have a pointer to the root of the 
+    // the world only needs to have a pointer to the root of the
     // articulated body tree.
     phyz_world.add_entity (ab_parent);
     // make the root fixed to the world. can be non-rooted as well
-    ab_parent->make_grounded (); 
-  
+    ab_parent->make_grounded ();
+
     // add all the links that will be seen swinging.
     for (i = 0; i < NUM_LINKS; i++)
     {
-      // position is irrelevent. 
+      // position is irrelevent.
       // It will be determined by root offset and joint angles
-      rb = add_test_body (ctVector3 (0.0, 0.0, 0.0));  
+      rb = add_test_body (ctVector3 (0.0, 0.0, 0.0));
       ab_child = new ctArticulatedBody (rb);
-      // link this body to the previous one.  first 2 vectors are joint offsets, 
+      // link this body to the previous one.  first 2 vectors are joint offsets,
       // the 3rd is the line the joint revolves around
       ctVector3 joint_offset (0, -0.1, 0);
       ctVector3 joint_action (0, 0, 1);
       ab_parent->link_revolute (ab_child, joint_offset, joint_offset, joint_action);
-  
+
       // make something to draw
       sprt = add_test_mesh (bxtmpl, room, view);
       chain[i] = new ChainLink (sprt, rb, ab_child);
-      
+
       // this will be parent of next body
       ab_parent = ab_child;
     }
-    
+
     // rotate them so we can see some action.
     chain[0]->ab->rotate_around_axis (degree_to_rad (80));
     //!me uncomment if you have a good frame-rate
@@ -531,7 +531,7 @@ void Phyztest::SetupFrame ()
       iMeshFactoryWrapper* tmpl = view->GetEngine ()->GetMeshFactories ()
       	->FindByName ("box");
       if (!tmpl)
-      {     
+      {
 	Report (CS_REPORTER_SEVERITY_NOTIFY, "couldn't load template 'box'");
 	return;
       }
@@ -566,12 +566,12 @@ void Phyztest::SetupFrame ()
     rb_bot->add_force (sf);
     ctVector3 rotaxisz (0, 0, 1);
     ctVector3 rotaxisy (0, 1, 0);
- 
-    rb_bot->rotate_around_line (rotaxisy, degree_to_rad (45));  
+
+    rb_bot->rotate_around_line (rotaxisy, degree_to_rad (45));
     rb_bot->rotate_around_line (rotaxisz, degree_to_rad (60));
     rb_bot->set_angular_v (ctVector3 (1.0, 0, 0));
   }
-  
+
   // Move the dynamic light around.
   /*  angle += elapsed_time * 0.4 / 1000.;
       while (angle >= 2.*3.1415926) angle -= 2.*3.1415926;
@@ -587,10 +587,10 @@ void Phyztest::SetupFrame ()
   if (rb_bot && kbd->GetKeyState (CSKEY_ENTER))
     rb_bot->apply_impulse (ctVector3 (0,1,0), ctVector3 (0,10,0));
 
-  // evolve the physics world by time step.  
+  // evolve the physics world by time step.
   // Slowed down by 4x due to speed of demo objects
   // !me .25 needed to balance test samples..
-  // !me phyz_world.evolve (0, 0.25*elapsed_time / 1000.0);  
+  // !me phyz_world.evolve (0, 0.25*elapsed_time / 1000.0);
 
   csRigidSpaceTimeObj::evolve_system
     (0, 0.25*elapsed_time / 1000.0, &phyz_world, engine);
@@ -602,11 +602,11 @@ void Phyztest::SetupFrame ()
   {
     csVector3 new_p = rb_bot->get_pos ();
     iLight* lights[2];
-    int num_lights = engine->GetNearbyLights (room, new_p, 
+    int num_lights = engine->GetNearbyLights (room, new_p,
 		       CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
-    bot->UpdateLighting (lights, num_lights);  
+    bot->UpdateLighting (lights, num_lights);
   }
- 
+
   // if we have a swinging chain demo started
   if (chain_added == true)
   {
@@ -626,7 +626,7 @@ void Phyztest::SetupFrame ()
 	//  Report (CS_REPORTER_SEVERITY_DEBUG, "chain pos %d = %f, %f, %f",
 	//            i, new_p.x, new_p.y, new_p.z);
         chain[i]->sprt->GetMovable ()->SetPosition (new_p);
-        
+
         M = chain[i]->rb->get_R ();   // get orientation for this link
         // ctMatrix3 and csMatrix3 not directly compatable yet
         m.Set (M[0][0], M[0][1], M[0][2],
@@ -639,9 +639,9 @@ void Phyztest::SetupFrame ()
         chain[i]->sprt->GetMovable ()->SetTransform (m);
 	chain[i]->sprt->GetMovable ()->UpdateMove ();
 
-        num_lights = engine->GetNearbyLights (room, new_p, 
+        num_lights = engine->GetNearbyLights (room, new_p,
 			   CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
-        chain[i]->sprt->UpdateLighting (lights, num_lights); 
+        chain[i]->sprt->UpdateLighting (lights, num_lights);
       }
     }
   }
@@ -660,19 +660,19 @@ void Phyztest::SetupFrame ()
     ctVector3 T = rb_bot->get_torque ();
     ctVector3 P = rb_bot->get_P ();
     ctVector3 L = rb_bot->get_angular_P ();
-    WriteShadow (ALIGN_LEFT, 10, 10, write_colour, 
+    WriteShadow (ALIGN_LEFT, 10, 10, write_colour,
 		 "pos: %.2f, %.2f, %.2f", p.x, p.y, p.z);
-    WriteShadow (ALIGN_LEFT, 10, 20, write_colour, 
+    WriteShadow (ALIGN_LEFT, 10, 20, write_colour,
 		 "Frc: %.2f, %.2f, %.2f", F.x, F.y, F.z);
-    WriteShadow (ALIGN_LEFT, 10, 30, write_colour, 
+    WriteShadow (ALIGN_LEFT, 10, 30, write_colour,
 		 "Tqe: %.2f, %.2f, %.2f", T.x, T.y, T.z);
-    WriteShadow (ALIGN_LEFT, 10, 40, write_colour, 
+    WriteShadow (ALIGN_LEFT, 10, 40, write_colour,
 		 "  P: %.2f, %.2f, %.2f", P.x, P.y, P.z);
-    WriteShadow (ALIGN_LEFT, 10, 50, write_colour, 
+    WriteShadow (ALIGN_LEFT, 10, 50, write_colour,
 		 " lv: %.2f, %.2f, %.2f", lv.x, lv.y, lv.z);
-    WriteShadow (ALIGN_LEFT, 10, 60, write_colour, 
+    WriteShadow (ALIGN_LEFT, 10, 60, write_colour,
 		 "  L: %.2f, %.2f, %.2f", L.x, L.y, L.z);
-    WriteShadow (ALIGN_LEFT, 10, 70, write_colour, 
+    WriteShadow (ALIGN_LEFT, 10, 70, write_colour,
 		 " av: %.2f, %.2f, %.2f", av.x, av.y, av.z);
 
   }
@@ -703,7 +703,7 @@ bool Phyztest::HandleEvent (iEvent &Event)
     }
     return true;
   }
-  if ((Event.Type == csevBroadcast) && 
+  if ((Event.Type == csevBroadcast) &&
       (Event.Command.Code == cscmdContextResize))
     view->GetCamera ()->SetPerspectiveCenter (myG3D->GetWidth ()/2, myG3D->GetHeight ()/2);
   return false;

@@ -2,18 +2,18 @@
 #define __AWS_SLOT_H__
 
 /**************************************************************************
-    Copyright (C) 2000-2001 by Christopher Nelson 
-    
+    Copyright (C) 2000-2001 by Christopher Nelson
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -49,9 +49,9 @@ public:
 
   awsSinkManager(iBase *p);
   virtual ~awsSinkManager();
-    
+
   bool Initialize(iObjectRegistry *sys);
-  
+
 public:
   /// Registers a sink by name for lookup.
   virtual void RegisterSink(char *name, iAwsSink *sink);
@@ -83,7 +83,7 @@ class awsSink : public iAwsSink
 
     TriggerMap(unsigned long n, void (*t)(void *, iAwsSource *)):name(n), trigger(t) {};
   };
-    
+
   /// List of triggers registered.
   csBasicVector triggers;
 
@@ -105,7 +105,7 @@ public:
 
   /// A sink should call this to register trigger events
   virtual void RegisterTrigger(char *name, void (*Trigger)(void *, iAwsSource *));
-  
+
 };
 
 /// This is the signal source implementation, subclassed by all components.
@@ -126,7 +126,7 @@ class awsSource : public iAwsSource
       unsigned long signal;
    };
 
-public:  
+public:
     SCF_DECLARE_IBASE;
 
     /// Initializes a couple things.
@@ -160,8 +160,8 @@ public:
 class awsSlot : public iAwsSlot
 {
    /// The sink that this slot manages.
-   
-   
+
+
    /** A mapping between signals and triggers.  One signal may map to multiple triggers, or
     * vice versa.  The mapping list is traversed everytime there is a signal emitted.  All
     * mappings are evaluated and if they qualify, are activated. Note that a slot may be
@@ -177,7 +177,7 @@ class awsSlot : public iAwsSlot
    };
 
    csBasicVector stmap;
-  
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -186,10 +186,10 @@ public:
 
   /// Also does nothing
   virtual ~awsSlot();
-    
+
   /// Creates a connection from the source:signal to the sink:trigger specified.
   virtual void Connect(iAwsSource *source, unsigned long signal, iAwsSink *sink, unsigned long trigger);
-                                          
+
   /// Disconnects the slot from a signal source, also properly unmaps a signal::trigger binding.
   virtual void Disconnect(iAwsSource *source, unsigned long signal, iAwsSink *sink, unsigned long trigger);
 
@@ -198,5 +198,5 @@ public:
 };
 
 
-#endif 
+#endif
 

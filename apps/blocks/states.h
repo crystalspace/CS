@@ -48,7 +48,7 @@ public:
   int zone_dim;
   /// New dimensions of game area (set with menu).
   int new_zone_dim;
-  
+
   /**
    * Tells us wheather a cell is occupied. It's padded at both ends along
    * each axis. It is not recomended to access it directly since it is easy
@@ -59,11 +59,11 @@ public:
                 [ZONE_SAFETY + ZONE_HEIGHT + ZONE_SAFETY];
 
   /// Shows if we have a complete plane at a certain height.
-  bool filled_planes[ZONE_HEIGHT];  
+  bool filled_planes[ZONE_HEIGHT];
 
   /// Score.
   int score;
-  
+
   /**
    * If true we are in the process moving cubes/things lower because at least
    * one plane was made.
@@ -96,13 +96,13 @@ public:
   States ();
   /// Destructor.
   ~States ();
-  
+
   /// Initialize the states.
   void InitStates();
   /// Initialise game cube.
   void Init_game_cube();
 
-  /// Update score.  
+  /// Update score.
   void UpdateScore ();
   /// Add score moved from blocks to here.
   void AddScore (int dscore);
@@ -112,7 +112,7 @@ public:
   { return game_cube[x + ZONE_SAFETY][y + ZONE_SAFETY][z + ZONE_SAFETY]; }
   /// Set or clear occupancy of coordinate x, y, z.
   void set_cube (int x, int y, int z, bool v)
-  { game_cube[x + ZONE_SAFETY][y + ZONE_SAFETY][z + ZONE_SAFETY] = v; }  
+  { game_cube[x + ZONE_SAFETY][y + ZONE_SAFETY][z + ZONE_SAFETY] = v; }
 
   /**
    * Checks to see if a plane was formed.<p>
@@ -125,10 +125,10 @@ public:
 
   /// Check if the play area is empty.
   bool CheckEmptyPlayArea ();
-  
+
   /// Encode the state into a comma delimited string in buffer 'encodedData'.
   void EncodeStates();
-  
+
   /**
    * Decode 'encodedData' and fill this state with its contents.
    * Returns 'true' if the data could be decoded, else 'false'.
@@ -144,9 +144,9 @@ public:
   // position in encodedData that these sections finish.
   int endOfFloats;
   int endOfInts;
-  
+
  private:
-  
+
   // Data for encoding decoding.
   int tints[ST_NUM_INTS];
   unsigned char* tbools;
@@ -157,11 +157,11 @@ public:
 
 // -----------------------------------------------------------------------
 //  This is a description of the protocol.
-// 
+//
 // client
 // When receive: "SEND <State stateNumber>"
 // Send: "STARTSTATE<int stateNumber><States currentState>ENDSTATE"
-// 
+//
 // Server
 // When receive: "STARTSTATE<int stateNumber><States currentState>ENDSTATE"
 // Send: "SEND <State stateNumber+1>"
@@ -174,19 +174,19 @@ class NetworkStates
  public:
   NetworkStates ();
   ~NetworkStates ();
-  
+
   // Returns false if it can't encode the data for what ever reason.
   //  Increments the StateNumber everytime it is called.
   //  Sets the PreviousStateNumber to the current StateNumber.
   // EncodedData is a pointer to a state which has been encoded.
-  bool EncodeForNetwork(unsigned char * EncodedData, 
-			unsigned char * NetworkData, 
+  bool EncodeForNetwork(unsigned char * EncodedData,
+			unsigned char * NetworkData,
 			int sizeOfEncoded, int sizeOfNetwork);
 
   // Returns false if it can't decode the data for what ever reason.
   //  Sets the StateNumber to the data it recieves from the net.
   //  Sets the PreviousStateNumber to the current StateNumber.
-  bool DecodeFromNetwork(unsigned char * NetworkData, int sizeOfBuffer, 
+  bool DecodeFromNetwork(unsigned char * NetworkData, int sizeOfBuffer,
 			 States * aState);
 
   // Returns the number of the state.

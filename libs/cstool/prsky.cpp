@@ -39,22 +39,22 @@ csProcSkyTexture::csProcSkyTexture(csProcSky *par) : csProcTexture()
   {
   /// looking towards +y
   txtorig.Set(-500.,50.,-500.); // topleft point
-  txtu.Set(1000.,0.,0.); // right dir 
-  txtv.Set(0.,0.,1000.); // down dir 
+  txtu.Set(1000.,0.,0.); // right dir
+  txtv.Set(0.,0.,1000.); // down dir
   }
   else
   {
   /// looking towards +z
   txtorig.Set(-500.,500.,2000.); // topleft point
-  txtu.Set(1000.,0.,0.); // right dir 
-  txtv.Set(0.,-1000.,0.); // down dir 
+  txtu.Set(1000.,0.,0.); // right dir
+  txtv.Set(0.,-1000.,0.); // down dir
   }
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS ;// | 
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS ;// |
     //CS_TEXTURE_PROC_ALONE_HINT;
 }
 
-csProcSkyTexture::~csProcSkyTexture() 
+csProcSkyTexture::~csProcSkyTexture()
 {
   if(isect) {delete[] isect; isect=NULL;}
 }
@@ -153,7 +153,7 @@ void csProcSky::SetAnimated(bool anim, csTicks current_time)
     {
       if (p->AnimPrepared())
       {
-        p->ForceRerender(); 
+        p->ForceRerender();
         DrawToTexture(p, current_time);
       }
       p = p->GetNextSky();
@@ -198,7 +198,7 @@ void csProcSky::SmoothOctave(uint8 *octs, int nr, int smoothpower)
     {
       for(ix=-sm; ix<=+sm; ix++)
         for(iy=-sm; iy<=+sm; iy++)
-          tot += myoct[(x+ix+octsize)%octsize + 
+          tot += myoct[(x+ix+octsize)%octsize +
 	    ((y+iy+octsize)%octsize)*octsize];
       tot /= (2*sm+1)*(2*sm+1);
       SetOctave(octs, nr, x, y, tot);
@@ -228,7 +228,7 @@ void csProcSky::Enlarge(uint8* dest, uint8* src, int factor, int rshift)
       int botleft = GetOctave(0, sx, (sy+1)%srcsize) << 6;
       int botright = GetOctave(0, (sx+1)%srcsize, (sy+1)%srcsize) << 6;
       */
-      
+
       int leftinc = (botleft - topleft) >> factor;
       int rightinc = (botright - topright) >> factor;
       int leftval = topleft;  /// these will walk with y
@@ -255,7 +255,7 @@ void csProcSky::Enlarge(uint8* dest, uint8* src, int factor, int rshift)
 }
 
 
-void csProcSky::CopyOctave(uint8 *srcocts, int srcnr, uint8 *destocts, 
+void csProcSky::CopyOctave(uint8 *srcocts, int srcnr, uint8 *destocts,
   int destnr)
 {
   memcpy( destocts + octsize*octsize*destnr, srcocts + octsize*octsize*srcnr,
@@ -263,7 +263,7 @@ void csProcSky::CopyOctave(uint8 *srcocts, int srcnr, uint8 *destocts,
 }
 
 
-void csProcSky::Combine(uint8 *dest, uint8 *start, uint8 *end, int pos, 
+void csProcSky::Combine(uint8 *dest, uint8 *start, uint8 *end, int pos,
   int max, int nr)
 {
   int sz = octsize * octsize;
@@ -272,7 +272,7 @@ void csProcSky::Combine(uint8 *dest, uint8 *start, uint8 *end, int pos,
   uint8 *ep = end + sz * nr;
   int epow = max - pos; // end power, reverse position
   /// pos = strength of end
-  /// epow = strength of start 
+  /// epow = strength of start
   /// max = total strength
   int i;
   for(i=0; i<sz; i++)
@@ -354,7 +354,7 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
   csRGBcolor res;
   int r,g,b;
 
-  if(spot.y < cam.y) 
+  if(spot.y < cam.y)
   {
     haze = 1.0;   /// ground
     below = true;
@@ -432,7 +432,7 @@ uint8 csProcSky::GetCloudVal(int x, int y)
 
     int add = int( enlarged[i][ thesize*(y%thesize)+ x%thesize ]);
     thesize>>=1;
-    
+
     /*
     int add = 0 ;
 
@@ -493,7 +493,7 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex, csTicks current_time)
   iTextureManager *txtmgr = skytex->GetTextureManager();
 
   /// if it already has a texture cache (it has been drawn to in the past)
-  /// and we do not animate, and no rerender is forced, 
+  /// and we do not animate, and no rerender is forced,
   /// then nothing needs to be done
   if(!skytex->MustRender() && skytex->GetIntersect() && !animated) return;
 
@@ -539,7 +539,7 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex, csTicks current_time)
       bool below = false;
       float haze=0.0;
       csRGBcolor blue = GetSkyBlue(isect, haze, sundist, below); /* 35 msec */
-      /// 
+      ///
       int cloud;
       if(!below)
       {

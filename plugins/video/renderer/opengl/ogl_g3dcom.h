@@ -342,14 +342,14 @@ protected:
    * OpenGL capabilities.
    */
   csOpenGLCaps GLCaps;
-  
+
   /// Prefered clipping modes to use for optional portals.
   char clip_optional[3];
   /// Prefered clipping modes to use for required portals.
   char clip_required[3];
   /// Prefered clipping modes to use for outer portal.
   char clip_outer[3];
-  
+
   /**
    * handle of a local 1D alpha-blend texture; this texture holds an
    * exponential alpha curve from 0 to 1.  Using this texture, you
@@ -453,14 +453,14 @@ protected:
      */
     GLenum m_lightmap_src_blend;
     GLenum m_lightmap_dst_blend;
-    
+
     /**
      * Option variable: do multitexturing?  This value is zero if multitexturing
      * is not available.  If multitexturing is available, this value holds
      * the number of textures that can be mixed together in one pass.
      */
     int do_multitexture_level;
-    
+
     /**
      * Brighten rendered textures in an extra pass.
      * This slows down rendering (we should use multi-texturing)
@@ -524,7 +524,7 @@ public:
   /// The configuration file
   csConfigAccess config;
 
-  /// The System interface. 
+  /// The System interface.
   iObjectRegistry* object_reg;
 
   /// Constructor.
@@ -662,7 +662,7 @@ public:
   virtual iClipper2D* GetClipper () { return clipper; }
   /// Get clipper type.
   virtual int GetClipType () { return cliptype; }
- 
+
   /// Set near clip plane.
   virtual void SetNearPlane (const csPlane3& pl)
   {
@@ -713,7 +713,7 @@ public:
    * is effected by the fog.
    */
   virtual void OpenFogObject (CS_ID id, csFog* fog);
-    
+
   /**
    * Add a front or back-facing fog polygon in the current fog object.
    * Note that it is guaranteed that all back-facing fog polygons
@@ -729,7 +729,7 @@ public:
    * is effected by the fog.
    */
   virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype);
-        
+
   /**
    * Close a volumetric fog object. After the volumetric object is
    * closed it should be rendered on screen (whether you do it here
@@ -739,7 +739,7 @@ public:
    * is effected by the fog.
    */
   virtual void CloseFogObject (CS_ID id);
-	  
+
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int x, int y);
 
@@ -761,12 +761,12 @@ public:
    * Flush the DrawPolygon queue if needed.
    */
   void FlushDrawPolygon ();
-  
+
   /**
    * Flush the fog queue if needed.
    */
   void FlushDrawFog ();
-  
+
   /**
    * Draw a fully-featured polygon assuming one has an OpenGL renderer
    * that only has a single texture unit.

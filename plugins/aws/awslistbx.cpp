@@ -1,7 +1,7 @@
 #include "cssysdef.h"
 #include "awslistbx.h"
 #include "awsfparm.h"
-#include "aws3dfrm.h"   
+#include "aws3dfrm.h"
 #include "awskcfct.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -38,7 +38,7 @@ const int hsState=1;
 const int hsRow=2;
 
 //////////////////////////////////////////////////////////////////////////
-// awsListRow implementation 
+// awsListRow implementation
 //
 
 awsListRow::~awsListRow()
@@ -47,7 +47,7 @@ awsListRow::~awsListRow()
     delete [] cols;
 }
 
-int 
+int
 awsListRow::GetHeight(iAwsPrefManager *pm, int colcount)
 {
   int minheight=0;
@@ -66,7 +66,7 @@ awsListRow::GetHeight(iAwsPrefManager *pm, int colcount)
 
 
 //////////////////////////////////////////////////////////////////////////
-// awsListItem implementation 
+// awsListItem implementation
 //
 
 awsListItem::~awsListItem()
@@ -89,12 +89,12 @@ awsListItem::GetHeight(iAwsPrefManager *pm)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// awsListBox implementation 
+// awsListBox implementation
 //
 
-awsListBox::awsListBox():is_down(false), mouse_is_over(false), 
+awsListBox::awsListBox():is_down(false), mouse_is_over(false),
 is_switch(false), was_down(false),
-bkg(NULL), highlight(NULL), 
+bkg(NULL), highlight(NULL),
 tree_collapsed(NULL), tree_expanded(NULL),
 tree_hline(NULL), tree_vline(NULL),
 frame_style(0), alpha_level(92), hi_alpha_level(128),
@@ -112,7 +112,7 @@ awsListBox::~awsListBox()
 }
 
 char *
-awsListBox::Type() 
+awsListBox::Type()
 {
   return "List Box";
 }
@@ -136,7 +136,7 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   pm->LookupIntKey("ScrollBarWidth", sb_w);
   pm->GetInt(settings, "Style", frame_style);
   pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
-  pm->GetInt(settings, "HiAlpha", hi_alpha_level);          
+  pm->GetInt(settings, "HiAlpha", hi_alpha_level);
   pm->GetInt(settings, "Columns", ncolumns);
   pm->GetInt(settings, "Type", control_type);
   pm->GetInt(settings, "DefaultSortCol", sortcol);
@@ -205,7 +205,7 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
 
   sbinfo.Initialize(new scfString("vertscroll"), new scfString("Scroll Bar"));
 
-  sbinfo.AddRectKey(new scfString("Frame"), 
+  sbinfo.AddRectKey(new scfString("Frame"),
                     csRect(Frame().Width()-sb_w-1, border, Frame().Width()-1, Frame().Height()-1));
 
   sbinfo.AddIntKey(new scfString("Style"), awsScrollBar::fsVertical);
@@ -218,7 +218,7 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   scrollbar->SetProperty("BigChange", &bigchange);
   scrollbar->SetProperty("Max", &max);
   scrollbar->SetProperty("Min", &min);
- 
+
   // Setup trigger
   sink = new awsSink(this);
 
@@ -231,7 +231,7 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool 
+bool
 awsListBox::GetProperty(char *name, void **parm)
 {
   if (awsComponent::GetProperty(name, parm)) return true;
@@ -239,7 +239,7 @@ awsListBox::GetProperty(char *name, void **parm)
   return false;
 }
 
-bool 
+bool
 awsListBox::SetProperty(char *name, void *parm)
 {
   if (awsComponent::SetProperty(name, parm)) return true;
@@ -247,14 +247,14 @@ awsListBox::SetProperty(char *name, void *parm)
   return false;
 }
 
-void 
-awsListBox::ScrollChanged(void *sk, iAwsSource *source)     
+void
+awsListBox::ScrollChanged(void *sk, iAwsSource *source)
 {
   awsListBox *lb = (awsListBox *)sk;
   float *curval=0;
 
   source->GetComponent()->GetProperty("Value", (void **)&curval);
-  
+
   lb->UpdateMap();
   lb->scroll_start=(int)*curval;
   if (lb->scroll_start>lb->map_size-lb->drawable_count)
@@ -262,19 +262,19 @@ awsListBox::ScrollChanged(void *sk, iAwsSource *source)
 
   if (lb->scroll_start<0)
     lb->scroll_start=0;
-  
+
   lb->Invalidate();
 }
 
-void 
+void
 awsListBox::UpdateMap()
 {
   int map_size_m1;
 
   if (map_dirty)
-  { 
+  {
     int start=0;
-    
+
     map_dirty=false;
     map_size=0;
     if (map)
@@ -287,7 +287,7 @@ awsListBox::UpdateMap()
     // Set the scroll bar's max position
     map_size_m1 = map_size-1;
     scrollbar->SetProperty("Max", &map_size_m1);
-    
+
     // Map out items
     MapVisibleItems(&rows, start, map);
   }
@@ -320,13 +320,13 @@ awsListBox::MapVisibleItems(awsListRowVector *v, int &start, awsListRow **map)
       awsListRow *r = (awsListRow *)((*v)[i]);
 
       map[start++]=r;
-      
+
       if (r->children && r->expanded)
         MapVisibleItems(r->children, start, map);
   }
 }
 
-static 
+static
 int
 DoFindItem(awsListRowVector *v, iString *text, bool with_delete)
 {
@@ -380,7 +380,7 @@ DoRecursiveClearList(awsListRowVector *v)
 
 
 /////////////// Scripted Actions /////////////////////////////////////////////////////////////
-void 
+void
 awsListBox::InsertItem(void *owner, iAwsParmList &parmlist)
 {
   awsListBox *lb = (awsListBox *)owner;
@@ -401,7 +401,7 @@ awsListBox::InsertItem(void *owner, iAwsParmList &parmlist)
   parmlist.GetBool("selectable", &(row->selectable));
 
   /* Fill in the columns by looking for several parameters:
-   *   textX, imageX, txtalignX, imgalignX, statefulX, stateX, groupstateX, 
+   *   textX, imageX, txtalignX, imgalignX, statefulX, stateX, groupstateX,
    *   selectableX
    */
   for (i=0; i<lb->ncolumns; ++i)
@@ -448,9 +448,9 @@ awsListBox::InsertItem(void *owner, iAwsParmList &parmlist)
   parmlist.AddInt("id", (int)row);
 
   lb->map_dirty=true;
-} 
+}
 
-void 
+void
 awsListBox::DeleteItem(void *owner, iAwsParmList &parmlist)
 {
   awsListBox *lb = (awsListBox *)owner;
@@ -473,7 +473,7 @@ awsListBox::DeleteItem(void *owner, iAwsParmList &parmlist)
 }
 
 
-void 
+void
 awsListBox::GetSelectedItem(void *owner, iAwsParmList &parmlist)
 {
   awsListBox *lb = (awsListBox *)owner;
@@ -539,7 +539,7 @@ awsListBox::GetSelectedItem(void *owner, iAwsParmList &parmlist)
   delete usedt;
 }
 
-void 
+void
 awsListBox::ClearList(void *owner, iAwsParmList &)
 {
   awsListBox *lb = (awsListBox *)owner;
@@ -549,7 +549,7 @@ awsListBox::ClearList(void *owner, iAwsParmList &)
   lb->map_dirty=true;
 }
 
-bool 
+bool
 awsListBox::Execute(char *action, iAwsParmList &parmlist)
 {
   if (awsComponent::Execute(action, parmlist)) return true;
@@ -559,7 +559,7 @@ awsListBox::Execute(char *action, iAwsParmList &parmlist)
   return false;
 }
 
-void 
+void
 awsListBox::ClearGroup()
 {
   csEvent Event;
@@ -615,7 +615,7 @@ awsListBox::RecursiveClearPeers(awsListItem *itm, awsListRow *row)
   return false;
 }
 
-void 
+void
 awsListBox::ClearPeers(awsListItem *itm)
 {
   int j;
@@ -630,7 +630,7 @@ awsListBox::ClearPeers(awsListItem *itm)
   } // end for j (number of rows)
 }
 
-void 
+void
 awsListBox::ClearHotspots()
 {
   int i;
@@ -643,7 +643,7 @@ awsListBox::ClearHotspots()
   hotspots.SetLength(0);
 }
 
-bool 
+bool
 awsListBox::HandleEvent(iEvent& Event)
 {
   if (awsComponent::HandleEvent(Event)) return true;
@@ -675,7 +675,7 @@ awsListBox::GetRowDepth(awsListRow *row)
     ++depth;
     cur=cur->parent;
   }
-  
+
   return depth;
 }
 
@@ -697,7 +697,7 @@ awsListBox::IsLastChild(awsListRow *row)
   }
 }
 
-void 
+void
 awsListBox::OnDraw(csRect clip)
 {
 
@@ -705,7 +705,7 @@ awsListBox::OnDraw(csRect clip)
   //iGraphics3D *g3d = WindowManager()->G3D();
 
   int hi2   = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT2);
-  int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);    
+  int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);
   int i;
   int border=3;
   int sb_w, sb_h;
@@ -808,14 +808,14 @@ awsListBox::OnDraw(csRect clip)
     bool draw_this_time=true;
 
     UpdateMap();
-    
+
     if (map==NULL)
       start = (awsListRow *)rows[0];
     else
       start = map[scroll_start];
 
     row=start;
-    
+
     while (stop_drawing==false)
     {
       if (draw_this_time)
@@ -826,7 +826,7 @@ awsListBox::OnDraw(csRect clip)
       }
 
       draw_this_time=true;
-     
+
       // Find parent of current row.  If there is no parent, then go to the next row item.
       awsListRow *parent=row->parent;
 
@@ -870,9 +870,9 @@ awsListBox::OnDraw(csRect clip)
         }
         else
           row=(awsListRow *)parent->children->Get(i);
-        
+
       }
-       
+
     } // end while draw items recursively
 
     scrollbar->SetProperty("PageSize", &drawable_count);
@@ -880,7 +880,7 @@ awsListBox::OnDraw(csRect clip)
     int adjusted_max=map_size-1-drawable_count;
     if (adjusted_max<1)
       adjusted_max=1;
-  
+
     scrollbar->SetProperty("Max", (void *)&adjusted_max);
 
   }  // end if there are any rows to draw
@@ -909,7 +909,7 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
     // When it's a child AND has children...
     tree_expanded->GetOriginalDimensions(tbw, tbh);
     g3d->DrawPixmap((row->expanded ? tree_expanded : tree_collapsed),
-                    x+2+(tbw*(depth+1)), y, 
+                    x+2+(tbw*(depth+1)), y,
                     tbw, tbh, 0,0, tbw, tbh);
 
     g3d->DrawPixmap(tree_hline, x+2+(tbw*depth), y, tbw, tbh, 0,0, tbw, tbh);
@@ -917,7 +917,7 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
     if (last_child)
       g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith>>1, 0,0, tbw, tbh);
     else
-      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith+2, 0,0, tbw, tbh);    
+      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith+2, 0,0, tbw, tbh);
 
     // Create hot spot for expand/collapse
     awsListHotspot *hs = new awsListHotspot;
@@ -933,7 +933,7 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
   {
     // Draw tree box if needed
     tree_expanded->GetOriginalDimensions(tbw, tbh);
-    g3d->DrawPixmap((row->expanded ? tree_expanded : tree_collapsed), 
+    g3d->DrawPixmap((row->expanded ? tree_expanded : tree_collapsed),
                     x+2, y, tbw, tbh, 0,0, tbw, tbh);
 
     // Create hot spot for expand/collapse
@@ -954,7 +954,7 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
     if (last_child)
       g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith>>1, 0,0, tbw, tbh);
     else
-      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith+2, 0,0, tbw, tbh);    
+      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith+2, 0,0, tbw, tbh);
   }
 
   // Draw columns
@@ -1027,7 +1027,7 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
       else if (depth && i==0)                       tx = 2+(tbw*(depth+1));
       else                                          tx = 2;
 
-      iws = iw+2; 
+      iws = iw+2;
       break;
     } // end switch text alignment
 
@@ -1074,8 +1074,8 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
       } // end switch text alignment
 
       // Draw image
-      g3d->DrawPixmap(row->cols[i].image, 
-                      x+iix+iiws, y+iiy,  
+      g3d->DrawPixmap(row->cols[i].image,
+                      x+iix+iiws, y+iiy,
                       (cw < iiw ? cw : iiw), (ith < iih ? ith : iiw),
                       0,0, iiw, iih);
 
@@ -1166,7 +1166,7 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
   return false;
 }
 
-bool 
+bool
 awsListBox::OnMouseDown(int /*button*/,int x,int y)
 {
   int i;
@@ -1222,7 +1222,7 @@ awsListBox::OnMouseDown(int /*button*/,int x,int y)
   return false;
 }
 
-bool 
+bool
 awsListBox::OnMouseUp(int ,int ,int )
 {
   return false;
@@ -1246,7 +1246,7 @@ awsListBox::OnMouseDoubleClick(int ,int ,int )
   return false;
 }
 
-bool 
+bool
 awsListBox::OnMouseExit()
 {
   mouse_is_over=false;
@@ -1278,13 +1278,13 @@ awsListBox::OnLostFocus()
   return false;
 }
 
-bool 
+bool
 awsListBox::OnGainFocus()
 {
   return false;
 }
 
-void 
+void
 awsListBox::OnAdded()
 {
   AddChild(scrollbar);
@@ -1324,7 +1324,7 @@ awsListBoxFactory::~awsListBoxFactory()
 iAwsComponent *
 awsListBoxFactory::Create()
 {
-  return new awsListBox; 
+  return new awsListBox;
 }
 
 

@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -52,7 +52,7 @@ CIWorld::~CIWorld()
 
   DELETE_VECTOR_MEMBERS(m_TextureFileNames);
 
-  //m_Entities are only stored as references, so we don't need to delete 
+  //m_Entities are only stored as references, so we don't need to delete
   //them here.
 }
 
@@ -74,10 +74,10 @@ void CIWorld::FindSectors()
         CISector* pSector = CreateNewSector(pBrush);
         m_Sectors.Push(pSector);
       } //for brush
-    } 
+    }
     else
     {
-      //no sector. Remember the pointer to it. 
+      //no sector. Remember the pointer to it.
       m_Entities.Push(pEntity);
     }
   } //for entity
@@ -99,7 +99,7 @@ void CIWorld::GenerateDefaultsector()
   //Find out the size of this sector
   CdVector3 Min, Max;
   m_pMap->GetMapSize(Min, Max);
-  
+
   Min.x -= 10;
   Min.y -= 10;
   Min.z -= 10;
@@ -109,7 +109,7 @@ void CIWorld::GenerateDefaultsector()
   Max.z += 10;
 
   CdVector3 v[8];
-  v[0] = CdVector3(Min.x, Min.y, Min.z); 
+  v[0] = CdVector3(Min.x, Min.y, Min.z);
   v[1] = CdVector3(Max.x, Min.y, Min.z);
   v[2] = CdVector3(Max.x, Min.y, Max.z);
   v[3] = CdVector3(Min.x, Min.y, Max.z);
@@ -118,7 +118,7 @@ void CIWorld::GenerateDefaultsector()
   v[6] = CdVector3(Max.x, Max.y, Max.z);
   v[7] = CdVector3(Min.x, Max.y, Max.z);
 
-  static int Planes[6][4] = 
+  static int Planes[6][4] =
   {
     {4,5,1,0},
     {5,6,2,1},
@@ -137,14 +137,14 @@ void CIWorld::GenerateDefaultsector()
   {
     //For every side of the default sector create a flatshaded
     //plane in black color.
-    CMapTexturedPlane* pPlane = m_pMap->AddPlane(v[Planes[i][2]], 
+    CMapTexturedPlane* pPlane = m_pMap->AddPlane(v[Planes[i][2]],
                                                  v[Planes[i][1]],
-                                                 v[Planes[i][0]], 
+                                                 v[Planes[i][0]],
                                                  0,0,0); //black
     assert(pPlane);
     pBrush->AddPlane(pPlane);
   }
-  
+
   pBrush->CreatePolygons();
 
   CISector* pSector = CreateNewSector(pBrush);

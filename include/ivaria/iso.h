@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -95,22 +95,22 @@ struct iIsoEngine : public iBase
   /// Create a new mesh sprite
   virtual iIsoMeshSprite* CreateMeshSprite() = 0;
   /// (convenience) create new floor/ceiling tile.
-  virtual iIsoSprite* CreateFloorSprite(const csVector3& pos, float w, 
+  virtual iIsoSprite* CreateFloorSprite(const csVector3& pos, float w,
     float h) = 0;
   /// (convenience) create new front-facing sprite (for objects).
-  virtual iIsoSprite* CreateFrontSprite(const csVector3& pos, float w, 
+  virtual iIsoSprite* CreateFrontSprite(const csVector3& pos, float w,
     float h) = 0;
   /// (convenience) create new wall along z sprite (along x in grids).
-  virtual iIsoSprite* CreateZWallSprite(const csVector3& pos, float w, 
+  virtual iIsoSprite* CreateZWallSprite(const csVector3& pos, float w,
     float h) = 0;
   /// (convenience) create new wall along x sprite (along y in grids).
-  virtual iIsoSprite* CreateXWallSprite(const csVector3& pos, float w, 
+  virtual iIsoSprite* CreateXWallSprite(const csVector3& pos, float w,
     float h) = 0;
 
   /// Get the list of materials.
   virtual iMaterialList* GetMaterialList () = 0;
-  /** 
-   * Create a new materialwrapper for the iso engine from 
+  /**
+   * Create a new materialwrapper for the iso engine from
    * the given file (on the VFS), resulting in a material with that texture.
    */
   virtual iMaterialWrapper *CreateMaterialWrapper(const char *vfsfilename,
@@ -166,7 +166,7 @@ struct iIsoGrid : public iBase
    * Because cells are aligned at the whole numbers, minx and minz must
    * be whole numbers too. Contents are not shifted, so use when empty.
    */
-  virtual void SetSpace(int minx, int minz, float miny = -1.0, 
+  virtual void SetSpace(int minx, int minz, float miny = -1.0,
     float maxy = +10.0) = 0;
   /// does this grid contain given position?
   virtual bool Contains(const csVector3& pos) = 0;
@@ -215,7 +215,7 @@ struct iIsoGrid : public iBase
   /// unregister a dynamic light with this grid
   virtual void UnRegisterDynamicLight(iIsoLight *light) = 0;
   /// get a list of fake iLight interfaces for a spot on the grid
-  virtual void GetFakeLights(const csVector3& pos, iLight **& flights, 
+  virtual void GetFakeLights(const csVector3& pos, iLight **& flights,
     int& num) = 0;
 
   /// Add a sprite to this grid
@@ -224,13 +224,13 @@ struct iIsoGrid : public iBase
   virtual void AddSprite(iIsoSprite *sprite, const csVector3& pos) = 0;
   /// Remove a sprite from this grid
   virtual void RemoveSprite(iIsoSprite *sprite) = 0;
-  /** 
-    * Move a sprite already in this grid, give previous and new position 
+  /**
+    * Move a sprite already in this grid, give previous and new position
     * (used internally by IsoSprite).
     */
   virtual void MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
     const csVector3& newpos) = 0;
-    
+
   /// Draw using given renderview
   virtual void Draw(iIsoRenderView *rview) = 0;
 };
@@ -302,7 +302,7 @@ struct iIsoView : public iBase
    *  1.0 gives perfect isometrical view, 0.5 flattens the lines.
    *  skew values must be > 0.
    *  For a nice y scale, (sqrt(xskew*xskew+1+sqrt(yskew*yskew+1)/2
-   *  can compensate for the lengthening and shortening of the axes due 
+   *  can compensate for the lengthening and shortening of the axes due
    *  to the skewing.
    */
   virtual void SetAxes(float xscale, float yscale, float zscale,
@@ -319,7 +319,7 @@ struct iIsoView : public iBase
 
   /// Transform world space coordinate into a screen coordinate.
   virtual void W2S(const csVector3& world, csVector2& screen) const = 0;
-  /** 
+  /**
    *  Transform world space coordinate into a screen coordinate.
    *  The returned z value can be used for a zbuffer, is bigger when
    *  further away.
@@ -331,7 +331,7 @@ struct iIsoView : public iBase
    */
   virtual void S2W(const csVector2& screen, csVector3& world) const = 0;
 
-  /** 
+  /**
    * draw the view onto the screen.
    * Call this when in 3d mode (with the engine->getBeginDrawFlags passed)
    */
@@ -373,14 +373,14 @@ struct iIsoRenderView : public iBase
   /// get the clipper
   virtual iClipper2D* GetClipper() const = 0;
   /// get precalc grid values
-  virtual void GetPrecalcGrid(int& startx, int& starty, int& scanw, 
+  virtual void GetPrecalcGrid(int& startx, int& starty, int& scanw,
     int& scanh, float& cellpery) const = 0;
   /// get minimum z value (screen.z - minz is > 1), a lower bound
   virtual float GetMinZ() const = 0;
   /// set the minimum z value.
   virtual void SetMinZ(float val) = 0;
   /// add a component to draw between MAIN and FG passes, give materialindex.
-  virtual void AddPolyFX(int materialindex, G3DPolygonDPFX *g3dpolyfx, 
+  virtual void AddPolyFX(int materialindex, G3DPolygonDPFX *g3dpolyfx,
     uint mixmode) = 0;
 };
 
@@ -414,7 +414,7 @@ struct iIsoSprite : public iBase
   virtual void SetPosition(const csVector3& pos) = 0;
   /// Move the position by delta.
   virtual void MovePosition(const csVector3& delta) = 0;
-  /** 
+  /**
    * force position to a value - without updating other internal
    * data structures. Used by those internal data structures, to
    * invalidate impossible movement
@@ -504,7 +504,7 @@ struct iIsoLight : public iBase
   virtual csFlags& Flags() = 0;
   /// set attentuation type of light (CSISO_ATTN_... see above)
   virtual void SetAttenuation(int attn) = 0;
-  /// get attentuation type of light 
+  /// get attentuation type of light
   virtual int GetAttenuation() const = 0;
   /// set the position of the light
   virtual void SetPosition(const csVector3& pos) = 0;

@@ -5,8 +5,8 @@
 #include "csphyzik/ctcontct.h"
 
 // solve a = Af + b for f given that af >= 0,   a >= 0,   f >= 0  hold
-// a are relative accelerations at a contact point.  
-// f are contact forces.  Unknown.  
+// a are relative accelerations at a contact point.
+// f are contact forces.  Unknown.
 // A is a matrix to get accel from f's
 // b are accel at a point resulting from all forces other than contact forces
 // implementation of algorithm found in Baraff's 1994 paper:
@@ -22,12 +22,12 @@ void ctFastContactSolver::compute_contact_forces ( ctContact *c_list, int c_num 
   real *c_df = new real[c_num];
   // delta vector for acceleration vector
   real *c_da = new real[c_num];
-  // A matrix. 
+  // A matrix.
   ctMatrixN A(c_num);
   // the indexes of contacts with accleration = 0.  C in Baraff '94
   int *Czero_a = new int[c_num];
   // number of elements in C.  starts at 0
-  int C_top = 0; 
+  int C_top = 0;
   // the indexes of contacts with force = 0.  NC in Baraff '94
   int *NCzero_f = new int[c_num];
   // number of elements in NC.  starts at 0
@@ -59,10 +59,10 @@ void ctFastContactSolver::compute_contact_forces ( ctContact *c_list, int c_num 
 	}else	if( c_a[row] == 0.0 ){
 	Czero_a[C_top++] = row;
 	// points are accelerating such that they will interpenetrate
-      */ 
+      */
     }
     else
-    { // implied if( c_a[row] < 0.0 
+    { // implied if( c_a[row] < 0.0
       rebalance_forces ( row, c_num, A, c_a, c_f, c_da, c_df, Czero_a, &C_top, NCzero_f, &NC_top );
     }
     row++;
@@ -78,7 +78,7 @@ void ctFastContactSolver::compute_contact_forces ( ctContact *c_list, int c_num 
       if ( fabs(c_f[i]) > MIN_REAL )
       {
         bod->sum_force ( c_list[i].n*c_f[i] );
-        bod->sum_torque ((c_list[i].contact_p - bod->get_pos ()) 
+        bod->sum_torque ((c_list[i].contact_p - bod->get_pos ())
 			 % ( c_list[i].n*c_f[i] ));
       }
     }
@@ -113,7 +113,7 @@ void ctFastContactSolver::rebalance_forces ( int row, int c_num, ctMatrixN &A, r
   {
     // rebalances direction of all contact forces
     fdirection( c_df, row, c_num, A, Czero_a, *C_top, NCzero_f, *NC_top );
-    
+
     A.mult_v( c_da, c_df );
     // determine max step we can adjust forces by without throwing
     // an already valid value off.
@@ -138,7 +138,7 @@ void ctFastContactSolver::rebalance_forces ( int row, int c_num, ctMatrixN &A, r
 	c_f[i] += scale*c_df[i];
 	c_a[i] += scale*c_da[i];
       }
-    
+
       bool step_row_in_C = false;
       int j;
       int swap_idx = 0;
@@ -150,8 +150,8 @@ void ctFastContactSolver::rebalance_forces ( int row, int c_num, ctMatrixN &A, r
           swap_idx = j;
 	}
       }
-		  
-      // just decreased force of this contact to zero so move it into 
+
+      // just decreased force of this contact to zero so move it into
       // zero force set.  also accel no longer neccesarily 0
       if ( step_row_in_C )
       {
@@ -171,7 +171,7 @@ void ctFastContactSolver::rebalance_forces ( int row, int c_num, ctMatrixN &A, r
             swap_idx = j;
 	  }
 	}
-		    
+
         // increased force from zero to some positive value so move out
         // of zero force set
         if ( step_row_in_NC )
@@ -194,7 +194,7 @@ void ctFastContactSolver::rebalance_forces ( int row, int c_num, ctMatrixN &A, r
     }
     else
     { // because a must be +ve....  ignore... should never really happen..
-        a_is_zero = true; 
+        a_is_zero = true;
     }
   }
 }
@@ -218,7 +218,7 @@ void ctFastContactSolver::fdirection( real *c_df, int row, int c_num, ctMatrixN 
 
   ctMatrixN Acc ( Acc_dimen );
   real *Acd = new real [ Acc_dimen ];
-  
+
   bool *add_Acc_rows = new bool[c_num];
   for ( i = 0; i < c_num; add_Acc_rows[i++] = false );
 
@@ -265,8 +265,8 @@ void ctFastContactSolver::fdirection( real *c_df, int row, int c_num, ctMatrixN 
   delete [] Acd;
 }
 
-real ctFastContactSolver::find_max_step ( int *max_step_row, int row, 
-				   real *c_a, real *c_f, real *c_da, real *c_df, 
+real ctFastContactSolver::find_max_step ( int *max_step_row, int row,
+				   real *c_a, real *c_f, real *c_da, real *c_df,
 			       int *Czero_a, int C_top, int *NCzero_f, int NC_top )
 {
   real scale = MAX_REAL;
@@ -293,7 +293,7 @@ real ctFastContactSolver::find_max_step ( int *max_step_row, int row,
       }
     }
   }
-  
+
   for ( i = 0; i < NC_top; i++ )
   {
     int act_i = NCzero_f[i];
@@ -335,7 +335,7 @@ ctVector3 ctContactSolver::compute_ndot ( ctContact *c )
     if ( c->body_b != NULL )
       w_norm = (c->body_b->get_angular_v()) % c->n;
     else
-      w_norm = ctVector3( 0.0, 0.0, 0.0 ); 
+      w_norm = ctVector3( 0.0, 0.0, 0.0 );
     return w_norm;
   }
   else /* vertex-edge */
@@ -346,7 +346,7 @@ ctVector3 ctContactSolver::compute_ndot ( ctContact *c )
     ctVector3 eb = c->eb;
 
     ctVector3 eadot = bod_a->get_angular_v () % ea;
-    ctVector3 ebdot; 
+    ctVector3 ebdot;
     if ( bod_b != NULL )
       ebdot = bod_b->get_angular_v() % eb;
     else
@@ -364,8 +364,8 @@ ctVector3 ctContactSolver::compute_ndot ( ctContact *c )
   }
 }
 
-// b is a vector of scalars that are the magnitudes of the normal 
-// accelerations at a contact point between two bodies.  These accelerations 
+// b is a vector of scalars that are the magnitudes of the normal
+// accelerations at a contact point between two bodies.  These accelerations
 // do not include contact forces.
 void ctContactSolver::compute_contact_force_b ( ctContact contacts[], int ncontacts, real b[] )
 {
@@ -386,11 +386,11 @@ void ctContactSolver::compute_contact_force_b ( ctContact contacts[], int nconta
     ctMatrix3 I_inv_world = A->get_I_inv_world ();
 
     a_ext_part = f_ext_a / A->get_m() +
-      ((I_inv_world * t_ext_a) % ra ); 
+      ((I_inv_world * t_ext_a) % ra );
 
     a_vel_part = (A->get_angular_v() % (A->get_angular_v() % ra )) +
       ((I_inv_world * (A->get_angular_P() % A->get_angular_v())) % ra );
-    
+
     // B is NULL if it is an immovable object.
     if ( B != NULL )
     {
@@ -414,7 +414,7 @@ void ctContactSolver::compute_contact_force_b ( ctContact contacts[], int nconta
     double k1 = n * ((a_ext_part + a_vel_part) - ( b_ext_part + b_vel_part ));
 
     ctVector3 ndot = compute_ndot ( c );
-    
+
     double k2 = ( ndot * 2.0 ) * ( pt_velocity( A, c->contact_p ) -
 				   pt_velocity( B, c->contact_p ));
 
@@ -431,7 +431,7 @@ void ctContactSolver::compute_contact_force_matrix
     for( j = 0; j < ncontacts; j++ )
       a[i][j] = compute_aij( contacts[i], contacts[j] );
 
-  //!me should check here that a is PSD matrix to make sure my 
+  //!me should check here that a is PSD matrix to make sure my
   //!me changes were ok
   for ( i = 0; i < ncontacts; i++ )
     for ( j = 0; j < ncontacts; j++ )
@@ -470,9 +470,9 @@ real ctContactSolver::compute_aij ( ctContact &ci, ctContact &cj )
   {
     force_on_a = nj*(-1.0);
     //!me if nj is -ve why isn't torque?
-    //!me I changed the sign of the torque as well.  
+    //!me I changed the sign of the torque as well.
     //!me this means there is a typo in Baraff's tutorial... I hope
-    //!me Dr. Baraff said to me... "yeah that seems right" .. 
+    //!me Dr. Baraff said to me... "yeah that seems right" ..
     torque_on_a = ( pj - A->get_pos() ) % nj*(-1.0);
   }
 
@@ -496,9 +496,9 @@ real ctContactSolver::compute_aij ( ctContact &ci, ctContact &cj )
     {
       force_on_b = nj*(-1.0);
       //!me if nj is -ve why isn't torque?
-      //!me I changed the sign of the torque as well.  
+      //!me I changed the sign of the torque as well.
       //!me this means there is a typo in Baraff's tutorial... I hope
-      //!me Dr. Baraff said to me... "yeah that seems right" .. 
+      //!me Dr. Baraff said to me... "yeah that seems right" ..
       torque_on_b = ( pj - B->get_pos() ) % nj *(-1.0);
     }
 

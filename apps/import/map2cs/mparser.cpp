@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -61,7 +61,7 @@ bool CMapParser::Open(const char* filename)
   {
     m_NextToken[0] = 0;
   }
-  
+
   return true;
 }
 
@@ -71,14 +71,14 @@ bool CMapParser::GetNextChar()
   if (!m_Eof)
   {
     val = getc(m_fd);
-    if (val == EOF) 
+    if (val == EOF)
     {
       m_Eof = true;
     }
   }
 
   memmove(m_NextChars, &m_NextChars[1], ReadAhead-1);
-  if (m_NextChars[0] == '\n') 
+  if (m_NextChars[0] == '\n')
   {
     m_CurrentLine++;
   }
@@ -137,11 +137,11 @@ bool CMapParser::PeekNextToken(char* str)
 bool CMapParser::ReadNextToken(char* str, int maxlen)
 {
   char *strStart = str;
-  
+
   *str = 0; //clear the string first
-  
-  if (!SkipWhitespace()) return false;  
-  
+
+  if (!SkipWhitespace()) return false;
+
   //Check for Comments, that start by "//" and end at the end of the line
   if (m_NextChars[0] == '/' && m_NextChars[1] == '/')
   {
@@ -152,12 +152,12 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
       char Num = m_NextChars[4];
 
       //This is a special texture alignment info, provided by QuArK,
-      //that is a little more powerfull than the standard map format 
+      //that is a little more powerfull than the standard map format
       //can provide.
       //For more info on QuArK visit: http://www.planetquake.com/quark
       //
-      //For compatibility reasons, these extensions are hidden in a 
-      //comment. Normally we will remove all comments in the parser, 
+      //For compatibility reasons, these extensions are hidden in a
+      //comment. Normally we will remove all comments in the parser,
       //but this comment is important!
       if (!GetNextChar())    return false;
       if (!GetNextChar())    return false;
@@ -183,7 +183,7 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
     do
     {
       //drop the '\"' character
-      if (!GetNextChar()) 
+      if (!GetNextChar())
       {
         *str = 0;     //Terminate the string anyway
         return false; //if we fail now, the token is not complete!
@@ -202,14 +202,14 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
   }
 
   // Check for special single character tokens
-  if (m_NextChars[0]=='{' || 
-      m_NextChars[0]=='}' || 
-      m_NextChars[0]=='(' || 
-      m_NextChars[0]==')' || 
-      m_NextChars[0]=='\'' || 
+  if (m_NextChars[0]=='{' ||
+      m_NextChars[0]=='}' ||
+      m_NextChars[0]=='(' ||
+      m_NextChars[0]==')' ||
+      m_NextChars[0]=='\'' ||
       m_NextChars[0]==':')
   {
-    //These special single character tokens must be followed by a whitespace 
+    //These special single character tokens must be followed by a whitespace
     //to be accepted. (otherwise there are problems with special texture names)
     if (m_NextChars[1] < ' ')
     {
@@ -232,11 +232,11 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
       return true;
     }
 
-    if (m_NextChars[0]=='{' || 
-        m_NextChars[0]=='}' || 
-        m_NextChars[0]=='(' || 
-        m_NextChars[0]==')' || 
-        m_NextChars[0]=='\'' || 
+    if (m_NextChars[0]=='{' ||
+        m_NextChars[0]=='}' ||
+        m_NextChars[0]=='(' ||
+        m_NextChars[0]==')' ||
+        m_NextChars[0]=='\'' ||
         m_NextChars[0]==':' ||
         m_NextChars[0]<=' ')
     {
@@ -253,7 +253,7 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
     ReportError("Token (\"%s\"...) too long, max. length %d", tokenBegin, (char*)maxlen);
     return false;
   }
-  
+
   *str = 0;
   return true;
 }
@@ -302,7 +302,7 @@ bool CMapParser::ExpectToken(const char* ExpectedToken)
   }
   if (strcmp(Buffer, ExpectedToken) != 0)
   {
-    ReportError("Unexpected Token found. Expected \"%s\", found \"%s\"", 
+    ReportError("Unexpected Token found. Expected \"%s\", found \"%s\"",
                 ExpectedToken, Buffer);
     return false;
   }
@@ -329,8 +329,8 @@ bool CMapParser::GetSafeToken (char* str)
   return true;
 }
 
-void CMapParser::ReportError(const char* message, 
-                             const char* info1, 
+void CMapParser::ReportError(const char* message,
+                             const char* info1,
                              const char* info2)
 {
   char Msg1[1000], Msg2[1000];

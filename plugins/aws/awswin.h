@@ -2,17 +2,17 @@
 #define __AWS_WINDOW_H__
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
-    
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -94,7 +94,7 @@ private:
 
     /// True if the child exclusion region needs to be updated
     bool todraw_dirty;
-    
+
     /// The frame cache for storing frame state while the window is zoomed.
     csRect unzoomed_frame;
 
@@ -109,23 +109,23 @@ private:
 
 private:
     void Draw3DRect(iGraphics2D *g2d, csRect &f, int hi, int lo);
-    
+
     /// Get's this components idea of the window manager.  Should be used internally by the component ONLY.
     iAws *WindowManager()
     { return comp.WindowManager(); }
 
     /// Get's the window that this component resides in.
     virtual iAwsWindow *Window();
-        
+
     /// Get's the parent component of this component;
     virtual iAwsComponent *Parent();
-    
+
     /// Sets the window that this component resides in.
     virtual void SetWindow(iAwsWindow *win);
-    
+
     /// Sets the parent component of this component;
     virtual void SetParent(iAwsComponent *parent);
-    
+
     ////////////// Component declarations for embedded wrappers ///////////////////////////////
 
     /// Invalidation routine: allow the component to be redrawn when you call this
@@ -142,7 +142,7 @@ private:
 
     /// Returns the state of the hidden flag
     virtual bool isHidden();
-    
+
     /// Hides a component
     virtual void Hide();
 
@@ -160,13 +160,13 @@ private:
 
     /// Get's the unique id of this component.
     virtual unsigned long GetID();
-    
+
     /// Set's the unique id of this component. Note: only to be used by window manager.
     virtual void SetID(unsigned long _id);
 
     /// Recursively moves children (and all nested children) by relative amount given.
     virtual void MoveChildren(int delta_x, int delta_y);
-  
+
     /// Adds a child
     virtual void AddChild(iAwsComponent* child, bool owner);
 
@@ -178,13 +178,13 @@ private:
 
     /// Get's a specific child
     virtual iAwsComponent *GetChildAt(int i);
-    
+
     /// Returns true if this component has children
     virtual bool HasChildren();
 
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
     virtual bool HandleEvent(iEvent& Event);
-    
+
 public:
    static const unsigned long sWindowRaised;
    static const unsigned long sWindowLowered;
@@ -225,12 +225,12 @@ public:
 
    /// Should draw round border (default)
    static const int foRoundBorder;
-   
+
    /// Should draw beveled border
    static const int foBeveledBorder;
-   
+
    SCF_DECLARE_IBASE;
-   
+
    /// This is a component of type window
    virtual char *Type()
    {
@@ -281,10 +281,10 @@ public:
 
     /// Set's the window above this one
     virtual void SetWindowAbove(iAwsWindow *win);
-    
+
     /// Set's the window below this one
     virtual void SetWindowBelow(iAwsWindow *win);
-    
+
     /// Does some additional setup for windows, including linking into the window hierarchy.
     virtual bool Setup(iAws *_wmgr, awsComponentNode *settings);
 
@@ -297,7 +297,7 @@ public:
     /// Executes scriptable actions for this window
     bool Execute(char *action, iAwsParmList &parmlist);
 
-    /// Sets the engine view for this window 
+    /// Sets the engine view for this window
     virtual void SetEngineView(iView *_view);
 
     /// Gets the engine view for this window
@@ -315,10 +315,10 @@ public:
 
     /// Triggered when the user presses a mouse button down
     virtual bool OnMouseDown(int button, int x, int y);
-    
-    /// Triggered when the user unpresses a mouse button 
+
+    /// Triggered when the user unpresses a mouse button
     virtual bool OnMouseUp(int button, int x, int y);
-    
+
     /// Triggered when the user moves the mouse
     virtual bool OnMouseMove(int button, int x, int y);
 
@@ -336,7 +336,7 @@ public:
 
     /// Triggered when the user presses a key
     virtual bool OnKeypress(int key, int modifiers);
-    
+
     /// Triggered when the keyboard focus is lost
     virtual bool OnLostFocus();
 

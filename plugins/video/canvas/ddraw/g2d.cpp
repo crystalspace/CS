@@ -30,7 +30,7 @@
 #include "cssys/win32/win32.h"
 #include "iutil/cmdline.h"
 
-#ifndef DD_FALSE 
+#ifndef DD_FALSE
   // This is normally being done in the ddraw.h file
   #define DD_FALSE S_FALSE
 #endif
@@ -177,7 +177,7 @@ bool csGraphics2DDDraw3::Open ()
 
   if (InitSurfaces () != DD_OK)
     return false;
-  
+
   return true;
 }
 
@@ -285,13 +285,13 @@ void csGraphics2DDDraw3::Print (csRect *area)
       if (m_bPalettized)
         SelectPalette (hdc, oldPal, FALSE);
     }
-      
+
     switch (hRet)
     {
       case DDERR_SURFACELOST:
         if (m_lpddsPrimary->Restore () != DD_OK)
           loop = false;
-        if (m_lpddsBack 
+        if (m_lpddsBack
          && m_lpddsBack->IsLost () != DD_OK
          && m_lpddsBack->Restore () != DD_OK)
           loop = false;
@@ -349,7 +349,7 @@ void csGraphics2DDDraw3::Refresh (RECT &rect)
       case DDERR_SURFACELOST:
         if (m_lpddsPrimary->Restore () != DD_OK)
           loop = false;
-        if (m_lpddsBack 
+        if (m_lpddsBack
          && m_lpddsBack->IsLost () != DD_OK
          && m_lpddsBack->Restore () != DD_OK)
           loop = false;
@@ -419,18 +419,18 @@ void csGraphics2DDDraw3::SetColorPalette ()
       m_lpddPal->Release ();
       m_lpddPal = NULL;
     }
-    
+
     ret = m_lpDD->CreatePalette (DDPCAPS_8BIT, (PALETTEENTRY *)Palette, &m_lpddPal, NULL);
     if (ret == DD_OK) m_lpddsPrimary->SetPalette (m_lpddPal);
-    
+
     if (!FullScreen)
     {
       HPALETTE oldPal;
       HDC dc = GetDC (NULL);
-      
+
       SetSystemPaletteUse (dc, SYSPAL_NOSTATIC);
       PostMessage (HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
-      
+
       if (!CreateIdentityPalette (Palette))
       {
         InitFail (DD_FALSE, "Error creating Identity Palette.\n");
@@ -438,7 +438,7 @@ void csGraphics2DDDraw3::SetColorPalette ()
       }
 
       ClearSystemPalette ();
-      
+
       oldPal = SelectPalette (dc, m_hWndPalette, FALSE);
 
       RealizePalette (dc);
@@ -643,7 +643,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
     _DrawPixel = DrawPixel32;
     _WriteString = WriteString32;
     _GetPixelAt = GetPixelAt32;
-  
+
     // calculate CS's pixel format structure.
     pfmt.PixelBytes = 4;
     pfmt.PalEntries = 0;
@@ -737,7 +737,7 @@ void csGraphics2DDDraw3::ClearSystemPalette ()
 
   Palette->palNumEntries = 256;
   Palette->palVersion = 0x300;
-  
+
   Palette->palPalEntry [0].peRed = 0;
   Palette->palPalEntry [0].peGreen = 0;
   Palette->palPalEntry [0].peBlue = 0;

@@ -124,9 +124,9 @@
 #  endif
 #endif
 
-// Windows has built-in var "SystemRoot" 
+// Windows has built-in var "SystemRoot"
 // (env var on NT, but not 9x; so we provide it this way)
-// @@@ provide HOME(DIR) ??? ("My Docs" maybe?) 
+// @@@ provide HOME(DIR) ??? ("My Docs" maybe?)
 #ifdef CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
 
 char* __WindowsDirectory()
@@ -134,7 +134,7 @@ char* __WindowsDirectory()
   static char lpWindowsDirectory[MAX_PATH+1] = {'\0'};
 
   if (!*lpWindowsDirectory) {
-    GetWindowsDirectoryA(lpWindowsDirectory, MAX_PATH);  
+    GetWindowsDirectoryA(lpWindowsDirectory, MAX_PATH);
   }
 
   return lpWindowsDirectory;
@@ -150,7 +150,7 @@ char* __WindowsDirectory()
 
 #if defined(CS_SYSDEF_PROVIDE_DIR) || defined(CS_SYSDEF_PROVIDE_PATH)
 // Directory read functions
-# if !defined(COMP_GCC)	  
+# if !defined(COMP_GCC)
 #  if !defined(COMP_BC)
     #define __NEED_OPENDIR_PROTOTYPE
     #include <io.h>
@@ -256,7 +256,7 @@ static inline void* fast_mem_copy(void* dest, const void* src, int count)
 	mov     ecx, ebx
 	rep     movsb
   }
-  
+
   return dest;
 }
 #endif

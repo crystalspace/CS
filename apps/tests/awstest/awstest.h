@@ -40,18 +40,18 @@ private:
   iGraphics3D *myG3D;
   iGraphics2D *myG2D;
   iVFS *myVFS;
-  iConsoleOutput *myConsole;  
+  iConsoleOutput *myConsole;
   iLoader* loader;
   iVirtualClock* vc;
-  
+
   iFont* font;
   int col_red, col_blue, col_white, col_black;
   int col_yellow, col_cyan, col_green, col_gray;
   char message[255];
   csTicks message_timer;
   bool message_error;
-  
-  
+
+
 public:
   awsTest();
   virtual ~awsTest();
@@ -59,10 +59,10 @@ public:
   bool Initialize(int argc, const char* const argv[], const char *iConfigName);
 
   void Report (int severity, const char* msg, ...);
-    
+
   void SetupFrame();
   void FinishFrame();
-  bool HandleEvent (iEvent &Event); 
+  bool HandleEvent (iEvent &Event);
 };
 
 #endif // AWSTEST_H

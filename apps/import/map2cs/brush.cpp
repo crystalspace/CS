@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -37,7 +37,7 @@ void CMapBrushBoundingBox::Extend(CMapPolygon* pPoly)
     if (!m_Defined)
     {
       m_Defined = true;
-       
+
       m_x1 = m_x2 = v.x;
       m_y1 = m_y2 = v.y;
       m_z1 = m_z2 = v.z;
@@ -101,12 +101,12 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
   {
     if (strcmp(Buffer, "}") == 0)
     {
-      //OK, we are done with this entity and it looks like 
+      //OK, we are done with this entity and it looks like
       //everything is ok
       finished = true;
     }
     else
-    {      
+    {
       if (strcmp(Buffer, "(") != 0)
       {
         pParser->ReportError("Format error. Expected either \"(\" or \"}\""
@@ -118,7 +118,7 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
       CdVector3 v1, v2, v3;
       double x_off     = 0;
       double y_off     = 0;
-      double rot_angle = 0; 
+      double rot_angle = 0;
       double x_scale = 1.0;
       double y_scale = 1.0;
 
@@ -165,10 +165,10 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
         WC3MAP = true;
 
         // Warning!!!!
-        // I have not yet seen an explanation of the new 
+        // I have not yet seen an explanation of the new
         // format introduced by Worldcraft 3.3, so this is
         // mainly a hack, to get map2cs load these new maps
-        // again. Probably, the result will just be wrong 
+        // again. Probably, the result will just be wrong
         // with texture alignmets, that are not trivial.
         // Thomas Hieber 2000-06-12
 
@@ -207,7 +207,7 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
       // Check for additions to the map format, introduced by QuArK.
       // (A great freeware Quake editor)
 
-      if (strcmp(Buffer, "//TX1") == 0 || 
+      if (strcmp(Buffer, "//TX1") == 0 ||
           strcmp(Buffer, "//TX2") == 0 )
       {
         QuarkModeTexture = true;
@@ -245,7 +245,7 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
       // todo: We would need to handle WC3MAP here to, to get proper
       //       texture alingment, but I don't know the new format...
 
-      // In some rare cases, worldcraft will write illegal planes to the 
+      // In some rare cases, worldcraft will write illegal planes to the
       // map file. If we just accept these planes, we will produce follow
       // up errors. So we will not add that plane, and issue a warning
       // instead.
@@ -260,9 +260,9 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
         CMapTexturedPlane* pPlane = pMap->AddPlane(v1, v2, v3, TextureName,
                                                    x_off, y_off, rot_angle,
                                                    x_scale, y_scale,
-                                                   QuarkModeTexture, QuarkMirrored);      
-        assert(pPlane);  
-      
+                                                   QuarkModeTexture, QuarkMirrored);
+        assert(pPlane);
+
         //Add that plane to the planes list.
         m_Planes.Push(pPlane);
       }
@@ -310,18 +310,18 @@ bool CMapBrush::IsInside(CdVector3& v)
   for (k=0; k<NumPlanes; k++)
   {
     CMapTexturedPlane* pPlane = m_Planes[k];
-    
+
     if (pPlane->Classify(v) < (-SMALL_EPSILON))
     {
       return false;
-    } 
+    }
   }  //for (k)
 
   return true;
 }
 
 /// Get the resulting polygon, if the plane cuts through the brush
-void CMapBrush::IntersectWithPlane(CMapTexturedPlane* pIntersectplane, 
+void CMapBrush::IntersectWithPlane(CMapTexturedPlane* pIntersectplane,
                                    CMapPolygon& Poly)
 {
   Poly.SetErrorInfo(m_Line, -1);

@@ -22,10 +22,10 @@
 #include "csws/sdefault.h"
 
 /**
- *    The following defines are duplicated from cslistbx.cpp  
+ *    The following defines are duplicated from cslistbx.cpp
  *  Any changes should be made in BOTH places.
  *
- */  
+ */
 
 // Amount of space at left and at right of each listbox item
 #define LISTBOXITEM_XSPACE              2
@@ -72,13 +72,13 @@ void csDefaultListBoxItemSkin::Draw (csComponent &This)
 
   int x = LISTBOXITEM_XSPACE - This.GetDeltaX() + This.GetHOffset();
   csPixmap *ItemBitmap;
-  
+
   if ((ItemBitmap=This.GetItemBitmap()))
   {
     This.Pixmap(ItemBitmap, x, (This.bound.Height()-ItemBitmap->Height()) / 2);
     x += ItemBitmap->Width () + LISTBOXITEM_XSPACE;
   } /* endif */
-  
+
   char *text;
   if ((text=This.GetText()))
   {
@@ -86,17 +86,17 @@ void csDefaultListBoxItemSkin::Draw (csComponent &This)
     This.GetTextSize (text, &fh);
     This.Text (x, (This.bound.Height () - fh + 1) / 2, color, -1, text);
   } /* endif */
-  
+
  #undef This
 }
 
 void csDefaultListBoxSkin::Draw (csComponent &This)
 {
 #define This ((csListBox &)This)
-  
+
  int BorderWidth, BorderHeight;
-  
- This.GetBorderSize(&BorderWidth, &BorderHeight); 
+
+ This.GetBorderSize(&BorderWidth, &BorderHeight);
 
  if (This.GetPlaceItemsFlag())
     This.PlaceItems ();
@@ -125,19 +125,19 @@ void csDefaultListBoxSkin::Draw (csComponent &This)
       break;
      case cslfsTextured:
        This.Pixmap(This.GetFrameBitmap(), 1, 1, This.bound.Width ()-BorderWidth, This.bound.Height ()-BorderHeight, 0, 0, This.GetAlpha());
-       This.Rect3D (0, 0, This.bound.Width (), This.bound.Height (),CSPAL_LISTBOX_LIGHT3D, CSPAL_LISTBOX_DARK3D);					       
+       This.Rect3D (0, 0, This.bound.Width (), This.bound.Height (),CSPAL_LISTBOX_LIGHT3D, CSPAL_LISTBOX_DARK3D);
      break;
      case cslfsTexturedNoFrame:
        This.Pixmap(This.GetFrameBitmap(), 1, 1, This.bound.Width ()-BorderWidth, This.bound.Height ()-BorderHeight, 0, 0, This.GetAlpha());
      break;
      case cslfsBitmap:
-       This.Pixmap(This.GetFrameBitmap(), 0, 0, This.GetAlpha()); 
+       This.Pixmap(This.GetFrameBitmap(), 0, 0, This.GetAlpha());
      break;
     default:
       break;
   } /* endswitch */
-  
- 
+
+
   #undef This
 }
 

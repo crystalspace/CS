@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein 
+    Copyright (C) 1998 by Jorrit Tyberghein
     Copyright (C) 2001 by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
@@ -114,7 +114,7 @@ csXWindow::~csXWindow ()
     }
     scfiEventHandler->DecRef ();
   }
-  if (xf86vm) 
+  if (xf86vm)
     xf86vm->DecRef ();
   if (EventOutlet)
     EventOutlet->DecRef ();
@@ -157,7 +157,7 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   }
 
   int opcode, first_event, first_error;
-  if (XQueryExtension (dpy, CS_XEXT_XF86VM, 
+  if (XQueryExtension (dpy, CS_XEXT_XF86VM,
 		       &opcode, &first_event, &first_error))
   {
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager);
@@ -173,48 +173,48 @@ bool csXWindow::Open ()
   XSetWindowAttributes swa;
   memset (&swa, 0, sizeof(swa));
 //--------------------------------------------------------------------
-  unsigned long cw_ctx_mask = (CWOverrideRedirect | 
-			       CWBorderPixel | 
-			       (cmap ? CWColormap : 0) | 
+  unsigned long cw_ctx_mask = (CWOverrideRedirect |
+			       CWBorderPixel |
+			       (cmap ? CWColormap : 0) |
 			       CWEventMask );
 
-  unsigned long cw_wm_mask  = (CWBorderPixel | 
-			       (cmap ? CWColormap : 0) | 
+  unsigned long cw_wm_mask  = (CWBorderPixel |
+			       (cmap ? CWColormap : 0) |
 			       CWEventMask );
 
 //--------------------------------------------------------------------
-  unsigned long swa_ctx_mask = (KeyPressMask | 
+  unsigned long swa_ctx_mask = (KeyPressMask |
 				KeyReleaseMask |
-				ButtonPressMask | 
-				ButtonReleaseMask | 
-				PointerMotionMask | 
-				ExposureMask | 
+				ButtonPressMask |
+				ButtonReleaseMask |
+				PointerMotionMask |
+				ExposureMask |
 				KeymapStateMask );
-  
+
   unsigned long swa_wm_mask = (StructureNotifyMask |
 			       FocusChangeMask |
-			       KeyPressMask | 
+			       KeyPressMask |
 			       KeyReleaseMask |
-			       ButtonPressMask | 
-			       ButtonReleaseMask | 
+			       ButtonPressMask |
+			       ButtonReleaseMask |
 			       PointerMotionMask );
-  
-    
+
+
 //--------------------------------------------------------------------
-  unsigned long si_ctx_mask  = (KeyPressMask | 
+  unsigned long si_ctx_mask  = (KeyPressMask |
 				KeyReleaseMask |
-				ButtonPressMask | 
-				ButtonReleaseMask | 
-				PointerMotionMask | 
-				ExposureMask | 
+				ButtonPressMask |
+				ButtonReleaseMask |
+				PointerMotionMask |
+				ExposureMask |
 				KeymapStateMask );
 
-  unsigned long si_wm_mask  = (StructureNotifyMask | 
+  unsigned long si_wm_mask  = (StructureNotifyMask |
 			       FocusChangeMask |
-			       KeyPressMask | 
+			       KeyPressMask |
 			       KeyReleaseMask |
-			       ButtonPressMask | 
-			       ButtonReleaseMask | 
+			       ButtonPressMask |
+			       ButtonReleaseMask |
 			       PointerMotionMask );
 
 //--------------------------------------------------------------------
@@ -235,14 +235,14 @@ bool csXWindow::Open ()
   swa.border_pixel = 0;
 
   swa.event_mask = swa_wm_mask;
-  wm_win = XCreateWindow (dpy, 
-			  RootWindow (dpy, screen_num), 
-			  8, 8, wm_width, wm_height, 
+  wm_win = XCreateWindow (dpy,
+			  RootWindow (dpy, screen_num),
+			  8, 8, wm_width, wm_height,
 			  4,
-			  xvis->depth, 
-			  InputOutput, 
-			  xvis->visual, 
-			  cw_wm_mask, 
+			  xvis->depth,
+			  InputOutput,
+			  xvis->visual,
+			  cw_wm_mask,
 			  &swa);
 
   XStoreName (dpy, wm_win, win_title);
@@ -257,18 +257,18 @@ bool csXWindow::Open ()
   class_hint->res_name = win_title;
   class_hint->res_class = win_title;
   XmbSetWMProperties (dpy, wm_win,
-		      NULL, NULL, NULL, 0, 
+		      NULL, NULL, NULL, 0,
 		      NULL, NULL, class_hint);
 
   XFree (class_hint);
 
   swa.event_mask = swa_ctx_mask;
-  ctx_win = XCreateWindow (dpy, 
-			   wm_win, 
-			   0, 0, wm_width, wm_height, 
-			   0, 
-			   xvis->depth, 
-			   InputOutput, 
+  ctx_win = XCreateWindow (dpy,
+			   wm_win,
+			   0, 0, wm_width, wm_height,
+			   0,
+			   xvis->depth,
+			   InputOutput,
 			   xvis->visual,
 			   cw_ctx_mask,
 			   &swa);
@@ -421,10 +421,10 @@ void csXWindow::Close ()
 }
 
 void csXWindow::SetTitle (const char* title)
-{ 
+{
   delete [] win_title;
-  win_title = new char [strlen (title) + 1]; 
-  strcpy (win_title, title); 
+  win_title = new char [strlen (title) + 1];
+  strcpy (win_title, title);
 }
 
 void csXWindow::AllowResize (bool iAllow)
@@ -454,8 +454,8 @@ void csXWindow::AllowResize (bool iAllow)
 }
 
 void csXWindow::SetCanvas (iGraphics2D *canvas)
-{ 
-  Canvas = canvas; 
+{
+  Canvas = canvas;
   wm_width = Canvas->GetWidth ();
   wm_height = Canvas->GetHeight ();
 }
@@ -603,13 +603,13 @@ bool csXWindow::HandleEvent (iEvent &Event)
           case XK_F10:        key = CSKEY_F10; break;
           case XK_F11:        key = CSKEY_F11; break;
           case XK_F12:        key = CSKEY_F12; break;
-          case XK_KP_Add:     
+          case XK_KP_Add:
 	    {
 	      if (xf86vm && xf86vm->IsFullScreen () &&
 		  down && (event.xkey.state & Mod1Mask))
 		SetVideoMode (true, true, false);
 	      else
-		key = CSKEY_PADPLUS; 
+		key = CSKEY_PADPLUS;
 	      break;
 	    }
           case XK_KP_Subtract:
@@ -618,7 +618,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
 		  down && (event.xkey.state & Mod1Mask))
 		SetVideoMode (true, false, true);
 	      else
-		key = CSKEY_PADMINUS; 
+		key = CSKEY_PADMINUS;
 	      break;
 	    }
           case XK_KP_Multiply:
@@ -628,14 +628,14 @@ bool csXWindow::HandleEvent (iEvent &Event)
 		SetVideoMode (!xf86vm->IsFullScreen (), false, false);
 	      else
 #endif
-		key = CSKEY_PADMULT; 
+		key = CSKEY_PADMULT;
 	      break;
 	    }
           case XK_KP_Divide:  key = CSKEY_PADDIV; break;
           case XK_KP_Begin:   key = CSKEY_CENTER; break;
 	  case XK_KP_Enter:
           case XK_Return:
-	    {     
+	    {
 #ifndef CS_DEBUG
 	      if (xf86vm && down && event.xkey.state & Mod1Mask)
 		SetVideoMode (!xf86vm->IsFullScreen (), false, false);
@@ -651,11 +651,11 @@ bool csXWindow::HandleEvent (iEvent &Event)
         break;
       case FocusIn:
 	{
-	  EventOutlet->Broadcast (cscmdFocusChanged, 
+	  EventOutlet->Broadcast (cscmdFocusChanged,
 				  (void *)(event.type == FocusIn));
 #ifndef CS_DEBUG
-	  if (xf86vm && !keyboard_grabbed && 
-	      event.xfocus.window == wm_win) 
+	  if (xf86vm && !keyboard_grabbed &&
+	      event.xfocus.window == wm_win)
 	  {
 	    XGrabKeyboard (dpy,
 			   ctx_win,
@@ -670,10 +670,10 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	}
       case FocusOut:
 	{
-	  EventOutlet->Broadcast (cscmdFocusChanged, 
+	  EventOutlet->Broadcast (cscmdFocusChanged,
 				  (void *)(event.type == FocusIn));
 #ifndef CS_DEBUG
-	  if (xf86vm && keyboard_grabbed && !--keyboard_grabbed) 
+	  if (xf86vm && keyboard_grabbed && !--keyboard_grabbed)
 	    XUngrabKeyboard (dpy, CurrentTime);
 #endif
 	  break;

@@ -197,7 +197,7 @@ public:
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 };
- 
+
 /**
  * Snow type. This is the plugin you have to use to create instances
  * of csSnowMeshObjectFactory.

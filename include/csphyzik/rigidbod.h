@@ -24,7 +24,7 @@
 #include "csphyzik/phyzent.h"
 #include "csphyzik/phyztype.h"
 
-#define RBSTATESIZE (6 + PHYSICALENTITY_STATESIZE) 
+#define RBSTATESIZE (6 + PHYSICALENTITY_STATESIZE)
 struct iObjectRegistry;
 
 /// a rigid body.  has inertia tensor.
@@ -44,7 +44,7 @@ public:
   ///
   static ctRigidBody *new_ctRigidBody ( coord x, coord y, coord z );
   /// Get Rigid Body state size.
-  static int get_RB_state_size () 
+  static int get_RB_state_size ()
   { return RBSTATESIZE; }
 
 
@@ -54,35 +54,35 @@ public:
 **  Member functions
 */
   /**
-   * Calculate interia tensor as if body was a solid block of given dimensions.  
+   * Calculate interia tensor as if body was a solid block of given dimensions.
    * NOTE: m must be given first.
    */
   void calc_simple_I_tensor( real width, real height, real depth );
 
   /// Get Inertia tensor
-  const ctMatrix3 &get_I () 
+  const ctMatrix3 &get_I ()
   { return I; }
 
   /// Get Inverse Inertia tensor
   const ctMatrix3 &get_I_inv ()
   { return I_inv; }
 
-/*  
-  ctMatrix3 get_I_inv_world(){ 
+/*
+  ctMatrix3 get_I_inv_world(){
     const ctMatrix3 &R = RF.get_R();
-    ctMatrix3 I_inv_world = R * I_inv * (R.get_transpose()); 
+    ctMatrix3 I_inv_world = R * I_inv * (R.get_transpose());
     return I_inv_world;
   }
 
-  ctMatrix3 get_I_world(){ 
+  ctMatrix3 get_I_world(){
     const ctMatrix3 &R = RF.get_R();
-    ctMatrix3 I_world = R * I * (R.get_transpose()); 
+    ctMatrix3 I_world = R * I * (R.get_transpose());
     return I_world;
   }
 */
 
   ctMatrix3 get_I_inv_world ()
-  { 
+  {
     const ctMatrix3 &R = RF.get_R();
     ctMatrix3 I_inv_world;
     R.similarity_transform( I_inv_world, I_inv );
@@ -90,7 +90,7 @@ public:
   }
 
   ctMatrix3 get_I_world ()
-  { 
+  {
     const ctMatrix3 &R = RF.get_R();
     ctMatrix3 I_world;
     R.similarity_transform( I_world, I );
@@ -98,7 +98,7 @@ public:
   }
 
 /*
-  virtual ctMatrix3 get_impulse_I_inv(){ 
+  virtual ctMatrix3 get_impulse_I_inv(){
 //    return get_I_inv_world();
     const ctMatrix3 &R = RF.get_R();
     ctMatrix3 Mret;
@@ -107,7 +107,7 @@ public:
   }
 */
 
-  virtual void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv, 
+  virtual void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv,
        const ctVector3 &impulse_point, const ctVector3 &unit_length_impulse_vector )
   {
     (void)unit_length_impulse_vector;
@@ -123,20 +123,20 @@ public:
 
   ctVector3 get_P ()
   { return P; }
-	
+
   /// ODE interface
   virtual int get_state_size () { return RBSTATESIZE; }
-  virtual int set_state ( real *state_array ); 
-  virtual int get_state ( const real *state_array );  
-  virtual int set_delta_state ( real *state_array ); 
+  virtual int set_state ( real *state_array );
+  virtual int get_state ( const real *state_array );
+  virtual int set_delta_state ( real *state_array );
   virtual void set_angular_v ( const ctVector3 &pw );
   virtual void set_v ( const ctVector3 &pv );
   virtual void add_angular_v ( const ctVector3 &pw );
   virtual void add_v ( const ctVector3 &pv );
   virtual void set_m ( real pm );
-  
+
   /**
-   * Impulse_point is vector from center of body to point of collision in 
+   * Impulse_point is vector from center of body to point of collision in
    * world coordinates.  impulse_vector is in world coords.
    */
   virtual void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector );
@@ -145,11 +145,11 @@ protected:
   /// Momentum
   ctVector3 P;
   /// Angular momentum
-  ctVector3 L;   
+  ctVector3 L;
   /// Intertia tensor
-  ctMatrix3 I;   
+  ctMatrix3 I;
   /// Inverse of Inertia tensor
-  ctMatrix3 I_inv; 
+  ctMatrix3 I_inv;
 
 };
 

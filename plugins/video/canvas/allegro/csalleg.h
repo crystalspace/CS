@@ -66,7 +66,7 @@ public:
   virtual bool BeginDraw () { return (Memory != NULL); }
   virtual bool DoubleBuffer (bool /*Enable*/) { return true; }
   virtual bool GetDoubleBufferState () { return true; }
-  
+
   virtual bool PerformExtensionV (char const* command, va_list);
   /**
    * Blit between a bitmap and one twice it's size.

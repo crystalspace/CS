@@ -51,7 +51,7 @@ ctInverseKinematics *out_link_solver;
 }
 */
 
-void ctInverseKinematics::solve_IK ( real t, 
+void ctInverseKinematics::solve_IK ( real t,
 				     ctVector3 &the_goal, ctVector3 &end_effector )
 {
   ctArticulatedBody *out_link;
@@ -69,7 +69,7 @@ void ctInverseKinematics::solve_IK ( real t,
     out_link_solver->compute_joint_angle( t, the_goal, end_effector );
   }
   else
-  {  
+  {
     // reached the end of the chain
     if ( ab.handle )
     {
@@ -81,7 +81,7 @@ void ctInverseKinematics::solve_IK ( real t,
   }
 }
 
-void ctInverseKinematics::compute_joint_angle ( real t, 
+void ctInverseKinematics::compute_joint_angle ( real t,
 				    ctVector3 &the_goal, ctVector3 &end_effector )
 {
   ctJoint *joint_in;
@@ -101,7 +101,7 @@ void ctInverseKinematics::compute_joint_angle ( real t,
 
   joint_to_end = end_effector - joint_world;
   joint_to_goal = the_goal - joint_world;
-	
+
   angle_to_goal = angle_diff( joint_to_goal, joint_to_end );
 
   if ( t > MIN_REAL )

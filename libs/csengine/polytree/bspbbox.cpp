@@ -833,7 +833,7 @@ bool csBspPolygon::IntersectSegment (const csVector3& start,
   // with rays as well.
 
   if (pr) *pr = r;
- 
+
   isect.x = r*(x2-x1)+x1;
   isect.y = r*(y2-y1)+y1;
   isect.z = r*(z2-z1)+z1;

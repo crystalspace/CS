@@ -44,7 +44,7 @@ CS_IMPLEMENT_PLUGIN
 
   A RIFF file has an 8-byte RIFF header.
 
-  struct 
+  struct
   {
     char  id[4];   // identifier string = "RIFF"
     DWORD len;     // remaining length after this header
@@ -58,7 +58,7 @@ CS_IMPLEMENT_PLUGIN
   The remaining file consists of "chunks". A chunk is following:
 
   struct
-  { 
+  {
     char  id[4];   // identifier, e.g. "fmt " or "data"
     DWORD len;     // remaining chunk length after this header
   } chunk_hdr;
@@ -185,12 +185,12 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
   // check WAVE-id
   if (memcmp (riffchk.wave_id, "WAVE", 4) != 0)
     return NULL;
-  
+
 // find format-chunk, copy it into struct and make corrections if necessary
 
   // set index after riff-header to the first chunk inside
   index += sizeof (riffchk);
-  
+
   // find format-chunk
   bool found = false; // true, if format-chunk was found
   for ( ;
@@ -264,14 +264,14 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
 
   // make new buffer, which contains the wav-data
   data = new char[wavchk.len];
-    
+
   // copy the wav-data into the buffer
   if (memcpy(data, &buf[index], wavchk.len)==NULL)
   {
     delete[] data;
     return NULL;
   }
-  
+
   #ifdef CS_BIG_ENDIAN
   if (fmtchk.bits_per_sample == 16)
     csByteSwap16bitBuffer ( (unsigned short*)data, wavchk.len / 2);

@@ -21,7 +21,7 @@ all plugins drivers drivers2d: sdl2d
 
 sdl2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
-	
+
 sdl2dclean:
 	$(MAKE_CLEAN)
 
@@ -67,7 +67,7 @@ sdl2d: $(OUTDIRS) $(SDL2D)
 
 $(OUT)%$O: plugins/video/canvas/sdl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SDL2D)
- 
+
 $(SDL2D): $(OBJ.SDL2D) $(LIB.SDL2D)
 	$(DO.PLUGIN) $(LIB.SDL2D.SPECIAL)
 

@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef BRUSH_H
@@ -32,7 +32,7 @@ class CdVector3;
 
 /**
   * This bounding box is to manage the bounding box of a brush, or any other
-  * set of map polygons. It supports a fast intersection test of boxes, 
+  * set of map polygons. It supports a fast intersection test of boxes,
   * to check if there is any interaction possible.
   */
 class CMapBrushBoundingBox
@@ -72,7 +72,7 @@ public:
   /**
     * The destuctor as usual. Note, that this will _not_ destroy the Planes,
     * because they are only stored as reference here. The will be destroyed
-    * from the container inside CMapFile 
+    * from the container inside CMapFile
     */
   ~CMapBrush();
 
@@ -85,7 +85,7 @@ public:
 
   /**
     * Reads three integer values from the parser and stores them inside a
-    * vector3. Will also do error handling and error messages. 
+    * vector3. Will also do error handling and error messages.
     * returns false, if there was an error. Parsing of the file should then
     * stop.
     */
@@ -98,13 +98,13 @@ public:
   bool IsInside(CdVector3& v);
 
   /// Get the resulting polygon, if the plane cuts through the brush
-  void IntersectWithPlane(CMapTexturedPlane* pIntersectplane, 
+  void IntersectWithPlane(CMapTexturedPlane* pIntersectplane,
                           CMapPolygon& Poly);
 
   /// Access all polygons from outside
   int          GetPolygonCount()      {return m_Polygons.Length();}
   CMapPolygon* GetPolygon(int index) {return m_Polygons.Get(index);}
-  
+
   /// Add a plane. (Useful, when creating a brush from the outside)
   void AddPlane(CMapTexturedPlane* pPlane) {m_Planes.Push(pPlane);}
 
@@ -123,13 +123,13 @@ public:
 protected:
 
   /**
-    * Here, the brush will store references to all planes that form that 
+    * Here, the brush will store references to all planes that form that
     * brush.
     */
   CMapTexturedPlaneVector m_Planes;
 
   /**
-    * Here are all polgons stored, that are defined by the planes in 
+    * Here are all polgons stored, that are defined by the planes in
     * m_Planes. (Note that this info is derived from m_Planes, so it is
     * only a secondary data structure for convenience)
     */
@@ -141,9 +141,9 @@ protected:
   CMapEntity*             m_pEntity;
 
   /**
-    * The number of the line, where the brush definition starts. (for error 
+    * The number of the line, where the brush definition starts. (for error
     * messages)
-    */ 
+    */
   int m_Line;
 
   /**

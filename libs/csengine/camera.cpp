@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
     Camera code written by Ivan Avramovic <ivan@avramovic.com>
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -130,14 +130,14 @@ void csCamera::Correct (int n)
 
 /* Maybe w3 should be normalized.  Only necessary if there is
    significant roundoff error: */
-//  w3 = csVector3::unit(w3); 
-  
+//  w3 = csVector3::unit(w3);
+
 /* perhaps a snap-to should be performed on one of the other vectors as well */
 
   w1 = m_t2o.Col2();
   w2 = csVector3::Unit(w3 % w1);
   w1 = w2 % w3;
-  
+
   SetT2O (
     csMatrix3 (w1.x, w2.x, w3.x,
                w1.y, w2.y, w3.y,
@@ -152,7 +152,7 @@ void csCamera::Correct (int n, float* vals[])
   if (vals[0]==NULL) return;
   if (vals[1]==NULL) return;
   if (vals[2]!=NULL)
-  { 
+  {
     if (*vals[0] < *vals[1])
     {
       r = *vals[2];
@@ -166,14 +166,14 @@ void csCamera::Correct (int n, float* vals[])
       *vals[1] = r;
     }
   }
-  
+
   angle = atan2 (*vals[1], *vals[0]);
   angle = (TWO_PI / n) * QRound (n * angle / TWO_PI);
   *vals[1] = qsqrt ( (*vals[0])*(*vals[0]) + (*vals[1])*(*vals[1]) );
   Correct (n, vals+1);
   r = *vals[1];
   *vals[0] = r*cos (angle);
-  *vals[1] = r*sin (angle); 
+  *vals[1] = r*sin (angle);
   cameranr = cur_cameranr++;
 }
 

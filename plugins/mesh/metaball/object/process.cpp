@@ -52,7 +52,7 @@ static float p_c[RES_X+1][RES_Y+1][RES_Z+1];
 static char where[RES_X+1][RES_Y+1][RES_Z+1];
 
 float csMetaBall::potential(const csVector3 &p)
-{ 
+{
   int i;
   float res = -mp.iso_level,dx,dy,dz;
 
@@ -161,7 +161,7 @@ void csMetaBall::CalculateBlob(int dx,int dy,int dz)
     int i;
     for(i=0;i<8;i++)
       _cell.p[i]+=dv;
-    
+
     FillCell(_x,_y,_z,_cell);
 
     int num =

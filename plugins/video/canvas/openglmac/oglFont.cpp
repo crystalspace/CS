@@ -54,7 +54,7 @@ void csGraphics2DOpenGLFontServer::BuildFont(int iFont)
 		int index;
 		for (index=0; index < Font_Count; index++)
 		  newoffsets[index] = Font_Offsets[index];
-	
+
         delete[] Font_Offsets;
 		Font_Offsets = newoffsets;
     }
@@ -82,7 +82,7 @@ void csGraphics2DOpenGLFontServer::BuildFont(int iFont)
       int Rows = pFontServer->GetCharHeight (iFont, characterindex);
       flipbuffer = (unsigned char*)realloc (flipbuffer, BytesPerRow*Rows);
       unsigned char *basebuffer = pFontServer->GetCharBitmap (iFont, characterindex);
-      
+
       glNewList(newfontoffset+characterindex,GL_COMPILE);
 
       // copy into the flip buffer -- see flipbuffer declaration for
@@ -129,7 +129,7 @@ void csGraphics2DOpenGLFontServer::WriteCharacters(char *writeme, int fontnumber
 
     if (fontnumber >= Font_Count)
         fontnumber = 0;
-    
+
     // save GL state, set a new list base
     glPushAttrib(GL_LIST_BIT);
     glListBase(Font_Offsets[fontnumber]);
@@ -153,7 +153,7 @@ void csGraphics2DOpenGLFontServer::WriteCharacter(char writeme, int fontnumber)
 
     //printf("font %d, char %d, list %d",
     //		fontnumber, writeme, Font_Offsets[fontnumber] + writeme);
- 
+
 printf("%d\n", Font_Offsets[fontnumber] + writeme);
     glCallList(Font_Offsets[fontnumber] + writeme);
 }

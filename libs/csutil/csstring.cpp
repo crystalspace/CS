@@ -88,7 +88,7 @@ csString &csString::Truncate (size_t iPos)
 csString &csString::DeleteAt (size_t iPos, size_t iCount)
 {
   CS_ASSERT (iPos < Size && iPos + iCount <= Size);
-  
+
   if (iPos + iCount < Size)
     memmove(Data + iPos, Data + iPos + iCount, Size - (iPos + iCount));
   Size -= iCount;

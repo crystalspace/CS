@@ -813,20 +813,20 @@ bool csTreeBox::HandleEvent (iEvent &Event)
       } /* endif */
       break;
     case csevKeyDown:
-      switch (Event.Key.Code) 
+      switch (Event.Key.Code)
       {
         case CSKEY_UP:
           if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
             FocusItem ((csTreeItem *)active->SendCommand (cscmdTreeItemGetPrev));
           return true;
         case CSKEY_DOWN:
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
             FocusItem ((csTreeItem *)active->SendCommand (cscmdTreeItemGetNext));
           return true;
         case CSKEY_LEFT:
         {
           int odx = deltax;
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) 
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
             if (deltax > TREE_HORIZONTAL_PAGESTEP)
               deltax -= TREE_HORIZONTAL_PAGESTEP;
             else
@@ -841,12 +841,12 @@ bool csTreeBox::HandleEvent (iEvent &Event)
         case CSKEY_RIGHT:
         {
           int odx = deltax;
-          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) 
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
             if (deltax + TREE_HORIZONTAL_PAGESTEP <= maxdeltax)
               deltax += TREE_HORIZONTAL_PAGESTEP;
             else
               deltax = maxdeltax;
-          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
+          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
             if (deltax < maxdeltax)
               deltax++;
           if (deltax != odx)
@@ -1206,7 +1206,7 @@ void csTreeBox::FocusItem (csTreeItem *iItem)
       if (!cur->GetState (CSS_TREEITEM_OPEN))
         cur->Toggle (1);
     }
-    
+
     active->button->Select ();
     active->Invalidate ();
     active->Select ();

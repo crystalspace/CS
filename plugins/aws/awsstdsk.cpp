@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 
-void 
+void
 awsStandardSink::Hide(void *sink, iAwsSource *source)
 {
   (void) sink;
@@ -13,8 +13,8 @@ awsStandardSink::Hide(void *sink, iAwsSource *source)
 
   c->Hide();
 }
- 
-void 
+
+void
 awsStandardSink::Show(void *sink, iAwsSource *source)
 {
   (void) sink;
@@ -23,7 +23,7 @@ awsStandardSink::Show(void *sink, iAwsSource *source)
   c->Show();
 }
 
-void 
+void
 awsStandardSink::HideWindow(void *sink, iAwsSource *source)
 {
   (void) sink;
@@ -34,12 +34,12 @@ awsStandardSink::HideWindow(void *sink, iAwsSource *source)
     c->Hide();
   }
   else
-  { 
+  {
     if (c->Window()) c->Window()->Hide();
   }
 }
 
-void 
+void
 awsStandardSink::Invalidate(void *sink, iAwsSource *source)
 {
   (void) sink;

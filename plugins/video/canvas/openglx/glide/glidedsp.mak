@@ -60,14 +60,14 @@ oglglide: $(OUTDIRS) $(OGLGLIDE)
 
 $(OUT)%$O: plugins/video/canvas/openglx/glide/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.OGLGLIDE)
- 
+
 $(OGLGLIDE): $(OBJ.OGLGLIDE) $(LIB.OGLGLIDE)
 	$(DO.PLUGIN) $(LIB.OGLGLIDE.SPECIAL)
 
 clean: oglglideclean
 oglglideclean:
 	$(RM) $(OGLGLIDE) $(OBJ.OGLGLIDE)
- 
+
 ifdef DO_DEPEND
 dep: $(OUTOS)oglglide.dep
 $(OUTOS)oglglide.dep: $(SRC.OGLGLIDE)

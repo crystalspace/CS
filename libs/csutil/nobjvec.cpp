@@ -89,7 +89,7 @@ int csNamedObjectVector::Compare (csSome Item1, csSome Item2, int)
 {
   iObject *obj1 = SCF_QUERY_INTERFACE_FAST (((iBase*)Item1), iObject);
   iObject *obj2 = SCF_QUERY_INTERFACE_FAST (((iBase*)Item2), iObject);
-  
+
   int res = (obj1->GetName () == obj2->GetName ()) ? 0
        : strcmp (obj1->GetName (), obj2->GetName ());
   obj1->DecRef ();

@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998,2000 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -23,7 +23,7 @@
 
 //---------------------------------------------------------------------------
 
-csMatrix2::csMatrix2 () 
+csMatrix2::csMatrix2 ()
 {
   m11 = m22 = 1;
   m12 = m21 = 0;
@@ -90,12 +90,12 @@ float csMatrix2::Determinant () const
   return (m11 * m22 - m12 * m21);
 }
 
-csMatrix2 operator+ (const csMatrix2& m1, const csMatrix2& m2) 
+csMatrix2 operator+ (const csMatrix2& m1, const csMatrix2& m2)
 {
   return csMatrix2 (m1.m11+m2.m11, m1.m12+m2.m12,
                     m1.m21+m2.m21, m1.m22+m2.m22);
 }
-                  
+
 csMatrix2 operator- (const csMatrix2& m1, const csMatrix2& m2)
 {
   return csMatrix2 (m1.m11-m2.m11, m1.m12-m2.m12,

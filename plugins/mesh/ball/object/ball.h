@@ -220,13 +220,13 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual void GetRadius (csVector3& rad, csVector3& cent) 
+  virtual void GetRadius (csVector3& rad, csVector3& cent)
 	{ rad = max_radius; cent.Set(shift); }
   virtual void NextFrame (csTicks /*current_time*/) { }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
-  virtual bool HitBeamOutline (const csVector3& start, const csVector3& end, 
+  virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);

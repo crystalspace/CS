@@ -69,7 +69,7 @@ csBumpMap::csBumpMap (iImage* src, int fmt)
 		  heightdata [y * width + (x - 1) % width];
         int dy = heightdata [((y + 1) % height) * width + x] -
 		  heightdata [((y - 1) % height) * width + x];
-		
+
 		/// now dx,dy are -255 ... 255, but must fit in -8..+7
 		dx >>= 5;
 		dy >>= 5;

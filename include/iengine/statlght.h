@@ -29,7 +29,7 @@ SCF_VERSION (iStatLight, 0, 0, 1);
 
 /**
  * The iStatLight interface is the SCF interface
- * for the csStatLight class. 
+ * for the csStatLight class.
  */
 struct iStatLight : public iBase
 {

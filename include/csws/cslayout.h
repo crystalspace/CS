@@ -1,17 +1,17 @@
 /*
     Copyright (C) Aleksandras Gluchovas
     CS port by Norman Krämer <norman@users.sourceforge.net>
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -86,12 +86,12 @@ public:
  * Usually one designs dialogs, forms etc. by placing components like
  * listcontrols, inputlines, treecontrols and so on at absolute locations
  * inside the dialog. While this is fine for a fixed size of your dialog
- * it turns out to be pretty ugly if you want allow resizing of dialogs, 
+ * it turns out to be pretty ugly if you want allow resizing of dialogs,
  * forms etc. A comparable ugly effect you achive by running an application
  * in different window sizes.
  *
  * Layouts will help you to overcome this drawback.
- * They will allow you to relatively place a control and to resize 
+ * They will allow you to relatively place a control and to resize
  * components when necessary.
  *
  * Layouts are themselfs csComponents and have a transparent canvas.
@@ -108,7 +108,7 @@ protected:
   /**
    * A shortcoming of the original java layouts is that components are
    * asked for its preferred size without knowing at what size its parent
-   * component will be layout in the end. So the two phase layout is an 
+   * component will be layout in the end. So the two phase layout is an
    * attempt to overcome this. Currently only FlowLayout uses this.
    */
   static bool mUseTwoPhaseLayoutingGlobally;
@@ -125,7 +125,7 @@ public:
   csRect insets;
   enum LAYOUTING_PHASES {PHASE_0 = 0, PHASE_1 = 1};
   /// Here we have the constraint a components will be layout with.
-  /// When a component is added a copy of this will be made and 
+  /// When a component is added a copy of this will be made and
   /// attached to the component.
   csLayoutConstraint c;
 
@@ -139,7 +139,7 @@ public:
    * to add it to the layout.
    * <pre>
    * IN:  the component to add
-   * OUT: the constraint that is used to layout the component 
+   * OUT: the constraint that is used to layout the component
    *      (a copy of variable c  see above)
    * </pre>
    */
@@ -150,7 +150,7 @@ public:
   virtual void SuggestSize (int &sugw, int& sugh) = 0;
   /// recalc positions and sizes of components
   virtual void LayoutContainer () = 0;
-  /// make sure next time the layout is drawn the components are 
+  /// make sure next time the layout is drawn the components are
   /// layed out first
   virtual void InvalidateLayout ();
 

@@ -29,11 +29,11 @@ class csSchedulePart;
  * Use it like this:
  * <PRE>
  * class myEntity {
- *   public: 
+ *   public:
  *   virtual void Update();
  * };
  * </PRE>
- * 
+ *
  * Suppose you have an object of class myEntity, which looks like a button
  * in your virtual world, and you want the button to blink. Calling Update
  * every NextFrame would look bad, and handling the timing yourself is
@@ -50,10 +50,10 @@ class csSchedulePart;
  * }
  * </PRE>
  *
- * You would then use the csSchedule method 
+ * You would then use the csSchedule method
  *   AddCallback(call_entity_update, (void*)my_entity, 1000);
  * to have it call the function with the object pointer as argument after
- * 1000 milliseconds (= 1 second) once. 
+ * 1000 milliseconds (= 1 second) once.
  * or you can use:
  *   AddRepeatCallback(call_entity_update, (void*)my_entity, 1000);
  * to have the function called repeatedly, every 1000 msec (= second).
@@ -85,7 +85,7 @@ private:
 public:
   /// create an empty schedule
   csSchedule();
-  /// 
+  ///
   ~csSchedule();
 
   /**

@@ -18,7 +18,7 @@ awsTest *System;
 int
 main(int argc, char *argv[])
 {
-  printf("Beginning test of AWS as a plugin...\n"); 
+  printf("Beginning test of AWS as a plugin...\n");
 
   // Create our main class.
   System = new awsTest();
@@ -30,7 +30,7 @@ main(int argc, char *argv[])
     System->Report(CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     exit (1);
   }
- 
+
   // Main loop.
   csDefaultRunLoop(System->object_reg);
 

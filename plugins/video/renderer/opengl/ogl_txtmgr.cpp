@@ -53,7 +53,7 @@ csTextureOpenGL::~csTextureOpenGL ()
 
 csTextureProcOpenGL::~csTextureProcOpenGL ()
 {
-  if (texG3D) texG3D->DecRef (); 
+  if (texG3D) texG3D->DecRef ();
 }
 
 csTextureProcOpenGL::csTextureProcOpenGL (csTextureHandle *Parent,
@@ -110,7 +110,7 @@ bool csTextureHandleOpenGL::FindFormatType ()
 {
   int i;
 
-  for (i=0; csTextureManagerOpenGL::glformats[i].sourceFormat != sourceFormat 
+  for (i=0; csTextureManagerOpenGL::glformats[i].sourceFormat != sourceFormat
 	 && csTextureManagerOpenGL::glformats[i].components; i++);
 
   if (csTextureManagerOpenGL::glformats[i].sourceFormat != sourceFormat)
@@ -125,17 +125,17 @@ bool csTextureHandleOpenGL::FindFormatType ()
   if (csTextureManagerOpenGL::glformats[i].forcedFormat != 0)
   {
     targetFormat = csTextureManagerOpenGL::glformats[i].forcedFormat;
-    for (i=0; csTextureManagerOpenGL::glformats[i].targetFormat != targetFormat 
+    for (i=0; csTextureManagerOpenGL::glformats[i].targetFormat != targetFormat
 	   && csTextureManagerOpenGL::glformats[i].components; i++);
 
     if (csTextureManagerOpenGL::glformats[i].targetFormat != targetFormat)
       formatidx = i;
   }
-  
+
   sourceType = GL_UNSIGNED_BYTE;
   targetFormat = csTextureManagerOpenGL::glformats[formatidx].targetFormat;
 
-  if (csTextureManagerOpenGL::glformats[formatidx].sourceFormat == GL_RGB 
+  if (csTextureManagerOpenGL::glformats[formatidx].sourceFormat == GL_RGB
       || csTextureManagerOpenGL::glformats[formatidx].sourceFormat == GL_RGBA)
   {
     static GLenum formats [13][4] = {
@@ -191,7 +191,7 @@ bool csTextureHandleOpenGL::FindFormatType ()
 	for (i=0; csTextureManagerOpenGL::glformats[i].targetFormat
 		!= targetFormat; i++);
 	formatidx = i;
-	
+
 	int pixels = image->GetWidth () * image->GetHeight ();
 	csRGBpixel *_src = (csRGBpixel *)image->GetImageData ();
 
@@ -204,7 +204,7 @@ bool csTextureHandleOpenGL::FindFormatType ()
 	    _src->alpha = 0;
 	  _src++;
 	}
-	
+
 	// Now we draw borders inside all keycolored areas.
 	// This removes the halos of keycolor when using bilinear filtering
 	int h, rows, w, cols;
@@ -219,12 +219,12 @@ bool csTextureHandleOpenGL::FindFormatType ()
 	    {
 	      int n=0, r=0, g=0, b=0, xl, xr, yt, yb;
 
-	      if (!cols) 
+	      if (!cols)
 	      {
 		xl = w-1;
 		xr = 1;
-	      } 
-	      else if (cols==w-1) 
+	      }
+	      else if (cols==w-1)
 	      {
 		xl = cols-1;
 		xr = 0;
@@ -235,12 +235,12 @@ bool csTextureHandleOpenGL::FindFormatType ()
 		xr = cols+1;
 	      }
 
-	      if (!rows) 
+	      if (!rows)
 	      {
 		yt = h-1;
 		yb = 1;
-	      } 
-	      else if (rows==h-1) 
+	      }
+	      else if (rows==h-1)
 	      {
 		yt = rows-1;
 		yb = 0;
@@ -259,7 +259,7 @@ bool csTextureHandleOpenGL::FindFormatType ()
     g+=_src[(d)].green; \
     b+=_src[(d)].blue; \
 	      } \
-} 
+}
 	      CHECK_PIXEL((yt*w)+xl);
 	      CHECK_PIXEL((yt*w)+cols);
 	      CHECK_PIXEL((yt*w)+xr);
@@ -280,7 +280,7 @@ bool csTextureHandleOpenGL::FindFormatType ()
 	}
       }
     }
-    
+
     int d;
     for (i=0; i < 12; i++)
     {
@@ -327,7 +327,7 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
       for (i=0; i<n; i++, data++)
         *image_data++ = data->Luminance ();
       break;
-    case GL_LUMINANCE_ALPHA: 
+    case GL_LUMINANCE_ALPHA:
       image_data = new uint8 [n*2];
       for (i=0; i<n; i++, data++)
       {
@@ -395,24 +395,24 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
     glGenTextures (1, &t);
     glBindTexture (GL_TEXTURE_2D, t);
     glTexImage2D (GL_TEXTURE_2D, 0,
-    	csTextureManagerOpenGL::glformats[formatidx].compressedFormat, 
-	Image->GetWidth (), Image->GetHeight (), 0, 
-	csTextureManagerOpenGL::glformats[formatidx].sourceFormat, 
+    	csTextureManagerOpenGL::glformats[formatidx].compressedFormat,
+	Image->GetWidth (), Image->GetHeight (), 0,
+	csTextureManagerOpenGL::glformats[formatidx].sourceFormat,
 	sourceType, image_data);
     glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_ARB,
-    	&tex->compressed); 
- 
-    /* if the compression has been successful */ 
-    if (tex->compressed == GL_TRUE) 
-    { 
+    	&tex->compressed);
+
+    /* if the compression has been successful */
+    if (tex->compressed == GL_TRUE)
+    {
       glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT,
-      	&tex->internalFormat); 
+      	&tex->internalFormat);
       glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
       	GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB, &tex->size);
       delete [] image_data;
-      image_data = new uint8 [tex->size]; 
+      image_data = new uint8 [tex->size];
       csGraphics3DOGLCommon::glGetCompressedTexImageARB (GL_TEXTURE_2D, 0,
-      	image_data); 
+      	image_data);
     }
 
     glDeleteTextures (1, &t);
@@ -497,13 +497,13 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
       (orig_height > texman->max_tex_size))
   {
     int nwidth = orig_width;
-    int nheight = orig_height; 
+    int nheight = orig_height;
     if (orig_width > texman->max_tex_size) nwidth = texman->max_tex_size;
     if (orig_height > texman->max_tex_size) nheight = texman->max_tex_size;
     image->Rescale (nwidth, nheight);
   }
 
-  // In opengl all textures, even non-mipmapped textures are required 
+  // In opengl all textures, even non-mipmapped textures are required
   // to be powers of 2.
   AdjustSizePo2 ();
 
@@ -514,14 +514,14 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   //  printf ("proctex creation\n");
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
   {
-    bool alone_hint = (flags & CS_TEXTURE_PROC_ALONE_HINT) == 
+    bool alone_hint = (flags & CS_TEXTURE_PROC_ALONE_HINT) ==
                        CS_TEXTURE_PROC_ALONE_HINT;
     switch (texman->proc_tex_type)
     {
       case BACK_BUFFER_TEXTURE:
       {
 	csOpenGLProcBackBuffer *bbtexG3D = new csOpenGLProcBackBuffer(NULL);
-	bool persistent = (flags & CS_TEXTURE_PROC_PERSISTENT) == 
+	bool persistent = (flags & CS_TEXTURE_PROC_PERSISTENT) ==
 	                   CS_TEXTURE_PROC_PERSISTENT;
 	// already shares the texture cache/manager
 	bbtexG3D->Prepare (texman->G3D, this, pfmt, persistent);
@@ -532,7 +532,7 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
       {
 	// This is always in 32bit no matter what the pfmt.
 	csOpenGLProcSoftware *stexG3D = new csOpenGLProcSoftware (NULL);
-	if (stexG3D->Prepare (texman->G3D, texman->head_soft_proc_tex, 
+	if (stexG3D->Prepare (texman->G3D, texman->head_soft_proc_tex,
 			      this, pfmt, image->GetImageData (), alone_hint))
 	{
 	  ((csTextureProcOpenGL*)vTex[0])->texG3D = (iGraphics3D*) stexG3D;
@@ -576,9 +576,9 @@ void csTextureHandleOpenGL::CreateMipmaps ()
 
   //  printf ("transform 0\n");
   transform (image, vTex[0]);
-  
+
   // 2D textures uses just the top-level mipmap
-  if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D 
+  if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D
       && (flags & CS_TEXTURE_PROC) != CS_TEXTURE_PROC)
   {
     // Create each new level by creating a level 2 mipmap from previous level
@@ -608,9 +608,9 @@ void csTextureHandleOpenGL::CreateMipmaps ()
       prevImage->DecRef ();
       prevImage = thisImage;
     }
-    
+
     //  printf ("meancolor\n");
-    ComputeMeanColor (vTex[nTex]->get_width (), vTex[nTex]->get_height (), 
+    ComputeMeanColor (vTex[nTex]->get_width (), vTex[nTex]->get_height (),
 		      (csRGBpixel *)prevImage->GetImageData ());
 
     prevImage->DecRef ();
@@ -683,7 +683,7 @@ csTextureManagerOpenGL::~csTextureManagerOpenGL ()
 
 void csTextureManagerOpenGL::read_config (iConfigFile *config)
 {
-  const char *proc_texture_type = 
+  const char *proc_texture_type =
     config->GetStr ("Video.OpenGL.ProceduralTexture");
 
   if (!strcmp (proc_texture_type, "software"))
@@ -792,9 +792,9 @@ void csTextureManagerOpenGL::PrepareTextures ()
 
 iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImage* image, int flags)
 {
-  if (!image) 
+  if (!image)
   {
-    G3D->Report(CS_REPORTER_SEVERITY_BUG, 
+    G3D->Report(CS_REPORTER_SEVERITY_BUG,
       "BAAAD!!! csTextureManagerOpenGL::RegisterTexture with NULL image!");
 
     image = csCreateXORPatternImage(32, 32, 5);

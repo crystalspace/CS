@@ -41,7 +41,7 @@ SCF_EXPORT_CLASS_TABLE (soft3d)
     "crystalspace.graphics3d.software",
     "Software 3D graphics driver for Crystal Space",
     "crystalspace.font.server.")
-  SCF_EXPORT_CLASS (csSoftProcTexture3D, 
+  SCF_EXPORT_CLASS (csSoftProcTexture3D,
     "crystalspace.graphics3d.software.offscreen",
     "Software 3D off screen driver")
 SCF_EXPORT_CLASS_TABLE_END
@@ -73,7 +73,7 @@ bool csGraphics3DSoftware::Initialize (iObjectRegistry *object_reg)
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
-  
+
   NewInitialize ();
   const char *driver = cmdline->GetOption ("canvas");
   if (!driver)
@@ -99,21 +99,21 @@ bool csGraphics3DSoftware::Open ()
     return false;
 
   bool bFullScreen = G2D->GetFullScreen ();
-  Report (CS_REPORTER_SEVERITY_NOTIFY, 
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "Using %s mode %dx%d (internal rendering at %dx%d).",
-            bFullScreen ? "full screen" : "windowed", 
+            bFullScreen ? "full screen" : "windowed",
 	    G2D->GetWidth (), G2D->GetHeight (), width, height);
 
   if (pfmt.PixelBytes == 4)
-    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.",
       pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
   else if (pfmt.PixelBytes == 2)
-    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.",
       pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
   else
-    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
 	       "Using palette mode with 1 byte per pixel (256 colors).");
 
   return true;

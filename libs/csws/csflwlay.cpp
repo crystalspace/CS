@@ -14,7 +14,7 @@ csFlowLayout::csFlowLayout (csComponent *pParent)
   : csLayout (pParent), mAlign (CENTER), mHgap (5), mVgap (5)
 {}
 
-csFlowLayout::csFlowLayout (csComponent *pParent,int align)	
+csFlowLayout::csFlowLayout (csComponent *pParent,int align)
   : csLayout (pParent), mAlign (align), mHgap (5), mVgap (5)
 {}
 
@@ -69,14 +69,14 @@ void csFlowLayout::SuggestSize (int &sugw, int& sugh)
   int i;
   for (i = 0; i < vConstraints.Length (); i++)
   {
-    if (i != 0 ) 
+    if (i != 0 )
       width += mHgap;
 
     int w = 0, h = 0;
     vConstraints.Get (i)->comp->SuggestSize (w, h);
     width += w;
 
-    if (h > maxHeight) 
+    if (h > maxHeight)
       maxHeight = h;
   }
 
@@ -131,9 +131,9 @@ void csFlowLayout::LayoutContainer ()
       else
         break;
     }
-    
+
     if (mPrefDimOfPhase1.x < rowWidth)
-      mPrefDimOfPhase1.x = rowWidth; 
+      mPrefDimOfPhase1.x = rowWidth;
     if (col == 0)
       break; // cannot fit component into the row
 
@@ -142,9 +142,9 @@ void csFlowLayout::LayoutContainer ()
     if (mAlign == CENTER)
       pos = x + (parentWidth - rowWidth) / 2;
     else
-      if (mAlign == RIGHT) 
+      if (mAlign == RIGHT)
 	pos = x + (parentWidth - rowWidth);
-    
+
     col = 0;
     if (row != 0)
     {
@@ -159,7 +159,7 @@ void csFlowLayout::LayoutContainer ()
       if (col != 0) pos += mHgap;
       vConstraints.Get (i1)->comp->SetRect (pos, y + (maxHeight - h) / 2,
         pos + w, y + (maxHeight + h) / 2); // centered vertically
-      pos += w; ++col; 
+      pos += w; ++col;
       i1++;
     }
 

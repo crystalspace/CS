@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Norman Krämer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -68,7 +68,7 @@ int csSprite2DUVAnimationFrame::GetUVCount ()
 void csSprite2DUVAnimationFrame::SetUV (int idx, float u, float v)
 {
   csVector2 uv (u, v);
-  
+
   if (idx == -1 || idx >= vCoo.Length ())
     vCoo.Push (uv);
   else
@@ -161,13 +161,13 @@ void csSprite2DUVAnimation::MoveFrame (int frame, int idx)
     vFrames.Push (p);
   else
     vFrames.Insert (MAX (0, idx), p);
-    
+
   vFrames.Delete (frame + (idx <= frame ? 1 : 0));
 }
 
 void csSprite2DUVAnimation::RemoveFrame (int idx)
 {
-  delete (iSprite2DUVAnimationFrame *)vFrames.Get (idx);  
+  delete (iSprite2DUVAnimationFrame *)vFrames.Get (idx);
   vFrames.Delete (idx);
 }
 

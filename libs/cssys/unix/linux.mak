@@ -28,8 +28,8 @@ PLUGINS+=video/format/avi
 PLUGINS+=video/format/codecs/rle
 
 # Uncomment the following to build GGI 2D and/or SDL drivers
-#PLUGINS+=video/canvas/ggi 
-#PLUGINS+=video/canvas/sdl 
+#PLUGINS+=video/canvas/ggi
+#PLUGINS+=video/canvas/sdl
 
 # Uncomment the following to build sound drivers
 PLUGINS+=sound/driver/oss sound/renderer/software
@@ -58,7 +58,7 @@ ifeq ($(MAKESECTION),defines)
 include mk/unix.mak
 
 # Extra libraries needed on this system.
-LIBS.EXE+=$(LFLAGS.l)dl $(LFLAGS.l)m  
+LIBS.EXE+=$(LFLAGS.l)dl $(LFLAGS.l)m
 
 # Socket library
 LIBS.SOCKET.SYSTEM=

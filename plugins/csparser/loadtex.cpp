@@ -85,8 +85,8 @@ iImage* csLoader::LoadImage (const char* name, int Format)
   if (!ifile)
   {
     ifile = csCreateXORPatternImage(32, 32, 5);
-  } 
-  
+  }
+
   iDataBuffer *xname = VFS->ExpandPath (name);
   ifile->SetName (**xname);
   xname->DecRef ();
@@ -143,7 +143,7 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->QueryObject ()->SetName (name);
   TexHandle->DecRef ();
-  
+
   iMaterial* material = Engine->CreateBaseMaterial (TexWrapper);
 
   iMaterialWrapper *MatWrapper = Engine->GetMaterialList ()->

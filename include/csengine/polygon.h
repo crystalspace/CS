@@ -545,7 +545,7 @@ private:
   /// Precompute the (u,v) values for all vertices of the polygon
   void SetupHWUV();
 #endif
-  
+
   /**
    * Same as CalculateLighting but called before light view destruction
    * through callbacks and csPolyTexture::ProcessDelayedLightmaps ().
@@ -564,7 +564,7 @@ public:
 #endif
 
   /**
-   * Construct a new polygon with the given material. 
+   * Construct a new polygon with the given material.
    */
   csPolygon3D (csMaterialWrapper *mat);
 
@@ -914,7 +914,7 @@ public:
    * I hope this explanation is clear since I can't seem to make it
    * any clearer :-)
    */
-  void SetTextureSpace (const csVector3& v_orig, 
+  void SetTextureSpace (const csVector3& v_orig,
     const csVector3& v1, float len1);
 
   /**
@@ -1365,7 +1365,7 @@ public:
     {
       scfParent->SetTextureSpace (p1, uv1, p2, uv2, p3, uv3);
     }
-    virtual void SetTextureSpace (const csVector3& v_orig, 
+    virtual void SetTextureSpace (const csVector3& v_orig,
       const csVector3& v1, float l1)
     {
       scfParent->SetTextureSpace (v_orig, v1, l1);

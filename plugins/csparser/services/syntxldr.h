@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Norman Krämer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -21,7 +21,7 @@
 
 
 /**
- * This component provides services for other loaders to easily parse properties of 
+ * This component provides services for other loaders to easily parse properties of
  * standard CS world syntax. This implementation will parse the textual representation.
  */
 
@@ -65,7 +65,7 @@ public:
   virtual bool ParseMixmode (char *buffer, uint &mixmode);
   virtual bool ParseShading (char *buf, int &shading);
   virtual bool ParseTexture (
-  	char *buf, const csVector3* vref, uint &texspec, 
+  	char *buf, const csVector3* vref, uint &texspec,
 	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
 	csMatrix3 &tx_m, csVector3 &tx_v,
 	csVector2 &uv_shift,
@@ -74,7 +74,7 @@ public:
 	int &idx3, csVector2 &uv3,
 	char *plane, const char *polyname);
 
-  virtual  bool ParseWarp (char *buf, csVector &flags, bool &mirror, 
+  virtual  bool ParseWarp (char *buf, csVector &flags, bool &mirror,
 			   csMatrix3 &m, csVector3 &before, csVector3 &after);
 
   virtual bool ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char* buf,
@@ -85,7 +85,7 @@ public:
   virtual const char* MatrixToText (
   	const csMatrix3 &m, int indent, bool newline=true);
   virtual const char* VectorToText (
-  	const char *vname, const csVector3 &v, int indent, 
+  	const char *vname, const csVector3 &v, int indent,
 				    bool newline=true);
   virtual const char* VectorToText (
   	const char *vname, float x, float y, float z, int indent,

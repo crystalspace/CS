@@ -28,16 +28,16 @@
 
 /********** PHYSICAL ENTITY ****************/
 
-ctPhysicalEntity::ctPhysicalEntity() 
-  :  RF( ctReferenceFrame::universe() ), 
+ctPhysicalEntity::ctPhysicalEntity()
+  :  RF( ctReferenceFrame::universe() ),
      dRF(ctDeltaReferenceFrame::universe()), F(0), T(0)
 {
   RF.add_ref( RF );
   dRF.add_ref( dRF );
 }
 
-ctPhysicalEntity::ctPhysicalEntity ( ctReferenceFrame &ref, 
-				     ctDeltaReferenceFrame &dref  ) 
+ctPhysicalEntity::ctPhysicalEntity ( ctReferenceFrame &ref,
+				     ctDeltaReferenceFrame &dref  )
   : RF( ref ), dRF( dref ), F(0), T(0)
 {
   RF.add_ref ( RF );
@@ -59,14 +59,14 @@ void ctPhysicalEntity::apply_given_F ( ctForce& /*frc*/ )
 void ctPhysicalEntity::rotate_around_line ( ctVector3 &paxis, real ptheta )
 {
   ctMatrix3 new_T;
-  
+
   R_from_vector_and_angle ( paxis, -ptheta, new_T );
 //  RF.set_T(new_T*RF.get_T());  //!me is this right?
   RF.set_R(new_T*RF.get_R ());  //!me is this right?
 
 }
 
-// add this bodies state to the state vector buffer passed in. 
+// add this bodies state to the state vector buffer passed in.
 // increment state buffer to point after added state.  upload
 int ctPhysicalEntity::set_state( real *state_array )
 {
@@ -117,7 +117,7 @@ int ctPhysicalEntity::set_delta_state ( real *state_array )
   *state_array++ = w[2]*M[0][2] - w[0]*M[2][2];
   *state_array++ = -w[1]*M[0][0] + w[0]*M[1][0];
   *state_array++ = -w[1]*M[0][1] + w[0]*M[1][1];
-  *state_array++ = -w[1]*M[0][2] + w[0]*M[1][2];  
+  *state_array++ = -w[1]*M[0][2] + w[0]*M[1][2];
 
   return ctPhysicalEntity::get_state_size();
 }
@@ -153,12 +153,12 @@ int ctPhysicalEntity::get_state ( const real *state_array )
 
 void ctPhysicalEntity::set_v ( const ctVector3 &pv )
 {
-  dRF.v = pv; 
+  dRF.v = pv;
 }
 
 void ctPhysicalEntity::set_angular_v ( const ctVector3 &pw )
-{ 
-  dRF.w = pw; 
+{
+  dRF.w = pw;
 }
 
 
@@ -175,8 +175,8 @@ ctDynamicEntity::ctDynamicEntity ()
   solver = new ctSimpleDynamicsSolver ( *this );
 }
 
-ctDynamicEntity::ctDynamicEntity ( ctReferenceFrame &ref, 
-				   ctDeltaReferenceFrame &dref ) 
+ctDynamicEntity::ctDynamicEntity ( ctReferenceFrame &ref,
+				   ctDeltaReferenceFrame &dref )
   : ctPhysicalEntity ( ref, dref )
 {
   m = 10;
@@ -194,7 +194,7 @@ void ctDynamicEntity::apply_given_F ( ctForce &frc )
 
 
 void ctDynamicEntity::set_m ( real pm )
-{ 
-  m = pm; 
+{
+  m = pm;
 }
 

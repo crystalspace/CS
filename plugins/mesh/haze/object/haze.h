@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-    
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -61,7 +61,7 @@ protected:
   /// number of vertices == number of edges per polygon
   int *pol_num;
   /** per polygon: the vertice indices [pol_idx][num]
-   * use new[] and delete[] per pol_verts[i] as well as for pol_vert itself. 
+   * use new[] and delete[] per pol_verts[i] as well as for pol_vert itself.
    */
   int **pol_verts;
   /// per polygon the edge indices (for edges starting at that v, to v+1)
@@ -74,8 +74,8 @@ public:
   /// destructs content, using delete[].
   virtual ~csHazeHull();
 
-  /** 
-   *  If already verts, total_vert, total_poly, pol_num and pol_verts are 
+  /**
+   *  If already verts, total_vert, total_poly, pol_num and pol_verts are
    *  given. This routine computes the edges, and fills
    *  edgept1, edgept2, pol_edges and total_edges.
    */
@@ -88,7 +88,7 @@ public:
    * array of vertice idx is new[]ed.
    * made static here, so not every custom iHazeHull has to implement it.
    */
-  static void ComputeOutline(iHazeHull *hull, const csVector3& campos, 
+  static void ComputeOutline(iHazeHull *hull, const csVector3& campos,
     int& numv, int*& pts);
 
   /// --------- iHazeHull implementation --------------------------
@@ -140,7 +140,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csHazeHullBox);
     /// get settings
-    virtual void GetSettings(csVector3& a, csVector3& b) 
+    virtual void GetSettings(csVector3& a, csVector3& b)
     {a=scfParent->min; b=scfParent->max;}
   } scfiHazeHullBox;
   friend class HazeHullBox;
@@ -164,7 +164,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csHazeHullCone);
     /// get settings
     virtual void GetSettings(int &nr, csVector3& a, csVector3& b, float &ra,
-      float &rb) 
+      float &rb)
     {nr = scfParent->nr_sides; a=scfParent->start; b=scfParent->end;
      ra = scfParent->start_radius; rb = scfParent->end_radius;}
   } scfiHazeHullCone;
@@ -279,8 +279,8 @@ public:
    *  layer_uvs - u,v information per vertice.
    */
   void ComputeHullOutline(iHazeHull *hull, float layer_scale,
-    const csVector3& campos, csReversibleTransform& tr_o2c, float fov, 
-    float shx, float shy, int &layer_num, int *& layer_poly, 
+    const csVector3& campos, csReversibleTransform& tr_o2c, float fov,
+    float shx, float shy, int &layer_num, int *& layer_poly,
     csVector3 *& layer_pts, csVector2 *&layer_uvs);
   /** project a vertice in object space to screenspace */
   void ProjectO2S(csReversibleTransform& tr_o2c, float fov, float shiftx,
@@ -295,7 +295,7 @@ public:
       -1 is lowest quality (no adaptation)
     */
   void DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d, iMaterialHandle *mat,
-    int num_sides, csVector3* pts, csVector2* uvs, 
+    int num_sides, csVector3* pts, csVector2* uvs,
     float layer_scale, float quality);
 
   ///------------------------ iMeshObject implementation ------------------------
@@ -317,7 +317,7 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual void GetRadius (csVector3& rad, csVector3& cent) 
+  virtual void GetRadius (csVector3& rad, csVector3& cent)
 	{ rad =  radius; cent.Set(0,0,0); }
   virtual void NextFrame (csTicks current_time);
   virtual bool WantToDie () const { return false; }
@@ -345,25 +345,25 @@ public:
     virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual void SetOrigin(const csVector3& pos) { scfParent->origin = pos; }
     virtual const csVector3& GetOrigin() const {return scfParent->origin;}
-    virtual void SetDirectional(const csVector3& pos) 
+    virtual void SetDirectional(const csVector3& pos)
     { scfParent->directional=pos;}
-    virtual const csVector3& GetDirectional() const 
+    virtual const csVector3& GetDirectional() const
     {return scfParent->directional;}
     virtual int GetLayerCount() const {return scfParent->layers.Length();}
-    virtual void AddLayer(iHazeHull *hull, float scale) 
+    virtual void AddLayer(iHazeHull *hull, float scale)
     { csHazeLayer *lay = new csHazeLayer(hull, scale);
       scfParent->layers.Push(lay); }
-    virtual void SetLayerHull(int layer, iHazeHull* hull) 
+    virtual void SetLayerHull(int layer, iHazeHull* hull)
     { if(hull) hull->IncRef();
       if(scfParent->layers.GetLayer(layer)->hull)
         scfParent->layers.GetLayer(layer)->hull->DecRef();
       scfParent->layers.GetLayer(layer)->hull = hull;
     }
-    virtual iHazeHull* GetLayerHull(int layer) const 
+    virtual iHazeHull* GetLayerHull(int layer) const
     { return scfParent->layers.GetLayer(layer)->hull; }
-    virtual void SetLayerScale(int layer, float scale) 
+    virtual void SetLayerScale(int layer, float scale)
     { scfParent->layers.GetLayer(layer)->scale = scale; }
-    virtual float GetLayerScale(int layer) const 
+    virtual float GetLayerScale(int layer) const
     { return scfParent->layers.GetLayer(layer)->scale; }
   } scfiHazeState;
   friend class HazeState;
@@ -382,7 +382,7 @@ private:
   /// vector of csHazeLayer
   csHazeLayerVector layers;
   iBase* logparent;
-  
+
 public:
   /// Constructor.
   csHazeMeshObjectFactory (iBase *pParent);
@@ -400,7 +400,7 @@ public:
   const csVector3& GetOrigin() const {return origin;}
   /// get the directional
   const csVector3& GetDirectional() const {return directional;}
-  
+
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
@@ -423,25 +423,25 @@ public:
     virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual void SetOrigin(const csVector3& pos) { scfParent->origin = pos; }
     virtual const csVector3& GetOrigin() const {return scfParent->origin;}
-    virtual void SetDirectional(const csVector3& pos) 
+    virtual void SetDirectional(const csVector3& pos)
     { scfParent->directional=pos;}
-    virtual const csVector3& GetDirectional() const 
+    virtual const csVector3& GetDirectional() const
     {return scfParent->directional;}
     virtual int GetLayerCount() const {return scfParent->layers.Length();}
-    virtual void AddLayer(iHazeHull *hull, float scale) 
+    virtual void AddLayer(iHazeHull *hull, float scale)
     { csHazeLayer *lay = new csHazeLayer(hull, scale);
       scfParent->layers.Push(lay); }
-    virtual void SetLayerHull(int layer, iHazeHull* hull) 
+    virtual void SetLayerHull(int layer, iHazeHull* hull)
     { if(hull) hull->IncRef();
       if(scfParent->layers.GetLayer(layer)->hull)
         scfParent->layers.GetLayer(layer)->hull->DecRef();
       scfParent->layers.GetLayer(layer)->hull = hull;
     }
-    virtual iHazeHull* GetLayerHull(int layer) const 
+    virtual iHazeHull* GetLayerHull(int layer) const
     { return scfParent->layers.GetLayer(layer)->hull; }
-    virtual void SetLayerScale(int layer, float scale) 
+    virtual void SetLayerScale(int layer, float scale)
     { scfParent->layers.GetLayer(layer)->scale = scale; }
-    virtual float GetLayerScale(int layer) const 
+    virtual float GetLayerScale(int layer) const
     { return scfParent->layers.GetLayer(layer)->scale; }
   } scfiHazeFactoryState;
   friend class HazeFactoryState;
@@ -453,7 +453,7 @@ public:
     virtual iHazeHullBox* CreateBox(const csVector3& a, const csVector3& b)
       const { return &(new csHazeHullBox(a, b))->scfiHazeHullBox; }
     virtual iHazeHullCone* CreateCone(int nr_sides, const csVector3& start,
-      const csVector3& end, float srad, float erad) const 
+      const csVector3& end, float srad, float erad) const
       { return &(new csHazeHullCone(nr_sides, start, end, srad, erad))->
         scfiHazeHullCone; }
 

@@ -109,7 +109,7 @@ csApp::csApp (iObjectRegistry *r, csSkin &Skin)
   Mouse = new csMouse(this);
   hints = new csHintManager(this);
   scfiPlugin = new csAppPlugin(this);
-  
+
   app = this;			// so that all inserted windows will inherit it
   MouseOwner = NULL;		// no mouse owner
   KeyboardOwner = NULL;		// no keyboard owner
@@ -773,8 +773,8 @@ void csApp::NotifyDelete (csComponent *comp)
     CaptureKeyboard (NULL);
   if (FocusOwner == comp)
     CaptureFocus (NULL);
-    
-   if (LastMouseContainer == comp) 
+
+   if (LastMouseContainer == comp)
      LastMouseContainer = NULL;
 
   hints->Remove (comp);

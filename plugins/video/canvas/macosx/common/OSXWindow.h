@@ -1,6 +1,6 @@
 //
 //  OSXWindow.h
-//  
+//
 //
 //  Created by mreda on Tue Nov 06 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface OSXWindow : NSWindow 
+@interface OSXWindow : NSWindow
 {
 }
 

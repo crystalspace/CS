@@ -1,5 +1,5 @@
 /*
- * mpg123 defines 
+ * mpg123 defines
  * used source: musicout.h from mpegaudio package
  */
 
@@ -49,7 +49,7 @@
 #define AUSHIFT (3)
 
 
-struct al_table 
+struct al_table
 {
   short bits;
   short d;

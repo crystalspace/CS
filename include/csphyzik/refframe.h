@@ -34,8 +34,8 @@
 class ctReferenceFrame
 {
 public:
-  ctReferenceFrame ( coord px = 0, coord py = 0, coord pz = 0, 
-		     ctangle ppitch = 0, ctangle proll = 0, ctangle pyaw = 0, 
+  ctReferenceFrame ( coord px = 0, coord py = 0, coord pz = 0,
+		     ctangle ppitch = 0, ctangle proll = 0, ctangle pyaw = 0,
 		     ctReferenceFrame *ref = NULL );
 
   ~ctReferenceFrame() {}
@@ -52,7 +52,7 @@ public:
   { rf.reference_count++; }
 
   static void remove_ref ( ctReferenceFrame &rf )
-  { 
+  {
     if ( --rf.reference_count <= 0 )
       if ( rf.not_universe() )
 	delete &rf;
@@ -68,7 +68,7 @@ public:
   { offset = v; }
 
   void set_world_offset( ctVector3 &v )
-  { offset = v; }	
+  { offset = v; }
 
   /**
    * get/set rotation matrix ( transform from child to parent frame )
@@ -98,13 +98,13 @@ public:
 
   void set_parent_to_this ( const ctMatrix3 &M )
   { gTf = M; fTg = gTf.get_transpose(); }
-	
+
   //!me no hiearchy yet really
   const ctMatrix3 &get_this_to_world()
   { return fTg; }
 
   void this_to_world ( ctVector3 &v )
-  {	
+  {
     v = get_this_to_world()*v + get_world_offset();
 //		if( !T_world_calced() )
 //			calc_T_world();
@@ -112,7 +112,7 @@ public:
   }
 
   void this_to_world ( ctVector3 &v, ctVector3 &src )
-  {	
+  {
     v = get_this_to_world()*src + get_world_offset();
 //		if( !T_world_calced() )
 //			calc_T_world();
@@ -121,16 +121,16 @@ public:
 
 protected:
   /// transform from parent frame to this one
-  ctMatrix3 gTf;   
+  ctMatrix3 gTf;
   /// transfrom from this frame to parent frame
-  ctMatrix3 fTg;	
+  ctMatrix3 fTg;
   /// offset from parent frame to this one in parent's frame
-  ctVector3 offset;  
+  ctVector3 offset;
 
   int reference_count;
 
   /// true if this is the top-most reference frame
-  bool is_universe_frame; 
+  bool is_universe_frame;
 //	bool is_T_world_calced; // true if T_world is currently valid
 //	ctReferenceFrame *parent_frame;
 };
@@ -151,7 +151,7 @@ public:
   {  rf.reference_count++; }
 
   static void remove_ref ( ctDeltaReferenceFrame &rf )
-   { 
+   {
      if ( --rf.reference_count <= 0 )
        if ( rf.not_universe() )
 	 delete &rf;

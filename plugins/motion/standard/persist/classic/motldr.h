@@ -42,7 +42,7 @@ private:
   iObjectRegistry *object_reg;
   iVFS *vfs;
   iMotionManager *motman;
-  
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -75,11 +75,11 @@ private:
 
 public:
   SCF_DECLARE_IBASE;
-  
+
   csMotionSaver (iBase *);
   virtual ~csMotionSaver ();
   virtual void WriteDown ( iBase *obj, iStrVector *string);
-  
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMotionSaver);

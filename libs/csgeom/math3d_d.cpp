@@ -2,17 +2,17 @@
     Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
     Converted to double by Thomas Hieber
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -26,11 +26,11 @@
 //---------------------------------------------------------------------------
 
 double csDVector3::Norm () const
-{ 
-  return sqrt (x*x + y*y + z*z); 
+{
+  return sqrt (x*x + y*y + z*z);
 }
 
-void csDVector3::Normalize() 
+void csDVector3::Normalize()
 {
   double len;
   len = this->Norm();
@@ -47,7 +47,7 @@ csDVector3::csDVector3(const csVector3& v)
 
 //---------------------------------------------------------------------------
 
-csDMatrix3::csDMatrix3 () 
+csDMatrix3::csDMatrix3 ()
 {
   m12 = m13 = 0;
   m21 = m23 = 0;
@@ -144,13 +144,13 @@ double csDMatrix3::Determinant () const
    +m13 * (m21*m32 - m22*m31);
 }
 
-csDMatrix3 operator+ (const csDMatrix3& m1, const csDMatrix3& m2) 
+csDMatrix3 operator+ (const csDMatrix3& m1, const csDMatrix3& m2)
 {
   return csDMatrix3 (m1.m11+m2.m11, m1.m12+m2.m12, m1.m13+m2.m13,
                      m1.m21+m2.m21, m1.m22+m2.m22, m1.m23+m2.m23,
                      m1.m31+m2.m31, m1.m32+m2.m32, m1.m33+m2.m33);
 }
-                  
+
 csDMatrix3 operator- (const csDMatrix3& m1, const csDMatrix3& m2)
 {
   return csDMatrix3 (m1.m11-m2.m11, m1.m12-m2.m12, m1.m13-m2.m13,
@@ -193,7 +193,7 @@ csDMatrix3 operator/ (const csDMatrix3& m, double f)
 }
 
 bool operator== (const csDMatrix3& m1, const csDMatrix3& m2)
-{ 
+{
   if (m1.m11 != m2.m11 || m1.m12 != m2.m12 || m1.m13 != m2.m13) return false;
   if (m1.m21 != m2.m21 || m1.m22 != m2.m22 || m1.m23 != m2.m23) return false;
   if (m1.m31 != m2.m31 || m1.m32 != m2.m32 || m1.m33 != m2.m33) return false;
@@ -266,7 +266,7 @@ bool csDMath3::PlanesClose (const csDPlane& p1, const csDPlane& p2)
 
 //---------------------------------------------------------------------------
 
-double csDSquaredDist::PointLine (const csDVector3& p, 
+double csDSquaredDist::PointLine (const csDVector3& p,
                                   const csDVector3& l1, const csDVector3& l2)
 {
   csDVector3 W = l1-p;
@@ -275,7 +275,7 @@ double csDSquaredDist::PointLine (const csDVector3& p,
   return p2l * p2l;
 }
 
-double csDSquaredDist::PointPoly (const csDVector3& p, csDVector3 *V, int n, 
+double csDSquaredDist::PointPoly (const csDVector3& p, csDVector3 *V, int n,
                                   const csDPlane& plane, double sqdist)
 {
   csDVector3 W, L;
@@ -293,9 +293,9 @@ double csDSquaredDist::PointPoly (const csDVector3& p, csDVector3 *V, int n,
     else if ( !(W*(L = V[i-1]-V[i]) > 0) )
     {
       if ( !lflag && W*(plane.norm % L) > 0 )
-      { 
-        L = W - L * (W*L)/(L*L);  
-        return L*L; 
+      {
+        L = W - L * (W*L)/(L*L);
+        return L*L;
       }
       lflag = (W*(V[i+1]-V[i]) > 0);
     }
@@ -376,7 +376,7 @@ bool csDIntersect3::Plane(const csDVector3& u, const csDVector3& v,
   return true;
 }
 
-bool csDIntersect3::Planes(const csDPlane& p1, const csDPlane& p2, 
+bool csDIntersect3::Planes(const csDPlane& p1, const csDPlane& p2,
                            const csDPlane& p3, csDVector3& isect)
 {
   //To find the one point that is on all three planes, we need to solve
@@ -385,7 +385,7 @@ bool csDIntersect3::Planes(const csDPlane& p1, const csDPlane& p2,
   // A1*x+B1*y+C1*z+D1=0 //plane1
   // A2*x+B2*y+C2*z+D2=0 //plane2
   // A3*x+B3*y+C3*z+D3=0 //plane3
-  //This can be solved according to Cramers rule by looking at the 
+  //This can be solved according to Cramers rule by looking at the
   //determinants of the equation system.
   csDMatrix3 mdet(p1.A(), p1.B(), p1.C(),
                  p2.A(), p2.B(), p2.C(),
@@ -393,18 +393,18 @@ bool csDIntersect3::Planes(const csDPlane& p1, const csDPlane& p2,
   double det = mdet.Determinant();
   if (det == 0) return false; //some planes are parallel.
 
-  csDMatrix3 mx(-p1.D(),  p1.B(),  p1.C(), 
-               -p2.D(),  p2.B(),  p2.C(), 
+  csDMatrix3 mx(-p1.D(),  p1.B(),  p1.C(),
+               -p2.D(),  p2.B(),  p2.C(),
                -p3.D(),  p3.B(),  p3.C());
   double xdet = mx.Determinant();
 
-  csDMatrix3 my( p1.A(), -p1.D(),  p1.C(), 
-                p2.A(), -p2.D(),  p2.C(), 
+  csDMatrix3 my( p1.A(), -p1.D(),  p1.C(),
+                p2.A(), -p2.D(),  p2.C(),
                 p3.A(), -p3.D(),  p3.C());
   double ydet = my.Determinant();
 
-  csDMatrix3 mz( p1.A(),  p1.B(), -p1.D(), 
-                p2.A(),  p2.B(), -p2.D(), 
+  csDMatrix3 mz( p1.A(),  p1.B(), -p1.D(),
+                p2.A(),  p2.B(), -p2.D(),
                 p3.A(),  p3.B(), -p3.D());
   double zdet = mz.Determinant();
 
@@ -423,7 +423,7 @@ double csDIntersect3::Z0Plane (
   isect.y = r * (v.y-u.y) + u.y;
   isect.z = 0;
   return r;
-} 
+}
 
 double csDIntersect3::ZPlane (
   double zval, const csDVector3& u, const csDVector3& v, csDVector3& isect)

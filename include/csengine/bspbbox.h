@@ -272,7 +272,7 @@ public:
 
   /// Get vector array for this container.
   csVector3Array& GetVertices () { return vertices; }
-  
+
   /// Get camera vector array for this container.
   csVector3Array& GetCameraVertices () { return cam_vertices; }
 

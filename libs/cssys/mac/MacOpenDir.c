@@ -10,19 +10,19 @@ struct directory_scan {
 DIR * opendir(const char *name)
 {
 	Str255		theName;
-	OSErr 		theError; 
+	OSErr 		theError;
 	CInfoPBRec	thePB;
 	struct directory_scan *theDirInfo;
 
 	strcpy( (char *)&theName[1], name );
 	theName[0] = strlen( name );
-	thePB.dirInfo.ioFDirIndex = 0; 
+	thePB.dirInfo.ioFDirIndex = 0;
 	thePB.dirInfo.ioDrDirID  = 0L;
 	thePB.dirInfo.ioVRefNum = 0;
 	thePB.dirInfo.ioNamePtr = theName;
 
 	theError = PBGetCatInfoSync( &thePB );
-	
+
 	if ( theError != noErr )
 		return NULL;
 
@@ -46,7 +46,7 @@ dirent *readdir (DIR *dirp)
 	CInfoPBRec	thePB;
 	Str255		theName;
 
-	thePB.dirInfo.ioFDirIndex = ((struct directory_scan *)dirp)->index; 
+	thePB.dirInfo.ioFDirIndex = ((struct directory_scan *)dirp)->index;
 	thePB.dirInfo.ioDrDirID = ((struct directory_scan *)dirp)->dirID;
 	thePB.dirInfo.ioVRefNum = ((struct directory_scan *)dirp)->vRefNum;
 	thePB.dirInfo.ioNamePtr = theName;

@@ -17,7 +17,7 @@ const int awsLabel::alignLeft=0x0;
 const int awsLabel::alignRight=0x1;
 const int awsLabel::alignCenter=0x2;
 
-awsLabel::awsLabel():is_down(false), mouse_is_over(false), alignment(0), 
+awsLabel::awsLabel():is_down(false), mouse_is_over(false), alignment(0),
                      caption(NULL)
 {
   SetFlag(AWSF_CMP_ALWAYSERASE);
@@ -27,7 +27,7 @@ awsLabel::~awsLabel()
 { }
 
 char *
-awsLabel::Type() 
+awsLabel::Type()
 { return "Label"; }
 
 bool
@@ -43,7 +43,7 @@ awsLabel::Setup(iAws *_wmgr, awsComponentNode *settings)
  return true;
 }
 
-bool 
+bool
 awsLabel::GetProperty(char *name, void **parm)
 {
   if (awsComponent::GetProperty(name, parm)) return true;
@@ -62,7 +62,7 @@ awsLabel::GetProperty(char *name, void **parm)
   return false;
 }
 
-bool 
+bool
 awsLabel::SetProperty(char *name, void *parm)
 {
   if (awsComponent::SetProperty(name, parm)) return true;
@@ -70,7 +70,7 @@ awsLabel::SetProperty(char *name, void *parm)
   if (strcmp("Caption", name)==0)
   {
     iString *s = (iString *)(parm);
-    
+
     if (s)
     {
       if (caption) caption->DecRef();
@@ -78,24 +78,24 @@ awsLabel::SetProperty(char *name, void *parm)
       caption->IncRef();
       Invalidate();
     }
-    
+
     return true;
   }
-  
+
   return false;
 }
 
 
-void 
+void
 awsLabel::OnDraw(csRect clip)
 {
   iGraphics2D *g2d = WindowManager()->G2D();
-   
-   // Draw the caption, if there is one 
+
+   // Draw the caption, if there is one
    if (caption)
-    {     
+    {
       int tw, th, tx, ty, mcc;
-      
+
       mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(caption->GetData(), Frame().Width());
 
       scfString tmp(caption->GetData());
@@ -133,15 +133,15 @@ awsLabel::OnDraw(csRect clip)
     }
 }
 
-bool 
+bool
 awsLabel::OnMouseDown(int ,int ,int )
 {
   is_down=true;
   //Invalidate();
   return false;
 }
-    
-bool 
+
+bool
 awsLabel::OnMouseUp(int ,int ,int )
 {
   if (is_down)
@@ -151,7 +151,7 @@ awsLabel::OnMouseUp(int ,int ,int )
   //Invalidate();
   return false;
 }
-    
+
 bool
 awsLabel::OnMouseMove(int ,int ,int )
 {
@@ -170,7 +170,7 @@ awsLabel::OnMouseDoubleClick(int ,int ,int )
   return false;
 }
 
-bool 
+bool
 awsLabel::OnMouseExit()
 {
   mouse_is_over=false;
@@ -178,7 +178,7 @@ awsLabel::OnMouseExit()
 
   if (is_down)
     is_down=false;
-  
+
   return true;
 }
 
@@ -195,14 +195,14 @@ awsLabel::OnKeypress(int ,int )
 {
   return false;
 }
-    
+
 bool
 awsLabel::OnLostFocus()
 {
   return false;
 }
 
-bool 
+bool
 awsLabel::OnGainFocus()
 {
   return false;
@@ -231,6 +231,6 @@ awsLabelFactory::~awsLabelFactory()
 iAwsComponent *
 awsLabelFactory::Create()
 {
- return new awsLabel; 
+ return new awsLabel;
 }
 

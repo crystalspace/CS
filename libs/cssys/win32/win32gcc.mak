@@ -12,8 +12,8 @@ PLUGINS+= video/canvas/ddraw
 #PLUGINS+= video/canvas/ddraw8
 PLUGINS+= sound/loader/mp3
 
-# if u have the following line uncommented make sure one  
-# LIBS.OPENGL.SYSTEM is set below or you have a custom 
+# if u have the following line uncommented make sure one
+# LIBS.OPENGL.SYSTEM is set below or you have a custom
 # opengl dll installed as GL.dll (e.g. MESA)
 PLUGINS+= video/canvas/openglwin video/renderer/opengl
 
@@ -90,7 +90,7 @@ SOUND_LIBS=
 # Indicate where special include files can be found.
 # for instance where your dx includes are
 CFLAGS.INCLUDE=
-#$(CFLAGS.I)/dx7asdk/dxf/include 
+#$(CFLAGS.I)/dx7asdk/dxf/include
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -fvtable-thunks -pipe

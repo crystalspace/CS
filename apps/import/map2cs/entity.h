@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef ENTITY_H
@@ -40,9 +40,9 @@ protected:
 };
 
 /**
-  * An entity is the basic object in a MAP file. Everything inside a map 
+  * An entity is the basic object in a MAP file. Everything inside a map
   * file is an entity. A entity can contain an unlimited number of key
-  * value pairs. 
+  * value pairs.
   * It can also contain an unlimited number of brushes. The brushes will
   * then shape this entity.
   * If the entity contains no brushes, it is a point based entity, and one
@@ -52,7 +52,7 @@ protected:
   * Brush based entities are the world itself, doors, water, triggers...
   */
 class CMapEntity
-{ 
+{
 public:
   /**
     * Constructs an entity
@@ -68,7 +68,7 @@ public:
   /**
     * This will read a complete entity from a file (until the closing "}")
     * It will do all errorhandling and error messages itself. If there
-    * was an error, it will return false. In that case you should not 
+    * was an error, it will return false. In that case you should not
     * continue reading the file.
     */
   bool Read(CMapParser* pParser, CMapFile* pMap);
@@ -87,7 +87,7 @@ public:
   CMapCurve* GetCurve(int index) {return m_Curves.Get(index);}
 
   /**
-    * Get the classname of this entity or "", if this entity has no 
+    * Get the classname of this entity or "", if this entity has no
     * classname.
     */
   const char* GetClassname();
@@ -137,22 +137,22 @@ public:
   CMapKeyValuePair* GetKeyValuePair(int index) {return m_Keymap[index];}
 protected:
   /**
-    * Here are all contained brushes stored. 
+    * Here are all contained brushes stored.
     */
   CMapBrushVector        m_Brushes;
 
   /**
-    * Here are all contained curves stored. 
+    * Here are all contained curves stored.
     */
   CMapCurveVector        m_Curves;
 
   /**
     * Here are all Key/ Value pairs stored.
-    */ 
+    */
   CMapKeyValuePairVector m_Keymap;
 
   /**
-    * This name is used as unique name for the entity, if no 
+    * This name is used as unique name for the entity, if no
     * other name has been given
     */
   csString m_UniqueName;

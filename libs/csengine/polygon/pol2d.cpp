@@ -275,13 +275,13 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
   //  |  *a,b          and is clipped at c, where orig_triangle[0]
   //  | /              can be either a, b or c. In other words when
   //  |/               the single vertex is not 'top' and clipped.
-  // /|*c              
-  //  |                The '-= EPSILON' for both left and right 
+  // /|*c
+  //  |                The '-= EPSILON' for both left and right
   //  y     fig. 2     is fairly arbitrary, this probably needs to be refined.
 
-  if (orig_triangle[top] == orig_triangle[_vbl]) 
+  if (orig_triangle[top] == orig_triangle[_vbl])
       orig_triangle[_vbl].x -= EPSILON;
-  if (orig_triangle[top] == orig_triangle[_vbr]) 
+  if (orig_triangle[top] == orig_triangle[_vbr])
       orig_triangle[_vbr].x -= EPSILON;
 
   for (j = 0 ; j < g3dpoly->num ; j++)
@@ -302,7 +302,7 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
     //  |/       |/
     // C*       C*  Fig.1 :-)
     int vtl = top, vtr = top, vbl = _vbl, vbr = _vbr;
-    int ry = QRound (y); 
+    int ry = QRound (y);
     if (ry > QRound (orig_triangle [vbl].y))
     {
       vtl = vbl;
@@ -376,11 +376,11 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
     }
     else
     {
-    
+
       g3dpoly->vertices[j].r = 1;
       g3dpoly->vertices[j].g = 1;
       g3dpoly->vertices[j].b = 1;
-      
+
     }
   }
 }
@@ -571,7 +571,7 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
       rview->CalculateFogPolygon (g3dpoly);
       rview->GetGraphics3D ()->DrawPolygon (g3dpoly);
     }
-    
+
 #ifdef DO_HW_UVZ
     poly->isClipped = false;
     g3dpoly.uvz = NULL;

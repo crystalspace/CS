@@ -41,7 +41,7 @@ private:
 
   /// make my palette, max nr of colours
   void MakePalette (int max);
-  /// HSI to RGB csColor 
+  /// HSI to RGB csColor
   void SetHSI (csColor& col, float H, float S, float I);
   /// get fireline (wraps)
   uint8& GetFireLine (int x);

@@ -166,7 +166,7 @@ public:
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 
-  virtual void GetRadius(csVector3& radius, csVector3& cent) 
+  virtual void GetRadius(csVector3& radius, csVector3& cent)
 	{ radius =  rad; cent = object_bbox.GetCenter(); }
   virtual uint GetMixMode() { return MixMode; }
   virtual void SetMixMode(uint mode) { MixMode = mode; }

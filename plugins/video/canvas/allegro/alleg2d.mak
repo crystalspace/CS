@@ -72,7 +72,7 @@ alleg2d: $(OUTDIRS) $(ALLEG2D)
 
 $(OUT)%$O: plugins/video/canvas/allegro/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.ALLEG2D)
- 
+
 $(ALLEG2D): $(OBJ.ALLEG2D) $(LIB.ALLEG2D)
 	$(DO.PLUGIN) $(LIB.ALLEG2D.SPECIAL)
 

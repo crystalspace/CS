@@ -363,7 +363,7 @@ int ConvertModel(const char *filename) {
     CalError::printLastError();
     return 1;
   }
- 
+
   char outname[255];
   ReplaceExt(outname, filename, ".csk");
 
@@ -374,9 +374,9 @@ int ConvertModel(const char *filename) {
   calCoreModel.destroy();
   return 0;
 }
- 
+
 int main(int argc, char *argv[]) {
- 
+
   int i=1;
   for(;i<argc; i++) {
     if(argv[i][0]!='-')

@@ -74,7 +74,7 @@ public:
   void SetupFrame ();
   void FinishFrame ();
   bool HandleEvent (iEvent &Event);
-  
+
   iMaterialHandle* GetMaterial (int idx)
   {
     return materials[idx];

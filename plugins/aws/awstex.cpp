@@ -33,7 +33,7 @@ awsTextureManager::awsTextureManager():loader(NULL), txtmgr(NULL), vfs(NULL), ob
 {
  // empty
 }
-  
+
 awsTextureManager::~awsTextureManager()
 {
   for (int i=0; i < textures.Length (); i++)
@@ -54,7 +54,7 @@ awsTextureManager::Initialize(iObjectRegistry* obj_reg)
 
   loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
   vfs    = CS_QUERY_REGISTRY (object_reg, iVFS);
-  
+
   if (!loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.awsprefs",
@@ -74,19 +74,19 @@ awsTextureManager::Initialize(iObjectRegistry* obj_reg)
   }
 }
 
-iTextureHandle * 
+iTextureHandle *
 awsTextureManager::GetTexture(char *name, char *filename, bool replace)
 {
   unsigned long id = NameToId(name);
   return GetTexturebyID(id, filename, replace);
 }
 
-iTextureHandle * 
+iTextureHandle *
 awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace)
 {
   awsTexture *awstxt=NULL;
   bool        txtfound=false;
-  
+
 
  /*  Perform a lookup on the texture list.  We may consider doing this a little more
   * optimally in the future, like subclassing csVector and overriding CompareKey for
@@ -101,15 +101,15 @@ awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace
 
     if (DEBUG_GETTEX) printf("aws-debug: (%s) texture is: %p\n", __FILE__, awstxt->tex);
 
-    if (awstxt && id == awstxt->id) 
+    if (awstxt && id == awstxt->id)
     {
-      if (replace && filename !=NULL) 
+      if (replace && filename !=NULL)
         txtfound=true;
       else
         return awstxt->tex;
     }
   }
-  
+
   if (!txtfound && filename == NULL) return NULL;
   if (!txtfound) awstxt=NULL;
 
@@ -128,7 +128,7 @@ awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace
   }
 
   int Format = txtmgr->GetTextureFormat();
-  
+
   iImage *ifile = NULL;
   iDataBuffer *buf = vfs->ReadFile (filename);
 
@@ -155,10 +155,10 @@ awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace
   }
 
  /*  At this point, we have loaded the file from the disk, and all we're doing now is creating
-  * a texture handle to the image.  The texture handle is necessary to draw a pixmap with 
+  * a texture handle to the image.  The texture handle is necessary to draw a pixmap with
   * iGraphics3D::DrawPixmap()
   */
-  
+
   if (awstxt==NULL)
   {
     awstxt = new awsTexture;
@@ -183,7 +183,7 @@ awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace
   return awstxt->tex;
 }
 
-void 
+void
 awsTextureManager::SetTextureManager(iTextureManager *newtxtmgr)
 {
   if (txtmgr && newtxtmgr)
@@ -191,7 +191,7 @@ awsTextureManager::SetTextureManager(iTextureManager *newtxtmgr)
     UnregisterTextures();
     txtmgr->DecRef();
   }
-  
+
   if (newtxtmgr)
   {
     txtmgr = newtxtmgr;

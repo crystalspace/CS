@@ -62,7 +62,7 @@ static void item_scan(NeXTConfigHandle config, char const* section,
   char* k_shortcut = str_append(section, "shortcut", 0);
   char* k_action   = str_append(section, "action",   0);
   char* k_target   = str_append(section, "target",   0);
-  
+
   char const* inherit = NeXTConfigFile_lookup(config, k_inherit, 0);
   if (inherit != 0)
   {
@@ -70,12 +70,12 @@ static void item_scan(NeXTConfigHandle config, char const* section,
     item_scan(config, parent, title, shortcut, action, target);
     free(parent);
   }
-  
+
   *title    = NeXTConfigFile_lookup(config, k_title,    *title   );
   *shortcut = NeXTConfigFile_lookup(config, k_shortcut, *shortcut);
   *action   = NeXTConfigFile_lookup(config, k_action,   *action  );
   *target   = NeXTConfigFile_lookup(config, k_target,   *target  );
-  
+
   free(k_target  );
   free(k_action  );
   free(k_shortcut);
@@ -99,21 +99,21 @@ static void menu_add_item(Menu* menu, char const* key, NeXTConfigHandle config)
 {
   SEL cmd = 0;
   MenuCell* item;
-  
+
   char const* title    = "";
   char const* shortcut = "";
   char const* action   = 0;
   char const* target   = 0;
-  
+
   char* section = str_append("NeXT.Item.", key, ".");
   item_scan(config, section, &title, &shortcut, &action, &target);
   free(section);
-  
+
   if (action != 0)
     cmd = sel_getUid(action);
-  
+
   item = [menu addItem:title action:cmd keyEquivalent:shortcut[0]];
-  
+
   if (target != 0)
   {
     STR_SWITCH (target)
@@ -142,10 +142,10 @@ static void menu_add_submenu(Menu* menu, char const* name,
   {
     char* key = str_append("NeXT.Menu.", name, ".type");
     char const* type = NeXTConfigFile_lookup(config, key, 0);
-  
+
     MenuCell* item = [menu addItem:[sub title] action:0 keyEquivalent:0];
     [menu setSubmenu:sub forItem:item];
-  
+
     if (type != 0)
     {
       STR_SWITCH (type)

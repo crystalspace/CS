@@ -131,6 +131,6 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #---------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
-SYSCONFIG=echo PROC=ee >>config.tmp; echo OS=PS2 >>config.tmp; echo COMP=GCC >>config.tmp; echo CS_LITTLE_ENDIAN=1 >>config.tmp; echo override USE_PLUGINS=$(USE_PLUGINS) >>config.tmp 
+SYSCONFIG=echo PROC=ee >>config.tmp; echo OS=PS2 >>config.tmp; echo COMP=GCC >>config.tmp; echo CS_LITTLE_ENDIAN=1 >>config.tmp; echo override USE_PLUGINS=$(USE_PLUGINS) >>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)

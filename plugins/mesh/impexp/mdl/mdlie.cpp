@@ -87,7 +87,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csModelConverterMDL);
     virtual bool Initialize (iObjectRegistry *object_reg)
-    { 
+    {
       return scfParent->Initialize (object_reg);
     }
   } scfiComponent;
@@ -105,7 +105,7 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_FACTORY (csModelConverterMDL)
 
 SCF_EXPORT_CLASS_TABLE (mdlie)
-  SCF_EXPORT_CLASS (csModelConverterMDL, 
+  SCF_EXPORT_CLASS (csModelConverterMDL,
     "crystalspace.modelconverter.mdl",
     "MDL Model Converter")
 SCF_EXPORT_CLASS_TABLE_END
@@ -143,7 +143,7 @@ const csModelConverterFormat *csModelConverterMDL::GetFormat (int idx) const
 
 /*
   Purpose:
-   
+
     csModelConverterMDL::Load() reads a Quake2 MDL model file.
 
   Examples:
@@ -153,9 +153,9 @@ const csModelConverterFormat *csModelConverterMDL::GetFormat (int idx) const
     13 July 1999 Gary Haussmann
 
   Author:
- 
+
     John Burkardt
-  
+
   Modified by Martin Geisse to work with the new converter system.
 */
 
@@ -314,7 +314,7 @@ iModelData *csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
     int ActionType = get_le_long (Readbuffer);
     if (ActionType == 0)
       FrameCount = 1;
-    else 
+    else
     {
       in.Read (Readbuffer, SIZEOF_MDLLONG);
       FrameCount = get_le_long (Readbuffer);

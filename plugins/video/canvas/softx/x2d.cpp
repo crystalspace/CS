@@ -51,7 +51,7 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 
 csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
-  csGraphics2D (iParent), xwin (NULL), xshm (NULL),  xim (NULL), 
+  csGraphics2D (iParent), xwin (NULL), xshm (NULL),  xim (NULL),
   dpy (NULL), cmap (0), real_Memory (NULL),
   sim_lt8 (NULL), sim_lt16 (NULL)
 {
@@ -123,7 +123,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   if (do_shm)
   {
     int opcode, first_event, first_error;
-    if (XQueryExtension (dpy, CS_XEXT_SHM, 
+    if (XQueryExtension (dpy, CS_XEXT_SHM,
 			&opcode, &first_event, &first_error))
     {
       xshm = CS_LOAD_PLUGIN (plugin_mgr, CS_XEXT_SHM_SCF_ID, iXExtSHM);
@@ -132,7 +132,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     }
     else
     {
-      Report (CS_REPORTER_SEVERITY_WARNING, 
+      Report (CS_REPORTER_SEVERITY_WARNING,
 	      "No shared memory X-extension detected....disabling\n");
     }
   }
@@ -163,7 +163,7 @@ bool csGraphics2DXLib::Open()
 
   if (!xwin->Open ())
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
+    Report (CS_REPORTER_SEVERITY_ERROR,
 	    "Failed to open the X-Window!");
     return false;
   }
@@ -284,15 +284,15 @@ bool csGraphics2DXLib::CreateVisuals ()
     pfmt.complete ();
   }
 
-  // Allocate the palette if not truecolor or if 
+  // Allocate the palette if not truecolor or if
   // simulating truecolor on 8-bit display.
-  if ((sim_depth == 0 && pfmt.PalEntries) || 
+  if ((sim_depth == 0 && pfmt.PalEntries) ||
       (sim_depth != 0 && real_pfmt.PalEntries))
-    cmap = XCreateColormap (dpy, RootWindow (dpy, screen_num), 
+    cmap = XCreateColormap (dpy, RootWindow (dpy, screen_num),
 			    xvis.visual, AllocAll);
 
   // If we are simulating truecolor on an 8-bit display then we will create
-  // a truecolor 3:3:2 colormap. This is ugly but simulated depth is for 
+  // a truecolor 3:3:2 colormap. This is ugly but simulated depth is for
   // testing only. So who cares?
   if ((sim_depth == 15 || sim_depth == 16 || sim_depth == 32) && cmap)
   {
@@ -854,7 +854,7 @@ bool csGraphics2DXLib::AllocateMemory ()
   bool mem_valid = TryAllocateMemory ();
   if (!mem_valid && xshm)
   {
-    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "SHM available but could not allocate. Trying without SHM.");
     xshm->DecRef ();
     xshm = NULL;
@@ -878,15 +878,15 @@ bool csGraphics2DXLib::TryAllocateMemory ()
     int disp_depth = DefaultDepth(dpy,screen_num);
     int bitmap_pad = (disp_depth + 7) / 8;
     bitmap_pad = (bitmap_pad == 3) ? 32 : bitmap_pad*8;
-    xim = XCreateImage(dpy, DefaultVisual(dpy,screen_num), 
-		       disp_depth, ZPixmap, 0, NULL, 
+    xim = XCreateImage(dpy, DefaultVisual(dpy,screen_num),
+		       disp_depth, ZPixmap, 0, NULL,
 		       Width, Height, bitmap_pad, 0);
     xim->data = new char[xim->bytes_per_line*xim->height];
     real_Memory = (unsigned char*)(xim->data);
   }
   if (!real_Memory)
     return false;
-  
+
   // If not simulating depth then Memory is equal to real_Memory.
   // If simulating then we allocate a new Memory array in the faked format.
   if (!sim_depth)
@@ -924,15 +924,15 @@ bool csGraphics2DXLib::Resize (int width, int height)
 }
 
 void csGraphics2DXLib::SetFullScreen (bool yesno)
-{ 
-  csGraphics2D::SetFullScreen (yesno); 
-  xwin->SetFullScreen (yesno); 
+{
+  csGraphics2D::SetFullScreen (yesno);
+  xwin->SetFullScreen (yesno);
 }
 
 void csGraphics2DXLib::AllowResize (bool iAllow)
-{ 
-  AllowResizing = iAllow; 
-  xwin->AllowResize (iAllow); 
+{
+  AllowResizing = iAllow;
+  xwin->AllowResize (iAllow);
 }
 
 

@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -112,10 +112,10 @@ public:
 
   /// Get the vertex array.
   csColoredVertices& GetVertices () { return vertices; }
-  /** 
+  /**
    * Set vertices to form a regular n-polygon around (0,0),
    * optionally also set u,v to corresponding coordinates in a texture.
-   * Large n approximates a circle with radius 1. n must be > 2. 
+   * Large n approximates a circle with radius 1. n must be > 2.
    */
   void CreateRegularVertices (int n, bool setuv);
 
@@ -138,7 +138,7 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual void GetRadius (csVector3& rad, csVector3& cent) 
+  virtual void GetRadius (csVector3& rad, csVector3& cent)
 	{ rad =  radius; cent.Set(0,0,0); }
   virtual void NextFrame (csTicks current_time);
   virtual bool WantToDie () const { return false; }
@@ -148,7 +148,7 @@ public:
         csVector3&, float*);
   /// 2D sprites have no depth, so this is equivalent to HitBeamOutline.
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr) 
+  	csVector3& isect, float* pr)
   { return HitBeamOutline(start, end, isect, pr); }
   virtual long GetShapeNumber () const { return shapenr; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
@@ -227,7 +227,7 @@ protected:
   public:
     animVector () : csVector (8, 16){}
     virtual int CompareKey (csSome Item1, csConstSome Item2, int Mode) const
-    { 
+    {
       (void)Mode;
       csSprite2DUVAnimation *f1 = (csSprite2DUVAnimation *)Item1;
       const char *f2 = (const char *)Item2;
@@ -246,7 +246,7 @@ private:
    * the given colors.
    */
   bool lighting;
-  
+
 public:
   /// Constructor.
   csSprite2DMeshObjectFactory (iBase *pParent);
@@ -260,10 +260,10 @@ public:
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   /// Get mixmode.
   uint GetMixMode () const { return MixMode; }
-  
+
   int GetUVAnimationCount () const {return vAnims.Length ();}
   iSprite2DUVAnimation *CreateUVAnimation ()
-  { 
+  {
     csSprite2DUVAnimation *p = new csSprite2DUVAnimation (this);
     vAnims.Push (p);
     return (iSprite2DUVAnimation *)p;

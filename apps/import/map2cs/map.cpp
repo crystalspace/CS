@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -59,14 +59,14 @@ bool CMapFile::Read(const char* filename, const char* configfile)
   if (!parser.Open(filename)) return false;
 
   char Buffer[1000];
-  
+
   while (parser.GetNextToken(Buffer))
   {
     if (strcmp(Buffer, "{") == 0)
     {
       //a new entity follows.
       CMapEntity* pEntity = new CMapEntity;
-      if (!pEntity->Read(&parser, this)) 
+      if (!pEntity->Read(&parser, this))
       {
         break;
       }
@@ -77,7 +77,7 @@ bool CMapFile::Read(const char* filename, const char* configfile)
     {
       parser.ReportError("Format error! Expected an entity, that starts with \"{\" "
                          "but found \"%s\"", Buffer);
-      return false; 
+      return false;
     }
   }
 
@@ -95,10 +95,10 @@ bool CMapFile::WriteTextureinfo()
   return true;
 }
 
-CMapTexturedPlane* CMapFile::AddPlane(CdVector3 v1, CdVector3 v2, CdVector3 v3, 
+CMapTexturedPlane* CMapFile::AddPlane(CdVector3 v1, CdVector3 v2, CdVector3 v3,
                                       const char* TextureName,
                                       double x_off, double y_off,
-                                      double rot_angle, 
+                                      double rot_angle,
                                       double x_scale, double y_scale,
                                       bool QuarkModeTexture,
                                       bool QuarkMirrored)
@@ -110,17 +110,17 @@ CMapTexturedPlane* CMapFile::AddPlane(CdVector3 v1, CdVector3 v2, CdVector3 v3,
     exit(1);
   }
 
-  CMapTexturedPlane* pNewPlane = 
-    new CMapTexturedPlane(this, v1, v2, v3, pTexture, x_off, 
+  CMapTexturedPlane* pNewPlane =
+    new CMapTexturedPlane(this, v1, v2, v3, pTexture, x_off,
                           y_off, rot_angle, x_scale, y_scale,
                           QuarkModeTexture, QuarkMirrored);
   return AddPlane(pNewPlane);
 }
 
-CMapTexturedPlane* CMapFile::AddPlane(CdVector3 v1, CdVector3 v2, CdVector3 v3, 
+CMapTexturedPlane* CMapFile::AddPlane(CdVector3 v1, CdVector3 v2, CdVector3 v3,
                                       int r, int g, int b)
 {
-  CMapTexturedPlane* pNewPlane = new CMapTexturedPlane(v1, v2, v3, r, g, b); 
+  CMapTexturedPlane* pNewPlane = new CMapTexturedPlane(v1, v2, v3, r, g, b);
   return AddPlane(pNewPlane);
 }
 
@@ -187,9 +187,9 @@ void CMapFile::GetMapSize(CdVector3& Min, CdVector3& Max)
       if (!inited)
       {
         //we will intialize Min and Max to the value of the first
-        //vertex we find. (We can't just intialise Min and Max to 
+        //vertex we find. (We can't just intialise Min and Max to
         //(0,0,0), because we can'T guarantee, that nobody will
-        //create a map, that does not even enclude that point 
+        //create a map, that does not even enclude that point
         //inside the maps objects.
         inited = true;
         Min = v;
@@ -221,9 +221,9 @@ void CMapFile::GetMapSize(CdVector3& Min, CdVector3& Max)
           if (!inited)
           {
             //we will intialize Min and Max to the value of the first
-            //vertex we find. (We can't just intialise Min and Max to 
+            //vertex we find. (We can't just intialise Min and Max to
             //(0,0,0), because we can'T guarantee, that nobody will
-            //create a map, that does not even enclude that point 
+            //create a map, that does not even enclude that point
             //inside the maps objects.
             inited = true;
             Min = v;
@@ -277,7 +277,7 @@ bool CMapFile::AddTexture(const char* TextureName, CZipFile* pZipFile)
   }
 
   if (FindTextureFile(TextureName, fullname))
-  { 
+  {
     if (pZipFile->AddFile(fullname, TextureName))
     {
       return true;
@@ -344,7 +344,7 @@ const char* CMapFile::GetConfigStr(const char* Path, const char* def)
 void CMapFile::LoadWadFiles()
 {
   int wadnr = 1;
-  do 
+  do
   {
     char keyname[200];
     char wadname[300];

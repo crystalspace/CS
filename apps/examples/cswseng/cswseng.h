@@ -66,7 +66,7 @@ public:
 public:
   ceCswsEngineApp (iObjectRegistry *object_reg, csSkin &skin);
   ~ceCswsEngineApp ();
-  
+
   virtual bool HandleEvent (iEvent &Event);
   virtual bool Initialize ();
 };

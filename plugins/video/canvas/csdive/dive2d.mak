@@ -64,7 +64,7 @@ ifeq ($(MAKESECTION),targets)
 
 csdive: $(OUTDIRS) $(CSDIVE)
 
-$(CSDIVE): $(OBJ.CSDIVE) $(LIB.CSDIVE) $(DIVE2D.RES) $(CSOS2.LIB) 
+$(CSDIVE): $(OBJ.CSDIVE) $(LIB.CSDIVE) $(DIVE2D.RES) $(CSOS2.LIB)
 	$(DO.PLUGIN)
 
 $(CSOS2.LIB): plugins/video/canvas/csdive/csdive.imp

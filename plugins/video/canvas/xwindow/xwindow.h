@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein 
+    Copyright (C) 1998 by Jorrit Tyberghein
     Copyright (C) 2001 by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
@@ -49,7 +49,7 @@ class csXWindow : public iXWindow, public iEventPlug
   iXExtF86VM *xf86vm;
   /// The Window Title
   char *win_title;
-  /// The X-display 
+  /// The X-display
   Display* dpy;
   /// The Screen Number (not necessarilly the default)
   int screen_num;
@@ -76,7 +76,7 @@ class csXWindow : public iXWindow, public iEventPlug
   //-------------------------------------------------------------
   // Hardware mouse cursor or software emulation?
   bool do_hwmouse;
-  /// Mouse cursors (if hardware mouse cursors are used)  
+  /// Mouse cursors (if hardware mouse cursors are used)
   Cursor MouseCursor [int(csmcWait) + 1];
   /// Empty mouse cursor (consist of EmptyPixmap)
   Cursor EmptyMouseCursor;
@@ -131,7 +131,7 @@ public:
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csXWindow);
-    virtual bool Initialize (iObjectRegistry *o) 
+    virtual bool Initialize (iObjectRegistry *o)
     { return scfParent->Initialize(o); }
   } scfiComponent;
   struct EventHandler : public iEventHandler

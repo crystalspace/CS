@@ -29,12 +29,12 @@
 
 class ctQuatRigidBody;
 
-class ctQuatRigidBodyConnector : public ctPointObj 
+class ctQuatRigidBodyConnector : public ctPointObj
 {
   ctQuatRigidBody *rigid;
   /// Offset from center of mass
   ctVector3 r;
-     
+
  public:
   ctQuatRigidBodyConnector (ctQuatRigidBody *rb, ctVector3 offset);
   ~ctQuatRigidBodyConnector() {}

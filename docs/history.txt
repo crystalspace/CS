@@ -24,6 +24,10 @@ he history order is reversed so that new features are at the top.
 	- Removed the old csBeing references in walktest.
 	- Reformatted crysbal.cpp a bit.
 	- Updated apimod94.txi.
+	- Slight code cleanup: removed all trailing spaces and tabs from
+	  all lines in all source and make files throughout the entire project.
+	  Note that this will most likely not result in a significant
+	  FPS increase :-)
 17-Jan-2002
 	- Jorge Acereda made the following changes:
 	    - Added a comment to iGraphics2D::Write() to document the

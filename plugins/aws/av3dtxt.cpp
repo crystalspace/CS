@@ -419,7 +419,7 @@ void csTextureManagerNull::PrepareTextures ()
   // We won't Clear the palette as we don't care about unused colors anyway.
   // The locked colors will stay the same.
   memcpy(cmap.alloc, locked, sizeof(locked));
-  
+
   // Create mipmaps for all textures
   int i;
   for (i = 0; i < textures.Length (); i++)

@@ -23,17 +23,17 @@
 
 struct iImage;
 
-/** 
+/**
  * Bumpmap formats. The different hardware and software renderers may
  * require the bumpmap to be in a different format. They should all be
  * convertible from the height-map data.
  */
 
-/// The height of each bump is stored in 8 bits. 255 = high, 0 = low. 
+/// The height of each bump is stored in 8 bits. 255 = high, 0 = low.
 #define CS_BUMPFMT_HEIGHT_8     0x01
 
 /** (For software renderer) The slope in x and y are stored in
- *  the first 4 and last 4 bits of each byte. 
+ *  the first 4 and last 4 bits of each byte.
  */
 #define CS_BUMPFMT_SLOPE_44     0x02
 
@@ -42,7 +42,7 @@ struct iImage;
  * A class representing a bumpmap. It can be constructed from regular
  * images.
  */
-class csBumpMap 
+class csBumpMap
 {
 protected:
   /// Width of bumpmap.
@@ -58,7 +58,7 @@ public:
 
   /**
    * create a new bumpmap in the specified format from the image
-   * provided. 
+   * provided.
    */
   csBumpMap(iImage* src, int fmt);
 

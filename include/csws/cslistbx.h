@@ -212,32 +212,32 @@ public:
   /// Set content offset
   void SetOffset (int ihOffset)
   { hOffset = ihOffset; Invalidate (); }
-  
+
   /// Get the name of the skip slice for this component
   virtual char *GetSkinName ()
   { return "ListboxItem"; }
-  
+
   /**
    * Accessor functions for public variables.
    */
-   
+
    /// Get list box item style
-   csListBoxItemStyle GetItemStyle() 
+   csListBoxItemStyle GetItemStyle()
    { return ItemStyle; }
-   
+
   /// Get horizontal item offset in pixels
-  int GetDeltaX() 
+  int GetDeltaX()
   { return deltax; }
-  
+
   /// Get listbox item image
-  csPixmap *GetItemBitmap() 
+  csPixmap *GetItemBitmap()
   { return ItemBitmap; }
-    
+
   /// Get horizontal contents offset
   int GetHOffset()
   { return hOffset; }
-  
-  char *GetText() 
+
+  char *GetText()
   { return text; }
  };
 
@@ -308,7 +308,7 @@ class csListBox : public csComponent
   bool fDelFrameBitmap;
   /// Alpha for the listbox frame
   uint8 FrameAlpha;
-  
+
 public:
   /// Create input line object
   csListBox (csComponent *iParent, int iStyle = CSLBS_DEFAULTVALUE,
@@ -319,7 +319,7 @@ public:
 
   /// Handle external events and generate timeouts
   virtual bool HandleEvent (iEvent &Event);
- 
+
   /// Find a place for each menu item
   void PlaceItems (bool setscrollbars = true);
 
@@ -350,63 +350,63 @@ public:
 
  /// Set the frame bitmap (only useful when FrameStyle is cslfsBitmap)
  void SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap=false);
- 
+
  /// Set the background texture (only useful when FrameStyle is cslfsTextured)
  void SetTexture(csPixmap *iTexture, bool iDelFrameBitmap=false);
- 
+
  /// Set the frame's alpha
  void SetAlpha(uint8 iAlpha);
- 
+
  /// Get the name of the skip slice for this component
  virtual char *GetSkinName ()
  { return "Listbox"; }
-    
+
  /**
   * Accessors for private member variables
   *
   */
-  
+
   /// Get List box style
-  int GetListBoxStyle() 
+  int GetListBoxStyle()
   { return ListBoxStyle; }
-  
+
   /// Get  List box frame style
-  csListBoxFrameStyle GetFrameStyle() 
+  csListBoxFrameStyle GetFrameStyle()
   { return FrameStyle; }
-  
+
   /// Get List box frame width and height
   void GetBorderSize(int *iBorderWidth,  int *iBorderHeight);
-  
+
   ///  Get number of items that fits vertically
-  int VerticalCount() 
+  int VerticalCount()
   { return vertcount; }
-  
+
   /// Get the horizontal scroll bar
   csScrollBar *GetHScroll()
   { return hscroll; }
-  
+
   /// Get the vertical scroll bar
-  csScrollBar *GetVScroll() 
+  csScrollBar *GetVScroll()
   { return vscroll; }
-  
+
   /// Get horizontal scrolling position
   int GetDeltaX()
   { return deltax; }
-  
+
   /// Get horizontal scrolling maximum
   int GetMaxDeltaX()
   { return maxdeltax; }
-  
+
   /// Get  place items before redraw flag
-  bool GetPlaceItemsFlag() 
+  bool GetPlaceItemsFlag()
   { return fPlaceItems; }
-  
+
  /// Get frame bitmap or texture bitmap (same item, meaning just depends on FrameStyle)
  csPixmap *GetFrameBitmap()
  { return FrameBitmap; }
- 
+
  /// Get the alpha for the listbox
- uint8 GetAlpha() 
+ uint8 GetAlpha()
  { return FrameAlpha; }
 
 protected:

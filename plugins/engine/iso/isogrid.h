@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -40,7 +40,7 @@ private:
   int width, height;
   /// the cells in this grid, NULL means an empty cell
   iIsoCell **grid;
-  /** 
+  /**
    * minimum gridx and gridy coordinates
    * mingridx==minworldz, mingridy==minworldx
    */
@@ -89,13 +89,13 @@ public:
     grid[y*width+x] = val;
   }
 
-  /** 
+  /**
    *  Get the Cell for a given position in world space
    *  Assumes that grid.Contains(position).
    */
   inline iIsoCell *GetCell(const csVector3& pos) const
   { return GetCell(QInt(pos.z)-mingridx, QInt(pos.x)-mingridy); }
-  /** 
+  /**
    *  Set the Cell for a given position in world space
    *  Assumes that grid.Contains(position).
    */
@@ -116,11 +116,11 @@ public:
     const csVector3& newpos);
   virtual void Draw(iIsoRenderView *rview);
   virtual iIsoWorld* GetWorld() const {return world;}
-  virtual void SetSpace(int minx, int minz, float miny, 
+  virtual void SetSpace(int minx, int minz, float miny,
     float maxy);
   virtual int GetWidth() const {return width;}
   virtual int GetHeight() const {return height;}
-  virtual void GetGridOffset(int& minx, int& miny) const 
+  virtual void GetGridOffset(int& minx, int& miny) const
   {minx = mingridx; miny = mingridy;}
   virtual void SetGroundMult(int multx, int multy);
   virtual void SetGroundValue(int x, int y, int gr_x, int gr_y, float val);

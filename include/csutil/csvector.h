@@ -40,7 +40,7 @@ public:
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csBasicVector (int ilimit = 0, int ithreshold = 0);
-  
+
   /// Destroy the container but none of the objects to which it points.
   virtual ~csBasicVector();
 
@@ -102,7 +102,7 @@ public:
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
-  csVector (int ilimit = 8, int ithreshold = 16) 
+  csVector (int ilimit = 8, int ithreshold = 16)
     : csBasicVector(ilimit, ithreshold) {}
 
   /// Destroy the vector object.

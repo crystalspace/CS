@@ -1,17 +1,17 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
     Written by Michael Dale Long
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -81,7 +81,7 @@ struct iConsoleOutput : public iBase
   /**
    * Var_args version of PutText.
    */
-  virtual void PutTextV (const char *iText, va_list args) 
+  virtual void PutTextV (const char *iText, va_list args)
       CS_GNUC_PRINTF (2, 0) = 0;
 
   /// Return a line from the buffer (-1 = current line)
@@ -158,7 +158,7 @@ struct iConsoleOutput : public iBase
   virtual int GetMaxLineWidth () = 0;
 
   /**
-   * Tell console that this object should be notified when console 
+   * Tell console that this object should be notified when console
    * visibility status changes.
    */
   virtual void RegisterWatcher (iConsoleWatcher*) = 0;

@@ -30,7 +30,7 @@
 
 class ctQuatRigidBodyConnector;
 
-class ctQuatRigidBody : public ctEntity 
+class ctQuatRigidBody : public ctEntity
 {
  public:
   /// Constructor, Destructor
@@ -38,53 +38,53 @@ class ctQuatRigidBody : public ctEntity
   ~ctQuatRigidBody () {}
 
   /// Getters & Setters (including derived)
-  real get_mass ()       
+  real get_mass ()
   { return mass; }
 
-  void set_mass (real m) 
+  void set_mass (real m)
   { mass = m;  precalculated = false; }
 
-  ctVector3 get_center ()            
+  ctVector3 get_center ()
   { return pos; }
 
-  void set_center (ctVector3 x) 
+  void set_center (ctVector3 x)
   { pos = x; }
 
   ctVector3 get_linear_velocity ()
   { return mom / mass; }
 
-  void set_linear_velocity (ctVector3 vel)    
+  void set_linear_velocity (ctVector3 vel)
   { mom = vel * mass; }
 
   ctVector3 get_linear_momentum (void)
   { return mom; }
 
-  void set_linear_momentum (ctVector3 newmom) 
+  void set_linear_momentum (ctVector3 newmom)
   { mom = newmom; }
 
-  ctQuaternion get_orientation () 
+  ctQuaternion get_orientation ()
   { return quat; }
 
-  void set_orientation (ctQuaternion ori) 
+  void set_orientation (ctQuaternion ori)
   {
     quat = ori;
     quat.Normalize();
     precalculated = false;
   }
 
-  ctVector3 get_rotation() 
+  ctVector3 get_rotation()
   {
     real angle = 2.0 * acos(quat.r);
     real fact = angle / sin(angle);
     return ctVector3(quat.x * fact, quat.y * fact, quat.z*fact);
   }
 
-  void set_rotation (ctVector3 rot) 
+  void set_rotation (ctVector3 rot)
   {
     real len = rot.Norm ();
-    if (len <= 3*MIN_REAL) 
+    if (len <= 3*MIN_REAL)
       set_orientation(ctQuaternion(1.0, 0.0, 0.0, 0.0));
-    else 
+    else
     {
       rot /= len;
       real sine = sin(len);
@@ -93,44 +93,44 @@ class ctQuatRigidBody : public ctEntity
     }
   }
 
-  ctMatrix3 get_R () 
+  ctMatrix3 get_R ()
   {
     Precalculate();
     return R;
   }
 
-  void set_R (ctMatrix3& new_R) 
+  void set_R (ctMatrix3& new_R)
   {
     quat.from_matrix(new_R);
     precalculated = false;
   }
 
-  ctMatrix3 get_Ibody (void) 
+  ctMatrix3 get_Ibody (void)
   { return Ibody; }
 
-  void set_Ibody (const ctMatrix3& Ib) 
+  void set_Ibody (const ctMatrix3& Ib)
   {
     Ibody = Ib;
     Ibodyinv = Ibody.inverse();
     precalculated = false;
   }
 
-  ctMatrix3 get_Ibodyinv (void) 
+  ctMatrix3 get_Ibodyinv (void)
   { return Ibodyinv; }
 
-  ctMatrix3 get_Iinv (void) 
+  ctMatrix3 get_Iinv (void)
   {
     Precalculate();
     return Iinv;
   }
 
-  ctVector3  get_angular_velocity () 
+  ctVector3  get_angular_velocity ()
   {
     Precalculate();
     return omega;
   }
 
-  void set_angular_velocity (ctVector3 new_omega) 
+  void set_angular_velocity (ctVector3 new_omega)
   {
     // Omega = Iinv * ang_mom
     // Iinv * ang_mom = new_omega
@@ -143,39 +143,39 @@ class ctQuatRigidBody : public ctEntity
   }
 
   // Workhorse functions
-  void init_state () 
+  void init_state ()
   {
     F[0] = F[1] = F[2] = 0.0;
     T[0] = T[1] = T[2] = 0.0;
   }
 
-  int get_state_size () 
+  int get_state_size ()
   { return QUATRIGID_STATE_SIZE; }
 
   int get_state (const real *sa);
   int set_state (real *sa);
   int set_delta_state (real *sa);
 
-  void apply_F (ctVector3 newF) 
+  void apply_F (ctVector3 newF)
   { F += newF; }
 
-  void apply_T (ctVector3 newT) 
+  void apply_T (ctVector3 newT)
   { T += newT; }
 
   // Connector method
   ctQuatRigidBodyConnector *new_connector (ctVector3 offs);
 
   // Shorthand methods, just call other methods
-  inline ctVector3 get_velocity () 
+  inline ctVector3 get_velocity ()
   { return get_linear_velocity(); }
 
-  inline void set_velocity (ctVector3 vel) 
+  inline void set_velocity (ctVector3 vel)
   { set_linear_velocity(vel); }
 
-  inline ctVector3 get_omega () 
+  inline ctVector3 get_omega ()
   { return get_angular_velocity(); }
 
-  inline void set_omega (ctVector3 new_omega) 
+  inline void set_omega (ctVector3 new_omega)
   { set_angular_velocity(new_omega); }
 
  protected:

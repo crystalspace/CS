@@ -32,7 +32,7 @@ public:
   SCF_DECLARE_IBASE;
   csSoundListenerDS3D(iBase *piBase);
   virtual ~csSoundListenerDS3D();
-	
+
   virtual void SetDirection (const csVector3 &Front, const csVector3 &Top);
   virtual void SetPosition (const csVector3 &pos);
   virtual void SetVelocity (const csVector3 &v);

@@ -83,7 +83,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   if (!RunText (cmd)) return false;
 #if 0 // Enable this to send python script prints to the crystal space console.
   if (!LoadModule ("cshelper")) return false;
-#endif   
+#endif
   if (!LoadModule ("pdb")) return false;
   if (!LoadModule ("cspacec")) return false;
   if (!LoadModule ("cspace")) return false;
@@ -110,7 +110,7 @@ bool csPython::RunText(const char* Text)
 {
   csString str(Text);
   bool worked=!PyRun_SimpleString(str.GetData());
-  if(!worked) 
+  if(!worked)
     PyRun_SimpleString("pdb.pm()");
   ShowError();
   return worked;

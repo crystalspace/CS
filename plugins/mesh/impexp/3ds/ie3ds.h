@@ -1,7 +1,7 @@
 /*
     Written by Richard D Shank
     Copyright (C) 2001 by Jorrit Tyberghein
-    
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -56,7 +56,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE( csModelConverter3ds );
     virtual bool Initialize (iObjectRegistry *object_reg)
-    { 
+    {
       return scfParent->Initialize (object_reg);
     }
   } scfiComponent;

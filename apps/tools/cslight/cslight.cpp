@@ -89,7 +89,7 @@ void csGfxProgressMeter::Step()
     System->g3d->DrawPixmap (System->logo, (fw - w)/2, 20, w, h,
 	0, 0, lw, lh);
     if (System->font)
-      System->g2d->Write (System->font, 20, fh*3/4-40, System->color_text, 
+      System->g2d->Write (System->font, 20, fh*3/4-40, System->color_text,
         System->color_bg, cur_description);
     System->g2d->DrawBox (10, fh*3/4-10, where, 20, System->color_done);
     System->g2d->DrawBox (10+where, fh*3/4-10, fw-where-20, 20, System->color_todo);

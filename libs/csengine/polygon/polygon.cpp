@@ -957,7 +957,7 @@ void csPolygon3D::SetTextureSpace (
 	pv, (pv-po).Norm ());
 }
 
-void csPolygon3D::SetTextureSpace (const csVector3& v_orig, 
+void csPolygon3D::SetTextureSpace (const csVector3& v_orig,
   const csVector3& v1, float len1)
 {
   float xo = v_orig.x;
@@ -1013,7 +1013,7 @@ void csPolygon3D::SetTextureSpace (
 	float x2, float y2, float z2,
 	float len2)
 {
-  SetTextureSpace (csVector3 (xo, yo, zo), 
+  SetTextureSpace (csVector3 (xo, yo, zo),
 		   csVector3 (x1, y1, z1), len1,
 		   csVector3 (x2, y2, z2), len2);
 }

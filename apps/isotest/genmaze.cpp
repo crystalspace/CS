@@ -115,7 +115,7 @@ void csGenMaze::GenOrder(int order[4], int direction)
     int found = 0;
     for(k=0; k<4; k++)
     {
-      if(!done[k]) 
+      if(!done[k])
       {
         numskipped++;
         if(numskipped == skip+1){ found = k; break; }

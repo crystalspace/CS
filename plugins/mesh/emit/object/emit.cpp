@@ -604,9 +604,9 @@ bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
     cpa[i].z = (tr_o2c * part_pos[i]).z;
     cpa[i].part = GetParticle(i);
   }
-  qsort(cpa.GetArray(), number, sizeof( struct csEmitCompPart ), 
+  qsort(cpa.GetArray(), number, sizeof( struct csEmitCompPart ),
     compareparticle);
-  
+
   for (i = 0 ; i < number ; i++)
     cpa[i].part->Draw (rview, trans, mode);
 

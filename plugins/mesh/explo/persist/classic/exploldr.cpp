@@ -6,12 +6,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -109,10 +109,10 @@ SCF_IMPLEMENT_FACTORY (csExplosionLoader)
 SCF_IMPLEMENT_FACTORY (csExplosionSaver)
 
 SCF_EXPORT_CLASS_TABLE (exploldr)
-  SCF_EXPORT_CLASS (csExplosionFactoryLoader, 
+  SCF_EXPORT_CLASS (csExplosionFactoryLoader,
     "crystalspace.mesh.loader.factory.explosion",
     "Crystal Space Explosion Factory Loader")
-  SCF_EXPORT_CLASS (csExplosionFactorySaver, 
+  SCF_EXPORT_CLASS (csExplosionFactorySaver,
     "crystalspace.mesh.saver.factory.explosion",
     "Crystal Space Explosion Factory Saver")
   SCF_EXPORT_CLASS (csExplosionLoader, "crystalspace.mesh.loader.explosion",

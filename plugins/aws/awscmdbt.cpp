@@ -19,7 +19,7 @@ const int awsCmdButton::fsBitmap =0x2;
 
 const int awsCmdButton::signalClicked=0x1;
 
-awsCmdButton::awsCmdButton():is_down(false), mouse_is_over(false), 
+awsCmdButton::awsCmdButton():is_down(false), mouse_is_over(false),
                              is_switch(false), was_down(false),
                              frame_style(0), alpha_level(92),
                              caption(NULL)
@@ -32,7 +32,7 @@ awsCmdButton::~awsCmdButton()
 }
 
 char *
-awsCmdButton::Type() 
+awsCmdButton::Type()
 { return "Command Button"; }
 
 bool
@@ -43,7 +43,7 @@ awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
  if (!awsComponent::Setup(_wmgr, settings)) return false;
 
  iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
- 
+
  pm->LookupIntKey("OverlayTextureAlpha", alpha_level); // global get
  pm->GetInt(settings, "Style", frame_style);
  pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
@@ -58,10 +58,10 @@ awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
  case fsToolbar:
    {
      iString   *tn=NULL;
-    
+
      tex[0]=pm->GetTexture("Texture");
      pm->GetString(settings, "Image", tn);
-     
+
      if (tn) tex[1]=pm->GetTexture(tn->GetData(), tn->GetData());
    } break;
 
@@ -82,7 +82,7 @@ awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
  return true;
 }
 
-bool 
+bool
 awsCmdButton::GetProperty(char *name, void **parm)
 {
   if (awsComponent::GetProperty(name, parm)) return true;
@@ -109,7 +109,7 @@ awsCmdButton::GetProperty(char *name, void **parm)
   return false;
 }
 
-bool 
+bool
 awsCmdButton::SetProperty(char *name, void *parm)
 {
   if (awsComponent::SetProperty(name, parm)) return true;
@@ -117,7 +117,7 @@ awsCmdButton::SetProperty(char *name, void *parm)
   if (strcmp("Caption", name)==0)
   {
     iString *s = (iString *)(parm);
-    
+
     if (s)
     {
       if (caption) caption->DecRef();
@@ -125,13 +125,13 @@ awsCmdButton::SetProperty(char *name, void *parm)
       caption->IncRef();
       Invalidate();
     }
-    
+
     return true;
   }
   else if (strcmp("Image", name)==0)
   {
     iTextureHandle *img = (iTextureHandle *)(parm);
-    
+
     if (img)
     {
       if (tex[1]) tex[1]->DecRef();
@@ -139,21 +139,21 @@ awsCmdButton::SetProperty(char *name, void *parm)
       img->IncRef();
       Invalidate();
     }
-    
+
     return true;
   }
 
-  
+
   return false;
 }
 
-void 
+void
 awsCmdButton::ClearGroup()
 {
  csEvent Event;
 
  Event.Type = csevGroupOff;
- 
+
  int i;
  for(i=0; i<Parent()->GetChildCount(); ++i)
  {
@@ -164,7 +164,7 @@ awsCmdButton::ClearGroup()
  }
 }
 
-bool 
+bool
 awsCmdButton::HandleEvent(iEvent& Event)
 {
   if (awsComponent::HandleEvent(Event)) return true;
@@ -186,7 +186,7 @@ awsCmdButton::HandleEvent(iEvent& Event)
 
 
 
-void 
+void
 awsCmdButton::OnDraw(csRect clip)
 {
 
@@ -200,7 +200,7 @@ awsCmdButton::OnDraw(csRect clip)
   int  fill = WindowManager()->GetPrefMgr()->GetColor(AC_FILL);
   int dfill = WindowManager()->GetPrefMgr()->GetColor(AC_DARKFILL);
   int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
-    
+
   switch(frame_style)
   {
   case fsNormal:
@@ -221,7 +221,7 @@ awsCmdButton::OnDraw(csRect clip)
       g2d->DrawLine(Frame().xmax-1, Frame().ymin+2, Frame().xmax-1, Frame().ymax-1, hi2);
 
       g2d->DrawBox(Frame().xmin+3, Frame().ymin+3, Frame().Width()-3, Frame().Height()-3, dfill);
-      
+
     }
     else
     {
@@ -241,10 +241,10 @@ awsCmdButton::OnDraw(csRect clip)
     }
 
     if (tex[0])
-      g3d->DrawPixmap(tex[0], Frame().xmin, Frame().ymin, 
-                       Frame().Width()+1, Frame().Height()+1, 
-                       Frame().xmin-Window()->Frame().xmin, 
-                       Frame().ymin-Window()->Frame().ymin, 
+      g3d->DrawPixmap(tex[0], Frame().xmin, Frame().ymin,
+                       Frame().Width()+1, Frame().Height()+1,
+                       Frame().xmin-Window()->Frame().xmin,
+                       Frame().ymin-Window()->Frame().ymin,
                        Frame().Width()+1, Frame().Height()+1, alpha_level);
 
     if (tex[1])
@@ -253,17 +253,17 @@ awsCmdButton::OnDraw(csRect clip)
 
       tex[1]->GetOriginalDimensions(img_w, img_h);
 
-      g3d->DrawPixmap(tex[1], 
-                      Frame().xmin+is_down, Frame().ymin+is_down, 
+      g3d->DrawPixmap(tex[1],
+                      Frame().xmin+is_down, Frame().ymin+is_down,
                       Frame().Width(), Frame().Height(),
                       0, 0, img_w, img_h, 0);
     }
 
     // Draw the caption, if there is one and the style permits it.
     if (caption && frame_style==fsNormal)
-    {     
+    {
       int tw, th, tx, ty;
-      
+
       // Get the size of the text
       WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(caption->GetData(), tw, th);
 
@@ -281,9 +281,9 @@ awsCmdButton::OnDraw(csRect clip)
 
         if (mouse_is_over)
         {
-          int x, y, 
-              y1=Frame().ymin+ty+th+2+is_down, 
-              y2=Frame().ymin+ty-2+is_down, 
+          int x, y,
+              y1=Frame().ymin+ty+th+2+is_down,
+              y2=Frame().ymin+ty-2+is_down,
               x1=Frame().xmin+is_down+4,
               x2=Frame().xmax+is_down-4;
 
@@ -318,22 +318,22 @@ awsCmdButton::OnDraw(csRect clip)
     }
     break;
   }
- 
+
 }
 
-bool 
+bool
 awsCmdButton::OnMouseDown(int , int , int )
 {
   was_down=is_down;
 
   if (!is_switch || is_down==false)
     is_down=true;
-  
+
   Invalidate();
   return true;
 }
-    
-bool 
+
+bool
 awsCmdButton::OnMouseUp(int ,int ,int )
 {
   if (!is_switch)
@@ -356,7 +356,7 @@ awsCmdButton::OnMouseUp(int ,int ,int )
   Invalidate();
   return true;
 }
-    
+
 bool
 awsCmdButton::OnMouseMove(int ,int ,int )
 {
@@ -375,7 +375,7 @@ awsCmdButton::OnMouseDoubleClick(int ,int ,int )
   return false;
 }
 
-bool 
+bool
 awsCmdButton::OnMouseExit()
 {
   mouse_is_over=false;
@@ -383,7 +383,7 @@ awsCmdButton::OnMouseExit()
 
   if (is_down && !is_switch)
     is_down=false;
-  
+
   return true;
 }
 
@@ -400,14 +400,14 @@ awsCmdButton::OnKeypress(int ,int )
 {
   return false;
 }
-    
+
 bool
 awsCmdButton::OnLostFocus()
 {
   return false;
 }
 
-bool 
+bool
 awsCmdButton::OnGainFocus()
 {
   return false;
@@ -436,6 +436,6 @@ awsCmdButtonFactory::~awsCmdButtonFactory()
 iAwsComponent *
 awsCmdButtonFactory::Create()
 {
- return new awsCmdButton; 
+ return new awsCmdButton;
 }
 

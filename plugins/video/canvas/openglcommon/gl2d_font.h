@@ -107,7 +107,7 @@ protected:
     GLGlyphSet *Get (int iIndex)
     { return (GLGlyphSet *)csVector::Get (iIndex); }
   } FontCache;
-  
+
   /// the current clipping rect
   int ClipX1, ClipY1, ClipX2, ClipY2;
   /// Pointer to our callback routine.
@@ -116,7 +116,7 @@ protected:
 #ifndef OPENGL_BITMAP_FONT
   // Auxiliary routine for "font-on-a-texture" approach
   bool ClipRect (float x, float y,
-    float &x1, float &y1, float &x2, float &y2, 
+    float &x1, float &y1, float &x2, float &y2,
     float &tx1, float &ty1, float &tx2, float &ty2);
 #endif
 public:
@@ -138,7 +138,7 @@ public:
    * format, e.g. switched bottom-up.
    */
   void SetClipRect (int x1, int y1, int x2, int y2)
-  { ClipX1 = x1; ClipY1 = y1; ClipX2 = x2; ClipY2 = y2; }   
+  { ClipX1 = x1; ClipY1 = y1; ClipX2 = x2; ClipY2 = y2; }
 
   /**
    * Cache a font. If the font is already cached, just returns the

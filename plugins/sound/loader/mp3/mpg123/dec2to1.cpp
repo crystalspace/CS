@@ -109,7 +109,7 @@ int synth_2to1_mono2stereo(real *bandPtr,unsigned char *samples,int *pnt)
     ((short *)samples)[1] = ((short *)samples)[0];
     samples+=4;
   }
-  
+
   return ret;
 }
 
@@ -121,7 +121,7 @@ int synth_2to1(real *bandPtr,int channel,unsigned char *out,int *pnt)
   short *samples = (short *) (out + *pnt);
 
   real *b0,(*buf)[0x110];
-  int clip = 0; 
+  int clip = 0;
   int bo1;
 
   if(!channel) {

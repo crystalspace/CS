@@ -37,12 +37,12 @@
 #define LISTBOX_HORIZONTAL_PAGESTEP     8
 
 csListBoxItem::csListBoxItem (csComponent *iParent, const char *iText, int iID,
-  csListBoxItemStyle iStyle) : csComponent (iParent), 
+  csListBoxItemStyle iStyle) : csComponent (iParent),
     ItemStyle(iStyle), deltax(0),  ItemBitmap(NULL),  DeleteBitmap(false),
     hOffset(0)
 {
   state |= CSS_SELECTABLE | CSS_TRANSPARENT;
-  id = iID; 
+  id = iID;
   SetText (iText);
   SetPalette (CSPAL_LISTBOXITEM);
   ApplySkin (GetSkin ());
@@ -147,7 +147,7 @@ void csListBoxItem::SetState (int mask, bool enable)
   csComponent::SetState (mask, enable);
   if ((oldstate ^ state) & CSS_LISTBOXITEM_SELECTED)
   {
-    if (parent->GetState(CSS_TRANSPARENT)) 
+    if (parent->GetState(CSS_TRANSPARENT))
     {
       parent->parent->Invalidate();
       parent->Invalidate(true);
@@ -158,7 +158,7 @@ void csListBoxItem::SetState (int mask, bool enable)
   } /* endif */
   if ((oldstate ^ state) & CSS_FOCUSED)
   {
-    if (parent->GetState(CSS_TRANSPARENT)) 
+    if (parent->GetState(CSS_TRANSPARENT))
     {
       parent->parent->Invalidate();
       parent->Invalidate(true);
@@ -175,8 +175,8 @@ void csListBoxItem::SetBitmap (csPixmap *iBitmap, bool iDelete)
     delete ItemBitmap;
   ItemBitmap = iBitmap;
   DeleteBitmap = iDelete;
-  
-  if (parent->GetState(CSS_TRANSPARENT)) 
+
+  if (parent->GetState(CSS_TRANSPARENT))
   {
     parent->parent->Invalidate();
     parent->Invalidate(true);
@@ -191,12 +191,12 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
     ListBoxStyle(iStyle),  FrameStyle(iFrameStyle),
     deltax(0), fPlaceItems(false),
     FrameBitmap(NULL), fDelFrameBitmap(false), FrameAlpha(0)
-    
+
 {
   state |= CSS_SELECTABLE;
   SetPalette (CSPAL_LISTBOX);
   csScrollBarFrameStyle sbsty;
-  
+
   switch (FrameStyle)
   {
     case cslfsNone:
@@ -216,7 +216,7 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
        sbsty=cssfsThinRect;
        state|=CSS_TRANSPARENT;
        break;
-     case cslfsTexturedNoFrame: 
+     case cslfsTexturedNoFrame:
      case cslfsBitmap:
        BorderWidth=BorderHeight=0;
        sbsty=cssfsThinRect;
@@ -234,12 +234,12 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
     vscroll = new csScrollBar (this, sbsty);
   else
     vscroll = NULL;
-    
-    
+
+
    ApplySkin (GetSkin ());
 }
 
-csListBox::~csListBox() 
+csListBox::~csListBox()
 {
    if (fDelFrameBitmap && FrameBitmap)
      delete FrameBitmap;
@@ -769,11 +769,11 @@ bool csListBox::SetFocused (csComponent *comp)
 void csListBox::Insert (csComponent *comp)
 {
   fPlaceItems = true;
-  if (GetState(CSS_TRANSPARENT)) 
+  if (GetState(CSS_TRANSPARENT))
   {
     parent->Invalidate();
     //if (hscroll) hscroll->Invalidate();
-    //if (vscroll) vscroll->Invalidate();  
+    //if (vscroll) vscroll->Invalidate();
   }
   Invalidate (true, this);
   csComponent::Insert (comp);
@@ -782,11 +782,11 @@ void csListBox::Insert (csComponent *comp)
 void csListBox::Delete (csComponent *comp)
 {
   fPlaceItems = true;
-  if (GetState(CSS_TRANSPARENT)) 
+  if (GetState(CSS_TRANSPARENT))
   {
     parent->Invalidate();
     //if (hscroll) hscroll->Invalidate();
-    //if (vscroll) vscroll->Invalidate();  
+    //if (vscroll) vscroll->Invalidate();
   }
 
   Invalidate (true, this);
@@ -796,13 +796,13 @@ void csListBox::Delete (csComponent *comp)
 void csListBox::SuggestSize (int &w, int &h)
 {
 #define SKIN ((csListBoxSkin *)skinslice)
- 
+
   SKIN->SuggestSize (*this, w, h);
-  
+
 #undef SKIN
 }
 
-void csListBox::GetBorderSize(int *iBorderWidth,  int *iBorderHeight) 
+void csListBox::GetBorderSize(int *iBorderWidth,  int *iBorderHeight)
 {
    if (iBorderWidth)  *iBorderWidth =BorderWidth;
    if (iBorderHeight) *iBorderHeight=BorderHeight;
@@ -814,7 +814,7 @@ void csListBox::SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap)
   {
     FrameBitmap=iFrameBitmap;
     fDelFrameBitmap=iDelFrameBitmap;
-  } 
+  }
 }
 
 void csListBox::SetTexture(csPixmap *iTexture, bool iDelFrameBitmap)

@@ -576,7 +576,7 @@ b:      if (scanL2 == MinIndex) goto finish;
       {
         goto finish;
       }
-    
+
       // Compute the rounded screen coordinates of horizontal strip
       float _l = sxL, _r = sxR;
 
@@ -750,15 +750,15 @@ void csPolyTexture::SetPolygon (csPolygon3D* p)
   polygon = p;
 }
 
-bool csPolyTexture::DynamicLightsDirty () 
-{ 
-  return (lm && lm->dyn_dirty); 
+bool csPolyTexture::DynamicLightsDirty ()
+{
+  return (lm && lm->dyn_dirty);
 }
 
-void csPolyTexture::MakeDirtyDynamicLights () 
-{ 
-  if (lm) 
-    lm->dyn_dirty = true; 
+void csPolyTexture::MakeDirtyDynamicLights ()
+{
+  if (lm)
+    lm->dyn_dirty = true;
 }
 
 iLightMap* csPolyTexture::GetLightMap ()

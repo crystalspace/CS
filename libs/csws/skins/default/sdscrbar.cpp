@@ -22,7 +22,7 @@
 #include "csws/sdefault.h"
 
 /**
- * 
+ *
  *  These are defined also in csscrbar.cpp.  If you make modifications, be sure to update BOTH places.
  *
  */
@@ -50,7 +50,7 @@ void csDefaultScrollBarSkin::Draw(csComponent &This)
 {
 
 #define This ((csScrollBar &)This)
-  
+
   int dx, dy;
   switch (This.GetFrameStyle())
   {
@@ -87,7 +87,7 @@ void csDefaultScrollBarSkin::Draw(csComponent &This)
     This.Box (dx, dy, This.bound.Width () - dx, This.GetScroller()->bound.ymin, c1);
     This.Box (dx, This.GetScroller()->bound.ymax, This.bound.Width () - dx, This.bound.Height () - 1, c2);
   } /* endif */
-  
+
 #undef This
 }
 

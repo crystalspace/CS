@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein 
+    Copyright (C) 1998 by Jorrit Tyberghein
     Copyright (C) 2001 by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@ SCF_VERSION (iXExtF86VM, 1, 0, 0);
 struct iXExtF86VM : public iBase
 {
   /// Open Video Mode plugin
-  virtual bool Open (Display *dpy, int screen_num, 
+  virtual bool Open (Display *dpy, int screen_num,
 		     XVisualInfo *xvis, Colormap cmap) = 0;
   /// Finish
   virtual void Close () = 0;

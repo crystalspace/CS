@@ -266,7 +266,7 @@ iMotionTemplate* csMotionLoader::LoadMotion (const char* fname )
   char *name, *data;
   char *buf = **databuff;
   long cmd;
-  
+
 
   if ((cmd=csGetObject (&buf, tokens, &name, &data)) > 0)
   {
@@ -369,7 +369,7 @@ bool csMotionLoader::LoadBone (iMotionTemplate* mot, int bone, char* buf)
   char* params;
 
   while((cmd = csGetObject (&buf, tok_bone, &name, &params))>0) {
-    if (!params) 
+    if (!params)
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Expected parameters instead of '%s'!", buf);
       exit (1);
@@ -538,7 +538,7 @@ void csMotionSaver::WriteDown ( iBase* /* obj */, iStrVector* /* string */)
   {
 	motman->DecRef();
   }
-  else	
+  else
   printf("Motion Saver: Motion manager not loaded... aborting\n");
   plugin_mgr->DecRef ();
 }

@@ -136,7 +136,7 @@ public:
   inline int Push (csSome what)
   {
     if (!PrepareItem (what)) return -1;
-    return csVector::Push(what); 
+    return csVector::Push(what);
   }
   inline int PushSmart (csSome what)
   {
@@ -144,7 +144,7 @@ public:
     if (n != -1) return n;
 
     if (!PrepareItem (what)) return -1;
-    return csVector::Push(what); 
+    return csVector::Push(what);
   }
   inline bool Insert (int n, csSome Item)
   {
@@ -154,7 +154,7 @@ public:
   inline int InsertSorted (csSome Item, int *oEqual = NULL, int Mode = 0)
   {
     if (!PrepareItem (Item)) return -1;
-    return csVector::InsertSorted (Item, oEqual, Mode); 
+    return csVector::InsertSorted (Item, oEqual, Mode);
   }
   inline bool Replace (int n, csSome what)
   {
@@ -176,7 +176,7 @@ public:
  * take parameters of type 'iBase'. This way it overrides the methods of
  * csVector and makes them unaccessible. Using csVector's methods
  * directly is unsafe. <p>
- * 
+ *
  * Also, this means that CS_DECLARE_IBASE_VECTOR only has to cast from and to
  * (void*), which is always possible.  Theoretically, casting from and to iBase
  * is also always possible because the contained objects *must* be derived from
@@ -396,7 +396,7 @@ public:
 
 #define CS_PRIVATE_DECLARE_TYPED_IBASE_VECTOR(NAME,TYPE)		\
   CS_PRIVATE_DECLARE_TYPED_RESTR_ACC_VECTOR (NAME, TYPE, csIBaseVector)
-  
+
 /*
  * This is a special version of typed vectors that contain SCF objects. The
  * vector will correctly IncRef all added objects and DecRef all removed

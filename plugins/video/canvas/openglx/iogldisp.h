@@ -29,7 +29,7 @@ SCF_VERSION (iOpenGLDisp, 0, 0, 1);
  * Place in your implementation everything a special GL displaydriver needs to do.
  * This merely breaks down to initialization and shutdown stuff ( like grShutdown for Glide )
  */
- 
+
 struct iOpenGLDisp : public iComponent
 {
   virtual bool open() = 0;

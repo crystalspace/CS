@@ -19,12 +19,12 @@ csRigidSpaceTimeObj *csRigidSpaceTimeObj::space_time_continuum[ MAX_SPACE_TIME_N
 long csRigidSpaceTimeObj::continuum_end = 0;
 
 // hideously inefficient collision detection/response algorithm
-// just wanted to see some stuff bouncing around for now. 
+// just wanted to see some stuff bouncing around for now.
 
 csSpaceTimeObj::csSpaceTimeObj ()
 {
   //  space_time_continuum[continuum_end++] = this;
-  //what_type = ST_SPACETIME; 
+  //what_type = ST_SPACETIME;
 }
 
 csRigidSpaceTimeObj::~csRigidSpaceTimeObj ()
@@ -32,11 +32,11 @@ csRigidSpaceTimeObj::~csRigidSpaceTimeObj ()
   col->DecRef ();
 }
 
-csRigidSpaceTimeObj::csRigidSpaceTimeObj (iCollideSystem* cdsys, iMeshWrapper *psprt, 
+csRigidSpaceTimeObj::csRigidSpaceTimeObj (iCollideSystem* cdsys, iMeshWrapper *psprt,
 					  ctRigidBody *prb)
 {
   space_time_continuum[continuum_end++] = this;
-  // what_type = ST_SPACETIME; 
+  // what_type = ST_SPACETIME;
   // col = pcollide;
   sprt = psprt;
   rb = prb;
@@ -52,22 +52,22 @@ void set_no_rewind (ctEntity *ppe)
   ppe->set_rewind (false);
 }
 
-void csRigidSpaceTimeObj::evolve_system (real t1, real t2, ctWorld *time_world, 
+void csRigidSpaceTimeObj::evolve_system (real t1, real t2, ctWorld *time_world,
 					 iEngine *space_engine)
 {
   (void) space_engine;
   real ta, tb;
   ta = t1;
   tb = t2;
-  
+
   // don't take any time-steps greater than .1 s
   // otherwise things get kinda unstable.  Could probably even be safe with .05
   while (ta < t2)
   {
     if (tb - ta > 0.1)
       tb = ta + 0.1;
- 
-    time_world->evolve (ta, tb); 
+
+    time_world->evolve (ta, tb);
     ta = tb;
     tb = t2;
   }
@@ -78,7 +78,7 @@ void csRigidSpaceTimeObj::evolve_system (real t1, real t2, ctWorld *time_world,
 void csRigidSpaceTimeObj::update_space ()
 {
   ctVector3 new_p;
-  csMatrix3 m; 
+  csMatrix3 m;
   ctMatrix3 M;
   csRigidSpaceTimeObj *sto;
 
@@ -95,7 +95,7 @@ void csRigidSpaceTimeObj::update_space ()
     m.Set (M[0][0], M[0][1], M[0][2],
 	   M[1][0], M[1][1], M[1][2],
 	   M[2][0], M[2][1], M[2][2]);    // set orientation of mesh
-   
+
     sto->sprt->GetMovable ()->SetTransform (m);
     sto->sprt->GetMovable ()->UpdateMove ();
   }
@@ -169,7 +169,7 @@ real csRigidSpaceTimeObj::collision_check ()
       space_time_continuum[i]->rb->flags &= (~CTF_NOREWIND);
       this_contact = &(contact_heap [contact_heap_index]);
       this_contact->next = NULL;
-      
+
       int acol;
       for (acol = 0; acol < cdsys->GetCollisionPairCount (); acol++)
       {
@@ -191,14 +191,14 @@ real csRigidSpaceTimeObj::collision_check ()
 	// just one collision at a time here.
 	//      this_contact->next = NULL;
 
-	/*   // ignore ojbects that aren't really moving towards collision.  
+	/*   // ignore ojbects that aren't really moving towards collision.
 	// they may "seep" though floor.
 	if (fabs (space_time_continuum[i]->rb->get_v () * this_contact->n)  < MIN_REAL*1000.0)
 	return 0;
 	*/
 
         // check each point of this triangle to see which penetrated the most
-  
+
 	int j;
         for (j = 0; j < 3 ; j++)
 	{
@@ -213,12 +213,12 @@ real csRigidSpaceTimeObj::collision_check ()
           // this is the collision point
           if (current_depth > max_depth)
             max_depth = current_depth;
-          
-         
+
+
           if (current_depth > 0.0)
 	  {
             this_contact->contact_p = trime;
-        
+
             ctCollidingContact *chk = space_time_continuum[i]->contact;
             bool duplicate = false;
             while (chk != NULL && !duplicate)
@@ -227,7 +227,7 @@ real csRigidSpaceTimeObj::collision_check ()
 		  chk->contact_p[1] == this_contact->contact_p[1] &&
 		  chk->contact_p[2] == this_contact->contact_p[2])
                 duplicate = true;
-              
+
               chk = chk->next;
             }
             if (!duplicate)
@@ -242,7 +242,7 @@ real csRigidSpaceTimeObj::collision_check ()
             }
             // add collision point to other object as well, here
           }
-        } 
+        }
       }
     }
   }
@@ -274,7 +274,7 @@ real ctLameCollisionCatastrophe::check_catastrophe ()
 {
   return csRigidSpaceTimeObj::collision_check ();
 }
-  
+
 // take care of the catastrophe so that when integrated forward that
 // catasrophe will not exist.
 void ctLameCollisionCatastrophe::handle_catastrophe ()

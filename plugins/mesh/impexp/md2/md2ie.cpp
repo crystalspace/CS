@@ -91,7 +91,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csModelConverterMD2);
     virtual bool Initialize (iObjectRegistry *object_reg)
-    { 
+    {
       return scfParent->Initialize (object_reg);
     }
   } scfiComponent;
@@ -109,7 +109,7 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_FACTORY (csModelConverterMD2)
 
 SCF_EXPORT_CLASS_TABLE (md2ie)
-  SCF_EXPORT_CLASS (csModelConverterMD2, 
+  SCF_EXPORT_CLASS (csModelConverterMD2,
     "crystalspace.modelconverter.md2",
     "MD2 Model Converter")
 SCF_EXPORT_CLASS_TABLE_END
@@ -147,7 +147,7 @@ const csModelConverterFormat *csModelConverterMD2::GetFormat (int idx) const
 
 /*
   Purpose:
-   
+
     csModelConverterMD2::Load() reads a Quake2 MD2 model file.
 
   Examples:
@@ -157,9 +157,9 @@ const csModelConverterFormat *csModelConverterMD2::GetFormat (int idx) const
     13 July 1999 Gary Haussmann
 
   Author:
- 
+
     John Burkardt
-  
+
   Modified by Martin Geisse to work with the new converter system.
 */
 
@@ -318,13 +318,13 @@ iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 			readbuffer[j*4+2] * scale[2] + translate[2]);
       VertexFrame->AddVertex (Vertex);
     }
-    
+
     VertexFrame->AddColor (csColor (1, 1, 1));
     VertexFrame->AddNormal (csVector3 (1, 0, 0));
     VertexFrame->DecRef ();
   }
 
-  Object->SetDefaultVertices (DefaultFrame);  
+  Object->SetDefaultVertices (DefaultFrame);
   Object->DecRef ();
   return Scene;
 }

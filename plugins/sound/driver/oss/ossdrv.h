@@ -77,10 +77,10 @@ public:
   virtual ~csSoundDriverOSS();
 
   bool Initialize(iObjectRegistry *object_reg);
-  
+
   bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
   void Close();
-  
+
   void LockMemory(void **mem, int *memsize);
   void UnlockMemory();
   bool IsBackground();
@@ -88,7 +88,7 @@ public:
   bool IsStereo();
   int GetFrequency();
   bool IsHandleVoidSound();
-  
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverOSS);
@@ -100,7 +100,7 @@ public:
 private:
   // used to setup timer when background=true (not currently used)
   bool SetupTimer( int nTimesPerSecond );
-  
+
   AudioDevice device;
   struct sigaction oldact;
   struct itimerval otime;

@@ -108,7 +108,7 @@ extern void csMessageBox (csComponent *iParent, const char *iTitle,
 
 /// Create and return a new file open dialog
 extern csWindow *csFileDialog (csComponent *iParent, const char *iTitle,
-  const char *iFileName = "./", const char *iOpenButtonText = "~Load", 
+  const char *iFileName = "./", const char *iOpenButtonText = "~Load",
   bool vfspaths=false);
 /// Query full name, filename and pathname from a file dialog
 extern void csQueryFileDialog (csWindow *iFileDialog, char *iFileName,

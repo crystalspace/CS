@@ -655,7 +655,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
  */
 typedef charf *         png_zcharp;
 typedef charf * FAR *   png_zcharpp;
-typedef z_stream FAR *  png_zstreamp; 
+typedef z_stream FAR *  png_zstreamp;
 
 
 #ifndef PNG_EXPORT
@@ -717,7 +717,7 @@ typedef z_stream FAR *  png_zstreamp;
 /* End of memory model independent support */
 
 /* Just a double check that someone hasn't tried to define something
- * contradictory. 
+ * contradictory.
  */
 #if (PNG_ZBUF_SIZE > 65536) && defined(PNG_MAX_MALLOC_64K)
 #undef PNG_ZBUF_SIZE

@@ -422,7 +422,7 @@ bool csComponent::do_handle_event (csComponent *child, void *param)
       Event->Mouse.y -= dY;
       if (child->bound.ContainsRel (Event->Mouse.x, Event->Mouse.y))
       {
-	// Check to see if the mouse was last over this same component      
+	// Check to see if the mouse was last over this same component
         if (child->app->LastMouseContainer != child)
         {
        	  // No, send a csevMouseExit to the old component, and a csevMouseEnter to the new one.
@@ -454,7 +454,7 @@ bool csComponent::do_handle_event (csComponent *child, void *param)
 	  // Save the current container.
 	  child->app->LastMouseContainer = child;
         }
-      
+
         retc = child->HandleEvent (*Event);
         if (child->GetState (CSS_TRANSPARENT) == 0)
           retc = true;

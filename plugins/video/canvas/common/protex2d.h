@@ -44,8 +44,8 @@ public:
 
   virtual void Print (csRect *area = NULL);
 
-  virtual iGraphics2D *CreateOffScreenCanvas 
-  (int width, int height, void *buffer, bool use8bit, 
+  virtual iGraphics2D *CreateOffScreenCanvas
+  (int width, int height, void *buffer, bool use8bit,
    csPixelFormat *ipfmt, csRGBpixel *palette = NULL, int pal_size = 0);
 };
 

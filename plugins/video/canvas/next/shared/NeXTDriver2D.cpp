@@ -139,7 +139,7 @@ int NeXTDriver2D::get_desired_depth() const
   }
   if (depth != 0 && depth != 15 && depth != 16 && depth != 32)
   {
-    csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, NeXT_REPORTER_ID, 
+    csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, NeXT_REPORTER_ID,
       "WARNING: Ignoring request to simulate %d-bit RGB depth.\n"
       "WARNING: Can only simulate 15-, 16-, or 32-bit RGB depth.", depth);
     depth = 0;
@@ -217,7 +217,7 @@ bool NeXTDriver2D::Open()
   csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, NeXT_REPORTER_ID,
     CS_PLATFORM_NAME " 2D graphics driver for Crystal Space "
     CS_VERSION_NUMBER "\nWritten by Eric Sunshine <sunshine@sunshineco.com>");
-  
+
   int ok = 0;
   if (superclass::Open())
     ok = NeXTDelegate2D_open_window(controller, win_title, Width, Height,

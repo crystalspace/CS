@@ -66,15 +66,15 @@ struct iMetaBallState : public iBase
   /// For statistics only
   virtual int ReportTriangleCount () = 0;
 
-  /// Regular lighting and mixmode settings  
+  /// Regular lighting and mixmode settings
   virtual uint GetMixMode () = 0;
-  
+
   virtual void SetMixMode ( uint mode ) = 0;
-  
+
   virtual bool IsLighting () = 0;
-  
+
   virtual void SetLighting ( bool set ) = 0;
-  
+
   virtual iMaterialWrapper* GetMaterial () = 0;
 };
 

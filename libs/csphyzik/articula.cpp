@@ -33,12 +33,12 @@ void ctArticulatedBody::set_joint_friction ( double pfrict )
   ctJoint::joint_friction = pfrict;
 
 }
-  	
+
 // constructor
-ctArticulatedBody::ctArticulatedBody () 
+ctArticulatedBody::ctArticulatedBody ()
   : r_fg(0)
 {
-  handle = NULL; inboard_joint = NULL; 
+  handle = NULL; inboard_joint = NULL;
   is_grounded = false;
   attached_to = NULL;
   solver = new ctFeatherstoneAlgorithm( *this );
@@ -46,11 +46,11 @@ ctArticulatedBody::ctArticulatedBody ()
 }
 
 // construct with a handle
-ctArticulatedBody::ctArticulatedBody ( ctRigidBody *phandle ) 
+ctArticulatedBody::ctArticulatedBody ( ctRigidBody *phandle )
   : ctPhysicalEntity( *(phandle->get_RF()), *(phandle->get_dRF()) ),
   r_fg(0)
 {
-  handle = phandle; inboard_joint = NULL; 
+  handle = phandle; inboard_joint = NULL;
   is_grounded = false;
   attached_to = NULL;
   solver = new ctFeatherstoneAlgorithm( *this );
@@ -74,7 +74,7 @@ ctArticulatedBody::~ctArticulatedBody ()
   {
     delete out_link;
     out_link = outboard_links.get_next();
-  }	
+  }
 }
 
 //!me I don't really like the way this works....
@@ -86,9 +86,9 @@ ctFeatherstoneAlgorithm *ctArticulatedBody::install_featherstone_solver ()
 
   if ( solver )
     delete solver;
-	
+
   solver = feather_solve = new ctFeatherstoneAlgorithm( *this );
-	
+
   out_link = outboard_links.get_first();
   while ( out_link )
   {
@@ -106,9 +106,9 @@ ctInverseKinematics *ctArticulatedBody::install_IK_solver ()
 
   if ( solver )
     delete solver;
-	
+
   solver = ik_solve = new ctInverseKinematics ( *this );
-	
+
   out_link = outboard_links.get_first();
   while( out_link )
   {
@@ -139,17 +139,17 @@ int ctArticulatedBody::get_state_size ()
 
 
 
-void ctArticulatedBody::apply_impulse 
+void ctArticulatedBody::apply_impulse
   ( ctVector3 impulse_point, ctVector3 impulse_vector )
 {
   ((ctArticulatedSolver *)solver)->apply_impulse ( impulse_point, impulse_vector );
 }
 
-void ctArticulatedBody::get_impulse_m_and_I_inv 
+void ctArticulatedBody::get_impulse_m_and_I_inv
   ( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
 			      const ctVector3 &impulse_vector )
 {
-  ((ctArticulatedSolver *)solver)->get_impulse_m_and_I_inv 
+  ((ctArticulatedSolver *)solver)->get_impulse_m_and_I_inv
                                    ( pm, pI_inv, impulse_point, impulse_vector );
 }
 
@@ -158,8 +158,8 @@ void ctArticulatedBody::init_state ()
 {
   ctArticulatedBody *out_link;
 
-  if (handle) handle->init_state (); 
-	
+  if (handle) handle->init_state ();
+
   out_link = outboard_links.get_first ();
   while ( out_link )
   {
@@ -206,18 +206,18 @@ void ctArticulatedBody::compute_link_velocities ()
     // vector from C.O.M. of F to G in G's ref frame.
     r_fg = pe_g->get_T ()*( pe_g->get_org_world () - pe_f->get_org_world () );
 
-    // calc contribution to v and w from parent link.  
+    // calc contribution to v and w from parent link.
     w_body = T_fg*jnt->inboard->w_body;
     v_body = T_fg*jnt->inboard->v_body + (w_body % r_fg);
-    
+
     // get joint to calculate final result for v and angular v ( w )
     jnt->calc_vw( v_body, w_body );
-	  
+
     //!me this doesn't really need to be done, but better safe than sorry
     pe_g->set_angular_v( pe_g->get_this_to_world()*w_body );
     pe_g->set_v( pe_g->get_this_to_world()*v_body );
   }
-  
+
   // iterate to next links
   out_link = outboard_links.get_first();
   while ( out_link )
@@ -257,7 +257,7 @@ void ctArticulatedBody::apply_forces ( real t )
 
   if ( pe )
   {
-    pe->solve ( t ); 
+    pe->solve ( t );
     out_link = outboard_links.get_first ();
     while ( out_link )
     {
@@ -293,7 +293,7 @@ int ctArticulatedBody::set_state_links ( real *state_array )
     ret = inboard_joint->set_state ( state_array );
     state_array += ret;
   }
-	
+
   out_link = outboard_links.get_first ();
   while ( out_link )
   {
@@ -335,7 +335,7 @@ int ctArticulatedBody::get_state_links ( const real *state_array )
     // calc postion and orientation and store in handles state
     inboard_joint->update_link_RF();
   }
-	
+
   out_link = outboard_links.get_first();
   while ( out_link )
   {
@@ -403,7 +403,7 @@ int ctArticulatedBody::set_delta_state_links ( real *state_array )
 void ctArticulatedBody::update_links ()
 {
   ctArticulatedBody *out_link;
-	
+
   if ( inboard_joint )
     // calc postion and orientation
     inboard_joint->update_link_RF();
@@ -451,12 +451,12 @@ void ctArticulatedBody::calc_relative_frame ()
   r_fg = pe_g->get_T ()*( pe_g->get_org_world () - pe_f->get_org_world () );
 }
 
-// link together two articulated bodies via a hing joint that hinges 
+// link together two articulated bodies via a hing joint that hinges
 // along given axis
-void ctArticulatedBody::link_revolute ( ctArticulatedBody *child, 
+void ctArticulatedBody::link_revolute ( ctArticulatedBody *child,
  ctVector3 &pin_joint_offset, ctVector3 &pout_joint_offset, ctVector3 &pjoint_axis )
 {
-  ctJoint *jnt = new ctRevoluteJoint ( this, pin_joint_offset, child, 
+  ctJoint *jnt = new ctRevoluteJoint ( this, pin_joint_offset, child,
 				       pout_joint_offset, pjoint_axis );
 
   child->inboard_joint = jnt;

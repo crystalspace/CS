@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein 
+    Copyright (C) 1998 by Jorrit Tyberghein
     Copyright (C) 2001 by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
@@ -87,7 +87,7 @@ void csXExtF86VM::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csXExtF86VM::Open (Display *dpy, int screen_num, 
+bool csXExtF86VM::Open (Display *dpy, int screen_num,
 			XVisualInfo *xvis, Colormap cmap)
 {
   if (!ctx_win || !wm_win)
@@ -95,11 +95,11 @@ bool csXExtF86VM::Open (Display *dpy, int screen_num,
     Report (CS_REPORTER_SEVERITY_ERROR, "No Windows Set\n");
     return false;
   }
-    
+
   this->dpy = dpy;
   this->screen_num = screen_num;
-  unsigned long cw_fs_mask  = (CWOverrideRedirect | 
-			       CWBorderPixel | 
+  unsigned long cw_fs_mask  = (CWOverrideRedirect |
+			       CWBorderPixel |
 			       (cmap ? CWColormap : 0));
   XSetWindowAttributes swa;
   memset (&swa, 0, sizeof(swa));
@@ -109,16 +109,16 @@ bool csXExtF86VM::Open (Display *dpy, int screen_num,
   swa.border_pixel = 0;
   swa.event_mask = 0;
 
-  fs_win = XCreateWindow (dpy, 
-			  RootWindow (dpy, screen_num), 
+  fs_win = XCreateWindow (dpy,
+			  RootWindow (dpy, screen_num),
 			  0, 0, 1, 1,
-			  0, 
-			  xvis->depth, 
-			  InputOutput, 
+			  0,
+			  xvis->depth,
+			  InputOutput,
 			  xvis->visual,
-			  cw_fs_mask, 
+			  cw_fs_mask,
 			  &swa);
-  
+
   XStoreName (dpy, fs_win, "Full Screen");
   XSetWindowBackground (dpy, fs_win, BlackPixel (dpy, screen_num));
   XSelectInput (dpy, fs_win, 0);
@@ -144,13 +144,13 @@ void csXExtF86VM::Close ()
 bool csXExtF86VM::SetFullScreen (bool yesno)
 {
   if (!ctx_win)
-  { 
+  {
     // In initialization phase and configuring
     full_screen = yesno;
     return false;
   }
   if (full_screen != yesno)
-  {  
+  {
     if (yesno)
       EnterFullScreen ();
     else
@@ -205,7 +205,7 @@ void csXExtF86VM::FindBestMode (int ctx_width, int ctx_height)
   int i, nModes, best_mode;
   bool valid = false;
   unsigned int diff;
-  unsigned int best_diff = (unsigned int) -1; 
+  unsigned int best_diff = (unsigned int) -1;
   if (XF86VidModeGetModeLine(dpy, screen_num, &i, &mode)
    && XF86VidModeGetAllModeLines (dpy, screen_num, &nModes, &modes))
   {
@@ -231,8 +231,8 @@ void csXExtF86VM::FindBestMode (int ctx_width, int ctx_height)
   }
 }
 
-bool csXExtF86VM::SwitchMode (XF86VidModeModeInfo *to_mode, 
-			      XF86VidModeModeInfo *from_mode, 
+bool csXExtF86VM::SwitchMode (XF86VidModeModeInfo *to_mode,
+			      XF86VidModeModeInfo *from_mode,
 			      bool lock, int vp_x, int vp_y)
 {
   XF86VidModeLockModeSwitch (dpy, screen_num, lock);
@@ -273,7 +273,7 @@ void csXExtF86VM::EnterFullScreen ()
   XF86VidModeGetViewPort (dpy, screen_num, &viewport_x, &viewport_y);
 
   // grab pointer and keyboard in fullscreen mode
-  if ((XGrabPointer (dpy, fs_win, True, 
+  if ((XGrabPointer (dpy, fs_win, True,
 		    0, GrabModeAsync, GrabModeAsync,
 		    fs_win, None, CurrentTime) == GrabSuccess) &&
       (XGrabKeyboard (dpy, wm_win, True, GrabModeAsync,
@@ -283,8 +283,8 @@ void csXExtF86VM::EnterFullScreen ()
     full_screen = true;
 
     XReparentWindow (dpy, ctx_win, fs_win, 0, 0);
-    XWarpPointer (dpy, None, ctx_win, 
-		  0, 0, 0, 0, 
+    XWarpPointer (dpy, None, ctx_win,
+		  0, 0, 0, 0,
 		  fs_mode.hdisplay >> 1,
 		  fs_mode.vdisplay >> 1);
 
@@ -326,8 +326,8 @@ void csXExtF86VM::LeaveFullScreen ()
     XReparentWindow (dpy, ctx_win, wm_win, 0, 0);
     width = wa.width;
     height = wa.height;
-    XWarpPointer (dpy, None, ctx_win, 
-		  0, 0, 0, 0, 
+    XWarpPointer (dpy, None, ctx_win,
+		  0, 0, 0, 0,
 		  wa.width >> 1,
 		  wa.height >> 1);
   }

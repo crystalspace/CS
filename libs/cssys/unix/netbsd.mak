@@ -24,8 +24,8 @@ PLUGINS+=video/format/avi
 # CODECS (some formats are dynamic, that is they need codecs to encod/decode
 # data) OpenDivX : you need an additional library you can get from
 # www.projectmayo.com
-#PLUGINS+=video/format/codecs/opendivx                                                                  
-PLUGINS+=video/format/codecs/rle                                                                  
+#PLUGINS+=video/format/codecs/opendivx
+PLUGINS+=video/format/codecs/rle
 
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -100,7 +100,7 @@ LFLAGS.profile=-pg
 LFLAGS.DLL=-Wl,-shared
 
 # System-dependent flags to pass to NASM
-NASMFLAGS.SYSTEM=-f elf 
+NASMFLAGS.SYSTEM=-f elf
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = \

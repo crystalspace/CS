@@ -2,7 +2,7 @@
     Dynamics/Kinematics modeling and simulation library.
     Copyright (C) 1999 by Michael Alexander Ewert
                   2001 Anders Stenberg
-		  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -27,13 +27,13 @@
 
 ctGravityF::ctGravityF ( real pg, ctVector3 pd )
 {
-  magnitude = pg, direction = pd; 
+  magnitude = pg, direction = pd;
 }
 
-ctGravityF::ctGravityF ( ctReferenceFrame &rf, real pg, ctVector3 pd ) 
+ctGravityF::ctGravityF ( ctReferenceFrame &rf, real pg, ctVector3 pd )
   : ctForce( rf )
 {
-  magnitude = pg, direction = pd; 
+  magnitude = pg, direction = pd;
 }
 
 ctVector3 ctGravityF::apply_F ( ctDynamicEntity &pe )
@@ -60,28 +60,28 @@ ctVector3 ctAirResistanceF::apply_F ( ctDynamicEntity &pe )
 }
 
 ctAppliedF::ctAppliedF ( ctVector3 dir, real pm )
-{ 
-  magnitude = pm; 
-  direction = dir.Unit(); 
+{
+  magnitude = pm;
+  direction = dir.Unit();
 }
 
 ctVector3 ctAppliedF::apply_F ( ctDynamicEntity &pe )
-{ 
-  pe.sum_force ( direction * magnitude ); 
-  return direction*magnitude; 
+{
+  pe.sum_force ( direction * magnitude );
+  return direction*magnitude;
 }
 
 
 ctTorqueF::ctTorqueF( ctVector3 dir, real pm )
-{ 
-  magnitude = pm; 
-  direction = dir.Unit(); 
+{
+  magnitude = pm;
+  direction = dir.Unit();
 }
 
 ctVector3 ctTorqueF::apply_F( ctDynamicEntity &pe )
-{ 
-  pe.sum_torque ( direction*magnitude ); 
-  return direction*magnitude; 
+{
+  pe.sum_torque ( direction*magnitude );
+  return direction*magnitude;
 }
 
 
@@ -92,27 +92,27 @@ ctVector3 ctSpringF::apply_F( ctDynamicEntity &pe )
   ctVector3 a1;
   ctVector3 a2;
 
-  if ( body_vector.get_size() == 2 && 
+  if ( body_vector.get_size() == 2 &&
        attachment_point_vector.get_size() == 2 )
   {
     ctPhysicalEntity *b1 = body_vector.get_first();
     ctPhysicalEntity *b2 = body_vector.get_next();
-    
+
     ctVector3 *orig_a1 = attachment_point_vector.get_first();
     ctVector3 *orig_a2 = attachment_point_vector.get_next();
 
     if ( b1 && orig_a1 && orig_a2 )
     {
       ctReferenceFrame *r1 = b1->get_RF();
-      ctReferenceFrame *r2 = ( b2 == NULL ) ? 
+      ctReferenceFrame *r2 = ( b2 == NULL ) ?
 	&(ctReferenceFrame::universe()) : b2->get_RF();
 
       if ( r1 && r2 )
       {
 	r1->this_to_world( a1, *orig_a1 );
 	r2->this_to_world( a2, *orig_a2 );
-				
-	if ( &pe == b1 ) 
+
+	if ( &pe == b1 )
 	  d = a2 - a1;
 	else if( &pe == b2 )
 	  d = a1 - a2;
@@ -121,20 +121,20 @@ ctVector3 ctSpringF::apply_F( ctDynamicEntity &pe )
 	  log( "ctSpringF: body applied not part of coupling\n" );
 	  return ctVector3(0,0,0);
 	}
-				
+
 	//!me maybe don't need to normalize and find unit vector
 	//!me I think that d.Norm() and later mult d by disp divides out to 1
 	real disp = d.Norm() - rest_length;
 	if ( d*d > MIN_REAL ) // avoid divide by zero
 	  d = d.Unit();
 	else
-	  d = ctVector3(1, 0,0 );  
+	  d = ctVector3(1, 0,0 );
 
 	// f = -kx
 	f = d*disp*magnitude;
-	
+
 	if ( &pe == b1 )
-	{ 
+	{
 	  b1->sum_force(f);
 	  d = a1 - r1->get_world_offset ();
 	  b1->sum_torque ( d % f );
@@ -145,7 +145,7 @@ ctVector3 ctSpringF::apply_F( ctDynamicEntity &pe )
 	  d = a2 - r2->get_world_offset ();
 	  b2->sum_torque ( d % f );
 	}
-	return f;			
+	return f;
       }
     }
   }
@@ -160,27 +160,27 @@ ctVector3 ctCappedSpringF::apply_F( ctDynamicEntity &pe )
   ctVector3 a1;
   ctVector3 a2;
 
-  if ( body_vector.get_size() == 2 && 
+  if ( body_vector.get_size() == 2 &&
        attachment_point_vector.get_size() == 2 )
   {
     ctPhysicalEntity *b1 = body_vector.get_first();
     ctPhysicalEntity *b2 = body_vector.get_next();
-    
+
     ctVector3 *orig_a1 = attachment_point_vector.get_first();
     ctVector3 *orig_a2 = attachment_point_vector.get_next();
 
     if ( b1 && orig_a1 && orig_a2 )
     {
       ctReferenceFrame *r1 = b1->get_RF();
-      ctReferenceFrame *r2 = ( b2 == NULL ) ? 
+      ctReferenceFrame *r2 = ( b2 == NULL ) ?
 	&(ctReferenceFrame::universe()) : b2->get_RF();
 
       if ( r1 && r2 )
       {
 	r1->this_to_world( a1, *orig_a1 );
 	r2->this_to_world( a2, *orig_a2 );
-				
-	if ( &pe == b1 ) 
+
+	if ( &pe == b1 )
 	  d = a2 - a1;
 	else if( &pe == b2 )
 	  d = a1 - a2;
@@ -189,7 +189,7 @@ ctVector3 ctCappedSpringF::apply_F( ctDynamicEntity &pe )
 	  log( "ctSpringF: body applied not part of coupling\n" );
 	  return ctVector3(0,0,0);
 	}
-				
+
 	//!me maybe don't need to normalize and find unit vector
 	//!me I think that d.Norm() and later mult d by disp divides out to 1
 	real dist = d.Norm();
@@ -199,13 +199,13 @@ ctVector3 ctCappedSpringF::apply_F( ctDynamicEntity &pe )
 	if ( d*d > MIN_REAL ) // avoid divide by zero
 	  d = d.Unit();
 	else
-	  d = ctVector3(1, 0,0 );  
+	  d = ctVector3(1, 0,0 );
 
 	// f = -kx
 	f = d*disp*magnitude;
-	
+
 	if ( &pe == b1 )
-	{ 
+	{
 	  b1->sum_force(f);
 	  d = a1 - r1->get_world_offset ();
 	  b1->sum_torque ( d % f );
@@ -216,7 +216,7 @@ ctVector3 ctCappedSpringF::apply_F( ctDynamicEntity &pe )
 	  d = a2 - r2->get_world_offset ();
 	  b2->sum_torque ( d % f );
 	}
-	return f;			
+	return f;
       }
     }
   }
@@ -227,7 +227,7 @@ ctVector3 ctCappedSpringF::apply_F( ctDynamicEntity &pe )
 //!me untested
 // 1/r^2 force.  Such as gravity.
 // right now an object passing too close to the discontinuity will get accelerated
-// way fast and energy will NOT be conserved.  This could be fixed using R-K 
+// way fast and energy will NOT be conserved.  This could be fixed using R-K
 // method with adaptive step-sizing or some happy horse-shit like that.
 ctVector3 ctGravityWell::apply_F ( ctDynamicEntity &moon )
 {
@@ -257,10 +257,10 @@ ctVector3 ctGravityWell::apply_F ( ctDynamicEntity &moon )
 
       g_force = ( magnitude * (( ctDynamicEntity * )planet)->get_m() ) * moon.get_m () / r_len2;
       r_vec *= g_force;
-      moon.sum_force ( r_vec ); 
+      moon.sum_force ( r_vec );
       total_f += r_vec;
     }
     planet = body_vector.get_next ();
-  }	
+  }
   return total_f;
 }

@@ -190,7 +190,7 @@ void csSoundDriverWaveOut::Close()
   // wait for SoundProc() to exit
   while (SoundProcLocked);
 
-  if (SoundRender) 
+  if (SoundRender)
   {
     SoundRender->DecRef();
     SoundRender = NULL;
@@ -299,8 +299,8 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
 
     // call the sound renderer mixing function
     SoundRender->MixingFunction();
-  
-    // Set up and prepare header. 
+
+    // Set up and prepare header.
     lpWaveHdr->lpData = (char *)Memory;
     lpWaveHdr->dwBufferLength = MemorySize;
     lpWaveHdr->dwFlags = 0L;
@@ -314,10 +314,10 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
     }
     else
     {
-      // Now the data block can be sent to the output device. The 
-      // waveOutWrite function returns immediately and waveform 
+      // Now the data block can be sent to the output device. The
+      // waveOutWrite function returns immediately and waveform
       // data is sent to the output device in the background.
-      result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR)); 
+      result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
       if (!CheckError("waveOutWrite", result)) {
 	result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
 	CheckError("waveOutUnprepareHeader", result);
@@ -329,7 +329,7 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
       }
     }
   }
-  
+
   // unlock this function
   SoundProcLocked = false;
 }

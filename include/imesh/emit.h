@@ -1,17 +1,17 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -55,7 +55,7 @@ struct iEmitFixed : public iEmitGen3D
 /** sphere value emitter - returns points in a sphere */
 struct iEmitSphere : public iEmitGen3D
 {
-  /// set content, center and min, max radius 
+  /// set content, center and min, max radius
   virtual void SetContent(const csVector3& center, float min, float max) = 0;
   /// get content
   virtual void GetContent(csVector3& center, float& min, float& max) = 0;
@@ -131,10 +131,10 @@ struct iEmitSphereTangent : public iEmitGen3D
 struct iEmitCylinderTangent : public iEmitGen3D
 {
   /// set content, start,end of cylinder, min/max size
-  virtual void SetContent(const csVector3& start, const csVector3& end, 
+  virtual void SetContent(const csVector3& start, const csVector3& end,
     float min, float max) = 0;
   /// get content
-  virtual void GetContent(csVector3& start, csVector3& end, 
+  virtual void GetContent(csVector3& start, csVector3& end,
     float& min, float& max) = 0;
 };
 

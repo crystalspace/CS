@@ -103,7 +103,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
       // split the polygon into triangles and copy them
       for (i=2; i<PolyVertices.Length (); i++)
         StoreTriangle (PolyVertices[0], PolyVertices[i-1], PolyVertices[i]);
-      
+
       // store the material if we don't have any yet
       if (!Material && poly->GetMaterial ())
         Material = poly->GetMaterial ();
@@ -147,7 +147,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
 
   /* Create all actions in the target factory. We also build a default
    * action (named 'default') if no action with this name exists. The
-   * default action shows the first frame all the time. 
+   * default action shows the first frame all the time.
    */
   bool FoundDefault = false;
 

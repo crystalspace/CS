@@ -1,17 +1,17 @@
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
-              (C) 2001 F.Richter	
-    
+              (C) 2001 F.Richter
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -43,7 +43,7 @@ SCF_IMPLEMENT_IBASE (awsMultiProctexCanvas::awscG2D)
 SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
 SCF_IMPLEMENT_IBASE_END
 
-awsMultiProctexCanvas::awscG2D::awscG2D(awsMultiProctexCanvas *parent, iGraphics2D *aG2D) 
+awsMultiProctexCanvas::awscG2D::awscG2D(awsMultiProctexCanvas *parent, iGraphics2D *aG2D)
 {
   SCF_CONSTRUCT_IBASE (NULL);
 
@@ -128,7 +128,7 @@ void awsMultiProctexCanvas::awscG2D::DrawLine (
     {
       csRect crect(*awsc->GetFlatCanvasRect(i));
       csRect rect((int) x1-1,(int) y1-1,(int) x2+1,(int) y2+1);
-      
+
       if (rect.Intersects (crect))
       {
         awsSimpleCanvas *canvas = awsc->GetFlatCanvas(i);
@@ -140,9 +140,9 @@ void awsMultiProctexCanvas::awscG2D::DrawLine (
 	  //  a) setting the last pixel by hand if needed
 	  //  b) using a wrong clipping rect
 	  // we do (b) at the moment, so we don't draw lines with both y ==
-	  // Height() (otherwise it would crash because that line is obviously 
+	  // Height() (otherwise it would crash because that line is obviously
 	  // invalid
-          canvas->G2D()->DrawLine((float)x1-crect.xmin, (float)y1-crect.ymin, 
+          canvas->G2D()->DrawLine((float)x1-crect.xmin, (float)y1-crect.ymin,
                                   (float)x2-crect.xmin, (float)y2-crect.ymin, color);
 	}
       }
@@ -150,10 +150,10 @@ void awsMultiProctexCanvas::awscG2D::DrawLine (
 }
 
 void awsMultiProctexCanvas::awscG2D::DrawBox (int x, int y, int w, int h, int color)
-{ 
+{
   int i, count=awsc->GetFlatCanvasCount ();
   csRect boxrect (x, y, x+w, y+h);
-  
+
   for (i=0; i<count; ++i)
   {
       csRect *canvasRect = awsc->GetFlatCanvasRect(i);
@@ -203,7 +203,7 @@ void awsMultiProctexCanvas::awscG2D::Write (iFont *font, int x, int y, int fg, i
     return;
 
   int i,count=awsc->GetFlatCanvasCount();
-  
+
   for (i=0; i<count; ++i)
   {
       csRect *canvasRect = awsc->GetFlatCanvasRect(i);
@@ -219,7 +219,7 @@ void awsMultiProctexCanvas::awscG2D::Write (iFont *font, int x, int y, int fg, i
 unsigned char* awsMultiProctexCanvas::awscG2D::GetPixelAt (int x, int y)
 {
   int i,count=awsc->GetFlatCanvasCount();
-  
+
   for (i=0; i<count; ++i)
   {
       csRect *canvasRect = awsc->GetFlatCanvasRect(i);
@@ -237,7 +237,7 @@ void awsMultiProctexCanvas::awscG2D::GetPixel (int x, int y, uint8 &oR, uint8 &o
 {
   oR = oG = oB = 0;
   int i,count=awsc->GetFlatCanvasCount();
-  
+
   for (i=0; i<count; ++i)
   {
       csRect *canvasRect = awsc->GetFlatCanvasRect(i);
@@ -270,10 +270,10 @@ bool awsMultiProctexCanvas::awscG2D::BeginDraw ()
 
 void awsMultiProctexCanvas::awscG2D::FinishDraw ()
 {
-  if (FrameBufferLocked) 
+  if (FrameBufferLocked)
   {
     FrameBufferLocked--;
-    if (!FrameBufferLocked) 
+    if (!FrameBufferLocked)
     {
       int i, count=awsc->GetFlatCanvasCount();
 
@@ -313,12 +313,12 @@ int awsMultiProctexCanvas::awscG2D::GetPage ()
 }
 
 int awsMultiProctexCanvas::awscG2D::GetPalEntryCount ()
-{ 
+{
 /*  int count=awsc->GetFlatCanvasCount();
   if (count) {
     return awsc->GetFlatCanvas(0)->G2D()->GetPalEntryCount();
   } else {*/
-    return 0; 
+    return 0;
 //  }
 }
 
@@ -328,17 +328,17 @@ int awsMultiProctexCanvas::awscG2D::GetPixelBytes ()
   if (count) {
     return awsc->GetFlatCanvas(0)->G2D()->GetPixelBytes();
   } else {
-    return 0; 
+    return 0;
   }
 }
 
 csPixelFormat* awsMultiProctexCanvas::awscG2D::GetPixelFormat ()
-{ 
+{
   int count=awsc->GetFlatCanvasCount();
   if (count) {
     return awsc->GetFlatCanvas(0)->G2D()->GetPixelFormat();
   } else {
-    return NULL; 
+    return NULL;
   }
 }
 
@@ -359,7 +359,7 @@ void awsMultiProctexCanvas::awscG2D::Print (csRect *area)
       awsSimpleCanvas *canvas = awsc->GetFlatCanvas(i);
       awsc->realG3D()->DrawPixmap(canvas->GetTextureWrapper()->GetTextureHandle(),
                                   rect.xmin, rect.ymin, rect.Width()+1,rect.Height()+1,
-                                  rect.xmin-canvasRect->xmin, rect.ymin-canvasRect->ymin, 
+                                  rect.xmin-canvasRect->xmin, rect.ymin-canvasRect->ymin,
                                   rect.Width()+1,rect.Height()+1,
                                   0);
 
@@ -497,7 +497,7 @@ void awsMultiProctexCanvas::awscG3D::SetPerspectiveCenter (int x, int y)
 
 bool awsMultiProctexCanvas::awscG3D::BeginDraw (int DrawFlags)
 {
-  if ((G2D->GetWidth() != width) || 
+  if ((G2D->GetWidth() != width) ||
       (G2D->GetHeight() != height))
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
   // if 2D graphics is not locked, lock it
@@ -650,7 +650,7 @@ awsMultiProctexCanvas::awsMultiProctexCanvas(int w, int h, iObjectRegistry* obje
 
   for (i=0; i<count; ++i)
   {
-    // Setup the canvas that deals with this patch.  
+    // Setup the canvas that deals with this patch.
     awsSimpleCanvas *canvas = GetFlatCanvas(i);
 
     canvas->DisableAutoUpdate();
@@ -666,7 +666,7 @@ awsMultiProctexCanvas::awsMultiProctexCanvas(int w, int h, iObjectRegistry* obje
     int sy = vert*MaxCanvasHeight;
 
     rect->Set(sx,sy,sx+MaxCanvasWidth,sy+MaxCanvasHeight);
-    
+
     // Inc hor and vert counters
     if (!(++hor<HorzCanvases))
     {
@@ -702,7 +702,7 @@ awsMultiProctexCanvas::~awsMultiProctexCanvas ()
   SCF_DEC_REF (rG2D);
 }
 
-void 
+void
 awsMultiProctexCanvas::Animate (csTicks current_time)
 {
   (void)current_time;
@@ -728,7 +728,7 @@ void awsMultiProctexCanvas::Show (csRect *area, iGraphics3D *g3d, uint8 Alpha)
       awsSimpleCanvas *canvas = GetFlatCanvas(i);
       realG3D()->DrawPixmap(canvas->GetTextureWrapper()->GetTextureHandle(),
                             rect.xmin, rect.ymin, rect.Width()+1,rect.Height()+1,
-                            rect.xmin-canvasRect->xmin, rect.ymin-canvasRect->ymin, 
+                            rect.xmin-canvasRect->xmin, rect.ymin-canvasRect->ymin,
                             rect.Width()+1,rect.Height()+1,
                             Alpha);
 

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -41,7 +41,7 @@ csIsoView::csIsoView (iBase *iParent, iIsoEngine *eng, iIsoWorld *world)
   y_axis.Set(0.0,1.0);
   z_axis.Set(1.0,1.0);
   // default scale.
-  float startscale = float(engine->GetG3D()->GetHeight())/16.0; 
+  float startscale = float(engine->GetG3D()->GetHeight())/16.0;
   x_axis *= startscale;
   y_axis *= startscale;
   z_axis *= startscale;
@@ -92,7 +92,7 @@ void csIsoView::Draw()
   //printf("IsoView::Draw\n");
   rview->SetView(this);
   rview->SetG3D(engine->GetG3D());
-  csBoxClipper* clipper = new csBoxClipper(rect.xmin, rect.ymin, 
+  csBoxClipper* clipper = new csBoxClipper(rect.xmin, rect.ymin,
     rect.xmax, rect.ymax);
 
   rview->SetClipper(clipper);
@@ -102,7 +102,7 @@ void csIsoView::Draw()
   if(rview->GetNumBuckets() < ml->GetCount ())
     rview->CreateBuckets(ml->GetCount ());
   PreCalc();
-  
+
   int pass;
   for(pass = CSISO_RENDERPASS_PRE; pass <= CSISO_RENDERPASS_POST; pass++)
   {
@@ -175,7 +175,7 @@ void csIsoView::PreCalc()
   rview->SetMinZ(0.0);
 }
 
-void csIsoView::SetAxes(float xscale, float yscale, float zscale, float zskew, 
+void csIsoView::SetAxes(float xscale, float yscale, float zscale, float zskew,
   float xskew)
 {
   x_axis.Set(1.0,-xskew);
@@ -278,7 +278,7 @@ void csIsoFakeCamera::SetIsoView(const csVector2& scroll,
   shifty = scroll.y;
 }
 
-void csIsoFakeCamera::IsoReady(const csVector3& position, 
+void csIsoFakeCamera::IsoReady(const csVector3& position,
   iIsoRenderView *rview)
 {
   //printf("IsoReady %g,%g,%g\n", position.x, position.y, position.z);

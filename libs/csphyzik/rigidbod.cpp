@@ -25,12 +25,12 @@
 #include "csphyzik/debug.h"
 #include "csphyzik/contact.h"
 
-ctRigidBody::ctRigidBody() 
+ctRigidBody::ctRigidBody()
   : P(0), L(0)
 {
 }
 
-ctRigidBody::ctRigidBody( ctReferenceFrame &ref, ctDeltaReferenceFrame &dref ) 
+ctRigidBody::ctRigidBody( ctReferenceFrame &ref, ctDeltaReferenceFrame &dref )
   : ctDynamicEntity( ref, dref ), P(0), L(0)
 {
 
@@ -71,7 +71,7 @@ void ctRigidBody::set_angular_v ( const ctVector3 &pw )
   ctMatrix3 I_world;
   R.similarity_transform ( I_world, I );
 
-  // angular speed = 
+  // angular speed =
   // inverse of inertia tensor in world coords * angular momentum
   dRF.w = pw;
 
@@ -81,8 +81,8 @@ void ctRigidBody::set_angular_v ( const ctVector3 &pw )
 
 // v is a secondary value that is calculated from momentum
 void ctRigidBody::set_v ( const ctVector3 &pv )
-{ 
-  dRF.v = pv; 
+{
+  dRF.v = pv;
   P = pv*m;
 }
 
@@ -95,7 +95,7 @@ void ctRigidBody::add_angular_v ( const ctVector3 &pw )
   ctMatrix3 I_world;
   R.similarity_transform ( I_world, I );
 
-  // angular speed = 
+  // angular speed =
   // inverse of inertia tensor in world coords * angular momentum
   dRF.w += pw;
 
@@ -105,8 +105,8 @@ void ctRigidBody::add_angular_v ( const ctVector3 &pw )
 
 // v is a secondary value that is calculated from momentum
 void ctRigidBody::add_v ( const ctVector3 &pv )
-{ 
-  dRF.v += pv; 
+{
+  dRF.v += pv;
   P += pv*m;
 }
 
@@ -114,9 +114,9 @@ int ctRigidBody::set_state ( real *state_array )
 {
   int len;
 
-  len = ctPhysicalEntity::set_state( state_array ); 
+  len = ctPhysicalEntity::set_state( state_array );
   state_array += len;
-  
+
   *state_array++ = P[0];
   *state_array++ = P[1];
   *state_array++ = P[2];
@@ -133,11 +133,11 @@ int ctRigidBody::set_delta_state ( real *state_array )
 {
   int len;
 
-  len = ctPhysicalEntity::set_delta_state ( state_array ); 
+  len = ctPhysicalEntity::set_delta_state ( state_array );
   state_array += len;
-  
+
   // dP/dt = F     derivitive of momentum with time = applied force
-  *state_array++ = F[0];   
+  *state_array++ = F[0];
   *state_array++ = F[1];
   *state_array++ = F[2];
 
@@ -169,14 +169,14 @@ int ctRigidBody::get_state ( const real *state_array )
   if ( m >= MIN_REAL )
     dRF.v = P/m;
 
-  // calculate inverse of inertia tensor in world coords 
+  // calculate inverse of inertia tensor in world coords
   // this result is used to calculate angular speed w
   // ctMatrix3 I_inv_world = get_I_inv_world ();
   const ctMatrix3 &R = RF.get_R ();
   ctMatrix3 I_inv_world;
   R.similarity_transform ( I_inv_world, I_inv );
 
-  // angular speed = 
+  // angular speed =
   // inverse of inertia tensor in world coords * angular momentum
   dRF.w = I_inv_world * L;
 
@@ -187,7 +187,7 @@ int ctRigidBody::get_state ( const real *state_array )
 void ctRigidBody::calc_simple_I_tensor( real x, real y, real z )
 {
   real k;
-  
+
   if ( m > MIN_REAL )
     k = m/12.0;
   else
@@ -201,7 +201,7 @@ void ctRigidBody::calc_simple_I_tensor( real x, real y, real z )
   I[0][0] = (y*y + z*z)*k;
   I[1][1] = (x*x + z*z)*k;
   I[2][2] = (x*x + y*y)*k;
-  
+
   I_inv[0][0] = ( y > MIN_REAL || z > MIN_REAL ) ? 1.0/I[0][0] : MAX_REAL;
   I_inv[1][1] = ( x > MIN_REAL || z > MIN_REAL ) ? 1.0/I[1][1] : MAX_REAL;
   I_inv[2][2] = ( x > MIN_REAL || y > MIN_REAL ) ? 1.0/I[2][2] : MAX_REAL;
@@ -221,7 +221,7 @@ void ctRigidBody::set_m ( real pm )
 void ctRigidBody::apply_impulse ( ctVector3 jx, ctVector3 jv )
 {
   real mass = get_m ();
-  
+
   P += jv;
   dRF.v = P * (( mass > MIN_REAL ) ? 1.0/mass : MAX_REAL);
 

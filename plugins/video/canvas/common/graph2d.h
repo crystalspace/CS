@@ -72,7 +72,7 @@ public:
 
   /// Pointer to a title.
   char* win_title;
-  
+
   /// The width, height and depth of visual
   int Width, Height, Depth;
   /// True if visual is full-screen
@@ -244,7 +244,7 @@ public:
 
   /// Create an off screen canvas
   virtual iGraphics2D *CreateOffScreenCanvas
-  (int width, int height, void *buffer, bool alone_hint, 
+  (int width, int height, void *buffer, bool alone_hint,
    csPixelFormat *pfmt = NULL, csRGBpixel *palette = NULL, int pal_size = 0);
 
   /// Enable/disable canvas resize (Over-ride in sub classes)

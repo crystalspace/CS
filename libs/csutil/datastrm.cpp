@@ -116,7 +116,7 @@ bool csDataStream::GetString (char* buf, int len, bool OmitNewline)
   // truncate buffer length if greater than length of the line
   // (+1 for the null character)
   if (len > LineLen + 1) len = LineLen + 1;
-  
+
   // read the line
   Read (buf, len - 1);
   buf [len - 1] = 0;

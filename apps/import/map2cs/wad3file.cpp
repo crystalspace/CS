@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -41,7 +41,7 @@ int LittleEndian(int l)
   unsigned char* Buffer = (unsigned char*)(&l);
   return Buffer[0] | (Buffer[1] << 8) | (Buffer[2] << 16) | (Buffer[3] << 24);
 }
-  
+
 void WriteByte(char*& p, unsigned char c)
 {
   *((unsigned char*)p) = c;
@@ -61,9 +61,9 @@ void WriteDword(char*& p, unsigned long l)
 }
 
 int CreateBitmap(char*&      p,
-                 char*       pBits, 
-                 int         Width, 
-                 int         Height, 
+                 char*       pBits,
+                 int         Width,
+                 int         Height,
                  char*       pPalette)
 {
   int i;
@@ -120,10 +120,10 @@ int CreateBitmap(char*&      p,
   return Size;
 }
 
-bool WriteBitmap(const char* BmpFilename, 
-                 char*       pBits, 
-                 int         Width, 
-                 int         Height, 
+bool WriteBitmap(const char* BmpFilename,
+                 char*       pBits,
+                 int         Width,
+                 int         Height,
                  char*       pPalette)
 {
   //Open Outfile
@@ -169,8 +169,8 @@ bool CWad3File::Extract(const char* Texture, char*& Data, int& Size)
 
     char* pBitmap = Buffer + TexInfo.offsets[0];
 
-    Size = CreateBitmap(Data, pBitmap, 
-                         TexInfo.width, TexInfo.height, 
+    Size = CreateBitmap(Data, pBitmap,
+                         TexInfo.width, TexInfo.height,
                          Buffer + TexInfo.offsets[3] + TexInfo.width * TexInfo.height / 64 + 2 );
 
     delete [] Buffer;
@@ -241,7 +241,7 @@ bool CWad3File::Open(const char *filename)
     printf("Can't open %s!\n", filename);
     return false;
   }
-  
+
   // First data in the Wad is a magic token, that identifies the WAD3 format
   int FileID;
   if (!Read(FileID)) return false;
@@ -253,15 +253,15 @@ bool CWad3File::Open(const char *filename)
 
   //The next info ist the number of lumps in the WAD3 file.
   if (!Read(m_Numlumps)) return false;
-  
+
   //Allocate all needed lumps
   m_Lumpinfo = new S_Lumpinfo[m_Numlumps];
 
-  //The next Info is the fileoffset, where the Infotable for the 
+  //The next Info is the fileoffset, where the Infotable for the
   //lumps can be found.
   int InfotableOffset;
   if (!Read(InfotableOffset)) return false;
-  
+
   //Seek to this table
   Seek(InfotableOffset);
 
@@ -284,12 +284,12 @@ bool CWad3File::GetQtexInfo(const char* Texture, miptex_t* pInfo, int* LumpNr)
   if (!m_Filehandle) return false;
 
   int i, level;
-  for (i = 0; i < m_Numlumps; i++) 
+  for (i = 0; i < m_Numlumps; i++)
   {
     if (strcasecmp( m_Lumpinfo[i].name, Texture) == 0)
     {
       Seek(m_Lumpinfo[i].filepos);
-      if (LumpNr) 
+      if (LumpNr)
       {
         *LumpNr = i;
       }
@@ -300,7 +300,7 @@ bool CWad3File::GetQtexInfo(const char* Texture, miptex_t* pInfo, int* LumpNr)
       pInfo->height  = LittleEndian(pInfo->height);
 
       for (level = 0; level<MIPLEVELS; level++)
-      { 
+      {
         pInfo->offsets[level] = LittleEndian(pInfo->offsets[level]);
       }
       return true;
@@ -312,7 +312,7 @@ bool CWad3File::GetQtexInfo(const char* Texture, miptex_t* pInfo, int* LumpNr)
 
 bool CWad3File::Seek(int Pos)
 {
-  if (!m_Filehandle) 
+  if (!m_Filehandle)
   {
     return false;
   }
@@ -329,7 +329,7 @@ bool CWad3File::Seek(int Pos)
 
 bool CWad3File::Read(void* Buffer, int count)
 {
-  if (!m_Filehandle) 
+  if (!m_Filehandle)
   {
     return false;
   }

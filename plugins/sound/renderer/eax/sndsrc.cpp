@@ -52,14 +52,14 @@ csSoundSourceEAX::csSoundSourceEAX(iBase *piBase) {
 }
 
 csSoundSourceEAX::~csSoundSourceEAX() {
-  
+
   if(EaxKsPropertiesSet)
   {
     EaxKsPropertiesSet->Release();
     EaxKsPropertiesSet = NULL;
   }
-  
-  
+
+
   if (Buffer3D) Buffer3D->Release();
   if (Buffer2D) {
     Buffer2D->Stop();
@@ -130,7 +130,7 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
     return false;
   }
 
-  
+
 
   r = Buffer2D->QueryInterface(IID_IDirectSound3DBuffer, (void **) &Buffer3D);
   if (r != DS_OK) {
@@ -139,7 +139,7 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
       "for sound source (%s).\n", srdr->GetError(r));
     return false;
   }
-  
+
   //give the sound source a eax-property-set
   r = Buffer3D->QueryInterface(IID_IKsPropertySet, (void**) EaxKsPropertiesSet);
     if (r != DS_OK) {
@@ -150,17 +150,17 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
 	}
 
     //default Properties
-    EAXBUFFERPROPERTIES BufferProperties ={0, 0, 0, 0, 0.0f, 0, 0.25f, 0.5f, 0.0, 1, 1.0f, 0x700000};  
-    
-    //set the Defaultproperties 
+    EAXBUFFERPROPERTIES BufferProperties ={0, 0, 0, 0, 0.0f, 0, 0.25f, 0.5f, 0.0, 1, 1.0f, 0x700000};
+
+    //set the Defaultproperties
     r = EaxKsPropertiesSet->Set(DSPROPSETID_EAX_BufferProperties,
                             DSPROPERTY_EAXBUFFER_ALLPARAMETERS, NULL, 0, &BufferProperties,
                             sizeof(EAXBUFFERPROPERTIES));
-                            
-  if (r != DS_OK) 
-    Report (CS_REPORTER_SEVERITY_WARNING, 
+
+  if (r != DS_OK)
+    Report (CS_REPORTER_SEVERITY_WARNING,
 	"can´t set default Properties");
-                          
+
 
   SetMode3D(mode3d);
   BaseFrequency = SoundHandle->Data->GetFormat()->Freq;
@@ -207,7 +207,7 @@ void csSoundSourceEAX::SetVolume(float vol)
 }
 
 float csSoundSourceEAX::GetVolume()
-{  
+{
   long dsvol=DSBVOLUME_MIN;
   Buffer2D->GetVolume(&dsvol);
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
@@ -216,7 +216,7 @@ float csSoundSourceEAX::GetVolume()
 void csSoundSourceEAX::SetMode3D(int mode3D) {
   DWORD Mode = (mode3D == SOUND3D_ABSOLUTE) ? DS3DMODE_NORMAL :
     (mode3D == SOUND3D_RELATIVE) ? DS3DMODE_HEADRELATIVE :  DS3DMODE_DISABLE;
-  
+
   HRESULT r = Buffer3D->SetMode(Mode, DS3D_DEFERRED);
   if (r != DS_OK) {
     Report (CS_REPORTER_SEVERITY_WARNING,
@@ -254,7 +254,7 @@ void csSoundSourceEAX::Stop()
 {
   Buffer2D->Stop();
   Renderer->RemoveSource(this);
-  if (!Static) ClearBuffer();  
+  if (!Static) ClearBuffer();
 }
 
 void csSoundSourceEAX::SetFrequencyFactor(float factor) {

@@ -53,7 +53,7 @@ bool QModel::setError(const char* errorstring, FILE* closethis)
 
   if (sError != NULL)
     free(sError);
-  
+
   if (errorstring == NULL)
     sError = strdup("Unknown error");
   else

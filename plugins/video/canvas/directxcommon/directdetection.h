@@ -80,7 +80,7 @@ public:
     ZeroMemory(&Guid3D, sizeof(GUID));
     DeviceName3D = NULL; DeviceDescription3D = NULL;
     IsPrimary3D = true;
-  } 
+  }
   virtual ~DirectDetection3D() {}
 
   bool Hardware;              // Is hardware device ?
@@ -91,7 +91,7 @@ public:
   bool VideoMemoryTexture;    // Can push texture in video memory ?
   bool HighColor;             // Can enable 16 bit mode
   bool ZBuffer;               // Have a ZBuffer ?
-  D3DDEVICEDESC Desc3D;       // D3DDEVICEDESC for complete information 
+  D3DDEVICEDESC Desc3D;       // D3DDEVICEDESC for complete information
   GUID Guid3D;                // Guid for Direct3D device
   bool IsPrimary3D;           // Is a primary d3d device ?
   char * DeviceName3D;        // Device name
@@ -107,7 +107,7 @@ public:
 
   bool Only2D; // Is only a 2d device ?
   DirectDetectionDevice * next;
-  
+
   ///
   STDMETHODIMP_(LPD3DDEVICEDESC) GetDesc3D()  { return &Desc3D; }
   ///
@@ -125,7 +125,7 @@ public:
 };
 
 // master class of the device detection of direct3d and directdraw
-class DirectDetection  
+class DirectDetection
 {
 public:
   bool Have2DDevice();

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Norman Krämer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -37,14 +37,14 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csAVIFormat)
 SCF_EXPORT_CLASS_TABLE (csavi)
-  SCF_EXPORT_CLASS (csAVIFormat, "crystalspace.video.format.avi", 
+  SCF_EXPORT_CLASS (csAVIFormat, "crystalspace.video.format.avi",
 		"CrystalSpace AVI format interface")
 SCF_EXPORT_CLASS_TABLE_END
 
 #define AVI_EVEN(x) ((x)&1?(x)+1:(x))
 
-csAVIFormat::csAVIFormat (iBase *pParent) : 
-  len_hcl(8), 
+csAVIFormat::csAVIFormat (iBase *pParent) :
+  len_hcl(8),
   len_id(4),
   RIFF_ID("RIFF"),
   LIST_ID("LIST"),
@@ -122,15 +122,15 @@ bool csAVIFormat::Load (iFile *pVideoData)
   if (pFile)
   {
     pFile->DecRef ();
-    if (pData) 
+    if (pData)
       delete [] pData;
-    if (pChunkList) 
+    if (pChunkList)
       delete pChunkList;
     pChunkList = NULL;
     pData = NULL;
     pFile = NULL;
   }
-  
+
   (pFile = pVideoData)->IncRef ();
   size_t r=0;
   datalen = pFile->GetSize ();
@@ -158,7 +158,7 @@ bool csAVIFormat::InitVideoData ()
   if (bSucc)
   {
     if (fileheader.size > datalen)
-      Report (CS_REPORTER_SEVERITY_WARNING, 
+      Report (CS_REPORTER_SEVERITY_WARNING,
 		       "AVI: RIFF header claims to be longer than the whole file is !");
     bSucc = false;
     p += len_id;
@@ -302,10 +302,10 @@ bool csAVIFormat::ValidateStreams ()
   while (it->HasNext())
   {
     it->GetNext ()->GetStreamDescription (desc);
-    if (desc.type == CS_STREAMTYPE_AUDIO) 
+    if (desc.type == CS_STREAMTYPE_AUDIO)
       nAudio++;
     else
-    if (desc.type == CS_STREAMTYPE_VIDEO) 
+    if (desc.type == CS_STREAMTYPE_VIDEO)
       nVideo++;
   }
   it->DecRef ();
@@ -325,7 +325,7 @@ uint32 csAVIFormat::CreateStream (StreamHeader *streamheader)
   {
     // make an audio stream
     csAVIStreamAudio *pAudioStream = new csAVIStreamAudio (this);
-    
+
     memcpy (&strh, p, len_hcl);
     strh.Endian ();
     if (strh.Is (CHUNK_STRF))
@@ -360,7 +360,7 @@ uint32 csAVIFormat::CreateStream (StreamHeader *streamheader)
 	p += AVI_EVEN(strh.size);
 	n += AVI_EVEN(strh.size) + len_hcl;
       }
-      if (pAudioStream->Initialize (&aviheader, streamheader, &audsf, nAudio, 
+      if (pAudioStream->Initialize (&aviheader, streamheader, &audsf, nAudio,
 				    pCID, nCIDLen, pName, pFormatEx, nFormatEx, object_reg))
 	vStream.Push (pAudioStream);
       else
@@ -373,7 +373,7 @@ uint32 csAVIFormat::CreateStream (StreamHeader *streamheader)
   {
     // make an video stream
     csAVIStreamVideo *pVideoStream = new csAVIStreamVideo (this);
-    
+
     memcpy (&strh, p, len_hcl);
     strh.Endian ();
     if (strh.Is (CHUNK_STRF))
@@ -408,7 +408,7 @@ uint32 csAVIFormat::CreateStream (StreamHeader *streamheader)
 	p += AVI_EVEN(strh.size);
 	n += AVI_EVEN(strh.size) + len_hcl;
       }
-      if (pVideoStream->Initialize (&aviheader, streamheader, &vidsf, nVideo, 
+      if (pVideoStream->Initialize (&aviheader, streamheader, &vidsf, nVideo,
 				    pCID, nCIDLen, pName, pFormatEx, nFormatEx, object_reg))
       vStream.Push (pVideoStream);
       else
@@ -423,7 +423,7 @@ uint32 csAVIFormat::CreateStream (StreamHeader *streamheader)
     strh.Endian ();
     if (!strh.Is (CHUNK_STRF))
     {
-      Report (CS_REPORTER_SEVERITY_WARNING, "Unsupported streamtype \"%4c\" found ... ignoring it !", 
+      Report (CS_REPORTER_SEVERITY_WARNING, "Unsupported streamtype \"%4c\" found ... ignoring it !",
 		       strh.id);
       n = AVI_EVEN(strh.size) + len_hcl;
       p += AVI_EVEN(strh.size) + len_hcl;
@@ -474,7 +474,7 @@ bool csAVIFormat::HasChunk (uint32 id, uint32 frameindex)
   }
   return bSucc;
 }
- 
+
 bool csAVIFormat::GetChunk (uint32 frameindex, AVIDataChunk *pChunk)
 {
   char *pp = NULL;
@@ -486,7 +486,7 @@ bool csAVIFormat::GetChunk (uint32 frameindex, AVIDataChunk *pChunk)
       pChunk->currentframepos = startframepos;
     if (pChunkList)
     {
-      bool succ = pChunkList->GetPos (*(uint32*)pChunk->id, frameindex, 
+      bool succ = pChunkList->GetPos (*(uint32*)pChunk->id, frameindex,
 				      pp, pChunk->length);
       pChunk->data = (csSome)(pp + len_hcl);
       pChunk->currentframe = frameindex;
@@ -494,11 +494,11 @@ bool csAVIFormat::GetChunk (uint32 frameindex, AVIDataChunk *pChunk)
     }
     else
     {  // no index list
-      uint32 startfrom = (frameindex < (uint32)pChunk->currentframe ? 0 
+      uint32 startfrom = (frameindex < (uint32)pChunk->currentframe ? 0
 			 : frameindex <= maxframe ? pChunk->currentframe : maxframe);
       pp = (frameindex < (uint32)pChunk->currentframe ? startframepos
 	    : frameindex <= maxframe ? pChunk->currentframepos : maxframepos);
-    
+
       if (!no_recl)
       {
 	hcl ch;
@@ -515,7 +515,7 @@ bool csAVIFormat::GetChunk (uint32 frameindex, AVIDataChunk *pChunk)
 	pp = pp - AVI_EVEN(ch.size) + len_id;
 	maxsize = AVI_EVEN(ch.size);
       }
-      else 
+      else
       { // no_recl == true
 	hcl ch;
 	ch.size=0; // to stop MSVC moaning
@@ -598,7 +598,7 @@ csAVIFormat::streamiterator::streamiterator (iBase *pBase)
 
 csAVIFormat::streamiterator::~streamiterator ()
 {
-	
+
 }
 
 bool csAVIFormat::streamiterator::HasNext ()

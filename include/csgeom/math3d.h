@@ -61,7 +61,7 @@ public:
                           const csVector3& v1, const csVector3& v2)
   {
 //    float s = p * (v1%v2);  (original expression: expanded to the below:)
-    float s = p.x*(v1.y*v2.z-v1.z*v2.y) + p.y*(v1.z*v2.x-v1.x*v2.z) + 
+    float s = p.x*(v1.y*v2.z-v1.z*v2.y) + p.y*(v1.z*v2.x-v1.x*v2.z) +
               p.z*(v1.x*v2.y-v1.y*v2.x);
     if (s < 0) return 1;
     else if (s > 0) return -1;
@@ -85,13 +85,13 @@ public:
   { return pl.Classify (p) <= 0; }
 
   /**
-   * Calculate the line, that is the result of the Intersection of 
+   * Calculate the line, that is the result of the Intersection of
    * triangle 1  and triangle 2. This Method returns false, if there is
    * no intersection. If there is an intersection, the start of the line
    * is in line[0] and the end of the line is in line[1] and the method
    * return true;
    */
-  static bool FindIntersection(const csVector3  tri1[3], 
+  static bool FindIntersection(const csVector3  tri1[3],
                                const csVector3  tri2[3],
                                csVector3        line[2]);
 
@@ -341,9 +341,9 @@ public:
   {
     switch (nr)
     {
-      case 0: return PlaneXPlane (p1, pos, isect); 
-      case 1: return PlaneYPlane (p1, pos, isect); 
-      case 2: return PlaneZPlane (p1, pos, isect); 
+      case 0: return PlaneXPlane (p1, pos, isect);
+      case 1: return PlaneYPlane (p1, pos, isect);
+      case 2: return PlaneZPlane (p1, pos, isect);
     }
     return false;
   }

@@ -54,7 +54,7 @@ struct iFlareHalo;
 SCF_VERSION (iLight, 0, 0, 6);
 
 /**
- * The iLight interface is the SCF interface for the csLight class. 
+ * The iLight interface is the SCF interface for the csLight class.
  */
 struct iLight : public iBase
 {

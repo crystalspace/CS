@@ -64,11 +64,11 @@
 #define __CS_MD5_H__
 
 /**
- * This is am encapsulation of a C-implementation of MD5 digest algorithm by 
- * Peter Deutsch <ghost@aladdin.com>.  It provides the exact raw interface as 
- * Peter's original code except that it is wrapped within a namespace, as well 
- * as a more convenient interface which allows one to create a digest in a 
- * single step.  
+ * This is am encapsulation of a C-implementation of MD5 digest algorithm by
+ * Peter Deutsch <ghost@aladdin.com>.  It provides the exact raw interface as
+ * Peter's original code except that it is wrapped within a namespace, as well
+ * as a more convenient interface which allows one to create a digest in a
+ * single step.
  */
 class csMD5
 {

@@ -1,21 +1,21 @@
 /*
     Copyright (C) 1998 by Ayal Zwi Pinkus
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
- 
+
 #include <math.h>
 #include "cssysdef.h"
 #include "csengine/bezier.h"
@@ -23,7 +23,7 @@
 #include "csgeom/vector2.h"
 
 // Bezier offsets for calculating up to 10 control points
-int bezier_offsets[10] = 
+int bezier_offsets[10] =
 {
   OFFSET_1,
   OFFSET_2,
@@ -54,7 +54,7 @@ double csBezier2::BernsteinAt(double u, int j, double v, int k)
 }
 
 /**
- * Evaluate the derivite of the Berstein polynomial defined by j & k with 
+ * Evaluate the derivite of the Berstein polynomial defined by j & k with
  * respect to u at coordinates u, v
  */
 double csBezier2::BernsteinDuAt(double u, int j, double v, int k)
@@ -74,7 +74,7 @@ double csBezier2::BernsteinDuAt(double u, int j, double v, int k)
 }
 
 /**
- * Evaluate the derivite of the Berstein polynomial defined by j & k with 
+ * Evaluate the derivite of the Berstein polynomial defined by j & k with
  * respect to v at coordinates u, v
  */
 double csBezier2::BernsteinDvAt(double u, int j, double v, int k)
@@ -101,7 +101,7 @@ csBezier2::csBezier2()
   {
     // Test code
     //TODO remove ? int indexshouldbe = bezier_offsets[res-1];
-  
+
     int i,j,k,l;
     for (i=0;i<=res;i++)
     for (j=0;j<=res;j++)
@@ -117,22 +117,22 @@ csBezier2::csBezier2()
   }
 }
 
-csVector3 csBezier2::GetNormal(double** aControls, int u, 
+csVector3 csBezier2::GetNormal(double** aControls, int u,
                                       int v, int resolution)
 {
   csVector3 result;
-  
+
   // our normal is the cross product of the vector derivitives in the u & v
   // directions
   result = GetPoint (aControls,u,v,resolution,bernsteinDuMap) %
            GetPoint (aControls,u,v,resolution,bernsteinDvMap);
-  
+
   result.Normalize ();
-  
+
   return result;
 }
 
-csVector2 csBezier2::GetTextureCoord(double** aControls, int u, int v, 
+csVector2 csBezier2::GetTextureCoord(double** aControls, int u, int v,
                                      int resolution, double *map)
 {
   if (!map)
@@ -150,7 +150,7 @@ csVector2 csBezier2::GetTextureCoord(double** aControls, int u, int v,
     for (k=0;k<3;k++)
     {
       int ctrlindex = j+3*k;
-      double *ctrl = aControls[ ctrlindex ]; 
+      double *ctrl = aControls[ ctrlindex ];
       double fact = localmap[ctrlindex];
       result.x += ctrl[3] * fact;
       result.y += ctrl[4] * fact;
@@ -161,7 +161,7 @@ csVector2 csBezier2::GetTextureCoord(double** aControls, int u, int v,
 }
 
 
-csVector3 csBezier2::GetPoint(double** aControls, int u, int v, 
+csVector3 csBezier2::GetPoint(double** aControls, int u, int v,
                                      int resolution, double *map )
 {
   if (!map)
@@ -179,7 +179,7 @@ csVector3 csBezier2::GetPoint(double** aControls, int u, int v,
     for (k=0;k<3;k++)
     {
       int ctrlindex = j+3*k;
-      double *ctrl = aControls[ ctrlindex ]; 
+      double *ctrl = aControls[ ctrlindex ];
       double fact = localmap[ctrlindex];
       result.x += ctrl[0] * fact;
       result.y += ctrl[1] * fact;
@@ -192,7 +192,7 @@ csVector3 csBezier2::GetPoint(double** aControls, int u, int v,
   return result;
 }
 
-csVector3 csBezier2::GetPoint (double** aControls, double u, double v, 
+csVector3 csBezier2::GetPoint (double** aControls, double u, double v,
                                double (*f)(double, int, double, int) )
 {
   if (!f)
@@ -208,7 +208,7 @@ csVector3 csBezier2::GetPoint (double** aControls, double u, double v,
     for (k=0;k<3;k++)
     {
       double *ctrl = aControls[j+3*k];
-      
+
       result.x += ctrl[0] * f(u, j, v, k);
       result.y += ctrl[1] * f(u, j, v, k);
       result.z += ctrl[2] * f(u, j, v, k);

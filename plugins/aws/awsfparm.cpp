@@ -4,9 +4,9 @@
 
 #include <string.h>
 
-const int awsParmList::INT=0;    
+const int awsParmList::INT=0;
 const int awsParmList::FLOAT=1;
-const int awsParmList::STRING=2;   
+const int awsParmList::STRING=2;
 const int awsParmList::BASICVECTOR=3;
 const int awsParmList::STRINGVECTOR=4;
 const int awsParmList::RECT=5;
@@ -39,7 +39,7 @@ awsParmList::FindParm(char *_name, int type)
   for(i=0; i<parms.Length(); ++i)
   {
     parmItem *item = (parmItem *)parms[i];
-    
+
     if (item->name == name && item->type==type)
       return item;
   }
@@ -54,11 +54,11 @@ awsParmList::Clear()
 
  for(i=0; i<parms.Length(); ++i)
    delete (parmItem *)parms[i];
- 
+
  parms.SetLength(0);
 }
 
-void 
+void
 awsParmList::AddInt(char *name, int value)
 {
   parmItem *pi = new parmItem;
@@ -70,7 +70,7 @@ awsParmList::AddInt(char *name, int value)
   parms.Push(pi);
 }
 
-void 
+void
 awsParmList::AddFloat(char *name, float value)
 {
   parmItem *pi = new parmItem;
@@ -82,7 +82,7 @@ awsParmList::AddFloat(char *name, float value)
   parms.Push(pi);
 }
 
-void 
+void
 awsParmList::AddBool(char *name, bool value)
 {
   parmItem *pi = new parmItem;
@@ -94,7 +94,7 @@ awsParmList::AddBool(char *name, bool value)
   parms.Push(pi);
 }
 
-void 
+void
 awsParmList::AddString(char *name, iString* value)
 {
   parmItem *pi = new parmItem;
@@ -102,11 +102,11 @@ awsParmList::AddString(char *name, iString* value)
   pi->name = NameToID(name);
   pi->type = STRING;
   pi->parm.s = value;
-  
+
   parms.Push(pi);
 }
 
-void 
+void
 awsParmList::AddBasicVector(char *name, csBasicVector* value)
 {
   parmItem *pi = new parmItem;
@@ -118,7 +118,7 @@ awsParmList::AddBasicVector(char *name, csBasicVector* value)
   parms.Push(pi);
 }
 
-void 
+void
 awsParmList::AddStringVector(char *name, csStrVector* value)
 {
   parmItem *pi = new parmItem;
@@ -130,7 +130,7 @@ awsParmList::AddStringVector(char *name, csStrVector* value)
   parms.Push(pi);
 }
 
-void 
+void
 awsParmList::AddRect(char *name, csRect *value)
 {
   parmItem *pi = new parmItem;
@@ -142,7 +142,7 @@ awsParmList::AddRect(char *name, csRect *value)
   parms.Push(pi);
 }
 
-void 
+void
 awsParmList::AddPoint(char *name, csPoint *value)
 {
   parmItem *pi = new parmItem;
@@ -154,12 +154,12 @@ awsParmList::AddPoint(char *name, csPoint *value)
   parms.Push(pi);
 }
 
-bool 
+bool
 awsParmList::GetInt(char *name, int *value)
 {
   parmItem *pi=FindParm(name, INT);
 
-  if (pi) 
+  if (pi)
   {
     *value = pi->parm.i;
     return true;
@@ -173,7 +173,7 @@ awsParmList::GetFloat(char *name, float *value)
 {
   parmItem *pi=FindParm(name, FLOAT);
 
-  if (pi) 
+  if (pi)
   {
     *value = pi->parm.f;
     return true;
@@ -187,7 +187,7 @@ awsParmList::GetBool(char *name, bool *value)
 {
   parmItem *pi=FindParm(name, BOOL);
 
-  if (pi) 
+  if (pi)
   {
     *value = pi->parm.b;
     return true;
@@ -195,13 +195,13 @@ awsParmList::GetBool(char *name, bool *value)
 
   return false;
 }
-  
-bool 
+
+bool
 awsParmList::GetString(char *name, iString **value)
 {
   parmItem *pi=FindParm(name, STRING);
 
-  if (pi) 
+  if (pi)
   {
     *value = pi->parm.s;
     return true;
@@ -210,13 +210,13 @@ awsParmList::GetString(char *name, iString **value)
   return false;
 }
 
-  
-bool 
+
+bool
 awsParmList::GetBasicVector(char *name, csBasicVector **value)
 {
   parmItem *pi=FindParm(name, BASICVECTOR);
 
-  if (pi) 
+  if (pi)
   {
     *value = pi->parm.bv;
     return true;
@@ -224,13 +224,13 @@ awsParmList::GetBasicVector(char *name, csBasicVector **value)
 
   return false;
 }
-  
-bool 
+
+bool
 awsParmList::GetStringVector(char *name, csStrVector **value)
 {
   parmItem *pi=FindParm(name, STRINGVECTOR);
 
-  if (pi) 
+  if (pi)
   {
     *value = pi->parm.sv;
     return true;
@@ -238,13 +238,13 @@ awsParmList::GetStringVector(char *name, csStrVector **value)
 
   return false;
 }
-  
-bool 
+
+bool
 awsParmList::GetRect(char *name, csRect **value)
 {
   parmItem *pi=FindParm(name, RECT);
 
-  if (pi) 
+  if (pi)
   {
     *value = pi->parm.r;
     return true;
@@ -252,13 +252,13 @@ awsParmList::GetRect(char *name, csRect **value)
 
   return false;
 }
-  
-bool 
+
+bool
 awsParmList::GetPoint(char *name, csPoint **value)
 {
   parmItem *pi=FindParm(name, FLOAT);
 
-  if (pi) 
+  if (pi)
   {
     *value = pi->parm.p;
     return true;

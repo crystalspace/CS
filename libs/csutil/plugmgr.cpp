@@ -238,7 +238,7 @@ bool csPluginManager::UnloadPlugin (iComponent* obj)
   iConfig *config = SCF_QUERY_INTERFACE (obj, iConfig);
   if (config)
   {
-    for (int i = OptionList.Length () - 1; i >= 0; i--) 
+    for (int i = OptionList.Length () - 1; i >= 0; i--)
     {
       csPluginOption *pio = (csPluginOption *)OptionList.Get (i);
       if (pio->Config == config)

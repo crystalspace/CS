@@ -136,17 +136,17 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   iMaterialWrapper* t2 = engine->GetMaterialList ()->FindByName ("txt2");
   float s = 1;
 
-  create_one_side (walls_state, "n", t, t2, dx-s,dy+s,dz+s,  dx+s,dy+s,dz+s,  
+  create_one_side (walls_state, "n", t, t2, dx-s,dy+s,dz+s,  dx+s,dy+s,dz+s,
 		   dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);
-  create_one_side (walls_state, "e", t, t2, dx+s,dy+s,dz+s,  dx+s,dy+s,dz-s,  
+  create_one_side (walls_state, "e", t, t2, dx+s,dy+s,dz+s,  dx+s,dy+s,dz-s,
 		   dx+s,dy-s,dz-s,  dx+s,dy-s,dz+s, -.1,0,0);
-  create_one_side (walls_state, "w", t, t2, dx-s,dy+s,dz+s,  dx-s,dy-s,dz+s,  
+  create_one_side (walls_state, "w", t, t2, dx-s,dy+s,dz+s,  dx-s,dy-s,dz+s,
 		   dx-s,dy-s,dz-s,  dx-s,dy+s,dz-s, .1,0,0);
-  create_one_side (walls_state, "s", t, t2, dx+s,dy+s,dz-s,  dx-s,dy+s,dz-s,  
+  create_one_side (walls_state, "s", t, t2, dx+s,dy+s,dz-s,  dx-s,dy+s,dz-s,
 		   dx-s,dy-s,dz-s,  dx+s,dy-s,dz-s, 0,0,.1);
-  create_one_side (walls_state, "f", t, t2, dx-s,dy-s,dz+s,  dx+s,dy-s,dz+s,  
+  create_one_side (walls_state, "f", t, t2, dx-s,dy-s,dz+s,  dx+s,dy-s,dz+s,
 		   dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,.1,0);
-  create_one_side (walls_state, "c", t, t2, dx-s,dy+s,dz-s,  dx+s,dy+s,dz-s,  
+  create_one_side (walls_state, "c", t, t2, dx-s,dy+s,dz-s,  dx+s,dy+s,dz-s,
 		   dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-.1,0);
 
   iStatLight* light = engine->CreateLight ("",

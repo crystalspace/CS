@@ -50,13 +50,13 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   iOpenGLDisp *dispdriver;
 
   /**
-   * Helper function, attempts to create a visual/context with the 
+   * Helper function, attempts to create a visual/context with the
    * desired attributes
    */
   bool CreateVisuals ();
 
 public:
-  
+
   SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
 
   csGraphics2DGLX (iBase *iParent);
@@ -95,12 +95,12 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics2DGLX);
     virtual void *GetProcAddress (const char *funcname)
-    { 
+    {
 # ifndef CSGL_EXT_STATIC_ASSERTION
-      return (void*)glXGetProcAddressARB ((const GLubyte *)funcname); 
+      return (void*)glXGetProcAddressARB ((const GLubyte *)funcname);
 # else
       (void)funcname;
-      return (void*)NULL; 
+      return (void*)NULL;
 # endif
     }
   } scfiOpenGLInterface;

@@ -23,7 +23,7 @@
 
 /**
   This class contains
-  basic code to read font information and build appropriate bitmaps in 
+  basic code to read font information and build appropriate bitmaps in
   OpenGL.  It acts as a GL 'font server'.  You add a font by passing
   in a FontDef struct (see graph2d.h), and the server will add it to
   the list of fonts.  Destruction of the server will free up all the
@@ -43,7 +43,7 @@ class csGraphics2DOpenGLFontServer
     int Font_Count;
 
     /** each font is stored as a set of opengl display lists, one
-     * per character.  Each display list, or character, has a number; the 
+     * per character.  Each display list, or character, has a number; the
      * number of the first character for each font is stored here
      */
     GLuint *Font_Offsets;

@@ -4,9 +4,9 @@
 
   to compile do:  flex -L skinlang.flx
  *********/
- 
+
 %{
- 
+
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
 #include "awsprefs.h"
@@ -25,7 +25,7 @@
 {							\
   result = aws_fileinputvfs->Read(buf, max_size);	\
 }
-                               
+
 %}
 
 %option noyywrap
@@ -34,7 +34,7 @@
 %option outfile="sllex.cpp"
 %option prefix="aws"
 
- 
+
 %%
 component                                        return TOKEN_COMPONENT;
 connect											 return TOKEN_CONNECT;

@@ -39,10 +39,10 @@ INC.RLE = $(wildcard plugins/video/format/codecs/rle/*.h)
 SRC.RLE = $(wildcard plugins/video/format/codecs/rle/*.cpp)
 OBJ.RLE = $(addprefix $(OUT),$(notdir $(SRC.RLE:.cpp=$O)))
 DEP.RLE = CSUTIL CSSYS
-CFG.RLE = 
+CFG.RLE =
 
 TO_INSTALL.CONFIG += $(CFG.RLE)
-TO_INSTALL.DATA += 
+TO_INSTALL.DATA +=
 
 MSVC.DSP += RLE
 DSP.RLE.NAME = rle

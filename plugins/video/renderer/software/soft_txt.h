@@ -120,10 +120,10 @@ public:
   }
   /// Destroy the texture
   virtual ~csTextureSoftware ()
-  { 
-    delete [] bitmap; 
-    delete [] alphamap; 
-    if (image) image->DecRef (); 
+  {
+    delete [] bitmap;
+    delete [] alphamap;
+    if (image) image->DecRef ();
   }
 
   /// Return a pointer to texture data
@@ -137,10 +137,10 @@ public:
 /**
  * csTextureSoftwareProc is a class derived from csTextureSoftware that
  * implements the additional functionality to allow acess to the texture
- * memory via iGraphics2D/3D interfaces. Internally iGraphics2D/3D are 
- * initialised in 8bit mode and use the palette as calculated by 
+ * memory via iGraphics2D/3D interfaces. Internally iGraphics2D/3D are
+ * initialised in 8bit mode and use the palette as calculated by
  * csTextureHandleSoftware, so you can render to them as usual without
- * requiring recalculation of palettes each frame. 
+ * requiring recalculation of palettes each frame.
  */
 class csTextureSoftwareProc : public csTextureSoftware
 {
@@ -197,7 +197,7 @@ protected:
 
 public:
   /// Create the mipmapped texture object
-  csTextureHandleSoftware (csTextureManagerSoftware *texman, iImage *image, 
+  csTextureHandleSoftware (csTextureManagerSoftware *texman, iImage *image,
 		       int flags);
   /// Destroy the object and free all associated storage
   virtual ~csTextureHandleSoftware ();
@@ -248,8 +248,8 @@ public:
   virtual void ProcTextureSync ();
 
   /**
-   * Called when the procedural texture shares texture manager with parent 
-   * context and in either 16 or 32bit. The 8bit version doesn't require 
+   * Called when the procedural texture shares texture manager with parent
+   * context and in either 16 or 32bit. The 8bit version doesn't require
    * repreparing. Recalculates palette and remaps texture.
    */
   void ReprepareProcTexture ();
@@ -273,7 +273,7 @@ class csTextureManagerSoftware : public csTextureManager
 {
   friend class csTextureHandleSoftware;
 private:
-  /// How strong texture manager should push 128 colors towards 
+  /// How strong texture manager should push 128 colors towards
   /// a uniform palette
   int uniform_bias;
 
@@ -314,7 +314,7 @@ public:
 
   ///
   csTextureManagerSoftware (iObjectRegistry *object_reg,
-  			    csGraphics3DSoftwareCommon *iG3D, 
+  			    csGraphics3DSoftwareCommon *iG3D,
 			    iConfigFile *config);
   ///
   virtual ~csTextureManagerSoftware ();
@@ -379,7 +379,7 @@ public:
   //-----------------------Procedural Texture Support--------------------------
   /**
    * When in 16/32 bit mode and a dedicated procedural texture manager is present
-   * the main texture manager needs to keep track of the first 8bit procedural 
+   * the main texture manager needs to keep track of the first 8bit procedural
    * texture
    */
   csGraphics3DSoftwareCommon *first_8bit_proc_tex;
@@ -389,13 +389,13 @@ public:
   { return (csGraphics3DSoftwareCommon *)first_8bit_proc_tex; }
 
   ///
-  void SetMainTextureManager (csTextureManagerSoftware *main_txt_mgr) 
+  void SetMainTextureManager (csTextureManagerSoftware *main_txt_mgr)
   { main_txtmgr = main_txt_mgr; }
   ///
-  void SetProcTextureManager (csTextureManagerSoftware *proc_txt_mgr) 
+  void SetProcTextureManager (csTextureManagerSoftware *proc_txt_mgr)
   { proc_txtmgr =  proc_txt_mgr; }
   ///
-  csTextureManagerSoftware *GetMainTextureManager () const 
+  csTextureManagerSoftware *GetMainTextureManager () const
   { return main_txtmgr; }
   ///
   csTextureManagerSoftware *GetProcTextureManager () const
@@ -403,7 +403,7 @@ public:
 
 protected:
   /**
-   * When in 16/32bit mode and a dedicated 8bit procedural texture manager is 
+   * When in 16/32bit mode and a dedicated 8bit procedural texture manager is
    * present, its' textures are remapped to the global palette.
    */
   void Reprepare8BitProcs ();

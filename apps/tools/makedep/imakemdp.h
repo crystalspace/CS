@@ -28,7 +28,7 @@ in this Software without prior written authorization from the X Consortium.
 /* $XFree86: xc/config/imake/imakemdep.h,v 3.24.2.9 1998/11/12 10:34:48 dawes Exp $ */
 
 
-/* 
+/*
  * This file contains machine-dependent constants for the imake utility.
  * When porting imake, read each of the steps below and add in any necessary
  * definitions.  In general you should *not* edit ccimake.c or imake.c!
@@ -99,10 +99,10 @@ in this Software without prior written authorization from the X Consortium.
 #ifdef Mips
 #  if defined(SYSTYPE_BSD) || defined(BSD) || defined(BSD43)
 #    define imake_ccflags "-DBSD43"
-#  else 
+#  else
 #    define imake_ccflags "-DSYSV"
 #  endif
-#endif 
+#endif
 
 #ifdef is68k
 #define imake_ccflags "-Dluna -Duniosb"
@@ -282,17 +282,17 @@ in this Software without prior written authorization from the X Consortium.
 /*
  * Step 5:  cpp_argv
  *     The following table contains the flags that should be passed
- *     whenever a Makefile is being generated.  If your preprocessor 
+ *     whenever a Makefile is being generated.  If your preprocessor
  *     doesn't predefine any unique symbols, choose one and add it to the
  *     end of this table.  Then, do the following:
- * 
+ *
  *         a.  Use this symbol in Imake.tmpl when setting MacroFile.
  *         b.  Put this symbol in the definition of BootstrapCFlags in your
  *             <platform>.cf file.
- *         c.  When doing a make World, always add "BOOTSTRAPCFLAGS=-Dsymbol" 
+ *         c.  When doing a make World, always add "BOOTSTRAPCFLAGS=-Dsymbol"
  *             to the end of the command line.
- * 
- *     Note that you may define more than one symbol (useful for platforms 
+ *
+ *     Note that you may define more than one symbol (useful for platforms
  *     that support multiple operating systems).
  */
 
@@ -381,7 +381,7 @@ char *cpp_argv[ARGUMENTS] = {
 #ifdef MOTOROLA
 	"-DMOTOROLA",    /* Motorola Delta Systems */
 # ifdef SYSV
-	"-DSYSV", 
+	"-DSYSV",
 # endif
 # ifdef SVR4
 	"-DSVR4",
@@ -621,14 +621,14 @@ char *cpp_argv[ARGUMENTS] = {
 /* uname -r returns "x.y", e.g. "3.2" ,uname -v returns "x" e.g. "2" */
 # define DEFAULT_OS_MAJOR_REV   "r %[0-9]"
 # define DEFAULT_OS_MINOR_REV   "r %*d.%[0-9]"
-# define DEFAULT_OS_TEENY_REV   "v %[0-9]" 
+# define DEFAULT_OS_TEENY_REV   "v %[0-9]"
 /* # define DEFAULT_OS_NAME        "srm %[^\n]" */ /* Not useful on ISC */
 #elif defined(__FreeBSD__) || defined(__OpenBSD__)
 /* BSD/OS too? */
 /* uname -r returns "x.y[.z]-mumble", e.g. "2.1.5-RELEASE" or "2.2-0801SNAP" */
 # define DEFAULT_OS_MAJOR_REV   "r %[0-9]"
 # define DEFAULT_OS_MINOR_REV   "r %*d.%[0-9]"
-# define DEFAULT_OS_TEENY_REV   "r %*d.%*d.%[0-9]" 
+# define DEFAULT_OS_TEENY_REV   "r %*d.%*d.%[0-9]"
 # define DEFAULT_OS_NAME        "srm %[^\n]"
 # if defined(__FreeBSD__)
 /* Use an alternate way to find the teeny version for -STABLE, -SNAP versions */
@@ -677,7 +677,7 @@ char *cpp_argv[ARGUMENTS] = {
  */
 # define DEFAULT_OS_MAJOR_REV   "r %[0-9]"
 # define DEFAULT_OS_MINOR_REV   "r %*d.%[0-9]"
-# define DEFAULT_OS_TEENY_REV   "r %*d.%*d%[A-Z]" 
+# define DEFAULT_OS_TEENY_REV   "r %*d.%*d%[A-Z]"
 # define DEFAULT_OS_TEENY_REV_FROB(buf, size)				\
     do {								\
 	if (*(buf) >= 'A' && *(buf) <= 'Z') /* sanity check */		\
@@ -697,7 +697,7 @@ char *cpp_argv[ARGUMENTS] = {
 /* Lynx 2.4.0 /bin/cc doesn't like #elif */
 #  define DEFAULT_OS_MAJOR_REV   "r %[0-9]"
 #  define DEFAULT_OS_MINOR_REV   "r %*d.%[0-9]"
-#  define DEFAULT_OS_TEENY_REV   "r %*d.%*d.%[0-9]" 
+#  define DEFAULT_OS_TEENY_REV   "r %*d.%*d.%[0-9]"
 #  define DEFAULT_OS_NAME        "srm %[^\n]"
 # endif
 #endif

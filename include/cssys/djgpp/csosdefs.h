@@ -35,7 +35,7 @@ void _chdrive (char drive)
 {
   unsigned int num_drives; // useless
   _dos_setdrive (drive, &num_drives);
-}                  
+}
 #endif
 
 #if defined (CS_SYSDEF_PROVIDE_GETCWD) || defined (CS_SYSDEF_PROVIDE_ACCESS)

@@ -130,7 +130,7 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual void GetRadius (csVector3& rad, csVector3& cent) 
+  virtual void GetRadius (csVector3& rad, csVector3& cent)
 	{ rad = radius; cent = object_bbox.GetCenter(); }
   virtual void NextFrame (csTicks /*current_time*/) { }
   virtual bool WantToDie () const { return false; }

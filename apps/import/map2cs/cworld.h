@@ -1,23 +1,23 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
     modified by Petr Kocmid (pkocmid@atlas.cz)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef CWORLD_H
@@ -75,7 +75,7 @@ public:
   bool NeedSkysector();
 
   /**
-   * Checks is a sky is needed and writes a dome or a box without the sector 
+   * Checks is a sky is needed and writes a dome or a box without the sector
    * heading
    */
   void WriteSky();
@@ -94,7 +94,7 @@ protected:
   bool WriteVector(double x, double y, double z);
 
   /**
-    * Search a map for manual sectors. All other entities are stored in an 
+    * Search a map for manual sectors. All other entities are stored in an
     * other array called m_Entities, so every entity in the map is stored here.
     * Either as sector or as entity
     */
@@ -128,10 +128,10 @@ protected:
   /// Write a skybox sector with name "cs_skysector"
   void WriteSkybox();
 
-  /// Writes Sprites 
+  /// Writes Sprites
   void WriteSpritesTemplate();
 
-  /// Writes Scripts 
+  /// Writes Scripts
   void WriteScriptsTemplate();
 
   /**
@@ -139,10 +139,10 @@ protected:
     */
   bool WriteTextures();
 
-  /// Write the plugins section to the worldfile 
+  /// Write the plugins section to the worldfile
   bool WritePlugins();
 
-  /// Write the sounds section to the worldfile 
+  /// Write the sounds section to the worldfile
   void WriteSounds();
 
   /// Write the planes section to the worldfile

@@ -150,7 +150,7 @@ bool PicViewApp::Initialize ()
 
   // Initialize the texture manager
   txtmgr->ResetPalette ();
-  
+
   // Change to other directory before doing Prepare()
   // because otherwise precalc_info file will be written into MazeD.zip
   // The /tmp dir is fine for this.
@@ -172,7 +172,7 @@ bool PicViewApp::Initialize ()
   w->SetResizeMode(CS_LOCK_ALL);
   int bw = 0, bh = 0;
   w->GetBorderSize(bw, bh);
-  image_view->SetRect(bw, bh + w->GetTitlebarHeight(), bw + 5, 
+  image_view->SetRect(bw, bh + w->GetTitlebarHeight(), bw + 5,
     bh+w->GetTitlebarHeight() + 5);
 
   w = new ceControlWindow (this, "", CSWS_DEFAULTVALUE & ~CSWS_MENUBAR);
@@ -338,7 +338,7 @@ int main (int argc, char* argv[])
   	iCommandLineParser);
   cmdline->AddOption ("mode", "1024x768");
   cmdline->DecRef ();
-  
+
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
@@ -361,7 +361,7 @@ int main (int argc, char* argv[])
     return -1;
   }
   // Create our main class.
-  
+
   PicViewApp *theApp = new PicViewApp (object_reg, DefaultSkin);
 
   // Initialize the main system. This will load all needed plug-ins

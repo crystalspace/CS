@@ -94,9 +94,9 @@ bool csPrefixConfig::SaveNow(const char *Filename, iVFS *vfs) const
 
   // copy EOF comment
   cfg.SetEOFComment(GetEOFComment());
-  
+
   // write config file
-  return cfg.Save();    
+  return cfg.Save();
 }
 
 const char *csPrefixConfig::GetFileName () const

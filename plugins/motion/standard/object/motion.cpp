@@ -323,7 +323,7 @@ void csMotionController::Animate()
     csMotionBone* motbone=si->motion->bones[bone->boneids[0]];
     motbone->Animate(si->frametime, v, q, 1); //TODO pass interpolate flag
 
-//TODO Enable stack interpolation    
+//TODO Enable stack interpolation
     (void) sv; // fix warning
     (void) sq;
 /*    for(int j=1; j<bone->nummotions; j++) {
@@ -549,7 +549,7 @@ void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr, csAppliedFrame *nex
 
 void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr)
 {
-  int i;  
+  int i;
   for ( i = 0; i < fr->numqlinks; i++ )
 	UpdateTransform( fr->qaffector[i], fr->qlinks[i] );
   for ( i = 0; i < fr->nummlinks; i++ )
@@ -562,9 +562,9 @@ void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr)
 //TODO Azverkan support frame interpolation & make looping optional
 bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, csTicks elapsedtime)
 {
-  MOT_DPRINTF(("Updating motion on Loop: %d, Sweep: %d, Rate: %f\n", am->Loop, am->Sweep, am->Rate)); 
+  MOT_DPRINTF(("Updating motion on Loop: %d, Sweep: %d, Rate: %f\n", am->Loop, am->Sweep, am->Rate));
   if (!am->Rate) return true;
-  
+
   int size = am->numframes, keyf = am->frames[size-1]->keyframe, t_elapse;
   bool set=false;
   t_elapse = int( am->Rate * elapsedtime);
@@ -579,7 +579,7 @@ bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, csTicks elapsedti
 		am->curtime += t_elapse;
 		am->curtime = -am->curtime;
 		set = true;
-	  } 
+	  }
 	  else
 	  if ( am->curtime + t_elapse >= keyf )
 	  {
@@ -596,7 +596,7 @@ bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, csTicks elapsedti
 
   if ( am->curtime < 0 ) am->curtime += keyf;
 	else am->curtime %= keyf;
-	
+
   int i;
   for ( i = 0; i < size; i++ )
   {
@@ -611,7 +611,7 @@ bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, csTicks elapsedti
 
   if (!i && (am->Rate < 0)) am->nextframe = (am->Loop) ? size - 1 : 0;
   else
-	if ((i == size - 1) && (am->Rate > 0)) 
+	if ((i == size - 1) && (am->Rate > 0))
 	  am->nextframe = (am->Loop) ? 0 : size - 1;
 
   if ( slerp && (am->nextframe != am->curframe))
@@ -623,7 +623,7 @@ bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, csTicks elapsedti
 	return true;
   }
 #ifdef MOTION_DEBUG
-  printf("UpdateAppliedMotion %d %d\n", am->curtime, am->frames[am->curframe]->keyframe); 
+  printf("UpdateAppliedMotion %d %d\n", am->curtime, am->frames[am->curframe]->keyframe);
 #endif
 
   UpdateAppliedFrame(am->frames[am->curframe]);

@@ -137,7 +137,7 @@ void csProcWater::Animate (csTicks current_time)
   /// draw palette
   //for(i=0; i<palsize; i++)
   //{
-  //  g2d->DrawBox(i*(g2d->GetWidth()/palsize), 1, 
+  //  g2d->DrawBox(i*(g2d->GetWidth()/palsize), 1,
   //    (g2d->GetWidth()/palsize)+5, 10, palette[i]);
   //}
 
@@ -161,7 +161,7 @@ void csProcWater::Animate (csTicks current_time)
   for (y=0; y<mat_h; y++)
     for (x=0; x<mat_w; x++)
     {
-      int wt = GetImage (cur_image-1, x, y-1) + 
+      int wt = GetImage (cur_image-1, x, y-1) +
         GetImage (cur_image-1, x, y+1) +
         GetImage (cur_image-1, x-1, y) +
         GetImage (cur_image-1, x+1, y);
@@ -172,7 +172,7 @@ void csProcWater::Animate (csTicks current_time)
     }
 
   if (ptG3D->BeginDraw (CSDRAW_2DGRAPHICS))
-  {  
+  {
     /// draw texture
     for (y=0; y<mat_h; y++)
       for (x=0; x<mat_w;x++)

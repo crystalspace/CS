@@ -1,6 +1,6 @@
 //
 //  OSXDelegate2D_OpenGL.m
-//  
+//
 //
 //  Created by mreda on Wed Oct 31 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -30,11 +30,11 @@ static CGColorSpaceRef colorSpace = NULL;
     NSView *contentView = [window contentView];
 
     if (window == nil)
-        return NO; 
+        return NO;
 
     if (colorSpace == NULL)
         colorSpace = CGColorSpaceCreateDeviceRGB();
-        
+
     if ([contentView lockFocusIfCanDraw] == YES)
     {
         size_t bytesPerPixel = depth / 8;
@@ -42,21 +42,21 @@ static CGColorSpaceRef colorSpace = NULL;
         size_t bytesPerRow = bytesPerPixel * width;
         size_t bufferSize = height * bytesPerRow;
         CGDataProviderRef prov = CGDataProviderCreateWithData(NULL, buffer, bufferSize, NULL);
-        CGImageRef image = CGImageCreate(width, height, bitsPerComponent, depth, bytesPerRow, colorSpace, 
+        CGImageRef image = CGImageCreate(width, height, bitsPerComponent, depth, bytesPerRow, colorSpace,
                                         kCGImageAlphaNoneSkipFirst, prov, NULL, NO, kCGRenderingIntentDefault);
-                                        
-        CGContextDrawImage([[NSGraphicsContext currentContext] graphicsPort], 
+
+        CGContextDrawImage([[NSGraphicsContext currentContext] graphicsPort],
                                 CGRectMake(0, 0, width, height), image);
-        
+
         [window flushWindow];
         [contentView unlockFocus];
-        
+
         CGDataProviderRelease(prov);
         CGImageRelease(image);
 
         return YES;
     };
-    
+
     return NO;
 };
 

@@ -80,7 +80,7 @@ struct iImageIO : public iBase
    * Save an image using format <mime>.
    * If omitted format selection is left to the plugin.
    */
-  virtual iDataBuffer *Save (iImage *image, const char *mime = NULL) = 0; 
+  virtual iDataBuffer *Save (iImage *image, const char *mime = NULL) = 0;
 };
 
 #endif // __IGRAPHIC_IMAGEIO_H__

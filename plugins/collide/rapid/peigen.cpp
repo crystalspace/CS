@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -44,7 +44,7 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
   csVector3 b (M.m11, M.m22, M.m33), d (M.m11, M.m22, M.m33);
 
   nrot = 0;
-  
+
   // Try up to 50 times.
   for(i=0; i<50; i++)
     {
@@ -57,14 +57,14 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
 	  dout = d;
 	  return i;
 	}
-      
+
       if (i < 3) tresh=0.2*sm/(3*3); else tresh=0.0;
-      
+
       // Try rotations in 1st dimension
       {
-	g = 100.0*ABS (M.m12);  
+	g = 100.0*ABS (M.m12);
 	// Does this make sense??
-	// equiv to   if (i>3 && g == 0) 
+	// equiv to   if (i>3 && g == 0)
 	if (i>3 && ABS (d.x)+g==ABS (d.x) && ABS (d.y)+g==ABS (d.y))
 	  M.m12 =0.0;
 	else if (ABS (M.m12)>tresh)
@@ -81,7 +81,7 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
 	    z.x -= h; z.y += h; d.x -= h; d.y += h;
 	    M.m12=0.0;
 	    rotate(M.m13,M.m23); rotate(v.m11,v.m12);
-            rotate(v.m21,v.m22); rotate(v.m31,v.m32); 
+            rotate(v.m21,v.m22); rotate(v.m31,v.m32);
 	    nrot++;
 	  }
       }
@@ -106,7 +106,7 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
 	    z.x -= h; z.z += h; d.x -= h; d.z += h;
 	    M.m13=0.0;
 	    rotate(M.m12,M.m23); rotate(v.m11,v.m13);
-            rotate(v.m21,v.m23); rotate(v.m31,v.m33); 
+            rotate(v.m21,v.m23); rotate(v.m31,v.m33);
 	    nrot++;
 	  }
       }
@@ -131,12 +131,12 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
 	    z.y -= h; z.z += h; d.y -= h; d.z += h;
 	    M.m23=0.0;
 	    rotate(M.m12,M.m13); rotate(v.m12,v.m13);
-            rotate(v.m22,v.m23); rotate(v.m32,v.m33); 
+            rotate(v.m22,v.m23); rotate(v.m32,v.m33);
 	    nrot++;
 	  }
       }
 
-      b = b + z; d = b; z.Set( 0, 0, 0);      
+      b = b + z; d = b; z.Set( 0, 0, 0);
     }
 
   return -1;
@@ -184,5 +184,5 @@ int SortedEigen (csMatrix3& M, csMatrix3& evecs)
     }
   // we are returning the number of iterations Meigen took.
   // too many iterations means our chosen orientation is bad.
-  return n; 
+  return n;
 }

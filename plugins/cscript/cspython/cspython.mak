@@ -24,8 +24,8 @@ cspython:
 	$(MAKE_TARGET) MAKE_DLL=yes
 cspythonclean:
 	$(MAKE_CLEAN)
-cspythonswig: 
-	$(MAKE_TARGET) MAKE_DLL=yes	
+cspythonswig:
+	$(MAKE_TARGET) MAKE_DLL=yes
 
 endif # ifeq ($(MAKESECTION),roottargets)
 

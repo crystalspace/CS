@@ -1,18 +1,18 @@
 #ifndef __AWS_SCROLL_BAR_H__
 #define __AWS_SCROLL_BAR_H__
 /**************************************************************************
-    Copyright (C) 2000-2001 by Christopher Nelson 
-    
+    Copyright (C) 2000-2001 by Christopher Nelson
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -40,7 +40,7 @@ class awsScrollBar : public awsComponent
 
   /// Holds the texture handle for the inc arrow
   iTextureHandle *incimg;
-  
+
   /// Flags for frame style.
   int frame_style;
 
@@ -49,16 +49,16 @@ class awsScrollBar : public awsComponent
 
   /// Button for up or left
   awsCmdButton *decVal;
-   
-  /// Button for down or right 
+
+  /// Button for down or right
   awsCmdButton *incVal;
 
   /// The sink for button messages
   iAwsSink *sink;
-  
+
   /// The slot for decrement button messages
   iAwsSlot *dec_slot;
-  
+
   /// The slot for increment button messages
   iAwsSlot *inc_slot;
 
@@ -90,7 +90,7 @@ protected:
 
   static const int fsVertical;
   static const int fsHorizontal;
-  
+
   /******* Signals **********************/
 
   /// The value of the scroll bar changed
@@ -124,7 +124,7 @@ public:
   /// Triggered when the user presses a mouse button down
   virtual bool OnMouseDown(int button, int x, int y);
 
-  /// Triggered when the user unpresses a mouse button 
+  /// Triggered when the user unpresses a mouse button
   virtual bool OnMouseUp(int button, int x, int y);
 
   /// Triggered when the user moves the mouse
@@ -166,7 +166,7 @@ public:
   /// Does nothing
   virtual ~awsScrollBarFactory();
 
-  /// Returns a newly created component of the type this factory handles. 
+  /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create();
 };
 

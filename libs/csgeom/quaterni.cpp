@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2000 by Norman Kramer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -59,7 +59,7 @@ csQuaternion csQuaternion::ToAxisAngle() const
 
 	tr = (float)acos(r);
 	invscale = 1.0f / ((float)sin(tr));
-	return csQuaternion(tr * (float)QUATTOAXISANGLECONST, 
+	return csQuaternion(tr * (float)QUATTOAXISANGLECONST,
                             x * invscale, y * invscale, z * invscale);
 }
 
@@ -89,18 +89,18 @@ csQuaternion csQuaternion::Slerp(const csQuaternion &quat2, float slerp) const
 			scale0 = 1.0 - slerp;
 			scale1 = slerp;
 		}
-		return csQuaternion(scale0 * r + scale1 * quat2.r, 
-                                    scale0 * x + scale1 * quat2.x, 
-                                    scale0 * y + scale1 * quat2.y, 
+		return csQuaternion(scale0 * r + scale1 * quat2.r,
+                                    scale0 * x + scale1 * quat2.x,
+                                    scale0 * y + scale1 * quat2.y,
                                     scale0 * z + scale1 * quat2.z);
 	}
 	// The quaternions are nearly opposite so to avoid a divided by zero error
 	// Calculate a perpendicular quaternion and slerp that direction
 	scale0 = sin((1.0 - slerp) * PI);
 	scale1 = sin(slerp * PI);
-	return csQuaternion(scale0 * r + scale1 * quat2.z, 
-                            scale0 * x + scale1 * -quat2.y, 
-                            scale0 * y + scale1 * quat2.x, 
+	return csQuaternion(scale0 * r + scale1 * quat2.z,
+                            scale0 * x + scale1 * -quat2.y,
+                            scale0 * y + scale1 * quat2.x,
                             scale0 * z + scale1 * -quat2.r);
 }
 

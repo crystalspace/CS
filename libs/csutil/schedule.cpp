@@ -38,7 +38,7 @@ public:
   int period;
   /// how many msec after the previous part this part should be called
   int after;
-  /// next part in the linked time-sequence-sorted list 
+  /// next part in the linked time-sequence-sorted list
   csSchedulePart *next;
 };
 
@@ -75,14 +75,14 @@ void csSchedule::TimePassed(int elapsed_time)
     }
     /// first part must be called
     /// reschedule the first part (if needed), then call the first part
-    
+
     /// move the 'now' so that first->after msec have passed.
     csSchedulePart *part = first;
     todotime -= part->after;
     part->after = 0;
     /// unlink, possibly relink
     first = part->next;
-    if(part->period != 0) 
+    if(part->period != 0)
       InsertCall(part, part->period); // play it again, Sam!
 
     /// do the callback
@@ -209,7 +209,7 @@ void csSchedule::InsertCall(csSchedulePart *part, int afternow)
     part->next = first;
     first = part;
   }
-  else 
+  else
   {
     part->next = prev->next;
     prev->next = part;

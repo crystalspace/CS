@@ -19,7 +19,7 @@ extern "C" {
 //  int mkdir() {PS2UNUSED();}
 //  int getcwd() {PS2UNUSED();}
 //  int access() {PS2UNUSED();}
-//TODO Azverkan WriteMe  
+//TODO Azverkan WriteMe
 //  time_t time(time_t*) { return 0; }
 //  int link() {PS2UNUSED();}
 //  int times() {PS2UNUSED();}
@@ -28,7 +28,7 @@ extern "C" {
 struct MyFile {
 	int fd;
 	int pos;
-	bool eof; 
+	bool eof;
 };
 #define FILE2SCE(f) (((MyFile*)f)->fd)
 #define FILE2POS(f) (((MyFile*)f)->pos)
@@ -47,7 +47,7 @@ FILE *fopen(const char * filename, const char * mode) {
       sceFsReset();
       firstboot=0;
    }
-   
+
   int flags=0;
   if(mode[0]=='r') {
     if(mode[1]=='w')
@@ -55,7 +55,7 @@ FILE *fopen(const char * filename, const char * mode) {
     else
       flags=SCE_RDONLY;
   } else if(mode[0]=='w')
-    flags=SCE_WRONLY | SCE_CREAT;  
+    flags=SCE_WRONLY | SCE_CREAT;
   else if(mode[0]=='a')
     flags=SCE_TRUNC | SCE_CREAT;
 
@@ -65,19 +65,19 @@ FILE *fopen(const char * filename, const char * mode) {
   strcpy(buf, SCEHOST);
   strcat(buf, filename);
   FILE2SCE(f)=sceOpen(buf, flags);
-  
+
   if(FILE2SCE(f)<0) {
     strcpy(buf, SCECDROM);
     strcat(buf, filename);
     FILE2SCE(f)=sceOpen(buf, flags);
   }
-  
+
   if(FILE2SCE(f)<0) {
      delete f;
      printf("fopen(%s, %s) FAIL\n", filename, mode);
      return NULL;
   }
-  
+
 #if 0
   printf("fopen(%s, %s) %d\n", buf, mode, FILE2SCE(f));
 #endif
@@ -102,7 +102,7 @@ size_t  fread(void *buf, size_t size, size_t count, FILE *f) {
 #if PS2FILE_DEBUG
   printf("fread(%p, %d, %d, %d) %d\n", buf, size, count, FILE2SCE(f), bytes);
 #endif
-  if(bytes<size*count) 
+  if(bytes<size*count)
       FILE2EOF(f)=1;
 
   return bytes/size;
@@ -137,7 +137,7 @@ int fseek(FILE *f, long int dist, int pos) {
   } else {
     where=SCE_SEEK_END;
   }
-  
+
   FILE2POS(f)=sceLseek(FILE2SCE(f), dist, where);
 #if PS2FILE_DEBUG
   printf("fseek(%d, %d, %d) %d\n", FILE2SCE(f), dist, where, FILE2POS(f));

@@ -4,9 +4,9 @@ http://www.mikmod.org
 Grab the latest stable (i tested with 3.1.9).
 
 Notes:
-If you compile the mikmod lib with thread support you will need to add -lpthread to the 
+If you compile the mikmod lib with thread support you will need to add -lpthread to the
 final CS excutable (adding -lpthread to the sndmod.so plugin does not work)
-If you compile the mikmod lib without thread support (./configure --disable-threads) 
+If you compile the mikmod lib without thread support (./configure --disable-threads)
 no such problems with adding pthread will arise. So it's up to you.
 
 norman

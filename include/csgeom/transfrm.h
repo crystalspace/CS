@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -255,11 +255,11 @@ class csReversibleTransform : public csTransform
 protected:
   /// Inverse transformation matrix ('this' to 'other' space).
   csMatrix3 m_t2o;
-  
+
   /**
    * Initialize transform with both transform matrix and inverse tranform.
    */
-  csReversibleTransform (const csMatrix3& o2t, const csMatrix3& t2o, 
+  csReversibleTransform (const csMatrix3& o2t, const csMatrix3& t2o,
     const csVector3& pos) : csTransform (o2t,pos), m_t2o (t2o) {}
 
 public:
@@ -305,14 +305,14 @@ public:
   /**
    * Get the inverse of this transform.
    */
-  csReversibleTransform GetInverse () const 
-  { return csReversibleTransform (m_t2o, m_o2t, -m_o2t*v_o2t); } 
+  csReversibleTransform GetInverse () const
+  { return csReversibleTransform (m_t2o, m_o2t, -m_o2t*v_o2t); }
 
   /**
    * Set 'other' to 'this' transformation matrix.
    * This is the 3x3 matrix M from the transform equation T=M*(O-V).
    */
-  virtual void SetO2T (const csMatrix3& m) 
+  virtual void SetO2T (const csMatrix3& m)
   { m_o2t = m;  m_t2o = m_o2t.GetInverse (); }
 
   /**
@@ -320,7 +320,7 @@ public:
    * This is equivalent to SetO2T() except that you can now give the
    * inverse matrix.
    */
-  virtual void SetT2O (const csMatrix3& m) 
+  virtual void SetT2O (const csMatrix3& m)
   { m_t2o = m;  m_o2t = m_t2o.GetInverse (); }
 
   /**
@@ -418,13 +418,13 @@ public:
    * to calling t.This2Other(v).
    */
   friend csVector3 operator/ (const csVector3& v,
-  	const csReversibleTransform& t); 
+  	const csReversibleTransform& t);
 
   /**
    * Reverse a transformation on a 3D vector. This corresponds exactly
    * to calling v=t.This2Other(v).
    */
-  friend csVector3& operator/= (csVector3& v, const csReversibleTransform& t); 
+  friend csVector3& operator/= (csVector3& v, const csReversibleTransform& t);
 
   /**
    * Reverse a transformation on a Plane. This corresponds exactly
@@ -481,8 +481,8 @@ public:
   friend csReversibleTransform operator* (const csReversibleTransform& t1,
                                         const csReversibleTransform& t2)
   {
-    return csReversibleTransform (t1.m_o2t*t2.m_o2t, t2.m_t2o*t1.m_t2o, 
-                             t2.v_o2t + t2.m_t2o*t1.v_o2t); 
+    return csReversibleTransform (t1.m_o2t*t2.m_o2t, t2.m_t2o*t1.m_t2o,
+                             t2.v_o2t + t2.m_t2o*t1.v_o2t);
   }
 
   /**
@@ -497,7 +497,7 @@ public:
    * Then this will calculate a new transformation in 't1' as follows:
    * T=(t1.M*t2.M)*(O-(t2.Minv*t1.V+t2.V)).
    */
-  friend csTransform operator* (const csTransform& t1, 
+  friend csTransform operator* (const csTransform& t1,
                               const csReversibleTransform& t2);
 
   /**
@@ -563,7 +563,7 @@ public:
    * Set 'other' to 'this' transformation matrix.
    * This is the 3x3 matrix M from the transform equation T=M*(O-V).
    */
-  virtual void SetO2T (const csMatrix3& m) 
+  virtual void SetO2T (const csMatrix3& m)
   { m_o2t = m;  m_t2o = m_o2t.GetTranspose (); }
 
   /**
@@ -571,7 +571,7 @@ public:
    * This is equivalent to SetO2T() except that you can now give the
    * inverse matrix.
    */
-  virtual void SetT2O (const csMatrix3& m) 
+  virtual void SetT2O (const csMatrix3& m)
   { m_t2o = m;  m_o2t = m_t2o.GetTranspose (); }
 };
 

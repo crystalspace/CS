@@ -265,7 +265,7 @@ void PerfTest::SetupFrame ()
   current_time = vc->GetCurrentTicks ();
 
   // Tell 3D driver we're going to display 3D things.
-  if (!myG3D->BeginDraw (draw_3d ? CSDRAW_3DGRAPHICS : CSDRAW_2DGRAPHICS)) 
+  if (!myG3D->BeginDraw (draw_3d ? CSDRAW_3DGRAPHICS : CSDRAW_2DGRAPHICS))
     return;
 
   // Setup if needed.

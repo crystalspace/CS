@@ -219,7 +219,7 @@ public:
    * responsible for destroying the returned string with delete[].
    */
   char *Description() const
-  { 
+  {
     char *s = new char [bit_count + 1];
     char *p = s;
     for (unsigned i = 0; i < bit_count; i++)

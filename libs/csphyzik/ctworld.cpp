@@ -31,7 +31,7 @@
 
 static ctWorld *gcurrent_world = NULL;
 
-static void __ctworld_dydt(real t, const real y[], real dy[]) 
+static void __ctworld_dydt(real t, const real y[], real dy[])
 {
   gcurrent_world->dydt_eval (t, y, dy);
 }
@@ -40,8 +40,8 @@ void ctWorld::dydt_eval (real t, const real y[], real dy[] )
 {
   //  assert_goto( gcurrent_world != NULL, "current world NULL in dydt\n",
   //               ASSERTFAIL );
-  
-  gcurrent_world->calc_delta_state ( t, y, dy ); 
+
+  gcurrent_world->calc_delta_state ( t, y, dy );
 
   //ASSERTFAIL:
 }
@@ -66,7 +66,7 @@ ctWorld::ctWorld ()
 //!me delete _lists and ode
 ctWorld::~ctWorld()
 {
-  if ( ode_to_math ) 
+  if ( ode_to_math )
     delete ode_to_math;
   //!me lists delete here
   delete [] y0;
@@ -74,7 +74,7 @@ ctWorld::~ctWorld()
   delete [] y_save;
 }
 
-void ctWorld::calc_delta_state ( real t, const real y[], real dy[] ) 
+void ctWorld::calc_delta_state ( real t, const real y[], real dy[] )
 {
   // move data from y array into all entities in this world
   reintegrate_state ( y );
@@ -118,7 +118,7 @@ void ctWorld::register_catastrophe_manager ( ctCatastropheManager *pcm )
   if ( pcm != NULL )
     catastrophe_list.add_link ( pcm );
 }
- 
+
 // calculate new positions of world objects after time dt
 errorcode ctWorld::do_time_step ( real t0, real t1 )
 {
@@ -132,17 +132,17 @@ errorcode ctWorld::do_time_step ( real t0, real t1 )
   }
 
   gcurrent_world = this;
-  
+
   if ( arr_size > max_state_size )
     resize_state_vector( arr_size );
 
   load_state ( y0 );
-  
+
   // save this state for posible rewinding
   int i;
   for (i = 0; i < arr_size; i++ )
     y_save[i] = y0[i];
- 
+
   y_save_size = arr_size;
 
   if ( ode_to_math )
@@ -161,13 +161,13 @@ errorcode ctWorld::do_time_step ( real t0, real t1 )
   reintegrate_state ( y1 );
 
   gcurrent_world = NULL;
-  
+
   if ( fsm_state == CTWS_REWOUND && t1 >= rewound_from )
   {
     fsm_state = CTWS_NORMAL;
     rewound_from = 0;
   }
-  
+
   return WORLD_NOERR;
 }
 
@@ -190,7 +190,7 @@ errorcode ctWorld::evolve ( real t1, real t2 )
   ctLinkList<ctCatastropheManager> *swap_cat;
 
   //make sure we don't go into an infinite loop
-  long loops = max_time_subdivisions; 
+  long loops = max_time_subdivisions;
 
   ta = t1;
   tb = t2;
@@ -224,7 +224,7 @@ errorcode ctWorld::evolve ( real t1, real t2 )
       }
       cat = catastrophe_list.get_next ();
     }
-    
+
     // if there is a catastrophe
     if ( max_cat_dist > 0 )
     {
@@ -244,7 +244,7 @@ errorcode ctWorld::evolve ( real t1, real t2 )
       }
       else
 	tb -= (tb - ta)*0.5;
-    // if we have not arrived at the end of our time interval 
+    // if we have not arrived at the end of our time interval
     }
     else if ( is_unhandled_catastrophe )
     {
@@ -253,7 +253,7 @@ errorcode ctWorld::evolve ( real t1, real t2 )
 
       // we have found a time close to when catastrpohe happened
       if ( ( tb - ta ) <= TIME_EPSILON )
-      {  
+      {
         // resolve all catastrophes that occurred at this approx point in time.
         cat = recent_cat->get_first ();
         while ( cat )
@@ -282,7 +282,7 @@ errorcode ctWorld::evolve ( real t1, real t2 )
     }
   }
 
-  // we barfed out without handling catastrophe, 
+  // we barfed out without handling catastrophe,
   // so let's do the best we can in an ugly situation.
   if ( is_unhandled_catastrophe )
   {
@@ -301,7 +301,7 @@ errorcode ctWorld::evolve ( real t1, real t2 )
       cat = catastrophe_list.get_next();
     }
 
-    // resolve all catastrophes that occured, 
+    // resolve all catastrophes that occured,
     // not caring about getting the proper time-resolution.
     cat = this_slice_cat->get_first ();
     while ( cat )
@@ -382,7 +382,7 @@ void ctWorld::load_state ( real *state_array )
       state_size = pe->get_state_size ();
     else
       state_size = pe->set_state ( state_array );
-   
+
     state_array += state_size;
     pe = body_list.get_next ();
   }
@@ -481,16 +481,16 @@ void ctWorld::apply_function_to_body_list ( void(*fcn)( ctEntity *ppe ) )
   {
     fcn ( pe );
     pe = body_list.get_next ();
-  } 
+  }
 }
 
 
 // return the relative velocity between up to two bodies at a point in world space
-ctVector3 ctWorld::get_relative_v 
+ctVector3 ctWorld::get_relative_v
   ( ctPhysicalEntity *body_a, ctPhysicalEntity *body_b, const ctVector3 &the_p )
 {
   if ( (!body_a) && (!body_b) )
-    return ctVector3 (0,0,0);	
+    return ctVector3 (0,0,0);
 
   ctVector3 v_rel;
   ctVector3 body_x = body_a->get_pos ();
@@ -543,30 +543,30 @@ void ctWorld::resolve_collision ( ctCollidingContact *cont )
   real ma_inv, mb_inv;   // 1/mass_body
   real rota, rotb;       // contribution from rotational inertia
   ctVector3 n;
-  ctVector3 ra, rb;      // center of body to collision point in inertail ref frame 
+  ctVector3 ra, rb;      // center of body to collision point in inertail ref frame
   // keep track of previous object collided with.
   // in simultaneous collisions with the same object the restituion should
   // only be factored in once.  So all subsequent collisions are handled as
   // seperate collisions, but with a restitution of 1.0
   // if they are different objects then treat them as multiple collisions with
   // normal restitution.
-  //!me this isn't actually a very good method.... maybe something better can be 
+  //!me this isn't actually a very good method.... maybe something better can be
   //!me implemented once contact force solver is implemented
   ctPhysicalEntity *prev;
   ctPhysicalEntity *ba;
   ctPhysicalEntity *bb;
   ctCollidingContact *head_cont = cont;
 
-  // since NULL is used for an immovable object we need a 
+  // since NULL is used for an immovable object we need a
   // different "nothing" pointer
-  prev = (ctPhysicalEntity *)this; 
+  prev = (ctPhysicalEntity *)this;
 
   if ( (cont != NULL) && (cont->body_a != NULL) )
     ba = cont->body_a->get_collidable_entity();
   else
     return;
-	
-  if ( ba == NULL ) 
+
+  if ( ba == NULL )
     return;
 
   while ( cont != NULL )
@@ -581,13 +581,13 @@ void ctWorld::resolve_collision ( ctCollidingContact *cont )
     v_rel = n * get_relative_v ( ba, bb, cont->contact_p );
 
     // if the objects are traveling towards each other do collision response
-    if (v_rel < 0) 
+    if (v_rel < 0)
     {
       ra = cont->contact_p - ba->get_pos ();
 
       ba->get_impulse_m_and_I_inv ( &ma_inv, &imp_I_inv, ra, n );
       ma_inv = 1.0/ma_inv;
-      rota = n * ((imp_I_inv*( ra%n ) )%ra);  
+      rota = n * ((imp_I_inv*( ra%n ) )%ra);
 
       if ( bb == NULL )
       {
@@ -613,7 +613,7 @@ void ctWorld::resolve_collision ( ctCollidingContact *cont )
       if ( prev != cont->body_b )
         j_magnitude = -(1.0 + cont->restitution ) * v_rel / bottom;
       else
-        // if we are dealing with a simulatneous collision with 
+        // if we are dealing with a simulatneous collision with
         // same object.
         j_magnitude = -(1.0 + 1.0 ) * v_rel / bottom;
 
@@ -622,13 +622,13 @@ void ctWorld::resolve_collision ( ctCollidingContact *cont )
 
       if ( bb != NULL )
         bb->apply_impulse( rb, j*(-1.0) );
-  
+
       // treat next simultaneous collision as a seperate collision.
       prev = bb;
 
     }
 
-    cont = cont->next;  
+    cont = cont->next;
   }
 
   // now check if any of the contacts are in resting contact
@@ -648,7 +648,7 @@ void ctWorld::resolve_collision ( ctCollidingContact *cont )
       r_cont->eb = cont->eb;
       r_cont->vf = cont->vf;
       r_cont->contact_p = cont->contact_p;
-   
+
     }
 
     cont = cont->next;
@@ -659,12 +659,12 @@ void ctWorld::resolve_collision ( ctCollidingContact *cont )
 // alloc stuff
 
 // Remove block matching "offset" from the used_blocks list and return it
-AllocNode *ctWorld::sa_make_unused(int offset) 
+AllocNode *ctWorld::sa_make_unused(int offset)
 {
   AllocNode *node = (AllocNode*) used_blocks.GetFirstItem ();
-  while (node) 
+  while (node)
   {
-    if (node->offset == offset) 
+    if (node->offset == offset)
     {
       used_blocks.RemoveItem ();
       return node;
@@ -676,21 +676,21 @@ AllocNode *ctWorld::sa_make_unused(int offset)
 }
 
 // Add block to the used_blocks list, inserted in its proper location
-bool ctWorld::sa_make_used(AllocNode *block) 
+bool ctWorld::sa_make_used(AllocNode *block)
 {
   AllocNode *index = (AllocNode*) used_blocks.GetFirstItem ();
-  if (!index || index->offset > block->offset) 
+  if (!index || index->offset > block->offset)
     return used_blocks.AddItem((void*)block);
 
-  while (index) 
+  while (index)
   {
-    if (index->offset > block->offset) 
+    if (index->offset > block->offset)
     {
       used_blocks.GetPrevItem ();
       return used_blocks.AddCurrentItem ( (void*)block );
     }
     index = (AllocNode*)used_blocks.GetNextItem ();
-    if (index == (AllocNode*)used_blocks.PeekFirstItem ()) 
+    if (index == (AllocNode*)used_blocks.PeekFirstItem ())
       index = NULL;
   }
 
@@ -703,37 +703,37 @@ bool ctWorld::sa_make_used(AllocNode *block)
   return false;
 }
 
-int ctWorld::state_alloc (int size) 
+int ctWorld::state_alloc (int size)
 {
-  if ( size <= 0 ) 
+  if ( size <= 0 )
     return -1;
 
   int maxsize = 0;
   int bestfit = 0;
   AllocNode *index = (AllocNode*) free_blocks.GetFirstItem ();
-  while (index) 
+  while (index)
   {
-    if ( index->size > maxsize ) 
+    if ( index->size > maxsize )
       maxsize = index->size;
 
-    if ( (index->size >= size) && (index->size < bestfit) ) 
+    if ( (index->size >= size) && (index->size < bestfit) )
       bestfit = index->size;
 
     index = (AllocNode*) free_blocks.GetNextItem ();
 
-    if ( index == (AllocNode*) free_blocks.PeekFirstItem () ) 
+    if ( index == (AllocNode*) free_blocks.PeekFirstItem () )
       index = NULL;
   }
 
   // Combination of best-fit and worst-fit algorithms that seem to me to
   // fill the bill nicely
   int blocksize;
-  if ( bestfit == size ) 
+  if ( bestfit == size )
     blocksize = bestfit;
-  else 
+  else
     blocksize = maxsize;
 
-  if ( blocksize < size ) 
+  if ( blocksize < size )
   {
     // No already-allocated block fits
     AllocNode node;
@@ -746,9 +746,9 @@ int ctWorld::state_alloc (int size)
 
   // Grab first block of size blocksize and make it used, not free
   index = (AllocNode*)free_blocks.GetFirstItem ();
-  while (index) 
+  while (index)
   {
-    if ( index->size == blocksize ) 
+    if ( index->size == blocksize )
     {
       free_blocks.RemoveItem ();     // Block isn't free
       assert (sa_make_used (index));  // Block is now used
@@ -762,7 +762,7 @@ int ctWorld::state_alloc (int size)
   return -1;
 }
 
-void ctWorld::state_free (int offset) 
+void ctWorld::state_free (int offset)
 {
   AllocNode *freenode;
 
@@ -772,7 +772,7 @@ void ctWorld::state_free (int offset)
     // Wasn't in used_blocks list, state_free() of invalid offset
     return;
 
-  if (freenode->offset + freenode->size == state_size) 
+  if (freenode->offset + freenode->size == state_size)
   {
     // If this is the last block in the free & used lists, reduce state_size
     state_size -= freenode->size;
@@ -782,18 +782,18 @@ void ctWorld::state_free (int offset)
 
   AllocNode *index = (AllocNode*) free_blocks.GetFirstItem ();
   bool handled = false;
-  if ( !index || (index->offset > freenode->offset) ) 
+  if ( !index || (index->offset > freenode->offset) )
   {
     // Tack it onto the beginning
     free_blocks.AddItem((void*)freenode);
     handled = true;
   }
 
-  while ( !handled && index ) 
+  while ( !handled && index )
   {
-    if ( index->offset > freenode->offset ) 
+    if ( index->offset > freenode->offset )
     {
-      if ( freenode->offset + freenode->size >= index->offset ) 
+      if ( freenode->offset + freenode->size >= index->offset )
       {
 	assert (freenode->offset + freenode->size == index->offset);
 	index->offset = freenode->offset;
@@ -801,8 +801,8 @@ void ctWorld::state_free (int offset)
 	delete freenode;
 	handled = true;
 	break;
-      } 
-      else 
+      }
+      else
       {
 	// Blocks are separate, just need to insert before current block
 	// if() statement before while guarantees this isn't first list elt
@@ -812,10 +812,10 @@ void ctWorld::state_free (int offset)
     }
 
     index = (AllocNode*) free_blocks.GetNextItem ();
-    if ( index == (AllocNode*) free_blocks.PeekFirstItem () ) 
+    if ( index == (AllocNode*) free_blocks.PeekFirstItem () )
       index = NULL;
   }
-  if (!handled) 
+  if (!handled)
   {
     // Block wasn't inserted before the end of the list, so it presumably
     // goes at the end of the list, but before the end of the state vector.

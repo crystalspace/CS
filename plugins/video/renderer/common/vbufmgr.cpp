@@ -78,7 +78,7 @@ csVertexBufferManager::~csVertexBufferManager()
   // @@@ Maybe an assert here to check if that's the case?
   // CS_ASSERT (buffers.Length () == 0);
 
-  /// go through list of registered client and tell 'em we are no longer 
+  /// go through list of registered client and tell 'em we are no longer
   /// available
   for (int i=0; i < vClients.Length (); i++)
     ((iVertexBufferManagerClient*)vClients.Get (i))->ManagerClosing ();

@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998,2000 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -29,7 +29,7 @@
 // the vertices of the polygon are oriented in clockwise ordering.
 // If this was not the case then the polygon should not be drawn (culled)
 // and this routine would not be called for it.
-int csMath2::InPoly2D (const csVector2& v, 
+int csMath2::InPoly2D (const csVector2& v,
                        csVector2* P, int n, csBox2* bounding_box)
 {
   if (!bounding_box->In (v.x, v.y)) return CS_POLY_OUT;
@@ -91,7 +91,7 @@ bool csIntersect2::IntersectPolygon (const csPlane2& plane,
 
 bool csIntersect2::Segments (
   const csSegment2& a, const csSegment2& b,
-  csVector2& isect, float& dist) 
+  csVector2& isect, float& dist)
 {
   float denom;
   float r, s;
@@ -103,7 +103,7 @@ bool csIntersect2::Segments (
 //            (Ya1-Yb1)(Xb2-Xb1)-(Xa1-Xb1)(Yb2-Yb1)
 //        r = -------------------------------------  (eqn 1)
 //            (Xa2-Xa1)(Yb2-Yb1)-(Ya2-Ya1)(Xb2-Xb1)
-// 
+//
 //            (Ya1-Yb1)(Xa2-Xa1)-(Xa1-Xb1)(Ya2-Ya1)
 //        s = -------------------------------------  (eqn 2)
 //            (Xa2-Xa1)(Yb2-Yb1)-(Ya2-Ya1)(Xb2-Xb1)
@@ -126,7 +126,7 @@ bool csIntersect2::Segments (
 
 bool csIntersect2::SegmentLine (
   const csSegment2& a, const csSegment2& b,
-  csVector2& isect, float& dist) 
+  csVector2& isect, float& dist)
 {
   float denom;
   const csVector2& a1 = a.Start ();
@@ -148,7 +148,7 @@ bool csIntersect2::SegmentLine (
 
 bool csIntersect2::Lines (
   const csSegment2& a, const csSegment2& b,
-  csVector2& isect) 
+  csVector2& isect)
 {
   float denom, r;
   const csVector2& a1 = a.Start ();

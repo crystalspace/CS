@@ -30,7 +30,7 @@ static MetaBone* _mb;
 
 // You need to set the resolution of the renderer manually
 // using these three settings. Sorry, its done this way
-// cuase prising the cache out significantly slows down 
+// cuase prising the cache out significantly slows down
 // processing. Mik.
 
 #define RES_X   80
@@ -114,7 +114,7 @@ void csMetaGen::GenCell( int x, int y, int z, csTesselator::GridCell &c)
   _2coord(x,y,z,base);
   int i;
   for(i=0;i<8;i++)
-    c.p[i] = base + csVector3(f_shift_x[i], 
+    c.p[i] = base + csVector3(f_shift_x[i],
 		f_shift_y[i], f_shift_z[i]);
 }
 
@@ -147,7 +147,7 @@ void csMetaGen::FillCellSlice(int _x,int _y,int _z,csTesselator::GridCell &c)
   	  int z = _z + shift_z[i];
   	  if(where[x][y][z]!=frame)
   	  {
-    	p_c[x][y][z] = c.val[i] = 
+    	p_c[x][y][z] = c.val[i] =
 		  potential(c.p[i].x, c.p[i].z, y - _mb->start_slice );
     	where[x][y][z]=frame;
   	  }
@@ -199,7 +199,7 @@ void csMetaGen::BlobCalc(int dx,int dy,int dz)
     int i;
     for(i=0;i<8;i++)
       _cell.p[i]+=dv;
-    
+
     FillCell(_x,_y,_z,_cell);
 
     int num=csTesselator::Tesselate(_cell, _verts + _tess);
@@ -249,7 +249,7 @@ void csMetaGen::RingCalc(int dx,int dz)
     int i;
     for(i=0;i<8;i++)
       _cell.p[i]+=dv;
-    
+
     FillCellSlice(_x,_y,_z,_cell);
     int num = csTesselator::Tesselate(_cell, _verts + _tess);
 
@@ -308,10 +308,10 @@ int csMetaGen::CalcBlobSurf(MetaField *field)
   	while(!check_cell_assume_inside(cell))
   	{
   	  visited[x][y][z] = frame;
-		
+
   	  for(j = 0; j < 8; j++)
         cell.p[j].x -= stepx;
-		  
+
   	  x--;
   	  FillCell(x,y,z,cell);
     }
@@ -360,10 +360,10 @@ int csMetaGen::CalcLinSurf( MetaBone* bone )
   	  while(!check_cell_assume_inside(cell))
   	  {
     	visited[x][y][z] = frame;
-		
+
     	for(k = 0; k < 8; k++)
       	  cell.p[k].x -= stepx;
-		  
+
     	x--;
     	FillCellSlice(x,y,z,cell);
   	  }
@@ -402,13 +402,13 @@ void csMetaGen::ZeroCache()
 		where[i][j][k] = 0;
 		p_c[i][j][k] = 0.0;
 		visited[i][j][k] = 0;
-	  }	
+	  }
   for ( i = RES_X; i < RES_X + 1; i++)
 	for ( j = RES_Y; j < RES_Y + 1; j++)
 	  for ( k = RES_Z; k < RES_Z + 1; k++ )
 	  {
 		where[i][j][k] = 0;
 		p_c[i][j][k] = 0.0;
-	  }	
+	  }
   frame = 0;
 }

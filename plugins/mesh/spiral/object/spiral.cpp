@@ -49,7 +49,7 @@ void csSpiralMeshObject::SetupObject ()
     last_reuse = 0;
     float radius = 10.0; // guessed radius of the spiral;
     float height = 10.0; // guessed height
-    bbox.Set(source - csVector3(-radius,0,-radius), 
+    bbox.Set(source - csVector3(-radius,0,-radius),
       source + csVector3(+radius, +height, +radius) );
 
     // Calculate the maximum radius.

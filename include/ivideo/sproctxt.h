@@ -32,8 +32,8 @@ SCF_VERSION (iSoftProcTexture, 0, 0, 1);
 struct iSoftProcTexture : public iBase
 {
   /// Prepare a software procedural texture for use by a hardware renderer
-  virtual iTextureHandle *CreateOffScreenRenderer 
-    (iGraphics3D *parent_g3d, iGraphics3D *partner_g3d, int width, int height, 
+  virtual iTextureHandle *CreateOffScreenRenderer
+    (iGraphics3D *parent_g3d, iGraphics3D *partner_g3d, int width, int height,
      void *buffer, csPixelFormat *ipfmt, int flags) = 0;
 
   /// This converts mode once and for all to a less efficient one.

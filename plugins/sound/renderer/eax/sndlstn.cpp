@@ -46,7 +46,7 @@ csSoundListenerEAX::~csSoundListenerEAX() {
 
 	if(EaxKsPropertiesSet)
 	{
-		EaxKsPropertiesSet->Release();		
+		EaxKsPropertiesSet->Release();
 		EaxKsPropertiesSet = NULL;
 	}
 
@@ -61,31 +61,31 @@ csSoundListenerEAX::~csSoundListenerEAX() {
 bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
   srdr->IncRef();
   Renderer = srdr;
-	
+
   DSBUFFERDESC dsbd;
   dsbd.dwSize = sizeof(DSBUFFERDESC);
   dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRL3D | DSBCAPS_CTRLVOLUME;
   dsbd.dwReserved = 0;
   dsbd.dwBufferBytes = 0;
   dsbd.lpwfxFormat = NULL;
-  
+
   iReporter* reporter = CS_QUERY_REGISTRY (Renderer->object_reg, iReporter); ;
 
   HRESULT r;
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, NULL);
   if (r != DS_OK) {
     if (reporter)
-      reporter->Report (CS_REPORTER_SEVERITY_WARNING, 
+      reporter->Report (CS_REPORTER_SEVERITY_WARNING,
         "crystalspace.sound.eax", "EAX listener: "
         "Cannot create primary sound buffer (%s).\n", Renderer->GetError(r));
     if (reporter) reporter->DecRef ();
     return false;
   }
-	
+
   r = PrimaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void **) &Listener);
   if (r != DS_OK) {
     if (reporter)
-      reporter->Report (CS_REPORTER_SEVERITY_WARNING, 
+      reporter->Report (CS_REPORTER_SEVERITY_WARNING,
         "crystalspace.sound.eax", "EAX listener: Cannot query listener"
         " interface from primary sound buffer (%s).\n", Renderer->GetError(r));
     if (reporter) reporter->DecRef ();
@@ -95,14 +95,14 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
 	r = PrimaryBuffer->QueryInterface(IID_IKsPropertySet, (void**) &EaxKsPropertiesSet);
 	ULONG support = 0;
 	if(SUCCEEDED(r) && EaxKsPropertiesSet)
-	{    
+	{
 		r = EaxKsPropertiesSet->QuerySupport(DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ALLPARAMETERS, &support);
 		if(!SUCCEEDED(r) || (support&(KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
 				!= (KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
 		{
 			if (reporter)
-                          reporter->Report (CS_REPORTER_SEVERITY_WARNING, 
-                            "crystalspace.sound.eax", 
+                          reporter->Report (CS_REPORTER_SEVERITY_WARNING,
+                            "crystalspace.sound.eax",
                             "EAX listener : this device don't support EAX 2.0\nSo only DirectSound3D will be used.");
 			EaxKsPropertiesSet->Release();
 			EaxKsPropertiesSet = NULL;
@@ -110,7 +110,7 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
 	}
 	else {
 		if (reporter)
-                   reporter->Report (CS_REPORTER_SEVERITY_WARNING, 
+                   reporter->Report (CS_REPORTER_SEVERITY_WARNING,
                      "crystalspace.sound.eax",
                      "EAX listener : cannot get properties, this device may not support EAX\nSo only DirectSound3D will be used.");
              }
@@ -212,7 +212,7 @@ void csSoundListenerEAX::SetEnvironment(csSoundEnvironment env) {
 	if(EaxKsPropertiesSet)
 	{
 		DWORD preset={EAX_ENVIRONMENT_GENERIC};
-		
+
 		int i;
 		for(i=0; i<MAX_s2eaxEnv; i++)
 		{
@@ -222,7 +222,7 @@ void csSoundListenerEAX::SetEnvironment(csSoundEnvironment env) {
 				break;
 			}
 		}
-		
+
 		EaxKsPropertiesSet->Set(DSPROPSETID_EAX_ListenerProperties,
 			DSPROPERTY_EAXLISTENER_ENVIRONMENT,
 			NULL,

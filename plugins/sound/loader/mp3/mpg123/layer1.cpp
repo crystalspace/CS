@@ -1,10 +1,10 @@
-/* 
- * Mpeg Layer-1 audio decoder 
+/*
+ * Mpeg Layer-1 audio decoder
  * --------------------------
  * copyright (c) 1995 by Michael Hipp, All rights reserved. See also 'README'
  * near unoptimzed ...
  *
- * may have a few bugs after last optimization ... 
+ * may have a few bugs after last optimization ...
  *
  */
 
@@ -20,7 +20,7 @@ void I_step_one (unsigned int balloc[], unsigned int scale_index[2][SBLIMIT], cs
   if(fr->stereo) {
     int i;
     int jsbound = fr->jsbound;
-    for (i=0;i<jsbound;i++) { 
+    for (i=0;i<jsbound;i++) {
       *ba++ = fr->bsi.GetBits (4);
       *ba++ = fr->bsi.GetBits (4);
     }
@@ -72,7 +72,7 @@ void I_step_two(real fraction[2][SBLIMIT],unsigned int balloc[2*SBLIMIT],
       if ((n = *ba++))
         *sample++ = fr->bsi.GetBits (n+1);
     }
-    for (i=jsbound;i<SBLIMIT;i++) 
+    for (i=jsbound;i<SBLIMIT;i++)
       if ((n = *ba++))
         *sample++ = fr->bsi.GetBits (n+1);
 
@@ -142,7 +142,7 @@ int do_layer1 (csMPGFrame *fr)
     {
       clip += (fr->synthMono)( (real *) fraction[single], pcm->buffer, &(pcm->pos));
     }
-    else 
+    else
     {
       int p1 = pcm->pos;
       clip += (fr->synth)( (real *) fraction[0],0,pcm->buffer,&p1);

@@ -27,7 +27,7 @@
 #include "csphyzik/qtrbconn.h"
 #include "csphyzik/phyzent.h"
 
-ctQuatRigidBody::ctQuatRigidBody(ctVector3 x, real M) 
+ctQuatRigidBody::ctQuatRigidBody(ctVector3 x, real M)
 {
   mass = M;
   pos = x;
@@ -41,7 +41,7 @@ ctQuatRigidBody::ctQuatRigidBody(ctVector3 x, real M)
   precalculated = false;
 }
 
-int ctQuatRigidBody::get_state(const real *sa) 
+int ctQuatRigidBody::get_state(const real *sa)
 {
   pos[0] = sa[0];
   pos[1] = sa[1];
@@ -60,7 +60,7 @@ int ctQuatRigidBody::get_state(const real *sa)
   return get_state_size ();
 }
 
-int ctQuatRigidBody::set_state(real *sa) 
+int ctQuatRigidBody::set_state(real *sa)
 {
   sa[0]  = pos[0];
   sa[1]  = pos[1];
@@ -81,7 +81,7 @@ int ctQuatRigidBody::set_state(real *sa)
   return get_state_size ();
 }
 
-int ctQuatRigidBody::set_delta_state(real *sa) 
+int ctQuatRigidBody::set_delta_state(real *sa)
 {
   Precalculate ();  // just in case
 
@@ -105,14 +105,14 @@ int ctQuatRigidBody::set_delta_state(real *sa)
   return get_state_size ();
 }
 
-ctQuatRigidBodyConnector *ctQuatRigidBody::new_connector(ctVector3 offs) 
+ctQuatRigidBodyConnector *ctQuatRigidBody::new_connector(ctVector3 offs)
 {
   ctQuatRigidBodyConnector *ret = new ctQuatRigidBodyConnector(this, offs);
   assert(ret);
   return ret;
 }
 
-void ctQuatRigidBody::Precalculate () 
+void ctQuatRigidBody::Precalculate ()
 {
   if(precalculated) return;
   quat.Normalize();

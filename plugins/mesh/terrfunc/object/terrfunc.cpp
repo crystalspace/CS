@@ -182,7 +182,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   initialized = false;
   blockxy = 4;
   gridx = 8; gridy = 8;
-  
+
   grid_stepx = grid_stepy = 1/8;
   inv_block_stepx = 1.;
   inv_block_stepy = 1.;
@@ -1160,8 +1160,8 @@ void csTerrFuncObject::SetupObject ()
     inv_block_stepx = 1 / scale.x;
     inv_block_stepy = 1 / scale.z;
     inv_grid_stepx = 1 / grid_stepx;
-    inv_grid_stepy = 1 / grid_stepy;	
-	 
+    inv_grid_stepy = 1 / grid_stepy;
+
     int bx, by;
     int blidx = 0;
     for (by = 0 ; by < blockxy ; by++)
@@ -1227,7 +1227,7 @@ void csTerrFuncObject::SetupObject ()
   }
 }
 
-void csTerrFuncObject::SetupVertexBuffer (iVertexBuffer *&vbuf1, 
+void csTerrFuncObject::SetupVertexBuffer (iVertexBuffer *&vbuf1,
 					  iVertexBuffer *&vbuf2)
 {
  if (!vbuf1)
@@ -1485,18 +1485,18 @@ bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
   float min_y = global_bbox.MinY();
   int max_index = blockxy*blockxy;
   int x, y, index, i, max = 0;
-  
+
   Object2Block( isect, x, y ); // Seed the routine
   if ( x == blockxy ) x--; // Kludge to bring x and y back into bounds if hit
   if ( y == blockxy ) y--; // from the positive x or z side. not perty but quick.
 
-  for (Block2Index(x, y, index); 
-      (index > -1) && (index < max_index); 
+  for (Block2Index(x, y, index);
+      (index > -1) && (index < max_index);
       Block2Index(x, y, index))
   {
     rev.SetEnd(isect);
-    tbox = blocks[index].bbox; 
-    if (csIntersect3::BoxSegment (tbox, seg, isect, NULL) > -1) 
+    tbox = blocks[index].bbox;
+    if (csIntersect3::BoxSegment (tbox, seg, isect, NULL) > -1)
     {
       max = blocks[index].mesh[0].num_triangles;
       vrt = blocks[index].mesh_vertices[0];
@@ -1506,8 +1506,8 @@ bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
         if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
     	     vrt[tr[i].c], seg, isect))
         {
-	      
-            if (pr) *pr = qsqrt(csSquaredDist::PointPoint (start, isect) / 
+
+            if (pr) *pr = qsqrt(csSquaredDist::PointPoint (start, isect) /
 	                           csSquaredDist::PointPoint (start, end));
 	    return true;
 	}
@@ -1516,7 +1516,7 @@ bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
     v = tbox.Max();
     tbox.AddBoundingVertex(v.x, max_y, v.z);
     tbox.AddBoundingVertex(v.x, min_y, v.z);
-     
+
     switch (csIntersect3::BoxSegment (tbox, rev, isect, NULL)) {
       case BOX_SIDE_x: x--; break;
       case BOX_SIDE_X: x++; break;
@@ -1548,19 +1548,19 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
   int max_index = blockxy*blockxy;
   int x, y, index, i, max = 0;
   bool brk = false;
-  
+
   dist = dist2 = max_dist;
   Object2Block( st, x, y ); // Seed the routine
   if ( x == blockxy ) x--; // Kludge to bring x and y back into bounds if hit
   if ( y == blockxy ) y--; // from the positive x or z side. not perty but quick.
 
-  for (Block2Index(x, y, index); 
-      (index > -1) && (index < max_index); 
+  for (Block2Index(x, y, index);
+      (index > -1) && (index < max_index);
       Block2Index(x, y, index))
   {
     rev.SetEnd(st);
-    tbox = blocks[index].bbox; 
-    if (csIntersect3::BoxSegment (tbox, seg, st, NULL) > -1) 
+    tbox = blocks[index].bbox;
+    if (csIntersect3::BoxSegment (tbox, seg, st, NULL) > -1)
     {
       max = blocks[index].mesh[0].num_triangles;
       vrt = blocks[index].mesh_vertices[0];
@@ -1585,7 +1585,7 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
     v = tbox.Max();
     tbox.AddBoundingVertex(v.x, max_y, v.z);
     tbox.AddBoundingVertex(v.x, min_y, v.z);
-     
+
     switch (csIntersect3::BoxSegment (tbox, rev, st, NULL)) {
       case BOX_SIDE_x: x--; break;
       case BOX_SIDE_X: x++; break;

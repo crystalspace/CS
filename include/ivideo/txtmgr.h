@@ -63,7 +63,7 @@ struct iMaterialHandle;
 #define CS_TEXTURE_NOMIPMAPS		0x00000008
 /**
  * Create a procedural texture.
- * After the texture is prepared call 
+ * After the texture is prepared call
  * iTextureHangle->GetDynamicTextureInterface to retrieve an iGraphics3D
  * interface to the texture. Render as usual.
  */
@@ -81,16 +81,16 @@ struct iMaterialHandle;
 #define CS_TEXTURE_PROC_PERSISTENT  	0x00000040
 /**
  * Currently this flag is acted upon by the 16/32bit software renderer and the
- * opengl software texture implementation only. 
+ * opengl software texture implementation only.
  * It has no performance penalty for the other drivers, so set it when you can,
- * which practically speaking will be most of the time. 
+ * which practically speaking will be most of the time.
  * Set this flag when you can safely allocate the procedural textures their
- * own set of textures which will not be referred to when calling the main 
+ * own set of textures which will not be referred to when calling the main
  * renderer. This means that the engine for example will not be able to render
- * to these procedural textures as well as the main renderer. 
- * This flag allows for a big optimisation by setting up an 8bit texture 
- * manager for the software procedural textures so that all rendering is done 
- * within the software texture managers' native format.  
+ * to these procedural textures as well as the main renderer.
+ * This flag allows for a big optimisation by setting up an 8bit texture
+ * manager for the software procedural textures so that all rendering is done
+ * within the software texture managers' native format.
  */
 #define CS_TEXTURE_PROC_ALONE_HINT      0x00000080
 

@@ -53,7 +53,7 @@ private:
   iVFS *vfs;
   iKeyboardDriver* kbd;
   iVirtualClock* vc;
- 
+
 public:
   Simple ();
   virtual ~Simple ();

@@ -10,7 +10,7 @@
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -246,7 +246,7 @@ public:
   //----------------------------------------------------------------------
   // Drawing
   //----------------------------------------------------------------------
-  
+
   /**
    * Draw the sector in the given view and with the given transformation.
    */
@@ -328,7 +328,7 @@ public:
    * is a lot faster but it does mean that you need to use another
    * collision detection system to test with walls.
    */
-  csSector* FollowSegment (csReversibleTransform& t, csVector3& new_position, 
+  csSector* FollowSegment (csReversibleTransform& t, csVector3& new_position,
                           bool& mirror, bool only_portals = false);
 
   /**

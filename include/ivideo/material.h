@@ -70,7 +70,7 @@ struct iMaterial : public iBase
    * Get a texture layer.
    */
   virtual csTextureLayer* GetTextureLayer (int idx) = 0;
-  
+
   /**
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.

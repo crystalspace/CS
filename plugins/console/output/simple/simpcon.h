@@ -203,7 +203,7 @@ public:
   { return LineSize; }
 
   /**
-   * Tell console that this object should be notified when console 
+   * Tell console that this object should be notified when console
    * visibility status changes.
    */
   virtual void RegisterWatcher (iConsoleWatcher* iClient)

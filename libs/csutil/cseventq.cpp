@@ -286,7 +286,7 @@ iEventCord* csEventQueue::GetEventCord (int cat, int subcat)
 {
   csEventCord* cord;
   int const n = EventCords.Find (cat, subcat);
-  if (n >= 0) 
+  if (n >= 0)
     cord = EventCords.Get(n);
   else
   {

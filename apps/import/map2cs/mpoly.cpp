@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -54,7 +54,7 @@ CMapPolygon::~CMapPolygon()
   //Do the final cleanup.
   Clear();
 }
-  
+
 void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
                           const CMapTexturedPlaneVector& planes,
                           CMapBrush*                     pBrush)
@@ -70,7 +70,7 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
   m_pBrush     = pBrush;
 
   //for the upcoming handling, we copy planes into a reduced array of planes
-  //this will help us to change order and to remove already used planes. 
+  //this will help us to change order and to remove already used planes.
   //Also we will remove all planes that don't create an edge right here.
   int p=0;
   CMapTexturedPlaneVector RedplanesStage1;
@@ -99,7 +99,7 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
   //Now we try to find a starting position for our search for edges and points.
   //This position will be a vertex, that is defined by the baseplane and two
   //other planes. The point is guaranteed to be part of the polygon and not
-  //to be outside of it. 
+  //to be outside of it.
   //they will also be sorted, so that one can contiue from plane1 to plane2 and
   //one will get a proper orientation of the polygon for backface culling.
   CMapTexturedPlane* pPlane1 = NULL;
@@ -125,7 +125,7 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
   //Remove the baseplane too.
   int BaseplaneIndex = redplanes.Find(pBaseplane);
   if (BaseplaneIndex >= 0) redplanes.Delete(BaseplaneIndex);
-  
+
   //Insert pPlane1 as first element of redplanes. This will ensure, that
   //this plane is preferred to close the polygon again. Otherwise there
   //is a small chance the polygon is closed by another plane and we can't
@@ -144,40 +144,40 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
     //pPlane1 = pPlane2;
 
     int NumPlanes = redplanes.Length();
- 
+
     //Check all planes, if they will form a new legal vertex
     //with the baseplane and plane1 (the last found plane)
     for (p=0; p<NumPlanes; p++)
     {
       pPlane2 = redplanes[p];
-      
+
       //Only after three planes have been inserted, we can check if
-      //m_Planes[0] will close the polygon. 
+      //m_Planes[0] will close the polygon.
       //if (m_Planes.Length() < 3 && i==0) continue;
 
       //If this plane is to be processed, and both planes will form
       //a vertex with the baseplane, we need to do further checks.
-      if (CdIntersect3::Planes(*m_pBaseplane, *pPlane1, 
+      if (CdIntersect3::Planes(*m_pBaseplane, *pPlane1,
                                *pPlane2, point))
       {
         //Check if the newly found vertex is identical to one of the two last
         //vertices. If this is the case, we will ignore that point, because
         //this is an identitcal edge to a previous edge, and would close the
-        //polygon in an illegal way. 
+        //polygon in an illegal way.
         if ((((*m_Vertices[m_Vertices.Length()-1])-point).Norm()<SMALL_EPSILON) ||
             (m_Vertices.Length() > 1 &&
              ((*m_Vertices[m_Vertices.Length()-2])-point).Norm()<SMALL_EPSILON))
         {
-          //This would close the polygon too early. We wont handle this plane. 
+          //This would close the polygon too early. We wont handle this plane.
           //If there is no alternative found later on, then we declare this polygon
           //to be empty.
           continue; //Continue with processing the next plane.
         }
-        
+
         //See if the new Vertex is a valid vertex. For this we use the original
-        //planes array, and not the reduced array!        
+        //planes array, and not the reduced array!
         //assert(point != *(m_Vertices[m_Vertices.Length()-1]));
-        if (CheckIfInside(point, planes, m_pBaseplane, pPlane1, pPlane2)) 
+        if (CheckIfInside(point, planes, m_pBaseplane, pPlane1, pPlane2))
         {
           //Ok, this is a good next plane
           if (pPlane2 != m_Planes[0])
@@ -191,10 +191,10 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
           }
           //In any case, we need the vertex. (which _is_ new)
           m_Vertices.Push(new CdVector3(point));
-          
+
           //Remember that we found a new vertex
           FoundNewVertex = true;
-          
+
           //leave the for loop across all planes and prepare search for
           //the next plane.
           break;
@@ -218,7 +218,7 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
   }
 
   //The following check would be nice to have, but test with some maps showed, that
-  //even polygons got removed that had an area _much_ larger than one pixel. 
+  //even polygons got removed that had an area _much_ larger than one pixel.
   //In future, I need to either fix GetArea or get the final polygon merger step
   //before exporting to work. (Probably the second, because that will cure other
   //problems too.)
@@ -267,18 +267,18 @@ double CMapPolygon::GetArea()
   for (i=0; i<(m_Vertices.Length()-1); i++)
   {
     Sum += (*(m_Vertices[i])) % (*(m_Vertices[i+1]));
-  }  
+  }
 
   double Area = (Normal * Sum)/2;
   return ABS(Area);
 }
 
-void CMapPolygon::Split(CMapTexturedPlane* pSplitplane, 
+void CMapPolygon::Split(CMapTexturedPlane* pSplitplane,
                         CMapPolygon*       pTargetPoly)
 {
   assert(pSplitplane);
   assert(pTargetPoly);
-  
+
   //If this polygon is empty, we can return at once.
   if (IsEmpty()) return;
 
@@ -298,7 +298,7 @@ void CMapPolygon::Split(CMapTexturedPlane* pSplitplane,
   NewPlanes.Push(pSplitplane);
 
   //Create a new polygon from these planes on the current baseplane.
-  pTargetPoly->Create(m_pBaseplane, NewPlanes, m_pBrush);                     
+  pTargetPoly->Create(m_pBaseplane, NewPlanes, m_pBrush);
 }
 
 /// Assign an existing polygon.
@@ -348,9 +348,9 @@ void CMapPolygon::GetStartplanes(const CMapTexturedPlaneVector& planes,
                                  CMapTexturedPlane*&            pPlane1,
                                  CMapTexturedPlane*&            pPlane2,
                                  CdVector3&                     point)
-{  
+{
   int NumPlanes = planes.Length();
-  
+
   //Try the follwing for all possible pairs of planes.
   int i, j;
   for (i=0; i<NumPlanes; i++)
@@ -361,13 +361,13 @@ void CMapPolygon::GetStartplanes(const CMapTexturedPlaneVector& planes,
       pPlane2 = planes[j];
       if (CdIntersect3::Planes(*m_pBaseplane, *pPlane1, *pPlane2, point))
       {
-        if (CheckIfInside(point, planes, m_pBaseplane, pPlane1, pPlane2)) 
+        if (CheckIfInside(point, planes, m_pBaseplane, pPlane1, pPlane2))
         {
           //OK, these planes might be a good start
 
           //To get proper orientation (backface culling!) of the polygon, we
           //need to decide where to start. To do this, we take the cross product
-          //of the normals of the two planes, and check if this points to 
+          //of the normals of the two planes, and check if this points to
           //the same direction as the baseplane. If not, we need to swap planes
           double direction = (pPlane1->Normal()%pPlane2->Normal())*
                               m_pBaseplane->Normal();
@@ -379,13 +379,13 @@ void CMapPolygon::GetStartplanes(const CMapTexturedPlaneVector& planes,
             pPlane1 = pPlane2;
             pPlane2 = p;
           }
-          return; 
+          return;
         }
       } //if (intersect)
     } //for (j)
   } //for (i)
 
-  //if we arrive here, then there is a problem finding any starting pint 
+  //if we arrive here, then there is a problem finding any starting pint
   //for the poly
   pPlane1 = NULL;
   pPlane2 = NULL;
@@ -397,11 +397,11 @@ int  CMapPolygon::GetNumberOfValidVertices(CMapTexturedPlane*             pPlane
 {
   int       GetVertexCount = 0;
   CdVector3 Vertex[3]; // I expect this array to be filled with only two values.
-                       // getting three values happens only in case of an error, 
-                       // that will be explicitly tracked down. 
+                       // getting three values happens only in case of an error,
+                       // that will be explicitly tracked down.
 
   int NumPlanes = planes.Length();
-  
+
   //Try the follwing for all planes.
   int i;
   for (i=0; i<NumPlanes; i++)
@@ -412,7 +412,7 @@ int  CMapPolygon::GetNumberOfValidVertices(CMapTexturedPlane*             pPlane
     CdVector3 point(0,0,0);
     if (CdIntersect3::Planes(*m_pBaseplane, *pPlane, *pOtherPlane, point))
     {
-      if (CheckIfInside(point, planes, m_pBaseplane, pPlane, pOtherPlane)) 
+      if (CheckIfInside(point, planes, m_pBaseplane, pPlane, pOtherPlane))
       {
         //OK, this vertex is the inside the polygon. Now we check, if this vertex
         //was already found. (possible, if there are several planes cutting through
@@ -432,7 +432,7 @@ int  CMapPolygon::GetNumberOfValidVertices(CMapTexturedPlane*             pPlane
           //A new original vertex has been found.
           Vertex[GetVertexCount] = point;
           GetVertexCount++;
-          if (GetVertexCount>=3) 
+          if (GetVertexCount>=3)
           {
             //DumpPolyinfo(pPlane, planes);
             //@@@@@@@@@@@assert(false);
@@ -459,7 +459,7 @@ bool CMapPolygon::CheckIfInside(const CdVector3&               point,
   for (k=0; k<NumPlanes; k++)
   {
     CMapTexturedPlane* pPlane = planes[k];
-    
+
     //we will not check the point against the planes forming it.
     //this will avoid problems related to precision loss.
     if (pPlane == pIgnorePlane1 ||
@@ -469,7 +469,7 @@ bool CMapPolygon::CheckIfInside(const CdVector3&               point,
     if (pPlane->Classify(point) < (-SMALL_EPSILON))
     {
       return false;
-    } 
+    }
   }  //for (k)
 
   return true;
@@ -514,15 +514,15 @@ void CMapPolygon::DumpPolyinfo(CMapTexturedPlane*             pBaseplane,
           {
             double v=(c==0)?point.x:(c==1)?point.y:point.z;
 
-            if (CheckIfInside(point, planes, pBaseplane, planes[x], planes[y])) 
+            if (CheckIfInside(point, planes, pBaseplane, planes[x], planes[y]))
             {
               printf("%8.3fI ",v); //10 char "Inside"
-            }                 
+            }
             else
             {
               printf("%8.3fO ",v); //10 char "Outside"
             }
-          } 
+          }
           else
           {
             printf("        M "); //10 char "Miss"

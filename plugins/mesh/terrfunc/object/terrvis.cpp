@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -104,7 +104,7 @@ static void BuildHorIndexTable (int horsize)
   horidx_table[128+128] = horidx_table[127+128];
 }
 
-int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z, 
+int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z,
   int horsize)
 {
   BuildHorIndexTable (horsize);
@@ -221,27 +221,27 @@ void csTerrainQuad::ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
   // if divbyzero, use infinity with the same sign.
   // see if negative values occur, distances get swapped in that case
 
-  if(minh < 0.0) 
+  if(minh < 0.0)
   {
     /// below zero, smallest height at minimal distance is the steepest down
     if(mindist == 0.0) mindy = MININF;
     else mindy = minh * qisqrt(mindist);
   }
-  else 
+  else
   {
-    /// above zero, the smallest height at maximal distance is the smallest 
+    /// above zero, the smallest height at maximal distance is the smallest
     /// upslope
     if(maxdist == 0.0) mindy = MAXINF;
     else mindy = minh * qisqrt(maxdist);
   }
 
-  if(maxh < 0.0) 
+  if(maxh < 0.0)
   {
     /// below zero, biggest height at maximal distance is the least downslope
     if(maxdist == 0.0) maxdy = MININF;
     else maxdy = maxh * qisqrt(maxdist);
   }
-  else 
+  else
   {
     /// above zero, the biggest height at minimum distance is steepest upslope
     if(mindist == 0.0) maxdy = MAXINF;
@@ -260,7 +260,7 @@ void csTerrainQuad::ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
   CS_ASSERT( mindy <= maxdy );
 }
 
-bool csTerrainQuad::CheckIfAbove(float* horizon, int horsize, int left, 
+bool csTerrainQuad::CheckIfAbove(float* horizon, int horsize, int left,
   int right, float dy)
 {
   /// loop from left to right, but it can wrap by horsize
@@ -274,7 +274,7 @@ bool csTerrainQuad::CheckIfAbove(float* horizon, int horsize, int left,
   return false;
 }
 
-void csTerrainQuad::HeightenHorizon(float* horizon, int horsize, int left, 
+void csTerrainQuad::HeightenHorizon(float* horizon, int horsize, int left,
   int right, float dy)
 {
   int len = (right-left+horsize)%horsize;
@@ -287,7 +287,7 @@ void csTerrainQuad::HeightenHorizon(float* horizon, int horsize, int left,
 }
 
 
-void csTerrainQuad::ComputeVisibility(const csVector3& campos, 
+void csTerrainQuad::ComputeVisibility(const csVector3& campos,
   const csBox3& bbox, float* horizon, int horsize)
 {
   // compute visibility for this node

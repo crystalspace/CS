@@ -44,8 +44,8 @@ csProcFire::csProcFire () : csProcTexture()
   single_flame_mode = true;
   halfbase = mat_w/4;
   fireline = NULL;
-  
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS 
+
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS
     ;//|CS_TEXTURE_PROC_ALONE_HINT;
 }
 
@@ -65,7 +65,7 @@ bool csProcFire::PrepareAnim ()
   image = new uint8[mat_w*mat_h];
   memset(image, 0, mat_w*mat_h);
   memset(fireline, 0, mat_w);
-  
+
   int start = GetRandom (mat_w);
 
   int i;
@@ -77,7 +77,7 @@ bool csProcFire::PrepareAnim ()
 
 uint8& csProcFire::GetFireLine(int x)
 {
-  if (x < 0) 
+  if (x < 0)
     x += mat_w;
   x %= mat_w;
   return fireline[ x ];
@@ -112,7 +112,7 @@ void csProcFire::MakePalette (int max)
     float H = 4.6 - 1.5 * float(i) / float(maxcolours);
     float S = float(i) / float(maxcolours);
     float I = 4.0 * float(i) / float(maxcolours);
-    if (i < palsize/4) 
+    if (i < palsize/4)
       S=0.0;
     SetHSI (col, H, S, I);
     col *= 255.0;
@@ -178,7 +178,7 @@ void csProcFire::Animate (csTicks /*current_time*/)
     if (c < 40)
       c += GetRandom(possburn); /// 3 = paper, 90 = oil
     else c += GetRandom(contburn)-contburn/2 + addburn;
-    if (c > 255) 
+    if (c > 255)
       c = 255;
     fireline [x] = c;
   }
@@ -210,7 +210,7 @@ void csProcFire::Animate (csTicks /*current_time*/)
   }
 
   if (ptG3D->BeginDraw (CSDRAW_2DGRAPHICS))
-  {  
+  {
     /// draw firetexture
     im = image;
     for (y = 0 ; y < mat_h ; y++)

@@ -22,9 +22,9 @@ const int awsTextBox::signalLostFocus=0x2;
 awsTextBox::awsTextBox(): mouse_is_over(false), has_focus(false), should_mask(0),
                           bkg(NULL),
                           frame_style(0), alpha_level(92),
-                          text(NULL), disallow(NULL), maskchar(NULL), 
+                          text(NULL), disallow(NULL), maskchar(NULL),
                           start(0), cursor(0)
-{ 
+{
 }
 
 awsTextBox::~awsTextBox()
@@ -32,7 +32,7 @@ awsTextBox::~awsTextBox()
 }
 
 char *
-awsTextBox::Type() 
+awsTextBox::Type()
 { return "Text Box"; }
 
 bool
@@ -41,7 +41,7 @@ awsTextBox::Setup(iAws *_wmgr, awsComponentNode *settings)
  if (!awsComponent::Setup(_wmgr, settings)) return false;
 
  iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
- 
+
  pm->LookupIntKey("ButtonTextureAlpha", alpha_level); // global get
  pm->GetInt(settings, "Style", frame_style);
  pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
@@ -72,7 +72,7 @@ awsTextBox::Setup(iAws *_wmgr, awsComponentNode *settings)
  return true;
 }
 
-bool 
+bool
 awsTextBox::GetProperty(char *name, void **parm)
 {
   if (awsComponent::GetProperty(name, parm)) return true;
@@ -101,7 +101,7 @@ awsTextBox::GetProperty(char *name, void **parm)
   return false;
 }
 
-bool 
+bool
 awsTextBox::SetProperty(char *name, void *parm)
 {
   if (awsComponent::SetProperty(name, parm)) return true;
@@ -109,7 +109,7 @@ awsTextBox::SetProperty(char *name, void *parm)
   if (strcmp("Text", name)==0)
   {
     iString *s = (iString *)(parm);
-    
+
     if (s)
     {
       if (text) text->DecRef();
@@ -117,28 +117,28 @@ awsTextBox::SetProperty(char *name, void *parm)
       text->IncRef();
       Invalidate();
     }
-    
+
     return true;
-  } 
+  }
   else if (strcmp("Disallow", name)==0)
   {
     iString *s = (iString *)(parm);
-    
+
     if (s)
     {
       if (disallow) disallow->DecRef();
       disallow=s;
       disallow->IncRef();
     }
-    
+
     return true;
   }
-  
+
   return false;
 }
 
 
-void 
+void
 awsTextBox::OnDraw(csRect clip)
 {
 
@@ -151,7 +151,7 @@ awsTextBox::OnDraw(csRect clip)
   int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);
   int dfill = WindowManager()->GetPrefMgr()->GetColor(AC_DARKFILL);
   int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
-    
+
   switch(frame_style)
   {
   case fsNormal:
@@ -168,16 +168,16 @@ awsTextBox::OnDraw(csRect clip)
     g2d->DrawLine(Frame().xmax-1, Frame().ymin+2, Frame().xmax-1, Frame().ymax-1, hi2);
 
     g2d->DrawBox(Frame().xmin+3, Frame().ymin+3, Frame().Width()-3, Frame().Height()-3, dfill);
-    
+
     if (bkg)
        g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, Frame().Width()+1, Frame().Height()+1, 0, 0, Frame().Width()+1, Frame().Height()+1, alpha_level);
-   
+
     break;
   }
-        
+
   // Draw the caption, if there is one and the style permits it.
   if (text && text->Length())
-  {     
+  {
     int tw, th, tx, ty, mcc;
     iString *saved=NULL;
 
@@ -192,18 +192,18 @@ awsTextBox::OnDraw(csRect clip)
 
     // Get the maximum number of characters we can use
     mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(text->GetData()+start, Frame().Width()-10);
-     
+
     // Check to see if we're getting wierd.
     start = cursor-mcc;
     if (start<0) start=0;
-           
+
     // Make the text the right length
-    scfString tmp(text->GetData()+start);      
+    scfString tmp(text->GetData()+start);
     tmp.Truncate(mcc);
 
      // Get the size of the text
     WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(tmp.GetData(), tw, th);
-      
+
     // Calculate the center
     tx = 4;
     ty = (Frame().Height()>>1) - (th>>1);
@@ -231,22 +231,22 @@ awsTextBox::OnDraw(csRect clip)
   {
     g2d->DrawLine(Frame().xmin+5,Frame().ymin+5,Frame().xmin+5,Frame().ymax-5, WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE));
   }
-  
- 
+
+
 }
 
-bool 
+bool
 awsTextBox::OnMouseDown(int ,int ,int )
 {
   return false;
 }
-    
-bool 
+
+bool
 awsTextBox::OnMouseUp(int ,int ,int )
 {
   return false;
 }
-    
+
 bool
 awsTextBox::OnMouseMove(int ,int ,int )
 {
@@ -265,7 +265,7 @@ awsTextBox::OnMouseDoubleClick(int ,int ,int )
   return false;
 }
 
-bool 
+bool
 awsTextBox::OnMouseExit()
 {
   mouse_is_over=false;
@@ -285,16 +285,16 @@ bool
 awsTextBox::OnKeypress(int key, int modifiers)
 {
   (void) modifiers;
-  
+
   switch(key)
   {
   case CSKEY_BACKSPACE:
     if (cursor>0) cursor--;
     if (cursor-start<5) start=cursor-5;
     if (start<0) start=0;
-    if (text && (text->Length()>1)) 
+    if (text && (text->Length()>1))
       text->Truncate(text->Length()-1);
-    else 
+    else
       text->Clear();
 
     break;
@@ -308,13 +308,13 @@ awsTextBox::OnKeypress(int key, int modifiers)
         if (disallow &&
            (strchr(disallow->GetData(), key)!=0))
             ignore=true;
-      
+
         if (!ignore)
         {
           char str[2];
           str[0] = (char)key;
           str[1] = 0;
-      
+
           text->Append(scfString(str));
           cursor++;
           Broadcast(signalChanged);
@@ -326,7 +326,7 @@ awsTextBox::OnKeypress(int key, int modifiers)
   Invalidate();
   return true;
 }
-    
+
 bool
 awsTextBox::OnLostFocus()
 {
@@ -336,7 +336,7 @@ awsTextBox::OnLostFocus()
   return false;
 }
 
-bool 
+bool
 awsTextBox::OnGainFocus()
 {
   has_focus=true;
@@ -367,6 +367,6 @@ awsTextBoxFactory::~awsTextBoxFactory()
 iAwsComponent *
 awsTextBoxFactory::Create()
 {
- return new awsTextBox; 
+ return new awsTextBox;
 }
 

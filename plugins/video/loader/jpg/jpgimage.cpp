@@ -59,7 +59,7 @@ SCF_EXPORT_CLASS_TABLE_END
 
 #define JPG_MIME "image/jpg"
 
-static iImageIO::FileFormatDescription formatlist[2] = 
+static iImageIO::FileFormatDescription formatlist[2] =
 {
   {JPG_MIME, "Grayscale", CS_IMAGEIO_LOAD},
   {JPG_MIME, "Truecolor", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE}
@@ -122,7 +122,7 @@ size_t my_dst_mgr::buf_len = 4096;
 static void init_destination (j_compress_ptr cinfo)
 {
   my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
-  dest->buffer = (JOCTET*)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, 
+  dest->buffer = (JOCTET*)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo,
     JPOOL_IMAGE, sizeof(JOCTET) * my_dst_mgr::buf_len);
   dest->pub.next_output_byte = dest->buffer;
   dest->pub.free_in_buffer = my_dst_mgr::buf_len;
@@ -132,7 +132,7 @@ static boolean empty_output_buffer (j_compress_ptr cinfo)
 {
   my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
 
-  dest->ds->data = (unsigned char*)realloc (dest->ds->data, 
+  dest->ds->data = (unsigned char*)realloc (dest->ds->data,
     dest->ds->len + sizeof(JOCTET) * my_dst_mgr::buf_len);
   if (!dest->ds->data)
     ERREXITS(cinfo,JERR_OUT_OF_MEMORY, "Could not reallocate enough memory");
@@ -149,7 +149,7 @@ static void term_destination (j_compress_ptr cinfo)
 {
   my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
   size_t len = my_dst_mgr::buf_len - dest->pub.free_in_buffer;
-  
+
   if (len > 0)
   {
     dest->ds->data = (unsigned char*)realloc (dest->ds->data,
@@ -184,7 +184,7 @@ iImage *csJPGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
     delete i;
     return NULL;
   }
-  return i;    
+  return i;
 }
 
 void csJPGImageIO::SetDithering (bool)
@@ -248,7 +248,7 @@ iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*)
   /* make the iDataBuffer to return */
   csDataBuffer *db = new csDataBuffer (ds.len);
   memcpy (db->GetData (), ds.data, ds.len);
-  
+
   return db;
 }
 

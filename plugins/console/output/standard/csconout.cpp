@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -103,7 +103,7 @@ csConsoleOutput::~csConsoleOutput ()
   if (G2D)
     G2D->DecRef ();
   if (G3D)
-    G3D->DecRef ();    
+    G3D->DecRef ();
   delete buffer;
 }
 
@@ -114,7 +114,7 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   if (!G3D) return false;
   G2D = G3D->GetDriver2D ();
   G2D->IncRef ();
-  
+
   // Initialize the display rectangle to the entire display
   size.Set (0, 0, G2D->GetWidth () - 1, G2D->GetHeight () - 1);
   invalid.Set (size); // Invalidate the entire console
@@ -141,7 +141,7 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
 void csConsoleOutput::Clear (bool wipe)
 {
   if (wipe)
-    // Clear the buffer 
+    // Clear the buffer
     buffer->Clear ();
   else
     // Put the top of the buffer on the current line
@@ -425,14 +425,14 @@ void csConsoleOutput::SetPosition(int x, int y, int width, int height)
     size.xmax = G2D->GetWidth () - 1;
   if (size.ymax >= G2D->GetHeight ())
     size.ymax = G2D->GetHeight () - 1;
-  
+
   // Calculate the number of lines on the console
   int fw, fh;
   font->GetMaxSize (fw, fh);
   buffer->SetPageSize (size.Height () / (fh + 2));
 
   // Invalidate the entire new area of the console
-  invalid.Set (size); 
+  invalid.Set (size);
 
   // Update cursor coordinates
   cy = MIN (cy, buffer->GetPageSize ());
@@ -534,7 +534,7 @@ void csConsoleOutput::SetCursorPos(int x, int y)
     cx = max_x - 1;
   else
     cx = x;
-  
+
   // Keep it from going off the bottom of the display
   if (y > max_y)
     cy = max_y - 1;
@@ -548,10 +548,10 @@ void csConsoleOutput::SetCursorPos (int iCharNo)
   {
     int max_x;
     const csString *curline = buffer->GetLine (cy);
- 
+
     max_x = curline ? curline->Length () : 0;
     cx = (iCharNo > max_x) ? max_x : (iCharNo <= 0) ? 0 : iCharNo;
-  }    
+  }
 }
 
 void csConsoleOutput::SetVisible (bool iShow)

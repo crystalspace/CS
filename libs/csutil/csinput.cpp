@@ -98,7 +98,7 @@ void csInputDriver::Post(iEvent* e)
 
 bool csInputDriver::HandleEvent(iEvent& e)
 {
-  bool const mine = (e.Type == csevBroadcast && 
+  bool const mine = (e.Type == csevBroadcast &&
     e.Command.Code == cscmdFocusChanged && !e.Command.Info);
   if (mine) // Application lost focus.
     LostFocus();

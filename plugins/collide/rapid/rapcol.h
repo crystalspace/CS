@@ -86,10 +86,10 @@ private:
   static bool firstHit;
 
   void GeometryInitialize (iPolygonMesh *mesh);
-  
+
 public:
   static int numHits;
- 
+
   /// Create a collider based on geometry.
   csRapidCollider (iPolygonMesh* mesh);
 

@@ -293,7 +293,7 @@ iNetworkConnection* csSocketDriver::NewConnection(
       host[p - target] = '\0';
       port = atoi(p + 1);
     }
-  
+
     if (host == 0 || port == 0)
       LastError = CS_NET_ERR_CANNOT_PARSE_ADDRESS;
     else

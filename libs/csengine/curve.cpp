@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998 by Ayal Zwi Pinkus
     Copyright (C) 2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -140,7 +140,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 unsigned long csCurve::LastCurveID = 0;
 
 csCurve::csCurve (csCurveTemplate* parent_tmpl) : csObject (),
-    Material (NULL), CurveTemplate (parent_tmpl), LightPatches (NULL), 
+    Material (NULL), CurveTemplate (parent_tmpl), LightPatches (NULL),
     O2W (NULL), uv2World (NULL), uv2Normal (NULL), ParentThing (NULL),
     LightMap (NULL), LightmapUpToDate (false)
 {
@@ -152,7 +152,7 @@ csCurve::csCurve (csCurveTemplate* parent_tmpl) : csObject (),
   vbuf = NULL;
   vbufmgr = NULL;
   SetupVertexBuffer ();
-} 
+}
 
 csCurve::~csCurve ()
 {
@@ -183,10 +183,10 @@ void csCurve::SetMaterial (iMaterialWrapper *m)
   SCF_SET_REF (Material, m);
 }
 
-void csCurve::MakeDirtyDynamicLights () 
-{ 
+void csCurve::MakeDirtyDynamicLights ()
+{
   LightmapUpToDate = false;
-  LightMap->MakeDirtyDynamicLights (); 
+  LightMap->MakeDirtyDynamicLights ();
 };
 
 void csCurve::AddLightPatch (csLightPatch* lp)
@@ -260,7 +260,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
 
       pos = uv2World[uv];
 
-      // is the point contained within the light frustrum? 
+      // is the point contained within the light frustrum?
       if (!lp->GetLightFrustum ()->Contains (pos - center))
         // No, skip it
         continue;
@@ -280,7 +280,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
             break;
 	  }
         }
-                  
+
         // if it was found in shadow skip it
         if (shad)
           continue;
@@ -322,17 +322,17 @@ void csCurve::ShineDynLight (csLightPatch* lp)
   shadow_it->DecRef ();
 }
 
-void csCurve::SetObject2World (const csReversibleTransform *o2w) 
-{ 
+void csCurve::SetObject2World (const csReversibleTransform *o2w)
+{
   if (!LightMap) return;	// Return if there is no LightMap yet.
   int lm_width = LightMap->GetWidth ();
   int lm_height = LightMap->GetHeight ();
 
   // current index into buffers
   int uv, ui, vi;
-  
+
   // if there was already an object to world transform specified
-  if (O2W && uv2World) 
+  if (O2W && uv2World)
   {
     // untransform our buffers
     for(ui=0; ui < lm_width; ui++)
@@ -345,9 +345,9 @@ void csCurve::SetObject2World (const csReversibleTransform *o2w)
       }
     }
   }
-  
+
   // intialize the new transform
-  delete O2W; 
+  delete O2W;
   O2W = new csReversibleTransform(*o2w);
 
   if (uv2World)
@@ -377,7 +377,7 @@ void csCurve::CalculateLightingStatic (csFrustumView* lview, bool vis)
     CalcUVBuffers ();
   }
 
-  if (!LightMap || LightmapUpToDate) 
+  if (!LightMap || LightmapUpToDate)
     return;
 
   int lm_width = LightMap->GetWidth ();
@@ -449,9 +449,9 @@ void csCurve::CalculateLightingStatic (csFrustumView* lview, bool vis)
       cosinus /= d;
       cosinus += cosfact;
 
-      if (cosinus < 0) 
+      if (cosinus < 0)
         cosinus = 0;
-      else if (cosinus > 1) 
+      else if (cosinus > 1)
         cosinus = 1;
 
       float brightness = cosinus * light->GetBrightnessAtDistance (d);
@@ -499,7 +499,7 @@ void csCurve::CalculateLightingDynamic (csFrustumView* lview)
   csLightPatch* lp = csEngine::current_engine->lightpatch_pool->Alloc ();
 
   AddLightPatch (lp);
-  
+
   csDynLight* dl = (csDynLight*)(lptq->GetCsLight ());
   dl->AddLightpatch (lp);
 
@@ -509,7 +509,7 @@ void csCurve::CalculateLightingDynamic (csFrustumView* lview)
 
   // Copy shadow frustums.
   lp->GetShadowBlock ().DeleteShadows ();
-  // @@@: It would be nice if we could optimize earlier 
+  // @@@: It would be nice if we could optimize earlier
   // to determine relevant shadow frustums in curves and use
   // AddRelevantShadows instead.
   lp->GetShadowBlock ().AddAllShadows (lview->GetFrustumContext ()
@@ -531,7 +531,7 @@ void csCurve::InitializeDefaultLighting ()
   r = csLight::ambient_red;
   g = csLight::ambient_green;
   b = csLight::ambient_blue;
-  LightMap->Alloc (CURVE_LM_SIZE*csLightMap::lightcell_size, 
+  LightMap->Alloc (CURVE_LM_SIZE*csLightMap::lightcell_size,
                    CURVE_LM_SIZE*csLightMap::lightcell_size, r, g, b);
   LightmapUpToDate = false;
 }
@@ -546,11 +546,11 @@ bool csCurve::ReadFromCache (int id)
   r = csLight::ambient_red;
   g = csLight::ambient_green;
   b = csLight::ambient_blue;
-  LightMap->Alloc (CURVE_LM_SIZE*csLightMap::lightcell_size, 
+  LightMap->Alloc (CURVE_LM_SIZE*csLightMap::lightcell_size,
                    CURVE_LM_SIZE*csLightMap::lightcell_size, r, g, b);
 
   LightMap->ReadFromCache (id, CURVE_LM_SIZE*csLightMap::lightcell_size,
-           CURVE_LM_SIZE*csLightMap::lightcell_size, this, false, 
+           CURVE_LM_SIZE*csLightMap::lightcell_size, this, false,
            csEngine::current_engine);
   LightmapUpToDate = true;
   return true;
@@ -576,7 +576,7 @@ void csCurve::PrepareLighting ()
 }
 
 
-void csCurve::GetCoverageMatrix (csFrustumView& lview, 
+void csCurve::GetCoverageMatrix (csFrustumView& lview,
                                  csCoverageMatrix &cm) const
 {
   csVector3 pos;
@@ -586,7 +586,7 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
   iShadowIterator* shadow_it = ctxt->GetShadows ()->GetShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
   csVector3& center = ctxt->GetLightFrustum ()->GetOrigin ();
-  
+
   int lm_width = LightMap->GetWidth ();
   int lm_height = LightMap->GetHeight ();
 
@@ -600,7 +600,7 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
       uv = vi*lm_width + ui;
       pos = uv2World[uv];
 
-      // is the point contained within the light frustrum? 
+      // is the point contained within the light frustrum?
       if (!ctxt->GetLightFrustum ()->Contains (pos-center))
         // No, skip it
         continue;
@@ -621,7 +621,7 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
             break;
 	  }
         }
-              
+
         // if it was found in shadow skip it
         if (shadowed)
           continue;
@@ -684,7 +684,7 @@ void csCurve::CalcUVBuffers()
 
       // ask our curve to find the object space coordinate at u,v
       PosInSpace (uv2World[uv], u, v);
-      
+
       // ask our curve to find the normal at u,v
       Normal (uv2Normal[uv], u, v);
 
@@ -783,7 +783,7 @@ void csCurve::HardTransform (const csReversibleTransform& /*trans*/)
 }
 
 iCurveTemplate* csCurve::Curve::GetParentTemplate ()
-{ 
+{
   return &(scfParent->GetParentTemplate ()->scfiCurveTemplate);
 }
 
@@ -842,17 +842,17 @@ csCurveTesselated* csBezierCurve::Tesselate (int res)
     res=2;
   else if (res>9)
     res=9;
-  
+
   if (res == previous_resolution && previous_tesselation)
     return previous_tesselation;
 
   previous_resolution = res;
   delete previous_tesselation;
 
-  previous_tesselation = 
+  previous_tesselation =
        new csCurveTesselated ((res+1)*(res+1), 2*res*res);
 
-  double *controls[9] = 
+  double *controls[9] =
   {
     cpt[0], cpt[1], cpt[2], cpt[3], cpt[4],
     cpt[5], cpt[6], cpt[7], cpt[8],
@@ -882,7 +882,7 @@ csCurveTesselated* csBezierCurve::Tesselate (int res)
     {
       csTriangle& up = previous_tesselation->GetTriangle (2*(i+j*res));
       csTriangle& down = previous_tesselation->GetTriangle (2*(i+j*res)+1);
-      
+
       int tl = i+(res+1)*j;
       int tr = i+(res+1)*j+1;
 
@@ -918,7 +918,7 @@ void csBezierCurve::GetObjectBoundingBox (csBox3& bbox)
 }
 
 csBezierCurve::csBezierCurve (csBezierTemplate* parent_tmpl) :
-  csCurve (parent_tmpl) 
+  csCurve (parent_tmpl)
 {
   int i,j;
   for (i=0 ; i<3 ; i++)
@@ -956,7 +956,7 @@ bool csBezierCurve::IsLightable ()
 
 void csBezierCurve::PosInSpace (csVector3& vec, double u, double v)
 {
-  double *controls[9] = 
+  double *controls[9] =
   {
     cpt[0], cpt[1], cpt[2], cpt[3], cpt[4],
     cpt[5], cpt[6], cpt[7], cpt[8],
@@ -967,7 +967,7 @@ void csBezierCurve::PosInSpace (csVector3& vec, double u, double v)
 
 void csBezierCurve::Normal (csVector3& vec, double u, double v)
 {
-  double *controls[9] = 
+  double *controls[9] =
   {
     cpt[0], cpt[1], cpt[2], cpt[3], cpt[4],
     cpt[5], cpt[6], cpt[7], cpt[8],
@@ -984,7 +984,7 @@ void csBezierCurve::HardTransform (const csReversibleTransform& trans)
 //------------------------------------------------------------------
 
 csBezierTemplate::csBezierTemplate ()
-  : csCurveTemplate () 
+  : csCurveTemplate ()
 {
   int i;
   for (i=0 ; i<9 ; i++)
@@ -995,7 +995,7 @@ void csBezierTemplate::SetVertex (int index, int ver_ind)
 {
   ver_id[index] = ver_ind;
 }
-int csBezierTemplate::GetVertex (int index) 
+int csBezierTemplate::GetVertex (int index)
 {
   return ver_id[index];
 }

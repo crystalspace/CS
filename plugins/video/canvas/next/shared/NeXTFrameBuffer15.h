@@ -32,19 +32,19 @@ private:
 public:
   NeXTFrameBuffer15(unsigned int width, unsigned int height);
   virtual ~NeXTFrameBuffer15();
-  
+
   virtual int depth() const;
   virtual int bits_per_sample() const;
   virtual int bytes_per_pixel() const;
   virtual int palette_entries() const;
-  
+
   virtual int red_mask() const;
   virtual int green_mask() const;
   virtual int blue_mask() const;
-  
+
   virtual unsigned char* get_raw_buffer() const;
   virtual unsigned char* get_cooked_buffer() const;
-  
+
   virtual void cook();
 };
 

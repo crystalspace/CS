@@ -839,7 +839,7 @@ void redirect (char *line, char *makefile)
       *dst++ = *src++;
     strcpy (dst, ".bak");
   }
-#else  
+#else
   sprintf (backup, "%s.bak", makefile);
 #endif
   unlink (backup);

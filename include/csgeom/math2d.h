@@ -44,7 +44,7 @@ public:
    *          1 if point v is right of segment 's1-s2'
    *       or 0 if point v lies on segment 's1-s2'.
    */
-  static int WhichSide2D (const csVector2& v, 
+  static int WhichSide2D (const csVector2& v,
                           const csVector2& s1, const csVector2& s2)
   {
     float k  = (s1.y - v.y)*(s2.x - s1.x);
@@ -60,7 +60,7 @@ public:
    *          1 if point v is right of segment 'seg'
    *       or 0 if point v lies on segment 'seg'.
    */
-  static int WhichSide2D (const csVector2& v, 
+  static int WhichSide2D (const csVector2& v,
                           const csSegment2& s)
   {
     return WhichSide2D (v, s.Start (), s.End ());

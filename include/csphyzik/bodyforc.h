@@ -31,7 +31,7 @@ class ctPhysicalEntity;
 class ctNBodyForce : public ctForce
 {
 public:
-  ctLinkList<ctPhysicalEntity> body_vector;  
+  ctLinkList<ctPhysicalEntity> body_vector;
 
   ctNBodyForce ();
   ctNBodyForce ( ctReferenceFrame &rf );

@@ -110,13 +110,13 @@ void csBorderLayout::LayoutContainer ()
       y + nh + Vgap (mNORTH.comp));
     mEAST.comp->SetSize (ew, eh);
   }
-	
+
   if (mNORTH.comp)
   {
     mNORTH.comp->SetPos (x, y);
     mNORTH.comp->SetSize (nw, nh);
   }
-	
+
   if (mSOUTH.comp)
   {
     mSOUTH.comp->SetPos (x, y + nh + ch + Vgap (mNORTH.comp) + Vgap (mCENTER.comp));
@@ -167,7 +167,7 @@ void csBorderLayout::RemoveLayoutComponent (csComponent* comp)
 
 void csBorderLayout::MaximumLayoutSize (int &w, int &h)
 {
-  if (parent) 
+  if (parent)
     w = parent->bound.Width (), h = parent->bound.Height ();
   else
     w = h = 1 << 31;

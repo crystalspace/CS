@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -68,22 +68,22 @@ public:
   }
   virtual const csVector3& GetPosition () const {return isomesh->GetPosition();}
   virtual const csVector3 GetFullPosition () const {return isomesh->GetPosition();}
-  virtual void SetTransform (const csReversibleTransform& t) 
+  virtual void SetTransform (const csReversibleTransform& t)
   {
     isomesh->SetTransform(t.GetT2O());
     isomesh->SetPosition(t.GetOrigin());
     updatenumber++;
   }
-  virtual csReversibleTransform& GetTransform () 
-  { 
-    obj.SetT2O(isomesh->GetTransform()); 
+  virtual csReversibleTransform& GetTransform ()
+  {
+    obj.SetT2O(isomesh->GetTransform());
     obj.SetOrigin(isomesh->GetPosition());
     return obj;
   }
   virtual csReversibleTransform GetFullTransform () const
-  { 
+  {
     csReversibleTransform obj;
-    obj.SetT2O(isomesh->GetTransform()); 
+    obj.SetT2O(isomesh->GetTransform());
     obj.SetOrigin(isomesh->GetPosition());
     return obj;
   }
@@ -133,14 +133,14 @@ class csIsoFakeRenderView : public iRenderView
    * Instead the callback function is called.
    */
   iDrawFuncCallback* callback;
-  
+
 public:
   SCF_DECLARE_IBASE;
-  csIsoFakeRenderView() 
+  csIsoFakeRenderView()
   {
     callback = NULL;
   }
-  virtual ~csIsoFakeRenderView() 
+  virtual ~csIsoFakeRenderView()
   {
     SCF_DEC_REF (callback);
   }
@@ -158,7 +158,7 @@ public:
   virtual void RestoreRenderContext (csRenderContext* ) {}
   virtual iCamera* CreateNewCamera() {return fakecam;} //@@@ copy?
   virtual iEngine* GetEngine () {return 0;}
-  virtual iGraphics2D* GetGraphics2D () 
+  virtual iGraphics2D* GetGraphics2D ()
   {return isorview->GetG3D()->GetDriver2D();}
   virtual iGraphics3D* GetGraphics3D () {return isorview->GetG3D();}
   virtual void SetFrustum (float, float, float, float) {}
@@ -284,7 +284,7 @@ public:
     return true;
   }
   virtual bool ClipBBox (const csBox2& sbox, const csBox3& /*cbox*/,
-          int& clip_portal, int& clip_plane, int& clip_z_plane) 
+          int& clip_portal, int& clip_plane, int& clip_z_plane)
   {
     clip_plane = CS_CLIP_NOT;
     /// test if chance that we must clip to a portal -> or the Toplevel clipper
@@ -452,14 +452,14 @@ int csIsoMeshSprite::GetVertexCount() const
   return 0;
 }
 
-void csIsoMeshSprite::AddVertex(const csVector3& /*coord*/, float /*u*/, 
+void csIsoMeshSprite::AddVertex(const csVector3& /*coord*/, float /*u*/,
   float /*v*/)
 {
   /// no effect
 }
 
 
-void csIsoMeshSprite::SetPosition(const csVector3& newpos) 
+void csIsoMeshSprite::SetPosition(const csVector3& newpos)
 {
   /// manage movement of the sprite, oldpos, newpos
   csVector3 oldpos = position;
@@ -467,7 +467,7 @@ void csIsoMeshSprite::SetPosition(const csVector3& newpos)
   if(grid) grid->MoveSprite(this, oldpos, newpos);
 }
 
-void csIsoMeshSprite::MovePosition(const csVector3& delta) 
+void csIsoMeshSprite::MovePosition(const csVector3& delta)
 {
   SetPosition(position + delta);
 }
@@ -533,7 +533,7 @@ void csIsoMeshSprite::SetAllStaticColors(const csColor& /*color*/)
   /// nothing
 }
 
-void csIsoMeshSprite::AddToVertexStaticColor(int /*i*/, 
+void csIsoMeshSprite::AddToVertexStaticColor(int /*i*/,
   const csColor& /*color*/)
 {
   /// nothing

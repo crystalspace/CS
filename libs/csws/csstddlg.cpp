@@ -262,7 +262,7 @@ public:
   cspFileDialog (csComponent *iParent);
   virtual ~cspFileDialog ();
   virtual bool HandleEvent (iEvent &Event);
-  
+
   void UseVFS(bool toggle);
   void Reread ();
   // set file path
@@ -499,13 +499,13 @@ void cspFileDialog::Reread ()
          || (*curp == pathsep)))
       curp++;
     activate = lbi;
-    delete[] name;    
+    delete[] name;
   } /* endwhile */
 
   int i,n;
   csStrVector dirs;
   csStrVector files;
-  
+
   if (!usevfs)
   {
     // work on real FS
@@ -551,7 +551,7 @@ void cspFileDialog::Reread ()
 	while (dirlen && fname[dirlen-1]!= VFS_PATH_SEPARATOR)
 	  dirlen--;
 	fname=fname+dirlen;
-		
+
 	if (fname[strlen(fname)-1] == VFS_PATH_SEPARATOR)
 	{
 	  fname[strlen(fname)-1]='\0';
@@ -563,7 +563,7 @@ void cspFileDialog::Reread ()
     }
     filelist->DecRef();
   }
-      
+
   dirs.QuickSort (csStrVector::CASE_INSENSITIVE);
   for (i = 0, n = dirs.Length(); i < n; i++)
   {
@@ -571,11 +571,11 @@ void cspFileDialog::Reread ()
     lbi->SetBitmap (fdspr [0], false);
     lbi->SetOffset (level * 6);
   }
-  
+
   files.QuickSort (csStrVector::CASE_INSENSITIVE);
   for (i = 0, n = files.Length(); i < n; i++)
     (void)new csListBoxItem (fp, files.Get(i));
-  
+
   busy = false;
   // Place listbox items
   // Activate current directory item
@@ -587,14 +587,14 @@ bool cspFileDialog::GetFileName(char *buf, size_t bufsize)
 {
   csComponent *f = GetChild (CSWID_FILENAME);
   csComponent *p = GetChild (CSWID_PATHNAME);
-  
+
   if (f && p && buf)
   {
     p->GetText (buf, bufsize);
     size_t sl = strlen (buf);
 
     char separator = usevfs ? VFS_PATH_SEPARATOR : PATH_SEPARATOR;
-    
+
     if (sl < bufsize)
     {
       if ((buf [sl - 1] != '/')
@@ -603,14 +603,14 @@ bool cspFileDialog::GetFileName(char *buf, size_t bufsize)
 	buf [sl++] = separator;
 	buf [sl] = 0;
       }
-      
+
       f->GetText (&buf [sl], bufsize - sl);
     }
     return true;
   }
   return false;
 }
-  
+
 csWindow *csFileDialog (csComponent *iParent, const char *iTitle,
     const char *iFileName, const char *iOpenButtonText, bool vfspaths)
 {
@@ -618,16 +618,16 @@ csWindow *csFileDialog (csComponent *iParent, const char *iTitle,
       CSWS_BUTSYSMENU | CSWS_BUTCLOSE | CSWS_TITLEBAR);
   cspFileDialog *d = new cspFileDialog (w);
   w->SetDragStyle (w->GetDragStyle () & ~CS_DRAG_SIZEABLE);
-  
+
   d->UseVFS(vfspaths);
-    
+
   csComponent *c = new csInputLine (d, CS_MAXPATHLEN);
   c->id = CSWID_FILENAME;
   c->SetRect (5, 15, 5+310, 31);
-  
+
   c = new csStatic (d, c, "File ~name");
   c->SetPos (5, 5);
-  
+
   c = new csInputLine (d, CS_MAXPATHLEN);
   c->id = CSWID_PATHNAME;
   c->SetRect (5, 45, 5+310, 61);

@@ -1,18 +1,18 @@
 #ifndef __IAWS_AWS_H__
 #define __IAWS_AWS_H__
 /**************************************************************************
-    Copyright (C) 2001 by Christopher Nelson 
-    
+    Copyright (C) 2001 by Christopher Nelson
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -72,8 +72,8 @@ const int AWSF_AlwaysRedrawWindows=2;
 SCF_VERSION (iAws, 0, 1, 0);
 
 struct iAws : public iBase
-{  
-public:  
+{
+public:
   /// Get a pointer to the preference manager
   virtual iAwsPrefManager *GetPrefMgr()=0;
 
@@ -91,10 +91,10 @@ public:
 
   /// Set the top window
   virtual void       SetTopWindow(iAwsWindow *win)=0;
-  
+
   /// Causes the current view of the window system to be drawn to the given graphics device.
   virtual void       Print(iGraphics3D *g3d, uint8 Alpha=0)=0;
-  
+
   /// Redraw whatever portions of the screen need it.
   virtual void       Redraw()=0;
 
@@ -121,7 +121,7 @@ public:
 
   /// Dispatches events to the proper components
   virtual bool HandleEvent(iEvent&)=0;
-  
+
   /// Set the contexts however you want
   virtual void SetCanvas(iAwsCanvas *newCanvas)=0;
 
@@ -132,7 +132,7 @@ public:
   virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr)=0;
 
   /// Create a default canvas, just a single proctex
-  virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr, 
+  virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr,
     int width, int height, const char *name)=0;
 
   /// Create a canvas that uses custom graphics devices
@@ -142,8 +142,8 @@ public:
   virtual iGraphics2D *G2D()=0;
 
   /// Get the iGraphics3D interface so that components can use it.
-  virtual iGraphics3D *G3D()=0; 
-  
+  virtual iGraphics3D *G3D()=0;
+
   /// Instantiates a window based on a window definition.
   virtual iAwsWindow *CreateWindowFrom(char *defname)=0;
 
@@ -159,7 +159,7 @@ public:
   /// Clears one or more flags for different operating modes
   virtual void ClearFlag(unsigned int flags)=0;
 
-  /// Returns the current flags 
+  /// Returns the current flags
   virtual unsigned int GetFlags()=0;
 };
 
@@ -170,47 +170,47 @@ struct iAwsPrefManager : public iBase
 {
 public:
   /// Performs whatever initialization is needed
-  virtual bool Setup(iObjectRegistry *object_reg)=0;   
+  virtual bool Setup(iObjectRegistry *object_reg)=0;
 
   /// Invokes the definition parser to load definition files
   virtual bool Load(const char *def_file)=0;
 
   /// Maps a name to an id
   virtual unsigned long NameToId(char *name)=0;
-    
+
   /// Select which skin is the default for components, the skin must be loaded.  True on success, false otherwise.
   virtual bool SelectDefaultSkin(char *skin_name)=0;
 
   /// Lookup the value of an int key by name (from the skin def)
-  virtual bool LookupIntKey(char *name, int &val)=0; 
+  virtual bool LookupIntKey(char *name, int &val)=0;
 
   /// Lookup the value of an int key by id (from the skin def)
-  virtual bool LookupIntKey(unsigned long id, int &val)=0; 
+  virtual bool LookupIntKey(unsigned long id, int &val)=0;
 
   /// Lookup the value of a string key by name (from the skin def)
-  virtual bool LookupStringKey(char *name, iString *&val)=0; 
+  virtual bool LookupStringKey(char *name, iString *&val)=0;
 
   /// Lookup the value of a string key by id (from the skin def)
-  virtual bool LookupStringKey(unsigned long id, iString *&val)=0; 
+  virtual bool LookupStringKey(unsigned long id, iString *&val)=0;
 
   /// Lookup the value of a rect key by name (from the skin def)
-  virtual bool LookupRectKey(char *name, csRect &rect)=0; 
+  virtual bool LookupRectKey(char *name, csRect &rect)=0;
 
   /// Lookup the value of a rect key by id (from the skin def)
-  virtual bool LookupRectKey(unsigned long id, csRect &rect)=0; 
-  
+  virtual bool LookupRectKey(unsigned long id, csRect &rect)=0;
+
   /// Lookup the value of an RGB key by name (from the skin def)
   virtual bool LookupRGBKey(char *name, unsigned char &red, unsigned char &green, unsigned char &blue)=0;
-    
+
   /// Lookup the value of an RGB key by name (from the skin def)
   virtual bool LookupRGBKey(unsigned long id, unsigned char &red, unsigned char &green, unsigned char &blue)=0;
 
   /// Lookup the value of a point key by name (from the skin def)
-  virtual bool LookupPointKey(char *name, csPoint &point)=0; 
+  virtual bool LookupPointKey(char *name, csPoint &point)=0;
 
   /// Lookup the value of a point key by id (from the skin def)
-  virtual bool LookupPointKey(unsigned long id, csPoint &point)=0; 
-  
+  virtual bool LookupPointKey(unsigned long id, csPoint &point)=0;
+
   /// Get the an integer from a given component node
   virtual bool GetInt(awsComponentNode *node, char *name, int &val)=0;
 
@@ -219,13 +219,13 @@ public:
 
   /// Get the value of an integer from a given component node
   virtual bool GetString(awsComponentNode *node, char *name, iString *&val)=0;
-  
+
   /// Find window definition and return the component node holding it, Null otherwise
   virtual awsComponentNode *FindWindowDef(char *name)=0;
-  
+
   /// Sets the value of a color in the global AWS palette.
-  virtual void SetColor(int index, int color)=0; 
-    
+  virtual void SetColor(int index, int color)=0;
+
   /// Gets the value of a color from the global AWS palette.
   virtual int  GetColor(int index)=0;
 
@@ -243,13 +243,13 @@ public:
 
   /// Sets the font server that the preference manager uses
   virtual void SetFontServer(iFontServer *fntsvr)=0;
-  
+
   /// Sets the window manager that the preference manager uses
   virtual void SetWindowMgr(iAws *wmgr)=0;
-    
+
   /** Sets up the AWS palette so that the colors are valid reflections of
-       user preferences.  Although SetColor can be used, it's recommended 
-       that you do not.  Colors should always be a user preference, and 
+       user preferences.  Although SetColor can be used, it's recommended
+       that you do not.  Colors should always be a user preference, and
        should be read from the window and skin definition files (as
        happens automatically normally. */
   virtual void SetupPalette()=0;
@@ -288,7 +288,7 @@ SCF_VERSION (iAwsSink, 0, 0, 1);
 struct iAwsSink : public iBase
 {
   /// Maps a trigger name to a trigger id
-  virtual unsigned long GetTriggerID(char *name)=0;  
+  virtual unsigned long GetTriggerID(char *name)=0;
 
   /// Handles trigger events
   virtual void HandleTrigger(int trigger_id, iAwsSource *source)=0;
@@ -301,7 +301,7 @@ struct iAwsSink : public iBase
 SCF_VERSION (iAwsSource, 0, 0, 1);
 
 struct iAwsSource : public iBase
-{      
+{
   /// Gets the component owner for this (sources are embedded)
   virtual iAwsComponent *GetComponent()=0;
 
@@ -320,11 +320,11 @@ SCF_VERSION (iAwsSlot, 0, 0, 1);
 
 struct iAwsSlot : public iBase
 {
-  /** Connect sets us up to receive signals from some other component.  You can connect to as many different sources 
+  /** Connect sets us up to receive signals from some other component.  You can connect to as many different sources
    * and signals as you'd like.  You may connect to multiple signals from the same source.
    */
   virtual void Connect(iAwsSource *source, unsigned long signal, iAwsSink *sink, unsigned long trigger)=0;
-  
+
   /**  Disconnects us from the specified source and signal.  This may happen automatically if the signal source
    *  goes away.  You will receive disconnect notification always (even if you request the disconnection.)
    */
@@ -409,10 +409,10 @@ struct iAwsComponent : public iAwsSource
   /// Recursively moves children (and all nested children) by relative amount given.
   virtual void MoveChildren(int delta_x, int delta_y)=0;
 
-  /// Adds a child into this component.   
+  /// Adds a child into this component.
   virtual void AddChild(iAwsComponent* child, bool owner=true)=0;
 
-  /// Removes a child from this component. 
+  /// Removes a child from this component.
   virtual void RemoveChild(iAwsComponent *child)=0;
 
   /// Get's the number of children
@@ -420,7 +420,7 @@ struct iAwsComponent : public iAwsSource
 
   /// Get's a specific child
   virtual iAwsComponent *GetChildAt(int i)=0;
-    
+
   /// Returns true if this component has children
   virtual bool HasChildren()=0;
 
@@ -429,10 +429,10 @@ struct iAwsComponent : public iAwsSource
 
   /// Triggered when the user presses a mouse button down
   virtual bool OnMouseDown(int button, int x, int y)=0;
-    
-  /// Triggered when the user unpresses a mouse button 
+
+  /// Triggered when the user unpresses a mouse button
   virtual bool OnMouseUp(int button, int x, int y)=0;
-    
+
   /// Triggered when the user moves the mouse
   virtual bool OnMouseMove(int button, int x, int y)=0;
 
@@ -450,7 +450,7 @@ struct iAwsComponent : public iAwsSource
 
   /// Triggered when the user presses a key
   virtual bool OnKeypress(int key, int modifiers)=0;
-    
+
   /// Triggered when the keyboard focus is lost
   virtual bool OnLostFocus()=0;
 
@@ -474,7 +474,7 @@ struct iAwsWindow : public iAwsComponent
 
   /// Gets the value of the redraw tag
   virtual unsigned int RedrawTag()=0;
-  
+
   /// Raises a window to the top.
   virtual void Raise()=0;
 
@@ -489,7 +489,7 @@ struct iAwsWindow : public iAwsComponent
 
   /// Set's the window above this one
   virtual void SetWindowAbove(iAwsWindow *win)=0;
-    
+
   /// Set's the window below this one
   virtual void SetWindowBelow(iAwsWindow *win)=0;
 
@@ -502,7 +502,7 @@ struct iAwsWindow : public iAwsComponent
   /// Event triggered when a window is about to be lowered
   virtual void OnLower()=0;
 
-  /// Sets the engine view for this window 
+  /// Sets the engine view for this window
   virtual void SetEngineView(iView *_view)=0;
 
   /// Gets the engine view for this window
@@ -514,7 +514,7 @@ SCF_VERSION (iAwsComponentFactory, 0, 0, 1);
 
 struct iAwsComponentFactory : public iBase
 {
-  /// Returns a newly created component of the type this factory handles. 
+  /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create()=0;
 
   /// Registers this factory with the window manager

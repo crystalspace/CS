@@ -253,13 +253,13 @@ public:
   void SetHeightFunction (iTerrainHeightFunction* func)
   {
     SCF_SET_REF (height_func, func);
-    initialized = false; 
+    initialized = false;
   }
   /// Set the normal function to use for the terrain.
   void SetNormalFunction (iTerrainNormalFunction* func)
-  { 
+  {
     SCF_SET_REF (normal_func, func);
-    initialized = false; 
+    initialized = false;
   }
   void SetHeightMap (iImage* im, float hscale, float hshift);
 
@@ -409,15 +409,15 @@ public:
 // Take a block x,y vaue and convert it to an index
   inline void Block2Index( int x, int y, int& index )
 	{ index = y * blockxy + x; }
-// Find the nearest top left block to point p. 
-  void Object2Block( csVector3 p, int& x, int& y) 
+// Find the nearest top left block to point p.
+  void Object2Block( csVector3 p, int& x, int& y)
 	{
 	  x = int ( inv_block_stepx * ( p.x - topleft.x));
 	  y = int ( inv_block_stepy * ( p.z - topleft.z));
 	}
 // Find the nearest top left grid to point p.
-  void Object2Grid( csVector3 p, int& block_index, int& x, int& y) 
-	{ 
+  void Object2Grid( csVector3 p, int& block_index, int& x, int& y)
+	{
 	  csVector3 block_corner;
 	  Object2Block(p, x, y);
 	  Block2Object(x, y, block_corner);
@@ -425,15 +425,15 @@ public:
 	  x = int ( inv_grid_stepx * ( p.x - block_corner.x ));
 	  y = int ( inv_grid_stepy * ( p.z - block_corner.z ));
 	}
-// Find the top left corner of grid x,y in block bx,by 
-  void Grid2Object( int bx, int by, int x, int y, csVector3& p) 
+// Find the top left corner of grid x,y in block bx,by
+  void Grid2Object( int bx, int by, int x, int y, csVector3& p)
 	{
 	  Block2Object(bx, by, p);
 	  p.x += x * grid_stepx;
 	  p.z += y * grid_stepy;
 	}
-// Find the top left corner of block x,y 
-  void Block2Object( int x, int y, csVector3& p) 
+// Find the top left corner of block x,y
+  void Block2Object( int x, int y, csVector3& p)
 	{
 	  p.x = x * scale.x + topleft.x;
 	  p.y = topleft.y;

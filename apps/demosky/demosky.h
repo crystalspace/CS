@@ -63,17 +63,17 @@ private:
   /// the flock of birds
   Flock *flock;
 
-  /// the sky 
+  /// the sky
   csProcSky *sky;
   /// the six sides (front, back, left, right, up, down)
   csProcSkyTexture *sky_f, *sky_b, *sky_l, *sky_r, *sky_u, *sky_d;
 
-  /** set texture space of poly, a size x size texture , 
+  /** set texture space of poly, a size x size texture ,
    * given orig,u,ulen,v,vlen,  so that you get no ugly
    * edges (connecting to other polygons
    */
-  void SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly, int size, 
-    const csVector3& orig, const csVector3& upt, float ulen, 
+  void SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly, int size,
+    const csVector3& orig, const csVector3& upt, float ulen,
     const csVector3& vpt, float vlen);
 
 public:

@@ -99,7 +99,7 @@ void csScan_Initialize ()
     Scan.exp_16 [i] = QRound (32 * exp (-float (i) / 256.)) - 1;
 }
 
-void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits, 
+void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits,
   int gbits, int bbits)
 {
   int i;

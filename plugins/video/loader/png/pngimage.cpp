@@ -45,7 +45,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csPNGImageIO);
 
 SCF_EXPORT_CLASS_TABLE (cspngimg)
-  SCF_EXPORT_CLASS (csPNGImageIO, "crystalspace.graphic.image.io.png", 
+  SCF_EXPORT_CLASS (csPNGImageIO, "crystalspace.graphic.image.io.png",
 		"CrystalSpace PNG image format I/O plugin")
 SCF_EXPORT_CLASS_TABLE_END
 
@@ -79,7 +79,7 @@ void png_flush (png_structp)
 {
 }
 
-static iImageIO::FileFormatDescription formatlist[5] = 
+static iImageIO::FileFormatDescription formatlist[5] =
 {
   {PNG_MIME, "Gray", CS_IMAGEIO_LOAD},
   {PNG_MIME, "GrayAlpha", CS_IMAGEIO_LOAD},
@@ -112,7 +112,7 @@ iImage *csPNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
     delete i;
     return NULL;
   }
-  return i;    
+  return i;
 }
 
 void csPNGImageIO::SetDithering (bool)
@@ -248,7 +248,7 @@ error2:
 
   /* clean up after the write, and free any memory allocated */
   png_destroy_write_struct (&png, &info);
-  if (palette) 
+  if (palette)
     free(palette);
 
   /* Free the row pointers */

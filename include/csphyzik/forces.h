@@ -2,7 +2,7 @@
     Dynamics/Kinematics modeling and simulation library.
     Copyright (C) 1999 by Michael Alexander Ewert
                   2001 Anders Stenberg
-		  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -31,10 +31,10 @@ class ctDynamicEntity;
 class ctGravityF : public ctForce
 {
 public:
-  ctGravityF ( real pg = 9.81*M_PER_WORLDUNIT, 
+  ctGravityF ( real pg = 9.81*M_PER_WORLDUNIT,
 	       ctVector3 pd = ctVector3( 0.0, -1.0, 0.0 ) );
 
-  ctGravityF ( ctReferenceFrame &rf, real pg = 9.81*M_PER_WORLDUNIT, 
+  ctGravityF ( ctReferenceFrame &rf, real pg = 9.81*M_PER_WORLDUNIT,
 	       ctVector3 pd = ctVector3( 0.0, -1.0, 0.0 ) );
 
   virtual ctVector3 apply_F ( ctDynamicEntity &pe );
@@ -49,7 +49,7 @@ public:
 class ctAirResistanceF : public ctForce
 {
 public:
-	
+
   ctAirResistanceF ( real pk = DEFAULT_AIR_RESISTANCE );
 
   virtual ctVector3 apply_F( ctDynamicEntity &pe );
@@ -80,10 +80,10 @@ class ctSpringF : public ctNBodyForce
 protected:
   ctLinkList<ctVector3> attachment_point_vector;
   real rest_length;
-	
+
 public:
   /// body b2 can be NULL to indicate it is attached to the immovable world
-  ctSpringF ( ctPhysicalEntity *b1, ctVector3 p1, 
+  ctSpringF ( ctPhysicalEntity *b1, ctVector3 p1,
 	      ctPhysicalEntity *b2, ctVector3 p2 )
   {
     body_vector.add_link( b1 );
@@ -92,9 +92,9 @@ public:
     attachment_point_vector.add_link( new ctVector3(p2) );
     rest_length = 1;
   }
-	
+
   ~ctSpringF ()
-  { 
+  {
     attachment_point_vector.delete_link ( attachment_point_vector.get_first() );
     attachment_point_vector.delete_link ( attachment_point_vector.get_first() );
   }
@@ -116,10 +116,10 @@ class ctCappedSpringF : public ctNBodyForce
 protected:
   ctLinkList<ctVector3> attachment_point_vector;
   real cap_min, cap_max;
-	
+
 public:
   /// body b2 can be NULL to indicate it is attached to the immovable world
-  ctCappedSpringF ( ctPhysicalEntity *b1, ctVector3 p1, 
+  ctCappedSpringF ( ctPhysicalEntity *b1, ctVector3 p1,
 	      ctPhysicalEntity *b2, ctVector3 p2 )
   {
     body_vector.add_link( b1 );
@@ -128,9 +128,9 @@ public:
     attachment_point_vector.add_link( new ctVector3(p2) );
     cap_min = cap_max = 1;
   }
-	
+
   ~ctCappedSpringF ()
-  { 
+  {
     attachment_point_vector.delete_link ( attachment_point_vector.get_first() );
     attachment_point_vector.delete_link ( attachment_point_vector.get_first() );
   }
@@ -148,13 +148,13 @@ public:
 
 
 /**
- * 1/r^2 force. ( G * M1 * m2 ) / ( r^2 ) 
+ * 1/r^2 force. ( G * M1 * m2 ) / ( r^2 )
  * a gravity well.  gravitational attraction between bodies.
  * add bodies to this force that will exert force on bodies that have this force
  * included in their force list.
- * !me right now an object passing too close to the discontinuity will get 
- * accelerated way to fast and energy will NOT be conserved.  This could be 
- * fixed using R-K  method with adaptive step-sizing or some happy horse-shit 
+ * !me right now an object passing too close to the discontinuity will get
+ * accelerated way to fast and energy will NOT be conserved.  This could be
+ * fixed using R-K  method with adaptive step-sizing or some happy horse-shit
  * like that.
  */
 
@@ -163,7 +163,7 @@ class ctGravityWell : public ctNBodyForce
 public:
   ctGravityWell( ctPhysicalEntity *BIG_mass )
   {
-    magnitude = PHYZ_CONSTANT_G; 
+    magnitude = PHYZ_CONSTANT_G;
     body_vector.add_link( BIG_mass );
   }
 
@@ -174,7 +174,7 @@ public:
   virtual ctVector3 apply_F ( ctDynamicEntity &pe );
 
 protected:
-	
+
 };
 
 #endif // __CT_THEFORCES_H__

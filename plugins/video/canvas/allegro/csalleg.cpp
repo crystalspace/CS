@@ -269,7 +269,7 @@ void csGraphics2DAlleg::Print (csRect *area)
   }
 
 //  vsync ();
-  
+
   if (bitmap->w == SCREEN_W && bitmap->h == SCREEN_H)
   {
     if (area)
@@ -356,7 +356,7 @@ void csGraphics2DAlleg::SetRGB (int i, int r, int g, int b)
 bool csGraphics2DAlleg::HandleEvent (iEvent &/*Event*/)
 {
   int scancode, keycode, c;
-  
+
   if (!is_open)
     return false;
   if (keyboard_needs_poll ())
@@ -400,7 +400,7 @@ bool csGraphics2DAlleg::HandleEvent (iEvent &/*Event*/)
       EventOutlet->Mouse (c + 1, down, x_mouse, y_mouse);
   }
   button = mouse_b;
-  
+
   return false;
 }
 

@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -31,7 +31,7 @@
 
 //---------------------------------------------------------------------------
 
-bool csMath3::FindIntersection(const csVector3  tri1[3], 
+bool csMath3::FindIntersection(const csVector3  tri1[3],
                                const csVector3  tri2[3],
                                csVector3        line[2])
 {
@@ -239,7 +239,7 @@ int csMath3::OuterPlanes (const csBox3& box1, const csBox3& box2,
         if (num_planes >= 8)
 	{
 	  printf ("INTERNAL ERROR! OuterPlanes returns too many planes!\n");
-          exit (0); 
+          exit (0);
 	}
 	planes[num_planes++] = pl;
       }
@@ -270,7 +270,7 @@ int csMath3::FindObserverSides (const csBox3& box1, const csBox3& box2,
 
 //---------------------------------------------------------------------------
 
-float csSquaredDist::PointLine (const csVector3& p, 
+float csSquaredDist::PointLine (const csVector3& p,
                                 const csVector3& l1, const csVector3& l2)
 {
   csVector3 W = l1-p;
@@ -279,7 +279,7 @@ float csSquaredDist::PointLine (const csVector3& p,
   return p2l * p2l;
 }
 
-float csSquaredDist::PointPoly (const csVector3& p, csVector3 *V, int n, 
+float csSquaredDist::PointPoly (const csVector3& p, csVector3 *V, int n,
                                 const csPlane3& plane, float sqdist)
 {
   csVector3 W, L;
@@ -297,9 +297,9 @@ float csSquaredDist::PointPoly (const csVector3& p, csVector3 *V, int n,
     else if ( !(W*(L = V[i-1]-V[i]) > 0) )
     {
       if ( !lflag && W*(plane.norm % L) > 0 )
-      { 
-        L = W - L * (W*L)/(L*L);  
-        return L*L; 
+      {
+        L = W - L * (W*L)/(L*L);
+        return L*L;
       }
       lflag = (W*(V[i+1]-V[i]) > 0);
     }
@@ -461,7 +461,7 @@ bool csIntersect3::Plane(const csVector3& u, const csVector3& v,
   return true;
 }
 
-bool csIntersect3::Planes(const csPlane3& p1, const csPlane3& p2, 
+bool csIntersect3::Planes(const csPlane3& p1, const csPlane3& p2,
                           const csPlane3& p3, csVector3& isect)
 {
   //To find the one point that is on all three planes, we need to solve
@@ -470,7 +470,7 @@ bool csIntersect3::Planes(const csPlane3& p1, const csPlane3& p2,
   // A1*x+B1*y+C1*z+D1=0 //plane1
   // A2*x+B2*y+C2*z+D2=0 //plane2
   // A3*x+B3*y+C3*z+D3=0 //plane3
-  //This can be solved according to Cramers rule by looking at the 
+  //This can be solved according to Cramers rule by looking at the
   //determinants of the equation system.
   csMatrix3 mdet(p1.A(), p1.B(), p1.C(),
                  p2.A(), p2.B(), p2.C(),
@@ -478,18 +478,18 @@ bool csIntersect3::Planes(const csPlane3& p1, const csPlane3& p2,
   float det = mdet.Determinant();
   if (det == 0) return false; //some planes are parallel.
 
-  csMatrix3 mx(-p1.D(),  p1.B(),  p1.C(), 
-               -p2.D(),  p2.B(),  p2.C(), 
+  csMatrix3 mx(-p1.D(),  p1.B(),  p1.C(),
+               -p2.D(),  p2.B(),  p2.C(),
                -p3.D(),  p3.B(),  p3.C());
   float xdet = mx.Determinant();
 
-  csMatrix3 my( p1.A(), -p1.D(),  p1.C(), 
-                p2.A(), -p2.D(),  p2.C(), 
+  csMatrix3 my( p1.A(), -p1.D(),  p1.C(),
+                p2.A(), -p2.D(),  p2.C(),
                 p3.A(), -p3.D(),  p3.C());
   float ydet = my.Determinant();
 
-  csMatrix3 mz( p1.A(),  p1.B(), -p1.D(), 
-                p2.A(),  p2.B(), -p2.D(), 
+  csMatrix3 mz( p1.A(),  p1.B(), -p1.D(),
+                p2.A(),  p2.B(), -p2.D(),
                 p3.A(),  p3.B(), -p3.D());
   float zdet = mz.Determinant();
 
@@ -538,7 +538,7 @@ float csIntersect3::Z0Plane(
   isect.y = r * (v.y-u.y) + u.y;
   isect.z = 0;
   return r;
-} 
+}
 
 float csIntersect3::ZPlane(
   float zval, const csVector3& u, const csVector3& v, csVector3& isect)

@@ -60,7 +60,7 @@ svgalib2d: $(OUTDIRS) $(SVGA2D)
 
 $(OUT)%$O: plugins/video/canvas/svgalib/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SVGA2D)
- 
+
 $(SVGA2D): $(OBJ.SVGA2D) $(LIB.SVGA2D)
 	$(DO.PLUGIN) $(LIB.SVGA2D.SPECIAL)
 

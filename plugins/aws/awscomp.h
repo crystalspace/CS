@@ -1,18 +1,18 @@
  #ifndef __AWS_COMPONENT_H__
  #define __AWS_COMPONENT_H__
 /**************************************************************************
-    Copyright (C) 2000-2001 by Christopher Nelson 
-    
+    Copyright (C) 2000-2001 by Christopher Nelson
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -37,23 +37,23 @@ SCF_VERSION (awsComponent, 0, 0, 1);
 *       and ask the preference manager about things like it's default texture, colors, etc; using the Lookup* functions.  *
 *       The component can then get texture handles from the preference manager using the values of the keys that it has   *
 *       looked up.
-*           e.g. 
-*            
+*           e.g.
+*
 *            iAwsPrefManager *pm = wmgr->GetPrefMgr();
-*            
+*
 *            pm->LookupStringKey("Texture", texturename);
-*            
+*
 *            SetTexture(pm->GetPixmapFor(texturename));
-*                                                                                                                   
-*                                                                              
+*
+*
 *                                                                                                                         *
 **************************************************************************************************************************/
 class awsComponent : public iAwsComponent
 {
-   /// The stored handle to the window manager, in case a component needs it. 
+   /// The stored handle to the window manager, in case a component needs it.
    iAws  *wmgr;
 
-   /// The stored handle to the window 
+   /// The stored handle to the window
    iAwsWindow *win;
 
    /// The stored handle to the parent
@@ -73,7 +73,7 @@ class awsComponent : public iAwsComponent
 
    /// Embedded awsSource
    awsSource signalsrc;
-   
+
 public:
     SCF_DECLARE_IBASE;
 
@@ -92,14 +92,14 @@ public:
 
     /// Returns component that this belongs to.
     virtual iAwsComponent *GetComponent();
-         
+
 public:
     /**
-     *  This is the function that components use to set themselves up.  All components MUST implement this function.  
+     *  This is the function that components use to set themselves up.  All components MUST implement this function.
      *  You should also call awsComponent::Setup() so that it can perform some default initialization work.
      */
     virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
-   
+
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
     virtual bool HandleEvent(iEvent& Event);
 
@@ -138,7 +138,7 @@ public:
 
     /// Returns the state of the hidden flag
     virtual bool isHidden();
-    
+
     /// Hides a component
     virtual void Hide();
 
@@ -147,7 +147,7 @@ public:
 
     /// Get's the unique id of this component.
     virtual unsigned long GetID();
-    
+
     /// Set's the unique id of this component. Note: only to be used by window manager.
     virtual void SetID(unsigned long _id);
 
@@ -173,11 +173,11 @@ public:
 
     /// Get's a specific child
     virtual iAwsComponent *GetChildAt(int i);
-    
+
     /// Returns true if this component has children
     virtual bool HasChildren();
 
-    /** Get's this components idea of the window manager.  
+    /** Get's this components idea of the window manager.
       * Should be used internally by the component ONLY,
       * or by embedding classes. */
     iAws *WindowManager();
@@ -187,24 +187,24 @@ public:
 
     /// Get's the parent component of this component;
     virtual iAwsComponent *Parent();
-    
+
     /// Sets the window that this component resides in.
     virtual void SetWindow(iAwsWindow *win);
 
     /// Sets the parent component of this component;
     virtual void SetParent(iAwsComponent *parent);
-    
-        
+
+
 public:
     /// Triggered when the component needs to draw
     virtual void OnDraw(csRect clip);
 
     /// Triggered when the user presses a mouse button down
     virtual bool OnMouseDown(int button, int x, int y);
-    
-    /// Triggered when the user unpresses a mouse button 
+
+    /// Triggered when the user unpresses a mouse button
     virtual bool OnMouseUp(int button, int x, int y);
-    
+
     /// Triggered when the user moves the mouse
     virtual bool OnMouseMove(int button, int x, int y);
 
@@ -222,7 +222,7 @@ public:
 
     /// Triggered when the user presses a key
     virtual bool OnKeypress(int key, int modifiers);
-    
+
     /// Triggered when the keyboard focus is lost
     virtual bool OnLostFocus();
 
@@ -249,7 +249,7 @@ public:
     /// Returns the current window manager
     iAws *WindowManager() { return wmgr; }
 
-    /// Returns a newly created component of the type this factory handles. 
+    /// Returns a newly created component of the type this factory handles.
     virtual iAwsComponent *Create()=0;
 
     /// Registers this factory with the window manager

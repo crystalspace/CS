@@ -421,8 +421,8 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     int a = triangles[i].a;
     int b = triangles[i].b;
     int c = triangles[i].c;
-    int cnt_vis = int (work_verts[a].z >= SMALL_Z) + 
-    		  int (work_verts[b].z >= SMALL_Z) + 
+    int cnt_vis = int (work_verts[a].z >= SMALL_Z) +
+    		  int (work_verts[b].z >= SMALL_Z) +
     		  int (work_verts[c].z >= SMALL_Z);
     if (cnt_vis == 0)
     {

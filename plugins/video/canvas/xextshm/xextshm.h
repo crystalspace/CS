@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein 
+    Copyright (C) 1998 by Jorrit Tyberghein
     Copyright (C) 2001 by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ class csXExtSHM : public iXExtSHM
 {
   /// The Object Registry
   iObjectRegistry *object_reg;
-  /// The X-display 
+  /// The X-display
   Display* dpy;
   /// The Screen Number (not necessarilly the default)
   int screen_num;
@@ -61,7 +61,7 @@ public:
 
   virtual bool Initialize (iObjectRegistry*);
   void Report (int severity, const char* msg, ...);
-  virtual void SetDisplayScreen (Display *dpy, int screen_num) 
+  virtual void SetDisplayScreen (Display *dpy, int screen_num)
     { this->dpy = dpy; this->screen_num = screen_num; }
   virtual unsigned char *CreateMemory (int Width, int Height);
   virtual void DestroyMemory ();
@@ -70,7 +70,7 @@ public:
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csXExtSHM);
-    virtual bool Initialize (iObjectRegistry *o) 
+    virtual bool Initialize (iObjectRegistry *o)
     { return scfParent->Initialize(o); }
   } scfiComponent;
 

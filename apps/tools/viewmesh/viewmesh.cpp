@@ -123,10 +123,10 @@ bool ViewMesh::HandleEvent (iEvent& ev)
     // display next frame
     Draw();
   }
-    
+
   if (csApp::HandleEvent(ev))
     return true;
-    
+
   switch(ev.Type)
   {
     case csevKeyDown:
@@ -161,9 +161,9 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  menu->Hide();
       	  if (dialog)
 	    delete dialog;
-	  dialog= csFileDialog (this, "Select Mesh Object", "/this/", "Open", 
+	  dialog= csFileDialog (this, "Select Mesh Object", "/this/", "Open",
 	      true);
-	  
+
 	  ModalData *data=new ModalData;
 	  data->code = VIEWMESH_COMMAND_LOADMESH;
 	  StartModal (dialog, data);
@@ -184,7 +184,7 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 
 	  return true;
 	  }
-	
+
 	case VIEWMESH_COMMAND_CAMMODE1:
 	  cammode = movenormal;
 	  menu->Hide();
@@ -233,7 +233,7 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	default:
 	  break;
       }
-      if (ev.Command.Code > VIEWMESH_STATES_SELECT_START && 
+      if (ev.Command.Code > VIEWMESH_STATES_SELECT_START &&
 	  ev.Command.Code < VIEWMESH_STATES_SELECT_START + 100)
       {
       	iSprite3DState *spstate = SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
@@ -249,8 +249,8 @@ bool ViewMesh::HandleEvent (iEvent& ev)
       }
       break;
   }
- 
-  return false; 
+
+  return false;
 }
 
 bool ViewMesh::LoadSprite(const char *filename,float scale)
@@ -280,7 +280,7 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
     spstate->SetAction("default");
     spstate->DecRef();
   }
-    
+
   // Update Sprite States menu
   stateslist.DeleteAll();
   stateslist.Push (csStrNew("default"));
@@ -341,7 +341,7 @@ void ViewMesh::Draw()
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
-  
+
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
@@ -367,7 +367,7 @@ void ViewMesh::Draw()
       case moveorigin:
 	{
 	  csVector3 orig = c->GetTransform().GetOrigin();
-	
+
 	  if (GetKeyState (CSKEY_DOWN))
 	    c->GetTransform().SetOrigin (orig + CS_VEC_BACKWARD * 4 * speed);
 	  if (GetKeyState (CSKEY_UP))
@@ -393,20 +393,20 @@ void ViewMesh::Draw()
 	  if (GetKeyState (CSKEY_UP))
 	    orig = csXRotMatrix3(speed) * (orig-spritepos) + spritepos;
 	  if (GetKeyState (CSKEY_DOWN))
-	    orig = csXRotMatrix3(-speed) * (orig-spritepos) + spritepos;  
+	    orig = csXRotMatrix3(-speed) * (orig-spritepos) + spritepos;
 	  c->GetTransform().SetOrigin(orig);
 	  if (GetKeyState (CSKEY_PGUP))
 	    c->Move(CS_VEC_FORWARD * 4 * speed);
 	  if (GetKeyState (CSKEY_PGDN))
 	    c->Move(CS_VEC_BACKWARD * 4 * speed);
-	  c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );	
+	  c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );
 	  break;
 	}
       default:
 	break;
-    }	
+    }
   }
-    
+
   csApp::Draw();
   pplBeginDraw(CSDRAW_3DGRAPHICS);
   view->Draw();
@@ -584,7 +584,7 @@ bool ViewMesh::Initialize ()
   }
   if (i>0)
     engine->Prepare();
-      
+
   // Load a texture for our sprite.
   if (texturefilename && texturename)
   {
@@ -626,7 +626,7 @@ bool ViewMesh::Initialize ()
 CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
 
 int main (int argc, char* argv[])
-{ 
+{
   srand (time (NULL));
 
   iObjectRegistry *object_reg = csInitializer::CreateEnvironment(argc, argv);
@@ -640,7 +640,7 @@ int main (int argc, char* argv[])
     return 1;
   }
 
-  if (!csInitializer::RequestPlugins (object_reg, 
+  if (!csInitializer::RequestPlugins (object_reg,
 	      CS_REQUEST_VFS,
 	      CS_REQUEST_SOFTWARE3D,
 	      CS_REQUEST_ENGINE,
@@ -656,7 +656,7 @@ int main (int argc, char* argv[])
 	"Is your CRYSTAL environment var properly set?");
     return 1;
   }
-  
+
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
     ViewMesh::Help();
@@ -676,7 +676,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!app->Initialize ())
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	"crystalspace.application.viewmesh", "Error initializing system!");
     csInitializer::DestroyApplication(object_reg);
     return 1;

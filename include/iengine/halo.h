@@ -92,12 +92,12 @@ SCF_VERSION (iFlareHalo, 0, 0, 1);
  */
 struct iFlareHalo : public iBase
 {
-  /** 
+  /**
    * Add a visual component to the flare.
    * give position, size, image and mixmode.
    * The component is added at the end of the list - to be displayed last.
    */
-  virtual void AddComponent (float pos, float w, float h, uint mode, 
+  virtual void AddComponent (float pos, float w, float h, uint mode,
     iMaterialWrapper *image) = 0;
 };
 

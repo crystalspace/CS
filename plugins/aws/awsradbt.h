@@ -1,18 +1,18 @@
  #ifndef __AWS_RADIO_BUTTON_H__
  #define __AWS_RADIO_BUTTON_H__
 /**************************************************************************
-    Copyright (C) 2000-2001 by Christopher Nelson 
-    
+    Copyright (C) 2000-2001 by Christopher Nelson
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -27,7 +27,7 @@ class awsRadButton : public awsComponent
 
    /// True if the component has the mouse over it
    bool mouse_is_over;
-   
+
    /// True if this radio button is on
    bool is_on;
 
@@ -48,20 +48,20 @@ class awsRadButton : public awsComponent
 
 protected:
    /// Broadcasts the clear event to peers.
-   void ClearGroup(); 
-  
+   void ClearGroup();
+
 public:
     awsRadButton();
     virtual ~awsRadButton();
 
    /******* Alignment Options ************/
-  
+
    /// Align text to left.
    static const int alignLeft;
-  
+
    /// Align text to right
    static const int alignRight;
-    
+
    /// Align text centered
    static const int alignCenter;
 
@@ -70,7 +70,7 @@ public:
    /// An up and down motion for the button
    static const int signalClicked;
 
-      
+
 public:
     /// Get's the texture handle and the title, plus style if there is one.
     virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
@@ -95,10 +95,10 @@ public:
 
     /// Triggered when the user presses a mouse button down
     virtual bool OnMouseDown(int button, int x, int y);
-    
-    /// Triggered when the user unpresses a mouse button 
+
+    /// Triggered when the user unpresses a mouse button
     virtual bool OnMouseUp(int button, int x, int y);
-    
+
     /// Triggered when the user moves the mouse
     virtual bool OnMouseMove(int button, int x, int y);
 
@@ -116,7 +116,7 @@ public:
 
     /// Triggered when the user presses a key
     virtual bool OnKeypress(int key, int modifiers);
-    
+
     /// Triggered when the keyboard focus is lost
     virtual bool OnLostFocus();
 
@@ -136,7 +136,7 @@ public:
     /// Does nothing
     virtual ~awsRadButtonFactory();
 
-    /// Returns a newly created component of the type this factory handles. 
+    /// Returns a newly created component of the type this factory handles.
     virtual iAwsComponent *Create();
 };
 

@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -31,7 +31,7 @@
 #include "zipfile.h"
 #include "vertbuf.h"
 #include "mcurve.h"
-#include "sparser.h" 
+#include "sparser.h"
 
 #define TEMPWORLD "map2cs2.$$$"
 
@@ -61,10 +61,10 @@ void CCSWorld::FindSectors()
         CCSSector* pSector = new CCSSector(pBrush);
         m_Sectors.Push(pSector);
       } //for brush
-    } 
+    }
     else
     {
-      //no sector. Remember the pointer to it. 
+      //no sector. Remember the pointer to it.
       m_Entities.Push(pEntity);
     }
   } //for entity
@@ -86,7 +86,7 @@ void CCSWorld::GenerateDefaultsector()
   //Find out the size of this sector
   CdVector3 Min, Max;
   m_pMap->GetMapSize(Min, Max);
-  
+
   Min.x -= 10;
   Min.y -= 10;
   Min.z -= 10;
@@ -96,7 +96,7 @@ void CCSWorld::GenerateDefaultsector()
   Max.z += 10;
 
   CdVector3 v[8];
-  v[0] = CdVector3(Min.x, Min.y, Min.z); 
+  v[0] = CdVector3(Min.x, Min.y, Min.z);
   v[1] = CdVector3(Max.x, Min.y, Min.z);
   v[2] = CdVector3(Max.x, Min.y, Max.z);
   v[3] = CdVector3(Min.x, Min.y, Max.z);
@@ -105,7 +105,7 @@ void CCSWorld::GenerateDefaultsector()
   v[6] = CdVector3(Max.x, Max.y, Max.z);
   v[7] = CdVector3(Min.x, Max.y, Max.z);
 
-  static int Planes[6][4] = 
+  static int Planes[6][4] =
   {
     {4,5,1,0},
     {5,6,2,1},
@@ -123,14 +123,14 @@ void CCSWorld::GenerateDefaultsector()
   {
     //For every side of the default sector create a flatshaded
     //plane in black color.
-    CMapTexturedPlane* pPlane = m_pMap->AddPlane(v[Planes[i][2]], 
+    CMapTexturedPlane* pPlane = m_pMap->AddPlane(v[Planes[i][2]],
                                                  v[Planes[i][1]],
-                                                 v[Planes[i][0]], 
+                                                 v[Planes[i][0]],
                                                  0,0,0); //black
     assert(pPlane);
     pBrush->AddPlane(pPlane);
   }
-  
+
   pBrush->CreatePolygons();
 
   CCSSector* pSector = new CCSSector(pBrush);
@@ -153,13 +153,13 @@ bool CCSWorld::Write(const char* filename, CMapFile* pMap, const char * /*source
   WritePlayerStart();
   WriteTextures();
   WritePlugins();
-  WriteSounds(); 
+  WriteSounds();
   WriteSpritesTemplate();
-  WriteScriptsTemplate(); 
+  WriteScriptsTemplate();
   WritePlanes();
 
   WriteCurvetemplates();
-  
+
   WriteSkysector();
   WriteSectors();
 
@@ -199,7 +199,7 @@ CMapEntity* CCSWorld::GetWorldspawn()
     CMapEntity* pEntity = GetEntity(i);
     assert(pEntity);
     if (strcasecmp(pEntity->GetClassname(), "worldspawn") == 0)
-    { 
+    {
       return pEntity;
     }
   }
@@ -229,7 +229,7 @@ void CCSWorld::AllocateSkytextures()
   {
     static const char ext[] = "frblud";
     const char* basename    = pEntity->GetValueOfKey("skybox", "sky");
-    
+
 	int i;
     for (i=0; i<6; i++)
     {
@@ -249,7 +249,7 @@ void CCSWorld::WriteSkysector()
   if (!pEntity) return;
 
   // Only write a skydome, if there has been specified a skysector in the mapfile.
-  // There will likely be problems, if you are using sky-portals, but didn't specify 
+  // There will likely be problems, if you are using sky-portals, but didn't specify
   // a skysector. (to handle this correctly, you should check if there is a skysector,
   // when writing portals to it.)
   if (pEntity->GetValueOfKey("skybox") ||
@@ -348,8 +348,8 @@ void CCSWorld::WriteSkybox()
   const char* BoxName = pEntity->GetValueOfKey   ("skybox",    "sky");
   double      BoxSize = pEntity->GetNumValueOfKey("skyboxsize", 1600) / 2;
 
-  //The following code is pretty ugly, because to create a goodlooking 
-  //skybox, we create a flatcolored box, that contains another (smaller) 
+  //The following code is pretty ugly, because to create a goodlooking
+  //skybox, we create a flatcolored box, that contains another (smaller)
   //box with slightly overlapping sides.
   //This is because CS has some precision problems on the sides, and so
   //we will end up with lots of cracks between the boxes sides, which just
@@ -364,13 +364,13 @@ void CCSWorld::WriteSkybox()
    { 1, 1,-1},
    { 1, 1, 1}};
 
-  static struct 
+  static struct
   {
-    const char*   ext; 
-    const char*   vertices; 
+    const char*   ext;
+    const char*   vertices;
     CTextureFile* pTex;
-  } 
-  ThingSides[] = 
+  }
+  ThingSides[] =
   {
     {"f", " 3, 7, 5, 1", NULL},
     {"r", "15,14,12,13", NULL},
@@ -433,7 +433,7 @@ void CCSWorld::WriteSkybox()
 void CCSWorld::FindAdditionalTextures()
 {
   // Thomas Hieber, 16.05.2001:
-  // Please don't ask me about this function. I didn't create it, nor do I know the 
+  // Please don't ask me about this function. I didn't create it, nor do I know the
   // deeper truth about it. All it did was to move the code to a separate function
   // for better maintainablility. (And I have made the textures really register with
   // the texture manager, which should really help to get the textures in the zip
@@ -450,10 +450,10 @@ void CCSWorld::FindAdditionalTextures()
     if (strcmp(pEntity->GetClassname(), "cs_sprite")==0)
     {
       if (pEntity->GetValueOfKey("texture"))
-      { 
+      {
         const char* basename = pEntity->GetValueOfKey("texture", "white");
-        
-        // the texture manager will create a new texture for us, if the given 
+
+        // the texture manager will create a new texture for us, if the given
         // texture is missing
         CTextureFile* pTexture = m_pMap->GetTextureManager()->GetTexture(basename);
         assert(pTexture);
@@ -482,7 +482,7 @@ void CCSWorld::FindAdditionalTextures()
     CMapEntity* pEntity = GetEntity(j);
     assert(pEntity);
     if (strcmp(pEntity->GetClassname(), "cs_model") == 0)
-    { 
+    {
       const char* csnamevalue = pEntity->GetValueOfKey("cs_name");
       if (csnamevalue)
       {
@@ -490,7 +490,7 @@ void CCSWorld::FindAdditionalTextures()
         if (modelnamevalue)
         {
           if (pEntity->GetValueOfKey("texture"))
-          { 
+          {
             CTextureFile* pTexture = m_pMap->GetTextureManager()->GetTexture(modelnamevalue);
             assert(pTexture);
 
@@ -499,8 +499,8 @@ void CCSWorld::FindAdditionalTextures()
             sprintf(name, "/lib/models/%s", basename);
 
             pTexture->SetFilename(name);
-          } 
-        } 
+          }
+        }
       }
     }
   }
@@ -522,8 +522,8 @@ bool CCSWorld::WriteTextures()
 
     WriteIndent();
 
-    fprintf(m_fd, "TEXTURE '%s' (FILE (%s)", 
-                   pTexture->GetTexturename(), 
+    fprintf(m_fd, "TEXTURE '%s' (FILE (%s)",
+                   pTexture->GetTexturename(),
                    pTexture->GetFilename());
 
     if (pTexture->IsColorKeyed())
@@ -558,8 +558,8 @@ bool CCSWorld::WriteTextures()
     assert(pTexture);
 
     WriteIndent();
-    fprintf(m_fd, "MATERIAL '%s' (TEXTURE (%s))\n", 
-                  pTexture->GetTexturename(), 
+    fprintf(m_fd, "MATERIAL '%s' (TEXTURE (%s))\n",
+                  pTexture->GetTexturename(),
                   pTexture->GetTexturename());
   }
 
@@ -615,9 +615,9 @@ bool CCSWorld::WritePlayerStart()
           //The strings format matched
           WriteIndent();
           fprintf(m_fd, "START ('%s', %g, %g, %g)\n\n",
-                  pSector->GetName(), 
-                  x*m_ScaleFactor, 
-                  z*m_ScaleFactor, 
+                  pSector->GetName(),
+                  x*m_ScaleFactor,
+                  z*m_ScaleFactor,
                   y*m_ScaleFactor);
           return true;
         }
@@ -632,8 +632,8 @@ bool CCSWorld::WritePlayerStart()
         printf("warning: info_player_start has no origin.\n");
         printf("         no startinfo is written!\n");
       }
-    } 
-  } 
+    }
+  }
   return true;
 }
 
@@ -664,11 +664,11 @@ bool CCSWorld::WritePlanes()
       WriteVector(First);
       fprintf(m_fd, " SECOND ");
       WriteVector(Second);
-      fprintf(m_fd, " FIRST_LEN (%g) SECOND_LEN(%g)", 
-              (First-Origin).Norm()*m_ScaleFactor, 
+      fprintf(m_fd, " FIRST_LEN (%g) SECOND_LEN(%g)",
+              (First-Origin).Norm()*m_ScaleFactor,
               (Second-Origin).Norm()*m_ScaleFactor);
       fprintf(m_fd, " ))\n"); //End of "PLANE ("
-    } 
+    }
   }
   fprintf(m_fd, "\n"); //End of planes section
   return true;
@@ -694,8 +694,8 @@ bool CCSWorld::WriteVertex(double x, double y, double z)
 
 bool CCSWorld::WriteVector(double x, double y, double z)
 {
-  fprintf(m_fd, "(%g,%g,%g)", 
-          x*m_ScaleFactor, 
+  fprintf(m_fd, "(%g,%g,%g)",
+          x*m_ScaleFactor,
           z*m_ScaleFactor,
           y*m_ScaleFactor);
   return true;
@@ -745,7 +745,7 @@ bool CCSWorld::WriteKeys(CIWorld* pWorld, CMapEntity* pEntity)
   return true;
 }
 
-bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector, 
+bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
                             bool SectorPolygon, const CVertexBuffer& Vb)
 {
   const CMapTexturedPlane* pPlane   = pPolygon->GetBaseplane();
@@ -758,11 +758,11 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
   if (SectorPolygon)
   {
     //Because for a sector we draw the _inside_ of the brush, we spit out the
-    //vertices in reverse order, so they will have proper orientation for 
+    //vertices in reverse order, so they will have proper orientation for
     //backface culling in the engine.
     for (l=pPolygon->GetVertexCount()-1; l>=0; l--)
     {
-      fprintf(m_fd, "%d%s", Vb.GetIndex(pPolygon->GetVertex(l)), 
+      fprintf(m_fd, "%d%s", Vb.GetIndex(pPolygon->GetVertex(l)),
                           ((l==0) ? "" : ","));
     }
   }
@@ -782,7 +782,7 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
   {
     int r, g, b;
     pPlane->GetColor(r,g,b);
-    fprintf(m_fd, "FLATCOL(%g,%g,%g)", 
+    fprintf(m_fd, "FLATCOL(%g,%g,%g)",
                 r/(float)255, g/(float)255, b/(float)255);
   }
   else
@@ -801,9 +801,9 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
     }
     else
     {
-      //support for special rendering flags. Ideally, these properties would be 
+      //support for special rendering flags. Ideally, these properties would be
       //assigned to surfaces instead of entities, but the Quake/ Half-Life map
-      //format doesn't have a really portable way to do so. 
+      //format doesn't have a really portable way to do so.
       double Alpha  = pEntity->GetNumValueOfKey ("alpha",  100);
       bool   Solid  = pEntity->GetBoolValueOfKey("solid",  true);
       bool   Mirror = pEntity->GetBoolValueOfKey("mirror", false);
@@ -816,7 +816,7 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
       if (Mirror || Alpha<100 || !Solid)
       {
         //We have a special case, where we need to turn this polygon into a portal.
-        const char* targetsector = 
+        const char* targetsector =
           pEntity->GetValueOfKey("targetsector", pSector->GetName());
 
         fprintf(m_fd, " PORTAL ('%s')", targetsector);
@@ -828,17 +828,17 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
 
         if ( Mirror )
         {
-          fprintf(m_fd, " WARP (MIRROR () CLIP ())"); 
+          fprintf(m_fd, " WARP (MIRROR () CLIP ())");
         }
         else
         {
           if (Solid)
           {
-            fprintf(m_fd, " WARP (CLIP ())"); 
+            fprintf(m_fd, " WARP (CLIP ())");
           }
         }
       } //if polygon is a portal of some special kind
-    } // if entity classname == 
+    } // if entity classname ==
   } // if there is a entity to define some special flags.
 
   fprintf(m_fd, ")\n"); //End of Polygon
@@ -858,7 +858,7 @@ CISector* CCSWorld::CreateNewSector(CMapBrush* pBrush)
 void CCSWorld::WriteSpritesTemplate()
 {
   int i;
-  char   mdlname[99] = "none"; 
+  char   mdlname[99] = "none";
   char   action[99] = "none";
 
   //iterate all entities, brushes, polygons and vertices:
@@ -878,7 +878,7 @@ void CCSWorld::WriteSpritesTemplate()
     assert(classname);
 
     if (strcmp(classname, "cs_model")==0)
-    { 
+    {
       const char* csnamevalue = pEntity->GetValueOfKey("cs_name");
 
       if (!csnamevalue)
@@ -896,7 +896,7 @@ void CCSWorld::WriteSpritesTemplate()
           fprintf(m_fd, "SPRITE '%s' (\n", csnamevalue);
           Indent();
           WriteIndent();
-          //TODO: see if we can initalize .3ds files 
+          //TODO: see if we can initalize .3ds files
           fprintf(m_fd, "FILE ('/lib/models/%s.mdl')\n", mdlname);
           WriteIndent();
           fprintf(m_fd, "MATERIAL ('%s')\n", csnamevalue);
@@ -939,7 +939,7 @@ void CCSWorld::WriteSpritesTemplate()
         }
       }
     }
-  
+
   } //for entity
   return;
 }
@@ -958,7 +958,7 @@ void CCSWorld::WriteScriptsTemplate()
     assert(classname);
 
     if (strcmp(classname, "cs_script")==0)
-    { 
+    {
       const char* cs_scriptname = pEntity->GetValueOfKey("cs_name");
       assert(cs_scriptname);
       const char* scriptfilename = pEntity->GetValueOfKey("script_cmdfile");
@@ -971,7 +971,7 @@ void CCSWorld::WriteScriptsTemplate()
 
       //if scriptfile does not exist
       CScriptParser parser;
-      if (!parser.Open(scriptfilename)) 
+      if (!parser.Open(scriptfilename))
       {
         return;
       }
@@ -980,7 +980,7 @@ void CCSWorld::WriteScriptsTemplate()
       int found = 0;
       char Buffer[1000] = "";
       char spritecode[1000] = "";
-     
+
       while (found == 0)
       {
         parser.GetTextToken(Buffer);
@@ -989,8 +989,8 @@ void CCSWorld::WriteScriptsTemplate()
           found = 1;
         }
       }
-      
-      //else look for script if script does not exist 
+
+      //else look for script if script does not exist
       if (found == 0)
       {
         return;
@@ -1003,7 +1003,7 @@ void CCSWorld::WriteScriptsTemplate()
         strcpy(spritecode, Buffer);
         while (count != 0 )
         {
-          parser.GetLineToken(Buffer); 
+          parser.GetLineToken(Buffer);
 
           if ('(' == Buffer[0])
           {
@@ -1028,7 +1028,7 @@ void CCSWorld::WriteScriptsTemplate()
           WriteIndent();
           fprintf(m_fd, "SCRIPT '%s'\n", cs_scriptname);
           Indent();
-          WriteIndent(); 
+          WriteIndent();
           fprintf(m_fd, "%s", spritecode);
           WriteIndent();
           fprintf(m_fd, ") \n\n");
@@ -1041,7 +1041,7 @@ void CCSWorld::WriteScriptsTemplate()
 }
 
 //Sounds template section
-    //SOUNDS ( 
+    //SOUNDS (
     //  SOUND 'track4' (FILE (track4.wav))
     //)
 //add filename.zip to vfs in lib/sounds

@@ -72,7 +72,7 @@ struct csPixelFormat;
 /**
  * Mix modes for DrawPolygonFX ()
  * The constants below can be ORed together if they belong to different masks.
- */ 
+ */
 #define CS_FX_MASK_MIXMODE 0xF0000000 // SRC/DST mixing mode mask
 #define CS_FX_COPY         0x00000000 // =SRC
 #define CS_FX_MULTIPLY     0x10000000 // =SRC*DST
@@ -98,9 +98,9 @@ class G3DTexturedVertex : public csVector2
 public:
   /// inverse z value (1/real_z)
   float z;
-  
+
   // Texture coordinates
-  float u, v; 
+  float u, v;
 
   // Lighting info (Used only with Gouraud shading (between 0 and 1))
   float r, g, b;
@@ -378,7 +378,7 @@ struct G3DTriangleMesh
 
   /// Use precalculated vertex color?
   bool use_vertex_color;
-  
+
   /// Apply fogging?
   bool do_fog;
   /// Consider triangle vertices in anti-clockwise order if true.
@@ -609,19 +609,19 @@ struct iGraphics3D : public iBase
 
   /**
    * Draw a polygon with special effects. This is the most rich and slowest
-   * variant of DrawPolygonXxx. (If you use these features) 
+   * variant of DrawPolygonXxx. (If you use these features)
    *
    * Warning! Do not rely on this method to handle Color keying under
    * all circumstances. Color Keying will only work reliable in Mixmodes
    * FX_Copy, FX_Add and FX_Transparent. When using FX_Multiply
    * and FX_Multiply2, it depends very much on the driver if it works or
-   * not. For example the RivaTNT Detonator 0.48 driver can display 
-   * Multiply with color keying, while newer versions can't. They will 
+   * not. For example the RivaTNT Detonator 0.48 driver can display
+   * Multiply with color keying, while newer versions can't. They will
    * then not display anything at all. It is always safer to use a texture
    * where transparent sections are white or 50% gray if you want to achieve
    * transparent sections in Multiply, Multiply2.
    * There are also some drivers (which I would consider buggy...), that won't
-   * display FX_Alpha correctly with Color Keying. I can't provide a valid 
+   * display FX_Alpha correctly with Color Keying. I can't provide a valid
    * workaround for that except using FX_Multiplay and FX_Add, to manually
    * create the image, but that would be very expensive.
    */

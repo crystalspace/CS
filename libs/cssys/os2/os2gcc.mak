@@ -197,7 +197,7 @@ SYSHELP += \
   $(NEWLINE)echo $"  make os2gcc       Prepare for building on $(DESCRIPTION.os2gcc)$"
 
 # System-dependent help commands
-#  
+#
 SYSMODIFIERSHELP += \
   $(NEWLINE)echo $"  USE_OMF=yes$|no (default: yes)$" \
   $(NEWLINE)echo $"      OS/2-Only: Use OMF object module format (yes) vs a.out format (no)$" \

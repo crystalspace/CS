@@ -154,7 +154,7 @@ bool csSoundDataRaw::Initialize(const csSoundFormat *RequestFormat) {
   if (Format.Channels != RequestFormat->Channels && RequestFormat->Channels != -1) {
     REPLACE_DATA(ConvertChannels(Data, &Format, RequestFormat, NumSamples));
     Format.Channels = RequestFormat->Channels;
-  } 
+  }
 
   if (RequestFormat->Freq != Format.Freq && RequestFormat->Freq != -1) {
     REPLACE_DATA(ConvertFreq(Data, &Format, RequestFormat, NumSamples));

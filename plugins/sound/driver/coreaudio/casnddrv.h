@@ -1,5 +1,5 @@
 // casnddrv.h
-// CoreAudio (MacOS X) Sound Driver for Crystal Space 
+// CoreAudio (MacOS X) Sound Driver for Crystal Space
 //
 // Created by mreda on Sun Nov 11 2001.
 // Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -32,35 +32,35 @@ public:
 
     // Open the sound render
     virtual bool Open(iSoundRender *render, int freq, bool bit16, bool stereo);
-    
+
     // Close the sound render
     virtual void Close();
-	
+
     // Lock and Get Sound Memory Buffer
     virtual void LockMemory(void **mem, int *memsize);
-    
+
     // Unlock Sound Memory Buffer
     virtual void UnlockMemory();
-    
+
     // Must the driver be updated manually or does it run in background?
     virtual bool IsBackground();
-    
+
     // Is the driver in 16 bits mode ?
     virtual bool Is16Bits();
-    
+
     // Is the driver in stereo mode ?
     virtual bool IsStereo();
-    
+
     // Get current frequency of driver
     virtual int GetFrequency();
-    
+
     // Is the sound driver able to create silence without locking and
     // writing to the sound memory?
     virtual bool IsHandleVoidSound();
- 
+
     // Create samples and copy them into buffer
     void CreateSamples(float *buffer);
- 
+
     struct eiComponent : public iComponent
     {
         SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverCoreAudio);
@@ -77,9 +77,9 @@ protected:
     int frequency;				// Sound frequency
     bool is16Bit;				// true if sound is 16 bit
     bool isStereo;				// true if sound is stereo
-    
+
     AudioDeviceID audioDevice;			// ID of audio output device to use
-    
+
     bool isPlaying;				// Boolean to indicate if playback is going
 };
 

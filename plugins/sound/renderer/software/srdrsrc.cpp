@@ -260,7 +260,7 @@ void csSoundSourceSoftware::WriteBuffer(const void *Source, void *Dest,
 
   const csSoundFormat *InputFormat = SoundHandle->Data->GetFormat();
   const csSoundFormat *OutputFormat = &outfmt;
-  
+
   if (OutputFormat->Bits == 16) {
     #define stype short
     #define NullSample 0
@@ -287,7 +287,7 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
   long NumSamples = size / OutBPS;
 
   if (snd->IsStatic ())
-    while (1) 
+    while (1)
     {
       long Num = NumSamples;
 
@@ -297,10 +297,10 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
 
       WriteBuffer(Input + SoundPos * InBPS, mem, Num);
       SoundPos += Num;
-      
+
       NumSamples -= Num;
       mem = ((unsigned char *)mem) + Num * OutBPS;
-      
+
       if (NumSamples == 0) break;
       if (!(PlayMethod & SOUND_LOOP)) break;
       Restart();
@@ -308,7 +308,7 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
   else // streamed sound
   {
     long wait = 0;
-    while (1) 
+    while (1)
     {
       long Num = NumSamples;
 

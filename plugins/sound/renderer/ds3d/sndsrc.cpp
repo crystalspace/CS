@@ -169,7 +169,7 @@ void csSoundSourceDS3D::SetVolume(float vol)
 }
 
 float csSoundSourceDS3D::GetVolume()
-{  
+{
   long dsvol=DSBVOLUME_MIN;
   Buffer2D->GetVolume(&dsvol);
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
@@ -178,7 +178,7 @@ float csSoundSourceDS3D::GetVolume()
 void csSoundSourceDS3D::SetMode3D(int mode3D) {
   DWORD Mode = (mode3D == SOUND3D_ABSOLUTE) ? DS3DMODE_NORMAL :
     (mode3D == SOUND3D_RELATIVE) ? DS3DMODE_HEADRELATIVE :  DS3DMODE_DISABLE;
-  
+
   HRESULT r = Buffer3D->SetMode(Mode, DS3D_DEFERRED);
   if (r != DS_OK) {
     Report (CS_REPORTER_SEVERITY_WARNING,

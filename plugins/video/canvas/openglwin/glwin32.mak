@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-CFLAGS.GLWIN32 += 
+CFLAGS.GLWIN32 +=
 
 ifndef LIBS.OPENGL.SYSTEM
   LIB.GLWIN32.SYSTEM = -lGL

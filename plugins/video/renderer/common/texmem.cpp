@@ -26,7 +26,7 @@
   *
   * I have not implemented any unfragmentation procedure, mainly because it is
   * not always possible to read Data from Texture Memory.
-  * 
+  *
   * With this current implementation, it will be difficult to add.
   */
 int FixedTextureMemoryManager::getFragmentationState(void)
@@ -52,7 +52,7 @@ int FixedTextureMemoryManager::getFragmentationState(void)
   * Constructor of the FixedTextureMemoryManager Class.
   *
   * It takes the total size of the memory as a parameter.
-  * 
+  *
   * It initialise the memory as free space.
   */
 FixedTextureMemoryManager::FixedTextureMemoryManager(size_t _size) : size(_size)
@@ -87,9 +87,9 @@ bool FixedTextureMemoryManager::hasFreeSpace(size_t blocksize)
 
 /**
   * This function allocates a bloc of memory of the required size. It also put the
-  * memory bloc in the allocated state. It return a pointer to a 
+  * memory bloc in the allocated state. It return a pointer to a
   */
-textMemSpace FixedTextureMemoryManager::allocSpaceMem(size_t blocksize) 
+textMemSpace FixedTextureMemoryManager::allocSpaceMem(size_t blocksize)
 {
 	// If required mem size is strange
 	if(blocksize<=0)
@@ -149,12 +149,12 @@ found:
 	switch(nb)
 	{
 	case 0:
-		// if none 
+		// if none
 		f=new chunck;
 		//   add a chunck
 		f->self.offset=entry->offset;
 		f->self.size=entry->size;
-		
+
 		f->next=allocatedSpace;
 		if(allocatedSpace)
 			allocatedSpace->prev=f;
@@ -210,7 +210,7 @@ void FixedTextureMemoryManager::freeSpaceMem(textMemSpace entry) {
 		if(c==allocatedSpace)
 			allocatedSpace=c->next;
 		delete c;
-		
+
 	}
 	// else if at a border of the chunck
 	else if(entry->offset==c->self.offset)
@@ -234,7 +234,7 @@ void FixedTextureMemoryManager::freeSpaceMem(textMemSpace entry) {
 		 * must become:
 		 * current <-> new <-> after
 		 */
-		n->prev=c;   		  // current <- new 
+		n->prev=c;   		  // current <- new
 		n->next=c->next;	  // new -> after
 		if(n->next)
 			n->next->prev=n;  // new <- after
@@ -244,7 +244,7 @@ void FixedTextureMemoryManager::freeSpaceMem(textMemSpace entry) {
 		n->self.size=c->self.offset+c->self.size-n->self.offset;
 		c->self.size=entry->offset-c->self.offset;
 	}
-	
+
 	// find the free chunck(s) involved
     // initialize f to something to avoid compiler warning
 	chunck * f[2]={NULL};
@@ -265,7 +265,7 @@ void FixedTextureMemoryManager::freeSpaceMem(textMemSpace entry) {
 	switch(nb)
 	{
 	case 0:
-		// if none found 
+		// if none found
 		{
 			chunck * n=new chunck;
 			//     Create a new chunck.

@@ -54,7 +54,7 @@ private:
   float rot2_direction;
   iMeshWrapper* sprite2;
   iCollider* sprite2_col;
- 
+
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();

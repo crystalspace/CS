@@ -1,6 +1,6 @@
 /*
  *  CGDriver2D.cpp
- *  
+ *
  *
  *  Created by mreda on Fri Oct 26 2001.
  *  Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -15,7 +15,7 @@
 #include "iutil/eventq.h"
 #include "ivaria/reporter.h"
 #include "csver.h"
- 
+
 #include "CGDriver2D.h"
 
 #include "OSXDelegate2D_CGBlit.h"
@@ -66,44 +66,44 @@ bool CGDriver2D::Initialize(iObjectRegistry *reg)
 
     return true;
 };
-  
+
 
 // Open
 // Open graphics system (set mode, open window, etc)
 bool CGDriver2D::Open()
-{	    
+{
     // Check if already open has already been called
     if (is_open == true)
         return true;
-    
+
     // Report driver information
     csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, CGDRIVER_REPORTER_ID,
-            CS_PLATFORM_NAME " 2D CoreGraphics driver for Crystal Space " 
+            CS_PLATFORM_NAME " 2D CoreGraphics driver for Crystal Space "
             CS_VERSION_NUMBER "\nWritten by Matt Reda <mreda@mac.com>");
 
     // Superclass implementation
     if (OSXDriver2D::Open() == false)
         return false;
-    
+
     // Initialize function pointers
     SetupDrawingFunctions();
-    
+
     // Allocate memory for drawing
     Memory = (unsigned char *) malloc(Width * Height * pfmt.PixelBytes);
-    
+
     if (csGraphics2D::Open() == false)
         return false;
-    
+
     // Start by clearing view
     BeginDraw();
     Clear(0);
     FinishDraw();
     Print(NULL);
-    
+
     return true;
 };
-    
-    
+
+
 // Close
 // Close graphics system
 void CGDriver2D::Close()
@@ -113,7 +113,7 @@ void CGDriver2D::Close()
         return;
 
     // Free drawing buffer
-    free(Memory);    
+    free(Memory);
     Memory = NULL;
 
     // Superclasses
@@ -125,8 +125,8 @@ void CGDriver2D::Close()
 // SetTitle
 // Set window title
 void CGDriver2D::SetTitle(char *title)
-{ 
-    OSXDelegate2D_setTitle(delegate, title); 
+{
+    OSXDelegate2D_setTitle(delegate, title);
     csGraphics2D::SetTitle(title);
 };
 
@@ -160,7 +160,7 @@ void CGDriver2D::AllowResize (bool allow)
 bool CGDriver2D::Resize(int w, int h)
 {
     bool success = csGraphics2D::Resize(w, h);
-    
+
     if (success == true)
     {
         // Need to allocate new buffer
@@ -171,7 +171,7 @@ bool CGDriver2D::Resize(int w, int h)
         if (queue != NULL)
             queue->GetEventOutlet()->Broadcast(cscmdContextResize, (iGraphics2D *) this);
     };
-    
+
     return success;
 };
 

@@ -100,7 +100,7 @@ static void trimwhite (char*& s)
         s[n] = '\0';
       else
         break;
-  }  
+  }
 }
 
 static bool get2args (char *command, char *args, char *&arg1, char *&arg2,

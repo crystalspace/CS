@@ -145,7 +145,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
 
     if (group != 1 && group != 0)
       return setError("Incoherence in skin model properties", f);
-    
+
     if (group == 0) // one text skin
     {
       skins[i].group = false;
@@ -251,7 +251,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
     {
       framesets[i].group = true;
 
-      if (fread(&framesets[i].nbframes, sizeof(framesets[i].nbframes), 
+      if (fread(&framesets[i].nbframes, sizeof(framesets[i].nbframes),
                 1, f) != 1)
         return setError("Error reading mdl file", f);
       framesets[i].nbframes = convert_endian (framesets[i].nbframes);
@@ -283,12 +283,12 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
         // read max bound
         if (fread(&framesets[i].frames[j].max, sizeof(trivertx_t), 1, f) != 1)
           return setError("Error reading mdl file", f);
-        
+
         // frame name
         memset(framesets[i].frames[j].name, 0, MDL_FRAME_NAME_MAX + 1);
         if (fread(framesets[i].frames[j].name, MDL_FRAME_NAME_MAX, 1, f) != 1)
           return setError("Error reading mdl file", f);
-        
+
         // frame vertices
         framesets[i].frames[j].trivert = new trivertx_t[nbvertices];
         if (fread(framesets[i].frames[j].trivert,
@@ -348,18 +348,18 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
     else
     {
       printf("Generate skin texture file\n");
-  
+
       if (resizeSkin)
       {
 	printf("\tOld Skin size = %dx%d\n", skinwidth, skinheight);
-  
+
 	x = (float) skinwidth;
 	y = (float) skinheight;
 	spr.skinwidth  = 1;
 	spr.skinheight = 1;
 	while (x > 1) { x /= 2; spr.skinwidth  *= 2; }
 	while (y > 1) { y /= 2; spr.skinheight *= 2; }
-  
+
 	printf("\tNew Skin size = %dx%d\n", spr.skinwidth, spr.skinheight);
       }
       else // resizeSkin == false
@@ -368,14 +368,14 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 	spr.skinwidth  = skinwidth;
 	spr.skinheight = skinheight;
       }
-  
+
       // @@@ FIXME: Support option to load user-specified palette.lmp file.
       const unsigned char* const palette = DefaultQuakePalette;
       spr.skins = new skin_t [nbskins];
-  
+
       char *skinfilename;
       skinfilename = new char [strlen(spritename)+10];
-  
+
       for (i = 0; i < nbskins; i++)
       {
 	spr.skins[i].texs = new unsigned char*[skins[i].nbtexs];
@@ -383,14 +383,14 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 	{
 	  spr.skins[i].texs[j] =
 	    new unsigned char [spr.skinwidth * spr.skinheight];
-  
+
 	  if (skins[i].nbtexs > 1)
 	    sprintf(skinfilename, "%s%d%c.png", spritename, i, j + 'a');
 	  else if (nbskins > 1)
 	    sprintf(skinfilename, "%s%d.png", spritename, i);
 	  else
 	    sprintf(skinfilename, "%s.png", spritename);
-  
+
 	  if (!resizeSkin)
 	    for (k = 0; k < skinwidth * skinheight; k++)
 	      spr.skins[i].texs[j][k] = skins[i].texs[j][k];
@@ -408,7 +408,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 		  skins[i].texs[j][((int)x) + ((int)y) * skinwidth];
 	    }
 	  }
-  
+
 	  SkinImage img (
 	    spr.skins[i].texs[j], palette, spr.skinwidth, spr.skinheight);
 	  iDataBuffer *db = mdl2spr_imageio->Save (&img, "image/png");
@@ -542,7 +542,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
         float y=(float)spr.framesets[i].frames[j].trivert[k].packedposition[2];
         float u=(float)spr.vertices[k].s;
         float v=(float)spr.vertices[k].t;
-          
+
         x = ((x * scaleX) + originX) * scaleMdl;
         y = ((y * scaleZ) + originZ) * scaleMdl;
         z = ((z * scaleY) + originY) * scaleMdl;
@@ -574,7 +574,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 	  break;
       base_action=j + 1;
       strncpy(name_action, framesets[i].frames[0].name, base_action);
-      
+
       fprintf(f, "\t\tACTION '%s' (", name_action);
 
       for (j = 0; j < framesets[i].nbframes; j++)

@@ -1,17 +1,17 @@
 /*
     Crystal Space Windowing System : grid class
     Copyright (C) 2000 by Norman Kramer <normank@lycosmail.com>
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -39,10 +39,10 @@ csRegionTree2D::csRegionTree2D ()
 }
 
 csRegionTree2D::csRegionTree2D (csRect area, csSome data)
-{ 
+{
   region.Set (area);
   csRegionTree2D::data = data;
-  memset (children, 0, 5 * sizeof (csRegionTree2D *)); 
+  memset (children, 0, 5 * sizeof (csRegionTree2D *));
 }
 
 csRegionTree2D::~csRegionTree2D ()
@@ -150,13 +150,13 @@ void csRegionTree2D::Traverse (csRegionTreeFunc userFunc, csSome databag)
  ******************************************************************************/
 
 csSparseGrid::csGridRow::csGridRow (int theCol)
-{ 
-  col = theCol; 
+{
+  col = theCol;
 }
 
-csSparseGrid::csGridRow::~csGridRow () 
-{ 
-  DeleteAll (); 
+csSparseGrid::csGridRow::~csGridRow ()
+{
+  DeleteAll ();
 }
 
 void csSparseGrid::csGridRow::SetAt (int col, csSome data)
@@ -172,8 +172,8 @@ void csSparseGrid::csGridRow::SetAt (int col, csSome data)
 }
 
 csSparseGrid::csGridRowEntry* csSparseGrid::csGridRow::Get (int index)
-{ 
-  return (csSparseGrid::csGridRowEntry*)csVector::Get (index); 
+{
+  return (csSparseGrid::csGridRowEntry*)csVector::Get (index);
 }
 
 int csSparseGrid::csGridRow::Compare (csSome Item1, csSome Item2, int Mode) const
@@ -192,9 +192,9 @@ int csSparseGrid::csGridRow::CompareKey (csSome Item1, csConstSome Key, int Mode
 }
 
 bool csSparseGrid::csGridRow::FreeItem (csSome Item)
-{ 
-  delete (csSparseGrid::csGridRowEntry*)Item; 
-  return true; 
+{
+  delete (csSparseGrid::csGridRowEntry*)Item;
+  return true;
 }
 
 /******************************************************************************
@@ -213,7 +213,7 @@ void csGridCell::DrawLine (int x1, int y1, int x2, int y2, csCellBorder& border)
   bool sel = GetState (CSS_GRIDCELL_SELECTED);
 
   if (border.style == gcbsLine)
-    Box (MIN (x1, x2), y1, MAX (x1, x2), y2, 
+    Box (MIN (x1, x2), y1, MAX (x1, x2), y2,
 	 sel ? CSPAL_GRIDCELL_SEL_BORDER_FG : CSPAL_GRIDCELL_BORDER_FG);
   else if (border.style != gcbsNone)
   {
@@ -283,8 +283,8 @@ void csGridCell::Draw ()
   bound.ymin += ty;
   bound.xmax -= rx;
   bound.ymax -= by;
-  
-  Box (0, 0, bound.Width (), bound.Height (), 
+
+  Box (0, 0, bound.Width (), bound.Height (),
        sel ? CSPAL_GRIDCELL_SEL_BACKGROUND: CSPAL_GRIDCELL_BACKGROUND);
   if (data)
   {
@@ -295,7 +295,7 @@ void csGridCell::Draw ()
       fh = MIN (bound.Height (), fh);
       int tx = (bound.Width () - fw) / 2;
       int ty = (bound.Height () - fh) / 2;
-      Text (tx, ty, sel ? CSPAL_GRIDCELL_SEL_DATA_FG : CSPAL_GRIDCELL_DATA_FG, 
+      Text (tx, ty, sel ? CSPAL_GRIDCELL_SEL_DATA_FG : CSPAL_GRIDCELL_DATA_FG,
 	    sel ? CSPAL_GRIDCELL_SEL_DATA_BG : CSPAL_GRIDCELL_DATA_BG, t);
     }
   }
@@ -356,14 +356,14 @@ bool csGridView::SetRect (int xmin, int ymin, int xmax, int ymax)
   if (csComponent::SetRect (xmin, ymin, xmax, ymax))
   {
     if (hscroll)
-      hscroll->SetRect (0, 
+      hscroll->SetRect (0,
 			bound.Height () - CSSB_DEFAULTSIZE,
-			bound.Width () - (vscroll ? CSSB_DEFAULTSIZE : 0), 
+			bound.Width () - (vscroll ? CSSB_DEFAULTSIZE : 0),
 			bound.Height ());
     if (vscroll)
-      vscroll->SetRect (bound.Width () - CSSB_DEFAULTSIZE, 
+      vscroll->SetRect (bound.Width () - CSSB_DEFAULTSIZE,
 			0,
-			bound.Width (), 
+			bound.Width (),
 			bound.Height () - (hscroll ? CSSB_DEFAULTSIZE : 0));
     fPlaceItems = true;
     return true;
@@ -432,7 +432,7 @@ void csGridView::PlaceItems ()
       r = (csRegionTree2D*)vRegionList.Get (i);
       // #Cells * CellHeight
       w2 = (r->region.Height ()-MAX (row - r->region.ymin, 0)) *
-        ((csGridCell *)r->data)->bound.Height (); 
+        ((csGridCell *)r->data)->bound.Height ();
       if (w1 + w2 < bound.Height ())
       {
         nColCells += (r->region.Height () - MAX (row - r->region.ymin, 0));
@@ -500,7 +500,7 @@ void csGridView::CooAt (int theX, int theY, int &theRow, int &theCol)
     rc.Set (actCol, actRow, area.xmax, actRow+1);
     vRegions.SetLength (0);
     pGrid->regions->FindRegion (rc, vRegions);
-    x = 0; 
+    x = 0;
     n = 0;
     c = actCol;
     while (x < bound.Width () && x < theX && n < vRegions.Length ())
@@ -513,7 +513,7 @@ void csGridView::CooAt (int theX, int theY, int &theRow, int &theCol)
 	actCol++;
       }
     }
-    
+
     if (x>=theX)
     {
       actCol--;
@@ -577,15 +577,15 @@ void csGridView::Draw ()
 
   csComponent::Draw ();
   sel = pGrid->GetActiveView () == this;
-  Box (0, 0, bound.Width (), GRIDVIEW_BORDER_SIZE, 
+  Box (0, 0, bound.Width (), GRIDVIEW_BORDER_SIZE,
        sel ? CSPAL_GRIDVIEW_SEL_DARK3D : CSPAL_GRIDVIEW_DARK3D);
   Box (0, bound.Height ()- GRIDVIEW_BORDER_SIZE, bound.Width (), bound.Height (),
        sel ? CSPAL_GRIDVIEW_SEL_DARK3D : CSPAL_GRIDVIEW_DARK3D);
   Box (0, 0, GRIDVIEW_BORDER_SIZE, bound.Height (),
        sel ? CSPAL_GRIDVIEW_SEL_DARK3D : CSPAL_GRIDVIEW_DARK3D);
-  Box (bound.Width () - GRIDVIEW_BORDER_SIZE, 0, bound.Width (), bound.Height (), 
+  Box (bound.Width () - GRIDVIEW_BORDER_SIZE, 0, bound.Width (), bound.Height (),
        sel ? CSPAL_GRIDVIEW_SEL_DARK3D : CSPAL_GRIDVIEW_DARK3D);
-	  
+
   // fill the remainingspace with backcolor
   //  Box (0, y, bound.Width (), bound.Height (), CSPAL_GRIDVIEW_BACKGROUND);
 }
@@ -649,7 +649,7 @@ bool csGridView::HandleEvent (iEvent& Event)
       return succ;
     }
     break;
-  } 
+  }
   return csComponent::HandleEvent (Event);
 }
 
@@ -755,7 +755,7 @@ void csGrid::init (csComponent *pParent, csRect &rc, int iStyle, csGridCell *gc)
 csGrid::~csGrid ()
 {
   int i, j;
-  
+
   for (i = 0; i < grid->rows.Length (); i++)
   {
     csSparseGrid::csGridRow *r = (csSparseGrid::csGridRow*)grid->rows.Get(i)->data;
@@ -766,7 +766,7 @@ csGrid::~csGrid ()
     }
     delete r;
   }
-  
+
   delete grid;
   delete regions;
 
@@ -926,7 +926,7 @@ void csGrid::CalcMinimalSize (csRegionTree2D *node, int &w, int &h)
       h = h1 + h2;
     }
   }
-    
+
 }
 
 bool csGrid::SetRect (int xmin, int ymin, int xmax, int ymax)
@@ -991,9 +991,9 @@ csString *csGrid::GetStringAt (int row, int col)
   return (csString*)grid->GetAt (row, col);
 }
 
-void csGrid::CreateRegion (csRect& rc, csGridCell *cell) 
+void csGrid::CreateRegion (csRect& rc, csGridCell *cell)
 {
-  regions->Insert (rc, cell); 
+  regions->Insert (rc, cell);
   if (!cell->IsUsed ())
   {
     cell->SetUsed ();

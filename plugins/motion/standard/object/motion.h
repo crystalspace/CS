@@ -54,7 +54,7 @@ CS_DECLARE_TYPED_VECTOR( csMotionBoneVectorBase, csMotionBone );
 class csMotionBoneVector : public csMotionBoneVectorBase
 {
 public:
-  csMotionBoneVector (int ilimit = 0, int ithreshold = 0) 
+  csMotionBoneVector (int ilimit = 0, int ithreshold = 0)
     : csMotionBoneVectorBase(ilimit, ithreshold) {}
   virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
     { unsigned int id1 = ((csMotionBone*)Item1)->GetHash(), id2 = ((csMotionBone*)Item2)->GetHash();
@@ -85,7 +85,7 @@ public:
   csMotionTemplate();
   virtual ~csMotionTemplate();
 
-  void SetName (const char* name); 
+  void SetName (const char* name);
   unsigned int GetHash() { return hash; }
 
   virtual const char* GetName ();
@@ -103,7 +103,7 @@ CS_DECLARE_TYPED_VECTOR( csMotionTemplateVectorBase, csMotionTemplate );
 class csMotionTemplateVector : public csMotionTemplateVectorBase
 {
 public:
-  csMotionTemplateVector (int ilimit = 8, int ithreshold = 16) 
+  csMotionTemplateVector (int ilimit = 8, int ithreshold = 16)
     : csMotionTemplateVectorBase(ilimit, ithreshold) {}
   virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
     { unsigned int id1 = ((csMotionTemplate*)Item1)->GetHash(), id2 = ((csMotionTemplate*)Item2)->GetHash();
@@ -138,7 +138,7 @@ CS_DECLARE_TYPED_VECTOR( csMotionStackVectorBase, csMotionStackItem );
 class csMotionStackVector : public csMotionStackVectorBase
 {
 public:
-  csMotionStackVector (int ilimit = 0, int ithreshold = 0) 
+  csMotionStackVector (int ilimit = 0, int ithreshold = 0)
     : csMotionStackVectorBase(ilimit, ithreshold) {}
   virtual bool FreeItem (csSome Item) {
     delete (csMotionStackItem*)Item; return true;
@@ -186,7 +186,7 @@ CS_DECLARE_TYPED_VECTOR( csMotionControllerVectorBase, csMotionController );
 class csMotionControllerVector : public csMotionControllerVectorBase
 {
 public:
-  csMotionControllerVector (int ilimit = 8, int ithreshold = 16) 
+  csMotionControllerVector (int ilimit = 8, int ithreshold = 16)
     : csMotionControllerVectorBase(ilimit, ithreshold) {}
   virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
     { unsigned int id1 = (int)((csMotionController*)Item1)->GetSkeleton(), id2 = (unsigned int)((csMotionController*)Item2)->GetSkeleton();
@@ -203,12 +203,12 @@ public:
 class csMotionManager : public iMotionManager
 {
   csTicks oldtime;
-  
+
   csMotionTemplateVector motions;
   csMotionControllerVector controllers;
 
   iObjectRegistry* object_reg;
-  
+
 public:
   SCF_DECLARE_IBASE;
 

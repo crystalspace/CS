@@ -1,13 +1,13 @@
 //
 //  OSXDelegate2D.h
-//  
+//
 //
 //  Created by mreda on Wed Oct 31 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
 //
 
 // For setting mouse cursor
-#include "ivideo/cursor.h"			
+#include "ivideo/cursor.h"
 
 #ifndef __OSXDELEGATE2D_H
 #define __OSXDELEGATE2D_H
@@ -24,13 +24,13 @@
 #import "OSXDriver2D.h"
 
 
-@interface OSXDelegate2D : NSResponder 
+@interface OSXDelegate2D : NSResponder
 {
     // Keep track of maouse tracking state
     NSTrackingRectTag trackingMouseTag;
     BOOL trackingMouse;
     BOOL hideMouse;				// YES if mouse is not visible
-    
+
     // Window - created even in fullscreen mode to get events (but with a different style)
     // Window can have one of two titles - Paused or active
     NSWindow *window;
@@ -53,7 +53,7 @@
 // Returns YES to indicate that it will become the first responder
 - (BOOL) acceptsFirstResponder;
 
-// Open a window if none open 
+// Open a window if none open
 - (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs;
 
 // Set the window's title

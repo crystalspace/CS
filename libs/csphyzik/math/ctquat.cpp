@@ -24,7 +24,7 @@
 #include "csphyzik/ctquat.h"
 #include "csgeom/quaterni.h"
 
-ctMatrix3 ctQuaternion::to_matrix () 
+ctMatrix3 ctQuaternion::to_matrix ()
 {
   ctMatrix3 M;
 
@@ -43,27 +43,27 @@ ctMatrix3 ctQuaternion::to_matrix ()
   return M;
 }
 
-void ctQuaternion::from_matrix(ctMatrix3& M) 
+void ctQuaternion::from_matrix(ctMatrix3& M)
 {
   real         tr, s;
 
   tr = M[0][0] + M[1][1] + M[2][2];
-  if (tr >= 0.0) 
+  if (tr >= 0.0)
   {
     s = sqrt(tr + 1.0);
     r = 0.5 * s;
     x = (M[2][1] - M[1][2]) * s;
     y = (M[0][2] - M[2][0]) * s;
     z = (M[1][0] - M[0][1]) * s;
-  } 
-  else 
+  }
+  else
   {
     int i = 0;
 
     if (M[1][1] > M[0][0]) i = 1;
     if (M[2][2] > M[i][i]) i = 2;
 
-    switch (i) 
+    switch (i)
     {
       case 0:
 	s = sqrt((M[0][0] - (M[1][1] + M[2][2])) + 1.0);

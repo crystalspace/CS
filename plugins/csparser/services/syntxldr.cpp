@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Norman Krämer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -58,7 +58,7 @@ SCF_IMPLEMENT_FACTORY (csTextSyntaxService);
 
 SCF_EXPORT_CLASS_TABLE (cssynldr)
   SCF_EXPORT_CLASS (csTextSyntaxService,
-  	"crystalspace.syntax.loader.service.text", 
+  	"crystalspace.syntax.loader.service.text",
 	"Crystal Space loader services for textual CS syntax")
 SCF_EXPORT_CLASS_TABLE_END
 
@@ -389,7 +389,7 @@ bool csTextSyntaxService::ParseShading (char *buf, int &shading)
 }
 
 bool csTextSyntaxService::ParseTexture (
-	char *buf, const csVector3* vref, uint &texspec, 
+	char *buf, const csVector3* vref, uint &texspec,
 	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
 	csMatrix3 &tx_m, csVector3 &tx_v,
 	csVector2 &uv_shift,
@@ -542,7 +542,7 @@ bool csTextSyntaxService::ParseTexture (
 }
 
 bool csTextSyntaxService::ParseWarp (
-	char *buf, csVector &flags, bool &mirror, 
+	char *buf, csVector &flags, bool &mirror,
 	csMatrix3 &m, csVector3 &before, csVector3 &after)
 {
 
@@ -786,7 +786,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	csScanStr (params, "%f", &tx_len.x);
 	break;
       case CS_TOKEN_TEXTURE:
-	if (!ParseTexture (params, thing_state->GetVertices (), texspec, 
+	if (!ParseTexture (params, thing_state->GetVertices (), texspec,
 			   tx_orig, tx1, tx2, tx_len,
 			   tx_matrix, tx_vector,
 			   uv_shift,
@@ -1117,19 +1117,19 @@ const char* csTextSyntaxService::MatrixToText (
 {
   char line[100];
   csString ind = csString::PadLeft (' ', indent);
-  
+
   text = ind;
   text.Append ("MATRIX (\n");
 
-  sprintf (line, "%g, %g, %g\n", m.m11, m.m12, m.m13); 
+  sprintf (line, "%g, %g, %g\n", m.m11, m.m12, m.m13);
   text.Append (ind);
   text.Append (line);
 
-  sprintf (line, "%g, %g, %g\n", m.m21, m.m22, m.m23); 
+  sprintf (line, "%g, %g, %g\n", m.m21, m.m22, m.m23);
   text.Append (ind);
   text.Append (line);
 
-  sprintf (line, "%g, %g, %g\n", m.m31, m.m32, m.m33); 
+  sprintf (line, "%g, %g, %g\n", m.m31, m.m32, m.m33);
   text.Append (ind);
   text.Append (line);
 
@@ -1148,8 +1148,8 @@ const char* csTextSyntaxService::VectorToText (
 {
   char line[100];
   csString ind = csString::PadLeft (' ', indent);
-  
-  sprintf (line, "%s (%g, %g, %g)%c", vname, x, y, z, newline ? '\n' : ' '); 
+
+  sprintf (line, "%s (%g, %g, %g)%c", vname, x, y, z, newline ? '\n' : ' ');
   text.Append (ind);
   text.Append (line);
 
@@ -1169,8 +1169,8 @@ const char* csTextSyntaxService::VectorToText (
 {
   char line[100];
   csString ind = csString::PadLeft (' ', indent);
-  
-  sprintf (line, "%s (%g, %g)%c", vname, x, y, newline ? '\n' : ' '); 
+
+  sprintf (line, "%s (%g, %g)%c", vname, x, y, newline ? '\n' : ' ');
   text.Append (ind);
   text.Append (line);
 
@@ -1189,8 +1189,8 @@ const char* csTextSyntaxService::BoolToText (
 {
   char line[100];
   csString ind = csString::PadLeft (' ', indent);
-  
-  sprintf (line, "%s (%s)%c", vname, b ? "yes" : "no", newline ? '\n' : ' '); 
+
+  sprintf (line, "%s (%s)%c", vname, b ? "yes" : "no", newline ? '\n' : ' ');
   text.Append (ind);
   text.Append (line);
 
@@ -1201,7 +1201,7 @@ const char* csTextSyntaxService::MixmodeToText (
 	uint mixmode, int indent, bool newline)
 {
   csString ind = csString::PadLeft (' ', indent);
-  
+
   text = ind;
   text.Append ("MIXMODE (\n");
   if (mixmode & CS_FX_COPY)
@@ -1239,7 +1239,7 @@ const char* csTextSyntaxService::MixmodeToText (
     text.Append (ind);
     text.Append (" TRANSPARENT ()\n");
   }
-  if(mixmode & CS_FX_ALPHA) 
+  if(mixmode & CS_FX_ALPHA)
   {
     char buf[30];
     sprintf(buf, "  ALPHA (%.5g)\n", float(mixmode&CS_FX_MASK_ALPHA)/255.);;

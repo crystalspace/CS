@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2000 by Samuel Humphreys
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -40,11 +40,11 @@ struct iVertexBufferManager;
  * glCopyTexImage2D are notoriously underoptimised/disfunctional among some
  * opengl implementations/drivers/gfx-cards.
  *
- * How it works: There are the stand alone and sharing modes. It is strongly 
+ * How it works: There are the stand alone and sharing modes. It is strongly
  * recommended that this implementation is not used in 'sharing' mode. Sharing
- * mode is implemented mostly for consistency among procedural texture 
+ * mode is implemented mostly for consistency among procedural texture
  * implementations so the engine can render to it if necessary transparently.
- * Sharing mode also adds a further layer of complexity to the stand alone 
+ * Sharing mode also adds a further layer of complexity to the stand alone
  * mode, but without performance penalty.
  */
 
@@ -85,7 +85,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   /**
    * The mode the software textures are in. If true then the software texture
    * manager is not updated with procedural textures. If one of the software
-   * procedural textures registers with this as false then all procedural 
+   * procedural textures registers with this as false then all procedural
    * textures are changed to false.
    */
   bool alone_mode;
@@ -102,7 +102,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   /// Prepare.
   bool Prepare (
     csGraphics3DOGLCommon *parent_g3d,
-    csOpenGLProcSoftware *partner_tex, 
+    csOpenGLProcSoftware *partner_tex,
     csTextureHandleOpenGL *tex,
     csPixelFormat *pfmt,
     void *buffer,
@@ -121,7 +121,7 @@ class csOpenGLProcSoftware : public iGraphics3D
 
   virtual void DrawPolygon (G3DPolygonDP& poly);
   virtual void DrawPolygonDebug (G3DPolygonDP& poly);
-  virtual void DrawLine (const csVector3& v1, const csVector3& v2, 
+  virtual void DrawLine (const csVector3& v1, const csVector3& v2,
 			 float fov, int color);
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
@@ -165,7 +165,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   virtual iGraphics2D *GetDriver2D ();
   virtual iTextureManager *GetTextureManager ();
   virtual iVertexBufferManager* GetVertexBufferManager ();
-  virtual iHalo *CreateHalo (float iR, float iG, float iB, 
+  virtual iHalo *CreateHalo (float iR, float iG, float iB,
 			     unsigned char *iAlpha, int iWidth, int iHeight);
   virtual void DrawPixmap (iTextureHandle*, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th, uint8 Alpha);
@@ -178,7 +178,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
 
   int ConvertColour (int col)
   {
-    return soft_texman->FindRGB 
+    return soft_texman->FindRGB
       (((col&gl_pfmt->RedMask  )>>gl_pfmt->RedShift  )<<(8-gl_pfmt->RedBits  ),
        ((col&gl_pfmt->GreenMask)>>gl_pfmt->GreenShift)<<(8-gl_pfmt->GreenBits),
        ((col&gl_pfmt->BlueMask )>>gl_pfmt->BlueShift )<<(8-gl_pfmt->BlueBits));
@@ -217,7 +217,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   virtual void FinishDraw ()
   { g2d->FinishDraw (); }
 
-  virtual void Print (csRect* pArea) 
+  virtual void Print (csRect* pArea)
   { g2d->Print (pArea); }
 
   virtual int GetPage ()
@@ -264,7 +264,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   { g2d->SetRGB (i, r, g, b); }
   ///
   virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *s)
-  { 
+  {
     int cbg = (bg != -1) ? ConvertColour (bg) : bg;
     g2d->Write (font, x, y, ConvertColour (fg), cbg, s);
   }
@@ -302,12 +302,12 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB)
   { g2d->GetPixel (x, y, oR, oG, oB); }
 
-  virtual iImage *ScreenShot () 
+  virtual iImage *ScreenShot ()
   { return g2d->ScreenShot(); }
 
-  virtual iGraphics2D *CreateOffScreenCanvas 
-  (int /*width*/, int /*height*/, void* /*buffer*/, bool /*hint*/, 
-   csPixelFormat* /*ipfmt = NULL*/, csRGBpixel* /*palette = NULL*/, 
+  virtual iGraphics2D *CreateOffScreenCanvas
+  (int /*width*/, int /*height*/, void* /*buffer*/, bool /*hint*/,
+   csPixelFormat* /*ipfmt = NULL*/, csRGBpixel* /*palette = NULL*/,
    int /*pal_size = 0*/)
   { return NULL; }
 

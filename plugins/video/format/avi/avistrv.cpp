@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Norman Krämer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -47,13 +47,13 @@ csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
   pIA = new csImageArea (1,1,1,1);
 }
 
-bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph, 
-				   const csAVIFormat::StreamHeader *psh, 
-				   const csAVIFormat::VideoStreamFormat *pf, 
-				   uint16 nStreamNumber, 
+bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
+				   const csAVIFormat::StreamHeader *psh,
+				   const csAVIFormat::VideoStreamFormat *pf,
+				   uint16 nStreamNumber,
 				   uint8 *pInitData, uint32 nInitDataLen,
 				   char *pName,
-				   uint8 *pFormatEx, uint32 nFormatEx, 
+				   uint8 *pFormatEx, uint32 nFormatEx,
 				   iObjectRegistry *object_reg)
 {
   strdesc.type = CS_STREAMTYPE_VIDEO;
@@ -277,8 +277,8 @@ void csAVIStreamVideo::NextFrame ()
 //#define yuvmmx
 #ifdef yuvmmx
 extern "C"{
-void yuv2rgba_mmx (unsigned char* ybuffer, unsigned char* ubuffer, 
-		   unsigned char* vbuffer, unsigned char* outbuffer, 
+void yuv2rgba_mmx (unsigned char* ybuffer, unsigned char* ubuffer,
+		   unsigned char* vbuffer, unsigned char* outbuffer,
 		   int width, int height);
 }
 #endif
@@ -289,7 +289,7 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
   unsigned char *udata = (unsigned char *)data[1];
   unsigned char *vdata = (unsigned char *)data[2];
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  yuv2rgba_mmx (ydata, udata, vdata, (unsigned char *)pixel, 
+  yuv2rgba_mmx (ydata, udata, vdata, (unsigned char *)pixel,
 		strdesc.width, strdesc.height);
 
 #else
@@ -445,11 +445,11 @@ void csAVIStreamVideo::makeMaterial ()
   pMaterial->Prepare ();
 }
 
-bool csAVIStreamVideo::LoadCodec (uint8 *pInitData, uint32 nInitDataLen, 
+bool csAVIStreamVideo::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
 				  uint8 *pFormatEx, uint32 nFormatEx)
 {
   // based on the codec id we try to load the apropriate codec
- 
+
   // create a classname from the coec id
   char cn[128];
   sprintf (cn, "crystalspace.video.codec.avi.%s", strdesc.codec);

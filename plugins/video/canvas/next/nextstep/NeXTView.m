@@ -84,14 +84,14 @@ MSG(rightMouseDragged)
   NXSize s;
   unsigned int const w = (unsigned int)bounds.size.width;
   unsigned int const h = (unsigned int)bounds.size.height;
-  
+
   unsigned int const samples_per_pixel = 3;	// RGB (A is not included).
   unsigned int const bytes_per_pixel = bits_per_sample / 2;
   unsigned int const bytes_per_row = bytes_per_pixel * w;
   unsigned int const bits_per_pixel = bytes_per_pixel * CHAR_BIT;
-  
+
   assert(bits_per_sample == 4 || bits_per_sample == 8);
-  
+
   rep = [[NXBitmapImageRep allocFromZone:[self zone]]
     initData:buff
     pixelsWide:w

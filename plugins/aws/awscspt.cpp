@@ -1,17 +1,17 @@
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
-    	      (c) 2001 F.Richter	
-    
+    	      (c) 2001 F.Richter
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -39,38 +39,38 @@ awsSimpleCanvas::awsSimpleCanvas ()
 {
   mat_w=256;
   mat_h=256;
-  
+
   // this doesn't work:
   //texFlags = CS_TEXTURE_2D | CS_TEXTURE_PROC;
   // but this is ok either:
   texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS;
 }
 
-void 
+void
 awsSimpleCanvas::Animate (csTicks current_time)
 {
   (void)current_time;
 }
 
-void 
+void
 awsSimpleCanvas::SetSize(int w, int h)
-{  
-  mat_w=w; 
-  mat_h=h; 
+{
+  mat_w=w;
+  mat_h=h;
 }
 
 /////////
 
 SCF_IMPLEMENT_IBASE (awsSingleProctexCanvas)
   SCF_IMPLEMENTS_INTERFACE (iAwsCanvas)
-  static scfInterfaceID scfID_iTextureWrapper = (scfInterfaceID)-1;		
-  if (scfID_iTextureWrapper == (scfInterfaceID)-1)				
-    scfID_iTextureWrapper = iSCF::SCF->GetInterfaceID ("iTextureWrapper");		
-  if (iInterfaceID == scfID_iTextureWrapper)		
-  {									
+  static scfInterfaceID scfID_iTextureWrapper = (scfInterfaceID)-1;
+  if (scfID_iTextureWrapper == (scfInterfaceID)-1)
+    scfID_iTextureWrapper = iSCF::SCF->GetInterfaceID ("iTextureWrapper");
+  if (iInterfaceID == scfID_iTextureWrapper)
+  {
     iTextureWrapper *tex = canvas->GetTextureWrapper();
-    (tex)->IncRef ();						
-    return tex;				
+    (tex)->IncRef ();
+    return tex;
   }
 SCF_IMPLEMENT_IBASE_END
 
@@ -92,7 +92,7 @@ awsSingleProctexCanvas::~awsSingleProctexCanvas ()
   delete canvas;
 }
 
-void 
+void
 awsSingleProctexCanvas::Animate (csTicks current_time)
 {
   (void)current_time;
@@ -102,7 +102,7 @@ void awsSingleProctexCanvas::Show (csRect *area, iGraphics3D *g3d, uint8 Alpha)
 {
   int w = ((!g3d) || (G2D()->GetWidth()  < g3d->GetWidth())  ? G2D()->GetWidth() : g3d->GetWidth());
   int h = ((!g3d) || (G2D()->GetHeight() < g3d->GetHeight()) ? G2D()->GetHeight() : g3d->GetHeight());
-  
+
   area->xmin = (area->xmin < 0 ? 0 : area->xmin);
   area->ymin = (area->ymin < 0 ? 0 : area->ymin);
 

@@ -35,14 +35,14 @@ class csGraphics2DOpenGL : public csGraphics2DGLCommon, public iMacGraphics
 public:
 	csGraphics2DOpenGL(iBase* iParent);
 	virtual ~csGraphics2DOpenGL(void);
-  
+
 	virtual bool	Open ();
 	virtual void	Close ();
-  
+
 	virtual bool	Initialize(iObjectRegistry *object_reg);
 
 	virtual void	Print (csRect *area = NULL);
-  
+
 	virtual void	SetRGB(int i, int r, int g, int b);
 
 	virtual void	ActivateWindow( WindowPtr theWindow, bool active );

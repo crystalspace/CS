@@ -36,11 +36,11 @@ protected:
   CrystGLWindow* window;
   color_space curr_color_space;
   BRect screen_frame;
-  
+
 public:
   csGraphics2DGLBe(iBase*);
   virtual ~csGraphics2DGLBe();
-  
+
   virtual bool Initialize(iObjectRegistry*);
   virtual bool Open();
   virtual void Close();

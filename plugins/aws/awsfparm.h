@@ -20,9 +20,9 @@ class awsParmList : public iAwsParmList
   csBasicVector parms;
 
 public:
-  static const int INT;    
+  static const int INT;
   static const int FLOAT;
-  static const int STRING;   
+  static const int STRING;
   static const int BASICVECTOR;
   static const int STRINGVECTOR;
   static const int RECT;
@@ -33,7 +33,7 @@ public:
   {
     int  type;
     unsigned long name;
-    union parmValue 
+    union parmValue
     {
       int i;
       float f;

@@ -48,7 +48,7 @@ ctNBodyForce::ctNBodyForce ()
 
 }
 
-ctNBodyForce::ctNBodyForce ( ctReferenceFrame &ref ) 
+ctNBodyForce::ctNBodyForce ( ctReferenceFrame &ref )
   : ctForce( ref )
 {
 }
@@ -56,7 +56,7 @@ ctNBodyForce::ctNBodyForce ( ctReferenceFrame &ref )
 ctNBodyForce::~ctNBodyForce ()
 {
   ctPhysicalEntity *pe;
-	
+
   pe = body_vector.get_first();
   while ( pe )
   {

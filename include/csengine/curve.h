@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -123,12 +123,12 @@ private:
 
   /// Pointer to the template for this curve
   csCurveTemplate* CurveTemplate;
-  
+
   /// list of light patches
   csLightPatch* LightPatches;
 
   /**
-   * Object to world transformation (Needed by CalculateLighting & 
+   * Object to world transformation (Needed by CalculateLighting &
    * ShineDynLight).
    */
   csReversibleTransform* O2W;
@@ -136,7 +136,7 @@ private:
   /*
    * Position Buffer: this is an array which coordinates u,v lightmap
    * pixel coordinates to the position on the curve in world space
-   * coordinates.  
+   * coordinates.
    * i.e. in a 10x10 lightmap uv2World[5][5] is the world space coordinate
    *   of the lightmap texel 5,5 on the lightmap
    */
@@ -144,7 +144,7 @@ private:
 
   /*
    * Normal Buffer: this is an array which coordinates u,v lightmap
-   * pixel coordinates to the normal of the curve  
+   * pixel coordinates to the normal of the curve
    * i.e. in a 10x10 lightmap uv2Normal[5][5] is the normal vector which
    * corresponds to the lightmap texel 5,5 on the lightmap
    */
@@ -236,7 +236,7 @@ public:
   void PrepareLighting ();
 
   /**
-   * Populate a coverage matrix which relates shadow information for this 
+   * Populate a coverage matrix which relates shadow information for this
    * curve's lightmap
    */
   void GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &cm) const;
@@ -297,7 +297,7 @@ public:
 
   /// Do a hard transform on this curve.
   virtual void HardTransform (const csReversibleTransform& trans);
-  
+
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //----------------------- iCurve interface implementation -----------------

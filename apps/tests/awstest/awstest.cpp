@@ -137,7 +137,7 @@ static bool AwsEventHandler (iEvent& ev)
   }
 }
 
-bool 
+bool
 awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 {
   object_reg = csInitializer::CreateEnvironment (argc, argv);
@@ -191,19 +191,19 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   QUERY_REG (myG2D, iGraphics2D, "Couldn't load  iGraphics2D plugin!");
   QUERY_REG (myVFS, iVFS, "Couldn't load  iVFS plugin!");
   QUERY_REG (myConsole, iConsoleOutput, "Couldn't load iConsoleOutput plugin!");
-  
+
   // Load AWS
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading AWS...");
   aws = CS_LOAD_PLUGIN(plugin_mgr,
   	"crystalspace.window.alternatemanager", iAws);
-  
+
   if (!aws)
   {
     Report(CS_REPORTER_SEVERITY_ERROR, "Could not load the AWS plugin!");
     return false;
   }
-    
-  
+
+
   loader = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.level.loader", iLoader);
   if (!loader)
   {
@@ -215,7 +215,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not register loader!");
     return false;
   }
- 
+
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
   if (nw) nw->SetTitle ("AWS Test Harness");
@@ -232,7 +232,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   // Initialize the texture manager
   txtmgr->ResetPalette ();
-  
+
   // Allocate a uniformly distributed in R,G,B space palette for console
   // The console will crash on some platforms if this isn't initialize properly
   int r,g,b;
@@ -240,7 +240,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     for (g = 0; g < 8; g++)
       for (b = 0; b < 4; b++)
 	txtmgr->ReserveColor(r * 32, g * 32, b * 64);
-	
+
   txtmgr->SetPalette();
 
   font = myG2D->GetFontServer()->LoadFont (CSFONT_LARGE);
@@ -253,7 +253,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "The Alternate Window System Test Harness.");
-  
+
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
@@ -344,7 +344,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   engine->Prepare ();
 
   Report(CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
-  
+
   view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
@@ -353,7 +353,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   wview = new csView (engine, myG3D);
   wview->GetCamera ()->SetSector (room);
   wview->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
-   
+
   txtmgr->SetPalette ();
   col_red = txtmgr->FindRGB (255, 0, 0);
   col_blue = txtmgr->FindRGB (0, 0, 255);
@@ -363,12 +363,12 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   col_yellow = txtmgr->FindRGB (255, 255, 0);
   col_cyan = txtmgr->FindRGB (0, 255, 255);
   col_green = txtmgr->FindRGB (0, 255, 0);
-  
+
   if (AWSTEST_CANVAS == AWSTEST_SINGLEPROC)
   {
     awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager(), 512, 512, NULL);
     //aws->SetFlag(AWSF_AlwaysEraseWindows);  // Only set for surface or direct-drawing w/o engine
-  } 
+  }
   else if (AWSTEST_CANVAS == AWSTEST_MULTIPROC)
   {
     awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager());
@@ -394,48 +394,48 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   if (!aws->GetPrefMgr()->Load("/this/data/temp/awstest.def"))
       Report(CS_REPORTER_SEVERITY_ERROR, "couldn't load definition file!");
   aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
-  
+
   printf("aws-debug: Creating splash window...\n");
   iAwsWindow *test = aws->CreateWindowFrom("Splash");
   iAwsWindow *test2 = aws->CreateWindowFrom("Another");
   iAwsWindow *test3 = aws->CreateWindowFrom("Engine View");
-  
+
   test3->SetEngineView(wview);
 
   if (test)  test->Show();
   if (test3) test3->Show();
-  
+
   //if (test2) test2->Show();
   s->SetTestWin(test2);
-  
+
   /////////
-  
+
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Init done.");
 
   return true;
 }
-    
-void 
+
+void
 awsTest::SetupFrame()
 {
   static int counter=0;
-    
-  iCamera* c = view->GetCamera();   
-  iCamera* c2 = wview->GetCamera();   
+
+  iCamera* c = view->GetCamera();
+  iCamera* c2 = wview->GetCamera();
 
   counter++;
-  
+
   // First get elapsed time from the system driver.
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
-  
+
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 2);
 
   c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
   c2->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-  
+
   // Tell 3D driver we're going to display 3D things.
   if (!myG3D->BeginDraw (
       engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -443,13 +443,13 @@ awsTest::SetupFrame()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
-    
+
   // Start drawing 2D graphics.
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    
+
   sprintf(message, "awsTest(%d)", counter);
   myG2D->Write(font, 5,5, col_green, -1, message);
-  
+
   aws->Redraw();
   aws->Print(myG3D, 64);
   /*if (AWSTEST_SINGLEPROCTEXCANVAS)
@@ -466,15 +466,15 @@ awsTest::SetupFrame()
     }
   }*/
 }
-  
-void 
+
+void
 awsTest::FinishFrame ()
 {
   myG3D->FinishDraw ();
   myG3D->Print (NULL);
 }
-  
-bool 
+
+bool
 awsTest::HandleEvent (iEvent &Event)
 {
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
@@ -487,11 +487,11 @@ awsTest::HandleEvent (iEvent &Event)
     }
     return true;
   }
-  
+
   return aws->HandleEvent(Event);
 }
 
-void 
+void
 awsTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;

@@ -27,18 +27,18 @@ class ctFastContactSolver : public ctContactSolver
 {
 public:
   virtual void compute_contact_forces ( ctContact *c_list, int c_num );
-  
+
 protected:
 
-  void rebalance_forces ( int row, int c_num, ctMatrixN 
-			  &A, real *c_a, real *c_f, real *c_da, real *c_df, 
+  void rebalance_forces ( int row, int c_num, ctMatrixN
+			  &A, real *c_a, real *c_f, real *c_da, real *c_df,
 			  int *Czero_a, int *C_top, int *NCzero_f, int *NC_top );
 
-  void fdirection ( real *c_df, int row, int c_num, ctMatrixN &A, 
+  void fdirection ( real *c_df, int row, int c_num, ctMatrixN &A,
 		    int *Czero_a, int C_top, int *NCzero_f, int NC_top );
 
-  real find_max_step ( int *max_step_row, int row, real *c_a, real *c_f, 
-		       real *c_da, real *c_df, int *Czero_a, int C_top, 
+  real find_max_step ( int *max_step_row, int row, real *c_a, real *c_f,
+		       real *c_da, real *c_df, int *Czero_a, int C_top,
 		       int *NCzero_f, int NC_top );
 
 };

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Norman Krämer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -72,7 +72,7 @@ struct iSyntaxService : public iBase
    *     It consists of or'ed CSTEX_.
    * <li>tx_orig, tx1, tx2, len: texture transformation is given by 3
    *     points describing a 3d space (third vector is implicitly given to
-   *     be perpendicular on the 2 vectors described by the 3 points), 
+   *     be perpendicular on the 2 vectors described by the 3 points),
    * <li>width and height of the texture.
    * <li>tx_m and tx_v: if texture transformation is given explicitly by
    *     matrix/vector.
@@ -84,7 +84,7 @@ struct iSyntaxService : public iBase
    *     This is used to make errormessages more verbose.
    * </ul>
    */
-  virtual bool ParseTexture (char *buf, const csVector3* vref, uint &texspec, 
+  virtual bool ParseTexture (char *buf, const csVector3* vref, uint &texspec,
 			     csVector3 &tx_orig, csVector3 &tx1,
 			     csVector3 &tx2, csVector3 &len,
 			     csMatrix3 &tx_m, csVector3 &tx_v,
@@ -98,7 +98,7 @@ struct iSyntaxService : public iBase
    * Parses a WARP () specification.
    * flags: contains all flags found in the description.
    */
-  virtual  bool ParseWarp (char *buf, csVector &flags, bool &mirror, 
+  virtual  bool ParseWarp (char *buf, csVector &flags, bool &mirror,
 			   csMatrix3 &m, csVector3 &before,
 			   csVector3 &after) = 0;
 

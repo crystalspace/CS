@@ -1,17 +1,17 @@
 /*
-    Copyright (C) 2000  by Samuel Humphreys 
+    Copyright (C) 2000  by Samuel Humphreys
     Based on the Glide implementation by Norman Kramer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -34,8 +34,8 @@
 
 csOpenGLProcBackBuffer::csOpenGLProcBackBuffer (iBase *parent) :
   csGraphics3DOGLCommon (parent)
-{ 
-  tex_mm = NULL; 
+{
+  tex_mm = NULL;
   g3d = NULL;
   rstate_bilinearmap = false;
   buffer = NULL;
@@ -68,9 +68,9 @@ void csOpenGLProcBackBuffer::Close ()
   m_fogtexturehandle = 0;
 }
 
-void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d, 
+void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
   csTextureHandleOpenGL *tex_mm, csPixelFormat *ipfmt, bool bpersistent)
-{ 
+{
   memcpy (&pfmt, ipfmt, sizeof(csPixelFormat));
   persistent = bpersistent;
   this->g3d = g3d;
@@ -226,31 +226,31 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
     printf ("cached \n");
     // Currently Mesa3.x has bugs which affects at least the voodoo2.
     // Copying the framebuffer to make a new texture will work with the voodoo2
-    // as of Mesa CVS 6/6/2000. Unfortunately this change has broken the 
+    // as of Mesa CVS 6/6/2000. Unfortunately this change has broken the
     // glCopyTexSubImage command, so I cant test this with just updating
     // the rectangle as it is intended to be.
     glDeleteTextures (1, &tex_data->Handle);
     tex_data->Handle = 0;
     glGenTextures (1, &tex_data->Handle);
-    // Texture is in tha cache, update texture directly. 
+    // Texture is in tha cache, update texture directly.
     glBindTexture (GL_TEXTURE_2D, tex_data->Handle);
     //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
 		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
 
-    glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0,0,width,height,0); 
+    glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0,0,width,height,0);
 //      glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
   }
   else
   {
     printf ("not cached \n");
-    glReadPixels (0,0, width, height, tex_mm->SourceFormat (), 
+    glReadPixels (0,0, width, height, tex_mm->SourceFormat (),
 		  tex_mm->SourceType (), tex_0->get_image_data ());
 #ifdef GL_VERSION_1_2x
     // Not in cache.
@@ -270,7 +270,7 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
       {
 	dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
 	dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
-	dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb; 
+	dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb;
       }
     }
     else
@@ -297,21 +297,21 @@ SCF_IMPLEMENT_IBASE (csOpenGLProcBackBuffer2D)
   SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
 SCF_IMPLEMENT_IBASE_END;
 
-csOpenGLProcBackBuffer2D::csOpenGLProcBackBuffer2D 
+csOpenGLProcBackBuffer2D::csOpenGLProcBackBuffer2D
     (iGraphics2D *ig2d, int iwidth, int iheight, csPixelFormat *ipfmt)
-{  
+{
   SCF_CONSTRUCT_IBASE (NULL);
-  g2d = ig2d; 
+  g2d = ig2d;
   width = iwidth;
-  height = iheight; 
+  height = iheight;
   pfmt = ipfmt;
-  frame_height = g2d->GetHeight (); 
-  g2d->IncRef (); 
+  frame_height = g2d->GetHeight ();
+  g2d->IncRef ();
 }
 
 csOpenGLProcBackBuffer2D::~csOpenGLProcBackBuffer2D ()
-{ 
-  g2d->DecRef (); 
+{
+  g2d->DecRef ();
 }
 
 void csOpenGLProcBackBuffer2D::Clear (int color)
@@ -335,52 +335,52 @@ void csOpenGLProcBackBuffer2D::Clear (int color)
   glEnd ();
 }
 
-void csOpenGLProcBackBuffer2D::DrawLine (float x1, float y1, 
+void csOpenGLProcBackBuffer2D::DrawLine (float x1, float y1,
 					    float x2, float y2, int color)
-{ 
-  g2d->DrawLine (x1, frame_height - height + y1, 
-		 x2, frame_height - height + y2, color); 
+{
+  g2d->DrawLine (x1, frame_height - height + y1,
+		 x2, frame_height - height + y2, color);
 }
 
-void csOpenGLProcBackBuffer2D::DrawBox (int x, int y, int w, int h, 
+void csOpenGLProcBackBuffer2D::DrawBox (int x, int y, int w, int h,
 					   int color)
 {
-  g2d->DrawBox (x, frame_height - height + y, w, h, color); 
+  g2d->DrawBox (x, frame_height - height + y, w, h, color);
 }
 
 void csOpenGLProcBackBuffer2D::DrawPixel (int x, int y, int color)
-{ 
-  g2d->DrawPixel (x, frame_height - height + y, color); 
+{
+  g2d->DrawPixel (x, frame_height - height + y, color);
 }
 
 unsigned char *csOpenGLProcBackBuffer2D::GetPixelAt (int x, int y)
-{ 
-  return g2d->GetPixelAt (x, frame_height - height + y); 
+{
+  return g2d->GetPixelAt (x, frame_height - height + y);
 }
 
 csImageArea *csOpenGLProcBackBuffer2D::SaveArea (int x, int y, int w, int h)
-{ 
-  return g2d->SaveArea (x, frame_height - height + y, w, h); 
+{
+  return g2d->SaveArea (x, frame_height - height + y, w, h);
 }
 
 void csOpenGLProcBackBuffer2D::Write (iFont *font, int x, int y,
   int fg, int bg, const char *str)
-{ 
-  g2d->Write (font, x, frame_height - height + y, fg, bg, str); 
+{
+  g2d->Write (font, x, frame_height - height + y, fg, bg, str);
 }
 
 int csOpenGLProcBackBuffer2D::GetWidth ()
-{ 
-  return width; 
+{
+  return width;
 }
 
 int csOpenGLProcBackBuffer2D::GetHeight ()
-{ 
-  return height; 
+{
+  return height;
 }
 
-void csOpenGLProcBackBuffer2D::GetPixel (int x, int y, 
+void csOpenGLProcBackBuffer2D::GetPixel (int x, int y,
   uint8 &oR, uint8 &oG, uint8 &oB)
-{ 
-  g2d->GetPixel (x, frame_height - height + y, oR, oG, oB); 
+{
+  g2d->GetPixel (x, frame_height - height + y, oR, oG, oB);
 }

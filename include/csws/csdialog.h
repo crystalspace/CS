@@ -79,7 +79,7 @@ protected:
 public:
   /// Create dialog object
   csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle = csdfsNone);
-  
+
   /// Destroy a dialog object
   virtual ~csDialog();
 
@@ -122,10 +122,10 @@ public:
 
   /// Set dialog transparency level (0 - opaque, 255 - fully transparent)
   void SetAlpha (uint8 iAlpha);
-  
+
   /// Set dialog overlay transparency level (0 - opaque, 255 - fully transparent)
   void SetOverlayAlpha (uint8 iAlpha);
-  
+
   /// Query dialog transparency level
   uint8 GetAlpha ()
   { return GetState (CSS_TRANSPARENT) ? Alpha : 0; }
@@ -137,18 +137,18 @@ public:
 
   /// Set the bitmap for the frame (only useful if the framestyle is csdfsBitmap)
   void SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap);
-  
+
   /// Set the bitmap for the overlay (only useful if the framestyle is csdfsBitmap)
   void SetOverlayBitmap(csPixmap *iOverlayBitmap, bool iDelOverlayBitmap);
-      
+
   /// Get the frame bitmap
   csPixmap *GetFrameBitmap()
   { return FrameBitmap; }
-  
+
   /// Get the overlay bitmap
   csPixmap *GetOverlayBitmap()
   { return OverlayBitmap; }
-  
+
 protected:
   /// Adjust focused control by switching back or forth if it is disabled
   void AdjustFocused (bool forward);

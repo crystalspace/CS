@@ -35,7 +35,7 @@ csProcPlasma::csProcPlasma () : csProcTexture()
   mat_w = 64;
   mat_h = 64;
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS | 
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS |
     CS_TEXTURE_PROC_ALONE_HINT;
 }
 
@@ -131,7 +131,7 @@ void csProcPlasma::Animate (csTicks current_time)
   /// draw palette
   //for(int i=0; i<palsize; i++)
   //{
-  //  g2d->DrawBox(i*(g2d->GetWidth()/palsize), 1, 
+  //  g2d->DrawBox(i*(g2d->GetWidth()/palsize), 1,
   //    (g2d->GetWidth()/palsize)+5, 10, palette[i]);
   //}
 

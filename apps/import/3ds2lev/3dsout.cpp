@@ -49,7 +49,7 @@ void OutpHeadCS (FILE *o, Lib3dsFile *p3dsFile)
     {
       // search if already present
       bool found = false;
-      
+
       for (j=0; j<numTextures; j++) {
         if (strcmp(p3dsMesh->faceL->material, textures[j])==0) {
           found = true;
@@ -229,7 +229,7 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
     // get the number of vertices in the current mesh
     int numVertices = p3dsMesh->points;
     int i;
-    
+
     // vertexes pointer
     Lib3dsPoint *pCurPoint = p3dsMesh->pointL;
     Lib3dsTexel *pCurTexel = p3dsMesh->texelL;

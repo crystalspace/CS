@@ -17,7 +17,7 @@ aws3DFrame::~aws3DFrame()
 {
 }
 
-void 
+void
 aws3DFrame::Draw(iAws *wmgr, iAwsWindow *window, csRect &frame, int frame_style, iTextureHandle *bkg, int alpha_level)
 {
   iGraphics2D *g2d = wmgr->G2D();
@@ -56,34 +56,34 @@ aws3DFrame::Draw(iAws *wmgr, iAwsWindow *window, csRect &frame, int frame_style,
 
     if (bkg)
     {
-      g3d->DrawPixmap(bkg, frame.xmin+4, frame.ymin+4, 
-                      frame.Width()-7, frame.Height()-7, 
-                      frame.xmin+4-window->Frame().xmin, 
-                      frame.ymin+4-window->Frame().ymin, 
+      g3d->DrawPixmap(bkg, frame.xmin+4, frame.ymin+4,
+                      frame.Width()-7, frame.Height()-7,
+                      frame.xmin+4-window->Frame().xmin,
+                      frame.ymin+4-window->Frame().ymin,
                       frame.Width()-7, frame.Height()-7, 0);
 
-      g3d->DrawPixmap(bkg, frame.xmin, frame.ymin, 
-                      frame.Width(), 4, 
-                      frame.xmin-window->Frame().xmin, 
-                      frame.ymin-window->Frame().ymin, 
+      g3d->DrawPixmap(bkg, frame.xmin, frame.ymin,
+                      frame.Width(), 4,
+                      frame.xmin-window->Frame().xmin,
+                      frame.ymin-window->Frame().ymin,
                       frame.Width(), 4, alpha_level);
 
-      g3d->DrawPixmap(bkg, frame.xmin, frame.ymin+4, 
-                      4, frame.Height(), 
-                      frame.xmin-window->Frame().xmin, 
-                      frame.ymin+4-window->Frame().ymin, 
+      g3d->DrawPixmap(bkg, frame.xmin, frame.ymin+4,
+                      4, frame.Height(),
+                      frame.xmin-window->Frame().xmin,
+                      frame.ymin+4-window->Frame().ymin,
                       4, frame.Height(), alpha_level);
 
-      g3d->DrawPixmap(bkg, frame.xmax-4, frame.ymin+4, 
-                      4, frame.Height(), 
-                      frame.xmax-4-window->Frame().xmin, 
-                      frame.ymin+4-window->Frame().ymin, 
+      g3d->DrawPixmap(bkg, frame.xmax-4, frame.ymin+4,
+                      4, frame.Height(),
+                      frame.xmax-4-window->Frame().xmin,
+                      frame.ymin+4-window->Frame().ymin,
                       4, frame.Height(), alpha_level);
 
-      g3d->DrawPixmap(bkg, frame.xmin+4, frame.ymax-4, 
-                      frame.Width()-4, 4, 
-                      frame.xmin+4-window->Frame().xmin, 
-                      frame.ymax-4-window->Frame().ymin, 
+      g3d->DrawPixmap(bkg, frame.xmin+4, frame.ymax-4,
+                      frame.Width()-4, 4,
+                      frame.xmin+4-window->Frame().xmin,
+                      frame.ymax-4-window->Frame().ymin,
                       frame.Width()-4, 4, alpha_level);
     }
     else
@@ -107,10 +107,10 @@ aws3DFrame::Draw(iAws *wmgr, iAwsWindow *window, csRect &frame, int frame_style,
     g2d->DrawBox(frame.xmin+3, frame.ymin+3, frame.Width()-3, frame.Height()-3, dfill);
 
     if (bkg)
-      g3d->DrawPixmap(bkg, frame.xmin, frame.ymin, 
-                      frame.Width()+1, frame.Height()+1, 
-                      frame.xmin-window->Frame().xmin, 
-                      frame.ymin-window->Frame().ymin, 
+      g3d->DrawPixmap(bkg, frame.xmin, frame.ymin,
+                      frame.Width()+1, frame.Height()+1,
+                      frame.xmin-window->Frame().xmin,
+                      frame.ymin-window->Frame().ymin,
                       frame.Width()+1, frame.Height()+1, alpha_level);
     break;
 
@@ -130,10 +130,10 @@ aws3DFrame::Draw(iAws *wmgr, iAwsWindow *window, csRect &frame, int frame_style,
     g2d->DrawBox(frame.xmin+2, frame.ymin+2, frame.Width()-3, frame.Height()-3, fill);
 
     if (bkg)
-      g3d->DrawPixmap(bkg, frame.xmin, frame.ymin, 
-                      frame.Width()+1, frame.Height()+1, 
-                      frame.xmin-window->Frame().xmin, 
-                      frame.ymin-window->Frame().ymin, 
+      g3d->DrawPixmap(bkg, frame.xmin, frame.ymin,
+                      frame.Width()+1, frame.Height()+1,
+                      frame.xmin-window->Frame().xmin,
+                      frame.ymin-window->Frame().ymin,
                       frame.Width()+1, frame.Height()+1, alpha_level);
     break;
 
@@ -141,10 +141,10 @@ aws3DFrame::Draw(iAws *wmgr, iAwsWindow *window, csRect &frame, int frame_style,
     g2d->DrawBox(frame.xmin, frame.ymin, frame.Width(), frame.Height(), fill);
 
     if (bkg)
-      g3d->DrawPixmap(bkg, frame.xmin, frame.ymin, 
-                      frame.Width()+1, frame.Height()+1, 
-                      frame.xmin-window->Frame().xmin, 
-                      frame.ymin-window->Frame().ymin, 
+      g3d->DrawPixmap(bkg, frame.xmin, frame.ymin,
+                      frame.Width()+1, frame.Height()+1,
+                      frame.xmin-window->Frame().xmin,
+                      frame.ymin-window->Frame().ymin,
                       frame.Width()+1, frame.Height()+1, alpha_level);
 
     break;

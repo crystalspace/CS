@@ -320,7 +320,7 @@ bool csRegion::Region::ShineLights ()
   { return scfParent->ShineLights (); }
 bool csRegion::Region::Prepare ()
   { return scfParent->Prepare (); }
- 
+
 iSector* csRegion::Region::FindSector (const char *iName)
 {
   iSector* sector = CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iSector, iName);

@@ -151,7 +151,7 @@ void csView::UpdateView ()
       pverts[i].x *= scale_x;
       pverts[i].y *= scale_y;
     }
-  } 
+  }
   else if (RectView)
   {
     RectView->Set (QRound (scale_x * RectView->MinX()),
@@ -167,7 +167,7 @@ void csView::UpdateView ()
 void csView::Draw ()
 {
   UpdateClipper();
-  G3D->SetPerspectiveCenter ( (int)Camera->GetShiftX (), 
+  G3D->SetPerspectiveCenter ( (int)Camera->GetShiftX (),
 			      (int)Camera->GetShiftY () );
 
   Engine->SetContext (G3D);
@@ -206,7 +206,7 @@ void csView::RestrictClipperToScreen ()
       PolyView->MakeRoom (OutCount);
       PolyView->SetVertices (TempPoly, OutCount);
       PolyView->UpdateBoundingBox ();
-    } 
+    }
     delete [] TempPoly;
   }
 }

@@ -30,7 +30,7 @@
  * basic function is to retrieve its position and velocity, and allow
  * point forces and impulses to be applied.
  */
-class ctPointObj 
+class ctPointObj
 {
  public:
   ctPointObj () {}
@@ -43,19 +43,19 @@ class ctPointObj
   virtual void apply_force(ctVector3 force) = 0;
 };
 
-class ctConstPoint : public ctPointObj 
+class ctConstPoint : public ctPointObj
 {
   ctVector3 x;
  public:
-  ctConstPoint (ctVector3 pt) 
+  ctConstPoint (ctVector3 pt)
   { x = pt; }
 
   ~ctConstPoint() {}
 
-  ctVector3 pos () 
+  ctVector3 pos ()
   { return x; }
 
-  ctVector3 vel () 
+  ctVector3 vel ()
   { return ctVector3(0.0, 0.0, 0.0); }
 
   void apply_force(ctVector3 /*force*/) {}

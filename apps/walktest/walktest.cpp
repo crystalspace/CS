@@ -127,7 +127,7 @@ WalkTest::WalkTest () :
   anim_sky = NULL;
   anim_dirlight = NULL;
   anim_dynlight = NULL;
-  
+
   wf = NULL;
   map_mode = MAP_OFF;
   map_projection = WF_ORTHO_PERSP;
@@ -271,7 +271,7 @@ void WalkTest::SetDefaults ()
     strcpy (map_dir, val);
   else
     sprintf (map_dir, "/lev/%s", val);
-  
+
   if (cmdline->GetOption ("stats"))
   {
     do_stats = true;
@@ -915,7 +915,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
     {
       csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
       cfg_playrecording++;
-      if (cfg_playrecording >= recording.Length ()) 
+      if (cfg_playrecording >= recording.Length ())
       {
 	if (cfg_playloop)
 	  cfg_playrecording = 0;
@@ -926,7 +926,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 	  cfg_playrecording = -1;
 	  if (perf_stats) perf_stats->FinishSubsection ();
 	  recorded_perf_stats = NULL;
-	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Demo '%s' finished", 
+	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Demo '%s' finished",
 		       recorded_perf_stats_name);
 	}
       }
@@ -1170,7 +1170,7 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 	mesh = SCF_QUERY_INTERFACE (tp->GetMeshObject (), iPolygonMesh);
 	if (mesh)
 	{
-	  csColliderWrapper *cw = new csColliderWrapper (tp->QueryObject (), 
+	  csColliderWrapper *cw = new csColliderWrapper (tp->QueryObject (),
 							 collide_system, mesh);
 	  cw->SetName (tp->QueryObject ()->GetName());
 	  cw->DecRef ();
@@ -1189,7 +1189,7 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
       mesh = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
       if (mesh)
       {
-	csColliderWrapper *cw = new csColliderWrapper (sp->QueryObject (), 
+	csColliderWrapper *cw = new csColliderWrapper (sp->QueryObject (),
 						       collide_system, mesh);
 	cw->SetName (sp->QueryObject ()->GetName());
 	cw->DecRef ();
@@ -1696,7 +1696,7 @@ int main (int argc, char* argv[])
 
   extern void CreateSystem(void);
   CreateSystem();
-  
+
   // Initialize the main system. This will load all needed plugins
   // (3D, 2D, network, sound, ..., engine) and initialize them.
   if (!Sys->Initialize (argc, argv, "/config/walktest.cfg"))

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -45,7 +45,7 @@ csGenerateImageTextureBlend::~csGenerateImageTextureBlend()
   }
 }
 
-void csGenerateImageTextureBlend::AddLayer(float value, 
+void csGenerateImageTextureBlend::AddLayer(float value,
   csGenerateImageTexture *tex)
 {
   /// find a spot
@@ -88,7 +88,7 @@ void csGenerateImageTextureBlend::AddLayer(float value,
   }
 }
 
-void csGenerateImageTextureBlend::GetColor(csColor &col, 
+void csGenerateImageTextureBlend::GetColor(csColor &col,
   float x, float y)
 {
   /// get height
@@ -190,7 +190,7 @@ void csGenerateImageTextureSingle::ComputeLayerColor(
   csColor col1, col2; /// left & right linear interpolation
   int x = QInt(imagepos.x);
   int y = QInt(imagepos.y);
-  
+
   //GetImagePixel(layer->image, x, y, pix);
   //col1.Set(pix.red, pix.green, pix.blue);
   //return col1;
@@ -227,7 +227,7 @@ void csGenerateImageTextureSingle::ComputeLayerColor(
   col *= 1./255.;
 }
 
-void csGenerateImageTextureSingle::GetColor(csColor &col, 
+void csGenerateImageTextureSingle::GetColor(csColor &col,
   float x, float y)
 {
   ComputeLayerColor(csVector2(x,y), col);
@@ -250,13 +250,13 @@ csGenerateImage::~csGenerateImage()
   if(tex) delete tex;
 }
 
-iImage *csGenerateImage::Generate(int totalw, int totalh, 
+iImage *csGenerateImage::Generate(int totalw, int totalh,
   int startx, int starty, int partw, int parth)
 {
   csImageMemory *csim = new csImageMemory(partw, parth);
   csim->Clear(csRGBpixel (128, 128, 128));
   iImage *result = csim;
-  
+
   csVector2 pixelsize( 1./float(totalw), 1./float(totalh) );
   csVector2 startpos(float(startx) * pixelsize.x, float(starty)*pixelsize.y);
   csVector2 pos;
@@ -274,7 +274,7 @@ iImage *csGenerateImage::Generate(int totalw, int totalh,
       /// compute color
       tex->GetColor(col, pos.x, pos.y);
       pix.Set(QInt(col.red*255.),QInt(col.green*255.),QInt(col.blue*255.));
-      //if(x==0)printf("Set pixel %3d, %3d to %3d %3d %3d\n", x, y, 
+      //if(x==0)printf("Set pixel %3d, %3d to %3d %3d %3d\n", x, y,
         //col.red, col.green, col.blue);
       /// set pixel
       *destpix = pix;

@@ -46,7 +46,7 @@ Server blocks will wait for a client connection and display the clients data.
 The protocol should be something like this.
 
 
-client 
+client
 When receive: "SEND <State stateNumber>"
 Send: "STARTSTATE<int stateNumber><States currentState>ENDSTATE"
 
@@ -54,11 +54,11 @@ Server
 When receive: "STARTSTATE<int stateNumber><States currentState>ENDSTATE"
 Send: "SEND <State stateNumber+1>"
 
-"BYE"  other blocks quits. 
+"BYE"  other blocks quits.
 
 
 Server: is the one that is the MASTER!!!  it controls everything.
-Client: Is subserviant to the master.  Displays the servers game on its 
+Client: Is subserviant to the master.  Displays the servers game on its
         display.
 
 
@@ -66,8 +66,8 @@ Client: Is subserviant to the master.  Displays the servers game on its
 
 
 
-Figure out how we are going to decide who is server, or client.  Some sort of 
-negotiation would be the best.  But having people decide by themselves would 
+Figure out how we are going to decide who is server, or client.  Some sort of
+negotiation would be the best.  But having people decide by themselves would
 be easier.
 
 
@@ -144,7 +144,7 @@ DONE
  -------------------------------------------
  | Third part - Move the relevant game play options to a seperate class.
 
-All the things which determine what sort of game everyone is having. 
+All the things which determine what sort of game everyone is having.
 
 list of things to be moved:
 

@@ -1,17 +1,17 @@
 /*
     Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 2000 by Samuel Humphreys
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -53,7 +53,7 @@ SCF_IMPLEMENT_IBASE_END;
 struct txt_handles
 {
   txt_handles (iTextureHandle *soft, iTextureHandle *ogl)
-  { 
+  {
     (soft_txt = soft)->IncRef ();
     (ogl_txt = ogl)->IncRef ();
   }
@@ -102,16 +102,16 @@ class TxtHandleVector : public csVector
   iTextureManager* soft_man;
 public:
   // Constructor
-  TxtHandleVector (iObjectRegistry *objreg, iTextureManager *stm) 
+  TxtHandleVector (iObjectRegistry *objreg, iTextureManager *stm)
     : csVector (8, 8), object_reg (objreg), soft_man (stm)
   {
     plugin_mgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
     soft_man->IncRef ();
-  }; 
+  };
   // Destructor
-  virtual ~TxtHandleVector () 
-  { 
-    DeleteAll (); 
+  virtual ~TxtHandleVector ()
+  {
+    DeleteAll ();
     SCF_DEC_REF (soft_man);
     SCF_DEC_REF (plugin_mgr);
   }
@@ -138,13 +138,13 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
 
   int flags = txtmm->GetFlags ();
 #ifdef CS_DEBUG
-  if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) 
+  if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
   {
     printf ("Big Error, attempting to register and prepare a procedural texture with the software Opengl texture vector\n");
   }
 #endif
   // image gets a DecRef() in the software texture manager if procedural texture
-  // flags are not set. 
+  // flags are not set.
   iTextureHandle *hstxt = soft_man->RegisterTexture (image, flags);
   // deal with key colours..
   if (ogl_txt->GetKeyColor ())
@@ -160,7 +160,7 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
   return hstxt;
 }
 
-void TxtHandleVector::AddTextureHandles (iTextureHandle *soft, 
+void TxtHandleVector::AddTextureHandles (iTextureHandle *soft,
 					 iTextureHandle *ogl)
 {
   Push (new txt_handles (soft, ogl));
@@ -169,10 +169,10 @@ void TxtHandleVector::AddTextureHandles (iTextureHandle *soft,
 //-----------------------------------------------------------------------------
 
 csOpenGLProcSoftware::csOpenGLProcSoftware (iBase * pParent)
-{ 
+{
   SCF_CONSTRUCT_IBASE (pParent);
-  tex = NULL; 
-  g3d = NULL; 
+  tex = NULL;
+  g3d = NULL;
   isoft_proc = NULL;
   parent_g3d = NULL;
   alone_mode = true;
@@ -230,7 +230,7 @@ bool csOpenGLProcSoftware::Prepare(
   csTextureHandleOpenGL *tex,
   csPixelFormat *ipfmt,
   void *buffer,bool alone_hint)
-{ 
+{
   // We generate a 32 bit pfmt taking into account endianness and whether
   // frame buffer is RGB or BGR...there must be a better way...
 
@@ -289,7 +289,7 @@ bool csOpenGLProcSoftware::Prepare(
 
   // Get an instance of the software procedural texture renderer
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager);
-  iGraphics3D *soft_proc_g3d = CS_LOAD_PLUGIN (plugin_mgr, 
+  iGraphics3D *soft_proc_g3d = CS_LOAD_PLUGIN (plugin_mgr,
     "crystalspace.graphics3d.software.offscreen", iGraphics3D);
   if (!soft_proc_g3d)
   {
@@ -312,12 +312,12 @@ bool csOpenGLProcSoftware::Prepare(
   }
 
   // temporarily assign parent_g3d as g3d so that the software 3d driver
-  // can get the 2d software procedural texture driver from the opengl 2d 
+  // can get the 2d software procedural texture driver from the opengl 2d
   // driver.
   //    g3d = parent_g3d;
 
-  iTextureHandle *soft_proc_tex = isoft_proc->CreateOffScreenRenderer 
-    ((iGraphics3D*) parent_g3d, head_soft_tex ? head_soft_tex->g3d : NULL, 
+  iTextureHandle *soft_proc_tex = isoft_proc->CreateOffScreenRenderer
+    ((iGraphics3D*) parent_g3d, head_soft_tex ? head_soft_tex->g3d : NULL,
      width, height, buffer, &pfmt, tex->GetFlags());
 
   if (!soft_proc_tex)
@@ -367,7 +367,7 @@ void csOpenGLProcSoftware::Print (csRect *area)
   glDisable (GL_ALPHA_TEST);
 
   g3d->Print (area);
-  
+
   csTxtCacheData *tex_data = (csTxtCacheData*) tex->GetCacheData();
   if (tex_data)
   {
@@ -385,8 +385,8 @@ void csOpenGLProcSoftware::Print (csRect *area)
 }
 
 iGraphics2D *csOpenGLProcSoftware::GetDriver2D ()
-{ 
-  return dummy_g2d; 
+{
+  return dummy_g2d;
 }
 
 bool csOpenGLProcSoftware::BeginDraw (int DrawFlags)
@@ -438,12 +438,12 @@ void csOpenGLProcSoftware::DrawPolygonDebug (G3DPolygonDP& poly)
 }
 
 void csOpenGLProcSoftware::DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color)
-{ 
-  g3d->DrawLine (v1, v2, fov, color); 
+{
+  g3d->DrawLine (v1, v2, fov, color);
 }
 
 void csOpenGLProcSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
-{ 
+{
   dummyMaterial dmat;
   iMaterialHandle* old_handle = poly.mat_handle;
   poly.mat_handle = &dmat;
@@ -472,7 +472,7 @@ void csOpenGLProcSoftware::DrawTriangleMesh (G3DTriangleMesh& mesh)
 }
 
 void csOpenGLProcSoftware::DrawPolygonMesh (G3DPolygonMesh& mesh)
-{ 
+{
   iPolygonBuffer* pb = mesh.polybuf;
   iMaterialHandle** old_materials = new iMaterialHandle* [
   	pb->GetMaterialCount ()];
@@ -501,116 +501,116 @@ void csOpenGLProcSoftware::DrawPolygonMesh (G3DPolygonMesh& mesh)
 }
 
 void csOpenGLProcSoftware::OpenFogObject (CS_ID id, csFog* fog)
-{ 
-  g3d->OpenFogObject (id, fog); 
+{
+  g3d->OpenFogObject (id, fog);
 }
 
 void csOpenGLProcSoftware::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype)
-{ 
+{
   g3d->DrawFogPolygon (id, poly, fogtype);
 }
 
 void csOpenGLProcSoftware::CloseFogObject (CS_ID id)
-{ 
-  g3d->CloseFogObject (id); 
+{
+  g3d->CloseFogObject (id);
 }
 
 bool csOpenGLProcSoftware::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
-{ 
-  return g3d->SetRenderState (op, val); 
+{
+  return g3d->SetRenderState (op, val);
 }
 
 long csOpenGLProcSoftware::GetRenderState (G3D_RENDERSTATEOPTION op)
-{ 
-  return g3d->GetRenderState (op); 
+{
+  return g3d->GetRenderState (op);
 }
 
 csGraphics3DCaps *csOpenGLProcSoftware::GetCaps ()
-{ 
-  return g3d->GetCaps (); 
+{
+  return g3d->GetCaps ();
 }
 
 uint32 *csOpenGLProcSoftware::GetZBuffAt (int x, int y)
-{ 
-  return g3d->GetZBuffAt (x, y); 
+{
+  return g3d->GetZBuffAt (x, y);
 }
 
 float csOpenGLProcSoftware::GetZBuffValue (int x, int y)
-{ 
-  return g3d->GetZBuffValue (x, y); 
+{
+  return g3d->GetZBuffValue (x, y);
 }
 
 void csOpenGLProcSoftware::DumpCache ()
-{ 
-  g3d->DumpCache (); 
+{
+  g3d->DumpCache ();
 }
 
 void csOpenGLProcSoftware::ClearCache ()
-{ 
-  g3d->ClearCache (); 
+{
+  g3d->ClearCache ();
 }
 
 void csOpenGLProcSoftware::RemoveFromCache (iPolygonTexture* poly_texture)
-{ 
-  g3d->RemoveFromCache (poly_texture); 
+{
+  g3d->RemoveFromCache (poly_texture);
 }
 
 void csOpenGLProcSoftware::SetPerspectiveCenter (int x, int y)
-{ 
-  g3d->SetPerspectiveCenter (x, y); 
+{
+  g3d->SetPerspectiveCenter (x, y);
 }
 
 void csOpenGLProcSoftware::GetPerspectiveCenter (int& x, int& y)
-{ 
-  g3d->GetPerspectiveCenter (x, y); 
+{
+  g3d->GetPerspectiveCenter (x, y);
 }
 
 void csOpenGLProcSoftware::SetPerspectiveAspect (float aspect)
-{ 
-  g3d->SetPerspectiveAspect (aspect); 
+{
+  g3d->SetPerspectiveAspect (aspect);
 }
 
 float csOpenGLProcSoftware::GetPerspectiveAspect ()
-{ 
+{
   return g3d->GetPerspectiveAspect ();
 }
 
 void csOpenGLProcSoftware::SetObjectToCamera (csReversibleTransform* o2c)
-{ 
-  g3d->SetObjectToCamera (o2c); 
+{
+  g3d->SetObjectToCamera (o2c);
 }
 
 const csReversibleTransform& csOpenGLProcSoftware::GetObjectToCamera ()
-{ 
-  return g3d->GetObjectToCamera (); 
+{
+  return g3d->GetObjectToCamera ();
 }
 
 // Here we return the main opengl texture manager as all textures are originally
 // registered here.
 iTextureManager *csOpenGLProcSoftware::GetTextureManager ()
-{ 
-  return parent_g3d->GetTextureManager (); 
+{
+  return parent_g3d->GetTextureManager ();
 }
 
 iVertexBufferManager *csOpenGLProcSoftware::GetVertexBufferManager ()
-{ 
-  return parent_g3d->GetVertexBufferManager (); 
+{
+  return parent_g3d->GetVertexBufferManager ();
 }
 
-iHalo *csOpenGLProcSoftware::CreateHalo (float iR, float iG, float iB, 
+iHalo *csOpenGLProcSoftware::CreateHalo (float iR, float iG, float iB,
 	                         unsigned char *iAlpha, int iWidth, int iHeight)
-{ 
-  return g3d->CreateHalo (iR, iG, iB, iAlpha, iWidth, iHeight); 
+{
+  return g3d->CreateHalo (iR, iG, iB, iAlpha, iWidth, iHeight);
 }
 
-void csOpenGLProcSoftware::DrawPixmap (iTextureHandle *hTex, int sx, 
+void csOpenGLProcSoftware::DrawPixmap (iTextureHandle *hTex, int sx,
   int sy, int sw, int sh,int tx, int ty, int tw, int th, uint8 Alpha)
-{ 
+{
   iTextureHandle *soft_txt_handle;
   int idx = txts_vector->FindKey ((void*)hTex);
   if (idx == -1) // @@@ grow grow grow
     soft_txt_handle = txts_vector->RegisterAndPrepare (hTex);
   else
     soft_txt_handle = (iTextureHandle*)txts_vector->Get (idx)->soft_txt;
-  g3d->DrawPixmap (soft_txt_handle, sx, sy, sw, sh, tx, ty, tw, th, Alpha); 
+  g3d->DrawPixmap (soft_txt_handle, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }

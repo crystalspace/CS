@@ -48,7 +48,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: uninstexe uninstexeclean
 
-all apps: uninstexe 
+all apps: uninstexe
 uninstexe: $(OUTDIRS) $(UNINSTEXE.EXE)
 clean: uninstexeclean
 

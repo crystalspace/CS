@@ -101,7 +101,7 @@ public:
   void Close();
   virtual csNetworkDriverCapabilities GetCapabilities() const;
   virtual csNetworkDriverError GetLastError () const { return LastError; }
-    
+
   /**
    * The target should be a <host,port#> tuple.  It should be a string
    * containing: "host:port#" (ie. "localhost:888").  Host can be an IP

@@ -42,20 +42,20 @@ public:
 
   csGraphics2DOpenGL(iBase *iParent);
   virtual ~csGraphics2DOpenGL(void);
-  
+
   virtual bool Open ();
   virtual void Close ();
 
   void Report (int severity, const char* msg, ...);
-  
+
   virtual bool Initialize(iObjectRegistry *object_reg);
 
   virtual void Print (csRect *area = NULL);
-  
+
   virtual void SetRGB(int i, int r, int g, int b);
- 
+
   virtual HRESULT SetColorPalette();
-  
+
   virtual bool SetMouseCursor (csMouseCursorID iShape);
   virtual bool SetMousePosition (int x, int y);
 
@@ -77,20 +77,20 @@ public:
   } scfiOpenGLInterface;
 
 protected:
-  
+
   HDC hDC;
   HGLRC hGLRC;
   HWND m_hWnd;
   HINSTANCE  m_hInstance;
   int m_nCmdShow;
-  
+
   iWin32Assistant* m_piWin32Assistant;
 
   bool m_bPalettized;
   bool m_bPaletteChanged;
 
   bool m_bHardwareCursor;
-  
+
   HRESULT RestoreAll();
   unsigned char *LockBackBuf();
 };

@@ -63,14 +63,14 @@ public:
   virtual int bits_per_sample() const = 0;
   virtual int bytes_per_pixel() const = 0;
   virtual int palette_entries() const = 0;
-  
+
   virtual int red_mask() const = 0;
   virtual int green_mask() const = 0;
   virtual int blue_mask() const = 0;
-  
+
   virtual unsigned char* get_raw_buffer() const = 0;
   virtual unsigned char* get_cooked_buffer() const = 0;
-  
+
   virtual void cook() = 0;
 };
 

@@ -8,19 +8,19 @@
 using namespace Arts;
 #define EPSILON 0.000001
 
-csSoundSource_impl::csSoundSource_impl () 
+csSoundSource_impl::csSoundSource_impl ()
 {
   pos = 0;
   leftsrc = rightsrc = NULL;
   bLoop = false;
 }
 
-csSoundSource_impl::~csSoundSource_impl () 
+csSoundSource_impl::~csSoundSource_impl ()
 {
   free (leftsrc);
   free (rightsrc);
 }
-  
+
 void csSoundSource_impl::calculateBlock (unsigned long samples)
 {
   unsigned long i, to = myMin(data.size()-2*pos, 2*samples) / 2;
@@ -35,7 +35,7 @@ void csSoundSource_impl::calculateBlock (unsigned long samples)
   if (bLoop && pos*2 == data.size ())
     pos = 0;
 }
-  
+
 std::vector<float> * csSoundSource_impl::Data()
 {
   return &data;
@@ -55,13 +55,13 @@ void csSoundSource_impl::Data(const std::vector<float>& newValue)
   short *from = (short *)malloc (data.size () * sizeof(short));
   for (unsigned long i=0; i < data.size (); i++)
     from [i] = (short) data[i];
-  
+
   free (leftsrc);
   free (rightsrc);
   leftsrc = (float *)malloc (sizeof(float) * data.size () / 2 );
   rightsrc = (float *)malloc (sizeof(float) * data.size () / 2);
-  uni_convert_stereo_2float ( data.size()/2, 
-			      (unsigned char*)from, 
+  uni_convert_stereo_2float ( data.size()/2,
+			      (unsigned char*)from,
 			      data.size () * sizeof(short),
 			      2,
 			      16,
@@ -89,21 +89,21 @@ void cs3DEffect_impl::recalcVolume ()
 
     if (recalc < 2)
     {
-      if (mode == SOUND3D_DISABLE) 
+      if (mode == SOUND3D_DISABLE)
       {
 	volRight = volLeft = 1.0;
 	recalc = 4;
 	return;
       }
-      if (mode == SOUND3D_RELATIVE) 
+      if (mode == SOUND3D_RELATIVE)
       {
 	// position of the sound is relative to the listener, so we simply
 	// place the listener at (0,0,0) with front (0,0,1) and top (0,1,0)
 	EarLy = EarLz = EarRy = EarRz = 0.0f;
 	EarRx = headSize;
 	EarLx = -EarRx;
-      } 
-      else 
+      }
+      else
       {
 	// calculate the 'left' vector: left = upVector x frontVector
 	float leftX, leftY, leftZ, n;
@@ -111,20 +111,20 @@ void cs3DEffect_impl::recalcVolume ()
 	leftY = upZ*frontX-upX*frontZ;
 	leftZ = upX*frontY-upY*frontX;
 
-	if ( (n=Norm (leftX, leftY, leftZ))<EPSILON) 
+	if ( (n=Norm (leftX, leftY, leftZ))<EPSILON)
 	{
 	  // user has supplied bad front and top vectors
 	  volRight = volLeft = 0.0f;
 	  recalc = 4;
 	  return;
-	} 
-	else 
+	}
+	else
 	{
 	  leftX /=n;
 	  leftY /=n;
 	  leftZ /=n;
 	}
-    
+
 	// calculate ear position
 	EarLx=leftX*headSize;
 	EarLy=leftY*headSize;
@@ -174,7 +174,7 @@ csSoundModule_impl::csSoundModule_impl ()
 {
   bOK = true;
   bPlaying = false;
-  
+
   // create the object we'll need
   server = Arts::Reference ("global:Arts_SimpleSoundServer");
   if (server.isNull ())
@@ -236,7 +236,7 @@ void csSoundModule_impl::SetHeadSize (float headSize)
     effect.SetHeadSize (headSize);
 }
 
-void csSoundModule_impl::SetOrientation (float upX, float upY, float upZ, 
+void csSoundModule_impl::SetOrientation (float upX, float upY, float upZ,
 					 float frontX, float frontY, float frontZ)
 {
   if (bOK)

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998,2000 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -29,7 +29,7 @@
 
 csTicks csGetTicks ()
 {
-  //03/20/1999 Thomas Hieber: completely redone to get true Millisecond 
+  //03/20/1999 Thomas Hieber: completely redone to get true Millisecond
   //accuracy instead of very rough ticks. This routine will also provide
   //correct wrap around at the end of "long"
 #if defined(__CYGWIN32__)
@@ -41,7 +41,7 @@ csTicks csGetTicks ()
   static __int64 LastRest  = 0;
   static long    LastTime  = 0;
 
-  //Freq was set to -1, if the current Hardware does not support 
+  //Freq was set to -1, if the current Hardware does not support
   //high resolution timers. We will use GetTickCount instead then.
   if (Freq < 0)
   {
@@ -63,7 +63,7 @@ csTicks csGetTicks ()
   //retrieve current count
   __int64 Count = 0;
   QueryPerformanceCounter((LARGE_INTEGER*)&Count);
-  
+
   //calculate the time passed since last call, and add the rest of
   //those tics that didn't make it into the last reported time.
   __int64 Delta = 1000*(Count-LastCount)+LastRest;
@@ -72,7 +72,7 @@ csTicks csGetTicks ()
   LastRest  = Delta%Freq;         //save those ticks not being counted
   LastCount = Count;              //save last count
 
-  return LastTime; //return a high quality measurement of time. 
+  return LastTime; //return a high quality measurement of time.
 }
 
 void csSleep (int SleepTime)

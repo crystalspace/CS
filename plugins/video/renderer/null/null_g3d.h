@@ -203,7 +203,7 @@ public:
   /// Get world to camera transformation.
   virtual const csReversibleTransform& GetObjectToCamera ()
   { return o2c; }
- 
+
   /// Set optional clipper.
   virtual void SetClipper (iClipper2D*, int) { }
   /// Get clipper.

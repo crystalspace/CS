@@ -105,7 +105,7 @@ bool csRadElement::DeltaIsZero(int suv, int w, int h)
   return true;
 }
 
-void csRadElement::GetTextureColour(int suv, int w, int h, csColor &avg, 
+void csRadElement::GetTextureColour(int suv, int w, int h, csColor &avg,
                                     csRGBMap *texturemap)
 {
   /// Note that the texturemap must be width * height in size
@@ -256,21 +256,21 @@ csRGBMap * csRadElement::ComputeTextureLumelSized()
 
   if(mathandle == NULL) // no material: flatcol is enough.
     return map;
-  
+
   int transr=0, transg=0, transb=0; // transparent color
-  
+
   csMaterial* mat = (csMaterial*)mathandle->GetMaterial ();
   iTextureWrapper* txthandle = mat->GetTextureWrapper ();
   txthandle->GetKeyColor(transr, transg, transb);
-  
+
   iImage *txtimage = txthandle->GetImageFile();
-  iImage *rgbimage = txtimage->Clone(); 
-  
+  iImage *rgbimage = txtimage->Clone();
+
   rgbimage->SetFormat(CS_IMGFMT_TRUECOLOR); // get rgb
-  
+
   int txtw = rgbimage->GetWidth();
   int txth = rgbimage->GetHeight();
-  
+
   csRGBpixel *rgb = (csRGBpixel *) rgbimage->GetImageData();
 
   int lightcell_size = csLightMap::lightcell_size;
@@ -330,9 +330,9 @@ csVector3 csRadElement::GetAvgNormal() const
 {
   /// @@@ This is definately not an accurate or effecient way to calculate
   /// @@@ the average normal value.  What is?
-  
+
   csVector3 avg(0,0,0);
-  
+
   // sum every normal in _uv2Normal
   int i, j;
   for(i=0; i < width; i++)
@@ -351,13 +351,13 @@ csVector3 csRadElement::GetAvgNormal() const
 
 
 csRadElement* csRadElement::GetRadElement(csPolygon3D &object)
-{ 
+{
   // we are attached to the original polygon as a child.
   return CS_GET_CHILD_OBJECT_FAST (&object, csRadPoly);
 }
 
 csRadElement* csRadElement::GetRadElement(csCurve &object)
-{ 
+{
   // we are attached to the original curve as a child.
   return CS_GET_CHILD_OBJECT_FAST (&object, csRadCurve);
 }
@@ -396,13 +396,13 @@ csRadPoly :: csRadPoly(csPolygon3D *original, csSector* sector)
   polygon->ObjAdd(this); // attach to original
   area = original->GetArea();
   total_unshot_light = area;
-  
+
   //lightmap = polygon->GetLightMapInfo()->GetLightMap(); // returns the
   // 'real' lightmap, which includes dynamic lights.
   // but we need the static lightmap
   csmap = polygon->GetLightMapInfo()->GetPolyTex()->GetCSLightMap();
   //  csmap->SetLastFrustumId(0); // id's start at zero again
-  
+
   width = csmap->GetRealWidth();
   height = csmap->GetRealHeight();
   size = csmap->GetSize();
@@ -461,7 +461,7 @@ void csRadPoly::Setup()
   CalcLumel2World(lumel_origin, 0, 0);
   CalcLumel2World(lumel_x_axis, 1, 0);
   CalcLumel2World(lumel_y_axis, 0, 1);
-  one_lumel_area = ABS( csMath3::Area3(lumel_origin, lumel_x_axis, 
+  one_lumel_area = ABS( csMath3::Area3(lumel_origin, lumel_x_axis,
     lumel_y_axis) );
   printf("The one lumel area is %g in size\n", one_lumel_area);
   lumel_x_axis -= lumel_origin;
@@ -494,13 +494,13 @@ csRadCurve :: csRadCurve(csCurve *original, csSector* sector)
   curve = original;
   curve->ObjAdd(this); // attach to original
   total_unshot_light = original->GetArea();
-  
+
   //lightmap = polygon->GetLightMapInfo()->GetLightMap(); // returns the
   // 'real' lightmap, which includes dynamic lights.
   // but we need the static lightmap
   csmap = curve->GetLightMap();
   //  csmap->SetLastFrustumId(0); // id's start at zero again
-  
+
   width = csmap->GetRealWidth();
   height = csmap->GetRealHeight();
   size = csmap->GetSize();
@@ -605,10 +605,10 @@ csRadTree* csRadTree::Delete(csRadElement *e)
       spot = spot->right;
     else spot = spot->left;
   }
-  
+
   if(spot==NULL) // no such element
     return this;
-  
+
   // spot is the element containing p, parent is parent of spot.
   if(parent == NULL) // no parent, this el. contains things.
   {
@@ -649,7 +649,7 @@ csRadTree* csRadTree::Delete(csRadElement *e)
     delete spot;
   }
   else // else! do not do both.
-    if(spot->right == NULL) 
+    if(spot->right == NULL)
   {
     replacement = spot->left;
     spot->left = NULL;
@@ -738,11 +738,11 @@ csRadList :: ~csRadList()
 
 void csRadList :: InsertElement(csRadElement *e)
 {
-  if(!tree) 
+  if(!tree)
   {
     tree = new csRadTree(e, 0, 0);
   }
-  else 
+  else
   {
     tree->Insert(e);
   }
@@ -753,7 +753,7 @@ void csRadList :: InsertElement(csRadElement *e)
 
 void csRadList::DeleteElement(csRadElement *e)
 {
-  if(tree) 
+  if(tree)
   {
     tree = tree->Delete(e);
     num--;
@@ -765,14 +765,14 @@ csRadElement* csRadList :: PopHighest()
 {
   csRadElement *e;
 
-  if(!tree) 
+  if(!tree)
   {
     return NULL;
   }
 
   tree = tree->PopHighest(e);
   num--;
-  
+
   return e;
 }
 
@@ -787,11 +787,11 @@ void csRadList :: Print()
   // for debug purposes
   csEngine::current_engine->Report ("csRadList Print().");
 
-  if (tree) 
+  if (tree)
   {
     tree->TraverseInOrder( print_func );
   }
-  else 
+  else
   {
     csEngine::current_engine->Report ("csRadList empty.");
   }
@@ -837,7 +837,7 @@ csRadiosity :: csRadiosity(csEngine *current_engine, iProgressMeter* meter)
   csPolygon3D* poly;
   while ( (poly = poly_it.Fetch()) != NULL)
   {
-    if( (poly->GetUnsplitPolygon() == NULL) && // only for original polygons 
+    if( (poly->GetUnsplitPolygon() == NULL) && // only for original polygons
 	   // in the list, not the split children also in list.
          poly->GetLightMapInfo() && // only for lightmapped polys
          poly->GetLightMapInfo()->GetPolyTex()->GetCSLightMap())
@@ -856,7 +856,7 @@ csRadiosity :: csRadiosity(csEngine *current_engine, iProgressMeter* meter)
       list->InsertElement(new csRadCurve(curve, curve_it.GetLastSector ()));
     }
   }
-  
+
   /// remove ambient light from maps.
   RemoveAmbient();
   texturemap = 0;
@@ -949,7 +949,7 @@ bool csRadiosity :: DoRadiosityStep (int steps)
     StartFrustum();
     // have shot all from shootrad.
     shoot->CopyAndClearDelta();
-    list->InsertElement(shoot); 
+    list->InsertElement(shoot);
   }
 
   if (steps <= 0)
@@ -993,7 +993,7 @@ void csRadiosity :: DoRadiosity()
     StartFrustum();
     // have shot all from shootrad.
     shoot->CopyAndClearDelta();
-    list->InsertElement(shoot); 
+    list->InsertElement(shoot);
     pulse->Erase();
   }
   ApplyDeltaAndAmbient();
@@ -1013,7 +1013,7 @@ csRadElement* csRadiosity :: FetchNext()
   {
     stop_value = stop_priority;
   }
-  else 
+  else
   {
     stop_value = start_priority / stop_improvement;
   }
@@ -1024,9 +1024,9 @@ csRadElement* csRadiosity :: FetchNext()
   csRadElement* element = list->PopHighest();
 
   float nextpriority = element ? element->GetPriority() : 0.0;
-  
+
   float val = (start_priority - nextpriority ) / start_priority;
-  
+
   if (val < 0.0f)
   {
     val=0.0f;
@@ -1046,7 +1046,7 @@ csRadElement* csRadiosity :: FetchNext()
   // stop varibles
   bool stop_now = false;
   char reason[80];
- 
+
   if (element == NULL)
   {
     stop_now = true;
@@ -1078,9 +1078,9 @@ csRadElement* csRadiosity :: FetchNext()
       }
 
     csEngine::current_engine->Report ("Finished radiosity (%s).", reason);
-    
+
     if(element) list->InsertElement(element); // to prevent memory leak.
-    
+
     return NULL;
   }
 
@@ -1090,7 +1090,7 @@ csRadElement* csRadiosity :: FetchNext()
   }
 
   element->SetLastShootingPriority(nextpriority);
-  
+
   return element;
 }
 
@@ -1129,7 +1129,7 @@ void csRadiosity :: StartFrustum()
   // start from the center of the shooting poly.
   // this will lead to inaccuracy as each lumel of the shooting
   // poly is it's own center. But that is too slow.
-  csVector3 center; 
+  csVector3 center;
 
   // And this leads to sharper shadows as well.
   shoot_src->Lumel2World(center, QInt (shoot_src->GetWidth()/2.0),
@@ -1139,7 +1139,7 @@ void csRadiosity :: StartFrustum()
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
-  
+
   // add a backplane to frustum to clip to it... But which plane?
   //csPlane3 *src_plane = shoot_src->GetPolygon3D()->GetPolyPlane();
   //lview->GetLightFrustum ()->SetBackPlane(* src_plane);
@@ -1240,7 +1240,7 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview,
     //@@@ FIXME csRadiosity *rad = (csRadiosity*)lview->GetUserData ();
     //@@@rad->ProcessDest(dest, lview);
   }
-  
+
   /// portal?
   if (!po) goto stop;
   /// @@@ hope that poly array is big enough
@@ -1250,7 +1250,7 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview,
   else
     for (j = 0 ; j < num_vertices ; j++)
       poly[j] = destpoly3d->Vwor (j) - center;
- 
+
   delete new_ctxt->GetLightFrustum ();
   new_ctxt->SetLightFrustum (old_ctxt->
   	GetLightFrustum ()-> Intersect(poly,num_vertices));
@@ -1265,19 +1265,19 @@ stop:
 
 void csRadiosity :: ProcessDest(csRadElement *dest, csFrustumView *lview)
 {
-  if(shoot_src == dest) return; // different elements required. or we 
+  if(shoot_src == dest) return; // different elements required. or we
     			//might requeue 'shoot', and corrupt the list.
 
   // prepare to send/receive light.
   if(!PrepareShootDest(dest, lview))
   {
-    //@@@ REWRITEdelete shadow_matrix; 
+    //@@@ REWRITEdelete shadow_matrix;
     shadow_matrix = 0;
     return;
   }
 
   ShootRadiosityToElement(dest);
-  //@@@ REWRITE delete shadow_matrix; 
+  //@@@ REWRITE delete shadow_matrix;
   shadow_matrix = 0;
   list->DeleteElement(dest); // get out of tree
   dest->ComputePriority(); // recompute dest's unshot light
@@ -1335,10 +1335,10 @@ void csRadiosity :: ShootRadiosityToElement(csRadElement* dest)
   csRadPoly* rp_dest = (csRadPoly*)dest;
   csEngine::current_engine->Report (
         "Shooting from RadPoly %x (%s in %s sz %d) to %x (%s in %s sz %d).",
-  	(int)shoot_src, rp_src->GetPolygon3D()->GetName(), 
-	rp_src->GetSector()->GetName(), 
-	shoot_src->GetSize(), 
-	(int)dest, rp_dest->GetPolygon3D()->GetName(), 
+  	(int)shoot_src, rp_src->GetPolygon3D()->GetName(),
+	rp_src->GetSector()->GetName(),
+	shoot_src->GetSize(),
+	(int)dest, rp_dest->GetPolygon3D()->GetName(),
 	rp_dest->GetSector()->GetName(), dest->GetSize());
 #endif
 
@@ -1454,7 +1454,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   if( 0 && source_patch_size == 1)
   {
-    /// although this is OK code, 
+    /// although this is OK code,
     /// taking only one normal at short distances is bad.
     /// an average works much better then.
     cossrcangle = src_normal * pathangle;
@@ -1486,22 +1486,22 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
     cosdestangle += - (dest_normal * (dest_lumel - pos).Unit());
     distance += (dest_lumel - pos).SquaredNorm();
 
-    cossrcangle /= 4.0; 
-    cosdestangle /= 4.0; 
-    distance /= 4.0; 
+    cossrcangle /= 4.0;
+    cosdestangle /= 4.0;
+    distance /= 4.0;
   }
 
   float sqdistance = distance;
-  
+
   float totalfactor;
   //// avoid divide by zero
   if (sqdistance < 0.00001f) totalfactor = source_patch_area * visibility;
   else
     // This function calculates radiosity with squared light attenuation
     // what CS uses is linear attenuation in lighting.
-    totalfactor = cossrcangle * cosdestangle * 
+    totalfactor = cossrcangle * cosdestangle *
       source_patch_area * visibility / (sqdistance);
-  
+
   //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
   if(totalfactor < 0.0)
@@ -1515,7 +1515,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
      ||(totalfactor > 10.0f) )
     csEngine::current_engine->Report ("totalfactor %g = "
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
-	"srclumelcolor (%g, %g, %g), deltacolor (%g, %g, %g)\n", 
+	"srclumelcolor (%g, %g, %g), deltacolor (%g, %g, %g)\n",
   	totalfactor, cossrcangle, cosdestangle,
  	source_patch_area, visibility, sqdistance,
 	src_lumel_color.red, src_lumel_color.green, src_lumel_color.blue,
@@ -1523,25 +1523,25 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 #endif
 
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
-  //if(totalfactor > 0.000001) 
+  //if(totalfactor > 0.000001)
     shoot_dest->AddToDelta(ruv, delta_color * totalfactor * 1.);
 
   // specular gloss
   // direction of the 'light' on dest is -path
   // normal at this destlumel is dest_normal
   // viewing direction, below, equal to normal (look at polygon frontally)
-  if(!csRadiosity::do_static_specular) 
+  if(!csRadiosity::do_static_specular)
   {
     return;
   }
- 
+
   // Now we need to correct the cosinus factor so that it
   // really represents a cosinus.
   if(distance < 0.1f) return; // also prevents divide by zero
   float inv_distance = qisqrt (distance);
   path *= inv_distance;
   cosdestangle *= inv_distance;
-  
+
   /// take angle as positive
   if(cosdestangle<0.0)cosdestangle=-cosdestangle;
 
@@ -1549,22 +1549,22 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   csVector3 reflectdir =
     (2.0f * dest_normal * (cosdestangle) - path) * dest_normal;
- 
+
   double val = ( reflectdir * viewdir );
-  
+
   if(val<0.0) val=-val;
   if(val<SMALL_EPSILON) return;
-  
-  if (val>1.0) 
+
+  if (val>1.0)
     val=1.0;
   //alternative specular computation
   //csVector3 halfdir = (-path + viewdir);
   //halfdir.Normalize();
   //double val = ABS( halfdir * dest_normal );
   //float gloss = spec_amt * pow(val, spec_tightness);
-  float gloss = static_specular_amount * 
+  float gloss = static_specular_amount *
     FastPow2(val, static_specular_tightness);
-  
+
   // add delta using both gloss and totalfactor
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss*totalfactor,
   //  src_lumel_color);
@@ -1592,7 +1592,7 @@ static void calc_ambient_func(csRadElement *p)
 
   total_area += this_area;
   total_reflect += p->GetDiffuse() * this_area;
-  
+
   float red, green, blue;
   p->GetDeltaSums(red, green, blue);
 
@@ -1604,15 +1604,15 @@ static void calc_ambient_func(csRadElement *p)
 /// add the ambient sec, without * diffuse it.
 static void add_ambient_sec_func(csRadElement *p)
 {
-  p->ApplyAmbient(QRound((float)total_delta_color_red), 
-    QRound((float)total_delta_color_green), 
+  p->ApplyAmbient(QRound((float)total_delta_color_red),
+    QRound((float)total_delta_color_green),
     QRound((float)total_delta_color_blue));
 }
 
 static void apply_ambient_func(csRadElement *p)
 {
-  p->ApplyAmbient(QRound((float)total_delta_color_red * p->GetDiffuse()), 
-    QRound((float)total_delta_color_green * p->GetDiffuse()), 
+  p->ApplyAmbient(QRound((float)total_delta_color_red * p->GetDiffuse()),
+    QRound((float)total_delta_color_green * p->GetDiffuse()),
     QRound((float)total_delta_color_blue * p->GetDiffuse()));
 }
 
@@ -1641,14 +1641,14 @@ void csRadiosity :: ApplyDeltaAndAmbient()
   list->Traverse(calc_ambient_func);
 
   total_reflect /= total_area;
-  
+
   /// the usual formula - 1.0
   /// subtraction, as the deltamaps will already get added directly.
   /// thus the 1.0, immediate path to the polygon is already added.
   total_reflect = 1.0 / (1.0 - total_reflect) - 1.0;
-  
+
   float mult = total_reflect / total_area;
-  
+
   total_delta_color_red *= mult;
   total_delta_color_green *= mult;
   total_delta_color_blue *= mult;

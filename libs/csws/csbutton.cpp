@@ -79,10 +79,10 @@ void csButton::GetFrameBitmaps(csPixmap **iNormal, csPixmap **iPressed, csPixmap
 {
   if (iNormal)
   	*iNormal = FrameNormal;
-  	
+
   if (iPressed)
   	*iPressed = FramePressed;
-  	
+
   if (iHighlighted)
   	*iHighlighted = FrameHighlighted;
 }
@@ -90,37 +90,37 @@ void csButton::GetFrameBitmaps(csPixmap **iNormal, csPixmap **iPressed, csPixmap
 void csButton::SetFrameBitmaps(csPixmap *iNormal, csPixmap *iPressed, csPixmap *iHighlighted, bool iDelete)
 {
 	FreeFrameBitmaps();
-	
+
 	FrameNormal = iNormal;
 	if (iPressed)
 		FramePressed = iPressed;
 	else
 		FramePressed = iNormal;
-		
+
 	if (iHighlighted)
 		FrameHighlighted = iHighlighted;
 	else
 		FrameHighlighted = iNormal;
-		
+
 	delFrameImages = iDelete;
-	
+
 	Invalidate();
 }
 
 void csButton::SetButtonTexture(csPixmap *iNormal, csPixmap *iPressed, bool iDelete)
 {
 	FreeFrameBitmaps();
-	
+
 	FrameNormal = iNormal;
 	if (iPressed)
 		FramePressed = iPressed;
 	else
 		FramePressed = iNormal;
-		
+
 	FrameHighlighted = NULL;
-		
+
 	delFrameImages = iDelete;
-	
+
 	Invalidate();
 }
 
@@ -135,12 +135,12 @@ void csButton::SetTextureOrigin(int iOrgX, int iOrgY)
  TexOrgY = iOrgY;
 }
 
-void 
+void
 csButton::GetTextureOrigin(int *iOrgX, int *iOrgY)
 {
  if (iOrgX)
  	*iOrgX = TexOrgX;
- 	
+
  if (iOrgY)
  	*iOrgY = TexOrgY;
 }
@@ -165,14 +165,14 @@ void csButton::FreeFrameBitmaps ()
   {
   	if (FramePressed && FramePressed != FrameNormal)
       delete FramePressed;
-      
+
    	if (FrameHighlighted && FrameHighlighted != FrameNormal)
       delete FrameHighlighted;
 
     if (FrameNormal)
       delete FrameNormal;
   } /* endif */
-      
+
   delFrameImages = false;
   FrameNormal = NULL;
   FramePressed = NULL;
@@ -263,7 +263,7 @@ bool csButton::HandleEvent (iEvent &Event)
         return true;
       }
       break;
-      
+
     case csevMouseMove:
       if ((app->MouseOwner == this)
        && !(ButtonStyle & CSBS_MULTICHOOSE))
@@ -275,21 +275,21 @@ bool csButton::HandleEvent (iEvent &Event)
       } /* endif */
       return true;
       break;
-      
+
     case csevMouseEnter:
       Highlighted=true;
       if (GetState(CSS_TRANSPARENT))  	   parent->Invalidate(true);
       Invalidate();
     return true;
     break;
-    	
+
     case csevMouseExit:
       Highlighted=false;
       if (GetState(CSS_TRANSPARENT)) 	   parent->Invalidate(true);
       Invalidate();
     return true;
     break;
-    	
+
     case csevKeyDown:
       return HandleKeyPress (Event);
     case csevKeyUp:
@@ -371,12 +371,12 @@ void csButton::SetPressed (bool state)
   {
     parent->SendCommand (Pressed ? cscmdButtonDown : cscmdButtonUp,
       (void *)this);
-   
+
     if (GetState(CSS_TRANSPARENT)) parent->Invalidate(true);
-      
+
   }
-      
-      
+
+
 
   Invalidate ();
 }

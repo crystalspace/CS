@@ -80,7 +80,7 @@
   }
 
 /**
- * This is a macro that will declare a growable array variable that is able to 
+ * This is a macro that will declare a growable array variable that is able to
  * contain a number of elements of given type.<p>
  * Methods:
  * <ul>
@@ -104,9 +104,9 @@
 /**
  * Same as TYPEDEF_GROWING_ARRAY but contains additionally an reference
  * counter, so that the object can be shared among different clients.
- * If you do an IncRef each time you make use of it and an DecRef when you're 
- * done, the array will be automatically freed when there are no more 
- * references to it.<p> 
+ * If you do an IncRef each time you make use of it and an DecRef when you're
+ * done, the array will be automatically freed when there are no more
+ * references to it.<p>
  * Methods:
  * <ul>
  * <li>void IncRef ()/void DecRef () - Reference counter management

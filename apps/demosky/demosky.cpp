@@ -128,8 +128,8 @@ void Cleanup ()
   csInitializer::DestroyApplication (object_reg);
 }
 
-void DemoSky::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly, 
-  int size, const csVector3& orig, const csVector3& upt, float ulen, 
+void DemoSky::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly,
+  int size, const csVector3& orig, const csVector3& upt, float ulen,
   const csVector3& vpt, float vlen)
 {
   csVector3 texorig = orig;
@@ -263,7 +263,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
 
   // Initialize the texture manager
   txtmgr->ResetPalette ();
-  
+
   // Allocate a uniformly distributed in R,G,B space palette for console
   // The console will crash on some platforms if this isn't initialize properly
   int r,g,b;
@@ -314,7 +314,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (size, -simi, -size));
   p->CreateVertex (csVector3 (-size, -simi, -size));
 
-  SetTexSpace (sky_d, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+  SetTexSpace (sky_d, p, 256, p->GetVertex  (0), p->GetVertex  (1),
 	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
@@ -325,7 +325,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (size, simi, size));
   p->CreateVertex (csVector3 (-size, simi, size));
 
-  SetTexSpace (sky_u, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+  SetTexSpace (sky_u, p, 256, p->GetVertex  (0), p->GetVertex  (1),
 	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
@@ -336,7 +336,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (size, -size, simi));
   p->CreateVertex (csVector3 (-size, -size, simi));
 
-  SetTexSpace (sky_f, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+  SetTexSpace (sky_f, p, 256, p->GetVertex  (0), p->GetVertex  (1),
 	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
@@ -347,7 +347,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (simi, -size, -size));
   p->CreateVertex (csVector3 (simi, -size, size));
 
-  SetTexSpace (sky_r, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+  SetTexSpace (sky_r, p, 256, p->GetVertex  (0), p->GetVertex  (1),
 	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
@@ -358,7 +358,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (-simi, -size, size));
   p->CreateVertex (csVector3 (-simi, -size, -size));
 
-  SetTexSpace (sky_l, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+  SetTexSpace (sky_l, p, 256, p->GetVertex  (0), p->GetVertex  (1),
 	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
@@ -369,7 +369,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (-size, -size, -simi));
   p->CreateVertex (csVector3 (size, -size, -simi));
 
-  SetTexSpace (sky_b, p, 256, p->GetVertex  (0), p->GetVertex  (1), 
+  SetTexSpace (sky_b, p, 256, p->GetVertex  (0), p->GetVertex  (1),
 	       2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
   walls_state->DecRef ();
@@ -433,7 +433,7 @@ void DemoSky::SetupFrame ()
     " Arrow keys/pgup/pgdown to move.";
   int txtx = 10;
   int txty = myG2D->GetHeight() - 20;
-  myG2D->Write(font, txtx+1, txty+1, myG3D->GetTextureManager()->FindRGB(80,80,80), 
+  myG2D->Write(font, txtx+1, txty+1, myG3D->GetTextureManager()->FindRGB(80,80,80),
     -1, text);
   myG2D->Write(font, txtx, txty, myG3D->GetTextureManager()->FindRGB(255,255,255),
     -1, text);
@@ -505,7 +505,7 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
     pos.z -= (float(rand()+1.)/float(RAND_MAX))*20. ;
     spr[i] = engine->CreateMeshWrapper(fact, "Bird", sector, pos);
 
-    iSprite2DState *sprstate = SCF_QUERY_INTERFACE(spr[i]->GetMeshObject(), 
+    iSprite2DState *sprstate = SCF_QUERY_INTERFACE(spr[i]->GetMeshObject(),
       iSprite2DState);
     sprstate->GetVertices().SetLimit(4);
     sprstate->GetVertices().SetLength(4);

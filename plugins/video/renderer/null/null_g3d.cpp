@@ -217,7 +217,7 @@ void csGraphics3DNull::Close()
   texman->Clear ();
   texman->DecRef (); texman = NULL;
   vbufmgr->DecRef (); vbufmgr = NULL;
-  
+
   G2D->Close ();
   width = height = -1;
 }
@@ -238,8 +238,8 @@ void csGraphics3DNull::SetPerspectiveCenter (int x, int y)
 
 bool csGraphics3DNull::BeginDraw (int DrawFlags)
 {
-  if ((G2D->GetWidth() != width) || 
-      (G2D->GetHeight() != height)) 
+  if ((G2D->GetWidth() != width) ||
+      (G2D->GetHeight() != height))
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))

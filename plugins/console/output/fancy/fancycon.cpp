@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -108,14 +108,14 @@ csFancyConsole::~csFancyConsole ()
   if (G2D)
     G2D->DecRef ();
   if (G3D)
-    G3D->DecRef ();    
+    G3D->DecRef ();
   if (base)
     base->DecRef ();
   if (VFS)
     VFS->DecRef ();
 }
 
-bool csFancyConsole::Initialize (iObjectRegistry *object_reg) 
+bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
 {
   csFancyConsole::object_reg = object_reg;
 
@@ -239,7 +239,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
 
   // first draw the background
   // do we draw gouraud/flat or with texture ?
- 
+
   bool with_color = deco.bgnd.mat == NULL;
 
   csRect size (outersize);
@@ -277,7 +277,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
   poly.vertices [2].v = v_stretch;
   poly.vertices [3].u = 0;
   poly.vertices [3].v = v_stretch;
-    
+
   for (i = 0; i < poly.num; i++)
   {
     poly.vertices [i].r = ((float)deco.bgnd.kr) * (1 / 255.0);
@@ -289,7 +289,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
   poly.mat_handle = deco.bgnd.mat;
   if (with_color)
     G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, false);
-  
+
   float alpha = deco.bgnd.do_alpha ? deco.bgnd.alpha : 0.0;
 
   poly.mixmode = CS_FX_SETALPHA (alpha) |
@@ -298,7 +298,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
 
   if (with_color)
     G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, true);
-  
+
   // draw the top left decoration
   DrawBorder (outersize.xmin, height-outersize.ymin, bordersize.xmin,
     bordersize.ymin, deco.border[0], 0);
@@ -323,7 +323,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
   // draw the left decoration
   DrawBorder (outersize.xmin, height-p2size.ymin+deco.p2ty, bordersize.xmin,
     p2size.Height()+deco.p2by+deco.p2ty, deco.border[7], 4);
-  
+
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zBuf);
   G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, btext);
   G3D->SetRenderState (G3DRENDERSTATE_GOURAUDENABLE, bgour);
@@ -342,7 +342,7 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
 
     float u_stretch = 1.0, v_stretch = 1.0;
     int w, h;
-    
+
     border.mat->GetTexture ()->GetMipMapDimensions (0, w, h);
     switch (align)
     {
@@ -365,7 +365,7 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
         w = width;
         break;
     }
-    
+
     if (!border.do_stretch)
     {
       u_stretch = ((float)width) / ((float)w);
@@ -556,7 +556,7 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
   if (border.do_alpha)
     Keyname.Clear() << "FancyConsole." << sect << ".alpha";
     border.alpha = ini->GetFloat (Keyname, 0.0);
-  
+
   if (bgnd)
   {
     int r,g,b;

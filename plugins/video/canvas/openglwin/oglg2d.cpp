@@ -90,16 +90,16 @@ static void SystemFatalError (char *str, HRESULT hRes = S_OK)
   {
     DWORD dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL, hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
-  
+
     if (dwResult != 0)
     {
       szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str) + strlen(szStdMessage) + 1];
       strcpy( szMsg, str );
       strcat( szMsg, szStdMessage );
       strcat( szMsg, (const char*)lpMsgBuf );
-      
+
       LocalFree( lpMsgBuf );
-      
+
       MessageBox (NULL, szMsg, "Fatal Error in glwin32.dll", MB_OK);
       delete szMsg;
 
@@ -108,7 +108,7 @@ static void SystemFatalError (char *str, HRESULT hRes = S_OK)
   }
 
   MessageBox(NULL, str, "Fatal Error in glwin32.dll", MB_OK);
-  
+
   exit(1);
 }
 
@@ -135,7 +135,7 @@ static struct {
   WORD Version;
   WORD NumberOfEntries;
   PALETTEENTRY aEntries[256];
-} SysPalette = 
+} SysPalette =
 {
   0x300,
     256
@@ -145,7 +145,7 @@ static HPALETTE hWndPalette=NULL;
 
 static void ClearSystemPalette()
 {
-  struct 
+  struct
   {
     WORD Version;
     WORD nEntries;
@@ -155,12 +155,12 @@ static void ClearSystemPalette()
     0x300,
       256
   };
-  
+
   HPALETTE BlackPal, OldPal;
   HDC hdc;
-  
+
   int c;
-  
+
   for(c=0; c<256; c++)
   {
     Palette.aEntries[c].peRed = 0;
@@ -168,16 +168,16 @@ static void ClearSystemPalette()
     Palette.aEntries[c].peBlue = 0;
     Palette.aEntries[c].peFlags = PC_NOCOLLAPSE;
   }
-  
+
   hdc = GetDC(NULL);
-  
+
   BlackPal = CreatePalette((LOGPALETTE *)&Palette);
-  
+
   OldPal = SelectPalette(hdc,BlackPal,FALSE);
   RealizePalette(hdc);
   SelectPalette(hdc, OldPal, FALSE);
   DeleteObject(BlackPal);
-  
+
   ReleaseDC(NULL, hdc);
 }
 
@@ -188,18 +188,18 @@ static void CreateIdentityPalette(csRGBpixel *p)
     WORD Version;
     WORD nEntries;
     PALETTEENTRY aEntries[256];
-  } Palette = 
+  } Palette =
   {
     0x300,
       256
   };
-  
+
   if(hWndPalette)
     DeleteObject(hWndPalette);
-  
+
   Palette.aEntries[0].peFlags = 0;
   Palette.aEntries[0].peFlags = 0;
-  
+
   for(i=1; i<255; i++)
   {
     Palette.aEntries[i].peRed = p[i].red;
@@ -207,14 +207,14 @@ static void CreateIdentityPalette(csRGBpixel *p)
     Palette.aEntries[i].peBlue = p[i].blue;
     Palette.aEntries[i].peFlags = PC_RESERVED;
   }
-  
+
   hWndPalette = CreatePalette((LOGPALETTE *)&Palette);
-  
-  if(!hWndPalette) 
+
+  if(!hWndPalette)
     SystemFatalError ("Error creating identity palette.");
 }
 
-csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent) : 
+csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent) :
                    csGraphics2DGLCommon (iParent),
                    m_nGraphicsReady(true),
                    m_hWnd(NULL),
@@ -268,7 +268,7 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
     pfmt.PalEntries = 256;
     pfmt.PixelBytes = 1;
   }
-  
+
   Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"Using %d bits per pixel (%d color mode).", Depth, 1 << Depth);
 
@@ -304,15 +304,15 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
       0,                              /* reserved */
       0, 0, 0                         /* no layer, visible, damage masks */
   };
-  
+
   int pixelFormat;
   pixelFormat = ChoosePixelFormat(hDC, &pfd);
-  
+
   if (pixelFormat == 0)
     SystemFatalError ("ChoosePixelFormat failed.");
   if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE)
     SystemFatalError ("SetPixelFormat failed.");
-    
+
   if (DescribePixelFormat(hDC, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
     SystemFatalError ("DescribePixelFormat failed.");
 }
@@ -374,7 +374,7 @@ bool csGraphics2DOpenGL::Open()
 
   if (FullScreen)
   {
-	  m_hWnd = CreateWindowEx(exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, 
+	  m_hWnd = CreateWindowEx(exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title,
 		WS_POPUP, 0, 0, Width, Height,
 		NULL, NULL, m_hInstance, NULL);
   }
@@ -453,7 +453,7 @@ void csGraphics2DOpenGL::Print (csRect* /*area*/)
 HRESULT csGraphics2DOpenGL::SetColorPalette()
 {
   HRESULT ret = S_OK;
-  
+
   if ((Depth==8) && m_bPaletteChanged)
   {
     m_bPaletteChanged = false;
@@ -462,15 +462,15 @@ HRESULT csGraphics2DOpenGL::SetColorPalette()
     {
       HPALETTE oldPal;
       HDC dc = GetDC(NULL);
-      
+
       SetSystemPaletteUse(dc, SYSPAL_NOSTATIC);
       PostMessage(HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
-      
+
       CreateIdentityPalette(Palette);
       ClearSystemPalette();
-      
+
       oldPal = SelectPalette(dc, hWndPalette, FALSE);
-      
+
       RealizePalette(dc);
       SelectPalette(dc, oldPal, FALSE);
       ReleaseDC(NULL, dc);
@@ -478,7 +478,7 @@ HRESULT csGraphics2DOpenGL::SetColorPalette()
 
     return ret;
   }
-  
+
   return S_OK;
 }
 
@@ -496,7 +496,7 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
     SetCursor(NULL);
     return false;
   }
-	
+
   switch(iShape)
   {
     case csmcNone:     hCursor = NULL; break;
@@ -513,7 +513,7 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
     case csmcWait:     hCursor = LoadCursor (NULL, IDC_WAIT);     break;
     default: hCursor = NULL;		//return false;
   }
-	
+
 	if (hCursor)
 	{
 		SetCursor(hCursor);
@@ -529,7 +529,7 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
 bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
 {
   POINT p;
-  
+
   p.x = x;
   p.y = y;
 
@@ -544,9 +544,9 @@ bool csGraphics2DOpenGL::PerformExtensionV (char const* command, va_list args)
 {
   if (!strcasecmp (command, "configureopengl"))
   {
-    // Ugly hack needed to work around an interference between the 3dfx opengl 
+    // Ugly hack needed to work around an interference between the 3dfx opengl
     // driver on voodoo cards <= 2 and the win32 console window
-    if (GetFullScreen() && config->GetBool("Video.OpenGL.Win32.DisableConsoleWindow", false) ) 
+    if (GetFullScreen() && config->GetBool("Video.OpenGL.Win32.DisableConsoleWindow", false) )
     {
       m_piWin32Assistant->DisableConsole();
       Report (CS_REPORTER_SEVERITY_NOTIFY, "*** Disabled Win32 console window to avoid OpenGL interference.");

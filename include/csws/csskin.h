@@ -265,7 +265,7 @@ public:
   /// Get the identifier of the component this skin slice is for
   virtual const char *GetName ()
   { return "Listbox"; }
-  
+
   /// Suggest the optimal size of the button, given an already filled object
   virtual void SuggestSize (csListBox &This, int &w, int &h) = 0;
 };
@@ -337,7 +337,7 @@ public:
  * After CSWS_SKIN_DECLARE_END you should put either a variable name
  * (e.g. "CSWS_SKIN_DECLARE_END myskin;") or simply a ';' - in the later
  * case you will define just a <b>type</b> called [name], where
- * `name' is the first parameter passed to CSWS_SKIN_DECLARE(), and you will 
+ * `name' is the first parameter passed to CSWS_SKIN_DECLARE(), and you will
  * have to declare somewhere a variable of this type in order to use
  * the skin.
  */

@@ -266,7 +266,7 @@ N2D_PROTO(void,flush)(NeXTDelegateHandle2D handle)
     [[NSCursor arrowCursor] set];
     hideMouse = NO;
   }
-  
+
   if (hideMouse)
     NeXTDriver2D_hide_mouse_pointer(driver);
   else
@@ -282,7 +282,7 @@ N2D_PROTO(int,set_mouse_cursor)
 //-----------------------------------------------------------------------------
 // mouseEntered:
 //-----------------------------------------------------------------------------
-- (void)mouseEntered:(NSEvent*)p 
+- (void)mouseEntered:(NSEvent*)p
 {
   if ([p trackingNumber] == trackingTag)
   {
@@ -296,7 +296,7 @@ N2D_PROTO(int,set_mouse_cursor)
 //-----------------------------------------------------------------------------
 // mouseExited:
 //-----------------------------------------------------------------------------
-- (void)mouseExited:(NSEvent*)p 
+- (void)mouseExited:(NSEvent*)p
 {
   if ([p trackingNumber] == trackingTag)
   {

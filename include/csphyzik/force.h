@@ -32,7 +32,7 @@ class ctForce
 {
 public:
 
-  /// defaults with inertial reference frame 
+  /// defaults with inertial reference frame
   ctForce();
   /// use supplied referece frame
   ctForce( ctReferenceFrame &rf );
@@ -53,7 +53,7 @@ public:
   ctVector3 direction;
   ctVector3 origin;
   ctReferenceFrame &RF;
-	
+
 };
 
 #endif // __CT_FORCE_H__

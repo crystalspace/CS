@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein and K. Robert Bate.
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -75,7 +75,7 @@ void SendODOCToSelf( FSSpec *theFileSpec );
 void SendRDOCToSelf( FSSpec *theFileSpec );
 bool RegisterServer (char *SharedLibraryFilename, csConfigFile *ini, bool Register);
 
-void main ( ) 
+void main ( )
 {
 	Initialize();
 
@@ -135,7 +135,7 @@ void Initialize( void )
 	 */
 	AppleEventHandlerUPP = NewAEEventHandlerProc( AppleEventHandler );
 	if ( AppleEventHandlerUPP )
-		AEInstallEventHandler( typeWildCard, typeWildCard, 
+		AEInstallEventHandler( typeWildCard, typeWildCard,
 							  (AEEventHandlerUPP)AppleEventHandlerUPP, 0, FALSE );
 
 	/*
@@ -182,7 +182,7 @@ void denitialize( void )
 	 *	remove them.
 	 */
 	if ( AppleEventHandlerUPP ) {
-		AERemoveEventHandler( typeWildCard, typeWildCard, 
+		AERemoveEventHandler( typeWildCard, typeWildCard,
 							  (AEEventHandlerUPP)AppleEventHandlerUPP, FALSE );
 		DisposeRoutineDescriptor( AppleEventHandlerUPP );
 		AppleEventHandlerUPP = NULL;
@@ -223,7 +223,7 @@ void HandleEvents( void )
 				break;
 
 			case diskEvt:
-				Point dPt = {100,100};					
+				Point dPt = {100,100};
 				if( HiWord( theEvent.message ) != 0)
 					DIBadMount( dPt, theEvent.message );
 				break;
@@ -249,31 +249,31 @@ void HandleMouseEvent( EventRecord *theEvent )
 	short		partCode;
 	long		menucode;
 	Point		theMouse;
-	
+
 	// find out what part of the screen the mouse was clicked on
-	
+
 	partCode = FindWindow( theEvent->where, &targetWindow );
-	
+
 	switch (partCode)
-	{	
+	{
 		case inDesk:
 			break;
-		
+
 		case inMenuBar:
 			// pull down the menu and track it
 			menucode = MenuSelect( theEvent->where );
-			
-			// handle the user's choice	
+
+			// handle the user's choice
 			if ( HiWord( menucode ))
 				HandleMenuSelection( HiWord(menucode), LoWord(menucode) );
 			HiliteMenu(0);
 
 			break;
-		
+
 		case inSysWindow:
 			SystemClick( theEvent, targetWindow );	// system will handle it (DA window)
 			break;
-	
+
 		case inContent:
 			if ( targetWindow )						// the user clicked in a window
 			{
@@ -291,7 +291,7 @@ void HandleMouseEvent( EventRecord *theEvent )
 			InsetRect( &r, 4, 4 );
 			DragWindow( targetWindow, theEvent->where, &r );
 			break;
-		
+
 		case inGrow:
 		{
 			// the user wants to resize the window
@@ -313,16 +313,16 @@ void HandleMouseEvent( EventRecord *theEvent )
 			if( TrackGoAway( targetWindow, theEvent->where ))
 			{
 				// if the user clicks in the go-away box, the application will be shutdown.
-				
+
 				Shutdown = true;
 			}
 			break;
-		
+
 		case inZoomIn:
 		case inZoomOut:
 			if( TrackBox( targetWindow, theEvent->where, partCode ))
 			{
-				// if the user clicked in the zoom box, the window will be zoomed				
+				// if the user clicked in the zoom box, the window will be zoomed
 			}
 			break;
 	}
@@ -356,7 +356,7 @@ void HandleMenuSelection( const short menuNum, const short itemNum )
 		}
 		return;
 	}
-	
+
 	if (menuNum == kFileMenuID) {
 		if (itemNum == 1) {
 			StandardFileReply	stdReply;
@@ -390,8 +390,8 @@ void HandleKey( const char key, const char /* keycode */, const short modifiers,
 	// A key has been pressed -- handle typical cases.
 	if (modifiers & cmdKey) {
 		// command key was pressed -- check for menu shortcut.
-		long menucode = MenuKey( key );		
-		// handle the user's choice	
+		long menucode = MenuKey( key );
+		// handle the user's choice
 		if ( HiWord( menucode )) {
 			HandleMenuSelection( HiWord(menucode), LoWord(menucode) );
 			HiliteMenu(0);
@@ -447,22 +447,22 @@ OSErr HandleAppleEvent( AppleEvent *theEvent )
 	FInfo		theFileInfo;
 	short		refNum;
 	long		count;
-	
-	// Get the event class		                      
+
+	// Get the event class
 	err = AEGetAttributePtr( theEvent, keyEventClassAttr,
-				typeType, &actualType, (Ptr)&eventClass, 
+				typeType, &actualType, (Ptr)&eventClass,
 				sizeof(eventClass), &actualSize );
 	if ( err != noErr )
 		return err;
 
 	// Get the event ID
 	err = AEGetAttributePtr( theEvent, keyEventIDAttr,
-				typeType, &actualType, (Ptr)&eventID, 
+				typeType, &actualType, (Ptr)&eventID,
 				sizeof(eventID), &actualSize );
 	if ( err != noErr )
 		return err;
-		                      
-	if ( eventClass == kCoreEventClass ) {	
+
+	if ( eventClass == kCoreEventClass ) {
 		switch (eventID) {
 			case kAEOpenApplication:
 				break;
@@ -470,7 +470,7 @@ OSErr HandleAppleEvent( AppleEvent *theEvent )
 			case kAEOpenDocuments:
 			case kAEPrintDocuments:
 				err = AEGetKeyDesc( theEvent, keyDirectObject, typeAEList, &fileListDesc );
-				if (err == noErr) {					
+				if (err == noErr) {
 					err = AECountItems( &fileListDesc, &numFiles );
 					if (err == noErr) {
 						for (i = 1; i <= numFiles; i++) {
@@ -504,7 +504,7 @@ OSErr HandleAppleEvent( AppleEvent *theEvent )
 	} else if ( eventClass == 'CSrg' ) {
 		if ( eventID == 'RDOC' ) {
 			err = AEGetKeyDesc( theEvent, keyDirectObject, typeAEList, &fileListDesc );
-			if (err == noErr) {					
+			if (err == noErr) {
 				err = AECountItems( &fileListDesc, &numFiles );
 				if (err == noErr) {
 					for (i = 1; i <= numFiles; i++) {
@@ -531,7 +531,7 @@ OSErr HandleAppleEvent( AppleEvent *theEvent )
 	} else {
 		err = errAEEventNotHandled;		// We got an event we don't understand
 	}
-	
+
 	return err;
 }
 

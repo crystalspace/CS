@@ -1,6 +1,6 @@
 //
 //  OSXDelegate2D_OpenGL.m
-//  
+//
 //
 //  Created by mreda on Wed Oct 31 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -56,25 +56,25 @@ NSOpenGLContext *context;
 
     // Attributes for OpenGL contexts (0 is for fullscreen, 1 is for window)
     NSOpenGLPixelFormatAttribute attribs[] = {
-        NSOpenGLPFAWindow, NSOpenGLPFADoubleBuffer, NSOpenGLPFAAccelerated, 
+        NSOpenGLPFAWindow, NSOpenGLPFADoubleBuffer, NSOpenGLPFAAccelerated,
         NSOpenGLPFAColorSize, depth, NSOpenGLPFADepthSize, 16, nil
     };
 
     // Create a pixel format
     pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
-    if (pixelFormat == nil) 
+    if (pixelFormat == nil)
         return NULL;
-    
+
     // Create a GL context
     context = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
     [pixelFormat release];
     if (context == nil)
         return NULL;
-        
+
     // Need to know when window is resized so we can update the OpenGL context
     if (window != nil)
     {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowResized:) 
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowResized:)
                                                 name:NSWindowDidResizeNotification object:window];
 
         // Bind context
@@ -93,9 +93,9 @@ NSOpenGLContext *context;
 - (void) updateOpenGLContext
 {
     // Listen for resizes on new window
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowResized:) 
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowResized:)
                                                 name:NSWindowDidResizeNotification object:window];
-                                                
+
     [context setView:[window contentView]];
     [context makeCurrentContext];
     [context update];

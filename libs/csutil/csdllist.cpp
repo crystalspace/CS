@@ -180,7 +180,7 @@ void * csDLinkList::PeekFirstItem()
    {
      if (!firstItem)
        return NULL;
-       
+
      return firstItem->theObject;
    }
 

@@ -583,7 +583,7 @@ bool csRenderView::TestBSphere (const csReversibleTransform& o2c,
   //------
   if (tr_center.z+radius <= 0)
     return false;
-  
+
   //------
   // Test against far plane if needed.
   //------
@@ -624,7 +624,7 @@ bool csRenderView::TestBSphere (const csReversibleTransform& o2c,
     if (mirror) dist = -dist;
     if ((-dist) > radius) return false;
   }
- 
+
   return true;
 }
 
@@ -712,7 +712,7 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
     else if (dist <= radius) clip_plane = CS_CLIP_NEEDED;
 //printf ("8\n"); fflush (stdout);
   }
- 
+
   //------
   // If we don't need to clip to the current portal then we
   // test if we need to clip to the top-level portal.
@@ -759,9 +759,9 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
     // object if no point of the camera_bounding box is further than the D
     // part of the farplane.
     if (cbox.SquaredOriginDist () > far_plane->D ()*far_plane->D ())
-      return false;	
+      return false;
   }
-  
+
   //------
   // Test if there is a chance we must clip to current portal.
   //------
@@ -811,7 +811,7 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
     if (cnt == 8) return false;	// Object not visible.
     if (cnt > 0) clip_plane = CS_CLIP_NEEDED;
   }
- 
+
   //------
   // If we don't need to clip to the current portal then we
   // test if we need to clip to the top-level portal.

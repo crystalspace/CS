@@ -1,16 +1,16 @@
 /*
 	Copyright (C) 1999 by Jorrit Tyberghein and K. Robert Bate.
-  
+
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Library General Public
 	License as published by the Free Software Foundation; either
 	version 2 of the License, or (at your option) any later version.
-  
+
 	This library is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 	Library General Public License for more details.
-  
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free
 	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -20,7 +20,7 @@
 	Written by K. Robert Bate 1998.
 
 	 3/1999		-	Created.
-	
+
 ----------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -32,11 +32,11 @@
 #include <misc_io.h>
 #include <stat.h>
 #include <string.h>
-#ifdef __cplusplus 
+#ifdef __cplusplus
 	extern "C" {
 #endif
 #include <fsp_fopen.h>
-#ifdef __cplusplus 
+#ifdef __cplusplus
 }
 #endif
 #define CS_SYSDEF_PROVIDE_UNLINK
@@ -93,7 +93,7 @@ static void FixupFilePath( const char *source, char *dest )
 	*dest = 0;
 }
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 	#ifdef _MSL_USING_NAMESPACE
 		namespace std {
 	#endif
@@ -103,7 +103,7 @@ static void FixupFilePath( const char *source, char *dest )
 /*
  *	fopen
  *
- *	Same as the library fopen except convert the 
+ *	Same as the library fopen except convert the
  *	unix path into a mac path then open the file.
  */
 
@@ -129,11 +129,11 @@ FILE * fopen(const char * filename, const char * mode)
 	 */
 
 	__begin_critical_region( files_access );
-	
+
 	file = FSp_fopen( &theFileSpec, mode );
-	
+
 	__end_critical_region( files_access );
-	
+
 	return file;
 }
 
@@ -148,15 +148,15 @@ char * fgets(char * s, int n, FILE * file)
 {
 	char *	p = s;
 	int			c;
-	
+
 	if (--n < 0)
 		return(NULL);
-	
+
 	if (n)
 		do
 		{
 			c = getc(file);
-			
+
 			if (c == EOF)
 				if (file->state.eof && p != s)
 					break;
@@ -171,15 +171,15 @@ char * fgets(char * s, int n, FILE * file)
 				} else {
 					c = '\n';
 				}
-				
+
 			}
 
 			*p++ = c;
 		}
 		while (c != '\n' && --n);
-	
+
 	*p = 0;
-	
+
 	return(s);
 }
 
@@ -190,7 +190,7 @@ char * fgets(char * s, int n, FILE * file)
 	#endif
 #endif
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 	extern "C" {
 #endif
 
@@ -260,7 +260,7 @@ int mkdir(const char *path, int /* mode */)
 
 /*
  *	int unlink(const char *path)
- *	
+ *
  *		Unlink (i.e. delete) a file.
  */
 #if __MSL__	>=0x6000
@@ -295,7 +295,7 @@ int unlink(const char *path)
 
 /*
  *	int rmdir(const char *path)
- *	
+ *
  *		remove (i.e. delete) a directory.
  */
 #if __MSL__	>=0x6000
@@ -350,7 +350,7 @@ int chdir(const char *path)
 		FixupFilePath( path, (char *)&new_path[1] );
 		/* convert the c string into a pascal string */
 		new_path[0] = strlen( (char *)&new_path[1] );
-	
+
 		if (new_path[new_path[0]] != ':')
 			new_path[++new_path[0]] = ':';
 
@@ -393,7 +393,7 @@ static long getdirname(Str255 s, short vrefnum, long dirnum)
  *
  *		Recursive call to return the full path to a directory.
  */
- 
+
 static void catdirname(char *buf, int size, short vrefnum, long dirnum)
 {
 	Str255			dirname;
@@ -417,7 +417,7 @@ static void catdirname(char *buf, int size, short vrefnum, long dirnum)
  *
  *		Returns the path to the current directory.
  */
- 
+
 #if __MSL__	>=0x6000
 char *_getcwd(char *buf, int size)
 #else
@@ -446,7 +446,7 @@ char *getcwd(char *buf, int size)
 			vpb.ioVolIndex = vrefnum;
 			vpb.ioNamePtr = (StringPtr)buf;
 			vpb.ioVRefNum = 0;
-	
+
 			error = PBHGetVInfoSync((HParmBlkPtr)&vpb);
 			if (error == noErr) {
 				buf[buf[0] + 1] = '/';

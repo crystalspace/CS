@@ -71,7 +71,7 @@ protected:
   /**
    * bounding box in 3d of all particles in this system.
    * the particle system subclass has to give this a reasonable value.
-   * no particle may exceed the bbox. 
+   * no particle may exceed the bbox.
    */
   csBox3 bbox;
   iMeshObjectDrawCallback* vis_cb;
@@ -98,7 +98,7 @@ protected:
 
 public:
   /**
-   * Make a new system. 
+   * Make a new system.
    * Also adds the particle system to the list of the current engine.
    */
   csParticleSystem (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
@@ -120,17 +120,17 @@ public:
   void RemoveParticles ();
 
   /// Add a new particle, increases num_particles. Do a DecRef yourself.
-  inline void AppendParticle (iParticle *part) 
+  inline void AppendParticle (iParticle *part)
   { particles.Push(part); part->IncRef(); }
-  
-  /** 
+
+  /**
    * Add an rectangle shaped sprite2d particle. Pass along half w and h.
    * adds sprite to engine list.
    */
   void AppendRectSprite (float width, float height, iMaterialWrapper* mat,
     bool lighted);
 
-  /** 
+  /**
    * Add a sprite2d n-gon with material, and given radius.
    * adds sprite to engine list.
    */
@@ -138,7 +138,7 @@ public:
     bool lighted);
 
   /// Set selfdestruct mode on, and msec to live.
-  inline void SetSelfDestruct (csTicks t) 
+  inline void SetSelfDestruct (csTicks t)
   { self_destruct=true; time_to_live = t; };
   /// system will no longer self destruct
   inline void UnSetSelfDestruct () { self_destruct=false; }
@@ -153,7 +153,7 @@ public:
   inline bool GetDelete () const { return to_delete; }
 
   /// Change color of all particles, by col per second.
-  inline void SetChangeColor(const csColor& col) 
+  inline void SetChangeColor(const csColor& col)
   {change_color = true; colorpersecond = col;}
   /// Stop change of color
   inline void UnsetChangeColor() {change_color=false;}
@@ -162,7 +162,7 @@ public:
   { if(!change_color) return false; col = colorpersecond; return true; }
 
   /// Change size of all particles, by factor per second.
-  inline void SetChangeSize(float factor) 
+  inline void SetChangeSize(float factor)
   {change_size = true; scalepersecond = factor;}
   /// Stop change of size
   inline void UnsetChangeSize() {change_size=false;}
@@ -171,12 +171,12 @@ public:
   { if(!change_size) return false; factor = scalepersecond; return true; }
 
   /// Set the alpha of particles.
-  inline void SetAlpha(float alpha) 
+  inline void SetAlpha(float alpha)
   {alpha_now = alpha; MixMode = CS_FX_SETALPHA (alpha); SetupMixMode (); }
   /// Get the probable alpha of the particles
   inline float GetAlpha() const {return alpha_now;}
   /// Change alpha of all particles, by factor per second.
-  inline void SetChangeAlpha(float factor) 
+  inline void SetChangeAlpha(float factor)
   {change_alpha = true; alphapersecond = factor;}
   /// Stop change of alpha
   inline void UnsetChangeAlpha() {change_alpha=false;}
@@ -185,7 +185,7 @@ public:
   { if(!change_alpha) return false; factor = alphapersecond; return true; }
 
   /// Change rotation of all particles, by angle in radians per second.
-  inline void SetChangeRotation(float angle) 
+  inline void SetChangeRotation(float angle)
   {change_rotation = true; anglepersecond = angle;}
   /// Stop change of rotation
   inline void UnsetChangeRotation() {change_rotation=false;}
@@ -239,7 +239,7 @@ public:
     SetupObject ();
     bbox = csParticleSystem::bbox;
   }
-  virtual void GetRadius (csVector3& rad, csVector3& cent) 
+  virtual void GetRadius (csVector3& rad, csVector3& cent)
   {
     SetupObject ();
     rad = radius;
@@ -304,7 +304,7 @@ public:
       scfParent->UnsetChangeColor ();
     }
     virtual bool GetChangeColor (csColor& col) const
-    { 
+    {
       return scfParent->GetChangeColor(col); }
     virtual void SetChangeSize (float factor)
     {
@@ -315,8 +315,8 @@ public:
       scfParent->UnsetChangeSize ();
     }
     virtual bool GetChangeSize (float& factor) const
-    { 
-      return scfParent->GetChangeSize(factor); 
+    {
+      return scfParent->GetChangeSize(factor);
     }
     virtual void SetChangeRotation (float angle)
     {
@@ -327,8 +327,8 @@ public:
       scfParent->UnsetChangeRotation ();
     }
     virtual bool GetChangeRotation (float& angle) const
-    { 
-      return scfParent->GetChangeRotation(angle); 
+    {
+      return scfParent->GetChangeRotation(angle);
     }
     virtual void SetChangeAlpha (float factor)
     {
@@ -339,8 +339,8 @@ public:
       scfParent->UnsetChangeAlpha ();
     }
     virtual bool GetChangeAlpha (float& factor) const
-    { 
-      return scfParent->GetChangeAlpha(factor); 
+    {
+      return scfParent->GetChangeAlpha(factor);
     }
     virtual void SetSelfDestruct (csTicks t)
     {
@@ -380,13 +380,13 @@ public:
   /// Get a particles speed. speeds are in metres/second.
   csVector3& GetSpeed (int idx) const { return part_speed[idx]; }
   /// Set a particles speed. speeds are in metres/second.
-  void SetSpeed (int idx, const csVector3& spd) 
+  void SetSpeed (int idx, const csVector3& spd)
   { part_speed[idx] = spd; }
 
   /// Get a particles acceleration. accelerations are in metres/second.
   csVector3& GetAccel (int idx) const { return part_accel[idx]; }
   /// Set a particles acceleration. accelerations are in metres/second.
-  void SetAccel (int idx, const csVector3& acl) 
+  void SetAccel (int idx, const csVector3& acl)
   { part_accel[idx] = acl; }
 };
 

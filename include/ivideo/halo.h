@@ -47,7 +47,7 @@ struct iHalo : public iBase
   virtual void GetColor (float &oR, float &oG, float &oB) = 0;
 
   /**
-   * Draw the halo given a center point and an intensity. 
+   * Draw the halo given a center point and an intensity.
    * If either w and/or h is negative, the native width and/or height
    * is used instead. If the halo should be clipped against some
    * polygon, that polygon should be given, otherwise if a NULL pointer

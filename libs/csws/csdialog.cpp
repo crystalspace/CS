@@ -275,7 +275,7 @@ void csDialog::SetFrameStyle (csDialogFrameStyle iFrameStyle)
 void csDialog::SetAlpha (uint8 iAlpha)
 {
   Alpha = iAlpha;
-	
+
   if (Alpha || FrameStyle == csdfsBitmap)
     SetState (CSS_TRANSPARENT, true);
   else
@@ -285,14 +285,14 @@ void csDialog::SetAlpha (uint8 iAlpha)
 void csDialog::SetOverlayAlpha (uint8 iAlpha)
 {
   OverlayAlpha = iAlpha;
-	
+
   if (Alpha || FrameStyle == csdfsBitmap)
     SetState (CSS_TRANSPARENT, true);
   else
     SetState (CSS_TRANSPARENT, false);
 }
 
-void 
+void
 csDialog::SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap)
 {
 	// Delete the previous bitmap, if it needs to be
@@ -302,7 +302,7 @@ csDialog::SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap)
 	  delFrameBitmap=false;
 	  FrameBitmap=NULL;
 	}
-	
+
 	// Set the new one only	if there's something to set
 	if (iFrameBitmap) {
 	  FrameBitmap = iFrameBitmap;
@@ -310,7 +310,7 @@ csDialog::SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap)
 	}
 }
 
-void 
+void
 csDialog::SetOverlayBitmap(csPixmap *iOverlayBitmap, bool iDelOverlayBitmap)
 {
 	// Delete the previous bitmap, if it needs to be
@@ -320,7 +320,7 @@ csDialog::SetOverlayBitmap(csPixmap *iOverlayBitmap, bool iDelOverlayBitmap)
 	  delOverlayBitmap=false;
 	  OverlayBitmap=NULL;
 	}
-	
+
 	// Set the new one only if there's something to set
 	if (iOverlayBitmap) {
 	  OverlayBitmap = iOverlayBitmap;

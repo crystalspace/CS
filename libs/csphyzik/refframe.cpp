@@ -21,9 +21,9 @@
 #include "cssysdef.h"
 #include "csphyzik/refframe.h"
 
-ctReferenceFrame::ctReferenceFrame 
-  ( coord px, coord py, coord pz, ctangle ppitch, ctangle proll, ctangle pyaw, 
-    ctReferenceFrame *ref ) 
+ctReferenceFrame::ctReferenceFrame
+  ( coord px, coord py, coord pz, ctangle ppitch, ctangle proll, ctangle pyaw,
+    ctReferenceFrame *ref )
   : offset ( px, py, pz )
 {
   //!me what the hell is this.  Who writes this stuff?
@@ -40,18 +40,18 @@ ctReferenceFrame::ctReferenceFrame
 }
 
 ctReferenceFrame& ctReferenceFrame::universe ()
-{ 
+{
   static ctReferenceFrame basis;
   static bool initialized = false;
-  if (!initialized) 
+  if (!initialized)
   {
     initialized = true;
-    basis.is_universe_frame = true; 
+    basis.is_universe_frame = true;
   }
   return basis;
-} 
+}
 
-ctDeltaReferenceFrame::ctDeltaReferenceFrame () 
+ctDeltaReferenceFrame::ctDeltaReferenceFrame ()
   : v(0), w(0)
 {
 	reference_count = 0; is_universe_frame = false;
@@ -61,13 +61,13 @@ ctDeltaReferenceFrame& ctDeltaReferenceFrame::universe ()
 {
   static ctDeltaReferenceFrame basis;
   static bool initialized = false;
-  if (!initialized) 
+  if (!initialized)
   {
     initialized = true;
     basis.is_universe_frame = true;
   }
   return basis;
-} 
+}
 
 // calculate tranform from world coords to this coords by going from
 // root ( world ) and combining all transfroms up to this frame.
@@ -77,12 +77,12 @@ ctDeltaReferenceFrame& ctDeltaReferenceFrame::universe ()
 
 /*
 	// if this transform is valid, don't bother re-calcing it
-	if( !is_T_world_calced ){  
+	if( !is_T_world_calced ){
 		// this is world coords, don't need to calc world-to-world
 		if( !this->is_universe() ){
 			if( parent_frame ){ // not NULL
 				// don't calc world coords ( I matrix ) with this.
-				if( parent_frame->is_universe() ){  
+				if( parent_frame->is_universe() ){
 					T_world = T_parent;
 				}else{
 					// recurse 'till root ( world/universe coords )
@@ -92,7 +92,7 @@ ctDeltaReferenceFrame& ctDeltaReferenceFrame::universe ()
 					T_world = (T_parent)*(parent_frame->T_world);
 				}
 			}
-		}		
+		}
 		is_T_world_calced = true;
 	}*/
 //}
@@ -135,7 +135,7 @@ ctMatrix3 = M;
 	*state_array++;
 	o.z = **state_array;
 	*state_array++;
-	
+
 	for( int i = 0; i < 3; i++ ){
 		for( int j = 0; j < 3; j++ ){
 			M[i][j] = **state_array;

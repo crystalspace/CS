@@ -23,7 +23,7 @@
 
 // This is a force which acts on a ctPointObj, which may or may not be a
 // ctEntity.  The class is intended to act on point-masses and connectors.
-class ctPointForce 
+class ctPointForce
 {
  public:
   virtual void apply(ctPointObj* point) = 0;

@@ -1,19 +1,19 @@
  #ifndef __AWSCSPT_H__
  #define __AWSCSPT_H__
 /**************************************************************************
-    Copyright (C) 2000-2001 by Christopher Nelson 
-    	      (c) 2001 F.Richter	
-    
+    Copyright (C) 2000-2001 by Christopher Nelson
+    	      (c) 2001 F.Richter
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -41,11 +41,11 @@ class awsSimpleCanvas : public csProcTexture
     virtual void Animate (csTicks current_time);
 
     /// Get the iGraphics2D interface so that components can use it.
-    iGraphics2D *G2D() 
+    iGraphics2D *G2D()
     { return ptG2D; }
 
     /// Get the iGraphics3D interface so that components can use it.
-    iGraphics3D *G3D() 
+    iGraphics3D *G3D()
     { return ptG3D; }
 
     /// Set dimensions of texture

@@ -440,7 +440,7 @@ char *yytext;
 
   to compile do:  flex -L skinlang.flx
  *********/
- 
+
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
 #include "awsprefs.h"
@@ -459,7 +459,7 @@ char *yytext;
 {							\
   result = aws_fileinputvfs->Read(buf, max_size);	\
 }
-                               
+
 #define YY_NEVER_INTERACTIVE 1
 
 /* Macros after this point can all be overridden by user definitions in

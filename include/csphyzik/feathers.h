@@ -21,7 +21,7 @@
 #ifndef CT_FEATHERSTONE_ALGORITHM
 #define CT_FEATHERSTONE_ALGORITHM
 
-//!me T = 2*pi*sqrt( length/g )  
+//!me T = 2*pi*sqrt( length/g )
 //!me period of a meter long rod should be 1.64s under g=9.81 and 1 world unit = 1 m
 //!me actual period observed is ~1.70s  could be acceptable numerical error.. or not..
 
@@ -39,7 +39,7 @@ class ctArticulatedBody;
 class ctFeatherstoneAlgorithm : public ctArticulatedSolver
 {
 public:
-  ctFeatherstoneAlgorithm ( ctArticulatedBody &pab ) 
+  ctFeatherstoneAlgorithm ( ctArticulatedBody &pab )
     : ab( pab ){ sIsQsZIc_computed = false; };
 
   /// do it!  Apply algorithm to solve for motions
@@ -59,7 +59,7 @@ public:
 
   /**
    * can use this to impart and impulse to this object.
-   * impulse_point is vector from center of body to point of collision in 
+   * impulse_point is vector from center of body to point of collision in
    * world coordinates.  impulse_vector is in world coords
    */
   void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector );
@@ -68,7 +68,7 @@ public:
    * Calculate virtual mass and behaviour for an impulse applied at a point
    * impulse_point is point of collision in world frame.
    */
-  void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv, 
+  void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv,
     const ctVector3 &impulse_point, const ctVector3 &unit_length_impulse_vector );
 
 protected:
@@ -96,7 +96,7 @@ protected:
   ctArticulatedBody &ab;
 
   // work variables
-	
+
   ctSpatialVector a;
 
   /// spatial inertia matrix
@@ -104,11 +104,11 @@ protected:
 
   /**
    * bias vector or zero acceleration vector
-   *  [ -m_i g_i - F_externaly_applied            ]   !note! negated!  
+   *  [ -m_i g_i - F_externaly_applied            ]   !note! negated!
    *  [ w_i x I_i w_i - Torque_externally_applied ]
    * some other symbol in featherstone's book ( P? )
    */
-  ctSpatialVector Za;  
+  ctSpatialVector Za;
 
   /// spatial coriolus force
   ctSpatialVector c;

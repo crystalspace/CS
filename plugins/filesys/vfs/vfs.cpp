@@ -720,10 +720,10 @@ int VfsNode::Expand (csVFS *Parent, char *dst, char *src, int size)
 	  {
             level++;
 	  }
-          else if (*src == ')') 
+          else if (*src == ')')
 	  {
             level--;
-	  } 
+	  }
 	  if (level) src++; // don't skip over the last parenthesis
         } /* endwhile */
         // Replace closing parenthesis with \0

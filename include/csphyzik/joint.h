@@ -29,10 +29,10 @@ class ctArticulatedBody;
 class ctForce;
 
 /// joint velocity and acceleration
-#define JOINT_STATESIZE 2 
+#define JOINT_STATESIZE 2
 
 /**
- * a joint that links together and constrains the motion of two articulated 
+ * a joint that links together and constrains the motion of two articulated
  * bodies inboard means articulated body that is closer to the root of the whole
  * outboard is the opposite
  */
@@ -42,13 +42,13 @@ public:
   /// static values
   static double joint_friction;
 
-  ctJoint () 
+  ctJoint ()
     : inboard_offset(0), outboard_offset(0), joint_axis(0)
   { q = qv = qa = 0; }
-  
-  ctJoint ( ctArticulatedBody *in, ctVector3 &in_offset, 
+
+  ctJoint ( ctArticulatedBody *in, ctVector3 &in_offset,
 	    ctArticulatedBody *out, ctVector3 &out_offset );
-	
+
   /// Add v and w (angular v) of the outboard link, contributed from joints state
   virtual void calc_vw( ctVector3 &v, ctVector3 &w ) = 0;
   /**
@@ -56,12 +56,12 @@ public:
    * r is vector from center of inboard handle to center of outboard handle.
    * w_f is the angular velocity of inboard handle.
    */
-  virtual void calc_coriolus ( const ctVector3 &r, const ctVector3 &w_f, 
+  virtual void calc_coriolus ( const ctVector3 &r, const ctVector3 &w_f,
 			       ctSpatialVector &c ) = 0;
 
   virtual ctSpatialVector get_spatial_joint_axis() = 0;
 
-  /**  
+  /**
    * Internal force generated at joint.  can be used to simulate a robotic
    * motor or muscle force on a limb.
    */
@@ -70,11 +70,11 @@ public:
   virtual int get_state_size(){ return JOINT_STATESIZE; }// = 0;
   virtual int set_state( real *sa );
   virtual int get_state( const real *sa );
-  virtual int set_delta_state( real *state_array ); 
+  virtual int set_delta_state( real *state_array );
 
-  /// Update the body_to_world reference frame of the outboard handle 
+  /// Update the body_to_world reference frame of the outboard handle
   void update_link_RF ();
-	
+
   /// return vector from inboard center to outboard center in outboard coords
   ctVector3 get_r ();
 
@@ -90,12 +90,12 @@ public:
    * Points from joint axis to origin of outboard entity in outboard frame
    * (d in Mirtch thesis)
    */
-  ctVector3 outboard_offset;  
-	
+  ctVector3 outboard_offset;
+
   /// Valid in both in and out frame of reference
   ctVector3 joint_axis;
   /// joint position, velocity and acceleration in radians
-  real q, qv, qa;  
+  real q, qv, qa;
 
 protected:
   //!me go through and hide all data that should be hidden
@@ -111,7 +111,7 @@ public:
   virtual void calc_vw ( ctVector3 &v, ctVector3& /*w*/ )
   { v = v + joint_axis *qv; }
 
-  virtual void calc_coriolus ( const ctVector3 &r, const ctVector3 &w_f, 
+  virtual void calc_coriolus ( const ctVector3 &r, const ctVector3 &w_f,
 			      ctSpatialVector &c );
 
   virtual ctSpatialVector get_spatial_joint_axis ();
@@ -122,17 +122,17 @@ public:
 class ctRevoluteJoint : public ctJoint
 {
 public:
-  ctRevoluteJoint ( ctArticulatedBody *in, ctVector3 &in_offset, 
-		    ctArticulatedBody *out, ctVector3 &out_offset, 
+  ctRevoluteJoint ( ctArticulatedBody *in, ctVector3 &in_offset,
+		    ctArticulatedBody *out, ctVector3 &out_offset,
 		    ctVector3 &paxis );
 
   virtual void calc_vw ( ctVector3 &v, ctVector3 &w )
-  { 
+  {
     w = w + joint_axis*qv;
     v = v + ( joint_axis % outboard_offset )*qv;
   }
 
-  virtual void calc_coriolus ( const ctVector3 &r, const ctVector3 &w_f, 
+  virtual void calc_coriolus ( const ctVector3 &r, const ctVector3 &w_f,
 			       ctSpatialVector &c );
 
   virtual ctSpatialVector get_spatial_joint_axis ();
@@ -140,15 +140,15 @@ public:
 
 /**
  * a hinge with a joint angle "constraint" enforced by PID controller techniques.
- * adjust spring and damping constants on a per joint basis to get it behaving 
- * right.  e.g. if your joint is bouncing back at the constrained angle, 
+ * adjust spring and damping constants on a per joint basis to get it behaving
+ * right.  e.g. if your joint is bouncing back at the constrained angle,
  * then reduce spring_constant.
  */
 class ctConstrainedRevoluteJoint : public ctRevoluteJoint
 {
 public:
-  ctConstrainedRevoluteJoint ( ctArticulatedBody *in, ctVector3 &in_offset, 
-			       ctArticulatedBody *out, ctVector3 &out_offset, 
+  ctConstrainedRevoluteJoint ( ctArticulatedBody *in, ctVector3 &in_offset,
+			       ctArticulatedBody *out, ctVector3 &out_offset,
 			       ctVector3 &paxis );
 
   /**
@@ -172,9 +172,9 @@ public:
   ///!me tweak these for better stability, depending on your situation.
 
   /// Spring konstant
-  real k;  
-  /// Damping konstant.  
-  real damping_k; 
+  real k;
+  /// Damping konstant.
+  real damping_k;
 };
 
 #endif // __CT_JOINT_H__

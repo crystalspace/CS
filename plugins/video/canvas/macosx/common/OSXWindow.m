@@ -1,6 +1,6 @@
 //
 //  OSXWindow.m
-//  
+//
 //
 //  Created by mreda on Tue Nov 06 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.

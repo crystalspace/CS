@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -143,15 +143,15 @@ bool csIsoEngine::HandleEvent (iEvent& Event)
           return false;
         }
         g2d = g3d->GetDriver2D ();
-        if (!g2d) 
+        if (!g2d)
         {
           Report (CS_REPORTER_SEVERITY_ERROR, "IsoEngine: could not get G2D.");
           return false;
         }
         txtmgr = g3d->GetTextureManager();
-        if (!txtmgr) 
+        if (!txtmgr)
         {
-          Report (CS_REPORTER_SEVERITY_ERROR, 
+          Report (CS_REPORTER_SEVERITY_ERROR,
             "IsoEngine: could not get TextureManager.");
           return false;
         }
@@ -203,7 +203,7 @@ int csIsoEngine::GetBeginDrawFlags () const
   return CSDRAW_CLEARZBUFFER;
 }
 
-iIsoSprite* csIsoEngine::CreateFloorSprite(const csVector3& pos, float w, 
+iIsoSprite* csIsoEngine::CreateFloorSprite(const csVector3& pos, float w,
       float h)
 {
   iIsoSprite *spr = new csIsoSprite(this);
@@ -215,7 +215,7 @@ iIsoSprite* csIsoEngine::CreateFloorSprite(const csVector3& pos, float w,
   return spr;
 }
 
-iIsoSprite* csIsoEngine::CreateFrontSprite(const csVector3& pos, float w, 
+iIsoSprite* csIsoEngine::CreateFrontSprite(const csVector3& pos, float w,
       float h)
 {
   iIsoSprite *spr = new csIsoSprite(this);
@@ -286,33 +286,33 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   }
 
   buf = VFS->ReadFile (vfsfilename);
-  if(!buf) 
+  if(!buf)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not read vfs file %s\n", 
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not read vfs file %s\n",
       vfsfilename);
     goto create_out;
   }
 
   image = imgloader->Load(buf->GetUint8 (), buf->GetSize (),
 			  txtmgr->GetTextureFormat ());
-  if(!image) 
+  if(!image)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
+    Report (CS_REPORTER_SEVERITY_ERROR,
       "The imageloader could not load image %s", vfsfilename);
     goto create_out;
   }
-  
+
   handle = txtmgr->RegisterTexture(image, CS_TEXTURE_2D | CS_TEXTURE_3D);
-  if(!handle) 
+  if(!handle)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
+    Report (CS_REPORTER_SEVERITY_ERROR,
       "Texturemanager could not register texture %s", vfsfilename);
     goto create_out;
   }
 
   material = new csIsoMaterial(handle);
   math = txtmgr->RegisterMaterial(material);
-  if(math) 
+  if(math)
   {
     mat_wrap = materials.scfiMaterialList.NewMaterial (math);
     mat_wrap->IncRef ();	// Jorrit: @@@ Not sure why this is needed?
@@ -320,7 +320,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   }
   else
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
+    Report (CS_REPORTER_SEVERITY_ERROR,
       "Texturemanager could not register material %s", materialname);
     goto create_out;
   }
@@ -336,7 +336,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
 }
 
 iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory(const char* classId,
-    const char *name) 
+    const char *name)
 {
   iMeshObjectFactory *mesh_fact;
   iMeshObjectType *mesh_type;
@@ -348,14 +348,14 @@ iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory(const char* classId,
     if (wrap)
       return wrap;
   }
-  
+
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   mesh_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, classId, iMeshObjectType);
 
-  if(!mesh_type) 
+  if(!mesh_type)
     mesh_type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
   plugin_mgr->DecRef ();
-  if(!mesh_type) 
+  if(!mesh_type)
     return NULL;
 
   csIsoMeshFactoryWrapper* wrap = NULL;

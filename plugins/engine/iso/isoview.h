@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -84,7 +84,7 @@ public:
   virtual void MoveScroll(const csVector3& delta);
   virtual void SetAxes(float xscale, float yscale, float zscale,
     float zskew, float xskew);
-  virtual iCamera* GetFakeCamera(const csVector3& center, 
+  virtual iCamera* GetFakeCamera(const csVector3& center,
     iIsoRenderView *rview);
 };
 
@@ -115,7 +115,7 @@ public:
   virtual ~csIsoFakeCamera();
 
   /// precalc values for this view
-  void SetIsoView(const csVector2& scroll, const csVector2& x_axis, 
+  void SetIsoView(const csVector2& scroll, const csVector2& x_axis,
     const csVector2& y_axis, const csVector2& z_axis);
 
   /// ready for a particular mesh (approximate for that mesh)

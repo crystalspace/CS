@@ -32,7 +32,7 @@ class ctInverseKinematics;
 class ctKinematicEntity; 
 
 //!me some of these methods probably don't need to be virtual anymore, esp. those dealing with RF and dRF
-// articulated body.  Definition: a handle ( rigid body ) with 0 or more  
+// articulated body.  Definition: a handle ( rigid body ) with 0 or more
 // articulated bodies attached to it via joints
 class ctArticulatedBody : public ctPhysicalEntity
 {
@@ -62,11 +62,11 @@ public:
 
   /**
    * link two bodies together with a revolute joint.
-   * pin_joint_offset is the offset from the inboard( parent ) link to joint 
+   * pin_joint_offset is the offset from the inboard( parent ) link to joint
    * pout_joint_offset is from the outbaord (child) link to the joint.
    * all offsets are directed from a link's C.O.M. to the joint
    */
-  void link_revolute ( ctArticulatedBody *child, ctVector3 &pin_joint_offset, 
+  void link_revolute ( ctArticulatedBody *child, ctVector3 &pin_joint_offset,
 		       ctVector3 &pout_joint_offset, ctVector3 &pjoint_axis );
 
   void link_joint ( ctJoint *jnt, ctArticulatedBody *child );
@@ -75,7 +75,7 @@ public:
 
   /**
    * compute force and torque from all forces acting on this articulated body
-   * that includeds this handle and all children down to the leaf nodes. 
+   * that includeds this handle and all children down to the leaf nodes.
    */
   void apply_forces ( real t );
 
@@ -83,7 +83,7 @@ public:
 			      ctVector3 impulse_vector );
 
   /// impulse_point is point of collision in world frame
-  virtual void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv, 
+  virtual void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv,
     const ctVector3 &impulse_point, const ctVector3 &unit_length_impulse_vector );
 
   virtual void init_state ();
@@ -92,7 +92,7 @@ public:
   virtual int get_state_size ();
   virtual int set_state ( real *sa );
   virtual int get_state ( const real *sa );
-  virtual int set_delta_state ( real *state_array ); 
+  virtual int set_delta_state ( real *state_array );
 
   /**
    * state methods for all children.  just need to call these for root and
@@ -102,7 +102,7 @@ public:
   int set_state_links ( real *sa );
   int get_state_links ( const real *sa );
   int set_delta_state_links ( real *state_array );
-	
+
   /// ungrounded articulated bodies are not staticaly attached to the world frame
   void make_grounded ()
   { is_grounded = true; };
@@ -111,7 +111,7 @@ public:
   { is_grounded = false; };
 
   /**
-   * this articulated body is attached to some other entity.  
+   * this articulated body is attached to some other entity.
    * it will respond to the accelerations of the entity it is attached to.
    */
   void attach_to_entity ( ctKinematicEntity *pattache )
@@ -142,13 +142,13 @@ public:
   friend class ctJoint;
 protected:
   /// rigid body for the root of this articulated body
-  ctRigidBody *handle;	
+  ctRigidBody *handle;
   /// joint attaching this body to parent. NULL if root
-  ctJoint *inboard_joint; 
-  /// children 
+  ctJoint *inboard_joint;
+  /// children
   ctLinkList<ctArticulatedBody> outboard_links;
   /// is it fixed to the world frame?
-  bool is_grounded;  
+  bool is_grounded;
 
   ctKinematicEntity *attached_to;
 
@@ -161,15 +161,15 @@ protected:
   ctMatrix3 T_fg;
 
   /**
-   * Frame to this frame. Vector from center of inboard frame to this frame 
+   * Frame to this frame. Vector from center of inboard frame to this frame
    * in this frame's coords
    */
-  ctVector3 r_fg; 
+  ctVector3 r_fg;
 
   /**
    * Angular and linear velocity calculated in this bodies frame.
    * Calculated in compute_link_velocities.
-   */ 
+   */
   ctVector3 w_body;
   ctVector3 v_body;
 

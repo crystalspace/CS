@@ -118,28 +118,28 @@ void csDefaultButtonSkin::Draw (csComponent &This)
         This.Clear (CSPAL_BUTTON_BACKGROUND);
       } /* endif */
       break;
-      
+
     case csbfsTextured: {
     	csPixmap *FrameNormal, *FramePressed;
     	int			  OrgX, OrgY;
-    	
+
     	// Retrieve info needed for texture operations
     	This.GetFrameBitmaps(&FrameNormal, &FramePressed, NULL);
     	This.GetTextureOrigin(&OrgX, &OrgY);
 
-			// Tile texture using user origins and user alpha    	    	
+			// Tile texture using user origins and user alpha
     	if (This.Pressed)
     		This.Pixmap(FramePressed,
     							  1, 1, This.bound.Width ()-1, This.bound.Height ()-1,
     							  OrgX+1, OrgY+1, This.GetAlpha());
-    							  
+
 	   	else
     		This.Pixmap(FrameNormal,
     							  1, 1, This.bound.Width ()-1, This.bound.Height ()-1,
     							  OrgX, OrgY, This.GetAlpha());
 
-    	
-    	// Draw a simple 3D border						      	
+
+    	// Draw a simple 3D border
       if (DefaultBorder)
         This.Rect3D (0, 0, This.bound.Width (), This.bound.Height (),
           CSPAL_BUTTON_DEFFRAME, CSPAL_BUTTON_DEFFRAME);
@@ -147,35 +147,35 @@ void csDefaultButtonSkin::Draw (csComponent &This)
         This.Rect3D (0, 0, This.bound.Width (), This.bound.Height (),
           CSPAL_BUTTON_LIGHT3D, CSPAL_BUTTON_DARK3D);
 
-	          
+
     	This.Rect3D (1, 1, This.bound.Width () - 1, This.bound.Height () - 1, di, li);
       //This.Rect3D (2, 2, This.bound.Width () - 2, This.bound.Height () - 2, di, li);
-    			
-    
+
+
     } /* end case csbfsTextured */
     break;
-    
+
     case csbfsBitmap: {
     	csPixmap *FrameNormal, *FramePressed, *FrameHighlighted;
-    	
+
     	// Get the bitmaps we can use
     	This.GetFrameBitmaps(&FrameNormal, &FramePressed, &FrameHighlighted);
-    	
+
     	int x = (This.bound.Width() - FrameNormal->Width()) / 2;
-    		  
+
 			// Draw bitmaps (not tiled)
 			if (This.Pressed)
     		This.Pixmap(FramePressed, x, 0, This.GetAlpha());
-    	
+
     	else if (This.Highlighted)
     		This.Pixmap(FrameHighlighted, x, 0, This.GetAlpha());
-    	    							  
+
 	   	else
 	   		This.Pixmap(FrameNormal, x, 0, This.GetAlpha());
-    
+
     } /* end case csbfsBitmap */
     break;
-        
+
     default:
       return;
   } /* endswitch */
@@ -218,11 +218,11 @@ void csDefaultButtonSkin::Draw (csComponent &This)
     else if (This.GetFrameStyle() == csbfsBitmap)
     {
     	txty = This.bound.Height() - fh;
-    	    
+
     }
     else
       txty = (This.bound.Height () - fh) / 2;
-      
+
     if ((ButtonStyle & CSBS_SHIFT) && This.Pressed) { txtx++; txty++; }
   }
 
@@ -234,11 +234,11 @@ void csDefaultButtonSkin::Draw (csComponent &This)
   {
     if (!This.GetDrawTextOnHighlightOnly() ||
             (This.GetDrawTextOnHighlightOnly() && (This.Highlighted || This.Pressed)))
-   {    
+   {
       This.Text (txtx, txty, This.GetState (CSS_DISABLED) ? CSPAL_BUTTON_DTEXT :
       	(This.Highlighted ?  CSPAL_BUTTON_LIGHT3D : CSPAL_BUTTON_TEXT), -1, text);
    }
-      
+
     if (!This.GetState (CSS_DISABLED))
       This.DrawUnderline (txtx, txty, text, This.GetUnderlinePos (), CSPAL_BUTTON_TEXT);
   }

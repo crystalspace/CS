@@ -1,6 +1,6 @@
 //
 //  OSXDriver2D.cpp
-//  
+//
 //
 //  Created by mreda on Wed Oct 31 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -15,7 +15,7 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "csver.h"
- 
+
 #include "OSXDriver2D.h"
 
 #include <ApplicationServices/ApplicationServices.h>
@@ -36,7 +36,7 @@ OSXDriver2D::OSXDriver2D(csGraphics2D *inCanvas)
 
     origWidth = 0;
     origHeight = 0;
-    
+
     delegate = OSXDelegate2D_new(this);
 };
 
@@ -55,7 +55,7 @@ OSXDriver2D::~OSXDriver2D()
         }
         scfiEventHandler->DecRef();
     }
-    
+
     Close();					// Just in case it hasn't been called
 
     OSXDelegate2D_delete(delegate);
@@ -89,7 +89,7 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
 
     // Get and save original mode - released in Close()
     originalMode = CGDisplayCurrentMode(kCGDirectMainDisplay);
-        
+
     return true;
 };
 
@@ -97,7 +97,7 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
 // Open
 // Open graphics system (set mode, open window, etc)
 bool OSXDriver2D::Open()
-{	    
+{
     // Copy original values
     origWidth = canvas->Width;
     origHeight = canvas->Height;
@@ -119,7 +119,7 @@ bool OSXDriver2D::Open()
             return false;
 
     // Create window
-    if (OSXDelegate2D_openWindow(delegate, canvas->win_title, 
+    if (OSXDelegate2D_openWindow(delegate, canvas->win_title,
                                     canvas->Width, canvas->Height, canvas->Depth, canvas->FullScreen) == false)
         return false;
 
@@ -149,7 +149,7 @@ void OSXDriver2D::Close()
 bool OSXDriver2D::HandleEvent(iEvent &ev)
 {
     bool handled = false;
-    
+
     if (ev.Type == csevBroadcast)
     {
         if (ev.Command.Code == cscmdFocusChanged)
@@ -162,8 +162,8 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
     {
         if ((ev.Key.Code == CSKEY_ENTER) && (ev.Key.Modifiers & CSMASK_ALT))
             handled = ToggleFullscreen();
-    } 
-    
+    }
+
     return handled;
 };
 
@@ -185,7 +185,7 @@ void OSXDriver2D::HideMouse()
 
 
 // ShowMouse
-// Show the mouse cursor 
+// Show the mouse cursor
 void OSXDriver2D::ShowMouse()
 {
     assistant->show_mouse_pointer();
@@ -203,8 +203,8 @@ void OSXDriver2D::Initialize16()
     canvas->pfmt.BlueMask = 0x1F;
     canvas->pfmt.complete();
 };
-    
-    
+
+
 // Initialize32
 // Initialize pixel format for 32 bit depth
 void OSXDriver2D::Initialize32()
@@ -218,16 +218,16 @@ void OSXDriver2D::Initialize32()
 };
 
 
-// EnterFullscreenMode    
+// EnterFullscreenMode
 // Switch to fullscreen mode - returns true on success
 bool OSXDriver2D::EnterFullscreenMode()
 {
     // Find mode and copy parameters
-    CFDictionaryRef mode = CGDisplayBestModeForParameters(kCGDirectMainDisplay, 
+    CFDictionaryRef mode = CGDisplayBestModeForParameters(kCGDirectMainDisplay,
                                                             canvas->Depth, canvas->Width, canvas->Height, NULL);
     if (mode == NULL)
         return false;
- 
+
     // Lock displays
     if (CGCaptureAllDisplays() != CGDisplayNoErr)
         return false;
@@ -236,11 +236,11 @@ bool OSXDriver2D::EnterFullscreenMode()
     if (CGDisplaySwitchToMode(kCGDirectMainDisplay, mode) == CGDisplayNoErr)
     {
         // Extract actual Width/Height/Depth
-        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayWidth), kCFNumberLongType, 
-                                                                                    &canvas->Width); 
-        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayHeight), kCFNumberLongType, 
-                                                                                    &canvas->Height); 
-        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayBitsPerPixel), kCFNumberLongType, 
+        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayWidth), kCFNumberLongType,
+                                                                                    &canvas->Width);
+        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayHeight), kCFNumberLongType,
+                                                                                    &canvas->Height);
+        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayBitsPerPixel), kCFNumberLongType,
                                                                                     &canvas->Depth);
     }
     else
@@ -257,7 +257,7 @@ bool OSXDriver2D::EnterFullscreenMode()
 // Switch out of fullscreen mode, to mode stored in originalMode
 void OSXDriver2D::ExitFullscreenMode()
 {
-    CGDisplaySwitchToMode(kCGDirectMainDisplay, originalMode);   
+    CGDisplaySwitchToMode(kCGDirectMainDisplay, originalMode);
     CGReleaseAllDisplays();
 };
 
@@ -268,9 +268,9 @@ bool OSXDriver2D::ToggleFullscreen()
 {
     bool oldAllowResizing = canvas->AllowResizing;
     bool success = true;
-    
+
     OSXDelegate2D_closeWindow(delegate);
-    
+
     if (canvas->FullScreen == true)
     {
         ExitFullscreenMode();
@@ -290,7 +290,7 @@ bool OSXDriver2D::ToggleFullscreen()
     };
 
     if (success == true)
-        OSXDelegate2D_openWindow(delegate, canvas->win_title, 
+        OSXDelegate2D_openWindow(delegate, canvas->win_title,
                                     canvas->Width, canvas->Height, canvas->Depth, canvas->FullScreen);
 
     return success;
@@ -299,7 +299,7 @@ bool OSXDriver2D::ToggleFullscreen()
 
 
 /// C API to driver class
-#define DRV2D_FUNC(ret, func) __private_extern__ "C" ret OSXDriver2D_##func 
+#define DRV2D_FUNC(ret, func) __private_extern__ "C" ret OSXDriver2D_##func
 
 typedef void *OSXDriver2DHandle;
 typedef void *NeXTEventHandle;

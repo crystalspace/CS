@@ -34,7 +34,7 @@ struct iEngine;
 struct iSector;
 
 /**
- * A Fire particle system. Each x msec n particles shoot out of the fire, 
+ * A Fire particle system. Each x msec n particles shoot out of the fire,
  */
 class csFireMeshObject : public csParticleSystem
 {
@@ -103,7 +103,7 @@ public:
   /// You can set a pseudo-static light here
   void SetControlledLight (iLight *l);
   /**
-   * Add a new dynamic light (no need to call SetControlledLight). 
+   * Add a new dynamic light (no need to call SetControlledLight).
    */
   void AddLight (iEngine*, iSector*);
 
@@ -128,7 +128,7 @@ public:
     csFireMeshObject::origin = origin;
   }
   /// Get origin of the fire.
-  const csBox3& GetOrigin () const 
+  const csBox3& GetOrigin () const
   { return origin; }
   /// Set direction of the fire.
   void SetDirection (const csVector3& direction)
@@ -145,7 +145,7 @@ public:
     initialized = false;
     lighted_particles = l;
   }
-  /// See if lighting is enabled. 
+  /// See if lighting is enabled.
   bool GetLighting () const
   { return lighted_particles; }
   /// Set swirl.
@@ -195,9 +195,9 @@ public:
     {
       scfParent->SetParticleCount (num);
     }
-    virtual int GetParticleCount () const 
-    { 
-      return scfParent->GetParticleCount (); 
+    virtual int GetParticleCount () const
+    {
+      return scfParent->GetParticleCount ();
     }
     virtual void SetDropSize (float dropwidth, float dropheight)
     {
@@ -284,7 +284,7 @@ public:
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 };
- 
+
 /**
  * Fire type. This is the plugin you have to use to create instances
  * of csFireMeshObjectFactory.

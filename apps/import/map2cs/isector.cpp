@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -41,9 +41,9 @@ CISector::CISector(CMapBrush* pBrush)
   m_pOriginalBrush  = pBrush;
 
   // If the brush has no assigned entity, then this is only
-  // a default sector 
+  // a default sector
   m_IsDefaultsector = (pBrush->GetEntity() == NULL);
-  
+
   // Create wall polygon sets for all sides of the brush
   int i;
   for (i=0; i<pBrush->GetPolygonCount(); i++)
@@ -68,7 +68,7 @@ const char* CISector::GetName()
 }
 
 
-bool CISector::IsInside(CdVector3& v) 
+bool CISector::IsInside(CdVector3& v)
 {
   assert(m_pOriginalBrush);
 
@@ -107,7 +107,7 @@ void CISector::CreatePortal(CISector* pOtherSector)
           pNewPortal->SetTargetSector(pOtherSector);
           m_Portals.Push(pNewPortal);
           //Make a hole in the wall, we can walk through
-          RemoveWallPolygon(pNewPortal, AllOrientations); 
+          RemoveWallPolygon(pNewPortal, AllOrientations);
         }
         else
         {
@@ -130,7 +130,7 @@ void CISector::RemoveWallPolygon(CMapPolygonSet* pRemovePoly, WallOrientation Or
   }
 }
 
-CMapPolygonSet* CISector::GetCorrespondingWall(CMapTexturedPlane* pPlane, 
+CMapPolygonSet* CISector::GetCorrespondingWall(CMapTexturedPlane* pPlane,
                                                WallOrientation Orientation)
 {
   if (!pPlane) return NULL;
@@ -171,7 +171,7 @@ void CISector::TextureWalls(CIWorld* pWorld)
     CMapEntity* pEntity = pWorld->GetEntity(i);
 
     //the entity is the regular world brush, and no special brush
-    //we only texture walls with brushes of that entity, to avoid 
+    //we only texture walls with brushes of that entity, to avoid
     //problems with unnecessarily split polygons.
     for (j=0; j<pEntity->GetNumBrushes(); j++)
     {
@@ -179,9 +179,9 @@ void CISector::TextureWalls(CIWorld* pWorld)
       for (k=0; k<pBrush->GetPolygonCount(); k++)
       {
         CMapPolygon* pPolygon = pBrush->GetPolygon(k);
-        CMapPolygonSet* pWall = GetCorrespondingWall(pPolygon->GetBaseplane(), 
+        CMapPolygonSet* pWall = GetCorrespondingWall(pPolygon->GetBaseplane(),
                                                      MirroredOrientation);
-      
+
         if (pWall)
         {
           // The polygon shares a plane with a sector wall. Now we need to
@@ -229,7 +229,7 @@ void CISector::InsertThings(CIWorld* pWorld)
     }
     else
     {
-      CIThing*   pThing  = pWorld->CreateNewThing(pEntity); 
+      CIThing*   pThing  = pWorld->CreateNewThing(pEntity);
       for (j=0; j<pEntity->GetNumBrushes(); j++)
       {
         CMapBrush* pBrush = pEntity->GetBrush(j);
@@ -257,16 +257,16 @@ void CISector::InsertThings(CIWorld* pWorld)
               else
               {
                 //Clip this polygon against all bounding planes of the sector
-                Polygon.Split(m_pOriginalBrush->GetPolygon(p)->GetBaseplane(), 
+                Polygon.Split(m_pOriginalBrush->GetPolygon(p)->GetBaseplane(),
                               &Polygon);
               }
             } // for Polygons
-      
+
             if (!Polygon.IsEmpty())
             {
               //if some part of the polygon is inside the sector
               CMapPolygonSet* pThingPoly = new CMapPolygonSet(Polygon);
-          
+
               if (pWorld->GetMap()->GetConfigInt("Map2CS.General.RemoveHidden", 0))
               {
                 CMapBrushBoundingBox PolygonBoundingBox;
@@ -301,7 +301,7 @@ void CISector::InsertThings(CIWorld* pWorld)
           } //for poly
         } //if (Check only, if brushes intersect)
       } //for brush
-    
+
       if (pThing->IsEmpty())
       {
         delete pThing;

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Norman Krämer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -41,13 +41,13 @@ class csAVIStreamAudio : public iAudioStream
   SCF_DECLARE_IBASE;
 
   csAVIStreamAudio (iBase *pBase);
-  bool Initialize (const csAVIFormat::AVIHeader *ph, 
-		   const csAVIFormat::StreamHeader *psh, 
-		   const csAVIFormat::AudioStreamFormat *pf, 
+  bool Initialize (const csAVIFormat::AVIHeader *ph,
+		   const csAVIFormat::StreamHeader *psh,
+		   const csAVIFormat::AudioStreamFormat *pf,
 		   uint16 nStreamNumber,
 		   uint8 *pInitData, uint32 nInitDataLen,
 		   char *pName,
-		   uint8 *pFormatEx, uint32 nFormatEx, 
+		   uint8 *pFormatEx, uint32 nFormatEx,
 		   iObjectRegistry *object_reg);
   virtual ~csAVIStreamAudio ();
 

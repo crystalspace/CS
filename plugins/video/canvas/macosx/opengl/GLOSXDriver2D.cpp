@@ -1,6 +1,6 @@
 //
 //  GLOSXDriver2D.cpp
-//  
+//
 //
 //  Created by mreda on Tue Oct 30 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -40,7 +40,7 @@ GLOSXDriver2D::GLOSXDriver2D(iBase *p)
     context = NULL;
 };
 
-    
+
 // Destructor
 GLOSXDriver2D::~GLOSXDriver2D()
 {
@@ -91,37 +91,37 @@ bool GLOSXDriver2D::Open()
 
     // Report driver information
     csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, GLOSXDRIVER_REPORTER_ID,
-                        CS_PLATFORM_NAME " 2D OpenGL driver for Crystal Space " 
+                        CS_PLATFORM_NAME " 2D OpenGL driver for Crystal Space "
                         CS_VERSION_NUMBER "\nWritten by Matt Reda <mreda@mac.com>");
 
     // Initialize base class - will create window, switch mdoes, etx
     if (OSXDriver2D::Open() == false)
         return false;
-        
+
     // Initialize function pointers
     SetupDrawingFunctions();
-        
+
     // Context was created in initialize, window was created in OSXDriver2D::Open() - bind them
     OSXDelegate2D_updateOpenGLContext(delegate);
-            
+
     // Initialize OpenGL base class
     if (csGraphics2DGLCommon::Open() == false)
         return false;
-        
+
     return true;
 };
-  
-    
+
+
 // Close
 // Close drawing operations
 void GLOSXDriver2D::Close()
 {
     if (is_open == false)
         return;
-        
+
     // Close openGL
     csGraphics2DGLCommon::Close();
-    
+
     // Close window/context
     OSXDriver2D::Close();
     CGLClearDrawable(context);
@@ -132,8 +132,8 @@ void GLOSXDriver2D::Close()
 // SetTitle
 // Set window title
 void GLOSXDriver2D::SetTitle(char *title)
-{ 
-    OSXDelegate2D_setTitle(delegate, title); 
+{
+    OSXDelegate2D_setTitle(delegate, title);
     csGraphics2DGLCommon::SetTitle(title);
 };
 
@@ -176,7 +176,7 @@ bool GLOSXDriver2D::Resize(int w, int h)
 bool GLOSXDriver2D::ToggleFullscreen()
 {
     bool success = OSXDriver2D::ToggleFullscreen();
-    
+
     if (success == true)
         OSXDelegate2D_updateOpenGLContext(delegate);
 

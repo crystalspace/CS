@@ -25,7 +25,7 @@
 /**
  * This class represents a block of memory in the true colour format only.
  * It is used with dynamic textures so that the usual method of registering
- * and preparing textures if fulfilled. 8bit images and cropping/cloning make 
+ * and preparing textures if fulfilled. 8bit images and cropping/cloning make
  * no  sense in this context.
  */
 
@@ -39,10 +39,10 @@ public:
   /// Create a blank true colour image of these dimensions.
   csImageMemory (int width, int height);
   /**
-   * Create an iImage interface for this true colour buffer with 
+   * Create an iImage interface for this true colour buffer with
    * these dimensions. If destroy is set to true then the supplied buffer
    * will be destroyed when the interfaces are.
-   */ 
+   */
   csImageMemory (int width, int height, csRGBpixel *buffer, bool destroy);
 
   virtual ~csImageMemory ();

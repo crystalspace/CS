@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Norman Krämer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -147,7 +147,7 @@ struct iStreamFormat : public iBase
    * Choose a video and audio stream to be played when calling NextFrame.
    */
   virtual void Select (iAudioStream *pAudio, iVideoStream *pVideo) = 0;
-  /** 
+  /**
    * Call this in your main loop between BeginDraw and EndDraw.  This will
    * decode the next frame from the video and draw it to the rectangle set in
    * SetRect ().  This is an convenience function only.  You achieve the same
@@ -192,8 +192,8 @@ struct iStream : public iBase
    * or the next frame at timeindex (bTimeSynced = true).
    */
   virtual bool SetPlayMethod (bool bTimeSynced) = 0;
-  /** 
-   * Call this in your main loop between BeginDraw and EndDraw. 
+  /**
+   * Call this in your main loop between BeginDraw and EndDraw.
    * This will examine the next frame (either time or index based).
    */
   virtual void NextFrame () = 0;
@@ -223,7 +223,7 @@ struct iVideoStream : public iStream
    * Call this if you want to use the frames as textures on your own polygons.
    */
   virtual iMaterialHandle* NextFrameGetMaterial () = 0;
-  
+
 };
 
 SCF_VERSION (iAudioStream, 0, 0, 1);

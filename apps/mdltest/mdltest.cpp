@@ -554,7 +554,7 @@ void Simple::SetupFrame ()
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
-  
+
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * 2;
 

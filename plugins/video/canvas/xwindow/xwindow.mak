@@ -28,7 +28,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
- 
+
 ifeq ($(USE_XFREE86VM),yes)
   CFLAGS.XWIN += -DXFREE86VM
   # On some platforms -lxf86vm must appear before -lX11.
@@ -69,7 +69,7 @@ xwin: $(OUTDIRS) $(XWIN)
 
 $(OUT)%$O: plugins/video/canvas/xwindow/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.XWIN)
- 
+
 $(XWIN): $(OBJ.XWIN) $(LIB.XWIN)
 	$(DO.PLUGIN) $(LIB.XWIN.SPECIAL)
 

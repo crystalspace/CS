@@ -225,7 +225,7 @@ iDataBuffer *csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
   hdr.biYPelsPerMeter = little_endian_long (0);
   hdr.biClrUsed = little_endian_long (0);
   hdr.biClrImportant = little_endian_long (0);
-  
+
 
   csDataBuffer *db = new csDataBuffer (len);
   unsigned char *p = (unsigned char *)db->GetData ();
@@ -303,7 +303,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
 	int scanlinewidth = 4 * ((Width+3) / 4);
 	int color;
     for (color = 0; color < 256; color++, pwork++)
-    {  
+    {
       // Whacky BMP palette is in BGR order.
       pwork->blue  = *inpal++;
       pwork->green = *inpal++;

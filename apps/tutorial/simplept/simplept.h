@@ -48,7 +48,7 @@ private:
   iView* view;
   iVirtualClock* vc;
   csEngineProcTex* ProcTexture;
- 
+
 public:
   Simple ();
   virtual ~Simple ();

@@ -457,7 +457,7 @@ void csInputLine::SuggestSize (int &w, int &h)
     w = GetTextSize (text, &h);
   else
     w = h = 0;
-  
+
   w = MAX (w, bound.Width ());
   h = MAX (h, bound.Height ());
 }

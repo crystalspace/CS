@@ -42,7 +42,7 @@ class csGraphics2DSVGALib : public csGraphics2D, public iEventPlug
 
   // The event outlet
   iEventOutlet *EventOutlet;
-  
+
 public:
   SCF_DECLARE_IBASE_EXT(csGraphics2D);
 

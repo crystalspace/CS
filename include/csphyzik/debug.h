@@ -19,7 +19,7 @@
 #define McAssertFail( A, B ) { if( !A ){ Debug::log( B ); abort(); } }
 #define McAssertGoTo( A, B, C ) { if( !A ){ Debug::log( B ); goto C; } }
 //#define assert McAssert
-#define assert_fail McAssertFail 
+#define assert_fail McAssertFail
 #define assert_goto McAssertGoTo
 
 #define logf printf

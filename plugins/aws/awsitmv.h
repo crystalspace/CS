@@ -7,7 +7,7 @@
 class awsListRowVector : public csVector
 {
   int sortcol;
-  
+
 public:
   awsListRowVector();
   virtual ~awsListRowVector();

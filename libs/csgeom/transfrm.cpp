@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -61,7 +61,7 @@ csPlane3 csTransform::Other2This (const csPlane3& p) const
 //
 // Old plane equation: N*X + D = 0
 // There exists point X = <r*A,r*B,r*C> = r*N which satisfies the
-// plane equation.  
+// plane equation.
 //  => r*(N*N) + D = 0
 //  => r = -D/(N*N)
 //
@@ -157,10 +157,10 @@ csSphere& operator*= (csSphere& p, const csTransform& t)
 csMatrix3 operator* (const csMatrix3& m, const csTransform& t)
 { return m*t.m_o2t; }
 
-csMatrix3 operator* (const csTransform& t, const csMatrix3& m) 
+csMatrix3 operator* (const csTransform& t, const csMatrix3& m)
 { return t.m_o2t*m; }
 
-csMatrix3& operator*= (csMatrix3& m, const csTransform& t) 
+csMatrix3& operator*= (csMatrix3& m, const csTransform& t)
 { return m *= t.m_o2t; }
 
 //---------------------------------------------------------------------------
@@ -202,10 +202,10 @@ csSphere csReversibleTransform::This2Other (const csSphere& s) const
   return news;
 }
 
-csVector3 operator/ (const csVector3& v, const csReversibleTransform& t) 
+csVector3 operator/ (const csVector3& v, const csReversibleTransform& t)
 { return t.This2Other (v); }
 
-csVector3& operator/= (csVector3& v, const csReversibleTransform& t) 
+csVector3& operator/= (csVector3& v, const csReversibleTransform& t)
 { v = t.This2Other (v); return v; }
 
 csPlane3 operator/ (const csPlane3& p, const csReversibleTransform& t)
@@ -238,8 +238,8 @@ csReversibleTransform& operator/=(csReversibleTransform& t1,
 csReversibleTransform operator/ (const csReversibleTransform& t1,
                                const csReversibleTransform& t2)
 {
-  return csReversibleTransform (t1.m_o2t*t2.m_t2o, t2.m_o2t*t1.m_t2o, 
-                   t2.m_o2t*(t1.v_o2t - t2.v_o2t)); 
+  return csReversibleTransform (t1.m_o2t*t2.m_t2o, t2.m_o2t*t1.m_t2o,
+                   t2.m_o2t*(t1.v_o2t - t2.v_o2t));
 }
 
 void csReversibleTransform::RotateOther (const csVector3& v, float angle)
@@ -255,8 +255,8 @@ void csReversibleTransform::RotateOther (const csVector3& v, float angle)
   uxsa = u.x*sa;
   uysa = u.y*sa;
   uzsa = u.z*sa;
-  
-  SetT2O ( 
+
+  SetT2O (
     csMatrix3(
       u.x*omcaux+ca,    u.y*omcaux-uzsa,  u.z*omcaux+uysa,
       u.x*omcauy+uzsa,  u.y*omcauy+ca,    u.z*omcauy-uxsa,

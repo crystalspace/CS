@@ -106,7 +106,7 @@ int main(int argc, const char* const args[])
   iVFS *pVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   // well, since we want to try our renderer, we should request it now
   iSoundRender *pSR = CS_QUERY_REGISTRY (object_reg, iSoundRender);
-  
+
   // load the sound
   iDataBuffer *db = pVFS->ReadFile (args[1]);
 

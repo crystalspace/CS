@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2000 by Norman Kramer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -37,7 +37,7 @@ int csCrystalBall::csTriNode::Add (const csCrystalBallVec *normal,
     else
     {
       csCrystalBallVec *n = (csCrystalBallVec*)vP->Get (from);
-    
+
       if (*n == *normal)
       {
 	// just append this index
@@ -119,7 +119,7 @@ int csCrystalBall::csTriNode::Add (const csCrystalBallVec *normal,
   return nPos;
 }
 
-void csCrystalBall::csTriNode::Adjust (int nPos) 
+void csCrystalBall::csTriNode::Adjust (int nPos)
 {
   bool bDive = true;
   if (from > nPos)
@@ -138,7 +138,7 @@ void csCrystalBall::csTriNode::Adjust (int nPos)
   }
 }
 
-int csCrystalBall::csTriNode::Classify (const csVector3 &n, int i1, int i2, 
+int csCrystalBall::csTriNode::Classify (const csVector3 &n, int i1, int i2,
 				      int i3, const csVector *vTP) const
 {
   csVector3 origo (0,0,0);
@@ -147,17 +147,17 @@ int csCrystalBall::csTriNode::Classify (const csVector3 &n, int i1, int i2,
   frust.AddVertex (*(csVector3*)vTP->Get (i1));
   frust.AddVertex (*(csVector3*)vTP->Get (i2));
   frust.AddVertex (*(csVector3*)vTP->Get (i3));
-  
+
   return (frust.Contains (n)
   	? csCrystalBall::csTriNode::INSIDE
 	: csCrystalBall::csTriNode::OUTSIDE);
 }
 
 void csCrystalBall::csTriNode::Transform (
-	const csMatrix3 &m, csVector &indexVector, 
+	const csMatrix3 &m, csVector &indexVector,
 	int useSign, long cookie,
-	const csVector *vP, const csVector *vTP, 
-	const csVector3 &v1, const csVector3 &v2, 
+	const csVector *vP, const csVector *vTP,
+	const csVector3 &v1, const csVector3 &v2,
 	const csVector3 &v3)
 {
   // If the node has no children, we can decide based on the normal
@@ -190,7 +190,7 @@ void csCrystalBall::csTriNode::Transform (
       const csVector3 &n1 = *p[i];
       const csVector3 &n2 = *p[i+1];
       int match = SignMatches (&n1, &n2, &td, useSign);
-      
+
       if (match == 0)
       {
 	// all in same half of sphere, sp add them all
@@ -234,7 +234,7 @@ bool csCrystalBall::csTriNode::SignMatches (const csVector3 *tn, int useSign)
 }
 
 int csCrystalBall::csTriNode::SignMatches (
-	const csVector3 *n1, const csVector3 *n2, 
+	const csVector3 *n1, const csVector3 *n2,
 	const csVector3 *td, int useSign)
 {
   int match;
@@ -275,9 +275,9 @@ csCrystalBall::csCrystalBall ()
 csCrystalBall::~csCrystalBall ()
 {
   int i;
-  for (i=0; i < vTrianglePoints.Length (); i++) 
+  for (i=0; i < vTrianglePoints.Length (); i++)
     delete (csVector3*)vTrianglePoints.Get (i);
-  for (i=0; i < vPoints.Length (); i++) 
+  for (i=0; i < vPoints.Length (); i++)
     delete (csCrystalBallVec*)vPoints.Get (i);
 }
 
@@ -286,7 +286,7 @@ void csCrystalBall::InsertPolygon (iPolygonMesh *polyset, int idx)
   csMeshedPolygon &mp = polyset->GetPolygons ()[idx];
   // calc the normal first
   csCrystalBallVec *n = new csCrystalBallVec (idx);
-  csMath3::CalcNormal (*n, polyset->GetVertices ()[mp.vertices[0]], 
+  csMath3::CalcNormal (*n, polyset->GetVertices ()[mp.vertices[0]],
 		       polyset->GetVertices ()[mp.vertices[1]],
 		       polyset->GetVertices ()[mp.vertices[2]]
 		       );
@@ -327,7 +327,7 @@ void csCrystalBall::Build (iPolygonMesh *polyset)
 void csCrystalBall::Transform (const csTransform &o2c, csVector &indexVector,
 			       int useSign, long cookie)
 {
-  // fill indexVector with the indices to those polygons that have a 
+  // fill indexVector with the indices to those polygons that have a
   // normal vector with sign(z-coordinate) == <useSign>
 
   // first check the base triangles

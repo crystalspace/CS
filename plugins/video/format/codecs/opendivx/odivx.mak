@@ -40,10 +40,10 @@ INC.ODIVX = $(wildcard plugins/video/format/codecs/opendivx/*.h)
 SRC.ODIVX = $(wildcard plugins/video/format/codecs/opendivx/*.cpp)
 OBJ.ODIVX = $(addprefix $(OUT),$(notdir $(SRC.ODIVX:.cpp=$O)))
 DEP.ODIVX = CSUTIL CSSYS
-CFG.ODIVX = 
+CFG.ODIVX =
 
 TO_INSTALL.CONFIG += $(CFG.ODIVX)
-TO_INSTALL.DATA += 
+TO_INSTALL.DATA +=
 
 MSVC.DSP += ODIVX
 DSP.ODIVX.NAME = odivx

@@ -6,12 +6,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -74,9 +74,9 @@ struct csCdTriangle
 };
 
 /**
-  * A bounding box, used in collision detection. Any bounding box, can 
-  * either be a node or a leaf. A leaf will contain a single polygon, while 
-  * a node contains pointers to two other bounding boxes. This means, that 
+  * A bounding box, used in collision detection. Any bounding box, can
+  * either be a node or a leaf. A leaf will contain a single polygon, while
+  * a node contains pointers to two other bounding boxes. This means, that
   * this class in fact represents a tree of hierarchical bounding boxes.
   * THIS CLASS IS FOR INTERNAL USE OF COLLISION DETECTION
   */
@@ -92,8 +92,8 @@ protected:
   // placement in parent's space
   // box (x_b) to parent (x_m) space: x_m = m_Rotation*x_b + m_Translation
   // parent (x_m) to box (x_b) space: x_b = m_Rotation.T()*(x_m - m_Translation)
-  csMatrix3 m_Rotation;    
-  csVector3 m_Translation; 
+  csMatrix3 m_Rotation;
+  csVector3 m_Translation;
 
   // this is "radius", that is, half the measure of a side length
   csVector3 m_Radius;
@@ -105,47 +105,47 @@ protected:
   csCdBBox* m_pChild0, * m_pChild1;
 
   /**
-    * Checks if two Bounding Boxes do collide. Thes routine assumes, 
-    * that each Bounding Box contains _exactly_ one Triangle in 
+    * Checks if two Bounding Boxes do collide. Thes routine assumes,
+    * that each Bounding Box contains _exactly_ one Triangle in
     * m_pTriangle!
     */
   static bool TrianglesHaveContact (csCdBBox* pBox1, csCdBBox* pBox2);
 
   /**
-    * Assign a Triangle to this Bounding box. This will make this 
+    * Assign a Triangle to this Bounding box. This will make this
     * Bounding Box into a leaf.
     */
   bool SetLeaf(csCdTriangle* pTriangle);
 
   /**
-    * Build a tree structure of Bounding Boxes. TriangleIndices is an array 
-    * of indices into the Triangles array. NumTriangles is the number of 
-    * valid indices in the TriangleIndices array. The idea behind this (at 
-    * first glance very odd) datastructure is, to keep the original order 
-    * of "Triangles" intact, and only shuffle the much smaller indices. In 
-    * fact, there is only one TriangleInidices array, that is sorted over 
-    * and over again and then passed recursively in two halfs to the same 
+    * Build a tree structure of Bounding Boxes. TriangleIndices is an array
+    * of indices into the Triangles array. NumTriangles is the number of
+    * valid indices in the TriangleIndices array. The idea behind this (at
+    * first glance very odd) datastructure is, to keep the original order
+    * of "Triangles" intact, and only shuffle the much smaller indices. In
+    * fact, there is only one TriangleInidices array, that is sorted over
+    * and over again and then passed recursively in two halfs to the same
     * routine again and again, until there are only leafes left.
     */
-  bool BuildBBoxTree(int*          TriangleIndices, 
-                     int           NumTriangles, 
+  bool BuildBBoxTree(int*          TriangleIndices,
+                     int           NumTriangles,
                      csCdTriangle* Triangles,
                      csCdBBox*&    pBoxPool);
 
   /**
-    * returns true, if this is a leaf bounding box, Maybe, this would be 
-    * faster and more secure, if we would return true, if m_pTriangle is 
+    * returns true, if this is a leaf bounding box, Maybe, this would be
+    * faster and more secure, if we would return true, if m_pTriangle is
     * set. For this we need to make sure, that m_pTriangle is always
     * properly initialised to NULL, which is currently not the case.
     * - thieber 14.03.2000 -
     */
-  bool IsLeaf() const { return (!m_pChild0 && !m_pChild1); } 
-  
+  bool IsLeaf() const { return (!m_pChild0 && !m_pChild1); }
+
   /**
-    * return the size of the bounding box. Why this returns d.x and not 
+    * return the size of the bounding box. Why this returns d.x and not
     * d.y or d.z is not obious to me. - thieber 13.03.2000 -
     */
-  float GetSize() const { return m_Radius.x; } 
+  float GetSize() const { return m_Radius.x; }
 
 public:
 
@@ -186,7 +186,7 @@ protected:
   int m_NumTriangles;
   int m_NumTrianglesAllocated;
   //------------------------
-  
+
   /// Build a tree of bounding boxes from the given Triangles
   bool BuildHierarchy();
 
@@ -201,14 +201,14 @@ public:
   csCdBBox* GetTopLevelBox() {return &m_pBoxes[0];}
 
   /// Add a triangle to the model
-  bool AddTriangle (const csVector3& p1, 
-                    const csVector3& p2, 
+  bool AddTriangle (const csVector3& p1,
+                    const csVector3& p2,
                     const csVector3& p3);
 };
 
 /***************************************************************************/
 
-// this is the collision query invocation.  It assumes that the 
+// this is the collision query invocation.  It assumes that the
 // models are not being scaled up or down, but have their native
 // dimensions.
 
@@ -229,7 +229,7 @@ public:
     // compute the area of the triangle
     u = q - p;
     v = r - p;
-    w = u % v; 
+    w = u % v;
 
     if (ABS (w.x)+ABS (w.y)+ABS (w.z) > SMALL_EPSILON)
         A = 0.5 * w.Norm();
@@ -242,8 +242,8 @@ public:
     if (A == 0.0)
     {
       // This triangle has zero area.  The second order components
-      // would be eliminated with the usual formula, so, for the 
-      // sake of robustness we use an alternative form.  These are the 
+      // would be eliminated with the usual formula, so, for the
+      // sake of robustness we use an alternative form.  These are the
       // centroid and second-order components of the triangle's vertices.
 
       // second-order components
@@ -252,7 +252,7 @@ public:
       s.m13 = (p.x*p.z + q.x*q.z + r.x*r.z);
       s.m22 = (p.y*p.y + q.y*q.y + r.y*r.y);
       s.m23 = (p.y*p.z + q.y*q.z + r.y*r.z);
-      s.m33 = (p.z*p.z + q.z*q.z + r.z*r.z);      
+      s.m33 = (p.z*p.z + q.z*q.z + r.z*r.z);
     }
     else
     {
@@ -267,7 +267,7 @@ public:
     s.m32 = s.m23;
     s.m21 = s.m12;
     s.m31 = s.m13;
-  } 
+  }
 };
 
 class Accum : public Moment

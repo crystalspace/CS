@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -129,7 +129,7 @@ csFlareHalo::~csFlareHalo()
   }
 }
 
-void csFlareHalo::AddComponent(float pos, float w, float h, uint mode, 
+void csFlareHalo::AddComponent(float pos, float w, float h, uint mode,
   iMaterialWrapper *image)
 {
   csFlareComponent *comp = new csFlareComponent;
@@ -276,7 +276,7 @@ bool csLightHalo::Process (csTicks ElapsedTime, const csEngine &Engine)
 }
 
 //----------------------------------------------------+ csLightFlareHalo +---//
-csLightFlareHalo::csLightFlareHalo(csLight *light, csFlareHalo *halo, 
+csLightFlareHalo::csLightFlareHalo(csLight *light, csFlareHalo *halo,
   int iHaloSize)
   : csLightHalo(light, 0)
 {
@@ -305,7 +305,7 @@ bool csLightFlareHalo::Process (csTicks elapsed_time, csEngine const& engine)
   Light->GetHalo ()->SetIntensity (hintensity);
 
   /// the perspective center of the view is the axis of the flare
-  csVector2 center (engine.current_camera->GetShiftX (), 
+  csVector2 center (engine.current_camera->GetShiftX (),
     engine.current_camera->GetShiftY ());
   /// start point of the flare is the (projected) light position
   csVector2 start (v.x, engine.current_camera->GetShiftY()*2.-v.y);
@@ -433,7 +433,7 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 #undef INTERPOLATE
 #undef INTERPOLATE1
 
-void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine, 
+void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine,
   csFlareComponent *comp, csVector2 const& start, csVector2 const& deltapos)
 {
   int i;
@@ -441,7 +441,7 @@ void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine,
   float compw = float(halosize)*comp->width;
   float comph = float(halosize)*comp->height;
   csVector2 pos = start + comp->position * deltapos;
-  
+
   /// drawing info for the polygon
   G3DPolygonDPFX dpfx;
 
@@ -467,7 +467,7 @@ void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine,
   csVector2 clipped_poly2d[MAX_OUTPUT_VERTICES];
   csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
 
-  uint8 clip_result = engine.top_clipper->Clip (HaloPoly, 4, clipped_poly2d, 
+  uint8 clip_result = engine.top_clipper->Clip (HaloPoly, 4, clipped_poly2d,
     num_clipped_verts, clipped_vtstats);
   if (clip_result == CS_CLIP_OUTSIDE) return; // nothing to do
 
@@ -480,13 +480,13 @@ void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine,
   // prepare for drawing
   dpfx.num = num_clipped_verts;
   dpfx.use_fog = false;
-  if(!comp->image) 
+  if(!comp->image)
   {
     printf("INTERNAL ERROR: flare used without material.\n");
     return;
   }
   dpfx.mat_handle = comp->image->GetMaterialHandle();
-  if(!dpfx.mat_handle) 
+  if(!dpfx.mat_handle)
   {
     printf("INTERNAL ERROR: flare used without valid material handle.\n");
     return;

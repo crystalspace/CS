@@ -33,19 +33,19 @@ struct md2_t
   int32 skinwidth;
   int32 skinheight;
   int32 framesize;              // byte size of each frame
-  
+
   int32 numskins;               // number of skins
   int32 numxyz;                 // number of xyz points
   int32 numverts;               // number of vertices
   int32 numtris;                // number of triangles
   int32 numglcmds;              // dwords in strip/fan command list ?
   int32 numframes;              // number of frames
-  
+
   int32 ofsskins;              // each skin is a MD2_SKIN_NAME_MAX string
   int32 ofsverts;              // offset from start for stverts
   int32 ofstris;               // offset for dtriangles
   int32 ofsframes;             // offset for first frame
-  int32 ofsglcmds; 
+  int32 ofsglcmds;
   int32 ofsend;                // end of file
 };
 

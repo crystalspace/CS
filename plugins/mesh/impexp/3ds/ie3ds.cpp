@@ -1,7 +1,7 @@
 /*
     Written by Richard D Shank
     Copyright (C) 2001 by Jorrit Tyberghein
-    
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -57,8 +57,8 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_FACTORY( csModelConverter3ds )
 
 SCF_EXPORT_CLASS_TABLE( ie3ds )
-  SCF_EXPORT_CLASS( csModelConverter3ds, 
-                "crystalspace.modelconverter.3ds", 
+  SCF_EXPORT_CLASS( csModelConverter3ds,
+                "crystalspace.modelconverter.3ds",
                 "3ds Model Converter" )
 SCF_EXPORT_CLASS_TABLE_END
 
@@ -161,7 +161,7 @@ static void AddTexels(Lib3dsTexel * pCurTexel, int numTexels,
   int i;
 
   if (!numTexels)
-  { 
+  {
     // This means that the model doesn't contains UV coordinates so
     // we will use the default ones.
     Vertices->AddTexel (csVector2 (0, 0));
@@ -210,7 +210,7 @@ static void AssignDefaultTexels (iModelDataObject *pDataObject,
       //pCurPoly->AddVertex( index, 0, 0, j );
       pCurPoly->AddVertex( index, i , 0, j);
     }
-    pCurFace++;	      
+    pCurFace++;
   }
 }
 
@@ -222,7 +222,7 @@ static void AssignDefinedTexels (iModelDataObject * pDataObject,
   int i,j,index;
   iModelDataPolygon * pCurPoly;
   float *normal;
-	
+
   for ( i = 0 ; i < numTriangles ; i++ )
   {
     // create a new poly for the data object
@@ -240,7 +240,7 @@ static void AssignDefinedTexels (iModelDataObject * pDataObject,
       //pCurPoly->AddVertex( index, 0, 0, j );
       pCurPoly->AddVertex( index, i , 0, index);
     }
-    pCurFace++;	      
+    pCurFace++;
   }
 }
 
@@ -399,9 +399,9 @@ bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,
   // add a dummy normal, white as the default color and three default texels
   //Vertices->AddNormal (csVector3 (0, 0, 0));
   Vertices->AddColor (csColor (1, 1, 1));
-    
+
   AddTexels(pCurTexel,numTexels,Vertices);
-  
+
 
   for ( i = 0 ; i < numVertices ; i++ )
   {
@@ -414,9 +414,9 @@ bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,
     Vertices->AddVertex( vertex );
     pCurPoint++;
   }
- 
+
   // It should be possible to add the texels
- 
+
   /***  Load up the triangles  ***/
 
   int numTriangles;//, index, j;
@@ -461,11 +461,11 @@ bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,
 		pCurPoly->AddVertex( index, 0 , 0, index);
 
       }
-	  
+
 
       // set the material
       // pCurPoly->SetMaterial (iModelDataMaterial *m) = 0;
-      pCurFace++;	      
+      pCurFace++;
     }*/
 
   return true;
@@ -484,13 +484,13 @@ Lib3dsFile *csModelConverter3ds::LoadFileData( uint8* pBuffer, uint32 size )
 
   // create a data stream from the buffer and don't delete it
   pData = new csDataStream( pBuffer, size, false );
-  
+
   pLibIO = lib3ds_io_new(
-    pData, 
+    pData,
     DataErrorFunc,
-    DataSeekFunc, 
-    DataTellFunc, 
-    DataReadFunc,  
+    DataSeekFunc,
+    DataTellFunc,
+    DataReadFunc,
     DataWriteFunc
   );
 

@@ -21,7 +21,7 @@
 #ifndef __CT_VECTOR__
 #define __CT_VECTOR__
 
-// very annoying that I can't use templates.  
+// very annoying that I can't use templates.
 // Crystal Space people have some beef with templates.
 
 class ctVector3;
@@ -38,7 +38,7 @@ class ctMatrix3;
 #include "csphyzik/phyztype.h"
 #include "csphyzik/debug.h"
 
-class ctVectorTranspose3 
+class ctVectorTranspose3
 {
 public:
   ctVectorTranspose3 ()
@@ -78,25 +78,25 @@ public:
     }
   }
 
-  real operator[] (const int index) const 
-  { return elements[index]; } 
-
-  real& operator[] (const int index) 
+  real operator[] (const int index) const
   { return elements[index]; }
 
-  ctVectorTranspose3 operator* ( const real pk ) 
-  { 
+  real& operator[] (const int index)
+  { return elements[index]; }
+
+  ctVectorTranspose3 operator* ( const real pk )
+  {
     ctVectorTranspose3 scaled;
 	int idx;
-    for(idx = 0; idx < 3; idx++ ) 
-      scaled.elements[idx] = elements[idx] * pk;  
+    for(idx = 0; idx < 3; idx++ )
+      scaled.elements[idx] = elements[idx] * pk;
     return scaled;
   }
-  
-  void operator*= (const real p) 
+
+  void operator*= (const real p)
   { int idx; for (idx=0; idx<3; ++idx) elements[idx] *= p; }
 
-  void operator/= (const real p) 
+  void operator/= (const real p)
   { int idx; for (idx=0; idx<3; ++idx) elements[idx] /= p; }
 
   real operator* ( const ctVector3 &bs );
@@ -133,14 +133,14 @@ public:
   inline real operator[](int n) const {return !n?x:n&1?y:z;}
 
   ctMatrix3 operator*( const ctVectorTranspose3 &pvt );
-  
+
   void cross(const ctVector3 & px, const ctVector3 & py){
     x = px.y*py.z - px.z*py.y;
     y = px.z*py.x - px.x*py.z;
     z = px.x*py.y - px.y*py.x;
   }
 
-  ctVector3 unit() const { return Unit(); } 
+  ctVector3 unit() const { return Unit(); }
 
   void normalize();
   real length(){ return Norm(); }

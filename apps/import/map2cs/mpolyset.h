@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef MPOLYSET_H
@@ -25,8 +25,8 @@
 #include "contain.h"
 
 /**
-  * This class stores an open number of concave polygons, that are coplanar. The 
-  * polygons need not have a commom texture, but they need to have a common 
+  * This class stores an open number of concave polygons, that are coplanar. The
+  * polygons need not have a commom texture, but they need to have a common
   * geometric baseplane.
   * This class will allow simple geometrical operations on polygon sets. This
   * will help to generate portals, or to clip awain hidden surfaces.
@@ -34,21 +34,21 @@
 class CMapPolygonSet
 {
 public:
-  /** 
+  /**
     * Create an empty Polygon set.
     */
   CMapPolygonSet();
 
-  /** 
-    * Create a new Polygon set from a given Polygon set. All information is 
-    * being duplicated, so the original Polygon set can be altered any way, 
+  /**
+    * Create a new Polygon set from a given Polygon set. All information is
+    * being duplicated, so the original Polygon set can be altered any way,
     * without affecting the newly created Set.
     */
   CMapPolygonSet(const CMapPolygonSet& Set);
 
   /**
-    * Create a new Polygon set from a single Polygon. All information is 
-    * being duplicated, so the original Polygon can be altered any way, 
+    * Create a new Polygon set from a single Polygon. All information is
+    * being duplicated, so the original Polygon can be altered any way,
     * without affecting the newly created Set.
     */
   CMapPolygonSet(const CMapPolygon&    Poly);
@@ -98,9 +98,9 @@ public:
   /**
     * Gets the Basplane for this polygon set. Attention: Though all
     * Polygons share the same _geometric_ baseplane, they need not
-    * share the same texture plane, so you man _not_ use this 
+    * share the same texture plane, so you man _not_ use this
     * baseplane to retreive texture information!
-    */ 
+    */
   CMapTexturedPlane* GetBaseplane();
 
 protected:

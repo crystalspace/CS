@@ -93,13 +93,13 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
     dispdriver = CS_LOAD_PLUGIN (plugin_mgr, strDriver, iOpenGLDisp);
     if (!dispdriver)
     {
-      Report (CS_REPORTER_SEVERITY_WARNING, 
-	      "Could not create an instance of %s ! Using NULL instead.", 
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	      "Could not create an instance of %s ! Using NULL instead.",
 	      strDriver);
-    }    
+    }
     else if (!dispdriver->open ())
     {
-      Report (CS_REPORTER_SEVERITY_ERROR, 
+      Report (CS_REPORTER_SEVERITY_ERROR,
 	      "open of displaydriver %s failed!", strDriver);
       return false;
     }
@@ -108,7 +108,7 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   xwin = CS_LOAD_PLUGIN (plugin_mgr, XWIN_SCF_ID, iXWindow);
   if (!xwin)
   {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
+    Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Could not create an instance of %s !", XWIN_SCF_ID);
     return false;
   }
@@ -139,7 +139,7 @@ csGraphics2DGLX::~csGraphics2DGLX ()
   Close ();
   if (dispdriver)
     dispdriver->DecRef();
- 
+
   if (xwin)
     xwin->DecRef ();
 }
@@ -162,7 +162,7 @@ bool csGraphics2DGLX::Open()
 
   if (!xwin->Open ())
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
+    Report (CS_REPORTER_SEVERITY_ERROR,
 	    "Failed to open the X-Window!");
     return false;
   }
@@ -189,7 +189,7 @@ void csGraphics2DGLX::Close(void)
 
   if ( dispdriver ){
       dispdriver->close();
-  }  
+  }
 
   if (xwin)
     xwin->Close ();
@@ -227,8 +227,8 @@ bool csGraphics2DGLX::CreateVisuals ()
 {
   int desired_attributes[] =
   {
-    GLX_RGBA, 
-    GLX_DEPTH_SIZE, 8, 
+    GLX_RGBA,
+    GLX_DEPTH_SIZE, 8,
     GLX_RED_SIZE, 4,
     GLX_BLUE_SIZE, 4,
     GLX_GREEN_SIZE, 4,
@@ -249,26 +249,26 @@ bool csGraphics2DGLX::CreateVisuals ()
     cmap = XCreateColormap (dpy, RootWindow (dpy, xvis->screen),
 			    xvis->visual, AllocNone);
 
-//    Report (CS_REPORTER_SEVERITY_NOTIFY, "Seized Visual ID %d", 
+//    Report (CS_REPORTER_SEVERITY_NOTIFY, "Seized Visual ID %d",
 //	      xvis->visual->visualid);
   }
   else
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
     	"Could not find proper GLX visual");
- 
+
     // what attribute was not supplied? we know that trying to get
     // all the attributes at once doesn't work.  provide more user info by
-    // trying each of the pieces and seeing if any single piece is not provided 
-    
+    // trying each of the pieces and seeing if any single piece is not provided
+
     // try to get a visual with 12 bit color
-    int color_attributes[] = 
-    { 
+    int color_attributes[] =
+    {
       GLX_RGBA,
       GLX_RED_SIZE,4,
       GLX_BLUE_SIZE,4,
       GLX_GREEN_SIZE,4,
-      None 
+      None
     };
 
     if (!glXChooseVisual(dpy, screen_num, color_attributes) )
@@ -302,7 +302,7 @@ bool csGraphics2DGLX::CreateVisuals ()
   else pfmt.PixelBytes = 2;
 
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Visual ID: %x, %dbit %sn",
-	    xvis->visualid, Depth, 
+	    xvis->visualid, Depth,
 	    visual_class_name (xvis->c_class));
 
   int ctype, frame_buffer_depth, size_depth_buffer, level;
@@ -335,17 +335,17 @@ bool csGraphics2DGLX::CreateVisuals ()
   {
     if (pfmt.RedMask > pfmt.BlueMask)
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, 
-		"R%d:G%d:B%d:A%d, ", 
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"R%d:G%d:B%d:A%d, ",
 		pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, alpha_bits);
     }
     else
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, 
-		"B%d:G%d:R%d:A%d, ", 
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"B%d:G%d:R%d:A%d, ",
 		pfmt.BlueBits, pfmt.GreenBits, pfmt.RedBits, alpha_bits);
     }
-  } 
+  }
   Report (CS_REPORTER_SEVERITY_NOTIFY, "level %d, double buffered", level);
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Depth buffer: %dbit", size_depth_buffer);
 
@@ -372,15 +372,15 @@ void csGraphics2DGLX::Print (csRect * /*area*/)
 
 
 void csGraphics2DGLX::SetFullScreen (bool yesno)
-{ 
-  csGraphics2D::SetFullScreen (yesno); 
-  xwin->SetFullScreen (yesno); 
+{
+  csGraphics2D::SetFullScreen (yesno);
+  xwin->SetFullScreen (yesno);
 }
 
 void csGraphics2DGLX::AllowResize (bool iAllow)
-{ 
-  AllowResizing = iAllow; 
-  xwin->AllowResize (iAllow); 
+{
+  AllowResizing = iAllow;
+  xwin->AllowResize (iAllow);
 }
 
 

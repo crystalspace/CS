@@ -82,7 +82,7 @@ OdeRungaKutta4::~OdeRungaKutta4 ()
 
 // Compute a step. Current state in t0, state after time step t0 -> t1 is put in y1
 // fourth order runga-kutta
-void OdeRungaKutta4::calc_step (real y0[], real y1[], 
+void OdeRungaKutta4::calc_step (real y0[], real y1[],
 			   unsigned int len, real t0, real t1, dydt_function dydt)
 {
   unsigned int i;
@@ -94,7 +94,7 @@ void OdeRungaKutta4::calc_step (real y0[], real y1[],
   real h_2 = h * 0.5;
 
   dydt(t0, y0, dy );
-  for (i = 0; i < len; i++) 
+  for (i = 0; i < len; i++)
     k1[i] = h*dy[i];  // first iteration
 
   for (i = 0; i < len; i++)
@@ -115,15 +115,15 @@ void OdeRungaKutta4::calc_step (real y0[], real y1[],
     Iy[i] = y0[i] + k3[i];
 
   dydt(t0 + h, Iy, dy );
-  for (i = 0; i < len; i++)   
+  for (i = 0; i < len; i++)
     k4[i] = h*dy[i]; // fourth iteration
 
   for (i = 0; i < len; i++)
-    y1[i] = y0[i] + (k1[i] * ONE_OVER_SIX) + 
-                    (k2[i] * ONE_OVER_THREE) + 
-                    (k3[i] * ONE_OVER_THREE) + 
+    y1[i] = y0[i] + (k1[i] * ONE_OVER_SIX) +
+                    (k2[i] * ONE_OVER_THREE) +
+                    (k3[i] * ONE_OVER_THREE) +
                     (k4[i] * ONE_OVER_SIX);
- 
+
 }
 
 // reallocate memory for all work variables
@@ -151,7 +151,7 @@ OdeEuler::OdeEuler()
   ode_realloc(ODE_INITIAL_STATE_SIZE);
 }
 
-void OdeEuler::calc_step (real y0[], real y1[], 
+void OdeEuler::calc_step (real y0[], real y1[],
 			  unsigned int len, real t0, real t1, dydt_function dydt)
 {
   unsigned int i;
@@ -162,7 +162,7 @@ void OdeEuler::calc_step (real y0[], real y1[],
   real h = t1 - t0;
 
   dydt(t0, y0, dy );
- 
+
   for (i = 0; i < len; i++)
     y1[i] = y0[i] + dy[i] * h;
 }
@@ -176,11 +176,11 @@ OdeMidPoint::OdeMidPoint()
 }
 
 // k1 = f( t, x )  : eval F and T at (t, x)
-// k2 = f( t + dt/2, x + dt/2*k1 ) 
-//    x + dt/2*k1 -> take step of size dt/2 from x. AddRB( k2, k1, dt/2,  
-//      f()         -> eval F and T at stepped ( t + dt/2, x + dt/2*k1 ) postion  
+// k2 = f( t + dt/2, x + dt/2*k1 )
+//    x + dt/2*k1 -> take step of size dt/2 from x. AddRB( k2, k1, dt/2,
+//      f()         -> eval F and T at stepped ( t + dt/2, x + dt/2*k1 ) postion
 // y' = y + dt*k2   -> take step of size dt from x
-void OdeMidPoint::calc_step (real y0[], real y1[], 
+void OdeMidPoint::calc_step (real y0[], real y1[],
 			   unsigned int len, real t0, real t1, dydt_function dydt)
 {
   unsigned int i;
@@ -195,7 +195,7 @@ void OdeMidPoint::calc_step (real y0[], real y1[],
     Iy[i] = y0[i] + dy[i] * h;  // first iteration
 
   dydt(t0 + h, Iy, dy );
-  
+
   h *= 2.0;
   for (i = 0; i < len; i++)
     y1[i] = y0[i] + dy[i] * h;

@@ -59,7 +59,7 @@ private:
   iKeyboardDriver* kbd;
   iVirtualClock* vc;
 
-  /// the sky 
+  /// the sky
   iMeshWrapper *skydome;
   float skytime;
 

@@ -10,7 +10,7 @@ awsListRowVector::~awsListRowVector()
 {
 }
 
-bool 
+bool
 awsListRowVector::FreeItem (csSome Item)
 {
   delete (awsListRow *)Item;
@@ -18,7 +18,7 @@ awsListRowVector::FreeItem (csSome Item)
   return true;
 }
 
-int 
+int
 awsListRowVector::Compare (csSome Item1, csSome Item2, int /*Mode*/) const
 {
   awsListRow *r1 = (awsListRow *)Item1;
@@ -31,11 +31,11 @@ awsListRowVector::Compare (csSome Item1, csSome Item2, int /*Mode*/) const
     return 1;
   else if (r2->cols[sortcol].text)
     return -1;
-  else 
-    return 0;  
+  else
+    return 0;
 }
 
-int 
+int
 awsListRowVector::CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
 {
   awsListRow *r1 = (awsListRow *)Item;

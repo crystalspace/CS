@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -66,7 +66,7 @@ void csIsoSprite::AddVertex(const csVector3& coord, float u, float v)
   static_colors.AddVertex(1.,1.,1.);
 }
 
-void csIsoSprite::SetPosition(const csVector3& newpos) 
+void csIsoSprite::SetPosition(const csVector3& newpos)
 {
   /// manage movement of the sprite, oldpos, newpos
   csVector3 oldpos = position;
@@ -74,7 +74,7 @@ void csIsoSprite::SetPosition(const csVector3& newpos)
   if(grid) grid->MoveSprite(this, oldpos, newpos);
 }
 
-void csIsoSprite::MovePosition(const csVector3& delta) 
+void csIsoSprite::MovePosition(const csVector3& delta)
 {
   SetPosition(position + delta);
 }
@@ -238,8 +238,8 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   for (i = 0; i < g3dpolyfx.num; i++)
   {
     view->W2S(position + poly[i], screenpos);
-    //if(screenpos.z == 0.0) g3dpolyfx.vertices [i].z = 0.5; else 
-    //if(screenpos.z < 0.0) 
+    //if(screenpos.z == 0.0) g3dpolyfx.vertices [i].z = 0.5; else
+    //if(screenpos.z < 0.0)
          //g3dpolyfx.vertices [i].z = 1.0-.5/(-screenpos.z+1.);
     //else g3dpolyfx.vertices [i].z = .5/(screenpos.z+1.);
     g3dpolyfx.vertices [i].z = 1./(screenpos.z-zlowerbound);
@@ -304,13 +304,13 @@ void csIsoSprite::AddToVertexColor(int i, const csColor& color)
 {
   CS_ASSERT (poly.GetVertexCount () == colors.GetVertexCount ());
   CS_ASSERT (i >= 0 && i < colors.GetVertexCount ());
-  colors[i].x += color.red; 
+  colors[i].x += color.red;
   if(colors[i].x>1.0f) colors[i].x=1.0f;
   else if(colors[i].x < 0.0f) colors[i].x = 0.0f;
-  colors[i].y += color.green; 
+  colors[i].y += color.green;
   if(colors[i].y>1.0f) colors[i].y=1.0f;
   else if(colors[i].y < 0.0f) colors[i].y = 0.0f;
-  colors[i].z += color.blue; 
+  colors[i].z += color.blue;
   if(colors[i].z>1.0f) colors[i].z=1.0f;
   else if(colors[i].z < 0.0f) colors[i].z = 0.0f;
 }
@@ -337,13 +337,13 @@ void csIsoSprite::AddToVertexStaticColor(int i, const csColor& color)
 {
   CS_ASSERT (poly.GetVertexCount () == static_colors.GetVertexCount ());
   CS_ASSERT (i >= 0 && i < static_colors.GetVertexCount ());
-  static_colors[i].x += color.red; 
+  static_colors[i].x += color.red;
   if(static_colors[i].x>1.0f) static_colors[i].x=1.0f;
   else if(static_colors[i].x < 0.0f) static_colors[i].x = 0.0f;
-  static_colors[i].y += color.green; 
+  static_colors[i].y += color.green;
   if(static_colors[i].y>1.0f) static_colors[i].y=1.0f;
   else if(static_colors[i].y < 0.0f) static_colors[i].y = 0.0f;
-  static_colors[i].z += color.blue; 
+  static_colors[i].z += color.blue;
   if(static_colors[i].z>1.0f) static_colors[i].z=1.0f;
   else if(static_colors[i].z < 0.0f) static_colors[i].z = 0.0f;
 }

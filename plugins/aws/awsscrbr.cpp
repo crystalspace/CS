@@ -21,10 +21,10 @@ const int awsScrollBar::signalChanged=0x1;
 const int awsScrollBar::fsVertical =0x0;
 const int awsScrollBar::fsHorizontal =0x1;
 
-awsScrollBar::awsScrollBar():is_down(false), mouse_is_over(false), 
+awsScrollBar::awsScrollBar():is_down(false), mouse_is_over(false),
 was_down(false), tex(NULL),
 frame_style(0), alpha_level(92),
-decVal(NULL), incVal(NULL), 
+decVal(NULL), incVal(NULL),
 sink(NULL), dec_slot(NULL), inc_slot(NULL),
 value(0), max(1), min(0), amntvis(0),
 value_delta(0.1), value_page_delta(0.25)
@@ -45,7 +45,7 @@ awsScrollBar::~awsScrollBar()
 }
 
 char *
-awsScrollBar::Type() 
+awsScrollBar::Type()
 {
   return "Scroll Bar";
 }
@@ -91,17 +91,17 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
 
       incimg->GetOriginalDimensions(img_w, img_h);
 
-      decinfo.AddRectKey(new scfString("Frame"), 
+      decinfo.AddRectKey(new scfString("Frame"),
                          csRect(0, 0,
                                 Frame().Width(), img_h));
 
-      incinfo.AddRectKey(new scfString("Frame"), 
+      incinfo.AddRectKey(new scfString("Frame"),
                          csRect(0, Frame().Height()-img_h,
                                 Frame().Width(), Frame().Height()));
     } break;
 
 
-  default:  
+  default:
     {
 
       incimg = pm->GetTexture("ScrollBarRt");
@@ -115,11 +115,11 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
 
       incimg->GetOriginalDimensions(img_w, img_h);
 
-      decinfo.AddRectKey(new scfString("Frame"), 
+      decinfo.AddRectKey(new scfString("Frame"),
                          csRect(Frame().xmin, Frame().ymin,
                                 Frame().xmin+img_w+5, Frame().ymax));
 
-      incinfo.AddRectKey(new scfString("Frame"), 
+      incinfo.AddRectKey(new scfString("Frame"),
                          csRect(Frame().xmax-img_w-5, Frame().ymin,
                                 Frame().xmax, Frame().ymax));
     } break;
@@ -151,7 +151,7 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool 
+bool
 awsScrollBar::GetProperty(char *name, void **parm)
 {
   if (awsComponent::GetProperty(name, parm)) return true;
@@ -166,7 +166,7 @@ awsScrollBar::GetProperty(char *name, void **parm)
   return false;
 }
 
-bool 
+bool
 awsScrollBar::SetProperty(char *name, void *parm)
 {
   if (awsComponent::SetProperty(name, parm)) return true;
@@ -182,18 +182,18 @@ awsScrollBar::SetProperty(char *name, void *parm)
     return true;
   }
   else if (strcmp("Min", name)==0)
-  { 
+  {
     min = *(int *)parm;
 
     // Fix value in case it's out of range
-    value = ( value < min ? min : 
+    value = ( value < min ? min :
                ( value > max ? max : value));
-    
+
     Invalidate();
     return true;
   }
   else if (strcmp("Max", name)==0)
-  { 
+  {
     max = *(int *)parm;
 
     // Fix the page size
@@ -201,20 +201,20 @@ awsScrollBar::SetProperty(char *name, void *parm)
       amntvis=max;
 
     // Fix value in case it's out of range
-    value = ( value < min ? min : 
+    value = ( value < min ? min :
                ( value > max ? max : value));
 
     Invalidate();
     return true;
   }
   else if (strcmp("PageSize", name)==0)
-  { 
+  {
     amntvis = *(int *)parm;
 
     // Fix the page size
     if (amntvis>max)
       amntvis=max;
-    
+
     Invalidate();
     return true;
   }
@@ -222,7 +222,7 @@ awsScrollBar::SetProperty(char *name, void *parm)
   return false;
 }
 
-void 
+void
 awsScrollBar::IncClicked(void *sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
@@ -230,14 +230,14 @@ awsScrollBar::IncClicked(void *sk, iAwsSource *)
   sb->value+=sb->value_delta;
 
   /// Check floor and ceiling
-  sb->value = ( sb->value < sb->min ? sb->min : 
+  sb->value = ( sb->value < sb->min ? sb->min :
                 ( sb->value > sb->max ? sb->max : sb->value));
 
-  sb->Broadcast(signalChanged); 
+  sb->Broadcast(signalChanged);
   sb->Invalidate();
 }
 
-void 
+void
 awsScrollBar::DecClicked(void *sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
@@ -245,21 +245,21 @@ awsScrollBar::DecClicked(void *sk, iAwsSource *)
   sb->value-=sb->value_delta;
 
   /// Check floor and ceiling
-  sb->value = ( sb->value < sb->min ? sb->min : 
+  sb->value = ( sb->value < sb->min ? sb->min :
                 ( sb->value > sb->max ? sb->max : sb->value));
 
-  sb->Broadcast(signalChanged); 
+  sb->Broadcast(signalChanged);
   sb->Invalidate();
 
 }
 
-void 
+void
 awsScrollBar::OnDraw(csRect clip)
 {
   aws3DFrame frame3d;
   int height=10, width=10;
 
-    
+
   csRect f(Frame());
 
   if (frame_style==fsVertical)
@@ -273,7 +273,7 @@ awsScrollBar::OnDraw(csRect clip)
       WindowManager()->GetPrefMgr()->LookupIntKey("ScrollBarHeight", height);
     else
       height = (int)((amntvis*f.Height())/max);
-    
+
 
     // Get the actual height that we can traverse with the knob
     int bh = f.Height()-height;
@@ -286,7 +286,7 @@ awsScrollBar::OnDraw(csRect clip)
 
     if (f.ymax>incVal->Frame().ymin-1)
       f.ymax=incVal->Frame().ymin-1;
-    
+
   }
   else
   {
@@ -310,17 +310,17 @@ awsScrollBar::OnDraw(csRect clip)
     if (f.xmax>incVal->Frame().xmin-1)
       f.xmax=incVal->Frame().xmin-1;
   }
-  
+
   frame3d.Draw(WindowManager(), Window(), f, aws3DFrame::fsRaised, tex, alpha_level);
 }
 
-bool 
+bool
 awsScrollBar::OnMouseDown(int , int , int)
 {
   return false;
 }
 
-bool 
+bool
 awsScrollBar::OnMouseUp(int ,int ,int)
 {
   return false;
@@ -344,7 +344,7 @@ awsScrollBar::OnMouseDoubleClick(int ,int ,int )
   return false;
 }
 
-bool 
+bool
 awsScrollBar::OnMouseExit()
 {
   mouse_is_over=false;
@@ -376,7 +376,7 @@ awsScrollBar::OnLostFocus()
   return false;
 }
 
-bool 
+bool
 awsScrollBar::OnGainFocus()
 {
   return false;
@@ -411,7 +411,7 @@ awsScrollBarFactory::~awsScrollBarFactory()
 iAwsComponent *
 awsScrollBarFactory::Create()
 {
-  return new awsScrollBar; 
+  return new awsScrollBar;
 }
 
 

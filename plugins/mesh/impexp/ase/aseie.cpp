@@ -83,7 +83,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csModelConverterASE);
     virtual bool Initialize (iObjectRegistry *object_reg)
-    { 
+    {
       return scfParent->Initialize (object_reg);
     }
   } scfiComponent;
@@ -101,7 +101,7 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_FACTORY (csModelConverterASE)
 
 SCF_EXPORT_CLASS_TABLE (aseie)
-  SCF_EXPORT_CLASS (csModelConverterASE, 
+  SCF_EXPORT_CLASS (csModelConverterASE,
     "crystalspace.modelconverter.ase",
     "ASE Model Converter")
 SCF_EXPORT_CLASS_TABLE_END
@@ -192,7 +192,7 @@ static bool csASEReadWord (csDataStream &str, char *buf, int max)
     CS_ASE_LEAVE_SUBSECTION (intp);					\
     return true;							\
   }
-    
+
 csASEInterpreter csASEInterpreter_MAIN;
 csASEInterpreter csASEInterpreter_SCENE;
 csASEInterpreter csASEInterpreter_GEOMOBJECT;
@@ -377,7 +377,7 @@ bool csASEInterpreter_MESH_FACE_LIST (csModelConverterASE *conv, csDataStream &i
     while (!in.Finished ()) {
       csASEReadWord (in, Token2, 256);
       int Param = in.ReadTextInt ();
-      
+
       if (!strcmp (Token2, "A:")) a = Param;
       if (!strcmp (Token2, "B:")) b = Param;
       if (!strcmp (Token2, "C:")) c = Param;

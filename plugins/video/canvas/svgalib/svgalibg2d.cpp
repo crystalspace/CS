@@ -246,7 +246,7 @@ bool csGraphics2DSVGALib::HandleEvent (iEvent &/*Event*/)
 {
   static int mouse_button_mask [3] =
   { MOUSE_LEFTBUTTON, MOUSE_RIGHTBUTTON, MOUSE_MIDDLEBUTTON };
-  
+
   keyboard_update ();
 /*
   bool shift = keyboard_keypressed (SCANCODE_LEFTSHIFT)
@@ -278,7 +278,7 @@ bool csGraphics2DSVGALib::HandleEvent (iEvent &/*Event*/)
       mouse_x = x; mouse_y = y;
       EventOutlet->Mouse (0, false, x, y);
     }
-    
+
     int buttons = mouse_getbutton ();
 	int button;
     for (button = 0; button < 3; button++)
@@ -293,7 +293,7 @@ bool csGraphics2DSVGALib::HandleEvent (iEvent &/*Event*/)
   }
   return false;
 }
-  
+
 void csGraphics2DSVGALib::Print (csRect * /*area*/)
 {
   gl_copyscreen (&physicalscreen);

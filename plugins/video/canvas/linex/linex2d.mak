@@ -64,7 +64,7 @@ linex2d: $(OUTDIRS) $(LINEX2D)
 
 $(OUT)%$O: plugins/video/canvas/linex/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.LINEX2D)
- 
+
 $(LINEX2D): $(OBJ.LINEX2D) $(LIB.LINEX2D)
 	$(DO.PLUGIN) $(LIB.LINEX2D.SPECIAL)
 

@@ -82,7 +82,7 @@ void csConsoleBuffer::NewLine (bool snap)
   {
     display_top++;
     display_bottom++;
-    
+
     /*
     display_top = current_line - page_size + 1;
     if (display_top < 0)
@@ -144,7 +144,7 @@ void csConsoleBuffer::SetLength (int length)
   }
 
   // Set up the new buffer
-  len = length; 
+  len = length;
   buffer = new csString * [length];
   dirty = new bool [length];
 

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -55,26 +55,26 @@ struct iHazeHull : public iBase
   /// get a vertex by index
   virtual void GetVertex(csVector3& res, int vertex_idx) const = 0;
   /// get the two (unordered) points of an edge (by index)
-  virtual void GetEdge(int edge_num, int& vertex_idx_1, int& vertex_idx_2) 
+  virtual void GetEdge(int edge_num, int& vertex_idx_1, int& vertex_idx_2)
     const = 0;
 
   /// get the number of vertices in a polygon
   virtual int GetPolVerticeCount(int polygon_num) const = 0;
   /// get vertexindex in a polygon (given vertex number in polygon)
   virtual int GetPolVertex(int polygon_num, int vertex_num) const = 0;
-  /** 
+  /**
    * Get the edge index that starts at given vertex number in polygon
    * Also returns the start and end vertex-idx of the edge (in clockwise
    * order)
    */
-  virtual int GetPolEdge(int polygon_num, int vertex_num, int& start_idx, 
+  virtual int GetPolEdge(int polygon_num, int vertex_num, int& start_idx,
     int& end_idx) const = 0;
 };
 
 SCF_VERSION (iHazeHullBox, 0, 0, 1);
 
 /**
- *  A predefined hull. 
+ *  A predefined hull.
  */
 struct iHazeHullBox : public iBase
 {
@@ -85,7 +85,7 @@ struct iHazeHullBox : public iBase
 SCF_VERSION (iHazeHullCone, 0, 0, 1);
 
 /**
- *  A predefined hull. 
+ *  A predefined hull.
  */
 struct iHazeHullCone : public iBase
 {
@@ -103,10 +103,10 @@ SCF_VERSION (iHazeHullCreation, 0, 0, 1);
 struct iHazeHullCreation : public iBase
 {
   /// create a predefined hull: a box given min and max.
-  virtual iHazeHullBox* CreateBox(const csVector3& min, 
+  virtual iHazeHullBox* CreateBox(const csVector3& min,
     const csVector3& max) const = 0;
-  /// create a predefined hull: a cone 
-  virtual iHazeHullCone* CreateCone(int nr_sides, const csVector3& start, 
+  /// create a predefined hull: a cone
+  virtual iHazeHullCone* CreateCone(int nr_sides, const csVector3& start,
     const csVector3& end, float srad, float erad) const = 0;
 };
 

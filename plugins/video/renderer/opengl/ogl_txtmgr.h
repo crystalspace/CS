@@ -86,7 +86,7 @@ class csTextureHandleOpenGL : public csTextureHandle
   int formatidx;
   GLenum sourceFormat, targetFormat;
   GLenum sourceType; // what size does each fragment have ? e.g. GL_UNSIGNED_BYTE
-  int bpp; 
+  int bpp;
   bool FindFormatType ();
   bool transform (iImage *Image, csTextureOpenGL *tex);
   void ShowFormat ();
@@ -97,7 +97,7 @@ class csTextureHandleOpenGL : public csTextureHandle
     csTextureOpenGL* operator [] (int idx) const { return (csTextureOpenGL*)csVector::Get (idx);}
     int Push (csTexture *t){ return csVector::Push ((csSome)t);}
   };
-  
+
 public:
   /// Retains original size of image before any readjustment
   int orig_width, orig_height;
@@ -163,7 +163,7 @@ class csTextureManagerOpenGL : public csTextureManager
 {
 
  protected:
-  struct formatDescription 
+  struct formatDescription
   {
     GLenum targetFormat;
     char *name;

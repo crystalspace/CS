@@ -1,5 +1,5 @@
-/* 
- * Mpeg Layer-1,2,3 audio decoder 
+/*
+ * Mpeg Layer-1,2,3 audio decoder
  * ------------------------------
  * copyright (c) 1995,1996,1997 by Michael Hipp, All rights reserved.
  * See also 'README'
@@ -38,7 +38,7 @@ void synth_ntom_set_step(long m,long n)
     fprintf(stderr,"max. 1:8 conversion allowed!\n");
     exit(1);
   }
-  
+
   ntom_val[0] = ntom_val[1] = NTOM_MUL>>1;
 }
 
@@ -77,7 +77,7 @@ int synth_ntom_8bit_mono(real *bandPtr,unsigned char *samples,int *pnt)
     tmp1 += 2;
   }
   *pnt += pnt1 >> 2;
-  
+
   return ret;
 }
 
@@ -129,7 +129,7 @@ int synth_ntom_mono2stereo(real *bandPtr,unsigned char *samples,int *pnt)
 
   ret = synth_ntom(bandPtr,0,samples,pnt);
   samples += pnt1;
-  
+
   for(i=0;i<((*pnt-pnt1)>>2);i++) {
     ((short *)samples)[1] = ((short *)samples)[0];
     samples+=4;
@@ -147,7 +147,7 @@ int synth_ntom(real *bandPtr,int channel,unsigned char *out,int *pnt)
   short *samples = (short *) (out + *pnt);
 
   real *b0,(*buf)[0x110];
-  int clip = 0; 
+  int clip = 0;
   int bo1;
   int ntom;
 
@@ -179,7 +179,7 @@ int synth_ntom(real *bandPtr,int channel,unsigned char *out,int *pnt)
   {
     register int j;
     real *window = decwin + 16 - bo1;
- 
+
     for (j=16;j;j--,window+=0x10)
     {
       real sum;

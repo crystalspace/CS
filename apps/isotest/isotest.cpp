@@ -117,7 +117,7 @@ void Cleanup ()
 
 
 /// call during 2d phase
-static void DebugZBufShow(iGraphics3D *g3d, iGraphics2D *g2d, 
+static void DebugZBufShow(iGraphics3D *g3d, iGraphics2D *g2d,
   iTextureManager* /*txtmgr*/)
 {
   int w = g3d->GetWidth();
@@ -266,7 +266,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   // Initialize the texture manager
   txtmgr->ResetPalette ();
-  
+
   // Allocate a uniformly distributed in R,G,B space palette for console
   // The console will crash on some platforms if this isn't initialize properly
   int r,g,b;
@@ -324,7 +324,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
           grid->SetGroundValue(x, y, mx, my, 0.0);
     }
 
- 
+
   // add the player sprite to the world
   player = engine->CreateFrontSprite(startpos, 1.3, 2.7);
   player->SetMaterialWrapper(snow);
@@ -447,7 +447,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   world->AddSprite(meshspr);
   mesh_obj->DecRef ();
   meshspr->DecRef ();
-  
+
   const char* fo_classId = "crystalspace.mesh.object.fountain";
   mesh_wrap = engine->CreateMeshFactory(fo_classId, "fountainFact");
   mesh_fact = mesh_wrap->GetMeshObjectFactory ();
@@ -513,12 +513,12 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
   scenelight->DecRef ();
 
-  
+
   /// add maze grid
   printf("Adding maze grid.\n");
   AddMazeGrid(world, 20, 20, math2, math1);
   printf("Adding maze grid done.\n");
-  
+
 
   // prepare texture manager
   txtmgr->PrepareTextures ();
@@ -540,8 +540,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
 // static helper
 static void AddWall(iIsoEngine *engine, iIsoWorld *world, iIsoGrid *grid,
-  int x, int y, int offx, int offy, int multx, int multy, 
-  float bot, float height, 
+  int x, int y, int offx, int offy, int multx, int multy,
+  float bot, float height,
   iMaterialWrapper *side, iMaterialWrapper *top)
 {
   height = 0;
@@ -555,13 +555,13 @@ static void AddWall(iIsoEngine *engine, iIsoWorld *world, iIsoGrid *grid,
   {
     height -= bot;
     height = 1.0;
-    sprite = engine->CreateZWallSprite(csVector3(y+offy+0.999,bot,x+offy), 
+    sprite = engine->CreateZWallSprite(csVector3(y+offy+0.999,bot,x+offy),
       1.0, height);
     sprite->SetMaterialWrapper(side);
     //sprite->SetMixMode( CS_FX_COPY | CS_FX_TILING );
     world->AddSprite(sprite);
     sprite->DecRef ();
-    sprite = engine->CreateXWallSprite(csVector3(y+offy,bot,x+offy), 
+    sprite = engine->CreateXWallSprite(csVector3(y+offy,bot,x+offy),
       1.0, height);
     sprite->SetMaterialWrapper(side);
     //sprite->SetMixMode( CS_FX_COPY | CS_FX_TILING );
@@ -645,7 +645,7 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
   scenelight->DecRef ();
 
   // add walls
-  
+
 #define ADDWALLFULL(x, y) AddWall(engine, world, mazegrid, x, y, (int)posx, \
   (int)posy, multx, multy, 0.0, 2.0, wall, floor);
 #define ADDWALLEMPTY(x, y) AddWall(engine, world, mazegrid, x, y, (int)posx, \
@@ -682,7 +682,7 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
     else ADDWALLFULL(x*2+1, gridh-1)
   }
   ADDWALLFULL(gridw-1, gridh-1)
-  
+
 }
 
 void IsoTest::SetupFrame ()
@@ -700,7 +700,7 @@ void IsoTest::SetupFrame ()
   if(!fpsstarted && (elapsed_time > 0))
   {fpsstarted = true; fps = 1. / (float(elapsed_time)*.001);}
   numtime += elapsed_time;
-  numframes ++; 
+  numframes ++;
   if(numtime >= 1000)
   {
      fps = float(numframes) / (float(numtime)*.001);
@@ -729,7 +729,7 @@ void IsoTest::SetupFrame ()
     csVector2 screenpos(mousex, myG3D->GetHeight() - mousey);
     view->S2W(screenpos, lastclick);
   }
-  if(walking) 
+  if(walking)
   {
     // if no keyboard cursor use, and there was a click,
     // move towards last click position.
@@ -741,15 +741,15 @@ void IsoTest::SetupFrame ()
     // make sure we do not scroll too far
     csBox3 maxbox = player->GetGrid()->GetBox();
     maxbox.SetSize( (maxbox.Max() - maxbox.Min())*1.5 );
-    if(!player->GetGrid()->Contains(lastclick) 
-      && !maxbox.In(view->GetViewScroll())) 
+    if(!player->GetGrid()->Contains(lastclick)
+      && !maxbox.In(view->GetViewScroll()))
       walking = false;
   }
   if(!playermotion.IsZero())
   {
     csVector3 oldpos = player->GetPosition();
     player->MovePosition(playermotion);
-    view->MoveScroll(player->GetPosition() - oldpos); 
+    view->MoveScroll(player->GetPosition() - oldpos);
     light->SetPosition(player->GetPosition()+csVector3(0,5,0));
   }
 
@@ -759,13 +759,13 @@ void IsoTest::SetupFrame ()
     return;
 
   view->Draw ();
-  
+
   // Start drawing 2D graphics.
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-  
+
   if(0) /// debug zbuffer
     DebugZBufShow(myG3D, myG2D, txtmgr);
-  
+
   char buf[255];
   sprintf(buf, "FPS: %g    loc(%g,%g,%g)", fps, player->GetPosition().x,
     player->GetPosition().y, player->GetPosition().z);
@@ -810,13 +810,13 @@ bool IsoTest::HandleEvent (iEvent &Event)
     float ycorrect = 1.0;
     if(setting!=0)
     {
-      ycorrect = sqrt(settings[setting][4]*settings[setting][4]+1.) 
+      ycorrect = sqrt(settings[setting][4]*settings[setting][4]+1.)
         + sqrt(settings[setting][3]*settings[setting][3]+1.);
       ycorrect *= .5;
     }
-    view->SetAxes( h*settings[setting][0], h*settings[setting][1]*ycorrect, 
+    view->SetAxes( h*settings[setting][0], h*settings[setting][1]*ycorrect,
       h*settings[setting][2], settings[setting][3], settings[setting][4]);
-    view->SetScroll(player->GetPosition(), 
+    view->SetScroll(player->GetPosition(),
       csVector2(myG3D->GetWidth()/2, myG3D->GetHeight()/2));
     return true;
   }

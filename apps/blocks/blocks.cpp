@@ -386,7 +386,7 @@ Blocks::Blocks ()
 
   // State changes.
   player1 = new States();
-  
+
 #if defined(BLOCKS_NETWORKING)
   player1_net = new NetworkStates();
 #endif
@@ -2303,14 +2303,14 @@ void Blocks::InitDemoRoom ()
 
   float char_width = CUBE_DIM*4.;
   float offset_x = -char_width * (6/2)+CUBE_DIM*2;
-  
+
   start_demo_shape (SHAPE_DEMO_B, offset_x, 3, 4); offset_x += char_width;
   start_demo_shape (SHAPE_DEMO_L, offset_x, 3, 4); offset_x += char_width;
   start_demo_shape (SHAPE_DEMO_O, offset_x, 3, 4); offset_x += char_width;
   start_demo_shape (SHAPE_DEMO_C, offset_x, 3, 4); offset_x += char_width;
   start_demo_shape (SHAPE_DEMO_K, offset_x, 3, 4); offset_x += char_width;
   start_demo_shape (SHAPE_DEMO_S, offset_x, 3, 4); offset_x += char_width;
-  
+
   CreateMenuEntry ("menu_novice", MENU_NOVICE);
   CreateMenuEntry ("menu_average", MENU_AVERAGE);
   CreateMenuEntry ("menu_expert", MENU_EXPERT);
@@ -2339,7 +2339,7 @@ void Blocks::InitEngine ()
   {
     // Load the blocks.zip library where sound refs are stored
     LevelLoader->LoadLibraryFile ("/data/blocks/Library");
-    
+
     iSoundWrapper* w = CS_GET_NAMED_CHILD_OBJECT (
       engine->QueryObject (), iSoundWrapper, "background.wav");
     if (w)
@@ -2553,7 +2553,7 @@ void Blocks::SetupFrame ()
 
   // -----------------------------------------------------------------
   // Start network stuff.
-  
+
 #if defined(BLOCKS_NETWORKING)
 
   if (do_network && NUM_FRAMES_CHK_NET <= since_last_check)
@@ -2570,11 +2570,11 @@ void Blocks::SetupFrame ()
       //    player1->PrintData("after.txt");
 
 ///    unsigned char * abuffer = (unsigned char *) malloc(
-///				     (ST_ENCODED_LENGTH + ST_CLIENT_EXTRA) 
+///				     (ST_ENCODED_LENGTH + ST_CLIENT_EXTRA)
 ///				     * sizeof(unsigned char));
-///        
-///    if(!player1_net->EncodeForNetwork(player1->encodedData, abuffer, 
-///				      ST_ENCODED_LENGTH, 
+///
+///    if(!player1_net->EncodeForNetwork(player1->encodedData, abuffer,
+///				      ST_ENCODED_LENGTH,
 ///                                      (ST_ENCODED_LENGTH + ST_CLIENT_EXTRA)))
 ///      printf("Network don't work\n");
 
@@ -2601,7 +2601,7 @@ void Blocks::SetupFrame ()
         if ((System->Time() - LastConnectTime) > 1000)
         {
           LastConnectTime = System->Time();
-	  
+
           Connection = Listener->Accept();
 	  // These slow down blocks too much.
 	  if (Connection != NULL)
@@ -2611,13 +2611,13 @@ void Blocks::SetupFrame ()
 			   "Awaiting connect (response %d)",
 			   Listener->GetLastError());
         }
-      
+
       }
     }
-    
+
     else  // We are not a blocks server.
     {
-      
+
       if (Connection != NULL)
         CheckConnection();
       else
@@ -2628,7 +2628,7 @@ void Blocks::SetupFrame ()
           Connect();
         }
       }
-      
+
     }
   }
   else  // aren't up to the number of frames yet.
@@ -2988,7 +2988,7 @@ void Blocks::CheckConnection()
 
 void Blocks::ClientCheckConnection()
 {
-  // The buffer is the length of the encoded state plus the STARTSTATE, 
+  // The buffer is the length of the encoded state plus the STARTSTATE,
   //  and ENDSTATE parts.
   const int BUFF_SIZE = ST_ENCODED_LENGTH + ST_CLIENT_EXTRA;
   unsigned char buff[BUFF_SIZE];
@@ -3003,8 +3003,8 @@ void Blocks::ClientCheckConnection()
     else
     {
       //Report (CS_REPORTER_SEVERITY_NOTIFY, "Server responds: %s", buff);
-      
-      
+
+
       if(!player1_net->DecodeFromNetwork(buff,
 				       (ST_ENCODED_LENGTH + ST_CLIENT_EXTRA),
 				       player1))
@@ -3048,7 +3048,7 @@ void Blocks::ServerCheckConnection()
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Received data: %s", buff);
       Connection->Send("OK", sizeof("OK"));
     }
-    
+
     else
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Other blocks responds: %s", buff);
@@ -3064,14 +3064,14 @@ void Blocks::ServerCheckConnection()
       Connection->DecRef();
       Connection = NULL;
     }
-    
+
 //    Connection->Send("You are a poo poo", sizeof("You are a poo poo"));
 
     // Encode the state.
     player1->EncodeStates();
-    
+
     if(!player1_net->EncodeForNetwork(player1->encodedData, buff,
-				      ST_ENCODED_LENGTH, 
+				      ST_ENCODED_LENGTH,
                                       (ST_ENCODED_LENGTH + ST_CLIENT_EXTRA)))
     {
       printf("SERVER:Network don't work\n");
@@ -3087,7 +3087,7 @@ void Blocks::ServerCheckConnection()
 bool Blocks::InitNet()
 {
   LastConnectTime = Sys->Time ();
-  
+
   if (IsServer)
   {
     const char source[] = "2222";

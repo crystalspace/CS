@@ -57,7 +57,7 @@ class csGraphics3DInfinite : public iGraphics3D
 
   /// Current transformation from world to camera.
   csReversibleTransform o2c;
- 
+
   /// Current 2D clipper.
   iClipper2D* clipper;
   /// Clipper type.
@@ -238,7 +238,7 @@ public:
   {
     return o2c;
   }
- 
+
   /// Set optional clipper.
   virtual void SetClipper (iClipper2D* clipper, int cliptype);
   /// Get clipper.

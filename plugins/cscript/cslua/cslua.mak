@@ -24,8 +24,8 @@ cslua:
 	$(MAKE_TARGET) MAKE_DLL=yes
 csluaclean:
 	$(MAKE_CLEAN)
-csluaswig: 
-	$(MAKE_TARGET) MAKE_DLL=yes	
+csluaswig:
+	$(MAKE_TARGET) MAKE_DLL=yes
 
 endif # ifeq ($(MAKESECTION),roottargets)
 

@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef MPOLY_H
@@ -38,17 +38,17 @@ public:
   CMapPolygon(const CMapPolygon& poly);
 
   /**
-    * The destructor. Cleans up things. Will free the vertices, but will 
+    * The destructor. Cleans up things. Will free the vertices, but will
     * _not_ free the planes this is suppoesd to be done somewhere else!
     */
   ~CMapPolygon();
-  
+
   /**
     * Creates a polygon, that sits on the given baseplane. It is
     * defined, by that plane, after carving away all the other planes
     * in the given planes. (The baseplane may be part of "planes", it
     * is being ignored then)
-    * Create can be called multiple times. It will remove any previous 
+    * Create can be called multiple times. It will remove any previous
     * definition at first, so the old values will be replaced.
     */
   void Create(CMapTexturedPlane*             pBaseplane,
@@ -58,19 +58,19 @@ public:
   /**
     * Remove all Contents from this Polygon, free the memory, and make it
     * an empty polygon again.
-    */ 
+    */
   void Clear();
 
   /**
     * returns true, if this Polygon is empty. This is the case, after
-    * construction, if the last Create did not produce a closed 
+    * construction, if the last Create did not produce a closed
     * polygon or if it didn't produce a polygon at all.
     */
   bool IsEmpty();
 
   /**
     * returns the Area of the Polygon (currently broken...)
-    */ 
+    */
   double GetArea();
 
   /**
@@ -96,7 +96,7 @@ public:
   void SetErrorInfo(int BrushLineNumber, int PlaneNumber);
 
   /// Access all vertices from outside
-  int                GetVertexCount() const     {return m_Vertices.Length();} 
+  int                GetVertexCount() const     {return m_Vertices.Length();}
   CdVector3          GetVertex(int index) const {return *(m_Vertices.Get(index));}
   CMapTexturedPlane* GetPlane (int index) const {return m_Planes.Get(index);}
 
@@ -119,7 +119,7 @@ protected:
   /**
     * Returns the number of valid vertices, the given plane will produce.
     * Any regular plane will produce two vertices (an edge). However, there
-    * are some planes, that will produce none or, just a single vertex. 
+    * are some planes, that will produce none or, just a single vertex.
     * We need to ignore these, when we try to determine the edges of the
     * final polygon
     */
@@ -128,7 +128,7 @@ protected:
 
   /**
     * Check in the given point is inside the volume formed by "planes"
-    * To avoid rounding problems, you can hand over 3 ignore planes, 
+    * To avoid rounding problems, you can hand over 3 ignore planes,
     * that will not be handled. Normally, you will give the 3 planes
     * that define the point to be ignored here.
     * return true, if the point is inside the planes.
@@ -143,7 +143,7 @@ protected:
   void DumpPolyinfo(CMapTexturedPlane*             pBaseplane,
                     const CMapTexturedPlaneVector& planes);
 
-  /** 
+  /**
     * A pointer to the baseplane
     */
   CMapTexturedPlane*      m_pBaseplane;

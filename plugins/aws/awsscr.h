@@ -24,5 +24,5 @@ public:
   /// Execute the corresponding action
   void Execute(char *action, void *owner, iAwsParmList &parmlist);
 };
-  
+
 #endif

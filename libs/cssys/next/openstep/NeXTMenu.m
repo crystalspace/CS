@@ -81,14 +81,14 @@ static void item_scan(NeXTConfigHandle config, char const* section,
   char const* k_shortcut = STR_APPEND(section, "shortcut");
   char const* k_action   = STR_APPEND(section, "action"  );
   char const* k_target   = STR_APPEND(section, "target"  );
-  
+
   char const* inherit = NeXTConfigFile_lookup(config, k_inherit, 0);
   if (inherit != 0)
   {
     char const* parent = STR_APPENDD("NeXT.Item.", inherit, ".");
     item_scan(config, parent, type, title, shortcut, action, target);
   }
-  
+
   *type     = NeXTConfigFile_lookup(config, k_type,     *type    );
   *title    = NeXTConfigFile_lookup(config, k_title,    *title   );
   *shortcut = NeXTConfigFile_lookup(config, k_shortcut, *shortcut);
@@ -117,24 +117,24 @@ static void menu_add_item(NSMenu* menu, char const* key,
   char const* shortcut = "";
   char const* action   = 0;
   char const* target   = 0;
-  
+
   char const* section = STR_APPENDD("NeXT.Item.", key, ".");
   item_scan(config, section, &type, &title, &shortcut, &action, &target);
-  
+
   if (type != 0 && strcmp(type, "separator") == 0)
     menu_add_separator(menu);
   else
   {
     SEL cmd = 0;
     NSMenuItem* item;
-  
+
     if (action != 0)
       cmd = NSSelectorFromString([NSString stringWithCString:action]);
-  
+
     item = [menu addItemWithTitle:[NSString stringWithCString:title] action:cmd
       keyEquivalent:[NSString stringWithCString:shortcut]];
     [item setKeyEquivalentModifierMask:NSCommandKeyMask];
-  
+
     if (target != 0)
     {
       STR_SWITCH (target)
@@ -165,11 +165,11 @@ static void menu_add_submenu(NSMenu* menu, char const* name,
   {
     char const* key = STR_APPENDD("NeXT.Menu.", name, ".type");
     char const* type = NeXTConfigFile_lookup(config, key, 0);
-  
+
     NSMenuItem* const item =
       [menu addItemWithTitle:[sub title] action:0 keyEquivalent:@""];
     [menu setSubmenu:sub forItem:item];
-  
+
     if (type != 0)
     {
       STR_SWITCH (type)

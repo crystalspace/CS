@@ -422,7 +422,7 @@ csSCF::~csSCF ()
   delete LibraryRegistry;
   LibraryRegistry = NULL;
 #endif
-  
+
   SCF = PrivateSCF = NULL;
 }
 

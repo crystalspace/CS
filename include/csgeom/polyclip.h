@@ -37,7 +37,7 @@ protected:
 
   /// Result of most recent clipping
   uint8 mrClipping;
-  
+
 public:
   /// Constructor.
   csClipper ();
@@ -47,7 +47,7 @@ public:
 
   /// Wrapper function: clip a polygon in-place.
   virtual uint8 ClipInPlace (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox);
-  
+
   /// most recent Clipresult
   uint8 LastClipResult () { return mrClipping; }
 

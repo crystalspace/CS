@@ -19,7 +19,7 @@ const int awsCheckBox::alignCenter=0x2;
 
 const int awsCheckBox::signalClicked=0x1;
 
-awsCheckBox::awsCheckBox():is_down(false), mouse_is_over(false), 
+awsCheckBox::awsCheckBox():is_down(false), mouse_is_over(false),
                              is_on(false),
                              frame_style(0), alpha_level(96),
                              alignment(0),
@@ -34,7 +34,7 @@ awsCheckBox::~awsCheckBox()
 }
 
 char *
-awsCheckBox::Type() 
+awsCheckBox::Type()
 { return "Check Box"; }
 
 bool
@@ -43,7 +43,7 @@ awsCheckBox::Setup(iAws *_wmgr, awsComponentNode *settings)
  if (!awsComponent::Setup(_wmgr, settings)) return false;
 
  iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
- 
+
  pm->GetInt(settings, "Alpha", alpha_level);
  pm->GetInt(settings, "Align", alignment);
  pm->GetString(settings, "Caption", caption);
@@ -56,7 +56,7 @@ awsCheckBox::Setup(iAws *_wmgr, awsComponentNode *settings)
  return true;
 }
 
-bool 
+bool
 awsCheckBox::GetProperty(char *name, void **parm)
 {
   if (awsComponent::GetProperty(name, parm)) return true;
@@ -83,7 +83,7 @@ awsCheckBox::GetProperty(char *name, void **parm)
   return false;
 }
 
-bool 
+bool
 awsCheckBox::SetProperty(char *name, void *parm)
 {
   if (awsComponent::SetProperty(name, parm)) return true;
@@ -91,7 +91,7 @@ awsCheckBox::SetProperty(char *name, void *parm)
   if (strcmp("Caption", name)==0)
   {
     iString *s = (iString *)(parm);
-    
+
     if (s)
     {
       if (caption) caption->DecRef();
@@ -99,24 +99,24 @@ awsCheckBox::SetProperty(char *name, void *parm)
       caption->IncRef();
       Invalidate();
     }
-    
+
     return true;
   }
-  
+
   return false;
 }
 
 
-void 
+void
 awsCheckBox::OnDraw(csRect clip)
 {
 
   iGraphics2D *g2d = WindowManager()->G2D();
   iGraphics3D *g3d = WindowManager()->G3D();
- 
+
   int txw=0, txh=0;
   int txy=0, txx=0;
-     
+
   /// Get the size of our textures
   if (tex[0]) tex[0]->GetOriginalDimensions(txw, txh);
 
@@ -131,36 +131,36 @@ awsCheckBox::OnDraw(csRect clip)
     txx=Frame().Width()-txw;
     break;
   }
-    
+
     if (!is_down && tex[0])
        g3d->DrawPixmap(tex[0], Frame().xmin+txx+is_down, Frame().ymin+txy+is_down, txw, txh, 0, 0, txw, txh, alpha_level);
     else if (is_down && tex[1])
        g3d->DrawPixmap(tex[1], Frame().xmin+txx+is_down, Frame().ymin+txy+is_down, txw, txh, 0, 0, txw, txh, alpha_level);
-       
+
 
     if (is_on && tex[2])
        g3d->DrawPixmap(tex[2], Frame().xmin+txx+is_down, Frame().ymin+txy+is_down, txw, txh, 0, 0, txw, txh, 0);
     else if (!is_on && tex[3])
       g3d->DrawPixmap(tex[3], Frame().xmin+txx+is_down, Frame().ymin+txy+is_down, txw, txh, 0, 0, txw, txh, 0);
-        
+
     // Draw the caption, if there is one and the style permits it.
     if (caption)
-    {     
+    {
       int tw, th, tx, ty, mcc;
-      
+
       mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(caption->GetData(), Frame().Width()-txw-2);
 
       scfString tmp(caption->GetData());
       tmp.Truncate(mcc);
-        
+
       // Get the size of the text
       WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(tmp.GetData(), tw, th);
-  
+
       // Calculate the center
       ty = (Frame().Height()>>1) - (th>>1);
 
       switch(alignment)
-      {       
+      {
        case alignRight:
         tx=Frame().Width()-txw-tw-2;
         break;
@@ -169,7 +169,7 @@ awsCheckBox::OnDraw(csRect clip)
         tx=txw+2;
         break;
       }
-  
+
 
       // Draw the text
         g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
@@ -179,18 +179,18 @@ awsCheckBox::OnDraw(csRect clip)
                    -1,
                    tmp.GetData());
     }
-    
+
 }
 
-bool 
+bool
 awsCheckBox::OnMouseDown(int , int , int )
 {
   is_down=true;
   Invalidate();
   return true;
 }
-    
-bool 
+
+bool
 awsCheckBox::OnMouseUp(int , int , int )
 {
   if (is_down)
@@ -198,15 +198,15 @@ awsCheckBox::OnMouseUp(int , int , int )
 
   if (!is_on)
     is_on=true;
-  else 
+  else
     is_on=false;
-  
+
   is_down=false;
 
   Invalidate();
   return true;
 }
-    
+
 bool
 awsCheckBox::OnMouseMove(int , int , int )
 {
@@ -225,7 +225,7 @@ awsCheckBox::OnMouseDoubleClick(int , int , int )
   return false;
 }
 
-bool 
+bool
 awsCheckBox::OnMouseExit()
 {
   mouse_is_over=false;
@@ -233,7 +233,7 @@ awsCheckBox::OnMouseExit()
 
   if (is_down)
     is_down=false;
-  
+
   return true;
 }
 
@@ -250,14 +250,14 @@ awsCheckBox::OnKeypress(int , int )
 {
   return false;
 }
-    
+
 bool
 awsCheckBox::OnLostFocus()
 {
   return false;
 }
 
-bool 
+bool
 awsCheckBox::OnGainFocus()
 {
   return false;
@@ -285,6 +285,6 @@ awsCheckBoxFactory::~awsCheckBoxFactory()
 iAwsComponent *
 awsCheckBoxFactory::Create()
 {
- return new awsCheckBox; 
+ return new awsCheckBox;
 }
 

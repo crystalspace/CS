@@ -51,7 +51,7 @@ csSoundListenerDS3D::~csSoundListenerDS3D() {
 bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D *srdr) {
   srdr->IncRef();
   Renderer = srdr;
-	
+
   DSBUFFERDESC dsbd;
   dsbd.dwSize = sizeof(DSBUFFERDESC);
   dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRL3D | DSBCAPS_CTRLVOLUME;
@@ -72,7 +72,7 @@ bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D *srdr) {
     if (reporter) reporter->DecRef ();
     return false;
   }
-	
+
   r = PrimaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void **) &Listener);
   if (r != DS_OK) {
     if (reporter)

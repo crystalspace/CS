@@ -33,7 +33,7 @@ class ctDynamicEntity;
 /**
  * parent of classes that implement different algorithms and methods
  * to solve physical motion problems
- * responsible for calculating the change in state wrt time 
+ * responsible for calculating the change in state wrt time
  * uses forces list and current state to do this.
  */
 class ctSolver
@@ -55,7 +55,7 @@ public:
 
 protected:
   /// body this solver acts on
-  ctDynamicEntity &de;  
+  ctDynamicEntity &de;
 
 };
 
@@ -69,7 +69,7 @@ public:
   virtual void apply_impulse ( ctVector3 impulse_point,
 			      ctVector3 impulse_vector ) = 0;
 
-  virtual void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv, 
+  virtual void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv,
 					 const ctVector3 &impulse_point,
 			      const ctVector3 &unit_length_impulse_vector ) = 0;
 

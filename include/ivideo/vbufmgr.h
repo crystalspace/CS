@@ -124,7 +124,7 @@ SCF_VERSION (iVertexBufferManagerClient, 0, 0, 1);
 
 /**
  * Objects using services provided by the vertexbuffermanager can register
- * with the manager to receive information about it current state, e.g. the 
+ * with the manager to receive information about it current state, e.g. the
  * manager tells its clients if he is going down, closes etc.
  */
 

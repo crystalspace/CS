@@ -261,13 +261,13 @@ private:
   int move_hor_dy;
   int queue_move_dx_todo;
   int queue_move_dy_todo;
-  
+
   /*
    * The following four flags indicate how the movement keys work.
    * This is to make sure that pressing the right arrow key will always
    * move the block to the right for example.
    */
-  int move_right_dx;      
+  int move_right_dx;
   int move_right_dy;
   int move_down_dx;
   int move_down_dy;
@@ -454,23 +454,23 @@ public:
   void removePlanesVisual (States* player);
 
   //------------- Networking stuff.
-  
+
 #if defined(BLOCKS_NETWORKING)
 
   //The generic connection checker which then calls a client or server checker.
   void CheckConnection();
-  
+
   void ClientCheckConnection();
   void ServerCheckConnection();
-  
+
   bool InitNet();
   void Connect ();
-  
+
   void TerminateConnection();
-  
+
   // The number of frames since the last network check.
   int since_last_check;
-  
+
   //----------------
   // State Changes.
   NetworkStates* player1_net;

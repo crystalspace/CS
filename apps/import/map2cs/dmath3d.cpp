@@ -2,17 +2,17 @@
     Copyright (C) 1998 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
     Converted to double by Thomas Hieber
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -29,7 +29,7 @@ double CdVector3::Norm () const
 
 //---------------------------------------------------------------------------
 
-CdMatrix3::CdMatrix3 () 
+CdMatrix3::CdMatrix3 ()
 {
   m12 = m13 = 0;
   m21 = m23 = 0;
@@ -126,13 +126,13 @@ double CdMatrix3::Determinant () const
    +m13 * (m21*m32 - m22*m31);
 }
 
-CdMatrix3 operator+ (const CdMatrix3& m1, const CdMatrix3& m2) 
+CdMatrix3 operator+ (const CdMatrix3& m1, const CdMatrix3& m2)
 {
   return CdMatrix3 (m1.m11+m2.m11, m1.m12+m2.m12, m1.m13+m2.m13,
                   m1.m21+m2.m21, m1.m22+m2.m22, m1.m23+m2.m23,
                   m1.m31+m2.m31, m1.m32+m2.m32, m1.m33+m2.m33);
 }
-                  
+
 CdMatrix3 operator- (const CdMatrix3& m1, const CdMatrix3& m2)
 {
   return CdMatrix3 (m1.m11-m2.m11, m1.m12-m2.m12, m1.m13-m2.m13,
@@ -175,7 +175,7 @@ CdMatrix3 operator/ (const CdMatrix3& m, double f)
 }
 
 bool operator== (const CdMatrix3& m1, const CdMatrix3& m2)
-{ 
+{
   if (m1.m11 != m2.m11 || m1.m12 != m2.m12 || m1.m13 != m2.m13) return false;
   if (m1.m21 != m2.m21 || m1.m22 != m2.m22 || m1.m23 != m2.m23) return false;
   if (m1.m31 != m2.m31 || m1.m32 != m2.m32 || m1.m33 != m2.m33) return false;
@@ -249,7 +249,7 @@ bool CdMath3::PlanesClose (const CdPlane& p1, const CdPlane& p2)
 
 //---------------------------------------------------------------------------
 
-double CdSquaredDist::PointLine (const CdVector3& p, 
+double CdSquaredDist::PointLine (const CdVector3& p,
                            const CdVector3& l1, const CdVector3& l2)
 {
   CdVector3 W = l1-p;
@@ -258,7 +258,7 @@ double CdSquaredDist::PointLine (const CdVector3& p,
   return p2l * p2l;
 }
 
-double CdSquaredDist::PointPoly (const CdVector3& p, CdVector3 *V, int n, 
+double CdSquaredDist::PointPoly (const CdVector3& p, CdVector3 *V, int n,
                           const CdPlane& plane, double sqdist)
 {
   CdVector3 W, L;
@@ -276,9 +276,9 @@ double CdSquaredDist::PointPoly (const CdVector3& p, CdVector3 *V, int n,
     else if ( !(W*(L = V[i-1]-V[i]) > 0) )
     {
       if ( !lflag && W*(plane.norm % L) > 0 )
-      { 
-        L = W - L * (W*L)/(L*L);  
-        return L*L; 
+      {
+        L = W - L * (W*L)/(L*L);
+        return L*L;
       }
       lflag = (W*(V[i+1]-V[i]) > 0);
     }
@@ -359,7 +359,7 @@ bool CdIntersect3::Plane(const CdVector3& u, const CdVector3& v,
   return true;
 }
 
-bool CdIntersect3::Planes(const CdPlane& p1, const CdPlane& p2, 
+bool CdIntersect3::Planes(const CdPlane& p1, const CdPlane& p2,
                           const CdPlane& p3, CdVector3& isect)
 {
   //To find the one point that is on all three planes, we need to solve
@@ -368,7 +368,7 @@ bool CdIntersect3::Planes(const CdPlane& p1, const CdPlane& p2,
   // A1*x+B1*y+C1*z+D1=0 //plane1
   // A2*x+B2*y+C2*z+D2=0 //plane2
   // A3*x+B3*y+C3*z+D3=0 //plane3
-  //This can be solved according to Cramers rule by looking at the 
+  //This can be solved according to Cramers rule by looking at the
   //determinants of the equation system.
   CdMatrix3 mdet(p1.A(), p1.B(), p1.C(),
                  p2.A(), p2.B(), p2.C(),
@@ -376,18 +376,18 @@ bool CdIntersect3::Planes(const CdPlane& p1, const CdPlane& p2,
   double det = mdet.Determinant();
   if (det == 0) return false; //some planes are parallel.
 
-  CdMatrix3 mx(-p1.D(),  p1.B(),  p1.C(), 
-               -p2.D(),  p2.B(),  p2.C(), 
+  CdMatrix3 mx(-p1.D(),  p1.B(),  p1.C(),
+               -p2.D(),  p2.B(),  p2.C(),
                -p3.D(),  p3.B(),  p3.C());
   double xdet = mx.Determinant();
 
-  CdMatrix3 my( p1.A(), -p1.D(),  p1.C(), 
-                p2.A(), -p2.D(),  p2.C(), 
+  CdMatrix3 my( p1.A(), -p1.D(),  p1.C(),
+                p2.A(), -p2.D(),  p2.C(),
                 p3.A(), -p3.D(),  p3.C());
   double ydet = my.Determinant();
 
-  CdMatrix3 mz( p1.A(),  p1.B(), -p1.D(), 
-                p2.A(),  p2.B(), -p2.D(), 
+  CdMatrix3 mz( p1.A(),  p1.B(), -p1.D(),
+                p2.A(),  p2.B(), -p2.D(),
                 p3.A(),  p3.B(), -p3.D());
   double zdet = mz.Determinant();
 
@@ -406,7 +406,7 @@ double CdIntersect3::Z0Plane(
   isect.y = r * (v.y-u.y) + u.y;
   isect.z = 0;
   return r;
-} 
+}
 
 double CdIntersect3::ZPlane(
   double zval, const CdVector3& u, const CdVector3& v, CdVector3& isect)

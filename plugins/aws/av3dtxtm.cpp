@@ -171,14 +171,14 @@ bool csTextureHandle::GetKeyColor ()
 }
 
 void csTextureHandle::GetMeanColor (uint8 &r, uint8 &g, uint8 &b)
-{ 
+{
   r = mean_color.red;
   g = mean_color.green;
   b = mean_color.blue;
 }
 
-bool csTextureHandle::GetMipMapDimensions (int mipmap, int& w, int& h) 
-{ 
+bool csTextureHandle::GetMipMapDimensions (int mipmap, int& w, int& h)
+{
   csTexture *txt = get_texture (mipmap);
   if (txt)
   {
@@ -286,7 +286,7 @@ void csMaterialHandle::Prepare ()
   if (material)
   {
     if (texture != material->GetTexture())
-    { 
+    {
       DG_UNLINK (this, texture);
       SCF_DEC_REF(texture);
       texture = material->GetTexture ();

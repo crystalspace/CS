@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998, 2000 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -26,7 +26,7 @@ struct iGraphics3D;
 
 SCF_VERSION (iTextureHandle, 2, 1, 1);
 
-/** 
+/**
  * A texture handle as returned by iTextureManager.
  */
 struct iTextureHandle : public iBase
@@ -84,11 +84,11 @@ struct iTextureHandle : public iBase
 
   /**
    * If the texture handle was created with as a procedural texture, this
-   * function returns an iGraphics3D interface to a texture buffer which 
+   * function returns an iGraphics3D interface to a texture buffer which
    * can be used in the  same way as a frame buffer based iGraphics3D.
    * This interface only becomes available once the texture has been
    * prepared by the texture manager.
-   */ 
+   */
   virtual iGraphics3D *GetProcTextureInterface () = 0;
 
   /**

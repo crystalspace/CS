@@ -106,7 +106,7 @@ public:
   int color_todo;
   iObjectRegistry* object_reg;
   iVirtualClock* vc;
- 
+
 public:
   Lighter ();
   virtual ~Lighter ();

@@ -168,8 +168,8 @@ public:
   virtual void Draw (iGraphics3D* g3d);
   virtual void Description (char* dst)
   {
-    sprintf (dst, 
-	     "100 Pixmaps with single texture (%d, %d) scaled to (%d, %d)... ", 
+    sprintf (dst,
+	     "100 Pixmaps with single texture (%d, %d) scaled to (%d, %d)... ",
 	     tex_w, tex_h, inc_w-5, inc_h-5);
   }
   virtual Tester* NextTester ();
@@ -179,7 +179,7 @@ public:
 class MultiTexturePixmapTester : public Tester
 {
   struct textures
-  {  
+  {
     iTextureHandle *texture;
     int tex_w, tex_h;
   };

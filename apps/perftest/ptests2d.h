@@ -31,7 +31,7 @@ class Tester2D : public Tester
 {
 protected:
   iGraphics2D *G2D;
-  int max_w, max_h, inc_h; 
+  int max_w, max_h, inc_h;
   int colour[8];
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
@@ -66,7 +66,7 @@ class StringTester : public Tester2D
   char *line;
   int length, text_height, rows;
   iFont *font;
-  
+
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
   virtual void Draw (iGraphics3D* g3d);

@@ -122,10 +122,10 @@ csGraphics3DLine::~csGraphics3DLine ()
   if (texman)
     texman->Clear();
   if (texman)
-    texman->DecRef(); 
+    texman->DecRef();
   texman = NULL;
   if (vbufmgr)
-    vbufmgr->DecRef (); 
+    vbufmgr->DecRef ();
   vbufmgr = NULL;
   if (G2D)
     G2D->DecRef ();
@@ -281,8 +281,8 @@ void csGraphics3DLine::SetClipper (iClipper2D* clip, int cliptype)
 
 bool csGraphics3DLine::BeginDraw (int DrawFlags)
 {
-  if ((G2D->GetWidth() != width) || 
-      (G2D->GetHeight() != height)) 
+  if ((G2D->GetWidth() != width) ||
+      (G2D->GetHeight() != height))
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))

@@ -6,12 +6,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -442,12 +442,12 @@ void csRainSaver::WriteDown (iBase* obj, iStrVector *str)
   state->GetDropSize(sx, sy);
   sprintf(buf, "DROPSIZE (%g, %g)\n", sx, sy);
   str->Push(csStrNew(buf));
-  printf(buf, "FALLSPEED (%g, %g, %g)\n", state->GetFallSpeed().x, 
+  printf(buf, "FALLSPEED (%g, %g, %g)\n", state->GetFallSpeed().x,
     state->GetFallSpeed().y, state->GetFallSpeed().z);
   str->Push(csStrNew(buf));
   csVector3 minbox, maxbox;
   state->GetBox(minbox, maxbox);
-  printf(buf, "BOX (%g,%g,%g, %g,%g,%g)\n", minbox.x, minbox.y, minbox.z, 
+  printf(buf, "BOX (%g,%g,%g, %g,%g,%g)\n", minbox.x, minbox.y, minbox.z,
     maxbox.x, maxbox.y, maxbox.z);
 
   fact->DecRef();

@@ -46,7 +46,7 @@ public:
 };
 
 /**
- * Singly-link list. Uses a sentinel at head. 
+ * Singly-link list. Uses a sentinel at head.
  * Caches link immediately before most recent access for ease of deletion.
  * Caches more recent link for ease of iteration.
  */
@@ -68,22 +68,22 @@ public:
   T* get_first()
   {  if ( head->next != 0 )
      {
-       prev = head; 
-       current = head->next; 
-       return head->next->contents; 
-     } 
-     else return 0; 
+       prev = head;
+       current = head->next;
+       return head->next->contents;
+     }
+     else return 0;
   }
 
   /// Get next to current item.  set current item to next item
   T* get_next()
-  {  
+  {
     if ( current->next )
     {
       prev = current;
       current = current->next;
       return current->contents;
-    } 
+    }
     else return 0;
   }
 
@@ -99,7 +99,7 @@ public:
     prev = head;
     size++;
   }
-  
+
   /// Add link to front
   void push( T* c )
   {
@@ -124,7 +124,7 @@ public:
 
   /// Remove and delete link, delete contents
   void delete_link ( T* c )
-  { 
+  {
     if ( c == 0 ) return;
     if ( prev && prev->next && c == prev->next->contents )
     {
@@ -155,7 +155,7 @@ public:
 
   /// Remove and delete link, DOESN'T delete contents
   void remove_link ( T* c )
-  { 
+  {
     if ( c == 0 ) return;
     if ( prev && prev->next && c == prev->next->contents )
     {
@@ -194,8 +194,8 @@ public:
       delete prev;
       prev = current;
     }
-    size = 0; 
-    head->next = prev = 0; 
+    size = 0;
+    head->next = prev = 0;
     current = head;
   }
 
@@ -212,8 +212,8 @@ public:
       delete prev;
       prev = current;
     }
-    size = 0; 
-    head->next = prev = 0; 
+    size = 0;
+    head->next = prev = 0;
     current = head;
   }
 

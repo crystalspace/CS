@@ -95,12 +95,12 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
 
   csBox3 bbox;
   sector->CalculateSectorBBox (bbox, true);
-  
+
   iMeshFactoryWrapper *mfw = Sys->view->GetEngine ()->
     CreateMeshFactory ("crystalspace.mesh.object.rain", "rain");
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom rain", sector, 
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom rain", sector,
 								  csVector3 (0, 0, 0));
   mfw->DecRef ();
 
@@ -143,7 +143,7 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
     CreateMeshFactory ("crystalspace.mesh.object.snow", "snow");
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom snow", sector, 
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom snow", sector,
 								  csVector3 (0, 0, 0));
   mfw->DecRef ();
 
@@ -185,7 +185,7 @@ void add_particles_fire (iSector* sector, char* matname, int num,
     CreateMeshFactory ("crystalspace.mesh.object.fire", "fire");
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom fire", sector, 
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom fire", sector,
 								  origin);
   mfw->DecRef ();
 
@@ -201,7 +201,7 @@ void add_particles_fire (iSector* sector, char* matname, int num,
   //firestate->SetDropSize (.02, .04);
   firestate->SetDropSize (.04, .08);
   firestate->SetLighting (false);
-  firestate->SetOrigin (csBox3(origin-csVector3(.2,0,.2), 
+  firestate->SetOrigin (csBox3(origin-csVector3(.2,0,.2),
     origin+csVector3(.2,0.2)));
   firestate->SetDirection (csVector3 (0, 1., 0));
   firestate->SetSwirl (1.6);
@@ -229,7 +229,7 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
     CreateMeshFactory ("crystalspace.mesh.object.fountain", "fountain");
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom fountain", sector, 
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom fountain", sector,
 								  origin);
   mfw->DecRef ();
 
@@ -274,7 +274,7 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
     CreateMeshFactory ("crystalspace.mesh.object.explosion", "explosion");
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom explosion", sector, 
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom explosion", sector,
 								  center);
   mfw->DecRef ();
 
@@ -325,7 +325,7 @@ void add_particles_spiral (iSector* sector, const csVector3& bottom, char* matna
     CreateMeshFactory ("crystalspace.mesh.object.spiral", "spiral");
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom spiral", sector, 
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom spiral", sector,
 								  bottom);
   mfw->DecRef ();
 
@@ -1179,7 +1179,7 @@ void fire_missile ()
     csMatrix3 m = ms->dir.GetT2O ();
     sp->GetMovable ()->SetTransform (m);
     sp->GetMovable ()->UpdateMove ();
-  } 
+  }
 }
 
 void AttachRandomLight (csDynLight* light)

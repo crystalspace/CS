@@ -50,7 +50,7 @@ private:
   // Fetch all the characters of the font
   void Load ();
 };
-  
+
 GLGlyphSet::GLGlyphSet (iFont *Font)
 {
   font = Font;

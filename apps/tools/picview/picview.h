@@ -67,7 +67,7 @@ public:
 public:
   PicViewApp (iObjectRegistry *object_reg, csSkin &skin);
   ~PicViewApp ();
-  
+
   virtual bool HandleEvent (iEvent &Event);
   virtual bool Initialize ();
 };

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein 
+    Copyright (C) 1998 by Jorrit Tyberghein
     Copyright (C) 2001 by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
@@ -37,14 +37,14 @@ class csXExtF86VM : public iXExtF86VM
 {
   /// The Object Registry
   iObjectRegistry *object_reg;
-  /// The X-display 
+  /// The X-display
   Display* dpy;
   /// The Screen Number (not necessarilly the default)
   int screen_num;
   /// The Full Screen Window
   Window fs_win;
   /// The context window and its parent window while in windowed mode
-  Window ctx_win, wm_win; 
+  Window ctx_win, wm_win;
   /// Is Full Screen ?
   bool full_screen;
   /// The dimensions
@@ -60,7 +60,7 @@ class csXExtF86VM : public iXExtF86VM
   /// Internal helper routines
   void FindBestMode (int ctx_width, int ctx_height);
   bool SwitchMode (XF86VidModeModeInfo *to_mode,
-		   XF86VidModeModeInfo *from_mode, 
+		   XF86VidModeModeInfo *from_mode,
 		   bool lock, int vp_x, int vp_y);
 
   void EnterFullScreen ();
@@ -76,7 +76,7 @@ public:
   void Report (int severity, const char* msg, ...);
 
 
-  virtual bool Open (Display *dpy, int screen_num, 
+  virtual bool Open (Display *dpy, int screen_num,
 		     XVisualInfo *xvis, Colormap cmap);
   virtual void Close ();
   virtual void SetWindows (Window ctx_win, Window wm_win)
@@ -97,7 +97,7 @@ public:
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csXExtF86VM);
-    virtual bool Initialize (iObjectRegistry *o) 
+    virtual bool Initialize (iObjectRegistry *o)
     { return scfParent->Initialize(o); }
   } scfiComponent;
 

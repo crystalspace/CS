@@ -1,5 +1,5 @@
-/* 
- * Mpeg Layer-2 audio decoder 
+/*
+ * Mpeg Layer-2 audio decoder
  * --------------------------
  * copyright (c) 1995 by Michael Hipp, All rights reserved. See also 'README'
  *
@@ -104,21 +104,21 @@ void II_step_one (unsigned int *bit_alloc,int *scale, csMPGFrame *fr)
 
     bita = bit_alloc;
     scfsi=scfsi_buf;
-    for (i=sblimit2;i;i--) 
+    for (i=sblimit2;i;i--)
       if (*bita++)
-        switch (*scfsi++) 
+        switch (*scfsi++)
         {
-          case 0: 
+          case 0:
                 *scale++ = fr->bsi.GetBitsFast (6);
                 *scale++ = fr->bsi.GetBitsFast (6);
                 *scale++ = fr->bsi.GetBitsFast (6);
                 break;
-          case 1 : 
+          case 1 :
                 *scale++ = sc = fr->bsi.GetBitsFast (6);
                 *scale++ = sc;
                 *scale++ = fr->bsi.GetBitsFast (6);
                 break;
-          case 2: 
+          case 2:
                 *scale++ = sc = fr->bsi.GetBitsFast (6);
                 *scale++ = sc;
                 *scale++ = sc;
@@ -147,17 +147,17 @@ void II_step_two(unsigned int *bit_alloc,real fraction[2][4][SBLIMIT],int *scale
       step = alloc1->bits;
       for (j=0;j<stereo;j++)
       {
-        if ( (ba=*bita++) ) 
+        if ( (ba=*bita++) )
         {
           k=(alloc2 = alloc1+ba)->bits;
-          if( (d1=alloc2->d) < 0) 
+          if( (d1=alloc2->d) < 0)
           {
             real cm=muls[k][scale[x1]];
             fraction[j][0][i] = ((real) ((int)fr->bsi.GetBits (k) + d1)) * cm;
             fraction[j][1][i] = ((real) ((int)fr->bsi.GetBits (k) + d1)) * cm;
             fraction[j][2][i] = ((real) ((int)fr->bsi.GetBits (k) + d1)) * cm;
-          }        
-          else 
+          }
+          else
           {
             static int *table[] = { 0,0,0,grp_3tab,0,grp_5tab,0,0,0,grp_9tab };
             unsigned int idx,*tab,m=scale[x1];
@@ -165,7 +165,7 @@ void II_step_two(unsigned int *bit_alloc,real fraction[2][4][SBLIMIT],int *scale
             tab = (unsigned int *) (table[d1] + idx + idx + idx);
             fraction[j][0][i] = muls[*tab++][m];
             fraction[j][1][i] = muls[*tab++][m];
-            fraction[j][2][i] = muls[*tab][m];  
+            fraction[j][2][i] = muls[*tab][m];
           }
           scale+=3;
         }
@@ -208,13 +208,13 @@ void II_step_two(unsigned int *bit_alloc,real fraction[2][4][SBLIMIT],int *scale
         fraction[0][0][i] = fraction[0][1][i] = fraction[0][2][i] =
         fraction[1][0][i] = fraction[1][1][i] = fraction[1][2][i] = 0.0;
       }
-/* 
+/*
    should we use individual scalefac for channel 2 or
    is the current way the right one , where we just copy channel 1 to
-   channel 2 ?? 
+   channel 2 ??
    The current 'strange' thing is, that we throw away the scalefac
    values for the second channel ...!!
--> changed .. now we use the scalefac values of channel one !! 
+-> changed .. now we use the scalefac values of channel one !!
 */
     }
 
@@ -273,10 +273,10 @@ int do_layer2 (csMPGFrame *fr)
 
   II_step_one(bit_alloc, scale, fr);
 
-  for (i=0;i<SCALE_BLOCK;i++) 
+  for (i=0;i<SCALE_BLOCK;i++)
   {
     II_step_two(bit_alloc,fraction,scale,fr,i>>2);
-    for (j=0;j<3;j++) 
+    for (j=0;j<3;j++)
     {
       if(single >= 0)
       {

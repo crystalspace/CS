@@ -145,7 +145,7 @@ class csDefaultListBoxSkin : public csListBoxSkin
 public:
   /// Draw the component we are responsible for
   virtual void Draw (csComponent &iComp);
-  
+
  /// Suggest the optimal size of the ListBox
  virtual void SuggestSize (csListBox &This, int &w, int &h);
 };
@@ -164,12 +164,12 @@ public:
 /**
  * This is the default skin for scroll bars
  */
- class csDefaultScrollBarSkin : public csScrollBarSkin 
+ class csDefaultScrollBarSkin : public csScrollBarSkin
  {
  public:
    /// Draw the component we are responsible for
    virtual void Draw(csComponent &iComp);
  };
- 
+
 
 #endif // __SDEFAULT_H__

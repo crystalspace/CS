@@ -39,7 +39,7 @@ enum errorcode { WORLD_NOERR, WORLD_ERR_NULLPARAMETER, WORLD_ERR_NOODE,
 
 class ctForce;
 // State-alloc tracking structure:
-class AllocNode 
+class AllocNode
 {
  public:
   int offset;
@@ -52,7 +52,7 @@ public:
 
   ctWorld ();
   /// !me delete _lists and ode
-  virtual ~ctWorld ();  
+  virtual ~ctWorld ();
 
   void calc_delta_state ( real t, const real y[], real ydot[] );
 
@@ -63,14 +63,14 @@ public:
    * Rewind the state of the system to the time just before evolve was called.
    * pass in the correct time frame.
    */
-  errorcode rewind ( real t1, real t2 );  
+  errorcode rewind ( real t1, real t2 );
 
   /// Maximum number of times to back-up in an evolve loop.
   void set_max_time_subdivisions ( long pmt )
   { max_time_subdivisions = pmt; }
 
   void register_catastrophe_manager ( ctCatastropheManager *pcm );
-  
+
   void solve ( real t );
   errorcode add_entity ( ctEntity *pe );
   errorcode add_enviro_force ( ctForce *f );
@@ -79,9 +79,9 @@ public:
 
   /// set the ODE solver used to evolve the system
   void set_ODE_solver ( OdeSolver *pode )
-  { 
+  {
     if( ode_to_math ) delete ode_to_math;
-    ode_to_math = pode; 
+    ode_to_math = pode;
   }
 
   /// Apply the given function to all physical entities in the system.
@@ -96,10 +96,10 @@ public:
 
   /// Collision response routines and utils
   void resolve_collision ( ctCollidingContact *cont );
-  ctVector3 get_relative_v 
+  ctVector3 get_relative_v
    ( ctPhysicalEntity *body_a, ctPhysicalEntity *body_b, const ctVector3 &the_p );
 
-  virtual int get_state_size () 
+  virtual int get_state_size ()
   { return 0; }
   /// Add this body's state to the state vector buffer passed in.
   virtual int set_state ( real * )
@@ -119,7 +119,7 @@ public:
   ///**********  State vector interface *********
   virtual int  state_alloc (int size);
   virtual void state_free (int offset);
-  virtual int  state_realloc (int offset, int newsize) 
+  virtual int  state_realloc (int offset, int newsize)
   {
     int newloc = state_alloc(newsize);
     if(!newloc) return 0;
@@ -148,19 +148,19 @@ protected:
   errorcode do_time_step( real t1, real t2 );
 
   /**
-   * Take state values( position, velocity, orientation, ... ) from 
+   * Take state values( position, velocity, orientation, ... ) from
    * this world's entities and put them into the array.
    */
   void load_state ( real *state_array );
 
   /**
-   * Take state values from array and reintegrate them into ctEntity 
+   * Take state values from array and reintegrate them into ctEntity
    * structures of this world.  The reverse operation of load_state.
    * State_array must have been filled out by load_state.
    */
   void reintegrate_state ( const real *state_array );
 
-  /// Put first derivative of all world entities into state 
+  /// Put first derivative of all world entities into state
   void load_delta_state ( real *state_array );
 
   void init_state ();
@@ -170,7 +170,7 @@ protected:
   void resize_state_vector ( long new_size );
 
   /// The current state of the world, as in finite state machine state
-  worldstate fsm_state;  
+  worldstate fsm_state;
   real rewound_from;
 
   ctLinkList<ctEntity> body_list;
@@ -178,12 +178,12 @@ protected:
   ctLinkList<ctCatastropheManager> catastrophe_list;
 
   /// Would an equation by any other name smell as sweet?
-  OdeSolver *ode_to_math;  
+  OdeSolver *ode_to_math;
 
   /// State vectors for ODE interface
 
   /// Used to save state so it can be rewound to pre-ODE state
-  real *y_save;  
+  real *y_save;
   real *y0;
   real *y1;
 

@@ -154,13 +154,13 @@ bool Md2::ReadMDLFile(const char* mdlfile)
   md2_t header;
   if (fread(&header, sizeof(md2_t), 1, f) != 1)
     return setError("Cannot read mdl header", f);
- 
+
   // byteswap header
   int32 * ph = (int32*) &header;
   int32 * phe = ph + sizeof(md2_t) / sizeof(int32);
   while (ph < phe)
     *ph++ = convert_endian(*ph);
-    
+
   // skins ops
   fseek(f, header.ofsskins, SEEK_SET);
   skinheight = header.skinheight;
@@ -344,7 +344,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
       float y = (float) trivert.packedposition[2];
       float u = (float) texvert.s;
       float v = (float) texvert.t;
-      
+
       x = ((x * frames[i].scale.x) + frames[i].translate.x) * scaleMdl;
       y = ((y * frames[i].scale.z) + frames[i].translate.z) * scaleMdl;
       z = ((z * frames[i].scale.y) + frames[i].translate.y) * scaleMdl;
@@ -355,7 +355,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 
       u = u / (float) skinwidth;
       v = v / (float) skinheight;
-      
+
       fprintf(f, " V (%.3f,%.3f,%.3f:%.2f,%.2f)", x, y, z, u, v);
     }
     fprintf(f, " )\n");
@@ -382,7 +382,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
             break;
         base_action=j + 1;
         strncpy(name_action, frames[i].name, base_action);
-        
+
         fprintf(f, "\t\tACTION '%s' (", name_action);
 
         fprintf(f, " F ('%s', %d)", frames[i].name, delayMdl);
@@ -394,7 +394,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
           strcpy(toy, name_action);
           strcat(toy, "%s");
           sscanf(frames[j].name, toy, &toy2);
-          
+
           for (k = 0; k < (int)strlen(toy2); k++)
           {
             if (!isdigit(toy2[k]))
@@ -405,7 +405,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
           }
           if (scrash)
 	    break;
-          
+
           if (strncmp(name_action, frames[j].name, base_action) == 0)
             fprintf(f, " F ('%s', %d)", frames[j].name, delayMdl);
           else

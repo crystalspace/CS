@@ -56,7 +56,7 @@ long csGetObject (char **buf, csTokenVector * tokens, char **name, char **data)
       break;
     }
   }
-  
+
   if (i+1 == tokens->Length ())
   {
     char *p = strchr (*buf, '\n');

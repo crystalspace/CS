@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2000-2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -77,20 +77,20 @@ struct iBallState : public iBase
   /// Test if cylindrical texture mapping is used.
   virtual bool IsCylindricalMapping () const = 0;
 
-  /** 
+  /**
    * Set the colours of the dome to a gradient, vertically.
    * the horizon_height is 0, the zenith_height is 1,
    * the gradient is then interpolated to get the colour.
    * The gradient is specified using a float**, where entry
    * gradient[nr] is an array of 4 elements {height, r, g, b}.
    * The entries must be in sorted order, low to high. End with a NULL
-   * e.g. (0.0, 100.0, { {0.0, 1,0,1}, {1.0, 0,0,0}, 0} for a 
+   * e.g. (0.0, 100.0, { {0.0, 1,0,1}, {1.0, 0,0,0}, 0} for a
    * gradient from purple to black.
-   */ 
+   */
   virtual void ApplyVertGradient(float horizon_height, float zenith_height,
     float** gradient) = 0;
 
-  /** 
+  /**
    * Create a lightspot on the colours of the dome.
    * The position indicates the direction of center of the lightspot
    * wrt. the center of the ball mesh.
@@ -101,7 +101,7 @@ struct iBallState : public iBase
   virtual void ApplyLightSpot(const csVector3& position, float size,
     float **gradient) = 0;
 
-  /** 
+  /**
    * Animate the ball as a skydome for earth.
    * Give a time - from 0.0 to 1.0.
    * 0.0 is sunrise, daytime after, 0.5 is sunset, night following.

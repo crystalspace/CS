@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -34,7 +34,7 @@ csIsoGrid::csIsoGrid (iBase *iParent, iIsoWorld *world, int w, int h)
   height = h;
   grid = new iIsoCell* [width*height];
   int i;
-  for(i=0; i<width*height; i++) 
+  for(i=0; i<width*height; i++)
     grid[i] = NULL;
   mingridx = 0; mingridy = 0;
   box.Set(0,-9999,0, height,+9999,width);
@@ -47,7 +47,7 @@ csIsoGrid::csIsoGrid (iBase *iParent, iIsoWorld *world, int w, int h)
 csIsoGrid::~csIsoGrid ()
 {
   int i;
-  for(i=0; i<width*height; i++) 
+  for(i=0; i<width*height; i++)
     if(grid[i]) grid[i]->DecRef();
 
   for (i=0; i<lights.Length (); i++)
@@ -80,7 +80,7 @@ void csIsoGrid::AddSprite(iIsoSprite *sprite, const csVector3& pos)
     cell = new csIsoCell(NULL);
     SetCell(pos, cell);
   }
-  //printf("adding sprite at pos (%g, %g, %g) to cell %x\n", pos.x, 
+  //printf("adding sprite at pos (%g, %g, %g) to cell %x\n", pos.x,
     //pos.y, pos.z, cell);
   GetCell(pos)->AddSprite(sprite, pos);
 }
@@ -116,7 +116,7 @@ void csIsoGrid::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
   }
   // sprite not any longer in this grid
   iIsoGrid *newgrid = world->FindGrid(newpos);
-  if(!newgrid) 
+  if(!newgrid)
   {
     // uh oh sprite moved out of *all* grids
     // disallow the movement
@@ -169,7 +169,7 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
 #if 1
     hpos = 0;
     if((width-0) < startx-starty)
-      hpos = (startx-starty - (width-0))/2; 
+      hpos = (startx-starty - (width-0))/2;
     if(0-height > startx-starty-scanh*2)
       scanh -= (0-height-(startx-starty-scanh*2))/2;
     for(; hpos < scanh; hpos++)
@@ -216,7 +216,7 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
 	posx--; posy--;
       }
     }
-    
+
     return;
 
 #else
@@ -281,7 +281,7 @@ void csIsoGrid::RecalcStaticLight()
 void csIsoGrid::SetSpace(int minx, int minz, float miny = -1.0,
   float maxy = +10.0)
 {
-  mingridx = minz; 
+  mingridx = minz;
   mingridy = minx;
   box.Set(minx,miny,minz, minx+height,maxy,minz+width);
 }
@@ -294,13 +294,13 @@ void csIsoGrid::SetGroundMult(int multx, int multy)
 
 void csIsoGrid::SetGroundValue(int x, int y, int gr_x, int gr_y, float val)
 {
-  groundmap->SetGround(x*groundmap->GetMultX()+gr_x, 
+  groundmap->SetGround(x*groundmap->GetMultX()+gr_x,
     y*groundmap->GetMultY()+gr_y, val);
 }
 
 float csIsoGrid::GetGroundValue(int x, int y, int gr_x, int gr_y)
 {
-  return groundmap->GetGround(x*groundmap->GetMultX()+gr_x, 
+  return groundmap->GetGround(x*groundmap->GetMultX()+gr_x,
     y*groundmap->GetMultY()+gr_y);
 }
 
@@ -345,8 +345,8 @@ void csIsoGrid::ResetAllLight()
 {
   ResetSpriteLight* rs = new ResetSpriteLight ();
   int i;
-  for(i=0; i<width*height; i++) 
-    if(grid[i]) 
+  for(i=0; i<width*height; i++)
+    if(grid[i])
       grid[i]->Traverse (rs);
   rs->DecRef ();
 }
@@ -371,14 +371,14 @@ void SetSpriteColor::Traverse (iIsoSprite* spr)
 
 void csIsoGrid::SetAllLight(const csColor& color)
 {
-  // make copy of color, since (weird usermade) iIsoSprites could violate 
+  // make copy of color, since (weird usermade) iIsoSprites could violate
   // the const that is promised in my heading.
   SetSpriteColor* sp = new SetSpriteColor ();
   csColor col = color;
   sp->col = &col;
   int i;
-  for(i=0; i<width*height; i++) 
-    if(grid[i]) 
+  for(i=0; i<width*height; i++)
+    if(grid[i])
     {
       grid[i]->Traverse (sp);
     }
@@ -410,8 +410,8 @@ void csIsoGrid::SetAllStaticLight(const csColor& color)
   SetSpriteStaticColor* sp = new SetSpriteStaticColor ();
   sp->col = &col;
   int i;
-  for(i=0; i<width*height; i++) 
-    if(grid[i]) 
+  for(i=0; i<width*height; i++)
+    if(grid[i])
     {
       grid[i]->Traverse (sp);
     }
@@ -459,7 +459,7 @@ void csIsoGrid::UnRegisterDynamicLight(iIsoLight *light)
   }
 }
 
-void csIsoGrid::GetFakeLights(const csVector3& pos, iLight **& flights, 
+void csIsoGrid::GetFakeLights(const csVector3& pos, iLight **& flights,
   int& num)
 {
   if(!fakelights)
@@ -539,7 +539,7 @@ bool csIsoGroundMap::HitBeam(const csVector3& gsrc, const csVector3& gdest)
 
   /// check each square along groundsquare size steps...
   if(delta.IsZero()) return true;
-  float len = 2.0*qsqrt(delta.z*delta.z*float(multx*multx) + 
+  float len = 2.0*qsqrt(delta.z*delta.z*float(multx*multx) +
     delta.x*delta.x*float(multy*multy));
   csVector3 m = delta/len;
   m.z *= float(multx);
@@ -560,7 +560,7 @@ bool csIsoGroundMap::HitBeam(const csVector3& gsrc, const csVector3& gdest)
     z = QInt(pos.z);
     x = QInt(pos.x);
     if(x >= 0 && z >= 0 && z<width && x<height)
-      if(pos.y <= GetGround(QInt(pos.z), QInt(pos.x))) 
+      if(pos.y <= GetGround(QInt(pos.z), QInt(pos.x)))
         return false;
     pos += m;
   }

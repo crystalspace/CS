@@ -440,7 +440,7 @@ bool csImageFile::HasKeycolor ()
   return has_keycolour;
 }
 
-void csImageFile::GetKeycolor (int &r, int &g, int &b) 
+void csImageFile::GetKeycolor (int &r, int &g, int &b)
 {
   r = keycolour_r;
   g = keycolour_g;

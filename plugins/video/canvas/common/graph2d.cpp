@@ -670,8 +670,8 @@ iImage *csGraphics2D::ScreenShot ()
   return ss;
 }
 
-iGraphics2D *csGraphics2D::CreateOffScreenCanvas  
-  (int width, int height, void *buffer, bool alone_hint, 
+iGraphics2D *csGraphics2D::CreateOffScreenCanvas
+  (int width, int height, void *buffer, bool alone_hint,
    csPixelFormat *pfmt, csRGBpixel *palette, int pal_size)
 {
   // default return a software canvas
@@ -723,8 +723,8 @@ bool csGraphics2D::Resize (int w, int h)
   if (!AllowResizing)
     return false;
 
-  if (Width != w || Height != h) 
-  { 
+  if (Width != w || Height != h)
+  {
     Width = w;
     Height = h;
 

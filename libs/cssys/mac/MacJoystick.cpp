@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein and K. Robert Bate.
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -154,7 +154,7 @@ void C3DView::SpendTime( const EventRecord&	/* inMacEvent */ )
 		theControls.xRotate = GetAxisValue( gInputElements[ kXRotate ] ) * kAngleDelta;
 		theControls.yRotate = GetAxisValue( gInputElements[ kYRotate ] ) * kAngleDelta;
 		theControls.zRotate = GetAxisValue( gInputElements[ kZRotate ] ) * kAngleDelta;
-	
+
 		/*	Check to see if the move to origin button was hit */
 		theControls.moveToOrigin = WasButtonHit( gInputElements[kMoveToOrigin] );
 
@@ -218,17 +218,17 @@ static Boolean WasButtonHit( ISpElementReference inElement )
 	OSStatus	error;
 	Boolean		wasEvent;
 	Boolean		down = false;
-	
+
 	do {
 		ISpElementEvent	event;
 
 		error = ISpElement_GetNextEvent(inElement, sizeof( ISpElementEvent ), &event, &wasEvent );
 
 		if (( ! error ) && ( wasEvent ) && ( event.data == kISpButtonDown )) {
-			down = true; 
+			down = true;
 			break;
 		}
 	} while (( wasEvent ) && ( ! error ));
-	
+
 	return down;
 }

@@ -95,7 +95,7 @@ private:
 
   // Do not cache the image of current frame
   bool DontCacheFrame;
-  
+
   /// Initialize pipeline
   void Initialize (iObjectRegistry *object_reg);
   /// Finish graphics pipeline

@@ -48,22 +48,22 @@ struct iCameraPosition : public iBase
 
   /// Create a clone this camera position.
   virtual iCameraPosition* Clone () const = 0;
-  
+
   /// Return the home sector.
   virtual const char *GetSector () = 0;
   /// Set the home sector.
   virtual void SetSector (const char *Name) = 0;
-  
+
   /// Return the position.
   virtual const csVector3 &GetPosition () = 0;
   /// Set the position.
   virtual void SetPosition (const csVector3 &p) = 0;
-  
+
   /// Return the 'up' vector.
   virtual const csVector3 &GetUpwardVector () = 0;
   /// Set the 'up' vector.
   virtual void SetUpwardVector (const csVector3 &v) = 0;
-  
+
   /// Return the 'front' vector.
   virtual const csVector3 &GetForwardVector () = 0;
   /// Set the 'front' vector.

@@ -22,7 +22,7 @@
 SCF_IMPLEMENT_IBASE(csSoundListener);
   SCF_IMPLEMENTS_INTERFACE(iSoundListener);
 SCF_IMPLEMENT_IBASE_END;
-  
+
 csSoundListener::csSoundListener()
 {
   SCF_CONSTRUCT_IBASE(NULL);

@@ -1,17 +1,17 @@
 /*
     Copyright (C) Aleksandras Gluchovas
     CS port by Norman Krämer <norman@users.sourceforge.net>
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -29,17 +29,17 @@
  * Sample:
  * <p>
  * <code>
- * csWindow *wnd = new csWindow (theApp, "BorderLayout", 
+ * csWindow *wnd = new csWindow (theApp, "BorderLayout",
  *                               CSWS_DEFAULTVALUE & ~CSWS_MENUBAR);
  * wnd->SetSize (400, 300);
  * wnd->Center ();
  * wnd->Select ();
- * 
+ *
  * csBorderLayout *border = new csFlowLayout (wnd);
  * wnd->SendCommand (cscmdWindowSetClient, (void*)border);
  *
- * csBorderConstraint *blc[5] = {csBorderLayout::CENTER, 
- *				 csBorderLayout::EAST, 
+ * csBorderConstraint *blc[5] = {csBorderLayout::CENTER,
+ *				 csBorderLayout::EAST,
  *				 csBorderLayout::NORTH,
  *				 csBorderLayout::WEST,
  *				 csBorderLayout::SOUTH};
@@ -77,7 +77,7 @@ class csBorderConstraint : public csLayoutConstraint
    */
   csBorderConstraint (int align): mAlign( align ) {}
   /// copy constructor
-  csBorderConstraint (const csBorderConstraint &c) : 
+  csBorderConstraint (const csBorderConstraint &c) :
     csLayoutConstraint (c.comp)
     { mAlign = c.mAlign; }
   virtual csLayoutConstraint *Clone ();
@@ -102,7 +102,7 @@ class csBorderLayout : public csLayout2
    * to add it to the layout.
    * <pre>
    * IN:  the component to add
-   * OUT: the constraint that is used to layout the component 
+   * OUT: the constraint that is used to layout the component
    *      (a copy of variable c  see above)
    * </pre>
    */
@@ -165,11 +165,11 @@ class csBorderLayout : public csLayout2
   };
 
  protected:
-  void DistributeSizes( int& left, int& center, 
+  void DistributeSizes( int& left, int& center,
 			int& right, int totalWidth, int gap,
 			bool hasLeft, bool hasCenter, bool hasRight );
 
-  int GetWidthSum( int left, int center, int right, int gap, 
+  int GetWidthSum( int left, int center, int right, int gap,
 		   bool hasLeft, bool hasCenter, bool hasRight );
 
   int Hgap (csComponent* pComp);

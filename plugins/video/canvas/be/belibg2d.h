@@ -37,7 +37,7 @@ protected:
   BBitmap* bitmap;
   color_space curr_color_space;
   BRect screen_frame;
-  
+
 public:
   csGraphics2DBeLib(iBase*);
   virtual ~csGraphics2DBeLib();

@@ -1,23 +1,23 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
     modified by Petr Kocmid (pkocmid@atlas.cz)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef IWORLD_H
@@ -29,7 +29,7 @@ class CMapFile;
 
 /**
   * this class encapsulates the worldin Crystal Space terminology. This means
-  * it is an array of Sectors. This is also an abstract baseclass, that will 
+  * it is an array of Sectors. This is also an abstract baseclass, that will
   * be overridden for other output formats.
   */
 class CIWorld
@@ -97,7 +97,7 @@ public:
 
 protected:
   /**
-    * Search a map for manual sectors. All other entities are stored in an 
+    * Search a map for manual sectors. All other entities are stored in an
     * other array called m_Entities, so every entity in the map is stored here.
     * Either as sector or as entity
     */
@@ -107,7 +107,7 @@ protected:
   void GenerateDefaultsector();
 
   /**
-    * Search all manual sectors for common polygons, that are to be turned 
+    * Search all manual sectors for common polygons, that are to be turned
     * into portals.
     */
   void FindPortals();
@@ -117,7 +117,7 @@ protected:
     */
   void InsertThings();
 
-  /** 
+  /**
     * Initialise m_TextureFileNames with a list of all textures
     */
   void BuildTexturelist();
@@ -128,7 +128,7 @@ protected:
   bool PrepareData(const char* filename, CMapFile* pMap);
 
 protected:
-  /// Array containing all Sectors 
+  /// Array containing all Sectors
   CISectorVector   m_Sectors;
 
   /// Array containing all non-sector Entities

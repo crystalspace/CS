@@ -140,12 +140,12 @@ SCF_VERSION (iModelDataVertices, 0, 0, 1);
  * A set of vertices, including position, normal, color and texture
  * coordinates. They are stored in independent lists, i.e. it is for example
  * possible to have different numbers of vertices and normals.
- */ 
+ */
 struct iModelDataVertices : public iBase
 {
   /// Query the iObject for this vertex set
   virtual iObject* QueryObject () = 0;
-  
+
   /// Return the number of contained vertices
   virtual int GetVertexCount () const = 0;
   /// Return the coordinates of a vertex
@@ -237,7 +237,7 @@ struct iModelDataAction : public iBase
 {
   /// Query the iObject for this action
   virtual iObject* QueryObject () = 0;
-  
+
   /// Return the number of key frames
   virtual int GetFrameCount () const = 0;
   /// Get the time value for a frame

@@ -33,7 +33,7 @@ private:
   int *palette;
   /// number of colours in palette
   int palsize;
-  
+
   /// cos array
   uint8 *costable;
 

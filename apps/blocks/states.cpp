@@ -114,7 +114,7 @@ void States::EncodeStates ()
   sprintf ((char*)encodedData,"%f9,%f9,", speed, cur_speed);
   int i = strlen((char*)encodedData);
   // i is at the start of the ints.
-  
+
   tints[0] = score;
   tints[1] = cube_x;
   tints[2] = cube_y;
@@ -122,13 +122,13 @@ void States::EncodeStates ()
   tints[4] = zone_dim;
   tints[5] = new_zone_dim;
 
-  memcpy(encodedData + i, tints, ST_NUM_INTS * ST_SIZE_INT);  
-  
+  memcpy(encodedData + i, tints, ST_NUM_INTS * ST_SIZE_INT);
+
   i += ST_NUM_INTS * ST_SIZE_INT + 1;
   encodedData[i] = ',';
   i++;
   // i here is at the bitset.
-  
+
 //  csBitSet tempBitSet(ST_NUM_BITS);
   tempBitSet->Reset();
 
@@ -138,7 +138,7 @@ void States::EncodeStates ()
       for (j = 0; j < ZONE_DIM; j++, pos++)
 	if (get_cube(j, k, l))
           tempBitSet->Set(pos);
-  memcpy(encodedData + i, tempBitSet->GetBits(), tempBitSet->GetByteCount());  
+  memcpy(encodedData + i, tempBitSet->GetBits(), tempBitSet->GetByteCount());
 }
 
 // @@@ FIXME: Fails to take endian into account when transporting integers.
@@ -166,10 +166,10 @@ bool States::DecodeStates ()
   float tspeed, tcur_speed;
   if(sscanf((char*)encodedData,"%f,%f", &tspeed, &tcur_speed) != ST_NUM_FLOATS)
     return false;
-    
+
   speed = tspeed;
   cur_speed = tcur_speed;
-   
+
   encodedData[i] = ',';
   i++;
 
@@ -199,7 +199,7 @@ bool States::DecodeStates ()
 
 bool States::PrintData (const char* fileName) const
 {
-  printf("\n--------------------------------------------------\n"); 
+  printf("\n--------------------------------------------------\n");
   printf("%s\n",encodedData);
   printf("\n--------------------------------------------------\n");
   printf("%f,%f,%d,%d,%d,%d,%d,%d\n",
@@ -216,7 +216,7 @@ bool States::PrintData (const char* fileName) const
     return false;
   bool ok = (fwrite(encodedData, ST_ENCODED_LENGTH, 1, fd) == 1);
   fclose(fd);
-  return ok;  
+  return ok;
 }
 
 #if defined(BLOCKS_NETWORKING)
@@ -232,20 +232,20 @@ NetworkStates::~NetworkStates ()
 }
 
 //bool NetworkStates::EncodeForNetwork (char * EncodedData, int sizeOfBuffer)
-bool NetworkStates::EncodeForNetwork(unsigned char * EncodedData, 
-				     unsigned char * NetworkData, 
+bool NetworkStates::EncodeForNetwork(unsigned char * EncodedData,
+				     unsigned char * NetworkData,
 			             int sizeOfEncoded, int sizeOfNetwork)
 {
 // Move the buffer of encoded data forwards so that STARTSTATE can be added.
-  
+
   // A shorthand.
   unsigned char * tb;
   tb = NetworkData;
-  
+
 //  tb = (char *) malloc(sizeOfBuffer * sizeof(char));
 
   memcpy(tb+10+ST_SIZE_INT, EncodedData, sizeOfEncoded);
-  
+
   tb[0] = 'S'; tb[1] = 'T'; tb[2] = 'A'; tb[3] = 'R'; tb[4] = 'T';
   tb[5] = 'S'; tb[6] = 'T'; tb[7] = 'A'; tb[8] = 'T'; tb[9] = 'E';
 
@@ -260,39 +260,39 @@ bool NetworkStates::EncodeForNetwork(unsigned char * EncodedData,
 
   StateNumber ++;
   PreviousStateNumber++;
-  
+
   int tempint[1];
   tempint[0] = StateNumber;
-  
+
   memcpy(tb+10,tempint, ST_SIZE_INT);
-  
+
   tb[sizeOfNetwork-1] = '\0';
-  
+
 //  memcpy(EncodedData, tb, sizeOfBuffer);
 //  free(tb);
   return true;
 }
 
-bool NetworkStates::DecodeFromNetwork(unsigned char * NetworkData, 
-				      int sizeOfBuffer, 
+bool NetworkStates::DecodeFromNetwork(unsigned char * NetworkData,
+				      int sizeOfBuffer,
 				      States * aState)
 {
   // First we have to see if there is a full set of network data.
   // Check if the STARTSTATE and ENDSTATE are there.
   if
-  ( 
+  (
     !(
-    NetworkData[0] == 'S' && 
-    NetworkData[1] == 'T' && 
-    NetworkData[2] == 'A' && 
-    NetworkData[3] == 'R' && 
-    NetworkData[4] == 'T' && 
-    NetworkData[5] == 'S' && 
-    NetworkData[6] == 'T' && 
-    NetworkData[7] == 'A' && 
-    NetworkData[8] == 'T' && 
+    NetworkData[0] == 'S' &&
+    NetworkData[1] == 'T' &&
+    NetworkData[2] == 'A' &&
+    NetworkData[3] == 'R' &&
+    NetworkData[4] == 'T' &&
+    NetworkData[5] == 'S' &&
+    NetworkData[6] == 'T' &&
+    NetworkData[7] == 'A' &&
+    NetworkData[8] == 'T' &&
     NetworkData[9] == 'E' &&
-  
+
     NetworkData[sizeOfBuffer-9] == 'E' &&
     NetworkData[sizeOfBuffer-8] == 'N' &&
     NetworkData[sizeOfBuffer-7] == 'D' &&
@@ -306,12 +306,12 @@ bool NetworkStates::DecodeFromNetwork(unsigned char * NetworkData,
   {
     return false;
   }
-  
+
   // Try to decode the State data in the middle.
   // Get the state number.
   int tempint[1];
   memcpy(tempint, NetworkData+10, ST_SIZE_INT);
-  
+
 //  char * tempStateData;
 //  tempStateData = aState->encodedData;
 

@@ -41,7 +41,7 @@ public:
         rows[idx][idy] = ( idx == idy ) ? 1.0 : 0.0;
   }
 
-  /**  
+  /**
    * Spatial transform based on rotation matrix pR and offset vector pr
    * bewteen two frames of reference.  Result will be a matrix that transforms
    * any spatial vector between those two frames
@@ -57,7 +57,7 @@ public:
   real * operator[] ( const int index )
   { return (real *)(rows[index]); }
 
-  real * operator[] ( const int index ) const 
+  real * operator[] ( const int index ) const
   { return (real *)(rows[index]); } //!me eh?
 
   void operator=( const ctSpatialMatrix6 &pm )
@@ -81,7 +81,7 @@ public:
       }
   }
 
-  ctSpatialMatrix6 get_transpose () const 
+  ctSpatialMatrix6 get_transpose () const
   {
     ctSpatialMatrix6 Mret;
 	int idx, idy;
@@ -104,7 +104,7 @@ public:
     }
   }
 
-  ctSpatialVector6 operator* ( const ctSpatialVector6 &pv ) 
+  ctSpatialVector6 operator* ( const ctSpatialVector6 &pv )
   {
     ctSpatialVector6 rv (0,0,0,0,0,0);
     int idx, idx2;
@@ -115,7 +115,7 @@ public:
     return rv;
   }
 
-  ctSpatialVector6 operator* ( const ctSpatialVector6 &pv ) const 
+  ctSpatialVector6 operator* ( const ctSpatialVector6 &pv ) const
   {
     ctSpatialVector6 rv( 0,0,0,0,0,0);
     int idx, idx2;
@@ -125,7 +125,7 @@ public:
     return rv;
   }
 
-  ctSpatialMatrix6 operator* ( const ctSpatialMatrix6 &MM ) const 
+  ctSpatialMatrix6 operator* ( const ctSpatialMatrix6 &MM ) const
   {
     ctSpatialMatrix6 Mret;
 	int idr, idc, adder;
@@ -140,7 +140,7 @@ public:
     return Mret;
   }
 
-  void mult_M( ctSpatialMatrix6 &Mret, const ctSpatialMatrix6 &MM ) const 
+  void mult_M( ctSpatialMatrix6 &Mret, const ctSpatialMatrix6 &MM ) const
   {
 	int idr, idc, adder;
     for (idr = 0; idr < 6; idr++)
@@ -166,7 +166,7 @@ public:
     *this = Mret;
   }
 
-  ctSpatialMatrix6 operator* ( const real pk ) const 
+  ctSpatialMatrix6 operator* ( const real pk ) const
   {
     ctSpatialMatrix6 Mret;
 	int idr, idc;
@@ -201,7 +201,7 @@ public:
         rows[idx][idy] = pm1.rows[idx][idy] + pm2.rows[idx][idy];
   }
 
-  void add3 ( ctSpatialMatrix6 &pmdest, 
+  void add3 ( ctSpatialMatrix6 &pmdest,
 	      const ctSpatialMatrix6 &pm1, const ctSpatialMatrix6 &pm2 )
   {
 	int idx, idy;
@@ -283,7 +283,7 @@ public:
     real *b;
     real *x;
     int idx, idy;
-    
+
     b = (real *)malloc ( sizeof( real )*6 );
     A = (real **)malloc ( sizeof( real * )*6 );
     x = px.get_elements();
@@ -310,7 +310,7 @@ public:
     {
       for(j = 0; j < dimen; j++)
       {
-//        Debug::logf( CT_DEBUG_LEVEL, "%lf :: ", rows[i][j] ); 
+//        Debug::logf( CT_DEBUG_LEVEL, "%lf :: ", rows[i][j] );
 //      Debug::logf( CT_DEBUG_LEVEL, "\n" );
       }
     }
@@ -321,9 +321,9 @@ protected:
 
 };
 
-inline ctSpatialMatrix6 ctSpatialVector6::operator* 
+inline ctSpatialMatrix6 ctSpatialVector6::operator*
    ( const ctVectorTranspose6 &pv )
-{ 
+{
   ctSpatialMatrix6 Mret;
   int idr, idc;
   for(idr = 0; idr < 6; idr++)

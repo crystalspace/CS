@@ -121,14 +121,14 @@ bool csCrossBuilder::BuildThing (iModelDataObject *Object, iThingState *tgt,
     // copy vertices
     for (i=0; i<Polygon->GetVertexCount (); i++)
       ThingPoly->CreateVertex (Polygon->GetVertex (i));
-    
+
     // copy material
     iModelDataMaterial *mat = Polygon->GetMaterial ();
     if (mat && mat->GetMaterialWrapper ())
       ThingPoly->SetMaterial (mat->GetMaterialWrapper ());
     else
       ThingPoly->SetMaterial (DefaultMaterial);
-    
+
     // copy texture transformation
     ThingPoly->SetTextureSpace (
       Vertices->GetVertex (Polygon->GetVertex (0)),
@@ -177,7 +177,7 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
       Engine->GetMeshFactories ()->Remove (SubWrapper);
       return NULL;
     }
-    
+
     sfState->SetMaterialWrapper (DefaultMaterial);
     BuildSpriteFactory (it.Get (), sfState);
     sfState->DecRef ();
@@ -192,6 +192,6 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
 
     it.Next ();
   }
-  
+
   return MainWrapper;
 }

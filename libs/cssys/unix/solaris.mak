@@ -23,8 +23,8 @@ PLUGINS+=video/canvas/xextf86vm
 PLUGINS+=video/format/avi
 # CODECS (some formats are dynamic, that is they need codecs to encod/decode data)
 # OpenDivX : you need an additional library you can get from www.projectmayo.com
-#PLUGINS+=video/format/codecs/opendivx                                                                  
-#PLUGINS+=video/format/codecs/rle                                                                  
+#PLUGINS+=video/format/codecs/opendivx
+#PLUGINS+=video/format/codecs/rle
 
 # Uncomment the following to build sound renderer
 #PLUGINS+=sound/renderer/software

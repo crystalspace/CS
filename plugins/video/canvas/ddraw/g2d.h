@@ -29,23 +29,23 @@ class csGraphics2DDDraw3 : public csGraphics2D
 public:
   csGraphics2DDDraw3 (iBase *iParent);
   virtual ~csGraphics2DDDraw3 ();
-  
+
   virtual bool Initialize (iObjectRegistry*);
 
   virtual bool Open ();
   virtual void Close ();
 
   void Report (int severity, const char* msg, ...);
-  
+
   virtual void Print (csRect *area = NULL);
-  
+
   virtual void SetRGB (int i, int r, int g, int b);
 
   virtual bool PerformExtensionV (char const* command, va_list);
-	
+
   virtual bool BeginDraw ();
   virtual void FinishDraw ();
-  
+
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
   /// Set mouse cursor position; return success status
@@ -63,7 +63,7 @@ protected:
   LPDIRECTDRAWSURFACE m_lpddsPrimary;
   LPDIRECTDRAWSURFACE m_lpddsBack;
   LPDIRECTDRAWPALETTE m_lpddPal;
-  
+
   HWND m_hWnd;
   HINSTANCE m_hInstance;
   HPALETTE m_hWndPalette;
@@ -77,7 +77,7 @@ protected:
   bool m_bDisableDoubleBuffer;
   bool m_bLocked;
   bool m_bHardwareCursor;
-  
+
   // Saves the window size & pos.
   RECT m_rcWindow;
   // true if double buffer is enabled

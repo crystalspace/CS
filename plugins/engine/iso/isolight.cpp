@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by W.C.A. Wijngaards
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -50,7 +50,7 @@ csIsoLight::~csIsoLight ()
 
 void csIsoLight::SetGrid(iIsoGrid *grid)
 {
-  if(csIsoLight::grid) 
+  if(csIsoLight::grid)
   {
     if(flags.Check(CSISO_LIGHT_DYNAMIC))
       csIsoLight::grid->UnRegisterDynamicLight(this);
@@ -92,18 +92,18 @@ float csIsoLight::GetAttenuation(float distance)
   switch(attenuation)
   {
     case CSISO_ATTN_NONE:
-      res = 1.0; 
+      res = 1.0;
       break;
     case CSISO_ATTN_LINEAR:
       if(distance >= radius) return 0.;
-      res = (radius - distance) * inv_radius; 
+      res = (radius - distance) * inv_radius;
       break;
     case CSISO_ATTN_INVERSE:
-      res = radius / distance; 
+      res = radius / distance;
       break;
     case CSISO_ATTN_REALISTIC:
     default:
-      res = radius / distance; 
+      res = radius / distance;
       res *= res;
       break;
   };
@@ -117,7 +117,7 @@ void csIsoLight::CalcVis()
   // only using the ground height (for speed)
   if(!grid) return;
   recalc_vis = false;
-  
+
   // set all to invisible
   //int size = (visw*vish+7)/8;
   //memset(vismap, 0, size*sizeof(uint8));
@@ -127,10 +127,10 @@ void csIsoLight::CalcVis()
   grid->GetGridOffset(mingridx, mingridy);
   int multx = grid->GetGroundMultX();
   int multy = grid->GetGroundMultY();
-  
+
   // scan each possibly visible ground cell
   // start with min,max at center cell;
-  int xmin = QInt(position.z * float(multx)) - mingridx*multx; 
+  int xmin = QInt(position.z * float(multx)) - mingridx*multx;
   int ymin = QInt(position.x * float(multy)) - mingridy*multy;
   int xmax = xmin;
   int ymax = ymin;
@@ -156,7 +156,7 @@ void csIsoLight::CalcVis()
     pos.Set(
       float(y+mingridy*multy)/float(multy),
       0.,
-      float(xmin+mingridx*multx)/float(multx) 
+      float(xmin+mingridx*multx)/float(multx)
     );
     for(x = xmin; x<=xmax; x++)
     {
@@ -164,7 +164,7 @@ void csIsoLight::CalcVis()
       pos.y = grid->GetGroundValue(x,y);
       // check if line from my position to ground cell pos is possible
       res = 0.0;
-      if(grid->GroundHitBeam(position, pos+csVector3(xinc*0.5,0,zinc*0.5))) 
+      if(grid->GroundHitBeam(position, pos+csVector3(xinc*0.5,0,zinc*0.5)))
         res += 0.2; // test center, then 4 corners
       if(grid->GroundHitBeam(position, pos)) res += 0.2;
       if(grid->GroundHitBeam(position, pos+csVector3(0,0,zinc))) res += 0.2;
@@ -227,7 +227,7 @@ void csIsoLight::ShineGrid()
   int mingridx, mingridy;
   grid->GetGridOffset(mingridx, mingridy);
   /// x in cell numbers
-  int xmin = QInt(position.z) - mingridx; 
+  int xmin = QInt(position.z) - mingridx;
   int ymin = QInt(position.x) - mingridy;
   int xmax = xmin;
   int ymax = ymin;
@@ -264,7 +264,7 @@ void csIsoLight::ShineSprite(iIsoSprite *sprite)
   float multy = grid->GetGroundMultY();
   // light position in the objects space
   csVector3 relpos = position - sprite->GetPosition();
-  int sprx = QInt(sprite->GetPosition().z * multx) - mingridx*QInt(multx); 
+  int sprx = QInt(sprite->GetPosition().z * multx) - mingridx*QInt(multx);
   int spry = QInt(sprite->GetPosition().x * multy) - mingridy*QInt(multy);
   bool dynamic = flags.Check(CSISO_LIGHT_DYNAMIC);
   int i;

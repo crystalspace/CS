@@ -44,12 +44,12 @@ public:
   csSoundDriverMac(iBase *piBase);
   virtual ~csSoundDriverMac();
   virtual bool Initialize(iObjectRegistry *object_reg);
-  
+
   void Report (int severity, const char* msg, ...);
 
   virtual bool Open(iSoundRender *, int frequency, bool bit16, bool stereo);
   virtual void Close();
-	
+
   virtual void LockMemory(void **mem, int *memsize);
   virtual void UnlockMemory();
   virtual bool IsBackground();
@@ -57,9 +57,9 @@ public:
   virtual bool IsStereo();
   virtual int  GetFrequency();
   virtual bool IsHandleVoidSound();
- 
+
   void SndDoubleBackProc(SndChannelPtr, SndDoubleBufferPtr);
-  
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverMac);
@@ -71,11 +71,11 @@ public:
   SndDoubleBufferHeader	mSoundDBHeader;
   SndDoubleBuffer		mSoundDoubleBuffer;
   SndChannelPtr			mSoundChannel;
-  
+
   long	mFramesPerBuffer;
   bool	mStopPlayback;
   long	mOutputVolume;
-  
+
   long	mBuffersFilled;
 };
 

@@ -43,8 +43,8 @@ csProcTextureSoft2D::~csProcTextureSoft2D ()
     Palette = NULL;
 }
 
-iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas 
-  (int width, int height, void *buffer, bool use8bit, 
+iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
+  (int width, int height, void *buffer, bool use8bit,
    csPixelFormat *ipfmt, csRGBpixel *palette, int pal_size)
 {
   Width = width;
@@ -55,7 +55,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 
   // Three ways into this routine:
   // 1. via Opengl as a software renderer, but sharing texture handles..it has
-  // its own texture manager but retains a csVector relating the opengl 
+  // its own texture manager but retains a csVector relating the opengl
   // texture handles to its own.
   //
   // 2. via Software drivers as a stand alone. Here we can render in (internal
@@ -89,7 +89,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
   }
   else
   {
-    // We are a stand alone software renderer being used in hardware 
+    // We are a stand alone software renderer being used in hardware
     // or a software shared implementation
     memcpy (&pfmt, ipfmt, sizeof (csPixelFormat));
     if (ipfmt->PixelBytes == 2)
@@ -101,8 +101,8 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
       _GetPixelAt = GetPixelAt16;
 
       // Here we are in a software context while sharing the texture manager
-      // We therefor render to a 16bit frame buffer and then unpack into an 
-      // csRGBpixel format from which the texture manager recalculates the 
+      // We therefor render to a 16bit frame buffer and then unpack into an
+      // csRGBpixel format from which the texture manager recalculates the
       // texture
       destroy_memory = true;
       Memory = new unsigned char[width*height*2];
@@ -117,7 +117,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 	*dst = ((((uint16)image_buffer[i].blue >> bb) << pfmt.BlueShift) +
 		(((uint16)image_buffer[i].green >> gb) << pfmt.GreenShift) +
 		(((uint16)image_buffer[i].red >> rb) << pfmt.RedShift));
-    } 
+    }
     else
     {
       // 32bit shared software or hardware
@@ -165,8 +165,8 @@ void csProcTextureSoft2D::Print (csRect *area)
     csRGBpixel *dst = image_buffer;
     if (pfmt.PixelBytes == 2)
     {
-      // As we are in 16bit mode we unpack the 16 bit frame buffer into 
-      // the 32 bit image_buffer as this is the format required by the 
+      // As we are in 16bit mode we unpack the 16 bit frame buffer into
+      // the 32 bit image_buffer as this is the format required by the
       // quantization routines in the texture manager.
       uint16 *src = (uint16*) Memory;
 
@@ -186,7 +186,7 @@ void csProcTextureSoft2D::Print (csRect *area)
 	  {
 	    dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
 	    dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
-	    dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb; 
+	    dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb;
 	  }
 	  src += stride;
 	  dst += stride;
@@ -198,11 +198,11 @@ void csProcTextureSoft2D::Print (csRect *area)
 	{
 	  dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
 	  dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
-	  dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb; 
+	  dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb;
 	}
       }
     }
-    else  // 32bit: byte shuffle 
+    else  // 32bit: byte shuffle
     {
       uint32 *src = (uint32 *)Memory;
       if (area)

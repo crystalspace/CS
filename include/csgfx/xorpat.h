@@ -20,7 +20,7 @@
 #ifndef __XORPAT_H__
 #define __XORPAT_H__
 
-/// Create an iImage with a nice XOR pattern. 
+/// Create an iImage with a nice XOR pattern.
 extern iImage* csCreateXORPatternImage(int width, int height, int patsize);
 
 #endif

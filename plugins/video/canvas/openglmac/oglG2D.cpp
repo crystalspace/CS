@@ -47,7 +47,7 @@ SCF_IMPLEMENT_IBASE_EXT (csGraphics2DOpenGL)
   SCF_IMPLEMENTS_INTERFACE (iMacGraphics)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-csGraphics2DOpenGL::csGraphics2DOpenGL(iBase* iParent) : 
+csGraphics2DOpenGL::csGraphics2DOpenGL(iBase* iParent) :
                    csGraphics2DGLCommon (iParent)
 {
 	mMainWindow = NULL;
@@ -194,7 +194,7 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
 
   		pfmt.complete ();
 	}
-  
+
 	printf ("Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
 
 	return true;
@@ -221,16 +221,16 @@ bool csGraphics2DOpenGL::Open()
 	displayRect = (**mMainGDevice).gdRect;
 	displayWidth = displayRect.right - displayRect.left;
 	displayHeight = displayRect.bottom - displayRect.top;
-	
+
 	theBounds.left = displayRect.left + ((displayWidth - Width) / 2);
 	theBounds.top = displayRect.top + ((displayHeight - Height) / 2);
-	
+
 	theBounds.right = theBounds.left + Width;
 	theBounds.bottom = theBounds.top + Height;
 
 	strcpy( (char *)&theTitle[1], win_title );
 	theTitle[0] = strlen( win_title );
-	mMainWindow = (CWindowPtr)::NewCWindow( nil, &theBounds, theTitle, true, noGrowDocProc, 
+	mMainWindow = (CWindowPtr)::NewCWindow( nil, &theBounds, theTitle, true, noGrowDocProc,
 											(WindowPtr) -1, false, 0 );
 
 	// set the color table into the video card
@@ -268,7 +268,7 @@ bool csGraphics2DOpenGL::Open()
 	csGraphics2DGLCommon::Open();
 
 	aglSwapBuffers( mGLContext );
-  
+
 	return true;
 }
 
@@ -312,7 +312,7 @@ void csGraphics2DOpenGL::Print( csRect *area )
 }
 
 void csGraphics2DOpenGL::SetColorPalette()
-{  
+{
 	if (( Depth == 8 ) && ( mPaletteChanged )) {
 		mPaletteChanged = false;
 

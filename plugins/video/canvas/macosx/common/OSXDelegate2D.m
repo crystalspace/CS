@@ -1,6 +1,6 @@
 //
 //  OSXDelegate2D.m
-//  
+//
 //
 //  Created by mreda on Wed Oct 31 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
@@ -42,22 +42,22 @@
 - (id) initWithDriver:(OSXDriver2D) drv
 {
     self = [super init];
-    
+
     if (self != nil)
     {
         window = nil;
         title = nil;
         pausedTitle = nil;
-            
+
         isPaused = NO;
-            
+
         hideMouse = NO;
         trackingMouse = NO;
         trackingMouseTag = 0;
-        
+
         driver = drv;
     };
-    
+
     return self;
 };
 
@@ -68,7 +68,7 @@
 {
     if (window != nil)
         [self closeWindow];
-    
+
     [title release];
     [pausedTitle release];
 
@@ -85,7 +85,7 @@
 
 
 // openWindow
-// Open a window if none open 
+// Open a window if none open
 // In fullscreen mode, opens a zero-sized window to get events
 - (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs
 {
@@ -93,7 +93,7 @@
 
     if (window != nil)
         return YES;
-        
+
     // Position window in upper left in fullscreen mode, because although CG will switch resolutions,
     // NSScreen does not reflect this change, and I don't think whatever mechanism NSWindow uses to position
     // itself reflects this change either, because putting the rect at 0,0 puts it off the bottom of the screen
@@ -103,10 +103,10 @@
     else
     {
         int dispWidth = CGDisplayPixelsWide(kCGDirectMainDisplay);
-        int dispHeight = CGDisplayPixelsHigh(kCGDirectMainDisplay);        
+        int dispHeight = CGDisplayPixelsHigh(kCGDirectMainDisplay);
         rect = NSMakeRect((dispWidth - w) / 2, (dispHeight - h) / 2, w - 1, h - 1);
     };
-    
+
     // Create window with correct style
     style = [self getWindowStyleForMode:fs];
     window = [[OSXWindow alloc] initWithContentRect:rect styleMask:style backing:NSBackingStoreBuffered defer:NO];
@@ -117,19 +117,19 @@
     // Set up window stuff
     if (fs == YES)
         [window setLevel:CGShieldingWindowLevel()];
-        
+
     [self configureTitles:winTitle];
     [self adjustTitle];
-        
+
     [window useOptimizedDrawing:YES];
     [window setDelegate:self];
     [window makeFirstResponder:self];
     [[window contentView] setNextResponder:self];
     [window makeKeyAndOrderFront:nil];
-    
+
     // Start tracking mouse
     [self startTrackingMouse];
-    
+
     return YES;
 };
 
@@ -153,12 +153,12 @@
         [[NSCursor arrowCursor] set];
         hideMouse = NO;
     };
-    
+
     if (hideMouse == YES)
         OSXDriver2D_HideMouse(driver);
     else
         OSXDriver2D_ShowMouse(driver);
-    
+
     return !hideMouse;
 };
 
@@ -173,17 +173,17 @@
         NSRect contentRect = [contentView bounds];
         NSPoint point = [contentView convertPoint:[window mouseLocationOutsideOfEventStream] fromView:nil];
         BOOL insideContentRect = [contentView mouse:point inRect:contentRect];
-        
+
         // Set up tag for mouseEntered and mouseExited events
         trackingMouseTag = [contentView addTrackingRect:contentRect owner:self userData:nil
                                                                                 assumeInside:insideContentRect];
-                                                                                
+
         // If inside, accept movement events
         [window setAcceptsMouseMovedEvents:insideContentRect];
-        
+
         if ((hideMouse == YES) && (insideContentRect == YES))
             OSXDriver2D_HideMouse(driver);
-        
+
         trackingMouse = YES;
     };
 };
@@ -197,10 +197,10 @@
     {
         //Stop tracking mouse
         [window setAcceptsMouseMovedEvents:NO];
-        
+
         // Stop tracking mouse entered/exited
         [[window contentView] removeTrackingRect:trackingMouseTag];
-        
+
         trackingMouse = NO;
     };
 };
@@ -213,7 +213,7 @@
     if ([ev trackingNumber] == trackingMouseTag)
     {
         [window setAcceptsMouseMovedEvents:YES];
-        
+
         if (hideMouse == YES)
             OSXDriver2D_HideMouse(driver);
     };
@@ -239,7 +239,7 @@
     if (window != nil)
     {
         [self stopTrackingMouse];
-        
+
         [window release];
         window = nil;
     };
@@ -253,7 +253,7 @@
 {
     isPaused = !focused;
     [self adjustTitle];
-    
+
     if (isPaused == YES)
         [self stopTrackingMouse];
     else
@@ -265,52 +265,52 @@
 // All these methods just relay the event to the assistant
 - (void) keyDown:(NSEvent *) ev
 {
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);	
+    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
 };
 
 - (void) keyUp:(NSEvent *) ev
 {
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);	
+    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
 };
 
 - (void) flagsChanged:(NSEvent *) ev
 {
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);	
+    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
 };
 
 - (void) mouseMoved:(NSEvent *) ev
 {
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);	
+    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
 };
 
 - (void) mouseDown:(NSEvent *) ev
 {
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);	
+    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
 };
 
 - (void) mouseUp:(NSEvent *) ev
 {
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);	
+    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
 };
 
 - (void) mouseDragged:(NSEvent *) ev
 {
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);	
+    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
 };
 
 - (void) rightMouseDown:(NSEvent *) ev
 {
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);	
+    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
 };
 
 - (void) rightMouseUp:(NSEvent *) ev
 {
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);	
+    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
 };
 
 - (void) rightMouseDragged:(NSEvent *) ev
 {
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);	
+    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
 };
 
 
@@ -331,7 +331,7 @@
         winStyle = NSBorderlessWindowMask;
     else
         winStyle = NSTitledWindowMask | NSResizableWindowMask;
-        
+
     return winStyle;
 };
 
@@ -343,7 +343,7 @@
     [title release];
     [pausedTitle release];
     title = [[NSString alloc] initWithCString:newTitle];
-    pausedTitle = [[title stringByAppendingString:@"  [Paused]"] retain]; 
+    pausedTitle = [[title stringByAppendingString:@"  [Paused]"] retain];
 };
 
 
@@ -378,17 +378,17 @@
     // Want to resize canvas based on content rect size, not frame rect size
     NSRect newFrameRect = [window frame];
     NSSize contentSize;
-    
+
     newFrameRect.size = frameSize;
     contentSize = [NSWindow contentRectForFrameRect:newFrameRect styleMask:style].size;
-        
+
     if (OSXDriver2D_Resize(driver, contentSize.width, contentSize.height) == YES)
     {
         NSRect rect = NSMakeRect(0, 0, contentSize.width - 1, contentSize.height - 1);
         newFrameRect = [NSWindow frameRectForContentRect:rect styleMask:style];
         return newFrameRect.size;
     };
-        
+
     return [window frame].size;
 };
 
@@ -398,7 +398,7 @@
 - (BOOL) windowShouldClose:(id) sender
 {
   [self stopTrackingMouse];
-  
+
   if (hideMouse == YES)
     OSXDriver2D_ShowMouse(driver);
 

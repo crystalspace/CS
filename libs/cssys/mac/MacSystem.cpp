@@ -421,10 +421,10 @@ static pascal void IdleTimer (EventLoopTimerRef inTimer, void* userData)
 static EventLoopTimerUPP GetTimerUPP (void)
 {
 	static EventLoopTimerUPP	sTimerUPP = NULL;
-	
+
 	if (sTimerUPP == NULL)
 		sTimerUPP = NewEventLoopTimerUPP (IdleTimer);
-	
+
 	return sTimerUPP;
 }
 #endif
@@ -501,7 +501,7 @@ that is called in the loop should move to a cscmdPreProcess event.
       /*
        *  If we got an event, check to see if sioux wants it
        */
-      if (!SIOUXHandleOneEvent ( &theEvent )) { 
+      if (!SIOUXHandleOneEvent ( &theEvent )) {
 	    /*
 	     *  If sioux doesn't want it, check to see if the driver needs it.
 	     */

@@ -221,7 +221,7 @@ bool Video::Initialize (int argc, const char* const argv[],
 
   // Initialize the texture manager
   txtmgr->ResetPalette ();
-  
+
   // Allocate a uniformly distributed in R,G,B space palette for console
   // The console will crash on some platforms if this isn't initialize properly
   int r,g,b;
@@ -246,19 +246,19 @@ bool Video::Initialize (int argc, const char* const argv[],
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   iMaterialWrapper *iMW = SCF_QUERY_INTERFACE (tm, iMaterialWrapper);
- 
+
   room = engine->CreateSector ("room");
 iMeshWrapper *wallmesh = engine->CreateSectorWallsMesh (room, "walls");
   iThingState* walls = SCF_QUERY_INTERFACE (wallmesh->GetMeshObject (), iThingState);
 
-  csVector3 
+  csVector3
 	   f1 (-5, 20, 5),
-	   f2 ( 5, 20, 5), 
-	   f3 ( 5, 0, 5), 
-	   f4 (-5, 0, 5), 
+	   f2 ( 5, 20, 5),
+	   f3 ( 5, 0, 5),
+	   f4 (-5, 0, 5),
 	   b1 (-5, 20, -5),
-	   b2 ( 5, 20, -5), 
-	   b3 ( 5, 0, -5), 
+	   b2 ( 5, 20, -5),
+	   b3 ( 5, 0, -5),
 	   b4 (-5, 0, -5);
 
   iPolygon3D* p = walls->CreatePolygon ("back");
@@ -312,7 +312,7 @@ iMeshWrapper *wallmesh = engine->CreateSectorWallsMesh (room, "walls");
   iMW->DecRef ();
   walls->DecRef ();
   wallmesh->DecRef ();
-  
+
   iStatLight* light;
   iLightList* ll = room->GetLights ();
   light = engine->CreateLight (NULL, csVector3(-3, 5, 0), 10, csColor(1, 0, 0), false);

@@ -298,7 +298,7 @@ bool csGraphics3DInfinite::BeginDraw (int DrawFlags)
     total_none_time += endnone-startnone;
     startnone = 0;
   }
-  
+
   if ((DrawFlags & CSDRAW_3DGRAPHICS) && !(DrawMode & CSDRAW_3DGRAPHICS))
   {
     start3d = GetAccurateTime ();

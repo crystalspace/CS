@@ -1,17 +1,17 @@
 /*
-    Copyright (C) 2000  by Samuel Humphreys 
+    Copyright (C) 2000  by Samuel Humphreys
     Based on the Glide implementation by Norman Kramer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -66,7 +66,7 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   csOpenGLProcBackBuffer (iBase*);
   virtual ~csOpenGLProcBackBuffer ();
 
-  void Prepare (csGraphics3DOGLCommon *g3d, csTextureHandleOpenGL *tex, 
+  void Prepare (csGraphics3DOGLCommon *g3d, csTextureHandleOpenGL *tex,
 		csPixelFormat *ipfmt, bool bpersistent);
 
   virtual bool Open ()
@@ -84,7 +84,7 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
 };
 
 
-// We do all this just to intercept a few calls. Mostly to transform 
+// We do all this just to intercept a few calls. Mostly to transform
 // y co-ordinates to a native opengl screen co-ordinate system, but also
 // to be able to report the correct texture width and height of this context.
 class csOpenGLProcBackBuffer2D : public iGraphics2D
@@ -96,8 +96,8 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
  public:
   SCF_DECLARE_IBASE;
 
-  csOpenGLProcBackBuffer2D (iGraphics2D *ig2d, int iwidth, int iheight, 
-			    csPixelFormat *ipfmt);  
+  csOpenGLProcBackBuffer2D (iGraphics2D *ig2d, int iwidth, int iheight,
+			    csPixelFormat *ipfmt);
   virtual ~csOpenGLProcBackBuffer2D ();
 
   virtual bool Open () { return false; }
@@ -182,12 +182,12 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
 
   virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB);
 
-  virtual iImage *ScreenShot () 
+  virtual iImage *ScreenShot ()
   { return g2d->ScreenShot(); }
 
-  virtual iGraphics2D *CreateOffScreenCanvas 
-  (int /*width*/, int /*height*/, void* /*buffer*/, bool /*hint*/, 
-   csPixelFormat* /*ipfmt = NULL*/, csRGBpixel* /*palette = NULL*/, 
+  virtual iGraphics2D *CreateOffScreenCanvas
+  (int /*width*/, int /*height*/, void* /*buffer*/, bool /*hint*/,
+   csPixelFormat* /*ipfmt = NULL*/, csRGBpixel* /*palette = NULL*/,
    int /*pal_size = 0*/)
   { return NULL; }
 

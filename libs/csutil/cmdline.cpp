@@ -105,7 +105,7 @@ csCommandLineParser::FindOption (const char *iName, int iIndex) const
   {
     while (iIndex)
     {
-      idx++; 
+      idx++;
       if (idx >= Options.Length ())
         return NULL;
       if (Options.CompareKey (Options.Get (idx), iName, 0) == 0)

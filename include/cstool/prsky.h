@@ -26,7 +26,7 @@
 
 class csProcSky;
 
-/** 
+/**
  * A polygon of a sky.
 */
 class csProcSkyTexture : public csProcTexture {
@@ -82,7 +82,7 @@ public:
   void UnsetForceRender() {forcerender = false;}
   /// has been prepared ?
   bool AnimPrepared () {return anim_prepared;}
-  /** 
+  /**
    * Set the texturemapping of the sky onto this texture
    * txtorig is a corner point of the polygon (say the topleft point)
    *   (in world coordinates)
@@ -133,7 +133,7 @@ class csProcSky {
   int *periods;
   /// current time position (in msec) per octaves
   int *curposition;
-  /** 
+  /**
    * start and end images for each octave; (like octaves but start and
    * end positions of this period of animation
    */
@@ -158,9 +158,9 @@ class csProcSky {
   /// animate octave nr, given elapsed time (msec);
   void AnimOctave(int nr, int elapsed);
   /// octave value get/set
-  uint8& GetOctave(uint8 *octaves, int oct, int x, int y) 
+  uint8& GetOctave(uint8 *octaves, int oct, int x, int y)
   { return octaves [ oct*octsize*octsize + y*octsize + x ]; }
-  void SetOctave(uint8 *octaves, int oct, int x, int y, uint8 val) 
+  void SetOctave(uint8 *octaves, int oct, int x, int y, uint8 val)
   { octaves[ oct*octsize*octsize + y*octsize + x ] = val; }
   /// copy one octave to another
   void CopyOctave(uint8 *srcocts, int srcnr, uint8 *destocts, int destnr);
@@ -187,7 +187,7 @@ public:
 
   /** Enable or disable sky animation. Sky animation is very slow.
      If you wish to continue the animated where it left off
-     (seamlessly) pass the current time, 
+     (seamlessly) pass the current time,
      if you wish to continue where the animated would be if
      it had been running all the time - pass 0 for time.
 

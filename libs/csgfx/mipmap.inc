@@ -1,17 +1,17 @@
 /*
     Crystal Space 3D engine
     Copyright (C) 2000 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -99,7 +99,7 @@ static void MIPMAP_NAME (unsigned w, unsigned h
        rb += (rgb & 0x00ff00ff) * m;					\
        ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
      }
-#  endif	
+#  endif
 #else
 #  if defined (MIPMAP_TRANSPARENT) && (MIPMAP_LEVEL == 0)
 #    define ACCUMULATE_PIXEL(p, m)		    			\
@@ -124,7 +124,7 @@ static void MIPMAP_NAME (unsigned w, unsigned h
        rb += (rgb & 0x00ff00ff) * m;					\
        ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
      }
-#  endif	
+#  endif
 #endif
 
 #if defined (MIPMAP_ALPHA)
@@ -144,7 +144,7 @@ static void MIPMAP_NAME (unsigned w, unsigned h
 
 #define ACCUMULATE_1X2(delta)						\
   ACCUMULATE_PIXEL (src [delta], 1);					\
-  ACCUMULATE_PIXEL (src [delta + 1], 1);				
+  ACCUMULATE_PIXEL (src [delta + 1], 1);
 
 // We could call ACCUMULATE_2X2 four times, but
 // this way its faster by about 10%...

@@ -1,17 +1,17 @@
 /*
 	  Crystal Space Tesselator
 	  Copyright (C) 1999 by Denis Dmitriev
-  
+
 	  This library is free software; you can redistribute it and/or
 	  modify it under the terms of the GNU Library General Public
 	  License as published by the Free Software Foundation; either
 	  version 2 of the License, or (at your option) any later version.
-  
+
 	  This library is distributed in the hope that it will be useful,
 	  but WITHOUT ANY WARRANTY; without even the implied warranty of
 	  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 	  Library General Public License for more details.
-  
+
 	  You should have received a copy of the GNU Library General Public
 	  License along with this library; if not, write to the Free
 	  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -34,7 +34,7 @@
  * triangle.  To obtain a convex hull, swap two of the vertices (1 and 3 does
  * nicely).  The algorithm is just about bullet proof, however there are a few
  * simple rules to using the algorithm:
- * <ol>  
+ * <ol>
  * <li>If you feed it NaNs in the grid cell value, it will produce NaNs in the
  *     output vertex list.  It won't barf, but your app might.
  * <li>If you don't allocate at least fifteen vertices for the vertex list,
@@ -43,7 +43,7 @@
  *     a frustum for example.
  * <li>The grid cell <em>does</em> have a specific vertex order.  The following
  *     is a list of the vertex order (cube extends from <0,0,0> to <1,1,1>).
- * <pre>	
+ * <pre>
  *     p[0]: (0,1,1)
  *     p[1]: (1,1,1)
  *     p[2]: (1,1,0)
@@ -91,7 +91,7 @@
  * corner (GridCell.val[]) to produce a linear estimate of where the
  * intersection with the edge occurs.  This is not 100% accurate, but does
  * provide a nice approximation.
- * 
+ *
  * The triangle table is a scripted set of triangle maps based on the cube
  * index.  It contains 256 mappings with up to five triangles.  The sixteenth
  * element of every mapping is -1, to terminate the mapping.  In many cases,

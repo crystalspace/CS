@@ -311,14 +311,14 @@ allFound = allFound && fName != NULL;
 	      {
 		GLint maxtextures;
 		glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);
-		if (maxtextures > 1) 
+		if (maxtextures > 1)
 		{
                   printf ("dang\n");
 		  m_config_options.do_multitexture_level = maxtextures;
 		  Report (CS_REPORTER_SEVERITY_NOTIFY,
 			  "Using multitexture extension with %d texture units", maxtextures);
-		} 
-		else 
+		}
+		else
 		{
 		  ARB_multitexture = false;
 		  Report (CS_REPORTER_SEVERITY_NOTIFY, "WARNING: driver supports multitexture"
@@ -439,7 +439,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
 	"Could not register the canvas!");
     return false;
   }
-  
+
   width = height = -1;
 
   return true;
@@ -744,14 +744,14 @@ bool csGraphics3DOGLCommon::NewOpen ()
 #define OGLCONFIGS_SUFFIX ".config"
 
   CS_ASSERT (object_reg != NULL);
-  
+
   const char *sGL_RENDERER   = (const char *)glGetString (GL_RENDERER);
   const char *sGL_VENDOR     = (const char *)glGetString (GL_VENDOR);
   const char *sGL_VERSION    = (const char *)glGetString (GL_VERSION);
   const char *sGL_EXTENSIONS = (const char *)glGetString (GL_EXTENSIONS);
 
   csStrVector oglconfigs;
-  
+
   iConfigIterator *it = config->Enumerate (OGLCONFIGS_PREFIX);
   while (it->Next ())
   {
@@ -778,7 +778,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
 	  count++; \
 	  apply &= csGlobMatches(s##str, config->GetStr(s_##str.GetData())); \
 	} \
-      } 
+      }
 
       CHECK_STRING (GL_VENDOR);
       CHECK_STRING (GL_VERSION);
@@ -798,11 +798,11 @@ bool csGraphics3DOGLCommon::NewOpen ()
 	  oglconfig.GetData(), cfgfile.GetData());
       }
       oglconfigs.Push(csStrNew (oglconfig.GetData()));
-    } 
+    }
   }
   it->DecRef();
 
-#undef OGLCONFIGS_PREFIX   
+#undef OGLCONFIGS_PREFIX
 #undef OGLCONFIGS_SUFFIX
 
   G2D->PerformExtension("configureopengl");
@@ -821,7 +821,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
   Caps.maxTexWidth = config->GetInt("Video.OpenGL.Caps.MaxTexWidth", 1024);
   Caps.fog = G3DFOGMETHOD_VERTEX;
   Caps.NeedsPO2Maps = config->GetBool("Video.OpenGL.Caps.NeedsPO2Maps", false);
-  Caps.MaxAspectRatio = config->GetInt("Video.OpenGL.Caps.MaxAspectRatio", 
+  Caps.MaxAspectRatio = config->GetInt("Video.OpenGL.Caps.MaxAspectRatio",
     32768);
   GLCaps.use_stencil = config->GetBool ("Video.OpenGL.Caps.Stencil", false);
   GLCaps.need_screen_clipping =
@@ -1996,7 +1996,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     return;
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
-  
+
   //========
   // First check if this polygon is different from the current polygons
   // in the queue. If so we need to flush the queue.
@@ -2061,7 +2061,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
       N = -Bc * inv_Dc * inv_aspect;
       O = -Cc * inv_Dc;
     }
-    
+
     // @@@ The texture transform matrix is currently written as
     // T = M*(C-V)
     // (with V being the transform vector, M the transform matrix, and C
@@ -2082,7 +2082,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     Q4 = -(Q1 * poly.plane.v_cam2tex->x
 	   + Q2 * poly.plane.v_cam2tex->y
 	   + Q3 * poly.plane.v_cam2tex->z);
-    
+
     // Precompute everything so that we can calculate (u,v) (texture space
     // coordinates) for every (sx,sy) (screen space coordinates). We make
     // use of the fact that 1/z, u/z and v/z are linear in screen space.
@@ -3789,7 +3789,7 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
     glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_CONSTANT_ARB);
     glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, c);
-    
+
   }
   else if (poly.mixmode & CS_FX_MASK_ALPHA)
     glColor4f (1.0, 1.0, 1.0, alpha);
@@ -4096,7 +4096,7 @@ void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
   }
 }
 
-iTextureManager *csGraphics3DOGLCommon::GetTextureManager () 
-{ 
-  return txtmgr; 
+iTextureManager *csGraphics3DOGLCommon::GetTextureManager ()
+{
+  return txtmgr;
 }

@@ -1,16 +1,16 @@
 /*
 	Copyright (C) 1998 by Jorrit Tyberghein and K. Robert Bate.
-  
+
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Library General Public
 	License as published by the Free Software Foundation; either
 	version 2 of the License, or (at your option) any later version.
-  
+
 	This library is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 	Library General Public License for more details.
-  
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free
 	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -23,7 +23,7 @@
 	12/1998		-	Modified to use DrawSprockets when
 					the FullScreen flag is set.
 	2/1999		-	Added support for 32 bit pixels.
-	
+
 ----------------------------------------------------------------*/
 
 #include "cssysdef.h"
@@ -389,16 +389,16 @@ bool csGraphics2DMac::Open()
 		displayRect = (**mMainGDevice).gdRect;
 		displayWidth = displayRect.right - displayRect.left;
 		displayHeight = displayRect.bottom - displayRect.top;
-		
+
 		theBounds.left = displayRect.left + ((displayWidth - Width) / 2);
 		theBounds.top = displayRect.top + ((displayHeight - Height) / 2);
-		
+
 		theBounds.right = theBounds.left + Width;
 		theBounds.bottom = theBounds.top + Height;
 
 		strcpy( (char *)&theTitle[1], win_title );
 		theTitle[0] = strlen( win_title );
-		mMainWindow = ::NewCWindow( NULL, &theBounds, theTitle, true, noGrowDocProc, 
+		mMainWindow = ::NewCWindow( NULL, &theBounds, theTitle, true, noGrowDocProc,
 												 (WindowPtr)-1, false, 0 );
 
 		// set the color table into the video card
@@ -457,7 +457,7 @@ void csGraphics2DMac::Close(void)
 			DSpContext_SetState(mDisplayContext, kDSpContextState_Inactive);
 			DSpContext_FadeGammaIn(NULL, NULL);
 			DSpContext_Release(mDisplayContext);
-			
+
 			mDisplayContext = NULL;
 		}
 		DSpShutdown();
@@ -711,7 +711,7 @@ bool csGraphics2DMac::DoubleBuffer(bool Enable)
 		if ( Enable != mDoubleBuffering ) {
 			mDoubleBuffering = Enable;
 
-			if ( Enable ) {  
+			if ( Enable ) {
 				mPixMap = ::GetGWorldPixMap(mOffscreen);
 				Memory = (unsigned char*)::GetPixBaseAddr(mPixMap);
 				theRowBytes = (**mPixMap).rowBytes & 0x7fff;

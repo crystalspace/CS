@@ -27,9 +27,9 @@
 
 double ctJoint::joint_friction = 0.0;
 
-ctJoint::ctJoint ( ctArticulatedBody *in, 
-	    ctVector3 &in_offset, ctArticulatedBody *out, ctVector3 &out_offset ) 
-  : inboard (in), inboard_offset (in_offset), outboard ( out ), 
+ctJoint::ctJoint ( ctArticulatedBody *in,
+	    ctVector3 &in_offset, ctArticulatedBody *out, ctVector3 &out_offset )
+  : inboard (in), inboard_offset (in_offset), outboard ( out ),
     outboard_offset(out_offset), joint_axis(0)
 {
   q = qv = qa = 0;
@@ -81,8 +81,8 @@ void ctJoint::update_link_RF ()
 
     ctMatrix3 T_new_out = R_delta.get_transpose ()*T_in;
     out_ref->set_parent_to_this ( T_new_out );
-    ctVector3 new_out_origin = in_ref->get_offset () + 
-                               T_in.get_transpose()*inboard_offset + 
+    ctVector3 new_out_origin = in_ref->get_offset () +
+                               T_in.get_transpose()*inboard_offset +
                                T_new_out.get_transpose()*outboard_offset;
     out_ref->set_offset( new_out_origin );
   }
@@ -97,10 +97,10 @@ real ctJoint::get_actuator_magnitude( real external_f, real /*inertail_comp*/ )
   if ( outboard && outboard->get_handle() )
   {
     //!me not very accurate, but should prevent too much instability
-    // return (-1.0*joint_friction*qv * outboard->get_handle()->get_m()/100.0 ); 
+    // return (-1.0*joint_friction*qv * outboard->get_handle()->get_m()/100.0 );
     internal_f = -1.0*joint_friction*qv * fabs( external_f );
 
-    // try to limit instability conditions. 
+    // try to limit instability conditions.
     // friction force is never more than some factor of external force.
     if ( fabs(internal_f) > 0.25*fabs(external_f) )
       internal_f *= 0.25*fabs(external_f/internal_f);
@@ -108,11 +108,11 @@ real ctJoint::get_actuator_magnitude( real external_f, real /*inertail_comp*/ )
     //!me attempt to limit overshoot.  not working well....
 /*		if( external_f > 0 ){
 			if( internal_f + external_f < 0 ){
-				internal_f = -external_f*0;  
+				internal_f = -external_f*0;
 			}
 		}else if( external_f < 0 ){
 			if( internal_f + external_f > 0 ){
-				internal_f = -external_f*0;  
+				internal_f = -external_f*0;
 			}
 		}else if( external_f == 0 ){
 			internal_f = 0;
@@ -120,7 +120,7 @@ real ctJoint::get_actuator_magnitude( real external_f, real /*inertail_comp*/ )
     return internal_f;
   }
   return 0;
-} 
+}
 
 
 ctSpatialVector ctPrismaticJoint::get_spatial_joint_axis ()
@@ -135,8 +135,8 @@ void ctPrismaticJoint::calc_coriolus
   c.set_b( w_f % ( w_f % r ) + (  w_f *2.0) % ( joint_axis*qv ));
 }
 
-ctRevoluteJoint::ctRevoluteJoint( ctArticulatedBody *in, ctVector3 &in_offset, 
-				  ctArticulatedBody *out, ctVector3 &out_offset, 
+ctRevoluteJoint::ctRevoluteJoint( ctArticulatedBody *in, ctVector3 &in_offset,
+				  ctArticulatedBody *out, ctVector3 &out_offset,
 				  ctVector3 &paxis)
 {
   q = qv = qa = 0;
@@ -154,12 +154,12 @@ ctSpatialVector ctRevoluteJoint::get_spatial_joint_axis()
   return ctSpatialVector( joint_axis, xross );
 }
 
-void ctRevoluteJoint::calc_coriolus ( const ctVector3 &r, const ctVector3 &w_f, 
+void ctRevoluteJoint::calc_coriolus ( const ctVector3 &r, const ctVector3 &w_f,
 				      ctSpatialVector &c )
 {
   ctVector3 V = ( joint_axis*qv );
 //  c.set_a( w_f % V);
-//  c.set_b( w_f % ( w_f % r ) + (w_f*2.0) % ( V % outboard_offset ) + 
+//  c.set_b( w_f % ( w_f % r ) + (w_f*2.0) % ( V % outboard_offset ) +
 //           V % ( V % outboard_offset ));
 
   c[0] = w_f[1]*V[2] - w_f[2]*V[1];
@@ -171,7 +171,7 @@ void ctRevoluteJoint::calc_coriolus ( const ctVector3 &r, const ctVector3 &w_f,
     V[2]*outboard_offset[0] - V[0]*outboard_offset[2],
     V[0]*outboard_offset[1] - V[1]*outboard_offset[0]
   );
-   
+
   ctVector3 vwork(
     w_f[1]*(w_f[0]*r[1] - w_f[1]*r[0]) - w_f[2]*(w_f[2]*r[0] - w_f[0]*r[2]),
     w_f[2]*(w_f[1]*r[2] - w_f[2]*r[1]) - w_f[0]*(w_f[0]*r[1] - w_f[1]*r[0]),
@@ -185,7 +185,7 @@ void ctRevoluteJoint::calc_coriolus ( const ctVector3 &r, const ctVector3 &w_f,
 }
 
 ctConstrainedRevoluteJoint::ctConstrainedRevoluteJoint
-  ( ctArticulatedBody *in, ctVector3 &in_offset, 
+  ( ctArticulatedBody *in, ctVector3 &in_offset,
     ctArticulatedBody *out, ctVector3 &out_offset, ctVector3 &paxis)
  : ctRevoluteJoint( in,  in_offset,  out,  out_offset, paxis)
 {
@@ -197,7 +197,7 @@ ctConstrainedRevoluteJoint::ctConstrainedRevoluteJoint
 
 //!me best thing to do would be exert -external_f and apply impulse to stop qv....
 // That would be perfect
-real ctConstrainedRevoluteJoint::get_actuator_magnitude 
+real ctConstrainedRevoluteJoint::get_actuator_magnitude
    ( real external_f, real inertail_comp )
 {
   real internal_f;
@@ -219,7 +219,7 @@ real ctConstrainedRevoluteJoint::get_actuator_magnitude
     if ( response_sign != 0 )
     {
       internal_f = -external_f;  //!me intertal_comp is never negative is it?
-      // only have a response force if it is working to satisfy constraint, 
+      // only have a response force if it is working to satisfy constraint,
       // not make it worse.
       // if working to maintain constraint one will be + and the other will be -.
       if ( -response_sign * internal_f > 0.0 )
@@ -234,4 +234,4 @@ real ctConstrainedRevoluteJoint::get_actuator_magnitude
     }
   }
   return ctRevoluteJoint::get_actuator_magnitude( external_f, inertail_comp );
-} 
+}

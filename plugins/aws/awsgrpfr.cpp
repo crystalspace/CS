@@ -21,14 +21,14 @@ const int awsGroupFrame::fsSunken =0x3;
 
 const int awsGroupFrame::signalClicked=0x1;
 
-awsGroupFrame::awsGroupFrame():frame_style(0), alpha_level(96), bkg(NULL), caption(NULL) 
+awsGroupFrame::awsGroupFrame():frame_style(0), alpha_level(96), bkg(NULL), caption(NULL)
 {}
 
 awsGroupFrame::~awsGroupFrame()
 {}
 
 char *
-awsGroupFrame::Type() 
+awsGroupFrame::Type()
 { return "Group Frame"; }
 
 bool
@@ -37,17 +37,17 @@ awsGroupFrame::Setup(iAws *_wmgr, awsComponentNode *settings)
  if (!awsComponent::Setup(_wmgr, settings)) return false;
 
  iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
- 
+
  pm->LookupIntKey("OverlayTextureAlpha", alpha_level);
  pm->GetInt(settings, "Style", frame_style);
  pm->GetString(settings, "Caption", caption);
 
  bkg=pm->GetTexture("Texture");
- 
+
  return true;
 }
 
-bool 
+bool
 awsGroupFrame::GetProperty(char *name, void **parm)
 {
   if (awsComponent::GetProperty(name, parm)) return true;
@@ -66,7 +66,7 @@ awsGroupFrame::GetProperty(char *name, void **parm)
   return false;
 }
 
-bool 
+bool
 awsGroupFrame::SetProperty(char *name, void *parm)
 {
   if (awsComponent::SetProperty(name, parm)) return true;
@@ -74,7 +74,7 @@ awsGroupFrame::SetProperty(char *name, void *parm)
   if (strcmp("Caption", name)==0)
   {
     iString *s = (iString *)(parm);
-    
+
     if (s)
     {
       if (caption) caption->DecRef();
@@ -82,28 +82,28 @@ awsGroupFrame::SetProperty(char *name, void *parm)
       caption->IncRef();
       Invalidate();
     }
-    
+
     return true;
   }
-  
+
   return false;
 }
 
-void 
+void
 awsGroupFrame::OnDraw(csRect clip)
 {
 
   iGraphics2D *g2d = WindowManager()->G2D();
-    
+
   aws3DFrame frame3d;
 
   frame3d.Draw(WindowManager(), Window(), Frame(), frame_style, bkg, alpha_level);
-  
-  // Draw the caption, if there is one 
+
+  // Draw the caption, if there is one
   if (caption)
-  {     
+  {
     int tw, th, tx, ty;
-    
+
     // Get the size of the text
     WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(caption->GetData(), tw, th);
 
@@ -118,22 +118,22 @@ awsGroupFrame::OnDraw(csRect clip)
                WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
                -1,
                caption->GetData());
-    
+
   }
 }
 
-bool 
+bool
 awsGroupFrame::OnMouseDown(int ,int ,int )
 {
   return false;
 }
-    
-bool 
+
+bool
 awsGroupFrame::OnMouseUp(int ,int ,int )
-{  
+{
   return false;
 }
-    
+
 bool
 awsGroupFrame::OnMouseMove(int ,int ,int )
 {
@@ -152,7 +152,7 @@ awsGroupFrame::OnMouseDoubleClick(int ,int ,int )
   return false;
 }
 
-bool 
+bool
 awsGroupFrame::OnMouseExit()
 {
   return false;
@@ -169,14 +169,14 @@ awsGroupFrame::OnKeypress(int ,int )
 {
   return false;
 }
-    
+
 bool
 awsGroupFrame::OnLostFocus()
 {
   return false;
 }
 
-bool 
+bool
 awsGroupFrame::OnGainFocus()
 {
   return false;
@@ -206,6 +206,6 @@ awsGroupFrameFactory::~awsGroupFrameFactory()
 iAwsComponent *
 awsGroupFrameFactory::Create()
 {
- return new awsGroupFrame; 
+ return new awsGroupFrame;
 }
 

@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -62,7 +62,7 @@ private:
 
   /// get a random number between 0.0 and max
   float GetRandom(float max);
-  
+
   /// draw a box of stars
   void DrawStarBox (iRenderView* rview,
     const csReversibleTransform &tr_o2c, csZBufMode zbufmode,
@@ -97,7 +97,7 @@ public:
   void SetMaxDistance (float maxdist) { max_dist = maxdist; }
   /// Get max distance at which stars are visible.
   float GetMaxDistance () const { return max_dist; }
-  
+
   /// Set the color to use. Will be added to the lighting values.
   void SetColor (const csColor& col) { color = col; }
   /// Get the color.
@@ -137,7 +137,7 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual void GetRadius (csVector3& rad, csVector3& cent) 
+  virtual void GetRadius (csVector3& rad, csVector3& cent)
 	{ rad = max_radius; cent = box.GetCenter(); }
   virtual void NextFrame (csTicks /*current_time*/) { }
   virtual bool WantToDie () const { return false; }

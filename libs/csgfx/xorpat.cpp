@@ -35,7 +35,7 @@ iImage* csCreateXORPatternImage(int width, int height, int patsize)
     for (y=0; y<width; y++)
     {
       pixel->red = pixel->green = pixel->blue =
-      	((x & ((1<<patsize)-1)) ^ (y & ((1<<patsize)-1))) << (8-patsize); 
+      	((x & ((1<<patsize)-1)) ^ (y & ((1<<patsize)-1))) << (8-patsize);
       pixel++;
     }
   }

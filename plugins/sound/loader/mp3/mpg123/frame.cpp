@@ -26,15 +26,15 @@ bool csPCMBuffer::Resize (int newsize)
   return true;
 }
 
-int csMPGFrame::tabsel_123[2][3][16] = 
+int csMPGFrame::tabsel_123[2][3][16] =
   {
     { {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,},
       {0,32,48,56, 64, 80, 96,112,128,160,192,224,256,320,384,},
-      {0,32,40,48, 56, 64, 80, 96,112,128,160,192,224,256,320,} 
+      {0,32,40,48, 56, 64, 80, 96,112,128,160,192,224,256,320,}
     },
     { {0,32,48,56,64,80,96,112,128,144,160,176,192,224,256,},
       {0,8,16,24,32,40,48,56,64,80,96,112,128,144,160,},
-      {0,8,16,24,32,40,48,56,64,80,96,112,128,144,160,} 
+      {0,8,16,24,32,40,48,56,64,80,96,112,128,144,160,}
     }
   };
 
@@ -184,7 +184,7 @@ bool csMPGFrame::ReadFrameBody ()
   }
   return true;
 }
-  
+
 bool csMPGFrame::Read ()
 {
   uint32 newhead;
@@ -201,28 +201,28 @@ read_again:
 init_resync:
 
     header_change = 2;
-    if (oldhead) 
+    if (oldhead)
     {
-      if ((oldhead & 0xc00) == (newhead & 0xc00)) 
+      if ((oldhead & 0xc00) == (newhead & 0xc00))
       {
         if ((oldhead & 0xc0) == 0 && (newhead & 0xc0) == 0)
-    	  header_change = 1; 
+    	  header_change = 1;
         else if ((oldhead & 0xc0) && (newhead & 0xc0))
 	  header_change = 1;
       }
     }
 
 
-    if (!firsthead && !HeadValid (newhead) ) 
+    if (!firsthead && !HeadValid (newhead) )
     {
       int i;
 
       /* I even saw RIFF headers at the beginning of MPEG streams ;( */
-      if(newhead == ('R'<<24)+('I'<<16)+('F'<<8)+'F') 
+      if(newhead == ('R'<<24)+('I'<<16)+('F'<<8)+'F')
       {
 	if (!ReadHead (newhead))
 	  return false;
-	while (newhead != ('d'<<24)+('a'<<16)+('t'<<8)+'a') 
+	while (newhead != ('d'<<24)+('a'<<16)+('t'<<8)+'a')
 	{
 	  if (!ReadHeadShift (newhead))
 	    return false;
@@ -234,7 +234,7 @@ init_resync:
 
       {
 	/* step in byte steps through next 64K */
-	for (i=0; i<65536; i++) 
+	for (i=0; i<65536; i++)
 	{
 	  if (!ReadHeadShift (newhead))
 	    return false;
@@ -242,24 +242,24 @@ init_resync:
 	    break;
 	}
 	junk += i;
-	if (i == 65536) 
+	if (i == 65536)
 	{
 	  fprintf(stderr,"Giving up searching valid MPEG header\n");
 	  return false;
 	}
       }
 
-      /* 
+      /*
        * should we additionaly check, whether a new frame starts at
        * the next expected position? (some kind of read ahead)
        * We could implement this easily, at least for files.
        */
     }
 
-    if ((newhead & 0xffe00000) != 0xffe00000) 
+    if ((newhead & 0xffe00000) != 0xffe00000)
     {
       /* and those ugly ID3 tags */
-      if ((newhead & 0xffffff00) == ('T'<<24)+('A'<<16)+('G'<<8)) 
+      if ((newhead & 0xffffff00) == ('T'<<24)+('A'<<16)+('G'<<8))
       {
 	if (io->seek (124, SEEK_CUR, datasource) == 0)
 	{
@@ -269,16 +269,16 @@ init_resync:
 	fprintf (stderr,"could not Skip ID3 Tag!\n");
       }
 
-      if (flags & CSMPEG_RESYNC) 
+      if (flags & CSMPEG_RESYNC)
       {
         int ntry = 0;
 	/* Read more bytes until we find something that looks
 	   reasonably like a valid header.  This is not a
 	   perfect strategy, but it should get us back on the
 	   track within a short time (and hopefully without
-	   too much distortion in the audio output).  
+	   too much distortion in the audio output).
 	*/
-        do 
+        do
 	{
           ntry++;
           if (!ReadHeadShift (newhead))
@@ -293,7 +293,7 @@ init_resync:
         return false;
     }
 
-    if (!firsthead) 
+    if (!firsthead)
     {
       if (!DecodeHeader (newhead))
         goto read_again;
@@ -327,12 +327,12 @@ bool csMPGFrame::BackSkipFrame (int num)
 {
   long bytes;
   uint32  newhead;
-  
+
   if (!firsthead)
     return true;
-  
+
   bytes = (framesize+8)*(num+2);
-  
+
   if (io->seek (-bytes, SEEK_CUR, datasource) < 0)
     return false;
 
@@ -341,13 +341,13 @@ bool csMPGFrame::BackSkipFrame (int num)
 
   if (!ReadHead (newhead))
     return false;
-  
-  while ((newhead & HDRCMPMASK) != (firsthead & HDRCMPMASK)) 
+
+  while ((newhead & HDRCMPMASK) != (firsthead & HDRCMPMASK))
   {
     if (!ReadHeadShift (newhead))
       return false;
   }
-  
+
   if (io->seek (-4, SEEK_CUR, datasource) <0)
     return false;
 
@@ -356,10 +356,10 @@ bool csMPGFrame::BackSkipFrame (int num)
 
   Read ();
   Read ();
-  
+
   if (layer_num == 3)
     bsi.SetPointer (512);
-  
+
   return 0;
 }
 
@@ -375,24 +375,24 @@ bool csMPGFrame::DecodeHeader (uint32 newhead)
   if (!HeadValid (newhead))
     return false;
 
-  if (newhead & (1<<20)) 
+  if (newhead & (1<<20))
   {
     lsf = (newhead & (1<<19)) ? 0x0 : 0x1;
     mpeg25 = 0;
   }
-  else 
+  else
   {
     lsf = 1;
     mpeg25 = 1;
   }
-    
-  if (!(flags & CSMPEG_RESYNC) || !oldhead) 
+
+  if (!(flags & CSMPEG_RESYNC) || !oldhead)
   {
     /* If "tryresync" is true, assume that certain
        parameters do not change within the stream! */
 
     layer_num = 4-((newhead>>17)&3);
-    if (((newhead>>10)&0x3) == 0x3) 
+    if (((newhead>>10)&0x3) == 0x3)
     {
       fprintf(stderr,"Stream error\n");
       return false;
@@ -419,20 +419,20 @@ bool csMPGFrame::DecodeHeader (uint32 newhead)
 
   oldhead = newhead;
 
-  if(!bitrate_index) 
+  if(!bitrate_index)
   {
     fprintf (stderr,"Free format not supported: (head %08lx)\n",newhead);
     return false;
   }
 
-  switch (layer_num) 
+  switch (layer_num)
   {
   case 1:
     layer = do_layer1;
 #ifdef VARMODESUPPORT
-    if (varmode) 
+    if (varmode)
     {
-      fprintf (stderr,"Sorry, layer-1 not supported in varmode.\n"); 
+      fprintf (stderr,"Sorry, layer-1 not supported in varmode.\n");
       return false;
     }
 #endif
@@ -443,9 +443,9 @@ bool csMPGFrame::DecodeHeader (uint32 newhead)
   case 2:
     layer = do_layer2;
 #ifdef VARMODESUPPORT
-    if (varmode) 
+    if (varmode)
     {
-      fprintf (stderr,"Sorry, layer-2 not supported in varmode.\n"); 
+      fprintf (stderr,"Sorry, layer-2 not supported in varmode.\n");
       return false;
     }
 #endif
@@ -465,9 +465,9 @@ bool csMPGFrame::DecodeHeader (uint32 newhead)
     framesize  = (long) tabsel_123[lsf][2][bitrate_index] * 144000;
     framesize /= freqs[sampling_frequency]<<lsf;
     framesize = framesize + padding - 4;
-    break; 
+    break;
   default:
-    fprintf (stderr, "Sorry, unknown layer type.\n"); 
+    fprintf (stderr, "Sorry, unknown layer type.\n");
     return false;
   }
 
@@ -483,7 +483,7 @@ void csMPGFrame::PrintRemoteHeader ()
 {
   /* version, layer, freq, mode, channels, bitrate, BPF */
   fprintf (stderr,"@I %s %s %ld %s %d %d %d\n",
-	   mpeg_types[lsf], 
+	   mpeg_types[lsf],
 	   mpeg_layers[layer_num],
 	   freqs[sampling_frequency],
 	   mpeg_modes[mode],
@@ -495,7 +495,7 @@ void csMPGFrame::PrintRemoteHeader ()
 
 void csMPGFrame::PrintHeader ()
 {
-  fprintf (stderr,"MPEG %s, Layer: %s, Freq: %ld, mode: %s, modext: %d, BPF : %d\n", 
+  fprintf (stderr,"MPEG %s, Layer: %s, Freq: %ld, mode: %s, modext: %d, BPF : %d\n",
 	   mpeg25 ? "2.5" : (lsf ? "2.0" : "1.0"),
 	   mpeg_layers[layer_num],
 	   freqs[sampling_frequency],
@@ -522,7 +522,7 @@ void csMPGFrame::PrintHeaderCompact ()
 	   mpeg25 ? "2.5" : (lsf ? "2.0" : "1.0"),
 	   mpeg_layers[layer_num],
 	   tabsel_123[lsf][layer_num-1][bitrate_index],
-	   freqs[sampling_frequency], 
+	   freqs[sampling_frequency],
 	   mpeg_modes[mode]
 	   );
 }
@@ -542,15 +542,15 @@ void csMPGFrame::PrintID3 (csTagID3 *buf)
   strncpy (year,    buf->year,4);
   strncpy (comment, buf->comment,30);
 
-  if (buf->genre <= sizeof (genre_table)/sizeof(*genre_table)) 
+  if (buf->genre <= sizeof (genre_table)/sizeof(*genre_table))
   {
     strncpy (genre, genre_table[buf->genre], 30);
-  } 
-  else 
+  }
+  else
   {
     strncpy (genre, "Unknown",30);
   }
-	
+
   fprintf (stderr, "Title  : %-30s  Artist: %s\n",  title,   artist);
   fprintf (stderr, "Album  : %-30s  Year  : %4s\n", album,   year);
   fprintf (stderr, "Comment: %-30s  Genre : %s\n",  comment, genre);
@@ -578,7 +578,7 @@ double csMPGFrame::bpf ()
   default:
     bpf = 1.0;
   }
-  
+
   return bpf;
 }
 
@@ -586,14 +586,14 @@ double csMPGFrame::tpf ()
 {
   int bs[4] = { 0,384,1152,1152 };
   double tpf;
-  
+
   tpf = (double) bs[layer_num];
   tpf /= freqs[sampling_frequency] << (lsf);
   return tpf;
 }
 
 /*
- * Returns number of frames queued up in output buffer, i.e. 
+ * Returns number of frames queued up in output buffer, i.e.
  * offset between currently played and currently decoded frame.
  */
 
@@ -602,20 +602,20 @@ long csMPGFrame::compute_buffer_offset ()
   return 0;
 #ifdef NOPE_IGNORE_ME_GO_AWAY
   long bufsize;
-	
+
   /*
    * buffermem->buf[0] holds output sampling rate,
    * buffermem->buf[1] holds number of channels,
    * buffermem->buf[2] holds audio format of output.
    */
-	
+
   if (!(flags & CSMPEG_BUFEFRS) || !(bufsize=xfermem_get_usedspace(buffermem))
      || !buffermem->buf[0] || !buffermem->buf[1])
     return 0;
 
-  bufsize = (long)((double) bufsize / buffermem->buf[0] / 
+  bufsize = (long)((double) bufsize / buffermem->buf[0] /
 		   buffermem->buf[1] / tpf ());
-  
+
   if((buffermem->buf[2] & AUDIO_FORMAT_MASK) == AUDIO_FORMAT_16)
     return bufsize/2;
   else
@@ -627,7 +627,7 @@ bool csMPGFrame::Initialize (int bits, int frequency, int channels, int down_sam
 {
   this->down_sample = down_sample;
 
-  switch (down_sample) 
+  switch (down_sample)
   {
   case 0:
   case 1:
@@ -641,7 +641,7 @@ bool csMPGFrame::Initialize (int bits, int frequency, int channels, int down_sam
 
       synth_ntom_set_step(n,m);
 
-      if(n>m) 
+      if(n>m)
       {
 	down_sample_sblimit = SBLIMIT * m;
 	down_sample_sblimit /= n;
@@ -674,7 +674,7 @@ void csMPGFrame::SelectSynth ()
 {
   int p8=0;
 
-  synthFunc funcs[2][4] = { 
+  synthFunc funcs[2][4] = {
     { synth_1to1,
       synth_2to1,
       synth_4to1,
@@ -682,10 +682,10 @@ void csMPGFrame::SelectSynth ()
     { synth_1to1_8bit,
       synth_2to1_8bit,
       synth_4to1_8bit,
-      synth_ntom_8bit } 
+      synth_ntom_8bit }
   };
 
-  synthFuncMono funcs_mono[2][2][4] = {    
+  synthFuncMono funcs_mono[2][2][4] = {
     { { synth_1to1_mono2stereo ,
 	synth_2to1_mono2stereo ,
 	synth_4to1_mono2stereo ,
@@ -709,7 +709,7 @@ void csMPGFrame::SelectSynth ()
 
   synth = funcs[p8][down_sample];
   synthMono = funcs_mono [channels == 2?0:1][p8][down_sample];
-  
+
   if (p8)
     make_conv16to8_table (outformat);
 }

@@ -89,7 +89,7 @@ bool csGraphics2DBeLib::Open()
 
     view = new CrystView(BRect(0, 0, vw, vh), object_reg, bitmap);
     window = new CrystWindow(win_rect, win_title, view, object_reg, this);
-	
+
     window->Show();
     if (window->Lock())
     {
@@ -97,7 +97,7 @@ bool csGraphics2DBeLib::Open()
       window->Unlock();
     }
     window->Flush();
-	
+
     Memory = (unsigned char*)bitmap->Bits();
     iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
     CS_ASSERT (behelper != NULL);
@@ -147,7 +147,7 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)
   unsigned long RedMask, GreenMask, BlueMask;
   switch (cs)
   {
-    case B_RGB15: 
+    case B_RGB15:
       Depth	= 15;
       RedMask   = 0x1f << 10;
       GreenMask = 0x1f << 5;

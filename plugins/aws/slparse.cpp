@@ -47,7 +47,7 @@ extern int awserror(char *s);
 extern int awslineno;
 static void mapsourcetosink(iAws *windowmgr, unsigned long signal, iString *sinkname, iString *triggername);
 
-/// This is locally global variable that holds keys for a little while 
+/// This is locally global variable that holds keys for a little while
 static awsKeyContainer kcont[32];
 /// This is the locally global variable that holds window keys.
 static awsKeyContainer wkcont;
@@ -848,10 +848,10 @@ case 13:
 { ++klevel; /* go down a level (mid-action rule) */ ;
     break;}
 case 14:
-{ awsConnectionNode *cn = new awsConnectionNode(); 
+{ awsConnectionNode *cn = new awsConnectionNode();
 																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
 																				  --klevel;
-																				  kcont[klevel].Add(cn); 		
+																				  kcont[klevel].Add(cn);
 																				;
     break;}
 case 15:
@@ -859,9 +859,9 @@ case 15:
     break;}
 case 16:
 { awsComponentNode *cn = new awsComponentNode(new scfString(yyvsp[-6].str), new scfString(yyvsp[-4].str));
-																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel])); 
+																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
 																				  --klevel;  /* go up a level in recursion */
-																				  kcont[klevel].Add(cn); 
+																				  kcont[klevel].Add(cn);
 																				;
     break;}
 case 17:
@@ -880,15 +880,15 @@ case 21:
 { yyval.key = new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val));     ;
     break;}
 case 22:
-{ awsConnectionNode *cn = new awsConnectionNode(); 
+{ awsConnectionNode *cn = new awsConnectionNode();
 																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
-																				  yyval.key=cn; 		
+																				  yyval.key=cn;
 			  																	;
     break;}
 case 23:
-{ awsComponentNode *cn = new awsComponentNode(new scfString(yyvsp[-5].str), new scfString(yyvsp[-3].str)); 
-																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel])); 
-																				   yyval.key=cn; 
+{ awsComponentNode *cn = new awsComponentNode(new scfString(yyvsp[-5].str), new scfString(yyvsp[-3].str));
+																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
+																				   yyval.key=cn;
 																				;
     break;}
 case 24:
@@ -898,10 +898,10 @@ case 25:
 { wkcont.Add(yyvsp[0].key); ;
     break;}
 case 26:
-{ 
+{
 																				  awsComponentNode *win = new awsComponentNode(new scfString(yyvsp[-3].str), new scfString("Default"));
-																				  ((awsKeyContainer*)win)->Consume(&wkcont); 
-																				  ((awsPrefManager *)((awsManager *)windowmgr)->GetPrefMgr())->AddWindowDef(win); 
+																				  ((awsKeyContainer*)win)->Consume(&wkcont);
+																				  ((awsPrefManager *)((awsManager *)windowmgr)->GetPrefMgr())->AddWindowDef(win);
 																				;
     break;}
 case 27:
@@ -926,18 +926,18 @@ case 33:
 { skcont.Add(yyvsp[0].key); ;
     break;}
 case 34:
-{ awsSkinNode *skin = new awsSkinNode(new scfString(yyvsp[-3].str)); 
-										                      ((awsKeyContainer*)skin)->Consume(&skcont); 
-															  ((awsPrefManager *)((awsManager*)windowmgr)->GetPrefMgr())->AddSkinDef(skin); 
+{ awsSkinNode *skin = new awsSkinNode(new scfString(yyvsp[-3].str));
+										                      ((awsKeyContainer*)skin)->Consume(&skcont);
+															  ((awsPrefManager *)((awsManager*)windowmgr)->GetPrefMgr())->AddSkinDef(skin);
 															 ;
     break;}
 case 35:
-{ 
-																				  if (((awsManager *)windowmgr)->GetPrefMgr()->ConstantExists(yyvsp[0].str)) 
+{
+																				  if (((awsManager *)windowmgr)->GetPrefMgr()->ConstantExists(yyvsp[0].str))
 																				    {
 																					  yyval.val = ((awsManager *)windowmgr)->GetPrefMgr()->GetConstantValue(yyvsp[0].str);
 																					}
-																				   else 
+																				   else
 																				    {
 																					  printf("\taws window definition error: %s is not a registered constant.\n", yyvsp[0].str);
 																					  yyval.val=0;
@@ -1192,7 +1192,7 @@ yyerrhandle:
 }
 
 
-int 
+int
 awserror(char *s)
 {
  printf("\taws definition parse error(%i): %s\n", awslineno, s);

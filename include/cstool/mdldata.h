@@ -179,7 +179,7 @@ public:
   csModelDataAction ();
   /// Destructor
   virtual ~csModelDataAction () { }
-  
+
   /// Return the number of key frames
   virtual int GetFrameCount () const;
   /// Get the time value for a frame
@@ -215,7 +215,7 @@ public:
   csModelDataPolygon ();
   /// destructor
   virtual ~csModelDataPolygon ();
-  
+
   /// Add a vertex
   int AddVertex (int ver, int nrm, int col, int tex);
   /// Return the number of vertices

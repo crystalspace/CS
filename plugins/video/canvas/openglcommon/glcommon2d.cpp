@@ -264,7 +264,7 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
     glBegin (GL_POINTS);
     glVertex2i (x, Height - y);
     glEnd ();
-    
+
     if (gl_texture2d) glEnable (GL_TEXTURE_2D);
   }
 }
@@ -281,7 +281,7 @@ void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
     font->GetDimensions (text, fw, fh);
     DrawBox (x, y, fw, fh, bg);
   }
-  
+
   if (gl_texture2d) glEnable (GL_TEXTURE_2D);
 
   setGLColorfromint (fg);

@@ -10,10 +10,10 @@
 extern const IID IID_IDirectDetectionInternal;
 
 /**
- * This interface is only used for communication between Direct3DRender.dll and Driver2D.dll. 
+ * This interface is only used for communication between Direct3DRender.dll and Driver2D.dll.
  * It is not a true COM interface (not derived from iBase), and should not be exposed by the API.
  */
-interface IDirectDetectionInternal 
+interface IDirectDetectionInternal
 {
     ///
     STDMETHOD_(LPD3DDEVICEDESC, GetDesc3D)() = 0;
@@ -27,7 +27,7 @@ interface IDirectDetectionInternal
     STDMETHOD_(int, GetAlphaBlendType)() = 0;
     ///
     STDMETHOD_(bool, GetAlphaBlendHalo)() = 0;
-    /// 
+    ///
     STDMETHOD_(bool, GetHardware)() = 0;
 };
 

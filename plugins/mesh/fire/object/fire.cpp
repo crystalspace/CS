@@ -87,7 +87,7 @@ void csFireMeshObject::SetupObject ()
 
     float fradius = drop_width * swirl; // guessed radius of the fire
     csVector3 height = total_time * direction; // guessed height
-    bbox.Set (origin.Min() - csVector3 (-fradius,0,-fradius), 
+    bbox.Set (origin.Min() - csVector3 (-fradius,0,-fradius),
       origin.Max() + csVector3 (+fradius, 0, +fradius) + height );
 
     // Calculate the maximum radius.
@@ -172,7 +172,7 @@ void csFireMeshObject::MoveAndAge (int i, float delta_t)
   csVector3 accel = GetRandomDirection () * swirl;
   part_speed[i] += accel * delta_t;
   part_pos[i] += part_speed[i] * delta_t;
-  GetParticle (i)->SetPosition (part_pos[i]); 
+  GetParticle (i)->SetPosition (part_pos[i]);
   part_age[i] += delta_t;
   int k;
 

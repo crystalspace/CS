@@ -289,7 +289,7 @@ csModelDataAction::csModelDataAction ()
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
-  
+
 int csModelDataAction::GetFrameCount () const
 {
   return Times.Length ();

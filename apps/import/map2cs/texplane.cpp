@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -25,9 +25,9 @@
 #include "texplane.h"
 
 CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
-                                     CdVector3 v0, CdVector3 v1, CdVector3 v2, 
+                                     CdVector3 v0, CdVector3 v1, CdVector3 v2,
                                      CTextureFile* pTexture,
-                                     double x_off, double y_off, double rot_angle, 
+                                     double x_off, double y_off, double rot_angle,
                                      double x_scale, double y_scale,
                                      bool QuarkModeTexture, bool QuarkMirrored)
 {
@@ -44,7 +44,7 @@ CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
   B() = B() / len;
   C() = C() / len;
   D() = D() / len;
-  
+
   //Now we assign all the texture information.
   m_pTexture = pTexture;
 
@@ -55,17 +55,17 @@ CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
 
   if (QuarkModeTexture)
   {
-    //In QuArK style maps, texturing is really simple. 
+    //In QuArK style maps, texturing is really simple.
     //The three given vertices are:
     //v0: the bottom left corner of the texture (origin)
     //v1: a point, 128 pixel upwards from the origin
     //v2: a point, 128 pixel right from the origin
-    //If QuarkMirrored is true. (//TX2), then you need to 
+    //If QuarkMirrored is true. (//TX2), then you need to
     //swap v1 and v2.
-    
+
     //Now the texture needs to be aligned, so that v0, v1 and v2
     //get the proper texture coordinates. This is pretty simple,
-    //because Crystal Space uses a pretty similar texture 
+    //because Crystal Space uses a pretty similar texture
     //specification system. The main difference are the reference
     //points required:
     //m_tx[0]: the coordinates of the top left corner of the texture
@@ -81,13 +81,13 @@ CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
     {
       m_tx[0] = v0 + scaley*(v2-v0);                  //CS Origin
       m_tx[1] = v0 + scaley*(v2-v0) + scalex*(v1-v0); //CS First
-      m_tx[2] = v0;                                   //CS Second 
+      m_tx[2] = v0;                                   //CS Second
     }
     else
     {
       m_tx[0] = v0 + scaley*(v1-v0);                  //CS Origin
       m_tx[1] = v0 + scaley*(v1-v0) + scalex*(v2-v0); //CS First
-      m_tx[2] = v0;                                   //CS Second 
+      m_tx[2] = v0;                                   //CS Second
     }
   }
   else
@@ -103,10 +103,10 @@ CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
     double sy    = m_pTexture->GetOriginalHeight() * y_scale;
 
     //Rotation of the texture. (converted from degrees to rad)
-    double angle = rot_angle*0.017453293; 
+    double angle = rot_angle*0.017453293;
 
     //The Origin of the texture is rotated around (0,0) and scaled.
-    double xo=-( cos(angle)*x_off*x_scale + 
+    double xo=-( cos(angle)*x_off*x_scale +
                 sin(angle)*y_off*y_scale );
     double yo=-(-sin(angle)*x_off*x_scale +
                 cos(angle)*y_off*y_scale );
@@ -118,7 +118,7 @@ CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
     double x2=xo+sy*sin(angle);
     double y2=yo+sy*cos(angle);
 
-    //Now we get the default plane for the current orientation of this 
+    //Now we get the default plane for the current orientation of this
     //plane.
     CdVector3 norm;
     CdVector3 xv;
@@ -131,7 +131,7 @@ CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
     CdVector3 tv1 = xv*x1 + yv*y1;
     CdVector3 tv2 = xv*x2 + yv*y2;
 
-    //Now we project these points onto our own plane along the default 
+    //Now we project these points onto our own plane along the default
     //planes normal vector.
     ProjectPoint(m_tx[0], tv0, norm); //Origin
     ProjectPoint(m_tx[1], tv1, norm); //First
@@ -141,10 +141,10 @@ CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
   //No mirror plane for this plane yet.
   m_pMirrorPlane = NULL;
 }
-  
+
 CMapTexturedPlane::CMapTexturedPlane(CMapTexturedPlane* pPlane, bool mirrored)
 {
-  //Depending on the setting of mirrored, we will copy the original geometry, 
+  //Depending on the setting of mirrored, we will copy the original geometry,
   //or we will set the mirrored plane
   double factor = mirrored ? -1.0 : 1.0;
   A() = factor * pPlane->A();
@@ -167,7 +167,7 @@ CMapTexturedPlane::CMapTexturedPlane(CMapTexturedPlane* pPlane, bool mirrored)
   m_pMirrorPlane = NULL;
 }
 
-CMapTexturedPlane::CMapTexturedPlane(CdVector3 v0, CdVector3 v1, CdVector3 v2, 
+CMapTexturedPlane::CMapTexturedPlane(CdVector3 v0, CdVector3 v1, CdVector3 v2,
                                      int r, int g, int b)
 {
   m_Red    = r;
@@ -181,14 +181,14 @@ CMapTexturedPlane::CMapTexturedPlane(CdVector3 v0, CdVector3 v1, CdVector3 v2,
   B() = B() / len;
   C() = C() / len;
   D() = D() / len;
-  
+
   //This plane is flatshaded
   m_pTexture  = NULL;
   m_PlaneName = "";
 
-  m_tx[0] = CdVector3(0,0,0); 
-  m_tx[1] = CdVector3(0,0,0); 
-  m_tx[2] = CdVector3(0,0,0); 
+  m_tx[0] = CdVector3(0,0,0);
+  m_tx[1] = CdVector3(0,0,0);
+  m_tx[2] = CdVector3(0,0,0);
 
   //No mirror plane for this plane yet.
   m_pMirrorPlane = NULL;
@@ -214,7 +214,7 @@ bool CMapTexturedPlane::IsEqual(CMapTexturedPlane* pPlane)
   if (m_Blue  != pPlane->m_Blue)  return false;
 
   //If the textures are equal we let csMath3 do the comparison of the
-  //planes. 
+  //planes.
   return CdMath3::PlanesEqual(*this, *pPlane);
 }
 
@@ -222,7 +222,7 @@ bool CMapTexturedPlane::IsSameGeometry(CMapTexturedPlane* pPlane)
 {
   return CdMath3::PlanesEqual(*this, *pPlane);
 }
- 
+
 void CMapTexturedPlane::SetName(const char* name)
 {
   m_PlaneName = name;
@@ -240,8 +240,8 @@ void CMapTexturedPlane::GetColor(int& r, int& g, int& b) const
   b = m_Blue;
 }
 
-void CMapTexturedPlane::CalcTextureAxis(CdVector3& no, 
-                                        CdVector3& xv, 
+void CMapTexturedPlane::CalcTextureAxis(CdVector3& no,
+                                        CdVector3& xv,
                                         CdVector3& yv)
 {
   //This is a table of all possible baseplanes. The order of these
@@ -250,10 +250,10 @@ void CMapTexturedPlane::CalcTextureAxis(CdVector3& no,
   //two axis.
   struct
   {
-    double x; 
-    double y; 
+    double x;
+    double y;
     double z;
-  } 
+  }
   baseaxis[18] =
   {
     { 0, 0, 1}, { 1, 0, 0}, { 0,-1, 0}, // floor      left-handed
@@ -266,12 +266,12 @@ void CMapTexturedPlane::CalcTextureAxis(CdVector3& no,
 
   double best     = 0;
   int   bestaxis = 0;
-  
+
   //Search for the best axis by comparing all normals
   int i;
   for (i=0 ; i<6 ; i++)
   {
-    double dot = Normal() * CdVector3(baseaxis[i*3].x, 
+    double dot = Normal() * CdVector3(baseaxis[i*3].x,
                                      baseaxis[i*3].y,
                                      baseaxis[i*3].z);
     if (dot > best)
@@ -296,7 +296,7 @@ void CMapTexturedPlane::CalcTextureAxis(CdVector3& no,
 };
 
 void CMapTexturedPlane::ProjectPoint(CdVector3& ProjectedPoint,
-                                     const CdVector3& OriginalPoint, 
+                                     const CdVector3& OriginalPoint,
                                      const CdVector3& Direction)
 {
   double denom = norm * Direction;

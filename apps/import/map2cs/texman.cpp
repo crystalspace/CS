@@ -1,22 +1,22 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -27,9 +27,9 @@
 #include "wad3file.h"
 #include "pk3file.h"
 
-static const char* Q3Extensions[] = 
+static const char* Q3Extensions[] =
 {
- "_hell", 
+ "_hell",
  "_trans",
  "_1k",
  "_750",
@@ -62,7 +62,7 @@ void CTextureManager::LoadTextureArchives(CMapFile* pMap)
   for (type=0; type<MaxType; type++)
   {
     int nr = 1;
-    do 
+    do
     {
       char keyname[200];
       char filename[300];
@@ -104,8 +104,8 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
   strcpy(CleanedUpTextureName, TextureName);
   CleanupTexturename(CleanedUpTextureName);
 
-  // filter out all chars not recognized as valid string chars 
-  // by csScanStr() 
+  // filter out all chars not recognized as valid string chars
+  // by csScanStr()
   char *TextureCleanName;
 
   TextureCleanName = (char*)malloc(strlen(TextureName)+1);
@@ -126,12 +126,12 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
     CTextureFile* pTexture = m_StoredTextures[i];
     assert(pTexture);
     if (strcasecmp(pTexture->GetTexturename(), TextureCleanName)==0)
-    { 
+    {
       return pTexture;
     }
   }
 
-  //If we didn't find it there, we look in all known texture archives. 
+  //If we didn't find it there, we look in all known texture archives.
   for (i=0; i<m_TextureArchives.Length(); i++)
   {
     CTextureArchive* pTexArchive = m_TextureArchives[i];
@@ -152,7 +152,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
   strcpy(defaultname, m_pMap->GetConfigStr(
         "Map2CS.TextureSettings.DefaultTexture", ""));
 
-  //Now we create a default texture for the missing texture. 
+  //Now we create a default texture for the missing texture.
   for (i=0; i<m_TextureArchives.Length(); i++)
   {
     CTextureArchive* pTexArchive = m_TextureArchives[i];
@@ -160,7 +160,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
     CTextureFile* pTexture = pTexArchive->CreateTexture(defaultname);
     if (pTexture)
     {
-      printf("Warning: texture '%s'('%s') is missing.\n         Using '%s' instead!\n", 
+      printf("Warning: texture '%s'('%s') is missing.\n         Using '%s' instead!\n",
              TextureName, CleanedUpTextureName, defaultname);
       pTexture->SetTexturename(TextureCleanName);
       m_StoredTextures.Push(pTexture);
@@ -189,14 +189,14 @@ bool CTextureManager::AddAllTexturesToZip(CZipFile* pZipfile)
   {
     CTextureFile* pTexture = m_StoredTextures[i];
     assert(pTexture);
-    
+
     //Only add visible textures to the ZIP. This avoids adding textures
     //that shouldn't bee seen in a map. (Like brushes that are used for
     //visblocking and that are using some reserved names.).
     if (pTexture->IsVisible())
     {
       if (!pTexture->AddToZip(pZipfile))
-      { 
+      {
         ok = false;
       }
     }

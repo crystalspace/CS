@@ -355,7 +355,7 @@ void csRGB2HLS (float r, float g, float b, float &h, float &l, float &s)
     h = 0;
   else
     h = delta + sign * (acos ((max - mid) / (max - min))) / CONST_F2A;
-  if (h < 0) 
+  if (h < 0)
     h += 1;
 }
 

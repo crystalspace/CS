@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein 
+    Copyright (C) 1998 by Jorrit Tyberghein
     Copyright (C) 2001 by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
@@ -92,9 +92,9 @@ unsigned char *csXExtSHM::CreateMemory (int Width, int Height)
 
   bitmap_pad = (bitmap_pad == 3) ? 32 : bitmap_pad*8;
 
-  XImage *xim = XShmCreateImage(dpy, DefaultVisual(dpy,screen_num), 
+  XImage *xim = XShmCreateImage(dpy, DefaultVisual(dpy,screen_num),
 				disp_depth,
-				ZPixmap, 0, 
+				ZPixmap, 0,
 				&shmi, Width, Height);
   if (!xim)
   {
@@ -122,7 +122,7 @@ unsigned char *csXExtSHM::CreateMemory (int Width, int Height)
   // the last client detaches from it.
   XSync (dpy, False);
   shmctl (shmi.shmid, IPC_RMID, 0);
-  
+
   shm_image.data = shmi.shmaddr;
   shm_image.obdata = (char *)&shmi;
 
@@ -146,10 +146,10 @@ void csXExtSHM::Print (Window window, GC gc, csRect *area)
 		  area->Width (), area->Height (),
 		  False);
   else
-    XShmPutImage (dpy, 
-		  window, gc, 
-		  &shm_image, 
-		  0, 0, 0, 0, Width, Height, 
+    XShmPutImage (dpy,
+		  window, gc,
+		  &shm_image,
+		  0, 0, 0, 0, Width, Height,
 		  False);
   XSync (dpy, False);
 }

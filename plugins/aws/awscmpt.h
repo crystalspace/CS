@@ -1,19 +1,19 @@
  #ifndef __AWSCMPT_H__
  #define __AWSCMPT_H__
 /**************************************************************************
-    Copyright (C) 2000-2001 by Christopher Nelson 
-    	      (c) 2001 F.Richter	
-    
+    Copyright (C) 2000-2001 by Christopher Nelson
+    	      (c) 2001 F.Richter
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -79,19 +79,19 @@ private:
 
     virtual int GetPalEntryCount ();
     virtual int GetPixelBytes ();
-    virtual csPixelFormat* GetPixelFormat (); 
-    
-    virtual csImageArea *SaveArea (int x, int y, int w, int h) 
+    virtual csPixelFormat* GetPixelFormat ();
+
+    virtual csImageArea *SaveArea (int x, int y, int w, int h)
 	{ (void) x; (void) y; (void) w; (void) h; return NULL; }
-    virtual void RestoreArea (csImageArea *Area, bool Free = true) 
+    virtual void RestoreArea (csImageArea *Area, bool Free = true)
 	{ (void) Area; (void) Free; };
-    virtual void FreeArea (csImageArea *Area) 
+    virtual void FreeArea (csImageArea *Area)
 	{ (void) Area; };
 
     virtual bool ClipLine (float &x1, float &y1, float &x2, float &y2,
       int xmin, int ymin, int xmax, int ymax)
       { return rG2D->ClipLine(x1, y1, x2, y2, xmin, ymin, xmax, ymax); }
-    
+
     virtual iFontServer *GetFontServer ()
 	{ return FontServer; }
 
@@ -100,23 +100,23 @@ private:
     virtual csRGBpixel *GetPalette () { return NULL; }
     virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB);
 
-    virtual bool PerformExtension (char const* command, ...) 
+    virtual bool PerformExtension (char const* command, ...)
 	{ (void) command; return false; };
     virtual bool PerformExtensionV (char const* command, va_list)
 	{ (void) command; return false; };
     virtual iImage *ScreenShot () { return NULL; };
     virtual iGraphics2D *CreateOffScreenCanvas
-    (int width, int height, void *buffer, bool alone_hint, 
+    (int width, int height, void *buffer, bool alone_hint,
      csPixelFormat *pfmt = NULL, csRGBpixel *palette = NULL, int pal_size = 0)
     { (void) width; (void) height; (void) buffer; (void) alone_hint;
       (void) pfmt; (void) palette; (void) pal_size; return NULL; };
 
     virtual void AllowResize (bool /*iAllow*/) { };
-    virtual bool Resize (int w, int h) 
+    virtual bool Resize (int w, int h)
 	{ (void) w; (void) h; return false; };
     virtual iNativeWindow* GetNativeWindow () { return NULL; };
     virtual bool GetFullScreen () { return false; }
-    virtual void SetFullScreen (bool b) 
+    virtual void SetFullScreen (bool b)
 	{ (void) b; };
     virtual bool SetMousePosition (int x, int y)
 	{ (void) x; (void) y; return false; };
@@ -248,7 +248,7 @@ private:
     { }
     virtual const csReversibleTransform& GetObjectToCamera ()
     { return o2c; }
- 
+
     virtual void SetClipper (iClipper2D*, int) { }
     virtual iClipper2D* GetClipper () { return NULL; }
     virtual int GetClipType () { return CS_CLIPPER_NONE; }
@@ -314,7 +314,7 @@ public:
 
   awsMultiProctexCanvas (int w, int h, iObjectRegistry* object_reg, iEngine* engine,
       	iTextureManager* txtmgr);
-  
+
   virtual ~awsMultiProctexCanvas ();
 
   virtual void Animate (csTicks current_time);
@@ -329,7 +329,7 @@ public:
   { return (v*VertCanvases)+h; }
 
   /// Gets the number of vertical and horizontal canvases
-  void GetCanvasCount(int &v, int &h) 
+  void GetCanvasCount(int &v, int &h)
   { v = VertCanvases; h = HorzCanvases; };
 
   /// Gets the number of canvases total
@@ -337,7 +337,7 @@ public:
   { return VertCanvases * HorzCanvases; }
 
   // Gets the canvas with v,h syntax
-  awsSimpleCanvas *GetCanvas(int v, int h) 
+  awsSimpleCanvas *GetCanvas(int v, int h)
   { return &canvas_list[GetIndex(v,h)]; };
 
   // Gets the canvas with flat syntax

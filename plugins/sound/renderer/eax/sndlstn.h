@@ -32,7 +32,7 @@ public:
   SCF_DECLARE_IBASE;
   csSoundListenerEAX(iBase *piBase);
   virtual ~csSoundListenerEAX();
-	
+
   virtual void SetDirection (const csVector3 &Front, const csVector3 &Top);
   virtual void SetPosition (const csVector3 &pos);
   virtual void SetVelocity (const csVector3 &v);
@@ -41,7 +41,7 @@ public:
   virtual void SetDopplerFactor (float factor);
   virtual void SetHeadSize (float size);
   virtual void SetEnvironment (csSoundEnvironment env);
-  
+
   bool Initialize(csSoundRenderEAX *srdr);
   void Prepare();
 

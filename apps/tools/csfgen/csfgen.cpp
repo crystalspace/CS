@@ -141,7 +141,7 @@ static bool Convert (const char *fontfile)
     int oldsize = opt.fontsize;
     opt.fontsize = font->GetSize ();
     if (opt.fontsize != oldsize)
-      printf ("Could not set font size %d, using size %d\n", 
+      printf ("Could not set font size %d, using size %d\n",
         oldsize, opt.fontsize);
   }
   else
@@ -237,7 +237,7 @@ static bool Convert (const char *fontfile)
 
     int bpc = ((width [c] + 7) / 8) * h;
 
-    if (bitmap) 
+    if (bitmap)
       if (opt.sourcecode)
       {
         fprintf (out, "  ");

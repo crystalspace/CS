@@ -4,7 +4,7 @@
 #include "iaws/aws.h"
 #include "iutil/string.h"
 
-class awsTestSink 
+class awsTestSink
 {
 
   iAws     *wmgr;
@@ -13,7 +13,7 @@ class awsTestSink
   iString  *pass;
 
   iAwsWindow *test;
-  
+
 private:
   static void RedClicked(void *sink,   iAwsSource *source);
   static void BlueClicked(void *sink,  iAwsSource *source);
@@ -28,7 +28,7 @@ private:
 public:
   awsTestSink();
   virtual ~awsTestSink();
-  
+
   void SetSink(iAwsSink *s);
   iAwsSink *GetSink() { return sink; }
 

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -230,7 +230,7 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
 
   csPolygon3D* poly = NULL;
   csCurve* curve = NULL;
-  
+
   if (isPolygon)
     poly = (csPolygon3D*)obj;
   else
@@ -475,7 +475,7 @@ bool csLightMap::UpdateRealLightMap ()
       do
       {
         s = *p++;
-	
+
         l = map->red + QRound (red * s);
         map->red = l < 255 ? l : 255;
         l = map->green + QRound (green * s);
@@ -553,7 +553,7 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   o_real.TakeOver (&real_lm);
 
   lm_size = lwidth * lheight;
- 
+
   // Allocate new data and transform old to new.
   static_lm.Alloc (lm_size);
   ResizeMap2 (o_stat.GetArray (), oldw, oldh, static_lm.GetArray (), lwidth, lheight);

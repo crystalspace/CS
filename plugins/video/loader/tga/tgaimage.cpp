@@ -106,7 +106,7 @@ static void get_map_entry (uint8*& ptr, csRGBpixel* Value, int Size, bool alpha)
 static void get_pixel (uint8*& ptr, csRGBpixel* dest, int Size, bool alpha);
 
 
-static iImageIO::FileFormatDescription formatlist[6] = 
+static iImageIO::FileFormatDescription formatlist[6] =
 {
   {TGA_MIME, "Map", CS_IMAGEIO_LOAD},
   {TGA_MIME, "RGB", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE},
@@ -141,7 +141,7 @@ iImage *csTGAImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
      delete i ;
     return NULL;
   }
-  return i;    
+  return i;
 }
 
 void csTGAImageIO::SetDithering (bool)
@@ -264,7 +264,7 @@ bool ImageTgaFile::Load (uint8* iBuffer, uint32 iSize)
   rows = (int (tga_head.Height_lo)) + (int (tga_head.Height_hi)) * 256;
   cols = (int (tga_head.Width_lo))  + (int (tga_head.Width_hi))  * 256;
 
-  switch (tga_head.ImgType) 
+  switch (tga_head.ImgType)
   {
     case TGA_Map:
     case TGA_RGB:
@@ -281,13 +281,13 @@ bool ImageTgaFile::Load (uint8* iBuffer, uint32 iSize)
   if (tga_head.ImgType == TGA_Map ||
       tga_head.ImgType == TGA_RLEMap ||
       tga_head.ImgType == TGA_CompMap ||
-      tga_head.ImgType == TGA_CompMap4) 
+      tga_head.ImgType == TGA_CompMap4)
   { /* Color-mapped image */
     if (tga_head.CoMapType != 1)
       return false;
     mapped = 1;
     /* Figure maxval from CoSize. */
-    switch (tga_head.CoSize) 
+    switch (tga_head.CoSize)
     {
       case 8:
       case 24:
@@ -307,7 +307,7 @@ bool ImageTgaFile::Load (uint8* iBuffer, uint32 iSize)
   else
   { /* Not colormap, so figure maxval from PixelSize. */
     mapped = 0;
-    switch (tga_head.PixelSize) 
+    switch (tga_head.PixelSize)
     {
       case 8:
       case 24:
@@ -326,13 +326,13 @@ bool ImageTgaFile::Load (uint8* iBuffer, uint32 iSize)
   }
 
   /* If required, read the color map information. */
-  if (tga_head.CoMapType != 0) 
+  if (tga_head.CoMapType != 0)
   {
     temp1 = int (tga_head.Index_lo) + int (tga_head.Index_hi) * 256;
     temp2 = int (tga_head.Length_lo) + int (tga_head.Length_hi) * 256;
     if ((temp1 + temp2 + 1) >= MAXCOLORS)
       return false;
-    for (i = temp1; i < int (temp1 + temp2); ++i) 
+    for (i = temp1; i < int (temp1 + temp2); ++i)
       get_map_entry (iBuffer, &ColorMap [i], (int) tga_head.CoSize,
         Format & CS_IMGFMT_ALPHA);
   }
@@ -351,22 +351,22 @@ bool ImageTgaFile::Load (uint8* iBuffer, uint32 iSize)
 
   truerow = 0;
   baserow = 0;
-  for (row = 0; row < rows; ++row) 
+  for (row = 0; row < rows; ++row)
   {
     realrow = truerow;
-    if (tga_head.OrgBit == 0) 
+    if (tga_head.OrgBit == 0)
       realrow = rows - realrow - 1;
 
-    for (col = 0; col < cols; ++col) 
+    for (col = 0; col < cols; ++col)
       get_pixel (iBuffer, &(pixels [realrow * cols + col]),
         (int) tga_head.PixelSize, Format & CS_IMGFMT_ALPHA);
-    if (tga_head.IntrLve == TGA_IL_Four) 
+    if (tga_head.IntrLve == TGA_IL_Four)
       truerow += 4;
-    else if (tga_head.IntrLve == TGA_IL_Two) 
+    else if (tga_head.IntrLve == TGA_IL_Two)
       truerow += 2;
     else
       ++truerow;
-    if (truerow >= rows) 
+    if (truerow >= rows)
       truerow = ++baserow;
   }
 
@@ -407,7 +407,7 @@ static void readtga (uint8*& iBuffer, TGAheader* tgaP)
   tgaP->OrgBit = (flags & 0x20)  >> 5;
   tgaP->IntrLve = (flags & 0xc0)  >> 6;
 
-  if (tgaP->IDLength != 0) 
+  if (tgaP->IDLength != 0)
     iBuffer += tgaP->IDLength;
 }
 
@@ -416,7 +416,7 @@ static void get_map_entry (uint8*& iBuffer, csRGBpixel* Value, int Size, bool al
   unsigned char j, k;
 
   /* Read appropriate number of bytes, break into rgb & put in map. */
-  switch (Size) 
+  switch (Size)
   {
     case 8:				/* Grey scale, read and triplicate. */
       Value->red = Value->green = Value->blue = *iBuffer++;
@@ -455,14 +455,14 @@ static void get_pixel (uint8*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
   unsigned char j, k;
 
   /* Check if run length encoded. */
-  if (rlencoded) 
+  if (rlencoded)
   {
-    if (RLE_count == 0) 
+    if (RLE_count == 0)
     { /* Have to restart run. */
       unsigned char i;
       i = *iBuffer++;
       RLE_flag = (i & 0x80);
-      if (RLE_flag == 0) 
+      if (RLE_flag == 0)
         /* Stream of unencoded pixels. */
         RLE_count = i + 1;
       else
@@ -474,7 +474,7 @@ static void get_pixel (uint8*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
     else
     { /* Have already read count & (at least) first pixel. */
       --RLE_count;
-      if (RLE_flag != 0) 
+      if (RLE_flag != 0)
       /* Replicated pixels. */
         goto PixEncode;
     }
@@ -518,7 +518,7 @@ static void get_pixel (uint8*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
   }
 
 PixEncode:
-  if (mapped) 
+  if (mapped)
     *dest = ColorMap [l];
   else
   {

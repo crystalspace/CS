@@ -55,7 +55,7 @@ csColliderWrapper::~csColliderWrapper ()
 
 bool csColliderWrapper::Collide (csObject& otherObject,
                           csReversibleTransform* pThisTransform,
-                          csReversibleTransform* pOtherTransform) 
+                          csReversibleTransform* pOtherTransform)
 {
   csColliderWrapper *pOtherCollider = GetColliderWrapper (otherObject);
   if (pOtherCollider)
@@ -66,7 +66,7 @@ bool csColliderWrapper::Collide (csObject& otherObject,
 
 bool csColliderWrapper::Collide (iObject* otherObject,
                           csReversibleTransform* pThisTransform,
-                          csReversibleTransform* pOtherTransform) 
+                          csReversibleTransform* pOtherTransform)
 {
   csColliderWrapper *pOtherCollider = GetColliderWrapper (otherObject);
   if (pOtherCollider)
@@ -75,8 +75,8 @@ bool csColliderWrapper::Collide (iObject* otherObject,
     return false;
 }
 
-bool csColliderWrapper::Collide (csColliderWrapper& otherCollider, 
-                          csReversibleTransform* pTransform1, 
+bool csColliderWrapper::Collide (csColliderWrapper& otherCollider,
+                          csReversibleTransform* pTransform1,
                           csReversibleTransform* pTransform2)
 {
   csColliderWrapper *pCollider2 = &otherCollider;
@@ -86,7 +86,7 @@ bool csColliderWrapper::Collide (csColliderWrapper& otherCollider,
   	pCollider2->collider, pTransform2);
 }
 
-csColliderWrapper* csColliderWrapper::GetColliderWrapper (csObject &object) 
+csColliderWrapper* csColliderWrapper::GetColliderWrapper (csObject &object)
 {
   csColliderWrapper* w = CS_GET_CHILD_OBJECT (&object, csColliderWrapper);
   if (w)
@@ -94,7 +94,7 @@ csColliderWrapper* csColliderWrapper::GetColliderWrapper (csObject &object)
   return w;
 }
 
-csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object) 
+csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object)
 {
   csColliderWrapper* w = CS_GET_CHILD_OBJECT (object, csColliderWrapper);
   if (w)

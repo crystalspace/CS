@@ -341,7 +341,7 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
     {
       NeXTKeymapBinding const* binding =
 	[keymap bindingForScanCode:p->data.key.keyCode];
-  
+
       *raw = binding->code;
       *cooked = p->data.key.charCode;
       if ((p->flags & NX_NUMERICPADMASK) != 0)

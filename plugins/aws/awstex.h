@@ -21,7 +21,7 @@ struct iImage;
  */
 class awsTextureManager
 {
-  
+
   /// this contains a reference to our loader.
   iImageIO *loader;
 
@@ -51,16 +51,16 @@ private:
 
   /// unregisters all currently loaded textures with the texture manager
   void UnregisterTextures();
-  
+
 public:
 
   /// empty constructor
   awsTextureManager();
 
-  /// de-inits 
+  /// de-inits
   ~awsTextureManager();
 
-  
+
   /** Get's a reference to and iLoader. */
   void Initialize(iObjectRegistry* object_reg);
 
@@ -81,7 +81,7 @@ public:
 
   /** Retrieves the texture manager that we are currently using */
   iTextureManager *GetTextureManager() { return txtmgr; }
-  
+
 };
 
 

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -215,10 +215,10 @@ struct iSprite2DState : public iSprite2DFactoryState
 {
   /// Get the vertex array.
   virtual csColoredVertices& GetVertices () = 0;
-  /** 
+  /**
    * Set vertices to form a regular n-polygon around (0,0),
    * optionally also set u,v to corresponding coordinates in a texture.
-   * Large n approximates a circle with radius 1. n must be > 2. 
+   * Large n approximates a circle with radius 1. n must be > 2.
    */
   virtual void CreateRegularVertices (int n, bool setuv) = 0;
 

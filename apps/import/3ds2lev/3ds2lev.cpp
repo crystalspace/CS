@@ -24,7 +24,7 @@
 #include <lib3ds/node.h>
 #include <lib3ds/vector.h>
 
-// ~end new implementation --------- 
+// ~end new implementation ---------
 
 CS_IMPLEMENT_APPLICATION
 
@@ -196,7 +196,7 @@ void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile)
 
   // used for coords of vertex
   float *xyz;
-  
+
   // set the current mesh to the first in the file
   Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
 
@@ -336,7 +336,7 @@ int RemoveDupVerts (H3dsScene * scene, H3dsMapVert * vrtmap, int verts)
         // We already know that they don't have the same values.
         if (vrtmap[runvtx].marked == 1)
           continue;
-    
+
         // If we find another vertex with the same x,y,z values
         // we must find and adjust all the indexes that point
         // to that vertex so that they point to currvtx.
@@ -346,16 +346,16 @@ int RemoveDupVerts (H3dsScene * scene, H3dsMapVert * vrtmap, int verts)
         {
           // Make them point to the top of our optimized array
           FindExchange (scene, runvtx, vrttop);
-    
+
           // Mark it so we don't process it again.
           vrtmap[runvtx].marked=1;
         }
       }
-    
+
       // Now find all other indexes that points to currvtx
       // and adjust them to the top of our optimized array, vrttop.
       FindExchange (scene, currvtx, vrttop);
-    
+
       // Put currvtx on top of our optimized array.
       vrtmap[vrttop] = vrtmap[currvtx];
       vrttop++;

@@ -123,7 +123,7 @@ void csProcBump::Animate (csTicks current_time)
   // nothing to do
 }
 
-void csProcBump::Recalc(const csVector3& center, const csVector3& normal, 
+void csProcBump::Recalc(const csVector3& center, const csVector3& normal,
     const csVector3& xdir, const csVector3& ydir,
     int numlight, iLight **lights)
 {
@@ -137,7 +137,7 @@ void csProcBump::Recalc(const csVector3& center, const csVector3& normal,
   csVector3 yax = ydir.Unit();
   int size = mat_w*mat_h;
   float *vals = new float[size];
-  for(i=0; i<size; i++) 
+  for(i=0; i<size; i++)
     vals[i] = 0.0;
 
   for(i=0; i<numlight; i++)
@@ -147,7 +147,7 @@ void csProcBump::Recalc(const csVector3& center, const csVector3& normal,
     // the amount of light that is displayed using regular lighting
     // this amount must be perturbed.
     float lightnow = lightdir * normal;
-    //printf("Lightdir %g %g %g , giving lightnow %g \n", 
+    //printf("Lightdir %g %g %g , giving lightnow %g \n",
       //lightdir.x, lightdir.y, lightdir.z, lightnow);
 
     for (y=0; y<mat_h; y++)
@@ -176,7 +176,7 @@ void csProcBump::Recalc(const csVector3& center, const csVector3& normal,
   ptG3D->Print (NULL);
   delete[] vals;
 }
-	  
+
 int csProcBump::GetHeight(int x, int y)
 {
   int r, g, b;
@@ -236,7 +236,7 @@ void csProcBump::SetupFast()
     }
 }
 
-void csProcBump::RecalcFast(const csVector3& center, const csVector3& normal, 
+void csProcBump::RecalcFast(const csVector3& center, const csVector3& normal,
     const csVector3& xdir, const csVector3& ydir,
     int numlight, iLight **lights)
 {

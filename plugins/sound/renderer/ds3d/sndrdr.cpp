@@ -109,7 +109,7 @@ bool csSoundRenderDS3D::Open()
     reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"crystalspace.sound.ds3d",
 	"SoundRender DirectSound3D selected");
-  
+
   HRESULT r;
   if (!AudioRenderer)
   {
@@ -127,7 +127,7 @@ bool csSoundRenderDS3D::Open()
       if (reporter) reporter->DecRef ();
       return false;
     }
-  
+
     DWORD dwLevel = DSSCL_EXCLUSIVE;
     r = AudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel);
     if (r != DS_OK)
@@ -169,7 +169,7 @@ bool csSoundRenderDS3D::Open()
   vc->DecRef ();
   LastTime = ct;
   if (reporter) reporter->DecRef ();
-  
+
   return true;
 }
 

@@ -1,18 +1,18 @@
 #ifndef __AWS_LIST_BOX_H__
 #define __AWS_LIST_BOX_H__
 /**************************************************************************
-    Copyright (C) 2000-2001 by Christopher Nelson 
-    
+    Copyright (C) 2000-2001 by Christopher Nelson
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -24,7 +24,7 @@
 
 /// Knows how to draw items that have several properties.
 struct awsListItem
-{  
+{
   /// An image, if it contains one.
   iTextureHandle *image;
 
@@ -39,13 +39,13 @@ struct awsListItem
 
   /// Whether this is a group state item or not (like radio-buttons vs. checkboxes)
   bool group_state;
-  
+
   /// Alignment of text (left or right) and stateful box (if one)
   int txt_align;
 
   /// Alignment of image (left or right)
   int img_align;
- 
+
   /// Draws item
   void DrawItem(iAws *wmgr, csRect frame);
 
@@ -58,7 +58,7 @@ struct awsListItem
 
 /// Manages a row of items
 struct awsListRow
-{  
+{
   /// Pointer to parent (if it has one)
   awsListRow *parent;
 
@@ -158,7 +158,7 @@ class awsListBox : public awsComponent
 
    /// Image of radio button type item (marked)
    iTextureHandle *tree_grpf;
-   
+
   //////////////////////////////////////////
 
    /// Flags for frame style.
@@ -205,7 +205,7 @@ class awsListBox : public awsComponent
 
    /// Number of items that can be drawn
    int drawable_count;
- 
+
 private:
    ///////////////////////////// Embedded items
 
@@ -242,7 +242,7 @@ private:
 
    /// Counts the number of visible items recursively, given the starting vector.
    static int CountVisibleItems(awsListRowVector *v);
-   
+
    /// Maps the visible items in the list recursively onto a flat index.
    static void MapVisibleItems(awsListRowVector *v, int &start, awsListRow **map);
 
@@ -271,13 +271,13 @@ protected:
 
    /// Used internally to redraw the list recursively (support tree/hierarchical drawing)
    bool DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, int depth, bool last_child);
-   
+
 public:
     awsListBox();
     virtual ~awsListBox();
 
    /******* Frame Styles **********************/
-    
+
    /// A bumpy frame, like Group Frame
    static const int fsBump;
 
@@ -297,7 +297,7 @@ public:
 
    /// A multi-column list
    static const int ctList;
-   
+
    /// A multi-column tree
    static const int ctTree;
 
@@ -309,7 +309,7 @@ public:
    /// The box was scrolled programmatically, or by a keypress.
    static const int signalScrolled;
 
-   
+
 public:
     /// Get's the texture handle and the title, plus style if there is one.
     virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
@@ -336,10 +336,10 @@ public:
 
     /// Triggered when the user presses a mouse button down
     virtual bool OnMouseDown(int button, int x, int y);
-    
-    /// Triggered when the user unpresses a mouse button 
+
+    /// Triggered when the user unpresses a mouse button
     virtual bool OnMouseUp(int button, int x, int y);
-    
+
     /// Triggered when the user moves the mouse
     virtual bool OnMouseMove(int button, int x, int y);
 
@@ -357,7 +357,7 @@ public:
 
     /// Triggered when the user presses a key
     virtual bool OnKeypress(int key, int modifiers);
-    
+
     /// Triggered when the keyboard focus is lost
     virtual bool OnLostFocus();
 
@@ -379,7 +379,7 @@ public:
     /// Does nothing
     virtual ~awsListBoxFactory();
 
-    /// Returns a newly created component of the type this factory handles. 
+    /// Returns a newly created component of the type this factory handles.
     virtual iAwsComponent *Create();
 };
 

@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -244,7 +244,7 @@ public:
   float default_texlen;
   bool use_mat_set;
   char* mat_set_name;
-  
+
   ThingLoadInfo () : default_material (NULL),
     default_texlen (1),
     use_mat_set (false), mat_set_name (NULL)
@@ -255,7 +255,7 @@ public:
     delete [] mat_set_name;
     mat_set_name = new char [strlen (name) + 1];
     strcpy (mat_set_name, name);
-  }   
+  }
 };
 
 static bool load_thing_part (iObjectRegistry* object_reg, iReporter* reporter,
@@ -518,7 +518,7 @@ Nag to Jorrit about this feature if you want it.");
 	  iPolygon3D* poly3d = thing_state->CreatePolygon (xname);
 	  if (info.default_material)
 	    poly3d->SetMaterial (info.default_material);
-	  if (!synldr->ParsePoly3d (engine, poly3d, params, 
+	  if (!synldr->ParsePoly3d (engine, poly3d, params,
 				   info.default_texlen, thing_state, vt_offset))
 	  {
 	    poly3d->DecRef ();
@@ -956,7 +956,7 @@ iBase* csBezierLoader::Parse (const char* string, iMaterialList*,
         break;
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
-	
+
 	{
 	  iLoader* ldr = CS_QUERY_REGISTRY (object_reg, iLoader);
 	  if (ldr)

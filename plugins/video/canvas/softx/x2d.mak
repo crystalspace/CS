@@ -28,7 +28,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
- 
+
 CFLAGS.X2D += -I$(X11_PATH)/include
 LIB.X2D.SYSTEM += -L$(X11_PATH)/lib -lX11
 #LIB.X2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11
@@ -46,8 +46,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(X2D)
 endif
 
-INC.X2D = $(wildcard plugins/video/canvas/softx/*.h $(INC.COMMON.DRV2D)) 
-SRC.X2D = $(wildcard plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D)) 
+INC.X2D = $(wildcard plugins/video/canvas/softx/*.h $(INC.COMMON.DRV2D))
+SRC.X2D = $(wildcard plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.X2D = $(addprefix $(OUT),$(notdir $(SRC.X2D:.cpp=$O)))
 DEP.X2D = CSUTIL CSSYS CSGEOM CSUTIL
 
@@ -62,7 +62,7 @@ x2d: $(OUTDIRS) $(X2D)
 
 $(OUT)%$O: plugins/video/canvas/softx/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.X2D)
- 
+
 $(X2D): $(OBJ.X2D) $(LIB.X2D)
 	$(DO.PLUGIN) $(LIB.X2D.SPECIAL)
 

@@ -102,7 +102,7 @@ void csRainMeshObject::Update (csTicks elapsed_time)
   {
     move = rain_dir * delta_t;
     part_pos[i] += move;
-    GetParticle (i)->SetPosition (part_pos[i]); 
+    GetParticle (i)->SetPosition (part_pos[i]);
   }
   // check if particles are out of the box.
   for (i=0 ; i < particles.Length () ; i++)
@@ -114,17 +114,17 @@ void csRainMeshObject::Update (csTicks elapsed_time)
       // To keep the number of particles (and thus the raininess)
       // constant another particle will appear in sight now.
       // @@@ rain only appears in box ceiling now, should appear on
-      // opposite side of rain_dir... 
+      // opposite side of rain_dir...
 
       // @@@ also shifty will not work very nicely with slanted rain.
       //   but perhaps it won't be too bad...
       float toolow = ABS(rainbox.MinY() - part_pos[i].y);
       float height = rainbox.MaxY() - rainbox.MinY();
       while (toolow>height) toolow-=height;
-      pos = GetRandomDirection( csVector3 (rainbox.MaxX() - rainbox.MinX(), 
+      pos = GetRandomDirection( csVector3 (rainbox.MaxX() - rainbox.MinX(),
         0.0f, rainbox.MaxZ() - rainbox.MinZ()), rainbox.Min() );
       pos.y = rainbox.MaxY() - toolow;
-      if(pos.y < rainbox.MinY() || pos.y > rainbox.MaxY()) 
+      if(pos.y < rainbox.MinY() || pos.y > rainbox.MaxY())
         pos.y = rainbox.MaxY() - height * ((float)rand() / (1.0 + RAND_MAX));
       GetParticle (i)->SetPosition (pos);
       part_pos[i] = pos;

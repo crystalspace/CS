@@ -1,18 +1,18 @@
  #ifndef __AWS_PREFERENCES_H__
  #define __AWS_PREFERENCES_H__
 /**************************************************************************
-    Copyright (C) 2000-2001 by Christopher Nelson 
-    
+    Copyright (C) 2000-2001 by Christopher Nelson
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -39,11 +39,11 @@ struct iString;
  This is the pseudo-symbol table for the definitions keeper.  Windows and their sub-keys can be looked up from here.
 There are a few different types of values possible for keys:  Strings, Integers, and Rects.  They can be looked up
 using appropriate search methods in the main preferences.  Skins and Windows are containers which hold the keys, and
-the prefs manager contains those skin and window defintions.  
- 
+the prefs manager contains those skin and window defintions.
+
  Windows can be filled in because components provide a factory service by registering, and then know how to get their
 settings from the window definition.
-                               
+
  ****/
 
 //////////////////////////////////  Keys  //////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ const unsigned char KEY_CONNECTIONMAP = 9;
 class awsKey
 {
   /// The name of the key
-  unsigned long name; 
+  unsigned long name;
   //iString *name;
 
 public:
@@ -73,13 +73,13 @@ public:
 
   /// Simple destructor does nothing
   virtual ~awsKey()         {};
-  
+
   /// Pure virtual function Type returns the type of key
   virtual unsigned char Type()=0;
 
   /// Accessor function gets name of key
   unsigned long Name() { return name; }
-  
+
 };
 
 class awsIntKey : public awsKey
@@ -95,7 +95,7 @@ public:
   virtual ~awsIntKey() {};
 
   /// So that we know it's an int key
-  virtual unsigned char Type() 
+  virtual unsigned char Type()
   { return KEY_INT; }
 
   /// Gets the value of this key as an integer
@@ -115,7 +115,7 @@ public:
   virtual ~awsStringKey() {};
 
   /// So that we know it's a string key.
-  virtual unsigned char Type() 
+  virtual unsigned char Type()
   { return KEY_STR; }
 
   /// Gets the value of this key as an iString
@@ -134,8 +134,8 @@ public:
   /// Destructor does nothing
   virtual ~awsRectKey() {};
 
-  /// So that we know this is a rect key 
-  virtual unsigned char Type() 
+  /// So that we know this is a rect key
+  virtual unsigned char Type()
   { return KEY_RECT; }
 
   /// Gets the value of this key as a rectangle
@@ -150,7 +150,7 @@ public:
   struct RGB {
   	unsigned char red, green, blue;
   } rgb;
-  
+
 	/// Constructs an integer key with the given name
   awsRGBKey(iString *name, unsigned char r, unsigned char g, unsigned char b):awsKey(name)
   { rgb.red=r; rgb.green=g; rgb.blue=b; }
@@ -158,8 +158,8 @@ public:
   /// Destructor does nothing
   virtual ~awsRGBKey() {};
 
-  /// So that we know this is a rect key 
-  virtual unsigned char Type() 
+  /// So that we know this is a rect key
+  virtual unsigned char Type()
   { return KEY_RGB; }
 
   /// Gets the value of this key as a rectangle
@@ -178,8 +178,8 @@ public:
   /// Destructor does nothing
   virtual ~awsPointKey() {};
 
-  /// So that we know this is a rect key 
-  virtual unsigned char Type() 
+  /// So that we know this is a rect key
+  virtual unsigned char Type()
   { return KEY_POINT; }
 
   /// Gets the value of this key as a rectangle
@@ -194,7 +194,7 @@ class awsConnectionKey : public awsKey
   unsigned long trigger;
   /// The signal that we want
   unsigned long signal;
-  
+
 public:
   /// Constructs an integer key with the given name
   awsConnectionKey(iString *name, iAwsSink *s, unsigned long t, unsigned long sig):
@@ -203,13 +203,13 @@ public:
   /// Destructor does nothing
   virtual ~awsConnectionKey() {};
 
-  /// So that we know this is a rect key 
-  virtual unsigned char Type() 
+  /// So that we know this is a rect key
+  virtual unsigned char Type()
   { return KEY_CONNECTION; }
 
   /// Gets the sink for this key
   iAwsSink *Sink() { return sink; }
-  
+
   /// Gets the trigger for this key
   unsigned long Trigger() { return trigger; }
 
@@ -220,7 +220,7 @@ public:
 
 //////////////////////////////////  Containers ////////////////////////////////////////////////////////////////////////
 
-class awsKeyContainer 
+class awsKeyContainer
 {
   /// list of children in container.
   csBasicVector children;
@@ -235,12 +235,12 @@ public:
 
   /// Looks up a key based on it's ID.
   awsKey *Find(unsigned long id);
-   
+
   csBasicVector &Children()
   { return children; }
- 
+
   /// Adds an item to the container
-  void Add(awsKey *key) 
+  void Add(awsKey *key)
   { children.Push(key); }
 
   /// Removes an item from the container
@@ -257,7 +257,7 @@ public:
 
 class awsSkinNode : public awsKey, awsKeyContainer
 {
-public:  
+public:
     awsSkinNode(iString *name):awsKey(name) {};
     virtual ~awsSkinNode() {};
 
@@ -266,9 +266,9 @@ public:
 
     awsKey *GetAt(int i)
     { return (awsKey *)Children()[i]; }
-    
+
     /// So that we know this is a skin node
-    virtual unsigned char Type() 
+    virtual unsigned char Type()
     { return KEY_SKIN; }
 };
 
@@ -277,22 +277,22 @@ class awsComponentNode : public awsKey, awsKeyContainer
   /// The type of component, like "Radio Button", "Check Box", etc.
   iString *comp_type;
 
-public:  
+public:
   awsComponentNode(iString *name, iString *component_type):awsKey(name), comp_type(component_type) {};
   virtual ~awsComponentNode() {};
-    
+
   /// So that we know this is a component node
-  virtual unsigned char Type() 
+  virtual unsigned char Type()
   { return KEY_COMPONENT; }
-    
+
   /// So that we can find out what sort of component type this should be
   iString *ComponentTypeName()
   { return comp_type; }
-    
+
   /// Exposes length of child list for iteration
   int GetLength()
   { return Children().Length(); }
-  
+
   /// Exposes [] for index access
   awsKey *GetItemAt(int i)
   { return (awsKey *)Children()[i];  }
@@ -300,19 +300,19 @@ public:
 
 class awsConnectionNode : public awsKey, awsKeyContainer
 {
-  
-public:  
+
+public:
   awsConnectionNode();
   virtual ~awsConnectionNode();
-    
+
   /// So that we know this is a component node
-  virtual unsigned char Type() 
+  virtual unsigned char Type()
   { return KEY_CONNECTIONMAP; }
-      
+
   /// Exposes length of child list for iteration
   int GetLength()
   { return Children().Length(); }
-  
+
   /// Exposes [] for index access
   awsKey *GetItemAt(int i)
   { return (awsKey *)Children()[i];  }
@@ -323,9 +323,9 @@ public:
 //////////////////////////////////  Preference Manager ////////////////////////////////////////////////////////////////
 
 
-enum AWS_COLORS { AC_HIGHLIGHT, AC_HIGHLIGHT2, AC_SHADOW, AC_SHADOW2, AC_FILL, AC_DARKFILL, 
-		  AC_TEXTFORE, AC_TEXTBACK, AC_TEXTDISABLED, 
-		  AC_BUTTONTEXT, AC_TRANSPARENT, 
+enum AWS_COLORS { AC_HIGHLIGHT, AC_HIGHLIGHT2, AC_SHADOW, AC_SHADOW2, AC_FILL, AC_DARKFILL,
+		  AC_TEXTFORE, AC_TEXTBACK, AC_TEXTDISABLED,
+		  AC_BUTTONTEXT, AC_TRANSPARENT,
                   AC_BLACK, AC_WHITE, AC_RED, AC_GREEN, AC_BLUE,
 		  AC_COLOR_COUNT };
 
@@ -343,9 +343,9 @@ class awsPrefManager : public iAwsPrefManager
   /// count of skin defintions loaded
   unsigned int n_skin_defs;
 
-  /// currently selected skin 
+  /// currently selected skin
   awsSkinNode *def_skin;
-  
+
   /// color index
   int sys_colors[AC_COLOR_COUNT];
 
@@ -388,40 +388,40 @@ public:
 
     /// Maps a name to an id
     virtual unsigned long NameToId(char *name);
-    
+
     /// Select which skin is the default for components, the skin must be loaded.  True on success, false otherwise.
     virtual bool SelectDefaultSkin(char *skin_name);
 
     /// Lookup the value of an int key by name (from the skin def)
-    virtual bool LookupIntKey(char *name, int &val); 
+    virtual bool LookupIntKey(char *name, int &val);
 
     /// Lookup the value of an int key by id (from the skin def)
-    virtual bool LookupIntKey(unsigned long id, int &val); 
+    virtual bool LookupIntKey(unsigned long id, int &val);
 
     /// Lookup the value of a string key by name (from the skin def)
-    virtual bool LookupStringKey(char *name, iString *&val); 
+    virtual bool LookupStringKey(char *name, iString *&val);
 
     /// Lookup the value of a string key by id (from the skin def)
-    virtual bool LookupStringKey(unsigned long id, iString *&val); 
+    virtual bool LookupStringKey(unsigned long id, iString *&val);
 
     /// Lookup the value of a rect key by name (from the skin def)
-    virtual bool LookupRectKey(char *name, csRect &rect); 
+    virtual bool LookupRectKey(char *name, csRect &rect);
 
     /// Lookup the value of a rect key by id (from the skin def)
-    virtual bool LookupRectKey(unsigned long id, csRect &rect); 
-    
+    virtual bool LookupRectKey(unsigned long id, csRect &rect);
+
     /// Lookup the value of an RGB key by name (from the skin def)
     virtual bool LookupRGBKey(char *name, unsigned char &red, unsigned char &green, unsigned char &blue);
-    
+
     /// Lookup the value of an RGB key by name (from the skin def)
     virtual bool LookupRGBKey(unsigned long id, unsigned char &red, unsigned char &green, unsigned char &blue);
 
     /// Lookup the value of a point key by name (from the skin def)
-    virtual bool LookupPointKey(char *name, csPoint &point); 
+    virtual bool LookupPointKey(char *name, csPoint &point);
 
     /// Lookup the value of a point key by id (from the skin def)
-    virtual bool LookupPointKey(unsigned long id, csPoint &point); 
-            
+    virtual bool LookupPointKey(unsigned long id, csPoint &point);
+
     /// Get the value of an integer from a given component node
     virtual bool GetInt(awsComponentNode *node, char *name, int &val);
 
@@ -430,7 +430,7 @@ public:
 
     /// Get the value of an integer from a given component node
     virtual bool GetString(awsComponentNode *node, char *name, iString *&val);
-    
+
     /// Find window definition and return the component node holding it, Null otherwise
     virtual awsComponentNode *FindWindowDef(char *name);
 
@@ -445,8 +445,8 @@ public:
 
 public:
     /// Sets the value of a color in the global AWS palette.
-    virtual void SetColor(int index, int color); 
-    
+    virtual void SetColor(int index, int color);
+
     /// Gets the value of a color from the global AWS palette.
     virtual int  GetColor(int index);
 
@@ -455,7 +455,7 @@ public:
 
     /// Gets a font.  If it's not loaded, it will be.  Returns NULL on error.
     virtual iFont *GetFont(char *filename);
-    
+
     /// Gets a texture from the global AWS cache
     virtual iTextureHandle *GetTexture(char *name, char *filename=NULL);
 
@@ -468,10 +468,10 @@ public:
 
     /** Changes the window manager.  This must be set during setup in awsManager. */
     virtual void SetWindowMgr(iAws *_wmgr);
-        
+
     /** Sets up the AWS palette so that the colors are valid reflections of
-       user preferences.  Although SetColor can be used, it's recommended 
-       that you do not.  Colors should always be a user preference, and 
+       user preferences.  Although SetColor can be used, it's recommended
+       that you do not.  Colors should always be a user preference, and
        should be read from the window and skin definition files (as
        happens automatically normally. */
     virtual void SetupPalette();
@@ -491,8 +491,8 @@ public:
 
     /** Creates a new key factory */
     virtual iAwsKeyFactory *CreateKeyFactory();
-    
+
 };
- 
+
 #endif
 

@@ -83,7 +83,7 @@ public:
   void FinishFrame ();
   bool HandleEvent (iEvent &Event);
   iIsoLight *GetLight () const {return light;}
-  void AddMazeGrid(iIsoWorld *world, float posx, float posy, 
+  void AddMazeGrid(iIsoWorld *world, float posx, float posy,
     iMaterialWrapper *floor, iMaterialWrapper *wall);
 
   void Report (int severity, const char* msg, ...);

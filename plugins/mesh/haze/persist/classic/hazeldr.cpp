@@ -204,7 +204,7 @@ static iHazeHull* ParseHull (char* buf, iHazeFactoryState *fstate, float &s)
   int number;
   float p,q;
 
-  iHazeHullCreation *hullcreate = SCF_QUERY_INTERFACE(fstate, 
+  iHazeHullCreation *hullcreate = SCF_QUERY_INTERFACE(fstate,
     iHazeHullCreation);
 
   while ((cmd = csGetObject (&buf, emits, &name, &params)) > 0)
@@ -218,7 +218,7 @@ static iHazeHull* ParseHull (char* buf, iHazeFactoryState *fstate, float &s)
     {
       case CS_TOKEN_HAZEBOX:
         {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
 	    &b.x, &b.y, &b.z);
 	  iHazeHullBox *ebox = hullcreate->CreateBox(a, b);
 	  result = SCF_QUERY_INTERFACE(ebox, iHazeHull);
@@ -397,7 +397,7 @@ static void WriteHull(iStrVector *str, iHazeHull *hull)
   if(econe)
   {
     econe->GetSettings(nr, a, b, p, q);
-    sprintf(buf, "  HAZEBOX(%d, %g,%g,%g, %g,%g,%g, %g, %g)\n", nr, 
+    sprintf(buf, "  HAZEBOX(%d, %g,%g,%g, %g,%g,%g, %g, %g)\n", nr,
       a.x,a.y,a.z, b.x,b.y,b.z, p, q);
     str->Push(csStrNew(buf));
     econe->DecRef();

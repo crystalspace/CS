@@ -2,7 +2,7 @@
 #include "awskcfct.h"
 
 #define KC(x) ((awsKeyContainer *)x)
-        
+
 awsKeyFactory::awsKeyFactory():base(0), base_in_use(false)
 {
 }
@@ -14,13 +14,13 @@ awsKeyFactory::~awsKeyFactory()
     delete base;
 }
 
-void 
+void
 awsKeyFactory::Initialize(iString *name, iString *component_type)
-{              
+{
   base = new awsComponentNode(name,component_type);
 }
 
-void 
+void
 awsKeyFactory::AddToWindowList(iAwsPrefManager *pm)
 {
   if (pm && base)
@@ -40,16 +40,16 @@ awsKeyFactory::AddFactory(iAwsKeyFactory *factory)
   }
 }
 
-void 
+void
 awsKeyFactory::AddIntKey(iString *name, int v)
 {
   if (base)
   {
     KC(base)->Add(new awsIntKey(name,v));
   }
-} 
+}
 
-void 
+void
 awsKeyFactory::AddStringKey(iString *name, iString *v)
 {
   if (base)
@@ -67,7 +67,7 @@ awsKeyFactory::AddRectKey(iString *name, csRect v)
   }
 }
 
-void 
+void
 awsKeyFactory::AddRGBKey(iString *name, unsigned char r, unsigned char g, unsigned char b)
 {
   if (base)
@@ -76,7 +76,7 @@ awsKeyFactory::AddRGBKey(iString *name, unsigned char r, unsigned char g, unsign
   }
 }
 
-void 
+void
 awsKeyFactory::AddPointKey(iString *name, csPoint v)
 {
   if (base)
@@ -85,7 +85,7 @@ awsKeyFactory::AddPointKey(iString *name, csPoint v)
   }
 }
 
-void 
+void
 awsKeyFactory::AddConnectionKey(iString *name, iAwsSink *s, unsigned long t, unsigned long sig)
 {
   if (base)

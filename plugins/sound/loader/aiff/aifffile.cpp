@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein    
+    Copyright (C) 1998 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -169,7 +169,7 @@ csSoundLoader_AIFF::LoadSound(void* databuf, unsigned long size) const
         data = new char[chunk_size];
         if(data==NULL) goto exit_read;
         char *ptr=(char *)data;
-        
+
         while(i<chunk_size)
         {
           dummy0 = Stream; addStream(1);
@@ -178,7 +178,7 @@ csSoundLoader_AIFF::LoadSound(void* databuf, unsigned long size) const
           *ptr++=dummy0-128;
           i++;
         }
-      }      
+      }
       else if(flag==BIT16)
       {
         int i=0;
@@ -188,7 +188,7 @@ csSoundLoader_AIFF::LoadSound(void* databuf, unsigned long size) const
         data= new char[chunk_size];
         if(data==NULL) goto exit_read;
         unsigned short *ptr=(unsigned short *)data;
-        
+
         int nbs = chunk_size/2;
         while(i<nbs)
         {

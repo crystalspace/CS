@@ -307,7 +307,7 @@ void csSoundRenderSoftware::MixingFunction()
       RemoveSource(src);
       i--;
     }
-  }  
+  }
 
   // update sound handles
   long NumSamples = memorysize / (is16Bits()?2:1) / (isStereo()?2:1);

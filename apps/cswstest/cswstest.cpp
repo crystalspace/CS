@@ -624,7 +624,7 @@ void csWsTest::GridDialog ()
   grid->CreateRegion (rc, gc);
   grid->SetStringAt (5, 4, "HitSquad rulz");
 
-  // make a single cell region thats blue and contains a button component 
+  // make a single cell region thats blue and contains a button component
   rc.Set (2, 8, 3, 9);
   gc = new csGridCell;
   gc->SetColor (CSPAL_GRIDCELL_BACKGROUND, cs_Color_Blue_L);
@@ -652,8 +652,8 @@ void csWsTest::LayoutDialog ()
 
   csGridBagLayout *gb = new csGridBagLayout (window);
 
-  csBorderConstraint *blc[5] = {csBorderLayout::CENTER, 
-				csBorderLayout::EAST, 
+  csBorderConstraint *blc[5] = {csBorderLayout::CENTER,
+				csBorderLayout::EAST,
 				csBorderLayout::NORTH,
 				csBorderLayout::WEST,
 				csBorderLayout::SOUTH};
@@ -684,7 +684,7 @@ void csWsTest::LayoutDialog ()
 
   csBorderLayout *border = new csBorderLayout (gb);
   border->SetRect (0, 0, 50, 50);
-  
+
   // a flow layout in the center of the borderlayout
   border->c = *blc[0];
   csFlowLayout *flow = new csFlowLayout (border);

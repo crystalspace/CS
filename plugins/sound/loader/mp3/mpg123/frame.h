@@ -1,5 +1,5 @@
 /*
- * mpg123 defines 
+ * mpg123 defines
  * used source: musicout.h from mpegaudio package
  */
 
@@ -68,7 +68,7 @@ class csPCMBuffer
 };
 
 
-class csMPGFrame 
+class csMPGFrame
 {
  protected:
   uint32 oldhead, firsthead;
@@ -105,7 +105,7 @@ class csMPGFrame
   double tpf ();
   long compute_buffer_offset ();
   void Resync ();
-  
+
  public:
 
   csMPGFrame (void *datasource, ioCallback *io, int outformat, int flags, long usebuffer=0);

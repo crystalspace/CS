@@ -139,7 +139,7 @@ public:
     {
       scfParent->SetFallSpeed (fspeed);
     }
-    virtual int GetParticleCount () const 
+    virtual int GetParticleCount () const
     { return scfParent->GetParticleCount(); }
     virtual void GetDropSize (float& dropwidth, float& dropheight) const
     { scfParent->GetDropSize(dropwidth, dropheight); }
@@ -178,7 +178,7 @@ public:
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 };
- 
+
 /**
  * Rain type. This is the plugin you have to use to create instances
  * of csRainMeshObjectFactory.

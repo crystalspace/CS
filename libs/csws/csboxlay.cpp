@@ -18,7 +18,7 @@ csBoxLayout::csBoxLayout (csComponent* pParent, int axis)
 void csBoxLayout::SuggestSize (int &sugw, int& sugh)
 {
   int width = 0;
-  int maxHeight = 0; 
+  int maxHeight = 0;
   int x, y;
   int i, cnt = vConstraints.Length ();
 
@@ -26,7 +26,7 @@ void csBoxLayout::SuggestSize (int &sugw, int& sugh)
   {
     x = y = 0;
     vConstraints.Get (i)->comp->SuggestSize (x, y);
-    if (mAxis == X_AXIS) 
+    if (mAxis == X_AXIS)
     {
       width += x;
       if (y > maxHeight) maxHeight = y;
@@ -45,7 +45,7 @@ void csBoxLayout::SuggestSize (int &sugw, int& sugh)
   }
   else
   {
-    sugw = maxHeight + insets.xmin + insets.xmax, 
+    sugw = maxHeight + insets.xmin + insets.xmax,
     sugh = width     + insets.ymin + insets.ymax;
   }
 }
@@ -90,7 +90,7 @@ void csBoxLayout::LayoutContainer ()
       if (parentWidth < prefTotalWidth)
       {
 	w  = (int)((float)parentWidth * ((float)w / (float)prefTotalWidth));
-	if (i+1 == cnt) 
+	if (i+1 == cnt)
 	  w = parentWidth - widthUsed;
       }
 
@@ -102,7 +102,7 @@ void csBoxLayout::LayoutContainer ()
       if (parentHeight < prefTotalWidth)
       {
 	h  = (int)((float)parentHeight * ((float)h / (float)prefTotalWidth));
-	if (i+1 == cnt) 
+	if (i+1 == cnt)
 	  h = parentHeight - widthUsed;
       }
 
@@ -111,9 +111,9 @@ void csBoxLayout::LayoutContainer ()
     }
 
     vConstraints.Get (i)->comp->SetRect (x, y, x+w, y+h);
-    if (mAxis == X_AXIS) 
+    if (mAxis == X_AXIS)
       x += w;
-    else 
+    else
       y += h;
   }
 }

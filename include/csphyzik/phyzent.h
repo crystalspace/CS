@@ -62,7 +62,7 @@ public:
   { return PHYSICALENTITY_STATESIZE; }
 
   /**
-   * Add this body's state to the state vector buffer passed in. 
+   * Add this body's state to the state vector buffer passed in.
    * Increment state buffer to point after added state.  Upload
    */
   virtual int set_state ( real *sa );
@@ -71,12 +71,12 @@ public:
   virtual int get_state( const real *sa );
 
   /// Add change in state vector over time to state buffer parameter.
-  virtual int set_delta_state( real *state_array ); 
+  virtual int set_delta_state( real *state_array );
 
   /// change orientation in radians
   virtual void rotate_around_line( ctVector3 &paxis, real ptheta );
   /// Set position
-  virtual void set_pos ( const ctVector3 &px ) 
+  virtual void set_pos ( const ctVector3 &px )
   { RF.set_offset( px ); }
   /// virtual because v is calculated from P ( momentum ) in rigid bodies
   virtual void set_v ( const ctVector3 &pv );
@@ -120,7 +120,7 @@ public:
 
   /**
    * Can use this to impart and impulse to this object.
-   * Impulse_point is vector from center of body to point of collision in 
+   * Impulse_point is vector from center of body to point of collision in
    * world coordinates.  Impulse_vector is in world coords
    */
   virtual void apply_impulse ( ctVector3 impulse_point, ctVector3 impulse_vector );
@@ -134,12 +134,12 @@ public:
    * Fill out mass and inverse inertia tensor behaviour for an impulse response
    * impulse_point is point of collision in world frame.
    */
-  virtual void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv, 
+  virtual void get_impulse_m_and_I_inv ( real *pm, ctMatrix3 *pI_inv,
        const ctVector3 &impulse_point, const ctVector3 &unit_length_impulse_vector )
-  { 
+  {
     (void)unit_length_impulse_vector;
     (void)impulse_point;
-    *pm = DEFAULT_ENTITY_MASS; 
+    *pm = DEFAULT_ENTITY_MASS;
     pI_inv->identity();
     *pI_inv *= 1.0/DEFAULT_ENTITY_MASS;
   }
@@ -154,7 +154,7 @@ public:
 
   ctVector3 get_v_this_to_world ( ctVector3 &pv )
   { ctVector3 pret = pv;  RF.this_to_world( pret ); return pret; }
-  
+
   ctReferenceFrame *get_RF()             { return &RF; }
   ctDeltaReferenceFrame *get_dRF()       { return &dRF; }
 
@@ -165,9 +165,9 @@ protected:
   /// Change of RF wrt time.  ( angular and linear velocity )
   ctDeltaReferenceFrame &dRF;
   /// Total added Force for a frame
-  ctVector3 F; 
+  ctVector3 F;
   /// Total Torque for a frame
-  ctVector3 T;  
+  ctVector3 T;
 };
 
 class ctSimpleDynamicsSolver;
@@ -193,7 +193,7 @@ public:
 
 protected:
   /// mass
-  real m;    
+  real m;
 };
 
 #endif // __CT_PHYZENT_H__

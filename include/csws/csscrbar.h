@@ -139,35 +139,35 @@ public:
 
   /// Override SetState method to disable scroll buttons as well
   virtual void SetState (int mask, bool enable);
-  
+
   /**
    * Accessors
    */
-   
+
   /// Get frame style
   csScrollBarFrameStyle GetFrameStyle()
   { return FrameStyle; }
-  
+
   /// Get active button
   int GetActiveButton()
   { return active_button; }
-  
+
   /// Returns true if scrollbar is horizontal
   bool GetIsHorizontal()
   { return IsHorizontal; }
-  
+
   /// Get the scroller button
   csButton *GetScroller()
   { return scroller; }
-  
+
   /// Get the top or left arrow button
   csButton *GetTopLeft()
   { return topleft; }
-  
+
   /// Get the bottom or right arrow button
   csButton *GetBotRight()
   { return botright; }
-  
+
   /// Get the name of the skip slice for this component
   virtual char *GetSkinName ()
   { return "ScrollBar"; }

@@ -40,7 +40,7 @@ SCF_EXPORT_CLASS_TABLE (csgifimg)
   SCF_EXPORT_CLASS (csGIFImageIO, "crystalspace.graphic.image.io.gif", "CrystalSpace GIF image format I/O plugin")
 SCF_EXPORT_CLASS_TABLE_END
 
-static iImageIO::FileFormatDescription formatlist[2] = 
+static iImageIO::FileFormatDescription formatlist[2] =
 {
   {"image/gif", "GIF87a", CS_IMAGEIO_LOAD},
   {"image/gif", "GIF89a", CS_IMAGEIO_LOAD}
@@ -67,7 +67,7 @@ iImage *csGIFImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
     delete i;
     return NULL;
   }
-  return i;    
+  return i;
 }
 
 void csGIFImageIO::SetDithering (bool)
@@ -112,16 +112,16 @@ private:
 
 public:
   GIFStream(uint8* b, long fsize, int offs=0) :
-   buf(b), ptr(b+offs), bmark(NULL), size(fsize), remaining(fsize-offs), 
+   buf(b), ptr(b+offs), bmark(NULL), size(fsize), remaining(fsize-offs),
    bitoffs(0), EOFcode( fsize <= offs ) {}
-  
+
   uint8 operator* () const
   { if (EOFcode) return 0;  else return *ptr; }
   uint8 operator[] (int i) const
   { if (i >= remaining) return 0;  else return ptr[i]; }
-  GIFStream& operator++ () 
+  GIFStream& operator++ ()
   { ptr++;  remaining--;  EOFcode = remaining<=0;  return *this; }
-  GIFStream operator++ (int) 
+  GIFStream operator++ (int)
   { GIFStream t = *this;  ++(*this);  return t; }
   GIFStream& operator+= (int i)
   { ptr += i;  remaining -= i;  EOFcode = remaining<=0;  return *this; }
@@ -169,7 +169,7 @@ private:
   uint8 *img;
   int w, h, x, y;
   bool interlaced;
-  int pass;  
+  int pass;
 
 public:
 
@@ -179,7 +179,7 @@ public:
     img = new uint8 [width * height];
   }
 
-  uint8& operator* () const 
+  uint8& operator* () const
   { return *(img + y * w + x); }
 
   GIFOutput& operator++ ()
@@ -218,8 +218,8 @@ private:
 
 public:
   GIFPalette () : pal_size (0), bitmask (0) {}
-  
-  void Load (GIFStream& gptr, int size) 
+
+  void Load (GIFStream& gptr, int size)
   {
     pal_size = (size < 0) ? 0 : (size > 256) ? 256 : size;
     bitmask = pal_size - 1;
@@ -232,7 +232,7 @@ public:
     }
   }
 
-  csRGBcolor operator () (int i) 
+  csRGBcolor operator () (int i)
   { return palette [i & bitmask]; }
 
   int get_size () const { return pal_size; }
@@ -252,7 +252,7 @@ int ImageGifFile::decode_gif (uint8* iBuffer, long iSize, int* Prefix,
   int is_transparent = 0;
   uint8 transp_index = 0;
 
-  if (strncmp( (char*)iBuffer, "GIF87a", 6) && strncmp( (char*)iBuffer, "GIF89a", 6)) 
+  if (strncmp( (char*)iBuffer, "GIF87a", 6) && strncmp( (char*)iBuffer, "GIF89a", 6))
     return GIF_BadFormat;
 
   gptr += 6;
@@ -315,7 +315,7 @@ int ImageGifFile::decode_gif (uint8* iBuffer, long iSize, int* Prefix,
   int width  = gptr.nextword();
   int height = gptr.nextword();
   set_dimensions (width, height);
-  
+
   GIFOutput optr(width, height, (gptr.nextbyte() & INTERLACEMASK));
 
   // Note that I ignore the possible existence of a local color map.
@@ -392,7 +392,7 @@ int ImageGifFile::decode_gif (uint8* iBuffer, long iSize, int* Prefix,
         code = Prefix[code];
       }
 
-      // The last code in the chain is treated as raw data. 
+      // The last code in the chain is treated as raw data.
 
       if (OutCount > 1024)
         return GIF_OutCount;

@@ -125,13 +125,13 @@ class csButton : public csComponent
 protected:
   /// Button images in normal and pressed state
   csPixmap *ImageNormal, *ImagePressed;
-  
+
   /**
    *	Images for button's frame in normal, pressed, and mouseover state
    * also used for textures if mode is csbfsTextured.
    */
   csPixmap *FrameNormal, *FramePressed, *FrameHighlighted;
-  
+
   /// Should images be automatically deleted?
   bool delImages;
   /// Should frame images be automatically deleted?
@@ -150,7 +150,7 @@ protected:
   uint8 ButtonAlpha;
   /// True if button text is only displayed when it has the focus
   bool DrawTextOnHighlightOnly;
-  
+
 public:
   /// Current button state
   bool Pressed;
@@ -169,11 +169,11 @@ public:
  /// Set text draw to highlight only
  void SetDrawTextOnHighlightOnly(bool iTOHO)
  { DrawTextOnHighlightOnly = iTOHO; }
- 
+
  /// Return value of DrawTextOnHighlightOnly
  bool GetDrawTextOnHighlightOnly()
  { return DrawTextOnHighlightOnly; }
- 
+
   /**
    * Set button bitmaps in normal and pressed states<p>
    * If iDelete is true, bitmaps will be automatically deleted when they
@@ -194,17 +194,17 @@ public:
    * are no longer needed (i.e. button disposal or another SetButtonBitmaps)
    */
   void SetButtonTexture (csPixmap *iNormal, csPixmap *iPressed, bool iDelete = true);
-	
+
 
   /// Query button bitmaps
   void GetBitmap (csPixmap **iNormal, csPixmap **iPressed);
-  
+
   /// Query button bitmaps
   void GetFrameBitmaps (csPixmap **iNormal, csPixmap **iPressed, csPixmap **iHighlighted);
 
   /// Delete image bitmaps if iDelete was true on SetBitmap
   void FreeBitmaps ();
-  
+
   /// Delete frame image bitmaps if iDelete was true on SetBitmap
   void FreeFrameBitmaps ();
 
@@ -242,20 +242,20 @@ public:
   /// Get the character number to be underlined (hotkey)
   inline int GetUnderlinePos ()
   { return underline_pos; }
-  
+
   /// Get the alpha-ness of the button
   inline uint8 GetAlpha()
   { return ButtonAlpha; }
-  
+
   /// Set the alpha-ness of the button (only useful with csbfsTextured and csbfsBitmap)
   void SetAlpha(uint8 iAlpha);
-  
+
   /// Set the origin of the texture
   void SetTextureOrigin(int iOrgX, int iOrgy);
-  
+
   /// Get the texture origins
   void GetTextureOrigin(int *iOrgx, int *iOrgy);
- 
+
   /// Get the name of the skip slice for this component
   virtual char *GetSkinName ()
   { return "Button"; }

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -256,9 +256,9 @@ private:
    * Scale param (the larger this param it, the more the curves are
    * tesselated).
    */
-  float curves_scale;  
+  float curves_scale;
 
-  /// Curve vertices. 
+  /// Curve vertices.
   csVector3* curve_vertices;
   /// Texture coords of curve vertices
   csVector2* curve_texels;
@@ -735,7 +735,7 @@ public:
   //----------------------------------------------------------------------
   // Drawing
   //----------------------------------------------------------------------
-  
+
   /**
    * Test if this thing is visible or not.
    */
@@ -760,7 +760,7 @@ public:
   //----------------------------------------------------------------------
   // Lighting
   //----------------------------------------------------------------------
-  
+
   /**
    * Init the lightmaps for all polygons in this thing.
    */
@@ -817,7 +817,7 @@ public:
    *
    * If only_portals == true then only portals are checked.
    */
-  csPolygon3D* IntersectSegment (const csVector3& start, 
+  csPolygon3D* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = NULL, bool only_portals = false);
 
@@ -835,7 +835,7 @@ public:
    * of this thing (if there is any). It also returns the mesh wrapper
    * that was hit. If this is NULL then this mesh was hit.
    */
-  csPolygon3D* IntersectSegmentFull (const csVector3& start, 
+  csPolygon3D* IntersectSegmentFull (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = NULL, csMeshWrapper** p_mesh = NULL);
 
@@ -1046,7 +1046,7 @@ public:
     { return &scfParent->GetFog (); }
   } scfiThingState;
   friend struct ThingState;
- 
+
   //------------------------- iLightingInfo interface -------------------------
   struct LightingInfo : public iLightingInfo
   {
@@ -1122,7 +1122,7 @@ public:
     int num_verts;		// Total number of vertices.
   } scfiPolygonMesh;
   friend struct PolyMesh;
- 
+
   //-------------------- iVisibilityCuller interface implementation ----------
   struct VisCull : public iVisibilityCuller
   {
@@ -1189,7 +1189,7 @@ public:
     {
       scfParent->GetBoundingBox (bbox);
     }
-    virtual void GetRadius ( csVector3& rad, csVector3& cent) 
+    virtual void GetRadius ( csVector3& rad, csVector3& cent)
 	  { scfParent->GetRadius (rad,cent); }
     virtual void NextFrame (csTicks /*current_time*/) { }
     virtual bool WantToDie () const { return false; }

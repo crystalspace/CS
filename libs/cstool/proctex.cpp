@@ -93,7 +93,7 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   tex = engine->GetTextureList ()->NewTexture (proc_image);
   engine->DecRef ();
   proc_image->DecRef ();
-  if (!tex) 
+  if (!tex)
     return false;
 
   if (key_color)

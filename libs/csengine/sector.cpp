@@ -641,7 +641,7 @@ void csSector::Draw (iRenderView* rview)
 
     // look if meshes from the previous sector should be drawn
     bool draw_prev_sector = false;
-  
+
     if (prev_sector) draw_prev_sector =
       prev_sector->HasFog () ||
       rview->GetPortalPolygon ()->IsTransparent () ||
@@ -674,7 +674,7 @@ void csSector::Draw (iRenderView* rview)
           }
         }
       }
-    } 
+    }
   }
 
   // queue all halos in this sector to be drawn.
@@ -884,7 +884,7 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
         ithing->DecRef ();
       }
     }
-      
+
     delete [] visible_objects;
   }
 

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Norman Krämer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -50,10 +50,10 @@ class csAVIFormat : public iStreamFormat
   // @@@TODO: handle optional chunklists in AVI files
   class ChunkList
   {
-    enum { 
+    enum {
       LIST     = 0x00000001, // the chunk is a list
       KEYFRAME = 0x00000010, // frame is a keyframe
-      NOTIME   = 0x00000100, // dont use this frame for time calculations - it takes no time 
+      NOTIME   = 0x00000100, // dont use this frame for time calculations - it takes no time
                              // (palette change for example)
       COMPUSE  = 0x0fff0000  // masks the bits used for compression
     };
@@ -67,9 +67,9 @@ class csAVIFormat : public iStreamFormat
       void Endian ()
       {
 		id = little_endian_long (id);
-		flags = little_endian_long (flags); 
-		offset = little_endian_long (offset); 
-		length = little_endian_long (length); 
+		flags = little_endian_long (flags);
+		offset = little_endian_long (offset);
+		length = little_endian_long (length);
       }
     };
 
@@ -89,12 +89,12 @@ class csAVIFormat : public iStreamFormat
       StreamList () : csVector (8, 8){}
       virtual ~StreamList () {}
       virtual int Compare (csSome Item1, csSome Item2, int) const
-      { 
+      {
 	StreamIdx *i1 = (StreamIdx*)Item1, *i2 = (StreamIdx*)Item2;
         return (i1->id < i2->id ? -1 : i1->id > i2->id ? 1 : 0);
       }
       virtual int CompareKey (csSome Item1, csConstSome Item2, int) const
-      { 
+      {
 	StreamIdx *i1 = (StreamIdx*)Item1;
 	uint32 id = (uint32)Item2;
         return (i1->id < id ? -1 : i1->id > id ? 1 : 0);
@@ -125,7 +125,7 @@ class csAVIFormat : public iStreamFormat
     uint32 length; // in byte
   };
 
-  // this is used to read in the id and length of an AVI fileheader, 
+  // this is used to read in the id and length of an AVI fileheader,
   // list or chunk
   struct hcl
   {
@@ -160,7 +160,7 @@ class csAVIFormat : public iStreamFormat
 
   struct AVIHeader
   {
-    enum { 
+    enum {
       HASINDEX       = 0x00000010,
       MUSTUSEINDEX   = 0x00000020,
       ISINTERLEAVED  = 0x00000100,
@@ -180,8 +180,8 @@ class csAVIFormat : public iStreamFormat
     uint32 height;
     uint32 reserved[4];
     void Endian ()
-    { 
-      msecperframe = little_endian_long (msecperframe); 
+    {
+      msecperframe = little_endian_long (msecperframe);
       maxbytespersec = little_endian_long (maxbytespersec);
       padsize = little_endian_long (padsize);
       flags = little_endian_long (flags);

@@ -9,7 +9,7 @@
 	;;		wr .. write/read clash
 	;;		x  .. special rule which does not permit pairing
 __TEXT_SECT__
-	
+
 	proc yuv2rgba_mmx
 	arg %$ybuffer		; luminance values
 	arg %$ubuffer		; chrominace Cb
@@ -18,20 +18,20 @@ __TEXT_SECT__
 	arg %$width		; width of the source picture
 	arg %$height		; height of the source picture
 
-	push ebp		;				
-	mov eax, %$outbuffer	; hold even lines in outbuffer	
- 	mov edx, %$ybuffer	;				
-	mov edi, %$ubuffer	;				
-	mov esi, %$vbuffer	;				
-	mov ebp, %$width	;				
+	push ebp		;
+	mov eax, %$outbuffer	; hold even lines in outbuffer
+ 	mov edx, %$ybuffer	;
+	mov edi, %$ubuffer	;
+	mov esi, %$vbuffer	;
+	mov ebp, %$width	;
 
-	sub edi,4		;				
-	sub esi,4		;				
-	sub edx,8		;				
-	sub eax,32		;				
-newline:		
-	mov ecx, ebp		;				
-	shr ecx, 3		; we write 8 pixel at once	
+	sub edi,4		;
+	sub esi,4		;
+	sub edx,8		;
+	sub eax,32		;
+newline:
+	mov ecx, ebp		;
+	shr ecx, 3		; we write 8 pixel at once
 
 lineloop:
 	add edi,4		;					0
@@ -46,7 +46,7 @@ lineloop:
 	psubw mm3, [UV_SUB]	; v -= 128				4
 	psllw mm2, 3		; u *= 8				4
 
-	add edx,8		;					
+	add edx,8		;
 	;; prepare y
 	movq mm1, [CLR_EVN]	;					5
 	movq mm4, mm2		;					5
@@ -118,7 +118,7 @@ lineloop:
 
 	;; now process the odd line in the output buffer
 	;; we still have the u,v value in mm2 and mm3 for this
-	
+
 	;; prepare y
 	movq mm0, [edx+ebp]	; first 8 y values
 	psubusb mm0, [Y_SUB]	; y -= 16
@@ -155,10 +155,10 @@ lineloop:
 	movq mm5, mm3
 	pmulhw mm4, [U2_FACT]
 	pmulhw mm5, [V2_FACT]
-	paddsw mm1, mm4		; 
+	paddsw mm1, mm4		;
 	paddsw mm1, mm5		;
 	packuswb mm1, mm1
-	paddsw mm0, mm4		; 
+	paddsw mm0, mm4		;
 	paddsw mm0, mm5		;
 	packuswb mm0, mm0
 	punpcklbw mm1, mm0	; mm1 = g7g6g5g4g3g2g1g0
@@ -181,9 +181,9 @@ lineloop:
 	punpcklwd mm6, mm0	; mm6 = ..b5g5r5..b4g4r4
 	punpckhwd mm7, mm0	; mm7 = ..b7g7r7..b6g6r6
 
-	movq [eax+4*ebp], mm4	
+	movq [eax+4*ebp], mm4
 	movq [eax+4*ebp+8], mm1
-	movq [eax+4*ebp+16], mm6	
+	movq [eax+4*ebp+16], mm6
 	movq [eax+4*ebp+24], mm7
 
 	dec ecx
@@ -194,12 +194,12 @@ lineloop:
 	DEC DWORD %$height
 	jnz NEAR newline
 	emms
-         				
-	pop ebp				
+
+	pop ebp
 	endproc yuv2rgba_mmx
 
 __DATA_SECT__
-	
+
 Y_FACT	DW 0x253f, 0x253f, 0x253f, 0x253f
 V1_FACT DW 0x3312, 0x3312, 0x3312, 0x3312
 U1_FACT DW 0x4093, 0x4093, 0x4093, 0x4093
@@ -207,4 +207,4 @@ U2_FACT DW 0xe5fc, 0xe5fc, 0xe5fc, 0xe5fc
 V2_FACT DW 0xf37d, 0xf37d, 0xf37d, 0xf37d
 Y_SUB   DW 0x1010, 0x1010, 0x1010, 0x1010
 UV_SUB  DW 0x0080, 0x0080, 0x0080, 0x0080
-CLR_EVN DW 0x00ff, 0x00ff, 0x00ff, 0x00ff		
+CLR_EVN DW 0x00ff, 0x00ff, 0x00ff, 0x00ff

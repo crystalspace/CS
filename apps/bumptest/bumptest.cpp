@@ -218,7 +218,7 @@ bool BumpTest::InitProcDemo ()
   p->CreateVertex (csVector3 (-dx, -dy, -dz) + csVector3(2.5,1,0));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
   //  */
-  
+
   iMeshWrapper* thing_wrap = engine->CreateMeshWrapper ("Bumpy");
 
   thing_wrap->SetMeshObject (thing_obj);
@@ -234,7 +234,7 @@ bool BumpTest::InitProcDemo ()
   linfo->DecRef ();
   thing_obj->DecRef ();
   thing_wrap->DecRef ();
-  
+
   imatBump->DecRef ();
 
 
@@ -263,7 +263,7 @@ bool BumpTest::InitProcDemo ()
   iMeshWrapper* sprite = engine->CreateMeshWrapper(sprfact, "bumpspr",
     room, csVector3(0, 5, 1) );
   sprite->GetMovable ()->UpdateMove ();
-  iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (), 
+  iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
     iSprite3DState);
 
   spstate->SetLighting(false);
@@ -375,7 +375,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
 
   // Initialize the texture manager
   txtmgr->ResetPalette ();
-  
+
   // Allocate a uniformly distributed in R,G,B space palette for console
   // The console will crash on some platforms if this isn't initialize properly
   int r,g,b;
@@ -512,14 +512,14 @@ void BumpTest::SetupFrame ()
   if (kbd->GetKeyState (CSKEY_DOWN))
     view->GetCamera ()->Move (CS_VEC_BACKWARD * 4.0f * speed);
 
-  
+
   // Move the -dynamic light around.
   if(going_right)
   {
     animli += speed * 2.5;
     if(animli > 7.0) going_right = false;
   }
-  else 
+  else
   {
     animli -= speed * 2.5;
     if(animli < 0.0) going_right = true;
@@ -527,7 +527,7 @@ void BumpTest::SetupFrame ()
   dynlight->QueryLight ()->SetSector (room);
   dynlight->QueryLight ()->SetCenter (csVector3(-3 + animli, 5, -2));
   dynlight->Setup ();
-  
+
 
   csVector3 center(0,5,-1);
   csVector3 normal(0,0,-1);

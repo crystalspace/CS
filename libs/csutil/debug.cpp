@@ -688,7 +688,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
           local_els[num++] = lel->parents[i].link;
 	  lel->parents[i].link->marker = true;
         }
-      }	
+      }
       for (i = 0 ; i < lel->num_children ; i++)
         if (!lel->children[i].link->marker)
         {

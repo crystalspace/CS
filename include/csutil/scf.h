@@ -458,7 +458,7 @@ void *Create_##Class (iBase *iParent)					\
 }
 
 /**
- * The SCF_DECLARE_FACTORY macro is used to provide a forward definition 
+ * The SCF_DECLARE_FACTORY macro is used to provide a forward definition
  * if SCF_IMPLEMENT_FACTORY is declared in another file.
  */
 #define SCF_DECLARE_FACTORY(Class)  void *Create_##Class (iBase *iParent);
@@ -761,7 +761,7 @@ struct iSCF : public iBase
    * thus it is called from time to time if you constantly create new objects.
    */
   virtual void UnloadUnusedModules () = 0;
-  
+
   /**
    * Register a single dynamic class (implemented in a shared library).  This
    * function tells SCF kernel that a specific class is implemented within a

@@ -192,7 +192,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   do_tweening = true;
   lighting_quality = DEFAULT_LIGHTING;
   lighting_quality_config = CS_SPR_LIGHT_GLOBAL;
-  
+
   lod_level = DEFAULT_LOD;
   lod_level_config = CS_SPR_LOD_GLOBAL;
   MixMode = CS_FX_COPY;
@@ -245,7 +245,7 @@ iMeshObject* csSprite3DMeshObjectFactory::NewInstance ()
   spr = new csSprite3DMeshObject ();
   spr->SetFactory (this);
   spr->EnableTweening (do_tweening);
-  
+
   // Set the quality config of the sprite to that of the template.
   spr->SetLightingQualityConfig (GetLightingQualityConfig());
   spr->SetAction ("default");
@@ -676,9 +676,9 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   fog_verts.IncRef ();
   obj_verts.IncRef ();
   tween_verts.IncRef ();
-  
+
   rand_num = new csRandomGen();
-  
+
   do_tweening = true;
   vis_cb = NULL;
 
@@ -800,7 +800,7 @@ int csSprite3DMeshObject::GetVertexToLightCount ()
   else
     return factory->GetVertexCount ();
 }
-  
+
 void csSprite3DMeshObject::GenerateSpriteLOD (int num_vts)
 {
   int* emerge_from = factory->GetEmergeFrom ();
@@ -966,7 +966,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     	"Error! Trying to draw a sprite with no material!");
     return false;
   }
- 
+
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
 
@@ -1012,9 +1012,9 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   	clip_z_plane) == false)
     return false;
 #endif
- 
+
   UpdateWorkTables (factory->GetVertexCount());
-  
+
   csSpriteFrame * cframe = cur_action->GetCsFrame (cur_frame);
 
   // Get next frame for animation tweening.
@@ -1116,7 +1116,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // Do vertex morphing if needed.
   //
   // @@@ Don't understand this piece of code.
-  //   Why is it checking if the level == 0, and negative?  neg is supposed 
+  //   Why is it checking if the level == 0, and negative?  neg is supposed
   //    to be off.  zero is a valid on number...???
   if (level_of_detail <= 0 || level_of_detail >= 1)
   {
@@ -1265,7 +1265,7 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time, bool onestep, boo
 
   // If the sprite has only one frame we disable tweening here.
   if (cur_action->GetFrameCount () <= 1) do_tweening = false;
-  
+
   if(onestep)
   {
     if(current_time>last_time+cur_action->GetFrameDelay (cur_frame))
@@ -1298,7 +1298,7 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time, bool onestep, boo
           }
           cur_frame = 0;
           ret = true;
-        }        
+        }
       }
       else break;
     }
@@ -1359,10 +1359,10 @@ void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
     for (i = 0 ; i < num_texels; i++)
       vertex_colors [i] = base_color;
   }
-  
+
 // @@@
 // NOTE: lighting fast does not need to reset the vertex colors, it does this.
-// 
+//
 //  else
 //    ResetVertexColors();
 
@@ -1398,7 +1398,7 @@ void csSprite3DMeshObject::UpdateLightingRandom ()
     r = rand_num->Get()*2;
     g = rand_num->Get()*2;
     b = rand_num->Get()*2;
-    
+
     vertex_colors[i].Set(r,g,b);
   }
 }
@@ -1410,13 +1410,13 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
 	iMovable* movable)
 {
   int light_num, j;
-  
+
   float cosinus;
   //int num_texels = factory->GetVertexCount();
   int num_texels = GetVertexToLightCount();
-  
+
   float light_bright_wor_dist;
-  
+
   // convert frame number in current action to absolute frame number
   int tf_idx = cur_action->GetCsFrame (cur_frame)->GetAnmIndex();
 
@@ -1426,7 +1426,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
   csReversibleTransform movtrans = movable->GetFullTransform ();
   csVector3 wor_center = movtrans.This2Other (obj_center);
   csColor color;
-  
+
   csColor light_color;
   float sq_light_radius;
   float cosinus_light;
@@ -1437,7 +1437,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
 #if 0
   // ambient colors.
   int r, g, b;
-  
+
   //@@@GetAmbientColor (r, g, b);
   r = g = b = 0;
   //@@@@@
@@ -1465,7 +1465,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
     light_bright_wor_dist = lights[light_num]->GetBrightnessAtDistance (wor_dist);
 
     color = light_color;
-  
+
     // This part of code will hardly ever be called.
     if (obj_sq_dist < SMALL_EPSILON)
     {
@@ -1685,7 +1685,7 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
 	const csVector3& end, csVector3& isect, float* pr)
 {
   // This routine is slow, but it is intended to be accurate.
-  
+
   csSegment3 seg (start, end);
   csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
   csVector3* verts = GetObjectVerts (cframe), tsect;

@@ -226,7 +226,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
 
   // Initialize the texture manager
   txtmgr->ResetPalette ();
-  
+
   // Allocate a uniformly distributed in R,G,B space palette for console
   // The console will crash on some platforms if this isn't initialize properly
   int r,g,b;
@@ -269,17 +269,17 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
     "skydome", room, meshposition);
   //skydome->SetRenderPriority(); for skyboxes...
   skydome->SetZBufMode(CS_ZBUF_FILL);
-  skydome->GetFlags().Set(CS_ENTITY_CAMERA | CS_ENTITY_NOSHADOWS | 
+  skydome->GetFlags().Set(CS_ENTITY_CAMERA | CS_ENTITY_NOSHADOWS |
     CS_ENTITY_NOLIGHTING);
 
   csVector3 meshradius(100.,100.,100.);
-  iBallState *ballstate = SCF_QUERY_INTERFACE( skydome->GetMeshObject(), 
+  iBallState *ballstate = SCF_QUERY_INTERFACE( skydome->GetMeshObject(),
     iBallState);
   ballstate->SetRadius( meshradius.x, meshradius.y, meshradius.z );
   ballstate->SetShift( 0,0,0 );
   //ballstate->SetRimVertices( 12 );
   ballstate->SetRimVertices( 24 );
-  ballstate->SetMaterialWrapper( wh ); 
+  ballstate->SetMaterialWrapper( wh );
   ballstate->SetMixMode( CS_FX_COPY );
   ballstate->SetReversed(true);
   ballstate->SetTopOnly(false);
@@ -308,7 +308,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
     testgrad2);
 
   ballstate->ApplyLightSpot( csVector3(20,30,100), 1.0, NULL);
-  
+
   float sunset0[] = {0.0, 0.9,0.9,-0.9};
   float sunset1[] = {0.5, 0.1,-0.6,-0.8};
   float sunset2[] = {1.0, 1,-0.9,1};
@@ -351,7 +351,7 @@ void DemoSky::SetupFrame ()
   float secsperday = 30.;
   skytime += (elapsed_time / ( 1000. * secsperday ));
   while(skytime > 1.0) skytime -= 1.0;
-  iBallState *ballstate = SCF_QUERY_INTERFACE( skydome->GetMeshObject(), 
+  iBallState *ballstate = SCF_QUERY_INTERFACE( skydome->GetMeshObject(),
     iBallState);
   ballstate->PaintSky(skytime, NULL, NULL, NULL, NULL);
   ballstate->DecRef();
@@ -386,9 +386,9 @@ void DemoSky::SetupFrame ()
   sprintf(buf, "%2dhr. %s", int(hour)%24, text);
   int txtx = 10;
   int txty = myG2D->GetHeight() - 20;
-  myG2D->Write(font, txtx+1, txty+1, 
+  myG2D->Write(font, txtx+1, txty+1,
     myG3D->GetTextureManager()->FindRGB(0,0,0), -1, buf);
-  myG2D->Write(font, txtx, txty, 
+  myG2D->Write(font, txtx, txty,
     myG3D->GetTextureManager()->FindRGB(192,192,192), -1, buf);
 }
 

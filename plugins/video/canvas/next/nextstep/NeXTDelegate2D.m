@@ -212,11 +212,11 @@ N2D_PROTO(int,best_bits_per_sample)(NeXTDelegateHandle2D handle)
     backing:NX_RETAINED
     buttonMask:NX_CLOSEBUTTONMASK
     defer:YES];
-  
+
   view = [[NeXTView alloc] initFrame:&r];
   [view setFrameBuffer:frameBuffer bitsPerSample:bitsPerSample];
   [[window setContentView:view] free];
-  
+
   [self configureTitles:title];
   [self adjustTitle];
   [window setFreeWhenClosed:NO];
@@ -227,7 +227,7 @@ N2D_PROTO(int,best_bits_per_sample)(NeXTDelegateHandle2D handle)
   [window setDelegate:self];
   [window makeFirstResponder:view];
   [window makeKeyAndOrderFront:0];
-  
+
   [self startTrackingMouse];	// *NOTE*
   return YES;
 }
@@ -305,7 +305,7 @@ N2D_PROTO(void,flush)(NeXTDelegateHandle2D handle)
     [NXArrow set];
     hideMouse = NO;
   }
-  
+
   if (hideMouse)
     NeXTDriver2D_hide_mouse_pointer(driver);
   else

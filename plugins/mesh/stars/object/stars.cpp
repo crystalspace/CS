@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -106,7 +106,7 @@ float csStarsMeshObject::GetRandom(float max)
   return max * (rand()/(RAND_MAX+1.0));
 }
 
-void csStarsMeshObject::DrawPoint(iRenderView *rview, 
+void csStarsMeshObject::DrawPoint(iRenderView *rview,
   const csVector3& pos, const csColor& col, csZBufMode zbufmode)
 {
   iGraphics2D *g2d = rview->GetGraphics2D();
@@ -114,7 +114,7 @@ void csStarsMeshObject::DrawPoint(iRenderView *rview,
   int x = QInt(pos.x);
   int y = QInt(pos.y);
   // clip to screen and to clipper
-  if(x < 0.0 || y < 0.0 || x >= g2d->GetWidth() || y >= g2d->GetHeight()) 
+  if(x < 0.0 || y < 0.0 || x >= g2d->GetWidth() || y >= g2d->GetHeight())
     return;
   if(!rview->GetClipper()->IsInside(csVector2(pos.x, pos.y)))
     return;
@@ -127,13 +127,13 @@ void csStarsMeshObject::DrawPoint(iRenderView *rview,
   }
 
   // draw
-  int colidx = g3d->GetTextureManager()->FindRGB(QInt(col.red * 255), 
+  int colidx = g3d->GetTextureManager()->FindRGB(QInt(col.red * 255),
     QInt(col.green*255), QInt(col.blue*255));
   g2d->DrawPixel(x, y, colidx);
-  
+
 }
 
-void csStarsMeshObject::DrawStarBox (iRenderView* rview, 
+void csStarsMeshObject::DrawStarBox (iRenderView* rview,
   const csReversibleTransform &tr_o2c, csZBufMode zbufmode,
   csBox3& starbox, const csVector3& origin)
 {
@@ -145,7 +145,7 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
   float sqmaxdist = max_dist * max_dist;
 
   /// primitive box clipping
-  if(!starbox.In(origin) 
+  if(!starbox.In(origin)
     && (starbox.GetCorner(0)-origin).SquaredNorm() > sqmaxdist
     && (starbox.GetCorner(1)-origin).SquaredNorm() > sqmaxdist
     && (starbox.GetCorner(2)-origin).SquaredNorm() > sqmaxdist
@@ -154,10 +154,10 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
     && (starbox.GetCorner(5)-origin).SquaredNorm() > sqmaxdist
     && (starbox.GetCorner(6)-origin).SquaredNorm() > sqmaxdist
     && (starbox.GetCorner(7)-origin).SquaredNorm() > sqmaxdist
-    ) 
+    )
     return;
 
-  unsigned int starseed = seed ^ QInt(starbox.Min().x) ^ QInt(starbox.Min().y) 
+  unsigned int starseed = seed ^ QInt(starbox.Min().x) ^ QInt(starbox.Min().y)
     ^ QInt(starbox.Min().z);
   srand(starseed);
 
@@ -165,7 +165,7 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
   int number = 100; // number of stars is volume * density
   //printf("boxsize.x %g %g %g\n", boxsize.x, boxsize.y, boxsize.z);
   number = QInt(
-    boxsize.x * boxsize.y * boxsize.z * density 
+    boxsize.x * boxsize.y * boxsize.z * density
     * ( GetRandom(0.4) + 0.8 ) /// * 0.8 ... * 1.2, so +- 20%
     );
   //printf("number is %d\n", number);
@@ -186,7 +186,7 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
   for (i = 0 ; i < number ; i++)
   {
     pos = starbox.Min();
-    pos += csVector3( GetRandom(boxsize.x), GetRandom(boxsize.y), 
+    pos += csVector3( GetRandom(boxsize.x), GetRandom(boxsize.y),
       GetRandom(boxsize.z));
     Perspective(tr_o2c*pos, screenpos, fov, shiftx, shifty);
     float sqdist = (pos-origin).SquaredNorm();
@@ -234,7 +234,7 @@ bool csStarsMeshObject::Draw (iRenderView* rview, iMovable* movable,
   int nr_x = QInt(gridsize * max_dist / boxsize.x)+1;
   int nr_y = QInt(gridsize * max_dist / boxsize.y)+1;
   int nr_z = QInt(gridsize * max_dist / boxsize.z)+1;
-  csVector3 starboxsize( boxsize.x / gridsize, boxsize.y / gridsize, 
+  csVector3 starboxsize( boxsize.x / gridsize, boxsize.y / gridsize,
     boxsize.z / gridsize );
   csVector3 starmin = box.Min();
   starmin.x += QInt((origin.x-box.Min().x)/starboxsize.x)*starboxsize.x;
@@ -251,7 +251,7 @@ bool csStarsMeshObject::Draw (iRenderView* rview, iMovable* movable,
       passbox.Set(starbox.Min()+offset, starbox.Max()+offset);
       DrawStarBox (rview, tr_o2c, zbufmode, passbox, origin);
     }
-  
+
   /// before exiting, set the seed to be pretty random again
   static unsigned int funkyrand = 0;
   if(funkyrand==0) funkyrand = (unsigned int) time(0);

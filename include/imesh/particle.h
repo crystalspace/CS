@@ -51,7 +51,7 @@ struct iParticle : public iBase
   virtual void SetColor (const csColor& col) = 0;
   /// Add color to the color of the sprite.
   virtual void AddColor (const csColor& col) = 0;
-  /// Scale particle by this factor. 
+  /// Scale particle by this factor.
   virtual void ScaleBy (float factor) = 0;
   /// Set the MixMode for the particle.
   virtual void SetMixMode (uint mode) = 0;

@@ -52,7 +52,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csModelConverterOBJ);
     virtual bool Initialize (iObjectRegistry *object_reg)
-    { 
+    {
       return scfParent->Initialize (object_reg);
     }
   } scfiComponent;
@@ -70,7 +70,7 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_FACTORY (csModelConverterOBJ)
 
 SCF_EXPORT_CLASS_TABLE (objie)
-  SCF_EXPORT_CLASS (csModelConverterOBJ, 
+  SCF_EXPORT_CLASS (csModelConverterOBJ,
     "crystalspace.modelconverter.obj",
     "OBJ Model Converter")
 SCF_EXPORT_CLASS_TABLE_END
@@ -214,7 +214,7 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
     else if (!strcasecmp (token, "END")) {
       continue;
     }
-/*  
+/*
   F V1 V2 V3
     or
   F V1/VT1/VN1 V2/VT2/VN2 ...
@@ -236,7 +236,7 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
     else if (!strcasecmp (token, "F")) {
       iModelDataPolygon *poly = new csModelDataPolygon ();
       csDataStream Params (params, strlen (params), false);
-      
+
       while (!Params.Finished ()) {
 	char sep;
         int vidx = Params.ReadTextInt (), nidx = 0, tidx = 0;
@@ -256,7 +256,7 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
             nidx = Params.ReadTextInt ();
 	  }
 	}
-	
+
 	// look for EOF or errors
 	if (sep == EOF) {
 	  break;
@@ -281,8 +281,8 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
       poly->DecRef ();
     }
 
-/*  
-  G  
+/*
+  G
   Group name.
 */
 
@@ -296,8 +296,8 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
     else if (!strcasecmp (token, "HOLE")) {
       continue;
     }
-/*  
-  L  
+/*
+  L
   I believe OBJ line node indices are 1 based rather than 0 based.
   So we have to decrement them before loading them into LINE_DEX.
 
@@ -320,10 +320,10 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
         if ( num_line < MAX_LINE  ) {
           line_dex[num_line] = node-1;
           line_mat[num_line] = 0;
-        } 
+        }
         num_line = num_line + 1;
 
-      } 
+      }
 
       if ( num_line < MAX_LINE ) {
         line_dex[num_line] = -1;
@@ -377,7 +377,7 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
       continue;
     }
 /*
-  S  
+  S
   Smoothing group
 */
     else if (!strcasecmp (token, "S")) {
@@ -440,7 +440,7 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
       continue;
     }
 /*
-  USEMTL  
+  USEMTL
   Material name.
 */
     else if (!strcasecmp (token, "USEMTL")) {

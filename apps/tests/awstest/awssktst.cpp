@@ -9,7 +9,7 @@ static char *names[10] = { "Yellow", "Green", "Blue", "Orange", "Purple", "Red",
 static int   namec = 0;
 
 awsTestSink::awsTestSink():wmgr(NULL), sink(NULL), user(NULL), pass(NULL), test(NULL)
-{  
+{
 }
 
 awsTestSink::~awsTestSink()
@@ -37,19 +37,19 @@ awsTestSink::SetSink(iAwsSink *s)
 }
 
 
-void 
+void
 awsTestSink::SetTestWin(iAwsWindow *testwin)
 {
   test=testwin;
 }
 
-void 
+void
 awsTestSink::SetWindowManager(iAws *_wmgr)
 {
   wmgr=_wmgr;
 }
 
-void 
+void
 awsTestSink::FillListBox(void *sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
@@ -261,7 +261,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
   pl->DecRef();
 }
 
-void 
+void
 awsTestSink::RedClicked(void *sink,   iAwsSource *source)
 {
   printf("awstest: red button clicked, source: %p, owner: %p, component: %p\n", source, sink, source->GetComponent());
@@ -273,40 +273,40 @@ awsTestSink::RedClicked(void *sink,   iAwsSource *source)
   comp->SetProperty("Caption", new scfString(names[namec]));
 }
 
-void 
+void
 awsTestSink::BlueClicked(void *sink,  iAwsSource *source)
 {
   printf("awstest: blue button clicked, source: %p, owner: %p\n", source, sink);
 }
 
 
-void 
+void
 awsTestSink::GreenClicked(void *sink, iAwsSource *source)
 {
   printf("awstest: green button clicked, source: %p, owner: %p\n", source, sink);
 }
 
-void 
+void
 awsTestSink::SetPass(void *sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   if (sink->pass) sink->pass->DecRef();
 
   iAwsComponent *comp = source->GetComponent();
-  comp->GetProperty("Text", (void**)&sink->pass); 
+  comp->GetProperty("Text", (void**)&sink->pass);
 }
 
-void 
+void
 awsTestSink::SetUser(void *sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   if (sink->user) sink->user->DecRef();
 
   iAwsComponent *comp = source->GetComponent();
-  comp->GetProperty("Text", (void**)&sink->user); 
+  comp->GetProperty("Text", (void**)&sink->user);
 }
 
-void 
+void
 awsTestSink::Login(void *sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;

@@ -128,7 +128,7 @@ struct iImage : public iBase
 
   /// check if image has a keycolour stored with it
   virtual bool HasKeycolor () = 0;
-  
+
   /// get the keycolour stored with the image.
   virtual void GetKeycolor (int &r, int &g, int &b) = 0;
 };

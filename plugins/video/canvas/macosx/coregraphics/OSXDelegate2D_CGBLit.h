@@ -1,6 +1,6 @@
 //
 //  OSXDelegate2D_OpenGL.h
-//  
+//
 //
 //  Created by mreda on Wed Oct 31 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.

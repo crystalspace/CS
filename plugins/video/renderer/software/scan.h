@@ -252,7 +252,7 @@ void csScan_Initialize ();
 /// Free all tables
 void csScan_Finalize ();
 /// Calculate blending tables (should be called each time pixel format changes)
-void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits, 
+void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits,
   int gbits, int bbits);
 /// Initialize the scanline variables
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,

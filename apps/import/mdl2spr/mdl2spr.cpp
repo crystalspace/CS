@@ -107,7 +107,7 @@ static float get_float(int& n, int argc, const char* const* argv)
   }
   return f;
 }
-int main(int argc,char *argv[]) 
+int main(int argc,char *argv[])
 {
   printf("mdl2spr version 0.40\n"
     "A quake model (MDL/MD2) convertor for Crystal Space.\n"
@@ -201,7 +201,7 @@ int main(int argc,char *argv[])
     delete mdl;
     exit(-1);
   }
-  
+
   mdl->dumpstats(stdout);
   putchar('\n');
   mdl->WriteSPR(argv[argc - 1], scaleMdl, delayMdl, positionMdlX,

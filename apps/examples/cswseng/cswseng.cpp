@@ -378,7 +378,7 @@ bool ceCswsEngineApp::Initialize ()
     	"crystalspace.application.cswseng", "No iLoader plugin!");
     exit (-1);
   }
-  
+
   pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   // Disable double buffering since it kills performance
   pG3D->GetDriver2D ()->DoubleBuffer (false);
@@ -387,7 +387,7 @@ bool ceCswsEngineApp::Initialize ()
 
   // Initialize the texture manager
   txtmgr->ResetPalette ();
-  
+
   // Allocate a uniformly distributed in R,G,B space palette for console
   // The console will crash on some platforms if this isn't initialize properly
   int r,g,b;
@@ -621,6 +621,6 @@ int main (int argc, char* argv[])
 
   delete theApp;
   csInitializer::DestroyApplication (object_reg);
-  
+
   return 0;
 }

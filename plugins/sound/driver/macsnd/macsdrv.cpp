@@ -99,22 +99,22 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16,
   bool stereo)
 {
   Report (CS_REPORTER_SEVERITY_NOTIFY, "SoundDriver Mac selected");
-  
+
   m_piSoundRender = render;
   OSErr	theError;
   short	outputChannels;
-  
+
   m_bStereo = stereo;
   m_b16Bits = bit16;
   m_nFrequency = frequency;
   MemorySize = kDoubleBufferSize;
-  
-  if (stereo) 
+
+  if (stereo)
     {
       outputChannels = initStereo;
       mSoundDBHeader.dbhNumChannels = 2;
-    } 
-  else 
+    }
+  else
     {
       outputChannels = initMono;
       mSoundDBHeader.dbhNumChannels = 1;
@@ -125,22 +125,22 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16,
     Report (CS_REPORTER_SEVERITY_ERROR, "Unable to open a sound channel.");
     return false;
   }
-  
+
   /*
    *	Fill in the double buffer header
    */
-  
+
   if (bit16) {
     mSoundDBHeader.dbhSampleSize = 16;
   } else {
     mSoundDBHeader.dbhSampleSize = 8;
   }
-  
+
   mSoundDBHeader.dbhCompressionID = 0;
   mSoundDBHeader.dbhPacketSize = 0;
   mSoundDBHeader.dbhSampleRate = frequency << 16;
   mSoundDBHeader.dbhDoubleBack = NewSndDoubleBackProc(SoundDoubleBackProc);
-  
+
   /*
    *	Calculate the number of frames per buffer.
    *	1 frame is = to 2 samples if stereo or 1 sample if mono.
@@ -150,7 +150,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16,
     mFramesPerBuffer /= 2L;
   if (m_b16Bits)
     mFramesPerBuffer /= 2L;
-  
+
   /*
    *	Get the space for the first buffer.
    */
@@ -169,12 +169,12 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16,
   mSoundDBHeader.dbhBufferPtr[0]->dbNumFrames = 0L;
   mSoundDBHeader.dbhBufferPtr[0]->dbFlags = 0;
   mSoundDBHeader.dbhBufferPtr[0]->dbUserInfo[0] = (long)this;
-  
+
   /*
    *	Fill in this buffer with sounds.
    */
   SndDoubleBackProc(mSoundChannel, mSoundDBHeader.dbhBufferPtr[0]);
-  
+
   /*
    *	Get the space for the second buffer.
    */
@@ -195,12 +195,12 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16,
   mSoundDBHeader.dbhBufferPtr[1]->dbNumFrames = 0L;
   mSoundDBHeader.dbhBufferPtr[1]->dbFlags = 0;
   mSoundDBHeader.dbhBufferPtr[1]->dbUserInfo[0] = (long)this;
-  
+
   /*
    *	Fill in this buffer with sounds.
    */
   SndDoubleBackProc(mSoundChannel, mSoundDBHeader.dbhBufferPtr[1]);
-  
+
   /*
    *	Start the sounds playing.
    */
@@ -219,22 +219,22 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16,
       "Unable to start the sound playing.");
     return false;
   }
-  
+
   GetDefaultOutputVolume(&mOutputVolume);
   SetDefaultOutputVolume(255);
-  
+
   return true;
 }
 
 void csSoundDriverMac::Close()
 {
   SCStatus	theStatus;
-  
+
   /*
    *	Tell the double buffer callback that this is the end.
    */
   mStopPlayback = true;
-  
+
   if (mSoundChannel)
   {
     /*
@@ -243,16 +243,16 @@ void csSoundDriverMac::Close()
     do {
       SndChannelStatus(mSoundChannel, sizeof(SCStatus), &theStatus);
     } while (theStatus.scChannelBusy);
-    
+
     /*
      *	Get rid of the sound channel.
      */
     SndDisposeChannel(mSoundChannel, TRUE);
   }
-  
+
   if (mSoundDBHeader.dbhDoubleBack)
     DisposeRoutineDescriptor(mSoundDBHeader.dbhDoubleBack);
-  
+
   /*
    *	Get rid of the memory used for the double buffers
    */
@@ -260,12 +260,12 @@ void csSoundDriverMac::Close()
     DisposePtr((Ptr)mSoundDBHeader.dbhBufferPtr[0]);
   if (mSoundDBHeader.dbhBufferPtr[1])
     DisposePtr((Ptr)mSoundDBHeader.dbhBufferPtr[1]);
-  
+
   /*
    *	Make sure our superclass does not also go a dispose of the memory
    */
   Memory = NULL;
-  
+
   SetDefaultOutputVolume(mOutputVolume);
 }
 
@@ -321,7 +321,7 @@ static pascal void SoundDoubleBackProc(
    *	It was placed there earlier.
    */
   me = (csSoundDriverMac *)(doubleBuffer->dbUserInfo[0]);
-  
+
   /*
    *	Set the location where the sounds will be written into by the
    *	mixing function to the currently empty buffer.

@@ -57,8 +57,8 @@ public:
   csString& Clear ()
   { return Truncate (0); }
 
-  /** 
-   * Get a pointer to ASCIIZ string - warning: this is a non constpointer 
+  /**
+   * Get a pointer to ASCIIZ string - warning: this is a non constpointer
    * ,so use this function with care!
    */
   char* GetData () const
@@ -85,7 +85,7 @@ public:
     CS_ASSERT (n < Size);
     return Data[n];
   }
-  
+
   /**
    * Set character at position `n'.  Does not expand string if `n' is greater
    * than length of string.
@@ -167,7 +167,7 @@ public:
    * Replace contents of this string with the contents of another.  If iCount
    * is -1, then use the entire replacement string.  Otherwise, use iCount
    * characters from the replacement string.
-   */  
+   */
   csString& Replace (const char* iStr, size_t iCount = (size_t)-1)
   {
     Size = 0;

@@ -31,7 +31,7 @@ vpath %.cpp apps/import/3ds2lev
 INC.3DS2LEV = $(wildcard apps/import/3ds2lev/*.h)
 SRC.3DS2LEV = $(wildcard apps/import/3ds2lev/*.cpp)
 OBJ.3DS2LEV = $(addprefix $(OUT),$(notdir $(SRC.3DS2LEV:.cpp=$O)))
-DEP.3DS2LEV = CSUTIL CSSYS CSUTIL 
+DEP.3DS2LEV = CSUTIL CSSYS CSUTIL
 LIB.3DS2LEV = $(foreach d,$(DEP.3DS2LEV),$($d.LIB))
 
 #TO_INSTALL.EXE += $(3DS2LEV.EXE)

@@ -435,7 +435,7 @@ public:
                           const csDVector3& v1, const csDVector3& v2)
   {
     // double s = p * (v1%v2); (original expression: expanded to the below:)
-    double s = p.x*(v1.y*v2.z-v1.z*v2.y) + p.y*(v1.z*v2.x-v1.x*v2.z) + 
+    double s = p.x*(v1.y*v2.z-v1.z*v2.y) + p.y*(v1.z*v2.x-v1.x*v2.z) +
               p.z*(v1.x*v2.y-v1.y*v2.x);
     if (s < 0) return 1;
     else if (s > 0) return -1;
@@ -625,8 +625,8 @@ public:
     csDVector3& isect,                     // intersection point
     double& dist);                       // distance from u to isect
 
-  /** 
-   * Intersect 3 planes, to get the point that is part of all three 
+  /**
+   * Intersect 3 planes, to get the point that is part of all three
    * planes. Returns true, if there is a single point that fits.
    * If some planes are parallel, then it will return false.
    */

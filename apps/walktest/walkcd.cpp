@@ -324,7 +324,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     new_pos = pos+vel;
     test = csOrthoTransform (csMatrix3(), new_pos);
 
-    num_sectors = FindSectors (new_pos, 4.0f*Sys->legs_radius, 
+    num_sectors = FindSectors (new_pos, 4.0f*Sys->legs_radius,
 		Sys->view->GetCamera()->GetSector(), n);
 
     num_our_cd = 0;
@@ -334,7 +334,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
 
     for ( ; num_sectors-- ; )
       hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
- 
+
     if (!hit)
     {
       Sys->on_ground = false;
@@ -344,7 +344,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     else
     {
       float max_y=-1e10;
-      
+
       for (j=0 ; j<num_our_cd ; j++)
       {
 	csCollisionPair cd = our_cd_contact[j];

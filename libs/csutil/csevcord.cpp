@@ -124,7 +124,7 @@ bool csEventCord::Post (iEvent *event)
 
   Unlock ();
 
-  // If we pass events along to the queue, then we return 
+  // If we pass events along to the queue, then we return
   // false so it will process the event.
   return !pass;
 }

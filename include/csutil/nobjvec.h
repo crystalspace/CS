@@ -253,14 +253,14 @@ inline bool csNamedObjectVector::Delete (int n)
 inline void csNamedObjectVector::DeleteAll ()
   { Vector->DeleteAll (); }
 inline iObject *csNamedObjectVector::Get (int n) const
-  { 
+  {
     iBase *objbase = (iBase*)Vector->Get (n);
     iObject *o = objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : 0;
     if (o) o->DecRef ();
     return o;
   }
 inline iObject *csNamedObjectVector::operator[] (int n) const
-  { 
+  {
     iBase *objbase = (iBase*)Vector->Get (n);
     iObject *o = objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : 0;
     if (o) o->DecRef ();

@@ -1,23 +1,23 @@
-/*  
+/*
     Map2cs: a convertor to convert the frequently used MAP format, into
     something, that can be directly understood by Crystal Space.
 
     Copyright (C) 1999 Thomas Hieber (thieber@gmx.net)
 	Modified by Pete Mistich for script handling
- 
-    This program is free software; you can redistribute it and/or modify 
-    it under the terms of the GNU General Public License as published by 
-    the Free Software Foundation; either version 2 of the License, or 
-    (at your option) any later version. 
- 
-    This program is distributed in the hope that it will be useful, 
-    but WITHOUT ANY WARRANTY; without even the implied warranty of 
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-    GNU General Public License for more details. 
- 
-    You should have received a copy of the GNU General Public License 
-    along with this program; if not, write to the Free Software 
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef SPARSER_H
@@ -37,8 +37,8 @@ const int MaxTokenLen = 300;
 
 /**
   * This class will parse the map file. It will translate the ASCII
-  * stream into Tokens, and will also keep track of the current 
-  * line numbers. 
+  * stream into Tokens, and will also keep track of the current
+  * line numbers.
   * It also contains simple error checking and reporting abilities,
   * so if you request a number and the map contains a text, you
   * will get a descriptive error message.
@@ -79,15 +79,15 @@ public:
 
   /**
     * Returnd the next token as text. If there is no next token.
-    * (because of end of file), an error message is displayed, and 
+    * (because of end of file), an error message is displayed, and
     * false is being returned
     */
   bool GetTextToken (char*  text);
-  
+
   //pm start
   /**
     * Returnd the next token as text. If there is no next token.
-    * (because of end of file), an error message is displayed, and 
+    * (because of end of file), an error message is displayed, and
     * false is being returned
     */
   bool GetLineToken (char*  text);
@@ -95,9 +95,9 @@ public:
 
   /**
     * Returns the next token. If there is no next token.
-    * (because of end of file), an error message is displayed, and 
+    * (because of end of file), an error message is displayed, and
     * false is being returned
-    * It is about the same code as GetTextToken, but the error 
+    * It is about the same code as GetTextToken, but the error
     * message is more general, and will not mention "text".
     */
   bool GetSafeToken (char* str);
@@ -119,15 +119,15 @@ public:
     * class from this class, which will display a csMessageBox,
     * while a console application will just do a printf.
     */
-  virtual void ReportError(const char* message, 
-                           const char* info1=NULL, 
+  virtual void ReportError(const char* message,
+                           const char* info1=NULL,
                            const char* info2=NULL);
 
 
   /**
     * Returns the Next token from the file. If there is no next
     * token, or if there is some severe format problem, it will
-    * return false, otherwise it will return true. 
+    * return false, otherwise it will return true.
     * This method will not generate any error messages by itself!
     */
   bool GetNextToken(char* str);
@@ -136,7 +136,7 @@ public:
   /**
     * Returns the Next token from the file. If there is no next
     * token, or if there is some severe format problem, it will
-    * return false, otherwise it will return true. 
+    * return false, otherwise it will return true.
     * This method will not generate any error messages by itself!
     */
   bool GetNextLineToken(char* str);
@@ -145,7 +145,7 @@ public:
   /**
     * Peeks at the Next token from in the file. If there is no next
     * token, or if there is some severe format problem, it will
-    * return false, otherwise it will return true. 
+    * return false, otherwise it will return true.
     * This method will not generate any error messages by itself!
     * This method can be called without changing the state of the
     * parser!
@@ -210,7 +210,7 @@ protected:
   char m_NextToken[MaxTokenLen];
 
   /**
-    * True, if the file has ended. (Note, that there may still be 
+    * True, if the file has ended. (Note, that there may still be
     * characters stored in m_NextChars, that have not been evaluated)
     */
   bool  m_Eof;
