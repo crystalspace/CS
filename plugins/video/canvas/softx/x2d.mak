@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.x2d = Crystal Space XLib 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make x2d          Make the $(DESCRIPTION.x2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make x2d          Make the $(DESCRIPTION.x2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: x2d
+.PHONY: x2d x2dclean
 
 all plugins drivers drivers2d: x2d
 
@@ -26,7 +27,7 @@ x2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # We need also the X libs
@@ -50,7 +51,7 @@ OBJ.XLIB2D = $(addprefix $(OUT),$(notdir $(SRC.XLIB2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: x2d x2dclean
@@ -67,7 +68,7 @@ $(XLIB2D): $(OBJ.XLIB2D) $(DEP.X2D)
 	$(DO.PLUGIN) $(LIBS.LOCAL.X2D)
 
 x2dclean:
-	$(RM) $(XLIB2D) $(OBJ.XLIB2D)
+	$(RM) $(XLIB2D) $(OBJ.XLIB2D) $(OUTOS)x2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)x2d.dep
@@ -79,7 +80,7 @@ endif
 
 endif # ifeq ($(MAKESECTION),targets)
 
-#------------------------------------------------------------------- config ---#
+#------------------------------------------------------------------ config ---#
 ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
 
 # Default value for DO_SHM

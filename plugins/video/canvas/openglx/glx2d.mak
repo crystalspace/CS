@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.glx2d = Crystal Space GL/X 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make glx2d        Make the $(DESCRIPTION.glx2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make glx2d        Make the $(DESCRIPTION.glx2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: glx2d
+.PHONY: glx2d glx2dclean
 
 all plugins drivers drivers2d: glx2d
 
@@ -26,7 +27,7 @@ glx2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
@@ -66,7 +67,7 @@ OBJ.GLX2D = $(addprefix $(OUT),$(notdir $(SRC.GLX2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: glx2d glx2dclean
@@ -86,7 +87,7 @@ $(GLX2D): $(OBJ.GLX2D) $(DEP.GLX2D)
 	$(DO.PLUGIN) $(LIBS.GLX2D)
 
 glx2dclean:
-	$(RM) $(GLX2D) $(OBJ.GLX2D)
+	$(RM) $(GLX2D) $(OBJ.GLX2D) $(OUTOS)glx2d.dep
  
 ifdef DO_DEPEND
 dep: $(OUTOS)glx2d.dep

@@ -8,14 +8,15 @@ DESCRIPTION.svgalib2d = Crystal Space SVGALib 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make svgalib2d    Make the $(DESCRIPTION.svgalib2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make svgalib2d    Make the $(DESCRIPTION.svgalib2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: svgalib2d
+.PHONY: svgalib2d svgalib2dclean
 
 all plugins drivers drivers2d: svgalib2d
 
@@ -26,7 +27,7 @@ svgalib2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # Link with SVGALib librarys
@@ -49,7 +50,7 @@ OBJ.SVGA2D = $(addprefix $(OUT),$(notdir $(SRC.SVGA2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: svgalib2d svgalib2dclean
@@ -66,7 +67,7 @@ $(SVGA2D): $(OBJ.SVGA2D) $(DEP.SVGA2D)
 	$(DO.PLUGIN) $(LIBS.SVGA2D)
 
 svgalib2dclean:
-	$(RM) $(SVGA2D) $(OBJ.SVGA2D)
+	$(RM) $(SVGA2D) $(OBJ.SVGA2D) $(OUTOS)svgalib2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)svgalib2d.dep
