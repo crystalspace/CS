@@ -457,7 +457,7 @@ bool csArchive::WriteZipArchive ()
   int tmplen = strlen (temp_file);
 
   APPEND_SLASH (temp_file, tmplen);
-  sprintf (&temp_file[tmplen], TEMP_FILE);
+  cs_snprintf (&temp_file[tmplen], MAXPATHLEN - tmplen, TEMP_FILE);
   if ((temp = fopen (temp_file, "w+b")) == NULL)
     return false;               /* Cannot create temporary file */
   fseek (file, 0, SEEK_SET);
