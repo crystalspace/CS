@@ -58,9 +58,9 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to CS root.
-copy $(TargetPath)  ..\..
+copy &quot;$(TargetPath)&quot;  ..\..
 echo Moving output to MSVC Debug Bin.
-copy $(TargetPath)  csdebug\bin
+copy &quot;$(TargetPath)&quot;  csdebug\bin
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -124,9 +124,9 @@ copy $(TargetPath)  csdebug\bin
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to CS root.
-copy $(TargetPath)  ..\..
+copy &quot;$(TargetPath)&quot;  ..\..
 echo Moving output to MSVC Release Bin.
-copy $(TargetPath)  csrelease\bin
+copy &quot;$(TargetPath)&quot;  csrelease\bin
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
