@@ -18,6 +18,8 @@
 */
 #include "cssysdef.h"
 
+#include "ivaria/reporter.h"
+
 #include "dds.h"
 #include "ddsloader.h"
 
@@ -42,8 +44,9 @@ csDDSImageIO::~csDDSImageIO ()
   SCF_DESTRUCT_IBASE();
 }
 
-bool csDDSImageIO::Initialize (iObjectRegistry* )
+bool csDDSImageIO::Initialize (iObjectRegistry* objreg)
 {
+  object_reg = objreg;
   return true;
 }
 
@@ -67,7 +70,7 @@ csPtr<iImage> csDDSImageIO::Load (uint8* buffer, uint32 size, int format)
     return 0;
   }
 
-  csDDSImageFile* image = new csDDSImageFile(format);
+  csDDSImageFile* image = new csDDSImageFile (object_reg, format);
   if (!image->Load (loader))
   {
     delete loader;
@@ -92,9 +95,10 @@ csPtr<iDataBuffer> csDDSImageIO::Save (iImage* image, const char* mime,
 
 //---------------------------------------------------------------------------
 
-csDDSImageFile::csDDSImageFile (int format)
+csDDSImageFile::csDDSImageFile (iObjectRegistry* object_reg, int format)
   : csImageFile (format), mipmaps(0), mipmapcount(0)
 {
+  csDDSImageFile::object_reg = object_reg;
 }
 
 csDDSImageFile::~csDDSImageFile ()
@@ -106,7 +110,8 @@ bool csDDSImageFile::Load (dds::Loader* loader)
   set_dimensions (loader->GetWidth(), loader->GetHeight());
   if (loader->GetBytesPerPixel() != 4)
   {
-    printf ("WARNING: DDS loader only supports 32 bit images at the moment.\n");
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "DDS loader only supports 32 bit images at the moment.");
     return false;
   }
   uint8* img = loader->LoadImage ();
@@ -114,15 +119,18 @@ bool csDDSImageFile::Load (dds::Loader* loader)
     return false;
   convert_rgba ((csRGBpixel*) img);
 
-  mipmapcount = loader->GetMipmapCount ();
+  mipmapcount = loader->GetMipmapCount () - 1;
   for (int i=0;i<mipmapcount;i++)
   {
     uint8* img = loader->LoadMipmap(i);
     if (!img)
       return false;
-    csDDSImageFile* image = new csDDSImageFile(Format);
-    image->set_dimensions (loader->GetWidth() >> (i+1),
-			   loader->GetHeight() >> (i+1));
+    csDDSImageFile* image = new csDDSImageFile (object_reg, Format);
+    int newW = loader->GetWidth() >> (i+1);
+    newW = MAX(newW, 1);
+    int newH = loader->GetHeight() >> (i+1);
+    newH = MAX(newH, 1);
+    image->set_dimensions (newW, newH);
     image->convert_rgba((csRGBpixel*) img);
     mipmaps.Push (image);
   }
@@ -141,6 +149,15 @@ csPtr<iImage> csDDSImageFile::MipMap (int step, csRGBpixel* transp)
 int csDDSImageFile::HasMipmaps ()
 {
   return mipmapcount;
+}
+
+void csDDSImageFile::Report (int severity, const char* msg, ...)
+{
+  va_list argv;
+  va_start (argv, msg);
+  csReportV (object_reg, severity, "crystalspace.graphic.image.io.dds", msg, 
+    argv);
+  va_end (argv);
 }
 
 CS_IMPLEMENT_PLUGIN

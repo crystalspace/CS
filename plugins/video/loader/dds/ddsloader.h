@@ -50,6 +50,7 @@ public:
 
 private:
   csImageIOFileFormatDescriptions formats;
+  csRef<iObjectRegistry> object_reg;
 };
 
 class csDDSImageFile : public csImageFile
@@ -62,12 +63,15 @@ public:
   
   virtual int HasMipmaps ();  
 private:
-  csDDSImageFile (int format);
+  csDDSImageFile (iObjectRegistry* object_reg, int format);
 
   bool Load (dds::Loader* loader);
 
   csRefArray<iImage> mipmaps;
   int mipmapcount;
+  csRef<iObjectRegistry> object_reg;
+
+  void Report (int severity, const char* msg, ...);
 };
 
 #endif

@@ -193,16 +193,25 @@ bool Loader::ReadHeader ()
     return false;
   }
 
-  // Adjust linearsize
-  if (header->flags & FLAG_PITCH)
-    header->linearsize *= header->height;
-
   // Calculate Positions of the image Data
   delete[] positions;
-  positions = new uint8* [GetMipmapCount() + 1];
+  positions = new uint8* [GetMipmapCount()];
   positions[0] = readpos;
-  uint32 add = header->linearsize;
-  for (i=1;i<GetMipmapCount()+1;i++)
+  uint32 add;
+  if (header->flags & FLAG_LINEARSIZE)
+    add = header->linearsize;
+  else if (header->flags & FLAG_PITCH)
+    add = header->linearsize *= header->height;
+  else
+  {
+    if (format == FORMAT_RGBA || format == FORMAT_RGB)
+      add = header->width * header->height * bpp;
+    else if (format == FORMAT_DXT1)
+      add = header->width * header->height / 2;
+    else
+      add = header->width * header->height;
+  }
+  for (i=1;i<GetMipmapCount();i++)
   {
     positions[i] = positions[i-1]+add;
     if (format == FORMAT_RGBA || format == FORMAT_RGB)
@@ -212,7 +221,7 @@ bool Loader::ReadHeader ()
     else
       add = MAX(add/4, 16);
   }
-  if ((size_t)(positions[GetMipmapCount()] - positions[0] + add) > sourcelen)
+  if ((size_t)(positions[GetMipmapCount() - 1] - positions[0] + add) > sourcelen)
   {
     printf ("DDS Image too small Needs:%u Has: %lu.\n",
 	(unsigned int)(positions[GetMipmapCount()] - positions[0] + add),
@@ -265,15 +274,17 @@ void Loader::CheckFormat ()
   {
     if (header->pixelformat.flags & FLAG_ALPHAPIXEL)
     {
-      blocksize = GetWidth() * GetHeight() * header->pixelformat.bitdepth * 4;
+      //blocksize = GetWidth() * GetHeight() * header->pixelformat.bitdepth * 4;
       format = FORMAT_RGBA;
     }
     else
     {
-      blocksize = GetWidth() * GetHeight() * header->pixelformat.bitdepth * 3;
+      //blocksize = GetWidth() * GetHeight() * header->pixelformat.bitdepth * 3;
       format = FORMAT_RGB;
-      bpp = 3;
+      //bpp = 3;
     }
+    bpp = header->pixelformat.bitdepth / 8;
+    blocksize = GetWidth() * GetHeight() * bpp;
   }
 
   depth = header->depth ? header->depth : 1;

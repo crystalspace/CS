@@ -74,6 +74,7 @@ chronological order.
 	  complain that it did not know how to create those files if they were
 	  needed.
 	- res enabled the glRasterPos hack in glcommon2d.cpp for NR, too.
+	- res fixed the interpretation of some header fields in the DDS loader.
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to
