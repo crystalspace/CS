@@ -46,6 +46,18 @@ awsWindow *test2 = aws->CreateWindowFrom("Another");
 if (test1) test1->Show();
 if (test2) test2->Show();
 @end example
+
+@item
+And finally you have to make sure it actually prints the output to the screen. So in your programs main drawing loop
+you input code similar to this:
+@example
+// Start drawing 2D graphics.
+if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+// make sure invalidated areas get a chance to redraw themselfs
+aws->Redraw ();
+// draw the current view of the window system to a graphics context with a certain alpha value
+aws->Print (myG3D, 64);
+@end example
 @end enumerate
 
 That's all there is to it.  @sc{aws} is designed to be easy to use.  Of course,
