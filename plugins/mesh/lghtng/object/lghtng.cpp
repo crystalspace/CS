@@ -20,7 +20,6 @@
 #include <cssysdef.h>
 #include <csgeom/math3d.h>
 #include <csgeom/poly2d.h>
-#include <csutil/randomgen.h>
 #include <iengine/movable.h>
 #include <iengine/rview.h>
 #include <ivideo/graph3d.h>
@@ -211,20 +210,19 @@ csLightningMeshObjectFactory::~csLightningMeshObjectFactory ()
 void csLightningMeshObjectFactory::CalculateFractal (int left, int right,
     float lh, float rh, int xyz, csVector3 *Vertices)
 {
-  csRandomGen rand;
   int mid = (left + right) / 2;
   float fracScale = ((float)(right - left)) / (float)(MaxPoints);
-  float midh = (lh + rh) / 2 + (fracScale * wildness * (rand.Get(20)-10))
+  float midh = (lh + rh) / 2 + (fracScale * wildness * (int)(rand.Get(20)-10))
       - (fracScale * wildness) / 2;
 
   const int mid2 = mid * 2;
   switch (xyz)
   {
     case 0:    
-      Vertices[mid2].x = origin.x + midh + (vibrate * (rand.Get(10)-5) - (vibrate / 2));      
+      Vertices[mid2].x = origin.x + midh + (vibrate * (int)(rand.Get(10)-5) - (vibrate / 2));      
       break;    
     case 1:
-      Vertices[mid2].y = origin.y + midh + (vibrate * (rand.Get(10)-5) - (vibrate / 2));
+      Vertices[mid2].y = origin.y + midh + (vibrate * (int)(rand.Get(10)-5) - (vibrate / 2));
       break;    
   }
 

@@ -24,6 +24,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 #include "csutil/refarr.h"
+#include <csutil/randomgen.h>
 #include "imesh/object.h"
 #include "imesh/lghtng.h"
 #include "imesh/particle.h"
@@ -64,6 +65,7 @@ class csLightningMeshObject : public iMeshObject
   csVector3 origin;
   csVector3 directional;
   int points;
+
   
   void SetupObject ();
 
@@ -249,6 +251,7 @@ private:
   csTicks update_interval;
   csTicks update_counter;
   iMaterialWrapper* material;
+  csRandomGen rand;
 
   csRef<iMeshObjectFactory> GenMeshFact;
   csRef<iGeneralFactoryState> GenFactState;
