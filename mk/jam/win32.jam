@@ -95,6 +95,39 @@ FILEFLAGS 0x0
 __EOF__
 }
 
+actions GenerateWin32ManifestRc
+{
+    cat > $(<) << __EOF__
+// This file is generated automatically.
+
+1 24
+{
+  "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>\r\n",
+  "<assembly xmlns=""urn:schemas-microsoft-com:asm.v1"" manifestVersion=""1.0"">\r\n",
+  "<assemblyIdentity\r\n",
+  "    version=""$(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]).$(PACKAGE_VERSION_LIST[3]).$(PACKAGE_VERSION_LIST[4])""\r\n",
+  "    processorArchitecture=""X86""\r\n",
+  "    name=""$(PRODUCT_NAME)""\r\n",
+  "    type=""win32""\r\n",
+  "/>\r\n",
+  "<description>$(PRODUCT_DESCRIPTION)</description>\r\n",
+  "<dependency>\r\n",
+  "    <dependentAssembly>\r\n",
+  "	  <assemblyIdentity\r\n",
+  "	      type=""win32""\r\n",
+  "	      name=""Microsoft.Windows.Common-Controls""\r\n",
+  "	      version=""6.0.0.0""\r\n",
+  "	      processorArchitecture=""X86""\r\n",
+  "	      publicKeyToken=""6595b64144ccf1df""\r\n",
+  "	      language=""*""\r\n",
+  "	  />\r\n",
+  "    </dependentAssembly>\r\n",
+  "</dependency>\r\n",
+  "</assembly>\r\n"
+}
+__EOF__
+}
+
 actions GenerateWin32MetadataRc
 {
     cat > $(<) << __EOF__
@@ -211,6 +244,33 @@ rule MakeVersionRc
   GenerateWin32VersionRc $(<) ;
 }
 
+rule MakeManifestRc
+{
+  # normalize version list
+  local v1, v2, v3, v4 ;
+  v1 = $(PACKAGE_VERSION_LIST[1]) ;
+  if ! $(v1) { v1 = 0 ; }
+  v2 = $(PACKAGE_VERSION_LIST[2]) ;
+  if ! $(v2) { v2 = 0 ; }
+  v3 = $(PACKAGE_VERSION_LIST[3]) ;
+  if ! $(v3) { v3 = 0 ; }
+  v4 = $(PACKAGE_VERSION_LIST[4]) ;
+  if ! $(v4) { v4 = 0 ; }
+  PACKAGE_VERSION_LIST on $(<) = $(v1) $(v2) $(v3) $(v4) ;
+      
+  local desc = [ Description $(>) ] ;
+  if ! $(desc) { desc = "$(>)" ; }
+  PRODUCT_DESCRIPTION on $(<) = $(desc) ;
+
+  local name ;
+  if $(PACKAGE_LONGNAME) { name = $(PACKAGE_LONGNAME) ; }
+  else if $(PACKAGE_NAME) { name = $(PACKAGE_NAME) ; }
+  else { name = $(>) ; }
+  PRODUCT_NAME on $(<) = $(name) ;
+      
+  GenerateWin32ManifestRc $(<) ;
+}
+
 rule MakeMetadataRc
 {
   local metafile = $($(>)_METAFILE) ;
@@ -231,6 +291,15 @@ rule AppResourceWin32
   Clean $(<)clean : $(versionrc) ;
   Clean clean : $(versionrc) ;
   Win32Resource $(<) : $(versionrc) ;
+
+  local manifestrc = [ DoObjectGrist _manifestrc.rc ] ;
+  LOCATE on $(manifestrc) = $(LOCATE_TARGET) ;
+  SEARCH on $(manifestrc) = $(LOCATE_TARGET) ;
+  
+  MakeManifestRc $(manifestrc) : $(<) ;
+  Clean $(<)clean : $(manifestrc) ;
+  Clean clean : $(manifestrc) ;
+  Win32Resource $(<) : $(manifestrc) ;
 
   local icon = [ ApplicationIcon win32 : $(<) ] ;
   if ! $(icon)

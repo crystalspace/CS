@@ -480,6 +480,13 @@ rule MsvcProject
 
     if [ IsElem $(type) : appgui appcon ]
     {
+      local manifestrc = $(resource:S=.mfrctmp) ;
+      MakeLocate $(manifestrc) : $(outdir) ;
+      MakeManifestRc $(manifestrc) : $(rawname) ;
+      Always $(manifestrc) ;
+      Win32Resource $(rawname) : $(manifestrc) ;
+      RmTemps $(resource) : $(manifestrc) ;
+      
       local icon = [ ApplicationIcon win32 : $(rawname) ] ;
       if ! $(icon)
       {
