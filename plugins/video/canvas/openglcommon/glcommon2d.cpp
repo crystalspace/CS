@@ -486,14 +486,14 @@ bool csGraphics2DGLCommon::Resize (int width, int height)
   {
     Width = width;
     Height = height;
-    SetClipRect (0, 0, Width - 1, Height - 1);
+    SetClipRect (0, 0, Width, Height);
     return true;
   }
   if (!AllowResizing)
     return false;
   Width = width;
   Height = height;
-  SetClipRect (0, 0, Width - 1, Height - 1);
+  SetClipRect (0, 0, Width, Height);
   EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
   return true;
 }
