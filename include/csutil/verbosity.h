@@ -88,7 +88,7 @@ public:
 /**
  * Parse verbosity for some given command line arguments.
  * \remarks Should only be used during early initializations when the object 
- *  registry is not set uo yet; otherwise, the iVerbosityManager object should
+ *  registry is not set up yet; otherwise, the iVerbosityManager object should
  *  be obtained and used instead.
  */
 extern CS_CSUTIL_EXPORT bool csCheckVerbosity (int argc,
