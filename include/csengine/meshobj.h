@@ -335,7 +335,15 @@ public:
   }
 
   /// Mark this object as visible.
-  void SetVisibilityNumber (uint32 vis) { visnr = vis; }
+  void SetVisibilityNumber (uint32 vis)
+  {
+    visnr = vis;
+    if (Parent)
+    {
+      ((csMeshWrapper::MeshWrapper*)Parent)->scfParent
+      	->SetVisibilityNumber (vis);
+    }
+  }
 
   /// Return if this object is visible.
   uint32 GetVisibilityNumber () const { return visnr; }

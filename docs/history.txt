@@ -20,6 +20,9 @@ The history order is reversed so that new features are at the top.
 	  an OpenGL 1.2 feature.
 	- Eric Sunshine re-implemented the "imgplexall" makefile target the
 	  proper way: modularly, rather than monolithically.
+	- Fixed a bug with hierarchical objects not culling correctly.
+	  If the parent object is invisible then the children were not
+	  rendered. This should now be solved.
 27-Feb-2003
 	- res fixed the "shifted alpha map" bug in the software renderer.
 	- Marten Svanfeldt once again fiddled with the light/shadow culling. 
