@@ -5,7 +5,8 @@
 DESCRIPTION.beos = BeOS
 
 # Choose which drivers you want to build/use
-DRIVERS+=cs3d/software cs2d/be cs2d/openglbe cs3d/opengl csnetman/simple
+DRIVERS+=cs3d/software cs2d/be cs2d/openglbe cs3d/opengl \
+  csnetdrv/sockets csnetman/simple
 # Uncomment the following if you want to build/use Glide.
 # DRIVERS+=cs2d/beglide2 cs3d/glide2
 
@@ -152,10 +153,3 @@ SYSCONFIG += $(NEWLINE)bin/haspythn.sh >> config.tmp
 SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 
 endif # rootdefines & config
-
-#--------------------------------------------------------------- volatile.h ---#
-ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/volatile)
-
-MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define NO_SOCKETS_SUPPORT$">>volatile.tmp
-
-endif # rootdefines & volatile
