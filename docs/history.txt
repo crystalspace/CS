@@ -1,5 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+10-Apr-2000
+	- Eric Sunshine added some missing cross references to the document
+	  texinfo/apps/overview.txi.
+	- Eric Sunshine fixed texinfo/anatomy/depend.txi so that it works with
+	  TeX, which was not able to deal with @itemize lists formatted with
+	  @w even though @w is perfectly legal Texinfo.
 9-Apr-2000
 	- Drasticly improved octree building but NOT with the solid
 	  space splitter. I still need to investigate that one.
