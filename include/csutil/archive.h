@@ -159,10 +159,10 @@ public:
 
   /**
    * Execute all pending operations involving writes to archive
-   * Neither delete_file or new_file will have effect until this
+   * Neither DeleteFile or NewFile will have effect until this
    * function will be called. Returns false if operation failed.
    * If operation failed, postponed operations remains in the
-   * same state as before calling write_archive(), i.e. for example
+   * same state as before calling Flush(), i.e. for example
    * user can be prompted to free some space on drive then retry
    * Flush().
    */
