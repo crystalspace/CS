@@ -428,12 +428,13 @@ int pricompare( const void *arg1, const void *arg2 )
 
 bool csShader::Prepare()
 {
+  int i;
 
   //go through the technques in priority order
   //fill priority struct
   priority_mapping* primap = new priority_mapping[techniques->Length()];
   
-  for(int i = 0; i < techniques->Length(); ++i)
+  for(i = 0; i < techniques->Length(); ++i)
   {
     primap[i].technique = i;
     primap[i].priority = ((iShaderTechnique*)techniques->Get(i))->GetPriority();
@@ -446,7 +447,7 @@ bool csShader::Prepare()
 
   csBasicVector* newTArr = new csBasicVector;
 
-  for(int i = 0; i < techniques->Length() && !isPrep; ++i)
+  for(i = 0; i < techniques->Length() && !isPrep; ++i)
   {
     iShaderTechnique* t = (iShaderTechnique*)techniques->Get(primap[i].technique);
     if ( t->Prepare() )
