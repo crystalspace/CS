@@ -59,7 +59,7 @@ public:
    *   snow flakes will start ...
    *   and when they exit this box they will disappear.
    * fall_speed: the direction and speed of the particles.
-   *   You can make slanted slow this way. Although you would also want to
+   *   You can make slanted snow this way. Although you would also want to
    *   slant the particles in that case...
    * swirl: is the amount of swirl for a flake, 0.0 is like rain.
    */
@@ -72,14 +72,14 @@ public:
   /// Get the number of particles used.
   int GetParticleCount () const
   { return number; }
-  /// Set the size of the snowflakes.
+  /// Set the size of the drops.
   void SetDropSize (float dropwidth, float dropheight)
   {
     initialized = false;
     drop_width = dropwidth;
     drop_height = dropheight;
   }
-  /// Get the size of the snowflakes.
+  /// Get the size of the drops.
   void GetDropSize (float& dropwidth, float& dropheight) const
   { dropwidth = drop_width; dropheight = drop_height; }
   /// Set box.
