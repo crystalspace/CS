@@ -41,6 +41,7 @@
 #include "csengine/collider.h"
 #include "csengine/particle.h"
 #include "csutil/scanstr.h"
+#include "csutil/csstring.h"
 #include "csparser/impexp.h"
 #include "csobject/dataobj.h"
 #include "cssfxldr/common/snddata.h"
@@ -54,59 +55,74 @@
 #include "isndbuf.h"
 #include "isndrdr.h"
 #include "igraph3d.h"
+#include "ivfs.h"
 #include "csengine/rapid.h"
 
 /// Save/load camera functions
-void SaveCamera (const char *fName)
+void SaveCamera (iVFS* vfs, const char *fName)
 {
+  if (!Sys->view) return;
   csCamera *c = Sys->view->GetCamera ();
-  FILE *f = fopen (fName, "w");
-  if (!f)
-    return;
+  if (!c) return;
   const csMatrix3& m_o2t = c->GetO2T ();
   const csVector3& v_o2t = c->GetOrigin ();
-  fprintf (f, "%f %f %f\n", v_o2t.x, v_o2t.y, v_o2t.z);
-  fprintf (f, "%f %f %f\n", m_o2t.m11, m_o2t.m12, m_o2t.m13);
-  fprintf (f, "%f %f %f\n", m_o2t.m21, m_o2t.m22, m_o2t.m23);
-  fprintf (f, "%f %f %f\n", m_o2t.m31, m_o2t.m32, m_o2t.m33);
-  fprintf (f, "%s\n", c->GetSector ()->GetName ());
-  fprintf (f, "%d\n", c->IsMirrored ());
-  fprintf (f, "%f %f %f\n", Sys->angle.x, Sys->angle.y, Sys->angle.z);
-  fclose (f);
+  csString s;
+  s << v_o2t.x << ' ' << v_o2t.y << ' ' << v_o2t.z << '\n'
+    << m_o2t.m11 << ' ' << m_o2t.m12 << ' ' << m_o2t.m13 << '\n'
+    << m_o2t.m21 << ' ' << m_o2t.m22 << ' ' << m_o2t.m23 << '\n'
+    << m_o2t.m31 << ' ' << m_o2t.m32 << ' ' << m_o2t.m33 << '\n'
+    << '"' << c->GetSector ()->GetName () << "\"\n"
+    << c->IsMirrored () << '\n'
+    << Sys->angle.x << ' ' << Sys->angle.y << ' ' << Sys->angle.z << '\n';
+  vfs->WriteFile (fName, s.GetData(), s.Length());
 }
 
-bool LoadCamera (const char *fName)
+bool LoadCamera (iVFS* vfs, const char *fName)
 {
-  char buf[100];
-  FILE *f = fopen (fName, "r");
-  if (!f)
+  if (!vfs->Exists (fName))
   {
-    CsPrintf (MSG_FATAL_ERROR, "Could not open coordinate file 'coord'!\n");
+    CsPrintf (MSG_FATAL_ERROR, "Could not open coordinate file '%s'!\n", fName);
     return false;
   }
+
+  size_t size;
+  char* data = vfs->ReadFile(fName, size);
+  if (data == NULL)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Could not read coordinate file '%s'!\n", fName);
+    return false;
+  }
+
   csMatrix3 m;
   csVector3 v;
-  csSector* s;
-  int imirror;
+  int imirror = false;
+  char* sector_name = new char [size];
 
-  fscanf (f, "%f %f %f\n", &v.x, &v.y, &v.z);
-  fscanf (f, "%f %f %f\n", &m.m11, &m.m12, &m.m13);
-  fscanf (f, "%f %f %f\n", &m.m21, &m.m22, &m.m23);
-  fscanf (f, "%f %f %f\n", &m.m31, &m.m32, &m.m33);
-  fscanf (f, "%s\n", buf);
-  s = (csSector*)Sys->world->sectors.FindByName (buf);
+  ScanStr (data,
+    "%f %f %f\n"
+    "%f %f %f\n"
+    "%f %f %f\n"
+    "%f %f %f\n"
+    "%S\n"
+    "%d\n"
+    "%f %f %f",
+    &v.x, &v.y, &v.z,
+    &m.m11, &m.m12, &m.m13,
+    &m.m21, &m.m22, &m.m23,
+    &m.m31, &m.m32, &m.m33,
+    sector_name,
+    &imirror,
+    &Sys->angle.x, &Sys->angle.y, &Sys->angle.z);
+
+  csSector* s = (csSector*)Sys->world->sectors.FindByName (sector_name);
+  delete[] sector_name;
+  delete[] data;
   if (!s)
   {
-    fclose (f);
-    CsPrintf (MSG_FATAL_ERROR, "Sector in coordinate file does not exist in this world!\n");
+    CsPrintf (MSG_FATAL_ERROR, "Sector `%s' in coordinate file does not "
+      "exist in this world!\n", sector_name);
     return false;
   }
-  imirror = false; fscanf (f, "%d\n", &imirror);
-
-  // Load head angle
-  fscanf (f, "%f %f %f", &Sys->angle.x, &Sys->angle.y, &Sys->angle.z);
-
-  fclose (f);
 
   csCamera *c = Sys->view->GetCamera ();
   c->SetSector (s);
@@ -207,12 +223,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "coordsave"))
   {
     Sys->Printf (MSG_CONSOLE, "SAVE COORDS\n");
-    SaveCamera ("coord");
+    SaveCamera (Sys->VFS, "/this/coord");
   }
   else if (!strcasecmp (cmd, "coordload"))
   {
     Sys->Printf (MSG_CONSOLE, "LOAD COORDS\n");
-    LoadCamera ("coord");
+    LoadCamera (Sys->VFS, "/this/coord");
   }
   else if (!strcasecmp (cmd, "dumpvis"))
   {

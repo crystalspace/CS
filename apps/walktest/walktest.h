@@ -293,8 +293,8 @@ extern void perf_test (int num);
 extern void CaptureScreen ();
 extern void free_keymap ();
 
-extern void SaveCamera (const char *fName);
-extern bool LoadCamera (const char *fName);
+extern void SaveCamera (iVFS*, const char *fName);
+extern bool LoadCamera (iVFS*, const char *fName);
 
 /// Apply lights to all static objects (currently only sprites)
 void light_statics ();
