@@ -222,7 +222,7 @@ private:
   csRef<iShader> standardShadowShader;
   csRef<iShader> debugShadowShader;
 #endif
-  void ToggleR3DState (G3D_RENDERSTATEOPTION op, const char* name);
+  void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
 
   // The selected mesh.
   iMeshWrapper* selected_mesh;
