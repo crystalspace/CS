@@ -272,12 +272,19 @@ public:
    * Index is the index of the polygon in the containing object. It is used
    * for identifying the lightmap on disk.
    */
-  bool ReadFromCache (int w, int h, int lms, csPolygonSet* owner, csPolygon3D* poly, int index, csWorld* world);
+  bool ReadFromCache (int w, int h, int lms, csPolygonSet* owner, csPolygon3D* poly,
+  	int index, csWorld* world);
 
   /**
    * Cache the lightmaps in the precalculation area.
    */
   void Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWorld* world);
+
+  /**
+   * Scale the lightmap one step down. This is used in
+   * 'High Quality Lightmap Mode'.
+   */
+  void Scale (int w, int h, int new_lms);
 
   /**
    * Convert the lightmaps to the correct mixing mode.

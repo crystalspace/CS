@@ -3666,11 +3666,15 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, char* file)
   csIniFile* cfg = new csIniFile ("world.cfg");
   if (cfg)
   {
-    csPolygon3D::def_mipmap_size = cfg->GetInt ("TextureMapper", "LIGHTMAP_SIZE", csPolygon3D::def_mipmap_size);
+    csPolygon3D::def_mipmap_size = cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",
+    	csPolygon3D::def_mipmap_size);
+    csPolygon3D::do_lightmap_highqual = cfg->GetInt ("Lighting", "LIGHTMAP_HIGHQUAL",
+    	csPolygon3D::do_lightmap_highqual);
     CHK (delete cfg);
   }
-  CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d.\n", csPolygon3D::def_mipmap_size,
-      csPolygon3D::def_mipmap_size);
+  CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d%s.\n", csPolygon3D::def_mipmap_size,
+      csPolygon3D::def_mipmap_size,
+      csPolygon3D::do_lightmap_highqual ? " (high quality)" : " (normal quality)");
 
   if (!LoadWorld (world, layer, buf)) return false;
 

@@ -44,6 +44,8 @@ bool csPolygon3D::do_force_recalc = false;
 bool csPolygon3D::do_not_force_recalc = false;
 // Option variable: shadow mipmap size
 int csPolygon3D::def_mipmap_size = 16;
+// Option variable: high quality lightmap rendering.
+bool csPolygon3D::do_lightmap_highqual = true;
 
 //---------------------------------------------------------------------------
 
@@ -622,7 +624,8 @@ void csPolygon3D::CreateLightMaps (IGraphics3D* g3d)
       lmi->tex3->SetMipmapSize (1);
       CHK (delete lmi->lightmap3);
       CHK (lmi->lightmap3 = new csLightMap ());
-      lmi->lightmap3->MipmapLightMap (TEXW(lmi->tex3), TEXH(lmi->tex3), 1, lmi->lightmap, TEXW(lmi->tex2), TEXH(lmi->tex2), lmi->tex2->mipmap_size);
+      lmi->lightmap3->MipmapLightMap (TEXW(lmi->tex3), TEXH(lmi->tex3), 1,
+      	lmi->lightmap, TEXW(lmi->tex2), TEXH(lmi->tex2), lmi->tex2->mipmap_size);
       lmi->tex3->lm = lmi->lightmap3;
     }
   }
@@ -1643,6 +1646,33 @@ void csPolygon3D::CacheLightMaps (csPolygonSet* owner, int index)
       lmi->tex->lm->Cache (owner, this, index, csWorld::current_world);
   }
   lmi->tex->lm->ConvertToMixingMode ();
+}
+
+void csPolygon3D::UpdateLightMapSize ()
+{
+  if (orig_poly) return;
+  csLightMapped* lmi = GetLightMapInfo ();
+  if (!lmi || lmi->lightmap == NULL) return;
+
+  if (CheckFlags (CS_POLY_LIGHTING) && TEXW(lmi->tex)*TEXH(lmi->tex) < 1000000)
+  {
+    CHK (delete lmi->lightmap);
+    CHK (lmi->lightmap = new csLightMap ());
+    int r, g, b;
+    GetSector ()->GetAmbientColor (r, g, b);
+    lmi->lightmap->Alloc (TEXW(lmi->tex), TEXH(lmi->tex), def_mipmap_size,
+    	r, g, b);
+    lmi->tex->SetMipmapSize (def_mipmap_size); lmi->tex->lm = lmi->lightmap;
+  }
+}
+
+void csPolygon3D::ScaleLightMaps ()
+{
+  if (orig_poly) return;
+  csLightMapped* lmi = GetLightMapInfo ();
+  if (!lmi || lmi->lightmap == NULL) return;
+  lmi->tex->SetMipmapSize (def_mipmap_size);
+  lmi->tex->lm->Scale (TEXW (lmi->tex), TEXH (lmi->tex), lmi->tex->mipmap_size);
 }
 
 //---------------------------------------------------------------------------

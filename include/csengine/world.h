@@ -39,6 +39,7 @@ class csStatLight;
 class csDynLight;
 class csSpriteTemplate;
 class csClipper;
+class csWorld;
 class Dumper;
 class csLight;
 class csHaloInformation;
@@ -78,6 +79,35 @@ interface IConfig;
  * Also check lights in nearby sectors (not implemented yet).
  */
 #define CS_NLIGHT_NEARBYSECTORS 8
+
+/**
+ * Iterator to iterate over all polygons in the world.
+ * This iterator assumes there are no fundamental changes
+ * in the world while it is being used.
+ * If changes to the world happen the results are unpredictable.
+ */
+class csPolyIt
+{
+private:
+  // The world for this iterator.
+  csWorld* world;
+  // Current sector index.
+  int sector_idx;
+  // Current thing.
+  csThing* thing;
+  // Current polygon index.
+  int polygon_idx;
+
+public:
+  /// Construct an iterator and initialize to start.
+  csPolyIt (csWorld* w);
+
+  /// Restart iterator.
+  void Restart ();
+
+  /// Get polygon from iterator. Return NULL at end.
+  csPolygon3D* Fetch ();
+};
 
 /**
  * The world! This class basicly represents the 3D engine.
@@ -432,6 +462,16 @@ public:
    * It is also removed from all sectors.
    */
   void RemoveSprite (csSprite3D* sprite);
+
+  /**
+   * Create an iterator to iterate over all polygons of the world.
+   */
+  csPolyIt* NewPolyIterator ()
+  {
+    csPolyIt* it;
+    CHK (it = new csPolyIt (this));
+    return it;
+  }
 
   CSOBJTYPE;
 };

@@ -53,6 +53,81 @@
 
 //---------------------------------------------------------------------------
 
+csPolyIt::csPolyIt (csWorld* w)
+{
+  world = w;
+  sector_idx = -1;
+  thing = NULL;
+  polygon_idx = 0;
+}
+
+void csPolyIt::Restart ()
+{
+  sector_idx = -1;
+  thing = NULL;
+  polygon_idx = 0;
+}
+
+csPolygon3D* csPolyIt::Fetch ()
+{
+  csSector* sector;
+  if (sector_idx == -1)
+  {
+    sector_idx = 0;
+    thing = NULL;
+    polygon_idx = 0;
+  }
+
+  sector = (csSector*)(world->sectors[sector_idx]);
+
+  // Try next polygon.
+  polygon_idx++;
+
+  if (thing)
+  {
+    // We are busy scanning the things of this sector.
+    // See if the current thing has the indicated polygon number.
+    // If not then we try the next thing.
+    while (thing && polygon_idx >= thing->GetNumPolygons ())
+    {
+      thing = (csThing*)(thing->GetNext ());
+      polygon_idx = 0;
+    }
+    if (!thing)
+    {
+      // There are no more things left. Go to the next sector.
+      sector_idx++;
+      if (sector_idx >= world->sectors.Length ()) return NULL;
+      // Initialize iterator to start of sector and recurse.
+      thing = NULL;
+      polygon_idx = -1;
+      return Fetch ();
+    }
+  }
+  else if (polygon_idx >= sector->GetNumPolygons ())
+  {
+    // We are not scanning things but we have no more polygons in
+    // this sector. Start scanning things.
+    polygon_idx = -1;
+    thing = sector->GetFirstThing ();
+    // Recurse.
+    if (thing) return Fetch ();
+    // No things. Go to next sector.
+    sector_idx++;
+    if (sector_idx >= world->sectors.Length ()) return NULL;
+    // Initialize iterator to start of sector and recurse.
+    thing = NULL;
+    return Fetch ();
+  }
+
+  csPolygon3D* poly;
+  if (thing) poly = (csPolygon3D*)(thing->GetPolygon (polygon_idx));
+  else poly = (csPolygon3D*)(sector->GetPolygon (polygon_idx));
+  return poly;
+}
+
+//---------------------------------------------------------------------------
+
 float csWorld::shift_x;
 float csWorld::shift_y;
 int csWorld::frame_width;
@@ -286,6 +361,7 @@ void csWorld::ShineLights ()
       int accurate_things;
       float cosinus_factor;
       int lightmap_size;
+      int lightmap_highqual;
     };
     PrecalcInfo current;
     memset(&current, 0, sizeof(current)); //03/05/1999 Thomas Hieber: initialize current to something.
@@ -301,6 +377,7 @@ void csWorld::ShineLights ()
     current.accurate_things = csPolyTexture::do_accurate_things;
     current.cosinus_factor = csPolyTexture::cfg_cosinus_factor;
     current.lightmap_size = csPolygon3D::def_mipmap_size;
+    current.lightmap_highqual = (int)csPolygon3D::do_lightmap_highqual;
     bool force = false;
     char* reason = NULL;
 
@@ -329,7 +406,8 @@ void csWorld::ShineLights ()
       else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.accurate_things) { force = true; reason = "'accurate things' flag changed"; }
       else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%f", &f); if (ABS (f-current.cosinus_factor) > SMALL_EPSILON) { force = true; reason = "cosinus factor changed"; }
       else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.lightmap_size) { force = true; reason = "lightmap size changed"; }
-      }}}}}}}}}}
+      else { p1 = p2+1; p2 = strchr (p1, '='); if (p2) sscanf (p2+1, "%d", &i); else i = -1; if (i != current.lightmap_highqual) { force = true; reason = "lightmap quality setting changed"; }
+      }}}}}}}}}}}
       CHK (delete [] data);
     }
     else
@@ -347,10 +425,10 @@ void csWorld::ShineLights ()
         "AMBIENT_GREEN=%d\n"    "AMBIENT_BLUE=%d\n"
         "REFLECT=%d\n"          "RADIOSITY=%d\n"
         "ACCURATE_THINGS=%d\n"  "COSINUS_FACTOR=%f\n"
-        "LIGHTMAP_SIZE=%d\n",
+        "LIGHTMAP_SIZE=%d\n"    "LIGHTMAP_HIGHQUAL=%d\n",
         current.lm_version, current.normal_light_level, current.ambient_white, current.ambient_red, current.ambient_green,
         current.ambient_blue, current.reflect, current.radiosity, current.accurate_things, current.cosinus_factor,
-        current.lightmap_size);
+        current.lightmap_size, current.lightmap_highqual);
       VFS->WriteFile ("precalc_info", data, strlen (data));
       CsPrintf (MSG_INITIALIZATION, "Lightmap data is not up to date (reason: %s).\n", reason);
       csPolygon3D::do_force_recalc = true;
@@ -371,22 +449,40 @@ void csWorld::ShineLights ()
     csSector::cfg_reflections = 1;
   }
 
-  int sn = 0;
-  int total = sectors.Length ();
-  csProgressMeter meter (total);
-  csProgressPulse pulse;
-  CsPrintf (MSG_INITIALIZATION, "Initializing lightmaps (%d sectors total):\n  ",total);
+  csPolyIt* pit = NewPolyIterator ();
 
-  for (sn = 0; sn < total; sn++)
+  // Set lumel size for 'High Quality Mode'
+  // and reinit all lightmaps.
+  // This loop also counts all polygons.
+  csPolygon3D* p;
+  int polygon_count = 0;
+  if (csPolygon3D::do_lightmap_highqual && csPolygon3D::do_force_recalc)
+    csPolygon3D::def_mipmap_size /= 2;
+  pit->Restart ();
+  while ((p = pit->Fetch ()) != NULL)
+  {
+    if (csPolygon3D::do_lightmap_highqual && csPolygon3D::do_force_recalc)
+      p->UpdateLightMapSize ();
+    polygon_count++;
+  }
+  
+  int sn = 0;
+  int num_sectors = sectors.Length ();
+  csProgressMeter meter;
+  csProgressPulse pulse;
+  CsPrintf (MSG_INITIALIZATION, "Initializing lightmaps (%d sectors total):\n  ", num_sectors);
+
+  meter.SetTotal (num_sectors);
+  for (sn = 0; sn < num_sectors ; sn++)
   {
     csSector* s = (csSector*)sectors [sn];
     s->InitLightMaps ();
     meter.Step();
   }
 
-  meter.Reset();
-  CsPrintf(MSG_INITIALIZATION, "\nShining lights (%d sectors total):\n  ",total);
-  for (sn = 0; sn < total; sn++)
+  meter.SetTotal (num_sectors);
+  CsPrintf(MSG_INITIALIZATION, "\nShining lights (%d sectors total):\n  ", num_sectors);
+  for (sn = 0; sn < num_sectors ; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
     s->ShineLights (&pulse);
@@ -394,9 +490,24 @@ void csWorld::ShineLights ()
     meter.Step();
   }
 
-  meter.Reset();
-  CsPrintf(MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors total):\n  ",total);
-  for (sn = 0; sn < total; sn++)
+  // Restore lumel size from 'High Quality Mode'
+  // and remap all lightmaps.
+  if (csPolygon3D::do_lightmap_highqual && csPolygon3D::do_force_recalc)
+  {
+    CsPrintf(MSG_INITIALIZATION, "\nScaling lightmaps:\n  ");
+    csPolygon3D::def_mipmap_size *= 2;
+    meter.SetTotal (polygon_count);
+    pit->Restart ();
+    while ((p = pit->Fetch ()) != NULL)
+    {
+      p->ScaleLightMaps ();
+      meter.Step();
+    }
+  }
+
+  meter.SetTotal (num_sectors);
+  CsPrintf(MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors total):\n  ", num_sectors);
+  for (sn = 0; sn < num_sectors ; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
     s->CacheLightMaps ();
@@ -408,6 +519,8 @@ void csWorld::ShineLights ()
 
   if (!VFS->Sync ())
     CsPrintf (MSG_WARNING, "WARNING: error updating lighttable cache!\n");
+
+  CHK (delete pit);
 }
 
 void csWorld::CreateLightMaps (IGraphics3D* g3d)
@@ -614,7 +727,8 @@ void csWorld::AdvanceSpriteFrames (long current_time)
 void csWorld::ReadConfig (csIniFile* config)
 {
   if (!config) return;
-  csPolygon3D::def_mipmap_size = config->GetInt ("TextureMapper", "LIGHTMAP_SIZE", 16);
+  csPolygon3D::def_mipmap_size = config->GetInt ("Lighting", "LIGHTMAP_SIZE", 16);
+  csPolygon3D::do_lightmap_highqual = config->GetYesNo ("Lighting", "LIGHTMAP_HIGHQUAL", true);
   csLight::ambient_red = config->GetInt ("World", "AMBIENT_RED", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_green = config->GetInt ("World", "AMBIENT_GREEN", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_blue = config->GetInt ("World", "AMBIENT_BLUE", DEFAULT_LIGHT_LEVEL);

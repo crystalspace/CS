@@ -53,7 +53,8 @@ void csShadowMap::Alloc (csLight*, int w, int h, int lms)
   for (i = 0 ; i < lm_size ; i++) map[i] = 0;
 }
 
-void csShadowMap::MipmapLightMap (int w, int h, int lms, csShadowMap* source, int w2, int h2, int lms2)
+void csShadowMap::MipmapLightMap (int w, int h, int lms, csShadowMap* source,
+	int w2, int h2, int lms2)
 {
   int lw = w/lms+2;
   int lh = h/lms+2;
@@ -185,7 +186,8 @@ void csLightMap::Alloc (int w, int h, int lms, int r, int g, int b)
   }
 }
 
-void csLightMap::MipmapLightMap (int w, int h, int lms, csLightMap* source, int w2, int h2, int lms2)
+void csLightMap::MipmapLightMap (int w, int h, int lms, csLightMap* source,
+	int w2, int h2, int lms2)
 {
   Alloc (w, h, lms, 0, 0, 0);
 
@@ -298,7 +300,8 @@ void CacheName (char* buf, csPolygonSet* owner, int index, char* suffix)
     sprintf (buf, "lm/%s_%d%s", name ? name : ".", index, suffix);
 }
 
-bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner, csPolygon3D* poly, int index, csWorld* world)
+bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner,
+	csPolygon3D* poly, int index, csWorld* world)
 {
   char buf[200];
   PolySave ps;
@@ -492,6 +495,137 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
       f = convert_endian (ls.dist); cf->Write ((char*)&f, 4);
       cf->Write ((char*)(smap->map), lm_size);
     }
+    smap = smap->next;
+  }
+}
+
+void csLightMap::Scale (int w, int h, int new_lms)
+{
+  csRGBLightMap old_static_lm;
+  old_static_lm.Copy (static_lm, lm_size);
+  int old_rwidth = rwidth;
+  int old_rheight = rheight;
+  Alloc (w, h, new_lms, 0, 0, 0);
+  int x, y, new_val;
+  for (y = 0 ; y < old_rheight-1 ; y += 2)
+  {
+    for (x = 0 ; x < old_rwidth-1 ; x += 2)
+    {
+      int old_idx = y*old_rwidth+x;
+      int new_idx = (y>>1)*rwidth + (x>>1);
+      new_val = ((int)old_static_lm.mapR[old_idx]) +
+      	        ((int)old_static_lm.mapR[old_idx+1]) +
+      	        ((int)old_static_lm.mapR[old_idx+old_rwidth]) +
+      	        ((int)old_static_lm.mapR[old_idx+old_rwidth+1]);
+      static_lm.mapR[new_idx] = new_val/4;
+      new_val = ((int)old_static_lm.mapG[old_idx]) +
+      	        ((int)old_static_lm.mapG[old_idx+1]) +
+      	        ((int)old_static_lm.mapG[old_idx+old_rwidth]) +
+      	        ((int)old_static_lm.mapG[old_idx+old_rwidth+1]);
+      static_lm.mapG[new_idx] = new_val/4;
+      new_val = ((int)old_static_lm.mapB[old_idx]) +
+      	        ((int)old_static_lm.mapB[old_idx+1]) +
+      	        ((int)old_static_lm.mapB[old_idx+old_rwidth]) +
+      	        ((int)old_static_lm.mapB[old_idx+old_rwidth+1]);
+      static_lm.mapB[new_idx] = new_val/4;
+    }
+    if (old_rwidth & 1)
+    {
+      x = old_rwidth-1;
+      int old_idx = y*old_rwidth+x;
+      int new_idx = (y>>1)*rwidth + (x>>1);
+      new_val = ((int)old_static_lm.mapR[old_idx]) +
+      	        ((int)old_static_lm.mapR[old_idx+old_rwidth]);
+      static_lm.mapR[new_idx] = new_val/2;
+      new_val = ((int)old_static_lm.mapG[old_idx]) +
+      	        ((int)old_static_lm.mapG[old_idx+old_rwidth]);
+      static_lm.mapG[new_idx] = new_val/2;
+      new_val = ((int)old_static_lm.mapB[old_idx]) +
+      	        ((int)old_static_lm.mapB[old_idx+old_rwidth]);
+      static_lm.mapB[new_idx] = new_val/2;
+    }
+  }
+  if (old_rheight & 1)
+  {
+    y = old_rheight-1;
+    for (x = 0 ; x < old_rwidth-1 ; x += 2)
+    {
+      int old_idx = y*old_rwidth+x;
+      int new_idx = (y>>1)*rwidth + (x>>1);
+      new_val = ((int)old_static_lm.mapR[old_idx]) +
+      	        ((int)old_static_lm.mapR[old_idx+1]);
+      static_lm.mapR[new_idx] = new_val/2;
+      new_val = ((int)old_static_lm.mapG[old_idx]) +
+      	        ((int)old_static_lm.mapG[old_idx+1]);
+      static_lm.mapG[new_idx] = new_val/2;
+      new_val = ((int)old_static_lm.mapB[old_idx]) +
+      	        ((int)old_static_lm.mapB[old_idx+1]);
+      static_lm.mapB[new_idx] = new_val/2;
+    }
+    if (old_rwidth & 1)
+    {
+      x = old_rwidth-1;
+      int old_idx = y*old_rwidth+x;
+      int new_idx = (y>>1)*rwidth + (x>>1);
+      new_val = ((int)old_static_lm.mapR[old_idx]);
+      static_lm.mapR[new_idx] = new_val;
+      new_val = ((int)old_static_lm.mapG[old_idx]);
+      static_lm.mapG[new_idx] = new_val;
+      new_val = ((int)old_static_lm.mapB[old_idx]);
+      static_lm.mapB[new_idx] = new_val;
+    }
+  }
+
+  // Scale all shadowmaps as well.
+  csShadowMap* smap = first_smap;
+  while (smap)
+  {
+    unsigned char* oldmap = smap->map;
+    smap->map = NULL;
+    smap->Alloc (smap->light, w, h, new_lms);
+    for (y = 0 ; y < old_rheight-1 ; y += 2)
+    {
+      for (x = 0 ; x < old_rwidth-1 ; x += 2)
+      {
+        int old_idx = y*old_rwidth+x;
+        int new_idx = (y>>1)*rwidth + (x>>1);
+        new_val = ((int)oldmap[old_idx]) +
+      	          ((int)oldmap[old_idx+1]) +
+      	          ((int)oldmap[old_idx+old_rwidth]) +
+      	          ((int)oldmap[old_idx+old_rwidth+1]);
+        smap->map[new_idx] = new_val/4;
+      }
+      if (old_rwidth & 1)
+      {
+        x = old_rwidth-1;
+        int old_idx = y*old_rwidth+x;
+        int new_idx = (y>>1)*rwidth + (x>>1);
+        new_val = ((int)oldmap[old_idx]) +
+      	          ((int)oldmap[old_idx+old_rwidth]);
+        smap->map[new_idx] = new_val/2;
+      }
+    }
+    if (old_rheight & 1)
+    {
+      y = old_rheight-1;
+      for (x = 0 ; x < old_rwidth-1 ; x += 2)
+      {
+        int old_idx = y*old_rwidth+x;
+        int new_idx = (y>>1)*rwidth + (x>>1);
+        new_val = ((int)oldmap[old_idx]) +
+      	          ((int)oldmap[old_idx+1]);
+        smap->map[new_idx] = new_val/2;
+      }
+      if (old_rwidth & 1)
+      {
+        x = old_rwidth-1;
+        int old_idx = y*old_rwidth+x;
+        int new_idx = (y>>1)*rwidth + (x>>1);
+        new_val = ((int)oldmap[old_idx]);
+        smap->map[new_idx] = new_val;
+      }
+    }
+    CHK (delete [] oldmap);
     smap = smap->next;
   }
 }

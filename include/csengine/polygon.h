@@ -430,6 +430,8 @@ public:
   static bool do_not_force_recalc;
   /// Option variable: shadow mipmap size
   static int def_mipmap_size;
+  /// Option variable: high quality lightmap rendering.
+  static bool do_lightmap_highqual;
 
   /**
    * If this flag is true then this polygon will never be drawn.
@@ -978,6 +980,19 @@ public:
    * nothing if the cached lightmap was already up-to-date.
    */
   void CacheLightMaps (csPolygonSet* owner, int index);
+
+  /**
+   * Scale the lightmaps one step down. This is used in 'High Quality
+   * Lightmap Mode' and is generally only called by csWorld.
+   */
+  void ScaleLightMaps ();
+
+  /**
+   * Redo some init of the polygon when the lumel size of
+   * lightmaps change. This can only be done at init time
+   * of polygons and is generally only called by csWorld.
+   */
+  void UpdateLightMapSize ();
 
   /**
    * Transform the plane of this polygon from object space to world space.
