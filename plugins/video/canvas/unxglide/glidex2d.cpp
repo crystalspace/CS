@@ -417,6 +417,11 @@ bool csGraphics2DGlideX::HandleEvent (iEvent &/*Event*/)
           case XK_F10:        key = CSKEY_F10; break;
           case XK_F11:        key = CSKEY_F11; break;
           case XK_F12:        key = CSKEY_F12; break;
+          case XK_KP_Add:     key = CSKEY_PADPLUS; break;
+          case XK_KP_Subtract:key = CSKEY_PADMINUS; break;
+          case XK_KP_Multiply:key = CSKEY_PADMULT; break;
+          case XK_KP_Divide:  key = CSKEY_PADDIV; break;
+          case XK_KP_Begin:   key = CSKEY_CENTER; break;
           default:            key = (key <= 127) ? ScanCodeToChar [key] : 0;
         }
 	EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);

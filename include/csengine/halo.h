@@ -23,6 +23,8 @@
 #include "csengine/light.h"
 #include "ihalo.h"
 
+class csWorld;
+
 enum csHaloType
 {
   cshtCross,
@@ -112,21 +114,22 @@ public:
   /// Halo handle as returned by 3D rasterizer
   iHalo *Handle;
 
+  /// Last time we were updated
+  cs_time LastTime;
+
   /// Create an light halo object
-  csLightHalo (csLight *iLight, iHalo *iHandle)
-  {
-    Handle = iHandle;
-    (Light = iLight)->flags.SetBool (CS_LIGHT_ACTIVEHALO, true);
-  }
+  csLightHalo (csLight *iLight, iHalo *iHandle);
 
   /// Destroy the light halo object
-  ~csLightHalo ()
-  {
-    if (Handle)
-      Handle->DecRef ();
-    if (Light)
-      Light->flags.SetBool (CS_LIGHT_ACTIVEHALO, false);
-  }
+  ~csLightHalo ();
+
+  /**
+   * Process a light halo. The function changes halo brightness depending
+   * whenever the halo is obscured or not and returns "false" if halo has
+   * reached zero intensity and should be removed from halo queue.
+   * The function also actually projects, clips and draws the halo.
+   */
+  bool Process (cs_time ElapsedTime, const csWorld &World);
 };
 
 #endif // __HALO_H__

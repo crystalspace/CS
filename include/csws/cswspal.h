@@ -23,6 +23,61 @@
 class csApp;
 
 /**
+ * csApp contains a static array with indexes of all colors
+ * used in windowing system. They are mapped to nearest closest
+ * match in physical palette.
+ */
+enum
+{
+  /// 0, 0, 0
+  cs_Color_Black = 0,
+  /// 255, 255, 255
+  cs_Color_White,
+  /// 128, 128, 128
+  cs_Color_Gray_D,
+  /// 160, 160, 160
+  cs_Color_Gray_M,
+  /// 204, 204, 204
+  cs_Color_Gray_L,
+  /// 0, 20, 80
+  cs_Color_Blue_D,
+  /// 0, 44, 176
+  cs_Color_Blue_M,
+  /// 0, 64, 255
+  cs_Color_Blue_L,
+  /// 20, 80, 20
+  cs_Color_Green_D,
+  /// 44, 176, 44
+  cs_Color_Green_M,
+  /// 64, 255, 64
+  cs_Color_Green_L,
+  /// 80, 0, 0
+  cs_Color_Red_D,
+  /// 176, 0, 0
+  cs_Color_Red_M,
+  /// 255, 0, 0
+  cs_Color_Red_L,
+  /// 0, 60, 80
+  cs_Color_Cyan_D,
+  /// 0, 132, 176
+  cs_Color_Cyan_M,
+  /// 0, 192, 255
+  cs_Color_Cyan_L,
+  /// 80, 60, 20
+  cs_Color_Brown_D,
+  /// 176, 132, 44
+  cs_Color_Brown_M,
+  /// 255, 192, 64
+  cs_Color_Brown_L,
+  /// 255, 250, 205
+  cs_Color_Lemon,
+  /// last color
+  cs_Color_Last,			// This should always be the last one
+  // now just the aliases
+  cs_Color_Yellow = cs_Color_Brown_L
+};
+
+/**
  * Control palette export structure
  */
 struct csPaletteExport

@@ -14,13 +14,6 @@ EMPTY=
 SPACE=$(EMPTY) $(EMPTY)
 SEPARATOR=$"*-------------------------------------------------------------------------*$"
 
-ifndef "
-"='
-endif
-ifndef |
-|=|
-endif
-
 # Unix shells tend to use "$" as delimiter for variable names.
 # Test for this behaviour and set $(BUCK) variable correspondigly ...
 __TMP__:=$(shell echo $$$$)

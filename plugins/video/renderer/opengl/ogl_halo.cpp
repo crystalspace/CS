@@ -35,8 +35,10 @@ class csOpenGLHalo : public iHalo
   float R, G, B;
   /// The width and height
   int Width, Height;
-  /// The inverse width and height of the halo
-  float inv_W, inv_H;
+  /// Width and height factor
+  float Wfact, Hfact;
+  /// DST blending factor
+  GLuint dstblend;
   /// Our OpenGL texture handle
   GLuint halohandle;
   /// The OpenGL 3D driver
@@ -77,14 +79,12 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   // OpenGL can only use 2^n sized textures
   Width = FindNearestPowerOf2 (iWidth);
   Height = FindNearestPowerOf2 (iHeight);
-  inv_W = 1. / iWidth;
-  inv_H = 1. / iHeight;
 
   uint8 *Alpha = iAlpha;
   if ((Width != iWidth) || (Height != iHeight))
   {
     // Allocate our copy of the scanline which is power-of-two
-    uint8 *Alpha = new uint8 [Width * Height];
+    Alpha = new uint8 [Width * Height];
     for (int i = 0; i < iHeight; i++)
     {
       // Copy a scanline from the supplied alphamap
@@ -94,6 +94,7 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
     }
   }
 
+  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
   // Create handle
   glGenTextures (1, &halohandle);
   // Activate handle
@@ -110,8 +111,19 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
     delete [] Alpha;
   (G3D = iG3D)->IncRef ();
 
+  Wfact = float (iWidth) / Width;
+  Hfact = float (iHeight) / Height;
+
   Width = iWidth;
   Height = iHeight;
+
+  if (R > 1.0 || G > 1.0 || B > 1.0)
+  {
+    dstblend = GL_ONE;
+    R /= 2; G /= 2; B /= 2;
+  }
+  else
+    dstblend = GL_ONE_MINUS_SRC_ALPHA;
 }
 
 csOpenGLHalo::~csOpenGLHalo ()
@@ -126,11 +138,12 @@ csOpenGLHalo::~csOpenGLHalo ()
 void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   csVector2 *iVertices, int iVertCount)
 {
-  (void) w;
-  (void) h;
   int swidth = G3D->width;
   int sheight = G3D->height;
   int i;
+
+  if (w < 0) w = Width;
+  if (h < 0) h = Height;
 
   csVector2 HaloPoly [4];
   if (!iVertices)
@@ -150,23 +163,25 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
     HaloPoly [3].Set (x2, y1);
   };
 
+  /// The inverse width and height of the halo
+  float inv_W = Wfact / w, inv_H = Hfact / h;
+
   glPushMatrix ();
   glTranslatef (0, 0, 0);
 
   glDisable (GL_DEPTH_TEST);
-
   glEnable (GL_BLEND);
   glEnable (GL_TEXTURE_2D);
-  glShadeModel (GL_FLAT);
-  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  glBindTexture (GL_TEXTURE_2D, halohandle);    
 
-  // Our usual blending
-  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glShadeModel (GL_FLAT);
+  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  glBindTexture (GL_TEXTURE_2D, halohandle);
+
+  glBlendFunc (GL_SRC_ALPHA, dstblend);
   glColor4f (R, G, B, iIntensity);
 
   glBegin (GL_POLYGON);
-  for (i = 0; i < iVertCount; i++)
+  for (i = iVertCount - 1; i >= 0; i--)
   {
     float vx = iVertices [i].x, vy = iVertices [i].y;
     glTexCoord2f ((vx - x) * inv_W, (vy - y) * inv_H);

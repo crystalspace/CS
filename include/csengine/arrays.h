@@ -137,4 +137,27 @@ public:
   { return (csCurveTemplate *)csVector::Get (iIndex); }
 };
 
+class csLightHalo;
+
+// Private class for keeping an array of halos
+class csHaloArray : public csVector
+{
+public:
+  // Constructor
+  csHaloArray () : csVector (16, 16) { }
+
+  // Destructor
+  virtual ~csHaloArray ();
+
+  // Free an item from array
+  virtual bool FreeItem (csSome Item);
+
+  // Find a halo by referenced light
+  virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const;
+
+  // Return an reference to Nth halo info
+  inline csLightHalo *Get (int n) const
+  { return (csLightHalo *)csVector::Get (n); }
+};
+
 #endif // __ARRAYS_H__

@@ -29,7 +29,7 @@
 #include "csengine/lppool.h"
 #include "csengine/polygon.h"
 #include "csengine/curve.h"
-#include "csutil/halogen.h"
+#include "csengine/halo.h"
 
 int csLight::ambient_red = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
@@ -469,41 +469,4 @@ void csDynLight::AddLightedSprite (csLightHitsSprite* lp)
   if (lightedsprites) lightedsprites->prev_light = lp;
   lightedsprites = lp;
   lp->light = this;
-}
-
-//---------------------------------------------------------------------------
-
-csHalo::csHalo (csHaloType iType)
-{
-  Intensity = 0;
-  Type = iType;
-}
-
-csHalo::~csHalo ()
-{
-}
-
-csCrossHalo::csCrossHalo (float intensity_factor, float cross_factor)
-  : csHalo (cshtCross)
-{
-  IntensityFactor = intensity_factor;
-  CrossFactor = cross_factor;
-}
-
-unsigned char *csCrossHalo::Generate (int Size)
-{
-  return GenerateHalo (Size, IntensityFactor, CrossFactor);
-}
-
-csNovaHalo::csNovaHalo (int seed, int num_spokes, float roundness)
-  : csHalo (cshtNova)
-{
-  Seed = seed;
-  NumSpokes = num_spokes;
-  Roundness = roundness;
-}
-
-unsigned char *csNovaHalo::Generate (int Size)
-{
-  return GenerateNova (Size, Seed, NumSpokes, Roundness);
 }

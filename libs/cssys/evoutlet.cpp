@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "cssys/csevent.h"
+#include "cssys/csevcord.h"
 
 IMPLEMENT_IBASE (csSystemDriver::csEventOutlet)
   IMPLEMENTS_INTERFACE (iEventOutlet)
@@ -50,17 +51,17 @@ iEvent *csSystemDriver::csEventOutlet::CreateEvent ()
 
 void csSystemDriver::csEventOutlet::PutEvent (iEvent *Event)
 {
-  if ((1 << Event->Type) & EnableMask) {
+  if ((1 << Event->Type) & EnableMask)
+  {
     // Check for a pertinent event cord
-    csEventCord *cord = STATIC_CAST(csEventCord *) (System->GetEventCord(Event->Category, Event->SubCategory));
+    csEventCord *cord = (csEventCord *)System->GetEventCord (Event->Category, Event->SubCategory);
 
-    if(cord) {
-      // Return if the event is not to be handled by the system queue
-      if(cord->PutEvent(Event))
-	return;
-    }
+    // Return if the event is not to be handled by the system queue
+    if (cord && cord->PutEvent (Event))
+      return;
     System->EventQueue.Put (Event);
-  } else
+  }
+  else
     delete Event;
 }
 

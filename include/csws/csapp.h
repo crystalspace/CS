@@ -271,9 +271,9 @@ public:
   /// Remove the hint associated with given component
   void HintRemove (csComponent *iComp);
 
-  /// Set hint timeout (0 == disable)
-  void HintTimeout (int iTimeout)
-  { hints.SetTimeout (iTimeout); }
+  /// Get the hint manager object
+  csHintManager &GetHintManager ()
+  { return hints; }
 
   /// Load a font and return its handle or NULL
   iFont *LoadFont (const char *iFontName)

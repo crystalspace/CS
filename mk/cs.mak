@@ -4,6 +4,11 @@
 # Don't use this directly as a makefile.
 ############################################
 
+# The following two symbols are intended to be used in "echo" commands.
+# config.mak can override them depending on configured platform's requirements.
+"='
+|=|
+
 # The following include file should define all variables
 # needed for this makefile to work. Please do not change
 # the include order unless you know what you are doing!

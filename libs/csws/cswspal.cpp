@@ -231,9 +231,9 @@ static int palette_csTreeCtrl [] =
 // Hint class default palette
 static int palette_csHint [] =
 {
-  cs_Color_Cyan_M,			// Hint background
-  cs_Color_White, 			// Hint text
-  cs_Color_Black  			// Hint border
+  cs_Color_Lemon,			// Hint background
+  cs_Color_Black, 			// Hint text
+  cs_Color_Brown_M  			// Hint border
 };
 
 // Pointers to all standard palettes

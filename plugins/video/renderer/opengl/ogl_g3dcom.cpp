@@ -952,7 +952,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glColor4f (2, 2, 2, 0);
     for (i = 0; i < poly.num; i++)
     {
-      glVertex4fv (p_glverts); p_glverts += 4;
+      glVertex4fv (p_glverts);
+      p_glverts += 4;
     }
     glEnd ();
   }
@@ -1149,43 +1150,43 @@ void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
   bool enable_blending = true;
   switch (mode & CS_FX_MASK_MIXMODE)
   {
-  case CS_FX_MULTIPLY:
-    // Color = SRC * DEST +   0 * SRC = DEST * SRC
-    m_alpha = 1.0f;
-    glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-    break;
-  case CS_FX_MULTIPLY2:
-    // Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
-    m_alpha = 1.0f;
-    glBlendFunc (GL_DST_COLOR, GL_SRC_COLOR);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    break;
-  case CS_FX_ADD:
-    // Color = 1 * DEST + 1 * SRC = DEST + SRC
-    m_alpha = 1.0f;
-    glBlendFunc (GL_ONE, GL_ONE);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    break;
-  case CS_FX_ALPHA:
-    // Color = Alpha * DEST + (1-Alpha) * SRC
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    break;
-  case CS_FX_TRANSPARENT:
-    // Color = 1 * DEST + 0 * SRC
-    m_alpha = 1.0f;
-    glBlendFunc (GL_ZERO, GL_ONE);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    break;
-  case CS_FX_COPY:
-  default:
-    enable_blending = false;
-    // Color = 0 * DEST + 1 * SRC = SRC
-    m_alpha = 1.0f;
-    glBlendFunc (GL_ONE, GL_ZERO);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    break;
+    case CS_FX_MULTIPLY:
+      // Color = SRC * DEST +   0 * SRC = DEST * SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_ZERO, GL_SRC_COLOR);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      break;
+    case CS_FX_MULTIPLY2:
+      // Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_DST_COLOR, GL_SRC_COLOR);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_ADD:
+      // Color = 1 * DEST + 1 * SRC = DEST + SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_ONE, GL_ONE);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_ALPHA:
+      // Color = Alpha * DEST + (1-Alpha) * SRC
+      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_TRANSPARENT:
+      // Color = 1 * DEST + 0 * SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_ZERO, GL_ONE);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_COPY:
+    default:
+      enable_blending = false;
+      // Color = 0 * DEST + 1 * SRC = SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_ONE, GL_ZERO);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
   }
 
   m_textured = (texturehandle != 0);

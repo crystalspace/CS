@@ -23,6 +23,7 @@
 #include "csengine/world.h"
 #include "csengine/sector.h"
 #include "csengine/pol2d.h"
+#include "csengine/light.h"
 #include <math.h>
 
 //=============================================================================

@@ -52,6 +52,11 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   // Get the font server: A missing font server is NOT an error
   if (!FontServer)
     FontServer = QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
+#ifdef CS_DEBUG
+  if (!FontServer)
+    System->Printf (MSG_WARNING, "WARNING: Canvas driver couldn't find a font server plugin!\n"
+      "This is normal if you don't want one (warning displays only in debug mode)");
+#endif
 
   Palette = new csRGBpixel [256];
   pfmt.PalEntries = 256;
@@ -226,7 +231,7 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     }
 
     // delta Y can be negative
-    int deltay = QInt16 ((y2 - y1) / (x2 - x1));
+    int deltay = (fy2 - fy1) / (fx2 - fx1 + 1);
 
 #define H_LINE(pixtype)						\
   {								\
@@ -259,7 +264,7 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     }
 
     // delta X can be negative
-    int deltax = QInt16 ((x2 - x1) / (y2 - y1));
+    int deltax = (fx2 - fx1) / (fy2 - fy1 + 1);
 
 #define V_LINE(pixtype)						\
   {								\
@@ -358,9 +363,9 @@ bool csGraphics2D::ClipLine (float &x1, float &y1, float &x2, float &y2,
   int xmin, int ymin, int xmax, int ymax)
 {
   float fxmin = xmin;
-  float fxmax = float (xmax) - 0.0001;
+  float fxmax = xmax;
   float fymin = ymin;
-  float fymax = float (ymax) - 0.0001;
+  float fymax = ymax;
 
 #define CLIP_LEFT   0x01
 #define CLIP_TOP    0x02
@@ -368,7 +373,8 @@ bool csGraphics2D::ClipLine (float &x1, float &y1, float &x2, float &y2,
 #define CLIP_BOTTOM 0x08
 
 #define SetOutCodes(u, x, y)                \
-  if (x < fxmin) u = CLIP_LEFT; else u = 0; \
+  u = 0;                                    \
+  if (x < fxmin) u |= CLIP_LEFT;            \
   if (y < fymin) u |= CLIP_TOP;             \
   if (x > fxmax) u |= CLIP_RIGHT;           \
   if (y > fymax) u |= CLIP_BOTTOM;
@@ -404,13 +410,15 @@ bool csGraphics2D::ClipLine (float &x1, float &y1, float &x2, float &y2,
     }
     else if (ocu1 & CLIP_RIGHT)         // clip right
     {
-      y1 = y1 + ((y2 - y1) * (fxmax - x1)) / (x2 - x1);
-      x1 = fxmax;
+      float newx = fxmax - 0.0001;
+      y1 = y1 + ((y2 - y1) * (newx - x1)) / (x2 - x1);
+      x1 = newx;
     }
     else if (ocu1 & CLIP_BOTTOM)        // clip below
     {
-      x1 = x1 + ((x2 - x1) * (fymax - y1)) / (y2 - y1);
-      y1 = fymax;
+      float newy = fymax - 0.0001;
+      x1 = x1 + ((x2 - x1) * (newy - y1)) / (y2 - y1);
+      y1 = newy;
     }
     SetOutCodes (ocu1, x1, y1);         // update for (x1,y1)
     Inside  = (ocu1 | ocu2) == 0;

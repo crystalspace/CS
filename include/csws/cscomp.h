@@ -56,38 +56,6 @@ class csSkinSlice;
 #define CSS_DIRTY		0x00000200
 
 /**
- * csApp contains a static array with indexes of all colors
- * used in windowing system. They are mapped to nearest closest
- * match in physical palette.
- */
-enum
-{
-  cs_Color_Black = 0,
-  cs_Color_White,
-  cs_Color_Gray_D,
-  cs_Color_Gray_M,
-  cs_Color_Gray_L,
-  cs_Color_Blue_D,
-  cs_Color_Blue_M,
-  cs_Color_Blue_L,
-  cs_Color_Green_D,
-  cs_Color_Green_M,
-  cs_Color_Green_L,
-  cs_Color_Red_D,
-  cs_Color_Red_M,
-  cs_Color_Red_L,
-  cs_Color_Cyan_D,
-  cs_Color_Cyan_M,
-  cs_Color_Cyan_L,
-  cs_Color_Brown_D,
-  cs_Color_Brown_M,
-  cs_Color_Brown_L,
-  cs_Color_Last,			// This should always be the last one
-  // now just the aliases
-  cs_Color_Yellow = cs_Color_Brown_L
-};
-
-/**
  * Predefined Windowing System Command Codes<p>
  * The list below does not contain all defined messages; these are only the
  * most general ones. Any class which defines some class-specific messages

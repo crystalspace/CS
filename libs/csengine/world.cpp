@@ -1294,8 +1294,10 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   s->Draw (rview);
 
   // draw all halos on the screen
+  cs_time Elapsed, Current;
+  System->GetElapsedTime (Elapsed, Current);
   for (int halo = halos.Length () - 1; halo >= 0; halo--)
-    if (!ProcessHalo (halos.Get (halo)))
+    if (!halos.Get (halo)->Process (Elapsed, *this))
       halos.Delete (halo);
 }
 
@@ -1361,80 +1363,6 @@ void csWorld::RemoveHalo (csLight* Light)
   int idx = halos.FindKey (Light);
   if(idx!=-1)
     halos.Delete (idx);
-}
-
-#define HALO_INTENSITY_STEP	0.15f
-
-bool csWorld::ProcessHalo (csLightHalo *Halo)
-{
-  // Whenever the center of halo (the light) is directly visible
-  bool halo_vis = false;
-  // Whenever at least a piece of halo is visible
-  bool draw_halo = false;
-  // top-left coordinates of halo rectangle
-  float xtl = 0, ytl = 0;
-
-  // Project the halo.
-  csVector3 v = current_camera->World2Camera (Halo->Light->GetCenter ());
-  // The clipped halo polygon
-  csVector2 HaloClip [32];
-  // Number of vertices in HaloClip array
-  int HaloVCount = 32;
-
-  if (v.z > SMALL_Z)
-  {
-    float iz = current_camera->GetFOV () / v.z;
-    v.x = v.x * iz + current_camera->GetShiftX ();
-    v.y = frame_height - 1 - (v.y * iz + current_camera->GetShiftY ());
-
-    if (top_clipper->IsInside (v.x, v.y))
-    {
-      float zv = G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
-      halo_vis = (v.z <= zv);
-    }
-
-    // Create a rectangle containing the halo and clip it against screen
-    int hw = Halo->Handle->GetWidth ();
-    int hh = Halo->Handle->GetHeight ();
-    float hw2 = float (hw) / 2.0;
-    float hh2 = float (hh) / 2.0;
-    csVector2 HaloPoly [4] =
-    {
-      csVector2 (v.x - hw2, v.y - hh2),
-      csVector2 (v.x - hw2, v.y + hh2),
-      csVector2 (v.x + hw2, v.y + hh2),
-      csVector2 (v.x + hw2, v.y - hh2)
-    };
-    // Clip the halo against clipper
-    if (top_clipper->Clip (HaloPoly, 4, HaloClip, HaloVCount))
-    {
-      xtl = HaloPoly [0].x;
-      ytl = HaloPoly [0].y;
-      draw_halo = true;
-    }
-  }
-
-  float hintensity = Halo->Light->GetHalo ()->GetIntensity ();
-  if (halo_vis)
-  {
-    if (hintensity < 1.0 - HALO_INTENSITY_STEP)
-      hintensity += HALO_INTENSITY_STEP;
-    else
-      hintensity = 1.0;
-  }
-  else
-  {
-    hintensity -= HALO_INTENSITY_STEP;
-
-    // this halo is completely invisible. kill it.
-    if (hintensity <= 0)
-      return false;
-  }
-  Halo->Light->GetHalo ()->SetIntensity (hintensity);
-
-  if (draw_halo)
-    Halo->Handle->Draw (xtl, ytl, -1, -1, hintensity, HaloClip, HaloVCount);
-  return true;
 }
 
 csStatLight* csWorld::FindLight (float x, float y, float z, float dist)

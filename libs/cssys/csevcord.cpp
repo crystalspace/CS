@@ -24,113 +24,129 @@
 #include "iplugin.h"
 #include "ievent.h"
 
-IMPLEMENT_IBASE(csEventCord)
-  IMPLEMENTS_INTERFACE(iEventCord)
+IMPLEMENT_IBASE (csEventCord)
+  IMPLEMENTS_INTERFACE (iEventCord)
 IMPLEMENT_IBASE_END
 
-csEventCord::csEventCord(int Category, int Subcategory) : category(Category), 
-  subcategory(Subcategory)
+csEventCord::csEventCord (int Category, int Subcategory) : category (Category), 
+  subcategory (Subcategory)
 {
   plugins = NULL;
   // By default, do not pass events to the system driver
-  pass = false;
+  // except Category/Subcategory zero
+  pass = (Category == 0) && (Subcategory == 0);
   SpinLock = 0;
 }
 
 int csEventCord::Insert(iPlugIn *plugin, int priority)
 {
-  Lock();
+  Lock ();
   // Increment the plugin reference count
-  plugin->IncRef();
+  plugin->IncRef ();
   int retval = 0;
-  if(plugins) { // Add a new record
-    PluginData *last = NULL, *curr = CONST_CAST(PluginData *) (plugins);
-    while (curr) {
-      if(priority>curr->priority)
-	break;
+  if (plugins)
+  {
+    // Add a new record
+    PluginData *last = NULL, *curr = plugins;
+    while (curr)
+    {
+      if (priority>curr->priority)
+        break;
       last = curr;
       curr = curr->next;
       retval++;
     }
-    if(last) {  // Insert in the middle or at the end
+    if (last)
+    {
+      // Insert in the middle or at the end
       last->next = new PluginData;
       last->next->plugin = plugin;
       last->next->priority = priority;
       last->next->next = curr;
-    } else { // Insert at the top
+    }
+    else
+    {
+      // Insert at the top
       plugins = new PluginData;
       plugins->plugin = plugin;
       plugins->priority = priority;
       plugins->next = curr;
     }
-  } else { // Create first record
+  }
+  else
+  {
+    // Create first record
     plugins = new PluginData;
     plugins->plugin = plugin;
     plugins->priority = priority;
     plugins->next = NULL;
   }
-  Unlock();
+
+  Unlock ();
   return retval;
 }
 
-void csEventCord::Remove(iPlugIn *plugin)
+void csEventCord::Remove (iPlugIn *plugin)
 {
-  Lock();
-  PluginData *last = NULL, *curr = CONST_CAST(PluginData *) (plugins);
+  Lock ();
+  PluginData *last = NULL, *curr = plugins;
   // Walk the list until you find the plugin
-  while(curr) {
-    if(curr->plugin==plugin) {
-      if(last) {
-	// Unlink the plugin from the list and delete it's record
-	last->next = curr->next;
-	curr->plugin->DecRef();
-	delete curr;
-	break;
+  while (curr)
+  {
+    if (curr->plugin == plugin)
+      if (last)
+      {
+        // Unlink the plugin from the list and delete it's record
+        last->next = curr->next;
+        curr->plugin->DecRef ();
+        delete curr;
+        break;
       }
-    }
     last = curr;
     curr = curr->next;
   }
-  Unlock();
+
+  Unlock ();
 }
 
-bool csEventCord::GetPass() const
+bool csEventCord::GetPass () const
 {
   return pass;
 }
 
-void csEventCord::SetPass(bool Pass)
+void csEventCord::SetPass (bool Pass)
 {
   pass = Pass;
 }
 
-bool csEventCord::PutEvent(iEvent *event)
+bool csEventCord::PutEvent (iEvent *event)
 {
-  Lock();
-  // Make sure we have a list
-  if(plugins) {
-    PluginData *curr = CONST_CAST(PluginData *) (plugins);
-    // Walk the list until a plugin returns true
-    while(curr) {
-      if(curr->plugin->HandleEvent(*event))
-	return true;
-      curr = curr->next;
-    }      
+  Lock ();
+
+  PluginData *cur = plugins;
+  // Walk the list until a plugin returns true
+  while (cur)
+  {
+    if (cur->plugin->HandleEvent (*event))
+      return true;
+    cur = cur->next;
   }
-  Unlock();
+
+  Unlock ();
 
   // If we pass events to the system driver, then we return 
   // false so it will process the event.
   return !pass;
 }
 
-int csSystemDriver::csEventCordsVector::Find(int Category, int SubCategory)
+int csSystemDriver::csEventCordsVector::Find (int Category, int SubCategory)
 {
   int i;
-  for(i = 0; i < Length(); i++) {
-    csEventCord *cord = Get(i);
-    if(cord->category==Category && cord->subcategory==SubCategory)
+  for (i = 0; i < Length (); i++)
+  {
+    csEventCord *cord = Get (i);
+    if (cord->category == Category && cord->subcategory == SubCategory)
       return i;
   }
   return -1;
-}     
+}

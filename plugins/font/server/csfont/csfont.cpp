@@ -129,7 +129,7 @@ iFont *csDefaultFontServer::GetFont (int iIndex)
   if ((iIndex >= 0) && (iIndex < fonts.Length ()))
   {
     iFont *font = fonts.Get (iIndex);
-    if (font) { font->IncRef (); return font; }
+    if (font) return font;
   }
   return NULL;
 }
@@ -356,7 +356,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
   int width, int height, int bytesperchar, uint8 *bitmap, uint8 *individualwidth)
   : DeleteCallbacks (4, 4)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (parent);
   Parent = parent;
   Parent->NotifyCreate (this);
   if (name [0] != '*')

@@ -24,7 +24,7 @@
 #include "csobject/nobjvec.h"
 #include "csengine/rview.h"
 #include "csengine/tranman.h"
-#include "csengine/halo.h"
+#include "csengine/arrays.h"
 #include "csobject/csobject.h"
 #include "igraph3d.h"
 #include "isystem.h"
@@ -56,6 +56,7 @@ class csCoverageMaskTree;
 class csCovMaskLUT;
 class csPoly2DPool;
 class csLightPatchPool;
+class csLightHalo;
 struct iSystem;
 struct iVFS;
 struct iMaterialWrapper;
@@ -332,25 +333,6 @@ class csWorld : public iWorld, public csObject
 {
   friend class Dumper;
 
-  // Private class for keeping an array of halos
-  class csHaloVector : public csVector
-  {
-  public:
-    // Constructor
-    csHaloVector () : csVector (16, 16) {}
-    // Destructor
-    virtual ~csHaloVector () { DeleteAll (); }
-    // Free an item from array
-    virtual bool FreeItem (csSome Item)
-    { delete (csLightHalo *)Item; return true; }
-    // Find a halo by referenced light
-    virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
-    { return ((csLightHalo *)Item)->Light == (csLight *)Key ? 0 : -1; }
-    // Return an reference to Nth halo info
-    inline csLightHalo *Get (int n) const
-    { return (csLightHalo *)csVector::Get (n); }
-  };
-
 public:
   /**
    * This is the Virtual File System object where all the files
@@ -501,7 +483,7 @@ private:
   /// Linked list of dynamic lights.
   csDynLight* first_dyn_lights;
   /// List of halos (csHaloInformation).
-  csHaloVector halos;  
+  csHaloArray halos;  
   /// If true then the lighting cache is enabled.
   static bool do_lighting_cache;
   /// Debugging: maximum number of polygons to process in one frame.
@@ -920,14 +902,6 @@ public:
    * Remove halo attached to given light from the world.
    */
   void RemoveHalo (csLight* Light);
-
-  /**
-   * Process a existing light halo. The function changes halo brightness
-   * in dependence whenever the halo is obscured or not and returns "false"
-   * if halo has reached zero intensity and should be removed from halo queue.
-   * The function also actually projects, clips and draws the halo.
-   */
-  bool ProcessHalo (csLightHalo *Halo);
 
   /**
    * Draw the world given a camera and a clipper. Note that

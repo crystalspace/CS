@@ -109,8 +109,8 @@ void csGraphicsPipeline::Line (float x1, float y1, float x2, float y2, int color
   if (!BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
-  INCLUDE_POINT (QRound (x1), QRound (y1));
-  INCLUDE_POINT (QRound (x2), QRound (y2));
+  INCLUDE_POINT (QInt (x1), QInt (y1));
+  INCLUDE_POINT (QInt (x2), QInt (y2));
   G2D->DrawLine (x1, y1, x2, y2, color);
 }
 

@@ -58,7 +58,7 @@ void csBasicVector::SetLength (int n)
 
 int csBasicVector::Find (csSome which) const
 {
-  for (int i = 0, n = Length(); i < n; i++)
+  for (int i = 0; i < Length (); i++)
     if (root [i] == which)
       return i;
   return -1;
@@ -138,7 +138,7 @@ bool csVector::Replace (int n, csSome what)
 
 int csVector::FindKey (csConstSome Key, int Mode) const
 {
-  for (int i = 0, n = Length(); i < n; i++)
+  for (int i = 0; i < Length (); i++)
     if (CompareKey (root [i], Key, Mode) == 0)
       return i;
   return -1;

@@ -1068,6 +1068,18 @@ bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
   if (idx < 0)
     return false;
 
+  iConfig *config = QUERY_INTERFACE (iObject, iConfig);
+  if (config)
+  {
+    for (int i = OptionList.Length () - 1; i >= 0; i--) 
+    {
+      csPluginOption *pio = (csPluginOption *)OptionList.Get (i);
+      if (pio->Config == config)
+        OptionList.Delete (i);
+    }
+    config->DecRef ();
+  }
+
   csPlugIn *p = PlugIns.Get (idx);
 
 #define CHECK(Var,Func)						\
@@ -1153,12 +1165,13 @@ iEventOutlet *csSystemDriver::CreateEventOutlet (iEventPlug *iObject)
 
 iEventCord *csSystemDriver::GetEventCord (int Category, int Subcategory)
 {
-  int idx = EventCords.Find(Category, Subcategory);
-  if(idx != -1) 
-    return EventCords.Get(idx);
-  else {
-    csEventCord *cord = new csEventCord(Category, Subcategory);
-    EventCords.Push(cord);
+  int idx = EventCords.Find (Category, Subcategory);
+  if (idx != -1) 
+    return EventCords.Get (idx);
+  else
+  {
+    csEventCord *cord = new csEventCord (Category, Subcategory);
+    EventCords.Push (cord);
     return cord;
   }
 }

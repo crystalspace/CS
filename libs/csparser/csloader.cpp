@@ -43,6 +43,7 @@
 #include "csengine/dumper.h"
 #include "csengine/keyval.h"
 #include "csengine/particle.h"
+#include "csengine/halo.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/token.h"

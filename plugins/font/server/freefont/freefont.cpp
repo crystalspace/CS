@@ -125,7 +125,7 @@ iFont *csFreeTypeServer::GetFont (int iIndex)
   if (iIndex >= 0 && iIndex < fonts.Length ())
   {
     csFreeTypeFont *font = fonts.Get (iIndex);
-    if (font) { font->IncRef (); return font; }
+    if (font) return font;
   }
   return NULL;
 }

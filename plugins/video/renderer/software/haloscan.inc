@@ -71,10 +71,13 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
         uint32 dg = d & HALO_GM;
         uint32 db = d & HALO_BM;
         // Apply alpha
-        dr = dr + ((a * (Scan.FogR - dr)) >> 7);
-        dg = dg + ((a * (Scan.FogG - dg)) >> 7);
-        db = db + ((a * (Scan.FogB - db)) >> 7);
+        dr = dr + ((a * int (Scan.FogR - dr)) >> 7);
+        dg = dg + ((a * int (Scan.FogG - dg)) >> 7);
+        db = db + ((a * int (Scan.FogB - db)) >> 7);
         // Clamp the values if needed
+        dr &= ~(int32 (dr) >> 31); // if (dr < 0) dr = 0;
+        dg &= ~(int32 (dg) >> 31); // if (dg < 0) dg = 0;
+        db &= ~(int32 (db) >> 31); // if (db < 0) db = 0;
 #ifdef HALO_CLAMP
         if (dr > HALO_RM) dr = HALO_RM; else dr &= HALO_RM;
         if (dg > HALO_GM) dg = HALO_GM; else dg &= HALO_GM;
@@ -99,7 +102,7 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
     unsigned int ax = 0;
     while (D < E)
     {
-      uint8 a = (A [ax >> 16] * Scan.FogDensity) >> 8;
+      int a = (A [ax >> 16] * Scan.FogDensity) >> 8;
       if (a)
       {
         // Get the destination pixel from framebuffer
@@ -110,10 +113,13 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
         uint32 dg = d & HALO_GM;
         uint32 db = d & HALO_BM;
         // Apply alpha
-        dr = dr + ((a * (Scan.FogR - dr)) >> 7);
-        dg = dg + ((a * (Scan.FogG - dg)) >> 7);
-        db = db + ((a * (Scan.FogB - db)) >> 7);
+        dr = dr + ((a * int (Scan.FogR - dr)) >> 7);
+        dg = dg + ((a * int (Scan.FogG - dg)) >> 7);
+        db = db + ((a * int (Scan.FogB - db)) >> 7);
         // Clamp the values if needed
+        dr &= ~((int32)dr >> 31); // if (dr < 0) dr = 0;
+        dg &= ~((int32)dg >> 31); // if (dg < 0) dg = 0;
+        db &= ~((int32)db >> 31); // if (db < 0) db = 0;
 #ifdef HALO_CLAMP
         if (dr > HALO_RM) dr = HALO_RM; else dr &= HALO_RM;
         if (dg > HALO_GM) dg = HALO_GM; else dg &= HALO_GM;

@@ -58,7 +58,7 @@ struct GLGlyphSet : public GLProtoGlyphSet
 
 GLGlyphSet::GLGlyphSet (iFont *Font)
 {
-  font = Font;
+  (font = Font)->IncRef ();
   size = Font->GetSize ();
 }
 
@@ -73,6 +73,7 @@ GLGlyphSet::~GLGlyphSet ()
       glDeleteTextures (1, &glyphs [i].hTexture);
     }
   }
+  font->DecRef ();
 }
 
 //-----------------------------------------------------// GLGlyphVector //----//
@@ -90,6 +91,12 @@ bool GLFontCache::GLGlyphVector::FreeItem (csSome Item)
 
 //-------------------------------------------------------// GLFontCache //----//
 
+static void FontDeleteNotify (iFont *font, void *glyphset)
+{
+  GLFontCache *This = (GLFontCache *)glyphset;
+  This->CacheFree (font);
+}
+
 GLFontCache::GLFontCache (iFontServer *fs) : FontCache (8, 8)
 {
   int i = 0;
@@ -100,12 +107,10 @@ GLFontCache::GLFontCache (iFontServer *fs) : FontCache (8, 8)
 
 GLFontCache::~GLFontCache ()
 {
-}
-
-static void FontDeleteNotify (iFont *font, void *glyphset)
-{
-  GLFontCache *This = (GLFontCache *)glyphset;
-  This->CacheFree (font);
+  // Remove deletion callbacks to avoid being deleted later -
+  // when the font cache object will be already deleted
+  for (int i = 0; i < FontCache.Length (); i++)
+    FontCache.Get (i)->font->RemoveDeleteCallback (FontDeleteNotify, this);
 }
 
 GLGlyphSet *GLFontCache::CacheFont (iFont *font)
@@ -243,13 +248,13 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
 
 void GLFontCache::CacheFree (iFont *font)
 {
+  font->RemoveDeleteCallback (FontDeleteNotify, this);
   for (int i = FontCache.Length () - 1; i >= 0; i--)
   {
     GLGlyphSet *gs = FontCache.Get (i);
     if (gs->font == font)
       FontCache.Delete (i);
   }
-  font->RemoveDeleteCallback (FontDeleteNotify, this);
 }
 
 bool GLFontCache::ClipRect (float x, float y,

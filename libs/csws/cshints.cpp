@@ -35,29 +35,95 @@ csHint::csHint (csComponent *iParent, const char *iText, iFont *Font,
 
 void csHint::SetText (const char *iText)
 {
-#if 0
-  // First of all, decide our width and height
-  int h, w = FontSize (iText, &fh);
-  while (w > h * 10)
+  if (!iText)
   {
-    w >>= 1;
-    h = (h + 2) << 1;
+    csComponent::SetText (iText);
+    SetRect (0, 0, 0, 0);
+    return;
+  }
+
+  // First of all, decide our width and height
+  iFont *font;
+  int fontsize;
+  GetFont (font, fontsize);
+  font->SetSize (fontsize);
+
+  int fw, fh;
+  font->GetDimensions (iText, fw, fh);
+  while (fw > fh * 30)
+  {
+    fw >>= 1;
+    fh = (fh + 2) << 1;
   }
 
   // Split the text (preferably between words) to approximatively given width
-  const char *txt = iText;
-  const int max_split = 20;
-  int split [max_split];
+  char *textcopy = strdup (iText);
+  char *txt = textcopy;
+  char *lasttxt = strchr (txt, 0);
+  const int max_splits = 20;
+  char *split [max_splits];
   int splitcount = 0;
-  while (splitcount < max_split)
+  int maxw = 0, maxlen = 0;
+  while (txt < lasttxt && splitcount < max_splits)
   {
+    // Skip all whitespace characters at the beginning of string
+    while (strchr (" \t", *txt))
+      txt++;
+
+    int len = font->GetLength (txt, fw);
+    // Now skip characters until we find a whitespace
+    while (txt [len] && !strchr (" \t", txt [len]))
+      len++;
+    // Skip all the spaces backward
+    while (len && strchr (" \t", txt [len - 1]))
+      len--;
+    // Allright, now split the string at this point
+    txt [len] = 0;
+
+    font->GetDimensions (txt, fw, fh);
+    if (fw > maxw) maxw = fw;
+
+    split [splitcount++] = txt;
+    txt += ++len;
+    maxlen += len;
   }
 
-  // Now find our position depending on parent component's position
+  txt = text = new char [maxlen];
+  for (fh = 0; fh < splitcount; fh++)
+  {
+    if (fh) *txt++ = '\n';
+    strcpy (txt, split [fh]);
+    txt = strchr (txt, 0);
+  }
 
-#endif  
-csComponent::SetText (iText);
-SetRect (-50,-40,100,40);
+  delete [] textcopy;
+
+  // Now find our position depending on mouse position
+  Invalidate ();
+
+  int maxfw, maxfh;
+  font->GetMaxSize (maxfw, maxfh);
+
+  csRect r (0, 0, maxw + 6, 2 + 2 + splitcount * (maxfh + 2));
+  int mx, my;
+  app->GetMouse ().GetPosition (mx, my);
+  parent->GlobalToLocal (mx, my);
+  r.Move (mx - r.Width () / 2, my - r.Height ());
+
+  mx = r.xmin; my = r.ymin;
+  parent->LocalToGlobal (mx, my);
+  int ox = mx, oy = my;
+  mx += r.Width ();
+  my += r.Height ();
+  if (mx > app->bound.xmax) mx = app->bound.xmax;
+  if (my > app->bound.ymax) my = app->bound.ymax;
+  mx -= r.Width ();
+  my -= r.Height ();
+  if (mx < app->bound.xmin) mx = app->bound.xmin;
+  if (my < app->bound.ymin) my = app->bound.ymin;
+  r.Move (mx - ox, my - oy);
+
+  SetRect (r);
 }
 
 void csHint::Draw ()
@@ -65,8 +131,27 @@ void csHint::Draw ()
   Rect3D (0, 0, bound.Width (), bound.Height (),
     CSPAL_HINT_BORDER, CSPAL_HINT_BORDER);
   Box (1, 1, bound.Width () - 1, bound.Height () - 1, CSPAL_HINT_BACKGROUND);
-//@@todo
-  Text (2, 2, CSPAL_HINT_TEXT, -1, text);
+
+  iFont *font;
+  int fontsize;
+  GetFont (font, fontsize);
+  font->SetSize (fontsize);
+
+  int cury = 3;
+  char *txt = text;
+  while (*txt)
+  {
+    char *eol = strchr (txt, '\n');
+    if (!eol) eol = strchr (txt, 0);
+    char oldchr = *eol;
+    *eol = 0;
+    int fw, fh;
+    font->GetDimensions (txt, fw, fh);
+    Text ((bound.Width () - fw) / 2, cury, CSPAL_HINT_TEXT, -1, txt);
+    *eol = oldchr;
+    txt = eol + 1;
+    cury += fh + 2;
+  }
 }
 
 bool csHint::PreHandleEvent (iEvent &Event)
@@ -92,6 +177,8 @@ csHintManager::csHintManager (csApp *iApp) : csVector (16, 16)
 csHintManager::~csHintManager ()
 {
   DeleteAll ();
+  if (font)
+    font->DecRef ();
 }
 
 bool csHintManager::FreeItem (csSome Item)

@@ -144,6 +144,8 @@ struct iFontServer : public iPlugIn
    * Get Nth loaded font or NULL.
    * You can query all loaded fonts with this method, by looping
    * through all indices starting from 0 until you get NULL.
+   * Note that the returned font is NOT IncRef'd: do it yourself
+   * if you store the pointer for long-term use.
    */
   virtual iFont *GetFont (int iIndex) = 0;
 };

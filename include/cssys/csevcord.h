@@ -30,41 +30,46 @@ class csEventCord : public iEventCord
 public:
   DECLARE_IBASE;
 
-  // Create an event cord for a given category/subcategory
+  /// Create an event cord for a given category/subcategory
   csEventCord(int category, int subcategory);
 
-  // Insert a plugin into the event cord
+  /// Insert a plugin into the event cord
   virtual int Insert(iPlugIn *plugin, int priority);
 
-  // Remove a plugin from the event cord
+  /// Remove a plugin from the event cord
   virtual void Remove(iPlugIn *plugin);
 
-  // Get and set whether events are passed to the system event queue
-  virtual bool GetPass() const;
-  virtual void SetPass(bool pass);
+  /// Get whether events are passed to the system event queue
+  virtual bool GetPass () const;
 
-  // For the system driver to post events to the cord.  Should not be
-  // used directly.
-  bool PutEvent(iEvent *event);
+  /// Set whether events are passed to the system event queue
+  virtual void SetPass (bool pass);
 
-  // The category and subcategory of this events on this cord
+  /**
+   * For the system driver to post events to the cord.
+   * Should not be used directly.
+   */
+  bool PutEvent (iEvent *event);
+
+  /// The category and subcategory of this events on this cord
   const int category, subcategory;
 
 protected:
-  // Pass events to the system queue?
+  /// Pass events to the system queue?
   volatile bool pass;
 
-  // Linked list of plugins
-  struct PluginData {
+  /// Linked list of plugins
+  struct PluginData
+  {
     iPlugIn *plugin;
     int priority;
     PluginData *next;
   };
 
-  // The cord itself
-  volatile PluginData *plugins;
+  /// The cord itself
+  PluginData *plugins;
 
-  // Protection against multiple threads accessing the same cord
+  /// Protection against multiple threads accessing the same cord
   volatile int SpinLock;
 
   /// Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!

@@ -436,6 +436,7 @@ void csApp::SetupPalette ()
   Pal [cs_Color_Brown_D] = txtmgr->FindRGB ( 80,  60,  20);
   Pal [cs_Color_Brown_M] = txtmgr->FindRGB (176, 132,  44);
   Pal [cs_Color_Brown_L] = txtmgr->FindRGB (255, 192,  64);
+  Pal [cs_Color_Lemon]   = txtmgr->FindRGB (255, 250, 205);
 }
 
 int csApp::FindColor (int r, int g, int b)

@@ -116,6 +116,10 @@ GLFontCache::GLFontCache (iFontServer *fs) : FontCache (8, 8)
 
 GLFontCache::~GLFontCache ()
 {
+  // Remove deletion callbacks to avoid being deleted later -
+  // when the font cache object will be already deleted
+  for (int i = 0; i < FontCache.Length (); i++)
+    FontCache.Get (i)->font->RemoveDeleteCallback (FontDeleteNotify, this);
 }
 
 static void FontDeleteNotify (iFont *font, void *glyphset)

@@ -21,8 +21,9 @@
 #include "csengine/arrays.h"
 #include "csengine/curve.h"
 #include "csengine/polygon.h"
+#include "csengine/halo.h"
 
-//-------------------------------------------------------- csCurvesArray -----//
+//-------------------------------------------------------+ csCurvesArray +----//
 
 csCurvesArray::~csCurvesArray ()
 {
@@ -42,7 +43,7 @@ int csCurvesArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
   return name ? strcmp (name, (char *)Key) : -1;
 }
 
-//------------------------------------------------------- csPolygonArray -----//
+//------------------------------------------------------+ csPolygonArray +----//
 
 csPolygonArray::~csPolygonArray ()
 {
@@ -79,7 +80,7 @@ csPolygon3D *csPolygonArrayNoFree::Get (int iIndex) const
   return (csPolygon3D *)(csPolygonInt *)csVector::Get (iIndex);
 }
 
-//------------------------------------------------- csCurveTemplateArray -----//
+//------------------------------------------------+ csCurveTemplateArray +----//
 
 csCurveTemplateArray::~csCurveTemplateArray ()
 {
@@ -97,4 +98,22 @@ int csCurveTemplateArray::CompareKey (csSome Item, csConstSome Key, int Mode) co
   (void) Mode;
   const char *name = ((csCurveTemplate *)Item)->GetName ();
   return name ? strcmp (name, (char *)Key) : -1;
+}
+
+//---------------------------------------------------------+ csHaloArray +----//
+
+csHaloArray::~csHaloArray ()
+{
+  DeleteAll ();
+}
+
+bool csHaloArray::FreeItem (csSome Item)
+{
+  delete (csLightHalo *)Item;
+  return true;
+}
+
+int csHaloArray::CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+{
+  return ((csLightHalo *)Item)->Light == (csLight *)Key ? 0 : -1;
 }

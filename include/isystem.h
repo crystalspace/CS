@@ -297,7 +297,7 @@ struct iSystem : public iBase
    * of plugins that register with the implementation of iEventCord
    * returned by this function.
    */
-  virtual iEventCord *GetEventCord(int Category, int Subcategory) = 0;
+  virtual iEventCord *GetEventCord (int Category, int Subcategory) = 0;
 
   /**
    * Get a public event outlet for posting just a single event and such.

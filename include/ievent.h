@@ -603,37 +603,37 @@ struct iEventOutlet : public iBase
   virtual void ImmediateBroadcast (int iCode, void *iInfo) = 0;
 };
 
-SCF_VERSION(iEventCord, 0, 0, 1);
+SCF_VERSION (iEventCord, 0, 0, 1);
 
 /**
  * The iEventCord is an interface provided by the system driver to
- * any plugins wanting to receive a given csevCommand events ASAP
- * in a specified priority.  It can optionally pass events onto 
- * the system queue, as well.
+ * any plugins wanting to receive some subclasses of events ASAP
+ * in a specified priority, bypassing system event queue.
+ * It can optionally pass events onto the system queue, as well.
  */
-struct iEventCord {
-
+struct iEventCord
+{
   /**
    * Insert a plugin into the queue.  The priority defines
    * when it will receive the event with respect to other
    * registered plugins.  Plugins with the same priority are
    * handled in a first-come first-served fashion.  This is 
-   * significant since returning false from HandleEvent will
+   * significant since returning true from HandleEvent will
    * stop further event processing.
    */
-  virtual int Insert(iPlugIn *plugin, int priority) = 0;
+  virtual int Insert (iPlugIn *plugin, int priority) = 0;
 
   /**
    * Remove a plugin from the queue.
    */
-  virtual void Remove(iPlugIn *plugin) = 0;
+  virtual void Remove (iPlugIn *plugin) = 0;
 
   /**
    * Returns true if events are passed on to the
    * system queue after all plugins in the local
    * queue have processed (and returned false).
    */
-  virtual bool GetPass() const = 0;
+  virtual bool GetPass () const = 0;
 
   /**
    * Sets whether events are passed to the system
@@ -641,8 +641,7 @@ struct iEventCord {
    * and all returned false.  This could cause the 
    * event to be processed twice under some circumstances.
    */
-  virtual void SetPass(bool pass) = 0;
-  
+  virtual void SetPass (bool pass) = 0;
 };
 
 #endif // __IEVENT_H__
