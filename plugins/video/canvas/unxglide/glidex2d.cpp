@@ -26,9 +26,9 @@
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
+#include "video/renderer/glide/gllib.h"
 
 #ifdef GLIDE3
-#include "video/renderer/glide3/gllib3.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
@@ -38,7 +38,6 @@ EXPORT_CLASS_TABLE (glidx2d3)
 EXPORT_CLASS_TABLE_END
 
 #else
-#include "video/renderer/glide2/gllib2.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
