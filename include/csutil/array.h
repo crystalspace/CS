@@ -381,7 +381,8 @@ public:
   }
 
   /**
-   * Find an element based on some key.
+   * Find an element based on some key.  Assumes that the array is sorted.
+   * If it is not sorted, then the result will not be meaningful.
    */
   int FindSortedKey (void* key, csArrayCompareFunction* comparekey) const
   {
