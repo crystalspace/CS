@@ -816,8 +816,7 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
     for (j = 0 ; j < num_vertices ; j++)
       poly[j] = destpoly3d->Vwor (j) - center;
  
-  if(dest)
-    delete new_lview.light_frustum;
+  delete new_lview.light_frustum;
   new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vertices);
   if (!new_lview.light_frustum) return;
 
