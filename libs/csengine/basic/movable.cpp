@@ -64,7 +64,8 @@ bool csMovableSectorList::FreeItem (void *item)
 
   // @@@ NOT IMPLEMENTED YET.
   CS_ASSERT (false);
-  (void)Sector;
+
+  Sector->DecRef ();
   return true;
 }
 
