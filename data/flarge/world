@@ -5922,16 +5922,18 @@
                             <plugin>crystalspace.mesh.loader.fountain</plugin>
                             <params>
                                 <factory>fountainFactory</factory>
-                                <number>50</number>
-                                <material>robot</material>
-                                <dropsize w="0.02" h="0.02" />
-                                <color red="0.65" green="0.65" blue="0.55" />
+                                <number>100</number>
+                                <material>spark</material>
+                                <dropsize w="0.1" h="0.1" />
+                                <color red="0.65" green="1" blue="1" />
+				<lighting>no</lighting>
                                 <accel x="0" y="0.1" z="0" />
-                                <falltime>3</falltime>
+                                <falltime>1.5</falltime>
                                 <speed>-1</speed>
                                 <elevation>1.5</elevation>
                                 <azimuth>0</azimuth>
                                 <opening>0.2</opening>
+				<mixmode> <add /> </mixmode>
                             </params>
                             <move>
                                 <v x="0" y="0" z="0" />
@@ -23265,40 +23267,40 @@
             <enable trigger="rot_shapes" />
         </sequence>
         <sequence name="rot_cubard">
-            <rotate mesh="cubard" duration="1000">
+            <rotate mesh="cubard" duration="2000">
                 <roty>2</roty>
                 <v x="4" y="0.3" z="12" />
             </rotate>
-            <rotate mesh="cubard:robotHead:ball1" duration="1000">
+            <rotate mesh="cubard:robotHead:ball1" duration="2000">
                 <roty>1.5</roty>
                 <v x="0" y="0.5" z="0" />
             </rotate>
-            <rotate mesh="cubard:robotHead:ball2" duration="1000">
+            <rotate mesh="cubard:robotHead:ball2" duration="2000">
                 <rotz>2.2</rotz>
                 <v x="0" y="0.5" z="0" />
             </rotate>
-            <rotate mesh="cubard:robotHead:ball3" duration="1000">
+            <rotate mesh="cubard:robotHead:ball3" duration="2000">
                 <rotx>1</rotx>
                 <v x="0" y="0.5" z="0" />
             </rotate>
-            <rotate mesh="cubard:robotArmRight" duration="500">
+            <rotate mesh="cubard:robotArmRight" duration="1000">
                 <rotz>-1.8</rotz>
                 <v x="0" y="0.23" z="-0.15" />
             </rotate>
-            <rotate mesh="cubard:robotArmLeft" duration="500">
+            <rotate mesh="cubard:robotArmLeft" duration="1000">
                 <rotz>-.4</rotz>
                 <v x="0" y="0.23" z="0.15" />
             </rotate>
-            <delay time="500" />
-            <rotate mesh="cubard:robotArmRight" duration="500">
+            <delay time="1000" />
+            <rotate mesh="cubard:robotArmRight" duration="1000">
                 <rotz>1.8</rotz>
                 <v x="0" y="0.23" z="-0.15" />
             </rotate>
-            <rotate mesh="cubard:robotArmLeft" duration="500">
+            <rotate mesh="cubard:robotArmLeft" duration="1000">
                 <rotz>.4</rotz>
                 <v x="0" y="0.23" z="0.15" />
             </rotate>
-            <delay time="500" />
+            <delay time="1000" />
             <enable trigger="rot_cubard" />
         </sequence>
         <sequence name="rot_transpBall">
