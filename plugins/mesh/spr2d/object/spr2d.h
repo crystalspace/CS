@@ -124,7 +124,7 @@ private:
   /// Update lighting given a position.
   void UpdateLighting (const csArray<iLight*>& lights, const csVector3& pos);
   void UpdateLighting (const csArray<iLight*>& lights,
-      	iMovable* movable);
+      	iMovable* movable, csVector3 offset);
 
   /// Check the start vector and recalculate the LookAt matrix if changed.
   void CheckBeam (const csVector3& start, const csVector3& plane,

@@ -181,7 +181,7 @@ bool csSprite2DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   {
     const csArray<iLight*>& relevant_lights = factory->light_mgr
     	->GetRelevantLights (logparent, -1, false);
-    UpdateLighting (relevant_lights, movable);
+    UpdateLighting (relevant_lights, movable, csVector3 (0.0f));
   }
 
   return true;
@@ -230,11 +230,11 @@ void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
 }
 
 void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
-    iMovable* movable)
+    iMovable* movable, csVector3 offset)
 {
   if (!lighting) return;
   csVector3 pos = movable->GetFullPosition ();
-  UpdateLighting (lights, pos);
+  UpdateLighting (lights, pos + offset);
 }
 
 #define INTERPOLATE1_S(var) \
@@ -459,7 +459,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
 
   // Camera transformation for the single 'position' vector.
   cam = rview->GetCamera ()->GetTransform ().Other2This (
-  	movable->GetFullPosition ());
+  	movable->GetFullPosition () + offset);
   if (cam.z < SMALL_Z) 
   {
     n = 0;
@@ -470,7 +470,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   {
     const csArray<iLight*>& relevant_lights = factory->light_mgr
     	->GetRelevantLights (logparent, -1, false);
-    UpdateLighting (relevant_lights, movable);
+    UpdateLighting (relevant_lights, movable, offset);
   }
 
   csReversibleTransform temp = camera->GetTransform ();

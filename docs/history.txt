@@ -30,6 +30,8 @@ chronological order.
 	    conveniance --> convenience
 	    conveniant	--> convenient
 	- res ported the csParticleSystem based particle systems to NR.
+	- res fixed spr2d not always respecting it's position when used as a
+	  particle.
 24-Mar-2004
 	- Jorrit extended the standard output console so that it now also
 	  supports setting of the font through the config file. Added
