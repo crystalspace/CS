@@ -18,6 +18,14 @@ chronological order.
 	- Jorrit disabled the 'softgl' rule (Software GL tweaks) in the
 	  gldrivers database. This rule prevents the use of hardware GL
 	  features in some situations so I'm not sure why it even exists.
+	- Jorrit added the iTextureManager->RegisterTexture() for NR also
+	  to OR builds (but with empty implementation in the OR 3D renderers).
+	  That way the renderstep plugins also compile with OR.
+	  This change also makes sure that the python plugin can now compile
+	  with NR too.
+	- Jorrit added back the render steps so that they again compile in
+	  OR too. The plan is to merge OR and NR builds. Not bring them
+	  further apart.
 4-Apr-2004
 	- res moved the attenuation texture generation to the light iter 
 	  plugin. Still the same texture for all lights, though. Plan is to

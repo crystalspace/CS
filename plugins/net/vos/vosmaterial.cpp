@@ -78,14 +78,16 @@ void ConstructMaterialTask::doTask()
 
     if(layers.size() > 0)
     {
-      iTextureWrapper** layertws = (iTextureWrapper**)malloc(layers.size() * sizeof(iTextureWrapper*));
+      iTextureWrapper** layertws = (iTextureWrapper**)malloc(
+      	layers.size() * sizeof(iTextureWrapper*));
       for(unsigned int i = 0; i < layers.size(); i++)
       {
         layertws[i] = layers[i]->GetTextureWrapper();
         layers[i]->release();
       }
 
-      imat = engine->CreateBaseMaterial(basetw, layers.size(), layertws, coords);
+      imat = engine->CreateBaseMaterial(basetw, layers.size(),
+      	layertws, coords);
       free(layertws);
       free(coords);
     }
@@ -96,7 +98,8 @@ void ConstructMaterialTask::doTask()
   }
   else
   {
-    if(iscolor) {
+    if(iscolor)
+    {
 
       // we tried some alternate ways of doing colors!
     /*
@@ -142,8 +145,10 @@ void ConstructMaterialTask::doTask()
     }
   }
 
-  if(imat.IsValid()) {
-    csRef<iMaterialWrapper> material = engine->GetMaterialList()->NewMaterial(imat);
+  if(imat.IsValid())
+  {
+    csRef<iMaterialWrapper> material = engine->GetMaterialList()->NewMaterial(
+    	imat);
     if(!material) return;
     material->Register(txtmgr);
     material->GetMaterialHandle()->Prepare();
@@ -190,7 +195,8 @@ csRef<iMaterialWrapper> csMetaMaterial::GetCheckerboard()
 void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
 {
   LOG("csMetaMaterial", 3, "setting up material");
-  ConstructMaterialTask* cmt = new ConstructMaterialTask(vosa3dl->GetObjectRegistry(), this);
+  ConstructMaterialTask* cmt = new ConstructMaterialTask(
+  	vosa3dl->GetObjectRegistry(), this);
 
   A3DL::TextureIterator txt = getTextureLayers();
   if(txt.hasMore())
@@ -205,7 +211,8 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
     txt++;
     if(txt.hasMore())
     {
-      cmt->coords = (csTextureLayer*)malloc(txt.remaining() * sizeof(csTextureLayer));
+      cmt->coords = (csTextureLayer*)malloc(txt.remaining()
+      	* sizeof(csTextureLayer));
       float uscale = 1, vscale = 1, ushift = 0, vshift = 0;
       for(int i = 0; txt.hasMore(); txt++, i++)
       {

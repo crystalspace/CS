@@ -303,6 +303,10 @@ public:
   virtual void PrepareTextures ();
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
+  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector*, int, int)
+  {
+    return 0;
+  }
 
   virtual csPtr<iSuperLightmap> CreateSuperLightmap (int width, 
     int height);

@@ -317,7 +317,8 @@ public:
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
 
-  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image, int flags, int target)
+  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image,
+  	int flags, int target)
   {
     return 0;
   }

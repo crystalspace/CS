@@ -159,17 +159,45 @@ struct iTextureManager : public iBase
    * The texture is unregistered at destruction, i.e. as soon as the last
    * reference to the texture handle is released.
    *<p>
-   * If CS_USE_NEW_RENDERER is enabled param target specifies the texture
-   * target. Defines for that can be found in ivideo/texture.h
+   * Note! This function will NOT scale the texture to fit hardware
+   * restrictions. This is done later when Prepare() is called.
+   */
+  virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags) = 0;
+
+  /**
+   * Register a texture. The given input image is IncRef'd and DecRef'ed
+   * later when FreeImages () is called. If you want to keep the input image
+   * make sure you have called IncRef yourselves.
+   *<p>
+   * The texture is not converted immediately. Instead, you can make
+   * intermediate calls to iTextureHandle::SetKeyColor (). Finally,
+   * if you want to merge the texture into the current environment, you
+   * should call txt->Prepare(). Alternatively you can call the
+   * PrepareTextures () method to compute a optimal palette and convert
+   * all the textures into the internal format.
+   *<p>
+   * This function returns a handle which should be given
+   * to the 3D rasterizer or 2D driver when drawing or otherwise using
+   * the texture.
+   *<p>
+   * The `flags' contains one or several of CS_TEXTURE_XXX flags OR'ed
+   * together. They define the mode texture is going to be used in.
+   *<p>
+   * The texture manager will reject the texture if it is an inappropiate
+   * format (see GetTextureFormat () method).
+   *<p>
+   * The texture is unregistered at destruction, i.e. as soon as the last
+   * reference to the texture handle is released.
+   *<p>
+   * Param target specifies the texture target. Defines for that can be
+   * found in ivideo/texture.h
    *<p>
    * Note! This function will NOT scale the texture to fit hardware
    * restrictions. This is done later when Prepare() is called.
-   *
    */
-  virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags) = 0;
-#ifdef CS_USE_NEW_RENDERER
-  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image, int flags, int target) = 0;
-#endif
+  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image,
+  	int flags, int target) = 0;
+
   /**
    * After all textures have been added, this function does all
    * needed calculations (palette, lookup tables, mipmaps, ...).

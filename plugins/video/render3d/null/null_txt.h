@@ -176,7 +176,8 @@ public:
   virtual void PrepareTextures ();
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
-  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector* image, int flags, int target);
+  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector* image,
+  	int flags, int target);
   ///
   virtual void UnregisterTexture (csTextureHandleNull* handle);
 
