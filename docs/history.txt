@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+21-Sep-2002
+	- Keith Fulton added optimization to dynamic lightmap recalculation
+	  to use tighter loops when overflow protection is not necessary.  These
+	  faster loops get called about 96% of the time in flarge, so dynamic
+	  and pseudo-dynamic lighting should be noticeably faster.
 20-Sep-2002
 	- Keith Fulton added Dynamic Ambient Lighting capability to all Things.
 	- Keith also added sector convenience function to set Dyn Ambient
