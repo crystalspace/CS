@@ -176,11 +176,6 @@ void csLight::CorrectForNocolor (float* rp, float* gp, float* bp)
 #endif
 }
 
-void csLight::Light::SetSector (iSector* sector)
-{
-  scfParent->SetSector (sector->GetPrivateObject ());
-}
-
 iCrossHalo* csLight::Light::CreateCrossHalo (float intensity, float cross)
 {
   csCrossHalo* halo = new csCrossHalo (intensity, cross);
@@ -476,19 +471,6 @@ void csDynLight::SetColor (const csColor& col)
 
     lp = lp->GetNextLight ();
   }
-}
-
-void csDynLight::Move (csSector* sector, float x, float y, float z)
-{
-  if (sector == csDynLight::sector && center.x == x && center.y == y && center.z == z)
-  {
-    // No move. Just return.
-    return;
-  }
-  SetSector (sector);
-  center.x = x;
-  center.y = y;
-  center.z = z;
 }
 
 void csDynLight::UnlinkLightpatch (csLightPatch* lp)

@@ -496,7 +496,8 @@ void BumpTest::NextFrame ()
     animli -= speed * 2.5;
     if(animli < 0.0) going_right = true;
   }
-  dynlight->Move(room, -3 + animli, 5, -2);
+  dynlight->SetSector (room);
+  dynlight->SetCenter (csVector3(-3 + animli, 5, -2));
   //printf("Moved to %g\n", -3 + animli);
   dynlight->Setup ();
 

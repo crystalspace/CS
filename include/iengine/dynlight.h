@@ -33,9 +33,14 @@ struct iDynLight : public iBase
 {
   /// Get the private pointer to csDynLight (ugly).
   virtual csDynLight* GetPrivateObject () = 0;
+
+  /// Get the iObject for this light
+  virtual iObject *QueryObject () = 0;
+  /// Get the iLight for this light
+  virtual iLight *QueryLight () = 0;
+
   /// Setup the light (i.e. do the lighting calculations).
   virtual void Setup () = 0;
 };
 
 #endif // __IENGINE_DYNLIGHT_H__
-

@@ -24,6 +24,7 @@
 class csColor;
 class csVector2;
 struct iPolygon3D;
+struct iPolyTxtPlane;
 
 /**
  * Polygon has no texture mapping.

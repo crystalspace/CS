@@ -27,11 +27,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 
-class csSector;
 class csEngine;
-class csMeshWrapper;
-class csMeshFactoryWrapper;
-class csDynLight;
 class csView;
 struct iMaterialWrapper;
 struct iTextureManager;
@@ -39,6 +35,10 @@ struct iFont;
 struct iLoader;
 struct iThingState;
 struct iMeshObjectType;
+struct iMeshFactoryWrapper;
+struct iSector;
+struct iMeshWrapper;
+struct iDynLight;
 
 class KeyMapping
 {
@@ -93,7 +93,7 @@ enum BlShapeType
 
 struct CubeInfo
 {
-  csMeshWrapper* thing;
+  iMeshWrapper* thing;
   float dx, dy, dz;
 };
 
@@ -156,10 +156,10 @@ public:
 class Blocks : public SysSystemDriver
 {
 private:
-  csMeshFactoryWrapper* cube_tmpl;
-  csMeshFactoryWrapper* pillar_tmpl;
-  csMeshFactoryWrapper* vrast_tmpl;
-  csMeshFactoryWrapper* hrast_tmpl;
+  iMeshFactoryWrapper* cube_tmpl;
+  iMeshFactoryWrapper* pillar_tmpl;
+  iMeshFactoryWrapper* vrast_tmpl;
+  iMeshFactoryWrapper* hrast_tmpl;
   iMaterialWrapper* cube_mat;
   iMaterialWrapper* cubef1_mat;
   iMaterialWrapper* cubef2_mat;
@@ -167,9 +167,9 @@ private:
   iMaterialWrapper* cubef4_mat;
   iMaterialWrapper* pillar_mat;
   iMaterialWrapper* raster_mat;
-  csSector* room;
-  csSector* demo_room;
-  csDynLight* dynlight;
+  iSector* room;
+  iSector* demo_room;
+  iDynLight* dynlight;
   float dynlight_dx;
   float dynlight_x;
   float dynlight_y;
@@ -191,19 +191,19 @@ private:
   int hs_pos;
 
   // For the menu.
-  csMeshWrapper* menus[MAX_MENUS];
+  iMeshWrapper* menus[MAX_MENUS];
   int idx_menus[MAX_MENUS];
   bool leftright_menus[MAX_MENUS];
-  csMeshWrapper* src_menus[MENU_TOTAL];
-  csMeshWrapper* arrow_left;
-  csMeshWrapper* arrow_right;
+  iMeshWrapper* src_menus[MENU_TOTAL];
+  iMeshWrapper* arrow_left;
+  iMeshWrapper* arrow_right;
   int cur_menu;
   int old_cur_menu;
   float menu_todo;
   float menu_hor_todo;
   float menu_hor_old_x_src, menu_hor_old_x_dst;
   float menu_hor_new_x_src, menu_hor_new_x_dst;
-  csMeshWrapper* menu_hor_old_menu;
+  iMeshWrapper* menu_hor_old_menu;
   int num_menus;	// Current number of active menu entries.
 
   TextEntryMenu* keyconf_menu;
@@ -331,10 +331,10 @@ public:
   void StartNewGame ();
   void StartDemo ();
   void StartKeyConfig ();
-  void set_cube_room (csSector* s) { room = s; }
+  void set_cube_room (iSector* s) { room = s; }
   void InitGame ();
   void CreateMenuEntry (const char* txt, int menu_nr);
-  csMeshWrapper* CreateMenuArrow (bool left);
+  iMeshWrapper* CreateMenuArrow (bool left);
   void ChangePlaySize (int new_size);
 
   void ReadConfig ();
@@ -360,12 +360,12 @@ public:
   void HandleHighscoresKey (int key, bool shift, bool alt, bool ctrl);
 
   // Creating cubes and other geometry.
-  csMeshWrapper* create_cube_thing (float dx, float dy, float dz,
-  	csMeshFactoryWrapper* tmpl);
-  csMeshWrapper* add_cube_thing (csSector* sect, float dx, float dy, float dz,
-  	float x, float y, float z, csMeshFactoryWrapper* tmpl);
+  iMeshWrapper* create_cube_thing (float dx, float dy, float dz,
+  	iMeshFactoryWrapper* tmpl);
+  iMeshWrapper* add_cube_thing (iSector* sect, float dx, float dy, float dz,
+  	float x, float y, float z, iMeshFactoryWrapper* tmpl);
   void add_cube (float dx, float dy, float dz, float x, float y, float z,
-  	csMeshFactoryWrapper* tmpl);
+  	iMeshFactoryWrapper* tmpl);
   void add_pillar (int x, int y);
   void add_vrast (int x, int y, float dx, float dy, float rot_z);
   void add_hrast (int x, int y, float dx, float dy, float rot_z);
@@ -384,7 +384,7 @@ public:
   void set_cube_f4_material (iMaterialWrapper* ct) { cubef4_mat = ct; }
   void set_pillar_material (iMaterialWrapper* ct) { pillar_mat = ct; }
   void set_raster_material (iMaterialWrapper* ct) { raster_mat = ct; }
-  void ChangeThingMaterial (csMeshWrapper* thing, iMaterialWrapper* mat);
+  void ChangeThingMaterial (iMeshWrapper* thing, iMaterialWrapper* mat);
   iMaterialWrapper* GetMaterialForHeight (int z);
 
   // Handle all time dependent movement of the game and menu.

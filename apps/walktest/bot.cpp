@@ -96,7 +96,8 @@ void Bot::move (cs_time elapsed_time)
     UpdateLighting (lights, num_lights);
     if (light)
     {
-      light->Move (s, new_p.x, new_p.y, new_p.z);
+      light->SetSector (s);
+      light->SetCenter (new_p);
       light->Setup ();
     }
   }

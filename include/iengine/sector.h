@@ -74,6 +74,11 @@ struct iSector : public iBase
   /// Find a light with the given position and radius.
   virtual iStatLight *FindLight (float x, float y, float z, float dist) = 0;
 
+  /// Calculate lighting for all objects in this sector
+  virtual void ShineLights () = 0;
+  /// Version of ShineLights() which only affects one mesh object.
+  virtual void ShineLights (iMeshWrapper*) = 0;
+
   /**
    * Calculate the bounding box of all objects in this sector.
    * This function is not very efficient as it will traverse all objects

@@ -24,12 +24,13 @@
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
 #include "csengine/lview.h"
+#include "csengine/sector.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/dynlight.h"
+#include "iengine/sector.h"
 
 class Dumper;
-class csSector;
 class csLightMap;
 class csDynLight;
 class csLightPatchPool;
@@ -137,9 +138,14 @@ public:
   csSector* GetSector () const { return sector; }
 
   /**
+   * Set the center position.
+   */
+  void SetCenter (const csVector3& v) { center = v; }
+
+  /**
    * Get the center position.
    */
-  csVector3& GetCenter () { return center; }
+  const csVector3& GetCenter () { return center; }
 
   /**
    * Get the radius.
@@ -155,6 +161,12 @@ public:
    * Get the inverse radius.
    */
   float GetInverseRadius () const { return inv_dist; }
+
+  /**
+   * Set the radius.
+   */
+  void SetRadius (float radius)
+    { dist = radius; sqdist = dist*dist; inv_dist = 1 / dist; }
 
   /**
    * Get the light color.
@@ -220,23 +232,41 @@ public:
   struct Light : public iLight
   {
     DECLARE_EMBEDDED_IBASE (csLight);
-    virtual csLight* GetPrivateObject () { return (csLight*)scfParent; }
-    virtual iObject *QueryObject() {return scfParent;}
-    virtual csVector3& GetCenter () { return scfParent->GetCenter (); }
-    virtual float GetSquaredRadius () const { return scfParent->GetSquaredRadius (); }
-    virtual csColor& GetColor () { return scfParent->GetColor (); }
-    virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
-    virtual void SetSector (iSector* sector);
+    virtual csLight* GetPrivateObject ()
+    { return scfParent; }
+    virtual iObject *QueryObject()
+    { return scfParent; }
+    virtual const csVector3& GetCenter ()
+    { return scfParent->GetCenter (); }
+    virtual void SetCenter (const csVector3& pos)
+    { scfParent->SetCenter (pos); }
+    virtual iSector *GetSector ()
+    { return &scfParent->GetSector ()->scfiSector; }
+    virtual void SetSector (iSector* sector)
+    { scfParent->SetSector (sector->GetPrivateObject ()); }
+    virtual float GetRadius ()
+    { return scfParent->GetRadius (); }
+    virtual float GetSquaredRadius ()
+    { return scfParent->GetSquaredRadius (); }
+    virtual float GetInverseRadius ()
+    { return scfParent->GetInverseRadius (); }
+    virtual void SetRadius (float r)
+    { scfParent->SetRadius (r); }
+    virtual const csColor& GetColor ()
+    { return scfParent->GetColor (); }
+    virtual void SetColor (const csColor& col)
+    { scfParent->SetColor (col); }
+    virtual int GetAttenuation ()
+    { return scfParent->GetAttenuation (); }
+    virtual void SetAttenuation (int a)
+    { scfParent->SetAttenuation (a); }
     virtual float GetBrightnessAtDistance (float d)
-    {
-      return scfParent->GetBrightnessAtDistance (d);
-    }
+    { return scfParent->GetBrightnessAtDistance (d); }
+
     virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
     virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
   	float roundness);
     virtual iFlareHalo* CreateFlareHalo ();
-    virtual int GetAttenuation () {return scfParent->GetAttenuation();}
-    virtual void SetAttenuation (int a) {scfParent->SetAttenuation(a);}
   } scfiLight;
 };
 
@@ -496,24 +526,6 @@ public:
   virtual void SetColor (const csColor& col);
 
   /**
-   * Move the light. This will NOT automatically recalculate the
-   * view frustum. You still need to call Setup() after this.
-   */
-  void Move (csSector* sector, csVector3& v) { Move (sector, v.x, v.y, v.z); }
-
-  /**
-   * Move the light. This will NOT automatically recalculate the
-   * view frustum. You still need to call Setup() after this.
-   */
-  void Move (csSector* sector, float x, float y, float z);
-
-  /**
-   * Resize the light. This will NOT automatically recalculate the
-   * view frustum. You still need to call Setup() after this.
-   */
-  void Resize (float radius) { dist = radius; sqdist = dist*dist; inv_dist = 1 / dist; }
-
-  /**
    * Unlink a light patch from the light patch list.
    * Warning! This function does not test if the light patch
    * is really on the list!
@@ -547,7 +559,12 @@ public:
     /// Used by the engine to retrieve internal dyn light object (ugly)
     virtual csDynLight* GetPrivateObject ()
     { return scfParent; }
-    virtual void Setup () { scfParent->Setup (); }
+    virtual void Setup ()
+    { scfParent->Setup (); }
+    virtual iObject *QueryObject ()
+    { return scfParent; }
+    virtual iLight *QueryLight ()
+    { return &(scfParent->scfiLight); }
   } scfiDynLight;
   friend struct eiDynLight;
 };

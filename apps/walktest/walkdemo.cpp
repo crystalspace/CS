@@ -1048,7 +1048,8 @@ void HandleDynLight (csDynLight* dyn)
         return;
       }
       else ms->dir.SetOrigin (v);
-      dyn->Move (s, v.x, v.y, v.z);
+      dyn->SetSector (s);
+      dyn->SetCenter (v);
       dyn->Setup ();
       if (ms->sprite) move_mesh (ms->sprite, s, v);
       if (Sys->Sound && ms->snd) ms->snd->SetPosition (v);
@@ -1073,7 +1074,7 @@ void HandleDynLight (csDynLight* dyn)
 	  return;
 	}
       }
-      dyn->Resize (es->radius);
+      dyn->SetRadius (es->radius);
       dyn->Setup ();
       break;
     }
@@ -1091,8 +1092,7 @@ void HandleDynLight (csDynLight* dyn)
         dyn->SetColor (csColor ((rl->dyn_r1+7.*dyn->GetColor ().red)/8.,
 		(rl->dyn_g1+7.*dyn->GetColor ().green)/8.,
 		(rl->dyn_b1+7.*dyn->GetColor ().blue)/8.));
-      dyn->Move (dyn->GetSector (), dyn->GetCenter ().x,
-      	dyn->GetCenter ().y+rl->dyn_move_dir, dyn->GetCenter ().z);
+      dyn->SetCenter (dyn->GetCenter () + csVector3 (0, rl->dyn_move_dir, 0));
       dyn->Setup ();
       break;
     }

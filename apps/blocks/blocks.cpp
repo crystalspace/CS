@@ -32,30 +32,27 @@
 #include "blocks.h"
 #include "cssys/system.h"
 #include "csutil/csstring.h"
-#include "csgfx/csimage.h"
-#include "csengine/dumper.h"
-#include "csengine/meshobj.h"
-#include "csengine/engine.h"
-#include "csengine/texture.h"
-#include "csengine/material.h"
-#include "csengine/sector.h"
-#include "csengine/polytext.h"
-#include "csengine/polygon.h"
-#include "csengine/light.h"
-#include "csengine/lghtmap.h"
-#include "csengine/thing.h"
-#include "csengine/textrans.h"
-#include "csengine/csview.h"
+
 #include "isys/vfs.h"
+#include "iutil/cfgmgr.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
-#include "isound/renderer.h"
-#include "csparser/snddatao.h"
-#include "isound/handle.h"
 #include "ivideo/fontserv.h"
-#include "iutil/cfgmgr.h"
-#include "imap/parser.h"
+#include "isound/renderer.h"
+#include "isound/handle.h"
+#include "isound/wrapper.h"
 #include "iengine/ptextype.h"
+#include "iengine/sector.h"
+#include "iengine/movable.h"
+#include "imap/parser.h"
+
+#include "csengine/engine.h"
+#include "csengine/sector.h"
+#include "csengine/polytext.h"
+#include "csengine/light.h"
+#include "csengine/textrans.h"
+#include "csengine/csview.h"
+#include "csengine/meshobj.h"
 
 #if defined(BLOCKS_NETWORKING)
 #include "inetwork/driver.h"
@@ -357,7 +354,7 @@ Blocks::Blocks ()
 
 Blocks::~Blocks ()
 {
-  delete dynlight;
+  if (dynlight) dynlight->DecRef ();
   if (engine) engine->Clear ();
   delete view;
   delete keyconf_menu;
@@ -396,7 +393,7 @@ void Blocks::InitGame ()
   pause = false;
 }
 
-static void reset_vertex_colors (csMeshWrapper* th)
+static void reset_vertex_colors (iMeshWrapper* th)
 {
   iThingState* thing_state = QUERY_INTERFACE (th->GetMeshObject (),
   	iThingState);
@@ -455,38 +452,38 @@ iPolygon3D* add_polygon_template (iThingState* tmpl,
   return p;
 }
 
-static csMeshFactoryWrapper* CreateMeshFactoryWrapper (
+static iMeshFactoryWrapper* CreateMeshFactoryWrapper (
 	const char* name)
 {
   iMeshObjectFactory* thing_fact = Sys->thing_type->NewFactory ();
-  csMeshFactoryWrapper* tmpl = new csMeshFactoryWrapper (thing_fact);
+
+  iMeshFactoryWrapper *wrap = Sys->engine->CreateMeshFactory (name);
+  wrap->SetMeshObjectFactory (thing_fact);
   thing_fact->DecRef ();
-  tmpl->SetName (name);
-  Sys->engine->mesh_factories.Push (tmpl);
-  return tmpl;
+  return wrap;
 }
 
-static csMeshWrapper* CreateMeshWrapper (const char* name)
+static iMeshWrapper* CreateMeshWrapper (const char* name)
 {
   iMeshObjectFactory* thing_fact = Sys->thing_type->NewFactory ();
   iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
-  csMeshWrapper* mesh_wrap = new csMeshWrapper (Sys->engine, mesh_obj);
+
+  iMeshWrapper *wrap = Sys->engine->CreateMeshObject (name);
+  wrap->SetMeshObject (mesh_obj);
   mesh_obj->DecRef ();
-  mesh_wrap->SetName (name);
-  Sys->engine->meshes.Push (mesh_wrap);
-  return mesh_wrap;
+  return wrap;
 }
 
-static csMeshWrapper* CreateMeshFromFactory (csMeshFactoryWrapper* fact,
+static iMeshWrapper* CreateMeshFromFactory (iMeshFactoryWrapper* fact,
 	const char* name)
 {
   iMeshObject* mesh_obj = fact->GetMeshObjectFactory ()->NewInstance ();
-  csMeshWrapper* mesh_wrap = new csMeshWrapper (Sys->engine, mesh_obj);
+
+  iMeshWrapper *wrap = Sys->engine->CreateMeshObject (name);
+  wrap->SetMeshObject (mesh_obj);
   mesh_obj->DecRef ();
-  mesh_wrap->SetName (name);
-  Sys->engine->meshes.Push (mesh_wrap);
-  return mesh_wrap;
+  return wrap;
 }
 
 
@@ -625,39 +622,39 @@ void Blocks::add_hrast_template ()
 
 void Blocks::add_pillar (int x, int y)
 {
-  csMeshWrapper* pillar = CreateMeshFromFactory (pillar_tmpl, "pillar");
-  pillar->GetMovable ().SetSector (room);
+  iMeshWrapper* pillar = CreateMeshFromFactory (pillar_tmpl, "pillar");
+  pillar->GetMovable ()->SetSector (room);
 
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM);
   pillar->HardTransform (csTransform (csMatrix3 (), v));
-  pillar->GetMovable ().SetSector (room);
-  pillar->GetMovable ().UpdateMove ();
+  pillar->GetMovable ()->SetSector (room);
+  pillar->GetMovable ()->UpdateMove ();
 }
 
 void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
 {
-  csMeshWrapper* vrast = CreateMeshFromFactory (vrast_tmpl, "vrast");
-  vrast->GetMovable ().SetSector (room);
+  iMeshWrapper* vrast = CreateMeshFromFactory (vrast_tmpl, "vrast");
+  vrast->GetMovable ()->SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
   vrast->HardTransform (csTransform (rot, v));
-  vrast->GetMovable ().UpdateMove ();
+  vrast->GetMovable ()->UpdateMove ();
 }
 
 void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
 {
-  csMeshWrapper* hrast = CreateMeshFromFactory (hrast_tmpl, "hrast");
-  hrast->GetMovable ().SetSector (room);
+  iMeshWrapper* hrast = CreateMeshFromFactory (hrast_tmpl, "hrast");
+  hrast->GetMovable ()->SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
   hrast->HardTransform (csTransform (rot, v));
-  hrast->GetMovable ().UpdateMove ();
+  hrast->GetMovable ()->UpdateMove ();
 }
 
-void Blocks::ChangeThingMaterial (csMeshWrapper* thing,
+void Blocks::ChangeThingMaterial (iMeshWrapper* thing,
 	iMaterialWrapper* mat)
 {
   iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
@@ -738,11 +735,11 @@ void set_uv (iPolygon3D* p, float u1, float v1, float u2, float v2,
 }
 
 // dx,dy,dz are logical coordinates (Z vertical).
-csMeshWrapper* Blocks::create_cube_thing (float dx, float dy, float dz,
-	csMeshFactoryWrapper* tmpl)
+iMeshWrapper* Blocks::create_cube_thing (float dx, float dy, float dz,
+	iMeshFactoryWrapper* tmpl)
 {
-  csMeshWrapper* cube = CreateMeshFromFactory (tmpl, "cubexxx");
-  cube->GetMovable ().SetSector (room);
+  iMeshWrapper* cube = CreateMeshFromFactory (tmpl, "cubexxx");
+  cube->GetMovable ()->SetSector (room);
   csVector3 shift (
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
@@ -772,9 +769,9 @@ csMeshWrapper* Blocks::create_cube_thing (float dx, float dy, float dz,
 
 // dx,dy,dz and x,y,z are logical coordinates (Z vertical).
 void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z,
-	csMeshFactoryWrapper* tmpl)
+	iMeshFactoryWrapper* tmpl)
 {
-  csMeshWrapper* cube = add_cube_thing (room, dx, dy, dz,
+  iMeshWrapper* cube = add_cube_thing (room, dx, dy, dz,
   	(x-(player1->zone_dim)/2+shift_rotate.x)*CUBE_DIM,
 	(z+shift_rotate.z)*CUBE_DIM+CUBE_DIM/2,
   	(y-(player1->zone_dim)/2+shift_rotate.y)*CUBE_DIM, tmpl);
@@ -787,21 +784,19 @@ void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z,
 
 // dx,dy,dz are logical coordinates (Z vertical).
 // x,y,z are physical coordinates (Y vertical).
-csMeshWrapper* Blocks::add_cube_thing (csSector* sect,
+iMeshWrapper* Blocks::add_cube_thing (iSector* sect,
 	float dx, float dy, float dz,
-	float x, float y, float z, csMeshFactoryWrapper* tmpl)
+	float x, float y, float z, iMeshFactoryWrapper* tmpl)
 {
-  csMeshWrapper* cube = create_cube_thing (dx, dy, dz, tmpl);
+  iMeshWrapper* cube = create_cube_thing (dx, dy, dz, tmpl);
   iThingState* cube_state = QUERY_INTERFACE (cube->GetMeshObject (),
   	iThingState);
-  cube->GetMovable ().SetSector (sect);
+  cube->GetMovable ()->SetSector (sect);
   csVector3 v (x, y, z);
-  cube->GetMovable ().SetPosition (sect, v);
-  cube->GetMovable ().UpdateMove ();
+  cube->GetMovable ()->SetPosition (sect, v);
+  cube->GetMovable ()->UpdateMove ();
   cube_state->InitLightMaps (false);
-  iMeshWrapper* icube = QUERY_INTERFACE (cube, iMeshWrapper);
-  room->ShineLights (icube);
-  icube->DecRef ();
+  room->ShineLights (cube);
   cube_state->CreateLightMaps (Gfx3D);
   cube_state->DecRef ();
   return cube;
@@ -948,11 +943,9 @@ again:
   int i;
   for (i = 0 ; i < num_cubes ; i++)
   {
-    csMeshWrapper* t = cube_info[i].thing;
+    iMeshWrapper* t = cube_info[i].thing;
     reset_vertex_colors (t);
-    iMeshWrapper* it = QUERY_INTERFACE (t, iMeshWrapper);
-    room->ShineLights (it);
-    it->DecRef ();
+    room->ShineLights (t);
   }
   csThing::current_light_frame_number++;
 }
@@ -1507,7 +1500,7 @@ void Blocks::freeze_shape ()
     sprintf (cubename, "cubeAt%d%d%d", x, y, z);
     // Before we let go of the shape (lose the pointer to it) we set it's
     // name according to it's position.
-    cube_info[i].thing->SetName (cubename);
+    cube_info[i].thing->QueryObject ()->SetName (cubename);
     ChangeThingMaterial (cube_info[i].thing, GetMaterialForHeight (z));
     if (screen != SCREEN_GAMEOVER && z >= GAMEOVER_HEIGHT)
     {
@@ -1614,7 +1607,8 @@ void Blocks::HandleStartupMovement (cs_time elapsed_time)
     dynlight_dx = -dynlight_dx;
     dynlight_x = old_dyn_x;
   }
-  dynlight->Move (demo_room, dynlight_x, dynlight_y, dynlight_z);
+  dynlight->QueryLight ()->SetSector (demo_room);
+  dynlight->QueryLight ()->SetCenter (csVector3 (dynlight_x, dynlight_y, dynlight_z));
   dynlight->Setup ();
 }
 
@@ -1725,15 +1719,13 @@ void Blocks::HandleGameMovement (cs_time elapsed_time)
 
   for (i = 0 ; i < num_cubes ; i++)
   {
-    csMeshWrapper* t = cube_info[i].thing;
+    iMeshWrapper* t = cube_info[i].thing;
     if (do_rot)
-      t->GetMovable ().Transform (rot);
-    t->GetMovable ().MovePosition (csVector3 (dx, -elapsed_fall, dy));
-    t->GetMovable ().UpdateMove ();
+      t->GetMovable ()->Transform (rot);
+    t->GetMovable ()->MovePosition (csVector3 (dx, -elapsed_fall, dy));
+    t->GetMovable ()->UpdateMove ();
     reset_vertex_colors (t);
-    iMeshWrapper* it = QUERY_INTERFACE (t, iMeshWrapper);
-    room->ShineLights (it);
-    it->DecRef ();
+    room->ShineLights (t);
   }
   csThing::current_light_frame_number++;
 }
@@ -1747,13 +1739,13 @@ void Blocks::HandleMovement (cs_time elapsed_time)
     float elapsed_fog = elapsed*.8;
     if (elapsed_fog > player1->fog_density) elapsed_fog = player1->fog_density;
     player1->fog_density -= elapsed_fog;
-    csSector* s;
+    iSector* s;
     if (screen == SCREEN_STARTUP) s = demo_room;
     else s = room;
     if (player1->fog_density)
-      s->SetFog (player1->fog_density, csColor (0, 0, 0));
+      s->GetPrivateObject ()->SetFog (player1->fog_density, csColor (0, 0, 0));
     else
-      s->DisableFog ();
+      s->GetPrivateObject ()->DisableFog ();
     return;
   }
 
@@ -1846,8 +1838,8 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
     float z = 5. - cos (angle)*3.;
 
     csVector3 v (x, y, z);
-    menus[i]->GetMovable ().SetPosition (demo_room, v);
-    menus[i]->GetMovable ().UpdateMove ();
+    menus[i]->GetMovable ()->SetPosition (demo_room, v);
+    menus[i]->GetMovable ()->UpdateMove ();
   }
   // Move the old menu item away.
   if ((ABS (menu_hor_trans) > SMALL_EPSILON) &&
@@ -1859,13 +1851,13 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
     float y = 3. + sin (angle)*3.;
     float z = 5. - cos (angle)*3.;
     csVector3 v (x, y, z);
-    menu_hor_old_menu->GetMovable ().SetPosition (demo_room, v);
-    menu_hor_old_menu->GetMovable ().UpdateMove ();
+    menu_hor_old_menu->GetMovable ()->SetPosition (demo_room, v);
+    menu_hor_old_menu->GetMovable ()->UpdateMove ();
   }
   else if (menu_hor_old_menu)
   {
-    menu_hor_old_menu->GetMovable ().ClearSectors ();
-    menu_hor_old_menu->GetMovable ().UpdateMove ();
+    menu_hor_old_menu->GetMovable ()->ClearSectors ();
+    menu_hor_old_menu->GetMovable ()->UpdateMove ();
     menu_hor_old_menu = NULL;
   }
 
@@ -1878,19 +1870,19 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
     float y = 3. + sin (angle)*3.;
     float z = 5. - cos (angle)*3.;
     csVector3 v (x, y, z);
-    arrow_left->GetMovable ().SetSector (demo_room);
-    arrow_right->GetMovable ().SetSector (demo_room);
-    arrow_left->GetMovable ().SetPosition (demo_room, v);
-    arrow_right->GetMovable ().SetPosition (demo_room, v);
-    arrow_left->GetMovable ().UpdateMove ();
-    arrow_right->GetMovable ().UpdateMove ();
+    arrow_left->GetMovable ()->SetSector (demo_room);
+    arrow_right->GetMovable ()->SetSector (demo_room);
+    arrow_left->GetMovable ()->SetPosition (demo_room, v);
+    arrow_right->GetMovable ()->SetPosition (demo_room, v);
+    arrow_left->GetMovable ()->UpdateMove ();
+    arrow_right->GetMovable ()->UpdateMove ();
   }
   else
   {
-    arrow_left->GetMovable ().ClearSectors ();
-    arrow_right->GetMovable ().ClearSectors ();
-    arrow_left->GetMovable ().UpdateMove ();
-    arrow_right->GetMovable ().UpdateMove ();
+    arrow_left->GetMovable ()->ClearSectors ();
+    arrow_right->GetMovable ()->ClearSectors ();
+    arrow_left->GetMovable ()->UpdateMove ();
+    arrow_right->GetMovable ()->UpdateMove ();
   }
 }
 
@@ -1898,7 +1890,7 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 {
   iMaterialWrapper* tm_front = engine->FindMaterial (mat);
 
-  csMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
+  iMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
   iThingState* thing_state = QUERY_INTERFACE (thing_wrap->GetMeshObject (),
   	iThingState);
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
@@ -1933,11 +1925,11 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
   src_menus[menu_nr] = thing_wrap;
 }
 
-csMeshWrapper* Blocks::CreateMenuArrow (bool left)
+iMeshWrapper* Blocks::CreateMenuArrow (bool left)
 {
   iMaterialWrapper* tm_front = engine->FindMaterial ("menu_back");
 
-  csMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
+  iMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
   iThingState* thing_state = QUERY_INTERFACE (thing_wrap->GetMeshObject (),
   	iThingState);
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
@@ -1989,13 +1981,13 @@ void Blocks::InitMenu ()
   num_menus = 0;
   for (int i = 0 ; i < MENU_TOTAL ; i++)
   {
-    src_menus[i]->GetMovable ().ClearSectors ();
-    src_menus[i]->GetMovable ().UpdateMove ();
+    src_menus[i]->GetMovable ()->ClearSectors ();
+    src_menus[i]->GetMovable ()->UpdateMove ();
   }
-  arrow_left->GetMovable ().ClearSectors ();
-  arrow_right->GetMovable ().ClearSectors ();
-  arrow_left->GetMovable ().UpdateMove ();
-  arrow_right->GetMovable ().UpdateMove ();
+  arrow_left->GetMovable ()->ClearSectors ();
+  arrow_right->GetMovable ()->ClearSectors ();
+  arrow_left->GetMovable ()->UpdateMove ();
+  arrow_right->GetMovable ()->UpdateMove ();
 }
 
 void Blocks::AddMenuItem (int menu_nr, bool leftright)
@@ -2004,14 +1996,14 @@ void Blocks::AddMenuItem (int menu_nr, bool leftright)
   idx_menus[num_menus] = menu_nr;
   leftright_menus[num_menus] = leftright;
   num_menus++;
-  src_menus[menu_nr]->GetMovable ().SetSector (demo_room);
+  src_menus[menu_nr]->GetMovable ()->SetSector (demo_room);
 }
 
 void Blocks::ReplaceMenuItem (int idx, int menu_nr)
 {
   menus[idx] = src_menus[menu_nr];
   idx_menus[idx] = menu_nr;
-  src_menus[menu_nr]->GetMovable ().SetSector (demo_room);
+  src_menus[menu_nr]->GetMovable ()->SetSector (demo_room);
 }
 
 void Blocks::ChangePlaySize (int new_size)
@@ -2021,9 +2013,9 @@ void Blocks::ChangePlaySize (int new_size)
   player1->zone_dim = new_size;
   WriteConfig ();
   InitGameRoom ();
-  room->InitLightMaps (false);
+  room->GetPrivateObject ()->InitLightMaps (false);
   room->ShineLights ();
-  room->CreateLightMaps (Gfx3D);
+  room->GetPrivateObject ()->CreateLightMaps (Gfx3D);
 }
 
 void Blocks::StartKeyConfig ()
@@ -2060,7 +2052,7 @@ void Blocks::StartKeyConfig ()
 void Blocks::InitGameRoom ()
 {
   iMaterialWrapper* tm = engine->FindMaterial ("room");
-  room = Sys->engine->CreateCsSector ("room");
+  room = Sys->engine->CreateSector ("room");
   iMeshWrapper* walls = Sys->engine->CreateSectorWallsMesh (room, "walls");
   iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
@@ -2130,20 +2122,20 @@ void Blocks::InitGameRoom ()
   Sys->add_hrast (2, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
   Sys->add_hrast (2, (player1->zone_dim)-1, CUBE_DIM/2, CUBE_DIM/2, 0);
 
-  room->AddLight (new csStatLight (-3, 5, 0, 10, .8, .4, .4, false));
-  room->AddLight (new csStatLight (3, 5, 0, 10, .4, .4, .8, false));
-  room->AddLight (new csStatLight (0, 5, -3, 10, .4, .8, .4, false));
-  room->AddLight (new csStatLight (0, 5, 3, 10, .8, .4, .8, false));
-  room->AddLight (new csStatLight (0, (ZONE_HEIGHT-3-3)*CUBE_DIM+1, 0,
+  room->GetPrivateObject ()->AddLight (new csStatLight (-3, 5, 0, 10, .8, .4, .4, false));
+  room->GetPrivateObject ()->AddLight (new csStatLight (3, 5, 0, 10, .4, .4, .8, false));
+  room->GetPrivateObject ()->AddLight (new csStatLight (0, 5, -3, 10, .4, .8, .4, false));
+  room->GetPrivateObject ()->AddLight (new csStatLight (0, 5, 3, 10, .8, .4, .8, false));
+  room->GetPrivateObject ()->AddLight (new csStatLight (0, (ZONE_HEIGHT-3-3)*CUBE_DIM+1, 0,
   	CUBE_DIM*10, .5, .5, .5, false));
-  room->AddLight (new csStatLight (0, (ZONE_HEIGHT-3+3)*CUBE_DIM+1, 0,
+  room->GetPrivateObject ()->AddLight (new csStatLight (0, (ZONE_HEIGHT-3+3)*CUBE_DIM+1, 0,
   	CUBE_DIM*10, .5, .5, .5, false));
 }
 
 void Blocks::InitDemoRoom ()
 {
   iMaterialWrapper* demo_tm = engine->FindMaterial ("clouds");
-  demo_room = Sys->engine->CreateCsSector ("room");
+  demo_room = Sys->engine->CreateSector ("room");
   iMeshWrapper* walls = Sys->engine->CreateSectorWallsMesh (demo_room, "walls");
   iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
@@ -2159,7 +2151,7 @@ void Blocks::InitDemoRoom ()
 
   walls_state->DecRef ();
 
-  demo_room->AddLight (new csStatLight (0, 0, -2, 10, .4, .4, .4, false));
+  demo_room->GetPrivateObject ()->AddLight (new csStatLight (0, 0, -2, 10, .4, .4, .4, false));
 
   float char_width = CUBE_DIM*4.;
   float offset_x = -char_width * (6/2)+CUBE_DIM*2;
@@ -2211,14 +2203,13 @@ void Blocks::StartDemo ()
   dynlight_y = 3;
   dynlight_z = 0;
   dynlight_dx = 3;
-  delete dynlight;
-  dynlight = new csDynLight (dynlight_x, dynlight_y, dynlight_z, 7, 3, 0, 0);
-
-  Sys->engine->AddDynLight (dynlight);
-  dynlight->SetSector (demo_room);
+  if (dynlight) dynlight->DecRef ();
+  dynlight = Sys->engine->CreateDynLight (
+    csVector3(dynlight_x, dynlight_y, dynlight_z), 7, csColor(3, 0, 0));
+  dynlight->QueryLight ()->SetSector (demo_room);
   dynlight->Setup ();
 
-  view->SetSector (demo_room);
+  view->scfiView.SetSector (demo_room);
   csVector3 pos (0, 3, -5);
   view->GetCamera ()->SetPosition (pos);
   cam_move_up = csVector3 (0, 1, 0);
@@ -2226,7 +2217,7 @@ void Blocks::StartDemo ()
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 
   player1->fog_density = 1;
-  demo_room->SetFog (player1->fog_density, csColor (0, 0, 0));
+  demo_room->GetPrivateObject ()->SetFog (player1->fog_density, csColor (0, 0, 0));
 
   InitMainMenu ();
   menu_hor_old_menu = NULL;
@@ -2251,17 +2242,18 @@ void Blocks::StartNewGame ()
   if (player1->new_zone_dim != player1->zone_dim)
     ChangePlaySize (player1->new_zone_dim);
 
-  delete dynlight; dynlight = NULL;
+  if (dynlight) dynlight->DecRef ();
+  dynlight = NULL;
 
   // First delete all cubes that may still be in the engine.
   int i = 0;
-  while (i < room->GetNumberMeshes ())
+  while (i < room->GetMeshCount ())
   {
-    csMeshWrapper* cube = room->GetMesh (i);
-    if (!strncmp (cube->GetName (), "cube", 4))
+    iMeshWrapper* cube = room->GetMesh (i);
+    if (!strncmp (cube->QueryObject ()->GetName (), "cube", 4))
     {
-      room->UnlinkMesh (cube);
-      delete cube;
+      room->GetPrivateObject ()->UnlinkMesh (cube->GetPrivateObject ());
+      cube->DecRef ();
     }
     else
       i++;
@@ -2271,12 +2263,12 @@ void Blocks::StartNewGame ()
   Sys->StartNewShape ();
 
   cam_move_up = csVector3 (0, 1, 0);
-  view->SetSector (room);
+  view->SetSector (room->GetPrivateObject ());
   Sys->HandleCameraMovement ();
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 
   player1->fog_density = 1;
-  room->SetFog (player1->fog_density, csColor (0, 0, 0));
+  room->GetPrivateObject ()->SetFog (player1->fog_density, csColor (0, 0, 0));
 }
 
 void Blocks::removePlanesVisual (States* player)
@@ -2289,9 +2281,9 @@ void Blocks::removePlanesVisual (States* player)
         { // Physically remove it.
           char temp[20];
           sprintf (temp, "cubeAt%d%d%d", x, y, z);
-	  csMeshWrapper* th = room->GetMesh (temp);
-	  th->GetMovable ().ClearSectors ();
-	  th->GetMovable ().UpdateMove ();
+	  iMeshWrapper* th = &(room->GetPrivateObject ()->GetMesh (temp)->scfiMeshWrapper);
+	  th->GetMovable ()->ClearSectors ();
+	  th->GetMovable ()->UpdateMove ();
         }
   }
 }
@@ -2333,7 +2325,7 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
   int i;
   int x,y,z;
   char temp[20];
-  csMeshWrapper* t;
+  iMeshWrapper* t;
 
   // Finished the transition.
   if (!player1->move_down_todo)
@@ -2352,11 +2344,13 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
 	{
 	  player1->set_cube (x, y, z-1, player1->get_cube (x, y, z));
           sprintf (temp, "cubeAt%d%d%d", x, y, z);
-          t = room->GetMesh (temp);
+
+  	  csMeshWrapper *mw = room->GetPrivateObject ()->GetMesh (temp);
+	  t = mw ? &mw->scfiMeshWrapper : NULL;
           if (t)
 	  {
             sprintf (temp, "cubeAt%d%d%d", x, y, z-1);
-	    t->SetName (temp);
+	    t->QueryObject ()->SetName (temp);
 	    ChangeThingMaterial (t, GetMaterialForHeight (z-1));
 	  }
 	}
@@ -2382,11 +2376,12 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
 	sprintf (temp, "cubeAt%d%d%d", x, y, z);
         // Only if there is a thing at that certain position, or less
 	// then CUBE_DIM lower.
-	t = room->GetMesh (temp);
+	csMeshWrapper *mw = room->GetPrivateObject ()->GetMesh (temp);
+	t = mw ? &mw->scfiMeshWrapper : NULL;
 	if (t)
 	{
-          t->GetMovable ().MovePosition (csVector3 (0, -elapsed_fall, 0));
-          t->GetMovable ().UpdateMove ();
+          t->GetMovable ()->MovePosition (csVector3 (0, -elapsed_fall, 0));
+          t->GetMovable ()->UpdateMove ();
           reset_vertex_colors (t);
 	  iMeshWrapper* it = QUERY_INTERFACE (t, iMeshWrapper);
           room->ShineLights (it);

@@ -59,20 +59,39 @@ struct iLight : public iBase
 {
   /// Get private pointer to light object. UGLY
   virtual csLight* GetPrivateObject () = 0;
+
   /// Get the iObject for this light.
   virtual iObject *QueryObject() = 0;
+
   /// Get the position of this light.
-  virtual csVector3& GetCenter () = 0;
-  /// Get the squared radius.
-  virtual float GetSquaredRadius () const = 0;
-  /// Get the color of this light.
-  virtual csColor& GetColor () = 0;
-  /// Set the color of this light.
-  virtual void SetColor (const csColor& col) = 0;
+  virtual const csVector3& GetCenter () = 0;
+  /// Set the position of this light.
+  virtual void SetCenter (const csVector3& pos) = 0;
+
+  /// Get the sector for this light.
+  virtual iSector *GetSector () = 0;
   /// Set the sector for this light.
   virtual void SetSector (iSector* sector) = 0;
-  /// Get the brightness of a light at a given distance.
-  virtual float GetBrightnessAtDistance (float d) = 0;
+
+  /// Get the radius
+  virtual float GetRadius () = 0;
+  /// Get the squared radius.
+  virtual float GetSquaredRadius () = 0;
+  /// Get the inverse radius.
+  virtual float GetInverseRadius () = 0;
+  /// Set the radius
+  virtual void SetRadius (float r) = 0;
+
+  /// Get the color of this light.
+  virtual const csColor& GetColor () = 0;
+  /// Set the color of this light.
+  virtual void SetColor (const csColor& col) = 0;
+
+  /// Return current attenuation mode
+  virtual int GetAttenuation () = 0;
+  /// Set attenuation mode
+  virtual void SetAttenuation (int a) = 0;
+
   /// Create a cross halo for this light.
   virtual iCrossHalo* CreateCrossHalo (float intensity, float cross) = 0;
   /// Create a nova halo for this light.
@@ -80,10 +99,9 @@ struct iLight : public iBase
   	float roundness) = 0;
   /// Create a flare halo for this light.
   virtual iFlareHalo* CreateFlareHalo () = 0;
-  /// Return current attenuation mode
-  virtual int GetAttenuation () = 0;
-  /// Set attenuation mode
-  virtual void SetAttenuation (int a) = 0;
+
+  /// Get the brightness of a light at a given distance.
+  virtual float GetBrightnessAtDistance (float d) = 0;
 };
 
 #endif // __IENGINE_LIGHT_H__

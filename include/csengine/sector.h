@@ -530,6 +530,14 @@ public:
     virtual void AddTerrain (iTerrainWrapper *pTerrain);
     virtual void AddLight (iStatLight *light);
     virtual iStatLight *FindLight (float x, float y, float z, float dist);
+    virtual void ShineLights ()
+    {
+      scfParent->ShineLights ();
+    }
+    virtual void ShineLights (iMeshWrapper* mesh)
+    {
+      scfParent->ShineLights (mesh);
+    }
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes,
   	bool do_terrain)
     {
