@@ -27,7 +27,7 @@ Cygwin uses a custom setup application for installation of Cygwin which can be
 obtained from their official website.
 
 @noindent
-@uref{http://www.cygin.com/}
+@uref{http://www.cygwin.com/}
 
 The installation program @file{setup.exe} must be downloaded to your computer.
 
