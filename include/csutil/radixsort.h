@@ -22,6 +22,9 @@
 
 #include "csextern.h"
 
+/**
+ * An in-place radix-sorter for a raw array of 32-bit unsigned integers.
+ */
 class CS_CRYSTALSPACE_EXPORT csRadixSorter
 {
 private:
@@ -46,4 +49,3 @@ public:
 };
 
 #endif
-
