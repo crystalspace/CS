@@ -39,6 +39,8 @@
 #include "iengine/viscull.h"
 #include "iengine/portalcontainer.h"
 
+#include "cstool/rendermeshlist.h"
+
 class csEngine;
 class csProgressPulse;
 class csSector;
@@ -156,9 +158,16 @@ private:
     uint32 cachedFrameNumber;
     //iRenderView *cachedRView;
     csRenderContext *cachedRenderContext;
+
+    visibleMeshCacheHolder() : meshList(0) {}
+    ~visibleMeshCacheHolder()
+    {
+      //delete meshList;
+    }
   };
 
   csArray<visibleMeshCacheHolder> visibleMeshCache;
+  csPDelArray<csRenderMeshList> usedMeshLists;
 
 
 private:

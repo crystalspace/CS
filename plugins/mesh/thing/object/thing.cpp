@@ -1077,7 +1077,9 @@ void csThingStatic::FillRenderMeshes (
     rm->material = pg.material;
     rm->meshtype = CS_MESHTYPE_POLYGON;
     rm->dynDomain.AttachNew (new csShaderVariableContext ());
-    rm->dynDomain->AddVariable (new csShaderVariable (texLightmapName));
+    csRef<csShaderVariable> sv (
+      csPtr<csShaderVariable> (new csShaderVariable (texLightmapName)));
+    rm->dynDomain->AddVariable (sv);
 
     /*csShaderVariable* sv;
     sv = dynDomain->GetVariableAdd (index_name);

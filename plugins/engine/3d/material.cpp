@@ -116,7 +116,7 @@ csShaderVariable* csMaterial::GetVar (csStringID name, bool create)
   csRef<csShaderVariable> var = GetVariable (name);
   if ((var == 0) && create)
   {
-    var = new csShaderVariable (name);
+    var.AttachNew (new csShaderVariable (name));
     AddVariable (var);
   }
   return var;

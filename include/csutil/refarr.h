@@ -23,6 +23,32 @@
 #include "ref.h"
 #include "array.h"
 
+#ifdef CS_REF_TRACKER
+ #include <typeinfo>
+ #include "csutil/reftrackeraccess.h"
+
+ #define CSREFARR_TRACK(x, cmd, refCount, obj, tag) \
+  {						    \
+    const int rc = obj ? refCount : -1;		    \
+    if (obj) cmd;				    \
+    if (obj)					    \
+    {						    \
+      csRefTrackerAccess::SetDescription (obj,	    \
+	typeid(T).name());			    \
+      csRefTrackerAccess::Match ## x (obj, rc, tag);\
+    }						    \
+  }
+ #define CSREFARR_TRACK_INCREF(obj,tag)	\
+  CSREFARR_TRACK(IncRef, obj->IncRef(), obj->GetRefCount(), obj, tag);
+ #define CSREFARR_TRACK_DECREF(obj,tag)	\
+  CSREFARR_TRACK(DecRef, obj->DecRef(), obj->GetRefCount(), obj, tag);
+#else
+ #define CSREFARR_TRACK_INCREF(obj,tag) \
+  if (obj) obj->IncRef();
+ #define CSREFARR_TRACK_DECREF(obj,tag) \
+  if (obj) obj->DecRef();
+#endif
+
 template <class T>
 class csRefArrayElementHandler
 {
@@ -30,12 +56,12 @@ public:
   static void Construct (T* address, T const& src)
   {
     *address = src;
-    if (src) src->IncRef ();
+    CSREFARR_TRACK_INCREF (src, address);
   }
 
   static void Destroy (T* address)
   {
-    if (*address) (*address)->DecRef ();
+    CSREFARR_TRACK_DECREF ((*address), address);
   }
 
   static void InitRegion (T* address, int count)
@@ -70,6 +96,9 @@ public:
   }
 
 };
+
+#undef CSREFARR_TRACK_INCREF
+#undef CSREFARR_TRACK_DECREF
 
 #endif // __CS_REFARR_H__
 

@@ -347,6 +347,7 @@ public:
       delete this;
     }
   }
+  int GetRefCount () { return ref; }
 };
 
 /**
@@ -545,6 +546,7 @@ public:
       delete this;
     }
   }
+  int GetRefCount () { return ref; }
 };
 
 /**

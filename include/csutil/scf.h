@@ -205,7 +205,6 @@ void Class::IncRef ()							\
 #define SCF_IMPLEMENT_IBASE_DECREF(Class)				\
 void Class::DecRef ()							\
 {									\
-  /*SCF_TRACK_DECREF;*/							\
   csRefTrackerAccess::TrackDecRef (this, scfRefCount);			\
   if (scfRefCount == 1)							\
   {									\

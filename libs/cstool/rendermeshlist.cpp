@@ -29,9 +29,9 @@
 #include "ivideo/rendermesh.h"
 
 
-csRenderMeshList::csRenderMeshList (iObjectRegistry *objreg)
+csRenderMeshList::csRenderMeshList (iEngine* engine)
 {
-  engine = CS_QUERY_REGISTRY(objreg, iEngine);
+  csRenderMeshList::engine = engine;
 }
 
 csRenderMeshList::~csRenderMeshList ()

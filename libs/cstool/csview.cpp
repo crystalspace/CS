@@ -31,7 +31,7 @@ SCF_IMPLEMENT_IBASE (csView)
 SCF_IMPLEMENT_IBASE_END
 
 csView::csView (iEngine *e, iGraphics3D* ig3d) :
-  Engine (e), G3D (ig3d), RectView (0), PolyView (0), Clipper (0)
+  Engine (e), G3D (ig3d), RectView (0), PolyView (0)
 {
   SCF_CONSTRUCT_IBASE (0);
 
@@ -45,7 +45,6 @@ csView::~csView ()
 {
   delete RectView;
   delete PolyView;
-  delete Clipper;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -84,7 +83,7 @@ void csView::SetRectangle (int x, int y, int w, int h)
   OldWidth = G3D->GetWidth ();
   OldHeight = G3D->GetHeight ();
   delete PolyView; PolyView = 0;
-  delete Clipper; Clipper = 0;
+  Clipper = 0;
 
   // Do not allow the rectangle to go out of the screen
   if (x < 0) { w += x; x = 0; }
@@ -103,7 +102,7 @@ void csView::ClearView ()
   OldWidth = G3D->GetWidth ();
   OldHeight = G3D->GetHeight ();
 
-  delete Clipper; Clipper = 0;
+  Clipper = 0;
   delete RectView; RectView = 0;
 
   if (PolyView) PolyView->MakeEmpty ();
@@ -115,7 +114,7 @@ void csView::AddViewVertex (int x, int y)
     PolyView = new csPoly2D ();
   PolyView->AddVertex (x, y);
 
-  delete Clipper; Clipper = 0;
+  Clipper = 0;
   delete RectView; RectView = 0;
 }
 
@@ -150,7 +149,6 @@ void csView::UpdateView ()
 		   QRound (scale_y * RectView->MaxY()) );
   }
 
-  delete Clipper;
   Clipper = 0;
 }
 
@@ -170,12 +168,12 @@ void csView::UpdateClipper ()
   if (!Clipper)
   {
     if (PolyView)
-      Clipper = new csPolygonClipper (PolyView);
+      Clipper.AttachNew (new csPolygonClipper (PolyView));
     else
     {
       if (!RectView)
         RectView = new csBox2 (0, 0, OldWidth - 1, OldHeight - 1);
-      Clipper = new csBoxClipper (*RectView);
+      Clipper.AttachNew (new csBoxClipper (*RectView));
     }
   }
 }

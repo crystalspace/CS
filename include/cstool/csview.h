@@ -47,7 +47,7 @@ private:
   /// Poly clipping region (0 if this is a rectangular clipper)
   csPoly2D* PolyView;
   /// The prepared clipper
-  iClipper2D* Clipper;
+  csRef<iClipper2D> Clipper;
 
   /// Rescale the clipper to deal with a context resize
   void UpdateView ();

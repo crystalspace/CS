@@ -40,7 +40,7 @@ public:
    * It needs objectregistry becouse the meshsorter needs to get the 
    * renderpriorities sortingoptions from the engine.
    */
-  csRenderMeshList (iObjectRegistry *objreg);
+  csRenderMeshList (iEngine* engine);
   
   /**
    * Destructor. Clean up the list
@@ -85,7 +85,7 @@ private:
   };
 
   csPDelArray < renderMeshListInfo > renderList;
-  csRef<iEngine> engine;
+  iEngine* engine;
 };
 
 #endif //__CS_RENDERMESHLIST_H__

@@ -32,6 +32,7 @@
 #include "csutil/blockallocator.h"
 #include "csutil/scf.h"
 #include "csutil/refarr.h"
+#include "csutil/weakrefarr.h"
 #include "csutil/blockallocator.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
@@ -285,7 +286,6 @@ protected:
   /// Texture handle, if created from one
   csRef<iTextureHandle> texture;
   /// Parent texture manager
-  //csRef<csGLTextureManager> texman;
   csGLTextureManager* texman;
 
 public:
@@ -440,11 +440,11 @@ class csGLTextureManager : public iTextureManager
     int texelbytes;
   };
 
-  typedef csRefArray<csGLTextureHandle> csTexVector;
+  typedef csWeakRefArray<csGLTextureHandle> csTexVector;
   /// List of textures.
   csTexVector textures;
   // Private class used to keep a list of objects derived from csMaterialHandle
-  typedef csRefArray<csGLMaterialHandle> csMatVector;
+  typedef csWeakRefArray<csGLMaterialHandle> csMatVector;
   /// List of materials.
   csMatVector materials;
 

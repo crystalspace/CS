@@ -44,27 +44,7 @@ SCF_IMPLEMENT_IBASE (csReporterListener::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-void csReporterListener::DecRef ()
-{
-  scfRefCount--;
-  if (scfRefCount <= 0)
-  {
-    SCF_TRACE (("  delete (%s *)%p\n", "csReporterListener", this));
-    if (scfParent)
-      scfParent->DecRef ();
-    delete this;
-  }
-  else
-    SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", "csReporterListener", this, scfRefCount));
-}
-
-//SCF_IMPLEMENT_IBASE (csReporterListener)
-
-SCF_IMPLEMENT_IBASE_INCREF(csReporterListener)
-SCF_IMPLEMENT_IBASE_GETREFCOUNT(csReporterListener)
-SCF_IMPLEMENT_IBASE_REFOWNER(csReporterListener)
-SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csReporterListener)
-SCF_IMPLEMENT_IBASE_QUERY(csReporterListener)
+SCF_IMPLEMENT_IBASE (csReporterListener)
   SCF_IMPLEMENTS_INTERFACE (iStandardReporterListener)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iReporterListener)

@@ -286,6 +286,7 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iFactoryClass, scfFactoryFunc iCreate, const char *iDescription,
   const char *iDepend, csStringID context)
 {
+  csRefTrackerAccess::SetDescription (this, CS_TYPENAME(*this));
   // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
   scfWeakRefOwners = 0;
   scfRefCount = 0; scfParent = 0;
@@ -301,6 +302,8 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
 #else
   (void)iLibraryName;
 #endif
+
+  SCF_INIT_TRACKER_ALIASES
 }
 
 scfFactory::~scfFactory ()
@@ -321,10 +324,13 @@ scfFactory::~scfFactory ()
   delete [] Dependencies;
   delete [] Description;
   delete [] ClassID;
+
+  csRefTrackerAccess::TrackDestruction (this, scfRefCount);
 }
 
 void scfFactory::IncRef ()
 {
+  csRefTrackerAccess::TrackIncRef (this, scfRefCount);
 #ifndef CS_STATIC_LINKED
   if (!Library && LibraryName)
   {
@@ -363,6 +369,7 @@ void scfFactory::IncRef ()
 
 void scfFactory::DecRef ()
 {
+  csRefTrackerAccess::TrackDecRef (this, scfRefCount);
 #ifdef CS_DEBUG
   if (scfRefCount == 0)
   {
@@ -968,7 +975,7 @@ scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)
 
 csRef<iStringArray> csSCF::QueryClassList (char const* pattern)
 {
-  csRef<iStringArray> v = new scfStringArray();
+  iStringArray* v = new scfStringArray();
 
   csScopedMutexLock lock (mutex);
   int const rlen = ClassRegistry->Length();
@@ -982,5 +989,5 @@ csRef<iStringArray> csSCF::QueryClassList (char const* pattern)
         v->Push (s);
     }
   }
-  return v;
+  return csPtr<iStringArray> (v);
 }

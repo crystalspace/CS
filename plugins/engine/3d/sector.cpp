@@ -48,8 +48,6 @@
 #include "ivideo/rendermesh.h"
 #endif
 
-#include "cstool/rendermeshlist.h"
-
 // Configuration variable: number of allowed reflections for static lighting.
 int csSector:: cfg_reflections = 1;
 
@@ -308,10 +306,10 @@ SCF_IMPLEMENT_IBASE(csSectorVisibleMeshCallback)
   SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListener)
 SCF_IMPLEMENT_IBASE_END
 
+CS_IMPLEMENT_STATIC_VAR (GetVisMeshCb, csSectorVisibleMeshCallback, ())
+
 csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
 {
-  static csSectorVisibleMeshCallback cb;
-
   if (rview == 0) return 0;
 
   // This is used for csMeshObject::IsChildVisible to determine
@@ -324,7 +322,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   {
     visibleMeshCache->Empty ();
     cb.Setup (visibleMeshCache, rview);
-    GetVisibilityCuller()->VisTest (rview, &cb);
+    GetVisibilityCuller()->VisTest (rview, GetVisMeshCb ());
 
     cachedFrameNumber = engine->GetCurrentFrameNumber ();
     cachedCamera = rview->GetCamera();
@@ -352,8 +350,8 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
     {
       //use this slot
       entry.meshList->Empty ();
-      cb.Setup (entry.meshList, rview);
-      GetVisibilityCuller()->VisTest (rview, &cb);
+      GetVisMeshCb ()->Setup (entry.meshList, rview);
+      GetVisibilityCuller()->VisTest (rview, GetVisMeshCb ());
 
       entry.cachedFrameNumber = cur_framenr;
       entry.cachedRenderContext = rview->GetRenderContext ();
@@ -365,9 +363,10 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   visibleMeshCacheHolder holder;
   holder.cachedFrameNumber = cur_framenr;
   holder.cachedRenderContext = rview->GetRenderContext ();
-  holder.meshList = new csRenderMeshList (engine->object_reg);
-  cb.Setup (holder.meshList, rview);
-  GetVisibilityCuller()->VisTest (rview, &cb);
+  holder.meshList = new csRenderMeshList (engine);
+  usedMeshLists.Push (holder.meshList);
+  GetVisMeshCb ()->Setup (holder.meshList, rview);
+  GetVisibilityCuller()->VisTest (rview, GetVisMeshCb ());
   visibleMeshCache.Push (holder);
   return holder.meshList;
 }

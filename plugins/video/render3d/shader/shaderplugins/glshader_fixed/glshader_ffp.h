@@ -42,7 +42,6 @@ private:
 
   char* programstring;
 
-  csHashMap variables;
   bool validProgram;
 
   // programloading stuff

@@ -25,8 +25,7 @@
 #include "csutil/callstack.h"
 #include "csutil/strset.h"
 
-struct STACKFRAME64;
-struct SYMBOL_INFO;
+#include "csutil/win32/DbgHelpAPI.h"
 
 class cswinCallStack : public csCallStack
 {

@@ -1197,7 +1197,10 @@ void csGLTextureManager::AlterTargetFormat (const char *oldTarget,
 void csGLTextureManager::Clear()
 {
   for (int i=0; i < textures.Length (); i++)
-    ((csGLTextureHandle *)textures.Get (i))->Clear ();
+  {
+    csGLTextureHandle* tex = textures[i];
+    if (tex) tex->Clear ();
+  }
 }
 
 void csGLTextureManager::UnregisterMaterial (csGLMaterialHandle* handle)
@@ -1270,14 +1273,20 @@ void csGLTextureManager::PrepareTextures ()
   // Create mipmaps for all textures
   int i;
   for (i = 0; i < textures.Length (); i++)
-    textures.Get (i)->Prepare ();
+  {
+    csGLTextureHandle* tex = textures[i];
+    if (tex) tex->Prepare ();
+  }
 }
 
 void csGLTextureManager::FreeImages ()
 {
   int i;
   for (i = 0 ; i < textures.Length () ; i++)
-    textures.Get (i)->FreeImage ();
+  {
+    csGLTextureHandle* tex = textures[i];
+    if (tex) tex->FreeImage ();
+  }
 }
 
 csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (
@@ -1312,16 +1321,22 @@ csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (
 
 void csGLTextureManager::PrepareMaterials ()
 {
+  // csGLMaterialHandle::Prepare() does nothing anyway 
+  /* 
   int i;
   for (i = 0; i < materials.Length (); i++)
     materials.Get (i)->Prepare ();
+    */
 }
 
 void csGLTextureManager::FreeMaterials ()
 {
   int i;
   for (i = 0; i < materials.Length (); i++)
-    materials.Get (i)->FreeMaterial ();
+  {
+    csGLMaterialHandle* mat = materials[i];
+    if (mat) mat->FreeMaterial ();
+  }
 }
 
 void csGLTextureManager::SetVerbose (bool vb)

@@ -79,6 +79,7 @@ void csGLTextureCache::Unload (csTxtCacheData *d)
 
 csGLTextureCache::csGLTextureCache (int max_size, csGLGraphics3D* G3D)
 {
+  SCF_CONSTRUCT_IBASE(0);
   rstate_bilinearmap = true;
   cache_size = max_size;
   num = 0;
@@ -91,6 +92,7 @@ csGLTextureCache::~csGLTextureCache ()
 {
   Clear ();
   //G3D->DecRef ();
+  SCF_DESTRUCT_IBASE();
 }
 
 void csGLTextureCache::Cache (iTextureHandle *txt_handle)

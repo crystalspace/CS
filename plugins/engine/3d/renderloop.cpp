@@ -46,7 +46,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csRenderLoop::csRenderLoop (csEngine* engine)
 {
-  SCF_CONSTRUCT_IBASE (engine);
+  SCF_CONSTRUCT_IBASE (0);
   csRenderLoop::engine = engine;
 }
 
