@@ -609,7 +609,7 @@ void PVSCalcSector::SortPolygonsOnSize ()
 }
 
 bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
-  	int& axis, float& where)
+  	int& axis, float& where, float& where_other)
 {
   float sdx = dest.MinX () - source.MaxX ();
   float sdy = dest.MinY () - source.MaxY ();
@@ -626,6 +626,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
   {
     axis = 0;
     where = dest.MinX ();
+    where_other = source.MaxX ();
     return true;
   }
   if (dsx > SMALL_EPSILON &&
@@ -637,6 +638,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
   {
     axis = 0;
     where = dest.MaxX ();
+    where_other = source.MinX ();
     return true;
   }
   if (sdy > SMALL_EPSILON &&
@@ -648,6 +650,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
   {
     axis = 1;
     where = dest.MinY ();
+    where_other = source.MaxY ();
     return true;
   }
   if (dsy > SMALL_EPSILON &&
@@ -659,6 +662,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
   {
     axis = 1;
     where = dest.MaxY ();
+    where_other = source.MinY ();
     return true;
   }
   if (sdz > SMALL_EPSILON &&
@@ -670,6 +674,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
   {
     axis = 2;
     where = dest.MinZ ();
+    where_other = source.MaxZ ();
     return true;
   }
   if (dsz > SMALL_EPSILON &&
@@ -681,6 +686,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
   {
     axis = 2;
     where = dest.MaxZ ();
+    where_other = source.MinZ ();
     return true;
   }
   return false;
@@ -689,8 +695,11 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
 bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
 	const csBox3& dest)
 {
-  if (!FindShadowPlane (source, dest, plane.axis, plane.where))
+  float where_other;
+  if (!FindShadowPlane (source, dest, plane.axis, plane.where, where_other))
     return false;
+
+//plane.where = (plane.where + where_other) / 2.0;
 
   // We project the destination box on the given shadow plane as seen
   // from every corner of the source box. ProjectOutline() will add the
@@ -895,39 +904,13 @@ bool PVSCalcSector::NodesSurelyVisible (const csBox3& source,
   	source.GetCenter (),
     	dest.GetCenter ())))
     return true;
-  if (!shadow_tree->HitBeam (csSegment3 (
-  	source.GetCorner (CS_BOX_CORNER_xyz),
-    	dest.GetCorner (CS_BOX_CORNER_XYZ))))
-    return true;
-  if (!shadow_tree->HitBeam (csSegment3 (
-  	source.GetCorner (CS_BOX_CORNER_Xyz),
-    	dest.GetCorner (CS_BOX_CORNER_xYZ))))
-    return true;
-  if (!shadow_tree->HitBeam (csSegment3 (
-  	source.GetCorner (CS_BOX_CORNER_xyZ),
-    	dest.GetCorner (CS_BOX_CORNER_XYz))))
-    return true;
-  if (!shadow_tree->HitBeam (csSegment3 (
-  	source.GetCorner (CS_BOX_CORNER_xYz),
-    	dest.GetCorner (CS_BOX_CORNER_XyZ))))
-    return true;
 
-  if (!shadow_tree->HitBeam (csSegment3 (
-  	source.GetCorner (CS_BOX_CORNER_XYZ),
-    	dest.GetCorner (CS_BOX_CORNER_xyz))))
-    return true;
-  if (!shadow_tree->HitBeam (csSegment3 (
-  	source.GetCorner (CS_BOX_CORNER_xYZ),
-    	dest.GetCorner (CS_BOX_CORNER_Xyz))))
-    return true;
-  if (!shadow_tree->HitBeam (csSegment3 (
-  	source.GetCorner (CS_BOX_CORNER_XYz),
-    	dest.GetCorner (CS_BOX_CORNER_xyZ))))
-    return true;
-  if (!shadow_tree->HitBeam (csSegment3 (
-  	source.GetCorner (CS_BOX_CORNER_XyZ),
-    	dest.GetCorner (CS_BOX_CORNER_xYz))))
-    return true;
+  int i, j;
+  for (i = 0 ; i < 8 ; i++)
+    for (j = 0 ; j < 8 ; j++)
+      if (!shadow_tree->HitBeam (csSegment3 (
+  	    source.GetCorner (i), dest.GetCorner (j))))
+        return true;
 
   return false;
 }
@@ -965,6 +948,7 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
       pvstree->MarkInvisible (sourcenode->node, destnode->node);
       sourcenode->invisible_nodes.Add (destnode);
       int destrep = destnode->represented_nodes;
+      total_invisnodes += destrep;
       DBA(("S%d ", destrep));
       DB(("S:Marked invisible (%g,%g,%g)-(%g,%g,%g) to (%g,%g,%g)-(%g,%g,%g)\n",
     	    source.MinX (), source.MinY (), source.MinZ (),
@@ -1011,6 +995,7 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
           pvstree->MarkInvisible (sourcenode->node, destnode->node);
 	  sourcenode->invisible_nodes.Add (destnode);
 	  int destrep = destnode->represented_nodes;
+          total_invisnodes += destrep;
 	  DBA(("%d ", destrep));
           DB(("Marked invisible (%g,%g,%g)-(%g,%g,%g) to (%g,%g,%g)-(%g,%g,%g)\n",
     	    source.MinX (), source.MinY (), source.MinZ (),
@@ -1031,6 +1016,7 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
             pvstree->MarkInvisible (destnode->node, sourcenode->node);
 	    destnode->invisible_nodes.Add (sourcenode);
 	    int srcrep = sourcenode->represented_nodes;
+            total_invisnodes += srcrep;
 	    DBA(("I%d ", srcrep));
             DB(("Marked invisible symmetry\n"));
 	  }
@@ -1042,6 +1028,8 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
       }
     }
   }
+
+  total_visnodes++;
 
   // The destination node was visible and coverage buffer was partially
   // full. This means that we have to proceed to test visibility for the
@@ -1060,9 +1048,12 @@ void PVSCalcSector::RecurseSourceNodes (PVSCalcNode* sourcenode,
   csTicks totaltime = currenttime - starttime;
   float average = float (totaltime) / float (totalnodes-nodecounter);
   csTicks remaining = (csTicks)(average * nodecounter);
-  printf ("\n%p (#n=%d cnt=%d) (tot=%ds rem=%ds avg=%gms) ",
-  	sourcenode, sourcenode->represented_nodes, nodecounter,
-	totaltime / 1000, remaining / 1000, average);
+  float cull_quality = 100.0 * float (total_invisnodes)
+  	/ float (1 + total_visnodes + total_invisnodes);
+  printf ("\n#n=%d cnt=%d (tot=%ds rem=%ds avg=%gms) (cq=%g%%) ",
+  	sourcenode->represented_nodes, nodecounter,
+	totaltime / 1000, remaining / 1000, average,
+	cull_quality);
   fflush (stdout);
 
   // We recurse through all destination nodes now. This will update the
@@ -1153,6 +1144,8 @@ void PVSCalcSector::Calculate ()
   csSet<PVSCalcNode*> invisible_nodes;
   int nodecounter = countnodes;
   starttime = csGetTicks ();
+  total_invisnodes = 0;
+  total_visnodes = 0;
   RecurseSourceNodes (shadow_tree, invisible_nodes, nodecounter);
 
   // Write our KDTree with pvs.

@@ -25,6 +25,11 @@ chronological order.
 	      as we have visibility anyway.
 	    - Show total time, estimated remaining time, and average
 	      time per node.
+	    - Added a measurement of culling quality during calculation.
+	      This is the percentage of invisible nodes compared to
+	      visible ones.
+	    - Speed up pvscalc a bit more by testing more beams
+	      before doing the expensive calculations.
 14-Feb-2005
 	- Chris made the minimum polygon UV determinant into a #define
 	  so that it would be more amenable to experimentation. 

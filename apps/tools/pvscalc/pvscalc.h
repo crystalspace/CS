@@ -187,6 +187,8 @@ private:
   int maxdepth;
   int totalnodes;
   int countnodes;
+  int total_invisnodes;
+  int total_visnodes;
   csTicks starttime;
 
   // The shadow KD tree used during calculations.
@@ -278,9 +280,11 @@ private:
    * the area shadows on. If the boxes are adjacent or one box is enclosed
    * in the other this function will return false. In that case the destination
    * box is surely visible from the source box.
+   * In 'where_other' the other plane is returned. Any shadow plane
+   * between 'where' and 'where_other' can be used as a valid shadow plane.
    */
   bool FindShadowPlane (const csBox3& source, const csBox3& dest,
-  	int& axis, float& where);
+  	int& axis, float& where, float& where_other);
 
   /**
    * Setup the projection plane and coverage buffer for two boxes. This
