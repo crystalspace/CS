@@ -2,6 +2,9 @@ Crystal Space detailed change log.
 http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
+7-Jul-2003
+	- Changed iDataBuffer so that it can be instructed not to delete
+	  the underlying buffer when it is freed.
 
 5-Jul-2003
         - Boyan removed circular reference between ds3d render and listener
