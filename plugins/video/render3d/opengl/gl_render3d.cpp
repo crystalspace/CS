@@ -368,11 +368,11 @@ void csGLGraphics3D::CalculateFrustum ()
   if (clipper)
   {
     frustum.MakeEmpty ();
-    int nv = clipper->GetVertexCount ();
+    size_t nv = clipper->GetVertexCount ();
     csVector3 v3;
     v3.z = 1;
     csVector2* v = clipper->GetClipPoly ();
-    int i;
+    size_t i;
     for (i = 0 ; i < nv ; i++)
     {
       v3.x = (v[i].x - asp_center_x) * (1.0/aspect);
@@ -1197,13 +1197,14 @@ void csGLGraphics3D::FinishDraw ()
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
 
-  SetMirrorMode (false);
-
   if (render_target)
   {
     r2tbackend->FinishDraw();
     SetRenderTarget (0);
   }
+  
+  SetMirrorMode (false);
+
   //render_target = 0;
   current_drawflags = 0;
 }

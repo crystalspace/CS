@@ -192,8 +192,6 @@ bool csGraphics2DGLCommon::Open ()
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
     }
   }
-  clearWithBox = config->GetBool ("Video.OpenGL.ClearScreenWithBox", false);
-  
   ext.InitGL_ARB_multisample();
 
   if (ext.CS_GL_ARB_multisample)
@@ -428,15 +426,10 @@ void csGraphics2DGLCommon::Clear (int color)
 {
   ((csGLFontCache*)fontCache)->FlushText ();
 
-  if (clearWithBox)
-    DrawBox (0, 0, vpWidth, vpHeight, color);
-  else
-  {
-    float r, g, b, a;
-    DecomposeColor (color, r, g, b, a);
-    glClearColor (r, g, b, a);
-    glClear (GL_COLOR_BUFFER_BIT);
-  }
+  float r, g, b, a;
+  DecomposeColor (color, r, g, b, a);
+  glClearColor (r, g, b, a);
+  glClear (GL_COLOR_BUFFER_BIT);
 }
 
 void csGraphics2DGLCommon::SetRGB (int i, int r, int g, int b)
@@ -724,8 +717,8 @@ csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
 #endif*/
 
   // Need to resolve pixel alignment issues
-  int screen_width = vpWidth * (4);
-  if (!screen_shot) screen_shot = new uint8 [screen_width * vpHeight];
+  int screen_width = Width * (4);
+  if (!screen_shot) screen_shot = new uint8 [screen_width * Height];
   //if (!screen_shot) return 0;
 
   glReadPixels (0, 0, vpWidth, vpHeight, GL_RGBA,

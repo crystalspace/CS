@@ -47,13 +47,13 @@
   // The currently clipped polygon
   csVector2 *InP = InPolygon;
   // Number of input vertices
-  int InV = InCount;
+  size_t InV = InCount;
   // The current output polygon
   csVector2 *OutP = (ClipCount & 1) ? OutPolygon : TempPoly;
   // Number of output vertices
-  int OutV = -1;
+  size_t OutV = (size_t)-1;
   // Current input vertex, vertex % num_vertices
-  int vert, realvert;
+  size_t vert, realvert;
   // Flag: was input polygon clipped?
   bool Clipped = false;
 

@@ -120,7 +120,7 @@ public:
 struct G3DPolygonDPFX
 {
   /// Current number of vertices.
-  int num;
+  size_t num;
   /// Vertices that form the polygon.
   csVector2 vertices[100];
   /// 1/z for every vertex.
@@ -157,7 +157,7 @@ struct G3DPolygonDPFX
 struct G3DPolygonDFP
 {
   /// Current number of vertices.
-  int num;
+  size_t num;
   /// Vertices that form the polygon.
   csVector2 vertices[100];
 

@@ -30,6 +30,7 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLScreenShot : public csImageBase
   csGraphics2DGLCommon* G2D;
   int Format;
   csRGBpixel* Data;
+  size_t dataSize;
   int Width, Height;
 
 public:

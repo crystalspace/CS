@@ -164,12 +164,12 @@
           if (ABS (InP [vert].x - OutP [OutV - 1].x) < EPSILON
            && ABS (InP [vert].y - OutP [OutV - 1].y) < EPSILON)
             vert++;
-          int count = InV - vert;
+          size_t count = InV - vert;
           if (OutV + count > MAX_OUTPUT_VERTICES)
             count = MAX_OUTPUT_VERTICES - OutV;
           memcpy (&OutP [OutV], &InP [vert], count * sizeof (OutP [0]));
 #ifdef OUTPUT_VERTEX_STATUS
-          for (int vs = 0; vs < count; vs++)
+          for (size_t vs = 0; vs < count; vs++)
 	  {
             CS_ASSERT ((vs+OutV) >= 0 && (vs+OutV) < MAX_OUTPUT_VERTICES);
             OutS [vs + OutV] = InS [vert + vs];

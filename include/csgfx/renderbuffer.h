@@ -76,7 +76,9 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release();
 
-  /// Copy data to the render buffer.
+  /**
+   * Copy data to the render buffer.
+   */
   virtual void CopyInto (const void *data, size_t elementCount,
     size_t elemOffset = 0);
 
@@ -154,8 +156,11 @@ public:
    *        etc
    * \param componentCount Number of components per element (e.g. 4 for RGBA)
    * \param copy if true (default) then this buffer will make a copy of the
-   *        data. Hardware vertex buffers and interleaved buffers will always
-   *        copy data.
+   *        data, else just svae the buffer pointers provided by the caller.
+   *        This has some implications: CopyInto() does not copy, merely update
+   *	    the internal buffer pointer. Lock() just returns that pointer.
+   *        The pointer passed to CopyInto() must be valid over the lifetime of
+   *        the render buffer.
    */
   static csRef<iRenderBuffer> CreateRenderBuffer (size_t elementCount, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
@@ -171,8 +176,11 @@ public:
    * \param rangeEnd Maximum index value that is expected to be written to 
    *  the created buffer.
    * \param copy if true (default) then this buffer will make a copy of the
-   *        data. Hardware vertex buffers and interleaved buffers will always
-   *        copy data.
+   *        data, else just svae the buffer pointers provided by the caller.
+   *        This has some implications: CopyInto() does not copy, merely update
+   *	    the internal buffer pointer. Lock() just returns that pointer.
+   *        The pointer passed to CopyInto() must be valid over the lifetime of
+   *        the render buffer.
    */
   static csRef<iRenderBuffer> CreateIndexRenderBuffer (size_t elementCount, 
     csRenderBufferType type, csRenderBufferComponentType componentType,

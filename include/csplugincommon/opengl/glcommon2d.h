@@ -129,12 +129,6 @@ protected:
   /// Driver database
   csGLDriverDatabase driverdb;
   bool useCombineTE;
-  /**
-   * It seems that on certain drivers (NV...) glClear() doesn't always do what
-   * it should. In this case Clear() draws a full screen quad instead of 
-   * using glClear().
-   */
-  bool clearWithBox;
 
   int vpWidth, vpHeight;
   bool vpSet;
@@ -237,6 +231,11 @@ public:
     int color);
   /// Blit.
   virtual void Blit (int x, int y, int w, int h, unsigned char const* data);
+
+  virtual int GetWidth ()
+  { return vpSet ? vpWidth : Width; }
+  virtual int GetHeight ()
+  { return vpSet ? vpHeight : Height; }
 
   /**
    * Get address of video RAM at given x,y coordinates.

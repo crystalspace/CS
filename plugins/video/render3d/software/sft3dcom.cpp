@@ -1462,8 +1462,8 @@ inline static void SelectInterpolationStep (float M)
 
 void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 {
-  int i;
-  int max_i, min_i;
+  size_t i;
+  size_t max_i, min_i;
   float max_y, min_y;
   unsigned char *d;
   uint32 *z_buf;
@@ -1614,7 +1614,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   // Using this we effectively partition our polygon in trapezoids
   // with at most two triangles (one at the top and one at the bottom).
 
-  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
+  size_t scanL1, scanL2, scanR1, scanR2;// scan vertex left/right start/final
   float sxL, sxR, dxL, dxR;             // sl X left/right and deltas
   int sy, fyL, fyR;                     // sl Y, final Y left, final Y right
   int xL, xR;
@@ -1728,8 +1728,8 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 
 void csSoftwareGraphics3DCommon::DrawPolygonZFill (G3DPolygonDFP& poly)
 {
-  int i;
-  int max_i, min_i;
+  size_t i;
+  size_t max_i, min_i;
   float max_y, min_y;
   unsigned char *d;
   uint32 *z_buf;
@@ -1818,7 +1818,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonZFill (G3DPolygonDFP& poly)
   // Using this we effectively partition our polygon in trapezoids
   // with at most two triangles (one at the top and one at the bottom).
 
-  int scanL1, scanL2, scanR1, scanR2; // scan vertex left/right start/final
+  size_t scanL1, scanL2, scanR1, scanR2; // scan vertex left/right start/final
   float sxL, sxR, dxL, dxR;           // scanline X left/right and deltas
   int sy, fyL, fyR;                   // scanline Y, final Y left, final Y right
   int xL, xR;
@@ -1941,10 +1941,10 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
     return;
   }*/
 
-  int i;
+  size_t i;
   float P1, P2, P3, P4;
   float Q1, Q2, Q3, Q4;
-  int max_i, min_i, min_z_i;
+  size_t max_i, min_i, min_z_i;
   float max_y, min_y;
   float min_z;
   unsigned char *d;
@@ -2269,7 +2269,7 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
   // Using this we effectively partition our polygon in trapezoids
   // with at most two triangles (one at the top and one at the bottom).
 
-  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
+  size_t scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
   float sxL, sxR, dxL, dxR;             // sl X left/right and deltas
   int sy, fyL, fyR;                     // sl Y, final Y left, final Y right
   int xL, xR;
@@ -3126,11 +3126,11 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   //-----
   float uu[64], vv[64], iz[64];
   float rr[64], gg[64], bb[64];
-  int top, bot;
+  size_t top, bot;
   float top_y = -99999;
   float bot_y = 99999;
   top = bot = 0;                        // avoid GCC complains
-  int i;
+  size_t i;
   for (i = 0 ; i < poly.num ; i++)
   {
     uu[i] = pqinfo.tw * poly.texels [i].x;
@@ -3168,7 +3168,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   struct
   {
     // Start and final vertex number
-    signed char sv, fv;
+    size_t sv, fv;
     // The X coordinates and its per-scanline delta; also the final Y coordinate
     int x, dxdy, fy;
     // The `U/V/Z' texture coordinates and their per-scanline delta
@@ -3798,7 +3798,7 @@ static dtmesh_color_verts *color_verts = 0;
 }
 
 static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
-                                 csVector2* clipped_verts, int num_vertices,
+                                 csVector2* clipped_verts, size_t num_vertices,
                                  csVertexStatus* clipped_vtstats, csVector2* orig_triangle,
                                  bool use_fog, bool gouraud)
 {
@@ -3809,13 +3809,13 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
   csColor tritexcoords_colors[3];
   float tritexcoords_z[3];
   G3DFogInfo trifoginfo [3];
-  int i;
+  size_t i;
   memcpy (tritexcoords_vertices, g3dpoly->vertices, 3 * sizeof (csVector2));
   memcpy (tritexcoords_texels, g3dpoly->texels, 3 * sizeof (csVector2));
   memcpy (tritexcoords_colors, g3dpoly->colors, 3 * sizeof (csColor));
   memcpy (tritexcoords_z, g3dpoly->z, 3 * sizeof (float));
 
-  int vt, vt2;
+  size_t vt, vt2;
   float t;
   for (i = 0 ; i < num_vertices ; i++)
   {
@@ -4011,7 +4011,7 @@ static void DoAddPerspective (csPoly2D& dest, const csVector3& v,
   //dest.GetBoundingBox ().AddBoundingVertex (p);
 }
 
-static bool DoPolyPerspective (csVector3* verts, int num_verts, 
+static bool DoPolyPerspective (csVector3* verts, size_t num_verts, 
 			       csPoly2D& dest, /*bool mirror,*/
 			       float aspect, float shift_x, float shift_y,
 			       const csPlane3& plane_cam)
@@ -4532,10 +4532,10 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
     
     csPolygonRenderData* spoly = polyRender->polys[i];
 
-    int numVerts = spoly->num_vertices;
+    size_t numVerts = spoly->num_vertices;
     CS_ALLOC_STACK_ARRAY(csVector3, camVerts, numVerts);
 
-    int v;
+    size_t v;
     int cnt_vis = 0;
     csVector3* obj_verts = *(spoly->p_obj_verts);
     for (v = 0; v < numVerts; v++)

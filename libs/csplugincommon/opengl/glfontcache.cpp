@@ -555,7 +555,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
   if (knownFont == 0) knownFont = CacheFont (font);
 
   if (pen_y <= ClipY1) return;
-  pen_y = G2D->Height - pen_y/* - maxheight*/;
+  pen_y = G2D->vpHeight - pen_y/* - maxheight*/;
 
   size_t textLen = strlen ((char*)text);
 

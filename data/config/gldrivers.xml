@@ -174,13 +174,6 @@
 	</OpenGL>
       </Video>
     </config>
-    <config name="clearWithBox">
-      <Video>
-	<OpenGL>
-	  <ClearScreenWithBox>yes</ClearScreenWithBox>
-	</OpenGL>
-      </Video>
-    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -262,14 +255,6 @@
 	<usecfg>pixelformatbroken</usecfg>
       </applicable>
     </rule>
-    <rule description="Intel: Texture Compression">
-      <conditions>
-	<regexp string="renderer" pattern="^Intel" />
-      </conditions>
-      <applicable>
-	<usecfg>texturecompression</usecfg>
-      </applicable>
-    </rule>
     <rule description="Intel: Extreme Buggy Graphics">
       <conditions>
 	<regexp string="vendor" pattern="^Intel" />
@@ -301,16 +286,6 @@
 	<usecfg>disableTC</usecfg>
       </applicable>
     </rule>
-    <!--
-    <rule description="NVidia: glClear() doesn't always seem to clear">
-      <conditions fulfill="all">
-	<regexp string="vendor" pattern="^NVIDIA" />
-      </conditions>
-      <applicable>
-	<usecfg>clearWithBox</usecfg>
-      </applicable>
-    </rule>
-    -->
     <!--
     <rule description="Software GL tweaks">
       <conditions fulfill="one">

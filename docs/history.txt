@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Apr-2005
+	- res fixed some VC7.0 warnings.
+	- res fixed crashes when making screenshots of render targets.
+	- res fixed text not showing up when drawing to a render target.
+	- res removed the clear-with-DrawBox() workarounf again. It caused 
+	  issues in other places, and the Clear() problem manifests itself 
+	  only in one place (PS labels), so it can be worked around there.
+	- res removed an entry from gldrivers.xml that became obsolete (and
+	  non-functional) after the last texture manager changes (texture
+	  class introduction etc.)
 1-Apr-2005
 	- Eric Sunshine fixed some unportable uses of #warning directives in
 	  the public CS headers. (#warning is not part of the C++ standard)

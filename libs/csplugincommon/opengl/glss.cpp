@@ -52,10 +52,9 @@ csGLScreenShot::csGLScreenShot (csGraphics2DGLCommon* G2D)
 
   poolNext = 0;
   csGLScreenShot::G2D = G2D;
-  Width = G2D->GetWidth ();
-  Height = G2D->GetHeight ();
   Format = CS_IMGFMT_TRUECOLOR;
-  Data = new csRGBpixel [Width * Height];
+  Data = 0;
+  dataSize = 0;
 }
 
 csGLScreenShot::~csGLScreenShot ()
@@ -66,6 +65,15 @@ csGLScreenShot::~csGLScreenShot ()
 
 void csGLScreenShot::SetData (void* data)
 {
+  Width = G2D->GetWidth ();
+  Height = G2D->GetHeight ();
+  if (dataSize < (size_t)(Width * Height))
+  {
+    delete[] Data;
+    Data = new csRGBpixel [Width * Height];
+    dataSize = Width * Height;
+  }
+
 // Pixel format is read as RGBA (in a byte array) but as soon as we
 // cast it to a 32 bit integer we have to deal with endianess, so convert
 // to big endian and convert RGBA to ARGB

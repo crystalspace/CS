@@ -66,7 +66,7 @@ struct csVertexStatus
    */
   unsigned char Type;
   /// Original vertex number (for #CS_VERTEX_ORIGINAL and #CS_VERTEX_ONEDGE)
-  unsigned char Vertex;
+  size_t Vertex;
   /// Additional information for #CS_VERTEX_ONEDGE (0..1, the 't' parameter)
   float Pos;
 };
