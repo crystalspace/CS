@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+23-Apr-2002
+	- Fixed parsing of FILE keyword in texture parsing so it also
+	  works with quotes.
 17-Apr-2002
 	- Started working on new XOR buffer which *might* (if all goes
 	  well) replace the c-buffer. Nothing functional yet though.

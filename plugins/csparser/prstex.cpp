@@ -226,7 +226,8 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
   CS_TOKEN_TABLE_END
 
   long cmd;
-  const char *filename = name;
+  char filename[256];
+  strcpy (filename, name);
   char *params;
   csColor transp (0, 0, 0);
   bool do_transp = false;
@@ -274,7 +275,7 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
 		&transp.blue);
         break;
       case CS_TOKEN_FILE:
-        filename = params;
+        csScanStr (params, "%s", filename);
         break;
       case CS_TOKEN_MIPMAP:
         if (strcasecmp (params, "yes") == 0)
