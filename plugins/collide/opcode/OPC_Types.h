@@ -13,7 +13,9 @@
 #define __ICETYPES_H__
 
 	// Constants
+	#ifndef PI
 	#define PI					3.1415926535897932384626433832795028841971693993751f	//!<	PI
+	#endif
 	#define HALFPI				1.57079632679489661923f									//!<	0.5 * PI
 	#define TWOPI				6.28318530717958647692f									//!<	2.0 * PI
 	#define INVPI				0.31830988618379067154f									//!<	1.0 / PI

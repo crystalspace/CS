@@ -220,10 +220,8 @@ bool csOPCODECollideSystem::Collide (
        return true;
       } else { //pairs=NULL;  very bad, this must be done on ResetCollisionPairs
 	       return false; };  
-  } else {
-	    
-  };
-
+  }
+  return false;
 }
 
 

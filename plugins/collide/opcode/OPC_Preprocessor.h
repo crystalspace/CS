@@ -13,10 +13,15 @@
 #define __ICEPREPROCESSOR_H__
 
 	// Check platform
+	#ifndef BOOL
         #define BOOL  bool
+	#endif
+	#ifndef FALSE
         #define FALSE false
+	#endif
+	#ifndef TRUE
         #define TRUE  true
-
+	#endif
  
 	#if defined( _WIN32 ) || defined( WIN32 )
 		#pragma message("Compiling on Windows...")
