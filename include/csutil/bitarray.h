@@ -26,8 +26,6 @@
 #ifndef __CS_BITARRAY_H__
 #define __CS_BITARRAY_H__
 
-#include <memory.h>
-
 /// A one-dimensional array of bits, similar to STL bitset.
 class csBitArray
 {

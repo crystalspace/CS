@@ -7,7 +7,6 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 6-Nov-2003
-        - Andreas Busch changed pgtest to use new keyeventhandling.
 	- res bumped the version of the iGraphics2D interface and updated
 	  some doxygen comments in include/graph2d.h. (Basically the 
 	  differences between his local copy he forgot to commit and 
@@ -23,6 +22,9 @@ chronological order.
 	  the assumption that the huge file size is what is triggering the
 	  server to drop the connection.  Enabling compression seems to
 	  side-step the problem.
+        - Andreas Busch changed pgtest to use new keyeventhandling.
+	- Eric Sunshine removed an unportable #include <memory.h> from
+	  bitarray.h.  This header is not present on all platforms.
 5-Nov-2003
 	- Jorrit optimized the kdtree a bit so that it now does 20 attempts
 	  instead of 10 to find the best split location. Also the cost is
