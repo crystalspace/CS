@@ -150,7 +150,7 @@ void CTextureFile::SetTexturename(const char* name)
     int i;
     for (i=0; i<int(sizeof(UnstoredTextures)/sizeof(UnstoredTextures[0])); i++)
     {
-      if (stricmp(m_Texturename, UnstoredTextures[i])==0)
+      if (strcasecmp(m_Texturename, UnstoredTextures[i])==0)
       {
 	m_Stored = false;
       }
