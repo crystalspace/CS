@@ -132,7 +132,11 @@ public:
   virtual void GetLOD (float& m, float& a) const;
   virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara);
   virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara)
-  	const;
+  	const
+  {
+    varm = lod_varm;
+    vara = lod_vara;
+  }
   virtual int GetLODPolygonCount (float lod) const;
 };
 

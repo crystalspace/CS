@@ -77,6 +77,10 @@ void csFoliageGeometry::SetMaterialWrapper (iMaterialWrapper* material)
 
 //----------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (csFoliageLODListener)
+  SCF_IMPLEMENTS_INTERFACE (iSharedVariableListener)
+SCF_IMPLEMENT_IBASE_END
+
 SCF_IMPLEMENT_IBASE (csFoliageObject)
   SCF_IMPLEMENTS_INTERFACE (iFoliageObject)
   SCF_IMPLEMENTS_INTERFACE (iLODControl)

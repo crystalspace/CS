@@ -9,6 +9,7 @@ chronological order.
 19-Oct-2004
 	- Jorrit worked further on foliage mesh. Added support for
 	  specifying LOD control in a foliage object.
+	- Jorrit fixed foliage so that it compiles again.
 18-Oct-2004
 	- res enhanced the OpenGL canvases so blending is always functioning
 	  (lack of an alpha channel in the frame buffer isn't really a reason
