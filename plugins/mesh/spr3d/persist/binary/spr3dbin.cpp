@@ -400,19 +400,11 @@ bool csSprite3DBinFactorySaver::Initialize (iObjectRegistry* object_reg)
 /**
  * Saves a csSprite3DBinFactorySaver
  */
-//TBD
 bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file)
 {
-	// TBD
- /* if (!parent) return false; //you never know...
-  
-  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
-  parent->SetValue("iSaverPlugin: Put a binary sprite in a xml format? Are you sure you want to do this?");
-  
-  return true;
-*/
-/*
   const char * name = 0;
+
+  if (!obj) return false;
 
   csRef<iSprite3DFactoryState> state (
     SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState));
@@ -554,7 +546,7 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file)
   char buf[1];
   buf[0] = state->IsTweeningEnabled() ? 0x01 : 0x00;
   file->Write(buf, 1);
-*/
-return true;
+
+  return true;
 }
 
