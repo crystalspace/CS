@@ -34,9 +34,9 @@
 
 //---------------------------------------------------------------------------
 
-csBits64 csCoverageTile::coverage_cache[32];
-csBits64 csCoverageTile::precalc_end_lines[64];
-csBits64 csCoverageTile::precalc_start_lines[64];
+csTileCol csCoverageTile::coverage_cache[NUM_TILECOL];
+csTileCol csCoverageTile::precalc_end_lines[NUM_TILEROW];
+csTileCol csCoverageTile::precalc_start_lines[NUM_TILEROW];
 bool csCoverageTile::precalc_init = false;
 
 void csCoverageTile::MakePrecalcTables ()
@@ -44,13 +44,13 @@ void csCoverageTile::MakePrecalcTables ()
   if (precalc_init) return;
   precalc_init = true;
   int i, j;
-  for (i = 0 ; i < 64 ; i++)
+  for (i = 0 ; i < NUM_TILEROW ; i++)
   {
     precalc_start_lines[i].Empty ();
     for (j = 0 ; j <= i ; j++)
       precalc_start_lines[i].XorBit (j);
     precalc_end_lines[i].Empty ();
-    for (j = i ; j < 64 ; j++)
+    for (j = i ; j < NUM_TILEROW ; j++)
       precalc_end_lines[i].XorBit (j);
   }
 }
@@ -77,17 +77,17 @@ csLineOperation& csCoverageTile::AddOperation ()
 void csCoverageTile::PushLine (int x1, int y1, int x2, int y2, int dx)
 {
   CS_ASSERT (x1 >= 0);
-  CS_ASSERT (x1 < (32<<16));
+  CS_ASSERT (x1 < (NUM_TILECOL<<16));
   CS_ASSERT (x2 >= 0);
-  CS_ASSERT (x2 < (32<<16));
+  CS_ASSERT (x2 < (NUM_TILECOL<<16));
   CS_ASSERT (y1 >= 0);
-  CS_ASSERT (y1 < 64);
+  CS_ASSERT (y1 < NUM_TILEROW);
   CS_ASSERT (y2 >= 0);
-  CS_ASSERT (y2 < 64);
+  CS_ASSERT (y2 < NUM_TILEROW);
   CS_ASSERT (x1+ABS (y2-y1)*dx >= 0);
-  CS_ASSERT (x1+ABS (y2-y1)*dx < (32<<16));
+  CS_ASSERT (x1+ABS (y2-y1)*dx < (NUM_TILECOL<<16));
   CS_ASSERT (x2-ABS (y1-y2)*dx >= 0); //@@@ VERY SUSPICIOUS! These asserts are triggerred in some cases!
-  CS_ASSERT (x2-ABS (y1-y2)*dx < (32<<16));
+  CS_ASSERT (x2-ABS (y1-y2)*dx < (NUM_TILECOL<<16));
   csLineOperation& op = AddOperation ();
   op.op = OP_LINE;
   op.x1 = x1;
@@ -101,11 +101,11 @@ void csCoverageTile::PushLine (int x1, int y1, int x2, int y2, int dx)
 void csCoverageTile::PushVLine (int x, int y1, int y2)
 {
   CS_ASSERT (x >= 0);
-  CS_ASSERT (x < (32<<16));
+  CS_ASSERT (x < (NUM_TILECOL<<16));
   CS_ASSERT (y1 >= 0);
-  CS_ASSERT (y1 < 64);
+  CS_ASSERT (y1 < NUM_TILEROW);
   CS_ASSERT (y2 >= 0);
-  CS_ASSERT (y2 < 64);
+  CS_ASSERT (y2 < NUM_TILEROW);
   csLineOperation& op = AddOperation ();
   op.op = OP_VLINE;
   op.x1 = x;
@@ -117,7 +117,7 @@ void csCoverageTile::PushVLine (int x, int y1, int y2)
 void csCoverageTile::PushFullVLine (int x)
 {
   CS_ASSERT (x >= 0);
-  CS_ASSERT (x < (32<<16));
+  CS_ASSERT (x < (NUM_TILECOL<<16));
   csLineOperation& op = AddOperation ();
   op.op = OP_FULLVLINE;
   op.x1 = x;
@@ -128,7 +128,7 @@ void csCoverageTile::FlushOperations ()
 {
   int i;
 
-  memset (coverage_cache, 0, sizeof (csBits64)*32);
+  memset (coverage_cache, 0, sizeof (csTileCol)*NUM_TILECOL);
 
   // First draw all lines.
   for (i = 0 ; i < num_operations ; i++)
@@ -136,35 +136,35 @@ void csCoverageTile::FlushOperations ()
     csLineOperation& op = operations[i];
     if (op.op == OP_FULLVLINE)
     {
-      CS_ASSERT (op.x1 >= 0 && op.x1 <= (32<<16));
+      CS_ASSERT (op.x1 >= 0 && op.x1 <= (NUM_TILECOL<<16));
       coverage_cache[op.x1 >> 16].Invert ();
     }
     else if (op.op == OP_VLINE)
     {
-      CS_ASSERT (op.x1 >= 0 && op.x1 <= (32<<16));
+      CS_ASSERT (op.x1 >= 0 && op.x1 <= (NUM_TILECOL<<16));
       CS_ASSERT (op.y1 >= 0);
-      CS_ASSERT (op.y1 < 64);
+      CS_ASSERT (op.y1 < NUM_TILEROW);
       CS_ASSERT (op.y2 >= 0);
-      CS_ASSERT (op.y2 < 64);
+      CS_ASSERT (op.y2 < NUM_TILEROW);
       int y1, y2;
       if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
       else { y1 = op.y2; y2 = op.y1; }
-      const csBits64& start = precalc_start_lines[y2];
-      const csBits64& end = precalc_end_lines[y1];
+      const csTileCol& start = precalc_start_lines[y2];
+      const csTileCol& end = precalc_end_lines[y1];
       // Xor the line with the coverage cache. This happens in three stages:
-      csBits64& cc = coverage_cache[op.x1 >> 16];
+      csTileCol& cc = coverage_cache[op.x1 >> 16];
       cc ^= start;
       cc ^= end;
       cc.Invert ();
     }
     else // OP_LINE
     {
-      CS_ASSERT (op.x1 >= 0 && op.x1 <= (32<<16));
-      CS_ASSERT (op.x2 >= 0 && op.x2 <= (32<<16));
+      CS_ASSERT (op.x1 >= 0 && op.x1 <= (NUM_TILECOL<<16));
+      CS_ASSERT (op.x2 >= 0 && op.x2 <= (NUM_TILECOL<<16));
       CS_ASSERT (op.y1 >= 0);
-      CS_ASSERT (op.y1 < 64);
+      CS_ASSERT (op.y1 < NUM_TILEROW);
       CS_ASSERT (op.y2 >= 0);
-      CS_ASSERT (op.y2 < 64);
+      CS_ASSERT (op.y2 < NUM_TILEROW);
       int x1, y1, x2, y2;
       if (op.y1 < op.y2) { x1 = op.x1; y1 = op.y1; x2 = op.x2; y2 = op.y2; }
       else { x1 = op.x2; y1 = op.y2; x2 = op.x1; y2 = op.y1; }
@@ -175,8 +175,8 @@ void csCoverageTile::FlushOperations ()
       while (dy >= 0)
       {
 	CS_ASSERT ((x>>16) >= 0);
-	CS_ASSERT ((x>>16) < 32);
-	csBits64& cc = coverage_cache[x >> 16];
+	CS_ASSERT ((x>>16) < NUM_TILECOL);
+	csTileCol& cc = coverage_cache[x >> 16];
 	cc.XorBit (y);
         x += dx;
         y++;
@@ -189,7 +189,7 @@ void csCoverageTile::FlushOperations ()
   num_operations = 0;
 }
 
-void csCoverageTile::FlushForEmpty (csBits64& fvalue, float maxdepth)
+void csCoverageTile::FlushForEmpty (csTileCol& fvalue, float maxdepth)
 {
   int i;
   MakeEmptyQuick ();
@@ -206,10 +206,10 @@ void csCoverageTile::FlushForEmpty (csBits64& fvalue, float maxdepth)
   // buffer contents will be modified to be true wherever the
   // coverage_cache actually modified the coverage buffer.
   tile_full = true;	// Assume full for now.
-  csBits64* cc = coverage_cache;
-  csBits64* c = coverage;      
+  csTileCol* cc = coverage_cache;
+  csTileCol* c = coverage;      
 
-  for (i = 0 ; i < 32 ; i++)
+  for (i = 0 ; i < NUM_TILECOL ; i++)
   {
     fvalue ^= *cc;
     *c = fvalue;
@@ -218,14 +218,15 @@ void csCoverageTile::FlushForEmpty (csBits64& fvalue, float maxdepth)
     cc++;
     c++;
   }
-  // Now do the depth update. Here we will use the coverage (instead of coverage_cache
-  // which is used in the general case)  to see where we need to update the depth buffer.
-  for (i = 0 ; i < 4 ; i++)
+  // Now do the depth update. Here we will use the coverage (instead of
+  // coverage_cache which is used in the general case) to see where we
+  // need to update the depth buffer.
+  for (i = 0 ; i < (NUM_TILECOL/8) ; i++)
   {
     float* ldepth = &depth[i];
     int idx = i << 3;
     int j = 1;
-    csBits64 mods = coverage[idx++];
+    csTileCol mods = coverage[idx++];
     while (j < 8)
     {
       mods |= coverage[idx++];
@@ -241,6 +242,7 @@ void csCoverageTile::FlushForEmpty (csBits64& fvalue, float maxdepth)
         ldepth[8] = maxdepth;
       if (mods.CheckByte3 ())
         ldepth[12] = maxdepth;
+#if NUM_TILEROW==64
       if (mods.CheckByte4 ())
         ldepth[16] = maxdepth;
       if (mods.CheckByte5 ())
@@ -249,6 +251,7 @@ void csCoverageTile::FlushForEmpty (csBits64& fvalue, float maxdepth)
         ldepth[24] = maxdepth;
       if (mods.CheckByte7 ())
         ldepth[28] = maxdepth;
+#endif
       tile_max_depth = maxdepth;
     }
   }
@@ -256,7 +259,7 @@ void csCoverageTile::FlushForEmpty (csBits64& fvalue, float maxdepth)
   return;
 }
 
-void csCoverageTile::FlushForFull (csBits64& fvalue, float maxdepth)
+void csCoverageTile::FlushForFull (csTileCol& fvalue, float maxdepth)
 {
   int i;
 
@@ -276,14 +279,14 @@ void csCoverageTile::FlushForFull (csBits64& fvalue, float maxdepth)
       // We can ignore the x value of the line here. So VLINE and
       // LINE are equivalent in this case.
       CS_ASSERT (op.y1 >= 0);
-      CS_ASSERT (op.y1 < 64);
+      CS_ASSERT (op.y1 < NUM_TILEROW);
       CS_ASSERT (op.y2 >= 0);
-      CS_ASSERT (op.y2 < 64);
+      CS_ASSERT (op.y2 < NUM_TILEROW);
       int y1, y2;
       if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
       else { y1 = op.y2; y2 = op.y1; }
-      const csBits64& start = precalc_start_lines[y2];
-      const csBits64& end = precalc_end_lines[y1];
+      const csTileCol& start = precalc_start_lines[y2];
+      const csTileCol& end = precalc_end_lines[y1];
       // Xor the line with the fvalue. This happens in three stages:
       fvalue ^= start;
       fvalue ^= end;
@@ -293,7 +296,7 @@ void csCoverageTile::FlushForFull (csBits64& fvalue, float maxdepth)
   num_operations = 0;
 }
 
-void csCoverageTile::FlushNoDepth (csBits64& fvalue, float maxdepth)
+void csCoverageTile::FlushNoDepth (csTileCol& fvalue, float maxdepth)
 {
   FlushOperations ();
   int i;
@@ -306,9 +309,9 @@ void csCoverageTile::FlushNoDepth (csBits64& fvalue, float maxdepth)
   // fvalue will be the modified from left to right and will be
   // OR-ed with the main buffer.
   tile_full = true;	// Assume full for now.
-  csBits64* cc = coverage_cache;
-  csBits64* c = coverage;
-  for (i = 0 ; i < 32 ; i++)
+  csTileCol* cc = coverage_cache;
+  csTileCol* c = coverage;
+  for (i = 0 ; i < NUM_TILECOL ; i++)
   {
     fvalue ^= *cc;
     *c |= fvalue;
@@ -319,7 +322,7 @@ void csCoverageTile::FlushNoDepth (csBits64& fvalue, float maxdepth)
   }
 }
 
-void csCoverageTile::FlushGeneral (csBits64& fvalue, float maxdepth)
+void csCoverageTile::FlushGeneral (csTileCol& fvalue, float maxdepth)
 {
   FlushOperations ();
   int i;
@@ -334,10 +337,10 @@ void csCoverageTile::FlushGeneral (csBits64& fvalue, float maxdepth)
   // coverage_cache actually modified the coverage buffer.
 
   tile_full = true;	// Assume full for now.
-  csBits64* cc = coverage_cache;
-  csBits64* c = coverage;      
+  csTileCol* cc = coverage_cache;
+  csTileCol* c = coverage;      
 
-  for (i = 0 ; i < 32 ; i++)
+  for (i = 0 ; i < NUM_TILECOL ; i++)
   {
     fvalue ^= *cc;
     *cc = fvalue;
@@ -352,12 +355,12 @@ void csCoverageTile::FlushGeneral (csBits64& fvalue, float maxdepth)
   // to see where we need to update the depth buffer. The coverage_cache
   // will now contain true wherever the coverage buffer was modified.
   bool recheck_min_depth = false;
-  for (i = 0 ; i < 4 ; i++)
+  for (i = 0 ; i < (NUM_TILECOL/8) ; i++)
   {
     float* ldepth = &depth[i];
     int idx = i << 3;
     int j = 1;
-    csBits64 mods = coverage_cache[idx++];
+    csTileCol mods = coverage_cache[idx++];
     while (j < 8)
     {
       mods |= coverage_cache[idx++];
@@ -405,6 +408,7 @@ void csCoverageTile::FlushGeneral (csBits64& fvalue, float maxdepth)
 	  recheck_min_depth = true;
 	}
       }
+#if NUM_TILEROW==64
       if (mods.CheckByte4 ())
       {
         float& d = ldepth[16];
@@ -445,17 +449,18 @@ void csCoverageTile::FlushGeneral (csBits64& fvalue, float maxdepth)
 	  recheck_min_depth = true;
 	}
       }
+#endif
     }
   }
   if (recheck_min_depth)
   {
     tile_min_depth = depth[0];
-    for (i = 1 ; i < 32 ; i++)
+    for (i = 1 ; i < NUM_DEPTH ; i++)
       if (depth[i] < tile_min_depth) tile_min_depth = depth[i];
   }
 }
 
-void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
+void csCoverageTile::Flush (csTileCol& fvalue, float maxdepth)
 {
   if (queue_tile_empty)
   {
@@ -478,7 +483,7 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
   FlushGeneral (fvalue, maxdepth);
 }
 
-bool csCoverageTile::TestFlushForFull (csBits64& fvalue, float mindepth)
+bool csCoverageTile::TestFlushForFull (csTileCol& fvalue, float mindepth)
 {
   int i;
 
@@ -503,14 +508,14 @@ bool csCoverageTile::TestFlushForFull (csBits64& fvalue, float mindepth)
       // We can ignore the x value of the line here. So VLINE and
       // LINE are equivalent in this case.
       CS_ASSERT (op.y1 >= 0);
-      CS_ASSERT (op.y1 < 64);
+      CS_ASSERT (op.y1 < NUM_TILEROW);
       CS_ASSERT (op.y2 >= 0);
-      CS_ASSERT (op.y2 < 64);
+      CS_ASSERT (op.y2 < NUM_TILEROW);
       int y1, y2;
       if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
       else { y1 = op.y2; y2 = op.y1; }
-      const csBits64& start = precalc_start_lines[y2];
-      const csBits64& end = precalc_end_lines[y1];
+      const csTileCol& start = precalc_start_lines[y2];
+      const csTileCol& end = precalc_end_lines[y1];
       // Xor the line with the fvalue. This happens in three stages:
       fvalue ^= start;
       fvalue ^= end;
@@ -521,7 +526,7 @@ bool csCoverageTile::TestFlushForFull (csBits64& fvalue, float mindepth)
   return false;
 }
 
-bool csCoverageTile::TestFlushGeneral (csBits64& fvalue, float mindepth)
+bool csCoverageTile::TestFlushGeneral (csTileCol& fvalue, float mindepth)
 {
   FlushOperations ();
   int i;
@@ -530,10 +535,10 @@ bool csCoverageTile::TestFlushGeneral (csBits64& fvalue, float mindepth)
   // Now perform the XOR sweep and test-OR with main coverage buffer.
   // fvalue will be the modified from left to right and will be
   // OR-ed with the main buffer.
-  csBits64* cc = coverage_cache;
-  csBits64* c = coverage;      
+  csTileCol* cc = coverage_cache;
+  csTileCol* c = coverage;      
 
-  for (i = 0 ; i < 32 ; i++)
+  for (i = 0 ; i < NUM_TILECOL ; i++)
   {
     fvalue ^= *cc;
     *cc = fvalue;
@@ -549,12 +554,12 @@ bool csCoverageTile::TestFlushGeneral (csBits64& fvalue, float mindepth)
     return true;
 
   // Now do the depth test but only where the coverage cache is set.
-  for (i = 0 ; i < 4 ; i++)
+  for (i = 0 ; i < (NUM_TILECOL/8) ; i++)
   {
     float* ldepth = &depth[i];
     int idx = i << 3;
     int j = 1;
-    csBits64 mods = coverage_cache[idx++];
+    csTileCol mods = coverage_cache[idx++];
     while (j < 8)
     {
       mods |= coverage_cache[idx++];
@@ -563,43 +568,29 @@ bool csCoverageTile::TestFlushGeneral (csBits64& fvalue, float mindepth)
     if (!mods.IsEmpty ())
     {
       if (mods.CheckByte0 ())
-      {
 	if (mindepth <= ldepth[0]) return true;
-      }
       if (mods.CheckByte1 ())
-      {
         if (mindepth <= ldepth[4]) return true;
-      }
       if (mods.CheckByte2 ())
-      {
         if (mindepth <= ldepth[8]) return true;
-      }
       if (mods.CheckByte3 ())
-      {
         if (mindepth <= ldepth[12]) return true;
-      }
+#if NUM_TILEROW==64
       if (mods.CheckByte4 ())
-      {
         if (mindepth <= ldepth[16]) return true;
-      }
       if (mods.CheckByte5 ())
-      {
         if (mindepth <= ldepth[20]) return true;
-      }
       if (mods.CheckByte6 ())
-      {
         if (mindepth <= ldepth[24]) return true;
-      }
       if (mods.CheckByte7 ())
-      {
         if (mindepth <= ldepth[28]) return true;
-      }
+#endif
     }
   }
   return false;
 }
 
-bool csCoverageTile::TestFlush (csBits64& fvalue, float mindepth)
+bool csCoverageTile::TestFlush (csTileCol& fvalue, float mindepth)
 {
   if (num_operations == 0 && fvalue.IsEmpty ())
   {
@@ -639,7 +630,7 @@ bool csCoverageTile::TestFullRect (float testdepth)
     if (testdepth > tile_max_depth)
       return false;
     int i;
-    for (i = 0 ; i < 32 ; i++)
+    for (i = 0 ; i < NUM_DEPTH ; i++)
       if (testdepth <= depth[i])
         return true;
     return false;
@@ -668,7 +659,7 @@ bool csCoverageTile::TestRect (int start, int end, float testdepth)
   if (!tile_full)
   {
     // Tile is not full which means we test coverage first.
-    csBits64* c = coverage+start;
+    csTileCol* c = coverage+start;
     for (i = start ; i <= end ; i++)
     {
       if (!c->IsFull ())
@@ -682,8 +673,8 @@ bool csCoverageTile::TestRect (int start, int end, float testdepth)
   if (testdepth > tile_max_depth) return false;
 
   // Initialize the coverage cache.
-  memset (&coverage_cache[0], 0, sizeof (csBits64) * 32);
-  memset (&coverage_cache[start], 0xff, sizeof (csBits64) * (end-start+1));
+  memset (&coverage_cache[0], 0, sizeof (csTileCol) * NUM_TILECOL);
+  memset (&coverage_cache[start], 0xff, sizeof (csTileCol) * (end-start+1));
 
   // Test depth where appropriate.
   for (i = (start>>3) ; i <= (end>>3) ; i++)
@@ -693,22 +684,28 @@ bool csCoverageTile::TestRect (int start, int end, float testdepth)
     // the corresponding depth value is relevant (i.e. testdepth < the
     // depth in the depth value). Only where the mask is true do we have
     // to check the coverage_cache.
-    uint32 b1 = 0, b2 = 0;
+    csTileCol testmask;
+    uint32 b1 = 0;
     if (testdepth < ld[0]) b1 |= 0xff;
     if (testdepth < ld[4]) b1 |= 0xff00;
     if (testdepth < ld[8]) b1 |= 0xff0000;
     if (testdepth < ld[12]) b1 |= 0xff000000;
+#if NUM_TILEROW==64
+    uint32 b2 = 0;
     if (testdepth < ld[16]) b2 |= 0xff;
     if (testdepth < ld[20]) b2 |= 0xff00;
     if (testdepth < ld[24]) b2 |= 0xff0000;
     if (testdepth < ld[28]) b2 |= 0xff000000;
     if (!b1 && !b2) continue;	// Nothing to do.
-    csBits64 testmask;
     testmask.Set (b1, b2);
+#else
+    if (!b1) continue;	// Nothing to do.
+    testmask.Set (b1);
+#endif
 
     int idx = i << 3;
     int j = 0;
-    csBits64* cc = coverage_cache+idx;
+    csTileCol* cc = coverage_cache+idx;
     while (j < 8)
     {
       if (testmask.TestMask (*cc))
@@ -720,7 +717,7 @@ bool csCoverageTile::TestRect (int start, int end, float testdepth)
   return false;
 }
 
-bool csCoverageTile::TestRect (const csBits64& vermask, int start, int end,
+bool csCoverageTile::TestRect (const csTileCol& vermask, int start, int end,
   	float testdepth)
 {
   // Tile is still empty.
@@ -737,7 +734,7 @@ bool csCoverageTile::TestRect (const csBits64& vermask, int start, int end,
   if (!tile_full)
   {
     // Tile is not full which means we first test coverage.
-    csBits64* c = coverage+start;
+    csTileCol* c = coverage+start;
     for (i = start ; i <= end ; i++)
     {
       if (vermask.TestInvertedMask (*c))
@@ -751,9 +748,11 @@ bool csCoverageTile::TestRect (const csBits64& vermask, int start, int end,
   if (testdepth > tile_max_depth) return false;
 
   // Initialize the coverage cache.
+  //memset (&coverage_cache[0], 0, sizeof (csTileCol) * NUM_TILECOL);
+  //@@@SPEED
   for (i = 0 ; i < start ; i++) coverage_cache[i].Empty ();
   for (i = start ; i <= end ; i++) coverage_cache[i] = vermask;
-  for (i = end ; i < 32 ; i++) coverage_cache[i].Empty ();
+  for (i = end+1 ; i < NUM_TILECOL ; i++) coverage_cache[i].Empty ();
 
   // Test depth where appropriate.
   for (i = (start>>3) ; i <= (end>>3) ; i++)
@@ -763,22 +762,28 @@ bool csCoverageTile::TestRect (const csBits64& vermask, int start, int end,
     // the corresponding depth value is relevant (i.e. testdepth < the
     // depth in the depth value). Only where the mask is true do we have
     // to check the coverage_cache.
-    uint32 b1 = 0, b2 = 0;
+    csTileCol testmask;
+    uint32 b1 = 0;
     if (testdepth < ld[0]) b1 |= 0xff;
     if (testdepth < ld[4]) b1 |= 0xff00;
     if (testdepth < ld[8]) b1 |= 0xff0000;
     if (testdepth < ld[12]) b1 |= 0xff000000;
+#if NUM_TILEROW==64
+    uint32 b2 = 0;
     if (testdepth < ld[16]) b2 |= 0xff;
     if (testdepth < ld[20]) b2 |= 0xff00;
     if (testdepth < ld[24]) b2 |= 0xff0000;
     if (testdepth < ld[28]) b2 |= 0xff000000;
     if (!b1 && !b2) continue;	// Nothing to do.
-    csBits64 testmask;
     testmask.Set (b1, b2);
+#else
+    if (!b1) continue;	// Nothing to do.
+    testmask.Set (b1);
+#endif
 
     int idx = i << 3;
     int j = 0;
-    csBits64* cc = coverage_cache+idx;
+    csTileCol* cc = coverage_cache+idx;
     while (j < 8)
     {
       if (testmask.TestMask (*cc))
@@ -792,8 +797,8 @@ bool csCoverageTile::TestRect (const csBits64& vermask, int start, int end,
 
 bool csCoverageTile::TestPoint (int x, int y, float testdepth)
 {
-  CS_ASSERT (x >= 0 && x < 32);
-  CS_ASSERT (y >= 0 && y < 64);
+  CS_ASSERT (x >= 0 && x < NUM_TILECOL);
+  CS_ASSERT (y >= 0 && y < NUM_TILEROW);
 
   // If tile is still empty we are visible.
   if (queue_tile_empty) return true;
@@ -801,7 +806,7 @@ bool csCoverageTile::TestPoint (int x, int y, float testdepth)
   // First check for depth.
   int xd = x >> 3;	// Depth x coordinate.
   int yd = y >> 3;	// Depth y coordinate.
-  float d = depth[(yd << 2) + xd];
+  float d = depth[(yd * (NUM_TILECOL/8)) + xd];
   if (testdepth <= d)
   {
     // Visible regardless of coverage.
@@ -815,7 +820,7 @@ bool csCoverageTile::TestPoint (int x, int y, float testdepth)
     return false;
   }
 
-  const csBits64& c = coverage[x];
+  const csTileCol& c = coverage[x];
   return !c.TestBit (y);
 }
 
@@ -836,6 +841,7 @@ csPtr<iString> csCoverageTile::Debug_Dump ()
   str.Append (ss);
   ss.Format ("  d %g,%g,%g,%g\n", depth[12], depth[13], depth[14], depth[15]);
   str.Append (ss);
+#if NUM_DEPTH>=32
   ss.Format ("  d %g,%g,%g,%g\n", depth[16], depth[17], depth[18], depth[19]);
   str.Append (ss);
   ss.Format ("  d %g,%g,%g,%g\n", depth[20], depth[21], depth[22], depth[23]);
@@ -844,6 +850,7 @@ csPtr<iString> csCoverageTile::Debug_Dump ()
   str.Append (ss);
   ss.Format ("  d %g,%g,%g,%g\n", depth[28], depth[29], depth[30], depth[31]);
   str.Append (ss);
+#endif
   int i;
   for (i = 0 ; i < num_operations ; i++)
   {
@@ -869,12 +876,12 @@ csPtr<iString> csCoverageTile::Debug_Dump ()
   }
   str.Append ("          1    1    2    2    3  \n");
   str.Append ("0    5    0    5    0    5    0  \n");
-  for (i = 0 ; i < 64 ; i++)
+  for (i = 0 ; i < NUM_TILEROW ; i++)
   {
     int j;
-    for (j = 0 ; j < 32 ; j++)
+    for (j = 0 ; j < NUM_TILECOL ; j++)
     {
-      const csBits64& c = coverage[j];
+      const csTileCol& c = coverage[j];
       str.Append (c.TestBit (i) ? "#" : ".");
     }
     ss.Format (" %d\n", i);
@@ -893,12 +900,12 @@ csPtr<iString> csCoverageTile::Debug_Dump_Cache ()
   int i;
   str.Append ("          1    1    2    2    3  \n");
   str.Append ("0    5    0    5    0    5    0  \n");
-  for (i = 0 ; i < 64 ; i++)
+  for (i = 0 ; i < NUM_TILEROW ; i++)
   {
     int j;
-    for (j = 0 ; j < 32 ; j++)
+    for (j = 0 ; j < NUM_TILECOL ; j++)
     {
-      const csBits64& c = coverage_cache[j];
+      const csTileCol& c = coverage_cache[j];
       str.Append (c.TestBit (i) ? "#" : ".");
     }
     ss.Format (" %d\n", i);
@@ -946,8 +953,8 @@ void csTiledCoverageBuffer::Setup (int w, int h)
 
   width = w;
   height = h;
-  num_tile_rows = (h+63)/64;
-  height_64 = num_tile_rows * 64;
+  num_tile_rows = (h+(NUM_TILEROW-1))/NUM_TILEROW;
+  height_64 = num_tile_rows * NUM_TILEROW;
   CS_ASSERT (height_64 >= height);
 
   width_po2 = 1;
@@ -957,10 +964,10 @@ void csTiledCoverageBuffer::Setup (int w, int h)
     width_po2 <<= 1;
     w_shift++;
   }
-  w_shift -= 5;
+  w_shift -= SHIFT_TILECOL;
   CS_ASSERT (w_shift >= 0);
 
-  num_tiles = (width_po2 / 32) * num_tile_rows;
+  num_tiles = (width_po2 / NUM_TILECOL) * num_tile_rows;
 
   tiles = new csCoverageTile[num_tiles];
   dirty_left = new int[num_tile_rows];
@@ -1002,8 +1009,8 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     if (y2 >= height) y2 = height-1;
 
     // First calculate tile coordinates of x1,y1 and x2,y2.
-    int tile_y1 = y1 >> 6;
-    int tile_y2 = (y2-1) >> 6;
+    int tile_y1 = y1 >> SHIFT_TILEROW;
+    int tile_y2 = (y2-1) >> SHIFT_TILEROW;
     csCoverageTile* tile = GetTile (0, tile_y1);
 
     if (tile_y1 == tile_y2)
@@ -1011,7 +1018,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       //------
       // All is contained in one tile.
       //------
-      tile->PushVLine (0, y1 & 63, (y2-1) & 63);
+      tile->PushVLine (0, y1 & (NUM_TILEROW-1), (y2-1) & (NUM_TILEROW-1));
       MarkTileDirty (0, tile_y1);
     }
     else
@@ -1020,17 +1027,17 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       // Multiple tiles. First do first tile, then intermediate tiles,
       // and finally the last tile.
       //------
-      tile->PushVLine (0, y1 & 63, 63);
+      tile->PushVLine (0, y1 & (NUM_TILEROW-1), (NUM_TILEROW-1));
       MarkTileDirty (0, tile_y1);
       int t;
       for (t = tile_y1+1 ; t < tile_y2 ; t++)
       {
-        tile += width_po2 >> 5;
+        tile += width_po2 >> SHIFT_TILECOL;
         tile->PushFullVLine (0);
 	MarkTileDirty (0, t);
       }
-      tile += width_po2 >> 5;
-      tile->PushVLine (0, 0, (y2-1) & 63);
+      tile += width_po2 >> SHIFT_TILECOL;
+      tile->PushVLine (0, 0, (y2-1) & (NUM_TILEROW-1));
       MarkTileDirty (0, tile_y2);
     }
     return;
@@ -1049,11 +1056,11 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     if (y2 >= height) y2 = height-1;
 
     // First calculate tile coordinates of x1,y1 and x2,y2.
-    int tile_y1 = y1 >> 6;
-    int tile_y2 = (y2-1) >> 6;
+    int tile_y1 = y1 >> SHIFT_TILEROW;
+    int tile_y2 = (y2-1) >> SHIFT_TILEROW;
     int t;
     for (t = tile_y1 ; t <= tile_y2 ; t++)
-      MarkTileDirty (width_po2 >> 5, t);
+      MarkTileDirty (width_po2 >> SHIFT_TILECOL, t);
     return;
   }
   else if (x1 == x2)
@@ -1068,10 +1075,10 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     if (y2 >= height) y2 = height-1;
 
     // First calculate tile coordinates of x1,y1 and x2,y2.
-    int tile_x = x1 >> 5;	// tile_x1 == tile_x2
-    int tile_y1 = y1 >> 6;
-    int tile_y2 = (y2-1) >> 6;
-    x1 &= 31;
+    int tile_x = x1 >> SHIFT_TILECOL;	// tile_x1 == tile_x2
+    int tile_y1 = y1 >> SHIFT_TILEROW;
+    int tile_y2 = (y2-1) >> SHIFT_TILEROW;
+    x1 &= (NUM_TILECOL-1);
     x1 <<= 16;
 
     csCoverageTile* tile = GetTile (tile_x, tile_y1);
@@ -1080,7 +1087,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       //------
       // All is contained in one tile.
       //------
-      tile->PushVLine (x1, y1 & 63, (y2-1) & 63);
+      tile->PushVLine (x1, y1 & (NUM_TILEROW-1), (y2-1) & (NUM_TILEROW-1));
       MarkTileDirty (tile_x, tile_y1);
     }
     else
@@ -1089,17 +1096,17 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       // Multiple tiles. First do first tile, then intermediate tiles,
       // and finally the last tile.
       //------
-      tile->PushVLine (x1, y1 & 63, 63);
+      tile->PushVLine (x1, y1 & (NUM_TILEROW-1), (NUM_TILEROW-1));
       MarkTileDirty (tile_x, tile_y1);
       int t;
       for (t = tile_y1+1 ; t < tile_y2 ; t++)
       {
-        tile += width_po2 >> 5;
+        tile += width_po2 >> SHIFT_TILECOL;
 	tile->PushFullVLine (x1);
 	MarkTileDirty (tile_x, t);
       }
-      tile += width_po2 >> 5;
-      tile->PushVLine (x1, 0, (y2-1) & 63);
+      tile += width_po2 >> SHIFT_TILECOL;
+      tile->PushVLine (x1, 0, (y2-1) & (NUM_TILEROW-1));
       MarkTileDirty (tile_x, tile_y2);
     }
     return;
@@ -1159,8 +1166,8 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     if (y2 >= height) y2 = height-1;
 
     // First calculate tile coordinates.
-    int tile_y1 = y1 >> 6;
-    int tile_y2 = (y2-1) >> 6;
+    int tile_y1 = y1 >> SHIFT_TILEROW;
+    int tile_y2 = (y2-1) >> SHIFT_TILEROW;
 
     if (right_side)
     {
@@ -1171,7 +1178,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       //------
       int t;
       for (t = tile_y1 ; t <= tile_y2 ; t++)
-        MarkTileDirty (width_po2 >> 5, t);
+        MarkTileDirty (width_po2 >> SHIFT_TILECOL, t);
       return;
     }
     else
@@ -1185,7 +1192,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
         //------
         // All is contained in one tile.
         //------
-        tile->PushVLine (0, y1 & 63, (y2-1) & 63);
+        tile->PushVLine (0, y1 & (NUM_TILEROW-1), (y2-1) & (NUM_TILEROW-1));
         MarkTileDirty (0, tile_y1);
       }
       else
@@ -1194,17 +1201,17 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
         // Multiple tiles. First do first tile, then intermediate tiles,
         // and finally the last tile.
         //------
-        tile->PushVLine (0, y1 & 63, 63);
+        tile->PushVLine (0, y1 & (NUM_TILEROW-1), (NUM_TILEROW-1));
         MarkTileDirty (0, tile_y1);
         int t;
         for (t = tile_y1+1 ; t < tile_y2 ; t++)
         {
-          tile += width_po2 >> 5;
+          tile += width_po2 >> SHIFT_TILECOL;
           tile->PushFullVLine (0);
 	  MarkTileDirty (0, t);
         }
-        tile += width_po2 >> 5;
-        tile->PushVLine (0, 0, (y2-1) & 63);
+        tile += width_po2 >> SHIFT_TILECOL;
+        tile->PushVLine (0, 0, (y2-1) & (NUM_TILEROW-1));
         MarkTileDirty (0, tile_y2);
       }
       return;
@@ -1229,38 +1236,38 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     if (x1 <= 0)
     {
       // We have an initial part that needs to be clamped.
-      int tile_y1 = old_y1 >> 6;
-      int tile_y2 = (y1-1) >> 6;
+      int tile_y1 = old_y1 >> SHIFT_TILEROW;
+      int tile_y2 = (y1-1) >> SHIFT_TILEROW;
       csCoverageTile* tile = GetTile (0, tile_y1);
       if (tile_y1 == tile_y2)
       {
-        tile->PushVLine (0, old_y1 & 63, (y1-1) & 63);
+        tile->PushVLine (0, old_y1 & (NUM_TILEROW-1), (y1-1) & (NUM_TILEROW-1));
         MarkTileDirty (0, tile_y1);
       }
       else
       {
-        tile->PushVLine (0, old_y1 & 63, 63);
+        tile->PushVLine (0, old_y1 & (NUM_TILEROW-1), (NUM_TILEROW-1));
         MarkTileDirty (0, tile_y1);
         int t;
         for (t = tile_y1+1 ; t < tile_y2 ; t++)
         {
-          tile += width_po2 >> 5;
+          tile += width_po2 >> SHIFT_TILECOL;
 	  tile->PushFullVLine (0);
 	  MarkTileDirty (0, t);
         }
-        tile += width_po2 >> 5;
-        tile->PushVLine (0, 0, (y1-1) & 63);
+        tile += width_po2 >> SHIFT_TILECOL;
+        tile->PushVLine (0, 0, (y1-1) & (NUM_TILEROW-1));
         MarkTileDirty (0, tile_y2);
       }
     }
     else if (x1 >= width-1)
     {
       // We have an initial part for which we need to mark tiles dirty.
-      int tile_y1 = old_y1 >> 6;
-      int tile_y2 = (y1-1) >> 6;
+      int tile_y1 = old_y1 >> SHIFT_TILEROW;
+      int tile_y2 = (y1-1) >> SHIFT_TILEROW;
       int t;
       for (t = tile_y1 ; t <= tile_y2 ; t++)
-        MarkTileDirty (width_po2 >> 5, t);
+        MarkTileDirty (width_po2 >> SHIFT_TILECOL, t);
     }
   }
   if (old_y2 > y2)
@@ -1268,38 +1275,38 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     if (x2 <= 0)
     {
       // We have a final part that needs to be clamped.
-      int tile_y1 = y2 >> 6;
-      int tile_y2 = (old_y2-1) >> 6;
+      int tile_y1 = y2 >> SHIFT_TILEROW;
+      int tile_y2 = (old_y2-1) >> SHIFT_TILEROW;
       csCoverageTile* tile = GetTile (0, tile_y1);
       if (tile_y1 == tile_y2)
       {
-        tile->PushVLine (0, y2 & 63, (old_y2-1) & 63);
+        tile->PushVLine (0, y2 & (NUM_TILEROW-1), (old_y2-1) & (NUM_TILEROW-1));
         MarkTileDirty (0, tile_y1);
       }
       else
       {
-        tile->PushVLine (0, y2 & 63, 63);
+        tile->PushVLine (0, y2 & (NUM_TILEROW-1), (NUM_TILEROW-1));
         MarkTileDirty (0, tile_y1);
         int t;
         for (t = tile_y1+1 ; t < tile_y2 ; t++)
         {
-          tile += width_po2 >> 5;
+          tile += width_po2 >> SHIFT_TILECOL;
 	  tile->PushFullVLine (0);
 	  MarkTileDirty (0, t);
         }
-        tile += width_po2 >> 5;
-        tile->PushVLine (0, 0, (old_y2-1) & 63);
+        tile += width_po2 >> SHIFT_TILECOL;
+        tile->PushVLine (0, 0, (old_y2-1) & (NUM_TILEROW-1));
         MarkTileDirty (0, tile_y2);
       }
     }
     else if (x2 >= width-1)
     {
       // We have a final part for which we need to mark tiles dirty.
-      int tile_y1 = y2 >> 6;
-      int tile_y2 = (old_y2-1) >> 6;
+      int tile_y1 = y2 >> SHIFT_TILEROW;
+      int tile_y2 = (old_y2-1) >> SHIFT_TILEROW;
       int t;
       for (t = tile_y1 ; t <= tile_y2 ; t++)
-        MarkTileDirty (width_po2 >> 5, t);
+        MarkTileDirty (width_po2 >> SHIFT_TILECOL, t);
     }
   }
 
@@ -1307,13 +1314,13 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   // First calculate tile coordinates of x1,y1 and x2,y2.
   // Now we know that this line segment is fully on screen.
   //------
-  int tile_x1 = x1 >> 5;
-  int tile_y1 = y1 >> 6;
-  int tile_x2 = x2 >> 5;
-  int tile_y2 = (y2-1) >> 6;
+  int tile_x1 = x1 >> SHIFT_TILECOL;
+  int tile_y1 = y1 >> SHIFT_TILEROW;
+  int tile_x2 = x2 >> SHIFT_TILECOL;
+  int tile_y2 = (y2-1) >> SHIFT_TILEROW;
 
-# define xmask ((32<<16)-1)
-# define ymask ((64<<16)-1)
+# define xmask ((NUM_TILECOL<<16)-1)
+# define ymask ((NUM_TILEROW<<16)-1)
 
   if (tile_x1 == tile_x2 && tile_y1 == tile_y2)
   {
@@ -1324,9 +1331,9 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     int dx = ((x2-x1)<<16) / (dy-yfurther);
     csCoverageTile* tile = GetTile (tile_x1, tile_y1);
 // @@@@@@@ DOUBLE CHECK THE THING BELOW TO SEE IF IT IS REALLY OK!!!
-    tile->PushLine ((x1 & 31) << 16, y1 & 63, ((x2 & 31) << 16)
-    	-(yfurther ? 0 : dx),
-    	(y2-1) & 63, dx);
+    tile->PushLine ((x1 & (NUM_TILECOL-1)) << 16, y1 & (NUM_TILEROW-1),
+    	((x2 & (NUM_TILECOL-1)) << 16) -(yfurther ? 0 : dx),
+    	(y2-1) & (NUM_TILEROW-1), dx);
     MarkTileDirty (tile_x1, tile_y1);
     return;
   }
@@ -1340,22 +1347,24 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     int dx = ((x2-x1)<<16) / (dy-yfurther);
     x1 <<= 16;
     x2 <<= 16;
-    int x = x1 + dx * (63 - (y1 & 63));
+    int x = x1 + dx * ((NUM_TILEROW-1) - (y1 & (NUM_TILEROW-1)));
     csCoverageTile* tile = GetTile (tile_x1, tile_y1);
-    tile->PushLine (x1 & xmask, y1 & 63, x & xmask, 63, dx);
+    tile->PushLine (x1 & xmask, y1 & (NUM_TILEROW-1),
+    	x & xmask, (NUM_TILEROW-1), dx);
     MarkTileDirty (tile_x1, tile_y1);
     x += dx;
     int t;
     for (t = tile_y1+1 ; t < tile_y2 ; t++)
     {
-      tile += width_po2 >> 5;
-      int xt = x + (dx << 6) - dx;
-      tile->PushLine (x & xmask, 0, xt & xmask, 63, dx);
+      tile += width_po2 >> SHIFT_TILECOL;
+      int xt = x + (dx << SHIFT_TILEROW) - dx;
+      tile->PushLine (x & xmask, 0, xt & xmask, NUM_TILEROW-1, dx);
       MarkTileDirty (tile_x1, t);
       x = xt+dx;
     }
-    tile += width_po2 >> 5;
-    tile->PushLine (x & xmask, 0, (x2 & xmask) - dx, (y2-1) & 63, dx);
+    tile += width_po2 >> SHIFT_TILECOL;
+    tile->PushLine (x & xmask, 0, (x2 & xmask) - dx,
+    	(y2-1) & (NUM_TILEROW-1), dx);
     MarkTileDirty (tile_x1, tile_y2);
     return;
   }
@@ -1389,12 +1398,12 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     csCoverageTile* stile = GetTile (tile_x1, tile_y1);
     while (dy > 0)
     {
-      int tile_x = x >> (16+5);
+      int tile_x = x >> (16+SHIFT_TILECOL);
       if (cur_tile_x != tile_x)
       {
         csCoverageTile* tile = stile + (cur_tile_x-tile_x1);
-        tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
-      	  (y-1) & 63, dx);
+        tile->PushLine (last_x & xmask, last_y & (NUM_TILEROW-1),
+		(x-dx) & xmask, (y-1) & (NUM_TILEROW-1), dx);
         cur_tile_x = tile_x;
         last_x = x;
         last_y = y;
@@ -1408,8 +1417,8 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     if (need_to_finish)
     {
       csCoverageTile* tile = stile + (cur_tile_x-tile_x1);
-      tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
-    	  (y-1) & 63, dx);
+      tile->PushLine (last_x & xmask, last_y & (NUM_TILEROW-1), (x-dx) & xmask,
+    	  (y-1) & (NUM_TILEROW-1), dx);
     }
     return;
   }
@@ -1428,13 +1437,13 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   int cur_tile_y = tile_y1;
   while (dy > 0)
   {
-    int tile_x = x >> (16+5);
-    int tile_y = y >> 6;
+    int tile_x = x >> (16+SHIFT_TILECOL);
+    int tile_y = y >> SHIFT_TILEROW;
     if (cur_tile_x != tile_x || cur_tile_y != tile_y)
     {
       csCoverageTile* tile = GetTile (cur_tile_x, cur_tile_y);
-      tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
-      	(y-1) & 63, dx);
+      tile->PushLine (last_x & xmask, last_y & (NUM_TILEROW-1), (x-dx) & xmask,
+      	(y-1) & (NUM_TILEROW-1), dx);
       MarkTileDirty (cur_tile_x, cur_tile_y);
       cur_tile_x = tile_x;
       cur_tile_y = tile_y;
@@ -1450,8 +1459,8 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   if (need_to_finish)
   {
     csCoverageTile* tile = GetTile (cur_tile_x, cur_tile_y);
-    tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
-    	(y-1) & 63, dx);
+    tile->PushLine (last_x & xmask, last_y & (NUM_TILEROW-1), (x-dx) & xmask,
+    	(y-1) & (NUM_TILEROW-1), dx);
     MarkTileDirty (cur_tile_x, cur_tile_y);
   }
 }
@@ -1647,19 +1656,19 @@ bool csTiledCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
 
   int tx, ty;
   int startrow, endrow;
-  startrow = bbox.miny >> 6;
+  startrow = bbox.miny >> SHIFT_TILEROW;
   if (startrow < 0) startrow = 0;
-  endrow = bbox.maxy >> 6;
+  endrow = bbox.maxy >> SHIFT_TILEROW;
   if (endrow >= num_tile_rows) endrow = num_tile_rows-1;
 
   bool rc = false;
   for (ty = startrow ; ty <= endrow ; ty++)
   {
-    csBits64 fvalue;
+    csTileCol fvalue;
     fvalue.Empty ();
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
     int dr = dirty_right[ty];
-    if (dr >= (width_po2 >> 5)) dr = (width_po2 >> 5)-1;
+    if (dr >= (width_po2 >> SHIFT_TILECOL)) dr = (width_po2 >> SHIFT_TILECOL)-1;
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
       // Even if we found a visible tile we need to continue to clear
@@ -1684,18 +1693,18 @@ void csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
 
   int tx, ty;
   int startrow, endrow;
-  startrow = bbox.miny >> 6;
+  startrow = bbox.miny >> SHIFT_TILEROW;
   if (startrow < 0) startrow = 0;
-  endrow = bbox.maxy >> 6;
+  endrow = bbox.maxy >> SHIFT_TILEROW;
   if (endrow >= num_tile_rows) endrow = num_tile_rows-1;
 
   for (ty = startrow ; ty <= endrow ; ty++)
   {
-    csBits64 fvalue;
+    csTileCol fvalue;
     fvalue.Empty ();
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
     int dr = dirty_right[ty];
-    if (dr >= (width_po2 >> 5)) dr = (width_po2 >> 5)-1;
+    if (dr >= (width_po2 >> SHIFT_TILECOL)) dr = (width_po2 >> SHIFT_TILECOL)-1;
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
       tile->Flush (fvalue, max_depth);
@@ -1714,18 +1723,18 @@ void csTiledCoverageBuffer::InsertOutline (csVector2* verts, int num_verts,
 
   int tx, ty;
   int startrow, endrow;
-  startrow = bbox.miny >> 6;
+  startrow = bbox.miny >> SHIFT_TILEROW;
   if (startrow < 0) startrow = 0;
-  endrow = bbox.maxy >> 6;
+  endrow = bbox.maxy >> SHIFT_TILEROW;
   if (endrow >= num_tile_rows) endrow = num_tile_rows-1;
 
   for (ty = startrow ; ty <= endrow ; ty++)
   {
-    csBits64 fvalue;
+    csTileCol fvalue;
     fvalue.Empty ();
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
     int dr = dirty_right[ty];
-    if (dr >= (width_po2 >> 5)) dr = (width_po2 >> 5)-1;
+    if (dr >= (width_po2 >> SHIFT_TILECOL)) dr = (width_po2 >> SHIFT_TILECOL)-1;
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
       tile->Flush (fvalue, max_depth);
@@ -1766,51 +1775,55 @@ bool csTiledCoverageBuffer::PrepareTestRectangle (const csBox2& rect,
   }
 
   if (data.bbox.miny < 0) data.bbox.miny = 0;
-  data.startrow = data.bbox.miny >> 6;
+  data.startrow = data.bbox.miny >> SHIFT_TILEROW;
   if (data.bbox.maxy >= height) data.bbox.maxy = height-1;
-  data.endrow = data.bbox.maxy >> 6;
+  data.endrow = data.bbox.maxy >> SHIFT_TILEROW;
   CS_ASSERT (data.endrow < num_tile_rows);
   if (data.bbox.minx < 0) data.bbox.minx = 0;
-  data.startcol = data.bbox.minx >> 5;
+  data.startcol = data.bbox.minx >> SHIFT_TILECOL;
   if (data.bbox.maxx >= width) data.bbox.maxx = width-1;
   CS_ASSERT (data.bbox.maxx < width);
-  data.endcol = data.bbox.maxx >> 5;
+  data.endcol = data.bbox.maxx >> SHIFT_TILECOL;
 
-  data.start_x = data.bbox.minx & 31;
-  data.end_x = data.bbox.maxx & 31;
+  data.start_x = data.bbox.minx & (NUM_TILECOL-1);
+  data.end_x = data.bbox.maxx & (NUM_TILECOL-1);
   return true;
 }
 
-bool csTiledCoverageBuffer::TestRectangle (const csTestRectData& data, float min_depth)
+bool csTiledCoverageBuffer::TestRectangle (const csTestRectData& data,
+	float min_depth)
 {
   int tx, ty;
-  csBits64 vermask;
+  csTileCol vermask;
   for (ty = data.startrow ; ty <= data.endrow ; ty++)
   {
     bool do_vermask = false;
     vermask.Full ();
-    if (ty == data.startrow && (data.bbox.miny & 63) != 0)
+    if (ty == data.startrow && (data.bbox.miny & (NUM_TILEROW-1)) != 0)
     {
-      vermask = csCoverageTile::precalc_end_lines[data.bbox.miny & 63];
+      vermask = csCoverageTile::precalc_end_lines[
+      	data.bbox.miny & (NUM_TILEROW-1)];
       do_vermask = true;
     }
-    if (ty == data.endrow && (data.bbox.maxy & 63) != 63)
+    if (ty == data.endrow &&
+    	(data.bbox.maxy & (NUM_TILEROW-1)) != (NUM_TILEROW-1))
     {
-      vermask &= csCoverageTile::precalc_start_lines[data.bbox.maxy & 63];
+      vermask &= csCoverageTile::precalc_start_lines[
+      	data.bbox.maxy & (NUM_TILEROW-1)];
       do_vermask = true;
     }
 
     csCoverageTile* tile = GetTile (data.startcol, ty);
     for (tx = data.startcol ; tx <= data.endcol ; tx++)
     {
-      int sx = 0, ex = 31;
+      int sx = 0, ex = NUM_TILECOL-1;
       bool do_hor = false;
       if (tx == data.startcol && data.start_x != 0)
       {
         sx = data.start_x;
 	do_hor = true;
       }
-      if (tx == data.endcol && data.end_x != 31)
+      if (tx == data.endcol && data.end_x != (NUM_TILECOL-1))
       {
         ex = data.end_x;
 	do_hor = true;
@@ -1846,7 +1859,8 @@ bool csTiledCoverageBuffer::TestRectangle (const csTestRectData& data, float min
   return false;
 }
 
-bool csTiledCoverageBuffer::QuickTestRectangle (const csTestRectData& data, float min_depth)
+bool csTiledCoverageBuffer::QuickTestRectangle (const csTestRectData& data,
+	float min_depth)
 {
   int tx, ty;
   for (ty = data.startrow ; ty <= data.endrow ; ty++)
@@ -1873,11 +1887,12 @@ bool csTiledCoverageBuffer::TestPoint (const csVector2& point, float min_depth)
   if (xi >= width) return false;
   if (yi >= height) return false;
 
-  int ty = yi >> 6;
-  int tx = xi >> 5;
+  int ty = yi >> SHIFT_TILEROW;
+  int tx = xi >> SHIFT_TILECOL;
 
   csCoverageTile* tile = GetTile (tx, ty);
-  return tile->TestPoint (xi & 31, yi & 63, min_depth);
+  return tile->TestPoint (xi & (NUM_TILECOL-1), yi & (NUM_TILEROW-1),
+  	min_depth);
 }
 
 #if defined(THIS_IS_UNUSED)
@@ -1919,12 +1934,12 @@ csPtr<iString> csTiledCoverageBuffer::Debug_Dump ()
   int x, y, tx, ty, i, j;
   for (ty = 0 ; ty < num_tile_rows ; ty++)
   {
-    for (y = 0 ; y < 8 ; y++)
+    for (y = 0 ; y < (NUM_TILEROW/8) ; y++)
     {
-      for (tx = 0 ; tx < (width_po2 >> 5) ; tx++)
+      for (tx = 0 ; tx < (width_po2 >> SHIFT_TILECOL) ; tx++)
       {
         csCoverageTile* tile = GetTile (tx, ty);
-	for (x = 0 ; x < 4 ; x++)
+	for (x = 0 ; x < (NUM_TILECOL/4) ; x++)
 	{
           int cnt = 0;
 	  if (!tile->queue_tile_empty)
@@ -1957,14 +1972,14 @@ void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
   {
     for (y = 0 ; y < 8 ; y++)
     {
-      for (tx = 0 ; tx < (width_po2 >> 5) ; tx++)
+      for (tx = 0 ; tx < (width_po2 >> SHIFT_TILECOL) ; tx++)
       {
-        g2d->DrawPixel (tx*32, ty*64, colpoint);
+        g2d->DrawPixel (tx*NUM_TILECOL, ty*NUM_TILEROW, colpoint);
 
         csCoverageTile* tile = GetTile (tx, ty);
-	for (x = 0 ; x < 4 ; x++)
+	for (x = 0 ; x < (NUM_TILECOL/8) ; x++)
 	{
-	  float depth = tile->depth[y*4+x];
+	  float depth = tile->depth[y*(NUM_TILECOL/8)+x];
 	  for (i = 0 ; i < 8 ; i++)
 	    for (j = 0 ; j < 8 ; j++)
 	    {
@@ -1978,7 +1993,8 @@ void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
 	        int c = 255-int (depth);
 		if (c < 50) c = 50;
 		int col = g2d->FindRGB (c, c, c);
-	        g2d->DrawPixel (tx*32+x*8+i, ty*64+y*8+j, col);
+	        g2d->DrawPixel (tx*NUM_TILECOL+x*8+i,
+			ty*NUM_TILEROW+y*8+j, col);
 	      }
 	    }
 	}
@@ -2039,3 +2055,4 @@ csTicks csTiledCoverageBuffer::Debug_Benchmark (int /*num_iterations*/)
   csTicks end = csGetTicks ();
   return end-start;
 }
+

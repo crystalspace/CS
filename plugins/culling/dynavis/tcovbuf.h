@@ -73,8 +73,8 @@ struct csLineOperation
 
 /**
  * Coverage tile.
- * One tile is 32x64 pixels. Every tile is made from 4x8 blocks (so
- * one block is 8x8 pixels).
+ * One tile is 32x64 or 64x32 pixels. Every tile is made from 4x8 or 8x4
+ * blocks (so one block is 8x8 pixels).
  */
 class csCoverageTile
 {
@@ -88,24 +88,24 @@ private:
   bool queue_tile_empty;
 
   // The coverage bits.
-  csBits64 coverage[32];
+  csTileCol coverage[NUM_TILECOL];
 
   // The cache on which we will write lines before or-ing that to the
   // real coverage bits.
-  static csBits64 coverage_cache[32];
+  static csTileCol coverage_cache[NUM_TILECOL];
 
   // This is an array of precalculated bit-sets for vertical line
   // segments that start at 'n' and go to 63.
-  static csBits64 precalc_end_lines[64];
+  static csTileCol precalc_end_lines[NUM_TILEROW];
   // This is an array of precalculated bit-sets for vertical line
   // segments that start at 0 and go to 'n'.
-  static csBits64 precalc_start_lines[64];
+  static csTileCol precalc_start_lines[NUM_TILEROW];
   // If true the two arrays above are initialized.
   static bool precalc_init;
 
   // For every block a depth value (4 blocks on every row, ordered
   // by rows).
-  float depth[32];
+  float depth[NUM_DEPTH];
   // Minimum depth of all blocks.
   float tile_min_depth;
   // Maximum depth of all blocks.
@@ -165,8 +165,8 @@ public:
   void MakeEmpty ()
   {
     tile_full = false; queue_tile_empty = false;
-    memset (coverage, 0, sizeof (csBits64)*32);
-    memset (depth, 0, sizeof (float)*32);
+    memset (coverage, 0, sizeof (csTileCol)*NUM_TILECOL);
+    memset (depth, 0, sizeof (float)*NUM_DEPTH);
     tile_min_depth = INIT_MIN_DEPTH;
     tile_max_depth = 0;
     blocks_full = 0;
@@ -181,7 +181,7 @@ public:
   void MakeEmptyQuick ()
   {
     queue_tile_empty = false;
-    memset (depth, 0, sizeof (float)*32);
+    memset (depth, 0, sizeof (float)*NUM_DEPTH);
     tile_min_depth = INIT_MIN_DEPTH;
     tile_max_depth = 0;
     blocks_full = 0;
@@ -229,43 +229,43 @@ public:
    * the current tile is full. In that case only the fvalue will be
    * updated.
    */
-  void Flush (csBits64& fvalue, float maxdepth);
+  void Flush (csTileCol& fvalue, float maxdepth);
 
   /**
    * Version of Flush that handles the case where the tile is empty.
    */
-  void FlushForEmpty (csBits64& fvalue, float maxdepth);
+  void FlushForEmpty (csTileCol& fvalue, float maxdepth);
 
   /**
    * Version of Flush that handles the case where the tile is full.
    */
-  void FlushForFull (csBits64& fvalue, float maxdepth);
+  void FlushForFull (csTileCol& fvalue, float maxdepth);
 
   /**
    * Version of Flush that handles the case where there is no depth checking.
    */
-  void FlushNoDepth (csBits64& fvalue, float maxdepth);
+  void FlushNoDepth (csTileCol& fvalue, float maxdepth);
 
   /**
    * General Flush (slowest version).
    */
-  void FlushGeneral (csBits64& fvalue, float maxdepth);
+  void FlushGeneral (csTileCol& fvalue, float maxdepth);
 
   /**
    * Perform a non-modifying flush and return true if Flush would
    * have affected the coverage buffer.
    */
-  bool TestFlush (csBits64& fvalue, float mindepth);
+  bool TestFlush (csTileCol& fvalue, float mindepth);
 
   /**
    * Version of TestFlush that handles the case where the tile is full.
    */
-  bool TestFlushForFull (csBits64& fvalue, float mindepth);
+  bool TestFlushForFull (csTileCol& fvalue, float mindepth);
 
   /**
    * General TestFlush version (least efficient).
    */
-  bool TestFlushGeneral (csBits64& fvalue, float maxdepth);
+  bool TestFlushGeneral (csTileCol& fvalue, float maxdepth);
 
   /**
    * Test if a given rectangle with exactly the size of this tile
@@ -288,7 +288,7 @@ public:
    * as the vertical mask from 'start' to 'end' horizontally (inclusive
    * range).
    */
-  bool TestRect (const csBits64& vermask, int start, int end,
+  bool TestRect (const csTileCol& vermask, int start, int end,
   	float testdepth);
 
   /**
@@ -314,7 +314,7 @@ public:
  * arranged in rows. For example, a 128x128 bitmap is represented
  * by 4 rows of 128 ints. Every int represents a column of 32 pixels.
  * In addition there is also a maximum depth value for every 8x8 pixels.
- * The screen buffer is divided into tiles of 64x32 pixels.
+ * The screen buffer is divided into tiles of 64x32 or 32x64 pixels.
  */
 class csTiledCoverageBuffer : public iBase
 {
