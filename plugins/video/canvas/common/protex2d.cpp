@@ -120,6 +120,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 	destroy_memory = true;
 	Memory = new unsigned char[width*height*2];
 	image_buffer = (RGBPixel*) buffer;
+	memset (image_buffer, 0, sizeof(RGBPixel)*width*height);
       }
       else if ((hint == csosbHardware) || (hint == csosbHardwareAlone))
       {
@@ -131,10 +132,16 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
     else
     {
       // 32bit shared software or hardware
-      Depth = 32;
+      Depth = 16;
       _DrawPixel = DrawPixel32;
       _WriteChar = WriteChar32;
       _GetPixelAt = GetPixelAt32;
+
+      destroy_memory = true;
+      Memory = new unsigned char[width*height*4];
+      image_buffer = (RGBPixel*) buffer;
+      memset (image_buffer, 0, sizeof(RGBPixel)*width*height);
+      memset (Memory, 0, sizeof(RGBPixel)*width*height);
     }
   }
 
@@ -170,19 +177,45 @@ void csProcTextureSoft2D::Print (csRect*)
 {
   if (image_buffer)
   {
-    // If we are in 16bit mode we unpack the 16 bit frame buffer into 
-    // the 32 bit image_buffer as this is the format required by the 
-    // quantization routines in the texture manager.
-    UShort *mem = (UShort*) Memory;
     RGBPixel *im = image_buffer;
-    for (int i = 0; i < Width*Height; i++, im++, mem++)
+    if (pfmt.PixelBytes == 2)
     {
-      im->red = ((*mem & pfmt.RedMask) >> pfmt.RedShift) << (8 - pfmt.RedBits);
-      im->green = ((*mem & pfmt.GreenMask) >> pfmt.GreenShift) 
-					   << (8 - pfmt.GreenBits);
-      im->blue = ((*mem & pfmt.BlueMask) >> pfmt.BlueShift) 
-					 << (8 - pfmt.BlueBits);
-      
+      // As we are in 16bit mode we unpack the 16 bit frame buffer into 
+      // the 32 bit image_buffer as this is the format required by the 
+      // quantization routines in the texture manager.
+      UShort *mem = (UShort*) Memory;
+
+      for (int i = 0; i < Width*Height; i++, im++, mem++)
+      {
+	im->red = ((*mem & pfmt.RedMask) >> pfmt.RedShift) << (8 - pfmt.RedBits);
+	im->green = ((*mem & pfmt.GreenMask) >> pfmt.GreenShift) 
+					     << (8 - pfmt.GreenBits);
+	im->blue = ((*mem & pfmt.BlueMask) >> pfmt.BlueShift) 
+					   << (8 - pfmt.BlueBits); 
+      }
+    }
+    // 32bit byte shuffle hmmm...ERIC !!
+    else if (pfmt.RedMask > pfmt.BlueMask)
+    {
+      RGBPixel *mem = (RGBPixel *)Memory;
+      for (int i = 0; i < Width*Height; i++, im++, mem++)
+      {
+	im->alpha = 255;
+	im->red = mem->blue;
+	im->green = mem->green;
+	im->blue = mem->red;
+      }
+    }
+    else
+    {
+      RGBPixel *mem = (RGBPixel *)Memory;
+      for (int i = 0; i < Width*Height; i++, im++, mem++)
+      {
+	im->alpha = 255;
+	im->red = mem->alpha;
+	im->green = mem->red;
+	im->blue = mem->green;
+      }
     }
   }
 }

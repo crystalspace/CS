@@ -92,6 +92,15 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
   image->IncRef ();
   iTextureHandle *hstxt = soft_man->RegisterTexture (image, flags);
 
+  // deal with key colours..
+  if (ogl_txt->GetKeyColor ())
+  {
+    UByte r, g, b;
+    ogl_txt->GetKeyColor (r, g, b);
+    hstxt->SetKeyColor (true);
+    hstxt->SetKeyColor (r, g, b);
+  }
+
   Push (new txt_handles (hstxt, ogl_txt));
 
   soft_man->PrepareTexture (hstxt);
@@ -248,11 +257,13 @@ void csOpenGLProcSoftware::Print (csRect *area)
 
     switch (pfmt.PixelBytes)
     {
+#ifdef GL_VERSION_1_2
       case 2:
-//	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-//			width, height,
-//			GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buffer);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
+			width, height,
+			GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buffer);
 	break;
+#endif
       case 4:
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
 			width, height,
@@ -261,8 +272,11 @@ void csOpenGLProcSoftware::Print (csRect *area)
 
       default:
 	 SysPrintf (MSG_STDOUT,
-		    "Currently not supporting paletted opengl\n");
-	 SysPrintf (MSG_STDOUT, "so this procedural texture will not work\n");
+		    "Either you are attempting paletted opengl or have a\n");
+	 SysPrintf (MSG_STDOUT, 
+		    "16/24bit display. In the latter case set proc texture to\n");
+	 SysPrintf (MSG_STDOUT, 
+		    "FORCE32BITSOFTWARE in data/config/opengl.cfg\n");
 	 break;
     }
   }

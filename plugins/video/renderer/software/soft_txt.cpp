@@ -351,6 +351,7 @@ iGraphics3D *csTextureMMSoftware::GetProcTextureInterface ()
     }
     else if (alone_hint)
     {
+      // We can work internally at 8bit
       success = stex->Prepare (this, texman->G3D, texman->alone_proc_tex, 
                      alone_hint, (void*) ((csTextureSoftware*) tex[0])->bitmap, 
                                &texman->pfmt, palette, 256);
@@ -362,6 +363,7 @@ iGraphics3D *csTextureMMSoftware::GetProcTextureInterface ()
       }
     }
     else
+      // We work at display depth i.e. 16/32bit
       success = stex->Prepare  (this, texman->G3D, NULL, alone_hint, 
                  (void*) ((csTextureSoftware*) tex[0])->image->GetImageData (), 
 		  &texman->pfmt, palette, 256);

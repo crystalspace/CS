@@ -1,6 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
 6-Jul-2000
+	- Samuel Humphreys did the following changes:
+            - #ifdefed with OPENGL_1_2 the GL_UNSIGNED_SHORT_5_6_5 data type,
+              which Mesa supports but windows doesn't. The native 16bit display
+              path for procedural textures now works again.
+            - Added a temporary box to the top left corner of dtsimple which should
+              be the same colour which proc textures clear to...this is for 
+              testing...
+            - Clumsily fixed the problem with the 32bit software procedural 
+              textures. From canvas/common/protex2d.cpp:197 I have added byte
+              shuffle code which probably isn't the best way to do it, and 
+              probably not correct for all endianness and frame buffer pixel types.
+              Hopefully Eric or AndyZ will take a look and do it properly :)
+            - The portal procedural texture now correctly appears.
+            - Cleaned up proc texture detection in sftcom3d.cpp.
+            - Added more comments to remind myself what Ive done.
 	- Added csPortal::CompleteSector() as a virtual function. This
 	  function is responsible for creating a new destination sector
 	  if this sector would be NULL. It can be used by subclasses of

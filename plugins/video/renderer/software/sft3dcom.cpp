@@ -157,7 +157,7 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
   do_gouraud = true;
   Gamma = QInt16 (1.0);
 
-  dbg_max_polygons_to_draw = 2000000000;        // After 2 billion polygons we give up :-)
+  dbg_max_polygons_to_draw = 2000000000; // After 2 billion polygons we give up :-)
 
   z_buffer = NULL;
   line_table = NULL;
@@ -292,7 +292,7 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
   z_buf_mode = CS_ZBUF_NONE;
   fog_buffers = NULL;
 
-  // Create the texture manager, if one does not already exist
+  // Create the texture manager
   texman = new csTextureManagerSoftware (System, this, config);
   texman->SetPixelFormat (pfmt);
 
@@ -1206,8 +1206,6 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
     return;
   }
 
-  // dynamic textures need to be uncached each frame if using lightmaps.
-  bool uncache_dynamic_texture = false;
   int i;
   float P1, P2, P3, P4;
   float Q1, Q2, Q3, Q4;
@@ -1608,10 +1606,6 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 #undef CHECK
     }
 texr_done:
-
-    // check if a dynamic texture
-    uncache_dynamic_texture =
-      ((tex_mm->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC);
     tcache->fill_texture (mipmap, tex, tex_mm,  u_min, v_min, u_max, v_max);
   }
   csScan_InitDraw (mipmap, this, tex, tex_mm, txt_unl);
@@ -1752,7 +1746,7 @@ texr_done:
   } /* endfor */
 
 finish:
-  if (uncache_dynamic_texture)
+  if ((tex_mm->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
     tcache->uncache_texture (0, tex);
 }
 

@@ -87,9 +87,7 @@ bool csSoftProcTexture3D::Prepare
   (System = parent_g3d->System)->IncRef ();
   this->partner_g3d = partner_g3d;
 
-  iGraphics2D *g2d;
-
-  g2d = parent_g3d->G2D;
+  iGraphics2D *g2d = parent_g3d->G2D;
     
   G2D = g2d->CreateOffScreenCanvas (width, height, buffer, 
 			      alone_hint ? csosbSoftwareAlone : csosbSoftware,
@@ -134,6 +132,15 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
   partner_g3d = (csGraphics3DSoftwareCommon*)partner;
   iGraphics2D *parent_g2d = parent_g3d->GetDriver2D ();
 
+  // Here we create additional images for this texture which are registered as 
+  // procedural textures with out own texture manager. This way if the procedural
+  // texture is written to with itself, this texture manager will know about it
+  // and act accordingly. This is done for both alone and sharing procedural
+  // textures. In the case of the alone procedural texture it will never be 
+  // utilised unless there is another sharing procedural texture in the system
+  // in which case the previous alone procedural textures are converted to
+  // sharing ones.
+ 
   // We set the 'destroy' parameter for csImageMemory to false as these buffers 
   // are destroyed else where.
   iImage *tex_image;
@@ -147,11 +154,13 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
   }
   else
   {
-    // no paletted opengl
+    // 16bit, no paletted opengl
     RGBPixel *image_buffer = new RGBPixel[width*height];
     tex_image = new csImageMemory (width, height, 
 				  image_buffer, true);
 
+    // Here we pass the image_buffer which is updated within our own texture
+    // manager through the 'palette' parameter
     G2D = parent_g2d->CreateOffScreenCanvas (width, height, buffer, 
 					     hint, ipfmt, image_buffer, 0);
   }

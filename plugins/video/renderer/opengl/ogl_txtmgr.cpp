@@ -118,6 +118,7 @@ void csTextureMMOpenGL::InitTexture (csTextureManagerOpenGL *texman,
       }
       case SOFTWARE_TEXTURE:
       {
+	// This pathway allows native 16bit support if screen is in this mode
 	csOpenGLProcSoftware *stexG3D = new csOpenGLProcSoftware (NULL);
 	if (stexG3D->Prepare (texman->G3D, texman->head_soft_proc_tex, 
 			      this, pfmt, image->GetImageData (), alone_hint))
