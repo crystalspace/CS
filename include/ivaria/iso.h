@@ -238,6 +238,9 @@ struct iIsoView : public iBase
    *  it is the amount of vertical change per horizontal change.
    *  1.0 gives perfect isometrical view, 0.5 flattens the lines.
    *  skew values must be > 0.
+   *  For a nice y scale, (sqrt(xskew*xskew+1+sqrt(yskew*yskew+1)/2
+   *  can compensate for the lengthening and shortening of the axes due 
+   *  to the skewing.
    */
   virtual void SetAxes(float xscale, float yscale, float zscale,
     float zskew, float xskew) = 0;

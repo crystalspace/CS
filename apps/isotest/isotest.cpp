@@ -173,7 +173,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   // add the player sprite to the world
   csVector3 startpos(10,0,5);
-  player = engine->CreateFrontSprite(startpos, 0.5, 2.7);
+  player = engine->CreateFrontSprite(startpos, 0.7, 2.7);
   player->SetMaterialHandle(snow);
   world->AddSprite(player);
   player->SetGridChangeCallback(PlayerGridChange, (void*)this);
@@ -182,7 +182,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   iIsoLight *scenelight = engine->CreateLight();
   scenelight->SetPosition(csVector3(3,3,6));
   scenelight->SetGrid(grid);
-  scenelight->SetRadius(4.0);
+  scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
+  scenelight->SetRadius(5.0);
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
 
   // add a light for the player, above players head.
@@ -350,7 +351,14 @@ bool IsoTest::HandleEvent (iEvent &Event)
     static int setting = 0;
     setting = (setting+1)%nrsettings;
     float h = engine->GetG3D()->GetHeight();
-    view->SetAxes( h*settings[setting][0], h*settings[setting][1], 
+    float ycorrect = 1.0;
+    if(setting!=0)
+    {
+      ycorrect = sqrt(settings[setting][4]*settings[setting][4]+1.) 
+        + sqrt(settings[setting][3]*settings[setting][3]+1.);
+      ycorrect *= .5;
+    }
+    view->SetAxes( h*settings[setting][0], h*settings[setting][1]*ycorrect, 
       h*settings[setting][2], settings[setting][3], settings[setting][4]);
     view->SetScroll(player->GetPosition(), 
       csVector2(G3D->GetWidth()/2, G3D->GetHeight()/2));
