@@ -1,0 +1,228 @@
+/*
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+/*
+ * Doxygen groups.
+ * 
+ * These are here rather than the includes because:
+ *  a) Module names aren't sorted; so we can do that here
+ *  b) it's easier to see what Modules are there and what
+ *     identifiers they have
+ *  c) it's easier to change a description
+ *
+ */
+ 
+/**
+ * \defgroup aws AWS
+ * @{ */
+
+	/** 
+ 	 * \defgroup aws_comp_flags Component flags
+ 	 */
+ 
+	/**
+	 * \defgroup aws_sink_errors Sink error codes
+	 */
+ 
+	/** 
+	 * \defgroup aws_sys_flags Window manager flags
+	 */
+ 
+	/**
+	 * \defgroup aws_window_trans Window transitions
+	 */
+ 
+/** @} */
+ 
+/**
+ * \defgroup csws Crystal Space Windowing System
+ * @{ */
+
+	/**
+	 * \defgroup csws_comps Components
+	 * @{ */
+
+		/**
+		 * \defgroup csws_comps_app Application
+		 */
+
+		/**
+		 * \defgroup csws_comps_button Button
+		 */
+ 
+		/**
+		 * \defgroup csws_comps_chkbx Check box
+		 */
+ 
+		/**
+		 * \defgroup csws_comps_cwheel Color wheel
+		 */
+ 
+		/**
+		 * \defgroup csws_comps_dialog Dialog
+		 */
+ 
+		/**
+		 * \defgroup csws_comps_hints Floating hints
+		 */
+ 
+		/**
+		 * \defgroup csws_comps_grid Grid
+		 */
+ 
+		/**
+		 * \defgroup csws_comps_iline Input line
+		 */
+ 
+		/**
+		 * \defgroup csws_comps_keyacc Keyboard accelerator
+		 */
+ 
+		/**
+		 * \defgroup csws_comps_listbox List box
+		 */
+ 
+		/**
+		 * \defgroup csws_comps_menu Menu
+		 */
+ 
+		/**
+		 * \defgroup csws_comps_notebook Notebook
+		 */
+		 
+		/**
+		 * \defgroup csws_comps_radbut Radio button
+		 */
+		 
+		/**
+		 * \defgroup csws_comps_scrbar Scroll bar
+		 */
+		 
+		/**
+		 * \defgroup csws_comps_spinbox Spin box
+		 */
+		 
+		/**
+		 * \defgroup csws_comps_splitter Splitter
+		 */
+		 
+		/**
+		 * \defgroup csws_comps_static Static control
+		 */
+		 
+		/**
+		 * \defgroup csws_comps_timer Timer
+		 */
+		 
+		/**
+		 * \defgroup csws_comps_title Title bar
+		 */
+		 
+		/**
+		 * \defgroup csws_comps_treebox Tree box
+		 */
+		 
+		/**
+		 * \defgroup csws_comps_window Windows
+		 */
+		 
+	/** @} */
+ 
+	/**
+	 * \defgroup csws_layout Layouting
+	 */
+
+	/**
+	 * \defgroup csws_skins Skin support
+	 */
+ 
+	/**
+	 * \defgroup csws_stddlg Standard dialogs
+	 */
+ 
+/** @} */
+ 
+/**
+ * \defgroup engine3d Crystal Space 3D Engine
+ * @{ */
+
+	/**
+	 * \defgroup engine3d_light Lighting
+	 */
+ 
+	/**
+	 * \defgroup engine3d_meshes Mesh support
+	 */
+ 
+	/**
+	 * \defgroup engine3d_textures Textures & Materials
+	 */
+ 
+	/**
+	 * \defgroup engine3d_views Views & Cameras
+	 */
+ 
+	/**
+	 * \defgroup engine3d_vis Visibility
+	 */
+	 
+/** @} */
+ 
+/**
+ * \defgroup event_handling Event handling
+ */
+ 
+/**
+ * \defgroup floating_point Floating point utility routines
+ */
+ 
+/**
+ * \defgroup geom_utils Geometry utilities
+ */
+
+/**
+ * \defgroup gfx Graphics
+ * @{
+ */
+ 
+	/**
+	 * \defgroup gfx2d 2D
+	 */
+	 
+	/** 
+	 * \defgroup gfx3d 3D
+	 */ 
+ 
+/** @} */ 
+ 
+/**
+ * \defgroup loadsave Loading & Saving support
+ */
+ 
+/**
+ * \defgroup scf Shared Class Facility (SCF)
+ */
+
+/**
+ * \defgroup util Utilities
+ */
+ 
+/**
+ * \defgroup vfs Virtual File System (VFS)
+ */
+
