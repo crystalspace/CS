@@ -14,6 +14,8 @@ The history order has been reversed so that new features are at the top.
 	  glcommon2d.cpp.
 	- Eric Sunshine fixed potential a memory leak which Martin introduced
 	  in glcommon2d.cpp.
+	- Eric Sunshine fixed CS/include/cssys/next/csosdefs.h so that it
+	  respects SYSDEF_ACCESS.
 29-Jan-2001
 	- Martin also modified the sound drivers so that they are now opened,
 	  closed, and updated via system events.

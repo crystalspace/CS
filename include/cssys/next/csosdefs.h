@@ -94,7 +94,10 @@ static inline char* strdup( char const* s )
 //-----------------------------------------------------------------------------
 // Pull in definitions for getwd(), ntohl(), htonl(), select(), etc.
 //-----------------------------------------------------------------------------
-#if defined(SYSDEF_GETCWD) || defined(SYSDEF_SOCKETS) || defined(SYSDEF_SELECT)
+#if defined(SYSDEF_GETCWD)  || \
+    defined(SYSDEF_SOCKETS) || \
+    defined(SYSDEF_SELECT)  || \
+    defined(SYSDEF_ACCESS)
 #include <libc.h>
 #endif
 
