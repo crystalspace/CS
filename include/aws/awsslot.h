@@ -148,7 +148,7 @@ public:
 class awsSlot : public iAwsSlot
 {
    /// The sink that this slot manages.
-   iAwsSink *sink;
+   
    
    /** A mapping between signals and triggers.  One signal may map to multiple triggers, or
     * vice versa.  The mapping list is traversed everytime there is a signal emitted.  All
@@ -157,9 +157,10 @@ class awsSlot : public iAwsSlot
    {
      unsigned long signal;
      unsigned long trigger;
+     iAwsSink     *sink;
      unsigned long refs;
 
-     SignalTriggerMap(unsigned long s, unsigned long t, unsigned long r):signal(s), trigger(t), refs(r) {};
+     SignalTriggerMap(unsigned long s, iAwsSink *sk, unsigned long t, unsigned long r):signal(s), trigger(t), sink(sk), refs(r) {};
    };
 
    csBasicVector stmap;
@@ -172,15 +173,12 @@ public:
 
   /// Also does nothing
   virtual ~awsSlot();
-
-  /// Sets up the slot's sink
-  virtual void Initialize(iAwsSink *sink);
-  
+    
   /// Creates a connection from the source:signal to the sink:trigger specified.
-  virtual void Connect(iAwsSource &source, unsigned long signal, unsigned long trigger);
+  virtual void Connect(iAwsSource *source, unsigned long signal, iAwsSink *sink, unsigned long trigger);
                                           
   /// Disconnects the slot from a signal source, also properly unmaps a signal::trigger binding.
-  virtual void Disconnect(iAwsSource &source, unsigned long signal, unsigned long trigger);
+  virtual void Disconnect(iAwsSource *source, unsigned long signal, iAwsSink *sink, unsigned long trigger);
 
   /// Emit a signal to activate all necessary triggers.
   virtual void Emit(iAwsSource &source, unsigned long signal);
