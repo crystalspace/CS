@@ -297,7 +297,6 @@
 #include "csutil/plugmgr.h"
 #include "csutil/prfxcfg.h"
 #include "csutil/randomgen.h"
-#include "csutil/sarray.h"
 #include "csutil/scanstr.h"
 #include "csutil/scf.h"
 #include "csutil/scfstr.h"
