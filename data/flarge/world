@@ -27,10 +27,23 @@ WORLD (
     MATERIAL 'raindrop' (TEXTURE ('raindrop'))
     MATERIAL 'white' (TEXTURE ('white.gif'))
     MATERIAL 'bricks' (TEXTURE ('bricks.gif'))
+    MATERIAL 'mosaic' (TEXTURE ('mosaic.gif'))
+  )
+  PLUGINS (
+    PLUGIN 'thing' ('crystalspace.mesh.loader.thing')
+    PLUGIN 'thingFact' ('crystalspace.mesh.loader.factory.thing')
+    PLUGIN 'plane' ('crystalspace.mesh.loader.thing.plane')
+    PLUGIN 'bezier' ('crystalspace.mesh.loader.thing.bezier')
+    PLUGIN 'spr3dFact' ('crystalspace.mesh.loader.factory.sprite.3d')
+    PLUGIN 'spr3d' ('crystalspace.mesh.loader.sprite.3d')
+    PLUGIN 'spr2dFact' ('crystalspace.mesh.loader.factory.sprite.2d')
+    PLUGIN 'spr2d' ('crystalspace.mesh.loader.sprite.2d')
+    PLUGIN 'cubeFact' ('crystalspace.mesh.loader.factory.cube')
+    PLUGIN 'cube' ('crystalspace.mesh.loader.cube')
   )
 
   ADDON (
-    PLUGIN ('crystalspace.mesh.loader.plane')
+    PLUGIN ('plane')
     PARAMS (
       NAME ('largeE')
       ORIG (20,17,20)
@@ -41,7 +54,7 @@ WORLD (
     )
   )
   ADDON (
-    PLUGIN ('crystalspace.mesh.loader.plane')
+    PLUGIN ('plane')
     PARAMS (
       NAME ('largeN')
       ORIG (-20,17,20)
@@ -52,7 +65,7 @@ WORLD (
     )
   )
   ADDON (
-    PLUGIN ('crystalspace.mesh.loader.plane')
+    PLUGIN ('plane')
     PARAMS (
       NAME ('largeS')
       ORIG (20,17,6)
@@ -63,7 +76,7 @@ WORLD (
     )
   )
   ADDON (
-    PLUGIN ('crystalspace.mesh.loader.plane')
+    PLUGIN ('plane')
     PARAMS (
       NAME ('largeW')
       ORIG (-20,17,6)
@@ -74,7 +87,7 @@ WORLD (
     )
   )
   ADDON (
-    PLUGIN ('crystalspace.mesh.loader.plane')
+    PLUGIN ('plane')
     PARAMS (
       NAME ('largeD')
       ORIG (-20,-1,20)
@@ -85,7 +98,7 @@ WORLD (
     )
   )
   ADDON (
-    PLUGIN ('crystalspace.mesh.loader.plane')
+    PLUGIN ('plane')
     PARAMS (
       NAME ('corridoruD')
       ORIG (-20,8,30)
@@ -97,7 +110,7 @@ WORLD (
   )
 
   MESHOBJ 'sprSkelFact' (
-    PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')
+    PLUGIN ('spr3dFact')
     PARAMS (
       MATERIAL ('robot')
       FRAME 'f1' (
@@ -149,7 +162,7 @@ WORLD (
     )
   )
   MESHOBJ 'sprFrameFact' (
-    PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')
+    PLUGIN ('spr3dFact')
     PARAMS (
       MATERIAL ('robot')
       FRAME 'f1' (
@@ -243,21 +256,21 @@ WORLD (
     PARAMS ()
   )
   MESHOBJ 'robotBody' (
-    PLUGIN ('crystalspace.mesh.loader.factory.cube')
+    PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
       SIZE (.2,.5,.2)
     )
   )
   MESHOBJ 'robotHead' (
-    PLUGIN ('crystalspace.mesh.loader.factory.cube')
+    PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
       SIZE (.17,.2,.17)
     )
   )
   MESHOBJ 'robotLeg' (
-    PLUGIN ('crystalspace.mesh.loader.factory.cube')
+    PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
       SIZE (.1,.4,.1)
@@ -265,7 +278,7 @@ WORLD (
     )
   )
   MESHOBJ 'robotArm' (
-    PLUGIN ('crystalspace.mesh.loader.factory.cube')
+    PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
       SIZE (.1,.3,.1)
@@ -273,7 +286,7 @@ WORLD (
     )
   )
   MESHOBJ 'robotHand' (
-    PLUGIN ('crystalspace.mesh.loader.factory.cube')
+    PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
       SIZE (.05,.12,.12)
@@ -281,7 +294,7 @@ WORLD (
     )
   )
   MESHOBJ 'robotFoot' (
-    PLUGIN ('crystalspace.mesh.loader.factory.cube')
+    PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
       SIZE (.3,.1,.1)
@@ -289,7 +302,7 @@ WORLD (
     )
   )
   MESHOBJ 'spr' (
-    PLUGIN ('crystalspace.mesh.loader.factory.sprite.2d')
+    PLUGIN ('spr2dFact')
     PARAMS (
       MATERIAL ('robot')
     )
@@ -304,7 +317,7 @@ WORLD (
   )
 
   MESHOBJ 'cube' (
-    PLUGIN ('crystalspace.mesh.loader.factory.thing')
+    PLUGIN ('thingFact')
     PARAMS (
     VERTEX (-0.5,-0.5,-0.5) VERTEX (-0.5,-0.5,0.5) VERTEX (-0.5,0.5,-0.5)
     VERTEX (-0.5,0.5,0.5) VERTEX (0.5,-0.5,-0.5) VERTEX (0.5,-0.5,0.5)
@@ -461,19 +474,73 @@ WORLD (
     )
   )
 
-  THING 'tunnel' (
-    VERTEX ( 5, 2, 0) VERTEX ( 5, 2, 5) VERTEX ( 0, 2, 5) VERTEX (-5, 2, 5)
-    VERTEX (-5, 2, 0) VERTEX (-5, 2,-5) VERTEX ( 0, 2,-5) VERTEX ( 5, 2,-5)
+  ADDON (
+    PLUGIN ('bezier')
+    PARAMS (
+      NAME ('b1') MATERIAL ('mosaic')
+      VERTICES ( 0, 1, 2,   8, 9,10, 16,17,18)
+    )
+  )
+  ADDON (
+    PLUGIN ('bezier')
+    PARAMS (
+      NAME ('b1') MATERIAL ('mosaic')
+      VERTICES ( 0, 1, 2,   8, 9,10, 16,17,18)
+    )
+  )
+  ADDON (
+    PLUGIN ('bezier')
+    PARAMS (
+      NAME ('b2') MATERIAL ('mosaic')
+      VERTICES ( 2, 3, 4,  10,11,12, 18,19,20)
+    )
+  )
+  ADDON (
+    PLUGIN ('bezier')
+    PARAMS (
+      NAME ('b3') MATERIAL ('mosaic')
+      VERTICES ( 4, 5, 6,  12,13,14, 20,21,22)
+    )
+  )
+  ADDON (
+    PLUGIN ('bezier')
+    PARAMS (
+      NAME ('b4') MATERIAL ('mosaic')
+      VERTICES ( 6, 7, 0,  14,15, 8, 22,23,16)
+    )
+  )
+  ADDON (
+    PLUGIN ('bezier')
+    PARAMS (
+      NAME ('b5') MATERIAL ('mosaic')
+      VERTICES ( 16,17,18, 24,25,26, 0, 1, 2)
+    )
+  )
+  ADDON (
+    PLUGIN ('bezier')
+    PARAMS (
+      NAME ('b6') MATERIAL ('mosaic')
+      VERTICES ( 18,19,20, 26,27,28, 2, 3, 4)
+    )
+  )
+  ADDON (
+    PLUGIN ('bezier')
+    PARAMS (
+      NAME ('b7') MATERIAL ('mosaic')
+      VERTICES (20,21,22,  28,29,30, 4, 5, 6)
+    )
+  )
+  ADDON (
+    PLUGIN ('bezier')
+    PARAMS (
+      NAME ('b8') MATERIAL ('mosaic')
+      VERTICES (22,23,16,  30,31,24, 6, 7, 0)
+    )
+  )
 
-    VERTEX ( 2,0, 0) VERTEX ( 2,0, 2) VERTEX ( 0,0, 2) VERTEX (-2,0, 2)
-    VERTEX (-2,0, 0) VERTEX (-2,0,-2) VERTEX ( 0,0,-2) VERTEX ( 2,0,-2)
-
-    VERTEX ( 5,-2, 0) VERTEX ( 5,-2, 5) VERTEX ( 0,-2, 5) VERTEX (-5,-2, 5)
-    VERTEX (-5,-2, 0) VERTEX (-5,-2,-5) VERTEX ( 0,-2,-5) VERTEX ( 5,-2,-5)
-
-    VERTEX ( 8,0, 0) VERTEX ( 8,0, 8) VERTEX ( 0,0, 8) VERTEX (-8,0, 8)
-    VERTEX (-8,0, 0) VERTEX (-8,0,-8) VERTEX ( 0,0,-8) VERTEX ( 8,0,-8)
-
+  MESHOBJ 'tunnel' (
+    PLUGIN ('thingFact')
+    PARAMS (
     CURVECENTER (0,0,0)
     CURVESCALE (80)
 
@@ -513,15 +580,15 @@ WORLD (
     CURVECONTROL ( 0,0,-8:0  ,0.5)
     CURVECONTROL ( 8,0,-8:0.5,0.5)
 
-    BEZIER 'bez2' (TEXNR ('mosaic.gif') VERTICES ( 0, 1, 2,   8, 9,10, 16,17,18))
-    BEZIER 'bez2' (TEXNR ('mosaic.gif') VERTICES ( 2, 3, 4,  10,11,12, 18,19,20))
-    BEZIER 'bez2' (TEXNR ('mosaic.gif') VERTICES ( 4, 5, 6,  12,13,14, 20,21,22))
-    BEZIER 'bez2' (TEXNR ('mosaic.gif') VERTICES ( 6, 7, 0,  14,15, 8, 22,23,16))
-
-    BEZIER 'bez2' (TEXNR ('mosaic.gif') VERTICES ( 16,17,18, 24,25,26, 0, 1, 2))
-    BEZIER 'bez2' (TEXNR ('mosaic.gif') VERTICES ( 18,19,20, 26,27,28, 2, 3, 4))
-    BEZIER 'bez2' (TEXNR ('mosaic.gif') VERTICES (20,21,22,  28,29,30, 4, 5, 6))
-    BEZIER 'bez2' (TEXNR ('mosaic.gif') VERTICES (22,23,16,  30,31,24, 6, 7, 0))
+    CURVE 'bez' ('b1')
+    CURVE 'bez' ('b2')
+    CURVE 'bez' ('b3')
+    CURVE 'bez' ('b4')
+    CURVE 'bez' ('b5')
+    CURVE 'bez' ('b6')
+    CURVE 'bez' ('b7')
+    CURVE 'bez' ('b8')
+    )
   )
 
   THING 'prism4' (
@@ -623,8 +690,9 @@ WORLD (
   )
 
   SECTOR 'room' (
-    THING 'walls' (
-    ZFILL()
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
+    PARAMS (
     VERTEX (-2,-1,-2)
     VERTEX (-2,-1,2)
     VERTEX (-2,3,-2)
@@ -635,7 +703,7 @@ WORLD (
     VERTEX (2,-1,2)
     VERTEX (2,3,-2)
     VERTEX (2,3,2)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'east' (
       VERTICES (9,8,6,7)
       TEXTURE (
@@ -686,6 +754,8 @@ WORLD (
         V (-2,3,2)
       )
     )
+    )
+    ZFILL()
     )
     LIGHT (0,0,0:3,1,1,1,0)
   )
@@ -2097,7 +2167,7 @@ WORLD (
     )
     LIGHT (3.5,2,12.5:5,.7,.7,.8, 0)
     MESHOBJ 'sprSkel' (
-      PLUGIN ('crystalspace.mesh.loader.sprite.3d')
+      PLUGIN ('spr3d')
       PARAMS (
         FACTORY ('sprSkelFact')
         ACTION ('default')
@@ -2105,7 +2175,7 @@ WORLD (
       MOVE (V (1.5,.3,14))
     )
     MESHOBJ 'sprFrame' (
-      PLUGIN ('crystalspace.mesh.loader.sprite.3d')
+      PLUGIN ('spr3d')
       PARAMS (
         FACTORY ('sprFrameFact')
         ACTION ('default')
@@ -2114,11 +2184,11 @@ WORLD (
     )
     MESHOBJ 'cubard' (
       KEY ("entity_Rotate","0,50,0,true")
-      PLUGIN ('crystalspace.mesh.loader.cube')
+      PLUGIN ('cube')
       PARAMS (FACTORY ('robotBody'))
       MOVE (V (4,.3,12))
       MESHOBJ 'robotHead' (
-        PLUGIN ('crystalspace.mesh.loader.cube')
+        PLUGIN ('cube')
         PARAMS (FACTORY ('robotHead'))
         MOVE (V (0,.42,0) MATRIX (ROT_X (0)))
 	MESHOBJ 'ball1' (
@@ -2160,19 +2230,19 @@ WORLD (
       )
       MESHOBJ 'robotArmRight' (
         KEY ("entity_Rotate","0,0,100,true")
-        PLUGIN ('crystalspace.mesh.loader.cube')
+        PLUGIN ('cube')
         PARAMS (FACTORY ('robotArm'))
         MOVE (V (0,.23,-.15) MATRIX (ROT_X (.2)))
         MESHOBJ 'robotArmRight2' (
-          PLUGIN ('crystalspace.mesh.loader.cube')
+          PLUGIN ('cube')
           PARAMS (FACTORY ('robotArm'))
           MOVE (V (0,-.3,0) MATRIX (ROT_X (0)))
           MESHOBJ 'robotHandRight' (
-            PLUGIN ('crystalspace.mesh.loader.cube')
+            PLUGIN ('cube')
             PARAMS (FACTORY ('robotHand'))
             MOVE (V (.0,-.29,0) MATRIX (ROT_X (0)))
             MESHOBJ 'something' (
-              PLUGIN ('crystalspace.mesh.loader.sprite.2d')
+              PLUGIN ('spr2d')
               PARAMS (
                 FACTORY ('spr')
                 VERTICES (-.1,.1,.1,.1,.1,-.1,-.1,-.1)
@@ -2203,15 +2273,15 @@ WORLD (
       )
       MESHOBJ 'robotArmLeft' (
         KEY ("entity_Rotate","0,0,10,true")
-        PLUGIN ('crystalspace.mesh.loader.cube')
+        PLUGIN ('cube')
         PARAMS (FACTORY ('robotArm'))
         MOVE (V (0,.23,.15) MATRIX (ROT_X (-.2)))
         MESHOBJ 'robotArmLeft2' (
-          PLUGIN ('crystalspace.mesh.loader.cube')
+          PLUGIN ('cube')
           PARAMS (FACTORY ('robotArm'))
           MOVE (V (0,-.3,0) MATRIX (ROT_X (0)))
           MESHOBJ 'robotHandLeft' (
-            PLUGIN ('crystalspace.mesh.loader.cube')
+            PLUGIN ('cube')
             PARAMS (FACTORY ('robotHand'))
             MOVE (V (.0,-.29,0) MATRIX (ROT_X (0)))
             MESHOBJ 'flame' (
@@ -2233,30 +2303,30 @@ WORLD (
 	)
       )
       MESHOBJ 'robotLegRight' (
-        PLUGIN ('crystalspace.mesh.loader.cube')
+        PLUGIN ('cube')
         PARAMS (FACTORY ('robotLeg'))
         MOVE (V (0,-.25,-.05) MATRIX (ROT_X (.2)))
         MESHOBJ 'robotLegRight2' (
-          PLUGIN ('crystalspace.mesh.loader.cube')
+          PLUGIN ('cube')
           PARAMS (FACTORY ('robotLeg'))
           MOVE (V (0,-.4,0) MATRIX (ROT_X (0)))
           MESHOBJ 'robotFootRight' (
-            PLUGIN ('crystalspace.mesh.loader.cube')
+            PLUGIN ('cube')
             PARAMS (FACTORY ('robotFoot'))
             MOVE (V (0,-.4,0) MATRIX (ROT_X (0)))
           )
         )
       )
       MESHOBJ 'robotLegLeft' (
-        PLUGIN ('crystalspace.mesh.loader.cube')
+        PLUGIN ('cube')
         PARAMS (FACTORY ('robotLeg'))
         MOVE (V (0,-.25,.05) MATRIX (ROT_X (-.2)))
         MESHOBJ 'robotLegLeft2' (
-          PLUGIN ('crystalspace.mesh.loader.cube')
+          PLUGIN ('cube')
           PARAMS (FACTORY ('robotLeg'))
           MOVE (V (0,-.4,0) MATRIX (ROT_X (0)))
           MESHOBJ 'robotFootLeft' (
-            PLUGIN ('crystalspace.mesh.loader.cube')
+            PLUGIN ('cube')
             PARAMS (FACTORY ('robotFoot'))
             MOVE (V (0,-.4,0) MATRIX (ROT_X (0)))
           )
@@ -2549,7 +2619,7 @@ WORLD (
     )
     )
     MESHOBJ 'cube2' (
-      PLUGIN ('crystalspace.mesh.loader.thing')
+      PLUGIN ('thing')
       PARAMS (
         FACTORY ('cube')
         MOVEABLE ()
@@ -2558,14 +2628,14 @@ WORLD (
       KEY ("entity_Rotate", "90,0,0,yes")
     )
     MESHOBJ 'cube3' (
-      PLUGIN ('crystalspace.mesh.loader.thing')
+      PLUGIN ('thing')
       PARAMS (
         FACTORY ('cube')
       )
       HARDMOVE (MATRIX (ROT_Y (45)) V (-14,-1,36))
     )
     MESHOBJ 'cube4' (
-      PLUGIN ('crystalspace.mesh.loader.thing')
+      PLUGIN ('thing')
       PARAMS (
         FACTORY ('cube')
         MOVEABLE ()
@@ -2574,12 +2644,12 @@ WORLD (
       MOVE (MATRIX (ROT_Z (45)) V (-12,-1,36))
     )
     MESHOBJ 'cube5' (
-      PLUGIN ('crystalspace.mesh.loader.thing')
+      PLUGIN ('thing')
       PARAMS (FACTORY ('cube'))
       HARDMOVE (MATRIX (ROT_X (10)) V (-18,1,36))
     )
     MESHOBJ 'cube6' (
-      PLUGIN ('crystalspace.mesh.loader.thing')
+      PLUGIN ('thing')
       PARAMS (
         FACTORY ('cube')
         MOVEABLE ()
@@ -2588,12 +2658,12 @@ WORLD (
       MOVE (MATRIX (ROT_Y (10)) V (-16,1,36))
     )
     MESHOBJ 'cube7' (
-      PLUGIN ('crystalspace.mesh.loader.thing')
+      PLUGIN ('thing')
       PARAMS (FACTORY ('cube'))
       HARDMOVE (MATRIX (ROT_Z (10)) V (-14,1,36))
     )
     MESHOBJ 'cube8' (
-      PLUGIN ('crystalspace.mesh.loader.thing')
+      PLUGIN ('thing')
       PARAMS (FACTORY ('cube'))
       HARDMOVE (MATRIX (ROT_X (45) ROT_Y (10)) V (-12,1,36))
     )
@@ -4812,7 +4882,7 @@ WORLD (
     )
   )
   ADDON (
-    PLUGIN ('crystalspace.mesh.loader.plane')
+    PLUGIN ('plane')
     PARAMS (
       NAME ('streetD')
       ORIG (-43,-1.3,5)
@@ -4823,7 +4893,7 @@ WORLD (
     )
   )
   ADDON (
-    PLUGIN ('crystalspace.mesh.loader.plane')
+    PLUGIN ('plane')
     PARAMS (
       NAME ('streetS')
       ORIG (-43,12,-10)
@@ -4834,7 +4904,7 @@ WORLD (
     )
   )
   ADDON (
-    PLUGIN ('crystalspace.mesh.loader.plane')
+    PLUGIN ('plane')
     PARAMS (
       NAME ('streetN')
       ORIG (-43,12,5)
@@ -4845,7 +4915,7 @@ WORLD (
     )
   )
   ADDON (
-    PLUGIN ('crystalspace.mesh.loader.plane')
+    PLUGIN ('plane')
     PARAMS (
       NAME ('streetW')
       ORIG (-43,12,5)
@@ -4856,7 +4926,7 @@ WORLD (
     )
   )
   ADDON (
-    PLUGIN ('crystalspace.mesh.loader.plane')
+    PLUGIN ('plane')
     PARAMS (
       NAME ('streetE')
       ORIG (-3,12,5)
@@ -5213,8 +5283,11 @@ WORLD (
       )
       MOVE (V (0,0,0))
     )
-    THING 'tunnel_1' (
-      TEMPLATE (tunnel)
+    MESHOBJ 'tunnel_1' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY ('tunnel')
+      )
       HARDMOVE (
         MATRIX (0.2,0,0,0,0.2,0,0,0,0.2)
         V (-5,3,-3)
