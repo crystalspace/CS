@@ -1,5 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
+19-Apr-2001
+	- Martin Geisse did further work on csparser.
 18-Apr-2001
 	- Removed the test for stencil buffer since it seems that just doing
 	  that test is enough to break significant parts of OpenGL on some
@@ -38,6 +40,18 @@ The history order has been reversed so that new features are at the top.
 	      This bug could very well be the cause for the
 	      bad texture cache contents that happens with very
 	      thin polygons.
+	- Martin Geisse added QueryObject() method to engine objects
+	  (subclasses of csObject). This returns the iObject interface
+	  for these objects, just like QUERY_INTERFACE, but is faster.
+	- Christopher Nelson updated header files for skinned listbox
+	  and scrollbar and also added sdscrbar.cpp default scrollbar skin.
+	- Christopher also did the following:
+	    - Updated csListBox to be a skinned object, now supports
+	      cslfsTextured and cslfsBitmap.
+	    - Updated csScrollBar to be a skinned object.
+	    - Fixed dumb bug with csListbox and csScrollBar not being drawn.
+	    - Fixed bug where bitmapped or textured dialogs don't
+	      redraw children right.
 17-Apr-2001
 	- Martin Geisse eliminated some warnings in the function terrain
 	  loader.
