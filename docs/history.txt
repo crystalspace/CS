@@ -1,6 +1,7 @@
 The history order is reversed so that new features are at the top.
 
 26-Aug-2001
+	- Norman Kramer fixed compilation error in csrectrg.cpp.
 	- Eric Sunshine made the following changes to the project:
 	    - Removed all event related code and functionality from
 	      csSystemDriver and the cssys library as part of the continuing
