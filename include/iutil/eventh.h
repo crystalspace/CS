@@ -20,7 +20,6 @@
 #define __IUTIL_EVENTH_H__
 
 #include "csutil/scf.h"
-
 struct iEvent;
 
 SCF_VERSION (iEventHandler, 0, 0, 1);
@@ -31,17 +30,18 @@ SCF_VERSION (iEventHandler, 0, 0, 1);
 struct iEventHandler : public iBase
 {
   /**
-   * This is the basic event handler function. Component should register first
-   * with an event queue, using iEventQueue::RegisterListener() method,
-   * before he'll receive any events. The handler should return true
-   * if the event has been handled indeed (and thus to not pass it further).
-   * The default implementation of HandleEvent does nothing.
-   * NOTE: do NOT return true unless you really handled the event
-   * and want the event to not be passed further for processing by
-   * other plugins.
+   * This is the basic event handling function.  To receive events, a component
+   * must implement iEventHandler and register with an event queue using
+   * iEventQueue::RegisterListener().  The event handler should return true if
+   * the event was handled.  Returning true prevents the event from being
+   * passed along to other event handlers.  If the event was not handled, then
+   * false should be returned, in which case other event handlers are given a
+   * shot at the event.  Note that broadcast events are sent to all handlers
+   * which are interested in them regardless of the return value of this
+   * method.  NOTE: Do _not_ return true unless you really handled the event
+   * and want event dispatch to stop at your handler.
    */
-  virtual bool HandleEvent (iEvent &/*Event*/) = 0;
+  virtual bool HandleEvent (iEvent&) = 0;
 };
 
 #endif // __IUTIL_EVENTH_H__
-

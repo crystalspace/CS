@@ -2,57 +2,58 @@ The history order is reversed so that new features are at the top.
 
 27-Aug-2001
 	- Fixed a linking error in povie.mak.
-	- Did a new change to iPolygonBuffer. Materials for polygons are now
-	  treated indirectly. So AddPolygon() accepts an index into a table
-	  with materials instead of a material handle. In addition added
-	  the functions iPolygonBuffer::AddMaterial(), GetMaterial(),
+	- Did a new change to iPolygonBuffer.  Materials for polygons are now
+	  treated indirectly.  So AddPolygon() accepts an index into a table
+	  with materials instead of a material handle.  In addition added the
+	  functions iPolygonBuffer::AddMaterial(), GetMaterial(),
 	  GetMaterialCount(), and SetMaterial() to operate on the material
-	  array. This change was done to make it easier to replace the material
-	  handles from the wrappers when needed. This replacing is needed
-	  in two cases:
-	    1. The material wrapper is registered/prepared again
-	       (possibly for another 3D renderer) so the handle has changed.
+	  array.  This change was done to make it easier to replace the
+	  material handles from the wrappers when needed.  This replacing is
+	  needed in two cases:
+	    1. The material wrapper is registered/prepared again (possibly for
+	       another 3D renderer) so the handle has changed.
 	    2. The procedural software renderer for OpenGL also wants to
 	       replace material handles.
 	- Changed the treatment of DrawPolygonMesh (FASTMESH flag) in csThing
 	  by sorting the polygons on material first and then creating a
 	  material table. Also the material handles are correctly updated
 	  every time the thing is drawn which is how it should be.
-	- Renamed G3DTriangleMesh::fxmode to mixmode for consistency with
-	  other similar structures.
+	- Renamed G3DTriangleMesh::fxmode to mixmode for consistency with other
+	  similar structures.
 	- Added G3DPolygonMesh::mixmode.
 	- Set G3DPolygonMesh::mixmode to CS_FX_COPY for now. This fixes a bug
 	  with the mixmode not being initialized correctly resulting
 	  (sometimes) in semi-transparent things.
-	- Fixed the OpenGL renderer so that DrawPolygonMesh correctly
-	  replaces the texture handles when going to the software renderer
-	  for a procedural texture.
+	- Fixed the OpenGL renderer so that DrawPolygonMesh correctly replaces
+	  the texture handles when going to the software renderer for a
+	  procedural texture.
 	- Removed iWin32SystemDriver and merged the three functions
 	  (GetInstance(), GetIsActive(), and GetCmdShow()) with iWin32Helper.
 	- Philip Wyett fixed ddraw/ddraw8 canvases which still contained an
-	  include of the deleted win32itf.h.
-	- Moved implementation of iObjectRegistry from system driver to
-	  csutil (csObjectRegistry class). Replaced the object registry
-	  in the system driver with this implementation.
-	- Made CS_QUERY_REGISTRY variants safe by putting brackets around
-	  the first argument.
-	- Split iPlugin interface into iComponent and iEventHandler and
-	  removed iPlugin interface. iComponent now contains the Initialize()
-	  function and iEventHandler contains HandleEvent. The idea is
-	  that event handling is a seperate concept from plugins so
-	  HandleEvent does not belong in iPlugin. In addition the notion
-	  of initializing is not plugin specific either so it also doesn't
-	  belong to iPlugin. This means there is actually nothing left
-	  in iPlugin so it is removed :-)
-	  To change code to work with this you basically have to replace
-	  iPlugin with iComponent. If you also need events (i.e. you used
-	  HandleEvent) then you have to additionally create a new
-	  embedded iEventHandler interface object.
+	  include of the obsolete win32itf.h.
+	- Moved implementation of iObjectRegistry from system driver to csutil
+	  (csObjectRegistry class).  Replaced the object registry in the system
+	  driver with this implementation.
+	- Made CS_QUERY_REGISTRY variants safe by putting brackets around the
+	  first argument.
+	- Split iPlugin interface into iComponent and iEventHandler and removed
+	  iPlugin interface.  iComponent now contains the Initialize() function
+	  and iEventHandler contains HandleEvent.  The idea is that event
+	  handling is a seperate concept from plugins so HandleEvent does not
+	  belong in iPlugin.  In addition the notion of initializing is not
+	  plugin specific either so it also doesn't belong to iPlugin.  This
+	  means there is actually nothing left in iPlugin so it is removed.  To
+	  change code to work with this you basically have to replace iPlugin
+	  with iComponent.  If you also need events (i.e.  you used
+	  HandleEvent) then you have to additionally create a new embedded
+	  iEventHandler interface object.
 	- Eric Sunshine added a dummy constructor to G3DPolygonDPFX to pacify
 	  the NextStep compiler which complained that it wasn't able to
 	  instantiate the object.  This problem cropped up when the
 	  subcomponent G3DTexturedVertex was re-derived from csVector2 (which
 	  has a constructor).
+	- Eric Sunshine fixed incorrect documentation for the new iComponent
+	  and iEventHandler interfaces.
 26-Aug-2001
 	- Removed G3DVertex class since this is equivalent to using
 	  csVector2 instead.

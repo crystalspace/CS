@@ -20,7 +20,6 @@
 #define __IUTIL_COMP_H__
 
 #include "csutil/scf.h"
-
 struct iObjectRegistry;
 
 SCF_VERSION (iComponent, 0, 0, 1);
@@ -30,11 +29,8 @@ SCF_VERSION (iComponent, 0, 0, 1);
  */
 struct iComponent : public iBase
 {
-  /**
-   * Initialize the plugin, and return success status.
-   */
-  virtual bool Initialize (iObjectRegistry* object_reg) = 0;
+  /// Initialize the component, and return success status.
+  virtual bool Initialize (iObjectRegistry*) = 0;
 };
 
 #endif // __IUTIL_COMP_H__
-
