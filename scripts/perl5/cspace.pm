@@ -1818,6 +1818,8 @@ sub DESTROY {
 *ClassifyX = *cspacec::csPoly3D_ClassifyX;
 *ClassifyY = *cspacec::csPoly3D_ClassifyY;
 *ClassifyZ = *cspacec::csPoly3D_ClassifyZ;
+*ClassifyAxis = *cspacec::csPoly3D_ClassifyAxis;
+*IsAxisAligned = *cspacec::csPoly3D_IsAxisAligned;
 *CutToPlane = *cspacec::csPoly3D_CutToPlane;
 *SplitWithPlane = *cspacec::csPoly3D_SplitWithPlane;
 *SplitWithPlaneX = *cspacec::csPoly3D_SplitWithPlaneX;
@@ -12555,6 +12557,10 @@ sub CS_DBGHELP_BENCHMARK () { $cspacec::CS_DBGHELP_BENCHMARK }
 sub CS_DBGHELP_TXTDUMP () { $cspacec::CS_DBGHELP_TXTDUMP }
 sub CS_DBGHELP_GFXDUMP () { $cspacec::CS_DBGHELP_GFXDUMP }
 sub CS_DBGHELP_STATETEST () { $cspacec::CS_DBGHELP_STATETEST }
+sub CS_AXIS_NONE () { $cspacec::CS_AXIS_NONE }
+sub CS_AXIS_X () { $cspacec::CS_AXIS_X }
+sub CS_AXIS_Y () { $cspacec::CS_AXIS_Y }
+sub CS_AXIS_Z () { $cspacec::CS_AXIS_Z }
 sub CS_POLY_IN () { $cspacec::CS_POLY_IN }
 sub CS_POLY_ON () { $cspacec::CS_POLY_ON }
 sub CS_POLY_OUT () { $cspacec::CS_POLY_OUT }
