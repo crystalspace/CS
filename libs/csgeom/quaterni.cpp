@@ -64,7 +64,7 @@ csQuaternion csQuaternion::ToAxisAngle() const
 }
 
 
-#define SLERPDELTA 0.0001 // Difference at which to lerp instead of slerp
+#define SLERPDELTA 0.0001f // Difference at which to lerp instead of slerp
 
 csQuaternion csQuaternion::Slerp(const csQuaternion &quat2, float slerp) const
 {
@@ -75,18 +75,18 @@ csQuaternion csQuaternion::Slerp(const csQuaternion &quat2, float slerp) const
 	cosom = x * quat2.x + y * quat2.y + z * quat2.z + r * quat2.r;
 
 	// Make sure the two quaternions are not exactly opposite? (within a little slop)
-	if ((1.0 + cosom) > SLERPDELTA)
+	if ((1.0f + cosom) > SLERPDELTA)
 	{
 		// Are they more than a little bit different?  Avoid a divided by zero and lerp if not
-		if ((1.0 - cosom) > SLERPDELTA) {
+		if ((1.0f - cosom) > SLERPDELTA) {
 			// Yes, do a slerp
 			omega = acos(cosom);
-			invsinom = 1.0 / sin(omega);
-			scale0 = sin((1.0 - slerp) * omega) * invsinom;
+			invsinom = 1.0f / sin(omega);
+			scale0 = sin((1.0f - slerp) * omega) * invsinom;
 			scale1 = sin(slerp * omega) * invsinom;
 		} else {
 			// Not a very big difference, do a lerp
-			scale0 = 1.0 - slerp;
+			scale0 = 1.0f - slerp;
 			scale1 = slerp;
 		}
 		return csQuaternion(scale0 * r + scale1 * quat2.r,
@@ -96,7 +96,7 @@ csQuaternion csQuaternion::Slerp(const csQuaternion &quat2, float slerp) const
 	}
 	// The quaternions are nearly opposite so to avoid a divided by zero error
 	// Calculate a perpendicular quaternion and slerp that direction
-	scale0 = sin((1.0 - slerp) * PI);
+	scale0 = sin((1.0f - slerp) * PI);
 	scale1 = sin(slerp * PI);
 	return csQuaternion(scale0 * r + scale1 * quat2.z,
                             scale0 * x + scale1 * -quat2.y,

@@ -208,7 +208,7 @@ void csCubicSpline::Calculate (float time)
   A = (time_points[idx+1] - time) / (time_points[idx+1] - time_points[idx]);
   B = 1-A;
   float temp = (time_points[idx+1] - time_points[idx]);
-  temp = temp * temp / 6.;
+  temp = temp * temp / 6.0f;
   C = (A*A*A - A) * temp;
   D = (B*B*B - B) * temp;
 }
@@ -256,7 +256,7 @@ void csBSpline::Calculate (float time)
     if (time >= time_points[idx] && time <= time_points[idx+1])
       break;
   }
-  t = 1. - (time_points[idx+1]-time) / (time_points[idx+1]-time_points[idx]);
+  t = 1.0f - (time_points[idx+1]-time) / (time_points[idx+1]-time_points[idx]);
 }
 
 float csBSpline::GetInterpolatedDimension (int dim)

@@ -20,6 +20,7 @@
 #define __CS_QUATERNION_H__
 
 #include "csgeom/math3d.h"
+#include "qsqrt.h"
 
 /**
  * Class for a quaternion.
@@ -77,8 +78,8 @@ public:
    */
   void PrepRotation (float angle, csVector3 vec)
   {
-    double theSin = sin (angle/2);
-    Init (cos (angle/2), vec.x*theSin, vec.y*theSin, vec.z*theSin);
+    double theSin = sin (angle / 2);
+    Init (cos (angle / 2), vec.x*theSin, vec.y*theSin, vec.z*theSin);
   }
 
   /// rotated = q * vec * qConj.
@@ -98,15 +99,15 @@ public:
     if(x*x + y*y + z*z > .999)
     {
       // Severe problems...
-      float inverselen = 1.0/(x*x + y*y + z*z);
+      float inverselen = 1.0f / (x*x + y*y + z*z);
       x *= inverselen;
       y *= inverselen;
       z *= inverselen;
-      r = 0.0;
+      r = 0.0f;
     }
     else
     {
-      r = sqrt(1.0 - x*x - y*y - z*z);
+      r = qsqrt(1.0f - x*x - y*y - z*z);
     }
   }
 

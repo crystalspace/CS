@@ -102,9 +102,9 @@ csSphere csTransform::Other2This (const csSphere& s) const
   // relative to the transform.
   csVector3 v_radius (s.GetRadius ());
   v_radius = Other2ThisRelative (v_radius);
-  float radius = fabs (v_radius.x);
-  if (radius < fabs (v_radius.y)) radius = fabs (v_radius.y);
-  if (radius < fabs (v_radius.z)) radius = fabs (v_radius.z);
+  float radius = (float) fabs (v_radius.x);
+  if (radius < (float) fabs (v_radius.y)) radius = (float) fabs (v_radius.y);
+  if (radius < (float) fabs (v_radius.z)) radius = (float) fabs (v_radius.z);
   news.SetRadius (radius);
   return news;
 }
@@ -147,9 +147,9 @@ csSphere& operator*= (csSphere& p, const csTransform& t)
   // relative to the transform.
   csVector3 v_radius (p.GetRadius ());
   v_radius = t.Other2ThisRelative (v_radius);
-  float radius = fabs (v_radius.x);
-  if (radius < fabs (v_radius.y)) radius = fabs (v_radius.y);
-  if (radius < fabs (v_radius.z)) radius = fabs (v_radius.z);
+  float radius = (float) fabs (v_radius.x);
+  if (radius < (float) fabs (v_radius.y)) radius = (float) fabs (v_radius.y);
+  if (radius < (float) fabs (v_radius.z)) radius = (float) fabs (v_radius.z);
   p.SetRadius (radius);
   return p;
 }
@@ -195,9 +195,9 @@ csSphere csReversibleTransform::This2Other (const csSphere& s) const
   // relative to the transform.
   csVector3 v_radius (s.GetRadius ());
   v_radius = This2OtherRelative (v_radius);
-  float radius = fabs (v_radius.x);
-  if (radius < fabs (v_radius.y)) radius = fabs (v_radius.y);
-  if (radius < fabs (v_radius.z)) radius = fabs (v_radius.z);
+  float radius = (float) fabs (v_radius.x);
+  if (radius < (float) fabs (v_radius.y)) radius = (float) fabs (v_radius.y);
+  if (radius < (float) fabs (v_radius.z)) radius = (float) fabs (v_radius.z);
   news.SetRadius (radius);
   return news;
 }
@@ -247,8 +247,8 @@ void csReversibleTransform::RotateOther (const csVector3& v, float angle)
   csVector3 u = v;
   float ca, sa, omcaux, omcauy, omcauz, uxsa, uysa, uzsa;
   u = csVector3::Unit (u);
-  ca = cos (angle);
-  sa = sin (angle);
+  ca = (float) cos (angle);
+  sa = (float) sin (angle);
   omcaux = (1-ca)*u.x;
   omcauy = (1-ca)*u.y;
   omcauz = (1-ca)*u.z;
@@ -269,8 +269,8 @@ void csReversibleTransform::RotateThis (const csVector3& v, float angle)
   csVector3 u = v;
   float ca, sa, omcaux, omcauy, omcauz, uxsa, uysa, uzsa;
   u = csVector3::Unit (u);
-  ca = cos (angle);
-  sa = sin (angle);
+  ca = (float) cos (angle);
+  sa = (float) sin (angle);
   omcaux = (1-ca)*u.x;
   omcauy = (1-ca)*u.y;
   omcauz = (1-ca)*u.z;

@@ -54,8 +54,8 @@ void csSphere::Union (const csVector3& ocenter, float oradius)
   else
   {
     csVector3 direction = (center-ocenter) / distance;
-    center = (center + direction*radius + ocenter + direction*oradius) * .5;
-    radius = (radius + oradius + distance) * .5;
+    center = (center + direction*radius + ocenter + direction*oradius) * 0.5f;
+    radius = (radius + oradius + distance) * 0.5f;
   }
 }
 

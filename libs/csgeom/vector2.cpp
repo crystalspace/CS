@@ -32,8 +32,8 @@ float csVector2::Norm () const
 
 void csVector2::Rotate (float angle)
 {
-  float s = sin (angle);
-  float c = cos (angle);
+  float s = (float) sin (angle);
+  float c = (float) cos (angle);
   float nx = x * c + y * s;
   y = -x * s + y * c;
   x = nx;
