@@ -57,18 +57,19 @@ FIXED?	[S]  In walktest, if you fire a rocket and manually delete its dynamic
 	     (optimize mode)
 	[S]  cswseng crashes dereferencing a null pointer.  To reproduce: 1)
 	     Launch cswseng.  2) Press "New View".  3) Press "Quit".  4) Crash.
-	     (optimize mode)
+	     (optimize and debug mode)
 	[S]  cswstest crashes with dereference of null pointer.  To reproduce:
 	     1) Launch cswstest.  2) Open Grid test window.  3) Close Grid test
-	     window (or quit app).  4) Crash. (optimize mode)
+	     window (or quit app).  4) Crash. (optimize and debug mode)
 	[S]  mottest crashes dereferencing a null pointer.  To reproduce: 1)
-	     Launch mottest.  2) Press ESC.  3) Crash.  (optimize mode)
+	     Launch mottest.  2) Press ESC.  3) Crash.
+	     (optimize and debug mode)
 	[S]  OpenGL renderer crashes dereferencing null pointer if font manager
 	     is not present.  To reproduce: 1) Launch netmtst with OpenGL
 	     renderer: ./netmtst -video=opengl.  2) Crash.
 	[S]  perftest crashes dereferencing a null pointer when using OpenGL.
 	     To reproduce: 1) Launch perftest with OpenGL.  2) Press space-bar
-	     several times.  3) Crash.  (optimize mode)
+	     several times.  3) Crash.  (optimize and debug mode)
 	[S]  perftest used to print a message at the bottom of the window
 	     briefly describing each test.  These messages are no longer
 	     present.
@@ -93,8 +94,12 @@ FIXED?	[S]  In walktest, if you fire a rocket and manually delete its dynamic
 	     with this program.
 	[S]  Some canvases still clip improperly as shown by the clipping tests
 	     in g2dtest.  The Windows OpenGL canvas is one such canvas.
-	     Possibly, the MacOS/X canvases are also flawed.
+	     Possibly, the MacOS/X canvases are also flawed. Same is true for
+	     xwindows and glx2d canvas. As Jorrit says probably the test and
+	     not the canvas is broken as clipping semantics changed recently.
 	[S]  cs2xml crashes when trying to convert castle.zip.  (optimize mode)
+	[O]  levtool fails to convert castle.zip (after it has been converted
+		with cs2xml)
 	[S] unittest crashes and/or hangs:
 		./unittest -video=software
 		...
@@ -105,7 +110,9 @@ FIXED?	[S]  In walktest, if you fire a rocket and manually delete its dynamic
 	     bbox is above the top border of the screen, then the entire cloth
 	     is culled.  Charles James Leonardo Quarra Cappiello
 	     <charsquarra@hotmail.com> wonders if this problem arose when the
-	     old culler was removed.
+	     old culler was removed. Matze: This is probably a duplicate
+	     because this is probably caused because of the wrong bounding
+	     box.
 	[S]  NetTut doesn't parse it's commandline (one always get an error
 	     message no matter what is entered at the command line).
 		Usage:  ./nettut [server/client] [tcp/udp] [hostname*] [port]
