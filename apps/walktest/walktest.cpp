@@ -1232,7 +1232,7 @@ void WalkTest::Inititalize2DTextures ()
   // the use in the 2D part.
   texh = texlist->FindByName ("cslogo");
   if (texh)
-    texh->flags = CS_TEXTURE_2D;
+    texh->SetFlags (CS_TEXTURE_2D);
 }
 
 

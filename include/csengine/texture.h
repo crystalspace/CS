@@ -26,6 +26,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
+#include "igraphic/image.h"
 
 class csTextureWrapper;
 struct iTextureManager;
@@ -45,44 +46,54 @@ private:
   iTextureHandle* handle;
   // key color
   int key_col_r, key_col_g, key_col_b;
+  /// Texture registration flags
+  int flags;
+
   // The callback which is called just before texture is used.
   csTextureCallback* use_callback;
   // User-data for the callback.
   void* use_data;
 
+  // update our key color with that from the handle
+  inline void UpdateKeyColorFromHandle ();
+  // update our key color with that from the image
+  inline void UpdateKeyColorFromImage ();
+
 public:
-  /// Texture registration flags
-  int flags;
 
   /// Construct a texture handle given a image file
   csTextureWrapper (iImage* Image);
-
-  /**
-   * Construct a csTextureWrapper from a pre-registered AND prepared texture 
-   * handle. The engine takes over responsibility for destroying the texture
-   * handle. To prevent this IncRef () the texture handle.
-   */
+  /// Construct a csTextureWrapper from a pre-registered texture
   csTextureWrapper (iTextureHandle *ith);
-
-  /// Copy constructor
-  csTextureWrapper (csTextureWrapper &th);
   /// Release texture handle
   virtual ~csTextureWrapper ();
 
-  /// Get the texture handle.
-  iTextureHandle* GetTextureHandle () { return handle; }
-
-  /// Change the base iImage
+  /**
+   * Change the base iImage. The changes will not be visible until the
+   * texture is registered again.
+   */
   void SetImageFile (iImage *Image);
   /// Get the iImage.
-  iImage* GetImageFile () { return image; }
+  inline iImage* GetImageFile ();
+
+  /**
+   * Change the texture handle. The changes will immediatly be visible. This
+   * will also change the iImage, key color and registration flags to those of
+   * the new texture.
+   */
+  void SetTextureHandle (iTextureHandle *tex);
+  /// Get the texture handle.
+  inline iTextureHandle* GetTextureHandle ();
 
   /// Set the transparent color.
   void SetKeyColor (int red, int green, int blue);
-
   /// Query the transparent color.
-  void GetKeyColor (int &red, int &green, int &blue)
-  { red = key_col_r; green = key_col_g; blue = key_col_b; }
+  inline void GetKeyColor (int &red, int &green, int &blue);
+
+  /// Set the flags which are used to register the texture
+  inline void SetFlags (int flags);
+  /// Return the flags which are used to register the texture
+  inline int GetFlags ();
 
   /// Register the texture with the texture manager
   void Register (iTextureManager *txtmng);
@@ -92,26 +103,25 @@ public:
    * This is mainly useful for procedural textures which can then
    * choose to update their image.
    */
-  void SetUseCallback (csTextureCallback* callback, void* data)
-  { use_callback = callback; use_data = data; }
+  inline void SetUseCallback (csTextureCallback* callback, void* data);
 
   /**
    * Get the use callback. If there are multiple use callbacks you can
    * use this function to chain.
    */
-  csTextureCallback* GetUseCallback () { return use_callback; }
+  inline csTextureCallback* GetUseCallback ();
 
   /**
    * Get the use data.
    */
-  void* GetUseData () { return use_data; }
+  inline void* GetUseData ();
 
   /**
    * Visit this texture. This should be called by the engine right
    * before using the texture. It is responsible for calling the use
    * callback if there is one.
    */
-  void Visit () { if (use_callback) use_callback (&scfiTextureWrapper, use_data); }
+  inline void Visit ();
 
   CSOBJTYPE;
   DECLARE_OBJECT_INTERFACE;
@@ -122,15 +132,23 @@ public:
   {
     DECLARE_EMBEDDED_IBASE (csTextureWrapper);
 
-    virtual csTextureWrapper *GetPrivateObject() const;
+    virtual csTextureWrapper *GetPrivateObject()
+    {return scfParent;}
+
     virtual iObject *QueryObject();
-    virtual iTextureHandle *GetTextureHandle() const;
+    virtual void SetImageFile (iImage *Image);
+    virtual iImage* GetImageFile ();
+    virtual void SetTextureHandle (iTextureHandle *tex);
+    virtual iTextureHandle* GetTextureHandle ();
     virtual void SetKeyColor (int red, int green, int blue);
-    virtual void GetKeyColor (int &red, int &green, int &blue) const;
+    virtual void GetKeyColor (int &red, int &green, int &blue);
+    virtual void SetFlags (int flags);
+    virtual int GetFlags ();
     virtual void Register (iTextureManager *txtmng);
     virtual void SetUseCallback (csTextureCallback* callback, void* data);
-    virtual csTextureCallback* GetUseCallback () const;
-    virtual void* GetUseData () const;
+    virtual csTextureCallback* GetUseCallback ();
+    virtual void* GetUseData ();
+    virtual void Visit ();
   } scfiTextureWrapper;
 };
 
@@ -176,5 +194,44 @@ public:
     virtual iTextureWrapper *FindByName (const char* iName) const;
   } scfiTextureList;
 };
+
+//--- implementation of inline methods ---------------------------------------
+
+inline iImage* csTextureWrapper::GetImageFile ()
+{ return image; }
+inline iTextureHandle* csTextureWrapper::GetTextureHandle ()
+{ return handle; }
+inline void csTextureWrapper::GetKeyColor (int &red, int &green, int &blue)
+{ red = key_col_r; green = key_col_g; blue = key_col_b; }
+inline void csTextureWrapper::SetUseCallback (csTextureCallback* callback, void* data)
+{ use_callback = callback; use_data = data; }
+inline csTextureCallback* csTextureWrapper::GetUseCallback ()
+{ return use_callback; }
+inline void* csTextureWrapper::GetUseData ()
+{ return use_data; }
+inline void csTextureWrapper::Visit ()
+{ if (use_callback) use_callback (&scfiTextureWrapper, use_data); }
+inline void csTextureWrapper::SetFlags (int f)
+{ flags = f; }
+inline int csTextureWrapper::GetFlags ()
+{ return flags; }
+inline void csTextureWrapper::UpdateKeyColorFromHandle ()
+{
+  if (handle->GetKeyColor ())
+  {
+    UByte r, g, b;
+    handle->GetKeyColor (r, g, b);
+    SetKeyColor ((int)r, (int)g, (int)b);
+  } else
+    key_col_r = -1;
+}
+inline void csTextureWrapper::UpdateKeyColorFromImage ()
+{
+  if(image->HasKeycolor ())
+    image->GetKeycolor( key_col_r, key_col_g, key_col_b );
+  else
+    key_col_r = -1;
+}
+
 
 #endif // __CS_TEXTURE_H__

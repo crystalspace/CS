@@ -1873,7 +1873,7 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
   else
     tex = GetTextures ()->NewTexture (ifile);
 
-  tex->flags = iFlags;
+  tex->SetFlags (iFlags);
   tex->SetName (iName);
 
   // dereference image pointer since tex already incremented it

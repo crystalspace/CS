@@ -41,19 +41,37 @@ SCF_VERSION (iTextureWrapper, 0, 0, 3);
  */
 struct iTextureWrapper : public iBase
 {
-  /// @@@temporary: return the private csTextureWrapper object
-  virtual csTextureWrapper *GetPrivateObject() const = 0;
-
+  /// @@@ return the private object
+  virtual csTextureWrapper *GetPrivateObject() = 0;
   /// Get the iObject for this texture
   virtual iObject *QueryObject() = 0;
 
-  /// Get the texture handle
-  virtual iTextureHandle *GetTextureHandle() const = 0;
+  /**
+   * Change the base iImage. The changes will not be visible until the
+   * texture is registered again.
+   */
+  virtual void SetImageFile (iImage *Image) = 0;
+  /// Get the iImage.
+  virtual iImage* GetImageFile () = 0;
+
+  /**
+   * Change the texture handle. The changes will immediatly be visible. This
+   * will also change the iImage, key color and registration flags to those of
+   * the new texture.
+   */
+  virtual void SetTextureHandle (iTextureHandle *tex) = 0;
+  /// Get the texture handle.
+  virtual iTextureHandle* GetTextureHandle () = 0;
 
   /// Set the transparent color.
   virtual void SetKeyColor (int red, int green, int blue) = 0;
   /// Query the transparent color.
-  virtual void GetKeyColor (int &red, int &green, int &blue) const = 0;
+  virtual void GetKeyColor (int &red, int &green, int &blue) = 0;
+
+  /// Set the flags which are used to register the texture
+  virtual void SetFlags (int flags) = 0;
+  /// Return the flags which are used to register the texture
+  virtual int GetFlags () = 0;
 
   /// Register the texture with the texture manager
   virtual void Register (iTextureManager *txtmng) = 0;
@@ -64,15 +82,24 @@ struct iTextureWrapper : public iBase
    * choose to update their image.
    */
   virtual void SetUseCallback (csTextureCallback* callback, void* data) = 0;
+
   /**
    * Get the use callback. If there are multiple use callbacks you can
    * use this function to chain.
    */
-  virtual csTextureCallback* GetUseCallback () const = 0;
+  virtual csTextureCallback* GetUseCallback () = 0;
+
   /**
-   * Get the data for the use callback.
+   * Get the use data.
    */
-  virtual void* GetUseData () const = 0;
+  virtual void* GetUseData () = 0;
+
+  /**
+   * Visit this texture. This should be called by the engine right
+   * before using the texture. It is responsible for calling the use
+   * callback if there is one.
+   */
+  virtual void Visit () = 0;
 };
 
 

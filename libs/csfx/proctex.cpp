@@ -76,7 +76,7 @@ bool csProcTexture::Initialize (iSystem* system)
   if (key_color)
     tex->SetKeyColor (key_red, key_green, key_blue);
 
-  tex->flags |= texFlags;
+  tex->SetFlags (tex->GetFlags() | texFlags);
   tex->SetName (GetName ());
   if (use_cb)
     tex->SetUseCallback (ProcCallback, (void*)this);

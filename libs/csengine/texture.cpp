@@ -41,51 +41,29 @@ IMPLEMENT_OBJECT_INTERFACE (csTextureWrapper)
 IMPLEMENT_OBJECT_INTERFACE_END
 
 csTextureWrapper::csTextureWrapper (iImage* Image) :
-  csPObject (), handle (NULL), flags (CS_TEXTURE_3D)
+  csPObject (), handle (NULL), flags (CS_TEXTURE_3D), use_callback (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
-  use_callback = NULL;
-  (image = Image)->IncRef ();
-  key_col_r = -1;
-  if(image->HasKeycolor ())
-    image->GetKeycolor( key_col_r, key_col_g, key_col_b );
-  csEngine::current_engine->AddToCurrentRegion (this);
-}
 
-csTextureWrapper::csTextureWrapper (csTextureWrapper &th) :
-  csPObject (), handle (NULL)
-{
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
-  use_callback = NULL;
-  flags = th.flags;
-  (image = th.image)->IncRef ();
-  key_col_r = th.key_col_r;
-  key_col_g = th.key_col_g;
-  key_col_b = th.key_col_b;
-  handle = th.GetTextureHandle ();
-  SetName (th.GetName ());
-  if (handle)
-    SetKeyColor (key_col_r, key_col_g, key_col_b);
+  (image = Image)->IncRef ();
+  UpdateKeyColorFromImage ();
+
+  // @@@ ?????
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
-  csPObject (), image (NULL)
+  csPObject (), image (NULL), use_callback (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
-  use_callback = NULL;
-  ith->IncRef ();
-  handle = ith;
+
+  (handle = ith)->IncRef ();
   flags = ith->GetFlags ();
-  if (ith->GetKeyColor ())
-  {
-    UByte r, g, b;
-    ith->GetKeyColor (r, g, b);
-    SetKeyColor ((int)r, (int)g, (int)b);
-  }
+  UpdateKeyColorFromHandle ();
+
+  // @@@ ?????
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -102,6 +80,21 @@ void csTextureWrapper::SetImageFile (iImage *Image)
   if (image)
     image->DecRef ();
   (image = Image)->IncRef ();
+
+  UpdateKeyColorFromImage ();
+}
+
+void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
+{
+  if (image)
+    image->DecRef ();
+  if (handle)
+    handle->DecRef ();
+
+  image = NULL;
+  (handle = tex)->IncRef ();
+  flags = handle->GetFlags ();
+  UpdateKeyColorFromHandle ();
 }
 
 void csTextureWrapper::SetKeyColor (int red, int green, int blue)
@@ -121,9 +114,13 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   // smgh 22/07/00
   //if (handle) handle->DecRef ();
 
-  // don't register the texture twice. Also stop if we have no image
-  if (handle || !image)
+  // if we have no image, we cannot register it.
+  if (!image)
     return;
+
+  // release old handle
+  if (handle)
+    handle->DecRef ();
 
   // Now we check the size of the loaded image. Having an image, that
   // is not a power of two will result in strange errors while
@@ -146,50 +143,34 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
     SetKeyColor (key_col_r, key_col_g, key_col_b);
 }
 
-csTextureWrapper *csTextureWrapper::TextureWrapper::GetPrivateObject() const
-{
-  return scfParent;
-}
-
-iTextureHandle *csTextureWrapper::TextureWrapper::GetTextureHandle() const
-{
-  return scfParent->GetTextureHandle();
-}
-
 iObject *csTextureWrapper::TextureWrapper::QueryObject()
-{
-  return scfParent;
-}
-
+{ return scfParent; }
+void csTextureWrapper::TextureWrapper::SetImageFile (iImage *Image)
+{ scfParent->SetImageFile (Image); }
+iImage* csTextureWrapper::TextureWrapper::GetImageFile ()
+{ return scfParent->GetImageFile (); }
+void csTextureWrapper::TextureWrapper::SetTextureHandle (iTextureHandle *tex)
+{ scfParent->SetTextureHandle (tex); }
+iTextureHandle* csTextureWrapper::TextureWrapper::GetTextureHandle ()
+{ return scfParent->GetTextureHandle (); }
 void csTextureWrapper::TextureWrapper::SetKeyColor (int red, int green, int blue)
-{
-  scfParent->SetKeyColor (red, green, blue);
-}
-
-void csTextureWrapper::TextureWrapper::GetKeyColor (int &red, int &green, int &blue) const
-{
-  scfParent->GetKeyColor (red, green, blue);
-}
-
+{ scfParent->SetKeyColor (red, green, blue); }
+void csTextureWrapper::TextureWrapper::GetKeyColor (int &red, int &green, int &blue)
+{ scfParent->GetKeyColor (red, green, blue); }
+void csTextureWrapper::TextureWrapper::SetFlags (int flags)
+{ scfParent->SetFlags (flags); }
+int csTextureWrapper::TextureWrapper::GetFlags ()
+{ return scfParent->GetFlags (); }
 void csTextureWrapper::TextureWrapper::Register (iTextureManager *txtmng)
-{
-  scfParent->Register(txtmng);
-}
-
+{ scfParent->Register (txtmng); }
 void csTextureWrapper::TextureWrapper::SetUseCallback (csTextureCallback* callback, void* data)
-{
-  scfParent->SetUseCallback (callback, data);
-}
-
-csTextureCallback* csTextureWrapper::TextureWrapper::GetUseCallback () const
-{
-  return scfParent->GetUseCallback();
-}
-
-void* csTextureWrapper::TextureWrapper::GetUseData () const
-{
-  return scfParent->GetUseData();
-}
+{ scfParent->SetUseCallback (callback, data); }
+csTextureCallback* csTextureWrapper::TextureWrapper::GetUseCallback ()
+{ return scfParent->GetUseCallback (); }
+void* csTextureWrapper::TextureWrapper::GetUseData ()
+{ return scfParent->GetUseData (); }
+void csTextureWrapper::TextureWrapper::Visit ()
+{ scfParent->Visit (); }
 
 //------------------------------------------------------- csTextureList -----//
 
