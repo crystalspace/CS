@@ -33,7 +33,7 @@ void csString::SetSize (size_t NewSize)
 
   Data = (char *)realloc (Data, MaxSize = NewSize);
 
-  if (Size > MaxSize)
+  if (Size >= MaxSize)
     Size = MaxSize, Data [Size] = 0;
 }
 
@@ -52,7 +52,7 @@ csString &csString::Insert (size_t iPos, const csString &iStr)
 
   size_t sl = iStr.Length ();
   size_t NewSize = sl + Length ();
-  if (NewSize > MaxSize)
+  if (NewSize >= MaxSize)
     SetSize (NewSize);
   memcpy (Data + iPos + sl, Data + iPos, Size - iPos);
   memcpy (Data + iPos, iStr.GetData (), sl);
@@ -76,7 +76,7 @@ csString &csString::Overwrite (size_t iPos, const csString &iStr)
 
   size_t sl = iStr.Length ();
   size_t NewSize = iPos + sl;
-  if (NewSize > MaxSize)
+  if (NewSize >= MaxSize)
     SetSize (NewSize);
   memcpy (Data + iPos, iStr.GetData (), sl);
   Data [Size = NewSize] = 0;
@@ -93,7 +93,7 @@ csString &csString::Append (const csString &iStr, size_t iCount)
     return *this;
 
   size_t NewSize = Size + iCount;
-  if (NewSize > MaxSize)
+  if (NewSize >= MaxSize)
     SetSize (NewSize);
 
   memcpy (Data + Size, iStr.GetData (), iCount);
@@ -111,7 +111,7 @@ csString &csString::Append (const char *iStr, size_t iCount)
     return *this;
 
   size_t NewSize = Size + iCount;
-  if (NewSize > MaxSize)
+  if (NewSize >= MaxSize)
     SetSize (NewSize);
 
   memcpy (Data + Size, iStr, iCount);
