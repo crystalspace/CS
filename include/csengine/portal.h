@@ -207,7 +207,7 @@ public:
   virtual void SetMirror (iPolygon3D *iPoly);
 
   /// Set the missing sector callback.
-  virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
+  virtual void SetPortalSectorCallback (csPortalSectorCallback *cb,
   	void* cbData)
   {
     sector_cb = cb;

@@ -115,7 +115,7 @@ struct iPortal : public iBase
   virtual void SetMirror (iPolygon3D *iPoly) = 0;
 
   /// Set the missing sector callback.
-  virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
+  virtual void SetPortalSectorCallback (csPortalSectorCallback *cb,
   	void* cbData) = 0;
   /// Get the missing sector callback.
   virtual csPortalSectorCallback* GetPortalSectorCallback () = 0;

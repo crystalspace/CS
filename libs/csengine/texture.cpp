@@ -74,6 +74,7 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
   CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   use_callback = NULL;
   ith->IncRef ();
+  handle = ith;
   flags = ith->GetFlags ();
   if (ith->GetKeyColor ())
   {
@@ -81,7 +82,6 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
     ith->GetKeyColor (r, g, b);
     SetKeyColor ((int)r, (int)g, (int)b);
   }
-  handle = ith;
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -137,6 +137,12 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   if (handle)
     SetKeyColor (key_col_r, key_col_g, key_col_b);
 }
+
+csTextureWrapper *csTextureWrapper::TextureWrapper::GetPrivateObject() const
+{
+  return scfParent;
+}
+
 
 //------------------------------------------------------- csTextureList -----//
 

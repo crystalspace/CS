@@ -31,11 +31,13 @@ struct iImageLoader;
 struct iSoundLoader;
 struct iEngine;
 struct iVFS;
+struct iGraphics3D;
+struct iSoundRender;
+
 struct csRGBcolor;
 struct iMotion;
 struct iMotionAnim;
 struct iSkeletonLimb;
-struct iPlugIn;
 class csTextureWrapper;
 class csMaterialWrapper;
 class csPolygonTemplate;
@@ -234,14 +236,6 @@ public:
   /// Load library from a VFS file
   static bool LoadLibraryFile (csEngine*, const char* filename);
 
-  /**
-   * Load a texture and add it to the engine.
-   * The texture will be registered for 3d use only.
-   * A corresponding material with the same name will be added too.
-   */
-  static csTextureWrapper* LoadTexture (csEngine*, const char* name,
-    const char* fname);
-
   /// Load a Mesh Object Factory from the map file.
   static csMeshFactoryWrapper* LoadMeshObjectFactory (csEngine*, const char* fname);
 
@@ -279,6 +273,10 @@ public:
     iSoundLoader *SoundLoader;
     // engine
     iEngine *Engine;
+    // graphics renderer
+    iGraphics3D *G3D;
+    // sound renderer
+    iSoundRender *SoundRender;
   } tmpWrap;
 
   // constructor
@@ -288,7 +286,9 @@ public:
   // initialize the plug-in
   virtual bool Initialize(iSystem *System);
 
-  virtual iImage *LoadImage (const char* name);
+  virtual iImage *LoadImage (const char *fname);
+  virtual iTextureHandle *LoadTexture (const char *fname, int flags);
+  virtual iTextureWrapper *LoadTexture (const char *name, const char *fname, int flags);
 };
 
 #endif // __CS_CSLOADER_H__

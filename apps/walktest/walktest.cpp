@@ -72,6 +72,7 @@
 #include "iengine/collider.h"
 #include "iengine/motion.h"
 #include "ivaria/perfstat.h"
+#include "imap/parser.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
@@ -111,6 +112,7 @@ WalkTest::WalkTest () :
   wMissile_whoosh = NULL;
   cslogo = NULL;
   engine = NULL;
+  LevelLoader = NULL;
   anim_sky = NULL;
   anim_dirlight = NULL;
 
@@ -194,6 +196,7 @@ WalkTest::~WalkTest ()
   delete [] recorded_perf_stats_name;
   if (perf_stats) perf_stats->DecRef ();
   if (Engine) Engine->DecRef ();
+  if (LevelLoader) LevelLoader->DecRef();
 }
 
 void WalkTest::SetSystemDefaults (iConfigManager *Config)
@@ -1311,6 +1314,14 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   }
   engine = Engine->GetCsEngine ();
 
+  // Find the level loader plugin
+  LevelLoader = QUERY_PLUGIN_ID (Sys, CS_FUNCID_LVLLOADER, iLoaderNew);
+  if (!LevelLoader)
+  {
+    Printf (MSG_FATAL_ERROR, "No level loader plugin!\n");
+    return false;
+  }
+
   // performance statistics module, also takes care of fps
   perf_stats = QUERY_PLUGIN (this, iPerfStats);
   if (!perf_stats)
@@ -1363,8 +1374,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     do_cd = true;
 
     // Load two textures that are used in the maze.
-    csLoader::LoadTexture (engine, "txt", "/lib/std/stone4.gif");
-    csLoader::LoadTexture (engine, "txt2", "/lib/std/mystone2.gif");
+    LevelLoader->LoadTexture ("txt", "/lib/std/stone4.gif");
+    LevelLoader->LoadTexture ("txt2", "/lib/std/mystone2.gif");
 
     if (do_infinite)
     {

@@ -123,6 +123,8 @@ public:
   struct TextureWrapper : public iTextureWrapper
   {
     DECLARE_EMBEDDED_IBASE (csTextureWrapper);
+
+    virtual csTextureWrapper *GetPrivateObject() const;
   } scfiTextureWrapper;
 };
 

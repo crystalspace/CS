@@ -22,7 +22,9 @@
 #include "csutil/scf.h"
 #include "cstypes.h"
 
-SCF_VERSION (iTextureWrapper, 0, 0, 1);
+class csTextureWrapper;
+
+SCF_VERSION (iTextureWrapper, 0, 0, 2);
 
 /**
  * This class represents a texture wrapper which holds
@@ -31,6 +33,8 @@ SCF_VERSION (iTextureWrapper, 0, 0, 1);
  */
 struct iTextureWrapper : public iBase
 {
+  /// @@@temporary: return the private csTextureWrapper object
+  virtual csTextureWrapper *GetPrivateObject() const = 0;
 };
 
 #endif // __IENGINE_TEXTURE_H__

@@ -256,7 +256,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
   walls_state->DecRef ();
 
-  csLoader::LoadTexture (engine, "seagull", "/lib/std/seagull.gif");
+  LevelLoader->LoadTexture ("seagull", "/lib/std/seagull.gif");
   csMaterialWrapper *sg = engine->GetMaterials ()->FindByName("seagull");
   flock = new Flock(engine, 10, QUERY_INTERFACE(sg, iMaterialWrapper), 
     QUERY_INTERFACE(room, iSector));

@@ -50,6 +50,7 @@ struct iCollideSystem;
 struct iPerfStats;
 struct iConfigFile;
 struct iMaterialHandle;
+struct iLoaderNew;
 
 // Several map modes.
 #define MAP_OFF 0
@@ -259,6 +260,8 @@ public:
   /// The main engine interface
   /// (when interface will be complete, csEngine will not be needed anymore)
   iEngine *Engine;
+  /// The level loader
+  iLoaderNew *LevelLoader;
 
   /// The view on the world.
   csView* view;

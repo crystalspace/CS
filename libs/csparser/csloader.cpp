@@ -56,6 +56,7 @@
 #include "isound/renderer.h"
 #include "iterrain/object.h"
 #include "iengine/terrain.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "isys/vfs.h"
 #include "igraphic/image.h"
@@ -718,7 +719,7 @@ void csLoader::txt_process (char *name, char* buf)
         else if (strcasecmp (params, "no") == 0)
           flags &= ~CS_TEXTURE_DITHER;
         else
-          CsPrintf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
+          CsPrintf (MSG_WARNING, "Warning! Invalid DITHER() value, 'yes' or 'no' expected\n");
         break;
     }
   }
@@ -729,28 +730,13 @@ void csLoader::txt_process (char *name, char* buf)
     fatal_exit (0, false);
   }
 
-  iImage *image = GlobalLoader->LoadImage (filename);
-  if (!image)
-    return;
-
   // The size of image should be checked before registering it with
   // the 3D or 2D driver... if the texture is used for 2D only, it can
   // not have power-of-two dimensions...
 
-  // Add a default material with the same name as the texture.
-//csMaterial *material = new csMaterial ();
-//csMaterialWrapper *mat = Engine->GetMaterials ()->NewMaterial (material);
-
-  csTextureWrapper *tex = Engine->GetTextures ()->NewTexture (image);
-//material->SetTextureWrapper (tex);
-  tex->flags = flags;
-  tex->SetName (name);
-  // dereference image pointer since tex already incremented it
-  image->DecRef ();
-//material->DecRef ();
-
-  if (do_transp)
-    tex->SetKeyColor (QInt (transp.red * 255.99),
+  iTextureWrapper *tex = GlobalLoader->LoadTexture (name, filename, flags);
+  if (tex && do_transp)
+    tex->GetPrivateObject()->SetKeyColor (QInt (transp.red * 255.99),
       QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
 }
 
@@ -1475,28 +1461,6 @@ bool csLoader::LoadLibraryFile (csEngine* engine, const char* fname)
   
   loaded_plugins.DeleteAll ();
   return retcode;
-}
-
-csTextureWrapper* csLoader::LoadTexture (csEngine* engine, const char* name, const char* fname)
-{
-  if (!GlobalLoader) return NULL;
-
-  Engine = engine;
-  iImage *image = GlobalLoader->LoadImage (fname);
-  if (!image)
-    return NULL;
-  csTextureWrapper *th = engine->GetTextures ()->NewTexture (image);
-  th->SetName (name);
-  // dereference image pointer since th already incremented it
-  image->DecRef ();
-
-  csMaterial* material = new csMaterial ();
-  csMaterialWrapper* mat = Engine->GetMaterials ()->NewMaterial (material);
-  mat->SetName (name);
-  material->SetTextureWrapper (th);
-  material->DecRef ();
-
-  return th;
 }
 
 //---------------------------------------------------------------------------
@@ -2490,6 +2454,8 @@ bool csLoader::LoadMotion (iMotion* mot, char* buf)
 
 /************ iLoaderNew implementation **************/
 
+//--- Plugin stuff -----------------------------------------------------------
+
 iLoaderNew *csLoader::GlobalLoader = NULL;
 
 IMPLEMENT_IBASE(csLoader);
@@ -2525,6 +2491,8 @@ csLoader::~csLoader()
   DEC_REF(tmpWrap.ImageLoader);
   DEC_REF(tmpWrap.SoundLoader);
   DEC_REF(tmpWrap.Engine);
+  DEC_REF(tmpWrap.G3D);
+  DEC_REF(tmpWrap.SoundRender);
 
   GlobalLoader = NULL;
 }
@@ -2548,14 +2516,25 @@ bool csLoader::Initialize(iSystem *System)
   GET_PLUGIN(tmpWrap.ImageLoader, CS_FUNCID_IMGLOADER, iImageLoader, "image loader");
   GET_PLUGIN(tmpWrap.SoundLoader, CS_FUNCID_SNDLOADER, iSoundLoader, "sound loader");
   GET_PLUGIN(tmpWrap.Engine, CS_FUNCID_ENGINE, iEngine, "engine");
+  GET_PLUGIN(tmpWrap.G3D, CS_FUNCID_VIDEO, iGraphics3D, "video driver");
+  GET_PLUGIN(tmpWrap.SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound driver");
 
   return true;
 }
 
+//--- Image and Texture loading ----------------------------------------------
+
 iImage* csLoader::LoadImage (const char* name)
 {
-  if (!tmpWrap.Engine || !tmpWrap.ImageLoader)
+  if (!tmpWrap.ImageLoader)
      return NULL;
+
+  int Format;
+  if (tmpWrap.Engine) {
+    Format = tmpWrap.Engine->GetTextureFormat ();
+  } else if (tmpWrap.G3D) {
+    Format = tmpWrap.G3D->GetTextureManager()->GetTextureFormat();
+  } else return NULL;
 
   iImage *ifile = NULL;
   iDataBuffer *buf = tmpWrap.VFS->ReadFile (name);
@@ -2567,8 +2546,7 @@ iImage* csLoader::LoadImage (const char* name)
     return NULL;
   }
 
-  ifile = tmpWrap.ImageLoader->Load (buf->GetUint8 (), buf->GetSize (),
-    tmpWrap.Engine->GetTextureFormat ());
+  ifile = tmpWrap.ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format);
   buf->DecRef ();
 
   if (!ifile)
@@ -2582,4 +2560,45 @@ iImage* csLoader::LoadImage (const char* name)
   xname->DecRef ();
 
   return ifile;
+}
+
+iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags)
+{
+  if (!tmpWrap.G3D)
+    return NULL;
+
+  iImage *Image = LoadImage(fname);
+  if (!Image)
+    return NULL;
+
+  iTextureHandle *TexHandle = tmpWrap.G3D->GetTextureManager()->
+    RegisterTexture (Image, Flags);
+  if (!TexHandle)
+    System->Printf(MSG_WARNING, "cannot create texture from '%s'.", fname);
+
+  return TexHandle;
+}
+
+iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname, int flags)
+{
+  if (!tmpWrap.Engine)
+    return NULL;
+  
+  iTextureHandle *TexHandle = LoadTexture(fname, flags);
+  if (!TexHandle)
+    return NULL;
+
+  csTextureWrapper *TexWrapper = tmpWrap.Engine->GetCsEngine()->
+    GetTextures()->NewTexture(TexHandle);
+  TexWrapper->SetName (name);
+
+  csMaterial *Material = new csMaterial ();
+  Material->SetTextureWrapper (TexWrapper);
+
+  iMaterialWrapper *MatWrapper = tmpWrap.Engine->GetMaterialList()->
+    NewMaterial (Material);
+  MatWrapper->GetPrivateObject()->SetName (name);
+  Material->DecRef ();
+
+  return &(TexWrapper->scfiTextureWrapper);
 }

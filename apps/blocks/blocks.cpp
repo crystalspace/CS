@@ -1783,37 +1783,37 @@ void Blocks::InitTextures ()
   if (engine) engine->Clear ();
   csEngine* const e = Sys->engine;
 
-  csLoader::LoadTexture (e, "pillar", "stone4.png");
+  LevelLoader->LoadTexture ("pillar", "stone4.png");
   Sys->set_pillar_material (e->FindMaterial ("pillar"));
 
-  csLoader::LoadTexture (e, "cube", "cube.png");
+  LevelLoader->LoadTexture ("cube", "cube.png");
   Sys->set_cube_material (e->FindMaterial ("cube"));
-  csLoader::LoadTexture (e, "raster", "clouds_thick1.jpg");
+  LevelLoader->LoadTexture ("raster", "clouds_thick1.jpg");
   Sys->set_raster_material (e->FindMaterial ("raster"));
-  csLoader::LoadTexture (e, "room", "mystone2.png");
-  csLoader::LoadTexture (e, "clouds", "clouds.jpg");
+  LevelLoader->LoadTexture ("room", "mystone2.png");
+  LevelLoader->LoadTexture ("clouds", "clouds.jpg");
 
-  csLoader::LoadTexture (e, "cubef1", "cubef1.png");
+  LevelLoader->LoadTexture ("cubef1", "cubef1.png");
   Sys->set_cube_f1_material (e->FindMaterial ("cubef1"));
-  csLoader::LoadTexture (e, "cubef2", "cubef2.png");
+  LevelLoader->LoadTexture ("cubef2", "cubef2.png");
   Sys->set_cube_f2_material (e->FindMaterial ("cubef2"));
-  csLoader::LoadTexture (e, "cubef3", "cubef3.png");
+  LevelLoader->LoadTexture ("cubef3", "cubef3.png");
   Sys->set_cube_f3_material (e->FindMaterial ("cubef3"));
-  csLoader::LoadTexture (e, "cubef4", "cubef4.png");
+  LevelLoader->LoadTexture ("cubef4", "cubef4.png");
   Sys->set_cube_f4_material (e->FindMaterial ("cubef4"));
 
-  csLoader::LoadTexture (e, "menu_novice", "novice.png");
-  csLoader::LoadTexture (e, "menu_back", "back.png");
-  csLoader::LoadTexture (e, "menu_average", "average.png");
-  csLoader::LoadTexture (e, "menu_expert", "expert.png");
-  csLoader::LoadTexture (e, "menu_high", "high.png");
-  csLoader::LoadTexture (e, "menu_quit", "quit.png");
-  csLoader::LoadTexture (e, "menu_3x3", "p3x3.png");
-  csLoader::LoadTexture (e, "menu_4x4", "p4x4.png");
-  csLoader::LoadTexture (e, "menu_5x5", "p5x5.png");
-  csLoader::LoadTexture (e, "menu_6x6", "p6x6.png");
-  csLoader::LoadTexture (e, "menu_keyconfig", "keys.png");
-  csLoader::LoadTexture (e, "menu_start", "start.png");
+  LevelLoader->LoadTexture ("menu_novice", "novice.png");
+  LevelLoader->LoadTexture ("menu_back", "back.png");
+  LevelLoader->LoadTexture ("menu_average", "average.png");
+  LevelLoader->LoadTexture ("menu_expert", "expert.png");
+  LevelLoader->LoadTexture ("menu_high", "high.png");
+  LevelLoader->LoadTexture ("menu_quit", "quit.png");
+  LevelLoader->LoadTexture ("menu_3x3", "p3x3.png");
+  LevelLoader->LoadTexture ("menu_4x4", "p4x4.png");
+  LevelLoader->LoadTexture ("menu_5x5", "p5x5.png");
+  LevelLoader->LoadTexture ("menu_6x6", "p6x6.png");
+  LevelLoader->LoadTexture ("menu_keyconfig", "keys.png");
+  LevelLoader->LoadTexture ("menu_start", "start.png");
 }
 
 void Blocks::DrawMenu (int menu)

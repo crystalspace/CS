@@ -21,6 +21,7 @@
 #define __IMAP_PARSER_H__
 
 #include "isys/plugin.h"
+#include "ivideo/txtmgr.h"
 
 struct iImage;
 struct iTextureHandle;
@@ -63,7 +64,21 @@ SCF_VERSION (iLoaderNew, 0, 0, 1);
 struct iLoaderNew : public iPlugIn
 {
   /// Load an image file
-  virtual iImage *LoadImage (const char* name) = 0;
+  virtual iImage *LoadImage (const char* Filename) = 0;
+  /**
+   * Load an image and create a texture handle from it. The 'Flags' parameter
+   * accepts the flags described in ivideo/txtmgr.h.
+   */
+  virtual iTextureHandle *LoadTexture (const char* Filename,
+    int Flags = CS_TEXTURE_3D) = 0;
+  /**
+   * Load a texture and register it with the engine. 'Name' is the name that
+   * the engine will use for the wrapper. The 'Flags' parameter accepts the
+   * flags described in ivideo/txtmgr.h. This function also creates a
+   * material for the texture.
+   */
+  virtual iTextureWrapper *LoadTexture (const char *Name,
+    const char *FileName, int Flags = CS_TEXTURE_3D) = 0;
 };
 
 #endif // __IMAP_PARSER_H__
