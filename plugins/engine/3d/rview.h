@@ -99,11 +99,10 @@ public:
   /// Get the original camera.
   virtual iCamera* GetOriginalCamera () const { return original_camera; }
 
-  SCF_DECLARE_IBASE;
-
+  /// Setup the clip planes for the current context and camera (in world space).
+  void SetupClipPlanes ();
   /// Get the current render context.
-  virtual csRenderContext* GetRenderContext () { return ctxt; }
-
+  csRenderContext* GetCsRenderContext () const { return ctxt; }
   /**
    * Create a new render context. This is typically used
    * when going through a portal. Note that you should remember
@@ -111,21 +110,115 @@ public:
    * The render context will get all the values from the current context
    * (with SCF references properly incremented).
    */
-  virtual void CreateRenderContext ();
-
+  void CreateRenderContext ();
   /**
    * Restore a render context. Use this to restore a previously overwritten
    * render context. This function will take care of properly cleaning
    * up the current render context.
    */
-  virtual void RestoreRenderContext (csRenderContext* original);
+  void RestoreRenderContext (csRenderContext* original);
 
   /**
    * Create a new camera in the current render context. This function
    * will create a new camera based on the current one. The new camera
    * reference is returned.
    */
-  virtual iCamera* CreateNewCamera ();
+  iCamera* CreateNewCamera ();
+
+  /**
+   * Set the previous sector.
+   */
+  void SetPreviousSector (iSector* s) { ctxt->previous_sector = s; }
+  /**
+   * Set the current sector.
+   */
+  void SetThisSector (iSector* s) { ctxt->this_sector = s; }
+
+  /**
+   * Get render recursion level.
+   */
+  int GetRenderRecursionLevel () const { return ctxt->draw_rec_level; }
+  /**
+   * Set render recursion level.
+   */
+  void SetRenderRecursionLevel (int rec)
+  {
+    ctxt->draw_rec_level = rec;
+  }
+  /// Set the last portal.
+  void SetLastPortal (iPortal* por)
+  {
+    ctxt->last_portal = por;
+  }
+  /// Set the 2D clipper for this view.
+  void SetClipper (iClipper2D* clip);
+  /// Set the view frustum at z=1.
+  void SetFrustum (float lx, float rx, float ty, float by);
+
+  ///
+  void UseClipPlane (bool u) { ctxt->do_clip_plane = u; }
+  ///
+  void UseClipFrustum (bool u) { ctxt->do_clip_frustum = u; }
+  /**
+   * Set the 3D clip plane that should be used to clip all geometry.
+   */
+  void SetClipPlane (const csPlane3& p) { ctxt->clip_plane = p; }
+  /**
+   * Get the 3D clip plane that should be used to clip all geometry.
+   * If this function returns false then this plane is invalid and should
+   * not be used. Otherwise it must be used to clip the object before
+   * drawing.
+   */
+  bool GetClipPlane (csPlane3& pl) const
+  {
+    pl = ctxt->clip_plane;
+    return ctxt->do_clip_plane;
+  }
+  /// Get the clip plane.
+  const csPlane3& GetClipPlane () const
+  {
+    return ctxt->clip_plane;
+  }
+  /// Get the clip plane.
+  csPlane3& GetClipPlane ()
+  {
+    return ctxt->clip_plane;
+  }
+  /**
+   * If true then we have to clip all objects to the portal frustum
+   * (returned with GetClipper()). Normally this is not needed but
+   * some portals require this. If GetClipPlane() returns true then the
+   * value of this function is also implied to be true.
+   */
+  bool IsClipperRequired () const { return ctxt->do_clip_frustum; }
+
+  /**
+   * Every fogged sector we encountered results in an extra structure in the
+   * following list. This is only used if we are doing vertex based fog.
+   * This function will return the first csFogInfo instance.
+   */
+  csFogInfo* GetFirstFogInfo () { return ctxt->fog_info; }
+  /**
+   * Set the first fog info.
+   */
+  void SetFirstFogInfo (csFogInfo* fi)
+  {
+    ctxt->fog_info = fi;
+    ctxt->added_fog_info = true;
+  }
+  /**
+   * Return true if fog info has been added.
+   */
+  bool AddedFogInfo () const { return ctxt->added_fog_info; }
+  /**
+   * Reset fog info.
+   */
+  void ResetFogInfo () { ctxt->added_fog_info = false; }
+
+  SCF_DECLARE_IBASE;
+
+  /// Get the current render context.
+  virtual csRenderContext* GetRenderContext () { return ctxt; }
 
   /// Get the engine.
   virtual iEngine* GetEngine () { return (iEngine*)engine; }
@@ -133,8 +226,6 @@ public:
   virtual iGraphics2D* GetGraphics2D () { return g2d; }
   /// Get the 3D graphics subsystem.
   virtual iGraphics3D* GetGraphics3D () { return g3d; }
-  /// Set the view frustum at z=1.
-  virtual void SetFrustum (float lx, float rx, float ty, float by);
   /// Get the frustum.
   virtual void GetFrustum (float& lx, float& rx, float& ty, float& by)
   {
@@ -150,62 +241,6 @@ public:
 
   /// Get the 2D clipper for this view.
   virtual iClipper2D* GetClipper () { return ctxt->iview; }
-  /// Set the 2D clipper for this view.
-  virtual void SetClipper (iClipper2D* clip);
-
-  /**
-   * If true then we have to clip all objects to the portal frustum
-   * (returned with GetClipper()). Normally this is not needed but
-   * some portals require this. If GetClipPlane() returns true then the
-   * value of this function is also implied to be true.
-   */
-  virtual bool IsClipperRequired () { return ctxt->do_clip_frustum; }
-  /**
-   * Get the 3D clip plane that should be used to clip all geometry.
-   * If this function returns false then this plane is invalid and should
-   * not be used. Otherwise it must be used to clip the object before
-   * drawing.
-   */
-  virtual bool GetClipPlane (csPlane3& pl)
-  {
-    pl = ctxt->clip_plane;
-    return ctxt->do_clip_plane;
-  }
-  /// Get the clip plane.
-  virtual csPlane3& GetClipPlane ()
-  {
-    return ctxt->clip_plane;
-  }
-  ///
-  virtual void SetClipPlane (const csPlane3& p) { ctxt->clip_plane = p; }
-  ///
-  virtual void UseClipPlane (bool u) { ctxt->do_clip_plane = u; }
-  ///
-  virtual void UseClipFrustum (bool u) { ctxt->do_clip_frustum = u; }
-
-
-  /**
-   * Every fogged sector we encountered results in an extra structure in the
-   * following list. This is only used if we are doing vertex based fog.
-   * This function will return the first csFogInfo instance.
-   */
-  virtual csFogInfo* GetFirstFogInfo () { return ctxt->fog_info; }
-  /**
-   * Set the first fog info.
-   */
-  virtual void SetFirstFogInfo (csFogInfo* fi)
-  {
-    ctxt->fog_info = fi;
-    ctxt->added_fog_info = true;
-  }
-  /**
-   * Return true if fog info has been added.
-   */
-  virtual bool AddedFogInfo () { return ctxt->added_fog_info; }
-  /**
-   * Reset fog info.
-   */
-  virtual void ResetFogInfo () { ctxt->added_fog_info = false; }
 
   /**
    * Get the current camera.
@@ -273,39 +308,12 @@ public:
   virtual iSector* GetThisSector () { return ctxt->this_sector; }
 
   /**
-   * Set the current sector.
-   */
-  virtual void SetThisSector (iSector* s) { ctxt->this_sector = s; }
-
-  /**
    * Get previous sector.
    */
   virtual iSector* GetPreviousSector () { return ctxt->previous_sector; }
 
-  /**
-   * Set the previous sector.
-   */
-  virtual void SetPreviousSector (iSector* s) { ctxt->previous_sector = s; }
-
   /// Get the last portal.
   virtual iPortal* GetLastPortal () { return ctxt->last_portal; }
-  /// Set the last portal.
-  virtual void SetLastPortal (iPortal* por)
-  {
-    ctxt->last_portal = por;
-  }
-
-  /**
-   * Get render recursion level.
-   */
-  virtual int GetRenderRecursionLevel () { return ctxt->draw_rec_level; }
-  /**
-   * Set render recursion level.
-   */
-  virtual void SetRenderRecursionLevel (int rec)
-  {
-    ctxt->draw_rec_level = rec;
-  }
 };
 
 #endif // __CS_RVIEW_H__

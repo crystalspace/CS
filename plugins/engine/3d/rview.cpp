@@ -1078,6 +1078,40 @@ bool csRenderView::ClipBBox (
   return true;
 }
 
+void csRenderView::SetupClipPlanes ()
+{
+  csPlane3* frust = ctxt->frustum;
+  const csReversibleTransform& tr = ctxt->icamera->GetTransform ();
+  csVector3 o2tmult = tr.GetO2T () * tr.GetO2TTranslation ();
+  csPlane3* clip_planes = ctxt->clip_planes;
+  clip_planes[0].Set (tr.GetT2O() * frust[0].norm, -frust[0].norm*o2tmult);
+  clip_planes[1].Set (tr.GetT2O() * frust[1].norm, -frust[1].norm*o2tmult);
+  clip_planes[2].Set (tr.GetT2O() * frust[2].norm, -frust[2].norm*o2tmult);
+  clip_planes[3].Set (tr.GetT2O() * frust[3].norm, -frust[3].norm*o2tmult);
+  csPlane3 pz0 (0, 0, 1, 0);	// Inverted!!!.
+  clip_planes[4] = tr.This2Other (pz0);
+  if (ctxt->do_clip_plane)
+  {
+    // We have a real near clipping plane. In that case
+    // we add both the Z=0 plane and the near clipping plane.
+    csPlane3 pznear = ctxt->clip_plane;
+    pznear.Invert ();
+    clip_planes[5] = tr.This2Other (pznear);
+    ctxt->clip_planes_mask = 0x3f;
+  }
+  else
+  {
+    ctxt->clip_planes_mask = 0x1f;
+  }
+  csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
+  if (far_plane)
+  {
+    csPlane3 fp = *far_plane;
+    clip_planes[6] = tr.This2Other (fp);
+    ctxt->clip_planes_mask |= 0x40;
+  }
+}
+
 void csRenderView::SetupClipPlanes (const csReversibleTransform& tr_o2c,
   	csPlane3* planes, uint32& frustum_mask,
 	csPlane3* top_planes)

@@ -154,27 +154,13 @@ public:
 
   //---------------- iRenderView -----------------------
   virtual csRenderContext* GetRenderContext () {return 0;}
-  virtual void CreateRenderContext() {}
-  virtual void RestoreRenderContext (csRenderContext* ) {}
   virtual iCamera* CreateNewCamera() {return fakecam;} //@@@ copy?
   virtual iEngine* GetEngine () {return 0;}
   virtual iGraphics2D* GetGraphics2D ()
   {return isorview->GetG3D()->GetDriver2D();}
   virtual iGraphics3D* GetGraphics3D () {return isorview->GetG3D();}
-  virtual void SetFrustum (float, float, float, float) {}
   virtual void GetFrustum (float&, float&, float&, float&) {}
   virtual iClipper2D* GetClipper () {return isorview->GetClipper();}
-  virtual void SetClipper (iClipper2D*) {}
-  virtual bool IsClipperRequired () {return false;}
-  virtual bool GetClipPlane (csPlane3& ) {return false;}
-  virtual csPlane3& GetClipPlane () {return *(csPlane3*)0;}
-  virtual void SetClipPlane (const csPlane3& ) {}
-  virtual void UseClipPlane (bool ) {}
-  virtual void UseClipFrustum (bool ) {}
-  virtual csFogInfo* GetFirstFogInfo () {return 0;}
-  virtual void SetFirstFogInfo (csFogInfo* ) {}
-  virtual bool AddedFogInfo () {return false;}
-  virtual void ResetFogInfo () {}
   virtual iCamera* GetCamera () {return fakecam;}
   virtual void CalculateFogPolygon (G3DPolygonDP& poly) { poly.use_fog = false; }
   virtual void CalculateFogPolygon (G3DPolygonDPFX& poly) { poly.use_fog = false; }
@@ -329,13 +315,8 @@ public:
   }
 
   virtual iSector* GetThisSector () {return 0;}
-  virtual void SetThisSector (iSector* ) {}
   virtual iSector* GetPreviousSector () {return 0;}
-  virtual void SetPreviousSector (iSector* ) {}
   virtual iPortal* GetLastPortal () {return 0;}
-  virtual void SetLastPortal (iPortal*) {}
-  virtual int GetRenderRecursionLevel () {return 0;}
-  virtual void SetRenderRecursionLevel (int ) {}
   virtual iCamera* GetOriginalCamera () const { return 0; }
 };
 

@@ -27,6 +27,7 @@
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "plugins/engine/3d/portalcontainer.h"
+#include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/meshobj.h"
 
 // ---------------------------------------------------------------------------
@@ -958,7 +959,7 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
 
   // Setup clip and far plane.
   csPlane3 portal_plane, *pportal_plane;
-  bool do_portal_plane = rview->GetClipPlane (portal_plane);
+  bool do_portal_plane = ((csRenderView*)rview)->GetClipPlane (portal_plane);
   if (do_portal_plane)
     pportal_plane = &portal_plane;
   else

@@ -38,10 +38,10 @@
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/material.h"
+#include "plugins/engine/3d/rview.h"
 #include "iengine/rview.h"
 #include "iengine/portal.h"
 #include "imesh/lighting.h"
-#include "plugins/engine/3d/material.h"
 
 #include "ivaria/bugplug.h"
 
@@ -646,7 +646,8 @@ void csSector::PrepareDraw (iRenderView *rview)
 
   // Make sure the visibility culler is loaded.
   GetVisibilityCuller ();
-  rview->SetThisSector (&scfiSector);
+  csRenderView* csrview = (csRenderView*)rview;
+  csrview->SetThisSector (&scfiSector);
 
   int i = sector_cb_vector.Length ()-1;
   while (i >= 0)

@@ -22,6 +22,7 @@
 #include "ivideo/texture.h"
 #include "plugins/engine/3d/portal.h"
 #include "plugins/engine/3d/portalcontainer.h"
+#include "plugins/engine/3d/rview.h"
 #include "iengine/texture.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
@@ -426,23 +427,24 @@ bool csPortal::Draw (
 
   if (!new_clipper.GetVertexCount ()) return false;
 
-  iCamera *icam = rview->GetCamera ();
+  csRenderView* csrview = (csRenderView*)rview;
+  csRenderContext *old_ctxt = csrview->GetCsRenderContext ();
+  iCamera *icam = old_ctxt->icamera;
   csPolygonClipper new_view ((csPoly2D*)&new_clipper,
   	icam->IsMirrored (), true);
 
-  csRenderContext *old_ctxt = rview->GetRenderContext ();
-  rview->CreateRenderContext ();
-  rview->SetRenderRecursionLevel (rview->GetRenderRecursionLevel () + 1);
-  rview->SetClipper (&new_view);
-  rview->ResetFogInfo ();
-  rview->SetLastPortal ((iPortal*)this);
-  rview->SetPreviousSector (rview->GetThisSector ());
-  rview->SetClipPlane (camera_plane);
-  rview->GetClipPlane ().Invert ();
+  csrview->CreateRenderContext ();
+  csrview->SetRenderRecursionLevel (csrview->GetRenderRecursionLevel () + 1);
+  csrview->SetClipper (&new_view);
+  csrview->ResetFogInfo ();
+  csrview->SetLastPortal ((iPortal*)this);
+  csrview->SetPreviousSector (rview->GetThisSector ());
+  csrview->SetClipPlane (camera_plane);
+  csrview->GetClipPlane ().Invert ();
   if (flags.Check (CS_PORTAL_CLIPDEST))
   {
-    rview->UseClipPlane (true);
-    rview->UseClipFrustum (true);
+    csrview->UseClipPlane (true);
+    csrview->UseClipFrustum (true);
   }
   // When going through a portal we first remember the old clipper
   // and clip plane (if any). Then we set a new one. Later we restore.
@@ -453,19 +455,20 @@ bool csPortal::Draw (
   int old_cliptype = G3D->GetClipType ();
   G3D->SetClipper (
       rview->GetClipper (),
-      rview->IsClipperRequired () ? CS_CLIPPER_REQUIRED : CS_CLIPPER_OPTIONAL);
+      csrview->IsClipperRequired ()
+      	? CS_CLIPPER_REQUIRED : CS_CLIPPER_OPTIONAL);
 
   csPlane3 old_near_plane = G3D->GetNearPlane ();
   bool old_do_near_plane = G3D->HasNearPlane ();
   csPlane3 cp;
-  if (rview->GetClipPlane (cp))
+  if (csrview->GetClipPlane (cp))
     G3D->SetNearPlane (cp);
   else
     G3D->ResetNearPlane ();
 
   if (flags.Check (CS_PORTAL_WARP))
   {
-    iCamera *inewcam = rview->CreateNewCamera ();
+    iCamera *inewcam = csrview->CreateNewCamera ();
 
     bool mirror = inewcam->IsMirrored ();
     csReversibleTransform warp_wor;
@@ -478,7 +481,7 @@ bool csPortal::Draw (
   else
     sector->Draw (rview);
 
-  rview->RestoreRenderContext (old_ctxt);
+  csrview->RestoreRenderContext (old_ctxt);
 
   // Now restore our G3D clipper and plane.
   G3D->SetClipper (old_clipper, old_cliptype);
