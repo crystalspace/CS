@@ -250,10 +250,10 @@ bool csButton::HandleEvent (csEvent &Event)
       switch (Event.Mouse.Button)
       {
         case 1:
-          if (GetState (CSS_DISABLED))
+          if (GetState (CSS_DISABLED)
+           || app->MouseOwner)
             return true;
-          if (!app->MouseOwner)
-            app->CaptureMouse (this);
+          app->CaptureMouse (this);
           SetPressed (true);
           if ((ButtonStyle & CSBS_NOMOUSEFOCUS) == 0)
             csComponent::HandleEvent (Event);
@@ -267,10 +267,9 @@ bool csButton::HandleEvent (csEvent &Event)
     case csevMouseUp:
       if (Event.Mouse.Button == 1)
       {
-        if (app->MouseOwner)
+        if (app->MouseOwner == this)
         {
-          if (app->MouseOwner == this)
-            app->CaptureMouse (NULL);
+          app->CaptureMouse (NULL);
           if (Pressed)
           {
             if (!(ButtonStyle & CSBS_MULTICHOOSE))
@@ -282,7 +281,7 @@ bool csButton::HandleEvent (csEvent &Event)
       }
       break;
     case csevMouseMove:
-      if ((app->MouseOwner)
+      if ((app->MouseOwner == this)
        && !(ButtonStyle & CSBS_MULTICHOOSE))
       {
         bool inside = bound.ContainsRel (Event.Mouse.x, Event.Mouse.y);
