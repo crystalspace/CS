@@ -7,14 +7,14 @@ The history order has been reversed so that new features are at the top.
 		FOUNTAIN 'fount1' (ORIGIN (x,y,z) TEXTURE ('green.gif'))
 	  For snow use:
 		SNOW 'snow' (BOX (x1,y1,z1,x2,y2,z2) TEXTURE ('snow.jpg'))
-	  There are many more options.  See docs/incoming/worldfmt.tex for a 
-	  list.  
-	- Wouter Wijngaards added a fountain particle system.  Under 
-	  construction still...  
-	- Added 'fountain' console command to create a fountain.  The first 
-	  argument is the texture (default is 'green.gif' until we find a 
-	  better splash texture).  The second argument is the number of 
-	  particles (default is 50).  
+	  There are many more options.  See docs/incoming/worldfmt.tex for a
+	  list.
+	- Wouter Wijngaards added a fountain particle system.  Under
+	  construction still...
+	- Added 'fountain' console command to create a fountain.  The first
+	  argument is the texture (default is 'green.gif' until we find a
+	  better splash texture).  The second argument is the number of
+	  particles (default is 50).
 	- Enabled extensions in OpenGL renderer.
 	- Disabled the experimental optimization in DrawPolygon for OpenGL.
 	  It had a bad effect on performance.
@@ -22,8 +22,8 @@ The history order has been reversed so that new features are at the top.
 	  other than Windows and Unix (with Mesa). Also made the extension
 	  detection safe so that extensions are not used if you have
 	  Mesa 3.0 or older.
-	- Extend makefies for OpenGL so that OPENGL_PATH is used if USE_MESA=0 
-	  (similar to MESA_PATH).  
+	- Extend makefies for OpenGL so that OPENGL_PATH is used if USE_MESA=0
+	  (similar to MESA_PATH).
 	- Eric Sunshine made the following changes to the Blocks game:
 	    - Fixed a nasty memory corruption bug.  HandleLoweringPlanes() was
 	      writing one past the end of the States::filled_planes[] array
@@ -54,6 +54,10 @@ The history order has been reversed so that new features are at the top.
 	  plug-in triggered several particularly rare NextStep compiler bugs.
 	  This is almost certainly a new record for number of severe compiler
 	  bugs triggered by a single update to a single module.  :-)
+	- Eric Sunshine eliminated a few compilation warnings in the Dungeon
+	  plug-in which were reported by George Yohng <cspace@mmts.nsys.by>,
+	  though the bulk of them had already been fixed by Eric even before
+	  receiving the problem report.
 19-Jun-2000
 	- Martin Geisse fixed a number of compiler warnings all over
 	  the place.
