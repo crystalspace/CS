@@ -671,7 +671,6 @@ csEngine::csEngine (iBase *iParent) :
   engine_states = NULL;
   rad_debug = NULL;
   nextframe_pending = 0;
-  cache_mgr = NULL;
   default_max_lightmap_w = 256;
   default_max_lightmap_h = 256;
   default_lightmap_cell_size = 16;
@@ -1167,8 +1166,6 @@ bool csEngine::Prepare (iProgressMeter *meter)
 
 void csEngine::SetCacheManager (iCacheManager* cache_mgr)
 {
-  if (cache_mgr) cache_mgr->IncRef ();
-  if (csEngine::cache_mgr) csEngine::cache_mgr->DecRef ();
   csEngine::cache_mgr = cache_mgr;
 }
 
@@ -1182,7 +1179,8 @@ iCacheManager* csEngine::GetCacheManager ()
       strcat (buf, "cache");
     else
       strcat (buf, "/cache");
-    cache_mgr = new csVfsCacheManager (object_reg, buf);
+    cache_mgr = csPtr<iCacheManager> (
+    	new csVfsCacheManager (object_reg, buf));
   }
   return cache_mgr;
 }
