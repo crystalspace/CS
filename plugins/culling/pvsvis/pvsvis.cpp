@@ -58,6 +58,7 @@ SCF_IMPLEMENT_FACTORY (csPVSVis)
 
 SCF_IMPLEMENT_IBASE (csPVSVis)
   SCF_IMPLEMENTS_INTERFACE (iVisibilityCuller)
+  SCF_IMPLEMENTS_INTERFACE (iPVSCuller)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
@@ -210,6 +211,11 @@ void csPVSVis::Setup (const char* name)
 
 const char* csPVSVis::ParseCullerParameters (iDocumentNode* node)
 {
+  if (!node)
+  {
+    return "The PVS visibility culler requires an outer <box>!";
+  }
+
   bool box_was_given = false;
 
   csRef<iSyntaxService> syn = CS_QUERY_REGISTRY (object_reg,
@@ -231,8 +237,8 @@ const char* csPVSVis::ParseCullerParameters (iDocumentNode* node)
     }
     else if (!strcmp ("minnode", value))
     {
-      csBox3 b;
-      if (!syn->ParseBox (child, b))
+      csVector3 b;
+      if (!syn->ParseVector (child, b))
         return "Error parsing <minnode> for the PVS visibility culler!";
       pvstree.SetMinimalNodeBox (b);
     }

@@ -27,6 +27,27 @@
     <sector>Scene</sector>
     <position x="0.165359" y="2.82483" z="-0.435181"/>
   </start>
+  <meshfact name="WallW">
+    <plugin>thingfact</plugin>
+    <params>
+      <v x="7.57999e-008" y="1.23402" z="1.23402"/>
+      <v x="-8.67746e-009" y="1.23402" z="-1.23402"/>
+      <v x="-1.95009e-007" y="-1.23402" z="-1.23402"/>
+      <v x="-1.10532e-007" y="-1.23402" z="1.23402"/>
+      <p>
+        <v>3</v>
+        <v>2</v>
+        <v>1</v>
+        <v>0</v>
+        <material>oldbrick</material>
+        <texmap>
+          <uv idx="0" u="1" v="0"/>
+          <uv idx="1" u="1" v="1"/>
+          <uv idx="2" u="0" v="1"/>
+        </texmap>
+      </p>
+    </params>
+  </meshfact>
   <meshfact name="floor">
     <plugin>genmeshfact</plugin>
     <params>
@@ -41,6 +62,12 @@
     </params>
   </meshfact>
   <sector name="Scene">
+    <cullerp plugin="crystalspace.culling.pvsvis">
+      <box>
+	<min x="-16" y="-1" z="-4" />
+	<max x="16" y="10" z="16" />
+      </box>
+    </cullerp>
     <meshobj name="floor">
       <plugin>genmesh</plugin>
       <params>
@@ -57,454 +84,6 @@
       <color red="1" green="1" blue="1"/>
       <radius>30</radius>
     </light>
-    <meshobj name="Plane">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="0"/>
-            <uv idx="1" u="0" v="1"/>
-            <uv idx="2" u="1" v="1"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-6.20248" y="3.87779" z="0.146157"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.001">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="1"/>
-            <uv idx="1" u="1" v="1"/>
-            <uv idx="2" u="1" v="0"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-8.24713" y="6.18665" z="0.398644"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.002">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="0"/>
-            <uv idx="1" u="0" v="1"/>
-            <uv idx="2" u="1" v="1"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-5.7831" y="4.86715" z="0.0874105"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.003">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="0"/>
-            <uv idx="1" u="0" v="1"/>
-            <uv idx="2" u="1" v="1"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-7.27028" y="5.54314" z="0.0874106"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.004">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="0"/>
-            <uv idx="1" u="0" v="1"/>
-            <uv idx="2" u="1" v="1"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-8.35187" y="2.70397" z="0.0874105"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.005">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="0"/>
-            <uv idx="1" u="0" v="1"/>
-            <uv idx="2" u="1" v="1"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-6.41326" y="3.31236" z="1.55402"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.006">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="0"/>
-            <uv idx="1" u="0" v="1"/>
-            <uv idx="2" u="1" v="1"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-5.24001" y="2.50117" z="-1.15005"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.007">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="0"/>
-            <uv idx="1" u="0" v="1"/>
-            <uv idx="2" u="1" v="1"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-7.92221" y="6.21913" z="-1.28754"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.008">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="0"/>
-            <uv idx="1" u="0" v="1"/>
-            <uv idx="2" u="1" v="1"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-6.75246" y="4.39402" z="-1.36795"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.009">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="0"/>
-            <uv idx="1" u="0" v="1"/>
-            <uv idx="2" u="1" v="1"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-5.14835" y="5.2544" z="1.68922"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.010">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="0"/>
-            <uv idx="1" u="0" v="1"/>
-            <uv idx="2" u="1" v="1"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-6.75246" y="6.20083" z="1.47132"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.011">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="1"/>
-            <uv idx="1" u="1" v="1"/>
-            <uv idx="2" u="1" v="0"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-7.49605" y="2.58721" z="1.64339"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.012">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="0"/>
-            <uv idx="1" u="0" v="1"/>
-            <uv idx="2" u="1" v="1"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-6.20248" y="6.11479" z="0.0601186"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.013">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="1"/>
-            <uv idx="1" u="1" v="1"/>
-            <uv idx="2" u="1" v="0"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-8.24713" y="4.444" z="1.68488"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.014">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="1"/>
-            <uv idx="1" u="1" v="1"/>
-            <uv idx="2" u="1" v="0"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-8.24713" y="2.61836" z="0.81356"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name="Plane.015">
-      <plugin>thing</plugin>
-      <params>
-        <v x="5.01218e-008" y="1" z="1"/>
-        <v x="-1.83353e-008" y="1" z="-1"/>
-        <v x="-1.69331e-007" y="-1" z="-1"/>
-        <v x="-1.00874e-007" y="-1" z="1"/>
-        <p>
-          <v>3</v>
-          <v>2</v>
-          <v>1</v>
-          <v>0</v>
-          <material>oldbrick</material>
-          <texmap>
-            <uv idx="0" u="0" v="1"/>
-            <uv idx="1" u="1" v="1"/>
-            <uv idx="2" u="1" v="0"/>
-          </texmap>
-        </p>
-      </params>
-      <zuse/>
-      <move>
-        <v x="-8.24713" y="3.4482" z="-1.92489"/>
-        <matrix>
-          <rotx>-1.5708</rotx>
-        </matrix>
-      </move>
-    </meshobj>
     <meshobj name="Suzanne">
       <plugin>thing</plugin>
       <params>
@@ -20821,6 +20400,8 @@
         </p>
       </params>
       <zuse/>
+      <staticpos/>
+      <staticshape/>
       <move>
         <v x="6.41545" y="4.32635" z="0.0415792"/>
         <matrix>
@@ -20851,6 +20432,306 @@
       <zuse/>
       <move>
         <v x="-0.0284809" y="4.32635" z="5.63305"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-7.18215" y="6.20962" z="-2.14001"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.001">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-6.80661" y="4.47275" z="-2.14001"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.002">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-7.4638" y="2.59506" z="-2.14001"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.003">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-6.33719" y="2.07869" z="-2.14001"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.004">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-6.0072" y="2.07869" z="-0.710063"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.005">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-6.57051" y="3.76862" z="-0.710063"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.006">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-6.10108" y="4.66052" z="-0.710063"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.007">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-6.94605" y="6.11574" z="-0.710062"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.008">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-7.38603" y="6.11574" z="0.774879"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.009">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-6.3533" y="5.17689" z="0.774879"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.010">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-7.01049" y="3.58085" z="0.774878"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.011">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-6.49412" y="2.59506" z="0.774878"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.012">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-5.6961" y="2.12563" z="0.774878"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.013">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-7.18215" y="6.20962" z="-2.14001"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.014">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-6.13609" y="2.12563" z="2.03983"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.015">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-6.13609" y="2.12563" z="2.03983"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.016">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-5.85443" y="3.48696" z="2.03983"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.017">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-7.16882" y="4.23804" z="2.03983"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.018">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-6.0422" y="5.50549" z="2.03983"/>
+        <matrix>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name="WallW.019">
+      <plugin>thing</plugin>
+      <params>
+        <factory>WallW</factory>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v x="-5.61972" y="6.30351" z="2.03983"/>
         <matrix>
           <rotx>-1.5708</rotx>
         </matrix>

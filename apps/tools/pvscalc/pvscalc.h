@@ -42,40 +42,20 @@ private:
   /// A pointer to the virtual clock.
   csRef<iVirtualClock> vc;
 
-  /// A pointer to the view which contains the camera.
-  csRef<iView> view;
-
-  /// A pointer to the sector the camera will be in.
-  iSector* room;
-
-  /// Position of camera in map.
-  csVector3 pos;
-
-  /// Current camera orientation.
-  float rotX, rotY;
-
-  /**
-   * Handle keyboard events - ie key presses and releases.
-   * This routine is called from the event handler in response to a 
-   * csevKeyboard event.
-   */
-  bool OnKeyboard (iEvent&);
-
-  /**
-   * Setup everything that needs to be rendered on screen. This routine
-   * is called from the event handler in response to a cscmdProcess
-   * broadcast message.
-   */
-  void ProcessFrame ();
-
-  /**
-   * Finally render the screen. This routine is called from the event
-   * handler in response to a cscmdFinalProcess broadcast message.
-   */
-  void FinishFrame ();
+  /// The sector we are scanning. Or empty if we scan all.
+  csString sectorname;
 
   /// Here we will load our world from a map file.
   bool LoadMap ();
+
+  /// Set the current dir to the requested mapfile.
+  bool SetMapDir (const char* map_dir);
+
+  /// Calculate PVS for the given sector and culler.
+  void CalculatePVS (iSector* sector, iPVSCuller* pvs);
+
+  /// Calculate PVS for all sectors as given in 'sectorname'.
+  void CalculatePVS ();
 
 public:
 

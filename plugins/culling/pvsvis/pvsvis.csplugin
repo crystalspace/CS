@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.culling.pvsvis</name>
-        <implementation>csPVSVIS</implementation>
+        <implementation>csPVSVis</implementation>
         <description>PVS Visibility System</description>
       </class>
     </classes>

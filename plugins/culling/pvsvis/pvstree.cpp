@@ -170,6 +170,7 @@ csStaticPVSTree::csStaticPVSTree ()
 {
   SCF_CONSTRUCT_IBASE (0);
   root = 0;
+  node_minbox_set = false;
 }
 
 csStaticPVSTree::~csStaticPVSTree ()
@@ -327,7 +328,11 @@ const char* csStaticPVSTree::ReadPVS ()
   csRef<iDataBuffer> buf = cache_mgr->ReadCache (
   	"PVS", pvscache, 0);
   if (!buf)
-    return "Couldn't get PVS cache from cache manager!";
+  {
+    CreateRootNode ();
+    root->PropagateBBox (root_box);
+    return "Couldn't get PVS from cache manager!";
+  }
   return ReadPVS (buf);
 }
 
@@ -442,6 +447,13 @@ void csStaticPVSTree::MarkInvisible (const csVector3& pos, uint32 cur_timestamp)
 void csStaticPVSTree::SetBoundingBox (const csBox3& bbox)
 {
   root_box = bbox;
+  // If the node_minbox is not set we calculated it here from
+  // the root box.
+  if (!node_minbox_set)
+  {
+    node_minbox = (root_box.Max () - root_box.Min ()) / 20.0;
+  }
+
   if (root)
     root->PropagateBBox (root_box);
 }

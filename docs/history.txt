@@ -15,6 +15,26 @@ chronological order.
 	  writing stuff that was previously in that place).
 	- res fixed a leak in the image sharpener.
 	- res added a method to csImageMemory to specify index data with alpha.
+	- Jorrit did the following things related to PVS:
+	    - Fixed a bug in the pvsvis.csplugin which prevented the plugin
+	      from loading.
+	    - Changed pvstest test map to actually use pvsvis. Also added
+	      <staticpos/> and <staticshape/> flags.
+	    - Changed pvscalc to accept commandline parameters (map directory
+	      or zip followed by an optional sector name). pvscalc will now
+	      load the world, and scan all sectors (and do nothing for them).
+	    - Pvscalc will now report information about bounding boxes
+	      and number of static/normal objects.
+	    - Fixed another bug in pvsvis which would cause a crash if no
+	      parameters were given to the culler in the world file.
+	    - Fixed a crash in pvsvis which would occur when the PVS was
+	      not yet calculated.
+	    - Added missing implements of iPVSCuller to pvsvis.
+	    - Added a method to get the bounding box from iStaticPVSTree.
+	    - Changed the minimal size of a node to a csVector3 instead
+	      of a csBox3. Also when it is not set manually it will now
+	      be calculated from the total root box as the dimensions of
+	      that box divided by 20.
 29-Jan-2005
 	- Jorrit moved the tiled coverage buffer from Dynavis to csgeom.
 	  This class is going to be useful for the PVS calculator.
