@@ -253,22 +253,5 @@ void Simple::CreateRoom ()
  *-------------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  csReversibleTransform cam, mesh, combined, originalMesh;
-  cam.RotateThis (csYRotMatrix3 (31));
-  cam.RotateThis (csXRotMatrix3 (31));
-  cam.Translate (csVector3 (3,4,5));
-  
-  mesh.RotateThis (csYRotMatrix3 (-1));
-  mesh.Translate (csVector3 (-4,-2,7));
-  mesh.RotateThis (csXRotMatrix3 (5));
-  
-  combined = cam;
-  combined /= mesh;
-
-  csMatrix3 originalMatrix;
-  originalMatrix = combined.GetT2O () * cam.GetO2T ();
-
-  originalMesh = combined.GetInverse () * cam;
-
   return Simple().Main(argc, argv);
 }
