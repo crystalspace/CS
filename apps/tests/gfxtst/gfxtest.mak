@@ -30,7 +30,7 @@ vpath %.cpp apps/tests/gfxtst
 # csutil listed twice because of circular dependency between cssys and csutil.
 LIB.GFXTEST = $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 
-GFXTEST.EXE = gfxtstest$(EXE)
+GFXTEST.EXE = gfxtest$(EXE)
 SRC.GFXTEST += apps/tests/gfxtst/gfxtest.cpp
 OBJ.GFXTEST = $(addprefix $(OUT),$(notdir $(SRC.GFXTEST:.cpp=$O)))
 
