@@ -54,8 +54,8 @@ csColliderWrapper::~csColliderWrapper ()
 }
 
 bool csColliderWrapper::Collide (csObject& otherObject,
-                          csTransform* pThisTransform,
-                          csTransform* pOtherTransform) 
+                          csReversibleTransform* pThisTransform,
+                          csReversibleTransform* pOtherTransform) 
 {
   csColliderWrapper *pOtherCollider = GetColliderWrapper (otherObject);
   if (pOtherCollider)
@@ -65,8 +65,8 @@ bool csColliderWrapper::Collide (csObject& otherObject,
 }
 
 bool csColliderWrapper::Collide (iObject* otherObject,
-                          csTransform* pThisTransform,
-                          csTransform* pOtherTransform) 
+                          csReversibleTransform* pThisTransform,
+                          csReversibleTransform* pOtherTransform) 
 {
   csColliderWrapper *pOtherCollider = GetColliderWrapper (otherObject);
   if (pOtherCollider)
@@ -76,8 +76,8 @@ bool csColliderWrapper::Collide (iObject* otherObject,
 }
 
 bool csColliderWrapper::Collide (csColliderWrapper& otherCollider, 
-                          csTransform* pTransform1, 
-                          csTransform* pTransform2)
+                          csReversibleTransform* pTransform1, 
+                          csReversibleTransform* pTransform2)
 {
   csColliderWrapper *pCollider2 = &otherCollider;
   if (pCollider2 == this) return false;

@@ -70,8 +70,9 @@ iCollider* csRapidCollideSystem::CreateCollider (iPolygonMesh* mesh)
   return col;
 }
 
-bool csRapidCollideSystem::Collide (iCollider* collider1,
-  const csTransform* trans1, iCollider* collider2, const csTransform* trans2)
+bool csRapidCollideSystem::Collide (
+  iCollider* collider1, const csReversibleTransform* trans1,
+  iCollider* collider2, const csReversibleTransform* trans2)
 {
   csRapidCollider* col1 = (csRapidCollider*)collider1;
   csRapidCollider* col2 = (csRapidCollider*)collider2;

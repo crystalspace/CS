@@ -13,6 +13,12 @@ Crystal Space.
 parameters: @code{argc} and @code{argv}.
 Consequently @code{csInitializer::SetupKeyboardHandler()} has been removed.
 
+@subheading iCollideSystem changes
+@cindex @code{iCollideSystem}
+
+The @code{iCollideSystem::Collide()} function now accepts
+@code{csReversibleTransform} transforms instead of just @code{csTransform}.
+
 @subheading Texture Manager Changes
 @cindex @code{iTextureManager::UnregisterTexture()}
 @cindex @code{iTextureManager::UnregisterMaterial()}

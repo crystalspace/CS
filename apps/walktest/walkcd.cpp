@@ -217,7 +217,8 @@ int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
   return c;
 }
 
-int CollisionDetect (csColliderWrapper *c, iSector* sp, csTransform *cdt)
+int CollisionDetect (csColliderWrapper *c, iSector* sp,
+	csReversibleTransform *cdt)
 {
   int hit = 0;
   int i, j;

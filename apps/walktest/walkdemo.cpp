@@ -832,7 +832,8 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
 #define MAXSECTORSOCCUPIED  20
 
 extern int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa);
-extern int CollisionDetect (csColliderWrapper *c, iSector* sp, csTransform *cdt);
+extern int CollisionDetect (csColliderWrapper *c, iSector* sp,
+	csReversibleTransform* cdt);
 extern csCollisionPair our_cd_contact[1000];//=0;
 extern int num_our_cd;
 

@@ -149,8 +149,8 @@ csRAPIDCollider::~csRAPIDCollider(void)
 }
 
 bool csRAPIDCollider::Collide (csRAPIDCollider &otherCollider, 
-                               const csTransform *pTransform1, 
-                               const csTransform *pTransform2)
+                               const csReversibleTransform *pTransform1, 
+                               const csReversibleTransform *pTransform2)
 {
   csRAPIDCollider *pRAPIDCollider2 = (csRAPIDCollider *)&otherCollider;
   if (pRAPIDCollider2 == this) return false;
@@ -169,27 +169,36 @@ bool csRAPIDCollider::Collide (csRAPIDCollider &otherCollider,
   csCdBBox *b1 = m_pCollisionModel->m_pBoxes;
   csCdBBox *b2 = pRAPIDCollider2->m_pCollisionModel->m_pBoxes;
 
-  csMatrix3 R1, R2;
-  csVector3 T1 (0, 0, 0), T2 (0, 0, 0);
-  if (pTransform1)
+  csMatrix3 R1;
+  csVector3 T1 (0, 0, 0);
+  if (pTransform1 && pTransform2)
+  {
+    csReversibleTransform trans1 = *pTransform1;
+    trans1 *= pTransform2->GetInverse ();
+    T1 = trans1.GetO2TTranslation ();
+    R1 = trans1.GetO2T ();
+  }
+  else if (pTransform1)
   {
     T1 = pTransform1->GetO2TTranslation ();
     R1 = pTransform1->GetO2T ();
   }
-  if (pTransform2)
+  else if (pTransform2)
   {
-    R2 = pTransform2->GetO2T ();
-    T2 = pTransform2->GetO2TTranslation ();
+    csReversibleTransform trans1 = pTransform2->GetInverse ();
+    T1 = trans1.GetO2TTranslation ();
+    R1 = trans1.GetO2T ();
   }
 
-  // [R1,T1] and [R2,T2] are how the two triangle sets (i.e. models)
-  // are positioned in world space. [tR1,tT1] and [tR2,tT2] are
-  // how the top level boxes are positioned in world space
+  // [R1,T1] is how the first triangle set is positioned relative to the
+  // second one (combination of two transforms) (in world space).
+  // [tR1,tT1] and [tR2,tT2] are how the top level boxes are
+  // positioned in world space
 
-  csMatrix3 tR1 =  R1 * b1->m_Rotation;
+  csMatrix3 tR1 = R1 * b1->m_Rotation;
   csVector3 tT1 = (R1 * b1->m_Translation) + T1;
-  csMatrix3 tR2 =  R2 * b2->m_Rotation;
-  csVector3 tT2 = (R2 * b2->m_Translation) + T2;
+  csMatrix3 tR2 = b2->m_Rotation;
+  csVector3 tT2 = b2->m_Translation;
 
   // [R,T] is the placement of b2's top level box within
   // the coordinate system of b1's top level box.
@@ -200,8 +209,8 @@ bool csRAPIDCollider::Collide (csRAPIDCollider &otherCollider,
   // To transform tri's from model1's CS to model2's CS use this:
   //    x2 = mR . x1 + mT
 
-  csRAPIDCollider::mR = R2.GetTranspose () * R1;
-  csRAPIDCollider::mT = R2.GetTranspose () * (T1 - T2);
+  csRAPIDCollider::mR = R1;
+  csRAPIDCollider::mT = T1;
 
   // reset the report fields
   csRAPIDCollider::numHits = 0;

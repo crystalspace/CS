@@ -24,7 +24,7 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
 
-class csTransform;
+class csReversibleTransform;
 struct iPolygonMesh;
 struct iCollideSystem;
 struct iCollider;
@@ -73,22 +73,22 @@ public:
    * not false is returned.
    */
   bool Collide (csColliderWrapper& pOtherCollider,
-                csTransform* pThisTransform = NULL,
-                csTransform* pOtherTransform = NULL);
+                csReversibleTransform* pThisTransform = NULL,
+                csReversibleTransform* pOtherTransform = NULL);
   /**
    * Similar to Collide for csColliderWrapper. Calls GetColliderWrapper for
    * otherCollider.
    */
   bool Collide (csObject& otherObject,
-                csTransform* pThisTransform = NULL,
-                csTransform* pOtherTransform = NULL);
+                csReversibleTransform* pThisTransform = NULL,
+                csReversibleTransform* pOtherTransform = NULL);
   /**
    * Similar to Collide for csColliderWrapper. Calls GetColliderWrapper for
    * otherCollider.
    */
   bool Collide (iObject* otherObject,
-                csTransform* pThisTransform = NULL,
-                csTransform* pOtherTransform = NULL);
+                csReversibleTransform* pThisTransform = NULL,
+                csReversibleTransform* pOtherTransform = NULL);
 
   /**
    * If object has a child of type csColliderWrapper it is returned.

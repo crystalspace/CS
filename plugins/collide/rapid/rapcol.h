@@ -23,7 +23,7 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
 
-class csTransform;
+class csReversibleTransform;
 
 class csCdModel;
 class csCdBBox;
@@ -93,8 +93,8 @@ public:
    * not false is returned.
    */
   bool Collide (csRAPIDCollider &pOtherCollider,
-                        const csTransform *pThisTransform = NULL,
-                        const csTransform *pOtherTransform = NULL);
+                        const csReversibleTransform *pThisTransform = NULL,
+                        const csReversibleTransform *pOtherTransform = NULL);
 
   /// Query the array with collisions (and their count).
   static csCollisionPair *GetCollisions ();

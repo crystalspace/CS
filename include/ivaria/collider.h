@@ -24,7 +24,7 @@
 #include "csgeom/vector3.h"
 
 struct iPolygonMesh;
-class csTransform;
+class csReversibleTransform;
 
 /**
  * A structure used to return collision pairs.
@@ -66,8 +66,9 @@ struct iCollideSystem : public iBase
    * with ResetCollisionPairs. Every call to Collide will
    * add to that array.
    */
-  virtual bool Collide (iCollider* collider1, const csTransform* trans1,
-  	iCollider* collider2, const csTransform* trans2) = 0;
+  virtual bool Collide (
+  	iCollider* collider1, const csReversibleTransform* trans1,
+  	iCollider* collider2, const csReversibleTransform* trans2) = 0;
 
   /**
    * Get pointer to current array of collision pairs.

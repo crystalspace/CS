@@ -1,5 +1,21 @@
 The history order is reversed so that new features are at the top.
 
+7-Dec-2001
+	- Added a new tutorial application (no doc yet) for collision
+	  detection. This tutorial contains a hierarchical mesh object
+	  (one stick with two other stick children) that rotates around.
+	  The children also rotate and will change rotation direction when
+	  they hit each other.
+	- Fixed a very significant bug in the RAPID collision detection
+	  plugin. It turned out that if the second transform given to
+	  iCollideSystem::Collide() was different from the identity transform
+	  then collision detection would very often fail. To make fixing
+	  this bug easier (more performant) I changed the API for the
+	  Collide() function to accept csReversibleTransform instead
+	  of csTransform (I need to get the inverse of the transform).
+	  This bug was not discovered earlier because in most cases
+	  the second transform will be an identity transform (since the
+	  second transform is often used for static geometry).
 5-Dec-2001
 	- Added a new HOWTO to explain how to attach game objects to Crystal
 	  Space objects.
