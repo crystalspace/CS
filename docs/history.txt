@@ -27,6 +27,11 @@ The history order is reversed so that new features are at the top.
 	  - Updated the Makefile in line with the changes.
 	  - Fixed the example Perl code in perl5test so it follows the
 	    conventions of the new SWIG module.
+	  - Norman Kraemer extended progver.m4 for patterns to contain
+	    optional components. Thus we can now have a pattern like this:
+	     9.9|.9 where the last part is optional (.9)
+	     or even
+	     9.9|.9|._|.9 where we have 3 optional parts
 2-May-2003
 	- Eric Sunshine augmented jobber.pl to make it possible to associate
 	  multiple directories with a single "target" (in @TARGETS).  All of
