@@ -235,6 +235,19 @@ const char* csPlexDocument::Write (iVFS* vfs, const char* filename)
   }
 }
 
+int csPlexDocument::Changeable ()
+{
+  if (wrappedDoc)
+  {
+    return wrappedDoc->Changeable();
+  }
+  else
+  {
+    // @@@ guess.
+    return CS_CHANGEABLE_NEWROOT;
+  }
+}
+
 SCF_IMPLEMENT_IBASE(csMplexDocumentSystem)
   SCF_IMPLEMENTS_INTERFACE(iDocumentSystem)
   SCF_IMPLEMENTS_INTERFACE(iComponent)

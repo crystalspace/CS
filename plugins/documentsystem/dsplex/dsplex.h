@@ -73,5 +73,7 @@ public:
   virtual const char* Write (iFile* file);
   virtual const char* Write (iString* str);
   virtual const char* Write (iVFS* vfs, const char* filename);
+
+  virtual int Changeable ();
 };
 

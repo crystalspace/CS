@@ -1,15 +1,18 @@
 #------------------------------------------------------------------------------
 # Binary document system submakefile
 #------------------------------------------------------------------------------
+
 DESCRIPTION.bindoc = Crystal Space binary document system
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
+
 PLUGINHELP += \
   $(NEWLINE)echo $"  make bindoc     Make the $(DESCRIPTION.bindoc)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
+
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
@@ -22,6 +25,7 @@ bindocclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
+
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
@@ -43,25 +47,26 @@ SRC.BINDOC = $(wildcard $(DIR.BINDOC)/*.cpp)
 OBJ.BINDOC = $(addprefix $(OUT.BINDOC)/,$(notdir $(SRC.BINDOC:.cpp=$O)))
 DEP.BINDOC = CSUTIL CSTOOL CSSYS CSUTIL
 
+OUTDIRS += $(OUT.BINDOC)
+
 MSVC.DSP += BINDOC
 DSP.BINDOC.NAME = bindoc
 DSP.BINDOC.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
+
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: bindoc bindocclean bindoccleandep
-bindoc: $(OUTDLL) $(OUT.BINDOC) $(BINDOC)
 
-$(OUT.BINDOC)/%$O: $(DIR.BINDOC)/%.cpp $(OUT.BINDOC)
+bindoc: $(OUTDIRS) $(BINDOC)
+
+$(OUT.BINDOC)/%$O: $(DIR.BINDOC)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(BINDOC): $(OBJ.BINDOC) $(LIB.BINDOC)
 	$(DO.PLUGIN)
-
-$(OUT.BINDOC): 
-	$(MKDIRS)
 
 clean: bindocclean
 bindocclean:

@@ -608,5 +608,10 @@ const char* csTinyXmlDocument::Write (iVFS* vfs, const char* filename)
   return NULL;
 }
 
+int csTinyXmlDocument::Changeable ()
+{
+  return CS_CHANGEABLE_YES;
+}
+
 //------------------------------------------------------------------------
 

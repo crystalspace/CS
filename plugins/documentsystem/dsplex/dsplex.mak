@@ -43,6 +43,8 @@ SRC.DSPLEX = $(wildcard $(DIR.DSPLEX)/*.cpp)
 OBJ.DSPLEX = $(addprefix $(OUT.DSPLEX)/,$(notdir $(SRC.DSPLEX:.cpp=$O)))
 DEP.DSPLEX = CSUTIL CSTOOL CSSYS CSUTIL
 
+OUTDIRS += $(OUT.DSPLEX)
+
 MSVC.DSP += DSPLEX
 DSP.DSPLEX.NAME = dsplex
 DSP.DSPLEX.TYPE = plugin
@@ -52,16 +54,13 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: dsplex dsplexclean dsplexcleandep
-dsplex: $(OUTDLL) $(OUT.DSPLEX) $(DSPLEX)
+dsplex: $(OUTDIRS) $(DSPLEX)
 
-$(OUT.DSPLEX)/%$O: $(DIR.DSPLEX)/%.cpp $(OUT.DSPLEX)
+$(OUT.DSPLEX)/%$O: $(DIR.DSPLEX)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(DSPLEX): $(OBJ.DSPLEX) $(LIB.DSPLEX)
 	$(DO.PLUGIN)
-
-$(OUT.DSPLEX): 
-	$(MKDIRS)
 
 clean: dsplexclean
 dsplexclean:

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
-	      (C) 2003 by Frank Richter
+	      (C) 2003 by Frank Richter <resqu@gmx.ch>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "iutil/document.h"
 #include "csutil/ptrarr.h"
-#include "csutil/refarr.h"
 #include "csutil/strset.h"
 
 struct iDataBuffer;
@@ -31,24 +30,34 @@ class csMemFile;
    structure, unless noted otherwise.
 
    All integers are stored in little endian.
+   Flags are big endian. Currently 10bits are used, should
+   not exceed 16bit. 
 
-   Wanted to use uint8 for flags, but I guess uint32
-   causes less trouble (alignment etc.)
-
-   @@@ uses 32bit integers throughout... 
-   possibly causes problems on 64 bit machines
+   Strings are saved within a table, or if possible,
+   directly in the 32bit sized value field. By saving the
+   value in front of the flags, having those use at max
+   16bit and in BE, actually up to 6 bytes can be crammed into
+   the 32bit value ;) - and quite a lot of tags & attribute names
+   in CS are shorter than this. Saves a few bytes.
  */
 
-/// conveniance macro
+/// convenience macro
+#define ENDIANSHUFFLE(x) ((x >> 24) | ((x >> 8) & 0xff00) | \
+  ((x << 8) & 0xff0000) | (x << 24))
 #ifdef CS_LITTLE_ENDIAN
 #  define LE(x)	  (x)
+#  define BE(x)	  ENDIANSHUFFLE(x)
 #else
-#  define LE(x)	  ((x >> 24) | ((x >> 8) & 0xff00) | \
-  ((x << 8) & 0xff0000) | (x << 24))
+#  define LE(x)	  ENDIANSHUFFLE(x)
+#  define BE(x)	  (x)
 #endif
 
 /// The Binary Document magic ID
-#define BD_HEADER_MAGIC	      LE (0x83190420)
+#define BD_HEADER_MAGIC	      LE (0x20048319)
+
+/*
+   bd* structures: data as it appears on disk.
+ */
 
 /// Binary document file header
 typedef struct 
@@ -77,49 +86,57 @@ typedef struct
 } bdDocument;
 
 /// mask for a node/attr value type
-#define BD_VALUE_TYPE_MASK	    LE (0x00c0)
+#define BD_VALUE_TYPE_MASK	    BE (0x000000c0)
 /// node/attr value is string
-#define BD_VALUE_TYPE_STR	    LE (0x0000)
+#define BD_VALUE_TYPE_STR	    BE (0x00000000)
 /// node/attr value is integer
-#define BD_VALUE_TYPE_INT	    LE (0x0040)
+#define BD_VALUE_TYPE_INT	    BE (0x00000040)
 /// node/attr value is float
-#define BD_VALUE_TYPE_FLOAT	    LE (0x0080)
+#define BD_VALUE_TYPE_FLOAT	    BE (0x00000080)
 /**
  * node/attr value is a string and shorter than 4 chars and
  * cranked into the 'value' field
  */
-#define BD_VALUE_STR_IMMEDIATE	    LE (0x0100)
+#define BD_VALUE_STR_IMMEDIATE	    BE (0x00000020)
+/// maximum length of an immediate node value, incl. 0
+#define MAX_IMM_NODE_VALUE_STR	    6
 
 /// mask for a node type
-#define BD_NODE_TYPE_MASK	    LE (0x001c)
-/// node is an element
-#define BD_NODE_TYPE_ELEMENT	    LE (0x0000)
-/// node is a comment
-#define BD_NODE_TYPE_COMMENT	    LE (0x0004)
+#define BD_NODE_TYPE_MASK	    BE (0x0000001c)
 /// node is some text
-#define BD_NODE_TYPE_TEXT   	    LE (0x0008)
+#define BD_NODE_TYPE_TEXT   	    BE (0x00000000)
+/// node is a comment
+#define BD_NODE_TYPE_COMMENT	    BE (0x00000004)
+/// node is an element
+#define BD_NODE_TYPE_ELEMENT	    BE (0x00000008)
 /// node is the document
-#define BD_NODE_TYPE_DOCUMENT	    LE (0x000c)
+#define BD_NODE_TYPE_DOCUMENT	    BE (0x0000000c)
 /// node is of unknown type
-#define BD_NODE_TYPE_UNKNOWN	    LE (0x0010)
+#define BD_NODE_TYPE_UNKNOWN	    BE (0x00000010)
 /// node is a declaration
-#define BD_NODE_TYPE_DECLARATION    LE (0x0014)
+#define BD_NODE_TYPE_DECLARATION    BE (0x00000014)
 
 /// node has attributes
-#define BD_NODE_HAS_ATTR	    LE (0x0001)
+#define BD_NODE_HAS_ATTR	    BE (0x00000001)
 /// node has children
-#define BD_NODE_HAS_CHILDREN	    LE (0x0002)
+#define BD_NODE_HAS_CHILDREN	    BE (0x00000002)
 
 /**
  * attr name is a string and shorter than 4 chars and
  * cranked into the 'value' field
  */
-#define BD_ATTR_NAME_IMMEDIATE	    LE (0x0200)
+#define BD_ATTR_NAME_IMMEDIATE	    BE (0x00000100)
+#define MAX_IMM_ATTR_VALUE_STR	    3
+#define MAX_IMM_ATTR_NAME_STR	    6
+
+/// mask of the flags that can be stored on disk.
+#define BD_DISK_FLAGS_MASK	    BE (0x0000ffff)
 
 /**
  * node has been changed. must be always 0 on disk.
  */
-#define BD_NODE_MODIFIED	    LE (0x0020)
+#define BD_NODE_MODIFIED	    BE (0x80000000)
+#define BD_ATTR_MODIFIED	    BD_NODE_MODIFIED
 
 /// used to save NULL strings
 #define BD_OFFSET_INVALID	    0xffffffff
@@ -127,15 +144,15 @@ typedef struct
 /// Binary document node
 typedef struct
 {
-  /// Flags of this node
-  uint32 flags;
   /**
-   * Value of this nose
+   * Value of this node
    *  str: ID of string or immediate string
    *  int: value
    *  float: value converted using float2long
    */
   uint32 value;
+  /// Flags of this node
+  uint32 flags;
   /**
    * Offsets to children/attribute tables
    *  [0] - attr 
@@ -149,16 +166,19 @@ typedef struct
 {
   /// number of children
   uint32 num;
-  /* uint32 offsets to children */
+  /* 
+    uint32 offsets to children 
+	   from beg. of this struct
+  */
 } bdNodeChildTab;
 
 /// Binary document node attribute
 typedef struct
 {
-  /// Attribute flags
-  uint32 flags;
   /// ID of the name
   uint32 nameID;
+  /// Attribute flags
+  uint32 flags;
   /// Value, same as in node value
   uint32 value;
 } bdNodeAttribute;
@@ -175,54 +195,94 @@ struct csBinaryDocument;
 struct csBinaryDocAttribute;
 struct csBinaryDocNode;
 
+/*
+  csBd* structures: descendants from bd* structs.
+  Contain some convenience methods to navigate through
+  attrs and childs. 
+  Also contains some extra fields used when creating a document.
+
+  Because editing requires extra structures, modifying a doc
+  loaded from disk would need a new set of csBd*s created to be
+  created based up on the data loaded from disk. Due to the way
+  everything works, some extra overhead would be needed, which counters
+  the intention of maximum loading speed. Thus modifying a loaded doc
+  is not supported.
+ */
+struct csBdNode;
+struct csBdAttr;
+
 struct csBinaryDocAttributeIterator : public iDocumentAttributeIterator
 {
 private:
+  friend struct csBinaryDocument;
+
   /**
    * Where we are in the attribute list.
    */
   int pos;
   /// The node whose attributes we're iterating.
-  csBinaryDocNode* node;
+  csBdNode* iteratedNode;
+  /// Owning node.
+  csBinaryDocNode* parentNode;
+
 public:
   SCF_DECLARE_IBASE;
 
-  csBinaryDocAttributeIterator (csBinaryDocNode *node);
+  csBinaryDocAttributeIterator ();
   virtual ~csBinaryDocAttributeIterator();
+  void SetTo (csBdNode* node,
+    csBinaryDocNode* parent);
 
   virtual bool HasNext ();
   virtual csRef<iDocumentAttribute> Next ();
 };
 
+struct csBdAttr : public bdNodeAttribute {
+public:
+  // fields below only exist in modified attrs!
+  /// name
+  char* nstr;
+  /// value
+  char* vstr;
+private:
+public:
+  csBdAttr (const char* name);
+  ~csBdAttr ();
+
+  const char* GetValueStr (csBinaryDocument* doc);
+  const char* GetNameStr (csBinaryDocument* doc);
+};
+
 struct csBinaryDocAttribute : public iDocumentAttribute
 {
 private:
+  friend struct csBinaryDocument;
   friend struct csBinaryDocNode;
 
-  csBinaryDocument* doc;
+  /// Owning node.
   csBinaryDocNode* node;
 
-  char* name;
-  uint32 flags;
-  uint32 value;
+  /// Pointer to data
+  csBdAttr* attrPtr;
+  /// buffer for int/float values requested as strings
   char* vstr;
+  /// attrPtr for which vstr is valid
+  csBdAttr* vsptr;
 
-  /// Switch into "modified" state
-  inline void Modify();
+  csBinaryDocAttribute* pool_next;
+
   /// Store into a file
   void Store (csMemFile* nodesFile);
+
+  void CleanData ();
 public:
   SCF_DECLARE_IBASE;
 
-  /// Create new
-  csBinaryDocAttribute (csBinaryDocument* document,
-    csBinaryDocNode* node,
-    uint32 attrType);
-  /// Create from data
-  csBinaryDocAttribute (csBinaryDocument* document,
-    csBinaryDocNode* node,
-    bdNodeAttribute* data);
+  csBinaryDocAttribute ();
   virtual ~csBinaryDocAttribute ();
+
+  void SetTo (csBdAttr* ptr,
+	      csBinaryDocNode* owner);
 
   virtual const char* GetName ();
   virtual const char* GetValue ();
@@ -237,25 +297,73 @@ public:
 struct csBinaryDocNodeIterator : iDocumentNodeIterator
 {
 private:
+  friend struct csBinaryDocument;
+
+  /// Owning node.
+  csBinaryDocNode* parentNode;
   /**
    * Where we are in the children list.
    */
   int pos;
-  /// The node whose children we're iterating.
-  csBinaryDocNode* node;
   /// Only iterate through nodes w/ this name
   char* value;
+  /// Node whose childen we're iterating.
+  csBdNode* iteratedNode;
 
-  inline void FastForward();
+  // fill up struct size to 32(64)
+  // may sound like voodoo - but seems to help performance
+  int pad[1];
+
+  /// Skip to next node with value 'value'.
+  void FastForward();
 public:
   SCF_DECLARE_IBASE;
 
-  csBinaryDocNodeIterator (csBinaryDocNode* node,
-    const char* onlyval = NULL);
+  csBinaryDocNodeIterator ();
   virtual ~csBinaryDocNodeIterator ();
+  void SetTo (csBdNode* node,
+    csBinaryDocNode* parent,
+    const char* onlyval = NULL);
 
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
+};
+
+struct csBdNode : public bdNode
+{
+public:
+  // fields below only exist in modified attrs!
+  /// value of type 'string' for mod. nodes
+  char* vstr;
+  /// attributes
+  csPDelArray<csBdAttr>* attrs;
+  /// children
+  csPDelArray<csBdNode>* nodes;
+private:
+  void* GetFromOffset (uint32 offset)
+  { return (void*)((uint8*)this + offset); }
+  bdNodeAttrTab* GetAttrTab ();
+  bdNodeChildTab* GetChildTab ();
+public:
+  csBdNode (uint32 newType);
+  csBdNode (csBdNode* copyFrom);
+  ~csBdNode ();
+
+  const char* GetValueStr (csBinaryDocument* doc);
+
+  csBdAttr* atGetItem (int pos);
+  void atSetItem (csBdAttr* item, int pos);
+  int atItemPos (csBdAttr* item);
+  void atInsertBefore (csBdAttr* item, int pos);
+  void atRemove (int pos);
+  int atNum ();
+
+  csBdNode* ctGetItem (int pos);
+  void ctSetItem (csBdNode* item, int pos);
+  int ctItemPos (csBdNode* item);
+  void ctInsertBefore (csBdNode* item, int pos);
+  void ctRemove (int pos);
+  int ctNum ();
 };
 
 struct csBinaryDocNode: public iDocumentNode
@@ -268,35 +376,36 @@ private:
 
   /**
    * Pointer to the node data.
-   *  Modified node - new'd bdNode*.
+   *  Modified node - new'd csBdNode*.
    *  Unmodified n. - Pointer to structure in data buffer.
    */
-  bdNode* nodeData;
+  csBdNode* nodeData;
   csBinaryDocument* doc;
+  /// buffer for int/float values requested as strings
   char* vstr;
-  csBinaryDocNode* Parent; 
-  csRefArray<csBinaryDocAttribute> *attributes;
-  csRefArray<csBinaryDocNode> *children;
+  /// nodeData for which vstr is valid
+  csBdNode* vsptr;
+  // to save a few bytes the 'Parent' pointer also serves as
+  // 'pool_next'.
+  csBinaryDocNode* PoolNextOrParent; 
 
-  static int attrCompareName (csBinaryDocAttribute* item1, 
-    csBinaryDocAttribute* item2);
-  static int attrCompareKeyName (csBinaryDocAttribute* item, void* key);
-  inline void Modify();
   void Store (csMemFile* nodesFile);
-  inline int IndexOfAttr (const char* attr);
-  inline void InsertNewAttr (csRef<csBinaryDocAttribute> attrib);
-  inline void ReadChildren();
-  inline void ReadAttrs();
+  int IndexOfAttr (const char* attr);
+  void CleanData();
+  void ResortAttrs();
+  void ResortAttrs(int a, int b);
+  
+  inline const char* nodeValueStr (csBdNode* nodeData);
+  inline int nodeValueInt (csBdNode* nodeData);
+  inline float nodeValueFloat (csBdNode* nodeData);
 public:
   SCF_DECLARE_IBASE;
 
-  csBinaryDocNode (csBinaryDocument* document,
-    csBinaryDocNode* parent,
-    uint32 nodeType);
-  csBinaryDocNode (csBinaryDocument* document,
-    csBinaryDocNode* parent,
-    bdNode* data);
+  csBinaryDocNode ();
   virtual ~csBinaryDocNode ();
+
+  void SetTo (csBdNode* ptr,
+	      csBinaryDocNode* parent);
 
   virtual csDocumentNodeType GetType ();
   virtual bool Equals (iDocumentNode* other);
@@ -329,71 +438,46 @@ public:
   virtual void SetAttributeAsFloat (const char* name, float value);
 };
 
-/**
- * Special version of csStringHash which doesn't copy the registered
- * strings via csStrNew() but only keeps a pointer to them.
- */
-class csNoCopyStringHash
-{
-private:
-  csHashMap Registry;
-  csHashMap RevRegistry;
-public:
-  /// Constructor
-  csNoCopyStringHash (uint32 size = 211);
-  /// Destructor
-  ~csNoCopyStringHash ();
-
-  /**
-   * Register a string with an id. Returns the pointer to the copy
-   * of the string in this hash.
-   */
-  const char* Register (char *s, csStringID id);
-
-  /**
-   * Request the ID for the given string. Return csInvalidStringID
-   * if the string was never requested before.
-   */
-  csStringID Request (const char *s);
-
-  /**
-   * Request the string for a given ID. Return NULL if the string
-   * has not been requested (yet).
-   */
-  char* Request (csStringID id);
-
-  /**
-   * Delete all stored strings.
-   */
-  void Clear ();
-};
-
 struct csBinaryDocument : public iDocument
 {
 private:
   friend struct csBinaryDocNode;
+  friend struct csBinaryDocNodeIterator;
   friend struct csBinaryDocAttribute;
+  friend struct csBinaryDocAttributeIterator;
 
   csRef<iDataBuffer> data;
-  csBinaryDocNode* root;
+  uint8* dataStart;
+  csBdNode* root;	
+  csBinaryDocNode* nodePool;
+  csBinaryDocAttribute* attrPool;
   
-  csStringSet* outStrSet;
-  csNoCopyStringHash* inStrHash;
+  csStringHash* outStrHash;
+  csMemFile* outStrStorage;
+  uint32 outStrTabOfs;
+  uint32 inStrTabOfs;
 
-  /// Get an ID for a string in the output string map
-  uint32 GetOutStringID (const char* str);
-  /// Get an ID for a string in the input string map
-  uint32 GetInStringID (const char* str);
-  /// Get a string for an ID in the output string map
-  const char* GetOutIDString (uint32 ID);
-  /// Get a string for an ID in the input string map
-  char* GetInIDString (uint32 ID);
-  inline const char* Write (csMemFile& out);
+  csBinaryDocNode* GetPoolNode ();
+  void RecyclePoolNode (csBinaryDocNode *node);
+  csBinaryDocAttribute* GetPoolAttr ();
+  void RecyclePoolAttr (csBinaryDocAttribute *attr);
+
+  csBinaryDocNode* GetRootNode ();
+
+  const char* Write (csMemFile& out);
 public:
   SCF_DECLARE_IBASE;
 
   csBinaryDocument ();
   virtual ~csBinaryDocument ();
+
+  /**
+   * Get an ID for a string in the output string table.
+   * Only call while writing.
+   */
+  uint32 GetOutStringID (const char* str);
+  /// Get a string for an ID in the input string table
+  const char* GetInIDString (uint32 ID);
 
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();
@@ -405,5 +489,7 @@ public:
   virtual const char* Write (iFile* file);
   virtual const char* Write (iString* str);
   virtual const char* Write (iVFS* vfs, const char* filename);
+
+  virtual int Changeable ();
 };
 

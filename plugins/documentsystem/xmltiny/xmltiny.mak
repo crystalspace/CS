@@ -43,6 +43,8 @@ SRC.XMLTINY = $(wildcard $(DIR.XMLTINY)/*.cpp)
 OBJ.XMLTINY = $(addprefix $(OUT.XMLTINY)/,$(notdir $(SRC.XMLTINY:.cpp=$O)))
 DEP.XMLTINY = CSUTIL CSTOOL CSSYS CSUTIL
 
+OUTDIRS += $(OUT.XMLTINY)
+
 MSVC.DSP += XMLTINY
 DSP.XMLTINY.NAME = xmltiny
 DSP.XMLTINY.TYPE = plugin
@@ -52,16 +54,13 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: xmltiny xmltinyclean xmltinycleandep
-xmltiny: $(OUTDLL) $(OUT.XMLTINY) $(XMLTINY)
+xmltiny: $(OUTDIRS) $(XMLTINY)
 
-$(OUT.XMLTINY)/%$O: $(DIR.XMLTINY)/%.cpp $(OUT.XMLTINY)
+$(OUT.XMLTINY)/%$O: $(DIR.XMLTINY)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(XMLTINY): $(OBJ.XMLTINY) $(LIB.XMLTINY)
 	$(DO.PLUGIN)
-
-$(OUT.XMLTINY): 
-	$(MKDIRS)
 
 clean: xmltinyclean
 xmltinyclean:

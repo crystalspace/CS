@@ -44,6 +44,8 @@ public:
   virtual const char* Write (iFile* file);
   virtual const char* Write (iString* str);
   virtual const char* Write (iVFS* vfs, const char* filename);
+
+  virtual int Changeable ();
 };
 
 SCF_IMPLEMENT_IBASE (csTinyDocWrapper)
@@ -123,6 +125,11 @@ const char* csTinyDocWrapper::Write (iString* str)
 const char* csTinyDocWrapper::Write (iVFS* vfs, const char* filename)
 {
   return tinydoc->Write (vfs, filename);
+}
+
+int csTinyDocWrapper::Changeable ()
+{
+  return tinydoc->Changeable();
 }
 
 class csTinyXMLPlugin : public iDocumentSystem, public iComponent

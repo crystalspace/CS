@@ -23,6 +23,13 @@ The history order is reversed so that new features are at the top.
 	  between 'malloc' and 'delete[]'.
 	- Luca Romagnoli <lucak@qubica.net> suggested a bugfix in the spr3d
 	  loader with regards to <applymotion/>.
+	- res made the following changes:
+	    - Partly rewritten & much improved binary document system.
+	    - Modified document systems makefiles according to latest
+	      bugplug.mak changes.
+	    - added iDocument::Changeable() which returns whether a 
+	      can be changed or not.
+	    - res added the document system makefiles to user.mak.
 31-Mar-2003
 	- Fixed a very old clipping bug with individual polygon drawing
 	  in the thing plugin in case there is rendering through a portal
@@ -32,6 +39,8 @@ The history order is reversed so that new features are at the top.
 	  exit out of that function (because after clipping no triangles
 	  were visible) the clipper wouldn't get restored correctly.
 	  This could cause wrong clipping for objects following later.
+	- res started to add to the documentation which parts don't use the
+	  LGPL.
 30-Mar-2003
 	- Keith Fulton enhanced maya2spr in the following ways.
 	    - Attempted to fix all bugs except for the last two in

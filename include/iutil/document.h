@@ -54,6 +54,17 @@ enum csDocumentNodeType
   CS_NODE_DECLARATION
 };
 
+/** \name Document changeabilty
+ * @{
+ */
+/// The document can not be changed, CreateRoot() is not supported.
+#define CS_CHANGEABLE_NEVER		0
+/// The document only allows changes with a newly created root.
+#define CS_CHANGEABLE_NEWROOT		1
+/// The document can be changed.
+#define CS_CHANGEABLE_YES		2
+/** @} */
+
 //===========================================================================
 
 SCF_VERSION (iDocumentAttributeIterator, 0, 0, 1);
@@ -237,7 +248,7 @@ struct iDocumentNode : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iDocument, 0, 1, 0);
+SCF_VERSION (iDocument, 0, 2, 0);
 
 /**
  * Representation of a document containing a hierarchical structure of nodes.
@@ -305,6 +316,15 @@ struct iDocument : public iBase
    * error string.
    */
   virtual const char* Write (iVFS* vfs, const char* filename) = 0;
+  
+  /**
+   * Returns how far this document can be changed.
+   * \sa
+   * 	#CS_CHANGEABLE_NEVER
+   * 	#CS_CHANGEABLE_NEWROOT
+   * 	#CS_CHANGEABLE_YES
+   */
+  virtual int Changeable () = 0;
 };
 
 //===========================================================================
