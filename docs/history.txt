@@ -51,6 +51,10 @@ chronological order.
 	      ("attribute 3" vs "color") in shaders more safe. Note that
 	      since some attribute aliasing properties are undefined in 
 	      the extension specification, shaders should preferably not mix.
+	- Oktal added an overloaded SetLength() to csPDelArray which copies
+	  the pointed-to object, not the pointer itsself, then converted all
+	  csArray<csShaderVariable> instances in the new renderer shader
+	  variable system to csPDelArray<csShaderVariable>.
 24-Aug-2003
 	- Luca added the CSTOOL library dependency to maya2spr makefile.
 	- Luca reverted his latest commit because the cstool library is not

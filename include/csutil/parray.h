@@ -52,9 +52,11 @@ public:
 template <class T>
 class csPDelArray : public csArray<T*, csPDelArrayElementHandler<T*> >
 {
+  typedef csPDelArrayElementHandler<T*> superclass;
+
 private:
   csPDelArray (const csPDelArray&) {}
-  csPDelArray& operator= (const csPDelArray&) {}
+  csPDelArray& operator= (const csPDelArray&) { return *this; }
 
 public:
   /**
@@ -99,6 +101,21 @@ public:
     return ret;
   }
 
+  /// Variant of SetLength() which copies the pointed-to object instead of
+  /// the actual pointer.
+  void SetLength (int n, T const &what)
+  {
+    if (n <= Length ())
+    {
+      Truncate (n);
+    }
+    else
+    {
+      int old_len = Length ();
+      SetLength (n, 0);
+      for (int i = old_len ; i < n ; i++) Get(i) = new T (what);
+    }
+  }
 };
 
 #endif // __CS_PTRARR_H__

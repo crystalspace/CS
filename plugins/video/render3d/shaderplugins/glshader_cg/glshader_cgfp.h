@@ -40,7 +40,7 @@ private:
     XMLTOKEN_PROGRAM
   };
 
-  csArray<csSymbolTable> symtabs;
+  csPDelArray<csSymbolTable> symtabs;
   csSymbolTable *symtab;
 
   struct variablemapentry
@@ -127,11 +127,11 @@ public:
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
   virtual csSymbolTable* GetSymbolTable(int i) {
     if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
-    return & symtabs[i];
+    return symtabs[i];
   }
   virtual void SelectSymbolTable(int i) {
     if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
-    symtab = & symtabs[i];
+    symtab = symtabs[i];
   }
 
   /// Check if valid
