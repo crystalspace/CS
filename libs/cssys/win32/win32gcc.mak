@@ -11,9 +11,9 @@ PLUGINS+= sound/renderer/software
 PLUGINS+= video/canvas/ddraw
 #PLUGINS+= video/canvas/ddraw8
 PLUGINS+= sound/loader/mp3
-
-# udp/tcp network plugin
 PLUGINS+=net/driver/ensocket
+#PLUGINS.DYNAMIC += mesh/impexp/3ds
+#PLUGINS.DYNAMIC += font/server/freefnt2
 
 # if u have the following line uncommented make sure one
 # LIBS.OPENGL.SYSTEM is set below or you have a custom
