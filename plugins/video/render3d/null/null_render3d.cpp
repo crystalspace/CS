@@ -125,7 +125,7 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
     driver = cmdline->GetOption ("canvas");
 
   if (!driver)
-    driver = config->GetStr ("Video.Null.Canvas", CS_OPENGL_2D_DRIVER);
+    driver = config->GetStr ("Video.Null.Canvas", CS_SOFTWARE_2D_DRIVER);
 
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
   if (!G2D)
