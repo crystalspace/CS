@@ -693,7 +693,7 @@ question.  These solutions are summarized below.
 @item
 The NextStep port emulates private plug-in symbols by actually stripping away
 all public (resolved) symbols from the plug-in module at build time except for
-the @sc{scf} @code{GetClassTable()} hook (@pxref{SCF}).  This technique
+the @sc{scf} @code{module_scfInitialize()} hook (@pxref{SCF}).  This technique
 provides fairly decent insurance against symbolic conflicts at plug-in load
 time even when multiple plug-ins have been linked against the same static
 libraries.  The only big drawback to this approach is that it makes symbolic

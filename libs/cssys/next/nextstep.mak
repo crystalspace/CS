@@ -78,6 +78,6 @@ NEXT.FRIEND=no
 ifeq ($(MAKESECTION),postdefines)
 PUBDLLSYM = $(OUTOS)$(basename $(notdir $@)).sym
 DO.SHARED.PLUGIN.POSTAMBLE += \
-  ; echo "_$(basename $(notdir $@))_GetClassTable" > $(PUBDLLSYM) \
+  ; echo "_$(basename $(notdir $@))_scfInitialize" > $(PUBDLLSYM) \
   ; $(STRIP) -s $(PUBDLLSYM) -u $(NEXT.STRIP_FLAGS) $@
 endif

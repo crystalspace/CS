@@ -15,6 +15,10 @@ The history order is reversed so that new features are at the top.
 	  problem was triggered by the SCF module_scfInitialize() function,
 	  which is created by the EXPORT_CLASS_TABLE() macro, and which
 	  contains the C++ expression `iSCF::SCF = SCF'.
+	- Eric Sunshine repaired the NextStep plugin generation process
+	  (DO.SHARED.PLUGIN.POSTAMBLE in nextstep.mak) to take into account
+	  the name change: module_GetClassTable() -> module_scfInitialize().
+	  Also repaired the NextStep documentation in this regard.
 31-May-2001
 	- In an effort to understand how the keyframer section in 3DS
 	  works I extended 3ds2lev verbose option to also list the contents
