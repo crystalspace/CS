@@ -37,7 +37,8 @@ CSCONFIG.DEP = \
 CSCONFIG.TMP = $(OUT)/csconfig.tmp
 
 TO_INSTALL.EXE	+= $(CSCONFIG.EXE)
-TO_INSTALL.ROOT += $(SRCDIR)/scripts/cs-config/crystal.m4
+# @@@ Enable this when TO_INSTALL.ETC functionality is added to install.mak.
+#TO_INSTALL.ETC += $(wildcard $(SRCDIR)/mk/autoconf/*.m4)
 
 # This section is specially protected by DO_CREATE_CSCONFIG in order to prevent
 # execution of sed commands for _all_ other build targets.  DO_CREATE_CSCONFIG
