@@ -12,6 +12,9 @@ chronological order.
 	  since MSVC used by Bruce Williams <midnightcoder@midnightcoder.com>
 	  could not grok the 'static const int'.  The 'enum' is accepted by all
 	  the compilers used for CS.
+	- Keith Fulton updated for more accurate bounding box calculations in
+	  very latest cal3d cvs, and attempted to update ./configure to check
+	  for new cal3d API.
 1-Feb-2004
 	- Eric Sunshine applied a couple small patches from Randall Foreman
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration

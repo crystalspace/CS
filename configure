@@ -24658,8 +24658,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalLoader::loadCoreAnimation((void*)0,(CalCoreSkeleton*)0);
-	    CalModel m; m.getMixer()->getTimeFactor();
+  CalLoader::loadCoreAnimation((void*)0,(CalCoreSkeleton*)0);
+  CalModel m; m.getMixer()->getTimeFactor();
+  CalCoreSkeleton *s; s->calculateBoundingBoxes((CalCoreModel*)0);
   ;
   return 0;
 }
