@@ -1,52 +1,54 @@
 The history order is reversed so that new features are at the top.
 
 21-Jun-2001
-	- Fixed a bug in the cleanup of sectors in the engine. The
-	  portal references were not cleaned up.
+	- Fixed a bug in the cleanup of sectors in the engine.  The portal
+	  references were not cleaned up.
 	- Made the destructors of the following classes private:
-		- csTextureWrapper
-		- csMaterialWrapper
-		- csCollection
-		- csSector
-		- csMeshFactoryWrapper
-		- csTerrainFactoryWrapper
-		- csCurveTemplate
-		- csCameraPosition
+	    - csTextureWrapper
+	    - csMaterialWrapper
+	    - csCollection
+	    - csSector
+	    - csMeshFactoryWrapper
+	    - csTerrainFactoryWrapper
+	    - csCurveTemplate
+	    - csCameraPosition
 	- Removed csCurveTemplateArray. It was not used.
-	- csThing no longer puts itself in the current region. That is
-	  not needed since csMeshWrapper already does that.
-	- Completely reworked the callback system for portals. A portal
-	  callback is no longer a function. Instead it is an SCF
-	  class (iPortalCallback) that you have to implement. This allows
-	  cleanup of that callback when the portal is deleted.
-	  There are also two types of portal callback now:
+	- csThing no longer puts itself in the current region.  That is not
+	  needed since csMeshWrapper already does that.
+	- Completely reworked the callback system for portals.  A portal
+	  callback is no longer a function.  Instead it is an SCF class
+	  (iPortalCallback) that you have to implement.  This allows cleanup of
+	  that callback when the portal is deleted.  There are also two types
+	  of portal callback now:
 	     - Missing sector: this is the old type. When a sector is missing
 	       (null portal) this will be called.
 	     - Portal callback: this will be called when the sector is not
 	       missing.
-	- Made a few things in the Window canvases static (ddraw, ddraw8,
-	  and glwin32) so that they can be static linked with each other.
-	- Fixed static linking for apps using the engine as a plugin by
-	  adding engine/3d to the PLUGINS section (instead of PLUGINS.DYNAMIC)
-	  in mk/user.mak.
-	- Fixed a bug in csMeshWrapper::DecRef()
-	  (and csTerrainWrapper::DecRef()). The custom code there would
-	  do scfRefCount++ in the assumption that the engine would
-	  decrease it again. But this only happens if the object was in
-	  the engine which is not always the case (in fact it should never
-	  be the case now). So this was a big memory leak. I kept the custom
-	  DecRef() and put some testing code there (using CS_ASSERT) to make
-	  sure that it is not misused.
+	- Made a few things in the Window canvases static (ddraw, ddraw8, and
+	  glwin32) so that they can be static linked with each other.
+	- Fixed static linking for apps using the engine as a plugin by adding
+	  engine/3d to the PLUGINS section (instead of PLUGINS.DYNAMIC) in
+	  mk/user.mak.
+	- Fixed a bug in csMeshWrapper::DecRef() and
+	  csTerrainWrapper::DecRef().  The custom code there would do
+	  scfRefCount++ in the assumption that the engine would decrease it
+	  again.  But this only happens if the object was in the engine which
+	  is not always the case (in fact it should never be the case now).  So
+	  this was a big memory leak.  I kept the custom DecRef() and put some
+	  testing code there (using CS_ASSERT) to make sure that it is not
+	  misused.
 	- Fixed handling of csRegion::DeleteAll(). It should now work a lot
 	  better and actually delete everything.
-	- Replaced csDrawCallback with iMeshDrawCallback (similar to
-	  the iPortalCallback). This new callback can even return false
-	  to prevent the drawing to take place.
-	- Replaced csMeshCallback with iMeshObjectDrawCallback.
-	  Can now also prevent drawing.
+	- Replaced csDrawCallback with iMeshDrawCallback (similar to the
+	  iPortalCallback).  This new callback can even return false to prevent
+	  the drawing to take place.
+	- Replaced csMeshCallback with iMeshObjectDrawCallback.  Can now also
+	  prevent drawing.
 	- Replaced csDrawFunc with iDrawFuncCallback.
 	- Norman Kramer removed UnlinkCollection() from csEngine.
 	- Fixed a problem with the transparent sphere in flarge.
+	- Eric Sunshine removed several outdated DO_BLAH references from
+	  the documentation, and from mac/volatile.h and win32/volatile.h
 20-Jun-2001
 	- Made the resolving of portals to sectors a bit more robust
 	  by not resolving portals that point to sectors that already
@@ -93,11 +95,10 @@ The history order is reversed so that new features are at the top.
 	- Wouter Wijngaards fixed the bug where perftest incorrectly reported
 	  the fps when spacebar was pressed to advance to the next test.
 	- Fixed SCF stuff in csMaterialWrapper, csTextureWrapper,
-	  csCameraPosition, and csMapNode. Please don't use
-	  CONSTRUCT_IBASE (NULL) for classes that get iBase from
-	  a superclass.
-	- csPortal now also extends csObject and embeds iPortal instead
-	  of inheriting from it. Added iPortal::QueryObject().
+	  csCameraPosition, and csMapNode.  Please don't use CONSTRUCT_IBASE
+	  (NULL) for classes that get iBase from a superclass.
+	- csPortal now also extends csObject and embeds iPortal instead of
+	  inheriting from it.  Added iPortal::QueryObject().
 19-Jun-2001
 	- Removed verbose output of lightmap calculation if recalculation
 	  of lighting is not enabled. Now the progress bars are only
@@ -159,8 +160,8 @@ The history order is reversed so that new features are at the top.
 	  because a += was used where an = should be used (for SYSCONFIG).
 	- Wouter fixed the ddraw.mak makefile so it no longer tries to install
 	  the removed directx5 and 6 config files.
-	- Worked on apimod19.txi. Also updated dirhier.txi to add the
-	  sequence plugin.
+	- Worked on apimod19.txi.  Also updated dirhier.txi to add the sequence
+	  plugin.
 	- Philip Wyett fixed the video app after Jorrit's changes.
 	- Michael Voasse shifted the tesselator from MetaBall to csgeom. It
 	  is a general purpose utility that better serves CS in the geometry
@@ -225,11 +226,11 @@ The history order is reversed so that new features are at the top.
 	    - Created the csComponentFactory class.
 	    - Made some mods to the interface and manager to support
 	      component registration.  
-	- Norman Kramer removed csBase in favor of iBase (or in many
-	  cases it is just removed). Did various changes throughout the
-	  project for this.
-	- Norman als changed csObjVector so that it DecRef()'s the items
-	  in FreeItem().
+	- Norman Kramer removed csBase in favor of iBase (or in many cases it
+	  is just removed).  Did various changes throughout the project for
+	  this.
+	- Norman als changed csObjVector so that it DecRef()'s the items in
+	  FreeItem().
 	- Norman made csLightArray descendant of iBase.
 	- Norman changed scfSharedLibrary so it no longer derives from iBase.
 	- Norman changed csRect so it no longer derives from iBase.

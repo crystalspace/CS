@@ -36,15 +36,6 @@
 
 #if !defined (COMP_GCC)
   #define DO_SOUND
-  #define DO_GIF
-  #define DO_BMP
-  #define DO_TGA
-  #define DO_PNG
-  #define DO_JPG
-  #define DO_AIFF
-  #define DO_IFF
-  #define DO_WAV
-  #define DO_AU
   #define DO_MMX
   #define ZLIB_DLL
 #endif
