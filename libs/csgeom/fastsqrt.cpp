@@ -35,7 +35,7 @@ void BuildSqrtTable ()
   ULong i;
   FastSqrtUnion s;
 
-  for (i = 1; i <= 0x7FFF; i++)
+  for (i = 0; i <= 0x7FFF; i++)
   {
     // Build a float with the bit pattern i as mantissa
     // and an exponent of 0, stored as 127
@@ -53,7 +53,6 @@ void BuildSqrtTable ()
 
     fast_sqrt_table[i] = (s.i & 0x7FFFFF);
   }
-  fast_sqrt_table[0] = 0x1f800000;
 }
 
 float FastSqrt (float n)
