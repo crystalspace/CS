@@ -23,12 +23,37 @@
 #include "imap/writer.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "csutil/strhash.h"
 
 struct iEngine;
 struct iPluginManager;
 struct iObjectRegistry;
 struct iSyntaxService;
 struct iReporter;
+
+/**
+ * Private information during the loading process of a thing.
+ */
+class ThingLoadInfo
+{
+public:
+  iMaterialWrapper* default_material;
+  float default_texlen;
+  bool use_mat_set;
+  char* mat_set_name;
+
+  ThingLoadInfo () : default_material (NULL),
+    default_texlen (1),
+    use_mat_set (false), mat_set_name (NULL)
+    {}
+
+  void SetTextureSet (const char* name)
+  {
+    delete [] mat_set_name;
+    mat_set_name = new char [strlen (name) + 1];
+    strcpy (mat_set_name, name);
+  }
+};
 
 /**
  * Thing loader.
@@ -40,6 +65,13 @@ private:
   iObjectRegistry* object_reg;
   iSyntaxService *synldr;
   iReporter* reporter;
+  csStringHash xmltokens;
+
+  bool LoadThingPart (iXmlNode* node, iLoaderContext* ldr_context,
+	iObjectRegistry* object_reg, iReporter* reporter,
+	iSyntaxService *synldr, ThingLoadInfo& info,
+	iEngine* engine, iThingState* thing_state,
+	int vt_offset, bool isParent);
 
 public:
   SCF_DECLARE_IBASE;
@@ -57,10 +89,7 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual iBase* Parse (iXmlNode* node,
-    iLoaderContext* ldr_context, iBase* context)
-  {
-    return NULL;
-  }
+    iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {
@@ -113,6 +142,7 @@ private:
   iObjectRegistry* object_reg;
   iSyntaxService *synldr;
   iReporter* reporter;
+  csStringHash xmltokens;
 
 public:
   SCF_DECLARE_IBASE;
@@ -130,10 +160,7 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual iBase* Parse (iXmlNode* node,
-    iLoaderContext* ldr_context, iBase* context)
-  {
-    return NULL;
-  }
+    iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {
@@ -185,6 +212,7 @@ private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
   iReporter* reporter;
+  csStringHash xmltokens;
 
 public:
   SCF_DECLARE_IBASE;
@@ -202,10 +230,7 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual iBase* Parse (iXmlNode* node,
-    iLoaderContext* ldr_context, iBase* context)
-  {
-    return NULL;
-  }
+    iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {

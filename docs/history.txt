@@ -9,11 +9,13 @@ The history order is reversed so that new features are at the top.
 	  services).
 	- Implemented ParsePortal() in syntax services.
 	- Removed XML version of ParseShading() in syntax services. It
-	  doesn't do much useful.
+	  isn't that useful to keep as a seperate routine.
 	- Added XML version of ParseBool() to syntax services.
 	- Partially implemented XML version of ParsePoly3d() for syntax
 	  services. This means that syntax services nearly completely
 	  supports XML now.
+	- Implemented XML thing loading. This includes plane and
+	  bezier addon-loaders.
 9-Aug-2002
 	- Added conveniance functions to get a value from a node (iXmlNode).
 	  This will basically search for the first TEXT child in the node and

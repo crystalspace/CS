@@ -23,11 +23,18 @@
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
-#include "thingldr.h"
-#include "imesh/object.h"
+#include "csutil/csstring.h"
+#include "iutil/vfs.h"
+#include "iutil/xml.h"
+#include "iutil/object.h"
+#include "iutil/objreg.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
+#include "iutil/plugin.h"
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
-#include "iutil/plugin.h"
+#include "iengine/material.h"
+#include "imesh/object.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
@@ -36,19 +43,13 @@
 #include "imesh/thing/curve.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
-#include "qint.h"
-#include "iutil/vfs.h"
-#include "csutil/csstring.h"
-#include "iutil/object.h"
 #include "ivideo/material.h"
-#include "iengine/material.h"
-#include "iutil/objreg.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
 #include "imap/services.h"
 #include "imap/ldrctxt.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
+#include "thingldr.h"
+#include "qint.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -89,6 +90,39 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (W)
   CS_TOKEN_DEF (V)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_CLONE = 1,
+  XMLTOKEN_CURVE,
+  XMLTOKEN_CURVECENTER,
+  XMLTOKEN_CURVECONTROL,
+  XMLTOKEN_CURVESCALE,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_FASTMESH,
+  XMLTOKEN_FOG,
+  XMLTOKEN_MATSETSELECT,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_MOVEABLE,
+  XMLTOKEN_PART,
+  XMLTOKEN_P,
+  XMLTOKEN_RADIUS,
+  XMLTOKEN_TEXLEN,
+  XMLTOKEN_VISTREE,
+  XMLTOKEN_V,
+
+  // Below is for plane loader.
+  XMLTOKEN_ORIG,
+  XMLTOKEN_FIRSTLEN,
+  XMLTOKEN_FIRST,
+  XMLTOKEN_SECONDLEN,
+  XMLTOKEN_SECOND,
+  XMLTOKEN_MATRIX,
+  //XMLTOKEN_V,
+  XMLTOKEN_NAME,
+  XMLTOKEN_UVEC,
+  XMLTOKEN_VVEC
+};
 
 SCF_IMPLEMENT_IBASE (csThingLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -235,29 +269,26 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
       return false;
     }
   }
+
+  xmltokens.Register ("clone", XMLTOKEN_CLONE);
+  xmltokens.Register ("curve", XMLTOKEN_CURVE);
+  xmltokens.Register ("curvecenter", XMLTOKEN_CURVECENTER);
+  xmltokens.Register ("curvecontrol", XMLTOKEN_CURVECONTROL);
+  xmltokens.Register ("curvescale", XMLTOKEN_CURVESCALE);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("fastmesh", XMLTOKEN_FASTMESH);
+  xmltokens.Register ("fog", XMLTOKEN_FOG);
+  xmltokens.Register ("matsetselect", XMLTOKEN_MATSETSELECT);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("moveable", XMLTOKEN_MOVEABLE);
+  xmltokens.Register ("part", XMLTOKEN_PART);
+  xmltokens.Register ("p", XMLTOKEN_P);
+  xmltokens.Register ("radius", XMLTOKEN_RADIUS);
+  xmltokens.Register ("texlen", XMLTOKEN_TEXLEN);
+  xmltokens.Register ("vistree", XMLTOKEN_VISTREE);
+  xmltokens.Register ("v", XMLTOKEN_V);
   return true;
 }
-
-class ThingLoadInfo
-{
-public:
-  iMaterialWrapper* default_material;
-  float default_texlen;
-  bool use_mat_set;
-  char* mat_set_name;
-
-  ThingLoadInfo () : default_material (NULL),
-    default_texlen (1),
-    use_mat_set (false), mat_set_name (NULL)
-    {}
-
-  void SetTextureSet (const char* name)
-  {
-    delete [] mat_set_name;
-    mat_set_name = new char [strlen (name) + 1];
-    strcpy (mat_set_name, name);
-  }
-};
 
 static bool load_thing_part (csParser* parser, iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
@@ -290,7 +321,6 @@ static bool load_thing_part (csParser* parser, iLoaderContext* ldr_context,
     CS_TOKEN_TABLE (P)
   CS_TOKEN_TABLE_END
 
-  char* name = NULL;
   char* xname;
   long cmd;
   char* params;
@@ -539,7 +569,7 @@ Nag to Jorrit about this feature if you want it.");
 	  iCurveTemplate* ct = te->FindCurveTemplate (cname);
 	  te->DecRef ();
 	  iCurve* p = thing_state->CreateCurve (ct);
-	  p->QueryObject()->SetName (name);
+	  p->QueryObject()->SetName (cname);
           if (!ct->GetMaterial ())
 	    p->SetMaterial (info.default_material);
         }
@@ -631,6 +661,266 @@ iBase* csThingLoader::Parse (const char* string,
   return fact;
 }
 
+// XML versions: -------------------------------------------------
+
+bool csThingLoader::LoadThingPart (iXmlNode* node, iLoaderContext* ldr_context,
+	iObjectRegistry* object_reg, iReporter* reporter,
+	iSyntaxService *synldr, ThingLoadInfo& info,
+	iEngine* engine, iThingState* thing_state,
+	int vt_offset, bool isParent)
+{
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_VISTREE:
+        if (!isParent)
+	{
+	  ReportError (reporter,
+	    "crystalspace.thingloader.parse.vistree",
+	    "'vistree' flag only for top-level thing!");
+	  return false;
+	}
+        else thing_state->GetFlags ().Set (CS_THING_VISTREE);
+        break;
+      case XMLTOKEN_FASTMESH:
+        if (!isParent)
+	{
+	  ReportError (reporter,
+	    "crystalspace.thingloader.parse.fastmesh",
+	    "'fastmesh' flag only for top-level thing!");
+	  return false;
+	}
+        else thing_state->GetFlags ().Set (CS_THING_FASTMESH);
+        break;
+      case XMLTOKEN_MOVEABLE:
+        if (!isParent)
+	{
+	  ReportError (reporter,
+	    "crystalspace.thingloader.parse.moveable",
+	    "'moveable' flag only for top-level thing!");
+	  return false;
+	}
+        else thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
+        break;
+      case XMLTOKEN_FACTORY:
+        if (!isParent)
+	{
+	  ReportError (reporter,
+	    "crystalspace.thingloader.parse.factory",
+	    "'factory' statement only for top-level thing!");
+	  return false;
+	}
+	else
+        {
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+          if (!fact)
+          {
+	    ReportError (reporter,
+	      "crystalspace.thingloader.parse.factory",
+              "Couldn't find thing factory '%s'!", factname);
+            return false;
+          }
+	  csRef<iThingState> tmpl_thing_state;
+	  tmpl_thing_state.Take (SCF_QUERY_INTERFACE (
+	  	fact->GetMeshObjectFactory (), iThingState));
+	  if (!tmpl_thing_state)
+	  {
+	    ReportError (reporter,
+	      "crystalspace.thingloader.parse.factory",
+              "Object '%s' is not a thing!", factname);
+            return false;
+	  }
+	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
+	  if (info.use_mat_set)
+          {
+	    thing_state->ReplaceMaterials (engine->GetMaterialList (),
+	      info.mat_set_name);
+	    info.use_mat_set = false;
+	  }
+        }
+        break;
+      case XMLTOKEN_CLONE:
+        if (!isParent)
+	{
+	  ReportError (reporter,
+	    "crystalspace.thingloader.parse.clone",
+	    "CLONE statement only for top-level thing!");
+	  return false;
+	}
+	else
+        {
+	  const char* meshname = child->GetContentsValue ();
+	  iMeshWrapper* wrap = ldr_context->FindMeshObject (meshname);
+          if (!wrap)
+          {
+	    ReportError (reporter,
+	      "crystalspace.thingloader.parse.clone",
+              "Couldn't find thing '%s'!", meshname);
+            return false;
+          }
+
+	  csRef<iThingState> tmpl_thing_state;
+	  tmpl_thing_state.Take (SCF_QUERY_INTERFACE (
+	  	wrap->GetMeshObject (), iThingState));
+	  if (!tmpl_thing_state)
+	  {
+	    ReportError (reporter,
+	      "crystalspace.thingloader.parse.clone",
+              "Object '%s' is not a thing!", meshname);
+            return false;
+	  }
+	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
+	  if (info.use_mat_set)
+          {
+	    thing_state->ReplaceMaterials (engine->GetMaterialList (),
+	      info.mat_set_name);
+	    info.use_mat_set = false;
+	  }
+        }
+        break;
+      case XMLTOKEN_PART:
+	if (!LoadThingPart (child, ldr_context, object_reg, reporter,
+		synldr, info, engine, thing_state,
+		thing_state->GetVertexCount (), false))
+	  return false;
+        break;
+      case XMLTOKEN_V:
+        {
+	  csVector3 v;
+	  if (!synldr->ParseVector (child, v))
+	    return false;
+          thing_state->CreateVertex (v);
+        }
+        break;
+      case XMLTOKEN_FOG:
+	ReportError (reporter,
+	      "crystalspace.thingloader.parse.fog",
+      	      "FOG for things is currently not supported!\n\
+Nag to Jorrit about this feature if you want it.");
+	return false;
+
+      case XMLTOKEN_P:
+        {
+	  iPolygon3D* poly3d = thing_state->CreatePolygon (
+			  child->GetAttributeValue ("name"));
+	  if (info.default_material)
+	    poly3d->SetMaterial (info.default_material);
+	  if (!synldr->ParsePoly3d (child, ldr_context,
+	  			    engine, poly3d,
+				    info.default_texlen, thing_state,
+				    vt_offset))
+	  {
+	    poly3d->DecRef ();
+	    return false;
+	  }
+        }
+        break;
+
+      case XMLTOKEN_CURVE:
+        {
+	  const char* cname = child->GetContentsValue ();
+	  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+	    iThingEnvironment);
+	  iCurveTemplate* ct = te->FindCurveTemplate (cname);
+	  te->DecRef ();
+	  iCurve* p = thing_state->CreateCurve (ct);
+	  p->QueryObject()->SetName (cname);
+          if (!ct->GetMaterial ())
+	    p->SetMaterial (info.default_material);
+        }
+        break;
+
+      case XMLTOKEN_CURVECENTER:
+        {
+          csVector3 c;
+	  if (!synldr->ParseVector (child, c))
+	    return false;
+          thing_state->SetCurvesCenter (c);
+        }
+        break;
+      case XMLTOKEN_CURVESCALE:
+        {
+	  float f = child->GetContentsValueAsFloat ();
+	  thing_state->SetCurvesScale (f);
+          break;
+        }
+      case XMLTOKEN_CURVECONTROL:
+        {
+          csVector3 v;
+          csVector2 t;
+	  v.x = child->GetAttributeValueAsFloat ("x");
+	  v.y = child->GetAttributeValueAsFloat ("y");
+	  v.z = child->GetAttributeValueAsFloat ("z");
+	  t.x = child->GetAttributeValueAsFloat ("u");
+	  t.y = child->GetAttributeValueAsFloat ("v");
+          thing_state->AddCurveVertex (v, t);
+        }
+        break;
+
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          info.default_material = ldr_context->FindMaterial (matname);
+          if (info.default_material == NULL)
+          {
+	    ReportError (reporter,
+	        "crystalspace.thingloader.parse.material",
+                "Couldn't find material named '%s'!", matname);
+            return false;
+          }
+	}
+        break;
+      case XMLTOKEN_TEXLEN:
+	info.default_texlen = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_MATSETSELECT:
+        info.SetTextureSet (child->GetContentsValue ());
+        info.use_mat_set = true;
+        break;
+      default:
+        ReportError (reporter,
+	    "crystalspace.thingloader.parse.badformat",
+	    "Token '%s' not found while parsing a thing!", value);
+	return false;
+    }
+  }
+  return true;
+}
+
+iBase* csThingLoader::Parse (iXmlNode* node,
+			     iLoaderContext* ldr_context, iBase*)
+{
+  // Things only work with the real 3D engine and not with the iso engine.
+  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  CS_ASSERT (engine != NULL);
+  iMeshObjectFactory* fact = NULL;
+  iThingState* thing_state = NULL;
+
+  iMeshObjectType* type = engine->GetThingType (); // @@@ CS_LOAD_PLUGIN LATER!
+  // We always do NewFactory() even for mesh objects.
+  // That's because csThing implements both so a factory is a mesh object.
+  fact = type->NewFactory ();
+  thing_state = SCF_QUERY_INTERFACE (fact, iThingState);
+
+  ThingLoadInfo info;
+  if (!LoadThingPart (node, ldr_context, object_reg, reporter, synldr, info,
+  	engine, thing_state, 0, true))
+  {
+    fact->DecRef ();
+    fact = NULL;
+  }
+  thing_state->DecRef ();
+  engine->DecRef ();
+  return fact;
+}
+
 //---------------------------------------------------------------------------
 
 csThingSaver::csThingSaver (iBase* pParent)
@@ -711,6 +1001,18 @@ bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
       return false;
     }
   }
+
+  xmltokens.Register ("clone", XMLTOKEN_CLONE);
+  xmltokens.Register ("orig", XMLTOKEN_ORIG);
+  xmltokens.Register ("firstlen", XMLTOKEN_FIRSTLEN);
+  xmltokens.Register ("first", XMLTOKEN_FIRST);
+  xmltokens.Register ("secondlen", XMLTOKEN_SECONDLEN);
+  xmltokens.Register ("second", XMLTOKEN_SECOND);
+  xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
+  xmltokens.Register ("v", XMLTOKEN_V);
+  xmltokens.Register ("name", XMLTOKEN_NAME);
+  xmltokens.Register ("uvec", XMLTOKEN_UVEC);
+  xmltokens.Register ("vvec", XMLTOKEN_VVEC);
   return true;
 }
 
@@ -854,6 +1156,123 @@ iBase* csPlaneLoader::Parse (const char* string,
   return ppl;
 }
 
+iBase* csPlaneLoader::Parse (iXmlNode* node,
+			     iLoaderContext* /*ldr_context*/,
+			     iBase* /*context*/)
+{
+  // Things only work with the real 3D engine and not with the iso engine.
+  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  CS_ASSERT (engine != NULL);
+
+  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+  	iThingEnvironment);
+  engine->DecRef ();
+  iPolyTxtPlane* ppl = te->CreatePolyTxtPlane ();
+  te->DecRef ();
+
+  bool tx1_given = false, tx2_given = false;
+  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
+  float tx1_len = 0, tx2_len = 0;
+  csMatrix3 tx_matrix;
+  csVector3 tx_vector (0, 0, 0);
+  char name[255]; name[0] = 0;
+
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_NAME:
+	strcpy (name, child->GetContentsValue () ?
+			child->GetContentsValue () : "");
+	ppl->QueryObject()->SetName (name);
+        break;
+      case XMLTOKEN_ORIG:
+        tx1_given = true;
+        synldr->ParseVector (child, tx_orig);
+        break;
+      case XMLTOKEN_FIRST:
+        tx1_given = true;
+        synldr->ParseVector (child, tx1);
+        break;
+      case XMLTOKEN_FIRSTLEN:
+	tx1_len = child->GetContentsValueAsFloat ();
+        tx1_given = true;
+        break;
+      case XMLTOKEN_SECOND:
+        tx2_given = true;
+        synldr->ParseVector (child, tx2);
+        break;
+      case XMLTOKEN_SECONDLEN:
+	tx2_len = child->GetContentsValueAsFloat ();
+        tx2_given = true;
+        break;
+      case XMLTOKEN_MATRIX:
+        synldr->ParseMatrix (child, tx_matrix);
+        break;
+      case XMLTOKEN_V:
+        synldr->ParseVector (child, tx_vector);
+        break;
+      case XMLTOKEN_UVEC:
+        tx1_given = true;
+        synldr->ParseVector (child, tx1);
+        tx1_len = tx1.Norm ();
+        tx1 += tx_orig;
+        break;
+      case XMLTOKEN_VVEC:
+        tx2_given = true;
+        synldr->ParseVector (child, tx2);
+        tx2_len = tx2.Norm ();
+        tx2 += tx_orig;
+        break;
+      default:
+        ReportError (reporter,
+	    "crystalspace.planeloader.parse.badformat",
+            "Token '%s' not found while parsing a plane!", value);
+	return NULL;
+    }
+  }
+
+  if (tx1_given)
+    if (tx2_given)
+    {
+      if (!tx1_len)
+      {
+	ReportError (reporter,
+	  "crystalspace.planeloader.parse.badplane",
+          "Bad texture specification for PLANE '%s'", name);
+	tx1_len = 1;
+      }
+      if (!tx2_len)
+      {
+	ReportError (reporter,
+	  "crystalspace.planeloader.parse.badplane",
+          "Bad texture specification for PLANE '%s'", name);
+	tx2_len = 1;
+      }
+      if ((tx1-tx_orig) < SMALL_EPSILON)
+        printf ("Bad texture specification for PLANE '%s'\n", name);
+      else if ((tx2-tx_orig) < SMALL_EPSILON)
+        printf ("Bad texture specification for PLANE '%s'\n", name);
+      else ppl->SetTextureSpace (tx_orig, tx1, tx1_len, tx2, tx2_len);
+    }
+    else
+    {
+      ReportError (reporter,
+	  "crystalspace.planeloader.parse.badplane",
+          "Not supported!");
+      return NULL;
+    }
+  else
+    ppl->SetTextureSpace (tx_matrix, tx_vector);
+
+  return ppl;
+}
+
 //---------------------------------------------------------------------------
 
 csPlaneSaver::csPlaneSaver (iBase* pParent)
@@ -903,6 +1322,9 @@ bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
   csBezierLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  xmltokens.Register ("v", XMLTOKEN_V);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("name", XMLTOKEN_NAME);
   return true;
 }
 
@@ -992,6 +1414,79 @@ iBase* csBezierLoader::Parse (const char* string,
 	  "crystalspace.bezierloader.parse.badformat",
           "Token '%s' not found while parsing a bezier template!",
     	  parser->GetLastOffender ());
+    return NULL;
+  }
+  return tmpl;
+}
+
+iBase* csBezierLoader::Parse (iXmlNode* node,
+			      iLoaderContext* ldr_context, iBase* /*context*/)
+{
+  // Things only work with the real 3D engine and not with the iso engine.
+  csRef<iEngine> engine;
+  engine.Take (CS_QUERY_REGISTRY (object_reg, iEngine));
+  CS_ASSERT (engine != NULL);
+
+  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+	    iThingEnvironment);
+  iCurveTemplate* tmpl = te->CreateBezierTemplate ();
+  te->DecRef ();
+
+  iMaterialWrapper* mat = NULL;
+
+  int num_v = 0;
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_NAME:
+	tmpl->QueryObject()->SetName (child->GetContentsValue ());
+        break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          mat = ldr_context->FindMaterial (matname);
+          if (mat == NULL)
+          {
+	    ReportError (reporter,
+	      "crystalspace.bezierloader.parse.material",
+              "Couldn't find material named '%s'!", matname);
+            return NULL;
+          }
+          tmpl->SetMaterial (mat);
+	}
+        break;
+      case CS_TOKEN_V:
+        {
+          if (num_v >= 9)
+          {
+	    ReportError (reporter,
+	      "crystalspace.bezierloader.parse.vertices",
+              "Wrong number of vertices to bezier! Should be 9!");
+            return NULL;
+          }
+	  tmpl->SetVertex (num_v, child->GetContentsValueAsInt ());
+	  num_v++;
+        }
+        break;
+      default:
+	ReportError (reporter,
+	  "crystalspace.bezierloader.parse.badformat",
+          "Token '%s' not found while parsing a bezier template!", value);
+	return NULL;
+    }
+  }
+  
+  if (num_v != 9)
+  {
+    ReportError (reporter,
+      "crystalspace.bezierloader.parse.vertices",
+      "Wrong number of vertices to bezier! %d should be 9!", num_v);
     return NULL;
   }
   return tmpl;
