@@ -35,6 +35,9 @@ chronological order.
 	  installed in a standard location (other than "path"), then it would
 	  never get around to trying "path/include" and "path/lib" because it
 	  would find the installation at the standard location.
+	- Eric Sunshine fixed bug in csGLGraphics3D::Initialize()
+	  (gl_render3d.cpp) where it neglected to check if the canvas plugin
+	  load request failed; leading to a crash if the canvas did not load.
 22-Apr-2004
 	- Jorrit removed motion and motldr from Jamrules for static
 	  compilation.

@@ -2453,6 +2453,7 @@ float csGLGraphics3D::GetZBuffValue (int x, int y)
 
 bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 {
+  bool ok = true;
   object_reg = p;
 
   if (!scfiEventHandler)
@@ -2481,11 +2482,15 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
-  object_reg->Register( G2D, "iGraphics2D");
-  if (!G2D)
-    return false;
+  if (G2D != 0)
+    object_reg->Register(G2D, "iGraphics2D");
+  else
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error loading Graphics2D plugin.");
+    ok = false;
+  }
 
-  return true;
+  return ok;
 }
 
 

@@ -485,11 +485,13 @@ bool csGraphics3DOGLCommon::NewInitialize ()
     CS_QUERY_REGISTRY (object_reg, iPluginManager));
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
   if (!G2D)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to load canvas plugin!");
     return false;
+  }
   if (!object_reg->Register (G2D, "iGraphics2D"))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-  "Could not register the canvas!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not register the canvas!");
     return false;
   }
 
