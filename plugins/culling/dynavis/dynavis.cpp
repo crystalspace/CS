@@ -639,21 +639,26 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
     {
       int vertex_idx = vi[j];
       float tz = (*tr_cam)[vertex_idx].z;
-      if (tz <= 0.1)
+      // @@@ Note: originally 0.1 was used here. However this could cause
+      // very large coordinates to be generated and our coverage line drawer
+      // cannot currently cope with that. We need to improve that line
+      // drawer considerably.
+      if (tz <= 0.2)
       {
 	max_depth = -1.0;
 	if (do_cull_clampoccluder)
 	{
-	  if (i > 0)
+	  if (j > 0)
 	  {
-	    // If i > 0 we know there was already one vertex which is in front
+	    // If j > 0 we know there was already one vertex which is in front
 	    // of the Z=0.1 plane.
 	    do_clamp = true;
 	  }
 	  else
 	  {
-	    // i == 0 so we still have to test if there are other vertices
+	    // j == 0 so we still have to test if there are other vertices
 	    // in front of the Z=0.1 plane.
+	    // NOTE: we reuse the 'j' index here!!! This is not a bug.
 	    for (++j ; j < num_verts ; j++)	// The start '++j' is not a bug!
 	    {
 	      vertex_idx = vi[j];
@@ -680,7 +685,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 #     ifdef CS_DEBUG
       if (do_state_dump)
       {
-        printf ("  max_depth=%g ", max_depth);
+        printf ("  (not clamped) max_depth=%g ", max_depth);
         for (j = 0 ; j < num_verts ; j++)
 	  printf ("(%g,%g) ", verts2d[j].x, verts2d[j].y);
         printf ("\n");
@@ -713,7 +718,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 #     ifdef CS_DEBUG
       if (do_state_dump)
       {
-        printf ("  max_depth=%g ", max_depth);
+        printf ("  (clamped) max_depth=%g ", max_depth);
         for (j = 0 ; j < num_verts ; j++)
 	  printf ("(%g,%g) ", verts2d[j].x, verts2d[j].y);
         printf ("\n");
@@ -789,7 +794,11 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     csVector3 v = verts[i] - trans_vec;
     camv.z = trans_mat.m31 * v.x + trans_mat.m32 * v.y + trans_mat.m33 * v.z;
 
-    if (camv.z <= 0.1)
+    // @@@ Note: originally 0.1 was used here. However this could cause
+    // very large coordinates to be generated and our coverage line drawer
+    // cannot currently cope with that. We need to improve that line
+    // drawer considerably.
+    if (camv.z <= 0.2)
     {
       // @@@ Later we should clamp instead of ignoring this outline.
       return;

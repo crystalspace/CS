@@ -23,6 +23,12 @@ The history order is reversed so that new features are at the top.
 	  wants to update the tile. However, a few of the testing functions
 	  didn't properly test for this flag.
 	- Removed the state dump code in Dynavis in optimize mode.
+	- Fixed a bug in Dynavis occluder clamping (for individual polygons).
+	- Worked around a bug in Dynavis caused by the bad polygon drawer
+	  with have in the coverage buffer. This polygon drawer cannot
+	  cope well with large integer coordinates for the given polygons.
+	  Worked around this by increasing Z=.1 to Z=.2 so that the perspective
+	  corrected coordinates don't get as big.
 9-Feb-2003
 	- res augmented flarge to contain a notice that the flickering in
 	  the street is intentional.
