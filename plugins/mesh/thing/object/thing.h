@@ -30,7 +30,7 @@
 #include "csutil/csvector.h"
 #include "csutil/array.h"
 #include "csutil/refarr.h"
-#include "csutil/array.h"
+#include "csutil/garray.h"
 #include "csutil/blockallocator.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
@@ -128,6 +128,9 @@ private:
  * The static data for a thing.
  */
 class csThingStatic : public iThingFactoryState, public iMeshObjectFactory
+#ifdef CS_USE_NEW_RENDERER
+		      ,public iRenderBufferSource
+#endif
 {
 public:
   csRef<csThingObjectType> thing_type;
@@ -180,6 +183,18 @@ public:
    * will be used.
    */
   float cosinus_factor;
+
+#ifdef CS_USE_NEW_RENDERER
+  csRef<iRender3D> r3d;
+
+  csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> texel_buffer;
+  csRef<iRenderBuffer> normal_buffer;
+  csRef<iRenderBuffer> color_buffer;
+  csRef<iRenderBuffer> index_buffer;
+
+  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
+#endif
 
 
 public:
@@ -371,6 +386,13 @@ public:
   } scfiObjectModel;
   friend class ObjectModel;
 
+#ifdef CS_USE_NEW_RENDERER
+  iRenderBuffer *GetRenderBuffer (csStringID name);
+
+  void FillRenderMeshes (csGrowingArray<csRenderMesh*>& rmeshes,
+    const csArray<RepMaterial>& repMaterials);
+#endif
+
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 };
 
@@ -489,6 +511,13 @@ private:
   float current_lod;
   uint32 current_features;
 
+#ifdef CS_USE_NEW_RENDERER
+  csGrowingArray<csRenderMesh*> renderMeshes;
+  csReversibleTransform tr_o2c; //@@@
+
+  void PrepareRenderMeshes ();
+  void ClearRenderMeshes ();
+#endif
 public:
   /**
    * How many times are we busy drawing this thing (recursive).
@@ -931,6 +960,10 @@ public:
   } scfiShadowReceiver;
   friend struct ShadowReceiver;
 
+#ifdef CS_USE_NEW_RENDERER
+  virtual csRenderMesh **GetRenderMeshes (int &num);
+#endif
+
   //-------------------- iMeshObject interface implementation ----------
   struct MeshObject : public iMeshObject
   {
@@ -968,8 +1001,7 @@ public:
     virtual void DisableShadowCaps () {}
     virtual csRenderMesh** GetRenderMeshes (int &n)
     {
-      n = 0;
-      return 0;
+      return scfParent->GetRenderMeshes (n);
     }
 #endif // CS_USE_NEW_RENDERER
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }

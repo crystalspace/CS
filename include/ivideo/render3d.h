@@ -309,7 +309,10 @@ struct iRender3D : public iBase
   /// Get a pointer to our texture manager
   virtual iTextureManager* GetTextureManager () = 0;
 
-  /// Create a renderbuffer
+  /**
+   * Create a renderbuffer.
+   * \p size is the size of the buffer in bytes.
+   */
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
     int componentCount) = 0;

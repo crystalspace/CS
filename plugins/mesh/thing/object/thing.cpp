@@ -15,6 +15,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include "cssysdef.h"
 #include "cssys/csendian.h"
 #include "qint.h"
@@ -55,11 +56,16 @@
 #include "iutil/comp.h"
 #include "iutil/cache.h"
 #include "iutil/cmdline.h"
+#include "iutil/strset.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
 #include "qsqrt.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/reporter.h"
+
+#ifdef CS_USE_NEW_RENDERER
+#include "ivideo/rendermesh.h"
+#endif
 
 CS_IMPLEMENT_PLUGIN
 
@@ -121,6 +127,9 @@ SCF_IMPLEMENT_IBASE(csThingStatic)
   SCF_IMPLEMENTS_INTERFACE(iThingFactoryState)
   SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
+#ifdef CS_USE_NEW_RENDERER
+  SCF_IMPLEMENTS_INTERFACE(iRenderBufferSource)
+#endif
   {
     static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
     if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
@@ -168,6 +177,19 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
   prepared = false;
   cosinus_factor = -1;
   logparent = 0;
+
+#ifdef CS_USE_NEW_RENDERER
+  r3d = CS_QUERY_REGISTRY (thing_type->object_reg, iRender3D);
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
+      "crystalspace.renderer.stringset", iStringSet);
+
+  vertex_name = strings->Request ("vertices");
+  texel_name = strings->Request ("texture coordinates");
+  normal_name = strings->Request ("normals");
+  color_name = strings->Request ("colors");
+  index_name = strings->Request ("indices");
+#endif
 }
 
 csThingStatic::~csThingStatic ()
@@ -778,6 +800,125 @@ void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
   cent = b.GetCenter ();
 }
 
+iRenderBuffer* csThingStatic::GetRenderBuffer (csStringID name)
+{
+  // @@@ Smells like a hash may be useful here.
+  if (name == vertex_name)
+  {
+    return vertex_buffer;
+  } 
+  else if (name == texel_name)
+  {
+    return texel_buffer;
+  }
+  else if (name == normal_name)
+  {
+    return normal_buffer;
+  }
+  else if (name == color_name)
+  {
+    return color_buffer;
+  }
+  else if (name == index_name)
+  {
+    return index_buffer;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+void csThingStatic::FillRenderMeshes (csGrowingArray<csRenderMesh*>& rmeshes,
+    const csArray<RepMaterial>& repMaterials)
+{
+  int num_indices = 0;
+  int i;
+
+  for (i = 0; i < static_polygons.Length(); i++)
+  {
+    csPolygon3DStatic* poly = static_polygons.Get (i);
+
+    num_indices += poly->GetVertexCount ();
+  }
+
+  if (!vertex_buffer)
+    vertex_buffer = r3d->CreateRenderBuffer (num_indices * sizeof (csVector3), 
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+
+  csVector3* vertices = (csVector3*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
+  if (!normal_buffer)
+    normal_buffer = r3d->CreateRenderBuffer (num_indices * sizeof (csVector3), 
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+
+  csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
+  if (!texel_buffer)
+    texel_buffer = r3d->CreateRenderBuffer (num_indices * sizeof (csVector2), 
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+
+  csVector2* texels = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
+  if (!index_buffer)
+    index_buffer = r3d->CreateRenderBuffer (num_indices  * sizeof (int), 
+      CS_BUF_INDEX, CS_BUFCOMP_INT, 1);
+
+  int* indices = (int*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
+  
+  int index = 0;
+  for (i = 0; i < static_polygons.Length(); i++)
+  {
+    csPolygon3DStatic* static_data = static_polygons.Get (i);
+
+    csRenderMesh* rm = new csRenderMesh;
+
+    rm->buffersource = this;
+    rm->z_buf_mode = CS_ZBUF_USE;
+    rm->mixmode = CS_FX_COPY; 
+    rm->indexstart = index;
+    rm->material = static_data->GetMaterialWrapper ();
+    rm->meshtype = CS_MESHTYPE_TRIANGLEFAN;
+
+    int* poly_indices = static_data->GetVertexIndices ();
+
+    csVector3 polynormal;
+    if (!smoothed)
+    {
+      polynormal = static_data->GetObjectPlane().Normal();
+      polynormal.Normalize();
+    }
+    csMatrix3 t_m;
+    csVector3 t_v;
+    static_data->GetTextureSpace (t_m, t_v);
+
+    int j;
+    for (j = static_data->GetVertexCount(); j-- > 0;)
+    {
+      int vidx = *poly_indices++;
+      *vertices++ = obj_verts[vidx];
+      if (smoothed)
+	*normals++ = obj_normals[vidx];
+      else
+	*normals++ = polynormal;
+      csVector3 t = (t_m * obj_verts[vidx] + t_v);
+      *texels++ = csVector2 (t.x, t.y);
+      *indices++ = index++;
+    }
+   
+    rm->indexend = index;
+
+    rmeshes.Push (rm);
+  }
+
+  index_buffer->Release ();
+  texel_buffer->Release ();
+  normal_buffer->Release ();
+  vertex_buffer->Release ();
+
+//  csHashMap mat_rms;
+}
+
 //----------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(csThingStatic::PolyMesh)
@@ -870,6 +1011,10 @@ csThing::~csThing ()
   delete[] cam_verts;
 
   polygons.DeleteAll ();          // delete prior to portal_poly array !
+
+#ifdef CS_USE_NEW_RENDERER
+  ClearRenderMeshes ();
+#endif
 }
 
 char* csThing::GenerateCacheName ()
@@ -1791,6 +1936,28 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
   csSphere sphere;
   sphere.SetCenter (b.GetCenter ());
   sphere.SetRadius (static_data->max_obj_radius);
+
+#ifdef CS_USE_NEW_RENDERER
+  //@@@
+  int i;
+  tr_o2c = camtrans;
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
+  	clip_z_plane) == false)
+    return false;
+
+  for (i = 0; i < renderMeshes.Length(); i++)
+  {
+    csRenderMesh* rm = renderMeshes[i];
+    rm->transform = &tr_o2c;
+    rm->clip_portal = clip_portal;
+    rm->clip_plane = clip_plane;
+    rm->clip_z_plane = clip_z_plane;
+    rm->do_mirror = icam->IsMirrored ();  
+  }
+#else
   if (can_move)
   {
     csReversibleTransform tr_o2c = camtrans;
@@ -1804,6 +1971,7 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
     bool rc = rview->TestBSphere (camtrans, sphere);
     return rc;
   }
+#endif
 }
 
 bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
@@ -2000,6 +2168,39 @@ void csThing::Merge (csThing *other)
 
   delete[] merge_vertices;
 }
+
+#ifdef CS_USE_NEW_RENDERER
+
+void csThing::PrepareRenderMeshes ()
+{
+  static_data->FillRenderMeshes (renderMeshes, replace_materials);
+}
+
+void csThing::ClearRenderMeshes ()
+{
+  for (int i = 0; i < renderMeshes.Length(); i++)
+  {
+    delete renderMeshes[i];
+  }
+  renderMeshes.DeleteAll ();
+}
+
+csRenderMesh **csThing::GetRenderMeshes (int &num)
+{
+  // @@@ "dirtiness" check
+  if (renderMeshes.Length() == 0)
+  {
+    PrepareRenderMeshes ();
+  }
+
+  num = renderMeshes.Length();
+  for (int i = 0; i < num; i++)
+  {
+    renderMeshes[i]->material->Visit ();
+  }
+  return renderMeshes.GetArray ();
+}
+#endif
 
 //---------------------------------------------------------------------------
 

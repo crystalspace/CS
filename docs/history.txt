@@ -52,6 +52,8 @@ The history order is reversed so that new features are at the top.
 	      then fallback to GetPolygonMeshColldet.
 	    - Added setting of PolygonMeshShadows in genmesh.
 	    - Added stencil to user.mk
+	- res started working on converting thing for NR. You already can see
+	  something, but it's still rather crude and naive, tho.
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.

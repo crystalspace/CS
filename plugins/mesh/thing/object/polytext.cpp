@@ -745,7 +745,11 @@ b:
         {
           d = csSquaredDist::PointPoint (lightpos, v2);
 
+#ifdef CS_USE_NEW_RENDERER
+          if (d >= light->QueryLight ()->GetInfluenceRadiusSq ()) continue;
+#else
           if (d >= light->QueryLight ()->GetSquaredRadius ()) continue;
+#endif
           d = qsqrt (d);
 
           float cosinus = (v2 - lightpos) *
@@ -1296,7 +1300,11 @@ void csShadowBitmap::UpdateLightMap (
       // @@@ Optimization: It should be possible to combine these
       // calculations into a more efficient formula.
       float d = csSquaredDist::PointPoint (lightpos, v);
+#ifdef CS_USE_NEW_RENDERER
+      if (d >= light->GetInfluenceRadiusSq ()) continue;
+#else
       if (d >= light->GetSquaredRadius ()) continue;
+#endif
 
       d = qsqrt (d);
 
@@ -1468,7 +1476,11 @@ bool csShadowBitmap::UpdateShadowMap (
 
       // calculations into a more efficient formula.
       float d = csSquaredDist::PointPoint (lightpos, v);
+#ifdef CS_USE_NEW_RENDERER
+      if (d >= light->GetInfluenceRadiusSq ()) continue;
+#else
       if (d >= light->GetSquaredRadius ()) continue;
+#endif
 
       d = qsqrt (d);
 
