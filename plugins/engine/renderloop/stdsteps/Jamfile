@@ -1,11 +1,10 @@
 SubDir TOP plugins engine renderloop stdsteps ;
 
+Help rendstep_std : "Crystal Space standard render loop steps" ;
+
 Plugin rendstep_std
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith rendstep_std : renderstepcommon csgeom csutil csgfx cstool ;
 
 CompileGroups rendstep_std : nrall ;
-
-Help rendstep_std : "Crystal Space standard render loop steps" ;
-

@@ -1,9 +1,8 @@
 SubDir TOP plugins mesh lghtng object ;
 
+Help lghtng : "Lightning mesh object plug-in" ;
+
 Plugin lghtng
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith lghtng : csgeom csutil ;
-
-Help lghtng : "Lightning mesh object plug-in" ;
-

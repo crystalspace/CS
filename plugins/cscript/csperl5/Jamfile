@@ -2,6 +2,8 @@ SubDir TOP plugins cscript csperl5 ;
 
 if $(PERL5.AVAILABLE) = "yes"
 {
+  Help csperl5 : "Crystal Script Perl5 plug-in" ;
+  
   if $(PERL5.EXTUTILS.EMBED.AVAILABLE) = "yes"
   {
     if $(PERL5.DYNALOADER.AVAILABLE) = "yes"
@@ -60,7 +62,6 @@ if $(PERL5.AVAILABLE) = "yes"
   CFlags csperl5 : -I$(TOP)/scripts/perl5 -Wno-unused ;
   LinkWith csperl5 : cstool csgeom csutil ;
   ExternalLibs csperl5 : PERL5 ;
-  Help csperl5 : "Crystal Script Perl5 plug-in" ;
   Clean clean : $(perlxs) ;
   Clean csperl5clean : $(perlxs) ;
 }

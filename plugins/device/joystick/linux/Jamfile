@@ -2,13 +2,13 @@ SubDir TOP plugins device joystick linux ;
 
 if $(LINUXJOYSTICK.AVAILABLE) = "yes" 
 {
+Help joylin : "Crystal Space Joystick plugin for Linux" ;
+
 Plugin joylin
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith joylin : csutil ;
 ExternalLibs joylin :  JOYSTICK ;
-
-Help joylin : "Crystal Space Joystick plugin for Linux" ;
 
 InstallConfig joystick.cfg ;
 

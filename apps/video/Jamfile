@@ -1,9 +1,8 @@
 SubDir TOP apps video ;
 
+Help csvid : "Crystal Space video example" ;
+
 Application csvid
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith csvid : csgeom csgfx cstool csutil ;
-
-Help csvid : "Crystal Space video example" ;
-

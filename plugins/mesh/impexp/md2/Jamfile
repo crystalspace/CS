@@ -1,9 +1,8 @@
 SubDir TOP plugins mesh impexp md2 ;
 
+Help md2ie : "MD2 Import/Export plug-in" ;
+
 Plugin md2ie
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith md2ie : csgeom cstool csutil ;
-
-Help md2ie : "MD2 Import/Export plug-in" ;
-

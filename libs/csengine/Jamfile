@@ -1,5 +1,7 @@
 SubDir TOP libs csengine ;
 
+Help csengine : "Crystal Space 3D engine" ;
+
 Library csengine :
 	[ Wildcard *.cpp *.h ]
 	[ Wildcard basic : *.cpp *.h ]
@@ -8,7 +10,6 @@ Library csengine :
         [ Wildcard ../../include/csengine : *.h ]
 ;
 
-Help csengine : "Crystal Space 3D engine" ;
 LibDepends csengine : cstool csgfx csgeom csutil ;
 
 InstallConfig engine.cfg ;

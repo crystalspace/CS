@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh genmesh persist standard ;
 
+Help gmeshldr : "General mesh object loader" ;
+
 Plugin gmeshldr
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith gmeshldr : csgeom csutil ;
 
-Help gmeshldr : "General mesh object loader" ;
 CompileGroups gmeshldr :  meshes ;
 

@@ -9,6 +9,8 @@ if $(CMD.BISON) && $(CMD.FLEX)
   BisonFlags skinpars.yy : "-p aws" ;
 }
 
+Help aws : "Alternate Windowing System plug-in" ;
+
 Plugin aws :
 	$(FILES)
 ;
@@ -26,11 +28,9 @@ C++FLAGS on [ DoObjectGrist skinlex$(SUFOBJ) skinpars$(SUFOBJ) ] +=
 # @@@ FIXME: The configure script should check if compiler recognizes -I rather
 # than hard-coding it here.
 C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
-  -I$(SEARCH_SOURCE) ;
+  -I$(LOCATE_TARGET) -I$(SEARCH_SOURCE) ;
 
 LinkWith aws : csgeom csgfx cstool csutil ;
-
-Help aws : "Alternate Windowing System plug-in" ;
 
 if $(CMD.BISON) && $(CMD.FLEX)
 {

@@ -1,9 +1,8 @@
 SubDir TOP apps tutorial simplept ;
 
+Help simplept : "Crystal Space procedural textures tutorial" ;
+
 Application simplept
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith simplept : csgeom csgfx cstool csutil ;
-
-Help simplept : "Crystal Space procedural textures tutorial" ;
-

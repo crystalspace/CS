@@ -1,10 +1,11 @@
 SubDir TOP libs csgfx ;
 
+Help csgfx : "Crystal Space graphics utility library" ;
+
 Library csgfx
 	: [ Wildcard *.cpp *.h ]
           [ Wildcard ../../include/csgfx : *.h ]
 ;
 
-Help csgfx : "Crystal Space graphics utility library" ;
 LibDepends csgfx : csutil ;
 

@@ -1,10 +1,10 @@
 SubDir TOP apps import md32spr ;
 
+Help md32spr : "Quake MD3 conversion tool" ;
+
 Application md32spr
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
 LinkWith md32spr : csgeom csgfx cstool csutil ;
-
-Help md32spr : "Quake MD3 conversion tool" ;
-
+ExternalLibs md32spr : ZLIB ;

@@ -1,9 +1,8 @@
 SubDir TOP apps tutorial simple1 ;
 
+Help simple1 : "Crystal Space tutorial part one" ;
+
 Application simple1
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith simple1 : csgeom csgfx cstool csutil ;
-
-Help simple1 : "Crystal Space tutorial part one" ;
-

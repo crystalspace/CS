@@ -1,5 +1,7 @@
 SubDir TOP apps walktest ;
 
+Help walktest : "Crystal Space WalkTest demo" ;
+
 Application walktest
 	: [ Wildcard *.cpp *.h ]
 ;
@@ -47,6 +49,8 @@ else
 
 CompileGroups walktest : nrall ;
 
+if $(MSVCGEN_CONFIG) != "yes"
+{
 SubVariant static ;
 Application walktest_static
 	: [ Wildcard *.cpp *.h ]
@@ -58,8 +62,7 @@ LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;
 # this flag isn't defined
 CFlags walktest_static : -DCS_STATIC_LINKED ;
 SubVariant ;
-
-Help walktest : "Crystal Space WalkTest demo" ;
+}
 
 Win32Resource walktest : $(TOP)/libs/cssys/win32/rsrc/cs1.rc ;
 InstallConfig autoexec.cfg walktest.cfg ;

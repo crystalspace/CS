@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh ball persist standard ;
 
+Help ballldr : "Ball mesh object loader" ;
+
 Plugin ballldr
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith ballldr : csgeom csutil ;
 
-Help ballldr : "Ball mesh object loader" ;
 CompileGroups ballldr :  meshes ;
 

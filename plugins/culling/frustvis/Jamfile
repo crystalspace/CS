@@ -1,9 +1,8 @@
 SubDir TOP plugins culling frustvis ;
 
+Help frustvis : "Crystal Space Frustum Visibility System" ;
+
 Plugin frustvis
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith frustvis : csgeom csutil ;
-
-Help frustvis : "Crystal Space Frustum Visibility System" ;
-

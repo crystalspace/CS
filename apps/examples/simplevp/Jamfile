@@ -1,9 +1,9 @@
 SubDir TOP apps examples simplevp ;
 
+Help simplevp : "effects and vertex programs demonstration" ;
+
 Application simplevp
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith simplevp : csgeom csgfx cstool csutil ;
-
-Help simplevp : "effects and vertex programs demonstration" ;
 

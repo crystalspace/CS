@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh bezier object ;
 
+Help bezier : "Bezier mesh object plug-in" ;
+
 Plugin bezier
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith bezier : csgeom csutil cstool ;
 
-Help bezier : "Bezier mesh object plug-in" ;
 CompileGroups bezier :  meshes ;
 

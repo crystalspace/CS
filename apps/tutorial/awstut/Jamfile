@@ -1,10 +1,10 @@
 SubDir TOP apps tutorial awstut ;
 
+Help awstut : "Alternate Windowing System Tutorial" ;
+
 Application awstut
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith awstut : csgeom csgfx cstool csutil ;
-
-Help awstut : "Alternate Windowing System Tutorial" ;
 
 InstallConfig awstut.cfg ;

@@ -1,9 +1,10 @@
 SubDir TOP plugins mesh fountain persist standard ;
 
+Help fountldr : "Fountain mesh object loader" ;
+
 Plugin fountldr
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith fountldr : csgeom csutil ;
 
-Help fountldr : "Fountain mesh object loader" ;
 CompileGroups fountldr : meshes ;

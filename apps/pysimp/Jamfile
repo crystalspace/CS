@@ -1,9 +1,9 @@
 SubDir TOP apps pysimp ;
 
+Help pysimp : "Crystal Space Python example" ;
+
 Application pysimp
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith pysimp : csgeom csgfx cstool csutil ;
-
-Help pysimp : "Crystal Space Python example" ;
 

@@ -1,10 +1,10 @@
 SubDir TOP plugins mesh haze object ;
 
+Help haze : "Haze mesh object plug-in" ;
+
 Plugin haze
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith haze : csgeom csutil ;
 
-Help haze : "Haze mesh object plug-in" ;
 CompileGroups haze :  meshes ;
-

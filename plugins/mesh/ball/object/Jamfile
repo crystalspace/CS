@@ -1,10 +1,11 @@
 SubDir TOP plugins mesh ball object ;
 
+Help ball : "Ball mesh object plug-in" ;
+
 Plugin ball
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith ball : csgeom csutil csgfx ;
 
-Help ball : "Ball mesh object plug-in" ;
 CompileGroups ball :  meshes ;
 

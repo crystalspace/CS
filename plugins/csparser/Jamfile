@@ -1,10 +1,10 @@
 SubDir TOP plugins csparser ;
 
+Help csparser : "Crystal Space map file parser" ;
+
 Plugin csparser
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith csparser : csgeom csgfx cstool csutil ;
-
-Help csparser : "Crystal Space map file parser" ;
 
 SubInclude TOP plugins csparser services ;

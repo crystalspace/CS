@@ -1,9 +1,8 @@
 SubDir TOP plugins engine 3d ;
 
+Help engine : "Crystal Space 3D engine plug-in" ;
+
 Plugin engine
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith engine : csengine csgeom csgfx cstool csutil ;
-
-Help engine : "Crystal Space 3D engine plug-in" ;
-

@@ -1,10 +1,10 @@
 SubDir TOP apps tests gfxtst ;
 
+Help gfxtest : "Crystal Space image manipulator" ;
+
 Application gfxtest
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
 LinkWith gfxtest : csgeom csgfx cstool csutil ;
-
-Help gfxtest : "Crystal Space image manipulator" ;
 

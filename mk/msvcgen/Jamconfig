@@ -17,6 +17,7 @@ TARGET.OS = "WIN32" ;
 TARGET.PROCESSOR = "X86" ;
 MODE = "debug" ; # msvcgen will create rules for debug and optimize
 USE_PLUGINS = "yes" ;
+USE_NEW_RENDERER ?= "yes" ;
 
 # msvcgen flags
 MSVC.DEPEND = ;
@@ -67,7 +68,7 @@ JPEG.AVAILABLE = "yes" ;
 JPEG.MSVCLIBS = "libjpeg.lib" ;
 MNG.AVAILABLE = "yes" ;
 MNG.MSVCLIBS = "libmng.lib" ;
-MIKMOD.AVAILABLE = "no" ;
+MIKMOD.AVAILABLE = "yes" ;
 MIKMOD.MSVCLIBS = "mikmod.lib" ;
 VORBISFILE.AVAILABLE = "yes" ;
 VORBISFILE.MSVCLIBS = "vorbisfile.lib" "vorbis.lib" "ogg.lib" ;
@@ -84,11 +85,13 @@ OSS.AVAILABLE = "no" ;
 SOCKET.AVAILABLE = "yes" ;
 SOCKET.MSVCLIBS = "wsock32.lib" ;
 DIRECTX.AVAILABLE = "yes" ;
-DIRECTX.MSVCLIBS = "dsound.lib" "ddraw.lib" ;
+DIRECTX.MSVCLIBS = "dsound.lib" "ddraw.lib" "dinput.lib" ;
 WAVEOUT.AVAILABLE = "yes" ;
 WAVEOUT.MSVCLIBS = "winmm.lib" ;
 CG.AVAILABLE = "yes" ;
 CG.MSVCLIBS = "cg.lib" "cgGL.lib" ;
+CAL3D.AVAILABLE = "yes" ;
+CAL3D.MSVCLIBS = "cal3d.lib" ;
 
 # ok
 JAMCONFIG_READ = "yes" ;

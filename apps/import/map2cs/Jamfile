@@ -1,13 +1,13 @@
 SubDir TOP apps import map2cs ;
 
+Help map2cs : "Quake map conversion tool" ;
+
 Application map2cs
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
 LinkWith map2cs : csgeom csgfx cstool csutil ;
 ExternalLibs map2cs : ZLIB ;
-
-Help map2cs : "Quake map conversion tool" ;
 
 InstallConfig map2cs.cfg ;
 

@@ -1,9 +1,9 @@
 SubDir TOP apps mdltest ;
 
+Help mdltest : "Model Importing Test Application" ;
+
 Application mdltest
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith mdltest : csgeom csgfx cstool csutil ;
-
-Help mdltest : "Model Importing Test Application" ;
 

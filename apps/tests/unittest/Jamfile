@@ -1,10 +1,10 @@
 SubDir TOP apps tests unittest ;
 
+Help unittest : "Crystal Space unittest tester" ;
+
 Application unittest
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
 LinkWith unittest : csgeom csgfx cstool csutil ;
-
-Help unittest : "Crystal Space unittest tester" ;
 

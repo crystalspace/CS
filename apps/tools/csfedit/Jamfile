@@ -1,9 +1,9 @@
 SubDir TOP apps tools csfedit ;
 
+Help csfedit : "Crystal Space font editor" ;
+
 Application csfedit
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith csfedit : csgeom csgfx cstool csutil csws ;
-
-Help csfedit : "Crystal Space font editor" ;
 

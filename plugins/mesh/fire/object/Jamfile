@@ -1,10 +1,10 @@
 SubDir TOP plugins mesh fire object ;
 
+Help fire : "Fire mesh object plug-in" ;
+
 Plugin fire
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith fire : partgen cstool csgeom csutil ;
 
-Help fire : "Fire mesh object plug-in" ;
 CompileGroups fire :  meshes ;
-

@@ -13,6 +13,18 @@ chronological order.
 	- In csutil/inpnames.h|cpp, Oktal added functions csTypeOfInputDef and
 	  csParseJoystickDef.
 	- Keith added ability to override default material in sprcal3d mesh.
+	- res made the following changes:
+	  - Moved 'Help' statement in Jamfiles in front of Application/Plugin/
+	    etc statements. This way, the Win32 version rc generator can use
+	    them.
+	  - Fixed "Independent target ../../../mk/visualcX/foobar.rc" Jam 
+	    warnings.
+	  - Changed the AWS Jamfile to use the out/... directory as an 
+	    additional inlude path, to work around problems caused by
+	    different versions of Bison used for the local build and the
+	    generated stuff in CVS (the file skinpars.hpp was slightly 
+	    different, but enought to cause a link error when the CVS version
+	    was used, as opposed to the locally generated one.)
 9-Jan-2004
 	- Jorrit fixed a warning in memimage.cpp.  It was trying to delete a
 	  void* which is undefined.

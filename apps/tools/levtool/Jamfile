@@ -1,9 +1,9 @@
 SubDir TOP apps tools levtool ;
 
+Help levtool : "Crystal Space Level Tool" ;
+
 Application levtool
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
 LinkWith levtool : csgeom csgfx cstool csutil ;
-
-Help levtool : "Crystal Space Level Tool" ;

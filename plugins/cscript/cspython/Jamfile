@@ -2,6 +2,8 @@ SubDir TOP plugins cscript cspython ;
 
 if $(PYTHON.AVAILABLE) = "yes"
 {
+  Help cspython : "Crystal Script Python plug-in" ;
+  
   if $(CMD.SWIG)
   {
     # We need to work a bit on our own, because we create cs_pyth.cpp from
@@ -29,5 +31,4 @@ if $(PYTHON.AVAILABLE) = "yes"
   LinkWith cspython : cstool csgfx csgeom csutil ;
   ExternalLibs cspython : PYTHON ;
   CFlags cspython : -DSWIG_GLOBAL ;
-  Help cspython : "Crystal Script Python plug-in" ;
 }

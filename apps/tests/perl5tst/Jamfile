@@ -2,10 +2,10 @@ SubDir TOP apps tests perl5tst ;
 
 if $(PERL5.SDK.AVAILABLE) = "yes"
 {
+Help perl5test : "Crystal Space Perl5 scripting test" ;
+
 Application perl5test
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith perl5test : cstool csutil ;
-
-Help perl5test : "Crystal Space Perl5 scripting test" ;
 }

@@ -2,10 +2,10 @@ SubDir TOP apps tests picogui ;
 
 if $(PGSERVER.AVAILABLE) = "yes"
 {
+Help pgtesttest : "Crystal Space PicoGUI test" ;
+
 Application pgtest
 	: pgtest.cpp
 ;
 LinkWith pgtest : csgeom csgfx cstool csutil ;
-
-Help pgtesttest : "Crystal Space PicoGUI test" ;
 }

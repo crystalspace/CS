@@ -1,9 +1,8 @@
 SubDir TOP plugins mesh impexp obj ;
 
+Help objie : "OBJ Import/Export plug-in" ;
+
 Plugin objie
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith objie : csgeom cstool csutil ;
-
-Help objie : "OBJ Import/Export plug-in" ;
-

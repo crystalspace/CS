@@ -1,10 +1,9 @@
 SubDir TOP plugins mesh cloth persist standard ;
 
+Help clothldr : "Cloth mesh object factory loader plug-in" ;
+
 Plugin clothldr
 	: [ Wildcard *.cpp *.h ]
 	: noinstall
 ;
 LinkWith clothldr : csgeom csutil ;
-
-Help clothldr : "Cloth mesh object factory loader plug-in" ;
-

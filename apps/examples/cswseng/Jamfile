@@ -1,9 +1,9 @@
 SubDir TOP apps examples cswseng ;
 
+Help cswseng : "Crystal Space Example: CSWS And Engine" ;
+
 Application cswseng
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith cswseng : csgeom csgfx cstool csutil csws ;
-
-Help cswseng : "Crystal Space Example: CSWS And Engine" ;
 

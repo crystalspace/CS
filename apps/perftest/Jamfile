@@ -1,9 +1,9 @@
 SubDir TOP apps perftest ;
 
+Help perftest : "Crystal Space graphics performance tester" ;
+
 Application perftest
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith perftest : csgeom csgfx cstool csutil ;
-
-Help perftest : "Crystal Space graphics performance tester" ;
 

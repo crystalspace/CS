@@ -1,9 +1,8 @@
 SubDir TOP plugins console output standard ;
 
+Help csconout : "Crystal Space standard output console" ;
+
 Plugin csconout
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith csconout : csgeom csutil ;
-
-Help csconout : "Crystal Space standard output console" ;
-

@@ -1,11 +1,11 @@
 SubDir TOP apps isomap ;
 
+Help isomap : "Crystal Space isomap demo executable" ;
+
 Application isomap
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith isomap : csgeom csgfx cstool csutil ;
-
-Help isomap : "Crystal Space isomap demo executable" ;
 
 InstallMapfile isomap ;
 

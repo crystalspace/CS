@@ -1,9 +1,8 @@
 SubDir TOP apps tutorial simpcd ;
 
+Help simpcd : "Crystal Space CD tutorial" ;
+
 Application simpcd
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith simpcd : csgeom csgfx cstool csutil ;
-
-Help simpcd : "Crystal Space CD tutorial" ;
-
