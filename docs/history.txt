@@ -8,6 +8,16 @@ The history order is reversed so that new features are at the top.
 	- Fixed a problem in the spr3dldr.cpp with 'char*' being used
 	  instead of 'const char*' to store the result of
 	  GetAttributeValue().
+	- Greg Block fixed MacOSX load library paths.
+		- We support loading from the install path, "components"
+		  subdirectory (as configured by build)
+		- We also attempt to load from .
+		- This, technically, means that app-wrapped applications
+		  can include plugins in their <app>/Contents/MacOS of
+		  the app bundle.
+		- A more complete review of wrapped app-loading issues
+		  needs to take place in the future, to support
+		  application-bundled versions of CS.
 16-Feb-2003
 	- Significant optimization in the dynamic/pseudo-dynamic lighting
 	  system for things. In the past, when a dynamic light or
