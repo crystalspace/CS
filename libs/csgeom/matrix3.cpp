@@ -122,6 +122,38 @@ float csMatrix3::Determinant () const
    +m13 * (m21*m32 - m22*m31);
 }
 
+void csMatrix3::Set (const csQuaternion &quat)
+{
+  float s;
+  float xs, ys, zs;
+  float wx, wy, wz;
+  float xx, xy, xz;
+  float yy, yz, zz;
+  float x = quat.x;
+  float y = quat.y;
+  float z = quat.z;
+  float w = quat.r;
+
+  // For unit Quat, just set s = 2 or set xs = x + x, etc.
+  s = 2 / (x * x + y * y + z * z + w * w );
+
+  xs = x * s; ys = y * s; zs = z * s;
+  wx = w * xs; wy = w * ys; wz = w * zs;
+  xx = x * xs; xy = x * ys; xz = x * zs;
+  yy = y * ys; yz = y * zs; zz = z * zs;
+
+  m11 = 1.0f - (yy + zz);
+  m12 = xy + wz;
+  m13 = xz - wy;
+  m21 = xy - wz;
+  m22 = 1.0f - (xx + zz);
+  m23 = yz + wx;
+  m31 = xz + wy;
+  m32 = yz - wx;
+  m33 = 1.0f - (xx + yy);
+}
+
+
 csMatrix3 operator+ (const csMatrix3& m1, const csMatrix3& m2) 
 {
   return csMatrix3 (m1.m11+m2.m11, m1.m12+m2.m12, m1.m13+m2.m13,
@@ -225,47 +257,3 @@ csZRotMatrix3::csZRotMatrix3 (float angle)
 }
 
 //---------------------------------------------------------------------------
-
-void csMatrix3::Set(const csQuaternion &quat)
-{
-	float s;
-	float xs, ys, zs;
-	float wx, wy, wz;
-	float xx, xy, xz;
-	float yy, yz, zz;
-	float x = quat.x;
-	float y = quat.y;
-	float z = quat.z;
-	float w = quat.r;
-
-	// For unit Quat, just set s = 2 or set xs = x + x, etc.
-	s = 2 / (x * x + y * y + z * z + w * w );
-
-	xs = x * s;
-	ys = y * s;
-	zs = z * s;
-
-	wx = w * xs;
-	wy = w * ys;
-	wz = w * zs;
-
-	xx = x * xs;
-	xy = x * ys;
-	xz = x * zs;
-
-	yy = y * ys;
-	yz = y * zs;
-	zz = z * zs;
-
-	m11 = 1.0f - (yy + zz);
-	m12 = xy + wz;
-	m13 = xz - wy;
-	m21 = xy - wz;
-	m22 = 1.0f - (xx + zz);
-	m23 = yz + wx;
-	m31 = xz + wy;
-	m32 = yz - wx;
-	m33 = 1.0f - (xx + yy);
-}
-
-

@@ -51,8 +51,8 @@ public:
              float m21, float m22, float m23,
              float m31, float m32, float m33);
 
-	/// Construct a matrix with a quaternion
-	explicit csMatrix3(const csQuaternion &quat) { Set(quat); }
+  /// Construct a matrix with a quaternion.
+  explicit csMatrix3 (const csQuaternion &quat) { Set (quat); }
 
   /// Get the first row of this matrix as a vector.
   inline csVector3 Row1() const { return csVector3 (m11,m12,m13); }
@@ -82,8 +82,8 @@ public:
     csMatrix3::m31 = m31; csMatrix3::m32 = m32; csMatrix3::m33 = m33;
   }
 
-	/// Initialize matrix with a quaternion
-  void Set(const csQuaternion &quat);
+  /// Initialize matrix with a quaternion.
+  void Set (const csQuaternion &quat);
 
   /// Add another matrix to this matrix.
   csMatrix3& operator+= (const csMatrix3& m);

@@ -31,8 +31,7 @@ csSkeletonLimb::~csSkeletonLimb ()
     delete children;
     children = n;
   }
-	if(name)
-		free(name);
+  if (name) free (name);
 }
 
 void csSkeletonLimb::AddVertex (int v)
@@ -64,8 +63,7 @@ void csSkeletonLimbState::AddChild (csSkeletonLimbState* child)
 
 void csSkeletonLimb::UpdateState (csSkeletonLimbState* limb)
 {
-	if(name)
-		limb->SetName(name);
+  if (name) limb->SetName (name);
   limb->vertices = vertices;
   limb->num_vertices = num_vertices;
   limb->tmpl = this;
@@ -98,7 +96,6 @@ void csSkeletonLimb::ComputeBoundingBox (csPoly3D* source)
 {
   if (num_vertices)
   {
-
     box.StartBoundingBox ((*source)[vertices[0]]);
     int i;
     for (i = 1 ; i < num_vertices ; i++)
@@ -115,10 +112,10 @@ void csSkeletonLimb::ComputeBoundingBox (csPoly3D* source)
   }
 }
 
-void csSkeletonLimb::SetName(const char *newname) {
-	if(name)
-		free(name);
-	name=strdup(newname);
+void csSkeletonLimb::SetName (const char *newname)
+{
+  if (name) free (name);
+  name = strdup (newname);
 }
 
 csSkeletonLimbState* csSkeletonLimb::CreateState ()
@@ -156,7 +153,7 @@ IMPLEMENT_IBASE_END
 csSkeletonLimbState::csSkeletonLimbState (): 
   next (NULL), vertices (NULL), num_vertices (0), children (NULL)
 { 
-	CONSTRUCT_IBASE(NULL);
+  CONSTRUCT_IBASE(NULL);
 }
 
 csSkeletonLimbState::~csSkeletonLimbState ()
@@ -223,7 +220,8 @@ IMPLEMENT_EMBEDDED_IBASE (csSkeletonConnectionState::SkeletonBone)
   IMPLEMENTS_INTERFACE (iSkeletonBone)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSkeletonConnectionState::csSkeletonConnectionState () {
+csSkeletonConnectionState::csSkeletonConnectionState ()
+{
   CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
 }
 
@@ -243,7 +241,8 @@ IMPLEMENT_EMBEDDED_IBASE (csSkeletonState::SkeletonBone)
   IMPLEMENTS_INTERFACE (iSkeletonBone)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSkeletonState::csSkeletonState () {
+csSkeletonState::csSkeletonState ()
+{
   CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
 }
 

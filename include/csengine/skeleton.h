@@ -53,8 +53,8 @@ private:
   /// Bounding box in object space for this limb.
   csBox3 box;
 
-	/// The name of this Limb
-	char* name;
+  /// The name of this Limb.
+  char* name;
 
 protected:
   /// Update state information.
@@ -98,7 +98,10 @@ public:
    */
   void ComputeBoundingBox (csPoly3D* source);
 
-	void SetName(const char* name);
+  /// Set the name for this limb.
+  void SetName (const char* name);
+  /// Get the name for this limb.
+  const char* GetName () const { return name; }
 };
 
 /**
@@ -204,7 +207,7 @@ public:
   csSkeletonLimbState* GetNext () { return next; }
 
   CSOBJTYPE;
-	DECLARE_IBASE;
+  DECLARE_IBASE;
 };
 
 /**
@@ -249,28 +252,29 @@ public:
     DECLARE_EMBEDDED_IBASE (csSkeletonConnectionState);
 
     ///
-    virtual iSkeletonBone* GetNext () {
+    virtual iSkeletonBone* GetNext ()
+    {
       csSkeletonLimbState* ls=scfParent->GetNext();
-			if(!ls)
-				return NULL;
-			return QUERY_INTERFACE(ls, iSkeletonBone);
+      if (!ls) return NULL;
+      return QUERY_INTERFACE(ls, iSkeletonBone);
     }
     ///
-    virtual iSkeletonBone* GetChildren () {
+    virtual iSkeletonBone* GetChildren ()
+    {
       csSkeletonLimbState* ls=scfParent->GetChildren();
-			if(!ls)
-				return NULL;
-			return QUERY_INTERFACE(ls, iSkeletonBone);
+      if (!ls) return NULL;
+      return QUERY_INTERFACE(ls, iSkeletonBone);
     }
     ///
-    virtual const char* GetName () {
-			return scfParent->GetName();
-		}
+    virtual const char* GetName ()
+    {
+      return scfParent->GetName();
+    }
     ///
-    void SetTransformation (const csTransform& tr) {
-			scfParent->SetTransformation(tr);
-		}
-
+    void SetTransformation (const csTransform& tr)
+    {
+      scfParent->SetTransformation (tr);
+    }
   } scfiSkeletonBone;
   friend struct SkeletonBone;
 };
@@ -311,23 +315,24 @@ public:
     DECLARE_EMBEDDED_IBASE (csSkeletonState);
 
     ///
-    virtual iSkeletonBone* GetNext () {
+    virtual iSkeletonBone* GetNext ()
+    {
       csSkeletonLimbState* ls=scfParent->GetNext();
-			if(!ls)
-				return NULL;
-			return QUERY_INTERFACE(ls, iSkeletonBone);
+      if(!ls) return NULL;
+      return QUERY_INTERFACE(ls, iSkeletonBone);
     }
     ///
-    virtual iSkeletonBone* GetChildren () {
+    virtual iSkeletonBone* GetChildren ()
+    {
       csSkeletonLimbState* ls=scfParent->GetChildren();
-			if(!ls)
-				return NULL;
-			return QUERY_INTERFACE(ls, iSkeletonBone);
+      if(!ls) return NULL;
+      return QUERY_INTERFACE(ls, iSkeletonBone);
     }
     ///
-    virtual const char* GetName () {
-			return scfParent->GetName();
-		}
+    virtual const char* GetName ()
+    {
+      return scfParent->GetName();
+    }
     ///
     void SetTransformation (const csTransform&) {}
 

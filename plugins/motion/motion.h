@@ -24,7 +24,8 @@
 #include "csgeom/quaterni.h"
 #include "csgeom/matrix3.h"
 
-struct csMotionFrame {
+struct csMotionFrame
+{
   cs_time keyframe;
 
   int size;
@@ -33,7 +34,8 @@ struct csMotionFrame {
 };
 
 ///
-class csMotion:public iMotion {
+class csMotion:public iMotion
+{
 public:
   char* name;
   char matrixmode;
@@ -82,22 +84,24 @@ public:
 
 DECLARE_TYPED_VECTOR_WITH_BASE(csMotionVector,csMotion,csMotionVectorBase); 
 
-struct csAppliedMotion {
-	iSkeletonBone* skel;
-	csMotion* curmotion;
-	cs_time curtime;
-	csMotionFrame* curframe;
-	csMotionFrame* nextframe;
+struct csAppliedMotion
+{
+  iSkeletonBone* skel;
+  csMotion* curmotion;
+  cs_time curtime;
+  csMotionFrame* curframe;
+  csMotionFrame* nextframe;
 };
 
 DECLARE_TYPED_VECTOR(csAppliedMotionVector,csAppliedMotion); 
 
 ///
-class csMotionManager:public iMotionManager {
+class csMotionManager:public iMotionManager
+{
   csMotionVector motions;
-	csAppliedMotionVector skels;
-	cs_time oldtime;
-	iSystem* iSys;
+  csAppliedMotionVector skels;
+  cs_time oldtime;
+  iSystem* iSys;
 public:
   DECLARE_IBASE;
 
@@ -109,23 +113,24 @@ public:
   ///
   virtual bool Initialize (iSystem *iSys);
   ///
-  virtual iMotion* FindByName (const char* name) {
-		return FindClassByName(name);  
-	}
+  virtual iMotion* FindByName (const char* name)
+  {
+    return FindClassByName(name);  
+  }
   ///
   virtual iMotion* AddMotion (const char* name);
-	///
-	virtual bool ApplyMotion(iSkeletonBone *skel, const char* motion);
-	///
-	virtual void UpdateAll();
+  ///
+  virtual bool ApplyMotion(iSkeletonBone *skel, const char* motion);
+  ///
+  virtual void UpdateAll();
 
   ///
   csMotion* FindClassByName (const char* name);
 
-	void UpdateTransform(csAppliedMotion *am, iSkeletonBone *bone, int link, int link2);
-	bool UpdateBone(csAppliedMotion *am, iSkeletonBone *bone, unsigned int hash);
-	void UpdateAppliedBones(csAppliedMotion *am, iSkeletonBone *bone);
-	bool UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime);
+  void UpdateTransform(csAppliedMotion *am, iSkeletonBone *bone, int link, int link2);
+  bool UpdateBone(csAppliedMotion *am, iSkeletonBone *bone, unsigned int hash);
+  void UpdateAppliedBones(csAppliedMotion *am, iSkeletonBone *bone);
+  bool UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime);
 };
 
 #endif

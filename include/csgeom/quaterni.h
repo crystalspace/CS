@@ -92,15 +92,20 @@ public:
     return csVector3 (p.x, p.y, p.z);
   }
 
-  void Normalize() {
-    if(x*x + y*y + z*z > .999) {
+  /// Normalize this quaternion.
+  void Normalize ()
+  {
+    if(x*x + y*y + z*z > .999)
+    {
       // Severe problems...
       float inverselen = 1.0/(x*x + y*y + z*z);
       x *= inverselen;
       y *= inverselen;
       z *= inverselen;
       r = 0.0;
-    } else {
+    }
+    else
+    {
       r = sqrt(1.0 - x*x - y*y - z*z);
     }
   }
@@ -118,13 +123,13 @@ public:
   csQuaternion ToAxisAngle() const;
 
   /**
-	 * Spherical Linear Interpolation between two quaternions
-	 * Calculated between this class & the second quaternion by the slerp
-	 * factor and returned as a new quaternion
+   * Spherical Linear Interpolation between two quaternions
+   * Calculated between this class & the second quaternion by the slerp
+   * factor and returned as a new quaternion
    */
-	csQuaternion Slerp(const csQuaternion &quat2, float slerp) const; 
+  csQuaternion Slerp (const csQuaternion &quat2, float slerp) const; 
 
-//	csQuaternion Lerp(const csQuaternion& quat2, float ratio) const;
+//csQuaternion Lerp(const csQuaternion& quat2, float ratio) const;
 
   float r,x,y,z;
 };

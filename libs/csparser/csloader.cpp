@@ -4497,18 +4497,17 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
       case CS_TOKEN_LIMB:
         {
           csSkeletonConnection* con = new csSkeletonConnection ();
-					if(name)
-						con->SetName(name);
-					if (!LoadSkeleton (con, params, true)) return false;
-					limb->AddChild (con);
-				}
+	  if (name) con->SetName (name);
+	  if (!LoadSkeleton (con, params, true)) return false;
+	  limb->AddChild (con);
+	}
         break;
       case CS_TOKEN_TRANSFORM:
         if (is_connection)
         {
           char* params2;
-					csMatrix3 m;
-					csVector3 v (0, 0, 0);
+	  csMatrix3 m;
+	  csVector3 v (0, 0, 0);
           while ((cmd = csGetObject (&params, tok_matvec, &xname, &params2)) > 0)
           {
     	    if (!params2)
@@ -4520,21 +4519,21 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
             {
               case CS_TOKEN_MATRIX:
                 load_matrix (params2, m);
-								break;
+		break;
               case CS_TOKEN_V:
                 load_vector (params2, v);
-								break;
+		break;
             }
           }
-					csTransform tr (m, -m.GetInverse () * v);
-					((csSkeletonConnection*)limb)->SetTransformation (tr);
+	  csTransform tr (m, -m.GetInverse () * v);
+	  ((csSkeletonConnection*)limb)->SetTransformation (tr);
         }
-				else
-					{
-					CsPrintf (MSG_FATAL_ERROR, "TRANSFORM not valid for this type of skeleton limb!\n");
-					fatal_exit (0, false);
-				}
-				break;
+	else
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "TRANSFORM not valid for this type of skeleton limb!\n");
+	  fatal_exit (0, false);
+	}
+	break;
       case CS_TOKEN_VERTICES:
         {
           int list[1000], num;	//@@@ HARDCODED!!!
@@ -4660,13 +4659,12 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
         break;
 
       case CS_TOKEN_SKELETON:
-				{
+	{
           csSkeleton* skeleton = new csSkeleton ();
-					if(name)
-						skeleton->SetName(name);
-					if (!LoadSkeleton (skeleton, params, false)) return false;
-					stemp->SetSkeleton (skeleton);
-				}
+	  if(name) skeleton->SetName (name);
+	  if (!LoadSkeleton (skeleton, params, false)) return false;
+	  stemp->SetSkeleton (skeleton);
+	}
         break;
 
       case CS_TOKEN_ACTION:
@@ -5159,19 +5157,19 @@ iMotion* csLoader::LoadMotion (csWorld* world, const char* fname)
 bool csLoader::LoadMotion (iMotion* mot, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
-	  CS_TOKEN_TABLE (ANIM)
+    CS_TOKEN_TABLE (ANIM)
     CS_TOKEN_TABLE (FRAME)
   CS_TOKEN_TABLE_END
 
-	CS_TOKEN_TABLE_START (tok_anim)
-  	CS_TOKEN_TABLE (EULER)
-		CS_TOKEN_TABLE (Q)
-  	CS_TOKEN_TABLE (MATRIX)
-	CS_TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_anim)
+    CS_TOKEN_TABLE (EULER)
+    CS_TOKEN_TABLE (Q)
+    CS_TOKEN_TABLE (MATRIX)
+  CS_TOKEN_TABLE_END
 
-	CS_TOKEN_TABLE_START (tok_frame)
-		CS_TOKEN_TABLE (LINK)
-	CS_TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START (tok_frame)
+    CS_TOKEN_TABLE (LINK)
+  CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
@@ -5187,54 +5185,59 @@ bool csLoader::LoadMotion (iMotion* mot, char* buf)
     }
     switch (cmd)
     {
-			case CS_TOKEN_ANIM:
-				{
-					cmd = csGetObject (&params, tok_anim, &name, &params2);
-					switch(cmd) 
-					{
-						case CS_TOKEN_EULER:
-						{
-							csVector3 e;
-							csQuaternion quat;
-							load_vector(params2, e);
-							quat.SetWithEuler(e);
-							mot->AddAnim(quat);
-						} break;
-						case CS_TOKEN_Q:
-						{
-							csQuaternion quat;
-							load_quaternion(params2, quat);
-							mot->AddAnim(quat);
-						} break;
-						case CS_TOKEN_MATRIX:
-						{
-							csMatrix3 mat;
-							load_matrix(params2, mat);
-							mot->AddAnim(mat);
-						} break;
-						default:
-							CsPrintf (MSG_FATAL_ERROR, "Expected MATRIX or Q instead of '%s'!\n", buf);
-							fatal_exit (0, false);
-					}     
-				}
-			break;
+      case CS_TOKEN_ANIM:
+        {
+	  cmd = csGetObject (&params, tok_anim, &name, &params2);
+	  switch (cmd) 
+	  {
+	    case CS_TOKEN_EULER:
+	      {
+	        csVector3 e;
+	        csQuaternion quat;
+	        load_vector(params2, e);
+	        quat.SetWithEuler(e);
+	        mot->AddAnim(quat);
+	      }
+	      break;
+	    case CS_TOKEN_Q:
+	      {
+	        csQuaternion quat;
+	        load_quaternion(params2, quat);
+	        mot->AddAnim(quat);
+	      }
+	      break;
+	    case CS_TOKEN_MATRIX:
+	      {
+	        csMatrix3 mat;
+	        load_matrix(params2, mat);
+	        mot->AddAnim(mat);
+	      }
+	      break;
+	    default:
+	      CsPrintf (MSG_FATAL_ERROR, "Expected MATRIX or Q instead of '%s'!\n", buf);
+	      fatal_exit (0, false);
+	  }     
+        }
+        break;
       case CS_TOKEN_FRAME:
-				{
-					int framenumber;
-					ScanStr(name, "%d", &framenumber);
-					int index=mot->AddFrame(framenumber);
-					while((cmd = csGetObject (&params, tok_frame, &name, &params2))>0) {
-						if(cmd!=CS_TOKEN_LINK) {
-							CsPrintf (MSG_FATAL_ERROR, "Expected LINK instead of '%s'!\n", buf);
-							fatal_exit (0, false);
-						}
-						int link;
-						ScanStr(params2, "%d", &link);
-						mot->AddFrameLink(index, name, link);
-					}
-				}
-			break;
-		}
+	{
+	  int framenumber;
+	  ScanStr(name, "%d", &framenumber);
+	  int index=mot->AddFrame(framenumber);
+	  while((cmd = csGetObject (&params, tok_frame, &name, &params2))>0)
+	  {
+	    if(cmd!=CS_TOKEN_LINK)
+	    {
+	      CsPrintf (MSG_FATAL_ERROR, "Expected LINK instead of '%s'!\n", buf);
+	      fatal_exit (0, false);
+	    }
+	    int link;
+	    ScanStr(params2, "%d", &link);
+	    mot->AddFrameLink(index, name, link);
+	  }
+        }
+	break;
+    }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {

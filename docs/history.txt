@@ -1,6 +1,26 @@
 The history order has been reversed so that new features are at the top.
 
+11-Oct-2000
+	- Philip Wyett fixed a bug in csapp.cpp. He removed 'const'
+	  from 'const char* filename'.
+	- Philip also updated the VC project files to conform to recent
+	  commits (ltbsp.cpp and ltbsp.h, and also the new motion
+	  stuff from Brandon).
+	- Brandon Ehle did the following changes:
+	    There are some issues with frames where no interpolation
+	    occurs, but Quaternion based skeletal animation is in and
+	    amazingly fast even before attempting to optimize.  Matrix
+	    mode animation is supported, but no interpolation code exists
+	    yet.  Tons of changes to the csQuaternion class as it appears
+	    that nobody has used it yet and one function added to
+	    csMatrix3 to support Quaternion initialization.  Also
+	    revamped the iMotion interfaces a bit, and added a hacky SCF
+	    implementation for the csSkeleton classes until someone with
+	    better knowledge can fix them so they are correct.
+	- Cleaned up the formatting in the commits from Brandon.
 10-Oct-2000
+	- Norman Kramer did some fixes after Andrew's changes.
+	- Andrew Zabolotny renamed fontserver to fontplex.
 	- Andrew Zabolotny did the following changes:
 	    - Fixed makedep so that it will work unde Unix (well, at
 	      least under Linux :-) Added autodetection of system include

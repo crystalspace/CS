@@ -558,8 +558,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  db_boxnode1 db_boxnode2 db_boxvis db_radstep db_radhi db_radtodo\n");
     CONPRI("Sprites:\n");
     CONPRI("  loadsprite addsprite delsprite listsprites\n");
-    CONPRI("  listactions setaction\n");
-    CONPRI("  setmotion\n");
+    CONPRI("  listactions setaction setmotion\n");
     CONPRI("Various:\n");
     CONPRI("  coordsave coordload bind capture map mapproj p_alpha s_fog\n");
     CONPRI("  snd_play snd_volume record play clrrec saverec\n");
@@ -1405,22 +1404,22 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // Test to see if the sprite exists.
-      csSprite3D* aspr = (csSprite3D *) Sys->world->sprites.FindByName(name);
-      
-      if(aspr)
+      csSprite3D* aspr = (csSprite3D *) Sys->world->sprites.FindByName (name);
+      if (aspr)
       {
-				iSkeletonBone *sb=QUERY_INTERFACE(aspr->GetSkeletonState(), iSkeletonBone);
-				if(sb) {
-					if(System->MotionMan) {
-						if(!System->MotionMan->ApplyMotion(sb, motion)) {
-							Sys->Printf (MSG_CONSOLE, "That motion does not exist!\n");
-						}
-					} else {
-						Sys->Printf (MSG_CONSOLE, "No motion manager exists to animate the skeleton!\n");
-					}
-				} else {
-					Sys->Printf (MSG_CONSOLE, "That sprite does not contain a skeleton!\n");
-				}
+	iSkeletonBone *sb=QUERY_INTERFACE(aspr->GetSkeletonState(), iSkeletonBone);
+	if (sb)
+	{
+	  if (System->MotionMan)
+	  {
+	    if (!System->MotionMan->ApplyMotion(sb, motion))
+	      Sys->Printf (MSG_CONSOLE, "That motion does not exist!\n");
+	  }
+	  else
+	    Sys->Printf (MSG_CONSOLE, "No motion manager exists to animate the skeleton!\n");
+	}
+	else
+	  Sys->Printf (MSG_CONSOLE, "That sprite does not contain a skeleton!\n");
       }
       else
       {

@@ -38,8 +38,8 @@ EXPORT_CLASS_TABLE_END
 csMotionManager::csMotionManager(iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
-	oldtime=0;
-	iSys=NULL;
+  oldtime=0;
+  iSys=NULL;
 }
 
 csMotionManager::~csMotionManager()
@@ -48,7 +48,7 @@ csMotionManager::~csMotionManager()
 
 bool csMotionManager::Initialize (iSystem* TiSys)
 {
-	iSys=TiSys;
+  iSys=TiSys;
   return true;
 }
 
@@ -63,7 +63,7 @@ csMotion* csMotionManager::FindClassByName (const char* name)
 iMotion* csMotionManager::AddMotion (const char* name)
 {
 #ifdef MOTION_DEBUG
-	printf("AddMotion(%s)\n", name);
+  printf("AddMotion(%s)\n", name);
 #endif
   csMotion* mot=new csMotion();
   mot->SetName(name);
@@ -72,166 +72,194 @@ iMotion* csMotionManager::AddMotion (const char* name)
 }
 
 //TODO Azverkan use a sorted array
-bool csMotionManager::ApplyMotion(iSkeletonBone *skel, const char* motion) {
-	csMotion* newmotion=FindClassByName((const char*)csHashCompute(motion));
-	if(!newmotion)
-		return false;
+bool csMotionManager::ApplyMotion(iSkeletonBone *skel, const char* motion)
+{
+  csMotion* newmotion=FindClassByName((const char*)csHashCompute(motion));
+  if(!newmotion) return false;
 
-	int size=skels.Length();
-	int i=0;
-	for(; i<size; i++) {
-		if( ((iSkeletonBone*)(skels[i]->skel)) == skel) {
-			break;
-		}
-	}
-	csAppliedMotion *am=NULL;
-	if(i==size) {
-		am=new csAppliedMotion();
-		skels.Push(am);
-	} else {
-		am=skels[i];
-	}
-	am->curframe=NULL;
-	am->skel=skel;
-	am->curmotion=newmotion;
-	am->curtime=0;
-	return true;
+  int size=skels.Length();
+  int i=0;
+  for(; i<size; i++)
+  {
+    if( ((iSkeletonBone*)(skels[i]->skel)) == skel)
+      break;
+  }
+  csAppliedMotion *am=NULL;
+  if(i==size)
+  {
+    am=new csAppliedMotion();
+    skels.Push(am);
+  }
+  else
+    am=skels[i];
+  am->curframe=NULL;
+  am->skel=skel;
+  am->curmotion=newmotion;
+  am->curtime=0;
+  return true;
 }
 
-void csMotionManager::UpdateTransform(csAppliedMotion *am, iSkeletonBone *bone, int link1, int link2) {
-	if(am->curmotion->matrixmode==0) {
-		csQuaternion quat;
-		csQuaternion &quat1=((csQuaternion*)am->curmotion->transforms)[link1];
-		if(am->nextframe) {
-			csQuaternion &quat2=((csQuaternion*)am->curmotion->transforms)[link2];
-
-			float dist1=(float)(am->curtime)-(float)(am->curframe->keyframe);
-			float dist2=(float)(am->nextframe->keyframe)-(float)(am->curframe->keyframe);
-			float ratio = dist1 / dist2;
+void csMotionManager::UpdateTransform (csAppliedMotion *am, iSkeletonBone *bone, int link1, int link2)
+{
+  if (am->curmotion->matrixmode==0)
+  {
+    csQuaternion quat;
+    csQuaternion &quat1=((csQuaternion*)am->curmotion->transforms)[link1];
+    if(am->nextframe)
+    {
+      csQuaternion &quat2=((csQuaternion*)am->curmotion->transforms)[link2];
+      float dist1=(float)(am->curtime)-(float)(am->curframe->keyframe);
+      float dist2=(float)(am->nextframe->keyframe)-(float)(am->curframe->keyframe);
+      float ratio = dist1 / dist2;
 
 #ifdef MOTION_DEBUG
-			printf("Slerp Q(%g,%g,%g,%g) Q(%g,%g,%g,%g) %g\n", quat1.x, quat1.y, quat1.z, quat1.r, quat2.x, quat2.y, quat2.z, quat2.r, ratio);
+      printf("Slerp Q(%g,%g,%g,%g) Q(%g,%g,%g,%g) %g\n", quat1.x, quat1.y, quat1.z, quat1.r, quat2.x, quat2.y, quat2.z, quat2.r, ratio);
 #endif
 
-			quat=quat1.Slerp(quat2, ratio);
-		} else {
-			quat=quat1;
-		}
+      quat=quat1.Slerp(quat2, ratio);
+    }
+    else
+      quat=quat1;
 
 #ifdef MOTION_DEBUG
-		printf("UpdateTransform Q(%g,%g,%g,%g)\n", quat.x, quat.y, quat.z, quat.r);
+    printf("UpdateTransform Q(%g,%g,%g,%g)\n", quat.x, quat.y, quat.z, quat.r);
 #endif
-		bone->SetTransformation(csTransform(csMatrix3(quat), csVector3(0,0,0)));
-	} else if(am->curmotion->matrixmode==1) {
-		csMatrix3 &mat=((csMatrix3*)am->curmotion->transforms)[link1];
-		bone->SetTransformation(csTransform(mat, csVector3(0,0,0)));
-	}
+    bone->SetTransformation(csTransform(csMatrix3(quat), csVector3(0,0,0)));
+  }
+  else if (am->curmotion->matrixmode==1)
+  {
+    csMatrix3 &mat=((csMatrix3*)am->curmotion->transforms)[link1];
+    bone->SetTransformation(csTransform(mat, csVector3(0,0,0)));
+  }
 }
 
-bool csMotionManager::UpdateBone(csAppliedMotion *am, iSkeletonBone *bone, unsigned int hash) {
-	int link1=-1;
-	int link2=-1;
+bool csMotionManager::UpdateBone(csAppliedMotion *am, iSkeletonBone *bone, unsigned int hash)
+{
+  int link1=-1;
+  int link2=-1;
 
-	int size=am->curframe->size;
-	for(int i=0; i<size; i++) {
-		if(am->curframe->affectors[i]==hash) {
-			link1=am->curframe->links[i];
-			break;
-		}
-	}
-	if(link1<0) {
+  int size=am->curframe->size;
+  for(int i=0; i<size; i++)
+  {
+    if(am->curframe->affectors[i]==hash)
+    {
+      link1=am->curframe->links[i];
+      break;
+    }
+  }
+  if(link1<0)
+  {
 #ifdef MOTION_DEBUG
-		printf("UpdateBone() link1 fail\n");
+    printf("UpdateBone() link1 fail\n");
 #endif			
-		return false;
-	}
+    return false;
+  }
 
-	if(am->nextframe) {
-		int size=am->nextframe->size;
-		for(int i=0; i<size; i++) {
-			if(am->nextframe->affectors[i]==hash) {
-				link2=am->nextframe->links[i];
-				break;
-			}
-		}
-		if(link2<0) {
+  if(am->nextframe)
+  {
+    int size=am->nextframe->size;
+    for(int i=0; i<size; i++)
+    {
+      if(am->nextframe->affectors[i]==hash)
+      {
+        link2=am->nextframe->links[i];
+        break;
+      }
+    }
+    if(link2<0)
+    {
 #ifdef MOTION_DEBUG
-			printf("UpdateBone() link2 fail\n");
+      printf("UpdateBone() link2 fail\n");
 #endif			
-			return false;
-		}
-	}
+      return false;
+    }
+  }
 
-	UpdateTransform(am, bone, link1, link2);
-	return true;
+  UpdateTransform(am, bone, link1, link2);
+  return true;
 }
 
-void csMotionManager::UpdateAppliedBones(csAppliedMotion *am, iSkeletonBone *bone) {
-	const char* name=bone->GetName();
-	if(name) {
-		unsigned int hash=csHashCompute(name);
-		UpdateBone(am, bone, hash);
-	}
+void csMotionManager::UpdateAppliedBones(csAppliedMotion *am, iSkeletonBone *bone)
+{
+  const char* name=bone->GetName();
+  if(name)
+  {
+    unsigned int hash=csHashCompute(name);
+    UpdateBone(am, bone, hash);
+  }
 
-	iSkeletonBone *child=bone->GetChildren();
-	while(child) {
-		UpdateAppliedBones(am, child);
-		child=child->GetNext();
-	}
+  iSkeletonBone *child=bone->GetChildren();
+  while(child)
+  {
+    UpdateAppliedBones(am, child);
+    child=child->GetNext();
+  }
 }
 
 //TODO Azverkan support frame interpolation & make looping optional
-bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime) {
-	am->curtime+=elapsedtime;
+bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime)
+{
+  am->curtime+=elapsedtime;
 
-	int size=am->curmotion->numframes;
+  int size=am->curmotion->numframes;
 
   //Check to see if motion has looped
-	CS_ASSERT(am->curmotion->frames[size-1].keyframe>0);
+  CS_ASSERT(am->curmotion->frames[size-1].keyframe>0);
 
-	while(am->curmotion->frames[size-1].keyframe < am->curtime) {
-		am->curtime -= am->curmotion->frames[size-1].keyframe;
-	}
+  while(am->curmotion->frames[size-1].keyframe < am->curtime)
+  {
+    am->curtime -= am->curmotion->frames[size-1].keyframe;
+  }
 
-	am->nextframe=NULL;
-	for(int i=0; i<size; i++) {
-		if(am->curmotion->frames[i].keyframe==am->curtime) {
-			am->curframe=&am->curmotion->frames[i];
-			break;
-		} else if(am->curmotion->frames[i].keyframe>am->curtime) {
-			if(i!=0) {
-				am->curframe=&am->curmotion->frames[i-1];
-				am->nextframe=&am->curmotion->frames[i];
-			} else {
-				am->curframe=&am->curmotion->frames[i];
-			}
-			break;
-		}
-	}
+  am->nextframe=NULL;
+  for(int i=0; i<size; i++)
+  {
+    if(am->curmotion->frames[i].keyframe==am->curtime)
+    {
+      am->curframe=&am->curmotion->frames[i];
+      break;
+    }
+    else if (am->curmotion->frames[i].keyframe>am->curtime)
+    {
+      if(i!=0)
+      {
+	am->curframe=&am->curmotion->frames[i-1];
+	am->nextframe=&am->curmotion->frames[i];
+      }
+      else
+      {
+	am->curframe=&am->curmotion->frames[i];
+      }
+      break;
+    }
+  }
 
-	if(!am->curframe)
-		return false;
+  if (!am->curframe) return false;
 
 #ifdef MOTION_DEBUG
-	printf("UpdateAppliedMotion %d %d\n", am->curtime, am->curframe->keyframe); 
+  printf("UpdateAppliedMotion %d %d\n", am->curtime, am->curframe->keyframe); 
 #endif
 
-	UpdateAppliedBones(am, am->skel);
-	return true;
+  UpdateAppliedBones(am, am->skel);
+  return true;
 }
 
-void csMotionManager::UpdateAll() {
-	cs_time newtime=iSys->GetTime();
-	if(oldtime==0) { //Handle first run
-		oldtime=newtime;
-	}
-	cs_time elapsedtime=newtime-oldtime;
-	oldtime=newtime;
+void csMotionManager::UpdateAll()
+{
+  cs_time newtime=iSys->GetTime();
+  if(oldtime==0)
+  {
+    //Handle first run
+    oldtime=newtime;
+  }
+  cs_time elapsedtime=newtime-oldtime;
+  oldtime=newtime;
 
-	int size=skels.Length();
-	for(int i=0; i<size; i++) {
-		UpdateAppliedMotion(skels[i], elapsedtime);
-	}
+  int size=skels.Length();
+  for (int i=0; i<size; i++)
+  {
+    UpdateAppliedMotion(skels[i], elapsedtime);
+  }
 }
 
 IMPLEMENT_IBASE (csMotion)
@@ -251,31 +279,28 @@ csMotion::csMotion()
 }
 
 csMotion::~csMotion()
-  {
-  if (name)
-    free(name);
-  if (transforms)
-    free(transforms);
+{
+  if (name) free (name);
+  if (transforms) free (transforms);
   if (frames)
   {
     for (int i = 0; i < numframes; i++)
     {
       if (frames[i].size)
       {
-        free(frames[i].links);
-        free(frames[i].affectors);
+        free (frames[i].links);
+        free (frames[i].affectors);
       }
     }
-    free(frames);
+    free (frames);
   }
 }
 
-void csMotion::SetName(const char* newname)
+void csMotion::SetName (const char* newname)
 {
-  if (name)
-    free(name);
-  name = strdup(newname);
-  hash = csHashCompute(name);
+  if (name) free (name);
+  name = strdup (newname);
+  hash = csHashCompute (name);
 }
 
 const char* csMotion::GetName()
