@@ -1,0 +1,10 @@
+Things that need to be done in new renderer:
+
+	- Support hierarchical meshes. Currently only the top-level mesh
+	  is considered.
+	- Support static LOD. This is a special case of a hierarchical mesh
+	  where only one of the children is drawn based on distance
+	  related conditions.
+	- Make csShader a csObject so it can be supported in regions.
+	  Also add iRegion->PrepareShaders().
+

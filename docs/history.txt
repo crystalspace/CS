@@ -35,6 +35,8 @@ chronological order.
 	        to old renderer branch.
 	      - Started work on documenting the API changes for the new
 	        renderer that are relevant for user applications.
+	- Jorrit added a docs/todo_newrenderer.txt which should contain
+	  all stuff that needs to be done for new renderer (in detail).
 28-Aug-2003
 	- Jorrit fixed the x2d plugin so it actually reports an error if the
 	  'xwin' plugin cannot be found.
