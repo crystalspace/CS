@@ -52,7 +52,8 @@ void csIsoRenderView::CreateBuckets(int num)
 void csIsoRenderView::DrawBuckets()
 {
   csIsoRenderBucket *p, *np;
-  for(int i=0; i<maxbuckets; i++)
+  int i;
+  for(i=0; i<maxbuckets; i++)
   {
     p = buckets[i];
     if(!p) continue;

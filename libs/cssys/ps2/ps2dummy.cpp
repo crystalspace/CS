@@ -109,8 +109,9 @@ size_t  fread(void *buf, size_t size, size_t count, FILE *f) {
 }
 
 size_t  fwrite(const void *buf, size_t size, size_t count, FILE *f) {
+  int i;
   if(f==stdout || f==stderr) {
-    for(int i=0; i<size*count; i++) {
+    for(i=0; i<size*count; i++) {
       printf("%c", ((char*)buf)[i]);
     }
     return count;

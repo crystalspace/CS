@@ -86,7 +86,8 @@ csIsoEngine::csIsoEngine (iBase *iParent)
 
 csIsoEngine::~csIsoEngine ()
 {
-  for(int i=0; i<materials.Length(); i++)
+  int i;
+  for(i=0; i<materials.Length(); i++)
     RemoveMaterial(i);
   if(g3d) g3d->DecRef();
 }
@@ -138,7 +139,8 @@ bool csIsoEngine::HandleEvent (iEvent& Event)
         // We must free all material and texture handles since after
         // G3D->Close() they all become invalid, no matter whenever
         // we did or didn't an IncRef on them.
-	for(int i=0; i<materials.Length(); i++)
+	  int i;
+	  for(i=0; i<materials.Length(); i++)
 	  RemoveMaterial(i);
         return true;
       }

@@ -68,7 +68,8 @@ void csTerrainQuad::Build (int depth)
 
 void csTerrainQuad::InitHorizon (float *horizon, int horsize)
 {
-  for(int i=0; i<horsize; i++)
+  int i;
+  for(i=0; i<horsize; i++)
     horizon[i] = MININF;
 }
 

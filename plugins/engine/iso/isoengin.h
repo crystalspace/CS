@@ -50,13 +50,14 @@ public:
   csIsoNamedVector(int ilimit = 0, int ithreshold = 0) 
     : csBasicVector(ilimit, ithreshold) {}
   /// delete, but and the wrapperobjects in it (but no decref of content)
-  ~csIsoNamedVector() {for(int i=0; i<Length(); i++) 
+  ~csIsoNamedVector() {int i; for(i=0; i<Length(); i++) 
     delete (csIsoObjWrapper*)Get(i); }
 
   /// find a wrapper by name
   csIsoObjWrapper *FindByName(const char* name) const
   {
-    for(int i=0; i<Length(); i++)
+	int i;
+    for(i=0; i<Length(); i++)
     {
       csIsoObjWrapper *o = (csIsoObjWrapper*)Get(i);
       if(o->GetName() && (strcmp(o->GetName(), name) == 0))
@@ -67,7 +68,8 @@ public:
   /// find iBase by name
   iBase *FindContentByName(const char* name) const
   {
-    for(int i=0; i<Length(); i++)
+	int i;
+    for(i=0; i<Length(); i++)
     {
       csIsoObjWrapper *o = (csIsoObjWrapper*)Get(i);
       if(o->GetName() && (strcmp(o->GetName(), name) == 0))
@@ -78,7 +80,8 @@ public:
   /// find index by name, -1 means not found
   int FindIndexByName(const char* name) const
   {
-    for(int i=0; i<Length(); i++)
+	int i;
+    for(i=0; i<Length(); i++)
     {
       csIsoObjWrapper *o = (csIsoObjWrapper*)Get(i);
       if(o->GetName() && (strcmp(o->GetName(), name) == 0))

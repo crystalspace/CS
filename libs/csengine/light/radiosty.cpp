@@ -145,8 +145,9 @@ void csRadElement::GetSummedDelta(int suv, int w, int h, csColor& sum)
   sum.red = 0.0f;
   sum.green = 0.0f;
   sum.blue = 0.0f;
-  for(int y=0; y<h; y++, suv += width - w)
-    for(int x=0; x<w; x++, suv ++)
+  int y, x;
+  for(y=0; y<h; y++, suv += width - w)
+    for(x=0; x<w; x++, suv ++)
     {
       sum.red += deltamap->GetRed()[suv];
       sum.green += deltamap->GetGreen()[suv];
@@ -200,7 +201,8 @@ void csRadElement::GetDeltaSums(float &red, float &green, float &blue)
   red = 0.0;
   green = 0.0;
   blue = 0.0;
-  for(int uv=0; uv<size; uv++)
+  int uv;
+  for(uv=0; uv<size; uv++)
   {
     red += deltamap->GetRed()[uv];
     green += deltamap->GetGreen()[uv];
@@ -211,7 +213,8 @@ void csRadElement::GetDeltaSums(float &red, float &green, float &blue)
 void csRadElement::ApplyAmbient(int red, int green, int blue)
 {
   float res;
-  for(int uv=0; uv<size; uv++)
+  int uv;
+  for(uv=0; uv<size; uv++)
   {
     res = deltamap->GetRed()[uv] + red;
     if(res>255)res=255; else if(res<0) res=0;
@@ -279,8 +282,9 @@ csRGBMap * csRadElement::ComputeTextureLumelSized()
   int texelsperlumel_shift = lightcell_shift * 2;
   int lumel_uv = 0;
   m = map->GetArray ();
-  for(int lumel_y = 0; lumel_y < height; lumel_y ++)
-    for(int lumel_x = 0; lumel_x < width; lumel_x++, lumel_uv++)
+  int lumel_y, lumel_x, dy, dx;
+  for(lumel_y = 0; lumel_y < height; lumel_y ++)
+    for(lumel_x = 0; lumel_x < width; lumel_x++, lumel_uv++)
     {
       /// these ints are only large enough for a lightcellsize < 4096
       int sumr = 0;
@@ -289,8 +293,8 @@ csRGBMap * csRadElement::ComputeTextureLumelSized()
       // in texture coords the lumel is:
       int txt_start_x = (lumel_x << lightcell_shift) % txtw;
       int txt_start_y = (lumel_y << lightcell_shift) % txth;
-      for(int dy = 0; dy < lightcell_size; dy++)
-        for(int dx = 0; dx < lightcell_size; dx++)
+      for(dy = 0; dy < lightcell_size; dy++)
+        for(dx = 0; dx < lightcell_size; dx++)
 	{
 	  int txt_x = (dx + txt_start_x) % txtw; // modulo to wrap around
 	  int txt_y = (dy + txt_start_y) % txth; // and make texture tile
@@ -330,9 +334,10 @@ csVector3 csRadElement::GetAvgNormal() const
   csVector3 avg(0,0,0);
   
   // sum every normal in _uv2Normal
-  for(int i=0; i < width; i++)
+  int i, j;
+  for(i=0; i < width; i++)
   {
-    for(int j=0; j < height; j++)
+    for(j=0; j < height; j++)
     {
       avg += GetNormal(i,j);
     }

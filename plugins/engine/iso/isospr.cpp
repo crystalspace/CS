@@ -293,7 +293,8 @@ void csIsoSprite::SetAllColors(const csColor& color)
 {
   CS_ASSERT (poly.GetVertexCount () == colors.GetVertexCount ());
   CS_ASSERT (poly.GetVertexCount () == static_colors.GetVertexCount ());
-  for(int i=0; i<poly.GetVertexCount(); i++)
+  int i;
+  for(i=0; i<poly.GetVertexCount(); i++)
   {
     colors[i].Set(color.red, color.green, color.blue);
   }
@@ -316,7 +317,8 @@ void csIsoSprite::AddToVertexColor(int i, const csColor& color)
 
 void csIsoSprite::ResetAllColors()
 {
-  for(int i=0; i<poly.GetVertexCount(); i++)
+  int i;
+  for(i=0; i<poly.GetVertexCount(); i++)
   {
     colors[i] = static_colors[i];
   }
@@ -324,7 +326,8 @@ void csIsoSprite::ResetAllColors()
 
 void csIsoSprite::SetAllStaticColors(const csColor& color)
 {
-  for(int i=0; i<poly.GetVertexCount(); i++)
+  int i;
+  for(i=0; i<poly.GetVertexCount(); i++)
   {
     static_colors[i].Set(color.red, color.green, color.blue);
   }

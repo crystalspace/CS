@@ -59,7 +59,8 @@ csHazeHull::~csHazeHull()
   delete[] verts; verts = NULL;
   delete[] edgept1; edgept1 = NULL;
   delete[] edgept2; edgept2 = NULL;
-  for(int p=0; p<total_poly; p++)
+  int p;
+  for(p=0; p<total_poly; p++)
   {
     delete[] pol_verts[p]; pol_verts[p] = NULL;
     delete[] pol_edges[p]; pol_edges[p] = NULL;
@@ -178,12 +179,12 @@ void csHazeHull::ComputeOutline(iHazeHull *hull, const csVector3& campos,
   int *nextvert = new int[hull->GetVerticeCount()];
 
   /// no edges used
-  int i;
+  int i, p;
   for(i=0; i<hull->GetEdgeCount(); i++)
     use_edge[i] = 0;
 
   /// mark number of times an edge is used by visible polygons
-  for(int p=0; p<hull->GetPolygonCount(); p++)
+  for(p=0; p<hull->GetPolygonCount(); p++)
   {
     csVector3 v0,v1,v2;
     hull->GetVertex(v0, hull->GetPolVertex(p, 0));
@@ -328,7 +329,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 static void ConeFillVerts(csVector3 *verts, int nr_sides, 
   const csVector3& pos, float radius)
 {
-  for(int i=0; i<nr_sides; i++)
+  int i;
+  for(i=0; i<nr_sides; i++)
   {
     float angle = (float(i)*PI*2.0) / float(nr_sides);
     verts[i] = pos;
@@ -442,7 +444,8 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
   origin = factory->GetOrigin();
   directional = factory->GetDirectional();
   csHazeLayerVector *factlayers = factory->GetLayers();
-  for(int i=0; i<factlayers->Length(); i++)
+  int i;
+  for(i=0; i<factlayers->Length(); i++)
   {
     csHazeLayer *p = new csHazeLayer (factlayers->GetLayer(i)->hull,
       factlayers->GetLayer(i)->scale);
@@ -462,8 +465,9 @@ void csHazeMeshObject::SetupObject ()
   {
     bbox.StartBoundingBox( origin );
     csVector3 pos;
-    for(int l=0; l<layers.Length(); l++)
-      for(int i=0; i<layers.GetLayer(l)->hull->GetVerticeCount(); i++)
+	int l, i;
+    for(l=0; l<layers.Length(); l++)
+      for(i=0; i<layers.GetLayer(l)->hull->GetVerticeCount(); i++)
       {
 	layers.GetLayer(l)->hull->GetVertex(pos, i);
         bbox.AddBoundingVertex( pos );
@@ -849,7 +853,8 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 
 
 #if 0 // draw multiple hulls
-  for(int curlay = 1; curlay < layers.Length(); curlay++)
+  int  curlay;
+  for(curlay = 1; curlay < layers.Length(); curlay++)
   {
     // get hull [curlay] outline in screenspace
     iHazeHull *hull2 = layers.GetLayer(curlay)->hull;

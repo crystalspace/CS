@@ -129,7 +129,8 @@ csProcSky::csProcSky()
 csProcSky::~csProcSky()
 {
   delete[] octaves;
-  for(int i=0 ; i<nr_octaves; i++)
+  int i;
+  for(i=0 ; i<nr_octaves; i++)
     delete[] enlarged[i];
   delete[] enlarged;
   delete[] startoctaves;
@@ -189,13 +190,12 @@ void csProcSky::SmoothOctave(uint8 *octs, int nr, int smoothpower)
   /// make a backup for perfect smoothing
   memcpy(myoct, octs+sz*nr, sz);
   /// smooth
-  int sm = smoothpower;
-  for(int y=0; y<octsize; y++)
-    for(int x=0; x<octsize; x++)
+  int sm = smoothpower, y, x, ix, iy, tot=0;
+  for(y=0; y<octsize; y++)
+    for(x=0; x<octsize; x++)
     {
-      int tot= 0;
-      for(int ix=-sm; ix<=+sm; ix++)
-        for(int iy=-sm; iy<=+sm; iy++)
+      for(ix=-sm; ix<=+sm; ix++)
+        for(iy=-sm; iy<=+sm; iy++)
           tot += myoct[(x+ix+octsize)%octsize + 
 	    ((y+iy+octsize)%octsize)*octsize];
       tot /= (2*sm+1)*(2*sm+1);
@@ -211,8 +211,9 @@ void csProcSky::Enlarge(uint8* dest, uint8* src, int factor, int rshift)
   int zoom = 1<<factor;
   int destsize = srcsize*zoom;
   //// smooth in squares of zoom x zoom
-  for(int sy = 0; sy <srcsize; sy++)
-    for(int sx = 0; sx <srcsize; sx++)
+  int sy, sx;
+  for(sy = 0; sy <srcsize; sy++)
+    for(sx = 0; sx <srcsize; sx++)
     {
       /// the topleft/topright/botleft/botright values of the square
       int topleft = src[sy*srcsize + sx] << 6;
@@ -233,19 +234,20 @@ void csProcSky::Enlarge(uint8* dest, uint8* src, int factor, int rshift)
       /// the start of the horizontal line in dest;
       uint8* dypos= dest + sy*zoom*destsize;
       /// smooth 1 square onto dest
-      for(int dy = 0; dy<zoom; dy++)
+	  int dy, dx;
+      for(dy = 0; dy<zoom; dy++)
       {
         int horinc = (rightval - leftval) >> factor;
-	int horval = leftval;
-	uint8* dxpos = dypos + sx*zoom;
-        for(int dx = 0; dx<zoom; dx++)
-	{
-	  *dxpos++ = horval >> (6+rshift);
-	  horval += horinc;
-	}
-	leftval += leftinc;
-	rightval += rightinc;
-	dypos += destsize;
+		int horval = leftval;
+		uint8* dxpos = dypos + sx*zoom;
+		for(dx = 0; dx<zoom; dx++)
+		{
+		  *dxpos++ = horval >> (6+rshift);
+		  horval += horinc;
+		}
+		leftval += leftinc;
+		rightval += rightinc;
+		dypos += destsize;
       }
     }
 }
@@ -270,7 +272,8 @@ void csProcSky::Combine(uint8 *dest, uint8 *start, uint8 *end, int pos,
   /// pos = strength of end
   /// epow = strength of start 
   /// max = total strength
-  for(int i=0; i<sz; i++)
+  int i;
+  for(i=0; i<sz; i++)
   {
     //float res = float(pos) * float(*ep++) + float(epow)*float(*sp++);
     //*dp++ = int(res / float(max));
@@ -515,8 +518,9 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex, csTicks current_time)
   txtorig += 0.5f*(texelu+texelv);
   csVector3 isect;
   // csVector3 spot;
-  for(int y=0; y<height; y++)
-    for(int x=0; x<width; x++)
+  int y, x;
+  for(y=0; y<height; y++)
+    for(x=0; x<width; x++)
     {
       /*    // 20 msec
       /// get texel pt in 3d space
@@ -593,8 +597,9 @@ void csProcSky::MakeIntersectCache(csProcSkyTexture *skytex)
   csVector3 texelv = txtv / float(height);
   txtorig += 0.5f*(texelu+texelv);
   csVector3 spot, isect;
-  for(int y=0; y<height; y++)
-    for(int x=0; x<height; x++)
+  int y, x;
+  for(y=0; y<height; y++)
+    for(x=0; x<height; x++)
     {
       /// get texel pt in 3d space
       spot = txtorig + texelu*float(x) + texelv*float(y);

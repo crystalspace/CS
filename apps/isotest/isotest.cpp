@@ -438,8 +438,9 @@ static void AddWall(iIsoEngine *engine, iIsoWorld *world, iIsoGrid *grid,
 {
   height = 0;
   return;
-  for(int my=0; my<multy; my++)
-    for(int mx=0; mx<multx; mx++)
+  int my, mx;
+  for(my=0; my<multy; my++)
+    for(mx=0; mx<multx; mx++)
       grid->SetGroundValue(x, y, mx, my, height);
   iIsoSprite *sprite = 0;
   if(bot != height)

@@ -264,11 +264,12 @@ iImage *csGenerateImage::Generate(int totalw, int totalh,
   csRGBpixel *destpix = (csRGBpixel*)result->GetImageData();
   csRGBpixel pix;
   csColor col;
-  for(int y=0; y< parth; y++)
+  int y, x;
+  for(y=0; y< parth; y++)
   {
     pos.y = startpos.y + pixelsize.y * float(y);
     pos.x = startpos.x;
-    for(int x=0; x< partw; x++)
+    for(x=0; x< partw; x++)
     {
       /// compute color
       tex->GetColor(col, pos.x, pos.y);

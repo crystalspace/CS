@@ -382,7 +382,8 @@ void list_meshes (void)
   iMeshList* meshes = Sys->Engine->GetMeshes ();
   num_meshes = meshes->GetMeshCount ();
 
-  for(int i = 0; i < num_meshes; i++)
+  int i;
+  for(i = 0; i < num_meshes; i++)
   {
     mesh = meshes->GetMesh (i);
     mesh_name = mesh->QueryObject ()->GetName();

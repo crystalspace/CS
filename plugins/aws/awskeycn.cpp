@@ -19,8 +19,9 @@ awsKeyContainer::Find(unsigned long idname)
 {
    if (aws_debug)
      printf("aws-debug: searching for %lu (%i items)\n", idname, children.Length());
-     
-   for(int i=0; i<children.Length(); ++i)  
+   
+   int i;
+   for(i=0; i<children.Length(); ++i)  
    {
               
        awsKey *key = STATIC_CAST(awsKey*,children[i]);
@@ -44,8 +45,9 @@ awsKeyContainer::Consume(awsKeyContainer *c)
   {
      if (aws_debug)
        printf("aws-debug: Consuming %d items (%d items currently).\n", c->children.Length(), children.Length());
-       
-     for(int i=0; i<c->children.Length(); ++i) 
+     
+	 int i;
+     for(i=0; i<c->children.Length(); ++i) 
      {
         void *p = c->children[i];
 	

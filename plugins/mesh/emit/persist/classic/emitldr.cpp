@@ -643,9 +643,10 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   iEmitMix *emix = SCF_QUERY_INTERFACE(emit, iEmitMix);
   if(emix)
   {
-    for(int i=0; i<emix->GetEmitterCount(); i++)
+	int i;
+	float w;
+    for(i=0; i<emix->GetEmitterCount(); i++)
     {
-      float w;
       iEmitGen3D *gen;
       emix->GetContent(i, w, gen);
       sprintf(buf, "  EMITMIX( WEIGHT(%g)\n", w);
@@ -758,9 +759,9 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str,
     str->Push(csStrNew(buf));
   }
 
-  for(int i=0; i<state->GetAgingCount(); i++)
+  int i, time;
+  for(i=0; i<state->GetAgingCount(); i++)
   {
-    int time;
     csColor col;
     float alpha, swirl, rotspeed, scale;
     state->GetAgingMoment(i, time, col, alpha, swirl, rotspeed, scale);

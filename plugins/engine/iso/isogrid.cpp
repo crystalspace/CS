@@ -33,7 +33,8 @@ csIsoGrid::csIsoGrid (iBase *iParent, iIsoWorld *world, int w, int h)
   width = w;
   height = h;
   grid = new iIsoCell* [width*height];
-  for(int i=0; i<width*height; i++) 
+  int i;
+  for(i=0; i<width*height; i++) 
     grid[i] = NULL;
   mingridx = 0; mingridy = 0;
   box.Set(0,-9999,0, height,+9999,width);
@@ -45,7 +46,8 @@ csIsoGrid::csIsoGrid (iBase *iParent, iIsoWorld *world, int w, int h)
 
 csIsoGrid::~csIsoGrid ()
 {
-  for(int i=0; i<width*height; i++) 
+  int i;
+  for(i=0; i<width*height; i++) 
     if(grid[i]) grid[i]->DecRef();
   delete[] grid;
   delete groundmap;
@@ -243,7 +245,8 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
     if(recalc_staticlight) RecalcStaticLight();
     // calculate dyn lighting
     ResetAllLight();
-    for(int l=0; l<dynamiclights.Length(); l++)
+	int l;
+    for(l=0; l<dynamiclights.Length(); l++)
       ((iIsoLight*)(dynamiclights[l]))->ShineGrid();
     // reset fakelight array
     if(fakelights)
@@ -257,7 +260,8 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
 void csIsoGrid::RecalcStaticLight()
 {
   SetAllStaticLight(csColor(0.,0.,0.));
-  for(int l=0; l<lights.Length(); l++)
+  int l;
+  for(l=0; l<lights.Length(); l++)
     ((iIsoLight*)(lights[l]))->ShineGrid();
   recalc_staticlight = false;
 }
@@ -328,7 +332,8 @@ void ResetSpriteLight::Traverse (iIsoSprite* spr)
 void csIsoGrid::ResetAllLight()
 {
   ResetSpriteLight* rs = new ResetSpriteLight ();
-  for(int i=0; i<width*height; i++) 
+  int i;
+  for(i=0; i<width*height; i++) 
     if(grid[i]) 
       grid[i]->Traverse (rs);
   rs->DecRef ();
@@ -359,7 +364,8 @@ void csIsoGrid::SetAllLight(const csColor& color)
   SetSpriteColor* sp = new SetSpriteColor ();
   csColor col = color;
   sp->col = &col;
-  for(int i=0; i<width*height; i++) 
+  int i;
+  for(i=0; i<width*height; i++) 
     if(grid[i]) 
     {
       grid[i]->Traverse (sp);
@@ -391,7 +397,8 @@ void csIsoGrid::SetAllStaticLight(const csColor& color)
   csColor col = color;
   SetSpriteStaticColor* sp = new SetSpriteStaticColor ();
   sp->col = &col;
-  for(int i=0; i<width*height; i++) 
+  int i;
+  for(i=0; i<width*height; i++) 
     if(grid[i]) 
     {
       grid[i]->Traverse (sp);
@@ -471,7 +478,8 @@ csIsoGroundMap::csIsoGroundMap(iIsoGrid *grid, int multx, int multy)
   width = grid->GetWidth() * multx;
   height = grid->GetHeight() * multy;
   map = new float[width*height];
-  for(int i=0; i<width*height; i++)
+  int i;
+  for(i=0; i<width*height; i++)
     map[i] = 0.0f;
 }
 

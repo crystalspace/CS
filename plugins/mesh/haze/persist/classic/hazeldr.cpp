@@ -421,7 +421,8 @@ void csHazeFactorySaver::WriteDown (iBase* obj, iStrVector *str,
     hazestate->GetDirectional().y, hazestate->GetDirectional().z);
   str->Push(csStrNew(buf));
 
-  for(int i=0; i<hazestate->GetLayerCount(); i++)
+  int i;
+  for(i=0; i<hazestate->GetLayerCount(); i++)
   {
     sprintf(buf, "LAYER (%f ", hazestate->GetLayerScale(i) );
     WriteHull(str, hazestate->GetLayerHull(i));
@@ -595,7 +596,8 @@ void csHazeSaver::WriteDown (iBase* obj, iStrVector *str,
     state->GetDirectional().y, state->GetDirectional().z);
   str->Push(csStrNew(buf));
 
-  for(int i=0; i<state->GetLayerCount(); i++)
+  int i;
+  for(i=0; i<state->GetLayerCount(); i++)
   {
     sprintf(buf, "LAYER (%f ", state->GetLayerScale(i) );
     WriteHull(str, state->GetLayerHull(i));

@@ -36,11 +36,12 @@ csGenMaze::~csGenMaze()
 
 void csGenMaze::InitMaze()
 {
-  for(int y=0; y<height; y++)
-    for(int x=0; x<width; x++)
+  int y, x, i;
+  for(y=0; y<height; y++)
+    for(x=0; x<width; x++)
     {
       GetNode(x,y).visited = false;
-      for(int i=0; i<4; i++)
+      for(i=0; i<4; i++)
         GetNode(x,y).opening[i] = false;
     }
 }
@@ -67,7 +68,8 @@ void csGenMaze::VisitNode(int x, int y, int direction)
   GenOrder(order, direction);
   GetNode(x,y).visited = true;
   /// take each direction and go there...
-  for(int i=0; i<4; i++)
+  int i;
+  for(i=0; i<4; i++)
   {
     int nx, ny;
     GetNeighbor(order[i], x, y, nx, ny);
@@ -93,7 +95,7 @@ void csGenMaze::GenOrder(int order[4], int direction)
 {
   CS_ASSERT( direction >= 0 && direction < 4);
   bool done[4];
-  int i;
+  int i, k;
   for(i=0; i<4; i++) done[i] = false;
   i=0;
   if( float(rand()+1)/RAND_MAX < straightness)
@@ -111,7 +113,7 @@ void csGenMaze::GenOrder(int order[4], int direction)
     /// find it
     int numskipped = 0;
     int found = 0;
-    for(int k=0; k<4; k++)
+    for(k=0; k<4; k++)
     {
       if(!done[k]) 
       {

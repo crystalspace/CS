@@ -148,7 +148,8 @@ void csIsoLight::CalcVis()
   float zinc = 1./float(multx);
   float xinc = 1./float(multy);
   float res = 0;
-  for(int y = ymin; y<=ymax; y++)
+  int y, x;
+  for(y = ymin; y<=ymax; y++)
   {
     // set pos to the start of the x line
     // set it to the topleft from center of that square
@@ -157,7 +158,7 @@ void csIsoLight::CalcVis()
       0.,
       float(xmin+mingridx*multx)/float(multx) 
     );
-    for(int x = xmin; x<=xmax; x++)
+    for(x = xmin; x<=xmax; x++)
     {
       // set posy to groundy
       pos.y = grid->GetGroundValue(x,y);
@@ -241,9 +242,10 @@ void csIsoLight::ShineGrid()
   if(ymax >= grid->GetHeight()) ymax = grid->GetHeight()-1;
   LightFunc* lf = new LightFunc ();
   lf->light = this;
-  for(int y = ymin; y<=ymax; y++)
+  int y, x;
+  for(y = ymin; y<=ymax; y++)
   {
-    for(int x = xmin; x<=xmax; x++)
+    for(x = xmin; x<=xmax; x++)
     {
       iIsoCell *cell = grid->GetGridCell(x,y);
       if(cell) cell->Traverse (lf);
@@ -265,7 +267,8 @@ void csIsoLight::ShineSprite(iIsoSprite *sprite)
   int sprx = QInt(sprite->GetPosition().z * multx) - mingridx*QInt(multx); 
   int spry = QInt(sprite->GetPosition().x * multy) - mingridy*QInt(multy);
   bool dynamic = flags.Check(CSISO_LIGHT_DYNAMIC);
-  for(int i=0; i<sprite->GetVertexCount(); i++)
+  int i;
+  for(i=0; i<sprite->GetVertexCount(); i++)
   {
     csVector3 vpos = sprite->GetVertexPosition(i);
     int x = QInt(vpos.z * multx) + sprx;

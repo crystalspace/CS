@@ -181,7 +181,8 @@ awsPrefManager::SelectDefaultSkin(char *skin_name)
       SetupPalette();
   
       // Get the default textures into the texture manager.
-      for(int i=0; i<def_skin->Length(); ++i)
+	  int i;
+      for(i=0; i<def_skin->Length(); ++i)
       {
         awsKey *k = def_skin->GetAt(i);
 

@@ -103,7 +103,8 @@ public:
     if (other.GetArray()) { 
       Alloc (size); 
       csRGBpixel* m = other.GetArray ();
-      for(int i=0; i<size; i++)
+	  int i;
+      for(i=0; i<size; i++)
       {
         GetRed()[i] = m[i].red;
         GetGreen()[i] = m[i].green;
@@ -119,7 +120,8 @@ public:
     if (GetMap()) { 
       other.Alloc (size); 
       csRGBpixel* m = other.GetArray ();
-      for(int i=0; i<size; i++)
+	  int i;
+      for(i=0; i<size; i++)
       {
         m[i].red = (unsigned char)GetRed()[i];
         m[i].green = (unsigned char)GetGreen()[i];

@@ -92,7 +92,8 @@ awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace
 
   if (DEBUG_GETTEX) printf("aws-debug: (%s) texture count is: %d\n", __FILE__, textures.Length());
 
-  for(int i=0; i<textures.Length() && txtfound==false; ++i)
+  int i;
+  for(i=0; i<textures.Length() && txtfound==false; ++i)
   {
     awsTexture *awstxt = (awsTexture *)textures[i];
 

@@ -155,14 +155,16 @@ void csParticleSystem::SetupMixMode ()
 
 void csParticleSystem::SetupColor ()
 {
-  for(int i = 0 ; i < particles.Length () ; i++)
+  int i;
+  for(i = 0 ; i < particles.Length () ; i++)
     GetParticle (i)->SetColor (color);
 }
 
 
 void csParticleSystem::AddColor (const csColor& col)
 {
-  for(int i = 0; i<particles.Length(); i++)
+  int i;
+  for(i = 0; i<particles.Length(); i++)
     GetParticle(i)->AddColor(col);
 }
 

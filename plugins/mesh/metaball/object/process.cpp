@@ -94,13 +94,15 @@ void GenCell(int x,int y,int z,csTesselator::GridCell &c)
   csVector3 base;
   _2coord(x,y,z,base);
 
-  for(int i=0;i<8;i++)
+  int i;
+  for(i=0;i<8;i++)
     c.p[i]=base+csVector3(f_shift_x[i],f_shift_y[i],f_shift_z[i]);
 }
 
 void csMetaBall::FillCell(int _x,int _y,int _z,csTesselator::GridCell &c)
 {
-  for(int i=0;i<8;i++)
+  int i;
+  for(i=0;i<8;i++)
   {
     int x=_x+shift_x[i];
     int y=_y+shift_y[i];

@@ -339,13 +339,13 @@ int converter::md2_read ( FILE *filein ) {
   md2framedata *file_framedata = new md2framedata[num_object];
   float scale[3],translate[3];
 
-  int frameindex;
+  int frameindex, transformindex;;
   for (frameindex = 0; frameindex < num_object; frameindex++)
   {
     // read in scale and translate info
     fread(scale,SIZEOF_MD2FLOAT,3,filein);
     fread(translate,SIZEOF_MD2FLOAT,3,filein);
-    for(int transformindex = 0; transformindex<3; transformindex++)
+    for(transformindex = 0; transformindex<3; transformindex++)
     {
       scale[transformindex] = convert_endian(scale[transformindex]);
       translate[transformindex] = convert_endian(translate[transformindex]);

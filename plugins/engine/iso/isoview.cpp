@@ -101,7 +101,8 @@ void csIsoView::Draw()
     rview->CreateBuckets(engine->GetMaterialCount());
   PreCalc();
   
-  for(int pass = CSISO_RENDERPASS_PRE; pass <= CSISO_RENDERPASS_POST; pass++)
+  int pass;
+  for(pass = CSISO_RENDERPASS_PRE; pass <= CSISO_RENDERPASS_POST; pass++)
   {
     //printf("Renderpass %d\n", pass);
     rview->SetRenderPass(pass);

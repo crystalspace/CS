@@ -180,6 +180,7 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
 void
 awsManager::Mark(csRect &rect)
 {
+  int i;
    //  If we have too many rects, we simply assume that a large portion of the
    // screen will be filled, so we agglomerate them all in buffer 0.
    if (all_buckets_full)
@@ -188,7 +189,7 @@ awsManager::Mark(csRect &rect)
      return;
    }
 
-   for(int i=0; i<dirty_lid; ++i)
+   for(i=0; i<dirty_lid; ++i)
    {
        if (dirty[i].Intersects(rect))
 	 dirty[i].AddAdjanced(rect);
@@ -199,7 +200,7 @@ awsManager::Mark(csRect &rect)
    // set the dirty flag.
    if (dirty_lid>awsNumRectBuckets)
    {
-     for(int i=1; i<awsNumRectBuckets; ++i)
+     for(i=1; i<awsNumRectBuckets; ++i)
      {
        dirty[0].AddAdjanced(dirty[i]);
        all_buckets_full=true;
@@ -220,7 +221,8 @@ awsManager::WindowIsDirty(awsWindow *win)
   }
   else
   {
-    for(int i=0; i<dirty_lid; ++i)
+	int i;
+    for(=0; i<dirty_lid; ++i)
       if (win->Overlaps(dirty[i])) return true;
   }
 
@@ -295,7 +297,8 @@ awsManager::Redraw()
            RedrawWindow(curwin, dirty[0]);
          else
          {
-            for(int i=0; i<dirty_lid; ++i)
+			int i;
+            for(i=0; i<dirty_lid; ++i)
               RedrawWindow(curwin, dirty[i]);
          }
       }
@@ -384,8 +387,8 @@ awsManager::CreateWindowFrom(char *defname)
 void
 awsManager::CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponentNode *settings)
 {
-   
-  for(int i=0; i<settings->GetLength(); ++i)
+  int i;
+  for(i=0; i<settings->GetLength(); ++i)
   {
     awsKey *key = settings->GetItemAt(i); 
     
