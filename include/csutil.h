@@ -115,6 +115,7 @@
 #include "csutil/utiltest.h"
 #include "csutil/verbosity.h"
 #include "csutil/vfscache.h"
+#include "csutil/vfsplat.h"
 #include "csutil/virtclk.h"
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
