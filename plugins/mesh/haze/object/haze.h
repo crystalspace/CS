@@ -182,7 +182,7 @@ public:
   csHazeLayerVector(int ilimit = 8, int ithreshold = 16)
     : csVector(ilimit, ithreshold) {}
   /// destroy
-  virtual ~csHazeLayerVector() {}
+  virtual ~csHazeLayerVector() {DeleteAll ();}
   /// delete correctly
   virtual bool FreeItem(csSome Item)
   { delete (csHazeLayer*)Item; return true; }
