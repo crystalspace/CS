@@ -29,6 +29,8 @@ The history order is reversed so that new features are at the top.
 	      the att. type and radius given in the world file; added
 	      another syntax for explicit attenuation vectors:
 		<attenuation c="0" l="0.1" q="0" />
+	- Eric Sunshine fixed the PrintHelp action in help.jam so that "jam
+	  help" works even on platforms which do not have a printf command.
 12-Apr-2003
 	- Rhad fixed a couple potential deadlock and mutex issues in
 	  the ds3d sound renderer plugin. Also fixed similar issues in

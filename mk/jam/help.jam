@@ -21,5 +21,7 @@ Always help ;
 
 actions quietly PrintHelp
 {
-  printf " jam %-12s   Build the %-40s\n" "$(<)" "$(>)"
+  # target width:12, description width:40
+  echo " jam ->$(<)            <-  Build the =>$(>)                                        <=" | \
+    sed 's/->\(............\).*<-/\1/;s/=>\(........................................\).*<=/\1/'
 }
