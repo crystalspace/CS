@@ -93,6 +93,9 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_ZNONE:
 	step->SetZBufMode (CS_ZBUF_NONE);
 	break;
+      case XMLTOKEN_ZMESH:
+        step->SetZBufMode (CS_ZBUF_MESH);
+        break;
       case XMLTOKEN_SHADERTYPE:
 	step->SetShaderType (child->GetContentsValue ());
 	break;

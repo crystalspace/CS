@@ -207,41 +207,38 @@ void csGLGraphics3D::SetGlOrtho (bool inverted)
   //}
 }
 
-void csGLGraphics3D::SetZMode (csZBufMode mode)
+void csGLGraphics3D::SetZMode (csZBufMode mode, bool internal)
 {
+  if (!internal)
+    current_zmode = mode;
+
   switch (mode)
   {
     case CS_ZBUF_NONE:
-      current_zmode = mode;
       statecache->Disable_GL_DEPTH_TEST ();
       break;
     case CS_ZBUF_FILL:
     case CS_ZBUF_FILLONLY:
-      current_zmode = mode;
       statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_ALWAYS);
       statecache->SetDepthMask (GL_TRUE);
       break;
     case CS_ZBUF_EQUAL:
-      current_zmode = mode;
       statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_EQUAL);
       statecache->SetDepthMask (GL_FALSE);
       break;
     case CS_ZBUF_TEST:
-      current_zmode = mode;
       statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_GREATER);
       statecache->SetDepthMask (GL_FALSE);
       break;
     case CS_ZBUF_INVERT:
-      current_zmode = mode;
       statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_LESS);
       statecache->SetDepthMask (GL_FALSE);
       break;
     case CS_ZBUF_USE:
-      current_zmode = mode;
       statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_GEQUAL);
       statecache->SetDepthMask (GL_TRUE);
@@ -1703,6 +1700,18 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
       int num_tri = (mymesh->indexend-mymesh->indexstart)/3;
       bugplug->AddCounter ("Triangle Count", num_tri);
       bugplug->AddCounter ("Mesh Count", 1);
+    }
+
+    if (current_zmode == CS_ZBUF_MESH)
+    {
+      if (mymesh->z_buf_mode != CS_ZBUF_MESH)
+      {
+        SetZMode (mymesh->z_buf_mode, true);
+      } else {
+        // Should do some real reporting here. :)
+        csPrintf ("Bwaaaah! Meshes can't have zmesh zmode. You deserve some spanking!\n");
+        return;
+      }
     }
 
     glColor4f (1, 1, 1, 1);

@@ -150,7 +150,9 @@ enum csZBufMode
   /// test if equal
   CS_ZBUF_EQUAL    = 0x00000005,
   /// inverted test
-  CS_ZBUF_INVERT   = 0x00000006
+  CS_ZBUF_INVERT   = 0x00000006,
+  /// use the z mode of the mesh (NOTE: NOT VALID AS MESH ZMODE)
+  CS_ZBUF_MESH    = 0x00000007
 };
 
 // @@@ Keep in sync with values below

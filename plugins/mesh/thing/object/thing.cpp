@@ -2692,11 +2692,24 @@ csRenderMesh **csThing::GetRenderMeshes (int &num)
 
   //PrepareLMs (); // @@@ Maybe more here ?
 
+  int i;
   num = renderMeshes.Length ();
-  for (int i = 0; i < materials_to_visit.Length (); i++)
+  for (i = 0; i < materials_to_visit.Length (); i++)
   {
     materials_to_visit[i]->Visit ();
   }
+
+  for (i = 0; i < renderMeshes.Length (); i++)
+  {
+    renderMeshes[i]->z_buf_mode = CS_ZBUF_USE;
+    if (logparent)
+    {
+      csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
+      if (mw)
+        renderMeshes[i]->z_buf_mode = mw->GetZBufMode ();
+    }
+  }
+
   return renderMeshes.GetArray ();
 #else
   return 0;

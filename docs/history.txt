@@ -34,6 +34,18 @@ chronological order.
 	  fix linking problem on Cygwin (hopefully).
 	- Eric Sunshine fixed bug in cspace.i.  Was using bogus %ignoren rather
 	  than %ignore.
+	- Anders Stenberg made the following changes to NR to 
+	  bring it closer to OR:
+	  - Made or_lighting the default shader, with a renderloop to fit it
+	  - Added a "zmesh" z-mode for renderloop passes, that uses the z-mode
+	    set by the mesh.
+	  - Moved the adding of a default shader to materials from loader to
+	    engine, so that materials created from code also will get it.
+	  These changes mean that all the simp* applications should work
+	  pretty good. There still is a problem with textures on the sprites in
+	  simple2 and simpcd. This seems to be caused by engine->Prepare being
+	  called _before_ all textures are created/loaded. Is that behaviour
+	  allowed?
 20-Dec-2003
 	- Andreas Busch added Yield() to csThread for posix and win32.
 	- res made some changes to GL proc texes and the GL canvas to work

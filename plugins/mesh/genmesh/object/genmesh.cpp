@@ -1023,6 +1023,14 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
   mesh.material = mater;
   mesh.dynDomain = dynDomain;
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
+  mesh.z_buf_mode = CS_ZBUF_USE;
+  if (logparent)
+  {
+    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
+    if (mw)
+      mesh.z_buf_mode = mw->GetZBufMode ();
+  }
+
   meshPtr = &mesh;
   n = 1;
   return &meshPtr;

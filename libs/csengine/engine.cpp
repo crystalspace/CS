@@ -925,6 +925,25 @@ bool csEngine::HandleEvent (iEvent &Event)
 			iShaderManager));
 	      object_reg->Register (ShaderManager, "iShaderManager");
 	    }
+
+            // Load a default shader for OR compatibility
+            csRef<iDocumentSystem> docsys (
+              CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
+            if (docsys == 0)
+              docsys.AttachNew (new csTinyDocumentSystem ());
+            csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+
+            csRef<iShaderCompiler> shcom (ShaderManager->
+              GetCompiler ("XMLShader"));
+
+            csRef<iFile> shaderFile = VFS->Open (
+              "/shader/or_lighting.xml", VFS_FILE_READ);
+            shaderDoc->Parse (shaderFile);
+            default_shader = shcom->CompileShader (shaderDoc->GetRoot ()->
+              GetNode ("shader"));
+            ShaderManager->RegisterShader (default_shader);
+            default_shadertype = Strings->Request ("OR compatibility");
+
 #endif // CS_USE_NEW_RENDERER
             frame_width = G3D->GetWidth ();
             frame_height = G3D->GetHeight ();
@@ -1813,30 +1832,8 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
   loop->AddStep (step);
   genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
   
-  genStep->SetShaderType ("ambient");
-  genStep->SetZBufMode (CS_ZBUF_USE);
-  genStep->SetZOffset (true);
-
-  csRef<iRenderStepType> liType =
-    CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.renderloop.step.lightiter.type",
-      iRenderStepType);
-
-  csRef<iRenderStepFactory> liFact = liType->NewFactory ();
-
-  step = liFact->Create ();
-  loop->AddStep (step);
-
-  csRef<iRenderStepContainer> container =
-    SCF_QUERY_INTERFACE (step, iRenderStepContainer);
-
-  step = genFact->Create ();
-  container->AddStep (step);
-
-  genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
-
-  genStep->SetShaderType ("diffuse");
-  genStep->SetZBufMode (CS_ZBUF_TEST);
+  genStep->SetShaderType ("OR compatibility");
+  genStep->SetZBufMode (CS_ZBUF_MESH);
   genStep->SetZOffset (false);
 
   return csPtr<iRenderLoop> (loop);
@@ -2219,6 +2216,7 @@ void csEngine::ReadConfig (iConfigFile *Config)
 
   default_clear_zbuf = 
     Config->GetBool ("Engine.ClearZBuffer", default_clear_zbuf);
+  clear_zbuf = default_clear_zbuf;
   default_clear_screen = 
     Config->GetBool ("Engine.ClearScreen", default_clear_screen);
   clear_screen = default_clear_screen;
@@ -2860,6 +2858,11 @@ iMaterialWrapper *csEngine::CreateMaterial (
   iMaterialWrapper *wrapper = materials->NewMaterial (mat);
   wrapper->QueryObject ()->SetName (iName);
   mat->DecRef ();
+
+#ifdef CS_USE_NEW_RENDERER
+  wrapper->GetMaterial ()->SetShader (default_shadertype, default_shader);
+#endif // CS_USE_NEW_RENDERER
+
   return wrapper;
 }
 
@@ -2902,6 +2905,10 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
   mat->DecRef ();
+
+#ifdef CS_USE_NEW_RENDERER
+  imat->SetShader (default_shadertype, default_shader);
+#endif // CS_USE_NEW_RENDERER
   return csPtr<iMaterial> (imat);
 }
 
@@ -2930,6 +2937,11 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
   mat->DecRef ();
+
+#ifdef CS_USE_NEW_RENDERER
+  imat->SetShader (default_shadertype, default_shader);
+#endif // CS_USE_NEW_RENDERER
+
   return csPtr<iMaterial> (imat);
 }
 

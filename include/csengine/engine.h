@@ -434,6 +434,12 @@ private:
   /// Store the current framenumber. Is incremented every Draw ()
   uint32 current_framenumber;
 
+  /// Default shader to attach to all materials
+  csRef<iShader> default_shader;
+
+  /// Default shadertype to attach to all materials
+  csStringID default_shadertype;
+
 private:
   /**
    * Setup for starting a Draw or DrawFunc.

@@ -100,6 +100,7 @@ private:
   int current_drawflags;
   int current_shadow_state;
   csZBufMode current_zmode;
+  bool zmesh;
 
   int asp_center_x, asp_center_y;
   float aspect;
@@ -172,6 +173,8 @@ private:
   // Disables offsetting of Z values
   void DisableZOffset ()
   { statecache->Disable_GL_POLYGON_OFFSET_FILL (); }
+
+  void SetZMode (csZBufMode mode, bool internal);
 
   void SetMixMode (uint mode);
   void SetAlphaType (csAlphaMode::AlphaType alphaType);
@@ -293,8 +296,9 @@ public:
   }
 
   /// Set the z buffer write/test mode
-  virtual void SetZMode (csZBufMode mode);
-
+  virtual void SetZMode (csZBufMode mode)
+  { SetZMode (mode, false); }
+  
   /// Set object to view transform
   virtual void SetObjectToCamera (csReversibleTransform* wvmatrix);
   virtual const csReversibleTransform& GetObjectToCamera ();
