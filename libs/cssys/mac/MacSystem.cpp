@@ -165,7 +165,7 @@ static void NLtoCR( UInt8 *theString )
 }
 
 
-void SysSystemDriver::Alert(char* s)
+void SysSystemDriver::Alert(const char* s)
 {
 	Str255	theMessage;
 
@@ -177,7 +177,7 @@ void SysSystemDriver::Alert(char* s)
 }
 
 
-void SysSystemDriver::Warn(char* s)
+void SysSystemDriver::Warn(const char* s)
 {
 	Str255	theMessage;
 

@@ -44,8 +44,8 @@ public:
 	virtual void SystemHelp(void);
 	virtual void Loop();
 
-	virtual void Alert(char* s);
-	virtual void Warn(char* s);
+	virtual void Alert(const char* s);
+	virtual void Warn(const char* s);
 
 	OSErr		HandleAppleEvent( AppleEvent *theEvent );
 
