@@ -14,6 +14,9 @@ The history order is reversed so that new features are at the top.
 	- Further improved csdemo with new path editing capabilities.
 	  Added laser beams for the fighers. Added photon torpedo.
 	  Increased the resolution of the star-field...
+	- Fixed all image loader plugins to make a global var static.
+	  If this doesn't happen then it isn't possible to statically link
+	  the image loaders.
         - Eric Sunshine modified user.mak so that the gif, png, jpg, and mplex
           image loaders are listed under PLUGINS rather than PLUGINS.DYNAMIC.
           These image types are used very commonly, so they will almost

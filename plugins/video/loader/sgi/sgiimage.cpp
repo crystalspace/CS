@@ -35,7 +35,7 @@ EXPORT_CLASS_TABLE (cssgiimg)
   EXPORT_CLASS (csSGIImageIO, "crystalspace.graphic.image.io.sgi", "CrystalSpace SGI image format I/O plugin")
 EXPORT_CLASS_TABLE_END
 
-iImageIO::FileFormatDescription formatlist[2] = 
+static iImageIO::FileFormatDescription formatlist[2] = 
 {
   {"image/sgi", "RGB", CS_IMAGEIO_LOAD},
   {"image/sgi", "RLE", CS_IMAGEIO_LOAD}

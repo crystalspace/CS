@@ -61,7 +61,7 @@ struct WALHeader
 } _WALHeader;
 
 
-iImageIO::FileFormatDescription formatlist[1] = 
+static iImageIO::FileFormatDescription formatlist[1] = 
 {
   {"image/wal", "8 bit, palettized", CS_IMAGEIO_LOAD}
 };

@@ -45,7 +45,7 @@ EXPORT_CLASS_TABLE (cstgaimg)
   EXPORT_CLASS (csTGAImageIO, "crystalspace.graphic.image.io.tga", "CrystalSpace TGA image format I/O plugin")
 EXPORT_CLASS_TABLE_END
 
-iImageIO::FileFormatDescription formatlist[6] = 
+static iImageIO::FileFormatDescription formatlist[6] = 
 {
   {"image/tga", "Map", CS_IMAGEIO_LOAD},
   {"image/tga", "RGB", CS_IMAGEIO_LOAD},

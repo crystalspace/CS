@@ -36,7 +36,7 @@ EXPORT_CLASS_TABLE (csbmpimg)
   EXPORT_CLASS (csBMPImageIO, "crystalspace.graphic.image.io.bmp", "CrystalSpace BMP image format I/O plugin")
 EXPORT_CLASS_TABLE_END
 
-iImageIO::FileFormatDescription formatlist[] =
+static iImageIO::FileFormatDescription formatlist[] =
 {
   { "image/bmp", "8 bit, palettized, RGB", CS_IMAGEIO_LOAD},
   { "image/bmp", "8 bit, palettized, RLE8", CS_IMAGEIO_LOAD},

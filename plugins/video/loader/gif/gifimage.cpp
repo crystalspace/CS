@@ -34,7 +34,7 @@ EXPORT_CLASS_TABLE (csgifimg)
   EXPORT_CLASS (csGIFImageIO, "crystalspace.graphic.image.io.gif", "CrystalSpace GIF image format I/O plugin")
 EXPORT_CLASS_TABLE_END
 
-iImageIO::FileFormatDescription formatlist[2] = 
+static iImageIO::FileFormatDescription formatlist[2] = 
 {
   {"image/gif", "GIF87a", CS_IMAGEIO_LOAD},
   {"image/gif", "GIF89a", CS_IMAGEIO_LOAD}

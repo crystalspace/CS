@@ -73,7 +73,7 @@ void png_flush (png_structp)
 {
 }
 
-iImageIO::FileFormatDescription formatlist[5] = 
+static iImageIO::FileFormatDescription formatlist[5] = 
 {
   {PNG_MIME, "Gray", CS_IMAGEIO_LOAD},
   {PNG_MIME, "GrayAlpha", CS_IMAGEIO_LOAD},

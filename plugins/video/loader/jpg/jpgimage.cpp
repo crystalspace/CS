@@ -47,7 +47,7 @@ EXPORT_CLASS_TABLE (csjpgimg)
   EXPORT_CLASS (csJPGImageIO, "crystalspace.graphic.image.io.jpg", "CrystalSpace JPG image format I/O plugin")
 EXPORT_CLASS_TABLE_END
 
-iImageIO::FileFormatDescription formatlist[2] = 
+static iImageIO::FileFormatDescription formatlist[2] = 
 {
   {"image/jpg", "Grayscale", CS_IMAGEIO_LOAD},
   {"image/jpg", "Truecolor", CS_IMAGEIO_LOAD}
