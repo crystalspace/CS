@@ -273,13 +273,13 @@ void draw_edges (csRenderView* rview, int type, void* entity)
   {
     if (!hilighted_only)
     {
-      G3DPolygonDPQ* dpq = (G3DPolygonDPQ*)entity;
-      int i1 = dpq->num-1;
+      G3DPolygonDPFX* dpfx = (G3DPolygonDPFX*)entity;
+      int i1 = dpfx->num-1;
       int i;
-      for (i = 0 ; i < dpq->num ; i++)
+      for (i = 0 ; i < dpfx->num ; i++)
       {
-        rview->g2d->DrawLine (dpq->vertices[i].sx, csWorld::frame_height - 1 - dpq->vertices[i].sy,
-      	  dpq->vertices[i1].sx, csWorld::frame_height - 1 - dpq->vertices[i1].sy, blue);
+        rview->g2d->DrawLine (dpfx->vertices[i].sx, csWorld::frame_height - 1 - dpfx->vertices[i].sy,
+      	  dpfx->vertices[i1].sx, csWorld::frame_height - 1 - dpfx->vertices[i1].sy, blue);
         i1 = i;
       }
     }

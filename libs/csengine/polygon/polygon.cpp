@@ -1548,7 +1548,7 @@ void csPolygon2D::Draw (IGraphics2D* g2d, int col)
 
 //---------------------------------------------------------------------------
 
-void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* clipped_verts, int num_vertices,
+void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts, int num_vertices,
 	csVector2* orig_triangle, bool gouraud)
 {
   // 'was_clipped' will be true if the triangle was clipped.
@@ -1601,7 +1601,7 @@ void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* clipped_verts, int 
     // Find the original triangle top/left/bottom/right vertices
     // between which the currently examined point is located.
     // There are two possible major cases:
-    // A*       A*       When DrawPolygonQuick works, it will switch
+    // A*       A*       When DrawPolygonFX works, it will switch
     //  |\       |\      start/final values and deltas ONCE (not more)
     //  | \      | \     per triangle.On the left pictures this happens
     //  |*X\     |  \    at the point B. This means we should "emulate"
@@ -1712,7 +1712,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
 
   if (poly->GetUVCoords () || poly->CheckFlags (CS_POLY_FLATSHADING))
   {
-    G3DPolygonDPQ g3dpoly;
+    G3DPolygonDPFX g3dpoly;
     csVector2 orig_triangle[3];
 
     memset (&g3dpoly, 0, sizeof (g3dpoly));
@@ -1726,8 +1726,8 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
     g3dpoly.flat_color_b = poly->GetFlatColor ().blue;
     if (poly->CheckFlags (CS_POLY_FLATSHADING)) g3dpoly.txt_handle = NULL;
 
-    // We are going to use DrawPolygonQuick.
-    // Here we have to do a little messy thing because PreparePolygonQuick()
+    // We are going to use DrawPolygonFX.
+    // Here we have to do a little messy thing because PreparePolygonFX()
     // still requires the original triangle that was valid before clipping.
     float iz;
     iz = 1. / poly->Vcam (0).z;
@@ -1769,10 +1769,10 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
       g3dpoly.vertices[2].g = po_colors[2].green;
       g3dpoly.vertices[2].b = po_colors[2].blue;
     }
-    PreparePolygonQuick (&g3dpoly, vertices, num_vertices, orig_triangle, po_colors != NULL);
-    g3d->StartPolygonQuick (g3dpoly.txt_handle, po_colors != NULL);
-    g3d->DrawPolygonQuick (g3dpoly);
-    g3d->FinishPolygonQuick ();
+    PreparePolygonFX (&g3dpoly, vertices, num_vertices, orig_triangle, po_colors != NULL);
+    g3d->StartPolygonFX (g3dpoly.txt_handle, FX_Copy, 0.0f, po_colors != NULL);
+    g3d->DrawPolygonFX (g3dpoly);
+    g3d->FinishPolygonFX ();
   }
   else
   {

@@ -306,7 +306,7 @@ extern "C" csDrawScanline csScan_8_mmx_draw_scanline_tex_zfil;
 extern "C" csDrawPIScanlineFX      csScan_8_draw_pifx_scanline_dummy;
 
 /*
- * The following methods are used by DrawPolygonQuick() and do not require
+ * The following methods are used by DrawPolygonFX() and do not require
  * perspective-correct texture mapping. They do not require InitDraw ()
  * to be called before using.
  */

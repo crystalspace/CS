@@ -141,15 +141,6 @@ public:
   /// Draw a Line.
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov,  int color);
  
-  /// Start DrawPolygonQuick drawing.
-  STDMETHODIMP StartPolygonQuick (ITextureHandle* handle, bool gouraud);
-
-  /// Finish DrawPolygonQuick drawing.
-  STDMETHODIMP FinishPolygonQuick ();
-
-  /// Draw a projected (non-perspective correct) polygon.
-  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly);
-
   /// Start a series of DrawPolygonFX
   STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud);
 

@@ -222,7 +222,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     // Clipped polygon (assume it cannot have more than 64 vertices)
 
     // Draw all the triangles within this curve
-    G3DPolygonDPQ poly;
+    G3DPolygonDPFX poly;
     memset (&poly, 0, sizeof(poly));
     poly.txt_handle = c->GetTextureHandle ();
     if (poly.txt_handle == NULL)
@@ -244,7 +244,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
     rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
     if (!rview.callback)
-      rview.g3d->StartPolygonQuick (poly.txt_handle, gouraud);
+      rview.g3d->StartPolygonFX (poly.txt_handle, FX_Copy, 0.0, gouraud);
 
     for (j = 0 ; j < tess->GetNumTriangles () ; j++)
     {
@@ -314,17 +314,17 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	  idx += dir;
   	}
 
-        PreparePolygonQuick (&poly, clipped_triangle, rescount, (csVector2 *)triangle, gouraud);
+        PreparePolygonFX (&poly, clipped_triangle, rescount, (csVector2 *)triangle, gouraud);
 
   	// Draw resulting polygon
 	if (!rview.callback)
-  	  rview.g3d->DrawPolygonQuick (poly);
+  	  rview.g3d->DrawPolygonFX (poly);
 	else
           rview.callback (&rview, CALLBACK_POLYGONQ, (void*)&poly);
       }
     }
     if (!rview.callback)
-      rview.g3d->FinishPolygonQuick ();
+      rview.g3d->FinishPolygonFX ();
 
     CHK (delete [] persp);
     CHK (delete [] z_array);

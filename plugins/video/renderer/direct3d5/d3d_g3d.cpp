@@ -1135,64 +1135,6 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
 
 
 
-
-
-STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonQuick(ITextureHandle* handle, bool gouraud )
-{ 
-  m_gouraud = gouraud && rstate_gouraud;
-
-  HighColorCache_Data *pTexData;
-  
-  csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)GetcsTextureMMFromITextureHandle (handle);
-
-  m_pTextureCache->Add (handle);
-
-  pTexData = txt_mm->get_hicolorcache ();
-  
-  VERIFY_RESULT( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, ((D3DTextureCache_Data *)pTexData->pData)->htex), DD_OK );
-
-  return S_OK; 
-}
-
-STDMETHODIMP csGraphics3DDirect3DDx5::FinishPolygonQuick( )
-{ 
- 
-  return S_OK; 
-}
-
-STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly)
-{    
-  int i;
-  D3DTLVERTEX vx;
-  
-  VERIFY_RESULT( m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK );
-
-  for(i=0; i<poly.num; i++)
-  {
-    vx.sx = poly.vertices[i].sx;
-    vx.sy = m_nHeight-poly.vertices[i].sy;
-    vx.sz = SCALE_FACTOR / poly.vertices[i].z;
-
-    if(vx.sz>0.9999)
-      vx.sz=0.9999;
-
-    vx.rhw = poly.vertices[i].z;
-    if (m_gouraud)
-      vx.color = D3DRGB(poly.vertices[i].r, poly.vertices[i].g, poly.vertices[i].b);
-    else
-      vx.color = D3DRGB(0.8, 0.8, 0.8);
-    vx.specular = D3DRGB(0.0, 0.0, 0.0);
-    vx.tu = poly.vertices[i].u;
-    vx.tv = poly.vertices[i].v;
-    
-    VERIFY_RESULT(m_lpd3dDevice->Vertex( &vx ), DD_OK);
-  }
-  
-  VERIFY_RESULT( m_lpd3dDevice->End(0), DD_OK );
-
-  return S_OK;
-}
-
 STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud)
 {
   m_gouraud = gouraud && rstate_gouraud;

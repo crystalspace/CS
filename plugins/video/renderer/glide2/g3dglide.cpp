@@ -1125,23 +1125,25 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   return S_OK;
 }
 
-/// Start DrawPolygonQuick drawing.
-STDMETHODIMP csGraphics3DGlide2x::StartPolygonQuick (ITextureHandle* /*handle*/, bool gouraud) 
-{ 
+STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle* /*handle*/, DPFXMixMode mode, 
+                                                 float alpha, bool gouraud)
+{
+  m_mixmode = mode;
+  m_alpha   = alpha;
   m_gouraud = gouraud && rstate_gouraud;
   return S_OK; 
 }
 
-/// Finish DrawPolygonQuick drawing.
-STDMETHODIMP csGraphics3DGlide2x::FinishPolygonQuick () 
-{ 
+STDMETHODIMP csGraphics3DGlide2x::FinishPolygonFX()
+{
   return S_OK; 
 }
 
-/// Draw a projected (non-perspective correct) polygon.
-STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly)
+STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
 {
-  //  HighColorCacheAndManage_Data* tcache=NULL;
+  //This implementation is pretty wrong, because it does not take into account all the
+  //possible mixmodes. Also performace could be improved pretty much, if the setup
+  //stuff for the renderer would move into StartPolygonFX. - Thomas Hieber 07/18/1999
   HighColorCache_Data* tcache=NULL;
 
   if (poly.num < 3) return S_OK;
@@ -1212,36 +1214,6 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly)
   }
 
   return S_OK;
-}
-
-STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, 
-                                                 float alpha, bool gouraud)
-{
-  //This implementation is pretty wrong, but at least, it will show something on the screen
-  m_mixmode = mode;
-  m_alpha   = alpha;
-  m_gouraud = gouraud;
-  return StartPolygonQuick(handle, gouraud);
-}
-
-STDMETHODIMP csGraphics3DGlide2x::FinishPolygonFX()
-{
-  //This implementation is pretty wrong, but at least, it will show something on the screen
-  return FinishPolygonQuick();
-}
-
-STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
-{
-  //This implementation is pretty wrong, but at least, it will show something on the screen
-  G3DPolygonDPQ newpoly;
-  for (int i=0; i<poly.num; i++)
-  {
-    newpoly.vertices[i] = poly.vertices[i];
-  }
-  newpoly.num        = poly.num;
-  newpoly.inv_aspect = poly.inv_aspect;
-  newpoly.txt_handle = poly.txt_handle;
-  return DrawPolygonQuick(newpoly);
 }
 
 /// Give a texture to csGraphics3D to cache it.

@@ -269,6 +269,8 @@ csSprite3D::csSprite3D () : csObject ()
   cur_action = NULL;
   vertex_colors = NULL;
   dynamiclights = NULL;
+  MixMode = FX_Copy;
+  Alpha   = 0.0f;
 }
 
 csSprite3D::~csSprite3D ()
@@ -530,7 +532,7 @@ void csSprite3D::Draw (csRenderView& rview)
   }
 
   // Clipped polygon (assume it cannot have more than 64 vertices)
-  G3DPolygonDPQ poly;
+  G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
 
   // The triangle in question
@@ -545,7 +547,7 @@ void csSprite3D::Draw (csRenderView& rview)
     poly.txt_handle = tpl->cstxt->GetTextureHandle ();
 
   if (!rview.callback)
-    rview.g3d->StartPolygonQuick (poly.txt_handle, vertex_colors != NULL);
+    rview.g3d->StartPolygonFX (poly.txt_handle, MixMode, Alpha, vertex_colors != NULL);
 
   // Get this field from the current view for conveniance.
   bool mirror = rview.IsMirrored ();
@@ -600,19 +602,19 @@ void csSprite3D::Draw (csRenderView& rview)
         }
 	idx += dir;
       }
-      PreparePolygonQuick (&poly, clipped_triangle, rescount, (csVector2 *)triangle,
+      PreparePolygonFX (&poly, clipped_triangle, rescount, (csVector2 *)triangle,
       	vertex_colors != NULL);
 
       // Draw resulting polygon
       if (!rview.callback)
-        rview.g3d->DrawPolygonQuick (poly);
+        rview.g3d->DrawPolygonFX (poly);
       else
         rview.callback (&rview, CALLBACK_POLYGONQ, (void*)&poly);
     }
   }
 
   if (!rview.callback)
-    rview.g3d->FinishPolygonQuick ();
+    rview.g3d->FinishPolygonFX ();
 }
 
 void csSprite3D::InitSprite ()
@@ -634,6 +636,9 @@ void csSprite3D::InitSprite ()
   last_time = tm;
 
   m_world2obj = m_obj2world.GetInverse ();
+
+  MixMode = FX_Copy;
+  Alpha   = 0.0f;
 }
 
 bool csSprite3D::NextFrame (long current_time, bool onestep, bool stoptoend)
@@ -696,8 +701,11 @@ void csSprite3D::RemoveFromSectors ()
     sectors[0] = NULL;
     sectors.Pop ();
     int idx = ss->sprites.Find (this);
-    ss->sprites[idx] = NULL;
-    ss->sprites.Delete (idx);
+    if (idx>=0)
+    {
+      ss->sprites[idx] = NULL;
+      ss->sprites.Delete (idx);
+    }
   }
 }
 
