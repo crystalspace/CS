@@ -55,7 +55,7 @@ class awsManager : public iAws
         awsCanvas (awsManager *_wmgr);
   
         /// Destroy this texture
-        virtual ~awsCanvas ();
+        virtual ~awsCanvas () {}
         
         /// This is actually not used ever.  The window manager doesn't "animate", and only refreshes the canvas when needed.
         virtual void Animate (cs_time current_time);
@@ -68,7 +68,8 @@ class awsManager : public iAws
         iGraphics3D *G3D() 
         { return ptG3D; }
 
-   } canvas;
+   };
+   awsCanvas canvas;
 
 public:
     DECLARE_IBASE;

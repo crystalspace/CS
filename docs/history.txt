@@ -48,6 +48,11 @@ The history order is reversed so that new features are at the top.
 	  compilation on all platforms other than Visual-C++.
 	- Eric Sunshine eliminated a compilation warning about member
 	  initialization occurring in wrong order in keyval.cpp.
+	- Eric Sunshine worked around a bogus error in the NextStep compiler
+	  where it claimed to know nothing about the embedded ~awsCanvas() in
+	  the awsmgr.cpp file.
+	- Eric Sunshine added the missing `aws' entry to the PLUGINS.DYNAMIC
+	  list in user.mak.  (Currently commented-out, though).
 14-Jun-2001
 	- Made the terrain visibility checker more efficient and more robust.
 	  The calculation of the extent works completely different now and

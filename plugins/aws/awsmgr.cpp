@@ -45,26 +45,18 @@ awsWindow *
 awsManager::GetTopWindow()
 { return top; }
     
-
 void 
 awsManager::SetTopWindow(awsWindow *_top)
 { top = _top; }
 
 
- //// Canvas stuff  //////////////////////////////////////////////////////////////////////////////////
-
-
+ //// Canvas stuff  ///////////////////////////////////////////////////////////
 awsManager::awsCanvas::awsCanvas (awsManager *_wmgr):wmgr(_wmgr)
 {
 }
  
-awsManager::awsCanvas::~awsCanvas ()
-{
-}
-
 
 void 
 awsManager::awsCanvas::Animate (cs_time current_time)
 {
 }
-
