@@ -21,7 +21,7 @@
 
 #define CS_VERSION_MAJOR "0.94"	/* NOTE: Update docs/texinfo/version.txi  */
 #define CS_VERSION_MINOR "001"	/* whenever updating these two values.    */
-#define CS_RELEASE_DATE "Wed, 2-Apr-2002"
+#define CS_RELEASE_DATE "Wed, 8-Apr-2002"
 
 #if !defined(CS_PLATFORM_NAME)
 #  define CS_PLATFORM_NAME "MysteryPlatform"
