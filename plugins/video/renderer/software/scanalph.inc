@@ -127,9 +127,12 @@
 
 #ifdef A_MAP
 #  define SCANMAP
+#  define TEXCOORDS
 #  define A_SRCADDR	((vv >> 16) << shifter) + (uu >> 16)
+#  define A_ASRCADDR    ((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)
 #else
 #  define A_SRCADDR	((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)
+#  define A_ASRCADDR    srcaddr
 #endif
 
 #define SCANLOOP \
@@ -139,7 +142,7 @@
     {									\
       Z_FILL;								\
       unsigned srcaddr = A_SRCADDR;					\
-      uint8 alpha = Scan.AlphaMap [srcaddr];				\
+      uint8 alpha = Scan.AlphaMap [A_ASRCADDR];				\
       A_IPIXTYPE src = A_PIXEL_PREPROC(A_COLORMAP (srcTex [srcaddr]));	\
       A_IPIXTYPE dst = A_PIXEL_PREPROC(A_DSTTEX);			\
       unsigned src_rb = src & A_MASK_RB;				\
@@ -217,6 +220,7 @@ void A_SCANFUNC (void *dest, int len, uint32 *zbuff,
 #undef A_NORMSHIFT
 #undef A_COLORMAP
 #undef A_SRCADDR
+#undef A_ASRCADDR
 #undef A_DSTTEX
 #undef A_IPIXTYPE
 #undef A_PIXTYPE

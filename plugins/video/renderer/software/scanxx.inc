@@ -487,7 +487,7 @@ transp_pixel:								\
   {									\
     if (izz >= *z_buffer)						\
     {									\
-      UByte c = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
+      PIXTYPE c = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
       if (!c) goto transp_pixel;					\
       *z_buffer = izz;							\
       *_dest = c;							\
@@ -515,7 +515,7 @@ transp_pixel:								\
   {									\
     if (izz >= *z_buffer)						\
     {									\
-      UByte c = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
+      PIXTYPE c = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
       if (!c) goto transp_pixel;					\
       *_dest = c;							\
     }									\

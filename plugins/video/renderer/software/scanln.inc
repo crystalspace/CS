@@ -25,6 +25,7 @@
 	SCANEND		: optional additional code after the function (mostly for Z fill)
 	SCANLOOP	: code to draw one segment of 16 (or less) pixels
 	SCANMAP		: define if the function uses the lighted textures
+	TEXCOORDS	: if SCANMAP is defined but you want/need texture coordinates, too
 	SCAN8		: define if function uses 8-bit pixels
 	SCAN16		: define if function uses 16-bit pixels
 	SCAN32		: define if function uses 32-bit pixels
@@ -38,9 +39,9 @@
 	lastZbuf	: pointer to z_buffer for end of complete line
 	srcTex		: pointer to texture map
 	shifter		: shift value for vv (only if SCANMAP is defined)
-	shifter_h	: shift value for vv (only if SCANMAP is NOT defined)
-	ander_w		: and value for uu (only if SCANMAP is NOT defined)
-	ander_h		: and value for vv (only if SCANMAP is NOT defined)
+	shifter_h	: shift value for vv (only if SCANMAP is NOT defined OR TEXCOORDS is defined)
+	ander_w		: and value for uu (only if SCANMAP is NOT defined OR TEXCOORDS is defined)
+	ander_h		: and value for vv (only if SCANMAP is NOT defined OR TEXCOORDS is defined)
     The SCANLOOP code needs to update these variables as follows:
 	uu, vv, izz	: u, v, and 1/z components just after this segment (izz = 8:24)
 	_dest		: _destend+1
@@ -83,10 +84,12 @@ void SCANFUNC (int xx, unsigned char* d, uint32* z_buf, float inv_z,
   uint32 shifter = Scan.shf_u;
   PIXTYPE *srcTex = (PIXTYPE *)Scan.bitmap2;
 # else
+  UByte *srcTex = Scan.bitmap;
+# endif
+# if !defined(SCANMAP) || defined(TEXCOORDS)
   uint32 shifter_h = Scan.shf_h;
   uint32 ander_w = Scan.and_w;
   uint32 ander_h = Scan.and_h;
-  UByte *srcTex = Scan.bitmap;
 # endif // SCANMAP
   uint32 *z_buffer = z_buf; (void)z_buffer;
   uint32 *lastZbuf = z_buffer + xx-1; (void)lastZbuf;
@@ -191,3 +194,5 @@ void SCANFUNC (int xx, unsigned char* d, uint32* z_buf, float inv_z,
 #undef SCANLOOP
 #undef SCANMAP
 #undef PIXTYPE
+#undef TEXCOORDS
+
