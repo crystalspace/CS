@@ -51,6 +51,8 @@ The history order is reversed so that new features are at the top.
 	- Jorrit did some updates to the documentation to avoid the word
 	  'region' where something else is meant.
 	- Jorrit fixed iso loader after his latest changes.
+	- Wouter fixed reference leaks in Aws for iGraphics2D/3D and font
+	  manager.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,

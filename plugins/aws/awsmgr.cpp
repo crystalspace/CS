@@ -215,7 +215,7 @@ void awsManager::SetCanvas (iAwsCanvas *newCanvas)
   if (!newCanvas)
     return;
   
-  canvas = newCanvas;
+  canvas = csPtr<iAwsCanvas>(newCanvas);
 
   ptG2D = canvas->G2D ();
   ptG3D = canvas->G3D ();
