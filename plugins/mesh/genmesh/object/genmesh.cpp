@@ -234,7 +234,6 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
   csReversibleTransform trans = movable->GetFullTransform ();
   // the object center in world coordinates. "0" because the object
   // center in object space is obviously at (0,0,0).
-  csVector3 wor_center = trans.This2Other (0);
   csColor color;
   for (l = 0 ; l < num_lights ; l++)
   {
