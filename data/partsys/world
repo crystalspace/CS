@@ -201,13 +201,13 @@
                 <v x="-1" y="5" z="-20" />
                 <material>abstract</material>
                 <texlen>5</texlen>
+                <cosfact>0.8</cosfact>
                 <p name="down1">
                     <v>0</v>
                     <v>1</v>
                     <v>10</v>
                     <v>15</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -218,7 +218,6 @@
                     <v>11</v>
                     <v>14</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -229,7 +228,6 @@
                     <v>2</v>
                     <v>3</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -240,7 +238,6 @@
                     <v>23</v>
                     <v>18</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -251,7 +248,6 @@
                     <v>22</v>
                     <v>19</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -262,7 +258,6 @@
                     <v>7</v>
                     <v>6</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -478,6 +473,7 @@
                 <v x="1" y="5" z="-20" />
                 <v x="-1" y="5" z="-20" />
                 <material>abstract</material>
+                <cosfact>0.8</cosfact>
                 <texlen>5</texlen>
                 <p name="down1">
                     <v>0</v>
@@ -485,7 +481,6 @@
                     <v>10</v>
                     <v>15</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -496,7 +491,6 @@
                     <v>11</v>
                     <v>14</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -507,7 +501,6 @@
                     <v>2</v>
                     <v>3</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -518,7 +511,6 @@
                     <v>23</v>
                     <v>18</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -529,7 +521,6 @@
                     <v>22</v>
                     <v>19</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -540,7 +531,6 @@
                     <v>7</v>
                     <v>6</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -929,13 +919,13 @@
                 <v x="-1" y="5" z="-20" />
                 <material>abstract</material>
                 <texlen>5</texlen>
+                <cosfact>0.8</cosfact>
                 <p name="down1">
                     <v>0</v>
                     <v>1</v>
                     <v>10</v>
                     <v>15</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -946,7 +936,6 @@
                     <v>11</v>
                     <v>14</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -957,7 +946,6 @@
                     <v>2</v>
                     <v>3</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -968,7 +956,6 @@
                     <v>23</v>
                     <v>18</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -979,7 +966,6 @@
                     <v>22</v>
                     <v>19</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -990,7 +976,6 @@
                     <v>7</v>
                     <v>6</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -1296,13 +1281,13 @@
                 <v x="-1" y="5" z="-20" />
                 <material>abstract</material>
                 <texlen>5</texlen>
+                <cosfact>0.8</cosfact>
                 <p name="down1">
                     <v>0</v>
                     <v>1</v>
                     <v>10</v>
                     <v>15</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -1313,7 +1298,6 @@
                     <v>11</v>
                     <v>14</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -1324,7 +1308,6 @@
                     <v>2</v>
                     <v>3</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -1335,7 +1318,6 @@
                     <v>23</v>
                     <v>18</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -1346,7 +1328,6 @@
                     <v>22</v>
                     <v>19</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -1357,7 +1338,6 @@
                     <v>7</v>
                     <v>6</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -1801,13 +1781,13 @@
                 <v x="-1" y="5" z="-20" />
                 <material>abstract</material>
                 <texlen>5</texlen>
+                <cosfact>0.8</cosfact>
                 <p name="down1">
                     <v>0</v>
                     <v>1</v>
                     <v>10</v>
                     <v>15</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -1818,7 +1798,6 @@
                     <v>11</v>
                     <v>14</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -1829,7 +1808,6 @@
                     <v>2</v>
                     <v>3</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -1840,7 +1818,6 @@
                     <v>23</v>
                     <v>18</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -1851,7 +1828,6 @@
                     <v>22</v>
                     <v>19</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -1862,7 +1838,6 @@
                     <v>7</v>
                     <v>6</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -2083,13 +2058,13 @@
                 <v x="-1" y="5" z="-20" />
                 <material>abstract</material>
                 <texlen>5</texlen>
+                <cosfact>0.8</cosfact>
                 <p name="down1">
                     <v>0</v>
                     <v>1</v>
                     <v>10</v>
                     <v>15</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -2100,7 +2075,6 @@
                     <v>11</v>
                     <v>14</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -2111,7 +2085,6 @@
                     <v>2</v>
                     <v>3</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>floor</plane>
                     </texmap>
@@ -2122,7 +2095,6 @@
                     <v>23</v>
                     <v>18</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -2133,7 +2105,6 @@
                     <v>22</v>
                     <v>19</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
@@ -2144,7 +2115,6 @@
                     <v>7</v>
                     <v>6</v>
                     <material>wood</material>
-                    <cosfact>0.8</cosfact>
                     <texmap>
                         <plane>ceiling</plane>
                     </texmap>
