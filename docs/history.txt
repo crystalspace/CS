@@ -22,6 +22,8 @@ chronological order.
 	  sizeof(bool)==1 since this assertion is not satisfiable on all
 	  platforms (such as MacOS/X) and since the OPCODE library itself does
 	  not actually require bool to be one byte.
+	- Eric Sunshine eliminated compilation warnings in csBitArray. Also
+	  made minor fixes to Doxygen comment.
 29-May-2004
 	- Peter Amstutz added a "--with-vos" option to the configure
 	  script to set the PKG_CONFIG_PATH environment variable when

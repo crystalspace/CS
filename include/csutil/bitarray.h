@@ -28,7 +28,9 @@
 
 #include "csextern.h"
 
-/// A one-dimensional array of bits, similar to STL bitset.
+/**
+ * A one-dimensional array of bits, similar to STL bitset.
+ */
 class CS_CSUTIL_EXPORT csBitArray
 {
 public:
@@ -106,41 +108,43 @@ public:
     csBitArray &mArray;
     size_t mPos;
   public:
+    /// Constructor.
     BitProxy(csBitArray &array, unsigned pos): mArray(array), mPos(pos)
     {}
 
+    /// Boolean assignment.
     BitProxy &operator= (bool value)
     {
       mArray.Set (mPos, value);
       return *this;
     }
 
+    /// Proxy assignment.
     BitProxy &operator= (const BitProxy &that)
     {
       mArray.Set (mPos, that.mArray.IsBitSet (that.mPos));
       return *this;
     }
 
+    /// Boolean accessor.
     operator bool() const
     {
       return mArray.IsBitSet (mPos);
     }
 
+    /// Flip state of this bit.
     bool Flip()
     {
       mArray.FlipBit (mPos);
       return mArray.IsBitSet (mPos);
     }
   };
-
-
   friend class BitProxy;
 
-  //
-  // Constructors and destructor
-  //
-
-  csBitArray () : mLength(0), mpStore(0)
+  /**
+   * Defalut constructor.
+   */
+  csBitArray () : mpStore(0), mSingleWord(0), mLength(0), mNumBits(0)
   {
     SetSize (0);
     // Clear last bits
@@ -150,8 +154,8 @@ public:
   /**
    * Construct with a size of \a size bits.
    */
-  explicit csBitArray(size_t size) : mLength(0), mpStore(0),
-    mSingleWord(0)
+  explicit csBitArray(size_t size) :
+    mpStore(0), mSingleWord(0), mLength(0), mNumBits(0)
   {
     SetSize (size);
     // Clear last bits
@@ -159,26 +163,32 @@ public:
   }
 
   /**
-   * construct as duplicate of \a that.
+   * Construct as duplicate of \a that (copy constructor).
    */
-  csBitArray (const csBitArray &that) : mLength(0), mpStore(0)
+  csBitArray (const csBitArray &that) :
+    mpStore(0), mSingleWord(0), mLength(0), mNumBits(0)
   {
     *this = that;
   }
 
-  /// destructor
+  /// Destructor.
   virtual ~csBitArray()
   {
     if (mLength > 1)
       delete mpStore;
   }
 
-  /// Return the number of bits store.
+  /// Return the number of stored bits.
   size_t Length() const
   {
     return mNumBits;
   }
 
+  /**
+   * Set the number of stored bits.
+   * \remarks If the new size is larger than the old size, the newly added
+   *    bits are cleared.
+   */
   void SetLength (size_t newSize)
   {
     SetSize (newSize);
@@ -190,33 +200,32 @@ public:
   // Operators
   //
 
-  /// copy from other array
+  /// Copy from other array.
   csBitArray &operator=(const csBitArray &that)
   {
     if (this != &that)
     {
       SetSize (that.mNumBits);
-
       memcpy (mpStore, that.mpStore, mLength * sizeof(store_type));
     }
     return *this;
   }
 
-  /// return bit at position <code>pos</code>
+  /// Return bit at position <code>pos</code>.
   BitProxy operator[] (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
     return BitProxy(*this, pos);
   }
 
-  /// return bit at position <code>pos</code>
+  /// Return bit at position <code>pos</code>.
   const BitProxy operator[] (size_t pos) const
   {
     CS_ASSERT (pos < mNumBits);
     return BitProxy(CS_CONST_CAST(csBitArray&,*this), pos);
   }
 
-  /// equal to other array
+  /// Equal to other array.
   bool operator==(const csBitArray &that) const
   {
     if (mNumBits != that.mNumBits)
@@ -228,13 +237,13 @@ public:
     return true;
   }
 
-  /// not equal to other array
+  /// Not equal to other array.
   bool operator != (const csBitArray &that) const
   {
     return !(*this == that);
   }
 
-  /// bit-wise and
+  /// Bit-wise `and'.
   csBitArray& operator &= (const csBitArray &that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
@@ -243,7 +252,7 @@ public:
     return *this;
   }
 
-  /// bit-wise or
+  /// Bit-wise `or'.
   csBitArray operator |= (const csBitArray &that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
@@ -252,7 +261,7 @@ public:
     return *this;
   }
 
-  /// bit-wise xor
+  /// Bit-wise `xor'.
   csBitArray operator ^= (const csBitArray &that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
@@ -261,25 +270,25 @@ public:
     return *this;
   }
 
-  /// Flip all bits
+  /// Return complement bit array in which all bits are flipped from this one.
   csBitArray operator~() const
   {
     return csBitArray(*this).FlipAllBits();
   }
 
-  /// bit-wise and
+  /// Bit-wise `and'.
   friend csBitArray operator& (const csBitArray &a1, const csBitArray &a2)
   {
     return csBitArray(a1) &= a2;
   }
 
-  /// bit-wise or
+  /// Bit-wise `or'.
   friend csBitArray operator | (const csBitArray &a1, const csBitArray &a2)
   {
     return csBitArray(a1) |= a2;
   }
 
-  /// bit-wise xor
+  /// Bit-wise `xor'.
   friend csBitArray operator ^ (const csBitArray &a1, const csBitArray &a2)
   {
     return csBitArray(a1) ^= a2;
@@ -348,7 +357,7 @@ public:
     return *this;
   }
 
-  /// return the full array
+  /// Return the full array.
   store_type* GetArrayBits()
   {
     return mpStore;
