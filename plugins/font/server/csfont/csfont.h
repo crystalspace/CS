@@ -21,6 +21,8 @@
 #define __CS_CSFONT_H__
 
 #include "ifontsrv.h"
+#include "csutil/csvector.h"
+class iSystem;
 
 struct csFontDef
 {
@@ -37,17 +39,34 @@ struct csFontDef
  */
 class csDefaultFontServer : public iFontServer
 {
-  // The list of registered fonts
+  // the system
+  iSystem *System;
+
+  // The list of pre-registered fonts
   static csFontDef FontList[];
+
+  // number of preregistered fonts
+  int FontPreCount;
+
+  // vector of all FontDefs
+  csBasicVector fonts;
 
   // Number of fonts
   int FontCount;
+
+  /// Read a .fnt file to a new csFontDef given vfs path, false on error.
+  bool ReadFntFile(const char *file, csFontDef *&fontdef);
+
+  /// get the fontDef for a certain font ID
+  csFontDef *GetFontDef(int id) {return (csFontDef*)fonts[id];}
 
 public:
   DECLARE_IBASE;
 
   /// Create the plugin object
   csDefaultFontServer (iBase *pParent);
+  /// destroy it
+  virtual ~csDefaultFontServer ();
 
   /// Register plugin with the system driver
   virtual bool Initialize (iSystem *pSystem);
