@@ -39,6 +39,57 @@ public:
   bool RunText(const char *Text);
   bool LoadModule(const char *Text);
   bool Store(const char* name, void* data, void* tag);
+
+  /*
+    @@@ New functions not yet implemented
+  */
+  bool Call(const char *name, const char *fmt, ...)
+    { return false; }
+  bool Call(const char *name, int &ret, const char *fmt, ...)
+    { return false; }
+  bool Call(const char *name, float &ret, const char *fmt, ...)
+    { return false; }
+  bool Call(const char *name, double &ret, const char *fmt, ...)
+    { return false; }
+  bool Call(const char *name, char **ret, const char *fmt, ...)
+    { return false; }
+  bool Call(const char *name, void **ret, const char *fmt, ...)
+    { return false; }
+  bool Call(const char *name, csRef<iScriptObject> &ref, const char *fmt, ...)
+    { return false; }
+  csPtr<iScriptObject> NewObject(const char *type, const char *fmt, ...) const
+    { return NULL; }
+  bool Store(const char *name, int data)
+    { return false; }
+  bool Store(const char *name, float data)
+    { return false; }
+  bool Store(const char *name, double data)
+    { return false; }
+  bool Store(const char *name, char *data)
+    { return false; }
+  bool Store(const char *name, void *data, const char *type)
+    { return false; }
+  bool Store(const char *name, iScriptObject *data)
+    { return false; }
+  bool SetTruth(const char *name, bool data)
+    { return false; }
+  bool Retrieve(const char *name, int &data) const
+    { return false; }
+  bool Retrieve(const char *name, float &data) const
+    { return false; }
+  bool Retrieve(const char *name, double &data) const
+    { return false; }
+  bool Retrieve(const char *name, char **data) const
+    { return false; }
+  bool Retrieve(const char *name, void **data, const char *type) const
+    { return false; }
+  bool Retrieve(const char *name, csRef<iScriptObject> &data) const
+    { return false; }
+  bool GetTruth(const char *name, bool &data) const
+    { return false; }
+  bool Remove(const char *name)
+    { return false; }
+
   void ShowError();
   void Print(bool Error, const char *msg);
 
