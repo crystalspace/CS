@@ -526,6 +526,7 @@ private:
   float diffusion;
 
   float particle_radius;
+  bool radius_changed;
 
   csArray<csColor> gradient_colors;
   float loop_time;
@@ -961,6 +962,7 @@ public:
     { scfParent->Stop (); }
     virtual bool IsRunning ()
     { return scfParent->IsRunning (); }
+   
   } scfiParticlesObjectState;
   friend struct eiParticlesObjectState;
 

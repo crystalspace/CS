@@ -222,6 +222,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   autostart = p->autostart;
 
   particle_radius = p->particle_radius;
+  radius_changed=false;
 
   gradient_colors = p->gradient_colors;
 
@@ -394,6 +395,7 @@ void csParticlesObject::SetParticleRadius (float rad)
   {
     csShaderVariable* sv = svcontext->GetVariableAdd (radius_name);
     if (sv) sv->SetValue (particle_radius);
+    radius_changed=true;
   }
 }
 
@@ -621,13 +623,14 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   {
     int fov = QInt (cam->GetFOVAngle ());
     int fov_pixels = cam->GetFOV ();
-    if (camera_fov != fov || camera_pixels != fov_pixels)
+    if (radius_changed || camera_fov != fov || camera_pixels != fov_pixels)
     {
       camera_fov = fov;
       camera_pixels = fov_pixels;
       float lambda = (float)(fov_pixels / (2.0 * tan (fov / 360.0 * PI)));
       csShaderVariable* sv = svcontext->GetVariable (scale_name);
       sv->SetValue (1.0f / (lambda * particle_radius * 3));
+      radius_changed=false;
     }
   }
 
