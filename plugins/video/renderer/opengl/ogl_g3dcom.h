@@ -324,21 +324,6 @@ private:
     csPlane3* planes, int num_planes);
 
   /**
-   * Classify all vertices from a mesh for clipping (ClipTriangleMeshExact).
-   */
-  void ClassifyForClipTriangleMeshExact (
-    int num_vertices,
-    csVector3* vertices,
-    csVector2* texels,
-    csColor* vertex_colors,
-    float** userarrays,
-    int* userarraycomponents,
-    G3DFogInfo* vertex_fog,
-    int& num_clipped_vertices,
-    const csVector3& frust_origin,
-    csPlane3* planes, int num_planes);
-
-  /**
    * Given information from a mesh, clip the mesh to the frustum.
    * The clipped mesh will be put in the clipped_??? arrays.
    */

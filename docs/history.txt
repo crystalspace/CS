@@ -9,12 +9,15 @@ The history order is reversed so that new features are at the top.
 	- Cleaned up super lightmap code a little more.
 	- Started work on new optimization in the super lightmap cache. Not
 	  operational yet.
-	- Made the super lightmap cache in the OpenGL renderer a lot smaller.
+	- Made the super lightmap cache in the OpenGL renderer a lot faster.
 	  There is now a cost associated with every super lightmap (based
 	  on number of lightmaps that are in it) and also a timestamp which
 	  says when that super lightmap was last needed. When selecting a
 	  new super lightmap this information is used to make sure that
 	  useful super lightmaps stay in memory.
+	- Fixed a bad bug in the exact clipper used by DrawPolygonMesh. This
+	  bug was introduced yesterday and caused lightmaps to be wrong
+	  if exact clipping was needed.
 30-Jan-2003
 	- Greatly modified the DrawPolygonMesh and polygon buffer
 	  code in the OpenGL renderer. This is still very experimental

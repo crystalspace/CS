@@ -3458,87 +3458,6 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   }
 }
 
-void csGraphics3DOGLCommon::ClassifyForClipTriangleMeshExact (
-    int num_vertices,
-    csVector3* vertices,
-    csVector2* texels,
-    csColor* vertex_colors,
-    float** userarrays,
-    int* userarraycomponents,
-    G3DFogInfo* vertex_fog,
-    int& num_clipped_vertices,
-    const csVector3& frust_origin,
-    csPlane3* planes, int num_planes)
-{
-  int i, j;
-
-  if (num_vertices > clipped_translate->Length ())
-    clipped_translate->SetLength (num_vertices); // Used for original vertices.
-  if (num_vertices > clipped_plane->Length ())
-    clipped_plane->SetLength (num_vertices); // Used for original vertices.
-  int num_vts = num_vertices*2+100;
-  if (num_vts > clipped_vertices->Length ())
-  {
-    clipped_vertices->SetLength (num_vts);
-    clipped_texels->SetLength (num_vts);
-    clipped_colors->SetLength (num_vts);
-    clipped_fog->SetLength (num_vts);
-    for( i=0; i<CS_VBUF_TOTAL_USERA; i++ )
-      clipped_user[i]->SetLength (num_vts);
-  }
-
-  num_clipped_vertices = 0;
-
-  int* clip_translate = clipped_translate->GetArray ();
-  int* clip_plane = clipped_plane->GetArray ();
-  csVector3* clip_vertices = clipped_vertices->GetArray ();
-  csVector2* clip_texels = clipped_texels->GetArray ();
-  csColor* clip_colors = clipped_colors->GetArray ();
-  G3DFogInfo* clip_fog = clipped_fog->GetArray ();
-
-  // Check all original vertices and see if they are in frustum.
-  // If yes we set clipped_translate to the new position in the transformed
-  // vertex array. Otherwise we set clipped_translate to -1.
-  for (i = 0 ; i < num_vertices ; i++)
-  {
-    const csVector3& v = vertices[i];
-    bool inside = true;
-    clip_plane[i] = -1;
-    for (j = 0 ; j < num_planes ; j++)
-    {
-      if (planes[j].Classify (v-frust_origin) >= 0)
-      {
-	inside = false;
-	clip_plane[i] = j;
-	break;  // Not inside.
-      }
-    }
-    if (inside)
-    {
-      clip_translate[i] = num_clipped_vertices;
-      clip_vertices[num_clipped_vertices] = v;
-      clip_texels[num_clipped_vertices] = texels[i];
-      if (vertex_colors)
-        clip_colors[num_clipped_vertices] = vertex_colors[i];
-      if (vertex_fog)
-        clip_fog[num_clipped_vertices] = vertex_fog[i];
-      if (userarrays)
-      {
-        for (int u=0; u<CS_VBUF_TOTAL_USERA; u++)
-          if (userarrays[u] != NULL)
-          {
-            for (int c=0; c<userarraycomponents[u]; c++)
-              (*clipped_user[u])[num_clipped_vertices] =
-                (userarrays[u])[i*userarraycomponents[u]+c];
-          }
-      }
-      num_clipped_vertices++;
-    }
-    else
-      clip_translate[i] = -1;
-  }
-}
-
 void csGraphics3DOGLCommon::ClipTriangleMeshExact (
     int num_triangles,
     int num_vertices,
@@ -3564,6 +3483,21 @@ void csGraphics3DOGLCommon::ClipTriangleMeshExact (
     clipped_triangles->SetLength (num_tri);
   }
 
+  if (num_vertices > clipped_translate->Length ())
+    clipped_translate->SetLength (num_vertices); // Used for original vertices.
+
+  int num_vts = num_vertices*2+100;
+  if (num_vts > clipped_vertices->Length ())
+  {
+    clipped_vertices->SetLength (num_vts);
+    clipped_texels->SetLength (num_vts);
+    clipped_colors->SetLength (num_vts);
+    clipped_fog->SetLength (num_vts);
+    for( i=0; i<CS_VBUF_TOTAL_USERA; i++ )
+      clipped_user[i]->SetLength (num_vts);
+  }
+
+  num_clipped_vertices = 0;
   num_clipped_triangles = 0;
 
   csTriangle* clip_triangles = clipped_triangles->GetArray ();
@@ -3573,6 +3507,35 @@ void csGraphics3DOGLCommon::ClipTriangleMeshExact (
   csVector2* clip_texels = clipped_texels->GetArray ();
   csColor* clip_colors = clipped_colors->GetArray ();
   G3DFogInfo* clip_fog = clipped_fog->GetArray ();
+
+  // Make the clipped vertex arrays.
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    if (clip_plane[i] == -1)
+    {
+      const csVector3& v = vertices[i];
+      clip_translate[i] = num_clipped_vertices;
+      clip_vertices[num_clipped_vertices] = v;
+      clip_texels[num_clipped_vertices] = texels[i];
+      if (vertex_colors)
+        clip_colors[num_clipped_vertices] = vertex_colors[i];
+      if (vertex_fog)
+        clip_fog[num_clipped_vertices] = vertex_fog[i];
+      if (userarrays)
+      {
+        for (int u=0; u<CS_VBUF_TOTAL_USERA; u++)
+          if (userarrays[u] != NULL)
+          {
+            for (int c=0; c<userarraycomponents[u]; c++)
+              (*clipped_user[u])[num_clipped_vertices] =
+                (userarrays[u])[i*userarraycomponents[u]+c];
+          }
+      }
+      num_clipped_vertices++;
+    }
+    else
+      clip_translate[i] = -1;
+  }
 
   // Now clip all triangles.
   for (i = 0 ; i < num_triangles ; i++)
@@ -4284,23 +4247,9 @@ uint prev_mixmode = ~0;
       if (ci.how_clip == '0' || ci.use_lazy_clipping
         || ci.do_plane_clipping || ci.do_z_plane_clipping)
       {
-        //ci.use_lazy_clipping = true;//@@@
-        if (ci.use_lazy_clipping)
-        {
-          ClassifyForClipTriangleMesh (
+        ClassifyForClipTriangleMesh (
             total_verts_count, work_verts,
             ci.frust_origin, ci.frustum_planes, ci.num_planes);
-        }
-        else
-        {
-          ClassifyForClipTriangleMeshExact (
-            total_verts_count,
-            work_verts, work_uv_verts, work_colors, work_userarrays,
-            userarraycomponents,
-            mesh.do_fog ? work_fog : NULL,
-            ci.num_clipped_vertices,
-            ci.frust_origin, ci.frustum_planes, ci.num_planes);
-        }
       }
     }
     trimesh.triangles = t->triangles.GetArray ();
@@ -5113,11 +5062,11 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     || ci.do_plane_clipping || ci.do_z_plane_clipping)
   {
     //ci.use_lazy_clipping = true;//@@@
-    if (ci.use_lazy_clipping)
-    {
-      if (setup) ClassifyForClipTriangleMesh (
+    if (setup) ClassifyForClipTriangleMesh (
         num_vertices, work_verts,
         ci.frust_origin, ci.frustum_planes, ci.num_planes);
+    if (ci.use_lazy_clipping)
+    {
       ClipTriangleMesh (
         num_triangles, num_vertices, triangles,
         work_verts, num_triangles,
@@ -5125,18 +5074,8 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     }
     else
     {
-      if (setup)
-        ClassifyForClipTriangleMeshExact (
-          num_vertices,
-          work_verts, work_uv_verts, work_colors, work_userarrays,
-          userarraycomponents,
-          mesh.do_fog ? work_fog : NULL,
-          ci.num_clipped_vertices,
-          ci.frust_origin, ci.frustum_planes, ci.num_planes);
-      int old_num_vertices = num_vertices;
-      num_vertices = ci.num_clipped_vertices;
       ClipTriangleMeshExact (
-        num_triangles, old_num_vertices, triangles,
+        num_triangles, num_vertices, triangles,
         work_verts, work_uv_verts, work_colors, work_userarrays,
         userarraycomponents,
         mesh.do_fog ? work_fog : NULL,
@@ -5507,11 +5446,11 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
     || ci.do_plane_clipping || ci.do_z_plane_clipping)
   {
     //ci.use_lazy_clipping = true;//@@@
-    if (ci.use_lazy_clipping)
-    {
-      if (setup) ClassifyForClipTriangleMesh (
+    if (setup) ClassifyForClipTriangleMesh (
         num_vertices, work_verts,
         ci.frust_origin, ci.frustum_planes, ci.num_planes);
+    if (ci.use_lazy_clipping)
+    {
       ClipTriangleMesh (
 	num_triangles, num_vertices, triangles,
 	work_verts, num_triangles,
@@ -5519,18 +5458,8 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
     }
     else
     {
-      if (setup)
-        ClassifyForClipTriangleMeshExact (
-          num_vertices,
-          work_verts, work_uv_verts, work_colors, NULL,
-          NULL,
-          mesh.do_fog ? work_fog : NULL,
-          ci.num_clipped_vertices,
-          ci.frust_origin, ci.frustum_planes, ci.num_planes);
-      int old_num_vertices = num_vertices;
-      num_vertices = ci.num_clipped_vertices;
       ClipTriangleMeshExact (
-	num_triangles, old_num_vertices, triangles,
+	num_triangles, num_vertices, triangles,
 	work_verts, work_uv_verts, work_colors, NULL, NULL,
 	mesh.do_fog ? work_fog : NULL,
 	num_triangles, num_vertices,
@@ -5890,11 +5819,11 @@ void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
     || ci.do_plane_clipping || ci.do_z_plane_clipping)
   {
     //ci.use_lazy_clipping = true;//@@@
-    if (ci.use_lazy_clipping)
-    {
-      if (setup) ClassifyForClipTriangleMesh (
+    if (setup) ClassifyForClipTriangleMesh (
         num_vertices, work_verts,
         ci.frust_origin, ci.frustum_planes, ci.num_planes);
+    if (ci.use_lazy_clipping)
+    {
       ClipTriangleMesh (
 	num_triangles, num_vertices, triangles,
 	work_verts, num_triangles,
@@ -5902,18 +5831,8 @@ void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
     }
     else
     {
-      if (setup)
-        ClassifyForClipTriangleMeshExact (
-          num_vertices,
-          work_verts, work_uv_verts, work_colors, NULL,
-          NULL,
-          mesh.do_fog ? work_fog : NULL,
-          ci.num_clipped_vertices,
-          ci.frust_origin, ci.frustum_planes, ci.num_planes);
-      int old_num_vertices = num_vertices;
-      num_vertices = ci.num_clipped_vertices;
       ClipTriangleMeshExact (
-	num_triangles, old_num_vertices, triangles,
+	num_triangles, num_vertices, triangles,
 	work_verts, work_uv_verts, work_colors, NULL, NULL,
 	mesh.do_fog ? work_fog : NULL,
 	num_triangles, num_vertices,
