@@ -228,7 +228,8 @@ void csIsoLight::ShineGrid()
   {
     for(int x = xmin; x<=xmax; x++)
     {
-      grid->GetGridCell(x,y)->Traverse(lightfunc, (iIsoLight*)this);
+      iIsoCell *cell = grid->GetGridCell(x,y);
+      if(cell) cell->Traverse(lightfunc, (iIsoLight*)this);
     }
   }
 }
