@@ -35,6 +35,8 @@
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 
+struct iPortal;
+
 //------------- Fake 3d Interfaces -----------------------------
 /// fake a movable for a MeshSprite
 class csIsoFakeMovable : public iMovable
@@ -309,8 +311,9 @@ public:
   virtual void SetThisSector (iSector* ) {}
   virtual iSector* GetPreviousSector () {return 0;}
   virtual void SetPreviousSector (iSector* ) {}
-  virtual iPolygon3D* GetPortalPolygon () {return 0;}
-  virtual void SetPortalPolygon (iPolygon3D* ) {}
+  virtual iPortal* GetLastPortal () {return 0;}
+  virtual iPolygon3D* GetLastPortalP () {return 0;}
+  virtual void SetLastPortal (iPortal*, iPolygon3D* ) {}
   virtual int GetRenderRecursionLevel () {return 0;}
   virtual void SetRenderRecursionLevel (int ) {}
   virtual void AttachRenderContextData (void* key, iBase* data)
