@@ -15,6 +15,10 @@ The history order is reversed so that new features are at the top.
 	  options for all loaded plugins AFTER all plugins are initialized.
 	  This fixes a lot of commandline options (like -ilace, -smaller
 	  for software renderer and -fov for engine).
+	- Eric Sunshine corrected ddraw/g2d.cpp so that it uses a fixed SCF
+	  class identifier in SCF_EXPORT_CLASS_DEP() rather than using the
+	  CS_SOFTWARE_2D_DRIVER macro which might change value, inadvertently
+	  causing the ddraw2d plugin to change identity.
 3-June-2003
 	- Philipp Aumayr fixed the fancycon bug, where the borders
 	  were visibile in SW but not in GL mode. (wrong mixmode at line
@@ -48,9 +52,9 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett updated the docs to reflect a new msvc_libs release.
 	- Jorrit fixed genmesh in case the genmesh object (not the factory)
 	  itself is hard-transformed for the following functions:
-	  	- AppendShadows()
-		- UpdateLighting2()
-		- UpdateLighting()
+	    AppendShadows()
+	    UpdateLighting2()
+	    UpdateLighting()
 	- Jorrit updated csColliderHelper::InitializeCollisionWrapper()
 	  function so that it compares the polygon mesh returned by the
 	  object with the one from the factory. If they are different it
@@ -92,44 +96,43 @@ The history order is reversed so that new features are at the top.
 	  shadermanager has been replaced with csRefArray too. 
 	  (Might have introduced bugs with reference counts.)
 	- Oktal overhauled the Perl Swig interface files, including:
-	  - Recovered the csWrapPtr usage stuff that got misplaced during
-	    Rene's reshuffling of the Python interface.
-	  - Added operator overloading for logical and and or (although no
-	    operators yet work because they depend on the existance of a
-	    %perl5code directive in Swig.)
-	  - Storing pointers as IV's (int) instead of PV's (string pointer)
-	    in line with Swig's behaviour.
-	  - Added a cspace::AUTOLOAD subroutine (called by Perl when a
-	    non-existant object method is called) to give the module's objects
-	    accessor methods for their properties, just like most other Perl
-	    modules.
-	  - Changed to proper argument handling for native Perl C functions;
-	    now using the XS macros from Perl's API.
-	  - Some big code blocks containing errors had been commented out;
-	    fixed the errors and uncommented them. These include bindings for
-	    collision detection, hashmaps and requesting plugins.
-	  - Added -Wno-unused to PERL5.CFLAGS to avoid loads of warnings
-	    in Swig-generated code.
-	  - Added wrappings for iString and csString. The one for csString is
-	    commented out until work can be done to fix it.
+	    - Recovered the csWrapPtr usage stuff that got misplaced during
+	      Rene's reshuffling of the Python interface.
+	    - Added operator overloading for logical and and or (although no
+	      operators yet work because they depend on the existance of a
+	      %perl5code directive in Swig.)
+	    - Storing pointers as IV's (int) instead of PV's (string pointer)
+	      in line with Swig's behaviour.
+	    - Added a cspace::AUTOLOAD subroutine (called by Perl when a
+	      non-existant object method is called) to give the module's
+	      objects accessor methods for their properties, just like most
+	      other Perl modules.
+	    - Changed to proper argument handling for native Perl C functions;
+	      now using the XS macros from Perl's API.
+	    - Some big code blocks containing errors had been commented out;
+	      fixed the errors and uncommented them.  These include bindings
+	      for collision detection, hashmaps and requesting plugins.
+	    - Added -Wno-unused to PERL5.CFLAGS to avoid loads of warnings in
+	      Swig-generated code.
+	    - Added wrappings for iString and csString.  The one for csString
+	      is commented out until work can be done to fix it.
 	- Oktal made the following changes to the Perl scripting plugin:
-	  - Fixed broken Get() and Set() functions in the iScriptObject
-	    implementation; now using the generally accepted convention for
-	    accessing object properties in Perl.
-	  - Got rid of the functions for manipuating void* pointers within
-	    the scripting language since that is difficult in Perl, and
-	    shouldn't be neccessary (use iScriptObject instead.) Now the
-	    type specifier for iScriptObject's in the format strings is %p
-	    instead of %O, we also get rid of some warnings in GCC.
-	  - Replaced the GetType() function which returns the type of an
-	    iScriptObject with an IsType() function which takes a string
-	    parameter, `type,' and returns true if the object is that type,
-	    or is derived from an object of that type, since that is easier
-	    to do in Perl and probably other languages.
-	  - Added reference counting of the internal Perl variables.
-	  - Added #undef free and malloc since Perl headers #define those.
-	  - Added tests for the new iScript methods to perl5test.
-	  
+	    - Fixed broken Get() and Set() functions in the iScriptObject
+	      implementation; now using the generally accepted convention for
+	      accessing object properties in Perl.
+	    - Got rid of the functions for manipuating void* pointers within
+	      the scripting language since that is difficult in Perl, and
+	      shouldn't be neccessary (use iScriptObject instead.) Now the type
+	      specifier for iScriptObject's in the format strings is %p instead
+	      of %O, we also get rid of some warnings in GCC.
+	    - Replaced the GetType() function which returns the type of an
+	      iScriptObject with an IsType() function which takes a string
+	      parameter, `type,' and returns true if the object is that type,
+	      or is derived from an object of that type, since that is easier
+	      to do in Perl and probably other languages.
+	    - Added reference counting of the internal Perl variables.
+	    - Added #undef free and malloc since Perl headers #define those.
+	    - Added tests for the new iScript methods to perl5test.
 31-May-2003
 	- Oktal fixed an error in the Perl plugin that only appeared with
 	  certain versions of Perl, to do with their funny macros.
@@ -150,17 +153,18 @@ The history order is reversed so that new features are at the top.
 	  Win32Assistant and the values are retrieved at it's construction.
 	- Matze fixed a crasher in the maploader.
 	- Duhprey made the following changes to odedynam:
-	  - Added linear and angular global dampening hack.
-	  - Added interface for anonymous colliders in system, these have body
-	    0 in ode terms which makes then immune to gravity and collision
-	    response.
-	  - Modified joint interface to survive being attached to only one
-	    body, the other is attached to body 0 and static on the other end.
-	  - Allowed an arbitrary execute callback for use when a mesh or a 
-	    bone is not attached to a body, but there is a callback handler.
+	    - Added linear and angular global dampening hack.
+	    - Added interface for anonymous colliders in system, these have
+	      body 0 in ode terms which makes then immune to gravity and
+	      collision response.
+	    - Modified joint interface to survive being attached to only one
+	      body, the other is attached to body 0 and static on the other
+	      end.
+	    - Allowed an arbitrary execute callback for use when a mesh or a
+	      bone is not attached to a body, but there is a callback handler.
 	- Duhprey made the following changes to physldr:
-	  - Fixed a few bugs in the parsing.
-	  - Added parse commands for the new features in odedynam.
+	    - Fixed a few bugs in the parsing.
+	    - Added parse commands for the new features in odedynam.
 	- Eric Sunshine made the following changes to the Jam build:
 	    - Removed some leftover junk from LinkStaticPlugins in static.jam.
 	    - Added a hack to Jamrules to allow STATIC.PLUGINLIST work on all
