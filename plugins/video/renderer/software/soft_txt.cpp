@@ -256,6 +256,7 @@ csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
   ResetPalette ();
   read_config (config);
   G2D = iG2D;
+  inv_cmap = NULL;
 }
 
 void csTextureManagerSoftware::SetPixelFormat (csPixelFormat &PixelFormat)
