@@ -66,6 +66,14 @@ chronological order.
 	- Eric Sunshine added a couple missing invocations of
 	  SCF_IMPLEMENTS_INTERFACE(iParticlesStateBase) to the 'particles'
 	  plugin.
+	- Eric Sunshine made the following changes to configure.ac:
+	    - Fixed typographical problems in OpenDivX check which resulted in
+	      syntax error at run-time.
+	    - Fixed bug where the OpenDivX version <4 check was not invoked
+	      when the version >=4 check failed.
+	    - Generalized the -I/usr/local/include and -L/usr/local/lib checks
+	      so that the results apply to all subsequent checks automatically
+	      rather than having to be applied manually to selected checks.
 17-Feb-2004
 	- Jorrit fixed a bug in csPolygonMeshTools::Triangulate(). It would
 	  try to allocate a 0 size array in some cases.

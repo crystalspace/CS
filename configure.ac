@@ -951,27 +951,22 @@ AS_IF([test $cs_cv_prog_cxx_debug != no],
 # complain if it is already in the built-in search path, and we would like to
 # avoid the complaint, if possible.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_LOCAL_INCLUDE],
-    [AS_IF([test -d /usr/local/include],
-	[CS_CHECK_BUILD_FLAGS([if -I/usr/local/include is usable],
-	    [cs_cv_prog_cxx_local_include],
-	    [CS_CREATE_TUPLE([-I/usr/local/include])], [C++],
-	    [cs_cv_prog_cxx_local_include=yes],
-	    [cs_cv_prog_cxx_local_include=no],
-	    [$cs_prog_cxx_enable_warnings $cs_prog_cxx_enable_errors])],
-	[cs_cv_prog_cxx_local_include=no])
-    
-    AS_IF([test $cs_cv_prog_cxx_local_include = yes],
-	[CS_BUILD_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])
-	cs_use_local_include=-I/usr/local/include],
-	[cs_use_local_include=''])])
+AS_IF([test -d /usr/local/include],
+    [CS_CHECK_BUILD_FLAGS([if -I/usr/local/include is usable],
+	[cs_cv_prog_cxx_local_include],
+	[CS_CREATE_TUPLE([-I/usr/local/include])], [C++],
+	[cs_cv_prog_cxx_local_include=yes],
+	[cs_cv_prog_cxx_local_include=no],
+	[$cs_prog_cxx_enable_warnings $cs_prog_cxx_enable_errors])],
+    [cs_cv_prog_cxx_local_include=no])
 
-CS_CHECK_LOCAL_INCLUDE
+AS_IF([test $cs_cv_prog_cxx_local_include = yes],
+    [CS_BUILD_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])
+    CPPFLAGS="$CPPFLAGS -I/usr/local/include"])
 
 AS_IF([test -d /usr/local/lib],
     [CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [-L/usr/local/lib], [+])
-    cs_use_local_lib=-L/usr/local/lib],
-    [cs_use_local_lib=''])
+    LDFLAGS="$LDFLAGS -L/usr/local/lib"])
 
 
 
@@ -1535,8 +1530,7 @@ AC_DEFUN([CS_AL_INCLUDE],
     #endif]])
 
 AC_DEFUN([CS_CHECK_LIBOPENAL],
-    [AC_REQUIRE([CS_CHECK_LOCAL_INCLUDE])
-    AC_REQUIRE([CS_CHECK_COMMON_LIBS])
+    [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
 	[AC_LANG_PROGRAM(
 	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alut.h])],
@@ -1551,8 +1545,8 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
 	CS_CREATE_TUPLE([],[],[-lalut -lopenal -ldsound]) \
 	CS_CREATE_TUPLE([],[],[-lalut -lopenal32 -ldsound])], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libopenal], [OPENAL])], [], [],
-	[$cs_use_local_include $cs_cv_sys_pthread_cflags],
-	[$cs_use_local_lib $cs_cv_sys_pthread_lflags],
+	[$cs_cv_sys_pthread_cflags],
+	[$cs_cv_sys_pthread_lflags],
 	[$cs_cv_sys_pthread_libs $cs_cv_libdl_libs])])
 
 CS_CHECK_LIBOPENAL
@@ -1770,18 +1764,20 @@ CS_CHECK_LIB_WITH([asound],
 #------------------------------------------------------------------------------
 # Check for OpenDivX version 4+ or earlier.
 #------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([divxdecore],
+CS_CHECK_BUILD([for OpenDivX4], [cs_cv_libdivxdecore4],
     [AC_LANG_PROGRAM(
 	[[#include <divx4/decore.h>]],
 	[DEC_MEM_REQS r; decore(0, DEC_OPT_MEMORY_REQS, 0, &r);])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_divxdecore], [OPENDIVX4])])
+    [CS_CREATE_TUPLE([],[],[-ldivxdecore])], [],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libdivxdecore4], [OPENDIVX4])])
 
-AS_IF([test $cs_cv_divxdecore != yes],
-    [CS_CHECK_LIB_WITH([divxdecore],
+AS_IF([test $cs_cv_libdivxdecore4 != yes],
+    [CS_CHECK_BUILD([for OpenDivX], [cs_cv_libdivxdecore],
 	[AC_LANG_PROGRAM(
 	    [[#include <decore.h>]],
 	    [decore(0, DEC_OPT_RELEASE, 0, 0);])],
-	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_divxdecore], [OPENDIVX])])])
+	[CS_CREATE_TUPLE([],[],[-ldivxdecore])], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libdivxdecore], [OPENDIVX])])])
 
 
 

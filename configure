@@ -970,10 +970,6 @@ Optional Packages:
   --with-libasound=dir    specify location of libasound if not detected
                           automatically; searches dir, dir/include, and
                           dir/lib
-  --with-libdivxdecore=dir
-                          specify location of libdivxdecore if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
   --with-libbfd=dir       specify location of libbfd if not detected
                           automatically; searches dir, dir/include, and
                           dir/lib
@@ -11274,8 +11270,6 @@ fi
 # complain if it is already in the built-in search path, and we would like to
 # avoid the complaint, if possible.
 #------------------------------------------------------------------------------
-
-
 if test -d /usr/local/include; then
   echo "$as_me:$LINENO: checking if -I/usr/local/include is usable" >&5
 echo $ECHO_N "checking if -I/usr/local/include is usable... $ECHO_C" >&6
@@ -11438,7 +11432,7 @@ else
 fi
 
 
-    if test $cs_cv_prog_cxx_local_include = yes; then
+if test $cs_cv_prog_cxx_local_include = yes; then
   cs_build_prop_val=`echo x-I/usr/local/include | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
@@ -11447,9 +11441,7 @@ fi
 "
 fi
 
-	cs_use_local_include=-I/usr/local/include
-else
-  cs_use_local_include=''
+    CPPFLAGS="$CPPFLAGS -I/usr/local/include"
 fi
 
 
@@ -11462,9 +11454,7 @@ if test -d /usr/local/lib; then
 "
 fi
 
-    cs_use_local_lib=-L/usr/local/lib
-else
-  cs_use_local_lib=''
+    LDFLAGS="$LDFLAGS -L/usr/local/lib"
 fi
 
 
@@ -22615,7 +22605,6 @@ fi
 
 
 
-
     if test "" != yes; then
   echo "$as_me:$LINENO: checking for OpenAL" >&5
 echo $ECHO_N "checking for OpenAL... $ECHO_C" >&6
@@ -22698,8 +22687,8 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_use_local_include $cs_cv_sys_pthread_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_use_local_lib $cs_cv_sys_pthread_lflags $cs_lflags_save"
+	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_cv_libdl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -22772,8 +22761,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_use_local_include $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_use_local_lib $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs $cs_cv_libdl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libopenal=yes
 		cs_cv_libopenal_cflags=$cs_build_cflags
@@ -22865,8 +22854,8 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_use_local_include $cs_cv_sys_pthread_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_use_local_lib $cs_cv_sys_pthread_lflags $cs_lflags_save"
+	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_cv_libdl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -22939,8 +22928,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_use_local_include $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_use_local_lib $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs $cs_cv_libdl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libopenal=yes
 		cs_cv_libopenal_cflags=$cs_build_cflags
@@ -27517,135 +27506,10 @@ fi
 #------------------------------------------------------------------------------
 # Check for OpenDivX version 4+ or earlier.
 #------------------------------------------------------------------------------
-
-# Check whether --with-libdivxdecore or --without-libdivxdecore was given.
-if test "${with_libdivxdecore+set}" = set; then
-  withval="$with_libdivxdecore"
-
-fi;
-
-    if test -z "$with_libdivxdecore"; then
-  with_libdivxdecore=yes
-fi
-
-    if test "$with_libdivxdecore" != no; then
-  # If --with-lib value is same as cached value, then assume other
-	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libdivxdecore" != "$cs_cv_with_libdivxdecore"; then
-  cs_ignore_cache=yes
-else
-  cs_ignore_cache=no
-fi
-
-
-	if test $with_libdivxdecore != yes; then
-  cs_check_lib_paths=$with_libdivxdecore
-else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
-fi
-
-
-	cs_check_lib_flags=''
-	for cs_check_lib_alias in divxdecore
-	do
-	    for cs_lib_item in $cs_check_lib_paths
-    do
-	case $cs_lib_item in
-	    *\|*)
-    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_check_incdir=''
-else
-  if test "$1" = filler; then
-  cs_check_incdir=''
-else
-  cs_check_incdir=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_check_libdir=''
-else
-  if test "$1" = filler; then
-  cs_check_libdir=''
-else
-  cs_check_libdir=$1
-fi
-
-	shift
-fi
-
-		if test -n "$cs_check_incdir"; then
-  cs_check_lib_cflag="-I$cs_check_incdir"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_check_libdir"; then
-  cs_check_lib_lflag="-L$cs_check_libdir"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "$cs_check_lib_alias"; then
-  cs_check_lib_libs="-l$cs_check_lib_alias"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "$cs_check_lib_alias"; then
-  cs_check_lib_libs="-l$cs_check_lib_alias"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "$cs_check_lib_alias"; then
-  cs_check_lib_libs="-l$cs_check_lib_alias"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		;;
-	esac
-    done
-	done
-
-	if test "$cs_ignore_cache" != yes; then
-  echo "$as_me:$LINENO: checking for libdivxdecore" >&5
-echo $ECHO_N "checking for libdivxdecore... $ECHO_C" >&6
-if test "${cs_cv_libdivxdecore+set}" = set; then
+if test "" != yes; then
+  echo "$as_me:$LINENO: checking for OpenDivX4" >&5
+echo $ECHO_N "checking for OpenDivX4... $ECHO_C" >&6
+if test "${cs_cv_libdivxdecore4+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -27660,7 +27524,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in $cs_check_lib_flags
+    for cs_build_item in `echo @@@-ldivxdecore | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -27785,20 +27649,20 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libdivxdecore=yes
-		cs_cv_libdivxdecore_cflags=$cs_build_cflags
-		cs_cv_libdivxdecore_lflags=$cs_build_lflags
-		cs_cv_libdivxdecore_libs=$cs_build_libs
+	cs_cv_libdivxdecore4=yes
+		cs_cv_libdivxdecore4_cflags=$cs_build_cflags
+		cs_cv_libdivxdecore4_lflags=$cs_build_lflags
+		cs_cv_libdivxdecore4_libs=$cs_build_libs
 else
-  cs_cv_libdivxdecore=no
+  cs_cv_libdivxdecore4=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_libdivxdecore" >&5
-echo "${ECHO_T}$cs_cv_libdivxdecore" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libdivxdecore4" >&5
+echo "${ECHO_T}$cs_cv_libdivxdecore4" >&6
 else
-  echo "$as_me:$LINENO: checking for libdivxdecore" >&5
-echo $ECHO_N "checking for libdivxdecore... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for OpenDivX4" >&5
+echo $ECHO_N "checking for OpenDivX4... $ECHO_C" >&6
 	    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -27811,7 +27675,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in $cs_check_lib_flags
+    for cs_build_item in `echo @@@-ldivxdecore | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -27936,35 +27800,20 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libdivxdecore=yes
-		cs_cv_libdivxdecore_cflags=$cs_build_cflags
-		cs_cv_libdivxdecore_lflags=$cs_build_lflags
-		cs_cv_libdivxdecore_libs=$cs_build_libs
+	cs_cv_libdivxdecore4=yes
+		cs_cv_libdivxdecore4_cflags=$cs_build_cflags
+		cs_cv_libdivxdecore4_lflags=$cs_build_lflags
+		cs_cv_libdivxdecore4_libs=$cs_build_libs
 else
-  cs_cv_libdivxdecore=no
+  cs_cv_libdivxdecore4=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_libdivxdecore" >&5
-echo "${ECHO_T}$cs_cv_libdivxdecore" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libdivxdecore4" >&5
+echo "${ECHO_T}$cs_cv_libdivxdecore4" >&6
 fi
 
-    if test $cs_cv_libdivxdecore = yes; then
-  :
-else
-  cs_cv_libdivxdecore_cflags=''
-	cs_cv_libdivxdecore_lflags=''
-	cs_cv_libdivxdecore_libs=''
-
-fi
-
-else
-  cs_cv_libdivxdecore=no
-fi
-
-
-    cs_cv_with_libdivxdecore="$with_libdivxdecore"
-    if test "$cs_cv_libdivxdecore" = yes; then
-  if test "$cs_cv_divxdecore" = yes; then
+    if test $cs_cv_libdivxdecore4 = yes; then
+  if test "$cs_cv_libdivxdecore4" = yes; then
   cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OPENDIVX4.AVAILABLE = $cs_build_prop_val
@@ -27973,7 +27822,7 @@ fi
 "
 fi
 
-	cs_build_prop_val=`echo x$cs_cv_divxdecore_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_prop_val=`echo x$cs_cv_libdivxdecore4_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OPENDIVX4.CFLAGS = $cs_build_prop_val
 "
@@ -27981,7 +27830,7 @@ fi
 "
 fi
 
-	cs_build_prop_val=`echo x$cs_cv_divxdecore_lflags $cs_cv_divxdecore_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_prop_val=`echo x$cs_cv_libdivxdecore4_lflags $cs_cv_libdivxdecore4_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OPENDIVX4.LFLAGS = $cs_build_prop_val
 "
@@ -27991,138 +27840,18 @@ fi
 
 fi
 
-fi
-
-
-if test $cs_cv_divxdecore != yes; then
-
-# Check whether --with-libdivxdecore or --without-libdivxdecore was given.
-if test "${with_libdivxdecore+set}" = set; then
-  withval="$with_libdivxdecore"
-
-fi;
-
-    if test -z "$with_libdivxdecore"; then
-  with_libdivxdecore=yes
-fi
-
-    if test "$with_libdivxdecore" != no; then
-  # If --with-lib value is same as cached value, then assume other
-	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libdivxdecore" != "$cs_cv_with_libdivxdecore"; then
-  cs_ignore_cache=yes
 else
-  cs_ignore_cache=no
+  cs_cv_libdivxdecore4_cflags=''
+	cs_cv_libdivxdecore4_lflags=''
+	cs_cv_libdivxdecore4_libs=''
+
 fi
 
 
-	if test $with_libdivxdecore != yes; then
-  cs_check_lib_paths=$with_libdivxdecore
-else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
-fi
-
-
-	cs_check_lib_flags=''
-	for cs_check_lib_alias in divxdecore
-	do
-	    for cs_lib_item in $cs_check_lib_paths
-    do
-	case $cs_lib_item in
-	    *\|*)
-    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_check_incdir=''
-else
-  if test "$1" = filler; then
-  cs_check_incdir=''
-else
-  cs_check_incdir=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_check_libdir=''
-else
-  if test "$1" = filler; then
-  cs_check_libdir=''
-else
-  cs_check_libdir=$1
-fi
-
-	shift
-fi
-
-		if test -n "$cs_check_incdir"; then
-  cs_check_lib_cflag="-I$cs_check_incdir"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_check_libdir"; then
-  cs_check_lib_lflag="-L$cs_check_libdir"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "$cs_check_lib_alias"; then
-  cs_check_lib_libs="-l$cs_check_lib_alias"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "$cs_check_lib_alias"; then
-  cs_check_lib_libs="-l$cs_check_lib_alias"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "$cs_check_lib_alias"; then
-  cs_check_lib_libs="-l$cs_check_lib_alias"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		;;
-	esac
-    done
-	done
-
-	if test "$cs_ignore_cache" != yes; then
-  echo "$as_me:$LINENO: checking for libdivxdecore" >&5
-echo $ECHO_N "checking for libdivxdecore... $ECHO_C" >&6
+if test $cs_cv_libdivxdecore4 != yes; then
+  if test "" != yes; then
+  echo "$as_me:$LINENO: checking for OpenDivX" >&5
+echo $ECHO_N "checking for OpenDivX... $ECHO_C" >&6
 if test "${cs_cv_libdivxdecore+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -28138,7 +27867,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in $cs_check_lib_flags
+    for cs_build_item in `echo @@@-ldivxdecore | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -28275,8 +28004,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_libdivxdecore" >&5
 echo "${ECHO_T}$cs_cv_libdivxdecore" >&6
 else
-  echo "$as_me:$LINENO: checking for libdivxdecore" >&5
-echo $ECHO_N "checking for libdivxdecore... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for OpenDivX" >&5
+echo $ECHO_N "checking for OpenDivX... $ECHO_C" >&6
 	    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -28289,7 +28018,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in $cs_check_lib_flags
+    for cs_build_item in `echo @@@-ldivxdecore | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -28427,22 +28156,7 @@ echo "${ECHO_T}$cs_cv_libdivxdecore" >&6
 fi
 
     if test $cs_cv_libdivxdecore = yes; then
-  :
-else
-  cs_cv_libdivxdecore_cflags=''
-	cs_cv_libdivxdecore_lflags=''
-	cs_cv_libdivxdecore_libs=''
-
-fi
-
-else
-  cs_cv_libdivxdecore=no
-fi
-
-
-    cs_cv_with_libdivxdecore="$with_libdivxdecore"
-    if test "$cs_cv_libdivxdecore" = yes; then
-  if test "$cs_cv_divxdecore" = yes; then
+  if test "$cs_cv_libdivxdecore" = yes; then
   cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OPENDIVX.AVAILABLE = $cs_build_prop_val
@@ -28451,7 +28165,7 @@ fi
 "
 fi
 
-	cs_build_prop_val=`echo x$cs_cv_divxdecore_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_prop_val=`echo x$cs_cv_libdivxdecore_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OPENDIVX.CFLAGS = $cs_build_prop_val
 "
@@ -28459,7 +28173,7 @@ fi
 "
 fi
 
-	cs_build_prop_val=`echo x$cs_cv_divxdecore_lflags $cs_cv_divxdecore_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_prop_val=`echo x$cs_cv_libdivxdecore_lflags $cs_cv_libdivxdecore_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OPENDIVX.LFLAGS = $cs_build_prop_val
 "
@@ -28468,6 +28182,11 @@ fi
 fi
 
 fi
+
+else
+  cs_cv_libdivxdecore_cflags=''
+	cs_cv_libdivxdecore_lflags=''
+	cs_cv_libdivxdecore_libs=''
 
 fi
 
