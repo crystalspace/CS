@@ -13,11 +13,13 @@ The history order is reversed so that new features are at the top.
 	      tweaks.
 	    - CS_INITIALIZE_PLATFORM_APPLICATION is now employed in
 	      csInitializer::InitializeSCF().
+	    - Removed ugly main() renaming hack for Win32.
 	    - csInitializer::SetupConfigManager() now attempts to create
 	      a platform-specific configuration instance for the user
 	      configuration. Falls back to old user.cfg mechanism if
 	      csGetPlatformConfig() returns 0.
-	    - 
+	    - Added a dummy csGetPlatformConfig() in 
+	      libs/cssys/general/platformcfg.cpp.
 8-Jun-2003
 	- Eric Sunshine fixed problems in csInitializer::CloseApplication() and
 	  csInitializer::DestroyApplication() where they threw assertion
