@@ -24,7 +24,7 @@
 #include "csutil/csobject.h"
 #include "itexture/iproctex.h"
 #include "iengine/texture.h"
-#include "iutil/event.h"
+#include "iutil/eventh.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
