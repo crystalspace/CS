@@ -159,9 +159,12 @@ public:
    * Setup the config manager. If you have no config file then you can still
    * call this routine using a NULL parameter. If you don't call this then
    * either RequestPlugins() or Initialize() will call this routine with
-   * NULL parameter.
+   * NULL parameter. The 'ApplicationID' parameter is used to determine the
+   * correct user-specific domain. It is possibly overriden by the application
+   * config file option "System.ApplicationID".
    */
-  static bool SetupConfigManager (iObjectRegistry*, const char* configName);
+  static bool SetupConfigManager (iObjectRegistry*, const char* configName,
+    const char *ApplicationID = "Noname");
 
   /**
    * Request a few widely used standard plugins and also read

@@ -194,7 +194,7 @@ bool csInitializer::SetupCommandLineParser (
 }
 
 bool csInitializer::SetupConfigManager (
-  iObjectRegistry* r, const char* configName)
+  iObjectRegistry* r, const char* configName, const char *AppID)
 {
   if (config_done) return true;
 
@@ -255,7 +255,7 @@ bool csInitializer::SetupConfigManager (
 
       // open the user-and-application-specific config domain
       cfg = new csPrefixConfig ("/config/user.cfg", VFS,
-      	cfgacc->GetStr ("System.ApplicationID", "Noname"),
+      	cfgacc->GetStr ("System.ApplicationID", AppID),
         "User.Application");
       Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserApp);
       Config->SetDynamicDomain (cfg);
