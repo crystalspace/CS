@@ -30,7 +30,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # Non-Unix OpenGL renderer do not need the X11 libs
-ifndef OPENGL.LIBS.DEFINED
+ifndef LIBS.GL3D.SYSTEM
 
 LIBS.LOCAL.GL3D+=-L$(X11_PATH)/lib -lXext -lX11
 
@@ -52,9 +52,9 @@ CFLAGS.GL3D+=-I$(X11_PATH)/include
 
 else
 
-LIBS.LOCAL.GL3D+=$(OPENGL.LIBS.DEFINED)
+LIBS.LOCAL.GL3D+=$(LIBS.GL3D.SYSTEM)
 
-endif # OPENGL.LIBS.DEFINED
+endif # LIBS.GL3D.SYSTEM
 
 # The 3D OpenGL driver
 ifeq ($(USE_SHARED_PLUGINS),yes)

@@ -161,9 +161,8 @@ LINK=@$(OS2LINK) --linker=$(LD) --description="$(DESCRIPTION.$@)" --verbose --ou
 LFLAGS.CONSOLE.EXE=--console
 
 # Defineds for OpenGL 3D driver
-OPENGL.LIBS.DEFINED=1
+LIBS.GL3D.SYSTEM=-lopengl
 CFLAGS.GL3D+=-I/toolkit/h
-LIBS.LOCAL.GL3D+=-lopengl
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
