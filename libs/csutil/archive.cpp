@@ -25,9 +25,12 @@
 #define CS_SYSDEF_PROVIDE_ACCESS
 #include "cssysdef.h"
 #include "cssys/csendian.h"
-#include "csutil/util.h"
 #include "csutil/archive.h"
+#include "csutil/csstring.h"
+#include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
 #include "csutil/snprintf.h"
+#include "csutil/util.h"
 #include "iutil/vfs.h"	// For csFileTime
 
 // Default compression method to use when adding entries (there is no choice for now)
@@ -93,12 +96,80 @@ csArchive::~csArchive ()
   }
 }
 
+csArchive::ArchiveEntry *csArchive::CreateArchiveEntry (const char *name, size_t size, bool pack)
+{
+  ZIP_central_directory_file_header cdfh;
+
+  memset (&cdfh, 0, sizeof (cdfh));
+  cdfh.version_made_by[0] = 0x16;		/* Zip version 2.2 rev 6 ??? */
+  cdfh.version_made_by[1] = 0x06;
+  cdfh.version_needed_to_extract[0] = 20;       /* Unzip version 2.0 rev 0 */
+  cdfh.version_needed_to_extract[1] = 00;
+  if (pack)
+    cdfh.compression_method = DEFAULT_COMPRESSION_METHOD;
+  else
+    cdfh.compression_method = ZIP_STORE;
+  cdfh.ucsize = size;
+
+  ArchiveEntry *f = new ArchiveEntry (name, cdfh);
+
+  time_t curtime = time (0);
+  struct tm *curtm = localtime (&curtime);
+  csFileTime ft;
+  ASSIGN_FILETIME (ft, *curtm);
+  SetFileTime ((void *)f, ft);
+
+  return f;
+}
+
 void csArchive::ReadDirectory ()
 {
   if (dir.Length ())
     return;                     /* Directory already read */
 
   ReadZipDirectory (file);
+
+  //// After reading, ensure that a node entry exists in memory for every
+  //// directory component even if the physical archive file does not contain
+  //// the corresponding directory entries (which are optional in zip files).
+
+  // First, make a list of all possible directory components.
+  csString filename;
+  csSet<char*, csConstCharHashKeyHandler> dset;
+  for (int i = 0, n = dir.Length(); i < n; i++)
+  {
+    ArchiveEntry const* e = dir.Get (i);
+    filename = e->filename;
+    char* sep = filename.GetData();
+    while (sep)
+    {
+      char* slash = strchr(sep, '/');
+      if (slash == 0)
+        slash = strchr (sep, PATH_SEPARATOR);
+      sep = slash;
+      if (sep != 0)
+      {
+        char const ch = *++sep;
+	*sep = 0;
+        if (!dset.In(filename.GetData()))
+          dset.AddNoTest(strdup(filename)); // String is freed below.
+        *sep = ch;
+      }
+    }
+  }
+
+  // Now, iterate over `dset' and create fake directory components.
+  csSet<char*, csConstCharHashKeyHandler>::GlobalIterator it = dset.GetIterator();
+  while (it.HasNext())
+  {
+    char* dname = it.Next();
+    if (!FileExists (dname))
+    {
+      ArchiveEntry* f = CreateArchiveEntry(dname, 0, 0);
+      dir.InsertSorted (f, dir.Compare);
+    }
+    free(dname); // Free string we allocated above and stored in `dset'.
+  }
 }
 
 void csArchive::ReadZipDirectory (FILE *infile)
@@ -167,14 +238,6 @@ void csArchive::ReadZipDirectory (FILE *infile)
              || (fread (buff, 1, cdfh.filename_length, infile) < cdfh.filename_length))
               return;           /* Broken zipfile? */
             buff[cdfh.filename_length] = 0;
-
-            if ((buff[cdfh.filename_length - 1] == '/')
-             || (buff[cdfh.filename_length - 1] == PATH_SEPARATOR))
-            {
-              if (fseek (infile, cdfh.extra_field_length + cdfh.file_comment_length, SEEK_CUR))
-                return;         /* Broken zipfile? */
-              continue;
-            } /* endif */
 
             ArchiveEntry *curentry = InsertEntry (buff, cdfh);
             if (!curentry->ReadExtraField (infile, cdfh.extra_field_length)
@@ -393,30 +456,8 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
 void *csArchive::NewFile (const char *name, size_t size, bool pack)
 {
   DeleteFile (name);
-
-  ZIP_central_directory_file_header cdfh;
-
-  memset (&cdfh, 0, sizeof (cdfh));
-  cdfh.version_made_by[0] = 0x16;		/* Zip version 2.2 rev 6 ??? */
-  cdfh.version_made_by[1] = 0x06;
-  cdfh.version_needed_to_extract[0] = 20;       /* Unzip version 2.0 rev 0 */
-  cdfh.version_needed_to_extract[1] = 00;
-  if (pack)
-    cdfh.compression_method = DEFAULT_COMPRESSION_METHOD;
-  else
-    cdfh.compression_method = ZIP_STORE;
-  cdfh.ucsize = size;
-
-  ArchiveEntry *f = new ArchiveEntry (name, cdfh);
-
-  time_t curtime = time (0);
-  struct tm *curtm = localtime (&curtime);
-  csFileTime ft;
-  ASSIGN_FILETIME (ft, *curtm);
-  SetFileTime ((void *)f, ft);
-
+  ArchiveEntry *f = CreateArchiveEntry(name, size, pack);
   lazy.Push (f);
-
   return (void *)f;
 }
 

@@ -114,9 +114,11 @@ private:
   void UpdateDirectory ();
   void ReadZipDirectory (FILE *infile);
   ArchiveEntry *InsertEntry (const char *name,
-	ZIP_central_directory_file_header &cdfh);
+    ZIP_central_directory_file_header &cdfh);
   void ReadZipEntries (FILE *infile);
   char *ReadEntry (FILE *infile, ArchiveEntry *f);
+  ArchiveEntry *CreateArchiveEntry (const char *name,
+    size_t size = 0, bool pack = true);
 
 public:
   /// Open the archive.

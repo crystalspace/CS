@@ -21,6 +21,14 @@ chronological order.
 	  alternative algorithm to do tesselation.
 	- Eric Sunshine eliminated signed versus unsigned compilation warning
 	  from impnames.cpp.
+	- Eric Sunshine applied a patch to csArchive and csVFS from Fritz
+	  Elfert <felfert@to.com> which fixes methods, such as FileExists(), so
+	  that they work correctly for directory names even if an explicit
+	  directory entry does not exist in the zip file.  This means that if a
+	  zip files contains the single entry "foo/bar/cow.txt", FileExists()
+	  will now correctly return true for "foo" and "foo/bar".  Previously,
+	  it would return false.  Eric also applied a bit of cleanup to the
+	  patch to reduce coupling and increase safety.
 19-Oct-2003
 	- res fixed a bug in the OR polygon buffers: when two polygons 
 	  subsequently passed into AddPolygon() would have different lightmaps,

@@ -1210,6 +1210,11 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
          && csGlobMatches (fname, Mask))
 	{
           size_t cur = sl;
+
+          // Do not return an entry for the directory itself.
+          if (fname[cur] == 0)
+            continue;
+
 	  while (cur < fnl)
 	  {
 	    if (fname [cur] == VFS_PATH_SEPARATOR)
