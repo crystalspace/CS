@@ -35,8 +35,21 @@ SCF_VERSION (iPath, 0, 0, 1);
  * This is particularly useful in combination with
  * csReversibleTransform::LookAt().
  */
-struct iPath
+struct iPath : public iBase
 {
+  /**
+   * Return the number of points defining the path.  Calling this
+   * GetPointCount as in the real classes causes MANY ambiguous
+   * function call errors in msvc7.
+   */
+  virtual int Length () = 0;
+
+  /// Calculate internal values for this spline given some time value.
+  virtual void CalculateAtTime (float time) = 0;
+
+  /// Get the index of the current point we are in (valid after Calculate()).
+  virtual int GetCurrentIndex () = 0;
+
   /// Set the position vectors (first three dimensions of the cubic spline).
   virtual void SetPositionVectors (csVector3* v) = 0;
 
@@ -63,6 +76,12 @@ struct iPath
 
   /// Get one forward vector.
   virtual void GetForwardVector (int idx, csVector3& v) = 0;
+
+  /// Get one time value
+  virtual float GetTime (int idx) = 0;
+
+  /// Set one time value
+  virtual void SetTime (int idx, float t) = 0;
 
   /// Get the interpolated position.
   virtual void GetInterpolatedPosition (csVector3& pos) = 0;
