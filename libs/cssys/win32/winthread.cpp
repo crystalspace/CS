@@ -75,7 +75,7 @@ bool csWinMutex::LockWait()
 
 bool csWinMutex::LockTry ()
 {
-  bool rc = (WaitForSingleObject (mutex, 1) != WAIT_FAILED);
+  bool rc = (WaitForSingleObject (mutex, 0) != WAIT_FAILED);
   CS_TEST (rc);
   return rc;
 }
@@ -124,7 +124,7 @@ bool csWinSemaphore::LockWait ()
 
 bool csWinSemaphore::LockTry ()
 {
-  bool rc = (WaitForSingleObject (sem, 1) != WAIT_FAILED);
+  bool rc = (WaitForSingleObject (sem, 0) != WAIT_FAILED);
   if (rc)
     value--;
   CS_TEST (rc);
