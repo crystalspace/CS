@@ -62,7 +62,6 @@ csGLShaderFFP::csGLShaderFFP(csGLShader_FIXED* shaderPlug) :
 
 csGLShaderFFP::~csGLShaderFFP ()
 {
-  if (validProgram) Deactivate();
 }
 
 void csGLShaderFFP::Report (int severity, const char* msg, ...)
