@@ -248,11 +248,11 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     NXRect vr; [v getBounds:&vr];
     [v convertPoint:&vr.origin toView:0];
     [w convertBaseToScreen:&vr.origin];
-    int const ALIGN = (1 << 3);		// 8
+    int const ALIGN = (1 << 3) - 1;	// 8-pixel alignment
     int x = int( vr.origin.x );
-    if ((x & (ALIGN - 1)) != 0)
+    if ((x & ALIGN) != 0)
 	{
-	x = (x + ALIGN) & ~(ALIGN - 1);
+	x &= ~ALIGN;
 	NXRect wr; [w getFrame:&wr];
 	float const dx = vr.origin.x - wr.origin.x;
 	[w moveTo:(x - dx):wr.origin.y];
@@ -342,18 +342,6 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     if (sender == animationWindow)
 	[self adjustWindowPosition:animationWindow];
     return self;
-    }
-
-
-//-----------------------------------------------------------------------------
-// isEvent:shift:alt:ctrl: -- Extract shift, alt, ctrl flags from event.
-//-----------------------------------------------------------------------------
-- (void)isEvent:(NXEvent const*)p shift:(bool*)s alt:(bool*)a ctrl:(bool*)c
-    {
-    int const flags = p->flags;
-    *s = (flags & NX_SHIFTMASK    ) != 0;
-    *s = (flags & NX_ALTERNATEMASK) != 0;
-    *s = (flags & NX_CONTROLMASK  ) != 0;
     }
 
 
@@ -549,10 +537,8 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     if (!paused)
 	{
 	int x, y;
-	bool shift, alt, ctrl;
 	[self localize:p toView:v x:&x y:&y];
-	[self isEvent:p shift:&shift alt:&alt ctrl:&ctrl];
-	proxy->mouse_down( button, x, y, shift, alt, ctrl );
+	proxy->mouse_down( button, x, y, stateShift, stateAlt, stateCtrl );
 	}
     }
 

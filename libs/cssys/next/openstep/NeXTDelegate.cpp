@@ -185,11 +185,11 @@ enum
     NSView* const v = [w contentView];	// The NeXTView.
     NSPoint const p =
 	[w convertBaseToScreen:[v convertPoint:[v bounds].origin toView:0]];
-    int const ALIGN = (1 << 3);		// 8
+    int const ALIGN = (1 << 3) - 1;	// 8-pixel alignment
     int x = int( p.x );
-    if ((x & (ALIGN - 1)) != 0)
+    if ((x & ALIGN) != 0)
 	{
-	x = (x + ALIGN) & ~(ALIGN - 1);
+	x &= ~ALIGN;
 	NSRect const wr = [w frame];
 	float const dx = p.x - wr.origin.x;
 	[w setFrameOrigin:NSMakePoint(x - dx, wr.origin.y)];
@@ -270,18 +270,6 @@ enum
     {
     if ([n object] == animationWindow)
 	[self adjustWindowPosition:animationWindow];
-    }
-
-
-//-----------------------------------------------------------------------------
-// isEvent:shift:alt:ctrl: -- Extract shift, alt, ctrl flags from event.
-//-----------------------------------------------------------------------------
-- (void)isEvent:(NSEvent*)p shift:(bool*)s alt:(bool*)a ctrl:(bool*)c
-    {
-    unsigned int const flags = [p modifierFlags];
-    *s = (flags & NSShiftKeyMask    ) != 0;
-    *s = (flags & NSAlternateKeyMask) != 0;
-    *s = (flags & NSControlKeyMask  ) != 0;
     }
 
 
@@ -489,10 +477,8 @@ enum
     if (!paused)
 	{
 	int x, y;
-	bool shift, alt, ctrl;
 	[self localize:p toView:v x:&x y:&y];
-	[self isEvent:p shift:&shift alt:&alt ctrl:&ctrl];
-	proxy->mouse_down( button, x, y, shift, alt, ctrl );
+	proxy->mouse_down( button, x, y, stateShift, stateAlt, stateCtrl );
 	}
     }
 
