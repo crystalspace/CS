@@ -90,6 +90,16 @@ chronological order.
 	      Jam-based msvcgen facility.  The generated project files are now
 	      (finally) compatible with the ones produced by the GNU make-based
 	      msvcgen facility, and are suitable for actual use.
+	- Eric Sunshine fixed bug in "missing file type" warning in
+	  CompileObject rule in objects.jam.  It was referencing wrong input
+	  argument.
+	- Eric Sunshine converted jobber.pl to utilize Jam for all maintenance
+	  tasks, rather than using GNU make.  (Unfortunately, this is not yet
+	  installed on the SourceForge shell machine.  With CVS access so
+	  critically slow -- nearly two hours for a "cvs update", let alone an
+	  actual checkout -- it is not possible to check if the changes to
+	  jobber.pl are entirely correct.  Consequently, it can not yet be
+	  placed into production.)
 20-Apr-2004
 	- Jorrit added 'camera_origin' to csRenderMesh. The meshes will
 	  fill this field with the origin of that mesh in camera space. This
