@@ -23,7 +23,7 @@
 #include "NeXTDriver2D.h"
 #include "cscom/com.h"
 
-#define DLL_NAME "libnext2d.dylib"
+#define DLL_NAME "next2d.so"
 
 static unsigned int FACTORY_REF_COUNT = 0;
 
@@ -69,10 +69,10 @@ void NeXT2DUnregister ()
 //=============================================================================
 #else // CS_STATIC_LINKED
 
-void STDAPICALLTYPE ModuleRelease() { FACTORY_REF_COUNT--; }
-void STDAPICALLTYPE ModuleAddRef()  { FACTORY_REF_COUNT++; }   
-STDAPI DllRegisterServer()   { return csRegisterServer( &COM_REG_DATA ); }
-STDAPI DllUnregisterServer() { return csRegisterServer( &COM_REG_DATA ); }
+EXTERN_C void STDAPICALLTYPE ModuleRelease() { FACTORY_REF_COUNT--; }
+EXTERN_C void STDAPICALLTYPE ModuleAddRef()  { FACTORY_REF_COUNT++; }   
+STDAPI DllRegisterServer()   { return csRegisterServer  ( &COM_REG_DATA ); }
+STDAPI DllUnregisterServer() { return csUnregisterServer( &COM_REG_DATA ); }
 STDAPI DllCanUnloadNow() { return (FACTORY_REF_COUNT == 0) ? S_OK: S_FALSE; }
 
 //-----------------------------------------------------------------------------

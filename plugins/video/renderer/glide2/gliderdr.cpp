@@ -24,8 +24,6 @@
 #define DLL_NAME "Glide2xRender.dll"
 #elif defined (OS_MACOS)
 #define DLL_NAME "Glide2xRender.shlb"
-#elif defined (OS_NEXT)
-#define DLL_NAME "Glide2xRender.dylib"
 #else
 #define DLL_NAME "Glide2xRender.so"
 #endif
@@ -54,12 +52,12 @@ static DllRegisterData gb_regDataDefault=
   DLL_NAME,
 };
 
-void STDAPICALLTYPE ModuleAddRef()
+EXTERN_C void STDAPICALLTYPE ModuleAddRef()
 {
   gb_cRef++;
 }
 
-void STDAPICALLTYPE ModuleRelease()
+EXTERN_C void STDAPICALLTYPE ModuleRelease()
 {
   gb_cRef--;
 }
@@ -108,7 +106,7 @@ STDAPI DllUnregisterServer()
 #ifdef IS_DEFAULT  
   HRESULT hRes;
   
-  hRes = csRegisterServer(&gb_regDataDefault);
+  hRes = csUnregisterServer(&gb_regDataDefault);
   if (FAILED(hRes))
     return hRes;
 #endif
