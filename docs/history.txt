@@ -13,7 +13,24 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+3-Nov-1999
+	- Removed init of four function pointers in OpenGL driver because
+	  gcc fails on them.
 2-Nov-1999
+	- Added -lmgrid and -lmonly commandline option for software renderer.
+	  -lmgrid adds an extra grid to every lightmap lumel. -lmonly doesn't
+	  do texture mapping but only applies the lightmap. Both are debugging
+	  options. The functionality for those options was still present in CS
+	  but it wasn't possible to enable it anymore.
+	- Added '-cache/-nocache' commandline options to disable caching of lightmaps.
+	  This is useful when testing lighting to speed up the starting process because
+	  caching takes a lot of time.
+	- Added message to initialization that indicates how much seconds were
+	  used to calculate lighting.
+	- Optimized quadtree lighting routines. Now lighting dmburg calculates
+	  in half the time (from 137 seconds to 66 seconds).
+	  Note that I had to disable this optimization because it is not
+	  yet compatible with old style portal levels.
 	- Eric Sunshine fixed a problem which was recently introduced into
 	  csLoader and caused the application to crash during parsing of many
 	  of the standard levels (maze, large, flarge, etc.).  The problem was
@@ -35,9 +52,16 @@ Short-term cleanups that need to be done:
 	  cs[XYZ]RotMatrix3 classes.
 	- Eric Sunshine eliminated some compiler warnings in csEngine reported
 	  by Furqan Ullah <furqan@writeme.com>.
+	- Brandon Ehle added newdoc directory with LaTeX documentation.
+	- Alex Pfaffe added some fixes to terrain engine.
+	  He fixed an orientation problem with the terrain. It now
+	  renders correctly.
+	- Updates to Macintosh project files from Robert Bate.
 1-Nov-1999
 	- Eric Sunshine eliminated some compiler warnings issued by
 	  VC++ 5.0.
+	- Seth Galbraith did some changes to lighting. He added several
+	  types of lighting attenuation.
 31-Oct-1999
 	- Eric Sunshine moved the Python detection code from unixconf.sh to
 	  haspythn.sh since it is needed by platforms which do not invoke
@@ -46,6 +70,41 @@ Short-term cleanups that need to be done:
 	  invoked so that Seth can use the 'linux' target from DOS. :-O
 	- Eric Sunshine fixed a number of syntactic problems which were
 	  recently introduced into csColor.h.
+	- Gary Haussman did various changes to OpenGL renderer:
+	   - Moved mipmap handling into texture cache code. All mipmap
+	     calculations are now done by OpenGL except for the construction
+	     of the mipmap textures.
+	   - Completed multitexture shortcut. Test under software Mesa;
+	     some functionality is needed to work under Win.
+	   - Collected the jumble of class member variables into
+	     semi-intuitive groups. Deleted some superflous variables.
+30-Oct-1999
+	- Optimized quadtree so that it takes even less memory.
+28-Oct-1999
+	- Update to project files from Thomas Hieber.
+	- Updates to terrain engine from Alex Pfaffe.
+	- Andrew Zabolotny did a temporary fix to cspython.mak again.
+	- Several renames of docs done by Seth Galbraith.
+27-Oct-1999
+	- Fix from Stephan Goetter: additional check for proper format of
+	  image files.
+	- Fixes to cspython from Brandon Ehle.
+	- Brandon also added BCB4 convertor for VC project files.
+	- Gary Haussman did some changes to the OpenGL 3D Rasterizer:
+	    - Bulked up member initializer list.
+	    - Moved texture deletion so that it occurs just before closing
+	      the window. This *might* eliminate some of the crashes at
+	      exit when using OpenGL.
+	    - Slimmed down lightmap blend configuration code.
+	    - Added 'shortcut' methods to allow certain hardware
+	      configurations to detect and render polygons in an
+	      optimized manner where possible. The first planned shortcut
+	      methods include rendering using multitexture and batching
+	      up FX polygon drawing.
+	- Started fundamental speed optimizations in the lighting routines.
+	  These can make a huge difference! Speed optimization is based on
+	  using the quadtree for calculating shadows instead of the shadow
+	  frustrum list.
 26-Oct-1999
 	- Eric Sunshine fixed a bug which was causing the engine to crash
 	  when a non-coplaner polygon was found in a world.
@@ -65,12 +124,18 @@ Short-term cleanups that need to be done:
 	- Brandon also added the start for cspython.
 	- Seth Galbraith addded a new way to align textures on polygons.
 	  You can use vertex indices in ORIG, FIRST, and SECOND instead
-	  of x,y,z coordinates. Note that this is NOT done for templates
-	  yet.
+	  of x,y,z coordinates.
+	- Seth also rewrote load_matrix so that there are SCALE tokens
+	  and more (and more foolproof) ways to enter rotation and scale.
+	- Seth added logo to some of the CS docs and added a general
+	  index.htm file for accessing all the documents.
 	- Robert Bate fixed Mac port for recent changes.
 	- Fixed a bug in polygon splitters. It could happen that polygons
 	  were split to degenerate polygons (with only one or two vertices).
 	  This caused problems with lighting and even crashes.
+	- Eric Sunshine made BUGGY_EGCS_COMPILER=yes the default to prevent
+	  confusing first-time users.
+	- CrystalClear updates from Michael Dale Long.
 25-Oct-1999
 	- CrystalClear updates from Michael Dale Long.
 	- FINALLY fixed the bug in the quadcube!!! Lighting shadow
