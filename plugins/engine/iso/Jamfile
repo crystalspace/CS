@@ -1,8 +1,0 @@
-SubDir TOP plugins engine iso ;
-
-Description iso : "isometric engine" ;
-
-Plugin iso
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith iso : csgeom csgfx csutil ;

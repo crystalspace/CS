@@ -9,6 +9,13 @@ chronological order.
 4-Jun-2004
         - Andrew Craig removed misplaced return in sprcal3d as reported by
           Ingie from the mailing list.
+	- Jorrit finally bit the bullet and removed the iso engine. The old
+	  iso engine sources (and loader) are tagged with the ISO_OBSOLETE
+	  tag so you can get them back if you want. Note that I did NOT
+	  remove the 'isotest' application! Instead the isotest application
+	  has been rewritten to use the 3D engine and it 'simulates' isometric
+	  view only in the way that the camera moves. It does require new
+	  renderer though as it uses stencil shadows.
 3-Jun-2004
 	- Eric Sunshine added MsvcGenVariable rule to msvcgen.jam, which allows
 	  clients to create msvcgen %foo%-style template variables on-the-fly.

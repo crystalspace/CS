@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
-    Copyright (C) 2001 by W.C.A. Wijngaards
+    Copyright (C) 2004 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,72 +20,49 @@
 #define __ISOTEST_H__
 
 #include <stdarg.h>
-#include "csgeom/math2d.h"
-#include "csgeom/math3d.h"
+#include "csutil/ref.h"
 
-struct iIsoEngine;
-struct iIsoView;
-struct iIsoWorld;
-struct iIsoSprite;
-struct iIsoLight;
+struct iEngine;
 struct iLoader;
-struct iFont;
-struct iMaterialWrapper;
-struct iKeyboardDriver;
-struct iMouseDriver;
-struct iObjectRegistry;
 struct iGraphics3D;
-struct iGraphics2D;
+struct iKeyboardDriver;
 struct iVirtualClock;
+struct iObjectRegistry;
+struct iEvent;
+struct iSector;
+struct iView;
+struct iMeshWrapper;
+struct iLight;
 
 class IsoTest
 {
-public:
-  iObjectRegistry* object_reg;
-
 private:
-  /// the iso engine
-  csRef<iIsoEngine> engine;
-  /// world to display, the 'level'
-  csRef<iIsoWorld> world;
-  /// view on the world, the 'camera'
-  csRef<iIsoView> view;
-  /// G2D plugin
-  csRef<iGraphics2D> myG2D;
-  /// G3D plugin
-  csRef<iGraphics3D> myG3D;
-  /// Generic keyboard driver
+  iObjectRegistry* object_reg;
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
   csRef<iKeyboardDriver> kbd;
-  /// Generic mouse driver
-  csRef<iMouseDriver> mouse;
   csRef<iVirtualClock> vc;
+  iSector* room;
+  csRef<iView> view;
+  csRef<iMeshWrapper> actor;
+  iMeshWrapper* plane;
+  csRef<iLight> actor_light;
 
-  /// the font for text display
-  csRef<iFont> font;
-  /// the player sprite
-  csRef<iIsoSprite> player;
-  /// the light
-  csRef<iIsoLight> light;
-
-  /// to keep track of mouseclicks and actions. last click pos in world space.
-  csVector3 lastclick;
-  /// we are moving to lastclick position
-  bool walking;
-
-public:
-  IsoTest ();
-  virtual ~IsoTest ();
-
-  bool Initialize (int argc, const char* const argv[],
-    const char *iConfigName);
+  static bool IsoTestEventHandler (iEvent& ev);
+  bool HandleEvent (iEvent& ev);
   void SetupFrame ();
   void FinishFrame ();
-  bool HandleEvent (iEvent &Event);
-  iIsoLight *GetLight () const {return light;}
-  void AddMazeGrid(iIsoWorld *world, float posx, float posy,
-    iMaterialWrapper *floor, iMaterialWrapper *wall);
 
-  void Report (int severity, const char* msg, ...);
+  bool CreateActor ();
+  bool LoadMap ();
+
+public:
+  IsoTest (iObjectRegistry* object_reg);
+  ~IsoTest ();
+
+  bool Initialize ();
+  void Start ();
 };
 
 #endif // __ISOTEST_H__

@@ -1,9 +1,0 @@
-SubDir TOP apps isomap ;
-
-Description isomap : "isomap demo executable" ;
-
-Application isomap
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith isomap : csgeom csgfx cstool csutil ;
-

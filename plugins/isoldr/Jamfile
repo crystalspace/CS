@@ -1,8 +1,0 @@
-SubDir TOP plugins isoldr ;
-
-Description isoload : "isometric world loader plugin" ;
-
-Plugin isoload
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith isoload : csgeom csgfx csutil ;

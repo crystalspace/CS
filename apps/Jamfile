@@ -4,7 +4,6 @@ SubInclude TOP apps cswstest ;
 SubInclude TOP apps demo ;
 SubInclude TOP apps examples ;
 SubInclude TOP apps import ;
-SubInclude TOP apps isomap ;
 SubInclude TOP apps isotest ;
 SubInclude TOP apps perftest ;
 SubInclude TOP apps pysimp ;

@@ -1,5 +1,4 @@
 SubDir TOP plugins engine ;
 
 SubInclude TOP plugins engine 3d ;
-SubInclude TOP plugins engine iso ;
 SubInclude TOP plugins engine renderloop ;
