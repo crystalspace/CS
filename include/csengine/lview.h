@@ -241,7 +241,7 @@ public:
   /// Get the specified shadow.
   csFrustum* GetShadow (int idx)
   {
-    return (idx < shadows.Length () ? shadows[idx] : NULL);
+    return (idx < shadows.Length () ? (csFrustum*)shadows[idx] : NULL);
   }
 
   /**

@@ -3,6 +3,8 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+24-Apr-2003
+	- Fixed a compile error in lview.h.
 23-Apr-2003
 	- Removed iPluginManager->GetPluginCount() and GetPlugin() since
 	  those two functions cannot be used in a thread-safe way. The
