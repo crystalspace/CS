@@ -64,7 +64,7 @@ void csString::ExpandIfNeeded(size_t NewSize)
       n = (NewSize + GrowBy - 1) & ~(GrowBy - 1);
     else
     {
-      n = (MaxSize+1) << 1;
+      n = MaxSize != 0 ? MaxSize << 1 : DEFAULT_GROW_BY;
       while (n < NewSize)
         n <<= 1;
     }
