@@ -12,6 +12,13 @@ chronological order.
 	  This did not work well if clients attempted to take ownership of the
 	  received events via csRef<> or IncRef(), for instance.
 	- Eric Sunshine fixed several compilation warnings.
+	- Eric Sunshine fixed bad side-effect of 29-Jun-2004 change to
+	  flags.jam which fixed problem where LFlags invocations within
+	  Jamfiles for plugin modules were not being respected during creation
+	  a "static" variant. Unfortunately, as a side-effect, this caused an
+	  explosive inclusion of multiple copies of LINKLIBS and PLUGIN.LFLAGS
+	  to be added to the linker flags for the static variant, which
+	  overflowed Jam's command-line length limitation.
 29-Jul-2004
 	- Eric Sunshine made the following changes:
 	    - The cosf() check in configure.ac is now run with the C++ compiler

@@ -63,8 +63,8 @@ rule Plugin
   {
     SubVariant static ;
     Library $(<)_static : $(>) : $(3) independent noinstall nohelp ;
-    CFlags $(<)_static : [ FDefines CS_STATIC_LINKED ] ;
-    LFlags $(<)_static : $(LINKLIBS) ;
+    CFlags $(<)_static : [ FDefines CS_STATIC_LINKED ] : nostatic ;
+    LFlags $(<)_static : $(LINKLIBS) : nostatic ;
     SubVariant ;
   }
 
@@ -91,8 +91,8 @@ rule Plugin
   MakeLocate $(target) : $(LOCATE.TARGETS) ;
   SystemLinkPlugin $(<) : $(objects) : $(3) ;
 
-  CFlags $(<) : $(PLUGIN.CFLAGS) ;
-  LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
+  CFlags $(<) : $(PLUGIN.CFLAGS) : nostatic ;
+  LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) : nostatic ;
 
   if ! [ IsElem nohelp : $(3) ]
   {

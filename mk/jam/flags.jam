@@ -45,27 +45,35 @@ rule LinkWith
   }
 }
 
-##  CFlags target : flags
+##  CFlags target : flags : options
 ##    Sets cflags on all sourcefiles of a library, plugin or application target
 ##    This rule affects c++ and c compiler flags.
+##    Options
+##      nostatic - Do not apply the flags to a "_static" variation.
 rule CFlags
 {
+  CheckOptions nostatic : $(3) : $(<) ;
+
   CCFLAGS on $($(<)_OBJECTS) += $(>) ;
   C++FLAGS on $($(<)_OBJECTS) += $(>) ;
 
-  if $($(<)_TYPE) = plugin
+  if ! [ IsElem nostatic : $(3) ] && $($(<)_TYPE) = plugin
   {
     CFlags $(<)_static : $(>) ;
   }
 }
 
-##  LFlags target : flags
+##  LFlags target : flags : options
 ##    Sets linker flags for a library, plugin or application target
+##    Options
+##      nostatic - Do not apply the flags to a "_static" variation.
 rule LFlags
 {
+  CheckOptions nostatic : $(3) : $(<) ;
+
   LINKLIBS on $($(<)_TARGET) += $(>) ;
 
-  if $($(<)_TYPE) = plugin
+  if ! [ IsElem nostatic : $(3) ] && $($(<)_TYPE) = plugin
   {
     $(<)_static.LFLAGS += $(>) ;
   }
