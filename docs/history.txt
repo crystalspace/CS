@@ -25,6 +25,8 @@ The history order is reversed so that new features are at the top.
 	  One fires when the lights get very dim and the other fires
 	  when the light gets brighter again.  Note, these sequences
 	  activate each others' triggers, not their own.
+	- Fixed a few compile errors in the new changes in the engine
+	  sequence manager.
 10-Dec-2002
 	- Fixed a bug I introduced yesterday in parsing of HardMove.
 	  The transform was inverted.
