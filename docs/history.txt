@@ -16,6 +16,14 @@ chronological order.
 	- Eric Sunshine worked around problem where Doxygen became hightly
 	  confused early in csutil/array.h, with the result that the majority
 	  of methods were not reflected in the generated documentation.
+	- Eric Sunshine added extra quoting around usage of several commands in
+	  the build system where the paths to the commands might contain
+	  spaces.  In particular, these are commands discovered by the
+	  configure script via AC_PATH_PROGS(), which is used sparingly but
+	  with good reason in a few cases.  Extra quoting where the commands
+	  are used is not a particularly elegant solution, but I can not, at
+	  present, arrive at anything more generalized.  An obvious example of
+	  a path containing whitespace occurs on Windows with "Program Files".
 24-Oct-2004
 	- Eric Sunshine simplified the 22-Oct-2004 change to DDS loader so that
 	  it no longer Clone()'s the image when returning a mipmap.  It is

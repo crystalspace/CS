@@ -371,7 +371,7 @@ if ! $(TTREE)
   TT2LIB ?= [ ConcatDirs $(TOP) mk perl5 lib ] ;
 }
 PERL ?= perl ;
-RUN_TTREE ?= $(PERL) -I$(TT2LIB) $(TTREE) ;
+RUN_TTREE ?= $(PERL) -I$(TT2LIB) "\"$(TTREE)\"" ;
 
 # Implementation note: The --strip-root directives are order-sensitive when the
 # build directory is the same as the source directory, in which case TOP is "."

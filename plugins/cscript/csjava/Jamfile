@@ -96,7 +96,7 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
 
   actions Ant
   {
-    $(ANT) -quiet -emacs -Dbuild.compiler.emacs=true -buildfile $(>)
+    "$(ANT)" -quiet -emacs -Dbuild.compiler.emacs=true -buildfile $(>)
   }
   Ant $(jar) : $(buildxml:G=build) ;
   Clean csjavaclean : $(jar) ;
