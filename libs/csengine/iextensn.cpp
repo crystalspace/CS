@@ -18,8 +18,7 @@
 */
 
 #include "sysdef.h"
-#include "csutil/iextensn.h"
-//#include "cssys/common/system.h"
+#include "csengine/iextensn.h"
 
 // Check the extension against the ExtensionMask
 bool ExtensionLoaderInfo::CheckMask(const char* ext) {

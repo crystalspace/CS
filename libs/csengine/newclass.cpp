@@ -21,9 +21,9 @@
 #define CS_DISABLE_MODULE_LOCKING
 #include "cscom/com.h"
 #undef  CS_DISABLE_MODULE_LOCKING
-#include "csutil/newclass.h"
+#include "csengine/newclass.h"
 #include "csutil/csbase.h"
-#include "csutil/intrface.h"
+#include "csengine/intrface.h"
 #include "csengine/skeleton.h"
 
 IMPLEMENT_UNKNOWN(csClassSpawner);
