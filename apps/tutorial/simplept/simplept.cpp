@@ -20,7 +20,6 @@
 #include "cssys/system.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
-#include "cstool/prwater.h"
 #include "simplept.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
@@ -85,22 +84,16 @@ Simple::~Simple ()
   // which is now related to lightmap caching. I give up! My knowledge
   // about the texture cache is not enough to fix that.       -- mgeisse
 
-  // Yes and even after it is going again the same problem exists.
-  // I have disabled the cleanup for the moment, the engine cleanup is
-  // handled in main ( CleanUp() ) and thus should be corrected properly
-  // so that procedural texture shut down is transparent to the app. MHV.
+  engine->SetContext (g3d);
+  engine->GetSectors ()->RemoveSector (engine->FindSector ("room"));
 
-//  engine->SetContext (g3d);
-//  engine->GetSectors ()->RemoveSector (engine->FindSector ("room"));
+  engine->SetContext (ProcTexture->GetTextureHandle ()->GetProcTextureInterface ());
 
-//  engine->SetContext (ProcTexture->GetTextureHandle ()->GetProcTextureInterface ());
-
-//  delete ProcTexture;
-//  engine->DeleteAll ();
-//  if (view) view->DecRef ();
-//  if (engine) engine->DecRef ();
-//  if (loader) loader->DecRef();
-//  if (g3d) g3d->DecRef ();
+  engine->DeleteAll ();
+  if (view) view->DecRef ();
+  if (engine) engine->DecRef ();
+  if (loader) loader->DecRef();
+  if (g3d) g3d->DecRef ();
 }
 
 void Cleanup ()
@@ -170,19 +163,16 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   // Create the procedural texture and a material for it
-  iMaterialWrapper *ProcMat;
-  ProcTexture = new csProcWater ();
-  if (!( ProcMat = ProcTexture->Initialize (this, engine, G3D->GetTextureManager(), "ProcWater")))
+  ProcTexture = new csEngineProcTex ();
+  if (!ProcTexture->Initialize (G3D, engine, VFS, loader))
   {
     Printf (CS_MSG_FATAL_ERROR, "Could not initialize procedural texture!\n");
     Cleanup ();
     exit (1);
   }
-
-  if (!ProcTexture->PrepareAnim())
-  {
-      Printf(CS_MSG_FATAL_ERROR, "Could not prepare procedural texture!\n");
-  }
+  iTextureWrapper *tw = engine->GetTextureList ()->NewTexture
+      (ProcTexture->GetTextureHandle());
+  iMaterialWrapper *ProcMat = engine->CreateMaterial ("procmat", tw);
   room = engine->CreateSector ("proctex-room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
   iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
@@ -262,7 +252,7 @@ void Simple::NextFrame ()
     c->Move (VEC_BACKWARD * 4 * speed);
 
   // Update our procedural texture
-  ProcTexture->Animate (current_time);
+  ProcTexture->Update (current_time);
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (
