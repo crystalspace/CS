@@ -157,12 +157,11 @@ gensgmloptdsc(){
 	do
 		case $line in
 		[A-Z]*)
-    			[ "$variablelistflag" != "closed" ] && echo "</variablelist>"
+    			[ "$variablelistflag" != "closed" ] && echo "</variablelist>" && variablelistflag="closed"
 			echo "<para>$line</para>"
-    			echo "<variablelist>"
-			variablelistflag="open"
 			;;
 		-*=*)
+    			[ "$variablelistflag" != "open" ] && echo "<variablelist>" && variablelistflag="open"
 	echo $line | sed 's|\(-.[^=]*=\)<\(.[^>]*\)>.[ ]*\(.*\)$|\
       <varlistentry>\
         <term>\
@@ -174,6 +173,7 @@ gensgmloptdsc(){
       </varlistentry>|'
 			;;
 		-*)
+    			[ "$variablelistflag" != "open" ] && echo "<variablelist>" && variablelistflag="open"
 	echo $line | sed 's|\(-.[^ ]*\).[ ]*\(.*\)$|\
       <varlistentry>\
         <term>\
@@ -186,7 +186,9 @@ gensgmloptdsc(){
 			;;
 		esac
 	done
-    	echo "</variablelist>"
+
+    	#[ "$variablelistflag" != "closed" ] && echo "</variablelist>" && variablelistflag="closed"
+    	echo "</variablelist>" && variablelistflag="closed"
 }
 #=============================================================================
 gensgmloptnodsc(){
