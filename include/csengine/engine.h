@@ -24,6 +24,7 @@
 #include "csutil/csobject.h"
 #include "csutil/garray.h"
 #include "csutil/ptrarr.h"
+#include "csutil/refarr.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/config.h"
@@ -239,7 +240,7 @@ public:
    * encapsulating that memory to this array will ensure that the
    * memory is removed once the engine is destroyed.
    */
-  csObjVector cleanup;
+  csRefArray<iBase> cleanup;
 
   /**
    * List of sectors in the engine. This vector contains

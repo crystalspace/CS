@@ -132,12 +132,6 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 
 csMeshWrapper::~csMeshWrapper ()
 {
-  int i;
-  for (i = 0 ; i < draw_cb_vector.Length () ; i++)
-  {
-    iMeshDrawCallback* cb = (iMeshDrawCallback*)draw_cb_vector.Get (i);
-    cb->DecRef ();
-  }
   delete imposter_mesh;
 }
 
@@ -280,7 +274,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
   i = draw_cb_vector.Length ()-1;
   while (i >= 0)
   {
-    iMeshDrawCallback* cb = (iMeshDrawCallback*)draw_cb_vector.Get (i);
+    iMeshDrawCallback* cb = draw_cb_vector.Get (i);
     if (!cb->BeforeDrawing (meshwrap, rview)) return ;
     i--;
   }

@@ -22,6 +22,7 @@
 #include "csgeom/math3d.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
+#include "csutil/refarr.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 #include "iutil/objref.h"
@@ -115,7 +116,7 @@ private:
   /**
    * List of sector callbacks.
    */
-  csVector sector_cb_vector;
+  csRefArray<iSectorCallback> sector_cb_vector;
 
   /**
    * All static and pseudo-dynamic lights in this sector.
@@ -247,17 +248,13 @@ public:
   void SetSectorCallback (iSectorCallback* cb)
   {
     sector_cb_vector.Push (cb);
-    cb->IncRef ();
   }
 
   void RemoveSectorCallback (iSectorCallback* cb)
   {
     int idx = sector_cb_vector.Find (cb);
     if (idx != -1)
-    {
       sector_cb_vector.Delete (idx);
-      cb->DecRef ();
-    }
   }
 
   int GetSectorCallbackCount () const
@@ -267,7 +264,7 @@ public:
   
   iSectorCallback* GetSectorCallback (int idx) const
   {
-    return (iSectorCallback*)sector_cb_vector.Get (idx);
+    return sector_cb_vector.Get (idx);
   }
 
   //----------------------------------------------------------------------

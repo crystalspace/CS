@@ -642,26 +642,24 @@ csPtr<iBodyGroup> csODEDynamicSystem::CreateGroup ()
 {
   csODEBodyGroup* group = new csODEBodyGroup (this);
   groups.Push (group);
-  group->IncRef ();
   return csPtr<iBodyGroup> (group);
 }
 
 void csODEDynamicSystem::RemoveGroup (iBodyGroup *group)
 {
-  groups.Delete (group);
+  groups.Delete ((csODEBodyGroup*)group);
 }
 
 csPtr<iJoint> csODEDynamicSystem::CreateJoint ()
 {
   csODEJoint* joint = new csODEJoint (this);
   joints.Push (joint);
-  joint->IncRef ();
   return csPtr<iJoint> (joint);
 }
 
 void csODEDynamicSystem::RemoveJoint (iJoint *joint)
 {
-  joints.Delete (joint, true);
+  joints.Delete ((csODEJoint*)joint);
 }
 
 void csODEDynamicSystem::SetGravity (const csVector3& v)

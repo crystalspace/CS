@@ -21,6 +21,7 @@
 #define __CS_CSANIM2D_H__
 
 #include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
 #include "cstool/cspixmap.h"
 
 struct iGraphics3D;
@@ -28,10 +29,11 @@ class csPixmap;
 class csAnimatedPixmap;
 
 /// A 2d animation template. This class is used to create animated pixmaps.
-class csAnimationTemplate {
+class csAnimationTemplate
+{
 private:
   /// sprite frames
-  csVector Frames;
+  csPDelArray<csPixmap> Frames;
   /**
    * absolute time to finish a frame
    * (the time from start to finish of the frame)
@@ -52,7 +54,7 @@ public:
     {return (GetFrameCount()==0)?0:(csTicks)FinishTimes.Get(GetFrameCount()-1);}
   /// add a frame. (giving the length of this frame)
   inline void AddFrame(csTicks Delay, csPixmap *s)
-    {FinishTimes.Push((csSome)(GetLength() + Delay)); Frames.Push(s);}
+    {FinishTimes.Push((csSome)(GetLength() + Delay)); Frames.Push (s);}
   /// add a frame (giving the length of this frame)
   inline void AddFrame(csTicks Delay, iTextureHandle *Tex)
     {AddFrame(Delay, new csSimplePixmap(Tex));}
@@ -62,7 +64,7 @@ public:
 
   /// get a frame by number
   inline csPixmap *GetFrame(int n) const
-    {return (csPixmap*)(Frames.Get(n));}
+    {return Frames.Get(n);}
   /// get a frame by time
   csPixmap *GetFrameByTime(csTicks Time);
 
@@ -72,7 +74,8 @@ public:
 
 
 /// a pixmap with a 2d animation
-class csAnimatedPixmap : public csPixmap {
+class csAnimatedPixmap : public csPixmap
+{
 public:
   /// create an animated pixmap
   csAnimatedPixmap(csAnimationTemplate *tpl);

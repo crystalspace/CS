@@ -19,36 +19,35 @@
 #ifndef __CS_CRYSBALL_H__
 #define __CS_CRYSBALL_H__
 
-/**
- * This is an attempt to provide a  massdetection of backfaced polygons.
- *
- * Observation:
- * Mark 3 distinct points on a sphere. Consider the spherical triangle they form . If all
- * 3 points z-coordinates sign equal then all other points z-coordinate inside the
- * triangle have the same sign.
- *
- * It works this way:
- * Precompute the normals of a rigid set of polygons. These normals are unit size and
- * therefor mark a point on the unit sphere. If one rotates the polygonset all points
- * on the unit sphere are rotated by the same amount.
- *
- * To start off, subdivide the sphere into 8 spherical triangles. For every triangle make
- * a list of  points (normals) in it. For every triangle then subdivide further into 3
- * subtriangles and mark the points contained in it. Repeat this process until every
- * triangle contains only one point (normal).
- *
- * Now to find the backfaced polygons rotate the triangle points on level 0.
- * If a triangles points have all equally signed z-coordinates all polygons belonging
- * to it are either all visible or invisible.
- * If the signs differ then recursively test the subtriangles.
- */
-
 #include "csutil/cstreend.h"
 #include "csgeom/vector3.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "igeom/polymesh.h"
 
+/**
+ * This is an attempt to provide a  massdetection of backfaced polygons.
+ * <p>
+ * Observation:
+ * Mark 3 distinct points on a sphere. Consider the spherical triangle they
+ * form . If all 3 points z-coordinates sign equal then all other points
+ * z-coordinate inside the triangle have the same sign.
+ * <p>
+ * It works this way:
+ * Precompute the normals of a rigid set of polygons. These normals are unit
+ * size and therefor mark a point on the unit sphere. If one rotates the
+ * polygonset all points on the unit sphere are rotated by the same amount.
+ * <p>
+ * To start off, subdivide the sphere into 8 spherical triangles. For every
+ * triangle make a list of  points (normals) in it. For every triangle then
+ * subdivide further into 3 subtriangles and mark the points contained in it.
+ * Repeat this process until every triangle contains only one point (normal).
+ * <p>
+ * Now to find the backfaced polygons rotate the triangle points on level 0.
+ * If a triangles points have all equally signed z-coordinates all polygons
+ * belonging to it are either all visible or invisible.
+ * If the signs differ then recursively test the subtriangles.
+ */
 class csCrystalBall
 {
   class csCrystalBallVec : public csVector3
@@ -75,15 +74,15 @@ class csCrystalBall
       {this->from = from; this->len = len;}
 
     // find a triangle for <normal> and return the index where its been inserted into vP
-    int Add (const csCrystalBallVec *normal, int tri1, int tri2, int tri3,
-	      csVector *vP, csVector *vTP);
+    int Add (csCrystalBallVec *normal, int tri1, int tri2, int tri3,
+	      csPArray<csCrystalBallVec> *vP, csPArray<csVector3> *vTP);
 
     // adjust (from,len) pairs after a new point was inserted
     void Adjust (int nPos);
 
     // classify a point to lie inside or outside the spherical triangle
     int Classify (const csVector3 &n, int i1, int i2, int i3,
-		  const csVector *vTP) const;
+		  const csPArray<csVector3> *vTP) const;
 
     // are all 3 normals on the side <useSign>
     // 0 ... yes
@@ -97,19 +96,20 @@ class csCrystalBall
 
     // rotate the unitsphere by matrix <m>. Add all polygon indices to <indexVector>
     // which normlals point to the <useSign> side
-    void Transform (const csMatrix3 &m, csVector &indexVector,
+    void Transform (const csMatrix3 &m, csGrowingArray<int> &indexVector,
 		    int useSign, long cookie,
-		    const csVector *vP, const csVector *vTP,
+		    const csPArray<csCrystalBallVec> *vP,
+		    const csPArray<csVector3> *vTP,
 		    const csVector3 &v1, const csVector3 &v2,
 		    const csVector3 &v3);
   };
 
  protected:
   // here we store the normals (pointers to csCrystalBallVec)
-  csVector vPoints;
+  csPArray<csCrystalBallVec> vPoints;
   // we divide a triangle into 3 sub triangles by inserting a divider point.
   // and <vTrianglePoints> is the place where we store those points (pointers to csVector3)
-  csVector vTrianglePoints;
+  csPArray<csVector3> vTrianglePoints;
   // our crystal ball is initially made of 8 spherical triangles (in the octants of a 3d cartesian coo system)
   csTriNode tri[8];
 
@@ -125,7 +125,7 @@ class csCrystalBall
 
   // rotate the unitsphere by <t>. Add all polygon indices to <indexVector>
   // which normlals point to the <useSign> side
-  void Transform (const csTransform &t, csVector &indexVector, int useSign, long cookie);
+  void Transform (const csTransform &t, csGrowingArray<int> &indexVector, int useSign, long cookie);
 };
 
 #endif // __CS_CRYSBALL_H__

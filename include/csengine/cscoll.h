@@ -20,8 +20,9 @@
 #define __CS_CSCOLL_H__
 
 #include "csgeom/matrix3.h"
-#include "csutil/csobject.h"
+#include "csutil/refarr.h"
 #include "csutil/csvector.h"
+#include "csutil/csobject.h"
 #include "iengine/collectn.h"
 
 class csSector;
@@ -37,7 +38,7 @@ class csCollection : public csObject
 {
 private:
   /// The list of objects contained in this csCollection.
-  csVector objects;
+  csRefArray<iObject> objects;
 
   /// Handle to the engine plug-in.
   csEngine* engine;
@@ -63,10 +64,10 @@ public:
   int GetObjectCount () const { return objects.Length(); }
 
   /// Add an object to the collection.
-  void AddObject (iObject* obj) { objects.Push((csSome)obj); }
+  void AddObject (iObject* obj) { objects.Push (obj); }
 
   ///
-  iObject* operator[] (int i) { return (iObject*) (objects[i]); }
+  iObject* operator[] (int i) { return objects[i]; }
 
   SCF_DECLARE_IBASE;
 

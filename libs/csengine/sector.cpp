@@ -130,14 +130,6 @@ csSector::~csSector ()
   CS_ASSERT (references.Length () == 0);
 
   lights.DeleteAll ();
-  int i;
-  for (i = 0 ; i < sector_cb_vector.Length () ; i++)
-  {
-    iSectorCallback* cb = (iSectorCallback*)sector_cb_vector.Get (i);
-    cb->DecRef ();
-  }
-
-  // rendering queues are deleted automatically.
 }
 
 void csSector::CleanupReferences ()
@@ -591,7 +583,7 @@ void csSector::Draw (iRenderView *rview)
   i = sector_cb_vector.Length ()-1;
   while (i >= 0)
   {
-    iSectorCallback* cb = (iSectorCallback*)sector_cb_vector.Get (i);
+    iSectorCallback* cb = sector_cb_vector.Get (i);
     cb->Traverse (&scfiSector, rview);
     i--;
   }
@@ -771,7 +763,7 @@ void csSector::CheckFrustum (iFrustumView *lview)
   int i = sector_cb_vector.Length ()-1;
   while (i >= 0)
   {
-    iSectorCallback* cb = (iSectorCallback*)sector_cb_vector.Get (i);
+    iSectorCallback* cb = sector_cb_vector.Get (i);
     cb->Traverse (&scfiSector, lview);
     i--;
   }

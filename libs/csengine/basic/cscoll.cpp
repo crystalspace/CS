@@ -50,9 +50,10 @@ iObject *csCollection::FindObject (char *name)
   int i;
   for (i = 0; i < objects.Length (); i++)
   {
-    iObject *obj = (iObject *) (objects[i]);
+    iObject *obj = objects[i];
     if (!strcmp (obj->GetName (), name)) return obj;
   }
 
   return NULL;
 }
+

@@ -16,16 +16,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "csutil/ptrarr.h"
+#include "csutil/garray.h"
 #include "csgeom/crysball.h"
 #include "csgeom/frustum.h"
 
 int csCrystalBall::csTriNode::Add (
-  const csCrystalBallVec *normal,
+  csCrystalBallVec *normal,
   int tri1,
   int tri2,
   int tri3,
-  csVector *vP,
-  csVector *vTP)
+  csPArray<csCrystalBallVec> *vP,
+  csPArray<csVector3> *vTP)
 {
   int nPos = 0;
   if (IsLeaf ())
@@ -37,16 +39,16 @@ int csCrystalBall::csTriNode::Add (
 
     if (len == 0) //leaf is empty
     {
-      nPos = vP->Insert (from, (void *)normal);
+      nPos = vP->Insert (from, normal);
     }
     else
     {
-      csCrystalBallVec *n = (csCrystalBallVec *)vP->Get (from);
+      csCrystalBallVec *n = vP->Get (from);
 
       if (*n == *normal)
       {
         // just append this index
-        nPos = vP->Insert (from, (void *)normal);
+        nPos = vP->Insert (from, normal);
       }
       else
       {
@@ -56,7 +58,7 @@ int csCrystalBall::csTriNode::Add (
         // triangles)
         csVector3 *mc = new csVector3 (*n + (*normal -*n) / 2.0f);
         mc->Normalize ();     // now the point lies on the unit sphere
-        divider = vTP->Push ((void *)mc);
+        divider = vTP->Push (mc);
 
         bool newStuffed = false, oldStuffed = false;
         int tripoint[4] = {tri1, tri2, tri3, tri1};
@@ -141,14 +143,14 @@ int csCrystalBall::csTriNode::Classify (
   int i1,
   int i2,
   int i3,
-  const csVector *vTP) const
+  const csPArray<csVector3> *vTP) const
 {
   csVector3 origo (0, 0, 0);
 
   csFrustum frust (origo);
-  frust.AddVertex (*(csVector3 *)vTP->Get (i1));
-  frust.AddVertex (*(csVector3 *)vTP->Get (i2));
-  frust.AddVertex (*(csVector3 *)vTP->Get (i3));
+  frust.AddVertex (*vTP->Get (i1));
+  frust.AddVertex (*vTP->Get (i2));
+  frust.AddVertex (*vTP->Get (i3));
 
   return frust.Contains (
       n) ? csCrystalBall::csTriNode::INSIDE : csCrystalBall::csTriNode::OUTSIDE;
@@ -156,11 +158,11 @@ int csCrystalBall::csTriNode::Classify (
 
 void csCrystalBall::csTriNode::Transform (
   const csMatrix3 &m,
-  csVector &indexVector,
+  csGrowingArray<int> &indexVector,
   int useSign,
   long cookie,
-  const csVector *vP,
-  const csVector *vTP,
+  const csPArray<csCrystalBallVec> *vP,
+  const csPArray<csVector3> *vTP,
   const csVector3 &v1,
   const csVector3 &v2,
   const csVector3 &v3)
@@ -182,14 +184,14 @@ void csCrystalBall::csTriNode::Transform (
         int i;
         for (i = from; i < to; i++)
           indexVector.Push (
-              (csSome) ((csCrystalBallVec *)vP->Get (i))->GetIndex ());
+              ((csCrystalBallVec *)vP->Get (i))->GetIndex ());
       }
     }
   }
   else
   {
     const csVector3 *p[4] = { &v1, &v2, &v3, &v1 };
-    csVector3 td = m * (*(csCrystalBallVec *)vTP->Get (divider));
+    csVector3 td = m * (*vTP->Get (divider));
     int i;
     for (i = 0; i < 3; i++)
     {
@@ -205,7 +207,7 @@ void csCrystalBall::csTriNode::Transform (
         int j;
         for (j = tri->from; j < to; j++)
           indexVector.Push (
-              (csSome) ((csCrystalBallVec *)vP->Get (j))->GetIndex ());
+              ((csCrystalBallVec *)vP->Get (j))->GetIndex ());
       }
       else if (match == 1)
       {
@@ -332,7 +334,7 @@ void csCrystalBall::Build (iPolygonMesh *polyset)
 
 void csCrystalBall::Transform (
   const csTransform &o2c,
-  csVector &indexVector,
+  csGrowingArray<int> &indexVector,
   int useSign,
   long cookie)
 {

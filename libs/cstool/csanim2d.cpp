@@ -21,18 +21,16 @@
 #include "cstool/csanim2d.h"
 #include "ivideo/graph3d.h"
 
-csAnimationTemplate::csAnimationTemplate() {
+csAnimationTemplate::csAnimationTemplate()
+{
 }
 
-csAnimationTemplate::~csAnimationTemplate() {
-  int i;
-  for (i=0;i<Frames.Length();i++) {
-    csPixmap *p = GetFrame(i);
-    delete p;
-  }
+csAnimationTemplate::~csAnimationTemplate()
+{
 }
 
-csPixmap *csAnimationTemplate::GetFrameByTime(csTicks Time) {
+csPixmap *csAnimationTemplate::GetFrameByTime(csTicks Time)
+{
   // test for empty animation
   if (GetFrameCount() == 0) return NULL;
   // wrap time

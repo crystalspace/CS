@@ -278,7 +278,6 @@
 #include "csutil/csinput.h"
 #include "csutil/csmd5.h"
 #include "csutil/csobject.h"
-#include "csutil/csobjvec.h"
 #include "csutil/cspmeter.h"
 #include "csutil/csppulse.h"
 #include "csutil/csqueue.h"

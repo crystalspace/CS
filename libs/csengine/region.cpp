@@ -60,7 +60,7 @@ void csRegion::DeleteAll ()
 {
   csRef<iObjectIterator> iter;
 
-  // First we need to copy the objects to a csVector to avoid
+  // First we need to copy the objects to a vector to avoid
   // messing up the iterator while we are deleting them.
   csPArray<iObject> copy;
   iter = GetIterator ();

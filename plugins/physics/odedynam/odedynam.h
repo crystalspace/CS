@@ -21,7 +21,6 @@
 #define __CS_ODEDYNAMICS_H__
 
 #include "csgeom/vector3.h"
-#include "csutil/csobjvec.h"
 #include "csutil/nobjvec.h"
 #include "csutil/garray.h"
 #include "csgeom/transfrm.h"
@@ -140,6 +139,9 @@ public:
   } scfiComponent;
 };
 
+class csODEBodyGroup;
+class csODEJoint;
+
 /**
  * This is the implementation for the dynamics core.
  * It handles all bookkeeping for rigid bodies and joints.
@@ -156,8 +158,8 @@ private:
   csRef<iDynamicsMoveCallback> move_cb;
 
   csRefArrayObject<iRigidBody> bodies;
-  csObjVector groups;
-  csObjVector joints;
+  csRefArray<csODEBodyGroup> groups;
+  csRefArray<csODEJoint> joints;
 
 public:
   SCF_DECLARE_IBASE_EXT (csObject);

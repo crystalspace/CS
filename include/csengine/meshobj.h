@@ -22,7 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
-#include "csutil/csvector.h"
+#include "csutil/refarr.h"
 #include "csutil/flags.h"
 #include "csutil/garray.h"
 #include "csengine/movable.h"
@@ -214,7 +214,7 @@ private:
    * The callbacks which are called just before drawing.
    * Type: iMeshDrawCallback.
    */
-  csVector draw_cb_vector;
+  csRefArray<iMeshDrawCallback> draw_cb_vector;
 
   /// Optional reference to the parent csMeshFactoryWrapper.
   iMeshFactoryWrapper* factory;
@@ -310,17 +310,13 @@ public:
   void SetDrawCallback (iMeshDrawCallback* cb)
   {
     draw_cb_vector.Push (cb);
-    cb->IncRef ();
   }
 
   void RemoveDrawCallback (iMeshDrawCallback* cb)
   {
     int idx = draw_cb_vector.Find (cb);
     if (idx != -1)
-    {
       draw_cb_vector.Delete (idx);
-      cb->DecRef ();
-    }
   }
 
   virtual int GetDrawCallbackCount () const
@@ -330,7 +326,7 @@ public:
 
   iMeshDrawCallback* GetDrawCallback (int idx) const
   {
-    return (iMeshDrawCallback*)draw_cb_vector.Get (idx);
+    return draw_cb_vector.Get (idx);
   }
 
   /// Mark this object as visible.
