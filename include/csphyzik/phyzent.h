@@ -34,8 +34,53 @@ class ctForce;
 class ctSolver;
 class ctCollidingContact;
 
-// parent class of physical bodies
-class ctPhysicalEntity : public ctEntity
+//!me not totaly happy with this... too many virtual fcns. 
+//!me had to do this to integrate articulated bodies into collision repsonse
+//!me in a reasonable manner.  
+/// any entity that has a linear/angular position and velocities
+/// i.e. frame of reference and first derivitave of that frame.
+/// any subclass of this can repond to collisions and impulses
+class ctReferenceFrameEntity : public ctEntity
+{
+public:
+
+  virtual ctVector3 get_v() = 0;
+  virtual void set_v( const ctVector3 &pv ) = 0;
+  virtual const ctVector3 &get_pos() = 0;
+  virtual void set_pos( const ctVector3 &px ) = 0;
+  virtual void set_angular_v( const ctVector3 &pw ) = 0;
+  virtual ctVector3 get_angular_v()= 0;
+
+  // resolve collision with a body.  warning: original cont may be modified
+  void resolve_collision( ctCollidingContact *cont );
+
+  /// can use this to impart and impulse to this object.
+  /// impulse_point is vector from center of body to point of collision in 
+  /// world coordinates.  impulse_vector is in world coords
+  virtual void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector ) = 0;
+
+  // fill out mass and inverse inertia tensor behaviour for an impulse response
+  // impulse_point is point of collision in world frame
+  virtual void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
+			      const ctVector3 &unit_length_impulse_vector  ) = 0;
+
+  // get relative velocity of two ( or one ) body from perspective of a 
+  // point in world space attached to first body ( //!me I think that is right )
+  ctVector3 get_relative_v( ctReferenceFrameEntity *body_b, const ctVector3 &the_p );
+
+  virtual const ctMatrix3 &get_R() = 0;
+  virtual const ctMatrix3 &get_T() = 0;
+
+  virtual const ctMatrix3 &get_world_to_this() = 0;
+  virtual const ctMatrix3 &get_this_to_world() = 0;
+  virtual void v_this_to_world( ctVector3 &pv ) = 0;
+  virtual ctVector3 get_v_this_to_world( ctVector3 &pv ) = 0;
+
+};
+
+
+/// parent class of physical bodies
+class ctPhysicalEntity : public ctReferenceFrameEntity
 {
 public:
 /*
@@ -69,15 +114,14 @@ public:
 
   // change orientation in radians
   virtual void rotate_around_line( ctVector3 &paxis, real ptheta );
-  ctVector3 get_v(){ return v; }
+  virtual ctVector3 get_v(){ return v; }
   // virtual because v is calculated from P ( momentum ) in rigid bodies
   virtual void set_v( const ctVector3 &pv );
-  void set_pos( real px, real py, real pz ) {
-    ctVector3 poff( px, py, pz );
-    RF.set_offset( poff );
+  virtual void set_pos( const ctVector3 &px ) {
+    RF.set_offset( px );
   }
   virtual void set_angular_v( const ctVector3 &pw );
-  ctVector3 get_angular_v(){ return w; }
+  virtual ctVector3 get_angular_v(){ return w; }
 
   ctVector3 get_F(){ return F; }
   ctVector3 get_torque(){ return T; }
@@ -93,21 +137,28 @@ public:
   void print_force(){/*cout << "F: " << F*F << "\n";*/ }
 
   // collision routines
-  // resolve collision with a body.  warning: original cont may be modified
-  virtual void resolve_collision( ctCollidingContact *cont );
 
   /// can use this to impart and impulse to this object.
   /// impulse_point is vector from center of body to point of collision in 
   /// world coordinates.  impulse_vector is in world coords
   virtual void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector );
-  virtual real get_impulse_m(){ return DEFAULT_ENTITY_MASS; }
-  virtual ctMatrix3 get_impulse_I_inv() {
-    return ctMatrix3( 1.0/get_impulse_m() );
+
+  //  virtual real get_impulse_m(){ return DEFAULT_ENTITY_MASS; }
+//  virtual ctMatrix3 get_impulse_I_inv() {
+//    return ctMatrix3( 1.0/get_impulse_m() );
+//  }
+  // fill out mass and inverse inertia tensor behaviour for an impulse response
+  // impulse_point is point of collision in world frame
+  virtual void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
+			      const ctVector3 &unit_length_impulse_vector  )
+  { *pm = DEFAULT_ENTITY_MASS; 
+    pI_inv->identity();
+    *pI_inv *= 1.0/DEFAULT_ENTITY_MASS;
   }
 
   const ctMatrix3 &get_R(){ return RF.get_R(); }
   const ctMatrix3 &get_T(){ return RF.get_T(); }
-#define get_pos get_org_world
+  const ctVector3 &get_pos(){ return RF.get_offset(); }
   const ctVector3 &get_org_world(){ return RF.get_offset(); }
   const ctMatrix3 &get_world_to_this(){ return RF.get_parent_to_this(); }
   const ctMatrix3 &get_this_to_world(){ return RF.get_this_to_parent(); }
@@ -122,7 +173,6 @@ protected:
 
   ctVector3 v;
   ctVector3 w;
-
 
   // frame of reference. orientation and position are stored here
   ctReferenceFrame &RF;
@@ -149,7 +199,7 @@ public:
 
   virtual void set_m( real pm );
   real get_m(){ return m; }
-  virtual real get_impulse_m(){ return m; }
+//  virtual real get_impulse_m(){ return m; }
 
 protected:
 

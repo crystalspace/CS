@@ -8,7 +8,7 @@
 
 typedef double real;
 typedef double coord;
-typedef float angle;
+typedef float ctangle;
 
 const double M_PER_WORLDUNIT = 1.0;
 
@@ -19,7 +19,7 @@ const double M_PER_WORLDUNIT = 1.0;
 #define PHYZ_CONSTANT_G		6.67e-11 * M_PER_WORLDUNIT * M_PER_WORLDUNIT
 
 // smallest time slice for ODE
-#define TIME_EPSILON 0.0001
+#define TIME_EPSILON 0.001
 
 #define MIN_REAL 0.000000001
 #define MAX_REAL 100000000.0

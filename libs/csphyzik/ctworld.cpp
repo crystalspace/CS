@@ -19,7 +19,9 @@
 */
 
 
+//#ifndef __NO_CRYSTALSPACE__
 #include "sysdef.h"
+//#endif
 #include "csphyzik/articula.h"
 #include "csphyzik/world.h"
 #include "csphyzik/rigidbod.h"
@@ -185,7 +187,7 @@ errorcode ctWorld::evolve( real t1, real t2 )
   ctLinkList<ctCatastropheManager> *recent_cat = new ctLinkList<ctCatastropheManager>();
   ctLinkList<ctCatastropheManager> *swap_cat;
 
-  long loops = 1000;  //make sure we don't go into an infinite loop
+  long loops = 30;  //make sure we don't go into an infinite loop
 
   ta = t1;
   tb = t2;

@@ -32,7 +32,7 @@ public:
   /// Reset list
   void reset(){ prev = 0; current = head; }
 
-  /// Get first item
+  /// Get first item. set current item to first item
   T* get_first(){  if( head->next != 0 ){
             prev = head; 
             current = head->next; 
@@ -40,7 +40,7 @@ public:
           } else return 0; 
         }
 
-  /// Get next item
+  /// Get next to current item.  set current item to next item
   T* get_next(){  
     if( current->next ){
       prev = current;
@@ -49,6 +49,11 @@ public:
     }else{
       return 0;
     }
+  }
+
+    /// Get first item. don't set current item to first item
+  T* peek_first(){  
+    return head->next->contents;
   }
 
   /// Add link to front

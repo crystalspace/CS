@@ -18,7 +18,9 @@
 
 */
 
+#ifndef __NO_CRYSTALSPACE__
 #include "sysdef.h"
+#endif
 #include "csphyzik/qtrbconn.h"
 #include "csphyzik/qtrigid.h"
 #include "csphyzik/phyzent.h"

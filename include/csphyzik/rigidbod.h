@@ -83,6 +83,7 @@ public:
     return I_world;
   }
 
+/*
   virtual ctMatrix3 get_impulse_I_inv(){ 
 //    return get_I_inv_world();
     const ctMatrix3 &R = RF.get_R();
@@ -90,6 +91,15 @@ public:
     R.similarity_transform( Mret, I_inv );
     return Mret;
   }
+*/
+
+  virtual void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
+			      const ctVector3 &unit_length_impulse_vector  ){
+    *pm = m;
+    const ctMatrix3 &R = RF.get_R();
+    R.similarity_transform( *pI_inv, I_inv );
+  }
+ 
 
 	ctVector3 get_angular_P(){ return L; }
 	
@@ -102,13 +112,9 @@ public:
   virtual void set_v( const ctVector3 &pv );
 	virtual void set_m( real pm );
   
-  // collision response
-  virtual void resolve_collision( ctCollidingContact *cont );
+  // impulse_point is vector from center of body to point of collision in 
+  // world coordinates.  impulse_vector is in world coords
   virtual void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector );
-  // get relative velocity of two ( or one ) body from perspective of a 
-  // point in world space attached to first body ( //!me I think that is right )
-  ctVector3 get_relative_v( ctPhysicalEntity *body_b, const ctVector3 &the_p );
-
 
 protected:
 	ctVector3 P;	// momentum

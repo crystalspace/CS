@@ -19,7 +19,9 @@
 */
 
 #include <assert.h>
+#ifndef __NO_CRYSTALSPACE__
 #include "sysdef.h"
+#endif
 #include "csphyzik/ctvector.h"
 #include "csphyzik/ctmatrix.h"
 #include "csphyzik/qtrigid.h"

@@ -65,6 +65,9 @@ public:
   virtual void apply_impulse( ctVector3 impulse_point,
 			      ctVector3 impulse_vector ) = 0;
 
+  virtual void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
+			      const ctVector3 &unit_length_impulse_vector ) = 0;
+
 };
 
 

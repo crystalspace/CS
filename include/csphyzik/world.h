@@ -86,8 +86,8 @@ public:
 
   // Static state-alloc stuff
   int            state_size;
-  csDLinkList    free_blocks;
-  csDLinkList    used_blocks;
+  csDLinkList free_blocks;
+  csDLinkList used_blocks;
 
   //**********  State vector interface *********
   virtual int  state_alloc(int size);

@@ -40,9 +40,11 @@
 #else
 #define CT_DEBUG_LEVEL 1
 //!me broken
-#define DEBUGLOGF( A,B )  Debug::log( A )  
-#define DEBUGLOG( A )  Debug::log( A )  
-
+//#define DEBUGLOGF( A,B )  Debug::log( A )  
+//#define DEBUGLOG( A )  Debug::log( A )  
+#include <stdio.h>
+#define DEBUGLOGF  printf  
+#define DEBUGLOG  printf 
 
 class Debug
 {

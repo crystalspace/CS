@@ -18,7 +18,9 @@
 
 */
 
+#ifndef __NO_CRYSTALSPACE__
 #include "sysdef.h"
+#endif
 #include "csphyzik/forces.h"
 #include "csphyzik/phyzent.h"
 #include "csphyzik/refframe.h"

@@ -51,8 +51,16 @@ public:
 	ctVector3 get_linear_a(){ ctVector3 aret( a[3], a[4], a[5] ); return aret; }
 	ctVector3 get_angular_a(){ ctVector3 aret( a[0], a[1], a[2] ); return aret; }
 
+  /// can use this to impart and impulse to this object.
+  /// impulse_point is vector from center of body to point of collision in 
+  /// world coordinates.  impulse_vector is in world coords
   void apply_impulse( ctVector3 impulse_point,
 			      ctVector3 impulse_vector );
+
+  // calculate virtual mass and behaviour for an impulse applied at a point
+  // impulse_point is point of collision in world frame
+  void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
+    const ctVector3 &unit_length_impulse_vector );
 
 protected:
 
@@ -67,7 +75,13 @@ protected:
 
   void impulse_to_v();
 
+  void test_impulse_response();
+
   void propagate_impulse();
+
+  void zero_Ja_help();
+
+  void zero_Ja();
 
 	// the articulated body we are solving motions for
 	ctArticulatedBody &ab;

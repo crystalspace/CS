@@ -34,7 +34,7 @@
 class ctReferenceFrame
 {
 public:
-	ctReferenceFrame( coord px = 0, coord py = 0, coord pz = 0, angle ppitch = 0, angle proll = 0, angle pyaw = 0, ctReferenceFrame *ref = NULL );
+	ctReferenceFrame( coord px = 0, coord py = 0, coord pz = 0, ctangle ppitch = 0, ctangle proll = 0, ctangle pyaw = 0, ctReferenceFrame *ref = NULL );
 
 	~ctReferenceFrame(){}
 
@@ -57,7 +57,7 @@ public:
 
 	const ctVector3 &get_offset(){ return offset; }
 	const ctVector3 &get_world_offset(){ return offset; }
-	void set_offset( ctVector3 &v ){ offset = v; }
+	void set_offset( const ctVector3 &v ){ offset = v; }
 	void set_world_offset( ctVector3 &v ){ offset = v; }	
 
 	// get/set rotation matrix ( transform from child to parent frame )

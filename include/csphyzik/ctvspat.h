@@ -156,6 +156,18 @@ public:
 		elements[5] = pb[2];
 	}
 
+	ctVector3 get_a(){
+ 		return ctVector3(elements[0],
+		          elements[1],
+		          elements[2]);
+	}
+
+	ctVector3 get_b(){
+ 		return ctVector3(elements[3],
+		          elements[4],
+		          elements[5]);
+	}
+
 	void operator=( const ctSpatialVector6 &pm ){
 		for( int idx = 0; idx < 6; idx++ )
 			elements[idx] = pm[idx];

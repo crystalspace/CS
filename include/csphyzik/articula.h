@@ -32,7 +32,9 @@ class ctInverseKinematics;
 
 // articulated body.  Definition: a handle ( rigid body ) with 0 or more  
 // articulated bodies attached to it via joints
-class ctArticulatedBody : public ctEntity
+//!me problem here needs to be ctPhysicalEntity for CD/CR, but then
+//!me things get fucked up because of v and w vars in here....
+class ctArticulatedBody : public ctReferenceFrameEntity
 {
 public:
 
@@ -68,9 +70,12 @@ public:
 	// that includeds this handle and all children down to the leaf nodes. 
 	void apply_forces( real t );
 
-
   virtual void apply_impulse( ctVector3 impulse_point,
 			      ctVector3 impulse_vector );
+
+  // impulse_point is point of collision in world frame
+  virtual void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
+			      const ctVector3 &unit_length_impulse_vector );
 
 	virtual void init_state();
 
@@ -105,6 +110,23 @@ public:
 	void calc_relative_frame();
 
 	void update_links();
+
+//* ctReferenceFrameEntity interface implentation
+
+  virtual ctVector3 get_v(){ return handle->get_v(); }
+  virtual void set_v( const ctVector3 &pv ){ handle->set_v( pv ); }
+  virtual const ctVector3 &get_pos(){ return handle->get_pos(); }
+  virtual void set_pos( const ctVector3 &px ){ handle->set_pos(px); }
+  virtual void set_angular_v( const ctVector3 &pw ){ handle->set_angular_v(pw); }
+  virtual ctVector3 get_angular_v(){ return handle->get_angular_v(); }
+
+  virtual const ctMatrix3 &get_R(){ return handle->get_R(); }
+  virtual const ctMatrix3 &get_T(){ return handle->get_T(); }
+
+  virtual const ctMatrix3 &get_world_to_this(){ return handle->get_world_to_this(); }
+  virtual const ctMatrix3 &get_this_to_world(){ return handle->get_this_to_world(); }
+  virtual void v_this_to_world( ctVector3 &pv ){ handle->v_this_to_world(pv); }
+  virtual ctVector3 get_v_this_to_world( ctVector3 &pv ){ return handle->get_v_this_to_world(pv); }
 
 	friend class ctFeatherstoneAlgorithm;
 	friend class ctInverseKinematics;

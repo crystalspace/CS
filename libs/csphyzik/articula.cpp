@@ -20,7 +20,9 @@
 
 // bleh, bleh, I am articula; I don't drink.... wine.....
 
+#ifndef __NO_CRYSTALSPACE__
 #include "sysdef.h"
+#endif
 #include "csphyzik/articula.h"
 #include "csphyzik/joint.h"
 #include "csphyzik/debug.h"
@@ -139,6 +141,13 @@ void ctArticulatedBody::apply_impulse( ctVector3 impulse_point, ctVector3 impuls
 {
   ((ctArticulatedSolver *)solver)->apply_impulse( impulse_point, impulse_vector );
 }
+
+void ctArticulatedBody::get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
+			      const ctVector3 &impulse_vector )
+{
+  ((ctArticulatedSolver *)solver)->get_impulse_m_and_I_inv( pm, pI_inv, impulse_point, impulse_vector );
+}
+
 
 void ctArticulatedBody::init_state()
 {

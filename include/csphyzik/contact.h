@@ -41,16 +41,18 @@ public:
   }
 
   // set body_b to NULL if it is an immovable object. e.g. the ground.
-  ctPhysicalEntity *body_a;  // body a.  this. ignored in collisions
-  ctPhysicalEntity *body_b;  // body b.  other body involved in the contact
+  ctReferenceFrameEntity *body_a;  // body a.  this. ignored in collisions
+  ctReferenceFrameEntity *body_b;  // body b.  other body involved in the contact
 
   ctVector3 contact_p;  // point of contact in world coords
 	
 	ctVector3 ea;  // edge direction for a
 	ctVector3 eb;  // edge direction for b
 
-	bool vf;
+  //!me bad code: fix it.  Should be enumed types
+	bool vf;  // true if it is a vertex-face collision. false if edge edge
 
+  // pointed away from body b, towards body a
   ctVector3 n;   // collision normal
 
   // coefficent of restitution.  what % of v bounces back. +ve
@@ -85,6 +87,7 @@ public:
 
 	bool vf;
 
+  // pointed away from body b, towards body a
   ctVector3 n;   // collision normal
 
   // link to next contact

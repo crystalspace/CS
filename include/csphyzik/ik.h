@@ -42,7 +42,11 @@ public:
 	ctVector3 get_angular_a(){ return ctVector3(0.0, 0.0, 0.0); }
 
   void apply_impulse( ctVector3 impulse_point,
-    ctVector3 impulse_vector ){};
+    ctVector3 impulse_vector ){}
+
+  void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
+			      const ctVector3 &impulse_vector ){}
+
 
 protected:
 	void solve_IK( real t, ctVector3 &the_goal, ctVector3 &end_effector );

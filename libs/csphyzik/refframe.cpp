@@ -18,10 +18,12 @@
 
 */
 
+#ifndef __NO_CRYSTALSPACE__
 #include "sysdef.h"
+#endif
 #include "csphyzik/refframe.h"
 
-ctReferenceFrame::ctReferenceFrame( coord px, coord py, coord pz, angle ppitch, angle proll, angle pyaw, ctReferenceFrame *ref ): offset( px, py, pz )
+ctReferenceFrame::ctReferenceFrame( coord px, coord py, coord pz, ctangle ppitch, ctangle proll, ctangle pyaw, ctReferenceFrame *ref ): offset( px, py, pz )
 {
   //!me what the hell is this.  Who writes this stuff?
   (void) ref;

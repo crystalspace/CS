@@ -20,7 +20,13 @@
 
 //!me last readable version before optimization in Crystal Space 15.002
 
+// this algorithm largely taken from Brian Mirtich's master thesis.
+// original algorithm is Dr. Featherstone's.  ( his book is much harder to understand ).
+
+
+#ifndef __NO_CRYSTALSPACE__
 #include "sysdef.h"
+#endif
 #include "csphyzik/feathers.h"
 #include "csphyzik/articula.h"
 #include "csphyzik/joint.h"
@@ -348,6 +354,61 @@ ctSpatialVector svwork, gXfa;
 	}
 }
 
+// used to see what the effect of a "test" impulse is upon the velocity 
+// of one link
+void ctFeatherstoneAlgorithm::test_impulse_response()
+{
+  ctArticulatedBody *inboard_link;
+  ctFeatherstoneAlgorithm *in_feather;
+  ctSpatialVector s;
+
+  if( ab.inboard_joint != NULL ){
+    inboard_link = ab.inboard_joint->inboard;
+    if( inboard_link != NULL ){
+      in_feather = (ctFeatherstoneAlgorithm *)inboard_link->solver;
+	    ctSpatialMatrix fXg;
+      ctVector3 vwork;
+      s = ab.inboard_joint->get_spatial_joint_axis();
+      // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
+      ab.T_fg.put_transpose( Mwork );
+      Mwork.mult_v( vwork, ab.r_fg );
+      vwork *= -1.0; 
+      fXg.form_spatial_transformation( Mwork, vwork );
+
+      // calc impulse transfered to parent
+      ctSpatialMatrix6 Ident;
+      Ident.identity();
+      ctSpatialMatrix6 Ident1;
+      Ident1 = Ia*s*(!s)*(1.0L/sIs);
+      in_feather->Ja = fXg*( Ident - Ident1 )*Ja;
+      // recurse
+      in_feather->test_impulse_response();
+    }
+  }
+  
+  // so go back down and calc v changes from impulses
+  // as the stack unwinds on path from root to impulse link
+  
+  // root gets special treatment
+  if( ab.inboard_joint == NULL ){
+    if( ab.is_grounded ){
+      dv.zero();
+    }else{
+      Ia.solve( dv, Ja*(-1.0) );
+    }
+  }else{
+   // instantaneous change in joint acceleration
+    real dqv;  
+    ctSpatialVector s = ab.inboard_joint->get_spatial_joint_axis();
+
+    dqv = !s*( 1.0L/sIs )*( Ia*gXf*in_feather->dv + Ja )*(-1.0);
+    dv = gXf*in_feather->dv + s*dqv;
+
+    ab.inboard_joint->qv += dqv;
+  }
+}
+
+
 void ctFeatherstoneAlgorithm::impulse_to_v()
 {
   ctFeatherstoneAlgorithm *in = (ctFeatherstoneAlgorithm *)(ab.inboard_joint->inboard->solver);
@@ -358,7 +419,7 @@ void ctFeatherstoneAlgorithm::impulse_to_v()
   dqv = !s*( 1.0L/sIs )*( Ia*gXf*in->dv + Ja )*(-1.0);
   dv = gXf*in->dv + s*dqv;
 
-  ab.inboard_joint->qv += dqv;
+  ab.inboard_joint->qv += dqv; 
 
   ctArticulatedBody *out_link = ab.outboard_links.get_first();
   ctFeatherstoneAlgorithm *out_link_solver;
@@ -395,11 +456,19 @@ void ctFeatherstoneAlgorithm::propagate_impulse()
       in_feather->Ja = fXg*( Ident - Ident1 )*Ja;
       // recurse
       in_feather->propagate_impulse();
+      return;
     }
   }
   
   // we have reached the root, so go back down and calc v changes from impulses
-  dv.zero();
+  if( ab.is_grounded ){
+    dv.zero();
+  }else{
+    Ia.solve( dv, Ja*(-1.0) );
+    //!me gains energy..... something is wrong.  otherwise looks good
+    ab.handle->set_v( ctVector3( dv[3], dv[4], dv[5] ) ); 
+    ab.handle->set_angular_v( ctVector3( dv[0], dv[1], dv[2] ) ); 
+  }
   ctArticulatedBody *out_link = ab.outboard_links.get_first();
   ctFeatherstoneAlgorithm *out_link_solver;
 	while( out_link ){
@@ -409,16 +478,79 @@ void ctFeatherstoneAlgorithm::propagate_impulse()
 	}
 }
 
+void ctFeatherstoneAlgorithm::zero_Ja_help()
+{
+  Ja *= 0.0;
+  ctArticulatedBody *out_link = ab.outboard_links.get_first();
+  ctFeatherstoneAlgorithm *out_link_solver;
+	while( out_link ){
+		out_link_solver = (ctFeatherstoneAlgorithm *)out_link->solver;
+		out_link_solver->zero_Ja_help();
+		out_link = ab.outboard_links.get_next();
+	}
+}
+
+
+void ctFeatherstoneAlgorithm::zero_Ja()
+{
+  ctArticulatedBody *inboard_link;
+  ctFeatherstoneAlgorithm *in_feather;
+
+  if( ab.inboard_joint != NULL ){
+    inboard_link = ab.inboard_joint->inboard;
+    in_feather = (ctFeatherstoneAlgorithm *)inboard_link->solver;
+    in_feather->zero_Ja();
+    return;
+  }
+
+  // we are at root so go down and zero out Ja
+  zero_Ja_help();
+}
+
+
+//!me mirtich uses a "F_coll" Frame of collision where the z-axis is the collision
+//!me normal...  kinda wierd.
+//!me So I stray from Mirtich here and use world coords instead of coll frame.
+//!me looks like things are working... needs some testing to make sure it all works
 void ctFeatherstoneAlgorithm::apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector )
 {
-  ctMatrix3 iR = ab.handle->get_this_to_world();
-  ctVector3 ir = iR.get_transpose()*(ab.handle->get_org_world() - impulse_point);
+  ctMatrix3 iR = ab.handle->get_world_to_this();
+  ctVector3 ir = iR*(-impulse_point);
   ctVector3 ija = iR*impulse_vector;
-  ctVector3 ijb = -ir % ( iR*impulse_vector );
+  ctVector3 ijb = -ir % ija;
   ctSpatialVector j_coll( ija, ijb );
 
+  zero_Ja();
   Ja = j_coll*(-1.0);
 
   propagate_impulse();
+
+}
+
+// calculate virtual mass and behaviour for an impulse applied at a point
+void ctFeatherstoneAlgorithm::get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
+    const ctVector3 &impulse_vector )
+{
+  // theory is that I can calculate what the mass and the inertia tensor is
+  // based on how this articulated body responds to a test impulse...
+  // Mirtich uses 3 orthogonal test impulses... but he is doing some kind of 
+  // continuous "collision integration".  I think I can get away with just one test
+  ctVector3 test_j = impulse_vector;
+  test_j.Normalize();
+  ctMatrix3 iR = ab.handle->get_world_to_this();
+  ctVector3 ir = iR*(-impulse_point);
+  ctVector3 ija = iR*test_j;
+  ctVector3 ijb = -ir % ija;
+  ctSpatialVector j_coll( ija, ijb );
+
+  Ja = j_coll*(-1.0);
+  test_impulse_response();
+
+  ctVector3 dv_world = iR.get_transpose()*dv.get_b();
+  *pm = 1.0/(dv_world*impulse_vector);
+  ctVector3 dw_world = iR.get_transpose()*dv.get_a();
+  ctVector3 r_x_i = -ir%impulse_vector;
+  // obtained by solving dw = Ia^-1(r x J)  for Ia^-1
+  *pI_inv = ctMatrix3(dw_world*r_x_i/(r_x_i*r_x_i));
 
 }
