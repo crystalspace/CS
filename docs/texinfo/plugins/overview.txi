@@ -42,9 +42,14 @@ internet or similar connection. @xref{Network Drivers}.
 @item
 @emph{3D Engine}
 
-Historically the engine was written as a library and it can still be used
-in that manner. However, it is now recommended to use the engine as a
-plugin instead. @xref{csEngine}.
+This is the core of Crystal Space. It is the main driving force behind
+CS. @xref{csEngine}.
+
+@item
+@emph{Isometric Engine}
+
+There is also an isometric engine that you can use instead of the 3D engine.
+While not as advanced as the 3D engine it is usable.
 
 @item
 @emph{Mesh Objects}

@@ -21,6 +21,13 @@ chronological order.
 	      Someone please write this :-)
 	    - Added links to the new sprcal3d document from the features
 	      section.
+	- Jorrit did several other documentation enhancements:
+	    - Added mention of the isometric engine to the plugin overview
+	      section and removed the sentence that claimed you could use
+	      the engine as a library. That's no longer possible.
+	    - Removed mention of the obsolete effect system from the
+	      graphics section.
+	    - Replaced 'effects' with 'shaders' in the XML format document.
 11-Feb-2004
 	- Jorrit optimized the csNewParticleSystem slightly (used by the
 	  rain mesh plugin) and also cleaned it up a bit.

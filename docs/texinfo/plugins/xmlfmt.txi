@@ -46,7 +46,7 @@ The basic structure of a map file for Crystal Space is as follows:
   initialization part:
     one texture specification section.
     one material specification section.
-    one effects section.
+    one shader section.
     one sounds section.
     one variable section.
     one render priority section.
@@ -176,12 +176,12 @@ that uses the @samp{plasma} texture. The layer is scaled 10 times in both
 on which this material is used is large). Note that not all renderers
 support layered materials. In that case the second layer will be ignored.
 
-@subsubheading Effects Section
-@cindex effects (Map File)
+@subsubheading Shader Section
+@cindex shaders (Map File)
 
-With effects you can describe more advanced texture and material
-effects (think shaders). The documentation for this section is not up-to-date
-since the entire effect/shader system is still work in progress.
+With shaders you can describe more advanced texture and material
+effects. The documentation for this section is not up-to-date
+since the entire shader system is still work in progress.
 
 @subsubheading Sounds Section
 @cindex sounds (Map File)

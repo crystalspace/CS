@@ -29,12 +29,11 @@ that don't need 3D rendering but still want to use Crystal Space). Additionally
 there is also a new OpenGL renderer that is in development right now.
 
 @item
-Effect or Shader System
+Shader System
 
 Some of the renderers (currently the OpenGL renderer) also require an
-additional effect or shader system. When this is present it is possible
-to make more advanced texture effects using shaders. This is still work
-in progress.
+additional shader system. When this is present it is possible
+to make more advanced texture effects using shaders.
 @end itemize
 
 @menu
