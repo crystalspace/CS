@@ -71,9 +71,7 @@ void csPolyTexture::SetMipmapSize (int mm)
     case 16: mipmap_shift = 4; break;
     case 32: mipmap_shift = 5; break;
     case 64: mipmap_shift = 6; break;
-    default: CsPrintf (MSG_FATAL_ERROR, "Bad mipmap value!\n");
-             fatal_exit (0, false);
-             mipmap_shift = 0;
+    default: mipmap_size = 2; mipmap_shift = 1; break;
   }
 }
 
