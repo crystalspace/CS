@@ -263,6 +263,8 @@ void csLightningMeshObjectFactory::CalculateFractal()
 
   Vertices[m2 - 2].x = origin.x;
   Vertices[m2 - 2].y = origin.y;
+
+  GenFactState->Invalidate();
 }
 
 void csLightningMeshObjectFactory::NextFrame (csTicks CurrentTime)
