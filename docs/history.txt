@@ -14,10 +14,10 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 6-Oct-1999
-	- Eric Sunshine implemented dynamic loading for the MacOS/X Server,
+	- Eric Sunshine implemented dynamic linking for the MacOS/X Server,
 	  OpenStep, and NextStep ports of Crystal Space.  This was a
 	  significant change which touched about 80 files on account of the
-	  radically different semantics of dynamic loading between NeXT and
+	  radically different semantics of dynamic linking between NeXT and
 	  CS/COM.  The changes affected every port and every driver in one way
 	  or another.  I also made a number of changes to COM in support of
 	  this change.
