@@ -36,9 +36,6 @@ struct iPolygon3D;
 struct iSector;
 struct iClipper2D;
 
-/// A callback function for csLight::LightingFunc().
-typedef void (csLightingFunc) (csFrustumView* lview, int type, void* entity);
-
 /**
  * This class is a csFrustum especially used for the lighting calculations.
  * It represents a shadow. It extends csFrustum by adding the notion of
@@ -435,16 +432,6 @@ private:
 
   /// If true the we process shadows for things.
   bool things_shadow;
-
-  /**
-   * A callback function. If this is set then no actual
-   * lighting is done.
-   * Instead the callback function is called.
-   */
-  csLightingFunc* callback;
-
-  /// Userdata belonging to the callback.
-  void* callback_data;
 
   /**
    * Mask and value which will be checked against the flags of every

@@ -101,7 +101,7 @@ void select_object (iRenderView* rview, int type, void* entity)
   (void)rview; (void)type; (void)entity;
 #if 0
 //@@@@@@@@@@@@@
-  if (type == CALLBACK_POLYGON2D)
+  if (type == CS_CALLBACK_POLYGON2D)
   {
     int i;
     csPolygon2D* polygon = (csPolygon2D*)entity;
@@ -119,7 +119,7 @@ void select_object (iRenderView* rview, int type, void* entity)
 
     delete pp;
   }
-  else if (type == CALLBACK_SECTOR)
+  else if (type == CS_CALLBACK_SECTOR)
   {
     csSector* sector = (csSector*)entity;
     int i;
@@ -163,7 +163,7 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
 {
   csWireFrame* wf = Sys->wf->GetWireframe ();
 #if 0
-  if (type == CALLBACK_POLYGON)
+  if (type == CS_CALLBACK_POLYGON)
   {
     csPolygon3D* poly = (csPolygon3D*)entity;
     int j;
@@ -176,7 +176,7 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
   }
   else
 #endif
-  if (type == CALLBACK_SECTOR)
+  if (type == CS_CALLBACK_SECTOR)
   {
     csSector* sector = (csSector*)entity;
     iSector* isector = &(sector->scfiSector);

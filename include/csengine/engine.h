@@ -678,7 +678,7 @@ public:
    * auto-detected (depending on level and/or hardware capabilities)
    * the first time csEngine::Draw() is called.
    */
-  void SetEngineMode (int mode)
+  virtual void SetEngineMode (int mode)
   {
     engine_mode = mode;
   }

@@ -37,8 +37,6 @@ csFrustumView::csFrustumView () :
 	curve_func (NULL),
 	userdata (NULL),
 	things_shadow (false),
-	callback (NULL),
-	callback_data (NULL),
 	ctxt (NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);

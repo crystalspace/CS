@@ -1727,11 +1727,6 @@ void csPolygon3D::FillLightMapDynamic (csFrustumView& lview)
 {
   csFrustumContext* ctxt = lview.GetFrustumContext ();
   //@@@if (orig_poly) return; BE CAREFUL
-  //@@@ DISABLED if (lview.callback)
-  //{
-    //lview.callback (&lview, CALLBACK_POLYGON, (void*)this);
-    //return;
-  //}
 
   // We are working for a dynamic light. In this case we create
   // a light patch for this polygon.

@@ -368,6 +368,9 @@ struct iMeshFactoryWrapper : public iBase
 
 SCF_VERSION (iMeshList, 0, 0, 1);
 
+/**
+ * A list of meshes.
+ */
 struct iMeshList : public iBase
 {
   /// Return the number of meshes in this list.
@@ -386,6 +389,9 @@ struct iMeshList : public iBase
 
 SCF_VERSION (iMeshFactoryList, 0, 0, 1);
 
+/**
+ * A list of mesh factories.
+ */
 struct iMeshFactoryList : public iBase
 {
   /// Return the number of mesh factories in this list.

@@ -250,7 +250,7 @@ void csMeshWrapper::DrawInt (iRenderView* rview)
   iMeshWrapper* meshwrap = &scfiMeshWrapper;
   if (rview->GetCallback ())
   {
-    rview->CallCallback (CALLBACK_MESH, (void*)&scfiMeshWrapper);
+    rview->CallCallback (CS_CALLBACK_MESH, (void*)&scfiMeshWrapper);
   }
   if (draw_cb) if (!draw_cb->BeforeDrawing (meshwrap, rview)) return;
 
@@ -258,7 +258,7 @@ void csMeshWrapper::DrawInt (iRenderView* rview)
   {
     if (rview->GetCallback ())
     {
-      rview->CallCallback (CALLBACK_VISMESH, (void*)&scfiMeshWrapper);
+      rview->CallCallback (CS_CALLBACK_VISMESH, (void*)&scfiMeshWrapper);
     }
     else
     {

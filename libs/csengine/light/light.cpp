@@ -257,31 +257,6 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
   lptq->DecRef ();
 }
 
-void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
-{
-  (void)callback; (void)callback_data;
-#if 0
-  csFrustumView lview;
-  csFrustumContext* ctxt = lview.GetFrustumContext ();
-  lview.SetNodeFunction (node_light_func);
-  lview.SetPolygonFunction (poly_light_func);
-  lview.SetCurveFunction (curve_light_func);
-  lview.SetRadius (GetRadius ());
-  lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
-  lview.callback = callback;
-  lview.callback_data = callback_data;
-  lview.shadow_thing_mask = CS_ENTITY_NOSHADOWS;
-  lview.shadow_thing_value = 0;
-  lview.process_thing_mask = CS_ENTITY_NOLIGHTING;
-  lview.process_thing_value = 0;
-
-  ctxt->light_frustum = new csFrustum (center);
-  ctxt->light_frustum->MakeInfinite ();
-  sector->CheckFrustum ((iFrustumView*)&lview);
-#endif
-}
-
-
 void csStatLight::RegisterLightMap (csLightMap* lmap)
 {
   if (!dynamic) return;

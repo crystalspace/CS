@@ -27,6 +27,11 @@ The history order is reversed so that new features are at the top.
 	  request a shutdown of the CS run-loop.)
 	- Fixed the Hurd, FreeBSD, Irix, and Solaris makefiles to also
 	  include the helper plugins for the X canvases.
+	- Added iEngine::SetEngineMode().
+	- Removed support for the obsolete and not-working lighting
+	  callback.
+	- Removed csStatLight::LightingFunc().
+	- Renamed CALLBACK_... to CS_CALLBACK_...
 29-Aug-2001
 	- Andrew Zabolotny reports: OS/2 port strikes back :-)
 	    - Fixed csdive plugin.

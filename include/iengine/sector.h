@@ -52,7 +52,7 @@ SCF_VERSION (iSector, 0, 4, 0);
  */
 struct iSector : public iBase
 {
-  /// Used by the engine to retrieve internal sector object (ugly)
+  /// @@@ Used by the engine to retrieve internal sector object (ugly)
   virtual csSector *GetPrivateObject () = 0;
   /// Get the iObject for this sector.
   virtual iObject *QueryObject() = 0;

@@ -123,14 +123,13 @@ struct iProgressMeter;
 #define CS_ENGINE_CACHE_WRITE 2
 
 /**
- * Flags for the callbacks called via iEngine::DrawFunc() or
- * iLight::LightingFunc().
- * (type iDrawFuncCallback or iLightingFuncCallback).
+ * Flags for the callbacks called via iEngine::DrawFunc().
+ * (type iDrawFuncCallback).
  */
-#define CALLBACK_SECTOR 1
-#define CALLBACK_SECTOREXIT 2
-#define CALLBACK_MESH 3
-#define CALLBACK_VISMESH 4
+#define CS_CALLBACK_SECTOR 1
+#define CS_CALLBACK_SECTOREXIT 2
+#define CS_CALLBACK_MESH 3
+#define CS_CALLBACK_VISMESH 4
 
 SCF_VERSION (iDrawFuncCallback, 0, 0, 1);
 
@@ -144,7 +143,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 6, 1);
+SCF_VERSION (iEngine, 0, 6, 2);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -307,6 +306,15 @@ struct iEngine : public iBase
    * flags that the application might be interested in.
    */
   virtual int GetBeginDrawFlags () const = 0;
+
+  /**
+   * Set the desired engine mode.
+   * One of the CS_ENGINE_... flags. Default is CS_ENGINE_AUTODETECT.
+   * If you select CS_ENGINE_AUTODETECT then the mode will be
+   * auto-detected (depending on level and/or hardware capabilities)
+   * the first time csEngine::Draw() is called.
+   */
+  virtual void SetEngineMode (int mode) = 0;
 
   /**
    * Get the current engine mode.

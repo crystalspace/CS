@@ -343,15 +343,6 @@ public:
    */
   void CalculateLighting (iMeshWrapper* mesh);
 
-  /**
-   * This function is similar to CalculateLighting. It will do all the stuff
-   * that CalculateLighting would do except for one important thing: it will
-   * not actually light the polygons. Instead it will call a callback function for
-   * every entity that it was planning to light. This allows you to show
-   * or draw debugging information.
-   */
-  void LightingFunc (csLightingFunc* callback, void* callback_data = NULL);
-
   //------------------------ iStatLight interface -----------------------------
   SCF_DECLARE_IBASE_EXT (csLight);
 

@@ -694,7 +694,7 @@ void csSector::Draw (iRenderView* rview)
 
   if (rview->GetCallback ())
   {
-    rview->CallCallback (CALLBACK_SECTOR, (void*)&scfiSector);
+    rview->CallCallback (CS_CALLBACK_SECTOR, (void*)&scfiSector);
   }
   else
   {
@@ -845,7 +845,7 @@ void csSector::Draw (iRenderView* rview)
 
   if (rview->GetCallback ())
   {
-    rview->CallCallback (CALLBACK_SECTOREXIT, (void*)&scfiSector);
+    rview->CallCallback (CS_CALLBACK_SECTOREXIT, (void*)&scfiSector);
   }
   else
   {
