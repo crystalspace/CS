@@ -40,6 +40,18 @@ chronological order.
 	  configuration runs.
 	- Eric Sunshine fixed bug in glrender.mak.  `gl3dclean' was no declared
 	  "phony" in `roottargets'.
+	- Eric Sunshine made the following changes to cocoa2d.mak:
+	    - Removed MACOSX.SOURCE_COCOA2D_PATHS and
+	      MACOSX.HEADER_COCOA2D_PATHS variables.  These were a necessary
+	      complication from back when the plugin had to build for MacOS/X,
+	      Rhapsody, OpenStep, and NextStep; but are no longer needed since
+	      the older ports were dropped.  Also, MACOSX.HEADER_COCOA2D_PATHS
+	      was not dealing correctly with $(SRCDIR); it was simply being
+	      ignored.
+	    - Added support for .mm Objective-C++ file extension.
+	    - Converted over to new build style where generated resources are
+	      placed in a cocoa2d-specific build directory, rather than directly
+	      in $(OUT).
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

@@ -25,38 +25,14 @@ ifeq ($(MAKESECTION),roottargets)
 all softcanvas plugins drivers drivers2d: cocoa2d
 
 cocoa2d:
-	$(MAKE_TARGET) MAKE_DLL=yes DO_COCOA2D=yes
+	$(MAKE_TARGET) MAKE_DLL=yes
 cocoa2dclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#----------------------------------------------------------------- defines ---#
-ifeq ($(MAKESECTION),defines)
-
-MACOSX.SOURCE_COCOA2D_PATHS = plugins/video/canvas/macosx/cocoa
-MACOSX.HEADER_COCOA2D_PATHS = \
-  $(addprefix $(CFLAGS.I),$(MACOSX.SOURCE_COCOA2D_PATHS))
-
-# Only add header search paths if actually building this plug-in or if
-# USE_PLUGINS=no, in which case this module might be built as the dependency
-# of some other module (rather than being built explicitly by the `cocoa2d'
-# target).
-ifeq ($(USE_PLUGINS),no)
-  CFLAGS.INCLUDE += $(MACOSX.HEADER_COCOA2D_PATHS)
-else
-ifeq ($(DO_COCOA2D),yes)
-  CFLAGS.INCLUDE += $(MACOSX.HEADER_COCOA2D_PATHS)
-endif
-endif
-
-endif # ifeq ($(MAKESECTION),defines)
-
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
-
-vpath %.cpp $(SRCDIR)/$(MACOSX.SOURCE_COCOA2D_PATHS)
-vpath %.m   $(SRCDIR)/$(MACOSX.SOURCE_COCOA2D_PATHS)
 
 ifeq ($(USE_PLUGINS),yes)
   COCOA2D = $(OUTDLL)/cocoa2d$(DLL)
@@ -69,24 +45,39 @@ else
   TO_INSTALL.STATIC_LIBS += $(COCOA2D)
 endif
 
-INF.COCOA2D = $(SRCDIR)/plugins/video/canvas/macosx/cocoa/cocoa2d.csplugin
-INC.COCOA2D = $(wildcard $(addprefix $(SRCDIR)/,$(INC.COMMON.DRV2D) \
-  $(addsuffix /*.h,$(MACOSX.SOURCE_COCOA2D_PATHS))))
-SRC.COCOA2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) \
-  $(addsuffix /*.cpp,$(MACOSX.SOURCE_COCOA2D_PATHS)) \
-  $(addsuffix /*.m,$(MACOSX.SOURCE_COCOA2D_PATHS))))
-OBJ.COCOA2D = $(addprefix $(OUT)/, \
-  $(notdir $(subst .cpp,$O,$(SRC.COCOA2D:.m=$O))))
+DIR.COCOA2D = plugins/video/canvas/macosx/cocoa
+OUT.COCOA2D = $(OUT)/$(DIR.COCOA2D)
+INF.COCOA2D = $(SRCDIR)/$(DIR.COCOA2D)/cocoa2d.csplugin
+INC.COCOA2D = $(wildcard $(addprefix $(SRCDIR)/, \
+  $(DIR.COCOA2D)/*.h $(INC.COMMON.DRV2D)))
+SRC.COCOA2D = $(wildcard $(addprefix $(SRCDIR)/, \
+  $(foreach s,*.cpp *.m *.mm,$(DIR.COCOA2D)/$s) $(SRC.COMMON.DRV2D)))
+OBJ.COCOA2D = $(addprefix $(OUT.COCOA2D)/, \
+  $(notdir $(subst .cpp,$O,$(subst .mm,$O,$(SRC.COCOA2D:.m=$O)))))
 DEP.COCOA2D = CSUTIL
+
+OUTDIRS += $(OUT.COCOA2D)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cocoa2d cocoa2dclean
+.PHONY: cocoa2d cocoa2dclean cocoa2dcleandep
 
 cocoa2d: $(OUTDIRS) $(COCOA2D)
+
+$(OUT.COCOA2D)/%$O: $(SRCDIR)/$(DIR.COCOA2D)/%.cpp
+	$(DO.COMPILE.CPP)
+
+$(OUT.COCOA2D)/%$O: $(SRCDIR)/$(DIR.COCOA2D)/%.mm
+	$(DO.COMPILE.MM)
+
+$(OUT.COCOA2D)/%$O: $(SRCDIR)/$(DIR.COCOA2D)/%.m
+	$(DO.COMPILE.M)
+
+$(OUT.COCOA2D)/%$O: $(SRCDIR)/plugins/video/canvas/common/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(COCOA2D): $(OBJ.COCOA2D) $(LIB.COCOA2D)
 	$(DO.PLUGIN)
@@ -95,12 +86,16 @@ clean: cocoa2dclean
 cocoa2dclean:
 	-$(RMDIR) $(COCOA2D) $(OBJ.COCOA2D) $(OUTDLL)/$(notdir $(INF.COCOA2D))
 
+cleandep: cocoa2dcleandep
+cocoa2dcleandep:
+	-$(RM) $(OUT.COCOA2D)/cocoa2d.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/cocoa2d.dep
-$(OUTOS)/cocoa2d.dep: $(SRC.COCOA2D)
-	$(DO.DEP1) $(MACOSX.HEADER_COCOA2D_PATHS) $(DO.DEP2)
+dep: $(OUT.COCOA2D) $(OUT.COCOA2D)/cocoa2d.dep
+$(OUT.COCOA2D)/cocoa2d.dep: $(SRC.COCOA2D)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/cocoa2d.dep
+-include $(OUT.COCOA2D)/cocoa2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
