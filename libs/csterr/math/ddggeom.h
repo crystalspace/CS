@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -22,8 +22,13 @@
 #include "math/ddgvec.h"
 #include "util/ddgerror.h"
 
-#define ddgVertex ddgVector3
+#define ddgVertex3 ddgVector3
+#define ddgVertex2 ddgVector2
+#define ddgVertex1 float
 #define ddgPoint3 ddgVector3
+#define ddgPoint2 ddgVector2
+#define ddgPoint1 float
+
 
 /**
  * General form of plane equation:
@@ -31,127 +36,195 @@
  * <br>			n = <a,b,c> = normal.
  */
 
-class WEXP ddgPlane {
-	ddgVector3		_normal;
-	float _d;
+class WEXP ddgPlane3 {
 public:
-	inline float a(void) { return _normal[0];};
-	inline float b(void) { return _normal[1];};
-	inline float c(void) { return _normal[2];};
-	inline float d(void) { return _d;};
-	inline ddgVector3 *normal(void) { return &_normal; }
+	///
+	ddgVector3		n;
+	///
+	float d;
+	///
+	inline float a(void) { return n[0];};
+	///
+	inline float b(void) { return n[1];};
+	///
+	inline float c(void) { return n[2];};
+
 	/// Default constructor.
-	ddgPlane(void) {}
+	ddgPlane3(void) {}
 	/// Create a plane given 3 points on its surface (counter clock wise)
-	ddgPlane( const ddgVector3 p0, const ddgVector3 p1, const ddgVector3 p2)
+	ddgPlane3( const ddgVector3 p0, const ddgVector3 p1, const ddgVector3 p2)
 	{
-		_normal.normal(&p0,&p1,&p2);
+		n.normal(&p0,&p1,&p2);
 		// Solve for D.
-		_d = -1 * (_normal.dot(&p0));
+		d = -1 * (n.dot(&p0));
 	}
 	/// Create a plane given a point on its surface and a normal.
-	ddgPlane( const ddgVector3 p0, const ddgVector3 n)
+	ddgPlane3( const ddgVector3 p0, const ddgVector3 pn)
 	{
-		_normal = n;
+		n = pn;
 		// Solve for D.
-		_d = -1 * (_normal.dot(&p0));
+		d = -1 * (n.dot(&p0));
 	}
 	/// Given y and z find x in plane.
 	bool projectAlongX(ddgVector3 *p)
 	{
-		if (_normal[0] == 0.0)
+		if (n[0] == 0.0)
 			return ddgFailure;
-		(*p)[0] = -1 * (_d + _normal[1] * (*p)[1] + _normal[2] * (*p)[2])/ _normal[0];
+		(*p)[0] = -1 * (d + n[1] * (*p)[1] + n[2] * (*p)[2])/ n[0];
 		return ddgSuccess;
 	}
 	/// Given x and z find y in plane.
 	bool projectAlongY(ddgVector3 *p)
 	{
-		if (_normal[1] == 0.0)
+		if (n[1] == 0.0)
 			return ddgFailure;
-		(*p)[1] = -1 * (_d + _normal[0] * (*p)[0] + _normal[2] * (*p)[2])/ _normal[1];
+		(*p)[1] = -1 * (d + n[0] * (*p)[0] + n[2] * (*p)[2])/ n[1];
 		return ddgSuccess;
 	}
 	/// Given x and y find z in plane.
 	bool projectAlongZ(ddgVector3 *p)
 	{
-		if (_normal[2] == 0.0)
+		if (n[2] == 0.0)
 			return ddgFailure;
-		(*p)[2] = -1 * (_d + _normal[1] * (*p)[1] + _normal[0] * (*p)[0])/ _normal[2];
+		(*p)[2] = -1 * (d + n[1] * (*p)[1] + n[0] * (*p)[0])/ n[2];
 		return ddgSuccess;
 	}
-	void set( const ddgVector3 n, float d )
+	///
+	void set( const ddgVector3 pn, float pd )
 	{
-		_normal = n;
-		_d = d;
+		n = pn;
+		d = pd;
 	}
+	///
 	void normalize( void )
 	{
-		_d /= _normal.size();
-		_normal.normalize();
+		n.normalize();
 	}
     ///
 	ddgVector3 project(ddgVector3 *p0);
     /// Intersect a plane with a line (defined by 2 points) return point of intersection.
-    bool intersectPlaneWithLine( const ddgVector3 l1, const ddgVector3 l2, ddgVector3 *pi);
+    bool intersectPlaneWithLine( const ddgVector3* l1, const ddgVector3* l2, ddgVector3 *pi);
     /// Intersect a point with plane.  Returns if point is on the plane
-    bool intersectPointPlane( const ddgVector3 pt);
+    bool intersectPointPlane( const ddgVector3* pt);
 	/// Return distance between point and plane.
-	float distToPoint(const ddgVector3 p);
+	float distToPoint(const ddgVector3* p);
 	/// Returns positive if point is above plane, negative if below, 0 if on.
 	inline float isPointAbovePlane( ddgVector3 *q)
 	{
-		return _normal.dot(q)+d();
+		return n.dot(q)+d;
 	}
 };
+
+/**
+ * This is a special 2 dimensional plane, it is defined by a normal like a 3d plane
+ * but is actually a line defined by the points which are orthogonal to the line.
+ */
+
+class WEXP ddgPlane2 {
+public:
+	///
+	ddgVector2		n;
+	///
+	float d;
+	///
+	inline float a(void) { return n[0];};
+	///
+	inline float b(void) { return n[1];};
+
+	/// Default constructor.
+	ddgPlane2(void) {}
+	/// Create a plane given a point on its surface and a normal.
+	ddgPlane2( const ddgVector2 p0, const ddgVector2 pn)
+	{
+		n = pn;
+		// Solve for D.
+		d = -1 * (n.dot(&p0));
+	}
+	///
+	void set( const ddgVector2 pn, float pd )
+	{
+		n = pn;
+		d = pd;
+	}
+	///
+	void normalize( void )
+	{
+		n.normalize();
+	}
+	///
+	inline float isPointAbovePlane( ddgVector2 *q)
+	{
+		return n.dot(q)+d;
+	}
+};
+
 /**
  * Ray triangle intersection tests.
  */
 
-class WEXP ddgTriangle {
-    /// Vertices of the triangle.
-    ddgVertex  _v1;
-    ///
-    ddgVertex  _v2;
-    ///
-    ddgVertex  _v3;
+class WEXP ddgTriangle3 {
 public:
+    /// Vertices of the triangle.
+    ddgVertex3  v[3];
     /// Constructor
-    ddgTriangle(ddgVector3 p1, ddgVector3 p2, ddgVector3 p3 ) :
-        _v1(p1), _v2(p2), _v3(p3) {}
+    ddgTriangle3(ddgVector3 *p1, ddgVector3 *p2, ddgVector3 *p3 ) 
+        {v[0].set(p1), v[1].set(p2), v[2].set(p3); }
+    /// Set method
+    void set(ddgVector3 *p1, ddgVector3 *p2, ddgVector3 *p3 ) 
+        {v[0].set(p1), v[1].set(p2), v[2].set(p3); }
+    /// Default bConstructor
+    ddgTriangle3(void ) {}
     /// Intersect a triangle with line.  Returns if point is 
-    bool intersectTriangleWithLine( const ddgVector3 l1, const ddgVector3 l2, ddgVector3 *pi);
+    bool intersectTriangleWithLine( const ddgVector3* l1, const ddgVector3* l2, ddgVector3 *pi);
     /** Intersect a point with triangle.  Returns if point is inside the triangle.
      *  point is assumed to lie in plane of triangle.
      */
-    bool intersectPointTriangle( const ddgVector3 pt);
+    bool intersectPointTriangle( const ddgVector3* pt);
+};
+
+class WEXP ddgPrism3 {
+public:
+	/// Top and bottom triangle that forms the prism.
+	ddgTriangle3	t[2];
+    /// Constructor
+    ddgPrism3(ddgVector3 *pt1, ddgVector3 *pt2, ddgVector3 *pt3, ddgVector3 *pb1, ddgVector3 *pb2, ddgVector3 *pb3 )
+        { t[0].set(pt1,pt2,pt3), t[1].set(pb1,pb2,pb3); }
+    /// Constructor
+    ddgPrism3(ddgTriangle3* top, ddgTriangle3* bottom )
+		{
+		t[0] = *top;
+		t[1] = *bottom;
+		}
+	/// Default constructor.
+	ddgPrism3(void) {}
 };
 
 /**
- * Polygon object
+ * 3D Polygon object
  */
 
-class WEXP ddgPolygon {
-	unsigned short _n;
-	ddgVector3		*_p;
+class WEXP ddgPolygon3 {
 public:
-	unsigned int vertices(void) { return _n; }
-	ddgVector3		*vertex(unsigned int n) { return &(_p[n]); }
-	ddgPolygon *clip( ddgPlane *p, bool rotated);
+	/// Number of points.
+	unsigned short noPoints;
+	/// Array of points.
+	ddgVector3		*vertex;
+	/// Clip polygon against a plane.
+	ddgPolygon3 *clip( ddgPlane3 *p, bool rotated);
 };
 
 /**
  * 2D rectangle object.
  */
-class WEXP ddgRect {
+class WEXP ddgRect2 {
 public:
 	/// The minimum point.
 	ddgVector2 min;
 	/// The maximum point.
 	ddgVector2 max;
-	ddgRect(void) {}
+	ddgRect2(void) {}
 	/// Constructor from 2 points.
-	ddgRect( ddgVector2 *p1, ddgVector2 *p2)
+	ddgRect2( ddgVector2 *p1, ddgVector2 *p2)
 	{
 			min = p1;
 			max = p1;
@@ -162,7 +235,7 @@ public:
 	 * Test if rectangles intersect.
 	 * and the rectangle which is the intersection of the given rectangles.
 	 */
-	bool intersect(ddgRect *r, ddgRect *i = NULL)
+	bool intersect(ddgRect2 *r, ddgRect2 *i = NULL)
 	{
 		if (r->min[0] > max[0] || min[0] > r->max[0] || r->min[1] > max[1] || min[1] > r->max[1])
 			return false;
@@ -180,48 +253,61 @@ public:
  * 2D Line object
  */
 class WEXP ddgLine2 {
-	/// A point on the line.
-	ddgVector2	_p;
-	/// Slope vector of the line.
-	ddgVector2	_d;
 public:
+	/// A point on the line.
+	ddgVector2	p;
+	/// Slope vector of the line.
+	ddgVector2	d;
 	/// Constructor using 2 points.
 	ddgLine2( ddgVector2 *p1, ddgVector2 *p2 )
 	{
-		_p.set(p1);
-		_d.set(p2);
-		_d -=p1;
-		_d.normalize();
+		set(p1,p2);
 	}
-	/// Return point vector.
-	ddgVector2 p(void) { return _p; }
-	/// Return slope vector.
-	ddgVector2 d(void) { return _d; }
+	/// Constructor using 2 points.
+	void set( ddgVector2 *p1, ddgVector2 *p2 )
+	{
+		p.set(p1);
+		d.set(p2);
+		d -=p1;
+		d.normalize();
+	}
+	/// Default constructor.
+	ddgLine2(void) {}
+	/// Return the orthogonal slope vector.  Equivalent of 2D normal.
+	ddgVector2 o(void) { return ddgVector2(d[1],d[0]); }
+
 	/// Given X, or Y, find the other.  Return ddgFailure if unsolvable.
 	inline bool solve( ddgVector2 *v, int dim)
 	{
-		if (_d[dim] == 0.0)
+		if (d[dim] == 0.0)
 			return ddgFailure;
-		float t = (v->v[dim] - _p.v[dim])/_d[dim];
-		*v = _p + (_d * t);
+		float t = (v->v[dim] - p.v[dim])/d[dim];
+		*v = p + (d * t);
 		return ddgSuccess;
 	}
 	/// Calculate the intersection point of this line with another.
-	bool intersect( ddgLine2 *l, ddgVector2 *p)
+	bool intersect( ddgLine2 *l, ddgVector2 *pt)
 	{
-		if (_d[1] == 0 )
+		if (d[1] == 0 )
 		{
 			ddgAsserts(0,"Special case");
 		}
-		if (_d[1] == l->d()[1] && _d[0] == l->d()[0])
+		if (d[1] == l->d[1] && d[0] == l->d[0])
 		{
 			return ddgFailure;		// Parallel lines.
 		}
-		float x = (_d[0]*_p[0] - l->d()[0]*l->p()[0]+_d[1]*+_p[1]- l->d()[1]*l->p()[1])*(l->d()[1]*_d[1]);
-		x /= (_d[1]*_d[0] - l->d()[1]*l->d()[0]);
-		float y = (_d[1]*_p[1]+_d[0]*_p[0]-_d[0]*x ) / _d[1];
-		p->set(x,y);
+		float x = (d[0]*p[0] - l->d[0]*l->p[0]+d[1]*+p[1]- l->d[1]*l->p[1])*(l->d[1]*d[1]);
+		x /= (d[1]*d[0] - l->d[1]*l->d[0]);
+		float y = (d[1]*p[1]+d[0]*p[0]-d[0]*x ) / d[1];
+		pt->set(x,y);
 		return ddgSuccess;
+	}
+	/// Returns [-1,1], positive if point is left of line, negative if right, 0 if on.
+	inline float isPointLeftOfLine( ddgVector2 *q)
+	{
+		ddgVector2 vq = *q - p;
+
+	    return o().dot(&vq);
 	}
 };
 
@@ -229,58 +315,56 @@ public:
  * 3D Line object
  */
 class WEXP ddgLine3 {
-	/// A point on the line.
-	ddgVector3	_p;
-	/// Slope vector of the line.
-	ddgVector3	_d;
 public:
+	/// A point on the line.
+	ddgVector3	p;
+	/// Slope vector of the line.
+	ddgVector3	d;
 	/// Constructor using 2 points.
 	ddgLine3( const ddgVector3 p1, const ddgVector3 p2 )
 	{
-		_p.set(&p1);
-		_d.set(&p2);
-		_d -= p1;
-		_d.normalize();
+		p.set(&p1);
+		d.set(&p2);
+		d -= p1;
+		d.normalize();
 	}
-	/// Return point on line.
-	ddgVector3 p(void) { return _p; }
-	/// Return slope
-	ddgVector3 d(void) { return _d; }
 	/// Given X, Y or Z coord, find the other 2.  Return ddgFailure if unsolvable.
 	inline bool solve( ddgVector3 *u, int dim)
 	{
-		if (_d[dim] == 0.0)
+		if (d[dim] == 0.0)
 			return ddgFailure;
-		float n = ((*u)[dim] - _p[dim])/_d[dim];
+		float n = ((*u)[dim] - p[dim])/d[dim];
 
-		*u =_d + ( _p * n);
+		*u =d + ( p * n);
 		return ddgSuccess;
 	}
 
 	/// Return the intersection point of this line with another.
 	ddgVector3 intersect( ddgLine3 *)
 	{
-		ddgVector3 p(0,0,0);
-		return p;
+		ddgVector3 pt(0,0,0);
+		return pt;
 	}
 	/// Calculate the intersection point of this line with another.
-	bool intersect( ddgLine3 *l, ddgVector3 *p)
+	bool intersect( ddgLine3 *l, ddgVector3 *pt)
 	{
 		// $TODO this function is simply wrong...
-		if (_d[1] == 0 )
+		if (d[1] == 0 )
 		{
 			ddgAsserts(0,"Special case");
 		}
-		if (_d[1] == l->d()[1] && _d[0] == l->d()[0])
+		if (d[1] == l->d[1] && d[0] == l->d[0])
 		{
 			return ddgFailure;		// Parallel lines.
 		}
-		float x = (_d[0]*_p[0] - l->d()[0]*l->p()[0]+_d[1]*+_p[1]- l->d()[1]*l->p()[1])*(l->d()[1]*_d[1]);
-		x /= (_d[1]*_d[0] - l->d()[1]*l->d()[0]);
-		float y = (_d[1]*_p[1]+_d[0]*_p[0]-_d[0]*x ) / _d[1];
+		float x = (d[0]*p[0] - l->d[0]*l->p[0]+d[1]*+p[1]- l->d[1]*l->p[1])*(l->d[1]*d[1]);
+		x /= (d[1]*d[0] - l->d[1]*l->d[0]);
+		float y = (d[1]*p[1]+d[0]*p[0]-d[0]*x ) / d[1];
 		// Dirty hack.
-		p->set(x,y,(*p)[2]);
+		pt->set(x,y,p[2]);
 		return ddgSuccess;
 	}
 };
+
+
 #endif

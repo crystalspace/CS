@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -66,7 +66,7 @@ return found_simd;
 // ----------------------------------------------------------------------
 float ddgAngle::_cosTable[180*ddgAngle_res+1];
 float ddgAngle::_acosTable[180*ddgAngle_res+1];
-float ddgAngle::pi = M_PI;
+
 ddgAngle ddg_init;	// Ensure table gets initialized.
 
 ddgAngle::ddgAngle()

@@ -71,7 +71,7 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
     return false;
 
   mesh = new ddgTBinMesh (heightMap);
-  clipbox = new ddgBBox (ddgVector3(0,0,3),ddgVector3(640, 480, 15000));
+  clipbox = new ddgBBox3 (ddgVector3(0,0,3),ddgVector3(640, 480, 15000));
   context = new ddgContext ();
   context->control( &control );
 
@@ -95,6 +95,18 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
   return true;
 }
 
+/// Number of entries in the Most Recently Used cache.
+#define	_MRUsize 12
+	/// Vertices cached.
+	unsigned int _MRUvertex[_MRUsize];
+	/// Buffer indexes corresponding to those vertices.
+	int			_MRUindex[_MRUsize];
+	/// Position of last entry added into the cache.
+	unsigned int			_MRUcursor;
+	/// Number or items currently in the cache.
+	unsigned int			_MRUinuse;
+static int lut[24] = {0,1,2,3,4,5,6,7,8,9,10,11,0,1,2,3,4,5,6,7,8,9,10,11};
+#define ddgInvalidBufferIndex	0xFFFF
 
 /**
  *  Retrieve info for a single triangle.
@@ -106,24 +118,55 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
     return ddgFailure;
 
   static ddgVector3 p[3];
-  static ddgColor3 c[3];
   static ddgVector2 t[3];
-  ddgVBIndex i[3] = {0,0,0};
+  ddgVBIndex bufindex[3] = {0,0,0};
 
   ddgTriIndex tv[3];
   tv[0] = bt->parent(tvc),
   tv[2] = mesh->v0(tvc),
   tv[1] = mesh->v1(tvc);
 
-  int cnt;
-  for (cnt = 0; cnt < 3; cnt++)
+  int i, j;
+  for (i = 0; i < 3; i++)
   {
-    bt->vertex(tv[cnt],&p[cnt]);
-    bt->textureC(tv[cnt],&t[cnt]);
-    i[cnt] = vbuf->pushVT(&p[cnt],&t[cnt]);
+	bufindex[i] = ddgInvalidBufferIndex;
+	j = _MRUsize+_MRUcursor;
+	unsigned int end = j - _MRUinuse;
+	// See if the current entry is in the MRUCache.
+	while (j > end)
+	{
+		ddgAssert(j>=0 && j < _MRUsize*2);
+		if (_MRUvertex[lut[j]] == tv[i])
+		{
+			bufindex[i] = _MRUindex[lut[j]];
+			break;
+		}
+		j--;
+	}
+	if (ddgInvalidBufferIndex == bufindex[i])
+	{
+		// We could just call.
+		bt->vertex(tv[i],&p[i]);
+		bt->textureC(tv[i],&(t[i]));
+
+		// Push the vertex.
+		bufindex[i] = vbuf->pushVT(&p[i],&t[i]);
+		if (_MRUinuse < _MRUsize)
+			_MRUinuse++;
+
+		if (_MRUcursor==_MRUsize-1)
+			_MRUcursor = 0;
+		else
+			_MRUcursor++;
+
+		// Record that these vertices are in the buffer.
+		_MRUindex[_MRUcursor] = bufindex[i];
+		_MRUvertex[_MRUcursor] = tv[i];
+	}
   }
+
   // Record that these vertices are in the buffer.
-  vbuf->pushTriangle(i[0],i[1],i[2]);
+  vbuf->pushTriangle(bufindex[0],bufindex[1],bufindex[2]);
 
   return ddgSuccess;
 }
@@ -173,22 +216,28 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     {
       if ((bt = mesh->getBinTree(i)))
       {
-	s = 0;
-	if (bt->vis() != ddgOUT)
-	{
-	  // Render each triangle.
-	  ci = bt->chain();
-	  // Render each triangle.
-	  while (ci)
-	  {
-	    ddgTNode *tn = (ddgTNode*) mesh->tcache()->get(ci);
-	    if (drawTriangle(bt, tn->tindex(), vbuf) == ddgSuccess)
-	      s++;
-	    ci = tn->next();
+		unsigned int v = 0;
+
+		if (bt && bt->treeVis() != ddgOUT)
+		{
+			/// Position of last entry added into the cache.
+			_MRUcursor = _MRUsize-1;
+			/// Number or items currently in the cache.
+			_MRUinuse = 0;
+			// Find 1st triangle in the mesh.
+			ddgTriIndex tindex = bt->firstInMesh();
+			ddgTriIndex end = 0;
+
+			do 
+			{
+ 			  if (drawTriangle(bt, tindex, vbuf) == ddgSuccess)
+			    v++;
+			  tindex = bt->nextInMesh(tindex, &end);
+			}
+			while (end);
+		}
+		bt->visTriangle(v);
 	  }
-	}
-	bt->visTriangle(s);
-      }
       i++;
     }
     // Ugly hack to help software renderer, reindex the triangles per block.
@@ -200,9 +249,9 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
       d = mesh->getBinTree(i)->visTriangle() + mesh->getBinTree(i+1)->visTriangle();
       if (d > 0)
       {
-	for (j = s*3; j < 3*(s+d); j++)
-	  vbuf->ibuf[j] -= s*3;
-	s = s+d;
+        for (j = s*3; j < 3*(s+d); j++)
+          vbuf->ibuf[j] -= s*3;
+        s = s+d;
       }
       i = i+2;
     }
@@ -251,8 +300,8 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
       g3dmesh.num_triangles = d; // number of triangles
       g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);	// pointer to array of csTriangle for all triangles
       // Enable clipping for blocks that are not entirely within the view frustrum.
-      g3dmesh.do_clip = mesh->getBinTree(i)->vis() == ddgIN
-	&& mesh->getBinTree(i+1)->vis() == ddgIN ? false : true;
+      g3dmesh.do_clip = mesh->getBinTree(i)->treeVis() == ddgIN
+	&& mesh->getBinTree(i+1)->treeVis() == ddgIN ? false : true;
 
       if (rview.callback)
         rview.callback (&rview, CALLBACK_MESH, (void*)&g3dmesh);

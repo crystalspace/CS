@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -20,9 +20,10 @@
 #define _ddgContext_Class
 
 #include "util/ddg.h"
-#include "struct/ddgcntrl.h"
 #include "math/ddgmatrx.h"
-#include "struct/ddgbbox.h"
+#include "math/ddgbbox.h"
+#include "math/ddgchull.h"
+#include "struct/ddgcntrl.h"
 class ddgClock;
 class ddgPath;
 /**
@@ -58,9 +59,9 @@ private:
 	/// Aspect ratio of the view, width/height.
     float				_aspect;
 	/// Box representing the view's viewing frustrum.
-    ddgBBox				_clipbox;
+    ddgBBox3				_clipbox;
 	///	A set of frustrum planes.
-	ddgPlane			*_frustrum;
+	ddgPlane3			*_frustrum3d;
 	/// Frame we are on in the path.
 	unsigned int		_frame;
 	/// Path that we are playing back or recording to.
@@ -73,12 +74,24 @@ private:
 	ddgVector3			_up;
     /// view's normalized right vector (calculated).
 	ddgVector3			_right;
+	/// A root hull against which to clip.
+	ddgCHull3			_rootHull;
+	/** A pair of lines defining the top down view frustrum
+	 *  This is used to perform clipping in the case where the
+	 *  camera orientation is level with the XZ plane.
+	 */
+	ddgPlane2			*_frustrum2d;
+	/// A 2D topdown view of the visible area of the view frustrum.
+	ddgCHull2			_topDownWedge;
+	/// Is the view nearly level.
+	bool				_levelView;
 public:
 	/** 
      *  Constructor.
 	 */
 	ddgContext(Mode m = ALL, Quality q = MEDIUM,
 		ddgControl *ctrl = NULL, ddgClock *cl = NULL);
+
 	/// Destructor.
 	~ddgContext(void);
 
@@ -94,6 +107,11 @@ public:
     void quality(Quality q) { _quality = q; }
     /// Set the clock to use.
     void clock(ddgClock *c) { _clock = c; }
+	/// Return the hullset.
+	ddgCHull3		*rootHull(void) { return &_rootHull; }
+	/// Return the hullset.
+	ddgCHull2		*topDownWedge(void) { return &_topDownWedge; }
+
 	/**
 	 * Update the clock, control object, matrices and anything else.
 	 * Return true if something changed.
@@ -116,9 +134,11 @@ public:
 	/// Set the control object.
 	void control( ddgControl *c ) { _control = c; }
 	/// Modify the bounding box of the view's viewing frustrum.
-	void clipbox( ddgBBox *b) { _clipbox.set( b->min(), b->max()); _dirty = true; }
+	void clipbox( ddgBBox3 *b) { _clipbox.set( b->min, b->max); _dirty = true; }
 	/// Return the bounding box of the view's viewing frustrum.
-	ddgBBox *clipbox( void ) { return &_clipbox; }
+	ddgBBox3 *clipbox( void ) { return &_clipbox; }
+	/// Clip against the convex hull set.
+	ddgInside clip( ddgBBox3 *bbox);
 
 	/// Return the up vector of the view.
 	ddgVector3 *up( void) { return &_up; }
@@ -136,7 +156,7 @@ public:
     /// Callback which is called to initialize the view.
     bool init(void);
     /// Returns true if bbox is visible from this view.
-    bool visible( ddgBBox * bbox );
+    bool visible( ddgBBox3 * bbox );
 	/// Convert the world coordinates to view coordinates.
 	void transform( ddgVector3 vin, ddgVector3 *vout );
 	/// Returns true if world coordinates are visible from view.
@@ -148,9 +168,17 @@ public:
 	/**
 	 * Get frustrum clipping planes in world space coordinates.
 	 */
-	void extractPlanes(ddgPlane Planes[6]);
+	void extractPlanes(ddgPlane3 planes[6]);
+	/// Update the clipping information based on the current viewpoint.
+	void updateClippingInfo(void);
+	/** Return true if the view is practically level.
+	 *  That means up vector near [0,1,0] and forward vector near [x,0,y]
+	 */
+	bool levelView( void ) { return _levelView; }
+
+
 	/// Return the frustrum planes.
-	ddgPlane *frustrum(void)	{ return _frustrum; }
+	ddgPlane3 *frustrum(void)	{ return _frustrum3d; }
 	/// World to view transformation matrix.
 	ddgMatrix4 *transformation(void) { return &_mm; }
 	/// View to world transformation matrix. [Inverse]

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -47,7 +47,8 @@ ddgStr::ddgStr(const int size)
 
 ddgStr::~ddgStr()
 {
-	delete [] s;
+	if (s)
+		delete [] s;
 }
 
 // OPTIM: Don't call delete/new if old string is same size as new string.

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -26,39 +26,39 @@
   d = DotProduct( n, p ) * inv_denom; 
   dst[0..2] = p[0..2] - d * inv_denom * n[0..2];
 */
-ddgVector3 ddgPlane::project(ddgVector3 *p0)
+ddgVector3 ddgPlane3::project(ddgVector3 *p0)
 {
-	float inv_denom = 1.0F / _normal.dot(&_normal);
-	ddgVector3 pp(_normal);
+	float inv_denom = 1.0F / n.dot(&n);
+	ddgVector3 pp(n);
 	ddgVector3 p1;
-	if (d())
-		p1.set(0,0,-1*c()/d()); // Some point on the plane.
-	else
-		p1.set(0,-1*b()/d(),0);
+	if (d)
+		p1.set(0,0,-1*c()/d); // Some point on the plane.
+//	else
+//		p1.set(0,-1*b()/d,0); <- DIVIDE BY ZERO?
 
-	pp.multiply(-inv_denom * _normal.dot(p0) * inv_denom);
+	pp.multiply(-inv_denom * n.dot(p0) * inv_denom);
 	pp.add(&p1);
     return pp;
 }
 
 /// Return distance between point and plane.
 /// Not useful except for that the sign indicates which side the point is on.
-float ddgPlane::distToPoint(const ddgVector3 q)
+float ddgPlane3::distToPoint(const ddgVector3* q)
 {
 	// Get point on the plane, let x = 0, y  = 0.
-	ddgVector3 p;
-	if (_normal[2] != 0)
-		p = ddgVector3(0,0, d() / _normal[2]);
+	ddgVector3 pt;
+	if (n[2] != 0)
+		pt = ddgVector3(0,0, d / n[2]);
 	else
-		p = ddgVector3(0,d()/_normal[1],0);
+		pt = ddgVector3(0,d/n[1],0);
 
 	ddgVector3 pq(q);
-	pq -= p;
-	return pq.dot(&_normal)/_normal.size();
+	pq -= pt;
+	return pq.dot(&n)/n.size();
 
 }
 /// Intersect a plane with a line (defined by 2 points) return point of intersection.
-bool ddgPlane::intersectPlaneWithLine(const ddgVector3 l1, const ddgVector3 l2, ddgVector3 *pi)
+bool ddgPlane3::intersectPlaneWithLine(const ddgVector3* l1, const ddgVector3* l2, ddgVector3 *pi)
 {
 /*    If the plane is defined as:
 
@@ -79,44 +79,44 @@ When the denominator is zero, the line is contained in the plane
 if the numerator is also zero (the point at t=0 satisfies the
 plane equation), otherwise the line is parallel to the plane.
 */
-    ddgVector3 dl(l2-l1);
-    float n = (l1[0]*a() + l1[1]*b() + l1[2]*c() + d());
-    float d = (a()*dl[0]  + b()*dl[1]  + c()*dl[2]);
-    if (!d && !n) // Line lies in the plane (and thus parallel).
+    ddgVector3 dl((*l2)-(*l1));
+    float n = (l1->v[0]*a() + l1->v[1]*b() + l1->v[2]*c() + d);
+    float dv = (a()*dl[0]  + b()*dl[1]  + c()*dl[2]);
+    if (!dv && !n) // Line lies in the plane (and thus parallel).
         return true;
-    if (d && !n) // Line parallel to plane.
+    if (dv && !n) // Line parallel to plane.
         return false;
     // Line intersects with the plane.
-    float t = -1 * n / d;
+    float t = -1 * n / dv;
     dl *= t;
     *pi = l1 + dl;
     return true;
 }
 /// Intersect a point with plane.  Returns if point is on the plane
-bool ddgPlane::intersectPointPlane( ddgVector3 )
+bool ddgPlane3::intersectPointPlane( const ddgVector3* )
 {
     bool hit = false;
     return hit;
 }
 
 /// Intersect a triangle with line.  Returns if point is 
-bool ddgTriangle::intersectTriangleWithLine( const ddgVector3 l1, const ddgVector3 l2, ddgVector3 *pi)
+bool ddgTriangle3::intersectTriangleWithLine( const ddgVector3* l1, const ddgVector3* l2, ddgVector3 *pi)
 {
-    ddgPlane p(_v1,_v2,_v3);
-    return p.intersectPlaneWithLine(l1,l2,pi);
+    ddgPlane3 pl(v[0],v[1],v[2]);
+    return pl.intersectPlaneWithLine(l1,l2,pi);
 }
 /** Intersect a point with triangle.  Returns if point is inside the triangle.
  *  point is assumed to lie in plane of triangle.
  */
-bool ddgTriangle::intersectPointTriangle( const ddgVector3 pt)
+bool ddgTriangle3::intersectPointTriangle( const ddgVector3* pt)
 {
     // Must be able to optimize this...
-    ddgVector3 d1(_v1-pt);
-    ddgVector3 d2(_v2-pt);
-    ddgVector3 d3(_v3-pt);
-    ddgVector3 d12(_v1-_v2);
-    ddgVector3 d13(_v1-_v3);
-    ddgVector3 d23(_v2-_v2);
+    ddgVector3 d1(v[0]-pt);
+    ddgVector3 d2(v[1]-pt);
+    ddgVector3 d3(v[2]-pt);
+    ddgVector3 d12(v[0]-v[1]);
+    ddgVector3 d13(v[0]-v[2]);
+    ddgVector3 d23(v[1]-v[1]);
 
     float sd1 = d1.sizesq();
     float sd2 = d2.sizesq();
@@ -134,14 +134,13 @@ bool ddgTriangle::intersectPointTriangle( const ddgVector3 pt)
 }
 
 
-
 /** Polygon clipping routine.
  *  The Sutherland-Hodgeman Clipping Algorithm
  *  Plane a set of clipping planes in world space.
  */
 
 /*
-Polygon* Polygon::clip (Plane* p, bool rotated)
+Polygon3* Polygon3::clip (Plane3* p, bool rotated)
  {	// Early out: All points on one side of plane 
 	 double dist[25];
 	 bool allin=true, allout=true;

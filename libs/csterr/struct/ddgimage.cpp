@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
     (Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -132,6 +132,60 @@ bool ddgImage::mapColorToAlpha( unsigned char *color )
 	return ddgSuccess;
 }
 
+bool ddgImage::mapLuminanceToRGBA( void )
+{
+	// Convert 1 channel color Luminance to true 4 channel alpha.
+	if (channels() != 1)
+		return ddgFailure;
+
+	unsigned char pixel = 0;
+
+	ddgImage *cImgOut = new ddgImage();
+	cImgOut->allocate(rows(),cols(),4);
+	int r = 0, c = 0;
+	for (r = 0; r < rows(); r++)
+	{
+		for (c = 0; c < cols(); c++)
+		{
+			get(r,c,&pixel);
+			cImgOut->set(r,c,pixel,pixel,pixel,pixel);
+		}
+	}
+	delete [] _pixbuffer;
+	_pixbuffer = cImgOut->_pixbuffer;
+	_channels = 4;
+	cImgOut->_pixbuffer = NULL;
+	delete cImgOut;
+
+	return ddgSuccess;
+}
+bool ddgImage::mapLuminanceToRGB( void )
+{
+	// Convert 1 channel color Luminance to true 3 channel.
+	if (channels() != 1)
+		return ddgFailure;
+
+	unsigned char pixel = 0;
+
+	ddgImage *cImgOut = new ddgImage();
+	cImgOut->allocate(rows(),cols(),3);
+	int r = 0, c = 0;
+	for (r = 0; r < rows(); r++)
+	{
+		for (c = 0; c < cols(); c++)
+		{
+			get(r,c,&pixel);
+			cImgOut->set(r,c,pixel,pixel,pixel);
+		}
+	}
+	delete [] _pixbuffer;
+	_pixbuffer = cImgOut->_pixbuffer;
+	_channels = 3;
+	cImgOut->_pixbuffer = NULL;
+	delete cImgOut;
+
+	return ddgSuccess;
+}
 // ----------------------------------------------------------------------
 // load:
 bool ddgImage::readRGB( const char *filename  )

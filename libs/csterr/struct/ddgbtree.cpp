@@ -44,15 +44,20 @@ ddgTBinTree::ddgTBinTree( ddgTreeIndex i, int dr, int dc, bool mirror )
 	_cacheIndex = new ddgCacheIndex[_mesh->triNo()+2];
 	ddgAsserts(_cacheIndex,"Failed to Allocate memory");
 	ddgMemorySet(ddgCacheIndex,_mesh->triNo()+2);
+
 	_rawHeight = new short[_mesh->triNo()+2];
 	ddgAsserts(_rawHeight,"Failed to Allocate memory");
 	ddgMemorySet(short,_mesh->triNo()+2);
-	_rawMinVal = new short[_mesh->triNo()+2];
+
+// LeafNo
+	_rawDelta = new unsigned short[_mesh->leafTriNo()];
+	ddgAsserts(_rawDelta,"Failed to Allocate memory");
+	ddgMemorySet(unsigned short,_mesh->leafTriNo());
+
+	_rawMinVal = new short[_mesh->leafTriNo()];
 	ddgAsserts(_rawMinVal,"Failed to Allocate memory");
-	ddgMemorySet(short,_mesh->triNo()+2);
-	_rawMaxVal = new short[_mesh->triNo()+2];
-	ddgAsserts(_rawMaxVal,"Failed to Allocate memory");
-	ddgMemorySet(short,_mesh->triNo()+2);
+	ddgMemorySet(short,_mesh->leafTriNo());
+
 /*
 	if (!recurStack)
 	{
@@ -60,7 +65,6 @@ ddgTBinTree::ddgTBinTree( ddgTreeIndex i, int dr, int dc, bool mirror )
 		ddgMemorySet(ddgTriIndex,2*_mesh->maxLevel());
 	}
 */
-	_chain = 0;
 }
 
 ddgTBinTree::~ddgTBinTree(void)
@@ -68,8 +72,9 @@ ddgTBinTree::~ddgTBinTree(void)
 	delete [] _cacheIndex;
 	delete [] _rawHeight;
 	delete [] _rawMinVal;
-	delete [] _rawMaxVal;
+	delete [] _rawDelta;
 }
+
 
 /** Initialize the bintree structure including
  *  the wedges and other mesh values.
@@ -82,20 +87,16 @@ bool ddgTBinTree::init( void )
 	_rawHeight[_mesh->triNo()+1] = _mesh->heightMap()->get(mrow(_mesh->triNo()+1),mcol(_mesh->triNo()+1)) ;
 
 	// Initialize the whole bin tree.
-
-	initTriangle(1,0,_mesh->triNo(),_mesh->triNo()+1,1);
+	initTriangle(1);
 	// Set the top level min/max values
-	_rawMaxVal[0] = _rawMaxVal[1];
+	_rawDelta[0] = _rawDelta[1];
 	_rawMinVal[0] = _rawMinVal[1];
-	_rawMaxVal[_mesh->triNo()] = _rawMaxVal[1];
-	_rawMinVal[_mesh->triNo()] = _rawMinVal[1];
-	_rawMaxVal[_mesh->triNo()+1] = _rawMaxVal[1];
-	_rawMinVal[_mesh->triNo()+1] = _rawMinVal[1];
 	// Initialize the tcache.
 	_cacheIndex[0] = 0;
 	_cacheIndex[1] = 0;
 	_cacheIndex[_mesh->triNo()] = 0;
 	_cacheIndex[_mesh->triNo()+1] = 0;
+	_treeVis = ddgUNDEF;
 
 	return ddgSuccess;
 }
@@ -109,10 +110,9 @@ float ddgTBinTree::_farClipSQ;
 float ddgTBinTree::_varianceScale = 1;
 float ddgTBinTree::_cosHalfFOV = 0.7;
 ddgMSTri	*ddgTBinTree::_stri;
-ddgTCache	*ddgTBinTree::_tcache;
 ddgTBinMesh	*ddgTBinTree::_mesh = NULL;
-int	ddgTBinTree::_clipPlanes = 5;
-
+ddgTCache	*ddgTBinTree::_tcache = NULL;
+static bool levelView = false;
 void ddgTBinTree::initContext( ddgContext *ctx, ddgTBinMesh *mesh )
 {
 	// Copy this data to a private structure.
@@ -127,27 +127,70 @@ void ddgTBinTree::initContext( ddgContext *ctx, ddgTBinMesh *mesh )
 	_tcache = mesh->tcache();
 	_cosHalfFOV = cosf(ddgAngle::degtorad(ctx->fov()/2.0));
 	if ((mesh->absDiffHeight()*_farClip)>0)
-		_varianceScale = (ddgPriorityResolution*4)/(mesh->absDiffHeight()*_farClip);
+		_varianceScale = (ddgPriorityResolution*8)/(mesh->absDiffHeight()*_farClip);
 	else
 		_varianceScale = 1;
+	// Forget about near/far clipping planes.
+	// Far is handled seprately and near is not worth bothering with.
+	_ctx->rootHull()->noPlanes = 4;
+	// Forget about near/far clipping planes.
+	_ctx->topDownWedge()->noLines = 2;
 }
+
+
 void ddgTBinTree::updateContext( ddgContext *ctx, ddgTBinMesh * )
 {
 	_pos.set( ctx->control()->position()->v[0], ctx->control()->position()->v[2]);
 	_forward.set( ctx->forward()->v[0], ctx->forward()->v[2]);
-	// Generally we want to clip agains the left/right top/bottom and near planes.
-	// Far is handled by the _farClipSQ and provides a curved clip plane.
-	_clipPlanes = 5;
-	// When our up vector is near to parallel with the y/height axis
-	// We only clip agains the left and right plane since the others are
-	// pretty much irrelevant.
-	if (ctx->forward()->v[1] < 0.5 && ctx->forward()->v[1] > -0.5)
-		_clipPlanes = 2;
+	levelView = ctx->levelView();
 }
 
+/// Return the index of the 1st child.
+ddgTriIndex ddgTBinTree::firstInMesh(void)
+{
+	// Find 1st triangle in the mesh.
+	ddgTriIndex tindex = 1;
+	while (tcacheId(tindex) == 0)
+	{
+		ddgAssert(tindex < _mesh->triNo());
+		tindex *= 2;
+	}
+	return tindex;
+}
 
+/** Return the index of the 2nd child.
+ *  end must be initialized to 0 and will be reset to 0 when there is nothing left to do.
+ */
+ddgTriIndex ddgTBinTree::nextInMesh(ddgTriIndex tindex, ddgTriIndex *end )
+{
+	if (*end == 0) *end = tindex *2;
 
+	// Go to next triangle.
+	tindex++;
+	// If it is not in the mesh.
+	if (tcacheId(tindex) == 0)
+	{
+		// Try parent.
+		if (tcacheId(parent(tindex)) != 0)
+		{
+			tindex = parent(tindex);
+			*end /= 2;
+		}
+		else // Try 1st child.
+		{
+			tindex = first(tindex);
+			*end *= 2;
+		}
+	}
+
+	if (tindex == *end)
+		*end = 0;
+
+	return tindex;
+}
 /**
+ * Initialize the static information in the bintree.
+ *  This method is only called at initialization.
  * Recursively calculate the min/max value of a triangle.
  * With this information we establish a convex hull
  * for each level of the hierarchy, this hull can be
@@ -155,44 +198,88 @@ void ddgTBinTree::updateContext( ddgContext *ctx, ddgTBinMesh * )
  * visibility culling.
  * collision detection.
  * ray intersection testing.
- *  Passed in are the triangles which carry the points
- *  that describe the current triangle.
- *  va is immediate parent.
- *  v1 and v0 are the left and right vertices of va.
- *  This method is only called at initialization.
+ * This method is called at initialization and may be
+ * called later on when the heights of the terrain are
+ * modified.
  */
-void ddgTBinTree::initTriangle( unsigned int level,
-					 ddgTriIndex va,	// Top
-					 ddgTriIndex v0,	// Left
-					 ddgTriIndex v1,	// Right
-					 ddgTriIndex vc)	// Centre
+void ddgTBinTree::initTriangle( ddgTriIndex tindex )
 {
-	short hmin, hmax;
+	_cacheIndex[tindex] = 0;
 	// Get the raw height and store it.
-	_rawHeight[vc] = _mesh->heightMap()->get(mrow(vc),mcol(vc));
+	_rawHeight[tindex] = _mesh->heightMap()->get(mrow(tindex),mcol(tindex));
 
 	// See if we are not at the bottom.
-	if (level < _mesh->maxLevel())
+	if (tindex < _mesh->leafTriNo())
 	{
-		initTriangle(level+1,vc,va,v0,left(vc)),
-		initTriangle(level+1,vc,v1,va,right(vc));
+		initTriangle(first(tindex)),
+		initTriangle(second(tindex));
+	}
+	calculateVariance(tindex);
+}
 
-		hmax = (short)ddgUtil::max(_rawMaxVal[left(vc)],_rawMaxVal[right(vc)]);
-		hmin = (short)ddgUtil::min(_rawMinVal[left(vc)],_rawMinVal[right(vc)]);
+void ddgTBinTree::calculateVariance(ddgTriIndex tindex)
+{
+	// Variance for leaf nodes is zero and these are not stored.
+	// See if we are not at the bottom.
+	if (tindex < _mesh->leafTriNo())
+	{
+		// Measure displacement of height(tindex) from midpoint of height(first),height(second).
+		int hmin, hdelta;
+		if (first(tindex) < _mesh->leafTriNo())
+		{
+			hmin = ddgUtil::min(_rawMinVal[first(tindex)],_rawMinVal[second(tindex)]);
+			hdelta = ddgUtil::max(_rawDelta[first(tindex)],_rawDelta[second(tindex)]);
+		}
+		else
+		{
+			hmin = ddgUtil::min(_rawHeight[first(tindex)],_rawHeight[second(tindex)]);
+			hdelta = ddgUtil::max(_rawHeight[first(tindex)],_rawHeight[second(tindex)]) - hmin;
+		}
+//	    int hd = _rawHeight(tindex) - (hmin + hdelta/2);
+
+		_rawMinVal[tindex] = (short)ddgUtil::min(_rawHeight[parent(tindex)],hmin);
+		ddgAssert(ddgUtil::max(_rawHeight[parent(tindex)], hmin + hdelta) - hmin >= 0);
+		_rawDelta[tindex] = (unsigned short)(ddgUtil::max(_rawHeight[parent(tindex)] ,hmin + hdelta) - hmin);
+	}
+}
+
+
+// UNTESTED.
+void ddgTBinTree::updateVariance(ddgTriIndex tindex) 
+{
+	ddgAssert(neighbour(tindex) != tindex);
+	// Don't bother with leaf nodes.
+	if (tindex > _mesh->leafTriNo())
+		return;
+	// To avoid loops, we only update the triangle with the higher index.
+
+	if (neighbour(tindex) < tindex)
+	{
+		ddgTBinTree *bt = neighbourTree(tindex);
+		// Transfer data to the neighbour.
+		bt->_rawHeight[neighbour(tindex)] = _rawHeight[tindex];
+
+		bt->updateVariance(neighbour(tindex)); 
 	}
 	else
 	{
-		hmax = (short)ddgUtil::max(_rawHeight[v0],_rawHeight[v1]);
-		hmin = (short)ddgUtil::min(_rawHeight[v0],_rawHeight[v1]);
+		int hmin = _rawMinVal[tindex];
+		int hdelta = _rawDelta[tindex];
+  
+		calculateVariance(tindex);
+
+		// update the parent of this vertex 
+		if (tindex > 0 && (hdelta != _rawDelta[tindex] || hmin != _rawMinVal[tindex] )) 
+		{
+			updateVariance(tindex / 2); 
+			if (neighbour(tindex))
+			{
+				neighbourTree(tindex)->calculateVariance(neighbour(tindex));
+				neighbourTree(tindex)->updateVariance(neighbour(tindex) / 2);
+			}
+		} 
 	}
-
-	_rawMaxVal[vc] = (short)ddgUtil::max(_rawHeight[va],hmax);
-	_rawMinVal[vc] = (short)ddgUtil::min(_rawHeight[va],hmin);
-	_cacheIndex[vc] = 0;
-	// Copy the height map's value into this triangle.
-
 }
-
 
 /// Return the quad neighbour. If 0 there is no neighbour.
 ddgTriIndex ddgTBinTree::neighbour( ddgTriIndex i)
@@ -254,7 +341,7 @@ ddgTNode *ddgTBinTree::snode(ddgTriIndex tindex)
 float ddgTBinTree::heightByPos(unsigned int r, unsigned int c)
 {
 	// See if we are in the correct tree to find this location.
-	ddgAsserts(r + c <= ddgTBinMesh_size,"Looking for data out of range.");
+	ddgAsserts(r + c <= ddgTBinMesh_size+1,"Looking for data out of range.");
 
 	ddgTriIndex tindex = _mesh->lookupIndex(r,c);
 	return _mesh->wheight(_rawHeight[tindex]);
@@ -262,15 +349,53 @@ float ddgTBinTree::heightByPos(unsigned int r, unsigned int c)
 
 void ddgTBinTree::vertex(ddgTriIndex tindex, ddgVector3 *vout)
 {
+/*
+	int h = _rawHeight[tindex];
+
+	if (tindex > 3 && tindex < _mesh->leafTriNo())
+	{
+		unsigned short ti = tcacheId(parent(tindex));
+
+		ddgTNode *tn = gnode(tindex);
+		if (tn)
+		{
+			int d = tn->delta();
+			if (d)
+			{
+				int c = tn->current() + d;
+				if ((d < 0 && c < h) ||(d > 0 && c > h))
+					tn->delta(0);
+				else
+				{
+					tn->current(c);
+					h = c;
+				}
+			}
+		}
+	}
+*/
 	vout->set(mrow(tindex),_mesh->wheight(_rawHeight[tindex]),mcol(tindex));
 }
 
+/// Get texture coord data, as a value from 0 to 1 on the bintree.
+void ddgTBinTree::textureC(unsigned int tindex, ddgVector2 *vout)
+{
+	if (_mirror)
+		vout->set( ddgTBinMesh_size - _mesh->stri[tindex].row, ddgTBinMesh_size- _mesh->stri[tindex].col);
+	else
+		vout->set(_mesh->stri[tindex].row, _mesh->stri[tindex].col);
+
+	vout->multiply( 1.0 / (float)ddgTBinMesh_size);
+}
+
+/*
 /// Get triangle row in the bin tree.
 unsigned int ddgTBinTree::row(unsigned int i)
 { return _mesh->stri[i].row; }
 /// Get triangle col.
 unsigned int ddgTBinTree::col(unsigned int i)
 { return _mesh->stri[i].col; }
+*/
 /// Get the triangle row on the master mesh.
 unsigned int ddgTBinTree::mrow(unsigned int i)
 { return _mirror ? _dr - _mesh->stri[i].row : _dr + _mesh->stri[i].row; }
@@ -289,7 +414,7 @@ void ddgTBinTree::insertSQ(ddgTriIndex tindex, ddgPriority pp, ddgCacheIndex ci,
 
 	// If parent is completely inside or completely outside of view, inherit.
 	// Otherwise calculate triangle's visibility.
-	ddgVisState v = (vp == ddgIN || vp == ddgOUT) ? vp : visibilityTriangle(tindex);
+	ddgVisState v = (vp == ddgIN || vp == ddgOUT || tindex >= _mesh->leafTriNo()) ? vp : visibilityTriangle(tindex);
 
 	ddgAssert(v != ddgUNDEF);
 
@@ -297,8 +422,7 @@ void ddgTBinTree::insertSQ(ddgTriIndex tindex, ddgPriority pp, ddgCacheIndex ci,
 	// Get a new cache entry if we need one.
 	if (ci == 0)
 	{
-		ci = _chain = _tcache->insertHead(_chain);
-		// Insert a node at front of the chain.
+		ci = _tcache->allocNode();
 		ddgAssert(ci);
 	}
 	tn = _tcache->get(ci);
@@ -307,18 +431,20 @@ void ddgTBinTree::insertSQ(ddgTriIndex tindex, ddgPriority pp, ddgCacheIndex ci,
 	tn->vis(v);
 	tn->qscacheIndex(0);
 	tn->qmcacheIndex(0);
-
-	// Record the cache index for the entry in this bintree.
-	tcacheId(tindex, ci);
-
+/*
+	tn->reset(_rawHeight[tindex],_rawHeight[first(tindex)],_rawHeight[second(tindex)]);
+*/
 	// Determine what this triangle's priority is going to be.
 	ddgPriority pr = 0;
-	tn->priorityFactor((_rawMaxVal[tindex]-_rawMinVal[tindex])*_varianceScale);
+	// Record the cache index for the entry in this bintree.
+	tcacheId(tindex, ci);
 	if (v != ddgOUT)
 	{
 		_mesh->incrTriVis();
+		// Leaf nodes cannot be split.
 		if (tindex < _mesh->leafTriNo())
 		{
+			tn->priorityFactor(_rawDelta[tindex]*_varianceScale);
 			pr = priorityCalc(tindex,tn->priorityFactor());
 			// Ensure our priority is less than our parent's.
 			if (pp > 1 && pr >= pp)
@@ -414,13 +540,13 @@ void ddgTBinTree::removeMQ(ddgTriIndex tindex)
 	ddgCacheIndex cl, cr, nl = 0, nr = 0;
 
 	// If one triangle is missing we can not be merged.
-	cl=tcacheId(left(p));
-	cr=tcacheId(right(p));
+	cl=tcacheId(first(p));
+	cr=tcacheId(second(p));
 	ddgAssert(cl&&cr);
 	if (n)
 	{
-		nl=nt->tcacheId(left(n));
-		nr=nt->tcacheId(right(n));
+		nl=nt->tcacheId(first(n));
+		nr=nt->tcacheId(second(n));
 		ddgAssert(nl&&nr);
 	}
 
@@ -433,14 +559,14 @@ void ddgTBinTree::removeMQ(ddgTriIndex tindex)
 	// Mark entries in the tmesh as not present in the merge queue.
 	_tcache->get(cl)->qmcacheIndex(0);
 	_tcache->get(cr)->qmcacheIndex(0);
-	qmcacheIndex(left(p),0);
-	qmcacheIndex(right(p),0);
+	qmcacheIndex(first(p),0);
+	qmcacheIndex(second(p),0);
 	if (n)
 	{
 		_tcache->get(nl)->qmcacheIndex(0);
 		_tcache->get(nr)->qmcacheIndex(0);
-		nt->qmcacheIndex(left(n),0);
-		nt->qmcacheIndex(right(n),0);
+		nt->qmcacheIndex(first(n),0);
+		nt->qmcacheIndex(second(n),0);
 	}
 }
 
@@ -454,7 +580,7 @@ void ddgTBinTree::forceSplit( ddgTriIndex tindex )
 	ddgPriority pr = forceSplit2(tindex);
 	// This operation may have created a mergable diamond.
 	if (_mesh->merge())
-		insertMQ(left(tindex),pr);
+		insertMQ(first(tindex),pr);
 }
 
 /*
@@ -465,7 +591,7 @@ void ddgTBinTree::forceSplit( ddgTriIndex tindex )
  */
 ddgPriority ddgTBinTree::forceSplit2( ddgTriIndex tindex )
 {
-	ddgTriIndex l = left(tindex), r = right(tindex), n = neighbour(tindex);
+	ddgTriIndex l = first(tindex), r = second(tindex), n = neighbour(tindex);
 	// If current triangle is not in the queue,
 	// split its parent, to get it into the queue.
 	if (!tcacheId(tindex))
@@ -502,7 +628,7 @@ ddgPriority ddgTBinTree::forceSplit2( ddgTriIndex tindex )
 		ddgTBinTree *nt = neighbourTree(tindex);
 		ddgAssert(nt);
 		// Make sure its children are in the queue.
-		if (!nt->tcacheId(left(n)) || !nt->tcacheId(right(n)))
+		if (!nt->tcacheId(first(n)) || !nt->tcacheId(second(n)))
 		{
 			ddgPriority npr = nt->priority(n);
 			if (npr > pr)
@@ -524,22 +650,18 @@ void ddgTBinTree::forceMerge( ddgTriIndex tindex)
 	ddgAssert((n && nt) || (!n && !nt));
 
 	// If one triangle is missing we can not be merged.
-	ddgAsserts (tcacheId(left(p)) && tcacheId(right(p)),"Incomplete merge diamond/invalid mesh!");
-	ddgAsserts (!n || (nt->tcacheId(left(n)) && nt->tcacheId(right(n))),"Incomplete merge diamond/invalid mesh!");
+	ddgAsserts (tcacheId(first(p)) && tcacheId(second(p)),"Incomplete merge diamond/invalid mesh!");
+	ddgAsserts (!n || (nt->tcacheId(first(n)) && nt->tcacheId(second(n))),"Incomplete merge diamond/invalid mesh!");
 
 	// If we were part of a merge diamond, remove us from the merge queue if it is there.
 	if (_mesh->merge())
-		removeMQ(left(p));
+		removeMQ(first(p));
 	// Remove its children and neighbour's children.
 	ddgCacheIndex ci = 0;
-	ci = removeSQ(left(p));
-	// Update the head of the chain if it was removed
-	if (ci == _chain)
-	{
-		_chain = _tcache->get(ci)->next();
-	}
+	ci = removeSQ(first(p));
+
 	_tcache->remove(ci);
-	ci = removeSQ(right(p));
+	ci = removeSQ(second(p));
 
 	// Insert parent and parent's neighbour.
 	insertSQ(p,ddgMAXPRI,ci,ddgUNDEF);
@@ -552,16 +674,12 @@ void ddgTBinTree::forceMerge( ddgTriIndex tindex)
 		ddgAssert(nt);
 		// If we were part of a merge diamond, remove us from the merge queue if it is there.
 		if (_mesh->merge())
-			nt->removeMQ(left(n));
+			nt->removeMQ(first(n));
 
-		ci = nt->removeSQ(left(n));
-		// Update the head of the chain if it was removed
-		if (ci == nt->_chain)
-		{
-			nt->_chain = _tcache->get(ci)->next();
-		}
+		ci = nt->removeSQ(first(n));
+
 		_tcache->remove(ci);
-		ci = nt->removeSQ(right(n));
+		ci = nt->removeSQ(second(n));
 		nt->insertSQ(n,ddgMAXPRI,ci,ddgUNDEF);
 		// This operation may have created a mergable diamond.
 		if (_mesh->merge())
@@ -596,11 +714,11 @@ void ddgTBinTree::updateMerge(ddgTriIndex tindex, ddgPriority pr )
 	ddgTBinTree *nt = n ? neighbourTree(p) : 0;
 	ddgAssert((n && nt) || (!n && !nt));
 
-	// If one triangle is missing we can not be merged.
-	if    (!(cl=tcacheId(left(p)))
-		|| !(cr=tcacheId(right(p)))
-		||  (nt && (!(nl=nt->tcacheId(left(n)))
-		         || !(nr=nt->tcacheId(right(n)))
+	// If we are the top triangle or if one triangle is missing we can not be merged.
+	if    (!p || !(cl=tcacheId(first(p)))
+		|| !(cr=tcacheId(second(p)))
+		||  (nt && (!(nl=nt->tcacheId(first(n)))
+		         || !(nr=nt->tcacheId(second(n)))
 			)))
 	{
 		ddgAssert(!qmcacheIndex(tindex));
@@ -612,31 +730,21 @@ void ddgTBinTree::updateMerge(ddgTriIndex tindex, ddgPriority pr )
 	// Determine the priority for this merge group.
 	if (pr == ddgMAXPRI)
 	{
-		/*
-		pr = priority(left(p));
-		ddgPriority p2 = priority(right(p));
-		// Find the highest priority among the 4 triangles.
-		if (p2 > pr) pr = p2;
-		if (n)
-		{
-			p2 = nt->priority(left(n));
-			if (p2 > pr) pr = p2;
-			p2 = nt->priority(right(n));
-			if (p2 > pr) pr = p2;
-		}
-		*/
 		pr = 0;
-		// If one of the leaves is visible, find the priority.
-		if (vis(left(p)) || vis(right(p)))
+		if (p < _mesh->leafTriNo())
 		{
-			pr = priorityCalc(p,(_rawMaxVal[p]-_rawMinVal[p])*_varianceScale);
-		}
-		// If there are neighbours and one of them is visible.
-		if (nt && (nt->vis(left(n)) || nt->vis(right(n))))
-		{
-			ddgPriority pr2 = priorityCalc(n,(nt->_rawMaxVal[n]-nt->_rawMinVal[n])*_varianceScale);
-			if (pr2 > pr)
-				pr = pr2;
+			// If one of the leaves is visible, find the priority.
+			if (vis(first(p)) || vis(second(p)))
+			{
+				pr = priorityCalc(p,_rawDelta[p]*_varianceScale);
+			}
+			// If there are neighbours and one of them is visible.
+			if (nt && (nt->vis(first(n)) || nt->vis(second(n))))
+			{
+				ddgPriority pr2 = priorityCalc(n, nt->_rawDelta[n]*_varianceScale);
+				if (pr2 > pr)
+					pr = pr2;
+			}
 		}
 	}
 
@@ -665,14 +773,14 @@ void ddgTBinTree::updateMerge(ddgTriIndex tindex, ddgPriority pr )
 	// Mark these entries in the tmesh as present in the merge queue.
 	_tcache->get(cl)->qmcacheIndex(mi);
 	_tcache->get(cr)->qmcacheIndex(mi);
-	qmcacheIndex(left(p),mi);
-	qmcacheIndex(right(p),mi);
+	qmcacheIndex(first(p),mi);
+	qmcacheIndex(second(p),mi);
 	if (nt)
 	{
 		_tcache->get(nl)->qmcacheIndex(mi);
 		_tcache->get(nr)->qmcacheIndex(mi);
-		nt->qmcacheIndex(left(n),mi);
-		nt->qmcacheIndex(right(n),mi);
+		nt->qmcacheIndex(first(n),mi);
+		nt->qmcacheIndex(second(n),mi);
 	}
 }
 
@@ -686,7 +794,7 @@ void ddgTBinTree::updateSplit(ddgTriIndex tindex, ddgVisState parVis )
 	ddgVisState v;
 
 	// If parent is completely inside or completely outside, inherit.
-	if (parVis == ddgOUT || parVis == ddgIN)
+	if (parVis == ddgOUT || parVis == ddgIN || tindex >= _mesh->leafTriNo())
 	{
 		v = parVis;
 	}
@@ -694,16 +802,15 @@ void ddgTBinTree::updateSplit(ddgTriIndex tindex, ddgVisState parVis )
 	else
 	{
 		v = visibilityTriangle(tindex);
+		if (tindex == 1)
+			treeVis(v);
 	}
-
-	if (tindex == 1)
-		_vis = v;
 
 	// This will only go as far as the leaves which are currently in the mesh.
 	if (!tcacheId(tindex))
 	{
-		updateSplit(left(tindex),v);
-		updateSplit(right(tindex),v);
+		updateSplit(first(tindex),v);
+		updateSplit(second(tindex),v);
 		return;
 	}
 
@@ -715,7 +822,7 @@ void ddgTBinTree::updateSplit(ddgTriIndex tindex, ddgVisState parVis )
 
 	// Determine what this triangle's priority is going to be.
 	ddgPriority opr = priority(tindex);
-	ddgPriority pr = (v == ddgOUT) ? 0 : priorityCalc(tindex,priorityFactor(tindex));
+	ddgPriority pr = (v == ddgOUT || tindex >= _mesh->leafTriNo()) ? 0 : priorityCalc(tindex,priorityFactor(tindex));
 
 	// If nothing changed return
 	if (pr == opr && v == ov)
@@ -762,34 +869,49 @@ void ddgTBinTree::updateSplit(ddgTriIndex tindex, ddgVisState parVis )
 
 
 /// VISIBILITY
+static ddgBBox3		bbox;
+static ddgRect2	    rect;
 
 ddgVisState ddgTBinTree::visibilityTriangle(ddgTriIndex tindex)
 {
 	ddgAsserts(tindex <= _mesh->triNo(), " No leaf node was found in the queue!");
-
+	ddgAsserts(tindex < _mesh->leafTriNo(), " Dont bother with leaf node testing, inherit from parent!");
 #ifdef _DEBUG
 	_mesh->visCountIncr();
 #endif
-	// Calculate bounding box of bintree.
-	static ddgBBox		bbox;
 
 	// See if the triangle is too far from the camera.  Ingore height component.
 	// Use the triangle's centre point.
-	static ddgVector2 c;
-	c.set(mrow(tindex)- _pos[0],
-		  mcol(tindex)- _pos[1]);
+	int cr = _dr, cc = _dc;
+	if (_mirror) 
+		{ cr -= _stri[tindex].row;  cc -= _stri[tindex].col; }
+	else 
+		{ cr += _stri[tindex].row;  cc += _stri[tindex].col; }
+	cr -= _pos[0];
+	cc -= _pos[1];
+	ddgVector2 center(cr ,cc );
 
 	// Do a rough distance test and optionally a true distance test in 2D
-	if (c[0] > _farClip || c[0] < - _farClip
-	  ||c[1] > _farClip || c[1] < - _farClip
-	  ||c.sizesq() > _farClipSQ)
+	if (center[0] > _farClip || center[0] < - _farClip
+	  ||center[1] > _farClip || center[1] < - _farClip
+	  ||center.sizesq() > _farClipSQ)
 		return ddgOUT;
 
 	ddgTriIndex tva = parent(tindex),
 		tv0 = _mesh->v0(tindex),
 		tv1 = _mesh->v1(tindex);
-	int r0 = mrow(tv0), r1 = mrow(tv1), ra = mrow(tva);
-	int c0 = mcol(tv0), c1 = mcol(tv1), ca = mcol(tva);
+
+	int r0 = _dr, r1 = _dr, ra = _dr, c0 = _dc, c1 = _dc, ca = _dc;
+	if (_mirror)
+	{
+		r0 -= _stri[tv0].row; r1 -= _stri[tv1].row; ra -= _stri[tva].row;
+		c0 -= _stri[tv0].col; c1 -= _stri[tv1].col; ca -= _stri[tva].col;
+	}
+	else
+	{
+		r0 += _stri[tv0].row; r1 += _stri[tv1].row; ra += _stri[tva].row;
+		c0 += _stri[tv0].col; c1 += _stri[tv1].col; ca += _stri[tva].col;
+	}
 #ifdef __CRYSTAL_SPACE__
 	// Calculate the angle between the forward vector and each point on the
 	// triangle and see if it falls within the fov, this is a kind of cone
@@ -801,17 +923,17 @@ ddgVisState ddgTBinTree::visibilityTriangle(ddgTriIndex tindex)
 	// 45 degrees = 0.7 ~ 90 fov
 	// 60 degrees = 0.5 ~ 120 fov
 	int vin = 0;
-	c.set(ra - _pos[0],ca - _pos[1]);
-	c.normalize();
-	if ( _forward.dot(&c) > _cosHalfFOV)
+	center.set(ra - _pos[0],ca - _pos[1]);
+	center.normalize();
+	if ( _forward.dot(&center) > _cosHalfFOV)
 		vin++;
-	c.set(r0 - _pos[0],c0 - _pos[1]);
-	c.normalize();
-	if ( _forward.dot(&c) > _cosHalfFOV)
+	center.set(r0 - _pos[0],c0 - _pos[1]);
+	center.normalize();
+	if ( _forward.dot(&center) > _cosHalfFOV)
 		vin++;
-	c.set(r1 - _pos[0],c1 - _pos[1]);
-	c.normalize();
-	if ( _forward.dot(&c) > _cosHalfFOV)
+	center.set(r1 - _pos[0],c1 - _pos[1]);
+	center.normalize();
+	if ( _forward.dot(&center) > _cosHalfFOV)
 		vin++;
 	if (vin == 0)
 		return ddgOUT;
@@ -830,15 +952,28 @@ ddgVisState ddgTBinTree::visibilityTriangle(ddgTriIndex tindex)
 	if (ca < cmin) cmin = ca;
 	if (ra > rmax) rmax = ra;
 	if (ca > cmax) cmax = ca;
+	// Calculate bounding box of bintree.
+	// Update the Y component if the view is not level.
+	if (!levelView )
+		{
+		bbox.min.v[0] = rmin;
+		bbox.max.v[0] = rmax;
+		bbox.min.v[2] = cmin;
+		bbox.max.v[2] = cmax;
+		// Adjust box by bintree thickness.
+		bbox.min.v[1] = _mesh->wheight(_rawMinVal[tindex]);
+		bbox.max.v[1] = bbox.min.v[1] + _mesh->wheight(_rawDelta[tindex]);
+		return _ctx->rootHull()->clip(&bbox);
+		}
+	else
+		{
+		rect.min.v[0] = rmin;
+		rect.max.v[0] = rmax;
+		rect.min.v[1] = cmin;
+		rect.max.v[1] = cmax;
+		return _ctx->topDownWedge()->clip(&rect);
+		}
 
-	// Adjust box by bintree thickness.
-	bbox._min.v[0] = rmin;
-	bbox._max.v[0] = rmax;
-	bbox._min.v[1] = _mesh->wheight(_rawMinVal[tindex]);
-	bbox._max.v[1] = _mesh->wheight(_rawMaxVal[tindex]);
-	bbox._min.v[2] = cmin;
-	bbox._max.v[2] = cmax;
-	return bbox.isVisible(_ctx->frustrum(),_clipPlanes);
 #endif
 }
 
@@ -855,31 +990,38 @@ float ddgTBinTree::treeHeight(unsigned int r, unsigned int c, float dx, float dz
 			   p1(0,h2,1),
 			   p2(1,h3,0),
 			   v(dx,0,dz);
-	ddgPlane p(p0,p1,p2);
+	ddgPlane3 p(p0,p1,p2);
 	p.projectAlongY(&v);
 
     return v[1];
 }
 
-/// PRIORITY
-
+ddgHistogram *prioHist = NULL;
+void ddgTBinTree::setHist( ddgHistogram * hist)
+{
+	prioHist = hist;
+}
 
 /// Calculate priority of triangle tindex  We assume that we only get called
+/// for visible triangles which are not leaves, because all others have priority 0.
 ddgPriority ddgTBinTree::priorityCalc(ddgTriIndex tindex, float pf)
 {
-	ddgAssert(tindex <= _mesh->triNo());
-	if (tindex >= _mesh->leafTriNo())
-		return 1;
-	float result;
+	ddgAssert(tindex < _mesh->leafTriNo());
 
 	// Calculate the distance of the nearest point to the
 	// near clipping plane by taking the dot product of
 	// the near clipping plane's vector with the vector
 	// from the camera to the point.
-	// $TODO if camera is moving forward, we can estimate delta z.
+	// $TODO if camera is moving forward, we can store z and estimate delta z.
 	float z;
-	static ddgVector2 p;
-	p.set(mrow(tindex)-_pos[0],mcol(tindex)-_pos[1]);
+	int cr = _dr, cc = _dc;
+	if (_mirror) 
+	{ cr -= _stri[tindex].row;  cc -= _stri[tindex].col; }
+	else 
+	{ cr += _stri[tindex].row;  cc += _stri[tindex].col; }
+	cr -= _pos[0];
+	cc -= _pos[1];
+	ddgVector2 p(cr,cc);
 	// This is the same a f dot p1 - f dot p2, f dot p2 can be precomputed,
 	// but I don't think that will speed things up.
 	z = _farClip - _forward.dot(&p);
@@ -892,15 +1034,25 @@ ddgPriority ddgTBinTree::priorityCalc(ddgTriIndex tindex, float pf)
 	// zDist is >= nearClip     && < farClip
 	// Max - Min >= 0   && < _absDiffHeight.
 
-	result = pf*z;
+	z *= pf;
 	
 #ifdef _DEBUG
 	_mesh->priCountIncr();
 #endif
-	ddgAssert(result >= 0);
-	return (ddgPriority)(result >= ddgPriorityResolution ? ddgPriorityResolution-1 : result);
+	ddgAssert(z >= 0);
+
+	if (prioHist)
+	{
+		int i = z >= ddgPriorityResolution ? ddgPriorityResolution-1 : z;
+		prioHist->incr(i);
+	}
+
+	return (ddgPriority)(z >= ddgPriorityResolution ? ddgPriorityResolution-1 : z);
 
 }
+
+
+// UNTESTED
 
 // p1 - start point of ray,
 // p2 - end point of ray.
@@ -924,11 +1076,11 @@ bool ddgTBinTree::rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int
 	static ddgVector2 r1, r2, r3, r4;
 	r1.set(v0[0],v0[2]);
 	r2.set(v1[0],v1[2]);
-	static ddgRect t(&r1, &r2);
+	static ddgRect2 t(&r1, &r2);
 	// Find bounding rectangle of ray.
 	r3.set(p1[0],p1[2]);
 	r4.set(p2[0],p2[2]);
-	static ddgRect r(&r3, &r4);
+	static ddgRect2 r(&r3, &r4);
 	// See if rectangles intersect.
 	if (!t.intersect(&r))
 		return false;
@@ -960,14 +1112,14 @@ bool ddgTBinTree::rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int
 	}
 	// We have the line segment which crosses this triangle in s[0]->s[1].
 	ddgVector2 sg1(s[0][0],s[0][1]), sg2(s[1][0],s[1][1]);
-	ddgRect sr(&sg1, &sg2),cs;
+	ddgRect2 sr(&sg1, &sg2),cs;
 	// Clip the segment to p1 and p2 incase p1 and p2 fall inside this triangle.
 	sr.intersect(&r,&cs);
 	// Now we have a line segment guaranteed to be both in the triangle and within the
 	// limits of the ray.
 
 	// Check for definite miss.
-	if (s[0].v[1] > _rawMaxVal[tindex] || s[1].v[1] > _rawMaxVal[tindex])
+	if (s[0].v[1] > _rawMinVal[tindex]+_rawDelta[tindex] || s[1].v[1] > _rawMinVal[tindex]+_rawDelta[tindex])
 		return false;
 	// Check for definite hit.
 	if (s[0].v[1] < _rawMinVal[tindex] || s[1].v[1] < _rawMinVal[tindex])
@@ -983,9 +1135,9 @@ bool ddgTBinTree::rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int
 	{	
 		// TODO perform directional test to ensure points closest to p1 are tested first.
 		// Skip the odd level.
-		if (rayTest(p1,p2,left(tindex),depth))
+		if (rayTest(p1,p2,first(tindex),depth))
 			return true;
-		return rayTest(p1,p2,right(tindex),depth);
+		return rayTest(p1,p2,second(tindex),depth);
 	}
 	// Default is not hit.
 	else

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -92,8 +92,6 @@ class WEXP ddgColor4 {
 
 	/// Construct a color from R,G,B values.
 	ddgColor4( unsigned char r, unsigned char g, unsigned char b, unsigned char a);
-    /// Construct a color from a color vector.
-//    ddgColor4( Vector4 *c);
     /// Create a default white color.
     ddgColor4( void );
 

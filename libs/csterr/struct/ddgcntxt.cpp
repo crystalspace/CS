@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -36,15 +36,26 @@ ddgContext::ddgContext(Mode m, Quality q, ddgControl *ctrl, ddgClock *cl)
 	_path = NULL;
 	_frame = 0;
 	_record = false;
-	_frustrum = new ddgPlane[6];
-	ddgMemorySet(ddgPlane,6);
+	_frustrum3d = new ddgPlane3[6];
+	_levelView = false;
+	ddgMemorySet(ddgPlane3,6);
+	_rootHull.planes = _frustrum3d;
+	_rootHull.noPlanes = 6;
+
+	_frustrum2d = new ddgPlane2[4];
+	ddgMemorySet(ddgPlane2,4);
+	_topDownWedge.lines = _frustrum2d;
+	_topDownWedge.noLines = 4;
 }
 
 ddgContext::~ddgContext(void)
 {
-	delete [] _frustrum;
-	ddgMemoryFree(ddgPlane,6);
-	_frustrum = NULL;
+	delete [] _frustrum3d;
+	ddgMemoryFree(ddgPlane3,6);
+	_frustrum3d = NULL;
+	delete [] _frustrum2d;
+	ddgMemoryFree(ddgPlane2,4);
+	_frustrum2d = NULL;
 }
 
 bool ddgContext::update()
@@ -80,11 +91,13 @@ bool ddgContext::update()
 	}
 #endif
 	_tanHalfFOV = tan(ddgAngle::degtorad(_fov/2.0));
+		// Generally we want to clip agains the left/right top/bottom and near planes.
+	// Far is handled by the _farClipSQ and provides a curved clip plane.
 	return _dirty;
 }
 
 
-bool ddgContext::visible ( ddgBBox *bbox )
+bool ddgContext::visible ( ddgBBox3 *bbox )
 {
 	float xmin, xmax, ymin, ymax, zmin, zmax;
 
@@ -182,8 +195,38 @@ void ddgContext::itransformation( ddgMatrix4 *matinv)
 	matinv->m[3].v[3] = 1;
 
 }
+
+void ddgContext::updateClippingInfo(void)
+{
+	extractPlanes(_frustrum3d);
+	// Generally we want to clip against the left/right top/bottom and near planes.
+	// Far is handled by the _farClipSQ and provides a curved clip plane.
+	// When our up vector is near to parallel with the y/height axis
+	// We only clip agains the left and right plane since the others are
+	// pretty much irrelevant.
+	if (_forward[1] == 0.0 && _up[1] == 1.0)
+		{
+		_levelView = true;
+		ddgVector2 pt;
+		// Left and right.
+		pt.set(_frustrum3d[0].n[0],_frustrum3d[0].n[2]);
+		_topDownWedge.lines[0].set(&pt,_frustrum3d[0].d);
+		pt.set(_frustrum3d[1].n[0],_frustrum3d[1].n[2]);
+		_topDownWedge.lines[1].set(&pt,_frustrum3d[1].d);
+		// Near and far.
+		pt.set(_frustrum3d[4].n[0],_frustrum3d[4].n[2]);
+		_topDownWedge.lines[2].set(&pt,_frustrum3d[4].d);
+		pt.set(_frustrum3d[5].n[0],_frustrum3d[5].n[2]);
+		_topDownWedge.lines[3].set(&pt,_frustrum3d[5].d);
+		}
+	else
+		{
+		_levelView = false;
+		}
+}
+
 // Extract 6 clipping planes in world space coordinates from the current view.
-void ddgContext::extractPlanes(ddgPlane planes[6])
+void ddgContext::extractPlanes(ddgPlane3 planes[6])
 {
 	ddgVector4 tmpVec;
 	ddgMatrix4 comboMat;
@@ -250,3 +293,19 @@ float ddgContext::ssdistance2( ddgVector3 *p, ddgVector3 *d)
 	float l = diff.size();
 	return l;
 }
+
+ddgInside ddgContext::clip( ddgBBox3 *bbox)
+{
+	if (_levelView)
+		{
+		static ddgRect2	rect;
+		rect.min.v[0] = bbox->min.v[0];
+		rect.max.v[0] = bbox->max.v[0];
+		rect.min.v[1] = bbox->min.v[2];
+		rect.max.v[1] = bbox->max.v[2];
+		return _topDownWedge.clip(&rect);
+		}
+	else
+		return _rootHull.clip(bbox);
+}
+

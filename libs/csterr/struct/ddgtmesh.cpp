@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -19,8 +19,9 @@
 //
 #include "struct/ddgtmesh.h"
 #include "struct/ddgbtree.h"
+
 // ----------------------------------------------------------------------
-//const unsigned int TBinMesh_size = 64;	// 64 seems to be a good size.
+//const unsigned int ddgTBinMesh_size = 64;	// 64 seems to be a good size.
 ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 {
 	_heightMap = h;	// Temporary 
@@ -82,6 +83,7 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	// Top level triangles.
 	stri[0].row = 0;
 	stri[0].col = 0;
+
 	// Corner entries.
 	stri[_triNo].row = ddgTBinMesh_size;
 	stri[_triNo].col = 0;
@@ -94,7 +96,7 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	_indexLUT[(ddgTBinMesh_size+1)*(ddgTBinMesh_size+1)-1] = 0;
 
 	// Initialize the other vertices.
-    initVertex(1,0,_triNo,_triNo+1,1);
+    initVertex(-1,0,_triNo,_triNo+1,1);
 	initNeighbours();
 
 	/// Total number of triangles rendered by this camera.
@@ -116,7 +118,7 @@ ddgTBinMesh::~ddgTBinMesh(void)
 {
 	delete [] stri;
 	delete _bintree;
-	delete[] _indexLUT;
+	delete [] _indexLUT;
 }
 
 /// Function to add a bintree.
@@ -193,15 +195,15 @@ bool ddgTBinMesh::init( ddgContext *ctx )
 		if (_bintree[i])
 		{
 			_bintree[i]->init();
-			if ( _bintree[i]->rawMaxVal(0) > _absMaxHeight)
-				_absMaxHeight = _bintree[i]->rawMaxVal(0);
+			if ( _bintree[i]->rawDelta(0) > _absDiffHeight)
+				_absDiffHeight = _bintree[i]->rawDelta(0);
 			if ( _bintree[i]->rawMinVal(0) < _absMinHeight)
 				_absMinHeight = _bintree[i]->rawMinVal(0);
 		}
 		ddgConsole::progress( "Initializing blocks", i,_bintreeMax-1);
 	}
 	// The difference between the highest point and the lowest point.
-	_absDiffHeight = _absMaxHeight - _absMinHeight;
+	_absMaxHeight = _absMinHeight + _absDiffHeight;
 	// Call it again to update the DiffHeight etc info.
 	ddgTBinTree::initContext(ctx,this);
 
@@ -220,7 +222,7 @@ bool ddgTBinMesh::init( ddgContext *ctx )
  *  v1 and v0 are the left and right vertices of va. 
  */
 
-void ddgTBinMesh::initVertex( unsigned int level,
+void ddgTBinMesh::initVertex( int level,
 					 ddgTriIndex va,	// Top
 					 ddgTriIndex v0,	// Left
 					 ddgTriIndex v1,	// Right
@@ -229,12 +231,23 @@ void ddgTBinMesh::initVertex( unsigned int level,
 	// Initialize row and col for this triangle.
 	stri[vc].row = (stri[v0].row + stri[v1].row) / 2;
 	stri[vc].col = (stri[v0].col + stri[v1].col) / 2;
-
 	// See if we are not at the bottom.
-	if (level < _maxLevel)
+	if (vc < leafTriNo())
 	{
-		initVertex(level+1,vc,va,v0,ddgTBinTree::left(vc)),
-		initVertex(level+1,vc,v1,va,ddgTBinTree::right(vc));
+		ddgTriIndex f,s;
+		// If level is odd return right, else left.
+		if (level & 1)
+		{
+			f = vc*2+1;
+			s = vc*2;
+		}
+		else
+		{
+			f = vc*2;
+			s = vc*2+1;
+		}
+		initVertex(level+1,vc,va,v0,f),
+		initVertex(level+1,vc,v1,va,s);
 	}
 	stri[vc].v0 = v0;
 	stri[vc].v1 = v1;
@@ -356,7 +369,6 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 		if (deltaViewAngle < 0.1)
 			_splitRun = true;
 	}
-
 	// Check if we didn't go anywhere and we have enough detail in the view.
 	if (deltaViewAngle == 1.0 && deltaMoveDistance == 0.0
 		&& _triVis >= _minDetail && _triVis <= _maxDetail)
@@ -375,7 +387,7 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 	// with merge enabled.
 	if (_splitRun)
 	{
-		// If the merge queue was enabled amd has content, reset it.
+		// If the merge queue was enabled and has content, reset it.
 		if (merge() && qmcache()->size())
 		{
 			qmcache()->reset();
@@ -385,30 +397,33 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 		_triVis = 0;
 
 		i = 0;
+		// Clear any cache entries we were holding onto.
 		while (i < _bintreeMax)
 		{
-			if (_bintree[i])
+			if (_bintree[i] && _bintree[i]->treeVis() != ddgUNDEF)
 			{
-				// Clear any cache entries we were holding onto.
-				ddgCacheIndex ci = _bintree[i]->chain();
-				while (ci)
-				{
-					ddgTNode *tn = (ddgTNode*) tcache()->get(ci);
-					_bintree[i]->tcacheId(tn->tindex(), 0);
-					ci = tn->next();
-				}
+				// Find 1st entry in the cache for this bintree mesh.
+				ddgTriIndex tindex = _bintree[i]->firstInMesh();
+				ddgTriIndex end = 0;
 
-				// Empty the active triangles chain for the bintree.
-				_bintree[i]->freeChain();
+				do 
+				{
+ 					_bintree[i]->tcacheId(tindex, 0);
+					// Go to next entry.
+					tindex = _bintree[i]->nextInMesh(tindex, &end);
+				}
+				while (end);
 			}
 			i++;
 		}
+
 		i = 0;
 		while (i < _bintreeMax)
 		{
-			if (_bintree[i])
+			if (_bintree[i] )
 			{
 				_bintree[i]->insertSQ(1,ddgMAXPRI,0,ddgUNDEF);
+				_bintree[i]->treeVis(_bintree[i]->vis(1));
 			}
 			i++;
 		}
@@ -492,7 +507,7 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 		count++;
 		if (count > _minDetail)
 		{
-			ddgAsserts(0,"Too many iterations to stabilization");
+//			ddgAsserts(0,"Too many iterations to stabilization");
 			done = true;
 			break;
 		}
@@ -543,7 +558,7 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 	_balCount = count;
     // Track the number of triangles produced by this calculation.
 	_triCount += _triVis;
-	return  true;
+	return true;
 }
 
 bool ddgTBinMesh::mapPosToTree(float *x, float *z, ddgTBinTree **bt, unsigned int *r, unsigned int *c)
@@ -597,5 +612,18 @@ float ddgTBinMesh::height(float x, float z)
 		return 0.0;
 }
 
-
-
+void ddgTBinMesh::setHeight(float x, float y, float z)
+{
+    // Find the binTree which owns this coordinate.
+    ddgTBinTree *bt = 0;
+    unsigned int r, c;
+    if (mapPosToTree(&x,&z,&bt, &r, &c) == ddgSuccess)
+	{
+		short h = ddgHeightMap::siconvert(y,_base,_scale);
+		ddgAssert(bt);
+		// Find mesh height at this location.
+		ddgTriIndex tindex = lookupIndex(r,c);
+		bt->rawHeight(tindex, h);
+		// $TODO update variance in the the mesh afterward
+	}
+}

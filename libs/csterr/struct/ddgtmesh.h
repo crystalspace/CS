@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@
 #define _ddgMesh_Class_
 
 #include "math/ddgvec.h"
-#include "struct/ddgbbox.h"
+#include "math/ddgbbox.h"
 #include "struct/ddghemap.h"
 #include "struct/ddgcache.h"
 
@@ -30,7 +30,8 @@ class ddgContext;
 
 // Block size of bintrees within a binmesh.
 #define ddgTBinMesh_size 32
-#define	ddgPriorityResolution 1024
+// Number of buckets.
+#define	ddgPriorityResolution 256
 
 typedef unsigned int ddgTriIndex;
 typedef unsigned int ddgTreeIndex;
@@ -45,8 +46,8 @@ typedef enum { eINNER = 0, eTOP = 1, eLEFT = 2, eDIAG = 3} Edge;
 class WEXP ddgMSTri
 {
 public:
-	/// Our position on the height grid.
-	unsigned int row, col; // Maybe possible to calculate.
+	/// Our position on the height grid w.r.t. the offsets of a given bintree.
+	int row, col;
 	/**
 	 *  The indices of the 2 other vertices which are a part of this triangle.
 	 *  The 3rd vertex is our own index in the mesh.
@@ -73,6 +74,7 @@ public:
 			return eDIAG;
 		return eINNER;
 	}
+
 };
 
 
@@ -90,19 +92,24 @@ private:
 	ddgTriIndex	_tindex;
 	/// Priority of triangle for this frame.			(2 byte)
 	ddgPriority _priority;
-    /**
-	 * The state which indicates whether we are visible w.r.t.
-	 * the viewing frustrum.							(1 byte)
-	 * Only 2 bits are currently used.
-	 */
-	ddgVisState _vis;
 	/// Index into the split queue cache if applicable.	(2 byte)
 	ddgCacheIndex	_qscacheIndex;
 	/// Index into the merge queue cache if applicable. (2 byte)
 	ddgCacheIndex	_qmcacheIndex;
 	/// Multiplier for priority recomputation. (4 byte)
 	float		_priorityFactor;
-
+/*
+	/// Morphing amount to morph in next step.
+	int			_delta;
+	///	Current morph height.
+	int			_current;
+*/
+    /**
+	 * The state which indicates whether we are visible w.r.t.
+	 * the viewing frustrum.							(1 byte)
+	 * Only 2 bits are currently used.
+	 */
+	ddgVisState _vis;
 public:
 	/// Set the queue cache index.
 	void qscacheIndex( ddgCacheIndex ci ) { _qscacheIndex = ci; }
@@ -116,7 +123,6 @@ public:
 	inline ddgTriIndex	tindex(void) { return _tindex; }
 	/// Set the triangle index.
 	inline void tindex(ddgTriIndex ti) { _tindex = ti; }
-
 	///
 	inline void priority(int p ) { _priority = p; }
 	///
@@ -126,12 +132,30 @@ public:
 	inline void vis(float v ) { _vis = ddgVisState(v); }
 	///
 	inline ddgVisState vis(void) { return _vis; }
-
 	///
 	inline void priorityFactor(float pf) { _priorityFactor = pf; }
 	///
 	inline float priorityFactor(void) { return _priorityFactor; }
+/*
+	///
+	inline int current(void) { return _current; }
+	///
+	inline int delta(void) { return _delta; }
+	///
+	///
+	inline void current(int c) { _current = c; }
+	///
+	inline void delta(int d) { _delta = d; }
+	///
 
+	inline void reset(short h, short v1, short v2)
+	{
+		// Set current value to midpoint.
+		_current = (v1 + v2)/2;
+		// Delta is 1/8th of total change.
+		_delta = (h - _current)/8;
+	}
+*/
 };
 
 /**
@@ -387,7 +411,7 @@ public:
 	 *  va is immediate parent.
 	 *  v1 and v0 are the sub triangles of va. 
 	 */
-	void initVertex( unsigned int level,
+	void initVertex( int level,
 			   ddgTriIndex va,
 			   ddgTriIndex v1,
 			   ddgTriIndex v0,
@@ -498,6 +522,12 @@ public:
 	 * Cannot be called before init.
      */
     float height(float x, float z);
+    /** Set height of mesh at a real location.
+     * Coords should be unscaled in x,z direction
+	 * coord should map to actual heightmap locations.
+	 * Cannot be called before init.
+     */
+    void setHeight(float x, float y, float z);
 	/// The difference between the highest point on the mesh and the lowest point.
 	int absDiffHeight(void) { return _absDiffHeight; }
 	/// The lowest point on the mesh.

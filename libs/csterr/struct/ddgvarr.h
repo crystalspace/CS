@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -25,6 +25,18 @@
 
 typedef int ddgVBIndex;
 /**
+ * special class to handle memory saving short as texture coords.
+ * could even use unsigned chars, but dont know packing format for
+ * glTexCoordPointer
+ */
+typedef float	ddgTexCoord;
+class ddgTexCoord2
+{
+public:
+	ddgTexCoord	v[2];
+};
+
+/**
  * A class supporting vertex array buffers.
  * It can allocate memory and supports pushing data into
  * buffers in various convenient configurations.
@@ -33,19 +45,19 @@ typedef int ddgVBIndex;
 class WEXP ddgVArray 
  {
 public:
-	/// Enumeration of tree types.
+	/// Enumeration of buffer types.
 	enum ddgBufType{ dummy = 0, point = 1, line = 2, triangle = 3, quad = 4 };
 private:
-	/// Size of the buffers allocated by this vertex array.
-	unsigned int _bufsize;
-    /**
-     * Number of vertices/texture/normal and color elements in buffer.
-     */
+    /// Number of vertices/texture/normal and color elements in buffer.
     unsigned int _num;
     /// Number of indices.
     unsigned int _inum;
+	/// Size of the buffers allocated by this vertex array.
+	unsigned int _bufsize;
     /// Textured triangle set.
     bool    _fTexture:1;
+    /// Textured triangle set using integer indices.
+    bool    _fTextureCoord:1;
     /// Render normals
     bool    _fNormal:1;
     /// Colored triangle set.
@@ -53,16 +65,18 @@ private:
     /// The type of objects this buffer is managing.
     ddgBufType    _type;
 public:
-	/// Vertex buffer.
-	ddgVector3	*vbuf;
 	/// Index buffer.
 	ddgVBIndex *ibuf;
+	/// Vertex buffer.
+	ddgVector3	*vbuf;
 	/// Texture coord buffer.
 	ddgVector2 *tbuf;
-	/// Normal coord buffer.
-	ddgVector3 *nbuf;
+	/// Integer texture coord buffer.
+	ddgTexCoord2	*tibuf;
 	/// Color buffer.
 	ddgColor4 *cbuf;
+	/// Normal coord buffer.
+	ddgVector3 *nbuf;
 	/// Create a object but don't allocate any memory.
 	ddgVArray( ddgBufType type = triangle);
 	/// Destructor free all memory.
@@ -70,16 +84,18 @@ public:
 	/// Initialize the vector Buffer object and allocate buffers if size is set.
 	bool init(void );
     /// Reset the buffers, Must be called before filling buffer.
-    void reset(void) { _num = 0; _inum = 0; }
+    inline void reset(void) { _num = 0; _inum = 0; }
     /// Initial buffer size to allocate.  Must be called before init.
-    void size(unsigned int s) { _bufsize = s; }
+    inline void size(unsigned int s) { _bufsize = s; }
 	/// Return the number of triangles in the buffer.
-	unsigned int size(void) { return _inum/3; }
+	inline unsigned int size(void) { return _inum/3; }
 	/// Return the number of shared indexes in the buffer.
-	unsigned int num(void) { return _num; }
+	inline unsigned int num(void) { return _num; }
 	/// Set the rendering mode.
-	void renderMode( bool t = true, bool n = true, bool c = true)
+	inline void renderMode( bool t = true, bool n = true, bool c = true)
     { _fTexture = t; _fNormal = n; _fColor = c; }
+	/// Activate the use of unsigned chars as texture coordinates.
+	inline void compactTextureCoords( bool c ) { _fTextureCoord = c; }
 	/// Is color active
 	inline bool colorOn(void) { return _fColor; }
 	/// Is texture active
@@ -90,24 +106,26 @@ public:
 	inline unsigned int inum(void) { return _inum; }
 	/// What type of primitive are we managing.
 	inline ddgBufType type(void) { return _type; }
-     /// Push a triangle into the buffer.
-    ddgVBIndex pushVTNC(ddgVector3 *p, ddgVector2 *t, ddgVector3 *n, ddgColor3 *c);
-    /// Push a triangle into the buffer.
+     /// Push a vertex into the buffer.
+    ddgVBIndex pushVTNC(ddgVector3 *p, ddgVector2 *t, ddgVector3 *n, ddgColor4 *c);
+    /// Push a vertex into the buffer.
     ddgVBIndex pushVTN(ddgVector3 *p, ddgVector2 *t, ddgVector3 *n); 
-    /// Push a triangle into the buffer.
+    /// Push a vertex into the buffer.
     ddgVBIndex pushVT(ddgVector3 *p, ddgVector2 *t);
     /// Push a vertex into the buffer.
-    ddgVBIndex pushVC(ddgVector3 *p, ddgColor3 *c);
+    ddgVBIndex pushVT(ddgVector3 *p, ddgTexCoord2 *t);
+    /// Push a vertex into the buffer.
+    ddgVBIndex pushVC(ddgVector3 *p, ddgColor4 *c);
     /// Push a vertex into the buffer.
     ddgVBIndex pushV(ddgVector3 *p);
     /// Push an index into the buffer.
-    unsigned int pushTriangle( ddgVBIndex i1, ddgVBIndex i2, ddgVBIndex i3 );
+    void pushTriangle( ddgVBIndex i1, ddgVBIndex i2, ddgVBIndex i3 );
     /// Push an index into the buffer.
-    unsigned int pushQuad( ddgVBIndex i1, ddgVBIndex i2, ddgVBIndex i3, ddgVBIndex i4 );
+    void pushQuad( ddgVBIndex i1, ddgVBIndex i2, ddgVBIndex i3, ddgVBIndex i4 );
     /// Push an index into the buffer.
-    unsigned int pushLine( ddgVBIndex i1, ddgVBIndex i2 );
+    void pushLine( ddgVBIndex i1, ddgVBIndex i2 );
     /// Push an index into the buffer.
-    unsigned int pushPoint( ddgVBIndex i1 );
+    void pushPoint( ddgVBIndex i1 );
  	/// Depth Sort the data in the buffer.
 	void sort(void);
 };

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -44,7 +44,54 @@
 #ifdef DDG
 #define WEXP	__declspec(dllexport)
 #define WFEXP	__cdecl
-#endif
+#endif // DDG
+#endif // WIN32
+
+#ifdef DDGGL
+#if defined(_WIN32)
+
+/* GLUT 3.7 now tries to avoid including <windows.h>
+   to avoid name space pollution, but Win32's <GL/gl.h> 
+   needs APIENTRY and WINGDIAPI defined properly. */
+   /* XXX This is from Win32's <windef.h> */
+#  ifndef APIENTRY
+#   define GLUT_APIENTRY_DEFINED
+#   if (_MSC_VER >= 800) || defined(_STDCALL_SUPPORTED)
+#    define APIENTRY    __stdcall
+#   else
+#    define APIENTRY
+#   endif
+#  endif
+   /* XXX This is from Win32's <winnt.h> */
+#  ifndef CALLBACK
+#   if (defined(_M_MRX000) || defined(_M_IX86) || defined(_M_ALPHA) || defined(_M_PPC)) && !defined(MIDL_PASS)
+#    define CALLBACK __stdcall
+#   else
+#    define CALLBACK
+#   endif
+#  endif
+   /* XXX This is from Win32's <wingdi.h> and <winnt.h> */
+#  ifndef WINGDIAPI
+#   define GLUT_WINGDIAPI_DEFINED
+#   define WINGDIAPI __declspec(dllimport)
+#  endif
+   /* XXX This is from Win32's <ctype.h> */
+#  ifndef _WCHAR_T_DEFINED
+typedef unsigned short wchar_t;
+#   define _WCHAR_T_DEFINED
+#  endif
+# endif
+
+#pragma comment (lib, "winmm.lib")     /* link with Windows MultiMedia lib */
+#pragma comment (lib, "opengl32.lib")  /* link with Microsoft OpenGL lib */
+#pragma comment (lib, "glu32.lib")     /* link with OpenGL Utility lib */
+#pragma comment (lib, "glut32.lib")    /* link with Win32 GLUT lib */
+
+#pragma warning (disable:4244)	/* Disable bogus conversion warnings. */
+#pragma warning (disable:4305)  /* VC++ 5.0 version of above warning. */
+
+#include <gl/gl.h>
+#include <gl/glu.h>
 #endif
 
 #ifdef __CRYSTAL_SPACE__
@@ -58,7 +105,6 @@
 #define WEXP
 #define WFEXP
 #endif
-// Various assert macros.
 //
 #ifndef DDG
 // Dummy classes

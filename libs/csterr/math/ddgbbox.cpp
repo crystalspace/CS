@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -17,55 +17,55 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 // 
-#include "struct/ddgbbox.h"
+#include "math/ddgbbox.h"
 
 // ----------------------------------------------------------------------
 // Initialization of global variables.
-short ddgBBox::_corner[8][3] = {
+short ddgBBox3::_corner[8][3] = {
     {-1,-1,-1},{1,-1,-1},{-1,1,-1},{1,1,-1},
     {-1,-1, 1},{1,-1, 1},{-1,1, 1},{1,1, 1}};
 
 // Calculate a corner of the ddgBBox.
-float ddgBBox::cornerx(int n) { return (n%2 == 0) ?_min[0] : _max[0];}
-float ddgBBox::cornery(int n) { return (n==0||n==1||n==4||n==5) ?_min[1]: _max[1];}
-float ddgBBox::cornerz(int n) { return (n < 4) ?_min[2] : _max[2];}
+float ddgBBox3::cornerx(int n) { return (n%2 == 0) ?min[0] : max[0];}
+float ddgBBox3::cornery(int n) { return (n==0||n==1||n==4||n==5) ?min[1]: max[1];}
+float ddgBBox3::cornerz(int n) { return (n < 4) ?min[2] : max[2];}
 
 // ----------------------------------------------------------------------
 // MinMax:
 //    Initialize the ddgBBox with minimum and maximum values.
 //
-void ddgBBox::set(float xmin, float xmax, float ymin, float ymax, float zmin, float zmax)
+void ddgBBox3::set(float xmin, float xmax, float ymin, float ymax, float zmin, float zmax)
 {
-	_min = ddgVector3(xmin,ymin,zmin);
-	_max = ddgVector3(xmax,ymax,zmax);
+	min = ddgVector3(xmin,ymin,zmin);
+	max = ddgVector3(xmax,ymax,zmax);
 }
 // ----------------------------------------------------------------------
 // MinMax:
 //    Initialize the ddgBBox with minimum and maximum vectors.
 //
-ddgBBox::ddgBBox(const ddgVector3 &min, const ddgVector3 &max)
+ddgBBox3::ddgBBox3(const ddgVector3 &pmin, const ddgVector3 &pmax)
 {
-	_min = min;
-	_max = max;
+	min = pmin;
+	max = pmax;
 }
 
 // ----------------------------------------------------------------------
-// ddgBBox:
+// ddgBBox3:
 //   Initialize the ddgBBox based on a centre point and deltas in 3 directions.
 //
-ddgBBox::ddgBBox(float xc, float xd, float yc, float yd, float zc, float zd)
+ddgBBox3::ddgBBox3(float xc, float xd, float yc, float yd, float zc, float zd)
 {
-	_min = ddgVector3( xc - xd, yc - yd, zc - zd);
-	_max = ddgVector3( xc + xd, yc + yd, zc + zd);
+	min = ddgVector3( xc - xd, yc - yd, zc - zd);
+	max = ddgVector3( xc + xd, yc + yd, zc + zd);
 }
 
 // ----------------------------------------------------------------------
 // copy:
 //   Copy the contents from a given bbox into this one.
-void ddgBBox::copy(ddgBBox *src)
+void ddgBBox3::copy(ddgBBox3 *src)
 {
-  _min = src->_min;
-  _max = src->_max;
+  min = src->min;
+  max = src->max;
 }
 
 // ----------------------------------------------------------------------
@@ -80,18 +80,18 @@ void ddgBBox::copy(ddgBBox *src)
 // If the value is not 0, the box is split at value, where value must
 // be within the axis bounds along that axis.
 // 
-void ddgBBox::split(Split side, float value )
+void ddgBBox3::split(Split side, float value )
 {
   if (value == 0)
     {
     switch(side)
     {
-      case XLT:  _max.v[0] = (_min.v[0] + _max.v[0])/2.0; break;
-      case XGT:  _min.v[0] = (_min.v[0] + _max.v[0])/2.0; break;
-      case YLT:  _max.v[1] = (_min.v[1] + _max.v[1])/2.0; break;
-      case YGT:  _min.v[1] = (_min.v[1] + _max.v[1])/2.0; break;
-      case ZLT:  _max.v[2] = (_min.v[2] + _max.v[2])/2.0; break;
-      case ZGT:  _min.v[2] = (_min.v[2] + _max.v[2])/2.0; break;
+      case XLT:  max.v[0] = (min.v[0] + max.v[0])/2.0; break;
+      case XGT:  min.v[0] = (min.v[0] + max.v[0])/2.0; break;
+      case YLT:  max.v[1] = (min.v[1] + max.v[1])/2.0; break;
+      case YGT:  min.v[1] = (min.v[1] + max.v[1])/2.0; break;
+      case ZLT:  max.v[2] = (min.v[2] + max.v[2])/2.0; break;
+      case ZGT:  min.v[2] = (min.v[2] + max.v[2])/2.0; break;
       }
     }
   else
@@ -124,9 +124,9 @@ void ddgBBox::split(Split side, float value )
 // ex, ey, ez:
 //    3D point in space.
 
-float ddgBBox::distancesq(ddgVector3 *eye)
+float ddgBBox3::distancesq(ddgVector3 *eye)
 {
-	ddgVector3 c(_min + _max);
+	ddgVector3 c(min + max);
 	c.divide(2);
 	ddgVector3 d(c - *eye);
 	return d.sizesq();
@@ -142,13 +142,13 @@ float ddgBBox::distancesq(ddgVector3 *eye)
 	t = (mm[d1] - p1->v[d1]) / d[d1]; \
 	iv = p1->v[d2] + t * d[d2]; \
 	jv = p1->v[d3] + t * d[d3]; \
-	if (INSIDE2(_min[d2],_min[d3],_max[d2],_max[d3],iv,jv)) \
+	if (INSIDE2(min[d2],min[d3],max[d2],max[d3],iv,jv)) \
 		return true; \
 }
 // Calculate the min and max values in a dimension and test.
-#define CALCDIM(d1,d2,d3) CALCTEST(_min,d1,d2,d3) CALCTEST(_max,d1,d2,d3)
+#define CALCDIM(d1,d2,d3) CALCTEST(min,d1,d2,d3) CALCTEST(max,d1,d2,d3)
 // Test for intersection of line with bbox.
-bool ddgBBox::intersect( ddgVector3 *p1, ddgVector3 *p2)
+bool ddgBBox3::intersect( ddgVector3 *p1, ddgVector3 *p2)
 {
 	ddgVector3 d(*p2 - *p1); // Slope of line.
 	float	t;
@@ -166,7 +166,7 @@ bool ddgBBox::intersect( ddgVector3 *p1, ddgVector3 *p2)
 	return false;
 }
 // Test for intersection of another bbox.
-bool ddgBBox::intersect( ddgBBox *b )
+bool ddgBBox3::intersect( ddgBBox3 *b )
 {
 	if (cornerx(0) > b->cornerx(1)
 		|| cornerx(1) < b->cornerx(0)
@@ -179,7 +179,7 @@ bool ddgBBox::intersect( ddgBBox *b )
 }
 
 
-ddgClipFlags ddgBBox::visibleSpace( ddgBBox b, float tanHalfFOV )
+ddgClipFlags ddgBBox3::visibleSpace( ddgBBox3 b, float tanHalfFOV )
 {
 	ddgClipFlags vis = 0;
 
@@ -220,42 +220,4 @@ ddgClipFlags ddgBBox::visibleSpace( ddgBBox b, float tanHalfFOV )
 
 
 	return vis;
-}
-/*
-Return Values:
-0 = Outside
-1 = Intersecting
-2 = Inside
- This method would benefit from SSE since we can perform 4 dot products in one go and we may need
-  as many as 12 in the worst case.
-*/
-ddgVis ddgBBox::isVisible(ddgPlane *planes, int n )
-{
-	ddgAssert(n > 0 && n < 20);
-	static ddgVector3 minPt(0,0,0), maxPt(0,0,0);
-	bool bIntersecting = false;	// Assume all points are inside.
-
-	for (int i = 0; i < n; i++)   // For each plane.
-	{
-		ddgAsserts(planes[i].normal()->v[0]||planes[i].normal()->v[1]||planes[i].normal()->v[2],"Zero size plane normal!");
-		for (int j = 0; j < 3; j++)  // For each dimension.
-		{
-			if (planes[i].normal()->v[j] >= 0.0f)
-			{
-				minPt.v[j] = _min[j];
-				maxPt.v[j] = _max[j];
-			}
-			else
-			{
-				minPt.v[j] = _max[j];
-				maxPt.v[j] = _min[j];
-			}
-		}
-	   	if (planes[i].isPointAbovePlane(&minPt) > 0.0f)	// MinPt is on outside.
-			return ddgOUT;
-
-		if (planes[i].isPointAbovePlane(&maxPt) >= 0.0f) // MaxPt is on outside (and min was on inside).
-			bIntersecting = true;
-	}
-	return bIntersecting ? ddgPART : ddgIN;
 }

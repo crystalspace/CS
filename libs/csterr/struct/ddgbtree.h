@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -21,23 +21,12 @@
 
 #include "struct/ddgtmesh.h"
 #include "struct/ddgcntxt.h"
+#include "struct/ddghist.h"
 
 typedef unsigned short ddgPriority;
 
 #define ddgMAXPRI 0xFFFF
 #define ddgMINPRI 0
-
-/// Index array offsets for each level of the implicit binary tree.
-const unsigned int ddgBintreeOffset[32] =
-	{ 0x1,       0x2,       0x4,       0x8,
-	  0x10,      0x20,      0x40,      0x80,
-	  0x100,     0x200,     0x400,     0x800,
-	  0x1000,    0x2000,    0x4000,    0x8000,
-	  0x10000,   0x20000,   0x40000,   0x80000,
-	  0x100000,  0x200000,  0x400000,  0x800000,
-	  0x1000000, 0x2000000, 0x4000000, 0x8000000,
-	  0x10000000,0x20000000,0x40000000,0x80000000
-	};
 
 /**
  * Triangle Bintree mesh.
@@ -73,13 +62,13 @@ class WEXP ddgTBinTree {
 	 */
 	short *_rawMinVal;
     /**
-	 * Maximum value of all triangles of this triangle's subtree	(2 bytes)
+	 * the Max height - Min height of all _rawHeights  in the subtree. (2 bytes)
 	 */
-	short *_rawMaxVal;
+	unsigned short *_rawDelta;
 	/**
 	 * Visibility state of the top level triangle in this tree.
 	 */
-	ddgVisState _vis;
+	ddgVisState _treeVis;
 
 	/**
 	 * Pointer to neighbouring TBinTrees.
@@ -112,8 +101,6 @@ class WEXP ddgTBinTree {
 	static float _nearClip;
 	/// Squared far clipping distance.
 	static float _farClipSQ;
-	/// Number of clip planes to test.
-	static int	_clipPlanes;
 	/// Cosine of the field of view / 2;
 	static float _cosHalfFOV;
 	/**
@@ -151,10 +138,10 @@ class WEXP ddgTBinTree {
 	static float _varianceScale;
 	/// Cached pointer to the static tree data.
 	static ddgMSTri	*_stri;
+
 	/// Cached pointer to the triangle cache.
 	static ddgTCache	*_tcache;
-	/// A cache chain for this bintree.
-	ddgCacheIndex		_chain;
+
 	/// The number of visible triangles.
 	unsigned int		_visTriangle;
 	/**
@@ -170,14 +157,6 @@ public:
 	/// Destroy the Bintree mesh.
 	~ddgTBinTree(void);
 
-	/// Free all the cached nodes in this bintree.
-	void freeChain(void) {
-		_chain = 0;
-	}
-	/// Free all the cached nodes in this bintree.
-	ddgCacheIndex chain(void) {
-		return _chain;
-	}
 	/// Return the number of visible triangles which this bin tree is managing.
 	unsigned int visTriangle(void) { return _visTriangle; }
 	/// Set the number of visible triangles which this bin tree is managing.
@@ -205,44 +184,21 @@ public:
 	/// Initialize the bin tree.
 	bool init(void);
 private:
+/*
 	/// Get triangle row in the bin tree.
 	unsigned int row(unsigned int i);
 	/// Get triangle col.
 	unsigned int col(unsigned int i);
+*/
 	/// Get the triangle row on the master mesh.
 	unsigned int mrow(unsigned int i);
 	/// Get the triangle column on the master mesh.
 	unsigned int mcol(unsigned int i);
-	/** Return the starting offset in the array where a
-	 * given level is stored.
-	 */
-	static unsigned int offset(unsigned int l)
-	{
-		return ddgBintreeOffset[l];
-	}
+
 public:
 
-	/// Return the level of this triangle based on its index.
-	static unsigned int level(ddgTriIndex i)
-	{
-		unsigned int l = 0;
-		if (i > 0)
-			while ((i=i/2) > 1)
-				l++;
-		return l;
-	}
-	/// If this is odd (right) or even(left) child in the tree.
-	static bool isRight(ddgTriIndex i)
-	{
-		return ((i%2) == 1);
-	}
-	/// If this is odd (right) or even(left) child in the tree.
-	static bool isLeft(ddgTriIndex i)
-	{
-		return ((i%2) == 0);
-	}
 	/// Return the parent of this element.
-	static ddgTriIndex parent(ddgTriIndex i)
+	static inline ddgTriIndex parent(ddgTriIndex i)
 	{
 //		asserts (i < _triNo,"Invalid element number.");
 		if (i == 0)
@@ -250,16 +206,19 @@ public:
 		if (i == 1) return 0;
 		return i/2;
 	}
-	/// Return the index of the left child.
-	static ddgTriIndex right(ddgTriIndex i)
-	{
-		return i*2;
-	}
-	/// Return the index of the left child.
-	static ddgTriIndex left(ddgTriIndex i)
-	{
-		return right(i)+1;
-	}
+
+	/// Return the index of the 1st child.
+	static inline ddgTriIndex first(ddgTriIndex i) { ddgAssert(i>0); return i*2; }
+	/// Return the index of the 2nd child.
+	static inline ddgTriIndex second(ddgTriIndex i) { ddgAssert(i>0); return i*2+1; }
+	/// Return the index of the 1st child.
+	ddgTriIndex firstInMesh(void);
+
+	/** Return the index of the 2nd child.
+	 *  end must be initialized to 0 and will be reset to 0 when there is nothing left to do.
+	 */
+	ddgTriIndex nextInMesh(ddgTriIndex tindex, ddgTriIndex *end );
+
 private:
 	/// Return the quad neighbour. If 0 there is no neighbour.
 	ddgTriIndex neighbour( ddgTriIndex i);
@@ -282,17 +241,23 @@ public:
 	{
 		return _rawHeight[tindex];
 	}
+	/// Get the raw height for a triangle.
+	void rawHeight( ddgTriIndex tindex, short h )
+	{
+		_rawHeight[tindex] = h;
+	}
 	/// Get the min height for a triangle block.
 	short rawMinVal( ddgTriIndex tindex )
 	{
 		return _rawMinVal[tindex];
 	}
-	/// Get the max height for a triangle block.
-	short rawMaxVal( ddgTriIndex tindex )
+	/// Get the variance for a triangle block.
+	unsigned short rawDelta( ddgTriIndex tindex )
 	{
-		return _rawMaxVal[tindex];
+		return _rawDelta[tindex];
 	}
 private:
+
 	/**
 	 *  Return the cache node which stores the extra data for this triangle
 	 *  for the purpose of reading data.  If the cacheIndex = 0, we will
@@ -307,7 +272,9 @@ private:
 	ddgTNode *snode(ddgTriIndex tindex);
 public:
 	/// Return toplevel visibility state.
-	ddgVisState vis(void)							{ return _vis; }
+	ddgVisState treeVis(void)							{ return _treeVis; }
+	/// Return toplevel visibility state.
+	void treeVis(ddgVisState v )						{ _treeVis = v; }
 	/// Return the objects visibility state.
 	ddgVisState vis(ddgTriIndex tindex)				{ return gnode(tindex)->vis(); }
 	/// Set the objects visibility state.
@@ -344,41 +311,28 @@ public:
     void vertex(ddgTriIndex tindex, ddgVector3 *vout);
 
     /// Get texture coord data, as a value from 0 to 1 on the bintree.
-    void textureC(unsigned int tindex, ddgVector2 *vout)
-    {
-        if (_mirror)
-        	vout->set(ddgTBinMesh_size-row(tindex),ddgTBinMesh_size-col(tindex));
-        else
-        	vout->set(row(tindex),col(tindex));
-		vout->multiply( 1.0 / (float)ddgTBinMesh_size);
-	}
+    void textureC(unsigned int tindex, ddgVector2 *vout);
 
 	/// Calculate visibility of a triangle.
 	ddgVisState visibilityTriangle(ddgTriIndex tvc);
 	/// Is triangle visible (even partially)?
-	bool visible(ddgTriIndex i)
+	bool visible(ddgTriIndex tindex)
 	{
-		return (vis(i) != ddgOUT) ? true : false;
+		return (vis(tindex) != ddgOUT) ? true : false;
 	}
 	/// Is triangle fully visible?
-	bool fullyvisible(ddgTriIndex i)
+	bool fullyvisible(ddgTriIndex tindex)
 	{
-		return (vis(i) == ddgIN) ? true : false;
+		return (vis(tindex) == ddgIN) ? true : false;
 	}
-	/**
-	 *  Initialize precomputed parameters.
-	 *  Recusively calculate a convex hull for a triangle.
-	 *  Splitting occurs along this points parent's 
-	 *  Passed in are the triangles which carry the points
-	 *  that describe the current triangle.
-	 *  va is immediate parent.
-	 *  v1 and v0 are the sub triangles of va. 
-	 */
-	void initTriangle( unsigned int level,
-			   ddgTriIndex va,
-			   ddgTriIndex v1,
-			   ddgTriIndex v0,
-			   ddgTriIndex vc);
+	/// Recusively initialize precomputed static parameters.
+	void initTriangle( ddgTriIndex tindex);
+
+	/// Calculate the variance for a triangle.
+	void calculateVariance(ddgTriIndex tindex);
+
+	/// Update variance for triangle and all affected triangles. (upward).
+	void updateVariance( ddgTriIndex tindex);
 
 	/// Split queue operations.
 	void insertSQ(ddgTriIndex tindex, ddgPriority p, ddgCacheIndex ci, ddgVisState parentVis );
@@ -415,8 +369,10 @@ public:
 	 * Returns false otherwise.
 	 */
 	bool rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int depth = -1 );
-
+	/// Generate a histogram of usage.
+	static void setHist( ddgHistogram * hist);
 };
+
 
 #ifdef DDGSTREAM
 ///

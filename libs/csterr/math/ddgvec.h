@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -20,12 +20,13 @@
 #define _ddgVector_Class_
 
 #include "util/ddgutil.h"
+
 /**
  * Two dimensional vector class.
  */
 class WEXP ddgVector2 {
 public:
-	/// Three floating point values.
+	/// Two floating point values.
 	float v[2];
 	/// return the value of the vector as a float array.
 	operator float* () { return v; }
@@ -426,48 +427,6 @@ WEXP ostream& WFEXP operator << ( ostream&s, const ddgVector3* v );
 ///
 WEXP istream& WFEXP operator >> ( istream& s, ddgVector3& v);
 #endif
-/*
-/// Define a crystal space friendly class.
-class ddgVector3 : public csVector3
-{
-public:
-	/// Default Constructor
-	ddgVector3( void ) {}
-	/// Constructor
-	ddgVector3( float x, float y, float z) : csVector3( x, y, z) {}
-	/// Calculate the dot product of this and u.
-	float dot ( const ddgVector3 *u )	{ return u->x*x+ u->y*y + u->z*z; }
-	///
-	float sizesq( void )                 { return (x*x+y*y+z*z); }
-	///
-	float size( void )                   { return sqrtf(sizesq()); }
-	///
-	void normalize( void )               { float s = 1.0/size(); x *= s; y *= s; z *= s; }
-	///
-	void set(float a, float b, float c ) { x = a; y = b; z = c; }
-	///
-	void set( csVector3 u )			{ x = u.x; y = u.y; z = u.z; }
-	///
-	void set( const ddgVector3 *u )      { x = u->x; y = u->y; z = u->z; }
-	// Calculate the normal for 3 non colinear points in space.
-	/// Assumes p0 p1 and p2 are in counterclockwise order.
-	void normal( const ddgVector3 *p0, const ddgVector3 *p1, const ddgVector3 *p2 )
-    {
-		ddgVector3 v1, v2;
-		v1.x = p0->x - p1->x;
-		v1.y = p0->y - p1->y;
-		v1.z = p0->z - p1->z;
-		v2.x = p2->x - p1->x;
-		v2.y = p2->y - p1->y;
-		v2.z = p2->z - p1->z;
-		Cross(v1, v2);
-    }
-	/// Multiply vector by scalar
-	ddgVector3& operator*=( const float d) 
-		{ x*= d; y *= d; z *= d; return *this; }
-
-};
-*/	
 /**
  * Four dimensional vector class.
  */

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -189,7 +189,14 @@ public:
 	 * 0,0 is used.
 	 */
 	bool mapColorToAlpha( unsigned char *color = NULL);
-
+	/**
+	 * Convert a LUMINANCE image to a full RGBA texture
+	 */
+	bool mapLuminanceToRGBA( void );
+	/**
+	 * Convert a LUMINANCE image to a full RGB texture
+	 */
+	bool mapLuminanceToRGB( void );
 };
 
 #endif

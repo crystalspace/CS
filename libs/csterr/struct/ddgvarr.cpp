@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -26,14 +26,17 @@
 // ----------------------------------------------------------------------
 ddgVArray::ddgVArray( ddgBufType type  )
 {
+	ibuf = NULL;
     vbuf = NULL;
 	tbuf = NULL;
-	ibuf = NULL;
+	tibuf = NULL;
 	cbuf = NULL;
 	nbuf = NULL;
     _num = 0;
+	_inum = 0;
     _fNormal = true;
     _fTexture = true;
+    _fTextureCoord = false;
     _fColor = true;
 	_type = type;
 	_bufsize = 0;
@@ -41,9 +44,10 @@ ddgVArray::ddgVArray( ddgBufType type  )
 
 ddgVArray::~ddgVArray(void)
 {
+	delete []ibuf;
 	delete []vbuf;
 	delete []tbuf;
-	delete []ibuf;
+	delete []tibuf;
 	delete []cbuf;
 	delete []nbuf;
 }
@@ -73,9 +77,18 @@ bool ddgVArray::init(void)
 		}
         if (_fTexture)
 		{
-    		tbuf = new ddgVector2[_bufsize];
-			ddgAsserts(tbuf,"Failed to Allocate memory");
-			ddgMemorySet(ddgVector2,_bufsize);
+			if (_fTextureCoord)
+			{
+    			tibuf = new ddgTexCoord2[_bufsize];
+				ddgAsserts(tibuf,"Failed to Allocate memory");
+				ddgMemorySet(ddgTexCoord2,_bufsize);
+			}
+			else
+			{
+    			tbuf = new ddgVector2[_bufsize];
+				ddgAsserts(tbuf,"Failed to Allocate memory");
+				ddgMemorySet(ddgVector2,_bufsize);
+			}
 		}
     }
  
@@ -86,40 +99,52 @@ bool ddgVArray::init(void)
 /// Push a given vertex into the buffer.
 ddgVBIndex ddgVArray::pushV(ddgVector3 *p1)
 {
-	ddgAsserts(_num+1 < _bufsize,"Buffer overflow");
+	ddgAsserts(_num < _bufsize,"Buffer overflow");
 	// Push the vertex.
     vbuf[_num] =(*p1);
     _num++;
 
-    return _num;
+    return _num-1;
 }
 /// Push a given vertex into the buffer.
 ddgVBIndex ddgVArray::pushVT(ddgVector3 *p1, ddgVector2 *t1)
 {
-	ddgAsserts(_num+1 < _bufsize,"Buffer overflow");
+	ddgAsserts(_num < _bufsize,"Buffer overflow");
 	// Push the vertex.
     vbuf[_num] =(*p1);
     tbuf[_num] =(*t1);
     _num++;
 
-    return _num;
+    return _num-1;
+}
+/// Push a given vertex into the buffer.
+ddgVBIndex ddgVArray::pushVT(ddgVector3 *p1, ddgTexCoord2 *t1)
+{
+	ddgAsserts(_num < _bufsize,"Buffer overflow");
+	// Push the vertex.
+    vbuf[_num] =(*p1);
+    tibuf[_num].v[0] =t1->v[0];
+    tibuf[_num].v[1] =t1->v[1];
+    _num++;
+
+    return _num-1;
 }
 /// Push a given vertex into the buffer.
 ddgVBIndex ddgVArray::pushVTN(ddgVector3 *p1, ddgVector2 *t1, ddgVector3 *n1 )
 {
-	ddgAsserts(_num+1 < _bufsize,"Buffer overflow");
+	ddgAsserts(_num < _bufsize,"Buffer overflow");
 	// Push the vertex.
     vbuf[_num] =(*p1);
     nbuf[_num] =(*n1);
     tbuf[_num] =(*t1);
     _num++;
 
-    return _num;
+    return _num-1;
 }
 /// Push a vertex into the buffer.
-ddgVBIndex ddgVArray::pushVTNC(ddgVector3 *p1, ddgVector2 *t1, ddgVector3 *n1, ddgColor3 *c1)
+ddgVBIndex ddgVArray::pushVTNC(ddgVector3 *p1, ddgVector2 *t1, ddgVector3 *n1, ddgColor4 *c1)
 {
-	ddgAsserts(_num+1 < _bufsize,"Buffer overflow");
+	ddgAsserts(_num < _bufsize,"Buffer overflow");
 	// Push the vertex.
     vbuf[_num] = (*p1);
     if (_fNormal)
@@ -131,16 +156,16 @@ ddgVBIndex ddgVArray::pushVTNC(ddgVector3 *p1, ddgVector2 *t1, ddgVector3 *n1, d
         cbuf[_num].v[0]=c1->v[0];
         cbuf[_num].v[1]=c1->v[1];
         cbuf[_num].v[2]=c1->v[2];
-        cbuf[_num].v[3]=255;
+        cbuf[_num].v[3]=c1->v[3];
     }
     _num++;
 
-    return _num;
+    return _num-1;
 }
 /// Push a vertex into the buffer.
-ddgVBIndex ddgVArray::pushVC(ddgVector3 *p1, ddgColor3 *c1)
+ddgVBIndex ddgVArray::pushVC(ddgVector3 *p1, ddgColor4 *c1)
 {
-	ddgAsserts(_num+1 < _bufsize,"Buffer overflow");
+	ddgAsserts(_num < _bufsize,"Buffer overflow");
 	// Push the vertex.
     vbuf[_num] = (*p1);
     if (_fColor)
@@ -148,49 +173,41 @@ ddgVBIndex ddgVArray::pushVC(ddgVector3 *p1, ddgColor3 *c1)
         cbuf[_num].v[0]=c1->v[0];
         cbuf[_num].v[1]=c1->v[1];
         cbuf[_num].v[2]=c1->v[2];
-        cbuf[_num].v[3]=255;
+        cbuf[_num].v[3]=c1->v[3];
     }
     _num++;
 
-    return _num;
+    return _num-1;
 }
 
-unsigned int ddgVArray::pushPoint( ddgVBIndex i1 )
+void ddgVArray::pushPoint( ddgVBIndex i1 )
 {
-    ibuf[_inum] = i1-1;
+    ibuf[_inum] = i1;
     _inum ++;
-	ddgAssert(!_num || _num >= _inum);
-    return _inum;
 }
 
-unsigned int ddgVArray::pushLine( ddgVBIndex i1, ddgVBIndex i2 )
+void ddgVArray::pushLine( ddgVBIndex i1, ddgVBIndex i2 )
 {
-    ibuf[_inum] = i1-1;
-    ibuf[_inum+1] = i2-1;
+    ibuf[_inum] = i1;
+    ibuf[_inum+1] = i2;
     _inum += 2;
-	ddgAssert(!_num || _num *2 >= _inum);
-    return _inum;
 }
 
-unsigned int ddgVArray::pushTriangle( ddgVBIndex i1, ddgVBIndex i2, ddgVBIndex i3 )
+void ddgVArray::pushTriangle( ddgVBIndex i1, ddgVBIndex i2, ddgVBIndex i3 )
 {
-    ibuf[_inum] = i1-1;
-    ibuf[_inum+1] = i2-1;
-    ibuf[_inum+2] = i3-1;
+    ibuf[_inum] = i1;
+    ibuf[_inum+1] = i2;
+    ibuf[_inum+2] = i3;
     _inum += 3;
-	ddgAssert(!_num || _num *3 >= _inum);
-    return _inum;
 }
 
-unsigned int ddgVArray::pushQuad( ddgVBIndex i1, ddgVBIndex i2, ddgVBIndex i3, ddgVBIndex i4 )
+void ddgVArray::pushQuad( ddgVBIndex i1, ddgVBIndex i2, ddgVBIndex i3, ddgVBIndex i4 )
 {
-    ibuf[_inum] = i1-1;
-    ibuf[_inum+1] = i2-1;
-    ibuf[_inum+2] = i3-1;
-    ibuf[_inum+3] = i4-1;
+    ibuf[_inum] = i1;
+    ibuf[_inum+1] = i2;
+    ibuf[_inum+2] = i3;
+    ibuf[_inum+3] = i4;
     _inum += 4;
-	ddgAssert(!_num || _num *4 >= _inum);
-    return _inum;
 }
 
 #define ZCACHESIZE	10000

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -41,18 +41,16 @@ enum {
 // Visibility data. 3 bits.
 typedef unsigned char ddgVisState;
 
-enum ddgVis { ddgOUT=0, ddgPART=1, ddgIN=2, ddgUNDEF = 4};
-#define ddgVisMerge(a,b) ( (a|b) == 0 ? ddgOUT : ((a|b) == 1 ? ddgPART : ((a|b) == 2 ? ddgIN : ddgUNDEF )))
 /**
  * Axis Aligned Bounding box object.
  * This object defines a 3d volume based a min and max point in 3D space.
  */
-class WEXP ddgBBox {
+class WEXP ddgBBox3 {
 public:
 	/// left bottom near corner of the bbox.
-	ddgVector3 _min;
+	ddgVector3 min;
 	/// right top far corner of the bbox.
-	ddgVector3 _max;
+	ddgVector3 max;
 	/// Indexes to the corner points of the bounding box.
 	static short _corner[8][3];
 	/// Split options.
@@ -60,53 +58,49 @@ public:
 	/** Default bounding box contains the entire 3D space.
 	 *  Set bounding box using centre point and delta.
 	 */
-	ddgBBox(float xc = 0.0, float xd = MAXFLOAT, 
+	ddgBBox3(float xc = 0.0, float xd = MAXFLOAT, 
 	   float yc = 0.0, float yd = MAXFLOAT, 
 	   float zc = 0.0, float zd = MAXFLOAT);
 	/// Set bounding box using Min and Max vectors.
-	ddgBBox(const ddgVector3 &min, const ddgVector3 &max);
+	ddgBBox3(const ddgVector3 &min, const ddgVector3 &max);
 	/// Set bounding box using Min Max coordinates.
 	void set(float xmin = -MAXFLOAT, float xmax = MAXFLOAT,
 		     float ymin = -MAXFLOAT, float ymax = MAXFLOAT,
 		     float zmin = -MAXFLOAT, float zmax = MAXFLOAT);
 	/// Set bounding box using another bounding box.
-	void set(const ddgVector3 &min, const ddgVector3 &max)
-	{ _min = min; _max = max; }
+	void set(const ddgVector3 &pmin, const ddgVector3 &pmax)
+	{ min = pmin; max = pmax; }
 
 	/// Return bounding box minimum x value.
-	float minx( void ) { return _min[0]; }
+	float minx( void ) { return min[0]; }
 	/// Return bounding box minimum y value.
-	float miny( void ) { return _min[1]; }
+	float miny( void ) { return min[1]; }
 	/// Return bounding box minimum z value.
-	float minz( void ) { return _min[2]; }
+	float minz( void ) { return min[2]; }
 	/// Return bounding box maximum x value.
-	float maxx( void ) { return _max[0]; }
+	float maxx( void ) { return max[0]; }
 	/// Return bounding box maximum y value.
-	float maxy( void ) { return _max[1]; }
+	float maxy( void ) { return max[1]; }
 	/// Return bounding box maximum z value.
-	float maxz( void ) { return _max[2]; }
+	float maxz( void ) { return max[2]; }
 
-	/// Return the minimum coordinate
-	ddgVector3 *min(void) { return &_min; }
-	/// Return the maximum coordinate
-	ddgVector3 *max(void) { return &_max; }
 	/// Set the min and max of the bounding box along X-axis.
-	void setx(float min, float max)
+	void setx(float pmin, float pmax)
 	{
-	  _min[0] = min;
-	  _max[0] = max;
+	  min[0] = pmin;
+	  max[0] = pmax;
 	}
 	/// Set the min and max of the bounding box along Y-axis.
-	void sety(float min, float max)
+	void sety(float pmin, float pmax)
 	{
-	  _min[1] = min;
-	  _max[1] = max;
+	  min[1] = pmin;
+	  max[1] = pmax;
 	}
 	/// Set the min and max of the bounding box along Z-axis.
-	void setz(float min, float max)
+	void setz(float pmin, float pmax)
 	{
-	  _min[2] = min;
-	  _max[2] = max;
+	  min[2] = pmin;
+	  max[2] = pmax;
 	}
 	/** Split a bounding box in a given direction.
 	*  Optionally give a split location, default is in the middle of the box.
@@ -119,24 +113,24 @@ public:
 	/// Return the Z coordinate of a corner of the BBox.
 	float cornerz(int n);
 	/// Copy the content of the src bbox.
-	void copy(ddgBBox *src);
+	void copy(ddgBBox3 *src);
 	/// Return the centre point of the bounding box.
 	ddgVector3 centre(void)
-	{ return ( _min + _max ) * 0.5;}
+	{ return ( min + max ) * 0.5;}
 	/// Move the bounding box by the specified vector.
 	void move(ddgVector3 o)
-	{ _min = _min + &o; _max = _max + &o; }
+	{ min = min + &o; max = max + &o; }
 	/// Scale the bounding box by the specified vector about its centre.
 	void scale(ddgVector3 s)
 	{
-		ddgVector3 c(_min + _max);
+		ddgVector3 c(min + max);
 		c = c * 0.5;
-		ddgVector3 d(c - _min);
+		ddgVector3 d(c - min);
 		d[0] *= s[0];
 		d[1] *= s[1];
 		d[2] *= s[2];
-		_min = c - d;
-		_max = c + d;
+		min = c - d;
+		max = c + d;
 	}
 	/// Return the distance between the centre of the box and the coordinate.
 	float distancesq( ddgVector3 *p);
@@ -145,9 +139,9 @@ public:
 	/// Test for intersection of line with bbox.
 	bool intersect( ddgVector3 *p1, ddgVector3 *p2);
 	/// Test for intersection of another bbox.
-	bool intersect( ddgBBox *b );
+	bool intersect( ddgBBox3 *b );
 	/// Return the size of the box.
-	ddgVector3 size(void) { return _max - _min; }
+	ddgVector3 size(void) { return max - min; }
 
     /** 
      * Test a bounding box against this bounding box in camera space.
@@ -157,14 +151,7 @@ public:
 	 * Assumes bbox is already in camera space.
 	 * vis indicates which half spaces don't need to be tested.
 	 */
-    ddgClipFlags visibleSpace( ddgBBox b, float tanHalfFOV );
-	/**
-	 * Test bounding box against a set planes (eg. frustrum).
-	 * Return 0 if out, 1 intersecting, 2 completely inside.
-	 * n = the number of planes.
-	 */
-	ddgVis isVisible(ddgPlane *Planes, int n);
-
+    ddgClipFlags visibleSpace( ddgBBox3 b, float tanHalfFOV );
 
 };
 

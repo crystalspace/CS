@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
+    Copyright (C) 1997, 1998, 1999, 2000 by Alex Pfaffe
 	(Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
@@ -59,6 +59,9 @@
 ///
 unsigned int const ddgAngle_res = 16;
 
+/// General purpose value of PI.
+#define ddgPi	M_PI
+
 /// General utility object to perform conversions for angles.
 class WEXP ddgAngle
 {
@@ -69,8 +72,6 @@ class WEXP ddgAngle
 public:
     /// Initializes lookup tables.
     ddgAngle();
-	/// General purpose value of PI.
-    static float pi;
     /// Input is angle in degrees.
     inline static float degtorad(float d) { return (d * (float)M_PI / 180.0f); }
     /// Input is angle in radians.
@@ -231,5 +232,12 @@ public:
     /// Return the head of the list.
     inline ddgListNode* head( ddgListNode *h = 0) { return (h? _head = h: _head); }
 };
+
+// Useful macros to parse commandline arguments.
+// Assumes text array is in 'argv' and arg count is in 'argc'.
+// Assumes current arguments index is in 'argi'.
+// Assumes keywords are prefixed with '-'
+#define ddgArgMatch(s)		 (argi < argc && ddgStr::equal(argv[argi],"-"##s))
+#define ddgArgMatchValue(s) (ddgArgMatch(s) && (++argi) < argc)
 
 #endif
