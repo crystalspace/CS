@@ -27,6 +27,8 @@
 
 struct iEngine;
 struct iSystem;
+struct iPluginManager;
+struct iObjectRegistry;
 
 /**
  * Rain factory loader.
@@ -35,6 +37,8 @@ class csRainFactoryLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -45,13 +49,15 @@ public:
   /// Destructor.
   virtual ~csRainFactoryLoader ();
 
+  bool Initialize (iSystem* p);
+
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csRainFactoryLoader);
-    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -64,6 +70,8 @@ class csRainFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -74,13 +82,15 @@ public:
   /// Destructor.
   virtual ~csRainFactorySaver ();
 
+  bool Initialize (iSystem* p);
+
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csRainFactorySaver);
-    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -94,6 +104,8 @@ class csRainLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -104,13 +116,15 @@ public:
   /// Destructor.
   virtual ~csRainLoader ();
 
+  bool Initialize (iSystem* p);
+
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csRainLoader);
-    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -123,6 +137,8 @@ class csRainSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -133,13 +149,15 @@ public:
   /// Destructor.
   virtual ~csRainSaver ();
 
+  bool Initialize (iSystem* p);
+
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csRainSaver);
-    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

@@ -22,6 +22,8 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "ivideo/txtmgr.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include <ctype.h>
 
 SCF_IMPLEMENT_IBASE (csAVIStreamVideo)
@@ -77,10 +79,12 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 
   nStream = nStreamNumber;
   pSystem = pTheSystem;
+  iObjectRegistry* object_reg = pSystem->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   if (pG3D) pG3D->DecRef ();
-  pG3D = CS_QUERY_PLUGIN (pSystem, iGraphics3D);
+  pG3D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics3D);
   if (pG2D) pG2D->DecRef ();
-  pG2D = CS_QUERY_PLUGIN (pSystem, iGraphics2D);
+  pG2D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics2D);
 
   pIA->w = 0;
   pIA->h = 0;

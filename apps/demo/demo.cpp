@@ -47,6 +47,8 @@
 #include "imesh/surf.h"
 #include "imesh/object.h"
 #include "imap/reader.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include "igraphic/imageio.h"
 #include "qsqrt.h"
 
@@ -58,7 +60,7 @@ CS_IMPLEMENT_APPLICATION
 Demo *System;
 
 #define  QUERY_PLUG(myPlug, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN (this, iFace); \
+  myPlug = CS_QUERY_PLUGIN (plugin_mgr, iFace); \
   if (!myPlug) \
   { \
     Printf (CS_MSG_FATAL_ERROR, errMsg); \
@@ -66,7 +68,7 @@ Demo *System;
   }
 
 #define  QUERY_PLUG_ID(myPlug, funcid, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN_ID (this, funcid, iFace); \
+  myPlug = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFace); \
   if (!myPlug) \
   { \
     Printf (CS_MSG_FATAL_ERROR, errMsg); \
@@ -745,9 +747,13 @@ bool Demo::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  iObjectRegistry* object_reg = GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
   // Load the engine plugin.
   engine =
-    CS_LOAD_PLUGIN (this, "crystalspace.engine.3d", CS_FUNCID_ENGINE, iEngine);
+    CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.engine.3d",
+    	CS_FUNCID_ENGINE, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No engine!\n");

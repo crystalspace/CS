@@ -24,6 +24,8 @@
 #include "isys/system.h"
 #include "csutil/util.h"
 #include "csutil/csvector.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 #include "police.fnt"
 #include "courier.fnt"	// font (C) Andrew Zabolotny
@@ -145,7 +147,7 @@ void csDefaultFontServer::NotifyDelete (csDefaultFont *font)
 
 csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
 {
-  iVFS *VFS = CS_QUERY_PLUGIN (System, iVFS);
+  iVFS *VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
   iDataBuffer *fntfile = VFS->ReadFile (file);
   VFS->DecRef ();
   if (!fntfile)
@@ -410,3 +412,13 @@ bool csDefaultFont::RemoveDeleteCallback (iFontDeleteNotify* func)
   }
   return false;
 }
+
+bool csDefaultFontServer::eiPlugin::Initialize (iSystem* p)
+{
+  scfParent->System = p;
+  scfParent->object_reg = p->GetObjectRegistry ();
+  scfParent->plugin_mgr = CS_QUERY_REGISTRY (scfParent->object_reg,
+  	iPluginManager);
+  return true;
+}
+

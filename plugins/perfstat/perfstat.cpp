@@ -22,11 +22,13 @@
 #include "csver.h"
 #include "csutil/scf.h"
 #include "perfstat.h"
-#include "isys/system.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
+#include "isys/system.h"
 #include "isys/vfs.h"
 #include "isys/event.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include "iengine/engine.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -80,6 +82,8 @@ csPerfStats::~csPerfStats ()
 bool csPerfStats::Initialize (iSystem *system)
 {
   System = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   if (!System->CallOnEvents (&scfiPlugin, CSMASK_Nothing))
     return false;
   sub_section = super_section = NULL;
@@ -88,9 +92,6 @@ bool csPerfStats::Initialize (iSystem *system)
   name = NULL;
   head_section = this;
 
-// iEngine *iengine = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_ENGINE, iEngine);
-// if (iengine) 
-//   Engine = iengine->GetCsEngine ();
   return true;
 }
 
@@ -343,25 +344,26 @@ void csPerfStats::WriteSummaryStats ()
 
 void csPerfStats::WriteMainHeader ()
 {
-    StatEntry *entry = new StatEntry ();
-    iGraphics3D *g3d = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
-    if (!g3d) abort ();
-    iGraphics2D *g2d = g3d->GetDriver2D ();
-    csGraphics3DCaps *caps = g3d->GetCaps ();
-    csPixelFormat *pfmt = g2d->GetPixelFormat ();
+  StatEntry *entry = new StatEntry ();
+  iGraphics3D *g3d = CS_QUERY_PLUGIN_ID (plugin_mgr,
+  	CS_FUNCID_VIDEO, iGraphics3D);
+  if (!g3d) abort ();
+  iGraphics2D *g2d = g3d->GetDriver2D ();
+  csGraphics3DCaps *caps = g3d->GetCaps ();
+  csPixelFormat *pfmt = g2d->GetPixelFormat ();
 
 #if defined CS_DEBUG
-    char exe_mode [] = "Debug";
+  char exe_mode [] = "Debug";
 #else
-    char exe_mode [] = "Optimised";
+  char exe_mode [] = "Optimised";
 #endif
 
 #if defined CS_BIG_ENDIAN
-    char endianness [] = "big";
+  char endianness [] = "big";
 #else
-    char endianness [] = "little";
+  char endianness [] = "little";
 #endif
-    char buf [] = 
+  char buf [] = 
 "===========================================================================\n"
 "Crystal Space Version %s (%s)\n"
 "===========================================================================\n"
@@ -597,7 +599,7 @@ bool csPerfStats::WriteFile ()
   statvec = NULL;
   head_section->framevec = NULL;
 
-  iVFS *vfs = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+  iVFS *vfs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (!vfs) 
     return false;
 

@@ -38,6 +38,8 @@ struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iCamera;
 struct iPolygon3D;
+struct iObjectRegistry;
+struct iPluginManager;
 
 class csMatrix3;
 class csVector3;
@@ -111,6 +113,8 @@ class csBugPlug : public iPlugin
 {
 private:
   iSystem *System;
+  iObjectRegistry* object_reg;
+  iPluginManager* plugin_mgr;
   iEngine *Engine;
   iGraphics3D* G3D;
   iGraphics2D* G2D;

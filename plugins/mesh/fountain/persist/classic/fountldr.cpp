@@ -35,6 +35,8 @@
 #include "csutil/util.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -128,14 +130,22 @@ csFountainFactoryLoader::~csFountainFactoryLoader ()
 {
 }
 
+bool csFountainFactoryLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
+}
+
 iBase* csFountainFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.fountain", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.fountain",
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.fountain",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.fountain\n");
   }
@@ -154,6 +164,14 @@ csFountainFactorySaver::csFountainFactorySaver (iBase* pParent)
 
 csFountainFactorySaver::~csFountainFactorySaver ()
 {
+}
+
+bool csFountainFactorySaver::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -194,6 +212,14 @@ csFountainLoader::csFountainLoader (iBase* pParent)
 
 csFountainLoader::~csFountainLoader ()
 {
+}
+
+bool csFountainLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -423,6 +449,14 @@ csFountainSaver::csFountainSaver (iBase* pParent)
 
 csFountainSaver::~csFountainSaver ()
 {
+}
+
+bool csFountainSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 void csFountainSaver::WriteDown (iBase* obj, iStrVector *str,

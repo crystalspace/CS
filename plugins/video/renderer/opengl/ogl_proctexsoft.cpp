@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 2000 by Samuel Humphreys
   
     This library is free software; you can redistribute it and/or
@@ -27,6 +28,8 @@
 #include "ivideo/txtmgr.h"
 #include "imesh/thing/polygon.h"
 #include "isys/event.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 
 #if defined(CS_OPENGL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
@@ -89,11 +92,15 @@ dummyMaterial::dummyMaterial ()
 class TxtHandleVector : public csVector
 {
   iSystem *system;
+  iPluginManager* plugin_mgr;
   iTextureManager *soft_man;
 public:
   // Constructor
   TxtHandleVector (iSystem *sys, iTextureManager *stm) 
-    : csVector (8, 8), system (sys), soft_man (stm) {}; 
+    : csVector (8, 8), system (sys), soft_man (stm)
+  {
+    plugin_mgr = CS_QUERY_REGISTRY (sys->GetObjectRegistry (), iPluginManager);
+  }; 
   // Destructor
   virtual ~TxtHandleVector () { DeleteAll (); }
   // Free an item from array
@@ -236,6 +243,7 @@ bool csOpenGLProcSoftware::Prepare(
   pfmt.complete ();
 
   system = parent_g3d->System;
+  iPluginManager* plugin_mgr = parent_g3d->plugin_mgr;
   this->buffer = (char*) buffer;
   this->tex = tex;
   this->parent_g3d = parent_g3d;
@@ -257,7 +265,7 @@ bool csOpenGLProcSoftware::Prepare(
   alone_mode = alone_hint;
 
   // Get an instance of the software procedural texture renderer
-  iGraphics3D *soft_proc_g3d = CS_LOAD_PLUGIN (system, 
+  iGraphics3D *soft_proc_g3d = CS_LOAD_PLUGIN (plugin_mgr, 
     "crystalspace.graphics3d.software.offscreen", NULL, iGraphics3D);
   if (!soft_proc_g3d)
   {

@@ -280,10 +280,20 @@ SCF_IMPLEMENT_IBASE (csSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iSystem)
 SCF_IMPLEMENT_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::ObjectRegistry)
+  SCF_IMPLEMENTS_INTERFACE (iObjectRegistry)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::PluginManager)
+  SCF_IMPLEMENTS_INTERFACE (iPluginManager)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
   OptionList (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectRegistry);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginManager);
 
   Keyboard.SetSystemDriver (this);
   Mouse.SetSystemDriver    (this);
@@ -1115,3 +1125,30 @@ iCommandLineParser *csSystemDriver::GetCommandLine ()
 {
   return CommandLine;
 }
+
+bool csSystemDriver::Register (iBase*, char const* tag)
+{
+  // @@@ TODO
+  return false;
+}
+
+void csSystemDriver::Unregister (iBase*, char const* tag = NULL)
+{
+  // @@@ TODO
+}
+
+iBase* csSystemDriver::Get (char const* tag)
+{
+  if (!strcmp (tag, "PluginManager"))
+  {
+    return &scfiPluginManager;
+  }
+  return NULL;
+}
+
+iBase* csSystemDriver::Get (scfInterfaceID, int version)
+{
+  // @@@
+  return &scfiPluginManager;
+}
+

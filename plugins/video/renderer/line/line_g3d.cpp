@@ -28,7 +28,9 @@
 #include "line_txt.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "ivideo/graph2d.h"
 #include "imesh/thing/polygon.h"	//@@@
 #include "imesh/thing/lightmap.h"	//@@@
@@ -114,7 +116,9 @@ bool csGraphics3DLine::Initialize (iSystem *iSys)
   if (!driver)
     driver = config->GetStr ("Video.Line.Canvas", LINE_CS_SOFTWARE_2D_DRIVER);
 
-  G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;
 

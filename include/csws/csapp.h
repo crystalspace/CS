@@ -38,6 +38,8 @@
 
 class csSkin;
 struct iImageIO;
+struct iObjectRegistry;
+struct iPluginManager;
 
 /**
  * Application's background styles
@@ -124,6 +126,10 @@ protected:
 public:
   /// The system driver
   iSystem *System;
+  /// The object registry.
+  iObjectRegistry* object_reg;
+  /// The plugin manager.
+  iPluginManager* plugin_mgr;
   /// The virtual file system
   iVFS *VFS;
   /// The system configuration

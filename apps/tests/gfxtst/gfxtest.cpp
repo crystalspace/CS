@@ -27,6 +27,8 @@
 #include "csutil/util.h"
 #include "csutil/cfgfile.h"
 #include "iutil/databuff.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 #include "igraphic/imageio.h"
 
 #include <string.h>
@@ -521,7 +523,10 @@ int main (int argc, char *argv[])
   if (optind >= argc)
     return display_help ();
 
-  ImageLoader = CS_QUERY_PLUGIN (&sys, iImageIO);
+  iObjectRegistry* object_reg = sys.GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+  ImageLoader = CS_QUERY_PLUGIN (plugin_mgr, iImageIO);
   if (!ImageLoader)
   {
     printf("could not load image loader");

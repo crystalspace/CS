@@ -26,6 +26,8 @@
 
 struct iEngine;
 struct iSystem;
+struct iPluginManager;
+struct iObjectRegistry;
 
 /**
  * MetaBall factory loader.
@@ -34,6 +36,8 @@ class csMetaBallFactoryLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -44,13 +48,15 @@ public:
   /// Destructor.
   virtual ~csMetaBallFactoryLoader ();
 
+  bool Initialize (iSystem* p);
+
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBallFactoryLoader);
-    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -63,6 +69,8 @@ class csMetaBallFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -73,13 +81,15 @@ public:
   /// Destructor.
   virtual ~csMetaBallFactorySaver ();
 
+  bool Initialize (iSystem* p);
+
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBallFactorySaver);
-    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -92,6 +102,8 @@ class csMetaBallLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -102,13 +114,15 @@ public:
   /// Destructor.
   virtual ~csMetaBallLoader ();
 
+  bool Initialize (iSystem* p);
+
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBallLoader);
-    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -121,6 +135,8 @@ class csMetaBallSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -131,13 +147,15 @@ public:
   /// Destructor.
   virtual ~csMetaBallSaver ();
 
+  bool Initialize (iSystem* p);
+
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBallSaver);
-    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

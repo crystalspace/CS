@@ -57,6 +57,8 @@
 #include "ivaria/perfstat.h"
 #include "ivaria/reporter.h"
 #include "imap/parser.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 #include "isound/wrapper.h"
 #include "imesh/terrfunc.h"
 #include "imesh/object.h"
@@ -236,7 +238,7 @@ bool WalkTestReporterListener::Report (iReporter* /*reporter*/, int severity,
 
 bool WalkTest::CheckErrors ()
 {
-  iReporter* reporter = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_REPORTER,
+  iReporter* reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER,
   	iReporter);
   if (!reporter) return false;
   if (reporter->GetMessageCount () == 0) return false;
@@ -1104,7 +1106,7 @@ void CaptureScreen ()
     Sys->Printf (CS_MSG_CONSOLE, "The 2D graphics driver does not support screen shots\n");
     return;
   }
-  iImageIO *imageio = CS_QUERY_PLUGIN (Sys, iImageIO);
+  iImageIO *imageio = CS_QUERY_PLUGIN (Sys->plugin_mgr, iImageIO);
   if (imageio)
   {
     iDataBuffer *db = imageio->Save (img, "image/png");
@@ -1245,6 +1247,9 @@ void WalkTest::Create2DSprites(void)
 bool WalkTest::Initialize (int argc, const char* const argv[],
 	const char *iConfigName)
 {
+  object_reg = Sys->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
   Sys->RequestPlugin ("crystalspace.utilities.reporter:Reporter");
 
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
@@ -1253,32 +1258,32 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  myG3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     return false;
   }
 
-  myG2D = CS_QUERY_PLUGIN (this, iGraphics2D);
+  myG2D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics2D);
   if (!myG2D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
     return false;
   }
 
-  myVFS = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
+  myVFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (!myVFS)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
     return false;
   }
 
-  myConsole = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
-  mySound = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
-  myMotionMan = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_MOTION, iMotionManager);
+  myConsole = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_CONSOLE, iConsoleOutput);
+  mySound = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_SOUND, iSoundRender);
+  myMotionMan = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_MOTION, iMotionManager);
 
-  iReporter* reporter = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_REPORTER,
+  iReporter* reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER,
   	iReporter);
   if (reporter)
   {
@@ -1348,7 +1353,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetVerbose (true);
 
   // Find the engine plugin and query the csEngine object from it...
-  Engine = CS_QUERY_PLUGIN (Sys, iEngine);
+  Engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   if (!Engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
@@ -1356,7 +1361,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 
   // Find the level loader plugin
-  LevelLoader = CS_QUERY_PLUGIN_ID (Sys, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No level loader plugin!\n");
@@ -1364,7 +1369,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 
   // performance statistics module, also takes care of fps
-  perf_stats = CS_QUERY_PLUGIN (this, iPerfStats);
+  perf_stats = CS_QUERY_PLUGIN (plugin_mgr, iPerfStats);
   if (!perf_stats)
   {
     Printf (CS_MSG_WARNING, "No iPerfStats plugin: you will have no performance statistics!\n");
@@ -1379,7 +1384,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Get the collide system plugin.
   const char* p = GetConfig()->GetStr ("Walktest.Settings.CollDetPlugin",
   	"crystalspace.collisiondetection.rapid");
-  collide_system = CS_LOAD_PLUGIN (Sys, p, "CollDet", iCollideSystem);
+  collide_system = CS_LOAD_PLUGIN (plugin_mgr, p, "CollDet", iCollideSystem);
   if (!collide_system)
   {
     Printf (CS_MSG_FATAL_ERROR, "No Collision Detection plugin found!\n");
@@ -1388,7 +1393,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Initialize the command processor with the engine and camera.
   csCommandProcessor::Initialize (Engine, view->GetCamera (),
-    Gfx3D, Sys->myConsole, Sys);
+    Gfx3D, Sys->myConsole, object_reg);
 
   // Now we have two choices. Either we create an infinite
   // maze (random). This happens when the '-infinite' commandline
@@ -1566,7 +1571,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   {
     myConsole->SetVisible (false);
     myConsole->AutoUpdate (false);
-    ConsoleInput = CS_QUERY_PLUGIN (Sys, iConsoleInput);
+    ConsoleInput = CS_QUERY_PLUGIN (plugin_mgr, iConsoleInput);
     if (ConsoleInput)
     {
       ConsoleInput->Bind (myConsole);

@@ -45,6 +45,8 @@ struct iEngine;
 struct iRegion;
 struct iSoundHandle;
 struct iCollideSystem;
+struct iObjectRegistry;
+struct iPluginManager;
 struct iPerfStats;
 struct iConfigFile;
 struct iMaterialHandle;
@@ -134,6 +136,9 @@ class WalkTest : public SysSystemDriver
   typedef SysSystemDriver superclass;
 
 public:
+  iObjectRegistry* object_reg;
+  iPluginManager* plugin_mgr;
+
   int FrameWidth, FrameHeight;
 
   /// The startup directory on VFS with needed map file

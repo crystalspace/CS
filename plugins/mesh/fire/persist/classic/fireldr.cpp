@@ -35,6 +35,8 @@
 #include "csutil/util.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -126,14 +128,22 @@ csFireFactoryLoader::~csFireFactoryLoader ()
 {
 }
 
+bool csFireFactoryLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
+}
+
 iBase* csFireFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.fire", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.fire",
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.fire",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.fire\n");
   }
@@ -152,6 +162,14 @@ csFireFactorySaver::csFireFactorySaver (iBase* pParent)
 
 csFireFactorySaver::~csFireFactorySaver ()
 {
+}
+
+bool csFireFactorySaver::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -191,6 +209,14 @@ csFireLoader::csFireLoader (iBase* pParent)
 
 csFireLoader::~csFireLoader ()
 {
+}
+
+bool csFireLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -415,6 +441,14 @@ csFireSaver::csFireSaver (iBase* pParent)
 
 csFireSaver::~csFireSaver ()
 {
+}
+
+bool csFireSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 void csFireSaver::WriteDown (iBase* obj, iStrVector *str,

@@ -27,6 +27,8 @@
 struct iEngine;
 struct iSystem;
 struct iReporter;
+struct iPluginManager;
+struct iObjectRegistry;
 
 /**
  * Ball factory loader.
@@ -35,6 +37,8 @@ class csBallFactoryLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
   iReporter* reporter;
 
 public:
@@ -68,6 +72,8 @@ class csBallFactorySaver : public iSaverPlugin
 private:
   iSystem* sys;
   iReporter* reporter;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -100,6 +106,8 @@ class csBallLoader : public iLoaderPlugin
 private:
   iSystem* sys;
   iReporter* reporter;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -132,6 +140,8 @@ class csBallSaver : public iSaverPlugin
 private:
   iSystem* sys;
   iReporter* reporter;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;

@@ -21,6 +21,8 @@
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "simpmap.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
@@ -75,22 +77,25 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  iObjectRegistry* object_reg = GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (this, iEngine);
+  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  loader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  loader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
   if (!loader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  g3d = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  g3d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!g3d)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");

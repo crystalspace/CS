@@ -30,7 +30,9 @@
 #include "isys/system.h"
 #include "isys/vfs.h"
 #include "isys/event.h"
+#include "isys/plugin.h"
 #include "iutil/config.h"
+#include "iutil/objreg.h"
 
 class csKeyboardDriver;
 class csMouseDriver;
@@ -310,6 +312,38 @@ public:
   /// A shortcut for requesting to load a plugin (before Initialize())
   void RequestPlugin (const char *iPluginName);
 
+  // @@@ The following (and some of the above) should all move to the
+  // specific implementation of the plugin manager when we have that.
+
+private:
+  /// Load a plugin and initialize it.
+  iBase *LoadPlugin (const char *iClassID, const char *iFuncID,
+    const char *iInterface, int iVersion);
+  /// Get first of the loaded plugins that supports given interface ID.
+  iBase *QueryPlugin (const char *iInterface, int iVersion);
+  /// Find a plugin given his functionality ID.
+  iBase *QueryPlugin (const char *iFuncID, const char *iInterface,
+  	int iVersion);
+  /// Find a plugin given his class ID and functionality ID.
+  iBase *QueryPlugin (const char* iClassID, const char *iFuncID,
+  	const char *iInterface, int iVersion);
+  /// Remove a plugin from system driver's plugin list.
+  bool UnloadPlugin (iPlugin *iObject);
+  /// Register a object that implements the iPlugin interface as a plugin.
+  bool RegisterPlugin (const char *iClassID, const char *iFuncID,
+  	iPlugin *iObject);
+  /// Get the number of loaded plugins in the plugin manager.
+  int GetPluginCount ();
+  /// Get the specified plugin from the plugin manager.
+  iBase* GetPlugin (int idx);
+
+  // @@@ The following should all move to the
+  // specific implementation of the object registry when we have that.
+  bool Register (iBase*, char const* tag = NULL);
+  void Unregister (iBase*, char const* tag = NULL);
+  iBase* Get (char const* tag);
+  iBase* Get (scfInterfaceID, int version);
+
 protected:
   /**
    * Print help for an iConfig interface.
@@ -343,12 +377,16 @@ protected:
    * CS/data/config/user.cfg. This function is called at least twice, with
    * different ID strings. This *must* be supported!
    */
-  virtual iConfigFile *OpenUserConfig(const char *ApplicationID, const char *Alias);
+  virtual iConfigFile *OpenUserConfig (const char *ApplicationID,
+  	const char *Alias);
 
 public:
   SCF_DECLARE_IBASE;
 
   /**************************** iSystem interface ****************************/
+
+  /// Get the object registry.
+  virtual iObjectRegistry* GetObjectRegistry () { return &scfiObjectRegistry; }
 
   /// Get the time in milliseconds.
   virtual csTime GetTime ();
@@ -384,24 +422,6 @@ public:
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
   /// Get the installation path.
   virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
-
-  /// Load a plugin and initialize it
-  virtual iBase *LoadPlugin (const char *iClassID, const char *iFuncID,
-    const char *iInterface, int iVersion);
-  /// Get first of the loaded plugins that supports given interface ID
-  virtual iBase *QueryPlugin (const char *iInterface, int iVersion);
-  /// Find a plugin given his functionality ID
-  virtual iBase *QueryPlugin (const char *iFuncID, const char *iInterface, int iVersion);
-  /// Find a plugin given his class ID and functionality ID
-  virtual iBase *QueryPlugin (const char* iClassID, const char *iFuncID, const char *iInterface, int iVersion);
-  /// Remove a plugin from system driver's plugin list
-  virtual bool UnloadPlugin (iPlugin *iObject);
-  /// Register a object that implements the iPlugin interface as a plugin
-  virtual bool RegisterPlugin (const char *iClassID, const char *iFuncID, iPlugin *iObject);
-  /// Get the number of loaded plugins in the plugin manager.
-  virtual int GetPluginCount ();
-  /// Get the specified plugin from the plugin manager.
-  virtual iBase* GetPlugin (int idx);
 
   /// Get the system configuration file: this does NOT IncRef the object
   virtual iConfigManager *GetConfig ();
@@ -443,6 +463,75 @@ public:
 
   /// Return the command line parser
   virtual iCommandLineParser *GetCommandLine ();
+
+  //------------------------------------------------------------------
+
+  class ObjectRegistry : public iObjectRegistry
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSystemDriver);
+    virtual bool Register (iBase* obj, char const* tag = NULL)
+    {
+      return scfParent->Register (obj, tag);
+    }
+    virtual void Unregister (iBase* obj, char const* tag = NULL)
+    {
+      scfParent->Unregister (obj, tag);
+    }
+    virtual iBase* Get (char const* tag)
+    {
+      return scfParent->Get (tag);
+    }
+    virtual iBase* Get (scfInterfaceID id, int version)
+    {
+      return scfParent->Get (id, version);
+    }
+  } scfiObjectRegistry;
+  friend class ObjectRegistry;
+
+  //------------------------------------------------------------------
+
+  class PluginManager : public iPluginManager
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSystemDriver);
+    virtual iBase *LoadPlugin (const char *iClassID, const char *iFuncID,
+          const char *iInterface = NULL, int iVersion = 0)
+    {
+      return scfParent->LoadPlugin (iClassID, iFuncID, iInterface,
+        iVersion);
+    }
+    virtual iBase *QueryPlugin (const char *iInterface, int iVersion)
+    {
+      return scfParent->QueryPlugin (iInterface, iVersion);
+    }
+    virtual iBase *QueryPlugin (const char *iFuncID, const char *iInterface,
+  	  int iVersion)
+    {
+      return scfParent->QueryPlugin (iFuncID, iInterface, iVersion);
+    }
+    virtual iBase *QueryPlugin (const char* iClassID, const char *iFuncID,
+  	  const char *iInterface, int iVersion)
+    {
+      return scfParent->QueryPlugin (iClassID, iFuncID, iInterface, iVersion);
+    }
+    virtual bool UnloadPlugin (iPlugin *iObject)
+    {
+      return scfParent->UnloadPlugin (iObject);
+    }
+    virtual bool RegisterPlugin (const char *iClassID, const char *iFuncID,
+          iPlugin *iObject)
+    {
+      return scfParent->RegisterPlugin (iClassID, iFuncID, iObject);
+    }
+    virtual int GetPluginCount ()
+    {
+      return scfParent->GetPluginCount ();
+    }
+    virtual iBase* GetPlugin (int idx)
+    {
+      return scfParent->GetPlugin (idx);
+    }
+  } scfiPluginManager;
+  friend class PluginManager;
 };
 
 // Fatal exit routine (which can be replaced if neccessary)

@@ -43,6 +43,8 @@
 #include "ivideo/material.h"
 #include "imap/parser.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -233,43 +235,46 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  iObjectRegistry* object_reg = GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (this, iEngine);
+  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  loader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  loader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
   if (!loader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  g3d = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  g3d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!g3d)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
-  crossbuilder = CS_QUERY_PLUGIN_ID (this, "CrossBuilder", iCrossBuilder);
+  crossbuilder = CS_QUERY_PLUGIN_ID (plugin_mgr, "CrossBuilder", iCrossBuilder);
   if (!crossbuilder)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iCrossBuilder plugin!\n");
     abort ();
   }
 
-  converter = CS_QUERY_PLUGIN_ID (this, "Converter", iModelConverter);
+  converter = CS_QUERY_PLUGIN_ID (plugin_mgr, "Converter", iModelConverter);
   if (!converter)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iModelConverter plugin!\n");
     abort ();
   }
 
-  vfs = CS_QUERY_PLUGIN_ID (this, "VFS", iVFS);
+  vfs = CS_QUERY_PLUGIN_ID (plugin_mgr, "VFS", iVFS);
   if (!vfs)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");

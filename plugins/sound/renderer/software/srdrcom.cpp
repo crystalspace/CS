@@ -24,9 +24,11 @@
 #include "cssysdef.h"
 #include "isys/system.h"
 #include "iutil/cfgfile.h"
+#include "iutil/objreg.h"
 #include "isound/driver.h"
 #include "isound/data.h"
 #include "isys/event.h"
+#include "isys/plugin.h"
 
 #include "srdrcom.h"
 #include "../common/slstn.h"
@@ -83,7 +85,9 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   char *drv = "crystalspace.sound.driver.null";
 #endif
 
-  SoundDriver = CS_LOAD_PLUGIN (System, drv, NULL, iSoundDriver);
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  SoundDriver = CS_LOAD_PLUGIN (plugin_mgr, drv, NULL, iSoundDriver);
   if (!SoundDriver) {	
     System->Printf(CS_MSG_INITIALIZATION,
       "csSoundRenderSoftware: Failed to load sound driver: %s\n", drv);

@@ -30,6 +30,8 @@
 #include "imesh/terrfunc.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -91,15 +93,22 @@ csTerrFuncFactoryLoader::~csTerrFuncFactoryLoader ()
 {
 }
 
+bool csTerrFuncFactoryLoader::Initialize (iSystem* system)
+{
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
+}
+
 iBase* csTerrFuncFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (pSystem,
+  iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.terrfunc", "MeshObj",
 	iMeshObjectType);
   if (!pType)
   {
-    pType = CS_LOAD_PLUGIN (pSystem, "crystalspace.mesh.object.terrfunc",
+    pType = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.terrfunc",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.terrfunc\n");
   }
@@ -117,6 +126,13 @@ csTerrFuncLoader::csTerrFuncLoader (iBase* pParent)
 
 csTerrFuncLoader::~csTerrFuncLoader ()
 {
+}
+
+bool csTerrFuncLoader::Initialize (iSystem* system)
+{
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
@@ -293,13 +309,13 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
         {
 	  float hscale, hshift;
 	  csScanStr (pParams, "%s,%f,%f\n", pStr, &hscale, &hshift);
-	  iVFS* vfs = CS_QUERY_PLUGIN (pSystem, iVFS);
+	  iVFS* vfs = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
 	  if (!vfs)
 	  {
 	    printf ("No VFS!\n");
 	    exit (0);
 	  }
-	  iImageIO* loader = CS_QUERY_PLUGIN_ID (pSystem,
+	  iImageIO* loader = CS_QUERY_PLUGIN_ID (plugin_mgr,
 	  	CS_FUNCID_IMGLOADER, iImageIO);
 	  if (!loader)
 	  {

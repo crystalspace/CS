@@ -34,6 +34,8 @@
 #include "imesh/particle.h"
 #include "imesh/partsys.h"
 #include "imesh/fountain.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include "genmaze.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -98,22 +100,25 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  iObjectRegistry* object_reg = GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (this, iIsoEngine);
+  engine = CS_QUERY_PLUGIN (plugin_mgr, iIsoEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No IsoEngine plugin!\n");
     abort ();
   }
 
-  myG3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
-  myG2D = CS_QUERY_PLUGIN (this, iGraphics2D);
+  myG2D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics2D);
   if (!myG2D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
@@ -128,7 +133,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     exit (1);
   }
 
-  iFontServer *fsvr = CS_QUERY_PLUGIN(this, iFontServer);
+  iFontServer *fsvr = CS_QUERY_PLUGIN(plugin_mgr, iFontServer);
   font = fsvr->LoadFont(CSFONT_LARGE);
   fsvr->DecRef();
 

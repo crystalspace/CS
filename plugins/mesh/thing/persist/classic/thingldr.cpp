@@ -42,6 +42,8 @@
 #include "iutil/object.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -213,6 +215,14 @@ csThingLoader::csThingLoader (iBase* pParent)
 
 csThingLoader::~csThingLoader ()
 {
+}
+
+bool csThingLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 class ThingLoadInfo
@@ -1188,6 +1198,14 @@ csThingSaver::~csThingSaver ()
 {
 }
 
+bool csThingSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
+}
+
 void csThingSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
   iEngine* /*engine*/)
 {
@@ -1210,6 +1228,14 @@ csPlaneLoader::csPlaneLoader (iBase* pParent)
 
 csPlaneLoader::~csPlaneLoader ()
 {
+}
+
+bool csPlaneLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
@@ -1343,6 +1369,14 @@ csPlaneSaver::~csPlaneSaver ()
 {
 }
 
+bool csPlaneSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
+}
+
 void csPlaneSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,
   iEngine* /*engine*/)
 {
@@ -1358,6 +1392,14 @@ csBezierLoader::csBezierLoader (iBase* pParent)
 
 csBezierLoader::~csBezierLoader ()
 {
+}
+
+bool csBezierLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
@@ -1438,6 +1480,14 @@ csBezierSaver::csBezierSaver (iBase* pParent)
 
 csBezierSaver::~csBezierSaver ()
 {
+}
+
+bool csBezierSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 void csBezierSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,

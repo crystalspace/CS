@@ -25,6 +25,8 @@
 #include "isys/plugin.h"
 
 struct iSystem;
+struct iObjectRegistry;
+struct iPluginManager;
 struct iEngine;
 
 // For more complete comments see iperfstat.h For usage see walktest
@@ -75,6 +77,8 @@ protected:
   //------------------------------------------------------------------------
 
   iSystem *System;
+  iObjectRegistry* object_reg;
+  iPluginManager* plugin_mgr;
   iEngine *Engine;
   /// The name of the sub/section utilised within an output file
   char *name;

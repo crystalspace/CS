@@ -22,7 +22,9 @@
 #include "csutil/csstrvec.h"
 #include "csutil/csstring.h"
 #include "iutil/cfgfile.h"
+#include "iutil/objreg.h"
 #include "isys/vfs.h"
+#include "isys/plugin.h"
 #include "freefont.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -58,6 +60,8 @@ csFreeTypeServer::~csFreeTypeServer ()
 bool csFreeTypeServer::Initialize (iSystem *Sys)
 {
   System = Sys;
+  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   if (TT_Init_FreeType (&engine))
   {
@@ -66,7 +70,7 @@ bool csFreeTypeServer::Initialize (iSystem *Sys)
     return false;
   }
 
-  VFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+  VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   ftconfig.AddConfig(System, "config/freetype.cfg");
  
   defaultSize = ftconfig->GetInt ("Freetype.Settings.Size", 10);

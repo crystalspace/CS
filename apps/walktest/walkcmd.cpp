@@ -307,7 +307,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   }
 
   // convert data from the 'filedata' structure into a CS sprite template
-  csCrossBuild_SpriteTemplateFactory builder (Sys);
+  csCrossBuild_SpriteTemplateFactory builder (Sys->object_reg);
   iMeshObjectFactory *result = (iMeshObjectFactory *)builder.CrossBuild (*filedata);
   delete filedata;
 
@@ -717,11 +717,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "plugins"))
   {
-    int num = Sys->GetPluginCount ();
+    int num = Sys->plugin_mgr->GetPluginCount ();
     int i;
     for (i = 0 ; i < num ; i++)
     {
-      iBase* plugin = Sys->GetPlugin (i);
+      iBase* plugin = Sys->plugin_mgr->GetPlugin (i);
       iFactory* fact = SCF_QUERY_INTERFACE (plugin, iFactory);
       Sys->Printf (CS_MSG_CONSOLE, "%d: %s\n", i, fact->QueryDescription ());
       fact->DecRef ();
@@ -733,11 +733,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       int idx;
       sscanf (arg, "%d", &idx);
-      if (idx < 0 || idx >= Sys->GetPluginCount ())
+      if (idx < 0 || idx >= Sys->plugin_mgr->GetPluginCount ())
 	Sys->Printf (CS_MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
       else
       {
-        iBase* plugin = Sys->GetPlugin (idx);
+        iBase* plugin = Sys->plugin_mgr->GetPlugin (idx);
         iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
 	if (!config)
 	  Sys->Printf (CS_MSG_CONSOLE, "No config interface for this plugin.\n");
@@ -787,11 +787,11 @@ bool CommandHandler (const char *cmd, const char *arg)
       char val[256];
       int idx;
       csScanStr (arg, "%d,%s,%s", &idx, name, val);
-      if (idx < 0 || idx >= Sys->GetPluginCount ())
+      if (idx < 0 || idx >= Sys->plugin_mgr->GetPluginCount ())
 	Sys->Printf (CS_MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
       else
       {
-        iBase* plugin = Sys->GetPlugin (idx);
+        iBase* plugin = Sys->plugin_mgr->GetPlugin (idx);
 	SetConfigOption (plugin, name, val);
       }
     }
@@ -944,7 +944,8 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "bugplug"))
   {
-    (void)_CS_LOAD_PLUGIN (Sys, "crystalspace.utilities.bugplug", "BugPlug");
+    (void)_CS_LOAD_PLUGIN (Sys->plugin_mgr, "crystalspace.utilities.bugplug",
+    	"BugPlug");
   }
   else if (!strcasecmp (cmd, "fps"))
     csCommandProcessor::change_boolean (arg, &Sys->do_fps, "fps");

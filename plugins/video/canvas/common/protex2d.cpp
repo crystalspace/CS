@@ -22,6 +22,8 @@
 #include "csgeom/csrect.h"
 #include "isys/system.h"
 #include "isys/event.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 
 csProcTextureSoft2D::csProcTextureSoft2D (iSystem *isys) : csGraphics2D (NULL)
 {
@@ -132,7 +134,10 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
   }
 
   // Get the font server, as we've bypassed csGraphics2D::Initialize
-  FontServer = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (System->GetObjectRegistry (),
+  	iPluginManager);
+  FontServer = CS_QUERY_PLUGIN_ID (plugin_mgr,
+  	CS_FUNCID_FONTSERVER, iFontServer);
 
   return (iGraphics2D*)this;
 }

@@ -26,6 +26,8 @@
 #include "csutil/typedvec.h"
 
 struct iSystem;
+struct iObjectRegistry;
+struct iPluginManager;
 class csDefaultFontServer;
 
 /**
@@ -117,6 +119,8 @@ class csDefaultFontServer : public iFontServer
 {
 private:
   iSystem *System;
+  iObjectRegistry* object_reg;
+  iPluginManager* plugin_mgr;
 
   // A list of csDefaultFont pointers.
   CS_DECLARE_TYPED_VECTOR (csFontList, csDefaultFont) fonts;
@@ -160,7 +164,7 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csDefaultFontServer);
-    virtual bool Initialize(iSystem* p) { scfParent->System = p; return true; }
+    virtual bool Initialize(iSystem* p);
     virtual bool HandleEvent(iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

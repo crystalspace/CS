@@ -1,5 +1,52 @@
 The history order is reversed so that new features are at the top.
 
+23-Jul-2001
+	- Continued work on the decomposition of the system driver. The
+	  following items were performed:
+	    - Added iObjectRegistry interface to iutil. In the future there
+	      will be an implementation of this interface that will be used
+	      to register many common CS global objects (like the plugin
+	      manager, commandline manager, config manager, ...). At these
+	      moment these facilities are all given by iSystem but in the
+	      future iSystem will go away so iObjectRegistry will replace
+	      that. The object registry also supports the notion of 'tags'.
+	      These tags will in the future be used to replace the current
+	      FuncID system that is used by the plugin system.
+	    - csSystemDriver now implements iObjectRegistry. This is a
+	      temporary measure until there is a sufficient stand-alone
+	      implementation of iObjectRegistry. Note that the iObjectRegistry
+	      implementation in csSystemDriver is incomplete. It is only
+	      there as a placeholder to be able to get the plugin manager (see
+	      later).
+	    - Added iSystem::GetObjectRegistry(). Use this function now
+	      to get the object registry. Later the object registry will
+	      be obtained using other methods.
+	    - Added CS_QUERY_REGISTRY define to query an object from the
+	      object registry. The first parameter is the object registry
+	      implementation. The second parameter can be either a tag
+	      name or an interface name. There is also CS_QUERY_REGISTRY_FAST
+	      which is a fast version (similar to SCF_QUERY_INTERFACE_FAST).
+	    - Added iPluginManager to isys. This interface represents the
+	      entity in CS that manages plugins. Currently this is implemented
+	      by csSystemDriver. To get the plugin manager you now do
+	          iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+		  	iPluginManager);
+	      iSystem no longer directly implements all the plugin related
+	      functions. The macros CS_LOAD_PLUGIN, CS_QUERY_PLUGIN and others
+	      have all been modified to use iPluginManager instead of
+	      iSystem. So where you would do:
+	      	  iVFS* vfs = CS_QUERY_PLUGIN (system, iVFS);
+	      you must now do:
+	          iObjectRegistry* object_reg = system->GetObjectRegistry ();
+		  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+		  	iPluginManager);
+	          ...
+		  iVFS* vfs = CS_QUERY_REGISTRY (plugin_mgr, iVFS);
+	      It is probably easiest to just store object_reg and plugin_mgr
+	      together where you are also storing the iSystem pointer.
+	      Don't forget to include "isys/plugin.h" and "iutil/objreg.h".
+	    - Fixed all apps and plugins in CS that I could compile. Also
+	      tried to fix the others but no guarantees.
 20-Jul-2001
 	- Added iMeshWrapper::Draw() so that it is now possible to draw
 	  mesh wrappers on your own. This can be useful if you want to display

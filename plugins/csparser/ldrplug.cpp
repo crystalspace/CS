@@ -47,7 +47,7 @@ struct csLoaderPluginRec
 csLoader::csLoadedPluginVector::csLoadedPluginVector (
 	int iLimit, int iThresh) : csVector (iLimit, iThresh)
 {
-  System = NULL;
+  plugin_mgr = NULL;
 }
 
 csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
@@ -60,12 +60,12 @@ bool csLoader::csLoadedPluginVector::FreeItem (csSome Item)
   csLoaderPluginRec *rec = (csLoaderPluginRec*)Item;
   if (rec->Plugin)
   {
-    if (System)
+    if (plugin_mgr)
     {
       iPlugin* p = SCF_QUERY_INTERFACE(rec->Plugin, iPlugin);
       if (p)
       {
-        System->UnloadPlugin(p);
+        plugin_mgr->UnloadPlugin(p);
 	p->DecRef();
       }
     }
@@ -94,7 +94,8 @@ iLoaderPlugin* csLoader::csLoadedPluginVector::GetPluginFromRec (
 	csLoaderPluginRec *rec, const char *FuncID)
 {
   if (!rec->Plugin)
-    rec->Plugin = CS_LOAD_PLUGIN (System, rec->ClassID, FuncID, iLoaderPlugin);
+    rec->Plugin = CS_LOAD_PLUGIN (plugin_mgr,
+    	rec->ClassID, FuncID, iLoaderPlugin);
   return rec->Plugin;
 }
 

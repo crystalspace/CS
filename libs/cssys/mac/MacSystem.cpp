@@ -42,6 +42,8 @@
 #include "IMacGraphics.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 
 #if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 #define SetQDGlobalsRandomSeed( n ) ( qd.randSeed = n )
@@ -275,7 +277,9 @@ void SysSystemDriver::Alert(const char* s)
     iGraphics2D *   theG2D = NULL;
     iMacGraphics *  theiG2D = NULL;
 
-    theG2D = CS_QUERY_PLUGIN( this, iGraphics2D );
+    iObjectRegistry* object_reg = GetObjectRegistry ();
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    theG2D = CS_QUERY_PLUGIN( plugin_mgr, iGraphics2D );
 
     if ( theG2D ) {
         theiG2D = SCF_QUERY_INTERFACE(theG2D, iMacGraphics);
@@ -308,7 +312,9 @@ void SysSystemDriver::Warn(const char* s)
     iGraphics2D *   theG2D = NULL;
     iMacGraphics *  theiG2D = NULL;
 
-    theG2D = CS_QUERY_PLUGIN( this, iGraphics2D );
+    iObjectRegistry* object_reg = GetObjectRegistry ();
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    theG2D = CS_QUERY_PLUGIN( plugin_mgr, iGraphics2D );
 
     if ( theG2D ) {
         theiG2D = SCF_QUERY_INTERFACE(theG2D, iMacGraphics);
@@ -434,7 +440,9 @@ void SysSystemDriver::Loop ()
   EventLoopTimerRef theTimer = NULL;
 #endif
 
-  mG2D = CS_QUERY_PLUGIN( this, iGraphics2D );
+  iObjectRegistry* object_reg = GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  mG2D = CS_QUERY_PLUGIN( plugin_mgr, iGraphics2D );
 
   if ( mG2D ) {
     mIG2D = SCF_QUERY_INTERFACE(mG2D, iMacGraphics);

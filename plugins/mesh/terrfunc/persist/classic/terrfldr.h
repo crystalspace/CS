@@ -24,6 +24,8 @@
 
 struct iEngine;
 struct iSystem;
+struct iPluginManager;
+struct iObjectRegistry;
 
 /**
  * TerrFunc factory loader.
@@ -32,6 +34,8 @@ class csTerrFuncFactoryLoader : public iLoaderPlugin
 {
 private:
   iSystem* pSystem;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -41,14 +45,15 @@ public:
   /// Destructor.
   virtual ~csTerrFuncFactoryLoader ();
 
+  bool Initialize (iSystem* p);
+
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncFactoryLoader);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->pSystem = p; return true; }
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -61,6 +66,8 @@ class csTerrFuncLoader : public iLoaderPlugin
 {
 private:
   iSystem* pSystem;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -70,14 +77,15 @@ public:
   /// Destructor.
   virtual ~csTerrFuncLoader ();
 
+  bool Initialize (iSystem* p);
+
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncLoader);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->pSystem = p; return true; }
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

@@ -27,6 +27,8 @@
 struct iEngine;
 struct iSystem;
 struct iReporter;
+struct iPluginManager;
+struct iObjectRegistry;
 
 /**
  * Sprite 2D factory loader.
@@ -36,6 +38,8 @@ class csSprite2DFactoryLoader : public iLoaderPlugin
 private:
   iSystem* sys;
   iReporter* reporter;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -68,6 +72,8 @@ class csSprite2DFactorySaver : public iSaverPlugin
 private:
   iSystem* sys;
   iReporter* reporter;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -100,6 +106,8 @@ class csSprite2DLoader : public iLoaderPlugin
 private:
   iSystem* sys;
   iReporter* reporter;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -132,6 +140,8 @@ class csSprite2DSaver : public iSaverPlugin
 private:
   iSystem* sys;
   iReporter* reporter;
+  iPluginManager* plugin_mgr;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;

@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include "cssysdef.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include "csutil/csvector.h"
 #include "fontplex.h"
 
@@ -55,12 +57,14 @@ csFontServerMultiplexor::~csFontServerMultiplexor ()
 
 bool csFontServerMultiplexor::Initialize (iSystem *System)
 {
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   // Query the auxiliary font servers in turn
   char funcid [20];
   for (int idx = 1; ; idx++)
   {
     sprintf (funcid, "FontServer.%d", idx);
-    iFontServer *fs = CS_QUERY_PLUGIN_ID (System, funcid, iFontServer);
+    iFontServer *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFontServer);
     if (!fs) break;
     fontservers.Push (fs);
   }

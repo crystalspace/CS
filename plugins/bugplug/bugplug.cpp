@@ -47,6 +47,8 @@
 #include "iengine/terrain.h"
 #include "iengine/movable.h"
 #include "iengine/camera.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include "qint.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -114,6 +116,8 @@ csBugPlug::~csBugPlug ()
 bool csBugPlug::Initialize (iSystem *system)
 {
   System = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   if (!System->CallOnEvents (this, CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
   	CSMASK_MouseUp|CSMASK_MouseDown))
     return false;
@@ -126,14 +130,14 @@ void csBugPlug::SetupPlugin ()
   if (initialized) return;
 
   if (!Engine)
-    Engine = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_ENGINE, iEngine);
+    Engine = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_ENGINE, iEngine);
   if (!Engine)
   {
     // No engine. It is possible that we are working with the iso-engine.
   }
 
   if (!G3D)
-    G3D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+    G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D)
   {
     printf ("No G3D!\n");
@@ -149,7 +153,7 @@ void csBugPlug::SetupPlugin ()
   }
 
   if (!VFS)
-    VFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+    VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (!VFS)
   {
     printf ("No VFS!\n");
@@ -157,7 +161,7 @@ void csBugPlug::SetupPlugin ()
   }
 
   if (!Conout)
-    Conout = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_CONSOLE, iConsoleOutput);
+    Conout = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_CONSOLE, iConsoleOutput);
 
   ReadKeyBindings ("/config/bugplug.cfg");
 

@@ -54,8 +54,10 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/graph3d.h"
 #include "isys/event.h"
+#include "isys/plugin.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/databuff.h"
+#include "iutil/objreg.h"
 #include "imap/reader.h"
 #include "imesh/lighting.h"
 #include "ivaria/reporter.h"
@@ -391,6 +393,8 @@ iObject* csObjectIt::Fetch ()
 int csEngine::frame_width;
 int csEngine::frame_height;
 iSystem* csEngine::System = NULL;
+iObjectRegistry* csEngine::object_reg = NULL;
+iPluginManager* csEngine::plugin_mgr = NULL;
 csEngine* csEngine::current_engine = NULL;
 iEngine* csEngine::current_iengine = NULL;
 bool csEngine::use_new_radiosity = false;
@@ -498,6 +502,8 @@ csEngine::~csEngine ()
 
 bool csEngine::Initialize (iSystem* sys)
 {
+  object_reg = sys->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 #if defined(JORRIT_DEBUG)
   printf ("csPolygon3D %ld\n", (long)sizeof (csPolygon3D));
   printf ("csPolyPlane %ld\n", (long)sizeof (csPolyPlane));
@@ -511,7 +517,7 @@ bool csEngine::Initialize (iSystem* sys)
 
   System = sys;
 
-  if (!(G3D = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_VIDEO, iGraphics3D)))
+  if (!(G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D)))
   {
     // If there is no G3D then we still allow initialization of the
     // engine because it might be useful to use the engine stand-alone
@@ -519,7 +525,7 @@ bool csEngine::Initialize (iSystem* sys)
     Warn ("No 3D driver!");
   }
 
-  if (!(VFS = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_VFS, iVFS)))
+  if (!(VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS)))
     return false;
 
   if (G3D)
@@ -528,12 +534,12 @@ bool csEngine::Initialize (iSystem* sys)
     G2D = NULL;
 
   // don't check for failure; the engine can work without the image loader
-  ImageLoader = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_IMGLOADER, iImageIO);
+  ImageLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader)
     Warn ("No image loader. Loading images will fail.");
 
   // Reporter is optional.
-  Reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  Reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
 
   // Tell system driver that we want to handle broadcast events
   if (!System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
@@ -1947,9 +1953,9 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
     if (factwrap != NULL) return factwrap;
   }
 
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, classId, "MeshObj",
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, classId, "MeshObj",
   	iMeshObjectType);
-  if (!type) type = CS_LOAD_PLUGIN (System, classId, "MeshObj", iMeshObjectType);
+  if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, "MeshObj", iMeshObjectType);
   if (!type) return NULL;
   iMeshObjectFactory* fact = type->NewFactory ();
   if (!fact) return NULL;
@@ -1997,10 +2003,10 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
 	const char* loaderClassId,
 	iDataBuffer* input)
 {
-  iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
-  	iLoaderPlugin);
+  iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	loaderClassId, "MeshLdr", iLoaderPlugin);
   if (!plug)
-    plug = CS_LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugin);
+    plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, "MeshLdr", iLoaderPlugin);
   if (!plug)
     return NULL;
 
@@ -2021,10 +2027,11 @@ iMeshWrapper* csEngine::LoadMeshWrapper (
 	iDataBuffer* input, iSector* sector, const csVector3& pos)
 {
   (void)classId;
-  iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
-  	iLoaderPlugin);
+  iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	loaderClassId, "MeshLdr", iLoaderPlugin);
   if (!plug)
-    plug = CS_LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugin);
+    plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId,
+    	"MeshLdr", iLoaderPlugin);
   if (!plug)
     return NULL;
 

@@ -29,11 +29,15 @@
 struct iSector;
 struct iView;
 struct iEngine;
+struct iObjectRegistry;
+struct iPluginManager;
 
 class Video : public SysSystemDriver
 {
   typedef SysSystemDriver superclass;
 private:
+  iObjectRegistry* object_reg;
+  iPluginManager* plugin_mgr;
   iSector* room;
   iView* view;
   iEngine* engine;

@@ -21,6 +21,8 @@
 #include "isys/system.h"
 #include "iutil/strvec.h"
 #include "csgfx/csimage.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 
 #define MY_CLASSNAME "crystalspace.graphic.image.io.multiplex"
 
@@ -62,6 +64,9 @@ bool csMultiplexImageIO::Initialize (iSystem *pSystem)
       "Initializing image loading multiplexer...\n"
       "  Looking for image loader modules:\n");
 
+    iObjectRegistry* object_reg = pSystem->GetObjectRegistry ();
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
     iStrVector* classlist =
       iSCF::SCF->QueryClassList ("crystalspace.graphic.image.io.");
     int const nmatches = classlist->Length();
@@ -73,7 +78,8 @@ bool csMultiplexImageIO::Initialize (iSystem *pSystem)
         if (strcasecmp (classname, MY_CLASSNAME))
         {
 	  pSystem->Printf(CS_MSG_INITIALIZATION,"  %s\n",classname);
-	  iImageIO *plugin = CS_LOAD_PLUGIN (pSystem, classname, NULL, iImageIO);
+	  iImageIO *plugin = CS_LOAD_PLUGIN (plugin_mgr,
+	  	classname, NULL, iImageIO);
 	  if (plugin)
 	  {
 	    // remember the plugin

@@ -33,6 +33,8 @@
 #include "csutil/util.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -122,14 +124,22 @@ csSurfFactoryLoader::~csSurfFactoryLoader ()
 {
 }
 
+bool csSurfFactoryLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
+}
+
 iBase* csSurfFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.surface", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.surface",
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.surface",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.surface\n");
   }
@@ -150,6 +160,14 @@ csSurfFactorySaver::~csSurfFactorySaver ()
 {
 }
 
+bool csSurfFactorySaver::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
+}
+
 #define MAXLINE 100 /* max number of chars per line... */
 
 void csSurfFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
@@ -168,6 +186,14 @@ csSurfLoader::csSurfLoader (iBase* pParent)
 
 csSurfLoader::~csSurfLoader ()
 {
+}
+
+bool csSurfLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -340,6 +366,14 @@ csSurfSaver::csSurfSaver (iBase* pParent)
 
 csSurfSaver::~csSurfSaver ()
 {
+}
+
+bool csSurfSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)

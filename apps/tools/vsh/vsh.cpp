@@ -21,7 +21,9 @@
 #include "csutil/util.h"
 #include "cssys/sysdriv.h"
 #include "isys/vfs.h"
+#include "isys/plugin.h"
 #include "iutil/strvec.h"
+#include "iutil/objreg.h"
 #include <ctype.h>
 
 #define VFS_CONFIG_FILE	"vfs.cfg"
@@ -509,7 +511,9 @@ int main (int argc, char *argv [])
 {
   csSystemDriver sys;
   sys.Initialize (argc, argv, NULL);
-  VFS = CS_QUERY_PLUGIN_ID (&sys, CS_FUNCID_VFS, iVFS);
+  iObjectRegistry* object_reg = sys.GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (!VFS)
   {
     fprintf (stderr, "Cannot load iVFS plugin\n");

@@ -34,6 +34,8 @@
 #include "iutil/object.h"
 #include "iengine/material.h"
 #include "ivaria/reporter.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -149,7 +151,9 @@ csSprite2DFactoryLoader::~csSprite2DFactoryLoader ()
 bool csSprite2DFactoryLoader::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -271,11 +275,11 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
   char* params;
   char str[255];
 
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.sprite.2d",
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.2d",
     	"MeshObj", iMeshObjectType);
   }
   if (!type)
@@ -367,7 +371,9 @@ csSprite2DFactorySaver::~csSprite2DFactorySaver ()
 bool csSprite2DFactorySaver::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -428,7 +434,9 @@ csSprite2DLoader::~csSprite2DLoader ()
 bool csSprite2DLoader::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -613,7 +621,9 @@ csSprite2DSaver::~csSprite2DSaver ()
 bool csSprite2DSaver::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 

@@ -28,6 +28,8 @@
 #include "igraphic/imageio.h"
 #include "igraphic/image.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -94,19 +96,22 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     exit (1);
   }
 
-  ImageLoader = CS_QUERY_PLUGIN_ID(this, CS_FUNCID_IMGLOADER, iImageIO);
+  iObjectRegistry* object_reg = GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+  ImageLoader = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader) {
     Printf (CS_MSG_FATAL_ERROR, "No image loader plugin!\n");
     return false;
   }
 
-  myG3D = CS_QUERY_PLUGIN_ID(this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D) {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
     return false;
   }
 
-  myVFS = CS_QUERY_PLUGIN_ID(this, CS_FUNCID_VFS, iVFS);
+  myVFS = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (!myVFS) {
     Printf (CS_MSG_FATAL_ERROR, "No iVFS loader plugin!\n");
     return false;
@@ -214,7 +219,10 @@ void PerfTest::NextFrame ()
   if (needs_setup)
   {
     if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    iConsoleOutput *Console = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
+    iObjectRegistry* object_reg = GetObjectRegistry ();
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    iConsoleOutput *Console = CS_QUERY_PLUGIN_ID (plugin_mgr,
+    	CS_FUNCID_CONSOLE, iConsoleOutput);
     if (Console)
     {
       Console->Clear ();

@@ -36,6 +36,8 @@
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
 #include "imesh/particle.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include "csutil/cscolor.h"
 #include "csgeom/path.h"
 #include "cstool/csfxscr.h"
@@ -49,7 +51,9 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
 {
   DemoSequenceManager::demo = demo;
   demoseq = this;
-  seqmgr = CS_LOAD_PLUGIN (demo, "crystalspace.utilities.sequence",
+  iObjectRegistry* object_reg = demo->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  seqmgr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.sequence",
   	"Sequence", iSequenceManager);
   if (!seqmgr)
   {

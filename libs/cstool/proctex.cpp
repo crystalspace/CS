@@ -31,6 +31,8 @@
 #include "iengine/texture.h"
 #include "iengine/material.h"
 #include "iengine/engine.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 #include "cstool/proctex.h"
 
@@ -82,7 +84,9 @@ bool csProcTexture::Initialize (iSystem* system)
   iImage *proc_image;
   proc_image = (iImage*) new csImageMemory (mat_w, mat_h);
 
-  iEngine* engine = CS_QUERY_PLUGIN (system, iEngine);
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (
+  	system->GetObjectRegistry (), iPluginManager);
+  iEngine* engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   tex = engine->GetTextureList ()->NewTexture (proc_image);
   engine->DecRef ();
   proc_image->DecRef ();

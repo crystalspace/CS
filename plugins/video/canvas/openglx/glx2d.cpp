@@ -26,9 +26,11 @@
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iutil/cfgfile.h"
+#include "iutil/objreg.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -62,7 +64,9 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
 
   if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", NULL)))
   {
-    dispdriver = CS_LOAD_PLUGIN (pSystem, strDriver, NULL, iOpenGLDisp);
+    iObjectRegistry* object_reg = pSystem->GetObjectRegistry ();
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    dispdriver = CS_LOAD_PLUGIN (plugin_mgr, strDriver, NULL, iOpenGLDisp);
     if (!dispdriver)
       CsPrintf (CS_MSG_FATAL_ERROR, "Could not create an instance of %s ! Using NULL instead.\n", strDriver);
     else

@@ -38,13 +38,16 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/ptextype.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 
 // helper function for image loading
 
-static iImage *LoadImage (iSystem *System, UByte* iBuffer, ULong iSize, int iFormat)
+static iImage *LoadImage (iPluginManager* plugin_mgr, UByte* iBuffer,
+	ULong iSize, int iFormat)
 {
   iImageIO *ImageLoader =
-    CS_QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
+    CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader) return NULL;
   iImage *img = ImageLoader->Load(iBuffer, iSize, iFormat);
   ImageLoader->DecRef();
@@ -57,9 +60,10 @@ static iImage *LoadImage (iSystem *System, UByte* iBuffer, ULong iSize, int iFor
 //
 
 /// constructor
-csCrossBuild_Factory::csCrossBuild_Factory(iSystem *sys)
+csCrossBuild_Factory::csCrossBuild_Factory(iObjectRegistry *objreg)
 {
-  System = sys;
+  object_reg = objreg;
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 }
 
 /// destructor
@@ -72,8 +76,9 @@ csCrossBuild_Factory::~csCrossBuild_Factory()
 //
 
 /// constructor
-csCrossBuild_SpriteTemplateFactory::csCrossBuild_SpriteTemplateFactory(iSystem *sys)
-  : csCrossBuild_Factory(sys)
+csCrossBuild_SpriteTemplateFactory::csCrossBuild_SpriteTemplateFactory(
+	iObjectRegistry *objreg)
+  : csCrossBuild_Factory(objreg)
 {
 }
 
@@ -85,10 +90,10 @@ csCrossBuild_SpriteTemplateFactory::~csCrossBuild_SpriteTemplateFactory()
 /// full sprite template builder
 void* csCrossBuild_SpriteTemplateFactory::CrossBuild (converter &buildsource)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
@@ -269,8 +274,8 @@ iTextureWrapper *ivconload_Quake2Textures(iEngine *engine,
 //
 
 /// constructor
-csCrossBuild_ThingTemplateFactory::csCrossBuild_ThingTemplateFactory(iSystem *sys)
-  : csCrossBuild_Factory(sys)
+csCrossBuild_ThingTemplateFactory::csCrossBuild_ThingTemplateFactory(iObjectRegistry *objreg)
+  : csCrossBuild_Factory(objreg)
 {
 }
 
@@ -282,7 +287,7 @@ csCrossBuild_ThingTemplateFactory::~csCrossBuild_ThingTemplateFactory()
 /// full thing template builder
 void *csCrossBuild_ThingTemplateFactory::CrossBuild (converter &buildsource)
 {
-  iEngine* engine = CS_QUERY_PLUGIN (System, iEngine);
+  iEngine* engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   iMeshObjectType* thing_type = engine->GetThingType ();
   engine->DecRef ();
   iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
@@ -352,16 +357,20 @@ void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh (
   }
 }
 
-csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(iSystem *sys)
+csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(
+	iObjectRegistry *objreg)
 {
-  System = sys;
-  localVFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+  object_reg = objreg;
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  localVFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
 }
 
 
-csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(iSystem *sys, iVFS *specialVFS)
+csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(
+	iObjectRegistry *objreg, iVFS *specialVFS)
 {
-  System = sys;
+  object_reg = objreg;
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   (localVFS = specialVFS)->IncRef ();
 }
 
@@ -477,14 +486,14 @@ iTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
     {
       iDataBuffer *imagedata = localVFS->ReadFile(skinfilename);
 
-      iImage *newskin = LoadImage(System, imagedata->GetUint8 (),
+      iImage *newskin = LoadImage(plugin_mgr, imagedata->GetUint8 (),
         imagedata->GetSize (), importdestination->GetTextureFormat ());
 
       imagedata->DecRef ();
 
       //if (!defaulttexture)
       defaulttexture = importdestination->GetTextureList ()->NewTexture (newskin);
-      iGraphics3D *G3D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+      iGraphics3D *G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
       defaulttexture->Register (G3D->GetTextureManager ());
       G3D->DecRef ();
       

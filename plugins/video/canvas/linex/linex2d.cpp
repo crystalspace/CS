@@ -28,6 +28,7 @@
 #include "isys/system.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
+#include "iutil/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -174,7 +175,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   EventOutlet = System->CreateEventOutlet (this);
 
   // Do a trick: unload the system font server since its useless for us
-  iPlugin *fs = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iPlugin);
+  iPlugin *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_FONTSERVER, iPlugin);
   if (fs)
   {
     System->UnloadPlugin (fs);
@@ -185,7 +186,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
     FontServer->DecRef ();
 
   // Load our specific font server instead
-  FontServer = CS_LOAD_PLUGIN (System, "crystalspace.font.server.linex2d",
+  FontServer = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.font.server.linex2d",
     CS_FUNCID_FONTSERVER, iFontServer);
 
   return true;

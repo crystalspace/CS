@@ -26,7 +26,8 @@
 struct iEngine;
 struct iCamera;
 struct iConsoleOutput;
-struct iSystem;
+struct iObjectRegistry;
+struct iPluginManager;
 
 /**
  * This class represents a command that can be send thru the console
@@ -42,8 +43,10 @@ private:
   static iCamera* camera;
   /// The iGraphics3D interface to use.
   static iGraphics3D* g3d;
-  /// The iSystem interface to use.
-  static iSystem* system;
+  /// The iObjectRegistry interface to use.
+  static iObjectRegistry* object_reg;
+  /// The plugin manager.
+  static iPluginManager* plugin_mgr;
   /// The console.
   static iConsoleOutput* console;
 
@@ -56,7 +59,7 @@ private:
 public:
   /// Call this first.
   static void Initialize (iEngine* engine, iCamera* camera, iGraphics3D* g3d,
-    iConsoleOutput* console, iSystem* system);
+    iConsoleOutput* console, iObjectRegistry* objreg);
 
   /// This struct can be used as a console input callback
   struct PerformCallback : public iConsoleExecCallback

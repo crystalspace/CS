@@ -97,10 +97,10 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
   sector->CalculateSectorBBox (bbox, true);
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.rain",
-    	  "MeshObj", iMeshObjectType);
-  if (!type) type = CS_LOAD_PLUGIN (Sys, "crystalspace.mesh.object.rain",
-    	  "MeshObj", iMeshObjectType);
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys->plugin_mgr,
+  	"crystalspace.mesh.object.rain", "MeshObj", iMeshObjectType);
+  if (!type) type = CS_LOAD_PLUGIN (Sys->plugin_mgr,
+  	"crystalspace.mesh.object.rain", "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
   iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mesh, NULL,
@@ -143,10 +143,11 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
   sector->CalculateSectorBBox (bbox, true);
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.snow",
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (
+  	Sys->plugin_mgr, "crystalspace.mesh.object.snow",
     	  "MeshObj", iMeshObjectType);
-  if (!type) type = CS_LOAD_PLUGIN (Sys, "crystalspace.mesh.object.snow",
-    	  "MeshObj", iMeshObjectType);
+  if (!type) type = CS_LOAD_PLUGIN (Sys->plugin_mgr,
+  	"crystalspace.mesh.object.snow", "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
   iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mesh, NULL,
@@ -188,10 +189,10 @@ void add_particles_fire (iSector* sector, char* matname, int num,
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.fire",
-      	"MeshObj", iMeshObjectType);
-  if (!type) type = CS_LOAD_PLUGIN (Sys, "crystalspace.mesh.object.fire",
-      	"MeshObj", iMeshObjectType);
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys->plugin_mgr,
+  	"crystalspace.mesh.object.fire", "MeshObj", iMeshObjectType);
+  if (!type) type = CS_LOAD_PLUGIN (Sys->plugin_mgr,
+  	"crystalspace.mesh.object.fire", "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
   iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mesh, NULL,
@@ -235,10 +236,10 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.fountain",
-      	"MeshObj", iMeshObjectType);
-  if (!type) type = CS_LOAD_PLUGIN (Sys, "crystalspace.mesh.object.fountain",
-      	"MeshObj", iMeshObjectType);
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys->plugin_mgr,
+  	"crystalspace.mesh.object.fountain", "MeshObj", iMeshObjectType);
+  if (!type) type = CS_LOAD_PLUGIN (Sys->plugin_mgr,
+  	"crystalspace.mesh.object.fountain", "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
   iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mesh, NULL,
@@ -283,10 +284,10 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.explosion",
-      	"MeshObj", iMeshObjectType);
-  if (!type) type = CS_LOAD_PLUGIN (Sys, "crystalspace.mesh.object.explosion",
-      	"MeshObj", iMeshObjectType);
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys->plugin_mgr,
+  	"crystalspace.mesh.object.explosion", "MeshObj", iMeshObjectType);
+  if (!type) type = CS_LOAD_PLUGIN (Sys->plugin_mgr,
+  	"crystalspace.mesh.object.explosion", "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
   iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mesh, NULL,
@@ -335,10 +336,10 @@ void add_particles_spiral (iSector* sector, const csVector3& bottom, char* matna
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.spiral",
-      	"MeshObj", iMeshObjectType);
-  if (!type) type = CS_LOAD_PLUGIN (Sys, "crystalspace.mesh.object.spiral",
-      	"MeshObj", iMeshObjectType);
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys->plugin_mgr,
+  	"crystalspace.mesh.object.spiral", "MeshObj", iMeshObjectType);
+  if (!type) type = CS_LOAD_PLUGIN (Sys->plugin_mgr,
+  	"crystalspace.mesh.object.spiral", "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
   iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper

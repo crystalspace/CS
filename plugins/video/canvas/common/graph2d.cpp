@@ -28,6 +28,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 SCF_IMPLEMENT_IBASE(csGraphics2D)
   SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
@@ -61,6 +63,8 @@ csGraphics2D::csGraphics2D (iBase* parent)
 bool csGraphics2D::Initialize (iSystem* pSystem)
 {
   System = pSystem;
+  object_reg = System->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   // Get the system parameters
   config.AddConfig (System, "/config/video.cfg");
   Width = config->GetInt ("Video.ScreenWidth", Width);
@@ -70,7 +74,8 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
 
   // Get the font server: A missing font server is NOT an error
   if (!FontServer)
-    FontServer = CS_QUERY_PLUGIN_ID(System, CS_FUNCID_FONTSERVER, iFontServer);
+    FontServer = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_FONTSERVER,
+    	iFontServer);
 #ifdef CS_DEBUG
   if (!FontServer)
     System->Printf (CS_MSG_WARNING,

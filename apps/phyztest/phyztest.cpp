@@ -28,6 +28,8 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "ivaria/polymesh.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -157,29 +159,32 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  iObjectRegistry* object_reg = GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
   // Find the pointer to engine plugin
-  myG3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
-  myG2D = CS_QUERY_PLUGIN (this, iGraphics2D);
+  myG2D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics2D);
   if (!myG2D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
     abort ();
   }
 
-  engine = CS_QUERY_PLUGIN (this, iEngine);
+  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  LevelLoader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
@@ -204,7 +209,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     exit (1);
   }
 
-  cdsys = CS_LOAD_PLUGIN (System, "crystalspace.collisiondetection.rapid", "CollDet", iCollideSystem);
+  cdsys = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.collisiondetection.rapid", "CollDet", iCollideSystem);
 
   // Some commercials...
   Printf (CS_MSG_INITIALIZATION, "Phyztest Crystal Space Application version 0.1.\n");

@@ -29,9 +29,11 @@
 #include "qint.h"
 
 #include "isys/vfs.h"
+#include "isys/plugin.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -780,7 +782,10 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-  System.myG2D = CS_QUERY_PLUGIN (&System, iGraphics2D);
+  iObjectRegistry* object_reg = System.GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+  System.myG2D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics2D);
   // Now load the canvas plugin
   if (!System.myG2D)
   {
@@ -794,7 +799,7 @@ int main (int argc, char *argv[])
       strcat (tmp, canvas);
       canvas = tmp;
     }
-    System.myG2D = CS_LOAD_PLUGIN (&System, canvas, CS_FUNCID_CANVAS, iGraphics2D);
+    System.myG2D = CS_LOAD_PLUGIN (plugin_mgr, canvas, CS_FUNCID_CANVAS, iGraphics2D);
     System.SetG2D (System.myG2D); // @@ temporary as long as the rest of CS relies on G2D variable in System
     System.myG2D->IncRef ();
   }

@@ -38,6 +38,8 @@
 #include "iengine/material.h"
 #include "iengine/motion.h"
 #include "ivaria/reporter.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -170,7 +172,9 @@ csSprite3DFactoryLoader::~csSprite3DFactoryLoader ()
 bool csSprite3DFactoryLoader::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -487,11 +491,11 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
   CS_ASSERT (imeshfactwrap != NULL);
   imeshfactwrap->DecRef ();
 
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.sprite.3d",
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.3d",
     	"MeshObj", iMeshObjectType);
   }
   if (!type)
@@ -725,7 +729,9 @@ csSprite3DFactorySaver::~csSprite3DFactorySaver ()
 bool csSprite3DFactorySaver::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -888,7 +894,9 @@ csSprite3DLoader::~csSprite3DLoader ()
 bool csSprite3DLoader::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -997,7 +1005,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_APPLY_MOTION:
 	{
 	  csScanStr (params, "%s", str);
-	  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS( sys, 
+	  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
 		"crystalspace.motion.manager.default", "MotionManager",
 		iMotionManager);
 	  if (!motman) 
@@ -1071,7 +1079,9 @@ csSprite3DSaver::~csSprite3DSaver ()
 bool csSprite3DSaver::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 

@@ -23,7 +23,9 @@
 #include "csws/csgfxppl.h"
 #include "csws/csmouse.h"
 #include "csutil/util.h"
+#include "iutil/objreg.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
@@ -59,12 +61,14 @@ void csGraphicsPipeline::Initialize (iSystem *System)
 {
   MaxPage = 0;
   DrawMode = 0;
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   memset (SyncArea, 0, sizeof (SyncArea));
-  G3D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+  G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (G3D)
     (G2D = G3D->GetDriver2D ())->IncRef ();
   else
-    G2D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_CANVAS, iGraphics2D);
+    G2D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_CANVAS, iGraphics2D);
   RefreshRect.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
   CanvasResize ();
 }

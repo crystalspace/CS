@@ -32,7 +32,9 @@
 #include "ivideo/txtmgr.h"
 #include "isys/evdefs.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/objreg.h"
 
 #define SIZE_LINE 256
 
@@ -91,7 +93,9 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  G3D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+  iObjectRegistry* object_reg = iSys->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D) return false;
   G2D = G3D->GetDriver2D ();
 

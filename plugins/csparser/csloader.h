@@ -39,6 +39,8 @@ struct iGraphics3D;
 struct iSoundRender;
 struct iMotionManager;
 struct iLoaderPlugin;
+struct iObjectRegistry;
+struct iPluginManager;
 
 struct iObject;
 struct iThingState;
@@ -82,7 +84,7 @@ class csLoader : public iLoader
     // Return the loader plugin from a record, possibly loading the plugin now
     iLoaderPlugin* GetPluginFromRec (csLoaderPluginRec*, const char *FuncID);
   public:
-    iSystem *System;
+    iPluginManager* plugin_mgr;
 
     // constructor
     csLoadedPluginVector (int iLimit = 8, int iThresh = 16);
@@ -232,6 +234,8 @@ public:
   
   // system driver
   iSystem *System;
+  iObjectRegistry* object_reg;
+  iPluginManager* plugin_mgr;
   // virtual file system
   iVFS *VFS;
   // The error reporter

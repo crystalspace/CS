@@ -34,7 +34,9 @@
 #include "ogl_txtmgr.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
@@ -201,6 +203,8 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
 bool csGraphics3DOGLCommon::Initialize (iSystem* p)
 {
   System = p;
+  object_reg = System->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
@@ -212,7 +216,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
-  G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
+  G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;
 

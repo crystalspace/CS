@@ -37,7 +37,9 @@
 #include "cstool/csview.h"
 
 #include "isys/vfs.h"
+#include "isys/plugin.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/objreg.h"
 #include "inetwork/driver.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -84,7 +86,7 @@ static long LastConnectTime = 0;
 //-----------------------------------------------------------------------------
 
 #define  QUERY_PLUG_ID(myPlug, funcid, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN_ID (Sys, funcid, iFace); \
+  myPlug = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFace); \
   if (!myPlug) \
   { \
     Sys->Printf (CS_MSG_FATAL_ERROR, errMsg); \
@@ -92,7 +94,7 @@ static long LastConnectTime = 0;
   }
 
 #define  QUERY_PLUG(myPlug, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN (Sys, iFace); \
+  myPlug = CS_QUERY_PLUGIN (plugin_mgr, iFace); \
   if (!myPlug) \
   { \
     Sys->Printf (CS_MSG_FATAL_ERROR, errMsg); \
@@ -100,13 +102,14 @@ static long LastConnectTime = 0;
   }
 
 #define  QUERY_PLUG_NM(myPlug, funcid, iFace, errMsg) \
-  myPlug = CS_QUERY_PLUGIN_ID (Sys, funcid, iFace); \
+  myPlug = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFace); \
   if (!myPlug) \
   { \
     Sys->Printf (CS_MSG_INITIALIZATION, errMsg); \
   }
 
 Blocks* Sys = NULL;
+iPluginManager* plugin_mgr = NULL;
 
 #define Gfx3D Sys->myG3D
 #define Gfx2D Sys->myG2D
@@ -2253,7 +2256,7 @@ void Blocks::InitEngine ()
   InitDemoRoom ();
   Sys->engine->Prepare ();
 
-  iSoundRender *snd = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
+  iSoundRender *snd = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_SOUND, iSoundRender);
   if (snd)
   {
     // Load the blocks.zip library where sound refs are stored
@@ -3083,6 +3086,9 @@ int main (int argc, char* argv[])
     fatal_exit (0, false);
   }
 
+  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Sys->Open ("3D Blocks"))
   {
@@ -3108,7 +3114,8 @@ int main (int argc, char* argv[])
   Sys->font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 
   // Get the level loader
-  Sys->LevelLoader = CS_QUERY_PLUGIN_ID(Sys, CS_FUNCID_LVLLOADER, iLoader);
+  Sys->LevelLoader = CS_QUERY_PLUGIN_ID(plugin_mgr,
+  	CS_FUNCID_LVLLOADER, iLoader);
   if (!Sys->LevelLoader)
   {
     Sys->Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");

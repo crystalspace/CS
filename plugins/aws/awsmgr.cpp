@@ -3,6 +3,8 @@
 #include "awsprefs.h"
 #include "ivideo/txtmgr.h"
 #include "iengine/engine.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include <stdio.h>
 
 awsManager::awsManager(iBase *p):prefmgr(NULL),System(NULL), 
@@ -22,9 +24,11 @@ bool
 awsManager::Initialize(iSystem *system)
 {   
   System=system;
+  iObjectRegistry* object_reg = system->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   
   printf("aws-debug: getting image loader.\n");
-  ImageLoader = CS_QUERY_PLUGIN_ID(System, CS_FUNCID_IMGLOADER, iImageIO);
+  ImageLoader = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
   
   if (!ImageLoader) 
   {

@@ -26,8 +26,10 @@
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "imesh/sprite2d.h"
 #include "iengine/movable.h"
+#include "iutil/objreg.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -62,9 +64,12 @@ csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory
   vis_cb = NULL;
   mat = NULL;
 
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (system, "crystalspace.mesh.object.sprite.2d",
-      "MeshObj", iMeshObjectType);
-  if (!type) type = CS_LOAD_PLUGIN (system, "crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
+  iObjectRegistry* object_reg = system->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
+  if (!type) type = CS_LOAD_PLUGIN (plugin_mgr,
+  	"crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
   spr_factory = type->NewFactory ();
   type->DecRef ();
   shapenr = 0;

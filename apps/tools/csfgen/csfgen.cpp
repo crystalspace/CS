@@ -22,6 +22,8 @@
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "ivideo/fontserv.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -114,7 +116,10 @@ static bool Convert (const char *fontfile)
   if (opt.verbose)
     printf ("Loading font %s, size = %d\n", fontfile, opt.fontsize);
 
-  iFontServer *fs = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+  iFontServer *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_FONTSERVER, iFontServer);
   if (!fs)
   {
     printf ("Font server plugin has not been loaded.\n");

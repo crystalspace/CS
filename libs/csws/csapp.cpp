@@ -38,6 +38,8 @@
 #include "isys/vfs.h"
 #include "ivideo/txtmgr.h"
 #include "isys/event.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include "igraphic/imageio.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugin //--
@@ -54,7 +56,9 @@ csApp::csAppPlugin::csAppPlugin (csApp *iParent)
 
 bool csApp::csAppPlugin::Initialize (iSystem *System)
 {
-  app->VFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  app->VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (!app->VFS) return false;
 
   // Get system event outlet for faster access
@@ -105,6 +109,8 @@ csApp::csApp (iSystem *sys, csSkin &Skin)
   InFrame = false;
   ImageLoader = NULL;
   System = sys;
+  object_reg = sys->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   LastMouseContainer = NULL;
 
   OldMouseCursorID = csmcNone;
@@ -126,7 +132,7 @@ csApp::~csApp ()
     delete mi;
   }
 
-  System->UnloadPlugin (scfiPlugin);
+  plugin_mgr->UnloadPlugin (scfiPlugin);
 
   // Delete all children prior to shutting down the system
   DeleteAll ();
@@ -156,7 +162,8 @@ csApp::~csApp ()
 
 bool csApp::Initialize ()
 {
-  if (!System->RegisterPlugin ("crystalspace.windowing.system", "CSWS", scfiPlugin))
+  if (!plugin_mgr->RegisterPlugin
+  	("crystalspace.windowing.system", "CSWS", scfiPlugin))
     return false;
 
   // Create the graphics pipeline
@@ -171,11 +178,12 @@ bool csApp::Initialize ()
 
   config.AddConfig(System, "/config/csws.cfg");
 
-  FontServer = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
+  FontServer = CS_QUERY_PLUGIN_ID (plugin_mgr,
+  	CS_FUNCID_FONTSERVER, iFontServer);
   DefaultFont = FontServer->LoadFont (CSFONT_COURIER);
   DefaultFontSize = 8;
 
-  ImageLoader = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
+  ImageLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader)
     System->Printf (CS_MSG_WARNING,
       "No image loader. Loading images will fail.\n");

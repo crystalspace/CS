@@ -23,9 +23,11 @@
 #include "soft_g3d.h"
 #include "protex3d.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "ivideo/graph2d.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -72,7 +74,9 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   const char *driver = iSys->GetCommandLine ()->GetOption ("canvas");
   if (!driver)
     driver = config->GetStr ("Video.Software.Canvas", CS_SOFTWARE_2D_DRIVER);
-  G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
+  iObjectRegistry* object_reg = iSys->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, NULL, iGraphics2D);
   return G2D ? true : false;
 }
 

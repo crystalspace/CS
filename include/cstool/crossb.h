@@ -34,7 +34,8 @@ struct iThingState;
 struct iTextureWrapper;
 struct iEngine;
 struct iImage;
-struct iSystem;
+struct iObjectRegistry;
+struct iPluginManager;
 
 /**
  * The general cross builder interface.  All cross builders inherit from
@@ -44,13 +45,14 @@ struct iSystem;
 class csCrossBuild_Factory
 {
 protected:
-  iSystem *System;
+  iObjectRegistry *object_reg;
+  iPluginManager* plugin_mgr;
 
   iImage *LoadImage (UByte* iBuffer, ULong iSize, int iFormat);
 
 public:
     /// Constructor.  By default you will probably not do much here.
-    csCrossBuild_Factory(iSystem *sys);
+    csCrossBuild_Factory(iObjectRegistry *objreg);
 
     /**
      * Destructor.  Don't go off killing the converter, as you don't
@@ -107,7 +109,7 @@ class csCrossBuild_SpriteTemplateFactory : public csCrossBuild_Factory
 {
   public:
     /// Constructor.  There are currently no options
-    csCrossBuild_SpriteTemplateFactory(iSystem *sys);
+    csCrossBuild_SpriteTemplateFactory(iObjectRegistry *objreg);
 
     /**
      * Destructor.  Does not delete the sprite templates it has
@@ -153,7 +155,7 @@ class csCrossBuild_ThingTemplateFactory : public csCrossBuild_Factory
 {
   public:
     /// Constructor.  There are currently no options
-    csCrossBuild_ThingTemplateFactory(iSystem *sys);
+    csCrossBuild_ThingTemplateFactory(iObjectRegistry *objreg);
 
     /**
      * Destructor.  Does not delete the Thing templates it has
@@ -214,7 +216,9 @@ class csCrossBuild_Quake2Importer
 {
   private:
     // the system driver
-    iSystem *System;
+    iObjectRegistry *object_reg;
+    // the plugin manager
+    iPluginManager* plugin_mgr;
 
     // VFS to use.  May be the default, or it may have
     // .zip files mounted containing the sprites
@@ -247,8 +251,8 @@ class csCrossBuild_Quake2Importer
      * Constructor needs a VFS to map from the WAD, sprite respository, or
      * whatever, to files.  If no VFS is supplied it will use the system VFS
      */
-    csCrossBuild_Quake2Importer(iSystem *sys);
-    csCrossBuild_Quake2Importer(iSystem *sys, iVFS *specialVFS);
+    csCrossBuild_Quake2Importer(iObjectRegistry *objreg);
+    csCrossBuild_Quake2Importer(iObjectRegistry *objreg, iVFS *specialVFS);
     ~csCrossBuild_Quake2Importer();
 
     /**

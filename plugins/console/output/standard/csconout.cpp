@@ -31,6 +31,8 @@
 #include "cssys/csevent.h"
 #include "csgeom/csrect.h"
 #include "csutil/csstring.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -89,7 +91,9 @@ csConsoleOutput::~csConsoleOutput ()
 bool csConsoleOutput::Initialize (iSystem *system)
 {
   System = system;
-  G3D = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+  iObjectRegistry* object_reg = system->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D) return false;
   G2D = G3D->GetDriver2D ();
   G2D->IncRef ();

@@ -5,7 +5,9 @@
 #include "cssys/sysdriv.h"
 #include "csutil/scf.h"
 #include "csutil/cfgfile.h"
+#include "iutil/objreg.h"
 #include "isys/vfs.h"
+#include "isys/plugin.h"
 #include "isound/data.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
@@ -95,12 +97,16 @@ int main(int argc, const char* const args[])
     return -1;
   }
 
+  iObjectRegistry* object_reg = sys.GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
   // get a soundloader
-  iSoundLoader *pLoader = CS_QUERY_PLUGIN_ID (&sys, "SoundLoader", iSoundLoader);
+  iSoundLoader *pLoader = CS_QUERY_PLUGIN_ID (plugin_mgr,
+  	"SoundLoader", iSoundLoader);
   // we read the soundata the CS way, that is through VFS
-  iVFS *pVFS = CS_QUERY_PLUGIN (&sys, iVFS);
+  iVFS *pVFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
   // well, since we want to try our renderer, we should request it now
-  iSoundRender *pSR = CS_QUERY_PLUGIN (&sys, iSoundRender);
+  iSoundRender *pSR = CS_QUERY_PLUGIN (plugin_mgr, iSoundRender);
   
   // load the sound
   iDataBuffer *db = pVFS->ReadFile (args[1]);

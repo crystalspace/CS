@@ -27,6 +27,9 @@
 #include "iutil/config.h"
 #include "csutil/cfgacc.h"
 
+struct iObjectRegistry;
+struct iPluginManager;
+
 #define CsPrintf System->Printf
 
 /**
@@ -56,6 +59,10 @@ public:
 
   /// The system driver.
   iSystem* System;
+  /// The object registry.
+  iObjectRegistry* object_reg;
+  /// The plugin manager.
+  iPluginManager* plugin_mgr;
 
   /// The font server
   iFontServer *FontServer;

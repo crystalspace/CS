@@ -25,7 +25,9 @@
 #include "null_txt.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "ivideo/graph2d.h"
 
 #define SysPrintf System->Printf
@@ -87,7 +89,9 @@ bool csGraphics3DNull::Initialize (iSystem *iSys)
   if (!driver)
     driver = config->GetStr ("Video.Null.Canvas", CS_SOFTWARE_2D_DRIVER);
 
-  G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;
 

@@ -36,6 +36,8 @@
 #include "ivideo/graph2d.h"
 #include "ivaria/conout.h"
 #include "isys/event.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 
@@ -46,7 +48,8 @@ iEngine* csCommandProcessor::engine = NULL;
 iCamera* csCommandProcessor::camera = NULL;
 iGraphics3D* csCommandProcessor::g3d = NULL;
 iConsoleOutput* csCommandProcessor::console = NULL;
-iSystem* csCommandProcessor::system = NULL;
+iObjectRegistry* csCommandProcessor::object_reg = NULL;
+iPluginManager* csCommandProcessor::plugin_mgr = NULL;
 iFile* csCommandProcessor::script = NULL;
 // Additional command handler
 csCommandProcessor::CmdHandler csCommandProcessor::ExtraHandler = NULL;
@@ -61,13 +64,14 @@ void csCommandProcessor::PerformCallback::Execute (const char* command)
 }
 
 void csCommandProcessor::Initialize (iEngine* engine, iCamera* camera,
-  iGraphics3D* g3d, iConsoleOutput* console, iSystem* system)
+  iGraphics3D* g3d, iConsoleOutput* console, iObjectRegistry* objreg)
 {
   csCommandProcessor::engine = engine;
   csCommandProcessor::camera = camera;
   csCommandProcessor::g3d = g3d;
   csCommandProcessor::console = console;
-  csCommandProcessor::system = system;
+  csCommandProcessor::object_reg = objreg;
+  csCommandProcessor::plugin_mgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
 }
 
 bool csCommandProcessor::PerformLine (const char* line)
@@ -340,8 +344,8 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     change_float (arg, &csPolyTexture::cfg_cosinus_factor, "cosinus factor", -1, 1);
   else if (!strcasecmp (cmd, "lod"))
   {
-    iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.sprite.3d",
-      	  "MeshObj", iMeshObjectType);
+    iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+    	"crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
     csVariant lod_level;
     GetConfigOption (type, "sprlod", lod_level);
     float f = lod_level.GetFloat ();
@@ -351,8 +355,8 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   }
   else if (!strcasecmp (cmd, "sprlight"))
   {
-    iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.sprite.3d",
-      	  "MeshObj", iMeshObjectType);
+    iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+    	"crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
     csVariant lqual;
     GetConfigOption (type, "sprlq", lqual);
     long l = lqual.GetLong ();
@@ -450,7 +454,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
 bool csCommandProcessor::start_script (const char* scr)
 {
   bool ok = false;
-  iVFS* v = CS_QUERY_PLUGIN_ID (system, CS_FUNCID_VFS, iVFS);
+  iVFS* v = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (v)
   {
     if (v->Exists (scr))

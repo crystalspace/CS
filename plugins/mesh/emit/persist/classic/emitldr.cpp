@@ -35,6 +35,8 @@
 #include "csutil/util.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -137,14 +139,22 @@ csEmitFactoryLoader::~csEmitFactoryLoader ()
 {
 }
 
+bool csEmitFactoryLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
+}
+
 iBase* csEmitFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.emit", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.emit",
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.emit",
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.emit\n");
   }
@@ -163,6 +173,14 @@ csEmitFactorySaver::csEmitFactorySaver (iBase* pParent)
 
 csEmitFactorySaver::~csEmitFactorySaver ()
 {
+}
+
+bool csEmitFactorySaver::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -202,6 +220,14 @@ csEmitLoader::csEmitLoader (iBase* pParent)
 
 csEmitLoader::~csEmitLoader ()
 {
+}
+
+bool csEmitLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -564,6 +590,14 @@ csEmitSaver::csEmitSaver (iBase* pParent)
 
 csEmitSaver::~csEmitSaver ()
 {
+}
+
+bool csEmitSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  return true;
 }
 
 /// write emitter to string

@@ -21,7 +21,9 @@
 #include "iengine/motion.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
+#include "isys/plugin.h"
 #include "iutil/databuff.h"
+#include "iutil/objreg.h"
 
 #include "csgeom/transfrm.h"
 #include "csgeom/quaterni.h"
@@ -100,13 +102,15 @@ csMotionLoader::~csMotionLoader()
 bool csMotionLoader::Initialize (iSystem* Sys)
 {
   sys=Sys;
-  vfs = CS_QUERY_PLUGIN_ID( sys, CS_FUNCID_VFS, iVFS );
+  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  vfs = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_VFS, iVFS );
   if (!vfs)
   {
 	printf("Motion Loader: Virtual file system not loaded.. aborting\n");
 	return false;
   }
-  motman = CS_QUERY_PLUGIN_CLASS( sys, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
+  motman = CS_QUERY_PLUGIN_CLASS(plugin_mgr, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
   if (!motman)
   {
 	printf("Motion Loader: Motion manager not loaded... aborting\n");
@@ -474,7 +478,9 @@ csMotionSaver::~csMotionSaver()
 
 void csMotionSaver::WriteDown ( iBase* /* obj */, iStrVector* /* string */, iEngine* /* engine */)
 {
-  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS( sys, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
+  iObjectRegistry* object_reg = sys->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS(plugin_mgr, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
   if (motman)
   {
 	motman->DecRef();

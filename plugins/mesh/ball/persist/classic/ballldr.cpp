@@ -35,6 +35,8 @@
 #include "iutil/object.h"
 #include "iengine/material.h"
 #include "ivaria/reporter.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -150,18 +152,20 @@ csBallFactoryLoader::~csBallFactoryLoader ()
 bool csBallFactoryLoader::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
 iBase* csBallFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (sys,
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.ball", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (sys, "crystalspace.mesh.object.ball",
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.ball",
     	"MeshObj", iMeshObjectType);
   }
   if (!type)
@@ -193,7 +197,9 @@ csBallFactorySaver::~csBallFactorySaver ()
 bool csBallFactorySaver::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -222,7 +228,9 @@ csBallLoader::~csBallLoader ()
 bool csBallLoader::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 
@@ -444,7 +452,9 @@ csBallSaver::~csBallSaver ()
 bool csBallSaver::Initialize (iSystem* system)
 {
   sys = system;
-  reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
+  object_reg = system->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
 }
 

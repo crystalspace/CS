@@ -35,6 +35,8 @@
 #include "iutil/object.h"
 #include "igraphic/imageio.h"
 #include "imesh/object.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -90,8 +92,11 @@ bool csIsoEngine::HandleEvent (iEvent& Event)
     {
       case cscmdSystemOpen:
       {
+        iObjectRegistry* object_reg = system->GetObjectRegistry ();
+	iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+		iPluginManager);
         // system is open we can get ptrs now
-        g3d = CS_QUERY_PLUGIN_ID (system, CS_FUNCID_VIDEO, iGraphics3D);
+        g3d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
         if (!g3d)
         {
           system->Printf(CS_MSG_INTERNAL_ERROR, "IsoEngine: could not get G3D.\n");
@@ -239,7 +244,10 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(iMaterialHandle *handle,
 iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
 	          const char *materialname)
 {
-  iImageIO *imgloader = CS_QUERY_PLUGIN(system, iImageIO);
+  iObjectRegistry* object_reg = system->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+		iPluginManager);
+  iImageIO *imgloader = CS_QUERY_PLUGIN(plugin_mgr, iImageIO);
   if(imgloader==NULL)
   {
     system->Printf(CS_MSG_INTERNAL_ERROR, "Could not get image loader plugin.\n");
@@ -247,7 +255,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
       vfsfilename);
     return NULL;
   }
-  iVFS *VFS = CS_QUERY_PLUGIN(system, iVFS);
+  iVFS *VFS = CS_QUERY_PLUGIN(plugin_mgr, iVFS);
   if(VFS==NULL)
   {
     system->Printf(CS_MSG_INTERNAL_ERROR, "Could not get VFS plugin.\n");
@@ -335,9 +343,12 @@ iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
 {
   if(name && FindMeshFactory(name))
     return FindMeshFactory(name);
-  iMeshObjectType *mesh_type = CS_QUERY_PLUGIN_CLASS (system, classId, "MeshObj", 
-    iMeshObjectType);
-  if(!mesh_type) mesh_type = CS_LOAD_PLUGIN( system, classId,  "MeshObj", 
+  iObjectRegistry* object_reg = system->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+		iPluginManager);
+  iMeshObjectType *mesh_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	classId, "MeshObj", iMeshObjectType);
+  if(!mesh_type) mesh_type = CS_LOAD_PLUGIN( plugin_mgr, classId,  "MeshObj", 
     iMeshObjectType);
   if(!mesh_type) return NULL;
   iMeshObjectFactory *mesh_fact = mesh_type->NewFactory();

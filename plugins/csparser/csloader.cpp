@@ -54,6 +54,8 @@
 #include "isound/renderer.h"
 #include "isys/vfs.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
 #include "imesh/thing/thing.h"
@@ -790,19 +792,19 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    delete filedata;
 	    return false;
 	  }
-  	  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System,
+  	  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
 	  	"crystalspace.mesh.object.sprite.3d", "MeshObj",
 		iMeshObjectType);
   	  if (!type)
   	  {
-    	    type = CS_LOAD_PLUGIN (System, "crystalspace.mesh.object.sprite.3d",
+    	    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.3d",
 	    	"MeshObj", iMeshObjectType);
     	    printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
   	  }
 	  iMeshObjectFactory* fact = type->NewFactory ();
 	  stemp->SetMeshObjectFactory (fact);
 	  fact->DecRef ();
-	  csCrossBuild_SpriteTemplateFactory builder (System);
+	  csCrossBuild_SpriteTemplateFactory builder (object_reg);
 	  builder.CrossBuild (fact, *filedata);
 	  delete filedata;
         }
@@ -1686,7 +1688,7 @@ csLoader::~csLoader()
 }
 
 #define GET_PLUGIN(var, func, intf, msgname)	\
-  var = CS_QUERY_PLUGIN_ID(System, func, intf);	\
+  var = CS_QUERY_PLUGIN_ID(plugin_mgr, func, intf);	\
   if (var)					\
     System->Printf(CS_MSG_INITIALIZATION,	\
       " "msgname);
@@ -1694,11 +1696,13 @@ csLoader::~csLoader()
 bool csLoader::Initialize(iSystem *iSys)
 {
   System = iSys;
+  object_reg = System->GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   System->Printf(CS_MSG_INITIALIZATION, "Initializing loader plug-in\n ");
-  loaded_plugins.System = System;
+  loaded_plugins.plugin_mgr = plugin_mgr;
 
   // get the virtual file system plugin
-  VFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+  VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (!VFS) {
     System->Printf (CS_MSG_INITIALIZATION,
       "Failed to initialize the loader: No VFS plugin.\n");

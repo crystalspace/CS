@@ -45,6 +45,8 @@ struct iGraphics2D;
 class OpenGLTextureCache;
 class OpenGLLightmapCache;
 struct iClipper2D;
+struct iObjectRegistry;
+struct iPluginManager;
 
 /// OpenGL capabilities
 struct csOpenGLCaps
@@ -486,6 +488,8 @@ public:
 
   /// The System interface. 
   iSystem* System;
+  iObjectRegistry* object_reg;
+  iPluginManager* plugin_mgr;
 
   /// Constructor.
   csGraphics3DOGLCommon (iBase*);

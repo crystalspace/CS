@@ -61,6 +61,8 @@ struct iImageIO;
 struct iClipper2D;
 struct iReporter;
 struct iProgressMeter;
+struct iObjectRegistry;
+struct iPluginManager;
 
 SCF_DECLARE_FAST_INTERFACE (iEngine)
 SCF_DECLARE_FAST_INTERFACE (iSector)
@@ -340,6 +342,10 @@ public:
   static int frame_width, frame_height;
   /// Remember iSystem interface.
   static iSystem* System;
+  /// Remember iObjectRegistry.
+  static iObjectRegistry* object_reg;
+  /// Remember iPluginManager.
+  static iPluginManager* plugin_mgr;
   /// The shared engine instance.
   static csEngine* current_engine;
   /// The shared engine instance.

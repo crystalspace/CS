@@ -26,7 +26,9 @@
 #include "video/renderer/inf/inf_g3d.h"
 #include "video/renderer/inf/inf_txt.h"
 #include "iutil/cfgfile.h"
+#include "iutil/objreg.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "ivideo/graph2d.h"
 #include "imesh/thing/polygon.h"	//@@@
 #include "imesh/thing/lightmap.h"	//@@@
@@ -117,7 +119,9 @@ bool csGraphics3DInfinite::Initialize (iSystem *iSys)
 
   width = height = -1;
 
-  G2D = CS_LOAD_PLUGIN (System, "crystalspace.graphics2d.infinite",
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  G2D = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graphics2d.infinite",
     NULL, iGraphics2D);
   if (!G2D)
     return false;

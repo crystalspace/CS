@@ -36,6 +36,8 @@
 #include "imesh/object.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
+#include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 #define SET_BIT(var,mask,state) \
   var = (var & ~(mask)) | ((state) ? (mask) : 0);
@@ -342,22 +344,25 @@ bool ceCswsEngineApp::Initialize ()
   if (!csApp::Initialize ())
     return false;
 
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (System, iEngine);
+  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   if (!engine)
   {
     System->Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  LevelLoader = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
     System->Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
   
-  pG3D = CS_QUERY_PLUGIN (System, iGraphics3D);
+  pG3D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics3D);
   // Disable double buffering since it kills performance
   pG3D->GetDriver2D ()->DoubleBuffer (false);
   iTextureManager* txtmgr = pG3D->GetTextureManager ();
@@ -380,7 +385,7 @@ bool ceCswsEngineApp::Initialize ()
   // Change to other directory before doing Prepare()
   // because otherwise precalc_info file will be written into MazeD.zip
   // The /tmp dir is fine for this.
-  VFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
+  VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   VFS->ChDir ("/tmp");
 
   // Now prepare the engine
@@ -388,7 +393,7 @@ bool ceCswsEngineApp::Initialize ()
 
   txtmgr->SetPalette ();
 
-  Console = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_CONSOLE, iConsoleOutput);
+  Console = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_CONSOLE, iConsoleOutput);
   if (Console)
   {
     // Tell the console to shut up so that iSystem::Printf() won't clobber CSWS

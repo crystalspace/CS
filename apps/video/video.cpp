@@ -37,6 +37,8 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -83,8 +85,11 @@ bool Video::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  object_reg = GetObjectRegistry ();
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (this, iEngine);
+  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
@@ -92,14 +97,14 @@ bool Video::Initialize (int argc, const char* const argv[],
   }
 
   // Find the pointer to level loader plugin
-  LevelLoader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  myG3D = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
@@ -235,12 +240,12 @@ bool Video::Initialize (int argc, const char* const argv[],
 
   // load the videoformat plugin
   Printf (CS_MSG_INITIALIZATION, "Loading an iVideoFormat.\n");
-  pVideoFormat = CS_LOAD_PLUGIN (this,
+  pVideoFormat = CS_LOAD_PLUGIN (plugin_mgr,
     "crystalspace.video.format.avi", "VideoFormat", iStreamFormat);
 
   if (pVideoFormat)
   {
-    iVFS *pVFS = CS_QUERY_PLUGIN (this, iVFS);
+    iVFS *pVFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
     if (pVFS)
     {
       Printf (CS_MSG_INITIALIZATION, "Opening the video file.\n");
