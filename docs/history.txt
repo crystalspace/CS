@@ -64,7 +64,10 @@ chronological order.
 	  csStringArray.
 	- Jorrit moved const Get() and [] operator implementations to
 	  csArrayBase.
->>>>>>> 1.4591
+	- Eric Sunshine reverted Paul Garceau's CS_WCHAR_T_SIZE-related hack
+	  to csunicode.h which was addressing the symptom, rather than the
+	  cause.  We need to determine the actual problem (if there is one),
+	  and instead address that.
 3-Aug-2003
 	- Paul G. implemented a very nasty (and hopefully very temporary) hack
 	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for
