@@ -55,6 +55,7 @@ private:
   void FinishFrame ();
 
   iObjectRegistry* object_reg;
+  csRef<iVFS> vfs;
   csRef<iEngine> engine;
   csRef<iLoader> loader;
   csRef<iGraphics3D> g3d;

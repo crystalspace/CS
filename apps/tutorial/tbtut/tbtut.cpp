@@ -123,6 +123,12 @@ bool TerrBigTut::Initialize ()
     return false;
   }
 
+  if ((vfs = CS_QUERY_REGISTRY (object_reg, iVFS)) == NULL) {
+    Report (CS_REPORTER_SEVERITY_ERROR, 
+	  "Unable to initialize vfs");
+	return false;
+  }
+
   if ((vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock)) == NULL) {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Unable to initialize virtual clock");
@@ -241,7 +247,8 @@ bool TerrBigTut::Initialize ()
   }
   iMaterialWrapper *mat = engine->GetMaterialList()->FindByName ("heightmap");
   terrbigstate->SetMaterialsList (&mat, 1);
-  terrbigstate->LoadHeightMapFile ("./data/terrain/test.map");
+  csRef<iDataBuffer> path = vfs->GetRealPath ("/lev/terrain/test.map");
+  terrbigstate->LoadHeightMapFile ((char *)path->GetData());
   terrbigstate->SetScaleFactor (csVector3 (1.0, 10, 1.0));
 
   mesh->SetRenderPriority (engine->GetRenderPriority ("object"));
