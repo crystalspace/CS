@@ -294,20 +294,59 @@ bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
+
 bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for Sprite2D mesh");
-  paramsNode=0;
-  
+
+  if (obj)
+  {
+    csRef<iSprite2DFactoryState> spritefact = SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState);
+    csRef<iMeshObjectFactory> meshfact = SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+    if (!spritefact) return false;
+    if (!meshfact) return false;
+
+/*
+    //TBD: Writedown UVAnimation tag
+    for (int i=0; i<spritefact->GetUVAnimationCount(); i++)
+    {
+      iSprite2DUVAnimation* anim = spritefact->GetUVAnimation(i);
+      anim->GetName();
+      for (int j=0; j<anim->GetFrameCount(); j++)
+      {
+        iSprite2DUVAnimationFrame* frame = anim->GetFrame(j);
+
+      }
+    }
+*/
+    //Writedown Material tag
+    iMaterialWrapper* mat = spritefact->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
+
+    //Writedown Lighting tag
+    synldr->WriteBool(paramsNode, "lighting", spritefact->HasLighting(), true);
+
+    //Writedown Mixmode tag
+    int mixmode = spritefact->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+  }
   return true;
 }
-
 //---------------------------------------------------------------------------
 
 csSprite2DLoader::csSprite2DLoader (iBase* pParent)
@@ -500,17 +539,98 @@ bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
+
 bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for Sprite2D mesh");
-  paramsNode=0;
-  
+
+  if (obj)
+  {
+    csRef<iSprite2DState> sprite = SCF_QUERY_INTERFACE (obj, iSprite2DState);
+    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+    if (!sprite) return false;
+    if (!mesh) return false;
+
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
+      }    
+    }
+
+    //Writedown vertex tag
+    csColoredVertices vertex = sprite->GetVertices();
+    csColoredVertices::Iterator iter = vertex.GetIterator();
+    while (iter.HasNext())
+    {
+      csSprite2DVertex vertex = iter.Next();
+
+      csRef<iDocumentNode> vNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      vNode->SetValue("v");
+      vNode->SetAttributeAsFloat("x", vertex.pos.x);
+      vNode->SetAttributeAsFloat("x", vertex.pos.y);
+    }
+
+    //Writedown uv tag
+    iter.Reset();
+    while (iter.HasNext())
+    {
+      csSprite2DVertex vertex = iter.Next();
+
+      csRef<iDocumentNode> uvNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      uvNode->SetValue("uv");
+      uvNode->SetAttributeAsFloat("u", vertex.u);
+      uvNode->SetAttributeAsFloat("v", vertex.v);
+
+    }
+
+    //Writedown Material tag
+    iMaterialWrapper* mat = sprite->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
+
+    //Writedown color tag
+    iter.Reset();
+    while (iter.HasNext())
+    {
+      csSprite2DVertex vertex = iter.Next();
+
+      csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      colorNode->SetValue("color");
+      colorNode->SetAttributeAsFloat("red", vertex.color.red);
+      colorNode->SetAttributeAsFloat("green", vertex.color.green);
+      colorNode->SetAttributeAsFloat("blue", vertex.color.blue);
+    }
+
+    //Writedown Lighting tag
+    synldr->WriteBool(paramsNode, "lighting", sprite->HasLighting(), true);
+
+    //TBD: write down animate tag
+
+    //Writedown Mixmode tag
+    int mixmode = sprite->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+  }
   return true;
 }
-

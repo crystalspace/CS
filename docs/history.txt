@@ -27,6 +27,8 @@ chronological order.
 	  zip file extension. Don't really see why that is useful.
 	- Eric Sunshine eliminated a number of compilation warnings reported by
 	  gcc on Linux/PowerPC.
+	- PK implemented the SaverPlugin in spr2dmesh and fixed a bug in
+	  csSaver::SavePortals.
 10-Aug-2004
 	- PK implemented the csThingFactorySaver.
 	- Jorrit fixed a few places in CS where a reverse size_t loop was done

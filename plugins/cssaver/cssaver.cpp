@@ -419,13 +419,13 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
                                                          iPortalContainer);
     if (portal) 
     {
-/*
+
       //Create the Tag for the Portal
       csRef<iDocumentNode> meshNode = CreateNode(parent, "portal");
 
       for (int i=0; i<portal->GetPortalCount(); i++)
         if (!SavePortals(portal->GetPortal(i), meshNode)) return false;
-*/
+
       continue;
     }
 
@@ -513,7 +513,7 @@ bool csSaver::SavePortals(iPortal *portal, iDocumentNode *parent)
   {
     csRef<iDocumentNode> sectorNode = CreateNode(parent, "sector");
     const char* name = sector->QueryObject()->GetName();
-    if (name && *name) sectorNode->SetAttribute("name", name);
+    if (name && *name) sectorNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(name);
   }
 
   return true;
