@@ -382,8 +382,7 @@ void awsBarChart::OnDraw (csRect clip)
   }
 }
 
-void 
-awsBarChart::Push(BarItem &i, bool normal)
+void awsBarChart::Push(BarItem &i, bool normal)
 {
   if (items_buffer_size <= count_items+1)
   {
@@ -392,18 +391,18 @@ awsBarChart::Push(BarItem &i, bool normal)
     {
       if (!normal)
       {
-	// Leave zeroth hole open for new insert to front
-	memcpy(tmp+1, items, items_buffer_size*sizeof(BarItem));
-	tmp[0]=i;	
+        // Leave zeroth hole open for new insert to front
+        memcpy(tmp+1, items, items_buffer_size*sizeof(BarItem));
+        tmp[0]=i;	
       }
       else
       {
-	// Insert new item on back
-	memcpy(tmp, items, items_buffer_size*sizeof(BarItem));
-	tmp[count_items]=i;
+        // Insert new item on back
+        memcpy(tmp, items, items_buffer_size*sizeof(BarItem));
+        tmp[count_items]=i;
       }
 
-      delete items;
+      delete[] items;
       items=tmp;
       items_buffer_size+=16;
       count_items++;
@@ -417,17 +416,17 @@ awsBarChart::Push(BarItem &i, bool normal)
   else
   {
     if (!normal)
-      {
-	// Leave zeroth hole open for new insert to front
-	memmove(items+1, items, count_items*sizeof(BarItem));
-	items[0]=i;	
-	count_items++;
-      }
-      else
-      {
-	// Insert new item on back
-	items[count_items++]=i;
-      }
+    {
+      // Leave zeroth hole open for new insert to front
+      memmove(items+1, items, count_items*sizeof(BarItem));
+      items[0]=i;
+      count_items++;
+    }
+    else
+    {
+      // Insert new item on back
+      items[count_items++]=i;
+    }
   } // end else enough space
 }
 
