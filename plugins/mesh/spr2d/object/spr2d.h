@@ -48,8 +48,7 @@ protected:
   class uvAnimationControl
   {
   public:
-    uvAnimationControl (){animate=false;}
-    bool animate, loop, halted;
+    bool loop, halted;
     csTicks last_time;
     int frameindex, framecount, style, counter;
     iSprite2DUVAnimation *ani;
@@ -58,7 +57,7 @@ protected:
     const csVector2 *GetVertices (int &num);
   };
 
-  uvAnimationControl uvani;
+  uvAnimationControl* uvani;
 
 private:
   csRef<iMeshObjectFactory> ifactory;
@@ -75,8 +74,6 @@ private:
   float current_lod;
   uint32 current_features;
   csBox2 bbox_2d;
-  csMatrix3 o2t; // Cached LookAt() matrix
-  csVector3 cached_start;
 
   /**
    * Array of 3D vertices.
@@ -89,9 +86,6 @@ private:
    */
   bool lighting;
 
-  /// Temporary camera space vector between DrawTest() and Draw().
-  csVector3 cam;
-
   /**
    * Setup this object. This function will check if setup is needed.
    */
@@ -102,7 +96,7 @@ private:
 
   /// Check the start vector and recalculate the LookAt matrix if changed.
   void CheckBeam (const csVector3& start, const csVector3& plane,
-  	float dist_squared);
+  	float dist_squared, csMatrix3& o2t);
 
 public:
   /// Constructor.

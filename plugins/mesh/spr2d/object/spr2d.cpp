@@ -71,12 +71,13 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   shapenr = 0;
   current_lod = 1;
   current_features = 0;
-  o2t.Identity();
+  uvani = NULL;
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
+  delete uvani;
 }
 
 void csSprite2DMeshObject::SetupObject ()
@@ -126,12 +127,15 @@ void csSprite2DMeshObject::RemoveListener (iObjectModelListener *listener)
   listeners.Delete (idx);
 }
 
+static csVector3 cam;
+
 bool csSprite2DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
 
   // Camera transformation for the single 'position' vector.
-  cam = rview->GetCamera ()->GetTransform ().Other2This (movable->GetFullPosition ());
+  cam = rview->GetCamera ()->GetTransform ().Other2This (
+  	movable->GetFullPosition ());
   if (cam.z < SMALL_Z) return false;
   return true;
 }
@@ -346,7 +350,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
     g3dpolyfx.vertices [i].b = vertices [i].color.blue;
   }
 
-  if (!uvani.animate)
+  if (!uvani)
   {
     for (i = 0; i < vertices.Length (); i++)
     {
@@ -357,7 +361,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   else
   {
     int n;
-    const csVector2 *uv = uvani.GetVertices (n);
+    const csVector2 *uv = uvani->GetVertices (n);
     for (i = 0; i < n; i++)
     {
       g3dpolyfx.vertices [i].u = uv [i].x;
@@ -423,8 +427,8 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
 
 void csSprite2DMeshObject::NextFrame (csTicks current_time, const csVector3& /*pos*/)
 {
-  if (uvani.animate && !uvani.halted)
-    uvani.Advance (current_time);
+  if (uvani && !uvani->halted)
+    uvani->Advance (current_time);
 }
 
 void csSprite2DMeshObject::Particle::UpdateLighting (iLight** lights,
@@ -441,8 +445,8 @@ void csSprite2DMeshObject::Particle::Draw (iRenderView* rview,
 
   // Camera transformation for the single 'position' vector.
   csVector3 new_pos = transform.This2Other (part_pos);
-  scfParent->cam = rview->GetCamera ()->GetTransform ().Other2This (new_pos);
-  if (scfParent->cam.z < SMALL_Z) return;
+  cam = rview->GetCamera ()->GetTransform ().Other2This (new_pos);
+  if (cam.z < SMALL_Z) return;
   scfParent->Draw (rview, NULL, mode);
 }
 
@@ -496,54 +500,55 @@ void csSprite2DMeshObject::Sprite2DState::SetUVAnimation (const char *name,
     iSprite2DUVAnimation *ani = scfParent->factory->GetUVAnimation (name);
     if (ani && ani->GetFrameCount ())
     {
-      scfParent->uvani.animate = true;
-      scfParent->uvani.ani = ani;
-      scfParent->uvani.last_time = 0;
-      scfParent->uvani.frameindex = 0;
-      scfParent->uvani.framecount = ani->GetFrameCount ();
-      scfParent->uvani.frame = ani->GetFrame (0);
-      scfParent->uvani.style = style;
-      scfParent->uvani.counter = 0;
-      scfParent->uvani.loop = loop;
-      scfParent->uvani.halted = false;
+      scfParent->uvani = new uvAnimationControl ();
+      scfParent->uvani->ani = ani;
+      scfParent->uvani->last_time = 0;
+      scfParent->uvani->frameindex = 0;
+      scfParent->uvani->framecount = ani->GetFrameCount ();
+      scfParent->uvani->frame = ani->GetFrame (0);
+      scfParent->uvani->style = style;
+      scfParent->uvani->counter = 0;
+      scfParent->uvani->loop = loop;
+      scfParent->uvani->halted = false;
     }
   }
   else
   {
     // stop animation and show the normal texture
-    scfParent->uvani.animate = false;
+    delete scfParent->uvani;
+    scfParent->uvani = NULL;
   }
 }
 
 void csSprite2DMeshObject::Sprite2DState::StopUVAnimation (int idx)
 {
-  if (scfParent->uvani.animate)
+  if (scfParent->uvani)
   {
     if (idx != -1)
     {
-      scfParent->uvani.frameindex = MIN(MAX(idx, 0),
-      	scfParent->uvani.framecount-1);
-      scfParent->uvani.frame = scfParent->uvani.ani->GetFrame (
-      	scfParent->uvani.frameindex);
+      scfParent->uvani->frameindex = MIN(MAX(idx, 0),
+      	scfParent->uvani->framecount-1);
+      scfParent->uvani->frame = scfParent->uvani->ani->GetFrame (
+      	scfParent->uvani->frameindex);
     }
-    scfParent->uvani.halted = true;
+    scfParent->uvani->halted = true;
   }
 }
 
 void csSprite2DMeshObject::Sprite2DState::PlayUVAnimation (int idx, int style, bool loop)
 {
-  if (scfParent->uvani.animate)
+  if (scfParent->uvani)
   {
     if (idx != -1)
     {
-      scfParent->uvani.frameindex = MIN(MAX(idx, 0), scfParent->uvani.framecount-1);
-      scfParent->uvani.frame = scfParent->uvani.ani->GetFrame (scfParent->uvani.frameindex);
+      scfParent->uvani->frameindex = MIN(MAX(idx, 0), scfParent->uvani->framecount-1);
+      scfParent->uvani->frame = scfParent->uvani->ani->GetFrame (scfParent->uvani->frameindex);
     }
-    scfParent->uvani.halted = false;
-    scfParent->uvani.counter = 0;
-    scfParent->uvani.last_time = 0;
-    scfParent->uvani.loop = loop;
-    scfParent->uvani.style = style;
+    scfParent->uvani->halted = false;
+    scfParent->uvani->counter = 0;
+    scfParent->uvani->last_time = 0;
+    scfParent->uvani->loop = loop;
+    scfParent->uvani->style = style;
   }
 }
 
@@ -658,7 +663,7 @@ const csVector2 *csSprite2DMeshObject::uvAnimationControl::GetVertices (int &num
 // of its bounding box can be hit (if at all).
 
 void csSprite2DMeshObject::CheckBeam (const csVector3& start,
-      const csVector3& pl, float sqr)
+      const csVector3& pl, float sqr, csMatrix3& o2t)
 {
   // This method is an optimized version of LookAt() based on
   // the presumption that the up vector is always (0,1,0).
@@ -668,8 +673,6 @@ void csSprite2DMeshObject::CheckBeam (const csVector3& start,
   // The transformation matrix is stored and used again if the
   // start vector for the beam is in the same position. MHV.
 
-  if (start == cached_start) return;
-  cached_start.Set (start);
   csVector3 pl2 = pl * qisqrt (sqr);
   csVector3 v1( pl2.z, 0, -pl2.x);
   sqr = v1*v1;
@@ -691,7 +694,8 @@ bool csSprite2DMeshObject::HitBeamOutline(const csVector3& start,
   float dist;
   csIntersect3::Plane(start, end, pl, 0, isect, dist);
   if (pr) *pr = dist;
-  CheckBeam (start, pl, sqr);
+  csMatrix3 o2t;
+  CheckBeam (start, pl, sqr, o2t);
   csVector3 r = o2t * isect;
   int trail, len = vertices.Length();
   trail = len - 1;
