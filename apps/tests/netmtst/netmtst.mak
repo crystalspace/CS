@@ -31,7 +31,7 @@ vpath %.cpp apps/tests/netmtst
 NETMANTEST.EXE = netmtst$(EXE)
 SRC.NETMANTEST = $(wildcard apps/tests/netmtst/*.cpp)
 OBJ.NETMANTEST = $(addprefix $(OUT)/,$(notdir $(SRC.NETMANTEST:.cpp=$O)))
-DEP.NETMANTEST = NETMAN CSTOOL CSUTIL CSSYS
+DEP.NETMANTEST = CSTOOL CSUTIL CSSYS
 LIB.NETMANTEST = $(foreach d,$(DEP.NETMANTEST),$($d.LIB))
 
 MSVC.DSP += NETMANTEST

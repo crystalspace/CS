@@ -33,7 +33,7 @@ vpath %.cpp apps/tests/perl5tst
 PERL5TEST.EXE = perl5tst$(EXE)
 SRC.PERL5TEST = $(wildcard apps/tests/perl5tst/*.cpp)
 OBJ.PERL5TEST = $(addprefix $(OUT)/,$(notdir $(SRC.PERL5TEST:.cpp=$O)))
-DEP.PERL5TEST = CSPERL5 CSTOOL CSUTIL CSSYS
+DEP.PERL5TEST = CSTOOL CSUTIL CSSYS
 LIB.PERL5TEST = $(foreach d,$(DEP.PERL5TEST),$($d.LIB))
 
 MSVC.DSP += PERL5TEST

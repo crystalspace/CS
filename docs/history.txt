@@ -24,6 +24,8 @@ The history order is reversed so that new features are at the top.
 	  plugins/mesh/thing/persist/impexp
 	- Matze removed comments about 8.3 filenames from CS docs. Even djgpp
 	  (which isn't supported anymore) was able to use long names in win9x.
+	- Matze removed invalid dependencies from netmtest and perl5tst
+	  makefiles.
 19-Feb-2003
 	- Mårten Svanfeldt fixed a bug introduced when adding the new
 	  light-parameters for the new renderer due to a missing
