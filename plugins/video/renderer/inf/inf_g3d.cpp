@@ -51,12 +51,11 @@ IMPLEMENT_IBASE (csGraphics3DInfinite)
   IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
 
-csGraphics3DInfinite::csGraphics3DInfinite (iBase *iParent) : G2D (NULL)
+csGraphics3DInfinite::csGraphics3DInfinite (iBase *iParent) :
+  G2D (NULL), config (NULL)
 {
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
-
-  config = new csIniFile ("inf3d.cfg");
 
   clipper = NULL;
   texman = NULL;
@@ -99,6 +98,10 @@ csGraphics3DInfinite::~csGraphics3DInfinite ()
 bool csGraphics3DInfinite::Initialize (iSystem *iSys)
 {
   System = iSys;
+
+  iVFS* v = System->GetVFS();
+  config = new csIniFile (v, "/config/inf3d.cfg");
+  v->DecRef(); v = NULL;
 
   width = height = -1;
 

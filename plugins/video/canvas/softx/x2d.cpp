@@ -762,7 +762,7 @@ void csGraphics2DXLib::recompute_grey_palette ()
   CsPrintf (MSG_DEBUG_0, "Done!\n");
 }
 
-bool csGraphics2DXLib::PerformExtension (char* args)
+bool csGraphics2DXLib::PerformExtension (const char* args)
 {
   if (!strcasecmp (args, "sim_pal"))
   {

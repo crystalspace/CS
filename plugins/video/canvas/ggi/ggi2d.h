@@ -29,7 +29,7 @@
 class csGraphics2DGGI : public csGraphics2D
 {
   ///
-  virtual bool PerformExtension (char* args);
+  virtual bool PerformExtension (const char* args);
 
 private:
   ggi_visual_t vis;

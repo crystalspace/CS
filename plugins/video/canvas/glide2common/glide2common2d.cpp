@@ -66,7 +66,9 @@ bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
   // see if we need to go fullscreen or not...
-  csIniFile* config = new csIniFile("cryst.cfg");
+  iVFS* v = pSystem->GetVFS();
+  csIniFile* config = new csIniFile(v, "/config/cryst.cfg");
+  v->DecRef(); v = NULL;
   m_DoGlideInWindow = (!config->GetYesNo("VideoDriver","FullScreen",FALSE));
   CHK (delete config);
   

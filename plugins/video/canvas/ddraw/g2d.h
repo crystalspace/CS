@@ -43,7 +43,7 @@ public:
   
   virtual void SetRGB(int i, int r, int g, int b);
 
-  virtual bool PerformExtension (char *args);
+  virtual bool PerformExtension (const char *args);
 	
   virtual bool Initialize (iSystem *pSystem);
 

@@ -97,7 +97,7 @@ bool WalkTest::move_3d = false;
 WalkTest::WalkTest () :
   SysSystemDriver (), pos (0, 0, 0), velocity (0, 0, 0)
 {
-  extern bool CommandHandler (char *cmd, char *arg);
+  extern bool CommandHandler (const char *cmd, const char *arg);
   Command::ExtraHandler = CommandHandler;
   auto_script = NULL;
   layer = NULL;
@@ -1150,14 +1150,14 @@ int main (int argc, char* argv[])
 
   // Initialize the main system. This will load all needed plugins
   // (3D, 2D, network, sound, ..., engine) and initialize them.
-  if (!Sys->Initialize (argc, argv, "cryst.cfg"))
+  if (!Sys->Initialize (argc, argv, "/config/cryst.cfg"))
   {
     Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
     fatal_exit (-1, false);
   }
 
   // Start the 'autoexec.cfg' script and fully execute it.
-  Command::start_script ("autoexec.cfg");
+  Command::start_script ("/config/autoexec.cfg");
   char cmd_buf[512];
   while (Command::get_script_line (cmd_buf, 511))
     Command::perform_line (cmd_buf);

@@ -330,7 +330,7 @@ are the files which contain the maps and rooms which you can explore with
 WalkTest and edit with MazeD, the Crystal Space map (or ``maze'') editor.
 
 Before running the demonstration programs for the first time, you should
-locate the file @file{cryst.cfg} in the top-level @file{CS} directory.  This
+locate the file @file{cryst.cfg} in the @file{CS/data/config} directory.  This
 file contains parameters which control Crystal Space's environment.
 
 By default, the overall ambient light level specified in @file{cryst.cfg} is

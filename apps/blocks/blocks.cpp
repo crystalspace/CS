@@ -2724,7 +2724,7 @@ const char* Blocks::KeyName (const KeyMapping& map)
 
 void Blocks::ReadConfig ()
 {
-  csIniFile keys ("blocks.cfg");
+  csIniFile keys (Sys->VFS, "/config/blocks.cfg");
   NamedKey (keys.GetStr ("Keys", "UP", "up"), key_up);
   NamedKey (keys.GetStr ("Keys", "DOWN", "down"), key_down);
   NamedKey (keys.GetStr ("Keys", "LEFT", "left"), key_left);
@@ -2764,7 +2764,7 @@ void Blocks::ReadConfig ()
 
 void Blocks::WriteConfig ()
 {
-  csIniFile keys ("blocks.cfg");
+  csIniFile keys (Sys->VFS, "/config/blocks.cfg");
   keys.SetStr ("Keys", "UP", KeyName (key_up));
   keys.SetStr ("Keys", "DOWN", KeyName (key_down));
   keys.SetStr ("Keys", "LEFT", KeyName (key_left));
@@ -2800,7 +2800,7 @@ void Blocks::WriteConfig ()
 	  keys.SetStr ("HighScores", key, highscores[level][size-3].GetName (i));
         }
     }
-  keys.SaveIfDirty ("blocks.cfg");
+  keys.SaveIfDirty (Sys->VFS, "/config/blocks.cfg");
 }
 
 
@@ -2956,7 +2956,7 @@ int main (int argc, char* argv[])
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!Sys->Initialize (argc, argv, "blocks.cfg"))
+  if (!Sys->Initialize (argc, argv, "/config/blocks.cfg"))
   {
     Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();

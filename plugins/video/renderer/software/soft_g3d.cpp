@@ -121,12 +121,11 @@ IMPLEMENT_IBASE (csGraphics3DSoftware)
   IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
 
-csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
+csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) :
+  G2D (NULL), config (NULL)
 {
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
-
-  config = new csIniFile ("soft3d.cfg");
 
   tcache = NULL;
   texman = NULL;
@@ -178,6 +177,10 @@ csGraphics3DSoftware::~csGraphics3DSoftware ()
 bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 {
   (System = iSys)->IncRef ();
+
+  iVFS* v = System->GetVFS();
+  config = new csIniFile (v, "/config/soft3d.cfg");
+  v->DecRef(); v = NULL;
 
   width = height = -1;
 

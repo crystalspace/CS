@@ -375,12 +375,12 @@ int csGraphics3DGlide2x::SelectBoard(GrHwConfiguration & hwconfig)
 csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
     m_pTextureCache(NULL),
     m_pLightmapCache(NULL),
-    m_pAlphamapCache(NULL)
+    m_pAlphamapCache(NULL),
+    config(NULL)
 {
   CONSTRUCT_IBASE (iParent);
 
   m_piSystem = NULL;
-  config = new csIniFile ("glide2x.cfg");
   m_pCamera = NULL;
   m_thTex = NULL;
   m_verts = NULL;
@@ -445,6 +445,10 @@ bool csGraphics3DGlide2x::Initialize (iSystem *iSys)
   (m_piSystem = iSys)->IncRef ();
 
   SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide2x selected\n");
+
+  iVFS* v = m_piSystem->GetVFS();
+  config = new csIniFile (v, "/config/glide2x.cfg");
+  v->DecRef(); v = NULL;
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D_DRIVER, NULL, iGraphics2D);
   if (!m_piG2D)

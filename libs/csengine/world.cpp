@@ -1564,6 +1564,7 @@ iThing *csWorld::CreateThing (const char *iName, iSector *iParent)
   csThing *thing = new csThing ();
   thing->SetName (iName);
   thing->SetSector (iParent->GetPrivateObject ());
-  thing->IncRef ();
-  return QUERY_INTERFACE (thing, iThing);
+  iThing* p = QUERY_INTERFACE (thing, iThing);
+  thing->DecRef ();
+  return p;
 }

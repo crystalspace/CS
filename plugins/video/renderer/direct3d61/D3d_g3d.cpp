@@ -266,6 +266,7 @@ csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6 (iBase *iParent) :
   m_pTextureCache(NULL),
   m_piSystem(NULL),
   m_bVerbose(true),
+  config(NULL),
   m_nHeight(0),
   m_nHalfHeight(0),
   m_nWidth(0),
@@ -300,8 +301,6 @@ csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6 (iBase *iParent) :
   rstate_mipmap = true;
 
   m_gouraud = true;
-
-  config = new csIniFile("Direct3DDX6.cfg");
 }
 
 csGraphics3DDirect3DDx6::~csGraphics3DDirect3DDx6()
@@ -320,6 +319,10 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
   m_piSystem->IncRef ();
 
   SysPrintf (MSG_INITIALIZATION, "\nDirect3DRender DX6.1 selected\n");
+
+  iVFS* v = m_piSystem->GetVFS();
+  config = new csIniFile(v, "/config/direct3ddx6.cfg");
+  v->DecRef(); v = NULL;
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, "crystalspace.graphics2d.direct3d.dx61", NULL, iGraphics2D);
   if (!m_piG2D)

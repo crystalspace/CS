@@ -296,7 +296,7 @@ csPolygonInt* csPolygonSet::GetPolygonInt (int idx)
   return (csPolygonInt*)GetPolygon3D (idx);
 }
 
-csPolygon3D* csPolygonSet::GetPolygon3D (char* name)
+csPolygon3D* csPolygonSet::GetPolygon3D (const char* name)
 {
   int idx = polygons.FindKey (name);
   return idx >= 0 ? polygons.Get (idx) : NULL;

@@ -290,7 +290,7 @@ public:
   { return polygons.Get (idx); }
 
   /// Get the named polygon from this set.
-  csPolygon3D *GetPolygon3D (char* name);
+  csPolygon3D *GetPolygon3D (const char* name);
 
   /// Get the entire array of polygons.
   csPolygonArray& GetPolygonArray () { return polygons; }

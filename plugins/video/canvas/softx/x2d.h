@@ -120,7 +120,7 @@ public:
   bool AllocateMemory ();
 
   /// Extensions for X11 port.
-  virtual bool PerformExtension (char* args);
+  virtual bool PerformExtension (const char* args);
 
   /// Set mouse position.
   virtual bool SetMousePosition (int x, int y);

@@ -4,6 +4,25 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine re-enabled -kb flag and re-added CRLF line terminators
 	  for all .dsp files so that they will work even from CVS snapshot
 	  which is created on a Unix machine.
+	- Eric Sunshine made the following configuration file-related changes:
+	    - All Crystal Space application and plug-in configuration files
+	      are now loaded from virtual filesystems via VFS rather than the
+	      physical filesystem, with the exception of scf.cfg and vfs.cfg
+	      which can not be loaded from VFS for (hopefully) obvious
+	      reasons.  (scf.cfg is needed to initialize SCF which is used to
+	      load the VFS plug-in, and vfs.cfg is used to actually define the
+	      VFS volumes.)
+	    - Moved all configuration files onto the VFS volume /config which
+	      happens to be mounted at physical location CS/data/config.  Note
+	      that using the /config volume is a convenience, rather than a
+	      requirement.  Programs written using Crystal Space can choose to
+	      locate their own configuration files anywhere they like; even on
+	      a physical filesystem, if desired (though this is frowned upon).
+	- Eric Sunshine modified WalkTest so that script files which it
+	  executes are now loaded from VFS rather than from a physical
+	  filesystem.
+	- Eric Sunshine fixed a lot more 'const' problems throughout the
+	  project.  Most of these involved changing (char*) to (const char*).
 7-May-2000
 	- More work on PVS. Still not working properly though.
 	- Started working on saving and loading of octree and PVS.

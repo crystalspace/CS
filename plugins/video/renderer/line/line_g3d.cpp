@@ -64,12 +64,10 @@ IMPLEMENT_IBASE (csGraphics3DLine)
   IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
 
-csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
+csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL), config (NULL)
 {
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
-
-  config = new csIniFile ("line3d.cfg");
 
   clipper = NULL;
   texman = NULL;
@@ -96,6 +94,10 @@ csGraphics3DLine::~csGraphics3DLine ()
 bool csGraphics3DLine::Initialize (iSystem *iSys)
 {
   System = iSys;
+
+  iVFS* v = System->GetVFS();
+  config = new csIniFile (v, "/config/line3d.cfg");
+  v->DecRef(); v = NULL;
 
   width = height = -1;
 

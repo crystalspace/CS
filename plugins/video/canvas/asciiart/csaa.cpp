@@ -64,7 +64,9 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  config = new csIniFile ("asciiart.cfg");
+  iVFS* v = pSystem->GetVFS();
+  config = new csIniFile (v, "/config/asciiart.cfg");
+  v->DecRef(); v = NULL;
 
   // Load settings from config file and setup the aa_defparams structure
   HardwareCursor = System->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);

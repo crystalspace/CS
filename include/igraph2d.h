@@ -236,7 +236,7 @@ struct iGraphics2D : public iPlugIn
   * This is probably not the good way to do this but I see no other
   * way currently.
   */
-  virtual bool PerformExtension (char *args) = 0;
+  virtual bool PerformExtension (const char *args) = 0;
 
  /**
   * Return the number of bytes for every pixel.

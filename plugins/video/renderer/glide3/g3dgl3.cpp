@@ -208,12 +208,12 @@ void csGraphics3DGlide3x::InitializeBoard( const char* szHW )
 csGraphics3DGlide3x::csGraphics3DGlide3x(iBase* iParent) :
     m_pTextureCache(NULL),
     m_pLightmapCache(NULL),
-    m_pAlphamapCache(NULL)
+    m_pAlphamapCache(NULL),
+    config(NULL)
 {
   CONSTRUCT_IBASE (iParent);
 
   m_piSystem = NULL;
-  config = new csIniFile ("Glide3x.cfg");
   m_pCamera = NULL;
   m_thTex = NULL;
   m_verts = NULL;
@@ -286,6 +286,10 @@ bool csGraphics3DGlide3x::Initialize (iSystem *iSys)
   (m_piSystem = iSys)->IncRef ();
 
   SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide3x selected\n");
+
+  iVFS* v = m_piSystem->GetVFS();
+  config = new csIniFile (v, "/config/glide3x.cfg");
+  v->DecRef(); v = NULL;
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D_DRIVER_V3, NULL, iGraphics2D);
   if (!m_piG2D)

@@ -362,6 +362,8 @@ public:
   virtual void StartShutdown ();
   /// check if system is shutting down
   virtual bool GetShutdown ();
+  /// Get a VFS implementation if available
+  virtual iVFS* GetVFS () const;
   /// Get a integer configuration value
   virtual int ConfigGetInt (const char *Section, const char *Key, int Default = 0);
   /// Get a string configuration value

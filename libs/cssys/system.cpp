@@ -37,6 +37,7 @@
 #include "iconfig.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
+#define VFS_ID "VFS:"
 
 // The global system variable
 csSystemDriver *System = NULL;
@@ -351,20 +352,43 @@ csSystemDriver::~csSystemDriver ()
 
 bool csSystemDriver::Initialize (int argc, const char* const argv[], const char *iConfigName)
 {
+  // Initialize Shared Class Facility
+  csIniFile scfconfig ("scf.cfg");
+  scfInitialize (&scfconfig);
+
+  // @@@ This is ugly.  We need a better, more generalized way of doing this.
+  // Hard-coding the name of the VFS plugin (crytalspace.kernel.vfs) is bad.
+  // Then later ensuring that we skip over this same plugin when requested
+  // by the client is even uglier.  The reason that the VFS plugin is required
+  // this early is that both the application configuration file and the
+  // configuration file for other plugins may (and almost always do) reside on
+  // a VFS volume.
+  Config = new csIniFile;
+  VFS = (iVFS*)LoadPlugIn("crystalspace.kernel.vfs", CS_FUNCID_VFS, "iVFS", 0);
+  if (VFS)
+    VFS->IncRef();
+
   // Initialize configuration file
   if (iConfigName)
-    CHKB (Config = new csIniFile (ConfigName = strnew (iConfigName)))
-  else
-    CHKB (Config = new csIniFile ());
+  {
+    const char* vol = NULL;
+    if (VFS && Config->Load (VFS, iConfigName))
+      vol = VFS_ID;
+    else if (Config->Load (iConfigName))
+      vol = "";
+    if (vol != NULL)
+    {
+      ConfigName = new char[strlen(iConfigName) + strlen(vol) + 1];
+      sprintf(ConfigName, "%s%s", vol, iConfigName);
+    }
+    else
+      Printf (MSG_WARNING,
+	"WARNING: Failed to load configuration file `%s'\n", iConfigName);
+  }
 
   Mouse.SetDoubleClickTime (
     ConfigGetInt ("MouseDriver", "DoubleClickTime", 300),
     ConfigGetInt ("MouseDriver", "DoubleClickDist", 2));
-
-  // Initialize Shared Class Facility
-  csIniFile *scfconfig = new csIniFile ("scf.cfg");
-  scfInitialize (scfconfig);
-  delete scfconfig;
 
   // Collect all options from command line
   CollectOptions (argc, argv);
@@ -408,13 +432,15 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   for (n = 0; n < ConfigList.Length (); n++)
   {
     const char *funcID = ConfigList.Get (n);
+    // If plugin is VFS then skip if already loaded earlier
+    if (VFS && strcmp (funcID, CS_FUNCID_VFS) == 0)
+      continue;
     // If -video was used to override 3D driver, then respect it.
-    if (!g3d_override || strcmp (funcID, CS_FUNCID_VIDEO))
-    {
-      const char *classID = Config->GetStr ("PlugIns", funcID);
-      if (classID)
-        PluginList.Push (new csPluginLoadRec (funcID, classID));
-    }
+    if (g3d_override && strcmp (funcID, CS_FUNCID_VIDEO) == 0)
+      continue;
+    const char *classID = Config->GetStr ("PlugIns", funcID);
+    if (classID)
+      PluginList.Push (new csPluginLoadRec (funcID, classID));
   }
   ConfigList.DeleteAll ();
 
@@ -434,7 +460,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   }
 
   /// Now find the drivers that are known by the system driver
-  VFS = QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
+  if (!VFS)
+    VFS = QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
   G3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (G3D) (G2D = G3D->GetDriver2D ())->IncRef ();
   Sound = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
@@ -972,6 +999,12 @@ bool csSystemDriver::GetShutdown ()
   return Shutdown;
 }
 
+iVFS* csSystemDriver::GetVFS () const
+{
+  VFS->IncRef();
+  return VFS;
+}
+
 int csSystemDriver::ConfigGetInt (const char *Section, const char *Key, int Default)
 {
   return Config->GetInt (Section, Key, Default);
@@ -1009,7 +1042,11 @@ bool csSystemDriver::ConfigSetFloat (const char *Section, const char *Key, float
 
 bool csSystemDriver::ConfigSave ()
 {
-  return ConfigName ? Config->SaveIfDirty (ConfigName) : false;
+  if (!ConfigName) return false;
+  if (strncmp(VFS_ID, ConfigName, sizeof(VFS_ID) - 1) == 0)
+    return Config->SaveIfDirty (VFS, ConfigName + sizeof(VFS_ID) - 1);
+  else
+    return Config->SaveIfDirty (ConfigName);
 }
 
 void csSystemDriver::QueueKeyEvent (int iKeyCode, bool iDown)

@@ -180,8 +180,9 @@ configuration information.
 
 @item NeXTMenu.cfg
 An @sc{ini}-style configuration file which defines a menu layout appropriate
-to the platform.  Actually located in the root Crystal Space directory,
-@file{CS}.
+to the platform.  This file is actually located in the virtual directory
+@file{/config/}, which is typically mounted at the physical location
+@file{CS/data/config}.
 
 @item NeXTTime.cpp
 Platform-specific implementation of @code{csSystemDriver::Time()} which works

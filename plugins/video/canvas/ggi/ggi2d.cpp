@@ -308,7 +308,7 @@ void csGraphics2DGGI::SetRGB(int i, int r, int g, int b)
   csGraphics2D::SetRGB (i, r, g, b);
 }
 
-bool csGraphics2DGGI::PerformExtension(char* args)
+bool csGraphics2DGGI::PerformExtension(const char* args)
 {
   (void) args;
 

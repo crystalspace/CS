@@ -587,7 +587,7 @@ void csGraphics2DDDraw3::SetFor3D(bool For3D)
   m_bUses3D = For3D;
 }
 
-bool csGraphics2DDDraw3::PerformExtension (char *args)
+bool csGraphics2DDDraw3::PerformExtension (const char *args)
 {
 	csString ext(args);
 

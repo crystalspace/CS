@@ -177,14 +177,14 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
 
 //===========================================================================
 
-float safe_atof (char* arg)
+float safe_atof (const char* arg)
 {
   if (arg) return atof (arg);
   else return 1;
 }
 
 //--//--//--//--//--//--//--//--//--//--//-- Handle our additional commands --//
-bool CommandHandler (char *cmd, char *arg)
+bool CommandHandler (const char *cmd, const char *arg)
 {
   if (!strcasecmp (cmd, "help"))
   {
@@ -225,7 +225,7 @@ bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "bind"))
   {
-    extern void bind_key (char* arg);
+    extern void bind_key (const char* arg);
     bind_key (arg);
   }
   else if (!strcasecmp (cmd, "fclear"))
@@ -697,7 +697,7 @@ bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "map"))
   {
-    char* choices[4] = { "off", "overlay", "on", NULL };
+    const char* const choices[4] = { "off", "overlay", "on", NULL };
     Command::change_choice (arg, &Sys->map_mode, "map", choices, 3);
   }
   else if (!strcasecmp (cmd, "snd_play"))

@@ -99,7 +99,9 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
 
   SysPrintf (MSG_INITIALIZATION, "\nRender = %d\n",m_piSoundRender);
 
-  configwodrv = new csIniFile ("wodrv.cfg");
+  iVFS* v = m_piSystem->GetVFS();
+  configwodrv = new csIniFile (v, "/config/wodrv.cfg");
+  v-DecRef(); v = NULL;
 
   MMRESULT res;
   WAVEFORMATEX format;

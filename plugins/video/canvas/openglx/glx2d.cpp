@@ -56,7 +56,9 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
     return false;
   }
 
-  csIniFile *config = new csIniFile( "opengl.cfg" );
+  iVFS* v = pSystem->GetVFS();
+  csIniFile *config = new csIniFile(v,  "/config/opengl.cfg" );
+  v->DecRef(); v = NULL;
   
   dispdriver = NULL;
   const char *strDriver;

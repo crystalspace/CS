@@ -478,7 +478,7 @@ bool csGraphics2D::SetMouseCursor (csMouseCursorID iShape)
   return (iShape == csmcArrow);
 }
 
-bool csGraphics2D::PerformExtension (char* args)
+bool csGraphics2D::PerformExtension (const char* args)
 {
   (void)args;
   return false;

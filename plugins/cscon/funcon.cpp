@@ -299,7 +299,7 @@ void funConsole::GetPosition(int &x, int &y, int &width, int &height) const
 
 void funConsole::LoadPix()
 {
-  csIniFile *ini = new csIniFile( "funcon.cfg" );
+  csIniFile *ini = new csIniFile( piVFS, "/config/funcon.cfg" );
   const char* dir = ini->GetStr( "funcon", "zip" );
   const char* mountdir = ini->GetStr( "funcon", "mount" );
   if ( piVFS->Mount( mountdir, dir ) )

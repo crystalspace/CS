@@ -60,7 +60,7 @@ csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVe
 // Everything for key mapping and binding.
 //===========================================================================
 
-void map_key (char* keyname, csKeyMap* map)
+void map_key (const char* keyname, csKeyMap* map)
 {
   map->shift = 0;
   map->alt = 0;
@@ -169,7 +169,7 @@ char* keyname (csKeyMap* map)
   return buf;
 }
 
-csKeyMap* find_mapping (char* keyname)
+csKeyMap* find_mapping (const char* keyname)
 {
   csKeyMap map;
   map_key (keyname, &map);
@@ -185,7 +185,7 @@ csKeyMap* find_mapping (char* keyname)
   return NULL;
 }
 
-void bind_key (char* arg)
+void bind_key (const char* arg)
 {
   if (!arg)
   {

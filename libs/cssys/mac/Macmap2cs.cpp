@@ -60,7 +60,7 @@ int main( int argc, char *argv[ ])
     return 1;
   } 
 
-  const char* configfile = "map2cs.cfg";
+  const char* configfile = "data/config/map2cs.cfg";
   if (argc==4)
   {
     configfile = argv[3];

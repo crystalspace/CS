@@ -78,18 +78,20 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : m_pListener(NULL)
 
 bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 {
-	configsndsoft = new csIniFile ("sndsoft.cfg");
+	if ( iSys == NULL )
+		return false;
+
+	m_piSystem = iSys;
+
+	iVFS* v = m_piSystem->GetVFS();
+	configsndsoft = new csIniFile (v, "/config/sndsoft.cfg");
+	v->DecRef(); v = NULL;
 	
 #ifdef SOUND_DRIVER
 	char *szSoundDriver = SOUND_DRIVER;	// "crystalspace.sound.driver.xxx"
 #else
 	char *szSoundDriver = "crystalspace.sound.driver.null";
 #endif
-
-	if ( iSys == NULL )
-		return false;
-
-	m_piSystem = iSys;
 
 	m_piSoundDriver = LOAD_PLUGIN (iSys, szSoundDriver, NULL, iSoundDriver);
   

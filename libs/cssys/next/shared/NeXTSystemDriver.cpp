@@ -66,12 +66,17 @@ void* NeXTSystemDriver::QueryInterface( char const*iInterfaceID, int iVersion )
 bool NeXTSystemDriver::Initialize( int argc, char const* const argv[],
     char const* cfgfile )
     {
-    next_config = new csIniFile( "next.cfg" );
+    bool ok = false;
     init_system();
-    init_menu();
     init_ticks();
     initialized = true;
-    return superclass::Initialize( argc, argv, cfgfile );
+    if (superclass::Initialize( argc, argv, cfgfile ))
+	{
+	next_config = new csIniFile( VFS, "/config/next.cfg" );
+	init_menu();
+	ok = true;
+	}
+    return ok;
     }
 
 

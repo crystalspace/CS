@@ -114,7 +114,8 @@ IMPLEMENT_IBASE_END
  Method implementations
 =========================================================================*/
 
-csGraphics3DOpenGL::csGraphics3DOpenGL (iBase * iParent):G2D (NULL), System (NULL)
+csGraphics3DOpenGL::csGraphics3DOpenGL (iBase * iParent):
+  G2D (NULL), config (NULL), System (NULL)
 {
   CONSTRUCT_IBASE (iParent);
 
@@ -129,8 +130,6 @@ csGraphics3DOpenGL::csGraphics3DOpenGL (iBase * iParent):G2D (NULL), System (NUL
   m_fogtexturehandle = 0;
   dbg_max_polygons_to_draw = 2000000000;	// After 2 billion
   // polygons we give up :-)
-
-  config = new csIniFile ("opengl.cfg");
 
   Caps.CanClip = false;
   Caps.minTexHeight = 2;
@@ -158,6 +157,10 @@ csGraphics3DOpenGL::~csGraphics3DOpenGL ()
 bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
 {
   (System = iSys)->IncRef ();
+
+  iVFS* v = System->GetVFS();
+  config = new csIniFile (v, "/config/opengl.cfg");
+  v->DecRef(); v = NULL;
 
   G2D = LOAD_PLUGIN (System, OPENGL_2D_DRIVER, NULL, iGraphics2D);
   if (!G2D)

@@ -6,7 +6,9 @@
 Most applications have an accompanying configuration file which describes
 configuration options particular to that application.  In other cases, a
 configuration file may be specific to a particular plug-in module or device
-driver.  Configuration files are named with the file extension @file{.cfg}.
+driver.  Configuration files are named with the file extension @file{.cfg}
+and are typically located within the virtual directory @file{/config/} which
+is most usually mounted at the physical location @file{CS/data/config}.
 
 @menu
 * Config Common:: Common Configuration Options

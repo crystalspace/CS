@@ -168,6 +168,7 @@ csGraphics3DDirect3DDx5::csGraphics3DDirect3DDx5(iBase* iParent) :
   m_pTextureCache(NULL),
   m_piSystem(NULL),
   m_bVerbose(true),
+  config(NULL),
   m_pClipper(NULL)
 {
   CONSTRUCT_IBASE (iParent);
@@ -195,7 +196,6 @@ csGraphics3DDirect3DDx5::csGraphics3DDirect3DDx5(iBase* iParent) :
   rstate_mipmap = true;
 
   m_gouraud = true;
-  config = new csIniFile ("Direct3DDX5.cfg");
 }
 
 csGraphics3DDirect3DDx5::~csGraphics3DDirect3DDx5 ()
@@ -214,6 +214,10 @@ bool csGraphics3DDirect3DDx5::Initialize (iSystem *iSys)
   m_piSystem->IncRef ();
 
   SysPrintf (MSG_INITIALIZATION, "\nDirect3DRender selected\n");
+
+  iVFS* v = m_piSystem->GetVFS();
+  config = new csIniFile (v, "/config/direct3ddx5.cfg");
+  v->DecRef(); v = NULL;
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, SOFTWARE_2D_DRIVER, NULL, iGraphics2D);
   if (!m_piG2D)

@@ -38,7 +38,7 @@ class csString;
 class csSimpleCommand : public csBase
 {
 public:
-  virtual bool PerformLine( char* ) = 0;  // Should be (char const*)
+  virtual bool PerformLine(const char*) = 0;
 };
 
 

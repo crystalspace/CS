@@ -241,7 +241,7 @@ public:
    * Perform a system specific extension. Return false if extension
    * not supported.
    */
-  virtual bool PerformExtension (char* args);
+  virtual bool PerformExtension (const char* args);
 
   /// Do a screenshot: return a new iImage object
   virtual iImage *ScreenShot ();

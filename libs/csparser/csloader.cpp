@@ -4155,7 +4155,7 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
     return false;
   }
 
-  CHK (csIniFile* cfg = new csIniFile ("world.cfg"));
+  CHK (csIniFile* cfg = new csIniFile (System->VFS, "world.cfg"));
   if (cfg)
   {
     csLightMap::SetLightCellSize (cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",

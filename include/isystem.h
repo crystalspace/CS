@@ -130,6 +130,7 @@
   (Interface *)(Object)->LoadPlugIn (ClassID, FuncID, #Interface, VERSION_##Interface)
 
 struct iPlugIn;
+struct iVFS;
 
 SCF_VERSION (iSystem, 1, 0, 0);
 
@@ -148,7 +149,7 @@ SCF_VERSION (iSystem, 1, 0, 0);
  */
 struct iSystem : public iBase
 {
-  /// returns the configuration.
+  /// Returns the configuration.
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen) = 0;
   /// Load a plugin and initialize it
   virtual iBase *LoadPlugIn (const char *iClassID, const char *iFuncID,
@@ -159,14 +160,16 @@ struct iSystem : public iBase
   virtual iBase *QueryPlugIn (const char *iFuncID, const char *iInterface, int iVersion) = 0;
   /// Remove a plugin from system driver's plugin list
   virtual bool UnloadPlugIn (iPlugIn *iObject) = 0;
-  /// print a string to the specified device.
+  /// Print a string to the specified device.
   virtual void Printf (int mode, const char *format, ...) = 0;
-  /// get the time in milliseconds.
+  /// Get the time in milliseconds.
   virtual time_t GetTime () = 0;
-  /// quit the system.
+  /// Quit the system.
   virtual void StartShutdown () = 0;
-  /// check if system is shutting down
+  /// Check if system is shutting down
   virtual bool GetShutdown () = 0;
+  /// Get a VFS implementation if available
+  virtual iVFS* GetVFS () const = 0;
   /// Get a integer configuration value
   virtual int ConfigGetInt (const char *Section, const char *Key, int Default = 0) = 0;
   /// Get a string configuration value
