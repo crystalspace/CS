@@ -222,7 +222,6 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
-#include "csgeom/vtpool.h"
 #include "csgeom/crysball.h"
 #include "csgeom/objmodel.h"
 #endif
