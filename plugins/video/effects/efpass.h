@@ -31,6 +31,18 @@ class csEffectPass : public csStateHandler
 {
 private:
   csBasicVector layers;
+		
+	csRef<iBase> rendererData;
+
+	csRef<iBase> GetRendererData()
+	{
+		return rendererData;
+	}
+
+	void SetRendererData(csRef<iBase> data)
+	{
+		rendererData = data;
+	}
 public:
 
   SCF_DECLARE_IBASE;
@@ -62,6 +74,11 @@ public:
     {
       scfParent->SetStateOpaque( state, value );
     }
+		void SetStateVector4( csStringID state, csEffectVector4 value)
+		{
+			scfParent->SetStateVector4( state, value);
+		}
+
     
     float GetStateFloat( csStringID state )
     {
@@ -75,6 +92,11 @@ public:
     {
       return scfParent->GetStateOpaque( state );
     }
+		csEffectVector4 GetStateVector4( csStringID state)
+		{
+			return scfParent->GetStateVector4( state );
+		}
+
 
     iEffectLayer* CreateLayer()
     {
@@ -97,6 +119,16 @@ public:
     {
       return scfParent->GetNextState();
     }
+
+		csRef<iBase> GetRendererData()
+		{
+			return scfParent->GetRendererData();
+		}
+
+		void SetRendererData(csRef<iBase> data)
+		{
+			scfParent->SetRendererData(data);
+		}
   } scfiEffectPass;
 };
 

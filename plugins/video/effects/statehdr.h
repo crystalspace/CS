@@ -21,10 +21,12 @@
 #define __STATEHANDLER_H__
 
 #include "csutil/strset.h"
+#include "ivideo/effects/efvector4.h"
 
 #define CS_STATETYPE_FLOAT    1
-#define CS_STATETYPE_STRING    2
-#define CS_STATETYPE_OPAQUE    3
+#define CS_STATETYPE_STRING   2
+#define CS_STATETYPE_OPAQUE   3
+#define CS_STATETYPE_VECTOR4	4
 
 
 struct statedata 
@@ -37,9 +39,11 @@ struct statedata
     csStringID string_value;
     void *opaque_value;
   };
+	csEffectVector4 vector_value;
   statedata( csStringID state, float value ) { name = state; float_value = value; type = CS_STATETYPE_FLOAT; }
   statedata( csStringID state, csStringID value ) { name = state; string_value = value; type = CS_STATETYPE_STRING; }
   statedata( csStringID state, void* value ) { name = state; opaque_value = value; type = CS_STATETYPE_OPAQUE; }
+	statedata( csStringID state, csEffectVector4 value) {name = state; vector_value=value; type = CS_STATETYPE_VECTOR4;}
 };
 
 class csStateHandler : public iBase
@@ -57,10 +61,12 @@ public:
   void SetStateFloat( csStringID state, float value );
   void SetStateString( csStringID state, csStringID value );
   void SetStateOpaque( csStringID state, void *value );
+	void SetStateVector4( csStringID state, csEffectVector4 value);
   
   float GetStateFloat( csStringID state );
   csStringID GetStateString( csStringID state );
   void *GetStateOpaque( csStringID state );
+	csEffectVector4 GetStateVector4( csStringID state);
 
   csStringID GetFirstState();
   csStringID GetNextState();

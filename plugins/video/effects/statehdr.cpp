@@ -94,6 +94,22 @@ void csStateHandler::SetStateOpaque( csStringID state, void *value )
   states->Put( state, new statedata( state, value ) );
 }
 
+void csStateHandler::SetStateVector4( csStringID state, csEffectVector4 value)
+{
+	csHashIterator cIterator( states, state );
+  while( cIterator.HasNext() )
+  {
+    statedata* data = (statedata*)cIterator.Next();
+    if( data->name == state )
+    {
+      if( data->type == CS_STATETYPE_VECTOR4 )
+        data->vector_value = value;
+      return;
+    }
+  }
+  states->Put( state, new statedata( state, value ) );
+}
+
 float csStateHandler::GetStateFloat( csStringID state )
 {
   csHashIterator cIterator( states, state );
@@ -137,6 +153,21 @@ void *csStateHandler::GetStateOpaque( csStringID state )
     }
   }
   return NULL;
+}
+
+csEffectVector4 csStateHandler::GetStateVector4(csStringID state)
+{
+	csHashIterator cIterator( states, state );
+  while( cIterator.HasNext() )
+  {
+    statedata* data = (statedata*)cIterator.Next();
+    if( data->name == state )
+    {
+      if( data->type == CS_STATETYPE_VECTOR4 )
+        return data->vector_value;
+    }
+  }
+  return csEffectVector4();
 }
 
 csStringID csStateHandler::GetFirstState()
