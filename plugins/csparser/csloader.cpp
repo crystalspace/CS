@@ -930,24 +930,8 @@ bool csLoader::LoadMap (iDocumentNode* node)
             return false;
           break;
         case XMLTOKEN_LIBRARY:
-	  {
-	    char fileName[CS_MAXPATHLEN];
-	    char filePath[CS_MAXPATHLEN];
-	    csSplitPath (child->GetContentsValue (), 
-	      filePath, sizeof (filePath),
-	      fileName, sizeof (fileName));
-	    if (filePath[0] != 0)
-	    {
-	      VFS->PushDir ();
-	      VFS->ChDir (filePath);
-	    }
-	    bool rv = LoadLibraryFile (fileName);
-	    if (filePath[0] != 0)
-	    {
-	      VFS->PopDir ();
-	    }
-	    if (!rv) return false;
-	  }
+	  if (!LoadLibraryFile (child->GetContentsValue ()))
+	    return false;
 	  break;
         case XMLTOKEN_START:
         {
