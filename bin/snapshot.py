@@ -99,7 +99,7 @@ moduledir = "CS"
 ownergroup = "crystal"
 packprefix = "cs-"
 snapdir = "/home/groups/ftp/pub/crystal/cvs-snapshots"
-keepsnaps = 4
+keepsnaps = 3
 
 archivers = (
     {"name": "gzip",
@@ -205,6 +205,7 @@ class Snapshot:
         if os.path.exists(self.stamppath):
             file = open(self.stamppath, "r")
             stamp = string.strip(file.readline())
+            file.close()
         return stamp
 
     def purge(self, pattern):
