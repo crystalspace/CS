@@ -151,7 +151,7 @@ m4_define([cs_jam_local_exe], [jam$EXEEXT])
 
 AC_PATH_PROGS([JAM], [jam], [], [$PATH$PATH_SEPARATOR.])
 AS_IF([test -n "$JAM"],
-    [CS_CHECK_PROG_VERSION([jam], [$JAM -v 2>&1], [2.4], [9.9|.9],
+    [CS_CHECK_PROG_VERSION([jam], ["$JAM" -v 2>&1], [2.4], [9.9|.9],
 	[cs_prog_jam_okay=yes], [cs_prog_jam_okay=no])],
     [cs_prog_jam_okay=no])
 
@@ -2232,7 +2232,7 @@ AS_IF([test "$CS_NEED_LOCAL_JAM" = yes && test $enable_make_emulation = yes],
 # (2)
 AC_DEFUN([CS_SYNTHESIZE_MAKEFILE],
     [AS_IF([AC_RUN_LOG(
-	    [$JAM -sDUMPTARGETS_FILE=$tmp/jcache dumptargets 1>&2])],
+	    ["$JAM" -sDUMPTARGETS_FILE=$tmp/jcache dumptargets 1>&2])],
 	[jam_targets=all
 	while read jam_line; do
 	    jam_targets="$jam_targets $jam_line"

@@ -4386,10 +4386,10 @@ cs_prog_jam_min_suffix_done=
 
 
 
-test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`$JAM -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`"$JAM" -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
 test -n "$cs_prog_jam_is_version" && test -z $cs_prog_jam_is_suffix_done  && { cs_prog_jam_is_suffix_done=yes ; cs_prog_jam_is_suffix= ; }
 
-test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`$JAM -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`"$JAM" -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
 test -n "$cs_prog_jam_is_version" && test -z $cs_prog_jam_is_suffix_done  && { cs_prog_jam_is_suffix_done=yes ; cs_prog_jam_is_suffix=.0 ; }
 
 
@@ -36956,8 +36956,8 @@ echo "$as_me: error: failed to build jam; please install manually" >&2;}
 fi
 
     rm -rf jambuild ;;
-    Makefile ) if { (echo "$as_me:$LINENO: \$JAM -sDUMPTARGETS_FILE=\$tmp/jcache dumptargets 1>&2") >&5
-  ($JAM -sDUMPTARGETS_FILE=$tmp/jcache dumptargets 1>&2) 2>&5
+    Makefile ) if { (echo "$as_me:$LINENO: \"\$JAM\" -sDUMPTARGETS_FILE=\$tmp/jcache dumptargets 1>&2") >&5
+  ("$JAM" -sDUMPTARGETS_FILE=$tmp/jcache dumptargets 1>&2) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then

@@ -32,6 +32,8 @@ chronological order.
 	  sets cs_cv_sys_pthread_recursive=no if cs_cv_sys_pthread == no. This
 	  fixes problem where AS_IF() configure.ac emitted error about missing
 	  argument to 'test' binary operator if pthread was absent.
+	- Eric Sunshine made Jam test and usage in configure.ac more tolerant
+	  of whitepsace in Jam path.
 16-May-2004
         - Philip Wyett eliminated gcc compiler warnings in simpleformer.cpp.
         - Andrew Craig enhanced viewmesh by letting the user select a mesh 
