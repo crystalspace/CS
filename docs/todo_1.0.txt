@@ -63,6 +63,7 @@ Bugs to fix:
 	     exploding, press shift-1.  to delete the dynamic light.  d) Wait
 	     momentarily for the rocket to delete its own light.  e) Crash.
 	     (optimize mode)
+	     [Bug 747978]
 	[**] cswseng crashes dereferencing a null pointer.  To reproduce: 1)
 	     Launch cswseng.  2) Press "New View".  3) Press "Quit".  4) Crash.
 	     (optimize and debug mode)
@@ -79,9 +80,11 @@ Bugs to fix:
 	[S]  perftest crashes dereferencing a null pointer when using OpenGL.
 	     To reproduce: 1) Launch perftest with OpenGL.  2) Press space-bar
 	     several times.  3) Crash.  (optimize and debug mode)
+	     [Bug 747980]
 	[S]  perftest used to print a message at the bottom of the window
 	     briefly describing each test.  These messages are no longer
 	     present.
+	     [Bug 747981]
 	[S]  simplecloth crashes consistently at startup dereferencing address
 	     0x0884 when run with the software renderer.  The program seems to
 	     run correctly with the OpenGL renderer.  (optimize mode) Matze
@@ -92,6 +95,7 @@ Bugs to fix:
 	     but the fix is not yet in CVS.  Dan Mahoney
 	     <domahoneyii@users.sourceforget.net> reports that the crash is on
 	     line 95 of scanp2.inc.
+	     [Bug 747983]
 	[**] Starting walktest with infinite renderer leads to direct crash
 	     (infinte renderer is removed now)
 	[**] simpvs crashes immediately at startup dereferencing a null pointer.
@@ -114,9 +118,11 @@ Bugs to fix:
 	     Eric responds: The clipping tests in g2dtest were added after the
 	     semantics changed.  The tests were added specifically to test if
 	     canvases were respecting the new semantics.
+	     [Bug 747985]
 	[S]  Line drawing in software renderer is not stable (overwriting
 	     memory).  This shows with BugPlug and also with AWS in some cases.
 	     Is this related to incorrect clipping?  (See above item.)
+	     [Bug 747988]
 	[**] cs2xml crashes when trying to convert castle.zip.  (optimize mode)
 	     (note by Jorrit: cannot reproduce).
 	[**] levtool fails to convert castle.zip (after it has been converted
@@ -127,6 +133,7 @@ Bugs to fix:
 		plugins/culling/dynavis/tcovbuf.cpp:707:
 			failed assertion 'w_shift >= 0'
 		Trace/Breakpoint ausgelst
+	     [Bug 747989]
 	[S]  Cloth plugin has a culling problem.  If any corner of the cloth's
 	     bbox is above the top border of the screen, then the entire cloth
 	     is culled.  Charles James Leonardo Quarra Cappiello
@@ -134,14 +141,17 @@ Bugs to fix:
 	     old culler was removed. Matze: This is probably a duplicate
 	     because this is probably caused because of the wrong bounding
 	     box.
+	     [Bug 747990]
 	[S]  NetTut doesn't parse it's commandline (one always get an error
 	     message no matter what is entered at the command line).
 		Usage:  ./nettut [server/client] [tcp/udp] [hostname*] [port]
 		 * - specify hostname only if you are using client mode.
+	     [Bug 747994]
 	[S]  NetMantest or the netmanager plugin leaks
-	[S]  There are still numerous unreleased instances of SCF classes.
+	[S]  There are still some unreleased instances of SCF classes.
 	     Update: When talking about walktest this only true in the flarge
-	     map.  Problem is probably the hirarchical mesh factory there.
+	     map.  Problem is probably the hierarchical mesh factory there.
+	     [Bug 747995]
 	[S]  The frame around the fancy console looks "strange" (Matze's
 	     phrasing).
 	[**] Restoration of dllwrap uses $* which gets eaten by cs-config.
@@ -169,6 +179,7 @@ Bugs to fix:
 	     OpenGL alone) and this occurs if you look into the reflecting
 	     table.
 	[V]  Static lighting no longer goes through space-warping portals.
+	     [Bug 748001]
 	[**] One of the halos in flarge seems to disappear in some cases with
 	     OpenGL.
 	[V]  Walktest + newsky: it appears that there are some visibility
@@ -184,6 +195,7 @@ Bugs to fix:
 		"room"
 		0
 		--snap--
+	     [Bug 748002]
 	[V]  Fix radiosity so that it works again.  Radiosity is currently
 	     disabled because several things had been rewritten and the
 	     radiosity code was left behind.  To fix this we need to have a way
@@ -237,6 +249,7 @@ Bugs to fix:
 	        Mount ("this/is/a/dir$/", "/lib/whatever");
 	     That is, the last '/' has to be preceeded with '$'.  This needs to
 	     be fixed.
+	     [Bug 747998]
 	[**] With OpenGL the lightmaps are not mapped correctly.  This is very
 	     visible if you have two adjacent polygons which have a different
 	     size and a shadow going over those two polygons (in dmburg this
