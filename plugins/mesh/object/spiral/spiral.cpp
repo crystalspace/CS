@@ -137,9 +137,9 @@ IMPLEMENT_IBASE (csSpiralMeshObjectFactory)
   IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 IMPLEMENT_IBASE_END
 
-csSpiralMeshObjectFactory::csSpiralMeshObjectFactory (iSystem* system)
+csSpiralMeshObjectFactory::csSpiralMeshObjectFactory (iBase *pParent, iSystem* system)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (pParent);
   csSpiralMeshObjectFactory::system = system;
 }
 
@@ -186,7 +186,7 @@ bool csSpiralMeshObjectType::Initialize (iSystem* system)
 
 iMeshObjectFactory* csSpiralMeshObjectType::NewFactory ()
 {
-  csSpiralMeshObjectFactory* cm = new csSpiralMeshObjectFactory (system);
+  csSpiralMeshObjectFactory* cm = new csSpiralMeshObjectFactory (this, system);
   iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

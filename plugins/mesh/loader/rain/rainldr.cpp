@@ -94,6 +94,7 @@ iBase* csRainFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
     printf ("Load TYPE plugin crystalspace.mesh.object.rain\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
   return fact;
 }
 

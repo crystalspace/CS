@@ -148,10 +148,10 @@ IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::Sprite3DFactoryState)
   IMPLEMENTS_INTERFACE (iSprite3DFactoryState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory () :
+csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
     texels (8, 8), vertices (8, 8), normals (8, 8)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (pParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
   cstxt = NULL;
   emerge_from = NULL;
@@ -1610,7 +1610,7 @@ bool csSprite3DMeshObjectType::Initialize (iSystem* pSystem)
 
 iMeshObjectFactory* csSprite3DMeshObjectType::NewFactory ()
 {
-  csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory ();
+  csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory (this);
   cm->System = System;
   iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();

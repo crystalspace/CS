@@ -179,7 +179,7 @@ private:
 
 public:
   /// Constructor.
-  csSprite2DMeshObjectFactory ();
+  csSprite2DMeshObjectFactory (iBase *pParent);
 
   /// Destructor.
   virtual ~csSprite2DMeshObjectFactory ();

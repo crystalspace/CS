@@ -182,9 +182,9 @@ IMPLEMENT_IBASE (csFountainMeshObjectFactory)
   IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 IMPLEMENT_IBASE_END
 
-csFountainMeshObjectFactory::csFountainMeshObjectFactory (iSystem* system)
+csFountainMeshObjectFactory::csFountainMeshObjectFactory (iBase *pParent, iSystem* system)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (pParent);
   csFountainMeshObjectFactory::system = system;
 }
 
@@ -231,7 +231,7 @@ bool csFountainMeshObjectType::Initialize (iSystem* system)
 
 iMeshObjectFactory* csFountainMeshObjectType::NewFactory ()
 {
-  csFountainMeshObjectFactory* cm = new csFountainMeshObjectFactory (system);
+  csFountainMeshObjectFactory* cm = new csFountainMeshObjectFactory (this, system);
   iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

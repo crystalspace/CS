@@ -153,6 +153,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine)
     printf ("Load TYPE plugin crystalspace.mesh.object.sprite.2d\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
   iSprite2DFactoryState* spr2dLook = QUERY_INTERFACE (fact, iSprite2DFactoryState);
 
   char* buf = (char*)string;

@@ -232,9 +232,9 @@ IMPLEMENT_IBASE (csFireMeshObjectFactory)
   IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 IMPLEMENT_IBASE_END
 
-csFireMeshObjectFactory::csFireMeshObjectFactory (iSystem* system)
+csFireMeshObjectFactory::csFireMeshObjectFactory (iBase *pParent, iSystem* system)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (pParent);
   csFireMeshObjectFactory::system = system;
 }
 
@@ -281,7 +281,7 @@ bool csFireMeshObjectType::Initialize (iSystem* system)
 
 iMeshObjectFactory* csFireMeshObjectType::NewFactory ()
 {
-  csFireMeshObjectFactory* cm = new csFireMeshObjectFactory (system);
+  csFireMeshObjectFactory* cm = new csFireMeshObjectFactory (this, system);
   iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

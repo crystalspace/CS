@@ -96,6 +96,7 @@ iBase* csFireFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
     printf ("Load TYPE plugin crystalspace.mesh.object.fire\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
   return fact;
 }
 

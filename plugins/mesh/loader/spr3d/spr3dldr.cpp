@@ -390,6 +390,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
     printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
   iSprite3DFactoryState* spr3dLook = QUERY_INTERFACE (fact, iSprite3DFactoryState);
 
   char* buf = (char*)string;
@@ -413,8 +414,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	  {
             // @@@ Error handling!
 	    printf ("Can't find material!\n");
-            fact->DecRef ();
 	    spr3dLook->DecRef ();
+            fact->DecRef ();
             return NULL;
 	  }
 	  spr3dLook->SetMaterialWrapper (mat);
@@ -430,8 +431,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	  {
 	    // @@@ Error handling!
 	    printf ("Bad skeleton!\n");
-	    fact->DecRef ();
 	    spr3dLook->DecRef ();
+	    fact->DecRef ();
 	    return NULL;
 	  }
 	}
@@ -450,8 +451,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	      //@@@ Error handling!
               //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
 	      printf ("Bad action!\n");
-	      fact->DecRef ();
 	      spr3dLook->DecRef ();
+	      fact->DecRef ();
 	      return NULL;
             }
             switch (cmd)
@@ -465,8 +466,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
                   //CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add a unknown frame '%s' in %s action !\n",
                         //fn, act->GetName ());
 		  printf ("Bad frame!\n");
-		  fact->DecRef ();
 		  spr3dLook->DecRef ();
+		  fact->DecRef ();
                   return NULL;
                 }
                 act->AddFrame (ff, d);
@@ -491,8 +492,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	      //@@@ Error handling!
               //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
 	      printf ("Error\n");
-	      fact->DecRef ();
 	      spr3dLook->DecRef ();
+	      fact->DecRef ();
 	      return NULL;
             }
             switch (cmd)
@@ -510,8 +511,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
                   //CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
                     //fr->GetName ());
 	      	  printf ("Too many vertices!\n");
-		  fact->DecRef ();
 		  spr3dLook->DecRef ();
+		  fact->DecRef ();
 		  return NULL;
                 }
                 spr3dLook->GetVertex (anm_idx, i) = csVector3 (x, y, z);
@@ -526,8 +527,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
             //CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing frame '%s'!\n",
                 //fr->GetName (), csGetLastOffender ());
 	    printf ("Token not found!\n");
-	    fact->DecRef ();
 	    spr3dLook->DecRef ();
+	    fact->DecRef ();
 	    return NULL;
           }
           if (i < spr3dLook->GetNumTexels ())
@@ -536,8 +537,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
             //CsPrintf (MSG_FATAL_ERROR, "Error! Too few vertices in frame '%s'! (%d %d)\n",
                 //fr->GetName (), i, state->GetNumTexels ());
 	    printf ("Too few vertices!\n");
-	    fact->DecRef ();
 	    spr3dLook->DecRef ();
+	    fact->DecRef ();
 	    return NULL;
           }
         }

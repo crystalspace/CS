@@ -99,6 +99,7 @@ iBase* csFountainFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine
     printf ("Load TYPE plugin crystalspace.mesh.object.fountain\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
   return fact;
 }
 

@@ -202,7 +202,7 @@ private:
 
 public:
   /// Constructor.
-  csFountainMeshObjectFactory (iSystem* system);
+  csFountainMeshObjectFactory (iBase *pParent, iSystem* system);
 
   /// Destructor.
   virtual ~csFountainMeshObjectFactory ();

@@ -132,7 +132,7 @@ private:
 
 public:
   /// Constructor.
-  csCubeMeshObjectFactory ();
+  csCubeMeshObjectFactory (iBase *pParent);
 
   /// Destructor.
   virtual ~csCubeMeshObjectFactory ();

@@ -151,7 +151,7 @@ private:
 
 public:
   /// Constructor.
-  csSnowMeshObjectFactory (iSystem* system);
+  csSnowMeshObjectFactory (iBase *pParent, iSystem* system);
 
   /// Destructor.
   virtual ~csSnowMeshObjectFactory ();

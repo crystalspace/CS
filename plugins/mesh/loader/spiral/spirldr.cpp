@@ -91,6 +91,7 @@ iBase* csSpiralFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/
     printf ("Load TYPE plugin crystalspace.mesh.object.spiral\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
   return fact;
 }
 

@@ -249,7 +249,7 @@ public:
 
 public:
   /// Create the sprite template
-  csSprite3DMeshObjectFactory ();
+  csSprite3DMeshObjectFactory (iBase *pParent);
   /// Destroy the template
   virtual ~csSprite3DMeshObjectFactory ();
 

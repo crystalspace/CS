@@ -512,9 +512,9 @@ IMPLEMENT_IBASE (csBallMeshObjectFactory)
   IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 IMPLEMENT_IBASE_END
 
-csBallMeshObjectFactory::csBallMeshObjectFactory ()
+csBallMeshObjectFactory::csBallMeshObjectFactory (iBase *pParent)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (pParent);
 }
 
 csBallMeshObjectFactory::~csBallMeshObjectFactory ()
@@ -559,7 +559,7 @@ bool csBallMeshObjectType::Initialize (iSystem*)
 
 iMeshObjectFactory* csBallMeshObjectType::NewFactory ()
 {
-  csBallMeshObjectFactory* cm = new csBallMeshObjectFactory ();
+  csBallMeshObjectFactory* cm = new csBallMeshObjectFactory (this);
   iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

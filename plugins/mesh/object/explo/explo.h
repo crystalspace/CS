@@ -224,7 +224,7 @@ private:
 
 public:
   /// Constructor.
-  csExploMeshObjectFactory (iSystem* system);
+  csExploMeshObjectFactory (iBase *pParent, iSystem* system);
 
   /// Destructor.
   virtual ~csExploMeshObjectFactory ();

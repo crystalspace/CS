@@ -90,6 +90,7 @@ iBase* csBallFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
     printf ("Load TYPE plugin crystalspace.mesh.object.ball\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
   return fact;
 }
 

@@ -40,7 +40,7 @@ IMPLEMENT_EMBEDDED_IBASE_END
 
 csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (factory);
   CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
   csParticleSystem::factory = factory;
   particles.SetLength (0);

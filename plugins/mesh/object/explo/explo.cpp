@@ -162,9 +162,9 @@ IMPLEMENT_IBASE (csExploMeshObjectFactory)
   IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 IMPLEMENT_IBASE_END
 
-csExploMeshObjectFactory::csExploMeshObjectFactory (iSystem* system)
+csExploMeshObjectFactory::csExploMeshObjectFactory (iBase *pParent, iSystem* system)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (pParent);
   csExploMeshObjectFactory::system = system;
 }
 
@@ -211,7 +211,7 @@ bool csExploMeshObjectType::Initialize (iSystem* system)
 
 iMeshObjectFactory* csExploMeshObjectType::NewFactory ()
 {
-  csExploMeshObjectFactory* cm = new csExploMeshObjectFactory (system);
+  csExploMeshObjectFactory* cm = new csExploMeshObjectFactory (this, system);
   iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

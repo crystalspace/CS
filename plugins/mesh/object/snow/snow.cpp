@@ -151,9 +151,9 @@ IMPLEMENT_IBASE (csSnowMeshObjectFactory)
   IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 IMPLEMENT_IBASE_END
 
-csSnowMeshObjectFactory::csSnowMeshObjectFactory (iSystem* system)
+csSnowMeshObjectFactory::csSnowMeshObjectFactory (iBase *pParent,iSystem* system)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (pParent);
   csSnowMeshObjectFactory::system = system;
 }
 
@@ -200,7 +200,7 @@ bool csSnowMeshObjectType::Initialize (iSystem* system)
 
 iMeshObjectFactory* csSnowMeshObjectType::NewFactory ()
 {
-  csSnowMeshObjectFactory* cm = new csSnowMeshObjectFactory (system);
+  csSnowMeshObjectFactory* cm = new csSnowMeshObjectFactory (this, system);
   iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

@@ -355,9 +355,9 @@ IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectFactory::CubeFactoryState)
   IMPLEMENTS_INTERFACE (iCubeFactoryState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csCubeMeshObjectFactory::csCubeMeshObjectFactory ()
+csCubeMeshObjectFactory::csCubeMeshObjectFactory (iBase *pParent)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (pParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiCubeFactoryState);
   sizex = 1;
   sizey = 1;
@@ -420,7 +420,7 @@ bool csCubeMeshObjectType::Initialize (iSystem*)
 
 iMeshObjectFactory* csCubeMeshObjectType::NewFactory ()
 {
-  csCubeMeshObjectFactory* cm = new csCubeMeshObjectFactory ();
+  csCubeMeshObjectFactory* cm = new csCubeMeshObjectFactory (this);
   iCubeFactoryState* cubeLook = QUERY_INTERFACE (cm, iCubeFactoryState);
   cubeLook->SetSize (default_sizex, default_sizey, default_sizez);
   cubeLook->SetShift (default_shift.x, default_shift.y, default_shift.z);

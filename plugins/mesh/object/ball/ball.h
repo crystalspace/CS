@@ -169,7 +169,7 @@ class csBallMeshObjectFactory : public iMeshObjectFactory
 {
 public:
   /// Constructor.
-  csBallMeshObjectFactory ();
+  csBallMeshObjectFactory (iBase *pParent);
 
   /// Destructor.
   virtual ~csBallMeshObjectFactory ();

@@ -424,9 +424,9 @@ IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObjectFactory::Sprite2DFactoryState)
   IMPLEMENTS_INTERFACE (iSprite2DFactoryState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory ()
+csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iBase *pParent)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (pParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DFactoryState);
   material = NULL;
   MixMode = 0;
@@ -475,7 +475,7 @@ bool csSprite2DMeshObjectType::Initialize (iSystem*)
 
 iMeshObjectFactory* csSprite2DMeshObjectType::NewFactory ()
 {
-  csSprite2DMeshObjectFactory* cm = new csSprite2DMeshObjectFactory ();
+  csSprite2DMeshObjectFactory* cm = new csSprite2DMeshObjectFactory (this);
   iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

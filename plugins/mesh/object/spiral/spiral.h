@@ -92,7 +92,7 @@ private:
 
 public:
   /// Constructor.
-  csSpiralMeshObjectFactory (iSystem* system);
+  csSpiralMeshObjectFactory (iBase *pParent, iSystem* system);
 
   /// Destructor.
   virtual ~csSpiralMeshObjectFactory ();

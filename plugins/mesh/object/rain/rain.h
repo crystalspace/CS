@@ -138,7 +138,7 @@ private:
 
 public:
   /// Constructor.
-  csRainMeshObjectFactory (iSystem* system);
+  csRainMeshObjectFactory (iBase *pParent, iSystem* system);
 
   /// Destructor.
   virtual ~csRainMeshObjectFactory ();

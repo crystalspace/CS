@@ -99,6 +99,7 @@ iBase* csExplosionFactoryLoader::Parse (const char* /*string*/, iEngine* /*engin
     printf ("Load TYPE plugin crystalspace.mesh.object.explosion\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
   return fact;
 }
 

@@ -195,7 +195,7 @@ private:
 
 public:
   /// Constructor.
-  csFireMeshObjectFactory (iSystem* system);
+  csFireMeshObjectFactory (iBase *pParent, iSystem* system);
 
   /// Destructor.
   virtual ~csFireMeshObjectFactory ();

@@ -95,6 +95,7 @@ iBase* csSnowFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
     printf ("Load TYPE plugin crystalspace.mesh.object.snow\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
   return fact;
 }
 

@@ -152,6 +152,7 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
     printf ("Load TYPE plugin crystalspace.mesh.object.cube\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
   iCubeFactoryState* cubeLook = QUERY_INTERFACE (fact, iCubeFactoryState);
 
   char* buf = (char*)string;
@@ -160,8 +161,8 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
     if (!params)
     {
       // @@@ Error handling!
-      fact->DecRef ();
       cubeLook->DecRef ();
+      fact->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -173,8 +174,8 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
 	  if (!mat)
 	  {
             // @@@ Error handling!
-            fact->DecRef ();
 	    cubeLook->DecRef ();
+            fact->DecRef ();
             return NULL;
 	  }
 	  cubeLook->SetMaterialWrapper (mat);

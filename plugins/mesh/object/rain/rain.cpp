@@ -139,9 +139,9 @@ IMPLEMENT_IBASE (csRainMeshObjectFactory)
   IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 IMPLEMENT_IBASE_END
 
-csRainMeshObjectFactory::csRainMeshObjectFactory (iSystem* system)
+csRainMeshObjectFactory::csRainMeshObjectFactory (iBase *pParent, iSystem* system)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (pParent);
   csRainMeshObjectFactory::system = system;
 }
 
@@ -188,7 +188,7 @@ bool csRainMeshObjectType::Initialize (iSystem* system)
 
 iMeshObjectFactory* csRainMeshObjectType::NewFactory ()
 {
-  csRainMeshObjectFactory* cm = new csRainMeshObjectFactory (system);
+  csRainMeshObjectFactory* cm = new csRainMeshObjectFactory (this, system);
   iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
