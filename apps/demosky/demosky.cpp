@@ -87,10 +87,10 @@ void Simple::SetTexSpace(csPolygon3D *poly, int size, const csVector3& orig,
   csVector3 uvector = upt - orig;
   csVector3 vvector = vpt - orig;
   /// to have 1 pixel going over the edges.
-  texorig -= uvector * 1. / float(size);
-  texorig -= vvector * 1. / float(size);
-  texu += uvector * 1. / float(size);
-  texv += vvector * 1. / float(size);
+  texorig -= uvector / float(size);
+  texorig -= vvector / float(size);
+  texu += uvector / float(size);
+  texv += vvector / float(size);
   texulen += 2. / float(size);
   texvlen += 2. / float(size);
   poly->SetTextureSpace (texorig, texu, texulen, texv, texvlen);
