@@ -23,6 +23,9 @@
 #include "csutil/scf.h"
 #include "iplugin.h"
 
+/**
+ * Potential network driver error codes.
+ */
 enum csNetworkDriverError
 {
   CS_NET_ERR_NO_ERROR,
@@ -42,6 +45,9 @@ enum csNetworkDriverError
   CS_NET_ERR_CANNOT_CLEANUP
 };
 
+/**
+ * Network driver capabilities structure.
+ */
 struct csNetworkDriverCapabilities
 {
   bool ConnectionReliable;
@@ -79,13 +85,15 @@ struct iNetworkConnection : public iNetworkEndPoint
   /// Send nbytes of data over the connection.
   virtual bool Send(const void* data, size_t nbytes) = 0;
 
-  /// Receive data from the connection.  If the connection is in blocking
-  /// mode, then the function does not return until data has been read, an
-  /// error has occurred, or the connection was closed.  In non-blocking mode,
-  /// Receive returns immediately.  If data is available then it returns the
-  /// number of bytes (<= maxbytes) which was read.  If data is not available
-  /// and the connection is non-blocking, then it returns 0 and GetLastError()
-  /// returns CS_NET_ERR_NO_ERROR.
+  /**
+   * Receive data from the connection.  If the connection is in blocking
+   * mode, then the function does not return until data has been read, an
+   * error has occurred, or the connection was closed.  In non-blocking mode,
+   * Receive returns immediately.  If data is available then it returns the
+   * number of bytes (<= maxbytes) which was read.  If data is not available
+   * and the connection is non-blocking, then it returns 0 and GetLastError()
+   * returns CS_NET_ERR_NO_ERROR.
+   */
   virtual size_t Receive(void* buff, size_t maxbytes) = 0;
 };
 
@@ -99,13 +107,15 @@ SCF_VERSION (iNetworkListener, 0, 0, 1);
  */
 struct iNetworkListener : public iNetworkEndPoint
 {
-  /// Accepts a connection request.  If the listener is in blocking mode, then
-  /// the function does not return until a connection has been established or
-  /// an error has occurred.  If in non-blocking mode, then it returns
-  /// immediately.  The return value is either an accepted connection or NULL.
-  /// If the connection is non-blocking, NULL is returned, and GetLastError()
-  /// returns CS_NET_ERR_NO_ERROR then no connection was pending.  Otherwise
-  /// an error occurred, and GetLastError() returns the appropriate error code.
+  /**
+   * Accepts a connection request.  If the listener is in blocking mode, then
+   * the function does not return until a connection has been established or
+   * an error has occurred.  If in non-blocking mode, then it returns
+   * immediately.  The return value is either an accepted connection or NULL.
+   * If the connection is non-blocking, NULL is returned, and GetLastError()
+   * returns CS_NET_ERR_NO_ERROR then no connection was pending.  Otherwise
+   * an error occurred, and GetLastError() returns the appropriate error code.
+   */
   virtual iNetworkConnection* Accept() = 0;
 };
 
@@ -118,30 +128,36 @@ SCF_VERSION (iNetworkDriver, 0, 0, 1);
  */
 struct iNetworkDriver : public iPlugIn
 {
-  /// Create a new network connection.  The 'target' parameter is driver
-  /// dependent.  For example, with a socket driver, the target might be
-  /// "host:port#"; with a modem driver it might be "comport:phone#"; etc.
-  /// The 'reliable' flag determines whether a reliable connection is made
-  /// (sometimes known as connection-oriented) or an unreliable one (sometimes
-  /// known as connectionless).  The 'blocking' flag determines whether
-  /// operations on the connection return immediately in all cases or wait
-  /// until the operation can be completed successfully.  Returns the new
-  /// connection object or NULL if the connection failed.
+  /**
+   * Create a new network connection.  The 'target' parameter is driver
+   * dependent.  For example, with a socket driver, the target might be
+   * "host:port#"; with a modem driver it might be "comport:phone#"; etc.
+   * The 'reliable' flag determines whether a reliable connection is made
+   * (sometimes known as connection-oriented) or an unreliable one (sometimes
+   * known as connectionless).  The 'blocking' flag determines whether
+   * operations on the connection return immediately in all cases or wait
+   * until the operation can be completed successfully.  Returns the new
+   * connection object or NULL if the connection failed.
+   */
   virtual iNetworkConnection* NewConnection(const char* target,
     bool reliable, bool blocking) = 0;
 
-  /// Create a new network listener.  The 'source' parameter is driver
-  /// dependent.  For example, with a socket driver, the target might be
-  /// "port#"; with a modem driver it might be "comport"; etc.  The 'reliable'
-  /// determines whether or not a reliable connection is made.  The
-  /// 'blockingListener' flag determines whether or not the Accept() method
-  /// blocks while when called.  The 'blockingConnection' flag determines
-  /// whether or not methods in the resulting connection object block.
+  /**
+   * Create a new network listener.  The 'source' parameter is driver
+   * dependent.  For example, with a socket driver, the target might be
+   * "port#"; with a modem driver it might be "comport"; etc.  The 'reliable'
+   * determines whether or not a reliable connection is made.  The
+   * 'blockingListener' flag determines whether or not the Accept() method
+   * blocks while when called.  The 'blockingConnection' flag determines
+   * whether or not methods in the resulting connection object block.
+   */
   virtual iNetworkListener* NewListener( const char* source,
     bool reliable, bool blockingListener, bool blockingConnection) = 0;
 
-  /// Get network driver capabilities.  This function returns information
-  /// describing the capabilities of the driver.
+  /**
+   * Get network driver capabilities.  This function returns information
+   * describing the capabilities of the driver.
+   */
   virtual csNetworkDriverCapabilities GetCapabilities() const = 0;
 
   /// Retrieve the code for the last error encountered.
