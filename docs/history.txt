@@ -35,6 +35,10 @@ for each given day, however, are in normal (ascending) chronological order.
 	- Jorrit cleaned up several include files in include/imesh.
 	- Jorrit cleaned up several include files and Doxygen commments
 	  in include/ivaria.
+	- Luca changed the behaviour of awsRadButton::OnKeypress, 
+	  awsCheckBox::OnKeypress and awsCmdButton::OnKeypress. Now those methods
+	  return true iff the key event is really "eaten". Before they were 
+	  returning always true, even if the key event was not used at all.
 26-Jul-2003
 	- Wouter Wijngaards fixed the partedit awssink.cpp file, removed
 	  'static' from enums and put initializers for a constructor

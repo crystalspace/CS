@@ -516,35 +516,37 @@ bool awsCmdButton::OnMouseEnter ()
 
 bool awsCmdButton::OnKeypress (int key, int cha, int modifiers)
 {
- char chr = (char)key;
- switch(chr)
- {
+  bool eventEaten = false;
+  char chr = (char)key;
+  switch(chr)
+  {
   case CSKEY_ENTER:
+    eventEaten = true;
     was_down = is_down;
-
+    
     if (!is_switch || is_down == false) is_down = true;
-
-		if (!is_switch)
-		{
-			if (is_down) 
-				Broadcast (signalClicked);
-			is_down = false;
-		}
-		else
-		{
-			if (was_down)
-				is_down = false;
-			else
-				ClearGroup ();
-
-			Broadcast (signalClicked);
-		}
-		break;
-	}
-
-	Invalidate ();
-
-	return true;
+    
+    if (!is_switch)
+    {
+      if (is_down) 
+        Broadcast (signalClicked);
+      is_down = false;
+    }
+    else
+    {
+      if (was_down)
+        is_down = false;
+      else
+        ClearGroup ();
+      
+      Broadcast (signalClicked);
+    }
+    break;
+  }
+  
+  Invalidate ();
+  
+  return eventEaten;
 }
 
 void awsCmdButton::OnSetFocus ()

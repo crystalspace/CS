@@ -332,22 +332,24 @@ bool awsRadButton::OnMouseEnter ()
 
 bool awsRadButton::OnKeypress (int key, int cha, int modifiers)
 {
- char chr = (char)key;
- switch(chr)
- {
+  bool eventEaten = false;
+  char chr = (char)key;
+  switch(chr)
+  {
   case CSKEY_ENTER:
-			if (!is_on)
-			{
-				is_on = true;
-				ClearGroup ();
-			}
-			Broadcast (signalClicked);
-		break;
-	}
-
-	Invalidate ();
-
-	return true;
+    eventEaten = true;
+    if (!is_on)
+    {
+      is_on = true;
+      ClearGroup ();
+    }
+    Broadcast (signalClicked);
+    break;
+  }
+  
+  Invalidate ();
+  
+  return eventEaten;
 }
 
 void awsRadButton::OnSetFocus ()
