@@ -153,7 +153,9 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
 
   if (reg && tm)
   {
-    TexWrapper->Register (tm);
+    // If we already have a texture handle then we don't register again.
+    if (!TexWrapper->GetTextureHandle ())
+      TexWrapper->Register (tm);
     TexWrapper->GetTextureHandle()->Prepare ();
     if (matwrap)
     {

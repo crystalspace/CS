@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Dec-2003
+	- Jorrit fixed a problem in iLoader->LoadTexture(). It would register
+	  the texture twice resuling in two texture handles. For the OR this
+	  is actually not a real problem (except for wasting resources) but
+	  the NR could not cope with this.
 21-Dec-2003
 	- res added a shader, or_lighting.xml, which mimics the old renderer.
 	- res fixed genmesh to provide the lighting as vertex colors on NR as
