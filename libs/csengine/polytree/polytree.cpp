@@ -244,6 +244,15 @@ struct CPSortPolDist
   float sqdist;
 };
 
+static int CPSortDistance (const void* el1, const void* el2)
+{
+  CPSortPolDist* po1 = (CPSortPolDist*)el1;
+  CPSortPolDist* po2 = (CPSortPolDist*)el2;
+  if (po1->sqdist < po2->sqdist) return -1;
+  else if (po1->sqdist > po2->sqdist) return 1;
+  else return 0;
+}
+
 static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
 	int num, bool same_plane, void* vdata)
 {
@@ -286,6 +295,8 @@ static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
 	  else sorted_polygons[i].sqdist = 1000000000.;
 	}
 	// @@@ DO qsort here!!!
+	qsort ((void*)sorted_polygons, num, sizeof (CPSortPolDist),
+		CPSortDistance);
       }
 
       for (i = 0 ; i < num ; i++)

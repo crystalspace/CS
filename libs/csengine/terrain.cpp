@@ -230,6 +230,12 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 	}
   }
 
+  rview.g3d->SetObjectToCamera (&rview);
+  rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
+  // @@@ This should only be done when aspect changes...
+  rview.g3d->SetPerspectiveAspect (rview.aspect);
+  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
+
   // Setup the structure for DrawTriangleMesh.
   static G3DTriangleMesh g3dmesh;
   static bool init = false;

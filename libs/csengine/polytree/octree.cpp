@@ -1884,15 +1884,12 @@ static void SplitOptPlane2 (const csPoly3D* np, csPoly3D& inputF, const csPoly3D
   }
 }
 
-bool db_classify = false;
 int csOctree::ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly)
 {
   if (node->GetMiniBsp ())
   {
-if (db_classify) CsPrintf (MSG_DEBUG_0, "o::cl_pol: minibsp\n");
     csBspTree* bsp = node->GetMiniBsp ();
     int rc = bsp->ClassifyPolygon (poly);
-if (db_classify) CsPrintf (MSG_DEBUG_0, "o::cl_pol: minibsp rc=%d\n", rc);
     //if (rc == 1)
     //{
       //if (!ClassifyPoint (poly.GetCenter ())) rc = 0;
@@ -1901,7 +1898,6 @@ if (db_classify) CsPrintf (MSG_DEBUG_0, "o::cl_pol: minibsp rc=%d\n", rc);
   }
   if (node->IsLeaf ())
   {
-if (db_classify) CsPrintf (MSG_DEBUG_0, "o::cl_pol: leaf rc=%d\n", ClassifyPoint (poly.GetCenter ()));
     if (ClassifyPoint (poly.GetCenter ())) return 1;
     else return 0;
   }
@@ -1929,15 +1925,12 @@ if (db_classify) CsPrintf (MSG_DEBUG_0, "o::cl_pol: leaf rc=%d\n", ClassifyPoint
   for (i = 0 ; i < 8 ; i++)
     if (node->children[i] && nps[i])
     {
-if (db_classify) CsPrintf (MSG_DEBUG_0, "o::cl_pol: child[%d]\n", i);
       int rc = ClassifyPolygon ((csOctreeNode*)node->children[i], *nps[i]);
-if (db_classify) CsPrintf (MSG_DEBUG_0, "o::cl_pol: child[%d] rc=%d\n", i, rc);
       if (rc == -1) return rc;
       if (rc == 0) found_open = true;
       if (rc == 1) found_solid = true;
       if (found_solid && found_open) return -1;
     }
-if (db_classify) CsPrintf (MSG_DEBUG_0, "o::cl_pol: end rc=%d\n", found_solid);
   if (found_solid) return 1;
   return 0;
 }
@@ -1973,7 +1966,6 @@ UShort csOctree::ClassifyRectangle (int plane_nr, float plane_pos,
   for (y = 0 ; y < 4 ; y++)
     for (x = 0 ; x < 4 ; x++)
     {
-CsPrintf (MSG_DEBUG_0, "Trying %dx%d\n", x, y);
       poly.MakeEmpty ();
       v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4.;
       v.y = cor_xy.y + y*(cor_XY.y-cor_xy.y)/4.;
@@ -1987,15 +1979,7 @@ CsPrintf (MSG_DEBUG_0, "Trying %dx%d\n", x, y);
       v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4.;
       v.y = cor_xy.y + (y+1)*(cor_XY.y-cor_xy.y)/4.;
       poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
-db_classify = (x == 0 && y == 1);
-{
-int i;
-for (i = 0 ; i < poly.GetNumVertices () ; i++)
-CsPrintf (MSG_DEBUG_0, "  %d: %f,%f,%f\n", i,
-poly[i].x, poly[i].y, poly[i].z);
-}
       rc = ClassifyPolygon (poly);
-CsPrintf (MSG_DEBUG_0, "  rc=%d\n", rc);
       if (rc == 1) result |= 1<<bitnr;
       bitnr++;
     }

@@ -654,12 +654,10 @@ bool csBspTree::ReadFromCache (iFile* cf,
   return rc;
 }
 
-extern bool db_classify;
 int csBspTree::ClassifyPolygon (csBspNode* node, const csPoly3D& poly)
 {
   if (!node)
   {
-if (db_classify) CsPrintf (MSG_DEBUG_0, "b::cl_pol: !node rc=%d\n", ClassifyPoint (poly.GetCenter ()));
     if (ClassifyPoint (poly.GetCenter ()))
       return 1;
     else
@@ -668,7 +666,6 @@ if (db_classify) CsPrintf (MSG_DEBUG_0, "b::cl_pol: !node rc=%d\n", ClassifyPoin
 
   if (!node->front && !node->back)
   {
-if (db_classify) CsPrintf (MSG_DEBUG_0, "b::cl_pol: leaf rc=%d\n", ClassifyPoint (poly.GetCenter ()));
     // Leaf.
     // If we come here then we know that the entire polygon is in
     // this node. In that case we test one of the vertices to see if
@@ -682,45 +679,28 @@ if (db_classify) CsPrintf (MSG_DEBUG_0, "b::cl_pol: leaf rc=%d\n", ClassifyPoint
   switch (c)
   {
     case POL_SAME_PLANE:
-if (db_classify) CsPrintf (MSG_DEBUG_0, "b::cl_pol: SAME rc=%d\n", ClassifyPoint (poly.GetCenter ()));
       if (ClassifyPoint (poly.GetCenter ()))
         return 1;
       else
         return 0;
       break;
     case POL_FRONT:
-if (db_classify) CsPrintf (MSG_DEBUG_0, "b::cl_pol: FRONT\n");
       return ClassifyPolygon (node->front, poly);
     case POL_BACK:
-if (db_classify) CsPrintf (MSG_DEBUG_0, "b::cl_pol: BACK\n");
       return ClassifyPolygon (node->back, poly);
     case POL_SPLIT_NEEDED:
       {
-if (db_classify) CsPrintf (MSG_DEBUG_0, "b::cl_pol: SPLIT\n");
         csPoly3D front, back;
 	poly.SplitWithPlane (front, back, node->splitter);
-if (db_classify)
-{
-int i;
-for (i = 0 ; i < poly.GetNumVertices () ; i++)
-CsPrintf (MSG_DEBUG_0, "  poly: %d: %f,%f,%f\n", i, poly[i].x, poly[i].y, poly[i].z);
-for (i = 0 ; i < front.GetNumVertices () ; i++)
-CsPrintf (MSG_DEBUG_0, "  front: %d: %f,%f,%f\n", i, front[i].x, front[i].y, front[i].z);
-for (i = 0 ; i < back.GetNumVertices () ; i++)
-CsPrintf (MSG_DEBUG_0, "  back: %d: %f,%f,%f\n", i, back[i].x, back[i].y, back[i].z);
-}
         int rc1 = ClassifyPolygon (node->front, front);
-if (db_classify) CsPrintf (MSG_DEBUG_0, "b::cl_pol: SPLIT rc1=%d\n", rc1);
 	if (rc1 == -1) return -1;
         int rc2 = ClassifyPolygon (node->back, back);
-if (db_classify) CsPrintf (MSG_DEBUG_0, "b::cl_pol: SPLIT rc2=%d\n", rc2);
 	if (rc2 == -1) return -1;
 	if (rc1 != rc2) return -1;
 	return rc1;
       }
       return -1;
   }
-if (db_classify) CsPrintf (MSG_DEBUG_0, "b::cl_pol: end rc=-1\n");
   return -1;
 }
 
