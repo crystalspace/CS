@@ -33,7 +33,17 @@
 #include "csutil/array.h"
 #include "csutil/csstring.h"
 #include "csutil/scf.h"
+#include "iengine/engine.h"
+#include "igraphic/imageio.h"
+#include "imap/loader.h"
+#include "imap/saver.h"
 #include "iutil/evdefs.h"
+#include "iutil/fontserv.h"
+#include "iutil/vfs.h"
+#include "ivaria/conout.h"
+#include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
+#include "ivideo/graph3d.h"
 
 struct iObjectRegistry;
 struct iEvent;
@@ -43,7 +53,6 @@ struct iPluginManager;
 struct iVirtualClock;
 struct iCommandLineParser;
 struct iConfigManager;
-struct iVFS;
 
 /**\name Plugin request macros
  * Utility macros to select what plugins you want to have loaded.
@@ -51,6 +60,14 @@ struct iVFS;
 /// Request a plugin.
 #define CS_REQUEST_PLUGIN(Name,Interface) Name, #Interface, \
   scfInterface<Interface>::GetID(), scfInterface<Interface>::GetVersion()
+
+// !!! NOTE !!!
+// When editing this list, you *must* ensure that initapp.h #include the
+// appropriate header for each SCF interface mentioned by a CS_REQUEST_PLUGIN()
+// invocation. This is necessary to guarantee that the interface-specialized
+// version of scfInterface<> is seen by clients rather than the non-specialized
+// template.
+
 /// Marker for the end of the requested plugins list.
 #define CS_REQUEST_END \
   0
