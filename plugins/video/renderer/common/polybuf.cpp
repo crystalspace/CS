@@ -51,7 +51,8 @@ void csPolArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
   pol.v_obj2tex = v_obj2tex;
   pol.mat_index = mat_index;
   pol.poly_texture = poly_texture;
-  poly_texture->IncRef ();
+  if (poly_texture)
+    poly_texture->IncRef ();
   polygons.Push (pol);
 }
 
@@ -85,7 +86,8 @@ void csPolArrayPolygonBuffer::Clear ()
   {
     csPolArrayPolygon& pol = polygons[i];
     delete[] pol.vertices;
-    pol.poly_texture->DecRef ();
+    if (pol.poly_texture)
+      pol.poly_texture->DecRef ();
   }
   polygons.SetLength (0);
 

@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+17-Apr-2003
+	- Fixed a bug in the common polygon buffer implementation where it
+	  was incrementing the ref count on poly_texture without testing if
+	  it is NULL or not.
 16-Apr-2003
 	- Rhad altered the rapid triangle collision test to ignore
 	  degenerate triangles.
