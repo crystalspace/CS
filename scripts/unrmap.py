@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-import types
-from string import *;
-import re
+import types, string, re
 
 try:
 	import cPickle
@@ -12,11 +10,21 @@ except:
 	import pickle
 
 try:
-	import cspacec
 	from cspace import *
 except:
     	print "WARNING: Failed to import module cspace, can only pickle the map"
 
+#Variables
+scale=0.1
+warn=0
+
+#Helper functions            
+def VectorConvert(vec):
+	return (float(vec[0])*scale, float(vec[1])*scale, float(vec[2])*scale)
+def TOcsVector3(vec):
+    	return csVector3(vec[0], vec[1], vec[2])
+    	
+#Unreal Objects
 class Object:
 	"""Lowest level Unreal Object"""
 	def __init__(self, attrib):
@@ -43,9 +51,9 @@ class PlayerStart(Actor):
 	def Add(self, attrib):
 		self.attrib.update(attrib)
 		if(attrib.has_key('Location')):
-			loc=re.match('X=(.*),Y=(.*),Z=(.*)').groups()
+			self.loc=VectorConvert(re.match('\(X=(.*),Y=(.*),Z=(.*)\)', attrib['Location']).groups())
 	def Load(self, view):
-#		view.GetCamera().SetPosition(csVector3(loc[0],loc[1],loc[2]))
+		view.GetCamera().SetPosition(TOcsVector3(self.loc))
 		pass
 class Brush(Actor):
     	"""A geometry object from Unreal"""
@@ -53,13 +61,12 @@ class Brush(Actor):
 		if not self.attrib.has_key('CsgOper'):
 			poly=room.NewPolygon(tm)
 #		elif self.attrib['CsgOper']=='CSG_Add':
-#			thing=csThing()
-#			poly=thing.NewPolygon(tm)
-#			vecs.Load(poly)
-#			room.AddThing(thing)
-#			return
+#			poly=room.NewPolygon(tm)
+#		elif self.attrib['CsgOper']=='CSG_Add':
+#			poly=room.NewPolygon(tm)
 		else:
-			print "WARNING: Unknown "+self.attrib['CsgOper']
+			if(warn):
+				print "WARNING: Unknown "+self.attrib['CsgOper']
 			return
 		vecs.Load(poly)
 	def Load(self, room, tm):
@@ -72,9 +79,6 @@ class FakeBrush(Object):
 class PolyList(Object):
     	"""A list of polygons"""
 	pass
-	
-scale=0.10
-	
 class Polygon(Object):
     	"""A polygons"""
 	def __init__(self, attrib):
@@ -88,28 +92,30 @@ class Polygon(Object):
 		poly.SetTextureSpace(poly.Vobj(0), poly.Vobj(1), 3);
 	def __repr__(self):
 		return str(self.veclist)
-	
 class Map(Actor):
 	"""A pickleable map"""
 	def Count(self):
 		print "----- Map Count -----"
+		print "Brush: ", self.counts['Brush']
+		print "PlayerStart: ", self.counts['PlayerStart']
 		print "---------------------"
+	def Inc(self, type):
+		self.counts[type]=self.counts[type]+1
 	def Load(self):
+		self.counts={'Brush':0,'PlayerStart':0}
 		system=GetSystem()
 		room=csSector(roomptr)
 		view=csView(viewptr)
 		tm=csTextureHandle(tmptr)
 		for x in self.stack:
 			if isinstance(x, Brush):
+				self.Inc('Brush')
 				x.Load(room, tm)
 			elif isinstance(x, PlayerStart):
+				self.Inc('PlayerStart')
 				x.Load(view)	
-		g3d=system.Query_iGraphics3D()
 
 # The Map Reader
-
-def VectorConvert(vec):
-	return (float(vec[0])*scale, float(vec[1])*scale, float(vec[2])*scale)
 class UnrealMap:
 	"""Import an Unreal Map and pickle it"""
 	def Load(self, file):
@@ -127,7 +133,7 @@ class UnrealMap:
 		self.NextLine()
 		if(not len(self.line)):
 			return 0
-		self.words=split(self.line)
+		self.words=string.split(self.line)
 		if(self.words[0]=='Begin'):
 			self.Push()
 			self.Begin()
@@ -173,9 +179,9 @@ class UnrealMap:
 		self.Pop()
 	def PolyAdd(self):
 		self.NextLine();
-		self.words=split(self.line)
+		self.words=string.split(self.line)
 		if(self.words[0]=='Vertex'):
-			vecs=split(self.words[1], ',')
+			vecs=string.split(self.words[1], ',')
 			self.block.AddPoint(VectorConvert(vecs))
 			return 1
 		if(self.words[0]=='End'):
@@ -187,7 +193,8 @@ class UnrealMap:
 			exec 'actor='+attrib['Class']+'(attrib)'
 			self.block=actor
 		except:
-			print 'ERROR: Actor '+attrib['Class']+' not found'
+			if(warn):
+				print 'ERROR: Actor '+attrib['Class']+' not found'
 			self.block=Actor(attrib)
 		self.Loop()
 	def Pop(self):
@@ -201,7 +208,7 @@ class UnrealMap:
 	def Params(self, index):
 		params={}
 		for x in self.words[index:]:
-			word=split(x, '=')
+			word=string.split(x, '=', 1)
 			if(len(word)==2):
 				params[word[0]]=word[1]
 		return params
@@ -221,8 +228,7 @@ def Load(file):
 		m.Load(filet3d)
 		m.Save(filepym)
 		a=m.map
-	a.Count()
 	print 'Unrmap: Map loaded, creating...'
 	a.Load()
-				
-#Load('entry')
+	a.Count()
+#Load('/code/CS/data/entry')

@@ -98,11 +98,8 @@ bool PySimple::Initialize (int argc, char *argv[], const char *iConfigName)
 
   iScript* is = CREATE_INSTANCE("crystalspace.script.python", iScript);
   is->Initialize(this);
-  is->RunText("import sys");
-  is->RunText("sys.path.append('./scripts/');");
-  is->RunText("import cshelper");
 
-  if(!is->RunText("import unrmap"))
+  if(!is->LoadModule("unrmap"))
     return 0;
 
 //TODO Python HACK
