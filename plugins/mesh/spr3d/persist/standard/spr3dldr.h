@@ -28,7 +28,6 @@
 #include "csutil/strhash.h"
 
 struct iEngine;
-struct iSkeletonLimb;
 struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
@@ -44,10 +43,6 @@ private:
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
-
-  // Load a skeleton.
-  bool LoadSkeleton (iDocumentNode* node, iReporter* reporter, 
-    iSkeletonLimb* limb);
 
 public:
   SCF_DECLARE_IBASE;
@@ -82,9 +77,6 @@ private:
   iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
-
-  // Save a skeleton.
-  void SaveSkeleton (iSkeletonLimb* limb, csString& str);
 
 public:
   SCF_DECLARE_IBASE;

@@ -232,7 +232,6 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   logparent = 0;
   cstxt = 0;
   emerge_from = 0;
-  skeleton = 0;
   cachename = 0;
 
   texel_mesh = new csTriangleMesh ();
@@ -254,7 +253,6 @@ csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
 {
   delete texel_mesh;
   delete[] emerge_from;
-  delete skeleton;
   delete tri_verts;
   delete[] cachename;
   ClearLODListeners ();
@@ -321,12 +319,6 @@ void csSprite3DMeshObjectFactory::AddVertices (int num)
 void csSprite3DMeshObjectFactory::AddTriangle (int a, int b, int c)
 {
   texel_mesh->AddTriangle (a, b, c);
-}
-
-void csSprite3DMeshObjectFactory::SetSkeleton (csSkel* sk)
-{
-  delete skeleton;
-  skeleton = sk;
 }
 
 csPtr<iMeshObject> csSprite3DMeshObjectFactory::NewInstance ()
@@ -400,8 +392,6 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
     delete [] new_normals;
   }
 
-  if (skeleton) skeleton->RemapVertices (translate);
-
   for (i = 0 ; i < GetTriangleCount () ; i++)
   {
     csTriangle& tr = texel_mesh->GetTriangles()[i];
@@ -443,11 +433,6 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
     	qsqrt (max_sq_radius.x),
 	qsqrt (max_sq_radius.y),
 	qsqrt (max_sq_radius.z)));
-  }
-  if (skeleton)
-  {
-    // @@@ should the base frame for the skeleton be a variable?
-    skeleton->ComputeBoundingBox (vertices.Get (0));
   }
 }
 
@@ -800,94 +785,43 @@ csSpriteAction2* csSprite3DMeshObjectFactory::FindAction (const char *n) const
 
 void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
 {
-  if (skeleton)
+  int num = GetVertexCount ();
+  int numf = GetFrameCount ();
+  int i, j;
+  for (i = 0 ; i < numf ; i++)
   {
-    // If there is a skeleton we only have to transform the vertices of the
-    // root limb and change the transforms of all children connecting to
-    // the root.
-    int vt_cnt = skeleton->GetVertexCount ();
-    int* vt = skeleton->GetVertices ();
-    int i;
-    csVector3* verts = GetVertices (0);
-    for (i = 0 ; i < vt_cnt ; i++)
-      verts[vt[i]] = t.This2Other (verts[vt[i]]);
-    iSkeletonLimb* c = skeleton->GetChildren ();
-    while (c)
-    {
-      csRef<iSkeletonConnection> con = SCF_QUERY_INTERFACE (c,
-      	iSkeletonConnection);
-      if (con)
-      {
-        csTransform& tr = con->GetTransformation ();
-	// @@@ Not sure about the line below.
-	con->SetTransformation (t * tr);
-      }
-      c = c->GetNextSibling ();
-    }
-    ComputeBoundingBox ();
-  }
-  else
-  {
-    int num = GetVertexCount ();
-    int numf = GetFrameCount ();
-    int i, j;
-    for (i = 0 ; i < numf ; i++)
-    {
-      csVector3* verts = GetVertices (i);
-      csBox3 box;
-      verts[0] = t.This2Other (verts[0]);
-      csVector3& v0 = verts[0];
-      box.StartBoundingBox (v0);
-      csVector3 max_sq_radius (v0.x*v0.x + v0.x*v0.x,
+    csVector3* verts = GetVertices (i);
+    csBox3 box;
+    verts[0] = t.This2Other (verts[0]);
+    csVector3& v0 = verts[0];
+    box.StartBoundingBox (v0);
+    csVector3 max_sq_radius (v0.x*v0.x + v0.x*v0.x,
     	v0.y*v0.y + v0.y*v0.y, v0.z*v0.z + v0.z*v0.z);
-      for (j = 1 ; j < num ; j++)
-      {
-        csVector3& v = verts[j];
-        v = t.This2Other (v);
-        box.AddBoundingVertexSmart (v);
-	csVector3 sq_radius (v.x*v.x + v.x*v.x, v.y*v.y + v.y*v.y,
+    for (j = 1 ; j < num ; j++)
+    {
+      csVector3& v = verts[j];
+      v = t.This2Other (v);
+      box.AddBoundingVertexSmart (v);
+      csVector3 sq_radius (v.x*v.x + v.x*v.x, v.y*v.y + v.y*v.y,
 		v.z*v.z + v.z*v.z);
-        if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
-        if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
-        if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
-      }
-      GetFrame (i)->SetBoundingBox (box);
-      GetFrame (i)->SetRadius (csVector3 (
+      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+    }
+    GetFrame (i)->SetBoundingBox (box);
+    GetFrame (i)->SetRadius (csVector3 (
     	qsqrt (max_sq_radius.x),
 	qsqrt (max_sq_radius.y),
 	qsqrt (max_sq_radius.z)));
 
-    }
   }
   scfiObjectModel.ShapeChanged ();
 }
 
-void csSprite3DMeshObjectFactory::Sprite3DFactoryState::
-	EnableSkeletalAnimation ()
-{
-  csSkel* skel = new csSkel ();
-  scfParent->SetSkeleton (skel);
-}
-
-iSkeleton* csSprite3DMeshObjectFactory::Sprite3DFactoryState::GetSkeleton ()
-  const
-{
-  csRef<iSkeleton> iskel (
-  	SCF_QUERY_INTERFACE_SAFE (scfParent->GetSkeleton (), iSkeleton));
-  return iskel;	// DecRef is ok here.
-}
-
 void csSprite3DMeshObjectFactory::GetObjectBoundingBox (csBox3& b, int /*type*/)
 {
-  if (skeleton)
-  {
-    skeleton->ComputeBoundingBox (csTransform (), b, vertices.Get (0));
-  }
-  else
-  {
-    csSpriteFrame* cframe = GetAction (0)->GetCsFrame (0);
-    cframe->GetBoundingBox (b);
-  }
+  csSpriteFrame* cframe = GetAction (0)->GetCsFrame (0);
+  cframe->GetBoundingBox (b);
 }
 
 void csSprite3DMeshObjectFactory::GetRadius (csVector3& rad, csVector3& cent)
@@ -1017,7 +951,6 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   force_otherskin = false;
   cur_action = 0;
   vertex_colors = 0;
-  skeleton_state = 0;
   tween_ratio = 0;
   do_lighting = true;
   num_verts_for_lod = -1;
@@ -1079,7 +1012,6 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
   tween_verts->DecRef ();
 
   delete [] vertex_colors;
-  delete skeleton_state;
   delete rand_num;
   ClearLODListeners ();
   
@@ -1132,10 +1064,6 @@ void csSprite3DMeshObject::SetupLODListeners (iSharedVariable* varm,
 void csSprite3DMeshObject::SetFactory (csSprite3DMeshObjectFactory* tmpl)
 {
   factory = tmpl;
-  delete skeleton_state;
-  skeleton_state = 0;
-  if (tmpl->GetSkeleton ())
-    skeleton_state = (csSkelState*)tmpl->GetSkeleton ()->CreateState ();
   EnableTweening (tmpl->IsTweeningEnabled ());
   MixMode = tmpl->GetMixMode ();
   SetLodLevelConfig (factory->GetLodLevelConfig ());
@@ -1272,26 +1200,18 @@ void csSprite3DMeshObject::GetTransformedBoundingBox (
   cur_cameranr = cameranr;
   cur_movablenr = movablenr;
 
-  if (skeleton_state)
-  {
-    skeleton_state->ComputeBoundingBox (trans, camera_bbox,
-    	factory->vertices.Get (0));
-  }
-  else
-  {
-    CS_ASSERT (cur_action != 0);
-    csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
-    csBox3 box;
-    cframe->GetBoundingBox (box);
-    camera_bbox.StartBoundingBox (trans * box.GetCorner (0));
-    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
-    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
-    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (3));
-    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (4));
-    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (5));
-    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (6));
-    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (7));
-  }
+  CS_ASSERT (cur_action != 0);
+  csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
+  csBox3 box;
+  cframe->GetBoundingBox (box);
+  camera_bbox.StartBoundingBox (trans * box.GetCorner (0));
+  camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
+  camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
+  camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (3));
+  camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (4));
+  camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (5));
+  camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (6));
+  camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (7));
 
   cbox = camera_bbox;
 }
@@ -1344,17 +1264,9 @@ float csSprite3DMeshObject::GetScreenBoundingBox (
 
 void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b, int /*type*/)
 {
-  if (skeleton_state)
-  {
-    skeleton_state->ComputeBoundingBox (csTransform (), b,
-    	factory->vertices.Get (0));
-  }
-  else
-  {
-    CS_ASSERT (cur_action != 0);
-    csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
-    cframe->GetBoundingBox (b);
-  }
+  CS_ASSERT (cur_action != 0);
+  csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
+  cframe->GetBoundingBox (b);
 }
 
 void csSprite3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
@@ -1363,20 +1275,9 @@ void csSprite3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
   GetObjectBoundingBox(bbox);
   cent = bbox.GetCenter();
 
-  if (skeleton_state)
-  {
-    skeleton_state->ComputeSqRadius (csTransform (), r,
-    	factory->vertices.Get (0));
-    r.x = qsqrt (r.x);
-    r.y = qsqrt (r.y);
-    r.z = qsqrt (r.z);
-  }
-  else
-  {
-    CS_ASSERT (cur_action != 0);
-    csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
-    cframe->GetRadius (r);
-  }
+  CS_ASSERT (cur_action != 0);
+  csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
+  cframe->GetRadius (r);
   rad =  r;
 }
 
@@ -1641,7 +1542,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 #endif
 
   bool do_tween = false;
-  if (!skeleton_state && tween_ratio) do_tween = true;
+  if (tween_ratio) do_tween = true;
 
   int cf_idx = cframe->GetAnmIndex();
 
@@ -1653,20 +1554,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   {
     int nf_idx = next_frame->GetAnmIndex();
     real_tween_verts = factory->GetVertices (nf_idx);
-  }
-
-  // If we have a skeleton then we transform all vertices through
-  // the skeleton. In that case we also include the camera transformation
-  // so that the 3D renderer does not need to do it anymore.
-  csVector3* verts;
-  if (skeleton_state)
-  {
-    skeleton_state->Transform (tr_o2c, real_obj_verts, tr_verts->GetArray ());
-    verts = tr_verts->GetArray ();
-  }
-  else
-  {
-    verts = real_obj_verts;
   }
 
   // Calculate the right LOD level for this sprite.
@@ -1822,10 +1709,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   g3dmesh.do_morph_colors = false;
   g3dmesh.vertex_fog = fog_verts->GetArray ();
 
-  if (skeleton_state)
-    g3dmesh.vertex_mode = G3DTriangleMesh::VM_VIEWSPACE;
-  else
-    g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+  g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
   g3dmesh.mixmode = MixMode | (vertex_colors ? CS_FX_GOURAUD : 0);
 
 
@@ -1942,7 +1826,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
 
 
   bool do_tween = false;
-  if (!skeleton_state && tween_ratio) do_tween = true;
+  if (tween_ratio) do_tween = true;
 
   int cf_idx = cframe->GetAnmIndex();
 
@@ -1955,20 +1839,6 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
     real_tween_verts = factory->GetVertices (nf_idx);
     factory->ComputeNormals (next_frame);
     real_tween_norms = factory->GetNormals (nf_idx);
-  }
-
-  // If we have a skeleton then we transform all vertices through
-  // the skeleton. In that case we also include the camera transformation
-  // so that the 3D renderer does not need to do it anymore.
-  csVector3* verts;
-  if (skeleton_state)
-  {
-    skeleton_state->Transform (tr_o2c, real_obj_verts, tr_verts->GetArray ());
-    verts = tr_verts->GetArray ();
-  }
-  else
-  {
-    verts = real_obj_verts;
   }
 
   // Calculate the right LOD level for this sprite.
@@ -2093,13 +1963,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
   }
 
   n = 1;
-  if (skeleton_state) 
-  {
-    /* set to identity for software skeleton */
-    rmesh->object2camera = csReversibleTransform ();
-  }
-  else
-    rmesh->object2camera = tr_o2c;
+  rmesh->object2camera = tr_o2c;
   rmesh->mixmode = MixMode;
   rmesh->indexstart = 0;
   rmesh->indexend = final_num_triangles * 3;
@@ -2364,15 +2228,7 @@ csVector3* csSprite3DMeshObject::GetObjectVerts (csSpriteFrame* fr)
   for (i = 0; i < factory->GetVertexCount (); i++)
     (*obj_verts)[i] = factory->GetVertex(fr_idx, i);
 
-  if (skeleton_state)
-  {
-    UpdateWorkTables (factory->GetVertexCount());
-    skeleton_state->Transform (csTransform (), obj_verts->GetArray (),
-    	tr_verts->GetArray ());
-    return tr_verts->GetArray ();
-  }
-  else
-    return obj_verts->GetArray ();
+  return obj_verts->GetArray ();
 }
 
 void csSprite3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
@@ -2912,14 +2768,6 @@ csMeshedPolygon* csSprite3DMeshObject::PolyMesh::GetPolygons ()
   return polygons;
 }
 
-iSkeletonState* csSprite3DMeshObject::Sprite3DState::GetSkeletonState () const
-{
-  csRef<iSkeletonState> iskelstate (
-  	SCF_QUERY_INTERFACE_SAFE (scfParent->GetSkeletonState (),
-	iSkeletonState));
-  return iskelstate;	// DecRef is ok here.
-}
-
 #ifndef CS_USE_NEW_RENDERER
 void csSprite3DMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
 {
@@ -2941,7 +2789,7 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
         sizeof (csVector3)*final_num_vertices, CS_BUF_DYNAMIC,
 		CS_BUFCOMP_FLOAT, 3, false);
     }
-    if (!skeleton_state && tween_ratio > EPSILON)
+    if (tween_ratio > EPSILON)
     {
       csRenderBufferLock<csVector3> tweenedVerts (vertices);
 

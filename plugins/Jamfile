@@ -16,7 +16,6 @@ SubInclude TOP plugins filesys ;
 SubInclude TOP plugins font ;
 SubInclude TOP plugins isoldr ;
 SubInclude TOP plugins mesh ;
-SubInclude TOP plugins motion ;
 SubInclude TOP plugins movierecorder ;
 SubInclude TOP plugins net ;
 SubInclude TOP plugins physics ;

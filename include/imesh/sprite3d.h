@@ -26,8 +26,6 @@
 
 class csColor;
 struct iMaterialWrapper;
-struct iSkeleton;
-struct iSkeletonState;
 struct iMeshObject;
 struct iMeshWrapper;
 struct iMeshObjectFactory;
@@ -252,15 +250,6 @@ struct iSprite3DFactoryState : public iBase
   /// Query the socket number f.
   virtual iSpriteSocket* GetSocket (int f) const = 0;
 
-  /// Enable skeletal animation for this factory.
-  virtual void EnableSkeletalAnimation () = 0;
-  /**
-   * Get the skeleton. Will only be valid if skeletal animation
-   * has been enabled with EnableSkeletalAnimation(). Otherwise
-   * it will return 0.
-   */
-  virtual iSkeleton* GetSkeleton () const = 0;
-
   /// Enable/disable tweening.
   virtual void EnableTweening (bool en) = 0;
   /// Query state of tweening.
@@ -346,13 +335,6 @@ struct iSprite3DState : public iBase
   virtual bool IsLighting () const = 0;
 
   // @@@ TODO: what about convenience functions to set colors for verts?
-
-  /**
-   * Get the skeleton state. Will only be valid if skeletal animation
-   * has been enabled for the factory that this sprite was created from.
-   * Otherwise it will return 0.
-   */
-  virtual iSkeletonState* GetSkeletonState () const = 0;
 
   /// Go to a specified frame.
   virtual void SetFrame (int f) = 0;

@@ -239,19 +239,6 @@ action which you want the sprite to use.
 @item listmeshes
 Lists all of the mesh objects in the world.
 
-@item addskel
-Add a skeletal tree (demonstration). The first argument is the depth. A
-depth of 1 will create a root and one layer above. The second argument is
-the width. This is the number of branches created at every depth. A good
-tree is @samp{addskel 3,3}. Be careful with large numbers here. The number
-of triangles grows @emph{very} fast! If the width parameter is negative the
-chosen width will be random between 1 and @samp{-width} (inclusive).
-
-@item addghost @var{depth},@var{width}
-Add a floating transparent green ghost. The first argument is the depth. A
-depth of 1 will create a root and one layer above. The second argument is
-the width. This is the number of arms for the ghost.
-
 @item rain @var{texture},@var{nparticles},@var{speed}
 Add a particle system simulating rain.  The three parameter for this command
 are the texture to use for the particles (@file{raindrop.png} is good), the

@@ -29,7 +29,6 @@
 #include "csgeom/transfrm.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
-#include "iengine/skelbone.h"
 #include "iutil/comp.h"
 
 #include "ivaria/dynamics.h"
@@ -38,7 +37,6 @@
 struct iObjectRegistry;
 struct iVirtualClock;
 struct iMeshWrapper;
-struct iSkeletonBone;
 class csPolygonTree;
 struct iODEFrameUpdateCallback;
 
@@ -457,7 +455,7 @@ public:
 /**
  * This is the implementation for a rigid body.
  * It keeps all properties for the body.
- * It can also be attached to a movable or a bone,
+ * It can also be attached to a movable,
  * to automatically update it.
  */
 class csODERigidBody : public csObject
@@ -473,7 +471,6 @@ private:
   csODEDynamicSystem* dynsys;
 
   csRef<iMeshWrapper> mesh;
-  csRef<iSkeletonBone> bone;
   csRef<iDynamicsMoveCallback> move_cb;
   csRef<iDynamicsCollisionCallback> coll_cb;
 
@@ -561,10 +558,6 @@ public:
     { scfParent->AttachMesh (mesh); }
     csRef<iMeshWrapper> GetAttachedMesh () 
     { return scfParent->GetAttachedMesh (); }
-    void AttachBone (iSkeletonBone* bone) 
-    { scfParent->AttachBone (bone); }
-    csRef<iSkeletonBone> GetAttachedBone () 
-    { return scfParent->GetAttachedBone (); }
     void SetMoveCallback (iDynamicsMoveCallback* cb) 
     { scfParent->SetMoveCallback (cb); }
     void SetCollisionCallback (iDynamicsCollisionCallback* cb) 
@@ -640,8 +633,6 @@ public:
 
   void AttachMesh (iMeshWrapper* mesh);
   csRef<iMeshWrapper> GetAttachedMesh () { return mesh; }
-  void AttachBone (iSkeletonBone* bone);
-  csRef<iSkeletonBone> GetAttachedBone () { return bone; }
   void SetMoveCallback (iDynamicsMoveCallback* cb);
   void SetCollisionCallback (iDynamicsCollisionCallback* cb);
 
@@ -809,7 +800,7 @@ private:
 
 /**
  * This is the implementation for a default dynamics move callback.
- * It can update mesh and bone.
+ * It can update mesh.
  */
 class csODEDefaultMoveCallback : public iDynamicsMoveCallback
 {
@@ -820,7 +811,6 @@ public:
   virtual ~csODEDefaultMoveCallback ();
 
   void Execute (iMeshWrapper* mesh, csOrthoTransform& t);
-  void Execute (iSkeletonBone* bone, csOrthoTransform& t);
   void Execute (csOrthoTransform& t);
 };
 

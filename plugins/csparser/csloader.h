@@ -66,7 +66,6 @@ struct iPolygonMesh;
 struct iObject;
 struct iThingState;
 struct iCollection;
-struct iSkeletonLimb;
 struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;

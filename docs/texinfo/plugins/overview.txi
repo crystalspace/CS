@@ -105,11 +105,6 @@ The scripting plug-in modules allow support for Python and Perl.
 The font server can be used to display different fonts in your application.
 
 @item
-@emph{Motion Manager}
-
-Skeletal motion manager.
-
-@item
 @emph{Reporter}
 
 The reporter plugin is used by all plugins in Crystal Space to report

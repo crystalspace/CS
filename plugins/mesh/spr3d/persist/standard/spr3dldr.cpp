@@ -30,14 +30,12 @@
 #include "iengine/engine.h"
 #include "iutil/plugin.h"
 #include "imesh/sprite3d.h"
-#include "imesh/skeleton.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
 #include "iutil/vfs.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
-#include "iengine/motion.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
@@ -51,7 +49,6 @@ CS_IMPLEMENT_PLUGIN
 enum
 {
   XMLTOKEN_ACTION,
-  XMLTOKEN_APPLYMOTION,
   XMLTOKEN_BASECOLOR,
   XMLTOKEN_F,
   XMLTOKEN_FACTORY,
@@ -149,93 +146,6 @@ bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csSprite3DFactoryLoader::LoadSkeleton (iDocumentNode* node,
-					    iReporter* reporter,
-					    iSkeletonLimb* limb)
-{
-  csRef<iSkeletonConnection> con (
-  	SCF_QUERY_INTERFACE (limb, iSkeletonConnection));
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_LIMB:
-        {
-          iSkeletonConnection* newcon = limb->CreateConnection ();
-	  csRef<iSkeletonLimb> newlimb (
-	  	SCF_QUERY_INTERFACE (newcon, iSkeletonLimb));
-	  const char* limbname = child->GetAttributeValue ("name");
-	  if (limbname) newlimb->SetName (limbname);
-	  if (!LoadSkeleton (child, reporter, newlimb))
-	    return false;
-	}
-        break;
-      case XMLTOKEN_TRANSFORM:
-        if (con)
-        {
-	  csMatrix3 m;
-	  csVector3 v (0, 0, 0);
-	  csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
-	  while (child_it->HasNext ())
-	  {
-	    csRef<iDocumentNode> childchild = child_it->Next ();
-	    if (childchild->GetType () != CS_NODE_ELEMENT) continue;
-	    const char* child_value = childchild->GetValue ();
-	    csStringID id = xmltokens.Request (child_value);
-	    switch (id)
-	    {
-              case XMLTOKEN_MATRIX:
-		if (!synldr->ParseMatrix (childchild, m))
-		  return false;
-		break;
-   	      case XMLTOKEN_Q:
-	        {
-		  csQuaternion q;
-		  q.x = childchild->GetAttributeValueAsFloat ("x");
-		  q.y = childchild->GetAttributeValueAsFloat ("y");
-		  q.z = childchild->GetAttributeValueAsFloat ("z");
-		  q.r = childchild->GetAttributeValueAsFloat ("r");
-		  m.Set (q);
-	        }
-	        break;
-              case XMLTOKEN_V:
-	        if (!synldr->ParseVector (childchild, v))
-		  return false;
-		break;
-	      default:
-		synldr->ReportBadToken (childchild);
-	        return false;
-            }
-          }
-	  csTransform tr (m, -m.GetInverse () * v);
-	  con->SetTransformation (tr);
-        }
-	else
-	{
-	  synldr->ReportError (
-	    "crystalspace.sprite3dfactoryloader.parse.skeleton.badtransform",
-	    child, "'transform' not valid for this type of skeleton limb!");
-	  return false;
-	}
-	break;
-      case XMLTOKEN_V:
-	limb->AddVertex (child->GetContentsValueAsInt ());
-        break;
-      default:
-	synldr->ReportBadToken (child);
-	return false;
-    }
-  }
-
-  return true;
-}
-
 csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 				       iLoaderContext* ldr_context, 
 				       iBase* context)
@@ -296,17 +206,10 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
         break;
 
       case XMLTOKEN_SKELETON:
-        {
-          spr3dLook->EnableSkeletalAnimation ();
-          iSkeleton* skeleton = spr3dLook->GetSkeleton ();
-          csRef<iSkeletonLimb> skellimb (
-	  	SCF_QUERY_INTERFACE (skeleton, iSkeletonLimb));
-	  const char* skelname = child->GetAttributeValue ("name");
-          if (skelname) skellimb->SetName (skelname);
-          if (!LoadSkeleton (child, reporter, skellimb))
-	    return 0;
-        }
-        break;
+	synldr->ReportError (
+		  "crystalspace.sprite3dfactoryloader.parse.badskeletal",
+		  child, "Skeletal sprites are no longer supported! (use sprcal3d instead)");
+        return 0;
 
       case XMLTOKEN_ACTION:
         {
@@ -496,40 +399,6 @@ bool csSprite3DFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
-  csString& str)
-{
-  csRef<iSkeletonConnection> con (
-  	SCF_QUERY_INTERFACE (limb, iSkeletonConnection));
-  int i;
-  char buf[MAXLINE];
-  str.Append("VERTICES (");
-  for(i=0; i<limb->GetVertexCount(); i++)
-  {
-    sprintf(buf, "%d%s", limb->GetVertices()[i],
-      (i==limb->GetVertexCount()-1)?"":",");
-    str.Append(buf);
-  }
-  str.Append(")\n");
-
-  str.Append("TRANSFORM (");
-  //str.Append (synldr->MatrixToText (con->GetTransformation().GetO2T(), 1, true));
-  sprintf(buf, " V(%g,%g,%g))", con->GetTransformation().GetO2TTranslation().x,
-    con->GetTransformation().GetO2TTranslation().y,
-    con->GetTransformation().GetO2TTranslation().z);
-  str.Append(buf);
-
-  iSkeletonLimb *ch = limb->GetChildren();
-  while(ch)
-  {
-    sprintf(buf, "LIMB '%s' (", ch->GetName());
-    str.Append(buf);
-    SaveSkeleton(ch, str);
-    str.Append(")\n");
-    ch = ch->GetNextSibling();
-  }
-}
-
 void csSprite3DFactorySaver::WriteDown (iBase*, iFile*)
 {
 }
@@ -554,7 +423,6 @@ bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
   xmltokens.Register ("action", XMLTOKEN_ACTION);
-  xmltokens.Register ("applymotion", XMLTOKEN_APPLYMOTION);
   xmltokens.Register ("basecolor", XMLTOKEN_BASECOLOR);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
@@ -598,9 +466,9 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	if (!spr3dLook)
 	{
       	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		"crystalspace.sprite3dloader.parse.missingfactory",
 		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
+		"No Factory! Please define 'factory' before 'action'!");
 	  return 0;
 	}
 	spr3dLook->SetAction (child->GetContentsValue ());
@@ -609,9 +477,9 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	if (!spr3dLook)
 	{
       	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		"crystalspace.sprite3dloader.parse.missingfactory",
 		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
+		"No Factory! Please define 'factory' before 'basecolor'!");
 	  return 0;
 	}
 	else
@@ -626,9 +494,9 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	if (!spr3dLook)
 	{
       	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		"crystalspace.sprite3dloader.parse.missingfactory",
 		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
+		"No Factory! Please define 'factory' before 'lighting'!");
 	  return 0;
 	}
 	else
@@ -643,9 +511,9 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	if (!spr3dLook)
 	{
       	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		"crystalspace.sprite3dloader.parse.missingfactory",
 		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
+		"No Factory! Please define 'factory' before 'material'!");
 	  return 0;
 	}
 	else
@@ -666,9 +534,9 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	if (!spr3dLook)
 	{
       	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		"crystalspace.sprite3dloader.parse.missingfactory",
 		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
+		"No Factory! Please define 'factory' before 'mixmode'!");
 	  return 0;
 	}
 	else
@@ -679,69 +547,13 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
           spr3dLook->SetMixMode (mm);
 	}
 	break;
-      case XMLTOKEN_APPLYMOTION:
-	{
-	  const char* motname = child->GetContentsValue ();
-	  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-	  	iPluginManager));
-	  csRef<iMotionManager> motman (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-		"crystalspace.motion.manager.default",
-		iMotionManager));
-	  if (!motman)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.setup.motion.motionmanager",
-		child, "Could not find motion manager!");
-	    return 0;
-	  }
-	  if (!spr3dLook)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
-		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
-	    return 0;
-	  }
-	  iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
-	  csRef<iSkeletonLimbState> limb (SCF_QUERY_INTERFACE (skel_state,
-	  	iSkeletonLimbState));
-	  limb = limb->GetChildren ();
-	  if (!limb)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.nochildren",
-		child, "Skeleton has no libs. Cannot apply motion!");
-	    return 0;
-	  }
-	  csRef<iSkeletonConnectionState> con (SCF_QUERY_INTERFACE (limb,
-	  	iSkeletonConnectionState));
-	  csRef<iSkeletonBone> bone (SCF_QUERY_INTERFACE (con, iSkeletonBone));
-	  if (!bone)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.nobones",
-		child, "The skeleton has no bones!");
-	    return 0;
-	  }
-          iMotionTemplate* motion = motman->FindMotionByName (motname);
-	  if (!motion)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.nomotion",
-		child, "The motion '%s' does not exist!", motname);
-	    return 0;
-	  }
-          iMotionController* mc = motman->AddController (bone);
-          mc->SetMotion (motion);
-	}
-	break;
       case XMLTOKEN_TWEEN:
 	if (!spr3dLook)
 	{
       	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		"crystalspace.sprite3dloader.parse.missingfactory",
 		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
+		"No Factory! Please define 'factory' before 'tween'!");
 	  return 0;
 	}
 	else

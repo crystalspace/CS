@@ -258,9 +258,6 @@ object there is typically one implementation in @file{object/} and one or more
 loader/saver plugins in @file{persist/}.  @file{persist/standard/} is the
 loader in Crystal Space format.
 
-@item CS/plugins/motion
-Skeletal motion.
-
 @item CS/plugins/net
 Network communications.
 

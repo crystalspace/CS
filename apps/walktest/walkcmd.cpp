@@ -38,18 +38,15 @@
 #include "isound/listener.h"
 #include "isound/renderer.h"
 #include "isound/wrapper.h"
-#include "imesh/skeleton.h"
 #include "imesh/mdlconv.h"
 #include "imesh/mdldata.h"
 #include "imesh/crossbld.h"
-#include "iengine/skelbone.h"
 #include "iengine/camera.h"
 #include "iengine/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "iutil/vfs.h"
 #include "iutil/config.h"
-#include "iengine/motion.h"
 #include "iengine/light.h"
 #include "imesh/sprite3d.h"
 #include "imesh/thing.h"
@@ -1049,7 +1046,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Statistics:");
     CONPRI("  stats perftest coordshow");
     CONPRI("Special effects:");
-    CONPRI("  addbot delbot addskel addghost fire explosion spiral frain rain");
+    CONPRI("  addbot delbot fire explosion spiral frain rain");
     CONPRI("  snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
     CONPRI("Debugging:");
@@ -1058,7 +1055,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  db_radstep db_radhi db_radtodo");
     CONPRI("Meshes:");
     CONPRI("  loadmesh addmesh delmesh listmeshes");
-    CONPRI("  listactions setaction setmotion");
+    CONPRI("  listactions setaction");
     CONPRI("Various:");
     CONPRI("  coordsave coordload bind p_alpha s_fog");
     CONPRI("  snd_play snd_volume record play playonce clrrec saverec");
@@ -2103,93 +2100,6 @@ bool CommandHandler (const char *cmd, const char *arg)
           Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Mesh is not a 3D sprite!");
       }
     }
-  }
-  else if (!strcasecmp (cmd, "setmotion"))
-  {
-    char name[100];
-    char motion[100];
-    int cnt = 0;
-    if (arg) cnt = csScanStr (arg, "%s,%s", name, motion);
-    if(cnt != 2)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected parameters 'meshname,motion'!");
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"To get the names use 'listmeshes'");
-    }
-    else
-    {
-      // Test to see if the mesh exists.
-      iMeshWrapper* wrap = Sys->Engine->GetMeshes ()->FindByName (name);
-      if (!wrap)
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No such mesh!");
-      else
-      {
-	csRef<iSprite3DState> state (
-		SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
-		iSprite3DState));
-        if (state)
-        {
-	  csRef<iSkeletonBone> sb (
-	  	SCF_QUERY_INTERFACE(state->GetSkeletonState(), iSkeletonBone));
-	  if (sb)
-	  {
-	    if (Sys->myMotionMan)
-	    {
-              iMotionController* mc=Sys->myMotionMan->
-	      	FindControllerBySkeleton(sb);
-              if(!mc)
-	      {
-                mc=Sys->myMotionMan->AddController(sb);
-              }
-              iMotionTemplate* mt=Sys->myMotionMan->FindMotionByName(motion);
-	      if (mt)
-	      {
-                mc->SetMotion(mt);
-              }
-	      else
-	        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-			"That motion does not exist!");
-	    }
-	    else
-	      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      	"No motion manager exists to animate the skeleton!");
-	  }
-	  else
-	    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"That sprite does not contain a skeleton!");
-        }
-	else
-	{
-          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Mesh is not a 3D sprite!");
-	}
-      }
-    }
-  }
-  else if (!strcasecmp (cmd, "addskel"))
-  {
-    RECORD_ARGS (cmd, arg);
-    int depth = 0, width = 0;
-    if (arg) csScanStr (arg, "%d,%d", &depth, &width);
-    if (depth < 1) depth = 3;
-    if (width < 1) width = 3;
-    extern void add_skeleton_tree (iSector* where, csVector3 const& pos,
-    	int depth, int width);
-    csOrthoTransform& t = Sys->view->GetCamera ()->GetTransform ();
-    add_skeleton_tree (Sys->view->GetCamera ()->GetSector (),
-    	t.GetOrigin ()+t.Other2This (csVector3 (0, 0, 1)), depth, width);
-  }
-  else if (!strcasecmp (cmd, "addghost"))
-  {
-    RECORD_ARGS (cmd, arg);
-    int depth, width;
-    if (arg) csScanStr (arg, "%d,%d", &depth, &width);
-    else { depth = 5; width = 8; }
-    extern void add_skeleton_ghost (iSector* where, csVector3 const& pos,
-    	int maxdepth, int width);
-    csOrthoTransform& t = Sys->view->GetCamera ()->GetTransform ();
-    add_skeleton_ghost (Sys->view->GetCamera ()->GetSector (),
-    	t.GetOrigin ()+t.Other2This (csVector3 (0, 0, 1)), depth, width);
   }
   else if (!strcasecmp (cmd, "addbot"))
   {

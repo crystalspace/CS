@@ -35,7 +35,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/csstring.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
-#include "iengine/motion.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
@@ -544,7 +543,6 @@ bool csSpriteCal3DLoader::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
   xmltokens.Register ("action", XMLTOKEN_ACTION);
-  xmltokens.Register ("applymotion", XMLTOKEN_APPLYMOTION);
   xmltokens.Register ("basecolor", XMLTOKEN_BASECOLOR);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
@@ -670,62 +668,6 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
 	if (!synldr->ParseMixmode (child, mm))
 	  return 0;
 	spr3dLook->SetMixMode (mm);
-      }
-      break;
-    case XMLTOKEN_APPLYMOTION:
-      {
-	const char* motname = child->GetContentsValue ();
-	csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-	  iPluginManager));
-	csRef<iMotionManager> motman (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-	  "crystalspace.motion.manager.default",
-	  iMotionManager));
-	if (!motman)
-	{
-	  synldr->ReportError (
-	    "crystalspace.sprite3dloader.setup.motion.motionmanager",
-	    child, "Could not find motion manager!");
-	  return 0;
-	}
-	if (!spr3dLook)
-	{
-	  synldr->ReportError (
-	    "crystalspace.sprite3dloader.parse.motion.missingfactory",
-	    child,
-	    "No Factory! Please define 'factory' before 'applymotion'!");
-	  return 0;
-	}
-	iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
-	csRef<iSkeletonLimbState> limb (SCF_QUERY_INTERFACE (skel_state,
-	  iSkeletonLimbState));
-	limb = limb->GetChildren ();
-	if (!limb)
-	{
-	  synldr->ReportError (
-	    "crystalspace.sprite3dloader.parse.motion.nochildren",
-	    child, "Skeleton has no libs. Cannot apply motion!");
-	  return 0;
-	}
-	csRef<iSkeletonConnectionState> con (SCF_QUERY_INTERFACE (limb,
-	  iSkeletonConnectionState));
-	csRef<iSkeletonBone> bone (SCF_QUERY_INTERFACE (con, iSkeletonBone));
-	if (!bone)
-	{
-	  synldr->ReportError (
-	    "crystalspace.sprite3dloader.parse.motion.nobones",
-	    child, "The skeleton has no bones!");
-	  return 0;
-	}
-	iMotionTemplate* motion = motman->FindMotionByName (motname);
-	if (!motion)
-	{
-	  synldr->ReportError (
-	    "crystalspace.sprite3dloader.parse.motion.nomotion",
-	    child, "The motion '%s' does not exist!", motname);
-	  return 0;
-	}
-	iMotionController* mc = motman->AddController (bone);
-	mc->SetMotion (motion);
       }
       break;
     case XMLTOKEN_TWEEN:

@@ -1284,7 +1284,6 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys) : geoms (1,4)
   collision_group = 0;
 
   mesh = 0;
-  bone = 0;
   move_cb = 0;
   coll_cb = 0;
 }
@@ -1749,13 +1748,6 @@ void csODERigidBody::AttachMesh (iMeshWrapper* m)
   mesh = m;
 }
 
-void csODERigidBody::AttachBone (iSkeletonBone* b)
-{
-  if (b) b->IncRef ();
-  if (bone) bone->DecRef ();
-  bone = b;
-}
-
 void csODERigidBody::SetMoveCallback (iDynamicsMoveCallback* cb)
 {
   if (cb) cb->IncRef ();
@@ -1782,7 +1774,6 @@ void csODERigidBody::Update ()
     csOrthoTransform trans;
     trans = GetTransform ();
     if (mesh) move_cb->Execute (mesh, trans);
-    if (bone) move_cb->Execute (bone, trans);
     /* remainder case for all other callbacks */
     move_cb->Execute (trans);
   }
@@ -2229,12 +2220,6 @@ void csODEDefaultMoveCallback::Execute (iMeshWrapper* mesh,
   mesh->GetMovable ()->SetPosition (t.GetOrigin ());
   mesh->GetMovable ()->GetTransform ().SetT2O (t.GetO2T ());
   mesh->GetMovable ()->UpdateMove ();
-}
-
-void csODEDefaultMoveCallback::Execute (iSkeletonBone* bone,
-  csOrthoTransform& t)
-{
-  bone->SetTransformation (t);
 }
 
 void csODEDefaultMoveCallback::Execute (csOrthoTransform& t)

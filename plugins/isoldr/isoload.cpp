@@ -38,11 +38,8 @@
 
 #include "imesh/lighting.h"
 #include "imesh/sprite3d.h"
-#include "imesh/skeleton.h"
 #include "imesh/object.h"
 #include "iengine/engine.h"
-#include "iengine/motion.h"
-#include "iengine/skelbone.h"
 #include "iengine/material.h"
 #include "iengine/movable.h"
 #include "iengine/halo.h"

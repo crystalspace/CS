@@ -126,7 +126,7 @@ Its also a good idea @emph{not} to use the same name twice, as you will prevent
 the second action from being accessed. You can use the same name for an action
 and a frame, as they are stored in different places. In general though,
 never use the same name for two items of the same type, whether it be a mesh
-object, a frame, a motion or whatever.
+object, a frame, or whatever.
 
 After the name of the action, we enter into the body of the action where the
 frame @dfn{sequences} are defined. Each frame of the sequence starts with

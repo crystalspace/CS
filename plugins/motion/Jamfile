@@ -1,3 +1,0 @@
-SubDir TOP plugins motion ;
-
-SubInclude TOP plugins motion standard ;

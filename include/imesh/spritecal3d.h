@@ -27,8 +27,6 @@
 class csColor;
 class csRandomGen;
 struct iMaterialWrapper;
-struct iSkeleton;
-struct iSkeletonState;
 struct iMeshObject;
 struct iMeshWrapper;
 struct iMeshObjectFactory;

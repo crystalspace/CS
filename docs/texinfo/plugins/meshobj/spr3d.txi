@@ -11,18 +11,12 @@
 @cindex @code{iConfig}
 @cindex @code{iSpriteFrame}
 @cindex @code{iSpriteAction}
-@cindex @code{iSkeleton}
-@cindex @code{iSkeletonLimb}
-@cindex @code{iSkeletonConnection}
-@cindex @code{iSkeletonState}
-@cindex @code{iSkeletonLimbState}
-@cindex @code{iSkeletonConnectionState}
 
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
-A 3D Sprite is a complex set of 3D triangles that either supports frame
-based animation or else skeletal animation.
+A 3D Sprite is a complex set of 3D triangles that supports animation through
+frames.
 
 @subsubheading Basic Structure
 
@@ -74,17 +68,11 @@ a 3D sprite factory.  The definition of this interface can be found in
 @file{CS/include/imesh/sprite3d.h} and that is also the include file you need
 to include in your applications to use this plugin.  Using this interface you
 can access the material, triangles, vertices, texture coordinates, normals,
-frames, actions, skeletal structure, and various other configuration parameters
-for a 3D sprite factory.
+frames, actions, and various other configuration parameters for a 3D
+sprite factory.
 
 For frame based animation you need to access the @samp{iSpriteFrame} and
-@samp{iSpriteAction} interfaces (defined in @file{CS/include/imesh/sprite3d.h})
-and for skeletal animation you need to work with @samp{iSkeletonLimb},
-@samp{iSkeletonConnection}, and @samp{iSkeleton} (defined in
-@file{CS/include/imesh/skeleton.h}).  Note that you will also have to
-setup one frame if you use skeletal animation.  This frame defines the
-default setup of the sprite if the skeleton is at rest (i.e. all
-transformations in the skeleton connectors are identity transformations).
+@samp{iSpriteAction} interfaces (defined in @file{CS/include/imesh/sprite3d.h}).
 
 @subsubheading Factory Loader
 
@@ -100,8 +88,6 @@ have the same number of vertices.
 Define one action.  An action is a list of frames.  Every frame is annotated
 with the @samp{f} tag which contains the name of the frame to use and a
 delay.
-@item <skeleton name="skeletonname"> @dots{}
-Define a skeleton. See below for tags in skeleton.
 @item <t v1="" v2="" v3="" />
 Define one triangle.  The three parameters are the indices for the three
 triangle vertices.
@@ -111,20 +97,6 @@ Defines how to apply normal smoothing on the sprite.
 Set to yes if you want to enable frame tweening.  Default is false.
 @end table
 
-A skeleton is a hierarchical structure which is defined as follows:
-
-@table @code
-@item <limb name="limbname"> @dots{}
-A limb defines a connection to a child limb.  This is where the hierarchy kicks
-in.  Inside @samp{limb} you use the same tags as on this level.
-@item vertices <v v1="" @dots{} />
-This is a list of vertex indices from the main frame.  This limb will control
-the given vertices.
-@item <transform> @dots{}
-Specify the default transformation to use for this limb with relation to its
-parent (cannot be used on the top level).
-@end table
-
 @subsubheading Object State Interface
 
 @samp{iSprite3DState} is the @sc{scf} interface that you can
@@ -132,20 +104,8 @@ use to set/get settings for a 3D Sprite object. The definition of this
 interface can be found in @file{CS/include/imesh/sprite3d.h} and that's also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the material, blending mode (mixmode),
-current frame and action, current skeletal animation state, and various
-other configuration parameters for a 3D sprite object.
-
-The state of a skeleton is described via the following interfaces which are
-defined in @file{CS/include/imesh/sprite3d.h}:
-
-@itemize @bullet
-@item
-@code{iSkeletonLimbState},
-@item
-@code{iSkeletonConnectionState}
-@item
-@code{iSkeletonState}
-@end itemize
+current frame and action, and various other configuration parameters for an
+3D sprite object.
 
 @subsubheading Object Loader
 

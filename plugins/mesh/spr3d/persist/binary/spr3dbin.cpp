@@ -20,8 +20,6 @@
  *
  * These classes Save and Load Sprites with a binary representation
  *
- * TODO: Add support for skeletons
- *
  */
 
 #include "cssysdef.h"
@@ -37,14 +35,12 @@
 #include "iengine/engine.h"
 #include "iutil/plugin.h"
 #include "imesh/sprite3d.h"
-#include "imesh/skeleton.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
 #include "iutil/vfs.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
-#include "iengine/motion.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"

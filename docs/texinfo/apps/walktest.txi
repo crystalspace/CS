@@ -510,19 +510,6 @@ through the map.
 @item delbot
 Delete the most recently added bot.
 
-@item addghost depth, width
-Add a floating transparent green ghost.  The first argument is the depth.  A
-depth of 1 will create a root and one layer above.  The second argument is the
-width.  This is the number of arms for the ghost
-
-@item addskel depth, width
-Add a skeletal tree (demonstration).  The first argument is the depth.  A depth
-of 1 will create a root and one layer above.  The second argument is the width.
-This is the number of branches created at every depth.  A good tree is `addskel
-3,3'.  Be careful with large numbers here.  The number of triangles grows very
-fast!  If the width parameter is negative the chosen width will be random
-between 1 and @samp{-width} (inclusive).
-
 @item explosion name
 Add a particle system simulating an explosion.  The parameter for this command
 is the texture to use for the particles.
@@ -656,7 +643,6 @@ Switch the active view, ie the one you can move in.
 @cindex Mesh Commands
 @cindex Load Meshes
 @cindex Actions
-@cindex Motions
 
 These commands allow meshes to be loaded interactively, instead of having to
 modifiy the world file.  This can also be used for rapid development of meshes,
@@ -683,9 +669,6 @@ List available actions for this mesh.
 
 @item setaction meshname, action
 Starts named action.
-
-@item setmotion meshname, motion
-Starts named motion (3D Sprites only).
 
 @item action [@key{a}]
 Activate the object that is right in front of you.  This command will use the

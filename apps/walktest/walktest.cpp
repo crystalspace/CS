@@ -32,7 +32,6 @@
 #include "csgeom/frustum.h"
 #include "iengine/region.h"
 #include "iengine/light.h"
-#include "iengine/motion.h"
 #include "iengine/camera.h"
 #include "iengine/sector.h"
 #include "csgeom/csrect.h"
@@ -316,10 +315,6 @@ void WalkTest::SetupFrame ()
 	CommandHandler(reccam->cmd, reccam->arg);
     }
   }
-
-  // Update the Motion Manager
-  if (myMotionMan)
-    myMotionMan->UpdateAll ();
 
   MoveSystems (elapsed_time, current_time);
   PrepareFrame (elapsed_time, current_time);
@@ -662,8 +657,6 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 	i--;
       }
   }
-  // Move ghosts.
-  MoveGhosts ();
 
   //------------
   // Here comes the main call to the engine. view->Draw() actually
@@ -1168,7 +1161,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
   mySound = CS_QUERY_REGISTRY (object_reg, iSoundRender);
-  myMotionMan = CS_QUERY_REGISTRY (object_reg, iMotionManager);
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space version %s (%s).", CS_VERSION, CS_RELEASE_DATE);

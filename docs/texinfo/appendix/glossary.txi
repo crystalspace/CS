@@ -15,8 +15,9 @@ most common are the software and OpenGL renderers.
 @item 3D Sprite
 A 3D Sprite in Crystal Space is a mesh object based on a triangle mesh.
 It is often used for actors. The word 'Sprite' may be confusing because a
-3D Sprite is really a full 3D object. 3D Sprites support skeletal and
-frame based animation.
+3D Sprite is really a full 3D object. 3D Sprites support frame based animation.
+The @sc{sprcal3d} mesh object also supports skeletal animation through
+the @sc{cal3d} library.
 
 @item Ambient (lighting)
 Ambient lighting is a constant amount of lighting that is added to all other

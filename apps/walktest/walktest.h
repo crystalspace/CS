@@ -55,7 +55,6 @@ struct iMeshWrapper;
 struct iLight;
 struct iView;
 struct iSoundRender;
-struct iMotionManager;
 struct iModelConverter;
 struct iCrossBuilder;
 struct iKeyboardDriver;
@@ -313,7 +312,6 @@ public:
   csRef<iConsoleOutput> myConsole;
   csRef<iVFS> myVFS;
   csRef<iSoundRender> mySound;
-  csRef<iMotionManager> myMotionMan;
 
   /// The view on the world.
   iView* view;
@@ -442,9 +440,6 @@ public:
 
   /// Move bots, particle systems, players, etc. for each frame.
   virtual void MoveSystems (csTicks elapsed_time, csTicks current_time);
-
-  /// Move all ghosts.
-  void MoveGhosts ();
 
   /**
    * Draw all things related to debugging (mostly edge drawing).

@@ -26,7 +26,6 @@
 #include "iutil/comp.h"
 
 struct iEngine;
-struct iSkeletonLimb;
 struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
@@ -75,9 +74,6 @@ private:
   iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
-
-  // Save a skeleton.
-  void SaveSkeleton (iSkeletonLimb* limb, csString& str);
 
 public:
   SCF_DECLARE_IBASE;

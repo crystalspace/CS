@@ -36,7 +36,6 @@
 #include "csutil/virtclk.h"
 #include "csutil/xmltiny.h"
 #include "iengine/engine.h"
-#include "iengine/motion.h"
 #include "igraphic/imageio.h"
 #include "imap/parser.h"
 #include "imesh/crossbld.h"

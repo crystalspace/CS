@@ -11,6 +11,16 @@ chronological order.
 	- Jorrit fixed a bug in iEngine->CreatePortalContainer(). If there
 	  is a portal render priority then the created mesh will automatically
 	  get that render priority.
+	- Jorrit removed support for skeletal sprites. Instead you should
+	  now use sprcal3d objects.
+	- Jorrit removed the mottest program since it depends on skeletal
+	  sprites. One should wonder if the entire motion plugin still
+	  makes sense now.
+	- Jorrit removed the walktest 'setmotion' command.
+	- Jorrit removed the walktest 'addghost' and 'addskel' commands.
+	- Jorrit removed the motion manager plugin. It was not very nicely
+	  designed and I question the usability of the plugin.
+	  Also removed associated iSkeletonBone.
 18-Apr-2004
 	- Eric Sunshine fixed CS/bin/autogen.sh so that it returns the exit
 	  status of 'autoconf' as its own exit status. This allows invokers of

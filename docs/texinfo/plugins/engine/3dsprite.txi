@@ -6,8 +6,8 @@
 @noindent
 @emph{Written by Seth Galbraith, @email{sgalbrai@@linknet.kitsap.lib.wa.us}.}
 
-3D @dfn{sprites} are triangle-based models which can be animated by a skeleton
-or pre-calculated vertex animations.  This type of model is well suited for
+3D @dfn{sprites} are triangle-based models which can be animated by
+pre-calculated vertex animations.  This type of model is well suited for
 detailed models which are not easily represented as heightmapped terrain or
 bezier curves. 3D sprites can be used in your application through the
 mesh object plugin systems (i.e. a 3D sprite is one particular type of

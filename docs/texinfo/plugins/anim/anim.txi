@@ -9,25 +9,22 @@
 After you have created your sprite you are now probably wondering
 what you can do to bring your creation to life? In this section
 we explore the two ways in which you can introduce animation
-sequences to your sprite. We will then round the discussion out
-with a description of how to use the skeletal animation directly
-from you application.
+sequences to your sprite.
 
 For the Crystal Space developer, there are currently two options
 for the production and management of sprite animation. The first
 option is frame based animation, referred to as an action, and the
-second is skeletal animation, referred to as a motion. As of
-writing this document, the two are separate. However, in the
-not too distant future I expect that this situation will change.
+second is skeletal animation (which uses the external @sc{cal3d}
+library). As of writing this document, the two are separate.
+However, in the not too distant future I expect that this situation
+will change.
 
 @menu
 * Introduction::
 * Sprite Actions::
 * The Sprite Action Interface::
-* Moving On::
 @end menu
 
 @importss{plugins,anim,intro.txi}
 @importss{plugins,anim,action.txi}
 @importss{plugins,anim,actionpi.txi}
-@importss{plugins,anim,skeleton.txi}

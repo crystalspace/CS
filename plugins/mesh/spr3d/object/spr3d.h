@@ -32,7 +32,6 @@
 #include "csgeom/box.h"
 #include "csgeom/objmodel.h"
 #include "csgeom/trimeshlod.h"
-#include "plugins/mesh/spr3d/object/skel3d.h"
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"
 #include "iengine/material.h"
@@ -295,9 +294,6 @@ private:
   /// Cache name for caching sprite specific data.
   char* cachename;
 
-  /// An optional skeleton.
-  csSkel* skeleton;
-
   /**
    * The order in which to introduce levels in order to get to a higher LOD.
    * The index of this array is the vertex number which is introduced.
@@ -400,12 +396,6 @@ public:
   virtual ~csSprite3DMeshObjectFactory ();
 
   void Report (int severity, const char* msg, ...);
-
-  /// Set the skeleton for this sprite template.
-  void SetSkeleton (csSkel* sk);
-
-  /// Get the skeleton for this sprite template.
-  csSkel* GetSkeleton () const { return skeleton; }
 
   /// Get the 'emerge_from' array from which you can construct triangles.
   int* GetEmergeFrom () const { return emerge_from; }
@@ -894,8 +884,6 @@ public:
       	iSpriteSocket));
       return ifr;	// DecRef is ok here.
     }
-    virtual void EnableSkeletalAnimation ();
-    virtual iSkeleton* GetSkeleton () const;
     virtual void EnableTweening (bool en)
     {
       scfParent->EnableTweening (en);
@@ -982,8 +970,7 @@ public:
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
- * Animation is done with frames (a frame may be controlled by
- * a skeleton).
+ * Animation is done with frames.
  */
 class csSprite3DMeshObject : public iMeshObject
 {
@@ -1275,9 +1262,6 @@ private:
   ///
   bool force_otherskin;
 
-  /// Skeleton state (optional).
-  csSkelState* skeleton_state;
-
   iMeshObjectDrawCallback* vis_cb;
 
   /**
@@ -1407,9 +1391,6 @@ public:
 
   /// Get the factory.
   csSprite3DMeshObjectFactory* GetFactory3D () const { return factory; }
-
-  /// Get the skeleton state for this sprite.
-  csSkelState* GetSkeletonState () const { return skeleton_state; }
 
   /// Force a new material skin other than default
   void SetMaterial (iMaterialWrapper *material);
@@ -1634,9 +1615,6 @@ public:
 
   /**
    * Get an array of object vertices which is valid for the given frame.
-   * This function correcty acounts for sprites which use skeletons. In
-   * that case it will use the current transformation state of the skeleton
-   * to compute object space vertices.<br>
    * Warning! The returned array should be used immediatelly or copied. It
    * points to a private static array in the sprite class and can be reused
    * if other calls to the sprite happen.
@@ -1830,7 +1808,6 @@ public:
     {
       return scfParent->IsLighting ();
     }
-    virtual iSkeletonState* GetSkeletonState () const;
     virtual void SetFrame (int f)
     {
       scfParent->SetFrame (f);

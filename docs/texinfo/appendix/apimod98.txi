@@ -1508,3 +1508,23 @@ An important change is that setting the @code{CS_ENTITY_INVISIBLEMESH} flag
 on a parent in a hierarchy will no longer make the children invisible. You
 now have to set the invisible flag manually on all children in the hierarchy.
 
+@subheading Skeletal Sprites
+@cindex @code{iSkeletonState}
+@cindex @code{iSkeletonState}
+@cindex @code{iSkeletonLimbState}
+@cindex @code{iSkeletonConnection}
+@cindex @code{iSkeletonConnectionState}
+@cindex @code{iMotionTemplate}
+@cindex @code{iMotionManager}
+@cindex @code{iSkeletonBone}
+
+Support for skeletal sprites has been removed. This means the interfaces
+@code{iSkeletonState}, @code{iSkeletonLimbState}, @code{iSkeletonConnection},
+@code{iSkeletonConnectionState}, and @code{iSkeletonLimb} are also removed.
+Use @sc{sprcal3d} mesh object instead. It is more flexible and works correctly.
+
+In addition @code{iMotionTemplate}, @code{iMotionManager}, and
+@code{iSkeletonBone} are also removed (including the entire motion manager
+plugin).
+
+

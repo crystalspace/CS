@@ -196,7 +196,7 @@ Map file loader and converters. @xref{XML File Format},
 Scripting bindings (Python, Perl, Java). @xref{Scripting Languages}.
 
 @item
-Skeletal animation. @xref{MeshObject Spr3D}. @xref{MeshObject SprCal3D}.
+Skeletal animation. @xref{MeshObject SprCal3D}.
 
 @item
 Object movement. @xref{HOWTO Mesh Movement}.

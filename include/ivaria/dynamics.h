@@ -28,7 +28,6 @@ class csOrthoTransform;
 class csMatrix3;
 class csPlane3;
 struct iMeshWrapper;
-struct iSkeletonBone;
 
 struct iObject;
 struct iDynamicSystem;
@@ -240,7 +239,6 @@ SCF_VERSION (iDynamicsMoveCallback, 0, 0, 1);
 struct iDynamicsMoveCallback : public iBase
 {
   virtual void Execute (iMeshWrapper* mesh, csOrthoTransform& t) = 0;
-  virtual void Execute (iSkeletonBone* bone, csOrthoTransform& t) = 0;
   virtual void Execute (csOrthoTransform& t) = 0;
 };
 
@@ -506,10 +504,6 @@ struct iRigidBody : public iBase
   virtual void AttachMesh (iMeshWrapper* mesh) = 0;
   /// Returns the attached MeshWrapper
   virtual csRef<iMeshWrapper> GetAttachedMesh () = 0;
-  /// Attach a bone to this body
-  virtual void AttachBone (iSkeletonBone* bone) = 0;
-  /// Returns the attached bone
-  virtual csRef<iSkeletonBone> GetAttachedBone () = 0;
 
   /**
    * Set a callback to be executed when this body moves.

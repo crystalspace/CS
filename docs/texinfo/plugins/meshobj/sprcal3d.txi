@@ -7,7 +7,6 @@
 @cindex @code{iMeshObject}
 @cindex @code{iMeshObjectFactory}
 @cindex @code{iMeshObjectType}
-@cindex @code{iSkeletonConnectionState}
 
 @file{sprcal3d} is a 3D mesh that can perform skeletal animation using the
 Cal3D library.
