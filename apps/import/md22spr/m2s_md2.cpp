@@ -146,7 +146,7 @@ bool Md2::ReadMDLFile(const char* mdlfile)
     return setError("Invalid mdl magic", f);
 
   // check if is a correct version
-  magic.version = convert_endian (magic.version);
+  magic.version = csConvertEndian (magic.version);
   if (magic.version != 8)
     return setError("Invalid mdl version", f);
 
@@ -159,7 +159,7 @@ bool Md2::ReadMDLFile(const char* mdlfile)
   int32 * ph = (int32*) &header;
   int32 * phe = ph + sizeof(md2_t) / sizeof(int32);
   while (ph < phe)
-    *ph++ = convert_endian(*ph);
+    *ph++ = csConvertEndian(*ph);
 
   // skins ops
   fseek(f, header.ofsskins, SEEK_SET);
@@ -186,8 +186,8 @@ bool Md2::ReadMDLFile(const char* mdlfile)
   {
     if (fread(&vertices[i], sizeof(vertice2_t), 1, f) != 1)
       return setError("Error reading mdl file", f);
-    vertices[i].s = convert_endian (vertices[i].s);
-    vertices[i].t = convert_endian (vertices[i].t);
+    vertices[i].s = csConvertEndian (vertices[i].s);
+    vertices[i].t = csConvertEndian (vertices[i].t);
   }
 
   // triangles ops
@@ -200,12 +200,12 @@ bool Md2::ReadMDLFile(const char* mdlfile)
   {
     if (fread(&qtriangles[i], sizeof(triangle2_t), 1, f) != 1)
       return setError("Error reading mdl file", f);
-    qtriangles[i].xyz[0] = convert_endian (qtriangles[i].xyz[0]);
-    qtriangles[i].xyz[1] = convert_endian (qtriangles[i].xyz[1]);
-    qtriangles[i].xyz[2] = convert_endian (qtriangles[i].xyz[2]);
-    qtriangles[i].vertice[0] = convert_endian (qtriangles[i].vertice[0]);
-    qtriangles[i].vertice[1] = convert_endian (qtriangles[i].vertice[1]);
-    qtriangles[i].vertice[2] = convert_endian (qtriangles[i].vertice[2]);
+    qtriangles[i].xyz[0] = csConvertEndian (qtriangles[i].xyz[0]);
+    qtriangles[i].xyz[1] = csConvertEndian (qtriangles[i].xyz[1]);
+    qtriangles[i].xyz[2] = csConvertEndian (qtriangles[i].xyz[2]);
+    qtriangles[i].vertice[0] = csConvertEndian (qtriangles[i].vertice[0]);
+    qtriangles[i].vertice[1] = csConvertEndian (qtriangles[i].vertice[1]);
+    qtriangles[i].vertice[2] = csConvertEndian (qtriangles[i].vertice[2]);
   }
 
   // frames ops
@@ -218,15 +218,15 @@ bool Md2::ReadMDLFile(const char* mdlfile)
   {
     if (fread(&frames[i].scale, sizeof(vec3_t), 1, f) != 1)
       return setError("Error reading mdl file", f);
-    frames[i].scale.x = convert_endian (frames[i].scale.x);
-    frames[i].scale.y = convert_endian (frames[i].scale.y);
-    frames[i].scale.z = convert_endian (frames[i].scale.z);
+    frames[i].scale.x = csConvertEndian (frames[i].scale.x);
+    frames[i].scale.y = csConvertEndian (frames[i].scale.y);
+    frames[i].scale.z = csConvertEndian (frames[i].scale.z);
 
     if (fread(&frames[i].translate, sizeof(vec3_t), 1, f) != 1)
       return setError("Error reading mdl file", f);
-    frames[i].translate.x = convert_endian (frames[i].translate.x);
-    frames[i].translate.y = convert_endian (frames[i].translate.y);
-    frames[i].translate.z = convert_endian (frames[i].translate.z);
+    frames[i].translate.x = csConvertEndian (frames[i].translate.x);
+    frames[i].translate.y = csConvertEndian (frames[i].translate.y);
+    frames[i].translate.z = csConvertEndian (frames[i].translate.z);
 
     // name of frame
     memset(frames[i].name, 0, MD2_FRAME_NAME_MAX + 1);

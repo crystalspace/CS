@@ -252,9 +252,9 @@ char* csBezierMesh::GenerateCacheName ()
 
   csMemFile mf;
   int32 l;
-  l = convert_endian ((int32)static_data->num_curve_vertices);
+  l = csConvertEndian ((int32)static_data->num_curve_vertices);
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)curves.Length ());
+  l = csConvertEndian ((int32)curves.Length ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)
@@ -272,17 +272,17 @@ char* csBezierMesh::GenerateCacheName ()
     }
   }
 
-  l = convert_endian ((int32)csQint ((b.MinX () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((b.MinY () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MinY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((b.MinZ () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MinZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((b.MaxX () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MaxX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((b.MaxY () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MaxY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((b.MaxZ () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MaxZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());

@@ -15,6 +15,31 @@ chronological order.
 	  registers an object instantiated from the loaded plugin with the
 	  object-registry if necessary. Also, as a test of its functionality,
 	  altered the shaders and renderers to utilize this new macro.
+	- Eric Sunshine renamed the following symbols in order to avoid
+	  global namespace pollution:
+	    big_endian_float()       --> csBigEndianFloat()
+	    big_endian_long()        --> csBigEndianLong()
+	    big_endian_longlong()    --> csBigEndianLongLong()
+	    big_endian_short()       --> csBigEndianShort()
+	    convert_endian()         --> csConvertEndian()
+	    double2longlong()        --> csDoubleToLongLong()
+	    float2long()             --> csFloatToLong()
+	    float2short()            --> csFloatToShort()
+	    get_le_float16()         --> csGetLittleEndianFloat16()
+	    get_le_float32()         --> csGetLittleEndianFloat32()
+	    get_le_long()            --> csGetLittleEndianLong()
+	    get_le_short()           --> csGetLittleEndianShort()
+	    little_endian_float()    --> csLittleEndianFloat()
+	    little_endian_long()     --> csLittleEndianLong()
+	    little_endian_longlong() --> csLittleEndianLongLong()
+	    little_endian_short()    --> csLittleEndianShort()
+	    long2float()             --> csLongToFloat()
+	    longlong2double()        --> csLongLongToDouble()
+	    set_le_float16()         --> csSetLittleEndianFloat16()
+	    set_le_float32()         --> csSetLittleEndianFloat32()
+	    set_le_long()            --> csSetLittleEndianLong()
+	    set_le_short()           --> csSetLittleEndianShort()
+	    short2float()            --> csShortToFloat()
 15-Dec-2004
 	- res added a graphical alert box to the xwindow plugin. It is based 
 	  upon the xmessage program, utilizes the Xaw toolkit and is enabled

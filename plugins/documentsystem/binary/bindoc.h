@@ -170,7 +170,7 @@ typedef struct
    * Value of this node
    *  str: offset of string into string table or 'immediate' string
    *  int: value
-   *  float: value converted using float2long
+   *  float: value converted using csFloatToLong
    */
   uint32 value;
   /// Flags of this node
@@ -269,8 +269,8 @@ private:
   uint32 GetRealNameID() const
   {
     return (nameID & BD_ATTR_FLAGS_IN_NAME) ? 
-      (little_endian_long (nameID) & BD_ATTR_NAME_ID_WITH_FLAGS_MASK) : 
-      little_endian_long (nameID);
+      (csLittleEndianLong (nameID) & BD_ATTR_NAME_ID_WITH_FLAGS_MASK) : 
+      csLittleEndianLong (nameID);
   }
 public:
   uint32 GetRealFlags() const
@@ -391,7 +391,7 @@ private:
   {
     if (flags & BD_NODE_HAS_ATTR)
       return (sizeof (bdNode) + sizeof (bdNodeAttrTab) + 
-	(little_endian_long (GetAttrTab()->num) * sizeof (uint32)));
+	(csLittleEndianLong (GetAttrTab()->num) * sizeof (uint32)));
     else
       return (sizeof (bdNode));
   }

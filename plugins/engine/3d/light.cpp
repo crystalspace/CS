@@ -137,21 +137,21 @@ const char* csLight::GenerateUniqueID ()
   }
 
   int32 l;
-  l = convert_endian ((int32)csQint ((center.x * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((center.x * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((center.y * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((center.y * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((center.z * 1000)+.5));
-  mf.Write ((char*)&l, 4);
-
-  l = convert_endian ((int32)csQint ((influenceRadius * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((center.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
-  l = convert_endian ((int32)csQint ((attenuationvec.x * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((influenceRadius * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((attenuationvec.y * 1000)+.5));
+
+  l = csConvertEndian ((int32)csQint ((attenuationvec.x * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((attenuationvec.z * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((attenuationvec.y * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = csConvertEndian ((int32)csQint ((attenuationvec.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());

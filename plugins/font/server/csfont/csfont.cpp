@@ -352,9 +352,9 @@ error:
       int numRanges = 0;
       do
       {
-	ranges.GetExtend (numRanges).startChar = get_le_long (binary);
+	ranges.GetExtend (numRanges).startChar = csGetLittleEndianLong (binary);
 	binary += 4;
-	ranges[numRanges].charCount = get_le_long (binary);
+	ranges[numRanges].charCount = csGetLittleEndianLong (binary);
 	binary += 4;
 	numGlyphs += ranges[numRanges].charCount;
 	numRanges++;
@@ -389,13 +389,13 @@ error:
       for (j = 0; j < numGlyphs; j++)
       {
 	memset (&(bMetrics[j]), 0, sizeof (csBitmapMetrics));
-	bMetrics[j].width = get_le_long (binary);
+	bMetrics[j].width = csGetLittleEndianLong (binary);
 	binary += 4;
-	bMetrics[j].height = get_le_long (binary);
+	bMetrics[j].height = csGetLittleEndianLong (binary);
 	binary += 4;
-	bMetrics[j].left = get_le_long (binary);
+	bMetrics[j].left = csGetLittleEndianLong (binary);
 	binary += 4;
-	bMetrics[j].top = get_le_long (binary);
+	bMetrics[j].top = csGetLittleEndianLong (binary);
 	binary += 4;
 	bitmapSize += ((bMetrics[j].width + 7) / 8) * bMetrics[j].height;
       }
@@ -404,13 +404,13 @@ error:
 	for (j = 0; j < numGlyphs; j++)
 	{
 	  memset (&(aMetrics[j]), 0, sizeof (csBitmapMetrics));
-	  aMetrics[j].width = get_le_long (binary);
+	  aMetrics[j].width = csGetLittleEndianLong (binary);
 	  binary += 4;
-	  aMetrics[j].height = get_le_long (binary);
+	  aMetrics[j].height = csGetLittleEndianLong (binary);
 	  binary += 4;
-	  aMetrics[j].left = get_le_long (binary);
+	  aMetrics[j].left = csGetLittleEndianLong (binary);
 	  binary += 4;
-	  aMetrics[j].top = get_le_long (binary);
+	  aMetrics[j].top = csGetLittleEndianLong (binary);
 	  binary += 4;
 	  alphaSize += bMetrics[j].width * bMetrics[j].height;
 	}
@@ -441,7 +441,7 @@ error:
       for (int j = 0; j < numGlyphs; j++)
       {
 	memset (&(gMetrics[j]), 0, sizeof (csGlyphMetrics));
-	gMetrics[j].advance = get_le_long (binary);
+	gMetrics[j].advance = csGetLittleEndianLong (binary);
 	binary += 4;
       }
     }

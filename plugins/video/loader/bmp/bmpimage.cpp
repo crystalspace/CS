@@ -66,21 +66,21 @@ static inline uint16 us_endian (const uint8* ptr)
 {
   uint16 n;
   memcpy(&n, ptr, sizeof(n));
-  return convert_endian(n);
+  return csConvertEndian(n);
 }
 
 static inline uint32 ul_endian (const uint8* ptr)
 {
   uint32 n;
   memcpy(&n, ptr, sizeof(n));
-  return convert_endian(n);
+  return csConvertEndian(n);
 }
 
 static inline long l_endian (const uint8* ptr)
 {
   int32 n;
   memcpy(&n, ptr, sizeof(n));
-  return convert_endian(n);
+  return csConvertEndian(n);
 }
 
 #define BFTYPE(x)    us_endian((x) +  0)
@@ -225,21 +225,21 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   bmpHeader hdr;
   hdr.bfTypeLo = 'B';
   hdr.bfTypeHi = 'M';
-  hdr.bfSize = little_endian_long (len);
+  hdr.bfSize = csLittleEndianLong (len);
   hdr.bfRes1 = 0;
   hdr.bfRes2 = 0;
-  hdr.bfOffBits = little_endian_long (sizeof (bmpHeader)-2 + 256*(palette?4:0));
-  hdr.biSize = little_endian_long (40);
-  hdr.biWidth = little_endian_long (w);
-  hdr.biHeight = little_endian_long (h);
-  hdr.biPlanes = little_endian_short (1);
-  hdr.biBitCount = little_endian_short (bytesPerPixel*8);
-  hdr.biCompression = little_endian_long (0);
-  hdr.biSizeImage = little_endian_long (0);
-  hdr.biXPelsPerMeter = little_endian_long (0);
-  hdr.biYPelsPerMeter = little_endian_long (0);
-  hdr.biClrUsed = little_endian_long (0);
-  hdr.biClrImportant = little_endian_long (0);
+  hdr.bfOffBits = csLittleEndianLong (sizeof (bmpHeader)-2 + 256*(palette?4:0));
+  hdr.biSize = csLittleEndianLong (40);
+  hdr.biWidth = csLittleEndianLong (w);
+  hdr.biHeight = csLittleEndianLong (h);
+  hdr.biPlanes = csLittleEndianShort (1);
+  hdr.biBitCount = csLittleEndianShort (bytesPerPixel*8);
+  hdr.biCompression = csLittleEndianLong (0);
+  hdr.biSizeImage = csLittleEndianLong (0);
+  hdr.biXPelsPerMeter = csLittleEndianLong (0);
+  hdr.biYPelsPerMeter = csLittleEndianLong (0);
+  hdr.biClrUsed = csLittleEndianLong (0);
+  hdr.biClrImportant = csLittleEndianLong (0);
 
   csDataBuffer *db = new csDataBuffer (len);
   unsigned char *p = (unsigned char *)db->GetData ();

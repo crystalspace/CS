@@ -274,13 +274,13 @@ void csSprite3DMeshObjectFactory::GenerateCacheName ()
 {
   csMemFile mf;
   int32 l;
-  l = convert_endian ((int32)frames.Length ());
+  l = csConvertEndian ((int32)frames.Length ());
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)actions.Length ());
+  l = csConvertEndian ((int32)actions.Length ());
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)GetVertexCount ());
+  l = csConvertEndian ((int32)GetVertexCount ());
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)GetTriangleCount ());
+  l = csConvertEndian ((int32)GetTriangleCount ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)
@@ -392,7 +392,7 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
       {
 	int32 f;
         cf->Read ((char*)&f, 4);
-	f = convert_endian (f);
+	f = csConvertEndian (f);
 	*tr++ = CS_STATIC_CAST(int,f);
       }
   
@@ -467,7 +467,7 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
     for (i = 0; i < GetVertexCount(); i++)
     {
       int const n = *tr++;
-      int32 f = convert_endian (CS_STATIC_CAST(int32,n));
+      int32 f = csConvertEndian (CS_STATIC_CAST(int32,n));
       mf->Write ((char const*) &f, 4);
     }
 
@@ -719,9 +719,9 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
         {
           float f;
 	  csVector3 v;
-          cf->Read ((char*)&f, 4); v.x = convert_endian (f);
-          cf->Read ((char*)&f, 4); v.y = convert_endian (f);
-          cf->Read ((char*)&f, 4); v.z = convert_endian (f);
+          cf->Read ((char*)&f, 4); v.x = csConvertEndian (f);
+          cf->Read ((char*)&f, 4); v.y = csConvertEndian (f);
+          cf->Read ((char*)&f, 4); v.z = csConvertEndian (f);
 	  fr_normals[i].Set (v);
         }
   
@@ -816,11 +816,11 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
     {
       float f;
       csVector3& v = fr_normals[i];
-      f = convert_endian (v.x);
+      f = csConvertEndian (v.x);
       mf->Write ((char *) &f, 4);
-      f = convert_endian (v.y);
+      f = csConvertEndian (v.y);
       mf->Write ((char *) &f, 4);
-      f = convert_endian (v.z);
+      f = csConvertEndian (v.z);
       mf->Write ((char *) &f, 4);
     }
 

@@ -165,8 +165,8 @@ static bool CheckMDLVersion (csDataStream &in)
   uint32 FileID, FileVersion;
   in.ReadUInt32 (FileID);
   in.ReadUInt32 (FileVersion);
-  FileID = little_endian_long (FileID);
-  FileVersion = little_endian_long (FileVersion);
+  FileID = csLittleEndianLong (FileID);
+  FileVersion = csLittleEndianLong (FileVersion);
 
   if (FileID != ( ('O'<<24)+('P'<<16)+('D'<<8)+'I' ) )
     return false;
@@ -178,11 +178,11 @@ static bool CheckMDLVersion (csDataStream &in)
 }
 
 #define CS_MDL_READ_LONG(name)						\
-  hdr->name = get_le_long (buf + Position);				\
+  hdr->name = csGetLittleEndianLong (buf + Position);				\
   Position += SIZEOF_MDLLONG;
 
 #define CS_MDL_READ_FLOAT(name)						\
-  hdr->name = convert_endian(*((float*)(buf + Position)));		\
+  hdr->name = csConvertEndian(*((float*)(buf + Position)));		\
   Position += SIZEOF_MDLFLOAT;
 
 static void ReadMDLHeader (csMDLHeader *hdr, csDataStream *in)
@@ -238,13 +238,13 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
   for (i=0; i<Header.SkinCount; i++)
   {
     in.Read (Readbuffer, SIZEOF_MDLLONG);
-    int Type = get_le_long (Readbuffer);
+    int Type = csGetLittleEndianLong (Readbuffer);
     if (Type == 0) {
       // single skin
       in.Skip (Header.SkinWidth * Header.SkinHeight);
     } else if (Type == 1) {
       in.Read (Readbuffer, SIZEOF_MDLLONG);
-      int MultiskinCount = get_le_long (Readbuffer);
+      int MultiskinCount = csGetLittleEndianLong (Readbuffer);
       for (j=0; j<MultiskinCount; j++)
         in.Skip (Header.SkinWidth * Header.SkinHeight);
     } else {
@@ -270,10 +270,10 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
   for (i=0; i<Header.VertexCount; i++)
   {
     in.Read (Readbuffer, SIZEOF_MDLLONG * 3);
-    int IsSeamVertex = get_le_long (Readbuffer);
+    int IsSeamVertex = csGetLittleEndianLong (Readbuffer);
     Texels [i].Set (
-      get_le_long(Readbuffer + SIZEOF_MDLLONG) / (float)Header.SkinWidth,
-      get_le_long(Readbuffer + 2*SIZEOF_MDLLONG) / (float)Header.SkinHeight);
+      csGetLittleEndianLong(Readbuffer + SIZEOF_MDLLONG) / (float)Header.SkinWidth,
+      csGetLittleEndianLong(Readbuffer + 2*SIZEOF_MDLLONG) / (float)Header.SkinHeight);
     if (IsSeamVertex) {
       csVector2 SeamTexel = Texels [i] + csVector2 (0.5, 0);
       SeamTexels [i] = Texels.Push (SeamTexel);
@@ -287,10 +287,10 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
     Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
 
     in.Read (Readbuffer, SIZEOF_MDLLONG * 4);
-    int FrontPolygon = get_le_long (Readbuffer);
+    int FrontPolygon = csGetLittleEndianLong (Readbuffer);
 
     for (j=2; j>=0; j--) {
-      int VertexIndex = get_le_long (Readbuffer + (j+1) * SIZEOF_MDLLONG);
+      int VertexIndex = csGetLittleEndianLong (Readbuffer + (j+1) * SIZEOF_MDLLONG);
       if ((SeamTexels [VertexIndex] != -1) && !FrontPolygon) {
         Polygon->AddVertex (VertexIndex, 0, 0, SeamTexels [VertexIndex]);
       } else {
@@ -308,13 +308,13 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
   {
     int FrameCount;
     in.Read (Readbuffer, SIZEOF_MDLLONG);
-    int ActionType = get_le_long (Readbuffer);
+    int ActionType = csGetLittleEndianLong (Readbuffer);
     if (ActionType == 0)
       FrameCount = 1;
     else
     {
       in.Read (Readbuffer, SIZEOF_MDLLONG);
-      FrameCount = get_le_long (Readbuffer);
+      FrameCount = csGetLittleEndianLong (Readbuffer);
 
       // skip some stuff--general min/max, frame timings
       in.Skip (SIZEOF_MDLLONG * (2 + FrameCount));

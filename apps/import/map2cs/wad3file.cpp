@@ -55,13 +55,13 @@ void WriteByte(char*& p, unsigned char c)
 
 void WriteWord(char*& p, unsigned short s)
 {
-  set_le_short ((void*)p, s);
+  csSetLittleEndianShort ((void*)p, s);
   p+=2;
 }
 
 void WriteDword(char*& p, unsigned long l)
 {
-  set_le_long ((void*)p, l);
+  csSetLittleEndianLong ((void*)p, l);
   p+=4;
 }
 

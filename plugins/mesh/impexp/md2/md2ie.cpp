@@ -173,8 +173,8 @@ static bool CheckMD2Version (csDataStream &in)
   uint32 FileID, FileVersion;
   in.ReadUInt32 (FileID);
   in.ReadUInt32 (FileVersion);
-  FileID = little_endian_long (FileID);
-  FileVersion = little_endian_long (FileVersion);
+  FileID = csLittleEndianLong (FileID);
+  FileVersion = csLittleEndianLong (FileVersion);
 
   if (FileID != ( ('2'<<24)+('P'<<16)+('D'<<8)+'I' ) )
     return false;
@@ -186,7 +186,7 @@ static bool CheckMD2Version (csDataStream &in)
 }
 
 #define CS_MD2_READ(num,name)						\
-  hdr->name = get_le_long (buf + num * SIZEOF_MD2LONG);
+  hdr->name = csGetLittleEndianLong (buf + num * SIZEOF_MD2LONG);
 
 static void ReadMD2Header (csMD2Header *hdr, csDataStream *in)
 {
@@ -262,8 +262,8 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
   for (i = 0; i < Header.TexelCount; i++)
   {
     in.Read (readbuffer, SIZEOF_MD2SHORT*2);
-    Texels [i].Set (get_le_short(readbuffer)/(float)Header.SkinWidth,
-                    get_le_short(readbuffer+2)/(float)Header.SkinHeight);
+    Texels [i].Set (csGetLittleEndianShort(readbuffer)/(float)Header.SkinWidth,
+                    csGetLittleEndianShort(readbuffer+2)/(float)Header.SkinHeight);
   }
 
   // next we read in the triangle connectivity data.  This data describes
@@ -281,8 +281,8 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
     in.Read (readbuffer, SIZEOF_MD2SHORT*6);
     for (j = 0; j < 3; j++)
     {
-      short xyzindex = get_le_short (readbuffer + j * SIZEOF_MD2SHORT);
-      short texindex = get_le_short (readbuffer + (j+3) * SIZEOF_MD2SHORT);
+      short xyzindex = csGetLittleEndianShort (readbuffer + j * SIZEOF_MD2SHORT);
+      short texindex = csGetLittleEndianShort (readbuffer + (j+3) * SIZEOF_MD2SHORT);
       Polygon->AddVertex (xyzindex, 0, 0, texindex);
     }
 
@@ -306,8 +306,8 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
     in.Read (&translate, SIZEOF_MD2FLOAT*3);
     for (j = 0; j < 3; j++)
     {
-      scale[j] = convert_endian (scale[j]);
-      translate[j] = convert_endian (translate[j]);
+      scale[j] = csConvertEndian (scale[j]);
+      translate[j] = csConvertEndian (translate[j]);
     }
     scale *= SCALE_FACTOR;
     translate *= SCALE_FACTOR;

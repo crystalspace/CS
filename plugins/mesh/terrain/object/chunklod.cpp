@@ -1362,9 +1362,9 @@ char* csChunkLodTerrainObject::GenerateCacheName ()
   csMemFile mf;
   mf.Write ("chunklod", 8);
   uint32 l;
-  l = convert_endian ((uint32)pFactory->hm_x);
+  l = csConvertEndian ((uint32)pFactory->hm_x);
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((uint32)pFactory->hm_y);
+  l = csConvertEndian ((uint32)pFactory->hm_y);
   mf.Write ((char*)&l, 4);
 
   if (logparent)
@@ -1381,46 +1381,46 @@ char* csChunkLodTerrainObject::GenerateCacheName ()
         mf.Write (sect->QueryObject ()->GetName (),
         strlen (sect->QueryObject ()->GetName ()));
       csVector3 pos = movable->GetFullPosition ();
-      l = convert_endian ((int32)csQint ((pos.x * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((pos.x * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)csQint ((pos.y * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((pos.y * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)csQint ((pos.z * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((pos.z * 1000)+.5));
       mf.Write ((char*)&l, 4);
       csReversibleTransform tr = movable->GetFullTransform ();
       const csMatrix3& o2t = tr.GetO2T ();
-      l = convert_endian ((int32)csQint ((o2t.m11 * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((o2t.m11 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)csQint ((o2t.m12 * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((o2t.m12 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)csQint ((o2t.m13 * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((o2t.m13 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)csQint ((o2t.m21 * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((o2t.m21 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)csQint ((o2t.m22 * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((o2t.m22 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)csQint ((o2t.m23 * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((o2t.m23 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)csQint ((o2t.m31 * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((o2t.m31 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)csQint ((o2t.m32 * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((o2t.m32 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)csQint ((o2t.m33 * 1000)+.5));
+      l = csConvertEndian ((int32)csQint ((o2t.m33 * 1000)+.5));
       mf.Write ((char*)&l, 4);
     }
   }
 
-  l = convert_endian ((int32)csQint ((b.MinX () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((b.MinY () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MinY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((b.MinZ () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MinZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((b.MaxX () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MaxX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((b.MaxY () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MaxY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)csQint ((b.MaxZ () * 1000)+.5));
+  l = csConvertEndian ((int32)csQint ((b.MaxZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());

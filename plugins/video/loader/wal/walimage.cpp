@@ -132,10 +132,10 @@ csPtr<iDataBuffer> csWALImageIO::Save (iImage *image, const char *mime,
 bool ImageWALFile::Load (uint8* iBuffer, size_t iSize)
 {
   WALHeader head = *(WALHeader *)iBuffer;
-  head.width = little_endian_long (head.width);
-  head.height = little_endian_long (head.height);
-  head.offsets [0] = little_endian_long (head.offsets [0]);
-  head.offsets [3] = little_endian_long (head.offsets [3]);
+  head.width = csLittleEndianLong (head.width);
+  head.height = csLittleEndianLong (head.height);
+  head.offsets [0] = csLittleEndianLong (head.offsets [0]);
+  head.offsets [3] = csLittleEndianLong (head.offsets [3]);
 
   Format &= ~CS_IMGFMT_ALPHA;
 

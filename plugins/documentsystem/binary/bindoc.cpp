@@ -153,7 +153,7 @@ const char* csBdAttr::GetValueStr (csBinaryDocument* doc) const
     else
     {
       return doc->GetInIDString (
-	little_endian_long (value));
+	csLittleEndianLong (value));
     }
   }
 }
@@ -231,7 +231,7 @@ const char* csBinaryDocAttribute::GetValue ()
 	{
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1, "%d", 
-	    (int)((int32)little_endian_long (attrPtr->value)));
+	    (int)((int32)csLittleEndianLong (attrPtr->value)));
 	  delete[] vstr; 
 	  vstr = csStrNew (buf);
 	  vsptr = attrPtr;
@@ -244,7 +244,7 @@ const char* csBinaryDocAttribute::GetValue ()
 	{
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1,
-	    "%g", long2float (little_endian_long (attrPtr->value)));
+	    "%g", csLongToFloat (csLittleEndianLong (attrPtr->value)));
 	  delete[] vstr; 
 	  vstr = csStrNew (buf);
 	  vsptr = attrPtr;
@@ -270,11 +270,11 @@ int csBinaryDocAttribute::GetValueAsInt ()
       }
     case BD_VALUE_TYPE_INT:
       {
-	return (int)((int32)little_endian_long (attrPtr->value));
+	return (int)((int32)csLittleEndianLong (attrPtr->value));
       }
     case BD_VALUE_TYPE_FLOAT:
       {
-	return (int)long2float (little_endian_long (attrPtr->value));
+	return (int)csLongToFloat (csLittleEndianLong (attrPtr->value));
       }
     default:
       return 0;
@@ -295,11 +295,11 @@ float csBinaryDocAttribute::GetValueAsFloat ()
       }
     case BD_VALUE_TYPE_INT:
       {
-	return (float)((int32)little_endian_long (attrPtr->value));
+	return (float)((int32)csLittleEndianLong (attrPtr->value));
       }
     case BD_VALUE_TYPE_FLOAT:
       {
-	return long2float (little_endian_long (attrPtr->value));
+	return csLongToFloat (csLittleEndianLong (attrPtr->value));
       }
     default:
       return 0.0f;
@@ -330,7 +330,7 @@ bool csBinaryDocAttribute::GetValueAsBool ()
       }
     case BD_VALUE_TYPE_FLOAT:
       {
-	return (long2float (little_endian_long (attrPtr->value))== 0);
+	return (csLongToFloat (csLittleEndianLong (attrPtr->value))== 0);
       }
     default:
       return false;
@@ -390,13 +390,13 @@ void csBinaryDocAttribute::SetValue (const char* val)
     {
       attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
 	BD_VALUE_TYPE_INT;
-      attrPtr->value = little_endian_long ((long)v);
+      attrPtr->value = csLittleEndianLong ((long)v);
     }
     else if (checkFloat (val, f))
     {
       attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
 	BD_VALUE_TYPE_FLOAT;
-      attrPtr->value = little_endian_long (float2long (f));
+      attrPtr->value = csLittleEndianLong (csFloatToLong (f));
     }
     else 
     {
@@ -415,7 +415,7 @@ void csBinaryDocAttribute::SetValueAsInt (int v)
     delete[] vstr; vstr = 0;
     attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_INT;
-    attrPtr->value = little_endian_long ((long)v);
+    attrPtr->value = csLittleEndianLong ((long)v);
   }
 }
 
@@ -427,7 +427,7 @@ void csBinaryDocAttribute::SetValueAsFloat (float f)
     delete[] vstr; vstr = 0;
     attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_FLOAT;
-    attrPtr->value = little_endian_long (float2long (f));
+    attrPtr->value = csLittleEndianLong (csFloatToLong (f));
   }
 }
 
@@ -448,7 +448,7 @@ void csBinaryDocAttribute::Store (csMemFile* nodesFile)
     }
     else
     {
-      diskAttr.value = little_endian_long (
+      diskAttr.value = csLittleEndianLong (
 	node->doc->GetOutStringID (attrPtr->GetValueStr (node->doc)));
     }
   }
@@ -466,11 +466,11 @@ void csBinaryDocAttribute::Store (csMemFile* nodesFile)
   }
   else
   {
-    diskAttr.nameID = little_endian_long (
+    diskAttr.nameID = csLittleEndianLong (
       node->doc->GetOutStringID (attrPtr->GetNameStr (node->doc)));
     // @@@ What to do if nameID > BD_ATTR_MAX_NAME_ID?
     putFlagsInName = 
-      little_endian_long (diskAttr.nameID) <= BD_ATTR_MAX_NAME_ID_WITH_FLAGS;
+      csLittleEndianLong (diskAttr.nameID) <= BD_ATTR_MAX_NAME_ID_WITH_FLAGS;
   }
   if (putFlagsInName)
   {
@@ -663,7 +663,7 @@ csBdAttr* csBdNode::atGetItem(int pos)
   {
     void* at =  (void*)GetAttrTab();
     return (csBdAttr*)((uint8*)at +
-      little_endian_long (*((uint32*)at + pos + 1)));
+      csLittleEndianLong (*((uint32*)at + pos + 1)));
   }
 }
 
@@ -732,7 +732,7 @@ csBdNode* csBdNode::ctGetItem(int pos)
   {
     void* ct = (void*)GetChildTab();
     return (csBdNode*)((uint8*)ct +
-      little_endian_long (*((uint32*)ct + pos + 1)));
+      csLittleEndianLong (*((uint32*)ct + pos + 1)));
   }
 }
 
@@ -885,7 +885,7 @@ const char* csBinaryDocNode::nodeValueStr (csBdNode* nodeData)
 	{
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1, "%d", 
-	    (int)((int32)little_endian_long (nodeData->value)));
+	    (int)((int32)csLittleEndianLong (nodeData->value)));
 	  delete[] vstr; 
 	  vstr = csStrNew (buf);
 	  vsptr = nodeData;
@@ -898,7 +898,7 @@ const char* csBinaryDocNode::nodeValueStr (csBdNode* nodeData)
 	{
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1, "%g", 
-	    long2float (little_endian_long (nodeData->value)));
+	    csLongToFloat (csLittleEndianLong (nodeData->value)));
 	  delete[] vstr; 
 	  vstr = csStrNew (buf);
 	  vsptr = nodeData;
@@ -924,11 +924,11 @@ int csBinaryDocNode::nodeValueInt (csBdNode* nodeData)
       }
     case BD_VALUE_TYPE_INT:
       {
-	return (int32)little_endian_long (nodeData->value);
+	return (int32)csLittleEndianLong (nodeData->value);
       }
     case BD_VALUE_TYPE_FLOAT:
       {
-	return (int)long2float (little_endian_long (nodeData->value));
+	return (int)csLongToFloat (csLittleEndianLong (nodeData->value));
       }
     default:
       return 0;
@@ -949,11 +949,11 @@ float csBinaryDocNode::nodeValueFloat (csBdNode* nodeData)
       }
     case BD_VALUE_TYPE_INT:
       {
-	return (float)((int32)little_endian_long (nodeData->value));
+	return (float)((int32)csLittleEndianLong (nodeData->value));
       }
     case BD_VALUE_TYPE_FLOAT:
       {
-	return long2float (little_endian_long (nodeData->value));
+	return csLongToFloat (csLittleEndianLong (nodeData->value));
       }
     default:
       return 0.0f;
@@ -1075,13 +1075,13 @@ void csBinaryDocNode::SetValue (const char* value)
     {
       nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) | 
 	BD_VALUE_TYPE_INT;
-      nodeData->value = little_endian_long (v);
+      nodeData->value = csLittleEndianLong (v);
     }
     else if (checkFloat (value, f))
     {
       nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) | 
 	BD_VALUE_TYPE_FLOAT;
-      nodeData->value = little_endian_long (float2long (f));
+      nodeData->value = csLittleEndianLong (csFloatToLong (f));
     }
     else 
     {
@@ -1099,7 +1099,7 @@ void csBinaryDocNode::SetValueAsInt (int value)
     delete[] vstr; vstr = 0;
     nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) |
       BD_VALUE_TYPE_INT;
-    nodeData->value = little_endian_long ((int32)value);
+    nodeData->value = csLittleEndianLong ((int32)value);
   }
 }
 
@@ -1110,7 +1110,7 @@ void csBinaryDocNode::SetValueAsFloat (float value)
     delete[] vstr; vstr = 0;
     nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_FLOAT;
-    nodeData->value = little_endian_long (float2long (value));
+    nodeData->value = csLittleEndianLong (csFloatToLong (value));
   }
 }
 
@@ -1466,7 +1466,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     }
     else
     {
-      diskNode.value = little_endian_long (
+      diskNode.value = csLittleEndianLong (
 	doc->GetOutStringID (nodeData->vstr));
     }
   }
@@ -1516,7 +1516,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     unsigned int i;
     for (i = 0; i < attrCount; i++)
     {
-      startsScratch[i] = little_endian_long (nodesFile->GetPos() - attrStart);
+      startsScratch[i] = csLittleEndianLong (nodesFile->GetPos() - attrStart);
       csBinaryDocAttribute* attr = doc->GetPoolAttr ();
       attr->SetTo (nodeData->atGetItem (i), this);
       attr->Store (nodesFile);
@@ -1532,7 +1532,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     unsigned int i;
     for (i = 0; i < childCount; i++)
     {
-      startsScratch[i] = little_endian_long (nodesFile->GetPos() - childStart);
+      startsScratch[i] = csLittleEndianLong (nodesFile->GetPos() - childStart);
       csBinaryDocNode* node = doc->GetPoolNode();
       node->SetTo (nodeData->ctGetItem (i), this);
       node->Store (nodesFile);
@@ -1816,7 +1816,7 @@ const char* csBinaryDocument::Write (iFile* out)
     }
     doc.ofsStr -= docStart;
   }
-  doc.ofsStr = little_endian_long (doc.ofsStr);
+  doc.ofsStr = csLittleEndianLong (doc.ofsStr);
   outStrTabOfs = out->GetPos();
 
   csMemFile* outNodes = new csMemFile;
@@ -1843,7 +1843,7 @@ const char* csBinaryDocument::Write (iFile* out)
     }
     doc.ofsRoot -= docStart;
   }
-  doc.ofsRoot = little_endian_long (doc.ofsRoot);
+  doc.ofsRoot = csLittleEndianLong (doc.ofsRoot);
   out->Write (outNodes->GetData(), outNodes->GetSize());
   delete outNodes;
 

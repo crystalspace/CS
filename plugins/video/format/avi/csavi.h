@@ -68,10 +68,10 @@ class csAVIFormat : public iStreamFormat
       uint32 length;
       void Endian ()
       {
-	id = little_endian_long (id);
-	flags = little_endian_long (flags);
-	offset = little_endian_long (offset);
-	length = little_endian_long (length);
+	id = csLittleEndianLong (id);
+	flags = csLittleEndianLong (flags);
+	offset = csLittleEndianLong (offset);
+	length = csLittleEndianLong (length);
       }
     };
 
@@ -129,7 +129,7 @@ class csAVIFormat : public iStreamFormat
   {
     char id[4];
     uint32 size;
-    void Endian (){ size = little_endian_long (size); }
+    void Endian (){ size = csLittleEndianLong (size); }
     bool Is (const char *theID, const char* theType, const char* p)
       {return !strncmp (id, theID, 4) && !strncmp (p, theType, 4);}
     bool Is (const char* theID)
@@ -179,16 +179,16 @@ class csAVIFormat : public iStreamFormat
     uint32 reserved[4];
     void Endian ()
     {
-      msecperframe = little_endian_long (msecperframe);
-      maxbytespersec = little_endian_long (maxbytespersec);
-      padsize = little_endian_long (padsize);
-      flags = little_endian_long (flags);
-      framecount = little_endian_long (framecount);
-      initialframecount = little_endian_long (initialframecount);
-      streamcount = little_endian_long (streamcount);
-      suggestedbuffersize = little_endian_long (suggestedbuffersize);
-      width = little_endian_long (width);
-      height = little_endian_long (height);
+      msecperframe = csLittleEndianLong (msecperframe);
+      maxbytespersec = csLittleEndianLong (maxbytespersec);
+      padsize = csLittleEndianLong (padsize);
+      flags = csLittleEndianLong (flags);
+      framecount = csLittleEndianLong (framecount);
+      initialframecount = csLittleEndianLong (initialframecount);
+      streamcount = csLittleEndianLong (streamcount);
+      suggestedbuffersize = csLittleEndianLong (suggestedbuffersize);
+      width = csLittleEndianLong (width);
+      height = csLittleEndianLong (height);
     }
   };
   struct StreamHeader
@@ -209,21 +209,21 @@ class csAVIFormat : public iStreamFormat
     int32 left, top, right, bottom;
     void Endian ()
     {
-      flags = little_endian_long (flags);
-      priority = little_endian_short (priority);
-      language = little_endian_short (language);
-      initialframecount = little_endian_long (initialframecount);
-      scale = little_endian_long (scale);
-      rate = little_endian_long (rate);
-      start = little_endian_long (start);
-      length = little_endian_long (length);
-      suggestedbuffersize = little_endian_long (suggestedbuffersize);
-      quality = little_endian_long (quality);
-      samplesize = little_endian_long (samplesize);
-      top = little_endian_long (top);
-      left = little_endian_long (left);
-      right = little_endian_long (right);
-      bottom = little_endian_long (bottom);
+      flags = csLittleEndianLong (flags);
+      priority = csLittleEndianShort (priority);
+      language = csLittleEndianShort (language);
+      initialframecount = csLittleEndianLong (initialframecount);
+      scale = csLittleEndianLong (scale);
+      rate = csLittleEndianLong (rate);
+      start = csLittleEndianLong (start);
+      length = csLittleEndianLong (length);
+      suggestedbuffersize = csLittleEndianLong (suggestedbuffersize);
+      quality = csLittleEndianLong (quality);
+      samplesize = csLittleEndianLong (samplesize);
+      top = csLittleEndianLong (top);
+      left = csLittleEndianLong (left);
+      right = csLittleEndianLong (right);
+      bottom = csLittleEndianLong (bottom);
     }
   };
 
@@ -242,17 +242,17 @@ class csAVIFormat : public iStreamFormat
     uint32 colorsimportant;
     void Endian ()
     {
-      size = little_endian_long (size);
-      width = little_endian_long (width);
-      height = little_endian_long (height);
-      planes = little_endian_short (planes);
-      bitcount = little_endian_short (bitcount);
-      compression = little_endian_long (compression);
-      sizeimage = little_endian_long (sizeimage);
-      xpelspermeter = little_endian_long (xpelspermeter);
-      ypelspermeter = little_endian_long (ypelspermeter);
-      colorsused = little_endian_long (colorsused);
-      colorsimportant = little_endian_long (colorsimportant);
+      size = csLittleEndianLong (size);
+      width = csLittleEndianLong (width);
+      height = csLittleEndianLong (height);
+      planes = csLittleEndianShort (planes);
+      bitcount = csLittleEndianShort (bitcount);
+      compression = csLittleEndianLong (compression);
+      sizeimage = csLittleEndianLong (sizeimage);
+      xpelspermeter = csLittleEndianLong (xpelspermeter);
+      ypelspermeter = csLittleEndianLong (ypelspermeter);
+      colorsused = csLittleEndianLong (colorsused);
+      colorsimportant = csLittleEndianLong (colorsimportant);
     }
   };
 
@@ -267,13 +267,13 @@ class csAVIFormat : public iStreamFormat
     uint16 extra;
     void Endian ()
     {
-      formattag = little_endian_short (formattag);
-      channels = little_endian_short (channels);
-      samplespersecond = little_endian_long (samplespersecond);
-      avgbytespersecond = little_endian_long (avgbytespersecond);
-      blockalign = little_endian_short (blockalign);
-      bitspersample = little_endian_short (bitspersample);
-      extra = little_endian_short (extra);
+      formattag = csLittleEndianShort (formattag);
+      channels = csLittleEndianShort (channels);
+      samplespersecond = csLittleEndianLong (samplespersecond);
+      avgbytespersecond = csLittleEndianLong (avgbytespersecond);
+      blockalign = csLittleEndianShort (blockalign);
+      bitspersample = csLittleEndianShort (bitspersample);
+      extra = csLittleEndianShort (extra);
     }
   };
  protected:

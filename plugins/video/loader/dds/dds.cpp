@@ -51,7 +51,7 @@ void Loader::SetSource (void* buffer, size_t bufferlen)
 
 bool Loader::IsDDS ()
 {
-  uint32 magic = little_endian_long( *((uint32*) source));
+  uint32 magic = csLittleEndianLong( *((uint32*) source));
   if (magic != MakeFourCC ('D','D','S',' '))
     return false;
 
@@ -130,7 +130,7 @@ csRGBpixel* Loader::LoadMipmap (int number)
 
 uint32 Loader::GetUInt32()
 {
-  uint32 res = little_endian_long (*((uint32*) readpos));
+  uint32 res = csLittleEndianLong (*((uint32*) readpos));
   readpos += sizeof(uint32);
 
   return res;
@@ -387,9 +387,9 @@ void Loader::DecompressDXT1 (csRGBpixel* buffer, uint8* source,
     {
       for (x = 0; x < Width; x += 4) 
       {
-	color_0 = little_endian_short (*((uint16*)Temp)); 
-	color_1 = little_endian_short (*((uint16*)Temp+1));
-	bitmask = little_endian_long (((uint32*)Temp)[1]);
+	color_0 = csLittleEndianShort (*((uint16*)Temp)); 
+	color_1 = csLittleEndianShort (*((uint16*)Temp+1));
+	bitmask = csLittleEndianLong (((uint32*)Temp)[1]);
 	Temp += 8;
 
 	colours[0].r = COLOR565_RED(color_0); 
@@ -487,14 +487,14 @@ void Loader::DecompressDXT3(csRGBpixel* buffer, uint8* source,
     {
       for (x = 0; x < Width; x += 4) 
       {
-	alpha.row[0] = little_endian_short (Temp[0]);
-	alpha.row[1] = little_endian_short (Temp[1]);
-	alpha.row[2] = little_endian_short (Temp[2]);
-	alpha.row[3] = little_endian_short (Temp[3]);
+	alpha.row[0] = csLittleEndianShort (Temp[0]);
+	alpha.row[1] = csLittleEndianShort (Temp[1]);
+	alpha.row[2] = csLittleEndianShort (Temp[2]);
+	alpha.row[3] = csLittleEndianShort (Temp[3]);
 	Temp += 8;
-	color_0 = little_endian_short (*((uint16*)Temp));   
-	color_1 = little_endian_short (*((uint16*)Temp+1));
-	bitmask = little_endian_long (((uint32*)Temp)[1]);
+	color_0 = csLittleEndianShort (*((uint16*)Temp));   
+	color_1 = csLittleEndianShort (*((uint16*)Temp+1));
+	bitmask = csLittleEndianLong (((uint32*)Temp)[1]);
 
 	colours[0].r = COLOR565_RED(color_0); 
 	colours[0].g = COLOR565_GREEN(color_0);
@@ -588,9 +588,9 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, uint8* source,
 	alphas[1] = Temp[1];
 	alphamask = Temp + 2;
 	Temp += 8;
-	color_0 = little_endian_short (*((uint16*)Temp));   
-	color_1 = little_endian_short (*((uint16*)Temp+1));
-	bitmask = little_endian_long (((uint32*)Temp)[1]);
+	color_0 = csLittleEndianShort (*((uint16*)Temp));   
+	color_1 = csLittleEndianShort (*((uint16*)Temp+1));
+	bitmask = csLittleEndianLong (((uint32*)Temp)[1]);
 	Temp += 8;
 
 	colours[0].r = COLOR565_RED(color_0); 
@@ -664,7 +664,7 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, uint8* source,
 	// it operates on a 6-byte system.
 
 	// First three bytes
-	bits = little_endian_long (*((int32*)alphamask));
+	bits = csLittleEndianLong (*((int32*)alphamask));
 	for (j = 0; j < 2; j++) 
 	{
 	  for (i = 0; i < 4; i++) 
@@ -680,7 +680,7 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, uint8* source,
 	}
 
 	// Last three bytes
-	bits = little_endian_long (*((int32*)&alphamask[3]));
+	bits = csLittleEndianLong (*((int32*)&alphamask[3]));
 	for (j = 2; j < 4; j++) 
 	{
 	  for (i = 0; i < 4; i++) 

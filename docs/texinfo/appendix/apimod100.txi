@@ -237,17 +237,53 @@ global namespace.
 
 @itemize @bullet
 @item
+@code{big_endian_float()} @result{} @code{csBigEndianFloat()}
+@item
+@code{big_endian_long()} @result{} @code{csBigEndianLong()}
+@item
+@code{big_endian_longlong()} @result{} @code{csBigEndianLongLong()}
+@item
+@code{big_endian_short()} @result{} @code{csBigEndianShort()}
+@item
 @code{COMP_BC} @result{} @code{CS_COMPILER_BCC}
 @item
 @code{COMP_GCC} @result{} @code{CS_COMPILER_GCC}
 @item
 @code{COMP_VC} @result{} @code{CS_COMPILER_MSVC}
 @item
+@code{convert_endian()} @result{} @code{csConvertEndian()}
+@item
 @code{CS_PROCSIZE} @result{} @code{CS_PROCESSOR_SIZE}
 @item
 @code{DO_MMX} @result{} @code{CS_USE_MMX}
 @item
 @code{DO_NASM} @result{} @code{CS_USE_NASM}
+@item
+@code{double2longlong()} @result{} @code{csDoubleToLongLong()}
+@item
+@code{float2long()} @result{} @code{csFloatToLong()}
+@item
+@code{float2short()} @result{} @code{csFloatToShort()}
+@item
+@code{get_le_float16()} @result{} @code{csGetLittleEndianFloat16()}
+@item
+@code{get_le_float32()} @result{} @code{csGetLittleEndianFloat32()}
+@item
+@code{get_le_long()} @result{} @code{csGetLittleEndianLong()}
+@item
+@code{get_le_short()} @result{} @code{csGetLittleEndianShort()}
+@item
+@code{little_endian_float()} @result{} @code{csLittleEndianFloat()}
+@item
+@code{little_endian_long()} @result{} @code{csLittleEndianLong()}
+@item
+@code{little_endian_longlong()} @result{} @code{csLittleEndianLongLong()}
+@item
+@code{little_endian_short()} @result{} @code{csLittleEndianShort()}
+@item
+@code{long2float()} @result{} @code{csLongToFloat()}
+@item
+@code{longlong2double()} @result{} @code{csLongLongToDouble()}
 @item
 @code{MemoryMapFile()} @result{} @code{csMemoryMapFile()}
 @item
@@ -278,17 +314,27 @@ global namespace.
 @item
 @code{QInt()} @result{} @code{csQint()}
 @item
-@code{QInt8()} @result{} @code{csQint8()}
-@item
 @code{QInt16()} @result{} @code{csQint16()}
 @item
 @code{QInt24()} @result{} @code{csQint24()}
 @item
+@code{QInt8()} @result{} @code{csQint8()}
+@item
 @code{qisqrt()} @result{} @code{csQisqrt()}
+@item
+@code{QRound()} @result{} @code{csQround()}
 @item
 @code{qsqrt()} @result{} @code{csQsqrt()}
 @item
-@code{QRound()} @result{} @code{csQround()}
+@code{set_le_float16()} @result{} @code{csSetLittleEndianFloat16()}
+@item
+@code{set_le_float32()} @result{} @code{csSetLittleEndianFloat32()}
+@item
+@code{set_le_long()} @result{} @code{csSetLittleEndianLong()}
+@item
+@code{set_le_short()} @result{} @code{csSetLittleEndianShort()}
+@item
+@code{short2float()} @result{} @code{csShortToFloat()}
 @item
 @code{TEMP_DIR} @result{} @code{CS_TEMP_DIR}
 @item

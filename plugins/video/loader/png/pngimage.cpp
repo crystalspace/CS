@@ -329,9 +329,9 @@ error2:
       Image->GetKeyColor (key_r, key_g, key_b);
       png_color_16 trans;
       memset (&trans, 0, sizeof(trans));
-      trans.red = big_endian_short (key_r << 8);
-      trans.green = big_endian_short (key_g << 8);
-      trans.blue = big_endian_short (key_b << 8);
+      trans.red = csBigEndianShort (key_r << 8);
+      trans.green = csBigEndianShort (key_g << 8);
+      trans.blue = csBigEndianShort (key_b << 8);
       png_set_tRNS (png, info, 0, 0, &trans);
     }
   }
@@ -504,9 +504,9 @@ nomem2:
 	  png_color_16p trans_values;
 	  png_get_tRNS (png, info, 0, 0, &trans_values);
 	  has_keycolour = true;
-	  keycolour.red = convert_endian (trans_values->gray) & 0xff;
-	  keycolour.green = convert_endian (trans_values->gray) & 0xff;
-	  keycolour.blue = convert_endian (trans_values->gray) & 0xff;
+	  keycolour.red = csConvertEndian (trans_values->gray) & 0xff;
+	  keycolour.green = csConvertEndian (trans_values->gray) & 0xff;
+	  keycolour.blue = csConvertEndian (trans_values->gray) & 0xff;
 	}
       }
       break;
@@ -559,9 +559,9 @@ nomem2:
 	  png_color_16p trans_values;
 	  png_get_tRNS (png, info, 0, 0, &trans_values);
 	  has_keycolour = true;
-	  keycolour.red = convert_endian (trans_values->red) & 0xff;
-	  keycolour.green = convert_endian (trans_values->green) & 0xff;
-	  keycolour.blue = convert_endian (trans_values->blue) & 0xff;
+	  keycolour.red = csConvertEndian (trans_values->red) & 0xff;
+	  keycolour.green = csConvertEndian (trans_values->green) & 0xff;
+	  keycolour.blue = csConvertEndian (trans_values->blue) & 0xff;
 	}
         png_set_filler (png, 0xff, PNG_FILLER_AFTER);
       }

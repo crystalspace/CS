@@ -44,14 +44,14 @@ struct csEndianSwap8
 };
 
 #ifdef CS_BIG_ENDIAN
-#  define big_endian_longlong(x) x
-#  define big_endian_long(x)  x
-#  define big_endian_short(x) x
-#  define big_endian_float(x) x
+#  define csBigEndianLongLong(x) x
+#  define csBigEndianLong(x)  x
+#  define csBigEndianShort(x) x
+#  define csBigEndianFloat(x) x
 #else
 
 /// Convert a longlong from big-endian to machine format
-static inline uint64 big_endian_longlong (uint64 l)
+static inline uint64 csBigEndianLongLong (uint64 l)
 {
   uint64 r;
   csEndianSwap8 *p1 = (csEndianSwap8 *)&l;
@@ -69,17 +69,17 @@ static inline uint64 big_endian_longlong (uint64 l)
 
 
 /// Convert a long from big-endian to machine format
-static inline uint32 big_endian_long (uint32 l)
+static inline uint32 csBigEndianLong (uint32 l)
 { return (l >> 24) | ((l >> 8) & 0xff00) | ((l << 8) & 0xff0000) | (l << 24); }
 
 /// Convert a short from big-endian to machine format
-static inline uint16 big_endian_short (uint16 s)
+static inline uint16 csBigEndianShort (uint16 s)
 { return uint16((s >> 8) | (s << 8)); }
 
 /// Convert a big-endian floating-point number to machine format
-static inline float big_endian_float (float f)
+static inline float csBigEndianFloat (float f)
 {
-  //@@WARNING: Should be removed -- use float2long instead
+  //@@WARNING: Should be removed -- use csFloatToLong instead
   unsigned char tmp;
   csEndianSwap4 *pf = (csEndianSwap4 *)&f;
   tmp = pf->b1; pf->b1 = pf->b4; pf->b4 = tmp;
@@ -90,14 +90,14 @@ static inline float big_endian_float (float f)
 #endif // CS_BIG_ENDIAN
 
 #ifdef CS_LITTLE_ENDIAN
-#  define little_endian_longlong(x) x
-#  define little_endian_long(x)  x
-#  define little_endian_short(x) x
-#  define little_endian_float(x) x
+#  define csLittleEndianLongLong(x) x
+#  define csLittleEndianLong(x)  x
+#  define csLittleEndianShort(x) x
+#  define csLittleEndianFloat(x) x
 #else
 
 /// Convert a longlong from little-endian to machine format
-static inline uint64 little_endian_longlong (uint64 l)
+static inline uint64 csLittleEndianLongLong (uint64 l)
 {
   uint64 r;
   csEndianSwap8 *p1 = (csEndianSwap8 *)&l;
@@ -114,15 +114,15 @@ static inline uint64 little_endian_longlong (uint64 l)
 }
 
 /// Convert a long from little-endian to machine format
-static inline uint32 little_endian_long (uint32 l)
+static inline uint32 csLittleEndianLong (uint32 l)
 { return (l >> 24) | ((l >> 8) & 0xff00) | ((l << 8) & 0xff0000) | (l << 24); }
 
 /// Convert a short from little-endian to machine format
-static inline uint16 little_endian_short (uint16 s)
+static inline uint16 csLittleEndianShort (uint16 s)
 { return (s >> 8) | (s << 8); }
 
 /// Convert a little-endian floating-point number to machine format
-static inline float little_endian_float (float f)
+static inline float csLittleEndianFloat (float f)
 {
   unsigned char tmp;
   csEndianSwap4 *pf = (csEndianSwap4 *)&f;
@@ -149,8 +149,11 @@ static inline float little_endian_float (float f)
     For double, we use one bit sign, 15 bits exponent, 49 bits mantissa.
 */
 
-/// Convert a float to a cross-platform 32-bit format (no endianess adjustments!)
-static inline int32 float2long (float f)
+/**
+ * Convert a float to a cross-platform 32-bit format (no endianess
+ * adjustments!)
+ */
+static inline int32 csFloatToLong (float f)
 {
   int exp;
   int32 mant = csQroundSure (frexp (f, &exp) * 0x1000000);
@@ -161,7 +164,7 @@ static inline int32 float2long (float f)
 }
 
 /// Convert a 32-bit cross-platform float to native format (no endianess adjustments!)
-static inline float long2float (int32 l)
+static inline float csLongToFloat (int32 l)
 {
   int exp = (l >> 24) & 0x7f;
   if (exp & 0x40) exp = exp | ~0x7f;
@@ -170,7 +173,7 @@ static inline float long2float (int32 l)
   return (float) ldexp (mant, exp);
 }
 
-/* Implementation note: double2longlong() and longlong2double()
+/* Implementation note: csDoubleToLongLong() and csLongLongToDouble()
  *
  * We avoid use of CONST_INT64() because 64-bit constants are illegal with g++
  * under -ansi -pedantic, and we want this header to be useful to external
@@ -179,7 +182,7 @@ static inline float long2float (int32 l)
  */
 
 /// Convert a double to a cross-platform 64-bit format (no endianess adjustments!)
-static inline int64 double2longlong (double d)
+static inline int64 csDoubleToLongLong (double d)
 {
   int exp;
   int64 mant = (int64) (frexp (d, &exp) * ((int64)1 << 48));
@@ -191,7 +194,7 @@ static inline int64 double2longlong (double d)
 }
 
 /// Convert a 64-bit cross-platform double to native format (no endianess adjustments!)
-static inline double longlong2double (int64 i)
+static inline double csLongLongToDouble (int64 i)
 {
   int exp = (i >> 48) & 0x7fff;
   if (exp & 0x4000) exp = exp | ~0x7fff;
@@ -211,7 +214,7 @@ static inline double longlong2double (int64 i)
 /** @{ */
 
 /// Convert a float to a cross-platform 16-bit format (no endianess adjustments!)
-static inline short float2short (float f)
+static inline short csFloatToShort (float f)
 {
   int exp;
   long mant = csQroundSure (frexp (f, &exp) * 0x1000);
@@ -222,7 +225,7 @@ static inline short float2short (float f)
 }
 
 /// Convert a 16-bit cross-platform float to native format (no endianess adjustments!)
-static inline float short2float (short s)
+static inline float csShortToFloat (short s)
 {
   int exp = (s >> 11) & 0xf;
   if (exp & 0x8) exp = exp | ~0xf;
@@ -234,92 +237,92 @@ static inline float short2float (short s)
 /** @} */
 
 /// Swap the bytes in a uint64 value.
-static inline uint64 convert_endian (uint64 l)
-{ return little_endian_longlong (l); }
+static inline uint64 csConvertEndian (uint64 l)
+{ return csLittleEndianLongLong (l); }
 
 /// Swap the bytes in a int64 value.
-static inline int64 convert_endian (int64 l)
-{ return little_endian_longlong (l); }
+static inline int64 csConvertEndian (int64 l)
+{ return csLittleEndianLongLong (l); }
 
 /// Swap the bytes in a uint32 value.
-static inline uint32 convert_endian (uint32 l)
-{ return little_endian_long (l); }
+static inline uint32 csConvertEndian (uint32 l)
+{ return csLittleEndianLong (l); }
 
 /// Swap the bytes in a int32 value.
-static inline int32 convert_endian (int32 l)
-{ return little_endian_long (l); }
+static inline int32 csConvertEndian (int32 l)
+{ return csLittleEndianLong (l); }
 
 /// Swap the bytes in a int16 value.
-static inline int16 convert_endian (int16 s)
-{ return little_endian_short (s); }
+static inline int16 csConvertEndian (int16 s)
+{ return csLittleEndianShort (s); }
 
 /// Swap the bytes in a uint16 value.
-static inline uint16 convert_endian (uint16 s)
-{ return little_endian_short (s); }
+static inline uint16 csConvertEndian (uint16 s)
+{ return csLittleEndianShort (s); }
 
 /// Swap the bytes in a float value.
-static inline float convert_endian (float f)
-{ return little_endian_float (f); }
+static inline float csConvertEndian (float f)
+{ return csLittleEndianFloat (f); }
 
 /// Read a little-endian short from address
-inline uint16 get_le_short (void *buff)
+inline uint16 csGetLittleEndianShort (void *buff)
 {
 #ifdef CS_STRICT_ALIGNMENT
   uint16 s; memcpy (&s, buff, sizeof (s));
-  return little_endian_short (s);
+  return csLittleEndianShort (s);
 #else
-  return little_endian_short (*(uint16 *)buff);
+  return csLittleEndianShort (*(uint16 *)buff);
 #endif
 }
 
 /// Read a little-endian long from address
-inline uint32 get_le_long (void *buff)
+inline uint32 csGetLittleEndianLong (void *buff)
 {
 #ifdef CS_STRICT_ALIGNMENT
   uint32 l; memcpy (&l, buff, sizeof (l));
-  return little_endian_long (l);
+  return csLittleEndianLong (l);
 #else
-  return little_endian_long (*(uint32 *)buff);
+  return csLittleEndianLong (*(uint32 *)buff);
 #endif
 }
 
 /// Read a little-endian 32-bit float from address
-inline float get_le_float32 (void *buff)
-{ uint32 l = get_le_long (buff); return long2float (l); }
+inline float csGetLittleEndianFloat32 (void *buff)
+{ uint32 l = csGetLittleEndianLong (buff); return csLongToFloat (l); }
 
 /// Read a little-endian 16-bit float from address
-inline float get_le_float16 (void *buff)
-{ uint16 s = get_le_short (buff); return short2float (s); }
+inline float csGetLittleEndianFloat16 (void *buff)
+{ uint16 s = csGetLittleEndianShort (buff); return csShortToFloat (s); }
 
 /// Set a little-endian short on a address
-inline void set_le_short (void *buff, uint16 s)
+inline void csSetLittleEndianShort (void *buff, uint16 s)
 {
 #ifdef CS_STRICT_ALIGNMENT
-  s = little_endian_short (s);
+  s = csLittleEndianShort (s);
   memcpy (buff, &s, sizeof (s));
 #else
-  *((uint16 *)buff) = little_endian_short (s);
+  *((uint16 *)buff) = csLittleEndianShort (s);
 #endif
 }
 
 /// Set a little-endian long on a address
-inline void set_le_long (void *buff, uint32 l)
+inline void csSetLittleEndianLong (void *buff, uint32 l)
 {
 #ifdef CS_STRICT_ALIGNMENT
-  l = little_endian_long (l);
+  l = csLittleEndianLong (l);
   memcpy (buff, &l, sizeof (l));
 #else
-  *((uint32 *)buff) = little_endian_long (l);
+  *((uint32 *)buff) = csLittleEndianLong (l);
 #endif
 }
 
 /// Set a little-endian 32-bit float on a address
-inline void set_le_float32 (void *buff, float f)
-{ set_le_long (buff, float2long (f)); }
+inline void csSetLittleEndianFloat32 (void *buff, float f)
+{ csSetLittleEndianLong (buff, csFloatToLong (f)); }
 
 /// Set a little-endian 16-bit float on a address
-inline void set_le_float16 (void *buff, float f)
-{ set_le_short (buff, float2short (f)); }
+inline void csSetLittleEndianFloat16 (void *buff, float f)
+{ csSetLittleEndianShort (buff, csFloatToShort (f)); }
 
 /** @} */
 
