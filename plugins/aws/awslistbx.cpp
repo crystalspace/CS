@@ -650,7 +650,39 @@ awsListBox::HandleEvent(iEvent& Event)
   return false;
 }
 
+int
+awsListBox::GetRowDepth(awsListRow *row)
+{
+  int depth=0;
+  awsListRow *cur=row->parent;
 
+  // Find out how deep we are.
+  while (cur)
+  {
+    ++depth;
+    cur=cur->parent;
+  }
+  
+  return depth;
+}
+
+bool
+awsListBox::IsLastChild(awsListRow *row)
+{
+  awsListRow *v=row->parent;
+  int i;
+
+  if (!v)
+  {
+    i=rows.Find(row);
+    return i==rows.Length()-1;
+  }
+  else
+  {
+    i= v->children->Find(row);
+    return i==v->children->Length()-1;
+  }
+}
 
 void 
 awsListBox::OnDraw(csRect clip)
@@ -756,6 +788,9 @@ awsListBox::OnDraw(csRect clip)
     awsListRow *row;
     awsListRow *start;
 
+    bool stop_drawing=false;
+    bool draw_this_time=true;
+
     UpdateMap();
     
     if (map==NULL)
@@ -764,21 +799,18 @@ awsListBox::OnDraw(csRect clip)
       start = map[scroll_start];
 
     row=start;
-    x=startx;
-
-    bool stop_drawing=false;
-    bool draw_this_time=true;
-
+    
     while (stop_drawing==false)
     {
       if (draw_this_time)
-        stop_drawing=DrawItemsRecursively(row,x,y,border,false,false);
-      
+      {
+         // Reset row start point
+         x=startx;
+         stop_drawing=DrawItemsRecursively(row,x,y,border,GetRowDepth(row),IsLastChild(row));
+      }
+
       draw_this_time=true;
-
-      // Reset row start point
-      x=startx;
-
+     
       // Find parent of current row.  If there is no parent, then go to the next row item.
       awsListRow *parent=row->parent;
 

@@ -260,6 +260,12 @@ protected:
    /// Used internally to reset the hotspots list.
    void ClearHotspots();
 
+   /// Find out how depp this row is
+   int GetRowDepth(awsListRow *row);
+
+   /// Find out if this row is the last child in it's parent's list
+   bool IsLastChild(awsListRow *row);
+
    /// Used internally to redraw the list recursively (support tree/hierarchical drawing)
    bool DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, int depth, bool last_child);
    
