@@ -12,6 +12,8 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+29-Feb-2000
+	- Norman Kramer fixed a divide by zero bug in glide.
 28-Feb-2000
 	- Michael Ewert did some more optimization work op csphyzik.
 	  At least another 2x speed increase overall.
@@ -42,6 +44,27 @@ Short-term cleanups that need to be done:
 	- Andrew Zabolotny added a TYPEDEF_GROWING_ARRAY to csutil.
 	- Wyatt Miler is busy adding sound to Blocks.
 	- Started work on PVS.
+	- Andrew Zabolotny did another reasonably large change:
+	    - Removed csPolygonTexture mipmaps from the engine. From now
+	      on mipmaps are the fully internal problem of the 3D
+	      rasterizer. Removed MIPMAPPED() keyword (retained for
+	      backward compatibility but ignored).
+	    - Mipmap level selection is based on texel density in the
+	      nearest polygon point. Mipmap level 1 is selected when texel
+	      density is above 1 texel/pixel, mipmap level 2 is selected
+	      when density is above 2 texels/pixel, mipmap level 3 -
+	      when density is above 4 texels/pixel. Theoretically the
+	      thresholds should be 2/4/8 respectively (instead of 1/2/4)
+	      but with the above solution the texture cache usage is
+	      lower (lower mipmap resolutions are choosen more often)
+	      and the quality is reasonable.
+	    - Fixed (actually fixed, not just a work-around) the problem
+	      with lighted textures being written past end-of-texture in
+	      the texture cache. The problem was that sometimes textures
+	      are even smaller than the size of one lightmap cell; in this
+	      case we don't need to paint a whole lightcell.
+	- Thomas Hieber did some further work to get DX6.1 working again.
+	- Robert Bate updated the Mac project files again.
 27-Feb-2000
 	- Eric Sunshine fixed a bug in polytext.cpp where a recent "patch"
 	  following Andrew's "Big Change" broke CleanIfDirty().  The 'src' and
