@@ -210,9 +210,9 @@ float csGlideProcedural::GetPerspectiveAspect ()
   return g3d->GetPerspectiveAspect (); 
 }
 
-void csGlideProcedural::GetObjectToCamera (csReversibleTransform& o2c)
+const csReversibleTransform& csGlideProcedural::GetObjectToCamera ()
 { 
-  g3d->GetObjectToCamera (o2c); 
+  return g3d->GetObjectToCamera (); 
 }
 
 void csGlideProcedural::GetClipper (csVector2* vertices, int& num_vertices)

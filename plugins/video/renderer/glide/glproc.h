@@ -90,7 +90,7 @@ class csGlideProcedural : public iGraphics3D
   virtual void SetClipper (csVector2* vertices, int num_vertices);
   virtual void GetPerspectiveCenter (int& x, int& y);
   virtual float GetPerspectiveAspect ();
-  virtual void GetObjectToCamera (csReversibleTransform& o2c);
+  virtual const csReversibleTransform& GetObjectToCamera ();
   virtual void GetClipper (csVector2* vertices, int& num_vertices);
   virtual iGraphics2D *GetDriver2D ();
   virtual iTextureManager *GetTextureManager ();
