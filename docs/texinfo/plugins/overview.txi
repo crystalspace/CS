@@ -89,4 +89,15 @@ Skeletal motion manager.
 @emph{Performance Statistics}
 
 This plug-in helps to measure performance of the 3D engine.
+
+@item
+@emph{Model Converters}
+
+Helps loading model files of various formats and store them in a common
+data structure.
+
+@item
+@emph{Crossbuilder}
+
+Uses the structure created by a model converter to build a mesh object.
 @end itemize
