@@ -17,6 +17,7 @@ chronological order.
 	- Eric Sunshine fixed a couple more places in particleldr.cpp where
 	  false was being returned as a csPtr<>.  Reported by Randall Foreman's
 	  Borland compiler.
+	- res corrected the Help statement in the cscursor Jamfile.
 23-Jan-2004
 	- Jorrit fixed a crash bug in the engine.  At destruction it was
 	  forcing a get of the thing plugin.  However this also happens at

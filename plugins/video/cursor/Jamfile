@@ -1,6 +1,6 @@
 SubDir TOP plugins video cursor ;
 
-Help cursor : "Custom cursor plugin" ;
+Help cscursor : "Custom cursor plugin" ;
 
 Plugin cscursor
 	: [ Wildcard *.cpp *.h ]
