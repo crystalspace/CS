@@ -155,6 +155,8 @@ AC_DEFUN([CS_EMIT_BUILD_FLAGS],
 # INITIALIZATION
 #===============================================================================
 AC_INIT([crystal], [cs_version_number], [crystal-main@lists.sourceforge.net])
+CS_PACKAGEINFO([Crystal Space], [(c)1998-2003 Jorrit Tyberghein and others.],
+		[http://crystal.sourceforge.net])
 AC_CONFIG_SRCDIR([libs/cssys/cssys.mak])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_PREFIX_DEFAULT([cs_install_dir_default])
@@ -1758,10 +1760,7 @@ CS_MAKEFILE_PROPERTY([CFLAGS.SYSTEM], [AS_ESCAPE([$(CXXFLAGS.SYSTEM)])], [+])
 #------------------------------------------------------------------------------
 # Boilerplate: Jamconfig
 #------------------------------------------------------------------------------
-CS_JAMCONFIG_PROPERTY([PACKAGE.NAME], [$PACKAGE_NAME])
-CS_JAMCONFIG_PROPERTY([PACKAGE.VERSION], [$PACKAGE_VERSION])
-CS_JAMCONFIG_PROPERTY([PACKAGE.STRING], [$PACKAGE_STRING])
-CS_JAMCONFIG_PROPERTY([PACKAGE.BUGREPORT], [$PACKAGE_BUGREPORT])
+CS_PACKAGEINFO_SETJAMCONFIG
 CS_JAMCONFIG_PROPERTY([JAMCONFIG_READ], [yes])
 CS_JAMCONFIG_PROPERTY([CONFIGURE_INVOCATION], [$0 $ac_configure_args])
 

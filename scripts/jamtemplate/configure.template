@@ -7,7 +7,8 @@ AC_PREREQ([2.54])
 #----------------------------------------------------------------------------
 # Initialize autoconf
 #----------------------------------------------------------------------------
-AC_INIT([#PROJECTNAME#], [0.1], [#EMAIL#])
+AC_INIT([#PROJECTNAME#], [#VERSION#], [#EMAIL#])
+CS_PACKAGEINFO([#LONGNAME#], [#Copyright#], [#Homepage#])
 AC_CONFIG_SRCDIR([mk/jam/build.jam])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST
@@ -70,9 +71,10 @@ AC_MSG_RESULT([$cs_build_mode])
 CS_JAMCONFIG_PROPERTY([MODE], [$cs_build_mode])
 
 #-----------------------------------------------------------------------------
-# Output Installpaths
+# Output Installpaths/package info
 #-----------------------------------------------------------------------------
 CS_OUTPUT_INSTALLDIRS
+CS_PACKAGEINFO_SETJAMCONFIG
                                                                                 
 #----------------------------------------------------------------------------
 # Output generated files.  Also create a Jamfile when compiling outside

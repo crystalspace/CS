@@ -82,6 +82,7 @@ URI. Example: "http://www.spacefighter.org")
 __EOF__
 ReadValueStrict PROJECTNAME "Shortname: "
 ReadValueStrict LONGNAME "Longname: "
+ReadValueStrict VERSION "Version: "
 ReadValue HOMEPAGE "Homepage: "
 
 cat << __EOF__
@@ -94,6 +95,7 @@ configuration scripts so that people see a support address when typing
 __EOF__
 ReadValueStrict AUTHOR "Author: "
 ReadValueStrict EMAIL "E-Mail: "
+ReadValue COPYRIGHT "Copyright: "
 
 cat << __EOF__
 
@@ -118,7 +120,10 @@ function SetupFromTemplate
 	     | sed -e "s^#EMAIL#^$EMAIL^g" \
 	     | sed -e "s^#HOMEPAGE#^$HOMEPAGE^g" \
 	     | sed -e "s^#LONGNAME#^$LONGNAME^g" \
-	     | sed -e "s^#AUTHOR#^$AUTHOR^g" > "$2"
+	     | sed -e "s^#AUTHOR#^$AUTHOR^g" \
+	     | sed -e "s^#VERSION#^$VERSION^g" \
+	     | sed -e "s^#COPYRIGHT#^$VERSION^g" \
+	       > "$2"
 }
 
 # create directories

@@ -16,6 +16,9 @@ The history order is reversed so that new features are at the top.
 	  linking).
 	- res updated the GL ext manager generator script to contain Jorrits
 	  latest csGLExtensionManager fix.
+	- Matze added some macros for gathering additional project info in
+	  autoconf. This will be used to fill in stuff in the macosx and win32
+	  rc files.
 22-May-2003
 	- res made the following changes:
 	    - when using the new renderer, the sector now stores the 
