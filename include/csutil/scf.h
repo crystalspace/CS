@@ -226,7 +226,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 #define IMPLEMENT_EMBEDDED_IBASE_INCREF(Class)				\
 void Class::IncRef ()							\
 {									\
-  SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfRefCount + 1));\
+  SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfParent->scfRefCount + 1));\
   scfParent->IncRef ();							\
 }
 
@@ -239,7 +239,7 @@ void Class::IncRef ()							\
 void Class::DecRef ()							\
 {									\
   scfParent->DecRef ();							\
-  SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, scfRefCount));	\
+  SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, scfParent->scfRefCount));	\
 }
 
 /**
