@@ -49,14 +49,13 @@ csSoundSourceA3D::~csSoundSourceA3D()
 
 int csSoundSourceA3D::CreateSource(ISoundRender * render, csSoundBuffer * sound)
 {
-  HRESULT                 hr;
+  HRESULT           hr;
   csSoundRenderA3D *renderA3D;
-  VOID                            *pbWrite1 = NULL, *pbWrite2 = NULL;
-  DWORD                           cbLen1, cbLen2;
-  DWORD           dwMode;
+  VOID             *pbWrite1 = NULL, *pbWrite2 = NULL;
+  DWORD             cbLen1, cbLen2;
 
   if (!render) return E_FAIL;
-  if (!sound) return E_FAIL;
+  if (!sound)  return E_FAIL;
 
   renderA3D = (csSoundRenderA3D *)render;
 
@@ -175,7 +174,7 @@ STDMETHODIMP csSoundSourceA3D::StopSource()
 
 STDMETHODIMP csSoundSourceA3D::SetPosition(float x, float y, float z)
 {
-  HRESULT hr;
+  /*HRESULT hr;*/
   
   info.fPosX = x; info.fPosY = y; info.fPosZ = z;
 
@@ -189,7 +188,7 @@ STDMETHODIMP csSoundSourceA3D::SetPosition(float x, float y, float z)
 
 STDMETHODIMP csSoundSourceA3D::SetVelocity(float x, float y, float z)
 {
-  HRESULT hr;
+  /*HRESULT hr;*/
   
   info.fVelX = x; info.fVelY = y; info.fVelZ = z;
 

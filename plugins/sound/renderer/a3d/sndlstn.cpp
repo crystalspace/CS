@@ -193,7 +193,7 @@ STDMETHODIMP csSoundListenerA3D::SetDistanceFactor(float factor)
 
 STDMETHODIMP csSoundListenerA3D::SetRollOffFactor(float factor)
 {
-  HRESULT hr;
+  /*HRESULT hr;*/
 
   info.fRollOff = factor;
 
