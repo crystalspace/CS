@@ -74,15 +74,23 @@ void csGIFImageIO::SetDithering (bool)
 {
 }
 
-iDataBuffer *csGIFImageIO::Save (iImage *, iImageIO::FileFormatDescription *,
+iDataBuffer *csGIFImageIO::Save (iImage* image, iImageIO::FileFormatDescription* format,
   const char* extraoptions)
 {
+  image = NULL;
+  format = NULL;
+  extraoptions = NULL;
+
   return NULL;
 }
 
-iDataBuffer *csGIFImageIO::Save (iImage *, const char *,
+iDataBuffer *csGIFImageIO::Save (iImage* image, const char* mime,
   const char* extraoptions)
 {
+  image = NULL;
+  mime = NULL;
+  extraoptions = NULL;
+
   return NULL;
 }
 
