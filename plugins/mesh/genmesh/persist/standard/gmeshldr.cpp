@@ -435,7 +435,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError (
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
-		    child, "Too many colors for a general mesh factory!");
+		    child, "Too many vertices for a general mesh factory!");
 	    return 0;
 	  }
 	  float x, y, z, u, v;
