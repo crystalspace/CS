@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+25-Jul-2001
+	- Eric Sunshine changed the CVS snapshot and documentation generation
+	  scripts so that these resources are now published via the HTTP
+	  protocol only, rather than via both HTTP and FTP.  This was done
+	  since SourceForge plans to discontinue project-specific FTP service.
 24-Jul-2001
 	- Further work on the decomposition of the system driver.
 	    - The iObjectRegistry in the system driver is now more complete.
