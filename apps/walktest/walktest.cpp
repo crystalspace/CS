@@ -369,10 +369,16 @@ void WalkTest::DemoWrite (const char* buf)
       VERIFY_SUCCESS (Gfx2D->BeginDraw ());
       Gfx2D->Clear (0);
       Console->PutText ("%s", buf);
-      csRect area;
-      Console->Print (&area);
+
+      //Thomas Hieber 13.05.1999
+      //using an area of output would look nicer on some platforms, but is not
+      //correct, according the way Crystal Space handles multiple pages of
+      //output and will cause stange effects, so I removed it.
+
+      //csRect area;
+      Console->Print (NULL); //was:(&area);
       Gfx2D->FinishDraw ();
-      Gfx2D->Print (&area);
+      Gfx2D->Print (NULL); //was: Gfx2D->Print (&area);
     }
   }
 }
