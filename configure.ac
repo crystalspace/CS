@@ -1437,20 +1437,24 @@ CS_CHECK_BUILD([for pthread], [cs_cv_sys_pthread],
     [cs_pthread_flags], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])])
 
-#----------------------------------------------------------------------------
-# Determine if our pthread implementation supports the RECURSIVE_NP
-# externsion.
-#----------------------------------------------------------------------------
-AS_IF([test "$cs_cv_sys_pthread" == "yes"],
+
+
+#------------------------------------------------------------------------------
+# Check if pthread implementation supports the RECURSIVE_NP externsion.
+#------------------------------------------------------------------------------
+AS_IF([test $cs_cv_sys_pthread = yes],
     [CS_CHECK_BUILD([for pthread recursive mutexes],
-      [cs_cv_sys_pthread_mutex_recursive],
-      [AC_LANG_PROGRAM(
-	[#include <pthread.h>],
-	[
-	pthread_mutex_t mutex;
-	pthread_mutex_init (&mutex, PTHREAD_MUTEX_RECURSIVE_NP);
-	])], [cs_pthread_flags], [],
-      [CS_HEADER_PROPERTY([PTHREAD_MUTEX_HAS_RECURSIVE_NP], [])])])
+	[cs_cv_sys_pthread_mutex_recursive],
+	[AC_LANG_PROGRAM(
+	    [#include <pthread.h>],
+	    [pthread_mutex_t mutex;
+	    pthread_mutex_init(&mutex, PTHREAD_MUTEX_RECURSIVE_NP);])],
+	[], [], [CS_HEADER_PROPERTY([PTHREAD_MUTEX_HAS_RECURSIVE_NP])], [], [],
+	[$cs_cv_sys_pthread_cflags],
+	[$cs_cv_sys_pthread_lflags],
+	[$cs_cv_sys_pthread_libs])])
+
+
 
 #------------------------------------------------------------------------------
 # Determine if plugin modules must implement main().  This is needed on some
