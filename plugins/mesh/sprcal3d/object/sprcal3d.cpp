@@ -779,6 +779,8 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   {
     if (factory->submeshes[meshId]->attach_by_default)
     {
+      // @@@ FIXME: The pointer to int cast is potentially bogus on 64-bit
+      // platforms.
       AttachCoreMesh(factory->submeshes[meshId]->index,(int)(iMaterialWrapper*)
 		      factory->submeshes[meshId]->default_material);
     }
@@ -2148,6 +2150,8 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(const char *meshname)
   if (idx == -1)
     return false;
 
+  // @@@ FIXME: The pointer to int cast is potentially bogus on 64-bit
+  // platforms.
   return AttachCoreMesh(factory->submeshes[idx]->index,
   	(int)(iMaterialWrapper*)factory->submeshes[idx]->default_material);
 }
