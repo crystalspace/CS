@@ -640,6 +640,7 @@ csEngine::csEngine (iBase *iParent) :
   default_max_lightmap_h = 256;
   default_clear_zbuf = false;
   default_clear_screen = false;
+  cache_mgr = NULL;
 
   textures = new csTextureList ();
   materials = new csMaterialList ();

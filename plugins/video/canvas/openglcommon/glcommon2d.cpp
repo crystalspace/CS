@@ -75,6 +75,9 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 bool csGraphics2DGLCommon::Open ()
 {
   if (is_open) return true;
+
+  statecache->InitCache();
+
   // initialize font cache object
   if (!FontCache)
     FontCache = new GLFontCache (FontServer, this);
@@ -107,8 +110,6 @@ bool csGraphics2DGLCommon::Open ()
 
   glViewport (0, 0, Width, Height);
   Clear (0);
-
-  statecache->InitCache();
 
   return true;
 }

@@ -3135,7 +3135,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 	    clipped_texels->GetArray (),
 	    clipped_colors->GetArray (),
 	    clipped_userpointers,
-	    clipped_fog->GetArray ());
+	    vertex_fog != NULL ? clipped_fog->GetArray () : NULL);
 	  (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
 	  clipinfo[j].original.idx = num_clipped_vertices;
 	  num_clipped_vertices++;
@@ -3873,7 +3873,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       work_colors,
       work_userarrays,
       userarraycomponents,
-      work_fog,
+      mesh.do_fog ? work_fog : NULL,
       num_triangles,
       num_vertices,
       mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE,
@@ -4434,7 +4434,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
 	work_colors,
 	NULL,
 	NULL,
-	work_fog,
+	mesh.do_fog ? work_fog : NULL,
 	num_triangles,
 	num_vertices,
 	mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE,
