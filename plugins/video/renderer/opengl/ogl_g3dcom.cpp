@@ -110,6 +110,26 @@ CS_IMPLEMENT_STATIC_VAR (Get_clipped_colors, ogl_g3dcom_clipped_colors, ())
 /// Array for clipping.
 CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_fog, G3DFogInfo);
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_fog, ogl_g3dcom_clipped_fog, ())
+
+/// Array for clipping.
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_user, float);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user0, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user1, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user2, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user3, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user4, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user5, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user6, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user7, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user8, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user9, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user10, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user11, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user12, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user13, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user14, ogl_g3dcom_clipped_user, ())
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_user15, ogl_g3dcom_clipped_user, ())
+
 ///Array for clipping polygon meshes with lightmaps
 CS_TYPEDEF_GROWING_ARRAY (ogl_g3dcom_clipped_lightmaps, iPolyTex_p);
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmaps, ogl_g3dcom_clipped_lightmaps, ())
@@ -148,8 +168,11 @@ static ogl_g3dcom_clipped_vertices *clipped_vertices = NULL;
 static ogl_g3dcom_clipped_texels *clipped_texels = NULL;
 static ogl_g3dcom_clipped_colors *clipped_colors = NULL;
 static ogl_g3dcom_clipped_fog *clipped_fog = NULL;
-static ogl_g3dcom_clipped_lightmaps *clipped_lightmaps = NULL;
+static ogl_g3dcom_clipped_user *clipped_user[16] = {
+  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
+static ogl_g3dcom_clipped_lightmaps *clipped_lightmaps = NULL;
 static ogl_g3dcom_clipped_lightmap_vertices *clipped_lightmap_vertices = NULL;
 static ogl_g3dcom_clipped_lightmap_triangles *clipped_lightmap_triangles = NULL;
 static ogl_g3dcom_clipped_lightmap_translate *clipped_lightmap_translate = NULL;
@@ -259,6 +282,23 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
     clipped_texels = Get_clipped_texels ();
     clipped_colors = Get_clipped_colors ();
     clipped_fog = Get_clipped_fog ();
+    clipped_user[0] = Get_clipped_user0();
+    clipped_user[1] = Get_clipped_user1();
+    clipped_user[2] = Get_clipped_user2();
+    clipped_user[3] = Get_clipped_user3();
+    clipped_user[4] = Get_clipped_user4();
+    clipped_user[5] = Get_clipped_user5();
+    clipped_user[6] = Get_clipped_user6();
+    clipped_user[7] = Get_clipped_user7();
+    clipped_user[8] = Get_clipped_user8();
+    clipped_user[9] = Get_clipped_user9();
+    clipped_user[10] = Get_clipped_user10();
+    clipped_user[11] = Get_clipped_user11();
+    clipped_user[12] = Get_clipped_user12();
+    clipped_user[13] = Get_clipped_user13();
+    clipped_user[14] = Get_clipped_user14();
+    clipped_user[15] = Get_clipped_user15();
+
     clipped_lightmaps = Get_clipped_lightmaps ();
     clipped_lightmap_vertices = Get_clipped_lightmap_vertices();
     clipped_lightmap_triangles = Get_clipped_lightmap_triangles();
@@ -266,7 +306,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
     clipped_lightmap_texels = Get_clipped_lightmap_texels();
     clipped_lightmap_fog = Get_clipped_lightmap_fog();
     clipped_lightmap_fog_texels = Get_clipped_lightmap_fog_texels();
-
   }
 
   // See note above.
@@ -281,6 +320,8 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   clipped_texels->IncRef ();
   clipped_colors->IncRef ();
   clipped_fog->IncRef ();
+  for( int i=0; i<16; i++ )
+    clipped_user[i]->IncRef ();
 
   clipped_lightmap_triangles->IncRef();
   clipped_lightmap_translate->IncRef();
@@ -322,6 +363,8 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   clipped_texels->DecRef ();
   clipped_colors->DecRef ();
   clipped_fog->DecRef ();
+  for( int i=0; i<16; i++ )
+    clipped_user[i]->DecRef ();
 
   clipped_lightmap_triangles->DecRef();
   clipped_lightmap_translate->DecRef();
@@ -375,7 +418,7 @@ void csGraphics3DOGLCommon::InitGLExtensions ()
     {
       const unsigned char* extensions = glGetString(GL_EXTENSIONS);
       if (!extensions)
-	return; //  no need to look any further
+  return; //  no need to look any further
 
       // check the extension string for each extension in turn
       char* extbuf = new char[strlen((const char*)extensions)+1];
@@ -388,31 +431,31 @@ void csGraphics3DOGLCommon::InitGLExtensions ()
         char* next = strchr(ext, ' ');
         if (next) *next++ = 0;
 
-	csString cfgkey;
-	cfgkey << EXT_CONFIG_KEY << "." << ext;
+  csString cfgkey;
+  cfgkey << EXT_CONFIG_KEY << "." << ext;
 
-#       define USE_OGL_EXT(extname)		  \
-	if (!strcmp (ext, "GL_" #extname))	  \
-	{					  \
-	  if (!config->GetBool(EXT_CONFIG_KEY	  \
-	    ".GL_" #extname, false))		  \
-	  {					  \
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,  \
-	    "... not using %s", "GL_" #extname);  \
-	  }					  \
-	  else					  \
-	  {					  \
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,  \
-	      "... using %s", "GL_" #extname);	  \
-	    Init_##extname (G2DGL);		  \
-	  }					  \
-	} else
+#       define USE_OGL_EXT(extname)     \
+  if (!strcmp (ext, "GL_" #extname))    \
+  {           \
+    if (!config->GetBool(EXT_CONFIG_KEY   \
+      ".GL_" #extname, false))      \
+    {           \
+      Report (CS_REPORTER_SEVERITY_NOTIFY,  \
+      "... not using %s", "GL_" #extname);  \
+    }           \
+    else            \
+    {           \
+      Report (CS_REPORTER_SEVERITY_NOTIFY,  \
+        "... using %s", "GL_" #extname);    \
+      Init_##extname (G2DGL);     \
+    }           \
+  } else
 
 #       include "ogl_suppext.h"
 #       undef USE_OGL_EXT
-	{ /* the last 'else' */ }
+  { /* the last 'else' */ }
 
-	ext = next;
+  ext = next;
       }
       G2DGL->DecRef ();
       delete[] extbuf;
@@ -422,16 +465,16 @@ void csGraphics3DOGLCommon::InitGLExtensions ()
     csRef<iConfigIterator> it (config->Enumerate (EXT_CONFIG_KEY));
     while (it->Next())
     {
-#     define USE_OGL_EXT(extname)				    \
-	if (!strcmp (it->GetKey(), EXT_CONFIG_KEY ".GL_" #extname)) \
-	{ continue; } else
+#     define USE_OGL_EXT(extname)           \
+  if (!strcmp (it->GetKey(), EXT_CONFIG_KEY ".GL_" #extname)) \
+  { continue; } else
 
 #     include "ogl_suppext.h"
 #     undef USE_OGL_EXT
       {
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    "Extension %s was used in config but is "
-	    "actually not supported", it->GetKey());
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Extension %s was used in config but is "
+      "actually not supported", it->GetKey());
       }
     }
   }
@@ -821,12 +864,12 @@ bool csGraphics3DOGLCommon::NewOpen ()
       if (s##str) \
       { \
         csString s_##str; \
-	s_##str << OGLCONFIGS_PREFIX << oglconfig << '.' << #str; \
-	if (config->KeyExists(s_##str.GetData())) \
-	{ \
-	  count++; \
-	  apply &= csGlobMatches(s##str, config->GetStr(s_##str.GetData())); \
-	} \
+  s_##str << OGLCONFIGS_PREFIX << oglconfig << '.' << #str; \
+  if (config->KeyExists(s_##str.GetData())) \
+  { \
+    count++; \
+    apply &= csGlobMatches(s##str, config->GetStr(s_##str.GetData())); \
+  } \
       }
 
       CHECK_STRING (GL_VENDOR);
@@ -837,14 +880,14 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
       if (apply && count != 0)
       {
-	csString cfgfkey;
-	cfgfkey << OGLCONFIGS_PREFIX << oglconfig << OGLCONFIGS_SUFFIX;
-	csString cfgfile("/config/");
-	cfgfile << config->GetStr(cfgfkey.GetData());
-	config.AddConfig(object_reg, cfgfile.GetData(),
-	  iConfigManager::ConfigPriorityPlugin + 1);
-	Report (CS_REPORTER_SEVERITY_NOTIFY, "read config for '%s' from %s",
-	  oglconfig.GetData(), cfgfile.GetData());
+  csString cfgfkey;
+  cfgfkey << OGLCONFIGS_PREFIX << oglconfig << OGLCONFIGS_SUFFIX;
+  csString cfgfile("/config/");
+  cfgfile << config->GetStr(cfgfkey.GetData());
+  config.AddConfig(object_reg, cfgfile.GetData(),
+    iConfigManager::ConfigPriorityPlugin + 1);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "read config for '%s' from %s",
+    oglconfig.GetData(), cfgfile.GetData());
       }
       oglconfigs.Push(csStrNew (oglconfig.GetData()));
     }
@@ -1121,7 +1164,7 @@ void csGraphics3DOGLCommon::CommonOpen ()
   {
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
     effectserver = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.video.effects.stdserver", iEffectServer);
+      "crystalspace.video.effects.stdserver", iEffectServer);
     object_reg->Register (effectserver, "iEffectServer");
     plugin_mgr->DecRef ();
   }
@@ -1868,8 +1911,8 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
         float vshift = layer->vshift;
         for (i = 0 ; i < queue.num_vertices ; i++)
         {
-	  *dst++ = (*src++) * uscale + ushift;
-	  *dst++ = (*src++) * vscale + vshift;
+    *dst++ = (*src++) * uscale + ushift;
+    *dst++ = (*src++) * vscale + vshift;
         }
 
         p_gltxt = queue.layer_gltxt;
@@ -2314,8 +2357,8 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
   for (i = 1; i < poly.num; i++)
   {
     if ((ABS (poly.vertices[i].x - poly.vertices[i - 1].x)
-	+ ABS (poly.vertices[i].y - poly.vertices[i - 1].y))
-	> VERTEX_NEAR_THRESHOLD)
+  + ABS (poly.vertices[i].y - poly.vertices[i - 1].y))
+  > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
   // if this is a 'degenerate' polygon, skip it
@@ -2522,35 +2565,67 @@ static void ResolveVertex (
   csClipInfo* ci,
   int* clipped_translate,
   csVector3* overts, csVector2* otexels,
-  csColor* ocolors, G3DFogInfo* ofog,
-  csVector2& texel, csColor& color, G3DFogInfo& fog)
+  csColor* ocolors, float** ouserarrays, int* userarraycomponents,
+  G3DFogInfo* ofog,
+  int outi,
+  csVector2* texel, csColor* color, float** userarrays,
+  G3DFogInfo* fog)
 {
   switch (ci->type)
   {
     case CS_CLIPINFO_ORIGINAL:
-      texel = otexels[ci->original.idx];
-      if (ocolors) color = ocolors[ci->original.idx];
-      if (ofog) fog = ofog[ci->original.idx];
+      texel[outi] = otexels[ci->original.idx];
+      if (ocolors) color[outi] = ocolors[ci->original.idx];
+      if (ofog) fog[outi] = ofog[ci->original.idx];
+      if (ouserarrays)
+      {
+        for (int u=0; u<16; u++ )
+        {
+  if( ouserarrays[u] )
+  {
+    for( int c=0; c<userarraycomponents[u]; c++ )
+    {
+      (userarrays[u])[outi*userarraycomponents[u]+c] =
+        (ouserarrays[u])[ci->original.idx*userarraycomponents[u]+c];
+    }
+  }
+        }
+      }
       break;
     case CS_CLIPINFO_ONEDGE:
     {
       int i1 = ci->onedge.i1;
       int i2 = ci->onedge.i2;
       float r = ci->onedge.r;
-      texel = otexels[i1] * (1-r) + otexels[i2] * r;
+      texel[outi] = otexels[i1] * (1-r) + otexels[i2] * r;
       if (ocolors)
       {
-	color.red = ocolors[i1].red * (1-r) + ocolors[i2].red * r;
-	color.green = ocolors[i1].green * (1-r) + ocolors[i2].green * r;
-	color.blue = ocolors[i1].blue * (1-r) + ocolors[i2].blue * r;
+  color[outi].red = ocolors[i1].red * (1-r) + ocolors[i2].red * r;
+  color[outi].green = ocolors[i1].green * (1-r) + ocolors[i2].green * r;
+  color[outi].blue = ocolors[i1].blue * (1-r) + ocolors[i2].blue * r;
       }
       if (ofog)
       {
-	fog.intensity = ofog[i1].intensity*(1-r)+ofog[i2].intensity*r;
-	fog.intensity2 = 0;
-	fog.r = ofog[i1].r * (1-r) + ofog[i2].r * r;
-	fog.g = ofog[i1].g * (1-r) + ofog[i2].g * r;
-	fog.b = ofog[i1].b * (1-r) + ofog[i2].b * r;
+  fog[outi].intensity = ofog[i1].intensity*(1-r)+ofog[i2].intensity*r;
+  fog[outi].intensity2 = 0;
+  fog[outi].r = ofog[i1].r * (1-r) + ofog[i2].r * r;
+  fog[outi].g = ofog[i1].g * (1-r) + ofog[i2].g * r;
+  fog[outi].b = ofog[i1].b * (1-r) + ofog[i2].b * r;
+      }
+      if (ouserarrays)
+      {
+        for (int u=0; u<16; u++ )
+        {
+  if( ouserarrays[u] )
+  {
+    for( int c=0; c<userarraycomponents[u]; c++ )
+    {
+      (userarrays[u])[outi*userarraycomponents[u]+c] =
+        (ouserarrays[u])[i1*userarraycomponents[u]+c] * (1-r) +
+        (ouserarrays[u])[i2*userarraycomponents[u]+c] * r;
+    }
+  }
+        }
       }
       break;
     }
@@ -2558,29 +2633,54 @@ static void ResolveVertex (
     {
       csVector2 texel1, texel2;
       csColor color1, color2;
+      float user1[64], user2[64];
+      float* userpointers1[16] = {&user1[0],  &user1[4],  &user1[8],  &user1[12],
+                                 &user1[16], &user1[20], &user1[24], &user1[28],
+                                 &user1[32], &user1[36], &user1[40], &user1[44],
+                                 &user1[48], &user1[52], &user1[56], &user1[60] };
+      float* userpointers2[16] = {&user2[0],  &user2[4],  &user2[8],  &user2[12],
+                                 &user2[16], &user2[20], &user2[24], &user2[28],
+                                 &user2[32], &user2[36], &user2[40], &user2[44],
+                                 &user2[48], &user2[52], &user2[56], &user2[60] };
       G3DFogInfo fog1, fog2;
       ResolveVertex (ci->inside.ci1, clipped_translate, overts, otexels,
-	ocolors, ofog, texel1, color1, fog1);
+  ocolors, ouserarrays, userarraycomponents,
+  ofog, 0, &texel1, &color1, userpointers1, &fog1);
       ResolveVertex (ci->inside.ci2, clipped_translate, overts, otexels,
-	ocolors, ofog, texel2, color2, fog2);
+  ocolors, ouserarrays, userarraycomponents,
+  ofog, 0, &texel2, &color2, userpointers2, &fog2);
       delete ci->inside.ci1;
       delete ci->inside.ci2;
       ci->type = CS_CLIPINFO_ORIGINAL;
       float r = ci->inside.r;
-      texel = texel1 * (1-r) + texel2 * r;
+      texel[outi] = texel1 * (1-r) + texel2 * r;
       if (ocolors)
       {
-	color.red = color1.red * (1-r) + color2.red * r;
-	color.green = color1.green * (1-r) + color2.green * r;
-	color.blue = color1.blue * (1-r) + color2.blue * r;
+  color[outi].red = color1.red * (1-r) + color2.red * r;
+  color[outi].green = color1.green * (1-r) + color2.green * r;
+  color[outi].blue = color1.blue * (1-r) + color2.blue * r;
       }
       if (ofog)
       {
-	fog.intensity =  fog1.intensity*(1-r)+fog2.intensity*r;
-	fog.intensity2 = 0;
-	fog.r = fog1.r * (1-r) + fog2.r * r;
-	fog.g = fog1.g * (1-r) + fog2.g * r;
-	fog.b = fog1.b * (1-r) + fog2.b * r;
+  fog[outi].intensity =  fog1.intensity*(1-r)+fog2.intensity*r;
+  fog[outi].intensity2 = 0;
+  fog[outi].r = fog1.r * (1-r) + fog2.r * r;
+  fog[outi].g = fog1.g * (1-r) + fog2.g * r;
+  fog[outi].b = fog1.b * (1-r) + fog2.b * r;
+      }
+      if (ouserarrays)
+      {
+        for (int u=0; u<16; u++ )
+        {
+  if( ouserarrays[u] )
+  {
+    for( int c=0; c<userarraycomponents[u]; c++ )
+    {
+      (userarrays[u])[outi*userarraycomponents[u]+c] =
+        user1[u*4+c] * (1-r) + user2[u*4+c] * r;
+    }
+  }
+        }
       }
       break;
     }
@@ -2594,6 +2694,8 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     csVector3* vertices,
     csVector2* texels,
     csColor* vertex_colors,
+    float** userarrays,
+    int* userarraycomponents,
     G3DFogInfo* vertex_fog,
     int& num_clipped_triangles,
     int& num_clipped_vertices,
@@ -2688,7 +2790,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     frust_origin.Set (0, 0, 0);
 
   ClipTriangleMesh (num_triangles, num_vertices, triangles, vertices,
-    texels, vertex_colors, vertex_fog,
+    texels, vertex_colors, userarrays, userarraycomponents, vertex_fog,
     num_clipped_triangles, num_clipped_vertices, exact_clipping,
     frust_origin, frustum_planes, num_planes,
     diagonal_planes, num_diagonal_planes);
@@ -2701,6 +2803,8 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     csVector3* vertices,
     csVector2* texels,
     csColor* vertex_colors,
+    float** userarrays,
+    int* userarraycomponents,
     G3DFogInfo* vertex_fog,
     int& num_clipped_triangles,
     int& num_clipped_vertices,
@@ -2727,6 +2831,8 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     clipped_texels->SetLimit (num_vts);
     clipped_colors->SetLimit (num_vts);
     clipped_fog->SetLimit (num_vts);
+    for( i=0; i<16; i++ )
+      clipped_user[i]->SetLimit (num_vts);
   }
 
   num_clipped_triangles = 0;
@@ -2743,8 +2849,8 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     {
       if (planes[j].Classify (v-frust_origin) >= 0)
       {
-	inside = false;
-	break;  // Not inside.
+  inside = false;
+  break;  // Not inside.
       }
     }
     if (inside)
@@ -2758,6 +2864,16 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
           (*clipped_colors)[num_clipped_vertices] = vertex_colors[i];
         if (vertex_fog)
           (*clipped_fog)[num_clipped_vertices] = vertex_fog[i];
+        if (userarrays) 
+        {
+          for (int u=0; u<16; u++)
+            if (userarrays[u] != NULL)
+            {
+              for (int c=0; c<userarraycomponents[u]; c++)
+                (*clipped_user[u])[num_clipped_vertices] = 
+                  (userarrays[u])[i*userarraycomponents[u]+c];
+            }
+        }
         num_clipped_vertices++;
       }
       else
@@ -2777,7 +2893,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     csTriangle& tri = triangles[i];
     int cnt = int ((*clipped_translate)[tri.a] != -1)
         + int ((*clipped_translate)[tri.b] != -1)
-	+ int ((*clipped_translate)[tri.c] != -1);
+  + int ((*clipped_translate)[tri.c] != -1);
     if (cnt == 0)
     {
       //=====
@@ -2795,13 +2911,13 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
         csVector3 v0 = vertices[tri.a] - frust_origin;
         csVector3 v1 = vertices[tri.b] - frust_origin;
         csVector3 v2 = vertices[tri.c] - frust_origin;
-	float c0 = pl.Classify (v0);
-	float c1 = pl.Classify (v1);
-	// Set cnt to 1 so that we will clip in the next part.
-	if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
-	float c2 = pl.Classify (v2);
-	if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
-	if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
+  float c0 = pl.Classify (v0);
+  float c1 = pl.Classify (v1);
+  // Set cnt to 1 so that we will clip in the next part.
+  if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
+  float c2 = pl.Classify (v2);
+  if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
+  if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
       }
     }
 
@@ -2833,7 +2949,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
         (*clipped_triangles)[num_clipped_triangles].b = tri.b;
         (*clipped_triangles)[num_clipped_triangles].c = tri.c;
         num_clipped_triangles++;
-	continue;
+  continue;
       }
 
       csVector3 poly[100];  // @@@ Arbitrary limit
@@ -2856,8 +2972,8 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //-----
       for (j = 0 ; j < num_planes ; j++)
       {
-	csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
-	if (num_poly <= 0) break;
+  csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
+  if (num_poly <= 0) break;
       }
 
       //-----
@@ -2866,22 +2982,28 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //-----
       for (j = 0 ; j < num_poly ; j++)
       {
-	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
-	{
-	  clipinfo[j].original.idx =
-	    (*clipped_translate)[clipinfo[j].original.idx];
-	}
+  if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
+  {
+    clipinfo[j].original.idx =
+      (*clipped_translate)[clipinfo[j].original.idx];
+  }
         else
-	{
-	  ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
-	    vertices, texels, vertex_colors, vertex_fog,
-	    clipped_texels->GetArray ()[num_clipped_vertices],
-	    clipped_colors->GetArray ()[num_clipped_vertices],
-	    clipped_fog->GetArray ()[num_clipped_vertices]);
-	  (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
-	  clipinfo[j].original.idx = num_clipped_vertices;
-	  num_clipped_vertices++;
-	}
+  {
+    float* clipped_userpointers[16];
+    for (int u=0; u<16; u++)
+      clipped_userpointers[u] = clipped_user[u]->GetArray ();
+    ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
+      vertices, texels, vertex_colors, 
+      userarrays, userarraycomponents, vertex_fog,
+      num_clipped_vertices,
+      clipped_texels->GetArray (),
+      clipped_colors->GetArray (),
+      clipped_userpointers,
+      clipped_fog->GetArray ());
+    (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
+    clipinfo[j].original.idx = num_clipped_vertices;
+    num_clipped_vertices++;
+  }
       }
 
       //-----
@@ -3063,8 +3185,8 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
     {
       if (planes[j].Classify (v-frust_origin) >= 0)
       {
-	inside = false;
-	break;  // Not inside.
+  inside = false;
+  break;  // Not inside.
       }
     }
     if (inside)
@@ -3097,7 +3219,7 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
     csTriangle& tri = triangles[i];
     int cnt = int ((*clipped_translate)[tri.a] != -1)
         + int ((*clipped_translate)[tri.b] != -1)
-	+ int ((*clipped_translate)[tri.c] != -1);
+  + int ((*clipped_translate)[tri.c] != -1);
     if (cnt == 0)
     {
       //=====
@@ -3115,13 +3237,13 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
         csVector3 v0 = vertices[tri.a] - frust_origin;
         csVector3 v1 = vertices[tri.b] - frust_origin;
         csVector3 v2 = vertices[tri.c] - frust_origin;
-	float c0 = pl.Classify (v0);
-	float c1 = pl.Classify (v1);
-	// Set cnt to 1 so that we will clip in the next part.
-	if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
-	float c2 = pl.Classify (v2);
-	if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
-	if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
+  float c0 = pl.Classify (v0);
+  float c1 = pl.Classify (v1);
+  // Set cnt to 1 so that we will clip in the next part.
+  if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
+  float c2 = pl.Classify (v2);
+  if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
+  if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
       }
     }
 
@@ -3158,7 +3280,7 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
         (*clipped_lightmaps)[num_clipped_triangles] = lightmaps[i];
         lightmaps[i]->IncRef();
         num_clipped_triangles++;
-	continue;
+  continue;
       }
 
       csVector3 poly[100];  // @@@ Arbitrary limit
@@ -3181,8 +3303,8 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
       //-----
       for (j = 0 ; j < num_planes ; j++)
       {
-	csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
-	if (num_poly <= 0) break;
+  csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
+  if (num_poly <= 0) break;
       }
 
       //-----
@@ -3191,22 +3313,24 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
       //-----
       for (j = 0 ; j < num_poly ; j++)
       {
-	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
-	{
-	  clipinfo[j].original.idx =
-	    (*clipped_translate)[clipinfo[j].original.idx];
-	}
+  if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
+  {
+    clipinfo[j].original.idx =
+      (*clipped_translate)[clipinfo[j].original.idx];
+  }
         else
-	{
-	  ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
-	    vertices, texels, vertex_colors, vertex_fog,
-	    clipped_texels->GetArray ()[num_clipped_vertices],
-	    clipped_colors->GetArray ()[num_clipped_vertices],
-	    clipped_fog->GetArray ()[num_clipped_vertices]);
-	  (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
-	  clipinfo[j].original.idx = num_clipped_vertices;
-	  num_clipped_vertices++;
-	}
+  {
+    ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
+      vertices, texels, vertex_colors, NULL, NULL, vertex_fog,
+      num_clipped_vertices,
+      clipped_texels->GetArray (),
+      clipped_colors->GetArray (),
+      NULL,
+      clipped_fog->GetArray ());
+    (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
+    clipinfo[j].original.idx = num_clipped_vertices;
+    num_clipped_vertices++;
+  }
       }
 
       //-----
@@ -3256,12 +3380,12 @@ static void ResolveVertexLightmap (
       texel = otexels[i1] * (1-r) + otexels[i2] * r;
       if (ofog)
       {
-	fog_texel.x = ofog[fog_indices[i1]].intensity*(1-r)+ofog[fog_indices[i1]].intensity*r;
-	fog_texel.y= 0;
+  fog_texel.x = ofog[fog_indices[i1]].intensity*(1-r)+ofog[fog_indices[i1]].intensity*r;
+  fog_texel.y= 0;
 
-	fog.red = ofog[fog_indices[i1]].r * (1-r) + ofog[fog_indices[i2]].r * r;
-	fog.green = ofog[fog_indices[i1]].g * (1-r) + ofog[fog_indices[i2]].g * r;
-	fog.blue = ofog[fog_indices[i1]].b * (1-r) + ofog[fog_indices[i2]].b * r;
+  fog.red = ofog[fog_indices[i1]].r * (1-r) + ofog[fog_indices[i2]].r * r;
+  fog.green = ofog[fog_indices[i1]].g * (1-r) + ofog[fog_indices[i2]].g * r;
+  fog.blue = ofog[fog_indices[i1]].b * (1-r) + ofog[fog_indices[i2]].b * r;
 
       }
       break;
@@ -3283,11 +3407,11 @@ static void ResolveVertexLightmap (
       texel = texel1 * (1-r) + texel2 * r;
       if (ofog)
       {
-	fog_texel.x =  fog_texel1.x*(1-r)+fog_texel2.x*r;
-	fog_texel.y = 0;
-	fog.red = fog1.red * (1-r) + fog2.red * r;
-	fog.green = fog1.green * (1-r) + fog2.green * r;
-	fog.blue = fog1.blue * (1-r) + fog2.blue * r;
+  fog_texel.x =  fog_texel1.x*(1-r)+fog_texel2.x*r;
+  fog_texel.y = 0;
+  fog.red = fog1.red * (1-r) + fog2.red * r;
+  fog.green = fog1.green * (1-r) + fog2.green * r;
+  fog.blue = fog1.blue * (1-r) + fog2.blue * r;
       }
       break;
     }
@@ -3459,8 +3583,8 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
     {
       if (planes[j].Classify (v-frust_origin) >= 0)
       {
-	inside = false;
-	break;  // Not inside.
+  inside = false;
+  break;  // Not inside.
       }
     }
     if (inside)
@@ -3507,7 +3631,7 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
     csTriangle& tri = triangles[i];
     int cnt = int ((*clipped_lightmap_translate)[tri.a] != -1)
         + int ((*clipped_lightmap_translate)[tri.b] != -1)
-	+ int ((*clipped_lightmap_translate)[tri.c] != -1);
+  + int ((*clipped_lightmap_translate)[tri.c] != -1);
     if (cnt == 0)
     {
       //=====
@@ -3539,13 +3663,13 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
         v2.y = vertices[tri.c].y - frust_origin.y;
         v2.z = vertices[tri.c].z - frust_origin.z;
 
-	float c0 = pl.Classify (v0);
-	float c1 = pl.Classify (v1);
-	// Set cnt to 1 so that we will clip in the next part.
-	if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
-	float c2 = pl.Classify (v2);
-	if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
-	if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
+  float c0 = pl.Classify (v0);
+  float c1 = pl.Classify (v1);
+  // Set cnt to 1 so that we will clip in the next part.
+  if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
+  float c2 = pl.Classify (v2);
+  if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
+  if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
       }
     }
 
@@ -3577,7 +3701,7 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
         (*clipped_lightmap_triangles)[num_clipped_triangles].b = tri.b;
         (*clipped_lightmap_triangles)[num_clipped_triangles].c = tri.c;
         num_clipped_triangles++;
-	continue;
+  continue;
       }
 
       csVector3 poly[100];  // @@@ Arbitrary limit
@@ -3619,8 +3743,8 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
       //-----
       for (j = 0 ; j < num_planes ; j++)
       {
-	csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
-	if (num_poly <= 0) break;
+  csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
+  if (num_poly <= 0) break;
       }
 
       //-----
@@ -3629,31 +3753,31 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
       //-----
       for (j = 0 ; j < num_poly ; j++)
       {
-	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
-	{
-	  clipinfo[j].original.idx =
-	    (*clipped_lightmap_translate)[clipinfo[j].original.idx];
-	}
+  if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
+  {
+    clipinfo[j].original.idx =
+      (*clipped_lightmap_translate)[clipinfo[j].original.idx];
+  }
         else
-	{
-	  ResolveVertexLightmap (
-	  	&clipinfo[j], clipped_lightmap_translate->GetArray (),
-		texels, vertex_fog,
-		clipped_lightmap_texels->GetArray ()[num_clipped_vertices],
-		clipped_lightmap_fog->GetArray ()[num_clipped_vertices],
-		clipped_lightmap_fog_texels->GetArray ()[num_clipped_vertices],
-		fog_indices);
+  {
+    ResolveVertexLightmap (
+      &clipinfo[j], clipped_lightmap_translate->GetArray (),
+    texels, vertex_fog,
+    clipped_lightmap_texels->GetArray ()[num_clipped_vertices],
+    clipped_lightmap_fog->GetArray ()[num_clipped_vertices],
+    clipped_lightmap_fog_texels->GetArray ()[num_clipped_vertices],
+    fog_indices);
 
-	  (*clipped_lightmap_vertices)[num_clipped_vertices].x =
+    (*clipped_lightmap_vertices)[num_clipped_vertices].x =
             poly[j].x+frust_origin.x;
           (*clipped_lightmap_vertices)[num_clipped_vertices].y =
             poly[j].y+frust_origin.y;
           (*clipped_lightmap_vertices)[num_clipped_vertices].z =
             poly[j].z+frust_origin.z;
           (*clipped_lightmap_vertices)[num_clipped_vertices].w = 1.0;
-	  clipinfo[j].original.idx = num_clipped_vertices;
-	  num_clipped_vertices++;
-	}
+    clipinfo[j].original.idx = num_clipped_vertices;
+    num_clipped_vertices++;
+  }
       }
 
       //-----
@@ -3703,12 +3827,12 @@ static void ResolveVertexUnlitPolys (
       float r = ci->onedge.r;
       if (ofog)
       {
-	fog_texel.x = ofog[fog_indices[i1]].intensity*(1-r)+ofog[fog_indices[i1]].intensity*r;
-	fog_texel.y= 0;
+  fog_texel.x = ofog[fog_indices[i1]].intensity*(1-r)+ofog[fog_indices[i1]].intensity*r;
+  fog_texel.y= 0;
 
-	fog.red = ofog[fog_indices[i1]].r * (1-r) + ofog[fog_indices[i2]].r * r;
-	fog.green = ofog[fog_indices[i1]].g * (1-r) + ofog[fog_indices[i2]].g * r;
-	fog.blue = ofog[fog_indices[i1]].b * (1-r) + ofog[fog_indices[i2]].b * r;
+  fog.red = ofog[fog_indices[i1]].r * (1-r) + ofog[fog_indices[i2]].r * r;
+  fog.green = ofog[fog_indices[i1]].g * (1-r) + ofog[fog_indices[i2]].g * r;
+  fog.blue = ofog[fog_indices[i1]].b * (1-r) + ofog[fog_indices[i2]].b * r;
       }
       break;
     }
@@ -3728,11 +3852,11 @@ static void ResolveVertexUnlitPolys (
       float r = ci->inside.r;
       if (ofog)
       {
-	fog_texel.x =  fog_texel1.x*(1-r)+fog_texel2.x*r;
-	fog_texel.y = 0;
-	fog.red = fog1.red * (1-r) + fog2.red * r;
-	fog.green = fog1.green * (1-r) + fog2.green * r;
-	fog.blue = fog1.blue * (1-r) + fog2.blue * r;
+  fog_texel.x =  fog_texel1.x*(1-r)+fog_texel2.x*r;
+  fog_texel.y = 0;
+  fog.red = fog1.red * (1-r) + fog2.red * r;
+  fog.green = fog1.green * (1-r) + fog2.green * r;
+  fog.blue = fog1.blue * (1-r) + fog2.blue * r;
       }
       break;
     }
@@ -3904,8 +4028,8 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
     {
       if (planes[j].Classify (v-frust_origin) >= 0)
       {
-	inside = false;
-	break;  // Not inside.
+  inside = false;
+  break;  // Not inside.
       }
     }
     if (inside)
@@ -3951,7 +4075,7 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
     csTriangle& tri = triangles[i];
     int cnt = int ((*clipped_lightmap_translate)[tri.a] != -1)
         + int ((*clipped_lightmap_translate)[tri.b] != -1)
-	+ int ((*clipped_lightmap_translate)[tri.c] != -1);
+  + int ((*clipped_lightmap_translate)[tri.c] != -1);
     if (cnt == 0)
     {
       //=====
@@ -4023,7 +4147,7 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
         (*clipped_lightmap_triangles)[num_clipped_triangles].b = tri.b;
         (*clipped_lightmap_triangles)[num_clipped_triangles].c = tri.c;
         num_clipped_triangles++;
-	continue;
+  continue;
       }
 
       csVector3 poly[100];  // @@@ Arbitrary limit
@@ -4065,8 +4189,8 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
       //-----
       for (j = 0 ; j < num_planes ; j++)
       {
-	csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
-	if (num_poly <= 0) break;
+  csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
+  if (num_poly <= 0) break;
       }
 
       //-----
@@ -4075,19 +4199,19 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
       //-----
       for (j = 0 ; j < num_poly ; j++)
       {
-	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
-	{
-	  clipinfo[j].original.idx =
-	    (*clipped_lightmap_translate)[clipinfo[j].original.idx];
-	}
-	else
-	{
-	  ResolveVertexUnlitPolys (&clipinfo[j], clipped_lightmap_translate->GetArray (),
-	    vertex_fog, clipped_lightmap_fog->GetArray ()[num_clipped_vertices],
-	    (*clipped_lightmap_fog_texels)[num_clipped_vertices],
-	    fog_indices);
+  if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
+  {
+    clipinfo[j].original.idx =
+      (*clipped_lightmap_translate)[clipinfo[j].original.idx];
+  }
+  else
+  {
+    ResolveVertexUnlitPolys (&clipinfo[j], clipped_lightmap_translate->GetArray (),
+      vertex_fog, clipped_lightmap_fog->GetArray ()[num_clipped_vertices],
+      (*clipped_lightmap_fog_texels)[num_clipped_vertices],
+      fog_indices);
 
-	  (*clipped_lightmap_vertices)[num_clipped_vertices].x =
+    (*clipped_lightmap_vertices)[num_clipped_vertices].x =
             poly[j].x+frust_origin.x;
           (*clipped_lightmap_vertices)[num_clipped_vertices].y =
             poly[j].y+frust_origin.y;
@@ -4096,7 +4220,7 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
           (*clipped_lightmap_vertices)[num_clipped_vertices].w = 1.0;
           clipinfo[j].original.idx = num_clipped_vertices;
           num_clipped_vertices++;
-	}
+  }
       }
 
       //-----
@@ -4434,6 +4558,8 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       work_verts,
       work_uv_verts,
       work_colors,
+      NULL,
+      NULL,
       NULL,
       //lightmaps,
       num_triangles,
@@ -4942,7 +5068,7 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
   pass->SetStateString( csEffectStrings::destination_blend_mode, GLBlendToString( m_config_options.m_lightmap_dst_blend ) ); \
   layer = pass->CreateLayer(); \
   layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateFloat( csEffectStrings::texture_coordinate_source, 1 );
+  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
 
 #define START_FX_HALOOVF \
   pass = tech->CreatePass(); \
@@ -4951,7 +5077,7 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
   pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::one ); \
   layer = pass->CreateLayer(); \
   layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateFloat( csEffectStrings::texture_coordinate_source, 1 );
+  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
 
 #define START_FX_MULTIPLY \
   pass = tech->CreatePass(); \
@@ -4960,7 +5086,7 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
   pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::source_color ); \
   layer = pass->CreateLayer(); \
   layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateFloat( csEffectStrings::texture_coordinate_source, 1 );
+  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
 
 #define START_FX_MULTIPLY2 \
   pass = tech->CreatePass(); \
@@ -4969,7 +5095,7 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
   pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::source_color ); \
   layer = pass->CreateLayer(); \
   layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateFloat( csEffectStrings::texture_coordinate_source, 1 );
+  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
 
 #define START_FX_ADD \
   pass = tech->CreatePass(); \
@@ -4978,7 +5104,7 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
   pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::one ); \
   layer = pass->CreateLayer(); \
   layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateFloat( csEffectStrings::texture_coordinate_source, 1 );
+  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
 
 #define START_FX_ALPHA \
   pass = tech->CreatePass(); \
@@ -4987,7 +5113,7 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
   pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::inverted_source_alpha ); \
   layer = pass->CreateLayer(); \
   layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateFloat( csEffectStrings::texture_coordinate_source, 1 );
+  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
 
 
 // @@@ Should use writemask instead of blendmode
@@ -5000,7 +5126,7 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
   pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::one ); \
   layer = pass->CreateLayer(); \
   layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateFloat( csEffectStrings::texture_coordinate_source, 1 );
+  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
 
 #define START_FX_COPY_ALPHA \
   pass = tech->CreatePass(); \
@@ -5009,14 +5135,14 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
   pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::inverted_source_alpha ); \
   layer = pass->CreateLayer(); \
   layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateFloat( csEffectStrings::texture_coordinate_source, 1 );
+  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
 
 #define START_FX_COPY_NOALPHA \
   pass = tech->CreatePass(); \
   pass->SetStateString( csEffectStrings::blending, csEffectStrings::disabled ); \
   layer = pass->CreateLayer(); \
   layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateFloat( csEffectStrings::texture_coordinate_source, 1 );
+  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
 
 #define SINGLETEXTURE_FOG \
   pass = tech->CreatePass(); \
@@ -5063,8 +5189,8 @@ void csGraphics3DOGLCommon::InitStockEffects()
   effectserver->Validate( StockEffects[0][0][1] );
 
   StockEffects[0][0][2] = effectserver->CreateEffect();
-  START_FX_MULTIPLY
   tech = StockEffects[0][0][2]->CreateTechnique();
+  START_FX_MULTIPLY
   effectserver->Validate( StockEffects[0][0][2] );
 
   StockEffects[0][0][3] = effectserver->CreateEffect();
@@ -5099,7 +5225,7 @@ void csGraphics3DOGLCommon::InitStockEffects()
 
 
   ////////////////////////////////////////////
-  // NO LIGHTMAPS, NO FOG
+  // NO LIGHTMAPS, FOG
   ////////////////////////////////////////////
 
   StockEffects[0][1][0] = effectserver->CreateEffect();
@@ -5203,7 +5329,7 @@ void csGraphics3DOGLCommon::InitStockEffects()
 }
 
 iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
-	G3DTriangleMesh& mesh)
+  G3DTriangleMesh& mesh)
 {
   if( (((csMaterialHandle*)mesh.mat_handle)->GetTextureLayerCount() > 0) ||
       !mesh.mat_handle->GetTexture() )
@@ -5213,34 +5339,34 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
   {
     case CS_FX_SRCDST:
       return effectserver->SelectAppropriateTechnique(
-      	StockEffects[0][mesh.do_fog?1:0][0] );
+        StockEffects[0][mesh.do_fog?1:0][0] );
     case CS_FX_HALOOVF:
       return effectserver->SelectAppropriateTechnique(
-      	StockEffects[0][mesh.do_fog?1:0][1] );
+        StockEffects[0][mesh.do_fog?1:0][1] );
     case CS_FX_MULTIPLY:
       return effectserver->SelectAppropriateTechnique(
-      	StockEffects[0][mesh.do_fog?1:0][2] );
+        StockEffects[0][mesh.do_fog?1:0][2] );
     case CS_FX_MULTIPLY2:
       return effectserver->SelectAppropriateTechnique(
-      	StockEffects[0][mesh.do_fog?1:0][3] );
+        StockEffects[0][mesh.do_fog?1:0][3] );
     case CS_FX_ADD:
       return effectserver->SelectAppropriateTechnique(
-      	StockEffects[0][mesh.do_fog?1:0][4] );
+        StockEffects[0][mesh.do_fog?1:0][4] );
     case CS_FX_ALPHA:
       return effectserver->SelectAppropriateTechnique(
-      	StockEffects[0][mesh.do_fog?1:0][5] );
+        StockEffects[0][mesh.do_fog?1:0][5] );
     case CS_FX_TRANSPARENT:
       return effectserver->SelectAppropriateTechnique(
-      	StockEffects[0][mesh.do_fog?1:0][6] );
+        StockEffects[0][mesh.do_fog?1:0][6] );
     case CS_FX_COPY:
     default:
       if (mesh.mat_handle->GetTexture()->GetKeyColor()
-      		|| mesh.mat_handle->GetTexture()->GetAlphaMap ())
+          || mesh.mat_handle->GetTexture()->GetAlphaMap ())
         return effectserver->SelectAppropriateTechnique(
-		StockEffects[0][mesh.do_fog?1:0][7] );
+    StockEffects[0][mesh.do_fog?1:0][7] );
       else
         return effectserver->SelectAppropriateTechnique(
-		StockEffects[0][mesh.do_fog?1:0][8] );
+    StockEffects[0][mesh.do_fog?1:0][8] );
   }
 }
 
@@ -5263,9 +5389,9 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   }
 
   iMaterial* material = ((csMaterialHandle*)(mesh.mat_handle))->GetMaterial();
-
   iEffectDefinition* effect = material->GetEffect();
-  iEffectTechnique* technique = effectserver->SelectAppropriateTechnique( effect );
+  iEffectTechnique* technique = effectserver->SelectAppropriateTechnique(
+    effect );
 
   if( !technique )
   {
@@ -5343,13 +5469,13 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
         continue;
       // We cannot use s or S if effect uses stencil.
       if ((c == 's' || c == 'S')
-      		&& (technique->GetClientFlags() & EFFECTFLAG_RUINSSCLIPPING))
+          && (technique->GetClientFlags() & EFFECTFLAG_RUINSSCLIPPING))
         continue;
       // We cannot use p or P if the clipper has more vertices than the
       // number of hardware planes minus one (for the view plane).
       if ((c == 'p' || c == 'P') &&
           clipper->GetVertexCount ()
-	  >= GLCaps.nr_hardware_planes-reserved_planes)
+    >= GLCaps.nr_hardware_planes-reserved_planes)
         continue;
       how_clip = c;
       break;
@@ -5422,6 +5548,15 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   csVector3* work_verts;
   csVector2* work_uv_verts;
   csColor* work_colors;
+  float* work_userarrays[16];
+  int userarraycomponents[16];
+
+  for (i=0; i<16; i++)
+  {
+    work_userarrays[i] = mesh.buffers[0]->GetUserArray (i);
+    userarraycomponents[i] = mesh.buffers[0]->GetUserArrayComponentCount (i);
+  }
+
 
   if (mesh.num_vertices_pool > 1)
   {
@@ -5439,8 +5574,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       if (mesh.do_morph_colors)
       {
         (*color_verts)[i].red = tr * col2[i].red + remainder * col1[i].red;
-	(*color_verts)[i].green = tr * col2[i].green + remainder * col1[i].green;
-	(*color_verts)[i].blue = tr * col2[i].blue + remainder * col1[i].blue;
+  (*color_verts)[i].green = tr * col2[i].green + remainder * col1[i].green;
+  (*color_verts)[i].blue = tr * col2[i].blue + remainder * col1[i].blue;
       }
     }
     work_verts = tr_verts->GetArray ();
@@ -5475,6 +5610,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       work_verts,
       work_uv_verts,
       work_colors,
+      work_userarrays,
+      userarraycomponents,
       work_fog,
       num_triangles,
       num_vertices,
@@ -5490,6 +5627,13 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       work_uv_verts = clipped_texels->GetArray ();
       work_colors = clipped_colors->GetArray ();
       work_fog = clipped_fog->GetArray ();
+      for (i=0; i<16; i++)
+      {
+        if (work_userarrays[i])
+          work_userarrays[i] = clipped_user[i]->GetArray();
+        else
+          work_userarrays[i] = NULL;
+      }
     }
     triangles = clipped_triangles->GetArray ();
     if (num_triangles <= 0) return; // Nothing to do!
@@ -5598,7 +5742,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
     //get rendererdata to use
     csRef<csOpenGlEffectPassData> pass_data =
-    	SCF_QUERY_INTERFACE(pass->GetRendererData(), csOpenGlEffectPassData);
+      SCF_QUERY_INTERFACE(pass->GetRendererData(), csOpenGlEffectPassData);
 
     if( p == 0 )
       SetGLZBufferFlags (z_buf_mode);
@@ -5609,7 +5753,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     {
       ///@@@HACK.. THESE SHOULD BE CHANEGD
       glTrackMatrixNV( GL_VERTEX_PROGRAM_NV, 0, GL_MODELVIEW_PROJECTION_NV,
-      	GL_IDENTITY_NV );
+        GL_IDENTITY_NV );
       csEffectVector4 vec;
       //set all constants
       for(int i = 0; i<pass_data->vertex_constants.Length(); i++)
@@ -5644,7 +5788,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
     statecache->SetShadeModel( pass_data->shade_state );
 
-    if( pass_data->vcsource == ED_VC_SOURCE_FOG )
+    if( pass_data->vcsource == ED_SOURCE_FOG )
     {
       glColorPointer (3, GL_FLOAT, sizeof(G3DFogInfo), & work_fog[0].r);
       glEnableClientState(GL_COLOR_ARRAY);
@@ -5662,7 +5806,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       iEffectLayer* layer = pass->GetLayer(l);
 
       csRef<csOpenGlEffectLayerData> layer_data = SCF_QUERY_INTERFACE(
-      	layer->GetRendererData(), csOpenGlEffectLayerData);
+        layer->GetRendererData(), csOpenGlEffectLayerData);
 
 
       //int colorsource[4] = { GL_PREVIOUS_ARB, GL_TEXTURE, -1, -1 };
@@ -5671,11 +5815,11 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       //int colorop = GL_MODULATE;
       int alphasource[4] = { GL_PREVIOUS_ARB, GL_TEXTURE, -1, -1 };
       int alphamod[4] = { GL_SRC_ALPHA, GL_SRC_ALPHA,
-      	GL_SRC_ALPHA, GL_SRC_ALPHA };
+        GL_SRC_ALPHA, GL_SRC_ALPHA };
       int alphaop = GL_MODULATE;
 
       if (ARB_multitexture && (ARB_texture_env_combine
-      		|| EXT_texture_env_combine))
+          || EXT_texture_env_combine))
       {
         glActiveTextureARB( GL_TEXTURE0_ARB + l );
         glClientActiveTextureARB( GL_TEXTURE0_ARB + l );
@@ -5690,13 +5834,23 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       if( layer_data->vcord_source == ED_SOURCE_FOG )
       {
         glTexCoordPointer (2, GL_FLOAT, sizeof(G3DFogInfo),
-		&work_fog[0].intensity);
+    &work_fog[0].intensity);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
       }
-      else
+      else if( layer_data->vcord_source == ED_SOURCE_MESH )
       {
-        glTexCoordPointer (2, GL_FLOAT, 0, mesh.buffers[0]->GetTexels());
+        glTexCoordPointer (2, GL_FLOAT, 0, work_uv_verts);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      } else if ((layer_data->vcord_source >= ED_SOURCE_USERARRAY(0)) &&
+                 (layer_data->vcord_source < ED_SOURCE_USERARRAY(16)))
+      {
+        int idx = layer_data->vcord_source-ED_SOURCE_USERARRAY(0);
+        if( work_userarrays[idx] )
+        {
+          glTexCoordPointer (userarraycomponents[idx],
+            GL_FLOAT, 0, work_userarrays[idx]);
+          glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        }
       }
 
       GLuint texturehandle = 0;
@@ -5707,6 +5861,9 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       {
         statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
         statecache->EnableState (GL_TEXTURE_2D, l);
+      } else if( layer_data->inputtex==0 )
+      {
+        txt_handle = 0;
       }
       else if( layer_data->inputtex==1 )
       {
@@ -5714,17 +5871,17 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
         txt_handle = mesh.mat_handle->GetTexture ();
       }
       else if( layer_data->inputtex-2<((csMaterialHandle*)mesh.mat_handle)
-      	->GetTextureLayerCount())
+        ->GetTextureLayerCount())
       {
         csTextureLayer* lay = ((csMaterialHandle*)mesh.mat_handle)
-		->GetTextureLayer (layer_data->inputtex-2);
+    ->GetTextureLayer (layer_data->inputtex-2);
         txt_handle = lay->txt_handle;
       }
 
       if (txt_handle)
       {
         csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
-		txt_handle->GetPrivateObject ();
+    txt_handle->GetPrivateObject ();
         csTxtCacheData *cachedata = (csTxtCacheData *)txt_mm->GetCacheData ();
         texturehandle = cachedata->Handle;
 
@@ -5763,8 +5920,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
 
-	if(pass_data->vertex_program > 0)
-	  statecache->DisableState (GL_VERTEX_PROGRAM_NV);
+  if(pass_data->vertex_program > 0)
+    statecache->DisableState (GL_VERTEX_PROGRAM_NV);
 
   }
   if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))
@@ -5778,6 +5935,12 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
   }
+
+  if (stencil_enabled)
+    statecache->DisableState (GL_STENCIL_TEST);
+  if (clip_planes_enabled)
+    for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
+      statecache->DisableState ((GLenum)(GL_CLIP_PLANE0+i));
 
   glPopMatrix ();
   glMatrixMode (GL_MODELVIEW);
@@ -5870,7 +6033,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
       // number of hardware planes minus one (for the view plane).
       if ((c == 'p' || c == 'P') &&
           clipper->GetVertexCount ()
-	  	>= GLCaps.nr_hardware_planes-reserved_planes)
+      >= GLCaps.nr_hardware_planes-reserved_planes)
         continue;
       how_clip = c;
       break;
@@ -5963,8 +6126,8 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
       if (mesh.do_morph_colors)
       {
         (*color_verts)[i].red = tr * col2[i].red + remainder * col1[i].red;
-	(*color_verts)[i].green = tr * col2[i].green + remainder * col1[i].green;
-	(*color_verts)[i].blue = tr * col2[i].blue + remainder * col1[i].blue;
+  (*color_verts)[i].green = tr * col2[i].green + remainder * col1[i].green;
+  (*color_verts)[i].blue = tr * col2[i].blue + remainder * col1[i].blue;
       }
     }
     work_verts = tr_verts->GetArray ();
@@ -5999,6 +6162,8 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
   work_verts,
   work_uv_verts,
   work_colors,
+  NULL,
+  NULL,
   work_fog,
   num_triangles,
   num_vertices,
@@ -6214,7 +6379,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
           (*rgba_verts)[k++] = work_colors[i].red * flat_r;
           (*rgba_verts)[k++] = work_colors[i].green * flat_g;
           (*rgba_verts)[k++] = work_colors[i].blue * flat_b;
-	  (*rgba_verts)[k++] = m_alpha;
+    (*rgba_verts)[k++] = m_alpha;
         }
       }
       else
@@ -6224,7 +6389,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
           (*rgba_verts)[k++] = work_colors[i].red;
           (*rgba_verts)[k++] = work_colors[i].green;
           (*rgba_verts)[k++] = work_colors[i].blue;
-	  (*rgba_verts)[k++] = m_alpha;
+    (*rgba_verts)[k++] = m_alpha;
         }
       }
     }
@@ -6235,24 +6400,24 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
       if (work_colors == color_verts->GetArray ())
       {
         for (i = 0 ; i < num_vertices ; i++)
-	{
-	  work_colors[i].red *= flat_r;
-	  work_colors[i].green *= flat_g;
-	  work_colors[i].blue *= flat_b;
-	}
+  {
+    work_colors[i].red *= flat_r;
+    work_colors[i].green *= flat_g;
+    work_colors[i].blue *= flat_b;
+  }
       }
       else
       {
         csColor* old = work_colors;
-	if (num_vertices > color_verts->Limit())
-	  color_verts->SetLimit(num_vertices);
-	work_colors = color_verts->GetArray ();
-	for (i = 0 ; i < num_vertices ; i++)
-	{
-	  work_colors[i].red = old[i].red * flat_r;
-	  work_colors[i].green = old[i].green * flat_g;
-	  work_colors[i].blue = old[i].blue * flat_b;
-	}
+  if (num_vertices > color_verts->Limit())
+    color_verts->SetLimit(num_vertices);
+  work_colors = color_verts->GetArray ();
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    work_colors[i].red = old[i].red * flat_r;
+    work_colors[i].green = old[i].green * flat_g;
+    work_colors[i].blue = old[i].blue * flat_b;
+  }
       }
     }
   }
@@ -7173,103 +7338,108 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
       if (pass_state == csEffectStrings::blending )
       {
         pass_statestring = pass->GetStateString( pass_state );
-	if( pass_statestring == csEffectStrings::enabled)
-	  pass_data->doblending = true;
-	else if( pass_statestring == csEffectStrings::disabled)
-	  pass_data->doblending = false;
-	else
-	  return false;
+        if( pass_statestring == csEffectStrings::enabled)
+          pass_data->doblending = true;
+        else if( pass_statestring == csEffectStrings::disabled)
+          pass_data->doblending = false;
+        else
+          return false;
 
       }
       else if( pass_state == csEffectStrings::shade_mode )
       {
         pass_statestring = pass->GetStateString( pass_state );
-	if(pass_statestring == csEffectStrings::flat)
-	  pass_data->shade_state = GL_FLAT;
-	else if(pass_statestring == csEffectStrings::smooth)
-	  pass_data->shade_state = GL_SMOOTH;
-	else
-	  return false;
+        if(pass_statestring == csEffectStrings::flat)
+          pass_data->shade_state = GL_FLAT;
+        else if(pass_statestring == csEffectStrings::smooth)
+          pass_data->shade_state = GL_SMOOTH;
+        else
+          return false;
       }
       else if( pass_state == csEffectStrings::source_blend_mode )
       {
         pass_statestring = pass->GetStateString( pass_state );
-        if( pass_statestring == csEffectStrings::destination_color )
-	      pass_data->sblend = GL_DST_COLOR;
-	    else if(pass_statestring == csEffectStrings::inverted_destination_color)
-  	      pass_data->sblend = GL_ONE_MINUS_DST_COLOR;
-	    else if( pass_statestring == csEffectStrings::source_alpha )
-	      pass_data->sblend = GL_SRC_ALPHA;
-	    else if( pass_statestring == csEffectStrings::inverted_source_alpha )
-	      pass_data->sblend = GL_ONE_MINUS_SRC_ALPHA;
-	    else if( pass_statestring == csEffectStrings::destination_alpha )
-	      pass_data->sblend = GL_DST_ALPHA;
-	    else if(pass_statestring == csEffectStrings::inverted_destination_alpha)
-	      pass_data->sblend = GL_ONE_MINUS_DST_ALPHA;
-	    else if( pass_statestring == csEffectStrings::saturated_source_alpha )
-	      pass_data->sblend = GL_SRC_ALPHA_SATURATE;
-	    else if( pass_statestring == csEffectStrings::one )
-	      pass_data->sblend = GL_ONE;
-	    else if( pass_statestring == csEffectStrings::zero )
-	      pass_data->sblend = GL_ZERO;
-	    else return false;
+      if( pass_statestring == csEffectStrings::destination_color )
+        pass_data->sblend = GL_DST_COLOR;
+      else if(pass_statestring == csEffectStrings::inverted_destination_color)
+          pass_data->sblend = GL_ONE_MINUS_DST_COLOR;
+      else if( pass_statestring == csEffectStrings::source_alpha )
+        pass_data->sblend = GL_SRC_ALPHA;
+      else if( pass_statestring == csEffectStrings::inverted_source_alpha )
+        pass_data->sblend = GL_ONE_MINUS_SRC_ALPHA;
+      else if( pass_statestring == csEffectStrings::destination_alpha )
+        pass_data->sblend = GL_DST_ALPHA;
+      else if(pass_statestring == csEffectStrings::inverted_destination_alpha)
+        pass_data->sblend = GL_ONE_MINUS_DST_ALPHA;
+      else if( pass_statestring == csEffectStrings::saturated_source_alpha )
+        pass_data->sblend = GL_SRC_ALPHA_SATURATE;
+      else if( pass_statestring == csEffectStrings::one )
+        pass_data->sblend = GL_ONE;
+      else if( pass_statestring == csEffectStrings::zero )
+        pass_data->sblend = GL_ZERO;
+      else return false;
       }
       else if( pass_state == csEffectStrings::destination_blend_mode )
       {
         pass_statestring = pass->GetStateString( pass_state );
-	    if( pass_statestring == csEffectStrings::source_color )
-	      pass_data->dblend = GL_SRC_COLOR;
-	    else if( pass_statestring == csEffectStrings::inverted_source_color )
-	      pass_data->dblend = GL_ONE_MINUS_SRC_COLOR;
-	    else if( pass_statestring == csEffectStrings::source_alpha )
-	      pass_data->dblend = GL_SRC_ALPHA;
-	    else if( pass_statestring == csEffectStrings::inverted_source_alpha )
-	      pass_data->dblend = GL_ONE_MINUS_SRC_ALPHA;
-	    else if( pass_statestring == csEffectStrings::destination_alpha )
-	      pass_data->dblend = GL_DST_ALPHA;
-	    else if(pass_statestring == csEffectStrings::inverted_destination_alpha)
-	      pass_data->dblend = GL_ONE_MINUS_DST_ALPHA;
-	    else if( pass_statestring == csEffectStrings::one )
-	      pass_data->dblend = GL_ONE;
-	    else if( pass_statestring == csEffectStrings::zero )
-	      pass_data->dblend = GL_ZERO;
-	    else return false;
-    	break;
+      if( pass_statestring == csEffectStrings::source_color )
+        pass_data->dblend = GL_SRC_COLOR;
+      else if( pass_statestring == csEffectStrings::inverted_source_color )
+        pass_data->dblend = GL_ONE_MINUS_SRC_COLOR;
+      else if( pass_statestring == csEffectStrings::source_alpha )
+        pass_data->dblend = GL_SRC_ALPHA;
+      else if( pass_statestring == csEffectStrings::inverted_source_alpha )
+        pass_data->dblend = GL_ONE_MINUS_SRC_ALPHA;
+      else if( pass_statestring == csEffectStrings::destination_alpha )
+        pass_data->dblend = GL_DST_ALPHA;
+      else if(pass_statestring == csEffectStrings::inverted_destination_alpha)
+        pass_data->dblend = GL_ONE_MINUS_DST_ALPHA;
+      else if( pass_statestring == csEffectStrings::one )
+        pass_data->dblend = GL_ONE;
+      else if( pass_statestring == csEffectStrings::zero )
+        pass_data->dblend = GL_ZERO;
+      else return false;
+      break;
       }
       else if( (pass_state == csEffectStrings::vertex_color_source) )
       {
         pass_statestring = pass->GetStateString( pass_state );
-	    if(pass_statestring == csEffectStrings::fog)
-	      pass_data->vcsource = ED_VC_SOURCE_FOG;
-	    else if(pass_statestring == csEffectStrings::mesh)
-	      pass_data->vcsource = ED_VC_SOURCE_MESH;
-	    else return false;
+        if(pass_statestring == csEffectStrings::fog)
+          pass_data->vcsource = ED_SOURCE_FOG;
+        else if( pass->GetStateString( pass_state )
+          == csEffectStrings::mesh )
+          pass_data->vcsource = ED_SOURCE_MESH;
+        else
+        {
+          pass_data->vcsource = 
+            ED_SOURCE_USERARRAY((int)pass->GetStateString( pass_state )-1);
+        }
       }
       else if ( pass_state == csEffectStrings::nvvertex_program_gl )
       {
-	if( (!NV_vertex_program) || !(glBindProgramNV && glGenProgramsNV
-		&& glDeleteProgramsNV && glLoadProgramNV))
+        if( (!NV_vertex_program) || !(glBindProgramNV && glGenProgramsNV
+          && glDeleteProgramsNV && glLoadProgramNV))
           return false;
-	    csStringID vp_s = pass->GetStateString(pass_state);
-	    unsigned char* vp;
-	    if(vp_s != csInvalidStringID)
-	    {
-	      //get a program
-	      vp = (unsigned char*)effectserver->RequestString(vp_s);
-	    }
-	    else
-	    {
-	      vp = (unsigned char*)pass->GetStateOpaque(pass_state);
-	    }
-	    if (!vp) return false;
-	    //create and load vertex program
-	    glGenProgramsNV(1, &pass_data->vertex_program);
-	    glLoadProgramNV(GL_VERTEX_PROGRAM_NV, pass_data->vertex_program,
-	    strlen((const char*)vp), vp);
-	    if(glGetError() != GL_NO_ERROR)
-	    {
-	      return false;
-	    }
+        csStringID vp_s = pass->GetStateString(pass_state);
+        unsigned char* vp;
+        if(vp_s != csInvalidStringID)
+        {
+          //get a program
+          vp = (unsigned char*)effectserver->RequestString(vp_s);
+        }
+        else
+        {
+          vp = (unsigned char*)pass->GetStateOpaque(pass_state);
+        }
+        if (!vp) return false;
+        //create and load vertex program
+        glGenProgramsNV(1, &pass_data->vertex_program);
+        glLoadProgramNV(GL_VERTEX_PROGRAM_NV, pass_data->vertex_program,
+        strlen((const char*)vp), vp);
+        if(glGetError() != GL_NO_ERROR)
+        {
+          return false;
+        }
       }
       else
       {
@@ -7290,12 +7460,12 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           pass_data->vertex_constants.Push(new csOpenGlVPConstant(constnum,  varnum, vartype));
 
         } else
-	      return false;
+        return false;
       }
       pass_state = pass->GetNextState();
     }
     if( ARB_multitexture &&
-    	(pass->GetLayerCount() > m_config_options.do_multitexture_level) )
+      (pass->GetLayerCount() > m_config_options.do_multitexture_level) )
       return false;
     for( l=0; l<pass->GetLayerCount(); l++ )
     {
@@ -7307,204 +7477,206 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
       while(layer_state != csInvalidStringID )
       {
         if( (layer_state == csEffectStrings::color_source_1) ||
-            (layer_state == csEffectStrings::color_source_2) ||
-            (layer_state == csEffectStrings::color_source_3) )
-	{
+          (layer_state == csEffectStrings::color_source_2) ||
+          (layer_state == csEffectStrings::color_source_3) )
+        {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine)
-	    return false;
+            return false;
           layer_statestring = layer->GetStateString( layer_state );
 
-	  //which texture-unit
-	  int tu = 0;
-	  if(layer_state == csEffectStrings::color_source_1) tu = 0;
-	  else if(layer_state == csEffectStrings::color_source_2) tu = 1;
-	  else if(layer_state == csEffectStrings::color_source_3) tu = 2;
-	  //which source
-	  if( layer_statestring == csEffectStrings::vertex_color )
-	    layer_data->colorsource[tu] = GL_PRIMARY_COLOR_ARB;
+          //which texture-unit
+          int tu = 0;
+          if(layer_state == csEffectStrings::color_source_1) tu = 0;
+          else if(layer_state == csEffectStrings::color_source_2) tu = 1;
+          else if(layer_state == csEffectStrings::color_source_3) tu = 2;
+          //which source
+          if( layer_statestring == csEffectStrings::vertex_color )
+            layer_data->colorsource[tu] = GL_PRIMARY_COLOR_ARB;
           else if( layer_statestring == csEffectStrings::texture_color )
-	    layer_data->colorsource[tu] = GL_TEXTURE;
+            layer_data->colorsource[tu] = GL_TEXTURE;
           else if( layer_statestring == csEffectStrings::constant_color )
-	    layer_data->colorsource[tu] = GL_CONSTANT_ARB;
+            layer_data->colorsource[tu] = GL_CONSTANT_ARB;
           else if( layer_statestring == csEffectStrings::previous_layer_color )
-	    layer_data->colorsource[tu] = GL_PREVIOUS_ARB;
-	  else return false;
-	}
-	else if( (layer_state == csEffectStrings::color_source_modifier_1) ||
-                 (layer_state == csEffectStrings::color_source_modifier_2) ||
-                 (layer_state == csEffectStrings::color_source_modifier_3) )
+            layer_data->colorsource[tu] = GL_PREVIOUS_ARB;
+          else return false;
+        }
+        else if( (layer_state == csEffectStrings::color_source_modifier_1) ||
+          (layer_state == csEffectStrings::color_source_modifier_2) ||
+          (layer_state == csEffectStrings::color_source_modifier_3) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine)
-	    return false;
+            return false;
           layer_statestring = layer->GetStateString( layer_state );
 
-	  //tu to use..
-	  int tu = 0;
-	  if(layer_state == csEffectStrings::color_source_modifier_1)
-	    tu = 0;
-	  else if(layer_state == csEffectStrings::color_source_modifier_2)
-	    tu = 1;
-	  else if(layer_state == csEffectStrings::color_source_modifier_3)
-	    tu = 2;
+          //tu to use..
+          int tu = 0;
+          if(layer_state == csEffectStrings::color_source_modifier_1)
+            tu = 0;
+          else if(layer_state == csEffectStrings::color_source_modifier_2)
+            tu = 1;
+          else if(layer_state == csEffectStrings::color_source_modifier_3)
+            tu = 2;
 
-	  if( layer_statestring == csEffectStrings::source_color )
-	    layer_data->colormod[tu] = GL_SRC_COLOR;
+          if( layer_statestring == csEffectStrings::source_color )
+            layer_data->colormod[tu] = GL_SRC_COLOR;
           else if( layer_statestring == csEffectStrings::inverted_source_color )
-	    layer_data->colormod[tu]  = GL_ONE_MINUS_SRC_COLOR;
+            layer_data->colormod[tu]  = GL_ONE_MINUS_SRC_COLOR;
           else if( layer_statestring == csEffectStrings::source_alpha )
-	    layer_data->colormod[tu]  = GL_SRC_ALPHA;
+            layer_data->colormod[tu]  = GL_SRC_ALPHA;
           else if( layer_statestring == csEffectStrings::inverted_source_alpha )
-	    layer_data->colormod[tu]  = GL_ONE_MINUS_SRC_ALPHA;
-	  else return false;
+            layer_data->colormod[tu]  = GL_ONE_MINUS_SRC_ALPHA;
+          else return false;
         }
-	else if( (layer_state == csEffectStrings::alpha_source_1) ||
-                 (layer_state == csEffectStrings::alpha_source_2) ||
-                 (layer_state == csEffectStrings::alpha_source_3) )
+        else if( (layer_state == csEffectStrings::alpha_source_1) ||
+          (layer_state == csEffectStrings::alpha_source_2) ||
+          (layer_state == csEffectStrings::alpha_source_3) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine)
-	    return false;
+            return false;
           layer_statestring = layer->GetStateString( layer_state );
 
-	  int tu = 0;
-	  if( layer_state == csEffectStrings::alpha_source_1) tu = 0;
-	  else if( layer_state == csEffectStrings::alpha_source_2) tu = 1;
-	  else if( layer_state == csEffectStrings::alpha_source_3) tu = 2;
+          int tu = 0;
+          if( layer_state == csEffectStrings::alpha_source_1) tu = 0;
+          else if( layer_state == csEffectStrings::alpha_source_2) tu = 1;
+          else if( layer_state == csEffectStrings::alpha_source_3) tu = 2;
 
-	  if( layer_statestring == csEffectStrings::vertex_alpha )
-	    layer_data->alphasource[tu] = GL_PRIMARY_COLOR_ARB;
+          if( layer_statestring == csEffectStrings::vertex_alpha )
+            layer_data->alphasource[tu] = GL_PRIMARY_COLOR_ARB;
           else if( layer_statestring == csEffectStrings::texture_alpha )
-	    layer_data->alphasource[tu] = GL_TEXTURE;
+            layer_data->alphasource[tu] = GL_TEXTURE;
           else if( layer_statestring == csEffectStrings::constant_alpha )
-	    layer_data->alphasource[tu] = GL_CONSTANT_ARB;
+            layer_data->alphasource[tu] = GL_CONSTANT_ARB;
           else if( layer_statestring == csEffectStrings::previous_layer_alpha )
-	    layer_data->alphasource[tu] = GL_PREVIOUS_ARB;
-	  else return false;
+            layer_data->alphasource[tu] = GL_PREVIOUS_ARB;
+          else return false;
         }
-	else if( (layer_state == csEffectStrings::alpha_source_modifier_1) ||
-                 (layer_state == csEffectStrings::alpha_source_modifier_2) ||
-                 (layer_state == csEffectStrings::alpha_source_modifier_3) )
+        else if( (layer_state == csEffectStrings::alpha_source_modifier_1) ||
+          (layer_state == csEffectStrings::alpha_source_modifier_2) ||
+          (layer_state == csEffectStrings::alpha_source_modifier_3) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine)
-	    return false;
+            return false;
           layer_statestring = layer->GetStateString( layer_state );
 
-	  int tu = 0;
-	  if( layer_state == csEffectStrings::alpha_source_modifier_1)
-	    tu = 0;
-	  else if( layer_state == csEffectStrings::alpha_source_modifier_2)
-	    tu = 1;
-	  else if( layer_state == csEffectStrings::alpha_source_modifier_3)
-	    tu = 2;
+          int tu = 0;
+          if( layer_state == csEffectStrings::alpha_source_modifier_1)
+            tu = 0;
+          else if( layer_state == csEffectStrings::alpha_source_modifier_2)
+            tu = 1;
+          else if( layer_state == csEffectStrings::alpha_source_modifier_3)
+            tu = 2;
 
-	  if( layer_statestring == csEffectStrings::source_alpha )
-	    layer_data->alphamod[tu] = GL_SRC_ALPHA;
+          if( layer_statestring == csEffectStrings::source_alpha )
+            layer_data->alphamod[tu] = GL_SRC_ALPHA;
           else if( layer_statestring == csEffectStrings::inverted_source_alpha )
-	    layer_data->alphamod[tu] = GL_ONE_MINUS_SRC_ALPHA;
-	  else return false;
-	}
-	else if (layer_state == csEffectStrings::alpha_operation)
-	{
-	  if (!ARB_texture_env_combine && !EXT_texture_env_combine)
-	    return false;
-          layer_statestring = layer->GetStateString( layer_state );
-
-	  if( layer_statestring == csEffectStrings::use_source_1 )
-	    layer_data->alphap = GL_REPLACE;
-          else if( layer_statestring == csEffectStrings::multiply )
-	    layer_data->alphap = GL_MODULATE;
-          else if( layer_statestring == csEffectStrings::add )
-	    layer_data->alphap = GL_ADD;
-          else if( layer_statestring == csEffectStrings::add_signed )
-	    layer_data->alphap = GL_ADD_SIGNED_ARB;
-          else if( layer_statestring == csEffectStrings::subtract )
-	    layer_data->alphap = GL_SUBTRACT_ARB;
-          else if( layer_statestring == csEffectStrings::interpolate )
-	    layer_data->alphap = GL_INTERPOLATE_ARB;
-          else if( layer_statestring == csEffectStrings::dot_product )
-	  {
-	    if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
-	      layer_data->alphap = GL_DOT3_RGB_ARB;
-	    else
-	      return false;
-	  }
-          else if( layer_statestring == csEffectStrings::dot_product_to_alpha )
-	  {
-	    if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
-	      layer_data->alphap = GL_DOT3_RGBA_ARB;
-	    else
-	      return false;
-	  }
-	  else return false;
+            layer_data->alphamod[tu] = GL_ONE_MINUS_SRC_ALPHA;
+          else return false;
         }
-	else if( (layer_state == csEffectStrings::color_operation) )
+        else if (layer_state == csEffectStrings::alpha_operation)
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine)
-	    return false;
+            return false;
           layer_statestring = layer->GetStateString( layer_state );
 
-	  if( layer_statestring == csEffectStrings::use_source_1 )
-	    layer_data->colorp = GL_REPLACE;
+          if( layer_statestring == csEffectStrings::use_source_1 )
+            layer_data->alphap = GL_REPLACE;
           else if( layer_statestring == csEffectStrings::multiply )
-	    layer_data->colorp = GL_MODULATE;
+            layer_data->alphap = GL_MODULATE;
           else if( layer_statestring == csEffectStrings::add )
-	    layer_data->colorp = GL_ADD;
+            layer_data->alphap = GL_ADD;
           else if( layer_statestring == csEffectStrings::add_signed )
-	    layer_data->colorp = GL_ADD_SIGNED_ARB;
+            layer_data->alphap = GL_ADD_SIGNED_ARB;
           else if( layer_statestring == csEffectStrings::subtract )
-	    layer_data->colorp = GL_SUBTRACT_ARB;
+            layer_data->alphap = GL_SUBTRACT_ARB;
           else if( layer_statestring == csEffectStrings::interpolate )
-	    layer_data->colorp = GL_INTERPOLATE_ARB;
+            layer_data->alphap = GL_INTERPOLATE_ARB;
           else if( layer_statestring == csEffectStrings::dot_product )
-	  {
-	    if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
-	      layer_data->colorp = GL_DOT3_RGB_ARB;
-	    else
-	      return false;
-	  }
+          {
+            if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+              layer_data->alphap = GL_DOT3_RGB_ARB;
+            else
+              return false;
+          }
           else if( layer_statestring == csEffectStrings::dot_product_to_alpha )
-	  {
-	    if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
-	      layer_data->colorp = GL_DOT3_RGBA_ARB;
-	    else
-	      return false;
-	  }
+          {
+            if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+              layer_data->alphap = GL_DOT3_RGBA_ARB;
+            else
+              return false;
+          }
+          else return false;
+        }
+        else if( (layer_state == csEffectStrings::color_operation) )
+        {
+          if (!ARB_texture_env_combine && !EXT_texture_env_combine)
+            return false;
+          layer_statestring = layer->GetStateString( layer_state );
 
-	}
-	else if( (layer_state == csEffectStrings::texture_source) )
+          if( layer_statestring == csEffectStrings::use_source_1 )
+            layer_data->colorp = GL_REPLACE;
+          else if( layer_statestring == csEffectStrings::multiply )
+            layer_data->colorp = GL_MODULATE;
+          else if( layer_statestring == csEffectStrings::add )
+            layer_data->colorp = GL_ADD;
+          else if( layer_statestring == csEffectStrings::add_signed )
+            layer_data->colorp = GL_ADD_SIGNED_ARB;
+          else if( layer_statestring == csEffectStrings::subtract )
+            layer_data->colorp = GL_SUBTRACT_ARB;
+          else if( layer_statestring == csEffectStrings::interpolate )
+            layer_data->colorp = GL_INTERPOLATE_ARB;
+          else if( layer_statestring == csEffectStrings::dot_product )
+          {
+            if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+              layer_data->colorp = GL_DOT3_RGB_ARB;
+            else
+              return false;
+          }
+          else if( layer_statestring == csEffectStrings::dot_product_to_alpha )
+          {
+            if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+              layer_data->colorp = GL_DOT3_RGBA_ARB;
+            else
+              return false;
+          }
+
+        }
+        else if( (layer_state == csEffectStrings::texture_source) )
         {
           if( (layer->GetStateString( layer_state ) == csInvalidStringID) &&
-              (layer->GetStateFloat( layer_state ) == 0) &&
-              layer->GetStateOpaque( layer_state ) == NULL )
+            (layer->GetStateFloat( layer_state ) == 0) &&
+            layer->GetStateOpaque( layer_state ) == NULL )
             return false;
-	  if( layer->GetStateString( layer_state) == csEffectStrings::fog)
-	    layer_data->inputtex = -1;
-	  else
-	    // @@@SUSPICIOUS. IS INT, BUT FUNCTION RETURNS FLAOT
-	    layer_data->inputtex = (int)layer->GetStateFloat(layer_state);
-	}
-	else if(  (layer_state == csEffectStrings::texture_coordinate_source) )
-	{
-	  if( (layer->GetStateString( layer_state ) == csInvalidStringID) &&
-              (layer->GetStateFloat( layer_state ) == 0) &&
-              layer->GetStateOpaque( layer_state ) == NULL )
-            return false;
-	  if( layer->GetStateString( layer_state )
-	  	== csEffectStrings::texture_coordinate_source)
-	    layer_data->vcord_source = ED_SOURCE_FOG;
-	  else
-	    layer_data->vcord_source = ED_SOURCE_NONE;
+          if( layer->GetStateString( layer_state) == csEffectStrings::fog)
+            layer_data->inputtex = -1;
+          else
+            // @@@SUSPICIOUS. IS INT, BUT FUNCTION RETURNS FLAOT
+            layer_data->inputtex = (int)layer->GetStateFloat(layer_state);
         }
-	else if( (layer_state == csEffectStrings::constant_color_source) )
+        else if(  (layer_state == csEffectStrings::texture_coordinate_source) )
         {
-	  layer_statestring = layer->GetStateString( layer_state );
+          if( layer->GetStateString( layer_state )
+            == csEffectStrings::fog)
+            layer_data->vcord_source = ED_SOURCE_FOG;
+          if( layer->GetStateString( layer_state )
+            == csEffectStrings::mesh)
+            layer_data->vcord_source = ED_SOURCE_MESH;
+          else
+          {
+            layer_data->vcord_source = 
+              ED_SOURCE_USERARRAY((int)layer->GetStateFloat( layer_state )-1);
+          }
+        }
+        else if( (layer_state == csEffectStrings::constant_color_source) )
+        {
+          layer_statestring = layer->GetStateString( layer_state );
           if( layer_statestring != csEffectStrings::fog )
             return false;
-	  if( layer_statestring == csEffectStrings::fog)
-	    layer_data->ccsource = ED_SOURCE_FOG;
-	  else
-	    layer_data->ccsource = ED_SOURCE_NONE;
+          if( layer_statestring == csEffectStrings::fog)
+            layer_data->ccsource = ED_SOURCE_FOG;
+          else
+            layer_data->ccsource = ED_SOURCE_NONE;
         }
-	else
+        else
           return false;
         layer_state = layer->GetNextState();
       }

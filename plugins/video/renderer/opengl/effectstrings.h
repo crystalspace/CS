@@ -23,6 +23,8 @@
 /////////////////////////////////////////
 REGISTER_STRING( enabled, "enabled" )
 REGISTER_STRING( disabled, "disabled" )
+REGISTER_STRING( fog, "fog" )
+REGISTER_STRING( mesh, "mesh" )
 
 /////////////////////////////////////////
 // Misc drawing strings
@@ -56,8 +58,6 @@ REGISTER_STRING( vertex_color_source, "vertex color source" )
 REGISTER_STRING( constant_color_source, "constant color source" )
 REGISTER_STRING( texture_source, "texture source" )
 REGISTER_STRING( texture_coordinate_source, "texture coordinate source" )
-REGISTER_STRING( fog, "fog" )
-REGISTER_STRING( mesh, "mesh" )
 
 /////////////////////////////////////////
 // Multi texture setup
@@ -98,5 +98,6 @@ REGISTER_STRING( dot_product_to_alpha, "dot product to alpha" )
 /////////////////////////////////////////
 // NVVertex program support
 /////////////////////////////////////////
+
 REGISTER_STRING( nvvertex_program_gl, "nvvertex program gl")
 

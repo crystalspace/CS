@@ -28,6 +28,9 @@ SCF_VERSION(csOpenGlEffectLayerData, 0, 0, 1);
 
 #define ED_SOURCE_NONE 0
 #define ED_SOURCE_FOG 1
+#define ED_SOURCE_MESH 2
+#define ED_SOURCE_USERARRAY(x) (100+(x))
+
 
 class csOpenGlEffectLayerData : public iBase
 {
@@ -37,7 +40,7 @@ public:
   //ed_source macros
   int ccsource;
 
-  //vertex coordinate source
+  //texture coordinate source
   //ed_source macro
   int vcord_source;
 
@@ -87,9 +90,6 @@ SCF_IMPLEMENT_IBASE_END
 
 ///OpenGL specific effectdata stored per pass
 SCF_VERSION(csOpenGlEffectPassData, 0, 0, 1);
-
-#define ED_VC_SOURCE_FOG 1
-#define ED_VC_SOURCE_MESH 2
 
 #ifndef CS_EFVARIABLETYPE_UNDEFINED
 #define CS_EFVARIABLETYPE_UNDEFINED 0
@@ -142,7 +142,7 @@ public:
 
     shade_state = GL_SMOOTH;
 
-    vcsource = ED_VC_SOURCE_MESH;
+    vcsource = ED_SOURCE_MESH;
 
     vertex_program = 0;
   }
