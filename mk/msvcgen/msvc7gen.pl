@@ -213,7 +213,7 @@ sub guid_from_name {
     my $rawguid = md5_hex($projname);
     my $shapedguid = '{'.substr($rawguid, 0, 8).'-'.substr($rawguid, 8, 4).'-'.
       substr($rawguid, 12, 4).'-'.substr($rawguid, 16, 4).'-'.substr($rawguid, 20, 12).'}';
-    return $shapedguid;
+    return uc($shapedguid);
 }
 
 #------------------------------------------------------------------------------
@@ -356,7 +356,7 @@ sub interpolate_sln_project {
     my $result = $main::sln_group_template;
     interpolate('%project%', $main::opt_project, \$result);
     interpolate('%vcproj%', basename($main::opt_output), \$result);
-    interpolate('%guid%', guid_from_name($main::opt_name), \$result);
+    interpolate('%guid%', guid_from_name($main::opt_project), \$result);
     return $result;
 }
 
@@ -370,7 +370,7 @@ sub interpolate_sln_dependency {
     foreach $dependency (sort(@main::opt_depend)) {
 	my $buffer = $main::sln_depend_template;
 	interpolate('%depnum%', $depcnt, \$buffer);
-	interpolate('%guid%', guid_from_name($main::opt_name), \$buffer);
+	interpolate('%guid%', guid_from_name($main::opt_project), \$buffer);
 	interpolate('%depguid%', guid_from_name($dependency), \$buffer);
 	$result .= $buffer;
 	$depcnt++;
@@ -383,7 +383,7 @@ sub interpolate_sln_dependency {
 #------------------------------------------------------------------------------
 sub interpolate_sln_config {
     my $result = $main::sln_config_template;
-    interpolate('%guid%', guid_from_name($main::opt_name), \$result);
+    interpolate('%guid%', guid_from_name($main::opt_project), \$result);
     return $result;
 }
 
