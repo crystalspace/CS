@@ -337,7 +337,8 @@ bool csGraphics3DOpenGL::Open (const char *Title)
   errtest = glGetError ();
   if (errtest != GL_NO_ERROR)
   {
-    SysPrintf (MSG_DEBUG_0, "openGL error string: %s\n", gluErrorString (errtest));
+    //SysPrintf (MSG_DEBUG_0, "openGL error string: %s\n", gluErrorString (errtest));
+    SysPrintf (MSG_DEBUG_0, "openGL error: %d\n", errtest);
   }
   glClearColor (0., 0., 0., 0.);
   glClearDepth (-1.0);

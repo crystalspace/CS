@@ -35,6 +35,10 @@ Short-term cleanups that need to be done:
 	- Fixed a timing bug in WalkTest which caused movement to be
 	  very sluggish if you have very high framerates (> 100 FPS).
 	  This bug was introduced about 10 days ago.
+	- Removed the single use of the GLU library from the OpenGL
+	  code. Unfortunatelly this makes an error message less readable
+	  but it makes it easier to compile CS on platforms that don't
+	  have the GLU library (like mine).
 20-Mar-2000
 	- Michael Dale Long did a few changes to CrystalClear:
 	    - Major update to ccActor.  Sprite code should be fully
