@@ -128,7 +128,7 @@ csChunkLodTerrainFactory::~csChunkLodTerrainFactory ()
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrainFactoryState)
-  SCF_DESTRUCT_IBASE (p)
+  SCF_DESTRUCT_IBASE ()
 }
 
 csPtr<iMeshObject> csChunkLodTerrainFactory::NewInstance ()

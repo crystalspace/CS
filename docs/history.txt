@@ -32,6 +32,7 @@ chronological order.
 	  access to the csMeshWrapper.
 	  Note: this also fixes z-buffer mode for some mesh objects like
 	  ball which simply assumed CS_ZBUF_USE in all cases.
+	- Jorrit fixed a compile error in the new renderer terrain plugin.
 30-Dec-2003
 	- Eric Sunshine applied patch from Bjorn Hansen
 	  <holomorph@users.sourceforge.net> which adds csParseMouseDef() to
