@@ -105,8 +105,12 @@ class csCrystalBall
   };
 
  protected:
+  // here we store the normals (pointers to csCrystalBallVec)
   csVector vPoints;
+  // we divide a triangle into 3 sub triangles by inserting a divider point.
+  // and <vTrianglePoints> is the place where we store those points (pointers to csVector3)
   csVector vTrianglePoints;
+  // our crystal ball is initially made of 8 spherical triangles (in the octants of a 3d cartesian coo system)
   csTriNode tri[8];
 
  public:
