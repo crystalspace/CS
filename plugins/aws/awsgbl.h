@@ -57,6 +57,9 @@ private:
 
 	  /// Shallow copy
 	  void Set(GridBagLayoutInfo &l2);
+
+	  /// Deep copy
+	  GridBagLayoutInfo *Clone();
 	};
 
 	/**
@@ -170,7 +173,7 @@ public:
 	  */
 	void setConstraints(iAwsComponent *cmp, awsGridBagConstraints &constraints);
 
-	/**
+    /**
      * Gets the constraints for the specified component.  A copy of
      * the actual <code>GridBagConstraints</code> object is returned.
      * @param       comp the component to be queried.
@@ -178,7 +181,7 @@ public:
      *                  grid bag layout; a copy of the actual constraint
      *                  object is returned.
      */
-	awsGridBagConstraints getConstraints(iAwsComponent *cmp);
+    awsGridBagConstraints getConstraints(iAwsComponent *cmp);
 
 	/**
      * Retrieves the constraints for the specified component.
@@ -187,15 +190,15 @@ public:
      * @param       comp the component to be queried
      * @return      the contraints for the specified component.
      */
-	awsGridBagConstraints *lookupConstraints(iAwsComponent *cmp);
+    awsGridBagConstraints *lookupConstraints(iAwsComponent *cmp);
 
-	/**
+    /**
      * Removes the constraints for the specified component in this layout
      * @param       comp the component to be modified.
      */
     void removeConstraints(iAwsComponent *cmp);
 
-	/**
+    /**
      * Determines the origin of the layout grid.
      * Most applications do not call this method directly.
      * @return     the origin of the cell in the top-left
@@ -203,7 +206,7 @@ public:
      */
     csPoint getLayoutOrigin ();
 
-	/**
+    /**
      * Determines column widths and row heights for the layout grid.
      * <p>
      * Most applications do not call this method directly.
@@ -211,7 +214,7 @@ public:
      *                       of the layout columns and
      *                       the heights of the layout rows.
      */
-	void getLayoutDimensions (int **row, int **col);
+    void getLayoutDimensions (int **row, int **col);
 
 	/**
      * Determines the weights of the layout grid's columns and rows.
@@ -224,9 +227,9 @@ public:
      *                    horizontal weights of the layout columns
      *                    and the vertical weights of the layout rows.
      */
-	void getLayoutWeights (double **row, double **col);
+    void getLayoutWeights (double **row, double **col);
 
-	/**
+    /**
      * Determines which cell in the layout grid contains the point
      * specified by <code>(x,&nbsp;y)</code>. Each cell is identified
      * by its column index (ranging from 0 to the number of columns
@@ -280,7 +283,7 @@ protected:
    * This also caches the minsizes for all the children when they are
    * first encountered (so subsequent loops don't need to ask again).
    */
-  GridBagLayoutInfo GetLayoutInfo(iAwsComponent *parent, int sizeflag);
+  GridBagLayoutInfo* GetLayoutInfo(iAwsComponent *parent, int sizeflag);
 
 
   
@@ -294,7 +297,7 @@ protected:
    * Figure out the minimum size of the
    * master based on the information from GetLayoutInfo()
    */
-  csRect GetMinSize(iAwsComponent *parent, GridBagLayoutInfo info);
+  csRect GetMinSize(iAwsComponent *parent, GridBagLayoutInfo *info);
 
   /**
    * Lay out the grid

@@ -91,6 +91,12 @@ public:
 
     bool HandleEvent(iEvent& Event);
 
+    /// Gets how big this button should ideally be.
+    csRect getPreferredSize();
+
+    /// Gets the smallest this button can be.
+    csRect getMinimumSize();
+
     /// Triggered when the component needs to draw
     virtual void OnDraw(csRect clip);
 

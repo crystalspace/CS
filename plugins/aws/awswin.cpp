@@ -1,6 +1,7 @@
 #include "cssysdef.h"
 #include "awswin.h"
 #include "awsclip.h"
+#include "awslayot.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
@@ -531,6 +532,12 @@ awsWindow::OnMouseMove(int button, int x, int y)
     // Fix update zones
     WindowManager()->InvalidateUpdateStore();
 
+    if (Layout())
+    {
+      RecursiveLayoutChildren(this);
+      MoveChildren(Frame().xmin, Frame().ymin);
+    }
+    
     // Fix internal redraw zone
     todraw_dirty=true;
   }
@@ -1202,3 +1209,21 @@ awsWindow::Layout()
 void
 awsWindow::SetLayout(awsLayoutManager *l)
 { comp.SetLayout(l); }
+
+void
+awsWindow::RecursiveLayoutChildren(iAwsComponent *cmp)
+{
+  if (cmp->Layout())
+    cmp->Layout()->LayoutComponents();
+
+  if (!cmp->HasChildren())
+    return;
+
+  int i;
+  for(i=0; i<cmp->GetChildCount(); ++i)
+  {
+    iAwsComponent *child = cmp->GetChildAt(i);
+    
+    RecursiveLayoutChildren(child);
+  }
+}

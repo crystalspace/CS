@@ -126,6 +126,10 @@ private:
     /// Sets the parent component of this component;
     virtual void SetParent(iAwsComponent *parent);
 
+    /// Lays out children.
+    void RecursiveLayoutChildren(iAwsComponent *cmp);
+
+    
     ////////////// Component declarations for embedded wrappers ///////////////////////////////
 
     /// Invalidation routine: allow the component to be redrawn when you call this

@@ -7,6 +7,7 @@
 #include "iutil/event.h"
 #include "csutil/scfstr.h"
 #include "iaws/awsdefs.h"
+#include "awsgbl.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -41,7 +42,9 @@ awsComponent::~awsComponent()
 
 csRect&
 awsComponent::Frame()
-{ return frame; }
+{ 
+  return frame; 
+}
 
 char *
 awsComponent::Type()
@@ -140,6 +143,17 @@ awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
 
    // Children are automatically filled in by the windowmanager.
 
+   // Do layout check
+   iString *ln=NULL;
+
+   pm->GetString(settings, "Layout", ln);
+
+   if (ln)
+   {
+     if (strcmp("GridBag", ln->GetData())==0)
+       layout = new awsGridBagLayout(this);
+     
+   }
   }
 
   return true;
@@ -286,13 +300,13 @@ awsComponent::Overlaps(csRect &r)
 csRect 
 awsComponent::getPreferredSize()
 {
-	return getMinimumSize();	
+  return getMinimumSize();	
 }
 
 csRect 
 awsComponent::getMinimumSize()
 {
-	return csRect(0,0,5,5);
+  return csRect(0,0,30,15);
 }
 
 void

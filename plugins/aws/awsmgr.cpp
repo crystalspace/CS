@@ -623,6 +623,15 @@ awsManager::CreateWindowFrom(char *defname)
 
   CreateChildrenFromDef(this, win, win, winnode);
 
+  // If window has layout, then layout children.
+  if (win->Layout())
+  {
+    RecursiveLayoutChildren(win);
+    win->MoveChildren(win->Frame().xmin, win->Frame().ymin);
+  }
+
+  
+
   return win;
 }
 
@@ -688,8 +697,24 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *pa
     } // end else
 
   } // end for count of keys
+}
 
+void
+awsManager::RecursiveLayoutChildren(iAwsComponent *comp)
+{
+  if (comp->Layout())
+    comp->Layout()->LayoutComponents();
 
+  if (!comp->HasChildren())
+    return;
+
+  int i;
+  for(i=0; i<comp->GetChildCount(); ++i)
+  {
+    iAwsComponent *child = comp->GetChildAt(i);
+    
+    RecursiveLayoutChildren(child);
+  }
 }
 
 void
@@ -919,6 +944,25 @@ awsManager::RegisterCommonComponents()
   GetPrefMgr()->RegisterConstant("No", 0);
 
   GetPrefMgr()->RegisterConstant("signalComponentCreated", 0xefffffff);
+
+  // Layout constants
+  GetPrefMgr()->RegisterConstant("gbcRelative",  -1);
+  GetPrefMgr()->RegisterConstant("gbcRemainder",  0);
+  GetPrefMgr()->RegisterConstant("gbcNone",	  1);
+  GetPrefMgr()->RegisterConstant("gbcBoth",	  2);
+  GetPrefMgr()->RegisterConstant("gbcHorizontal", 3);
+  GetPrefMgr()->RegisterConstant("gbcVertical",   4);
+  GetPrefMgr()->RegisterConstant("gbcCenter",	  10);
+  GetPrefMgr()->RegisterConstant("gbcNorth",	  11);
+  GetPrefMgr()->RegisterConstant("gbcNorthEast",  12);
+  GetPrefMgr()->RegisterConstant("gbcEast",	  13);
+  GetPrefMgr()->RegisterConstant("gbcSouthEast",  14);
+  GetPrefMgr()->RegisterConstant("gbcSouth",	  15);
+  GetPrefMgr()->RegisterConstant("gbcSouthWest",  16);
+  GetPrefMgr()->RegisterConstant("gbcWest",	  17);
+  GetPrefMgr()->RegisterConstant("gbcNorthWest",  18);
+  
+  
 }
 
 bool

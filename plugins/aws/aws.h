@@ -188,6 +188,9 @@ protected:
 
     /// Recursively broadcasts events to children, but only if they deserve it.
     bool RecursiveBroadcastToChildren(iAwsComponent *cmp, iEvent &event);
+    
+    /// Recursively updates the layouts starting at the top and working down.
+    void RecursiveLayoutChildren(iAwsComponent *comp);
 
     /// Handles MouseEnter/Exit message when broadcasting component events.
     bool CheckFocus(iAwsComponent *cmp, iEvent &Event);

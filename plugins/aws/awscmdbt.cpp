@@ -327,6 +327,27 @@ awsCmdButton::OnDraw(csRect clip)
 
 }
 
+csRect 
+awsCmdButton::getPreferredSize()
+{
+  return getMinimumSize();	
+}
+
+csRect 
+awsCmdButton::getMinimumSize()
+{
+  int tw=0, th=0;
+
+  if (caption)
+  {      
+      // Get the size of the text
+      WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(caption->GetData(), tw, th);
+  }
+
+
+  return csRect(0,0,tw+6+(tw>>1),th+6+(th>>2));
+}
+
 bool
 awsCmdButton::OnMouseDown(int , int , int )
 {

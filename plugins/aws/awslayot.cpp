@@ -102,6 +102,24 @@ awsGridBagLayout::GridBagLayoutInfo::Set(awsGridBagLayout::GridBagLayoutInfo &l2
   weightY=l2.weightY;
 }
 
+awsGridBagLayout::GridBagLayoutInfo *
+awsGridBagLayout::GridBagLayoutInfo::Clone()
+{
+  GridBagLayoutInfo *i = new GridBagLayoutInfo();
+
+  i->width=width;
+  i->height=height;
+  i->startx=startx;
+  i->starty=starty;
+
+  memcpy(i->minWidth, minWidth, sizeof(int) * awsGridBagLayout::MAXGRIDSIZE);
+  memcpy(i->minHeight, minHeight, sizeof(int) * awsGridBagLayout::MAXGRIDSIZE);
+  memcpy(i->weightX, weightX, sizeof(double) * awsGridBagLayout::MAXGRIDSIZE);
+  memcpy(i->weightY, weightY, sizeof(double) * awsGridBagLayout::MAXGRIDSIZE);
+
+  return i;
+}
+
 
 awsGridBagLayout::awsGridBagLayout(iAwsComponent *o):
         awsLayoutManager(o),
@@ -301,7 +319,7 @@ awsGridBagLayout::removeLayoutComponent(iAwsComponent *cmp)
 }
 
 
-awsGridBagLayout::GridBagLayoutInfo 
+awsGridBagLayout::GridBagLayoutInfo * 
 awsGridBagLayout::GetLayoutInfo(iAwsComponent *parent, int sizeflag) 
 {	
 
@@ -682,8 +700,7 @@ awsGridBagLayout::GetLayoutInfo(iAwsComponent *parent, int sizeflag)
       }
     }
 
-    return r;
-  
+    return r.Clone();
 }
 
 
@@ -749,21 +766,21 @@ awsGridBagLayout::AdjustForGravity(awsGridBagConstraints *constraints, csRect r)
 
   
 csRect 
-awsGridBagLayout::GetMinSize(iAwsComponent *parent, GridBagLayoutInfo info) 
+awsGridBagLayout::GetMinSize(iAwsComponent *parent, GridBagLayoutInfo *info) 
 {
     csRect d;
     int i, t;
     //csRect insets = parent.getInsets();
 
     t = 0;
-    for(i = 0; i < info.width; i++)
-      t += info.minWidth[i];
+    for(i = 0; i < info->width; i++)
+      t += info->minWidth[i];
 
     d.xmax = t; // + insets.left + insets.right;
 
     t = 0;
-    for(i = 0; i < info.height; i++)
-      t += info.minHeight[i];
+    for(i = 0; i < info->height; i++)
+      t += info->minHeight[i];
 
     d.ymax = t; //+ insets.top + insets.bottom;
 
@@ -781,7 +798,7 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
     csRect r;
     int i, diffw, diffh;
     double weight;
-    GridBagLayoutInfo info;
+    GridBagLayoutInfo *info;
 
     /*
      * If the parent has no slaves anymore, then don't do anything
@@ -810,8 +827,8 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
     }
 
     if (layoutInfo) delete layoutInfo;
-    
-    layoutInfo = &info;
+        
+    layoutInfo = info;
     
     r.xmax= d.xmax;
     r.ymax = d.xmax;
@@ -825,16 +842,16 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
     diffw = parent->Frame().Width() - r.Width();
     if (diffw != 0) {
       weight = 0.0;
-      for (i = 0; i < info.width; i++)
-	weight += info.weightX[i];
+      for (i = 0; i < info->width; i++)
+	weight += info->weightX[i];
       if (weight > 0.0) {
-	for (i = 0; i < info.width; i++) {
-	  int dx = (int)(( ((double)diffw) * info.weightX[i]) / weight);
-	  info.minWidth[i] += dx;
+	for (i = 0; i < info->width; i++) {
+	  int dx = (int)(( ((double)diffw) * info->weightX[i]) / weight);
+	  info->minWidth[i] += dx;
 	  r.xmax += dx;
-	  if (info.minWidth[i] < 0) {
-	    r.xmax -= info.minWidth[i];
-	    info.minWidth[i] = 0;
+	  if (info->minWidth[i] < 0) {
+	    r.xmax -= info->minWidth[i];
+	    info->minWidth[i] = 0;
 	  }
 	}
       }
@@ -847,16 +864,16 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
     diffh = parent->Frame().Height() - r.Height();
     if (diffh != 0) {
       weight = 0.0;
-      for (i = 0; i < info.height; i++)
-	weight += info.weightY[i];
+      for (i = 0; i < info->height; i++)
+	weight += info->weightY[i];
       if (weight > 0.0) {
-	for (i = 0; i < info.height; i++) {
-	  int dy = (int)(( ((double)diffh) * info.weightY[i]) / weight);
-	  info.minHeight[i] += dy;
+	for (i = 0; i < info->height; i++) {
+	  int dy = (int)(( ((double)diffh) * info->weightY[i]) / weight);
+	  info->minHeight[i] += dy;
 	  r.ymax += dy;
-	  if (info.minHeight[i] < 0) {
-	    r.ymax -= info.minHeight[i];
-	    info.minHeight[i] = 0;
+	  if (info->minHeight[i] < 0) {
+	    r.ymax -= info->minHeight[i];
+	    info->minHeight[i] = 0;
 	  }
 	}
       }
@@ -871,8 +888,8 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
      * that has been collected.
      */
 
-    info.startx = diffw/2 + insets.xmin;
-    info.starty = diffh/2 + insets.ymin;
+    info->startx = diffw/2 + insets.xmin;
+    info->starty = diffh/2 + insets.ymin;
 
     for (compindex = 0 ; compindex < parent->GetChildCount(); ++compindex) {
       cmp = parent->GetChildAt(compindex);
@@ -880,27 +897,27 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
 
       constraints = lookupConstraints(cmp);
 
-      r.xmin = info.startx;
+      r.xmin = info->startx;
       for(i = 0; i < constraints->tempX; i++)
-	r.Move(info.minWidth[i],0);
+	r.Move(info->minWidth[i],0);
 
-      r.ymin = info.starty;
+      r.ymin = info->starty;
       for(i = 0; i < constraints->tempY; i++)
-	r.Move(0,info.minHeight[i]);
+	r.Move(0,info->minHeight[i]);
 
       r.SetSize(0,0);
       for(i = constraints->tempX;
 	  i < (constraints->tempX + constraints->tempWidth);
 	  i++)
 	    {
-	r.xmax += info.minWidth[i];
+	r.xmax += info->minWidth[i];
       }
       
       for(i = constraints->tempY;
 	  i < (constraints->tempY + constraints->tempHeight);
 	  i++)
 	  {
-	r.ymax += info.minHeight[i];
+	r.ymax += info->minHeight[i];
       }
 
       AdjustForGravity(constraints, r);
@@ -924,6 +941,7 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
 	    cmp->Frame().Height() != r.Height()) 
 	{
 	    cmp->Frame().Set(r);
+	    printf("gridbaglayout: %d,%d - %d, %d\n", r.xmin, r.ymin, r.xmax,r.ymax);
 	}
       }
     }
