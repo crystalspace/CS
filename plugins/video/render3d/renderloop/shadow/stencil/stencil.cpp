@@ -266,10 +266,19 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 {
   if (csStencilShadowCacheEntry::model != model) {
     printf ("New model %8.8x, old model %8.8x\n", model, csStencilShadowCacheEntry::model);
-    csStencilShadowCacheEntry::model == model;	
+    csStencilShadowCacheEntry::model = model;	
   }
 
-  csRef<iPolygonMesh> mesh = model->GetPolygonMeshColldet ();
+  //first try to use a MeshShadow polygonmesh
+  //but if we don't get any, attempt to use collidemesh
+  csRef<iPolygonMesh> mesh = model->GetPolygonMeshShadows ();
+  if (!mesh)
+    mesh = model->GetPolygonMeshColldet (); //@@@ CHECK IF WE WANT TO DO THIS
+    if (!mesh)
+      return; 
+
+  csVector3 *verts = mesh->GetVertices ();
+
   int new_triangle_count = 0;
   int i;
   for (i = 0; i < mesh->GetPolygonCount(); i ++) 
@@ -349,23 +358,24 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
   /* always change vertex based info */
   csVector3 *v = (csVector3*)shadow_vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
   csVector3 *n = (csVector3*)shadow_normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
   int ind = 0;
   for (int i = 0; i < mesh->GetPolygonCount(); i ++) 
   {
     csMeshedPolygon *poly = &mesh->GetPolygons()[i];
-    csVector3 ab = mesh->GetVertices()[poly->vertices[1]] -
-                   mesh->GetVertices()[poly->vertices[0]];
-    csVector3 bc = mesh->GetVertices()[poly->vertices[2]] -
-                   mesh->GetVertices()[poly->vertices[1]];
+    csVector3 ab = verts[poly->vertices[1]] -
+                   verts[poly->vertices[0]];
+    csVector3 bc = verts[poly->vertices[2]] -
+                   verts[poly->vertices[1]];
     csVector3 normal = ab % bc;
     normal.Normalize();
 
     for (int j = 2; j < poly->num_vertices; j ++) {
-      v[ind] = mesh->GetVertices()[poly->vertices[0]];
+      v[ind] = verts[poly->vertices[0]];
       n[ind++] = normal;
-      v[ind] = mesh->GetVertices()[poly->vertices[j-1]];
+      v[ind] = verts[poly->vertices[j-1]];
       n[ind++] = normal;
-      v[ind] = mesh->GetVertices()[poly->vertices[j]];
+      v[ind] = verts[poly->vertices[j]];
       n[ind++] = normal;
     }
   }
@@ -453,9 +463,7 @@ float s, e;
     /* need the extra reference for the hashmap */
     shadowCacheEntry = new csStencilShadowCacheEntry (this);
     shadowCacheEntry->Initialize (object_reg);
-    csRef<iObjectModel> model = 
-	SCF_QUERY_INTERFACE (mesh->GetFactory()->GetMeshObjectFactory(), 
-		iObjectModel);
+    csRef<iObjectModel> model = mesh->GetMeshObject ()->GetObjectModel ();
     model->AddListener (shadowCacheEntry);
     shadowCacheEntry->ObjectModelChanged (model);
     shadowcache.Put ((csHashKey)mesh, shadowCacheEntry);

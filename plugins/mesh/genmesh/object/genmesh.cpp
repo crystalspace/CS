@@ -914,7 +914,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshViscull (0);
-  scfiObjectModel.SetPolygonMeshShadows (0);
+  scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMesh);
 
   logparent = 0;
   initialized = false;

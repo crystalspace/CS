@@ -43,7 +43,12 @@ The history order is reversed so that new features are at the top.
 	- res added the ability to load a single plugin and further improved
 	  SCF factory 'contexts'.
 	- res fixed Win32 csLoadLibrary() which has been messed up by himself.
-        - Philip Wyett fixed a compile error in cmdline.cpp.
+	- Philip Wyett fixed a compile error in cmdline.cpp.
+	- Marten made the following changes:
+	    - Changed duhpreys shadowcode to use GetPolygonMeshShadows at first,
+	      then fallback to GetPolygonMeshColldet.
+	    - Added setting of PolygonMeshShadows in genmesh.
+	    - Added stencil to user.mk
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.
