@@ -10,13 +10,13 @@ struct iAws;
 struct iAwsSlot;
 struct iAwsSink;
 struct iAwsSource;
-struct iAwsComponent;
 struct iAwsWindow;
+struct iAwsParmList;
+struct iAwsComponent;
 struct iAwsPrefManager;
 struct iAwsSinkManager;
 
 class  awsWindow;
-class  awsParmList;
 class  awsComponent;
 class  awsComponentNode;
 class  awsComponentFactory;
@@ -98,7 +98,9 @@ public:
 
   /// Creates a new embeddable component
   virtual iAwsComponent *CreateEmbeddableComponent()=0;
-  
+
+  /// Creates a new parameter list
+  virtual iAwsParmList *CreateParmList();
 };
 
 
@@ -289,7 +291,7 @@ struct iAwsComponent : public iAwsSource
     virtual bool SetProperty(char *name, void *parm)=0;
 
     /// Executes a scriptable action
-    virtual bool Execute(char *action, awsParmList &parmlist)=0;
+    virtual bool Execute(char *action, iAwsParmList &parmlist)=0;
 
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate()=0;
