@@ -21,38 +21,52 @@
 
 #include "cstool/proctex.h"
 #include "ivideo/graph2d.h"
-#include "csutil/typedvec.h"
 #include "ivideo/graph3d.h"
-#include "video/canvas/common/graph2d.h"
+#include "csutil/typedvec.h"
 #include "csgeom/transfrm.h"
-#include "video/renderer/null/null_txt.h"
-#include "video/renderer/common/polybuf.h"
+#include "null_txt.h"
 #include "awscspt.h"
 #include "awscmpt.h"
+#include "csutil/cfgacc.h"
 
 class awsMultiProctexCanvas : public iAwsCanvas
 {
 private:
-  class awscG2D : public csGraphics2D {
+  class awscG2D : public iGraphics2D {
   private:
+    iFontServer *FontServer;
+    iObjectRegistry* object_reg;
+    int Width, Height;
+    int ClipX1, ClipX2, ClipY1, ClipY2;
+    int FrameBufferLocked;
+
     awsMultiProctexCanvas *awsc;
 
     iGraphics2D *rG2D;
   public:
+    SCF_DECLARE_IBASE;
+
     awscG2D (awsMultiProctexCanvas *parent, iGraphics2D *aG2D);
 
     /// Initialize the plugin
     virtual bool Initialize (iObjectRegistry*);
 
+    virtual bool Open ();
+    virtual void Close ();
+
     /// Set clipping rectangle
     virtual void SetClipRect (int xmin, int ymin, int xmax, int ymax);
+    /// Query clipping rectangle
+    virtual void GetClipRect (int &xmin, int &ymin, int &xmax, int &ymax)
+      { xmin = ClipX1; xmax = ClipX2; ymin = ClipY1; ymax = ClipY2; }
 
+    /// Draw a pixel
+    virtual void DrawPixel (int x, int y, int color);
     /// Draw a line
     virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
     /// Draw a box
     virtual void DrawBox (int x, int y, int w, int h, int color);
-    /// Draw a pixel
-    virtual void DrawPixel (int x, int y, int color);
+    virtual void SetRGB (int i, int r, int g, int b) {};
     /// Write a text string
     virtual void Write (iFont*, int x, int y, int fg, int bg, const char *text);
 
@@ -62,6 +76,42 @@ private:
      */
     virtual unsigned char *GetPixelAt (int x, int y);
 
+    virtual int GetPalEntryCount ();
+    virtual int GetPixelBytes ();
+    virtual csPixelFormat* GetPixelFormat (); 
+    
+    virtual csImageArea *SaveArea (int x, int y, int w, int h) { return NULL; }
+    virtual void RestoreArea (csImageArea *Area, bool Free = true) {};
+    virtual void FreeArea (csImageArea *Area) {};
+
+    virtual bool ClipLine (float &x1, float &y1, float &x2, float &y2,
+      int xmin, int ymin, int xmax, int ymax)
+      { return rG2D->ClipLine(x1, y1, x2, y2, xmin, ymin, xmax, ymax); }
+    
+    virtual iFontServer *GetFontServer ()
+    { return FontServer; }
+
+    virtual int GetWidth () { return Width; }
+    virtual int GetHeight () { return Height; }
+    virtual csRGBpixel *GetPalette () { return NULL; }
+    virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
+
+    virtual bool PerformExtension (char const* command, ...) { return false; };
+    virtual bool PerformExtensionV (char const* command, va_list) { return false; };
+    virtual iImage *ScreenShot () { return NULL; };
+    virtual iGraphics2D *CreateOffScreenCanvas
+    (int width, int height, void *buffer, bool alone_hint, 
+     csPixelFormat *pfmt = NULL, csRGBpixel *palette = NULL, int pal_size = 0)
+    { return NULL; };
+
+    virtual void AllowResize (bool /*iAllow*/) { };
+    virtual bool Resize (int w, int h) { return false; };
+    virtual iNativeWindow* GetNativeWindow () { return NULL; };
+    virtual bool GetFullScreen () { return false; }
+    virtual void SetFullScreen (bool b) {};
+    virtual bool SetMousePosition (int x, int y) { return false; };
+    virtual bool SetMouseCursor (csMouseCursorID iShape) { return false; };
+
     /**
      * This routine should be called before any draw operations.
      * It should return true if graphics context is ready.
@@ -69,6 +119,13 @@ private:
     virtual bool BeginDraw ();
     /// This routine should be called when you finished drawing
     virtual void FinishDraw ();
+
+    virtual int GetPage ();
+    virtual bool DoubleBuffer (bool Enable);
+    virtual bool GetDoubleBufferState ();
+
+    virtual void Clear (int color);
+    virtual void ClearAll (int color);
 
     virtual void Print (csRect *area = NULL);
   };
@@ -102,7 +159,6 @@ private:
     csConfigAccess config;
 
     csTextureManagerNull* texman;
-    csPolArrayVertexBufferManager* vbufmgr;
 
     iObjectRegistry* object_reg;
 
@@ -208,7 +264,7 @@ private:
     { return texman; }
 
     virtual iVertexBufferManager* GetVertexBufferManager ()
-    { return vbufmgr; }
+    { return NULL; }
 
     virtual float GetZBuffValue (int, int) { return 0; }
 
@@ -255,7 +311,7 @@ public:
   iGraphics2D *G2D() { return vG2D; }
   iGraphics3D *G3D() { return vG3D; }
 
-  virtual void Show (csRect *area = NULL, iGraphics3D *g3d=NULL);
+  virtual void Show (csRect *area = NULL, iGraphics3D *g3d=NULL, uint8 Alpha=0);
 
   /// Returns the index to which the vertical and horizontal indices specify.
   int GetIndex(int &v, int &h)

@@ -23,10 +23,8 @@
 #include "ivideo/graph2d.h"
 #include "csutil/typedvec.h"
 #include "ivideo/graph3d.h"
-#include "video/canvas/common/graph2d.h"
 #include "csgeom/transfrm.h"
-#include "video/renderer/null/null_txt.h"
-#include "video/renderer/common/polybuf.h"
+#include "null_txt.h"
 
 /// Handle to our procedural texture, which the user can have us draw on.
 class awsSimpleCanvas : public csProcTexture
@@ -74,7 +72,7 @@ public:
   iGraphics2D *G2D() { return canvas->G2D(); }
   iGraphics3D *G3D() { return canvas->G3D(); }
 
-  virtual void Show (csRect *area = NULL, iGraphics3D *g3d=NULL);
+  virtual void Show (csRect *area = NULL, iGraphics3D *g3d=NULL, uint8 Alpha=0);
 };
 
 #endif // __AWSCSPT_H__

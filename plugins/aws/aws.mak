@@ -38,9 +38,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(AWS)
 endif
 
-INC.AWS = $(wildcard plugins/aws/*.h)
-SRC.AWS = $(wildcard plugins/aws/*.cpp) plugins/video/canvas/common/graph2d.cpp plugins/video/renderer/null/null_txt.cpp plugins/video/renderer/common/polybuf.cpp  plugins/video/canvas/common/protex2d.cpp plugins/video/canvas/common/scrshot.cpp plugins/video/renderer/common/txtmgr.cpp plugins/video/renderer/common/vbufmgr.cpp
-
+INC.AWS = $(wildcard plugins/aws/*.h) $(wildcard include/iaws/*.h)
+SRC.AWS = $(wildcard plugins/aws/*.cpp) 
 OBJ.AWS = $(addprefix $(OUT),$(notdir $(SRC.AWS:.cpp=$O)))
 DEP.AWS = CSUTIL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
 

@@ -38,7 +38,7 @@ public:
   /// Get the iGraphics3D interface so that components can use it.
   virtual iGraphics3D *G3D()=0;
 
-  virtual void Show (csRect *area = NULL, iGraphics3D *g3d=NULL)=0;
+  virtual void Show (csRect *area = NULL, iGraphics3D *g3d=NULL, uint8 Alpha=0)=0;
 };
 
 #endif // __AWSCNVS_H__

@@ -39,8 +39,14 @@ SCF_IMPLEMENT_IBASE (awsMultiProctexCanvas)
 SCF_IMPLEMENTS_INTERFACE (iAwsCanvas)
 SCF_IMPLEMENT_IBASE_END
 
-awsMultiProctexCanvas::awscG2D::awscG2D(awsMultiProctexCanvas *parent, iGraphics2D *aG2D) : csGraphics2D(NULL) 
+SCF_IMPLEMENT_IBASE (awsMultiProctexCanvas::awscG2D)
+SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_END
+
+awsMultiProctexCanvas::awscG2D::awscG2D(awsMultiProctexCanvas *parent, iGraphics2D *aG2D) 
 {
+  SCF_CONSTRUCT_IBASE (NULL);
+
   rG2D = aG2D;
   awsc = parent;
 
@@ -61,31 +67,24 @@ bool awsMultiProctexCanvas::awscG2D::Initialize (iObjectRegistry* r)
     FontServer = CS_QUERY_REGISTRY (object_reg, iFontServer);
   }
 
-/*  Palette = new csRGBpixel [256];
-  pfmt.PalEntries = 256;
-  pfmt.PixelBytes = 1;
-  // Initialize pointers to default drawing methods
-  _DrawPixel = DrawPixel8;
-  _WriteString = WriteString8;
-  _GetPixelAt = GetPixelAt8;
-  // Mark all slots in palette as free
-  int i;
-  for (i = 0; i < 256; i++)
-  {
-    PaletteAlloc [i] = false;
-    Palette [i].red = 0;
-    Palette [i].green = 0;
-    Palette [i].blue = 0;
-  }*/
-
-  pfmt = *rG2D->GetPixelFormat ();
-  Palette = rG2D->GetPalette ();
+  //pfmt = *rG2D->GetPixelFormat ();
+  //Palette = rG2D->GetPalette ();
 
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
             "crystalspace.graphics2d.awsMultiProctexCanvas::awscG2D", "awsMultiProctexCanvas::awscG2D mode %dx%d.",
             Width, Height);
 
   return true;
+}
+
+bool awsMultiProctexCanvas::awscG2D::Open ()
+{
+  SetClipRect (0, 0, Width - 1, Height - 1);
+  return true;
+}
+
+void awsMultiProctexCanvas::awscG2D::Close ()
+{
 }
 
 void awsMultiProctexCanvas::awscG2D::SetClipRect (int xmin, int ymin, int xmax, int ymax)
@@ -219,18 +218,128 @@ void awsMultiProctexCanvas::awscG2D::Write (iFont *font, int x, int y, int fg, i
 
 unsigned char* awsMultiProctexCanvas::awscG2D::GetPixelAt (int x, int y)
 {
+  int i,count=awsc->GetFlatCanvasCount();
+  
+  for (i=0; i<count; ++i)
+  {
+      csRect *canvasRect = awsc->GetFlatCanvasRect(i);
+
+      if (canvasRect->Contains(x, y))
+      {
+        awsSimpleCanvas *canvas = awsc->GetFlatCanvas(i);
+        return canvas->G2D()->GetPixelAt(x-canvasRect->xmin, y-canvasRect->ymin);
+      }
+   }
   return NULL;
+}
+
+void awsMultiProctexCanvas::awscG2D::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
+{
+  oR = oG = oB = 0;
+  int i,count=awsc->GetFlatCanvasCount();
+  
+  for (i=0; i<count; ++i)
+  {
+      csRect *canvasRect = awsc->GetFlatCanvasRect(i);
+
+      if (canvasRect->Contains(x, y))
+      {
+        awsSimpleCanvas *canvas = awsc->GetFlatCanvas(i);
+        canvas->G2D()->GetPixel(x-canvasRect->xmin, y-canvasRect->ymin, oR, oG, oB);
+	return;
+      }
+   }
 }
 
 bool awsMultiProctexCanvas::awscG2D::BeginDraw ()
 {
-  csGraphics2D::BeginDraw();
+  if (!FrameBufferLocked)
+  {
+    int i, count=awsc->GetFlatCanvasCount();
+
+    for (i=0; i<count; ++i)
+    {
+      awsSimpleCanvas *canvas = awsc->GetFlatCanvas(i);
+
+      canvas->G2D()->BeginDraw();
+    }
+  }
+  FrameBufferLocked++;
   return true;
 }
 
 void awsMultiProctexCanvas::awscG2D::FinishDraw ()
 {
-  csGraphics2D::FinishDraw();
+  if (FrameBufferLocked) 
+  {
+    FrameBufferLocked--;
+    if (!FrameBufferLocked) 
+    {
+      int i, count=awsc->GetFlatCanvasCount();
+
+      for (i=0; i<count; ++i)
+      {
+	awsSimpleCanvas *canvas = awsc->GetFlatCanvas(i);
+
+	canvas->G2D()->FinishDraw();
+      }
+    }
+  }
+}
+
+void awsMultiProctexCanvas::awscG2D::Clear(int color)
+{
+  DrawBox (0, 0, Width, Height, color);
+}
+
+void awsMultiProctexCanvas::awscG2D::ClearAll(int color)
+{
+  DrawBox (0, 0, Width, Height, color);
+}
+
+bool awsMultiProctexCanvas::awscG2D::DoubleBuffer (bool Enable)
+{
+  return true;
+}
+
+bool awsMultiProctexCanvas::awscG2D::GetDoubleBufferState ()
+{
+  return false;
+}
+
+int awsMultiProctexCanvas::awscG2D::GetPage ()
+{
+  return 0;
+}
+
+int awsMultiProctexCanvas::awscG2D::GetPalEntryCount ()
+{ 
+/*  int count=awsc->GetFlatCanvasCount();
+  if (count) {
+    return awsc->GetFlatCanvas(0)->G2D()->GetPalEntryCount();
+  } else {*/
+    return 0; 
+//  }
+}
+
+int awsMultiProctexCanvas::awscG2D::GetPixelBytes ()
+{
+  int count=awsc->GetFlatCanvasCount();
+  if (count) {
+    return awsc->GetFlatCanvas(0)->G2D()->GetPixelBytes();
+  } else {
+    return 0; 
+  }
+}
+
+csPixelFormat* awsMultiProctexCanvas::awscG2D::GetPixelFormat ()
+{ 
+  int count=awsc->GetFlatCanvasCount();
+  if (count) {
+    return awsc->GetFlatCanvas(0)->G2D()->GetPixelFormat();
+  } else {
+    return NULL; 
+  }
 }
 
 void awsMultiProctexCanvas::awscG2D::Print (csRect *area)
@@ -276,7 +385,6 @@ awsMultiProctexCanvas::awscG3D::awscG3D (awsMultiProctexCanvas *parent, iGraphic
   G2D = NULL;
 
   texman = NULL;
-  vbufmgr = NULL;
 
   Caps.CanClip = false;
   Caps.minTexHeight = 2;
@@ -293,7 +401,6 @@ awsMultiProctexCanvas::awscG3D::~awscG3D ()
   Close ();
   texman->Clear ();
   texman->DecRef (); texman = NULL;
-  vbufmgr->DecRef (); vbufmgr = NULL;
   if (G2D)
     G2D->DecRef ();
 }
@@ -314,7 +421,6 @@ bool awsMultiProctexCanvas::awscG3D::Initialize (iObjectRegistry *r)
   G2D->Initialize(r);
 
   texman = new csTextureManagerNull (object_reg, G2D, config);
-  vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
   return true;
 }
@@ -370,7 +476,6 @@ void awsMultiProctexCanvas::awscG3D::Close()
 
   texman->Clear ();
   texman->DecRef (); texman = NULL;
-  vbufmgr->DecRef (); vbufmgr = NULL;
 
   G2D->Close ();
   width = height = -1;
@@ -603,8 +708,32 @@ awsMultiProctexCanvas::Animate (csTicks current_time)
   (void)current_time;
 }
 
-void awsMultiProctexCanvas::Show (csRect *area, iGraphics3D *g3d)
+void awsMultiProctexCanvas::Show (csRect *area, iGraphics3D *g3d, uint8 Alpha)
 {
-  vG3D->Print (area);
+  //vG3D->Print (area);
+
+  int i, count=GetFlatCanvasCount();
+
+  realG3D()->BeginDraw(CSDRAW_2DGRAPHICS);
+
+  for (i=0; i<count; ++i)
+  {
+    csRect *canvasRect = GetFlatCanvasRect(i);
+    csRect rect ((csRect&)*canvasRect);
+
+    if (area) rect.Intersect(*area);
+    if ((!area) || (!rect.IsEmpty()))
+    {
+      awsSimpleCanvas *canvas = GetFlatCanvas(i);
+      realG3D()->DrawPixmap(canvas->GetTextureWrapper()->GetTextureHandle(),
+                            rect.xmin, rect.ymin, rect.Width()+1,rect.Height()+1,
+                            rect.xmin-canvasRect->xmin, rect.ymin-canvasRect->ymin, 
+                            rect.Width()+1,rect.Height()+1,
+                            Alpha);
+
+    }
+  }
+
+  realG3D()->FinishDraw();
 }
 

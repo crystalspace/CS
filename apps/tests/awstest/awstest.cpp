@@ -134,7 +134,7 @@ awsTest::~awsTest()
   SCF_DEC_REF (myG2D);
   SCF_DEC_REF (myVFS);
   SCF_DEC_REF (myConsole);
-//  SCF_DEC_REF (awsCanvas);
+  SCF_DEC_REF (awsCanvas);
 }
 
 static bool AwsEventHandler (iEvent& ev)
@@ -154,8 +154,6 @@ static bool AwsEventHandler (iEvent& ev)
     return System ? System->HandleEvent (ev) : false;
   }
 }
-
-
 
 bool 
 awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
@@ -380,8 +378,6 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   col_cyan = txtmgr->FindRGB (0, 255, 255);
   col_green = txtmgr->FindRGB (0, 255, 0);
   
-  
-
   if (AWSTEST_SINGLEPROCTEXCANVAS)
   {
     awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager(), 512, 512, NULL);
@@ -458,8 +454,7 @@ awsTest::SetupFrame()
   myG2D->Write(font, 5,5, col_green, -1, message);
   
   aws->Redraw();
-  aws->Print(myG3D);
-
+  aws->Print(myG3D, 64);
   /*if (AWSTEST_SINGLEPROCTEXCANVAS)
   {
     iTextureWrapper *tex = SCF_QUERY_INTERFACE(awsCanvas, iTextureWrapper);

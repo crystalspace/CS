@@ -96,7 +96,7 @@ awsSingleProctexCanvas::Animate (csTicks current_time)
   (void)current_time;
 }
 
-void awsSingleProctexCanvas::Show (csRect *area, iGraphics3D *g3d)
+void awsSingleProctexCanvas::Show (csRect *area, iGraphics3D *g3d, uint8 Alpha)
 {
   int w = ((!g3d) || (G2D()->GetWidth()  < g3d->GetWidth())  ? G2D()->GetWidth() : g3d->GetWidth());
   int h = ((!g3d) || (G2D()->GetHeight() < g3d->GetHeight()) ? G2D()->GetHeight() : g3d->GetHeight());
@@ -114,7 +114,7 @@ void awsSingleProctexCanvas::Show (csRect *area, iGraphics3D *g3d)
      g3d->DrawPixmap(canvas->GetTextureWrapper()->GetTextureHandle(),
                      area->xmin,area->ymin,area->Width(),area->Height(),
                      area->xmin,area->ymin,area->Width(),area->Height(),
-                     0);
+                     Alpha);
   }
 }
 

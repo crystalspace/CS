@@ -306,7 +306,7 @@ awsManager::UpdateStore()
 }
 
 void
-awsManager::Print(iGraphics3D *g3d)
+awsManager::Print(iGraphics3D *g3d, uint8 Alpha)
 {
   UpdateStore();
 
@@ -321,7 +321,7 @@ awsManager::Print(iGraphics3D *g3d)
     for(i=0; i<erase.Count(); ++i)
     {
       csRect r(erase.RectAt(i));
-      canvas->Show(&r, g3d);
+      canvas->Show(&r, g3d, Alpha);
     }
 
     erase.makeEmpty();
@@ -332,7 +332,7 @@ awsManager::Print(iGraphics3D *g3d)
     for(i=0; i<updatestore.Count(); ++i)
     {
       csRect r(updatestore.RectAt(i));
-      canvas->Show(&r, g3d);   
+      canvas->Show(&r, g3d, Alpha);   
     }
   }
 

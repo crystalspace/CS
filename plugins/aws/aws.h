@@ -150,7 +150,7 @@ public:
     virtual bool       WindowIsDirty(iAwsWindow *win);
     
     /// Causes the current view of the window system to be drawn to the given graphics device.
-    virtual void       Print(iGraphics3D *g3d);
+    virtual void       Print(iGraphics3D *g3d, uint8 Alpha=0);
   
     /// Redraw whatever portions of the screen need it.
     virtual void       Redraw();
