@@ -929,8 +929,8 @@ void G2DTestSystemDriver::PixelClipTest ()
 	int i;
     for (i = 0; i < 1000; i++)
     {
-      float x = sx + rng.Get () * sw;
-      float y = sy + rng.Get () * sh;
+      int x = int(sx + rng.Get () * sw);
+      int y = int(sy + rng.Get () * sh);
       myG2D->DrawPixel(x,y,black);
     }
     delta_time = csGetTicks () - start_time;
@@ -1069,10 +1069,10 @@ void G2DTestSystemDriver::BoxClipTest()
 	int i;
     for (i = 0; i < 1000; i++)
     {
-      float x = sx + rng.Get () * sw;
-      float y = sy + rng.Get () * sh;
-      float width = rng.Get () * sw;
-      float height = rng.Get () * sh;
+      int x = int(sx + rng.Get () * sw);
+      int y = int(sy + rng.Get () * sh);
+      int width = int(rng.Get () * sw);
+      int height = int(rng.Get () * sh);
       myG2D->DrawBox(x,y,width,height,black);
     }
     delta_time = csGetTicks () - start_time;
