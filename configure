@@ -8599,6 +8599,8 @@ else
 
 fi
 
+else
+  cs_cv_python=no
 fi
 
 else
