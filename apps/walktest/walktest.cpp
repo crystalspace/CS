@@ -1004,9 +1004,9 @@ void WalkTest::PrepareFrame (cs_time elapsed_time, cs_time current_time)
       else
       {
         view->GetCamera ()->SetT2O (csMatrix3 ());
-        view->GetCamera ()->RotateWorld (csVector3 (0,1,0), angle.y);
+        view->GetCamera ()->RotateOther (csVector3 (0,1,0), angle.y);
         if (!do_gravity)
-          view->GetCamera ()->Rotate (csVector3 (1,0,0), angle.x);
+          view->GetCamera ()->RotateThis (csVector3 (1,0,0), angle.x);
       }
 
       csVector3 vel = view->GetCamera ()->GetT2O ()*velocity;
@@ -1023,7 +1023,7 @@ void WalkTest::PrepareFrame (cs_time elapsed_time, cs_time current_time)
       else { check_once = false; DoGravity (pos, vel); }
 
       if (do_gravity && !move_3d)
-        view->GetCamera ()->Rotate (csVector3 (1,0,0), angle.x);
+        view->GetCamera ()->RotateThis (csVector3 (1,0,0), angle.x);
 
       // Apply angle velocity to camera angle
       angle += angle_velocity;

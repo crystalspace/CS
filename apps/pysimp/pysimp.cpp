@@ -177,13 +177,13 @@ void PySimple::NextFrame ()
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
 
   if (GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed);
+    view->GetCamera ()->RotateThis (VEC_ROT_RIGHT, speed);
   if (GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed);
+    view->GetCamera ()->RotateThis (VEC_ROT_LEFT, speed);
   if (GetKeyState (CSKEY_PGUP))
-    view->GetCamera ()->Rotate (VEC_TILT_UP, speed);
+    view->GetCamera ()->RotateThis (VEC_TILT_UP, speed);
   if (GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed);
+    view->GetCamera ()->RotateThis (VEC_TILT_DOWN, speed);
   if (GetKeyState (CSKEY_UP))
     view->GetCamera ()->Move (VEC_FORWARD * 4 * speed);
   if (GetKeyState (CSKEY_DOWN))

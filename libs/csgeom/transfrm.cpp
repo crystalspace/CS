@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
@@ -20,6 +20,7 @@
 #include <math.h>
 #include "cssysdef.h"
 #include "csgeom/transfrm.h"
+#include "qsqrt.h"
 
 //---------------------------------------------------------------------------
 
@@ -180,6 +181,83 @@ csReversibleTransform operator/ (const csReversibleTransform& t1,
 {
   return csReversibleTransform (t1.m_o2t*t2.m_t2o, t2.m_o2t*t1.m_t2o, 
                    t2.m_o2t*(t1.v_o2t - t2.v_o2t)); 
+}
+
+void csReversibleTransform::RotateOther (const csVector3& v, float angle)
+{
+  csVector3 u = v;
+  float ca, sa, omcaux, omcauy, omcauz, uxsa, uysa, uzsa;
+  u = csVector3::Unit (u);
+  ca = cos (angle);
+  sa = sin (angle);
+  omcaux = (1-ca)*u.x;
+  omcauy = (1-ca)*u.y;
+  omcauz = (1-ca)*u.z;
+  uxsa = u.x*sa;
+  uysa = u.y*sa;
+  uzsa = u.z*sa;
+  
+  SetT2O ( 
+    csMatrix3(
+      u.x*omcaux+ca,    u.y*omcaux-uzsa,  u.z*omcaux+uysa,
+      u.x*omcauy+uzsa,  u.y*omcauy+ca,    u.z*omcauy-uxsa,
+      u.x*omcauz-uysa,  u.y*omcauz+uxsa,  u.z*omcauz+ca)
+      * GetT2O ());
+}
+
+void csReversibleTransform::RotateThis (const csVector3& v, float angle)
+{
+  csVector3 u = v;
+  float ca, sa, omcaux, omcauy, omcauz, uxsa, uysa, uzsa;
+  u = csVector3::Unit (u);
+  ca = cos (angle);
+  sa = sin (angle);
+  omcaux = (1-ca)*u.x;
+  omcauy = (1-ca)*u.y;
+  omcauz = (1-ca)*u.z;
+  uxsa = u.x*sa;
+  uysa = u.y*sa;
+  uzsa = u.z*sa;
+
+  SetT2O (GetT2O () *
+    csMatrix3(
+      u.x*omcaux+ca,    u.y*omcaux-uzsa,  u.z*omcaux+uysa,
+      u.x*omcauy+uzsa,  u.y*omcauy+ca,    u.z*omcauy-uxsa,
+      u.x*omcauz-uysa,  u.y*omcauz+uxsa,  u.z*omcauz+ca)
+      );
+}
+
+void csReversibleTransform::LookAt (const csVector3& v, const csVector3& up)
+{
+  csMatrix3 m; /* initialized to be the identity matrix */
+  csVector3 w1, w2, w3 = v;
+
+  float sqr;
+  sqr = v*v;
+  if (sqr > SMALL_EPSILON)
+  {
+    w3 *= qisqrt (sqr);
+    w1 = w3 % up;
+    sqr = w1*w1;
+    if (sqr < SMALL_EPSILON)
+    {
+      w1 = w3 % csVector3(0,0,-1);
+      sqr = w1*w1;
+      if (sqr < SMALL_EPSILON)
+      {
+       w1 = w3 % csVector3(0,-1,0);
+       sqr = w1*w1;
+      }
+    }
+    w1 *= qisqrt (sqr);
+    w2 = w3 % w1;
+
+    m.m11 = w1.x;  m.m12 = w2.x;  m.m13 = w3.x;
+    m.m21 = w1.y;  m.m22 = w2.y;  m.m23 = w3.y;
+    m.m31 = w1.z;  m.m32 = w2.z;  m.m33 = w3.z;
+  }
+
+  SetT2O (m);
 }
 
 //---------------------------------------------------------------------------

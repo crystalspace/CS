@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -459,7 +459,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     g3d->ClearCache ();
   }
   else if (!strcasecmp (cmd, "turn"))
-    camera->Rotate (VEC_ROT_RIGHT, M_PI);
+    camera->RotateThis (VEC_ROT_RIGHT, M_PI);
   else if (!strcasecmp (cmd, "activate"))
   {
     CsPrintf (MSG_CONSOLE, "OBSOLETE\n");

@@ -311,45 +311,10 @@ public:
   virtual void MoveUnrestricted (const csVector3& v) { v_o2t += m_t2o * v; }
 
   /**
-   * Rotate the camera by the angle (radians) around the given vector,
-   * in world coordinates.
-   * Note: this function rotates the camera, not the coordinate system.
-   */
-  virtual void RotateWorld (const csVector3& v, float angle);
-
-  /**
-   * Rotate the camera by the angle (radians) around the given vector,
-   * in camera coordinates.
-   * Note: this function rotates the camera, not the coordinate system.
-   */
-  virtual void Rotate (const csVector3& v, float angle);
-
-  /**
-   * Use the given transformation matrix, in worldspace,
-   * to reorient the camera.
-   * Note: this function rotates the camera, not the coordinate system.
-   */
-  virtual void RotateWorld (const csMatrix3& m) { SetT2O (m * m_t2o); }
-
-  /**
-   * Use the given transformation matrix, in camera space,
-   * to reorient the camera.
-   * Note: this function rotates the camera, not the coordinate system.
-   */
-  virtual void Rotate (const csMatrix3& m) { SetT2O (m_t2o * m); }
-
-  /**
-   * Have the camera look at the given (x,y,z) point, using up as
-   * the up-vector. 'v' should be given relative to the position
-   * of the camera.
-   */
-  virtual void LookAt (const csVector3& v, const csVector3& up);
-
-  /**
    * Eliminate roundoff error by snapping the camera orientation to a
    * grid of density n
    */
-  virtual void Correct (int n);
+  void Correct (int n);
 
   /// Change the shift for perspective correction.
   void SetPerspectiveCenter (float x, float y) { shift_x = x; shift_y = y; }
@@ -406,26 +371,6 @@ public:
     virtual void MoveUnrestricted (const csVector3& v)
     {
       scfParent->MoveUnrestricted (v);
-    }
-    virtual void RotateWorld (const csVector3& v, float angle)
-    {
-      scfParent->RotateWorld (v, angle);
-    }
-    virtual void Rotate (const csVector3& v, float angle)
-    {
-      scfParent->Rotate (v, angle);
-    }
-    virtual void RotateWorld (const csMatrix3& m)
-    {
-      scfParent->RotateWorld (m);
-    }
-    virtual void Rotate (const csMatrix3& m)
-    {
-      scfParent->Rotate (m);
-    }
-    virtual void LookAt (const csVector3& v, const csVector3& up)
-    {
-      scfParent->LookAt (v, up);
     }
     virtual void Correct (int n)
     {

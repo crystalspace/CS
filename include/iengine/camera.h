@@ -96,41 +96,6 @@ struct iCamera : public iBase
   virtual void MoveUnrestricted (const csVector3& v) = 0;
 
   /**
-   * Rotate the camera by the angle (radians) around the given vector,
-   * in world coordinates.
-   * Note: this function rotates the camera, not the coordinate system.
-   */
-  virtual void RotateWorld (const csVector3& v, float angle) = 0;
-
-  /**
-   * Rotate the camera by the angle (radians) around the given vector,
-   * in camera coordinates.
-   * Note: this function rotates the camera, not the coordinate system.
-   */
-  virtual void Rotate (const csVector3& v, float angle) = 0;
-
-  /**
-   * Use the given transformation matrix, in worldspace,
-   * to reorient the camera.
-   * Note: this function rotates the camera, not the coordinate system.
-   */
-  virtual void RotateWorld (const csMatrix3& m)  = 0;
-
-  /**
-   * Use the given transformation matrix, in camera space,
-   * to reorient the camera.
-   * Note: this function rotates the camera, not the coordinate system.
-   */
-  virtual void Rotate (const csMatrix3& m)  = 0;
-
-  /**
-   * Have the camera look at the given (x,y,z) point, using up as
-   * the up-vector. 'v' should be given relative to the position
-   * of the camera.
-   */
-  virtual void LookAt (const csVector3& v, const csVector3& up) = 0;
-
-  /**
    * Eliminate roundoff error by snapping the camera orientation to a
    * grid of density n
    */

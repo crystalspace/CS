@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -430,28 +430,28 @@ void csWireFrameCam::KeyRightStrafe (float speed, bool slow, bool fast)
 
 void csWireFrameCam::KeyLeft (float speed, bool slow, bool fast)
 {
-  if (slow) c->Rotate (VEC_ROT_LEFT, speed*.005);
-  else if (fast) c->Rotate (VEC_ROT_LEFT, speed*.2);
-  else c->Rotate (VEC_ROT_LEFT, speed*.1);
+  if (slow) c->RotateThis (VEC_ROT_LEFT, speed*.005);
+  else if (fast) c->RotateThis (VEC_ROT_LEFT, speed*.2);
+  else c->RotateThis (VEC_ROT_LEFT, speed*.1);
 }
 
 void csWireFrameCam::KeyRight (float speed, bool slow, bool fast)
 {
-  if (slow) c->Rotate (VEC_ROT_RIGHT, speed*.005);
-  else if (fast) c->Rotate (VEC_ROT_RIGHT, speed*.2);
-  else c->Rotate (VEC_ROT_RIGHT, speed*.1);
+  if (slow) c->RotateThis (VEC_ROT_RIGHT, speed*.005);
+  else if (fast) c->RotateThis (VEC_ROT_RIGHT, speed*.2);
+  else c->RotateThis (VEC_ROT_RIGHT, speed*.1);
 }
 
 void csWireFrameCam::KeyPgUp (float speed, bool slow, bool fast)
 {
-  if (slow) c->Rotate (VEC_TILT_UP, speed*.005);
-  else if (fast) c->Rotate (VEC_TILT_UP, speed*.2);
-  else c->Rotate (VEC_TILT_UP, speed*.1);
+  if (slow) c->RotateThis (VEC_TILT_UP, speed*.005);
+  else if (fast) c->RotateThis (VEC_TILT_UP, speed*.2);
+  else c->RotateThis (VEC_TILT_UP, speed*.1);
 }
 
 void csWireFrameCam::KeyPgDn (float speed, bool slow, bool fast)
 {
-  if (slow) c->Rotate (VEC_TILT_DOWN, speed*.005);
-  else if (fast) c->Rotate (VEC_TILT_DOWN, speed*.2);
-  else c->Rotate (VEC_TILT_DOWN, speed*.1);
+  if (slow) c->RotateThis (VEC_TILT_DOWN, speed*.005);
+  else if (fast) c->RotateThis (VEC_TILT_DOWN, speed*.2);
+  else c->RotateThis (VEC_TILT_DOWN, speed*.1);
 }

@@ -89,6 +89,13 @@ The history order has been reversed so that new features are at the top.
 	  support. Also support for skinned listbox headers.
 	- Christopher also did some further updates to cslistbox to make
 	  it work better as a skinned control.
+	- Implemented LookAt(), RotateOther(), and RotateThis() in
+	  csReversibleTransform. These functions used to be in csCamera
+	  but now csCamera simply inherits them.
+	- Also removed LookAt() from iCamera. This is now in the
+	  return transform.
+	- Removed RotateWorld() and Rotate() from csCamera and iCamera.
+	  Use RotateOther() and RotateThis() in csReversibleTransform.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works again.

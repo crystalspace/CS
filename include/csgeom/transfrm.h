@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
@@ -257,6 +257,41 @@ public:
    * is stored in 'result'.
    */
   void This2Other (const csPlane3& p, const csVector3& point, csPlane3& result) const;
+
+  /**
+   * Rotate the transform by the angle (radians) around the given vector,
+   * in other coordinates.
+   * Note: this function rotates the transform, not the coordinate system.
+   */
+  void RotateOther (const csVector3& v, float angle);
+
+  /**
+   * Rotate the transform by the angle (radians) around the given vector,
+   * in these coordinates.
+   * Note: this function rotates the tranform, not the coordinate system.
+   */
+  void RotateThis (const csVector3& v, float angle);
+
+  /**
+   * Use the given transformation matrix, in other space,
+   * to reorient the transformation.
+   * Note: this function rotates the transformation, not the coordinate system.
+   */
+  void RotateOther (const csMatrix3& m) { SetT2O (m * m_t2o); }
+
+  /**
+   * Use the given transformation matrix, in this space,
+   * to reorient the transformation.
+   * Note: this function rotates the transformation, not the coordinate system.
+   */
+  void RotateThis (const csMatrix3& m) { SetT2O (m_t2o * m); }
+
+  /**
+   * Let this transform look at the given (x,y,z) point, using up as
+   * the up-vector. 'v' should be given relative to the position
+   * of the origin of this transform.
+   */
+  void LookAt (const csVector3& v, const csVector3& up);
 
   /// Reverse a transformation on a 3D vector.
   friend csVector3 operator/ (const csVector3& v, const csReversibleTransform& t); 
