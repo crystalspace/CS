@@ -53,8 +53,11 @@ public:
   /// Play sound.
   void Play(unsigned char *snddata, int len);
 
+  bool Blocked();
+
 private:
   int audio;
+  int lasterr;
 };
 
 class csSoundDriverOSS : public iSoundDriver
@@ -69,6 +72,7 @@ protected:
   int fragments;
   int block_size;
   int block;
+  int lasterr;
   unsigned char *soundbuffer;
 
 public:
@@ -101,12 +105,13 @@ private:
   // used to setup timer when background=true (not currently used)
   bool SetupTimer( int nTimesPerSecond );
 
-  AudioDevice device;
   struct sigaction oldact;
   struct itimerval otime;
   bool bTimerInstalled, bSignalInstalled;
+  
 public:
   iSoundRender *m_piSoundRender;
+  AudioDevice device;
 };
 
 #endif // __CS_OSSDRV_H__

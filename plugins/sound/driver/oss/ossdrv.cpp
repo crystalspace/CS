@@ -65,8 +65,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundDriverOSS::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-static int lasterr=0;
-static int gaudio;
 static const char *err[]=
 {
   "no error", "get semaphore", "dec semaphore", "inc semaphore",
@@ -102,11 +100,11 @@ static const char *err[]=
 #define err_get_sem 1
 #define err_no_err 0
 
-bool AudioDeviceBlocked()
+bool AudioDevice::Blocked()
 {
   // are there free fragments to fill in the soundbuffer ?
   audio_buf_info info;
-  ioctl(gaudio, SNDCTL_DSP_GETOSPACE, &info);
+  ioctl(audio, SNDCTL_DSP_GETOSPACE, &info);
   /* Thats what the OSS-specification has to say:
      Number of full fragments that can be read or written without
      blocking.Note that this field is reliable only when the
@@ -118,6 +116,7 @@ bool AudioDeviceBlocked()
 AudioDevice::AudioDevice()
 {
   audio = -1;
+  lasterr = 0;
 }
 
 bool AudioDevice::Open(int& frequency, bool& bit16, bool& stereo,
@@ -130,7 +129,7 @@ bool AudioDevice::Open(int& frequency, bool& bit16, bool& stereo,
   dsp_stereo = stereo;
   dsp_sample = (bit16 ? 16 : 8);
 
-  lasterr=err_open_dsp;
+  lasterr = err_open_dsp;
   audio = open(SOUND_DEVICE, O_WRONLY | O_NONBLOCK, 0);
   succ = audio != -1;
 
@@ -156,7 +155,6 @@ bool AudioDevice::Open(int& frequency, bool& bit16, bool& stereo,
     lasterr=err_open_dsp;
     audio = open(SOUND_DEVICE, O_WRONLY, 0);
     succ = audio != -1;
-    gaudio = audio;
     // this amount of bytes we pump per second through the audio-device
     bytes_per_second = dsp_speed * (dsp_sample/8) * (dsp_stereo ? 2 : 1);
 
@@ -217,9 +215,9 @@ static void* soundptr;
 
 void isTime(int)
 {
-  iSoundRender *mysound=(iSoundRender*)soundptr;
-  if (!AudioDeviceBlocked())
-    mysound->MixingFunction();
+  csSoundDriverOSS *mysound = (csSoundDriverOSS*) soundptr;
+  if (!mysound->device.Blocked() && mysound->m_piSoundRender)
+    mysound->m_piSoundRender->MixingFunction();
 }
 
 bool csSoundDriverOSS::SetupTimer(int nTimesPerSecond)
@@ -240,7 +238,7 @@ bool csSoundDriverOSS::SetupTimer(int nTimesPerSecond)
   act.sa_flags = SA_NOCLDSTOP | SA_RESTART;
 
   // set static ptr because the timer handler needs it...
-  soundptr=(void*)m_piSoundRender;
+  soundptr=(void*) this;
 
   /*
    * Set signal handling function.
