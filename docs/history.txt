@@ -34,6 +34,8 @@ chronological order.
 	  first set the "GUI subsystem", then the "console subsystem" flags.)
 	- res fixed the waveout sound driver to convert error descriptions from
 	  the system to UTF-8.
+	- Wouter Wijngaards changed the csfx DrawPartial to work under the
+	  new renderer, it forgot to flip the y coord.
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.

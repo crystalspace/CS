@@ -325,9 +325,9 @@ void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
   float asp = hw / hh;
 
   float sx = ((float(x) / hw) - 1.0f) * asp;
-  float sy = (float(y) / hh) - 1.0f;
+  float sy = (float(g3d->GetHeight() - y - 1) / hh) - 1.0f;
   float smx = sx + (float (w) * asp / hw);
-  float smy = sy + float (h) / hh;
+  float smy = sy - float (h) / hh;
 
   csSimpleRenderMesh mesh;
   static uint indices[4] = {0, 1, 2, 3};
@@ -358,19 +358,19 @@ void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
   else
     mesh.mixmode = mixmode;
 
-  verts[0].Set (sx, sy, 2.0f);
+  verts[0].Set (sx, smy, 2.0f);
   texels[0].Set (0.0f, 1.0f);
   colors[0].Set (fr, fg, fb, fa);
   
-  verts[1].Set (sx, smy, 2.0f);
+  verts[1].Set (sx, sy, 2.0f);
   texels[1].Set (0.0f, 0.0f);
   colors[1].Set (fr, fg, fb, fa);
 
-  verts[2].Set (smx, smy, 2.0f);
+  verts[2].Set (smx, sy, 2.0f);
   texels[2].Set (1.0f, 0.0f);
   colors[2].Set (fr, fg, fb, fa);
 
-  verts[3].Set (smx, sy, 2.0f);
+  verts[3].Set (smx, smy, 2.0f);
   texels[3].Set (1.0f, 1.0f);
   colors[3].Set (fr, fg, fb, fa);
 
