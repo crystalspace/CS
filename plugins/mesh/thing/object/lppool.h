@@ -157,24 +157,19 @@ public:
   csFrustum* GetLightFrustum () { return light_frustum; }
 };
 
-
-
-CS_DECLARE_OBJECT_POOL (csLightPatchPoolHelper, csLightPatch);
-
 /**
  * This is an object pool which holds objects of type
  * csLightPatch. You can ask new instances from this pool.
  * If needed it will allocate one for you but ideally it can
  * give you one which was allocated earlier.
  */
-class csLightPatchPool : public csLightPatchPoolHelper
+class csLightPatchPool : public csObjectPool<csLightPatch>
 {
 public:
-  void Free (void* o)
+  void Free (csLightPatch* o)
   {
-    csLightPatch* p = (csLightPatch*)o;
-    p->RemovePatch ();
-    csLightPatchPoolHelper::Free (p);
+    o->RemovePatch ();
+    csObjectPool<csLightPatch>::Free (o);
   }
 };
 

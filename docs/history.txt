@@ -32,6 +32,8 @@ The history order is reversed so that new features are at the top.
 	    - use of 64bit portability macros and some other fixes to make it
 	      compile on MSVC.
 	    - added mmx.h from original NuppelVideo sources.
+	- Clarified csObjectPool class by making it templated and simplified
+	  the code a lot.
 1-Apr-2003
 	- Reverted dllwrap change to win32gcc.mak from 4 days ago since
 	  it prevents debug symbols from being present in plugins.

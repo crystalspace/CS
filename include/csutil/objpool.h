@@ -19,73 +19,35 @@
 #ifndef __CS_OBJPOOL_H__
 #define __CS_OBJPOOL_H__
 
+#include "csutil/ptrarr.h"
+
 /**
- * This macro defines a 'pool' class for the given type. The pool class 
- * (descending from csObjectPool) can be used to create objects of the given 
+ * This class defines a 'pool' class for the given type.
+ * This class can be used to create objects of the given 
  * type, but it will re-use older objects if possible to save time. For this 
  * reason, unused objects of the given type should not be deleted but given 
  * to the pool.
  */
-#define CS_DECLARE_OBJECT_POOL(name,type)				\
-class name : protected csObjectPool {					\
-private:								\
-  virtual void* CreateItem ()						\
-  { return new type (); }						\
-  virtual void FreeItem (void* o)					\
-  { type *obj = (type*)o; delete obj; }					\
-public:									\
-  virtual ~name ()							\
-  { for (int i=0; i<Num; i++) FreeItem (Objects[i]); }			\
-  type *Alloc ()							\
-  { return (type*)csObjectPool::Alloc (); }				\
-  void Free (type *o)							\
-  { csObjectPool::Free (o); }						\
-};
-
-/// Helper class for #DECLARE_OBJECT_POOL
+template <class T>
 class csObjectPool
 {
 protected:
-  void** Objects;
-  int Num, Max;
+  csPDelArray<T> Objects;
 
 public:
-  /// Create a new item
-  virtual void* CreateItem () = 0;
-  /// Delete an item
-  virtual void FreeItem (void*) = 0;
+  /// Get an object from the pool.
+  T *Alloc ()
+  {
+    if (Objects.Length () > 0)
+      return Objects.Pop ();
+    else
+      return new T ();
+  }
 
-  csObjectPool ()
-  {
-    Objects = new void* [16];
-    Num = 0;
-    Max = 16;
-  }
-  virtual ~csObjectPool ()
-  {
-    delete[] Objects;
-  }
-  /// Get an object from the pool
-  void *Alloc ()
-  {
-    if (Num > 0) {
-      Num--;
-      return Objects [Num];
-    } else {
-      return CreateItem ();
-    }
-  }
   /// Give an object back to the pool
-  void Free (void* o) {
-    if (Num == Max) {
-      void** old = Objects;
-      Objects = new void* [Max + 16];
-      memcpy (Objects, old, sizeof (void*) * Max);
-      delete[] old;
-      Max += 16;
-    }
-    Objects [Num] = o;
-    Num++;
+  void Free (T* o)
+  {
+    Objects.Push (o);
   }
 };
 
