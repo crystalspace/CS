@@ -25,6 +25,8 @@
     Improve 'Game Over' screen!
     Cleanup of several 'Screens' in Blocks (code cleanup).
     Psuedo-AI module to play automatically.
+    Add confirmation before quitting game.
+    Fix bugs with marker on floor (wrong size...).
  */
 
 #define SYSDEF_ACCESS
@@ -2139,10 +2141,12 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
     Gfx2D->Clear (0);
     int i;
     HighScore& hs = highscores[diff_level][zone_dim-3];
+    bool scores = false;
     for (i = 0 ; i < 10 ; i++)
     {
       if (hs.Get (i) >= 0)
       {
+        scores = true;
         if (hs.GetName (i))
           Gfx2D->Write (10, 10+i*12, white, black, hs.GetName (i));
         else
@@ -2152,6 +2156,9 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
         Gfx2D->Write (200, 10+i*12, white, black, scorebuf);
       }
     }
+    if (!scores)
+      Gfx2D->Write (10, Sys->FrameHeight/2, white, black,
+      	"This screen intentionally left blank");
     Gfx3D->FinishDraw ();
     Gfx3D->Print (NULL);
     return;
