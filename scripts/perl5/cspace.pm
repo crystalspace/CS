@@ -4229,8 +4229,15 @@ package cspace::iLight;
 *GetCenter = *cspacec::iLight_GetCenter;
 *SetCenter = *cspacec::iLight_SetCenter;
 *GetSector = *cspacec::iLight_GetSector;
+*GetMovable = *cspacec::iLight_GetMovable;
 *GetColor = *cspacec::iLight_GetColor;
 *SetColor = *cspacec::iLight_SetColor;
+*GetType = *cspacec::iLight_GetType;
+*SetType = *cspacec::iLight_SetType;
+*GetDirection = *cspacec::iLight_GetDirection;
+*SetDirection = *cspacec::iLight_SetDirection;
+*GetSpotFalloff = *cspacec::iLight_GetSpotFalloff;
+*SetSpotFalloff = *cspacec::iLight_SetSpotFalloff;
 *GetInfluenceRadius = *cspacec::iLight_GetInfluenceRadius;
 *GetInfluenceRadiusSq = *cspacec::iLight_GetInfluenceRadiusSq;
 *SetInfluenceRadius = *cspacec::iLight_SetInfluenceRadius;
@@ -12640,6 +12647,9 @@ sub CS_ATTN_LINEAR () { $cspacec::CS_ATTN_LINEAR }
 sub CS_ATTN_INVERSE () { $cspacec::CS_ATTN_INVERSE }
 sub CS_ATTN_REALISTIC () { $cspacec::CS_ATTN_REALISTIC }
 sub CS_ATTN_CLQ () { $cspacec::CS_ATTN_CLQ }
+sub CS_LIGHT_POINTLIGHT () { $cspacec::CS_LIGHT_POINTLIGHT }
+sub CS_LIGHT_DIRECTIONAL () { $cspacec::CS_LIGHT_DIRECTIONAL }
+sub CS_LIGHT_SPOTLIGHT () { $cspacec::CS_LIGHT_SPOTLIGHT }
 sub CS_ENGINE_CACHE_READ () { $cspacec::CS_ENGINE_CACHE_READ }
 sub CS_ENGINE_CACHE_WRITE () { $cspacec::CS_ENGINE_CACHE_WRITE }
 sub CS_ENGINE_CACHE_NOUPDATE () { $cspacec::CS_ENGINE_CACHE_NOUPDATE }
