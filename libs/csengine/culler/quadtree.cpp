@@ -459,7 +459,7 @@ void csQuadTree :: Print(void)
   printf("\n");
   // characters to represent the node states.
   char *display = "./?X"; // EMPTY, PARTIAL, UNKOWN, FULL
-  for(int dep=1; dep<max_depth; dep++)
+  for(int dep=1; dep<=max_depth; dep++)
   {
     int dep_prevnodes = ( Pow2( 2*(dep-1) ) - 1 ) / 3;
     // dep_prevnodes is the number of nodes in dep-1 tree.
