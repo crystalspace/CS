@@ -54,41 +54,65 @@ SCF_VERSION (iEvent, 0, 0, 2);
  */
 struct iEvent : public iBase
 {
-  uint8 Type;			// Event type (one of csevXXX)
-  uint8 Category;		// Event cathegory (unused by CSWS)
-  uint8 SubCategory;		// Even finer granularity
-  uint8 Flags;			// Miscelaneous event flags
-  csTicks Time;			// Time when the event occured
+  /// Event type (one of #csevKeyDown etc.)
+  uint8 Type;			
+  /// Event cathegory (unused by CSWS)
+  uint8 Category;		
+  /// Even finer granularity
+  uint8 SubCategory;		
+  /// Miscelaneous event flags
+  uint8 Flags;			
+  /// Time when the event occured
+  csTicks Time;			
   union
   {
     struct
     {
-      int Code;			// Key code
-      int Char;			// Character code
-      int Modifiers;		// Control key state
+      /// Key code
+      int Code;			
+      /// Character code
+      int Char;			
+      /// Control key state
+      int Modifiers;		
     } Key;
     struct
     {
-      int x,y;			// Mouse coords
-      int Button;		// Button number: 1-left, 2-right, 3-middle
-      int Modifiers;		// Control key state
+      /// Mouse coords
+      int x,y;			
+      /**
+       * Button number: 1-left, 2-right, 3-middle 
+       * (higher indices may occur)
+       */
+      int Button;		
+      /// Control key state
+      int Modifiers;		
     } Mouse;
     struct
     {
-      int number;		// Joystick number (1, 2, ...)
-      int x, y;			// Joystick x, y
-      int Button;		// Joystick button number
-      int Modifiers;		// Control key state
+      /// Joystick number (1, 2, ...)	
+      int number;		
+      /// Joystick x
+      int x;
+      /// Joystick y
+      int y;			
+      /// Joystick button number
+      int Button;		
+      /// Control key state
+      int Modifiers;		
     } Joystick;
     struct
     {
-      uint Code;		// Command code
-      void *Info;		// Command info
+      /// Command code	
+      uint Code;		
+      /// Command info
+      void *Info;		
     } Command;
     struct
     {
-      iNetworkSocket2 *From;	// Socket data recieved on
-      iNetworkPacket *Data;	// Packet of data recieved
+      /// Socket data recieved on	
+      iNetworkSocket2 *From;	
+      /// Packet of data recieved
+      iNetworkPacket *Data;	
     } Network;
   };
 };
