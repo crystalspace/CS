@@ -60,6 +60,9 @@ chronological order.
 	  the scan take precedence over those discovered later.  Previously,
 	  VFS stopped searching for configuration information at the first
 	  directory containing a file named vfs.cfg, and loaded only that file.
+	- Eric Sunshine augmented VFS so that it respects the --verbose
+	  command-line option. When given, it emits information about each
+	  vfs.cfg file it has loaded.
 5-Dec-2004
 	- res made the following changes:
 	    - Fixed the Win32 shared library linking.
