@@ -4,7 +4,7 @@ DESCRIPTION.rle = Crystal Space RLE codec
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make rle        Make the $(DESCRIPTION.rle)$"
+  $(NEWLINE)echo $"  make rle          Make the $(DESCRIPTION.rle)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
@@ -47,7 +47,6 @@ TO_INSTALL.DATA +=
 MSVC.DSP += RLE
 DSP.RLE.NAME = rle
 DSP.RLE.TYPE = plugin
-
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
