@@ -2,7 +2,7 @@
 # settings. Also have a look at mk/user.mak.
 
 # Friendly names for building environment
-DESCRIPTION.linux = Linux
+DESCRIPTION.cygnus = Cygnus
 
 # Choose which drivers you want to build/use
 DRIVERS=cs2d/softx cs3d/software csnetdrv/null csnetdrv/sockets \
@@ -25,7 +25,7 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 #PROC=
 
 # Operating system. Can be one of: SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, AMIGAOS, WIN32, OS2, BE
-OS=LINUX
+OS=WIN32
 
 # Compiler. Can be one of: GCC, WCC (Watcom C++), MPWERKS, VC (Visual C++), UNKNOWN
 COMP=GCC
@@ -36,16 +36,16 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 ifeq ($(MAKESECTION),defines)
 
 # Typical extension for executables on this system (e.g. EXE=.exe)
-EXE=
+EXE=.exe
 
 # Typical extension for dynamic libraries on this system.
-DLL=.so
+DLL=.dll
 
 # Typical extension for static libraries
-LIB=.a
+LIB=.lib
 
 # Typical prefix for library filenames
-LIB_PREFIX=lib
+LIB_PREFIX=
 
 # Does this system require libsocket.a?
 NEED_SOCKET_LIB=no
