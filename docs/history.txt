@@ -10,7 +10,17 @@ chronological order.
 	- Peter Amstutz added a check to "scan.cpp" of the software
 	  renderer so that it would not defer a null pointer (and hence crash)
 	  when rendering polygons that have a null lightmap.
-	- Keith Fulton committed 2 more fixes to maya2spr for very simple sprites.
+	- Keith Fulton committed 2 more fixes to maya2spr for very simple
+	  sprites.
+	- Eric Sunshine made the following changes:
+	    - Fixed bug: csArray::DefaultCompareKey() was comparing a void*
+	      against a T (the type with which the template was instantiated).
+	      Clearly, this was bogus.
+	    - Fixed bug: csStringArray::FindSortedKey() was not supplying a
+	      meaningful default comparison function.  It was just comparing
+	      based upon the address in memory at which the string was stored.
+	      Now, by default, it compares via strcmp(), though this can be
+	      overriden by the caller.
 9-Aug-2003
         - Philip Wyett moved int j out of 'for' loop within
           csSpriteCal3DMeshObject::DetachCoreMesh () and fixed compile error.

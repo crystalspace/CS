@@ -34,7 +34,7 @@ public:
 
   static void Destroy (const char** address)
   {
-    delete[] *address;
+    delete[] (char*)*address;
   }
 
   static void InitRegion (const char** address, int count)
@@ -49,14 +49,27 @@ public:
  */
 class csStringArray : public csArray<const char*, csStringArrayElementHandler>
 {
+  typedef csArray<const char*, csStringArrayElementHandler> superclass;
 public:
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csStringArray (int ilimit = 0, int ithreshold = 0)
-  	: csArray<const char*, csStringArrayElementHandler> (ilimit, ithreshold)
+  	: superclass(ilimit, ithreshold)
   {
+  }
+
+  static int CaseSensitiveCompareKey (char const* const& item1, void* p)
+  {
+    char const* item2 = *(char const**)p;
+    return strcmp (item1, item2);
+  }
+
+  static int CaseInsensitiveCompareKey (char const* const& item1, void* p)
+  {
+    char const* item2 = *(char const**)p;
+    return strcasecmp (item1, item2);
   }
 
   static int CaseSensitiveCompare (char const* item1, char const* item2)
@@ -84,7 +97,7 @@ public:
    */
   void Sort (ArraySortCompareFunction* compare)
   {
-    csArray<const char*, csStringArrayElementHandler>::Sort (compare);
+    superclass::Sort (compare);
   }
 
   /**
@@ -92,11 +105,23 @@ public:
    */
   void Sort ()
   {
-    csArray<const char*,
-    	csStringArrayElementHandler>::Sort (CaseSensitiveCompare);
+    superclass::Sort (CaseSensitiveCompare);
   }
 
-  /// Pop an element from tail end of array.
+  /**
+   * Find an element based on some key, using a csArrayCompareKeyFunction.
+   * The array must be sorted. Returns -1 if element does not exist.
+   */
+  int FindSortedKey (void* key, ArrayCompareKeyFunction* comparekey
+    = CaseSensitiveCompareKey, int* candidate = 0) const
+  {
+    return superclass::FindSortedKey(key, comparekey, candidate);
+  }
+
+  /**
+   * Pop an element from tail end of array.  Caller is responsible for
+   * invoking delete[] on the returned string when no longer needed.
+   */
   char* Pop ()
   {
     CS_ASSERT (Length () > 0);

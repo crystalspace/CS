@@ -328,8 +328,9 @@ public:
   }
 
   /// The default ArrayCompareKeyFunction for FindKey()
-  static int DefaultCompareKey (T const &item1, void *item2)
+  static int DefaultCompareKey (T const &item1, void* p)
   {
+    T const& item2 = *(T const*)p;
     if (item1 < item2) return -1;
     else if (item1 > item2) return 1;
     else return 0;
@@ -340,7 +341,7 @@ public:
    * The array must be sorted. Returns -1 if element does not exist.
    */
   int FindSortedKey (void* key, ArrayCompareKeyFunction* comparekey
-    = DefaultCompareKey, int *candidate = 0) const
+    = DefaultCompareKey, int* candidate = 0) const
   {
     int m = 0, l = 0, r = Length () - 1;
     while (l <= r)
