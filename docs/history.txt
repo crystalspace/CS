@@ -25,9 +25,24 @@ The history order is reversed so that new features are at the top.
 	  added missing entries.
 	- Updated docs so that it no longer says CS only works with
 	  Python 1.5.2.
-	- Matze changed aws to use bison/flex if present
+	- Matze changed aws to use bison/flex if present.
 	- Matze included a hacked flex skeleton file to avoid an msvc error,
-  	  where it can't find unistd.h
+  	  where it can't find unistd.h.
+	- Philip Wyett updated links in msvc documentation to correspond
+	  with location of latest msvc_libs.
+	- Philip also added necessary instructions for building CS Python
+	  plugin with versions of Python above 1.5.2.
+	- Additionally Philip reports:
+	    - Removed *.flx and *.bsn files showing up in the AWS MSVC project.
+	      This is no longer needed after MatzeB adding of flex skeleton and
+	      no longer needed for custom build step within MSVC.
+	    - Updated docs to take account of AWS/Flex changes made by MatzeB
+	      and added instructions for re-generating sllex.cpp etc. from the
+	      command line rather than from inside MSVC.
+	  This makes dealing with AWS and MSVC alot easier - Thanks Matze. :-)
+	- Philip also added info about Creative EAX 2.0 to MSVC build docs
+	  with link to Creative developers website from where the SDK can
+	  be obtained.
 5-Jan-2002
 	- Fixed a bug with the OpenGL renderer where it was trying to
 	  store a value of 0, 1, or 2 in a boolean :-)
@@ -37,6 +52,8 @@ The history order is reversed so that new features are at the top.
 4-Jan-2002
 	- Eric Sunshine fixed a bad booboo from some time ago which clobbered
 	  csTimer by mutating it into csTicksr.
+	- Matze added python.cex to 'make install'.
+	- Wouter Wijngaards fixed a spelling error in python.cin.
 3-Jan-2002
 	- Fixed a bug with the portal console command so that the
 	  portal back to the original level is now correct.
@@ -65,6 +82,15 @@ The history order is reversed so that new features are at the top.
 	  routines. They both would handle the portal clip plane inverted
 	  which means that objects were culled wrong. The best place to
 	  see this bug was to do 'portal sydney' in the console of WalkTest.
+	- Matze did a small hack to cspython.mak so it links with -util if
+	  python lib matches python2%.
+	- 'res' did the following on the OpenGL renderer:
+	    - When using keycolored textures, z buffer is only used for
+	      non-transparent pixels.
+	    - Slight visual improvement of keycolored textures w/ bilinear
+	      filtering.
+	    - Fixed bug "Using software renderer proctexes with OpenGL causes
+	      a crash".
 1-Jan-2002
 	- Fixed bug [497461] from sf.net. This bug prevented joystick
 	  button handling to work properly. Reported by J.F. Miller.
@@ -74,6 +100,11 @@ The history order is reversed so that new features are at the top.
 	    - Overfull and underfull `hbox' warnings from TeX.
 	    - Invalid use of @c comment on first line of cs-unix.txi,
 	      cs-mac.txi, and cs-dos.txi.
+	- 'res' updated a few places in CS so that a default image is used
+	  when an image file cannot be loaded:
+	    - An image file can't be loaded.
+	    - A NULL image is registered with the software and OpenGL texture
+	      managers.
 31-Dec-2001
 	- Got a patch from Tobias Brueckner <tobias.brueckner@gmx.net> which
 	  does the following:
@@ -94,18 +125,79 @@ The history order is reversed so that new features are at the top.
 	- Since the implementation of CollidePath() in RAPID plugin was
 	  SO extremely slow I reimplemented it completely. It appears that
 	  generating colliders at real-time is not an option at all.
+	- Philip Wyett added debug information switch /ZI which I forgot
+	  to add after removing /Zi yesterday. Thanks to 'res' for pointing
+	  this out.
+	- 'res' updated the Ascii Art canvas to work with aalib 1.4rc4.
 30-Dec-2001
 	- Fixed iPolygonMesh implementation in csThing so that it will
 	  check if the parent array of object-space vertices is still
 	  valid. If not it will recompute.
+	- Philip Wyett reports:
+	    - Removed MSVC compiler switch '/Zi' from CS. This switch is
+	      known to be the cause of both compiler and linker lockups
+	      in complex code and some assembler code.
+	    - Removed generic MSVC compiler optimization switches for
+	      more specific and controlable ones. This offers the ability
+	      for tweaks as you will see (/Ob2) if you attempt todo a MSVC
+	      'Release' build of the cvs code and the current 6000+
+	      warnings you will recieve. :-) Do not be frightened this
+	      is an optimization where MSVC performs pure inline expansion
+	      and also chooses functions which are not marked as inline
+	      or __inline and inlines them itself if they meet it's inlining
+	      criteria.
+	      Note: This warning will be eliminated for Crystal Space
+	      releases as to not disturb or confuse folks.
+	      The addition of the above is being done in the run up
+	      to CS 1.0 for optimization work on the MSVC port and CS
+	      generally.
+	      Other optimization switches now being employed are:
+		/Og - Global optimizations.
+		/Oi - Generate Intrinsic Functions.
+		/Ot - Favor Fast Code; Default.
+		/Oy - Frame-Pointer Omission
+	- 'res' did a small fix to awswin.cpp: engine view background now
+	  works correctly with single pt canvas too.
+29-Dec-2001
+	- 'res' did a fix to compile awslistbx.cpp on msvc.
 28-Dec-2001
 	- Small change to the scripting cs.i file so that it no longer
 	  includes from plugins/csscript/cspython.
 	- Added the ability to actually use the colon for specifying
 	  non-standard tag names in RequestPlugins. You can now do:
 	      CS_REQUEST_PLUGIN ("pluginname:alternative_tag", iWhatever)
-        - Matze fixed python makefile
-	- Matze added python.cex that makes cs-config output python settings
+        - Matze fixed python makefile.
+	- Matze added python.cex that makes cs-config output python settings.
+	- Matze also changed 'make all' so that it builds cs-config.
+	- Christopher Nelson did:
+	    - Updated some docs on the slot mechanism.  
+	    - Fixed a bug in scrollbar that caused the value to inc and dec
+	      each time.
+	    - Fixed scrolling in listbox so that it actually works without
+	      crashing the system. It was a stupid casting bug. Casting an
+	      unassigned variable to itself. Dumb dumb dumb.  
+	    - Note that there is an "issue" with scrolling where children
+	      begin on the far left when they become the root of the display.
+	      Further parents down the list are not left justified a similiar
+	      amount, so it can generate confusion when scrolling. Hopefully
+	      I'll have this bug fixed soon.
+	    - Made another fix to the list box. The list should now scroll
+	      correctly (well, mostly). There is still a slight bug that is
+	      somehow related to being the child of a child with children.
+	      It's annoying, but not fatal.
+	    - Scrollbars now have a moving knob. While they do have a
+	      provision for proportional sizing, this option is not
+	      implemented yet.
+	    - Added proportional scrolling to the scrollbar. The listbox now
+	      makes use of this. Note that proportional scrolling will look
+	      not quite perfect if the list is almost exactly the same size as
+	      what can fit in the box. This is due to round-off error I
+	      suspect.
+	    - Added scrollbar to component manager so that they can be created
+	      via the normal .def files. There is currently no documentation
+	      at all on scrollbars. Sorry.
+	    - Modified test app to be a little more thorough in testing the
+	      listbox.
 27-Dec-2001
 	- Added a new csStringSet::Request() which can return the string
 	  based on the ID (i.e. exactly the opposite of the old Request()
@@ -126,11 +218,92 @@ The history order is reversed so that new features are at the top.
 	- removed the type UByte,SByte, UShort,SShort, ULong,SLong, UInt, 
 	  SInt, uchar, ushort and ulong and substituted code with the
 	  corresponding intxx types.
+	- Philip Wyett reports: standardized and optimized methods
+	  'operator /' and 'operator /=' in csVector2 and csVector3.
+	  (Done by T. Michaels, Red Eye Entertainment)
+	- Matze did the following:
+	    - Reverted EventHandler changes in standard input console
+	      since there was no Event handler in Console plugin before.
+	    - Fix for perfstat plugin.
+	    - Fixed the OpenGL renderer. The parent OpenGL class
+	      didn't have a ref to pluginmanager anymore.
+            - Fixed SCF_DEBUG to work correctly with embeded interfaces
+            - Fixed some compiler warnings
+            - Fixed definition of int32 and uint32 should be long not int
+            - Removed the type UByte, SByte, UShort, SShort, ULong, SLong,
+	      UInt, SInt, uchar, ushort and ulong and substituted code with
+	      the corresponding intxx types.
+	- Christopher Nelson did the following:
+	    - Added scroll bar widget (finally). The widget is untested and is
+	      not yet enabled in the common components part of the window
+	      manager. It uses a number of somewhat experimental features of
+	      AWS, so it's probably horribly broken somehow. The scrollbar
+	      widget is a good example of using:
+		(1) awsKeyFactory
+		(2) embedded sinks
+		(3) manual triggers
+		(4) embedded components
+	    - Added a new function to the awsKeyFactory called GetNode.
+	    - Fixed a silly bug in awsImageView.
+	    - Added new scrollbar widget images.
+	    - Update standard skin definition to support scrollbar skins.
+	    - Beginnings of scrollbar code for listbox.
+	    - Had to add a couple of new skin parameters: ScrollBarWidth,
+	      ScrollBarHeight, otherwise we have a chicken and egg problem.
+	    - Did some more component embedding work on the list box.
+	    - Fixed some embedding stuff to work right.
+	    - Added a new event called OnAdded() which is called after a
+	      component child is added to it's parent.
+	    - Finished embedding scrollbar in listbox.
+	    - Made buttons work and look right in listbox.
+	    - Listbox still does not scroll.
+	    - Did a LOT more work on making scrolling work with the listbox.
+	      This is complex because the listbox is hierarchical and does not
+	      lie flat lie a good doggy. To remedy this I've had to create an
+	      indexing function which creates a map of all the visible
+	      elements of the list. This map is used for scrolling, and is
+	      only updated when the list is expanded, contracted, or elements
+	      are added or deleted. Not that scrolling still does not work
+	      right, and attempting to scroll crashes the test harness.
+	- The RedEye Team corrected compile error generating typo:
+	    scfiEventHandler-DecRef();
+	  is now:
+	    scfiEventHandler->DecRef();
+26-Dec-2001
+	- Matze fixed an issue with cs-config --makevars, if $@ is in
+	  a var.
+	- Christopher Nelson did the following:
+	    - Added comment to evdefs so people know what csevFrameStart is.
+	    - Added a new action called ClearList() that deletes an entire
+	      list (recursively) and makes sure to free it's rows and columns.
+	      This implementation should be leak-clean, but the code is
+	      currently untested.
+	    - Added new widget: awsImageView. The idea behind this widget is
+	      to display an image. It also supports full even redirection of
+	      OnMouseUp, OnMouseDown, OnMouseClicked, and OnMouseMoved.
+	      The point behind this widget is to allow you to make 2D paint
+	      kind of apps by displaying a texture hooked up to a proctex.
+	      I added this b/c of my landscape editor, and I think that it
+	      will be universally useful.  
+	    - No, no scrollbars yet.
+	- Matze fixed a typo in util.cpp.
 25-Dec-2001
 	- Matze had nothing to do and fixed hundreds of compiler warnings
 	  in aws.
 	- Jorrit had nothing to do and fixed Matze's history entry above
 	  :-)
+	- Matze also fixed plugin linking on linux.
+24-Dec-2001
+	- Christopher Nelson did the following:
+	    - Added DeleteItem and GetSelectedItem methods to listbox.
+	    - Added scripting helpers.
+	    - Added a new event calle OnFrame, which is called each time the
+	      frame refreshes.
+22-Dec-2001
+	- Philip Wyett updated cal3d in msvc_libs to current cvs to allow
+	  successful compilation of latest changes in caltocs. Use the link
+	  below to get the latest version.
+	  ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.92b.zip
 21-Dec-2001
 	- Fixed the JPG loader so that it actually fails instead of just
 	  hanging on JPG images that are too short.
@@ -144,6 +317,7 @@ The history order is reversed so that new features are at the top.
 	  first image to scale all the others too if multiple images
 	  where given and scaling is enabled.
 	- Fixed a potential overflow bug in the jpg image loader.
+	- 'res' did a small fix to the PNG image loader.
 20-Dec-2001
 	- Fixed gfxtest so it will actually write out the PNG file correctly
 	  on windows (i.e. use binary mode for writing the file).
@@ -151,6 +325,30 @@ The history order is reversed so that new features are at the top.
 	  size will then be calculated proportionally.
 	- Added the ability to add a filename after -S or --save option so
 	  you can give the filename it should use.
+	- Philip Wyett changed the output exe's name of picview to
+	  picview.exe for clarity.
+	- Philip also updated msvc_libs external libs package to include cal3d
+	  0.6. Use the following link to download.
+	    ftp://ftp.sunsite.dk/projects/crystal/support/win32/
+	    msvc_libs_0.92a.zip
+	- Matze improved cs-config to read .cex files. Not fully finished
+	  as it only reads them from the current dir at the moment.
+	- Brandon Ehle updated cal3dtocs to work with cal3d 0.7.
+	- Christopher Nelson did the following:
+	    - Added the ability to make a window display a view onto an
+	      engine as it's background.
+	    - Added a new simple window def so that I can demonstrate this
+	      functionality.
+	    - Added engine view to test app.
+	    - Fixed panning bug by setting perspective center.
+	    - Also added field of view so it tries to draw correctly for the
+	      window.
+	- 'res' did a small crash fix to the standard output console.
+	- 'res' also updated awstodo.txt.
+	- 'res' fixed a typo in awstest.cpp.
+	- Matze finised cs-config additions.
+	- Norman Kramer fixed caltocs so that it only compiles if setup found
+	  cal3d/cal3d.h include.
 19-Dec-2001
 	- Rationalized the far plane in the camera:
 	    - Removed the special csFarPlane class in the engine and instead
@@ -181,18 +379,86 @@ The history order is reversed so that new features are at the top.
 	  to calculate lighting anymore for (potentially non-existant)
 	  gouraud shaded polygons.
 	- Matze inlined constructor of csMatrix3 in the hope to speed it up a
-	  bit (no tests made).
+	  bit (no tests made). Also did a small change to csVector3
+	  constructors.
+18-Dec-2001
+	- Brandon Ehle added cal3dtocs application to CS. This application
+	  relies on an external library (cal3d). This converts cal3d
+	  skeleton-meshes and animations to LIBRARY files that load sprite3ds
+	  and motions. I have some modifications to cal3d that I need to get
+	  in, and I will post those patches on the SourceForge patch page
+	  until they are in cal3d cvs.^
+16-Dec-2001
+	- Norman Kramer added CS_QUERY_REGISTRY_TAG_INTERFACE macro.
+	- Norman also added SSE detection bit to cpuid.h.
+15-Dec-2001
+	- Norman Kramer provided a solution for opengl implementations with
+	  no ability to determine the address of EXT/ARB functions at runtime.
+	  Those should have CSGL_EXT_STATIC_ASSERTION defined and have to
+	  enable the supported extensions in extstat.h.
+	- Matze optimized Makefile.template by using := instead of =, which
+	  results in only 1 call of cs-config.
 14-Dec-2001
 	- Reverted a patch from 'res' on the OpenGL windows canvas
 	  related to the calculation of 'wwidth' and 'wheight'. This
 	  patch caused OpenGL to stop working correctly for me (ATI card).
 	  Don't know the reason though.
+	- 'res' did a window style change in the Windows/OpenGL canvas.
+	- Christopher Nelson did the following:
+	    - Created a new class called aws3DFrame which encapsulates the
+	      "built-in" frame types that most components use. Having this
+	      code in one class reduces the amount of extra code in the
+	      system, and also allows me to more easily fix bugs in frame
+	      implementations.
+	    - Modified the GroupFrame and ListBox to use this new method.
+	    - Added clipping constraints for rect region.
+	    - Fixed the crashing bug under the software renderer. This was
+	      caused by clipping to the software context's width and height.
+	      I fixed it by clipping to the software context's width-1 and
+	      height-1.
+	    - Add awsClipper. This is simply a utility package and lets you
+	      write a little more efficient code by clipping all drawing
+	      operations to the clipping rectangle passed into your OnDraw
+	      function. The window frame and a couple of other operations now
+	      use this. I'm not sure it does any good, so it may be removed in
+	      the future.
+	    - Caused the dirty, updatestore, and erase regions to be clipped
+	      to the correct screen coords. This probably doesn't do anything,
+	      but it was done in my search to discover the software clipping
+	      bug. It may sometimes be more efficient, and it may keep certain
+	      bugs from happening. It may also keep regions sane.
+	    - Added the manual key creation mechanism.
+	- Brandon Ehle did the following:
+	    - Fixed a stack overflow in MSVC when loading an object with a lot
+	      of limbs in its bone hierarchy.
+	    - Added '%n' to csScanStr to support the above.
 13-Dec-2001
 	- Applied a patch from Peter Amstutz <tetron@student.umass.edu>
 	  which allows csMovable to operate nicely even if there is no
 	  attached mesh object (i.e. mesh object == NULL).
 	- Bumped up version to 0.93.
 	- Fixed simplept from crashing with -help parameter.
+	- Christopher Nelson did the following:
+	    - Added a new canvas to AWS: awsScreenCanvas.
+	    - Added a new method: CreateCustomCanvas().
+	    - Used with a new flags AWSF_AlwaysRedrawWindows these two
+	      functions allow you to draw straight to the screen with OR
+	      without the engine. Note that if the engine is not drawing in
+	      the background, then you should also set the
+	      AWSF_AlwaysEraseWindows flag. Also note that if the engine is
+	      NOT drawing in the background, this will not work quite
+	      correctly. I still need to make a way to setup the background
+	      color or bitmap for the engine to erase to.  
+	    - Modified the test app to support drawing directly to the screen.
+	    - Small crash fix to awscspt.cpp.
+	    - Temporary hack to work around an OpenGL renderer bug. AWS
+	      works now with OpenGL.
+	- 'res' did a small change of window style to the Windows canvas.
+	- Brandon Ehle did the following:
+	    - Motion manager import from 3D Studio MAX is now working.
+	    - Fixed a couple bugs with interpolation and looping.
+	    - Enabled interpolation by default, eventually need to abstract
+	      this' in the API.
 12-Dec-2001
 	- Bumped up version for pending 0.92 release.
 	- Added GetLogicalParent() and SetLogicalParent() functions
@@ -239,14 +505,20 @@ The history order is reversed so that new features are at the top.
 	  simply crash.
 	- 'res' fixed aws so that it doesn't require source files from
 	  outside its directory. Also added transparency.
+	- 'res' did a small fix to the OpenGL procedural textures.
 	- Fixed fire proc texture.
 	- Luca Pancallo fixed 3ds2lev for real.
 	- Fixed a bug in things when polygons were split. This caused
 	  mazedex to crash.
 	- Martin Geisse removed some of the typed vector macros which were
-	  not really needed. Martin also added documenation about typed
+	  not really needed. Martin also added documentation about typed
 	  vectors.
 	- Release of CS 0.92r001.
+	- Brandon Ehle did the following:
+	    - Partial motion manager rewrite. The new architecture accomplishes
+	      all of what the old architecture could do, but faster, and in a
+	      more easily expandable way.
+	    - Doxygen documentation for motion manager.
 11-Dec-2001
 	- Thanks to Matze we finally got debugging to work properly with
 	  cygwin and mingw ports. In the past there was no useful debug
