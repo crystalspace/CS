@@ -66,8 +66,7 @@ DSP.WIN32SYS.RESOURCES = \
   libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp \
-  libs/cssys/general/runloop.cpp \
-  libs/cssys/general/sysinit.cpp
+  libs/cssys/general/runloop.cpp
 
 # grpall -- represents all other projects indirectly through grpapps,
 # grpplugins, and grplibs.

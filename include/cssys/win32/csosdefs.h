@@ -20,11 +20,6 @@
 #ifndef __CSOSDEFS_H__
 #define __CSOSDEFS_H__
 
-// So many things require this. IF you have an issue with something defined
-// in it then undef that def here.
-#include <windows.h>
-#include <malloc.h>
-
 #if defined(COMP_VC)
   #pragma warning(disable:4291)   // no matching operator delete found
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
@@ -49,6 +44,11 @@
   #pragma inline_recursion (on)
   #pragma auto_inline (on)
 #endif
+
+// So many things require this. IF you have an issue with something defined
+// in it then undef that def here.
+#include <windows.h>
+#include <malloc.h>
 
 #if defined(COMP_VC)
   typedef __int64 int64_t;

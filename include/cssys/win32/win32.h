@@ -19,102 +19,40 @@
 #ifndef __CS_WIN32_H__
 #define __CS_WIN32_H__
 
-#ifdef COMP_BC
-#  ifndef __CSOSDEFS_H__
-#     error csosdefs.h should be included before win32.h
-#  endif
+#ifndef __CSOSDEFS_H__
+#  error csosdefs.h should be included before "cssys/win32.h"
 #endif
 
 #include "csutil/scf.h"
-#include "cssys/win32/winhelp.h"
-#include "iutil/event.h"
-#include "iutil/eventh.h"
-#include <objbase.h>
 
-#include "cssys/system.h"
-#include "csutil/csinput.h"
+#define CS_WIN32_WINDOW_CLASS_NAME "CrystalSpaceWin32"
 
-class SysSystemDriver;
-struct iObjectRegistry;
-struct iConfigManager;
+SCF_VERSION (iWin32Assistant, 0, 0, 3);
 
 /**
- * Implementation class for iWin32Helper.
+ * This interface describes actions specific to the Windows platform.
+ * An instance of this object will be registered to the object registry
+ * with tag `iWin32Assistant'.
  */
-class Win32Helper : public iWin32Helper
+struct iWin32Assistant : public iBase
 {
-private:
-  SysSystemDriver* sys;
-
-public:
-  Win32Helper (SysSystemDriver* sys);
-  virtual ~Win32Helper ();
-
-  SCF_DECLARE_IBASE;
-  virtual bool SetCursor (int cursor);
-  virtual HINSTANCE GetInstance () const;
-  virtual bool GetIsActive () const;
-  virtual int GetCmdShow () const;
+  /// Returns the HINSTANCE of the program
+  virtual HINSTANCE GetInstance () const = 0;
+  /// Returns true if the program is 'active', false otherwise.
+  virtual bool GetIsActive () const = 0;
+  /// Gets the nCmdShow of the WinMain().
+  virtual int GetCmdShow () const = 0;
+  /// Set the mouse shape.
+  virtual bool SetCursor (int cursor) = 0;
 };
 
-/// Windows system driver
-class SysSystemDriver : public csSystemDriver, public iEventPlug
+// @@@ Delete everything below when the system driver is removed.
+#include "cssys/system.h"
+struct iObjectRegistry;
+class SysSystemDriver : public csSystemDriver
 {
 public:
-  SysSystemDriver (iObjectRegistry* object_reg);
-  virtual ~SysSystemDriver ();
-
-  /// Returns the HINSTANCE of the program
-  HINSTANCE GetInstance() const;
-  /// Returns true if the program is 'active', false otherwise.
-  bool GetIsActive() const;
-  /// Gets the nCmdShow of the WinMain().
-  int GetCmdShow() const;
-
-  /// @@@ CURRENTLY BROKEN!!!
-  virtual void SetSystemDefaults (iConfigManager *Config);
-
-  /// @@@ CURRENTLY BROKEN!!!
-  virtual void Help ();
-
-  virtual bool Initialize ();
-
-  /// Function for Win32Helper to set the cursor.
-  void SetWinCursor (HCURSOR cur)
-  {
-    m_hCursor = cur;
-    SetCursor (cur);
-  }
-
-  bool HandleEvent (iEvent& e);
-
-  //------------------------ iEventPlug interface ---------------------------//
-  SCF_DECLARE_IBASE_EXT (csSystemDriver);
-
-  virtual unsigned GetPotentiallyConflictingEvents ()
-  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
-  virtual unsigned QueryEventPriority (unsigned /*iType*/)
-  { return 100; }
-
-  struct eiEventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (SysSystemDriver);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent (e); }
-  } scfiEventHandler;
-
-private:
-  static long FAR PASCAL WindowProc (HWND hWnd, UINT message,
-    WPARAM wParam, LPARAM lParam);
-
-  HCURSOR m_hCursor;
-#ifdef DO_DINPUT_KEYBOARD
-  HANDLE m_hEvent;
-  HANDLE m_hThread;
-  friend DWORD WINAPI s_threadroutine(LPVOID param);
-#endif
-
-  bool need_console;
+  SysSystemDriver(iObjectRegistry* r) : csSystemDriver(r) {}
 };
 
 #endif // __CS_WIN32_H__
-

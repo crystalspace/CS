@@ -25,7 +25,7 @@
 #include "oglg2d.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "cssys/win32/winhelp.h"
+#include "cssys/win32/win32.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -217,7 +217,7 @@ csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent) :
                    csGraphics2DGLCommon (iParent),
                    m_nGraphicsReady(true),
                    m_hWnd(NULL),
-                   m_piWin32System(NULL),
+                   m_piWin32Assistant(NULL),
                    m_bPalettized(false),
                    m_bPaletteChanged(false)
 {
@@ -226,7 +226,7 @@ csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent) :
 
 csGraphics2DOpenGL::~csGraphics2DOpenGL(void)
 {
-  m_piWin32System->DecRef ();
+  m_piWin32Assistant->DecRef ();
   m_nGraphicsReady=0;
 }
 
@@ -250,13 +250,14 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
-  m_piWin32System = CS_QUERY_REGISTRY (object_reg, iWin32Helper);
-  if (!m_piWin32System)
-      SystemFatalError ("csGraphics2DDDraw3::Open(QI) -- system passed does not support iWin32Helper.");
+  m_piWin32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
+  if (!m_piWin32Assistant)
+      SystemFatalError ("csGraphics2DDDraw3::Open(QI) -- system passed does not support iWin32Assistant.");
+  m_piWin32Assistant->IncRef();
   
   // Get the creation parameters //
-  m_hInstance = m_piWin32System->GetInstance();
-  m_nCmdShow  = m_piWin32System->GetCmdShow();
+  m_hInstance = m_piWin32Assistant->GetInstance();
+  m_nCmdShow  = m_piWin32Assistant->GetCmdShow();
 
   if (Depth == 8)
   {
@@ -366,13 +367,13 @@ bool csGraphics2DOpenGL::Open()
 
   if (FullScreen)
   {
-	  m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME, win_title, 
+	  m_hWnd = CreateWindowEx(exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, 
 		style, CW_USEDEFAULT, CW_USEDEFAULT, wwidth, wheight,
 		NULL, NULL, m_hInstance, NULL);
   }
   else
   {
-	  m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME, win_title, style,
+	  m_hWnd = CreateWindowEx(exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style,
 		(GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
 		(GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
 		wwidth, wheight, NULL, NULL, m_hInstance, NULL );

@@ -16,16 +16,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdarg.h>
-
 #include "cssysdef.h"
-#include "cssys/system.h"
 #include "cssys/win32/win32.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
-
+#include <stdarg.h>
 #include <windows.h>
 
 #ifdef DO_DINPUT_KEYBOARD
@@ -47,8 +45,8 @@
 // Cygwin doesn't understand _argc or _argv, so we define them here.
 // These are borrowed from Mingw32 includes (see stdlib.h)
 // Cygwin Purists, forgive the corruption, Cygwin means Cygnus for Win32.
-extern int	_argc;
-extern char**	_argv;
+extern int _argc;
+extern char** _argv;
 #endif
 
 bool ApplicationActive = true;
@@ -61,22 +59,6 @@ void SystemFatalError (char *s)
   MessageBox(NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
   exit (1);
 }
-
-// @@@ Get rid of this!
-static SysSystemDriver* System = NULL;
-static iEventOutlet *EventOutlet = NULL;
-
-static void CreateEventOutlet (iObjectRegistry* object_reg, iEventPlug* ep)
-{
-  if (!EventOutlet)
-  {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-    CS_ASSERT (q != NULL);
-    EventOutlet = q->CreateEventOutlet (ep);
-  }
-}
-
-//-----------------------------------------------// The System Driver //------//
 
 #ifdef DO_DINPUT_KEYBOARD
 
@@ -176,7 +158,6 @@ DWORD WINAPI s_threadroutine (LPVOID param)
   int i,lastkey = -1;
 #ifndef DI_USEGETDEVICEDATA
   char *oldbuffer = NULL;
-#else
 #endif
   LPDIRECTINPUT lpdi = NULL;
   LPDIRECTINPUTDEVICE lpKbd = NULL;
@@ -184,20 +165,19 @@ DWORD WINAPI s_threadroutine (LPVOID param)
   LPDIRECTINPUTDEVICE lpMouse = NULL;
 
   HANDLE hEvent [2];
-//  HANDLE hevtMouse;
 
   CHK_FAILED (DirectInputCreate (ModuleHandle, DIRECTINPUT_VERSION, &lpdi, NULL));
   CHK_FAILED (lpdi->CreateDevice (GUID_SysKeyboard, &lpKbd, NULL));
   CHK_FAILED (lpKbd->SetDataFormat (&c_dfDIKeyboard));
   CHK_FAILED (lpKbd->SetCooperativeLevel (FindWindow (WINDOWCLASSNAME, NULL),
-									  DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
+    DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
 
   //Setup for directinput mouse code
-  /*
+#if 0
   CHK_FAILED(lpdi->CreateDevice (GUID_SysMouse, &lpMouse, NULL));
   CHK_FAILED(lpMouse->SetDataFormat(&c_dfDIMouse));
   CHK_FAILED(lpMouse->SetCooperativeLevel(FindWindow (WINDOWCLASSNAME, NULL),
-									  DISCL_EXCLUSIVE | DISCL_FOREGROUND));
+    DISCL_EXCLUSIVE | DISCL_FOREGROUND));
   hevtMouse = CreateEvent(0, 0, 0, 0);
   CHK_FAILED(lpMouse->SetEventNotification(g_hevtMouse));
   DIPROPDWORD dipdw =
@@ -211,7 +191,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
           DINPUT_BUFFERSIZE,              // dwData
       };
   CHK_FAILED(lpMouse->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph));
-  */
+#endif
 
 #ifdef DI_USEGETDEVICEDATA
   {
@@ -421,20 +401,78 @@ DWORD WINAPI s_threadroutine (LPVOID param)
 #undef CHK_FAILED
 #endif // DO_DINPUT_KEYBOARD
 
-SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
-  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (SysSystemDriver::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
-	: csSystemDriver (object_reg)
+class Win32Assistant : public iWin32Assistant, iEventPlug, iEventHandler
 {
-  System = this;
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
+private:
+  iObjectRegistry* registry;
+  bool need_console;
+  HCURSOR m_hCursor;
+  iEventOutlet* EventOutlet;
+  void SetWinCursor (HCURSOR);
+  iEventOutlet* GetEventOutlet();
+  static long FAR PASCAL WindowProc (HWND hWnd, UINT message,
+    WPARAM wParam, LPARAM lParam);
+#ifdef DO_DINPUT_KEYBOARD
+  HANDLE m_hEvent;
+  HANDLE m_hThread;
+  friend DWORD WINAPI s_threadroutine(LPVOID param);
+#endif
+public:
+  SCF_DECLARE_IBASE;
+  Win32Assistant (iObjectRegistry*);
+  virtual ~Win32Assistant ();
+  virtual void Shutdown();
+  virtual HINSTANCE GetInstance () const;
+  virtual bool GetIsActive () const;
+  virtual int GetCmdShow () const;
+  virtual bool SetCursor (int cursor);
+  virtual bool HandleEvent (iEvent&);
+  virtual unsigned GetPotentiallyConflictingEvents ();
+  virtual unsigned QueryEventPriority (unsigned);
+};
+
+static Win32Assistant* GLOBAL_ASSISTANT = 0;
+
+SCF_IMPLEMENT_IBASE (Win32Assistant)
+  SCF_IMPLEMENTS_INTERFACE (iWin32Assistant)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
+
+bool csPlatformStartup(iObjectRegistry* r)
+{
+  Win32Assistant* a = new Win32Assistant(r);
+  bool ok = r->Register (static_cast<iWin32Assistant*>(a), "iWin32Assistant");
+  if (ok)
+    GLOBAL_ASSISTANT = a;
+  else
+  {
+    a->DecRef();
+    fprintf (stderr, "FATAL: Failed to register iWin32Assistant!\n");
+  }
+  return ok;
+}
+
+bool csPlatformShutdown(iObjectRegistry* r)
+{
+  if (GLOBAL_ASSISTANT != 0)
+  {
+    r->Unregister(
+      static_cast<iWin32Assistant*>(GLOBAL_ASSISTANT), "iWin32Assistant");
+    GLOBAL_ASSISTANT->Shutdown();
+    GLOBAL_ASSISTANT->DecRef();
+    GLOBAL_ASSISTANT = 0;
+  }
+  return true;
+}
+
+Win32Assistant::Win32Assistant (iObjectRegistry* r) :
+  need_console(false), EventOutlet(0)
+{
+  SCF_CONSTRUCT_IBASE(0);
+
+  registry = r;
+  registry->IncRef();
 
   if (ModuleHandle == NULL)
     ModuleHandle = GetModuleHandle(NULL);
@@ -443,7 +481,7 @@ SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
   wc.hCursor        = NULL;
   wc.hIcon          = LoadIcon (NULL, IDI_APPLICATION);
   wc.lpszMenuName   = NULL;
-  wc.lpszClassName  = WINDOWCLASSNAME;
+  wc.lpszClassName  = CS_WIN32_WINDOW_CLASS_NAME;
   wc.hbrBackground  = 0;
   wc.hInstance      = ModuleHandle;
   wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
@@ -451,54 +489,57 @@ SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
   wc.cbClsExtra     = 0;
   wc.cbWndExtra     = 0;
 
-  need_console = false;
-
   bool bResult;
   bResult = RegisterClass (&wc);
   ASSERT (bResult);
   m_hCursor = LoadCursor (0, IDC_ARROW);
 
-  Win32Helper* winhelper = new Win32Helper (this);
-  if (!object_reg->Register (winhelper, "iWin32Helper"))
-  {
-    printf ("Could not register iWin32Helper!\n");
-    exit (0);
-  }
+  iEventQueue* q = CS_QUERY_REGISTRY (registry, iEventQueue);
+  CS_ASSERT (q != NULL);
+  q->RegisterListener (this, CSMASK_Nothing | CSMASK_Broadcast);
 }
 
-SysSystemDriver::~SysSystemDriver ()
+Win32Assistant::~Win32Assistant ()
 {
-  if (EventOutlet)
-  {
-    EventOutlet->DecRef ();
-    EventOutlet = NULL;
-  }
-
+  if (EventOutlet != 0)
+    EventOutlet->DecRef();
   if (need_console)
     FreeConsole();
-
-  System = NULL;
-
-  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  if (event_queue)
-    event_queue->RemoveListener (&scfiEventHandler);
 }
 
-bool SysSystemDriver::Initialize ()
+void Win32Assistant::Shutdown()
 {
-  if (!csSystemDriver::Initialize ()) return false;
-
-  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  CS_ASSERT (event_queue != NULL);
-  event_queue->RegisterListener (&scfiEventHandler,
-  	CSMASK_Nothing | CSMASK_Broadcast);
-
-  return true;
+  iEventQueue* q = CS_QUERY_REGISTRY (registry, iEventQueue);
+  if (q != 0)
+    q->RemoveListener(this);
 }
 
-bool SysSystemDriver::HandleEvent (iEvent& e)
+void Win32Assistant::SetWinCursor (HCURSOR cur)
 {
-  if (e.Type != csevBroadcast) return false;
+  m_hCursor = cur;
+  ::SetCursor (cur);
+}
+
+unsigned Win32Assistant::GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+unsigned Win32Assistant::QueryEventPriority (unsigned /*iType*/)
+  { return 100; }
+
+iEventOutlet* Win32Assistant::GetEventOutlet()
+{
+  if (EventOutlet == 0)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(registry, iEventQueue);
+    if (q != 0)
+      EventOutlet = q->CreateEventOutlet(this);
+  }
+  return EventOutlet;
+}
+
+bool Win32Assistant::HandleEvent (iEvent& e)
+{
+  if (e.Type != csevBroadcast)
+    return false;
 
   if (e.Command.Code == cscmdPreProcess)
   {
@@ -507,26 +548,22 @@ bool SysSystemDriver::HandleEvent (iEvent& e)
     {
       if (!GetMessage (&msg, NULL, 0, 0))
       {
-        CreateEventOutlet (object_reg, this);
-        EventOutlet->Broadcast (cscmdQuit);
+        iEventOutlet* outlet = GetEventOutlet();
+        outlet->Broadcast (cscmdQuit);
         return true;
       }
-
       TranslateMessage (&msg);
       DispatchMessage (&msg);
     }
-
     return true;
   }
   else if (e.Command.Code == cscmdSystemOpen)
   {
-    CreateEventOutlet (object_reg, this);
-
 #   ifdef DO_DINPUT_KEYBOARD
     DWORD dwThreadId;
     m_hEvent = CreateEvent (NULL, FALSE, FALSE, NULL);
-    m_hThread = CreateThread (NULL, 0, s_threadroutine, EventOutlet,
-    	0, &dwThreadId);
+    m_hThread =
+      CreateThread (NULL, 0, s_threadroutine, EventOutlet, 0, &dwThreadId);
     if (!m_hEvent || !m_hThread)
     {
       MessageBox (NULL, "CreateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
@@ -556,7 +593,7 @@ bool SysSystemDriver::HandleEvent (iEvent& e)
 
 #if 0
 // @@@ MOVE THIS CODE TO THE WINDOWS CANVASES!
-void SysSystemDriver::Alert (const char* s)
+void Win32Assistant::Alert (const char* s)
 {
   bool FullScreen = false;
   //int width, height, depth;
@@ -576,19 +613,17 @@ void SysSystemDriver::Alert (const char* s)
 }
 #endif
 
-//----------------------------------------------// SCF Implementation //------//
-
-HINSTANCE SysSystemDriver::GetInstance () const
+HINSTANCE Win32Assistant::GetInstance () const
 {
   return ModuleHandle;
 }
 
-bool SysSystemDriver::GetIsActive () const
+bool Win32Assistant::GetIsActive () const
 {
   return ApplicationActive;
 }
 
-int SysSystemDriver::GetCmdShow () const
+int Win32Assistant::GetCmdShow () const
 {
   return ApplicationShow;
 }
@@ -625,7 +660,7 @@ static unsigned char ScanCodeToChar [MAX_SCANCODE] =
 
 static unsigned char LastCharCode [MAX_SCANCODE];
 
-void WinKeyTrans (WPARAM wParam, bool down)
+static void WinKeyTrans (WPARAM wParam, bool down, iEventOutlet* outlet)
 {
   int key = 0, chr = 0;
   switch (wParam)
@@ -667,11 +702,11 @@ void WinKeyTrans (WPARAM wParam, bool down)
   }
 
   if (key)
-    EventOutlet->Key (key, chr, down);
+    outlet->Key (key, chr, down);
 }
 #endif
 
-long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
+long FAR PASCAL Win32Assistant::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
   switch (message)
@@ -683,10 +718,10 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
 #endif
       break;
     case WM_ACTIVATE:
-      if (System)
+      if (GLOBAL_ASSISTANT != 0)
       {
-	CreateEventOutlet (System->object_reg, System);
-        EventOutlet->Broadcast (cscmdFocusChanged,
+	iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+        outlet->Broadcast (cscmdFocusChanged,
           (void *)(LOWORD (wParam) != WA_INACTIVE));
       }
       break;
@@ -697,34 +732,46 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
     case WM_SYSCHAR:
     case WM_CHAR:
     {
-      int scancode = (lParam >> 16) & 0xff;
-      int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
-      if (key || (wParam >= ' '))
+      if (GLOBAL_ASSISTANT != 0)
       {
-	CreateEventOutlet (System->object_reg, System);
-        EventOutlet->Key (key, wParam, true);
-        LastCharCode [scancode] = wParam;
+        int scancode = (lParam >> 16) & 0xff;
+        int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
+        if (key || (wParam >= ' '))
+        {
+	  iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+          outlet->Key (key, wParam, true);
+          LastCharCode [scancode] = wParam;
+        }
       }
       break;
     }
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
-      WinKeyTrans (wParam, true);
-      if (wParam == VK_MENU) return 0;
+    {
+      if (GLOBAL_ASSISTANT != 0)
+      {
+        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+        WinKeyTrans (wParam, true, outlet);
+        if (wParam == VK_MENU) return 0;
+      }
       break;
+    }
     case WM_KEYUP:
     case WM_SYSKEYUP:
     {
-      WinKeyTrans (wParam, false);
-      if (wParam == VK_MENU) return 0;
-      // Check if this is the keyup event for a former WM_CHAR
-      int scancode = (lParam >> 16) & 0xff;
-      if ((scancode < MAX_SCANCODE) && LastCharCode [scancode])
+      if (GLOBAL_ASSISTANT != 0)
       {
-        int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
-	CreateEventOutlet (System->object_reg, System);
-        EventOutlet->Key (key, LastCharCode [scancode], false);
-        LastCharCode [scancode] = 0;
+        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+        WinKeyTrans (wParam, false, outlet);
+        if (wParam == VK_MENU) return 0;
+        // Check if this is the keyup event for a former WM_CHAR
+        int scancode = (lParam >> 16) & 0xff;
+        if ((scancode < MAX_SCANCODE) && LastCharCode [scancode])
+        {
+          int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
+          outlet->Key (key, LastCharCode [scancode], false);
+          LastCharCode [scancode] = 0;
+        }
       }
       break;
     }
@@ -732,78 +779,76 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
     case WM_LBUTTONDOWN:
     case WM_RBUTTONDOWN:
     case WM_MBUTTONDOWN:
-      SetCapture (hWnd);
-      CreateEventOutlet (System->object_reg, System);
-      EventOutlet->Mouse ((message == WM_LBUTTONDOWN) ? 1 :
-        (message == WM_RBUTTONDOWN) ? 2 : 3, true,
-        short (LOWORD (lParam)), short (HIWORD (lParam)));
+    {
+      if (GLOBAL_ASSISTANT != 0)
+      {
+        SetCapture (hWnd);
+        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+        outlet->Mouse ((message == WM_LBUTTONDOWN) ? 1 :
+          (message == WM_RBUTTONDOWN) ? 2 : 3, true,
+          short (LOWORD (lParam)), short (HIWORD (lParam)));
+      }
       return TRUE;
+    }
     case WM_LBUTTONUP:
     case WM_RBUTTONUP:
     case WM_MBUTTONUP:
-      ReleaseCapture ();
-      CreateEventOutlet (System->object_reg, System);
-      EventOutlet->Mouse ((message == WM_LBUTTONUP) ? 1 :
-        (message == WM_RBUTTONUP) ? 2 : 3, false,
-        short (LOWORD (lParam)), short (HIWORD (lParam)));
+    {
+      if (GLOBAL_ASSISTANT != 0)
+      {
+        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+        ReleaseCapture ();
+        outlet->Mouse ((message == WM_LBUTTONUP) ? 1 :
+          (message == WM_RBUTTONUP) ? 2 : 3, false,
+          short (LOWORD (lParam)), short (HIWORD (lParam)));
+      }
       return TRUE;
+    }
     case WM_MOUSEMOVE:
-      SetCursor (System->m_hCursor);
-      CreateEventOutlet (System->object_reg, System);
-      EventOutlet->Mouse (0, false,
-        short (LOWORD (lParam)), short (HIWORD (lParam)));
+    {
+      if (GLOBAL_ASSISTANT != 0)
+      {
+        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+        ::SetCursor (GLOBAL_ASSISTANT->m_hCursor);
+        outlet->Mouse (0, false, short(LOWORD(lParam)), short(HIWORD(lParam)));
+      }
       return TRUE;
+    }
   }
   return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
 void csSleep (int SleepTime)
 {
-  ::Sleep (SleepTime);
+  Sleep (SleepTime);
 }
 
+#if 0
 //@@@ THIS PART OF CONFIG HELP IS CURRENTLY BROKEN!!!
-void SysSystemDriver::SetSystemDefaults (iConfigManager *Config)
+void Win32Assistant::Win32Assistant (iConfigManager *Config)
 {
-  //csSystemDriver::SetSystemDefaults (Config);
-
 #ifdef CS_DEBUG
   need_console = true;
-
   if (need_console)
   {
-	AllocConsole();
-	freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
-	freopen("CONOUT$", "a", stdout); // Redirect stdout to console   
+    AllocConsole();
+    freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
+    freopen("CONOUT$", "a", stdout); // Redirect stdout to console   
   }
 #endif
 }
+#endif
 
+#if 0
 //@@@ THIS PART OF COMMANDLINE HELP IS CURRENTLY BROKEN!!!
-void SysSystemDriver::Help ()
+void Win32Assistant::Help ()
 {
-  //@@@???
   printf ("  -[no]console       Create a debug console (default = %s)\n",
     need_console ? "yes" : "no");
 }
+#endif
 
-//---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (Win32Helper)
-  SCF_IMPLEMENTS_INTERFACE (iWin32Helper)
-SCF_IMPLEMENT_IBASE_END
-
-Win32Helper::Win32Helper (SysSystemDriver* sys)
-{
-  SCF_CONSTRUCT_IBASE (NULL);
-  Win32Helper::sys = sys;
-}
-
-Win32Helper::~Win32Helper ()
-{
-}
-
-bool Win32Helper::SetCursor (int cursor)
+bool Win32Assistant::SetCursor (int cursor)
 {
   char *CursorID;
   switch (cursor)
@@ -834,22 +879,6 @@ bool Win32Helper::SetCursor (int cursor)
     cur = NULL;
     success = false;
   }
-  sys->SetWinCursor (cur);
+  SetWinCursor (cur);
   return success;
 }
-
-HINSTANCE Win32Helper::GetInstance () const
-{
-  return sys->GetInstance ();
-}
-
-bool Win32Helper::GetIsActive () const
-{
-  return sys->GetIsActive ();
-}
-
-int Win32Helper::GetCmdShow () const
-{
-  return sys->GetCmdShow ();
-}
-

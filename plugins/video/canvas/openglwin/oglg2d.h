@@ -26,7 +26,7 @@
 #include "video/canvas/openglcommon/glcommon2d.h"
 #include "video/canvas/openglcommon/iogl.h"
 
-struct iWin32Helper;
+struct iWin32Assistant;
 
 /// Windows version.
 class csGraphics2DOpenGL : public csGraphics2DGLCommon
@@ -80,7 +80,7 @@ protected:
   HINSTANCE  m_hInstance;
   int m_nCmdShow;
   
-  iWin32Helper* m_piWin32System;
+  iWin32Assistant* m_piWin32Assistant;
 
   bool m_bPalettized;
   bool m_bPaletteChanged;

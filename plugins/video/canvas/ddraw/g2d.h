@@ -19,7 +19,7 @@
 #ifndef __DD3G2D_H__
 #define __DD3G2D_H__
 
-#include "ddraw.h"
+#include <ddraw.h>
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 
@@ -30,7 +30,7 @@ public:
   csGraphics2DDDraw3 (iBase *iParent);
   virtual ~csGraphics2DDDraw3 ();
   
-  virtual bool Initialize (iObjectRegistry *object_reg);
+  virtual bool Initialize (iObjectRegistry*);
 
   virtual bool Open ();
   virtual void Close ();

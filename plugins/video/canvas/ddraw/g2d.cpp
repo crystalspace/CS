@@ -27,7 +27,7 @@
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "cssys/win32/winhelp.h"
+#include "cssys/win32/win32.h"
 
 #ifndef DD_FALSE 
   // This is normally being done in the ddraw.h file
@@ -115,7 +115,7 @@ bool csGraphics2DDDraw3::Open ()
   m_rcWindow.bottom = m_rcWindow.top + wheight;
 
   // create the window.
-  m_hWnd = CreateWindow (WINDOWCLASSNAME, win_title, 0,
+  m_hWnd = CreateWindow (CS_WIN32_WINDOW_CLASS_NAME, win_title, 0,
     m_rcWindow.left, m_rcWindow.top, m_rcWindow.right - m_rcWindow.left,
     m_rcWindow.bottom - m_rcWindow.top, NULL, NULL, m_hInstance, NULL);
   ASSERT (m_hWnd);
@@ -443,7 +443,7 @@ void csGraphics2DDDraw3::SetRGB (int i, int r, int g, int b)
 
 bool csGraphics2DDDraw3::SetMouseCursor (csMouseCursorID iShape)
 {
-  iWin32Helper* winhelper = CS_QUERY_REGISTRY (object_reg, iWin32Helper);
+  iWin32Assistant* winhelper = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
   CS_ASSERT (winhelper != NULL);
   return winhelper->SetCursor (iShape);
 }
