@@ -115,31 +115,33 @@ private:
   csConstructionObject* object1;
   csConstructionObject* object2;
   csConstructionObject* object3;
-  float factor, factor2;
-  float depth_factor;
 
 public:
   csRandomRule (csConstructionObject* object1,
   	csConstructionObject* object2,
-	csConstructionObject* object3,
-	float factor, float factor2,
-	float depth_factor)
+	csConstructionObject* object3)
   {
     csRandomRule::object1 = object1;
     csRandomRule::object2 = object2;
     csRandomRule::object3 = object3;
-    csRandomRule::factor = factor;
-    csRandomRule::factor2 = factor2;
-    csRandomRule::depth_factor = depth_factor;
   }
 
   virtual csConstructionObject* GetConstructionObject (int depth)
   {
-    float f = float ((rand () >> 3) & 0xff) / 255.;
-    float df = float (depth)*depth_factor;
-    f += df;
-    if (f <= factor) return object1;
-    else if (f <= factor2) return object2;
+    if (depth < 4)
+      return object1;
+    else if (depth < 7)
+    {
+      float f = float ((rand () >> 3) & 0xff) / 255.;
+      if (f <= .05) return object2;
+      return object1;
+    }
+    else if (depth == 7)
+    {
+      float f = float ((rand () >> 3) & 0xff) / 255.;
+      if (f <= .1) return object3;
+      return object1;
+    }
     else return object3;
   }
 
@@ -353,7 +355,7 @@ void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionObject* co,
   csOutputConnector* ocon = new csOutputConnector (j, vtidx, transform, rule1);
   co->AddConnector (ocon);
 
-  m.Set (.7, 0, 0, 0, .7, 0, 0, 0, .7);
+  m.Set (.5, 0, 0, 0, .5, 0, 0, 0, .5);
   m *= csZRotMatrix3 (.7);
   v = m.GetInverse () * csVector3 (.165, -.545*height, 0);
   transform.SetO2TTranslation (v);
@@ -422,8 +424,8 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   // A branch.
   //---------
   GenerateBranch (co_branch, 1, 1, .5,
-    new csRandomRule (co_branch, co_shrinktrunk, co_tip, .7, .85, .02),
-    new csRandomRule (co_branch, co_shrinktrunk, co_tip, .7, .85, .02));
+    new csRandomRule (co_branch, co_shrinktrunk, co_tip),
+    new csRandomRule (co_branch, co_shrinktrunk, co_tip));
 
   return true;
 }
