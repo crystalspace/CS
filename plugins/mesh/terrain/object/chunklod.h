@@ -104,10 +104,10 @@ public:
     float error;
     Data ()
     {
-      pos.Set (0);
-      norm.Set (0);
-      tan.Set (0);
-      bin.Set (0);
+      pos.Set (0.0f);
+      norm.Set (0.0f);
+      tan.Set (0.0f);
+      bin.Set (0.0f);
       tex.Set (0, 0);
       col = 0;
       error = 0.0;

@@ -223,6 +223,9 @@ public:
   /// Set the value of this vector.
   inline void Set (float const* v) { x = v[0]; y = v[1]; z = v[2]; }
 
+  /// Set the value of this vector so that all components are the same.
+  inline void Set (float v) { x = y = z = v; }
+
   /// Get the value of this vector.
   inline void Get (float* v) { v[0] = x; v[1] = y; v[2] = z; }
 

@@ -871,7 +871,7 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       rad = scfParent->GetRadius ();
-      cent.Set (0);
+      cent.Set (0.0f);
     }
   } scfiObjectModel;
   friend class ObjectModel;

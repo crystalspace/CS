@@ -68,7 +68,8 @@ public:
   csDVector4 (double m) : x(m), y(m), z(m), w(m) {}
 
   /// Make a new vector and initialize with the given values.
-  csDVector4 (double ix, double iy, double iz = 0, double iw = 1) { x = ix; y = iy; z = iz; w = iw;}
+  csDVector4 (double ix, double iy, double iz = 0, double iw = 1)
+  { x = ix; y = iy; z = iz; w = iw;}
 
   /// Copy Constructor.
   csDVector4 (const csDVector4& v) { x = v.x; y = v.y; z = v.z; w = v.w; }
@@ -94,22 +95,24 @@ public:
   { return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z + v1.w*v2.w; }
 
   /// Take the cross product of two vectors.
-  inline friend csDVector4 operator% (const csDVector4& v1, const csDVector4& v2)
+  inline friend csDVector4 operator% (const csDVector4& v1,
+  	const csDVector4& v2)
   {
     
-    return csDVector4 ( (v1.x*v2.y - v1.y*v2.x) + (v1.x*v2.z - v1.z*v2.x) + (v1.y*v2.z - v1.z*v2.y),
-                        (v1.z*v2.y - v1.y*v2.z) + (v1.y*v2.w - v1.w*v2.y) + (v1.z*v2.w - v1.w*v2.z),
-                        (v1.x*v2.z - v1.z-v2.x) + (v1.w*v2.x - v1.x*v2.w) + (v1.z*v2.w - v1.w*v2.z),
-                        (v1.y*v2.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w) );
+    return csDVector4 (
+      (v1.x*v2.y-v1.y*v2.x) + (v1.x*v2.z-v1.z*v2.x) + (v1.y*v2.z-v1.z*v2.y),
+      (v1.z*v2.y-v1.y*v2.z) + (v1.y*v2.w-v1.w*v2.y) + (v1.z*v2.w-v1.w*v2.z),
+      (v1.x*v2.z-v1.z-v2.x) + (v1.w*v2.x-v1.x*v2.w) + (v1.z*v2.w-v1.w*v2.z),
+      (v1.y*v2.x-v1.x*v2.y) + (v1.w*v2.x-v1.x*v2.w) + (v1.w*v2.y-v1.y*v2.w) );
   }
 
   /// Take cross product of two vectors and put result in this vector.
   void Cross (const csDVector4 & v1, const csDVector4 & v2)
   {
-    x = (v1.x*v2.y - v1.y*v2.x) + (v1.x*v2.z - v1.z*v2.x) + (v1.y*v2.z - v1.z*v2.y);
-    y = (v1.z*v2.y - v1.y*v2.z) + (v1.y*v2.w - v1.w*v2.y) + (v1.z*v2.w - v1.w*v2.z);
-    z = (v1.x*v2.z - v1.z-v2.x) + (v1.w*v2.x - v1.x*v2.w) + (v1.z*v2.w - v1.w*v2.z);
-    w = (v1.y*v2.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w);
+    x = (v1.x*v2.y-v1.y*v2.x) + (v1.x*v2.z-v1.z*v2.x) + (v1.y*v2.z-v1.z*v2.y);
+    y = (v1.z*v2.y-v1.y*v2.z) + (v1.y*v2.w-v1.w*v2.y) + (v1.z*v2.w-v1.w*v2.z);
+    z = (v1.x*v2.z-v1.z-v2.x) + (v1.w*v2.x-v1.x*v2.w) + (v1.z*v2.w-v1.w*v2.z);
+    w = (v1.y*v2.x-v1.x*v2.y) + (v1.w*v2.x-v1.x*v2.w) + (v1.w*v2.y-v1.y*v2.w);
   }
 
   /// Multiply a vector and a scalar.
@@ -195,7 +198,8 @@ public:
   inline csDVector4 operator- () const { return csDVector4(-x,-y,-z,-w); }
 
   /// Set the value of this vector.
-  inline void Set (double sx, double sy, double sz, double sw) { x = sx; y = sy; z = sz; w = sw; }
+  inline void Set (double sx, double sy, double sz, double sw)
+  { x = sx; y = sy; z = sz; w = sw; }
 
   /// Returns the norm of this vector.
   double Norm () const;
@@ -250,7 +254,8 @@ public:
   csVector4 (float m) : x(m), y(m), z(m), w(m) {}
 
   /// Make a new vector and initialize with the given values.
-  csVector4 (float ix, float iy, float iz = 0, float iw = 1) : x(ix), y(iy), z(iz), w(iw) {}
+  csVector4 (float ix, float iy, float iz = 0, float iw = 1)
+  	: x(ix), y(iy), z(iz), w(iw) {}
 
   /// Copy Constructor.
   csVector4 (const csVector4& v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
@@ -293,19 +298,20 @@ public:
   /// Take the cross product of two vectors.
   inline friend csVector4 operator% (const csVector4& v1, const csVector4& v2)
   {
-    return csVector4 (  (v1.x*v2.y - v1.y*v2.x) + (v1.x*v2.z - v1.z*v2.x) + (v1.y*v2.z - v1.z*v2.y),
-                        (v1.z*v2.y - v1.y*v2.z) + (v1.y*v2.w - v1.w*v2.y) + (v1.z*v2.w - v1.w*v2.z),
-                        (v1.x*v2.z - v1.z*v2.x) + (v1.w*v2.x - v1.x*v2.w) + (v1.z*v2.w - v1.w*v2.z),
-                        (v1.y*v2.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w) );
+    return csVector4 (
+      (v1.x*v2.y-v1.y*v2.x) + (v1.x*v2.z-v1.z*v2.x) + (v1.y*v2.z-v1.z*v2.y),
+      (v1.z*v2.y-v1.y*v2.z) + (v1.y*v2.w-v1.w*v2.y) + (v1.z*v2.w-v1.w*v2.z),
+      (v1.x*v2.z-v1.z*v2.x) + (v1.w*v2.x-v1.x*v2.w) + (v1.z*v2.w-v1.w*v2.z),
+      (v1.y*v2.x-v1.x*v2.y) + (v1.w*v2.x-v1.x*v2.w) + (v1.w*v2.y-v1.y*v2.w) );
   }
 
   /// Take cross product of two vectors and put result in this vector.
   void Cross (const csVector4 & v1, const csVector4 & v2)
   {
-    x = (v1.x*v2.y - v1.y*v2.x) + (v1.x*v2.z - v1.z*v2.x) + (v1.y*v2.z - v1.z*v2.y);
-    y = (v1.z*v2.y - v1.y*v2.z) + (v1.y*v2.w - v1.w*v2.y) + (v1.z*v2.w - v1.w*v2.z);
-    z = (v1.x*v2.z - v1.z*v2.x) + (v1.w*v2.x - v1.x*v2.w) + (v1.z*v2.w - v1.w*v2.z);
-    w = (v1.y*v2.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w);
+    x = (v1.x*v2.y-v1.y*v2.x) + (v1.x*v2.z-v1.z*v2.x) + (v1.y*v2.z-v1.z*v2.y);
+    y = (v1.z*v2.y-v1.y*v2.z) + (v1.y*v2.w-v1.w*v2.y) + (v1.z*v2.w-v1.w*v2.z);
+    z = (v1.x*v2.z-v1.z*v2.x) + (v1.w*v2.x-v1.x*v2.w) + (v1.z*v2.w-v1.w*v2.z);
+    w = (v1.y*v2.x-v1.x*v2.y) + (v1.w*v2.x-v1.x*v2.w) + (v1.w*v2.y-v1.y*v2.w);
   }
 
   /// Multiply a vector and a scalar.
@@ -413,13 +419,17 @@ public:
   inline csVector4 operator- () const { return csVector4(-x,-y,-z, -w); }
 
   /// Set the value of this vector.
-  inline void Set (float sx, float sy, float sz, float sw) { x = sx; y = sy; z = sz; w = sw; }
+  inline void Set (float sx, float sy, float sz, float sw)
+  { x = sx; y = sy; z = sz; w = sw; }
 
   /// Set the value of this vector.
   inline void Set (csVector4 const& v) { x = v.x; y = v.y; z = v.z; w = v.w; }
 
   /// Set the value of this vector.
   inline void Set (float const* v) { x = v[0]; y = v[1]; z = v[2]; w = v[3]; }
+
+  /// Set the value of this vector so that all components are the same.
+  inline void Set (float v) { x = y = z = w = v; }
 
   /// Get the value of this vector.
   inline void Get (float* v) { v[0] = x; v[1] = y; v[2] = z; v[3] = w; }

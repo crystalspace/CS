@@ -1088,7 +1088,7 @@ void csGenmeshMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 void csGenmeshMeshObject::GetRadius (csVector3& rad, csVector3& cent)
 {
   rad = factory->GetRadius ();
-  cent.Set (0);
+  cent.Set (0.0f);
 }
 
 bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
