@@ -9,6 +9,9 @@ chronological order.
 5-Jan-2004
 	- res fixed sprcal3d so render buffers are created correctly for 
 	  multi-mesh models.
+	- Keith Fulton added more functionality to sprcal3d and updated
+ 	  bbox calcs to be more efficient.   This requires cal3d cvs as
+	  of Jan-04-04, or later.
 4-Jan-2004
 	- Luca fixed a compilation error for the VC6 compiler.
 	- res added the creation of a global string set to InitApplication().
