@@ -22,6 +22,12 @@ The history order is reversed so that new features are at the top.
 	    - The -v option will now also show the local transformation matrix
 	      and translation vector of all objects in the 3ds file. That
 	      is useful for making hierarchical objects in CS.
+	    - Added -r option to relocate the 3ds objects inside. -r is
+	      executed AFTER -s.
+	    - Renamed -y option to -f (force).
+	    - Added -xyz, -xzy, -yxz, -yzx, -zxy, and -zyx commandline options
+	      to change the order of the x,y,z components from 3DS to CS.
+	      Default is -xyz.
 26-Apr-2001
 	- Philip Wyett fixed gcc outputting Worm.dll and Dog.dll. Now
 	  outputs worm.dll and dog.dll.
