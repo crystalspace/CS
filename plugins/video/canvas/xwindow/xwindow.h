@@ -25,8 +25,8 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"
-#include "ivideo/xwindow.h"
-#include "ivideo/xextf86vm.h"
+#include "video/canvas/xwindowcommon/xwindow.h"
+#include "video/canvas/xwindowcommon/xextf86vm.h"
 #include "ivideo/graph2d.h"
 
 #define XK_MISCELLANY 1

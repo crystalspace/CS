@@ -21,8 +21,8 @@
 
 #include "video/canvas/common/graph2d.h"
 #include "iutil/event.h"
-#include "ivideo/xwindow.h"
-#include "ivideo/xextshm.h"
+#include "video/canvas/xwindowcommon/xwindow.h"
+#include "video/canvas/xwindowcommon/xextshm.h"
 
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>

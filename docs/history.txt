@@ -18,11 +18,15 @@ for each given day, however, are in normal (ascending) chronological order.
 	  wrong doxygen comments, added missing LGPL notice, added missing
 	  include protector, replaced normal pointer with csRef.
 	- Jorrit did some Doxygen comment cleanups in include/ivideo.
+	- Jorrit moved all X-Windows specific include files from include/ivideo
+	  (xextf86vm.h, xextshm.h, and xwindow.h) to the new directory
+	  plugins/video/canvas/xwindowcommon. These include files are common
+	  to all canvas implementations that use X-Windows but they don't
+	  need to be public.
 26-Jul-2003
 	- Wouter Wijngaards fixed the partedit awssink.cpp file, removed
 	  'static' from enums and put initializers for a constructor
 	  in declaration order to remove compiler errors and warnings.
-
 25-Jul-2003
 	- Norman Kraemer fixed pythmod_setup.py for cases with no lib entries
 	  between the enclosing '--'.
