@@ -19,6 +19,7 @@
 #define SYSDEF_ACCESS
 #include "sysdef.h"
 #include "version.h"
+#include "qint.h"
 #include "cssys/common/system.h"
 #include "support/console.h"
 #include "support/command.h"
@@ -38,6 +39,7 @@
 #include "csengine/wirefrm.h"
 #include "csengine/library.h"
 #include "csengine/polygon/polytext.h"
+#include "csengine/polygon/pol2d.h"
 #include "csengine/scripts/csscript.h"
 #include "csengine/scripts/intscri.h"
 
@@ -113,17 +115,236 @@ void DrawZbuffer ()
 
 int collcount = 0;
 
+//------------------------------------------------------------------------
+// The following series of functions are all special callback functions
+// which are called by csWorld::DrawFunc() or csLight::LightingFunc().
+//------------------------------------------------------------------------
+
+// Callback for LightingFunc() to show the lighting frustrum for the
+// selected light.
+void show_frustrum (csLightView* lview, int type, void* /*entity*/)
+{
+  ITextureManager* txtmgr;
+  Gfx3D->GetTextureManager (&txtmgr);
+  int red, white;
+  txtmgr->FindRGB (255, 255, 255, white);
+  txtmgr->FindRGB (255, 0, 0, red);
+
+  if (type == CALLBACK_POLYGON)
+  {
+    csCamera* cam = Sys->view->GetCamera ();
+    csFrustrum* fr = lview->light_frustrum;
+    csVector3 v0, v1, v2;
+    csVector3 light_cam = cam->Other2This (fr->GetOrigin ());
+    int j;
+
+    for (j = 0 ; j < fr->GetNumVertices () ; j++)
+    {
+      v0 = fr->GetVertices ()[j] + fr->GetOrigin ();
+      v1 = cam->Other2This (v0);
+      v0 = fr->GetVertices ()[(j+1)%fr->GetNumVertices ()] + fr->GetOrigin ();
+      v2 = cam->Other2This (v0);
+      Gfx3D->DrawLine (light_cam, v1, csCamera::aspect, red);
+      Gfx3D->DrawLine (light_cam, v2, csCamera::aspect, red);
+      Gfx3D->DrawLine (v1, v2, csCamera::aspect, white);
+    }
+  }
+}
+
+// Callback for DrawFunc() to select an object with the mouse. The coordinate
+// to check for is in 'coord_check_vector'.
+bool check_poly;
+bool check_light;
+csVector2 coord_check_vector;
+
+void select_object (csRenderView* rview, int type, void* entity)
+{
+  static csPolygon3D* last_poly = NULL;
+
+  if (type == CALLBACK_POLYGON)
+  {
+    // Here we depend on CALLBACK_POLYGON being called right before CALLBACK_POLYGON2D.
+    last_poly = (csPolygon3D*)entity;
+  }
+  else if (type == CALLBACK_POLYGON2D)
+  {
+    int i;
+    csPolygon2D* polygon = (csPolygon2D*)entity;
+    int num = polygon->GetNumVertices ();
+    CHK (csPolygon2D* pp = new csPolygon2D (num));
+    if (rview->IsMirrored ())
+      for (i = 0 ; i < num ; i++)
+        pp->AddVertex  (polygon->GetVertices ()[num-i-1]);
+    else
+      for (i = 0 ; i < num ; i++)
+        pp->AddVertex  (polygon->GetVertices ()[i]);
+    if (csMath2::InPoly2D (coord_check_vector, pp->GetVertices (),
+        pp->GetNumVertices (), &pp->GetBoundingBox ()) != CS_POLY_OUT)
+    {
+      csPolygonSet* ps = (csPolygonSet*)(last_poly->GetParent ());
+      Sys->Printf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
+        csNameObject::GetName(*ps), csNameObject::GetName(*last_poly));
+      Dumper::dump (polygon, "csPolygon2D");
+      Dumper::dump (last_poly);
+      if (check_poly && !last_poly->GetPortal ())
+      {
+        if (Sys->selected_polygon == last_poly) Sys->selected_polygon = NULL;
+        else Sys->selected_polygon = last_poly;
+	//check_poly = false;
+      }
+    }
+
+    CHK (delete pp);
+  }
+  else if (type == CALLBACK_SECTOR)
+  {
+    csSector* sector = (csSector*)entity;
+    int i;
+    csVector3 v;
+    float iz;
+    int px, py, r;
+    for (i = 0 ; i < sector->lights.Length () ; i++)
+    {
+      v = rview->Other2This (((csStatLight*)sector->lights[i])->GetCenter ());
+      if (v.z > SMALL_Z)
+      {
+        iz = rview->aspect/v.z;
+        px = QInt (v.x * iz + csWorld::shift_x);
+        py = csWorld::frame_height - 1 - QInt (v.y * iz + csWorld::shift_y);
+        r = QInt (.3 * iz);
+        if (ABS (coord_check_vector.x - px) < 5 && ABS (coord_check_vector.y - (csWorld::frame_height-1-py)) < 5)
+        {
+	  csLight* light = (csLight*)sector->lights[i];
+	  if (check_light)
+	  {
+            if (Sys->selected_light == light) Sys->selected_light = NULL;
+	    else Sys->selected_light = light;
+	    //check_light = false;
+	  }
+          Sys->Printf (MSG_CONSOLE, "Selected light %s/(%f,%f,%f).\n",
+                    csNameObject::GetName(*sector), light->GetCenter ().x,
+                    light->GetCenter ().y, light->GetCenter ().z);
+          Sys->Printf (MSG_DEBUG_0, "Selected light %s/(%f,%f,%f).\n",
+                    csNameObject::GetName(*sector), light->GetCenter ().x,
+                    light->GetCenter ().y, light->GetCenter ().z);
+        }
+      }
+    }
+  }
+}
+
+// Callback for DrawFunc() to show an outline for all polygons and lights.
+// If callback_data in 'rview' is not NULL then we only show outline for
+// selected light and/or polygon.
+void draw_edges (csRenderView* rview, int type, void* entity)
+{
+  ITextureManager* txtmgr;
+  Gfx3D->GetTextureManager (&txtmgr);
+  int red, white, blue, yellow, selcol;
+  txtmgr->FindRGB (255, 255, 255, white);
+  txtmgr->FindRGB (255, 0, 0, red);
+  txtmgr->FindRGB (0, 0, 255, blue);
+  txtmgr->FindRGB (255, 255, 0, yellow);
+
+  bool hilighted_only = !!rview->callback_data;
+  if (hilighted_only) selcol = yellow;
+  else selcol = white;
+  static csPolygon3D* last_poly = NULL;
+
+  if (type == CALLBACK_POLYGON)
+  {
+    // Here we depend on CALLBACK_POLYGON being called right before CALLBACK_POLYGON2D.
+    last_poly = (csPolygon3D*)entity;
+  }
+  else if (type == CALLBACK_POLYGON2D)
+  {
+    csPolygon2D* polygon = (csPolygon2D*)entity;
+    if (!hilighted_only || Sys->selected_polygon == last_poly)
+      polygon->Draw (rview->g2d, selcol);
+  }
+  else if (type == CALLBACK_POLYGONQ)
+  {
+    if (!hilighted_only)
+    {
+      G3DPolygonDPQ* dpq = (G3DPolygonDPQ*)entity;
+      int i1 = dpq->num-1;
+      int i;
+      for (i = 0 ; i < dpq->num ; i++)
+      {
+        rview->g2d->DrawLine (dpq->vertices[i].sx, csWorld::frame_height - 1 - dpq->vertices[i].sy,
+      	  dpq->vertices[i1].sx, csWorld::frame_height - 1 - dpq->vertices[i1].sy, blue);
+        i1 = i;
+      }
+    }
+  }
+  else if (type == CALLBACK_SECTOR)
+  {
+    csSector* sector = (csSector*)entity;
+    int i;
+    csVector3 v;
+    float iz;
+    int px, py, r;
+    for (i = 0 ; i < sector->lights.Length () ; i++)
+    {
+      csStatLight* light = (csStatLight*)(sector->lights[i]);
+      if (!hilighted_only || Sys->selected_light == light)
+      {
+        v = rview->Other2This (light->GetCenter ());
+        if (v.z > SMALL_Z)
+        {
+          iz = rview->aspect/v.z;
+          px = QInt (v.x * iz + csWorld::shift_x);
+          py = csWorld::frame_height - 1 - QInt (v.y * iz + csWorld::shift_y);
+          r = QInt (.3 * iz);
+          rview->g2d->DrawLine (px-r, py-r, px+r, py+r, selcol);
+          rview->g2d->DrawLine (px+r, py-r, px-r, py+r, selcol);
+          rview->g2d->DrawLine (px, py-2, px, py+2, red);
+          rview->g2d->DrawLine (px+2, py, px-2, py, red);
+        }
+      }
+    }
+  }
+}
+
+// Callback for DrawFunc() to show a 3D map of everything that is visible.
+void draw_map (csRenderView* /*rview*/, int type, void* entity)
+{
+  csWireFrame* wf = Sys->wf->GetWireframe ();
+  if (type == CALLBACK_POLYGON)
+  {
+    csPolygon3D* poly = (csPolygon3D*)entity;
+    int j;
+    csWfPolygon* po = wf->AddPolygon ();
+    po->SetVisColor (wf->GetYellow ());
+    po->SetNumVertices (poly->GetNumVertices ());
+    for (j = 0 ; j < poly->GetNumVertices () ; j++) po->SetVertex (j, poly->Vwor (j));
+    po->Prepare ();
+  }
+  else if (type == CALLBACK_SECTOR)
+  {
+    csSector* sector = (csSector*)entity;
+    int i;
+    for (i = 0 ; i < sector->lights.Length () ; i++)
+    {
+      csWfVertex* vt = wf->AddVertex (((csStatLight*)sector->lights[i])->GetCenter ());
+      vt->SetColor (wf->GetRed ());
+    }
+  }
+}
+
+//------------------------------------------------------------------------
+
 void WalkTest::DrawFrame (long elapsed_time, long current_time)
 {
   (void)elapsed_time; (void)current_time;
 
   //not used since we need WHITE background not black
   int drawflags = 0; /* do_clear ? CSDRAW_CLEARSCREEN : 0; */
-  if (do_clear || Sys->world->map_mode == MAP_ON)
+  if (do_clear || map_mode == MAP_ON)
   {
     if (Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS) != S_OK)
       return;
-    Gfx2D->Clear (Sys->world->map_mode == MAP_ON ? 0 : 255);
+    Gfx2D->Clear (map_mode == MAP_ON ? 0 : 255);
   }
 
   if (!System->Console->IsActive ()
@@ -132,7 +353,7 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
     // Tell Gfx3D we're going to display 3D things
     if (Gfx3D->BeginDraw (drawflags | CSDRAW_3DGRAPHICS) != S_OK)
       return;
-    if (Sys->world->map_mode != MAP_ON) view->Draw ();
+    if (map_mode != MAP_ON) view->Draw ();
     // no need to clear screen anymore
     drawflags = 0;
 
@@ -158,11 +379,21 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
   // Start drawing 2D graphics
   if (Gfx3D->BeginDraw (drawflags | CSDRAW_2DGRAPHICS) != S_OK)
     return;
-  if (do_show_z) DrawZbuffer ();
-  if (Sys->world->map_mode)
+
+  if (map_mode != MAP_OFF)
   {
-    Sys->world->wf->GetWireframe ()->Draw (Gfx3D, Sys->world->wf->GetCamera ());
+    wf->GetWireframe ()->Clear ();
+    view->GetWorld ()->DrawFunc (Gfx3D, view->GetCamera (), view->GetClipper (), draw_map);
+    wf->GetWireframe ()->Draw (Gfx3D, wf->GetCamera ());
   }
+  else
+  {
+    if (do_show_z) DrawZbuffer ();
+    if (do_edges) view->GetWorld ()->DrawFunc (Gfx3D, view->GetCamera (), view->GetClipper (), draw_edges);
+    if (selected_polygon || selected_light) view->GetWorld ()->DrawFunc (Gfx3D, view->GetCamera (), view->GetClipper (), draw_edges, (void*)1);
+    if (do_light_frust && selected_light) ((csStatLight*)selected_light)->LightingFunc (show_frustrum);
+  }
+
   SimpleConsole* scon = (SimpleConsole*)System->Console;
   scon->Print (NULL);
 
@@ -381,7 +612,7 @@ int FindIntersection(CDTriangle *t1,CDTriangle *t2,csVector3 line[2])
 
 #define OYL  (-1.1)
 #define DYL  (OY-OYL)
-  
+
 void WalkTest::CreateColliders(void)
 {
   csPolygon3D *p;
@@ -400,33 +631,33 @@ void WalkTest::CreateColliders(void)
   // Left
   p = pb->NewPolygon (0);
 
-  p->AddVertex (0); p->AddVertex (1); 
-  p->AddVertex (2); p->AddVertex (3); 
+  p->AddVertex (0); p->AddVertex (1);
+  p->AddVertex (2); p->AddVertex (3);
 
   // Right
   p = pb->NewPolygon (0);
-  p->AddVertex (4); p->AddVertex (5); 
-  p->AddVertex (6); p->AddVertex (7); 
+  p->AddVertex (4); p->AddVertex (5);
+  p->AddVertex (6); p->AddVertex (7);
 
   // Bottom
   p = pb->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (1); 
-  p->AddVertex (5); p->AddVertex (4); 
+  p->AddVertex (0); p->AddVertex (1);
+  p->AddVertex (5); p->AddVertex (4);
 
   // Top
   p = pb->NewPolygon (0);
-  p->AddVertex (3); p->AddVertex (2); 
-  p->AddVertex (6); p->AddVertex (7); 
+  p->AddVertex (3); p->AddVertex (2);
+  p->AddVertex (6); p->AddVertex (7);
 
   // Front
   p = pb->NewPolygon (0);
-  p->AddVertex (1); p->AddVertex (5); 
-  p->AddVertex (6); p->AddVertex (2); 
+  p->AddVertex (1); p->AddVertex (5);
+  p->AddVertex (6); p->AddVertex (2);
 
   // Back
   p = pb->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (4); 
-  p->AddVertex (7); p->AddVertex (3); 
+  p->AddVertex (0); p->AddVertex (4);
+  p->AddVertex (7); p->AddVertex (3);
 
   this->body=new csCollider(pb);
 
@@ -444,33 +675,33 @@ void WalkTest::CreateColliders(void)
   // Left
   p = pl->NewPolygon (0);
 
-  p->AddVertex (0); p->AddVertex (1); 
-  p->AddVertex (2); p->AddVertex (3); 
+  p->AddVertex (0); p->AddVertex (1);
+  p->AddVertex (2); p->AddVertex (3);
 
   // Right
   p = pl->NewPolygon (0);
-  p->AddVertex (4); p->AddVertex (5); 
-  p->AddVertex (6); p->AddVertex (7); 
+  p->AddVertex (4); p->AddVertex (5);
+  p->AddVertex (6); p->AddVertex (7);
 
   // Bottom
   p = pl->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (1); 
-  p->AddVertex (5); p->AddVertex (4); 
+  p->AddVertex (0); p->AddVertex (1);
+  p->AddVertex (5); p->AddVertex (4);
 
   // Top
   p = pl->NewPolygon (0);
-  p->AddVertex (3); p->AddVertex (2); 
-  p->AddVertex (6); p->AddVertex (7); 
+  p->AddVertex (3); p->AddVertex (2);
+  p->AddVertex (6); p->AddVertex (7);
 
   // Front
   p = pl->NewPolygon (0);
-  p->AddVertex (1); p->AddVertex (5); 
-  p->AddVertex (6); p->AddVertex (2); 
+  p->AddVertex (1); p->AddVertex (5);
+  p->AddVertex (6); p->AddVertex (2);
 
   // Back
   p = pl->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (4); 
-  p->AddVertex (7); p->AddVertex (3); 
+  p->AddVertex (0); p->AddVertex (4);
+  p->AddVertex (7); p->AddVertex (3);
 
   this->legs=new csCollider(pl);
 
@@ -484,7 +715,7 @@ void WalkTest::CreateColliders(void)
 extern collision_pair *CD_contact;
 //collision_pair *our_cd_contact=0;
 static collision_pair our_cd_contact[1000];//=0;
-static int num_our_cd,alloced;
+static int num_our_cd;
 
 int FindSectors(csVector3 v, csVector3 d, csSector *s, csSector **sa)
 {
@@ -512,22 +743,22 @@ int FindSectors(csVector3 v, csVector3 d, csSector *s, csSector **sa)
   return c;
 }
 
-int CollisionDetect(csCollider *c,csSector* sp,csTransform *cdt)
+int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
 {
   int hit = 0;
 
   // Check collision with this sector.
-  csCollider::numHits=0;
-  csCollider::CollidePair(c,csColliderPointerObject::GetCollider(*sp),cdt);
+  csCollider::numHits = 0;
+  csCollider::CollidePair (c, csColliderPointerObject::GetCollider(*sp), cdt);
   hit += csCollider::numHits;
-  for(int i=0;i<csCollider::numHits;i++)
-    our_cd_contact[num_our_cd++]=CD_contact[i];
+  for (int i=0 ; i<csCollider::numHits ; i++)
+    our_cd_contact[num_our_cd++] = CD_contact[i];
 
-  if(csCollider::firstHit&&hit)
+  if (csCollider::firstHit && hit)
     return 1;
 
   // Check collision of with the things in this sector.
-  csThing* tp = sp->GetFirstThing ();
+  csThing *tp = sp->GetFirstThing ();
   while (tp)
   {
     // TODO, if and when Things can move, their transform must be passed in.
@@ -535,10 +766,10 @@ int CollisionDetect(csCollider *c,csSector* sp,csTransform *cdt)
     csCollider::CollidePair(c,csColliderPointerObject::GetCollider(*tp),cdt);
     hit += csCollider::numHits;
 
-    for(int i=0;i<csCollider::numHits;i++)
-      our_cd_contact[num_our_cd++]=CD_contact[i];
+    for (int i=0 ; i<csCollider::numHits ; i++)
+      our_cd_contact[num_our_cd++] = CD_contact[i];
 
-    if(csCollider::firstHit&&hit)
+    if (csCollider::firstHit && hit)
       return 1;
 
     tp = (csThing*)(tp->GetNext ());
@@ -548,106 +779,105 @@ int CollisionDetect(csCollider *c,csSector* sp,csTransform *cdt)
   return hit;
 }
 
-template <class T> inline int sign(T p) {return p>0?1:p<0?-1:0;}
-
 void DoGravity (csVector3& pos, csVector3& vel)
 {
-      csVector3 new_pos=pos+vel;
-      csMatrix3 m;
-      csOrthoTransform test (m, new_pos);
+  csVector3 new_pos = pos+vel;
+  csMatrix3 m;
+  csOrthoTransform test (m, new_pos);
 
-      csSector *n[MAXSECTORSOCCUPIED];
-      int num_sectors=FindSectors(new_pos,4*Sys->body->GetBbox()->d,Sys->view->GetCamera()->GetSector(),n);
+  csSector *n[MAXSECTORSOCCUPIED];
+  int num_sectors = FindSectors (new_pos, 4*Sys->body->GetBbox()->d,
+    Sys->view->GetCamera()->GetSector(), n);
 
-      num_our_cd=0;
-      csCollider::firstHit=false;
-      int hits=0;
+  num_our_cd = 0;
+  csCollider::firstHit = false;
+  int hits = 0;
 
-      csCollider::CollideReset();
+  csCollider::CollideReset ();
 
-      for(;num_sectors--;)
-        hits+=CollisionDetect(Sys->body,n[num_sectors],&test);
+  for ( ; num_sectors-- ; )
+    hits += CollisionDetect (Sys->body, n[num_sectors], &test);
 
-      for(int j=0;j<hits;j++)
+  for (int j=0 ; j<hits ; j++)
+  {
+    CDTriangle *wall = our_cd_contact[j].tr2;
+    csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
+    if (n*vel<0)
+      continue;
+    vel = -(vel%n)%n;
+  }
+
+  // We now know our (possible) velocity. Let's try to move up or down, if possible
+  new_pos = pos+vel;
+  test = csOrthoTransform (csMatrix3(), new_pos);
+
+  num_sectors = FindSectors (new_pos, 4*Sys->legs->GetBbox()->d, Sys->view->GetCamera()->GetSector(), n);
+
+  num_our_cd = 0;
+  csCollider::firstHit = false;
+  csCollider::numHits = 0;
+  int hit = 0;
+
+  csCollider::CollideReset ();
+
+  for ( ; num_sectors-- ; )
+    hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
+
+  if (!hit)
+  {
+    Sys->on_ground = false;
+    if (Sys->do_gravity && !Sys->move_3d)
+      vel.y -= 0.004;
+  }
+  else
+  {
+    float max_y=-1e10;
+
+    for (int j=0 ; j<hit ; j++)
+    {
+      // я -- мудрак!.. я отлаживал сей кусок два дн€. ј надо было только
+      //  использовать не указатели, а значени€. ј впрочем... ¬ам не пон€ть ;) -- D.D.
+
+      CDTriangle first = *our_cd_contact[j].tr1;
+      CDTriangle second = *our_cd_contact[j].tr2;
+
+      csVector3 n=((second.p3-second.p2)%(second.p2-second.p1)).Unit ();
+
+      if (n*csVector3(0,-1,0)<0.7)
+        continue;
+
+      csVector3 line[2];
+
+      first.p1 += new_pos;
+      first.p2 += new_pos;
+      first.p3 += new_pos;
+
+      if (FindIntersection (&first,&second,line))
       {
-        CDTriangle *wall=our_cd_contact[j].tr2;
-        csVector3 n=((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
-        if(n*vel<0)
-          continue;
-        vel=-(vel%n)%n;
+        if (line[0].y>max_y)
+          max_y=line[0].y;
+        if (line[1].y>max_y)
+          max_y=line[1].y;
       }
+    }
 
-      // We now know our (possible) velocity. Let's try to move up or down, if possible
-      new_pos=pos+vel;
-      test=csOrthoTransform(csMatrix3(),new_pos);
+    float p = new_pos.y-max_y+OYL+0.01;
+    if (fabs(p)<DYL-0.01)
+    {
+      if (max_y != -1e10)
+        new_pos.y = max_y-OYL-0.01;
 
-      num_sectors=FindSectors(new_pos,4*Sys->legs->GetBbox()->d,Sys->view->GetCamera()->GetSector(),n);
+      if (vel.y<0)
+        vel.y = 0;
+    }
+    Sys->on_ground = true;
+  }
 
-      num_our_cd=0;
-      csCollider::firstHit=false;
-      csCollider::numHits=0;
-      int hit=0;
+  pos = new_pos;
+  new_pos -= Sys->view->GetCamera ()->GetOrigin ();
+  Sys->view->GetCamera ()->MoveWorld (new_pos);
 
-      csCollider::CollideReset();
-
-      for(;num_sectors--;)
-        hit+=CollisionDetect(Sys->legs,n[num_sectors],&test);
-
-      if(!hit)
-      {
-        Sys->on_ground=false;
-        if(Sys->do_gravity&&!Sys->move_3d)
-          vel.y-=0.004;
-      }
-      else
-      {
-        float max_y=-1e10;
-
-        for(int j=0;j<hit;j++)
-        {
-          // я -- мудрак!.. я отлаживал сей кусок два дн€. ј надо было только
-          //  использовать не указатели, а значени€. ј впрочем... ¬ам не пон€ть ;) -- D.D.
-
-          CDTriangle first=*our_cd_contact[j].tr1;
-          CDTriangle second=*our_cd_contact[j].tr2;
-
-          csVector3 n=((second.p3-second.p2)%(second.p2-second.p1)).Unit();
-
-          if(n*csVector3(0,-1,0)<0.7)
-            continue;
-
-          csVector3 line[2];
-        
-          first.p1+=new_pos;
-          first.p2+=new_pos;
-          first.p3+=new_pos;
-
-          if(FindIntersection(&first,&second,line))
-          {
-            if(line[0].y>max_y)
-              max_y=line[0].y;
-            if(line[1].y>max_y)
-              max_y=line[1].y;
-          }
-        }
-
-        float p=new_pos.y-max_y+OYL+0.01;
-        if(fabs(p)<DYL-0.01)
-        {
-          if(max_y!=-1e10)
-            new_pos.y=max_y-OYL-0.01;
-
-          if(vel.y<0)
-            vel.y=0;
-        }
-        Sys->on_ground=true;
-      }
-
-      pos=new_pos;
-      new_pos-=Sys->view->GetCamera()->GetOrigin();
-      Sys->view->GetCamera()->MoveWorld(new_pos);
-
-      Sys->velocity=Sys->view->GetCamera()->GetO2T()*vel;
+  Sys->velocity = Sys->view->GetCamera ()->GetO2T ()*vel;
 }
 
 void WalkTest::PrepareFrame (long elapsed_time, long current_time)
@@ -656,17 +886,17 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
 
   CLights::LightIdle (); // SJI
 
-  if(do_cd)
+  if (do_cd)
   {
-    if(!player_spawned)
+    if (!player_spawned)
     {
-      CreateColliders();
+      CreateColliders ();
       player_spawned=true;
     }
 
-    pos=view->GetCamera()->GetOrigin();
+    pos=view->GetCamera ()->GetOrigin ();
 
-    for(int repeats=0;repeats<((elapsed_time)/25.0+0.5);repeats++)
+    for (int repeats=0 ; repeats<((elapsed_time)/25.0+0.5) ; repeats++)
     {
       if (move_3d)
       {
@@ -674,13 +904,13 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
       }
       else
       {
-        view->GetCamera()->SetT2O(csMatrix3());
-        view->GetCamera()->RotateWorld(csVector3(0,1,0),angle_y);
-        if(!do_gravity)
-          view->GetCamera()->Rotate(csVector3(1,0,0),angle_x);
+        view->GetCamera ()->SetT2O (csMatrix3 ());
+        view->GetCamera ()->RotateWorld (csVector3 (0,1,0), angle_y);
+        if (!do_gravity)
+          view->GetCamera ()->Rotate (csVector3 (1,0,0), angle_x);
       }
 
-      csVector3 vel=view->GetCamera()->GetT2O()*velocity;
+      csVector3 vel = view->GetCamera ()->GetT2O ()*velocity;
 
       static bool check_once = false;
       if (ABS (vel.x) < SMALL_EPSILON && ABS (vel.y) < SMALL_EPSILON && ABS (vel.z) < SMALL_EPSILON)
@@ -698,14 +928,14 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
     }
   }
 
-  if(!pressed_strafe)
-    velocity.x-=sign(velocity.x)*MIN(0.017,fabs(velocity.x));
+  if (!pressed_strafe)
+    velocity.x -= SIGN (velocity.x) * MIN (0.017, fabs (velocity.x));
 
-  if(!pressed_walk)
-    velocity.z-=sign(velocity.z)*MIN(0.017,fabs(velocity.z));
+  if (!pressed_walk)
+    velocity.z -= SIGN (velocity.z) * MIN (0.017, fabs (velocity.z));
 
-  if(!do_gravity)
-    velocity.y-=sign(velocity.y)*MIN(0.017,fabs(velocity.y));
+  if (!do_gravity)
+    velocity.y -= SIGN (velocity.y) * MIN (0.017, fabs (velocity.y));
 
 //  pressed_strafe=pressed_walk=false;
 
@@ -953,7 +1183,7 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
   for (i = 0 ; i < world->sprites.Length () ; i++)
   {
     spp = (csSprite3D*)world->sprites[i];
-    
+
     // TODO: Should create beings for these.
     CHK(csCollider* pCollider = new csCollider(spp));
     csColliderPointerObject::SetCollider(*spp, pCollider, true);
@@ -1153,7 +1383,7 @@ int main (int argc, char* argv[])
       fatal_exit (0, false);
     }
 
-    //Find the Crystal Space logo and set the renderer Flag to for_2d, to allow 
+    //Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
     //the use in the 2D part.
     csTextureList *texlist = world->GetTextures ();
     ASSERT(texlist);
@@ -1217,7 +1447,7 @@ int main (int argc, char* argv[])
   txtmgr->AllocPalette ();
 
   // Create a wireframe object which will be used for debugging.
-  CHK (world->wf = new csWireFrameCam (txtmgr));
+  CHK (Sys->wf = new csWireFrameCam (txtmgr));
 
   // Load a few sounds.
 #ifdef DO_SOUND

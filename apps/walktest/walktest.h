@@ -35,6 +35,11 @@ class csWorld;
 class csSprite2D;
 class PhysicsLibrary;
 
+// Several map modes.
+#define MAP_OFF 0
+#define MAP_OVERLAY 1
+#define MAP_ON 2
+
 ///
 struct csKeyMap
 {
@@ -74,6 +79,11 @@ public:
    */
   static bool move_3d;
 
+  /**
+   * If true we show edges around all polygons (debugging).
+   */
+  bool do_edges;
+
   /// The world.
   csWorld* world;
 
@@ -106,6 +116,17 @@ public:
   bool do_cd;
   bool do_freelook;
   bool do_gravity;
+  bool do_light_frust;
+
+  /// The selected light.
+  csLight* selected_light;
+  /// The selected polygon.
+  csPolygon3D* selected_polygon;
+
+  /// A WireFrame object for the map.
+  csWireFrameCam* wf;
+  /// Map mode.
+  int map_mode;
 
   /// Timing.
   float timeFPS;
