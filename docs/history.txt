@@ -19,9 +19,6 @@ The history order is reversed so that new features are at the top.
 	  within the physical filesystem.  It is essentially the complement of
 	  virtual iFile implementations for VFS, and the antithesis of
 	  csMemFile.
-	- Jorrit removed several usages of GetPrivateObject() in the engine.
-	  Not all usages could be removed however. The ones that were removed
-	  now were the easy ones.
 	- Eric Sunshine eliminated several compilation warnings from
 	  win32/registrycfg.cpp.
 	- Eric Sunshine performed Phase Two of the elimination of the
@@ -55,6 +52,10 @@ The history order is reversed so that new features are at the top.
 		  plugin's source code.
 	- Eric Sunshine eliminated several comilation warnings from
 	  clothldr.cpp.
+	- Jorrit removed several usages of GetPrivateObject() in the engine.
+	  Not all usages could be removed however. The ones that were removed
+	  now were the easy ones.
+	- Eric Sunshine eliminated the unmaintained and broken cslua module.
 27-May-2003
 	- Boyan made the following changes:
 	    - Fixed kyboard focusing component bug in AWS 
