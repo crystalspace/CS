@@ -1048,7 +1048,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygon& poly)
         
   verts=new GrVertex[poly.num];
   float q,x,y,ooz,z,u,v,lu,lv;
-
+  int i;
   TextureHandler *thLm =NULL, 
                  *thTex = (TextureHandler *)tcache->pData;
                        
@@ -1056,7 +1056,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygon& poly)
                 q = (float)((poly.polygon->theDynLight->RawIntensity() * 256) >> 16);
         else*/
   q = 255;
-  for(int i=0;i<poly.num;i++)
+  for(i=0;i<poly.num;i++)
     {
       x = poly.vertices[i].sx;
       y = poly.vertices[i].sy;
