@@ -49,7 +49,7 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   csTextureMMOpenGL *tex;
   csTextureProcOpenGL *tex_0;
 
-  int frame_height, pixel_bytes;
+  int frame_width, frame_height, pixel_bytes;
   csPixelFormat pfmt;
   bool rstate_bilinearmap;
 
@@ -76,6 +76,8 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   virtual void Close () {}
 
   virtual bool BeginDraw (int DrawFlags);
+
+  virtual void FinishDraw ();
 
   virtual void Print (csRect *area);
 

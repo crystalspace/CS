@@ -422,6 +422,12 @@ public:
 
   //Extension flags
   bool ARB_multitexture;
+
+ protected:
+
+  void start_draw_poly ();
+  void end_draw_poly ();
+  bool in_draw_poly;
 };
 
 #endif // __OGL3DCOM_H__

@@ -88,15 +88,14 @@ void csglBindTexture (GLenum target, GLuint handle)
 }
 
 //@@@ For opt DrawPolygon:
-bool in_draw_poly = false;
 
-void start_draw_poly ()
+void csGraphics3DOGLCommon::start_draw_poly ()
 {
   if (in_draw_poly) return;
   in_draw_poly = true;
 }
 
-void end_draw_poly ()
+void csGraphics3DOGLCommon::end_draw_poly ()
 {
   if (!in_draw_poly) return;
   in_draw_poly = false;
@@ -187,6 +186,9 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   color_verts.IncRef ();
   fog_intensities.IncRef ();
   fog_color_verts.IncRef ();
+
+  in_draw_poly = false;
+
 }
 
 csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
