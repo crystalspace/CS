@@ -566,6 +566,15 @@ Action:  Add a skeletal tree (demonstration). The first argument is the
 	 second argument is the width. This is the number of branches
 	 created at every depth. A good tree is 'addskel 3,3'. Be careful
 	 with large numbers here. The number of triangles grows VERY fast!
+	 If the width parameter is negative the choosen width will be
+	 random between 1 and -width (inclusive).
+
+Command: addghost
+Type:    general command
+Action:  Add a floating transparent green ghost. The first argument is the
+	 depth. A depth of 1 will create a root and one layer above. The
+	 second argument is the width. This is the number of arms for
+	 the ghost.
 
 Command: gouraud
 Type:    boolean command
