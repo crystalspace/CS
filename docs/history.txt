@@ -28,6 +28,9 @@ Short-term cleanups that need to be done:
 	  representation of the user's choice of plug-ins, whereas config.mak
 	  considered it a representation of the auto-detected plug-ins.  Thus,
 	  the user's PLUGINS choice in user.mak was being ignored.
+	- Eric Sunshine removed Brandon's include/csphysics/csphysic.h [sic]
+	  since it was both incomplete and entirely unimplemented.  Use the
+	  new full-featured and fully implemented csPhyziks library instead.
 25-Nov-1999
 	- Michael Ewert <mewert99@yahoo.com> supplied a new version of
 	  phyztest.cpp, the Phyziks test program.  This version is stable at
