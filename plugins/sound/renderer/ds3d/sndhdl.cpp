@@ -38,7 +38,8 @@ csSoundHandleDS3D::csSoundHandleDS3D(csRef<csSoundRenderDS3D> srdr, csRef<iSound
 
   buffer_writecursor=0;
 
-  mutex_WriteCursor=csMutex::Create();
+  // We need recursive locking capabilities
+  mutex_WriteCursor=csMutex::Create(true);
 
 }
 
@@ -77,11 +78,13 @@ void csSoundHandleDS3D::StartStream(bool Loop)
 {
   if (!Data->IsStatic() && !ActiveStream)
   {
+    mutex_WriteCursor->LockWait();
     buffer_writecursor=0;
     LoopStream = Loop;
     ActiveStream = true;
     // Fill our local buffer if we have one
     UpdateCount(NumSamples);
+    mutex_WriteCursor->Release();
   }
 }
 

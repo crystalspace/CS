@@ -341,6 +341,11 @@ void csSoundSourceDS3D::WriteMute(unsigned long NumBytes)
   if (WriteCursor == -1) {
     ResetPlayPosition = true;
     WriteCursor = 0;
+    /* If we're resetting the play cursor, stop the buffer during the write
+     *  to avoid invalid data being played briefly before the position is
+     *  reset.
+     */
+    Buffer2D->Stop();
   }
 
   if (Buffer2D->Lock(WriteCursor, NumBytes, &Pointer1, &Length1,
@@ -353,7 +358,11 @@ void csSoundSourceDS3D::WriteMute(unsigned long NumBytes)
 
   Buffer2D->Unlock(Pointer1, Length1, Pointer2, Length2);
   WriteCursor = (WriteCursor + Length1 + Length2) % BufferBytes;
-  if (ResetPlayPosition) Buffer2D->SetCurrentPosition(0);
+  if (ResetPlayPosition) 
+  {
+    Buffer2D->SetCurrentPosition(0);
+    Buffer2D->Play(0, 0, Looped ? DSBPLAY_LOOPING : 0);
+  }
 }
 
 void csSoundSourceDS3D::FillBufferWithSilence()
@@ -471,9 +480,17 @@ int32 csSoundSourceDS3D::GetFreeBufferSpace()
 
   if (DS_OK!=Buffer2D->GetCurrentPosition(&playcursor,NULL))
     return 0;
-  freespace=playcursor-WriteCursor;
-  if (freespace<0)
-    freespace=freespace+BufferBytes;
+  if (WriteCursor==-1)
+  {
+    // Fill entire buffer
+    return BufferBytes;
+  }
+  else
+  {
+    freespace=playcursor-WriteCursor;
+    if (freespace<0)
+      freespace=freespace+BufferBytes;
+  }
 
   return freespace;
 }

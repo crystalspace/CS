@@ -4,6 +4,8 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 6-Apr-2003
+        - Rhad fixed some thread syncronization issues in the OpenAL
+          and Direct Sound 3d sound renderers.
         - Rhad fixed a bug in the software sound renderer that caused
           streaming audio to be advanced twice per "cycle" instead of
           once if StartStream() was called on the handle (as it should

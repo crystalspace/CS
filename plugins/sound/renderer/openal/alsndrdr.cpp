@@ -181,7 +181,11 @@ void csSoundRenderOpenAL::Close()
   if (!al_open) return;
 
   // Signal the background thread to halt
-  bRunning=false;
+  if (bRunning)
+  {
+    bRunning=false;
+    bgThread->Wait();
+  }
 
   // Release the listener reference
   Listener = NULL;

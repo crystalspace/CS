@@ -40,7 +40,7 @@ csSoundHandleOpenAL::csSoundHandleOpenAL(csSoundRenderOpenAL *srdr, iSoundData *
 
   buffer_writecursor=0;
 
-  mutex_WriteCursor=csMutex::Create();
+  mutex_WriteCursor=csMutex::Create(true);
   ActiveStream=false;
 
 }
@@ -56,11 +56,13 @@ void csSoundHandleOpenAL::StartStream(bool Loop)
 {
   if (!Data->IsStatic() && !ActiveStream)
   {
+    mutex_WriteCursor->LockWait();
     buffer_writecursor=0;
     LoopStream = Loop;
     ActiveStream = true;
     // Fill our local buffer if we have one
     UpdateCount(NumSamples);
+    mutex_WriteCursor->Release();
   }
 }
 

@@ -176,7 +176,11 @@ bool csSoundRenderDS3D::Open()
 
 void csSoundRenderDS3D::Close()
 {
-  bRunning=false;
+  if (bRunning)
+  {
+    bRunning=false;
+    bgThread->Wait();
+  }
 
   mutex_ActiveSources->LockWait();
   while (ActiveSources.Length()>0)
