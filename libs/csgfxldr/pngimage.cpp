@@ -30,10 +30,10 @@ extern "C"
 
 //---------------------------------------------------------------------------
 
+csPNGImageLoader pngloader;
 bool RegisterPNG ()
 {
-  static csPNGImageLoader loader;
-  return csImageLoader::Register (&loader);
+  return csImageLoader::Register (&pngloader);
 }
 
 csImageFile* csPNGImageLoader::LoadImage (UByte* iBuffer, ULong iSize,

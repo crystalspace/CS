@@ -35,11 +35,11 @@ extern "C"
 }
 
 //---------------------------------------------------------------------------
+csJPGImageLoader jpgloader;
 
 bool RegisterJPG ()
 {
-  static csJPGImageLoader loader;
-  return csImageLoader::Register (&loader);
+  return csImageLoader::Register (&jpgloader);
 }
 
 csImageFile* csJPGImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

@@ -50,11 +50,11 @@ struct WALHeader
 } _WALHeader;
 
 //---------------------------------------------------------------------------
+csWALImageLoader walloader;
 
 bool RegisterWAL ()
 {
-  static csWALImageLoader loader;
-  return csImageLoader::Register (&loader);
+  return csImageLoader::Register (&walloader);
 }
 
 csImageFile* csWALImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
