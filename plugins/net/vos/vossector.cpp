@@ -109,15 +109,12 @@ void LoadSectorTask::doTask()
 {
   LOG("csVosSector", 2, "Starting task");
 
-  vRef<Vobject> v = Vobject::findObjectFromRoot(url);
-  vRef<A3DL::Sector> sec = meta_cast<A3DL::Sector>(v);
-
-  LOG("csVosSector", 2, "did metacast");
+  vRef<A3DL::Sector> sec = meta_cast<A3DL::Sector>(Vobject::findObjectFromRoot(url));
+  LOG("csVosSector", 2, "Iterating");
   for (ChildListIterator ci = sec->getChildren(); ci.hasMore(); ci++)
   {
-    LOG("csVosSector", 2, "did getchildren");
+  LOG("csVosSector", 2, "Foo");
     vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>((*ci)->getChild());
-    LOG("csVosSector", 2, "did getchild");
     std::cout << "looking at " << (*ci)->getChild()->getURLstr() << " " << obj3d.isValid() << std::endl;
 
     if(obj3d.isValid())
@@ -147,7 +144,6 @@ void LoadSectorTask::doTask()
       }
     }
   }
-  exit(0);
   vosa3dl->mainThreadTasks.push(new RelightTask(vosa3dl, (csVosSector*)sector));
 }
 
