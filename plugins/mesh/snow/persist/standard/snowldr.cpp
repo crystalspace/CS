@@ -258,6 +258,14 @@ csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
           snowstate = SCF_QUERY_INTERFACE (mesh, iSnowState);
+	  if (!snowstate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.snowloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a snow factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       case XMLTOKEN_MATERIAL:

@@ -281,6 +281,14 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
           fountstate = SCF_QUERY_INTERFACE (mesh, iFountainState);
+	  if (!fountstate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.fountstate.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a fountain factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       case XMLTOKEN_MATERIAL:

@@ -278,6 +278,14 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
           firestate = SCF_QUERY_INTERFACE (mesh, iFireState);
+	  if (!firestate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.fireloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a fire factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       case XMLTOKEN_MATERIAL:

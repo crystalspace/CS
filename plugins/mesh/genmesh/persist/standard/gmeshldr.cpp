@@ -626,7 +626,16 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+	  CS_ASSERT (mesh != 0);
           meshstate = SCF_QUERY_INTERFACE (mesh, iGeneralMeshState);
+	  if (!meshstate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a genmesh factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       case XMLTOKEN_MATERIAL:

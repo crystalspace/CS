@@ -460,6 +460,14 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           spr3dLook = SCF_QUERY_INTERFACE (mesh, iSprite3DState);
+	  if (!spr3dLook)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.sprite3dloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a spr3d factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       case XMLTOKEN_ACTION:

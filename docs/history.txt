@@ -18,6 +18,8 @@ chronological order.
 	      iPortalContainer, iStandardReporterListener.
 	- Jorrit reverted the crash fix in genmesh made by res2k earlier.
 	  Better to leave the crash there until the REAL bug is fixed.
+	- Jorrit fixed all mesh loaders to test if the factory is actually
+	  the same type as the mesh object. That's better then just crashing.
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to

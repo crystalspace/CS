@@ -271,6 +271,14 @@ csPtr<iBase> csStarLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           starstate = SCF_QUERY_INTERFACE (mesh, iStarsState);
+	  if (!starstate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.starloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a star factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       default:

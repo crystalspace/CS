@@ -254,6 +254,14 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
           explostate = SCF_QUERY_INTERFACE (mesh, iExplosionState);
+	  if (!explostate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.exploader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be an explosion factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       case XMLTOKEN_MATERIAL:

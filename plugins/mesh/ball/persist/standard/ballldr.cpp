@@ -313,6 +313,13 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           ballstate = SCF_QUERY_INTERFACE (mesh, iBallState);
+	  if (!ballstate)
+	  {
+      	    synldr->ReportError ("crystalspace.ballloader.parse.badfactory",
+		child, "factory '%s' doesn't appear to be a 'ball' factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       case XMLTOKEN_MATERIAL:

@@ -610,6 +610,14 @@ csPtr<iBase> csClothMeshLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  meshstate = SCF_QUERY_INTERFACE (mesh, iClothMeshState);
+	  if (!meshstate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.clothmeshloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a cloth factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       case XMLTOKEN_MATERIAL:

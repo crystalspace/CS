@@ -113,7 +113,7 @@ struct iLoader : public iBase
    * If you use 'checkDupes' == true then materials, textures,
    * and mesh factories will only be loaded if they don't already exist
    * in the entire engine (ignoring regions). By default this is false because
-   * it is very legel for different world files to have different objects
+   * it is very legal for different world files to have different objects
    * with the same name. Only use checkDupes == true if you know that your
    * objects have unique names accross all world files.
    * <p>
@@ -139,7 +139,7 @@ struct iLoader : public iBase
    * If you use 'checkDupes' == true then materials, textures,
    * and mesh factories will only be loaded if they don't already exist
    * in the entire engine (ignoring regions). By default this is false because
-   * it is very legel for different world files to have different objects
+   * it is very legal for different world files to have different objects
    * with the same name. Only use checkDupes == true if you know that your
    * objects have unique names accross all world files.
    */

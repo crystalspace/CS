@@ -209,6 +209,14 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = iFactory->GetMeshObjectFactory()->NewInstance();
           terrstate = SCF_QUERY_INTERFACE (mesh, iTerrFuncState);
+	  if (!terrstate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.terrfunc.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a terrfunc factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       case XMLTOKEN_MATERIAL:

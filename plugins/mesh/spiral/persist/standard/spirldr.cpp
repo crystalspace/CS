@@ -232,13 +232,21 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
 	  if (!fact)
 	  {
       	    synldr->ReportError (
-		"crystalspace.ballloader.parse.unknownfactory",
+		"crystalspace.spiralloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
 	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
           spiralstate = SCF_QUERY_INTERFACE (mesh, iSpiralState);
+	  if (!spiralstate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.spiralloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a spiral factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       case XMLTOKEN_MATERIAL:

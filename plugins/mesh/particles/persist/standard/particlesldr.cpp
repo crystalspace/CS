@@ -771,6 +771,14 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         }
         mesh = fact->GetMeshObjectFactory ()->NewInstance ();
         state = SCF_QUERY_INTERFACE(fact, iParticlesObjectState);
+	if (!state)
+	{
+      	  synldr->ReportError (
+		"crystalspace.particles.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a particles factory!",
+		factname);
+	  return 0;
+	}
         break;
       }
       case XMLTOKEN_COLOR:

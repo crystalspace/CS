@@ -329,6 +329,14 @@ csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
           }
           mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           Lightningstate = SCF_QUERY_INTERFACE (mesh, iLightningState);
+	  if (!Lightningstate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.lightningloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a lightning factory!",
+		factname);
+	    return 0;
+	  }
           LightningFactoryState = SCF_QUERY_INTERFACE (
               fact->GetMeshObjectFactory(), iLightningFactoryState);
         }

@@ -234,7 +234,7 @@ bool csBezierLoader::LoadThingPart (iDocumentNode* node,
           {
 	    synldr->ReportError (
 	      "crystalspace.bezierloader.parse.factory",
-              child, "Couldn't find thing factory '%s'!", factname);
+              child, "Couldn't find bezier mesh factory '%s'!", factname);
             return false;
           }
 	  csRef<iBezierFactoryState> tmpl_thing_state (SCF_QUERY_INTERFACE (
@@ -243,7 +243,7 @@ bool csBezierLoader::LoadThingPart (iDocumentNode* node,
 	  {
 	    synldr->ReportError (
 	      "crystalspace.bezierloader.parse.factory",
-              child, "Object '%s' is not a thing!", factname);
+              child, "Factory '%s' is not a bezier mesh factory!", factname);
             return false;
 	  }
 	  thing_fact_state->MergeTemplate (tmpl_thing_state,

@@ -953,7 +953,7 @@ if (!info.thing_fact_state) \
 	  {
 	    synldr->ReportError (
 	      "crystalspace.thingloader.parse.factory",
-              child, "Object '%s' is not a thing factory!", factname);
+              child, "Factory '%s' is not a thing factory!", factname);
             return false;
 	  }
 	  info.obj = fact->GetMeshObjectFactory ()->NewInstance ();

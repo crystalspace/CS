@@ -416,6 +416,14 @@ csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           state = SCF_QUERY_INTERFACE (mesh, iNullMeshState);
+	  if (!state)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.nullmeshloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a null factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       default:

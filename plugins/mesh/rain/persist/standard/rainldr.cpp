@@ -252,6 +252,14 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  rainstate = SCF_QUERY_INTERFACE (mesh, iRainState);
+	  if (!rainstate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.rainloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a rain factory!",
+		factname);
+	    return 0;
+	  }
 	}
 	break;
       case XMLTOKEN_MATERIAL:

@@ -362,6 +362,14 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           spr2dLook = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
+	  if (!spr2dLook)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.sprite2dloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a spr2d factory!",
+		factname);
+	    return 0;
+	  }
 	  verts = &(spr2dLook->GetVertices ());
 	}
 	break;

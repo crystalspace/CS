@@ -424,6 +424,14 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
           emitstate = SCF_QUERY_INTERFACE (mesh, iEmitState);
+	  if (!emitstate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.emitstate.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be an emit factory!",
+		factname);
+	    return 0;
+	  }
 	  emitfactorystate = SCF_QUERY_INTERFACE (
 	  	fact->GetMeshObjectFactory(), iEmitFactoryState);
 	}

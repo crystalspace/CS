@@ -388,6 +388,14 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           hazestate = SCF_QUERY_INTERFACE (mesh, iHazeState);
+	  if (!hazestate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.hazeloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a haze factory!",
+		factname);
+	    return 0;
+	  }
 	  hazefactorystate = SCF_QUERY_INTERFACE (
 	  	fact->GetMeshObjectFactory(), iHazeFactoryState);
 	}

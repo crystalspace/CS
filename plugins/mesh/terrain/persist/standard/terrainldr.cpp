@@ -308,6 +308,14 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
         }
         mesh = fact->GetMeshObjectFactory ()->NewInstance ();
         state = SCF_QUERY_INTERFACE (mesh, iTerrainObjectState);
+	if (!state)
+	{
+      	  synldr->ReportError (
+		"crystalspace.terrain.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a terrain factory!",
+		factname);
+	  return 0;
+	}
         break;
       }
       case XMLTOKEN_COLOR:
