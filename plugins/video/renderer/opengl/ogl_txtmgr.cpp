@@ -413,7 +413,8 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
       image_data = new uint8 [tex->size];
       csGraphics3DOGLCommon::glGetCompressedTexImageARB (GL_TEXTURE_2D, 0,
       	image_data);
-    }
+    } else
+      tex->size = n * csTextureManagerOpenGL::glformats[formatidx].texelbytes;
 
     glDeleteTextures (1, &t);
   }
@@ -768,7 +769,8 @@ void csTextureManagerOpenGL::DetermineStorageSizes ()
   {
     if (glformats[i].texelbytes == 0)
     {
-      glformats[i].texelbytes = glformats[i].components * 8;
+      //glformats[i].texelbytes = glformats[i].components * 8; // @@@ why *8?
+      glformats[i].texelbytes = glformats[i].components;
       if (glformats[i].texelbytes > d)
 	glformats[i].texelbytes = d;
     }
