@@ -147,7 +147,7 @@ bool csSoundRenderDS3D::Open()
 
   if (!Listener)
   {
-    Listener = new csSoundListenerDS3D(this);
+    Listener = csPtr<csSoundListenerDS3D>(new csSoundListenerDS3D(this));
     if (!Listener->Initialize(this))
     {
       return false;
