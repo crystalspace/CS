@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: terrfunc terrfuncclean
-plugins all: terrfunc
+plugins meshes all: terrfunc
 
 terrfuncclean:
 	$(MAKE_CLEAN)
