@@ -137,7 +137,7 @@ void csCamera::LookAt (const csVector3& v, const csVector3& up)
 void csCamera::Correct (int n)
 {
   csVector3 w1, w2, w3;
-  float* vals[4];
+  float* vals[5];
   if (n==0) return;
 
   w3 = m_t2o.Col3();
