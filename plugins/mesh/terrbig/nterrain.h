@@ -46,6 +46,16 @@ struct iLight;
 
  ******************************************************************************************/
 
+/// Calculates the binary logarithm of n
+int ilogb (unsigned n) 
+{
+  int i = -1;
+  while (n != 0) {
+      ++ i;
+      n >>= 1;
+  }
+  return i;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -495,16 +505,5 @@ public:
     { return scfParent->Initialize (object_reg); }
   } scfiComponent;
 };
-
-/// Calculates the binary logarithm of n
-int ilogb (unsigned n) 
-{
-  int i = -1;
-  while (n != 0) {
-      ++ i;
-      n >>= 1;
-  }
-  return i;
-}
 
 #endif // __CS_N_TERRAIN_RENDERER__
