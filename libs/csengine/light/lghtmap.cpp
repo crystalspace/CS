@@ -439,7 +439,6 @@ bool csLightMap::UpdateRealLightMap ()
       red = light->GetColor ().red;
       green = light->GetColor ().green;
       blue = light->GetColor ().blue;
-      csLight::CorrectForNocolor (&red, &green, &blue);
       p = smap->GetArray ();
       last_p = p+lm_size;
       do

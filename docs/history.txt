@@ -1,8 +1,42 @@
 The history order is reversed so that new features are at the top.
 
+11-Jul-2001
+	- Removed csLight::CorrectForNoColor() since it is obsolete.
+	- Added a virtual destructor to mdldata.h.
 10-Jul-2001
+	- Michael Voasse did the following:
+	    - Next installment on terrfunc, this patch adds some bound
+	      checking to HitBeamObject(), this should stop once and for all
+	      the current infinite loop problems. Also prevents out of
+	      bounds block indexes from being used.
+	    - Modified the intersect triangle stuff to check the triangle in
+	      both orientations. This is due to
+	      csIntersect3::IntersectTriangle() being picky about vertex
+	      orientation. Note this does slow down the HitBeam routine
+	      in terrfunc, but at least provides 100% accurate intersections.
+	      I will add a similar step to ball, sprite and metaball. Cube
+	      and surface need no change. 
+	    - Reworked how HitBeam uses its increment during box crawl. The
+	      increment is now only added during the Object2Block calc. This
+	      should squash the tiny error that allowed triangles that were
+	      close to the intersect point on the block bounding box being
+	      missed.
+	    - Lastly, this patch also implies HitBeam in terrfunc should be
+	      100%. If it is not, please report any bugs found.
+	- Martin Geisse added a call to MakeRoom() to csPoly2D::SetVertices()
+	  and csPoly3D::SetVertices ().
+	- Christopher Nelson added the aws registrations for SCF into scf.cfg.
 	- Eric Sunshine eliminated several compilation warnings from
 	  curve.cpp and polytext.cpp.
+	- Martin Geisse applied a small change to SCF_DECLARE_FAST_INTERFACE:
+	  The static interface variable is now defined outside the wrapper
+	  function, because static variables inside inline functions seem to
+	  cause problems on some platforms.
+	- Eric Sunshine reverted Martin's change since it unconditionally
+	  allocated storage for every `id' variable in every compilation unit
+	  even if the variable was never accessed.  I suggested, to Dan
+	  Bogdanov, a different potential work-around for the DJGPP port.
+	  If this work-around is successful then it will be applied instead.
 9-Jul-2001
 	- Added csThing::IntersectSegmentFull() which does the same
 	  thing as IntersectSegment() except that the latter doesn't (anymore)

@@ -2244,9 +2244,8 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
       csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
       pl.DD += center * pl.norm;
       pl.Invert ();
-      csFrustum* frust = shadows->GetLastShadowBlock ()->
-      		AddShadow (center, (void*)p,
-		p->GetVertices ().GetVertexCount (), pl);
+      csFrustum* frust = shadows->GetLastShadowBlock ()->AddShadow (
+      	center, (void*)p, p->GetVertices ().GetVertexCount (), pl);
       // Polygons that are merged with the octree have world==obj space.
       for (j = 0 ; j < p->GetVertices ().GetVertexCount () ; j++)
         frust->GetVertex (j).Set (p->Vobj (j)-center);

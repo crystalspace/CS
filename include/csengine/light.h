@@ -215,22 +215,6 @@ public:
    */
   float GetBrightnessAtDistance (float d);
 
-  /**
-   * Change the given r, g, b value to the current mixing mode
-   * (TRUE_RGB or NOCOLOR). In NOCOLOR mode this function will
-   * take the average of the three colors to return a grayscale
-   * value.
-   */
-  static void CorrectForNocolor (unsigned char* rp, unsigned char* gp, unsigned char* bp);
-
-  /**
-   * Change the given r, g, b value to the current mixing mode
-   * (TRUE_RGB or NOCOLOR). In NOCOLOR mode this function will
-   * take the average of the three colors to return a grayscale
-   * value.
-   */
-  static void CorrectForNocolor (float* rp, float* gp, float* bp);  
-
   //------------------------ iLight interface -----------------------------
   SCF_DECLARE_IBASE_EXT (csObject);
 
