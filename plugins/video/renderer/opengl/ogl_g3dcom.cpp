@@ -3557,8 +3557,8 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   int oheight = txt_mm->orig_height;
   if (owidth != bitmapwidth || oheight != bitmapheight)
   {
-    sx = sx * owidth / bitmapwidth;
-    sy = sy * oheight / bitmapheight;
+    //sx = sx * owidth / bitmapwidth;
+    //sy = sy * oheight / bitmapheight;
     sw = sw * owidth / bitmapwidth;
     sh = sh * oheight / bitmapheight;
   }
