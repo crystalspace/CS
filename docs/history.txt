@@ -13,6 +13,67 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+17-Aug-1999
+	- Small optimization. If a sprite is already marked visible we will
+	  not do further processing on the bounding box polygons in the BSP
+	  tree.
+	- Fixed the c-buffer so that it does not crash when given polygons
+	  which fall outside the y range.
+	- There is still one problem with the visibility testing for sprites
+	  using the c-buffer. If the sprite is too close it may disappear
+	  (the c-buffer thinks it is not visible). I will fix that soon.
+16-Aug-1999
+	- Added csSprite3D::AddBoundingBox().
+	- Added a csPoly3D class to csgeom similar to csPoly2D.
+	- Added a csPolyIndexed class to csgeom.
+	- Added csVector3Array to csgeom. Rewrote csVertexArray to
+	  inherit from csVector3Array.
+	- Changed csPolygon3D to use the new csPolyIndexed class.
+	- Basicly csgeom now knows about the following four polygon classes:
+	    - csPolygonInt: which is the general base class for every
+	      polygon which should go in a BSP tree. It is a virtual
+	      class and cannot be used as such.
+	    - csPoly2D: a basic 2D polygon from which you can subclass
+	      or which you can use standalone. There is also support
+	      for a bounding box in 2D and clipping.
+	    - csPoly3D: the same but in 3D. No bounding box and no
+	      clipping though.
+	    - csPolyIndexed: a polygon which doesn't hold the actual
+	      values of the vertices but instead holds indices into
+	      some array (which isn't maintained by this class).
+	      csPolygon3D and csBspPolygon now use this class.
+	- csengine knows about the following engine classes:
+	    - csPolygon3D: the main polygon class. It uses csPolyIndexed
+	      (but not subclassed). It subclasses csPolygonInt so that it
+	      can be put in a BSP tree.
+	    - csPolygon2D: our main 2D polygon class. It extends csPoly2D
+	      by adding functions for drawing a 2D polygon on screen and
+	      some others.
+	    - csBspPolygon: A polygon specifically created for bounding
+	      boxes for sprites and other dynamic actors. It uses
+	      csPolyIndexed (but not subclassed). It subclasses csPolygonInt
+	      so that it can be put in a BSP tree (in fact, that is its
+	      purpose).
+	- Basic c-buffer testing on sprites seems to work now. I
+	  need to test it further though. I also need to test the
+	  performance of this new system. What gain do we really get.
+15-Aug-1999
+	- Started work on new bounding box object. This object is
+	  specifically designed to be inserted in a BSP tree dynamically.
+	  The classes are csBspPolygon and csBspContainer.
+14-Aug-1999
+	- Added a new BSP mode (BSP_RANDOM) which allows for faster
+	  BSP tree creation (but with less quality).
+	- Added the calculation of bounding boxes for sprites. Every
+	  frame has its own bounding box in object space. For a skeleton
+	  sprite, every limb has its bounding box in object space.
+13-Aug-1999
+	- Added an extra parameter to the BSP tree builder so that you
+	  can select a criteria on which to choose the BSP splitter.
+	  This used to be a #define.
+	- Provided the ability to add dynamic polygons to a BSP tree.
+	  This is untested currently but the plan is to use this ability
+	  to add dynamic (i.e. moving) things and sprites to the BSP tree.
 12-Aug-1999
 	- Implemented an object pool for csLightPatch. This improves speed
 	  of dynamic lighting noticably.
@@ -33,6 +94,14 @@ Short-term cleanups that need to be done:
 	  crash otherwise.
 	- Edge drawing works now too when c-buffer is enabled.
 	- Fixed Blocks so that dynamic gouraud shading works again.
+	- Andrew Zabolotny added an Ascii Art library driver! :-) More for
+	  fun than something useable...  Fixed/improved some things in
+	  engine a bit that he discovered while debugging that driver. For
+	  example, console font size choosing should always work okay. Before
+	  my changes it can happen that 2D driver sets one width/height but
+	  system driver knows about completely different width/height.
+	- Thomas Hieber contributed some fixes and update to VC project files.
+	- Changes to Macintosh project files from Robert Bate.
 	- Eric Sunshine fixed a compilation error in blocks.cpp caused by
 	  incorrect resolution of conflicts between the previous two revisions.
 11-Aug-1999

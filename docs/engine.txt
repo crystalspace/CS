@@ -40,6 +40,8 @@ Currently Crystal Space has the following features:
 	- Portals are used for efficient and easy visibility sorting.
 	  In addition you can optionally enable a BSP for some
 	  sectors to allow for even more powerful world definitions.
+	- Additional C-buffer (coverage buffer) which can be enabled for
+	  even better visibility culling (for all 3D rasterizers!)
 	- Using portals you can also create transparent and semi-
 	  transparent mirrors.
 	- Alpha transparency in combination with mirrors allows simulation
