@@ -1839,7 +1839,6 @@ void csEngine::SelectRegion (const char *iName)
 
 void csEngine::SelectRegion (iRegion* region)
 {
-  if (!region) { csEngine::region = NULL; return; }
   csEngine::region = region;
 }
 
