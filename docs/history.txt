@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Sep-2003
+        - res added a simple calculation of binormals and tangents to thing.
+        - res reformatted light.xml a bit.
+        - res added some cheesy new textures to stdtex.zip: normalmaps for the
+          textures used in r3dtest and a new texture for the donut in flarge.
+          Also moved it a bit so it's only half shadowed.
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer
@@ -74,8 +80,6 @@ chronological order.
 	  expected when using GL_CLAMP.
         - res hardcoded the texture format for cubemaps to RGB8 to fix visual
           glitches on ATI cards.
-        - res added a simple calculation of binormals and tangents to thing.
-        - res reformatted light.xml a bit.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:
