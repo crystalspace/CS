@@ -1,4 +1,7 @@
-Here is the old history.
+History starts at first public release. The history order has been
+reversed so that new features are at the top.
+
+This history is "historical".  See "history.txt" for more recent entries.
 
 31-Dec-1999
 	- First significant memory optimization in csPolyTxtPlane. The

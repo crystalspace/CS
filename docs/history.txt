@@ -1,5 +1,4 @@
-History starts at first public release. The history order has been
-reversed so that new features are at the top.
+The history order has been reversed so that new features are at the top.
 
 Short-term cleanups that need to be done:
 	- Resolve config/console/commandline mess.  Several things are broken
@@ -16,71 +15,76 @@ Short-term cleanups that need to be done:
 4-Jan-2000
 	- Improved style a bit in new planeclp.h.
 	- Started work on including curved surfaces to the visibility
-	  algorithms. This initially means that csThing::Merge() now
-	  actually also merges curved surfaces.
-	- Changed STATBSP() option so that it ignores things that
-	  contains curves and doesn't try to add them to the static bsp.
-	  This means that curved surfaces will now appear correctly
-	  even if you use STATBSP() but they will still not use the
-	  visibility algorithm (i.e. they will be slow).
-	- Thomas Hieber removed setting for manual sectoring in map2cs.
-	  It is now always on. Textures are also exported with different
-	  name and filename.
-	- Thomas also fixed the release mode name for the Windows OpenGL
-	  2D driver.
+	  algorithms.  This initially means that csThing::Merge() now actually
+	  also merges curved surfaces.
+	- Changed STATBSP() option so that it ignores things that contains
+	  curves and doesn't try to add them to the static bsp.  This means
+	  that curved surfaces will now appear correctly even if you use
+	  STATBSP() but they will still not use the visibility algorithm (i.e.
+	  they will be slow).
+	- Thomas Hieber removed setting for manual sectoring in map2cs.  It is
+	  now always on.  Textures are also exported with different name and
+	  filename.
+	- Thomas also fixed the release mode name for the Windows OpenGL 2D
+	  driver.
 	- Eric Sunshine modified the CVS snapshot-generation script to patch
 	  the CVS/Root files ("cvs1" --> "cvs.crystal.sourceforge.net") such
-	  that the resulting snapshot can be used later for an anonymous
-	  cvs update.
+	  that the resulting snapshot can be used later for an anonymous cvs
+	  update.
 	- Eric Sunshine fixed DECLARE_GROWING_ARRAY() so that it is compilable
 	  on all platforms.  Recent changes to appease MSVC (the addition of a
-	  floating semi-colon) were not grokked by the NextStep compiler, so
-	  he resolved the issue by eliminating the problem altogether. :-)
-	- Eric Sunshine applied a patch to blocks.cpp from Artur
-	  Biesiadowski <abies@pg.gda.pl> to correct a bug where the
-	  orientation of a piece was different on-screen versus in-memory.
+	  floating semi-colon) were not grok'd by the NextStep compiler, so the
+	  issue was resolved by eliminating the problem altogether. :-)
+	- Eric Sunshine applied a patch to blocks.cpp from Artur Biesiadowski
+	  <abies@pg.gda.pl> to correct a bug where the orientation of a piece
+	  was different on-screen versus in-memory.
 	- Eric Sunshine fixed several compilation errors in map2cs.  He also
 	  eliminated some compilation warnings.
 	- Eric Sunshine removed all of the remaining, obsolete references to
 	  csregsvr from the documentation.
+	- Eric Sunshine fixed the makefile for scftutor so that it once again
+	  generates plug-in modules usable by NeXT.
+	- Eric Sunshine patched up linking of the CrystalClear plug-in so that
+	  it is once again usable on NeXT.
+	- Eric Sunshine fixed a bug in cctest where it was corrupting the path
+	  to the level file (as in "/lev/largelarge").
+	- Eric Sunshine fixed a bug in the CrystalClear plug-in where it failed
+	  to initialize its embedded physics configuration member.
 3-Jan-2000
 	- Thomas Hieber fixed a few things to make CS compilable again with
 	  MSVC.
 	- Norman Kramer added new keywords to world format TEX_SET and
-	  TEX_SET_SELECT. Using these new keywords it is possible to use
+	  TEX_SET_SELECT.  Using these new keywords it is possible to use
 	  different texture sets for different instantiations of a thing
 	  template.
 2-Jan-2000
-	- Removed another 16 bytes from csLightMap. This change also
-	  makes dynamic lighting more efficient (slightly).
+	- Removed another 16 bytes from csLightMap.  This change also makes
+	  dynamic lighting more efficient (slightly).
 	- Started cleaning up csPolyTexture.
 	- Optimization in the software renderer (CreateDirtyMatrix).
-	- VERY significant memory optimization. Instead of storing four
+	- VERY significant memory optimization.  Instead of storing four
 	  lightmap structures (and lightmaps) for every polygon we now only
-	  store one. The four lightmaps were the same anyway. I don't know
-	  why there should be four. This is left-over from a long time ago.
+	  store one.  The four lightmaps were the same anyway.  I don't know
+	  why there should be four.  This is left-over from a long time ago.
 	  This optimization means we save 4800 bytes for every lightmapped
 	  polygon with a 16x16 lightmap.
 	- Changes to Map2CS from Thomas Hieber (new lightscale option).
 	- Norman Kramer added a farplane to csCamera object such that
-	  everything is clipped to that plane. Default is no clipping.
+	  everything is clipped to that plane.  Default is no clipping.
 	- Eric Sunshine wrote a script (bin/snapshot.py) which generates
 	  snapshots and diffs of the CVS repository.  The script currently
 	  runs daily and deposits the snapshots at:
 	  ftp://crystal.sourceforge.net/pub/crystal/cvs-snapshots.
 1-Jan-2000
-	- My computer is still working :-)
-	  And so is Crystal Space.
-	- Removed 16 bytes from every csLightMap. This means a saving
-	  of 64 bytes for every lightmapped polygon since there are four
-	  lightmaps for the four mipmap levels.
+	- My computer is still working :-)  And so is Crystal Space.
+	- Removed 16 bytes from every csLightMap.  This means a saving of 64
+	  bytes for every lightmapped polygon since there are four lightmaps
+	  for the four mipmap levels.
 	- Removed another 12 bytes from csLightMap.
 	- Small optimization in coverage mask tree.
-	- Seth Galbraith did some changes on map2cs so that textures
-	  with no data are not saved. If no texture is found then a new
-	  texture is created (with no data) with the name from the map
-	  file.
+	- Seth Galbraith did some changes on map2cs so that textures with no
+	  data are not saved.  If no texture is found then a new texture is
+	  created (with no data) with the name from the map file.
 	- Seth also updated DJGPP help system with some correct links.
 
-Check out history.old for history older than this.
-
+Please see "history.old" for less recent historical entries.
