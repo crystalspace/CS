@@ -411,6 +411,12 @@ public:
   virtual void ParseKeyCmds (iObject* src);
 
   /**
+   * Find all SEED_MESH_OBJ nodes
+   * commands attached to an object and create them (load time execution).
+   */
+  void ParseKeyNodes (iObject* src);
+
+  /**
    * Find all key commands attached to objects and execute
    * them (load time execution).
    */

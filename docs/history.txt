@@ -16,6 +16,13 @@ The history order is reversed so that new features are at the top.
 	  This bug was not discovered earlier because in most cases
 	  the second transform will be an identity transform (since the
 	  second transform is often used for static geometry).
+	- Toni Asco' Gonzalez did the following:
+	    - Modified Map2cs to support generic mesh placing, using NODES
+	      to store information in world files.
+	    - Modified Walktest to be able to reading and interpreting those
+	      new nodes (SEED_MESH_OBJ) and be able to load model files
+	      (3ds, mdl, it's supposed to work wit all CS supported model
+	      formats).
 5-Dec-2001
 	- Added a new HOWTO to explain how to attach game objects to Crystal
 	  Space objects.

@@ -55,12 +55,21 @@
 #include "imesh/sprite3d.h"
 #include "iengine/statlght.h"
 #include "ivaria/reporter.h"
+//#include "csengine/meshobj.h"
+
 
 #include "csengine/polygon.h"
 #include "csengine/radiosty.h"
 #include "csengine/light.h"
+#include "imap/parser.h"
+
+#include "ivaria/mapnode.h"
 
 extern WalkTest* Sys;
+
+char* LookForKeyValue(iObjectIterator* it,const char* key);
+double ParseScaleFactor(iObjectIterator* it);
+
 
 /// Save recording
 void SaveRecording (iVFS* vfs, const char* fName)
@@ -312,7 +321,8 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
     return;
   }
 
-  iModelData *Model = Sys->ModelConverter->Load (buf->GetUint8 (), buf->GetSize ());
+  iModelData *Model = Sys->ModelConverter->Load (buf->GetUint8 (),
+  	buf->GetSize ());
   buf->DecRef ();
   if (!Model)
   {
@@ -330,6 +340,140 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   wrap->QueryObject ()->SetName (templatename);
 }
 
+
+void GenerateThing (iObjectIterator * it, iMaterialWrapper* mat,
+	char* spriteName, iSector* sector, csVector3 position, float size)
+{
+  it->Reset();
+  while(!it->IsFinished())
+  {
+    iModelDataObject* mdo = SCF_QUERY_INTERFACE(it->GetObject(),
+		                    iModelDataObject);
+    if(!mdo)
+    {
+      it->Next();
+      continue;
+    }
+    iMeshObjectType* thingType = Sys->Engine->GetThingType();
+    iMeshObjectFactory* thingFactory = thingType->NewFactory();
+    iThingState* thingState = SCF_QUERY_INTERFACE(thingFactory, iThingState);
+    if(!thingState)
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
+		  "Can't get iThingState Interface!");
+      thingFactory->DecRef();
+      return;
+    }
+    if(!Sys->CrossBuilder->BuildThing(mdo,thingState,mat))
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't Build Thing!");
+      thingFactory->DecRef();
+      thingState->DecRef();
+      return;
+    }
+    mdo->DecRef();
+    //Now we have loaded the thing, let's do the mesh
+    iMeshObject* thingObj = SCF_QUERY_INTERFACE(thingFactory,iMeshObject);
+    if(!thingObj)
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't Get iMeshObj Interface!");
+      thingFactory->DecRef();
+      return;
+    }
+    thingFactory->DecRef();
+    iMeshWrapper* thingWrapper = Sys->Engine->CreateMeshWrapper(
+    	thingObj,spriteName);
+
+    if(!thingWrapper)
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't Get iMeshObj Interface!");
+      thingObj->DecRef();
+      return;
+    }
+    thingObj->DecRef();
+    csMatrix3 m; m.Identity(); m = m*(1./size);
+    csReversibleTransform t = csReversibleTransform(m,csVector3(0,0,0));
+    csReversibleTransform t2;
+    t2.SetOrigin(position);
+    thingWrapper->HardTransform(t);
+    thingWrapper->HardTransform(t2);
+    thingWrapper->GetMovable()->SetSector(sector);
+    thingWrapper->GetMovable()->UpdateMove();
+    thingWrapper->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+    thingWrapper->DecRef();
+    thingState->DecRef();
+
+    it->Next();
+  }
+}
+
+void load_thing (iSector* sector, csVector3 position,
+	iObjectIterator* it, iEngine* Engine)
+{
+  /*
+   * First we check for mesh material:
+   * It must be in memory, since we've registered needed materials before
+   * object creation.
+   * I'll use only one material til i know how to register more materials
+   */
+
+  char* defaultMat = LookForKeyValue(it,"factorymaterial");
+  char* fileName = LookForKeyValue(it,"factoryfile");
+  char* spriteName = LookForKeyValue(it,"cs_name");
+  iMaterialWrapper *mat;
+
+  mat = Engine->GetMaterialList()->FindByName(defaultMat);
+  if(!mat)
+  {
+    Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't find material %s \
+	            for thing creation in memory!!",defaultMat);
+    return;
+  }
+  iDataBuffer *buffer = Sys->myVFS->ReadFile(fileName);
+  if(!buffer)
+  {
+    Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"There was an error loading \
+	            model %s for thing creation!", fileName);
+    return;
+  }
+
+  iModelData *Model = Sys->ModelConverter->Load (buffer->GetUint8(),
+  	buffer->GetSize());
+  buffer->DecRef();
+  if(!Model)
+  {
+    Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
+    	"There was an error reading the data!");
+    return;
+  }
+
+  iObjectIterator* it2= Model->QueryObject()->GetIterator();
+  GenerateThing(it2,mat,spriteName,sector,position, ParseScaleFactor(it));
+  it2->DecRef();
+  Model->DecRef();
+}
+
+
+iMeshWrapper* GenerateSprite(const char* tname, char* sname, iSector* where,
+	csVector3 const& pos)
+{
+  iMeshFactoryWrapper* tmpl = Sys->Engine->GetMeshFactories ()
+  	->FindByName (tname);
+  if (!tmpl)
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Unknown mesh factory '%s'!", tname);
+    return NULL;
+  }
+  iMeshWrapper* spr = Sys->Engine->CreateMeshWrapper (tmpl, sname);
+  spr->GetMovable()->SetPosition(where, pos);
+  spr->GetMovable ()->UpdateMove ();
+  spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  spr->DecRef (); // its now held by a ref inside the engine
+  return spr;
+}
+
+
 iMeshWrapper* add_meshobj (const char* tname, char* sname, iSector* where,
 	csVector3 const& pos, float size)
 {
@@ -341,8 +485,7 @@ iMeshWrapper* add_meshobj (const char* tname, char* sname, iSector* where,
     	"Unknown mesh factory '%s'!", tname);
     return NULL;
   }
-  iMeshWrapper* spr = Sys->Engine->CreateMeshWrapper (tmpl, sname,
-						      where, pos);
+  iMeshWrapper* spr = Sys->Engine->CreateMeshWrapper (tmpl, sname, where, pos);
   csMatrix3 m; m.Identity (); m = m * size;
   spr->GetMovable ()->SetTransform (m);
   spr->GetMovable ()->UpdateMove ();
@@ -383,7 +526,8 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 {
   iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
   if (!config)
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No config interface for this plugin.");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"No config interface for this plugin.");
   else
   {
     int i;
@@ -475,7 +619,274 @@ bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
   return false;
 }
 
+
+
+/// Looks for a key and returns its value (VERY INNEFICIENT!)
+
+char* LookForKeyValue (iObjectIterator* it,const char* key)
+{
+  char* value = new char[1024];
+  it->Reset();
+  while(!it->IsFinished())
+  {
+    iKeyValuePair *kp = SCF_QUERY_INTERFACE(it->GetObject(),iKeyValuePair);
+    if(!kp)
+    {
+      it->Next();
+      continue;
+    }
+    if(!strcmp(key,kp->GetKey()))
+    {
+      strcpy(value ,kp->GetValue());
+      kp->DecRef();
+      return value;
+    }
+    kp->DecRef();
+    it->Next();
+  }
+  delete[] value;
+  return NULL;
+}
+
+/**
+ * Contructs a models in format of SEED_MESH_OBJ
+ * Basically is a SPRITE3D contruction.
+ * If factory is already loaded it uses that, if doesn't creates a new one and
+ * register both.
+ * Same for materials and textures.
+ * Finally it scales and moves the 3D sprite, not the factory
+ */
+/*
+ Schematical explanation how how this works:
+
+  First of all, let's see if the factory specified in this node is already created
+    If yes, let's see if materials needed by sprite are already registered
+       If yes create the sprite
+	   If not register all the materials in node list that aren't already registered
+	If not register all the materials in node list that aren't already registered
+	   Create the factory
+	   Create the sprite
+*/
+
+
+/**
+ * Returns the Scale Factor value of the scalefactor key
+ * Basically transforms the string to a csVector3
+ */
+double ParseScaleFactor(iObjectIterator* it)
+{
+  double sf;
+  char* scaleValue = LookForKeyValue(it,"scalefactor");
+
+  sf = atof(scaleValue);
+  return sf;
+};
+
+
+/// Extracts the material name of the defmaterial key value
+char* LookForMaterialName(const char* value)
+{
+  /*
+   * value has the format mat_name, text_name. We must extract the material
+   * name.
+   */
+
+  char* matName = new char[strlen(value)];
+  int i;
+
+  for (i = 0; i < (int)strlen(value) ; i++)
+  {
+    if(value[i]!= ',') matName[i] = value[i];
+    else
+    {
+      matName[i] = 0;
+      return matName;
+    }
+  }
+  return matName;
+}
+
+/// Extracts the texture file name of the defmaterial key value
+char* LookForTextureFileName(const char* value)
+{
+  // value has the format mat_name, text_name. We must extract
+  // the texture file name.
+  int i = 0;
+  int j;
+  char* textFileName = new char[strlen(value)];
+  while (i < (int)strlen(value) && value[i] != ',') i++;
+  j = i+1;
+  int spaces = 0;
+  while (j < (int)strlen(value))
+  {
+    if (value[j] ==' ') spaces++;
+    else textFileName[j-spaces-i-1] = value[j];
+    j++;
+  }
+  textFileName[j-spaces-i-1] = 0;
+  return textFileName;
+}
+
+
+void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
+					   iGraphics3D* MyG3D, iLoader* loader,
+					   iObjectRegistry* objReg)
+{
+  iMaterialList* matList = Engine->GetMaterialList();
+  //used to check if a material is already registered
+  char * matName;
+  char * textFileName;
+  iKeyValuePair* kp;
+  it->Reset();
+
+  while(!it->IsFinished())
+  {
+    kp = SCF_QUERY_INTERFACE(it->GetObject(),iKeyValuePair);
+    if(!kp)
+    {
+      it->Next();
+      continue;
+    }
+    if(strcmp("defmaterial",kp->GetKey()))
+    {
+      it->Next();
+      kp->DecRef();
+      continue;
+    }
+    matName = LookForMaterialName(kp->GetValue());
+
+    //Let's see if Material is registered
+    if (matList->FindByName(matName))
+    {
+      //Is registered, let's go to another material
+      it->Next();
+      kp->DecRef();
+      delete [] matName;
+    }
+    else
+    {
+      //Is not registered. We have to do it.
+      textFileName = LookForTextureFileName(kp->GetValue());
+      if(!loader->LoadTexture(matName,textFileName))
+      {
+        printf("Error loading %s texture!!",textFileName);
+      }
+      //Material registered, let's go to another one
+      it->Next();
+      kp->DecRef();
+      delete [] matName;
+      delete [] textFileName;
+    }
+  }
+}
+
+/**
+ * Build the factory for the sprite specified in a SEED_MESH_OBJ
+ */
+void BuildFactory(iObjectIterator* it, char* factoryName, iEngine* Engine)
+{
+  char* modelFilename = LookForKeyValue(it,"factoryfile");
+  char* materialName = LookForKeyValue(it,"factorymaterial");
+  double scaleFactor = ParseScaleFactor(it);
+
+  //We had the material needed by the factory and the model file
+
+  load_meshobj(modelFilename,factoryName,materialName);
+
+  iSprite3DFactoryState* state = SCF_QUERY_INTERFACE(
+	  Engine->GetMeshFactories()->FindByName(factoryName)\
+	  ->GetMeshObjectFactory(),
+	  iSprite3DFactoryState);
+
+  iMeshFactoryWrapper* factWrapper =
+	                   Engine->GetMeshFactories()->FindByName(factoryName);
+
+  csMatrix3 m; m.Identity(); m = m*(1.0/scaleFactor);
+  csReversibleTransform t = csReversibleTransform(m,csVector3(0,0,0));
+  factWrapper->HardTransform(t);
+  state->DecRef();
+}
+
+/**
+ * Builds the sprite3D
+ */
+void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
+{
+  /*
+   * Basically we will call add_mesh
+   * We need the sprite name, the factory name and the sprite scale factor
+   */
+  char* sprName		= LookForKeyValue(it,"cs_name");
+  char* factName		= LookForKeyValue(it,"factory");
+  //double scaleFactor	= ParseScaleFactor(it);
+
+  iMeshWrapper* sprite = GenerateSprite(factName,sprName,sector,position);
+
+  iSprite3DState* state = SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+                          iSprite3DState);
+  state->SetAction("default");
+  state->DecRef();
+};
+
+
+
+void BuildThing(iSector* sector, csVector3 position,iObjectIterator* it,
+				iEngine* Engine)
+{
+  load_thing(sector,position,it,Engine);
+}
+
+void BuildObject(iSector * sector,
+	iObjectIterator* it, iEngine* Engine,
+	csVector3 position, iGraphics3D* MyG3D, iLoader* loader,
+	iObjectRegistry* objReg)
+{
+  char* factoryName;
+  if(strcmp(LookForKeyValue(it,"classname"),"SEED_MESH_OBJ")) return;
+  //Now we know this objects iterator belongs to a SEED_MESH_OBJECT
+  //Proceeding to contruct the object
+
+  RegisterMaterials(it,Engine,MyG3D,loader,objReg);
+  if (!strcmp(LookForKeyValue(it,"staticflag"),"static"))
+  {
+    BuildThing(sector,position,it,Engine);
+  }
+  else
+  {
+    factoryName = LookForKeyValue(it,"factory");
+    if(!Engine->GetMeshFactories()->FindByName(factoryName))
+	  BuildFactory(it, factoryName, Engine);
+
+    BuildSprite(sector, it, position);
+  }
+}
+
 //===========================================================================
+
+void WalkTest::ParseKeyNodes(iObject* src)
+{
+  iObjectIterator *it = src->GetIterator();
+  iSector* sector = SCF_QUERY_INTERFACE(src,iSector);
+
+  while(!it->IsFinished())
+  {
+    iMapNode* node = SCF_QUERY_INTERFACE(it->GetObject(), iMapNode);
+    if(!node)
+    {
+      it->Next();
+      continue;
+    }
+    iObjectIterator *it2 = it->GetObject()->GetIterator();
+
+    BuildObject(sector,it2, Engine, node->GetPosition(), myG3D,
+		LevelLoader, object_reg);
+    node->DecRef();
+    it->Next();
+    it2->DecRef();
+  }
+  it->DecRef ();
+  sector->DecRef ();
+}
 
 void WalkTest::ParseKeyCmds (iObject* src)
 {
@@ -619,6 +1030,7 @@ void WalkTest::ParseKeyCmds ()
   {
     iSector* sector = Engine->GetSectors ()->Get (i);
     ParseKeyCmds (sector->QueryObject ());
+    ParseKeyNodes(sector->QueryObject());
 
     int j;
     iMeshList* ml = sector->GetMeshes ();
@@ -640,7 +1052,8 @@ void WalkTest::ActivateObject (iObject* src)
   iObjectIterator *it = src->GetIterator ();
   while (!it->IsFinished ())
   {
-    csWalkEntity* wentity = SCF_QUERY_INTERFACE_FAST (it->GetObject (), csWalkEntity);
+    csWalkEntity* wentity = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
+    	csWalkEntity);
     if (wentity)
     {
       wentity->Activate ();
@@ -1191,7 +1604,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csEngine* engine = (csEngine*)(Sys->Engine);
     bool en = engine->IsPVS ();
     csCommandProcessor::change_boolean (arg, &en, "pvs");
-    if (en) 
+    if (en)
       engine->EnablePVS ();
     else
       engine->DisablePVS ();
@@ -1201,7 +1614,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csEngine* engine = (csEngine*)(Sys->Engine);
     bool en = engine->IsPVSOnly ();
     csCommandProcessor::change_boolean (arg, &en, "pvs only");
-    if (en) 
+    if (en)
       engine->EnablePVSOnly ();
     else
       engine->DisablePVSOnly ();
@@ -1211,7 +1624,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csEngine* engine = (csEngine*)(Sys->Engine);
     bool en = engine->IsPVSFrozen ();
     csCommandProcessor::change_boolean (arg, &en, "freeze pvs");
-    if (en) 
+    if (en)
       engine->FreezePVS (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
     else
       engine->UnfreezePVS ();
@@ -1874,7 +2287,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     int depth = 0, width = 0;
     if (arg) csScanStr (arg, "%d,%d", &depth, &width);
-    if (depth < 1) depth = 3; 
+    if (depth < 1) depth = 3;
     if (width < 1) width = 3;
     extern void add_skeleton_tree (iSector* where, csVector3 const& pos,
     	int depth, int width);
