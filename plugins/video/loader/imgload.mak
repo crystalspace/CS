@@ -97,14 +97,14 @@ ifeq ($(MAKESECTION),targets)
 imgload: $(OUTDIRS) $(IMGLOAD)
 
 $(OUT)imgload$O: imgload.cpp
-        $(DO.COMPILE.CPP) $(CFLAGS.IMG_FORMATS)
+	$(DO.COMPILE.CPP) $(CFLAGS.IMG_FORMATS)
 
 $(IMGLOAD): $(OBJ.IMGLOAD) $(LIB.IMGLOAD)
 	$(DO.PLUGIN)
 
 clean: imgloadclean
 imgloadclean:
-        $(RM) $(IMGLOAD) $(OBJ.IMGLOAD)
+	$(RM) $(IMGLOAD) $(OBJ.IMGLOAD)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)imgload.dep
