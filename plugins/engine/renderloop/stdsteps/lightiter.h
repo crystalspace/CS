@@ -44,7 +44,7 @@ class csLightIterRSLoader : public csBaseRenderStepLoader
   csRenderStepParser rsp;
 
   csStringHash tokens;
-#define CS_TOKEN_ITEM_FILE "engine/renderloop/stdsteps/lightiter.tok"
+#define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/stdsteps/lightiter.tok"
 #include "cstool/tokenlist.h"
 
 public:

@@ -48,7 +48,7 @@ public:
 class csGenericRSLoader : public csBaseRenderStepLoader
 {
   csStringHash tokens;
-#define CS_TOKEN_ITEM_FILE "engine/renderloop/stdsteps/generic.tok"
+#define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/stdsteps/generic.tok"
 #include "cstool/tokenlist.h"
 
 public:

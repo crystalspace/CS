@@ -101,7 +101,7 @@ public:
 class csFullScreenQuadRSLoader : public csBaseRenderStepLoader
 {
   csStringHash tokens;
-#define CS_TOKEN_ITEM_FILE "engine/renderloop/stdsteps/fullquad.tok"
+#define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/stdsteps/fullquad.tok"
 #include "cstool/tokenlist.h"
 
   bool ParseStep (iDocumentNode* node, 

@@ -202,7 +202,7 @@ class csStencilShadowLoader : public csBaseRenderStepLoader
   csRenderStepParser rsp;
 
   csStringHash tokens; 
- #define CS_TOKEN_ITEM_FILE "engine/renderloop/shadow/stencil/stencil.tok"
+ #define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/shadow/stencil/stencil.tok"
  #include "cstool/tokenlist.h"
 
 public:

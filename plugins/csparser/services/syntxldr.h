@@ -48,7 +48,7 @@ protected:
   csRef<iMeshObjectType> thing_type;
   csRef<iReporter> reporter;
   csStringHash xmltokens;
-#define CS_TOKEN_ITEM_FILE "csparser/services/syntxldr.tok"
+#define CS_TOKEN_ITEM_FILE "plugins/csparser/services/syntxldr.tok"
 #include "cstool/tokenlist.h"
 
   void ReportV (const char* msgid, int severity, 

@@ -45,7 +45,7 @@ class csTargetRSLoader : public csBaseRenderStepLoader
   csRenderStepParser rsp;
 
   csStringHash tokens;
-#define CS_TOKEN_ITEM_FILE "engine/renderloop/stdsteps/target.tok"
+#define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/stdsteps/target.tok"
 #include "cstool/tokenlist.h"
 
 public:
