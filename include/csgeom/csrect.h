@@ -21,7 +21,7 @@
 #ifndef __CSRECT_H__
 #define __CSRECT_H__
 
-//#include "csutil/csbase.h"
+#include "csutil/csbase.h"
 #include "types.h"	// for bool
 
 /**
@@ -45,7 +45,7 @@
  * Vertical line 'X=3' and horizontal line 'Y=2' does NOT belong to
  * the rectangle.
  */
-class csRect // : public csBase
+class csRect : public csBase
 {
 public:
   /// Rectangle bounds.
