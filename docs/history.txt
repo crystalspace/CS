@@ -34,8 +34,8 @@ The history order is reversed so that new features are at the top.
 	  discovered based upon bug report from Calvin Finch
 	  <calvinfinch@shaw.ca> in which he noted that link failed to resolve
 	  opendir(), readdir(), closedir().
-	- Eric Sunshine applied from John Harger <john_h@selectpath.com> to
-	  mdltool.cpp to work around MSVC6 internal compiler error.
+	- Eric Sunshine applied patch from John Harger <john_h@selectpath.com>
+	  to mdltool.cpp to work around MSVC6 internal compiler error.
 15-Jan-2003
 	- Started removing a few csVector usages and replacing them
 	  with typed versions. In particular changed:
