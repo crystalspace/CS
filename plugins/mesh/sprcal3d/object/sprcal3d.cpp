@@ -1382,7 +1382,7 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (factory->light_mgr)
   {
     const csArray<iLight*>& relevant_lights = factory->light_mgr
-    	->GetRelevantLights (logparent);
+    	->GetRelevantLights (logparent, -1, false);
     UpdateLighting (relevant_lights, movable);
   }
 

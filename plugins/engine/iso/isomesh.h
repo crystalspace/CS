@@ -65,7 +65,7 @@ public:
   ///
   virtual ~csIsoMeshSprite();
 
-  const csArray<iLight*>& GetRelevantLights ();
+  const csArray<iLight*>& GetRelevantLights (int maxLights, bool desireSorting);
 
   //-------- iIsoSprite ---------------------------------------------
   virtual int GetVertexCount() const;

@@ -215,7 +215,8 @@ void csMeshWrapper::SetLightingUpdate (int flags, int num_lights)
   relevant_lights_valid = false;
 }
 
-const csArray<iLight*>& csMeshWrapper::GetRelevantLights ()
+const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
+	bool /*desireSorting*/)
 {
   bool always_update = relevant_lights_flags.Check (
   	CS_LIGHTINGUPDATE_ALWAYSUPDATE);

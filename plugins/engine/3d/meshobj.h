@@ -429,7 +429,8 @@ public:
   /**
    * Get the array of relevant lights for this object.
    */
-  const csArray<iLight*>& GetRelevantLights ();
+  const csArray<iLight*>& GetRelevantLights (
+  	int maxLights, bool desireSorting);
   /**
    * Forcibly invalidate relevant lights.
    */

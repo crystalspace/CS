@@ -53,6 +53,13 @@ chronological order.
 	  cspython.mak by slightly reorganizing the rules.
 	- Eric Sunshine eliminated need for DO_SWIGPERL5INST conditional from
 	  csperl5.mak by slightly reorganizing the rules.
+	- Jorrit added two parameters to the new
+	  iLightManager->GetRelevantLights() function. The first parameter
+	  is the maximum number of lights the caller needs and the second
+	  parameter indicates if sorting on relevance is desired. Mesh
+	  objects can use these parameters to get more control on the list
+	  of lights they get from the light manager.
+	  This is currently not implemented. It is just an API change.
 	- Eric Sunshine added check to configure.ac which determines how to
 	  disable warnings about unused variables.  The result of this check is
 	  used by a few Jamfiles and makefiles when building auto-generated

@@ -115,11 +115,12 @@ bool csIsoEngine::Initialize (iObjectRegistry* p)
   return true;
 }
 
-const csArray<iLight*>& csIsoEngine::GetRelevantLights (iBase* logObject)
+const csArray<iLight*>& csIsoEngine::GetRelevantLights (iBase* logObject,
+	int maxLights, bool desireSorting)
 {
   iIsoMeshSprite* m = (iIsoMeshSprite*)logObject;
   csIsoMeshSprite* cm = (csIsoMeshSprite*)m;
-  return cm->GetRelevantLights ();
+  return cm->GetRelevantLights (maxLights, desireSorting);
 }
 
 bool csIsoEngine::HandleEvent (iEvent& Event)

@@ -36,7 +36,8 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual const csArray<iLight*>& GetRelevantLights (iBase* logObject);
+  virtual const csArray<iLight*>& GetRelevantLights (iBase* logObject,
+  	int maxLights, bool desireSorting);
 };
 
 #endif // __CS_CSENGINE_LIGHTMGR_H__

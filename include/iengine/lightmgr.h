@@ -52,8 +52,20 @@ struct iLightManager : public iBase
    * mean a list of all lights that affect the object or
    * it can be a list of the N most relevant lights (with N a
    * parameter set by the user on that object).
+   * \param logObject logObject is the logical parent for the mesh object as set
+   * by the mesh object creator.
+   * \param maxLights maxLights is the maximum number of lights that you (as
+   * the caller of this function) are interested in. Even with this set the
+   * light manager may still return an array containing more lights. You just
+   * have to ignore the additional lights then. If you don't want to limit
+   * the number of lights you can set maxLights to -1.
+   * \param desireSorting if this is true then you will get a list sorted
+   * on light relevance. Light relevance is a function of influence radius,
+   * and intensity. If you don't need sorting then don't set this as it will
+   * decrease performance somewhat.
    */
-  virtual const csArray<iLight*>& GetRelevantLights (iBase* logObject) = 0;
+  virtual const csArray<iLight*>& GetRelevantLights (iBase* logObject,
+  	int maxLights, bool desireSorting) = 0;
 };
 
 /** @} */

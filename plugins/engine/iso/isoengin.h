@@ -90,7 +90,8 @@ public:
   } * scfiEventHandler;
 
   //----- iLightManager ------------------------------------------------
-  virtual const csArray<iLight*>& GetRelevantLights (iBase* logObject);
+  virtual const csArray<iLight*>& GetRelevantLights (iBase* logObject,
+  	int maxLights, bool desireSorting);
 
   //----- iIsoEngine ---------------------------------------------------
   virtual iObjectRegistry* GetObjectRegistry() const {return object_reg;}

@@ -777,7 +777,7 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   {
     const csArray<iLight*>& relevant_lights
     	= ((csBallMeshObjectFactory*)factory)->light_mgr
-    	->GetRelevantLights (logparent);
+    	->GetRelevantLights (logparent, -1, false);
     UpdateLighting (relevant_lights, movable);
   }
 

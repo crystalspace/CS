@@ -372,7 +372,8 @@ void csIsoMeshSprite::SetMeshObject(iMeshObject *mesh)
   if (mesh) mesh->SetLogicalParent (this);
 }
 
-const csArray<iLight*>& csIsoMeshSprite::GetRelevantLights ()
+const csArray<iLight*>& csIsoMeshSprite::GetRelevantLights (int /*maxLights*/,
+	bool /*desireSorting*/)
 {
   grid->GetFakeLights (position, relevant_lights);
   return relevant_lights;
