@@ -1,6 +1,16 @@
 The history order is reversed so that new features are at the top.
 
 9-Mar-2003
+	- Marten Svanfeldt made the following changes:
+	    - Moved setting of lightposition from meshplugin into engine
+	    - Added caching of shadowvolumes to genmesh
+	    - Added usage of MMX-instructions when building shadowvolumes.
+	      This is only for MSVC7 at the moment. If you use new renderer,
+	      in combination with MSVC7 and a non-mmx capable machine, comment
+	      out those sections as it doesn't properly check for mmx-
+	      compatibility yet.
+	    - Made the new renderer clear the texture state cache on BeginDraw
+	      to correct the font-drawing.
 	- Anders Stenberg fixed VAR support in new renderer, along with
 	  some minor fixes.
 7-Mar-2003
