@@ -1232,6 +1232,8 @@ AS_IF([test "$cs_cv_libz" = yes && test "$cs_cv_libjpeg" = yes],
 	[$cs_cv_libjpeg_lflags $cs_cv_libz_lflags],
 	[$cs_cv_libjpeg_libs $cs_cv_libz_libs])])
 
+
+
 #-----------------------------------------------------------------------------
 # Check for libmikmod.  In addition to the standard installed locations, we
 # also search CS/libs/libmikmod*.
@@ -1242,6 +1244,8 @@ CS_CHECK_LIB_WITH([mikmod],
 	[MikMod_Init("mikmodtest"); MikMod_Exit();])],
     [libs/libmikmod*], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])])
+
+
 
 #-----------------------------------------------------------------------------
 # Check for libogg.  In addition to the standard installed locations, we
@@ -1254,6 +1258,8 @@ CS_CHECK_LIB_WITH([ogg],
     [libs/libogg*], [],                                                         
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libogg], [OGG])])
 
+
+
 #-----------------------------------------------------------------------------
 # Check for lib3ds.  In addition to the standard installed locations, we
 # also search CS/libs/lib3ds*.
@@ -1264,6 +1270,8 @@ CS_CHECK_LIB_WITH([3ds],
 	[/*some test would be nice here...*/])],
     [libs/lib3ds*], [],                                                         
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_lib3ds], [3DS])])
+
+
 
 #-----------------------------------------------------------------------------
 # Check for libode.  In addition to the standard installed locations, we
@@ -1276,6 +1284,8 @@ CS_CHECK_LIB_WITH([ode],
     [libs/libode*], [],                                                         
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libode], [ODE])])
 
+
+
 #-----------------------------------------------------------------------------
 # Check for libopenal.  In addition to the standard installed locations, we
 # also search CS/libs/libopenal*.
@@ -1287,6 +1297,8 @@ CS_CHECK_LIB_WITH([openal],
     [libs/libopenal*], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libopenal], [OPENAL])])
 
+
+
 #-----------------------------------------------------------------------------
 # Check for freetype2.
 #-----------------------------------------------------------------------------
@@ -1295,17 +1307,7 @@ AC_CHECK_FT2([2.0],
      CS_MAKEFILE_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
      CS_MAKEFILE_PROPERTY([FT2.CFLAGS], [$FT2_CFLAGS])])
 
-#----------------------------------------------------------------------------
-# Check if we should build linux joystick drivers
-#----------------------------------------------------------------------------
-AC_ARG_ENABLE([linux-joystick-support],
-    [AC_HELP_STRING([--enable-linux-joystick-support],
-	[enable joystick support on linux platform (default NO); This builds
-	plugins for the linux joystick which tries to use the linux kernel
-	joystick drivers.])],
-    [enable_linux_joystick_support=$enableval])
-AS_IF([test "$enable_linux_joystick_support" = yes],
-    [CS_MAKEFILE_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])], [])
+
 
 #------------------------------------------------------------------------------
 # For Mingw, test if we need to link explicitly with libmingwex.a.  Older
@@ -1714,6 +1716,20 @@ AC_CACHE_CHECK([if qint() functions correctly], [cs_cv_cxx_qint_ok],
 
 AS_IF([test $cs_cv_cxx_qint_ok = no],
     [CS_HEADER_PROPERTY([CS_QINT_WORKAROUND])])
+
+
+
+#----------------------------------------------------------------------------
+# Check if Linux joystick plugin should be built.
+#----------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to enable Linux joystick support])
+AC_ARG_ENABLE([linux-joystick],
+    [AC_HELP_STRING([--enable-linux-joystick],
+	[enable Linux joystick support (default NO)])],
+    [], [enable_linux_joystick=no])
+AC_MSG_RESULT([$enable_linux_joystick])
+AS_IF([test "$enable_linux_joystick" != no],
+    [CS_MAKEFILE_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])], [])
 
 
 

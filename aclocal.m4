@@ -116,10 +116,11 @@ if test x$no_ft = x ; then
 else
    AC_MSG_RESULT(no)
    if test "$FT2_CONFIG" = "no" ; then
-     echo "*** The freetype-config script installed by FreeType 2 could not be found."
-     echo "*** If FreeType 2 was installed in PREFIX, make sure PREFIX/bin is in"
-     echo "*** your path, or set the FT2_CONFIG environment variable to the"
-     echo "*** full path to freetype-config."
+      :
+#     echo "*** The freetype-config script installed by FreeType 2 could not be found."
+#     echo "*** If FreeType 2 was installed in PREFIX, make sure PREFIX/bin is in"
+#     echo "*** your path, or set the FT2_CONFIG environment variable to the"
+#     echo "*** full path to freetype-config."
    else
      if test x$ft_config_is_lt = xyes ; then
        echo "*** Your installed version of the FreeType 2 library is too old."

@@ -15,6 +15,11 @@ The history order is reversed so that new features are at the top.
 	  lazy clipping is forced in all cases.
 	- Keith Fulton fixed a bug flipping the do_tweening flag on saving
 	  of binary spr3d's.
+	- Eric Sunshine changed the Linux joystick test in configure.ac so that
+	  it now reports its results to the user.  Also cleaned up the logic.
+	- Eric Sunshine disabled the annoying, abusive message in aclocal.m4
+	  about missing FreeType2 library.  We don't need to abuse the user
+	  when an optional library is absent.
 27-Jan-2003
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find
