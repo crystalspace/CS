@@ -53,7 +53,7 @@ INC.STDPT = $(wildcard $(SRCDIR)/$(DIR.STDPT)/*.h)
 SRC.STDPT = $(wildcard $(SRCDIR)/$(DIR.STDPT)/*.cpp)
 OBJ.STDPT = $(addprefix $(OUT.STDPT)/,$(notdir $(SRC.STDPT:.cpp=$O)))
 # Customise the following line.
-DEP.STDPT= CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
+DEP.STDPT = CSTOOL CSGFX CSUTIL CSSYS CSUTIL
 
 OUTDIRS += $(OUT.STDPT)
 
