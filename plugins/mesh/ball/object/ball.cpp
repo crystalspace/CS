@@ -714,7 +714,6 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
   //mesh.transform = &tr_o2c;
 
   // Prepare for rendering.
-  mesh.z_buf_mode = CS_ZBUF_TEST;// mode;
   mesh.mixmode = CS_FX_COPY; // MixMode;
 
   mesh.indexstart = 0;

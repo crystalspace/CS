@@ -294,7 +294,8 @@ public:
 
     int num;
     csRenderMesh** meshes = mesh->GetRenderMeshes (num);
-    privMeshlist->AddRenderMeshes (meshes, num, mesh->GetRenderPriority ());
+    privMeshlist->AddRenderMeshes (meshes, num, mesh->GetRenderPriority (),
+	mesh->GetZBufMode ());
   }
 
 private:

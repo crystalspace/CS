@@ -1015,7 +1015,6 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
   //mesh.object2world = movable->GetFullTransform ();
 
   // Prepare for rendering.
-  mesh.z_buf_mode = CS_ZBUF_TEST;// mode;
   mesh.mixmode = CS_FX_COPY; // MixMode;
 
   mesh.indexstart = 0;
@@ -1023,13 +1022,6 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
   mesh.material = mater;
   mesh.dynDomain = dynDomain;
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
-  mesh.z_buf_mode = CS_ZBUF_USE;
-  if (logparent)
-  {
-    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
-    if (mw)
-      mesh.z_buf_mode = mw->GetZBufMode ();
-  }
 
   meshPtr = &mesh;
   n = 1;

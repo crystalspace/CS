@@ -21,6 +21,15 @@ chronological order.
 	  rethink this.
 	- Marten provided the correct fix for the issue above. It is to use the
 	  movable passed to DrawTest (through the transform stored in rmesh)
+	- Jorrit performed a considerable optimization with the new renderer
+	  by avoiding one or more SCF_QUERY_INTERFACE calls per object (per
+	  frame) and in some cases a loop. This SCF_QUERY_INTERFACE was there
+	  to get the z-buffer mode in the csRenderMesh structure (so the
+	  mesh object implementation could get the z-buffer mode from the
+	  mesh wrapper). Instead this is now done in
+	  csRenderMeshList->AddRenderMeshes() where there was a loop over
+	  all render meshes anyway and csRenderMeshList also has direct
+	  access to the csMeshWrapper.
 30-Dec-2003
 	- Eric Sunshine applied patch from Bjorn Hansen
 	  <holomorph@users.sourceforge.net> which adds csParseMouseDef() to

@@ -22,6 +22,7 @@
 #include "csutil/array.h"
 #include "csutil/parray.h"
 #include "csutil/ref.h"
+#include "ivideo/graph3d.h"
 
 struct iEngine;
 struct iObjectRegistry;
@@ -49,7 +50,8 @@ public:
   /**
    * Add a new set of rendermeshes to the lists
    */
-  void AddRenderMeshes (csRenderMesh** meshes, int num, long renderPriority);
+  void AddRenderMeshes (csRenderMesh** meshes, int num, long renderPriority,
+	csZBufMode z_buf_mode);
 
   /**
    * Get a sorted list of meshes, sorted by renderpriority, and if needed

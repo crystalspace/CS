@@ -1897,7 +1897,6 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n)
     /* set to identify for software skeleton */
     rendermesh.object2camera = csReversibleTransform ();
   }
-  rendermesh.z_buf_mode = CS_ZBUF_TEST;
   rendermesh.mixmode = CS_FX_COPY;
   rendermesh.indexstart = 0;
   rendermesh.indexend = final_num_triangles * 3;

@@ -1061,7 +1061,6 @@ void csThingStatic::FillRenderMeshes (
     else
       polyRenderer = polyRenderers[i];
 
-    rm->z_buf_mode = CS_ZBUF_USE;
     rm->mixmode = mixmode; 
     rm->material = pg.material;
     rm->meshtype = CS_MESHTYPE_POLYGON;
@@ -2697,17 +2696,6 @@ csRenderMesh **csThing::GetRenderMeshes (int &num)
   for (i = 0; i < materials_to_visit.Length (); i++)
   {
     materials_to_visit[i]->Visit ();
-  }
-
-  for (i = 0; i < renderMeshes.Length (); i++)
-  {
-    renderMeshes[i]->z_buf_mode = CS_ZBUF_USE;
-    if (logparent)
-    {
-      csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
-      if (mw)
-        renderMeshes[i]->z_buf_mode = mw->GetZBufMode ();
-    }
   }
 
   return renderMeshes.GetArray ();
