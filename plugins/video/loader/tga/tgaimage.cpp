@@ -53,15 +53,15 @@ SCF_IMPLEMENT_FACTORY (csTGAImageIO);
 typedef char ImageIDField[256];
 
 /* Definitions for image types. */
-#define TGA_Null 0
-#define TGA_Map 1
-#define TGA_RGB 2
-#define TGA_Mono 3
-#define TGA_RLEMap 9
-#define TGA_RLERGB 10
-#define TGA_RLEMono 11
-#define TGA_CompMap 32
-#define TGA_CompMap4 33
+#define TGA_Null	0
+#define TGA_Map		1
+#define TGA_RGB		2
+#define TGA_Mono	3
+#define TGA_RLEMap	9
+#define TGA_RLERGB     10
+#define TGA_RLEMono    11
+#define TGA_CompMap    32
+#define TGA_CompMap4   33
 
 /* Definitions for interleave flag. */
 #define TGA_IL_None   0x00
@@ -73,12 +73,8 @@ typedef char ImageIDField[256];
 #define TGA_Org_BL    0x00
 #define TGA_Org_TL    0x20
 
-#define MAXCOLORS 16384
-
 #define CSTGA_ID "Made with Crystal Space, see http://www.crystalspace3d.org/"
 #define TGA_MIME "image/tga"
-
-//CS_IMPLEMENT_STATIC_VAR (GetColorMap, csRGBpixel, [MAXCOLORS])
 
 static iImageIO::FileFormatDescription formatlist[6] =
 {
@@ -158,26 +154,21 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   int h = Image->GetHeight ();
   bool has_alpha = Image->GetFormat() & CS_IMGFMT_ALPHA;
 
-  hdr.IDLength  = 0;//strlen (CSTGA_ID);
+  hdr.IDLength  = (uint8)(strlen (CSTGA_ID) + 1);
   hdr.CoMapType = (palette ? 1 : 0);
   hdr.ImgType = (palette ? TGA_Map : TGA_RGB);
-  hdr.Index_lo = hdr.Index_hi = 0;
-  hdr.Length_lo = 0;
-  hdr.Length_hi = (palette ? 1 : 0);
+  hdr.Index= 0;
+  hdr.Length = (palette ? 256 : 0);
   hdr.CoSize = (palette ? 24 : 0);
-  hdr.X_org_lo = hdr.X_org_hi = 0;
-  hdr.Y_org_lo = hdr.Y_org_hi = 0;
-  hdr.Width_lo = (w%256);
-  hdr.Width_hi = (w/256);
-  hdr.Height_lo = h%256;
-  hdr.Height_hi = h/256;
+  hdr.X_org = 0;
+  hdr.Y_org = 0;
+  hdr.Width = w;
+  hdr.Height = h;
   hdr.PixelSize = (palette ? 8 : (has_alpha?32:24));
   hdr.flags = TGA_IL_None | TGA_Org_BL;
 
-
   size_t size = w * h * hdr.PixelSize/8 
-    + 256/*MAXCOLORS*/ * hdr.CoSize / 8 
-    + sizeof (TGAheader) + hdr.IDLength;
+    + 256 * hdr.CoSize / 8 + sizeof (TGAheader) + hdr.IDLength;
 
   csDataBuffer *db = new csDataBuffer (size);
 
@@ -246,7 +237,7 @@ csRef<iImageFileLoader> ImageTgaFile::InitLoader (csRef<iDataBuffer> source)
 
 void ImageTgaFile::TgaLoader::readtga (uint8*& iBuffer, TGAheader* tgaP)
 {
-  tgaP->IDLength = *iBuffer++;
+  /*tgaP->IDLength = *iBuffer++;
   tgaP->CoMapType = *iBuffer++;
   tgaP->ImgType = *iBuffer++;
   tgaP->Index_lo = *iBuffer++;
@@ -263,7 +254,9 @@ void ImageTgaFile::TgaLoader::readtga (uint8*& iBuffer, TGAheader* tgaP)
   tgaP->Height_lo = *iBuffer++;
   tgaP->Height_hi = *iBuffer++;
   tgaP->PixelSize = *iBuffer++;
-  tgaP->flags = *iBuffer++;
+  tgaP->flags = *iBuffer++;*/
+  memcpy (tgaP, iBuffer, sizeof (TGAheader));
+  iBuffer += sizeof (TGAheader);
 
   if (tgaP->IDLength != 0)
     iBuffer += tgaP->IDLength;
@@ -313,13 +306,9 @@ void ImageTgaFile::TgaLoader::get_map_entry (uint8*& iBuffer,
   }
 }
 
-void ImageTgaFile::TgaLoader::get_pixel (uint8*& iBuffer, csRGBpixel* dest, 
-					 int Size, bool alpha)
+void ImageTgaFile::TgaLoader::get_current_pixel (uint8*& iBuffer, int Size, 
+						 bool alpha)
 {
-  //int Red, Grn, Blu, Alpha;
-  unsigned int l = 0;
-  unsigned char j, k;
-
   /* Check if run length encoded. */
   if (rlencoded)
   {
@@ -342,57 +331,77 @@ void ImageTgaFile::TgaLoader::get_pixel (uint8*& iBuffer, csRGBpixel* dest,
       --RLE_count;
       if (RLE_flag != 0)
       /* Replicated pixels. */
-        goto PixEncode;
+        return;
     }
   }
 
+  uint8 j, k;
   /* Read appropriate number of bytes, break into RGB. */
   switch (Size)
   {
     case 8:				/* Grey scale, read and triplicate. */
-      Red = Grn = Blu = l = *iBuffer++;
-      Alpha = 0xff;
+      currentPixel.Red = currentPixel.Grn = currentPixel.Blu = currentPixel.l = *iBuffer++;
+      currentPixel.Alpha = 0xff;
       break;
 
     case 16:				/* 5 bits each of red green and blue. */
     case 15:				/* Watch byte order. */
       j = *iBuffer++;
       k = *iBuffer++;
-      l = ((unsigned int) k << 8)  + j;
-      Red = (k & 0x7C) << 1;
-      Red |= Red >> 5;
-      Grn = ((k & 0x03) << 6) | ((j & 0xE0) >> 2);
-      Grn |= Grn >> 5;
-      Blu = (j & 0x1F) << 3;
-      Blu |= Blu >> 5;
-      Alpha = 0xff;
+      currentPixel.l = ((unsigned int) k << 8)  + j;
+      currentPixel.Red = (k & 0x7C) << 1;
+      currentPixel.Red |= currentPixel.Red >> 5;
+      currentPixel.Grn = ((k & 0x03) << 6) | ((j & 0xE0) >> 2);
+      currentPixel.Grn |= currentPixel.Grn >> 5;
+      currentPixel.Blu = (j & 0x1F) << 3;
+      currentPixel.Blu |= currentPixel.Blu >> 5;
+      currentPixel.Alpha = 0xff;
       break;
 
     case 32:
     case 24:			/* 8 bits each of blue green and red. */
-      Blu = *iBuffer++;
-      Grn = *iBuffer++;
-      Red = *iBuffer++;
-      Alpha = 0xff;
+      currentPixel.Blu = *iBuffer++;
+      currentPixel.Grn = *iBuffer++;
+      currentPixel.Red = *iBuffer++;
+      currentPixel.Alpha = 0xff;
       if (Size == 32)
         if (alpha)
-          Alpha = *iBuffer++;	/* Read alpha byte */
+          currentPixel.Alpha = *iBuffer++;	/* Read alpha byte */
         else
           iBuffer++;
-      l = 0;
+      currentPixel.l = 0;
       break;
 
     default:
       return;
   }
+}
 
-PixEncode:
+void ImageTgaFile::TgaLoader::get_pixel (uint8*& iBuffer, csRGBpixel* dest, 
+					 int Size, bool alpha)
+{
+  get_current_pixel (iBuffer, Size, alpha);
+
   if (mapped)
-    *dest = colorMap[l];
+    *dest = colorMap[currentPixel.l];
   else
   {
-    dest->red = Red; dest->green = Grn; dest->blue = Blu; dest->alpha = Alpha;
+    dest->red = currentPixel.Red;
+    dest->green = currentPixel.Grn; 
+    dest->blue = currentPixel.Blu; 
+    dest->alpha = currentPixel.Alpha;
   }
+}
+
+void ImageTgaFile::TgaLoader::get_pixel (uint8*& iBuffer, uint8* dest, 
+					 int Size, bool alpha)
+{
+  get_current_pixel (iBuffer, Size, alpha);
+
+  if (tga_head.PixelSize <= 8)
+    *dest = currentPixel.l << indexShift;
+  else
+    *dest = currentPixel.l >> indexShift;
 }
 
 ImageTgaFile::TgaLoader::~TgaLoader()
@@ -402,6 +411,7 @@ ImageTgaFile::TgaLoader::~TgaLoader()
 
 bool ImageTgaFile::TgaLoader::InitOk()
 {
+  int NewFormat;
   iBuffer = dataSource->GetUint8();
   readtga (iBuffer, &tga_head);
 
@@ -419,8 +429,9 @@ bool ImageTgaFile::TgaLoader::InitOk()
       return false;
   }
 
-  Height = (int (tga_head.Height_lo)) + (int (tga_head.Height_hi)) * 256;
-  Width = (int (tga_head.Width_lo))  + (int (tga_head.Width_hi))  * 256;
+  Height = tga_head.Height;
+  Width = tga_head.Width;
+  colorMapSize = tga_head.Length;
 
   if (tga_head.ImgType == TGA_Map ||
       tga_head.ImgType == TGA_RLEMap ||
@@ -431,35 +442,65 @@ bool ImageTgaFile::TgaLoader::InitOk()
       return false;
     mapped = true;
   }
-  else
-  { /* Not colormap */
-    mapped = false;
-  }
-
-  /* If required, read the color map information. */
-  if (tga_head.CoMapType != 0)
+  else if ((tga_head.ImgType == TGA_Mono)
+    || (tga_head.ImgType == TGA_RLEMono))
   {
-    uint temp1 = int (tga_head.Index_lo) + int (tga_head.Index_hi) * 256;
-    uint temp2 = int (tga_head.Length_lo) + int (tga_head.Length_hi) * 256;
-    if ((temp1 + temp2 + 1) >= MAXCOLORS)
-      return false;
+    // Grayscale image
+    colorMapSize = 1 << tga_head.PixelSize;
+    mapped = true;
+  }
+  else
+    mapped = false;
+  if (mapped && (colorMapSize <= 256))
+  {
+    dataType = rdtIndexed;
+    NewFormat = (Format & ~CS_IMGFMT_MASK) | CS_IMGFMT_PALETTED8;
+  }
+  else
+  {
+    dataType = rdtRGBpixel;
+    NewFormat = (Format & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR;
   }
 
-  dataType = rdtRGBpixel;
+  if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
+    Format = NewFormat;
+  else
+    // Copy alpha flag
+    Format = (Format & CS_IMGFMT_MASK) | (NewFormat & ~CS_IMGFMT_MASK);
 
   return true;
 }
 
 bool ImageTgaFile::TgaLoader::LoadData ()
 {
-  if (tga_head.CoMapType != 0)
+  if (colorMapSize != 0)
   {
-    uint temp1 = int (tga_head.Index_lo) + int (tga_head.Index_hi) * 256;
-    uint temp2 = int (tga_head.Length_lo) + int (tga_head.Length_hi) * 256;
-    colorMap = new csRGBpixel [temp1 + temp2];
-    for (int i = temp1; i < int (temp1 + temp2); ++i)
-      get_map_entry (iBuffer, colorMap + i, tga_head.CoSize,
-        Format & CS_IMGFMT_ALPHA);
+    if (tga_head.PixelSize <= 8)
+      indexShift = 8 - tga_head.PixelSize;
+    else
+      indexShift = tga_head.PixelSize - 8;
+
+    uint colorMapOffs = tga_head.Index;
+    colorMap = new csRGBpixel [colorMapOffs + colorMapSize];
+    if (tga_head.CoMapType != 0)
+    {
+      for (uint i = colorMapOffs; i < colorMapOffs + colorMapSize; ++i)
+	get_map_entry (iBuffer, colorMap + i, tga_head.CoSize,
+	  Format & CS_IMGFMT_ALPHA);
+    }
+    else
+    {
+      if (tga_head.PixelSize <= 8)
+      {
+	for (uint i = 0; i < colorMapSize; i++)
+	  colorMap[i].Set (i << indexShift, i << indexShift, i << indexShift);
+      }
+      else
+      {
+	for (uint i = 0; i < colorMapSize; i++)
+	  colorMap[i].Set (i >> indexShift, i >> indexShift, i >> indexShift);
+      }
+    }
   }
 
   /* Check run-length encoding. */
@@ -467,9 +508,15 @@ bool ImageTgaFile::TgaLoader::LoadData ()
                tga_head.ImgType == TGA_RLERGB ||
                tga_head.ImgType == TGA_RLEMono);
 
-  // @@todo: avoid converting colormapped images into RGB,
-  // instead pass a pointer to convert_pal8
-  rgbaData = new csRGBpixel [Width * Height];
+  if (dataType == rdtIndexed)
+  {
+    indexData = new uint8[Width * Height];
+    palette = colorMap;
+    paletteCount = colorMapSize;
+    colorMap = 0;
+  }
+  else
+    rgbaData = new csRGBpixel [Width * Height];
 
   int truerow = 0;
   int baserow = 0;
@@ -479,9 +526,18 @@ bool ImageTgaFile::TgaLoader::LoadData ()
     if ((tga_head.flags & TGA_Org_MASK) == TGA_Org_BL)
       realrow = Height - realrow - 1;
 
-    for (int col = 0; col < Width; ++col)
-      get_pixel (iBuffer, rgbaData + (realrow * Width + col),
-        (int) tga_head.PixelSize, Format & CS_IMGFMT_ALPHA);
+    if (dataType == rdtIndexed)
+    {
+      for (int col = 0; col < Width; ++col)
+	get_pixel (iBuffer, indexData + (realrow * Width + col),
+	  tga_head.PixelSize, Format & CS_IMGFMT_ALPHA);
+    }
+    else
+    {
+      for (int col = 0; col < Width; ++col)
+	get_pixel (iBuffer, rgbaData + (realrow * Width + col),
+	  tga_head.PixelSize, Format & CS_IMGFMT_ALPHA);
+    }
     if ((tga_head.flags & TGA_IL_MASK) == TGA_IL_Four)
       truerow += 4;
     else if ((tga_head.flags & TGA_IL_MASK) == TGA_IL_Two)

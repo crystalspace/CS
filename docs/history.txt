@@ -24,9 +24,14 @@ chronological order.
 	    - Fixed crash in csInputDefinition for input strings like "-".
 	    - Un-deprecated some csString methods.
 	    - Removed the rather useless StdAfx.cpp file of the Opcode plugin.
+	- res fixed access of freed memory in archive.cpp.
+	- res fixed TGA loader not setting correct image format if the 
+	  requested one is CS_IMGFMT_ANY.
 	- Jorrit disabled VBO again as it causes a significant slowdown on his
 	  card. Probably because this card doesn't really support VBO so the
 	  driver emulates it or so?
+	- res changed the TGA loader to not convert all images to truecolor, 
+	  paletted images are properly supported.
 5-Apr-2005
 	- res replaced use of printf() and relatives with csPrintf() and 
 	  relatives and use of sprintf() with use of csStrings.

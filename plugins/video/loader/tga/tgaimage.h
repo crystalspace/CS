@@ -61,24 +61,32 @@ public:
 /* Header definition. */
 struct TGAheader
 {
-  unsigned char IDLength;		/* length of Identifier String */
-  unsigned char CoMapType;		/* 0 = no map */
-  unsigned char ImgType;		/* image type (see below for values) */
-  unsigned char Index_lo, Index_hi;	/* index of first color map entry */
-  unsigned char Length_lo, Length_hi;	/* number of entries in color map */
-  unsigned char CoSize;			/* size of color map entry (15,16,24,32) */
-  unsigned char X_org_lo, X_org_hi;	/* x origin of image */
-  unsigned char Y_org_lo, Y_org_hi;	/* y origin of image */
-  unsigned char Width_lo, Width_hi;	/* width of image */
-  unsigned char Height_lo, Height_hi;	/* height of image */
-  unsigned char PixelSize;		/* pixel size (8,16,24,32) */
+  struct LEUI16
+  {
+    uint8 lo, hi;
+    operator uint16() const { return hi * 256 + lo; }
+    const LEUI16& operator = (uint16 x) 
+    { lo = x % 256; hi = x / 256; return *this; }
+  };
+
+  uint8 IDLength;		/* length of Identifier String */
+  uint8 CoMapType;		/* 0 = no map */
+  uint8 ImgType;		/* image type (see below for values) */
+  LEUI16 Index;			/* index of first color map entry */
+  LEUI16 Length;		/* number of entries in color map */
+  uint8 CoSize;			/* size of color map entry (15,16,24,32) */
+  LEUI16 X_org;			/* x origin of image */
+  LEUI16 Y_org;			/* y origin of image */
+  LEUI16 Width;			/* width of image */
+  LEUI16 Height;		/* height of image */
+  uint8 PixelSize;		/* pixel size (8,16,24,32) */
   /* 
     bits 7-6, interleaving flag
     bit  5, origin: 0=lower left, 1=upper left
     bit  4, reserved
     bits 3-0, number of attribute bits per pixel 
    */
-  unsigned char flags;
+  uint8 flags;
 };
 
 /**
@@ -91,17 +99,27 @@ class ImageTgaFile : public csCommonImageFile
 private:
   class TgaLoader : public csCommonImageFileLoader
   {
+    struct TgaPix
+    {
+      int Red, Grn, Blu, Alpha;
+      uint l;
+    };
+
     csRef<iDataBuffer> dataSource;
     uint8* iBuffer;
     TGAheader tga_head;
     bool mapped, rlencoded;
     int RLE_count, RLE_flag;
-    int Red, Grn, Blu, Alpha;
+    TgaPix currentPixel;
     csRGBpixel* colorMap;
+    uint colorMapSize;
+    uint indexShift;
 
     void readtga (uint8*& ptr, struct TGAheader* tgaP);
     void get_map_entry (uint8*& ptr, csRGBpixel* Value, int Size, bool alpha);
+    void get_current_pixel (uint8*& ptr, int Size, bool alpha);
     void get_pixel (uint8*& ptr, csRGBpixel* dest, int Size, bool alpha);
+    void get_pixel (uint8*& ptr, uint8* dest, int Size, bool alpha);
   public:
     TgaLoader (int Format, iDataBuffer* source) 
       : csCommonImageFileLoader (Format), dataSource (source), 
