@@ -92,8 +92,7 @@ STDMETHODIMP IPolygon3D::GetTexture(int mipmap, IPolygonTexture** retval)
 STDMETHODIMP IPolygon3D::GetCameraVector(int v, ComcsVector3* retval)
 {
 	METHOD_PROLOGUE( csPolygon3D, Polygon3D );
-	csVector3 v3;
-	v3 = pThis->Vcam(v);
+	csVector3 v3 = pThis->Vcam(v);
 
 	//ASSERT( retval );
 	retval->x = v3.x;

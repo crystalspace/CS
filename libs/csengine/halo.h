@@ -40,7 +40,7 @@ public:
   HALOINFO haloinfo;
 
   ///
-  csHaloInformation()
+  csHaloInformation() : v (0, 0, 0)
   {
     pLight = NULL;
     r = g = b = intensity = 0.0f;
