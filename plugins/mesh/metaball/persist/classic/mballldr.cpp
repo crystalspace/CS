@@ -31,7 +31,9 @@
 #include "ivideo/graph3d.h"
 #include "qint.h"
 #include "iutil/strvec.h"
+#include "iutil/vfs.h"
 #include "csutil/util.h"
+#include "csutil/csstring.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
 #include "iutil/objreg.h"
@@ -174,7 +176,7 @@ bool csMetaBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-void csMetaBallFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/)
+void csMetaBallFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
 {
   // no params
 }
@@ -402,26 +404,28 @@ bool csMetaBallSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static void WriteMixmode(iStrVector *str, uint mixmode)
+static void WriteMixmode(csString& str, uint mixmode)
 {
-  str->Push(csStrNew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TILING) str->Push(csStrNew(" TILING ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
-  if(mixmode&CS_FX_ALPHA) {
+  str.Append("  MIXMODE (");
+  if(mixmode&CS_FX_COPY) str.Append(" COPY ()");
+  if(mixmode&CS_FX_ADD) str.Append(" ADD ()");
+  if(mixmode&CS_FX_MULTIPLY) str.Append(" MULTIPLY ()");
+  if(mixmode&CS_FX_MULTIPLY2) str.Append(" MULTIPLY2 ()");
+  if(mixmode&CS_FX_KEYCOLOR) str.Append(" KEYCOLOR ()");
+  if(mixmode&CS_FX_TILING) str.Append(" TILING ()");
+  if(mixmode&CS_FX_TRANSPARENT) str.Append(" TRANSPARENT ()");
+  if(mixmode&CS_FX_ALPHA)
+  {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
-  str->Push(csStrNew(")"));
+  str.Append(")");
 }
 
-void csMetaBallSaver::WriteDown (iBase* obj, iStrVector *str)
+void csMetaBallSaver::WriteDown (iBase* obj, iFile *file)
 {
+  csString str;
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iMeshObject *mesh = SCF_QUERY_INTERFACE(obj, iMeshObject);
   if(!mesh)
@@ -445,7 +449,7 @@ void csMetaBallSaver::WriteDown (iBase* obj, iStrVector *str)
   char name[MAXLINE];
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   if(state->GetMixMode() != CS_FX_COPY)
   {
     WriteMixmode(str, state->GetMixMode());
@@ -454,26 +458,27 @@ void csMetaBallSaver::WriteDown (iBase* obj, iStrVector *str)
   // Mesh information
   MetaParameters *mp = state->GetParameters();
   sprintf(buf, "NUMBER (%d)\n", state->GetMetaBallCount());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "ISO_LEVEL (%f)\n",mp->iso_level );
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "CHARGE (%f)\n", mp->charge);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterial()->
     QueryObject ()->GetName());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "LIGHTING(%s)\n",(state->IsLighting())? "true" : "false");
-  str->Push (csStrNew (buf));
+  str.Append (buf);
   sprintf(buf, "NUMBER (%d)\n", state->GetMetaBallCount());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "RATE (%f)\n",mp->rate);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "TRUE_MAP (%s)\n",(state->GetQualityEnvironmentMapping())?"true":"false");
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "TEX_SCALE (%f)\n",state->GetEnvironmentMappingFactor());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   fact->DecRef();
   mesh->DecRef();
   state->DecRef();
+  file->Write ((const char*)str, str.Length ());
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2002 by Jorrit Tyberghein
     Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
@@ -22,9 +22,9 @@
 
 #include "csutil/scf.h"
 
-struct iStrVector;
+struct iFile;
 
-SCF_VERSION (iSaverPlugin, 0, 1, 0);
+SCF_VERSION (iSaverPlugin, 0, 2, 0);
 
 /**
  * This is a plugin to save with.
@@ -32,11 +32,9 @@ SCF_VERSION (iSaverPlugin, 0, 1, 0);
 struct iSaverPlugin : public iBase
 {
   /**
-   *  Take a given object and push description onto the given string vector.
-   *  Concatenating the strings in the vector will create the saved text.
-   *  Or write them to a file consequtively.
+   * Take a given object and push description onto the given file.
    */
-  virtual void WriteDown (iBase* obj, iStrVector* str) = 0;
+  virtual void WriteDown (iBase* obj, iFile* file) = 0;
 };
 
 #endif

@@ -529,7 +529,7 @@ csMotionSaver::~csMotionSaver()
 {
 }
 
-void csMotionSaver::WriteDown ( iBase* /* obj */, iStrVector* /* string */)
+void csMotionSaver::WriteDown ( iBase* /* obj */, iFile* /* file */)
 {
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iMotionManager *motman = CS_QUERY_PLUGIN_CLASS (plugin_mgr,

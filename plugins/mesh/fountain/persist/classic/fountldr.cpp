@@ -33,6 +33,8 @@
 #include "qint.h"
 #include "iutil/strvec.h"
 #include "csutil/util.h"
+#include "csutil/csstring.h"
+#include "iutil/vfs.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
 #include "iutil/objreg.h"
@@ -180,27 +182,27 @@ bool csFountainFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-static void WriteMixmode(iStrVector *str, uint mixmode)
+static void WriteMixmode(csString& str, uint mixmode)
 {
-  str->Push(csStrNew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TILING) str->Push(csStrNew(" TILING ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
+  str.Append("  MIXMODE (");
+  if(mixmode&CS_FX_COPY) str.Append(" COPY ()");
+  if(mixmode&CS_FX_ADD) str.Append(" ADD ()");
+  if(mixmode&CS_FX_MULTIPLY) str.Append(" MULTIPLY ()");
+  if(mixmode&CS_FX_MULTIPLY2) str.Append(" MULTIPLY2 ()");
+  if(mixmode&CS_FX_KEYCOLOR) str.Append(" KEYCOLOR ()");
+  if(mixmode&CS_FX_TILING) str.Append(" TILING ()");
+  if(mixmode&CS_FX_TRANSPARENT) str.Append(" TRANSPARENT ()");
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
-  str->Push(csStrNew(")"));
+  str.Append(")");
 }
 
 
-void csFountainFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/)
+void csFountainFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
 {
   // nothing to do
 }
@@ -460,8 +462,9 @@ bool csFountainSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csFountainSaver::WriteDown (iBase* obj, iStrVector *str)
+void csFountainSaver::WriteDown (iBase* obj, iFile *file)
 {
+  csString str;
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
   iFountainState *state = SCF_QUERY_INTERFACE (obj, iFountainState);
@@ -470,7 +473,7 @@ void csFountainSaver::WriteDown (iBase* obj, iStrVector *str)
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   if(partstate->GetMixMode() != CS_FX_COPY)
   {
@@ -478,38 +481,39 @@ void csFountainSaver::WriteDown (iBase* obj, iStrVector *str)
   }
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
     partstate->GetColor().green, partstate->GetColor().blue);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "ORIGIN (%g, %g, %g)\n", state->GetOrigin().x,
     state->GetOrigin().y, state->GetOrigin().z);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   float sx = 0.0, sy = 0.0;
   state->GetDropSize(sx, sy);
   sprintf(buf, "DROPSIZE (%g, %g)\n", sx, sy);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "ACCEL (%g, %g, %g)\n", state->GetAcceleration().x,
     state->GetAcceleration().y, state->GetAcceleration().z);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "SPEED (%g)\n", state->GetSpeed());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "OPENING (%g)\n", state->GetOpening());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "AZIMUTH (%g)\n", state->GetAzimuth());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "ELEVATION (%g)\n", state->GetElevation());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "FALLTIME (%g)\n", state->GetFallTime());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   fact->DecRef();
   partstate->DecRef();
   state->DecRef();
+  file->Write ((const char*)str, str.Length ());
 }
 
 //---------------------------------------------------------------------------

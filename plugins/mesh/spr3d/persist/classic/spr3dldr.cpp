@@ -25,7 +25,6 @@
 #include "csgeom/transfrm.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
-#include "spr3dldr.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
@@ -35,7 +34,9 @@
 #include "ivideo/graph3d.h"
 #include "qint.h"
 #include "iutil/strvec.h"
+#include "iutil/vfs.h"
 #include "csutil/util.h"
+#include "csutil/csstring.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
 #include "iengine/motion.h"
@@ -44,6 +45,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/ldrctxt.h"
+#include "spr3dldr.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -773,86 +775,87 @@ bool csSprite3DFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-static void WriteMixmode(iStrVector *str, uint mixmode)
+static void WriteMixmode(csString& str, uint mixmode)
 {
-  str->Push(csStrNew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TILING) str->Push(csStrNew(" TILING ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
+  str.Append("  MIXMODE (");
+  if(mixmode&CS_FX_COPY) str.Append(" COPY ()");
+  if(mixmode&CS_FX_ADD) str.Append(" ADD ()");
+  if(mixmode&CS_FX_MULTIPLY) str.Append(" MULTIPLY ()");
+  if(mixmode&CS_FX_MULTIPLY2) str.Append(" MULTIPLY2 ()");
+  if(mixmode&CS_FX_KEYCOLOR) str.Append(" KEYCOLOR ()");
+  if(mixmode&CS_FX_TILING) str.Append(" TILING ()");
+  if(mixmode&CS_FX_TRANSPARENT) str.Append(" TRANSPARENT ()");
   if(mixmode&CS_FX_ALPHA) {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
-  str->Push(csStrNew(")"));
+  str.Append(")");
 }
 
 
 /// helper function to write a matrix
-static void WriteMatrix(const csMatrix3& m, iStrVector* str)
+static void WriteMatrix(const csMatrix3& m, csString& str)
 {
   char buf[MAXLINE];
   sprintf(buf, "MATRIX (%g,%g,%g,%g,%g,%g,%g,%g,%g)", m.m11, m.m12, m.m13,
     m.m21, m.m22, m.m23, m.m31, m.m32, m.m33);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 }
 
 
 void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
-  iStrVector* str)
+  csString& str)
 {
   iSkeletonConnection* con = SCF_QUERY_INTERFACE (limb, iSkeletonConnection);
   int i;
   char buf[MAXLINE];
-  str->Push(csStrNew("VERTICES ("));
+  str.Append("VERTICES (");
   for(i=0; i<limb->GetVertexCount(); i++)
   {
     sprintf(buf, "%d%s", limb->GetVertices()[i],
       (i==limb->GetVertexCount()-1)?"":",");
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
-  str->Push(csStrNew(")\n"));
+  str.Append(")\n");
 
-  str->Push(csStrNew("TRANSFORM ("));
+  str.Append("TRANSFORM (");
   WriteMatrix(con->GetTransformation().GetO2T(), str);
   sprintf(buf, " V(%g,%g,%g))", con->GetTransformation().GetO2TTranslation().x,
     con->GetTransformation().GetO2TTranslation().y,
     con->GetTransformation().GetO2TTranslation().z);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   iSkeletonLimb *ch = limb->GetChildren();
   while(ch)
   {
     sprintf(buf, "LIMB '%s' (", ch->GetName());
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     SaveSkeleton(ch, str);
-    str->Push(csStrNew(")\n"));
+    str.Append(")\n");
     ch = ch->GetNextSibling();
   }
 
   con->DecRef();
 }
 
-void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str)
+void csSprite3DFactorySaver::WriteDown (iBase* obj, iFile * file)
 {
+  csString str;
   iSprite3DFactoryState *state =
     SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState);
   char buf[MAXLINE];
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   int i,j;
   for(i=0; i<state->GetFrameCount(); i++)
   {
     iSpriteFrame* frame = state->GetFrame(i);
     sprintf(buf, "FRAME '%s' (\n", frame->GetName());
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     int anm_idx = frame->GetAnmIndex ();
     int tex_idx = frame->GetTexIndex ();
     for(j=0; j<state->GetVertexCount(); j++)
@@ -860,30 +863,30 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str)
       sprintf(buf, "  V(%g,%g,%g:%g,%g)\n", state->GetVertex(anm_idx, j).x,
         state->GetVertex(anm_idx, j).y, state->GetVertex(anm_idx, j).z,
 	state->GetTexel(tex_idx, j).x, state->GetTexel(tex_idx, j).y);
-      str->Push(csStrNew(buf));
+      str.Append(buf);
     }
-    str->Push(csStrNew(")\n"));
+    str.Append(")\n");
   }
 
   for(i=0; i<state->GetActionCount(); i++)
   {
     iSpriteAction* action = state->GetAction(i);
     sprintf(buf, "ACTION '%s' (", action->GetName());
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     for(j=0; j<action->GetFrameCount(); j++)
     {
       sprintf(buf, " F(%s,%d)", action->GetFrame(j)->GetName(),
         action->GetFrameDelay(j));
-      str->Push(csStrNew(buf));
+      str.Append(buf);
     }
-    str->Push(csStrNew(")\n"));
+    str.Append(")\n");
   }
 
   for(i=0; i<state->GetTriangleCount(); i++)
   {
     sprintf(buf, "TRIANGLE (%d,%d,%d)\n", state->GetTriangle(i).a,
       state->GetTriangle(i).b, state->GetTriangle(i).c);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
 
   iSkeleton *skeleton = state->GetSkeleton();
@@ -894,9 +897,9 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str)
     while(skelp)
     {
       sprintf(buf, "SKELETON '%s' (\n", skelp->GetName());
-      str->Push(csStrNew(buf));
+      str.Append(buf);
       SaveSkeleton(skelp, str);
-      str->Push(csStrNew(")\n"));
+      str.Append(")\n");
       skelp = skelp->GetNextSibling();
     }
     skellimb->DecRef();
@@ -908,9 +911,10 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str)
   /// or a list of SMOOTH(basenr, framenr);
 
   sprintf(buf, "TWEEN (%s)\n", state->IsTweeningEnabled()?"true":"false");
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   state->DecRef();
+  file->Write ((const char*)str, str.Length ());
 }
 
 //---------------------------------------------------------------------------
@@ -1126,8 +1130,9 @@ bool csSprite3DSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str)
+void csSprite3DSaver::WriteDown (iBase* obj, iFile *file)
 {
+  csString str;
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iSprite3DState *state = SCF_QUERY_INTERFACE (obj, iSprite3DState);
 
@@ -1140,7 +1145,7 @@ void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str)
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   if(state->GetMixMode() != CS_FX_COPY)
   {
@@ -1150,18 +1155,19 @@ void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str)
   {
     sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
       QueryObject ()->GetName());
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
   sprintf(buf, "LIGHTING (%s)\n", state->IsLighting ()?"true":"false");
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "TWEEN (%s)\n", state->IsTweeningEnabled()?"true":"false");
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   if(state->GetCurAction())
   {
     sprintf(buf, "ACTION (%s)\n", state->GetCurAction()->GetName());
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
   fact->DecRef();
   factstate->DecRef();
   state->DecRef();
+  file->Write ((const char*)str, str.Length ());
 }

@@ -85,7 +85,7 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to string vector.
-  virtual void WriteDown (iBase *obj, iStrVector *str);
+  virtual void WriteDown (iBase *obj, iFile *file);
 
   struct eiComponent : public iComponent
   {
@@ -150,7 +150,7 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to string vector.
-  virtual void WriteDown (iBase *obj, iStrVector *str);
+  virtual void WriteDown (iBase *obj, iFile *file);
 
   struct eiComponent : public iComponent
   {

@@ -32,6 +32,8 @@
 #include "ivideo/graph3d.h"
 #include "qint.h"
 #include "iutil/strvec.h"
+#include "iutil/vfs.h"
+#include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
@@ -201,7 +203,7 @@ bool csBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-void csBallFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/)
+void csBallFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
 {
   // no params
 }
@@ -442,8 +444,9 @@ bool csBallSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csBallSaver::WriteDown (iBase* obj, iStrVector *str)
+void csBallSaver::WriteDown (iBase* obj, iFile *file)
 {
+  csString str;
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iMeshObject *mesh = SCF_QUERY_INTERFACE(obj, iMeshObject);
   if(!mesh)
@@ -469,29 +472,31 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str)
   char name[MAXLINE];
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(csStrNew(buf));
+  str.Append (buf);
   if(state->GetMixMode() != CS_FX_COPY)
-    str->Push (csStrNew (synldr->MixmodeToText (state->GetMixMode(), 0)));
+    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0));
 
   // Mesh information
   float x=0, y=0, z=0;
   state->GetRadius(x, y, z);
-  str->Push(csStrNew(synldr->VectorToText ("RADIUS", x, y, z, 0)));
-  str->Push(csStrNew(synldr->VectorToText ("SHIFT", state->GetShift (), 0)));
+  str.Append(synldr->VectorToText ("RADIUS", x, y, z, 0));
+  str.Append(synldr->VectorToText ("SHIFT", state->GetShift (), 0));
   sprintf(buf, "NUMRIM (%d)\n", state->GetRimVertices());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(csStrNew(buf));
-  str->Push (csStrNew (synldr->BoolToText ("LIGHTING",state->IsLighting (),0)));
-  str->Push (csStrNew (synldr->BoolToText ("REVERSED",state->IsReversed (),0)));
-  str->Push (csStrNew (synldr->BoolToText ("TOPONLY",state->IsTopOnly (),0)));
-  str->Push (csStrNew (synldr->BoolToText ("CYLINDRICAL",state->IsCylindricalMapping (),0)));
+  str.Append (buf);
+  str.Append (synldr->BoolToText ("LIGHTING",state->IsLighting (),0));
+  str.Append (synldr->BoolToText ("REVERSED",state->IsReversed (),0));
+  str.Append (synldr->BoolToText ("TOPONLY",state->IsTopOnly (),0));
+  str.Append (synldr->BoolToText ("CYLINDRICAL",state->IsCylindricalMapping (),0));
   csColor col = state->GetColor ();
-  str->Push(csStrNew(synldr->VectorToText ("COLOR", col.red, col.green, col.blue, 0)));
+  str.Append (synldr->VectorToText ("COLOR", col.red, col.green, col.blue, 0));
+
+  file->Write ((const char*)str, str.Length ());
 
   fact->DecRef();
   mesh->DecRef();
   state->DecRef();
-
 }
+

@@ -32,7 +32,9 @@
 #include "qint.h"
 #include "iutil/strvec.h"
 #include "csutil/util.h"
+#include "csutil/csstring.h"
 #include "iutil/object.h"
+#include "iutil/vfs.h"
 #include "iengine/material.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
@@ -383,42 +385,44 @@ bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-static void WriteMixmode(iStrVector *str, uint mixmode)
+static void WriteMixmode(csString& str, uint mixmode)
 {
-  str->Push(csStrNew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TILING) str->Push(csStrNew(" TILING ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
+  str.Append("  MIXMODE (");
+  if(mixmode&CS_FX_COPY) str.Append(" COPY ()");
+  if(mixmode&CS_FX_ADD) str.Append(" ADD ()");
+  if(mixmode&CS_FX_MULTIPLY) str.Append(" MULTIPLY ()");
+  if(mixmode&CS_FX_MULTIPLY2) str.Append(" MULTIPLY2 ()");
+  if(mixmode&CS_FX_KEYCOLOR) str.Append(" KEYCOLOR ()");
+  if(mixmode&CS_FX_TILING) str.Append(" TILING ()");
+  if(mixmode&CS_FX_TRANSPARENT) str.Append(" TRANSPARENT ()");
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
-  str->Push(csStrNew(")"));
+  str.Append(")");
 }
 
-void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str)
+void csSprite2DFactorySaver::WriteDown (iBase* obj, iFile * file)
 {
+  csString str;
   iSprite2DFactoryState *state =
     SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState);
   char buf[MAXLINE];
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   if(state->GetMixMode() != CS_FX_COPY)
   {
     WriteMixmode(str, state->GetMixMode());
   }
   sprintf(buf, "LIGHTING (%s)\n", state->HasLighting()?"true":"false");
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   state->DecRef();
+  file->Write ((const char*)str, str.Length ());
 }
 //---------------------------------------------------------------------------
 
@@ -630,8 +634,9 @@ bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str)
+void csSprite2DSaver::WriteDown (iBase* obj, iFile *file)
 {
+  csString str;
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iSprite2DState *state = SCF_QUERY_INTERFACE (obj, iSprite2DState);
   char buf[MAXLINE];
@@ -639,13 +644,13 @@ void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str)
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "LIGHTING (%s)\n", state->HasLighting()?"true":"false");
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   if(state->GetMixMode() != CS_FX_COPY)
   {
     WriteMixmode(str, state->GetMixMode());
@@ -653,32 +658,33 @@ void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str)
 
   csColoredVertices& vs = state->GetVertices();
   int i;
-  str->Push(csStrNew("VERTICES("));
+  str.Append("VERTICES(");
   for(i=0; vs.Length(); i++)
   {
     sprintf(buf, "%g,%g%s", vs[i].pos.x, vs[i].pos.y,
       (i==vs.Length()-1)?"":", ");
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
-  str->Push(csStrNew(")\n"));
+  str.Append(")\n");
 
-  str->Push(csStrNew("UV("));
+  str.Append("UV(");
   for(i=0; vs.Length(); i++)
   {
     sprintf(buf, "%g,%g%s", vs[i].u, vs[i].v, (i==vs.Length()-1)?"":", ");
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
-  str->Push(csStrNew(")\n"));
+  str.Append(")\n");
 
-  str->Push(csStrNew("COLORS("));
+  str.Append("COLORS(");
   for(i=0; vs.Length(); i++)
   {
     sprintf(buf, "%g,%g,%g%s", vs[i].color_init.red, vs[i].color_init.green,
       vs[i].color_init.blue, (i==vs.Length()-1)?"":", ");
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
-  str->Push(csStrNew(")\n"));
+  str.Append(")\n");
 
   fact->DecRef();
   state->DecRef();
+  file->Write ((const char*)str, str.Length ());
 }

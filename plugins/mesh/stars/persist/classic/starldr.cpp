@@ -195,7 +195,7 @@ bool csStarFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-void csStarFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/)
+void csStarFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
 {
   // no params
 }
@@ -385,7 +385,7 @@ bool csStarSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csStarSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/)
+void csStarSaver::WriteDown (iBase* /*obj*/, iFile* /*file*/)
 {
   // @@@ Not implemented yet.
 }

@@ -76,7 +76,7 @@ public:
 
   csMotionSaver (iBase *);
   virtual ~csMotionSaver ();
-  virtual void WriteDown ( iBase *obj, iStrVector *string);
+  virtual void WriteDown ( iBase *obj, iFile *file);
 
   struct eiComponent : public iComponent
   {

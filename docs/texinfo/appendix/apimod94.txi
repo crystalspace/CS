@@ -6,7 +6,8 @@
 This section documents the major changes between versions 0.92 and 0.94 of of
 Crystal Space.
 
-@subheading Loader Changes
+@subheading Loader and Saver Changes
+@cindex @code{iSaverPlugin}
 @cindex @code{iLoaderPlugin}
 @cindex @code{iLoaderContext}
 @cindex @code{iTerrFuncState}
@@ -21,6 +22,9 @@ now expects an @code{iLoaderContext} instead of @code{iMaterialList}.
 @emph{WARNING!} This loader change means that the searching restricted
 on the current region now actually works! This means that by default
 when loading a map it will ONLY find objects defined in this map!
+
+The @code{iSaverPlugin} interface has also changed. It now uses an
+@code{iFile} parameter instead of @code{iStrVector}.
 
 @subheading iCamera changes
 @cindex @code{iCamera}

@@ -32,7 +32,9 @@
 #include "ivideo/graph3d.h"
 #include "qint.h"
 #include "iutil/strvec.h"
+#include "iutil/vfs.h"
 #include "csutil/util.h"
+#include "csutil/csstring.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
 #include "iutil/objreg.h"
@@ -359,27 +361,27 @@ bool csHazeFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-static void WriteMixmode(iStrVector *str, uint mixmode)
+static void WriteMixmode(csString& str, uint mixmode)
 {
-  str->Push(csStrNew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TILING) str->Push(csStrNew(" TILING ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
+  str.Append("  MIXMODE (");
+  if(mixmode&CS_FX_COPY) str.Append(" COPY ()");
+  if(mixmode&CS_FX_ADD) str.Append(" ADD ()");
+  if(mixmode&CS_FX_MULTIPLY) str.Append(" MULTIPLY ()");
+  if(mixmode&CS_FX_MULTIPLY2) str.Append(" MULTIPLY2 ()");
+  if(mixmode&CS_FX_KEYCOLOR) str.Append(" KEYCOLOR ()");
+  if(mixmode&CS_FX_TILING) str.Append(" TILING ()");
+  if(mixmode&CS_FX_TRANSPARENT) str.Append(" TRANSPARENT ()");
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
-  str->Push(csStrNew(")"));
+  str.Append(")");
 }
 
 /// write hull to string
-static void WriteHull(iStrVector *str, iHazeHull *hull)
+static void WriteHull(csString& str, iHazeHull *hull)
 {
   char buf[MAXLINE];
   csVector3 a,b;
@@ -390,7 +392,7 @@ static void WriteHull(iStrVector *str, iHazeHull *hull)
   {
     ebox->GetSettings(a, b);
     sprintf(buf, "  HAZEBOX(%g,%g,%g, %g,%g,%g)\n", a.x,a.y,a.z, b.x,b.y,b.z);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     ebox->DecRef();
     return;
   }
@@ -400,15 +402,16 @@ static void WriteHull(iStrVector *str, iHazeHull *hull)
     econe->GetSettings(nr, a, b, p, q);
     sprintf(buf, "  HAZEBOX(%d, %g,%g,%g, %g,%g,%g, %g, %g)\n", nr,
       a.x,a.y,a.z, b.x,b.y,b.z, p, q);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     econe->DecRef();
     return;
   }
   printf ("Unknown hazehull type, cannot writedown!\n");
 }
 
-void csHazeFactorySaver::WriteDown (iBase* obj, iStrVector *str)
+void csHazeFactorySaver::WriteDown (iBase* obj, iFile *file)
 {
+  csString str;
   iHazeFactoryState *hazestate = SCF_QUERY_INTERFACE (obj, iHazeFactoryState);
   char buf[MAXLINE];
 
@@ -418,24 +421,26 @@ void csHazeFactorySaver::WriteDown (iBase* obj, iStrVector *str)
   }
   sprintf(buf, "MATERIAL (%s)\n", hazestate->GetMaterialWrapper()->
     QueryObject()->GetName());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   sprintf(buf, "ORIGIN (%f,%f,%f)\n", hazestate->GetOrigin().x,
     hazestate->GetOrigin().y, hazestate->GetOrigin().z);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "DIRECTIONAL (%f,%f,%f)\n", hazestate->GetDirectional().x,
     hazestate->GetDirectional().y, hazestate->GetDirectional().z);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   int i;
   for(i=0; i<hazestate->GetLayerCount(); i++)
   {
     sprintf(buf, "LAYER (%f ", hazestate->GetLayerScale(i) );
     WriteHull(str, hazestate->GetLayerHull(i));
-    str->Push(csStrNew(" )\n"));
+    str.Append(" )\n");
   }
 
   if(hazestate) hazestate->DecRef();
+
+  file->Write ((const char*)str, str.Length ());
 }
 
 //---------------------------------------------------------------------------
@@ -575,8 +580,9 @@ bool csHazeSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csHazeSaver::WriteDown (iBase* obj, iStrVector *str)
+void csHazeSaver::WriteDown (iBase* obj, iFile *file)
 {
+  csString str;
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iHazeState *state = SCF_QUERY_INTERFACE (obj, iHazeState);
   char buf[MAXLINE];
@@ -584,7 +590,7 @@ void csHazeSaver::WriteDown (iBase* obj, iStrVector *str)
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   if(state->GetMixMode() != CS_FX_COPY)
   {
@@ -592,23 +598,24 @@ void csHazeSaver::WriteDown (iBase* obj, iStrVector *str)
   }
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject()->GetName());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   sprintf(buf, "ORIGIN (%f,%f,%f)\n", state->GetOrigin().x,
     state->GetOrigin().y, state->GetOrigin().z);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "DIRECTIONAL (%f,%f,%f)\n", state->GetDirectional().x,
     state->GetDirectional().y, state->GetDirectional().z);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   int i;
   for(i=0; i<state->GetLayerCount(); i++)
   {
     sprintf(buf, "LAYER (%f ", state->GetLayerScale(i) );
     WriteHull(str, state->GetLayerHull(i));
-    str->Push(csStrNew(" )\n"));
+    str.Append(" )\n");
   }
 
   fact->DecRef();
   state->DecRef();
+  file->Write ((const char*)str, str.Length ());
 }

@@ -487,7 +487,7 @@ bool csGeneralFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-void csGeneralFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/)
+void csGeneralFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
 {
   // no params
   // @@@ NOT IMPLEMENTED!
@@ -689,7 +689,7 @@ bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csGeneralMeshSaver::WriteDown (iBase*, iStrVector*)
+void csGeneralMeshSaver::WriteDown (iBase*, iFile*)
 {
   // @@@ Not implemented!
 }

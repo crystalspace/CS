@@ -30,6 +30,7 @@ struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
 struct iSyntaxService;
+struct iFile;
 
 /**
  * Ball factory loader.
@@ -88,7 +89,7 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Write down given object and add to string vector.
-  virtual void WriteDown (iBase *obj, iStrVector *str);
+  virtual void WriteDown (iBase *obj, iFile *str);
 
   struct eiComponent : public iComponent
   {
@@ -157,7 +158,7 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Write down given object and add to string vector.
-  virtual void WriteDown (iBase *obj, iStrVector *str);
+  virtual void WriteDown (iBase *obj, iFile *str);
 
   struct eiComponent : public iComponent
   {

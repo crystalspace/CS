@@ -31,10 +31,12 @@
 #include "imesh/emit.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
+#include "iengine/material.h"
 #include "iutil/strvec.h"
+#include "iutil/vfs.h"
+#include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "iutil/object.h"
-#include "iengine/material.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -189,26 +191,26 @@ bool csEmitFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-static void WriteMixmode(iStrVector *str, uint mixmode)
+static void WriteMixmode(csString& str, uint mixmode)
 {
-  str->Push(csStrNew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TILING) str->Push(csStrNew(" TILING ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
+  str.Append ("  MIXMODE (");
+  if(mixmode&CS_FX_COPY) str.Append(" COPY ()");
+  if(mixmode&CS_FX_ADD) str.Append(" ADD ()");
+  if(mixmode&CS_FX_MULTIPLY) str.Append(" MULTIPLY ()");
+  if(mixmode&CS_FX_MULTIPLY2) str.Append(" MULTIPLY2 ()");
+  if(mixmode&CS_FX_KEYCOLOR) str.Append(" KEYCOLOR ()");
+  if(mixmode&CS_FX_TILING) str.Append(" TILING ()");
+  if(mixmode&CS_FX_TRANSPARENT) str.Append(" TRANSPARENT ()");
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
-  str->Push(csStrNew(")"));
+  str.Append(")");
 }
 
-void csEmitFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/)
+void csEmitFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
 {
   // nothing to do
 }
@@ -613,7 +615,7 @@ bool csEmitSaver::Initialize (iObjectRegistry* object_reg)
 }
 
 /// write emitter to string
-static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
+static void WriteEmit(csString& str, iEmitGen3D *emit)
 {
   char buf[MAXLINE];
   csVector3 a,b;
@@ -624,7 +626,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     /// b is ignored
     efixed->GetValue(a, b);
     sprintf(buf, "  EMITFIXED(%g, %g, %g)\n", a.x, a.y, a.z);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     efixed->DecRef();
     return;
   }
@@ -633,7 +635,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   {
     esphere->GetContent(a, p, q);
     sprintf(buf, "  EMITSPHERE(%g,%g,%g, %g, %g)\n", a.x, a.y, a.z, p, q);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     esphere->DecRef();
     return;
   }
@@ -642,7 +644,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   {
     ebox->GetContent(a, b);
     sprintf(buf, "  EMITBOX(%g,%g,%g, %g,%g,%g)\n", a.x,a.y,a.z, b.x,b.y,b.z);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     ebox->DecRef();
     return;
   }
@@ -652,7 +654,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     econe->GetContent(a, p, q, r, s, t);
     sprintf(buf, "  EMITCONE(%g,%g,%g, %g, %g, %g, %g, %g)\n", a.x,a.y,a.z,
       p, q, r, s, t);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     econe->DecRef();
     return;
   }
@@ -666,9 +668,9 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
       iEmitGen3D *gen;
       emix->GetContent(i, w, gen);
       sprintf(buf, "  EMITMIX( WEIGHT(%g)\n", w);
-      str->Push(csStrNew(buf));
+      str.Append(buf);
       WriteEmit(str, gen);
-      str->Push(csStrNew("  )\n"));
+      str.Append("  )\n");
     }
     emix->DecRef();
     return;
@@ -678,7 +680,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   {
     eline->GetContent(a, b);
     sprintf(buf, "  EMITLINE(%g,%g,%g, %g,%g,%g)\n", a.x,a.y,a.z, b.x,b.y,b.z);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     eline->DecRef();
     return;
   }
@@ -688,7 +690,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     ecyl->GetContent(a, b, p, q);
     sprintf(buf, "  EMITCYLINDER(%g,%g,%g, %g,%g,%g, %g, %g)\n", a.x,a.y,a.z,
       b.x,b.y,b.z, p, q);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     ecyl->DecRef();
     return;
   }
@@ -699,7 +701,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     ecyltan->GetContent(a, b, p, q);
     sprintf(buf, "  EMITCYLINDERTANGENT(%g,%g,%g, %g,%g,%g, %g, %g)\n",
       a.x,a.y,a.z, b.x,b.y,b.z, p, q);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     ecyltan->DecRef();
     return;
   }
@@ -709,15 +711,16 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   {
     espheretan->GetContent(a, p, q);
     sprintf(buf, "  EMITSPHERETANGENT(%g,%g,%g, %g, %g)\n", a.x,a.y,a.z, p, q);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
     espheretan->DecRef();
     return;
   }
   printf ("Unknown emitter type, cannot writedown!\n");
 }
 
-void csEmitSaver::WriteDown (iBase* obj, iStrVector *str)
+void csEmitSaver::WriteDown (iBase* obj, iFile *file)
 {
+  csString str;
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
   iEmitState *state = SCF_QUERY_INTERFACE (obj, iEmitState);
@@ -726,7 +729,7 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str)
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   if(partstate->GetMixMode() != CS_FX_COPY)
   {
@@ -734,13 +737,13 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str)
   }
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
     QueryObject()->GetName());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "TOTALTIME (%d)\n", state->GetParticleTime());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   if(state->UsingRectParticles())
   {
     float w,h; state->GetRectParticles(w,h);
@@ -751,27 +754,27 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str)
     int n; float r; state->GetRegularParticles(n, r);
     sprintf(buf, "REGULARPARTICLES (%d, %g)\n", n, r);
   }
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
-  str->Push(csStrNew("STARTPOS(\n"));
+  str.Append("STARTPOS(\n");
   WriteEmit(str, state->GetStartPosEmit());
-  str->Push(csStrNew(")\n"));
+  str.Append(")\n");
 
-  str->Push(csStrNew("STARTSPEED(\n"));
+  str.Append("STARTSPEED(\n");
   WriteEmit(str, state->GetStartSpeedEmit());
-  str->Push(csStrNew(")\n"));
+  str.Append(")\n");
 
-  str->Push(csStrNew("STARTACCEL(\n"));
+  str.Append("STARTACCEL(\n");
   WriteEmit(str, state->GetStartAccelEmit());
-  str->Push(csStrNew(")\n"));
+  str.Append(")\n");
 
   if(state->GetAttractorEmit())
   {
-    str->Push(csStrNew("ATTRACTOR(\n"));
+    str.Append("ATTRACTOR(\n");
     WriteEmit(str, state->GetAttractorEmit());
-    str->Push(csStrNew(")\n"));
+    str.Append(")\n");
     sprintf(buf, "ATTRACTORFORCE (%g)\n", state->GetAttractorForce());
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
 
   int i, time;
@@ -782,8 +785,10 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str)
     state->GetAgingMoment(i, time, col, alpha, swirl, rotspeed, scale);
     sprintf(buf, "AGING (%d, %g,%g,%g, %g, %g, %g, %g)\n", time, col.red,
       col.green, col.blue, alpha, swirl, rotspeed, scale);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
+
+  file->Write ((const char*)str, str.Length ());
 
   fact->DecRef();
   partstate->DecRef();

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2001-2002 by Jorrit Tyberghein
     Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
@@ -32,6 +32,8 @@
 #include "ivideo/graph3d.h"
 #include "qint.h"
 #include "iutil/strvec.h"
+#include "iutil/vfs.h"
+#include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
@@ -180,26 +182,26 @@ bool csExplosionFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-static void WriteMixmode(iStrVector *str, uint mixmode)
+static void WriteMixmode(csString& str, uint mixmode)
 {
-  str->Push(csStrNew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TILING) str->Push(csStrNew(" TILING ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
+  str.Append("  MIXMODE (");
+  if(mixmode&CS_FX_COPY) str.Append(" COPY ()");
+  if(mixmode&CS_FX_ADD) str.Append(" ADD ()");
+  if(mixmode&CS_FX_MULTIPLY) str.Append(" MULTIPLY ()");
+  if(mixmode&CS_FX_MULTIPLY2) str.Append(" MULTIPLY2 ()");
+  if(mixmode&CS_FX_KEYCOLOR) str.Append(" KEYCOLOR ()");
+  if(mixmode&CS_FX_TILING) str.Append(" TILING ()");
+  if(mixmode&CS_FX_TRANSPARENT) str.Append(" TRANSPARENT ()");
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
-  str->Push(csStrNew(")"));
+  str.Append(")");
 }
 
-void csExplosionFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/)
+void csExplosionFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
 {
   // nothing to do
 }
@@ -460,8 +462,9 @@ bool csExplosionSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csExplosionSaver::WriteDown (iBase* obj, iStrVector *str)
+void csExplosionSaver::WriteDown (iBase* obj, iFile *file)
 {
+  csString str;
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
   iExplosionState *explostate = SCF_QUERY_INTERFACE (obj, iExplosionState);
@@ -470,7 +473,7 @@ void csExplosionSaver::WriteDown (iBase* obj, iStrVector *str)
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   if(partstate->GetMixMode() != CS_FX_COPY)
   {
@@ -478,41 +481,43 @@ void csExplosionSaver::WriteDown (iBase* obj, iStrVector *str)
   }
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
     partstate->GetColor().green, partstate->GetColor().blue);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
 
   sprintf(buf, "CENTER (%g, %g, %g)\n", explostate->GetCenter().x,
     explostate->GetCenter().y, explostate->GetCenter().z);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "PUSH (%g, %g, %g)\n", explostate->GetPush().x,
     explostate->GetPush().y, explostate->GetPush().z);
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "SPREADPOS (%g)\n", explostate->GetSpreadPos());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "SPREADSPEED (%g)\n", explostate->GetSpreadSpeed());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "SPREADACCEL (%g)\n", explostate->GetSpreadAcceleration());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "NUMBER (%d)\n", explostate->GetParticleCount());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "NRSIDES (%d)\n", explostate->GetNrSides());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "PARTRADIUS (%g)\n", explostate->GetPartRadius());
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   sprintf(buf, "LIGHTING (%s)\n", explostate->GetLighting()?"true":"false");
-  str->Push(csStrNew(buf));
+  str.Append(buf);
   csTicks fade_time = 0;
   if(explostate->GetFadeSprites(fade_time))
   {
     sprintf(buf, "FADE (%d)\n", (int)fade_time);
-    str->Push(csStrNew(buf));
+    str.Append(buf);
   }
 
   fact->DecRef();
   partstate->DecRef();
   explostate->DecRef();
+
+  file->Write ((const char*)str, str.Length ());
 }
 
 //---------------------------------------------------------------------------

@@ -38,7 +38,9 @@
 #include "ivideo/texture.h"
 #include "qint.h"
 #include "iutil/strvec.h"
+#include "iutil/vfs.h"
 #include "csutil/util.h"
+#include "csutil/csstring.h"
 #include "iutil/object.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
@@ -653,15 +655,17 @@ bool csThingSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csThingSaver::WriteDown (iBase* /*obj*/, iStrVector *str)
+void csThingSaver::WriteDown (iBase* /*obj*/, iFile *file)
 {
+  csString str;
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   char buf[MAXLINE];
   char name[MAXLINE];
   csFindReplace (name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf (buf, "FACTORY ('%s')\n", name);
-  str->Push (csStrNew (buf));
+  str.Append (buf);
   fact->DecRef ();
+  file->Write ((const char*)str, str.Length ());
 }
 
 //---------------------------------------------------------------------------
@@ -872,7 +876,7 @@ bool csPlaneSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csPlaneSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/)
+void csPlaneSaver::WriteDown (iBase* /*obj*/, iFile* /*file*/)
 {
 }
 
@@ -1013,6 +1017,6 @@ bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csBezierSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/)
+void csBezierSaver::WriteDown (iBase* /*obj*/, iFile* /*file*/)
 {
 }

@@ -20,6 +20,10 @@ The history order is reversed so that new features are at the top.
 	  archive.
 	- csdemo will now correctly move objects and camera so that they end
 	  up in the correct sector if they go through a portal.
+	- Changed iSaverPlugin::WriteDown() to accept iFile instead
+	  of iStrVector. This will make it possible to write binary data.
+	  Changed all implementations of this interface for the new
+	  method signature.
 11-Mar-2002
 	- Fixed a bug in csScanStr when presented with an empty string
 	  as input. This prevented the proper scanning of the format
