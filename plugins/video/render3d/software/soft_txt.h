@@ -270,6 +270,18 @@ public:
   virtual csPtr<iImage> Dump ();
 
   virtual iTextureHandle* GetTexture ();
+
+  /**
+   * Compute the ID for a renderer LM. 
+   */
+  static int ComputeRlmID (int u, int v)
+  { 
+    /*
+      Cantor's pairing function: maps every pair (n,n) uniquely to a number n
+      (http://en.wikipedia.org/wiki/Pairing_function)
+     */
+    return ((u + v) * (u + v + 1)) / 2 + v; 
+  }
 };
 
 /**

@@ -20,6 +20,7 @@
 #include "csutil/cfgfile.h"
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
+#include "csutil/physfile.h"
 #include "csutil/util.h"
 #include "csutil/snprintf.h"
 #include "iutil/vfs.h"
@@ -682,23 +683,17 @@ bool csConfigFile::LoadNow(const char *fName, iVFS *vfs, bool overwrite)
   if (vfs)
   {
     Filedata = vfs->ReadFile(fName);
-    if (!Filedata) return false;
   }
   else
   {
-    FILE *fp = fopen(fName, "rb");
-    if (!fp) return false;
-    fseek(fp, 0, SEEK_END);
-    size_t Size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    Filedata = csPtr<iDataBuffer> (new csDataBuffer(Size + 1));
-    fread(Filedata->GetData(), sizeof(char), Size, fp);
-    fclose(fp);
-    Filedata->GetInt8()[Size] = 0;
+    csRef<iFile> file;
+    file.AttachNew (new csPhysicalFile (fName, "rb"));
+    Filedata = file->GetAllData (true);
   }
+  if (!Filedata) return false;
 
   // parse the data
-  LoadFromBuffer((char*)Filedata->GetInt8(), overwrite);
+  LoadFromBuffer ((char*)Filedata->GetInt8(), overwrite);
 
   return true;
 }

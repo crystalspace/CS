@@ -17,9 +17,8 @@
 */
 
 /**
- * This file implements a platform sepcific user configration which tries to
- * create the config files in $HOME/.crystalspace which is apporpriate for most
- * posixish systems.
+ * This file implements a platform specific user configuration which tries to
+ * create the config files in the path returned by csGetPlatformConfigPath().
  */
 #include <sys/stat.h>
 
@@ -56,32 +55,27 @@
 #define S_IXOTH 0000001
 #endif
 
-csPtr<iConfigFile> csGetPlatformConfig(const char* key)
+csPtr<iConfigFile> csGetPlatformConfig (const char* key)
 {
-  // Is $HOME set? otherwise fallback to standard mode
-  const char* home = getenv("HOME");
-  if (home == 0)
-    return 0;
-  
-  // Construct directory and filename of the config file
-  csString dir, fname;
-  dir << home << CS_PATH_SEPARATOR << "." CS_PACKAGE_NAME;
-  fname << dir << CS_PATH_SEPARATOR << key << ".cfg";
+  csString fname = csGetPlatformConfigName (key);
+  csString dir (fname);
+  size_t slash = dir.FindLast (CS_PATH_SEPARATOR);
+  if (slash != (size_t)-1)
+    dir.Truncate (slash);
 
   // Try to create the directory (we assume that $HOME is already created)
   struct stat stats;
-  if (stat(dir, &stats) != 0)
+  if (stat (dir, &stats) != 0)
   {
     mode_t const m =
       S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IWGRP|S_IXGRP|S_IROTH|S_IWOTH|S_IXOTH;
-    if (mkdir(dir, m) != 0)
+    if (mkdir (dir, m) != 0)
     {
-      fprintf(stderr,
-  	  "Failed to create `%s' for configuration files (errno %d).\n",
-	  dir.GetData(), errno);
+      csPrintfErr ("Failed to create `%s' for configuration files (errno %d).\n",
+	dir.GetData(), errno);
       return 0;
     }
   }
 
-  return new csConfigFile(fname);
+  return new csConfigFile (fname);
 }

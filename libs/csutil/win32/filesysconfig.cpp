@@ -56,38 +56,45 @@ static void MakeDir (char* name)
   CreateDirectoryEx (upPath, name, 0);
 }
 
-csPtr<iConfigFile> csGetPlatformConfig(const char* Key)
+csPtr<iConfigFile> csGetPlatformConfig (const char* Key)
+{
+  csString path = csGetPlatformConfigPath (Key);
+
+  char* bslash = strrchr (path.GetData(), '\\');
+  if (bslash)
+    *bslash = 0;
+  // @@@ Would be nicer if this was only done when the config file is really 
+  // saved to disk.
+  MakeDir (path.GetData());
+  if (bslash)
+    *bslash = '\\';
+
+  // Create/read a config file; okay if missing; will be created when written
+  return new csConfigFile (path);
+}
+
+csString csGetPlatformConfigPath (const char* key, bool directory)
 {
   char appDataPath [MAX_PATH + 1];
-
+  csString path;
+  
   // Try to retrieve "Application Data" directory
   if (!GetShellFolderPath (CSIDL_APPDATA, appDataPath))
   {
     // Fall back to My Documents
     if (!GetShellFolderPath (CSIDL_PERSONAL, appDataPath))
     {
-      // Fail
-      return 0;
+      // Guess...
+      path << ".\\" << key << (directory ? "\\" : ".cfg");
+      return path;
     }
   }
 
-  CS_ALLOC_STACK_ARRAY (
-    char, realPath, strlen (appDataPath) + 1 + strlen (Key) + 5); 
-  sprintf (realPath, "%s\\%s", appDataPath, Key);
-  char* rpKey = realPath + strlen (appDataPath) + 1;
+  path << appDataPath << "\\" << key;
+  char* rpKey = path.GetData() + strlen (appDataPath) + 1;
   ReplaceReserved (rpKey);
   ReplaceSeparators (rpKey);
-  strcat (realPath, ".cfg");
-
-  char* bslash = strrchr (realPath, '\\');
-  if (bslash)
-    *bslash = 0;
-  // @@@ Would be nicer if this was only done when the config file is really 
-  // saved to disk.
-  MakeDir (realPath);
-  if (bslash)
-    *bslash = '\\';
-
-  // Create/read a config file; okay if missing; will be created when written
-  return new csConfigFile (realPath);
+  path << (directory ? "\\" : ".cfg");
+  
+  return path;
 }

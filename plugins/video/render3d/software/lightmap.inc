@@ -59,6 +59,8 @@
 
 #include "pixtype.inc"
 
+//#define DEBUG_LIMITS
+
 void LM_NAME (csPolyTextureMapping* tmapping,
 	      csSoftRendererLightmap* rlm, 
 	      SoftwareCachedTexture *ct,
@@ -170,6 +172,9 @@ void LM_NAME (csPolyTextureMapping* tmapping,
 			b <<= lm_color_shift;
 			
 			csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + ((pt_min_u + uu) & tx_andw)]];
+		      #ifdef DEBUG_LIMITS
+			CS_ASSERT ((uint8*)out < (uint8*)dst + ct->size);
+		      #endif
 			*out++ =
 				(lt_R [pix.red   | (r & 0x3f00)] << PI_RS) |
 				(lt_G [pix.green | (g & 0x3f00)] << PI_GS) |
@@ -353,6 +358,9 @@ void LM_NAME (csPolyTextureMapping* tmapping,
 			for (; uu < end_uu; uu++)
 			{
 			  csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + (uu & tx_andw)]];
+			#ifdef DEBUG_LIMITS
+			  CS_ASSERT ((uint8*)out < (uint8*)dst + ct->size);
+			#endif
 			  *out++ =
 				(lt_R [pix.red   | (r & 0x3f00)] << PI_RS) |
 				(lt_G [pix.green | (g & 0x3f00)] << PI_GS) |

@@ -5077,89 +5077,96 @@ bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
     {
       case XMLTOKEN_SHADER:
       {
-        /*csRef<iShader> shader (shaderMgr->CreateShader ());
-        //test if we have a childnode named file, if so load from file, else
-        //use inline loading
-        csRef<iDocumentNode> fileChild = child->GetNode ("file");
-        if (fileChild)
-        {
-	  csRef<iDataBuffer> db = VFS->ReadFile (fileChild->GetContentsValue ());
-          shader->Load (db);
-        }
-        else
-        {
-          shader->Load (child);
-        }*/
-
-	csRef<iShaderManager> shaderMgr =
-	  CS_QUERY_REGISTRY (object_reg, iShaderManager);
-
-	csRef<iDocumentNode> shaderNode;
-        csRef<iDocumentNode> fileChild = child->GetNode ("file");
-
-        if (fileChild)
-        {
-	  csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
-	  csRef<iFile> shaderFile = vfs->Open (
-	    fileChild->GetContentsValue (), VFS_FILE_READ);
-
-	  if(!shaderFile)
-	  {
-	    ReportWarning ("crystalspace.maploader",
-	      "Unable to open shader file '%s'!",
-	      fileChild->GetContentsValue ());
-	    break;
-	  }
-
-	  csRef<iDocumentSystem> docsys =
-	    CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
-	  if (docsys == 0)
-	    docsys.AttachNew (new csTinyDocumentSystem ());
-	  csRef<iDocument> shaderDoc = docsys->CreateDocument ();
-	  const char* err = shaderDoc->Parse (shaderFile, true);
-	  if (err != 0)
-	  {
-	    ReportWarning ("crystalspace.maploader",
-	      "Could not parse shader file '%s': %s",
-	      fileChild->GetContentsValue (), err);
-	    break;
-	  }
-	  shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
-	}
-	else
-	{
-	  shaderNode = child->GetNode ("shader");
-	}
-
-        const char* name = shaderNode->GetAttributeValue ("name");
-	if (ldr_context->CheckDupes () && name)
-	{
-	  iShader* m = shaderMgr->GetShader (name);
-	  if (m) return true;
-	}
-
-        const char* type = shaderNode->GetAttributeValue ("type");
-	if (type == 0)
-	{
-	  SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
-	    "'type' attribute is missing!");
-	  return false;
-	}
-	csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
-	csRef<iShader> shader = shcom->CompileShader (shaderNode);
-	if (shader)
-	{
-          shader->SetFileName(fileChild->GetContentsValue ());
-	  AddToRegion (ldr_context, shader->QueryObject ());
-	  shaderMgr->RegisterShader (shader);
-        }
-	else return false;
+	ParseShader (ldr_context, child, shaderMgr);
       }
       break;
     }
   }
   return true;
 }
+
+bool csLoader::ParseShader (iLoaderContext* ldr_context,
+			    iDocumentNode* node,
+			    iShaderManager* shaderMgr)
+{
+  /*csRef<iShader> shader (shaderMgr->CreateShader ());
+  //test if we have a childnode named file, if so load from file, else
+  //use inline loading
+  csRef<iDocumentNode> fileChild = child->GetNode ("file");
+  if (fileChild)
+  {
+    csRef<iDataBuffer> db = VFS->ReadFile (fileChild->GetContentsValue ());
+    shader->Load (db);
+  }
+  else
+  {
+    shader->Load (child);
+  }*/
+
+  csRef<iDocumentNode> shaderNode;
+  csRef<iDocumentNode> fileChild = node->GetNode ("file");
+
+  if (fileChild)
+  {
+    csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+    csRef<iFile> shaderFile = vfs->Open (
+      fileChild->GetContentsValue (), VFS_FILE_READ);
+
+    if(!shaderFile)
+    {
+      ReportWarning ("crystalspace.maploader",
+	"Unable to open shader file '%s'!",
+	fileChild->GetContentsValue ());
+      return false;
+    }
+
+    csRef<iDocumentSystem> docsys =
+      CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
+    if (docsys == 0)
+      docsys.AttachNew (new csTinyDocumentSystem ());
+    csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+    const char* err = shaderDoc->Parse (shaderFile, true);
+    if (err != 0)
+    {
+      ReportWarning ("crystalspace.maploader",
+	"Could not parse shader file '%s': %s",
+	fileChild->GetContentsValue (), err);
+      return false;
+    }
+    shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
+  }
+  else
+  {
+    shaderNode = node->GetNode ("shader");
+  }
+
+  const char* name = shaderNode->GetAttributeValue ("name");
+  if (ldr_context->CheckDupes () && name)
+  {
+    iShader* m = shaderMgr->GetShader (name);
+    if (m) return true;
+  }
+
+  const char* type = shaderNode->GetAttributeValue ("type");
+  if (type == 0)
+  {
+    SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
+      "'type' attribute is missing!");
+    return false;
+  }
+  csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
+  csRef<iShader> shader = shcom->CompileShader (shaderNode);
+  if (shader)
+  {
+    shader->SetFileName(fileChild->GetContentsValue ());
+    AddToRegion (ldr_context, shader->QueryObject ());
+    shaderMgr->RegisterShader (shader);
+  }
+  else 
+    return false;
+  return true;
+}
+
 #endif //CS_USE_NEW_RENDERER
 
 void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,

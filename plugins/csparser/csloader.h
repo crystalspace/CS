@@ -62,6 +62,7 @@ struct iDocumentNode;
 struct iDocument;
 struct iFile;
 struct iPolygonMesh;
+struct iShaderManager;
 
 struct iObject;
 struct iThingState;
@@ -546,6 +547,8 @@ private:
 #ifdef CS_USE_NEW_RENDERER
   /// Parse a shaderlist
   bool ParseShaderList (iLoaderContext* ldr_context, iDocumentNode* node);
+  bool ParseShader (iLoaderContext* ldr_context, iDocumentNode* node,
+    iShaderManager* shaderMgr);
 #endif //CS_USE_NEW_RENDERER
 
   /// For heightgen.

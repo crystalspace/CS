@@ -488,7 +488,8 @@ csPtr<iRendererLightmap> csSoftSuperLightmap::RegisterLightmap (int left, int to
   rlm->u2 = left + width;
   rlm->v2 = top  + height;
 
-  idmap.Put (((left + top) * (left + top + 1)) / 2, rlm);
+  const int id = ComputeRlmID (left, top);
+  idmap.Put (id, rlm);
 
   return csPtr<iRendererLightmap> (rlm);
 }

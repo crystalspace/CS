@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Nov-2004
+	- res fixed a problem in the NR software renderer were wrong renderer
+	  lightmaps were selected for polygons, causing problems from visual 
+	  glitches to crashes.
+	- res fixed the shader list loader in csparser to not stop parsing
+	  of the list when a shader is already loaded or under some error
+	  conditions.
+	- res added csGetPlatformConfigPath(), a function to obtain a platform 
+	  specific path for per-user data.
 19-Nov-2004
 	- PK fixed the mesh attaching to sockets in viewmesh by adding
 	  sprite->GetMovable()->UpdateMove() to ViewMesh::AttachMeshToSocket.

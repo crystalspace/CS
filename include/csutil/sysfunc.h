@@ -137,14 +137,34 @@ CS_CSUTIL_EXPORT void csSleep (int /*SleepTime*/);
 CS_CSUTIL_EXPORT csString csGetUsername();
 
 /**
- * Get a platform-specific config object.
+ * Get a platform-specific per-user config object.
  * The data is stored in a platform-specific manner - e.g. in "Documents and
  * Settings\\Application Data" on Windows, or $HOME on Unix.
- * \param key Used to distinguish different stored configurations.
+ * \param key Used to distinguish different stored configurations. Should be
+ *  the application ID, e.g. "MyGames.ClickFrenzy2".
  * \return A config 'file'. Might return 0 on some platforms or in case an
  *   error occured.
  */
 CS_CSUTIL_EXPORT csPtr<iConfigFile> csGetPlatformConfig (const char* key);
+
+/**
+ * Get a platform-specific path to store per-user configuration data.
+ * The path is in a platform-specific place - e.g. in "Documents and
+ * Settings\\Application Data" on Windows, or $HOME on Unix.
+ * \param key Used to distinguish different stored configurations. Should be
+ *  the application ID, e.g. "MyGames.ClickFrenzy2".
+ * \param directory Whether to construct a filename or path. When 'false', a
+ *   filename with the suffix '.cfg' will be returned (e.g. 
+ *   "...\MyGames\ClickFrenzy2.cfg"), otherwise a directory name is returned
+ *   "...\MyGames\ClickFrenzy2\"). Useful when the configuration data consists
+ *   of multiple files.
+ * \return A native path to a filename or directory suitable to store per-user 
+ *   configuration data.
+ * \remarks The returned path may not exist. The caller has to ensure its
+ *  existance before using it.
+ */
+CS_CSUTIL_EXPORT csString csGetPlatformConfigPath (const char* key, 
+  bool directory = false);
 
 /** @} */
 
