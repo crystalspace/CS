@@ -627,20 +627,14 @@ awsManager::HandleEvent(iEvent& Event)
         else return GetTopWindow()->HandleEvent(Event);
         
         break;
-      }
+      } // end mouse captured
       
       // If the top window still contains the mouse, it stays on top
-      if (GetTopWindow()->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
+      if (!GetTopWindow()->isHidden() && GetTopWindow()->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
       {
         if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
-        else 
-        {                   
-          return GetTopWindow()->HandleEvent(Event);
-        }
-        
-        break;
-      }
-      
+        else return GetTopWindow()->HandleEvent(Event);
+      } // end if topmost window contains it
       else
       {
         // Find the window that DOES contain the mouse.
@@ -653,21 +647,17 @@ awsManager::HandleEvent(iEvent& Event)
         while(win)
         {
           // If the window contains the mouse, it becomes new top.
-          if (win->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
+          if (!win->isHidden() && win->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
           {
             win->Raise();
             if (RecursiveBroadcastToChildren(win, Event)) return true;
-            else 
-            {              
-              return win->HandleEvent(Event);
-            }
-            break;
+            else return win->HandleEvent(Event);
           }
           else
             win = win->WindowBelow();
-        }
-      }
-    }
+        } // end while iterating windows
+      } // end else check all other windows
+    } // end if there is a top window
 
   break;
 

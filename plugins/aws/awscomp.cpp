@@ -174,6 +174,12 @@ awsComponent::Execute(char *action, awsParmList &parmlist)
     Invalidate();
     return true;
   }
+  else if (strcmp("HideWindow", action)==0)
+  {
+    Window()->Hide();
+    WindowManager()->InvalidateUpdateStore();
+    return true;
+  }
   else if (strcmp("Overlaps", action)==0)
   {
     csRect *r;
