@@ -6,7 +6,9 @@
 	  still around from before we had MSVC7 projects files in CVS.
 	- Philip Wyett added OpenAL plugin to MSVC build process. This
 	  Addition requires MSVC users move to msvc_libs_0.97dev002.
-	  Also updated docs to take account of new msvc_libs requirements.
+	    - Also updated docs to take account of new msvc_libs requirements.
+	    - Updated one and removed another '.cvsignore' related to
+	      new msvc_libs.
 4-Mar-2003
 	- Eric Sunshine fixed a problem in win32gcc.mak which caused plugin
 	  makefiles to fail when USE_PLUGINS=no.  Problem was that win32gcc.mak
