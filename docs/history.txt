@@ -60,6 +60,13 @@ chronological order.
 	  (which creates such minidumps).
 	- res augmented walktest to create such minidumps.
 	- res fixed some gcc warnings & errors in the minidump code.
+	- Luca fixed a bug in the csIntersect3::Plane () method. It was using 
+	  the wrong formula to calculate the x value along the segment 
+	  U + x (V - U): the unknown 'x' value is got by: 
+	  x = [(A,B,C) * U + D ] / (A,B,C) * (U - V) and NOT got by
+	  x = [(A,B,C) * U + D ] / (A,B,C) * (V - U). Look to the comments in 
+	  the code for more clarifications. He also set some default values 
+	 (and documented it) for the output arguments.
 25-Apr-2004
 	- Jorrit changed the way render priorities work in the engine. The
 	  RenderQueues field no longer contains all meshes for all render

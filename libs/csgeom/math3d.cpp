@@ -566,19 +566,24 @@ bool csIntersect3::Plane (
   float &dist)
 {
   float denom;
-  csVector3 vu = v - u;
+  csVector3 uv = u - v;
 
-  denom = p.norm * vu;
+  denom = p.norm * uv;
   if (denom == 0)
   {
     // they are parallel
+    dist = 0; //'dist' is an output arg, so it must be initialized.
     isect = v;
     return false;
   }
-  dist = -(p.norm * u + p.DD) / denom;
-  if (dist < -SMALL_EPSILON || dist > 1 + SMALL_EPSILON) return false;
+  dist = (p.norm * u + p.DD) / denom;
+  if (dist < -SMALL_EPSILON || dist > 1 + SMALL_EPSILON) 
+  {
+    isect = 0;//'isect' is an output arg, so it must be initialized.
+    return false;
+  }
 
-  isect = u + dist * vu;
+  isect = u + dist * -uv;
   return true;
 }
 

@@ -308,6 +308,19 @@ public:
    * The distance that is returned is a normalized distance with respect
    * to the given input vector. i.e. a distance of 0.5 means that the
    * intersection point is halfway u and v.
+   * There are two cases in which this method will return false:
+   * -  If the plane and the segment are parallel, then 'dist' will be set equal
+   * to 0, and 'isect' equal to 'v'.
+   * -  If the segment does not cross the plane (i.e. if 'dist'>1+epsilon or
+   * 'dist'<-epsilon, where epsilon is a very small value near to zero) then
+   * 'isect's value is (0, 0, 0).
+   * \remarks
+   * 'p' is the plane, expressed as: A x + B y + C z + D = 0 , where (A,B,C) is 
+   * the normal vector of the plane.
+   * 'u' and 'v' are the start (U point) and the end (V point) of the segment.
+   * 'isect' is searched along the segment U + x (V - U); the unknown 'x' value
+   * is got by: x = [(A,B,C) * U + D ] / (A,B,C) * (U - V), where * is the dot 
+   * product.  
    */
   static bool Plane (
     const csVector3& u, const csVector3& v,
