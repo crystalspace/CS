@@ -216,7 +216,7 @@ private:
 
 
   /// Find a prime number bigger then the given input number.
-  static uint32 FindLargerPrime (uint32 num);
+  static uint32 FindNextPrime (uint32 num);
 
 public:
   static uint32 prime_table[];

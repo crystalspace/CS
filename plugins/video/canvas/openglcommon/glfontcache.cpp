@@ -406,8 +406,8 @@ void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y,
     tx2 = cacheData->tx2;
     ty1 = cacheData->ty1;
     ty2 = cacheData->ty2;
-    y1 = fontDescent;
     y2 = cacheData->bmetrics.top;
+    y1 = y2 - cacheData->bmetrics.height;
 
     if (ClipRect (pen_x, pen_y, x1, y1, x2, y2, tx1, ty1, tx2, ty2))
     {
