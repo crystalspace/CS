@@ -78,6 +78,7 @@ csPolygon3D* csPolyIt::Fetch ()
     polygon_idx = 0;
   }
 
+  if (sector_idx >= world->sectors.Length ()) return NULL;
   sector = (csSector*)(world->sectors[sector_idx]);
 
   // Try next polygon.
