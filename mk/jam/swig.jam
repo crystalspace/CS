@@ -12,7 +12,6 @@ if $(CMD.SWIG)
     # all people have swig installed so we want to add these generated files to
     # the sources.
     MakeLocate $(<) : $(SUBDIR) ;
-    Clean clean : $(<) ;
     SWIG.FLAGS on $(<) += $(SWIG.FLAGS) ;
   }
   
