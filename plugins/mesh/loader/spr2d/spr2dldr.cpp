@@ -260,7 +260,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_LIGHTING:
         {
-          int do_lighting;
+          bool do_lighting;
           ScanStr (params, "%b", &do_lighting);
           spr2dLook->SetLighting (do_lighting);
         }
@@ -453,7 +453,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
         break;
       case CS_TOKEN_LIGHTING:
         {
-          int do_lighting;
+          bool do_lighting;
           ScanStr (params, "%b", &do_lighting);
           spr2dLook->SetLighting (do_lighting);
         }

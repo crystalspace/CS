@@ -3,6 +3,12 @@ The history order is reversed so that new features are at the top.
 2-May-2001
 	- Fixed the color bug in OpenGL DrawTriangleMesh with multi-
 	  texturing.
+	- Fixed several cases in the parsers where a boolean was read
+	  but put in 'int'. This doesn't work since a recent change where
+	  ScanStr works correctly on the 'bool' type. If %b is used for
+	  ScanStr then the parameter should be 'bool' and not 'int'.
+	  This mostly affected the LIGHTING() flag in several of the mesh
+	  object loaders.
 1-May-2001
 	- Fixed a bug in software renderer so that tiling really works.
 	- Extended the iMaterial structure in preparation of multi-texturing

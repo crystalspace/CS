@@ -492,7 +492,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         break;
       case CS_TOKEN_LIGHTING:
         {
-          int do_lighting;
+          bool do_lighting;
           ScanStr (params, "%b", &do_lighting);
           poly3d->GetFlags ().Set (CS_POLY_LIGHTING,
 	  	do_lighting ? CS_POLY_LIGHTING : 0);
@@ -514,7 +514,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         break;
       case CS_TOKEN_COLLDET:
         {
-          int do_colldet;
+          bool do_colldet;
           ScanStr (params, "%b", &do_colldet);
 	  if (do_colldet) set_colldet = 1;
 	  else set_colldet = -1;

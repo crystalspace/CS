@@ -346,7 +346,7 @@ iBase* csExplosionLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_LIGHTING:
         {
-          int do_lighting;
+          bool do_lighting;
           ScanStr (params, "%b", &do_lighting);
           explostate->SetLighting (do_lighting);
         }
