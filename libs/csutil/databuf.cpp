@@ -26,5 +26,5 @@ SCF_IMPLEMENT_IBASE_END
 
 csDataBuffer::~csDataBuffer ()
 {
-  delete [] Data;
+  if(do_delete) delete [] Data;
 }

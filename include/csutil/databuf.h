@@ -34,16 +34,26 @@ class csDataBuffer : public iDataBuffer
   char *Data;
   /// Data size
   size_t Size;
+  /// Should the buffer be deleted when we're done with it?
+  bool do_delete;
 
 public:
   SCF_DECLARE_IBASE;
 
   /// Construct an preallocated data buffer (filled with garbage initially)
   csDataBuffer (size_t iSize)
-  { SCF_CONSTRUCT_IBASE (0); Data = new char [Size = iSize]; }
+  { SCF_CONSTRUCT_IBASE (0); 
+    Data = new char [Size = iSize]; 
+    do_delete = true; }
+
   /// Construct an data buffer object given a existing (new char []) pointer
-  csDataBuffer (char *iData, size_t iSize)
-  { SCF_CONSTRUCT_IBASE (0); Data = iData; Size = iSize; }
+  csDataBuffer (char *iData, size_t iSize, bool should_delete = true)
+  { SCF_CONSTRUCT_IBASE (0); 
+    Data = iData; 
+    Size = iSize; 
+    do_delete = should_delete;
+  }
+
   /// Duplicate an existing data buffer. Also appends a 0 char.
   csDataBuffer (iDataBuffer *source)
   {
@@ -51,6 +61,7 @@ public:
     Data = new char [(Size = source->GetSize()) + 1];
     memcpy (Data, source->GetData(), Size);
     Data[Size] = 0;
+    do_delete = true;
   }
   /// Destroy (free) the buffer
   virtual ~csDataBuffer ();
