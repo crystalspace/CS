@@ -14,6 +14,8 @@ chronological order.
 	  invocation to its parent Jamfile to ensure that it gets built.
 	- John Harger added macros for DLL creation in libcsutil. So far I have
 	  tested it on MSVC 7.1 and it has worked without error. 
+	- res removed '#define CS_CSUTIL_LIB' from the csutil sources. The idea
+	  is to #define with a compiler (resp. preprocessor) option.
 16-Mar-2004
 	- Jorrit fixed a bug in iSector->HitBeamPortals(). It would not
 	  initialize the mesh to 0 which could cause bad errors in some

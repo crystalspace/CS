@@ -17,7 +17,6 @@
 */
 
 // Support for platform-specific VFS variables.
-#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 #include "csextern.h"
 #include <windows.h>

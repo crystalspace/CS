@@ -17,7 +17,6 @@
 */
 
 #include <sys/stat.h>
-#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 #include "csutil/cfgfile.h"
 #include "csutil/sysfunc.h"

@@ -22,7 +22,6 @@
 
 #define CS_SYSDEF_PROVIDE_GETCWD
 #define CS_SYSDEF_PROVIDE_EXPAND_PATH
-#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 
 #include "csutil/csunicode.h"

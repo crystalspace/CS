@@ -16,7 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 #include "csutil/strhash.h"
 #include "csutil/util.h"

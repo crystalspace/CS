@@ -58,7 +58,6 @@
   1999-05-03 lpd Original version.
  */
 
-#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 #include "csutil/csmd5.h"
 

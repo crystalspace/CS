@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 #include "csutil/util.h"
 #include "csutil/vfscache.h"

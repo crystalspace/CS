@@ -18,7 +18,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/csevent.h"
