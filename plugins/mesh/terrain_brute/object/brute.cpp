@@ -1120,6 +1120,7 @@ csRenderMesh** csTerrainObject::GetRenderMeshes (int &n,
                                                  iMovable* movable, 
                                                  uint32 frustum_mask)
 {
+  SetupObject();
   DrawTest (rview, movable, frustum_mask);
   n = returnMeshes->Length ();
   return returnMeshes->GetArray ();
