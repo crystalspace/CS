@@ -253,25 +253,35 @@ struct iCameraPosition : public iBase
 {
 };
 
+struct iSectorList : public iBase
+{
+  virtual int GetSectorCount () = 0;
+  virtual iSector *GetSector (int idx) = 0;
+  virtual void AddSector (iSector *sec) = 0;
+  virtual void RemoveSector (iSector *sec) = 0;
+  virtual iSector *FindByName (const char *name) = 0;
+};
+
 struct iEngine : public iBase
 {
   virtual int GetTextureFormat () = 0;
   virtual void SelectLibrary (const char *iName) = 0;
   virtual bool DeleteLibrary (const char *iName) = 0;
   virtual void DeleteAll () = 0;
-  virtual iTextureWrapper* CreateTexture (const char *iName, const char *iFileName, 
-    csColor *iTransp, int iFlags) = 0;
-  virtual iCameraPosition* CreateCameraPosition (const char *iName, const char *iSector,
-    const csVector3 &iPos, const csVector3 &iForward,
+  virtual iTextureWrapper* CreateTexture (const char *iName,
+  	const char *iFileName, csColor *iTransp, int iFlags) = 0;
+  virtual iCameraPosition* CreateCameraPosition (const char *iName,
+  	const char *iSector, const csVector3 &iPos, const csVector3 &iForward,
     const csVector3 &iUpward) = 0;
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix) = 0;
   virtual iSector *CreateSector (const char *iName, bool link = true) = 0;
-  virtual iSector *FindSector (const char *iName) = 0;
-  virtual iSector *GetSector (int idx) = 0;
-  virtual iMaterialWrapper *FindMaterial (const char *iName, bool regionOnly = false) = 0;
+  virtual iSector *FindSector (const char *iName, bool regionOnly = false) = 0;
+  virtual iMaterialWrapper *FindMaterial (const char *iName,
+  	bool regionOnly = false) = 0;
   virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
+  virtual iSectorList *GetSectors () = 0;
 };
 
 //****** System Interface

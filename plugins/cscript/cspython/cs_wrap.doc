@@ -446,7 +446,20 @@ SetCacheData(idx,d)
 1.20.  class iCameraPosition
 ----------------------------
 
-1.21.  class iEngine
+1.21.  class iSectorList
+------------------------
+
+GetSectorCount()
+
+GetSector(idx)
+
+AddSector(sec)
+
+RemoveSector(sec)
+
+FindByName(name)
+
+1.22.  class iEngine
 --------------------
 
 GetTextureFormat()
@@ -465,15 +478,15 @@ CreatePlane(iName,iOrigin,iMatrix)
 
 CreateSector(iName,link)
 
-FindSector(iName)
-
-GetSector(idx)
+FindSector(iName,regionOnly)
 
 FindMaterial(iName,regionOnly)
 
 CreateSectorWallsMesh(sector,name)
 
-1.22.  class iSystem
+GetSectors()
+
+1.23.  class iSystem
 --------------------
 
 Query_iEngine()
