@@ -21,7 +21,6 @@
 #define ITXTMGR_H
 
 #include "cscom/com.h"
-#include "csengine/cscolor.h"	//@@@BAD?
 
 class Vector2;
 class csMatrix3;
