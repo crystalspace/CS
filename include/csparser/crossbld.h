@@ -17,11 +17,10 @@
 */
 
 //
-// Crystal Space crossbuild factorys.  Given a converter instance, extracts
-// and constructs various
-// Crystal Space structures from the converter, including frames,
-// actions, sprite templates, and things.  The resulting structures
-// can be used in a Crystal Space world.
+// Crystal Space crossbuild factorys. Given a converter instance, extracts
+// and constructs various Crystal Space structures from the converter,
+// including frames, actions, sprite templates, and things.
+// The resulting structures can be used in a Crystal Space world.
 // 
 
 #ifndef __CROSSBLD_H__

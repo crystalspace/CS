@@ -192,6 +192,9 @@ O=.obj
 # We don't need separate directories for dynamic libraries
 OUTSUFX.yes=
 
+# Use makedep to build dependencies
+DEPEND_TOOL=mkdep
+
 endif # ifeq ($(MAKESECTION),defines)
 
 #-------------------------------------------------------------- postdefines ---#
@@ -207,9 +210,6 @@ ifeq ($(USE_DLL),no)
 DO.LINK.CONSOLE.EXE+=$(CR)$(DO.BIND.RES)
 DO.LINK.EXE+=$(CR)$(DO.BIND.RES)
 endif
-
-DO.DEP = gcc -MM $(filter-out $(CFLAGS.GENERAL) $(CFLAGS.optimize) $(CFLAGS.debug),\
-  $(subst -d,-D,$(CFLAGS))) $(subst -i=,-I ,$(CFLAGS.INCLUDE)) $^ | sed $(SED_DEPEND) >$@
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

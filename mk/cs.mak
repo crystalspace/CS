@@ -103,7 +103,17 @@ endif
 SED_DEPEND=-e "s/^\([^ ].*\)/$$\(OUT\)\1/" $(SYS_SED_DEPEND)
 # How to build a source dependency file
 ifndef DO.DEP
-  DO.DEP = -$(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $(filter-out %.asm,$^) | sed $(SED_DEPEND) >$@
+  ifeq ($(DEPEND_TOOL),cc)
+    DO.DEP = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $(filter-out %.asm,$^) | sed $(SED_DEPEND) >$@
+  else
+    ifeq ($(DEPEND_TOOL),mkdep)
+      depend: mkdep
+      DO.DEP = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE)) \
+        $(filter-out %.asm,$^) -o $O -p $(OUT) -r -c -f $@
+    else
+      DO.DEP = echo Building dependencies is not supported on this platform
+    endif
+  endif
 endif
 
 # Directories for output files

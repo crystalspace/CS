@@ -78,6 +78,14 @@ MEM=
 # You can define MESA_PATH variable in environment to point to MesaGL base path
 USE_MESA=1
 
+# The tool used to build dependencies. The possible values are:
+# none	- Cannot build dependencies on this platform
+# cc	- Use the C compiler (gcc -MM) for this
+# mkdep	- Use the makedep tool provided in the apps/makedep directory
+ifndef DEPEND_TOOL
+  DEPEND_TOOL=cc
+endif
+
 # Set this flag to 'yes' if you have a buggy egcs compiler (versions 1.1.2 and 1.1.3)
 # 1.0.3a is the latest pre 1.1.0 egcs which does not have this bug. Versions after 1.1.3
 # may also be safe.

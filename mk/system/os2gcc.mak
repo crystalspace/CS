@@ -189,6 +189,9 @@ OPENGL.LIBS.DEFINED=1
 CFLAGS.GL3D+=-I/toolkit/h
 LIBS.LOCAL.GL3D+=-lopengl
 
+# Use makedep to build dependencies
+DEPEND_TOOL=mkdep
+
 endif # ifeq ($(MAKESECTION),defines)
 
 #--------------------------------------------------------------- confighelp ---#
