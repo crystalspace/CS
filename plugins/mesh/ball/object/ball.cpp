@@ -555,6 +555,13 @@ void csBallMeshObject::SetupObject ()
       csVector3 (-radiusx, -radiusy, -radiusz) + shift);
     object_bbox.AddBoundingVertexSmart (
       csVector3 ( radiusx,  radiusy,  radiusz) + shift);
+#ifndef CS_USE_NEW_RENDERER
+    top_mesh.morph_factor = 0.0f;
+    top_mesh.num_vertices_pool = 1;
+    top_mesh.do_morph_texels = false;
+    top_mesh.do_morph_colors = false;
+    top_mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+#endif
   }
 }
 

@@ -43,6 +43,11 @@ The history order is reversed so that new features are at the top.
 	  curRegOnly parameter causes objects to be searched in only that
 	  region (as opposed to all regions).
 	  This fixes the -regions commandline option for walktest.
+	- Jorrit added some init code back to the ball mesh. That code
+	  caused 'top_mesh' to be uninitialized for some fields and this
+	  caused weird things on various systems. For some weird reason
+	  Marten removed this initialization code during the rewrite of
+	  ball mesh to the new renderer.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,
