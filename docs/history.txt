@@ -13,6 +13,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+24-Nov-1999
+	- Eric Sunshine fixed a transpostion error in snddata.cpp which was
+	  leaking memory.
 23-Nov-1999
 	- Robert Bate cleaned up the Macintosh port with relation to the
 	  old COM and new SCF.
