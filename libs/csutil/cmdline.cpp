@@ -54,7 +54,7 @@ SCF_IMPLEMENT_IBASE (csCommandLineParser)
 SCF_IMPLEMENT_IBASE_END
 
 csCommandLineParser::csCommandLineParser (iBase *Parent) :
-  Names (16, 16), Options (16, 16)
+  Options (16, 16), Names (16, 16)
 {
   SCF_CONSTRUCT_IBASE (Parent);
 }

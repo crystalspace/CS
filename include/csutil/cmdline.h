@@ -51,7 +51,9 @@ public:
   csCommandLineParser (iBase *Parent = NULL);
   /// Construct with a given command line.
   csCommandLineParser (int argc, const char* const argv[]);
-  
+  /// Destructor.
+  ~csCommandLineParser() {}
+
   /**
    * Initialize for the given command line.  Options from command line are
    * added to any options already present --- i.e. those added via AddName()
