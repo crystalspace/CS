@@ -49,6 +49,8 @@ private:
   iMaterialWrapper* matPlasma;
   iFont *font;
   iLoader *LevelLoader;
+  iGraphics2D *myG2D;
+  iGraphics3D *myG3D;
 
   /// the flock of birds
   Flock *flock;

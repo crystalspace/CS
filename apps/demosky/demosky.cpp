@@ -59,6 +59,8 @@ Simple::Simple ()
   sky_u = NULL;
   sky_d = NULL;
   flock = NULL;
+  myG2D = NULL;
+  myG3D = NULL;
   LevelLoader = NULL;
 }
 
@@ -68,6 +70,8 @@ Simple::~Simple ()
   if(font) font->DecRef ();
   if (LevelLoader) LevelLoader->DecRef ();
   if (engine) engine->DecRef ();
+  if (myG2D) myG2D->DecRef ();
+  if (myG3D) myG3D->DecRef ();
 
   delete sky;
   delete sky_f;
@@ -128,6 +132,20 @@ bool Simple::Initialize (int argc, const char* const argv[],
     abort ();
   }
 
+  myG3D = QUERY_PLUGIN (this, iGraphics3D);
+  if (!myG3D)
+  {
+    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    abort ();
+  }
+
+  myG2D = QUERY_PLUGIN (this, iGraphics2D);
+  if (!myG2D)
+  {
+    Printf (MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    abort ();
+  }
+
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Crystal Space Procedural Sky Demo"))
   {
@@ -136,7 +154,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
 
   // Setup the texture manager
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
   // Initialize the texture manager
@@ -151,7 +169,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 	txtmgr->ReserveColor (r * 32, g * 32, b * 64);
   txtmgr->SetPalette ();
 
-  font = G2D->GetFontServer()->LoadFont(CSFONT_LARGE);
+  font = myG2D->GetFontServer()->LoadFont(CSFONT_LARGE);
 
   // Some commercials...
   Printf (MSG_INITIALIZATION, "Crystal Space Procedural Sky Demo.\n");
@@ -262,7 +280,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = engine->CreateView (G3D);
+  view = engine->CreateView (myG3D);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
@@ -297,26 +315,26 @@ void Simple::NextFrame ()
     view->GetCamera ()->Move (VEC_BACKWARD * 4.0f * speed);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!G3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+  if (!myG3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;
 
   view->Draw ();
 
   // Start drawing 2D graphics.
-  if (!G3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
   const char *text = "Press 't' to toggle animation. Escape quits."
     " Arrow keys/pgup/pgdown to move.";
   int txtx = 10;
-  int txty = G2D->GetHeight() - 20;
-  G2D->Write(font, txtx+1, txty+1, G3D->GetTextureManager()->FindRGB(80,80,80), 
+  int txty = myG2D->GetHeight() - 20;
+  myG2D->Write(font, txtx+1, txty+1, myG3D->GetTextureManager()->FindRGB(80,80,80), 
     -1, text);
-  G2D->Write(font, txtx, txty, G3D->GetTextureManager()->FindRGB(255,255,255),
+  myG2D->Write(font, txtx, txty, myG3D->GetTextureManager()->FindRGB(255,255,255),
     -1, text);
 
   // Drawing code ends here.
-  G3D->FinishDraw ();
+  myG3D->FinishDraw ();
   // Print the final output.
-  G3D->Print (NULL);
+  myG3D->Print (NULL);
 }
 
 bool Simple::HandleEvent (iEvent &Event)
