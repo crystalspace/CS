@@ -454,19 +454,42 @@ nomem2:
     NULL, NULL, NULL);
 
   if (bit_depth > 8)
+  {
     // tell libpng to strip 16 bit/color files down to 8 bits/color
     png_set_strip_16 (png);
+    bit_depth = 8;
+  }
   else if (bit_depth < 8)
     // Expand pictures with less than 8bpp to 8bpp
     png_set_packing (png);
 
-  volatile enum { imgRGB, imgPAL } ImageType;
+  volatile enum { imgRGB, imgPAL, imgGrayAlpha } ImageType;
   int keycolor_index = -1;
 
   switch (color_type)
   {
     case PNG_COLOR_TYPE_GRAY:
     case PNG_COLOR_TYPE_GRAY_ALPHA:
+      if ((Format & CS_IMGFMT_ALPHA) && (color_type & PNG_COLOR_MASK_ALPHA))
+      {
+	ImageType = imgGrayAlpha;
+      }
+      else
+      {
+        // Check if we have keycolor transparency.
+	ImageType = imgPAL;
+	png_set_strip_alpha (png);
+	if (png_get_valid (png, info, PNG_INFO_tRNS))
+	{
+	  png_color_16p trans_values;
+	  png_get_tRNS (png, info, NULL, NULL, &trans_values);
+	  has_keycolour = true;
+	  keycolour_r = convert_endian (trans_values->gray) & 0xff;
+	  keycolour_g = convert_endian (trans_values->gray) & 0xff;
+	  keycolour_b = convert_endian (trans_values->gray) & 0xff;
+	}
+      }
+      break;
     case PNG_COLOR_TYPE_PALETTE:
       ImageType = imgPAL;
       // If we need alpha, take it. If we don't, strip it.
@@ -501,8 +524,6 @@ nomem2:
 	  else
 	    Format &= ~CS_IMGFMT_ALPHA;
 	}
-	else
-          Format &= ~CS_IMGFMT_ALPHA;
       }
       break;
     case PNG_COLOR_TYPE_RGB:
@@ -536,6 +557,8 @@ nomem2:
   set_dimensions (Width, Height);
   if (ImageType == imgRGB)
     exp_rowbytes = Width * sizeof (csRGBpixel);
+  else if (ImageType == imgGrayAlpha)
+    exp_rowbytes = Width * 2;
   else
     exp_rowbytes = Width;
 
@@ -554,6 +577,8 @@ nomem2:
   void *NewImage = NULL;
   if (ImageType == imgRGB)
     NewImage = new csRGBpixel [Width * Height];
+  else if (ImageType == imgGrayAlpha)
+    NewImage = new uint8 [Width * Height * 2];
   else
     NewImage = new uint8 [Width * Height];
   if (!NewImage)
