@@ -190,53 +190,93 @@ inline void csVector::QuickSort (int Mode)
 }
 
 /**
- * Declares a new vector type NAME as a subclass of BASE.  Elements of
+ * Declares a new vector type NAME as a subclass of csVector. Elements of
  * this vector are of type TYPE. The elements are automatically delete'd
- * on either Delete() or DeleteAll() or upon vector destruction.
+ * on either Delete() or DeleteAll() or upon vector destruction. This macro
+ * lets you define your own FreeItem() function.
  *
- * Usage: DECLARE_TYPED_VECTOR_WITH_BASE(NAME,TYPE,BASE)
+ * Usage:
+ *   BEGIN_TYPED_VECTOR_EXT(NAME,TYPE,OBJ)
+ *     user-defined FreeItem(OBJ) here
+ *   END_TYPED_VECTOR_EXT
+ *
+ * Parameters:
  *   NAME - Name of the new vector class.
  *   TYPE - Data type to which this vector refer.
  *          The TYPE should be possible to cast to (void *) and back.
- *   BASE - Base class of this new class (typically csVector).
+ *   OBJ  - Name of the object in the user-defined FreeItem().
  */
-#define DECLARE_TYPED_VECTOR_WITH_BASE(NAME,TYPE,BASE)		\
-  class NAME : public BASE					\
-  {								\
-  public:							\
-    NAME (int ilimit = 16, int ithreshold = 16) :		\
-      BASE (ilimit, ithreshold) {}				\
-    virtual ~NAME ()						\
-    { DeleteAll (); }						\
-    inline TYPE *& operator [] (int n)				\
-    { return (TYPE *&)BASE::operator [] (n); }			\
-    inline TYPE *& Get (int n) const				\
-    { return (TYPE *&)BASE::Get (n); }				\
-    int Find (TYPE *which) const				\
-    { return BASE::Find ((csSome)which); }			\
-    int FindKey (const TYPE *value) const			\
-    { return BASE::FindKey ((csSome)value); }			\
-    inline void Push (const TYPE *what)				\
-    { BASE::Push ((csSome)what); }				\
-    inline TYPE *Pop ()						\
-    { return (TYPE *)BASE::Pop (); }				\
-    bool Insert (int n, TYPE *Item)				\
-    { return BASE::Insert (n, (csSome)Item); }			\
-    virtual bool FreeItem (csSome Item)				\
-    { delete (TYPE *)Item; return true; }			\
+#define BEGIN_TYPED_VECTOR_EXT(NAME,TYPE,OBJ)				\
+  class NAME : private csVector						\
+  {									\
+  public:								\
+    inline NAME (int ilimit = 16, int ithreshold = 16) :		\
+      csVector (ilimit, ithreshold) {}					\
+    virtual ~NAME ()							\
+    { DeleteAll (); }							\
+    inline TYPE *& operator [] (int n)					\
+    { return (TYPE *&)csVector::operator [] (n); }			\
+    inline TYPE *& operator [] (int n) const				\
+    { return (TYPE *&)csVector::operator [] (n); }			\
+    inline TYPE *& Get (int n) const					\
+    { return (TYPE *&)csVector::Get(n); }				\
+    inline int Push (TYPE *what)					\
+    { return csVector::Push((csSome)what); }				\
+    inline TYPE *Pop ()							\
+    { return (TYPE *)csVector::Pop(); }					\
+    inline bool Insert (int n, TYPE *Item)				\
+    { return csVector::Insert (n, (csSome)Item); }			\
+    inline int InsertSorted (TYPE *Item, int *oEqual = NULL,		\
+	int Mode = 0)							\
+    { return csVector::InsertSorted ((csSome)Item, oEqual, Mode); }	\
+    inline int Find (TYPE *which) const					\
+    { return csVector::Find ((csSome)which); }				\
+    inline bool Replace (int n, TYPE *what, bool FreePrevious = true)	\
+    { return csVector::Replace(n, (csSome)what, FreePrevious); }	\
+    inline void SetLength (int n)					\
+    { csVector::SetLength(n); }						\
+    inline int Length () const						\
+    { return count; }							\
+    inline int Limit () const						\
+    { return limit; }							\
+    inline void Exchange (int n1, int n2)				\
+    { csVector::Exchange (n1, n2); }					\
+    inline void QuickSort (int Left, int Right, int Mode = 0)		\
+    { csVector::QuickSort (Left, Right, Mode); }			\
+    inline void QuickSort (int Mode = 0)				\
+    { csVector::QuickSort (Mode); }					\
+    inline bool Delete (int n, bool FreeIt = true)			\
+    { return csVector::Delete (n, FreeIt); }				\
+    inline void DeleteAll (bool FreeThem = true)			\
+    { csVector::DeleteAll (FreeThem); }					\
+    inline int FindKey (csConstSome Key, int Mode = 0) const		\
+    { return csVector::FindKey (Key, Mode); }				\
+    inline int FindSortedKey (csConstSome Key, int Mode = 0) const	\
+    { return csVector::FindSortedKey (Key, Mode); }			\
+    virtual bool FreeItem (csSome Item)					\
+    { return FreeTypedItem ((TYPE *)Item); }				\
+    inline bool FreeTypedItem (TYPE *OBJ) {
+
+#define END_TYPED_VECTOR_EXT						\
+    }									\
   }
 
 /**
- * Declares a new vector type NAME as a subclass of csVector.  Elements of
- * this vector are of type TYPE. The elements are automatically delete'd
+ * Declares a new vector type NAME as a subclass of csVector. Elements
+ * of this vector are of type TYPE. The elements are automatically delete'd
  * on either Delete() or DeleteAll() or upon vector destruction.
- *
- * Usage: DECLARE_TYPED_VECTOR(NAME,TYPE).
- *   NAME - Name of the new vector class.
- *   TYPE - Data type to which this vector of pointers refer.
- *          The TYPE should be possible to cast to (void *) and back.
  */
-#define DECLARE_TYPED_VECTOR(NAME,TYPE)				\
-  DECLARE_TYPED_VECTOR_WITH_BASE (NAME,TYPE,csVector)
+#define DECLARE_TYPED_VECTOR(NAME,TYPE)					\
+  BEGIN_TYPED_VECTOR_EXT (NAME,TYPE,obj)				\
+    delete obj;								\
+    return true;							\
+  END_TYPED_VECTOR_EXT
+
+/// This is a special version of typed vectors for SCF objects
+#define DECLARE_TYPED_SCF_VECTOR(NAME,TYPE)				\
+  BEGIN_TYPED_VECTOR_EXT (NAME,TYPE,obj)				\
+    obj->DecRef();							\
+    return true;							\
+  END_TYPED_VECTOR_EXT
 
 #endif // __CSVECTOR_H__
