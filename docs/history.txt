@@ -17,6 +17,28 @@ The history order has been reversed so that new features are at the top.
 	  makefiles to reflect this change.
 	- Eric Sunshine eliminated several compilation warnings throughout the
 	  project.
+	- Brandon Ehle did the following:
+	  Mostly scripting updates, but also a modification to the common.mak
+	  that enable multiprocessor compiles 'make -j5' etc
+	    - Various fixes to the cs.i file concerning the lack of
+	      iPolygonSet.
+	    - Updated cspython swig interface.
+	    - Fixed some cslua swig bugs, and added a default script
+	      'pysimp.lua'.
+	    - Added support to pysimp to run test code in python and in lua.
+	- Thomas Hieber did the following changes:
+	    - Added classes.xml which is a protype of a gameclass definition
+	      XML file. He is going to use this file for testing in the
+	      future, and also for reference on the file format. 
+	      (until there is a real spec on it).
+	    - Changed the interface of the XML file another time. 
+	      I really like this change, because the code is more powerful
+	      now, _and_ is simpler too.
+	- Martin Geisse did the following:
+	    - Removed the old iConfigFile interface.
+	    - Renamed iConfigFileNew to iConfigFile.
+	    - Renamed icfgnew.h to icfgfile.h.
+	    - Removed many references to the old config system.
 7-Mar-2001
 	- Martin Geisse changed CSWS to use the new config system.
 	- Thomas Hieber completely changed the way data from XML maps to
