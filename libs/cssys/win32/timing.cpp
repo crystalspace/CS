@@ -33,6 +33,9 @@ long csSystemDriver::Time ()
   //03/20/1999 Thomas Hieber: completely redone to get true Millisecond 
   //accuracy instead of very rough ticks. This routine will also provide
   //correct wrap around at the end of "long"
+#if defined(__CYGWIN32__)
+#	define __int64 long long
+#endif
 
   static __int64 Freq      = 0;
   static __int64 LastCount = 0;
