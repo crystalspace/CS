@@ -75,7 +75,7 @@ Simple::~Simple ()
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  delete simple;
+  delete simple; simple = NULL;
   csInitializer::DestroyApplication ();
 }
 
@@ -93,7 +93,7 @@ static bool SimpleEventHandler (iEvent& ev)
   }
   else
   {
-    return simple->HandleEvent (ev);
+    return simple ? simple->HandleEvent (ev) : false;
   }
 }
 

@@ -104,7 +104,7 @@ char WalkTest::map_dir [100];
 bool WalkTest::move_3d = false;
 
 WalkTest::WalkTest () :
-  SysSystemDriver (), pos (0, 0, 0), velocity (0, 0, 0)
+  pos (0, 0, 0), velocity (0, 0, 0)
 {
   extern bool CommandHandler (const char *cmd, const char *arg);
   csCommandProcessor::ExtraHandler = CommandHandler;
@@ -241,9 +241,9 @@ void WalkTest::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-void WalkTest::SetSystemDefaults (iConfigManager *Config)
+void WalkTest::SetDefaults ()
 {
-  superclass::SetSystemDefaults (Config);
+  iConfigManager* Config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   do_fps = Config->GetBool ("Walktest.Settings.FPS", true);
   do_stats = Config->GetBool ("Walktest.Settings.Stats", false);
   do_cd = Config->GetBool ("Walktest.Settings.Colldet", true);
@@ -1111,6 +1111,7 @@ void Cleanup ()
   free_keymap ();
   Sys->EndEngine ();
   delete Sys; Sys = NULL;
+  csInitializer::DestroyApplication ();
 }
 
 void start_console ()
@@ -1252,36 +1253,50 @@ static bool WalkEventHandler (iEvent& ev)
   }
   else
   {
-    return Sys->WalkHandleEvent (ev);
+    return Sys ? Sys->WalkHandleEvent (ev) : false;
   }
 }
 
 bool WalkTest::Initialize (int argc, const char* const argv[],
 	const char *iConfigName)
 {
-  Sys->RequestPlugin ("crystalspace.utilities.reporter:Reporter");
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
 
-  object_reg = Sys->GetObjectRegistry ();
-  if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
+  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+  	CS_PLUGIN_NONE))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Failed to initialize SysSystemDriver!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize!");
     return false;
   }
 
-  if (!csInitializeApplication (object_reg))
+  if (!csInitializer::Initialize (object_reg))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Failed to init application! (plugins missing?)");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize!");
     return false;
   }
+
+  if (!csInitializer::LoadReporter (object_reg, true))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize!");
+    return false;
+  }
+
+  if (!csInitializer::SetupObjectRegistry (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize!");
+    return false;
+  }
+
+  SetDefaults ();
 
   if (!csInitializer::SetupEventHandler (object_reg, WalkEventHandler))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not initialize event handler!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize!");
     return false;
   }
 
+  // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
     csCommandLineHelper::Help (object_reg);
@@ -1364,7 +1379,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Start the engine
   iNativeWindow* nw = Gfx2D->GetNativeWindow ();
   if (nw) nw->SetTitle ("Crystal Space Standard Test Application");
-  if (!Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     return false;
@@ -1711,7 +1726,7 @@ int main (int argc, char* argv[])
     csCommandProcessor::start_script (Sys->auto_script);
 
   // The main loop.
-  Sys->Loop ();
+  csInitializer::MainLoop (Sys->object_reg);
 
   Cleanup ();
 

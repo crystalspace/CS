@@ -461,7 +461,7 @@ static bool BlocksEventHandler (iEvent& ev)
   }
   else
   {
-    return Sys->BlHandleEvent (ev);
+    return Sys ? Sys->BlHandleEvent (ev) : false;
   }
 }
 
@@ -3160,9 +3160,9 @@ void Blocks::TerminateConnection()
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  csInitializer::DestroyApplication ();
   delete Sys;
   Sys = NULL;
+  csInitializer::DestroyApplication ();
 }
 
 //----------------------------------------------------------------------------

@@ -64,6 +64,8 @@ The history order is reversed so that new features are at the top.
 	  and I hope there are no other plugins that are making the same
 	  mistake!
 	- Converted Bumptest so it no longer inherits from SysSystemDriver.
+	- Converted WalkTest so it no longer inherits from SysSystemDriver.
+	- Converted Squawk so it no longer inherits from SysSystemDriver.
 3-Oct-2001
 	- Added the following functions to csInitializer:
 	    - InitializeSCF()

@@ -23,7 +23,6 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
-#include "cssys/sysdriv.h"
 #include "cstool/collider.h"
 #include "csutil/cscolor.h"
 #include "walktest/wentity.h"
@@ -62,6 +61,8 @@ struct iModelConverter;
 struct iCrossBuilder;
 struct iKeyboardDriver;
 struct iVirtualClock;
+struct iGraphics3D;
+struct iGraphics2D;
 
 // type information
 
@@ -136,10 +137,8 @@ public:
 };
 
 ///
-class WalkTest : public SysSystemDriver
+class WalkTest
 {
-  typedef SysSystemDriver superclass;
-
 public:
   iObjectRegistry* object_reg;
   iPluginManager* plugin_mgr;
@@ -395,7 +394,7 @@ public:
   virtual ~WalkTest ();
 
   /// Perform some initialization work
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
 
   /// Report something to the reporter.
@@ -477,8 +476,8 @@ public:
   ///
   bool WalkHandleEvent (iEvent &Event);
 
-  /// SetSystemDefaults to handle additional configuration defaults.
-  virtual void SetSystemDefaults (iConfigManager*);
+  /// Handle additional configuration defaults.
+  void SetDefaults ();
   /// Commandline help for WalkTest.
   void Help ();
 
