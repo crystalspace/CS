@@ -583,13 +583,11 @@ bool csPortalContainer::DoPerspective (
     {
       int quad = MQUADRANT (epointx, epointy);
       int rquad = MQUADRANT (rpointx, rpointy);
-      if (
-        (quad == 0 && -epointx == epointy) ||
-        (quad == 1 && epointx == epointy))
+      if ((quad == 0 && -epointx == epointy) ||
+          (quad == 1 && epointx == epointy))
         quad++;
-      if (
-        (rquad == 0 && -rpointx == rpointy) ||
-        (rquad == 1 && rpointx == rpointy))
+      if ((rquad == 0 && -rpointx == rpointy) ||
+          (rquad == 1 && rpointx == rpointy))
         rquad++;
       while (quad != rquad)
       {
@@ -603,13 +601,11 @@ bool csPortalContainer::DoPerspective (
     {
       int quad = QUADRANT (epointx, epointy);
       int rquad = QUADRANT (rpointx, rpointy);
-      if (
-        (quad == 0 && epointx == epointy) ||
-        (quad == 1 && -epointx == epointy))
+      if ((quad == 0 && epointx == epointy) ||
+          (quad == 1 && -epointx == epointy))
         quad++;
-      if (
-        (rquad == 0 && rpointx == rpointy) ||
-        (rquad == 1 && -rpointx == rpointy))
+      if ((rquad == 0 && rpointx == rpointy) ||
+          (rquad == 1 && -rpointx == rpointy))
         rquad++;
       while (quad != rquad)
       {
@@ -634,14 +630,9 @@ bool csPortalContainer::DoPerspective (
     {
       csVector3 *ind2 = end - 1;
       for (ind = source; ind < end; ind2 = ind, ind++)
-        if (
-          (
-            ind->x -
-            ind2->x
-          ) *
-              (ind2->y) -
-              (ind->y - ind2->y) *
-              (ind2->x) > -SMALL_EPSILON)
+        if ((ind->x - ind2->x) *
+            (ind2->y) - (ind->y - ind2->y) *
+            (ind2->x) > -SMALL_EPSILON)
           return false;
       dest->AddVertex (MAX_VALUE, -MAX_VALUE);
       dest->AddVertex (MAX_VALUE, MAX_VALUE);
@@ -652,14 +643,9 @@ bool csPortalContainer::DoPerspective (
     {
       csVector3 *ind2 = end - 1;
       for (ind = source; ind < end; ind2 = ind, ind++)
-        if (
-          (
-            ind->x -
-            ind2->x
-          ) *
-              (ind2->y) -
-              (ind->y - ind2->y) *
-              (ind2->x) < SMALL_EPSILON)
+        if ((ind->x - ind2->x) *
+            (ind2->y) - (ind->y - ind2->y) *
+            (ind2->x) < SMALL_EPSILON)
           return false;
       dest->AddVertex (-MAX_VALUE, -MAX_VALUE);
       dest->AddVertex (-MAX_VALUE, MAX_VALUE);
@@ -908,6 +894,7 @@ void csPortalContainer::HardTransform (const csReversibleTransform& t)
 {
   Prepare ();
   (void)t;
+  //@@@@@@@@@@@@@@@@
 }
 
 bool csPortalContainer::HitBeamOutline (const csVector3& start,

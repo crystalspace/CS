@@ -157,44 +157,58 @@ csSector::~csSector ()
 
 //----------------------------------------------------------------------
 
-void csSector::RegisterMeshToCuller (iMeshWrapper* mesh)
+void csSector::RegisterEntireMeshToCuller (iMeshWrapper* mesh)
 {
-  csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (mesh,
-        iVisibilityObject));
+  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
+        iVisibilityObject);
   culler->RegisterVisObject (vo);
   int i;
   iMeshList* ml = mesh->GetChildren ();
   for (i = 0 ; i < ml->GetCount () ; i++)
   {
     iMeshWrapper* child = ml->Get (i);
-    RegisterMeshToCuller (child);
+    RegisterEntireMeshToCuller (child);
   }
+}
+
+void csSector::RegisterMeshToCuller (iMeshWrapper* mesh)
+{
+  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
+        iVisibilityObject);
+  culler->RegisterVisObject (vo);
 }
 
 void csSector::UnregisterMeshToCuller (iMeshWrapper* mesh)
 {
-  csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (mesh,
-        iVisibilityObject));
+  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
+        iVisibilityObject);
   culler->UnregisterVisObject (vo);
-  int i;
-  iMeshList* ml = mesh->GetChildren ();
-  for (i = 0 ; i < ml->GetCount () ; i++)
-  {
-    iMeshWrapper* child = ml->Get (i);
-    UnregisterMeshToCuller (child);
-  }
 }
 
 void csSector::PrepareMesh (iMeshWrapper *mesh)
 {
   RenderQueues.Add (mesh);
   if (culler) RegisterMeshToCuller (mesh);
+  int i;
+  iMeshList* ml = mesh->GetChildren ();
+  for (i = 0 ; i < ml->GetCount () ; i++)
+  {
+    iMeshWrapper* child = ml->Get (i);
+    PrepareMesh (child);
+  }
 }
 
 void csSector::UnprepareMesh (iMeshWrapper *mesh)
 {
   RenderQueues.Remove (mesh);
   if (culler) UnregisterMeshToCuller (mesh);
+  int i;
+  iMeshList* ml = mesh->GetChildren ();
+  for (i = 0 ; i < ml->GetCount () ; i++)
+  {
+    iMeshWrapper* child = ml->Get (i);
+    UnprepareMesh (child);
+  }
 }
 
 void csSector::RelinkMesh (iMeshWrapper *mesh)
@@ -203,6 +217,13 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
   // priority was known!
   RenderQueues.RemoveUnknownPriority (mesh);
   RenderQueues.Add (mesh);
+  int i;
+  iMeshList* ml = mesh->GetChildren ();
+  for (i = 0 ; i < ml->GetCount () ; i++)
+  {
+    iMeshWrapper* child = ml->Get (i);
+    RelinkMesh (child);
+  }
 }
 
 //----------------------------------------------------------------------
@@ -212,8 +233,8 @@ bool csSector::UseCullerPlugin (const char *plugname)
   culler = 0;
 
   // Load the culler plugin.
-  csRef<iPluginManager> plugmgr (CS_QUERY_REGISTRY (csEngine::object_reg,
-  	iPluginManager));
+  csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (csEngine::object_reg,
+  	iPluginManager);
   culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
 
   if (!culler)
@@ -232,7 +253,7 @@ bool csSector::UseCullerPlugin (const char *plugname)
   {
     iMeshWrapper* m = meshes.Get (i);
     m->GetMovable ()->UpdateMove ();
-    RegisterMeshToCuller (m);
+    RegisterEntireMeshToCuller (m);
   }
   return true;
 }
@@ -287,17 +308,17 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
 {
   static csSectorVisibleMeshCallback cb;
 
-  if(0==rview) return 0;
+  if (rview == 0) return 0;
 
   if (engine->GetCurrentFrameNumber () != cachedFrameNumber ||
       rview->GetCamera () != cachedCamera )
   {
-      visibleMeshCache->Empty ();
-      cb.Setup (visibleMeshCache, rview);
-      GetVisibilityCuller()->VisTest (rview, &cb);
+    visibleMeshCache->Empty ();
+    cb.Setup (visibleMeshCache, rview);
+    GetVisibilityCuller()->VisTest (rview, &cb);
       
-      cachedFrameNumber = engine->GetCurrentFrameNumber ();
-      cachedCamera = rview->GetCamera();
+    cachedFrameNumber = engine->GetCurrentFrameNumber ();
+    cachedCamera = rview->GetCamera();
   }
 
   return visibleMeshCache;
@@ -858,9 +879,8 @@ void csSector::Draw (iRenderView *rview)
     for (i = 0 ; i < num_objects ; i++)
     {
       iMeshWrapper* sp = objects[i];
-      if (
-            !prev_sector ||
-            sp->GetMovable ()->GetSectors ()->Find (prev_sector) == -1)
+      if (!prev_sector ||
+          sp->GetMovable ()->GetSectors ()->Find (prev_sector) == -1)
       {
         // Mesh is not in the previous sector or there is no previous
         // sector.

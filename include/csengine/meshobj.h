@@ -150,6 +150,7 @@ class csMeshWrapper : public csObject, public iVisibilityObject
 protected:
   /// The parent sector object, or 0
   iMeshWrapper *Parent;
+  csMeshWrapper *csParent;
 
   /**
    * Bounding box in world space.
@@ -164,6 +165,13 @@ protected:
    * Current visibility number used by the visibility culler.
    */
   uint32 visnr;
+
+  /**
+   * Cached lod number. This is valid if cached_lod_visnr is equal
+   * to visnr.
+   */
+  float cached_lod;
+  uint32 cached_lod_visnr;
 
   /**
    * Position in the world.
@@ -284,6 +292,13 @@ protected:
    */
   virtual ~csMeshWrapper ();
 
+  /**
+   * During rendering a child mesh can ask its parent if it should
+   * be rendered or not. This is not very efficient so we should change
+   * this but for now this is our solution. @@@
+   */
+  bool IsChildVisible (iMeshWrapper* child, iRenderView* rview);
+
 public:
   /// Constructor.
   csMeshWrapper (iMeshWrapper* theParent, iMeshObject* meshobj);
@@ -337,7 +352,7 @@ public:
   }
 
   /// Set parent container for this object.
-  void SetParentContainer (iMeshWrapper* newParent) { Parent = newParent; }
+  void SetParentContainer (iMeshWrapper* newParent);
   /// Get parent container for this object.
   iMeshWrapper* GetParentContainer () const { return Parent; }
 

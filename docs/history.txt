@@ -26,6 +26,23 @@ chronological order.
 	    - Fixed mode switching when exiting/terminating app on glwin32.
 	    - Removed a prototype for a non-existing function from 
 	      win32/wintools.h.
+	- Jorrit made the parsing of the 'start' keyword safer by allocating
+	  the string from the node.
+	- Jorrit fixed a bug in hierarchical meshes. If you had more then
+	  two levels (i.e. a child of a child) then it was possible that in
+	  certain conditions the leaf wouldn't be correctly added to the
+	  culler.
+	- Jorrit changed the way child meshes are treated for render
+	  priorities. A child mesh is now put as a seperate entity in a
+	  render priority. That way it is now possible to put child meshes
+	  in different render priorities (different compared to the parent
+	  mesh).
+	- Jorrit fixed the way static lod works. The child is now responsible
+	  for asking the parent if it should be rendered (this also works
+	  for hierarchical meshes in general). This is perhaps not the ideal
+	  solution but for now it will do.
+	- Jorrit fixed a bug in portal loading and collision detection. This
+	  bug caused the camera to jump up and down in the reflecting room.
 29-Sep-2003
 	- Jorrit moved ParseTextureMapping() and ParsePoly3d() from syntax
 	  services to thing loader. It doesn't make much sense to make those

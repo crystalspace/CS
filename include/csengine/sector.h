@@ -217,10 +217,15 @@ public:
   /**
    * Register a mesh and all children to the visibility culler.
    */
+  void RegisterEntireMeshToCuller (iMeshWrapper* mesh);
+
+  /**
+   * Register a mesh (without children) to the visibility culler.
+   */
   void RegisterMeshToCuller (iMeshWrapper* mesh);
 
   /**
-   * Unregister a mesh and all children from the visibility culler.
+   * Unregister a mesh (without children) from the visibility culler.
    */
   void UnregisterMeshToCuller (iMeshWrapper* mesh);
 

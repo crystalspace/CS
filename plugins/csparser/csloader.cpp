@@ -3424,7 +3424,7 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
 
 bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
 {
-  const char* start_sector = "room";
+  char* start_sector = csStrNew ("room");
   csVector3 pos (0, 0, 0);
   csVector3 up (0, 1, 0);
   csVector3 forward (0, 0, 1);
@@ -3439,7 +3439,8 @@ bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
     switch (id)
     {
       case XMLTOKEN_SECTOR:
-	start_sector = child->GetContentsValue ();
+	delete[] start_sector;
+	start_sector = csStrNew (child->GetContentsValue ());
 	break;
       case XMLTOKEN_POSITION:
 	if (!SyntaxService->ParseVector (child, pos))
@@ -3470,6 +3471,7 @@ bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
   }
 
   campos->Set (start_sector, pos, forward, up);
+  delete[] start_sector;
   return true;
 }
 

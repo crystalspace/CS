@@ -571,11 +571,6 @@ bool csThingLoader::ParsePoly3d (
     return false;
   }
 
-  if (set_colldet == 1)
-    poly3d->GetFlags ().Set (CS_POLY_COLLDET);
-  else if (set_colldet == -1)
-    poly3d->GetFlags ().Reset (CS_POLY_COLLDET);
-
   if (!set_viscull)
   {
     if (portal_node)
@@ -789,6 +784,11 @@ bool csThingLoader::ParsePoly3d (
       }
     }
   }
+
+  if (set_colldet == 1)
+    poly3d->GetFlags ().Set (CS_POLY_COLLDET);
+  else if (set_colldet == -1)
+    poly3d->GetFlags ().Reset (CS_POLY_COLLDET);
 
   OptimizePolygon (poly3d);
 

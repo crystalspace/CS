@@ -59,10 +59,19 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
 
   movable.scfParent = (iBase*)(csObject*)this;
   visnr = 0;
+  cached_lod_visnr = ~0;
   wor_bbox_movablenr = -1;
   movable.SetMeshWrapper (this);
   Parent = theParent;
-  if (Parent) movable.SetParent (Parent->GetMovable ());
+  if (Parent)
+  {
+    csParent = ((csMeshWrapper::MeshWrapper*)Parent)->scfParent;
+    movable.SetParent (Parent->GetMovable ());
+  }
+  else
+  {
+    csParent = 0;
+  }
 
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
 
@@ -94,10 +103,19 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
 
   movable.scfParent = (iBase*)(csObject*)this;
   visnr = 0;
+  cached_lod_visnr = ~0;
   wor_bbox_movablenr = -1;
   movable.SetMeshWrapper (this);
   Parent = theParent;
-  if (Parent) movable.SetParent (Parent->GetMovable ());
+  if (Parent)
+  {
+    csParent = ((csMeshWrapper::MeshWrapper*)Parent)->scfParent;
+    movable.SetParent (Parent->GetMovable ());
+  }
+  else
+  {
+    csParent = 0;
+  }
 
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
 
@@ -112,6 +130,15 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   children.SetMesh (this);
   cast_hardware_shadow = true;
   draw_after_fancy_stuff = false;
+}
+
+void csMeshWrapper::SetParentContainer (iMeshWrapper* newParent)
+{
+  Parent = newParent;
+  if (Parent)
+    csParent = ((csMeshWrapper::MeshWrapper*)Parent)->scfParent;
+  else
+    csParent = 0;
 }
 
 void csMeshWrapper::ClearFromSectorPortalLists ()
@@ -245,7 +272,8 @@ void csMeshWrapper::DeferUpdateLighting (int flags, int num_lights)
 
 void csMeshWrapper::Draw (iRenderView *rview)
 {
-  if (flags.Check (CS_ENTITY_INVISIBLE)) return ;
+  if (flags.Check (CS_ENTITY_INVISIBLE)) return;
+  if (csParent && !csParent->IsChildVisible (&scfiMeshWrapper, rview)) return;
   DrawInt (rview);
 }
 
@@ -378,6 +406,35 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
   return (wor_sq_dist > dist*dist);
 }
 
+bool csMeshWrapper::IsChildVisible (iMeshWrapper* child, iRenderView* rview)
+{
+  if (flags.Check (CS_ENTITY_INVISIBLE)) return false;
+
+  if (static_lod)
+  {
+    // If we have static lod we only draw the children for the right LOD level.
+    if (cached_lod_visnr != visnr)
+    {
+      float distance = qsqrt (GetSquaredDistance (rview));
+      cached_lod = static_lod->GetLODValue (distance);
+      cached_lod_visnr = visnr;
+    }
+    csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (cached_lod);
+    // @@@ This loop is not very efficient!
+    int i;
+    for (i = 0 ; i < meshes.Length () ; i++)
+    {
+      if (meshes[i] == child) return true;
+    }
+    return false;
+  }
+
+  if (csParent && !csParent->IsChildVisible (&scfiMeshWrapper, rview))
+    return false;
+
+  return true;
+}
+
 void csMeshWrapper::DrawIntFull (iRenderView *rview)
 {
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
@@ -400,7 +457,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
     {
       if (lt != last_anim_time)
       {
-        meshobj->NextFrame (lt,movable.GetPosition ());
+        meshobj->NextFrame (lt, movable.GetPosition ());
         last_anim_time = lt;
       }
     }
@@ -411,6 +468,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
     meshobj->Draw (rview, &movable.scfiMovable, zbufMode);
   }
 
+#if 0
   if (static_lod)
   {
     // If we have static lod we only draw the children for the right LOD level.
@@ -422,14 +480,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
       meshes[i]->Draw (rview);
     }
   }
-  else
-  {
-    for (i = 0; i < children.GetCount (); i++)
-    {
-      iMeshWrapper *spr = children.Get (i);
-      spr->Draw (rview);
-    }
-  }
+#endif
 }
 
 bool csMeshWrapper::DrawImposter (iRenderView *rview)
@@ -437,12 +488,12 @@ bool csMeshWrapper::DrawImposter (iRenderView *rview)
   // Check for imposter existence.  If not, create it.
   if (!imposter_mesh)
   {
-      return false;
+    return false;
   }
 
   // Check for imposter already ready
   if (!imposter_mesh->GetImposterReady())
-      return false;
+    return false;
 
   // Check for too much camera movement since last imposter render
   if (!imposter_mesh->CheckIncidenceAngle (rview,
@@ -454,7 +505,7 @@ bool csMeshWrapper::DrawImposter (iRenderView *rview)
   return true;
 }
 
-void csMeshWrapper::SetImposterActive(bool flag,iObjectRegistry *objreg)
+void csMeshWrapper::SetImposterActive (bool flag,iObjectRegistry *objreg)
 {
   imposter_active = flag;
   if (flag)
@@ -1046,10 +1097,15 @@ void csMeshMeshList::PrepareMesh (iMeshWrapper* child)
 
   /* csSector->PrepareMesh tells the culler about the mesh
      (since removing the mesh above also removes it from the culler...) */
-  for (int i = 0 ; i < mesh->GetCsMovable().GetSectors()->GetCount() ; i++)
+  // First we find the top-level parent.
+  iMeshWrapper* toplevel = &(mesh->scfiMeshWrapper);
+  while (toplevel->GetParentContainer ())
+    toplevel = toplevel->GetParentContainer ();
+  iMovable* mov = toplevel->GetMovable ();
+  iSectorList* sl = mov->GetSectors ();
+  for (int i = 0 ; i < sl->GetCount() ; i++)
   {
-    csSector* sector = mesh->GetCsMovable ().GetSectors ()->Get (i)
-    	->GetPrivateObject ();
+    csSector* sector = sl->Get (i)->GetPrivateObject ();
     sector->UnprepareMesh (child);
     sector->PrepareMesh (child);
   }
