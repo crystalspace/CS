@@ -445,7 +445,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   {
     const csPluginLoadRec& r = PluginList.Get(n);
     // If plugin is VFS then skip if already loaded earlier.
-    if (VFS && strcmp (r.FuncID, CS_FUNCID_VFS) == 0)
+    if (VFS && r.FuncID && strcmp (r.FuncID, CS_FUNCID_VFS) == 0)
       continue;
     LoadPlugIn (r.ClassID, r.FuncID, NULL, 0);
   }

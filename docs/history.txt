@@ -48,6 +48,8 @@ The history order has been reversed so that new features are at the top.
 	- Split octree.h into octree.h and pvs.h. Was getting a bit big.
 	- Fixed bug 106203 on SF. Test for coplanar polygons at startup
 	  was wrong. Should be ok now.
+	- Eric Sunshine fixed a crasher in csSystemDriver::Initialize() where
+	  it would try to dereference the null pointer when loading plugins.
 1-Jun-2000
 	- Experiment with new octree generation method. Instead of only
 	  favoring a center with few splits I also try to favor centers which
