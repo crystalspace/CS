@@ -264,7 +264,7 @@ struct iEventOutlet : public iBase
   virtual void ImmediateBroadcast (int iCode, void *iInfo) = 0;
 };
 
-SCF_VERSION (iEventCord, 0, 0, 2);
+SCF_VERSION (iEventCord, 0, 0, 3);
 
 /**
  * The iEventCord is an interface provided by an event queue to
@@ -273,7 +273,7 @@ SCF_VERSION (iEventCord, 0, 0, 2);
  * Events may also optionally be sent to the normal event queue itself
  * if none of the event handlers in the cord handle the event.
  */
-struct iEventCord
+struct iEventCord : public iBase
 {
   /**
    * Insert an event handler into the cord.  The priority defines when it
