@@ -41,6 +41,9 @@ chronological order.
 	        which, are minimal and simple to re-apply.)
 	  Also added Description() convenience methods to csBox3, csBox2,
 	  csVector3, and csVector2.
+	- Eric Sunshine applied a patch from Michael D. Adams
+	  <mdmkolbe@yahoo.com> which fixes problem in winprintf.cpp where
+	  Cygwin did not understand _fileno() and _isatty().
 23-Feb-2005
 	- res moved the code from the various "common" libraries into a
 	  library "csplugincommon" (and libraries with Win32, OpenGL and

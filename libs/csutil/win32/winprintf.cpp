@@ -25,6 +25,11 @@
 #include <windows.h>
 #include "csutil/win32/wintools.h"
 
+#ifdef __CYGWIN__
+#define _fileno(x) fileno(x)
+#define _isatty(x) isatty(x)
+#endif
+
 static int _cs_fputs (const char* string, FILE* stream)
 {
   int rc;
