@@ -864,7 +864,7 @@ bool csPortalContainer::DrawTest (iRenderView* rview, iMovable* movable)
   }
 
 #ifdef CS_USE_NEW_RENDERER
-  rmesh.object2camera = camtrans / movtrans;  
+  last_movable = movable;  
 #endif
   return true;
 }
@@ -895,7 +895,7 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
   float shift_y = camera->GetShiftY ();
 
 #ifdef CS_USE_NEW_RENDERER
-  const csReversibleTransform movtrans = rmesh.object2camera * camtrans;
+  const csReversibleTransform movtrans = last_movable->GetFullTransform ();
 #else
   const csReversibleTransform& movtrans = movable->GetFullTransform ();
 #endif

@@ -48,6 +48,7 @@ chronological order.
         - Matze changed bison and flex jam rules to build into the out directory
           instaead of the source directory and added a rule to copy the
           generated files.
+	- Marten made some more fixes to portals.
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during

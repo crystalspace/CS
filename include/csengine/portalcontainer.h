@@ -156,6 +156,7 @@ private:
 
   csRenderMesh rmesh;
   csRenderMesh *rmeshPtr;
+  iMovable* last_movable;
 protected:
   /**
    * Destructor.  This is private in order to force clients to use DecRef()
