@@ -40,7 +40,7 @@ public:
   /// Create an iCollider for the given geometry.
        virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
  virtual csPtr<iCollider> CreateSphereCollider (iMeshObject* mesh) { return NULL; }; //to be implemented
-       virtual csPtr<iCollider> CreateCollider (iMeshObject* mesh) { return NULL; };
+       virtual csPtr<iCollider> CreateBoxCollider (iMeshObject* mesh) { return NULL; };
 
 
   virtual bool Collide (
