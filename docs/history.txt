@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+11-Dec-2002
+	- Keith Fulton added the <lightcolor> trigger condition tag
+	  to the sequence manager.  The flarge demo now has two
+	  sequences which are listening to the light on the stairs.
+	  One fires when the lights get very dim and the other fires
+	  when the light gets brighter again.  Note, these sequences
+	  activate each others' triggers, not their own.
 10-Dec-2002
 	- Fixed a bug I introduced yesterday in parsing of HardMove.
 	  The transform was inverted.
