@@ -863,6 +863,35 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	  sequence->AddOperationSetLight (cur_time, light, col);
 	}
         break;
+      case XMLTOKEN_FADEAMBIENT:
+        {
+	  csRef<iParameterESM> sector = ResolveOperationParameter (
+	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
+	  if (!sector) return NULL;
+
+	  csColor col;
+	  col.red = child->GetAttributeValueAsFloat ("red");
+	  col.green = child->GetAttributeValueAsFloat ("green");
+	  col.blue = child->GetAttributeValueAsFloat ("blue");
+	  int duration = child->GetAttributeValueAsInt ("duration");
+
+	  sequence->AddOperationFadeAmbient (cur_time,
+	    	sector, col, duration);
+	}
+	break;
+      case XMLTOKEN_SETAMBIENT:
+        {
+	  csRef<iParameterESM> sector = ResolveOperationParameter (
+	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
+	  if (!sector) return NULL;
+
+	  csColor col;
+	  col.red = child->GetAttributeValueAsFloat ("red");
+	  col.green = child->GetAttributeValueAsFloat ("green");
+	  col.blue = child->GetAttributeValueAsFloat ("blue");
+	  sequence->AddOperationSetAmbient (cur_time, sector, col);
+	}
+        break;
       case XMLTOKEN_FADEFOG:
         {
 	  csRef<iParameterESM> sector = ResolveOperationParameter (

@@ -313,7 +313,6 @@ class FadeLightInfo : public iSequenceTimedOperation
 public:
   csRef<iLight> light;
   csColor start_col, end_col;
-  float start_density, end_density;
 
   FadeLightInfo ()
   {
@@ -373,6 +372,89 @@ public:
     fl->DecRef ();
     if (lightpar)
       light = NULL;
+  }
+};
+
+//---------------------------------------------------------------------------
+
+/**
+ * Set ambient light operation.
+ */
+class OpSetAmbientLight : public OpStandard
+{
+private:
+  csRef<iSector> sector;
+  csColor color;
+
+public:
+  OpSetAmbientLight (iParameterESM* sectorpar, const csColor& color)
+  {
+    sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (), iSector);
+    OpSetAmbientLight::color = color;
+  }
+
+  virtual void Do (csTicks /*dt*/, iBase* params)
+  {
+    sector->SetDynamicAmbientLight (color);
+  }
+};
+
+class FadeAmbientLightInfo : public iSequenceTimedOperation
+{
+public:
+  csRef<iSector> sector;
+  csColor start_col, end_col;
+
+  FadeAmbientLightInfo ()
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+  }
+  virtual ~FadeAmbientLightInfo () { }
+  SCF_DECLARE_IBASE;
+
+  virtual void Do (float time, iBase*)
+  {
+    csColor color;
+    color.red = (1-time) * start_col.red + time * end_col.red;
+    color.green = (1-time) * start_col.green + time * end_col.green;
+    color.blue = (1-time) * start_col.blue + time * end_col.blue;
+    sector->SetDynamicAmbientLight (color);
+  }
+};
+
+SCF_IMPLEMENT_IBASE (FadeAmbientLightInfo)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_END
+
+/**
+ * Fade light operation.
+ */
+class OpFadeAmbientLight : public OpStandard
+{
+private:
+  csRef<iSector> sector;
+  csColor end_col;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
+
+public:
+  OpFadeAmbientLight (iParameterESM* sectorpar, const csColor& color,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  {
+    sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (), iSector);
+    OpFadeAmbientLight::end_col = color;
+    OpFadeAmbientLight::duration = duration;
+    OpFadeAmbientLight::eseqmgr = eseqmgr;
+  }
+
+  virtual void Do (csTicks dt, iBase* params)
+  {
+    FadeAmbientLightInfo* fl = new FadeAmbientLightInfo ();
+    fl->sector = sector;
+    fl->start_col = sector->GetDynamicAmbientLight ();
+    fl->end_col = end_col;
+    eseqmgr->FireTimedOperation (dt, duration, fl);
+    fl->DecRef ();
   }
 };
 
@@ -934,6 +1016,22 @@ void csSequenceWrapper::AddOperationFadeLight (csTicks time,
 	iParameterESM* light, const csColor& color, csTicks duration)
 {
   OpFadeLight* op = new OpFadeLight (light, color, duration, eseqmgr);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationSetAmbient (csTicks time,
+	iParameterESM* light, const csColor& color)
+{
+  OpSetAmbientLight* op = new OpSetAmbientLight (light, color);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationFadeAmbient (csTicks time,
+	iParameterESM* light, const csColor& color, csTicks duration)
+{
+  OpFadeAmbientLight* op = new OpFadeAmbientLight (light, color, duration, eseqmgr);
   sequence->AddOperation (time, op);
   op->DecRef ();
 }

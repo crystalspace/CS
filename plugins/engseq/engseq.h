@@ -133,6 +133,10 @@ public:
 		  const csColor& color);
   void AddOperationFadeLight (csTicks time, iParameterESM* light,
 		  const csColor& color, csTicks duration);
+  void AddOperationSetAmbient (csTicks time, iParameterESM* light,
+		  const csColor& color);
+  void AddOperationFadeAmbient (csTicks time, iParameterESM* light,
+		  const csColor& color, csTicks duration);
   void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
 		  const csColor& color);
   void AddOperationFadeMeshColor (csTicks time, iParameterESM* mesh,
@@ -212,6 +216,16 @@ public:
 		  const csColor& color, csTicks duration)
     {
       scfParent->AddOperationFadeLight (time, light, color, duration);
+    }
+    virtual void AddOperationSetAmbient (csTicks time, iParameterESM* light,
+		  const csColor& color)
+    {
+      scfParent->AddOperationSetAmbient (time, light, color);
+    }
+    virtual void AddOperationFadeAmbient (csTicks time, iParameterESM* light,
+		  const csColor& color, csTicks duration)
+    {
+      scfParent->AddOperationFadeAmbient (time, light, color, duration);
     }
     virtual void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
 		  const csColor& color)

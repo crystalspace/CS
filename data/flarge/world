@@ -22958,6 +22958,26 @@
 	    <enable trigger="animlight" />
 	</sequence>
 
+	<sequence name="anim_sky">
+	    /* Time of day simulation */
+	    <fadeambient sector="street1" red="1" green="1" blue="1"
+	    	duration="1000" />
+	    <delay>2000</delay>
+	    <fadeambient sector="street1" red="0" green="0" blue="0"
+	    	duration="1000" />
+	    <delay>2000</delay>
+	    /* Time of day simulation */
+	    <setambient sector="street1" red="1.5" green="1.5" blue="1.5" />
+	    <delay>75</delay>
+	    <setambient sector="street1" red="0" green="0" blue="0" />
+	    <delay>75</delay>
+	    <setambient sector="street1" red="1.5" green="1.5" blue="1.5" />
+	    <delay>150</delay>
+	    <setambient sector="street1" red="0" green="0" blue="0" />
+	    <delay>3000</delay>
+	    <enable trigger="anim_sky" />
+	</sequence>
+
 	<sequence name="animhugelight">
 	    <fadelight light="hugeroom_light1" red="0" green="0" blue=".2"
 	    	duration="3000" />
@@ -23270,6 +23290,11 @@
 	    <fire sequence="animlight">
 	        <light name="light" light="l1" />
 	    </fire>
+	</trigger>
+
+        <trigger name="anim_sky">
+	    <sectorvis sector="street1" />
+	    <fire sequence="anim_sky" />
 	</trigger>
 	
 	<trigger name="rot_shapes">

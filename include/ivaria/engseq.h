@@ -224,6 +224,18 @@ struct iSequenceWrapper : public iBase
 		  const csColor& color, csTicks duration) = 0;
 
   /**
+   * Operation: set dynamic ambient light color.
+   */
+  virtual void AddOperationSetAmbient (csTicks time, iParameterESM* light,
+		  const csColor& color) = 0;
+
+  /**
+   * Operation: fade dynamic ambient light to some color during some time.
+   */
+  virtual void AddOperationFadeAmbient (csTicks time, iParameterESM* light,
+		  const csColor& color, csTicks duration) = 0;
+
+  /**
    * Operation: set a mesh color.
    */
   virtual void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
