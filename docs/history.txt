@@ -13,6 +13,19 @@ chronological order.
 	  eliminated on 9-Feb-2004 when Eric re-wrote all of the highly nasty
 	  code in csEvent which made the dangerous assumption that the incoming
 	  iEvent was actually a csEvent.
+	- Keith Fulton added support for new animation callback system in cal3d.
+	  See viewmesh.cpp for very simple example of how to use this.  Here is
+	  a quick description of how the callback system works in cal3d:
+		Added animation callbacks to cal3d.  The CoreAnimation keeps the 
+		master list of callbacks for itself.  The Animation keeps last-
+		called times for each animation for itself.  The Mixer is 
+		responsible for causing the Animation to check for which of its 
+		callbacks must be called.  There are two callbacks defined--one 
+		for continuous calling during anim playback and one on completion 
+		of the animation.  The callbacks take the CalModel in question,
+		which they can use to getUserData in order to get their own 
+		application-specific data about which entity the callback is 
+		referring to.
 7-Dec-2004
 	- Eric Sunshine added new Autoconf macros CS_CHECK_PROG(),
 	  CS_CHECK_PROGS(), CS_CHECK_TOOL(), CS_CHECK_TOOLS(), CS_PATH_PROG(),

@@ -203,7 +203,7 @@ void csSpriteCal3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 
 csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
   iMeshObjectType* pParent, iObjectRegistry* object_reg)
-  : sprcal3d_type(pParent)
+  : sprcal3d_type(pParent), calCoreModel("no name")
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSpriteCal3DFactoryState);
@@ -248,7 +248,7 @@ csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
   //	maps.clear();
   //    }
 
-  calCoreModel.destroy();
+//  calCoreModel.destroy();
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
@@ -259,7 +259,8 @@ csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
 
 bool csSpriteCal3DMeshObjectFactory::Create(const char *name)
 {  
-  return calCoreModel.create(name);
+  // return calCoreModel.create(name);
+  return true;
 }
 
 void csSpriteCal3DMeshObjectFactory::ReportLastError ()
@@ -559,7 +560,7 @@ bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
   CalCoreMaterial::Map newmap;
   newmap.userData = mat;
 
-  newmat->create();
+//  newmat->create();
   newmat->reserve(1);
   newmat->setMap(0,newmap);  // sticking iMaterialWrapper into 2 places
   newmat->setUserData(mat);  // jam CS iMaterialWrapper into cal3d material holder
@@ -596,6 +597,36 @@ csPtr<iMeshObject> csSpriteCal3DMeshObjectFactory::NewInstance ()
   csRef<iMeshObject> im (SCF_QUERY_INTERFACE (spr, iMeshObject));
   spr->DecRef ();
   return csPtr<iMeshObject> (im);
+}
+
+bool csSpriteCal3DMeshObjectFactory::RegisterAnimCallback(
+    const char *anim, CalAnimationCallback *callback,float min_interval)
+{
+  for (size_t i=0; i<anims.Length(); i++)
+  {
+    if (anims[i]->name == anim)
+    {
+      CalCoreAnimation *cal_anim = calCoreModel.getCoreAnimation(anims[i]->index);
+      cal_anim->registerCallback(callback,min_interval);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool csSpriteCal3DMeshObjectFactory::RemoveAnimCallback(
+    const char *anim, CalAnimationCallback *callback)
+{
+  for (size_t i=0; i<anims.Length(); i++)
+  {
+    if (anims[i]->name == anim)
+    {
+      CalCoreAnimation *cal_anim = calCoreModel.getCoreAnimation(anims[i]->index);
+      cal_anim->removeCallback(callback);
+      return true;
+    }
+  }
+  return false;
 }
 
 void csSpriteCal3DMeshObjectFactory::HardTransform (
@@ -712,6 +743,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 						  iObjectRegistry* object_reg,
 						  CalCoreModel& calCoreModel)
+                          : calModel(&calCoreModel)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
@@ -732,12 +764,12 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   //  scfiObjectModel.SetPolygonMeshShadows (0);
 
   // create the model instance from the loaded core model
-  if(!calModel.create (&calCoreModel))
-  {
-    ReportCalError (object_reg, "crystalspace.mesh.sprite.cal3d", 
-      "Error creating model instance");
-    return;
-  }
+//  if(!calModel.create (&calCoreModel))
+//  {
+//    ReportCalError (object_reg, "crystalspace.mesh.sprite.cal3d", 
+//      "Error creating model instance");
+//    return;
+//  }
   vertices_allocated = false;
   
 #ifndef CS_USE_OLD_RENDERER
@@ -773,7 +805,7 @@ csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
 	delete[] vertices[m][s];
     }
   }
-  calModel.destroy();
+//  calModel.destroy();
 
   if (arrays_initialized)
   {
@@ -962,6 +994,11 @@ void csSpriteCal3DMeshObject::LightChanged (iLight*)
 void csSpriteCal3DMeshObject::LightDisconnect (iLight* light)
 {
   lighting_dirty = true;
+}
+
+void csSpriteCal3DMeshObject::SetUserData(void *data)
+{
+  calModel.setUserData(data);
 }
 
 void csSpriteCal3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
@@ -2003,6 +2040,7 @@ void csSpriteCal3DMeshObject::ClearAllAnims()
   {
      calModel.getMixer()->removeAction(last_locked_anim);
      last_locked_anim = -1;
+     is_idling = false;
   }
 }
 
@@ -2123,7 +2161,8 @@ bool csSpriteCal3DMeshObject::SetAnimAction(int idx, float delayIn,
 
   if (factory->anims[idx]->lock)
   {
-    last_locked_anim = idx;
+     last_locked_anim = idx;
+     is_idling = false;
   }
 
   return true;

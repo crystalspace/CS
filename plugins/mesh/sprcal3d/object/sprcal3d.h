@@ -258,6 +258,8 @@ public:
   	const char *morphtarget_name);
   bool AddCoreMaterial(iMaterialWrapper *mat);
   void BindMaterials();
+  bool RegisterAnimCallback(const char *anim, CalAnimationCallback *callback,float min_interval);
+  bool RemoveAnimCallback(const char *anim, CalAnimationCallback *callback);
 
   int  GetMeshCount() { return submeshes.Length(); }
   int GetMorphAnimationCount() { return morph_animation_names.Length(); }
@@ -499,6 +501,17 @@ public:
     {
       return &scfParent->calCoreModel;
     }
+    
+    virtual bool RegisterAnimCallback(const char *anim, CalAnimationCallback *callback,float min_interval)
+    {
+      return scfParent->RegisterAnimCallback(anim,callback,min_interval);
+    }
+
+    virtual bool RemoveAnimCallback(const char *anim, CalAnimationCallback *callback)
+    {
+      return scfParent->RemoveAnimCallback(anim,callback);
+    }
+  
   } scfiSpriteCal3DFactoryState;
   friend struct SpriteCal3DFactoryState;
 
@@ -790,6 +803,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  void SetUserData(void *data);
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
@@ -1069,6 +1083,10 @@ public:
     virtual CalModel *GetCal3DModel()
     {
       return &scfParent->calModel;
+    }
+    virtual void SetUserData(void *data)
+    {
+        scfParent->SetUserData(data);
     }
 
 

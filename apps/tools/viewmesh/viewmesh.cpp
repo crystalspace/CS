@@ -68,6 +68,8 @@
 #include "iutil/plugin.h"
 #include "imap/writer.h"
 
+#include <cal3d/animcallback.h>
+
 CS_IMPLEMENT_APPLICATION
 
 #define VIEWMESH_COMMAND_LOADMESH       77701
@@ -94,6 +96,25 @@ CS_IMPLEMENT_APPLICATION
 #define DEFAULT_SOCKET_X_ROTATION -PI/2.0f
 #define DEFAULT_SOCKET_Y_ROTATION 0.0f
 #define DEFAULT_SOCKET_Z_ROTATION 0.0f
+
+
+
+
+
+struct vmAnimCallback : public CalAnimationCallback
+{
+    vmAnimCallback() {}
+
+    void AnimationUpdate(float anim_time,CalModel *model)
+    {
+        printf("Anim Update at time %.2f.\n",anim_time);
+    }
+
+    void AnimationComplete(CalModel *model)
+    {
+        printf("Anim Completed!\n");
+    }
+};
 
 //-----------------------------------------------------------------------------
 
@@ -638,6 +659,9 @@ bool ViewMesh::LoadSprite (const char *filename, float scale)
       	SCF_QUERY_INTERFACE(imeshfact, iSpriteCal3DFactoryState));
       if (factstate)
       {
+        vmAnimCallback *callback = new vmAnimCallback;
+        factstate->RegisterAnimCallback("walk",callback,.5);
+
         factstate->RescaleFactory(scale);
 	  for (int i=0; i<factstate->GetMeshCount(); i++)
 	  {

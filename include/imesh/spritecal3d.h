@@ -96,6 +96,8 @@ struct iSpriteCal3DSocket : public iBase
 
 
 SCF_VERSION (iSpriteCal3DFactoryState, 0, 0, 3);
+struct CalAnimationCallback;
+
 
 /**
  * This interface describes the API for the 3D sprite factory mesh object.
@@ -315,6 +317,19 @@ struct iSpriteCal3DFactoryState : public iBase
    *  Use carefully!
    */
   virtual CalCoreModel *GetCal3DCoreModel() = 0;
+
+  /**
+   * This function will attach a callback to the Core Anim, to be called
+   * whenever the min_interval passes and this animation is active.
+   */
+  virtual bool RegisterAnimCallback(const char *anim, CalAnimationCallback *callback,float min_interval) = 0;
+
+  /**
+   * This function should be called to remove callbacks when the meshfact is 
+   * destroyed.
+   */
+  virtual bool RemoveAnimCallback(const char *anim, CalAnimationCallback *callback) = 0;
+
 };
 
 SCF_VERSION (iSpriteCal3DState, 0, 0, 2);
@@ -535,6 +550,9 @@ struct iSpriteCal3DState : public iBase
    *  Use carefully!
    */
   virtual CalModel *GetCal3DModel() = 0;
+
+  /// Set user data in the model, for access from the callback later, mostly.
+  virtual void SetUserData(void *data) = 0;
 };
 
 #endif// __CS_IMESH_SPRITECAL3D_H__
