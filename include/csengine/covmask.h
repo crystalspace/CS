@@ -89,7 +89,7 @@ public:
  */
 class csCovMaskSingle
 {
-private:
+protected:
 # if CS_CM == mask4x4
   UShort in;
 # elif CS_CM == mask8x4

@@ -189,6 +189,7 @@ void csCovMaskLUT::BuildTables ()
       // and mark if they are left of L1 and/or right of L2.
       int dimhor1 = CS_CM_HOR+1;
       float fdim = (float)dimension;
+// @@@ BUG! What if from1 and to1 are equal? (and from2 and to2).
       for (ix = 0 ; ix <= CS_CM_HOR ; ix++)
         for (iy = 0 ; iy <= CS_CM_VER ; iy++)
 	{
