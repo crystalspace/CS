@@ -21,6 +21,12 @@ chronological order.
 	- Jorrit added a new stat_dyn_reflect.xml shader.
         - res replaced the stat_dyn_reflect.xml shader with a commented and 
 	  syntactically and semantically more sensible version.
+	- res made the following changes:
+	    - Added enum for mouse button constants (csmbXXX).
+	    - Added support for mouse wheel and Xbuttons (e.g. thumb buttons on
+	      some mice) to Win32 port.
+	    - Fixed handling of high mouse buttons in X window plugin. It read
+	      beyond the end of an array for buttons > 5.
 20-Dec-2004
 	- Jorrit added csFastRandFloat() which is a fast random number
 	  generator routine that returns a number between 0 and 1.

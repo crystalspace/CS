@@ -127,6 +127,29 @@ struct csKeyEventData
   csKeyCharType charType;
 };
 
+/**
+ * Constants for mouse buttons.
+ * Note: the possibly occuring values are not limited to those below, e.g.
+ * maybe some day 6-button mice are available...
+ */
+enum csMouseButton
+{
+  /// Left button
+  csmbLeft = 1,
+  /// Right button
+  csmbRight = 2,
+  /// Middle button
+  csmbMiddle = 3,
+  /// Wheel was scrolled up
+  csmbWheelUp = 4,
+  /// Wheel was scrolled up
+  csmbWheelDown = 5,
+  /// Thumb button 1 (e.g. on 5-button mice)
+  csmbExtra1 = 6,
+  /// Thumb button 2 (e.g. on 5-button mice)
+  csmbExtra2 = 7
+};
+
 /// Mouse event data in iEvent.
 struct csEventMouseData
 {
@@ -135,8 +158,8 @@ struct csEventMouseData
   /// Mouse y
   int y;
   /**
-   * Button number: 1-left, 2-right, 3-middle 
-   * (higher indices may occur)
+   * Button number.
+   * \sa csMouseButton
    */
   int Button;
   /// Control key state

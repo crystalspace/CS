@@ -92,6 +92,8 @@ private:
   csRef<iEventOutlet> EventOutlet;
   csRef<csWin32KeyboardDriver> kbdDriver;
 
+  int mouseButtons;
+
   // @@@ The following aren't thread-safe. Prolly use TLS.
   /// The "Ok" button text passsed to Alert(),
   const char* msgOkMsg;
@@ -102,7 +104,7 @@ private:
   HANDLE exceptHandlerDLL;
 
   /// The console codepage that was set on program startup. WIll be restored on exit.
-  UINT oldCP;
+  //UINT oldCP;
 
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
@@ -326,7 +328,8 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   console_window (false),  
   is_console_app(false),
   cmdline_help_wanted(false),
-  EventOutlet (0)
+  EventOutlet (0),
+  mouseButtons(0)
 {
   SCF_CONSTRUCT_IBASE(0);
 
@@ -636,6 +639,18 @@ int Win32Assistant::GetCmdShow () const
 
 //----------------------------------------// Windows input translator //------//
 
+#ifndef WM_MOUSEWHEEL
+#define	WM_MOUSEWHEEL	0x020a
+#endif
+
+#ifndef WM_XBUTTONDOWN
+#define	WM_XBUTTONDOWN	0x020b
+#endif
+
+#ifndef WM_XBUTTONUP
+#define	WM_XBUTTONUP	0x020c
+#endif
+
 LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
@@ -644,6 +659,9 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     case WM_ACTIVATEAPP:
       if ((GLOBAL_ASSISTANT != 0))
       {
+        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+	POINT mousePos;
+	GetCursorPos (&mousePos);
         if (wParam) 
 	{ 
 	  GLOBAL_ASSISTANT->ApplicationActive = true; 
@@ -706,10 +724,13 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     {
       if (GLOBAL_ASSISTANT != 0)
       {
-        SetCapture (hWnd);
+	const int buttonNum = (message == WM_LBUTTONDOWN) ? csmbLeft :
+          (message == WM_RBUTTONDOWN) ? csmbRight : csmbMiddle;
+        if (GLOBAL_ASSISTANT->mouseButtons == 0) SetCapture (hWnd);
+	GLOBAL_ASSISTANT->mouseButtons |= 1 << (buttonNum - csmbLeft);
+
         iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-        outlet->Mouse ((message == WM_LBUTTONDOWN) ? 1 :
-          (message == WM_RBUTTONDOWN) ? 2 : 3, true,
+        outlet->Mouse (buttonNum, true,
           short (LOWORD (lParam)), short (HIWORD (lParam)));
       }
       return TRUE;
@@ -720,11 +741,67 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     {
       if (GLOBAL_ASSISTANT != 0)
       {
+	const int buttonNum = (message == WM_LBUTTONUP) ? csmbLeft :
+          (message == WM_RBUTTONUP) ? csmbRight : csmbMiddle;
+	GLOBAL_ASSISTANT->mouseButtons &= ~(1 << (buttonNum - csmbLeft));
+        if (GLOBAL_ASSISTANT->mouseButtons == 0) ReleaseCapture ();
+
         iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-        ReleaseCapture ();
-        outlet->Mouse ((message == WM_LBUTTONUP) ? 1 :
-          (message == WM_RBUTTONUP) ? 2 : 3, false,
+        outlet->Mouse (buttonNum, false,
           short (LOWORD (lParam)), short (HIWORD (lParam)));
+      }
+      return TRUE;
+    }
+    case WM_MOUSEWHEEL:
+    {
+      if (GLOBAL_ASSISTANT != 0)
+      {
+        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+	int wheelDelta = (short)HIWORD (wParam);
+	// @@@ Only emit events when WHEEL_DELTA wheel ticks accumulated?
+	outlet->Mouse (wheelDelta > 0 ? csmbWheelUp : csmbWheelDown, true,
+	  short (LOWORD (lParam)), short (HIWORD (lParam)));
+	//outlet->Mouse (wheelDelta > 0 ? csmbWheelUp : csmbWheelDown, false,
+	  //short (LOWORD (lParam)), short (HIWORD (lParam))); 
+      }
+      return 0;
+    }
+    case WM_XBUTTONUP:
+    case WM_XBUTTONDOWN:
+    {
+      if (GLOBAL_ASSISTANT != 0)
+      {
+	bool down = (message == WM_XBUTTONDOWN);
+	const int maxXButtons = 16; 
+	  // XButton flags are stored in high word of lparam
+	const int mbFlagsOffs = csmbMiddle; 
+	  // Offset of bit num of mouseButtons
+
+	int XButtons = HIWORD(wParam);
+
+	if (down && (GLOBAL_ASSISTANT->mouseButtons == 0)) SetCapture (hWnd);
+
+        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+	for (int x = 0; x < maxXButtons; x++)
+	{
+	  if (XButtons & (1 << x))
+	  {
+	    int mbFlag = 1 << (x + mbFlagsOffs);
+	    if (down && !(GLOBAL_ASSISTANT->mouseButtons & mbFlag))
+	    {
+	      GLOBAL_ASSISTANT->mouseButtons |= mbFlag;
+	      outlet->Mouse (csmbExtra1 + x, true,
+		short (LOWORD (lParam)), short (HIWORD (lParam)));
+	    }
+	    else if (!down && (GLOBAL_ASSISTANT->mouseButtons & mbFlag))
+	    {
+	      GLOBAL_ASSISTANT->mouseButtons &= ~mbFlag;
+	      outlet->Mouse (csmbExtra1 + x, false,
+		short (LOWORD (lParam)), short (HIWORD (lParam)));
+	    }
+	  }
+	}
+        if (!down && (GLOBAL_ASSISTANT->mouseButtons == 0)) ReleaseCapture ();
       }
       return TRUE;
     }
