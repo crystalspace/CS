@@ -38,6 +38,8 @@ typedef enum _CS_RENDERBUFFER_TYPE
 } CS_RENDERBUFFER_TYPE;
 
 
+SCF_VERSION (iRenderBuffer, 0, 0, 1);
+
 /**
  * This is a general buffer to be used by the renderer. It can ONLY be
  * created by the VB manager
@@ -65,10 +67,12 @@ struct iRenderBuffer : public iBase
   virtual int GetColorLength() = 0;
 };
 
+SCF_VERSION (iRenderBufferManager, 0, 0, 1);
+
 struct iRenderBufferManager : public iBase
 {
   /// Allocate a buffer of the specified type and return it
-  virtual iRenderBuffer* GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE location) = 0;
+  virtual csPtr<iRenderBuffer> GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE location) = 0;
   
   /// Lock a specified buffer. Return true if successful
   virtual bool LockBuffer(iRenderBuffer* buffer) = 0;
@@ -77,14 +81,17 @@ struct iRenderBufferManager : public iBase
   virtual void UnlockBuffer(iRenderBuffer* buffer) = 0;
 };
 
+SCF_VERSION (iStreamSource, 0, 0, 1);
+
 struct iStreamSource : public iBase
 {
   /// Get a named buffer
   virtual iRenderBuffer* GetBuffer(csStringID name) = 0;
 };
 
-struct csRenderMesh
+class csRenderMesh
 {
+public:
   /// Type of mesh
   typedef enum
   {
@@ -97,6 +104,11 @@ struct csRenderMesh
     MESHTYPE_LINESTRIP
   } meshtype;
 
+private: 
+  meshtype type;
+  csRef<iStreamSource> streamsource;
+
+public:
   ///Special attributes. Please don't change, it's used as flags
   typedef enum
   {
@@ -105,29 +117,29 @@ struct csRenderMesh
     SPECIAL_ZFILL = 2
   } specialattributes;
 
+  /// Set buffer source
+  virtual void SetStreamSource (iStreamSource* streamsource)
+    { csRenderMesh::streamsource = streamsource; }
   /// Get buffer source
-  virtual iStreamSource* GetStreamSource() = 0;
+  virtual iStreamSource* GetStreamSource()
+    { return streamsource; }
 
-  /// Number of buffers
-  virtual int GetBufferCount() = 0;
-  
-  /// References to defaultbuffers
-  virtual csStringID GetVertexBuffer() = 0;
-  virtual csStringID GetNormalBuffer() = 0;
-  virtual csStringID GetColorBuffer() = 0;
-  virtual csStringID GetIndexBuffer() = 0;
+  /// Set mesh type
+  virtual void SetType(meshtype type) 
+    { csRenderMesh::type = type; }
+  /// Get mesh type
+  virtual meshtype GetType() 
+    { return type; }
 
-  /// Objecttypes
-  virtual meshtype GetType() = 0;
-  virtual void SetType(meshtype type) = 0;
+  /// Get lighting information
+  virtual iLightingInfo* GetLightingInfo() { return NULL; }
 
-  /// Lighting information
-  virtual iLightingInfo* GetLightingInfo() = 0;
-
-  /// Special case for lightmap. To get lightmaps into renderers
-  /// not able to do multitexture, here is a handle to the lightmap
-  /// texture
-  virtual iTextureHandle* GetLightmapHandle() = 0;
+  /**
+   * Special case for lightmap. To get lightmaps into renderers
+   * not able to do multitexture, here is a handle to the lightmap
+   * texture
+   */
+  virtual iTextureHandle* GetLightmapHandle() { return NULL; }
 };
 
 

@@ -28,7 +28,7 @@ class csReversibleTransform;
 class csStringHash;
 
 
-struct csRenderMesh;
+class csRenderMesh;
 
 struct iGraphics2D;
 struct iTextureManager;

@@ -48,7 +48,6 @@ struct iEffectDefinition;
 struct iEffectTechnique;
 struct iEvent;
 
-SCF_VERSION (csGLRender3D, 0, 0, 1);
 
 class csGLRender3D : public iRender3D
 {

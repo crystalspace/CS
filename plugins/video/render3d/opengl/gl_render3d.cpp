@@ -36,6 +36,7 @@
 #include "ivideo/render3d.h"
 
 #include "gl_render3d.h"
+#include "gl_softrbufmgr.h"
 #include "glextmanager.h"
 
 #include "ivideo/effects/efserver.h"
@@ -80,10 +81,13 @@ csGLRender3D::csGLRender3D (iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEffectClient);
 
   scfiEventHandler = NULL;
+
+  strings = new csStringHash ();
 }
 
 csGLRender3D::~csGLRender3D()
 {
+  delete strings;
 }
 
 void csGLRender3D::Report (int severity, const char* msg, ...)
@@ -129,6 +133,8 @@ bool csGLRender3D::Open ()
 
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
+
+  buffermgr = new csSoftRenderBufferManager ();
 
   return true;
 }
