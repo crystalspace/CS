@@ -961,7 +961,7 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& box,
   int i, j;
   csPolygon3D* p;
   csPoly3D cur_poly;
-  csPoly2D proj_poly;
+//  csPoly2D proj_poly;
   for (i = 0 ; i < num_polygons ; i++)
     if (polygons[i]->GetType () == 1)
     {
