@@ -105,9 +105,6 @@
 #  error "Please define a suitable CS_XXX_ENDIAN macro in win32/csosdefs.h!"
 #endif
 
-#define CS_WIN32_ARGC __argc
-#define CS_WIN32_ARGV __argv
-
 /* Cygwin should implement it's own winMain...
    but how to get ModuleHandle from then? */
 #define CS_IMPLEMENT_APPLICATION \

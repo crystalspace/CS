@@ -600,7 +600,7 @@ bool cspFileDialog::GetFileName(char *buf, size_t bufsize)
       if ((buf [sl - 1] != '/')
  	  && (buf [sl - 1] != separator))
       {
-	buf [sl++] = PATH_SEPARATOR;
+	buf [sl++] = separator;
 	buf [sl] = 0;
       }
       

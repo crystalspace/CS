@@ -481,7 +481,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   need_console = true;
 #endif
 
-#if 0
+#if !defined(__CYGWIN__)
   // required as the CommandLineParser isn't set up yet:
   int i;
   for (i = 1; i < CS_WIN32_ARGC; i++)
@@ -494,7 +494,6 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
       if (!strcmp(opt, "noconsole")) need_console = false;
     }
   }
-#endif
 
   if (need_console)
   {
@@ -504,6 +503,9 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
     freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
     freopen("CONOUT$", "a", stdout); // Redirect stdout to console   
   }
+#else
+  need_console = false;
+#endif
 
   registry = r;
   registry->IncRef();
