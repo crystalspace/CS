@@ -80,8 +80,6 @@ void csFrustumView::RestoreFrustumContext (csFrustumContext *original)
   csFrustumContext *old_ctxt = ctxt;
   ctxt = original;
 
-  //@@@ HANDLING OF LightFrustum
-  if (old_ctxt->GetLightFrustum ()) old_ctxt->GetLightFrustum ()->DecRef ();
   delete old_ctxt;
 }
 

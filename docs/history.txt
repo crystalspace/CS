@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+25-Apr-2003
+	- Fixed a bug in the engine with frustums. Frustums used csRef now
+	  but there was still one case where a manual DecRef() was done.
+	  This caused crashes when firing missiles.
 24-Apr-2003
 	- Eric Sunshine made the following changes:
 	    - Improved robustness of --with-x check for Darwin/Macintosh, since
