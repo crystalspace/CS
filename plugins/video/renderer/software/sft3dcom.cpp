@@ -1586,7 +1586,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
     // theoretically we should do sqrt(dx^2+dy^2) here, but
     // we can approximate it by just abs(dx)+abs(dy)
     if ((ABS (poly.vertices [i].sx - poly.vertices [i - 1].sx)
-       + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
+       + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy))
+       	> VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
 
@@ -1625,7 +1626,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 
   iPolygonTexture *tex = poly.poly_texture;
   csTextureHandleSoftware *tex_mm =
-    (csTextureHandleSoftware *)poly.mat_handle->GetTexture ()->GetPrivateObject ();
+    (csTextureHandleSoftware *)poly.mat_handle->GetTexture ()
+    	->GetPrivateObject ();
 
   float fdu, fdv;
   if (tex)
@@ -1699,8 +1701,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
       int m0w = tex_mm->get_texture (0)->get_width ();
       int m0h = tex_mm->get_texture (0)->get_height ();
 
-      float _P1 = P1 * m0w, _P2 = P2 * m0w, _P3 = P3 * m0w, _P4 = P4 * m0w - fdu;
-      float _Q1 = Q1 * m0h, _Q2 = Q2 * m0h, _Q3 = Q3 * m0h, _Q4 = Q4 * m0h - fdv;
+      float _P1 = P1*m0w, _P2 = P2*m0w, _P3 = P3*m0w, _P4 = P4*m0w - fdu;
+      float _Q1 = Q1*m0h, _Q2 = Q2*m0h, _Q3 = Q3*m0h, _Q4 = Q4*m0h - fdv;
 
       float J1 = _P1 * inv_aspect + _P4 * M;
       float J2 = _P2 * inv_aspect + _P4 * N;
@@ -1985,7 +1987,9 @@ texr_done:
         scan_index += 4;
       else if ((Scan.AlphaMap = txt_unl->get_alphamap ()))
       {
-        scan_index = Scan.bitmap2 ? SCANPROC_MAP_ALPHA_ZNONE : SCANPROC_TEX_ALPHA_ZNONE;
+        scan_index = Scan.bitmap2
+		? SCANPROC_MAP_ALPHA_ZNONE
+		: SCANPROC_TEX_ALPHA_ZNONE;
         if (z_buf_mode == CS_ZBUF_FILL) scan_index++;
         else if (z_buf_mode == CS_ZBUF_USE) scan_index += 2;
         else if (z_buf_mode == CS_ZBUF_TEST) scan_index += 3;
@@ -1995,7 +1999,7 @@ texr_done:
   else
     dscan = ScanProc_Alpha (this, poly.alpha);
 
-  sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
+  sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;
   sy = fyL = fyR = QRound (poly.vertices [scanL2].sy);
 
@@ -2084,18 +2088,20 @@ texr_done:
         // Sub-pixel U & V correction
         float deltaX = (float)xL - sxL;
 
-        //G2D->GetPixelAt(xL, screenY, &d);
         d = line_table [screenY] + (xL << pixel_shift);
         z_buf = z_buffer + width * screenY + xL;
 
-        // Select the right filter depending if we are drawing an odd or even line.
-        // This is only used by scan_map_filt_zfil currently and is still
-        // experimental.
+        // Select the right filter depending if we are drawing an odd or
+	// even line. This is only used by scan_map_filt_zfil currently and
+	// is still experimental.
         if (sy & 1) filter_bf = 3; else filter_bf = 1;
 
         // do not draw the rightmost pixel - it will be covered
         // by neightbour polygon's left bound
-        dscan (xR - xL, d, z_buf, inv_z + deltaX * M, u_div_z + deltaX * J1, v_div_z + deltaX * K1);
+        dscan (xR - xL, d, z_buf,
+		inv_z + deltaX * M,
+		u_div_z + deltaX * J1,
+		v_div_z + deltaX * K1);
       }
 
       sxL += dxL;
@@ -2149,7 +2155,8 @@ void csGraphics3DSoftwareCommon::CloseFogObject (CS_ID id)
   FogBuffer* fb = find_fog_buffer (id);
   if (!fb)
   {
-    SysPrintf (MSG_INTERNAL_ERROR, "ENGINE FAILURE! Try to close a non-open fog object!\n");
+    SysPrintf (MSG_INTERNAL_ERROR,
+    	"ENGINE FAILURE! Try to close a non-open fog object!\n");
     return;
   }
   if (fb->next) fb->next->prev = fb->prev;
@@ -2158,7 +2165,8 @@ void csGraphics3DSoftwareCommon::CloseFogObject (CS_ID id)
   delete fb;
 }
 
-void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fog_type)
+void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
+	G3DPolygonDFP& poly, int fog_type)
 {
   int i;
   int max_i, min_i;
@@ -2223,7 +2231,8 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
     // theoretically we should do here sqrt(dx^2+dy^2), but
     // we can approximate it just by abs(dx)+abs(dy)
     if ((ABS (poly.vertices [i].sx - poly.vertices [i - 1].sx)
-       + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
+       + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy))
+       	> VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
 
@@ -2243,20 +2252,23 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
     Scan.FogDensity = QRound (fb->density * 100);
     if (pfmt.PalEntries == 0)
     {
-      Scan.FogR = QRound (fb->red * ((1 << pfmt.RedBits) - 1)) << pfmt.RedShift;
-      Scan.FogG = QRound (fb->green * ((1 << pfmt.GreenBits) - 1)) << pfmt.GreenShift;
-      Scan.FogB = QRound (fb->blue * ((1 << pfmt.BlueBits) - 1)) << pfmt.BlueShift;
+      Scan.FogR = QRound (fb->red * ((1 << pfmt.RedBits) - 1))
+      	<< pfmt.RedShift;
+      Scan.FogG = QRound (fb->green * ((1 << pfmt.GreenBits) - 1))
+      	<< pfmt.GreenShift;
+      Scan.FogB = QRound (fb->blue * ((1 << pfmt.BlueBits) - 1))
+      	<< pfmt.BlueShift;
 
       if (pfmt.PixelBytes == 4)
       {
         // trick: in 32-bit modes set FogR,G,B so that "R" uses bits 16-23,
         // "G" uses bits 8-15 and "B" uses bits 0-7. This is to accomodate
         // different pixel encodings such as RGB, BGR, RBG and so on...
-        unsigned long r = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 16) ? Scan.FogR :
+        ULong r = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 16) ? Scan.FogR :
           (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 16) ? Scan.FogG : Scan.FogB;
-        unsigned long g = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 8) ? Scan.FogR :
+        ULong g = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 8) ? Scan.FogR :
           (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 8) ? Scan.FogG : Scan.FogB;
-        unsigned long b = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 0) ? Scan.FogR :
+        ULong b = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 0) ? Scan.FogR :
           (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 0) ? Scan.FogG : Scan.FogB;
         Scan.FogR = R8G8B8_PIXEL_PREPROC(r);
         Scan.FogG = R8G8B8_PIXEL_PREPROC(g);
@@ -2305,13 +2317,13 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
   // Using this we effectively partition our polygon in trapezoids
   // with at most two triangles (one at the top and one at the bottom).
 
-  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
-  float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
-  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
+  int scanL1, scanL2, scanR1, scanR2; // scan vertex left/right start/final
+  float sxL, sxR, dxL, dxR;           // scanline X left/right and deltas
+  int sy, fyL, fyR;                   // scanline Y, final Y left, final Y right
   int xL, xR;
   int screenY;
 
-  sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
+  sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;
   sy = fyL = fyR = QRound (poly.vertices [scanL2].sy);
 
