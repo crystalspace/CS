@@ -53,7 +53,7 @@ else
 endif
 
 # The 2D GLX driver
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   GLX2D = $(OUTDLL)glx2d$(DLL)
   LIB.GLX2D = $(foreach d,$(DEP.GLX2D),$($d.LIB))
   LIB.GLX2D.SPECIAL = $(LIB.GLX2D.SYSTEM)

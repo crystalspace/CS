@@ -18,7 +18,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glos2 glos2clean
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
 all plugins drivers drivers2d: glos2
 endif
 
@@ -41,7 +41,7 @@ LIB.GLOS2.SYSTEM += -lopengl
 RES.GLOS2 = $(OUTOS)libGL.res
 
 # The 2D OS/2 OpenGL driver
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   GLOS2 = $(OUTDLL)glos2$(DLL)
   LIB.GLOS2 = $(foreach d,$(DEP.GLOS2),$($d.LIB))
   LIB.GLOS2.SPECIAL = $(LIB.GLOS2.SYSTEM)

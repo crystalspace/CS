@@ -38,7 +38,7 @@ endif
 CFLAGS.X2D += -I$(X11_PATH)/include
 LIB.X2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   X2D = $(OUTDLL)x2d$(DLL)
   LIB.X2D = $(foreach d,$(DEP.X2D),$($d.LIB))
   LIB.X2D.SPECIAL = $(LIB.X2D.SYSTEM)

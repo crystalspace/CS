@@ -40,7 +40,7 @@ CFLAGS.JAVA += $(CFLAGS.I)$(JAVA_INC)
 LIB.CSJAVA.SYSTEM += $(LFLAGS.l)native $(LFLAGS.l)kaffevm \
   $(LFLAGS.L)$(JAVA_LIB) $(TCLTK) $(PTHREAD)
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   CSJAVA = $(OUTDLL)csjava$(DLL)
   LIB.CSJAVA = $(foreach d,$(DEP.CSJAVA),$($d.LIB))
   LIB.CSJAVA.LOCAL = $(LIB.CSJAVA.SYSTEM)

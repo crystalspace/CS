@@ -40,7 +40,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp $(NEXT.SOURCE_2D_PATHS)
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   NEXT2D = $(OUTDLL)next2d$(DLL)
   LIB.NEXT2D = $(foreach d,$(DEP.NEXT2D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(NEXT2D)

@@ -32,7 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 CFLAGS.GLIDX2D3 = -I$(X11_PATH)/include $(GLIDE3_PATH) -DGLIDE3
 LIB.GLIDX2D3.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 -lglide3x  
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   GLIDX2D3 = glidx2d3$(DLL)
   LIB.GLIDX2D3 = $(foreach d,$(DEP.GLIDX2D3),$($d.LIB))
   LIB.GLIDX2D3.SPECIAL = $(LIB.GLIDX2D3.SYSTEM)

@@ -32,7 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/driver/waveoutsd
 
 # The WaveOut sound driver
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   SNDWOS = $(OUTDLL)sndwaveout$(DLL)
   LIB.SNDWOS = $(foreach d,$(DEP.SNDWOS),$($d.LIB))
   LDFLAGS.WOS = $(LIBS.SOUND.SYSTEM)

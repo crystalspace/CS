@@ -32,7 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/driver/oss
 
 # The OSS sound driver
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   SNDOSS = $(OUTDLL)ossdrv$(DLL)
   LIB.SNDOSS = $(foreach d,$(DEP.SNDOSS),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDOSS)

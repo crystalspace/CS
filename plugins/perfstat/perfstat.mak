@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/perfstat
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   PERFSTAT = $(OUTDLL)perfstat$(DLL)
   LIB.PERFSTAT = $(foreach d,$(DEP.PERFSTAT),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(PERFSTAT)

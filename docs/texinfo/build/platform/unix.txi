@@ -80,12 +80,12 @@ First you need to configure the makefiles for your system. If you are
 using Linux, for example, you can do this as follows:
 
 @example
-make linux USE_SHARED_PLUGINS=yes
+make linux USE_PLUGINS=yes
 @end example
 
 This indicates that we are going to compile for Linux and use dynamic
 linking (preferable). If you don't want to use the dynamic libraries you
-can set @code{USE_SHARED_PLUGINS=no}. That will generate one big executable.
+can set @code{USE_PLUGINS=no}. That will generate one big executable.
 
 You can optionally invoke the @samp{depend} target to make sure that all
 dependencies are correct.  This is only important if you intend to make
@@ -103,20 +103,20 @@ Then you need to do the following to actually build the entire project:
 make -k all
 @end example
 
-If you selected @code{USE_SHARED_PLUGINS=yes} then this will generate an
-executable and drivers (extension @file{*.so} on Linux and most Unix
-platforms) for the software renderer, a 2D driver, and some network drivers.
-If you selected @code{USE_SHARED_PLUGINS=no} then only the executable is
-generated and the drivers are contained in that executable.
+If you selected @code{USE_PLUGINS=yes} then this will generate an executable
+and drivers (extension @file{*.so} on Linux and most Unix platforms) for the
+software renderer, a 2D driver, and some network drivers.  If you selected
+@code{USE_PLUGINS=no} then only the executable is generated and the drivers are
+contained in that executable.
 
-If you selected @code{USE_SHARED_PLUGINS=yes} then you may need to register
-the drivers with the SCF system.  This generally only needs to be done once.
-The registration information is maintained in the file @file{scf.cfg}.
-However, typically this file is already up-to-date, so usually you can skip
-this step altogether. Only perform this step if the system is unable to
-locate the drivers or if you are actively developing a driver and changing
-registration information. The program to register plug-ins is called scfreg,
-and it was also compiled by @samp{make -k all}. To run it, type:
+If you selected @code{USE_PLUGINS=yes} then you may need to register the
+drivers with the SCF system.  This generally only needs to be done once.  The
+registration information is maintained in the file @file{scf.cfg}.  However,
+typically this file is already up-to-date, so usually you can skip this step
+altogether.  Only perform this step if the system is unable to locate the
+drivers or if you are actively developing a driver and changing registration
+information.  The program to register plug-ins is called scfreg, and it was
+also compiled by @samp{make -k all}.  To run it, type:
 
 @example
 ./scfreg *.so
@@ -125,7 +125,7 @@ and it was also compiled by @samp{make -k all}. To run it, type:
 If all is well this should register all drivers so that Crystal Space will be
 able to load them dynamically.  If your platform uses a file extension other
 than @file{*.so} for plug-in modules, then alter the command appropriately.
-This step is not needed when @code{USE_SHARED_PLUGINS=no} is specified.
+This step is not needed when @code{USE_PLUGINS=no} is specified.
 
 Now you can run the executable @file{walktest}.
 

@@ -52,7 +52,7 @@ else
   endif
 endif
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   GL3D = $(OUTDLL)gl3d$(DLL)
   LIB.GL3D = $(foreach d,$(DEP.GL3D),$($d.LIB))
   LIB.GL3D.SPECIAL = $(LIB.GL3D.LOCAL)

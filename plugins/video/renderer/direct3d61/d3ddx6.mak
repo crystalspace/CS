@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   D3DDX6 = $(OUTDLL)d3ddx61$(DLL)
   LIB.D3DDX6 = $(foreach d,$(DEP.D3DDX6),$($d.LIB))
   LIB.D3DDX6.SPECIAL = $(LIB.D3DDX6.LOCAL)

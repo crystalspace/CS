@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 CFLAGS.GLBE2D += -I/boot/home/develop/headers/be/opengl
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   GLBE2D = $(OUTDLL)glbe2d$(DLL)
   LIB.GLBE2D = $(foreach d,$(DEP.GLBE2D),$($d.LIB))
   LIBS.GLBE2D = -lGL

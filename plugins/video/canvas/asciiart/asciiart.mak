@@ -38,7 +38,7 @@ ifdef X11_PATH
 endif
 
 # The 2D Ascii Art driver
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   ASCIIART = $(OUTDLL)asciiart$(DLL)
   LIB.ASCIIART = $(foreach d,$(DEP.ASCIIART),$($d.LIB))
   LIB.ASCIIART.SPECIAL = $(LIB.ASCIIART.SYSTEM)

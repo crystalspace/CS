@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/simpcon
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   SIMPCON = $(OUTDLL)simpcon$(DLL)
   LIB.SIMPCON = $(foreach d,$(DEP.SIMPCON),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SIMPCON)

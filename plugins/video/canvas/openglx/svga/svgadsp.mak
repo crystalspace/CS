@@ -32,7 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/canvas/openglx/svga
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   OGLSVGA = $(OUTDLL)oglsvga$(DLL)
   LIB.OGLSVGA = $(foreach d,$(DEP.OGLSVGA),$($d.LIB))
 else

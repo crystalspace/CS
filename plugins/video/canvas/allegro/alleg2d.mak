@@ -33,7 +33,7 @@ ifeq ($(MAKESECTION),postdefines)
 LIB.ALLEG2D.SYSTEM+=`allegro-config --libs release`
 
 # The Allegro 2D driver
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   ALLEG2D = $(OUTDLL)alleg2d$(DLL)
   LIB.ALLEG2D = $(foreach d,$(DEP.ALLEG2D),$($d.LIB))
   LIB.ALLEG2D.SPECIAL += $(LIB.ALLEG2D.SYSTEM)

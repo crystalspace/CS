@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 # We need our own bison.simple file
 export BISON_SIMPLE = support/gnu/bison.sim
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
 # STDLDR = $(OUTDLL)stdldr$(DLL)
   STDLDR = testldr$(EXE)
   LIB.STDLDR = $(foreach d,$(DEP.STDLDR),$($d.LIB))

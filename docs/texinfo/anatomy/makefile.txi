@@ -58,7 +58,7 @@ sample of @file{config.mak} for Linux:
 TARGET = linux
 TARGET_MAKEFILE = libs/cssys/unix/linux.mak
 MODE = debug
-USE_SHARED_PLUGINS = yes
+USE_PLUGINS = yes
 PROC = INTEL
 CXX = gcc
 CFLAGS.CONFIG += -mpentium -march=i586
@@ -70,12 +70,13 @@ X11_PATH = /usr/X11R6
 As you can see, the first statement defines the @samp{TARGET} platform and the
 second defines the system-dependend submakefile.  The @samp{MODE} variable
 defines the default build mode (debug, profile or optimize).
-@samp{USE_SHARED_PLUGINS} tells whenever we will or won't use dynamic-linked
-libraries (on platforms that do not support dynamic linking system-dependent
-submakefile usually do @samp{override USE_SHARED_PLUGINS=no}).  The following
-statements defines several minor host platform and operating system
-characteristics such as processor type, C++ compiler, X-windows include path,
-and several optimization switches that are supported by compiler.
+@samp{USE_PLUGINS} tells whenever we will or will not use dynamic-linked
+libraries.  (On platforms that do not support dynamic linking, system-dependent
+submakefile often automatically perform @samp{override USE_PLUGINS=no} on your
+behalf.)  The following statements defines several minor host platform and
+operating system characteristics such as processor type, C++ compiler,
+X-windows include path, and several optimization switches that are supported by
+compiler.
 
 The system submakefile defines everything that is host platform/compiler
 dependent---the system-dependent libraries (for example, some Unix platforms

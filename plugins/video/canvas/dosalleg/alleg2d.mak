@@ -31,7 +31,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # The Allegro 2D DOS driver
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   ALLEG2D=$(OUTDLL)alg2d$(DLL)
   DEP.ALLEG2D=
   TO_INSTALL.DYNAMIC_LIBS+=$(ALLEG2D)

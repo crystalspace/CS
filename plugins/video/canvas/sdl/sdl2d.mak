@@ -33,7 +33,7 @@ ifeq ($(MAKESECTION),postdefines)
 CFLAGS.SDL2D += `sdl-config --cflags`
 LIB.SDL2D.SYSTEM += `sdl-config --libs` -ldl
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   SDL2D = $(OUTDLL)sdl2d$(DLL)
   LIB.SDL2D = $(foreach d,$(DEP.SDL2D),$($d.LIB))
   LIB.SDL2D.SPECIAL = $(LIB.SDL2D.SYSTEM)

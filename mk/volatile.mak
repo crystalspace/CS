@@ -16,7 +16,7 @@ define VOLATILE_H.SUFFIX
   echo $"#endif // __CS_VOLATILE_H__$">>volatile.tmp
 endef
 
-ifeq ($(USE_SHARED_PLUGINS),no)
+ifeq ($(USE_PLUGINS),no)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_STATIC_LINKED$">>volatile.tmp
 endif
 ifeq ($(DO_SOUND),yes)

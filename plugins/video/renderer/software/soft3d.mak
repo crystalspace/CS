@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/renderer/software plugins/video/renderer/common
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   SOFT3D = $(OUTDLL)soft3d$(DLL)
   LIB.SOFT3D = $(foreach d,$(DEP.SOFT3D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SOFT3D)

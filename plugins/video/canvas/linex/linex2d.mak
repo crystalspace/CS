@@ -39,7 +39,7 @@ CFLAGS.LINEX2D += -I$(X11_PATH)/include
 LIB.LINEX2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 
 # The 2D Xlib driver
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   LINEX2D = $(OUTDLL)linex2d$(DLL)
   LIB.LINEX2D = $(foreach d,$(DEP.LINEX2D),$($d.LIB))
   LIB.LINEX2D.SPECIAL = $(LIB.LINEX2D.SYSTEM)

@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/canvas/dosraw
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   RAW2D = $(OUTDLL)dosraw$(DLL)
   LIB.RAW2D = $(foreach d,$(DEP.RAW2D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(RAW2D)

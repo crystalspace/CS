@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 LIB.SVGA2D.SYSTEM += -lvga -lvgagl
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   SVGA2D = $(OUTDLL)svga2d$(DLL)
   LIB.SVGA2D = $(foreach d,$(DEP.SVGA2D),$($d.LIB))
   LIB.SVGA2D.SPECIAL += $(LIB.SVGA2D.SYSTEM)

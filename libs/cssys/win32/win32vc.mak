@@ -149,7 +149,7 @@ L^=$(filter %$(LIB_SUFFIX),$+)
 
 # How to bind resources to a DLL or executable
 DO.BIND.RES = $(RC) $(RCFLAGS) $(subst /,\,$(filter %.res,$^)) $@
-ifeq ($(USE_SHARED_PLUGINS),no)
+ifeq ($(USE_PLUGINS),no)
 DO.LINK.CONSOLE.EXE+=$(CR)$(DO.BIND.RES)
 DO.LINK.EXE+=$(CR)$(DO.BIND.RES)
 endif

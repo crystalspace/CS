@@ -52,7 +52,7 @@ OBJ.WORM = $(addprefix $(OUT),$(notdir $(SRC.WORM:.cpp=$O)))
 DEP.WORM = $(DEP.SCFTUTOR)
 LIB.WORM = $(LIB.SCFTUTOR)
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   DOG.DLL  = $(OUTDLL)Dog$(DLL)
   WORM.DLL = $(OUTDLL)Worm$(DLL)
   #TO_INSTALL.DYNAMIC_LIBS += $(DOG.DLL) $(WORM.DLL)

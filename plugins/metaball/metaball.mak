@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/metaball
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   METABALL = $(OUTDLL)metaball$(DLL)
   LIB.METABALL = $(foreach d,$(DEP.METABALL),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(METABALL)

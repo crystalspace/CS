@@ -56,7 +56,7 @@ LIB_PREFIX=lib
 # Extra libraries needed on this system.
 LIBS.EXE = -lm
 LIBS.SORT = -lm
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
 LIBS.EXE += -ldl
 LIBS.SORT += -ldl
 endif
@@ -113,7 +113,7 @@ NASMFLAGS.SYSTEM=-f coff -DEXTERNC_UNDERSCORE
 SRC.SYS_CSSYS = libs/cssys/general/timing.cpp libs/cssys/djgpp/djgpp.cpp \
   libs/cssys/djgpp/printf.cpp libs/cssys/general/getopt.cpp \
   libs/cssys/djgpp/djmousys.s libs/cssys/djgpp/djkeysys.s
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
 SRC.SYS_CSSYS += libs/cssys/djgpp/loadlib.cpp libs/cssys/general/findlib.cpp
 endif
 

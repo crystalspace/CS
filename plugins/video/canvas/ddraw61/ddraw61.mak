@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/canvas/ddraw61 plugins/video/canvas/common
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   DDRAW61 = $(OUTDLL)ddraw61$(DLL)
   LIB.DDRAW61 = $(foreach d,$(DEP.DDRAW61),$($d.LIB))
   LIB.DDRAW61.SPECIAL = $(LFLAGS.l)ddraw $(LFLAGS.l)dxguid

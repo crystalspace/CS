@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/renderer/inf
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   INF3D = $(OUTDLL)inf3d$(DLL)
   LIB.INF3D = $(foreach d,$(DEP.INF3D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(INF3D)

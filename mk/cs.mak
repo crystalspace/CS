@@ -39,7 +39,7 @@ ARFLAGS.@=$@
 # Object file extension
 O=.o
 
-ifeq ($(USE_SHARED_PLUGINS),no)
+ifeq ($(USE_PLUGINS),no)
   override MAKE_DLL=no
 endif
 

@@ -48,8 +48,8 @@ PLUGINS.DYNAMIC += motion
 #-----------------------------------------------------------------------------
 
 # Should we build drivers/plugins as loadable modules?
-ifndef USE_SHARED_PLUGINS
-  USE_SHARED_PLUGINS=yes
+ifndef USE_PLUGINS
+  USE_PLUGINS=yes
 endif
 
 # Should we build libraries as shared/dynamic libraries?

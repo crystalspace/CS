@@ -38,7 +38,7 @@ ifeq ($(OS),WIN32)
   endif
 endif
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   SNDSOFT = $(OUTDLL)sndsoft$(DLL)
   LIB.SNDSOFT = $(foreach d,$(DEP.SNDSOFT),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDSOFT)

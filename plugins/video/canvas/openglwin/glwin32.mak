@@ -37,7 +37,7 @@ else
   LIB.GLWIN32.SYSTEM = $(OPENGL.LIBS.DEFINED)
 endif
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   GLWIN32 = $(OUTDLL)glwin32$(DLL)
   LIB.GLWIN32 = $(foreach d,$(DEP.GLWIN32),$($d.LIB))
   LIB.GLWIN32.SPECIAL = $(LIB.GLWIN32.SYSTEM)

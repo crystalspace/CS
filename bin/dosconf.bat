@@ -91,7 +91,7 @@
   if not exist conftest.o goto nodxe2gen
 
   del conftest.o >nul
-  echo $$$ O.K., setting USE_SHARED_PLUGINS to "yes"
+  echo $$$ O.K., setting USE_PLUGINS to "yes"
   set SH=yes
 
     echo ### Checking if you have dynamic version of Zlib ...
@@ -125,7 +125,7 @@
   :nojpeg_i
 
 :nodxe2gen
-  echo USE_SHARED_PLUGINS = %SH%>>config.tmp
+  echo USE_PLUGINS = %SH%>>config.tmp
   del conftest.* >nul
 
   rem Under windoze we do a 2-sec pause, otherwise it will tell us

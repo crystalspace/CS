@@ -32,7 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/canvas/be
 
 # The 2D Belib driver
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   BE2D = $(OUTDLL)be2d$(DLL)
   LIB.BE2D = $(foreach d,$(DEP.BE2D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(BE2D)

@@ -37,7 +37,7 @@ endif
 
 LIB.MGL2D.SYSTEM += -lgm -lmgl -lpm
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   MGL2D = $(OUTDLL)mgl2d$(DLL)
   LIB.MGL2D = $(foreach d,$(DEP.MGL2D),$($d.LIB))
   LIB.MGL2D.SPECIAL = $(LIB.MGL2D.SYSTEM)

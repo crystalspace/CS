@@ -32,7 +32,7 @@ ifeq ($(NEED_SOCKET_LIB),yes)
   LIB.SOCKET.LOCAL = $(LFLAGS.l)socket
 endif
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   SOCKET = $(OUTDLL)cssocket$(DLL)
   LIB.SOCKET = $(foreach d,$(DEP.SOCKET),$($d.LIB))
   LIB.SOCKET.SPECIAL = $(LIB.SOCKET.LOCAL) $(LIB.SOCKET.SYSTEM)

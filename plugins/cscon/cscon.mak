@@ -24,7 +24,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/cscon
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   CSCON = $(OUTDLL)cscon$(DLL)
   LIB.CSCON = $(foreach d,$(DEP.CSCON),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSCON)

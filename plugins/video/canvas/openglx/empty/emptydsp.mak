@@ -30,7 +30,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   OGLEMPTY = $(OUTDLL)oglempty$(DLL)
   LIB.OGLEMPTY = $(foreach d,$(DEP.OGLEMPTY),$($d.LIB))
   DEP.OGLEMPTY = $(CSUTIL.LIB) $(CSSYS.LIB)

@@ -58,7 +58,7 @@ define PSEUDOHELP
 endef
 define SYSMODIFIERSHELP
   echo $"+++ Modifiers +++$"
-  echo $"  USE_SHARED_PLUGINS=yes$|no$"
+  echo $"  USE_PLUGINS=yes$|no$"
   echo $"      Build drivers/plugins as dynamic/static modules$"
   echo $"  MODE=optimize$|debug$|profile$"
   echo $"      Select one of three available compilation modes$"
@@ -107,7 +107,7 @@ platforms:
 
 showconfig:
 	@echo $"Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
-	@echo $"  USE_SHARED_PLUGINS=$(USE_SHARED_PLUGINS)$"
+	@echo $"  USE_PLUGINS=$(USE_PLUGINS)$"
 	@echo $"  MODE=$(MODE)$"
 	@$(SYSMODIFIERS)
 	@echo $(SEPARATOR)
@@ -148,7 +148,7 @@ banner:
 showplatforms:
 	@$(SYSHELP)
 	@$(SYSMODIFIERSHELP)
-	@echo $"  Example: make linux USE_SHARED_PLUGINS=yes MODE=debug$"
+	@echo $"  Example: make linux USE_PLUGINS=yes MODE=debug$"
 	@echo $(SEPARATOR)
 
 # Prepare for specific platform.
@@ -176,7 +176,7 @@ configbanner:
 
 config.tmp:
 	@echo MODE = $(MODE)>>config.tmp
-	@echo USE_SHARED_PLUGINS = $(USE_SHARED_PLUGINS)>>config.tmp
+	@echo USE_PLUGINS = $(USE_PLUGINS)>>config.tmp
 	@$(SYSCONFIG)
 	$(subst DEST,config.mak,$(UPD))
 

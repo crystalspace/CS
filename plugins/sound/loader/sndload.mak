@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/sound/loader
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   SNDLOAD = $(OUTDLL)sndload$(DLL)
   LIB.SNDLOAD = $(foreach d,$(DEP.SNDLOAD),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDLOAD)

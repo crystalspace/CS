@@ -26,7 +26,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/engine
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   ENGINE = $(OUTDLL)enginep$(DLL)
   LIB.ENGINE = $(foreach d,$(DEP.ENGINE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(ENGINE)

@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/filesys/vfs
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   VFS = $(OUTDLL)vfs$(DLL)
   LIB.VFS = $(foreach d,$(DEP.VFS),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(VFS)

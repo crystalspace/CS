@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+13-Nov-2000
+	- Eric Sunshine corrected the long standing misnomer where USE_PLUGINS
+	    was incorrectly specified as USE_SHARED_PLUGINS.  Updated all
+	    makefiles, scripts, and documentation to reflect this change.
 12-Nov-2000
 	- Eric Sunshine enabled automatic DSP generation for 3ds2lev.
 	- Eric Sunshine removed the obsolete and unused CS/bin/build.pl script.

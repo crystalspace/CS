@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/renderer/null
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   NULL3D = $(OUTDLL)null3d$(DLL)
   LIB.NULL3D = $(foreach d,$(DEP.NULL3D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(NULL3D)

@@ -38,7 +38,7 @@ DIVE2D.RES = $(OUTOS)libDIVE.res
 CSOS2.LIB = $(OUT)$(LIB_PREFIX)csos2$(LIB)
 
 # The 2D OS/2 DIVE driver
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   CSDIVE = csdive$(DLL)
   LIB.CSDIVE = $(foreach d,$(DEP.CSDIVE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSDIVE)

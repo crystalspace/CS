@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/sound/renderer/a3d
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   SNDA3D = $(OUTDLL)snda3d$(DLL)
   LIB.SNDA3D = $(foreach d,$(DEP.SNDA3D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(SNDA3D)

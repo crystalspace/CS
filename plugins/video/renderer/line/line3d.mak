@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/renderer/line
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   LINE3D = $(OUTDLL)line3d$(DLL)
   LIB.LINE3D = $(foreach d,$(DEP.LINE3D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(LINE3D)

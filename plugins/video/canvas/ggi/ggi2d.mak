@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 LIB.GGI2D.SYSTEM = -lggi
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   GGI2D = $(OUTDLL)ggi2d$(DLL)
   LIB.GGI2D = $(foreach d,$(DEP.GGI2D),$($d.LIB))
   LIB.GGI2D.SPECIAL += $(LIB.GGI2D.SYSTEM)

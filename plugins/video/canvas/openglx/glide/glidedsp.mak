@@ -33,7 +33,7 @@ ifeq ($(MAKESECTION),postdefines)
 CFLAGS.OGLGLIDE += -I/usr/include/glide -I/usr/local/glide/include
 LIB.OGLGLIDE.SYSTEM += -lglide2x
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   OGLGLIDE = $(OUTDLL)oglglide$(DLL)
   LIB.OGLGLIDE = $(foreach d,$(DEP.OGLGLIDE),$($d.LIB))
   LIB.OGLGLIDE.SPECIAL = $(LIB.OGLGLIDE.SYSTEM)

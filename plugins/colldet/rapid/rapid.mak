@@ -24,7 +24,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/colldet/rapid
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   RAPID = $(OUTDLL)rapid$(DLL)
   LIB.RAPID = $(foreach d,$(DEP.RAPID),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(RAPID)

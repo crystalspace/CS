@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/motion
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   MOTION = $(OUTDLL)motion$(DLL)
   LIB.MOTION = $(foreach d,$(DEP.MOTION),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(MOTION)

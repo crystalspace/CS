@@ -13,7 +13,7 @@ ifneq ($(LIBRARY_SUBMAKEFILES),)
 endif
 
 ifeq ($(PLUGINS_SUBMAKEFILES),)
-  ifeq ($(USE_SHARED_PLUGINS),yes)
+  ifeq ($(USE_PLUGINS),yes)
     PLUGINS += $(PLUGINS.DYNAMIC)
   endif
   PLUGINS_SUBMAKEFILES=\

@@ -23,7 +23,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/font/server/fontplex
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   FONTPLEX = $(OUTDLL)fontplex$(DLL)
   LIB.FONTPLEX = $(foreach d,$(DEP.FONTPLEX),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(FONTPLEX)

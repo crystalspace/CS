@@ -32,7 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 CFLAGS.GLIDEBE2D += $(GLIDE2_PATH)
 LIB.GLIDEBE2D.SYSTEM += /boot/develop/lib/x86/glide2x.so
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   GLIDEBE2D = $(OUTDLL)glidebe2d$(DLL)
   LIB.GLIDEBE2D = $(foreach d,$(DEP.GLIDEBE2D),$($d.LIB))
   LIB.GLIDEBE2D.SPECIAL = $(LIB.GLIDEBE2D.SYSTEM)

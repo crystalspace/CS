@@ -24,7 +24,7 @@ ifeq ($(MAKESECTION),postdefines)
 LIB.EXTERNAL.FREEFONT = -lttf
 CFLAGS.FREEFONT = -I/usr/local/include/freetype
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   FREEFONT = $(OUTDLL)freefont$(DLL)
   LIB.FREEFONT = $(foreach d,$(DEP.FREEFONT),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(FREEFONT)

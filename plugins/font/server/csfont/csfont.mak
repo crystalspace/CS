@@ -23,7 +23,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/font/server/csfont
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   CSFONT = $(OUTDLL)csfont$(DLL)
   LIB.CSFONT = $(foreach d,$(DEP.CSFONT),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSFONT)
