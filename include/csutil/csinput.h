@@ -54,7 +54,7 @@ private:
     csInputDriver* Parent;
     SCF_DECLARE_IBASE;
     FocusListener() { SCF_CONSTRUCT_IBASE(0); }
-    virtual bool Initialize(iObjectRegistry*) {}
+    virtual bool Initialize(iObjectRegistry*) { return true;}
     virtual bool HandleEvent(iEvent&);
   };
   friend struct FocusListener;

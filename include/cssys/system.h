@@ -344,7 +344,7 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSystemDriver);
-    virtual bool Initialize (iObjectRegistry*) {}
+    virtual bool Initialize (iObjectRegistry*) { return true; }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 };
