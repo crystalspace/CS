@@ -128,7 +128,7 @@ class csMetaGen : public iMeshObjectFactory
 
 //------------- MetaGen
   int vertices_tesselated;
-  EnvMappingModes env_mapping;
+  iMetaGen::EnvMappingModes env_mapping;
   float env_map_mult;
   char frame;
   float splinter_size;

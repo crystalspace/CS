@@ -71,7 +71,7 @@ csMetaGen::csMetaGen (iBase* parent)
   current_vertices = 0;
   current_texels = 0;
   vertices_tesselated = 0;
-  env_mapping = TRUE_ENV_MAP;
+  env_mapping = iMetaGen::TRUE_ENV_MAP;
   env_map_mult = 1.0;
   frame = 0;
   current_lod = 1;
@@ -128,10 +128,10 @@ void csMetaGen::FillArcSineTable()
     float c = 1.0 * i / asin_table_res;
     switch(env_mapping)
     {
-      case TRUE_ENV_MAP:
+      case iMetaGen::TRUE_ENV_MAP:
         asin_table[j] = env_map_mult * (0.5+asin(c)/M_PI);
         break;
-      case FAKE_ENV_MAP:
+      case iMetaGen::FAKE_ENV_MAP:
         asin_table[j] = 0.5 * env_map_mult * (1 + c);
         break;
     }
@@ -168,7 +168,7 @@ bool csMetaGen::Initialize ()
 
 void csMetaGen::SetQualityEnvironmentMapping (bool toggle)
 {
-  env_mapping = toggle ? TRUE_ENV_MAP : FAKE_ENV_MAP;
+  env_mapping = toggle ? iMetaGen::TRUE_ENV_MAP : iMetaGen::FAKE_ENV_MAP;
   if (asin_table)
 	FillArcSineTable ();
 }
