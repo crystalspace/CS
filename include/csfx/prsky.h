@@ -32,6 +32,8 @@ class csProcSky;
 class csProcSkyTexture : public csProcTexture {
   /// the sky this is a part of
   csProcSky *sky;
+  /// next procskytexture in this sky
+  csProcSkyTexture *next;
 
   /// texture orig,udir,vdir (in world coordinates as used in the sky)
   csVector3 txtorig, txtu, txtv;
@@ -45,6 +47,9 @@ public:
   csProcSkyTexture(csProcSky *par);
   ///
   virtual ~csProcSkyTexture();
+
+  void SetNextSky(csProcSkyTexture *n) {next = n;}
+  csProcSkyTexture *GetNextSky() const {return next;}
 
   virtual bool PrepareAnim ();
 
@@ -97,6 +102,9 @@ public:
  * can be rendered to.
 */
 class csProcSky {
+  /// the proc sky textures of this sky
+  csProcSkyTexture *firstsky;
+
   /// sphere radius
   float radius;
   /// sphere center
@@ -189,6 +197,10 @@ public:
   void SetAnimated(bool anim=true, cs_time current_time=0);
   /// See if the prsky is animated
   bool GetAnimated() const {return animated;}
+  /// get first sky texture with this sky
+  csProcSkyTexture *GetFirstSky() const {return firstsky;}
+  /// set first sky texture with this sky
+  void SetFirstSky(csProcSkyTexture *s) {firstsky = s;}
 };
 
 #endif // __PROCSKYTEX_H__
