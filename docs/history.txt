@@ -14,8 +14,16 @@ Short-term cleanups that need to be done:
 
 29-Mar-2000
 	- Fixed a bug in yesterdays bugfix on CompressShadowFrustrums.
-	- Fixed a bug which caused sectors using STATBSP to work wrong
-	  when the sector has less than 150 polygons.
+	- Fixed a bug which caused sectors using STATBSP to work wrong when
+	  the sector has less than 150 polygons.
+	- Eric Sunshine reverted Norman Kramer's change to the image loaders
+	  since it crashed the OpenStep port of CS.  Neither Jorrit, Andrew,
+	  nor Eric could understand the reasoning behind the change as stated
+	  in the log message.  Furthermore, it broke the rule about not
+	  relying upon global objects with constructors in plug-in modules.
+	  There is no guarantee that such constructors will be invoked on all
+	  platforms which support CS, thus they should be avoided.
+	- Eric Sunshine worked around several compilation problems on OpenStep.
 28-Mar-2000
 	- Added csColor+= operator to add colors.
 	- Fixed bug in loader of new mixmode parameter (for sprites).
