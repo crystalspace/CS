@@ -227,19 +227,48 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR
                          : GL_NEAREST_MIPMAP_NEAREST);
 
+  if (R3D->ext.CS_GL_EXT_texture_filter_anisotropic)
+  {
+    glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+      R3D->txtmgr->texture_filter_anisotropy);
+  }
+
   if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
   {
   }
   else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
   {
-    csGLTexture *togl = txt_mm->vTex[0];
-    gluBuild2DMipmaps (GL_TEXTURE_2D,
-                      togl->get_components (),
-                      togl->get_width (),
-                      togl->get_height (),
-                      txt_mm->SourceFormat (),
-                      txt_mm->SourceType (),
-                      togl->image_data );
+    int i;
+    for (i = 0; i < txt_mm->vTex.Length(); i++)
+    {
+      csGLTexture *togl = txt_mm->vTex[i];
+      if (togl->compressed == GL_FALSE)
+      {
+	glTexImage2D (
+	  GL_TEXTURE_2D, i, 
+	  txt_mm->TargetFormat(),
+	  togl->get_width(), 
+	  togl->get_height(),
+	  0, 
+	  txt_mm->SourceFormat(), 
+	  txt_mm->SourceType(), 
+	  togl->image_data);
+	//g3d->CheckGLError ("glTexImage2D()");
+      }
+      else
+      {
+	R3D->ext.glCompressedTexImage2DARB (
+	  GL_TEXTURE_2D, 
+	  i, 
+	  (GLenum)togl->internalFormat,
+	  togl->get_width(), 
+	  togl->get_height(), 
+	  0,
+	  togl->size, 
+	  togl->image_data);
+	//g3d->CheckGLError ("glCompressedTexImage2DARB()");
+      }
+    }
   }
   else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
   {

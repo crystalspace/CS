@@ -690,6 +690,9 @@ bool csGLRender3D::Open ()
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
+  textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias",
+    -0.5);
+
   // @@@ Should check what canvas to load
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
   object_reg->Register( G2D, "iGraphics2D");
@@ -1134,7 +1137,11 @@ bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
     statecache->Enable_GL_TEXTURE_2D (unit);
     if (bind)
       glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
-    glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, -2); //big hack
+    if (ext.CS_GL_EXT_texture_lod_bias)
+    {
+//      glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
+//	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); //big hack
+    }
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
     break;

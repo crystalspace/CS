@@ -130,6 +130,8 @@ private:
 
   csConfigAccess config;
 
+  float textureLodBias;
+
   /// Light standard variables
   csRef<iShaderVariable> shvar_light_0_pos;
   csRef<iShaderVariable> shvar_light_0_diffuse;

@@ -78,7 +78,6 @@ private:
   GLenum sourceFormat, targetFormat;
   GLenum sourceType; // what size does each fragment have? e.g. GL_UNSIGNED_BYTE
 
-
   /// 2D Canvas
   csRef<iGraphics2D> canvas;
   /// The transparent color
@@ -376,6 +375,14 @@ class csGLTextureManager : public iTextureManager
 public:
 
   int max_tex_size;
+  /// Sharpen mipmaps?
+  int sharpen_mipmaps;
+  /// downsample textures?
+  int texture_downsample;
+  /// texture filtering anisotropy
+  float texture_filter_anisotropy;
+  /// what bpp should textures have?
+  int texture_bits;
 
   static formatDescription glformats [];
 

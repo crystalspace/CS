@@ -31,6 +31,7 @@
 #include "csgfx/xorpat.h"
 #include "csutil/util.h"
 #include "csgfx/csimgvec.h"
+#include "csutil/array.h"
 
 #include "glextmanager.h"
 
@@ -372,9 +373,11 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh)
   {
     csGLTexture *real_tex = (csGLTexture*) cachedata;
 
+    mw = orig_width >> mipmap;
+    mh = orig_height >> mipmap;
     // real_tex size has to be multiple of 2
-    mw = real_tex->get_width() >> mipmap;
-    mh = real_tex->get_height() >> mipmap;
+    //mw = real_tex->get_width() >> mipmap;
+    //mh = real_tex->get_height() >> mipmap;
   }
   else
   if(images.IsValid() && (*images)[0].IsValid())
@@ -475,17 +478,33 @@ void csGLTextureHandle::AdjustSizePo2 ()
   int i;
   for(i = 0; i < images->Length(); i++)
   {
-    int newwidth  = (*images)[i]->GetWidth();
-    int newheight = (*images)[i]->GetHeight();
+    orig_width  = (*images)[i]->GetWidth();
+    orig_height = (*images)[i]->GetHeight();
 
-    if (!csIsPowerOf2(newwidth))
-      newwidth = csFindNearestPowerOf2 ((*images)[i]->GetWidth ()) / 2;
+    if (!csIsPowerOf2(orig_width))
+      orig_width = csFindNearestPowerOf2 ((*images)[i]->GetWidth ()) / 2;
 
     if (!csIsPowerOf2 (newheight))
-      newheight = csFindNearestPowerOf2 ((*images)[i]->GetHeight ()) / 2;
+      orig_height = csFindNearestPowerOf2 ((*images)[i]->GetHeight ()) / 2;
+
+    int newwidth  = orig_width;
+    int newheight = orig_height;
+
+    // downsample textures, if requested, but not 2D textures
+    if (!(flags & (CS_TEXTURE_2D)))
+    {
+      newwidth >>= txtmgr->texture_downsample;
+      newheight >>= txtmgr->texture_downsample;
+    }
+
+    // If necessary rescale if bigger than maximum texture size
+    if (newwidth > txtmgr->max_tex_size) newwidth = txtmgr->max_tex_size;
+    if (newheight > txtmgr->max_tex_size) newheight = txtmgr->max_tex_size;
 
     if (newwidth != (*images)[i]->GetWidth () || newheight != (*images)[i]->GetHeight ())
+    {
       (*images)[i]->Rescale (newwidth, newheight);
+    }
   }
 }
 
@@ -528,24 +547,39 @@ void csGLTextureHandle::CreateMipMaps()
 
   iImageVector* prevImages = images;
   csRef<iImageVector> thisImages =  new csImageVector(); 
+  csArray<int> nMipmaps;
 
   int w = (*prevImages)[0]->GetWidth ();
   int h = (*prevImages)[0]->GetHeight ();
-
+  int nTex = 0;
 
   for (i=0; i < prevImages->Length(); i++)
   {
       (*prevImages)[i]->IncRef();
+      nMipmaps.Push ((*prevImages)[i]->HasMipmaps());
   }
   
   while (w != 1 || h != 1)
   {
+    nTex++;
     for (i=0; i<prevImages->Length();i++)
     {
-      csRef<iImage> cimg = (*prevImages)[i]->MipMap (1, tc);
+      csRef<iImage> cimg;
+      if (nMipmaps[i] != 0)
+      {
+	cimg = (*images)[i]->MipMap (nTex, tc);
+	nMipmaps[i]--;
+      }
+      else
+      {
+        cimg = (*prevImages)[i]->MipMap (1, tc);
+      }
+      if (txtmgr->sharpen_mipmaps)
+      {
+	cimg = cimg->Sharpen (tc, txtmgr->sharpen_mipmaps);
+      }
       (*thisImages)[i] = cimg;
     }
-
 
     csGLTexture* ntex = NewTexture ((*thisImages)[0], true);
     ntex->d = thisImages->Length();
@@ -865,6 +899,16 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
 
 void csGLTextureManager::read_config (iConfigFile *config)
 {
+  sharpen_mipmaps = config->GetInt
+    ("Video.OpenGL.SharpenMipmaps", 0);
+  texture_downsample = config->GetInt
+    ("Video.OpenGL.TextureDownsample", 0);
+  texture_filter_anisotropy = config->GetFloat
+    ("Video.OpenGL.TextureFilterAnisotropy", 1.0);	
+  texture_bits = config->GetInt
+    ("Video.OpenGL.TextureBits", 0);
+  if (!texture_bits) texture_bits = pfmt.PixelBytes*8;
+
   csRef<iConfigIterator> it (config->Enumerate ("Video.OpenGL.TargetFormat"));
   while (it->Next ())
     AlterTargetFormat (it->GetKey (true)+1, it->GetStr ());
