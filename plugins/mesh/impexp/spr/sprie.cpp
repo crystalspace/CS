@@ -41,8 +41,8 @@ public:
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
   virtual const csModelConverterFormat *GetFormat( int idx ) const;
-  virtual iModelData *Load( uint8* Buffer, uint32 size );
-  virtual iDataBuffer *Save( iModelData*, const char *format );
+  virtual csPtr<iModelData> Load( uint8* Buffer, uint32 size );
+  virtual csPtr<iDataBuffer> Save( iModelData*, const char *format );
 
   struct Component : public iComponent
   {
@@ -102,9 +102,9 @@ const csModelConverterFormat *csModelConverterSPR::GetFormat (int idx) const
   return (idx == 0) ? &FormatInfo : NULL;
 }
 
-iModelData *csModelConverterSPR::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
+csPtr<iModelData> csModelConverterSPR::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
 {
-  return NULL;
+  return csPtr<iModelData> (NULL);
 }
 
 /*
@@ -123,17 +123,17 @@ iModelData *csModelConverterSPR::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
   Modified by Martin Geisse to work with the new converter interface.
 */
 
-iDataBuffer *csModelConverterSPR::Save (iModelData *Data, const char *Format)
+csPtr<iDataBuffer> csModelConverterSPR::Save (iModelData *Data, const char *Format)
 {
   if (strcasecmp (Format, "spr"))
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
 
   // only the first object is saved
   iModelDataObject *obj = CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject);
-  if (!obj) return NULL;
+  if (!obj) return csPtr<iDataBuffer> (NULL);
 
   csSpriteBuilderFile Builder;
   iDataBuffer *buf = Builder.Build (obj);
   obj->DecRef ();
-  return buf;
+  return csPtr<iDataBuffer> (buf);
 }

@@ -49,8 +49,8 @@ public:
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount () const;
   virtual const csModelConverterFormat *GetFormat (int idx) const;
-  virtual iModelData *Load (uint8* Buffer, uint32 Size);
-  virtual iDataBuffer *Save (iModelData*, const char *Format);
+  virtual csPtr<iModelData> Load (uint8* Buffer, uint32 Size);
+  virtual csPtr<iDataBuffer> Save (iModelData*, const char *Format);
 
   struct Component : public iComponent {
     SCF_DECLARE_EMBEDDED_IBASE (csModelConverterMultiplexer);
@@ -137,24 +137,24 @@ const csModelConverterFormat *csModelConverterMultiplexer::GetFormat (int idx) c
   return Formats.Get (idx);
 }
 
-iModelData *csModelConverterMultiplexer::Load (uint8* Buffer, uint32 Size)
+csPtr<iModelData> csModelConverterMultiplexer::Load (uint8* Buffer, uint32 Size)
 {
   int i;
   for (i=0; i<Converters.Length (); i++)
   {
     iModelData *mdl = Converters.Get(i)->Load (Buffer, Size);
-    if (mdl) return mdl;
+    if (mdl) return csPtr<iModelData> (mdl);
   }
-  return NULL;
+  return csPtr<iModelData> (NULL);
 }
 
-iDataBuffer *csModelConverterMultiplexer::Save (iModelData *mdl, const char *Format)
+csPtr<iDataBuffer> csModelConverterMultiplexer::Save (iModelData *mdl, const char *Format)
 {
   int i;
   for (i=0; i<Converters.Length (); i++)
   {
     iDataBuffer *dbuf = Converters.Get(i)->Save (mdl, Format);
-    if (dbuf) return dbuf;
+    if (dbuf) return csPtr<iDataBuffer> (dbuf);
   }
-  return NULL;
+  return csPtr<iDataBuffer> (NULL);
 }

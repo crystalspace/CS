@@ -55,10 +55,10 @@ struct iModelConverter : public iBase
   virtual const csModelConverterFormat *GetFormat (int idx) const = 0;
 
   /// Read a model file
-  virtual iModelData* Load (uint8* Buffer, uint32 Size) = 0;
+  virtual csPtr<iModelData> Load (uint8* Buffer, uint32 Size) = 0;
 
   /// Write data to a file
-  virtual iDataBuffer* Save (iModelData*, const char *Format) = 0;
+  virtual csPtr<iDataBuffer> Save (iModelData*, const char *Format) = 0;
 };
 
 #endif // __IMESH_MDLCONV_H__

@@ -45,8 +45,8 @@ public:
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
   virtual const csModelConverterFormat *GetFormat( int idx ) const;
-  virtual iModelData *Load( uint8* Buffer, uint32 size );
-  virtual iDataBuffer *Save( iModelData*, const char *format );
+  virtual csPtr<iModelData> Load( uint8* Buffer, uint32 size );
+  virtual csPtr<iDataBuffer> Save( iModelData*, const char *format );
 
   struct Component : public iComponent
   {
@@ -108,7 +108,7 @@ const csModelConverterFormat *csModelConverterOBJ::GetFormat (int idx) const
   return (idx == 0) ? &FormatInfo : NULL;
 }
 
-iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
+csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
 {
   // prepare input buffer
   csDataStream in (Buffer, Size, false);
@@ -232,11 +232,13 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
   backwards from the last stored vertex.
 */
 
-    else if (!strcasecmp (token, "F")) {
+    else if (!strcasecmp (token, "F"))
+    {
       iModelDataPolygon *poly = new csModelDataPolygon ();
       csDataStream Params (params, strlen (params), false);
 
-      while (!Params.Finished ()) {
+      while (!Params.Finished ())
+      {
 	char sep;
         int vidx = Params.ReadTextInt (), nidx = 0, tidx = 0;
         sep = Params.GetChar ();
@@ -257,9 +259,12 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
 	}
 
 	// look for EOF or errors
-	if (sep == EOF) {
+	if (sep == EOF)
+	{
 	  break;
-	} else if (!isspace (sep)) {
+	}
+	else if (!isspace (sep))
+	{
 	  // @@@ this is an error!
 	}
 
@@ -490,7 +495,7 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
       Object->DecRef ();
       Vertices->DecRef ();
       Scene->DecRef ();
-      return NULL;
+      return csPtr<iModelData> (NULL);
     }
   }
 
@@ -502,17 +507,17 @@ iModelData *csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
 
   Object->DecRef ();
   Vertices->DecRef ();
-  return Scene;
+  return csPtr<iModelData> (Scene);
 }
 
-iDataBuffer *csModelConverterOBJ::Save (iModelData *Data, const char *Format)
+csPtr<iDataBuffer> csModelConverterOBJ::Save (iModelData *Data, const char *Format)
 {
   if (strcasecmp (Format, "obj"))
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
 
   // only the first object is saved
   iModelDataObject *obj = CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject);
-  if (!obj) return NULL;
+  if (!obj) return csPtr<iDataBuffer> (NULL);
   iModelDataVertices *ver = obj->GetDefaultVertices ();
   int i;
 
@@ -557,5 +562,5 @@ iDataBuffer *csModelConverterOBJ::Save (iModelData *Data, const char *Format)
   }
 
   int Size = out.Length ();
-  return new csDataBuffer (out.Detach (), Size);
+  return csPtr<iDataBuffer> (new csDataBuffer (out.Detach (), Size));
 }

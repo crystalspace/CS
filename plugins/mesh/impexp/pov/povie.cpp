@@ -43,8 +43,8 @@ public:
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
   virtual const csModelConverterFormat *GetFormat( int idx ) const;
-  virtual iModelData *Load( uint8* Buffer, uint32 size );
-  virtual iDataBuffer *Save( iModelData*, const char *format );
+  virtual csPtr<iModelData> Load( uint8* Buffer, uint32 size );
+  virtual csPtr<iDataBuffer> Save( iModelData*, const char *format );
 
   struct Component : public iComponent
   {
@@ -119,9 +119,9 @@ static void WriteVertex (csString &out, iModelDataVertices *Vertices,
   out << s;
 }
 
-iModelData *csModelConverterPOV::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
+csPtr<iModelData> csModelConverterPOV::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
 {
-  return NULL;
+  return csPtr<iModelData> (NULL);
 }
 
 /*
@@ -189,10 +189,10 @@ iModelData *csModelConverterPOV::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
 
 */
 
-iDataBuffer *csModelConverterPOV::Save (iModelData *Data, const char *Format)
+csPtr<iDataBuffer> csModelConverterPOV::Save (iModelData *Data, const char *Format)
 {
   if (strcasecmp (Format, "pov"))
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
 
   csString out;
   out << "// This file was created by csModelConverterPOV from Crystal Space.\n";
@@ -278,5 +278,5 @@ iDataBuffer *csModelConverterPOV::Save (iModelData *Data, const char *Format)
 
   int Length = out.Length () + 1;
   char *FileData = out.Detach ();
-  return new csDataBuffer (FileData, Length);
+  return csPtr<iDataBuffer> (new csDataBuffer (FileData, Length));
 }

@@ -388,7 +388,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
   }
 }
 
-iModelData *csModelConverter3ds::Load( uint8* buffer, uint32 size )
+csPtr<iModelData> csModelConverter3ds::Load( uint8* buffer, uint32 size )
 {
   Lib3dsFile *p3dsFile;
   csModelData *pModelData;
@@ -396,7 +396,7 @@ iModelData *csModelConverter3ds::Load( uint8* buffer, uint32 size )
   /***  send the buffer in to be translated  ***/
   p3dsFile = LoadFileData( buffer, size );
   if( !p3dsFile )
-    return NULL; // kick out if there is a problem
+    return csPtr<iModelData> (NULL); // kick out if there is a problem
 
   // make a new instance of iModelData
   pModelData = new csModelData( );
@@ -494,7 +494,7 @@ Lib3dsMaterial *pCurMaterial;
 
     // now process that mesh
     if( !LoadMeshObjectData( pDataObject, pCurMesh, p3dsFile->materials) )
-      return NULL;
+      return csPtr<iModelData> (NULL);
 
     pDataObject->DecRef ();
 
@@ -507,12 +507,12 @@ Lib3dsMaterial *pCurMaterial;
   return SCF_QUERY_INTERFACE( pModelData, iModelData );
 }
 
-iDataBuffer *csModelConverter3ds::Save( iModelData* /*pMdl*/,
+csPtr<iDataBuffer> csModelConverter3ds::Save( iModelData* /*pMdl*/,
 	const char* /*formatName*/ )
 {
   // not yet supported
 
-  return NULL;
+  return csPtr<iDataBuffer> (NULL);
 }
 
 bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,

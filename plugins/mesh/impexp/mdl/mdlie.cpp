@@ -80,8 +80,8 @@ public:
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
   virtual const csModelConverterFormat *GetFormat( int idx ) const;
-  virtual iModelData *Load( uint8* Buffer, uint32 size );
-  virtual iDataBuffer *Save( iModelData*, const char *format );
+  virtual csPtr<iModelData> Load( uint8* Buffer, uint32 size );
+  virtual csPtr<iDataBuffer> Save( iModelData*, const char *format );
 
   struct Component : public iComponent
   {
@@ -217,7 +217,7 @@ static void ReadMDLHeader (csMDLHeader *hdr, csDataStream *in)
 #undef CS_MDL_READ_LONG
 #undef CS_MDL_READ_FLOAT
 
-iModelData *csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
+csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
 {
   // prepare input buffer
   csDataStream in (Buffer, Size, false);
@@ -226,7 +226,7 @@ iModelData *csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
 
   // check for the correct version
   if (!CheckMDLVersion (in))
-    return NULL;
+    return csPtr<iModelData> (NULL);
 
   // build the object framework
   iModelData *Scene = new csModelData ();
@@ -253,7 +253,7 @@ iModelData *csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
     } else {
       Scene->DecRef ();
       Object->DecRef ();
-      return NULL;
+      return csPtr<iModelData> (NULL);
     }
   }
 
@@ -373,13 +373,13 @@ iModelData *csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
   delete[] SeamTexels;
   Object->SetDefaultVertices (DefaultVertices);
   Object->DecRef ();
-  return Scene;
+  return csPtr<iModelData> (Scene);
 }
 
-iDataBuffer *csModelConverterMDL::Save (iModelData *, const char *Format)
+csPtr<iDataBuffer> csModelConverterMDL::Save (iModelData *, const char *Format)
 {
   if (strcasecmp (Format, "mdl"))
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
 
-  return NULL;
+  return csPtr<iDataBuffer> (NULL);
 }

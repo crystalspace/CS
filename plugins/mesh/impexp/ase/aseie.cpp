@@ -74,8 +74,8 @@ public:
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
   virtual const csModelConverterFormat *GetFormat( int idx ) const;
-  virtual iModelData *Load( uint8* Buffer, uint32 size );
-  virtual iDataBuffer *Save( iModelData*, const char *format );
+  virtual csPtr<iModelData> Load( uint8* Buffer, uint32 size );
+  virtual csPtr<iDataBuffer> Save( iModelData*, const char *format );
 
   struct Component : public iComponent
   {
@@ -488,7 +488,7 @@ bool csASEInterpreter_MESH_TVERTLIST (csModelConverterASE *conv, csDataStream &i
   return false;
 }
 
-iModelData *csModelConverterASE::Load (uint8 *Buffer, uint32 Size)
+csPtr<iModelData> csModelConverterASE::Load (uint8 *Buffer, uint32 Size)
 {
   csDataStream in (Buffer, Size, false);
   interp = &csASEInterpreter_MAIN;
@@ -497,7 +497,8 @@ iModelData *csModelConverterASE::Load (uint8 *Buffer, uint32 Size)
   Vertices = NULL;
   CurrentPolygon = NULL;
 
-  while (!in.Finished ()) {
+  while (!in.Finished ())
+  {
     // read a line of text
     char line [2048];
     int linelen = 0;
@@ -526,11 +527,11 @@ iModelData *csModelConverterASE::Load (uint8 *Buffer, uint32 Size)
       if (Vertices) Vertices->DecRef ();
       Vertices = NULL;
       Polygons.DeleteAll ();
-      return NULL;
+      return csPtr<iModelData> (NULL);
     }
   }
 
-  return Scene;
+  return csPtr<iModelData> (Scene);
 }
 
 // A simple triangle, consisting of three vertex indices
@@ -574,10 +575,10 @@ CS_DECLARE_TYPED_VECTOR (csTriangleVector, csTriangle);
 CS_DECLARE_TYPED_VECTOR (csExtTriangleVector, csExtTriangle);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
 
-iDataBuffer *csModelConverterASE::Save (iModelData *Data, const char *Format)
+csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Format)
 {
   if (strcasecmp (Format, "ase"))
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
 
 /*
   Purpose:
@@ -599,7 +600,7 @@ iDataBuffer *csModelConverterASE::Save (iModelData *Data, const char *Format)
 
   // only the first object is saved
   iModelDataObject *obj = CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject);
-  if (!obj) return NULL;
+  if (!obj) return csPtr<iDataBuffer> (NULL);
   csString out;
   iModelDataVertices *ver = obj->GetDefaultVertices ();
 
@@ -615,7 +616,8 @@ iDataBuffer *csModelConverterASE::Save (iModelData *Data, const char *Format)
   csTriangleVector tri;
 
   csModelDataPolygonIterator it (obj->QueryObject ());
-  while (!it.IsFinished ()) {
+  while (!it.IsFinished ())
+  {
     iModelDataPolygon *poly = it.Get ();
     int v1 = VertexTexelSet.Add (poly->GetVertex (0), -1, -1, poly->GetTexel (0));
     int vprev = VertexTexelSet.Add (poly->GetVertex (1), -1, -1, poly->GetTexel (1));
@@ -753,5 +755,5 @@ iDataBuffer *csModelConverterASE::Save (iModelData *Data, const char *Format)
   out << "}\n";
 
   int Size = out.Length ();
-  return new csDataBuffer (out.Detach (), Size);
+  return csPtr<iDataBuffer> (new csDataBuffer (out.Detach (), Size));
 }

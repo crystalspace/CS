@@ -88,8 +88,8 @@ public:
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
   virtual const csModelConverterFormat *GetFormat( int idx ) const;
-  virtual iModelData *Load( uint8* Buffer, uint32 size );
-  virtual iDataBuffer *Save( iModelData*, const char *format );
+  virtual csPtr<iModelData> Load( uint8* Buffer, uint32 size );
+  virtual csPtr<iDataBuffer> Save( iModelData*, const char *format );
 
   struct Component : public iComponent
   {
@@ -223,7 +223,7 @@ static void extractActionName (const char * str, char * act)
   act[i] = 0;
 }
 
-iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
+csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 {
   // prepare input buffer
   csDataStream in (Buffer, Size, false);
@@ -232,7 +232,7 @@ iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 
   // check for the correct version
   if (!CheckMD2Version (in))
-    return NULL;
+    return csPtr<iModelData> (NULL);
 
   // build the object framework
   iModelData *Scene = new csModelData ();
@@ -361,13 +361,13 @@ iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
   Object->SetDefaultVertices (DefaultFrame);
   Object->DecRef ();
   delete Texels;
-  return Scene;
+  return csPtr<iModelData> (Scene);
 }
 
-iDataBuffer *csModelConverterMD2::Save (iModelData *, const char *Format)
+csPtr<iDataBuffer> csModelConverterMD2::Save (iModelData *, const char *Format)
 {
   if (strcasecmp (Format, "md2"))
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
 
-  return NULL;
+  return csPtr<iDataBuffer> (NULL);
 }
