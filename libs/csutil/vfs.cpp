@@ -1162,7 +1162,7 @@ csStrVector *csVFS::FindFiles (const char *Path) const
 
   // Now separate the mask from directory suffix
   int dirlen = strlen (suffix);
-  while (dirlen && suffix [dirlen - 1] != '/')
+  while (dirlen && suffix [dirlen - 1] != VFS_PATH_SEPARATOR)
     dirlen--;
   strcpy (mask, suffix + dirlen);
   suffix [dirlen] = 0;
@@ -1170,10 +1170,16 @@ csStrVector *csVFS::FindFiles (const char *Path) const
     strcpy (mask, "*");
 
   if (node)
+  {
     strcpy (XPath, node->VPath);
+    strcat (XPath, suffix);
+  }
   else
-    XPath [0] = 0;
-  strcat (XPath, suffix);
+  {
+    char *s = ExpandPath (Path, true);
+    strcpy (XPath, s);
+    delete[] s;
+  }
 
   // first add all nodes that are located one level deeper
   // these are "directories" and will have a slash appended
