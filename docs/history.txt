@@ -138,6 +138,23 @@ The history order is reversed so that new features are at the top.
 	  neglected to install its configuration file `simpcon.cfg' at `make
 	  install' time.  Second, it failed to add `simpcon.cfg' to the
 	  generated MSVC DSP file.
+	- Philip Wyett removed "vc_asm.inc" and all it's supposed assembler
+	  optimizations from CSGEOM and other programs. These when not broken
+	  in fact offer no real optimization than the VC 6 compiler
+	  generated code.
+	- Philip removed now under DX8 COM helper FINAL_RELEASE. Also
+	  aids in compliance for CS eventually being able to be used for
+	  XBox Development.
+	- Philip fixed a compiler warning in mdl2spr.
+	- Philip fixed some documentation about Win32 port. Added links to
+	  ftp.sunsite.dk.
+	- Wouter Wijngaards tested the use of multiple grids. This works fine.
+	    - Fixed groundhitbeam to also work when the beam is (partially)
+	      outside the grid. You can thus make lights the are positioned
+	      outside a grid (say in another grid) and shine to the grid.
+	      So you can add two identical lights, to two grids, to have them
+	      both seem affected by the 'same' light.
+	    - Isotest now has a 2nd grid, more playground :-)
 24-Jun-2001
 	- 'Fixed' the lightmap overflow bug in software renderer. It is
 	  not really an elegant bug fix as I simply test for overflow
