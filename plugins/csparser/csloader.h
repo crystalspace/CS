@@ -119,6 +119,13 @@ class csLoader : public iLoader
   /// Parse a color definition
   bool ParseColor (char *buf, csRGBcolor &c);
 
+  /// Parse a list of textures and add them to the engine.
+  bool ParseTextureList (char* buf);
+  /**
+   * Parse a list of materials and add them to the engine. If a prefix is
+   * given, all material names will be prefixed with the corresponding string.
+   */
+  bool ParseMaterialList (char* buf, const char* prefix = NULL);
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (char *name, char* buf);
   /// Parse a proc texture definition and add the texture to the engine
@@ -142,11 +149,11 @@ class csLoader : public iLoader
   UInt ParseMixmode (char* buf);
 
   /// For heightgen.
-  csGenerateImageTexture* heightgen_txt_process (char* buf);
+  csGenerateImageTexture* ParseHeightgenTexture (char* buf);
   /// For heightgen.
-  csGenerateImageValue* heightgen_value_process (char* buf);
+  csGenerateImageValue* ParseHeightgenValue (char* buf);
   /// Parse and load a height texture
-  bool heightgen_process (char* buf);
+  bool ParseHeightgen (char* buf);
 
   /// Resolve the portals of a thing
   bool ResolvePortalSectors (iThingState *Mesh);
@@ -175,24 +182,12 @@ class csLoader : public iLoader
    */
   bool LoadSounds (char* buf);
 
-  /**
-   * Load all the texture descriptions from the map file
-   * (no actual images). 
-   */
-  bool LoadTextures (char* buf);
 
   /**
    * Load all the plugin descriptions from the map file
    * (the plugins are not actually loaded yet).
    */
   bool LoadPlugins (char* buf);
-
-  /**
-   * Load all the material descriptions from the map file
-   * (no actual images).If a prefix is given, all material names will be
-   * prefixed with the corresponding string.
-   */
-  bool LoadMaterials (char* buf, const char* prefix = NULL);
 
   /**
    * Load a library into given engine.<p>

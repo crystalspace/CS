@@ -30,10 +30,17 @@
 #include "csgeom/matrix3.h"
 #include "csgfx/rgbpixel.h"
 #include "csloader.h"
+#include "ivideo/graph3d.h"
 
 // Define all tokens used through this file
 CS_TOKEN_DEF_START
+  CS_TOKEN_DEF (ADD)
+  CS_TOKEN_DEF (ALPHA)
+  CS_TOKEN_DEF (COPY)
   CS_TOKEN_DEF (IDENTITY)
+  CS_TOKEN_DEF (KEYCOLOR)
+  CS_TOKEN_DEF (MULTIPLY)
+  CS_TOKEN_DEF (MULTIPLY2)
   CS_TOKEN_DEF (ROT)
   CS_TOKEN_DEF (ROT_X)
   CS_TOKEN_DEF (ROT_Y)
@@ -42,6 +49,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SCALE_X)
   CS_TOKEN_DEF (SCALE_Y)
   CS_TOKEN_DEF (SCALE_Z)
+  CS_TOKEN_DEF (TRANSPARENT)
 CS_TOKEN_DEF_END
 
 bool csLoader::ParseMatrix (char* buf, csMatrix3 &m)
@@ -173,4 +181,54 @@ bool csLoader::ParseColor (char *buf, csRGBcolor &c)
   return true;
 }
 
+UInt csLoader::ParseMixmode (char* buf)
+{
+  CS_TOKEN_TABLE_START (modes)
+    CS_TOKEN_TABLE (COPY)
+    CS_TOKEN_TABLE (MULTIPLY2)
+    CS_TOKEN_TABLE (MULTIPLY)
+    CS_TOKEN_TABLE (ADD)
+    CS_TOKEN_TABLE (ALPHA)
+    CS_TOKEN_TABLE (TRANSPARENT)
+    CS_TOKEN_TABLE (KEYCOLOR)
+  CS_TOKEN_TABLE_END
 
+  char* name;
+  long cmd;
+  char* params;
+
+  UInt Mixmode = 0;
+
+  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      ReportError (
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing mixmode!",
+	  buf);
+      return ~0;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
+      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
+      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
+      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
+      case CS_TOKEN_ALPHA:
+	Mixmode &= ~CS_FX_MASK_ALPHA;
+	float alpha;
+        csScanStr (params, "%f", &alpha);
+	Mixmode |= CS_FX_SETALPHA (alpha);
+	break;
+      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
+      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    TokenError ("the modes");
+    return ~0;
+  }
+  return Mixmode;
+}

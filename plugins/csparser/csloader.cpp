@@ -23,11 +23,6 @@
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "cstool/gentrtex.h"
-#include "cstool/proctex.h"
-#include "cstool/prdots.h"
-#include "cstool/prfire.h"
-#include "cstool/prplasma.h"
-#include "cstool/prwater.h"
 #include "cstool/keyval.h"
 #include "cstool/crossbld.h"
 #include "cstool/sndwrap.h"
@@ -85,41 +80,23 @@ csLoader::csLoaderStats::csLoaderStats()
 
 // Define all tokens used through this file
 CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (ADD)
   CS_TOKEN_DEF (ADDON)
-  CS_TOKEN_DEF (ALPHA)
-  CS_TOKEN_DEF (AMBIENT)
   CS_TOKEN_DEF (ATTENUATION)
   CS_TOKEN_DEF (BACK2FRONT)
-  CS_TOKEN_DEF (BLEND)
   CS_TOKEN_DEF (CAMERA)
   CS_TOKEN_DEF (CENTER)
   CS_TOKEN_DEF (COLLECTION)
   CS_TOKEN_DEF (COLOR)
-  CS_TOKEN_DEF (CONSTANT)
   CS_TOKEN_DEF (CONVEX)
-  CS_TOKEN_DEF (COPY)
   CS_TOKEN_DEF (CULLER)
   CS_TOKEN_DEF (DETAIL)
-  CS_TOKEN_DEF (DIFFUSE)
-  CS_TOKEN_DEF (DITHER)
   CS_TOKEN_DEF (DYNAMIC)
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FOG)
-  CS_TOKEN_DEF (FOR_2D)
-  CS_TOKEN_DEF (FOR_3D)
-  CS_TOKEN_DEF (FRAME)
-  CS_TOKEN_DEF (GENERATE)
   CS_TOKEN_DEF (HALO)
   CS_TOKEN_DEF (HARDMOVE)
-  CS_TOKEN_DEF (HEIGHT)
-  CS_TOKEN_DEF (HEIGHTGEN)
-  CS_TOKEN_DEF (HEIGHTMAP)
-  CS_TOKEN_DEF (IDENTITY)
   CS_TOKEN_DEF (INVISIBLE)
   CS_TOKEN_DEF (KEY)
-  CS_TOKEN_DEF (KEYCOLOR)
-  CS_TOKEN_DEF (LAYER)
   CS_TOKEN_DEF (LIBRARY)
   CS_TOKEN_DEF (LIGHT)
   CS_TOKEN_DEF (MATERIAL)
@@ -127,51 +104,25 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MATRIX)
   CS_TOKEN_DEF (MESHFACT)
   CS_TOKEN_DEF (MESHOBJ)
-  CS_TOKEN_DEF (MIPMAP)
-  CS_TOKEN_DEF (MIXMODE)
   CS_TOKEN_DEF (MOVE)
-  CS_TOKEN_DEF (MULTIPLY)
-  CS_TOKEN_DEF (MULTIPLY2)
   CS_TOKEN_DEF (NODE)
   CS_TOKEN_DEF (NOLIGHTING)
   CS_TOKEN_DEF (NOSHADOWS)
   CS_TOKEN_DEF (PARAMS)
-  CS_TOKEN_DEF (PARTSIZE)
-  CS_TOKEN_DEF (PERSISTENT)
   CS_TOKEN_DEF (PLUGIN)
   CS_TOKEN_DEF (PLUGINS)
   CS_TOKEN_DEF (POSITION)
   CS_TOKEN_DEF (PRIORITY)
-  CS_TOKEN_DEF (PROCEDURAL)
-  CS_TOKEN_DEF (PROCTEX)
   CS_TOKEN_DEF (RADIUS)
-  CS_TOKEN_DEF (REFLECTION)
   CS_TOKEN_DEF (REGION)
   CS_TOKEN_DEF (RENDERPRIORITIES)
-  CS_TOKEN_DEF (ROT)
-  CS_TOKEN_DEF (ROT_X)
-  CS_TOKEN_DEF (ROT_Y)
-  CS_TOKEN_DEF (ROT_Z)
-  CS_TOKEN_DEF (SCALE)
-  CS_TOKEN_DEF (SCALE_X)
-  CS_TOKEN_DEF (SCALE_Y)
-  CS_TOKEN_DEF (SCALE_Z)
   CS_TOKEN_DEF (SECTOR)
-  CS_TOKEN_DEF (SHIFT)
-  CS_TOKEN_DEF (SINGLE)
-  CS_TOKEN_DEF (SIZE)
-  CS_TOKEN_DEF (SLOPE)
-  CS_TOKEN_DEF (SOLID)
   CS_TOKEN_DEF (SOUND)
   CS_TOKEN_DEF (SOUNDS)
   CS_TOKEN_DEF (START)
-  CS_TOKEN_DEF (TEXTURE)
   CS_TOKEN_DEF (TEXTURES)
-  CS_TOKEN_DEF (TRANSPARENT)
-  CS_TOKEN_DEF (TYPE)
   CS_TOKEN_DEF (MAT_SET)
   CS_TOKEN_DEF (V)
-  CS_TOKEN_DEF (VALUE)
   CS_TOKEN_DEF (WORLD)
   CS_TOKEN_DEF (ZFILL)
   CS_TOKEN_DEF (ZNONE)
@@ -222,401 +173,6 @@ iMaterialWrapper *csLoader::FindMaterial (const char *iName)
     "crystalspace.maploader.find.material",
     "Could not find material named '%s'!", iName);
   return NULL;
-}
-
-//---------------------------------------------------------------------------
-
-struct HeightMapData
-{
-  iImage* im;
-  int iw, ih;	// Image width and height.
-  float w, h;	// Image width and height.
-  csRGBpixel* p;
-  float hscale, hshift;
-};
-
-static float HeightMapFunc (void* data, float x, float y)
-{
-  HeightMapData* hm = (HeightMapData*)data;
-  float dw = fmod (x*(hm->w-1), 1.0f);
-  float dh = fmod (y*(hm->h-1), 1.0f);
-  int ix = int (x*(hm->w-1));
-  int iy = int (y*(hm->h-1));
-  int iw = hm->iw;
-  int ih = hm->ih;
-  int idx = iy * iw + ix;
-  float col00, col01, col10, col11;
-  csRGBpixel* p = hm->p;
-  col00 = float (p[idx].red + p[idx].green + p[idx].blue)/3.;
-  if (ix < iw-1)
-    col10 = float (p[idx+1].red + p[idx+1].green + p[idx+1].blue)/3.;
-  else
-    col10 = col00;
-  if (iy < ih-1)
-    col01 = float (p[idx+iw].red + p[idx+iw].green + p[idx+iw].blue)/3.;
-  else
-    col01 = col00;
-  if (ix < iw-1 && iy < ih-1)
-    col11 = float (p[idx+iw+1].red + p[idx+iw+1].green + p[idx+iw+1].blue)/3.;
-  else
-    col11 = col00;
-  float col0010 = col00 * (1-dw) + col10 * dw;
-  float col0111 = col01 * (1-dw) + col11 * dw;
-  float col = col0010 * (1-dh) + col0111 * dh;
-  //printf("Heightmap x=%g y=%g height=%g\n", x, y, col * hm->hscale + hm->hshift);
-  return col * hm->hscale + hm->hshift;
-}
-
-static float SlopeMapFunc (void* data, float x, float y)
-{
-  float div = 0.02;
-  float mx = x-.01; if (mx < 0) { mx = x; div = .01; }
-  float px = x+.01; if (px > 1) { px = x; div = .01; }
-  float dhdx = HeightMapFunc (data, px, y) - HeightMapFunc (data, mx, y);
-  dhdx /= div;
-  div = 0.02;
-  float my = y-.01; if (my < 0) { my = y; div = .01; }
-  float py = y+.01; if (py > 1) { py = y; div = .01; }
-  float dhdy = HeightMapFunc (data, x, py) - HeightMapFunc (data, x, my);
-  dhdy /= div;
-  //printf ("x=%g y=%g dhdx=%g dhdy=%g slope=%g , %g\n", x, y, dhdx, dhdy,
-    //fabs((dhdx+dhdy)/2.), fabs(dhdx)/2.+fabs(dhdy)/2.); fflush (stdout);
-  //return fabs ((dhdx+dhdy)/2.);
-  return (fabs(dhdx)+fabs(dhdy))/2.;
-}
-
-csGenerateImageValue* csLoader::heightgen_value_process (char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (CONSTANT)
-    CS_TOKEN_TABLE (HEIGHTMAP)
-    CS_TOKEN_TABLE (SLOPE)
-    CS_TOKEN_TABLE (TEXTURE)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char *params;
-  char* name;
-  csGenerateImageValue* v = NULL;
-
-  if ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_CONSTANT:
-        {
-	  csGenerateImageValueFuncConst* vt =
-	  	new csGenerateImageValueFuncConst ();
-	  csScanStr (params, "%f", &(vt->constant));
-	  v = vt;
-	}
-	break;
-      case CS_TOKEN_HEIGHTMAP:
-        {
-	  csGenerateImageValueFunc* vf = new csGenerateImageValueFunc ();
-	  char heightmap[255];
-	  float hscale, hshift;
-          csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
-	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
-	  if (!img) return NULL;
-	  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
-  	  data->im = img;
-  	  data->iw = img->GetWidth ();
-  	  data->ih = img->GetHeight ();
-  	  data->w = float (data->iw);
-  	  data->h = float (data->ih);
-  	  data->p = (csRGBpixel*)(img->GetImageData ());
-  	  data->hscale = hscale;
-  	  data->hshift = hshift;
-  	  vf->heightfunc = HeightMapFunc;
-	  vf->userdata = (void*)data;
-	  v = vf;
-	}
-	break;
-      case CS_TOKEN_SLOPE:
-        {
-	  csGenerateImageValueFunc* vf = new csGenerateImageValueFunc ();
-	  char heightmap[255];
-	  float hscale, hshift;
-          csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
-	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
-	  if (!img) return NULL;
-	  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
-  	  data->im = img;
-  	  data->iw = img->GetWidth ();
-  	  data->ih = img->GetHeight ();
-  	  data->w = float (data->iw);
-  	  data->h = float (data->ih);
-  	  data->p = (csRGBpixel*)(img->GetImageData ());
-  	  data->hscale = hscale;
-  	  data->hshift = hshift;
-  	  vf->heightfunc = SlopeMapFunc;
-	  vf->userdata = (void*)data;
-	  v = vf;
-	}
-	break;
-      case CS_TOKEN_TEXTURE:
-	{
-	  csGenerateImageValueFuncTex* vf = new csGenerateImageValueFuncTex ();
-	  vf->tex = heightgen_txt_process (params);
-	  v = vf;
-	}
-	break;
-    }
-  }
-  if (!v)
-  {
-    ReportError (
-	  "crystalspace.maploader.parse.heightgen",
-          "Problem with value specification!");
-  }
-  return v;
-}
-
-csGenerateImageTexture* csLoader::heightgen_txt_process (char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (SOLID)
-    CS_TOKEN_TABLE (SINGLE)
-    CS_TOKEN_TABLE (BLEND)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (blend_commands)
-    CS_TOKEN_TABLE (VALUE)
-    CS_TOKEN_TABLE (LAYER)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (layer_commands)
-    CS_TOKEN_TABLE (HEIGHT)
-    CS_TOKEN_TABLE (TEXTURE)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char *params;
-  char* name;
-  csGenerateImageTexture* t = NULL;
-
-  if ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_SOLID:
-        {
-	  csGenerateImageTextureSolid* ts = new csGenerateImageTextureSolid ();
-	  csColor col;
-	  csScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
-	  ts->color = col;
-	  t = ts;
-	}
-	break;
-      case CS_TOKEN_SINGLE:
-        {
-	  char imagename[255];
-	  csVector2 scale, offset;
-          csScanStr (params, "%s,%f,%f,%f,%f",
-		imagename, &scale.x, &scale.y,
-		&offset.x, &offset.y);
-	  iImage* img = LoadImage (imagename, CS_IMGFMT_TRUECOLOR);
-	  if (!img) return NULL;
-	  csGenerateImageTextureSingle* ts =
-	  	new csGenerateImageTextureSingle ();
-	  ts->SetImage (img);
-	  ts->scale = scale;
-	  ts->offset = offset;
-	  t = ts;
-	}
-	break;
-      case CS_TOKEN_BLEND:
-        {
-	  csGenerateImageTextureBlend* tb = new csGenerateImageTextureBlend ();
-	  char* xname;
-	  char* params2;
-	  while ((cmd = csGetObject (&params, blend_commands,
-	  	&xname, &params2)) > 0)
-	  {
-	    switch (cmd)
-	    {
-	      case CS_TOKEN_VALUE:
-	        tb->valuefunc = heightgen_value_process (params2);
-		if (!tb->valuefunc)
-		{
-		  ReportError (
-		    "crystalspace.maploader.parse.heightgen",
-		    "Problem with returned value!");
-		  return NULL;
-		}
-	        break;
-	      case CS_TOKEN_LAYER:
-	        {
-		  float height = 0;
-		  csGenerateImageTexture* txt = NULL;
-	  	  char* yname;
-	  	  char* params3;
-	  	  while ((cmd = csGetObject (&params2, layer_commands,
-	  		  &yname, &params3)) > 0)
-	  	  {
-	    	    switch (cmd)
-	    	    {
-	      	      case CS_TOKEN_TEXTURE:
-	        	txt = heightgen_txt_process (params3);
-			if (!tb->valuefunc)
-			{
-			  ReportError (
-			    "crystalspace.maploader.parse.heightgen",
-			    "Problem with returned texture!");
-			  return NULL;
-			}
-	        	break;
-	      	      case CS_TOKEN_HEIGHT:
-		        csScanStr (params3, "%f", &height);
-	        	break;
-	    	    }
-		  }
-		  tb->AddLayer (height, txt);
-	  	}
-	        break;
-	    }
-	  }
-	  t = tb;
-	}
-	break;
-    }
-  }
-  if (!t)
-  {
-    ReportError (
-	    "crystalspace.maploader.parse.heightgen",
-	    "Problem with texture specification!");
-  }
-  return t;
-}
-
-bool csLoader::heightgen_process (char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (GENERATE)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (SIZE)
-    CS_TOKEN_TABLE (PARTSIZE)
-    CS_TOKEN_TABLE (MULTIPLY)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char *params;
-  char* name;
-  int totalw = 256, totalh = 256;
-  int partw = 64, parth = 64;
-  int mw = 1, mh = 1;
-  csGenerateImage* gen = new csGenerateImage ();
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_SIZE:
-	csScanStr (params, "%d,%d", &totalw, &totalh);
-	break;
-      case CS_TOKEN_MULTIPLY:
-	csScanStr (params, "%d,%d", &mw, &mh);
-	break;
-      case CS_TOKEN_PARTSIZE:
-	csScanStr (params, "%d,%d", &partw, &parth);
-	break;
-      case CS_TOKEN_TEXTURE:
-        {
-          csGenerateImageTexture* txt = heightgen_txt_process (params);
-          gen->SetTexture (txt);
-	}
-	break;
-      case CS_TOKEN_GENERATE:
-        {
-	  int startx, starty;
-	  csScanStr (params, "%d,%d", &startx, &starty);
-	  iImage* img = gen->Generate (totalw, totalh, startx*mw, starty*mh,
-	  	partw, parth);
-	  iTextureHandle *TexHandle = G3D->GetTextureManager ()
-	  	->RegisterTexture (img, CS_TEXTURE_3D);
-	  if (!TexHandle)
-	  {
-	    ReportError (
-	      "crystalspace.maploader.parse.heightgen",
-	      "Cannot create texture!");
-	    return false;
-	  }
-	  iTextureWrapper *TexWrapper = Engine->GetTextureList ()
-	  	->NewTexture (TexHandle);
-	  TexWrapper->QueryObject ()->SetName (name);
-	}
-	break;
-    }
-  }
-
-  delete gen;
-  //@@@ Memory leak!
-  //if (data)
-  //{
-    //data->im->DecRef ();
-    //delete data;
-  //}
-
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    TokenError ("a heightgen specification");
-    return false;
-  }
-  return true;
-}
-
-UInt csLoader::ParseMixmode (char* buf)
-{
-  CS_TOKEN_TABLE_START (modes)
-    CS_TOKEN_TABLE (COPY)
-    CS_TOKEN_TABLE (MULTIPLY2)
-    CS_TOKEN_TABLE (MULTIPLY)
-    CS_TOKEN_TABLE (ADD)
-    CS_TOKEN_TABLE (ALPHA)
-    CS_TOKEN_TABLE (TRANSPARENT)
-    CS_TOKEN_TABLE (KEYCOLOR)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  UInt Mixmode = 0;
-
-  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (
-	  "crystalspace.maploader.parse.badformat",
-	  "Expected parameters instead of '%s' while parsing mixmode!",
-	  buf);
-      return ~0;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
-      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
-      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
-      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
-      case CS_TOKEN_ALPHA:
-	Mixmode &= ~CS_FX_MASK_ALPHA;
-	float alpha;
-        csScanStr (params, "%f", &alpha);
-	Mixmode |= CS_FX_SETALPHA (alpha);
-	break;
-      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
-      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    TokenError ("the modes");
-    return ~0;
-  }
-  return Mixmode;
 }
 
 //---------------------------------------------------------------------------
@@ -753,7 +309,7 @@ bool csLoader::LoadMap (char* buf)
 	    return false;
           break;
 	case CS_TOKEN_MAT_SET:
-          if (!LoadMaterials (params, name))
+          if (!ParseMaterialList (params, name))
             return false;
           break;
 	case CS_TOKEN_PLUGINS:
@@ -761,11 +317,11 @@ bool csLoader::LoadMap (char* buf)
 	    return false;
 	  break;
         case CS_TOKEN_TEXTURES:
-          if (!LoadTextures (params))
+          if (!ParseTextureList (params))
             return false;
           break;
         case CS_TOKEN_MATERIALS:
-          if (!LoadMaterials (params))
+          if (!ParseMaterialList (params))
             return false;
           break;
         case CS_TOKEN_SOUNDS:
@@ -920,90 +476,6 @@ bool csLoader::LoadPlugins (char* buf)
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadTextures (char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (HEIGHTGEN)
-    CS_TOKEN_TABLE (PROCTEX)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (
-	  "crystalspace.maploader.parse.badformat",
-	  "Expected parameters instead of '%s' while parsing textures!", buf);
-      return false;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_TEXTURE:
-        if (!ParseTexture (name, params))
-	  return false;
-        break;
-      case CS_TOKEN_HEIGHTGEN:
-        if (!heightgen_process (params))
-	  return false;
-        break;
-      case CS_TOKEN_PROCTEX:
-        if (!ParseProcTex (name, params))
-	  return false;
-	break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    TokenError ("textures");
-    return false;
-  }
-
-  return true;
-}
-
-bool csLoader::LoadMaterials (char* buf, const char* prefix)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (MATERIAL)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (
-	  "crystalspace.maploader.parse.badformat",
-	  "Expected parameters instead of '%s' while parsing materials!", buf);
-      return false;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_MATERIAL:
-        if (!ParseMaterial (name, params, prefix))
-	  return false;
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    TokenError ("materials");
-    return false;
-  }
-
-  return true;
-}
-
-//---------------------------------------------------------------------------
-
 bool csLoader::LoadLibrary (char* buf)
 {
   CS_TOKEN_TABLE_START (tokens)
@@ -1048,11 +520,11 @@ bool csLoader::LoadLibrary (char* buf)
       	  break;
         case CS_TOKEN_TEXTURES:
           // Append textures to engine.
-          if (!LoadTextures (params))
+          if (!ParseTextureList (params))
             return false;
           break;
         case CS_TOKEN_MATERIALS:
-          if (!LoadMaterials (params))
+          if (!ParseMaterialList (params))
             return false;
           break;
         case CS_TOKEN_SOUNDS:
@@ -1855,333 +1327,6 @@ void csLoader::TokenError (const char *Object)
 }
 
 //--- Parsing of Engine Objects ---------------------------------------------
-
-iTextureWrapper* csLoader::ParseProcTex (char *name, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (TYPE)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char *params;
-  csProcTexture* pt = NULL;
-
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_TYPE:
-        if (pt)
-	{
-	  ReportError (
-	      "crystalspace.maploader.parse.proctex",
-	      "TYPE of proctex already specified!");
-	  return NULL;
-	}
-	else
-	{
-          if (!strcmp (params, "DOTS"))
-	    pt = new csProcDots ();
-	  else if (!strcmp (params, "PLASMA"))
-	    pt = new csProcPlasma ();
-	  else if (!strcmp (params, "WATER"))
-	    pt = new csProcWater ();
-	  else if (!strcmp (params, "FIRE"))
-	    pt = new csProcFire ();
-	  else
-	  {
-	    ReportError (
-	      "crystalspace.maploader.parse.proctex",
-	      "Unknown TYPE '%s' of proctex!", params);
-	    return NULL;
-	  }
-	}
-        break;
-    }
-  }
-
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    TokenError ("a proctex specification");
-    return NULL;
-  }
-
-  if (pt == NULL)
-  {
-    ReportError (
-	      "crystalspace.maploader.parse.proctex",
-	      "TYPE of proctex not given!");
-    return NULL;
-  }
-
-  pt->Initialize (System, Engine, G3D->GetTextureManager (), name);
-  return pt->GetTextureWrapper ();
-}
-
-iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (TRANSPARENT)
-    CS_TOKEN_TABLE (FILE)
-    CS_TOKEN_TABLE (MIPMAP)
-    CS_TOKEN_TABLE (DITHER)
-    CS_TOKEN_TABLE (PROCEDURAL)
-    CS_TOKEN_TABLE (PERSISTENT)
-    CS_TOKEN_TABLE (FOR_2D)
-    CS_TOKEN_TABLE (FOR_3D)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  const char *filename = name;
-  char *params;
-  csColor transp (0, 0, 0);
-  bool do_transp = false;
-  int flags = CS_TEXTURE_3D;
-
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_FOR_2D:
-        if (strcasecmp (params, "yes") == 0)
-          flags |= CS_TEXTURE_2D;
-        else if (strcasecmp (params, "no") == 0)
-          flags &= ~CS_TEXTURE_2D;
-        else
-	{
-	  ReportError (
-	      "crystalspace.maploader.parse.texture",
-	      "Invalid FOR_2D() value, 'yes' or 'no' expected!");
-	  return NULL;
-	}
-        break;
-      case CS_TOKEN_FOR_3D:
-        if (strcasecmp (params, "yes") == 0)
-          flags |= CS_TEXTURE_3D;
-        else if (strcasecmp (params, "no") == 0)
-          flags &= ~CS_TEXTURE_3D;
-        else
-	{
-	  ReportError (
-	      "crystalspace.maploader.parse.texture",
-	      "Invalid FOR_3D() value, 'yes' or 'no' expected!");
-	  return NULL;
-	}
-        break;
-      case CS_TOKEN_PERSISTENT:
-        flags |= CS_TEXTURE_PROC_PERSISTENT;
-        break;
-      case CS_TOKEN_PROCEDURAL:
-        flags |= CS_TEXTURE_PROC;
-        break;
-      case CS_TOKEN_TRANSPARENT:
-        do_transp = true;
-        csScanStr (params, "%f,%f,%f", &transp.red, &transp.green,
-		&transp.blue);
-        break;
-      case CS_TOKEN_FILE:
-        filename = params;
-        break;
-      case CS_TOKEN_MIPMAP:
-        if (strcasecmp (params, "yes") == 0)
-          flags &= ~CS_TEXTURE_NOMIPMAPS;
-        else if (strcasecmp (params, "no") == 0)
-          flags |= CS_TEXTURE_NOMIPMAPS;
-        else
-	{
-	  ReportError (
-	      "crystalspace.maploader.parse.texture",
-	      "Invalid MIPMAP() value, 'yes' or 'no' expected!");
-	  return NULL;
-	}
-        break;
-      case CS_TOKEN_DITHER:
-        if (strcasecmp (params, "yes") == 0)
-          flags |= CS_TEXTURE_DITHER;
-        else if (strcasecmp (params, "no") == 0)
-          flags &= ~CS_TEXTURE_DITHER;
-        else
-	{
-	  ReportError (
-	      "crystalspace.maploader.parse.texture",
-	      "Invalid DITHER() value, 'yes' or 'no' expected!");
-	  return NULL;
-	}
-        break;
-    }
-  }
-
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    TokenError ("a texture specification");
-    return NULL;
-  }
-
-  // The size of image should be checked before registering it with
-  // the 3D or 2D driver... if the texture is used for 2D only, it can
-  // not have power-of-two dimensions...
-
-  iTextureWrapper *tex = LoadTexture (name, filename, flags);
-  if (tex && do_transp)
-    tex->SetKeyColor (QInt (transp.red * 255.99),
-      QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
-
-  return tex;
-}
-
-iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *prefix)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (DIFFUSE)
-    CS_TOKEN_TABLE (AMBIENT)
-    CS_TOKEN_TABLE (REFLECTION)
-    CS_TOKEN_TABLE (LAYER)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (layerCommands)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (SCALE)
-    CS_TOKEN_TABLE (SHIFT)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char *params;
-  char str [255];
-
-  iTextureWrapper* texh = 0;
-  bool col_set = false;
-  csRGBcolor col;
-  float diffuse = CS_DEFMAT_DIFFUSE;
-  float ambient = CS_DEFMAT_AMBIENT;
-  float reflection = CS_DEFMAT_REFLECTION;
-  int num_txt_layer = 0;
-  csTextureLayer layers[4];
-  iTextureWrapper* txt_layers[4];
-
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_TEXTURE:
-      {
-        csScanStr (params, "%s", str);
-        texh = Engine->FindTexture (str, ResolveOnlyRegion);
-        if (!texh)
-        {
-	  ReportError (
-	      "crystalspace.maploader.parse.material",
-	      "Cannot find texture '%s' for material `%s'\n", str, name);
-	  return NULL;
-        }
-        break;
-      }
-      case CS_TOKEN_COLOR:
-        col_set = true;
-        if (!ParseColor (params, col))
-	  return NULL;
-        break;
-      case CS_TOKEN_DIFFUSE:
-        csScanStr (params, "%f", &diffuse);
-        break;
-      case CS_TOKEN_AMBIENT:
-        csScanStr (params, "%f", &ambient);
-        break;
-      case CS_TOKEN_REFLECTION:
-        csScanStr (params, "%f", &reflection);
-        break;
-      case CS_TOKEN_LAYER:
-	{
-	  if (num_txt_layer >= 4)
-	  {
-	    ReportError (
-	      "crystalspace.maploader.parse.material",
-	      "Only four texture layers supported!\n");
-	    return NULL;
-	  }
-	  txt_layers[num_txt_layer] = NULL;
-	  layers[num_txt_layer].txt_handle = NULL;
-	  layers[num_txt_layer].uscale = 1;
-	  layers[num_txt_layer].vscale = 1;
-	  layers[num_txt_layer].ushift = 0;
-	  layers[num_txt_layer].vshift = 0;
-	  layers[num_txt_layer].mode = CS_FX_ADD;
-	  char* params2;
-	  while ((cmd = csGetCommand (&params, layerCommands,
-		&params2)) > 0)
-	  {
-	    switch (cmd)
-	    {
-	      case CS_TOKEN_TEXTURE:
-		{
-                  csScanStr (params2, "%s", str);
-                  iTextureWrapper *texh = Engine->FindTexture (str,
-		  	ResolveOnlyRegion);
-                  if (texh)
-                    txt_layers[num_txt_layer] = texh;
-                  else
-                  {
-		    ReportError (
-			"crystalspace.maploader.parse.material",
-		    	"Cannot find texture `%s' for material `%s'!",
-			str, name);
-		    return NULL;
-                  }
-		}
-		break;
-	      case CS_TOKEN_SCALE:
-	        csScanStr (params2, "%d,%d",
-			&layers[num_txt_layer].uscale,
-			&layers[num_txt_layer].vscale);
-	        break;
-	      case CS_TOKEN_SHIFT:
-	        csScanStr (params2, "%d,%d",
-			&layers[num_txt_layer].ushift,
-			&layers[num_txt_layer].vshift);
-	        break;
-	      case CS_TOKEN_MIXMODE:
-	        layers[num_txt_layer].mode = ParseMixmode (params2);
-		if (layers[num_txt_layer].mode == (UInt)~0)
-		  return NULL;
-	        break;
-	    }
-	  }
-	  num_txt_layer++;
-	}
-        break;
-    }
-  }
-
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    TokenError ("a material specification");
-    return NULL;
-  }
-
-  iMaterial* material = Engine->CreateBaseMaterial (texh,
-  	num_txt_layer, txt_layers, layers);
-  if (col_set)
-    material->SetFlatColor (col);
-  material->SetReflection (diffuse, ambient, reflection);
-  iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);
-  if (prefix)
-  {
-    char *prefixedname = new char [strlen (name) + strlen (prefix) + 2];
-    strcpy (prefixedname, prefix);
-    strcat (prefixedname, "_");
-    strcat (prefixedname, name);
-    mat->QueryObject()->SetName (prefixedname);
-    delete [] prefixedname;
-  }
-  else
-    mat->QueryObject()->SetName (name);
-  // dereference material since mat already incremented it
-  material->DecRef ();
-
-  return mat;
-}
 
 iCollection* csLoader::ParseCollection (char* name, char* buf)
 {
