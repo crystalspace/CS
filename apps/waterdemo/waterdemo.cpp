@@ -65,6 +65,7 @@
 #endif
 #include "cstool/csview.h"
 #include "csgfx/csimgvec.h"
+#include "csutil/event.h"
 
 #include "waterdemo.h"
 
@@ -217,9 +218,10 @@ bool csWaterDemo::HandleEvent (iEvent& ev)
     waterdemo->FinishFrame ();
     return true;
   }
-  else if (ev.Type == csevKeyDown)
+  else if ((ev.Type == csevKeyboard) &&
+    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown))
   {
-    switch (ev.Key.Code)
+    switch (csKeyEventHelper::GetCookedCode (&ev))
     {
     case CSKEY_ESC:
       {
