@@ -61,8 +61,9 @@ bool csMovableSectorList::PrepareItem (csSome item)
     return false;
 
   sector->IncRef ();
-  movable->GetMeshWrapper ()->
-    MoveToSector (sector->GetPrivateObject ());
+  iMeshWrapper* mw = movable->GetMeshWrapper ();
+  if (mw)
+    mw->MoveToSector (sector->GetPrivateObject ());
   return true;
 }
 
@@ -108,6 +109,7 @@ csMovable::csMovable ()
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMovable);
   parent = NULL;
+  object = NULL;
   updatenr = 0;
   sectors.SetMovable (this);
 }
@@ -156,7 +158,7 @@ void csMovable::ClearSectors ()
 {
   if (parent == NULL)
   {
-    object->RemoveFromSectors ();
+    if (object) object->RemoveFromSectors ();
     sectors.DeleteAll ();
     sectors.SetLength (0);
   }
@@ -180,7 +182,7 @@ void csMovable::RemoveListener (iMovableListener* listener)
 void csMovable::UpdateMove ()
 {
   updatenr++;
-  object->UpdateMove ();
+  if (object) object->UpdateMove ();
 
   int i;
   for (i = 0 ; i < listeners.Length () ; i++)
