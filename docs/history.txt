@@ -9,37 +9,38 @@ chronological order.
 12-Nov-2003
 	- Eric Sunshine removed redundant SubDir invocation from
 	  cspython/Jamfile.
-	- Jorrit added another optimization to Dynavis. Dynavis now attempts
-	  to check if adding items from the write queue will help make
-	  the object invisible. If not it will not flush the write queue.
-	- Jorrit optimized Dynavis so that nodes also use the write queue
-	  now. Not sure if this really is an optimization. Have to do further
-	  tests.
-	- Wouter fixed a bug in the input console, csconin, where if it
-	  would hang when truncating the command history. It was using
-	  Delete (0) instead of DeleteIndex (0). Additionally, the history
-	  position could be invalid after truncation.
-	- Wouter fixed glcommon2d to glClear after resizing. Apparently some
- 	  drivers (like ati radeon 7500 on win XP) corrupt the video
- 	  memory if you don't. Fix from Robin Stanton.
-	- Wouter added SetDefaultFont to AwsPrefsManager.
-	- Committing updated versions of these scripts for 3ds max exporting.
-	  I've had these for two months and forgot to commit them (I thought
-	  it was done already.)  See Luca Pancallo (Talad on irc), director
-	  of Planeshift project with any questions about these--he wrote them.
-	- res improved support for transparency in NR. An 'alphamode' has been 
-	  added, for selection of what kind of transparency to use: none, 
-	  binary(ie alpha test), smooth blending. It's another member in 
+	- Jorrit added another optimization to Dynavis.  Dynavis now attempts
+ 	  to check if adding items from the write queue will help make the
+ 	  object invisible.  If not it will not flush the write queue.
+	- Jorrit optimized Dynavis so that nodes also use the write queue now.
+ 	  Not sure if this really is an optimization.  Have to do further
+ 	  tests.
+	- Wouter fixed a bug in the input console, csconin, where if it would
+ 	  hang when truncating the command history.  It was using Delete (0)
+ 	  instead of DeleteIndex (0).  Additionally, the history position could
+ 	  be invalid after truncation.
+	- Wouter fixed glcommon2d to invoke glClear() after resizing.
+ 	  Apparently some drivers (like ati radeon 7500 on win XP) corrupt the
+ 	  video memory if you don't.  Fix from Robin Stanton.
+	- Wouter added SetDefaultFont() to AwsPrefsManager.
+	- Keith Fulton committed updated versions of the scripts for 3ds Max
+ 	  exporting.  I've had these for two months and forgot to commit them
+ 	  (I thought it was done already.)  See Luca Pancallo (Talad on irc),
+ 	  director of PlaneShift project with any questions about these -- he
+ 	  wrote them.
+	- res improved support for transparency in NR. An 'alphamode' has been
+	  added, for selection of what kind of transparency to use: none,
+	  binary(ie alpha test), smooth blending. It's another member in
 	  csRenderMesh. On the shader side, it can be set per pass. There's
-	  also an 'auto' mode, where the shader pass selects the alpha mode 
-	  based on a specified texture (i.e. 'binary' mode for keycolored 
+	  also an 'auto' mode, where the shader pass selects the alpha mode
+	  based on a specified texture (i.e. 'binary' mode for keycolored
 	  textures.)
-	- res fixed a problem in csRenderMeshList::CompareMeshListInfo (),
-	  where the arguments weren't casted correctly.
+	- res fixed a problem in csRenderMeshList::CompareMeshListInfo(),
+ 	  where the arguments weren't casted correctly.
 	- res fixed a 'double to float conversion' MSVC warning in dynavis.
 	- res fixed a compile error in docconv.
 	- res fixed misinterpretion of the 'flags' TGA header field.
-	- res removed some leftover comments from 
+	- res removed some leftover comments from
 	  plugins/video/render3d/opengl/gl_txtmgr.cpp.
 11-Nov-2003
 	- Eric Sunshine fixed MacOS/X application menu malfunction introduced
@@ -56,11 +57,11 @@ chronological order.
 	  not in expanded form.
 	- res added a new tool app, docconv, to convert documents between
 	  different document systems.
-	- res tweaked the bindoc plugin a bit so it takes up a bit less memory 
+	- res tweaked the bindoc plugin a bit so it takes up a bit less memory
 	  when writing a document.
 10-Nov-2003
-	- Jorrit removed the blend2cs script from CS. It is made obsolete
-	  by the blend2cs project http://projects.blender.org/projects/blend2cs/
+	- Jorrit removed the blend2cs script from CS.  It is made obsolete by
+ 	  the blend2cs project http://projects.blender.org/projects/blend2cs/
 	- Wouter fixed up the terrain texture caching to use the
 	  CacheManager. Instead of a cachedir, put cache="yes" to
 	  use caching.
