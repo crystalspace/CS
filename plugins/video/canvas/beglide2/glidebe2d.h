@@ -23,6 +23,7 @@
 #include "cs2d/common/graph2d.h"
 #include "cssys/be/csbe.h"
 #include "cs2d/glide2common/glide2common2d.h"
+#include "cs2d/glide2common/iglide2d.h"
 
 #include <glide.h>
 
@@ -51,36 +52,6 @@ private:
   
   // double buffer implementation
   int			curr_page;// just temporary
-//  XImage* xim;
-//  GC gc;
-//  XVisualInfo *active_GLVisual;
-  short GraphicsReady;
-  bool bPalettized;
-//  bool bPaletteChanged;// moved to common class
-  int glDrawMode;
-  GrLfbInfo_t lfbInfo;
-//  bool locked;	 //moved to common class
-//  bool m_DoGlideInWindow; //moved to common class
-
-  // Window colormap
-//  Colormap cmap;//dh: removed 230699
-/*
-  // Use SHM or not?
-  bool do_shm;
-#ifdef DO_SHM
-  XShmSegmentInfo shmi;
-  XImage shm_image;
-#endif
-
-  // Hardware mouse cursor or software emulation?
-  bool do_hwmouse;
-  /// Mouse cursors (if hardware mouse cursors are used)  
-  Cursor MouseCursor [int(csmcWait) + 1];
-  /// Empty mouse cursor (consist of EmptyPixmap)
-  Cursor EmptyMouseCursor;
-  /// A empty pixmap
-  Pixmap EmptyPixmap;
-*/
 
   /// Pointer to DOS-specific interface
   iBeLibSystemDriver* BeSystem;
@@ -109,25 +80,12 @@ public:
   virtual bool Open (const char *Title);
   virtual void Close ();
   
-  virtual bool BeginDraw ();
-  virtual void FinishDraw ();
-//  virtual void SetTMUPalette(int tmu);// dh: moved to glide2common2d.h
   virtual void Print (csRect *area = NULL);
-//  virtual void SetRGB (int i, int r, int g, int b);// dh: moved to glide2common2d.h
 /*
   /// Set mouse cursor shape
   virtual bool SetMouseCursor (csMouseCursorID iShape);
-
-  virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
-  
-  void DrawPixelGlide (int x, int y, int color);
-  static void WriteCharGlide (int x, int y, int fg, int bg, char c);
-  static void DrawSpriteGlide (iTextureHandle *hTex, int sx, int sy, 
-                        int sw, int sh, int tx, int ty, int tw, int th);
-  static unsigned char* GetPixelAtGlide (int x, int y);          
-
-protected:
 */
+protected:
   /// This routine is called once per event loop
   static void ProcessEvents (void *Param);
   

@@ -39,8 +39,6 @@ IMPLEMENT_IBASE (csGraphics2DBeGlide)
   IMPLEMENTS_INTERFACE (iGraphics2D)
 IMPLEMENT_IBASE_END
 
-// replace this with config stuff...
-bool DoGlideInWindow=true; 
 
 // csGraphics2DGLX functions
 csGraphics2DBeGlide::csGraphics2DBeGlide(iBase *iParent) :
@@ -50,7 +48,7 @@ csGraphics2DBeGlide::csGraphics2DBeGlide(iBase *iParent) :
 
 bool csGraphics2DBeGlide::Initialize(iSystem *pSystem)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2DGlideCommon::Initialize (pSystem))
     return false;
 
   BeSystem = QUERY_INTERFACE (System, iBeLibSystemDriver);
@@ -70,7 +68,6 @@ bool csGraphics2DBeGlide::Initialize(iSystem *pSystem)
   CsPrintf (MSG_INITIALIZATION, "\n");
  
   GraphicsReady=1;  
-  m_DoGlideInWindow = FALSE;
   
   // temporary bitmap
   CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), curr_color_space));
@@ -121,7 +118,7 @@ bool csGraphics2DBeGlide::Open(const char *Title)
 void csGraphics2DBeGlide::Close(void)
 {
   // Close your graphic interface
-  csGraphics2D::Close ();
+  csGraphics2DGlideCommon::Close ();
 }
 
 void csGraphics2DBeGlide::Print (csRect *area)
@@ -130,49 +127,8 @@ void csGraphics2DBeGlide::Print (csRect *area)
   {
     FXgetImage();
   }
+  csGraphics2DGlideCommon::Print( area );
 }
-
-#define GR_DRAWBUFFER GR_BUFFER_FRONTBUFFER
-
-bool csGraphics2DBeGlide::BeginDraw(/*int Flag*/)
-{
-  csGraphics2D::BeginDraw ();
-  if (FrameBufferLocked != 1)
-    return true;
-
-  FxBool bret;
-  lfbInfo.size=sizeof(GrLfbInfo_t);
-  
-  glDrawMode=GR_LFB_WRITE_ONLY;
-
-  if(locked) FinishDraw();
-  
-  bret=GlideLib_grLfbLock(glDrawMode|GR_LFB_IDLE,
-                          GR_DRAWBUFFER,
-                          GR_LFBWRITEMODE_565,
-                          GR_ORIGIN_ANY,
-                          FXFALSE,
-                          &lfbInfo);
-  if(bret)
-    {
-      Memory=(unsigned char*)lfbInfo.lfbPtr;
-      if(lfbInfo.origin==GR_ORIGIN_UPPER_LEFT)
-        {
-          for(int i = 0; i < Height; i++)
-            LineAddress [i] = i * lfbInfo.strideInBytes;
-        }
-      else
-        {
-          int omi = Height-1;
-          for(int i = 0; i < Height; i++)
-            LineAddress [i] = (omi--) * lfbInfo.strideInBytes;
-        }
-      locked=true;
-    }
-  return bret;
-
-}
-
 
 // simplification of the Mesa FXgetImage() function
 void csGraphics2DBeGlide::FXgetImage()
@@ -200,20 +156,6 @@ void csGraphics2DBeGlide::FXgetImage()
 //printf("blit time is %i \n", blit_time);
 	}
 
-}
-
-void csGraphics2DBeGlide::FinishDraw ()
-{
-  csGraphics2D::FinishDraw ();
-  if (FrameBufferLocked)
-    return;
-
-  Memory=NULL;
-  for (int i = 0; i < Height; i++) LineAddress [i] = 0;
-  if (locked) 
-    GlideLib_grLfbUnlock(glDrawMode,GR_DRAWBUFFER);
-  
-  locked = false;
 }
 
 void csGraphics2DBeGlide::ProcessEvents (void *Param)
@@ -305,49 +247,7 @@ void csGraphics2DBeGlide::ProcessEvents (void *Param)
     }
 #endif
 }
-/*
-void csGraphics2DBeGlide::DrawLine (int x1, int y1, int x2, int y2, int color)
-{
-  // can't do this while framebuffer is locked...
-  if (locked) return;
- 
-  GrVertex a,b;
-  a.x=x1; a.y=y1;
-  b.x=x2; b.y=y2;
 
-  grConstantColorValue(color);
-  grDrawLine(&a,&b);
-}
-
-void csGraphics2DBeGlide::DrawPixelGlide (int x, int y, int color)
-{
-  // can't do this while framebuffer is locked...
-  if (locked) return;
-
-  GrVertex p;
-  p.x=x; p.y=y;
-
-  grConstantColorValue(color);
-  grDrawPoint(&p);
-}
-
-void csGraphics2DBeGlide::WriteCharGlide (int x, int y, int fg, int bg, char c)
-{
-  // not implemented yet...
-}
-
-void csGraphics2DBeGlide::DrawSpriteGlide (iTextureHandle *hTex, int sx, int sy,
-  int sw, int sh, int tx, int ty, int tw, int th)
-{
-  // not implemented yet...
-}
-
-unsigned char* csGraphics2DBeGlide::GetPixelAtGlide (int x, int y)
-{
-  // not implemented yet...
-  return NULL;
-}
-*/
 void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
 {
   unsigned long RedMask, GreenMask, BlueMask;
