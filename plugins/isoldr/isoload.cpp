@@ -1358,6 +1358,7 @@ bool csIsoLoader::LoadMap (iDocumentNode* node)
           else
             set_view = true;
           break;
+
 	default:
 	  ReportError (tag, "Bad token <%s>!", value);
 	  return false;
@@ -1439,8 +1440,8 @@ bool csIsoLoader::ParsePluginList (iDocumentNode* node, const char* /*prefix*/)
     {
       case XMLTOKEN_PLUGIN:
         {
-	  const char* plugname = child->GetContentsValue ();
-          loaded_plugins.NewPlugin (child->GetAttributeValue ("name"), plugname);
+	  const char* plug = child->GetContentsValue ();
+          loaded_plugins.NewPlugin (child->GetAttributeValue ("name"), plug);
         }
         break;
       default:
@@ -1516,8 +1517,8 @@ bool csIsoLoader::ParseGrid (iDocumentNode* node, const char* /*prefix*/)
       case XMLTOKEN_MULT:
         {
           int multx, multz;
-	  multx = child->GetAttributeValueAsInt ("multx");
-	  multz = child->GetAttributeValueAsInt ("multz");
+	  multx = child->GetAttributeValueAsInt ("x");
+	  multz = child->GetAttributeValueAsInt ("z");
 
           // May have to switch these as well - check out later !!
           current_grid->SetGroundMult(multx, multz);
@@ -1717,9 +1718,9 @@ bool csIsoLoader::ParseTile2D (iDocumentNode* node, const char* /*prefix*/)
   {
     y = QInt(start.y);
     for(z=QInt(start.z); z<end.z; z++)
-	  {
+    {
       for(x=QInt(start.x); x<end.x; x++)
-	    {
+      {
 //        ReportNotify("Tiling at %d %d %d %f %f %f",x,y,z,start.x,start.y,start.z);
 
         sprite = Engine->CreateFloorSprite(csVector3(x,y,z), 1.0, 1.0);
@@ -1810,8 +1811,9 @@ bool csIsoLoader::ParseMaterialList (iDocumentNode* node, const char* /*prefix*/
         {
 	  const char* vfsfilename = child->GetContentsValue ();
 	  const char* name = child->GetAttributeValue ("name");
-	  if (!Engine->CreateMaterialWrapper(vfsfilename, "name"))
-	    ReportNotify("WARNING: '%s' Not Loaded from '%s'", name, vfsfilename);
+	  if (!Engine->CreateMaterialWrapper (vfsfilename, name))
+	    ReportNotify ("WARNING: '%s' Not Loaded from '%s'",
+	    	name, vfsfilename);
         }
         break;
 
@@ -1846,29 +1848,21 @@ bool csIsoLoader::ParseMeshFactory(iDocumentNode* node, const char *prefix)
         {
 	  const char* classId = child->GetContentsValue ();
 	  plug = loaded_plugins.FindPlugin (classId);
+          if (!plug)
+	  {
+            ReportError (tag, "Could not load plugin!");
+	    return false;
+	  }
         }
         break;
 
       case XMLTOKEN_PARAMS:	
         {
-          if (!mfw)
-          {
-            ReportError(tag,"Define PLUGIN before PARAMS in %s.",
-              prefix);
-            return false;
-          }
-
-          if (!plug)
-          {
-            ReportError (tag, "Could not load plugin!");
-	          return false;
-          }
-
       	  // iMeshFactoryWrapper context.
           csRef<iBase> mof (plug->Parse (child, GetLoaderContext(), mfw));
           if (!mof)
           {
-            ReportError (tag, "Plugin loaded but cant parse PARAMS!");
+            ReportError (tag, "Plugin loaded but cant parse <params>!");
 	          return false;
           }
      	  csRef<iMeshObjectFactory> mof2 (SCF_QUERY_INTERFACE (mof,
@@ -1889,7 +1883,7 @@ bool csIsoLoader::ParseMeshFactory(iDocumentNode* node, const char *prefix)
       case XMLTOKEN_FILE:
       case XMLTOKEN_MOVE:
 	{
-          ReportNotify (tag,"Token '%s' not implemnted ... Yet!", value);
+          ReportNotify (tag,"Token '%s' not implemented ... Yet!", value);
         }
         break; 
 
@@ -1955,7 +1949,7 @@ bool csIsoLoader::ParseMeshObject (iDocumentNode* node, const char* prefix)
 
       case XMLTOKEN_KEY:
         {
-           ReportNotify("WARNING: KEY token not active in %s ... Yet",prefix);
+          ReportNotify ("WARNING: KEY token not active in %s ... Yet", prefix);
         }
         break;
 
@@ -1994,12 +1988,6 @@ bool csIsoLoader::ParseMeshObject (iDocumentNode* node, const char* prefix)
 
       case XMLTOKEN_PARAMS:
         {
-          if (!plug)
-          {
-            ReportError (tag, "plugin not loaded in %s.",prefix);
-	          return false;
-          }
-
           csRef<iBase> mo (plug->Parse (child, GetLoaderContext(), NULL));
 	  if (!mo)
           {
@@ -2013,9 +2001,9 @@ bool csIsoLoader::ParseMeshObject (iDocumentNode* node, const char* prefix)
           {
             ReportError (tag, 
               "Returned object does not implement iMeshObject!");
-	          return false;
+	    return false;
           }
-          meshspr->SetMeshObject(meshobj);
+          meshspr->SetMeshObject (meshobj);
         }
         break;
 
@@ -2023,6 +2011,11 @@ bool csIsoLoader::ParseMeshObject (iDocumentNode* node, const char* prefix)
         {
 	  const char* plugname = child->GetContentsValue ();
           plug = loaded_plugins.FindPlugin (plugname);
+          if (!plug)
+          {
+            ReportError (tag, "plugin not loaded in %s.", prefix);
+	    return false;
+          }
         }
         break;
 
@@ -2035,8 +2028,8 @@ bool csIsoLoader::ParseMeshObject (iDocumentNode* node, const char* prefix)
   if (meshspr && meshobj)
   {
     // iIsoGrid *gr = world->FindPos(meshspr->GetPosition());
-    world->AddSprite(meshspr);
-    meshspr->DecRef();
+    world->AddSprite (meshspr);
+    meshspr->DecRef ();
   }
 
   return true;
@@ -2056,7 +2049,8 @@ bool csIsoLoader::LoadPlugins (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_PLUGIN:
-	loaded_plugins.NewPlugin (child->GetAttributeValue ("name"), child->GetContentsValue ());
+	loaded_plugins.NewPlugin (child->GetAttributeValue ("name"),
+		child->GetContentsValue ());
         break;
 
       default:

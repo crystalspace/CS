@@ -5,6 +5,10 @@ The history order is reversed so that new features are at the top.
 	  people! When replacing a normal pointer with a csRef you
 	  must ALSO take care to remove the DecRef()!!! Don't blindly
 	  fix things so they compile.
+	- Fixed more DecRef() related problems with other plugins.
+	- Reverted initapp changes which were very dangerous.
+	- Fixed cs2xml so it can correctly convert isometric maps.
+	- Few fixes in iso loader (XML).
 15-Sep-2002
 	- Several csPtr/csRef related changes.
 	- Fixed a potential crash bug in AWS. An SCF_DEC_REF

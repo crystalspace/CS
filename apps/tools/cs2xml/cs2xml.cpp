@@ -88,6 +88,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (EMITCYLINDER)
   CS_TOKEN_DEF (EMITCYLINDERTANGENT)
   CS_TOKEN_DEF (EULER)
+  CS_TOKEN_DEF (END)
   CS_TOKEN_DEF (F)
   CS_TOKEN_DEF (FADE)
   CS_TOKEN_DEF (FALLSPEED)
@@ -114,6 +115,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MATRIX)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MAXCOLOR)
+  CS_TOKEN_DEF (MULT)
   CS_TOKEN_DEF (MULTIPLY)
   CS_TOKEN_DEF (NUM)
   CS_TOKEN_DEF (ORIG)
@@ -136,6 +138,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ROT_Y)
   CS_TOKEN_DEF (ROT_Z)
   CS_TOKEN_DEF (ROTPART)
+  CS_TOKEN_DEF (SPACE)
   CS_TOKEN_DEF (SCALE)
   CS_TOKEN_DEF (SCALE_X)
   CS_TOKEN_DEF (SCALE_Y)
@@ -526,6 +529,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (EMITCYLINDER)
     CS_TOKEN_TABLE (EMITCYLINDERTANGENT)
     CS_TOKEN_TABLE (EULER)
+    CS_TOKEN_TABLE (END)
     CS_TOKEN_TABLE (F)
     CS_TOKEN_TABLE (FADE)
     CS_TOKEN_TABLE (FALLSPEED)
@@ -551,6 +555,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (MATRIX)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (MAXCOLOR)
+    CS_TOKEN_TABLE (MULT)
     CS_TOKEN_TABLE (MULTIPLY)
     CS_TOKEN_TABLE (NUM)
     CS_TOKEN_TABLE (ORIG)
@@ -570,6 +575,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (REGULARPARTICLES)
     CS_TOKEN_TABLE (ROT)
     CS_TOKEN_TABLE (ROTPART)
+    CS_TOKEN_TABLE (SPACE)
     CS_TOKEN_TABLE (SCALE)
     CS_TOKEN_TABLE (SECOND)
     CS_TOKEN_TABLE (SETUPMESH)
@@ -641,7 +647,26 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    	    CS_NODE_ELEMENT, NULL);
 	      child->SetValue ("material");
 	      if (name && *name) child->SetAttribute ("name", name);
-              ParseGeneral (tokname, parser, child, params);
+	      if (IsString (params))	// Isometric engine
+	      {
+		csRef<iDocumentNode> text = child->CreateNodeBefore (
+		  CS_NODE_TEXT, NULL);
+	        char buf[2048];
+                csScanStr (params, "%s", buf);
+		text->SetValue (buf);
+	      }
+	      else	// 3D engine
+	      {
+                ParseGeneral (tokname, parser, child, params);
+	      }
+	    }
+	    else if (!strcmp (parent_token, "tile2d"))	// Iso engine.
+	    {
+	      char buf[512];
+              csScanStr (params, "%s", buf);
+	      csRef<iDocumentNode> child = CreateValueNode (parent,
+			  "material", buf);
+	      if (name && *name) child->SetAttribute ("name", name);
 	    }
 	    else
 	    {
@@ -891,6 +916,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
         case CS_TOKEN_FORWARD:
         case CS_TOKEN_UP:
         case CS_TOKEN_EULER:
+        case CS_TOKEN_END:
         case CS_TOKEN_TOPLEFT:
         case CS_TOKEN_DIRECTION:
         case CS_TOKEN_DIRECTIONAL:
@@ -1523,7 +1549,36 @@ defaulthalo:
 	    child->SetAttributeAsFloat ("radius", radius);
 	  }
 	  break;
+        case CS_TOKEN_SPACE:
+	  {	// Iso engine.
+	    int minx=0,minz=0;
+	    float miny=0,maxy=0;
+	    csScanStr (params, "%d,%d,%f,%f", &minx, &minz, &miny, &maxy);
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	  	  CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    child->SetAttributeAsInt ("minx", minx);
+	    child->SetAttributeAsInt ("minz", minz);
+	    child->SetAttributeAsFloat ("miny", miny);
+	    child->SetAttributeAsFloat ("maxy", maxy);
+	  }
+	  break;
+        case CS_TOKEN_MULT:
         case CS_TOKEN_SIZE:
+	  if (!strcmp (parent_token, "grid"))	// Iso engine.
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	  	  CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    int x, z;
+	    csScanStr (params, "%d,%d", &x, &z);
+	    child->SetAttributeAsInt ("x", x);
+	    child->SetAttributeAsInt ("z", z);
+	    break;
+	  }
+	  // FALL THROUGH TO CS_TOKEN_PARTSIZE!!!
         case CS_TOKEN_PARTSIZE:
         case CS_TOKEN_MULTIPLY:
 	  {
@@ -1617,9 +1672,19 @@ defaulthalo:
 	    CreateValueNodeAsFloat (child, "distance", d);
 	  }
 	  break;
+        case CS_TOKEN_GRID:
+	  if (!strcmp (parent_token, "grids"))	// Iso engine
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+            ParseGeneral (tokname, parser, child, params);
+	    break;
+	  }
+	  // FALL THROUGH TO CS_TOKEN_BLOCKS!!!
         case CS_TOKEN_BLOCKSIZE:
         case CS_TOKEN_BLOCKS:
-        case CS_TOKEN_GRID:
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
@@ -1797,25 +1862,36 @@ defaulthalo:
 	    	  CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
 	    if (name && *name) child->SetAttribute ("name", name);
-	    if (strchr (params, '('))
+	    if (!strcmp (parent_token, "tile2d"))	// Iso engine.
 	    {
-	      // New format.
-              ParseGeneral (tokname, parser, child, params);
+	      float x, y, z;
+	      csScanStr (params, "%f,%f,%f", &x, &y, &z);
+	      child->SetAttributeAsFloat ("x", x);
+	      child->SetAttributeAsFloat ("y", y);
+	      child->SetAttributeAsFloat ("z", z);
 	    }
 	    else
 	    {
-	      // Old format.
-	      char start_sector[1000];
-	      csVector3 pos;
-	      csScanStr (params, "%s,%f,%f,%f", &start_sector,
-		&pos.x, &pos.y, &pos.z);
-	      CreateValueNode (child, "sector", start_sector);
-	      csRef<iDocumentNode> childchild;
-	      childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
-	      childchild->SetValue ("position");
-	      childchild->SetAttributeAsFloat ("x", pos.x);
-	      childchild->SetAttributeAsFloat ("y", pos.y);
-	      childchild->SetAttributeAsFloat ("z", pos.z);
+	      if (strchr (params, '('))
+	      {
+	        // New format.
+                ParseGeneral (tokname, parser, child, params);
+	      }
+	      else
+	      {
+	        // Old format.
+	        char start_sector[1000];
+	        csVector3 pos;
+	        csScanStr (params, "%s,%f,%f,%f", &start_sector,
+		  &pos.x, &pos.y, &pos.z);
+	        CreateValueNode (child, "sector", start_sector);
+	        csRef<iDocumentNode> childchild;
+	        childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	        childchild->SetValue ("position");
+	        childchild->SetAttributeAsFloat ("x", pos.x);
+	        childchild->SetAttributeAsFloat ("y", pos.y);
+	        childchild->SetAttributeAsFloat ("z", pos.z);
+	      }
 	    }
 	  }
 	  break;

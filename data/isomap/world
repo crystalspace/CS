@@ -1,457 +1,529 @@
-WORLD (
-  START (
-    POSITION (20,0,20)
-  )
-
-  MATERIALS (
-    MATERIAL 'floor1' ('/lib/std/stone4.gif')
-    MATERIAL 'floor2' ('/lib/std/mystone2.gif')
-    MATERIAL 'player' ('/lib/std/snow.jpg')
-    MATERIAL 'snow' ('/lib/std/snow.jpg')
-    MATERIAL 'halo' ('/lib/stdtex/flare_purp.jpg')
-    MATERIAL 'spark' ('/lib/std/spark.png')
-    MATERIAL 'raindrop' ('/lib/std/raindrop.png')
-    MATERIAL 'flare_picir' ('/lib/stdtex/flare_picir.jpg')
-    MATERIAL 'flare_center' ('/lib/stdtex/flare_center.jpg')
-    MATERIAL 'andrew_marble4' ('/lib/std/andrew_marble4.gif')
-    MATERIAL 'sky' ('/lib/stdtex/sky.jpg')
-    MATERIAL 'fpart' ('/lib/stdtex/fpart.png')
-    MATERIAL 'fp2' ('/lib/stdtex/fp2.png')
-    MATERIAL 'hazecirc' ('/lib/stdtex/hazecirc.jpg')
-    MATERIAL 'hazebasic' ('/lib/stdtex/hazebasic.png')
-    MATERIAL 'oldmetal' ('/lib/stdtex/oldmetal.jpg')
-    MATERIAL 'parket' ('/lib/stdtex/parket.jpg')
-    MATERIAL 'asphalt' ('/lib/stdtex/asphalt.jpg')
-    MATERIAL 'mosaic' ('/lib/stdtex/mosaic.jpg')
-    MATERIAL 'explosion' ('/lib/std/explo.jpg')
-  )
-
-  ; ISO engine cant implement thing objects
-  PLUGINS (
-    PLUGIN 'fireFact' ('crystalspace.mesh.loader.factory.fire')
-    PLUGIN 'fire' ('crystalspace.mesh.loader.fire')
-    PLUGIN 'rainFact' ('crystalspace.mesh.loader.factory.rain')
-    PLUGIN 'rain' ('crystalspace.mesh.loader.rain')
-    PLUGIN 'snowFact' ('crystalspace.mesh.loader.factory.snow')
-    PLUGIN 'snow' ('crystalspace.mesh.loader.snow')
-    PLUGIN 'fountainFact' ('crystalspace.mesh.loader.factory.fountain')
-    PLUGIN 'fountain' ('crystalspace.mesh.loader.fountain')
-    PLUGIN 'emitFact' ('crystalspace.mesh.loader.factory.emit')
-    PLUGIN 'emit' ('crystalspace.mesh.loader.emit')
-    PLUGIN 'hazeFact' ('crystalspace.mesh.loader.factory.haze')
-    PLUGIN 'haze' ('crystalspace.mesh.loader.haze')
-    PLUGIN 'spiralFact' ('crystalspace.mesh.loader.factory.spiral')
-    PLUGIN 'spiral' ('crystalspace.mesh.loader.spiral')
-    PLUGIN 'meshFact' ('crystalspace.mesh.loader.factory.genmesh')
-    PLUGIN 'mesh' ('crystalspace.mesh.loader.genmesh')
-  )
-
-  MESHFACT 'fountainFact' (
-    PLUGIN ('crystalspace.mesh.loader.factory.fountain')
-    PARAMS ()
-  )
-  MESHFACT 'snowFact' (
-    PLUGIN ('crystalspace.mesh.loader.factory.snow')
-    PARAMS ()
-  )
-  MESHFACT 'fireFact' (
-    PLUGIN ('fireFact')
-    PARAMS ()
-  )
-  MESHFACT 'rainFact' (
-    PLUGIN ('rainFact')
-    PARAMS ()
-  )
-  MESHFACT 'spiralFact' (
-    PLUGIN ('spiralFact')
-    PARAMS ()
-  )
-  MESHFACT 'hazeFact' (
-    PLUGIN ('hazeFact')
-    PARAMS ()
-  )
-
-  MESHFACT 'emitFact' (
-    PLUGIN ('emitFact')
-    PARAMS ()
-  )
-
-  MESHFACT 'explosionFact' (
-    PLUGIN ('crystalspace.mesh.loader.factory.explosion')
-    PARAMS ()
-  )
-
-  MESHFACT 'ballFact' (
-    PLUGIN ('crystalspace.mesh.loader.factory.ball')
-    PARAMS ()
-  )
-
-  MESHFACT 'genMeshFact' (
-    PLUGIN ('meshFact')
-    PARAMS (
-      ; 8 vertices and 12 triangles.
-      NUM (8,12)
-      VERTICES (
-        V (-1,1,1:0,0)
-        V (-1,1,-1:1,0)
-        V (1,1,-1:0,1)
-        V (1,1,1:1,1)
-        V (-1,-1,1:1,0)
-        V (-1,-1,-1:0,1)
-        V (1,-1,-1:1,1)
-        V (1,-1,1:0,0)
-      )
-      TRIANGLES (
-        T (0,3,1)
-        T (3,2,1)
-        T (4,5,7)
-        T (5,6,7)
-        T (0,4,3)
-        T (4,7,3)
-        T (1,6,5)
-        T (1,2,6)
-        T (0,1,5)
-        T (0,5,4)
-        T (2,3,7)
-        T (2,7,6)
-      )
-      AUTONORMALS()
-    )
-  )
-
-  GRIDS (
-    GRID (
-      SIZE (8,8)
-      SPACE (0,0,-1,10)
-      MULT (1,1)
-      LIGHT (
-        ATTENUATION (2)
-        POSITION (4,2,4)
-        COLOR (1.0,1.0,1.0)
-        RADIUS (3.0)
-      )
-      TILE2D (
-        START (0,0,0)
-        END (8,0,8)
-        MATERIAL ('floor2')
-      )
- 
-      MESHOBJ 'fountain1' (
-        PRIORITY (alpha)
-        PLUGIN ('fountain')
-        PARAMS (
-          FACTORY ('fountainFact')
-          NUMBER (150)
-          MATERIAL ('spark')
-          ORIGIN (0,0,0)
-          DROPSIZE (.15,.15)
-          COLOR (0.7,0.9,1.0)
-          ACCEL (0,-0.3,0)
-          FALLTIME (9)
-          SPEED (1.8)
-          ELEVATION (1.0)
-          AZIMUTH (1.75)
-          OPENING (.2)
-          MIXMODE (ADD ())
-        )
-        ZTEST ()
-        MOVE (V (4,0,4))
-      )
-    )
-    GRID (
-      SIZE (8,8)
-      SPACE (0,8,-1,10)
-      MULT (1,1)
-      LIGHT (
-        ATTENUATION (2)
-        POSITION (4,2,12)
-        COLOR (1.0,1.0,1.0)
-        RADIUS (3.0)
-      )
-      TILE2D (
-        START (0,0,8)
-        END (8,0,16)
-        MATERIAL ('floor1')
-      )
-
-      MESHOBJ 'rainfall' (
-        PRIORITY (alpha)
-        PLUGIN ('rain')
-        PARAMS (
-  	    FACTORY ('rainFact')
-          BOX (-3,-.3,-3, 3,10,3);
-	    MIXMODE (ADD ())
-	    NUMBER (150)
-	    MATERIAL ('raindrop')
-	    DROPSIZE(0.02, 0.37)
-	    LIGHTING (off)
-	    COLOR (0.2, 0.35, 0.5)
-	    FALLSPEED(0, -2.84, 0);
-        )
-        ZTEST ()
-        MOVE (V (4,0,12))
-      )
-    )
-    GRID (
-      SIZE (8,8)
-      SPACE (8,0,-1,10)
-      MULT (1,1)
-      LIGHT (
-        ATTENUATION (2)
-        POSITION (12,2,4)
-        COLOR (1.0,1.0,1.0)
-        RADIUS (3.0)
-      )
-      TILE2D (
-        START (8,0,0)
-        END (16,0,8)
-        MATERIAL ('snow')
-      )
-
-      MESHOBJ 'snow1' (
-        PRIORITY ('alpha')
-        PLUGIN ('snow')
-        PARAMS (
-          FACTORY ('snowFact')
-          BOX (-3,-.3,-3,3,10,3)
-          NUMBER (1000)
-          MATERIAL ('snow')
-          MIXMODE (ADD ())
-          DROPSIZE (0.07,0.07)
-          LIGHTING (off)
-          FALLSPEED (0,-.3,0)
-          SWIRL (0.2)
-          COLOR (.25,.25,.25)
-        )
-        MOVE (V (12,0,4))
-        ZTEST ()
-      )
-    )
-
-    GRID (
-      SIZE (8,8)
-      SPACE (16,4,-1,10)
-      MULT (1,1)
-      LIGHT (
-        ATTENUATION (2)
-        POSITION (20,2,8)
-        COLOR (1.0,1.0,1.0)
-        RADIUS (5.0)
-      )
-      TILE2D (
-        START (16,0,4)
-        END (24,0,12)
-        MATERIAL ('floor1')
-      )
-      MESHOBJ 'spiral' (
-        PRIORITY (alpha)
-        PLUGIN ('spiral')
-        PARAMS (
-	    FACTORY ('spiralFact')
-	    MIXMODE (ADD ())
-          NUMBER (1500)
-	    MATERIAL ('raindrop')
-	    COLOR (0.0, 0.9, 0.2)
-	    SOURCE (0,0,0)
-        )
-        ZTEST ()
-        MOVE (V (20,0,8))
-      )
-    )
-
-    GRID (
-      SIZE (8,8)
-      SPACE (24,8,-1,10)
-      MULT (1,1)
-      LIGHT (
-        ATTENUATION (2)
-        POSITION (28,2,12)
-        COLOR (1.0,1.0,1.0)
-        RADIUS (5.0)
-      )
-      TILE2D (
-        START (24,0,8)
-        END (32,0,16)
-        MATERIAL ('asphalt')
-      )
-      MESHOBJ 'flame' (
-        PRIORITY (alpha)
-        PLUGIN ('fire')
-        PARAMS (
-	    FACTORY ('fireFact')
-	    MIXMODE (ADD ())
-	    NUMBER (500)
-	    MATERIAL ('raindrop')
-	    ORIGIN (0,0,0)
-	    DROPSIZE (0.05,0.04)
-	    LIGHTING (off)
-	    SWIRL (1.3)
-	    COLORSCALE (0.2)
-        )
-        ZTEST ()
-        MOVE (V (28,0,12))
-      )
-    )
-    GRID (
-      SIZE (8,8)
-      SPACE (16,12,-1,11)
-      MULT (1,1)
-      LIGHT (
-        ATTENUATION (2)
-        POSITION (20,3,16)
-        COLOR (1.0,1.0,1.0)
-        RADIUS (5.0)
-      )
-      TILE2D (
-        START (16,1,12)
-        END (24,1,20)
-        MATERIAL ('andrew_marble4')
-      )
-      MESHOBJ 'emit1' (
-        PRIORITY (alpha)
-        PLUGIN ('emit')
-        PARAMS (
-	    FACTORY ('emitFact')
-	    MIXMODE (ADD ())
-	    NUMBER (250)
-	    MATERIAL ('spark')
-          RECTPARTICLES(0.12, 0.12)
-	    LIGHTING (off)
-	    TOTALTIME (5000)
-	    STARTPOS (EMITFIXED (0,0,0))
-	    STARTSPEED (EMITFIXED (0,0.75,0))
-	    STARTACCEL (EMITFIXED (0,0,0))
-  	    ;ATTRACTOR ()
-	    ;ATTRACTORFORCE (1.0)
-	    ; age: time, rgb,  alpha, swirl, rotspeed, scale
-          AGING (0, 1.0,1.0,1.0, 0.3, 1.0, 0.0, 0.1)
-          AGING (1000, 0.0,1.0,1.0, 0.3, 0.0, 1.0, 0.4)
-          AGING (2000, 0.6,0.0,1.0, 0.3, 0.0, 20.0, 1.5)
-          AGING (3000, 0.3,0.0,0.5, 0.3, 0.0, 1.0, 1.0)
-          AGING (5000, 0.3,0.0,0.5, 1.0, 0.0, 0.0, 1.0)
-        )
-        ZTEST ()
-        MOVE (V (20,1,16))
-      )
-    )
-
-    GRID (
-      SIZE (8,8)
-      SPACE (8,16,-1,12)
-      MULT (1,1)
-      LIGHT (
-        ATTENUATION (2)
-        POSITION (12,4,20)
-        COLOR (1.0,1.0,1.0)
-        RADIUS (5.0)
-      )
-      TILE2D (
-        START (8,2,16)
-        END (16,2,24)
-        MATERIAL ('mosaic')
-      )
-      MESHOBJ 'haze3' (
-        PRIORITY (alpha)
-        PLUGIN ('haze')
-        PARAMS (
-          FACTORY ('hazeFact')
-	    MIXMODE (COPY ())
-	    MATERIAL ('fpart')
-	    ORIGIN ( 0,-1,0 )
-	    DIRECTIONAL ( 0,1,0 )
-	    LAYER( SCALE(0.5) HAZECONE(16, 0,-1,0, 0,5,0 , 1, 4.0) )
-        )
-        ZTEST ()
-        MOVE (V (12,2,20))
-      )
-    )
-
-    GRID (
-      SIZE (8,8)
-      SPACE (0,20,-1,12)
-      MULT (1,1)
-      LIGHT (
-        ATTENUATION (2)
-        POSITION (4,4,24)
-        COLOR (1.0,1.0,1.0)
-        RADIUS (5.0)
-      )
-      TILE2D (
-        START (0,0,20)
-        END (8,0,28)
-        MATERIAL ('parket')
-      )
-      MESHOBJ 'haze4' (
-        PRIORITY (alpha)
-        PLUGIN ('haze')
-        ZTEST ()
-        MOVE (V (4,0,24))
-        PARAMS (
-	    FACTORY ('hazeFact')
-	    MIXMODE (ADD ())
-	    MATERIAL ('flare_picir')
-	    ORIGIN ( 0,1,0 )
-	    DIRECTIONAL ( 0,1,0 )
-          LAYER( SCALE(0.5) HAZEBOX( -1,-1,-.3, 1,3,.3 ) )
-        )
-      )
-    )
-
-    GRID (
-      SIZE (8,8)
-      SPACE (-8,20,-1,12)
-      MULT (1,1)
-      LIGHT (
-        ATTENUATION (2)
-        POSITION (-4,4,24)
-        COLOR (1.0,1.0,1.0)
-        RADIUS (5.0)
-      )
-      TILE2D (
-        START (-8,0,20)
-        END (0,0,28)
-        MATERIAL ('oldmetal')
-      )
-      MESHOBJ 'metalBall' (
-        PLUGIN ('crystalspace.mesh.loader.ball')
-	  PARAMS (
-	    FACTORY ('ballFact')
-	    MATERIAL ('oldmetal')
-	    NUMRIM (16)
-	    RADIUS (1, 1, 1)
-	    SHIFT (0, 0, 0)
-	    MIXMODE (MULTIPLY ())
-	  )
-        ZTEST ()
-        PRIORITY ('alpha')
-        MOVE (V (-4, 2, 24))
-        KEY ("entity_Rotate","0,30,10,true")
-      )
-    )
-
-    GRID (
-      SIZE (8,8)
-      SPACE (-16,20,-1,10)
-      MULT (1,1)
-      LIGHT (
-        ATTENUATION (2)
-        POSITION (-12,4,24)
-        COLOR (1.0,1.0,1.0)
-        RADIUS (5.0)
-      )
-      TILE2D (
-        START (-16,0,20)
-        END (-8,0,28)
-        MATERIAL ('parket')
-      )
-      MESHOBJ 'genMesh' (
-        PLUGIN ('mesh')
-        PARAMS (
-          FACTORY ('genMeshFact')
-	    MATERIAL ('floor2')
-        )
-        MOVE (V (-12,0,24))
-      )
-    )
-  )
-)
+<world>
+    <start>
+        <position x="20" y="0" z="20" />
+    </start>
+    <materials>
+        <material name="floor1">/lib/std/stone4.gif</material>
+        <material name="floor2">/lib/std/mystone2.gif</material>
+        <material name="player">/lib/std/snow.jpg</material>
+        <material name="snow">/lib/std/snow.jpg</material>
+        <material name="halo">/lib/stdtex/flare_purp.jpg</material>
+        <material name="spark">/lib/std/spark.png</material>
+        <material name="raindrop">/lib/std/raindrop.png</material>
+        <material name="flare_picir">/lib/stdtex/flare_picir.jpg</material>
+        <material name="flare_center">/lib/stdtex/flare_center.jpg</material>
+        <material name="andrew_marble4">/lib/std/andrew_marble4.gif</material>
+        <material name="sky">/lib/stdtex/sky.jpg</material>
+        <material name="fpart">/lib/stdtex/fpart.png</material>
+        <material name="fp2">/lib/stdtex/fp2.png</material>
+        <material name="hazecirc">/lib/stdtex/hazecirc.jpg</material>
+        <material name="hazebasic">/lib/stdtex/hazebasic.png</material>
+        <material name="oldmetal">/lib/stdtex/oldmetal.jpg</material>
+        <material name="parket">/lib/stdtex/parket.jpg</material>
+        <material name="asphalt">/lib/stdtex/asphalt.jpg</material>
+        <material name="mosaic">/lib/stdtex/mosaic.jpg</material>
+        <material name="explosion">/lib/std/explo.jpg</material>
+    </materials>
+    <plugins>
+        <plugin name="fireFact">crystalspace.mesh.loader.factory.fire</plugin>
+        <plugin name="fire">crystalspace.mesh.loader.fire</plugin>
+        <plugin name="rainFact">crystalspace.mesh.loader.factory.rain</plugin>
+        <plugin name="rain">crystalspace.mesh.loader.rain</plugin>
+        <plugin name="snowFact">crystalspace.mesh.loader.factory.snow</plugin>
+        <plugin name="snow">crystalspace.mesh.loader.snow</plugin>
+        <plugin name="fountainFact">crystalspace.mesh.loader.factory.fountain</plugin>
+        <plugin name="fountain">crystalspace.mesh.loader.fountain</plugin>
+        <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
+        <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
+        <plugin name="hazeFact">crystalspace.mesh.loader.factory.haze</plugin>
+        <plugin name="haze">crystalspace.mesh.loader.haze</plugin>
+        <plugin name="spiralFact">crystalspace.mesh.loader.factory.spiral</plugin>
+        <plugin name="spiral">crystalspace.mesh.loader.spiral</plugin>
+        <plugin name="meshFact">crystalspace.mesh.loader.factory.genmesh</plugin>
+        <plugin name="mesh">crystalspace.mesh.loader.genmesh</plugin>
+    </plugins>
+    <meshfact name="fountainFact">
+        <plugin>crystalspace.mesh.loader.factory.fountain</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="snowFact">
+        <plugin>crystalspace.mesh.loader.factory.snow</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="fireFact">
+        <plugin>fireFact</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="rainFact">
+        <plugin>rainFact</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="spiralFact">
+        <plugin>spiralFact</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="hazeFact">
+        <plugin>hazeFact</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="emitFact">
+        <plugin>emitFact</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="explosionFact">
+        <plugin>crystalspace.mesh.loader.factory.explosion</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="ballFact">
+        <plugin>crystalspace.mesh.loader.factory.ball</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="genMeshFact">
+        <plugin>meshFact</plugin>
+        <params>
+            <numvt>8</numvt>
+            <numtri>12</numtri>
+            <v x="-1" y="1" z="1" u="0" v="0" />
+            <v x="-1" y="1" z="-1" u="1" v="0" />
+            <v x="1" y="1" z="-1" u="0" v="1" />
+            <v x="1" y="1" z="1" u="1" v="1" />
+            <v x="-1" y="-1" z="1" u="1" v="0" />
+            <v x="-1" y="-1" z="-1" u="0" v="1" />
+            <v x="1" y="-1" z="-1" u="1" v="1" />
+            <v x="1" y="-1" z="1" u="0" v="0" />
+            <t v1="0" v2="3" v3="1" />
+            <t v1="3" v2="2" v3="1" />
+            <t v1="4" v2="5" v3="7" />
+            <t v1="5" v2="6" v3="7" />
+            <t v1="0" v2="4" v3="3" />
+            <t v1="4" v2="7" v3="3" />
+            <t v1="1" v2="6" v3="5" />
+            <t v1="1" v2="2" v3="6" />
+            <t v1="0" v2="1" v3="5" />
+            <t v1="0" v2="5" v3="4" />
+            <t v1="2" v2="3" v3="7" />
+            <t v1="2" v2="7" v3="6" />
+            <autonormals />
+        </params>
+    </meshfact>
+    <grids>
+        <grid>
+            <size x="8" z="8" />
+            <space minx="0" minz="0" miny="-1" maxy="10" />
+            <mult x="1" z="1" />
+            <light>
+                <attenuation>2</attenuation>
+                <position x="4" y="2" z="4" />
+                <color red="1" green="1" blue="1" />
+                <radius>3</radius>
+            </light>
+            <tile2d>
+                <start x="0" y="0" z="0" />
+                <end x="8" y="0" z="8" />
+                <material>floor2</material>
+            </tile2d>
+            <meshobj name="fountain1">
+                <priority>alpha</priority>
+                <plugin>fountain</plugin>
+                <params>
+                    <factory>fountainFact</factory>
+                    <number>150</number>
+                    <material>spark</material>
+                    <origin x="0" y="0" z="0" />
+                    <dropsize w="0.15" h="0.15" />
+                    <color red="0.7" green="0.9" blue="1" />
+                    <accel x="0" y="-0.3" z="0" />
+                    <falltime>9</falltime>
+                    <speed>1.8</speed>
+                    <elevation>1</elevation>
+                    <azimuth>1.75</azimuth>
+                    <opening>0.2</opening>
+                    <mixmode>
+                        <add />
+                    </mixmode>
+                </params>
+                <ztest />
+                <move>
+                    <v x="4" y="0" z="4" />
+                </move>
+            </meshobj>
+        </grid>
+        <grid>
+            <size x="8" z="8" />
+            <space minx="0" minz="8" miny="-1" maxy="10" />
+            <mult x="1" z="1" />
+            <light>
+                <attenuation>2</attenuation>
+                <position x="4" y="2" z="12" />
+                <color red="1" green="1" blue="1" />
+                <radius>3</radius>
+            </light>
+            <tile2d>
+                <start x="0" y="0" z="8" />
+                <end x="8" y="0" z="16" />
+                <material>floor1</material>
+            </tile2d>
+            <meshobj name="rainfall">
+                <priority>alpha</priority>
+                <plugin>rain</plugin>
+                <params>
+                    <factory>rainFact</factory>
+                    <box>
+                        <min x="-3" y="-0.3" z="-3" />
+                        <max x="3" y="10" z="3" />
+                    </box>
+                    <mixmode>
+                        <add />
+                    </mixmode>
+                    <number>150</number>
+                    <material>raindrop</material>
+                    <dropsize w="0.02" h="0.37" />
+                    <lighting>no</lighting>
+                    <color red="0.2" green="0.35" blue="0.5" />
+                    <fallspeed x="0" y="-2.84" z="0" />
+                </params>
+                <ztest />
+                <move>
+                    <v x="4" y="0" z="12" />
+                </move>
+            </meshobj>
+        </grid>
+        <grid>
+            <size x="8" z="8" />
+            <space minx="8" minz="0" miny="-1" maxy="10" />
+            <mult x="1" z="1" />
+            <light>
+                <attenuation>2</attenuation>
+                <position x="12" y="2" z="4" />
+                <color red="1" green="1" blue="1" />
+                <radius>3</radius>
+            </light>
+            <tile2d>
+                <start x="8" y="0" z="0" />
+                <end x="16" y="0" z="8" />
+                <material>snow</material>
+            </tile2d>
+            <meshobj name="snow1">
+                <priority>alpha</priority>
+                <plugin>snow</plugin>
+                <params>
+                    <factory>snowFact</factory>
+                    <box>
+                        <min x="-3" y="-0.3" z="-3" />
+                        <max x="3" y="10" z="3" />
+                    </box>
+                    <number>1000</number>
+                    <material>snow</material>
+                    <mixmode>
+                        <add />
+                    </mixmode>
+                    <dropsize w="0.07" h="0.07" />
+                    <lighting>no</lighting>
+                    <fallspeed x="0" y="-0.3" z="0" />
+                    <swirl>0.2</swirl>
+                    <color red="0.25" green="0.25" blue="0.25" />
+                </params>
+                <move>
+                    <v x="12" y="0" z="4" />
+                </move>
+                <ztest />
+            </meshobj>
+        </grid>
+        <grid>
+            <size x="8" z="8" />
+            <space minx="16" minz="4" miny="-1" maxy="10" />
+            <mult x="1" z="1" />
+            <light>
+                <attenuation>2</attenuation>
+                <position x="20" y="2" z="8" />
+                <color red="1" green="1" blue="1" />
+                <radius>5</radius>
+            </light>
+            <tile2d>
+                <start x="16" y="0" z="4" />
+                <end x="24" y="0" z="12" />
+                <material>floor1</material>
+            </tile2d>
+            <meshobj name="spiral">
+                <priority>alpha</priority>
+                <plugin>spiral</plugin>
+                <params>
+                    <factory>spiralFact</factory>
+                    <mixmode>
+                        <add />
+                    </mixmode>
+                    <number>1500</number>
+                    <material>raindrop</material>
+                    <color red="0" green="0.9" blue="0.2" />
+                    <source x="0" y="0" z="0" />
+                </params>
+                <ztest />
+                <move>
+                    <v x="20" y="0" z="8" />
+                </move>
+            </meshobj>
+        </grid>
+        <grid>
+            <size x="8" z="8" />
+            <space minx="24" minz="8" miny="-1" maxy="10" />
+            <mult x="1" z="1" />
+            <light>
+                <attenuation>2</attenuation>
+                <position x="28" y="2" z="12" />
+                <color red="1" green="1" blue="1" />
+                <radius>5</radius>
+            </light>
+            <tile2d>
+                <start x="24" y="0" z="8" />
+                <end x="32" y="0" z="16" />
+                <material>asphalt</material>
+            </tile2d>
+            <meshobj name="flame">
+                <priority>alpha</priority>
+                <plugin>fire</plugin>
+                <params>
+                    <factory>fireFact</factory>
+                    <mixmode>
+                        <add />
+                    </mixmode>
+                    <number>500</number>
+                    <material>raindrop</material>
+                    <origin x="0" y="0" z="0" />
+                    <dropsize w="0.05" h="0.04" />
+                    <lighting>no</lighting>
+                    <swirl>1.3</swirl>
+                    <colorscale>0.2</colorscale>
+                </params>
+                <ztest />
+                <move>
+                    <v x="28" y="0" z="12" />
+                </move>
+            </meshobj>
+        </grid>
+        <grid>
+            <size x="8" z="8" />
+            <space minx="16" minz="12" miny="-1" maxy="11" />
+            <mult x="1" z="1" />
+            <light>
+                <attenuation>2</attenuation>
+                <position x="20" y="3" z="16" />
+                <color red="1" green="1" blue="1" />
+                <radius>5</radius>
+            </light>
+            <tile2d>
+                <start x="16" y="1" z="12" />
+                <end x="24" y="1" z="20" />
+                <material>andrew_marble4</material>
+            </tile2d>
+            <meshobj name="emit1">
+                <priority>alpha</priority>
+                <plugin>emit</plugin>
+                <params>
+                    <factory>emitFact</factory>
+                    <mixmode>
+                        <add />
+                    </mixmode>
+                    <number>250</number>
+                    <material>spark</material>
+                    <rectparticles w="0.12" h="0.12" />
+                    <lighting>no</lighting>
+                    <totaltime>5000</totaltime>
+                    <startpos>
+                        <emitfixed x="0" y="0" z="0" />
+                    </startpos>
+                    <startspeed>
+                        <emitfixed x="0" y="0.75" z="0" />
+                    </startspeed>
+                    <startaccel>
+                        <emitfixed x="0" y="0" z="0" />
+                    </startaccel>
+                    <aging>
+                        <color red="1" green="1" blue="1" />
+                        <time>0</time>
+                        <alpha>0.3</alpha>
+                        <swirl>1</swirl>
+                        <rotspeed>0</rotspeed>
+                        <scale>0.1</scale>
+                    </aging>
+                    <aging>
+                        <color red="0" green="1" blue="1" />
+                        <time>1000</time>
+                        <alpha>0.3</alpha>
+                        <swirl>0</swirl>
+                        <rotspeed>1</rotspeed>
+                        <scale>0.4</scale>
+                    </aging>
+                    <aging>
+                        <color red="0.6" green="0" blue="1" />
+                        <time>2000</time>
+                        <alpha>0.3</alpha>
+                        <swirl>0</swirl>
+                        <rotspeed>20</rotspeed>
+                        <scale>1.5</scale>
+                    </aging>
+                    <aging>
+                        <color red="0.3" green="0" blue="0.5" />
+                        <time>3000</time>
+                        <alpha>0.3</alpha>
+                        <swirl>0</swirl>
+                        <rotspeed>1</rotspeed>
+                        <scale>1</scale>
+                    </aging>
+                    <aging>
+                        <color red="0.3" green="0" blue="0.5" />
+                        <time>5000</time>
+                        <alpha>1</alpha>
+                        <swirl>0</swirl>
+                        <rotspeed>0</rotspeed>
+                        <scale>1</scale>
+                    </aging>
+                </params>
+                <ztest />
+                <move>
+                    <v x="20" y="1" z="16" />
+                </move>
+            </meshobj>
+        </grid>
+        <grid>
+            <size x="8" z="8" />
+            <space minx="8" minz="16" miny="-1" maxy="12" />
+            <mult x="1" z="1" />
+            <light>
+                <attenuation>2</attenuation>
+                <position x="12" y="4" z="20" />
+                <color red="1" green="1" blue="1" />
+                <radius>5</radius>
+            </light>
+            <tile2d>
+                <start x="8" y="2" z="16" />
+                <end x="16" y="2" z="24" />
+                <material>mosaic</material>
+            </tile2d>
+            <meshobj name="haze3">
+                <priority>alpha</priority>
+                <plugin>haze</plugin>
+                <params>
+                    <factory>hazeFact</factory>
+                    <mixmode>
+                        <copy />
+                    </mixmode>
+                    <material>fpart</material>
+                    <origin x="0" y="-1" z="0" />
+                    <directional x="0" y="1" z="0" />
+                    <layer>
+                        <scale>0.5</scale>
+                        <hazecone p="1" q="4" number="16">
+                            <min x="0" y="-1" z="0" />
+                            <max x="0" y="5" z="0" />
+                        </hazecone>
+                    </layer>
+                </params>
+                <ztest />
+                <move>
+                    <v x="12" y="2" z="20" />
+                </move>
+            </meshobj>
+        </grid>
+        <grid>
+            <size x="8" z="8" />
+            <space minx="0" minz="20" miny="-1" maxy="12" />
+            <mult x="1" z="1" />
+            <light>
+                <attenuation>2</attenuation>
+                <position x="4" y="4" z="24" />
+                <color red="1" green="1" blue="1" />
+                <radius>5</radius>
+            </light>
+            <tile2d>
+                <start x="0" y="0" z="20" />
+                <end x="8" y="0" z="28" />
+                <material>parket</material>
+            </tile2d>
+            <meshobj name="haze4">
+                <priority>alpha</priority>
+                <plugin>haze</plugin>
+                <ztest />
+                <move>
+                    <v x="4" y="0" z="24" />
+                </move>
+                <params>
+                    <factory>hazeFact</factory>
+                    <mixmode>
+                        <add />
+                    </mixmode>
+                    <material>flare_picir</material>
+                    <origin x="0" y="1" z="0" />
+                    <directional x="0" y="1" z="0" />
+                    <layer>
+                        <scale>0.5</scale>
+                        <hazebox>
+                            <min x="-1" y="-1" z="-0.3" />
+                            <max x="1" y="3" z="0.3" />
+                        </hazebox>
+                    </layer>
+                </params>
+            </meshobj>
+        </grid>
+        <grid>
+            <size x="8" z="8" />
+            <space minx="-8" minz="20" miny="-1" maxy="12" />
+            <mult x="1" z="1" />
+            <light>
+                <attenuation>2</attenuation>
+                <position x="-4" y="4" z="24" />
+                <color red="1" green="1" blue="1" />
+                <radius>5</radius>
+            </light>
+            <tile2d>
+                <start x="-8" y="0" z="20" />
+                <end x="0" y="0" z="28" />
+                <material>oldmetal</material>
+            </tile2d>
+            <meshobj name="metalBall">
+                <plugin>crystalspace.mesh.loader.ball</plugin>
+                <params>
+                    <factory>ballFact</factory>
+                    <material>oldmetal</material>
+                    <numrim>16</numrim>
+                    <radius x="1" y="1" z="1" />
+                    <shift x="0" y="0" z="0" />
+                    <mixmode>
+                        <multiply />
+                    </mixmode>
+                </params>
+                <ztest />
+                <priority>alpha</priority>
+                <move>
+                    <v x="-4" y="2" z="24" />
+                </move>
+                <key name="entity_Rotate" value="0,30,10,true" />
+            </meshobj>
+        </grid>
+        <grid>
+            <size x="8" z="8" />
+            <space minx="-16" minz="20" miny="-1" maxy="10" />
+            <mult x="1" z="1" />
+            <light>
+                <attenuation>2</attenuation>
+                <position x="-12" y="4" z="24" />
+                <color red="1" green="1" blue="1" />
+                <radius>5</radius>
+            </light>
+            <tile2d>
+                <start x="-16" y="0" z="20" />
+                <end x="-8" y="0" z="28" />
+                <material>parket</material>
+            </tile2d>
+            <meshobj name="genMesh">
+                <plugin>mesh</plugin>
+                <params>
+                    <factory>genMeshFact</factory>
+                    <material>floor2</material>
+                </params>
+                <move>
+                    <v x="-12" y="0" z="24" />
+                </move>
+            </meshobj>
+        </grid>
+    </grids>
+</world>
