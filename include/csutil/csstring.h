@@ -957,13 +957,14 @@ public:
   csStringFast (unsigned char c) : csStringBase()
   { Append ((char)c); }
   /// Destroy the csStringFast.
-  virtual ~csStringFast () { if (MaxSize <= LEN) Data = 0; }
+  virtual ~csStringFast () { /*if (MaxSize <= LEN) Data = 0;*/ }
   virtual void Free ()
-  { if (MaxSize <= LEN) Data = 0; csStringBase::Free(); }
+  { /*if (MaxSize <= LEN) Data = 0;*/ csStringBase::Free(); }
 
   virtual char* Detach ()
   { 
-    char* d = (MaxSize <= LEN) ? csStrNew (Data) : Data; 
+    //char* d = (MaxSize <= LEN) ? csStrNew (Data) : Data; 
+    char* d = Data; 
     Data = 0; Size = 0; MaxSize = 0; return d; }
 };
 
