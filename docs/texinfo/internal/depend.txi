@@ -26,16 +26,12 @@ than actually linking with a library.
 @item
 @code{csgeom}
 @item
-@code{csobject}
-@item
 @code{csutil}
 @end itemize
 
 @item Level 2: @emph{Basics---Common Base of Various CS Parts}
 
 @itemize @minus
-@item
-@code{csgfxldr}
 @item
 @code{cssys}
 @end itemize
@@ -55,7 +51,7 @@ than actually linking with a library.
 @code{sound/renderer}
 @end itemize
 
-@item Level 4: @emph{Engine---Binds Togehter Engines Components}
+@item Level 4: @emph{Engine---Binds Together Engines Components}
 
 @itemize @minus
 @item
@@ -80,8 +76,6 @@ than actually linking with a library.
 @code{walktest}
 @item
 @code{metademo}
-@item
-@code{MazeD}
 @end itemize
 @end itemize
 
