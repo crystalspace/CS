@@ -24,7 +24,7 @@
 // This is the name of the DLL
 #define DLL_NAME "glbe2d.so"
 
-static unsigned int gRefCount = 0;
+static int32 gRefCount = 0;
 static DllRegisterData gRegData =
 {
   &CLSID_GLBeGraphics2D,
@@ -58,12 +58,12 @@ STDAPI DllInitialize ()
 
 void STDAPICALLTYPE ModuleRelease (void)
 {
-  gRefCount--;
+  atomic_add(&gRefCount, -1);
 }
 
 void STDAPICALLTYPE ModuleAddRef (void)
 {
-  gRefCount++;
+  atomic_add(&gRefCount, 1);
 }
 
 // return S_OK if it's ok to unload us now.
@@ -117,7 +117,7 @@ STDMETHODIMP csGraphics2DGLBeFactory::CreateInstance (REFIID riid, ISystem * piS
     return E_INVALIDARG;
   }
 
-  csGraphics2DGLBe *pNew = new csGraphics2DGLBe (piSystem, false);
+  csGraphics2DGLBe *pNew = new csGraphics2DGLBe (piSystem/*, false*/);
 
   if (!pNew)
   {
@@ -131,9 +131,9 @@ STDMETHODIMP csGraphics2DGLBeFactory::CreateInstance (REFIID riid, ISystem * piS
 STDMETHODIMP csGraphics2DGLBeFactory::LockServer (BOOL bLock)
 {
   if (bLock)
-    gRefCount++;
+    atomic_add(&gRefCount, 1);
   else
-    gRefCount--;
+    atomic_add(&gRefCount, -1);
 
   return S_OK;
 }

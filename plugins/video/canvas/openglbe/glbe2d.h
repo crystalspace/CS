@@ -22,12 +22,16 @@
 #include "cscom/com.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/be/beitf.h"
+#include "cs2d/openglcommon/glcommon2d.h"
+
+#include <GL/gl.h>
 
 #ifndef CRYST_WINDOW_H
 #include "CrystGLWindow.h"
 #endif
 
-#include <GL/gl.h>
+interface ITextureHandle;
+class OpenGLTextureCache;
 
 // The CLSID to create csGraphics2DGLX instances
 extern const CLSID CLSID_GLBeGraphics2D;
@@ -46,37 +50,26 @@ public:
 ///
 
 /// BeLIB version.
-class csGraphics2DGLBe : public csGraphics2D
+class csGraphics2DGLBe : public csGraphics2DGLCommon
 {
+  friend class csGraphics3DOpenGL;	// dh: is this necessary?
+  friend class CrystGLWindow;
 private:
   // The display context
   CrystGLView*	dpy;
   int 			display_width, display_height;
   CrystGLWindow	*window;
-  BBitmap		*cryst_bitmap;
+  BBitmap		*cryst_bitmap;	// dh: is this necessary?
+  color_space	curr_color_space;
+  
+  int			curr_page;
 
-// Everything for simulated depth
-  int depth;
-  csPixelFormat real_pfmt;	// Contains the real pfmt is simulating stuff
-  unsigned char* real_Memory;	// Real memory to the display
-
-//  XImage* xim;
-//  GC gc;
-//  XVisualInfo *active_GLVisual;
-//  GLContext active_GLContext;
-
-  // Window colormap
-//  Colormap cmap;
-
+public:
   // Hardware mouse cursor or software emulation?
   bool do_hwmouse;
 
-  /// Pointer to system driver interface
-  static ISystem* System;
   /// Pointer to DOS-specific interface
-  static IBeLibSystemDriver* BeSystem;
-  /// This function has the rights to access the static members
-  friend void __printfGLBe (int msgtype, char *format, ...);
+  IBeLibSystemDriver* BeSystem;
 
   /// The "real" mouse handler
   BeMouseHandler MouseHandler;
@@ -94,34 +87,26 @@ private:
   /// This routine is called once per event loop
   static void ProcessEvents (void *Param);
 
+//  static csGraphics2DOpenGLFontServer *LocalFontServer;// moved into glcommon2d.h
+  
 public:
-  csGraphics2DGLBe (ISystem* piSystem, bool bUses3D);
+  csGraphics2DGLBe (ISystem* piSystem/*, bool bUses3D*/);// dh: removed bool as glx version doesn't have it.
   virtual ~csGraphics2DGLBe ();
+  
+  virtual void Initialize();//dh: declared in glcommon2d.h
 
-  virtual bool Open (char *Title);
-  virtual void Close ();
+  virtual bool Open (char *Title);//dh: declared in glcommon2d.h
+  virtual void Close ();//dh: declared in glcommon2d.h
+  
+  virtual int  GetPage ();
+  virtual bool DoubleBuffer (bool Enable);
 
-  virtual bool BeginDraw () { return (Memory != NULL); }
+  virtual bool BeginDraw () /*{ return (Memory != NULL); }*/;
+  virtual void FinishDraw ();
 
   virtual void Print (csRect *area = NULL);
-  virtual void SetRGB (int i, int r, int g, int b);
 
-  /// Draw a line
-  virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
-  /// Draw a horizontal line
-  virtual void DrawHorizLine (int x1, int x2, int y, int color);
-  /// Draw a pixel
-  static void DrawPixelGL (int x, int y, int color);
-  /// Write a single character
-  static void WriteCharGL (int x, int y, int fg, int bg, char c);
-  /// Draw a 2D sprite
-  static void DrawSpriteGL (ITextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
-  /**
-   * Get address of video RAM at given x,y coordinates.
-   * The OpenGL version of this function just returns NULL.
-   */
-  static unsigned char* GetPixelAtGL (int x, int y);
+  virtual void ApplyDepthInfo(color_space this_color_space);
 
 protected:
   DECLARE_IUNKNOWN ()

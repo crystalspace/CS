@@ -32,3 +32,74 @@ STDMETHODIMP IXBeLibGraphicsInfo::GetDisplay (BView ** dpy)
     return S_OK;
 }
 
+STDMETHODIMP IXBeLibGraphicsInfo::GetWindow (BWindow ** cryst_window)
+{
+    METHOD_PROLOGUE( csGraphics2DBeLib, XBeLibGraphicsInfo);
+    
+    *cryst_window = pThis->window;
+    return S_OK;
+}
+
+STDMETHODIMP IXBeLibGraphicsInfo::DirectConnect (direct_buffer_info *info)
+{
+    METHOD_PROLOGUE( csGraphics2DBeLib, XBeLibGraphicsInfo);
+
+	if (!pThis->fConnected && pThis->fConnectionDisabled) {
+		return S_OK;
+	}
+	pThis->locker->Lock();
+	
+	switch (info->buffer_state & B_DIRECT_MODE_MASK) {
+		case B_DIRECT_START:
+			printf("DirectConnect: B_DIRECT_START \n");
+			pThis->fConnected = true;
+			if (pThis->fDrawingThreadSuspended)	{
+				status_t retval;
+				bool notdone=true;
+				while (resume_thread(find_thread("LoopThread")) == B_BAD_THREAD_STATE)	{
+					//	this is done to cope with thread setting fDrawingThreadSuspended then getting
+					//	rescheduled before it can suspend itself.  It just makes repeated attempts to
+					//	resume that thread.
+					snooze(1000);
+				}
+				pThis->fDrawingThreadSuspended = false;
+			}
+				
+		case B_DIRECT_MODIFY:
+			printf("DirectConnect: B_DIRECT_MODIFY \n");
+			pThis->Memory = (unsigned char *) info->bits;
+			printf("Memory allocated is %X. bytes_per_row is %d \n", pThis->Memory, info->bytes_per_row);
+			pThis->curr_color_space = info->pixel_format;
+			pThis->ApplyDepthInfo(pThis->curr_color_space);
+			
+		// Create scanline address array
+		if (pThis->LineAddress == NULL)	{
+//			printf ("IXBeLibGraphicsInfo::DirectConnect() -- Creating LineAddress[].\n");
+			CHK (pThis->LineAddress = new int [pThis->Height]);
+			if (pThis->LineAddress == NULL)	{
+			    printf ("IXBeLibGraphicsInfo::DirectConnect() -- Couldn't create LineAddress[].\n");
+			    exit (1);
+			}
+		}
+		
+		//	initialise array
+		{
+		printf("Window bounds: %d %d %d %d \n", info->window_bounds.left, info->window_bounds.top, info->window_bounds.right, info->window_bounds.bottom);
+		int i,addr,bpl = info->bytes_per_row;
+		for (i = 0, addr = info->window_bounds.left * pThis->pfmt.PixelBytes + info->window_bounds.top * bpl; 
+			i < pThis->Height; 
+			i++, addr += bpl)
+			pThis->LineAddress[i] = addr;
+		}
+		break;
+		
+		case B_DIRECT_STOP:
+			printf("DirectConnect: B_DIRECT_STOP \n");
+			pThis->fConnected = false;
+		break;
+	}
+	
+	pThis->locker->Unlock();
+    printf("leaving IXBeLibGraphicsInfo::DirectConnected \n");
+    return S_OK;
+}

@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <time.h>
+#include <Beep.h>
 
 #include "sysdef.h"
 #include "cssys/common/system.h"
@@ -29,7 +30,6 @@
 
 #include "cs2d/be/isysg2d.h"		//@@@WHY?
 #include "cs2d/be/CrystWindow.h"	//@@@WHY?
-
 static bool LoopStarted = false;// For Print() to know whenever to flush output
 #define Gfx2D System->piG2D			//	put in by DH
 
@@ -48,6 +48,29 @@ IMPLEMENT_UNKNOWN_NODELETE(SysSystemDriver)
  */
 extern void debug_dump ();
 extern void cleanup ();
+
+/* not too much to be said... */
+class CrystApp : public BApplication {
+public:
+	CrystApp(SysSystemDriver *from) : BApplication("application/x-vnd.xsware-crystal") {
+		driver = from;
+		mspf = 100 * 1000;
+		time = system_time();//dhdebug
+	};
+	void Pulse(void);
+	bool QuitRequested();
+	void CrystApp::MessageReceived(BMessage *message);
+
+	void doMouseAction(BPoint point, int16 button, bool shift, bool alt, bool ctrl);
+	void doKeyAction(int key, bool down, bool shift, bool alt, bool ctrl);
+	bigtime_t mspf;
+	bigtime_t time;//dhdebug
+private:
+	
+	SysSystemDriver	*driver;
+	BWindow			*aWindow;
+	bigtime_t		milisecpf;
+};
 
 void handler (int sig)
 {
@@ -87,37 +110,14 @@ void init_sig ()
   signal (SIGILL, handler);
 }
 
-/* not too much to be said... */
-class CrystApp : public BApplication {
-public:
-	CrystApp(SysSystemDriver *from) : BApplication("application/x-vnd.xsware-crystal") {
-		driver = from;
-		mspf = 100 * 1000;
-		time = system_time();//dhdebug
-	};
-	void Pulse(void);
-	bool QuitRequested();
-	void CrystApp::MessageReceived(BMessage *message);
-
-	void doMouseAction(BPoint point, int16 button, bool shift, bool alt, bool ctrl);
-	void doKeyAction(int key, bool down, bool shift, bool alt, bool ctrl);
-	bigtime_t mspf;
-	bigtime_t time;//dhdebug
-private:
-	// performs actual drawing: done to implement BDirectWindow in the prescribed manner.
-//	void CrystApp::DrawingThread(void *data);
-	
-	SysSystemDriver	*driver;
-	BWindow			*aWindow;
-	bigtime_t		milisecpf;
-};
-
 static CrystApp *app = NULL;
 static bool firstRun;
 
 bool CrystApp::QuitRequested()
 {
+	status_t exit_value;
 	driver->Shutdown = true;
+	wait_for_thread(find_thread("LoopThread"), exit_value);//put in because I have moved drawing into that thread.
 	return(TRUE);
 }
 
@@ -143,35 +143,37 @@ void CrystApp::Pulse() {
 void CrystApp::MessageReceived(BMessage *msg)
 {	
 //	bigtime_t	time = system_time();
-	bigtime_t pre_draw_microsecs, post_draw_microsecs;
-	static long prev_frame_time = csSystemDriver::Time();//dhdebug
+//	bigtime_t pre_draw_microsecs, post_draw_microsecs;//dhdebug
+//	static long prev_frame_time = csSystemDriver::Time();//dhdebug
 	long curr_time;//dhdebug
-	//printf("got something %4s\n",&msg->what);
+//	printf("got something %4s\n",&msg->what);
 	switch(msg->what) {
 	// Switch between full-screen mode and windowed mode.
-	case 'next' :
+/*	case 'next' :
+		{
 //		driver->NextFrame(system_time () - time, system_time ());
 		pre_draw_microsecs = system_time();
 		curr_time = pre_draw_microsecs / 1000;
 		driver->NextFrame(curr_time - prev_frame_time, curr_time);//dhdebug
 		post_draw_microsecs = system_time();
-		printf("curr_time, prev_frame_time: %u  %u \n", curr_time, prev_frame_time);
+		printf("curr_time, prev_frame_time: %u  %u \n", curr_time, prev_frame_time);//dhdebug
 //		time = system_time() - time;
 		prev_frame_time = curr_time;//dhdebug
 //		mspf = time;
 		mspf = post_draw_microsecs - pre_draw_microsecs;//dhdebug
-		{
-			BMessageQueue *queu = MessageQueue();
-			BMessage *mmsg = NULL;
-			int32 i,nxt = 'next';
-			i=0;
-			while((mmsg = queu->FindMessage(nxt, 1))){
-				queu->RemoveMessage(mmsg);
-				i++;
-			}
+		BMessageQueue *queu = MessageQueue();
+		printf("queue size is %d \n", queu->CountMessages());
+		BMessage *mmsg = NULL;
+		int32 i,nxt = 'next';
+		i=0;
+		while((mmsg = queu->FindMessage(nxt, 1))){
+			queu->RemoveMessage(mmsg);
+			printf("removed a next message");
+			i++;
+		}
 //			printf("%4d was queed\n",i);
 		}
-		break;
+		break;*/
 	case 'keys' :
 		doKeyAction(msg->FindInt16("key"), msg->FindBool("down"),
 			msg->FindBool("shift"),msg->FindBool("alt"),msg->FindBool("ctrl"));
@@ -318,7 +320,7 @@ void SysSystemDriver::Loop(void)
 		my_thread = spawn_thread(SysSystemDriver::LoopThread, "LoopThread",
 							 B_DISPLAY_PRIORITY, (void*)this);
 		resume_thread(my_thread);
-		app->SetPulseRate(1000000/reqfps);
+//		app->SetPulseRate(1000000/reqfps);//dhdebug
 		app->Run();
 	} else while (!Shutdown && !ExitLoop) {
 		// we want a frame to take at least 16 ms.
@@ -470,19 +472,45 @@ BOOL ModuleIsStopping ()
 long SysSystemDriver::LoopThread(void *data)
 {
 	bigtime_t			delay;
+	static bigtime_t	prev_frame = csSystemDriver::Time();
+	bigtime_t			curr_time;
 	SysSystemDriver		*sys;
+	bool				*fConnected, *fConnectionDisabled;
 	bool	shutdown = false;
 	
 	// receive a pointer to the CrystWindow object.
 	sys = (SysSystemDriver*)data;
 	snooze(100000);
 	
-	// loop, frame after frame, until asked to quit.
-	while (!shutdown) {
+	// initialise pointer-pointers
+/*
+	IBeLibGraphicsInfo* piG2D = NULL;
+	HRESULT hRes = Gfx2D->QueryInterface ((REFIID)IID_IBeLibGraphicsInfo, (void**)&piG2D);
+	if (FAILED(hRes))	{
+		printf("Loopthread: can't get access to 2d graphics driver.\n");
+		exit(1);
+	}*/
+//	piG2D->GetfConnected(&fConnected);
+//	piG2D->GetfConnectionDisabled(&fConnectionDisabled);
 		
+	// loop, frame after frame, until asked to quit.
+	while (!shutdown /* && !(*fConnectionDisabled)*/) {
+	long render_time;
+	bigtime_t before,after;
+//		printf("LoopThread: loop executing\n");
+//		piG2D->SetFrameBufferLock(true);// change to implement BeginDraw/FinishDraw
+//		if (*fConnected)	{		// change to implement BeginDraw/FinishDraw
 		// get the right to do direct screen access.
 		//acquire_sem(w->drawing_lock);
-		app->PostMessage('next');
+//		app->PostMessage('next');//dhdebug
+//		printf("LoopThread: NextFrame executing\n");
+		curr_time = csSystemDriver::Time();
+		before = curr_time;
+		/*driver->*/NextFrame(curr_time - prev_frame, curr_time);
+		after = csSystemDriver::Time();
+		render_time = (after - before);
+		printf ("render time is %d milliseconds.\n", render_time);
+		prev_frame=curr_time;
 //		if(be_app->Lock()) {
 //			shutdown = sys->Shutdown;
 //			delay = sys->mspf;
@@ -490,28 +518,14 @@ long SysSystemDriver::LoopThread(void *data)
 //		}
 //		if(delay>0)
 //			snooze(delay);
-	snooze(app->mspf);
+//	snooze(app->mspf);//dhdebug
 
 		// release the direct screen access
 		//release_sem(w->drawing_lock);
+//		}// change to implement BeginDraw/FinishDraw
+//		piG2D->SetFrameBufferLock(false);// change to implement BeginDraw/FinishDraw
 	}	
 	return 0;
 }
-/*
-void CrystApp::DrawingThread(void *data)
-{
-	while (!shutdown) {
-		// decrement one-shot counter
-		if (acquire_sem(one_shot_cnt_sem) != B_NO_ERROR) {
-			Printf (MSG_FATAL_ERROR, "Semaphore error in DrawingThread");
-			return;
-		}
-		one_shot_cnt--;
-		release_sem(one_shot_cnt_sem);
-		
-		// acquire one-shot semaphore
-		acquire_sem(one_shot_sem);
-		
-		// do drawing
-*/	
+
 		

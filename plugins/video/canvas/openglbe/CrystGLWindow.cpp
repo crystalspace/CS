@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "sysdef.h"
+#include "cs2d/openglbe/glbe2d.h"
 
 #ifndef CRYST_WINDOW_H
 #include "CrystGLWindow.h"
@@ -32,7 +33,7 @@
 static void doKey(int key, bool down) ;
 
 CrystGLView::CrystGLView(BRect frame)
-	: BGLView(frame, "", B_FOLLOW_ALL, 0, BGL_RGB | BGL_DEPTH | BGL_DOUBLE)
+	: BGLView(frame, "", B_FOLLOW_NONE, 0, BGL_RGB | BGL_DEPTH | BGL_DOUBLE)
 {
 	inmotion = false;
 }
@@ -116,14 +117,30 @@ bool CrystGLView::IsInMotion(void) {
 	return inmotion;
 }
 
-CrystGLWindow::CrystGLWindow(BRect frame, const char *name, CrystGLView *theview)
-			: BWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE,0)
+void	CrystGLView::AttachedToWindow()
+{
+      LockGL(); 
+      BGLView::AttachedToWindow(); 
+      UnlockGL();
+}
+
+CrystGLWindow::CrystGLWindow(BRect frame, const char *name, CrystGLView *theview, csGraphics2DGLBe *piBeG2D)
+//			: BWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE,0)
 //			: BGLScreen(name, B_16_BIT_640x480, 0, &res, 0)
-//			: BDirectWindow(frame,name, B_TITLED_WINDOW, 0, 0)
+			: BDirectWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE, 0)
 //			: BWindowScreen(name, B_8_BIT_640x480, res, 0)
 {
 	view = theview;
-
+/*
+	//	initialise local flags
+	fConnected = false;
+	fConnectionDisabled = false;
+	fDrawingThreadSuspended=false;
+	locker = new BLocker();*/ //dh:remove for conventional DirectConnected
+	
+	// cache the pointer to the 2D graphics driver object
+	pi_BeG2D = piBeG2D;
+	
 	view->SetViewColor(0, 0, 0);
 	AddChild(view);
 
@@ -142,6 +159,7 @@ CrystGLWindow::~CrystGLWindow()
 
 bool CrystGLWindow::QuitRequested()
 {
+	pi_BeG2D->dpy->EnableDirectMode( false );
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return(TRUE);
 }
@@ -151,12 +169,58 @@ void CrystGLWindow::MessageReceived(BMessage *message)
 	switch(message->what) {
 	// Switch between full-screen mode and windowed mode.
 	case 'full' :
-//		SetFullScreen(!IsFullScreen());
+		SetFullScreen(!IsFullScreen());
 		break;
 	default :
 		BWindow::MessageReceived(message);
 		break;
 	}
+}
+
+void CrystGLWindow::DirectConnected(direct_buffer_info *info)
+{/*
+printf("Entered CrystWindow::DirectConnected \n");
+	if (!fConnected && fConnectionDisabled) {
+		return S_OK;
+	}
+	locker->Lock();
+
+	switch (info->buffer_state & B_DIRECT_MODE_MASK) {
+		case B_DIRECT_START:
+//			printf("DirectConnected: B_DIRECT_START \n");
+			fConnected = true;
+			if (fDrawingThreadSuspended)	{
+				status_t retval;
+				bool notdone=true;
+				while (resume_thread(find_thread("LoopThread")) == B_BAD_THREAD_STATE)	{
+					//	this is done to cope with thread setting fDrawingThreadSuspended then getting
+					//	rescheduled before it can suspend itself.  It just makes repeated attempts to
+					//	resume that thread.
+					snooze(1000);
+				}
+				fDrawingThreadSuspended = false;
+			}
+				
+		case B_DIRECT_MODIFY:
+		break;
+		
+		case B_DIRECT_STOP:
+//			printf("DirectConnected: B_DIRECT_STOP \n");
+			fConnected = false;
+		break;
+	}
+	
+	locker->Unlock();
+//    printf("leaving IXBeLibGraphicsInfo::DirectConnected \n");
+	*/
+//	let's try doing it with BGLView's DirectConnected method
+	if (pi_BeG2D->dpy) {
+		pi_BeG2D->dpy->DirectConnected(info);
+		}
+	pi_BeG2D->dpy->EnableDirectMode( true );
+	
+//	this bit just keeps conventional window behaviour until I've sorted out DirectConnected
+//BDirectWindow::DirectConnected(info);
 }
 
 long CrystGLWindow::StarAnimation(void *data)

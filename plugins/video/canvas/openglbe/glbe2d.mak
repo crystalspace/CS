@@ -4,6 +4,8 @@
 # Driver description
 DESCRIPTION.glbe2d = Crystal Space GL/Be 2D driver
 
+include libs/cs2d/openglcommon/glcommon2d.mak
+
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
@@ -35,7 +37,7 @@ CFLAGS.GLBE2D+=-I/boot/home/develop/headers/be/opengl
 # The 2D GLBe driver
 ifeq ($(USE_DLL),yes)
   GLBE2D=$(OUTDLL)glbe2d$(DLL)
-  DEP.BE2D = $(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.BE2D = $(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.GLBE2D=-lGL
 else
   GLBE2D=$(OUT)$(LIB_PREFIX)glbe2d$(LIB)
@@ -44,7 +46,13 @@ else
   LIBS.EXE+=-lGL
 endif
 DESCRIPTION.$(GLBE2D) = $(DESCRIPTION.glbe2d)
-SRC.GLBE2D = $(wildcard libs/cs2d/openglbe/*.cpp $(SRC.COMMON.DRV2D))
+SRC.GLBE2D = $(wildcard libs/cs2d/openglbe/*.cpp \
+  libs/cs2d/openglcommon/*.cpp \
+  libs/cs3d/opengl/ogl_*cache.cpp libs/cs3d/opengl/ogl_txtmgr.cpp \
+  libs/cs3d/opengl/itexture.cpp \
+  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/memheap.cpp \
+  libs/cs3d/common/inv_cmap.cpp libs/cs3d/common/imgtools.cpp\
+ $(SRC.COMMON.DRV2D))
 OBJ.GLBE2D = $(addprefix $(OUT),$(notdir $(SRC.GLBE2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -14,6 +14,8 @@ class IXBeLibGraphicsInfo : public IBeLibGraphicsInfo
     DECLARE_IUNKNOWN()
     ///
     STDMETHOD(GetDisplay)( BView** dpy );
+    STDMETHOD(GetWindow)( BWindow** cryst_window );
+    STDMETHOD(DirectConnect)(direct_buffer_info *info);
 };
 
 #endif

@@ -50,6 +50,12 @@ csGraphics2DBeLib::csGraphics2DBeLib(ISystem* piSystem, bool bUses3D) : csGraphi
     printf ("csGraphics2DBeLib::Open() -- ISystem does not support IBeLibSystemDriver.");
     exit (1);
   }
+  
+  // set up interface flags
+  // locker is set up in crystwindow as are these flags
+  fConnected = false;
+  fConnectionDisabled=false;
+  fDrawingThreadSuspended=false;
 
   //CsPrintf (MSG_INITIALIZATION, "Crystal Space X windows version");
   printf ("Crystal Space BeOS version.\n");
@@ -65,7 +71,8 @@ csGraphics2DBeLib::~csGraphics2DBeLib(void)
 
 void csGraphics2DBeLib::Initialize ()
 {
-  color_space curr_color_space;
+
+//  color_space curr_color_space;
   unsigned long RedMask, GreenMask, BlueMask;
   
   // this sets system parameters (screen size, "depth", fullscreen mode, default pixelformats)
@@ -73,108 +80,34 @@ void csGraphics2DBeLib::Initialize ()
 
   // get current screen depth
   curr_color_space = BScreen(B_MAIN_SCREEN_ID).ColorSpace();
-  
-  // set bitmap depth, overrides the Depth setting in cryst.cfg.
-  switch (curr_color_space) {
-  	case B_RGB15:
-  		Depth = 15;
-  		break;
-  	case B_RGB16:
-  		Depth = 16;
-  		break;
-  	case B_RGB32:
-  	case B_RGBA32:
-  		Depth = 32;
-  		break;
-  	default:
-  	// an unimplemented colorspace, go with defaults
-  	printf("Unrecognised screen color space, using defaults instead");
-  		break;
-  }
-  
-  switch (Depth) {
-  	case 15: 
-  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB15));
-  		RedMask   = 0x1f << 10;
-  		GreenMask = 0x1f << 5;
-  		BlueMask  = 0x1f;
-  		
-  		DrawPixel = DrawPixel16;
-  		WriteChar = WriteChar16;
-  		GetPixelAt= GetPixelAt16;
-  		DrawSprite= DrawSprite16;
-  		
-  		pfmt.PixelBytes = 2;
-  		pfmt.PalEntries = 0;
-  		pfmt.RedMask    = RedMask;
-  		pfmt.GreenMask  = GreenMask;
-  		pfmt.BlueMask   = BlueMask;
-  		
-  		complete_pixel_format();
-  		break;
-  	case 16:
-  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB16));
-  		RedMask   = 0x1f << 11;
-  		GreenMask = 0x3f << 5;
-  		BlueMask  = 0x1f;
-  		
-  		DrawPixel = DrawPixel16;
-  		WriteChar = WriteChar16;
-  		GetPixelAt= GetPixelAt16;
-  		DrawSprite= DrawSprite16;
-  		
-  		pfmt.PixelBytes = 2;
-  		pfmt.PalEntries = 0;
-  		pfmt.RedMask    = RedMask;
-  		pfmt.GreenMask  = GreenMask;
-  		pfmt.BlueMask   = BlueMask;
-  		
-  		complete_pixel_format();
-  		break;
-  	case 32:
-  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB32));
-  		RedMask   = 0xff << 16;
-  		GreenMask = 0xff << 8;
-  		BlueMask  = 0xff;
-  		
-  		DrawPixel = DrawPixel32;
-  		WriteChar = WriteChar32;
-  		GetPixelAt= GetPixelAt32;
-  		DrawSprite= DrawSprite32;
-  		
-  		pfmt.PixelBytes = 4;
-  		pfmt.PalEntries = 0;
-  		pfmt.RedMask    = RedMask;
-  		pfmt.GreenMask  = GreenMask;
-  		pfmt.BlueMask   = BlueMask;
-  		
-  		complete_pixel_format();
-  		break;
-  	case 8:
-  	case 24:
-  	default:
-  	// an unimplemented colorspace, give up and die
-  	printf("Unimplemented color depth in Be 2D driver, depth = %i\n", Depth);
-  	exit(1);
-  		break;
-  }
+  ApplyDepthInfo(curr_color_space);
+  // create buffers
+  curr_page = 0;
+  int i;
+  for (i=0; i < NO_OF_BUFFERS; i++)
+  	CHK (cryst_bitmap[i] = new BBitmap(BRect(0,0,Width-1,Height-1), curr_color_space));
 }
 
 bool csGraphics2DBeLib::Open(char *Title)
-{
-	// Open your graphic interface
-	if (!csGraphics2D::Open (Title)) return false;
+{/*
+	// This call loads the Be settings of the graphics interface
+	curr_color_space = BScreen(B_MAIN_SCREEN_ID).ColorSpace();	
+	ApplyDepthInfo(curr_color_space);
+*/	
+	// This call initializes the LineAddress array and needs Height, Width and pfmt.
+	if (!csGraphics2D::Open (Title)) return false;// remove for direct buffer access
 	
 	dpy = CHK (new CrystView(BRect(0,0,Width-1,Height-1)));
-	window = CHK (new CrystWindow(BRect(32,32,Width+32,Height+32), Title, dpy));
+	window = CHK (new CrystWindow(BRect(32,32,Width+32,Height+32), Title, dpy, this));
 	
 	window->Show();
 	if(window->Lock()) {
 		dpy->MakeFocus();
 		window->Unlock();
 	}
-
-	Memory = (unsigned char *)cryst_bitmap->Bits();
+	
+//	CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), curr_color_space));
+	Memory = (unsigned char *)cryst_bitmap[curr_page]->Bits();// comment this for direct framebuffer access.
 //	for(int i = 0; i < FRAME_HEIGHT; i++)
 //		LineAddress [i] = i * cryst_bitmap->BytesPerRow();
 
@@ -201,7 +134,7 @@ bool csGraphics2DBeLib::Open(char *Title)
 //    }
 //CHK (Memory = new unsigned char [Width*Height*pfmt.PixelBytes]);
 //  }
-  Clear (0);
+//  Clear (0);// this blows up BDirectWindow as it gets to draw before BDirectWindow is set up!
   return true;
 }
 
@@ -211,14 +144,61 @@ void csGraphics2DBeLib::Close(void)
   csGraphics2D::Close ();
 }
 
+bool csGraphics2DBeLib::BeginDraw ()
+{
+	// check that I do have a draw buffer!
+	if (Memory == NULL) return false;
+/*	
+	// if fConnectionDisabled, then I will suspend the drawing thread and await shutdown.
+	// fConnectionDisabled is set true by the csGraphics2DBeLib destructor.
+	// If true, then the Window is being destroyed so this thread should go as well!
+	// The application object may try to kill it too but it doesn't matter: you can only die once!
+	if (fConnectionDisabled) kill_thread(find_thread(NULL));
+	
+	// lock 2D driver object
+	locker->Lock();
+	
+	// this implements the fConnected feature with suspend_thread
+	// it is only feasible because this is the only place that suspends that thread.
+	// if you put in suspension elsewhere, use a proper semaphore
+	if (!fConnected)	{
+		fDrawingThreadSuspended = true;
+		locker->Unlock();
+		suspend_thread(find_thread(NULL));	
+	}*/ //uncomment for direct buffer access
+	return true;
+}
+
+void csGraphics2DBeLib::FinishDraw ()
+{
+	// unlock 2D driver object
+	locker->Unlock();
+}
+
 void csGraphics2DBeLib::Print (csRect *area)
 {
+//bigtime_t before, after, blit_time;//dhdebug
+//before=system_time();
 	if( window->Lock()) {
-		dpy->DrawBitmap(cryst_bitmap);
-//		dpy->DrawBitmapAsync(cryst_bitmap);
+		dpy->Sync();
+		dpy->DrawBitmapAsync(cryst_bitmap[curr_page]);
+		dpy->Flush();
+		
+		//advance video page
+		curr_page = (++curr_page)%NO_OF_BUFFERS;
+		Memory = (unsigned char *)cryst_bitmap[curr_page]->Bits();
+		
 		window->Unlock();
-	}
+//after=system_time();
+//blit_time=after-before;
+//printf("blit time is %i \n", blit_time);
+	} //remove this for direct frame buffer access
 //      XPutImage (dpy, window, gc, xim, 0, 0, 0, 0, Width, Height);
+}
+
+int csGraphics2DBeLib::GetPage ()
+{
+  return curr_page;
 }
 
 void csGraphics2DBeLib::SetRGB(int i, int r, int g, int b)
@@ -226,8 +206,82 @@ void csGraphics2DBeLib::SetRGB(int i, int r, int g, int b)
   csGraphics2D::SetRGB (i, r, g, b);
 }
 
+void csGraphics2DBeLib::ApplyDepthInfo(color_space this_color_space)
+{
+  unsigned long RedMask, GreenMask, BlueMask;
   
-
+  switch (this_color_space) {
+  	case B_RGB15: 
+//			defer bitmap creation
+//  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB15));
+		Depth	  = 15;
+  		RedMask   = 0x1f << 10;
+  		GreenMask = 0x1f << 5;
+  		BlueMask  = 0x1f;
+  		
+  		DrawPixel = DrawPixel16;
+  		WriteChar = WriteChar16;
+  		GetPixelAt= GetPixelAt16;
+  		DrawSprite= DrawSprite16;
+  		
+  		pfmt.PixelBytes = 2;
+  		pfmt.PalEntries = 0;
+  		pfmt.RedMask    = RedMask;
+  		pfmt.GreenMask  = GreenMask;
+  		pfmt.BlueMask   = BlueMask;
+  		
+  		complete_pixel_format();
+  		break;
+  	case B_RGB16:
+//			defer bitmap creation
+//  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB16));
+  		Depth	  = 16;
+  		RedMask   = 0x1f << 11;
+  		GreenMask = 0x3f << 5;
+  		BlueMask  = 0x1f;
+  		
+  		DrawPixel = DrawPixel16;
+  		WriteChar = WriteChar16;
+  		GetPixelAt= GetPixelAt16;
+  		DrawSprite= DrawSprite16;
+  		
+  		pfmt.PixelBytes = 2;
+  		pfmt.PalEntries = 0;
+  		pfmt.RedMask    = RedMask;
+  		pfmt.GreenMask  = GreenMask;
+  		pfmt.BlueMask   = BlueMask;
+  		
+  		complete_pixel_format();
+  		break;
+  	case B_RGB32:
+  	case B_RGBA32:
+//			defer bitmap creation
+//  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB32));
+		Depth	  = 32;
+  		RedMask   = 0xff << 16;
+  		GreenMask = 0xff << 8;
+  		BlueMask  = 0xff;
+  		
+  		DrawPixel = DrawPixel32;
+  		WriteChar = WriteChar32;
+  		GetPixelAt= GetPixelAt32;
+  		DrawSprite= DrawSprite32;
+  		
+  		pfmt.PixelBytes = 4;
+  		pfmt.PalEntries = 0;
+  		pfmt.RedMask    = RedMask;
+  		pfmt.GreenMask  = GreenMask;
+  		pfmt.BlueMask   = BlueMask;
+  		
+  		complete_pixel_format();
+  		break;
+  	default:
+  	// an unimplemented colorspace, give up and die
+  	printf("Unimplemented color depth in Be 2D driver, depth = %i\n", Depth);
+  	exit(1);
+  		break;
+  }
+}
   
 
 

@@ -49,19 +49,26 @@ virtual			~CrystView();
 	int 	inmotion;
 	BPoint 	lastloc;
 };
+class csGraphics2DBeLib;
 
 class CrystWindow : public BDirectWindow { // BWindowScreen {
 
 public:
-		// standard constructor and destrcutor
-				CrystWindow(BRect frame, const char *name, CrystView *v); 
+		// standard constructor and destructor
+				CrystWindow(BRect frame, const char *name, CrystView *v, csGraphics2DBeLib *piBeG2D); 
 virtual			~CrystWindow();
 
 		// standard window member
 virtual	bool	QuitRequested();
 virtual	void	MessageReceived(BMessage *message);
 
+virtual void	DirectConnected(direct_buffer_info *info);
+
 		CrystView		*view;
+		//	stuff to implement BDirectWindow
+		IBeLibGraphicsInfo	*piG2D;// new pointer to 2D driver info method interface.
+		csGraphics2DBeLib	*pi_BeG2D;//local copy of this pointer to csGraphics2DBeLib.
+		
 		// the drawing thread function.
 static	long	StarAnimation(void *data);
 };

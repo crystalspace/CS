@@ -25,7 +25,7 @@
 #include <Bitmap.h>
 #endif
 //#include <WindowScreen.h>
-//#include <DirectWindow.h>
+#include <DirectWindow.h>
 #include <GLView.h>
 
 //#include <OS.h>
@@ -47,24 +47,43 @@ virtual			~CrystGLView();
 
    	bool IsInMotion(void);
 
+	//	for intialisation
+	virtual void AttachedToWindow();
+	
 	int 	inmotion;
 	BPoint 	lastloc;
 };
 
-class CrystGLWindow : public BWindow { // BGLScreen { //BDirectWindow { // BWindowScreen {
+class csGraphics2DGLBe;
 
+class CrystGLWindow : public BDirectWindow { // BGLScreen { //BWindow { // BWindowScreen {
+friend class csGraphics2DGLBe;
 public:
 		// standard constructor and destrcutor
-				CrystGLWindow(BRect frame, const char *name, CrystGLView *v); 
+				CrystGLWindow(BRect frame, const char *name, CrystGLView *v, csGraphics2DGLBe *p); 
 virtual			~CrystGLWindow();
 
 		// standard window member
 virtual	bool	QuitRequested();
 virtual	void	MessageReceived(BMessage *message);
 
+virtual void	DirectConnected(direct_buffer_info *info);
+
 		CrystGLView		*view;
 		status_t 		res;
+		
+		//	stuff to implement BDirectWindow
+//		IBeLibGraphicsInfo	*piG2D;// new pointer to 2D driver info method interface.
+		csGraphics2DGLBe	*pi_BeG2D;//local copy of this pointer to csGraphics2DBeLib.
+protected:
+  BLocker		*locker;
+  bool			fDirty;
+  bool			fConnected;
+  bool			fConnectionDisabled;
+  bool			fDrawingThreadSuspended;
+		
 		// the drawing thread function.
+public:
 static	long	StarAnimation(void *data);
 };
 

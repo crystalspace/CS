@@ -44,11 +44,28 @@ public:
 class csGraphics2DBeLib : public csGraphics2D
 {
   friend class csGraphics3DSoftware;
+  friend class CrystWindow;
 private:
   CrystView*	dpy;
-  int 		display_width, display_height;
+  int 			display_width, display_height;//actual screen dimensions, as opposed to window dimensions
   CrystWindow	*window;
-  BBitmap	*cryst_bitmap;
+//  BBitmap		*cryst_bitmap;	// this points to the BBitmap used by CrystWindow in non-direct framebuffer mode.
+  								// this is the single buffer version.
+  color_space	curr_color_space;
+  
+  // double buffer implementation
+#define			NO_OF_BUFFERS 2
+  BBitmap		*cryst_bitmap[NO_OF_BUFFERS];
+  int			curr_page;
+  
+  // stuff to implement BDirectWindow  
+protected:
+  BLocker		*locker;
+  bool			fDirty;
+  bool			fConnected;
+  bool			fConnectionDisabled;
+  bool			fDrawingThreadSuspended;
+		
 
 // Everything for simulated depth
   int depth;
@@ -60,13 +77,16 @@ public:
   virtual ~csGraphics2DBeLib(void);
 
   virtual bool Open (char *Title);
-  virtual bool Initialize ();
+  virtual void Initialize ();
   virtual void Close ();
 
-  virtual bool BeginDraw () { return (Memory != NULL); }
+  virtual bool BeginDraw () /*{ return (Memory != NULL); }*/;
+  virtual void FinishDraw ();
 
   virtual void Print (csRect *area = NULL);
+  virtual int  GetPage ();
   virtual void SetRGB (int i, int r, int g, int b);
+  virtual void ApplyDepthInfo(color_space this_color_space);
 
 protected:
   DECLARE_IUNKNOWN()

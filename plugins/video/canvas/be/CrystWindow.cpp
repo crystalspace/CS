@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sysdef.h"
+#include "cs2d/be/belibg2d.h"
 #ifndef CRYST_WINDOW_H
 #include "cs2d/be/CrystWindow.h"
 #endif
@@ -109,14 +110,27 @@ bool CrystView::IsInMotion(void) {
 	return inmotion;
 }
 
-CrystWindow::CrystWindow(BRect frame, const char *name, CrystView *theview)
+CrystWindow::CrystWindow(BRect frame, const char *name, CrystView *theview, csGraphics2DBeLib *piBeG2D)
 //			: BWindow(frame,name, B_TITLED_WINDOW, 0, 0)
-			: BDirectWindow(frame,name, B_TITLED_WINDOW, 0, 0)
+//			: BDirectWindow(frame,name, B_TITLED_WINDOW, 0, 0)
+			: BDirectWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE)
 //			: BWindowScreen(name, B_8_BIT_640x480, res, 0)
 {
 	view = theview;
 	
-	view->SetViewColor(0, 0, 0);
+	//	initialise local flags
+	pi_BeG2D = piBeG2D;// cache a pointer to the csGraphics2DBeLib object for later use.
+	pi_BeG2D->fConnected = false;
+	pi_BeG2D->fConnectionDisabled = false;
+	pi_BeG2D->locker = new BLocker();
+	
+	HRESULT hRes = piBeG2D->QueryInterface ((REFIID)IID_IBeLibGraphicsInfo, (void**)&piG2D);
+	if (SUCCEEDED(hRes))	{
+		printf("piBeG2D->QueryInterface succeeded \n");
+	}
+
+	view->SetViewColor(0, 0, 0);// remove for direct framebuffer access
+//	view->SetViewColor(B_TRANSPARENT_32_BIT);// uncomment for direct framebuffer access
 	AddChild(view);
 
 	// Add a shortcut to switch in and out of fullscreen mode.
@@ -124,12 +138,17 @@ CrystWindow::CrystWindow(BRect frame, const char *name, CrystView *theview)
 	
 	// As we said before, the window shouldn't get wider than 2048 in any
 	// direction, so those limits will do.
-	SetSizeLimits(40.0, 2000.0, 40.0, 2000.0);
+	SetSizeLimits(40.0, 2000.0, 40.0, 2000.0);//this isn't needed in BDirectWindow
 }
 
 CrystWindow::~CrystWindow()
 {
 //	long		result;
+	pi_BeG2D->fConnectionDisabled = true;
+	Hide();
+	Flush();
+	delete pi_BeG2D->locker;
+	piG2D->Release();
 }
 
 bool CrystWindow::QuitRequested()
@@ -149,6 +168,15 @@ void CrystWindow::MessageReceived(BMessage *message)
 		BWindow::MessageReceived(message);
 		break;
 	}
+}
+
+void CrystWindow::DirectConnected(direct_buffer_info *info)
+{
+printf("Entered CrystWindow::DirectConnected \n");
+//HRESULT hRes = piG2D->DirectConnect(info);//dh:uncomment this to get direct framebuffer access
+
+//	this bit just keeps conventional window behaviour until I've sorted out DirectConnected
+BDirectWindow::DirectConnected(info);
 }
 
 long CrystWindow::StarAnimation(void *data)
