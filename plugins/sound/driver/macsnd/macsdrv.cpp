@@ -36,8 +36,14 @@ static pascal void SoundDoubleBackProc(
 
 IMPLEMENT_FACTORY(csSoundDriverMac);
 
+EXPORT_CLASS_TABLE (snddrv)
+	EXPORT_CLASS (csSoundDriverMac, SOUND_DRIVER,
+		"Crystal Space Sound driver for Macintosh")
+EXPORT_CLASS_TABLE_END
+
 IMPLEMENT_IBASE(csSoundDriverMac)
   IMPLEMENTS_INTERFACE(iSoundDriver)
+	IMPLEMENTS_INTERFACE(iPlugIn)
 IMPLEMENT_IBASE_END;
 
 csSoundDriverMac::csSoundDriverMac(iBase *piBase)

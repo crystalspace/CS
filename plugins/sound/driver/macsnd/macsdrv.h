@@ -29,13 +29,11 @@
 #include "csutil/scf.h"
 #include "isnddrv.h"
 
-extern const CLSID CLSID_MacSoundDriver;
-
-class csSoundDriverMac : public ISoundDriver
+class csSoundDriverMac : public iSoundDriver
 {
 protected:
   iSystem* m_piSystem;
-  ISoundRender *m_piSoundRender;
+  iSoundRender *m_piSoundRender;
   void * Memory;
   int MemorySize;
   float volume;
@@ -49,7 +47,7 @@ public:
   virtual ~csSoundDriverMac();
   bool Initialize(iSystem *iSys);
   
-  bool Open(ISoundRender *render, int frequency, bool bit16, bool stereo);
+  bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
   void Close();
 	
   void SetVolume(float vol);
