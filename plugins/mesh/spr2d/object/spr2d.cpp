@@ -541,24 +541,39 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
   {
     if (texels_dirty)
     {
-      size_t texelSize = sizeof (float) * vertices.Length() * 2;
-      if (!texel_buffer.IsValid() ||
-	(size_t)texel_buffer->GetSize() != texelSize)
+		
+	  int texels_count;
+	  const csVector2 *uvani_uv;
+	  if (!uvani)
+	    texels_count = vertices.Length ();
+	  else
+	 	uvani_uv = uvani->GetVertices (texels_count);
+	  
+	  size_t texelSize = sizeof (float) * texels_count * 2;
+      if (!texel_buffer.IsValid() || (size_t)texel_buffer->GetSize() != texelSize)
       {
-	texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
-	  texelSize, CS_BUF_STATIC, 
-	  CS_BUFCOMP_FLOAT, 2, false));
-	variable->SetValue (texel_buffer);
+		texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+		texelSize, CS_BUF_STATIC, 
+		CS_BUFCOMP_FLOAT, 2, false));
+		variable->SetValue (texel_buffer);
       }
 
       csRenderBufferLock<csVector2> texelLock (texel_buffer);
 
-      for (int i = 0; i < vertices.Length(); i++)
-      {
-	csVector2& v = texelLock[i];
-	v.x = vertices[i].u;
-	v.y = vertices[i].v;
-      }
+	  for (int i = 0; i < texels_count; i++)
+	  {
+	  	csVector2& v = texelLock[i];
+	  	if (!uvani)
+		{
+			v.x = vertices[i].u;
+			v.y = vertices[i].v;
+		}
+		else
+		{
+			v.x = uvani_uv[i].x;
+			v.y = uvani_uv[i].y;
+		}
+	  }
       texels_dirty = false;
     }
   }
@@ -653,7 +668,15 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
 void csSprite2DMeshObject::NextFrame (csTicks current_time, const csVector3& /*pos*/)
 {
   if (uvani && !uvani->halted)
+#ifdef CS_USE_NEW_RENDERER
+  {
+	int old_frame_index = uvani->frameindex;
+#endif
     uvani->Advance (current_time);
+#ifdef CS_USE_NEW_RENDERER
+	texels_dirty = old_frame_index != uvani->frameindex;
+  }
+#endif
 }
 
 void csSprite2DMeshObject::Particle::UpdateLighting (const csArray<iLight*>& lights,
