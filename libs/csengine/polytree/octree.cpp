@@ -359,7 +359,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   // @@@ Choose based on vertices in polygons!
 #elif 0
   // @@@ Choose one axis at a time instead of all three together!
-#elif 1
+#elif 0
   // @@@ Choose while trying to maximize the area of solid space
   // This will improve occlusion!
   // One way to do this:

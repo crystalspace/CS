@@ -16,6 +16,8 @@ The history order has been reversed so that new features are at the top.
 	    - Fixed an alignment bug which appeared since the
 	      last modification of csendian on processors that require
 	      strict alignment.
+	- Restored old way to generate octree because it takes forever
+	  to compute now.
 4-Apr-2000
 	- Fixed several occurances of 'delete' that should be 'delete[]'.
 	  Reported by Paul Snively <psnively@earthlink.net>.
