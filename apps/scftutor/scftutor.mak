@@ -28,8 +28,6 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp apps/scftutor
 
 ZOO.EXE = zoo$(EXE)
-DOG.DLL = Dog$(DLL)
-WORM.DLL = Worm$(DLL)
 SRC.ZOO = apps/scftutor/zoo.cpp apps/scftutor/frog.cpp
 OBJ.ZOO = $(addprefix $(OUT),$(notdir $(SRC.ZOO:.cpp=$O)))
 SRC.DOG = apps/scftutor/dog.cpp
@@ -39,6 +37,13 @@ OBJ.WORM = $(addprefix $(OUT),$(notdir $(SRC.WORM:.cpp=$O)))
 DESCRIPTION.$(ZOO.EXE) = $(DESCRIPTION.scftut)
 DESCRIPTION.$(DOG.DLL) = Sample Dog class
 DESCRIPTION.$(WORM.DLL) = Sample Worm class
+
+ifeq ($(USE_SHARED_PLUGINS),yes)
+  DOG.DLL = Dog$(DLL)
+  WORM.DLL = Worm$(DLL)
+else
+  SRC.ZOO += $(SRC.DOG) $(SRC.WORM)
+endif
 
 LIB.SCFTUTOR = $(CSUTIL.LIB) $(CSSYS.LIB)
 

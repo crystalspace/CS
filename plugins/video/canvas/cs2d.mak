@@ -4,7 +4,7 @@
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cs2d/common libs/cs2d/openglcommon libs/cs2d/glide2common 
+vpath %.cpp libs/cs2d/common
 
 SRC.COMMON.DRV2D=libs/cs2d/common/igraph2d.cpp libs/cs2d/common/graph2d.cpp \
   libs/cs2d/common/fonts.cpp

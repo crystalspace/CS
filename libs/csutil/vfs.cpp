@@ -36,11 +36,6 @@
 // Characters ignored in VFS paths (except in middle)
 #define CS_VFSSPACE		" \t"
 
-//Hack to work around clash with some Win32 definition
-#ifdef DeleteFile
-#undef DeleteFile
-#endif
-
 //***********************************************************
 // NOTE on naming convention: public classes begin with "cs"
 // while private (local) classes do not.

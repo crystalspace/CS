@@ -24,11 +24,6 @@
 #include <time.h>
 #include "csutil/zip.h"
 
-//Hack to work around clash with some Win32 definition
-#ifdef DeleteFile
-#undef DeleteFile
-#endif
-
 /**
  * csArchive class that can be used to work with standard .ZIP format files.
  * Constructor accepts a file name - if such a file is not found, it is

@@ -144,4 +144,9 @@ typedef struct
 #      define E_OFFSET_START_CENTRAL_DIRECTORY  12
 #      define E_ZIPFILE_COMMENT_LENGTH          16
 
+// what an ugly Windows hack ...
+#ifdef DeleteFile
+#  undef DeleteFile
+#endif
+
 #endif /* ZIP_H */
