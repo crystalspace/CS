@@ -1286,8 +1286,8 @@ void csEngine::ResetWorldSpecificSettings()
   SetClearZBuf (default_clear_zbuf);
   SetLightmapCellSize (default_lightmap_cell_size);
   SetMaxLightmapSize (default_max_lightmap_w, default_max_lightmap_h);
-  SetAmbientLight (csColor (default_ambient_red, default_ambient_green, 
-    default_ambient_blue));
+  SetAmbientLight (csColor (default_ambient_red / 255.0f, default_ambient_green / 255.0f, 
+    default_ambient_blue / 255.0f));
 }
 
 void csEngine::InitCuller ()

@@ -2071,13 +2071,19 @@ bool csLoader::LoadSettings (char* buf)
       }
       case CS_TOKEN_MAXLIGHTMAPSIZE:
       {
-	int maxw, maxh;
-	csScanStr (params, "%d,%d", &maxw, &maxh);
-	if ( (maxw >= 0) && (maxh >= 0) )
-	  Engine->SetMaxLightmapSize (maxw, maxh);
+	int max[2], num;
+	csScanStr (params, "%D", max, &num);
+	if (num == 1) 
+	  max[1] = max[0];
+	if ( (max[0] > 0) && (max[1] > 0) )
+	{
+	  Engine->SetMaxLightmapSize (max[0], max[1]);
+	}
 	else
+	{
 	  ReportNotify ("bogus maximum lightmap size %dx%d, line %d", 
-	    maxw, maxh, csGetParserLine());
+	    max[0], max[1], csGetParserLine());
+	}
 	break;
       }
       case CS_TOKEN_AMBIENT:
