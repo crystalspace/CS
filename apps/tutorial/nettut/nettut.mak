@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tutorial/nettut
 
-NETTUT.EXE = simple1$(EXE)
+NETTUT.EXE = nettut$(EXE)
 INC.NETTUT = $(wildcard apps/tutorial/nettut/*.h)
 SRC.NETTUT = $(wildcard apps/tutorial/nettut/*.cpp)
 OBJ.NETTUT = $(addprefix $(OUT),$(notdir $(SRC.NETTUT:.cpp=$O)))
