@@ -428,7 +428,6 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual void* GetPrivateObject () { return (void*)this; }
   virtual int GetPolygonCount () { return static_polygons.Length (); }
   virtual void RemovePolygon (int idx);
   virtual void RemovePolygons ();
@@ -936,7 +935,6 @@ public:
   struct ThingState : public iThingState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual void* GetPrivateObject () { return (void*)scfParent; }
     virtual iThingFactoryState* GetFactory ()
     {
       return (iThingFactoryState*)(scfParent->static_data);

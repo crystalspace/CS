@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 6-Jan-2005
+	- Jorrit removed GetPrivateObject() from iThingState and iBezierState.
 	- Eric Sunshine applied a patch from Brian DeVries
 	  <mavericktux@cashette.com> for sprcal3d.txi which provides some help
 	  for problems which new sprcal3d users might encounter. Eric also did

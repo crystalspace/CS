@@ -87,9 +87,6 @@ SCF_VERSION (iBezierFactoryState, 0, 0, 1);
  */
 struct iBezierFactoryState : public iBase
 {
-  /// @@@ UGLY
-  virtual void* GetPrivateObject () = 0;
-
   /**
    * Get the center of the curves.
    */
@@ -179,9 +176,6 @@ SCF_VERSION (iBezierState, 0, 0, 1);
  */
 struct iBezierState : public iBase
 {
-  /// @@@ UGLY
-  virtual void* GetPrivateObject () = 0;
-
   /// Get the factory.
   virtual iBezierFactoryState* GetFactory () = 0;
 };

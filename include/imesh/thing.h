@@ -203,9 +203,6 @@ SCF_VERSION (iThingFactoryState, 0, 2, 0);
  */
 struct iThingFactoryState : public iBase
 {
-  /// @@@ UGLY
-  virtual void* GetPrivateObject () = 0;
-
   /**
    * Compress the vertex table so that all nearly identical vertices
    * are compressed. The polygons in the set are automatically adapted.
@@ -670,9 +667,6 @@ SCF_VERSION (iThingState, 0, 7, 0);
  */
 struct iThingState : public iBase
 {
-  /// @@@ UGLY
-  virtual void* GetPrivateObject () = 0;
-
   /// Get the factory.
   virtual iThingFactoryState* GetFactory () = 0;
 

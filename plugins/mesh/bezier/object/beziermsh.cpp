@@ -1132,8 +1132,9 @@ void csBezierMesh::MergeTemplate (
   static_data->curves_scale = tpl->GetCurvesScale ();
 
   //@@@ TEMPORARY
-  csRef<iBezierState> ith (SCF_QUERY_INTERFACE (tpl, iBezierState));
-  ParentTemplate = (csBezierMesh *) (ith->GetPrivateObject ());
+  csRef<iBezierState> ith = SCF_QUERY_INTERFACE (tpl, iBezierState);
+  ParentTemplate = ((csBezierMesh::BezierState*)(iBezierState*)ith)
+  	->GetPrivateObject ();
 
   for (i = 0; i < tpl->GetCurveVertexCount (); i++)
   {

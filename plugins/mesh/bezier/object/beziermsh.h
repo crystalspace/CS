@@ -603,7 +603,6 @@ public:
   struct BezierFactoryState : public iBezierFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual void* GetPrivateObject () { return (void*)scfParent; }
     virtual const csVector3& GetCurvesCenter () const
     { return scfParent->static_data->curves_center; }
     virtual void SetCurvesCenter (const csVector3& cen)
@@ -663,8 +662,9 @@ public:
   //------------------------- iBezierState interface -------------------------
   struct BezierState : public iBezierState
   {
+    csBezierMesh* GetPrivateObject () { return scfParent; }
+
     SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual void* GetPrivateObject () { return (void*)scfParent; }
     virtual iBezierFactoryState* GetFactory ()
     {
       return &(scfParent->scfiBezierFactoryState);
