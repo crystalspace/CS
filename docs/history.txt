@@ -14,6 +14,19 @@ The history order has been reversed so that new features are at the top.
 	  at http://crystal.sourceforge.net/.
 	    - Added link for online CVS browsing.
 	    - Aesthetic improvements.
+	- Eric Sunshine made the following changes to the automated
+	  documentation building process:
+	    - docproc.pl now places downloadable documentation package files
+	      in the FTP area rather than the HTTP area.
+	    - Modified spoofdir.cfg to access FTP space instead of HTTP space
+	      in order to satisfy HTTP requests for documentation.
+	    - Documentation packages can now be downloaded via HTTP or FTP
+	      rather than being restricted only to HTTP.
+	    - Updated the Jump Start page (http://crystal.sourceforge.net/) to
+	      reflect fact that documentation packages can now be downloaded
+	      via HTTP and FTP.
+	    - Updated documentation directory annotations (in spoofdir.info
+	      files) appropriately.
 4-Sep-2000
 	- Brandon Ehle did some maintenance to the Python scripting stuff.
 	  Need to wait for next SWIG release for everything to fall in place.
