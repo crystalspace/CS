@@ -59,7 +59,7 @@ endif
 .SUFFIXES: $O $(EXE) $(LIB) $(DLL) .S .c .cpp .h .asm .ash .y
 
 # Define paths automatically searched for source files
-vpath %.cpp support/debug
+vpath %.cpp
 
 # Directory for object files
 OUTBASE=out
@@ -89,16 +89,8 @@ ifeq ($(MODE),debug)
   CFLAGS+=$(CFLAGS.D)CS_DEBUG
 endif
 
-# Memory debugger
-ifdef MEMDBG
-  # This should be filtered out
-  DEP.EXE += $(OUT)/memdbg$O
-  # This is here because it should be the latest on the command line
-  LIBS += $(OUT)/memdbg$O
-endif
-
 # Use $(^^) instead of $^ when you need all dependencies except libraries
-^^=$(filter-out %memdbg$O,$(filter-out %$(LIB_SUFFIX),$^))
+^^=$(filter-out %$(LIB_SUFFIX),$^)
 # Use $(<<) instead of $< to allow system-dependent makefiles to override
 <<=$<
 # Use $(L^) to link with all libraries specified as dependencies

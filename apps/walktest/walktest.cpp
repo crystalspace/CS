@@ -85,7 +85,7 @@
 #  include <unistd.h>
 #endif
 
-#include "debug/fpu80x86.h"	// for debugging numerical instabilities
+#include "csutil/fpu80x86.h"	// for debugging numerical instabilities
 
 WalkTest *Sys;
 

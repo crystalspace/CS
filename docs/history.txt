@@ -4,6 +4,15 @@ The history order is reversed so that new features are at the top.
 	- Removed support/doom2cs again. This doom2cs utility can now be
 	  found at ftp://sunsite.dk/projects/crystal/contrib/doom2cs.zip
 	- Ryan Surkamp applied a fix to the bcterr landscape engine.
+	- Removed support/gnu/bison.sim file. As far as I could see this file
+	  is not used in CS. If it appears I looked wrong then we can always
+	  put it back.
+	- Removed the old memory debugger in support/debug. There are
+	  better tools out there now (valgrind for example) and I'm not even
+	  sure this system still works.
+	- Moved fpu80x86.h to include/csutil.
+	- Completely removed the 'support' directory from CS since it is now
+	  empty.
 7-Aug-2002
 	- Eric Sunshine fixed a couple problems with csconf.mak.  First, it was
 	  using " instead of $".  It was using the hardcoded path "out/"
