@@ -1087,7 +1087,7 @@ bool awsManager::RecursiveBroadcastToChildren (
       // If it has children, broadcast to them (depth-first recursion)
       if (child->HasChildren ())
         if (RecursiveBroadcastToChildren (child, Event)) return true;
-      if (CheckFocus (child, Event)) return true;
+      if (!child->isDeaf () && CheckFocus (child, Event)) return true;
     }           // End for
   }
   return false;
