@@ -53,6 +53,8 @@ chronological order.
 	  integers.  When downsampling was performed the downsampled data was
 	  zero bytes long (muted).
 	- Eric Sunshine augmented cspace.i so that it also publishes csPixmap.
+	- Duhprey made null renderer for NR (Shaders currently try to load with 
+	  error, but it appears to be harmless.)
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.
