@@ -24,6 +24,25 @@
 #include "oglg2d.h"
 #include "isystem.h"
 
+#ifndef CDS_FULLSCREEN
+#define CDS_UPDATEREGISTRY  0x00000001
+#define CDS_TEST            0x00000002
+#define CDS_FULLSCREEN      0x00000004
+#define CDS_GLOBAL          0x00000008
+#define CDS_SET_PRIMARY     0x00000010
+#define CDS_RESET           0x40000000
+#define CDS_SETRECT         0x20000000
+#define CDS_NORESET         0x10000000
+
+/* Return values for ChangeDisplaySettings */
+#define DISP_CHANGE_SUCCESSFUL       0
+#define DISP_CHANGE_RESTART          1
+#define DISP_CHANGE_FAILED          -1
+#define DISP_CHANGE_BADMODE         -2
+#define DISP_CHANGE_NOTUPDATED      -3
+#define DISP_CHANGE_BADFLAGS        -4
+#define DISP_CHANGE_BADPARAM        -5
+#endif
 
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
