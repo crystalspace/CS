@@ -20,6 +20,7 @@
 #define __CS_IVARIA_KEYVAL_H__
 
 #include "csutil/scf.h"
+#include "iutil/stringarray.h"
 
 struct iObject;
 struct iSector;
