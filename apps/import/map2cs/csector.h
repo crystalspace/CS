@@ -22,6 +22,7 @@
 #ifndef __CSECTOR_H__
 #define __CSECTOR_H__
 
+#include "dochelp.h"
 #include "isector.h"
 
 /**

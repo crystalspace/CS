@@ -18,6 +18,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __DOCHELP_H__
+#define __DOCHELP_H__
+
 #include "iutil/document.h"
 
 // Helper type for often used stuff
@@ -55,4 +58,6 @@ static inline DocNode CreateNode (DocNode parent, const char* name,
   cont->SetValueAsInt (content);
   return temp;
 }
+
+#endif
 

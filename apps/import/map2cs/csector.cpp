@@ -189,7 +189,8 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
 
           //print textureinfo
 	  CreateNode (p, "material", pTexture->GetTexturename());
-	  CreateNode (CreateNode (p, "texmap"), "plane", pPolygon->GetBaseplane()->GetName());
+	  pWorld->WriteTexMap (pPolygon->GetBaseplane (), p);
+	  //CreateNode (CreateNode (p, "texmap"), "plane", pPolygon->GetBaseplane()->GetName());
 	  CreateNode (CreateNode (p, "portal"), "sector", pPortal->GetTargetSector()->GetName());
         }
       }

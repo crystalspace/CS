@@ -23,6 +23,7 @@
 #ifndef __CWORLD_H__
 #define __CWORLD_H__
 
+#include "dochelp.h"
 #include "iworld.h"
 #include "csutil/ref.h"
 
@@ -91,13 +92,13 @@ public:
    */
   CMapEntity* GetWorldspawn();
 
-protected:
   /**
     * Write a vector to the worldfile. This will be everything, including
     * opening and closing bracket and doing the proper scaling
     */
   bool WriteVector(csRef<iDocumentNode> node, const char* name, const CdVector3& v);
 
+protected:
   /// Write a vector as vertex (Including the VERTEX() statement)
   bool WriteVertex(csRef<iDocumentNode> node, double x, double y, double z);
 
@@ -149,9 +150,6 @@ protected:
   /// Write the sounds section to the worldfile
   void WriteSounds(csRef<iDocumentNode> node);
 
-  /// Write the planes section to the worldfile
-  bool WritePlanes(csRef<iDocumentNode> node);
-
   /// Writes all the sector and everything inside of it.
   bool WriteSectors(csRef<iDocumentNode> node);
 
@@ -160,6 +158,10 @@ protected:
 
   /// Write Templates for all curves
   bool WriteCurvetemplates(csRef<iDocumentNode> node);
+
+public:
+  /// Write a simple 'texmap' section for a polygon based on plane.
+  bool WriteTexMap (CMapTexturedPlane* plane, DocNode& poly);
 
 protected:
 }; //CCSWorld

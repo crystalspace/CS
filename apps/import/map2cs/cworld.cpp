@@ -215,7 +215,6 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
   WriteSounds (world);
   WriteSpritesTemplate (world);
   WriteScriptsTemplate (world);
-  WritePlanes (world);
 
   WriteCurvetemplates (world);
 
@@ -327,10 +326,10 @@ void CCSWorld::WriteSkydome(csRef<iDocumentNode> node)
   if (!pEntity) return;
 
   const char* DomeName   = pEntity->GetValueOfKey   ("skydome",      "sky");
-  double      DomeRadius = pEntity->GetNumValueOfKey("skydomeradius", 800);
+  //double      DomeRadius = pEntity->GetNumValueOfKey("skydomeradius", 800);
 
   CTextureManager* pTexMan  = m_pMap->GetTextureManager();
-  CTextureFile*    pTexture = pTexMan->GetTexture(DomeName);
+  //CTextureFile*    pTexture = pTexMan->GetTexture(DomeName);
 
 /* @@@ TODO!
   
@@ -379,7 +378,7 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
     {"b", "7", "6", "2", "3", NULL},
     {"l", "6", "4", "0", "2", NULL},
     {"u", "6", "7", "5", "4", NULL},
-    {"d", "3", "2", "0", "1", NULL},
+    {"d", "3", "2", "0", "1", NULL}
   };
 
   //assign texture pointers to the sides of the skybox
@@ -590,8 +589,6 @@ bool CCSWorld::WritePlugins(csRef<iDocumentNode> node)
   plugin->SetAttribute ("name", "thing");
   plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.factory.thing");
   plugin->SetAttribute ("name", "thingFact");
-  plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.thing.plane");
-  plugin->SetAttribute ("name", "plane");
 
   return true;
 }
@@ -668,41 +665,6 @@ bool CCSWorld::WritePlayerStart(csRef<iDocumentNode> node)
   return true;
 }
 
-bool CCSWorld::WritePlanes(csRef<iDocumentNode> node)
-{
-  int i;
-  for (i=0; i<m_pMap->GetPlaneCount(); i++)
-  {
-    CMapTexturedPlane* pPlane = m_pMap->GetPlane(i);
-
-    char TexName[200];
-    sprintf(TexName, "Plane%d", i);
-    pPlane->SetName(TexName);
-
-    //Check if the plane has a texture. Otherwise, we will not write
-    //thi info to the map file.
-    if (pPlane->GetTexture())
-    {
-      CdVector3 Origin = pPlane->GetTextureCoordinates(0);
-      CdVector3 First  = pPlane->GetTextureCoordinates(1);
-      CdVector3 Second = pPlane->GetTextureCoordinates(2);
-
-      DocNode addon = CreateNode (node, "addon");
-      CreateNode (addon, "plugin", "plane");
-      DocNode params = CreateNode (addon, "params");
-      CreateNode (params, "name", TexName);
-      WriteVector(params, "orig", Origin);
-      WriteVector(params, "first", First);
-      WriteVector(params, "second", Second);
-      CreateNode (params, "firstlen",
-	(float)((First-Origin).Norm()*m_ScaleFactor));
-      CreateNode (params, "secondlen",
-	(float)((Second-Origin).Norm()*m_ScaleFactor));
-    }
-  }
-  return true;
-}
-
 bool CCSWorld::WriteSectors(csRef<iDocumentNode> node)
 {
   int i;
@@ -774,6 +736,28 @@ bool CCSWorld::WriteKeys(csRef<iDocumentNode> node, CIWorld* pWorld,
   return true;
 }
 
+bool CCSWorld::WriteTexMap (CMapTexturedPlane* plane, DocNode& poly)
+{
+  //Check if the plane has a texture. Otherwise, we will not write
+  //thi info to the map file.
+  if (plane->GetTexture())
+  {
+    CdVector3 Origin = plane->GetTextureCoordinates(0);
+    CdVector3 First  = plane->GetTextureCoordinates(1);
+    CdVector3 Second = plane->GetTextureCoordinates(2);
+
+    DocNode params = CreateNode (poly, "texmap");
+    WriteVector(params, "orig", Origin);
+    WriteVector(params, "first", First);
+    WriteVector(params, "second", Second);
+    CreateNode (params, "firstlen",
+	(float)((First-Origin).Norm()*m_ScaleFactor));
+    CreateNode (params, "secondlen",
+	(float)((Second-Origin).Norm()*m_ScaleFactor));
+  }
+  return true;
+}
+
 bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon, 
 			    CCSSector* pSector, bool SectorPolygon, 
 			    const CVertexBuffer& Vb,
@@ -817,8 +801,7 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
   {
     //print textureinfo
     CreateNode (poly, "material", pTexture->GetTexturename());
-    CreateNode (CreateNode (poly, "texmap"), "plane", 
-      pPolygon->GetBaseplane()->GetName());
+    WriteTexMap (pPolygon->GetBaseplane (), poly);
     Sky = (strcasecmp (pTexture->GetTexturename(), "sky") == 0);
   }
 

@@ -1,7 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 27-Mar-2003
-	- Several fixes to make CS compile again, at least on Mingw.
+	- Several fixes to make CS compile again, at least on mingw.
+	- Changed map2cs so it no longer outputs planes using the plane
+	  addon loader. Instead texture mapping is directly specified in
+	  every polygon.
 	- Andrew Craig made some more fixes to make CS compile again under
 	  windows.
 	- Eric Sunshine fixed problem with 10-Mar-2003 patch to bugplug.mak and
