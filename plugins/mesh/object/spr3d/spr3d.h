@@ -822,6 +822,11 @@ private:
    */
   csColor* vertex_colors;
 
+  /**
+   * Base color that will be added to the sprite colors.
+   */
+  csColor base_color;
+
   /// The parent.
   csSprite3DMeshObjectFactory* factory;
 
@@ -943,7 +948,7 @@ public:
   void SetLighting (bool l)
   {
     do_lighting = l;
-    if (!do_lighting) ResetVertexColors ();
+    ResetVertexColors ();
   }
   /// Is lighting enabled?
   bool IsLighting ()
@@ -951,19 +956,20 @@ public:
     return do_lighting;
   }
 
-  /// Set color for all vertices
-  void SetColor (const csColor& col);
+  /// Set base color.
+  void SetBaseColor (const csColor& col)
+  {
+    delete[] vertex_colors;
+    vertex_colors = NULL;
+    base_color = col;
+    ResetVertexColors ();
+  }
 
-  /// Add color to all vertices
-  void AddColor (const csColor& col);
-
-  /**
-   * Set a color for a vertex.
-   * As soon as you use this function this sprite will be rendered
-   * using gouraud shading. Calling this function for the first time
-   * will initialize all colors to black.
-   */
-  void SetVertexColor (int i, const csColor& col);
+  /// Get base color.
+  void GetBaseColor (csColor& col)
+  {
+    col = base_color;
+  }
 
   /**
    * Add a color for a vertex.
@@ -1248,6 +1254,14 @@ public:
     virtual bool IsLodEnabled ()
     {
       return scfParent->GetLodLevel () >= 0;
+    }
+    virtual void SetBaseColor (const csColor& col)
+    {
+      scfParent->SetBaseColor (col);
+    }
+    virtual void GetBaseColor (csColor& col)
+    {
+      scfParent->GetBaseColor (col);
     }
   } scfiSprite3DState;
 };

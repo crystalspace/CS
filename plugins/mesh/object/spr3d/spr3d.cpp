@@ -605,6 +605,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   cur_cameranr = -1;
   cur_movablenr = -1;
   MixMode = CS_FX_COPY;
+  base_color.Set (0, 0, 0);
   initialized = false;
   shapenr = 0;
 }
@@ -638,32 +639,6 @@ void csSprite3DMeshObject::SetMaterial (iMaterialWrapper *material)
   cstxt = material;
 }
 
-void csSprite3DMeshObject::SetColor (const csColor& col)
-{
-  for (int i=0 ; i < factory->GetNumTexels () ; i++)
-    SetVertexColor (i, col);
-}
-
-
-void csSprite3DMeshObject::AddColor (const csColor& col)
-{
-  for (int i=0 ; i < factory->GetNumTexels () ; i++)
-    AddVertexColor (i, col);
-}
-
-
-void csSprite3DMeshObject::SetVertexColor (int i, const csColor& col)
-{
-  if (!vertex_colors)
-  {
-    vertex_colors = new csColor [factory->GetNumTexels ()];
-    int j;
-    for (j = 0 ; j < factory->GetNumTexels (); j++)
-      vertex_colors[j].Set (0, 0, 0);
-  }
-  vertex_colors[i] = col;
-}
-
 void csSprite3DMeshObject::AddVertexColor (int i, const csColor& col)
 {
   if (!vertex_colors)
@@ -671,7 +646,7 @@ void csSprite3DMeshObject::AddVertexColor (int i, const csColor& col)
     vertex_colors = new csColor [factory->GetNumTexels ()];
     int j;
     for (j = 0 ; j < factory->GetNumTexels (); j++)
-      vertex_colors[j].Set (0, 0, 0);
+      vertex_colors[j] = base_color;
   }
   vertex_colors [i] += col;
 }
@@ -680,7 +655,7 @@ void csSprite3DMeshObject::ResetVertexColors ()
 {
   if (vertex_colors)
     for (int i = 0 ; i < factory->GetNumTexels (); i++)
-      vertex_colors [i].Set (0, 0, 0);
+      vertex_colors [i] = base_color;
   //delete [] vertex_colors;
   //vertex_colors = NULL;
 }
@@ -1192,6 +1167,10 @@ void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
 	iMovable* movable)
 {
   SetupObject ();
+
+  // Make sure that the color array is initialized.
+  AddVertexColor (0, csColor (0, 0, 0));
+
   if (!do_lighting) return;
 
   // Make sure the normals are computed
@@ -1199,25 +1178,13 @@ void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
   if (tween_ratio && GetLightingQuality() != CS_SPR_LIGHTING_FAST)
     factory->ComputeNormals (cur_action->GetCsNextFrame (cur_frame));
 
-  // Make sure that the color array is initialized.
-  AddVertexColor (0, csColor (0, 0, 0));
-
   if (GetLightingQuality() == CS_SPR_LIGHTING_LQ ||
       GetLightingQuality() == CS_SPR_LIGHTING_HQ )
   {
-    int r, g, b;
     int num_texels = factory->GetNumTexels();
-
-    //@@@@@@@@@@@@@@@@@ TODO:GetAmbientColor (r, g, b);
-    r = g = b = 0;
-    //@@@@@@
-    float rr = r / 128.0;
-    float gg = g / 128.0;
-    float bb = b / 128.0;
-
-    // Reseting all of the vertex_colors to the ambient light.
+    // Reseting all of the vertex_colors to the base color.
     for (int i = 0 ; i < num_texels; i++)
-      vertex_colors [i].Set (rr, gg, bb);
+      vertex_colors [i] = base_color;
   }
   
 // @@@
@@ -1293,6 +1260,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
   float light_color_g;
   float light_color_b;
 
+#if 0
   // ambient colors.
   int r, g, b;
   
@@ -1302,7 +1270,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
   float amb_r = r / 128.0;
   float amb_g = g / 128.0;
   float amb_b = b / 128.0;
-
+#endif
 
   for (light_num = 0 ; light_num < num_lights ; light_num++)
   {
@@ -1342,7 +1310,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
     // NOTE: Doing this to get rid of a divide in the loop.
     //obj_dist = 1 / obj_dist;
 
-    // The first light should have the ambient color added.
+    // The first light should have the base color added.
     if(light_num == 0)
     {
       for (j = 0 ; j < num_texels ; j++)
@@ -1350,9 +1318,9 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
         // this obj_dist is not the obj_dist, see NOTE above.
         cosinus = (obj_light_dir * factory->GetNormal (tf_idx, j)) * inv_obj_dist;
         cosinus_light = (cosinus * light_bright_wor_dist);
-        vertex_colors[j].Set(light_color_r * cosinus_light + amb_r,
-                             light_color_g * cosinus_light + amb_g,
-                             light_color_b * cosinus_light + amb_b);
+        vertex_colors[j].Set(light_color_r * cosinus_light + base_color.red,
+                             light_color_g * cosinus_light + base_color.green,
+                             light_color_b * cosinus_light + base_color.blue);
       }
     }
     else  // The next lights should have the light color added.

@@ -48,6 +48,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TRANSPARENT)
 
   CS_TOKEN_DEF (ACTION)
+  CS_TOKEN_DEF (BASECOLOR)
   CS_TOKEN_DEF (F)
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (FRAME)
@@ -803,6 +804,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ACTION)
     CS_TOKEN_TABLE (FACTORY)
+    CS_TOKEN_TABLE (BASECOLOR)
     CS_TOKEN_TABLE (LIGHTING)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (MIXMODE)
@@ -850,6 +852,13 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_ACTION:
         ScanStr (params, "%s", str);
 	spr3dLook->SetAction (str);
+        break;
+      case CS_TOKEN_BASECOLOR:
+	{
+	  csColor col;
+          ScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
+	  spr3dLook->SetBaseColor (col);
+	}
         break;
       case CS_TOKEN_LIGHTING:
 	{

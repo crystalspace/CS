@@ -7,6 +7,10 @@ The history order is reversed so that new features are at the top.
 	  which better describes its purpose. It also returns the
 	  iCameraPosition now. CreateCollection now looks if a collection
 	  with the given name exists before creating one.
+	- Extended 3D sprite mesh plugin with SetBaseColor() and
+	  GetBaseColor(). This color is added to the color of all vertices.
+	  This works both with or without lighting. Also added BASECOLOR()
+	  keyword for the loader of 3D sprites.
 24-Apr-2001
 	- Martin Geisse possibly fixed the lockup that Philip get when
 	  exiting Blocks. The bug was in the WaveOut sound driver.
