@@ -99,8 +99,32 @@ void csSector::Prepare ()
 
 void csSector::AddThing (csThing* thing)
 {
-  thing->SetNext ((csPolygonSet*)first_thing);
+  thing->SetNext (first_thing);
   first_thing = thing;
+}
+
+bool csSector::RemoveThing (csThing* thing)
+{
+  if (first_thing == thing)
+  {
+    first_thing = (csThing*)thing->GetNext();
+    return true;
+  }
+  else
+  {
+    csThing* th = first_thing;
+    while (th)
+    {
+      csThing* next = (csThing*)th->GetNext();
+      if (next==thing)
+      {
+        th->SetNext(next->GetNext());
+        return true;
+      }
+      th = next;
+    }
+  }
+  return false; //Thing was not found
 }
 
 void csSector::AddLight (csStatLight* light)

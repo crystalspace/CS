@@ -172,6 +172,11 @@ public:
   void AddThing (csThing* thing);
 
   /**
+   * Remove a thing from this sector.
+   */
+  bool RemoveThing (csThing* thing);
+
+  /**
    * Add a static or pseudo-dynamic light to this sector.
    */
   void AddLight (csStatLight* light);
