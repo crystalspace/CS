@@ -18,6 +18,10 @@ chronological order.
 	      files.
 	    - Fixed --help message so that it shows how the path for the VOS
 	      pkg-config files can be given.
+	- Eric Sunshine removed the OPCODE compile-time assertion that
+	  sizeof(bool)==1 since this assertion is not satisfiable on all
+	  platforms (such as MacOS/X) and since the OPCODE library itself does
+	  not actually require bool to be one byte.
 29-May-2004
 	- Peter Amstutz added a "--with-vos" option to the configure
 	  script to set the PKG_CONFIG_PATH environment variable when

@@ -56,7 +56,7 @@
 	typedef float				float32;	//!< sizeof(float32)	must be 4
 	typedef double				float64;	//!< sizeof(float64)	must be 4
 
-	ICE_COMPILE_TIME_ASSERT(sizeof(bool)==1);	// ...otherwise things might fail with VC++ 4.2 !
+	// ICE_COMPILE_TIME_ASSERT(sizeof(bool)==1);	// ...otherwise things might fail with VC++ 4.2 !
 	ICE_COMPILE_TIME_ASSERT(sizeof(ubyte)==1);
 	ICE_COMPILE_TIME_ASSERT(sizeof(sbyte)==1);
 	ICE_COMPILE_TIME_ASSERT(sizeof(sword)==2);
