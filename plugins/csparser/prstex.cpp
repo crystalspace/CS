@@ -134,9 +134,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     if (t) return t;
   }
 
-  //char filename[256];
-  //strcpy (filename, txtname);
-  const char* filename = 0;
+  char filename[256];
+  strcpy (filename, txtname);
   csColor transp (0, 0, 0);
   bool do_transp = false;
   bool keep_image = false;
@@ -191,8 +190,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	      child, "Expected VFS filename for 'file'!");
 	    return 0;
 	  }
-          //strcpy (filename, fname);
-	  filename = fname;
+          strcpy (filename, fname);
 	}
         break;
       case XMLTOKEN_MIPMAP:

@@ -9,7 +9,15 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed a small bug in the thing plugin in case a polygon mesh
 	  was requested before the thing was prepared and in case the
 	  thing contained a portal.
-	- Matze fixed a stupid mistake where 3ds2lev forgot to output lights
+	- Jorrit reverted a change that res did about four weeks ago. Instead
+	  of copying the texture name for loading a texture he kept a pointer
+	  to it. The problem with that is that the filename of the texture
+	  (out of the child XML node) is not guaranteed to remain in memory
+	  while the node is out of scope. So a copy is required. Also in
+	  addition it was no longer possible to omit the <file> keyword
+	  if the filename happened to be equal to the texture name. The result
+	  of that was that dmburg failed.
+	- Matze fixed a stupid mistake where 3ds2lev forgot to output lights.
 11-Jun-2003
 	- Eric Sunshine removed an invocation of class_scfFinalize() from
 	  SCF_REGISTER_STATIC_CLASS() which should have been removed yesterday
