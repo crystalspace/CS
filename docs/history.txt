@@ -35,6 +35,7 @@ chronological order.
 	  'zero' return value in case a key wasn't found in the hash.
 	- res changed the csRefDocumentation slightly; at one place, 'csRef'
 	  was used, tho 'csRefCount' would make more sense there.
+	- res fixed the xwindow plugin after the csHash<>::Get() change.
 9-Mar-2004
 	- Wouter clarified a comment on iLightingInfo::InitializeDefault().
 	- Reed added "relight" command to Walktest.
