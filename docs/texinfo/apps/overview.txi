@@ -20,7 +20,10 @@ A @sc{3ds} to Crystal Space map converter (work in progress!).
 @cindex Applications, @file{csdemo}
 @item csdemo
 A self-running space demo. It requires the @file{demodata.zip} file
-that you can get from @url{ftp://sunsite.dk/projects/crystal/cs096/levels/demodata.zip}.
+that you can get from:
+
+@noindent
+@url{ftp://sunsite.dk/projects/crystal/cs096/levels/demodata.zip}
 
 @cindex @file{csfedit}
 @cindex Applications, @file{csfedit}
@@ -86,18 +89,6 @@ This is a tool to test graphics performance.
 @cindex Applications, @file{pysimp}
 @item pysimp
 An extremely simple example demonstrating use of the Python plug-in module.
-
-@cindex @file{scfreg}
-@cindex Applications, @file{scfreg}
-@item scfreg
-This application is used to register plug-in modules, such as the software and
-hardware renderers, with Crystal Space's @sc{scf} mechanism.
-
-@cindex @file{scftutor}
-@cindex Applications, @file{scftutor}
-@item scftutor
-An tutorial demonstrating the ins and outs of Crystal Space's @sc{scf} system.
-@xref{SCF}.
 
 @cindex @file{vsh}
 @cindex Applications, @file{vsh}
