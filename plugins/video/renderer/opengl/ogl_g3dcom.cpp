@@ -5080,7 +5080,7 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
     SetupBlend (CS_FX_COPY, 0, false);
 
   glEnable (GL_TEXTURE_2D);
-  glColor4f (1.0, 1.0, 1.0, Alpha ? (BYTE_TO_FLOAT (Alpha)) : 1.0);
+  glColor4f (1.0, 1.0, 1.0, Alpha ? (BYTE_TO_FLOAT (Alpha)) : 0.0);
   glBindTexture (GL_TEXTURE_2D, texturehandle);
 
   // convert texture coords given above to normalized (0-1.0) texture
