@@ -1448,7 +1448,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
 
   for (light_num = 0 ; light_num < num_lights ; light_num++)
   {
-    light_color = lights [light_num]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
+    light_color = lights [light_num]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
     sq_light_radius = lights [light_num]->GetSquaredRadius ();
 
     // Compute light position in object coordinates
@@ -1552,7 +1552,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (iLight** lights, int num_lights,
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
 
-    csColor light_color = lights[i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL)
+    csColor light_color = lights[i]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
       * lights[i]->GetBrightnessAtDistance (qsqrt (wor_sq_dist));
 
     for (j = 0 ; j < num_texels ; j++)
@@ -1614,7 +1614,7 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
   csReversibleTransform movtrans = movable->GetFullTransform ();
   for (i = 0 ; i < num_lights ; i++)
   {
-    csColor light_color = lights [i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
+    csColor light_color = lights [i]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
     float sq_light_radius = lights [i]->GetSquaredRadius ();
 
     // Compute light position in object coordinates

@@ -92,7 +92,6 @@ csLoader::csLoaderStats::csLoaderStats()
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADDON)
   CS_TOKEN_DEF (ATTENUATION)
-  CS_TOKEN_DEF (BACK2FRONT)
   CS_TOKEN_DEF (CAMERA)
   CS_TOKEN_DEF (CENTER)
   CS_TOKEN_DEF (COLLECTION)
@@ -1091,7 +1090,6 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
     CS_TOKEN_TABLE (HARDMOVE)
     CS_TOKEN_TABLE (NOLIGHTING)
     CS_TOKEN_TABLE (NOSHADOWS)
-    CS_TOKEN_TABLE (BACK2FRONT)
     CS_TOKEN_TABLE (INVISIBLE)
     CS_TOKEN_TABLE (DETAIL)
     CS_TOKEN_TABLE (ZFILL)
@@ -1198,16 +1196,6 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
 	  return NULL;
 	}
         mesh->GetFlags().Set (CS_ENTITY_NOSHADOWS);
-        break;
-      case CS_TOKEN_BACK2FRONT:
-        if (!mesh)
-	{
-	  ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	"First specify the parent factory with FACTORY!");
-	  return NULL;
-	}
-        mesh->GetFlags().Set (CS_ENTITY_BACK2FRONT);
         break;
       case CS_TOKEN_INVISIBLE:
         if (!mesh)
@@ -1459,7 +1447,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
     CS_TOKEN_TABLE (PARAMS)
     CS_TOKEN_TABLE (NOLIGHTING)
     CS_TOKEN_TABLE (NOSHADOWS)
-    CS_TOKEN_TABLE (BACK2FRONT)
     CS_TOKEN_TABLE (INVISIBLE)
     CS_TOKEN_TABLE (DETAIL)
     CS_TOKEN_TABLE (ZFILL)
@@ -1539,9 +1526,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
         break;
       case CS_TOKEN_NOSHADOWS:
         mesh->GetFlags().Set (CS_ENTITY_NOSHADOWS);
-        break;
-      case CS_TOKEN_BACK2FRONT:
-        mesh->GetFlags().Set (CS_ENTITY_BACK2FRONT);
         break;
       case CS_TOKEN_INVISIBLE:
         mesh->GetFlags().Set (CS_ENTITY_INVISIBLE);

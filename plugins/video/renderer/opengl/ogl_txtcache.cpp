@@ -28,8 +28,8 @@
 #include "ivideo/graph3d.h"
 
 // need definitions of R24(), G24(), and B24()
-#ifndef NORMAL_LIGHT_LEVEL
-#define NORMAL_LIGHT_LEVEL 128
+#ifndef CS_NORMAL_LIGHT_LEVEL
+#define CS_NORMAL_LIGHT_LEVEL 128
 #endif
 
 //----------------------------------------------------------------------------//

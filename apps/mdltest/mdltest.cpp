@@ -560,17 +560,17 @@ void Simple::SetupFrame ()
 
   iCamera* c = view->GetCamera();
   if (kbd->GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
+    c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
   if (kbd->GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
+    c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
   if (kbd->GetKeyState (CSKEY_PGUP))
-    c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
+    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
   if (kbd->GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
+    c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
   if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (VEC_FORWARD * 4 * speed, false);
+    c->Move (CS_VEC_FORWARD * 4 * speed, false);
   if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (VEC_BACKWARD * 4 * speed, false);
+    c->Move (CS_VEC_BACKWARD * 4 * speed, false);
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (

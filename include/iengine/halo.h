@@ -24,6 +24,9 @@
 
 struct iMaterialWrapper;
 
+/**
+ * The possible halo-types.
+ */
 enum csHaloType
 {
   cshtCross,

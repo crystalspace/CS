@@ -433,8 +433,8 @@ awsTest::SetupFrame()
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 2);
 
-  c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
-  c2->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
+  c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
+  c2->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
   
   // Tell 3D driver we're going to display 3D things.
   if (!myG3D->BeginDraw (

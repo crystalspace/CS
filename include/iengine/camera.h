@@ -22,19 +22,19 @@
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 
-#define VEC_FORWARD   csVector3(0,0,1)
-#define VEC_BACKWARD  csVector3(0,0,-1)
-#define VEC_RIGHT     csVector3(1,0,0)
-#define VEC_LEFT      csVector3(-1,0,0)
-#define VEC_UP        csVector3(0,1,0)
-#define VEC_DOWN      csVector3(0,-1,0)
+#define CS_VEC_FORWARD   csVector3(0,0,1)
+#define CS_VEC_BACKWARD  csVector3(0,0,-1)
+#define CS_VEC_RIGHT     csVector3(1,0,0)
+#define CS_VEC_LEFT      csVector3(-1,0,0)
+#define CS_VEC_UP        csVector3(0,1,0)
+#define CS_VEC_DOWN      csVector3(0,-1,0)
 
-#define VEC_ROT_RIGHT  csVector3(0,1,0)
-#define VEC_ROT_LEFT   csVector3(0,-1,0)
-#define VEC_TILT_RIGHT (-csVector3(0,0,1))
-#define VEC_TILT_LEFT  (-csVector3(0,0,-1))
-#define VEC_TILT_UP    (-csVector3(1,0,0))
-#define VEC_TILT_DOWN  (-csVector3(-1,0,0))
+#define CS_VEC_ROT_RIGHT  csVector3(0,1,0)
+#define CS_VEC_ROT_LEFT   csVector3(0,-1,0)
+#define CS_VEC_TILT_RIGHT (-csVector3(0,0,1))
+#define CS_VEC_TILT_LEFT  (-csVector3(0,0,-1))
+#define CS_VEC_TILT_UP    (-csVector3(1,0,0))
+#define CS_VEC_TILT_DOWN  (-csVector3(-1,0,0))
 
 class csCamera;
 class csVector3;
@@ -46,7 +46,8 @@ SCF_VERSION (iCamera, 0, 0, 13);
 
 /**
  * Camera class. This class represents camera objects which can be used to
- * render a world in the engine. A camera has the following properties: <ul>
+ * render a world in the engine. A camera has the following properties:
+ * <ul>
  * <li> Home sector: The sector in which rendering starts.
  * <li> Transformation: This is an orthonormal transformation which is applied
  *      to all rendered objects to move them from world space to camera space.
@@ -218,3 +219,4 @@ struct iCamera : public iBase
 };
 
 #endif
+

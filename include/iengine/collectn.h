@@ -28,6 +28,7 @@ SCF_VERSION (iCollection, 0, 0, 3);
 
 /**
  * A collection object is for conveniance of the script language.
+ * It is simply a collection of other objects.
  */
 struct iCollection : public iBase
 {
@@ -57,28 +58,28 @@ struct iCollectionList : public iBase
   /// Create a new collection.
   virtual iCollection* NewCollection (const char* name) = 0;
 
-  /// Return the number of collections in this list
+  /// Return the number of collections in this list.
   virtual int GetCount () const = 0;
 
-  /// Return a collection by index
+  /// Return a collection by index.
   virtual iCollection *Get (int n) const = 0;
 
-  /// Add a collection
+  /// Add a collection.
   virtual int Add (iCollection *obj) = 0;
 
-  /// Remove a collection
+  /// Remove a collection.
   virtual bool Remove (iCollection *obj) = 0;
 
-  /// Remove the nth collection
+  /// Remove the nth collection.
   virtual bool Remove (int n) = 0;
 
-  /// Remove all collections
+  /// Remove all collections.
   virtual void RemoveAll () = 0;
 
-  /// Find a collection and return its index
+  /// Find a collection and return its index.
   virtual int Find (iCollection *obj) const = 0;
 
-  /// Find a collection by name
+  /// Find a collection by name.
   virtual iCollection *FindByName (const char *Name) const = 0;
 };
 

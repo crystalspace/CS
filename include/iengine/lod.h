@@ -51,6 +51,18 @@ struct iLODControl : public iBase
    * Set the features you want this mesh object to support. Features can
    * be disabled by the engine for LOD purposes.
    * The values in this mask are combinations of the CS_LOD_* flags.
+   * The following values are possible in the mask (CS_LOD_ALL represents
+   * all):
+   * <ul>
+   * <li>CS_LOD_TRIANGLE_REDUCTION
+   * <li>CS_LOD_LIGHT_QUALITY
+   * <li>CS_LOD_LIGHT_QUANTITY
+   * <li>CS_LOD_FRAME_ANIMATION
+   * <li>CS_LOD_SKELETAL_ANIMATION
+   * <li>CS_LOD_TEXTURE_DETAIL
+   * <li>CS_LOD_TEXTURE_SIZE
+   * <li>CS_LOD_DISTANCE_REDUCTION
+   * </ul>
    */
   virtual void SetLODFeatures (uint32 mask, uint32 value) = 0;
 

@@ -86,16 +86,6 @@ class csFlags;
  */
 #define CS_ENTITY_NOLIGHTING 32
 
-/**
- * If CS_ENTITY_BACK2FRONT is set then all objects with the same
- * render order as this one and which also have this flag set will
- * be rendered in roughly back to front order. All objects with
- * the same render order but which do not have this flag set will
- * be rendered later. This flag is important if you want to have
- * alpha transparency rendered correctly.
- */
-#define CS_ENTITY_BACK2FRONT 64
-
 SCF_VERSION (iMeshDrawCallback, 0, 0, 1);
 
 /**
@@ -253,12 +243,29 @@ struct iMeshWrapper : public iBase
   virtual long GetRenderPriority () const = 0;
 
   /**
-   * Get flags for this meshwrapper.
+   * Get flags for this meshwrapper. The following flags are supported:
+   * <ul>
+   * <li>CS_ENTITY_CONVEX: entity is convex. This can help the engine with
+   *     optimizing rendering.
+   * <li>CS_ENTITY_DETAIL: this is a detail object. Again this is a hint
+   *     for the engine to render this object differently.
+   * <li>CS_ENTITY_CAMERA: entity will always be centered around the camera.
+   * <li>CS_ENTITY_INVISIBLE: entity is invisible.
+   * <li>CS_ENTITY_NOSHADOWS: cast no shadows.
+   * <li>CS_ENTITY_NOLIGHTING: do not light this object.
+   * </ul>
    */
   virtual csFlags& GetFlags () = 0;
 
   /**
    * Set the Z-buf drawing mode to use for this object.
+   * Possible values are:
+   * <ul>
+   * <li>CS_ZBUF_NONE: do not read nor write the Z-buffer.
+   * <li>CS_ZBUF_FILL: only write the Z-buffer but do not read.
+   * <li>CS_ZBUF_USE: write and read the Z-buffer.
+   * <li>CS_ZBUF_TEST: only read the Z-buffer but do not write.
+   * </ul>
    */
   virtual void SetZBufMode (csZBufMode mode) = 0;
   /**
@@ -435,28 +442,28 @@ SCF_VERSION (iMeshFactoryList, 0, 0, 1);
  */
 struct iMeshFactoryList : public iBase
 {
-  /// Return the number of mesh factory wrappers in this list
+  /// Return the number of mesh factory wrappers in this list.
   virtual int GetCount () const = 0;
 
-  /// Return a mesh factory wrapper by index
+  /// Return a mesh factory wrapper by index.
   virtual iMeshFactoryWrapper *Get (int n) const = 0;
 
-  /// Add a mesh factory wrapper
+  /// Add a mesh factory wrapper.
   virtual int Add (iMeshFactoryWrapper *obj) = 0;
 
-  /// Remove a mesh factory wrapper
+  /// Remove a mesh factory wrapper.
   virtual bool Remove (iMeshFactoryWrapper *obj) = 0;
 
-  /// Remove the nth mesh factory wrapper
+  /// Remove the nth mesh factory wrapper.
   virtual bool Remove (int n) = 0;
 
-  /// Remove all mesh factory wrappers
+  /// Remove all mesh factory wrappers.
   virtual void RemoveAll () = 0;
 
-  /// Find a mesh factory wrapper and return its index
+  /// Find a mesh factory wrapper and return its index.
   virtual int Find (iMeshFactoryWrapper *obj) const = 0;
 
-  /// Find a mesh factory wrapper by name
+  /// Find a mesh factory wrapper by name.
   virtual iMeshFactoryWrapper *FindByName (const char *Name) const = 0;
 };
 

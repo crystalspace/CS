@@ -1239,7 +1239,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "action"))
   {
-    csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other(3.0f*VEC_FORWARD);
+    csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other(3.0f*CS_VEC_FORWARD);
     iPolygon3D* p = Sys->view->GetCamera ()->GetHit (where);
     if (p)
     {

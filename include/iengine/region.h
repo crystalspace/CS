@@ -99,31 +99,33 @@ struct iRegion : public iBase
 
 SCF_VERSION (iRegionList, 0, 0, 1);
 
-/// A list of region objects.
+/**
+ * A list of region objects.
+ */
 struct iRegionList : public iBase
 {
-  /// Return the number of regions in this list
+  /// Return the number of regions in this list.
   virtual int GetCount () const = 0;
 
-  /// Return a region by index
+  /// Return a region by index.
   virtual iRegion *Get (int n) const = 0;
 
-  /// Add a region
+  /// Add a region.
   virtual int Add (iRegion *obj) = 0;
 
-  /// Remove a region
+  /// Remove a region.
   virtual bool Remove (iRegion *obj) = 0;
 
-  /// Remove the nth region
+  /// Remove the nth region.
   virtual bool Remove (int n) = 0;
 
-  /// Remove all regions
+  /// Remove all regions.
   virtual void RemoveAll () = 0;
 
-  /// Find a region and return its index
+  /// Find a region and return its index.
   virtual int Find (iRegion *obj) const = 0;
 
-  /// Find a region by name
+  /// Find a region by name.
   virtual iRegion *FindByName (const char *Name) const = 0;
 };
 

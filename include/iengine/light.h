@@ -32,9 +32,9 @@ struct iNovaHalo;
 struct iFlareHalo;
 
 /// Light level that is used when there is no light on the texture.
-#define DEFAULT_LIGHT_LEVEL 20
+#define CS_DEFAULT_LIGHT_LEVEL 20
 /// Light level that corresponds to a normally lit texture.
-#define NORMAL_LIGHT_LEVEL 128
+#define CS_NORMAL_LIGHT_LEVEL 128
 
 /**
  * Attenuation controls how the brightness of a light fades with distance.
@@ -91,9 +91,18 @@ struct iLight : public iBase
   /// Set the color of this light.
   virtual void SetColor (const csColor& col) = 0;
 
-  /// Return current attenuation mode
+  /// Return current attenuation mode.
   virtual int GetAttenuation () = 0;
-  /// Set attenuation mode
+  /**
+   * Set attenuation mode. The following values are possible (CS_ATTN_LINEAR
+   * is default CS_ATTN_LINEAR):
+   * <ul>
+   * <li> CS_ATTN_NONE: light * 1
+   * <li> CS_ATTN_LINEAR: light * (radius - distance) / radius
+   * <li> CS_ATTN_INVERSE: light * (radius / distance)
+   * <li> CS_ATTN_REALISTIC: light * (radius^2 / distance^2)
+   * </ul>
+   */
   virtual void SetAttenuation (int a) = 0;
 
   /// Create a cross halo for this light.
@@ -110,33 +119,36 @@ struct iLight : public iBase
 
 SCF_VERSION (iLightList, 0, 0, 1);
 
+/**
+ * This structure represents a list of lights.
+ */
 struct iLightList : public iBase
 {
-  /// Return the number of lights in this list
+  /// Return the number of lights in this list.
   virtual int GetCount () const = 0;
 
-  /// Return a light by index
+  /// Return a light by index.
   virtual iLight *Get (int n) const = 0;
 
-  /// Add a light
+  /// Add a light.
   virtual int Add (iLight *obj) = 0;
 
-  /// Remove a light
+  /// Remove a light.
   virtual bool Remove (iLight *obj) = 0;
 
-  /// Remove the nth light
+  /// Remove the nth light.
   virtual bool Remove (int n) = 0;
 
-  /// Remove all lights
+  /// Remove all lights.
   virtual void RemoveAll () = 0;
 
-  /// Find a light and return its index
+  /// Find a light and return its index.
   virtual int Find (iLight *obj) const = 0;
 
-  /// Find a light by name
+  /// Find a light by name.
   virtual iLight *FindByName (const char *Name) const = 0;
 
-  /// Find a light by its ID value
+  /// Find a light by its ID value.
   virtual iLight *FindByID (unsigned long id) const = 0;
 };
 

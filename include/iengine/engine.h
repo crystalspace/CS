@@ -157,7 +157,16 @@ SCF_VERSION (iDrawFuncCallback, 0, 0, 1);
  */
 struct iDrawFuncCallback : public iBase
 {
-  /// Before drawing.
+  /**
+   * Before drawing.
+   * The 'type' will be one of the following:
+   * <ul>
+   * <li>CS_CALLBACK_SECTOR: a sector is being drawn.
+   * <li>CS_CALLBACK_SECTOREXIT: a sector has been drawn completely.
+   * <li>CS_CALLBACK_MESH: a mesh will be drawn if visible.
+   * <li>CS_CALLBACK_VISMESH: the mesh is visible and will be drawn.
+   * </ul>
+   */
   virtual void DrawFunc (iRenderView* rview, int type, void* entity) = 0;
 };
 
@@ -248,8 +257,13 @@ struct iEngine : public iBase
   /**
    * Register a new render priority.
    * The parameter rendsort is one of the CS_RENDPRI_... flags.
-   * By default this is CS_RENDPRI_NONE which means objects in this render
-   * priority are not sorted.
+   * By default this is CS_RENDPRI_NONE. The following values are possible:
+   * <ul>
+   * <li>CS_RENDPRI_NONE: objects in this render priority are not sorted.
+   * <li>CS_RENDPRI_FRONT2BACK: sort objects front to back (as seen from
+   *     camera viewpoint).
+   * <li>CS_RENDPRI_BACK2FRONT: sort objects back to front.
+   * </ul>
    */
   virtual void RegisterRenderPriority (const char* name, long priority,
   	int rendsort = CS_RENDPRI_NONE) = 0;
@@ -298,7 +312,8 @@ struct iEngine : public iBase
   /**
    * Conveniance function to create the thing containing the
    * convex outline of a sector. The thing will be empty but
-   * it will have CS_ZBUF_FILL set and have 'wall' as render
+   * it will have CS_ZBUF_FILL set (so that the Z-buffer will be filled
+   * by the polygons of this object) and have 'wall' as render
    * priority. This version creates a mesh wrapper.
    */
   virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
@@ -324,6 +339,10 @@ struct iEngine : public iBase
   /**
    * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).
    * Default is CS_ENGINE_CACHE_READ.
+   * <ul>
+   * <li>CS_ENGINE_CACHE_READ: Read the cache.
+   * <li>CS_ENGINE_CACHE_WRITE: Write the cache.
+   * </ul>
    */
   virtual void SetLightingCacheMode (int mode) = 0;
   /// Get the mode for the lighting cache.
@@ -355,9 +374,16 @@ struct iEngine : public iBase
   /**
    * Set the desired engine mode.
    * One of the CS_ENGINE_... flags. Default is CS_ENGINE_AUTODETECT.
-   * If you select CS_ENGINE_AUTODETECT then the mode will be
-   * auto-detected (depending on level and/or hardware capabilities)
-   * the first time csEngine::Draw() is called.
+   * <ul>
+   * <li>CS_ENGINE_AUTODETECT: try to auto-detect the best mode to use
+   *     for rendering this level (also depends on hardware capabilities).
+   *     This is calculated the first time iEngine->Draw() is called.
+   * <li>CS_ENGINE_BACK2FRONT: Render polygons back to front (optionally
+   *     using octree/bsp for this).
+   * <li>CS_ENGINE_FRONT2BACK: Use the c-buffer for culling polygons and
+   *     render front to back (only if octree/bsp tree is available).
+   * <li>CS_ENGINE_ZBUFFER: Use the Z-buffer for rendering.
+   * </ul>
    */
   virtual void SetEngineMode (int mode) = 0;
 
@@ -474,7 +500,8 @@ struct iEngine : public iBase
    * <li>CS_NLIGHT_DYNAMIC: return dynamic lights.
    * <li>CS_NLIGHT_NEARBYSECTORS: Also check lights in nearby sectors
    *     (not implemented yet).
-   * </ul><br>
+   * </ul>
+   * <br>
    * It will only return as many lights as the size that you specified
    * for the light array. The returned lights are not guaranteed to be sorted
    * but they are guaranteed to be the specified number of lights closest to

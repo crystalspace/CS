@@ -9,6 +9,20 @@ The history order is reversed so that new features are at the top.
 	  'filename'.
 	- Modified the simple2 tutorial for the above change (i.e.
 	  simplified it).
+	- Renamed VEC_FORWARD and other similar defines to CS_VEC_FORWARD
+	  (i.e. follow CS conventions). Also updated apimod94.txi for this
+	  change.
+	- Renamed DEFAULT_LIGHT_LEVEL to CS_DEFAULT_LIGHT_LEVEL.
+	- Renamed NORMAL_LIGHT_LEVEL to CS_NORMAL_LIGHT_LEVEL.
+	- Removed CS_ENTITY_BACK2FRONT as this flag is obsolete and now
+	  handled by the render priority system. It was not implemented
+	  anyway.
+	- Deleted obsolete include/iengine/terrain.h include file. This
+	  was apparantly forgotten a long time ago.
+	- Rationalized many of the engine Doxygen comments. i.e. added
+	  more documentation for possible CS_... values where they can
+	  be used. Also updated some out-dated documentation and also
+	  added missing entries.
 5-Jan-2002
 	- Fixed a bug with the OpenGL renderer where it was trying to
 	  store a value of 0, 1, or 2 in a boolean :-)

@@ -59,7 +59,8 @@ struct iMotionTemplate : public iBase
   /// Find a bone index by name.
   virtual int FindBoneByName (const char* name) = 0;
   /// Add a keyframe to a handled bone by the bones index.
-  virtual void AddFrameBone (int boneid, float frametime, const csVector3 &position, const csQuaternion &rotation) = 0;
+  virtual void AddFrameBone (int boneid, float frametime,
+  	const csVector3 &position, const csQuaternion &rotation) = 0;
 };
 
 SCF_VERSION (iMotionController, 0, 10, 0);
@@ -80,7 +81,8 @@ struct iMotionController : public iBase
   /// Pause or Unpause this motion.
   virtual void Pause(bool enable) = 0;
 
-// All sorts of various features such as loop on/off, per character timescaling, etc
+  // All sorts of various features such as loop on/off,
+  // per character timescaling, etc.
 };
 
 SCF_VERSION (iMotionManager, 0, 10, 0);
@@ -107,7 +109,6 @@ struct iMotionManager : public iBase
   virtual iMotionController* AddController (iSkeletonBone *skel) = 0;
   /**
    * Delete a MotionController from a skeleton.
-   *
    * Note: Use when deleting a skeleton, not when pausing or changing
    *       animations (Memory fragmentation!).
    */
@@ -117,20 +118,18 @@ struct iMotionManager : public iBase
 
   /**
    * Progress all motions forward by amount of time in seconds.
-   *
    * Note: Use this if you want to support pause and per-scene timescaling.
    */
   virtual void UpdateAll ( float timedelta ) = 0;
   /**
    * Progress all motions forward to time in milliseconds.
-   *
    * Note: Use this if you want to support pause, but not per-scene timescaling.
    */
   virtual void UpdateAll ( unsigned int curtime ) = 0;
   /**
    * Progress all motions forward based on the realtime clock.
-   *
-   * Note: Don't use this if you plan to implement pause or per-scene timescaling.
+   * Note: Don't use this if you plan to implement pause or per-scene
+   * timescaling.
    */
   virtual void UpdateAll () = 0;
 };

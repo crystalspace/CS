@@ -484,7 +484,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
     }
   }
 
-  csColor color = light->GetColor () * NORMAL_LIGHT_LEVEL;
+  csColor color = light->GetColor () * CS_NORMAL_LIGHT_LEVEL;
 
   int new_lw = lm->GetWidth ();
 
@@ -1047,9 +1047,9 @@ void csShadowBitmap::UpdateLightMap (csRGBpixel* lightmap,
 	float cosfact)
 {
   if (IsFullyShadowed () || IsFullyUnlit ()) return;
-  float light_r = lightcolor.red * NORMAL_LIGHT_LEVEL;
-  float light_g = lightcolor.green * NORMAL_LIGHT_LEVEL;
-  float light_b = lightcolor.blue * NORMAL_LIGHT_LEVEL;
+  float light_r = lightcolor.red * CS_NORMAL_LIGHT_LEVEL;
+  float light_g = lightcolor.green * CS_NORMAL_LIGHT_LEVEL;
+  float light_b = lightcolor.blue * CS_NORMAL_LIGHT_LEVEL;
   bool ful_lit = IsFullyLit ();
   int i, j;
   int base_uv = 0;
@@ -1192,7 +1192,7 @@ void csShadowBitmap::UpdateShadowMap (unsigned char* shadowmap,
       float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
       int l = shadowmap[uv] +
-      	QRound (NORMAL_LIGHT_LEVEL * lightness * brightness);
+      	QRound (CS_NORMAL_LIGHT_LEVEL * lightness * brightness);
       shadowmap[uv] = l < 255 ? l : 255;
     }
   }

@@ -1088,17 +1088,17 @@ void Demo::SetupFrame ()
   {
     float speed = (elapsed_time / 1000.) * (0.03 * 20);
     if (kbd->GetKeyState (CSKEY_RIGHT))
-      camtrans.RotateThis (VEC_ROT_RIGHT, speed);
+      camtrans.RotateThis (CS_VEC_ROT_RIGHT, speed);
     if (kbd->GetKeyState (CSKEY_LEFT))
-      camtrans.RotateThis (VEC_ROT_LEFT, speed);
+      camtrans.RotateThis (CS_VEC_ROT_LEFT, speed);
     if (kbd->GetKeyState (CSKEY_PGUP))
-      camtrans.RotateThis (VEC_TILT_UP, speed);
+      camtrans.RotateThis (CS_VEC_TILT_UP, speed);
     if (kbd->GetKeyState (CSKEY_PGDN))
-      camtrans.RotateThis (VEC_TILT_DOWN, speed);
+      camtrans.RotateThis (CS_VEC_TILT_DOWN, speed);
     if (kbd->GetKeyState (CSKEY_UP))
-      view->GetCamera ()->Move (VEC_FORWARD * 400.0f * speed);
+      view->GetCamera ()->Move (CS_VEC_FORWARD * 400.0f * speed);
     if (kbd->GetKeyState (CSKEY_DOWN))
-      view->GetCamera ()->Move (VEC_BACKWARD * 400.0f * speed);
+      view->GetCamera ()->Move (CS_VEC_BACKWARD * 400.0f * speed);
   }
 
   if (map_enabled < MAP_EDIT_FORWARD)

@@ -23,7 +23,6 @@
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
 #include "imesh/object.h"
-#include "iengine/terrain.h"
 #include "imesh/terrfunc.h"
 
 #define CS_QUAD_TOPLEFT 0

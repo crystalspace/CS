@@ -44,11 +44,12 @@ SCF_VERSION (iSector, 0, 4, 1);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
- * is a convex polyhedron, that possibly contains portals, things,
- * sprites, lights and so on. Simply speaking, a "sector" is analogous
- * to an real-world room, rooms are interconnected with doors and windows
- * (e.g. portals), and rooms contain miscelaneous things, sprites
- * and lights.
+ * is an empty region of space that can contain other objects (mesh
+ * objects). A sector itself does not represent geometry but only
+ * contains other geometry. A sector does contain lights though.
+ * The sector is the basic building block for any Crystal Space level.
+ * A level can be made from one or more sectors. Using the thing mesh
+ * object one can use portals to connect multiple sectors.
  */
 struct iSector : public iBase
 {
@@ -147,30 +148,33 @@ struct iSector : public iBase
 
 SCF_VERSION (iSectorList, 0, 0, 2);
 
+/**
+ * A list of sectors.
+ */
 struct iSectorList : public iBase
 {
-  /// Return the number of sectors in this list
+  /// Return the number of sectors in this list.
   virtual int GetCount () const = 0;
 
-  /// Return a sector by index
+  /// Return a sector by index.
   virtual iSector *Get (int n) const = 0;
 
-  /// Add a sector
+  /// Add a sector.
   virtual int Add (iSector *obj) = 0;
 
-  /// Remove a sector
+  /// Remove a sector.
   virtual bool Remove (iSector *obj) = 0;
 
-  /// Remove the nth sector
+  /// Remove the nth sector.
   virtual bool Remove (int n) = 0;
 
-  /// Remove all sectors
+  /// Remove all sectors.
   virtual void RemoveAll () = 0;
 
-  /// Find a sector and return its index
+  /// Find a sector and return its index.
   virtual int Find (iSector *obj) const = 0;
 
-  /// Find a sector by name
+  /// Find a sector by name.
   virtual iSector *FindByName (const char *Name) const = 0;
 };
 
@@ -196,3 +200,4 @@ struct iSectorIterator : public iBase
 };
 
 #endif // __IENGINE_SECTOR_H__
+

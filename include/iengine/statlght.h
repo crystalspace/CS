@@ -43,3 +43,4 @@ struct iStatLight : public iBase
 };
 
 #endif // __IENGINE_STATLGHT_H__
+

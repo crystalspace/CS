@@ -31,9 +31,9 @@
 #include "csengine/meshobj.h"
 #include "csutil/debug.h"
 
-int csLight::ambient_red = DEFAULT_LIGHT_LEVEL;
-int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
-int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
+int csLight::ambient_red = CS_DEFAULT_LIGHT_LEVEL;
+int csLight::ambient_green = CS_DEFAULT_LIGHT_LEVEL;
+int csLight::ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
 unsigned long csLight::last_light_id = 0;
 
 SCF_IMPLEMENT_IBASE_EXT (csLight)

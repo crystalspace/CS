@@ -546,7 +546,7 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
 
-    csColor light_color = li->GetColor () * (256. / NORMAL_LIGHT_LEVEL)
+    csColor light_color = li->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (qsqrt (wor_sq_dist));
 
     for (i = 0 ; i < num_ball_vertices ; i++)

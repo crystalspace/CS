@@ -30,7 +30,8 @@ SCF_VERSION (iCameraPosition, 0, 0, 3);
 
 /**
  * A camera position. This object can be used to initialize a camera object to
- * a certain state. It has the following properties: <ul>
+ * a certain state. It has the following properties:
+ * <ul>
  * <li> Home sector name: This name is used to find the home sector of the
  *      camera in the engine when the camera position is applied.
  * <li> Position: Position of the camera
@@ -44,34 +45,34 @@ struct iCameraPosition : public iBase
   /// Get the iObject for this camera position.
   virtual iObject *QueryObject() = 0;
 
-  /// Create a clone this camera position
+  /// Create a clone this camera position.
   virtual iCameraPosition *Clone () const = 0;
   
-  /// Return the home sector
+  /// Return the home sector.
   virtual const char *GetSector() = 0;
-  /// Set the home sector
+  /// Set the home sector.
   virtual void SetSector(const char *Name) = 0;
   
-  /// Return the position
+  /// Return the position.
   virtual const csVector3 &GetPosition() = 0;
-  /// Set the position
+  /// Set the position.
   virtual void SetPosition(const csVector3 &p) = 0;
   
-  /// Return the 'up' vector
+  /// Return the 'up' vector.
   virtual const csVector3 &GetUpwardVector() = 0;
-  /// Set the 'up' vector
+  /// Set the 'up' vector.
   virtual void SetUpwardVector(const csVector3 &v) = 0;
   
-  /// Return the 'front' vector
+  /// Return the 'front' vector.
   virtual const csVector3 &GetForwardVector() = 0;
-  /// Set the 'front' vector
+  /// Set the 'front' vector.
   virtual void SetForwardVector(const csVector3 &v) = 0;
 
-  /// Set all attributes of the camera position
+  /// Set all attributes of the camera position.
   virtual void Set (const char *sector, const csVector3 &pos,
       const csVector3 &forward, const csVector3 &upward) = 0;
 
-  /// Load the camera position into a camera object
+  /// Load the camera position into a camera object.
   virtual bool Load (iCamera*, iEngine*) = 0;
 };
 

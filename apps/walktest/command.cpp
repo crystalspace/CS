@@ -422,7 +422,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     }
   }
   else if (!strcasecmp (cmd, "turn"))
-    camera->GetTransform ().RotateThis (VEC_ROT_RIGHT, PI);
+    camera->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, PI);
   else if (!strcasecmp (cmd, "activate"))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "OBSOLETE");

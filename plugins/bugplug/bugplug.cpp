@@ -47,7 +47,6 @@
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
-#include "iengine/terrain.h"
 #include "iengine/movable.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"

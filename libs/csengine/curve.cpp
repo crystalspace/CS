@@ -238,7 +238,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
   iShadowIterator* shadow_it = lp->GetShadowBlock ().GetShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
 
-  csColor color = light->GetColor() * NORMAL_LIGHT_LEVEL;
+  csColor color = light->GetColor() * CS_NORMAL_LIGHT_LEVEL;
 
   csRGBpixel *map = LightMap->GetRealMap().GetArray ();
   csVector3& center = lp->GetLightFrustum ()->GetOrigin ();
@@ -406,7 +406,7 @@ void csCurve::CalculateLightingStatic (csFrustumView* lview, bool vis)
   else
   {
     Lightmap = LightMap->GetStaticMap ().GetArray ();
-    color = col * NORMAL_LIGHT_LEVEL;
+    color = col * CS_NORMAL_LIGHT_LEVEL;
   }
 
   int lval;
@@ -458,7 +458,7 @@ void csCurve::CalculateLightingStatic (csFrustumView* lview, bool vis)
 
       if (dyn)
       {
-        lval = ShadowMap[uv] + QRound (NORMAL_LIGHT_LEVEL * brightness);
+        lval = ShadowMap[uv] + QRound (CS_NORMAL_LIGHT_LEVEL * brightness);
         if (lval > 255) lval = 255;
         ShadowMap[uv] = lval;
       }

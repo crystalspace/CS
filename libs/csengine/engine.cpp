@@ -1214,7 +1214,7 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
     PrecalcInfo current;
     memset (&current, 0, sizeof (current));
     current.lm_version = 1;
-    current.normal_light_level = NORMAL_LIGHT_LEVEL;
+    current.normal_light_level = CS_NORMAL_LIGHT_LEVEL;
     current.ambient_red = csLight::ambient_red;
     current.ambient_green = csLight::ambient_green;
     current.ambient_blue = csLight::ambient_blue;
@@ -1684,13 +1684,13 @@ void csEngine::ReadConfig (iConfigFile* Config)
   	"Engine.Lighting.LightmapQuality", 3);
 
   csLight::ambient_red = Config->GetInt (
-  	"Engine.Lighting.Ambient.Red", DEFAULT_LIGHT_LEVEL);
+  	"Engine.Lighting.Ambient.Red", CS_DEFAULT_LIGHT_LEVEL);
   csLight::ambient_green = Config->GetInt (
-  	"Engine.Lighting.Ambient.Green", DEFAULT_LIGHT_LEVEL);
+  	"Engine.Lighting.Ambient.Green", CS_DEFAULT_LIGHT_LEVEL);
   csLight::ambient_blue = Config->GetInt (
-  	"Engine.Lighting.Ambient.Blue", DEFAULT_LIGHT_LEVEL);
+  	"Engine.Lighting.Ambient.Blue", CS_DEFAULT_LIGHT_LEVEL);
   int ambient_white = Config->GetInt (
-  	"Engine.Lighting.Ambient.White", DEFAULT_LIGHT_LEVEL);
+  	"Engine.Lighting.Ambient.White", CS_DEFAULT_LIGHT_LEVEL);
   csLight::ambient_red += ambient_white;
   csLight::ambient_green += ambient_white;
   csLight::ambient_blue += ambient_white;

@@ -359,17 +359,17 @@ void DemoSky::SetupFrame ()
   // Now rotate the camera according to keyboard state
 
   if (kbd->GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
   if (kbd->GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
   if (kbd->GetKeyState (CSKEY_PGUP))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
   if (kbd->GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
   if (kbd->GetKeyState (CSKEY_UP))
-    view->GetCamera ()->Move (VEC_FORWARD * 4.0f * speed);
+    view->GetCamera ()->Move (CS_VEC_FORWARD * 4.0f * speed);
   if (kbd->GetKeyState (CSKEY_DOWN))
-    view->GetCamera ()->Move (VEC_BACKWARD * 4.0f * speed);
+    view->GetCamera ()->Move (CS_VEC_BACKWARD * 4.0f * speed);
 
   // Tell 3D driver we're going to display 3D things.
   if (!myG3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))

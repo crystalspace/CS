@@ -29,23 +29,24 @@ struct iLight;
 SCF_VERSION (iDynLight, 0, 0, 1);
 
 /**
- * The iDynLight interface is the SCF interface for the csDynLight class. 
+ * The iDynLight interface represents a dynamic light.
  */
 struct iDynLight : public iBase
 {
   /// Get the private pointer to csDynLight (ugly).
   virtual csDynLight* GetPrivateObject () = 0;
 
-  /// Get the iObject for this light
+  /// Get the iObject for this light.
   virtual iObject *QueryObject () = 0;
-  /// Get the iLight for this light
+  /// Get the iLight for this light.
   virtual iLight *QueryLight () = 0;
 
   /// Setup the light (i.e. do the lighting calculations).
   virtual void Setup () = 0;
 
-  /// Get the next dynamic light in the list
+  /// Get the next dynamic light in the list.
   virtual iDynLight* GetNext () = 0;
 };
 
 #endif // __IENGINE_DYNLIGHT_H__
+

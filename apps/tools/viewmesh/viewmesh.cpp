@@ -352,34 +352,34 @@ void ViewMesh::Draw()
     {
       case movenormal:
     	if (GetKeyState (CSKEY_RIGHT))
-	  c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
+	  c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
 	if (GetKeyState (CSKEY_LEFT))
-	  c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
+	  c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
 	if (GetKeyState (CSKEY_PGUP))
-	  c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
+	  c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
 	if (GetKeyState (CSKEY_PGDN))
-	  c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
+	  c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
 	if (GetKeyState (CSKEY_UP))
-	  c->Move (VEC_FORWARD * 4 * speed);
+	  c->Move (CS_VEC_FORWARD * 4 * speed);
 	if (GetKeyState (CSKEY_DOWN))
-	  c->Move (VEC_BACKWARD * 4 * speed);
+	  c->Move (CS_VEC_BACKWARD * 4 * speed);
 	break;
       case moveorigin:
 	{
 	  csVector3 orig = c->GetTransform().GetOrigin();
 	
 	  if (GetKeyState (CSKEY_DOWN))
-	    c->GetTransform().SetOrigin (orig + VEC_BACKWARD * 4 * speed);
+	    c->GetTransform().SetOrigin (orig + CS_VEC_BACKWARD * 4 * speed);
 	  if (GetKeyState (CSKEY_UP))
-	    c->GetTransform().SetOrigin (orig + VEC_FORWARD * 4 * speed);
+	    c->GetTransform().SetOrigin (orig + CS_VEC_FORWARD * 4 * speed);
 	  if (GetKeyState (CSKEY_LEFT))
-	    c->GetTransform().SetOrigin (orig + VEC_LEFT * 4 * speed);
+	    c->GetTransform().SetOrigin (orig + CS_VEC_LEFT * 4 * speed);
 	  if (GetKeyState (CSKEY_RIGHT))
-	    c->GetTransform().SetOrigin (orig + VEC_RIGHT * 4 * speed);
+	    c->GetTransform().SetOrigin (orig + CS_VEC_RIGHT * 4 * speed);
 	  if (GetKeyState (CSKEY_PGUP))
-	    c->GetTransform().SetOrigin (orig + VEC_UP * 4 * speed);
+	    c->GetTransform().SetOrigin (orig + CS_VEC_UP * 4 * speed);
 	  if (GetKeyState (CSKEY_PGDN))
-	    c->GetTransform().SetOrigin (orig + VEC_DOWN * 4 * speed);
+	    c->GetTransform().SetOrigin (orig + CS_VEC_DOWN * 4 * speed);
 	  c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );
   	  break;
 	}
@@ -396,9 +396,9 @@ void ViewMesh::Draw()
 	    orig = csXRotMatrix3(-speed) * (orig-spritepos) + spritepos;  
 	  c->GetTransform().SetOrigin(orig);
 	  if (GetKeyState (CSKEY_PGUP))
-	    c->Move(VEC_FORWARD * 4 * speed);
+	    c->Move(CS_VEC_FORWARD * 4 * speed);
 	  if (GetKeyState (CSKEY_PGDN))
-	    c->Move(VEC_BACKWARD * 4 * speed);
+	    c->Move(CS_VEC_BACKWARD * 4 * speed);
 	  c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );	
 	  break;
 	}

@@ -119,32 +119,32 @@ struct iTextureList : public iBase
 
   /**
    * Create a engine wrapper for a pre-prepared iTextureHandle
-   * The handle will be IncRefed
+   * The handle will be IncRefed.
    */
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith) = 0;
 
-  /// Return the number of textures in this list
+  /// Return the number of textures in this list.
   virtual int GetCount () const = 0;
 
-  /// Return a texture by index
+  /// Return a texture by index.
   virtual iTextureWrapper *Get (int n) const = 0;
 
-  /// Add a texture
+  /// Add a texture.
   virtual int Add (iTextureWrapper *obj) = 0;
 
-  /// Remove a texture
+  /// Remove a texture.
   virtual bool Remove (iTextureWrapper *obj) = 0;
 
-  /// Remove the nth texture
+  /// Remove the nth texture.
   virtual bool Remove (int n) = 0;
 
-  /// Remove all textures
+  /// Remove all textures.
   virtual void RemoveAll () = 0;
 
-  /// Find a texture and return its index
+  /// Find a texture and return its index.
   virtual int Find (iTextureWrapper *obj) const = 0;
 
-  /// Find a texture by name
+  /// Find a texture by name.
   virtual iTextureWrapper *FindByName (const char *Name) const = 0;
 };
 

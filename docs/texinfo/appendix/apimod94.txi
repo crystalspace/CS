@@ -13,3 +13,31 @@ Added @code{iCamera::SetFarPlane()} and changed @code{iCamera::GetFarPlane()}
 to return a pointer to the far plane. This function will return @code{NULL} if
 no far plane is used.
 
+The following defines have changed:
+@itemize @bullet
+@item
+@code{VEC_FORWARD} @result{} @code{CS_VEC_FORWARD}
+@item
+@code{VEC_BACKWARD} @result{} @code{CS_VEC_BACKWARD}
+@item
+@code{VEC_RIGHT} @result{} @code{CS_VEC_RIGHT}
+@item
+@code{VEC_LEFT} @result{} @code{CS_VEC_LEFT}
+@item
+@code{VEC_UP} @result{} @code{CS_VEC_UP}
+@item
+@code{VEC_DOWN} @result{} @code{CS_VEC_DOWN}
+@item
+@code{VEC_ROT_RIGHT} @result{} @code{CS_VEC_ROT_RIGHT}
+@item
+@code{VEC_ROT_LEFT} @result{} @code{CS_VEC_ROT_LEFT}
+@item
+@code{VEC_TILT_RIGHT} @result{} @code{CS_VEC_TILT_RIGHT}
+@item
+@code{VEC_TILT_LEFT} @result{} @code{CS_VEC_TILT_LEFT}
+@item
+@code{VEC_TILT_UP} @result{} @code{CS_VEC_TILT_UP}
+@item
+@code{VEC_TILT_DOWN} @result{} @code{CS_VEC_TILT_DOWN}
+@end itemize
+

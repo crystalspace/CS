@@ -118,17 +118,17 @@ bool ceEngineView::HandleEvent (iEvent &Event)
         float speed = (elapsed_time / 1000.) * (0.03 * 20);
 
         if (motion & 0x00000001)
-          view->GetCamera ()->Move (VEC_FORWARD * 4.0f * speed);
+          view->GetCamera ()->Move (CS_VEC_FORWARD * 4.0f * speed);
         if (motion & 0x00000002)
-          view->GetCamera ()->Move (VEC_BACKWARD * 4.0f * speed);
+          view->GetCamera ()->Move (CS_VEC_BACKWARD * 4.0f * speed);
         if (motion & 0x00000004)
-          view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
+          view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
         if (motion & 0x00000008)
-          view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
+          view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
         if (motion & 0x00000010)
-          view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed);
+          view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
         if (motion & 0x00000020)
-          view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
+          view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
 
         // Invalidate this view so that it gets updated
 	// We invalidate all the time so that animations get updated.
