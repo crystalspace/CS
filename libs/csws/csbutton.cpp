@@ -276,18 +276,18 @@ bool csButton::HandleEvent (iEvent &Event)
       break;
       
     case csevMouseEnter:
-    	Highlighted=true;
-    	Invalidate();
-    	if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
-    	return true;
-    	break;
+      Highlighted=true;
+      if (GetState(CSS_TRANSPARENT))  	   parent->Invalidate();
+      Invalidate();
+    return true;
+    break;
     	
     case csevMouseExit:
-    	Highlighted=false;
-    	Invalidate();
-    	if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
-    	return true;
-    	break;
+      Highlighted=false;
+      if (GetState(CSS_TRANSPARENT)) 	   parent->Invalidate();
+      Invalidate();
+    return true;
+    break;
     	
     case csevKeyDown:
       return HandleKeyPress (Event);

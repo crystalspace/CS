@@ -125,6 +125,7 @@ bool csListBoxItem::HandleEvent (iEvent &Event)
           if (deltax != (int)Event.Command.Info)
           {
             deltax = (int)Event.Command.Info;
+            if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
             Invalidate ();
           } /* endif */
           return true;
@@ -140,12 +141,14 @@ void csListBoxItem::SetState (int mask, bool enable)
   csComponent::SetState (mask, enable);
   if ((oldstate ^ state) & CSS_LISTBOXITEM_SELECTED)
   {
+    if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
     Invalidate ();
     parent->SendCommand (GetState (CSS_LISTBOXITEM_SELECTED) ?
       cscmdListBoxItemSelected : cscmdListBoxItemDeselected, this);
   } /* endif */
   if ((oldstate ^ state) & CSS_FOCUSED)
   {
+    if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
     Invalidate ();
     if (GetState (CSS_FOCUSED))
       parent->SendCommand (cscmdListBoxMakeVisible, this);
@@ -158,6 +161,8 @@ void csListBoxItem::SetBitmap (csPixmap *iBitmap, bool iDelete)
     delete ItemBitmap;
   ItemBitmap = iBitmap;
   DeleteBitmap = iDelete;
+  
+  if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
   Invalidate ();
 }
 
@@ -736,6 +741,7 @@ bool csListBox::SetFocused (csComponent *comp)
 void csListBox::Insert (csComponent *comp)
 {
   fPlaceItems = true;
+  if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
   Invalidate ();
   csComponent::Insert (comp);
 }
@@ -743,6 +749,7 @@ void csListBox::Insert (csComponent *comp)
 void csListBox::Delete (csComponent *comp)
 {
   fPlaceItems = true;
+  if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
   Invalidate ();
   csComponent::Delete (comp);
 }
