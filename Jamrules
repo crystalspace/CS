@@ -52,14 +52,15 @@ STATIC.PLUGINLIST =
   ballldr
   bezier
   bezierldr
+  bruteblock
   bugplug
   crossbld
   csbmpimg
   csconin
+  csddsimg
   csfont
   csgifimg
   csjpgimg
-  csddsimg
   csparser
   cspngimg
   cssynldr
@@ -76,22 +77,31 @@ STATIC.PLUGINLIST =
   fountldr
   frustvis
   genmesh
-  gmeshldr
+  gl3d
+  glshader_arb
+  glshader_fixed
   gmeshanim
+  gmeshldr
   gmeshskelanim
   haze
   hazeldr
   ieplex
   imgplex
   nullmesh
+  opcode
   protomesh
   protomeshldr
   rain
   rainldr
-  opcode
+  rendloop_loader
+  rendstep_std
+  rendstep_stencil
   reporter
   sequence
+  shadermgr
   simpcon
+  simpleformer
+  simpleformerldr
   snow
   snowldr
   spiral
@@ -102,24 +112,13 @@ STATIC.PLUGINLIST =
   spr3dldr
   starldr
   stars
-  stdrep
   stdpt
+  stdrep
   thing
   thingldr
   vfs
   xmlread
-  rendstep_stencil
-  rendstep_std
-  rendloop_loader
-  glshader_fixed
-  glshader_arb
-  gl3d
-  shadermgr
   xmlshader
-  chunklod
-  bruteblock
-  simpleformer
-  simpleformerldr
   ;
 
 # GL canvases
