@@ -79,6 +79,16 @@ Material to use for the polygon.
 @item MIXMODE
 Blending mode; one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
 @samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
+@item UVANIMATION
+Define an uv animation, that is a sequence of frames which textures are all in one big texture.
+Thus the animation is achieved by altering the (u,v) coordinates of the polygon defined by this
+sprite.
+@item FRAME
+Defines a single frame within an uv animation by specifying its duration in milliseconds and the u,v
+coordinates to use.
+@itemize
+FRAME 'framename' (millisec, u,v coo list)
+@end itemize
 @end table
 
 @subsubheading Object State Interface
@@ -109,4 +119,69 @@ List of 2D vertices defining the polygon.
 List of texture mapping UV coordinates for the polygon.
 @item COLORS
 List of rgb colors for the polygon.
+@item ANIMATE
+Select an uv animation from the list of animations declared in the template
+@itemize
+ANIMATE ('ani name', timing, loop)
+@itemize
+@item
+timing > 0 : every <timing> milliseconds the next frame will be shown
+@item
+timing < 0 : every <-timing> gameloop the next frame will be shown
+@item
+timing = 0 : timing attached to the frame will be used
+@item
+loop : loop the animation or stop after last frame (and show the last frame)
+@end itemize
+@end itemize
 @end table
+
+@subsubheading Example 1
+
+This is how our world file looks like:
+
+@example
+WORLD (
+
+  TEXTURES (
+    TEXTURE 'blow' (FILE(blow.png))
+  )
+
+  MATERIALS (
+    MATERIAL 'explosion' (TEXTURE ('blow'))
+  )
+
+  MESHOBJ 'Explosion' (
+    PLUGIN ('crystalspace.mesh.loader.factory.sprite.2d')
+    PARAMS (
+      MATERIAL ('explosion')
+      UVANIMATION 'boom' (
+        FRAME 'f1' ( 100, 0, 0, 0.5, 0, 0.5, 0.5, 0, 0.5)
+        FRAME 'f2' ( 100, 0.5, 0, 1, 0, 1, 0.5, 0.5, 0.5)
+        FRAME 'f3' ( 100, 0, 0.5, 0.5, 0.5, 0.5, 1, 0, 1)
+        FRAME 'f4' ( 100, 0.5, 0.5, 1, 0.5, 1, 1, 0.5, 1)
+      )
+    )
+  )
+
+  sector 'space' (
+    ; define all the stuff in space
+    ; ...
+    ; and now one of the enemies right after we met him
+    MESHOBJ 'kaboom' (
+      PLUGIN ('crystalspace.mesh.loader.sprite.2d')
+      PARAMS (
+        FACTORY ('Explosion')
+        VERTICES (-1,1,1,1,1,-1,-1,-1)
+        UV (0,0,1,0,1,1,0,1)
+        COLORS (1,1,1,1,1,1,1,1,1,1,1,1)
+	LIGHTING (no)
+        ; show the animation, use the timings attached to the frames, loop
+        ANIMATE ('boom', 0, yes)
+      )
+      MOVE (0,0,0)
+    )
+  )  
+)
+
+@end example
