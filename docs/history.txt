@@ -4,6 +4,11 @@ The history order is reversed so that new features are at the top.
 	- Removed a type->DecRef() in engine.cpp. The mesh object type
 	  plugins can remain in memory. This DecRef() caused crashes
 	  for csdemo.
+	- Small fix in the sequence manager.
+	- Fixed demo so that timewarping backwards with the big jump
+	  ('<' key) will now restart the entire sequence manager which
+	  means that child sequences will be correctly respawned. This
+	  does not happen with the ',' key though.
 27-Apr-2001
 	- Martin did some further work on csparser and csengine.
 	- Philip Wyett added csdemo.cfg to makefile inorder that it is

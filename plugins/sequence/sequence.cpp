@@ -212,6 +212,7 @@ void csSequenceManager::Clear ()
 {
   main_sequence->Clear ();
   main_time = 0;
+  previous_time_valid = false;
 }
 
 void csSequenceManager::Suspend ()

@@ -107,6 +107,7 @@ void DemoSequenceManager::Setup (const char* sequenceFileName)
   seqmgr->RunSequence (0, main_sequence);
   seqmgr->Resume ();
   suspended = false;
+  main_start_time = seqmgr->GetMainTime ();
   delete loader;
 }
 
@@ -142,8 +143,6 @@ void DemoSequenceManager::Restart (const char* sequenceFileName)
 
 void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
 {
-  (void)restart;
-
   // Temporarily resume everything to make sure our data is ok.
   bool sus = suspended;
   Resume ();
@@ -153,6 +152,24 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
   // one frame to update the screen.
   if (sus) suspend_one_frame = true;
 
+  if (seqmgr->GetMainTime () + dt <= main_start_time)
+  {
+    seqmgr->Clear ();
+    seqmgr->RunSequence (0, main_sequence);
+    main_start_time = seqmgr->GetMainTime ();
+    return;
+  }
+
+  if (restart)
+  {
+    dt = seqmgr->GetMainTime () + dt - main_start_time;
+    seqmgr->Clear ();
+    seqmgr->RunSequence (0, main_sequence);
+    main_start_time = seqmgr->GetMainTime ();
+    seqmgr->TimeWarp (dt, false);
+    return;
+  }
+  
   seqmgr->TimeWarp (dt, false);
   if (seqmgr->IsEmpty ())
   {

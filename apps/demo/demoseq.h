@@ -92,6 +92,7 @@ private:
   iSequence* main_sequence;
   bool suspended;
   bool suspend_one_frame;
+  cs_time main_start_time;
   cs_time suspend_time;
 
   //=====
