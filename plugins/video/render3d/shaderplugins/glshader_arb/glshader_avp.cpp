@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/scfstr.h"
+#include "csutil/csmd5.h"
 #include "csgeom/vector3.h"
 #include "csutil/xmltiny.h"
 
@@ -44,7 +45,7 @@ SCF_IMPLEMENT_IBASE(csShaderGLAVP)
 SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
-void csShaderGLAVP::Activate(iShaderPass* current)
+void csShaderGLAVP::Activate(iShaderPass* current, csRenderMesh* mesh)
 {
   //enable it
   glEnable(GL_VERTEX_PROGRAM_ARB);
@@ -101,6 +102,8 @@ void csShaderGLAVP::Deactivate(iShaderPass* current)
 
 bool csShaderGLAVP::LoadProgramStringToGL(const char* programstring)
 {
+  if(!programstring)
+    return false;
   //step to first !!
   int stringlen = strlen(programstring);
   int i=0;
@@ -152,22 +155,29 @@ void csShaderGLAVP::BuildTokenHash()
   xmltokens.Register("string", 100+iShaderVariable::STRING);
   xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
 }
-
-bool csShaderGLAVP::LoadProgram(const char* programstring)
+bool csShaderGLAVP::Load(iDataBuffer* program)
 {
-  BuildTokenHash();
-
-  csRef<iDocumentSystem> xml = csPtr<iDocumentSystem>(new csTinyDocumentSystem());
-  csRef<iDocument> xmldoc = xml->CreateDocument();
-
-  const char* error = xmldoc->Parse(programstring);
-  if(error!=NULL)
-  {
-    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "Error when loading variablefile. Error in xmlfile at %s", error); 
+  csRef<iDocumentSystem> xml (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+  if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+  csRef<iDocument> doc = xml->CreateDocument ();
+  const char* error = doc->Parse (program);
+  if (error != NULL)
+  { 
+    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.render3d.shader.glarb",
+      "XML error '%s'!", error);
     return false;
   }
+  return Load(doc->GetRoot());
+}
 
-  csRef<iDocumentNode> variablesnode = xmldoc->GetRoot()->GetNode("arbvp");
+bool csShaderGLAVP::Load(iDocumentNode* program)
+{
+  if(!program)
+    return false;
+
+  BuildTokenHash();
+
+  csRef<iDocumentNode> variablesnode = program->GetNode("arbvp");
   if(variablesnode)
   {
     csRef<iDocumentNodeIterator> it = variablesnode->GetNodes ();
@@ -180,8 +190,11 @@ bool csShaderGLAVP::LoadProgram(const char* programstring)
       switch(id)
       {
       case XMLTOKEN_PROGRAM:
-        if(!LoadProgramStringToGL(child->GetContentsValue()))
-          return false;
+        {
+          //save for later loading
+          programstring = new char[strlen(child->GetContentsValue())+1];
+          strcpy(programstring, child->GetContentsValue());
+        }
         break;
       case XMLTOKEN_DECLARE:
         {
@@ -235,6 +248,13 @@ bool csShaderGLAVP::LoadProgram(const char* programstring)
   return true;
 }
 
+  
+bool csShaderGLAVP::Prepare()
+{
+  return LoadProgramStringToGL(programstring);
+}
+
+
 csBasicVector csShaderGLAVP::GetAllVariableNames()
 {
   csBasicVector res;
@@ -259,3 +279,10 @@ iShaderVariable* csShaderGLAVP::GetVariable(const char* string)
   return NULL;
 }
 
+csPtr<iString> csShaderGLAVP::GetProgramID()
+{
+  csMD5::Digest d = csMD5::Encode(programstring);
+  scfString* str = new scfString();
+  str->Append((const char*)d.data[0], 16);
+  return csPtr<iString>(str);
+}

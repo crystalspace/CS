@@ -20,7 +20,9 @@
 
 #include "cssysdef.h"
 #include "cstypes.h"
+#include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/strset.h"
 #include "csutil/objreg.h"
 #include "csgeom/vector3.h"
 #include "csutil/hashmap.h"
@@ -29,6 +31,9 @@
 #include "iutil/vfs.h"
 #include "iutil/eventq.h"
 #include "iutil/virtclk.h"
+#include "iutil/comp.h"
+#include "iutil/plugin.h"
+#include "ivaria/reporter.h"
 
 #include "ivideo/shader/shader.h"
 #include "ivideo/shader/shadervar.h"
@@ -107,6 +112,13 @@ csShaderManager::~csShaderManager()
     delete (iShader*)shaders->Pop();
   }
   delete shaders;
+
+  int i;
+  for(i = 0; i < pluginlist.Length(); ++i)
+  {
+    iShaderProgramPlugin* sp = (iShaderProgramPlugin*)pluginlist.Pop();
+    sp->DecRef();
+  }
 }
 
 bool csShaderManager::Initialize(iObjectRegistry *objreg)
@@ -121,6 +133,27 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   if (q)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast || CSMASK_FrameProcess  );
 
+  
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY(objectreg, iPluginManager);
+
+  iStrVector* classlist = iSCF::SCF->QueryClassList("crystalspace.render3d.shader.");
+  int const nmatches = classlist->Length();
+  if(nmatches != 0)
+  {
+    int i;
+    for(i = 0; i < nmatches; ++i)
+    {
+      const char* classname = classlist->Get(i);
+      csRef<iShaderProgramPlugin> plugin = CS_LOAD_PLUGIN(plugin_mgr, classname, iShaderProgramPlugin);
+      if(plugin)
+      {
+        csReport( objectreg,  CS_REPORTER_SEVERITY_NOTIFY,"crystalspace.render3d.shadermgr", "Loaded plugin %s", classname);
+        pluginlist.Push(plugin);
+        plugin->IncRef();
+        plugin->Open();
+      }
+    }
+  }
 
   //create standard-variables
   sv_time = CreateVariable("STANDARD_TIME");
@@ -207,10 +240,6 @@ csPtr<iShader> csShaderManager::CreateShader()
   return (iShader*)cshader;
 }
 
-csPtr<iShader> csShaderManager::CreateShader(const char* filename)
-{
-  return NULL;
-}
 
 iShader* csShaderManager::GetShader(const char* name)
 {
@@ -223,33 +252,13 @@ iShader* csShaderManager::GetShader(const char* name)
   return NULL;
 }
 
-csPtr<iShaderProgram> csShaderManager::CreateShaderProgramFromFile(const char* filename, const char* type)
+csPtr<iShaderProgram> csShaderManager::CreateShaderProgram(const char* type)
 {
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY(objectreg, iVFS);
-  if(!vfs) return NULL;
-
-  csRef<iFile> shaderfile (vfs->Open(filename, VFS_FILE_READ));
-  if(!shaderfile) return NULL;
-
-  char* shadercontent = new char[shaderfile->GetSize()];
-  int i = shaderfile->Read(shadercontent, shaderfile->GetSize());
-  shadercontent[i] = 0;
-
-  csPtr<iShaderProgram> pm = CreateShaderProgramFromString(shadercontent, type);
-  
-  return pm;
-}
-
-csPtr<iShaderProgram> csShaderManager::CreateShaderProgramFromString(const char* string, const char* type)
-{
-  csRef<iRender3D> render3d = CS_QUERY_REGISTRY (objectreg, iRender3D);
-  if( render3d )
+  int i;
+  for(i = 0; i < pluginlist.Length(); ++i)
   {
-    csRef<iShaderRenderInterface> shi = SCF_QUERY_INTERFACE (render3d, iShaderRenderInterface);
-    if( shi)
-    {
-      return shi->CreateShaderProgram(string, NULL, type);
-    }
+    if( ((iShaderProgramPlugin*)pluginlist.Get(i))->SupportType(type))
+      return ((iShaderProgramPlugin*)pluginlist.Get(i))->CreateProgram();
   }
   return NULL;
 }
@@ -301,6 +310,13 @@ csShader::~csShader()
 
 bool csShader::IsValid()
 {
+  //is valid if there are at least one valid technique
+  for(int i = 0; i < techniques->Length(); ++i)
+  {
+    iShaderTechnique* t = (iShaderTechnique*) techniques->Get(i);
+    if(t->IsValid())
+      return true;
+  }
   return false;
 }
 
@@ -384,6 +400,72 @@ void csShader::MapStream(int mapid, const char* streamname)
 {
 }
 
+bool csShader::Load(iDocumentNode* node)
+{
+  return false;
+}
+
+bool csShader::Load(iDataBuffer* program)
+{
+  return false;
+}
+
+
+struct priority_mapping
+{
+  int technique;
+  int priority;
+};
+
+int pricompare( const void *arg1, const void *arg2 )
+{
+  priority_mapping* p1 = (priority_mapping*)arg1;
+  priority_mapping* p2 = (priority_mapping*)arg2;
+  if(p1->priority < p2->priority) return -1;
+  if(p1->priority > p2->priority) return -1;
+  return 0;
+}
+
+bool csShader::Prepare()
+{
+
+  //go through the technques in priority order
+  //fill priority struct
+  priority_mapping* primap = new priority_mapping[techniques->Length()];
+  
+  for(int i = 0; i < techniques->Length(); ++i)
+  {
+    primap[i].technique = i;
+    primap[i].priority = ((iShaderTechnique*)techniques->Get(i))->GetPriority();
+  }
+
+  qsort(primap, techniques->Length()-1, sizeof(priority_mapping), pricompare);
+
+  bool isPrep = false;
+  int prepNr;
+
+  csBasicVector* newTArr = new csBasicVector;
+
+  for(int i = 0; i < techniques->Length() && !isPrep; ++i)
+  {
+    iShaderTechnique* t = (iShaderTechnique*)techniques->Get(primap[i].technique);
+    if ( t->Prepare() )
+    {
+      t->IncRef();
+      newTArr->Push(t);
+    }
+  }
+  
+  while(techniques->Length() > 0)
+  {
+    ((iShaderTechnique*)techniques->Pop())->DecRef();
+  }
+
+  techniques = newTArr;
+
+  return true;
+}
+
 //==================== csShaderPass ==============//
 iShaderVariable* csShaderPass::GetVariable(const char* string)
 {
@@ -405,6 +487,29 @@ iShaderVariable* csShaderPass::GetVariable(const char* string)
   return NULL;
 }
 
+bool csShaderPass::Load(iDocumentNode* node)
+{
+  return false;
+}
+
+bool csShaderPass::Load(iDataBuffer* program)
+{
+  return false;
+}
+
+bool csShaderPass::Prepare()
+{
+  if(vp) 
+    if(!vp->Prepare())
+      return false;
+
+  if(fp)
+    if(!fp->Prepare())
+      return false;
+
+  return true;
+}
+
 //================= csShaderTechnique ============//
 csShaderTechnique::csShaderTechnique(csShader* owner)
 {
@@ -419,7 +524,6 @@ csShaderTechnique::~csShaderTechnique()
   {
     delete (iShaderPass*)passes->Pop();
   }
-
   delete passes;
 }
 
@@ -445,6 +549,34 @@ void csShaderTechnique::MapStream(int mapped_id, const char* streamname)
 
 bool csShaderTechnique::IsValid()
 {
-  return true;
+  bool valid = false;
+  //returns true if all passes are valid
+  for(int i = 0; i < passes->Length(); ++i)
+  {
+    iShaderPass* p = (iShaderPass*)passes->Get(i);
+    valid = p->IsValid();
+  }
+  
+  return valid;
 }
 
+bool csShaderTechnique::Load(iDocumentNode* node)
+{
+  return false;
+}
+
+bool csShaderTechnique::Load(iDataBuffer* program)
+{
+  return false;
+}
+
+bool csShaderTechnique::Prepare()
+{
+  for(int i = 0; i < passes->Length(); ++i)
+  {
+    iShaderPass* p = (iShaderPass*)passes->Get(i);
+    if(!p->Prepare())
+      return false;
+  }
+  return true;
+}

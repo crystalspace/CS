@@ -39,11 +39,13 @@ public:
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgramPlugin
   ////////////////////////////////////////////////////////////////////
-  virtual csPtr<iShaderProgram> CreateShaderProgram(const char* programstring, void* parameters, const char* type);
+  virtual csPtr<iShaderProgram> CreateProgram() ;
 
   virtual bool SupportType(const char* type);
 
   virtual void Open();
+
+  virtual csPtr<iString> GetProgramID(const char* programstring);
 
 
   ////////////////////////////////////////////////////////////////////

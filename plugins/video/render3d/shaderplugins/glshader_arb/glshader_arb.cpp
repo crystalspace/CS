@@ -24,6 +24,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/csmd5.h"
+#include "csutil/scfstr.h"
 #include "csgeom/vector3.h"
 
 #include "iutil/comp.h"
@@ -80,18 +82,9 @@ bool csGLShader_ARB::SupportType(const char* type)
   return false;
 }
 
-csPtr<iShaderProgram> csGLShader_ARB::CreateShaderProgram(const char* programstring, void* parameters, const char* type)
+csPtr<iShaderProgram> csGLShader_ARB::CreateProgram()
 {
-  if( strcasecmp(type, "gl_arb_vp") == 0)
-  {
-    csShaderGLAVP* myshader = new csShaderGLAVP(object_reg, ext);
-    if(myshader->LoadProgram(programstring))
-      return (iShaderProgram*) myshader;
-  }
-  else if (false)
-  {
-  }
-  return NULL;
+  return csPtr<iShaderProgram>(new csShaderGLAVP(object_reg, ext));
 }
 
 void csGLShader_ARB::Open()
@@ -103,6 +96,14 @@ void csGLShader_ARB::Open()
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
   ext = (csGLExtensionManager*) sri->GetObject("ext");
+}
+
+csPtr<iString> csGLShader_ARB::GetProgramID(const char* programstring)
+{
+  csMD5::Digest d = csMD5::Encode(programstring);
+  scfString* str = new scfString();
+  str->Append((const char*)d.data[0], 16);
+  return csPtr<iString>(str);
 }
 
 ////////////////////////////////////////////////////////////////////

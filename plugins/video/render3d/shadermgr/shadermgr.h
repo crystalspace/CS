@@ -48,6 +48,8 @@ private:
   // these are inited and updated by the shadermanager itself
   csRef<iShaderVariable> sv_time;
   void UpdateStandardVariables();
+
+  csBasicVector pluginlist;
 public:
   SCF_DECLARE_IBASE;
 
@@ -56,8 +58,6 @@ public:
 
   //==================== iShaderManager ================//
 
-  /// Creates a shader from specified file
-  virtual csPtr<iShader> CreateShader(const char* filename) ;
   /// Create a empty shader
   virtual csPtr<iShader> CreateShader() ;
   /// Get a shader by name
@@ -72,10 +72,8 @@ public:
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() ; 
 
-  /// Create a shaderpgoram from a shaderfile
-  virtual csPtr<iShaderProgram> CreateShaderProgramFromFile(const char* programfile, const char* type);
-  /// Create a shaderprogram from a string describing it
-  virtual csPtr<iShaderProgram> CreateShaderProgramFromString(const char* programstring, const char* type);
+/// Create a shaderprogram
+  virtual csPtr<iShaderProgram> CreateShaderProgram(const char* type);
 
   //==================== iComponent ====================//
   bool Initialize(iObjectRegistry* objreg);
@@ -191,6 +189,15 @@ public:
   virtual iShaderVariable* GetVariable(const char* string);
   /// Get all variable stringnames in this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames(); 
+
+  /// Loads a shader from buffer
+  virtual bool Load(iDataBuffer* program);
+
+  /// Loads from a document-node
+  virtual bool Load(iDocumentNode* node);
+
+  /// Prepares the shader for usage. Must be called before the shader is assigned to a material
+  virtual bool Prepare();
 };
 
 class csShaderTechnique : public iShaderTechnique
@@ -229,6 +236,15 @@ public:
 
   /// Check if valid (normaly a shader is valid if there is at least one valid technique)
   virtual bool IsValid(); 
+
+  /// Loads a shader from buffer
+  virtual bool Load(iDataBuffer* program);
+
+  /// Loads from a document-node
+  virtual bool Load(iDocumentNode* node) ;
+
+  /// Prepares the shader for usage. Must be called before the shader is assigned to a material
+  virtual bool Prepare();
 };
 
 class csShaderPass : public iShaderPass
@@ -267,16 +283,17 @@ public:
   /// Check if valid
   virtual bool IsValid()
   {
-    if( vp || fp )
-      return true;
-    return false;
+    bool valid = true;
+    if(vp) valid = vp->IsValid();
+    if(fp) valid = fp->IsValid();
+    return valid;
   }
 
   /// Activate
-  virtual void Activate()
+  virtual void Activate(csRenderMesh* mesh)
   {
-    if(vp) vp->Activate(this);
-    if(fp) fp->Activate(this);
+    if(vp) vp->Activate(this, mesh);
+    if(fp) fp->Activate(this, mesh);
   }
 
   /// Deactivate
@@ -292,6 +309,15 @@ public:
   virtual iShaderVariable* GetVariable(const char* string);
   /// Get all variable stringnames in this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() {return csBasicVector();}
+
+    /// Loads a shader from buffer
+  virtual bool Load(iDataBuffer* program);
+
+  /// Loads from a document-node
+  virtual bool Load(iDocumentNode* node);
+
+  /// Prepares the shader for usage. Must be called before the shader is assigned to a material
+  virtual bool Prepare();
 };
 
 #endif //__SHADERMGR_H__

@@ -53,26 +53,38 @@ private:
 
   void BuildTokenHash();
 
+  char* programstring;
+
+  bool validProgram;
+
 public:
   SCF_DECLARE_IBASE;
 
   csShaderGLAVP(iObjectRegistry* objreg, csGLExtensionManager* ext)
   {
+    validProgram = true;
     SCF_CONSTRUCT_IBASE (NULL);
     this->object_reg = objreg;
     this->ext = ext;
+    programstring = NULL;
   }
-  virtual ~csShaderGLAVP () {}
+  virtual ~csShaderGLAVP ()
+  {
+    if(programstring) delete programstring;
+  }
 
-  bool LoadProgram( const char* programstring );
   bool LoadProgramStringToGL( const char* programstring );
+
+  void SetValid(bool val) { validProgram = val; }
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram
   ////////////////////////////////////////////////////////////////////
 
+  virtual csPtr<iString> GetProgramID();
+
   /// Sets this program to be the one used when rendering
-  virtual void Activate(iShaderPass* current);
+  virtual void Activate(iShaderPass* current, csRenderMesh* mesh);
 
   /// Deactivate program so that it's not used in next rendering
   virtual void Deactivate(iShaderPass* current);
@@ -100,6 +112,18 @@ public:
   virtual iShaderVariable* GetVariable(const char* string);
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames(); 
+
+  /// Check if valid
+  virtual bool IsValid() { return validProgram;} 
+
+    /// Loads shaderprogram from buffer
+  virtual bool Load(iDataBuffer* program);
+
+  /// Loads from a document-node
+  virtual bool Load(iDocumentNode* node);
+
+  /// Prepares the shaderprogram for usage. Must be called before the shader is assigned to a material
+  virtual bool Prepare();
 };
 
 
