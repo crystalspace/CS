@@ -313,7 +313,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIGBIN MAKE JAM SET_MAKE CSLIBS_CONFIG NASM MAKEDEP PERL PYTHON CPP EGREP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS FT2_CONFIG FT2_CFLAGS FT2_LIBS SDLCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIGBIN MAKE JAM SET_MAKE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM MAKEDEP PERL PYTHON CPP EGREP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS FT2_CONFIG FT2_CFLAGS FT2_LIBS SDLCONFIG ac_ct_SDLCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -2800,8 +2800,10 @@ fi
 
 
 if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}dlltool", so it can be a program name with args.
-set dummy ${ac_tool_prefix}dlltool; ac_word=$2
+  for ac_prog in dlltool
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_DLLTOOL+set}" = set; then
@@ -2817,7 +2819,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_DLLTOOL="${ac_tool_prefix}dlltool"
+    ac_cv_prog_DLLTOOL="$ac_tool_prefix$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -2835,11 +2837,15 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
+    test -n "$DLLTOOL" && break
+  done
 fi
-if test -z "$ac_cv_prog_DLLTOOL"; then
+if test -z "$DLLTOOL"; then
   ac_ct_DLLTOOL=$DLLTOOL
-  # Extract the first word of "dlltool", so it can be a program name with args.
-set dummy dlltool; ac_word=$2
+  for ac_prog in dlltool
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_ac_ct_DLLTOOL+set}" = set; then
@@ -2855,7 +2861,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_DLLTOOL="dlltool"
+    ac_cv_prog_ac_ct_DLLTOOL="$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -2873,9 +2879,10 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
+  test -n "$ac_ct_DLLTOOL" && break
+done
+
   DLLTOOL=$ac_ct_DLLTOOL
-else
-  DLLTOOL="$ac_cv_prog_DLLTOOL"
 fi
 
 cs_build_prop_val=`echo x$DLLTOOL | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -2888,8 +2895,10 @@ fi
 
 
 if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}dllwrap", so it can be a program name with args.
-set dummy ${ac_tool_prefix}dllwrap; ac_word=$2
+  for ac_prog in dllwrap
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_DLLWRAP+set}" = set; then
@@ -2905,7 +2914,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_DLLWRAP="${ac_tool_prefix}dllwrap"
+    ac_cv_prog_DLLWRAP="$ac_tool_prefix$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -2923,11 +2932,15 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
+    test -n "$DLLWRAP" && break
+  done
 fi
-if test -z "$ac_cv_prog_DLLWRAP"; then
+if test -z "$DLLWRAP"; then
   ac_ct_DLLWRAP=$DLLWRAP
-  # Extract the first word of "dllwrap", so it can be a program name with args.
-set dummy dllwrap; ac_word=$2
+  for ac_prog in dllwrap
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_ac_ct_DLLWRAP+set}" = set; then
@@ -2943,7 +2956,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_DLLWRAP="dllwrap"
+    ac_cv_prog_ac_ct_DLLWRAP="$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -2961,9 +2974,10 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
+  test -n "$ac_ct_DLLWRAP" && break
+done
+
   DLLWRAP=$ac_ct_DLLWRAP
-else
-  DLLWRAP="$ac_cv_prog_DLLWRAP"
 fi
 
 cs_build_prop_val=`echo x$DLLWRAP | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -2976,8 +2990,10 @@ fi
 
 
 if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}windres", so it can be a program name with args.
-set dummy ${ac_tool_prefix}windres; ac_word=$2
+  for ac_prog in windres
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_WINDRES+set}" = set; then
@@ -2993,7 +3009,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_WINDRES="${ac_tool_prefix}windres"
+    ac_cv_prog_WINDRES="$ac_tool_prefix$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -3011,11 +3027,15 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
+    test -n "$WINDRES" && break
+  done
 fi
-if test -z "$ac_cv_prog_WINDRES"; then
+if test -z "$WINDRES"; then
   ac_ct_WINDRES=$WINDRES
-  # Extract the first word of "windres", so it can be a program name with args.
-set dummy windres; ac_word=$2
+  for ac_prog in windres
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_ac_ct_WINDRES+set}" = set; then
@@ -3031,7 +3051,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_WINDRES="windres"
+    ac_cv_prog_ac_ct_WINDRES="$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -3049,9 +3069,10 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
+  test -n "$ac_ct_WINDRES" && break
+done
+
   WINDRES=$ac_ct_WINDRES
-else
-  WINDRES="$ac_cv_prog_WINDRES"
 fi
 
 cs_build_prop_val=`echo x$WINDRES | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -3064,8 +3085,10 @@ fi
 
 
 if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}objcopy", so it can be a program name with args.
-set dummy ${ac_tool_prefix}objcopy; ac_word=$2
+  for ac_prog in objcopy
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_OBJCOPY+set}" = set; then
@@ -3081,7 +3104,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_OBJCOPY="${ac_tool_prefix}objcopy"
+    ac_cv_prog_OBJCOPY="$ac_tool_prefix$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -3099,11 +3122,15 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
+    test -n "$OBJCOPY" && break
+  done
 fi
-if test -z "$ac_cv_prog_OBJCOPY"; then
+if test -z "$OBJCOPY"; then
   ac_ct_OBJCOPY=$OBJCOPY
-  # Extract the first word of "objcopy", so it can be a program name with args.
-set dummy objcopy; ac_word=$2
+  for ac_prog in objcopy
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_ac_ct_OBJCOPY+set}" = set; then
@@ -3119,7 +3146,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_OBJCOPY="objcopy"
+    ac_cv_prog_ac_ct_OBJCOPY="$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -3137,9 +3164,10 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
+  test -n "$ac_ct_OBJCOPY" && break
+done
+
   OBJCOPY=$ac_ct_OBJCOPY
-else
-  OBJCOPY="$ac_cv_prog_OBJCOPY"
 fi
 
 if test -n "$OBJCOPY"; then
@@ -3844,10 +3872,11 @@ fi
 # of Crystal Space.  It contains common libraries, headers, and tools usable by
 # MSVC, Mingw/MSYS, and Cygwin users.
 #------------------------------------------------------------------------------
-for ac_prog in cslibs-config
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
+if test -n "$ac_tool_prefix"; then
+  for ac_prog in cslibs-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_CSLIBS_CONFIG+set}" = set; then
@@ -3863,7 +3892,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CSLIBS_CONFIG="$ac_prog"
+    ac_cv_prog_CSLIBS_CONFIG="$ac_tool_prefix$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -3881,8 +3910,53 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$CSLIBS_CONFIG" && break
+    test -n "$CSLIBS_CONFIG" && break
+  done
+fi
+if test -z "$CSLIBS_CONFIG"; then
+  ac_ct_CSLIBS_CONFIG=$CSLIBS_CONFIG
+  for ac_prog in cslibs-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_CSLIBS_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_CSLIBS_CONFIG"; then
+  ac_cv_prog_ac_ct_CSLIBS_CONFIG="$ac_ct_CSLIBS_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_CSLIBS_CONFIG="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
 done
+done
+
+fi
+fi
+ac_ct_CSLIBS_CONFIG=$ac_cv_prog_ac_ct_CSLIBS_CONFIG
+if test -n "$ac_ct_CSLIBS_CONFIG"; then
+  echo "$as_me:$LINENO: result: $ac_ct_CSLIBS_CONFIG" >&5
+echo "${ECHO_T}$ac_ct_CSLIBS_CONFIG" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$ac_ct_CSLIBS_CONFIG" && break
+done
+
+  CSLIBS_CONFIG=$ac_ct_CSLIBS_CONFIG
+fi
 
 if test -n "$CSLIBS_CONFIG"; then
   CSLIBS_CFLAGS=`{ (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --cflags") >&5
@@ -4024,10 +4098,11 @@ fi
 #------------------------------------------------------------------------------
 # Check for NASM and extensions (such as %xdefine) which we require.
 #------------------------------------------------------------------------------
-for ac_prog in nasmw nasm
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
+if test -n "$ac_tool_prefix"; then
+  for ac_prog in nasmw nasm
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_NASM+set}" = set; then
@@ -4043,7 +4118,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_NASM="$ac_prog"
+    ac_cv_prog_NASM="$ac_tool_prefix$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -4061,8 +4136,53 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$NASM" && break
+    test -n "$NASM" && break
+  done
+fi
+if test -z "$NASM"; then
+  ac_ct_NASM=$NASM
+  for ac_prog in nasmw nasm
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_NASM+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_NASM"; then
+  ac_cv_prog_ac_ct_NASM="$ac_ct_NASM" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_NASM="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
 done
+done
+
+fi
+fi
+ac_ct_NASM=$ac_cv_prog_ac_ct_NASM
+if test -n "$ac_ct_NASM"; then
+  echo "$as_me:$LINENO: result: $ac_ct_NASM" >&5
+echo "${ECHO_T}$ac_ct_NASM" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$ac_ct_NASM" && break
+done
+
+  NASM=$ac_ct_NASM
+fi
 
 if test -n "$NASM"; then
   echo "$as_me:$LINENO: checking if nasm is sufficiently recent" >&5
@@ -21923,10 +22043,11 @@ fi
 #------------------------------------------------------------------------------
 # Check for SDL.
 #------------------------------------------------------------------------------
-for ac_prog in sdl12-config sdl11-config sdl-config
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
+if test -n "$ac_tool_prefix"; then
+  for ac_prog in sdl12-config sdl11-config sdl-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_SDLCONFIG+set}" = set; then
@@ -21942,7 +22063,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_SDLCONFIG="$ac_prog"
+    ac_cv_prog_SDLCONFIG="$ac_tool_prefix$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -21960,8 +22081,53 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$SDLCONFIG" && break
+    test -n "$SDLCONFIG" && break
+  done
+fi
+if test -z "$SDLCONFIG"; then
+  ac_ct_SDLCONFIG=$SDLCONFIG
+  for ac_prog in sdl12-config sdl11-config sdl-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_SDLCONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_SDLCONFIG"; then
+  ac_cv_prog_ac_ct_SDLCONFIG="$ac_ct_SDLCONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_SDLCONFIG="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
 done
+done
+
+fi
+fi
+ac_ct_SDLCONFIG=$ac_cv_prog_ac_ct_SDLCONFIG
+if test -n "$ac_ct_SDLCONFIG"; then
+  echo "$as_me:$LINENO: result: $ac_ct_SDLCONFIG" >&5
+echo "${ECHO_T}$ac_ct_SDLCONFIG" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$ac_ct_SDLCONFIG" && break
+done
+
+  SDLCONFIG=$ac_ct_SDLCONFIG
+fi
 
 if test -n "$SDLCONFIG"; then
   cs_cv_libsdl=yes
@@ -29494,7 +29660,9 @@ s,@MAKE@,$MAKE,;t t
 s,@JAM@,$JAM,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t
 s,@CSLIBS_CONFIG@,$CSLIBS_CONFIG,;t t
+s,@ac_ct_CSLIBS_CONFIG@,$ac_ct_CSLIBS_CONFIG,;t t
 s,@NASM@,$NASM,;t t
+s,@ac_ct_NASM@,$ac_ct_NASM,;t t
 s,@MAKEDEP@,$MAKEDEP,;t t
 s,@PERL@,$PERL,;t t
 s,@PYTHON@,$PYTHON,;t t
@@ -29508,6 +29676,7 @@ s,@FT2_CONFIG@,$FT2_CONFIG,;t t
 s,@FT2_CFLAGS@,$FT2_CFLAGS,;t t
 s,@FT2_LIBS@,$FT2_LIBS,;t t
 s,@SDLCONFIG@,$SDLCONFIG,;t t
+s,@ac_ct_SDLCONFIG@,$ac_ct_SDLCONFIG,;t t
 s,@CGC@,$CGC,;t t
 s,@CXXCPP@,$CXXCPP,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t

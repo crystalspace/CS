@@ -189,16 +189,16 @@ CS_HEADER_PROPERTY([CS_COMPILER_NAME],
 AC_PROG_RANLIB
 CS_BUILD_PROPERTY([CMD.RANLIB], [$RANLIB])
 
-AC_CHECK_TOOL([DLLTOOL], [dlltool])
+AC_CHECK_TOOLS([DLLTOOL], [dlltool])
 CS_BUILD_PROPERTY([CMD.DLLTOOL], [$DLLTOOL])
 
-AC_CHECK_TOOL([DLLWRAP], [dllwrap])
+AC_CHECK_TOOLS([DLLWRAP], [dllwrap])
 CS_BUILD_PROPERTY([CMD.DLLWRAP], [$DLLWRAP])
 
-AC_CHECK_TOOL([WINDRES], [windres])
+AC_CHECK_TOOLS([WINDRES], [windres])
 CS_BUILD_PROPERTY([CMD.WINDRES], [$WINDRES])
 
-AC_CHECK_TOOL([OBJCOPY], [objcopy])
+AC_CHECK_TOOLS([OBJCOPY], [objcopy])
 AS_IF([test -n "$OBJCOPY"],
     [CS_BUILD_PROPERTY([OBJCOPY.AVAILABLE], [yes])
     CS_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY])])
@@ -245,7 +245,7 @@ AC_PROG_MAKE_SET
 # of Crystal Space.  It contains common libraries, headers, and tools usable by
 # MSVC, Mingw/MSYS, and Cygwin users.
 #------------------------------------------------------------------------------
-AC_CHECK_PROGS([CSLIBS_CONFIG], [cslibs-config])
+AC_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
 AS_IF([test -n "$CSLIBS_CONFIG"],
     [CSLIBS_CFLAGS=`AC_RUN_LOG([$CSLIBS_CONFIG --cflags])`
     CSLIBS_LFLAGS=`AC_RUN_LOG([$CSLIBS_CONFIG --lflags])`
@@ -285,7 +285,7 @@ AS_VAR_SET_IF([cs_cv_shell_mkdir_p],
 #------------------------------------------------------------------------------
 # Check for NASM and extensions (such as %xdefine) which we require.
 #------------------------------------------------------------------------------
-AC_CHECK_PROGS([NASM], [nasmw nasm])
+AC_CHECK_TOOLS([NASM], [nasmw nasm])
 AS_IF([test -n "$NASM"],
     [AC_CACHE_CHECK([if nasm is sufficiently recent], [cs_cv_prog_nasm_ok],
 	[echo "%xdefine TEST" > conftest.asm
@@ -1557,7 +1557,7 @@ AS_IF([test $cs_cv_libcal3d = yes],
 #------------------------------------------------------------------------------
 # Check for SDL.
 #------------------------------------------------------------------------------
-AC_CHECK_PROGS([SDLCONFIG], [sdl12-config sdl11-config sdl-config])
+AC_CHECK_TOOLS([SDLCONFIG], [sdl12-config sdl11-config sdl-config])
 AS_IF([test -n "$SDLCONFIG"],
     [cs_cv_libsdl=yes
     cs_cv_libsdl_cflags=`AC_RUN_LOG([$SDLCONFIG --cflags])`

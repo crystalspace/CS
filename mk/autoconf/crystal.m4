@@ -48,7 +48,7 @@ fi
 
 if test "x$CRYSTAL" = "x"
 then
-   AC_CHECK_PROGS([CSCONF], [cs-config])
+   AC_CHECK_TOOLS([CSCONF], [cs-config])
    if test "x$CSCONF" = "x"
    then
       CRYSTAL=/usr/local/crystal
