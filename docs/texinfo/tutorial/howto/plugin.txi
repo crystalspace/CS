@@ -39,10 +39,10 @@ class csVector3;
 SCF_VERSION (iMyApi, 0, 0, 1);
 
 /**
-* This is the API for our plugin. I recommend
-* to use better comments then this one here in a
-* real situation.
-*/
+ * This is the API for our plugin. It is recommended
+ * that you use better comments than this one in a
+ * real situation.
+ */
 struct iMyApi : public iBase
 @{
 /// Do something.
