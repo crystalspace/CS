@@ -36,8 +36,8 @@ int csPrintf(char const* str, ...)
 
 static int csFPutStr (FILE* file, const char* str)
 {
-// #ifdef CS_HAVE_FPUTWS
-#if 0
+#ifdef CS_HAVE_FPUTWS
+//#if 0
   // Jorrit: Disabled for now since on some linuxes it appears
   // that fputws is buggy.
   size_t wstrSize = strlen (str) + 1;

@@ -41,7 +41,7 @@ MsvcGenWorkspace typical : :
   terrainldr
   waterdemo
   xmlshader
-  wxgl
+  wx.*
   ;
 
 # Similar to "typical" but using the new renderer instead of the old.
@@ -54,7 +54,7 @@ MsvcGenWorkspace newrenderer : :
   null3d
   renderercommon
   soft3d
-  wxgl
+  wx.*
   ;
 
 # Like "typical", but with WX, too.
