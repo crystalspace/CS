@@ -23,6 +23,7 @@
 #include "csutil/csstring.h"
 #include "iutil/cfgfile.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "isys/vfs.h"
 #include "isys/plugin.h"
 #include "freefont.h"
