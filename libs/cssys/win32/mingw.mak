@@ -58,13 +58,13 @@ ifeq ($(MAKESECTION),defines)
 LIBS.EXE=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-lz
+Z_LIBS=-Llibs/zlib -lz
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-lpng
+PNG_LIBS=-Llibs/libpng -lpng
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-ljpeg
+JPG_LIBS=-Llibs/libjpeg -ljpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
