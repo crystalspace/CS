@@ -100,7 +100,7 @@ csQuadTree :: csQuadTree (const csBox2& the_box, int the_depth)
   {
     states = new unsigned char[state_size];
     /// and every node is EMPTY at the start
-    memset(states, CS_QUAD_ALL_UNKNOWN, state_size);  
+    memset(states, CS_QUAD_ALL_EMPTY, state_size);  
   }
   else states = NULL;
 }
@@ -344,6 +344,8 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
       int retval[4];
       pObj->CallChildren(&csQuadTree::insert_polygon_func, pObj, node_bbox, 
         node_pos, data, retval);
+      /// @@@ the polygon could have caused a child to become FULL and thus
+      /// all children could be FULL now, in which case we should be FULL too.
       return pObj->GetPolygonResult(retval);
     }
     /// no children, return value for change, either 
