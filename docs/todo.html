@@ -32,9 +32,6 @@ list first.
 <li> Make MazeD the best Crystal Space editor in the world :-)
 <li> Better LOD function for sprites. The current one doesn't preserve
      the shape well enough.
-<li> Dynamic curve lighting. This requires some thought because
-     lightmapping a curve is expensive. More precalculation may help
-     here.
 <li> Dynamic gouraud shaded polygons. This is easy to do. We need to do
      something similar to lightmaps where we store a static lightmap
      and let the dynamic light patches update it. In this case with
@@ -54,9 +51,6 @@ list first.
 <li> Create more user documentation. Update FAQ. More tutorials.
 <li> Rewrite bots and missile using the real collision detection system.
 <li> Optimize the collision detection system.
-<li> Optimize WhichSide3D. For lighting this is a very important function.
-     It could at least be made inline.
-<li> Fully implement 2*SRC*DST in software.
 <li> Fully implement or approximate 2*SRC*DST in hardware (with gamma or
      something else).
 <li> Integrate landscape engine (ROAM) with CS. Also integrate dynamic sky
@@ -76,14 +70,18 @@ list first.
      But also simple curves should be considered because they will be more
      efficient and also very useful. One good example is simple circle
      shaped curves. Those are great for archways.
-<li> REMPES visibility system.
+<li> Dynamic curve lighting. This requires some thought because
+     lightmapping a curve is expensive. More precalculation may help
+     here.
+<li> REMPES visibility system or at least a subset.
 <li> Implement a 'make install' in the makefile system.
 <li> Try to use the NASM assembler code in the Windows/VC port as well.
 <li> Better world loader with support for plug-ins (to allow apps to insert
      game specific data in a world file).
 <li> Import entities from MDL, 3DS, ...
-<li> Support for fog in the hardware renderers (Direct3D, OpenGL, and Glide).
-     Maybe with layered fog? Or some other approach?
+<li> Implement vertex fog for Direct3D and Glide. Further improve vertex fog
+     support in OpenGL and maybe support limited version of vertex fog for
+     software (testing purposes).
 <li> Resolve TXTMODE mess (private, global, and 24bit). Some mode/display
      combinations are obsolete or not well supported.
 <li> Special effects (bumpmapping, explosions, particles, smoke, ...)
