@@ -13,7 +13,7 @@ PLUGINS += sound/renderer/software
 DESCRIPTION.macosx = MacOS/X
 DESCRIPTION.OS.macosx = MacOS/X
 
-# Avoid linker complain about weak vs. non-weak frameworks.
+# Avoid linker complaint about weak vs. non-weak frameworks.
 # <cs-config>
 export MACOSX_DEPLOYMENT_TARGET = 10.2
 # </cs-config>

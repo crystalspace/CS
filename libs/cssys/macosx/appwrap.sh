@@ -1,6 +1,6 @@
 #! /bin/sh
 #==============================================================================
-# wrapapp.sh
+# appwrap.sh
 #
 #	Create a proper Cocoa application wrapper for the specified program.
 #
