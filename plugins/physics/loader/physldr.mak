@@ -31,8 +31,6 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/physics/loader
 
-LIB.EXTERNAL.physldr = -lode
-
 ifeq ($(USE_PLUGINS),yes)
   physldr = $(OUTDLL)/physldr$(DLL)
   LIB.physldr = $(foreach d,$(DEP.physldr),$($d.LIB))
@@ -64,7 +62,7 @@ ifeq ($(MAKESECTION),targets)
 physldr: $(OUTDIRS) $(physldr)
 
 $(physldr): $(OBJ.physldr) $(LIB.physldr)
-	$(DO.PLUGIN) $(LIB.EXTERNAL.physldr)
+	$(DO.PLUGIN)
 
 clean: physldrclean
 physldrclean:
