@@ -27,6 +27,29 @@ The history order is reversed so that new features are at the top.
 	- Jorge Acereda added #include "cssysdef.h" to loadlib.cpp, it must be
 	  included by all source files. Removed #include "csutil/csstring.h",
 	  no longer needed.
+	- Eric Sunshine made the following changes to the new External MSVC
+	  Application HOWTO:
+	    - Fixed a lot of Texinfo mark-up problems.
+	    - Fixed a number of spelling errors.
+	    - Fixed several occurrences of nonsensical sentences.  (This
+	      document apparently had not been proof-read.)
+	    - Fixed a number of formatting problems.
+	    - Fixed some (but not all) of instances of poor grammar.
+	    - Eliminated several `overfull hbox' warnings emitted by TeX.
+	    - Made numerous enhancements for Info mode.
+	    - Renamed the screenshots from `snap_NN' to `snapN' since TeX can
+	      not grok the underscore (`_') in filenames.
+	    - Removed the simple1.cpp and simple1.h files from the simple1.zip
+	      archive which accompanies this HOWTO.  These files were just
+	      verbatim copies of the files in CS/apps/tutorial/simple1.  Having
+	      them in the ZIP archive is a bad idea since it is guaranteed that
+	      they will become outdated in about two seconds flat.  Instead,
+	      the HOWTO just mentions that they can be grabbed from
+	      CS/apps/tutorial/simple1.
+	- Eric Sunshine made the following changes to the new External
+	  Application HOWTO:
+	    - Fixed a number of Texinfo mark-up problems.
+	    - Minor re-writing of some paragraphs.
 22-Oct-2001
 	- Fixed a bug in the 'addghost' console command. It would fail
 	  if you used it more than once.

@@ -21,8 +21,8 @@ code.
 * HOWTO Level Loading:: Loading a Level
 * HOWTO Pixmaps:: Loading Images for Pixmaps
 * HOWTO Render Priorities:: Render Priorities and Objects in Sectors
-* HOWTO Creating an external CS app:: Creating an external CS application
-* HOWTO Creating an external MSVC CS app:: Creating an external MSVC CS application
+* HOWTO CS Project:: Creating an External Crystal Space Application
+* HOWTO Creating External MSVC Application:: Creating an External @sc{msvc} Application
 @end menu
 
 @importss{tutorial,howto,colldet.txi}
@@ -35,4 +35,3 @@ code.
 @importss{tutorial,howto,rendpri.txi}
 @importss{tutorial,howto,project.txi}
 @importsss{tutorial,howto,msvcproj,msvcproj.txi}
-

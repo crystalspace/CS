@@ -1,142 +1,172 @@
 @c -*-texinfo-*-
-@node HOWTO Creating an external MSVC CS app, , , HOWTO Pixmaps, HOWTO
-@subsection Creating an external MSVC CS application
+@node HOWTO Creating External MSVC Application, , HOWTO CS Project, HOWTO
+@subsection Creating an External @sc{msvc} Application
 
-Thsi HOWTO is a step by step guide for creating a CS application with MSVC outside the
-CS code tree. For the complete sample application in a zip archive see @emph{simple1.zip}
-in the @emph{CS\docs\texinfo\tutorial\howto\msvcproj} directory.
+This @sc{howto} is a step by step guide for creating a Crystal Space
+application with @sc{msvc} outside the Crystal Space source tree.  For the
+complete sample application in a zip archive see @emph{simple1.zip} in the
+following directory:
 
-@subsubheading Step 1
+@noindent
+@file{CS\docs\texinfo\tutorial\howto\msvcproj}
 
-Open MSVC and from the file menu click on @emph{New}.
+@subsubheading @sc{msvc} External Step 1
 
-You will now be confronted with the following dialog box.
-
+Open @sc{msvc} and click on @emph{New} from the @emph{File} menu.  You will now
+be confronted with a dialog box for creating a new project.
 @ifnotinfo
-@picturesss{tutorial,howto,msvcproj,snap}
+
+@picturesss{tutorial,howto,msvcproj,snap0}
 @end ifnotinfo
 
-@subsubheading Step 2 
+@subsubheading @sc{msvc} External Step 2 
 
-As indicated in the above screenshot. Click on @emph{Win32 Application} (as simple1 is
-a GUI app. If we were creating a CS console app we would use @emph{Win32 Console
-Application}). Now enter the name of your app in the @emph{Project name} text box.
-For simplicity I have just named it @emph{simple1}, you can name it how you wish e.g.
-@emph{mybloomingaceapp} or whatever! :-)
+Click on @emph{Win32 Application} since @file{simple1} is a @sc{gui}
+application.  If we were creating a Crystal Space console application we would
+use @emph{Win32 Console Application}.  Now enter the name of your application
+in the @emph{Project name} text box.  In this example, the application is named
+@file{simple1}.
 
-Click @emph{OK} and  you will be next confronted with the following dialog box.
-
+Click @sc{ok} and you will next be confronted with another dialog box.
 @ifnotinfo
-@picturesss{tutorial,howto,msvcproj,snap_01}
+
+@picturesss{tutorial,howto,msvcproj,snap1}
 @end ifnotinfo
 
-@subsubheading Step 3
+@subsubheading @sc{msvc} External Step 3
 
-Just click on @emph{Finish} and you will be confronted with the following dialog box.
-
+Click on @emph{Finish} and yet another dialog box will be presented.
 @ifnotinfo
-@picturesss{tutorial,howto,msvcproj,snap_02}
+
+@picturesss{tutorial,howto,msvcproj,snap2}
 @end ifnotinfo
 
-@subsubheading Step 4
+@subsubheading @sc{msvc} External Step 4
 
-Just click on @emph{OK} and we should now be in the MSVC IDE with our
-basic new Win32 GUI (Graphical User Interface) application created.
+Click on @sc{ok} and we should now be in the @sc{msvc} @sc{ide} with our basic
+new Win32 @sc{gui} (Graphical User Interface) application project created and
+ready to be filled in.
 
-@subsubheading Step 5
+@subsubheading @sc{msvc} External Step 5
 
-Next thing todo is copy and paste the simple1.cpp and simple1.h from the
-CS code tree and paste into our newly created @emph{simple1} project directory.
-Hey, why bother typing the files out twice when you can cheat! :-) You
-can alternatively use the files from the attachment and use there location as
-your guide to where to place them.
+Next, copy and paste the @file{simple1.cpp} and @file{simple1.h} from the
+Crystal Space code tree and paste them into the newly created @file{simple1}
+project directory.  Thes files can be found here:
 
-@subsubheading Step 6
+@noindent
+@file{CS/apps/tutorial/simple1}
 
-Now in the left hand @emph{Workspace window} right click on the @emph{Source Files}
-folder and then click on @emph{Add Files to Folder}. Browse to the @emph{simple1.cpp}
-and double click on it and it will be added to the project. Do the same with
-@emph{simple1.h} to add that file under @emph{Header Files}.
+Alternately, you could type in your own Crystal Space program, but for the sake
+of this tutorial, using the existing @file{simple1} application is simpler.
 
-@subsubheading Step 7
+@subsubheading @sc{msvc} External Step 6
 
-Now we need to setup the paths so MSVC can see both the CS include and library files.
-First make sure that the 'simple1 files' is highlighted as in the screenshot below.
+Now, in the left hand @emph{Workspace} window, right click on the @emph{Source
+Files} folder and then click on @emph{Add Files to Folder}.  Browse to
+@file{simple1.cpp} and double click on it and it will be added to the project.
+Do the same for @file{simple1.h} to add that file to the @emph{Header Files}
+section.
 
+@subsubheading @sc{msvc} External Step 7
+
+Now configure the paths so @sc{msvc} can see both the Crystal Space include and
+library files.  First, make sure that the @emph{simple1 files} section is
+highlighted.
 @ifnotinfo
-@picturesss{tutorial,howto,msvcproj,snap_03}
+
+@picturesss{tutorial,howto,msvcproj,snap3}
 @end ifnotinfo
 
-Next from the file menu click on @emph{Tools} then @emph{Options}.
-
+Next, from the @emph{File} menu click on @emph{Tools}, and then @emph{Options}.
 You will be confronted with the @emph{Options} dialog box.
-
 @ifnotinfo
-@picturesss{tutorial,howto,msvcproj,snap_04}
+
+@picturesss{tutorial,howto,msvcproj,snap4}
 @end ifnotinfo
 
-@subsubheading Step 8
+@subsubheading @sc{msvc} External Step 8
 
 Click on the @emph{Directories} tab.
-
 @ifnotinfo
-@picturesss{tutorial,howto,msvcproj,snap_05}
+
+@picturesss{tutorial,howto,msvcproj,snap5}
 @end ifnotinfo
 
-Use the browe to point MSVC to the @emph{CS\include} directory where that maybe
-on your system as above. Next click on the @emph{Show directories for} and select
-@emph{Library files} and point it to either the @emph{CS\mk\visualc\csdebug\bin\libs}
-or @emph{CS\mk\visualc\csrelease\bin\libs} depending on what type of build of CS you did.
+Use the browser to point @sc{msvc} at the @emph{CS\include} directory.  Next,
+click on the @emph{Show directories for} drop-down list and select
+@emph{Library files}, and point it at either of the two following directories,
+depending on what type of build of Crystal Space you performed.
 
-Once you have performed these two action click on @emph{OK} to exit back to the IDE.
+@noindent
+@file{CS\mk\visualc\csdebug\bin\libs}@*
+@file{CS\mk\visualc\csrelease\bin\libs}
 
-@subsubheading Step 9
+Once you have performed these two action click on @sc{ok} to exit back to the
+@sc{ide}.
 
-Now we will setup the individual and rewuired build setting setup so CS can work
-itself and correctly parse, both MSVC and it's own settings. Firstly from the file
-menu click on @emph{Project} then @emph{Settings} and you will be confronted with the
-following dialog box. Next click on the @emph{C/C++} tab.
+@subsubheading @sc{msvc} External Step 9
 
+Now, configure the individual and required build settings for Crystal Space.
+First, from the @emph{File} menu, click on @emph{Project} then @emph{Settings}
+and you will be confronted with a @emph{Project Settings} dialog box.  Next,
+click on the @emph{C/C++} tab.
 @ifnotinfo
-@picturesss{tutorial,howto,msvcproj,snap_06}
+
+@picturesss{tutorial,howto,msvcproj,snap6}
 @end ifnotinfo
 
-Note: Here we will be telling MSVC we are going to develop with Crystal Space and
-do as it's told! :-)
+In the @emph{Preprocessor definitions} text box replace its contents with the
+line below.
+@iftex
+(In the @sc{ide}, the text is typed on a single line, though it appears
+wrapped in this example in order to fit on the printed page.)
 
-In the @emph{Preprocessor definitions} text box replace it's contents with the line below.
+@noindent
+@code{WIN32,_DEBUG,_WINDOWS,_MBCS,WIN32_VOLATILE,}@*
+@code{__CRYSTAL_SPACE__,CS_DEBUG}
+@end iftex
+@ifnottex
 
+@noindent
 @code{WIN32,_DEBUG,_WINDOWS,_MBCS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG}
+@end ifnottex
 
-For a release build it is slightly different. See the attached sample app for what to
-insert in that case.
+For a release build it is slightly different.  See the attached sample
+application for what to insert in that case.
 
-Next click on the @emph{Category} dropdown menu and select @emph{Code Generation} as
-in the screenshot below.
-
+Next click on the @emph{Category} drop-down menu and select @emph{Code
+Generation}.
 @ifnotinfo
-@picturesss{tutorial,howto,msvcproj,snap_07}
+
+@picturesss{tutorial,howto,msvcproj,snap7}
 @end ifnotinfo
 
-In @emph{Use run-time library} change @emph{Debug Single-threaded} for @emph{Debug
-Multithreaded}.
+In @emph{Use run-time library} change @emph{Debug Single-threaded} to
+@emph{Debug Multithreaded}.
 
-Note: In a release build this is slightly different. See attached sample app for settings
-in that case.
+Note: In a release build this is slightly different.  See the attached sample
+application for settings in that case.
 
-Next click on the @emph{Link} tab, as shown in the screenshot below.
-
+Next, click on the @emph{Link} tab.
 @ifnotinfo
-@picturesss{tutorial,howto,msvcproj,snap_08}
+
+@picturesss{tutorial,howto,msvcproj,snap8}
 @end ifnotinfo
 
-In the @emph{Object/library modules} text box add the CS libs as named below into the
-box with the others.
+In the @emph{Object/library modules} text box add the Crystal Space libraries
+as named below into the box with those already listed.
 
+@iftex
+@code{libcssys.lib libcsutil.lib libcsgeom.lib}@*
+@code{libcsgfx.lib libcstool.lib}
+@end iftex
+@ifnottex
 @code{libcssys.lib libcsutil.lib libcsgeom.lib libcsgfx.lib libcstool.lib}
+@end ifnottex
 
-These libs are the ones needed to successfully link our simple1 app and others are availale.
-See other CS applications for ones that use other / more of Crystal Spaces features. But
-this you can do when you a bit more experienced or feeling more daring.
+These libraries are needed to successfully link the @file{simple1} application,
+though other libraries are also available.  You can examine other existing
+Crystal Space applications to see which other libraries and features are
+available.
 
-Now click on 'OK' to return to the IDE and compile! :-)
+Finally, click on @sc{ok} to return to the @sc{ide} and then build the project.
