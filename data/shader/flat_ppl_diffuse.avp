@@ -18,7 +18,7 @@
       #---------------------------------------
       #Parameter definition
       PARAM mv[4]	     	= { state.matrix.modelview };
-      PARAM mvi[4]	 	= { state.matrix.modelview.invtrans };
+      PARAM mvi[4]	 	= { state.matrix.modelview.inverse };
       PARAM mvp[4]	     	= { state.matrix.mvp };
       PARAM lightPos   		= program.local[0];
       PARAM lightDiffuse 	= program.local[1];
@@ -43,18 +43,7 @@
       OUTPUT oNormal		= result.texcoord[1];
       OUTPUT oTex0		  = result.texcoord[2];
       # Temporaries
-      TEMP eyeVertex;
-      TEMP eyeNormal;
-      TEMP normalEyeToVertex;
-      TEMP vertToLight;
-      TEMP temp;
-      TEMP temp2;
-      TEMP lightAtnFinal;
-      TEMP lightFactors;
-      TEMP halfVector;
-      TEMP lightConsts;
-      
-      TEMP diffuse;
+      TEMP objLight;
       
       #Transform vertex to viewspace
       DP4 oPos.x, mvp[0], iPos;
@@ -65,20 +54,17 @@
       #Just pass on texture-coordinate
       MOV oTex0, iTex0;
       
-      #Transform position to eye
-      DP4 eyeVertex.x, mv[0], iPos;
-      DP4 eyeVertex.y, mv[1], iPos;
-      DP4 eyeVertex.z, mv[2], iPos;
-      DP4 eyeVertex.w, mv[3], iPos;
+      #Transform light to object
+      DP4 objLight.x, mvi[0], lightPos;
+      DP4 objLight.y, mvi[1], lightPos;
+      DP4 objLight.z, mvi[2], lightPos;
+      DP4 objLight.w, mvi[3], lightPos;
       
-      #Transform normal
-      DP4 oNormal.x, mvi[0], iNorm;
-      DP4 oNormal.y, mvi[1], iNorm;
-      DP4 oNormal.z, mvi[2], iNorm;
-      DP4 oNormal.w, mvi[3], iNorm;
+      #Just pass on normal
+      MOV oNormal, iNorm;
       
-      #calculate vector from vertex to light in eye-space
-      ADD oLightDir, lightPos, -eyeVertex;
+      #calculate vector from vertex to light in object-space
+      ADD oLightDir, objLight, -iPos;
       
       #Just pass on diffuse color
       MOV oCol0, lightDiffuse;
