@@ -42,6 +42,9 @@ The history order is reversed so that new features are at the top.
 	  of the mesh objects correctly implement StaticLightDisconnect()
 	  the function will not actually work even though it is fully
 	  bugfree :-)
+	- Jorrit added 'delstlight' command to walktest to delete a
+	  static light. Also changed 'addstlight' to make the light
+	  pseudo-dynamic so that removing it works correctly.
 	- Eric Sunshine augmented the Jam system so that it now builds the
 	  new renderer if --enable-new-renderer was specified with configure.
 	- Matze fixed broken install_maps target in jam. And added a TODO

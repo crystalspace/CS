@@ -1032,7 +1032,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Visibility:");
     CONPRI("  db_frustum farplane");
     CONPRI("Lights:");
-    CONPRI("  addlight dellight dellights addstlight");
+    CONPRI("  addlight dellight dellights addstlight delstlight");
     CONPRI("  clrlights setlight");
     CONPRI("Views:");
     CONPRI("  split_view unsplit_view toggle_view");
@@ -2154,6 +2154,34 @@ bool CommandHandler (const char *cmd, const char *arg)
       AttachRandomLight (dyn);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light added.");
   }
+  else if (!strcasecmp (cmd, "delstlight"))
+  {
+    RECORD_ARGS (cmd, arg);
+    char name[255];
+    if (arg && csScanStr (arg, "%s", name))
+    {
+    }
+    else
+    {
+      strcpy (name, "deflight");
+    }
+    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    iLight* l = ll->FindByName (name);
+    if (!l)
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Couldn't find light '%s' in this sector!", name);
+    }
+    else
+    {
+      csRef<iStatLight> sl = SCF_QUERY_INTERFACE (l, iStatLight);
+      if (sl)
+      {
+        Sys->view->GetEngine ()->RemoveLight (sl);
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light removed.");
+      }
+    }
+  }
   else if (!strcasecmp (cmd, "addstlight"))
   {
     RECORD_ARGS (cmd, arg);
@@ -2162,15 +2190,17 @@ bool CommandHandler (const char *cmd, const char *arg)
     csRef<iStatLight> light;
 
     float r, g, b, radius;
-    if (arg && csScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &radius) == 4)
+    char name[255];
+    if (arg && csScanStr (arg, "%s,%f,%f,%f,%f", name, &r, &g, &b,
+    	&radius) == 5)
     {
-      light = Sys->view->GetEngine ()->CreateLight (0,
-        pos, radius, csColor (r, g, b), false);
+      light = Sys->view->GetEngine ()->CreateLight (name,
+        pos, radius, csColor (r, g, b), true);
     }
     else
     {
-      light = Sys->view->GetEngine ()->CreateLight (0,
-        pos, 6, csColor (1, 1, 1), false);
+      light = Sys->view->GetEngine ()->CreateLight ("deflight",
+        pos, 6, csColor (1, 1, 1), true);
     }
     iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
     ll->Add (light->QueryLight ());
