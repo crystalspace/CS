@@ -254,7 +254,12 @@ awsWindow::OnMouseMove(int button, int x, int y)
     if (Frame().ymax - Frame().ymin < grip_size<<1)
       Frame().ymax = Frame().ymin+(grip_size<<1);
     
-    
+    if (Frame().xmax > WindowManager()->G2D()->GetWidth())
+      Frame().xmax = WindowManager()->G2D()->GetWidth();
+
+    if (Frame().ymax > WindowManager()->G2D()->GetHeight())
+      Frame().ymax = WindowManager()->G2D()->GetHeight();
+
     if (!marked)
       WindowManager()->Mark(Frame());
   
