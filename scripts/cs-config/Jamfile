@@ -8,23 +8,29 @@ actions csConfigGen
 {
   cat $(SUBDIR)/cs-config.temppre > $(<)
 
-  echo "CRYSTAL=\"\${CRYSTAL- $(PREFIX) }\"" >> $(<)
-  echo "prefix=\"\${CRYSTAL}\"" >> $(<)
-  echo "exec_prefix=\"\${prefix}\"" >> $(<)
-  echo "makeout=\"$(LOCATE.OBJECTS)\"" >> $(<)
-  echo "version=\"$(PACKAGE.VERSION)\"" >> $(<)
-  echo "longversion=\"$(PACKAGE.STRING)\"" >> $(<)
-  echo "includedir=\"\${prefix}/include\"" >> $(<)
-  echo "syslibs=\" $(LINKLIBS) \"" >> $(<)
-  echo "common_cflags=\"\"" >> $(<)
-  echo "common_cxxflags=\"\"" >> $(<)
-  echo "" >> $(<)
+  cat >> $(<) << __END__
+CRYSTAL="\${CRYSTAL-$(INSTALLDIR.PREFIX)}"
+prefix="\${CRYSTAL}"
+exec_prefix="\${prefix}"
+makeout="$(LOCATE.OBJECTS)"
+version="$(PACKAGE.VERSION)"
+longversion="$(PACKAGE.STRING)"
+# try to determine if we're in a source or installed CS version
+if [ -e \${prefix}/include/cssysdef.h ] ; then
+  includedir="\${prefix}/include"
+else
+  includedir="$(INSTALLDIR.INCLUDE)"
+fi
+syslibs=" $(LINKLIBS) "
+common_cflags=""
+common_cxxflags=""
 
-  echo "makevars()" >> $(<)
-  echo "{" >> $(<)
-  echo "echo Makevars not supported with jam build." >> $(<)
-  echo "}" >> $(<)
-  echo "" >> $(<)
+makevars()
+{
+echo Makevars not supported with jam build.
+}
+
+__END__
 
   cat $(SUBDIR)/cs-config.temppost >> $(<)
 }
