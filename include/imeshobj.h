@@ -25,8 +25,9 @@
 
 struct iRenderView;
 struct iMovable;
+struct iLight;
 
-SCF_VERSION (iMeshObject, 0, 0, 2);
+SCF_VERSION (iMeshObject, 0, 0, 3);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -34,16 +35,40 @@ SCF_VERSION (iMeshObject, 0, 0, 2);
 struct iMeshObject : public iBase
 {
   /**
+   * First part of Draw. The engine will call this DrawTest() before
+   * calling Draw() so DrawTest() can (if needed) remember computationally
+   * expensive data. If DrawTest() returns false the engine will not
+   * call Draw(). Possibly UpdateLighting() will be called in between
+   * DrawTest() and Draw().
+   */
+  virtual bool DrawTest (iRenderView* rview, iMovable* movable) = 0;
+
+  /**
+   * Update lighting for the object on the given position.
+   */
+  virtual void UpdateLighting (iLight** lights, int num_lights,
+      	iMovable* movable) = 0;
+
+  /**
    * Draw this mesh object. Returns false if not visible.
    * If this function returns true it does not mean that the object
    * is invisible. It just means that this MeshObject thinks that the
-   * object was probably visible.
+   * object was probably visible. DrawTest() will be called before
+   * this function (possibly with an UpdateLighting() in between.
    */
   virtual bool Draw (iRenderView* rview, iMovable* movable) = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 1);
 
+/**
+ * This is the actual interface describing the plugin for a mesh
+ * object. The plugin is actually a factory which can generate
+ * mesh objects of a certain type. For example, if you want to have
+ * multiple sets of sprites from the same sprite template then
+ * you should have an instance of iMeshObjectFactory for evey sprite
+ * template and an instance of iMeshObject for every sprite.
+ */
 struct iMeshObjectFactory : public iPlugIn
 {
   /// Create an instance of iMeshObject.

@@ -27,42 +27,43 @@ struct iSoundStream;
  * The sound format. This keeps information about the frequency, bits and
  * channels of a sound data object.
  */
-typedef struct csSoundFormat {
+struct csSoundFormat
+{
   /// Frequency of the sound (hz)
   int Freq;
   /// number of bits per sample (8 or 16)
   int Bits;
   /// number of channels (1 or 2)
   int Channels;
-} csSoundFormat;
+};
+
+SCF_VERSION (iSoundData, 1, 0, 0);
 
 /**
  * The sound data is a template used to play sounds. You can create any
  * number of totally independent sound streams from it to play several
  * instances of the sound.
  */
-SCF_VERSION (iSoundData, 1, 0, 0);
-
 struct iSoundData : public iBase
 {
-  /// get size of this sound in samples
+  /// Get size of this sound in samples.
   virtual long GetNumSamples() = 0;
-  /// get the format of the sound data
+  /// Get the format of the sound data.
   virtual const csSoundFormat *GetFormat() = 0;
-  /// create a sound stream for this data
+  /// Create a sound stream for this data.
   virtual iSoundStream *CreateStream() = 0;
 };
+
+SCF_VERSION (iSoundStream, 1, 0, 0);
 
 /**
  * The iSoundStream is either an instance of a sound data object or a
  * streamed sound file. There is a one-to-one relation between a sound stream
  * and a sound source.
  */
-SCF_VERSION (iSoundStream, 1, 0, 0);
-
 struct iSoundStream : public iBase
 {
-  /// get the format of the sound data
+  /// Get the format of the sound data.
   virtual const csSoundFormat *GetFormat() = 0;
 
   /**
@@ -98,7 +99,7 @@ struct iSoundStream : public iBase
    */
   virtual void *Read(long &NumSamples) = 0;
 
-  // discard a buffer returned by Read().
+  /// Discard a buffer returned by Read().
   virtual void DiscardBuffer(void *buf) = 0;
 };
 

@@ -178,6 +178,15 @@ public:
    */
   void CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh& mesh);
 
+  /**
+   * Check if the screen bounding box of an object is visible in
+   * this render view. If true is returned (visible) then do_clip
+   * will be set to true or false depending on wether or not clipping
+   * is wanted. This function also does far plane clipping.
+   */
+  bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
+      bool& do_clip);
+
   DECLARE_IBASE_EXT (csCamera);
 
   //------------------- iRenderView implementation -----------------------
@@ -214,6 +223,11 @@ public:
     virtual void CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh& mesh)
     {
       scfParent->CalculateFogMesh (tr_o2c, mesh);
+    }
+    virtual bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
+	bool& do_clip)
+    {
+      return scfParent->ClipBBox (sbox, cbox, do_clip);
     }
   } scfiRenderView;
 };

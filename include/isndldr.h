@@ -24,19 +24,18 @@
 struct iSoundData;
 struct csSoundFormat;
 
+SCF_VERSION (iSoundLoader, 1, 0, 0);
+
 /**
  * The sound loader plugin is used to load sound files from the VFS and
  * create sound data objects or sound streams from it.
  */
-SCF_VERSION (iSoundLoader, 1, 0, 0);
-
 struct iSoundLoader : public iPlugIn
 {
-public:
   /// Initialize the Sound Loader.
   virtual bool Initialize (iSystem *sys) = 0;
 
-  /// load a sound file from the VFS
+  /// Load a sound file from the VFS.
   virtual iSoundData *LoadSound(void *Data, unsigned long Size,
     const csSoundFormat *Format) = 0;
 };

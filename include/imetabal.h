@@ -39,6 +39,7 @@ enum EnvMappingModes    {TRUE_ENV_MAP,FAKE_ENV_MAP};
 
 SCF_VERSION (iMetaBalls, 0, 0, 1);
 
+///
 struct iMetaBalls : public iPlugIn
 {
   /// 

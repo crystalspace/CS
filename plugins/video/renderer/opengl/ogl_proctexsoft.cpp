@@ -555,9 +555,9 @@ void csOpenGLProcSoftware::SetObjectToCamera (csReversibleTransform* o2c)
   g3d->SetObjectToCamera (o2c); 
 }
 
-void csOpenGLProcSoftware::GetObjectToCamera (csReversibleTransform& o2c)
+const csReversibleTransform& csOpenGLProcSoftware::GetObjectToCamera ()
 { 
-  g3d->GetObjectToCamera (o2c); 
+  return g3d->GetObjectToCamera (); 
 }
 
 void csOpenGLProcSoftware::SetClipper (csVector2* vertices, int num_vertices)

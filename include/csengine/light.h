@@ -93,7 +93,7 @@ class csHalo;
  * Note that static and pseudo-dynamic lights are represented by the
  * same csStatLight class.
  */
-class csLight : public csObject, public iLight
+class csLight : public csObject
 {
 protected:
   /// Home sector of the light.
@@ -229,7 +229,21 @@ public:
   static void CorrectForNocolor (float* rp, float* gp, float* bp);  
 
   CSOBJTYPE;
-  DECLARE_IBASE;
+
+  //------------------------ iLight interface -----------------------------
+  DECLARE_IBASE_EXT (csObject);
+
+  struct Light : public iLight
+  {
+    DECLARE_EMBEDDED_IBASE (csLight);
+    virtual csVector3& GetCenter () { return scfParent->GetCenter (); }
+    virtual float GetSquaredRadius () const { return scfParent->GetSquaredRadius (); }
+    virtual csColor& GetColor () { return scfParent->GetColor (); }
+    virtual float GetBrightnessAtDistance (float d)
+    {
+      return scfParent->GetBrightnessAtDistance (d);
+    }
+  } scfiLight;
 };
 
 /**

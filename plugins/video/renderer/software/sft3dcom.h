@@ -391,9 +391,9 @@ public:
     this->o2c = *o2c;
   }
   /// Get world to camera transformation.
-  virtual void GetObjectToCamera (csReversibleTransform& o2c)
+  virtual const csReversibleTransform& GetObjectToCamera ()
   {
-    o2c = this->o2c;
+    return o2c;
   }
   /// Set optional clipper.
   virtual void SetClipper (csVector2* vertices, int num_vertices);

@@ -29,9 +29,10 @@ struct iSector;
 
 /**
  * The iView class encapsulates the top-level Crystal Space
- * renderer interface. It is basicly a camera and a clipper.
+ * renderer interface. It is basically a camera and a clipper.
  */
-struct iView : public iBase {
+struct iView : public iBase
+{
   /// Set sector for this view.
   virtual void SetSector (iSector* sector) = 0;
   /// Get current camera.

@@ -97,7 +97,7 @@ public:
     csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus);
 
   /// Classify some bounding box against this clipper.
-  virtual int ClassifyBox (csBox2 &box);
+  virtual int ClassifyBox (const csBox2 &box);
 
   /// Return true if given point is inside (or on bound) of clipper polygon.
   virtual bool IsInside (const csVector2& v)
@@ -163,7 +163,7 @@ public:
     csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus);
 
   /// Classify some bounding box against this clipper.
-  virtual int ClassifyBox (csBox2 &box);
+  virtual int ClassifyBox (const csBox2 &box);
 
   /// Return true if given point is inside (or on bound) of clipper polygon.
   virtual bool IsInside (const csVector2& v);

@@ -49,7 +49,7 @@ UByte csClipper::ClipInPlace (csVector2 *InPolygon, int &InOutCount,
 
 //---------------------------------------------------------------------------
 
-int csBoxClipper::ClassifyBox (csBox2 &box)
+int csBoxClipper::ClassifyBox (const csBox2 &box)
 {
   if (!region.Overlap (box))
     return -1;
@@ -179,7 +179,7 @@ void csPolygonClipper::Prepare ()
   } /* endfor */
 }
 
-int csPolygonClipper::ClassifyBox (csBox2 &box)
+int csPolygonClipper::ClassifyBox (const csBox2 &box)
 {
   if (!ClipBox.Overlap (box)) return -1;
   if (!IsInside (box.GetCorner (0))) return 0;

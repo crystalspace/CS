@@ -19,7 +19,7 @@
 #include "iplugin.h"
 #include "csutil/scf.h"
 
-SCF_VERSION(iPerfStats, 0, 0, 1);
+SCF_VERSION (iPerfStats, 0, 0, 1);
 
 /**
  * The performance and statistics plugin.

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csengine/sector.h"
 #include "csengine/meshobj.h"
+#include "csengine/light.h"
 #include "igraph3d.h"
 
 IMPLEMENT_CSOBJTYPE (csMeshObject, csSprite)
@@ -80,14 +81,30 @@ void csMeshObject::UpdateInPolygonTrees ()
 
 void csMeshObject::Draw (csRenderView& rview)
 {
-  mesh->Draw (QUERY_INTERFACE (&rview, iRenderView),
-      	      QUERY_INTERFACE (&movable, iMovable));
+  iRenderView* irv = QUERY_INTERFACE (&rview, iRenderView);
+  iMovable* imov = QUERY_INTERFACE (&movable, iMovable);
+  if (mesh->DrawTest (irv, imov))
+  {
+    UpdateDeferedLighting (movable.GetPosition ());
+    mesh->Draw (irv, imov);
+  }
 }
 
 
 void csMeshObject::UpdateLighting (csLight** lights, int num_lights)
 {
   defered_num_lights = 0;
+  if (num_lights <= 0) return;
+  // @@@ Can't we avoid this allocation?
+  iLight** ilights = new iLight* [num_lights];
+  int i;
+  for (i = 0 ; i < num_lights ; i++)
+  {
+    ilights[i] = QUERY_INTERFACE (lights[i], iLight);
+  }
+  iMovable* imov = QUERY_INTERFACE (&movable, iMovable);
+  mesh->UpdateLighting (ilights, num_lights, imov);
+  delete ilights;
 }
 
 

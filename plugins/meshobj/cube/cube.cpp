@@ -17,6 +17,8 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/math3d.h"
+#include "csgeom/fastsqrt.h"
 #include "plugins/meshobj/cube/cube.h"
 #include "imovable.h"
 #include "irview.h"
@@ -27,6 +29,8 @@
 #include "iclip2.h"
 #include "iengine.h"
 #include "itranman.h"
+#include "ilight.h"
+#include "lightdef.h"
 
 IMPLEMENT_IBASE (csCubeMeshObject)
   IMPLEMENTS_INTERFACE (iMeshObject)
@@ -113,15 +117,8 @@ float csCubeMeshObject::GetScreenBoundingBox (iTransformationManager* tranman,
   return cbox.MaxZ ();
 }
 
-bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* movable)
+bool csCubeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
-// @@@ TODO:
-//     - Far plane clipping (iCamera)
-//     - Portal plane clipping
-//     - Portal frustum clipping
-//     - Frustum clipping
-//     - Z fill vs Z use
-
   float size = factory->GetSize ();
   if (cur_size != size)
   {
@@ -138,14 +135,22 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* movable)
     vertices[5].Set ( s, -s,  s);
     vertices[6].Set (-s,  s,  s);
     vertices[7].Set ( s,  s,  s);
+    normals[0] = vertices[0]; normals[0].Normalize ();
+    normals[1] = vertices[1]; normals[1].Normalize ();
+    normals[2] = vertices[2]; normals[2].Normalize ();
+    normals[3] = vertices[3]; normals[3].Normalize ();
+    normals[4] = vertices[4]; normals[4].Normalize ();
+    normals[5] = vertices[5]; normals[5].Normalize ();
+    normals[6] = vertices[6]; normals[6].Normalize ();
+    normals[7] = vertices[7]; normals[7].Normalize ();
     uv[0].Set (0, 0);
-    uv[1].Set (.5, 0);
-    uv[2].Set (1, 0);
-    uv[3].Set (.2, .7);
-    uv[4].Set (.5, .5);
-    uv[5].Set (1, .5);
-    uv[6].Set (.5, 1);
-    uv[7].Set (1, 1);
+    uv[1].Set (1, 0);
+    uv[2].Set (0, 1);
+    uv[3].Set (1, 1);
+    uv[4].Set (1, 1);
+    uv[5].Set (0, 0);
+    uv[6].Set (0, 0);
+    uv[7].Set (0, 1);
     colors[0].Set (0, 0, 0);
     colors[1].Set (1, 0, 0);
     colors[2].Set (0, 1, 0);
@@ -181,23 +186,10 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* movable)
     mesh.vertex_fog = fog;
   }
  
-  if (!factory->GetMaterialWrapper ())
-  {
-    printf ("INTERNAL ERROR: cube used without material!\n");
-    return false;
-  }
-  iMaterialHandle* mat = factory->GetMaterialWrapper ()->GetMaterialHandle ();
-  if (!mat)
-  {
-    printf ("INTERNAL ERROR: cube used without valid material handle!\n");
-    return false;
-  }
   iGraphics3D* g3d = rview->GetGraphics3D ();
-  iGraphics2D* g2d = rview->GetGraphics2D ();
   iCamera* camera = rview->GetCamera ();
   iEngine* engine = rview->GetEngine ();
   iTransformationManager* tranman = engine->GetTransformationManager ();
-  iClipper2D* clipper = rview->GetClipper ();
 
   // First create the transformation from object to camera space directly:
   //   W = Mow * O - Vow;
@@ -220,49 +212,101 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* movable)
   csBox2 sbox;
   csBox3 cbox;
   if (GetScreenBoundingBox (tranman, fov, shiftx, shifty, tr_o2c, sbox, cbox) < 0)
-    return false;	// Not visible.
+    return false;
+  bool do_clip;
+  if (rview->ClipBBox (sbox, cbox, do_clip) == false)
+    return false;
 
-  // @@@ Far plane clipping should come here.
-
-  // Test if we need and should clip to the current portal.
-  int box_class;
-  box_class = clipper->ClassifyBox (sbox);
-  if (box_class == -1) return false; // Not visible.
-  bool do_clip = false;
-  csPlane3 clip_plane;
-  if (rview->IsClipperRequired () || rview->GetClipPlane (clip_plane))
-  {
-    if (box_class == 0) do_clip = true;
-  }
-
-  // If we don't need to clip to the current portal then we
-  // test if we need to clip to the top-level portal.
-  // Top-level clipping is always required unless we are totally
-  // within the top-level frustum.
-  // IF it is decided that we need to clip here then we still
-  // clip to the inner portal. We have to do clipping anyway so
-  // why not do it to the smallest possible clip area.
-  do_clip = true; // @@@
-  //if (!do_clip)
-  //{
-    //box_class = csEngine::current_engine->top_clipper->ClassifyBox (bbox);
-    //if (box_class == 0) do_clip = true;
-  //}
-
-  // Prepare for rendering.
+  iClipper2D* clipper = rview->GetClipper ();
   g3d->SetObjectToCamera (&tr_o2c);
-  g3d->SetClipper (clipper->GetClipPoly (), clipper->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
   g3d->SetPerspectiveAspect (fov);
+  g3d->SetClipper (clipper->GetClipPoly (), clipper->GetNumVertices ());
+  mesh.do_clip = do_clip;
+  mesh.do_mirror = camera->IsMirrored ();
+  return true;
+}
+
+void csCubeMeshObject::UpdateLighting (iLight** lights, int num_lights,
+    iMovable* movable)
+{
+  int i, l;
+
+  // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
+  for (i = 0 ; i < 8 ; i++)
+    colors[i].Set (0, 0, 0);
+
+  // Do the lighting.
+  csVector3 obj_center (0);
+  csReversibleTransform& trans = movable->GetTransform ();
+  csVector3 wor_center = trans.This2Other (obj_center);
+  csColor color;
+  for (l = 0 ; l < num_lights ; l++)
+  {
+    iLight* li = lights[l];
+    // Compute light position in object coordinates
+    csVector3 wor_light_pos = li->GetCenter ();
+    float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
+    if (wor_sq_dist >= li->GetSquaredRadius ()) continue;
+
+    csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
+    float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
+    float in_obj_dist = 1 / FastSqrt (obj_sq_dist);
+
+    csVector3 obj_light_dir = (obj_light_pos - obj_center);
+
+    csColor light_color = li->GetColor () * (256. / NORMAL_LIGHT_LEVEL)
+      * li->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
+
+    for (i = 0 ; i < 8 ; i++)
+    {
+      //csVector3 normal = tpl->GetNormal (tf_idx, i);
+      csVector3 normal = normals[i];
+      float cosinus;
+      if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
+      else cosinus = obj_light_dir * normal;
+
+      if (cosinus > 0)
+      {
+        color = light_color;
+        if (obj_sq_dist >= SMALL_EPSILON) cosinus *= in_obj_dist;
+        if (cosinus < 1) color *= cosinus;
+	colors[i] += color;
+      }
+    }
+  }
+
+  // Clamp all vertex colors to 2.
+  for (i = 0 ; i < 8 ; i++)
+    colors[i].Clamp (2., 2., 2.);
+}
+
+bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* movable)
+{
+// @@@ TODO:
+//     - Z fill vs Z use
+  if (!factory->GetMaterialWrapper ())
+  {
+    printf ("INTERNAL ERROR: cube used without material!\n");
+    return false;
+  }
+  iMaterialHandle* mat = factory->GetMaterialWrapper ()->GetMaterialHandle ();
+  if (!mat)
+  {
+    printf ("INTERNAL ERROR: cube used without valid material handle!\n");
+    return false;
+  }
+
+  iGraphics3D* g3d = rview->GetGraphics3D ();
+
+  // Prepare for rendering.
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
 
   factory->GetMaterialWrapper ()->Visit ();
   mesh.mat_handle[0] = mat;
   mesh.use_vertex_color = true;
-  mesh.do_clip = do_clip;
-  mesh.do_mirror = false; // @@@ rview->IsMirrored ();
-  mesh.fxmode = CS_FX_GOURAUD;	// @@@
-  rview->CalculateFogMesh (tr_o2c, mesh);
+  mesh.fxmode = factory->GetMixMode () | CS_FX_GOURAUD;
+  rview->CalculateFogMesh (g3d->GetObjectToCamera (), mesh);
   g3d->DrawTriangleMesh (mesh);
 
   return true;
@@ -293,6 +337,7 @@ csCubeMeshObjectFactory::csCubeMeshObjectFactory (iBase* pParent)
   CONSTRUCT_EMBEDDED_IBASE (scfiCubeMeshObject);
   size = 1;
   material = NULL;
+  MixMode = 0;
 }
 
 csCubeMeshObjectFactory::~csCubeMeshObjectFactory ()

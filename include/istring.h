@@ -24,7 +24,7 @@
 
 SCF_VERSION (iString, 0, 0, 1);
 
-/// This is a SCF-compatible interface for csString
+/// This is a SCF-compatible interface for csString.
 struct iString : public iBase
 {
   /// Set string capacity to NewSize characters (plus one for ending NULL)

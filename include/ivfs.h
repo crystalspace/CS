@@ -81,7 +81,7 @@ struct csFileTime
 
 SCF_VERSION (iFile, 0, 0, 1);
 
-/// A replacement for FILE type in the virtual file space
+/// A replacement for FILE type in the virtual file space.
 struct iFile : public iBase
 {
   /// Query file name (in VFS)

@@ -29,6 +29,8 @@ struct iSoundData;
 struct iSoundStream;
 struct csSoundFormat;
 
+SCF_VERSION (iSoundRender, 1, 0, 0);
+
 /**
  * The sound renderer is used to play previously loaded sounds or music.
  * Loading itself is NOT done through this interface. <p>
@@ -45,8 +47,6 @@ struct csSoundFormat;
  * sound sources from a sound data object, but only one source from a sound
  * stream.
  */
-SCF_VERSION (iSoundRender, 1, 0, 0);
-
 struct iSoundRender : public iPlugIn
 {
 public:

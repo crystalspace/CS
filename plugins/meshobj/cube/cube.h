@@ -20,6 +20,7 @@
 #define _CUBE_H_
 
 #include "csgeom/vector3.h"
+#include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "imeshobj.h"
 #include "imcube.h"
@@ -37,6 +38,7 @@ class csCubeMeshObject : public iMeshObject
 private:
   csCubeMeshObjectFactory* factory;
   csVector3 vertices[8];
+  csVector3 normals[8];
   csVector2 uv[8];
   csColor colors[8];
   csTriangle triangles[12];
@@ -80,7 +82,9 @@ public:
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
-  /// Draw.
+  virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+  virtual void UpdateLighting (iLight** lights, int num_lights,
+      	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable);
 };
 
@@ -94,6 +98,7 @@ class csCubeMeshObjectFactory : public iMeshObjectFactory
 private:
   float size;
   iMaterialWrapper* material;
+  UInt MixMode;
 
 public:
   /// Constructor.
@@ -109,6 +114,8 @@ public:
   float GetSize () { return size; }
   /// Get the material for this cube.
   iMaterialWrapper* GetMaterialWrapper () { return material; }
+  /// Get mixmode.
+  UInt GetMixMode () { return MixMode; }
 
 public:
   //------------------------ iMeshObjectFactory implementation --------------
@@ -128,6 +135,8 @@ public:
       scfParent->material = material;
     }
     virtual iMaterialWrapper* GetMaterialWrapper () { return scfParent->material; }
+    virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
+    virtual UInt GetMixMode () { return scfParent->MixMode; }
   } scfiCubeMeshObject;
   friend class CubeMeshObject;
 };

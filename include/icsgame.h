@@ -56,7 +56,7 @@ struct iPosition : public iBase
    * Orientation is the orientation of the entity<br>
    * In orientation:
    * <ul>
-   * <li>x is the roation around the upward axis,
+   * <li>x is the rotation around the upward axis,
    * <li>y is the elevation against the floor plane
    * <li>z is the rotation of the object around the forward axis
    * </ul>

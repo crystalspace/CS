@@ -359,6 +359,10 @@ public:
     {
       scfParent->Correct (n);
     }
+    virtual bool IsMirrored ()
+    {
+      return scfParent->IsMirrored ();
+    }
   } scfiCamera;
 
 private:

@@ -42,7 +42,7 @@ enum
   csevNetwork			// Something has arrived on network.
 };
 
-/**
+/*
  * Event masks.<p>
  * The event masks can be used by plugins to tell the system driver
  * (via iSystem::CallOnEvents) which kinds of events they want to receive
@@ -106,7 +106,7 @@ enum
 /// Check if the event is a network event
 #define IS_NETWORK_EVENT(e)	((1 << (e).Type) & CSMASK_Network)
 
-/**
+/*
  * Event flags masks.
  * Every event has a `flags' field which describes miscelaneous
  * aspects of the event. The following constants describes every
@@ -119,7 +119,7 @@ enum
  */
 #define CSEF_BROADCAST		0x00000001
 
-/**
+/*
  * Modifier key masks.
  * Every input event (keyboard, mouse and joystick) contains a Modifiers
  * field which is a bitfield consisting of any combination of the masks
@@ -137,7 +137,7 @@ enum
 /// Key is pressed for first time or it is an autorepeat?
 #define CSMASK_FIRST		0x80000000
 
-/**
+/*
  * Control key codes.
  * Not every existing key on any existing platform is supported by
  * Crystal Space. Instead, we tried to list here all the keys that

@@ -29,7 +29,8 @@
 #define SOUND_LOOP      2
 
 /// Every sound source must be set to one of these 3d modes.
-enum {
+enum
+{
   /// Disable 3d effect.
   SOUND3D_DISABLE,
   /// Position of the sound is relative to the listener.

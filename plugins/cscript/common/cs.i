@@ -135,8 +135,8 @@ struct iGraphics3D:public iPlugIn
 
 struct iCamera:public iBase
 {
-  float GetAspect ();
-  float GetInvAspect ();
+  float GetFOV ();
+  float GetInvFOV ();
 };
 
 struct iPolygonSet:public iBase

@@ -204,8 +204,7 @@ static void WalkDbgDrawMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
 {
   iTextureManager* txtmgr = g3d->GetTextureManager ();
   int green = txtmgr->FindRGB (0, 255, 0);
-  csReversibleTransform o2c;
-  g3d->GetObjectToCamera (o2c);
+  const csReversibleTransform& o2c = g3d->GetObjectToCamera ();
   csVector2 clip_verts[64];
   int num_clipper;
   g3d->GetClipper (&clip_verts[0], num_clipper);

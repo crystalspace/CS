@@ -24,7 +24,7 @@
 
 SCF_VERSION (iStrVector, 0, 0, 1);
 
-/// This is a SCF-compatible interface for csStrVector
+/// This is a SCF-compatible interface for csStrVector.
 struct iStrVector : public iBase
 {
   /// Query array length

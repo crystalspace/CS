@@ -287,9 +287,9 @@ DrawPixmap(hTex,sx,sy,sw,sh,tx,ty,tw,th)
 1.10.  class iCamera
 --------------------
 
-GetAspect()
+GetFOV()
 
-GetInvAspect()
+GetInvFOV()
 
 1.11.  class iPolygonSet
 ------------------------

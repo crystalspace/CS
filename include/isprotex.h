@@ -21,14 +21,14 @@
 
 #include "csutil/scf.h"
 
+SCF_VERSION (iSoftProcTexture, 0, 0, 1);
+
 /**
  * This interface is for internal use.
  * This interface currently is implemented in the software procedural texture
  * driver as part of renderer/software. Opengl currently supports a software
  * renderer option which utilises this. See ogl_proctexsoft.* for usage.
  */
-SCF_VERSION (iSoftProcTexture, 0, 0, 1);
-
 struct iSoftProcTexture : public iBase
 {
   /// Prepare a software procedural texture for use by a hardware renderer

@@ -37,14 +37,18 @@ int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
 
 IMPLEMENT_CSOBJTYPE (csLight,csObject);
 
-IMPLEMENT_IBASE (csLight)
+IMPLEMENT_IBASE_EXT (csLight)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iLight)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csLight::Light)
   IMPLEMENTS_INTERFACE (iLight)
-IMPLEMENT_IBASE_END
+IMPLEMENT_EMBEDDED_IBASE_END
 
 csLight::csLight (float x, float y, float z, float d,
   float red, float green, float blue) : csObject()
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiLight);
   center.x = x;
   center.y = y;
   center.z = z;

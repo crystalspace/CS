@@ -227,7 +227,7 @@ enum G3D_RENDERSTATEOPTION
   G3DRENDERSTATE_GAMMACORRECTION
 };
 
-/// Bit flags for iGraphics3D::BeginDraw ()
+// Bit flags for iGraphics3D::BeginDraw ()
 /// We're going to draw 2D graphics
 #define CSDRAW_2DGRAPHICS   0x00000001
 /// We're going to draw 3D graphics
@@ -359,7 +359,6 @@ struct csPolygonDPM
  */
 struct G3DPolygonMesh
 {
-
   /// Number of vertices.
   int num_vertices;
 
@@ -435,7 +434,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 4, 0, 1);
+SCF_VERSION (iGraphics3D, 4, 0, 2);
 
 /**
  * This is the standard 3D graphics interface.
@@ -496,7 +495,7 @@ struct iGraphics3D : public iPlugIn
   /**
    * Get world to camera transformation.
    */
-  virtual void GetObjectToCamera (csReversibleTransform& o2c) = 0;
+  virtual const csReversibleTransform& GetObjectToCamera () = 0;
 
   /**
    * Set optional clipper to use. If vertices == null

@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/box.h"
 #include "igraph3d.h"
 
 struct iEngine;
@@ -65,7 +66,7 @@ public:
   csFog* fog;
 };
 
-SCF_VERSION (iRenderView, 0, 0, 3);
+SCF_VERSION (iRenderView, 0, 0, 4);
 
 /**
  * This interface represents all information needed to render
@@ -122,6 +123,14 @@ struct iRenderView : public iBase
    * This function will take care of correctly enabling/disabling fog.
    */
   virtual void CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh& mesh) = 0;
+  /**
+   * Check if the screen bounding box of an object is visible in
+   * this render view. If true is returned (visible) then do_clip
+   * will be set to true or false depending on wether or not clipping
+   * is wanted. This function also does far plane clipping.
+   */
+  virtual bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
+      	bool& do_clip) = 0;
 };
 
 #endif

@@ -442,6 +442,45 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
   }
 }
 
+bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
+    bool& do_clip)
+{
+  // Test against far plane if needed.
+  if (UseFarPlane ())
+  {
+    // Ok, so this is not really a far plane clipping - we just dont draw this
+    // object if no point of the camera_bounding box is closer than the D
+    // part of the farplane.
+    if (cbox.SquaredOriginDist () > GetFarPlane ()->D ()*GetFarPlane ()->D ())
+       return false;	
+  }
+  
+  // Test if we need and should clip to the current portal.
+  int box_class;
+  box_class = view->ClassifyBox (sbox);
+  if (box_class == -1) return false; // Not visible.
+  do_clip = false;
+  if (do_clip_plane || do_clip_frustum)
+  {
+    if (box_class == 0) do_clip = true;
+  }
+
+  // If we don't need to clip to the current portal then we
+  // test if we need to clip to the top-level portal.
+  // Top-level clipping is always required unless we are totally
+  // within the top-level frustum.
+  // IF it is decided that we need to clip here then we still
+  // clip to the inner portal. We have to do clipping anyway so
+  // why not do it to the smallest possible clip area.
+  if (!do_clip)
+  {
+    box_class = engine->top_clipper->ClassifyBox (sbox);
+    if (box_class == 0) do_clip = true;
+  }
+
+  return true;
+}
+
 iEngine* csRenderView::RenderView::GetEngine ()
 {
   return QUERY_INTERFACE (scfParent->engine, iEngine);

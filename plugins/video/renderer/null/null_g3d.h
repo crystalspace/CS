@@ -22,6 +22,7 @@
 // csGraphics3DNull line rasterizer class.
 
 #include "csutil/scf.h"
+#include "csgeom/transfrm.h"
 #include "null_txt.h"
 #include "iconfig.h"
 #include "igraph2d.h"
@@ -62,6 +63,8 @@ class csGraphics3DNull : public iGraphics3D
 
   /// The pixel format
   csPixelFormat pfmt;
+  /// Dummy transform.
+  csReversibleTransform o2c;
 
 public:
   DECLARE_IBASE;
@@ -197,8 +200,8 @@ public:
   virtual void SetObjectToCamera (csReversibleTransform* /*o2c*/)
   { }
   /// Get world to camera transformation.
-  virtual void GetObjectToCamera (csReversibleTransform& /*o2c*/)
-  { }
+  virtual const csReversibleTransform& GetObjectToCamera ()
+  { return o2c; }
   /// Set optional clipper.
   virtual void SetClipper (csVector2* vertices, int num_vertices);
   /// Get optional clipper.

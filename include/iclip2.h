@@ -116,7 +116,7 @@ struct iClipper2D : public iBase
    * <li> 0 if box is partially visible.
    * <li> 1 if box is entirely visible.
    */
-  virtual int ClassifyBox (csBox2 &box) = 0;
+  virtual int ClassifyBox (const csBox2 &box) = 0;
 
   /// Return true if given point is inside (or on bound) of clipper polygon.
   virtual bool IsInside (const csVector2& v) = 0;

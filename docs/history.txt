@@ -1,6 +1,47 @@
 The history order has been reversed so that new features are at the top.
 
+29-Dec-2000
+	- Added iRenderView::ClipBBox() to test if a screen bounding box
+	  is visible and needs to be clipped. In addition it does far plane
+	  clipping. Thus is provides a quick and easy way for a mesh object
+	  plugin to test if some object is visible and needs to be clipped.
+	  The code is a straight copy from the code that was in csSprite3D.
+	  csSprite3D now also uses this function.
+	- Made iClipper2D and csClipper::ClassifyBox use a 'const' parameter.
+	- Cube also uses clipping correctly now.
+	- Extended iMeshObject with DrawTest() and UpdateLighting().
+	  DrawTest() is the first part of Draw() which is responsible for
+	  testing quick visibility. Draw() will do the real work. In between
+	  UpdateLighting() can optionally be called.
+	- Added IsMirrored() to iCamera.
+	- Fixed the python plugin for the change of GetAspect() to GetFOV().
+	- Changed iGraphics3D::GetObjectToCamera so that it returns a
+	  reference to the transformation. Modified all the 3D drivers
+	  accordingly.
+	- Extended iLight SCF structure to make it useful for calculating
+	  lighting in the cube plugin.
+	- Changed csLight to let it implement iLight through embedding
+	  instead of inheritance.
+	- Fixed UpdateLighting for csMeshObject.
+	- Added SetMixMode and GetMixMode to iCubeMeshObject interface.
+	- Did some cleanup to various of the SCF include files (comments
+	  and CS code style).
+	- All the above changes accomplish the following for the cube plugin:
+	    - Lighting works now (similarly to how sprite lighting works but
+	      a bit simpler).
+	    - Cube will correctly be rendered through a mirror.
+	    - Changed simple so that the new cube is moved around at the
+	      same rate as the dynamic light at the top of the room.
+	      That way you can see how the lighting is dynamically updated.
+	    - Cube now uses the plasma procedural texture.
+	    - Cube is now drawn with CS_FX_ADD mixmode for a nice blending
+	      effect. This does not work correctly in software mode though
+	      because there is a bug with blending and procedural textures.
+	      The initialization of the procedural textures (which are
+	      8-bit textures) overwrites the blend tables for the 16/32-bit
+	      render mode as well.
 28-Dec-2000
+	- Philip Wyett did a small fix to the cube plugin header.
 	- Seth Galbraith added more error checking to the MD2 importer.
 	- Added Visit() to iMaterialWrapper.
 	- Cube plugin now renders using DrawTriangleMesh.

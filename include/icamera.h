@@ -38,7 +38,7 @@
 
 class csCamera;
 
-SCF_VERSION (iCamera, 0, 0, 3);
+SCF_VERSION (iCamera, 0, 0, 4);
 
 /// Camera class.
 struct iCamera : public iBase
@@ -137,6 +137,9 @@ struct iCamera : public iBase
    * Get the transform corresponding to this camera.
    */
   virtual csOrthoTransform& GetTransform () = 0;
+
+  /// Return true if space is mirrored.
+  virtual bool IsMirrored () = 0;
 };
 
 #endif

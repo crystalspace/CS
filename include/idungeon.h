@@ -27,8 +27,9 @@
  * These are the options you can set for one randomizer. You should not alter
  * any options between CreateWorld() and WriteWorld().
  */
-enum {
-  DN_DESECTORIZE=0,
+enum
+{
+  DN_DESECTORIZE = 0,
   DN_CROSSCONNECT,
   DN_ADDTEXTURES,
   DN_CLEARPRECALC,
@@ -43,7 +44,8 @@ enum {
  * creator's statistics by calling GetStatistics();
  * NEVER alter the values you get from there!
  */
-class dnStats : public csBase {
+class dnStats : public csBase
+{
 public:
   long NumAreas,NumAreaTemplates,NumCrossCons;
   char **AreaTemplateNames;
@@ -53,43 +55,47 @@ public:
 
 /**
  * This is the randomizer plug-in itself. This is how to use it:
- * 1. Set all options via SetOption. These options SHOULD NOT be changed
+ * <ul>
+ * <li>1. Set all options via SetOption. These options SHOULD NOT be changed
  *    after this (unexpected results).
- * 2. Call PrepareInput with the path to the main dungeon.gen file as a
+ * <li>2. Call PrepareInput with the path to the main dungeon.gen file as a
  *    parameter.  This will read the necessary data for the randomizer.  It
  *    will fill the NumAreaTemplates and AreaTemplateNames fields of the
  *    statistics.  Calling this function more than once will overwrite the old
  *    data.
- * 3. Call CreateWorld.  This will run the randomizer and create the world, as
+ * <li>3. Call CreateWorld.  This will run the randomizer and create the world, as
  *    well as fill the remaining fields of the statistics.  You can run it
  *    again if you don't like the result.
- * 4. Call WriteWorld to save the generated world in CS map file format.  This
+ * <li>4. Call WriteWorld to save the generated world in CS map file format.  This
  *    will first clear the precalculated stuff (optionally), then write the
  *    map text file into the given virtual directory and finally copy the
  *    textures (optionally).
+ * </ul>
  */
 SCF_VERSION (iDungeon, 2, 0, 0);
-class iDungeon : public iPlugIn {
+
+class iDungeon : public iPlugIn
+{
 public:
-  /// plugin initialization
-  virtual bool Initialize(iSystem *sys)=0;
+  /// Plugin initialization.
+  virtual bool Initialize (iSystem *sys) = 0;
 
-  /// set a randomizer option.
-  virtual void SetOption(int opt,int value)=0;
+  /// Set a randomizer option.
+  virtual void SetOption (int opt,int value) = 0;
 
-  /// query a randomizer option.
-  virtual int GetOption(int opt)=0;
+  /// Query a randomizer option.
+  virtual int GetOption (int opt) = 0;
 
   /**
    * Read the main dungeon.gen file from the given virtual directory and
    * prepare its contents for the dungeon randomizer.
    */
-  virtual void PrepareInput(const char *InputDirectory)=0;
+  virtual void PrepareInput (const char *InputDirectory) = 0;
 
   /**
    * Create a random world.
    */
-  virtual void CreateWorld()=0;
+  virtual void CreateWorld () = 0;
 
   /**
    * Write the generated world to a file. OutputDirectory must be a valid VFS
@@ -98,10 +104,10 @@ public:
    * like a map directory. Note : due to the many small write operations,
    * writing to an archive directory may take some seconds.
    */
-  virtual void WriteWorld(const char *OutputDirectory)=0;
+  virtual void WriteWorld (const char *OutputDirectory) = 0;
 
   /// get a pointer to the statistics info
-  virtual dnStats *GetStatistics()=0;
+  virtual dnStats *GetStatistics () = 0;
 };
 
 #endif // __IDUNGEON_H__

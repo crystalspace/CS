@@ -1,5 +1,6 @@
 /*
     Copyright (C) 1999 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,13 +22,24 @@
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iLight, 0, 0, 1);
+class csLight;
+class csColor;
+
+SCF_VERSION (iLight, 0, 0, 2);
 
 /**
  * The iLight interface is the SCF interface for the csLight class. 
  */
 struct iLight : public iBase
 {
+  /// Get the position of this light.
+  virtual csVector3& GetCenter () = 0;
+  /// Get the squared radius.
+  virtual float GetSquaredRadius () const = 0;
+  /// Get the color of this light.
+  virtual csColor& GetColor () = 0;
+  /// Get the brightness of a light at a given distance.
+  virtual float GetBrightnessAtDistance (float d) = 0;
 };
 
 #endif // __ILIGHT_H__

@@ -27,26 +27,26 @@ class csRenderView;
 SCF_VERSION (iParticle, 0, 0, 1);
 
 /**
- *  An iParticle can be used in particle Systems.
- *  Each particle may perform these operations in it's own manner,
- *  Or even do nothing at some of the functions.
- *  If some are not implemented, functionality depending on that
- *  feature may not work.
+ * A iParticle can be used in particle Systems.
+ * Each particle may perform these operations in it's own manner,
+ * Or even do nothing at some of the functions.
+ * If some are not implemented, functionality depending on that
+ * feature may not work.
  */
 struct iParticle : public iBase
 {
-  /// a hint that this particle will start out in given sector.
+  /// A hint that this particle will start out in given sector.
   virtual void MoveToSector(csSector *sector) = 0;
   /// Set the position of this particle in world coordinates
   virtual void SetPosition(const csVector3& pos) = 0;
   /// Move the particle relative to position.
   virtual void MovePosition(const csVector3& move) = 0;
 
-  /// set the color of this particle.
+  /// Set the color of this particle.
   virtual void SetColor(const csColor& col) = 0;
-  /// add color to the color of the sprite.
+  /// Add color to the color of the sprite.
   virtual void AddColor(const csColor& col) = 0;
-  /// scale particle by this factor. 
+  /// Scale particle by this factor. 
   virtual void ScaleBy(float factor) = 0;
   /// Set the Mixmode for the particle.
   virtual void SetMixmode(UInt mode) = 0;

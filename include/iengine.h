@@ -1,6 +1,6 @@
 /*
     Crystal Space 3D Engine
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -86,6 +86,7 @@ struct iEngine : public iPlugIn
    * Create or select a new object library (name can be NULL for engine).
    * All new objects will be marked as belonging to this library.
    * You can then delete a whole library at once, for example.
+   * @@@ NOTE THE LIBRARY SYSTEM IS OBSOLETE. Use csRegion/iRegion instead.
    */
   virtual void SelectLibrary (const char *iName) = 0;
   /// Delete a whole library (all objects that are part of library)

@@ -24,7 +24,7 @@
 
 struct iMaterialWrapper;
 
-SCF_VERSION (iCubeMeshObject, 0, 0, 1);
+SCF_VERSION (iCubeMeshObject, 0, 0, 2);
 
 /**
  * This interface describes the API for the cube mesh object.
@@ -42,6 +42,10 @@ struct iCubeMeshObject : public iBase
   virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
   /// Get material of cube.
   virtual iMaterialWrapper* GetMaterialWrapper () = 0;
+  /// Set mix mode.
+  virtual void SetMixMode (UInt mode) = 0;
+  /// Get mix mode.
+  virtual UInt GetMixMode () = 0;
 };
 
 #endif

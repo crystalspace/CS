@@ -164,21 +164,20 @@ struct iGraphics2D : public iPlugIn
   /// Return information about the pixel format.
   virtual csPixelFormat *GetPixelFormat () = 0;
 
- /**
-  * Return the number of bytes for every pixel.
-  * This function is equivalent to the PixelBytes field that
-  * you get from GetPixelFormat.
-  */
+  /**
+   * Return the number of bytes for every pixel.
+   * This function is equivalent to the PixelBytes field that
+   * you get from GetPixelFormat.
+   */
   virtual int GetPixelBytes () = 0;
 
- /**
-  * Return the number of palette entries that can be modified.
-  * This should return 0 if there is no palette (true color displays).
-  * This function is equivalent to the PalEntries field that you
-  * get from GetPixelFormat. It is just a little bit easier to obtain
-  * this way.
-  */
-
+  /**
+   * Return the number of palette entries that can be modified.
+   * This should return 0 if there is no palette (true color displays).
+   * This function is equivalent to the PalEntries field that you
+   * get from GetPixelFormat. It is just a little bit easier to obtain
+   * this way.
+   */
   virtual int GetNumPalEntries () = 0;
 
   /// Get the palette (if there is one)
@@ -193,10 +192,10 @@ struct iGraphics2D : public iPlugIn
   /// Retrieve clipping rectangle
   virtual void GetClipRect (int& nMinX, int& nMinY, int& nMaxX, int& nMaxY) = 0;
 
- /**
-  * This routine should be called before any draw operations.
-  * It should return true if graphics context is ready.
-  */
+  /**
+   * This routine should be called before any draw operations.
+   * It should return true if graphics context is ready.
+   */
   virtual bool BeginDraw () = 0;
 
   /// This routine should be called when you finished drawing.
@@ -217,10 +216,10 @@ struct iGraphics2D : public iPlugIn
   /// Draw a box
   virtual void DrawBox (int x, int y, int w, int h, int color) = 0;
 
- /**
-  * Clip a line against given rectangle.
-  * Function returns true if line is not visible.
-  */
+  /**
+   * Clip a line against given rectangle.
+   * Function returns true if line is not visible.
+   */
   virtual bool ClipLine (float& x1, float& y1, float& x2, float& y2,
     int xmin, int ymin, int xmax, int ymax) = 0;
 
@@ -233,11 +232,11 @@ struct iGraphics2D : public iPlugIn
   /// Query pixel R,G,B at given screen location
   virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB) = 0;
 
- /**
-  * Save a subarea of screen and return a handle to saved buffer.
-  * Storage is allocated in this call, you should either FreeArea()
-  * the handle after usage or RestoreArea () it.
-  */
+  /**
+   * Save a subarea of screen and return a handle to saved buffer.
+   * Storage is allocated in this call, you should either FreeArea()
+   * the handle after usage or RestoreArea () it.
+   */
   virtual csImageArea *SaveArea (int x, int y, int w, int h) = 0;
 
   /// Restore a subarea of screen saved with SaveArea()
@@ -256,23 +255,23 @@ struct iGraphics2D : public iPlugIn
   /// Set mouse position (relative to top-left of CS window).
   virtual bool SetMousePosition (int x, int y) = 0;
 
- /**
-  * Set mouse cursor to one of predefined shape classes
-  * (see csmcXXX enum above). If a specific mouse cursor shape
-  * is not supported, return 'false'; otherwise return 'true'.
-  * If system supports it the cursor should be set to its nearest
-  * system equivalent depending on iShape argument and the routine
-  * should return "true".
-  */
+  /**
+   * Set mouse cursor to one of predefined shape classes
+   * (see csmcXXX enum above). If a specific mouse cursor shape
+   * is not supported, return 'false'; otherwise return 'true'.
+   * If system supports it the cursor should be set to its nearest
+   * system equivalent depending on iShape argument and the routine
+   * should return "true".
+   */
   virtual bool SetMouseCursor (csMouseCursorID iShape) = 0;
 
- /**
-  * Perform a system specific exension.<p>
-  * The command is a string; any arguments may follow, use stdarg
-  * to extract them. There is no way to guarantee the uniquiness of
-  * commands, so please try to use descriptive command names rather
-  * than "a", "b" and so on...
-  */
+  /**
+   * Perform a system specific exension.<p>
+   * The command is a string; any arguments may follow, use stdarg
+   * to extract them. There is no way to guarantee the uniquiness of
+   * commands, so please try to use descriptive command names rather
+   * than "a", "b" and so on...
+   */
   virtual bool PerformExtension (const char *iCommand, ...) = 0;
 
   /// Do a screenshot: return a new iImage object

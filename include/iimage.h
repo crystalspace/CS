@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 
-/**
+/*
  * We can request to load image in one of several formats.
  * We can request from csImageLoader to load a image in several formats.
  * The format we should use depends on what we want to do with the image;
@@ -49,7 +49,7 @@ SCF_VERSION (iImage, 1, 0, 1);
 
 /**
  * The iImage interface is used to work with image files
- * (what you expected?). Crystal Space supports loading of images in
+ * (what did you expect?). Crystal Space supports loading of images in
  * GIF, JPEG, PNG, SGI, TIFF etc formats, you can work with any image
  * through this interface.
  */
@@ -125,7 +125,6 @@ struct iImage : public iBase
   
   /// get the keycolour stored with the image.
   virtual void GetKeycolor (int &r, int &g, int &b) = 0;
-
 };
 
 #endif // __IIMAGE_H__

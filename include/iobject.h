@@ -35,7 +35,6 @@ struct iObject : public iBase
 
   /// Query object name
   virtual const char *GetName () const = 0;
-
 };
 
 #endif

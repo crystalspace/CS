@@ -117,7 +117,7 @@ struct iTextureManager : public iBase
    * The texture is not converted immediately. Instead, you can make
    * intermediate calls to iTextureHandle::SetKeyColor (). Finally,
    * if you want to merge the texture into the current environment, you
-   * should call PrepareTexture (). Alternatively you can call the
+   * should call txt->Prepare(). Alternatively you can call the
    * PrepareTextures () method to compute a optimal palette and convert
    * all the textures into the internal format.
    *<p>

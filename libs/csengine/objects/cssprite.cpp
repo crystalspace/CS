@@ -1048,52 +1048,9 @@ void csSprite3D::Draw (csRenderView& rview)
   csBox3 bbox3;
   
   if (GetScreenBoundingBox (rview, bbox, bbox3) < 0) return;	// Not visible.
-  
-  //@@@ Debug output: this should be an optional feature for WalkTest.
-  //{
-  //  csPolygon2D* p2d = new csPolygon2D ();
-  //  p2d->AddVertex (bbox.GetCorner (0));
-  //  p2d->AddVertex (bbox.GetCorner (1));
-  //  p2d->AddVertex (bbox.GetCorner (3));
-  //  p2d->AddVertex (bbox.GetCorner (2));
-  //  p2d->Draw (rview.g2d, 255);
-  //  delete p2d;
-  //}
-
-  // test against far plane if needed
-  if (rview.UseFarPlane ())
-  {
-    // ok, so this is not really a far plane clipping - we just dont draw this
-    //  sprite if no point of the camera_bounding box is closer than the D
-    //  part of the farplane
-    
-    if (camera_bbox.SquaredOriginDist () > rview.GetFarPlane ()->D ()*rview.GetFarPlane ()->D ())
-       return;	
-  }
-  
-  // Test if we need and should clip to the current portal.
-  int box_class;
-  box_class = rview.view->ClassifyBox (bbox);
-  if (box_class == -1) return; // Not visible.
-  bool do_clip = false;
-  if (rview.do_clip_plane || rview.do_clip_frustum)
-  {
-    if (box_class == 0) do_clip = true;
-  }
-
-  // If we don't need to clip to the current portal then we
-  // test if we need to clip to the top-level portal.
-  // Top-level clipping is always required unless we are totally
-  // within the top-level frustum.
-  // IF it is decided that we need to clip here then we still
-  // clip to the inner portal. We have to do clipping anyway so
-  // why not do it to the smallest possible clip area.
-  if (!do_clip)
-  {
-    box_class = csEngine::current_engine->top_clipper->ClassifyBox (bbox);
-    if (box_class == 0) do_clip = true;
-  }
-
+  bool do_clip;
+  if (rview.ClipBBox (bbox, bbox3, do_clip) == false) return;
+ 
   UpdateWorkTables (tpl->GetNumTexels());
   
 // Moving the lighting to below the lod.

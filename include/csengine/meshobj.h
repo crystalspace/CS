@@ -68,7 +68,7 @@ public:
   virtual void AddColor (const csColor& col);
 
   /**
-   * Light sprite according to the given array of lights (i.e.
+   * Light object according to the given array of lights (i.e.
    * fill the vertex color array).
    */
   virtual void UpdateLighting (csLight** lights, int num_lights);

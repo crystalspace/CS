@@ -135,7 +135,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   virtual void SetPerspectiveAspect (float aspect);
   virtual float GetPerspectiveAspect ();
   virtual void SetObjectToCamera (csReversibleTransform* o2c);
-  virtual void GetObjectToCamera (csReversibleTransform& o2c);
+  virtual const csReversibleTransform& GetObjectToCamera ();
   virtual void SetClipper (csVector2* vertices, int num_vertices);
   virtual void GetClipper (csVector2* vertices, int& num_vertices);
   virtual iGraphics2D *GetDriver2D ();

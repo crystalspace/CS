@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 #include "iplugin.h"
 
-/**
+/*
  * Some alias names for basic fonts.
  * Any font server should provide these fonts, since most
  * programs expect they to be available. Other fonts may or
