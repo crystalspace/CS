@@ -22,12 +22,43 @@
 #include "cssys/sysfunc.h"
 #include "svga.h"
 #include "csgeom/csrect.h"
+#include "csutil/cfgacc.h"
 #include "csutil/csinput.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/cfgmgr.h"
+#include "iutil/cmdline.h"
 #include "ivaria/reporter.h"
 
+
+
 CS_IMPLEMENT_PLUGIN
+
+int do_hwmouse = 0, mouse_narrow = 1;
+int screen_bytepp;
+
+
+static unsigned char mouseptr_pixmap[768];
+static unsigned char mouseptr_pixmap_orig[] =
+{
+  // 1 is black, 2 is white, 0 is transparent
+  0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,   
+  2,1,1,2,2,0,0,0,0,0,0,0,0,0,0,0,
+  2,1,1,1,1,2,2,0,0,0,0,0,0,0,0,0,
+  0,2,1,1,1,1,1,2,2,0,0,0,0,0,0,0, 
+  0,2,1,1,1,1,1,1,1,2,2,0,0,0,0,0,
+  0,0,2,1,1,1,1,1,1,1,1,2,2,0,0,0,
+  0,0,2,1,1,1,1,1,1,1,1,1,1,2,0,0,
+  0,0,0,2,1,1,1,1,1,2,2,2,2,0,0,0,
+  0,0,0,2,1,1,1,1,1,2,0,0,0,0,0,0,
+  0,0,0,0,2,1,1,2,2,1,2,0,0,0,0,0,
+  0,0,0,0,2,1,1,2,0,2,1,2,0,0,0,0,
+  0,0,0,0,0,2,1,2,0,0,2,1,2,0,0,0,
+  0,0,0,0,0,2,1,2,0,0,0,2,1,2,0,0,
+  0,0,0,0,0,0,2,0,0,0,0,0,2,1,2,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+};
 
 static unsigned short ScanCodeToChar[128] =
 {
@@ -91,6 +122,18 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2D::Initialize (object_reg))
     return false;
 
+  this->object_reg = object_reg;
+  csConfigAccess Config(object_reg, "/config/video.cfg");
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+                                                   iCommandLineParser);
+
+  do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
+  if (cmdline->GetOption ("sysmouse"))
+     do_hwmouse = true;
+     
+  if (cmdline->GetOption ("nosysmouse"))
+    do_hwmouse = false;
+
   Memory = NULL;
 
   // SVGALIB Starts here
@@ -152,6 +195,22 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
   memset (mouse_button , 0, sizeof (mouse_button));
   memset (keydown, 0, sizeof (keydown));
 
+  int cols = vga_getcolors ();
+  switch (cols)
+  {
+    case 16777216:
+      screen_bytepp = 3;
+      break;
+
+    case 65536: case 32768:
+      screen_bytepp = 2;
+      break;
+
+    default:
+      screen_bytepp = 1;
+  }
+
+
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
@@ -174,6 +233,8 @@ csGraphics2DSVGALib::~csGraphics2DSVGALib(void)
 
 bool csGraphics2DSVGALib::Open()
 {
+  int f;
+
   if (is_open) return true;
   // Open your graphic interface
   if (!csGraphics2D::Open ())
@@ -223,11 +284,52 @@ bool csGraphics2DSVGALib::Open()
   gl_enablepageflipping (&physicalscreen);
 
   keyboard_init ();
-//#if !defined (OS_DOS)
-//mouse_setxrange (0, Width-1);
-//mouse_setyrange (0, Height-1);
-//mouse_setwrap (MOUSE_NOWRAP);
-//#endif // OS_DOS
+
+  // Put the mouse where it should be! (And keep it there)
+  mouse_setposition (320, 240);
+  mouse_setxrange (0, Width-1);
+  mouse_setyrange (0, Height-1);
+  mouse_setwrap (MOUSE_NOWRAP);
+
+
+  // This is some overly confusing crap
+  // Stolen from zgv, sizes the cursor depending on color depth
+  for (f = 0; f < (256); f++)
+  {
+    int val;
+ 
+    switch(mouseptr_pixmap_orig[f])
+    {
+      case 1:
+        val = 1;
+        break;
+
+      case 2:
+        val = 2;
+        break;
+
+      default:
+        val = 0;
+        break;
+   }
+
+    switch(screen_bytepp)
+    {
+      case 3:
+        mouseptr_pixmap[f*3  ]=(val&255);
+        mouseptr_pixmap[f*3+1]=(val>>8);
+        mouseptr_pixmap[f*3+2]=(val>>16);
+        break;
+
+      case 2:
+        mouseptr_pixmap[f*2  ]=(val&255);
+        mouseptr_pixmap[f*2+1]=(val>>8);
+        break;
+
+      default:
+        mouseptr_pixmap[f]=val;
+    }
+  }
 
   Clear (0);
   return true;
@@ -269,14 +371,47 @@ bool csGraphics2DSVGALib::HandleEvent (iEvent &/*Event*/)
     }
   }
 
-  if (mouse_update ())
+  mouse_update ();
+
+  // Didn't want some of these vars as function scope (x,y)
+  if (1)
   {
     int x = mouse_getx ();
     int y = mouse_gety ();
+
+
     if ((x != mouse_x) || (y != mouse_y))
     {
       mouse_x = x; mouse_y = y;
       EventOutlet->Mouse (0, false, x, y);
+    }
+
+    // We're still going to draw the cursor even if
+    // the position hasn't changed
+    if (!do_hwmouse)
+    {
+      int small = 0, i;
+
+      int savew = 16;
+      int saveh = 16;
+
+      // See if mouse needs clipped
+      if (mouse_x > Width - savew)
+        savew = Width - mouse_x, small = 1;
+
+      if (mouse_y > Height - saveh)
+        saveh = Height - mouse_y, small = 1;
+
+      // If so, only draw the unclipped part
+      if (small)
+        for (i = 0; i < saveh; i++)
+          gl_putboxmask (mouse_x, mouse_y + i, savew, 1,
+                      mouseptr_pixmap + 16 * i * screen_bytepp);
+
+      // No problem, draw the whole damn thing
+      else
+        gl_putboxmask (mouse_x, mouse_y, savew, saveh, mouseptr_pixmap);             
+
     }
 
     int buttons = mouse_getbutton ();
