@@ -46,6 +46,7 @@ csProcTexture::csProcTexture ()
   sys = NULL;
   use_cb = true;
   last_cur_time = 0;
+  anim_prepared = false;
 }
 
 csProcTexture::~csProcTexture ()
@@ -55,6 +56,7 @@ csProcTexture::~csProcTexture ()
 void csProcTexture::ProcCallback (iTextureWrapper*, void* data)
 {
   csProcTexture* pt = (csProcTexture*)data;
+  pt->PrepareAnim ();
   cs_time elapsed_time, current_time;
   pt->sys->GetElapsedTime (elapsed_time, current_time);
   if (pt->last_cur_time == current_time) return;
@@ -88,11 +90,14 @@ bool csProcTexture::Initialize (iSystem* system)
 
 bool csProcTexture::PrepareAnim ()
 {
+  if (anim_prepared) return true;
   iTextureHandle* txt_handle = tex->GetTextureHandle ();
+  if (!txt_handle) return false;
   ptG3D = txt_handle->GetProcTextureInterface ();
   if (!ptG3D) return false;
   ptG2D = ptG3D->GetDriver2D ();
   ptTxtMgr = ptG3D->GetTextureManager ();
+  anim_prepared = true;
   return true;
 }
 
@@ -103,7 +108,7 @@ iMaterialWrapper* csProcTexture::Initialize (iSystem * system,
   Initialize (system);
   tex->Register (txtmgr);
   tex->GetTextureHandle ()->Prepare ();
-  PrepareAnim ();
+  //PrepareAnim ();
   iMaterial* material = engine->CreateBaseMaterial (tex);
   iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (material);
   mat->QueryObject ()->SetName (name);

@@ -45,6 +45,7 @@ csProcDots::~csProcDots ()
 
 bool csProcDots::PrepareAnim ()
 {
+  if (anim_prepared) return true;
   if (!csProcTexture::PrepareAnim ()) return false;
   MakePalette (256);
   return true;

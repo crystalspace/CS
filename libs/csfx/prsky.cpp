@@ -62,6 +62,7 @@ csProcSkyTexture::~csProcSkyTexture()
 
 bool csProcSkyTexture::PrepareAnim ()
 {
+  if (anim_prepared) return true;
   if (!csProcTexture::PrepareAnim ()) return false;
   /// initialise further (using the g2d, txtmgr and so on)
   return true;

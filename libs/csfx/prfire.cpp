@@ -58,6 +58,7 @@ csProcFire::~csProcFire ()
 
 bool csProcFire::PrepareAnim ()
 {
+  if (anim_prepared) return true;
   if (!csProcTexture::PrepareAnim ()) return false;
   MakePalette (256);
   fireline = new uint8[mat_w];

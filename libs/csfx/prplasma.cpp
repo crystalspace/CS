@@ -48,6 +48,7 @@ csProcPlasma::~csProcPlasma ()
 
 bool csProcPlasma::PrepareAnim ()
 {
+  if (anim_prepared) return true;
   if (!csProcTexture::PrepareAnim ()) return false;
   costable = new uint8[256];
   memset (costable, 0, sizeof (uint8)*256);

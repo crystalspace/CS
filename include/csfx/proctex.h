@@ -51,6 +51,7 @@ protected:
   iGraphics2D* ptG2D;
   iTextureManager* ptTxtMgr;
   iSystem* sys;
+  bool anim_prepared;
 
   bool key_color;
   int key_red, key_green, key_blue;

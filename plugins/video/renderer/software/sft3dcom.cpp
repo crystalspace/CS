@@ -3202,6 +3202,7 @@ bool csGraphics3DSoftwareCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
       return false;
 #endif
     case G3DRENDERSTATE_INTERLACINGENABLE:
+      CS_ASSERT (G2D);
       if (!value)
       {
 	G2D->DoubleBuffer (true);
@@ -3228,6 +3229,7 @@ bool csGraphics3DSoftwareCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
       do_gouraud = value;
       break;
     case G3DRENDERSTATE_GAMMACORRECTION:
+      CS_ASSERT (texman);
       texman->SetGamma ((Gamma = value) / 65536.);
       if (tcache) tcache->Clear ();
       break;

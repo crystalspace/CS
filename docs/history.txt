@@ -14,6 +14,9 @@ The history order is reversed so that new features are at the top.
 	  state (i.e. removed halos and proc textures).
 	- Also added a transparent floating sphere which has the plasma
 	  proc texture on it (in flarge).
+	- Fixed a bug in the procedural textures. They tried to initialize
+	  themselves too early, even before the Prepare() of the texture-
+	  manager happened.
 14-Jun-2001
 	- Made the terrain visibility checker more efficient and more robust.
 	  The calculation of the extent works completely different now and

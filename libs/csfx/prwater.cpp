@@ -48,6 +48,7 @@ csProcWater::~csProcWater ()
 
 bool csProcWater::PrepareAnim ()
 {
+  if (anim_prepared) return true;
   if (!csProcTexture::PrepareAnim ()) return false;
   dampening = 4;
   MakePalette (256);

@@ -296,6 +296,7 @@ void csTextureHandleSoftware::GetOriginalColormap (csRGBpixel *oPalette, int &oC
 void csTextureHandleSoftware::remap_texture ()
 {
   int i;
+  CS_ASSERT (texman);
   ApplyGamma (texman->GammaTable);
   switch (texman->pfmt.PixelBytes)
   {
@@ -323,8 +324,10 @@ void csTextureHandleSoftware::remap_texture ()
       delete [] (ULong *)pal2glob;
       pal2glob = new UByte [palette_size * sizeof (ULong)];
       for (i = 0; i < palette_size; i++)
+      {
         ((ULong *)pal2glob) [i] = texman->encode_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
+      }
       break;
   }
 }
