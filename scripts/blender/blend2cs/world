@@ -1,0 +1,393 @@
+WORLD (
+  TEXTURES (
+    TEXTURE 'oldmetal.gif' (FILE (/lib/stdtex/oldmetal.jpg))
+    TEXTURE 'parket.gif' (FILE (/lib/stdtex/parket.jpg))
+    TEXTURE 'asphalt.gif' (FILE (/lib/stdtex/asphalt.jpg))
+    TEXTURE 'mosaic.gif' (FILE (/lib/stdtex/mosaic.jpg))
+    TEXTURE 'mosholes.gif' (FILE (/lib/stdtex/mosholes.png) TRANSPARENT (1,0,0))
+    TEXTURE 'bricks.gif' (FILE (/lib/stdtex/bricks.jpg))
+    TEXTURE 'oldbrick.gif' (FILE (/lib/stdtex/oldbrick.jpg))
+    TEXTURE 'window.gif' (FILE (/lib/stdtex/window.jpg))
+    TEXTURE 'red.gif' (FILE (/lib/stdtex/red.jpg))
+    TEXTURE 'green.gif' (FILE (/lib/stdtex/green.jpg))
+    TEXTURE 'blue.gif' (FILE (/lib/stdtex/blue.jpg))
+    TEXTURE 'yellow.gif' (FILE (/lib/stdtex/yellow.jpg))
+    TEXTURE 'sky.gif' (FILE (/lib/stdtex/sky.jpg))
+    TEXTURE 'misty.gif' (FILE (/lib/stdtex/misty.jpg))
+    TEXTURE 'raindrop' (FILE (/lib/std/raindrop.png))
+    TEXTURE 'snow' (FILE (/lib/std/snow.jpg))
+    TEXTURE 'spark' (FILE (/lib/std/spark.png))
+    TEXTURE 'white.gif' (FILE (/lib/std/white.gif))
+  )
+  MATERIALS (
+    MATERIAL 'snow' (TEXTURE ('snow'))
+    MATERIAL 'spark' (TEXTURE ('spark'))
+    MATERIAL 'mosholes' (TEXTURE ('mosholes.gif'))
+    MATERIAL 'robot' (TEXTURE ('oldmetal.gif'))
+    MATERIAL 'robotMulti' (
+      TEXTURE ('oldmetal.gif')
+      LAYER (
+	TEXTURE ('spark')
+	SCALE (20,20)
+	MIXMODE (ADD ())
+      )
+    )
+    MATERIAL 'mosaic' (TEXTURE ('mosaic.gif))
+    MATERIAL 'raindrop' (TEXTURE ('raindrop'))
+    MATERIAL 'white' (TEXTURE ('white.gif'))
+    MATERIAL 'bricks' (
+      TEXTURE ('bricks.gif')
+      LAYER (
+	TEXTURE ('spark')
+	SCALE (10,10)
+	MIXMODE (ALPHA (.75))
+      )
+    )
+    MATERIAL 'mosaic' (TEXTURE ('mosaic.gif'))
+    MATERIAL 'oldmetal' (TEXTURE ('oldmetal.gif'))
+    MATERIAL 'parket' (TEXTURE ('parket.gif'))
+    MATERIAL 'asphalt' (TEXTURE ('asphalt.gif'))
+    MATERIAL 'mosholes' (TEXTURE ('mosholes.gif'))
+    MATERIAL 'oldbrick' (TEXTURE ('oldbrick.gif'))
+    MATERIAL 'window' (TEXTURE ('window.gif'))
+    MATERIAL 'red' (TEXTURE ('red.gif'))
+    MATERIAL 'green' (TEXTURE ('green.gif'))
+    MATERIAL 'blue' (TEXTURE ('blue.gif'))
+    MATERIAL 'yellow' (TEXTURE ('yellow.gif'))
+    MATERIAL 'sky' (TEXTURE ('sky.gif'))
+    MATERIAL 'misty' (TEXTURE ('misty.gif'))
+  )
+  RENDERPRIORITIES (
+    PRIORITY 'sky' (1,NONE)
+    PRIORITY 'wall' (2,NONE)
+    PRIORITY 'object' (3,NONE)
+    PRIORITY 'alpha' (4,BACK2FRONT)
+  )
+  PLUGINS (
+    PLUGIN 'thing' ('crystalspace.mesh.loader.thing')
+    PLUGIN 'thingFact' ('crystalspace.mesh.loader.factory.thing')
+    PLUGIN 'plane' ('crystalspace.mesh.loader.thing.plane')
+    PLUGIN 'bezier' ('crystalspace.mesh.loader.thing.bezier')
+    PLUGIN 'spr3dFact' ('crystalspace.mesh.loader.factory.sprite.3d')
+    PLUGIN 'spr3d' ('crystalspace.mesh.loader.sprite.3d')
+    PLUGIN 'spr2dFact' ('crystalspace.mesh.loader.factory.sprite.2d')
+    PLUGIN 'spr2d' ('crystalspace.mesh.loader.sprite.2d')
+    PLUGIN 'cubeFact' ('crystalspace.mesh.loader.factory.cube')
+    PLUGIN 'cube' ('crystalspace.mesh.loader.cube')
+  )
+
+  MESHFACT 'cone'(
+    PLUGIN ('thingFact')
+    PARAMS (
+      VERTEX (0.306123627439, -1.96500109729, 1.92454754891)
+      VERTEX (0.374195348319, -1.96500186958, 1.84160196193)
+      VERTEX (0.424777158776, -1.96500274882, 1.74697000562)
+      VERTEX (0.455925291832, -1.96500370123, 1.64428836057)
+      VERTEX (0.466442707507, -1.96500469021, 1.53750302026)
+      VERTEX (0.455925346017, -1.96500567775, 1.43071768383)
+      VERTEX (0.424777148145, -1.96500662589, 1.3280360329)
+      VERTEX (0.374195332885, -1.96500746841, 1.23340403446)
+      VERTEX (0.306123607796, -1.96500823138, 1.15045839133)
+      VERTEX (0.223177961213, -1.96500885568, 1.08238667045)
+      VERTEX (0.128545945297, -1.96500931732, 1.03180485999)
+      VERTEX (0.02586422574, -1.96500959855, 1.00065666733)
+      VERTEX (-0.0809211832192, -1.96500968858, 0.990139311261)
+      VERTEX (-0.187706592565, -1.96500958393, 1.00065679196)
+      VERTEX (-0.290388265838, -1.96500928864, 1.03180498983)
+      VERTEX (-0.385020264285, -1.96500881404, 1.0823868647)
+      VERTEX (-0.467965847809, -1.96500817839, 1.15045864939)
+      VERTEX (-0.536037509084, -1.9650074061, 1.23340435558)
+      VERTEX (-0.586619319541, -1.96500655665, 1.3280363864)
+      VERTEX (-0.617767333388, -1.96500560424, 1.4307181134)
+      VERTEX (-0.628284689458, -1.96500461526, 1.53750353525)
+      VERTEX (-0.617767149154, -1.96500362773, 1.64428893171)
+      VERTEX (-0.586618891677, -1.96500267958, 1.74697058263)
+      VERTEX (-0.536036897603, -1.96500180726, 1.84160255127)
+      VERTEX (-0.467965083107, -1.96500104429, 1.9245481348)
+      VERTEX (-0.385019347117, -1.96500041999, 1.99261973647)
+      VERTEX (-0.290387271597, -1.96499995836, 2.04320145752)
+      VERTEX (-0.187705529688, -1.96499970692, 2.07434947137)
+      VERTEX (-0.080920098371, -1.9649996169, 2.08486670823)
+      VERTEX (0.0258652886172, -1.96499972155, 2.07434910832)
+      VERTEX (0.128546939538, -1.96499998704, 2.04320079124)
+      VERTEX (0.223178848579, -1.96500046164, 1.99261873756)
+      VERTEX (-0.0809209379835, -1.19091546535, 1.53749586277)
+      VERTEX (-0.0809209909754, -1.96500465274, 1.53750299283)
+      MATERIAL ('bricks')
+      POLYGON 'cone_0' (
+        VERTICES (32,0,1)
+      )
+      POLYGON 'cone_1' (
+        VERTICES (1,2,32)
+      )
+      POLYGON 'cone_2' (
+        VERTICES (2,3,32)
+      )
+      POLYGON 'cone_3' (
+        VERTICES (3,4,32)
+      )
+      POLYGON 'cone_4' (
+        VERTICES (4,5,32)
+      )
+      POLYGON 'cone_5' (
+        VERTICES (5,6,32)
+      )
+      POLYGON 'cone_6' (
+        VERTICES (6,7,32)
+      )
+      POLYGON 'cone_7' (
+        VERTICES (7,8,32)
+      )
+      POLYGON 'cone_8' (
+        VERTICES (8,9,32)
+      )
+      POLYGON 'cone_9' (
+        VERTICES (9,10,32)
+      )
+      POLYGON 'cone_10' (
+        VERTICES (10,11,32)
+      )
+      POLYGON 'cone_11' (
+        VERTICES (11,12,32)
+      )
+      POLYGON 'cone_12' (
+        VERTICES (12,13,32)
+      )
+      POLYGON 'cone_13' (
+        VERTICES (13,14,32)
+      )
+      POLYGON 'cone_14' (
+        VERTICES (14,15,32)
+      )
+      POLYGON 'cone_15' (
+        VERTICES (15,16,32)
+      )
+      POLYGON 'cone_16' (
+        VERTICES (16,17,32)
+      )
+      POLYGON 'cone_17' (
+        VERTICES (17,18,32)
+      )
+      POLYGON 'cone_18' (
+        VERTICES (18,19,32)
+      )
+      POLYGON 'cone_19' (
+        VERTICES (19,20,32)
+      )
+      POLYGON 'cone_20' (
+        VERTICES (20,21,32)
+      )
+      POLYGON 'cone_21' (
+        VERTICES (21,22,32)
+      )
+      POLYGON 'cone_22' (
+        VERTICES (22,23,32)
+      )
+      POLYGON 'cone_23' (
+        VERTICES (23,24,32)
+      )
+      POLYGON 'cone_24' (
+        VERTICES (24,25,32)
+      )
+      POLYGON 'cone_25' (
+        VERTICES (25,26,32)
+      )
+      POLYGON 'cone_26' (
+        VERTICES (26,27,32)
+      )
+      POLYGON 'cone_27' (
+        VERTICES (27,28,32)
+      )
+      POLYGON 'cone_28' (
+        VERTICES (28,29,32)
+      )
+      POLYGON 'cone_29' (
+        VERTICES (29,30,32)
+      )
+      POLYGON 'cone_30' (
+        VERTICES (30,31,32)
+      )
+      POLYGON 'cone_31' (
+        VERTICES (31,0,32)
+      )
+      POLYGON 'cone_32' (
+        VERTICES (1,0,33)
+      )
+      POLYGON 'cone_33' (
+        VERTICES (2,1,33)
+      )
+      POLYGON 'cone_34' (
+        VERTICES (3,2,33)
+      )
+      POLYGON 'cone_35' (
+        VERTICES (4,3,33)
+      )
+      POLYGON 'cone_36' (
+        VERTICES (5,4,33)
+      )
+      POLYGON 'cone_37' (
+        VERTICES (6,5,33)
+      )
+      POLYGON 'cone_38' (
+        VERTICES (7,6,33)
+      )
+      POLYGON 'cone_39' (
+        VERTICES (8,7,33)
+      )
+      POLYGON 'cone_40' (
+        VERTICES (9,8,33)
+      )
+      POLYGON 'cone_41' (
+        VERTICES (10,9,33)
+      )
+      POLYGON 'cone_42' (
+        VERTICES (11,10,33)
+      )
+      POLYGON 'cone_43' (
+        VERTICES (12,11,33)
+      )
+      POLYGON 'cone_44' (
+        VERTICES (13,12,33)
+      )
+      POLYGON 'cone_45' (
+        VERTICES (14,13,33)
+      )
+      POLYGON 'cone_46' (
+        VERTICES (15,14,33)
+      )
+      POLYGON 'cone_47' (
+        VERTICES (16,15,33)
+      )
+      POLYGON 'cone_48' (
+        VERTICES (17,16,33)
+      )
+      POLYGON 'cone_49' (
+        VERTICES (18,17,33)
+      )
+      POLYGON 'cone_50' (
+        VERTICES (19,18,33)
+      )
+      POLYGON 'cone_51' (
+        VERTICES (20,19,33)
+      )
+      POLYGON 'cone_52' (
+        VERTICES (21,20,33)
+      )
+      POLYGON 'cone_53' (
+        VERTICES (22,21,33)
+      )
+      POLYGON 'cone_54' (
+        VERTICES (23,22,33)
+      )
+      POLYGON 'cone_55' (
+        VERTICES (24,23,33)
+      )
+      POLYGON 'cone_56' (
+        VERTICES (25,24,33)
+      )
+      POLYGON 'cone_57' (
+        VERTICES (26,25,33)
+      )
+      POLYGON 'cone_58' (
+        VERTICES (27,26,33)
+      )
+      POLYGON 'cone_59' (
+        VERTICES (28,27,33)
+      )
+      POLYGON 'cone_60' (
+        VERTICES (29,28,33)
+      )
+      POLYGON 'cone_61' (
+        VERTICES (30,29,33)
+      )
+      POLYGON 'cone_62' (
+        VERTICES (31,30,33)
+      )
+      POLYGON 'cone_63' (
+        VERTICES (33,0,31)
+      )
+    )
+  )
+  SECTOR 'room1'(
+    MESHOBJ 'walls' (
+      PLUGIN ('crystalspace.mesh.loader.factory.thing')
+      PARAMS (
+        VERTEX (-2.0, 1.99999991258, -1.99999996821)
+        VERTEX (-2.0, 1.99999996821, 1.99999991258)
+        VERTEX (-6.0, 1.99999996821, 1.99999991258)
+        VERTEX (-6.0, 1.99999991258, -1.99999996821)
+        VERTEX (-2.0, -1.99999996821, -1.99999991258)
+        VERTEX (-2.0, -1.99999991258, 1.99999996821)
+        VERTEX (-6.0, -1.99999991258, 1.99999996821)
+        VERTEX (-6.0, -1.99999996821, -1.99999991258)
+        MATERIAL ('mosaic')
+        POLYGON 'sector_room_0' (
+          VERTICES (0,1,2,3)
+        )
+        POLYGON 'sector_room_1' (
+          VERTICES (4,7,6,5)
+        )
+        POLYGON 'sector_room_2' (
+          VERTICES (0,4,5,1)
+          PORTAL ('room')
+        )
+        POLYGON 'sector_room_3' (
+          VERTICES (1,5,6,2)
+        )
+        POLYGON 'sector_room_4' (
+          VERTICES (2,6,7,3)
+        )
+        POLYGON 'sector_room_5' (
+          VERTICES (4,0,3,7)
+        )
+      )
+      zfill()
+    )
+  )
+  SECTOR 'room'(
+    MESHOBJ 'walls' (
+      PLUGIN ('crystalspace.mesh.loader.factory.thing')
+      PARAMS (
+        VERTEX (2.0, 2.0, 2.0)
+        VERTEX (2.0, -2.0, 2.0)
+        VERTEX (-2.0, -2.0, 2.0)
+        VERTEX (-2.0, 2.0, 2.0)
+        VERTEX (2.0, 2.0, -2.0)
+        VERTEX (2.0, -2.0, -2.0)
+        VERTEX (-2.0, -2.0, -2.0)
+        VERTEX (-2.0, 2.0, -2.0)
+        MATERIAL ('mosaic')
+        POLYGON 'sector_room_0' (
+          VERTICES (0,1,2,3)
+        )
+        POLYGON 'sector_room_1' (
+          VERTICES (4,7,6,5)
+        )
+        POLYGON 'sector_room_2' (
+          VERTICES (0,4,5,1)
+        )
+        POLYGON 'sector_room_3' (
+          VERTICES (1,5,6,2)
+        )
+        POLYGON 'sector_room_4' (
+          VERTICES (2,6,7,3)
+          PORTAL ('room1')
+        )
+        POLYGON 'sector_room_5' (
+          VERTICES (4,0,3,7)
+        )
+      )
+      zfill()
+    )
+    MESHOBJ 'cone_0' (
+    PLUGIN ('thing')
+      PARAMS (FACTORY ('cone'))
+    )
+    LIGHT 'light_theName' (
+      CENTER (5.96046447754e-08, -5.08393952714e-07, -0.0404615402222)
+      COLOR (0.0, 7.75953064549, 14.2258057594)
+      RADIUS (20.0)
+      ATTENUATION (realistic)
+    )
+  )
+)

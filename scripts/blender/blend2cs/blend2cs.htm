@@ -1,0 +1,175 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.76 [en] (X11; U; Linux 2.4.1-0.1.9 i686) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#BEC3BE" link="#0000EF" vlink="#59188E" alink="#FF0000">
+Documentation for the blend2cs.py script.
+<p>Features:
+<ul>
+<li>
+Export Blender meshes to sectors, portals, and things</li>
+
+<li>
+Hacked support for textures.</li>
+
+<li>
+Lights</li>
+</ul>
+
+<p><br>1.) Requirements
+<p>This script was designed for Blender V2.14, It may not work on other
+versions of Blender.
+<p>Also I used the CVS version of CS (cs-2001-06-21[1].083702.tar)
+<p>You will need to have Python installed, I am not positive what version
+you need, but to be safe install V2.0
+<p>In order for Blender to find the Python modules you will have to do
+the following (Linux)
+<p>put this in your /etc/profile
+<p>PYTHONHOME=/usr/lib/python2.0
+<br>export PYTHONHOMEcs-2001-06-21[1].083702.tar
+<p>You might have to do something similar on a windows machine.
+<p>Blender 2.14
+<br>If you want to use Blender 2.12 then look at the python file and replace
+all the Blender210 with Blender.
+<p>2.) Setup
+<p>Blender does not have a textures module in the Blender Python API, but
+I here the next release will have a lot more support added to the API!
+<br>Because of this we need to make a file containing the material and
+texture information. Currently this file must be called <a href="template">template</a>.
+<br>If you have problems with Python not being able to find this file,
+then edit the blendToCS.py file and put the full path to the file.
+<p>Next fire up Blender!
+<p>3.) Creating the sector 'room'
+<p>Remove the plane, if it is there.
+<br>Switch to top view and add a mesh>>cube
+<br>Scale the cube while holding [Ctrl]
+<p>Now go to the "Edit Buttons" [F9]
+<br>Make the following changes:
+<br><img SRC="fig1.png" height=58 width=146>
+<p>To specify a mesh as a sector enter the following into the OB: button:
+<p><img SRC="fig2.png" height=36 width=318>
+<p>The sector_&nbsp; part of the text tells the blendToCS.py script that
+this mesh object is a sector. The default sector which CS starts in is
+'room'
+<br>If you forget to put the sector_&nbsp; in the OB: button, then the
+blendToCS.py script will not export the mesh!
+<p>Next take a look at the worldStart file. You will see:
+<p>&nbsp;&nbsp;&nbsp; MATERIAL 'mosaic' (TEXTURE ('mosaic.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'oldmetal' (TEXTURE ('oldmetal.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'parket' (TEXTURE ('parket.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'asphalt' (TEXTURE ('asphalt.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'mosholes' (TEXTURE ('mosholes.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'oldbrick' (TEXTURE ('oldbrick.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'window' (TEXTURE ('window.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'red' (TEXTURE ('red.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'green' (TEXTURE ('green.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'blue' (TEXTURE ('blue.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'yellow' (TEXTURE ('yellow.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'sky' (TEXTURE ('sky.gif'))
+<br>&nbsp;&nbsp;&nbsp; MATERIAL 'misty' (TEXTURE ('misty.gif'))
+<p>We want to walls of the room to have the texture 'mosaic' so go to "the
+material buttons" [F5]
+<br>Add a new material and name it:
+<p><img SRC="fig3.png" height=26 width=190>
+<p>This will tell the script that the mesh(s) with this material will use
+the texture mosaic.
+<br>I was looking through the message forms at Blender, and some one said
+that the next Blender release will have full texture support (-:
+<p>(IMPORTANT) CS only renders one side of the polygons. So for both sectors
+and things all the normals must be facing outward from the object.
+<br>If you see a normal facing the wrong direction. Select the face by
+selecting the vertices around the face, and press the "Flip Normals" button
+in the
+<br>"Edit buttons" window. Also Try using [Ctrl+Alt+N] with all the vertices
+selected to recalculate the normals.
+<p>4.) Exporting the world.
+<p>Make sure you are not in "edit mode". If you are, then the script will
+not export the changed information.
+<p>Press [Shift+F11] to go to the script window.
+<br>Type this in:
+<p>execfile("/usr/local/CS/scrpits/blender/blend2cs/blend2cs.py")
+<p>You must give the full path for this to work. You could just open the
+script in the window, but this allows you to use an external editor to
+make changes to
+<br>the script.
+<p>Press [Alt+P]
+<p>The script will place the file world in the directory you started blender.
+If you don't like this, then edit the script.
+<p>Zip the world file into a zip file(put the zip file in the CS/data directory)
+and test it with walktest!
+<p>Next you might want to add another room.
+<p>Add another cube mesh:
+<p><img SRC="fig4.png" height=131 width=223>
+<p>Name the the new cube
+<br><img SRC="fig5.png" height=30 width=146>
+<p>Set the material for this cube the same as the first one.
+<p>To see the name of the meshes press:
+<br><img SRC="fig6.png" height=60 width=84>
+<p>You will have to press "name" for each mesh.
+<p>Select sector_room and press [Tab]
+<p>Press [B] and select:
+<br><img SRC="fig7.png" height=111 width=198>
+<p>Now while in the "Edit buttons" window add a "new" material and press
+"assign".
+<br><img SRC="fig8.png" height=106 width=138>
+<p>Switch to the "Material buttons" window.
+<p>Click on the "3" to the right on the name of the material, and click
+on "Single user"
+<br><img SRC="fig9.png" height=32 width=204>
+<br>The "3" might be a different number.
+<p>Rename the material to:
+<br><img SRC="fig10.png" height=24 width=184>
+<p>This will tell the script that the face with the material name 'portal_room1'
+is a portal to room1
+<p>Now export the world, zip it, and run CS with the -nolight option.
+<br>Walk into the other room, and turn around. What, where did the room
+I was just in goto?
+<br>For sector_room1 you need to add a portal to sector_room
+<p>I have an idea on how to make the portal stuff easier. If it works it
+will be in the next version.
+<p>Next you might want to add a Light.
+<p>Place the Blender cursor where you want to add a light.
+<br>Add>>Lamp
+<p>Goto "Edit buttons"
+<p><img SRC="fig14.png" height=32 width=302>
+<p>OB: Is the name of the light
+<br>LA: Is the sector which the light is in.
+<p>Goto "Lamp Buttons" [F4]
+<p>And set the following parameters:
+<br><img SRC="fig12.png" height=124 width=160>
+<p>The "Dist" is the radius of the light.
+<p>Export it, zip it, and run ./walktest -relight test
+<p>Now I bet you want to add a thing.
+<p>Put the Blender cursor where you want to add the thing and add a mesh
+of some kind. I added a cone.
+<br>Scale, rotate, and move the mesh to where you want it.
+<br>Remember the normals must be facing out from the object!
+<p>Assign a texture
+<br><img SRC="fig16.png" height=26 width=182>
+<p>Tell the script the mesh is a thing and what sector it is in
+<br><img SRC="fig17.png" height=30 width=298>
+<p>Export, zip, walktest -relight test
+<p><img SRC="fig18.jpg" height=314 width=400>
+<p>The Blender file: <a href="tutorial.blend">tutorial.blend</a>
+<p>Tips:
+<p>When you get into complex mesh modeling, you might have extra vertices
+in the mesh. To avoid this select a mesh, enter edit mode,
+<br>select all the vertices [A] and press [W], click on remove doubles.
+If there are any double vertices in a mesh, CS will give you an error.
+<p>If walktest will not load the world, then check the caps of all the
+names, materials. Capitalization matters!
+<br>Just check to see if everything is correct.
+<p>Contrubute/Bugs:
+<p>If you find any bugs, or have an idea, or have some code, or have created
+a cool world email me at <a href="mailto:mltang@carbon.cudenver.edu">mltang@carbon.cudenver.edu</a>
+<p>Thanks (-:
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+</body>
+</html>
