@@ -342,6 +342,8 @@ sub new {
 *__mult_ass__ = *cspacec::csColor___mult_ass__;
 *__add_ass__ = *cspacec::csColor___add_ass__;
 *__subtr_ass__ = *cspacec::csColor___subtr_ass__;
+*__eq__ = *cspacec::csColor___eq__;
+*__ne__ = *cspacec::csColor___ne__;
 *Add = *cspacec::csColor_Add;
 *Subtract = *cspacec::csColor_Subtract;
 *__add__ = *cspacec::csColor___add__;
@@ -386,6 +388,12 @@ sub new {
 }
 
 *Set = *cspacec::csColor4_Set;
+*__copy__ = *cspacec::csColor4___copy__;
+*__mult_ass__ = *cspacec::csColor4___mult_ass__;
+*__add_ass__ = *cspacec::csColor4___add_ass__;
+*__subtr_ass__ = *cspacec::csColor4___subtr_ass__;
+*__eq__ = *cspacec::csColor4___eq__;
+*__ne__ = *cspacec::csColor4___ne__;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
