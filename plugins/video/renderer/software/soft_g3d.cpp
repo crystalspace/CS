@@ -115,7 +115,7 @@ bool csGraphics3DSoftware::Open ()
 
 //---------------------------------------------------------------------------
 
-#define NUM_OPTIONS 8
+#define NUM_OPTIONS 7
 
 static const csOptionDescription config_options [NUM_OPTIONS] =
 {
@@ -124,9 +124,8 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 2, "alpha", "Semi-transparent textures", CSVAR_BOOL },
   { 3, "txtmap", "Texture mapping", CSVAR_BOOL },
   { 4, "mmx", "MMX support", CSVAR_BOOL },
-  { 5, "gamma", "Gamma value", CSVAR_FLOAT },
-  { 6, "gouraud", "Gouraud shading", CSVAR_BOOL },
-  { 7, "smaller", "Smaller rendering", CSVAR_BOOL },
+  { 5, "gouraud", "Gouraud shading", CSVAR_BOOL },
+  { 6, "smaller", "Smaller rendering", CSVAR_BOOL },
 };
 
 bool csGraphics3DSoftware::eiSoftConfig::SetOption (int id, csVariant* value)
@@ -142,9 +141,8 @@ bool csGraphics3DSoftware::eiSoftConfig::SetOption (int id, csVariant* value)
 #ifdef DO_MMX
     case 4: scfParent->do_mmx = value->GetBool (); break;
 #endif
-    case 5: scfParent->Gamma = (int) (65536. * value->GetFloat ()); break;
-    case 6: scfParent->do_gouraud = value->GetBool (); break;
-    case 7: scfParent->do_smaller_rendering = value->GetBool (); break;
+    case 5: scfParent->do_gouraud = value->GetBool (); break;
+    case 6: scfParent->do_smaller_rendering = value->GetBool (); break;
     default: return false;
   }
   return true;
@@ -163,9 +161,8 @@ bool csGraphics3DSoftware::eiSoftConfig::GetOption (int id, csVariant* value)
 #else
     case 4: value->SetBool (false); break;
 #endif
-    case 5: value->SetFloat (scfParent->Gamma / 65536.); break;
-    case 6: value->SetBool (scfParent->do_gouraud); break;
-    case 7: value->SetBool (scfParent->do_smaller_rendering); break;
+    case 5: value->SetBool (scfParent->do_gouraud); break;
+    case 6: value->SetBool (scfParent->do_smaller_rendering); break;
     default: return false;
   }
   return true;

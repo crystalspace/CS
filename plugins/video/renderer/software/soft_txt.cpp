@@ -135,7 +135,6 @@ csTextureHandleSoftware::csTextureHandleSoftware (
   pal2glob8 = NULL;
   if (flags & CS_TEXTURE_3D)
     AdjustSizePo2 ();
-  orig_palette = NULL;
   (this->texman = texman)->IncRef ();
   reverse_palette = NULL;
 }
@@ -146,7 +145,6 @@ csTextureHandleSoftware::~csTextureHandleSoftware ()
   texman->DecRef ();
   delete [] (uint8 *)pal2glob;
   delete [] pal2glob8;
-  delete [] orig_palette;
   delete [] reverse_palette;
 }
 
@@ -213,23 +211,6 @@ csTexture *csTextureHandleSoftware::NewTexture (iImage *newImage,
     Image = newImage;
 
   return new csTextureSoftware (this, Image);
-}
-
-void csTextureHandleSoftware::ApplyGamma (uint8 *GammaTable)
-{
-  if (!orig_palette)
-    return;
-
-  uint8 *src = orig_palette;
-  csRGBpixel *dst = palette;
-  int i;
-  for (i = palette_size; i > 0; i--)
-  {
-    dst->red   = GammaTable [*src++];
-    dst->green = GammaTable [*src++];
-    dst->blue  = GammaTable [*src++];
-    dst++;
-  }
 }
 
 void csTextureHandleSoftware::ComputeMeanColor ()
@@ -335,42 +316,12 @@ void csTextureHandleSoftware::SetupFromPalette ()
   mean_color.red   = r / palette_size;
   mean_color.green = g / palette_size;
   mean_color.blue  = b / palette_size;
-
-  // Now allocate the orig palette and compress the texture palette there
-  src = palette;
-  delete [] orig_palette;
-  orig_palette = new uint8 [palette_size * 3];
-  uint8 *dst = orig_palette;
-  for (i = palette_size; i > 0; i--)
-  {
-    *dst++ = src->red;
-    *dst++ = src->green;
-    *dst++ = src->blue;
-    src++;
-  }
-}
-
-void csTextureHandleSoftware::GetOriginalColormap (csRGBpixel *oPalette,
-		int &oCount)
-{
-  oCount = palette_size;
-  uint8 *src = orig_palette;
-  csRGBpixel *dst = oPalette;
-  int i;
-  for (i = palette_size; i > 0; i--)
-  {
-    dst->red   = *src++;
-    dst->green = *src++;
-    dst->blue  = *src++;
-    dst++;
-  }
 }
 
 void csTextureHandleSoftware::remap_texture ()
 {
   int i;
   CS_ASSERT (texman);
-  ApplyGamma (texman->GammaTable);
   switch (texman->pfmt.PixelBytes)
   {
     case 1:
@@ -443,24 +394,6 @@ csTextureManagerSoftware::csTextureManagerSoftware (
   G3D = iG3D;
   Scan.inv_cmap = NULL;
   Scan.GlobalCMap = NULL;
-}
-
-void csTextureManagerSoftware::SetGamma (float iGamma)
-{
-  Gamma = iGamma;
-  if (Gamma < EPSILON)
-    Gamma = EPSILON;
-
-  int i;
-  float inv_Gamma = 1 / Gamma;
-  for (i = 0; i < 256; i++)
-    GammaTable [i] = QRound (255 * pow (i / 255.0, inv_Gamma));
-  // Remap all textures according to the new colormap.
-  if (truecolor)
-    for (i = 0; i < textures.Length (); i++)
-      ((csTextureHandleSoftware*)textures.Get (i))->remap_texture ();
-  else if (textures.Length ())
-    SetPalette ();
 }
 
 void csTextureManagerSoftware::SetPixelFormat (csPixelFormat &PixelFormat)
@@ -633,10 +566,8 @@ void csTextureManagerSoftware::compute_palette ()
   for (i = textures.Length () - 1; i >= 0; i--)
   {
     csTextureHandleSoftware *txt = (csTextureHandleSoftware *)textures [i];
-    csRGBpixel colormap [256];
-    int colormapsize;
-    txt->GetOriginalColormap (colormap, colormapsize);
-    csRGBpixel *cmap = colormap;
+    int colormapsize = txt->GetColorMapSize ();
+    csRGBpixel* cmap = txt->GetColorMap ();
     if (txt->GetKeyColor ())
       cmap++, colormapsize--;
     quant.Count (cmap, colormapsize);
@@ -768,9 +699,9 @@ void csTextureManagerSoftware::SetPalette ()
   iGraphics2D *G2D = G3D->GetDriver2D ();
   for (i = 0; i < 256; i++)
   {
-    int r = GammaTable [cmap [i].red];
-    int g = GammaTable [cmap [i].green];
-    int b = GammaTable [cmap [i].blue];
+    int r = cmap [i].red;
+    int g = cmap [i].green;
+    int b = cmap [i].blue;
     G2D->SetRGB (i, r, g, b);
   }
 

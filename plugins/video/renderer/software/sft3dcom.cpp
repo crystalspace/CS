@@ -260,7 +260,6 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent)
   pixel_shift = 0;
   rstate_mipmap = 0;
   do_gouraud = true;
-  Gamma = QInt16 (1.0);
 
   dbg_max_polygons_to_draw = 2000000000; // After 2 billion polygons we give up :-)
 
@@ -343,12 +342,6 @@ void csGraphics3DSoftwareCommon::NewInitialize ()
   mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3);
   do_interlaced = config->GetBool ("Video.Software.Interlacing", false) ? 0 : -1;
 
-  const char *gamma = cmdline->GetOption ("gamma");
-  if (!gamma) gamma = config->GetStr ("Video.Software.Gamma", "1");
-  float fGamma;
-  sscanf (gamma, "%f", &fGamma);
-  Gamma = QInt16 (fGamma);
-
 #ifdef DO_MMX
   do_mmx = config->GetBool ("Video.Software.MMX", true);
 #endif
@@ -362,7 +355,6 @@ void csGraphics3DSoftwareCommon::SharedInitialize(csGraphics3DSoftwareCommon *p)
   do_smaller_rendering = p->do_smaller_rendering;
   mipmap_coef = p->mipmap_coef;
   do_interlaced = p->do_interlaced;
-  Gamma = p->Gamma;
 #ifdef DO_MMX
   do_mmx = p->do_mmx;
 #endif
@@ -489,7 +481,6 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
   ScanSetup ();
 
   SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
-  SetRenderState (G3DRENDERSTATE_GAMMACORRECTION, Gamma);
 
   return true;
 }
@@ -508,7 +499,6 @@ bool csGraphics3DSoftwareCommon::SharedOpen ()
   tcache = partner->tcache;
   ScanSetup ();
   SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
-  SetRenderState (G3DRENDERSTATE_GAMMACORRECTION, Gamma);
   return true;
 }
 
@@ -3475,11 +3465,6 @@ bool csGraphics3DSoftwareCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
     case G3DRENDERSTATE_GOURAUDENABLE:
       do_gouraud = value;
       break;
-    case G3DRENDERSTATE_GAMMACORRECTION:
-      CS_ASSERT (texman);
-      texman->SetGamma ((Gamma = value) / 65536.);
-      if (tcache) tcache->Clear ();
-      break;
     default:
       return false;
   }
@@ -3521,8 +3506,6 @@ long csGraphics3DSoftwareCommon::GetRenderState(G3D_RENDERSTATEOPTION op)
       return dbg_max_polygons_to_draw;
     case G3DRENDERSTATE_GOURAUDENABLE:
       return do_gouraud;
-    case G3DRENDERSTATE_GAMMACORRECTION:
-      return Gamma;
     default:
       return 0;
   }

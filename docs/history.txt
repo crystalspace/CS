@@ -1,6 +1,12 @@
 The history order is reversed so that new features are at the top.
 
 18-Oct-2002
+	- Removed support for gamma setting in the renderers. This was
+	  only supported by the software renderer and then only working
+	  properly in 8-bit mode.
+	- Added SetGamma/GetGamma to iGraphics2D where it belongs. Gamma
+	  is a canvas feature. Note that currently there are no canvases
+	  that support this.
 	- Eric Sunshine eliminated compilation warnings from several modules.
 	- Eric Sunshine fixed a compilation error in cspthrd.cpp for platforms
 	  which do not publish sys_errlist[].

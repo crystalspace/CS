@@ -211,6 +211,9 @@ public:
   /// Free storage allocated for a subarea of screen
   virtual void FreeArea (csImageArea *Area);
 
+  virtual bool SetGamma (float /*gamma*/) { return false; }
+  virtual float GetGamma () const { return 1.0; }
+
 private:
     /// helper function for ClipLine()
   bool CLIPt(float denom, float num, float& tE, float& tL);

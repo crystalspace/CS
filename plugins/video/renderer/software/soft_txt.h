@@ -152,10 +152,7 @@ protected:
   /// Same but for 8-bit modes (8bit to 16bit values)
   uint16 *pal2glob8;
 
-  /// The private palette for this texture (compressed a little)
-  uint8 *orig_palette;
-
-  /// The private palette (with gamma applied)
+  /// The private palette.
   csRGBpixel palette [256];
 
   /**
@@ -213,17 +210,12 @@ public:
   csRGBpixel *GetColorMap () { return palette; }
   /// Query the number of colors in the colormap
   int GetColorMapSize () { return palette_size; }
-  /// Get original colormap (packed)
-  void GetOriginalColormap (csRGBpixel *oPalette, int &oCount);
 
   /// Query palette -> native format table
   void *GetPaletteToGlobal () { return pal2glob; }
 
   /// Query palette -> 16-bit values table for 8-bit modes
   uint16 *GetPaletteToGlobal8 () { return pal2glob8; }
-
-  /// Apply gamma correction to private palette
-  void ApplyGamma (uint8 *GammaTable);
 
   /**
    * Query if the texture has an alpha channel.<p>
@@ -288,12 +280,6 @@ public:
   /// The multiplication tables used for lightmapping
   uint8 *lightmap_tables [3];
 
-  /// The translation table for applying gamma
-  uint8 GammaTable [256];
-
-  /// Texture gamma
-  float Gamma;
-
   ///
   csTextureManagerSoftware (iObjectRegistry *object_reg,
   			    csGraphics3DSoftwareCommon *iG3D,
@@ -329,9 +315,6 @@ public:
 
   /// Called from csTextureHandleSoftware destructor to deregister before death
   void UnregisterTexture (csTextureHandleSoftware* handle);
-
-  /// Set gamma correction value.
-  void SetGamma (float iGamma);
 
   /// Read configuration values from config file.
   virtual void read_config (iConfigFile *config);

@@ -170,8 +170,6 @@ protected:
 
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
-  /// Gamma correction value (16.16 format)
-  int Gamma;
 
   /// scan_xxx routines
   csDrawScanline* ScanProc [0x28];

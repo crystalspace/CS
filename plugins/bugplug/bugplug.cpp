@@ -808,8 +808,7 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_GAMMA:
         {
 	  if (!G3D) break;
-	  float val = G3D->GetRenderState (G3DRENDERSTATE_GAMMACORRECTION)
-		/ 65536.0f;
+	  float val = G2D->GetGamma ();
 	  sprintf (buf, "%g", val);
           EnterEditMode (cmd, "Enter new gamma:", buf);
 	}
@@ -1259,8 +1258,7 @@ void csBugPlug::ExitEditMode ()
   {
     case DEBUGCMD_GAMMA:
       csScanStr (edit_string, "%f", &f);
-      G3D->SetRenderState (G3DRENDERSTATE_GAMMACORRECTION,
-      	QRound (f * 65536));
+      G2D->SetGamma (f);
       break;
     case DEBUGCMD_FOV:
       csScanStr (edit_string, "%d", &i);

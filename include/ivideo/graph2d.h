@@ -111,7 +111,7 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
-SCF_VERSION (iGraphics2D, 2, 2, 0);
+SCF_VERSION (iGraphics2D, 2, 2, 1);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -310,6 +310,17 @@ struct iGraphics2D : public iBase
    */
   virtual bool SetMouseCursor (csMouseCursorID iShape) = 0;
 
+  /**
+   * Set gamma value (if supported by canvas). By default this is 1.
+   * Smaller values are darker. If the canvas doesn't support gamma
+   * then this function will return false.
+   */
+  virtual bool SetGamma (float gamma) = 0;
+
+  /**
+   * Get gamma value.
+   */
+  virtual float GetGamma () const = 0;
 };
 
 #endif // __IVIDEO_GRAPH2D_H__
