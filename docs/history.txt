@@ -3,6 +3,11 @@ The history order is reversed so that new features are at the top.
 11-Jul-2001
 	- Removed csLight::CorrectForNoColor() since it is obsolete.
 	- Added a virtual destructor to mdldata.h.
+	- Removed deletion of the 'void*' userdata in terrfunc. This
+	  is not legal. The correct solution to be able to clean up
+	  this data is to rewrite the callback system using SCF interfaces
+	  as I have already done at other places. This is on my todo.
+	  So please leave the memory leak there for the moment.
 10-Jul-2001
 	- Michael Voasse did the following:
 	    - Next installment on terrfunc, this patch adds some bound

@@ -227,10 +227,9 @@ public:
   /// Set the normal function to use for the terrain.
   void SetNormalFunction (csTerrainNormalFunction* func, void* d)
   { 
-	normal_func = func;
-	if (normal_func_data) delete normal_func_data;
-	normal_func_data = d; 
-	initialized = false; 
+    normal_func = func;
+    normal_func_data = d; 
+    initialized = false; 
   }
   void SetHeightMap (iImage* im, float hscale, float hshift);
 

@@ -205,8 +205,6 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
 csTerrFuncObject::~csTerrFuncObject ()
 {
   delete[] blocks;
-  if (height_func_data) delete height_func_data;
-  if (normal_func_data) delete normal_func_data;
   if (vis_cb) vis_cb->DecRef ();
 }
 
