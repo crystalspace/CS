@@ -160,3 +160,9 @@ supported in world files. The loader will give an error if it finds them.
 All the macro versions of the growing arrays and vectors have been removed
 and replaced with corresponding templated arrays (@pxref{csUtil}). 
 
+i.e. the following macros are gone: @code{CS_DECLARE_TYPED_VECTOR},
+@code{CS_DECLARE_OBJECT_VECTOR}, @code{CS_DECLARE_GROWING_ARRAY}, and all
+derivatives.
+
+
+
