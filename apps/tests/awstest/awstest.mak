@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.awstest = Alternate Windowing System test
+DESCRIPTION.awstst = Alternate Windowing System test
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP+=$(NEWLINE)echo $"  make awstest      Make the $(DESCRIPTION.awstest)$"
+APPHELP+=$(NEWLINE)echo $"  make awstst       Make the $(DESCRIPTION.awstst)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: awstest awstestclean
+.PHONY: awstst awststclean
 
-all apps: awstest
-awstest:
+all apps: awstst
+awstst:
 	$(MAKE_TARGET)
-awstestclean:
+awststclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -25,11 +25,11 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/awstest apps/support
+vpath %.cpp apps/tests/awstest apps/support
 
 AWSTEST.EXE = awstest$(EXE)
-INC.AWSTEST = $(wildcard apps/awstest/*.h)
-SRC.AWSTEST = $(wildcard apps/awstest/*.cpp)
+INC.AWSTEST = $(wildcard apps/tests/awstest/*.h)
+SRC.AWSTEST = $(wildcard apps/tests/awstest/*.cpp)
 OBJ.AWSTEST = $(addprefix $(OUT),$(notdir $(SRC.AWSTEST:.cpp=$O)))
 DEP.AWSTEST = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX 
 LIB.AWSTEST = $(foreach d,$(DEP.AWSTEST),$($d.LIB))
@@ -47,16 +47,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: awstest awstestclean
+.PHONY: awstst awststclean
 
 all: $(AWSTEST.EXE)
-awstest: $(OUTDIRS) $(AWSTEST.EXE)
-clean: awstestclean
+awstst: $(OUTDIRS) $(AWSTEST.EXE)
+clean: awststclean
 
 $(AWSTEST.EXE): $(DEP.EXE) $(OBJ.AWSTEST) $(LIB.AWSTEST)
 	$(DO.LINK.EXE)
 
-awstestclean:
+awststclean:
 	-$(RM) $(AWSTEST.EXE) $(OBJ.AWSTEST)
 
 ifdef DO_DEPEND
