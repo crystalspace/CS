@@ -21,19 +21,26 @@ VFS.Mount.varia = $(CS_DATADIR)$/varia$/
 VFS.Mount.scripts = $(CS_DATADIR)$/
 
 VFS.Mount.shader = $(CS_DATADIR)$/shader$/
+; The Unifont
+VFS.Mount.fonts/unifont = $(CS_DATADIR)$/unifont.zip
 ; The TTF font library
 VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/)
 
 VFS.Mount.lev/flarge   = $(CS_MAPDIR)$/flarge$/
+VFS.Mount.lev/r3dtest  = $(CS_DATADIR)$/r3dtest$/
+VFS.Mount.lev/stenciltest = $(CS_DATADIR)$/stenciltest$/
 VFS.Mount.lev/isomap   = $(CS_MAPDIR)$/isomap.zip, $(CS_DATADIR)$/isomap$/
 VFS.Mount.lev/mdltest  = $(CS_MAPDIR)$/mdltest$/
 VFS.Mount.lev/partsys  = $(CS_MAPDIR)$/partsys$/
 VFS.Mount.lev/terrain  = $(CS_MAPDIR)$/terrain$/
+VFS.Mount.lev/terrainf = $(CS_DATADIR)$/terrainf$/
+VFS.Mount.lev/particles  = $(CS_DATADIR)$/particles$/
 
 ; Mount all libraries under the /lib/ directory
 VFS.Mount.lib/std      = $(CS_DATADIR)$/standard.zip
 VFS.Mount.lib/stdtex   = $(CS_DATADIR)$/stdtex.zip
 VFS.Mount.lib/csws     = $(CS_DATADIR)$/csws.zip
+VFS.Mount.lib/cubemap  = $(CS_DATADIR)$/cube$/
 
 ; Mount for AWS
 VFS.Mount.aws = $(CS_DATADIR)$/awsdef.zip

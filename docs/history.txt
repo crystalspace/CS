@@ -8,6 +8,9 @@ chronological order.
 
 2-Jul-2004
 	- Jorrit fixed compile errors in sprcal3d and terrfunc.
+	- Eric Sunshine added a bunch of missing entries to
+	  plugins/filesys/vfs/vfs.cfg.template, which is the vfs.cfg that
+	  actually gets installed by "jam install".
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.
