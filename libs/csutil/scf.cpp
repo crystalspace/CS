@@ -29,12 +29,20 @@
 
 #ifndef CS_STATIC_LINKED
 
+class scfLibraryVector : public csObjVector
+{
+public:
+  /// Find a shared library by name
+  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+};
+
 // This is the registry for all shared libraries
-csObjVector *LibraryRegistry;
+static scfLibraryVector *LibraryRegistry = 0;
 
 /// A object of this class represents a shared library
 class scfSharedLibrary : public csBase
 {
+  friend scfLibraryVector;
   // Shared library name
   const char *LibraryName;
   // Handle of shared module (if RefCount > 0)
@@ -68,10 +76,6 @@ public:
 
   /// Find a scfClassInfo for given class ID
   scfClassInfo *Find (const char *iClassID);
-
-  /// Find a shared library by name
-  virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
-  { return (strcmp (((scfSharedLibrary *)Item)->LibraryName, (char *)Key) == 0); }
 };
 
 scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
@@ -109,6 +113,12 @@ scfClassInfo *scfSharedLibrary::Find (const char *iClassID)
       return cur;
   return NULL;
 }
+
+int scfLibraryVector::CompareKey (csSome Item, csConstSome Key, int) const
+{
+  return (strcmp (((scfSharedLibrary *)Item)->LibraryName, (char *)Key));
+}
+
 
 #endif // CS_STATIC_LINKED
 
@@ -298,7 +308,7 @@ void scfInitialize (csIniFile *iConfig)
     CHKB (ClassRegistry = new scfClassRegistry ());
 #ifndef CS_STATIC_LINKED
   if (!LibraryRegistry)
-    CHKB (LibraryRegistry = new csObjVector (16, 16));
+    CHKB (LibraryRegistry = new scfLibraryVector());
   if (iConfig)
     iConfig->EnumData ("SCF.Registry", ConfigIterator, NULL);
 #else
