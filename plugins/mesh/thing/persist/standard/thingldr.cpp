@@ -1253,6 +1253,7 @@ bool csThingSaver::Initialize (iObjectRegistry* object_reg)
 {
   csThingSaver::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 //TBD
@@ -1262,21 +1263,88 @@ bool csThingSaver::WriteDown (iBase* obj, iDocumentNode* parent)
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for thing mesh");
-  paramsNode=0;
-  
-  return true;
+  if (obj)
+  {
+    csRef<iThingState> thing = SCF_QUERY_INTERFACE (obj, iThingState);
+    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+    if (!thing) return false;
+    if (!mesh) return false;
 
-/*
-  csString str;
-  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  char buf[MAXLINE];
-  char name[MAXLINE];
-  csFindReplace (name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf (buf, "FACTORY ('%s')\n", name);
-  str.Append (buf);
-  file->Write ((const char*)str, str.Length ());
-*/
+    csRef<iMeshFactoryWrapper> factwrap;
+    iBase* factparent = mesh->GetFactory()->GetLogicalParent();
+    if (factparent)
+    {
+      csRef<iMeshFactoryWrapper> factwrap = 
+        SCF_QUERY_INTERFACE(factparent, iMeshFactoryWrapper);
+    }
+    if (factwrap)
+    {
+      const char* factname = factwrap->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }
+    else
+    {
+      //Write the factory stuff inside the params of the meshobject
+      iThingFactoryState* thingfact = thing->GetFactory();
+      for (int vertidx = 0; vertidx < thingfact->GetVertexCount(); vertidx++)
+      {
+        csRef<iDocumentNode> vertNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        vertNode->SetValue("v");
+        csVector3 vertex = thingfact->GetVertex(vertidx);
+        synldr->WriteVector(vertNode, &vertex);
+      }  
+      iMaterialWrapper* material = 0;
+      for (int polyidx = 0; polyidx < thingfact->GetPolygonCount(); polyidx++)
+      {
+        if (material != thingfact->GetPolygonMaterial(polyidx))
+        {
+          material = thingfact->GetPolygonMaterial(polyidx);
+          csRef<iDocumentNode> materialNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+          materialNode->SetValue("material");
+          const char* materialname = material->QueryObject()->GetName();
+          if (materialname && *materialname)
+          {
+            materialNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(materialname);
+          }
+        }
+        csRef<iDocumentNode> polyNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        polyNode->SetValue("p");
+        const char* polyname = thingfact->GetPolygonName(polyidx);
+        if (polyname && *polyname)
+        {
+          polyNode->SetAttribute("name", polyname);
+        }
+        for (int pvertidx = 0; pvertidx < thingfact->GetPolygonVertexCount(polyidx); pvertidx++)
+        {
+          csRef<iDocumentNode> vertNode = polyNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+          vertNode->SetValue("v");
+          int vertex = thingfact->GetPolygonVertexIndices(polyidx)[pvertidx];
+          vertNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(vertex);
+        }
+        if (thingfact->IsPolygonTextureMappingEnabled(polyidx))
+        {
+          csRef<iDocumentNode> texmapNode = polyNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+          texmapNode->SetValue("texmap");
+          csMatrix3 m; csVector3 v;
+          thingfact->GetPolygonTextureMapping(polyidx, m, v);
+          csRef<iDocumentNode> matrixNode = texmapNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+          matrixNode->SetValue("matrix");
+          synldr->WriteMatrix(matrixNode, &m);
+          csRef<iDocumentNode> vectorNode = texmapNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+          vectorNode->SetValue("v");
+          synldr->WriteVector(vectorNode, &v);
+        }        
+      }
+      //Writedown Smooth tag
+      synldr->WriteBool(paramsNode, "smooth", thingfact->GetSmoothingFlag(), false);
+    }
+  }
+  return true;
 }
 

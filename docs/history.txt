@@ -21,6 +21,7 @@ chronological order.
 	      now installed verbatim in $(datadir)/crystalspace/java to serve
 	      as an example, rather than being compiled into crystalspace.jar.
 	    - Removed legacy csjava/Makefile.
+	- PK started with the implementation of the thingmesh saver
 25-Jul-2004
         - Philip Wyett changed the order of variable initialisation culling a
           compiler warning in chunklod.cpp.
@@ -29,9 +30,9 @@ chronological order.
 	  apps to load mount files at run time (new API func: 
 	  LoadMountsFromFile)
 	- PK made the following changes:
-	  - Extended the iSyntaxService for iSaver.
-	  - Implemented the iSaverPlugin for ballmesh.
-	  - Fixed the texture saving in iSaver for images.
+	    - Extended the iSyntaxService for iSaver.
+	    - Implemented the iSaverPlugin for ballmesh.
+	    - Fixed the texture saving in iSaver for images.
 23-Jul-2004
 	- Jorrit fixed csbench so it first removes the csbench_report.zip.
 	  Not doing that causes corrupted zip files due to bugs in VFS.

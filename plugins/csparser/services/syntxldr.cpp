@@ -194,39 +194,39 @@ bool csTextSyntaxService::WriteMatrix (iDocumentNode* node, csMatrix3* m)
 {
   csRef<iDocumentNode> m11Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m11Node->SetValue("m11");
-  m11Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m11);
+  m11Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m11);
 
   csRef<iDocumentNode> m12Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m12Node->SetValue("m12");
-  m12Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m12);
+  m12Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m12);
 
   csRef<iDocumentNode> m13Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m13Node->SetValue("m13");
-  m13Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m13);
+  m13Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m13);
 
   csRef<iDocumentNode> m21Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m21Node->SetValue("m21");
-  m21Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m21);
+  m21Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m21);
 
   csRef<iDocumentNode> m22Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m22Node->SetValue("m22");
-  m22Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m22);
+  m22Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m22);
 
   csRef<iDocumentNode> m23Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m23Node->SetValue("m23");
-  m23Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m23);
+  m23Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m23);
 
   csRef<iDocumentNode> m31Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m31Node->SetValue("m31");
-  m31Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m31);
+  m31Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m31);
 
   csRef<iDocumentNode> m32Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m32Node->SetValue("m32");
-  m32Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m32);
+  m32Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m32);
 
   csRef<iDocumentNode> m33Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m33Node->SetValue("m33");
-  m33Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m33);
+  m33Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m33);
 
   return true;
 }

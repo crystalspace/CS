@@ -42,6 +42,7 @@
 #include "imap/writer.h"
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
+#include "csutil/util.h"
 #include "csgfx/rgbpixel.h"
 
 #define ONE_OVER_256 (1.0/255.0)
@@ -401,31 +402,31 @@ bool csSaver::SaveSectorMeshes(iSector *s, iDocumentNode *parent)
     }
     if (factory)
     {
-      csString pluginname = factory->QueryClassID();
+      const char* pluginname = factory->QueryClassID();
       if (pluginname && *pluginname)
       {
         csRef<iDocumentNode> pluginNode = CreateNode(meshNode, "plugin");
 
         //Add the plugin tag
-        pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue((const char*)pluginname);
+        char loadername[128] = "";
+        csFindReplace(loadername, pluginname, ".object.", ".loader.", 128);
+
+        pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
         csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-        //Replace the object with saver in the ID
-        const char* origstring = ".object.";
-        const char* newstring = ".saver.";
-        for (int i=0; i<pluginname.Length()-8; i++)
-        {
-          if (pluginname.Slice(i,8).Compare(origstring))
-            pluginname=pluginname.Slice(0,i)+newstring + pluginname.Slice(i+8,pluginname.Length());
-        }
+        char savername[128] = "";
+        csFindReplace(savername, pluginname, ".object.", ".saver.", 128);
 
         //Invoke the iSaverPlugin::WriteDown
-        csRef<iSaverPlugin> saver = CS_QUERY_PLUGIN_CLASS(plugin_mgr, pluginname, iSaverPlugin);
-        if (!saver) saver = CS_LOAD_PLUGIN(plugin_mgr, pluginname, iSaverPlugin);
+        csRef<iSaverPlugin> saver = CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
+        if (!saver) saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
         if (saver) saver->WriteDown(meshwrapper->GetMeshObject(), meshNode);
       }
 
-    }      
+    }
+    if (CS_ZBUF_FILL == meshwrapper->GetZBufMode())
+      CreateNode(meshNode, "zfill");
+
     //TBD: write <priority>
     //TBD: write other tags
   }
