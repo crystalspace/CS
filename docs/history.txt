@@ -60,6 +60,9 @@ chronological order.
 	  works around crasher in csImage::Rescale() on AMD64. Very possibly,
 	  the problem was result of unintended sign-extension when assigning
 	  signed int csQint() result to unsigned long.
+	- Rhad fixed coordinate system conversions for the OpenAL software 
+	  renderer.  Resolves bug #981288.  Also minor changes in anticipation
+	  of some future fixes.
 5-Oct-2004
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data

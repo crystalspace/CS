@@ -99,7 +99,7 @@ csSoundSourceOpenAL::csSoundSourceOpenAL(csSoundRenderOpenAL *rdr,
 csSoundSourceOpenAL::~csSoundSourceOpenAL() 
 {
   // Stop the source if it's playing
-  Stop();
+  //Stop();
 
   if (SoundRender->al_open)
   {
@@ -167,7 +167,7 @@ void csSoundSourceOpenAL::SetPosition(csVector3 v)
 {
   if (!SoundRender->al_open)
     return;
-  position[0] = v.x; position[1] = v.y; position[2] = v.z;
+  position[0] = v.x; position[1] = v.y; position[2] = -v.z;
   SoundRender->mutex_OpenAL->LockWait();
   alSourcefv (source, AL_POSITION, position);
   SoundRender->mutex_OpenAL->Release();
@@ -177,7 +177,7 @@ void csSoundSourceOpenAL::SetVelocity(csVector3 v)
 {
   if (!SoundRender->al_open)
     return;
-  velocity[0] = v.x; velocity[1] = v.y; velocity[2] = v.z;
+  velocity[0] = v.x; velocity[1] = v.y; velocity[2] = -v.z;
   SoundRender->mutex_OpenAL->LockWait();
   alSourcefv (source, AL_VELOCITY, velocity);
   SoundRender->mutex_OpenAL->Release();
@@ -311,7 +311,7 @@ bool csSoundSourceOpenAL::IsPlaying()
 
 void csSoundSourceOpenAL::Play(unsigned long PlayMethod)
 {
-  if (!SoundRender->al_open)
+  if (!SoundRender->al_open || SourcePlaying)
     return;
 #ifdef OPENAL_DEBUG_CALLS
   Report (CS_REPORTER_SEVERITY_NOTIFY,  	
@@ -408,7 +408,8 @@ void csSoundSourceOpenAL::Stop()
   Report (CS_REPORTER_SEVERITY_NOTIFY,  	
     "csSoundSourceOpenAL::Stop()");
 #endif
-  // Stop both the OpenAL source and 
+  // Stop both the OpenAL source and remove the source from the renderer's active source list
+  SoundRender->RemoveSource(this);
   SoundRender->mutex_OpenAL->LockWait();
   alSourceStop (source);
   SoundRender->mutex_OpenAL->Release();

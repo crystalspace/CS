@@ -41,15 +41,15 @@ csSoundListenerOpenAL::~csSoundListenerOpenAL()
 
 void csSoundListenerOpenAL::SetPosition(const csVector3 &v) {
   csSoundListener::SetPosition (v);
-  position[0] = v.x; position[1] = v.y; position[2] = v.z;
+  position[0] = v.x; position[1] = v.y; position[2] = -v.z;
   SoundRender->mutex_OpenAL->LockWait();
   alListenerfv (AL_POSITION, position);
   SoundRender->mutex_OpenAL->Release();
 }
 
 void csSoundListenerOpenAL::SetDirection(const csVector3 &f, const csVector3 &t) {
-  orientation[0] = f.x; orientation[1] = f.y; orientation[2] = f.z; 
-  orientation[3] = t.x; orientation[4] = t.y; orientation[5] = t.z; 
+  orientation[0] = f.x; orientation[1] = f.y; orientation[2] = -f.z; 
+  orientation[3] = t.x; orientation[4] = t.y; orientation[5] = -t.z; 
   csSoundListener::SetDirection(f, t);
   SoundRender->mutex_OpenAL->LockWait();
   alListenerfv (AL_ORIENTATION, orientation);
@@ -62,7 +62,7 @@ void csSoundListenerOpenAL::SetHeadSize(float size) {
 
 void csSoundListenerOpenAL::SetVelocity(const csVector3 &v) {
   csSoundListener::SetVelocity(v);
-  velocity[0] = v.x; velocity[1] = v.y; velocity[2] = v.z; 
+  velocity[0] = v.x; velocity[1] = v.y; velocity[2] = -v.z; 
   SoundRender->mutex_OpenAL->LockWait();
   alListenerfv (AL_VELOCITY, velocity);
   SoundRender->mutex_OpenAL->Release();
