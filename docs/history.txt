@@ -1,6 +1,17 @@
 The history order has been reversed so that new features are at the top.
 
+24-Aug-2000
+	- Wouter Wijngaards did a few optimizations on the makefiles
+	  so that compilation should be somewhat faster.
+	- Andrew Zabolotny did the following:
+	    - Now for builds with enabled shared libraries all cross-platform
+	      plugins will be built by default. For static builds only
+	      the most needed plugins are built (and linked against every
+	      executable).
+	    - Documented the -fs/-nofs switch in help (fullscreen toggle).
+	    - Fixed the 32-bit unlighted texture drawing bug (long-standing).
 23-Aug-2000
+	- Martin Geisse fixed a bug in the console plugin.
 	- Gary Haussmann enabled GL-level backface culling. This makes
 	  the OpenGL renderer more consistent with the software renderer.
 	  When used together with the engine this should make little
@@ -17,6 +28,8 @@ The history order has been reversed so that new features are at the top.
 	  that wasn't properly stored with glPushAttrib. This causes
 	  crashes on the voodoo3 and very likely also the big crash
 	  that I have on the GeForce (to be checked).
+	  (NOTE: after checking this it doesn't appear to be enough.
+	  I'll have to experiment further).
 	- Norman fixed csclear.cfg for the right console.
 22-Aug-2000
 	- Got a small patch from Rene Dudfield with new console command
