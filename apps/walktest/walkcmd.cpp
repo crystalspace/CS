@@ -658,7 +658,9 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  return true;
 	}
 	else
-	  name = option;
+    {
+	  strcpy(name, option);
+    }
 	char buf[255];
 	sprintf (buf, "/this/%s.rps", name);
 	Sys->recorded_perf_stats->SetOutputFile (buf, summary);
