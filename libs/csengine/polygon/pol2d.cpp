@@ -123,8 +123,10 @@ void csPolygon2D::Draw (iGraphics2D* g2d, int col)
 
 #define INTERPOLATE(component) \
 { \
-  float v1 = tritexcoords[edge_from[0]].##component## + t1 * (tritexcoords[edge_to[0]].##component## - tritexcoords[edge_from[0]].##component##); \
-  float v2 = tritexcoords[edge_from[1]].##component## + t2 * (tritexcoords[edge_to[1]].##component## - tritexcoords[edge_from[1]].##component##); \
+  float v1 = tritexcoords[edge_from[0]].##component## + \
+    t1 * (tritexcoords[edge_to[0]].##component## - tritexcoords[edge_from[0]].##component##); \
+  float v2 = tritexcoords[edge_from[1]].##component## + \
+    t2 * (tritexcoords[edge_to[1]].##component## - tritexcoords[edge_from[1]].##component##); \
   g3dpoly->vertices[i].##component## = v1 + t * (v2 - v1); \
 }
 
