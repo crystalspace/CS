@@ -8,6 +8,7 @@ The history order is reversed so that new features are at the top.
 	  portal it is now marked as excluded from the visculling mesh.
 	  Without this fix portals would actually cull geometry even if that
 	  wasn't the idea.
+	- Jorrit added stdpt and ptanimimg targets to 'make walkall'.
 	- res updated partsys for the latest <texture> changes.
 	- Oktal did a little reorganisation of the csperl5 clean targets,
 	  adding swigperl5clean and making csperl5maintainerclean call
