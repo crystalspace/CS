@@ -90,6 +90,15 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="nostencil">
+      <Video>
+	<OpenGL>
+	  <Caps>
+	    <Stencil>no</Stencil>
+	  </Caps>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -153,6 +162,7 @@
       </conditions>
       <applicable>
 	<usecfg>texturecompression</usecfg>
+	<usecfg>preferclipplane</usecfg>
       </applicable>
     </rule>
     <rule description="Software GL tweaks">

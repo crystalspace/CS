@@ -64,6 +64,10 @@ chronological order.
 	- Jorrit slightly improved performance in the engine by using
 	  csMeshWrapper instead of iMeshWrapper to control the socket
 	  positioning. That way a lot of virtual calls are avoided.
+	- res fixed the splatting_bump shader for the new <variablemap> syntax.
+	- res augmented the R300 driver db entry to prefer clip planes.
+	- res re-activated reporting of a missing 'destination' report in the
+	  shader program <variablemap> parser.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.

@@ -43,7 +43,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_afp.h"
 
 SCF_IMPLEMENT_IBASE_EXT(csShaderGLAFP)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 void csShaderGLAFP::Report (int severity, const char* msg, ...)

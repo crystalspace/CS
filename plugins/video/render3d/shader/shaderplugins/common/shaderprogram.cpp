@@ -67,11 +67,10 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
 	const char* destname = child->GetAttributeValue ("destination");
 	if (!destname)
 	{
-	  //synsrv->Report ("crystalspace.graphics3d.shader.common",
-	    //CS_REPORTER_SEVERITY_WARNING, child,
-	    //"<variablemap> has no 'destination' attribute");
-	  break;
-	  //return false;
+	  synsrv->Report ("crystalspace.graphics3d.shader.common",
+	    CS_REPORTER_SEVERITY_WARNING, child,
+	    "<variablemap> has no 'destination' attribute");
+	  return false;
 	}
 
 	variablemap.Push (VariableMapEntry (strings->Request (varname),
