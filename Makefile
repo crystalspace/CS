@@ -4,8 +4,9 @@
 #
 ################################################################################
 
-.PHONY: help all doc api depend configure clean cleanlib cleandep distclean \
-  libs drivers drivers2d drivers3d snddrivers netdrivers
+.PHONY: help banner showplatforms showconfig platforms all doc api depend \
+  configure clean cleanlib cleandep distclean libs drivers drivers2d \
+  drivers3d snddrivers netdrivers
 
 # The following two symbols are intended to be used in "echo" commands
 # config.mak can override them depending on configured system requirements
@@ -27,7 +28,7 @@ APPHELP = \
 LIBHELP = \
   echo $"The following Crystal Space libraries can be built:$"
 SYSHELP = \
-  echo $"Before anything else, you should configure the makefile system:$"
+  echo $"The makefile system can be configured for the following platforms:$"
 SYSMODIFIERSHELP = \
             echo $"  -*- Modifiers -*-$" \
   $(NEWLINE)echo $"  USE_DLL=yes$|no$" \
@@ -42,35 +43,47 @@ ifeq ($(TARGET),)
 MAKESECTION=confighelp
 -include $(wildcard mk/system/*.mak)
 
+help: banner showplatforms
+
 else
 
 MAKESECTION=rootdefines
 include mk/subs.mak
 
-endif
+help: banner showconfig drvhelp libhelp apphelp pseudohelp
 
-help:
+depend:
+	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
+
+doc api clean cleanlib cleandep distclean:
+	@$(MAKE) --no-print-directory -f mk/cs.mak $@
+
+unknown:
+	$(RM) config.mak
+	$(RM) include/volatile.h
+
+platforms:
 	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
-	@echo $"  Before compiling Crystal Space examine mk/user.mak and see if settings$"
-	@echo $"  are suited for your system. Note that you need at least one renderer and$"
-	@echo $"  at least one 2D driver in order to be able to run the engine.$"
-	@echo $"----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
-ifeq ($(TARGET),)
-	@$(SYSHELP)
-	@$(SYSMODIFIERSHELP)
-	@echo $"  Example: make linux USE_DLL=yes MODE=debug$"
-else
+	@$(MAKE) --no-print-directory TARGET= showplatforms
+
+showconfig:
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
 	@echo $"  USE_DLL=$(USE_DLL) MODE=$(MODE) $(SYSMODIFIERS)$"
-endif
 	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
-ifneq ($(TARGET),)
+
+drvhelp:
 	@$(DRVHELP)
 	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+
+libhelp:
 	@$(LIBHELP)
 	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+
+apphelp:
 	@$(APPHELP)
 	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+
+pseudohelp:
 	@echo $"  make apps         Make all applications$"
 	@echo $"  make libs         Make all static libraries$"
 	@echo $"  make drivers      Make all drivers$"
@@ -85,19 +98,23 @@ ifneq ($(TARGET),)
 	@echo $"  make cleanlib     Clean all dynamic libraries$"
 	@echo $"  make cleandep     Clean all dependency rule files$"
 	@echo $"  make distclean    Clean everything$"
+	@echo $"  make platforms    List the available target platforms$"
 	@echo $"----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
 
-depend:
-	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
-
-doc api clean cleanlib cleandep distclean:
-	@$(MAKE) --no-print-directory -f mk/cs.mak $@
-
-unknown:
-	$(RM) config.mak
-	$(RM) include/volatile.h
-
 endif
+
+banner:
+	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $"  Before compiling Crystal Space examine mk/user.mak and see if settings$"
+	@echo $"  are suited for your system. Note that you need at least one renderer and$"
+	@echo $"  at least one 2D driver in order to be able to run the engine.$"
+	@echo $"----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
+
+showplatforms:
+	@$(SYSHELP)
+	@$(SYSMODIFIERSHELP)
+	@echo $"  Example: make linux USE_DLL=yes MODE=debug$"
+	@echo $"----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
 
 # Prepare for specific system
 # WARNING: Try to avoid quotes in most important "echo" statements
