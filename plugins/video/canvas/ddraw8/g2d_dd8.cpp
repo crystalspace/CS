@@ -87,11 +87,10 @@ void csGraphics2DDDraw8::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.canvas.ddraw8", msg, arg);
-    rep->DecRef ();
   }
   else
   {
@@ -453,10 +452,10 @@ void csGraphics2DDDraw8::SetRGB (int i, int r, int g, int b)
 
 bool csGraphics2DDDraw8::SetMouseCursor (csMouseCursorID iShape)
 {
-  iWin32Assistant* winhelper = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
+  csRef<iWin32Assistant> winhelper =
+      CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
   CS_ASSERT (winhelper != NULL);
   bool rc = winhelper->SetCursor (iShape);
-  winhelper->DecRef ();
   return rc;
 }
 

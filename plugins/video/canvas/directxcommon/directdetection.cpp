@@ -21,7 +21,7 @@
 
 #include "cssysdef.h"
 #include <stdlib.h>
-#include <windowsx.h>
+#include <windows.h>
 
 #include <ddraw.h>
 

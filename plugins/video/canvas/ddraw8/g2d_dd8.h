@@ -19,6 +19,7 @@
 #ifndef __CS_G2D_DD8_H__
 #define __CS_G2D_DD8_H__
 
+#include <windows.h>
 #include <ddraw.h>
 
 #include "csutil/scf.h"

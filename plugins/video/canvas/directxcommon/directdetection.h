@@ -25,7 +25,7 @@
   #define DIRECTINPUT_VERSION 0x0300
 #endif
 
-#include <windowsx.h>
+#include <windows.h>
 #include <ddraw.h>
 #include <d3d.h>
 #include <d3dcaps.h>
