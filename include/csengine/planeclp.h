@@ -34,10 +34,6 @@
 class csPlaneClip : public csPlane
 {
 public:
-
-  /// Initialize to the xy plane.
-  csPlaneClip (){ init( 100 );}
-
   /// Initialize the plane.
   csPlaneClip (const csVector3& plane_norm, float d=0) : csPlane( plane_norm, d ){ init(100); }
 
@@ -101,8 +97,8 @@ public:
   }
 
  protected:
-  DECLARE_GROWING_ARRAY( , verts, csVector3 );
-  DECLARE_GROWING_ARRAY( , vis, bool );
+  DECLARE_GROWING_ARRAY(; , verts, csVector3 );
+  DECLARE_GROWING_ARRAY(; , vis, bool );
   void init( int len){ verts.SetLimit( len ); vis.SetLimit( len ); }
 
 };
