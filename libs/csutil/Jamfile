@@ -29,7 +29,7 @@ case MACOS_X :					# MacOS/X
 		[ ConcatDirs generic pluginpaths.cpp ]
 		[ ConcatDirs generic printf.cpp ]
 		[ ConcatDirs generic scanplugins.cpp ]
-		[ ConcatDirs generic sysroot.cpp ] ;
+		[ ConcatDirs generic sysroot.cpp ] 
 		[ ConcatDirs generic vfsplat.cpp ] ;
 case * :					# Posix, Unix, Linux, etc.
   CSSYS_SRC += [ Filter [ Wildcard unix : *.cpp *.cc *.c *.h ] :
@@ -49,7 +49,7 @@ case * :					# Posix, Unix, Linux, etc.
 		[ ConcatDirs generic printf.cpp ]
 		[ ConcatDirs generic resdir.cpp ]
 		[ ConcatDirs generic runloop.cpp ] 
-		[ ConcatDirs generic sysroot.cpp ] ;
+		[ ConcatDirs generic sysroot.cpp ] 
 		[ ConcatDirs generic vfsplat.cpp ] ;
   if $(EMBED_META) = "yes" && $(LIBBFD.AVAILABLE) = "yes"
   {
