@@ -60,28 +60,27 @@ libraries; however if you didn't download libjpeg or libpng simply skip
 corresponding instructions.
 
     Find and download (preferably latest) versions of Z-lib, PNGlib and
-libJPEG; unpack them in the cryst/ subdirectory; usually they unpacks in a dir
+libJPEG; unpack them in the CS/ subdirectory; usually they unpacks in a dir
 called somewhat like libjpeg-x.xx or zlib-x.xx where x.xx is current version
 number.  You should rename them into "zlib", "libjpeg" and "pnglib" so that
 CrystalSpace will find them.  You should have a tree like:
 
-  cryst/
-  cryst/docs    - CrystalSpace documentation
-  cryst/src     - CrystalSpace source code
-  cryst/zlib    - Z-lib library
-  cryst/pnglib  - PNG library
-  cryst/libjpeg - JPEG library
+  CS/             - CrystalSpace project root & source code
+  CS/docs         - CrystalSpace documentation
+  CS/libs/zlib    - Z-lib library
+  CS/libs/pnglib  - PNG library
+  CS/libs/libjpeg - JPEG library
   ...
 
     Latest Z-lib and PNGlib already includes makefiles for compiling them
 under OS/2 with EMX/GCC; even if you got a library that do not, you can find
-all required makefiles in cryst/src/system/os2.  There is a README file in
+all required makefiles in CS/libs/cssys/os2.  There is a README file in
 each directory which will tell you what you should do; in short, for Z-lib:
 
-  cd cryst
-  xcopy /s src\system\os2\zlib zlib
-  xcopy /s src\system\os2\libpng libpng
-  xcopy /s src\system\os2\libjpeg libjpeg
+  cd CS
+  xcopy /s libs\cssys\os2\zlib zlib
+  xcopy /s libs\cssys\os2\libpng libpng
+  xcopy /s libs\cssys\os2\libjpeg libjpeg
 
     Now you should build each library:
 

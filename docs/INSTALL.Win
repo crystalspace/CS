@@ -42,7 +42,7 @@ To compile Crystal Space, you'll have to perform the following steps:
    This will set up CrystalSpace to run in software mode using the worldfile
    "large.zip". Make sure that you have downloaded a worldfile from the 
    Crystal Space Website before this. These files are in ZIP format and should
-   be downloaded to the $/cryst/data directory. Do not attempt to extract this 
+   be downloaded to the $/CS/data directory. Do not attempt to extract this 
    archive - Crystal Space decompresses the ZIP file at run time.
 
 9. Open "Project", "Settings", select walktest on the left list. Select the 
@@ -186,21 +186,21 @@ download an up to date version from my homepage:
 http://members.xoom.com/thieber/libdlls13.zip
 If everything works alright the files should be in the following places:
 
-cryst\libjpeg.dll
-cryst\png.dll
-cryst\zlib.dll
-cryst\include\cssys\win32\jconfig.h
-cryst\include\cssys\win32\jerror.h
-cryst\include\cssys\win32\jinclude.h
-cryst\include\cssys\win32\jmorecfg.h
-cryst\include\cssys\win32\jpeglib.h
-cryst\include\cssys\win32\png.h
-cryst\include\cssys\win32\pngconf.h
-cryst\include\cssys\win32\zconf.h
-cryst\include\cssys\win32\zlib.h
-cryst\libs\cssys\win32\zlib.lib
-cryst\libs\cssys\win32\png.lib
-cryst\libs\cssys\win32\libjpeg.lib
+CS\libs\libjpeg.dll
+CS\libs\png.dll
+CS\libs\zlib.dll
+CS\include\cssys\win32\jconfig.h
+CS\include\cssys\win32\jerror.h
+CS\include\cssys\win32\jinclude.h
+CS\include\cssys\win32\jmorecfg.h
+CS\include\cssys\win32\jpeglib.h
+CS\include\cssys\win32\png.h
+CS\include\cssys\win32\pngconf.h
+CS\include\cssys\win32\zconf.h
+CS\include\cssys\win32\zlib.h
+CS\libs\cssys\win32\zlib.lib
+CS\libs\cssys\win32\png.lib
+CS\libs\cssys\win32\libjpeg.lib
 
 This is in fact the most common reason for not being able to compile CS,
 so make sure, that you installed the files to the right places.

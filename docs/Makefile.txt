@@ -139,7 +139,7 @@ either into root makefile or into submakefile.
 submakefiles contained one level deep into libs/ directory (i.e. libs/*/*.mak).
 For example, it could look like this:
 
-	[1|home|~/cs/cryst]ls libs/*/*.mak
+	[1|home|~/CS]ls libs/*/*.mak
 	libs/cs2d/cs2d.mak          libs/csinput/csinput.mak
 	libs/cs3d/cs3d.mak          libs/csparser/csparser.mak
 	libs/cscom/cscom.mak        libs/cssndldr/cssndldr.mak
@@ -150,7 +150,7 @@ For example, it could look like this:
 	The submakefiles for applications are searched latest, using the
 search mask apps/*/*.mak, this way:
 
-	[1|home|~/cs/cryst]ls apps/*/*.mak
+	[1|home|~/CS]ls apps/*/*.mak
 	apps/blocks/blocks.mak      apps/primedit/primedit.mak
 	apps/csregsvr/csregsvr.mak  apps/simple/simple.mak
 	apps/cswstest/cswstest.mak  apps/walktest/walktest.mak

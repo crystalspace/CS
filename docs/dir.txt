@@ -359,7 +359,7 @@ lower levels.  So for example, csengine may include headers from cscom, but
 not from csws or csparser.
 
 All communication between level 3 libraries happens through COM interfaces.
-Those are defined in the 'cryst/include' directory.  That's the ONLY way to
+Those are defined in the 'CS/include' directory.  That's the ONLY way to
 communicate on level 3.  'csengine' can use level3 libraries only through COM.
 
 csinput has a special role.  Though sitting logically at level 4, it can and

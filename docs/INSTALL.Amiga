@@ -23,7 +23,7 @@ Current Minimum Requirements:
    Several Hours and A Lot of Patience  (:
 
 
-This is a little doc for compiling Crystalspace on the Amiga:
+This is a little doc for compiling CrystalSpace on the Amiga:
 I will transform this piece of text into a Guide file when I have
 more time on my hands.
 
@@ -39,20 +39,20 @@ more time on my hands.
   Assign gg: <Your path where you have installed the GNU compiler>
 
   If you want to change the assign from gg: to something else
-  remember to also change it in cryst/src/mk/system/amiga.mak
+  remember to also change it in CS/mk/system/amiga.mak
   ( -Igg:os-include/amiga )
 
 - Unpack the Crystal Space archive in a directory of your choice.
-  A directory cryst will be created for you.
+  A directory 'CS' will be created for you.
 
 - Unpack the zlib_1.1.1.tgz archive. Unpack this archive in the
-  cryst directory. If you want support for PNG or JPEG you can also
+  'CS' directory. If you want support for PNG or JPEG you can also
   unpack the libpng.tgz and the libjpeg.tgz into the same directory
-  as zlib_1.1.1.tgz (in directory cryst). These two aren't needed to
+  as zlib_1.1.1.tgz (in directory CS). These two aren't needed to
   a working Crystal Space version.
 
 - You need to make the zlib. This is done by compiling the z.lib
-  library. Go to the zlib directory (cryst/zlib) and type
+  library. Go to the zlib directory (CS/libs/zlib) and type
   "sh ./configure".  When that is done, type "make".
 
   If all goes well you will get a libz.a file. To be sure that
@@ -64,8 +64,8 @@ more time on my hands.
   available at this time.
 
 - If you also chose to use the libpng package, you need to copy the
-  file "makefile.aos" from the cryst/src/system/amiga/png/
-  directory to the cryst/libpng/ directory if you got the general
+  file "makefile.aos" from the CS/libs/cssys/amiga/png/
+  directory to the CS/libs/libpng/ directory if you got the general
   version.  If you got the Amiga-specific version, that step is
   unnecessary.  Type "make -f makefile.aos" to compile PNG support.
 
@@ -82,31 +82,31 @@ more time on my hands.
   and from implicit typecasting to and from (void *).
 
 - Compiling without FPU:
-  Set DO_ASM to no in file cryst/src/mk/user.mak
+  Set DO_ASM to no in file CS/mk/user.mak
 
 - Compiling with FPU:
-  Set DO_ASM=yes in file cryst/src/mk/user.mak
-  Set FPUVER=-m68881 in file cryst/src/mk/system/amiga.mak
+  Set DO_ASM=yes in file CS/mk/user.mak
+  Set FPUVER=-m68881 in file CS/mk/system/amiga.mak
 
 - Optimizing for 020, 040, or 060:
-  See the CPUVER flag comments in cryst/src/mk/system/amiga.mak
+  See the CPUVER flag comments in CS/mk/system/amiga.mak
 
 - If you don't have png or jpeg installed set DO_PNG=no and DO_JPG=no
-  in file cryst/src/mk/user.mak. The GIF switch is require, because
+  in file CS/mk/user.mak. The GIF switch is require, because
   without it your program will do nothing.
 
-- Change DO_SOUND and DO_MMX to no in cryst/src/mk/user.mak
+- Change DO_SOUND and DO_MMX to no in CS/mk/user.mak
   (Sound isn't currently supported.)
 
 - Before you can compile CS you will need to add an include directory
   where the GNU make can find the Amiga specific includes like exec/type.h
   etc. This is essental, or Amiga.cpp and various other files will not be
   compiled.  The default is "GG:os-include/amiga/", but you can change
-  this in the cryst/src/mk/system/amiga.mak file by changing the path on
+  this in the CS/mk/system/amiga.mak file by changing the path on
   the "INCLUDE_DIRS=" line.
 
 - When you're ready to start making the CrystalSpace project, type
-  'make amiga' from the cryst/src directory.  When that completes,
+  'make amiga' from the 'CS' directory.  When that completes,
   you'll need to type 'make depend'.  After that, type 'make' by itself
   to see a list of the options available.  You'll need to make all of
   the network drivers, as CS currently requires them all (this will

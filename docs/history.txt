@@ -22,8 +22,8 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed problem in Squawk.  It was not properly clearing
 	  the console text in double-buffered environments.
 	- Eric Sunshine started cleaning up the BeOS port of Crystal Space.
-	    - It now builds straight out of the box.  It is no longer
-	      necessary to relocate or edit makefiles.
+	    - It now builds straight out of the box.  There is no longer any
+	      need to relocate or edit makefiles.
 	    - It now builds cleanly.  All compilation warnings and errors
 	      have been eradicated.
 	    - Disabled the excessive debugging output.
@@ -33,6 +33,9 @@ Short-term cleanups that need to be done:
 	    - The version string now says "BeOS-Intel-GCC" rather than
 	      "Unix-Intel-GCC".
 	    - The user no longer needs to manually configure for buggy EGCS.
+	- Following the decision to use 'CS' universally as Crystal Space's
+	  root directory (rather than 'cryst'), Eric Sunshine updated the
+	  remaining documentation to correctly reflect this choice.
 7-Aug-1999
 	- Continued work on better bsp support. Added the
 	  csPolygonBspContainer class. Also moved new bsp stuff to
