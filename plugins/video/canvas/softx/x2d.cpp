@@ -364,7 +364,7 @@ bool csGraphics2DXLib::Open(char *Title)
     else
 #   endif /* DO_SHM */
     {
-      CHK(xim->data = new unsigned char[xim->bytes_per_line*xim->height]);
+      CHK(xim->data = new char[xim->bytes_per_line*xim->height]);
       real_Memory = (unsigned char*)(xim->data);
     }
 
