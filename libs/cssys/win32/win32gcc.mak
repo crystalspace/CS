@@ -121,8 +121,8 @@ ifeq ($(MAKESECTION),postdefines)
 
 # How to make shared libs for cs-config
 # <cs-config>
-LINK.PLUGIN = dllwrap --driver-name=$(LINK)
-PLUGIN.POSTFLAGS = -mwindows -mconsole
+LINK.PLUGIN = dllwrap
+PLUGIN.POSTFLAGS = -mwindows -mconsole -lstdc++
 COMMAND_DELIM = ;
 # </cs-config>
 
@@ -156,7 +156,7 @@ DO.SHARED.PLUGIN.PREAMBLE += \
 DO.SHARED.PLUGIN.CORE = \
   $(LINK.PLUGIN) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) \
-    -mwindows
+    -mwindows -lstdc++
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
