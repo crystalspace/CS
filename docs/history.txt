@@ -1,8 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+13-Apr-2001
+	- Fixed Philip's fix on the terrain engine. Now it works AND
+	  compiles on VC.
+	- Luca Pancallo extended ASE importer in impexp. Luca also added
+	  a CS sprite exporter.
 12-Apr-2001
 	- Philip Wyett fixed a couple of function declaration redefinition
 	  compile errors under VC6.
+	- Philip fixed a problem in VC with the terrain engine.
 	- Added support for 'KEY' nodes in terrain objects.
 	- Extended iTerrainObject with GetDirLightPosition(),
 	  GetDirLightColor(), and IsDirLightEnabled().

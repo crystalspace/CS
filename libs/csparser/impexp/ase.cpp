@@ -45,6 +45,7 @@ int converter::ase_read ( FILE *filein ) {
   Modified:
 
     19 November 1998
+	15 April 2001 - Added texture mapping (Luca Pancallo)
 
   Author:
 
@@ -56,6 +57,7 @@ int converter::ase_read ( FILE *filein ) {
   int   i;
   int   iface = 0;
   int   ivert = 0;
+  int   itvert = 0;
   int   iword;
   int   j;
   int   khi;
@@ -75,7 +77,9 @@ int converter::ase_read ( FILE *filein ) {
   float x;
   float y;
   float z;
-
+  float u;
+  float v;
+  float w;
 
   level = 0;
   strcpy ( levnam[0], "Top" );
@@ -390,6 +394,49 @@ int converter::ase_read ( FILE *filein ) {
         }
       }
 /*
+  *MESH_TVERTLIST
+*/
+      else if ( strcmp ( levnam[level], "*MESH_TVERTLIST" ) == 0 ) {
+
+        if ( strcmp ( word, "{" ) == 0 ) {
+          continue;
+        }
+        else if ( strcmp ( word, "}" ) == 0 ) {
+          level = nlbrack - nrbrack;
+          continue;
+        }
+        else if ( strcmp ( word, "*MESH_TVERT" ) == 0 ) {
+
+          count = sscanf ( next, "%d%n", &itvert, &width );
+          next = next + width;
+
+          count = sscanf ( next, "%f%n", &u, &width );
+          next = next + width;
+
+          count = sscanf ( next, "%f%n", &v, &width );
+          next = next + width;
+
+		  // this value is always 0.0 - ignored
+          count = sscanf ( next, "%f%n", &w, &width );
+          next = next + width;
+
+          itvert = itvert + nbase;
+          ivert = 0;
+
+          vertex_uv[0][0][itvert] = u;
+          vertex_uv[1][0][itvert] = v;
+          //vertex_uv[2][0][itvert] = w; - ignored
+
+          break;
+
+        }
+        else {
+          num_bad = num_bad + 1;
+          fprintf ( logfile,  "Bad data in MESH_TVERTLIST, line %d\n", num_text );
+          break;
+        }
+      }
+/*
   *MESH_NORMALS
 */
       else if ( strcmp ( levnam[level], "*MESH_NORMALS" ) == 0 ) {
@@ -452,6 +499,7 @@ int converter::ase_read ( FILE *filein ) {
           break;
         }
       }
+
 /*
   *MESH_TFACELIST
 */
@@ -759,6 +807,7 @@ int converter::ase_write ( FILE *fileout ) {
   Modified:
 
     30 September 1998
+	15 April 2001 - Added texture mapping (Luca Pancallo)
 
   Author:
 
@@ -771,6 +820,7 @@ int converter::ase_write ( FILE *fileout ) {
   int i4;
   int iface;
   int ivert;
+  int itvert;
   int j;
   int num_text;
 
@@ -910,6 +960,21 @@ int converter::ase_write ( FILE *fileout ) {
 
   fprintf ( fileout, "    }\n" );
   num_text = num_text + 1;
+
+/*
+  Sub block MESH_TVERTLIST
+    Items MESH_TVERT (repeated)
+*/
+  fprintf ( fileout, "    *MESH_TVERTLIST {\n" );
+  num_text = num_text + 1;
+
+  for ( itvert = 0; itvert < num_cor3; itvert++ ) {
+
+    fprintf ( fileout, "      *MESH_TVERT %d %f %f 0.0\n", 
+      itvert, vertex_uv[0][0][itvert], vertex_uv[1][0][itvert]);
+    num_text = num_text + 1;
+  }
+
 /*
   Close the MESH object.
 */
