@@ -8,10 +8,12 @@ if $(PTHREAD.AVAILABLE) = "yes"
   CFLAGS += $(PTHREAD.CFLAGS) ;
 }
 
-# jam2.4 seems to fail scanning archive contents on macosx. So disable it here
+# jam2.4 has wrong rules for handling archives. This should work better
 if $(JAMVERSION) = 2.4
 {
-  NOARSCAN = true ;
+  AR = ar ru
+  NOARUPDATE = ;  
+  NOARSCAN = ;
 }
 
 APPLICATION.LFLAGS += -framework AppKit -framework Foundation ;
