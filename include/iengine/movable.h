@@ -65,7 +65,7 @@ struct iMovable : public iBase
 
   /**
    * Initialize the list of sectors to one sector where
-   * this thing is. This is a conveniance funcion.
+   * this thing is. This is a convenience funcion.
    * This function does not update the corresponding list in
    * the sector. It only does a local update here.
    * This function does not do anything if the parent is not NULL.
