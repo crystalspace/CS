@@ -30,7 +30,7 @@ extern "C"
 #    define HAVE_BOOLEAN
 #  endif
 #  include <jpeglib.h>
-#  include "csgfxldr/jmemsrc.c"	// include buffer source input code
+#  include "jmemsrc.c"	// include buffer source input code
 }
 
 //---------------------------------------------------------------------------
