@@ -789,17 +789,17 @@ TYPEMAP_OUT_csWrapPtr
 %rename(AddString) iEvent::Add(const char *, char *);
 %rename(AddBool) iEvent::Add(const char *, bool, bool);
 %rename(AddVoidPtr) iEvent::Add(const char *, void *, uint32);
-%rename(FindInt8) iEvent::Find(const char *, int8 &, int);
-%rename(FindInt16) iEvent::Find(const char *, int16 &, int);
-%rename(FindInt32) iEvent::Find(const char *, int32 &, bool, int);
-%rename(FindUInt8) iEvent::Find(const char *, uint8 &, int);
-%rename(FindUInt16) iEvent::Find(const char *, uint16 &, int);
-%rename(FindUInt32) iEvent::Find(const char *, uint32 &, int);
-%rename(FindFloat) iEvent::Find(const char *, float &, int);
-%rename(FindDouble) iEvent::Find(const char *, double &, int);
-%rename(FindString) iEvent::Find(const char *, char **, int);
-%rename(FindBool) iEvent::Find(const char *, bool &, int);
-%rename(FindVoidPtr) iEvent::Find(const char *, void **, uint32 &, int);
+%rename(FindInt8) iEvent::Find(const char *, int8 &, int) const;
+%rename(FindInt16) iEvent::Find(const char *, int16 &, int) const;
+%rename(FindInt32) iEvent::Find(const char *, int32 &, bool, int) const;
+%rename(FindUInt8) iEvent::Find(const char *, uint8 &, int) const;
+%rename(FindUInt16) iEvent::Find(const char *, uint16 &, int) const;
+%rename(FindUInt32) iEvent::Find(const char *, uint32 &, int) const;
+%rename(FindFloat) iEvent::Find(const char *, float &, int) const;
+%rename(FindDouble) iEvent::Find(const char *, double &, int) const;
+%rename(FindString) iEvent::Find(const char *, char **, int) const;
+%rename(FindBool) iEvent::Find(const char *, bool &, int) const;
+%rename(FindVoidPtr) iEvent::Find(const char *, void **, uint32 &, int) const;
 #pragma SWIG nowarn=312; // nested union not supported
 
 %include "iutil/event.h"

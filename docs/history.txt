@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Dec-2003
+	- res fixed the iEvent::Find() renaming in cspace.i after his recent
+	  constness changes.
 4-Dec-2003
         - Steven Geens added a odedynam function for mesh<->plane collisions.
 3-Dec-2003
