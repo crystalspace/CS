@@ -24,7 +24,7 @@
 #include "csutil/scanstr.h"
 #include "cstool/gentrtex.h"
 #include "cstool/keyval.h"
-#include "cstool/crossbld.h"
+#include "cstool/crossb.h"
 #include "cstool/sndwrap.h"
 #include "cstool/mapnode.h"
 #include "csgfx/csimage.h"

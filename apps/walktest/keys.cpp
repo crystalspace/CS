@@ -27,7 +27,7 @@
 #include "imesh/thing/polygon.h"
 #include "csutil/scanstr.h"
 #include "csutil/dataobj.h"
-#include "cstool/crossbld.h"
+#include "cstool/crossb.h"
 #include "cstool/impexp.h"
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
