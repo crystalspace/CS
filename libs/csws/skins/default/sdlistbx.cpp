@@ -1,6 +1,6 @@
 /*
-    Crystal Space Windowing System: Default button skin
-    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space Windowing System: Default listbox skin
+    Copyright (C) 2001 Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -104,22 +104,28 @@ void csDefaultListBoxSkin::Draw (csComponent &This)
   switch (This.GetFrameStyle())
   {
     case cslfsNone:
+    This.Box (BorderWidth, BorderHeight, This.bound.Width () - BorderWidth,
+           This.bound.Height () - BorderHeight,  CSPAL_LISTBOX_BACKGROUND);
       break;
     case cslfsThinRect:
       This.Rect3D (0, 0, This.bound.Width (), This.bound.Height (),
           CSPAL_LISTBOX_LIGHT3D, CSPAL_LISTBOX_DARK3D);
       This.Rect3D (1, 1, This.bound.Width () - 1, This.bound.Height () - 1,
           CSPAL_LISTBOX_DARK3D, CSPAL_LISTBOX_LIGHT3D);
+      This.Box (BorderWidth, BorderHeight, This.bound.Width () - BorderWidth,
+           This.bound.Height () - BorderHeight,  CSPAL_LISTBOX_BACKGROUND);
       break;
     case cslfsThickRect:
       This.Rect3D (0, 0, This.bound.Width (), This.bound.Height (),
           CSPAL_LISTBOX_LIGHT3D, CSPAL_LISTBOX_DARK3D);
       This.Rect3D (1, 1, This.bound.Width () - 1, This.bound.Height () - 1,
           CSPAL_LISTBOX_2LIGHT3D, CSPAL_LISTBOX_2DARK3D);
+      This.Box (BorderWidth, BorderHeight, This.bound.Width () - BorderWidth,
+           This.bound.Height () - BorderHeight, CSPAL_LISTBOX_BACKGROUND2);
       break;
      case cslfsTextured:
-       This.Pixmap(This.GetFrameBitmap(), 1, 1, This.bound.Width ()-1, This.bound.Height ()-1, 0, 0, This.GetAlpha());
-        This.Rect3D (0, 0, This.bound.Width (), This.bound.Height (),CSPAL_LISTBOX_LIGHT3D, CSPAL_LISTBOX_DARK3D);					       
+       This.Pixmap(This.GetFrameBitmap(), 1, 1, This.bound.Width ()-BorderWidth, This.bound.Height ()-BorderHeight, 0, 0, This.GetAlpha());
+       This.Rect3D (0, 0, This.bound.Width (), This.bound.Height (),CSPAL_LISTBOX_LIGHT3D, CSPAL_LISTBOX_DARK3D);					       
      break;
      case cslfsBitmap:
        This.Pixmap(This.GetFrameBitmap(), 0, 0, This.GetAlpha()); 
@@ -127,11 +133,8 @@ void csDefaultListBoxSkin::Draw (csComponent &This)
     default:
       break;
   } /* endswitch */
-  This.Box (BorderWidth, BorderHeight, This.bound.Width () - BorderWidth,
-    This.bound.Height () - BorderHeight,
-    This.GetFrameStyle() == cslfsThickRect ?
-    CSPAL_LISTBOX_BACKGROUND2 : CSPAL_LISTBOX_BACKGROUND);
-
+  
+ 
   #undef This
 }
 
