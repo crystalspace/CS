@@ -155,7 +155,7 @@ public:
     /// Get vertex location in world space from the cache, return the cache index if we have it.
     inline unsigned int vertex(ddgTriIndex tindex, ddgVector3 *vout)
     {
-		ddgVector3 tmp = *vout = ddgVector3(mrow(tindex),height(tindex),mcol(tindex));
+	*vout = ddgVector3(mrow(tindex),height(tindex),mcol(tindex));
 
         if (vbufferIndex(tindex))
 			return 0;
