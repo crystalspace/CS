@@ -30,11 +30,12 @@
 #include "ivideo/natwin.h"
 #include "ivideo/cursor.h"
 #include <stdarg.h>
-#include <windows.h>
 
 #include "csutil/win32/wintools.h"
 #include "win32kbd.h"
 #include "cachedll.h"
+
+#include <windows.h>
 
 #include <stdio.h>
 #include <time.h>

@@ -26,6 +26,10 @@ chronological order.
 	  namespace, and which interfere with CS's own method and function
 	  names. This file is now included by the various csutil/win32 headers
 	  after all Win32 API have been included.
+	- Marten Svanfeldt fixed some compilation errors Erics last fix itroduced.
+	  If you use Win32 API functions which is listed in sanity.inc, make sure
+	  that the windows headers are included in your sourcefile after sanity.inc, 
+	  otherwise it will not work.
 18-Sep-2004
 	- Eric Sunshine changed the executable subsystem type in the MSVC
 	  project files for GUI applications from "windows" to "console". This

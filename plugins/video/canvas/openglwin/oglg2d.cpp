@@ -18,19 +18,23 @@
 
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
+
+
+#include "csutil/win32/wintools.h"
+#include "csutil/win32/win32.h"
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <GL/gl.h>
-
-#include "csutil/win32/wintools.h"
 
 #include "csutil/scf.h"
 #include "oglg2d.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "csutil/win32/win32.h"
+
 #include "iutil/cmdline.h"
 #include "iutil/eventq.h"
+
 
 #ifndef GL_VERSION_1_1
 #error OpenGL version 1.1 required! Stopping compilation.
