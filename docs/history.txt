@@ -1,8 +1,70 @@
 The history order has been reversed so that new features are at the top.
 
+9-Nov-2000
+	- Small type problem in ogl_halo.cpp (GLuint instead of GLenum
+	  for blend mode).
+8-Nov-2000
+	- Andrew Zabolotny did the following changes:
+	    - Fixed the SIGSEGV at program exit when OpenGL driver is used
+	      due to font cache callback being called after the font cache
+	      object was destroyed in iG2D::Close().
+	    - Fixed halo drawing in OpenGL. It seems like halos in OpenGL
+	      never worked because backface culling was enabled in hardware,
+	      and the halo polygon was defined anti-clockwise (in OpenGL
+	      coordinates).
+	    - Fixed a very old bug in software halo drawing. The color
+	      components sometimes were incorrectly clamped; this was
+	      noticeable when one of the components was > 1.0 and others
+	      were < 1.0 (e.g. 2,0,0). Alas, this slows down halo drawing
+	      a little.
+	    - Made halo brightening/fading speed independent of frame rate.
+	      Currently halo fades in steps of 0.05 every 20msecs, this
+	      means a complete transition from intensity 0 to intensity 1
+	      (or vice versa) occupies about 400 msec, e.g. 4/10 seconds.
+	    - Added limited support for 2*SRC halos (e.g. halos with R,G,B
+	      > 1.0) in OpenGL renderer. However I wasn't able to add 100%
+	      correct support for it; software renderer still does it
+	      better. However results looks approximatively similar,
+	      although software halos are brighter.  Maybe someone with
+	      better knowledge of OpenGL can fix it; I don't have OpenGL
+	      docs handy right now. The basic formula for computing a
+	      pixel with halos in theory (and in software renderer) is:
+		output_color = src_color * alpha + dst_color * (1 - alpha).
+    	      This results in normal glBlendFunc (GL_SRC_ALPHA,
+	      GL_ONE_MINUS_SRC_ALPHA).  However, for case when
+	      src_color > 1.0 OpenGL will clamp the color to 1.0 thus
+	      producing incorrect results. To circumvent this, if renderer
+	      detects that at least one component is greater than 1.0, it
+	      divides every color component by two, and uses the following
+	      blending function: glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+    	      This is not mathematically correct, however it gives similar
+	      visual results except that "bright" halos are still darker
+	      than those from software renderer.
+	    - Separated most halo-related code into a new file called
+	      libs/csengine/light/halo.cpp.
+	    - Finished hint objects in CSWS.
+	    - Added hints to most buttons in MazeD. Move the mouse above
+	      some button on a toolbar and wait three seconds to see a
+	      short description of this button.
+	    - Fixed iSystem::UnloadPlugin() so that plugin is correctly
+	      unloaded if it implements the iConfig interface (plugin's
+	      options are removed as well).
+	    - Added support for keypad '+', '-', '/', '*' and center
+	      keys to all X11 canvas drivers.
+	    - Fixed a bug in event cords which caused hotkeys to not work
+	      in MazeD (and keyboard accelerators in general).
+	    - Fixed an accuracy problem with line drawing (actually two).
+	    - Fixed the problem with $" and $| introduced after Eric's
+	      last changes.  The problem was that on some systems with
+	      non-Unix-like shells (e.g. OS/2) " is defined to empty, thus
+	      `ifdef "' branch was taken.  Now " and | are defined prior
+	      to including config.mak from cs.mak, exactly same way as it
+	      works from root makefile.
 7-Nov-2000
 	- Fixed a bug to csSprite3D::HitBeamObject(). It was taking the
 	  wrong frame from the sprite to do the collision detection with.
+	- Norman Kramer fixed the glide canvas makefiles after Eric's changes
+	  yesterday.
 6-Nov-2000
 	- Eric Sunshine made the following changes to the project:
 	    - Visual-C++ DSW and DSP project files are now automatically

@@ -38,7 +38,7 @@ class csOpenGLHalo : public iHalo
   /// Width and height factor
   float Wfact, Hfact;
   /// DST blending factor
-  GLuint dstblend;
+  GLenum dstblend;
   /// Our OpenGL texture handle
   GLuint halohandle;
   /// The OpenGL 3D driver
