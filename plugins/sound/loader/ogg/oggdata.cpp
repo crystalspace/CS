@@ -199,7 +199,7 @@ public:
     SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   }
 
-  virtual csPtr<iSoundData> LoadSound (void *Buffer, unsigned long Size)
+  virtual csPtr<iSoundData> LoadSound (void *Buffer, uint32 Size)
   {
     csOggSoundData *sd=NULL;
     if (csOggSoundData::IsOgg (Buffer, Size))
