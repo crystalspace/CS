@@ -6,6 +6,35 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Mar-2005
+	- Eric Sunshine renamed the following configuration control macros
+	  (most of which are emitted to csconfig.h by configure.ac) to improve
+	  internal naming consistency, and to conform more closely to naming
+	  scheme used by Autoconf. In the case of the CS_USE_FAKE_feature
+	  macros, the boolean sense was also reversed.
+	    CS_HAS_CAL3D                   --> CS_HAVE_CAL3D
+	    CS_HAS_CMATH_H                 --> CS_HAVE_CMATH_H
+	    CS_HAS_GLHANDLEARB_T           --> CS_HAVE_GLHANDLEARB_T
+	    CS_HAS_INT64_C                 --> CS_HAVE_INT64_C
+	    CS_HAS_INTMAX_T                --> CS_HAVE_INTMAX_T
+	    CS_HAS_INTPTR_T                --> CS_HAVE_INTPTR_T
+	    CS_HAS_INTTYPES_H              --> CS_HAVE_INTTYPES_H
+	    CS_HAS_MACHINE_SOUNDCARD_H     --> CS_HAVE_MACHINE_SOUNDCARD_H
+	    CS_HAS_MEMORY_MAPPED_IO        --> CS_HAVE_MEMORY_MAPPED_IO
+	    CS_HAS_POSIX_MMAP              --> CS_HAVE_POSIX_MMAP
+	    CS_HAS_REGEX                   --> CS_HAVE_REGEX
+	    CS_HAS_SOUNDCARD_H             --> CS_HAVE_SOUNDCARD_H
+	    CS_HAS_STDINT_H                --> CS_HAVE_STDINT_H
+	    CS_HAS_SYS_PARAM_H             --> CS_HAVE_SYS_PARAM_H
+	    CS_HAS_SYS_SOUNDCARD_H         --> CS_HAVE_SYS_SOUNDCARD_H
+	    CS_HAS_WCHAR_H                 --> CS_HAVE_WCHAR_H
+	    CS_RTLD_NOW_AVAILABLE          --> CS_HAVE_RTLD_NOW
+	    CS_USE_FAKE_EXPLICIT_KEYWORD   --> CS_HAVE_CXX_KEYWORD_EXPLICIT
+	    CS_USE_FAKE_MATH_H_FLOAT_FUNCS --> CS_HAVE_MATH_H_FLOAT_FUNCS
+	    CS_USE_FAKE_SOCKLEN_TYPE       --> CS_HAVE_SOCKLEN_T
+	    CS_USE_FAKE_TYPENAME_KEYWORD   --> CS_HAVE_CXX_KEYWORD_TYPENAME
+	    CS_USE_FAKE_WCHAR_TYPE         --> CS_HAVE_WCHAR_T
+	    CS_USE_FAKE_WCSLEN             --> CS_HAVE_WCSLEN
 7-Mar-2005
 	- Jorrit fixed walktest to use csStrCaseCmp instead of strcasecmp.
 	  That fixes compilation on mingw.

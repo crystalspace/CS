@@ -224,7 +224,7 @@ AS_IF([test -n "$NASM"],
 # Check for typical required libraries (libm, libmx, libdl, libnsl).
 #------------------------------------------------------------------------------
 AC_LANG_PUSH([C++])
-AC_CHECK_HEADERS([cmath], [CS_HEADER_PROPERTY([CS_HAS_CMATH_H])])
+AC_CHECK_HEADERS([cmath], [CS_HEADER_PROPERTY([CS_HAVE_CMATH_H])])
 AC_LANG_POP([C++])
 
 AC_DEFUN([CS_CHECK_COMMON_LIBS],
@@ -247,8 +247,8 @@ AS_IF([test $ac_cv_lib_dl_dlopen = yes],
 AS_IF([test $ac_cv_lib_nsl_gethostbyname = yes],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lnsl], [+])])
 
-AS_IF([test $ac_cv_lib_m_cosf = no && test $ac_cv_lib_mx_cosf = no],
-    [CS_HEADER_PROPERTY([CS_USE_FAKE_MATH_H_FLOAT_FUNCS])])
+AS_IF([test $ac_cv_lib_m_cosf != no || test $ac_cv_lib_mx_cosf != no],
+    [CS_HEADER_PROPERTY([CS_HAVE_MATH_H_FLOAT_FUNCS])])
 
 
 
@@ -275,7 +275,7 @@ AC_DEFUN([CS_CHECK_RTLD],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     CS_CHECK_BUILD([for RTLD_NOW], [cs_cv_sys_rtld_now],
 	[AC_LANG_PROGRAM([[#include <dlfcn.h>]], [dlopen(0, RTLD_NOW)])],
-	[], [], [CS_HEADER_PROPERTY([CS_RTLD_NOW_AVAILABLE])], [], [],
+	[], [], [CS_HEADER_PROPERTY([CS_HAVE_RTLD_NOW])], [], [],
 	[], [], [$cs_cv_libdl_libs])])
 
 CS_CHECK_RTLD
@@ -1128,7 +1128,7 @@ AS_IF([test $cs_cv_libgl = yes],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],
 	    [GLhandleARB x; (void)x;])],
-	[], [],	[CS_HEADER_PROPERTY([CS_HAS_GLHANDLEARB_T])], [], [],
+	[], [],	[CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
 
     # Check for GLU.
@@ -1728,13 +1728,13 @@ CS_CHECK_LIBCG
 # Check for OpenSoundSystem (OSS).
 #------------------------------------------------------------------------------
 AC_CHECK_HEADER([soundcard.h],
-    [CS_HEADER_PROPERTY([CS_HAS_SOUNDCARD_H])
+    [CS_HEADER_PROPERTY([CS_HAVE_SOUNDCARD_H])
     cs_cv_header_soundcard_h=yes],
     [AC_CHECK_HEADER([sys/soundcard.h],
-	[CS_HEADER_PROPERTY([CS_HAS_SYS_SOUNDCARD_H])
+	[CS_HEADER_PROPERTY([CS_HAVE_SYS_SOUNDCARD_H])
 	cs_cv_header_soundcard_h=yes],
 	[AC_CHECK_HEADER([machine/soundcard.h],
-	      [CS_HEADER_PROPERTY([CS_HAS_MACHINE_SOUNDCARD_H])
+	      [CS_HEADER_PROPERTY([CS_HAVE_MACHINE_SOUNDCARD_H])
 	      cs_cv_header_soundcard_h=yes],
 	      [cs_cv_header_soundcard_h=no])])])
 
@@ -1807,7 +1807,7 @@ CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
 	#include <regex.h>]],
 	[regex_t re; regcomp (&re, 0, 0); regexec (&re, 0, 0, 0, 0);])],
     [], [],
-    [CS_HEADER_PROPERTY([CS_HAS_REGEX])
+    [CS_HEADER_PROPERTY([CS_HAVE_REGEX])
     CS_EMIT_BUILD_PROPERTY([REGEX.AVAILABLE], [yes])])
 
 
@@ -1931,14 +1931,14 @@ AC_C_BIGENDIAN(
 # Check if stdint.h is available and if the INT64_C() macro is available.
 #------------------------------------------------------------------------------
 AC_CHECK_HEADERS([stdint.h],
-    [CS_HEADER_PROPERTY([CS_HAS_STDINT_H])
+    [CS_HEADER_PROPERTY([CS_HAVE_STDINT_H])
     CS_CHECK_BUILD([if INT64_C is available], [cs_cv_c_int64],
         [AC_LANG_PROGRAM(
             [[#define __STDC_CONSTANT_MACROS
             #define __STDC_LIMIT_MACROS
             #include <stdint.h>]],
             [(void)INT64_C(0x100000000)])],
-        [], [C++], [CS_HEADER_PROPERTY([CS_HAS_INT64_C])])])
+        [], [C++], [CS_HEADER_PROPERTY([CS_HAVE_INT64_C])])])
 
 
 
@@ -1946,8 +1946,8 @@ AC_CHECK_HEADERS([stdint.h],
 # Check if intptr_t, uintptr_t, intmax_t and uintmax_t are available.
 #------------------------------------------------------------------------------
 AC_CHECK_HEADERS([stdint.h])
-AC_CHECK_HEADERS([inttypes.h], [CS_HEADER_PROPERTY([CS_HAS_INTTYPES_H])])
-AC_CHECK_TYPE([intptr_t], [CS_HEADER_PROPERTY([CS_HAS_INTPTR_T])], [],
+AC_CHECK_HEADERS([inttypes.h], [CS_HEADER_PROPERTY([CS_HAVE_INTTYPES_H])])
+AC_CHECK_TYPE([intptr_t], [CS_HEADER_PROPERTY([CS_HAVE_INTPTR_T])], [],
     [[#include <stddef.h>
     #ifdef HAVE_INTTYPES_H
     #include <inttypes.h>
@@ -1955,7 +1955,7 @@ AC_CHECK_TYPE([intptr_t], [CS_HEADER_PROPERTY([CS_HAS_INTPTR_T])], [],
     #ifdef HAVE_STDINT_H
     #include <stdint.h>
     #endif]])
-AC_CHECK_TYPE([intmax_t], [CS_HEADER_PROPERTY([CS_HAS_INTMAX_T])], [],
+AC_CHECK_TYPE([intmax_t], [CS_HEADER_PROPERTY([CS_HAVE_INTMAX_T])], [],
     [[#include <stddef.h>
     #ifdef HAVE_INTTYPES_H
     #include <inttypes.h>
@@ -1973,7 +1973,7 @@ AC_CHECK_TYPE([intmax_t], [CS_HEADER_PROPERTY([CS_HAS_INTMAX_T])], [],
 #------------------------------------------------------------------------------
 AC_LANG_PUSH([C++])
 
-AC_CHECK_HEADERS([wchar.h], [CS_HEADER_PROPERTY([CS_HAS_WCHAR_H])])
+AC_CHECK_HEADERS([wchar.h], [CS_HEADER_PROPERTY([CS_HAVE_WCHAR_H])])
 
 AC_CHECK_TYPE([wchar_t], [cs_type_wchar_t=yes], [cs_type_wchar_t=no],
     [[#if HAVE_WCHAR_H
@@ -1981,16 +1981,16 @@ AC_CHECK_TYPE([wchar_t], [cs_type_wchar_t=yes], [cs_type_wchar_t=no],
     #endif]])
 
 AS_IF([test $cs_type_wchar_t = yes],
-    [AC_CHECK_FUNC([wcslen], [], [CS_HEADER_PROPERTY([CS_USE_FAKE_WCSLEN])])
-    AC_CHECK_FUNC([fputws], [CS_HEADER_PROPERTY([CS_HAVE_FPUTWS])], [])
-    AC_CHECK_FUNC([fwide], [CS_HEADER_PROPERTY([CS_HAVE_FWIDE])], [])
-    AC_CHECK_FUNC([wcsrtombs], [CS_HEADER_PROPERTY([CS_HAVE_WCSRTOMBS])], [])
+    [CS_HEADER_PROPERTY([CS_HAVE_WCHAR_T])
+    AC_CHECK_FUNC([wcslen], [CS_HEADER_PROPERTY([CS_HAVE_WCSLEN])])
+    AC_CHECK_FUNC([fputws], [CS_HEADER_PROPERTY([CS_HAVE_FPUTWS])])
+    AC_CHECK_FUNC([fwide], [CS_HEADER_PROPERTY([CS_HAVE_FWIDE])])
+    AC_CHECK_FUNC([wcsrtombs], [CS_HEADER_PROPERTY([CS_HAVE_WCSRTOMBS])])
     AC_CHECK_SIZEOF([wchar_t], []
 	[[#if HAVE_WCHAR_H
 	#include <wchar.h>
 	#endif]])
-    CS_HEADER_PROPERTY([CS_WCHAR_T_SIZE], [$ac_cv_sizeof_wchar_t])],
-    [CS_HEADER_PROPERTY([CS_USE_FAKE_WCHAR_TYPE])])
+    CS_HEADER_PROPERTY([CS_WCHAR_T_SIZE], [$ac_cv_sizeof_wchar_t])])
 
 AC_LANG_POP([C++])
 
@@ -1999,7 +1999,7 @@ AC_LANG_POP([C++])
 #------------------------------------------------------------------------------
 # Check if MAXPATHLEN is defined by the system headers.
 #------------------------------------------------------------------------------
-AC_CHECK_HEADERS([sys/param.h], [CS_HEADER_PROPERTY([CS_HAS_SYS_PARAM_H])])
+AC_CHECK_HEADERS([sys/param.h], [CS_HEADER_PROPERTY([CS_HAVE_SYS_PARAM_H])])
 CS_CHECK_BUILD([for MAXPATHLEN], [cs_cv_c_macro_maxpathlen],
     [AC_LANG_PROGRAM(
 	[[#include <stdio.h>
@@ -2097,16 +2097,16 @@ AC_CACHE_CHECK([for C++ `explicit' keyword], [cs_cv_cxx_explicit],
     [CS_BUILD_IFELSE(
 	[AC_LANG_PROGRAM([class A { public: explicit A(int); };], [])],
 	[], [C++], [cs_cv_cxx_explicit=yes], [cs_cv_cxx_explicit=no])])
-AS_IF([test $cs_cv_cxx_explicit = no],
-    [CS_HEADER_PROPERTY([CS_USE_FAKE_EXPLICIT_KEYWORD])])
+AS_IF([test $cs_cv_cxx_explicit != no],
+    [CS_HEADER_PROPERTY([CS_HAVE_CXX_KEYWORD_EXPLICIT])])
 
 AC_CACHE_CHECK([for C++ `typename' keyword], [cs_cv_cxx_typename],
     [CS_BUILD_IFELSE(
 	[AC_LANG_PROGRAM(
 	    [template <typename T> class A { public: T a; };], [])],
 	[], [C++], [cs_cv_cxx_typename=yes], [cs_cv_cxx_typename=no])])
-AS_IF([test $cs_cv_cxx_typename = no],
-    [CS_HEADER_PROPERTY([CS_USE_FAKE_TYPENAME_KEYWORD])])
+AS_IF([test $cs_cv_cxx_typename != no],
+    [CS_HEADER_PROPERTY([CS_HAVE_CXX_KEYWORD_TYPENAME])])
 
 
 

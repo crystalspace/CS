@@ -22,7 +22,7 @@
 #include "iutil/vfs.h"
 #include "csutil/ref.h"
 
-#ifdef CS_HAS_MEMORY_MAPPED_IO
+#ifdef CS_HAVE_MEMORY_MAPPED_IO
 bool csMemoryMapFile(csMemMapInfo*, char const* filename);
 void csUnMemoryMapFile(csMemMapInfo*);
 #endif
@@ -44,14 +44,14 @@ csMemoryMappedIO::csMemoryMappedIO(unsigned _block_size, char const *filename,
   valid_mmio_object = false;
   if (realpath)
   {
-   #ifdef CS_HAS_MEMORY_MAPPED_IO
+   #ifdef CS_HAVE_MEMORY_MAPPED_IO
     valid_platform = csMemoryMapFile(&platform, realpath);
     if (!valid_platform)
    #endif
     {
       valid_mmio_object = SoftMemoryMapFile(&emulatedPlatform, realpath);
     }
-   #ifdef CS_HAS_MEMORY_MAPPED_IO
+   #ifdef CS_HAVE_MEMORY_MAPPED_IO
     else
       valid_mmio_object = true;
    #endif
@@ -62,7 +62,7 @@ csMemoryMappedIO::~csMemoryMappedIO()
 {
   if (valid_mmio_object)
   {
-   #ifdef CS_HAS_MEMORY_MAPPED_IO
+   #ifdef CS_HAVE_MEMORY_MAPPED_IO
     if (valid_platform)
     {
       csUnMemoryMapFile(&platform);
@@ -216,7 +216,7 @@ csMemoryMappedIO::CachePage(unsigned int page)
 void*
 csMemoryMappedIO::GetPointer(unsigned int index)
 {
-#ifdef CS_HAS_MEMORY_MAPPED_IO
+#ifdef CS_HAVE_MEMORY_MAPPED_IO
   if (valid_platform) 
   {
     return platform.data + (index*block_size);

@@ -150,7 +150,7 @@ private:
     unsigned int file_size;
   } emulatedPlatform;
   
-#ifdef CS_HAS_MEMORY_MAPPED_IO
+#ifdef CS_HAVE_MEMORY_MAPPED_IO
   /// Holds information specific to the platform for hardware paging.
   csMemMapInfo platform;
   

@@ -35,7 +35,7 @@
 3DS.AVAILABLE = yes ;
 3DS.LIBS = lib3ds-120.lib ;
 CAL3D.AVAILABLE = yes ;
-CAL3D.DEFINES = CS_HAS_CAL3D ;
+CAL3D.DEFINES = CS_HAVE_CAL3D ;
 CAL3D.LIBS = cal3d.lib ;
 CG.AVAILABLE = yes ;
 CG.LIBS = cg.lib cgGL.lib ;

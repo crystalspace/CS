@@ -21,7 +21,7 @@
 
 #include "csplatform.h"
 
-#ifdef CS_HAS_REGEX
+#ifdef CS_HAVE_REGEX
   #include <regex.h>
 #else
   #if (defined(CS_COMPILER_MSVC) || defined(CS_COMPILER_BCC)) && \

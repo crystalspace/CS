@@ -30,7 +30,7 @@
  * use the csMemoryMappedIO class.
  */
 
-#ifdef CS_HAS_MEMORY_MAPPED_IO
+#ifdef CS_HAVE_MEMORY_MAPPED_IO
 /**
  * Map a file to a memory area. 
  * Fills in the csMemMapInfo struct by mapping in \c filename.

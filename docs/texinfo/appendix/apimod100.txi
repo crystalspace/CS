@@ -782,6 +782,72 @@ The same improvements have been made to @code{csIntersect2}:
 @code{Segments()} @result{} @code{SegmentSegment()} (plane version)
 @end itemize
 
+The following configuration control macros (most of which are emitted to
+@file{csconfig.h} by the Crystal Space @file{configure} script) have been
+renamed in order to improve internal naming consistency, and to conform more
+closely to naming scheme used by Autoconf.
+
+@itemize @bullet
+@item
+@code{CS_HAS_CAL3D} @result{} @code{CS_HAVE_CAL3D}
+@item
+@code{CS_HAS_CMATH_H} @result{} @code{CS_HAVE_CMATH_H}
+@item
+@code{CS_HAS_GLHANDLEARB_T} @result{} @code{CS_HAVE_GLHANDLEARB_T}
+@item
+@code{CS_HAS_INT64_C} @result{} @code{CS_HAVE_INT64_C}
+@item
+@code{CS_HAS_INTMAX_T} @result{} @code{CS_HAVE_INTMAX_T}
+@item
+@code{CS_HAS_INTPTR_T} @result{} @code{CS_HAVE_INTPTR_T}
+@item
+@code{CS_HAS_INTTYPES_H} @result{} @code{CS_HAVE_INTTYPES_H}
+@item
+@code{CS_HAS_MACHINE_SOUNDCARD_H} @result{} @code{CS_HAVE_MACHINE_SOUNDCARD_H}
+@item
+@code{CS_HAS_MEMORY_MAPPED_IO} @result{} @code{CS_HAVE_MEMORY_MAPPED_IO}
+@item
+@code{CS_HAS_POSIX_MMAP} @result{} @code{CS_HAVE_POSIX_MMAP}
+@item
+@code{CS_HAS_REGEX} @result{} @code{CS_HAVE_REGEX}
+@item
+@code{CS_HAS_SOUNDCARD_H} @result{} @code{CS_HAVE_SOUNDCARD_H}
+@item
+@code{CS_HAS_STDINT_H} @result{} @code{CS_HAVE_STDINT_H}
+@item
+@code{CS_HAS_SYS_PARAM_H} @result{} @code{CS_HAVE_SYS_PARAM_H}
+@item
+@code{CS_HAS_SYS_SOUNDCARD_H} @result{} @code{CS_HAVE_SYS_SOUNDCARD_H}
+@item
+@code{CS_HAS_WCHAR_H} @result{} @code{CS_HAVE_WCHAR_H}
+@item
+@code{CS_RTLD_NOW_AVAILABLE} @result{} @code{CS_HAVE_RTLD_NOW}
+@end itemize
+
+@noindent
+Likewise, the same normalization has been applied to the
+@samp{CS_USE_FAKE_feature} macros published by the @file{configure} script, and
+the boolean sense of these control macros has been reversed to account for the
+name change.
+
+@itemize @bullet
+@item
+@code{CS_USE_FAKE_EXPLICIT_KEYWORD} @result{}
+@code{CS_HAVE_CXX_KEYWORD_EXPLICIT}
+@item
+@code{CS_USE_FAKE_MATH_H_FLOAT_FUNCS} @result{}
+@code{CS_HAVE_MATH_H_FLOAT_FUNCS}
+@item
+@code{CS_USE_FAKE_SOCKLEN_TYPE} @result{} @code{CS_HAVE_SOCKLEN_T}
+@item
+@code{CS_USE_FAKE_TYPENAME_KEYWORD} @result{}
+@code{CS_HAVE_CXX_KEYWORD_TYPENAME}
+@item
+@code{CS_USE_FAKE_WCHAR_TYPE} @result{} @code{CS_HAVE_WCHAR_T}
+@item
+@code{CS_USE_FAKE_WCSLEN} @result{} @code{CS_HAVE_WCSLEN}
+@end itemize
+
 @subheading Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size
 
 The default hash table size and grow rate has been reduced from 257 and 64 to
@@ -1056,15 +1122,6 @@ are also removed.
 @samp{iDataBuffer} object, instead of separate @samp{buffer} and @samp{size}
 parameters.
 
-@subheading @samp{iRenderBuffer} Generalization
-
-The @samp{iRenderBuffer} interface was made renderer-independant. Consequently,
-creation was moved out of @samp{iGraphics3D} and into @samp{csRenderBuffer}.
-The semantics of the parameters have changed too: notably, instead of 
-specifying the byte size of a buffer, the element count is specified. The same
-change has been made to @code{CopyToBuffer()} (which has been renamed to 
-@code{CopyInto()} to enforce human correction of the parameters).
-
 @subheading @samp{iLight} Changes
 
 The @samp{iLight} and its implementation (@samp{csLight}) have been extended to
@@ -1155,9 +1212,18 @@ dispose manually via @code{DecRef()}.
 
 @subheading Render Buffer Changes
 
+The @samp{iRenderBuffer} interface was made renderer-independant. Consequently,
+creation was moved out of @samp{iGraphics3D} and into @samp{csRenderBuffer} in
+the @file{csgfx} library (see @file{csgfx/renderbuffer.h}).  The semantics of
+the parameters have changed too: notably, instead of specifying the byte size
+of a buffer, the element count is specified. The same change has been made to
+@code{CopyToBuffer()} (which has been renamed to @code{CopyInto()} to enforce
+human correction of the arguments).
+
+More serious changes involve the publication of render buffers by renderers.
 Previously meshes provided render buffers via name, and these were mapped using
 @emph{name} <-> @emph{OpenGL} name mapping. But most meshes only provided a few
-standard-named buffers (such as, @samp{vertices}, @samp{texcoords}, etc.) and
+standard-named buffers (such as, @samp{vertices}, @samp{texcoords}, etc.), and
 the mapping itself took some time (5%+ per frame). This has been reworked.
 
 Now, meshes can provide a set of 16 buffers in a fixed structure. Meshes can

@@ -210,13 +210,19 @@ void csGraphics2DSDL::Report (int severity, const char* msg, ...)
 //  the main program exits. Of course, this is not the best solution,
 //  that's why the function is marked "fixup".
 
+#if defined(CS_HAVE_RTLD_NOW)
+#define CS_SDL2D_DLOPEN_MODE RTLD_NOW
+#else
+#define CS_SDL2D_DLOPEN_MODE RTLD_LAZY
+#endif
+
 void csGraphics2DSDL::fixlibrary()
 {
 #if defined(CS_USE_GNU_DLADDR)
     Dl_info dlip;
 
     dladdr((const void*)sdl2d_scfInitialize,&dlip);
-    dlopen(dlip.dli_fname,RTLD_NOW);
+    dlopen(dlip.dli_fname,CS_SDL2D_DLOPEN_MODE);
 
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Library %s locked.",dlip.dli_fname);
 #elif defined(CS_PLATFORM_WIN32)

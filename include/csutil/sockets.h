@@ -70,11 +70,11 @@ typedef unsigned int csNetworkSocket;
 #  define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
 #endif
 
-// Platforms which do not supply a socklen_t type should define
-// CS_USE_FAKE_SOCKLEN_TYPE. Note that we invoke the typedef only if some other
-// entity has not already #defined socklen_t, since the #define would cause
-// problems (i.e. `typedef int int').
-#if defined(CS_USE_FAKE_SOCKLEN_TYPE) && !defined(socklen_t)
+// Platforms which supply a socklen_t type should define CS_HAVE_SOCKLEN_T.
+// Note that we invoke the typedef only if some other entity has not already
+// #defined socklen_t, since the #define would cause problems (for example,
+//  `typedef int int').
+#if !defined(CS_HAVE_SOCKLEN_T) && !defined(socklen_t)
   typedef int socklen_t;
 #endif
 

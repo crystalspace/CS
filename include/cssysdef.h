@@ -71,7 +71,7 @@
 #define CS_MAXPATHLEN 1024
 #endif
 #include <stdio.h>
-#ifdef CS_HAS_SYS_PARAM_H
+#ifdef CS_HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
 
@@ -132,17 +132,17 @@ static inline bool isdir (const char *path, struct dirent *de)
 }
 #endif
 
-/**\def CS_HAS_POSIX_MMAP
- * Platforms which support POSIX mmap() should #define CS_HAS_POSIX_MMAP. This
+/**\def CS_HAVE_POSIX_MMAP
+ * Platforms which support POSIX mmap() should #define CS_HAVE_POSIX_MMAP. This
  * can be done via the platform-specific csosdef.h or via the configure script.
  * Doing so will declare a POSIX mmap()-suitable csMemMapInfo structure. The
  * build process on such platforms must also arrange to have
  * CS/libs/csutil/generic/mmap.cpp incorporated into the csutil library.
  */
-#ifdef CS_HAS_POSIX_MMAP
+#ifdef CS_HAVE_POSIX_MMAP
 
-#ifndef CS_HAS_MEMORY_MAPPED_IO
-#define CS_HAS_MEMORY_MAPPED_IO
+#ifndef CS_HAVE_MEMORY_MAPPED_IO
+#define CS_HAVE_MEMORY_MAPPED_IO
 #endif
 
 /// POSIX-specific memory mapped I/O platform dependent structure.
@@ -158,7 +158,7 @@ struct csMemMapInfo
   bool close;
 };
 
-#endif // CS_HAS_POSIX_MMAP
+#endif // CS_HAVE_POSIX_MMAP
 
 /**
  * The CS_HEADER_GLOBAL() macro composes a pathname from two components and

@@ -5624,7 +5624,7 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
   cat >>confdefs.h <<_ACEOF
 #define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
- cs_header_text="${cs_header_text}#define CS_HAS_CMATH_H
+ cs_header_text="${cs_header_text}#define CS_HAVE_CMATH_H
 "
 fi
 
@@ -6050,8 +6050,8 @@ fi
 fi
 
 
-if test $ac_cv_lib_m_cosf = no && test $ac_cv_lib_mx_cosf = no; then
-  cs_header_text="${cs_header_text}#define CS_USE_FAKE_MATH_H_FLOAT_FUNCS
+if test $ac_cv_lib_m_cosf != no || test $ac_cv_lib_mx_cosf != no; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_MATH_H_FLOAT_FUNCS
 "
 fi
 
@@ -7073,7 +7073,7 @@ echo "${ECHO_T}$cs_cv_sys_rtld_now" >&6
 fi
 
     if test $cs_cv_sys_rtld_now = yes; then
-  cs_header_text="${cs_header_text}#define CS_RTLD_NOW_AVAILABLE
+  cs_header_text="${cs_header_text}#define CS_HAVE_RTLD_NOW
 "
 else
   cs_cv_sys_rtld_now_cflags=''
@@ -21097,7 +21097,7 @@ echo "${ECHO_T}$cs_cv_libgl_glhandlearb" >&6
 fi
 
     if test $cs_cv_libgl_glhandlearb = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAS_GLHANDLEARB_T
+  cs_header_text="${cs_header_text}#define CS_HAVE_GLHANDLEARB_T
 "
 else
   cs_cv_libgl_glhandlearb_cflags=''
@@ -45569,7 +45569,7 @@ echo "${ECHO_T}$ac_cv_header_soundcard_h" >&6
 
 fi
 if test $ac_cv_header_soundcard_h = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAS_SOUNDCARD_H
+  cs_header_text="${cs_header_text}#define CS_HAVE_SOUNDCARD_H
 "
     cs_cv_header_soundcard_h=yes
 else
@@ -45711,7 +45711,7 @@ echo "${ECHO_T}$ac_cv_header_sys_soundcard_h" >&6
 
 fi
 if test $ac_cv_header_sys_soundcard_h = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAS_SYS_SOUNDCARD_H
+  cs_header_text="${cs_header_text}#define CS_HAVE_SYS_SOUNDCARD_H
 "
 	cs_cv_header_soundcard_h=yes
 else
@@ -45853,7 +45853,7 @@ echo "${ECHO_T}$ac_cv_header_machine_soundcard_h" >&6
 
 fi
 if test $ac_cv_header_machine_soundcard_h = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAS_MACHINE_SOUNDCARD_H
+  cs_header_text="${cs_header_text}#define CS_HAVE_MACHINE_SOUNDCARD_H
 "
 	      cs_cv_header_soundcard_h=yes
 else
@@ -49110,7 +49110,7 @@ echo "${ECHO_T}$cs_cv_regexp" >&6
 fi
 
     if test $cs_cv_regexp = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAS_REGEX
+  cs_header_text="${cs_header_text}#define CS_HAVE_REGEX
 "
     cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -51580,7 +51580,7 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
   cat >>confdefs.h <<_ACEOF
 #define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
- cs_header_text="${cs_header_text}#define CS_HAS_STDINT_H
+ cs_header_text="${cs_header_text}#define CS_HAVE_STDINT_H
 "
     if test "" != yes; then
   echo "$as_me:$LINENO: checking if INT64_C is available" >&5
@@ -51893,7 +51893,7 @@ echo "${ECHO_T}$cs_cv_c_int64" >&6
 fi
 
     if test $cs_cv_c_int64 = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAS_INT64_C
+  cs_header_text="${cs_header_text}#define CS_HAVE_INT64_C
 "
 else
   cs_cv_c_int64_cflags=''
@@ -52207,7 +52207,7 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
   cat >>confdefs.h <<_ACEOF
 #define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
- cs_header_text="${cs_header_text}#define CS_HAS_INTTYPES_H
+ cs_header_text="${cs_header_text}#define CS_HAVE_INTTYPES_H
 "
 fi
 
@@ -52277,7 +52277,7 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_type_intptr_t" >&5
 echo "${ECHO_T}$ac_cv_type_intptr_t" >&6
 if test $ac_cv_type_intptr_t = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAS_INTPTR_T
+  cs_header_text="${cs_header_text}#define CS_HAVE_INTPTR_T
 "
 fi
 
@@ -52345,7 +52345,7 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_type_intmax_t" >&5
 echo "${ECHO_T}$ac_cv_type_intmax_t" >&6
 if test $ac_cv_type_intmax_t = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAS_INTMAX_T
+  cs_header_text="${cs_header_text}#define CS_HAVE_INTMAX_T
 "
 fi
 
@@ -52509,7 +52509,7 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
   cat >>confdefs.h <<_ACEOF
 #define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
- cs_header_text="${cs_header_text}#define CS_HAS_WCHAR_H
+ cs_header_text="${cs_header_text}#define CS_HAVE_WCHAR_H
 "
 fi
 
@@ -52583,7 +52583,9 @@ fi
 
 
 if test $cs_type_wchar_t = yes; then
-  echo "$as_me:$LINENO: checking for wcslen" >&5
+  cs_header_text="${cs_header_text}#define CS_HAVE_WCHAR_T
+"
+    echo "$as_me:$LINENO: checking for wcslen" >&5
 echo $ECHO_N "checking for wcslen... $ECHO_C" >&6
 if test "${ac_cv_func_wcslen+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -52674,9 +52676,7 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_func_wcslen" >&5
 echo "${ECHO_T}$ac_cv_func_wcslen" >&6
 if test $ac_cv_func_wcslen = yes; then
-  :
-else
-  cs_header_text="${cs_header_text}#define CS_USE_FAKE_WCSLEN
+  cs_header_text="${cs_header_text}#define CS_HAVE_WCSLEN
 "
 fi
 
@@ -53381,9 +53381,6 @@ _ACEOF
 
     cs_header_text="${cs_header_text}#define CS_WCHAR_T_SIZE $ac_cv_sizeof_wchar_t
 "
-else
-  cs_header_text="${cs_header_text}#define CS_USE_FAKE_WCHAR_TYPE
-"
 fi
 
 
@@ -53544,7 +53541,7 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
   cat >>confdefs.h <<_ACEOF
 #define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
- cs_header_text="${cs_header_text}#define CS_HAS_SYS_PARAM_H
+ cs_header_text="${cs_header_text}#define CS_HAVE_SYS_PARAM_H
 "
 fi
 
@@ -54731,8 +54728,8 @@ fi
 fi
 echo "$as_me:$LINENO: result: $cs_cv_cxx_explicit" >&5
 echo "${ECHO_T}$cs_cv_cxx_explicit" >&6
-if test $cs_cv_cxx_explicit = no; then
-  cs_header_text="${cs_header_text}#define CS_USE_FAKE_EXPLICIT_KEYWORD
+if test $cs_cv_cxx_explicit != no; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_CXX_KEYWORD_EXPLICIT
 "
 fi
 
@@ -54887,8 +54884,8 @@ fi
 fi
 echo "$as_me:$LINENO: result: $cs_cv_cxx_typename" >&5
 echo "${ECHO_T}$cs_cv_cxx_typename" >&6
-if test $cs_cv_cxx_typename = no; then
-  cs_header_text="${cs_header_text}#define CS_USE_FAKE_TYPENAME_KEYWORD
+if test $cs_cv_cxx_typename != no; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_CXX_KEYWORD_TYPENAME
 "
 fi
 

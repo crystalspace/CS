@@ -130,7 +130,7 @@ typedef unsigned char GLubyte;
   Appear in the ARB_shader_objects ext spec.
  */
 typedef char GLcharARB;
-#ifndef CS_HAS_GLHANDLEARB_T
+#ifndef CS_HAVE_GLHANDLEARB_T
 typedef unsigned int GLhandleARB;
 #endif
 

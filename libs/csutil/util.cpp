@@ -27,7 +27,7 @@
 
 static const size_t shortStringChars = 64;
 
-#if defined(CS_USE_FAKE_WCSLEN)
+#if !defined(CS_HAVE_WCSLEN)
 
 static size_t wcslen(wchar_t const* s)
 {

@@ -26,7 +26,7 @@
 #endif
 #include <new>
 
-#ifdef CS_HAS_CAL3D
+#ifdef CS_HAVE_CAL3D
 #include <cal3d/animcallback.h>
 #endif
 
@@ -34,7 +34,7 @@ CS_IMPLEMENT_APPLICATION
 
 //---------------------------------------------------------------------------
 
-#ifdef CS_HAS_CAL3D
+#ifdef CS_HAVE_CAL3D
 struct vmAnimCallback : public CalAnimationCallback
 {
   vmAnimCallback() {}
@@ -62,7 +62,7 @@ ViewMesh::ViewMesh ()
 
 ViewMesh::~ViewMesh ()
 {
-#ifdef CS_HAS_CAL3D
+#ifdef CS_HAVE_CAL3D
   if (cal3dsprite && callback)
   {
     cal3dsprite->RemoveAnimCallback("walk", callback);
@@ -545,7 +545,7 @@ void ViewMesh::LoadSprite (const char* path, const char* filename)
         delete meshWrapOld;
       }
     }
-#ifdef CS_HAS_CAL3D
+#ifdef CS_HAVE_CAL3D
     if (cal3dsprite && callback)
     {
       cal3dsprite->RemoveAnimCallback("walk", callback);
@@ -615,7 +615,7 @@ void ViewMesh::LoadSprite (const char* path, const char* filename)
       }
       if (cal3dstate)
       {
-#ifdef CS_HAS_CAL3D
+#ifdef CS_HAVE_CAL3D
         vmAnimCallback *callback = new vmAnimCallback;
         cal3dsprite->RegisterAnimCallback("walk",callback,.5);
 #endif

@@ -26,7 +26,7 @@
 #include "csutil/csstring.h"
 
 #ifdef CS_DEBUG
-#  ifdef CS_RTLD_NOW_AVAILABLE
+#  ifdef CS_HAVE_RTLD_NOW
 #    define DLOPEN_MODE   RTLD_NOW // | RTLD_GLOBAL	// handy for debugging
 #  else
 #    define DLOPEN_MODE   RTLD_LAZY // | RTLD_GLOBAL

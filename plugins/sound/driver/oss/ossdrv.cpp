@@ -29,11 +29,11 @@
 #include <signal.h>
 
 #include "cssysdef.h"
-#if defined(CS_HAS_MACHINE_SOUNDCARD_H)
+#if defined(CS_HAVE_MACHINE_SOUNDCARD_H)
 #  include <machine/soundcard.h>
-#elif defined(CS_HAS_SYS_SOUNDCARD_H)
+#elif defined(CS_HAVE_SYS_SOUNDCARD_H)
 #  include <sys/soundcard.h>
-#else // CS_HAS_SOUNDCARD_H
+#else // CS_HAVE_SOUNDCARD_H
 #  include <soundcard.h>
 #endif
 #include "csutil/scf.h"

@@ -370,7 +370,7 @@ int csFile::GetStatus ()
 
 // ------------------------------------------------------------ DiskFile --- //
 
-#ifdef CS_HAS_MEMORY_MAPPED_IO
+#ifdef CS_HAVE_MEMORY_MAPPED_IO
 bool csMemoryMapFile(csMemMapInfo*, char const* filename);
 void csUnMemoryMapFile(csMemMapInfo*);
 
@@ -507,7 +507,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
     printf ("VFS: Successfully opened, handle = %d\n", fileno (file));
 #endif
 
-#if defined(VFS_DISKFILE_MAPPING) && defined(CS_HAS_MEMORY_MAPPED_IO)
+#if defined(VFS_DISKFILE_MAPPING) && defined(CS_HAVE_MEMORY_MAPPED_IO)
   if ((Error == VFS_STATUS_OK) && (!writemode) && 
     (Size >= VFS_DISKFILE_MAPPING_THRESHOLD_MIN) &&
     (Size <= VFS_DISKFILE_MAPPING_THRESHOLD_MAX))
@@ -800,7 +800,7 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
 
 iDataBuffer* DiskFile::TryCreateMapping ()
 {
-#ifdef CS_HAS_MEMORY_MAPPED_IO  
+#ifdef CS_HAVE_MEMORY_MAPPED_IO  
   csMMapDataBuffer* buf = new csMMapDataBuffer (fName);
   if (buf->GetStatus())
   {

@@ -26,11 +26,11 @@
 /**\addtogroup util
  * @{ */
 
-#if defined(CS_HAS_WCHAR_H)
+#if defined(CS_HAVE_WCHAR_H)
 #include <wchar.h>
 #endif
 
-#if defined(CS_USE_FAKE_WCHAR_TYPE)
+#if !defined(CS_HAVE_WCHAR_T)
 typedef uint16 wchar_t;
 #define CS_WCHAR_T_SIZE 2
 #endif

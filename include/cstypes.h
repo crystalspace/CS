@@ -27,7 +27,7 @@
 #include "csplatform.h"
 #include <float.h>
 
-#if defined(CS_HAS_STDINT_H)
+#if defined(CS_HAVE_STDINT_H)
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
 #endif
@@ -37,7 +37,7 @@
 #include <stdint.h>
 #endif
 
-#if defined(CS_HAS_INTTYPES_H)
+#if defined(CS_HAVE_INTTYPES_H)
 #include <inttypes.h>
 #endif
 
@@ -49,7 +49,7 @@
  * types. Use the explicitly-sized types sparingly.
  * @{ */
 
-#ifndef CS_HAS_STDINT_H
+#ifndef CS_HAVE_STDINT_H
 /// unsigned 8-bit integer (0..255)
 typedef unsigned char uint8;
 /// signed 8-bit integer (-128..127)
@@ -76,7 +76,7 @@ typedef __int64 int64;
 #warning Do not know how to declare 64-bit integers
 #endif // CS_COMPILER_GCC
 
-#else // CS_HAS_STDINT_H
+#else // CS_HAVE_STDINT_H
 
 typedef uint8_t uint8;
 typedef int8_t int8;
@@ -88,7 +88,7 @@ typedef uint64_t uint64;
 typedef int64_t int64;
 #endif
 
-#ifdef CS_HAS_INT64_C
+#ifdef CS_HAVE_INT64_C
 
 /**\def CONST_INT64
  * Specify a 64 bit integer constant.
@@ -104,7 +104,7 @@ typedef int64_t int64;
  */
 #define CONST_UINT64(x) UINT64_C(x)
 
-#else // CS_HAS_INT64_C
+#else // CS_HAVE_INT64_C
 
 #if defined(CS_COMPILER_GCC)
 #define CONST_INT64(x)  x ## LL
@@ -116,7 +116,7 @@ typedef int64_t int64;
 #warning Do not know how to contruct 64-bit integer constants
 #endif // CS_COMPILER_GCC
 
-#endif // CS_HAS_INT64_C
+#endif // CS_HAVE_INT64_C
 
 /** @} */
 
@@ -131,7 +131,7 @@ typedef int64_t int64;
 // #defined; newer versions of MSVC will provide them; older ones will not.  If
 // all else fails, then we fake up these types on our own.
 #include <stddef.h>
-#if !defined(CS_HAS_INTPTR_T) && !defined(_INTPTR_T_DEFINED)
+#if !defined(CS_HAVE_INTPTR_T) && !defined(_INTPTR_T_DEFINED)
 /// Integer at least as wide as a pointer
 typedef int intptr_t;
 /// Unsigned integer at least as wide as a pointer
@@ -143,7 +143,7 @@ typedef int ptrdiff_t;
 #define _PTRDIFF_T_DEFINED
 #endif
 
-#if !defined(CS_HAS_INTMAX_T)
+#if !defined(CS_HAVE_INTMAX_T)
 /// Greatest-width integer
 typedef int64 intmax_t;
 /// Greatest-width unsigned integer
@@ -170,7 +170,7 @@ typedef uint64 ulonglong;
 typedef int64 longlong;
 typedef uint64 ulonglong;
 #else
-#ifdef CS_HAS_STDINT_H
+#ifdef CS_HAVE_STDINT_H
 typedef int_least64_t longlong;
 typedef uint_least64_t ulonglong;
 #else 

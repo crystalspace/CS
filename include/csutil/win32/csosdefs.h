@@ -203,7 +203,7 @@
 #include <malloc.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef CS_HAS_SYS_PARAM_H
+#ifdef CS_HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
 #ifndef __CYGWIN32__
@@ -269,7 +269,7 @@
 #endif
 
 // Defines that this platform supports hardware memory-mapped i/o
-#define CS_HAS_MEMORY_MAPPED_IO
+#define CS_HAVE_MEMORY_MAPPED_IO
 
 /// Windows specific memory-mapped I/O stuff.
 struct csMemMapInfo
@@ -344,9 +344,7 @@ struct csMemMapInfo
 #endif
 
 #define CS_PROVIDES_EXPAND_PATH 1
-inline void csPlatformExpandPath(const char* path, char* buffer, int bufsize)
-{
-}
+inline void csPlatformExpandPath(const char* path, char* buffer, int nbuf) {}
 
 struct dirent
 {

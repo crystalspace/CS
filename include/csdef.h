@@ -28,7 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#if defined(CS_HAS_CMATH_H)
+#if defined(CS_HAVE_CMATH_H)
 #include <cmath>
 #else
 #include <math.h>
@@ -38,7 +38,7 @@
 #include <errno.h>
 #include <string.h>
 #include <assert.h>
-#ifdef CS_HAS_SYS_PARAM_H
+#ifdef CS_HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
 
@@ -94,10 +94,10 @@
 #define REINTERPRET_CAST(T,V) CS_REINTERPRET_CAST(T,V)
 #define CONST_CAST(T,V)       CS_CONST_CAST(T,V)
 
-// Platforms which do not have floating-point variations of the standard math.h
+// Platforms which have floating-point variations of the standard math.h
 // cos(), sin(), tan(), sqrt(), etc. functions should define
-// CS_USE_FAKE_MATH_H_FLOAT_FUNCS.
-#if defined(CS_USE_FAKE_MATH_H_FLOAT_FUNCS)
+// CS_HAVE_MATH_H_FLOAT_FUNCS.
+#if !defined(CS_HAVE_MATH_H_FLOAT_FUNCS)
   #define acosf(X)    CS_STATIC_CAST(float,acos(X))
   #define asinf(X)    CS_STATIC_CAST(float,asin(X))
   #define atan2f(X,Y) CS_STATIC_CAST(float,atan2(X,Y))
@@ -117,16 +117,16 @@
   #define ceilf(X)    CS_STATIC_CAST(float,ceil(X))
 #endif
 
-// Platforms with compilers which do not understand the new C++ keyword
-// `explicit' should define CS_USE_FAKE_EXPLICIT_KEYWORD.
-#if defined(CS_USE_FAKE_EXPLICIT_KEYWORD)
+// Platforms with compilers which understand the new C++ keyword `explicit'
+// should define CS_HAVE_CXX_KEYWORD_EXPLICIT.
+#if !defined(CS_HAVE_CXX_KEYWORD_EXPLICIT)
   #define explicit /* nothing */
 #endif
 
-// Platforms with compilers which do not understand the new C++ keyword
-// `typename' should define CS_USE_FAKE_TYPENAME_KEYWORD. For such compilers,
-// we fake up a `typename' keyword which can be used to declare template
-// arguments, such as:
+// Platforms with compilers which understand the new C++ keyword `typename'
+// should define CS_HAVE_CXX_KEYWORD_TYPENAME. For other compilers, we fake up
+// a `typename' keyword which can be used to declare template arguments, such
+// as:
 //
 //   template<typename T> class A {...};
 //
@@ -139,7 +139,7 @@
 //   typename_qualifier C::B var;
 //   typename_qualifier T::Functor get_functor() const;
 // };
-#if defined(CS_USE_FAKE_TYPENAME_KEYWORD)
+#if !defined(CS_HAVE_CXX_KEYWORD_TYPENAME)
   #define typename class
   #define typename_qualifier
 #else

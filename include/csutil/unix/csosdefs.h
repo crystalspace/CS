@@ -37,7 +37,7 @@
 #  define W_OK 4
 #endif
 
-#define CS_HAS_POSIX_MMAP
+#define CS_HAVE_POSIX_MMAP
 #define CS_USE_CUSTOM_ISDIR
 #define CS_PATH_DELIMITER ':'
 #define CS_PATH_SEPARATOR '/'
