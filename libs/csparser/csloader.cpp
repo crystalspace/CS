@@ -182,9 +182,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MATERIALS)
   CS_TOKEN_DEF (MATRIX)
   CS_TOKEN_DEF (MAX_TEXTURES)
-  CS_TOKEN_DEF (MERGE_NORMALS)
-  CS_TOKEN_DEF (MERGE_TEXELS)
-  CS_TOKEN_DEF (MERGE_VERTICES)
   CS_TOKEN_DEF (MIPMAP)
   CS_TOKEN_DEF (MIRROR)
   CS_TOKEN_DEF (MIXMODE)
@@ -229,6 +226,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SKELETON)
   CS_TOKEN_DEF (SKY)
   CS_TOKEN_DEF (SKYDOME)
+  CS_TOKEN_DEF (SMOOTH)
   CS_TOKEN_DEF (SNOW)
   CS_TOKEN_DEF (SOUND)
   CS_TOKEN_DEF (SOUNDS)
@@ -4635,9 +4633,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (FRAME)
     CS_TOKEN_TABLE (ACTION)
-    CS_TOKEN_TABLE (MERGE_NORMALS)
-    CS_TOKEN_TABLE (MERGE_TEXELS)
-    CS_TOKEN_TABLE (MERGE_VERTICES)
+    CS_TOKEN_TABLE (SMOOTH)
     CS_TOKEN_TABLE (TRIANGLE)
     CS_TOKEN_TABLE (SKELETON)
     CS_TOKEN_TABLE (FILE)
@@ -4798,25 +4794,18 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
         }
         break;
 
-      case CS_TOKEN_MERGE_NORMALS:
+      case CS_TOKEN_SMOOTH:
         {
-          int merge_frame = -1;
-          ScanStr (params, "%d", &merge_frame);
-          if (merge_frame > -1 && merge_frame < stemp->GetNumFrames ())
-            stemp->MergeNormals (merge_frame);
-          else stemp->MergeNormals ();
-        }
-        break;
-
-      case CS_TOKEN_MERGE_TEXELS:
-        {
-	  CsPrintf (MSG_WARNING, "MERGE_TEXELS is obsolete.\n");
-        }
-        break;
-
-      case CS_TOKEN_MERGE_VERTICES:
-        {
-	  CsPrintf (MSG_WARNING, "MERGE_VERTICES is obsolete.\n");
+          int num, list[30];
+          ScanStr (params, "%D", list, &num);
+          switch (num)
+          {
+            case 0  :  stemp->MergeNormals ();                  break;
+            case 1  :  stemp->MergeNormals (list[0]);           break;
+            case 2  :  stemp->MergeNormals (list[0], list[1]);  break;
+            default :  CsPrintf (MSG_WARNING, "Confused by SMOOTH options: '%s'\n", params);
+                       CsPrintf (MSG_WARNING, "no smoothing performed\n");
+          }
         }
         break;
 

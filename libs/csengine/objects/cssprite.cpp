@@ -338,15 +338,37 @@ void csSpriteTemplate::MergeNormals ()
 {
   int i;
   for (i = 0; i < GetNumFrames (); i++)
-    MergeNormals (i);
+    MergeNormals (i, i);
 }
-void csSpriteTemplate::MergeNormals (int frame)
+void csSpriteTemplate::MergeNormals (int base)
+{
+  if (base > GetNumFrames())
+  {
+    CsPrintf (MSG_WARNING, "No frame number: \n", base);
+    CsPrintf (MSG_WARNING, "no smoothing performed\n");
+    return;
+  }
+  int i;
+  for (i = 0; i < GetNumFrames (); i++)
+    MergeNormals (base, i);
+}
+void csSpriteTemplate::MergeNormals (int base, int frame)
 {
   int i, j;
 
+  int num_frames = GetNumFrames();
+  if (base  > num_frames) CsPrintf (MSG_WARNING, "No frame number: \n", base);
+  if (frame > num_frames) CsPrintf (MSG_WARNING, "No frame number: \n", frame);
+  if (frame > num_frames || base > num_frames)
+  {
+    CsPrintf (MSG_WARNING, "no smoothing performed\n");
+    return;
+  }
+
   GetFrame(frame)->SetNormalsCalculated (true);
 
-  csVector3* obj_verts = GetVertices (frame);
+  csVector3* obj_verts  = GetVertices (frame);
+  csVector3* base_verts = GetVertices (base);
 
   if (!tri_verts)
   {
@@ -378,7 +400,7 @@ void csSpriteTemplate::MergeNormals (int frame)
     merge[i] = i;
     for (j = 0; j < i; j++)
     {
-      csVector3 difference = obj_verts[i] - obj_verts[j];
+      csVector3 difference = base_verts[i] - base_verts[j];
       if (difference.Norm () < 0.01)
       {
         merge[i] = j;
@@ -1258,29 +1280,6 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   else
     next_frame = cur_action->GetFrame (0);
 
-  csVector3* work_obj_verts;
-
-  // we will need the vertex normals for the current frame
-  tpl->ComputeNormals (this_frame);
-
-  if (tween_ratio)
-  {
-    tpl->ComputeNormals (next_frame); // next frame normals for interpolation
-    UpdateWorkTables (tpl->GetNumTexels ()); // make room in obj_verts;
-
-    int tf_idx = this_frame->GetAnmIndex();
-    int nf_idx = next_frame->GetAnmIndex();
-
-    float remainder = 1 - tween_ratio;
-
-    for (i = 0 ; i < tpl->GetNumTexels() ; i++)
-      obj_verts[i] = tween_ratio * tpl->GetVertex (tf_idx, i)
-        + remainder * tpl->GetVertex (nf_idx, i);
-
-    work_obj_verts = obj_verts.GetArray ();
-  }
-  else work_obj_verts = GetObjectVerts (this_frame);
-
   ResetVertexColors ();
 
   // this is so that sprite gets blackened if no light strikes it
@@ -1296,8 +1295,34 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
       AddVertexColor (i, ambient_color);
   }
 
+  // make sure normals are computed
+  tpl->ComputeNormals (this_frame);
+  if (tween_ratio) tpl->ComputeNormals (next_frame);
+
+  csVector3* work_obj_verts;
+
   if (do_quality_lighting)
+  {
+    if (tween_ratio)
+    {
+      UpdateWorkTables (tpl->GetNumTexels ()); // make room in obj_verts;
+
+      int tf_idx = this_frame->GetAnmIndex();
+      int nf_idx = next_frame->GetAnmIndex();
+
+      float remainder = 1 - tween_ratio;
+
+      for (i = 0 ; i < tpl->GetNumTexels() ; i++)
+        obj_verts[i] = tween_ratio * tpl->GetVertex (tf_idx, i)
+          + remainder * tpl->GetVertex (nf_idx, i);
+
+      work_obj_verts = obj_verts.GetArray ();
+    }
+    else
+      work_obj_verts = GetObjectVerts (this_frame);
+
     UpdateLightingHQ (lights, num_lights, work_obj_verts);
+  }
   else
     UpdateLightingLQ (lights, num_lights, work_obj_verts);
 }
@@ -1335,17 +1360,15 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
     float obj_dist = FastSqrt (obj_sq_dist);
     float wor_dist = FastSqrt (wor_sq_dist);
 
-	csVector3 obj_light_direction = (obj_light_pos - obj_center);
+    csVector3 obj_light_direction = (obj_light_pos - obj_center);
 
     for (j = 0 ; j < tpl->GetNumTexels () ; j++)
     {
-//      csVector3& obj_vertex = object_vertices[j];
-
       csVector3 normal = tpl->GetNormal (tf_idx, j);
       if (tween_ratio)
       {
-        normal = tween_ratio * normal
-          + (1 - tween_ratio) * tpl->GetNormal (nf_idx, j);
+        normal = (1 - tween_ratio) * normal
+          + tween_ratio * tpl->GetNormal (nf_idx, j);
 	float norm = normal.Norm ();
 	if (ABS (norm) > SMALL_EPSILON)
           normal /= norm;
@@ -1355,7 +1378,6 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
       if (obj_sq_dist < SMALL_EPSILON)
         cosinus = 1;
       else
-//        cosinus = (obj_light_pos - obj_vertex) * normal;
         cosinus = obj_light_direction * normal;
 
       if (cosinus > 0)
@@ -1412,8 +1434,8 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
       csVector3 normal = tpl->GetNormal (tf_idx, j);
       if (tween_ratio)
       {
-        normal = tween_ratio * normal
-          + (1 - tween_ratio) * tpl->GetNormal (nf_idx, j);
+        normal = (1 - tween_ratio) * normal
+          + tween_ratio * tpl->GetNormal (nf_idx, j);
 	float norm = normal.Norm ();
 	if (ABS (norm) > SMALL_EPSILON)
           normal /= norm;

@@ -323,9 +323,23 @@ public:
 
   /**
    * Smooth out the gouraud shading by merging the precalculated
-   * vertex normals along seams in this frame
+   * vertex normals along seams in frame 'frame' based on which
+   * vertices are very close in frame 'base'
    */
-  void MergeNormals (int frame);
+  void MergeNormals (int base, int frame);
+
+  /**
+   * Smooth out the gouraud shading by merging the precalculated
+   * vertex normals along seams in all frames based on which
+   * vertices are very close in frame 'base'
+   */
+  void MergeNormals (int base);
+
+  /**
+   * Smooth out the gouraud shading by merging the precalculated
+   * vertex normals along seams in all frames based on which
+   * vertices are very close in each frame
+   */
   void MergeNormals ();
 
   CSOBJTYPE;
