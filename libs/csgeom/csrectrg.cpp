@@ -291,12 +291,23 @@ void csRectRegion::fragmentRect(
 // intersections
 bool csRectRegion::chopEdgeIntersection(csRect &rect1, csRect &rect2)
 {
-  if ((rect1.xmax <= rect2.xmax && rect1.xmin >= rect2.xmin) ||
-      (rect1.ymax <= rect2.ymax && rect1.ymin >= rect2.ymin))
+  if ((rect1.xmin <= rect2.xmin && rect1.xmax >= rect2.xmax) ||
+      (rect1.ymin <= rect2.ymin && rect1.ymax >= rect2.ymax))
   {
-    csRect i(rect1);
-    i.Intersect(rect2);
-    rect1.Subtract(i);
+    printf("csrectrgn: chopping edge\n");
+    printf("\t(%d,%d,%d,%d) intersects ", rect1.xmin, rect1.ymin, rect1.xmax, rect1.ymax);
+    printf("(%d,%d,%d,%d)", rect2.xmin, rect2.ymin, rect2.xmax, rect2.ymax);
+
+    csRect i(rect2);
+    i.Intersect(rect1);
+    rect2.Subtract(i);
+
+    printf(" at (%d,%d,%d,%d)\n", i.xmin, i.ymin, i.xmax, i.ymax);
+
+
+    printf("\tyielding (%d,%d,%d,%d) and ", rect1.xmin, rect1.ymin, rect1.xmax, rect1.ymax);
+    printf("(%d,%d,%d,%d)\n", rect2.xmin, rect2.ymin, rect2.xmax, rect2.ymax);
+
     return true;
   }
   return false;
@@ -318,7 +329,7 @@ void csRectRegion::Include(csRect &rect)
   {
     csRect &r1 = region[i];
     csRect r2(rect);
-
+    
     // Check to see if these even touch
     if (r2.Intersects(r1)==false)
       continue;
@@ -345,14 +356,24 @@ void csRectRegion::Include(csRect &rect)
     // what.  It may be more efficient to chop part off of one or the other.
     // Usually, it's easier to chop up the smaller one.
 
-    bool edgeChopWorked;
+    r2.Set(rect);
+    
+    if (!chopEdgeIntersection(r1, r2))
+    {
+      if (chopEdgeIntersection(r2, r1))
+      {
+        region[i].Set(r1);
+        continue;
+      }
+    }
+    else
+    {
+      rect.Set(r2);
 
-    if (!(edgeChopWorked = chopEdgeIntersection(r1, r2)))
-      edgeChopWorked = chopEdgeIntersection(r2, r1);
-  
-    // If we were able to chop the edge off of one of them, cool.
-    if (edgeChopWorked)
-      continue;
+      if (rect.IsEmpty()) return;
+      else                continue;
+    }
+      
 
     // Otherwise we have to do the most irritating part: A full split operation
     // that may create other rects that need to be tested against the database
@@ -368,6 +389,9 @@ void csRectRegion::Include(csRect &rect)
     // Fragment it
     fragmentRect(r1, r2, true, true);
   } // end for
+
+  // In the end, we need to put the rect on the stack
+  if (!rect.IsEmpty()) pushRect(rect);
 }
 
 void 
