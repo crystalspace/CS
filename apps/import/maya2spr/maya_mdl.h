@@ -38,6 +38,7 @@ protected:
     NodeAnimCurveTL *animnode;
     NodeMesh        *meshnode;
     NodeFile        *filenode;
+    csVector3        translate,scale;
 
     bool CreateNode(MayaInputFile& file,DAGNode& tree);
 

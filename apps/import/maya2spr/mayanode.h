@@ -88,16 +88,26 @@ class NodeTransform : public DAGNode
 {
 protected:
 
-    double transX, transY, transZ;
-    double rotX, rotY, rotZ;
+    csVector3 trans, rot, scale;
 
     bool LoadAttr(MayaInputFile& file);
-    bool LoadTransformAttr(MayaInputFile& file);
+    bool LoadTransformAttr(MayaInputFile& file,csVector3& vec);
     bool LoadRotationAttr(MayaInputFile& file);
 
 public:
+
+    NodeTransform();
     virtual bool Load(MayaInputFile& file);
     virtual bool IsType(const char *type) { return (!strcmp("NodeTransform",type)); };
+
+    void GetTransform(csVector3& t)
+    {
+	t = trans;
+    }
+    void GetScale(csVector3& s)
+    {
+	s = scale;
+    }
 };
 
 
@@ -159,6 +169,8 @@ protected:
     VertUV  *CSVerts;
     int     *CSPoly[3];
 
+    csVector3 translate;    // Vector to subtract from each vertex point to center object
+    csVector3 scale;        // Vector to scale each vertex by once it is centered on 0,0,0
 
     bool GetArrayRange(csString& token,int& start,int& stop);
 
@@ -173,6 +185,8 @@ protected:
     int  GetStopVertex(int edge,int face);
 
 public:
+    
+    NodeMesh(csVector3& trans,csVector3& scale);
 
     virtual bool Load(MayaInputFile& file);
     bool WriteVertices(FILE *f);
@@ -212,7 +226,7 @@ public:
 class NodeAnimCurveTL : public DAGNode
 {
 protected:
-    int  index,coord,frames;
+    int  index,coord,frames,expected_verts;
 
     bool GetIndexCoord(csString& tok,int& index,int& coord);
     
@@ -224,6 +238,7 @@ public:
     float   **animX,**animY,**animZ;
 
     NodeAnimCurveTL(int vertices);
+    void CreateDefault();
     virtual bool Load(MayaInputFile& file);
     virtual void PrintStats(FILE *s,int level);
     virtual bool IsType(const char *type) { return (!strcmp("NodeAnimCurveTL",type)); };

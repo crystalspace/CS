@@ -3,6 +3,17 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+30-Mar-2003
+	- Keith Fulton enhanced maya2spr in the following ways.
+	    - Attempted to fix all bugs except for the last two in
+	      http://sourceforge.net/mailarchive/message.php?msg_id=4051103
+	    - maya2spr now supports maya exports with no animation.
+              It makes a single frame, single action sprite in this case.
+	    - maya2spr now uses the initial translation and scaling
+	      transformation specified in the .ma file.
+	    - Hopefully it won't crash as much.  If you have problems
+	      or crashes, email your .ma and your command line you tried
+  	      to keith@paqrat.com and I will try to fix your problems.
 29-Mar-2003
 	- Oktal added double2longlong and longlong2double functions to
 	  csendian.h, for converting doubles to a portable format, like

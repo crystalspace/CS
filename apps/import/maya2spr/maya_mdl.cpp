@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <conio.h>
 
 #include "cssysdef.h"
 #include "maya_mdl.h"
@@ -58,6 +59,8 @@ Maya4Model::~Maya4Model()
 void Maya4Model::Clear()
 {
     animnode = NULL;
+    meshnode = NULL;
+    filenode = NULL;
 }
 
 bool Maya4Model::ReadMAFile(const char* mdlfile)
@@ -86,6 +89,14 @@ bool Maya4Model::ReadMAFile(const char* mdlfile)
             }
         }
     }
+
+    // If file has loaded with no anim curves, create a default 0 anim curve
+    if (!animnode)
+    {
+	printf("Creating default animcurveTL...\n");
+        animnode = new NodeAnimCurveTL(meshnode->CountVertices()); // position paths for each vertex
+	animnode->CreateDefault();
+    }
     return true;
 }
 
@@ -102,12 +113,14 @@ bool Maya4Model::CreateNode(MayaInputFile& file,DAGNode& tree)
         newnode = new NodeTransform;        // positioning of mesh
     else if (tok == "mesh")
     {
-        meshnode = new NodeMesh;             // vertices, edges, polys
+	printf("Mesh will be translated by (%1.2f,%1.2f,%1.2f)...\n",translate.x,translate.y,translate.z);
+	printf("Mesh will be scaled by (%1.2f,%1.2f,%1.2f)...\n",scale.x,scale.y,scale.z);
+        meshnode = new NodeMesh(translate,scale); // vertices, edges, polys
         newnode = meshnode;
     }
     else if (tok == "file")
     {
-        filenode = new NodeFile;             // texture
+        filenode = new NodeFile;            // texture
         newnode  = filenode;
     }
     else if (tok == "animCurveTL")
@@ -132,6 +145,12 @@ bool Maya4Model::CreateNode(MayaInputFile& file,DAGNode& tree)
     {
         NodeMesh *mesh = (NodeMesh *)newnode;
         vertices = mesh->CountVertices();
+    }
+    else if (newnode->IsType("NodeTransform"))
+    {
+	NodeTransform *tr = (NodeTransform *)newnode;
+	tr->GetTransform(translate);
+	tr->GetScale(scale);
     }
 
     if (newnode->Parent())
@@ -178,7 +197,10 @@ bool Maya4Model::WriteSPR(const char* spritename, csDLinkList& /* <Animation> */
     fprintf(f,"   <plugin>crystalspace.mesh.loader.factory.sprite.3d</plugin>\n");
     fprintf(f,"   <params>\n");
     
-    filenode->Write(f);
+    if (filenode)
+        filenode->Write(f);
+    else
+	fprintf(f,"      <material>no_maya_material</material>\n");
 
     for (int frame=0; frame<((animnode)?animnode->GetFrames():1); frame++)
     {
@@ -222,7 +244,11 @@ bool Maya4Model::WriteSPR(const char* spritename, csDLinkList& /* <Animation> */
         else
             stop = (animnode)?animnode->GetFrames():start;
 	
-	frame_duration /= (stop-start);
+	if (stop>start)
+	    frame_duration /= (stop-start);
+	else
+	    frame_duration = 1000;
+
 	if (!frame_duration)
 	    frame_duration = 67; // default is 15 fps.
 

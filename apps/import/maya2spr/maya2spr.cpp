@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <conio.h>
+
 
 #include "cssysdef.h"
 #include "maya_mdl.h"
@@ -187,5 +189,6 @@ int main(int argc,char *argv[])
   delete mdl;
 
   printf("maya2spr completed successfully.\n");
+
   return 0;
 }

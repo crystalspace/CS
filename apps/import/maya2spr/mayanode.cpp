@@ -23,6 +23,8 @@
 #include "mayanode.h"
 #include "binarytree.h"
 
+#include <conio.h>
+
 
 void DAGNode::PrintStats(FILE *s,int level) 
 {
@@ -40,6 +42,13 @@ void DAGNode::PrintStats(FILE *s,int level)
 
   } while (where != first);
 
+}
+
+NodeTransform::NodeTransform()
+{
+    trans.Set(0,0,0);
+    scale.Set(0,0,0);
+    rot.Set(0,0,0);
 }
 
 bool NodeTransform::Load(MayaInputFile& file)
@@ -88,12 +97,20 @@ bool NodeTransform::LoadAttr(MayaInputFile& file)
         }
         else if (tok == ".t")
         {
-            return LoadTransformAttr(file);
+            return LoadTransformAttr(file,trans);
+        }
+        else if (tok == ".s")
+        {
+            return LoadTransformAttr(file,scale);
         }
         else if (tok == ".r")
         {
-            return LoadRotationAttr(file);
+            return LoadTransformAttr(file,rot);
         }
+	else if (tok == ".sp")
+	{
+            return LoadTransformAttr(file,trans);
+	}
         else if (tok == "createNode")
         {
             file.PushToken(tok);
@@ -103,7 +120,7 @@ bool NodeTransform::LoadAttr(MayaInputFile& file)
     return false;
 }
 
-bool NodeTransform::LoadTransformAttr(MayaInputFile& file)
+bool NodeTransform::LoadTransformAttr(MayaInputFile& file,csVector3& vec)
 {
     csString tok;
 
@@ -123,13 +140,13 @@ bool NodeTransform::LoadTransformAttr(MayaInputFile& file)
         return false;
     }
     file.GetToken(tok);
-    transX = atof(tok);
+    vec.x = atof(tok);
 
     file.GetToken(tok);
-    transY = atof(tok);
+    vec.y = atof(tok);
 
     file.GetToken(tok);
-    transZ = atof(tok);
+    vec.z = -atof(tok);
 
     file.GetToken(tok);
     if (tok != ";")
@@ -140,50 +157,38 @@ bool NodeTransform::LoadTransformAttr(MayaInputFile& file)
     return true;
 }
 
-bool NodeTransform::LoadRotationAttr(MayaInputFile& file)
-{
-    csString tok;
-
-    file.GetToken(tok);
-
-    if (tok != "-type")
-    {
-        file.SetError("Expected -type token in Rotation Attr.");
-        return false;
-    }
-
-    file.GetToken(tok);
-
-    if (tok != "double3")
-    {
-        file.SetError("-type in Rotation Attr must be double3.");
-        return false;
-    }
-
-    file.GetToken(tok);
-    rotX = atof(tok);
-
-    file.GetToken(tok);
-    rotY = atof(tok);
-
-    file.GetToken(tok);
-    rotZ = atof(tok);
-
-    file.GetToken(tok);
-    if (tok != ";")
-    if (tok != ";")
-    {
-        file.SetError("Missing semicolon (;) at end of Rotation Attr.");
-        return false;
-    }
-
-    return true;
-}
-
-
-
 
 /*--------------------------------------------------------------------------*/
+
+NodeMesh::NodeMesh(csVector3& trans,csVector3& s)
+{
+    translate = trans;
+    scale     = s;
+
+    countelem = 0;  // count comes before enumeration
+    type = 0;       // indicator of using double, int, string, etc.
+
+    count_uv=0;    //  how many u,v's are there?
+    u = v = NULL;       //  u,v mapping set for all vertices
+
+    count_vert=0;     //  how many x,y,z's follow?
+    vertex = NULL;      //  x,y,z coords for all vertices
+    animvertex = NULL;  //  x,y,z coords for all vertices
+    vertnorms = NULL;   //  Vertex normals for all vertices
+
+    count_edge=0;            // how many edges?
+    edgestart=NULL;
+    edgestop=NULL;  // edge definitions (index to vertices)
+
+    count_face=0;      // how many faces are there (both e1,e2,e3 and uv1, etc.)
+    faceedge=NULL;    // edges of triangle faces (index to edges)
+    tri_normals=NULL; // normals to each poly
+    uv1 = uv2 = uv3 = NULL;  // indices into u[] and v[] for each point
+    
+    countcsverts=0;
+    CSVerts=NULL;
+    CSPoly[0] = CSPoly[1] = CSPoly[2] = NULL;
+}
 
 void NodeMesh::PrintStats(FILE *s,int level)
 {
@@ -264,7 +269,12 @@ bool NodeMesh::LoadAttr(MayaInputFile& file)
                 v = new float[countelem];
 
                 count_uv = countelem;
-
+		int i;
+		for (i=0; i<countelem; i++)
+		{
+		    u[i] = 0;
+		    v[i] = 0;
+		}
                 if (strlen(countname)>13) // if subscript is here
                 {
                     return LoadUVMap(file,tok); // actually only partial for large models per line
@@ -465,8 +475,11 @@ bool NodeMesh::LoadVertexList(MayaInputFile& file,csString& token)
             // Must reverse because Maya uses opposite Z orientation
             vertex[i].z = -vertex[i].z;
         }
+	vertex[i] -= translate;
+	vertex[i].x *= scale.x;
+	vertex[i].y *= scale.y;
+	vertex[i].z *= scale.z;
     }
-
     return true;
 }
 
@@ -1000,9 +1013,9 @@ bool NodeFile::LoadFilenameAttr(MayaInputFile& file)
     else
         file.PushToken(tok);
 
-    if (tok != "(")
+    if (tok != "(" && tok != "\"")
     {
-        file.SetError("Filenames for textures must be within ()'s.");
+        file.SetError("Filenames for textures must be within ()'s or in quotes.");
         return false;
     }
 
@@ -1011,9 +1024,17 @@ bool NodeFile::LoadFilenameAttr(MayaInputFile& file)
     printf(" Filename was <%s>\n",(const char *)filename);
 
     file.GetToken(tok);
-    if (tok != ")")
+    if (tok == ":") // check for special case of path including drive letter
     {
-        file.SetError("Filenames for textures must be within ()'s.");
+	filename.Append(tok);   // append the colon to the drive letter
+	file.GetToken(tok);	// get the rest of the filename
+	filename.Append(tok);   // append the part of the filename behind the colon
+	file.GetToken(tok);     // prefetch the next token
+    }
+
+    if (tok != ")" && tok != "\"")
+    {
+        file.SetError("Filenames for textures must be within ()'s or quotes.");
         return false;
     }
     else
@@ -1034,6 +1055,7 @@ bool NodeFile::LoadFilenameAttr(MayaInputFile& file)
 NodeAnimCurveTL::NodeAnimCurveTL(int vertices)
 {
     totalcurves = 0;
+    expected_verts = vertices;
 
     animX = new float* [ vertices ];
     animY = new float* [ vertices ];
@@ -1051,6 +1073,22 @@ void NodeAnimCurveTL::PrintStats(FILE *s,int level)
     fprintf(s," (%d frames)\n",frames);
 
     DAGNode::PrintStats(s,level+1);
+}
+
+void NodeAnimCurveTL::CreateDefault()
+{
+    frames = 1;
+
+    for (int i=0; i<expected_verts; i++)
+    {
+	animX[i] = new float[frames]; 
+	animX[i][0] = 0;
+	animY[i] = new float[frames]; 
+	animY[i][0] = 0;
+	animZ[i] = new float[frames];
+	animZ[i][0] = 0;
+    }
+    totalcurves = expected_verts * 3;
 }
 
 bool NodeAnimCurveTL::Load(MayaInputFile& file)

@@ -229,9 +229,6 @@ bool MayaInputFile::GetToken(csString& tok)
         tok.DeleteAt(tok.Length()-1);
     }
 
-//    printf("token <%s>\n",(const char *)tok);
-//    getch();
-
     return (tok.Length() > 0);
 }
 
