@@ -3,8 +3,16 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+6-May-2003
+	- Eric Sunshine made the following changes:
+	    - Fixed Linux joystick makefile so that makefile target and
+	      generated plugin name agree with one another (previously, one was
+	      "joylin" and the other "csjoylin").
+	    - Removed several obsolete and bogus entries from scf.cfg.
+	    - Added several missing entries to scf.cfg.
+	    - Fixed problem in CoreGraphics driver where it was not specifying
+	      its SCF dependency properly.
 5-May-2003
-	- Marten Svanfeldt fixed a few compilation errors in MSVC 7.1
 	- Eric Sunshine changed jobber.pl and snapshot.py to once again use
 	  /home/groups/c/cr/crystal as a working area rather than /tmp.  It
 	  seems that the snapshot script runs out of disk space when using
@@ -19,11 +27,12 @@ The history order is reversed so that new features are at the top.
 	  to awsScrollBar::Setup() to correct the placement of the horizontal
 	  scroll bar left/right buttons.  Eric also corrected the initial
 	  position of the "knob" for horzontal scrollers.
-	- In the csperl5 makefile, Oktal removed the Perl module's dependency
-	  on the SWIG interface file, so that it will not try to rebuild the
-	  module (which will fail if users do not have SWIG installed) when
-	  this interface file is updated (the module will be updated with the
-	  same changes when the interface file is modified).
+	- Oktal removed the Perl module's dependency on the SWIG interface file
+	  in the csperl5 makefile so that it will not try to rebuild the module
+	  (which will fail if users do not have SWIG installed) when this
+	  interface file is updated (the module will be updated with the same
+	  changes when the interface file is modified).
+	- Marten Svanfeldt fixed a few compilation errors in MSVC 7.1
 4-May-2003
 	- Eric Sunshine made the following changes:
 	    - Updated Swig test in configure.ac to utilize new optional version
