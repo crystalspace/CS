@@ -280,10 +280,11 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
     {
       csStringID typeID;
       iShader* shader = shaderIter.Next(typeID);
-      const char* shadername = shader->QueryObject()->GetName();
+      if (!shader || !typeID) continue;
+      const char *shadername = shader->QueryObject()->GetName();
+      const char *shadertype = stringset->Request(typeID);
       if (orcompatID == typeID && orlightID == stringset->Request(shadername))
         continue;
-      const char* shadertype = stringset->Request(typeID);
 
       csRef<iDocumentNode> shaderNode = CreateNode(child, "shader");
       shaderNode->SetAttribute("type", shadertype);
