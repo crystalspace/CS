@@ -52,6 +52,7 @@ MIKMOD.LIBS = mikmod.lib ;
 MNG.AVAILABLE = yes ;
 MNG.LIBS = libmng.lib ;
 ODE.AVAILABLE = yes ;
+ODE.CFLAGS = "/D \"CS_HAS_ODE\"" ;
 ODE.LIBS = ode.lib ;
 OPENAL.AVAILABLE = yes ;
 OPENAL.LIBS = openal32.lib alut.lib ;
