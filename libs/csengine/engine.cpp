@@ -1073,7 +1073,8 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
         current.ambient_green, current.ambient_blue, current.reflect,
         current.radiosity, current.cosinus_factor,
         current.lightmap_size);
-      VFS->WriteFile ("precalc_info", data, strlen (data));
+      if (lightcache_mode & CS_ENGINE_CACHE_WRITE)
+        VFS->WriteFile ("precalc_info", data, strlen (data));
       Report ("Lightmap data is not up to date (reason: %s).", reason);
       lightcache_mode &= ~CS_ENGINE_CACHE_READ;
     }

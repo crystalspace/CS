@@ -5,6 +5,9 @@ The history order is reversed so that new features are at the top.
 	  - Improved lighting on water procedural texture in flarge.
 	- Fixed SCF dependencies for fancy console and standard console.
 	  Thanks to res <resqu@gmx.ch> for spotting this.
+	- Fixed a problem that precalc_info is written even if caching
+	  of lightmap data is disabled. Thanks to res <reque@gmx.ch> for
+	  spotting this.
 22-Oct-2001
 	- Fixed a bug in the 'addghost' console command. It would fail
 	  if you used it more than once.
