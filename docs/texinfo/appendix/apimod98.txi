@@ -1388,21 +1388,26 @@ was not useful.
 
 @code{iFont::SetSize()} has been removed. Instead, the font size is 
 supplied when the font is created with @code{iFontServer::LoadFont()}.
-This change has been made to fix the issue that multiple LoadFont()
-calls returned the same instance of a font, and thus subsequent calls 
-of @code{SetSize} affected a font globally (e.g. all Arial fonts would
-have the same size.) The new behaviour is to only return an existing
-instance of a font when both the font name and font size match.
+This change has been made to fix the problem that multiple LoadFont()
+calls were returning the same instance of a font, and thus subsequent calls 
+of @code{SetSize()} affected a font globally (e.g. all Arial fonts would
+be the same size). The new behaviour is to return only an existing
+instance of a font when both the font name and font size match.  If there is
+no existing instance with the requested name and size, then a new instance
+is created and returned.
 
-Code like:
+Font-related client code, such as the following:
+
 @example
 csRef<iFont> font = fontserver->LoadFont ("myfont.ttf");
 font->SetSize (23);
-g2d->Write (font, /* ... */);
+g2d->Write (font, @dots{});
 @end example
 
+@noindent
 Should be changed to:
+
 @example
 csRef<iFont> font = fontserver->LoadFont ("myfont.ttf", 23);
-g2d->Write (font, /* ... */);
+g2d->Write (font, @dots{});
 @end example

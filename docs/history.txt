@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Mar-2004
+	- Eric Sunshine performed an overhaul of the "Creating an External
+	  Crystal Space Application" HOWTO since it was extremely outdated.
+	  Also overhauled and simplified the related
+	  cs-config/Makefile.template.
+	- Eric Sunshine performed some minor cleanup of material recently added
+	  to apimod98.txi.
 10-Mar-2004
 	- res made the following changes related to fonts:
 	    - Removed iFontServer::GetFont() and GetFontCount().
