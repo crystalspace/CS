@@ -6,8 +6,12 @@
 
 outfile=$1
 description=$2
+if test -n "$3"; then
+  verfile=$3
+else
+  verfile=include/csver.h
+fi
 
-verfile=include/csver.h
 vmajor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e 's/#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < ${verfile}`
 vminor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e 's/#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < ${verfile}`
 vminor=`echo ${vminor} | sed -e 's/[^0-9]//g'`

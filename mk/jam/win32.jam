@@ -12,9 +12,9 @@ WAVEOUT.LFLAGS = -ldsound -lwinmm ;
 
 actions LinkPlugin bind NEEDLIBS
 {
-  $(TOP)/libs/cssys/win32/mkverres.sh $(TEMP)/$(NAME:B)version.rc "$($(NAME)_help)"
+  $(TOP)/libs/cssys/win32/mkverres.sh $(TEMP)/$(NAME:B)version.rc "$($(NAME)_help)" $(TOP)/include/csver.h
   $(TOP)/libs/cssys/win32/mergeres.sh $(TEMP)/$(NAME:B)resource.rc ./ $(TEMP)/$(NAME:B)version.rc $($(NAME:B)_WIN32RESOURCE)
-  windres --include-dir include $(RCFLAGS) -i $(TEMP)/$(NAME:B)resource.rc -o $(TEMP)/$(NAME:B)resource.o
+  windres --include-dir $(BUILDTOP)/include --include-dir $(TOP)/include $(RCFLAGS) -i $(TEMP)/$(NAME:B)resource.rc -o $(TEMP)/$(NAME:B)resource.o
 
   dllwrap --driver-name=$(CMD.LINK) --dllname $(NAME:B) -o $(<) $(TEMP)/$(NAME:B)resource.o $(>) $(NEEDLIBS) $(ADDLIBS) $(LINKLIBS) -mwindows -mconsole
   rm -f $(TEMP)/$(NAME:B)version.rc $(TEMP)/$(NAME:B)resource.rc
@@ -22,9 +22,9 @@ actions LinkPlugin bind NEEDLIBS
 
 actions LinkApplication bind NEEDLIBS
 {
-  $(TOP)/libs/cssys/win32/mkverres.sh $(TEMP)/$(NAME:B)version.rc "$($(NAME)_help)"
+  $(TOP)/libs/cssys/win32/mkverres.sh $(TEMP)/$(NAME:B)version.rc "$($(NAME)_help)" $(TOP)/include/csver.h
   $(TOP)/libs/cssys/win32/mergeres.sh $(TEMP)/$(NAME:B)resource.rc ./ $(TEMP)/$(NAME:B)version.rc $($(NAME:B)_WIN32RESOURCE)
-  windres --include-dir include $(RCFLAGS) -i $(TEMP)/$(NAME:B)resource.rc -o $(TEMP)/$(NAME:B)resource.o
+  windres --include-dir $(BUILDTOP)/include --include-dir $(TOP)/include $(RCFLAGS) -i $(TEMP)/$(NAME:B)resource.rc -o $(TEMP)/$(NAME:B)resource.o
 
   $(CMD.LINK) -o $(<) $(TEMP)/$(NAME:B)resource.o $(>) $(NEEDLIBS) $(LINKLIBS) $(ADDLIBS) $(LIBS.EXE)
   rm -f $(TEMP)/$(MAME:B)version.rc $(TEMP)/$(NAME:B)resource.rc
