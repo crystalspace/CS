@@ -16,13 +16,14 @@
 //
 //-----------------------------------------------------------------------------
 #import "NeXTMenu.h"
-#import "sysdef.h"
-#import "csutil/inifile.h"
 extern "Objective-C" {
 #import <appkit/Application.h>
 #import <appkit/Menu.h>
 #import <appkit/MenuCell.h>
 }
+#import "sysdef.h"
+#import "csutil/inifile.h"
+#undef interface // This COM macro interferes with Objective-C's @interface.
 
 static Menu* build_menu( char const* section, csIniFile const& );
 
