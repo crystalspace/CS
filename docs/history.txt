@@ -156,6 +156,10 @@ The history order is reversed so that new features are at the top.
 	  the owner ship of a passed iEvent is treated.
 	- Philip Wyett fixed error accessing private class awscG2D under
           MSVC 6.
+	- res made a small change to his AddAffectedLightingInfo() fix:
+	  uses csHashMap::AddNoTest() instead of csHashMap::Add() now
+	  (the latter one tests whether a hash object already exists in the
+	  hash, which is never the case here)
 10-May-2003
 	- Philip Wyett eliminated the 88 double to float conversion compiler
           warnings in gtreeldr.cpp under MSVC 6.
