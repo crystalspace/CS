@@ -62,7 +62,6 @@ void csTerrainQuad::Build (int depth)
   children[3]->Build (depth-1);
 }
 
-
 /// smallest value for horizon
 #define MININF -99999999.0
 
@@ -146,9 +145,20 @@ void csTerrainQuad::ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
     if(sqdist[i] < mindist) mindist = sqdist[i];
     else if(sqdist[i] > maxdist) maxdist = sqdist[i];
   }
-  if(maxdist == 0.0) mindy = -MININF; // MAXINF
+
+  if(maxdist == 0.0) 
+  {
+    if(min_height < 0) mindy = MININF; 
+    else mindy = -MININF; 
+  }
   else mindy = min_height / qsqrt(maxdist);
-  maxdy = max_height / qsqrt(mindist);
+
+  if(mindist == 0.0) 
+  {
+    if(max_height < 0) maxdy = MININF; 
+    else maxdy = -MININF; 
+  }
+  else maxdy = max_height / qsqrt(mindist);
 }
 
 bool csTerrainQuad::CheckIfAbove(float* horizon, int horsize, int left, 
