@@ -89,10 +89,10 @@ rule Plugin
 rule PluginMetaData
 {
   local target = $(>:G=$(GRISTMETA)) ;
-  Depends $(<) : $(target) ;
+  Depends $($(<)_TARGET) : $(target) ;
   Depends $(target) : $(>) ;
   MakeLocate $(target) : $(LOCATE.TARGETS) ;
-  File $(target) : $(>) ;
+  Copy $(target) : $(>) ;
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
 }
