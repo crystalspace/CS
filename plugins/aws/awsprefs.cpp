@@ -291,8 +291,8 @@ bool awsPrefManager::Load (const char *def_file)
 
   printf (
     "\tload successful (%lu windows, %lu skins loaded.)\n",
-    win_defs.Length() - ncw,
-    skin_defs.Length() - ncs);
+    (unsigned long)(win_defs.Length() - ncw),
+    (unsigned long)(skin_defs.Length() - ncs));
 
   return true;
 }

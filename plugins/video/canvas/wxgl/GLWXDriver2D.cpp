@@ -153,7 +153,7 @@ bool csGraphics2DWX::Open()
     {
       WX_GL_RGBA,
       WX_GL_DOUBLEBUFFER,
-      NULL
+      0
     };
 
   /*WX_GL_DEPTH_SIZE, format[glpfvDepthBits],

@@ -25,6 +25,8 @@ chronological order.
 	  lightmap system that we'll have in Crystal Space.
 	- Jorrit removed the feature in walktest to be able to change the
 	  zip file extension. Don't really see why that is useful.
+	- Eric Sunshine eliminated a number of compilation warnings reported by
+	  gcc on Linux/PowerPC.
 10-Aug-2004
 	- PK implemented the csThingFactorySaver.
 	- Jorrit fixed a few places in CS where a reverse size_t loop was done
