@@ -15,6 +15,10 @@ chronological order.
 	- Jorrit optimized Dynavis so that nodes also use the write queue
 	  now. Not sure if this really is an optimization. Have to do further
 	  tests.
+	- Wouter fixed a bug in the input console, csconin, where if it
+	  would hang when truncating the command history. It was using
+	  Delete (0) instead of DeleteIndex (0). Additionally, the history
+	  position could be invalid after truncation.
 11-Nov-2003
 	- Eric Sunshine fixed MacOS/X application menu malfunction introduced
 	  on August 1, 2003 when configuration was changed so that OSXDelegate

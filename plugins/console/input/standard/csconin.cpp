@@ -218,7 +218,9 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
 	    {
 	      HistoryPos = History.Push (csStrNew (line)) + 1;
 	      while (History.Length () > MaxLines)
-		History.Delete (0);
+		History.DeleteIndex (0);
+  	      if(HistoryPos >= History.Length ())
+    	        HistoryPos = History.Length () - 1;
 	    }
 	    line.Replace ("");
 	    strCursorPos = 0;
@@ -339,7 +341,9 @@ void csConsoleInput::SetBufferSize (int iSize)
 {
   MaxLines = (iSize >= 0) ? iSize : 0;
   while (History.Length () > MaxLines)
-    History.Delete (0);
+    History.DeleteIndex (0);
+  if(HistoryPos >= History.Length ())
+    HistoryPos = History.Length () - 1;
 }
 
 void csConsoleInput::Clear ()
