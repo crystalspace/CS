@@ -9,6 +9,8 @@ chronological order.
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.
+	- res fixed the corruption of the graphics on Win32 when Alt+Tabbing 
+	  out and back into a fullscreen app with GL canvas.
 30-Jun-2004
 	- Jorrit modified walktest so that the default 'perftest' command
 	  does 200 frames instead of 100. That is more accurate.
