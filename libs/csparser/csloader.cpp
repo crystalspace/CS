@@ -1745,7 +1745,13 @@ ImageFile* csLoader::load_image (const char* name)
   ifile = ImageLoader::load ((UByte *)buf, size);
   CHK (delete [] buf);
 
-  if (ifile && (ifile->get_status () & IFE_Corrupt))
+  if (!ifile)
+  {
+    CsPrintf (MSG_WARNING, "'%s': Cannot load image. Unknown format or wrong extension!\n",name);
+    return NULL;
+  }
+
+  if (ifile->get_status () & IFE_Corrupt)
   {
     CsPrintf (MSG_WARNING, "'%s': %s!\n",name,ifile->get_status_mesg());
     CHK (delete ifile);
