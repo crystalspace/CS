@@ -1,6 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
 18-Jan-2001
+	- Wouter Wijngaards fixed Martin's stricmp() in cfgfile.cpp.
+	  stricmp is not portable, please use strcasecmp.
+	- Martin Geisse added a new module for configuration files with
+	  another format than INI. This format uses a flat list of config
+	  files with pseudo-hierarchy instead of the sections in INI
+	  files. The new system is intended to replace the current system
+	  soon.
+	- Martin also moved the dungeon plug-in to the new config system
+	  and fixed some bugs in both modules.
 	- Extended iMeshObject interface with SetVisibleCallback() and
 	  GetVisibleCallback(). This function will essentially provide
 	  the same functionality as SetDrawCallback2() does for csSprite3D.
