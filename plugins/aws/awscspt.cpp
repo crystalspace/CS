@@ -52,7 +52,10 @@ awsSimpleCanvas::Animate (csTicks current_time)
 
 void 
 awsSimpleCanvas::SetSize(int w, int h)
-{  mat_w=w; mat_h=h; }
+{  
+  mat_w=w; 
+  mat_h=h; 
+}
 
 /////////
 
@@ -72,6 +75,8 @@ SCF_IMPLEMENT_IBASE_END
 awsSingleProctexCanvas::awsSingleProctexCanvas(int w, int h, iObjectRegistry* object_reg, iEngine* engine,
       	iTextureManager* txtmgr, const char *name)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
+
   canvas = new awsSimpleCanvas ();
   canvas->DisableAutoUpdate();
   canvas->SetSize(w, h);
@@ -93,8 +98,8 @@ awsSingleProctexCanvas::Animate (csTicks current_time)
 
 void awsSingleProctexCanvas::Show (csRect *area, iGraphics3D *g3d)
 {
-  int w = (G2D()->GetWidth()  < g3d->GetWidth() ? G2D()->GetWidth() : g3d->GetWidth());
-  int h = (G2D()->GetHeight() < g3d->GetHeight() ? G2D()->GetHeight() : g3d->GetHeight());
+  int w = ((!g3d) || (G2D()->GetWidth()  < g3d->GetWidth())  ? G2D()->GetWidth() : g3d->GetWidth());
+  int h = ((!g3d) || (G2D()->GetHeight() < g3d->GetHeight()) ? G2D()->GetHeight() : g3d->GetHeight());
   
   area->xmin = (area->xmin < 0 ? 0 : area->xmin);
   area->ymin = (area->ymin < 0 ? 0 : area->ymin);

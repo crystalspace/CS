@@ -132,11 +132,20 @@ void awsMultiProctexCanvas::awscG2D::DrawLine (
       
       if (rect.Intersects (crect))
       {
-   
-
         awsSimpleCanvas *canvas = awsc->GetFlatCanvas(i);
-        canvas->G2D()->DrawLine((float)x1-crect.xmin, (float)y1-crect.ymin, 
-                                (float)x2-crect.xmin, (float)y2-crect.ymin, color);
+	if (((y1-crect.ymin) < crect.Height()) || ((y2-crect.ymin) < crect.Height())) {
+	  // hack to avoid crash due to the behaviour of DrawLine():
+	  // DrawLine() expects the clipping rect to include bottom
+	  // and right edges BUT it never draws the last pixel of a line.
+	  // so we cannot draw correct lines across proctexes without either
+	  //  a) setting the last pixel by hand if needed
+	  //  b) using a wrong clipping rect
+	  // we do (b) at the moment, so we don't draw lines with both y ==
+	  // Height() (otherwise it would crash because that line is obviously 
+	  // invalid
+          canvas->G2D()->DrawLine((float)x1-crect.xmin, (float)y1-crect.ymin, 
+                                  (float)x2-crect.xmin, (float)y2-crect.ymin, color);
+	}
       }
     }
 }
