@@ -330,7 +330,19 @@ Blocks::Blocks ()
 
   // State changes.
   player1 = new States();
-  
+
+
+  //menu 
+  cur_menu = 0;
+  old_cur_menu = 0;
+  menu_todo = 0.0;
+  menu_hor_todo = 0.0;
+  menu_hor_old_x_src = 0.0;
+  menu_hor_old_x_dst = 0.0;
+  menu_hor_new_x_src = 0.0;
+  menu_hor_new_x_dst = 0.0;
+
+  menu_hor_old_menu = NULL;
 }
 
 Blocks::~Blocks ()
@@ -1804,6 +1816,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int
     }
     float y = 3. + sin (angle)*3.;
     float z = 5. - cos (angle)*3.;
+
     csVector3 v (x, y, z);
     menus[i]->SetPosition (demo_room, v);
     menus[i]->Transform ();
@@ -1825,7 +1838,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int
   else if (menu_hor_old_menu)
   {
     demo_room->RemoveThing (menu_hor_old_menu);
-    menu_hor_old_menu = NULL;
+	menu_hor_old_menu = NULL;
   }
 
   if (!(ABS (menu_trans) > SMALL_EPSILON) &&
