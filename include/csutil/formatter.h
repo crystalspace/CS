@@ -590,7 +590,7 @@ class csPrintfFormatter
 	case convFloatExp:
 	case convFloatGeneral:
 	case convFloatHex:
-	  if (currentFormat.type == typeLong)
+	  if (currentFormat.type == typeLongLong)
 	  {
 	    param.vLongDbl = va_arg (args, long double);
 	  }
@@ -775,7 +775,7 @@ class csPrintfFormatter
   /// Output a float. We're lazy and use the existing CRT routines.
   template<class T>
   void OutputFloat (Twriter& writer, const FormatSpec& currentFormat,
-    T value, const char* type)
+    const T& value, const char* type)
   {
     char flags[5] = "";
     if (currentFormat.plusSign)
@@ -942,7 +942,7 @@ class csPrintfFormatter
     }
     scratch.Push ('0');
     scratch.Push (currentFormat.uppercase ? 'X' : 'x');
-    if (exp == 0)
+    if (vSplit.exp == 0)
       scratch.Push ('0');
     else
       scratch.Push ('1');
@@ -1180,7 +1180,7 @@ public:
 	  {
 	    if (currentFormat.type == typeLongLong)
 	      OutputFloat (writer, currentFormat, 
-	      params[currentFormat.paramIdx].vLongDbl, "f");
+	      params[currentFormat.paramIdx].vLongDbl, "Lf");
 	    else
 	      OutputFloat (writer, currentFormat, 
 	      params[currentFormat.paramIdx].vDbl, "f");
@@ -1191,7 +1191,7 @@ public:
 	    if (currentFormat.type == typeLongLong)
 	      OutputFloat (writer, currentFormat, 
 	      params[currentFormat.paramIdx].vLongDbl, 
-	      currentFormat.uppercase ? "E" : "e");
+	      currentFormat.uppercase ? "LE" : "Le");
 	    else
 	      OutputFloat (writer, currentFormat, 
 	      params[currentFormat.paramIdx].vDbl, 
@@ -1203,7 +1203,7 @@ public:
 	    if (currentFormat.type == typeLongLong)
 	      OutputFloat (writer, currentFormat, 
 	      params[currentFormat.paramIdx].vLongDbl, 
-	      currentFormat.uppercase ? "G" : "g");
+	      currentFormat.uppercase ? "LG" : "Lg");
 	    else
 	      OutputFloat (writer, currentFormat, 
 	      params[currentFormat.paramIdx].vDbl, 

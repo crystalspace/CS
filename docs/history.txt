@@ -30,6 +30,8 @@ chronological order.
 	      size-agnostic type for %lld(%llu) formats.)
 	- res added a patch from Seth Yastrov <syastrov@gmail.com> to directly
 	  set the float heightmap data on an iSimpleFormerState.
+	- res fixed some issues with cs_snprintf() long double support. Needs
+	  more work, though.
 4-Mar-2005
 	- Eric Sunshine applied patch from <obi666@users.sourceforge.net>
 	  (patch #1155282), which adds iAnimTimeUpdateHandler for
