@@ -13,6 +13,13 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+21-Sep-1999
+	- Jorrit reverted a fix on sprite lighting which Eric accidently
+	  removed.
+	- Jorrit added SetPerspectiveCenter() to IGraphics3D to make
+	  changable view centers work correctly. This is needed to use
+	  the extensions added by Seth. I implemented this function with
+	  all 3D renderers. But I only tested software and OpenGL.
 20-Sep-1999
 	- Eric Sunshine fixed an accidental sign-extension problem in
 	  csPixelFormat.
@@ -28,6 +35,14 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed a bug in the new polygon iterator, csPolyIt.
 	  It would crash with a BUS error if the world contained no sectors.
 	  This bug prevented MetaDemo and MazeD from launching.
+	- Gary Haussman worked further on the MD2 importer in order that
+	  it fully supports textures and skins. Not fully implemented yet.
+	- Gary added code to read in data from a quake 1 MDL file.
+	- Gary also changed vertex fog code for sprites so that the fog
+	  polygon is properly blended. He also does some better renderstate
+	  management to avoid pipeline stalls.
+	- Andrew Zabolotny fixed expandpath() to properly expand paths
+	  like c:something.
 19-Sep-1999
 	- Moved LIGHTMAP_SIZE config value from softrdnr.cfg to cryst.cfg
 	  where it belongs.  It now works again.
