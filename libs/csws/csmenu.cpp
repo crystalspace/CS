@@ -1017,6 +1017,17 @@ void csMenu::SetCheck (int iCommandCode, bool iState)
     item->SendCommand (cscmdMenuItemCheck, (void *)iState);
 }
 
+bool csMenu::GetCheck (int iCommandCode)
+{
+  csComponent *item = GetItem (iCommandCode);
+  if (item)
+  {
+    csMenuItem *mi = (csMenuItem *)item;
+    return (mi->GetStyle() & CSMIS_CHECKED);
+  }
+  return false;
+}
+
 void csMenu::Insert (csComponent *comp)
 {
   fPlaceItems = true;

@@ -92,6 +92,9 @@ public:
   /// Move child menus when moved
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);
 
+  /// Get the Style bitmask for this menu item.
+  virtual int GetStyle () { return Style; };
+
 protected:
   /// Menu item 'checked' image
   static csPixmap *sprchecked;
@@ -280,8 +283,11 @@ public:
   /// Find the item with given command code (even in submenus)
   csComponent *GetItem (int iCommandCode);
 
-  /// Set/remove a checkmark left to menu item
+  /// Set/remove a checkmark left of the menu item
   void SetCheck (int iCommandCode, bool iState);
+
+  /// Get the checked state of the specified menu item.
+  bool GetCheck (int iCommandCode);
 
   /// Set fPlaceItems since a item has been inserted
   virtual void Insert (csComponent *comp);
