@@ -611,7 +611,7 @@ void csRadiosity :: DoRadiosity()
   {
     iterations++;
     // shoot the light off of RadPoly.
-    //CsPrintf(MSG_STDOUT, "(priority at %f).\n", shoot->GetPriority() );
+    CsPrintf(MSG_STDOUT, "(priority at %f).\n", shoot->GetPriority() );
     pulse->Step();
     // prepare to shoot from source (visibility, precompute, etc)
     PrepareShootSource(shoot);
@@ -760,14 +760,11 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   csPolygon3D *destpoly3d = ((csPolygon3D*)obj)->GetBasePolygon();
   csRadPoly *dest = csRadPoly::GetRadPoly(*destpoly3d); // obtain radpoly
   // if polygon not lightmapped / radiosity rendered, it can still be a portal.
-  /* if(dest) 
-  {
-    // check poly -- on right side of us?
-    csVector3 destcenter;
-    dest->QuickLumel2World(destcenter,dest->GetWidth()/2.,dest->GetHeight()/2.);
-    if( csMath3::WhichSide3D(destcenter-plane_origin, plane_v1, plane_v2) >= 0)
-      dest=0; // when on the plane or behind, skip.
-  } */
+
+  // check poly -- on right side of us?
+  if(!destpoly3d->GetPlane()->VisibleFromPoint( 
+    lview->light_frustum->GetOrigin() ))
+    return;
 
   csFrustumView new_lview = *lview;
   new_lview.light_frustum = NULL;
@@ -897,8 +894,12 @@ bool csRadiosity :: PrepareShootDest(csRadPoly *dest, csFrustumView *lview)
 void csRadiosity :: ShootRadiosityToPolygon(csRadPoly* dest)
 {
   // shoot from each lumel, also a radiosity patch, to each lumel on other.
-  //CsPrintf(MSG_STDOUT, "Shooting from RadPoly %x to %x.\n", 
-  //	(int)shoot, (int)dest);
+  CsPrintf(MSG_STDOUT, "Shooting from RadPoly %x (%s in %s sz %d) to %x (%s in %s sz %d).\n",
+  	(int)shoot_src, shoot_src->GetPolygon3D()->GetName(), 
+	shoot_src->GetPolygon3D()->GetSector()->GetName(), 
+	shoot_src->GetSize(), 
+	(int)dest, dest->GetPolygon3D()->GetName(), 
+	dest->GetPolygon3D()->GetSector()->GetName(), dest->GetSize());
 
   int sx, sy, rx, ry; // shoot x,y, receive x,y
   int suv = 0, ruv = 0; // shoot uv index, receive uv index.
@@ -970,7 +971,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
     source_patch_area * visibility / distance;
   //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
-#if 0
+#if 1
    if(totalfactor > 10.0f)
     CsPrintf(MSG_STDOUT, "totalfactor %g = "
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
