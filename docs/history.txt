@@ -29,6 +29,13 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed mk/msvcgen/win32.mak so that the libcssys project
 	  file is once again created correctly following the replacement of
 	  DSP.PROJECT.RESOURCES with $(PROJECT.EXE).WINRSRC.
+	- Eric Sunshine temporarily disabled msvcgen.mak's use of
+	  $(PROJECT.EXE).WINRSRC since it causes problems at build time.  The
+	  exact problem is that when WINRSRC points at
+	  CS/libs/cssys/win32/rsrc/cs1.rc, the .res file is created in the same
+	  directory.  However, at link time, MSVC expects to find the .res file
+	  in the buid directory (CS/mk/visualc/csdebug/temp/walktest, for
+	  example).  We need to devise a reasonable solution for this problem.
 	- Added iXmlNode and iXmlAttribute. These are proposals for the
 	  XML interfaces we're going to use in CS.
 4-Aug-2002

@@ -338,7 +338,9 @@ MSVC.MAKEVERRC = $(MSVC.MAKEVERRC.$(DSP.$*.TYPE))
 
 # Macro to compose entire list of resources which comprise a project.
 MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) \
-  $($($*.EXE).WINRSRC) $(MSVC.VERSIONRC.CVS)
+  $(MSVC.VERSIONRC.CVS)
+#MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) \
+#  $($($*.EXE).WINRSRC) $(MSVC.VERSIONRC.CVS)
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
