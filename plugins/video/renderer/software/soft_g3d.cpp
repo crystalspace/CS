@@ -187,22 +187,15 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 
 csGraphics3DSoftware::~csGraphics3DSoftware ()
 {
-  // @@@ Jorrit: removed because this causes a call
-  // of a virtual function call which is not allowed
-  // in a destructor. We should have a Deinitialize()
-  // call or something.
-  //if (System)
-    //System->DecRef ();
-
   Close ();
   csScan_Finalize ();
   CHK (delete texman);
   CHK (delete [] z_buffer);
   CHK (delete [] smaller_buffer);
-  if (G2D)
-    G2D->DecRef ();
   CHK (delete [] line_table);
-  CHK(delete config;)
+  CHK (delete config;)
+  if (G2D) G2D->DecRef ();
+  if (System) System->DecRef ();
 }
 
 bool csGraphics3DSoftware::Initialize (iSystem *iSys)
@@ -1443,6 +1436,7 @@ texr_done:
 
 #undef CHECK
 
+    // In VERYNICE mode we need other texture sizes
     tcache->fill_texture (mipmap, tex, u_min, v_min, u_max, v_max);
   }
   csScan_InitDraw (mipmap, this, tex, tex_mm, txt_unl);

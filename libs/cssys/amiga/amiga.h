@@ -26,8 +26,6 @@
 class SysSystemDriver : public csSystemDriver
 {
 public:
-	DECLARE_IBASE;
-
 	SysSystemDriver ();
 	~SysSystemDriver ();
 

@@ -76,7 +76,8 @@ public:
 	virtual int GetSimulatedDepth() const;
 	} scfiNeXTSystemDriver;
     friend struct NeXTSystemInterface;
-    DECLARE_IBASE;
+    /// Override QueryInterface to allow additional interfaces
+    virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
     };
 
 class SysSystemDriver : public NeXTSystemDriver {};

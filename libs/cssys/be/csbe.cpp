@@ -36,12 +36,6 @@
 
 // The System driver ////////////////
 
-IMPLEMENT_IBASE (SysSystemDriver)
-  IMPLEMENTS_INTERFACE (iSystem)
-  IMPLEMENTS_INTERFACE (iBeLibSystemDriver)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
-IMPLEMENT_IBASE_END
-
 class CrystApp : public BApplication
 {
 public:
@@ -321,10 +315,14 @@ int CrystApp::classifyAsciiKey(int c) const
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver(), running(false)
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
   CHK (app = new CrystApp (this));
 };
+
+void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
+{
+  IMPLEMENTS_INTERFACE_COMMON (iBeLibSystemDriver, (iBeLibSystemDriver *)this)
+  return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
+}
 
 static int32 begin_loop(void* data)
 {

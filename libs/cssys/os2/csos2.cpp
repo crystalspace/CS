@@ -31,18 +31,16 @@
 
 //== class SysSystemDriver =====================================================
 
-IMPLEMENT_IBASE (SysSystemDriver)
-  IMPLEMENTS_INTERFACE (iSystem)
-  IMPLEMENTS_INTERFACE (iOS2SystemDriver)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
-IMPLEMENT_IBASE_END
-
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
-  CONSTRUCT_IBASE (NULL)
-  CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
   // Lower the priority of the main thread
   DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0);
+}
+
+void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
+{
+  IMPLEMENTS_INTERFACE_COMMON (iOS2SystemDriver, (iOS2SystemDriver *)this)
+  return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
 }
 
 void SysSystemDriver::SetSystemDefaults (csIniFile *config)

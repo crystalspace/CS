@@ -263,9 +263,17 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
 
 //---------------------------------------------------- The System Driver -----//
 
+IMPLEMENT_IBASE (csSystemDriver)
+  IMPLEMENTS_INTERFACE (iSystem)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
+IMPLEMENT_IBASE_END
+
 csSystemDriver::csSystemDriver () : PlugIns (8, 8), OptionList (16, 16),
   CommandLine (16, 16), CommandLineNames (16, 16)
 {
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
+
   console_open ();
   System = this;
   IsFocused = true;

@@ -48,8 +48,6 @@ public:
 
 	OSErr		HandleAppleEvent( AppleEvent *theEvent );
 
-	DECLARE_IBASE;
-
 private:
 	void		DispatchEvent( time_t current_time, EventRecord *theEvent, iMacGraphics* piG2D );
 	void		HandleMouseEvent( time_t current_time, EventRecord *theEvent, iMacGraphics* piG2D );

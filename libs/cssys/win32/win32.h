@@ -66,7 +66,11 @@ public:
   bool GetIsActive() const;
   /// Gets the nCmdShow of the WinMain().
   int GetCmdShow() const;
-  DECLARE_IBASE;
+
+  virtual void IncRef () { csSystemDriver::IncRef (); }
+  virtual void DecRef () { csSystemDriver::DecRef (); }
+  /// Override QueryInterface to allow additional interfaces
+  virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
 };
 
 /// Windows version.

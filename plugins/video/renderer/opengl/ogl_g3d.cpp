@@ -142,12 +142,8 @@ csGraphics3DOpenGL::~csGraphics3DOpenGL ()
   CHK (delete config);
 
   Close ();
-  if (G2D)
-    G2D->DecRef ();
-
-  // see csGraphics3DSoftware::~csGraphics3DSoftware() for more details.
-  // if (System)
-  // System->DecRef ();
+  if (G2D) G2D->DecRef ();
+  if (System) System->DecRef ();
 }
 
 bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
@@ -354,8 +350,7 @@ bool csGraphics3DOpenGL::Open (const char *Title)
   // the engine initializer likes to print out console messages
   // on the screen before any 'normal' drawing has been done, so
   // here we set up the transforms so that initialization text will
-  // appear on
-  // the screen.
+  // appear on the screen.
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
 
@@ -371,14 +366,13 @@ void csGraphics3DOpenGL::Close ()
   if ((width == height) && height == -1)
     return;
 
-  // we should remove all texture handles before we kill
-  // the graphics context
+  // we should remove all texture handles before we kill the graphics context
+  CHK (delete txtmgr);
+  txtmgr = NULL;
   CHK (delete texture_cache);
   texture_cache = NULL;
   CHK (delete lightmap_cache);
   lightmap_cache = NULL;
-  CHK (delete txtmgr);
-  txtmgr = NULL;
 
   if (m_fogtexturehandle)
   {
@@ -1242,6 +1236,10 @@ void csGraphics3DOpenGL::GetCaps (G3D_CAPS * caps)
 
 void csGraphics3DOpenGL::ClearCache ()
 {
+  // We will clear lightmap cache since when unloading a world lightmaps
+  // become invalid. We won't clear texture cache since texture items are
+  // cleaned up individually when an iTextureHandle's RefCount reaches zero.
+  lightmap_cache->Clear ();
 }
 
 void csGraphics3DOpenGL::DumpCache ()

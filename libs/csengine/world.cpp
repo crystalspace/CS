@@ -241,7 +241,7 @@ csWorld::~csWorld ()
   Clear ();
   if (G3D) G3D->DecRef ();
   if (VFS) VFS->DecRef ();
-  CHK (delete textures);
+  if (System) System->DecRef ();
   CHK (delete render_pol2d_pool);
   CHK (delete lightpatch_pool);
   CHK (delete quadcube);
@@ -266,7 +266,7 @@ bool csWorld::Initialize (iSystem* sys)
   printf ("csLightMap %ld\n", (long)sizeof (csLightMap));
 #endif
 
-  System = sys;
+  (System = sys)->IncRef ();
 
   if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
   {

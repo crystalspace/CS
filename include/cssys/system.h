@@ -325,6 +325,7 @@ protected:
   void SetMode (const char* mode);
 
 public:
+  DECLARE_IBASE;
 
   /**************************** iSystem interface ****************************/
 

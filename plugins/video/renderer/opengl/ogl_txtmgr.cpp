@@ -65,6 +65,12 @@ csTextureMMOpenGL::csTextureMMOpenGL (iImage *image, int flags,
   adjust_size_po2 ();
 }
 
+csTextureMMOpenGL::~csTextureMMOpenGL ()
+{
+  if (G3D && G3D->texture_cache)
+    G3D->texture_cache->Uncache (this);
+}
+
 csTexture *csTextureMMOpenGL::new_texture (iImage *Image)
 {
   return new csTextureOpenGL (this, Image);

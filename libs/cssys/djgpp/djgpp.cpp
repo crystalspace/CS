@@ -72,16 +72,8 @@ static unsigned short ScanCodeToChar[128] =
 
 //================================================================== System ====
 
-IMPLEMENT_IBASE (SysSystemDriver)
-  IMPLEMENTS_INTERFACE (iSystem)
-  IMPLEMENTS_INTERFACE (iDosSystemDriver)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
-IMPLEMENT_IBASE_END
-
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
   // Sanity check
   if (sizeof (event_queue [0]) != 12)
   {
@@ -89,6 +81,12 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
     Printf (MSG_FATAL_ERROR, "sizeof (event_queue [0]) == %d instead of 12!\n", sizeof (event_queue [0]));
     exit (-1);
   }
+}
+
+void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
+{
+  IMPLEMENTS_INTERFACE_COMMON (iDosSystemDriver, (iDosSystemDriver *)this)
+  return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
 }
 
 void SysSystemDriver::Loop ()

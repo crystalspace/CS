@@ -187,7 +187,7 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
   if (scfCompatibleVersion (iVersion, VERSION_##Interface)		\
    && !strcmp (iInterfaceID, #Interface))				\
   {									\
-    Object->IncRef();							\
+    (Object)->IncRef ();						\
     return STATIC_CAST (Interface *) (Object);				\
   }
 

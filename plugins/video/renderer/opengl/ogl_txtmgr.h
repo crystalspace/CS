@@ -38,6 +38,8 @@ public:
 
   /// Initialize the object
   csTextureMMOpenGL (iImage *image, int flags, csGraphics3DOpenGL *iG3D);
+  /// Delete the texture object
+  virtual ~csTextureMMOpenGL ();
   /// Create a new texture object
   virtual csTexture *new_texture (iImage *Image);
   /// Compute the mean color for the just-created texture

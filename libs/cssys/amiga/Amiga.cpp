@@ -120,15 +120,8 @@ void SysMouseDriver::Close(void)
 {
 }
 
-IMPLEMENT_IBASE (SysSystemDriver)
-  IMPLEMENTS_INTERFACE (iSystem)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
-IMPLEMENT_IBASE_END
-
 SysSystemDriver::SysSystemDriver () : csSystemDriver()
 {
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
 }
 
 void SysSystemDriver::SetSystemDefaults (csIniFile *config)

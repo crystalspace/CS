@@ -40,10 +40,13 @@ class SysSystemDriver : public csSystemDriver, public iUnixSystemDriver
   void *CallbackParam;
 
 public:
-  DECLARE_IBASE;
-
   // Constructor
   SysSystemDriver ();
+
+  virtual void IncRef () { csSystemDriver::IncRef (); }
+  virtual void DecRef () { csSystemDriver::DecRef (); }
+  /// Override QueryInterface to allow additional interfaces
+  virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
 
   /// Check for system-specific INI entries
   virtual void SetSystemDefaults (csIniFile *config);

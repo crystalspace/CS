@@ -414,17 +414,8 @@ void SysMouseDriver::Close()
 
 // The System driver ////////////////
 
-IMPLEMENT_IBASE (SysSystemDriver)
-  IMPLEMENTS_INTERFACE (iSystem)
-  IMPLEMENTS_INTERFACE (iWin32SystemDriver)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
-IMPLEMENT_IBASE_END
-
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
-  CONSTRUCT_IBASE(NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
-
   WNDCLASS wc;
   wc.style         = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
   wc.lpfnWndProc   = WindowProc;
@@ -437,6 +428,12 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   wc.lpszClassName = WINDOWCLASSNAME;
 
   RegisterClass (&wc);
+}
+
+void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
+{
+  IMPLEMENTS_INTERFACE_COMMON (iWin32SystemDriver, (iWin32SystemDriver *)this)
+  return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
 }
 
 void SysSystemDriver::Loop ()

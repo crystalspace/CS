@@ -38,9 +38,12 @@ protected:
   CrystApp* app;
 
 public:
-  DECLARE_IBASE;
-
   SysSystemDriver ();
+
+  virtual void IncRef () { csSystemDriver::IncRef (); }
+  virtual void DecRef () { csSystemDriver::DecRef (); }
+  /// Override QueryInterface to allow additional interfaces
+  virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
 
   // Main event loop
   virtual void Loop ();

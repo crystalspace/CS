@@ -262,6 +262,10 @@ void OpenGLCache::Clear ()
       if (lm)
         lm->SetCacheData (NULL);
     }
+
+    Unload (head);
+    delete head;
+
     head = n;
   }
 
@@ -280,6 +284,28 @@ OpenGLTextureCache::OpenGLTextureCache(int size, int bitdepth)
 OpenGLTextureCache::~OpenGLTextureCache ()
 {
   Clear ();
+}
+
+void OpenGLTextureCache::Uncache (iTextureHandle *texh)
+{
+  csGLCacheData *cached_texture = (csGLCacheData *)texh->GetCacheData ();
+  if (!cached_texture)
+    return;
+
+  texh->SetCacheData (NULL);
+  Unload (cached_texture);
+
+  csGLCacheData *n = cached_texture->next;
+  if (n)
+    n->next->prev = cached_texture->prev;
+  else
+    tail = cached_texture->prev;
+  if (cached_texture->prev)
+    cached_texture->prev->next = n;
+  else
+    head = n;
+
+  delete cached_texture;
 }
 
 void OpenGLTextureCache::Load (csGLCacheData *d)

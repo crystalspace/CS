@@ -443,8 +443,8 @@ csGraphics3DGlide2x::~csGraphics3DGlide2x()
     m_piGlide2D->DecRef ();
   if (m_piG2D)
     m_piG2D->DecRef ();
-//  if (m_piSystem)
-//    m_piSystem->DecRef ();
+  if (m_piSystem)
+    m_piSystem->DecRef ();
 }
 
 bool csGraphics3DGlide2x::Initialize (iSystem *iSys)

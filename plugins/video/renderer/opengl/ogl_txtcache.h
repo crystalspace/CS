@@ -48,13 +48,12 @@ enum csCacheType
 ///
 class OpenGLCache
 {
-private:
+protected:
   ///
   csCacheType type;
   /// the head and tail of the cache data
   csGLCacheData *head, *tail;
 
-protected:
   /// the maximum size of the cache
   long cache_size;
   /// number of items
@@ -100,6 +99,8 @@ public:
   void SetBilinearMapping (bool m) { rstate_bilinearmap = m; }
   ///
   bool GetBilinearMapping () { return rstate_bilinearmap; }
+  /// Remove an individual texture from cache
+  virtual void Uncache (iTextureHandle *texh);
 
 protected:
   ///
