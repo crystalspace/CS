@@ -115,7 +115,7 @@ void awsGroupFrame::OnDraw (csRect clip)
 }
 
 
-/************************************* Command Button Factory ****************/
+/************************************* Group Frame Factory ****************/
 
 awsGroupFrameFactory::awsGroupFrameFactory (
   iAws *wmgr) :

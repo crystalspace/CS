@@ -4,20 +4,18 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
-// These constants are also defined in awsPanel
-// if you edit them here make sure to edit those as well
-const int aws3DFrame:: fsBump = 0;
-const int aws3DFrame:: fsSimple = 1;
-const int aws3DFrame:: fsRaised = 2;
-const int aws3DFrame:: fsSunken = 3;
-const int aws3DFrame:: fsFlat = 4;
-const int aws3DFrame:: fsNone = 5;
-const int aws3DFrame:: fsBevel = 6;
-const int aws3DFrame:: fsThick = 7;
-const int aws3DFrame:: fsBitmap = 8;
-const int aws3DFrame:: fsSmallRaised = 9;
-const int aws3DFrame::fsSmallSunken = 10;
-const int aws3DFrame:: fsMask  = 0xf;
+const int aws3DFrame:: fsBump = _3dfsBump;
+const int aws3DFrame:: fsSimple = _3dfsSimple;
+const int aws3DFrame:: fsRaised = _3dfsRaised;
+const int aws3DFrame:: fsSunken = _3dfsSunken;
+const int aws3DFrame:: fsFlat = _3dfsFlat;
+const int aws3DFrame:: fsNone = _3dfsNone;
+const int aws3DFrame:: fsBevel = _3dfsBevel;
+const int aws3DFrame:: fsThick = _3dfsThick;
+const int aws3DFrame:: fsBitmap = _3dfsBitmap;
+const int aws3DFrame:: fsSmallRaised = _3dfsSmallRaised;
+const int aws3DFrame::fsSmallSunken = _3dfsSmallSunken;
+const int aws3DFrame:: fsMask  = _3dfsMask;
 
 aws3DFrame::aws3DFrame ()
 {

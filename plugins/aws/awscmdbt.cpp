@@ -296,8 +296,8 @@ void awsCmdButton::OnDraw (csRect /*clip*/)
 	  
 	  g3d->DrawPixmap (
 		  tex[0],
-		  Frame ().xmin + is_down + itx,
-		  Frame ().ymin + is_down + ity,
+		  Frame ().xmin + is_down + itx + 2,
+		  Frame ().ymin + is_down + ity + 2,
 		  img_w,
 		  img_h,
 		  0,

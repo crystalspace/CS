@@ -4,24 +4,22 @@
 
 #include "cssysdef.h"
 #include "awsPanel.h"
+#include "aws3dfrm.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-
-// copied for convenience
-// MAKE SURE THEY STAY IN STEP WITH STYLES DEFINED BY 3D FRAME
-const int awsPanel::fsBump   = 0;
-const int awsPanel::fsSimple = 1;
-const int awsPanel::fsRaised = 2;
-const int awsPanel::fsSunken = 3;
-const int awsPanel::fsFlat   = 4;
-const int awsPanel::fsNone   = 5;
-const int awsPanel::fsBevel  = 6;
-const int awsPanel::fsThick  = 7;
-const int awsPanel::fsBitmap = 8;
-const int awsPanel::fsMask   = 0xf;
+const int awsPanel:: fsBump = _3dfsBump;
+const int awsPanel:: fsSimple = _3dfsSimple;
+const int awsPanel:: fsRaised = _3dfsRaised;
+const int awsPanel:: fsSunken = _3dfsSunken;
+const int awsPanel:: fsFlat = _3dfsFlat;
+const int awsPanel:: fsNone = _3dfsNone;
+const int awsPanel:: fsBevel = _3dfsBevel;
+const int awsPanel:: fsThick = _3dfsThick;
+const int awsPanel:: fsBitmap = _3dfsBitmap;
+const int awsPanel:: fsMask  = _3dfsMask;
 
 // Windows like this one
 const int awsPanel::fsNormal = awsPanel::fsThick;

@@ -44,6 +44,7 @@
 #include "awsMenu.h"
 #include "awsimgvw.h"
 #include "awsmled.h"
+#include "aws3dfrm.h"
 
 
 #include "awscmpt.h"
@@ -1243,6 +1244,18 @@ void awsManager::RegisterCommonComponents ()
   GetPrefMgr ()->RegisterConstant ("blSouth", 3);
   GetPrefMgr ()->RegisterConstant ("blWest", 4);
 
+  GetPrefMgr ()->RegisterConstant ("fsBump", _3dfsBump);
+  GetPrefMgr ()->RegisterConstant ("fsSimple", _3dfsSimple);
+  GetPrefMgr ()->RegisterConstant ("fsRaised", _3dfsRaised);
+  GetPrefMgr ()->RegisterConstant ("fsSunken", _3dfsSunken);
+  GetPrefMgr ()->RegisterConstant ("fsFlat", _3dfsFlat);
+  GetPrefMgr ()->RegisterConstant ("fsNone", _3dfsNone);
+  GetPrefMgr ()->RegisterConstant ("fsBevel", _3dfsBevel);
+  GetPrefMgr ()->RegisterConstant ("fsThick", _3dfsThick);
+  GetPrefMgr ()->RegisterConstant ("fsBitmap", _3dfsBitmap);
+  GetPrefMgr ()->RegisterConstant ("fsSmallRaised", _3dfsSmallRaised);
+  GetPrefMgr ()->RegisterConstant ("fsSmallSunken", _3dfsSmallSunken);
+  
 }
 
 bool awsManager::AllWindowsHidden ()

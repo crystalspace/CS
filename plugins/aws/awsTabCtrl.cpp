@@ -347,12 +347,19 @@ bool awsTabCtrl::Setup (iAws *_wmgr, awsComponentNode *settings)
   previnfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsNormal);
   nextinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsNormal);
 
+  previnfo.AddStringKey(new scfString("Icon"), new scfString("ScrollBarLt"));
+  nextinfo.AddStringKey(new scfString("Icon"), new scfString("ScrollBarRt"));
+
   nextimg = WindowManager ()->GetPrefMgr ()->GetTexture ("ScrollBarRt");
   previmg = WindowManager ()->GetPrefMgr ()->GetTexture ("ScrollBarLt");
 
   if (!previmg || !nextimg) return false;
 
-  csRect r(0, 0, HandleSize, HandleSize);
+  int img_w, img_h;
+  
+  previmg->GetOriginalDimensions (img_w, img_h);
+
+  csRect r(0, 0, 30, 30 ); //( HandleSize > img_w ? HandleSize : img_w), ( HandleSize > img_h ? HandleSize : img_h) + 15);
 
   r.Move (Frame ().Width () - 2*HandleSize-1, Frame ().Height ()-HandleSize - 1);
   previnfo.AddRectKey (new scfString ("Frame"), r);
@@ -366,8 +373,8 @@ bool awsTabCtrl::Setup (iAws *_wmgr, awsComponentNode *settings)
   prev.Setup (_wmgr, previnfo.GetThisNode ());
   next.Setup (_wmgr, nextinfo.GetThisNode ());
 
-  prev.SetProperty ("Image", previmg);
-  next.SetProperty ("Image", nextimg);
+  //prev.SetProperty ("Image", previmg);
+  //next.SetProperty ("Image", nextimg);
 
   sink->RegisterTrigger ("Prev", &PrevClicked);
   sink->RegisterTrigger ("Next", &NextClicked);
@@ -435,7 +442,7 @@ void awsTabCtrl::DoLayout ()
 	r = Frame();
     r.xmin = r.xmax - 2*HandleSize-1;
     r.ymax--;
-    r.ymin = r.ymax - HandleSize;
+    //r.ymin = r.ymax - (HandleSize<<1);
     r.xmax = r.xmin + HandleSize;
     prev.ResizeTo(r);
     prev.Show ();

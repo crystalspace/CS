@@ -11,7 +11,6 @@ struct iAws;
 struct iAwsComponent;
 
 
-
 /// This class draws several different 3d frame types to avoid code duplication.
 class aws3DFrame
 {
@@ -121,4 +120,20 @@ public:
   csRect GetInsets(int style);
 
 };
+
+// These are the frame styles actually support by the 3d frame class, and thus globally
+
+const int _3dfsBump = 0;
+const int _3dfsSimple = 1;
+const int _3dfsRaised = 2;
+const int _3dfsSunken = 3;
+const int _3dfsFlat = 4;
+const int _3dfsNone = 5;
+const int _3dfsBevel = 6;
+const int _3dfsThick = 7;
+const int _3dfsBitmap = 8;
+const int _3dfsSmallRaised = 9;
+const int _3dfsSmallSunken = 10;
+const int _3dfsMask  = 0xf;
+
 #endif

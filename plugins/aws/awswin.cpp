@@ -35,7 +35,7 @@ const int awsWindow:: foMin = 0x4;
 const int awsWindow:: foClose = 0x8;
 const int awsWindow:: foTitle = 0x10;
 const int awsWindow:: foGrip = 0x20;
-const int awsWindow:: foRoundBorder = 0x0;
+const int awsWindow:: foRoundBorder = 0x0;			// default
 const int awsWindow:: foBeveledBorder = 0x40;
 const int awsWindow:: foNoBorder = 0x80;
 
@@ -200,9 +200,11 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   // Hide any of the undesired controls
   if(~frame_options & foClose)
     close_button.Hide();
-  else if(~frame_options & foZoom)
+  
+  if(~frame_options & foZoom)
     zoom_button.Hide();
-  else if(~frame_options & foMin)
+  
+  if(~frame_options & foMin)
     min_button.Hide();
 
 
