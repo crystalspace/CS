@@ -104,7 +104,7 @@ struct iNetworkConnection : public iNetworkEndPoint
   virtual bool IsConnected () const = 0;
 
   /**
-   * Receive data from the connection.  If the endpoint is conifgured to block,
+   * Receive data from the connection.  If the endpoint is configured to block,
    * then the function does not return until data has been read, an
    * error has occurred, or the connection was closed.  If non-blocking, then
    * Receive() returns immediately.  If data is available then, it returns the
