@@ -20,6 +20,7 @@
 #ifndef __CS_REFARR_H__
 #define __CS_REFARR_H__
 
+#include "csutil/ref.h"
 #include "csutil/array.h"
 
 template <class T>
@@ -57,6 +58,15 @@ public:
   csRefArray (int ilimit = 0, int ithreshold = 0)
   	: csArray<T*, csRefArrayElementHandler<T*> > (ilimit, ithreshold)
   {
+  }
+
+  /// Pop an element from tail end of array.
+  csPtr<T> Pop ()
+  {
+    CS_ASSERT (Length () > 0);
+    csRef<T> ret = Get (Length () - 1);
+    SetLength (Length () - 1);
+    return csPtr<T> (ret);
   }
 
 };
