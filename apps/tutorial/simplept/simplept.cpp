@@ -41,6 +41,7 @@
 #include "iengine/material.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
+#include "imesh/genmesh.h"
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -58,7 +59,7 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-void CreatePolygon (iThingState *th, int v1, int v2, int v3, int v4,
+void Simple::CreatePolygon (iThingState *th, int v1, int v2, int v3, int v4,
   iMaterialWrapper *mat)
 {
   iPolygon3D* p = th->CreatePolygon ();
@@ -68,6 +69,146 @@ void CreatePolygon (iThingState *th, int v1, int v2, int v3, int v4,
   p->CreateVertex (v3);
   p->CreateVertex (v4);
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 6);
+}
+
+static float frand (float range)
+{
+  float r = float ((rand () >> 2) % 1000);
+  return r * range / 1000.0;
+}
+
+bool Simple::CreateGenMesh (iMaterialWrapper* mat)
+{
+  csRef<iMeshFactoryWrapper> genmesh_fact (
+  	csPtr<iMeshFactoryWrapper> (engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", "genmesh")));
+  if (!genmesh_fact)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simplept",
+	"Can't make genmesh factory!");
+    return false;
+  }
+  factstate = SCF_QUERY_INTERFACE (genmesh_fact->GetMeshObjectFactory (),
+  	iGeneralFactoryState);
+  if (!factstate)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simplept",
+	"Strange, genmesh_fact doesn't implement iGeneralFactoryState!");
+    return false;
+  }
+
+  factstate->SetMaterialWrapper (mat);
+  factstate->SetVertexCount ((genmesh_resolution+1)*(genmesh_resolution+1));
+  factstate->SetTriangleCount (genmesh_resolution*genmesh_resolution*2);
+
+  csVector3* verts = factstate->GetVertices ();
+  csVector2* texels = factstate->GetTexels ();
+  csTriangle* triangles = factstate->GetTriangles ();
+
+  int x, y;
+  int idx = 0;
+  for (y = 0 ; y <= genmesh_resolution ; y++)
+  {
+    float dy = float (y) / float (genmesh_resolution);
+    for (x = 0 ; x <= genmesh_resolution ; x++)
+    {
+      float dx = float (x) / float (genmesh_resolution);
+      float z = 8;
+      if (x > 0 && x < genmesh_resolution-1 &&
+      	  y > 0 && y < genmesh_resolution-1)
+        z += frand (genmesh_scale.z);
+      verts[idx].Set (
+      	dx * genmesh_scale.x - genmesh_scale.x/2,
+	dy * genmesh_scale.y - genmesh_scale.y/2,
+	z);
+      texels[idx].Set (dx, dy);
+
+      idx++;
+    }
+  }
+
+  idx = 0;
+  for (y = 0 ; y < genmesh_resolution ; y++)
+    for (x = 0 ; x < genmesh_resolution ; x++)
+    {
+      int idxv = y*(genmesh_resolution+1)+x;
+      triangles[idx].c = idxv;
+      triangles[idx].b = idxv+1;
+      triangles[idx].a = idxv+genmesh_resolution+1;
+      idx++;
+      triangles[idx].c = idxv+1;
+      triangles[idx].b = idxv+genmesh_resolution+1+1;
+      triangles[idx].a = idxv+genmesh_resolution+1;
+      idx++;
+    }
+
+  factstate->CalculateNormals ();
+  factstate->Invalidate ();
+
+  genmesh = csPtr<iMeshWrapper> (engine->CreateMeshWrapper (genmesh_fact,
+  	"genmesh", room, csVector3 (0, 0, 0)));
+  if (!genmesh)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simplept",
+	"Can't make genmesh object!");
+    return false;
+  }
+  csRef<iGeneralMeshState> state (
+  	SCF_QUERY_INTERFACE (genmesh->GetMeshObject (),
+  	iGeneralMeshState));
+  if (!state)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simplept",
+	"Strange, genmesh doesn't implement iGeneralMeshState!");
+    return false;
+  }
+
+  state->SetLighting (true);
+  state->SetManualColors (false);
+  genmesh->SetZBufMode (CS_ZBUF_FILL);
+  genmesh->SetRenderPriority (engine->GetWallRenderPriority ());
+  genmesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+
+  int tot_angle_table_size = (genmesh_resolution+1) * (genmesh_resolution+1);
+  angle_table = new float [tot_angle_table_size];
+  angle_speed = new float [tot_angle_table_size];
+  start_verts = new csVector3 [tot_angle_table_size];
+  int i;
+  for (i = 0 ; i < tot_angle_table_size ; i++)
+  {
+    angle_table[i] = 0;
+    angle_speed[i] = 2. * (frand (5) + 5) / 10.0;
+    start_verts[i] = verts[i];
+  }
+
+  return true;
+}
+
+void Simple::AnimateGenMesh (csTicks elapsed)
+{
+  csVector3* verts = factstate->GetVertices ();
+  int idx = 0;
+  int x, y;
+  for (y = 0 ; y <= genmesh_resolution ; y++)
+  {
+    for (x = 0 ; x <= genmesh_resolution ; x++)
+    {
+      if (x > 0 && x < genmesh_resolution-1 &&
+      	  y > 0 && y < genmesh_resolution-1)
+      {
+	angle_table[idx] += float (elapsed) * angle_speed[idx] / 1000.0;
+	verts[idx] = start_verts[idx];
+	verts[idx].x += .1*cos (angle_table[idx]);
+	verts[idx].y += .1*sin (angle_table[idx]);
+      }
+      idx++;
+    }
+  }
+  genmesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +391,9 @@ bool Simple::Initialize ()
 
   CreatePolygon (walls_state, 0, 1, 2, 3, tm);
   CreatePolygon (walls_state, 1, 0, 4, 5, tm);
-  CreatePolygon (walls_state, 2, 1, 5, 6, ProcMat);
+  genmesh_resolution = 15;
+  genmesh_scale.Set (6, 6, 0);
+  CreateGenMesh (ProcMat);
   CreatePolygon (walls_state, 3, 2, 6, 7, tm);
   CreatePolygon (walls_state, 0, 3, 7, 4, tm);
   CreatePolygon (walls_state, 7, 6, 5, 4, tm);
@@ -293,6 +436,8 @@ void Simple::SetupFrame ()
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
+
+  AnimateGenMesh (elapsed_time);
 
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);

@@ -9,6 +9,8 @@ The history order is reversed so that new features are at the top.
 	  that can be used to render on the given texture.
 	- Implemented GetCanvas() correctly in the software renderer.
 	  OpenGL implementation doesn't work yet.
+	- Modified simplept so it 'shimmers' the proc texture portal.
+	  This gives a water like effect.
 19-Oct-2002
 	- After my changes yesterday the NASM version of the software
 	  renderer was totally broken. After long debugging I found

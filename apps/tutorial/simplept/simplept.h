@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include "csutil/ref.h"
 #include "cstool/proctex.h"
+#include "csgeom/vector3.h"
 
 struct iEngine;
 struct iLoader;
@@ -34,6 +35,10 @@ struct iView;
 struct iTextureHandle;
 struct iObjectRegistry;
 struct iVirtualClock;
+struct iThingState;
+struct iMaterialWrapper;
+struct iMeshWrapper;
+struct iGeneralFactoryState;
 class csEngineProcTex;
 
 class Simple
@@ -50,6 +55,19 @@ private:
   csRef<iView> view;
   csRef<iVirtualClock> vc;
   csEngineProcTex* ProcTexture;
+  csRef<iMeshWrapper> genmesh;
+  csRef<iGeneralFactoryState> factstate;
+
+  void CreatePolygon (iThingState *th, int v1, int v2, int v3, int v4,
+    iMaterialWrapper *mat);
+
+  int genmesh_resolution;
+  csVector3 genmesh_scale;
+  float* angle_table;
+  float* angle_speed;
+  csVector3* start_verts;
+  bool CreateGenMesh (iMaterialWrapper* mat);
+  void AnimateGenMesh (csTicks elapsed);
 
 public:
   Simple (iObjectRegistry* object_reg);

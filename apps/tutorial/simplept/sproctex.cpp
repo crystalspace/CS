@@ -78,7 +78,7 @@ bool csEngineProcTex::PrepareAnim ()
 void csEngineProcTex::Animate (csTicks CurrentTime)
 {
   // move the camera
-  csVector3 Position (-0.5, 0, 3 + sin (CurrentTime / 1000.0)*3);
+  csVector3 Position (-0.5, 0, 3 + sin (CurrentTime / (10*1000.0))*1);
   View->GetCamera ()->Move (Position - View->GetCamera ()
   	->GetTransform ().GetOrigin ());
 
