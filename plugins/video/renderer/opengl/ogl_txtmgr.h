@@ -95,6 +95,7 @@ public:
   /// Returns dynamic texture interface if any.
   virtual iGraphics3D *GetProcTextureInterface ();
   /// Prepare the texture for usage
+
   virtual void Prepare ();
   /**
    * Query if the texture has an alpha channel.<p>
@@ -142,7 +143,7 @@ public:
   void SetPixelFormat (csPixelFormat &PixelFormat);
   /// Called by texture's destructor
   void UnregisterTexture (csTextureHandleOpenGL *handle);
-
+  virtual void Clear ();
   /// Read configuration values from config file.
   virtual void read_config (iConfigFile *config);
   ///

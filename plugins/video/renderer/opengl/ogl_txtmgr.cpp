@@ -205,6 +205,26 @@ csTextureManagerOpenGL::~csTextureManagerOpenGL ()
   Clear ();
 }
 
+void csTextureManagerOpenGL::Clear ()
+{
+  int i;
+  for (i=textures.Length ()-1; i >= 0; i--)
+  {
+    csTextureHandleOpenGL* txt = (csTextureHandleOpenGL*)textures.Get (i);
+    UnregisterTexture (txt);
+    txt->DecRef ();
+  }
+
+  for (i=materials.Length ()-1; i >= 0; i--)
+  {
+    csMaterialHandle *mat = materials.Get (i);
+    UnregisterMaterial (mat);
+    mat->DecRef ();
+  }
+
+  csTextureManager::Clear ();
+}
+
 void csTextureManagerOpenGL::read_config (iConfigFile *config)
 {
   const char *proc_texture_type = 
