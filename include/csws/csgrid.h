@@ -126,6 +126,9 @@ class csSparseGrid
     static int Compare (csGridRowEntry* const&, csGridRowEntry* const&);
     // Compare a row entry with a key
     static int CompareKey (csGridRowEntry* const&, int const& Key);
+    // Functor wrapping CompareKey() for a given number.
+    static csArrayCmp<csGridRowEntry*,int> KeyCmp(int n)
+    { return csArrayCmp<csGridRowEntry*,int>(n, CompareKey); }
   };
   friend class csSparseGrid::csGridRow;
 
@@ -151,11 +154,11 @@ public:
   void* GetAt (int row, int col)
   {
     void* result = 0;
-    int idx1 = rows.FindSortedKey (row, rows.CompareKey);
+    int idx1 = rows.FindSortedKey (rows.KeyCmp(row));
     if (idx1 != -1)
     {
       int idx2 = ((csGridRow *)rows.Get (idx1)->data)->FindSortedKey (
-      	col, rows.CompareKey);
+      	rows.KeyCmp(col));
       if (idx2 != -1)
 	result = ((csGridRow *)rows.Get (idx1)->data)->Get (idx2)->data;
     }
@@ -165,7 +168,7 @@ public:
   // Set the data at given row/column
   void SetAt (int row, int col, void* data)
   {
-    int idx = rows.FindSortedKey (row, rows.CompareKey);
+    int idx = rows.FindSortedKey (rows.KeyCmp(row));
     if (idx == -1)
       idx = rows.InsertSorted (new csGridRowEntry (row, new csGridRow (row)),
       	rows.Compare);

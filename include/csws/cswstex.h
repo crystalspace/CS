@@ -121,13 +121,11 @@ public:
   /// Compare texture with name; used in FindKey ()
   static int CompareKey (csWSTexture* const&, char const* const& Key);
   /// Find a texture by name
-  csWSTexture *FindTexture (const char *name)
+  csWSTexture *FindTexture (const char *name) const
   {
-    int idx = FindKey (name, CompareKey);
+    int idx = FindKey (csArrayCmp<csWSTexture*,char const*>(name, CompareKey));
     return idx >= 0 ? Get (idx) : (csWSTexture*)0;
   }
 };
-
-/** @} */
 
 #endif // __CS_CSWSTEX_H__

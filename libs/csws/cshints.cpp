@@ -221,7 +221,7 @@ void csHintManager::Add (const char *iText, csComponent *iComp)
 
 void csHintManager::Remove (csComponent *iComp)
 {
-  int idx = FindSortedKey (iComp, CompareKey);
+  int idx = FindSortedKey (KeyCmp(iComp));
   if (idx >= 0)
     DeleteIndex (idx);
 }
@@ -239,7 +239,7 @@ void csHintManager::SetFont (iFont *iNewFont, int iSize)
 bool csHintManager::do_checkhint (csComponent *comp, void *data)
 {
   csHintManager *This = (csHintManager *)data;
-  return (This->FindSortedKey (comp, CompareKey) >= 0);
+  return (This->FindSortedKey (KeyCmp(comp)) >= 0);
 }
 
 void csHintManager::HandleEvent (iEvent &Event)
@@ -261,7 +261,7 @@ void csHintManager::HandleEvent (iEvent &Event)
         if (c && !c->GetState (CSS_DISABLED))
         {
           // Look for a hint for given component
-          int idx = FindSortedKey (c, CompareKey);
+          int idx = FindSortedKey (KeyCmp(c));
           if (idx >= 0)
           {
             // Okay, create the floating hint object

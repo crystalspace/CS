@@ -57,14 +57,20 @@ public:
  * The constraints (and thus the components to place) are
  * taken into account in the sequence they are added to this vector.
  */
-class CS_CSWS_EXPORT csConstraintVector : public csPDelArray<csLayoutConstraint>
+class CS_CSWS_EXPORT csConstraintVector :
+  public csPDelArray<csLayoutConstraint>
 {
 public:
-  /// look up an constraint given a components
+  /// Look up an constraint given a components.
   static int CompareKey (csLayoutConstraint* const& Item1,
 			 csComponent* const& Item2)
   {
     return (Item1->comp < Item2 ? -1 : Item1->comp > Item2 ? 1 : 0);
+  }
+  /// Return a functor wrapping CompareKey() for a given component.
+  static csArrayCmp<csLayoutConstraint*,csComponent*> KeyCmp(csComponent* c)
+  {
+    return csArrayCmp<csLayoutConstraint*,csComponent*>(c, CompareKey);
   }
 };
 
@@ -82,7 +88,7 @@ public:
  * They will allow you to relatively place a control and to resize
  * components when necessary.
  *
- * Layouts are themselfs csComponents and have a transparent canvas.
+ * Layouts are themselves csComponents and have a transparent canvas.
  * Thus you will not note them. One important issue about layouts is
  * that they will transfer all Events of type csevCommand to its parent
  * control. This will allow you overwrite just one HandleEvent to receive

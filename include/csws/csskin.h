@@ -176,9 +176,12 @@ public:
   /// Compare a item from this array with some key
   static int CompareKey (csSkinSliceNonAbstr* const&, char const* const& Key);
 
+  /// Return a functor wrapping CompareKey() for a name.
+  static csArrayCmp<csSkinSliceNonAbstr*,char const*> KeyCmp(char const* n)
+  { return csArrayCmp<csSkinSliceNonAbstr*,char const*>(n, CompareKey); }
+
   /// Compare two items from this array
-  static int Compare (csSkinSliceNonAbstr* const&,
-		      csSkinSliceNonAbstr* const&);
+  static int Compare(csSkinSliceNonAbstr* const&, csSkinSliceNonAbstr* const&);
 
   /// Apply this skin to some component and all components inserted into it
   void Apply (csComponent *iComp);

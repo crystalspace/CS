@@ -158,9 +158,9 @@ csSparseGrid::csGridRow::csGridRow (int theCol)
 
 void csSparseGrid::csGridRow::SetAt (int col, void* data)
 {
-  int key = FindSortedKey (col, CompareKey);
+  int key = FindSortedKey (KeyCmp(col));
   if (key == -1 && data)
-    key = InsertSorted (new csGridRowEntry (col, data), Compare);
+    key = InsertSorted (new csGridRowEntry(col, data), Compare);
   else
     if (data)
       Get (key)->data = data;

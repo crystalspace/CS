@@ -106,6 +106,9 @@ public:
   static int Compare (void* const& Item1, void* const& Item2);
   /// Compare a hint with a csComponent
   static int CompareKey (void* const& Item, csComponent* const& key);
+  /// Return a functor wrapping CompareKey() for a given csComponent.
+  static csArrayCmp<void*,csComponent*> KeyCmp(csComponent* c)
+  { return csArrayCmp<void*,csComponent*>(c, CompareKey); }
   /// Add a new hint
   void Add (const char *iText, csComponent *iComp);
   /// Remove the hint (if any) associated with this component
