@@ -3469,18 +3469,18 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 
 //---------------------------------------------------------------------------
 
-csSoundBufferObject* csLoader::load_sound(char* name, csWorld* w)
+csSoundBufferObject* csLoader::load_sound(char* name, char* filename, csWorld* w)
 {
   csSoundBufferObject* sndobj = NULL;
   csSoundBuffer* snd = NULL;
 
   size_t size;
-  char* buf = VFS->ReadFile (name, size);
+  char* buf = VFS->ReadFile (filename, size);
 
   if (!buf || !size)
   {
     CsPrintf (MSG_FATAL_ERROR,
-      "Cannot read sound file \"%s\" from VFS\n", name);
+      "Cannot read sound file \"%s\" from VFS\n", filename);
     return NULL;
   }
 
@@ -3488,7 +3488,7 @@ csSoundBufferObject* csLoader::load_sound(char* name, csWorld* w)
   CHK (delete [] buf);
   if (!snd)
   {
-    CsPrintf (MSG_FATAL_ERROR, "The sound file \"%s\" is corrupt!\n", name);
+    CsPrintf (MSG_FATAL_ERROR, "The sound file \"%s\" is corrupt!\n", filename);
     return NULL;
   }
 
@@ -3830,6 +3830,10 @@ bool csLoader::LoadSounds (csWorld* world, char* buf)
     TOKEN_TABLE (SOUND)
   TOKEN_TABLE_END
 
+  TOKEN_TABLE_START (options)
+    TOKEN_TABLE (FILE)
+  TOKEN_TABLE_END
+
   char* name;
   long cmd;
   char* params;
@@ -3845,10 +3849,20 @@ bool csLoader::LoadSounds (csWorld* world, char* buf)
     {
       case TOKEN_SOUND:
         {
+          char* filename = name;
+	  char* maybename;
+          cmd = csGetCommand (&params, options, &maybename);
+	  if (cmd == TOKEN_FILE)
+            filename = maybename;
+          else if (cmd == PARSERR_TOKENNOTFOUND)
+	  {
+            CsPrintf (MSG_FATAL_ERROR, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
+            fatal_exit (0, false);
+	  }
           csSoundBuffer *snd = csSoundBufferObject::GetSound(*world,name);
           if (!snd)
           {
-            csSoundBufferObject *s = load_sound (name, world);
+            csSoundBufferObject *s = load_sound (name, filename, world);
             if (s) world->ObjAdd(s);
           }
         }
