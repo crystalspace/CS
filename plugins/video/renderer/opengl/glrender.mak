@@ -88,7 +88,7 @@ gl3dclean:
 ifdef DO_DEPEND
 depend: $(OUTOS)gl3d.dep
 $(OUTOS)gl3d.dep: $(SRC.GL3D)
-	$(DO.DEP) $(CFLAGS.GL3D)
+	$(DO.DEP1) $(CFLAGS.GL3D) $(DO.DEP2)
 else
 -include $(OUTOS)gl3d.dep
 endif

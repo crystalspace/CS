@@ -53,6 +53,7 @@ DESCRIPTION.$(GLIDEX2D) = $(DESCRIPTION.glidex2d)
 SRC.GLIDEX2D = $(wildcard libs/cs2d/unxglide2/*.cpp $(SRC.COMMON.DRV2D) $(SRC.COMMON.DRV2D.GLIDE))
 OBJ.GLIDEX2D = $(addprefix $(OUT),$(notdir $(SRC.GLIDEX2D:.cpp=$O)))
 
+
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #------------------------------------------------------------------ targets ---#
@@ -80,7 +81,7 @@ glidexclean:
 ifdef DO_DEPEND
 depend: $(OUTOS)glidex2d.dep
 $(OUTOS)glidex2d.dep: $(SRC.GLIDEX2D)
-	$(DO.DEP) $(CFLAGS.GLIDEX2D)
+	$(DO.DEP1) $(CFLAGS.GLIDEX2D) $(DO.DEP2)
 else
 -include $(OUTOS)glidex2d.dep
 endif

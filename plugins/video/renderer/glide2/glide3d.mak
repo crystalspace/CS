@@ -73,7 +73,7 @@ glide3dclean:
 ifdef DO_DEPEND
 depend: $(OUTOS)glide3d.dep
 $(OUTOS)glide3d.dep: $(SRC.GLIDE3D)
-	$(DO.DEP) $(CFLAGS.GLIDE3D)
+	$(DO.DEP1) $(CFLAGS.GLIDE3D) $(DO.DEP2)
 else
 -include $(OUTOS)glide3d.dep
 endif
