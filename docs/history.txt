@@ -31,6 +31,8 @@ The history order is reversed so that new features are at the top.
 	  supposed to transform the incoming .csplugin suffix on the pathname
 	  with .csbundle, but instead uselessly replaced .csplugin with
 	  .csplugin.
+	- Anders Stenberg added support for pixmaps (DrawPixmap) to new 
+	  renderer.
 25-Jun-2003
 	- Oktal manually applied a patch to cssocket that was intended for
 	  ensocket, submitted by Ladislav Foldyna.

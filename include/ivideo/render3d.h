@@ -389,6 +389,24 @@ struct iRender3D : public iBase
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (csRenderMesh* mymesh) = 0;
 
+  /**
+  * Draw a pixmap using a rectangle from given texture.
+  * The sx,sy(sw,sh) rectangle defines the screen rectangle within
+  * which the drawing is performed (clipping rectangle is also taken
+  * into account). The tx,ty(tw,th) rectangle defines a subrectangle
+  * from texture which should be painted. If the subrectangle exceeds
+  * the actual texture size, texture coordinates are wrapped around
+  * (e.g. the texture is tiled). The Alpha parameter defines the
+  * transparency of the drawing operation, 0 means opaque, 255 means
+  * fully transparent.<p>
+  * <b>WARNING: Tiling works only with textures that have power-of-two
+  * sizes!</b> That is, both width and height should be a power-of-two,
+  * although not neccessarily equal.
+  */
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
+    int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha = 0) = 0;
+
+
   /// Set the masking of color and/or alpha values to framebuffer
   virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha) = 0;
 

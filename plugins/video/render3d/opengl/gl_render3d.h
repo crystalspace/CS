@@ -331,6 +331,10 @@ public:
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (csRenderMesh* mymesh);
 
+  /// Draw a 2D sprite
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
+    int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha);
+
   /// Set the masking of color and/or alpha values to framebuffer
   virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha)
   { 

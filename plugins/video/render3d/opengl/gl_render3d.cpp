@@ -681,18 +681,8 @@ bool csGLRender3D::Open ()
 
   config.AddConfig(object_reg, "/config/r3dopengl.cfg");
 
-  const char *driver = cmdline->GetOption ("canvas");
-  if (!driver)
-    driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
-
   textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias",
     -0.5);
-
-  // @@@ Should check what canvas to load
-  G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
-  object_reg->Register( G2D, "iGraphics2D");
-  if (!G2D)
-    return false;
 
   if (!G2D->Open ())
   {
@@ -1418,6 +1408,119 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   }*/
 }
 
+void csGLRender3D::DrawPixmap (iTextureHandle *hTex,
+                                        int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha)
+{
+  // If original dimensions are different from current dimensions (because
+  // image has been scaled to conform to OpenGL texture size restrictions)
+  // we correct the input coordinates here.
+  int bitmapwidth = 0, bitmapheight = 0;
+  hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);
+  csGLTextureHandle *txt_mm = (csGLTextureHandle*)
+    hTex->GetPrivateObject ();
+  int owidth = txt_mm->orig_width;
+  int oheight = txt_mm->orig_height;
+  if (owidth != bitmapwidth || oheight != bitmapheight)
+  {
+    sw = sw * owidth / bitmapwidth;
+    sh = sh * oheight / bitmapheight;
+  }
+
+  int ClipX1, ClipY1, ClipX2, ClipY2;
+  G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
+
+  // Texture coordinates (floats)
+  float _tx = tx, _ty = ty, _tw = tw, _th = th;
+
+  // Clipping
+  if ((sx >= ClipX2) || (sy >= ClipY2) ||
+    (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
+    return;                             // Sprite is totally invisible
+  if (sx < ClipX1)                      // Left margin crossed?
+  {
+    int nw = sw - (ClipX1 - sx);        // New width
+    _tx += (ClipX1 - sx) * _tw / sw;    // Adjust X coord on texture
+    _tw = (_tw * nw) / sw;              // Adjust width on texture
+    sw = nw; sx = ClipX1;
+  }
+  if (sx + sw > ClipX2)                 // Right margin crossed?
+  {
+    int nw = ClipX2 - sx;               // New width
+    _tw = (_tw * nw) / sw;              // Adjust width on texture
+    sw = nw;
+  }
+  if (sy < ClipY1)                      // Top margin crossed?
+  {
+    int nh = sh - (ClipY1 - sy);        // New height
+    _ty += (ClipY1 - sy) * _th / sh;    // Adjust Y coord on texture
+    _th = (_th * nh) / sh;              // Adjust height on texture
+    sh = nh; sy = ClipY1;
+  }
+  if (sy + sh > ClipY2)                 // Bottom margin crossed?
+  {
+    int nh = ClipY2 - sy;               // New height
+    _th = (_th * nh) / sh;              // Adjust height on texture
+    sh = nh;
+  }
+
+  // cache the texture if we haven't already.
+  txtcache->Cache (hTex);
+
+  // Get texture handle
+  GLuint texturehandle = ((csTxtCacheData *)txt_mm->GetCacheData ())->Handle;
+
+  // as we are drawing in 2D, we disable some of the commonly used features
+  // for fancy 3D drawing
+  statecache->SetShadeModel (GL_FLAT);
+  SetZMode (CS_ZBUF_NONE);
+  //@@@???statecache->SetDepthMask (GL_FALSE);
+
+  // if the texture has transparent bits, we have to tweak the
+  // OpenGL blend mode so that it handles the transparent pixels correctly
+  if (hTex->GetKeyColor () || hTex->GetAlphaMap () || Alpha)
+    SetMixMode (CS_FX_ALPHA, 0, false);
+  else
+    SetMixMode (CS_FX_COPY, 0, false);
+
+  statecache->Enable_GL_TEXTURE_2D ();
+  glColor4f (1.0, 1.0, 1.0, Alpha ? (1.0 - BYTE_TO_FLOAT (Alpha)) : 1.0);
+  statecache->SetTexture (GL_TEXTURE_2D, texturehandle);
+
+  // convert texture coords given above to normalized (0-1.0) texture
+  // coordinates
+  float ntx1,nty1,ntx2,nty2;
+  ntx1 = (_tx      ) / bitmapwidth;
+  ntx2 = (_tx + _tw) / bitmapwidth;
+  nty1 = (_ty      ) / bitmapheight;
+  nty2 = (_ty + _th) / bitmapheight;
+
+  // draw the bitmap
+  glBegin (GL_QUADS);
+  //    glTexCoord2f (ntx1, nty1);
+  //    glVertex2i (sx, height - sy - 1);
+  //    glTexCoord2f (ntx2, nty1);
+  //    glVertex2i (sx + sw, height - sy - 1);
+  //    glTexCoord2f (ntx2, nty2);
+  //    glVertex2i (sx + sw, height - sy - sh - 1);
+  //    glTexCoord2f (ntx1, nty2);
+  //    glVertex2i (sx, height - sy - sh - 1);
+
+  // smgh: This works in software opengl and with cswstest
+  // wouter: removed height-sy-1 to be height-sy.
+  //    this is because on opengl y=0.0 is off screen, as is y=height.
+  //    using height-sy gives output on screen which is identical to 
+  //    using the software canvas.
+  glTexCoord2f (ntx1, nty1);
+  glVertex2i (sx, viewheight - sy);
+  glTexCoord2f (ntx2, nty1);
+  glVertex2i (sx + sw, viewheight - sy);
+  glTexCoord2f (ntx2, nty2);
+  glVertex2i (sx + sw, viewheight - (sy + sh));
+  glTexCoord2f (ntx1, nty2);
+  glVertex2i (sx, viewheight - (sy + sh));
+  glEnd ();
+}
+
 void csGLRender3D::SetShadowState (int state)
 {
   switch (state)
@@ -1530,6 +1633,23 @@ bool csGLRender3D::Initialize (iObjectRegistry* p)
     strings = csPtr<iStringSet> (new csScfStringSet ());
     object_reg->Register (strings, "crystalspace.renderer.stringset");
   }
+
+  csRef<iPluginManager> plugin_mgr (
+    CS_QUERY_REGISTRY (object_reg, iPluginManager));
+
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+    iCommandLineParser));
+
+  config.AddConfig(object_reg, "/config/r3dopengl.cfg");
+
+  const char *driver = cmdline->GetOption ("canvas");
+  if (!driver)
+    driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
+
+  G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
+  object_reg->Register( G2D, "iGraphics2D");
+  if (!G2D)
+    return false;
 
   return true;
 }
