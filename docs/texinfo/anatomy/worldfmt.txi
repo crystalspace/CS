@@ -362,7 +362,7 @@ Things and objects:
 <detail> ::= 'DETAIL' '(' ')'
 <convex> ::= 'CONVEX' '(' ')'
 <template> ::= 'TEMPLATE' '(' <thingtpl-name> ')'
-<tex-select> ::= 'TEX_SET_SELECT' '(' <tex-set-name> ')'
+<tex-select> ::= 'MAT_SET_SELECT' '(' <mat-set-name> ')'
 <thing-camera> ::= 'CAMERA' '(' ')'
   
 <thing-comp> ::= <vertex> | <polygon> | <texnr> | <texlen> | 
@@ -546,14 +546,14 @@ Descriptions for all textures:
 Grouping textures: Sometimes you want things of the same type but with
 different textures on it. Here comes the grouping of textures in handy.
 
-The final name of a texture in a @code{TEX_SET} will be
-@samp{<tex-set-name>_<texture-name>}. The textures will be merged into the
-global texturelist. You should define a @code{TEX_SET} after @code{TEXTURES}
+The final name of a texture in a @code{MAT_SET} will be
+@samp{<mat-set-name>_<texture-name>}. The textures will be merged into the
+global texturelist. You should define a @code{MAT_SET} after @code{TEXTURES}
 since the later command deletes the internal list first :) For usage of
-@code{TEX_SET} see the @code{THING} description.
+@code{MAT_SET} see the @code{THING} description.
 @example
 <tex-set-name> ::= name
-<texture-set> ::= 'TEX_SET' <tex-set-name> '(' [ <texture-desc> ] ')'
+<texture-set> ::= 'MAT_SET' <mat-set-name> '(' <materials> ')'
 @end example
   
 @item
