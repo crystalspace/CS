@@ -53,6 +53,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SIZE)
   CS_TOKEN_DEF (TOPLEFT)
   CS_TOKEN_DEF (HEIGHTMAP)
+  CS_TOKEN_DEF (GROUPMATERIAL)
 CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csBCTerrFactoryLoader)
@@ -272,6 +273,7 @@ iBase* csBCTerrLoader::Parse (const char* pString,
     CS_TOKEN_TABLE (TOPLEFT)
     CS_TOKEN_TABLE (HEIGHTMAP)
     CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (GROUPMATERIAL)
   CS_TOKEN_TABLE_END
   
   char *pName;
@@ -373,6 +375,28 @@ iBase* csBCTerrLoader::Parse (const char* pString,
           iState->SetBlockMaterial (x, z, mat);					
         }
         
+      }
+      break;
+      case CS_TOKEN_GROUPMATERIAL:
+      {
+        int i, rangeStart, rangeEnd, iter;
+        bool done;
+        char pMatName[256];
+        done = false;
+        i = 0;
+        iter = 0;
+	csScanStr (pParams, "%s,%d,%d", pStr, &rangeStart, &rangeEnd);
+        for (i = rangeStart; i <= rangeEnd; i++) 
+        {
+          sprintf (pMatName, pStr, i);
+          iMaterialWrapper* mat = ldr_context->FindMaterial (pMatName);
+          if (mat)
+          {
+            if (iState)
+              iState->SetBlockMaterialNum (iter, mat);
+            iter++;
+          }
+        }
       }
       break;
     }
