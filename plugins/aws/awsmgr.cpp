@@ -47,7 +47,7 @@
 #include "aws3dfrm.h"
 
 
-#include "awscmpt.h"
+//#include "awscmpt.h"
 #include "awscscr.h"
 #include "awslayot.h"
 
