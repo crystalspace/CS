@@ -419,6 +419,8 @@ public:
     {
         return stri[i].edge();
     }
+	/// Return the index lookup table.
+	ddgTriIndex	*indexLUT(void) { return _indexLUT; }
 	/// Return the cache of active triangles.
 	ddgTCache *tcache(void) { return &_tcache; }
 	/// Return merge queue state.

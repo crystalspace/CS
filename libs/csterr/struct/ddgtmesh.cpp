@@ -68,8 +68,8 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	ddgMemorySet(ddgTriIndex,(ddgTBinMesh_size+1)*(ddgTBinMesh_size+1));
 	// Queues to hold the visible, clipped and sorted visible triangles.
 	// Estimate how many entries we can possibly have in the split and merge queues.
-	_qscache.init(2*_absMaxDetail/3, ddgPriorityResolution);
-	_qmcache.init(_absMaxDetail/2, ddgPriorityResolution,true);
+	_qscache.init(_absMaxDetail, ddgPriorityResolution);
+	_qmcache.init(_absMaxDetail, ddgPriorityResolution,true);
 
 	unsigned int i;
 	for (i = 0; i < _bintreeMax; i++ )
@@ -188,6 +188,8 @@ bool ddgTBinMesh::init( ddgContext *ctx )
 		}
 	}
 
+	// We call this function twice.
+	ddgTBinTree::initContext(ctx,this);
 	for (i = 0; i < _bintreeMax; i++)
 	{
 		if (_bintree[i])
@@ -202,9 +204,10 @@ bool ddgTBinMesh::init( ddgContext *ctx )
 	}
 	// The difference between the highest point and the lowest point.
 	_absDiffHeight = _absMaxHeight - _absMinHeight;
-	ddgTBinTree::updateContext(ctx,this);
+	// Call it again to update the DiffHeight etc info.
+	ddgTBinTree::initContext(ctx,this);
 
-	// Let go of the height map we should not need it anymore.
+	// Let go of the height map we do not need it anymore.
     _heightMap = 0;
 	ddgConsole::end() ;
 
@@ -340,7 +343,7 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 		lastDirty = true;
 
 	// Initialize world to camera space matrix and viewing frustrum. 
-	ddgTBinTree::updateContext(ctx,this);
+	ddgTBinTree::initContext(ctx,this);
 	// Calculate visibility info for all triangles currently in the mesh
 	// at the current camera position.
 	// Clear queue.
@@ -392,13 +395,15 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 	else 
 	{
 		i = 0;
-		/*
+
 		unsigned int r, c;
+		// Include a 2 block border.
+		float d = _farClip+2*ddgTBinMesh_size;
 		// Only update those triangles which could possibly be in visible range.
 		// See if the triangle is too far from the camera.  Ingore height component.
 		ddgVector2 pos( ctx->control()->position()->v[0], ctx->control()->position()->v[2]);
-		ddgVector2 min = pos - ddgVector2(farClip(),farClip());
-		ddgVector2 max = pos + ddgVector2(farClip(),farClip());
+		ddgVector2 min = pos - ddgVector2(d,d);
+		ddgVector2 max = pos + ddgVector2(d,d);
 		max /= ddgTBinMesh_size;
 		min /= ddgTBinMesh_size;
 		if (min[0] < 0) min[0] = 0;
@@ -409,7 +414,8 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 		unsigned int rmax = (unsigned int)max[1];
 		unsigned int cmin = (unsigned int)min[0];
 		unsigned int cmax = (unsigned int)max[0];
-		
+
+		// Update the potentially visible square.
 		for (r = rmin; r < rmax; r++)
 			for (c = cmin; c < cmax; c++)
 			{
@@ -424,15 +430,7 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 					_bintree[i+1]->updateSplit(1,ddgUNDEF);
 				}
 		}
-*/
-		while (i < _bintreeMax)
-		{
-			if ( _bintree[i])
-			{
-				_bintree[i]->updateSplit(1,ddgUNDEF);
-			}
-			i++;
-		}
+
 		// Validate the merge queue.
 		ddgCacheIndex ci = qmcache()->head();
 		while (ci)
@@ -466,6 +464,7 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 		ddgQNode *qn = qscache()->get(csi);
 		ddgTBinTree *sbt = getBinTree(qn->tree());
 		ddgTriIndex si = qn->tindex();
+		ddgPriority ps = sbt->priority(si);
 		if (merge())
 		{
 			ddgCacheIndex cmi = qmcache()->head();
@@ -475,7 +474,6 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 				ddgTBinTree *mbt = getBinTree(qn->tree());
 				ddgTriIndex mi = qn->tindex();
 				ddgPriority pm = qmcache()->convert(qn->bucket());
-				ddgPriority ps = sbt->priority(si);
 				ddgAssert(ps == 0 || ps == qscache()->convert(qscache()->get(csi)->bucket()));
 				if (( _triVis > _maxDetail) // We have too many triangles.
 					|| (pm == 0)			// We have useless merge diamonds, merge these 1st.
@@ -490,7 +488,7 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 				}
 			}
 		}
-		if (csi && _triVis < _minDetail)
+		if (csi && _triVis < _minDetail )
 		{
 			ddgAsserts( sbt->visible(si), "Non visible triangle in the split queue!")
 			sbt->forceSplit(si);

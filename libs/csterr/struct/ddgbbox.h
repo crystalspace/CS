@@ -48,11 +48,11 @@ enum ddgVis { ddgOUT=0, ddgPART=1, ddgIN=2, ddgUNDEF = 4};
  * This object defines a 3d volume based a min and max point in 3D space.
  */
 class WEXP ddgBBox {
+public:
 	/// left bottom near corner of the bbox.
 	ddgVector3 _min;
 	/// right top far corner of the bbox.
 	ddgVector3 _max;
-public:
 	/// Indexes to the corner points of the bounding box.
 	static short _corner[8][3];
 	/// Split options.

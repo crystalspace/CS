@@ -27,7 +27,7 @@
 
 #ifdef WIN32
 // Windows defines
-#if defined (COMP_VC) || defined (COMP_BC)
+#if defined (COMP_VC) || defined (COMP_BC) || defined (DDG)
 #pragma warning (disable:4244)	// Disable bogus conversion warnings. 
 #pragma warning (disable:4305)  // VC++ 5.0 version of above warning. 
 #pragma warning (disable:4097)	// typedef-name 'super' used as synonym for class-name 'ddgSubclass::ddgSuperClass'. 
@@ -42,7 +42,7 @@
 #define WFEXP	__cdecl
 #endif
 //
-#if defined (COMP_GCC)
+#if defined (COMP_GCC) || defined (DDG)
 #include <stdlib.h>			// For exit() COMP_GCC
 #endif
 //

@@ -97,8 +97,16 @@ class WEXP ddgTBinTree {
 	ddgTBinTree   *_pNeighbourTop;
 	/// For mirrored mesh this is the right side.
 	ddgTBinTree   *_pNeighbourLeft;
-	/// View context
+	/// Various static variables to avoid dereferencing _mesh.
 	static ddgContext	  *_ctx;
+	static ddgVector2	_pos;
+	static ddgVector2	_forward;
+	static float _farClip;
+	static float _nearClip;
+	static float _farClipSQ;
+	static int _priorityScale;
+	static ddgMSTri	*_stri;
+	static ddgTCache	*_tcache;
 	/// A cache chain for this bintree.
 	ddgCacheIndex		_chain;
 	/// The number of visible triangles.
@@ -155,7 +163,7 @@ public:
     /// Get vertex location in world space from the cache, return the cache index if we have it.
     inline unsigned int vertex(ddgTriIndex tindex, ddgVector3 *vout)
     {
-	*vout = ddgVector3(mrow(tindex),height(tindex),mcol(tindex));
+		*vout = ddgVector3(mrow(tindex),height(tindex),mcol(tindex));
 
         if (vbufferIndex(tindex))
 			return 0;
@@ -246,7 +254,7 @@ public:
 	/// Return the quad neighbour. If 0 there is no neighbour.
 	inline ddgTriIndex neighbour( ddgTriIndex i)
 	{
-		switch(_mesh->edge(i))
+		switch(_mesh->stri[i].edge())
 		{
 		case eINNER:
 			return _mesh->stri[i].neighbour;
@@ -264,7 +272,7 @@ public:
 	/// Return the bintree of the neighbour.
 	inline ddgTBinTree *neighbourTree( ddgTriIndex i)
 	{
-		switch(_mesh->edge(i))
+		switch(_mesh->stri[i].edge())
 		{
 		case eINNER:
 			return this;
@@ -279,11 +287,6 @@ public:
 			return 0;
 		}
 	}
-	/// Return the edge information.
-	inline unsigned int edge( ddgTriIndex i)
-	{ return _mesh->edge(i); }
-
-
 
 	/// Set the cache index for a triangle
 	inline void tcacheId( ddgTriIndex tindex, ddgCacheIndex ci )
@@ -429,14 +432,13 @@ public:
 	/// Merge 4 triangles into 2.
 	void forceMerge( ddgTriIndex tindex);
 
-	/// Recursively update the split info for a triangle which is in the mesh, return true if something changed.
-	bool updateSplit(ddgTriIndex tindex, ddgVisState newVis );
+	/// Recursively update the split info for a triangle which is in the mesh.
+	void updateSplit(ddgTriIndex tindex, ddgVisState newVis );
 
-	/// Update the merge info for a triangle which is in the mesh, return true if something changed.
-	bool updateMerge(ddgTriIndex tindex, ddgPriority pr);
-
-	/// Calculate priority of triangle tindex.
-	ddgPriority priorityCalc(ddgTriIndex tindex);
+	/// Update the merge info for a triangle which is in the mesh.
+	void updateMerge(ddgTriIndex tindex, ddgPriority pr);
+	/// Calculate priority of triangle tindex  We assume that we only get called
+	inline ddgPriority priorityCalc(ddgTriIndex tindex);
 
 	/// The mesh that manages this bintree.
 	inline ddgTBinMesh *mesh(void) { return _mesh; }
@@ -444,7 +446,9 @@ public:
 	/// Return the index in the mesh.
 	inline unsigned int index(void) { return _index; }
 
-	/// Update view context.
+	/// Initialize view context called once during initialization.
+	static void initContext( ddgContext *context, ddgTBinMesh *mesh );
+	/// Update view context called each frame.
 	static void updateContext( ddgContext *context, ddgTBinMesh *mesh );
 
 	/**
@@ -462,10 +466,4 @@ WEXP ostream& WFEXP operator << ( ostream&s, ddgTBinTree v );
 ///
 WEXP ostream& WFEXP operator << ( ostream&s, ddgTBinTree* v );
 #endif // DDGSTREAM
-
-WEXP void WFEXP incrframe(void);
-#ifdef _DEBUGLOG
-WEXP void WFEXP logactivate(void);
-#endif
-WEXP void WFEXP logqueue( ddgTBinMesh *m);
 #endif

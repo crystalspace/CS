@@ -116,7 +116,7 @@ public:
     /// Exponential interpolation from a to b.
     inline static float einterp(float a, float b, float x)
     {
-        return a+(b-a)*(pow(2.0,8.0*x)/256.0);
+        return a+(b-a)*(powf(2.0,8.0*x)/256.0);
     }
     /// Cosine interpolation from a to b. Goes from a->b->a.
     inline static float cinterp(float a, float b, float x)

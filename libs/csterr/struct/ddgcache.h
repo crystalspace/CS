@@ -233,6 +233,8 @@ class WEXP ddgSCache : public ddgLCache {
 	ddgCacheIndex	*_bucket;
 	/// The bucket with the item of highest priority in the queue.
 	ddgCacheIndex	_head;
+	/// The bucket with the item of lowest priority in the queue.
+	ddgCacheIndex	_tail;
 	/// The number of buckets to use.
 	short	_bucketNo;
 	/// Sort cache in reverse.
@@ -245,12 +247,14 @@ public:
 		_bucket = 0;
 		_bucketNo = 0;
 		_head = 0;
+		_tail = 0;
 	}
 	/// Destructor.
 	~ddgSCache(void)
 	{
 		delete[] _bucket;
 		_head = 0;
+		_tail = 0;
 		_bucket = 0;
 	}
 	/// Initialize the cache.
@@ -265,10 +269,11 @@ public:
 		reset();
 	}
 	/// Reset the queue.
-	void reset(void)
+	inline void reset(void)
 	{
 		ddgCache::reset();
 		_head = 0;
+		_tail = 0;
 		unsigned int i = _bucketNo;
 		while (i--)
 			_bucket[i] = 0;
@@ -279,9 +284,9 @@ public:
 		return (ddgSNode*) ddgCache::get(index);
 	}
 	/// Return the number of buckets/key slots.
-	short bucketNo(void) { return _bucketNo; }
+	inline short bucketNo(void) { return _bucketNo; }
 	/// Convert bucket # back to key for reversed cache.
-	short convert( short b )
+	inline short convert( short b )
 	{
 		return _reverse ? _bucketNo - b - 1 : b;
 	}
@@ -304,6 +309,8 @@ public:
 		// Reset the head and tail of the queue if need be.
 		if (_head < ddgCacheIndex(b))
 			_head = b;
+		else if (_tail > ddgCacheIndex(b))
+			_tail = b;
 		ddgAssert(ci);
 		return ci;
 	}
@@ -330,6 +337,13 @@ public:
 			_head--;
 		return _bucket[_head];
 	}
+	/// Return the item at the head of the queue.
+	inline ddgCacheIndex tail(void)
+	{
+		while (!_bucket[_tail] && _tail < _bucketNo-1 )
+			_tail++;
+		return _bucket[_tail];
+	}
 	/// Return the item following this one ci must be valid.
 	inline ddgCacheIndex next(ddgCacheIndex ci)
 	{
@@ -339,7 +353,7 @@ public:
 		if (n->next())
 			return n->next();
 		// Find next bucket with something in it.
-		while (--b && !_bucket[b] ){}
+		while (--b > _tail && !_bucket[b] ){}
 		return b ? _bucket[b] : 0;
 	}
 };

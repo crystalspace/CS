@@ -871,8 +871,9 @@ bool ddgImage::readPNG(const char *filename)
     return ddgSuccess;
 error:
     if (fptr) fclose(fptr);
-#endif
+#else
 	(void)filename;
+#endif
 	return ddgFailure;
 }
 
@@ -880,7 +881,8 @@ bool ddgImage::writePNG(const char *filename)
 {
 #ifdef DDGPNG
     return ddgSuccess;
-#endif
+#else
     (void)filename;
+#endif
     return ddgFailure;
 }

@@ -40,7 +40,7 @@ private:
     /**
      * Number of vertices/texture/normal and color elements in buffer.
      */
-    ddgVBIndex _num;
+    unsigned int _num;
     /// Number of indices.
     unsigned int _inum;
     /// Textured triangle set.
