@@ -9,6 +9,14 @@ The history order has been reversed so that new features are at the top.
 	      and plugins/overview.txi.
 	    - Performed some minor re-writing of cssys.txi.
 	    - Replaced Doc++ references with Doxygen references in coding.txi.
+	- Eric Sunshine made the following changes to CVSROOT/sumlog.awk (and
+	    cousins):
+	    - Minor beautification of generated output in order to facilitate
+	      ease of reading.
+	    - Now ensures that all developers have write access to temporary
+	      working directory.  This should prevent the problem of
+	      "permission denied" errors which occurred for some users when
+	      committing files.
 27-Nov-2000
 	- Fixed a bug in sprites recently introduced by Seth. The problem
 	  was a divide by zero when normalizing the null vector.
