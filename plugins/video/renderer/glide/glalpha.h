@@ -97,8 +97,11 @@ public:
   }
 
   /// Get the alpha map data.
-  void *GetAlphaMap ()
+  void *GetAlphaMapData ()
   { return alpha; }
+
+  bool GetAlphaMap ()
+  { return true; }
 
   /// Get the mean color.
   virtual void GetMeanColor (UByte &red, UByte &green, UByte &blue)

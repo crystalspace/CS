@@ -523,7 +523,7 @@ void csGlideTextureCache::LoadAlpha (csGlideCacheData *d)
   {
     d->texhnd.info.format=GR_TEXFMT_ALPHA_8;
     d->texhnd.tmu = m_tmu;
-    d->texhnd.info.data=(unsigned char*)txt_mm->GetAlphaMap ();
+    d->texhnd.info.data=(unsigned char*)txt_mm->GetAlphaMapData ();
     d->texhnd.size = GlideLib_grTexTextureMemRequired(GR_MIPMAPLEVELMASK_BOTH,&d->texhnd.info);
 
     d->mempos=manager->allocSpaceMem(d->texhnd.size);

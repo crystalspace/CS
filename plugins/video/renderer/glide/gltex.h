@@ -47,6 +47,8 @@ public:
   /// Encode 24 bit data into 16 bit ( 565 RGB scheme )
   virtual void remap_mm ();
   virtual iGraphics3D *GetProcTextureInterface();
+  bool GetAlphaMap ()
+  { return false; }
 };
 
 /**
@@ -72,6 +74,8 @@ public:
   { return (RGBPixel*)image->GetImageData (); }
   iImage *get_image ()
   { return image; }
+  bool GetAlphaMap ()
+  { return false; }
 };
 
 /**
