@@ -21,7 +21,7 @@
 #include "igraph2d.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
-//#include "qsqrt.h"
+#include "qsqrt.h"
 #include "csgeom/matrix3.h"
 
 //---------- csProcSkyTexture ------------------------------------
@@ -147,7 +147,7 @@ bool csProcSky::SphereIntersect(const csVector3& point, csVector3& isect)
   float discrim = b*b - 4.0*a*c;
   if(discrim < 0.0) return false;
   float div = 1.0 / (2.0 * a); /// do the div only once
-  float sqdis = sqrt(discrim); /// and the sqrt only once.
+  float sqdis = qsqrt(discrim); /// and the sqrt only once.
   /// the positive mu solution is in the direction viewed.
   float mu = div * (-b + sqdis);
   if(mu < 0.0) mu = div * (-b - sqdis);
