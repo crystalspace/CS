@@ -755,6 +755,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "csgeom/math2d.h"
 
 %ignore csPoly2D::operator[];
+%ignore csPoly2D::GetVertices (); // Non-const.
 %include "csgeom/poly2d.h"
 
 %include "csgeom/math3d.h"
@@ -793,6 +794,10 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csBox3::operator< (const csVector3& point, const csBox3& box);
 %include "csgeom/box.h"
 
+%ignore csSegment2::Start (); // Non-const.
+%ignore csSegment2::End ();   // Non-const.
+%ignore csSegment3::Start (); // Non-const.
+%ignore csSegment3::End ();   // Non-const.
 %include "csgeom/segment.h"
 
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;

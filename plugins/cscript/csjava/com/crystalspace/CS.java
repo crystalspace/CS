@@ -19,6 +19,8 @@
 
 package com.crystalspace;
 
+import com.crystalspace.csPluginRequest;
+
 public class CS extends cspace
 {
     public static String CSJAVA_LIB = "csjava";
@@ -32,13 +34,15 @@ public class CS extends cspace
         }
         catch (UnsatisfiedLinkError e)
         {
-            System.out.println("Fatal Error: unresolved symbol in '" + CSJAVA_LIB + "'.");
+            System.out.println("Fatal Error: unresolved symbol in '" +
+			       CSJAVA_LIB + "'.");
             System.out.println(e.toString());
             System.exit(-1);
         }
         catch (SecurityException e)
         {
-            System.out.println("Fatal Error: no permission to open '" + CSJAVA_LIB + "'.");
+            System.out.println("Fatal Error: no permission to open '" +
+			       CSJAVA_LIB + "'.");
             System.out.println(e.toString());
             System.exit(-1);
         }
@@ -48,8 +52,14 @@ public class CS extends cspace
     protected static boolean requestPlugin (String name, String intf)
     {
         int intfVersion = 0;
-        int intfID = (int) iSCF.getSCF().GetInterfaceID(intf);
-        boolean result = csInitializer._RequestPlugin(getTheObjectRegistry(), name, intf, intfID, intfVersion); 
+        long intfID = (long) iSCF.getSCF().GetInterfaceID(intf);
+
+	csPluginRequestArray arr = new csPluginRequestArray();
+        arr.Push(new csPluginRequest(
+	    new csString(name), new csString(intf), intfID, intfVersion));
+
+	boolean result =
+	    csInitializer._RequestPlugins(getTheObjectRegistry(), arr); 
         System.out.println("Loading " + name + "? " + result);
         return result;
     }
@@ -69,4 +79,3 @@ public class CS extends cspace
     public static csVector3 CS_VEC_TILT_DOWN = new csVector3(1,0,0);
 
 };
-

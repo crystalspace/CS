@@ -26,6 +26,12 @@ chronological order.
 	  install if the archive had not already been created by 'all' or
 	  'csjava'. This problem also caused the makefile emulation setup by
 	  configure.ac to fail.
+	- Eric Sunshine applied some corrections to the Swig input files,
+	  partly based upon a patch submitted by Brendon Costa. This fixes
+	  some, but not all, Java compilation errors in Swig-generated code.
+	  Also applied Brendon's patch to SimpleRoom.java. In addition to
+	  addressing the remaining Java compilation errors, we still also need
+	  to fix the RequestPlugins() bug (tracker #858626).
 27-Jul-2004
 	- Peter Amstutz added the wxgl canvas (initially developed by
 	  Daniel Fryer) which makes it fairly easy to embed Crystal Space

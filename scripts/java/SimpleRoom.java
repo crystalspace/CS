@@ -30,7 +30,7 @@ class EventHandler extends csJEventHandler
     {
         iObjectRegistry object_reg = getTheObjectRegistry();
         myG3D = (iGraphics3D) CS_QUERY_REGISTRY(object_reg, iGraphics3D.class);
-	    vc = (iVirtualClock) CS_QUERY_REGISTRY(object_reg, iVirtualClock.class);
+	vc = (iVirtualClock) CS_QUERY_REGISTRY(object_reg, iVirtualClock.class);
         kbd = (iKeyboardDriver) CS_QUERY_REGISTRY(object_reg, iKeyboardDriver.class);
         view = v;
     }
@@ -66,7 +66,9 @@ class EventHandler extends csJEventHandler
 
     public boolean HandleEvent (iEvent ev)
     {
-        if (ev.getType() == csevKeyDown && ev.getKey().getCode() == CSKEY_ESC)
+        if (ev.getType() == csevKeyboard &&
+	    (csKeyEventHelper.GetEventType(ev) == csKeyEventTypeDown) &&
+            (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC))
         {
             // escape key to quit
             iEventQueue q = (iEventQueue) CS_QUERY_REGISTRY(getTheObjectRegistry(), iEventQueue.class);
@@ -88,39 +90,40 @@ class SimpleRoom extends CS
 {
     protected static csView view;
 
-	public static void CreateRoom ()
+    public static void CreateRoom ()
     {
         iObjectRegistry object_reg = getTheObjectRegistry();
         System.out.println("getting engine");
-	    iEngine engine = (iEngine) CS_QUERY_REGISTRY(object_reg, iEngine.class);
+	iEngine engine = (iEngine) CS_QUERY_REGISTRY(object_reg, iEngine.class);
         System.out.println("getting clock");
-	    iVirtualClock vc = (iVirtualClock) CS_QUERY_REGISTRY(object_reg, iVirtualClock.class);
+	iVirtualClock vc = (iVirtualClock) CS_QUERY_REGISTRY(object_reg, iVirtualClock.class);
         System.out.println("getting loader");
-	    iLoader loader = (iLoader) CS_QUERY_REGISTRY(object_reg, iLoader.class);
+	iLoader loader = (iLoader) CS_QUERY_REGISTRY(object_reg, iLoader.class);
         System.out.println("getting keyboard driver");
         iKeyboardDriver kbd = (iKeyboardDriver) CS_QUERY_REGISTRY(object_reg, iKeyboardDriver.class);
         System.out.println("getting texture");
-	    String matname = "mystone";
-	    loader.LoadTexture(matname, "/lib/stdtex/bricks.jpg", CS_TEXTURE_3D, null, false, true);
+	String matname = "mystone";
+	loader.LoadTexture(matname, "/lib/stdtex/bricks.jpg", CS_TEXTURE_3D, null, false, true);
         engine.SetLightingCacheMode(0);
         engine.CreateSector("room");
         System.out.println("getting room sectors");
-	    iSector room = engine.GetSectors().FindByName("room");
+	iSector room = engine.GetSectors().FindByName("room");
         System.out.println("getting walls mesh");
-	    iMeshWrapper walls = engine.CreateSectorWallsMesh(room, "walls");
+	iMeshWrapper walls = engine.CreateSectorWallsMesh(room, "walls");
         System.out.println("getting thingstate");
-	    iThingState thingstate = (iThingState) SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState.class);
+	iThingState thingstate = (iThingState) SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState.class);
         System.out.println("getting naterial");
-	    iMaterialWrapper material = engine.GetMaterialList().FindByName(matname);
+	iMaterialWrapper material = engine.GetMaterialList().FindByName(matname);
 	
         System.out.println("creating walls");
-	    iThingFactoryState fact = thingstate.GetFactory()
-	    fact.AddInsideBox (
+	iThingFactoryState fact = thingstate.GetFactory();
+	fact.AddInsideBox (
 	      new csVector3(-5,0,-5),
 	      new csVector3(5,20,5));
-	    fact.SetPolygonTextureMapping(CS_POLYRANGE_LAST, 3);
-	    fact.SetPolygonMaterial(CS_POLYRANGE_LAST, material);
-	    //thingstate.DecRef();
+
+	csPolygonRange CS_POLYRANGE_LAST = new csPolygonRange(-1, -1);
+	fact.SetPolygonTextureMapping(CS_POLYRANGE_LAST, 3);
+	fact.SetPolygonMaterial(CS_POLYRANGE_LAST, material);
 
         iLight light = engine.CreateLight("", new csVector3(0, 5, 0), 10f, new csColor(1, 0, 0),
 		CS_LIGHT_DYNAMICTYPE_STATIC);
@@ -138,24 +141,42 @@ class SimpleRoom extends CS
 
     public static void main (String args[])
     {
-        iObjectRegistry object_reg = csInitializer.CreateEnvironment(args);
-        setTheObjectRegistry(object_reg);
-        boolean result;
-        result = requestPlugin("crystalspace.kernel.vfs", "iVFS");
-        result = requestPlugin("crystalspace.graphics3d.opengl", "iGraphics3D");
-        result = requestPlugin("crystalspace.engine.3d", "iEngine");
-        result = requestPlugin("crystalspace.graphic.image.io.multiplex", "iImageIO");
-        result = requestPlugin("crystalspace.level.loader", "iLoader");
-        result = requestPlugin("crystalspace.font.server.default", "iFontServer");
-        System.out.println("Opening application");
-        result = csInitializer.OpenApplication(object_reg);
-        System.out.println("Application opened");
-        int mask = (CSMASK_FrameProcess|CSMASK_Input|CSMASK_Broadcast);
-        CreateRoom();
-        EventHandler eventHandler = new EventHandler(view);
-        result = csInitializer._SetupEventHandler(object_reg, eventHandler, mask);
-        System.out.println("Event handler added");
-        csDefaultRunLoop(object_reg);
+	try
+	{
+	    System.out.println("Starting the java simple program.");
+
+	    System.out.println("Creating Environment...");
+	    iObjectRegistry object_reg = csInitializer.CreateEnvironment(args);
+	    setTheObjectRegistry(object_reg);
+	    boolean result;
+	    System.out.println("Requesting Plugins...");
+	    result = requestPlugin("crystalspace.kernel.vfs", "iVFS");
+	    result = requestPlugin("crystalspace.graphics3d.opengl", "iGraphics3D");
+	    result = requestPlugin("crystalspace.engine.3d", "iEngine");
+	    result = requestPlugin("crystalspace.graphic.image.io.multiplex", "iImageIO");
+	    result = requestPlugin("crystalspace.level.loader", "iLoader");
+	    result = requestPlugin("crystalspace.font.server.default", "iFontServer");
+
+	    System.out.println("Opening application...");
+	    result = csInitializer.OpenApplication(object_reg);
+
+	    System.out.println("Application opened");
+
+	    System.out.println("Creating the room...");
+	    int mask = (CSMASK_FrameProcess|CSMASK_Input|CSMASK_Broadcast);
+	    CreateRoom();
+
+	    System.out.println("Setting up event handlers...");
+	    EventHandler eventHandler = new EventHandler(view);
+	    result = csInitializer._SetupEventHandler(object_reg, eventHandler, mask);
+	    System.out.println("Event handler added");
+
+	    System.out.println("Starting the main runloop...");
+	    csDefaultRunLoop(object_reg);
+	}
+	catch(Exception e)
+	{
+	    System.out.println("Errr something went wrong. We caught an exception: " + e);
+	}
     }
 };
-
