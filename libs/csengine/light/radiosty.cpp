@@ -1094,8 +1094,8 @@ bool csRadiosity :: VisiblePoly(csRadPoly *src, csRadPoly *dest)
   // for now check the center (u,v) of lightmap hitbeam.
   // thus if the center is shadowed it is still skipped, wrongly.
   csVector3 start, end;
-  src->GetLumelWorldCoords(start, src->GetWidth()/2., src->GetHeight()/2.);
-  dest->GetLumelWorldCoords(end, dest->GetWidth()/2., dest->GetHeight()/2.);
+  src->QuickLumel2World(start, src->GetWidth()/2., src->GetHeight()/2.);
+  dest->QuickLumel2World(end, dest->GetWidth()/2., dest->GetHeight()/2.);
   return GetVisibility(src, start, dest, end) > 0.0;
 }
 
@@ -1129,7 +1129,7 @@ void csRadiosity :: MapFrustrum(csFrustrum *shad,
   txt_pl->GetWorldToTexture(m_world2tex, v_world2tex);
 
   csVector3 projector;
-  float inv_lightcell_size = 1.0 / csPolygon3D::lightcell_size;
+  float inv_lightcell_size = 1.0 / csLightMap::lightcell_size;
   for (i = 0; i < rpv; i++)
   {
     projector = (*m_world2tex) * (frust->GetVertex (i) + frust->GetOrigin() 
