@@ -12,12 +12,39 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+25-Jun-99:
+	- New csSprite3D::UpdateLighting() to update the lighting of a
+	  sprite given an array of lights.
+	- Also added normal calculation to sprite frames because this
+	  is needed for lighting.
+	- New csWorld::GetNearbyLights() function to calculate a list of
+	  nearby lights.
+	- Added lighting for missile and bot based on environment.
+	- Added 'addsprite' command. You can add a sprite with this
+	  command like this: 'addsprite bot,5'. 'bot' is the name of
+	  a sprite template which needs to be loaded in memory (either
+	  from standard.zip or from the level). The size is a scale
+	  factor for the sprite. The sprite is put at the current
+	  location.
 24-Jun-99:
 	- Renamed MarkVisibleThing() to GetVisibleThings().
 	- The optimization with lighting and bounding boxes is active now.
 	- The bounding box creation also works for curves now.
+	- Andrew Zabolotny moved the specific FPU settings which are
+	  (uncommented) in walktest.cpp to support/debug/fpu80x86.h.
+	- Andrew added a faster version of QInt() and QInt24() for
+	  x86/GCC platforms (and QInt24() also for M68K).
+	- Andrew also fixed a few bugs in the NASM code.
+	- Andrew changed ALL occurances of 'gouroud' still remaining to
+	  'gouraud' and removed an additional number of warnings.
 23-Jun-99:
 	- Fixed another serious bug with lighting.
+	- Thomas Hieber changed the interface of DrawPolygonFX().
+	- Thomas also fixed a small bug in OpenGL driver with regards
+	  to gouraud shading.
+	- Thomas added fully functional DrawPolygonFX for 16 and 32
+	  bit modes in software renderer.
+	- Thomas also added some fixes to VC project files.
 22-Jun-99:
 	- Thomas Hieber cleaned up the software renderer some more.
 	  He unified most routines for scanline drawing.
