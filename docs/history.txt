@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Sep-2004
+	- Jorrit fixed genmesh so it compiles with OR again.
 11-Sep-2004
 	- Andrew Robberts updated sprcal3d to allow for transformations of
 	  a mesh attached to a socket.
