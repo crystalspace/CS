@@ -29,6 +29,7 @@ The history order is reversed so that new features are at the top.
 	- Made SetValue() on elements in TinyXML a bit more relaxed in case
 	  the given value == NULL. Previously it would crash there.
 	- Optimized TinyXML loader a tiny bit.
+	- Got a new energy.jpg from Boyan. Looks much better.
 12-Mar-2003
 	- Added csArray::ShrinkBestFit() routine. This routine will set
 	  the capacity of the array exactly to the current length. This
