@@ -41,6 +41,7 @@ Append the output to a file containing skin definitions.
 @item QFrame @tab ==> @tab Group Frame
 @item QCheckBox @tab ==> @tab Check Box
 @item QLineEdit @tab ==> @tab Text Box
+@item QTextView @tab ==> @tab Multiline Edit
 @item QLabel @tab ==> @tab Label
 @item QLabel with Pixmap @tab ==> @tab Image View
 @item QListBox @tab ==> @tab List Box
