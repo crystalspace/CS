@@ -47,11 +47,11 @@ void csPolygon2D::AddPerspective (float x, float y, float z)
   if (num_vertices >= max_vertices)
     MakeRoom (max_vertices+5);
 
-  float iz = csWorld::current_world->current_camera->aspect/z;
+  float iz = csWorld::current_world->current_camera->GetFOV ()/z;
   float px, py;
 
-  px = x * iz + csWorld::current_world->current_camera->shift_x;
-  py = y * iz + csWorld::current_world->current_camera->shift_y;
+  px = x * iz + csWorld::current_world->current_camera->GetShiftX ();
+  py = y * iz + csWorld::current_world->current_camera->GetShiftY ();
   vertices[num_vertices].x = px;
   vertices[num_vertices].y = py;
 
@@ -456,9 +456,9 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
   {
     // Calculate the original 3D coordinate again (camera space).
     csVector3 v;
-    v.z = 1. / (M * (poly.vertices[i].sx - rview->shift_x) + N * (poly.vertices[i].sy - rview->shift_y) + O);
-    v.x = (poly.vertices[i].sx - rview->shift_x) * v.z * inv_aspect;
-    v.y = (poly.vertices[i].sy - rview->shift_y) * v.z * inv_aspect;
+    v.z = 1. / (M * (poly.vertices[i].sx - rview->GetShiftX ()) + N * (poly.vertices[i].sy - rview->GetShiftY ()) + O);
+    v.x = (poly.vertices[i].sx - rview->GetShiftX ()) * v.z * inv_aspect;
+    v.y = (poly.vertices[i].sy - rview->GetShiftY ()) * v.z * inv_aspect;
 
     // Initialize fog vertex.
     poly.fog_info[i].r = 0;
@@ -548,8 +548,8 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
     // Calculate the original 3D coordinate again (camera space).
     csVector3 v;
     v.z = 1. / poly.vertices[i].z;
-    v.x = (poly.vertices[i].sx - rview->shift_x) * v.z * inv_aspect;
-    v.y = (poly.vertices[i].sy - rview->shift_y) * v.z * inv_aspect;
+    v.x = (poly.vertices[i].sx - rview->GetShiftX ()) * v.z * inv_aspect;
+    v.y = (poly.vertices[i].sy - rview->GetShiftY ()) * v.z * inv_aspect;
 
     // Initialize fog vertex.
     poly.fog_info[i].r = 0;
@@ -790,7 +790,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
 
     g3dpolyfx.num = num_vertices;
     g3dpolyfx.txt_handle = poly->GetTextureHandle ();
-    g3dpolyfx.inv_aspect = rview->inv_aspect;
+    g3dpolyfx.inv_aspect = rview->GetInvFOV ();
 
     csColor* po_colors = do_light && gs ? gs->GetColors () : NULL;
     if (poly->flags.Check (CS_POLY_FLATSHADING)) g3dpolyfx.txt_handle = NULL;
@@ -801,21 +801,21 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     float iz;
     iz = 1. / unsplit->Vcam (0).z;
     g3dpolyfx.vertices[0].z = iz;
-    iz *= rview->aspect;
-    orig_triangle[0].x = unsplit->Vcam (0).x * iz + rview->shift_x;
-    orig_triangle[0].y = unsplit->Vcam (0).y * iz + rview->shift_y;
+    iz *= rview->GetFOV ();
+    orig_triangle[0].x = unsplit->Vcam (0).x * iz + rview->GetShiftX ();
+    orig_triangle[0].y = unsplit->Vcam (0).y * iz + rview->GetShiftY ();
 
     iz = 1. / unsplit->Vcam (1).z;
     g3dpolyfx.vertices[1].z = iz;
-    iz *= rview->aspect;
-    orig_triangle[1].x = unsplit->Vcam (1).x * iz + rview->shift_x;
-    orig_triangle[1].y = unsplit->Vcam (1).y * iz + rview->shift_y;
+    iz *= rview->GetFOV ();
+    orig_triangle[1].x = unsplit->Vcam (1).x * iz + rview->GetShiftX ();
+    orig_triangle[1].y = unsplit->Vcam (1).y * iz + rview->GetShiftY ();
 
     iz = 1. / unsplit->Vcam (2).z;
     g3dpolyfx.vertices[2].z = iz;
-    iz *= rview->aspect;
-    orig_triangle[2].x = unsplit->Vcam (2).x * iz + rview->shift_x;
-    orig_triangle[2].y = unsplit->Vcam (2).y * iz + rview->shift_y;
+    iz *= rview->GetFOV ();
+    orig_triangle[2].x = unsplit->Vcam (2).x * iz + rview->GetShiftX ();
+    orig_triangle[2].y = unsplit->Vcam (2).y * iz + rview->GetShiftY ();
 
     if (g3dpolyfx.txt_handle)
     {
@@ -860,7 +860,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
 
     g3dpoly.num = num_vertices;
     g3dpoly.txt_handle = poly->GetTextureHandle ();
-    g3dpoly.inv_aspect = rview->inv_aspect;
+    g3dpoly.inv_aspect = rview->GetInvFOV ();
 
     // We are going to use DrawPolygon.
     if (mirror)
@@ -935,7 +935,7 @@ void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
   static G3DPolygonDFP g3dpoly;
   memset(&g3dpoly, 0, sizeof(g3dpoly));
   g3dpoly.num = num_vertices;
-  g3dpoly.inv_aspect = csWorld::current_world->current_camera->inv_aspect;
+  g3dpoly.inv_aspect = csWorld::current_world->current_camera->GetInvFOV ();
 #if 0
   memcpy (g3dpoly.vertices, vertices, num_vertices * sizeof (csVector2));
 #else

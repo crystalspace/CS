@@ -51,6 +51,7 @@ class csCamera : public csOrthoTransform, public iCamera
 {
   friend class Dumper;
 
+private:
   /// The sector the camera is in.
   csSector* sector;
   /// If true we are in a mirrored world.
@@ -59,8 +60,7 @@ class csCamera : public csOrthoTransform, public iCamera
   /// a farplane to cut everything thats behind it
   csPlaneClip *fp;
   bool use_farplane;
-  
-public:
+
   ///
   int aspect;
   static int default_aspect;
@@ -71,6 +71,7 @@ public:
   float shift_x;
   float shift_y;
 
+public:
   ///
   csCamera ();
   /// copy constructor
@@ -95,19 +96,26 @@ public:
   static int GetDefaultFOV () { return default_aspect; }
 
   /// Set the FOV for this camera.
-  void SetFOV (int a) { aspect = a; inv_aspect = 1.0f / a; }
+  virtual void SetFOV (int a) { aspect = a; inv_aspect = 1.0f / a; }
   /// Get the FOV for this camera
   int GetFOV () const { return aspect; }
+  /// Get the inverse FOV for this camera.
+  float GetInvFOV () const { return inv_aspect; }
+
+  /// Get the X shift value.
+  float GetShiftX () const { return shift_x; }
+  /// Get the Y shift value.
+  float GetShiftY () const { return shift_y; }
 
   /// Set farplane, everything behind this will be cut
-  void SetFarPlane( csPlaneClip* farplane ){ fp = farplane; }
+  void SetFarPlane (csPlaneClip* farplane) { fp = farplane; }
   /// Get the Farplane
-  csPlaneClip* GetFarPlane(){ return fp; }
+  csPlaneClip* GetFarPlane () { return fp; }
   
   /// do we actually use the farplane ?
-  bool UseFarPlane(){ return use_farplane; }
+  bool UseFarPlane () { return use_farplane; }
   /// Set whether we use farplane or not. Farplane must been set before
-  void UseFarPlane(bool useit){ use_farplane = fp && useit; }
+  void UseFarPlane (bool useit) { use_farplane = fp && useit; }
   
   /**
    * Set the sector that the camera resides in.

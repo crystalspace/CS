@@ -215,9 +215,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
       coord = obj_cam.Other2This (cv.object_coord);
       if (coord.z >= SMALL_Z)
       {
-    	float iz = rview.aspect/coord.z;
-        persp[j].x = coord.x * iz + rview.shift_x;
-        persp[j].y = coord.y * iz + rview.shift_y;
+    	float iz = rview.GetFOV ()/coord.z;
+        persp[j].x = coord.x * iz + rview.GetShiftX ();
+        persp[j].y = coord.y * iz + rview.GetShiftY ();
       }
       z_array[j] = coord.z;
     }
@@ -229,7 +229,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     memset (&poly, 0, sizeof(poly));
     poly.txt_handle = c->GetTextureHandle ();
     poly.txt_handle->GetMeanColor (poly.flat_color_r, poly.flat_color_g, poly.flat_color_b);
-    poly.inv_aspect = rview.inv_aspect;
+    poly.inv_aspect = rview.GetInvFOV ();
     if (poly.txt_handle == NULL)
     {
       CsPrintf (MSG_STDOUT, "Warning! Curve without texture!\n");

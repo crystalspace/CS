@@ -177,7 +177,7 @@ void csSprite2D::Draw (csRenderView& rview)
   static G3DPolygonDPFX g3dpolyfx;
   g3dpolyfx.num = vertices.Length ();
   g3dpolyfx.txt_handle = cstxt->GetTextureHandle ();
-  g3dpolyfx.inv_aspect = rview.inv_aspect;
+  g3dpolyfx.inv_aspect = rview.GetInvFOV ();
   g3dpolyfx.txt_handle->GetMeanColor (g3dpolyfx.flat_color_r,
       g3dpolyfx.flat_color_g, g3dpolyfx.flat_color_b);
 
@@ -186,14 +186,14 @@ void csSprite2D::Draw (csRenderView& rview)
   csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
 
   float iz = 1. / cam.z;
-  float iza = iz * rview.aspect;
+  float iza = iz * rview.GetFOV ();
 
   int i;
   for (i = 0 ; i < vertices.Length () ; i++)
   {
     g3dpolyfx.vertices[i].z = iz;
-    poly2d[i].x = (cam.x+vertices[i].pos.x) * iza + rview.shift_x;
-    poly2d[i].y = (cam.y+vertices[i].pos.y) * iza + rview.shift_y;
+    poly2d[i].x = (cam.x+vertices[i].pos.x) * iza + rview.GetShiftX ();
+    poly2d[i].y = (cam.y+vertices[i].pos.y) * iza + rview.GetShiftY ();
     g3dpolyfx.vertices[i].sx = poly2d[i].x;
     g3dpolyfx.vertices[i].sy = poly2d[i].y;
     g3dpolyfx.vertices[i].u = vertices[i].u;

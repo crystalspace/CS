@@ -642,8 +642,8 @@ bool WalkTest::HandleEvent (csEvent &Event)
         {
         csVector3 v;
         v.z = System->G3D->GetZBuffValue(Event.Mouse.x, Event.Mouse.y);
-        v.x = (Event.Mouse.x-FRAME_WIDTH/2) * v.z / view->GetCamera ()->aspect;
-        v.y = (FRAME_HEIGHT-1-Event.Mouse.y-FRAME_HEIGHT/2) * v.z / view->GetCamera ()->aspect;
+        v.x = (Event.Mouse.x-FRAME_WIDTH/2) * v.z / view->GetCamera ()->GetFOV ();
+        v.y = (FRAME_HEIGHT-1-Event.Mouse.y-FRAME_HEIGHT/2) * v.z / view->GetCamera ()->GetFOV ();
         csVector3 vw = view->GetCamera ()->Camera2World (v);
 
         Sys->Printf (MSG_CONSOLE, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);

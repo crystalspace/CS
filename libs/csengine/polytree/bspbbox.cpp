@@ -634,10 +634,10 @@ bool csBspPolygon::DoPerspective (const csTransform& trans,
      float rx, ry, rpointx, rpointy;
 
      // Perspective correct the point.
-     float iz = csWorld::current_world->current_camera->aspect/reentern->z;
+     float iz = csWorld::current_world->current_camera->GetFOV ()/reentern->z;
      csVector2 rvert;
-     rvert.x = reentern->x * iz + csWorld::current_world->current_camera->shift_x;
-     rvert.y = reentern->y * iz + csWorld::current_world->current_camera->shift_y;
+     rvert.x = reentern->x * iz + csWorld::current_world->current_camera->GetShiftX ();
+     rvert.y = reentern->y * iz + csWorld::current_world->current_camera->GetShiftY ();
 
      if (reenter == exit && reenter->z > -SMALL_EPSILON)
      { rx = ex;  ry = ey; }

@@ -94,6 +94,13 @@ public:
  */
 class csRenderView : public csCamera
 {
+private:
+  /// FOV in angles (degrees).
+  float fov_angle;
+
+  /// Compute above angle.
+  void ComputeAngle ();
+
 public:
   /// The 2D polygon describing how everything drawn inside should be clipped.
   csClipper* view;
@@ -161,21 +168,12 @@ public:
   bool added_fog_info;
 
   ///
-  csRenderView () :
-    csCamera (), view (NULL), g3d (NULL), g2d (NULL), portal_polygon (NULL),
-    do_clip_plane (false), do_clip_frustum (false), callback (NULL),
-    callback_data (NULL), fog_info (NULL), added_fog_info (false) {}
+  csRenderView ();
   ///
-  csRenderView (const csCamera& c) :
-    csCamera (c), view (NULL), g3d (NULL), g2d (NULL), portal_polygon (NULL),
-    do_clip_plane (false), do_clip_frustum (false), callback (NULL),
-    callback_data (NULL), fog_info (NULL), added_fog_info (false) {}
+  csRenderView (const csCamera& c);
   ///
   csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
-    iGraphics2D* ig2d) :
-    csCamera (c), view (v), g3d (ig3d), g2d (ig2d), portal_polygon (NULL),
-    do_clip_plane (false), do_clip_frustum (false), callback (NULL),
-    callback_data (NULL), fog_info (NULL), added_fog_info (false) {}
+    iGraphics2D* ig2d);
 
   ///
   void SetView (csClipper* v) { view = v; }
@@ -188,6 +186,18 @@ public:
     rightx = rx;
     topy = ty;
     boty = by;
+  }
+
+  /**
+   * Override SetFOV from csCamera so that we can calculate the FOV
+   * in angles here.
+   */
+  virtual void SetFOV (int a);
+
+  /// Get the FOV in angles (degrees).
+  float GetFOVAngle ()
+  {
+    return fov_angle;
   }
 };
 

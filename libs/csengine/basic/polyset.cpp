@@ -474,7 +474,7 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   d->g3d->SetObjectToCamera (&tr_o2c);
   d->g3d->SetClipper (d->view->GetClipPoly (), d->view->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
-  d->g3d->SetPerspectiveAspect (d->aspect);
+  d->g3d->SetPerspectiveAspect (d->GetFOV ());
   d->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
     use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 

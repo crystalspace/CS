@@ -119,9 +119,9 @@ void show_frustum (csFrustumView* lview, int type, void* /*entity*/)
       v1 = cam->Other2This (v0);
       v0 = fr->GetVertices ()[(j+1)%fr->GetNumVertices ()] + fr->GetOrigin ();
       v2 = cam->Other2This (v0);
-      Gfx3D->DrawLine (light_cam, v1, cam->aspect, red);
-      Gfx3D->DrawLine (light_cam, v2, cam->aspect, red);
-      Gfx3D->DrawLine (v1, v2, cam->aspect, white);
+      Gfx3D->DrawLine (light_cam, v1, cam->GetFOV (), red);
+      Gfx3D->DrawLine (light_cam, v2, cam->GetFOV (), red);
+      Gfx3D->DrawLine (v1, v2, cam->GetFOV (), white);
     }
   }
 }
@@ -164,9 +164,9 @@ void select_object (csRenderView* rview, int type, void* entity)
       v = rview->Other2This (((csStatLight*)sector->lights[i])->GetCenter ());
       if (v.z > SMALL_Z)
       {
-        iz = rview->aspect/v.z;
-        px = QInt (v.x * iz + rview->shift_x);
-        py = csWorld::frame_height - 1 - QInt (v.y * iz + rview->shift_y);
+        iz = rview->GetFOV ()/v.z;
+        px = QInt (v.x * iz + rview->GetShiftX ());
+        py = csWorld::frame_height - 1 - QInt (v.y * iz + rview->GetShiftY ());
         r = QInt (.3 * iz);
         if (ABS (coord_check_vector.x - px) < 5 && ABS (coord_check_vector.y - (csWorld::frame_height-1-py)) < 5)
         {
@@ -247,9 +247,9 @@ void draw_edges (csRenderView* rview, int type, void* entity)
         v = rview->Other2This (light->GetCenter ());
         if (v.z > SMALL_Z)
         {
-          iz = rview->aspect/v.z;
-          px = QInt (v.x * iz + rview->shift_x);
-          py = csWorld::frame_height - 1 - QInt (v.y * iz + rview->shift_y);
+          iz = rview->GetFOV ()/v.z;
+          px = QInt (v.x * iz + rview->GetShiftX ());
+          py = csWorld::frame_height - 1 - QInt (v.y * iz + rview->GetShiftY ());
           r = QInt (.3 * iz);
           rview->g2d->DrawLine (px-r, py-r, px+r, py+r, selcol);
           rview->g2d->DrawLine (px+r, py-r, px-r, py+r, selcol);
@@ -448,29 +448,29 @@ void DrawOctreeBoxes (csOctreeNode* node,
     csCamera* cam = Sys->view->GetCamera ();
     const csBox3& box = node->GetBox ();
     DrawLineDepth (cam->Other2This (box.GetCorner (0)),
-  		   cam->Other2This (box.GetCorner (1)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (1)), cam->GetFOV ());
     DrawLineDepth (cam->Other2This (box.GetCorner (0)),
-  		   cam->Other2This (box.GetCorner (2)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (2)), cam->GetFOV ());
     DrawLineDepth (cam->Other2This (box.GetCorner (0)),
-  		   cam->Other2This (box.GetCorner (4)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (4)), cam->GetFOV ());
     DrawLineDepth (cam->Other2This (box.GetCorner (7)),
-  		   cam->Other2This (box.GetCorner (3)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (3)), cam->GetFOV ());
     DrawLineDepth (cam->Other2This (box.GetCorner (7)),
-  		   cam->Other2This (box.GetCorner (6)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (6)), cam->GetFOV ());
     DrawLineDepth (cam->Other2This (box.GetCorner (6)),
-  		   cam->Other2This (box.GetCorner (2)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (2)), cam->GetFOV ());
     DrawLineDepth (cam->Other2This (box.GetCorner (6)),
-  		   cam->Other2This (box.GetCorner (4)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (4)), cam->GetFOV ());
     DrawLineDepth (cam->Other2This (box.GetCorner (3)),
-  		   cam->Other2This (box.GetCorner (2)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (2)), cam->GetFOV ());
     DrawLineDepth (cam->Other2This (box.GetCorner (3)),
-  		   cam->Other2This (box.GetCorner (1)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (1)), cam->GetFOV ());
     DrawLineDepth (cam->Other2This (box.GetCorner (5)),
-  		   cam->Other2This (box.GetCorner (1)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (1)), cam->GetFOV ());
     DrawLineDepth (cam->Other2This (box.GetCorner (5)),
-  		   cam->Other2This (box.GetCorner (4)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (4)), cam->GetFOV ());
     DrawLineDepth (cam->Other2This (box.GetCorner (5)),
-  		   cam->Other2This (box.GetCorner (7)), cam->aspect);
+  		   cam->Other2This (box.GetCorner (7)), cam->GetFOV ());
   }
   int i;
   for (i = 0 ; i < 8 ; i++)

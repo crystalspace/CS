@@ -1231,17 +1231,17 @@ float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox2& boundi
   }
   else
   {
-    oneCorner.x = cbox.MaxX () / cbox.MaxZ () * camtrans.aspect + camtrans.shift_x;
-    oneCorner.y = cbox.MaxY () / cbox.MaxZ () * camtrans.aspect + camtrans.shift_y;
+    oneCorner.x = cbox.MaxX () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
+    oneCorner.y = cbox.MaxY () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
     boundingBox.StartBoundingBox (oneCorner);
-    oneCorner.x = cbox.MinX () / cbox.MaxZ () * camtrans.aspect + camtrans.shift_x;
-    oneCorner.y = cbox.MinY () / cbox.MaxZ () * camtrans.aspect + camtrans.shift_y;
+    oneCorner.x = cbox.MinX () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
+    oneCorner.y = cbox.MinY () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
     boundingBox.AddBoundingVertexSmart (oneCorner);
-    oneCorner.x = cbox.MinX () / cbox.MinZ () * camtrans.aspect + camtrans.shift_x;
-    oneCorner.y = cbox.MinY () / cbox.MinZ () * camtrans.aspect + camtrans.shift_y;
+    oneCorner.x = cbox.MinX () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
+    oneCorner.y = cbox.MinY () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
     boundingBox.AddBoundingVertexSmart (oneCorner);
-    oneCorner.x = cbox.MaxX () / cbox.MinZ () * camtrans.aspect + camtrans.shift_x;
-    oneCorner.y = cbox.MaxY () / cbox.MinZ () * camtrans.aspect + camtrans.shift_y;
+    oneCorner.x = cbox.MaxX () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
+    oneCorner.y = cbox.MaxY () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
     boundingBox.AddBoundingVertexSmart (oneCorner);
   }
 
@@ -1324,7 +1324,7 @@ void csSprite3D::Draw (csRenderView& rview)
   rview.g3d->SetObjectToCamera (&tr_o2c);
   rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
-  rview.g3d->SetPerspectiveAspect (rview.aspect);
+  rview.g3d->SetPerspectiveAspect (rview.GetFOV ());
 
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
 

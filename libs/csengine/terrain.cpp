@@ -145,21 +145,20 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   // matrix.
 
   const csVector3& translation = rview.GetO2TTranslation();
-  // JORRIT: I need the camera's foward facing vector in world space.
-  // I dont think this is working...
-  const csVector3 wforward(1,0,0);
-  const csVector3 cforward = wforward * rview;
+  // Compute the camera's foward facing vector in world space.
+  const csVector3 wforward (0,0,1);
+  const csVector3 cforward = rview.This2OtherRelative (wforward);
   ddgVector3 f(cforward.x,cforward.y,cforward.z);
-  // Hard code for now to show initial view.
-  f.set(0,0,1);
   f.normalize();
 
   ddgControl *control = context->control();
   control->position(translation.x, translation.y, translation.z);
  
   context->forward(&f);
-  // JORRIT: rview.GetFOV() returns 480 I need the real field of view.
-  context->fov(90);
+
+  // Get the FOV in angles.
+  context->fov (rview.GetFOVAngle ());
+
   // context->extractPlanes(context->frustrum());
   // Optimize the mesh w.r.t. the current viewing location.
   modified = mesh->calculate(context);
@@ -211,7 +210,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   rview.g3d->SetObjectToCamera (&rview);
   rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
-  rview.g3d->SetPerspectiveAspect (rview.aspect);
+  rview.g3d->SetPerspectiveAspect (rview.GetFOV ());
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
 
   // Setup the structure for DrawTriangleMesh.
@@ -224,7 +223,10 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 	g3dmesh.num_vertices_pool = 1;
 	g3dmesh.num_textures = 1;
 	g3dmesh.use_vertex_color = false;
-	g3dmesh.do_clip = false;	// DEBUG THIS LATER
+	// I temporarily set do_clip to true because this works for OpenGL
+	// and software. do_clip==false is a LOT faster for OpenGL though.
+	// Will have to implement this better.
+	g3dmesh.do_clip = true;	// DEBUG THIS LATER
 	g3dmesh.do_mirror = rview.IsMirrored ();
 	g3dmesh.do_morph_texels = false;
 	g3dmesh.do_morph_colors = false;

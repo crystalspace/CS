@@ -315,9 +315,8 @@ bool csWorld::HandleEvent (csEvent &Event)
 
         frame_width = G3D->GetWidth ();
         frame_height = G3D->GetHeight ();
-        if (csCamera::default_aspect == 0)
-          csCamera::default_aspect = frame_height;
-        csCamera::default_inv_aspect = 1./csCamera::default_aspect;
+        if (csCamera::GetDefaultFOV () == 0)
+          csCamera::SetDefaultFOV (frame_height);
 
         // @@@ Ugly hack to always have a camera in current_camera.
         // This is needed for the lighting routines.
@@ -938,8 +937,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   }
   // when many cameras per context, need to make sure each camera has updated
   // shift_* fields, after resizing.
-  current_camera->shift_x = frame_width/2;
-  current_camera->shift_y = frame_height/2;
+  current_camera->SetPerspectiveCenter (frame_width/2, frame_height/2);
 
   top_clipper = view;
 
@@ -948,10 +946,10 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   rview.callback = NULL;
 
   // Calculate frustum for screen dimensions (at z=1).
-  float leftx = - c->shift_x * c->inv_aspect;
-  float rightx = (frame_width - c->shift_x) * c->inv_aspect;
-  float topy = - c->shift_y * c->inv_aspect;
-  float boty = (frame_height - c->shift_y) * c->inv_aspect;
+  float leftx = - c->GetShiftX () * c->GetInvFOV ();
+  float rightx = (frame_width - c->GetShiftX ()) * c->GetInvFOV ();
+  float topy = - c->GetShiftY () * c->GetInvFOV ();
+  float boty = (frame_height - c->GetShiftY ()) * c->GetInvFOV ();
   rview.SetFrustum (leftx, rightx, topy, boty);
 
   tr_manager.NewFrame ();
@@ -1024,8 +1022,7 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   }
   // when many cameras per context, need to make sure each camera has updated
   // shift_* fields, after resizing.
-  current_camera->shift_x = frame_width/2;
-  current_camera->shift_y = frame_height/2;
+  current_camera->SetPerspectiveCenter (frame_width/2, frame_height/2);
 
   csRenderView rview (*c, view, G3D, G2D);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
@@ -1033,14 +1030,13 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   rview.callback_data = callback_data;
 
   // Maybe not necessary if DrawFunc is never called before Draw
-  c->shift_x = frame_width/2;
-  c->shift_y = frame_height/2;
+  c->SetPerspectiveCenter (frame_width/2, frame_height/2);
 
   // Calculate frustum for screen dimensions (at z=1).
-  float leftx = - c->shift_x * c->inv_aspect;
-  float rightx = (frame_width - c->shift_x) * c->inv_aspect;
-  float topy = - c->shift_y * c->inv_aspect;
-  float boty = (frame_height - c->shift_y) * c->inv_aspect;
+  float leftx = - c->GetShiftX () * c->GetInvFOV ();
+  float rightx = (frame_width - c->GetShiftX ()) * c->GetInvFOV ();
+  float topy = - c->GetShiftY () * c->GetInvFOV ();
+  float boty = (frame_height - c->GetShiftY ()) * c->GetInvFOV ();
   rview.SetFrustum (leftx, rightx, topy, boty);
 
   tr_manager.NewFrame ();
@@ -1068,9 +1064,9 @@ void csWorld::AddHalo (csLight* Light)
     return;
 
   // Project X,Y into screen plane
-  float iz = current_camera->aspect / v.z;
-  v.x = v.x * iz + current_camera->shift_x;
-  v.y = frame_height - 1 - (v.y * iz + current_camera->shift_y);
+  float iz = current_camera->GetFOV () / v.z;
+  v.x = v.x * iz + current_camera->GetShiftX ();
+  v.y = frame_height - 1 - (v.y * iz + current_camera->GetShiftY ());
 
   // If halo is not inside visible region, return
   if (!top_clipper->IsInside (v.x, v.y))
@@ -1133,9 +1129,9 @@ bool csWorld::ProcessHalo (csLightHalo *Halo)
 
   if (v.z > SMALL_Z)
   {
-    float iz = current_camera->aspect / v.z;
-    v.x = v.x * iz + current_camera->shift_x;
-    v.y = frame_height - 1 - (v.y * iz + current_camera->shift_y);
+    float iz = current_camera->GetFOV () / v.z;
+    v.x = v.x * iz + current_camera->GetShiftX ();
+    v.y = frame_height - 1 - (v.y * iz + current_camera->GetShiftY ());
 
     if (top_clipper->IsInside (v.x, v.y))
     {

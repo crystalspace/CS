@@ -17,6 +17,17 @@ The history order has been reversed so that new features are at the top.
 	  instead.  This means that text is not shaped (all letters are on
 	  a black background instead of showing the picture behind them) but
 	  at least you can see the text!
+	- Made almost all variables in csCamera private and added some
+	  accessor functions.
+	- Made csCamera::SetFOV() virtual and override it in
+	  csRenderView::SetFOV() so that we can calculate the angle of the
+	  FOV in degrees there. This is needed for the terrain engine.
+	- Use the new angle for FOV in terrain engine.
+	- Fixed terrain engine so that the correct forward facing vector
+	  is used.
+	- Fixed terrain engine so that it will run correctly on software
+	  renderer. This will make the OpenGL version slower so this is
+	  a temporary fix until we implement a better solution.
 	- Eric Sunshine fixed the CS_ASSERT() macro so that it now works as
 	  expected; that is, it "asserts" that some condition is true.
 	  Previously, the logical sense of the conditional test was reversed.

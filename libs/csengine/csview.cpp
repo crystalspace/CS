@@ -79,7 +79,7 @@ void csView::AddViewVertex (int x, int y)
 void csView::Draw ()
 {
   UpdateClipper();
-  G3D->SetPerspectiveCenter ((int)camera->shift_x, (int)camera->shift_y);
+  G3D->SetPerspectiveCenter ((int)camera->GetShiftX (), (int)camera->GetShiftY ());
   world->Draw (camera, clipper);
 }
 
