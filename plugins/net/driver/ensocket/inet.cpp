@@ -16,16 +16,15 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifdef __CYGWIN__
-#define __USE_W32_SOCKETS
-#endif
 
+#define CS_SYSDEF_PROVIDE_SELECT
 #include "cssysdef.h"
 #include "cssys/sockets.h"
 #include "inet.h"
 #include "inetwork/sockerr.h"
 
-#ifdef OS_WIN32
+#if defined(OS_WIN32) && !defined(__CYGWIN__)
+#define WINSOCK
 #define CS_SOCKET2_ERROR SOCKET_ERROR
 #define CS_SOCKET2_GET_LAST_ERROR WSAGetLastError()
 #define CS_SOCKET2_EWOULDBLOCK WSAEWOULDBLOCK
@@ -64,7 +63,7 @@ csNetworkDriver2::csNetworkDriver2 (iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   last_error = CS_NET_DRIVER_NOERROR;
 
-#ifdef OS_WIN32
+#ifdef WINSOCK
   WSADATA Data;
   if (WSAStartup(MAKEWORD(1,0),&Data) != 0)
     last_error = CS_NET_DRIVER_CANNOT_INIT;
@@ -73,7 +72,7 @@ csNetworkDriver2::csNetworkDriver2 (iBase *parent)
 
 csNetworkDriver2::~csNetworkDriver2()
 {
-#ifdef OS_WIN32
+#ifdef WINSOCK
   WSACleanup();
 #endif
 }

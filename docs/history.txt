@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 13-Jun-2003
 	- Oktal renamed the function AutoLoad slightly, to avoid conflict with
 	  the Windows API identifier of the same name, in perlpost.i.
+	- Oktal switched Cygwin build from using Winsock to Posix Sockets,
+	  since Winsock was confusing Swig.
 	- Oktal added #ifndef directives to math2d.h and plane.h in
 	  include/csgeom, where those files define the same macros.
 	- Eric Sunshine applied a fix to SRC.CSSYS and INC.CSSYS in cssys.mak

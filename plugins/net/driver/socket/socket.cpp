@@ -16,9 +16,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifdef __CYGWIN__
-#define __USE_W32_SOCKETS
-#endif
 
 #define CS_SYSDEF_PROVIDE_SELECT
 #include "cssysdef.h"
@@ -419,7 +416,7 @@ csNetworkDriverCapabilities csSocketDriver::GetCapabilities() const
   return c;
 }
 
-#if !defined(OS_WIN32)
+#if !defined(OS_WIN32) || defined(__CYGWIN__)
 
 bool csSocketDriver::PlatformDriverStart() { return true; }
 bool csSocketDriver::PlatformDriverStop()  { return true; }

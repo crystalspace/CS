@@ -25,7 +25,7 @@
 #include "inetwork/driver2.h"
 #include "inetwork/socket2.h"
 
-#ifndef OS_WIN32
+#if !defined(OS_WIN32) || defined(__CYGWIN__)
 #define SOCKET int
 #else
 #include <winsock.h>
