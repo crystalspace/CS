@@ -23,7 +23,7 @@ comments in the @sc{api} reference and the header files should also help.
 One exception should be made here for the @code{csObject} class. This class
 will be explained in the next section.
 
-@node csObject
+@node csObject, , csUtil, csUtil
 @subsection @code{csObject}
 @cindex @code{csObject}
 
