@@ -49,6 +49,7 @@
   #pragma warning(disable:4102)
   #pragma warning(disable:4005)
   #pragma warning(disable:4130)
+  #pragma warning(disable:4711)
 
   #pragma inline_depth (255)
   #pragma inline_recursion (on)
