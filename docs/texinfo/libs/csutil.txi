@@ -25,10 +25,10 @@ vectors. They will be explained in the next sections.
 
 @menu
 * csObject:: @code{csObject}
-* Typed Vectors::
+* Typed Vectors:: @code{Typed Vectors}
 @end menu
 
-@node csObject, , csUtil, csUtil
+@node csObject, Typed Vectors, csUtil, csUtil
 @subsection @code{csObject}
 @cindex @code{csObject}
 
@@ -68,7 +68,7 @@ interface feature of @sc{scf}, i.e. you must declare a fast interface by using
 @code{SCF_DECLARE_FAST_INTERFACE} before using them. Note that all these
 macros increase the reference count of the returned object by 1.
 
-@node Typed Vectors
+@node Typed Vectors, , csObject, csUtil
 @subsection @code{Typed Vectors}
 @cindex @code{Typed Vectors}
 
