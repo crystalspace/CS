@@ -4,12 +4,15 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine replaced out-of-date crystalspace.console.stdout
 	  references in several programs (nstp, perfest, ttffnt) with new
 	  crystalspace.console.output.standard.
-	- Andrew Zabolotny fixed vshell so that it compiles again after
-	  Andrew's latest changes.
-	- Andrew also fixes system so that it is allowed to have
-	  apps with no config files. This fixes the crash bug in simple.
+	- Andrew Zabolotny fixed vshell so that it compiles again after his
+	  latest changes.
+	- Andrew also fixes system so that it is allowed to have apps with
+	  no config files. This fixes the crash bug in simple.
 	- Fixed a crash bug in lighting if precalc_info was missing.
 	  This bug was caused by Andrew's changes.
+	- Eric Sunshine disabled shooter.mak since the csgame library is now
+	  defunct.
+	- Eric Sunshine eliminated a slew of compilation warnings in 3ds2lev.
 2-Oct-2000
 	- Andrew Zabolotny did the following changes to CS:
 	    - Overhauled the csIniFile class. There is now a new
