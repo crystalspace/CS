@@ -161,7 +161,7 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
   }
   else
   {
-    if (m_Walls.Length() > 0 ||
+    if (/*m_Walls.Length() > 0 ||*/
         m_Portals.Length() > 0)
     {
       //DocNode part = CreateNode (params, "part");

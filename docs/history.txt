@@ -17,6 +17,9 @@ The history order is reversed so that new features are at the top.
 	  was not defined.  The work-around was to remove ZLIB_DLL from
 	  volatile.h.  This macro is only needed when building the zlib.dll
 	  itself, thus it was superfluous for volatile.h to define it.
+	- res made the following changes to map2cs:
+	  * Fixed: output of things w/o polys 
+	  * Hopefully fixed texture alignment/rotation this time.
 6-Mar-2003
 	- Reworked the notion of curve templates. The iCurveTemplate has
 	  been removed and it's functionality has moved to iCurve itself.
