@@ -1172,7 +1172,7 @@ void csGraphics3DDirect3DDx6::CacheTexture (iPolygonTexture *texture)
 {
   iTextureHandle* txt_handle = texture->GetTextureHandle ();
   m_pTextureCache->cache_texture (txt_handle);
-  //m_pLightmapCache->cache_lightmap (texture); //THFIXME
+  m_pLightmapCache->cache_lightmap (texture); //THFIXME
 }
 
 void csGraphics3DDirect3DDx6::UncacheTexture (iTextureHandle *handle)
@@ -1294,7 +1294,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
   // retrieve the lightmap from the cache.
   iLightMap* piLM = pTex->GetLightMap ();
 
-  if ( false && piLM  && m_bRenderLightmap) //THFIXME
+  if ( piLM  && m_bRenderLightmap) //THFIXME
   {
     pLightCache = (csD3DCacheData *)piLM->GetCacheData ();
     if (!pLightCache)

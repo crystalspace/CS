@@ -84,7 +84,7 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
     }
   }
 
-  Image->DecRef ();
+  //Image->DecRef ();
 }
 
 csTextureDirect3D::~csTextureDirect3D ()

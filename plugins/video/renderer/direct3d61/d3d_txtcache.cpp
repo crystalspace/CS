@@ -624,8 +624,6 @@ void D3DLightMapCache::Load (csD3DCacheData *cached_lightmap)
   
   if (m_bHardware)
     LoadIntoVRAM (cached_lightmap);
-  
-  piLM->DecRef ();
 }       
 
 void D3DLightMapCache::LoadIntoVRAM(csD3DCacheData *cached_lightmap)
