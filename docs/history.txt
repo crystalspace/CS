@@ -37,6 +37,10 @@ Short-term cleanups that need to be done:
 	  on Unix (some do not run though).
 	- Eric Sunshine fixed the lighting progress meters so that they update
 	  correctly (again) on stdout.
+	- Eric Sunshine worked around a couple NextStep compiler bugs which
+	  were triggered by the global SCF conversion.
+	- Eric Sunshine fixed Blocks so that it compiles again (following
+	  some changes by Andrew today).
 14-Nov-1999
 	- Updates to CrystalClear from Michael Dale Long and fixes for SCF to
 	  cctest.
