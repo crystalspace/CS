@@ -10,14 +10,6 @@ with the file extension @file{.cfg} and are typically located within the
 virtual directory @file{/config/} which is most usually mounted at the
 physical location @file{CS/data/config}.
 
-When you run an application, all configuration files (those from the plug-in
-modules and the application-specific file) are combined to one big database
-of options. When this happens, options from the application-specific config
-file override options from the plug-in specific config files. Thus you can
-set any option in your application's config file to override options from the
-plug-in config files. When you change the configuration from within your
-application, the changes are always applied to the application-specific file.
-
 The format of these files is simple. They consist of a number of @dfn{keys},
 each of which consists of a name, a value and an optional comment. Key names
 contain dots to create some kind of hierarchy, similar to a file system:
@@ -38,6 +30,62 @@ Section.TestOption = false
 ; key. When a config file is loaded and saved again later this
 ; end-of-file comment is put back at the end of the config file.
 @end example
+
+When you run an application, all configuration domains are combined to one
+big database of options. When this happens, options from higher-priority
+domains override options from lower-priority domains. These domains are (from
+low to high priority):
+@itemize @bullet
+@item
+Plug-In configuration files, such as @file{CS/data/config/opengl.cfg}. These
+files define the default values for the plug-in configuration.
+
+@item
+The application configuration file. This is the file which you specify in
+@code{@var{System}->Initialize(argc, argv, @var{ConfigFile})}. This file
+defines the default values for the application configuration, and can
+override the configuration for plug-in modules if an application requires
+this.
+
+@item
+The user-specific, application-neutral domain. This domain only makes sense
+in a multi-user environment, thus you can disable it in @file{system.cfg} or
+in the application config file if you have a single-user system.
+
+This domain is intended for users who want to override the configuration from
+the lower-priority domains explained above. This is an application-neutral
+domain, so any options you define here are used by all applications.
+
+Currently this domain does not make use of multi-user environments. All
+options are stored in @file{CS/data/config/user.cfg} and are prepended with
+the string @samp{Global.}. So for example the option
+@samp{Walktest.Settings.FPS} will be called
+@samp{Global.Walktest.Settings.FPS}.
+
+@item
+Ther user-specific, application-specific domain. This domain works like the
+application-neutral user domain, except that it is not application-neutral.
+A user may set options in this domain, for example, if he wants different
+screen size settings for different applications.
+
+This domain also does not yet make use of multi-user environments. All
+options are stored in @file{CS/data/config/user.cfg} and are prepended with
+the string @samp{ApplicationID.}, where @samp{ApplicationID} is defined in
+the user-neutral, application-specific config file (e.g. @file{walktest.cfg}).
+
+@item
+The command-line parameters. @strong{Note}: This is not yet implemented.
+@end itemize
+
+Thus you can set any option in your application's
+config file to override options from the plug-in config files. And you can
+again override those options with a line in the user configuration.
+
+If the application tries to change options in the config file, these changes
+are always applied to the user-specific, application-specific domain. The
+only exception are applications that disable the user configuration
+altogether, in which case the changes are applied to the user-neutral,
+application-specific configuration.
 
 @menu
 * Config System:: System Configuration
