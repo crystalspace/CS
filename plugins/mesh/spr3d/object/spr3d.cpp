@@ -43,7 +43,7 @@
 #include "qsqrt.h"
 
 // [res: moved here 'cause I get an "internal compiler error" on msvc7... whyever]
-CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh2, ())
+CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh, ())
 
 CS_IMPLEMENT_PLUGIN
 
@@ -238,7 +238,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   skeleton = NULL;
   cachename = NULL;
 
-  texel_mesh = new csTriangleMesh2 ();
+  texel_mesh = new csTriangleMesh ();
 
   tri_verts = NULL;
   do_tweening = true;
@@ -365,14 +365,14 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
   for (i = 0; i < GetVertexCount(); i++)
     v[i] = GetVertex (lod_base_frame, i);
 
-  csTriangleVertices2* verts = new csTriangleVertices2 (texel_mesh, v,
+  csTriangleVerticesCost* verts = new csTriangleVerticesCost (texel_mesh, v,
   	GetVertexCount());
   delete [] v;
 
   delete [] emerge_from;
   emerge_from = new int [GetVertexCount()];
   int* translate = new int [GetVertexCount()];
-  csTriangleMesh2* new_mesh = new csTriangleMesh2 (*texel_mesh);
+  csTriangleMesh* new_mesh = new csTriangleMesh (*texel_mesh);
 
   csSpriteLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
 
@@ -534,7 +534,7 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
 
   if (!tri_verts)
   {
-    tri_verts = new csTriangleVertices2 (texel_mesh, object_verts,
+    tri_verts = new csTriangleVerticesCost (texel_mesh, object_verts,
       GetVertexCount());
   }
 
@@ -560,14 +560,14 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
 
   for (i = 0; i < GetVertexCount(); i++)
   {
-    csTriangleVertex2 &vt = tri_verts->GetVertex (i);
-    if (vt.num_con_triangles)
+    csTriangleVertexCost &vt = tri_verts->GetVertex (i);
+    if (vt.con_triangles.Length ())
     {
       csVector3 &n = GetNormal (frame_number, i);
       if (n.IsZero())
       {
         //n.Set (0,0,0);
-        for (j = 0; j < vt.num_con_triangles; j++)
+        for (j = 0; j < vt.con_triangles.Length (); j++)
           n += tri_normals [vt.con_triangles[j]];
         float norm = n.Norm ();
         if (norm)
@@ -656,7 +656,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
   if (!tri_verts)
   {
-    tri_verts = new csTriangleVertices2 (texel_mesh, obj_verts,
+    tri_verts = new csTriangleVerticesCost (texel_mesh, obj_verts,
     	GetVertexCount());
   }
 
@@ -695,23 +695,23 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   }
 
   // create a mesh which only uses the vertex indices in the table
-  csTriangleMesh2 merge_mesh;
+  csTriangleMesh merge_mesh;
   for (i = 0; i < num_triangles; i++)
     merge_mesh.AddTriangle (merge[tris[i].a], merge[tris[i].b],
     	merge[tris[i].c]);
-  csTriangleVertices2 * tv = new csTriangleVertices2 (&merge_mesh,
+  csTriangleVerticesCost * tv = new csTriangleVerticesCost (&merge_mesh,
   	obj_verts, GetVertexCount());
 
   // calculate vertex normals, by averaging connected triangle normals
   csVector3* fr_normals = GetNormals (frame);
   for (i = 0; i < GetVertexCount(); i++)
   {
-    csTriangleVertex2 &vt = tv->GetVertex (i);
-    if (vt.num_con_triangles)
+    csTriangleVertexCost &vt = tv->GetVertex (i);
+    if (vt.con_triangles.Length ())
     {
       csVector3 &n = fr_normals[i];
       n.Set (tri_normals[vt.con_triangles[0]]);
-      for (j = 1; j < vt.num_con_triangles; j++)
+      for (j = 1; j < vt.con_triangles.Length (); j++)
         n += tri_normals [vt.con_triangles[j]];
       float norm = n.Norm ();
       if (norm)
@@ -1067,8 +1067,8 @@ int csSprite3DMeshObject::GetVertexToLightCount ()
 void csSprite3DMeshObject::GenerateSpriteLOD (int num_vts)
 {
   int* emerge_from = factory->GetEmergeFrom ();
-  csTriangleMesh2* base_mesh = factory->GetTexelMesh ();
-  mesh->Reset ();
+  csTriangleMesh* base_mesh = factory->GetTexelMesh ();
+  mesh->SetSize (0);
   int i;
   int a, b, c;
   for (i = 0 ; i < base_mesh->GetTriangleCount () ; i++)
@@ -1487,7 +1487,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // Calculate the right LOD level for this sprite.
 
   // Select the appropriate mesh.
-  csTriangleMesh2* m;
+  csTriangleMesh* m;
   int* emerge_from = NULL;
 
   float fnum = 0.0f;

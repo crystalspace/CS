@@ -20,11 +20,11 @@
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
 #include "csgeom/frustum.h"
+#include "csgeom/trimesh.h"
 #include "cssys/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
 #include "genmesh.h"
-#include "gmtri.h"
 #include "iengine/shadows.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -2005,7 +2005,7 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
 
   csTriangleMesh* tri_mesh = new csTriangleMesh ();
   tri_mesh->SetTriangles (tris, num_triangles);
-  csGenTriangleVertices* tri_verts = new csGenTriangleVertices (tri_mesh,
+  csTriangleVertices* tri_verts = new csTriangleVertices (tri_mesh,
   	new_verts, new_num_verts);
 
   if (mesh_tri_normals)
@@ -2036,11 +2036,11 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
   for (i = 0 ; i < new_num_verts ; i++)
   {
     csTriangleVertex &vt = tri_verts->GetVertex (i);
-    if (vt.num_con_triangles)
+    if (vt.con_triangles.Length ())
     {
       csVector3 &n = new_normals[i];
       n.Set (0,0,0);
-      for (j = 0; j < vt.num_con_triangles; j++)
+      for (j = 0; j < vt.con_triangles.Length () ; j++)
         n += mesh_tri_normals [vt.con_triangles[j]];
       float norm = n.Norm ();
       if (norm)

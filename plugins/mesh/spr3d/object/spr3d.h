@@ -357,7 +357,7 @@ private:
   int lod_level_config;
 
   /// The base mesh is also the texture alignment mesh.
-  csTriangleMesh2* texel_mesh;
+  csTriangleMesh* texel_mesh;
   /// The array of texels
   csPDelArray<csPoly2D> texels;
   /// The vertices
@@ -370,7 +370,7 @@ private:
    * Also contains temporary vertex position information
    * for one sprite (@@@this should be avoided!!!!)
    */
-  csTriangleVertices2* tri_verts;
+  csTriangleVerticesCost* tri_verts;
 
   /// The default mixing mode for new sprites
   int MixMode;
@@ -472,7 +472,7 @@ public:
   void ComputeBoundingBox ();
 
   ///
-  csTriangleMesh2* GetTexelMesh () const {return texel_mesh;}
+  csTriangleMesh* GetTexelMesh () const {return texel_mesh;}
 
   /// Add some vertices, normals, and texels
   void AddVertices (int num);
@@ -1124,7 +1124,7 @@ public:
    * change every frame anyway. We hold it static also since
    * we don't want to allocate it again every time.
    */
-  CS_DECLARE_STATIC_CLASSVAR (mesh, GetLODMesh, csTriangleMesh2)
+  CS_DECLARE_STATIC_CLASSVAR (mesh, GetLODMesh, csTriangleMesh)
 private:
 
   /// Mixmode for the triangles/polygons of the sprite.

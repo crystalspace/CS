@@ -164,12 +164,9 @@ public:
   csThingObjectType* thing_type;
 
 private:
-  /// ID for this thing (will be >0).
-  unsigned int thing_id;
-  /// Last used ID.
-  static int last_thing_id;
-  /// Current visibility number.
-  uint32 current_visnr;
+  //-------------------------------------------------------------------------
+  // Static factory like information.
+  //-------------------------------------------------------------------------
 
   /// Number of vertices
   int num_vertices;
@@ -178,6 +175,53 @@ private:
 
   /// Vertices in object space.
   csVector3* obj_verts;  
+
+  /// Normals in object space
+  csVector3* obj_normals;
+
+  /// Smooth flag
+  bool smoothed;
+
+  /// Bounding box in object space.
+  csBox3 obj_bbox;
+
+  /// If true then the bounding box in object space is valid.
+  bool obj_bbox_valid;
+
+  /// Radius of object in object space.
+  csVector3 obj_radius;
+  /// Full radius of object in object space.
+  float max_obj_radius;
+
+  /**
+   * Tesselation parameter:
+   * Center of thing to determine distance from
+   */
+  csVector3 curves_center;
+  /**
+   * Scale param (the larger this param it, the more the curves are
+   * tesselated).
+   */
+  float curves_scale;
+
+  /// Curve vertices.
+  csVector3* curve_vertices;
+  /// Texture coords of curve vertices
+  csVector2* curve_texels;
+
+  /// Number of vertices.
+  int num_curve_vertices;
+  /// Maximum number of vertices.
+  int max_curve_vertices;
+
+  //-------------------------------------------------------------------------
+
+  /// ID for this thing (will be >0).
+  unsigned int thing_id;
+  /// Last used ID.
+  static int last_thing_id;
+  /// Current visibility number.
+  uint32 current_visnr;
 
   /**
    * Vertices in world space.
@@ -190,9 +234,6 @@ private:
   /// Number of vertices for cam_verts.
   int num_cam_verts;
 
-  /// Normals in object space
-  csVector3* obj_normals;
-
   /**
    * This field describes how the light hitting polygons of this thing is
    * affected by the angle by which the beam hits the polygon. If this value is
@@ -200,9 +241,6 @@ private:
    * will be used.
    */
   float cosinus_factor;
-
-  /// Smooth flag
-  bool smoothed;
 
   /// Camera number for which the above camera vertices are valid.
   long cameranr;
@@ -261,8 +299,6 @@ private:
   /// Optional oriented bounding box.
   csThingBBox* bbox;
 
-  /// Bounding box in object space.
-  csBox3 obj_bbox;
   /**
    * Bounding box in world space.
    * This is a cache for GetBoundingBox(iMovable,csBox3) which
@@ -271,14 +307,6 @@ private:
   csBox3 wor_bbox;
   /// Last movable number that was used for the bounding box in world space.
   long wor_bbox_movablenr;
-
-  /// If true then the bounding box in object space is valid.
-  bool obj_bbox_valid;
-
-  /// Radius of object in object space.
-  csVector3 obj_radius;
-  /// Full radius of object in object space.
-  float max_obj_radius;
 
 #ifndef CS_USE_NEW_RENDERER
   /// Fog information.
@@ -293,9 +321,6 @@ private:
    */
   uint32 light_version;
 
-  /// If convex, this holds the index to the center vertex.
-  int center_idx;
-
   /// Pointer to the Thing Template which it derived from.
   csThing* ParentTemplate;
   /// Pointer to logical parent.
@@ -303,27 +328,6 @@ private:
 
   /// If true then this thing has been prepared (Prepare() function).
   bool prepared;
-
-  /**
-   * Tesselation parameter:
-   * Center of thing to determine distance from
-   */
-  csVector3 curves_center;
-  /**
-   * Scale param (the larger this param it, the more the curves are
-   * tesselated).
-   */
-  float curves_scale;
-
-  /// Curve vertices.
-  csVector3* curve_vertices;
-  /// Texture coords of curve vertices
-  csVector2* curve_texels;
-
-  /// Number of vertices.
-  int num_curve_vertices;
-  /// Maximum number of vertices.
-  int max_curve_vertices;
 
   float current_lod;
   uint32 current_features;
@@ -886,20 +890,6 @@ public:
    * Get the moving option.
    */
   int GetMovingOption () const { return cfg_moving; }
-
-  /**
-   * Set convexity flag of this thing. You should call this instead
-   * of SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX) because this function
-   * does some extra calculations.
-   */
-  void SetConvex (bool c);
-
-  /**
-   * If this thing is convex you can use getCenter to get the index
-   * of the vertex holding the center of this thing. This center is
-   * calculated by 'setConvex(true)'.
-   */
-  int GetCenter () { return center_idx; }
 
 #ifndef CS_USE_NEW_RENDERER
   /// Return true if this has fog.

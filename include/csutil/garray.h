@@ -127,6 +127,12 @@ public:
     return root;
   }
 
+  /// Get the pointer to the start of the array.
+  const T* GetArray () const
+  {
+    return root;
+  }
+
   /// Get a const reference.
   const T& Get (int n) const
   {

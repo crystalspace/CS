@@ -19,77 +19,21 @@
 #ifndef __CS_SPRTRI_H__
 #define __CS_SPRTRI_H__
 
-#include "ivideo/graph3d.h"
 #include "csgeom/math3d.h"
+#include "csgeom/trimesh.h"
 
-/**
- * A mesh of triangles. Note that a mesh of triangles is only valid
- * if used in combination with a vertex or edge table. Every triangle is then
- * a set of three indices in that table.
- */
-class csTriangleMesh2
-{
-private:
-  /// The triangles.
-  csTriangle* triangles;
-  int num_triangles;
-  int max_triangles;
-
-public:
-  ///
-  csTriangleMesh2 () : triangles (NULL), num_triangles (0), max_triangles (0) { }
-  ///
-  csTriangleMesh2 (const csTriangleMesh2& mesh);
-  ///
-  ~csTriangleMesh2 ();
-
-  /// Add a triangle to the mesh.
-  void AddTriangle (int a, int b, int c);
-  /// Query the array of triangles.
-  csTriangle* GetTriangles () { return triangles; }
-  ///
-  csTriangle& GetTriangle (int i) { return triangles[i]; }
-  /// Query the number of triangles.
-  int GetTriangleCount () { return num_triangles; }
-
-  /// Clear the mesh of triangles.
-  void Clear ();
-  /// Reset the mesh of triangles (don't deallocate the internal structures yet).
-  void Reset ();
-  /// Set the size of the triangle list.
-  void SetSize(int count);
-  /// Set the triangle array.  The array is copied.
-  void SetTriangles( csTriangle const* trigs, int count );
-};
-
-class csTriangleVertices2;
+class csTriangleVerticesCost;
 
 /**
  * The representation of a vertex in a triangle mesh.
  * This is basicly used as a temporary structure to be able to
  * calculate the cost of collapsing this vertex more quickly.
  */
-class csTriangleVertex2
+class csTriangleVertexCost : public csTriangleVertex
 {
 public:
-  /// Position of this vertex in 3D space.
-  csVector3 pos;
-  /// Index of this vertex.
-  int idx;
   /// True if already deleted.
   bool deleted;
-
-  /// Triangles that this vertex is connected to.
-  int* con_triangles;
-  /// Number of triangles.
-  int num_con_triangles;
-  int max_con_triangles;
-
-  /// Other vertices that this vertex is connected to.
-  int* con_vertices;
-  /// Number of vertices.
-  int num_con_vertices;
-  int max_con_vertices;
 
   /// Precalculated minimal cost of collapsing this vertex to some other.
   float cost;
@@ -97,14 +41,9 @@ public:
   int to_vertex;
 
   ///
-  csTriangleVertex2 () : deleted (false), con_triangles (NULL), num_con_triangles (0), max_con_triangles (0),
-  	con_vertices (NULL), num_con_vertices (0), max_con_vertices (0) { }
+  csTriangleVertexCost () : deleted (false) { }
   ///
-  ~csTriangleVertex2 () { delete [] con_triangles; delete [] con_vertices; }
-  ///
-  void AddTriangle (int idx);
-  ///
-  void AddVertex (int idx);
+  ~csTriangleVertexCost () { }
   ///
   bool DelVertex (int idx);
   ///
@@ -114,7 +53,7 @@ public:
    * Calculate the minimal cost of collapsing this vertex to some other.
    * Also remember which other vertex was selected for collapsing to.
    */
-  void CalculateCost (csTriangleVertices2* vertices);
+  void CalculateCost (csTriangleVerticesCost* vertices);
 };
 
 /**
@@ -123,24 +62,24 @@ public:
  * for LOD generation since every vertex contains information which
  * helps selecting the best vertices for collapsing.
  */
-class csTriangleVertices2
+class csTriangleVerticesCost
 {
 private:
-  csTriangleVertex2* vertices;
+  csTriangleVertexCost* vertices;
   int num_vertices;
 
 public:
   /// Build vertex table for a triangle mesh.
-  csTriangleVertices2 (csTriangleMesh2* mesh, csVector3* verts, int num_verts);
+  csTriangleVerticesCost (csTriangleMesh* mesh, csVector3* verts, int num_verts);
   ///
-  ~csTriangleVertices2 ();
+  ~csTriangleVerticesCost ();
   /// Update vertex table for a given set of vertices (with the same number as at init).
   void UpdateVertices (csVector3* verts);
 
   ///
   int GetVertexCount () { return num_vertices; }
   ///
-  csTriangleVertex2& GetVertex (int idx) { return vertices[idx]; }
+  csTriangleVertexCost& GetVertex (int idx) { return vertices[idx]; }
 
   /// Calculate the cost of all vertices.
   void CalculateCost ();
@@ -174,7 +113,7 @@ public:
    * Note. The given 'mesh' and 'verts' objects are no longer valid after
    * calling this function. Don't expect anything useful information here.
    */
-  static void CalculateLOD (csTriangleMesh2* mesh, csTriangleVertices2* verts,
+  static void CalculateLOD (csTriangleMesh* mesh, csTriangleVerticesCost* verts,
   	int* translate, int* emerge_from);
 };
 

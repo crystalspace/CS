@@ -16,11 +16,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_GMTRIANGLE_H__
-#define __CS_GMTRIANGLE_H__
+#ifndef __CS_TRIMESH_H__
+#define __CS_TRIMESH_H__
 
-#include "ivideo/graph3d.h"
+#include "csgeom/tri.h"
 #include "csgeom/math3d.h"
+#include "csutil/garray.h"
+#include "csutil/array.h"
 
 /**
  * A mesh of triangles. Note that a mesh of triangles is only valid
@@ -29,15 +31,13 @@
  */
 class csTriangleMesh
 {
-private:
+protected:
   /// The triangles.
-  csTriangle* triangles;
-  int num_triangles;
-  int max_triangles;
+  csGrowingArray<csTriangle> triangles;
 
 public:
   ///
-  csTriangleMesh () : triangles (NULL), num_triangles (0), max_triangles (0) { }
+  csTriangleMesh () { }
   ///
   csTriangleMesh (const csTriangleMesh& mesh);
   ///
@@ -46,23 +46,21 @@ public:
   /// Add a triangle to the mesh.
   void AddTriangle (int a, int b, int c);
   /// Query the array of triangles.
-  csTriangle* GetTriangles () { return triangles; }
+  csTriangle* GetTriangles () { return triangles.GetArray (); }
+  /// Query the array of triangles.
+  const csTriangle* GetTriangles () const { return triangles.GetArray (); }
   ///
   csTriangle& GetTriangle (int i) { return triangles[i]; }
   /// Query the number of triangles.
-  int GetTriangleCount () { return num_triangles; }
+  int GetTriangleCount () const { return triangles.Length (); }
 
   /// Clear the mesh of triangles.
   void Clear ();
-  /// Reset the mesh of triangles (don't deallocate internal structures yet).
-  void Reset ();
   /// Set the size of the triangle list.
   void SetSize (int count);
   /// Set the triangle array.  The array is copied.
   void SetTriangles (csTriangle const* trigs, int count);
 };
-
-class csTriangleVertices;
 
 /**
  * The representation of a vertex in a triangle mesh.
@@ -78,23 +76,15 @@ public:
   int idx;
 
   /// Triangles that this vertex is connected to.
-  int* con_triangles;
-  /// Number of triangles.
-  int num_con_triangles;
-  int max_con_triangles;
+  csArray<int> con_triangles;
 
   /// Other vertices that this vertex is connected to.
-  int* con_vertices;
-  /// Number of vertices.
-  int num_con_vertices;
-  int max_con_vertices;
+  csArray<int> con_vertices;
 
   ///
-  csTriangleVertex () : con_triangles (NULL),
-  	num_con_triangles (0), max_con_triangles (0),
-  	con_vertices (NULL), num_con_vertices (0), max_con_vertices (0) { }
+  csTriangleVertex () { }
   ///
-  ~csTriangleVertex () { delete [] con_triangles; delete [] con_vertices; }
+  ~csTriangleVertex () { }
   ///
   void AddTriangle (int idx);
   ///
@@ -105,17 +95,17 @@ public:
  * A class which holds vertices and connectivity information for a triangle
  * mesh.
  */
-class csGenTriangleVertices
+class csTriangleVertices
 {
-private:
+protected:
   csTriangleVertex* vertices;
   int num_vertices;
 
 public:
   /// Build vertex table for a triangle mesh.
-  csGenTriangleVertices (csTriangleMesh* mesh, csVector3* verts, int num_verts);
+  csTriangleVertices (csTriangleMesh* mesh, csVector3* verts, int num_verts);
   ///
-  ~csGenTriangleVertices ();
+  ~csTriangleVertices ();
   /**
    * Update vertex table for a given set of vertices (with the same number
    * as at init).
@@ -123,10 +113,10 @@ public:
   void UpdateVertices (csVector3* verts);
 
   ///
-  int GetVertexCount () { return num_vertices; }
+  int GetVertexCount () const { return num_vertices; }
   ///
   csTriangleVertex& GetVertex (int idx) { return vertices[idx]; }
 };
 
-#endif // __CS_GMTRIANGLE_H__
+#endif // __CS_TRIMESH_H__
 

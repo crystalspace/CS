@@ -157,7 +157,6 @@ csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
   dynamic_ambient.Set (0,0,0);
   light_version = 1;
 
-  center_idx = -1;
   ParentTemplate = NULL;
 
   cameranr = -1;
@@ -2077,41 +2076,6 @@ void PolyMeshHelper::Cleanup ()
 }
 
 //-------------------------------------------------------------------------
-
-void csThing::SetConvex (bool c)
-{
-  flags.Set (CS_ENTITY_CONVEX, c ? CS_ENTITY_CONVEX : 0);
-  if (c)
-  {
-    if (center_idx == -1) center_idx = AddVertex (0, 0, 0);
-
-    int i;
-    float minx = 1000000000., miny = 1000000000., minz = 1000000000.;
-    float maxx = -1000000000., maxy = -1000000000., maxz = -1000000000.;
-    for (i = 0; i < num_vertices; i++)
-    {
-      if (i != center_idx)
-      {
-        if (obj_verts[i].x < minx) minx = obj_verts[i].x;
-        if (obj_verts[i].x > maxx) maxx = obj_verts[i].x;
-        if (obj_verts[i].y < miny) miny = obj_verts[i].y;
-        if (obj_verts[i].y > maxy) maxy = obj_verts[i].y;
-        if (obj_verts[i].z < minz) minz = obj_verts[i].z;
-        if (obj_verts[i].z > maxz) maxz = obj_verts[i].z;
-      }
-    }
-
-    obj_verts[center_idx].Set (
-        (minx + maxx) / 2,
-        (miny + maxy) / 2,
-        (minz + maxz) / 2);
-    if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
-      wor_verts[center_idx].Set (
-          (minx + maxx) / 2,
-          (miny + maxy) / 2,
-          (minz + maxz) / 2);
-  }
-}
 
 void csThing::UpdateCurveTransform (const csReversibleTransform &movtrans)
 {
