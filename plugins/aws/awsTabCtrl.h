@@ -50,8 +50,8 @@ class awsTab : public awsComponent
   virtual ~awsTab ();
 
   virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
-  virtual bool GetProperty (char *name, void **parm);
-  virtual bool SetProperty (char *name, void *parm);
+  virtual bool GetProperty (const char *name, void **parm);
+  virtual bool SetProperty (const char *name, void *parm);
 
   virtual void OnDraw (csRect clip);
   bool OnMouseDown (int, int, int);
@@ -61,7 +61,8 @@ class awsTab : public awsComponent
   virtual csRect getPreferredSize ();
   virtual csRect getMinimumSize ();
 
-  virtual char *Type (){return "Tab Button";}
+  virtual const char *Type ()
+  {return "Tab Button";}
 
   void SetActive (bool what);
   void SetFirst (bool what){is_first=what;}
@@ -156,7 +157,7 @@ protected:
 
   virtual void OnDraw(csRect clip);
   virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
-  virtual char *Type (){return "Simple Tab Control";}
+  virtual const char *Type (){return "Simple Tab Control";}
 
   virtual csRect getInsets();
 
@@ -213,7 +214,6 @@ protected:
 
   // show buttonbar at top or bottom
   void SetTopBottom (bool to_top);
-
 };
 
 #endif

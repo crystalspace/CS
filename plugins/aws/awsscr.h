@@ -18,11 +18,12 @@ class awsActionDispatcher
   csBasicVector actions;
 public:
   /// Register an action.
-  void Register (
-        char *name,
+  void Register (const char *name,
         void (Action) (void *owner, iAwsParmList &parmlist));
 
   /// Execute the corresponding action
-  void Execute (char *action, void *owner, iAwsParmList &parmlist);
+  void Execute (const char *action, void *owner, iAwsParmList &parmlist);
 };
+
 #endif
+

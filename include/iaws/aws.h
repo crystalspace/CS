@@ -704,29 +704,29 @@ struct iAwsComponentFactory : public iBase
 };
 
 
-SCF_VERSION (iAwsKeyFactory, 0, 0, 1);
+SCF_VERSION (iAwsKeyFactory, 0, 0, 2);
 
 /// Interface for key factories.
 struct iAwsKeyFactory : public iBase
 {
    /// Initializes the factory , name is the name of this component, component type is it's type.
-   virtual void Initialize(iString *name, iString *component_type)=0;
+   virtual void Initialize(const char* name, const char* component_type)=0;
    /// Adds this factory's base to the window manager IF the base is a window
    virtual void AddToWindowList(iAwsPrefManager *pm)=0;
    /// Adds the given factory's base in as a child of this factory.
    virtual void AddFactory(iAwsKeyFactory *factory)=0;
    /// Add an integer key
-   virtual void AddIntKey(iString *name, int v)=0;
+   virtual void AddIntKey (const char* name, int v)=0;
    /// Add a string key
-   virtual void AddStringKey(iString *name, iString *v)=0;
+   virtual void AddStringKey (const char* name, const char* v)=0;
    /// Add a rect key
-   virtual void AddRectKey(iString *name, csRect v)=0;
+   virtual void AddRectKey (const char* name, csRect v)=0;
    /// Add an RGB key
-   virtual void AddRGBKey(iString *name, unsigned char r, unsigned char g, unsigned char b)=0;
+   virtual void AddRGBKey (const char* name, unsigned char r, unsigned char g, unsigned char b)=0;
    /// Add a point key
-   virtual void AddPointKey(iString *name, csPoint v)=0;
+   virtual void AddPointKey (const char* name, csPoint v)=0;
    /// Add a connection key
-   virtual void AddConnectionKey(iString *name, iAwsSink *s, unsigned long t, unsigned long sig)=0;
+   virtual void AddConnectionKey (const char* name, iAwsSink *s, unsigned long t, unsigned long sig)=0;
 };
 
 /* @} */

@@ -105,16 +105,16 @@ public:
   virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
 
   /// Gets properties
-  bool GetProperty (char *name, void **parm);
+  bool GetProperty (const char *name, void **parm);
 
   /// Sets properties
-  bool SetProperty (char *name, void *parm);
+  bool SetProperty (const char *name, void *parm);
 
   /// Performs "scripted" execution.
-  bool Execute (char *action, iAwsParmList &parmlist);
+  bool Execute (const char *action, iAwsParmList &parmlist);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
-  virtual char *Type ();
+  virtual const char *Type ();
 
 public:
 

@@ -175,7 +175,7 @@ void awsTab::OnDraw (csRect)
 
 }
 
-bool awsTab::GetProperty (char *name, void **parm)
+bool awsTab::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -197,7 +197,7 @@ bool awsTab::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsTab::SetProperty (char *name, void *parm)
+bool awsTab::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
   
@@ -341,14 +341,14 @@ bool awsTabCtrl::Setup (iAws *_wmgr, awsComponentNode *settings)
 
   awsKeyFactory previnfo, nextinfo;
 
-  previnfo.Initialize (new scfString ("prev"), new scfString ("Slider Button"));
-  nextinfo.Initialize (new scfString ("next"), new scfString ("Slider Button"));
+  previnfo.Initialize ("prev", "Slider Button");
+  nextinfo.Initialize ("next", "Slider Button");
 
-  previnfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsNormal);
-  nextinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsNormal);
+  previnfo.AddIntKey ("Style", awsCmdButton::fsNormal);
+  nextinfo.AddIntKey ("Style", awsCmdButton::fsNormal);
 
-  previnfo.AddStringKey(new scfString("Icon"), new scfString("ScrollBarLt"));
-  nextinfo.AddStringKey(new scfString("Icon"), new scfString("ScrollBarRt"));
+  previnfo.AddStringKey("Icon", "ScrollBarLt");
+  nextinfo.AddStringKey("Icon", "ScrollBarRt");
 
   nextimg = WindowManager ()->GetPrefMgr ()->GetTexture ("ScrollBarRt");
   previmg = WindowManager ()->GetPrefMgr ()->GetTexture ("ScrollBarLt");
@@ -356,16 +356,16 @@ bool awsTabCtrl::Setup (iAws *_wmgr, awsComponentNode *settings)
   if (!previmg || !nextimg) return false;
 
   int img_w, img_h;
-  
+
   previmg->GetOriginalDimensions (img_w, img_h);
 
   csRect r(0, 0, 30, 30 ); //( HandleSize > img_w ? HandleSize : img_w), ( HandleSize > img_h ? HandleSize : img_h) + 15);
 
   r.Move (Frame ().Width () - 2*HandleSize-1, Frame ().Height ()-HandleSize - 1);
-  previnfo.AddRectKey (new scfString ("Frame"), r);
+  previnfo.AddRectKey ("Frame", r);
 
   r.Move (HandleSize+1, 0);
-  nextinfo.AddRectKey (new scfString ("Frame"), r);
+  nextinfo.AddRectKey ("Frame", r);
 
   prev.SetParent (this);
   next.SetParent (this);
@@ -482,9 +482,8 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, void* user_param)
   // initialize and setup the button
   awsKeyFactory btninfo;
 
-  caption->IncRef ();
-  btninfo.Initialize (caption, new scfString ("Tab"));
-  btninfo.AddRectKey (new scfString ("Frame"), csRect (0, 0, Frame ().Width (), Frame ().Height ()));
+  btninfo.Initialize (caption->GetData(), "Tab");
+  btninfo.AddRectKey ("Frame", csRect (0, 0, Frame ().Width (), Frame ().Height ()));
 
   btn->SetParent (this);
   btn->Setup (WindowManager (), btninfo.GetThisNode ());

@@ -64,7 +64,7 @@ awsBarChart::~awsBarChart ()
   }
 }
 
-char *awsBarChart::Type ()
+const char *awsBarChart::Type ()
 {
   return "Bar Chart";
 }
@@ -123,7 +123,7 @@ bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsBarChart::GetProperty (char *name, void **parm)
+bool awsBarChart::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -141,7 +141,7 @@ bool awsBarChart::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsBarChart::SetProperty (char *name, void *parm)
+bool awsBarChart::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 
@@ -168,7 +168,7 @@ bool awsBarChart::SetProperty (char *name, void *parm)
   return false;
 }
 
-bool awsBarChart::Execute (char *action, iAwsParmList &parmlist)
+bool awsBarChart::Execute (const char *action, iAwsParmList &parmlist)
 {
   if (awsComponent::Execute (action, parmlist)) return true;
 

@@ -81,7 +81,7 @@ awsScrollBar::~awsScrollBar ()
   if (captured) WindowManager ()->ReleaseMouse ();
 }
 
-char *awsScrollBar::Type ()
+const char *awsScrollBar::Type ()
 {
   return "Scroll Bar";
 }
@@ -115,19 +115,13 @@ bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
 
   awsKeyFactory incinfo, decinfo, knobinfo;
 
-  decinfo.Initialize (
-      new scfString ("decVal"),
-      new scfString ("Slider Button"));
-  incinfo.Initialize (
-      new scfString ("incVal"),
-      new scfString ("Slider Button"));
-  knobinfo.Initialize (
-      new scfString ("knob"),
-      new scfString ("Slider Button"));
+  decinfo.Initialize ("decVal", "Slider Button");
+  incinfo.Initialize ("incVal", "Slider Button");
+  knobinfo.Initialize ("knob", "Slider Button");
 
-  decinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsNormal);
-  incinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsNormal);
-  knobinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsNormal);
+  decinfo.AddIntKey ("Style", awsCmdButton::fsNormal);
+  incinfo.AddIntKey ("Style", awsCmdButton::fsNormal);
+  knobinfo.AddIntKey ("Style", awsCmdButton::fsNormal);
 
   switch (orientation)
   {
@@ -143,21 +137,15 @@ bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
 
         incimg->GetOriginalDimensions (img_w, img_h);
 
-        decinfo.AddRectKey (
-            new scfString ("Frame"),
-            csRect (0, 0, Frame ().Width (), img_h));
+        decinfo.AddRectKey ("Frame", csRect (0, 0, Frame ().Width (), img_h));
 
-        incinfo.AddRectKey (
-            new scfString ("Frame"),
-            csRect (
+        incinfo.AddRectKey ("Frame", csRect (
               0,
               Frame ().Height () - img_h,
               Frame ().Width (),
               Frame ().Height ()));
 
-        knobinfo.AddRectKey (
-            new scfString ("Frame"),
-            csRect (0, img_h + 1, Frame ().Width (), 2 * img_h + 1));
+        knobinfo.AddRectKey ("Frame", csRect (0, img_h + 1, Frame ().Width (), 2 * img_h + 1));
       }
       break;
 
@@ -173,24 +161,21 @@ bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
 
         incimg->GetOriginalDimensions (img_w, img_h);
 
-        decinfo.AddRectKey (
-            new scfString ("Frame"),
+        decinfo.AddRectKey ("Frame",
             csRect (
               Frame ().xmin,
               Frame ().ymin,
               Frame ().xmin + img_w + 5,
               Frame ().ymax));
 
-        incinfo.AddRectKey (
-            new scfString ("Frame"),
+        incinfo.AddRectKey ("Frame",
             csRect (
               Frame ().xmax - img_w - 5,
               Frame ().ymin,
               Frame ().xmax,
               Frame ().ymax));
 
-        knobinfo.AddRectKey (
-            new scfString ("Frame"),
+        knobinfo.AddRectKey ("Frame",
             csRect (
               Frame ().xmin + img_w + 6,
               Frame ().ymin,
@@ -256,7 +241,7 @@ bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsScrollBar::GetProperty (char *name, void **parm)
+bool awsScrollBar::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -269,7 +254,7 @@ bool awsScrollBar::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsScrollBar::SetProperty (char *name, void *parm)
+bool awsScrollBar::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 
@@ -726,7 +711,7 @@ bool awsSliderButton::Setup (iAws *wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsSliderButton::GetProperty (char *name, void **parm)
+bool awsSliderButton::GetProperty (const char *name, void **parm)
 {
   if (awsCmdButton::GetProperty (name, parm)) return true;
 
@@ -739,7 +724,7 @@ bool awsSliderButton::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsSliderButton::SetProperty (char *name, void *parm)
+bool awsSliderButton::SetProperty (const char *name, void *parm)
 {
   if (awsCmdButton::SetProperty (name, parm)) return true;
 
@@ -758,7 +743,7 @@ bool awsSliderButton::SetProperty (char *name, void *parm)
   return false;
 }
 
-char *awsSliderButton::Type ()
+const char *awsSliderButton::Type ()
 {
   return "Slider Button";
 }

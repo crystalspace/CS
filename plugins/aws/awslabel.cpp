@@ -25,7 +25,7 @@ awsLabel::~awsLabel ()
 {
 }
 
-char *awsLabel::Type ()
+const char *awsLabel::Type ()
 {
   return "Label";
 }
@@ -42,7 +42,7 @@ bool awsLabel::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsLabel::GetProperty (char *name, void **parm)
+bool awsLabel::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -60,7 +60,7 @@ bool awsLabel::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsLabel::SetProperty (char *name, void *parm)
+bool awsLabel::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 

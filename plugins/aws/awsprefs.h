@@ -74,7 +74,7 @@ public:
   { };
 
   /// Pure virtual function Type returns the type of key
-  virtual unsigned char Type () = 0;
+  virtual uint8 Type () = 0;
 
   /// Accessor function gets name of key
   unsigned long Name () { return name; }
@@ -100,7 +100,7 @@ public:
   { }
 
   /// So that we know it's an int key
-  virtual unsigned char Type ()
+  virtual uint8 Type ()
   { return KEY_INT; }
 
   /// Gets the value of this key as an integer
@@ -114,21 +114,32 @@ class awsStringKey : public awsKey
   iString *val;
 
 public:
-  /// Constructs a string key with the given name
+  /// Constructs a string key with the given name (this function takes ref of
+  //the iString
+#if 0
   awsStringKey (iString *name, iString *v)
     : awsKey(name), val(v)
   { }
+#endif
   /// Constructs a string key with the given name
   awsStringKey (const char* name, const char* v)
     : awsKey(name)
   { val = new scfString (v); }
 
+  awsStringKey (const char* name, iString* v)
+    : awsKey(name), val(v)
+  { val->IncRef (); }
+
+  awsStringKey (const awsStringKey& key)
+    : awsKey(*this)
+  { val = key.val; val->IncRef(); }
+
   /// Destructor does nothing
   virtual ~awsStringKey ()
-  { }
+  { SCF_DEC_REF(val); }
 
   /// So that we know it's a string key.
-  virtual unsigned char Type ()
+  virtual uint8 Type ()
   { return KEY_STR; }
 
   /// Gets the value of this key as an iString
@@ -156,7 +167,7 @@ public:
   { }
 
   /// So that we know this is a rect key
-  virtual unsigned char Type ()
+  virtual uint8 Type ()
   { return KEY_RECT; }
 
   /// Gets the value of this key as a rectangle
@@ -207,7 +218,7 @@ public:
   { }
 
   /// So that we know this is a rect key
-  virtual unsigned char Type ()
+  virtual uint8 Type ()
   { return KEY_RGB; }
 
   /// Gets the value of this key as a rectangle
@@ -235,7 +246,7 @@ public:
   { }
 
   /// So that we know this is a rect key
-  virtual unsigned char Type ()
+  virtual uint8 Type ()
   { return KEY_POINT; }
 
   /// Gets the value of this key as a rectangle
@@ -285,7 +296,7 @@ public:
   { }
 
   /// So that we know this is a rect key
-  virtual unsigned char Type ()
+  virtual uint8 Type ()
   { return KEY_CONNECTION; }
 
   /// Gets the sink for this key
@@ -365,7 +376,7 @@ public:
   { }
 
   /// So that we know this is a skin node
-  virtual unsigned char Type ()
+  virtual uint8 Type ()
   { return KEY_SKIN; }
 };
 
@@ -384,7 +395,7 @@ public:
   { }
 
   /// So that we know this is a component node
-  virtual unsigned char Type ()
+  virtual uint8 Type ()
   { return KEY_COMPONENT; }
 
   /// So that we can find out what sort of component type this should be
@@ -399,7 +410,7 @@ public:
   virtual ~awsConnectionNode ();
 
   /// So that we know this is a component node
-  virtual unsigned char Type () { return KEY_CONNECTIONMAP; }
+  virtual uint8 Type () { return KEY_CONNECTIONMAP; }
 };
 
 //////////////////////////////////  Preference Manager ////////////////////////////////////////////////////////////////

@@ -50,9 +50,8 @@ bool awsCmdButton::Setup (iAws *_wmgr, awsComponentNode *settings)
   if(!pm->GetString(settings, "BitmapOverlay", tn) &&
 	  pm->GetString (settings, "Image", tn))
   {
-      awsStringKey* key = new awsStringKey(new scfString("BitmapOverlay"),
-		                                   new scfString(*tn));
-	  settings->Add(key);
+    awsStringKey* key = new awsStringKey("BitmapOverlay", tn);
+    settings->Add(key);
   }
 
   if (!awsPanel::Setup (_wmgr, settings)) return false;
@@ -65,9 +64,9 @@ bool awsCmdButton::Setup (iAws *_wmgr, awsComponentNode *settings)
 
   if(style == fsNormal || fsToolbar)
   {
-	  iString *in = NULL;
-	  pm->GetString (settings, "Icon", in);
-	  if (in) tex[0] = pm->GetTexture (in->GetData (), in->GetData ());
+    iString *in = NULL;
+    pm->GetString (settings, "Icon", in);
+    if (in) tex[0] = pm->GetTexture (in->GetData (), in->GetData ());
   }
   
   else if(style == fsBitmap)

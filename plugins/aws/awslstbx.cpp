@@ -113,7 +113,7 @@ awsListBox::~awsListBox ()
 {
 }
 
-char *awsListBox::Type ()
+const char *awsListBox::Type ()
 {
   return "List Box";
 }
@@ -193,19 +193,17 @@ bool awsListBox::Setup (iAws *_wmgr, awsComponentNode *settings)
 
   awsKeyFactory sbinfo;
 
-  sbinfo.Initialize (
-      new scfString ("vertscroll"),
-      new scfString ("Scroll Bar"));
+  sbinfo.Initialize ("vertscroll", "Scroll Bar");
 
   sbinfo.AddRectKey (
-      new scfString ("Frame"),
+      "Frame",
       csRect (
         Frame ().Width () - sb_w - 1,
         border,
         Frame ().Width () - 1,
         Frame ().Height () - 1));
 
-  sbinfo.AddIntKey (new scfString ("Orientation"), awsScrollBar::sboVertical);
+  sbinfo.AddIntKey ("Orientation", awsScrollBar::sboVertical);
 
   scrollbar->SetParent (this);
   scrollbar->Setup (_wmgr, sbinfo.GetThisNode ());
@@ -231,14 +229,14 @@ bool awsListBox::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsListBox::GetProperty (char *name, void **parm)
+bool awsListBox::GetProperty (const char *name, void **parm)
 {
   if (awsPanel::GetProperty (name, parm)) return true;
 
   return false;
 }
 
-bool awsListBox::SetProperty (char *name, void *parm)
+bool awsListBox::SetProperty (const char *name, void *parm)
 {
   if (awsPanel::SetProperty (name, parm)) return true;
 
@@ -560,7 +558,7 @@ bool awsListBox::GetItems (awsListRow *row, iAwsParmList &parmlist)
       if (usedt[i])
       {
         cs_snprintf (buf, 50, "text%d", i);
-        parmlist.AddString (buf, str[i]);
+        parmlist.AddString (buf, str[i]->GetData());
       }
 
       if (useds[i])
@@ -596,7 +594,7 @@ void awsListBox::ClearList (void *owner, iAwsParmList &)
   lb->map_dirty = true;
 }
 
-bool awsListBox::Execute (char *action, iAwsParmList &parmlist)
+bool awsListBox::Execute (const char *action, iAwsParmList &parmlist)
 {
   if (awsPanel::Execute (action, parmlist)) return true;
 

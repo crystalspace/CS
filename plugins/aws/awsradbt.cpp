@@ -36,7 +36,7 @@ awsRadButton::~awsRadButton ()
 {
 }
 
-char *awsRadButton::Type ()
+const char *awsRadButton::Type ()
 {
   return "Radio Button";
 }
@@ -59,7 +59,7 @@ bool awsRadButton::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsRadButton::GetProperty (char *name, void **parm)
+bool awsRadButton::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -85,7 +85,7 @@ bool awsRadButton::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsRadButton::SetProperty (char *name, void *parm)
+bool awsRadButton::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 

@@ -14,8 +14,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-awsEngineView::awsEngineView() :
-view(NULL)
+awsEngineView::awsEngineView()
+  : view(NULL)
 {
 }
 
@@ -24,35 +24,37 @@ awsEngineView::~awsEngineView()
   if(view) view->DecRef();
 }
 
-bool awsEngineView::SetProperty(char* name, void* parm)
+bool awsEngineView::SetProperty (const char* name, void* parm)
 {
   int i = strcmp(name, "view");
   printf("%d", i);
   if(strcmp(name, "view")==0)
   {
-    if(view) view->DecRef();
+    if(view)
+      view->DecRef();
     view = (iView*) parm;
-	if(view) view->IncRef();
-	return true;
-  }
-  else
-	return awsComponent::SetProperty(name, parm);
-}
-
-bool awsEngineView::GetProperty(char* name, void** parm)
-{
-  if(strcmp(name, "view")==0)
-  {
-	*parm = (void*) view;
+    if(view)
+      view->IncRef();
     return true;
   }
   else
-	return awsComponent::GetProperty(name, parm);
+    return awsComponent::SetProperty(name, parm);
 }
 
-char* awsEngineView::Type()
+bool awsEngineView::GetProperty (const char* name, void** parm)
 {
-	return "Engine View";
+  if(strcmp(name, "view")==0)
+  {
+    *parm = (void*) view;
+    return true;
+  }
+  else
+    return awsComponent::GetProperty(name, parm);
+}
+
+const char* awsEngineView::Type()
+{
+  return "Engine View";
 }
 
 void awsEngineView::OnDraw(csRect )
@@ -98,5 +100,6 @@ awsEngineViewFactory::~awsEngineViewFactory()
 
 iAwsComponent* awsEngineViewFactory::Create()
 {
-	return (new awsEngineView())->GetComponent();
+  return (new awsEngineView())->GetComponent();
 }
+

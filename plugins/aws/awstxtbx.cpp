@@ -66,7 +66,7 @@ awsTextBox::~awsTextBox ()
   }
 }
 
-char *awsTextBox::Type ()
+const char *awsTextBox::Type ()
 {
   return "Text Box";
 }
@@ -128,7 +128,7 @@ bool awsTextBox::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsTextBox::GetProperty (char *name, void **parm)
+bool awsTextBox::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -156,7 +156,7 @@ bool awsTextBox::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsTextBox::SetProperty (char *name, void *parm)
+bool awsTextBox::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 

@@ -42,7 +42,7 @@ awsStatusBar::~awsStatusBar ()
   
 }
 
-char *awsStatusBar::Type ()
+const char *awsStatusBar::Type ()
 {
   return "Status Bar";
 }
@@ -80,7 +80,7 @@ bool awsStatusBar::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsStatusBar::GetProperty (char *name, void **parm)
+bool awsStatusBar::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -94,7 +94,7 @@ bool awsStatusBar::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsStatusBar::SetProperty (char *name, void *parm)
+bool awsStatusBar::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 
@@ -108,7 +108,7 @@ bool awsStatusBar::SetProperty (char *name, void *parm)
   return false;
 }
 
-bool awsStatusBar::Execute (char *action, iAwsParmList &parmlist)
+bool awsStatusBar::Execute (const char *action, iAwsParmList &parmlist)
 {
   if (awsComponent::Execute (action, parmlist)) return true;
  

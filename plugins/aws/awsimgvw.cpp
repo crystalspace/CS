@@ -46,7 +46,7 @@ awsImageView::~awsImageView ()
 {
 }
 
-char *awsImageView::Type ()
+const char *awsImageView::Type ()
 {
   return "Image View";
 }
@@ -101,14 +101,14 @@ void awsImageView::SetColor(int color_index)
 
 int awsImageView::GetColor() { return color; }
 
-bool awsImageView::GetProperty (char *name, void **parm)
+bool awsImageView::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
   return false;
 }
 
-bool awsImageView::SetProperty (char *name, void *parm)
+bool awsImageView::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
   if (strcmp(name, "Color")==0)

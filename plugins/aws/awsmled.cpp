@@ -116,7 +116,7 @@ awsMultiLineEdit::~awsMultiLineEdit ()
   }
 }
 
-bool awsMultiLineEdit::Execute (char *action, iAwsParmList &parmlist)
+bool awsMultiLineEdit::Execute (const char *action, iAwsParmList &parmlist)
 {
   if (awsComponent::Execute (action, parmlist)) return true;
   actions.Execute (action, this, parmlist);
@@ -313,14 +313,14 @@ bool awsMultiLineEdit::Setup (iAws *wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsMultiLineEdit::GetProperty (char *name, void **parm)
+bool awsMultiLineEdit::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
   return false;
 }
 
-bool awsMultiLineEdit::SetProperty (char *name, void *parm)
+bool awsMultiLineEdit::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 
@@ -363,7 +363,7 @@ bool awsMultiLineEdit::SetProperty (char *name, void *parm)
   return false;
 }
 
-char *awsMultiLineEdit::Type ()
+const char *awsMultiLineEdit::Type ()
 {
   return "Multiline Edit";
 }
@@ -1180,8 +1180,7 @@ void awsMultiLineEdit::actGetRow (void *owner, iAwsParmList &parmlist)
 
   if (parmlist.GetInt ("row", &row) && row < me->vText.Length () && row >= 0)
   {
-    scfString *str = new scfString (((csString*)me->vText.Get (row))->GetData ());
-    parmlist.AddString ("string", str);
+    parmlist.AddString ("string", *((csString*) me->vText.Get(row)) );
   }
 }
 
@@ -1203,12 +1202,12 @@ void awsMultiLineEdit::actGetRowCount (void *owner, iAwsParmList &parmlist)
 void awsMultiLineEdit::actGetText (void *owner, iAwsParmList &parmlist)
 {
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
-  scfString *text = new scfString;
+  csString text;
   for (int i=0; i < me->vText.Length (); i++)
   {
-    text->Append (((csString*)me->vText.Get (i))->GetData ());
+    text.Append (((csString*)me->vText.Get (i))->GetData ());
     if (i < me->vText.Length ()-1)
-      text->Append ("\n");
+      text.Append ("\n");
   }
   parmlist.AddString ("text", text);
 }
@@ -1280,3 +1279,4 @@ iAwsComponent *awsMultiLineEditFactory::Create ()
 {
   return new awsMultiLineEdit;
 }
+

@@ -6,8 +6,7 @@
 
 #include <string.h>
 
-void awsActionDispatcher::Register (
-  char *name,
+void awsActionDispatcher::Register (const char *name,
   void (Action) (void *owner, iAwsParmList &parmlist))
 {
   awsActionMap *map = new awsActionMap ();
@@ -22,7 +21,7 @@ void awsActionDispatcher::Register (
 }
 
 void awsActionDispatcher::Execute (
-  char *action,
+  const char *action,
   void *owner,
   iAwsParmList &parmlist)
 {

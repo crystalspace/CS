@@ -21,7 +21,7 @@ awsGroupFrame::~awsGroupFrame ()
 {
 }
 
-char *awsGroupFrame::Type ()
+const char *awsGroupFrame::Type ()
 {
   return "Group Frame";
 }
@@ -37,7 +37,7 @@ bool awsGroupFrame::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsGroupFrame::GetProperty (char *name, void **parm)
+bool awsGroupFrame::GetProperty (const char *name, void **parm)
 {
   if (awsPanel::GetProperty (name, parm)) return true;
 
@@ -55,7 +55,7 @@ bool awsGroupFrame::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsGroupFrame::SetProperty (char *name, void *parm)
+bool awsGroupFrame::SetProperty (const char *name, void *parm)
 {
   if (awsPanel::SetProperty (name, parm)) return true;
 

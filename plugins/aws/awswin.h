@@ -146,7 +146,8 @@ public:
   SCF_DECLARE_IBASE_EXT(awsComponent);
 
   /// This is a awsComponent of type window
-  virtual char *Type () { return "Window"; }
+  virtual const char *Type ()
+  { return "Window"; }
 
 public:
   /// Constructs window class, clear some variables to defaults
@@ -161,13 +162,13 @@ public:
   virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
 
   /// Gets properties for this window
-  bool GetProperty (char *name, void **parm);
+  bool GetProperty (const char *name, void **parm);
 
   /// Sets properties for this window
-  bool SetProperty (char *name, void *parm);
+  bool SetProperty (const char *name, void *parm);
 
   /// Executes scriptable actions for this window
-  bool Execute (char *action, iAwsParmList &parmlist);
+  bool Execute (const char *action, iAwsParmList &parmlist);
 
   /// Gets the preferred size of the awsComponent
   virtual csRect getPreferredSize ();
@@ -220,3 +221,4 @@ public:
 };
 
 #endif
+

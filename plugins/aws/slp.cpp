@@ -1035,16 +1035,16 @@ case 9:
 		;
     break;}
 case 10:
-{  yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str)); ;
+{  yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); ;
     break;}
 case 11:
-{  yyval.key = new awsIntKey(new scfString(yyvsp[-2].str), yyvsp[0].val); ;
+{  yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); ;
     break;}
 case 12:
-{  yyval.key = new awsRGBKey(new scfString(yyvsp[-6].str), yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); ;
+{  yyval.key = new awsRGBKey(yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); ;
     break;}
 case 13:
-{  yyval.key = new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
+{  yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
     break;}
 case 14:
 { awsConnectionNode *cn = new awsConnectionNode();
@@ -1080,13 +1080,13 @@ case 18:
 		;
     break;}
 case 19:
-{ yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str)); ;
+{ yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); ;
     break;}
 case 20:
-{ yyval.key = new awsIntKey(new scfString(yyvsp[-2].str), yyvsp[0].val); ;
+{ yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); ;
     break;}
 case 21:
-{ yyval.key = new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
+{ yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
     break;}
 case 22:
 { awsConnectionNode *cn = new awsConnectionNode();
@@ -1122,19 +1122,19 @@ case 26:
 		;
     break;}
 case 27:
-{ yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str)); ;
+{ yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); ;
     break;}
 case 28:
-{ yyval.key = new awsRGBKey(new scfString(yyvsp[-6].str), yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); ;
+{ yyval.key = new awsRGBKey(yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); ;
     break;}
 case 29:
-{ yyval.key = new awsIntKey(new scfString(yyvsp[-2].str), yyvsp[0].val); ;
+{ yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); ;
     break;}
 case 30:
-{ yyval.key = new awsPointKey(new scfString(yyvsp[-6].str), csPoint(yyvsp[-3].val, yyvsp[-1].val)); ;
+{ yyval.key = new awsPointKey(yyvsp[-6].str, csPoint(yyvsp[-3].val, yyvsp[-1].val)); ;
     break;}
 case 31:
-{ yyval.key = new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
+{ yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
     break;}
 case 32:
 { awsKeyContainer* kc = new awsKeyContainer;

@@ -32,7 +32,7 @@ awsCheckBox::~awsCheckBox ()
 {
 }
 
-char *awsCheckBox::Type ()
+const char *awsCheckBox::Type ()
 {
   return "Check Box";
 }
@@ -55,7 +55,7 @@ bool awsCheckBox::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsCheckBox::GetProperty (char *name, void **parm)
+bool awsCheckBox::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -81,7 +81,7 @@ bool awsCheckBox::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsCheckBox::SetProperty (char *name, void *parm)
+bool awsCheckBox::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 

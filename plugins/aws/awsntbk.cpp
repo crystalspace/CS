@@ -38,7 +38,7 @@ awsNotebook::awsNotebook () :
 awsNotebook::~awsNotebook ()
 {}
 
-char *awsNotebook::Type ()
+const char *awsNotebook::Type ()
 {
   return "Notebook";
 }
@@ -57,7 +57,7 @@ bool awsNotebook::Setup (iAws *_wmgr, awsComponentNode *settings)
 
   awsKeyFactory info;
 
-  info.Initialize (new scfString ("ButtonBar"), new scfString ("Notebook ButtonBar"));
+  info.Initialize ("ButtonBar", "Notebook ButtonBar");
 
   csRect r(0, 0, Frame().Width (), 20);
 
@@ -70,7 +70,7 @@ bool awsNotebook::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsNotebook::GetProperty (char *name, void **parm)
+bool awsNotebook::GetProperty (const char *name, void **parm)
 {
   if (awsPanel::GetProperty (name, parm)) return true;
 
@@ -85,7 +85,7 @@ bool awsNotebook::GetProperty (char *name, void **parm)
   return true;
 }
 
-bool awsNotebook::SetProperty (char *name, void *parm)
+bool awsNotebook::SetProperty (const char *name, void *parm)
 {
   if (awsPanel::SetProperty (name, parm)) return true;
 
@@ -225,7 +225,7 @@ bool awsNotebookPage::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsNotebookPage::GetProperty (char *name, void **parm)
+bool awsNotebookPage::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -261,7 +261,7 @@ bool awsNotebookPage::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsNotebookPage::SetProperty (char *name, void *parm)
+bool awsNotebookPage::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
   
@@ -302,7 +302,7 @@ bool awsNotebookPage::SetProperty (char *name, void *parm)
   return false;
 }
 
-char *awsNotebookPage::Type ()
+const char *awsNotebookPage::Type ()
 {
   return "Notebook Page";
 }
@@ -506,7 +506,7 @@ void awsNotebookButton::OnDraw (csRect)
 
 }
 
-bool awsNotebookButton::GetProperty (char *name, void **parm)
+bool awsNotebookButton::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -523,7 +523,7 @@ bool awsNotebookButton::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsNotebookButton::SetProperty (char *name, void *parm)
+bool awsNotebookButton::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
   
@@ -687,11 +687,11 @@ bool awsNotebookButtonBar::Setup (iAws *_wmgr, awsComponentNode *settings)
 
   awsKeyFactory previnfo, nextinfo;
 
-  previnfo.Initialize (new scfString ("prev"), new scfString ("Slider Button"));
-  nextinfo.Initialize (new scfString ("next"), new scfString ("Slider Button"));
+  previnfo.Initialize ("prev", "Slider Button");
+  nextinfo.Initialize ("next", "Slider Button");
 
-  previnfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsToolbar);
-  nextinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsToolbar);
+  previnfo.AddIntKey ("Style", awsCmdButton::fsToolbar);
+  nextinfo.AddIntKey ("Style", awsCmdButton::fsToolbar);
 
   nextimg = WindowManager ()->GetPrefMgr ()->GetTexture ("ScrollBarRt");
   previmg = WindowManager ()->GetPrefMgr ()->GetTexture ("ScrollBarLt");
@@ -701,10 +701,10 @@ bool awsNotebookButtonBar::Setup (iAws *_wmgr, awsComponentNode *settings)
   csRect r(0, 0, HandleSize, HandleSize);
 
   r.Move (Frame ().Width () - 2*HandleSize-1, Frame ().Height ()-HandleSize);
-  previnfo.AddRectKey (new scfString ("Frame"), r);
+  previnfo.AddRectKey ("Frame", r);
 
   r.Move (HandleSize+1, 0);
-  nextinfo.AddRectKey (new scfString ("Frame"), r);
+  nextinfo.AddRectKey ("Frame", r);
 
   prev->SetParent (this);
   next->SetParent (this);
@@ -855,17 +855,16 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   // initialize and setup the button
   awsKeyFactory btninfo;
 
-  str->IncRef ();
-  btninfo.Initialize (str, new scfString ("Notebook Button"));
-  btninfo.AddRectKey (new scfString ("Frame"), csRect (0, 0, Frame ().Width (), Frame ().Height ()));
+  btninfo.Initialize (str->GetData(), "Notebook Button");
+  btninfo.AddRectKey ("Frame", csRect (0, 0, Frame ().Width (), Frame ().Height ()));
 
   iString *icon = NULL;
   if (comp->GetProperty ("Icon", (csSome*)&icon) && icon && icon->Length ())
   {
-    btninfo.AddStringKey (new scfString ("Icon"), icon);
+    btninfo.AddStringKey ("Icon", icon ? icon->GetData() : "");
     int *iconalign;
     if (comp->GetProperty ("IconAlign", (csSome*)&iconalign))
-      btninfo.AddIntKey (new scfString ("IconAlign"), *iconalign);
+      btninfo.AddIntKey ("IconAlign", *iconalign);
   }
 
   btn->SetParent (this);

@@ -137,11 +137,10 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   closep.ymin = Frame ().ymin + closep.ymin;
   closep.ymax = Frame ().ymin + closep.ymax;
   
-  awsComponentNode closeinfo(new scfString("Close Button"), 
-    new scfString("Command Button"));
-  closeinfo.Add(new awsIntKey(new scfString("Style"), awsCmdButton::fsNormal));
-  closeinfo.Add(new awsIntKey(new scfString("IconAlign"), awsCmdButton::iconLeft));
-  closeinfo.Add(new awsStringKey(new scfString("Icon"), close_button_txt));
+  awsComponentNode closeinfo("Close Button", "Command Button");
+  closeinfo.Add(new awsIntKey("Style", awsCmdButton::fsNormal));
+  closeinfo.Add(new awsIntKey("IconAlign", awsCmdButton::iconLeft));
+  closeinfo.Add(new awsStringKey("Icon", close_button_txt));
   close_button.SetFlag(AWSF_CMP_NON_CLIENT);
   close_button.Create(WindowManager(), this, &closeinfo);
   close_button.ResizeTo(closep);
@@ -160,11 +159,10 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   zoomp.ymin = Frame ().ymin + zoomp.ymin;
   zoomp.ymax = Frame ().ymin + zoomp.ymax;
   
-  awsComponentNode zoominfo(new scfString("Zoom Button"), 
-    new scfString("Command Button"));
-  zoominfo.Add(new awsIntKey(new scfString("Style"), awsCmdButton::fsNormal));
-  zoominfo.Add(new awsIntKey(new scfString("IconAlign"), awsCmdButton::iconLeft));
-  zoominfo.Add(new awsStringKey(new scfString("Icon"), zoom_button_txt));
+  awsComponentNode zoominfo("Zoom Button", "Command Button");
+  zoominfo.Add(new awsIntKey("Style", awsCmdButton::fsNormal));
+  zoominfo.Add(new awsIntKey("IconAlign", awsCmdButton::iconLeft));
+  zoominfo.Add(new awsStringKey("Icon", zoom_button_txt));
   zoom_button.SetFlag(AWSF_CMP_NON_CLIENT);
   zoom_button.Create(WindowManager(), this, &zoominfo);
   zoom_button.ResizeTo(zoomp);
@@ -184,11 +182,10 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   minp.ymin = Frame ().ymin + minp.ymin;
   minp.ymax = Frame ().ymin + minp.ymax;
   
-  awsComponentNode mininfo(new scfString("Min Button"), 
-    new scfString("Command Button"));
-  mininfo.Add(new awsIntKey(new scfString("Style"), awsCmdButton::fsNormal));
-  mininfo.Add(new awsIntKey(new scfString("IconAlign"), awsCmdButton::iconLeft));
-  mininfo.Add(new awsStringKey(new scfString("Icon"), min_button_txt));
+  awsComponentNode mininfo("Min Button", "Command Button");
+  mininfo.Add(new awsIntKey("Style", awsCmdButton::fsNormal));
+  mininfo.Add(new awsIntKey("IconAlign", awsCmdButton::iconLeft));
+  mininfo.Add(new awsStringKey("Icon", min_button_txt));
 
   min_button.SetFlag(AWSF_CMP_NON_CLIENT);
   min_button.Create(WindowManager(), this, &mininfo);
@@ -211,7 +208,7 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-bool awsWindow::GetProperty (char *name, void **parm)
+bool awsWindow::GetProperty (const char *name, void **parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -244,7 +241,7 @@ bool awsWindow::GetProperty (char *name, void **parm)
   return false;
 }
 
-bool awsWindow::SetProperty (char *name, void *parm)
+bool awsWindow::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 
@@ -278,7 +275,7 @@ bool awsWindow::SetProperty (char *name, void *parm)
   return false;
 }
 
-bool awsWindow::Execute (char *action, iAwsParmList &parmlist)
+bool awsWindow::Execute (const char *action, iAwsParmList &parmlist)
 {
   if (awsComponent::Execute (action, parmlist)) return true;
 

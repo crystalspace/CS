@@ -32,12 +32,12 @@ class awsPopupMenu;
 class awsMenuEntry : public awsPanel
 {
 private:
-	iString* caption;
-	awsPopupMenu* popup;
-	bool selected;
+  iString* caption;
+  awsPopupMenu* popup;
+  bool selected;
   bool mouse_down;
   bool mouse_over;
-	void* user_param;
+  void* user_param;
 
   /// an image which will displayed to the left of the caption
   iTextureHandle* image;
@@ -63,23 +63,23 @@ protected:
   void SizeToFit();
 
 public:
-	awsMenuEntry();
-	~awsMenuEntry();
+  awsMenuEntry();
+  ~awsMenuEntry();
 
   virtual bool Setup(iAws* wmgr, awsComponentNode* settings);
-	char* Type();
+  virtual const char* Type();
 	
-	virtual bool GetProperty(char* name, void **parm);
-	virtual bool SetProperty(char* name, void *parm);
+  virtual bool GetProperty(const char* name, void **parm);
+  virtual bool SetProperty(const char* name, void *parm);
 
-	virtual void OnDraw(csRect clip);
+  virtual void OnDraw(csRect clip);
 
   virtual bool OnMouseEnter();
   virtual bool OnMouseExit(); 
   virtual bool OnMouseDown(int button, int x, int y);
   virtual bool OnMouseUp(int button, int x, int y);
 
-	static const int signalClicked;
+  static const int signalClicked;
   static const int signalSelected;
 };
 
@@ -102,13 +102,12 @@ public:
   ~awsMenuBarEntry();
 
   virtual bool Setup(iAws* wmgr, awsComponentNode* settings);
-  const char* Type();
+  virtual const char* Type();
 	
   virtual bool GetProperty(const char* name, void **parm);
   virtual bool SetProperty(const char* name, void *parm);
 
   virtual bool OnMouseEnter();
-
 };
 
 class awsMenuBarEntryFactory : public awsComponentFactory
@@ -227,7 +226,6 @@ public:
   virtual bool ShouldTrackMouse();
   virtual bool Create(iAws* manager, iAwsComponent* parent, awsComponentNode* settings);
   virtual iAwsComponent* GetNewDefaultEntry();
-
 };
 
 class awsMenuBarFactory : public awsComponentFactory

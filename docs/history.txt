@@ -18,6 +18,9 @@ The history order is reversed so that new features are at the top.
 		-reindented some stuff
 		-rewrote some parts of the parser
 		-changed some char* into const char*
+		-changed lots of stuff that used iString* before, but since
+			everyone was using iString* without care (LEAKS!)
+			I changed most of this stuff to const char*
 2-Jul-2002
 	- Removed an obsolete feature to show the c-buffer in walktest.
 	- Removed db_cbuffer console command in walktest.

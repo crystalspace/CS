@@ -77,37 +77,37 @@ bool awsMenuEntry::Setup (iAws *_wmgr, awsComponentNode *settings)
   return true;
 }
 
-char* awsMenuEntry::Type() { return "Menu Entry"; }
+const char* awsMenuEntry::Type() { return "Menu Entry"; }
 
-bool awsMenuEntry::GetProperty(char* name, void **parm)
+bool awsMenuEntry::GetProperty(const char* name, void **parm)
 {
-	if (awsPanel::GetProperty (name, parm)) return true;
+  if (awsPanel::GetProperty (name, parm)) return true;
 	
-	if (strcmp ("Caption", name) == 0)
-	{
-		char *st = NULL;
-		
-		if (caption) st = caption->GetData ();
-		
-		iString *s = new scfString (st);
-		*parm = (void *)s;
-		return true;
-	}
-	else if(strcmp(name, "PopupMenu") == 0)
-	{
-        *parm = (void *)popup;
-		return true;
-	}
-	else if(strcmp(name, "Selected") == 0)
-	{
-		*parm = (void*)selected;
-		return true;
-	}
-	else if(strcmp(name, "UserParam") == 0)
-	{
-		*parm = user_param;
-		return true;
-	}
+  if (strcmp ("Caption", name) == 0)
+  {
+    char *st = NULL;
+    
+    if (caption) st = caption->GetData ();
+    
+    iString *s = new scfString (st);
+    *parm = (void *)s;
+    return true;
+  }
+  else if(strcmp(name, "PopupMenu") == 0)
+  {
+    *parm = (void *)popup;
+    return true;
+  }
+  else if(strcmp(name, "Selected") == 0)
+  {
+    *parm = (void*)selected;
+    return true;
+  }
+  else if(strcmp(name, "UserParam") == 0)
+  {
+    *parm = user_param;
+    return true;
+  }
   else if(strcmp(name, "CloseSignal") == 0)
   {
     *parm = (void *)signalClicked;
@@ -124,71 +124,72 @@ bool awsMenuEntry::GetProperty(char* name, void **parm)
     return true;
   }
 	
-	return false;
+  return false;
 }
 
-bool awsMenuEntry::SetProperty(char *name, void *parm)
+bool awsMenuEntry::SetProperty(const char *name, void *parm)
 {
-	if (awsPanel::SetProperty (name, parm)) return true;
+  if (awsPanel::SetProperty (name, parm)) return true;
 	
-	if (strcmp ("Caption", name) == 0)
-	{
-		iString *s = (iString *) (parm);
-		
-		if (s && s->Length ())
-		{
-			if (caption) caption->DecRef ();
-			caption = s;
-			caption->IncRef (); 
+  if (strcmp ("Caption", name) == 0)
+  {
+    iString *s = (iString *) (parm);
+    
+    if (s && s->Length ())
+    {
+      if (caption) caption->DecRef ();
+      caption = s;
+      caption->IncRef (); 
       SizeToFit();
-			Invalidate ();
-		}
-		else
-		{
-			if (caption) caption->DecRef ();
-			caption = NULL;
-		}
-		
-		return true;
-	}
-	if(strcmp(name, "PopupMenu") == 0)
-	{
-		awsPopupMenu *pm = (awsPopupMenu *) (parm);
-		
-		if (popup) popup->DecRef ();
-		popup = pm;
-		if (popup) popup->IncRef ();
-		SizeToFit();
+      Invalidate ();
+    }
+    else
+    {
+      if (caption) caption->DecRef ();
+      caption = NULL;
+    }
+    
+    return true;
+  }
+  if(strcmp(name, "PopupMenu") == 0)
+  {
+    awsPopupMenu *pm = (awsPopupMenu *) (parm);
+    
+    if (popup) popup->DecRef ();
+    popup = pm;
+    if (popup) popup->IncRef ();
+    SizeToFit();
     Invalidate ();
     return true;
-	}
-	else if(strcmp(name, "Selected") == 0)
-	{
-		selected = (bool)parm;
-		return true;
-	}
-	else if(strcmp(name, "UserParam") == 0)
-	{
-		user_param = parm;
-		return true;
-	}
+  }
+  else if(strcmp(name, "Selected") == 0)
+  {
+    selected = (bool)parm;
+    return true;
+  }
+  else if(strcmp(name, "UserParam") == 0)
+  {
+    user_param = parm;
+    return true;
+  }
   else if(strcmp(name, "Image") == 0)
   {
-   	iTextureHandle *im = (iTextureHandle*) (parm);
-		
-		if (image) image->DecRef ();
-		image = im;
-		if (image) image->IncRef ();
+    iTextureHandle *im = (iTextureHandle*) (parm);
+    
+    if (image) image->DecRef ();
+    image = im;
+    if (image) image->IncRef ();
     Invalidate ();
   }
-	return false;
+  
+  return false;
 }
 
 void awsMenuEntry::SizeToFit()
 {
   int tw, th;
   WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions ( 
-    caption->GetData(), tw, th);
+      caption->GetData(), tw, th);
  
   th = MAX(image_height, th);
 
@@ -997,11 +998,4 @@ iAwsComponent* awsPopupMenuFactory::Create()
 {
   return (iAwsComponent*) new awsPopupMenu;
 }
-
-
-
-
-
-
-
 

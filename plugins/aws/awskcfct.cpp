@@ -15,7 +15,7 @@ awsKeyFactory::~awsKeyFactory ()
   if (base && !base_in_use) delete base;
 }
 
-void awsKeyFactory::Initialize (iString *name, iString *component_type)
+void awsKeyFactory::Initialize (const char* name, const char* component_type)
 {
   base = new awsComponentNode (name, component_type);
 }
@@ -38,7 +38,7 @@ void awsKeyFactory::AddFactory (iAwsKeyFactory *factory)
   }
 }
 
-void awsKeyFactory::AddIntKey (iString *name, int v)
+void awsKeyFactory::AddIntKey (const char* name, int v)
 {
   if (base)
   {
@@ -46,7 +46,7 @@ void awsKeyFactory::AddIntKey (iString *name, int v)
   }
 }
 
-void awsKeyFactory::AddStringKey (iString *name, iString *v)
+void awsKeyFactory::AddStringKey (const char* name, const char* v)
 {
   if (base)
   {
@@ -54,7 +54,7 @@ void awsKeyFactory::AddStringKey (iString *name, iString *v)
   }
 }
 
-void awsKeyFactory::AddRectKey (iString *name, csRect v)
+void awsKeyFactory::AddRectKey (const char* name, csRect v)
 {
   if (base)
   {
@@ -63,7 +63,7 @@ void awsKeyFactory::AddRectKey (iString *name, csRect v)
 }
 
 void awsKeyFactory::AddRGBKey (
-  iString *name,
+  const char* name,
   unsigned char r,
   unsigned char g,
   unsigned char b)
@@ -74,7 +74,7 @@ void awsKeyFactory::AddRGBKey (
   }
 }
 
-void awsKeyFactory::AddPointKey (iString *name, csPoint v)
+void awsKeyFactory::AddPointKey (const char* name, csPoint v)
 {
   if (base)
   {
@@ -83,7 +83,7 @@ void awsKeyFactory::AddPointKey (iString *name, csPoint v)
 }
 
 void awsKeyFactory::AddConnectionKey (
-  iString *name,
+  const char* name,
   iAwsSink *s,
   unsigned long t,
   unsigned long sig)
@@ -98,3 +98,4 @@ awsComponentNode *awsKeyFactory::GetThisNode ()
 {
   return base;
 }
+

@@ -18,8 +18,7 @@
  *  some of the values are sane. This code does NOT do those checks.  Using this will allow
  *  you to destroy yourself.  Have fun.
  */
-class awsKeyFactory :
-  public iAwsKeyFactory
+class awsKeyFactory : public iAwsKeyFactory
 {
   /** Base container.  Normally the base container is a window, but this can start at any level
    *  of the hierarchy.  If it's not a window, then it must be added to a window eventually to be
@@ -36,7 +35,7 @@ public:
   virtual ~awsKeyFactory ();
 
   /// Initializes the factory , name is the name of this component, component type is it's type.
-  virtual void Initialize (iString *name, iString *component_type);
+  virtual void Initialize (const char* name, const char* component_type);
 
   /// Adds this factory's base to the window manager IF the base is a window
   virtual void AddToWindowList (iAwsPrefManager *pm);
@@ -45,27 +44,27 @@ public:
   virtual void AddFactory (iAwsKeyFactory *factory);
 
   /// Add an integer key
-  virtual void AddIntKey (iString *name, int v);
+  virtual void AddIntKey (const char* name, int v);
 
   /// Add a string key
-  virtual void AddStringKey (iString *name, iString *v);
+  virtual void AddStringKey (const char* name, const char* v);
 
   /// Add a rect key
-  virtual void AddRectKey (iString *name, csRect v);
+  virtual void AddRectKey (const char* name, csRect v);
 
   /// Add an RGB key
   virtual void AddRGBKey (
-                iString *name,
+                const char *name,
                 unsigned char r,
                 unsigned char g,
                 unsigned char b);
 
   /// Add a point key
-  virtual void AddPointKey (iString *name, csPoint v);
+  virtual void AddPointKey (const char* name, csPoint v);
 
   /// Add a connection key
   virtual void AddConnectionKey (
-                iString *name,
+                const char* name,
                 iAwsSink *s,
                 unsigned long t,
                 unsigned long sig);
@@ -73,4 +72,5 @@ public:
   /// Get the base node
   awsComponentNode *GetThisNode ();
 };
+
 #endif

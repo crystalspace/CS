@@ -146,12 +146,12 @@ public:
     virtual csRGBpixel *GetPalette ()     { return NULL; }
     virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB);
 
-    virtual bool PerformExtension (char const *command, ...)
+    virtual bool PerformExtension (const char* command, ...)
     {
       (void)command;
       return false;
     };
-    virtual bool PerformExtensionV (char const *command, va_list)
+    virtual bool PerformExtensionV (const char* command, va_list)
     {
       (void)command;
       return false;

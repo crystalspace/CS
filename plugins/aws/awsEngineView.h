@@ -11,32 +11,31 @@ struct iView;
 class awsEngineView : public awsComponent  
 {
 public:
-	awsEngineView();
-	virtual ~awsEngineView();
+  awsEngineView();
+  virtual ~awsEngineView();
 
-	virtual void OnDraw(csRect clip);
+  virtual void OnDraw(csRect clip);
 
-	/// Gets properties
-    bool GetProperty (char *name, void **parm);
+  /// Gets properties
+  bool GetProperty (const char *name, void **parm);
 
-    /// Sets properties
-    bool SetProperty (char *name, void *parm);
+  /// Sets properties
+  bool SetProperty (const char *name, void *parm);
 
-    /// Returns the named TYPE of the component, like "Radio Button", etc.
-    virtual char *Type ();
+  /// Returns the named TYPE of the component, like "Radio Button", etc.
+  virtual const char *Type ();
 
 private:
-	iView* view;
-
+  iView* view;
 };
 
 class awsEngineViewFactory : public awsComponentFactory
 {
 public:
-	awsEngineViewFactory(iAws* mgr);
-	~awsEngineViewFactory();
+  awsEngineViewFactory(iAws* mgr);
+  ~awsEngineViewFactory();
 
-	iAwsComponent* Create();
+  iAwsComponent* Create();
 };
 
 #endif

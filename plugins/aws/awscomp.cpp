@@ -141,8 +141,6 @@ iAwsComponent *awsComponent::GetComponent ()
   return this;
 }
 
-
-
 bool awsComponent::Create(iAws* wmgr, iAwsComponent* parent, awsComponentNode* settings)
 {
   SetID(settings->Name());

@@ -66,8 +66,8 @@ class awsNotebookButton : public awsComponent
   virtual ~awsNotebookButton ();
 
   virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
-  virtual bool GetProperty (char *name, void **parm);
-  virtual bool SetProperty (char *name, void *parm);
+  virtual bool GetProperty (const char *name, void **parm);
+  virtual bool SetProperty (const char *name, void *parm);
 
   virtual void OnDraw (csRect clip);
   bool OnMouseDown (int, int, int);
@@ -77,7 +77,8 @@ class awsNotebookButton : public awsComponent
   virtual csRect getPreferredSize ();
   virtual csRect getMinimumSize ();
 
-  virtual char *Type (){return "Notebook Button";}
+  virtual const char *Type ()
+  {return "Notebook Button";}
 
   void SetActive (bool what){is_active=what;}
   void SetFirst (bool what){is_first=what;}
@@ -216,7 +217,7 @@ class awsNotebookButtonBar : public awsComponent
   virtual void OnDraw (csRect clip);
 
   virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
-  virtual char *Type (){return "Notebook ButtonBar";}
+  virtual const char *Type (){return "Notebook ButtonBar";}
 
   // This will create a button based on the Caption property of the component.
   // the Icon and IconAlign properties are also taken into account.
@@ -270,13 +271,13 @@ public:
   virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
 
   /// Gets properties
-  bool GetProperty (char *name, void **parm);
+  bool GetProperty (const char *name, void **parm);
 
   /// Sets properties
-  bool SetProperty (char *name, void *parm);
+  bool SetProperty (const char *name, void *parm);
 
   /// Returns the named TYPE of the component, like "Notebook Page", etc.
-  virtual char *Type ();
+  virtual const char *Type ();
 
 };
 
@@ -342,13 +343,13 @@ public:
   virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
 
   /// Gets properties
-  bool GetProperty (char *name, void **parm);
+  bool GetProperty (const char *name, void **parm);
 
   /// Sets properties
-  bool SetProperty (char *name, void *parm);
+  bool SetProperty (const char *name, void *parm);
 
   /// Returns the named TYPE of the component, like "Notebook Page", etc.
-  virtual char *Type ();
+  virtual const char *Type ();
 public:
 
   /// Triggered when the component needs to draw
