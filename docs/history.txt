@@ -38,8 +38,11 @@ Short-term cleanups that need to be done:
 	  entire library really needs to be converted to VFS.
 	- Eric Sunshine modified the import/export library so that it now
 	  appends output to the log file rather than overwriting it.
+	- Eric Sunshine removed some unused methods from the import/export
+	  library.
 	- Eric Sunshine added "const" here and there through the source tree.
 	- Eric Sunshine updated some documentation.
+	- Eric Sunshine fixed some compilation warnings in MazeD.
 28-Sep-1999
 	- Csparser detects duplicate vertex indices in polygons and ignores
 	  them (while given a warning at the same time).
