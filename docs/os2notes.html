@@ -16,21 +16,19 @@
 <H2>DIVE</H2>
 <P>
   The current implementation requires DIVE, so the application is compiled as
-  a PM application, and you will need to write a .DEF file for your
-  executable(-s), like below:
-<PRE>
-NAME Cryst WINDOWAPI
-DESCRIPTION "CrystalSpace test executable"
-STACKSIZE 1048576
-</PRE>
-  If you won't define the WINDOWAPI flag, the executable will not work.
+  a PM application. This is done by default (bin/os2link.cmd creates automatically
+  a .def file). If you want to compile the application as a console application,
+  you have to link it with the $(DO.LINK.CONSOLE.EXE) macro (have a look at
+  apps/csregsvr/csregsvr.mak).
 <P>
   Other thing you should keep in mind is that DIVE library (libDIVE.cpp)
   uses a couple of resources, so you should not forget to link the resources
-  to your application. Resources can be found in libDIVE.rc
+  to your application. Resources can be found in libDIVE.rc; this is
+  added to linker dependencies for PM programs in CSDIVE driver makefile,
+  so you also don't need to worry about it (but is still useful to know :-)
 </P>
 <P>
-  There is one feature not too pleasant related to DIVE (or to acceleration
+  There is one not too pleasant feature related to DIVE (or to acceleration
   hardware specifics?). If DIVE image should be rescaled (i.e. the scale ratio
   is not 1:1) DIVE is almost TWICE (!) slower if DIVE window (the client
   rectangle, not the window border) is not on a two-aligned bound (at least
@@ -153,6 +151,16 @@ STACKSIZE 1048576
   csGraphics2D::SetMousePointer can be implemented to construct a OS/2
   pointer from "native" CrystalSpace textures, but I was too lazy for this.
 </P>
+<H1>Misterious crashes</H1>
+If you just compiled WALKTEST or MAZED or some other executable (or even
+CSREGSVR), run it and get misterious exits or crashes during startup, it could
+be caused by the following problem:<B>
+I had a precompiled version of the JPEG and PNG dynamic libraries that were
+compiled with -Zcrtdll. And compiled Crystal Space with -Zsys, i.e. no EMX
+C runtime DLLs. For some reason this combination doesn't work until C/C++
+compilers and company are resident in memory (if you're using "set GCCLOAD").
+So you should either recompile everything with -Zsys, or recompile everything
+with -Zcrtdll, or do a "emxload -q" before running such executables.
 <HR>
 <H1>Contributors</H1>
 <P>
