@@ -92,19 +92,8 @@ OpenGLCache::~OpenGLCache ()
 
 void OpenGLCache::cache_texture (iTextureHandle *txt_handle)
 {
-  int size = 0;
-
   if (type != CS_TEXTURE)
     return;
-
-  for (int c = 0; c < 4; c++)
-  {
-    int width, height;
-    if (txt_handle->GetMipMapDimensions (c, width, height))
-      size += width * height;
-  }
-
-  size *= bpp / 8;
 
   csGLCacheData *cached_texture = (csGLCacheData *)txt_handle->GetCacheData ();
   if (cached_texture)
@@ -132,6 +121,17 @@ void OpenGLCache::cache_texture (iTextureHandle *txt_handle)
   }
   else
   {
+    int size = 0;
+
+    for (int c = 0; c < 4; c++)
+    {
+      int width, height;
+      if (txt_handle->GetMipMapDimensions (c, width, height))
+        size += width * height;
+    }
+
+    size *= bpp / 8;
+
     // unit is not in memory. load it into the cache
     while (total_size + size >= cache_size)
       // out of memory. remove units from bottom of list.
@@ -389,7 +389,7 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 	th = thhack;
       }
 
-      if (transp)
+      if (transp && !(txt && txt->KeyColorSet ()))
       {
 	int pixels = tw * th;
 	csRGBpixel *_src = src;
@@ -402,6 +402,7 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 	    _src->alpha = 0;
 	  _src++;
 	}
+	if (txt) txt->KeyColorSet (true);
       }
 
       // now that the texture has been generated, send it to openGL
@@ -429,7 +430,7 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
       tw = txt->get_width ();
       th = txt->get_height ();
       src = txt->get_image_data ();
-      if (transp)
+      if (transp && !txt->KeyColorSet ())
       {
 	int pixels = tw * th;
 	csRGBpixel *_src = src;
@@ -442,6 +443,7 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 	    _src->alpha = 0;
 	  _src++;
 	}
+	txt->KeyColorSet (true);
       }
       glTexImage2D (GL_TEXTURE_2D, 0, 4, tw, th,
 		    0, GL_RGBA, GL_UNSIGNED_BYTE, src);

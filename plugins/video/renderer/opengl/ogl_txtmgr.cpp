@@ -42,6 +42,7 @@ csTextureOpenGL::csTextureOpenGL (csTextureHandle *Parent, iImage *Image)
   w = Image->GetWidth ();
   h = Image->GetHeight ();
   compute_masks ();
+  bKCset = false;
 }
 
 csTextureOpenGL::~csTextureOpenGL ()

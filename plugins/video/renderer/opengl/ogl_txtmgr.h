@@ -45,7 +45,8 @@ class csTextureOpenGL : public csTexture
 protected:
   /// The actual image
   iImage *image;
-
+  bool bKCset;
+  
 public:
   /// Create a csTexture object
   csTextureOpenGL (csTextureHandle *Parent, iImage *Image);
@@ -57,6 +58,12 @@ public:
   /// Get the image object
   iImage *get_image ()
   { return image; }
+  /// has the keycolor been set already ?
+  bool KeyColorSet ()
+  { return bKCset; }
+  /// remember state of KeyColor
+  void KeyColorSet (bool bWhat)
+  { bKCset = bWhat; }
 };
 
 /**
