@@ -108,8 +108,7 @@ public:
 };
 
 /**
- * This class implements the software texture cache
- * for 8-bit modes (16-bit mode overrides this class).
+ * This class implements the software texture cache.
  */
 class csTextureCacheSoftware
 {

@@ -386,36 +386,21 @@ bool csGraphics3DSoftwareCommon::Open ()
   }
 
   pfmt = *G2D->GetPixelFormat ();
-  if (pfmt.PalEntries)
-  {
-    // If we don't have truecolor we simulate 5:6:5 bits
-    // for R:G:B in the masks anyway because we still need the
-    // 16-bit format for our light mixing
-    pfmt.RedShift   = RGB2PAL_BITS_G + RGB2PAL_BITS_B;
-    pfmt.GreenShift = RGB2PAL_BITS_B;
-    pfmt.BlueShift  = 0;
-    pfmt.RedMask    = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.RedShift;
-    pfmt.GreenMask  = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.GreenShift;
-    pfmt.BlueMask   = ((1 << RGB2PAL_BITS_B) - 1);
-    pfmt.RedBits    = RGB2PAL_BITS_R;
-    pfmt.GreenBits  = RGB2PAL_BITS_G;
-    pfmt.BlueBits   = RGB2PAL_BITS_B;
-  }
 
   if (pfmt.PixelBytes == 4)
     pixel_shift = 2;
   else if (pfmt.PixelBytes == 2)
     pixel_shift = 1;
   else
-    pixel_shift = 0;
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"8-bit palette mode no longer works in the software renderer!");
+    return false;
+  }
 
   DrawMode = 0;
   SetDimensions (G2D->GetWidth (), G2D->GetHeight ());
   z_buf_mode = CS_ZBUF_NONE;
-
-  int i;
-  for (i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
-    fog_tables [i].table = NULL;
 
   return true;
 }
@@ -519,150 +504,6 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
 
   switch (pfmt.PixelBytes)
   {
-    case 1:
-      if (do_alpha) ScanProc_Alpha = ScanProc_8_Alpha;
-
-      ScanProc [SCANPROC_FLAT_ZNONE] = csScan_8_scan_flat_znone;
-      ScanProc [SCANPROC_FLAT_ZFIL] = csScan_8_scan_flat_zfil;
-      ScanProc [SCANPROC_FLAT_ZUSE] = csScan_8_scan_flat_zuse;
-      ScanProc [SCANPROC_FLAT_ZTEST] = csScan_8_scan_flat_ztest;
-
-      ScanProc [SCANPROC_TEX_ZNONE] = csScan_8_scan_tex_znone;
-      ScanProc [SCANPROC_TEX_ZFIL] =
-#ifdef DO_MMX
-        UseMMX ? csScan_8_mmx_scan_tex_zfil :
-#endif
-        csScan_8_scan_tex_zfil;
-      ScanProc [SCANPROC_TEX_ZUSE] = csScan_8_scan_tex_zuse;
-      ScanProc [SCANPROC_TEX_ZTEST] = csScan_8_scan_tex_ztest;
-
-      ScanProc [SCANPROC_MAP_ZNONE] = csScan_8_scan_map_znone;
-      ScanProc [SCANPROC_MAP_ZFIL] =
-        bilinear_filter ? csScan_8_scan_map_filt_zfil :
-#ifdef DO_MMX
-        UseMMX ? csScan_8_mmx_scan_map_zfil :
-#endif
-        csScan_8_scan_map_zfil;
-      ScanProc [SCANPROC_MAP_ZUSE] = csScan_8_scan_map_zuse;
-      ScanProc [SCANPROC_MAP_ZTEST] = csScan_8_scan_map_ztest;
-
-      ScanProc [SCANPROC_TEX_KEY_ZNONE] = csScan_8_scan_tex_key_znone;
-      ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_8_scan_tex_key_zfil;
-      ScanProc [SCANPROC_TEX_KEY_ZUSE] = csScan_8_scan_tex_key_zuse;
-      ScanProc [SCANPROC_TEX_KEY_ZTEST] = csScan_8_scan_tex_key_ztest;
-      ScanProc [SCANPROC_MAP_KEY_ZNONE] = csScan_8_scan_map_key_znone;
-      ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_8_scan_map_key_zfil;
-      ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_8_scan_map_key_zuse;
-      ScanProc [SCANPROC_MAP_KEY_ZTEST] = csScan_8_scan_map_key_ztest;
-
-      ScanProc [SCANPROC_TEX_ALPHA_ZNONE] = csScan_8_scan_tex_alpha_znone;
-      ScanProc [SCANPROC_TEX_ALPHA_ZFIL] = csScan_8_scan_tex_alpha_zfil;
-      ScanProc [SCANPROC_TEX_ALPHA_ZUSE] = csScan_8_scan_tex_alpha_zuse;
-      ScanProc [SCANPROC_TEX_ALPHA_ZTEST] = csScan_8_scan_tex_alpha_ztest;
-      ScanProc [SCANPROC_MAP_ALPHA_ZNONE] = csScan_8_scan_map_alpha_znone;
-      ScanProc [SCANPROC_MAP_ALPHA_ZFIL] = csScan_8_scan_map_alpha_zfil;
-      ScanProc [SCANPROC_MAP_ALPHA_ZUSE] = csScan_8_scan_map_alpha_zuse;
-      ScanProc [SCANPROC_MAP_ALPHA_ZTEST] = csScan_8_scan_map_alpha_ztest;
-
-      ScanProc [SCANPROC_TEX_FX_ZNONE] = csScan_8_scan_tex_fx_znone;
-      ScanProc [SCANPROC_TEX_FX_ZFIL] = csScan_8_scan_tex_fx_zfil;
-      ScanProc [SCANPROC_TEX_FX_ZUSE] = csScan_8_scan_tex_fx_zuse;
-      ScanProc [SCANPROC_TEX_FX_ZTEST] = csScan_8_scan_tex_fx_ztest;
-      ScanProc [SCANPROC_MAP_FX_ZNONE] = csScan_8_scan_map_fx_znone;
-      ScanProc [SCANPROC_MAP_FX_ZFIL] = csScan_8_scan_map_fx_zfil;
-      ScanProc [SCANPROC_MAP_FX_ZUSE] = csScan_8_scan_map_fx_zuse;
-      ScanProc [SCANPROC_MAP_FX_ZTEST] = csScan_8_scan_map_fx_ztest;
-
-      ScanProc [SCANPROC_FOG] = csScan_8_scan_fog;
-      ScanProc [SCANPROC_FOG_VIEW] = csScan_8_scan_fog_view;
-
-      ScanProcPI [SCANPROC_PI_FLAT_ZNONE] = csScan_8_scan_pi_flat_znone;
-      ScanProcPI [SCANPROC_PI_FLAT_ZFIL] = csScan_8_scan_pi_flat_zfil;
-      ScanProcPI [SCANPROC_PI_FLAT_ZUSE] = csScan_8_scan_pi_flat_zuse;
-      ScanProcPI [SCANPROC_PI_FLAT_ZTEST] = csScan_8_scan_pi_flat_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_ZNONE] = csScan_8_scan_pi_tex_znone;
-      ScanProcPI [SCANPROC_PI_TEX_ZFIL] = csScan_8_scan_pi_tex_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_ZUSE] = csScan_8_scan_pi_tex_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_ZTEST] = csScan_8_scan_pi_tex_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZNONE] = csScan_8_scan_pi_tex_key_znone;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZFIL] = csScan_8_scan_pi_tex_key_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZUSE] = csScan_8_scan_pi_tex_key_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZTEST] = csScan_8_scan_pi_tex_key_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZNONE] = csScan_8_scan_pi_tile_tex_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZFIL] = csScan_8_scan_pi_tile_tex_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZUSE] = csScan_8_scan_pi_tile_tex_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZTEST] = csScan_8_scan_pi_tile_tex_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZNONE] = csScan_8_scan_pi_tile_tex_key_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZFIL] = csScan_8_scan_pi_tile_tex_key_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZUSE] = csScan_8_scan_pi_tile_tex_key_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZTEST] = csScan_8_scan_pi_tile_tex_key_ztest;
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZNONE] = csScan_8_scan_pi_flat_fx_znone;
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZFIL] = csScan_8_scan_pi_flat_fx_zfil;
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZUSE] = csScan_8_scan_pi_flat_fx_zuse;
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZTEST] = csScan_8_scan_pi_flat_fx_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZNONE] = csScan_8_scan_pi_tex_fx_znone;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZFIL] = csScan_8_scan_pi_tex_fx_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZUSE] = csScan_8_scan_pi_tex_fx_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZTEST] = csScan_8_scan_pi_tex_fx_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZNONE] = csScan_8_scan_pi_tex_fxkey_znone;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZFIL] = csScan_8_scan_pi_tex_fxkey_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZUSE] = csScan_8_scan_pi_tex_fxkey_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZTEST] = csScan_8_scan_pi_tex_fxkey_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZNONE] = csScan_8_scan_pi_tile_tex_fx_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZFIL] = csScan_8_scan_pi_tile_tex_fx_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZUSE] = csScan_8_scan_pi_tile_tex_fx_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZTEST] = csScan_8_scan_pi_tile_tex_fx_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZNONE] = csScan_8_scan_pi_tile_tex_fxkey_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZFIL] = csScan_8_scan_pi_tile_tex_fxkey_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZUSE] = csScan_8_scan_pi_tile_tex_fxkey_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZTEST] = csScan_8_scan_pi_tile_tex_fxkey_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZNONE] = csScan_8_scan_pi_tex_alpha_znone;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZFIL] = csScan_8_scan_pi_tex_alpha_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZUSE] = csScan_8_scan_pi_tex_alpha_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZTEST] = csScan_8_scan_pi_tex_alpha_ztest;
-
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZNONE] = csScan_8_scan_pi_flat_gou_znone;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZFIL] = csScan_8_scan_pi_flat_gou_zfil;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZUSE] = csScan_8_scan_pi_flat_gou_zuse;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZTEST] = csScan_8_scan_pi_flat_gou_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZNONE] = csScan_8_scan_pi_tex_gou_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZFIL] = csScan_8_scan_pi_tex_gou_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZUSE] = csScan_8_scan_pi_tex_gou_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZTEST] = csScan_8_scan_pi_tex_gou_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZNONE] = csScan_8_scan_pi_tex_goukey_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZFIL] = csScan_8_scan_pi_tex_goukey_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZUSE] = csScan_8_scan_pi_tex_goukey_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZTEST] = csScan_8_scan_pi_tex_goukey_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZNONE] = csScan_8_scan_pi_tile_tex_gou_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZFIL] = csScan_8_scan_pi_tile_tex_gou_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZUSE] = csScan_8_scan_pi_tile_tex_gou_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZTEST] = csScan_8_scan_pi_tile_tex_gou_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZNONE] = csScan_8_scan_pi_tile_tex_goukey_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZFIL] = csScan_8_scan_pi_tile_tex_goukey_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZUSE] = csScan_8_scan_pi_tile_tex_goukey_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZTEST] = csScan_8_scan_pi_tile_tex_goukey_ztest;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZNONE] = csScan_8_scan_pi_flat_goufx_znone;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZFIL] = csScan_8_scan_pi_flat_goufx_zfil;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZUSE] = csScan_8_scan_pi_flat_goufx_zuse;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZTEST] = csScan_8_scan_pi_flat_goufx_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZNONE] = csScan_8_scan_pi_tex_goufx_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZFIL] = csScan_8_scan_pi_tex_goufx_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZUSE] = csScan_8_scan_pi_tex_goufx_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZTEST] = csScan_8_scan_pi_tex_goufx_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZNONE] = csScan_8_scan_pi_tex_goufxkey_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZFIL] = csScan_8_scan_pi_tex_goufxkey_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZUSE] = csScan_8_scan_pi_tex_goufxkey_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZTEST] = csScan_8_scan_pi_tex_goufxkey_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZNONE] = csScan_8_scan_pi_tile_tex_goufx_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZFIL] = csScan_8_scan_pi_tile_tex_goufx_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZUSE] = csScan_8_scan_pi_tile_tex_goufx_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZTEST] = csScan_8_scan_pi_tile_tex_goufx_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZNONE] = csScan_8_scan_pi_tile_tex_goufxkey_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZFIL] = csScan_8_scan_pi_tile_tex_goufxkey_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZUSE] = csScan_8_scan_pi_tile_tex_goufxkey_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST] = csScan_8_scan_pi_tile_tex_goufxkey_ztest;
-      break;
-
     case 2:
       if (do_alpha) ScanProc_Alpha = ScanProc_16_Alpha;
 
@@ -1163,36 +1004,6 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
     }
 }
 
-csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_8_Alpha
-  (csGraphics3DSoftwareCommon *This, int alpha, bool keycolor, bool alphamap)
-{
-  keycolor = false; // done to eliminate compiler warning and use it at least once.
-  alphamap = false; // done to eliminate compiler warning and use it at least once.
-  
-  csAlphaTables *alpha_tables = This->texman->alpha_tables;
-
-  if (alpha < 32)
-    return NULL;
-  else if (alpha < 96)
-  {
-    Scan.AlphaMap = alpha_tables->alpha_map25;
-    return csScan_8_scan_map_fixalpha2;
-  }
-  else if (alpha < 160)
-  {
-    Scan.AlphaMap = alpha_tables->alpha_map50;
-    return csScan_8_scan_map_fixalpha1;
-  }
-  else if (alpha < 224)
-  {
-    Scan.AlphaMap = alpha_tables->alpha_map25;
-    return csScan_8_scan_map_fixalpha1;
-  }
-  else
-    // completely opaque
-    return csScan_8_scan_map_zfil;
-}
-
 csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_16_Alpha
   (csGraphics3DSoftwareCommon *This, int alpha, bool keycolor, bool alphamap)
 {
@@ -1262,11 +1073,6 @@ void csGraphics3DSoftwareCommon::Close ()
 {
   if ((width == height) && (width == -1))
     return;
-
-  int i;
-  for (i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
-    if (fog_tables [i].table)
-      delete [] fog_tables [i].table;
 
   while (fog_buffers)
   {
@@ -1376,8 +1182,6 @@ bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
       uint8* bitmap = tex_0->bitmap;
       switch (pfmt.PixelBytes)
       {
-	case 1: // Not supported @@@
-	  break;
 	case 2:
 	  {
 	    uint16* pal2glob = (uint16*)(tex_mm->GetPaletteToGlobal ());
@@ -1526,8 +1330,6 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
       uint8* bitmap = tex_0->bitmap;
       switch (pfmt.PixelBytes)
       {
-	case 1: // Not supported @@@
-	  break;
 	case 2:
 	  {
 	    for (y = txt_h-1 ; y >= 0 ; y--)
@@ -1745,17 +1547,10 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
     lg = lg << 1; if (lg > 255) lg = 255;
     lb = lb << 1; if (lb > 255) lb = 255;
 
-    if (pfmt.PixelBytes >= 2)
-      Scan.FlatColor = texman->encode_rgb ((color.red * lr) >> 8,
-        (color.green * lg) >> 8, (color.blue * lb) >> 8);
-    else
-      Scan.FlatColor = texman->find_rgb ((color.red * lr) >> 8,
-        (color.green * lg) >> 8, (color.blue * lb) >> 8);
+    Scan.FlatColor = texman->encode_rgb ((color.red * lr) >> 8,
+      (color.green * lg) >> 8, (color.blue * lb) >> 8);
   }
-  else if (pfmt.PixelBytes >= 2)
-    Scan.FlatColor = texman->encode_rgb (color.red, color.green, color.blue);
-  else
-    Scan.FlatColor = texman->find_rgb (color.red, color.green, color.blue);
+  Scan.FlatColor = texman->encode_rgb (color.red, color.green, color.blue);
 
   Scan.M = M;
 
@@ -2359,7 +2154,6 @@ texr_done:
     uint mode = poly.mixmode;
     Scan.PaletteTable = tex_mm->GetPaletteToGlobal ();
     Scan.TexturePalette = tex_mm->GetColorMap ();
-    Scan.PrivateCMap = tex_mm->GetPaletteToGlobal8 ();
     Scan.BlendTable = NULL;
     // array to select blend tables from
     unsigned char **BlendingTable = Scan.BlendingTable;
@@ -2668,40 +2462,29 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
     }
 
     Scan.FogDensity = QRound (fb->density * 100);
-    if (pfmt.PalEntries == 0)
-    {
-      Scan.FogR = QRound (fb->red * ((1 << pfmt.RedBits) - 1))
+    Scan.FogR = QRound (fb->red * ((1 << pfmt.RedBits) - 1))
       	<< pfmt.RedShift;
-      Scan.FogG = QRound (fb->green * ((1 << pfmt.GreenBits) - 1))
+    Scan.FogG = QRound (fb->green * ((1 << pfmt.GreenBits) - 1))
       	<< pfmt.GreenShift;
-      Scan.FogB = QRound (fb->blue * ((1 << pfmt.BlueBits) - 1))
+    Scan.FogB = QRound (fb->blue * ((1 << pfmt.BlueBits) - 1))
       	<< pfmt.BlueShift;
 
-      if (pfmt.PixelBytes == 4)
-      {
-        // trick: in 32-bit modes set FogR,G,B so that "R" uses bits 16-23,
-        // "G" uses bits 8-15 and "B" uses bits 0-7. This is to accomodate
-        // different pixel encodings such as RGB, BGR, RBG and so on...
-        uint32 r = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 16) ? Scan.FogR :
-          (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 16) ? Scan.FogG : Scan.FogB;
-        uint32 g = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 8) ? Scan.FogR :
-          (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 8) ? Scan.FogG : Scan.FogB;
-        uint32 b = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 0) ? Scan.FogR :
-          (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 0) ? Scan.FogG : Scan.FogB;
-        Scan.FogR = R8G8B8_PIXEL_PREPROC(r);
-        Scan.FogG = R8G8B8_PIXEL_PREPROC(g);
-        Scan.FogB = R8G8B8_PIXEL_PREPROC(b);
-      }
-      Scan.FogPix = Scan.FogR | Scan.FogG | Scan.FogB;
-    }
-    else
+    if (pfmt.PixelBytes == 4)
     {
-      Scan.FogR = QRound (fb->red * 255);
-      Scan.FogG = QRound (fb->green * 255);
-      Scan.FogB = QRound (fb->blue * 255);
-      Scan.Fog8 = BuildIndexedFogTable ();
-      Scan.FogPix = texman->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
+      // trick: in 32-bit modes set FogR,G,B so that "R" uses bits 16-23,
+      // "G" uses bits 8-15 and "B" uses bits 0-7. This is to accomodate
+      // different pixel encodings such as RGB, BGR, RBG and so on...
+      uint32 r = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 16) ? Scan.FogR :
+          (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 16) ? Scan.FogG : Scan.FogB;
+      uint32 g = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 8) ? Scan.FogR :
+          (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 8) ? Scan.FogG : Scan.FogB;
+      uint32 b = (R8G8B8_SHIFT_ADJUST(pfmt.RedShift) == 0) ? Scan.FogR :
+          (R8G8B8_SHIFT_ADJUST(pfmt.GreenShift) == 0) ? Scan.FogG : Scan.FogB;
+      Scan.FogR = R8G8B8_PIXEL_PREPROC(r);
+      Scan.FogG = R8G8B8_PIXEL_PREPROC(g);
+      Scan.FogB = R8G8B8_PIXEL_PREPROC(b);
     }
+    Scan.FogPix = Scan.FogR | Scan.FogG | Scan.FogB;
   }
 
   SelectInterpolationStep (M);
@@ -3022,12 +2805,8 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   }
 
   // Get the same value as a pixel-format-encoded value
-  if (pfmt.PixelBytes >= 2)
-    Scan.FlatColor = texman->encode_rgb (Scan.FlatRGB.red, Scan.FlatRGB.green,
-      Scan.FlatRGB.blue);
-  else
-    Scan.FlatColor = texman->find_rgb (Scan.FlatRGB.red, Scan.FlatRGB.green,
-      Scan.FlatRGB.blue);
+  Scan.FlatColor = texman->encode_rgb (Scan.FlatRGB.red, Scan.FlatRGB.green,
+    Scan.FlatRGB.blue);
 
   //-----
   // Get the values from the polygon for more conveniant local access.
@@ -3375,61 +3154,6 @@ void csGraphics3DSoftwareCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     cl = NULL;
   DefaultDrawPolygonMesh (mesh, this, o2c, cl,
 	false /*lazyclip*/, aspect, width2, height2);
-}
-
-unsigned char *csGraphics3DSoftwareCommon::BuildIndexedFogTable ()
-{
-  static int usage = 0;
-  usage++;
-
-  // first look if a fog table with given R,G,B has already been built
-  int i, j;
-  for (i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
-    if (fog_tables [i].table
-     && (fog_tables [i].r == Scan.FogR)
-     && (fog_tables [i].g == Scan.FogG)
-     && (fog_tables [i].b == Scan.FogB))
-    {
-      fog_tables [i].lastuse = usage;
-      return fog_tables [i].table;
-    }
-
-  // We have to build this table: find a free slot
-  // in fog tables or free the least recently used one
-  int fi = -1, lr = -1;
-  for (i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
-    if (!fog_tables [i].table)
-    {
-      fi = i;
-      break;
-    }
-    else if (usage - fog_tables [i].lastuse > lr)
-    {
-      fi = i;
-      lr = usage - fog_tables [i].lastuse;
-    }
-
-  if (fog_tables [fi].table)
-    delete [] fog_tables [fi].table;
-  fog_tables [fi].table = new unsigned char [32 * 4096];
-  if (!fog_tables [fi].table)
-    return NULL;
-
-  unsigned char *dest = fog_tables [fi].table;
-  for (i = 0; i < 256; i++)
-  {
-    int r = texman->cmap [i].red;
-    int g = texman->cmap [i].green;
-    int b = texman->cmap [i].blue;
-    for (j = 1; j <= 32; j++)
-      dest [(j - 1) * 256 + i] = texman->find_rgb (
-        Scan.FogR + (int (j * (r - Scan.FogR)) >> 5),
-        Scan.FogG + (int (j * (g - Scan.FogG)) >> 5),
-        Scan.FogB + (int (j * (b - Scan.FogB)) >> 5));
-  }
-
-  fog_tables [fi].lastuse = usage;
-  return fog_tables [fi].table;
 }
 
 bool csGraphics3DSoftwareCommon::SetRenderState (G3D_RENDERSTATEOPTION op,

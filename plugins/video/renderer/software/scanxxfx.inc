@@ -25,15 +25,12 @@
     The following macros are expected to be defined prior to including
     this file:
 
-	SCAN8/SCAN16/SCAN32	The number of bits per pixel (8, 16, 32)
+	SCAN16/SCAN32	The number of bits per pixel (16, 32)
 	COLORMAP
-	PI_INDEX8 or PI_R?G?B?
+	PI_R?G?B?
 */
 
-#if defined (SCAN8)
-#  define PIXTYPE uint8
-#  define SCAN_BPP 8
-#elif defined (SCAN16)
+#if defined (SCAN16)
 #  define PIXTYPE uint16
 #  if defined (PI_R5G6B5)
 #    define SCAN_BPP 16_565
@@ -59,14 +56,14 @@
   unsigned rs = (rgbtexel.red   << (PI_RB_BLEND * 2 - 8)) & PI_RM_BLEND;  \
   unsigned gs = (rgbtexel.green << (PI_GB_BLEND * 2 - 8)) & PI_GM_BLEND;  \
   unsigned bs = (rgbtexel.blue  << (PI_BB_BLEND * 2 - 8)) & PI_BM_BLEND;  \
-  unsigned pixel = SCR_COLORMAP (*_dest);				  \
+  unsigned pixel = *_dest;						  \
   unsigned rd = (pixel & PI_RM) >> PI_RS_DST_BLEND;			  \
   unsigned gd = (pixel & PI_GM) >> PI_GS_DST_BLEND;			  \
   unsigned bd = (pixel & PI_BM) >> PI_BS_DST_BLEND;			  \
   rs = unsigned (Scan.BlendTable [PI_RBT_OFS + rs + rd]);		  \
   gs = unsigned (Scan.BlendTable [PI_GBT_OFS + gs + gd]);		  \
   bs = unsigned (Scan.BlendTable [PI_BBT_OFS + bs + bd]);		  \
-  *_dest = INV_COLORMAP ((rs << PI_RS) | (gs << PI_GS) | (bs << PI_BS))
+  *_dest = (rs << PI_RS) | (gs << PI_GS) | (bs << PI_BS)
 
 //------------------------------------------------------------------
 
@@ -176,7 +173,7 @@
   do									\
   {									\
     PIXTYPE pix = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
-    uint8 texel = SCR_COLORMAP (pix);					\
+    uint8 texel = pix;							\
     DO_BLEND(texel);							\
     _dest++;								\
     uu += duu;								\
@@ -197,7 +194,7 @@
   do									\
   {									\
     PIXTYPE pix = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
-    uint8 texel = SCR_COLORMAP (pix);					\
+    uint8 texel = pix;							\
     DO_BLEND(texel);							\
     _dest++;								\
     uu += duu;								\
@@ -228,7 +225,7 @@
     {									\
       *z_buffer = izz;							\
       PIXTYPE pix = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
-      uint8 texel = SCR_COLORMAP (pix);					\
+      uint8 texel = pix;						\
       DO_BLEND(texel);							\
     }									\
     _dest++;								\
@@ -254,7 +251,7 @@
     if (izz >= *z_buffer)						\
     {									\
       PIXTYPE pix = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
-      uint8 texel = SCR_COLORMAP (pix);					\
+      uint8 texel = pix;						\
       DO_BLEND(texel);							\
     }									\
     _dest++;								\

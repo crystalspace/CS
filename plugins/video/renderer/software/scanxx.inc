@@ -23,14 +23,11 @@
     are quite the same in all 8-, 16- and 32bpp modes. The following macros
     are expected to be defined prior to including this file:
 
-	SCAN8/SCAN16/SCAN32	The number of bits per pixel (8, 16, 32)
+	SCAN16/SCAN32	The number of bits per pixel (16, 32)
 	COLORMAP
 */
 
-#if defined (SCAN8)
-#  define PIXTYPE uint8
-#  define SCAN_BPP 8
-#elif defined (SCAN16)
+#if defined (SCAN16)
 #  define PIXTYPE uint16
 #  define SCAN_BPP 16
 #elif defined (SCAN32)

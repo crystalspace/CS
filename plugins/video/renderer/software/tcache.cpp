@@ -33,10 +33,6 @@ static int hash_table [384];
 
 //------------------------------------------------------------------------------
 
-#define LM_NAME		csTextureCacheSoftware::create_lighted_texture_8
-#define PI_INDEX8
-#include "lightmap.inc"
-
 #define LM_NAME		csTextureCacheSoftware::create_lighted_texture_555
 #define PI_R5G5B5
 #include "lightmap.inc"
@@ -69,9 +65,7 @@ csTextureCacheSoftware::csTextureCacheSoftware (csTextureManagerSoftware *TexMan
   frameno = 0;
   Clear ();
   bytes_per_texel = texman->pfmt.PixelBytes;
-  if (texman->pfmt.PixelBytes == 1)
-    create_lighted_texture = &csTextureCacheSoftware::create_lighted_texture_8;
-  else if (texman->pfmt.PixelBytes == 2)
+  if (texman->pfmt.PixelBytes == 2)
     if (texman->pfmt.GreenBits == 5)
       create_lighted_texture = &csTextureCacheSoftware::create_lighted_texture_555;
     else

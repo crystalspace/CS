@@ -17,6 +17,10 @@ The history order is reversed so that new features are at the top.
 	  data to the texture.
 	- Procedural textures are now fully working in the software renderer
 	  (only in truecolor modes!).
+	- Completely removed 8-bit support from the software renderer.
+	  If people want it back we can always make 8-bit emulation mode
+	  (by rendering internally to 16-bit and then transforming to
+	  8-bit in Print()).
 17-Oct-2002
 	- Removed a few additional procedural texture functions from the
 	  iGraphics3D/iGraphics2D interfaces.

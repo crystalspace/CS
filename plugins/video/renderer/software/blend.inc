@@ -57,7 +57,7 @@
 #define PI_GS_GOUTEX	(24 - (PI_GB - PI_GB_BLEND))
 #define PI_BS_GOUTEX	(24 - (PI_BB - PI_BB_BLEND))
 
-// In 5-6-5 and 8-bit indexed modes we'll need two blending tables:
+// In 5-6-5 mode we'll need two blending tables:
 // one for 5-bit transformations and second for 6-bit transformations
 #if (PI_GB == 6)
 #  define PI_RBT_OFS	0
@@ -69,11 +69,4 @@
 #  define PI_BBT_OFS	0
 #endif
 
-#if defined (PI_INDEX8)
-#  define INV_COLORMAP(x) Scan.inv_cmap [x]
-#  define SCR_COLORMAP(x) Scan.GlobalCMap [x]
-#else
-#  define INV_COLORMAP(x) x
-#  define SCR_COLORMAP(x) x
-#endif
 

@@ -103,8 +103,6 @@ struct csScanSetup
   uint32 FogPix;
   /// Fog density
   unsigned int FogDensity;
-  /// The fog table for paletted (currently only 8-bit) modes
-  unsigned char *Fog8;
 
   /// A pointer to the texture.
   csTextureHandleSoftware *Texture;
@@ -188,14 +186,6 @@ struct csScanSetup
   /// Current blending table
   unsigned char *BlendTable;
 
-  /// The inverse colormap (extracted from texture manager)
-  uint8 *inv_cmap;
-
-  /// This is the global palette -> uint16 conversion table (for 8-bit modes)
-  uint16 *GlobalCMap;
-  /// And this one is the texture private palette -> uint16 conversion table
-  uint16 *PrivateCMap;
-
   /**
    * A table of 4096 1/z values where z is in fixed-point 0.12 format
    * Used in fog routines to get the real value of Z. The result is
@@ -207,10 +197,6 @@ struct csScanSetup
    * A table of exp(x) in the range 0..255; x == 0..EXP_256_SIZE
    */
   unsigned char *exp_256;
-  /**
-   * Same in the range 0..31 for 8-bit fog
-   */
-  unsigned char *exp_16;
 
   /**
    * This table contains eight subtables - one for each available blending
@@ -293,96 +279,6 @@ csDrawPIScanlineGouraud csScan_##pfmt##_scan_pi_##features##_znone;	\
 csDrawPIScanlineGouraud csScan_##pfmt##_scan_pi_##features##_zfil;	\
 csDrawPIScanlineGouraud csScan_##pfmt##_scan_pi_##features##_zuse;	\
 csDrawPIScanlineGouraud csScan_##pfmt##_scan_pi_##features##_ztest;
-
-//---//---//---//---//---//---//---//---//---//-- 8-bit drawing routines //---//
-
-/// Draw one horizontal scanline with no texture mapping
-SCAN_ROUTINE (8, flat)
-/// Draw one horizontal scanline (no lighting).
-SCAN_ROUTINE (8, tex)
-/// Draw one horizontal scanline (lighting).
-SCAN_ROUTINE (8, map)
-/// Draw one horizontal scanline (transparent and no lighting).
-SCAN_ROUTINE (8, tex_key)
-/// Draw one horizontal scanline (transparent with lighting).
-SCAN_ROUTINE (8, map_key)
-/// Draw one horizontal scanline (alphamap and no lighting).
-SCAN_ROUTINE (8, tex_alpha)
-/// Draw one horizontal scanline (alphamap with lighting).
-SCAN_ROUTINE (8, map_alpha)
-/// Draw one horizontal scanline (fx and no lighting).
-SCAN_ROUTINE (8, tex_fx)
-/// Draw one horizontal scanline (fx with lighting).
-SCAN_ROUTINE (8, map_fx)
-
-/// Draw one horizontal scanline (lighting and filtering).
-csDrawScanline csScan_8_scan_map_filt_zfil;
-
-/// Draw one horizontal scanline for fog.
-csDrawScanline csScan_8_scan_fog;
-/// Draw one horizontal scanline for fog when camera is inside fog
-csDrawScanline csScan_8_scan_fog_view;
-
-/// Draw one horizontal scanline (lighting and fixed alpha transparency).
-csDrawScanline csScan_8_scan_map_fixalpha1;
-csDrawScanline csScan_8_scan_map_fixalpha2;
-
-/*
- * The following methods are used by DrawPolygonFX() and do not require
- * perspective-correct texture mapping. They do not require InitDraw ()
- * to be called before using.
- */
-
-/// Draw a flat-lighted perspective-incorrect line
-PI_SCAN_ROUTINE (8, flat)
-/// Draw a perspective-incorrect texture mapped polygon scanline
-PI_SCAN_ROUTINE (8, tex)
-/// Draw a perspective-incorrect texture mapped polygon scanline with color keying
-PI_SCAN_ROUTINE (8, tex_key)
-/// Draw a perspective-incorrect texture mapped polygon scanline
-PI_SCAN_ROUTINE (8, tile_tex)
-/// Draw a perspective-incorrect texture mapped polygon scanline with color keying
-PI_SCAN_ROUTINE (8, tile_tex_key)
-/// Draw a flat-lighted perspective-incorrect with table-driven effects
-PI_SCAN_ROUTINE (8, flat_fx)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects
-PI_SCAN_ROUTINE (8, tex_fx)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
-PI_SCAN_ROUTINE (8, tex_fxkey)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects
-PI_SCAN_ROUTINE (8, tile_tex_fx)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
-PI_SCAN_ROUTINE (8, tile_tex_fxkey)
-/// Draw a flat-shaded alpha-mapped texture
-PI_SCAN_ROUTINE (8, tex_alpha)
-
-/// Draw a single-color Gouraud-shaded polygon
-PIG_SCAN_ROUTINE (8, flat_gou)
-/// Draw a perspective-incorrect texture mapped polygon scanline with Gouraud shading
-PIG_SCAN_ROUTINE (8, tex_gou)
-/// Perspective-incorrect textured polygon with Gouraud shading and color keying
-PIG_SCAN_ROUTINE (8, tex_goukey)
-/// Draw a perspective-incorrect texture mapped polygon scanline with Gouraud shading
-PIG_SCAN_ROUTINE (8, tile_tex_gou)
-/// Perspective-incorrect textured polygon with Gouraud shading and color keying
-PIG_SCAN_ROUTINE (8, tile_tex_goukey)
-/// Draw a single-color Gouraud-shaded polygon with table-driven effects
-PIG_SCAN_ROUTINE (8, flat_goufx)
-/// Draw a perspective-incorrect textured polygon scanline with table-driven effects
-PIG_SCAN_ROUTINE (8, tex_goufx)
-/// Draw a perspective-incorrect polygon scanline with various effects and color keying
-PIG_SCAN_ROUTINE (8, tex_goufxkey)
-/// Draw a perspective-incorrect textured polygon scanline with table-driven effects
-PIG_SCAN_ROUTINE (8, tile_tex_goufx)
-/// Draw a perspective-incorrect polygon scanline with various effects and color keying
-PIG_SCAN_ROUTINE (8, tile_tex_goufxkey)
-
-#ifdef DO_MMX
-/// Draw one horizontal scanline (lighting) using MMX
-csDrawScanline csScan_8_mmx_scan_map_zfil;
-/// Draw one horizontal scanline (no lighting) using MMX
-csDrawScanline csScan_8_mmx_scan_tex_zfil;
-#endif
 
 //---//---//---//---//---//---//---//---//---//- 16-bit drawing routines //---//
 

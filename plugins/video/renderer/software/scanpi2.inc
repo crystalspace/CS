@@ -67,11 +67,10 @@
         // (actually 6.5 format since we allow 2*SRC lighting)).
         // For this we use the formula: shift_amount = (24 - X) where
         // X is the number of bits. In the above example we'll get 24+5=19.
-        // Thus, 24 - 19 = 5. For 8-bit modes we use 6.16 format, since
-        // otherwise the tables grow quite big.
-        unsigned rs = ((r * rgbtexel.red  ) >> (24 - PI_RB_BLEND)) & PI_RM_BLEND;
-        unsigned gs = ((g * rgbtexel.green) >> (24 - PI_GB_BLEND)) & PI_GM_BLEND;
-        unsigned bs = ((b * rgbtexel.blue ) >> (24 - PI_BB_BLEND)) & PI_BM_BLEND;
+        // Thus, 24 - 19 = 5.
+        unsigned rs = ((r*rgbtexel.red  ) >> (24 - PI_RB_BLEND)) & PI_RM_BLEND;
+        unsigned gs = ((g*rgbtexel.green) >> (24 - PI_GB_BLEND)) & PI_GM_BLEND;
+        unsigned bs = ((b*rgbtexel.blue ) >> (24 - PI_BB_BLEND)) & PI_BM_BLEND;
   #else
         // Flat lighting. Here we use the following formula: since we need
         // to convert the 8-bit r, g and b values from rgbtexel to X.X format,
@@ -88,7 +87,7 @@
         // subvalues to get just the lower X bits from them (where X is the
         // number of bits per color component except in 32bpp modes where we
         // use 6 bit values).
-        unsigned pixel = SCR_COLORMAP (*_dest);
+        unsigned pixel = *_dest;
         unsigned rd = (pixel & PI_RM) >> PI_RS_DST_BLEND;
         unsigned gd = (pixel & PI_GM) >> PI_GS_DST_BLEND;
         unsigned bd = (pixel & PI_BM) >> PI_BS_DST_BLEND;
@@ -97,7 +96,7 @@
         gs = unsigned (Scan.BlendTable [PI_GBT_OFS + gs + gd]);
         bs = unsigned (Scan.BlendTable [PI_BBT_OFS + bs + bd]);
 
-        pixel = INV_COLORMAP ((rs << PI_RS) | (gs << PI_GS) | (bs << PI_BS));
+        pixel = (rs << PI_RS) | (gs << PI_GS) | (bs << PI_BS);
 #elif defined (PI_GOURAUD)
         // The color of the source texel (SRC)
         unsigned rs, gs, bs;
@@ -119,7 +118,7 @@
         if (b >= ((PI_BM >> PI_BS) << 16)) bs = PI_BM; else
     #endif
         bs = (b >> (16 - PI_BS)) & PI_BM;
-        unsigned pixel = INV_COLORMAP (rs | gs | bs);
+        unsigned pixel = rs | gs | bs;
   #else
         // If in textured Gouraud but not in blending mode, we should normalize
         // R,G,B components as they were multiplied with #.16 light components
@@ -151,7 +150,7 @@
     #else
         bs = (bs << (PI_BS - PI_BS_GOUTEX)) & PI_BM;
     #endif
-        unsigned pixel = INV_COLORMAP (rs | gs | bs);
+        unsigned pixel = rs | gs | bs;
   #endif
 #elif !defined (PI_FLAT)
         unsigned pixel = COLORMAP [texel];

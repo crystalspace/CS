@@ -20,11 +20,6 @@
 #include "sft3dcom.h"
 #include "soft_txt.h"
 
-#define DP_NAME DrawPixmap8
-#define DP_PIXTYPE uint8
-#define DP_PIXFORM_INDEX8
-#include "drawsprt.inc"
-
 #define DP_NAME DrawPixmap16_555
 #define DP_PIXTYPE uint16
 #define DP_PIXFORM_R5G5B5
@@ -44,11 +39,9 @@ void csGraphics3DSoftwareCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh,
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
-  if ((1 << pfmt.PixelBytes) & (1 << 1)) // PixelBytes == 1
-    DrawPixmap8 (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
-  else if ((1 << pfmt.PixelBytes) & (1 << 2)) // PixelBytes == 2
+  if (pfmt.PixelBytes == 2)
   {
-    if ((1 << pfmt.GreenBits) & (1 << 5)) // GreenBits == 5
+    if (pfmt.GreenBits == 5)
       DrawPixmap16_555 (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
     else
       DrawPixmap16_565 (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
@@ -56,3 +49,4 @@ void csGraphics3DSoftwareCommon::DrawPixmap (iTextureHandle *hTex,
   else
     DrawPixmap32 (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }
+

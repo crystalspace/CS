@@ -22,8 +22,7 @@
 
 // Depending on the Colorformat, we define different masks and shiftvalues
 // to get the accrding values for rgb; R,G,B stands for Red, Green and Blue,
-// and M, S, B stands for Mask, Shift and Bits correspondingly. In 8-bit mode
-// we set a pseudo-pixel type useable for input to the inverse colormap table.
+// and M, S, B stands for Mask, Shift and Bits correspondingly.
 #undef PI_PIXTYPE
 #undef PI_RM
 #undef PI_RS
@@ -35,15 +34,7 @@
 #undef PI_BS
 #undef PI_BB
 
-#if defined (PI_INDEX8)
-#  define PI_PIXTYPE	uint8
-#  define PI_RB		RGB2PAL_BITS_R
-#  define PI_GB		RGB2PAL_BITS_G
-#  define PI_BB		RGB2PAL_BITS_B
-#  define PI_RS		(RGB2PAL_BITS_B + RGB2PAL_BITS_G)
-#  define PI_GS		(RGB2PAL_BITS_B)
-#  define PI_BS		(0)
-#elif defined (PI_R5G5B5)
+#if defined (PI_R5G5B5)
 #  define PI_PIXTYPE	uint16
 #  define PI_RB		5
 #  define PI_GB		5

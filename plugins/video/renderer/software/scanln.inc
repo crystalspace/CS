@@ -26,7 +26,6 @@
 	SCANLOOP	: code to draw one segment of 16 (or less) pixels
 	SCANMAP		: define if the function uses the lighted textures
 	TEXCOORDS	: if SCANMAP is defined but you want/need texture coordinates, too
-	SCAN8		: define if function uses 8-bit pixels
 	SCAN16		: define if function uses 16-bit pixels
 	SCAN32		: define if function uses 32-bit pixels
 
@@ -51,9 +50,7 @@
     be updated in the Z fill loop.
 */
 
-#if defined (SCAN8)
-#  define PIXTYPE uint8
-#elif defined (SCAN16)
+#if defined (SCAN16)
 #  define PIXTYPE uint16
 #elif defined (SCAN32)
 #  define PIXTYPE uint32

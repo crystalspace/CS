@@ -37,10 +37,6 @@ class csTextureCacheSoftware;
 class csPolArrayVertexBufferManager;
 struct iConfigFile;
 
-// Maximum number of fog tables in indexed (8-bit) modes.  This is maximum
-// number of instantly visible fogs without noticeable slowdowns.
-#define MAX_INDEXED_FOG_TABLES	8
-
 // Maximum size of a single lightmap, in pixels
 #define MAX_LIGHTMAP_SIZE	1500000
 
@@ -199,17 +195,6 @@ protected:
    * (Flat drawing).
    */
   void DrawPolygonFlat (G3DPolygonDPF& poly);
-
-  /// The dynamically built fog tables
-  struct
-  {
-    unsigned char *table;
-    unsigned long r, g, b;
-    int lastuse;
-  } fog_tables [MAX_INDEXED_FOG_TABLES];
-
-  /// Build the table used for fog in paletted modes
-  unsigned char *BuildIndexedFogTable ();
 
   /// Start a series of DrawPolygonFX
   void RealStartPolygonFX (iMaterialHandle* handle, uint mode,

@@ -26,7 +26,6 @@
     output lighted texture is created:
 
 	LM_NAME		The name of the routine.
-	PI_INDEX8,
 	PI_R5G5B5,
 	PI_R5G6B5,
 	PI_R8G8B8	The pixel format.
@@ -171,15 +170,9 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 			
 			csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + ((pt_min_u + uu) & tx_andw)]];
 		*out++ =
-	#if defined (PI_INDEX8)
-				Scan.inv_cmap [
-	#endif
 				(lt_R [pix.red   | (r & 0x3f00)] << PI_RS) |
 				(lt_G [pix.green | (g & 0x3f00)] << PI_GS) |
 				(lt_B [pix.blue  | (b & 0x3f00)] << PI_BS)
-	#if defined (PI_INDEX8)
-				]
-	#endif
 			;
 		}
 
@@ -361,15 +354,9 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 			{
 			csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + (uu & tx_andw)]];
 		*out++ =
-	#if defined (PI_INDEX8)
-				Scan.inv_cmap [
-	#endif
 				(lt_R [pix.red   | (r & 0x3f00)] << PI_RS) |
 				(lt_G [pix.green | (g & 0x3f00)] << PI_GS) |
 				(lt_B [pix.blue  | (b & 0x3f00)] << PI_BS)
-	#if defined (PI_INDEX8)
-				]
-	#endif
 			;
 			r += rd; g += gd; b += bd;
 			}
@@ -388,7 +375,6 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
 #undef LM_NAME
 #undef PI_PIXTYPE
-#undef PI_INDEX8
 #undef PI_R5G5B5
 #undef PI_R5G6B5
 #undef PI_R8G8B8

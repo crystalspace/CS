@@ -75,31 +75,6 @@ public:
 
 //----------------// Halo scanline rasterizing functions for all modes //-----//
 
-void halo_dscan_8 (void *src, void *dest, int count, int delta)
-{
-  unsigned char *A = (unsigned char *)src;
-  unsigned char *D = (unsigned char *)dest;
-  unsigned char *E = D + count;
-  if (delta == 0x10000)
-    while (D < E)
-    {
-      unsigned int a = (*A++ * Scan.FogDensity) & 0x1f00;
-      if (a) *D = Scan.Fog8 [(a ^ 0x1f00) | *D];
-      D++;
-    }
-  else
-  {
-    unsigned int ax = 0;
-    while (D < E)
-    {
-      unsigned int a = (A [ax >> 16] * Scan.FogDensity) & 0x1f00;
-      if (a) *D = Scan.Fog8 [(a ^ 0x1f00) | *D];
-      D++;
-      ax += delta;
-    }
-  }
-}
-
 #define HALO_NAME	halo_dscan_16_555
 #define HALO_BPP	16
 #define HALO_RM		0x7c00
@@ -186,38 +161,22 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   bool clamp = false;
   const csPixelFormat& pfmt = G3D->pfmt;
 
-  if (pfmt.PixelBytes == 1)
-  {
-    Scan.FogR = QRound (R * 255);
-    Scan.FogG = QRound (G * 255);
-    Scan.FogB = QRound (B * 255);
-    Scan.Fog8 = G3D->BuildIndexedFogTable ();
-    Scan.FogPix = G3D->texman->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
-    // halo intensity (0..31)
-    Scan.FogDensity = QRound (iIntensity * 32);
-  }
-  else
-  {
-    Scan.FogR = QRound (R * ((1 << pfmt.RedBits  ) - 1))
+  Scan.FogR = QRound (R * ((1 << pfmt.RedBits  ) - 1))
       << R8G8B8_SHIFT_ADJUST(pfmt.RedShift);
-    Scan.FogG = QRound (G * ((1 << pfmt.GreenBits) - 1))
+  Scan.FogG = QRound (G * ((1 << pfmt.GreenBits) - 1))
       << R8G8B8_SHIFT_ADJUST(pfmt.GreenShift);
-    Scan.FogB = QRound (B * ((1 << pfmt.BlueBits ) - 1))
+  Scan.FogB = QRound (B * ((1 << pfmt.BlueBits ) - 1))
       << R8G8B8_SHIFT_ADJUST(pfmt.BlueShift);
 
-    // halo intensity (0..64)
-    Scan.FogDensity = QRound (iIntensity * 64);
-    // Detect when the halo will possibly overflow
-    clamp = (Scan.FogR > R8G8B8_PIXEL_PREPROC(pfmt.RedMask  ))
+  // halo intensity (0..64)
+  Scan.FogDensity = QRound (iIntensity * 64);
+  // Detect when the halo will possibly overflow
+  clamp = (Scan.FogR > R8G8B8_PIXEL_PREPROC(pfmt.RedMask  ))
          || (Scan.FogG > R8G8B8_PIXEL_PREPROC(pfmt.GreenMask))
          || (Scan.FogB > R8G8B8_PIXEL_PREPROC(pfmt.BlueMask ));
-  }
 
   switch (pfmt.PixelBytes)
   {
-    case 1:
-      dscan = halo_dscan_8;
-      break;
     case 2:
       if (pfmt.GreenBits == 6)
       {

@@ -28,7 +28,6 @@
 	  - If using a lightmap (otherwise using an unlighted texture)
 	A_PI
 	  - If you want the perspective-incorrect scanline function
-	A_INDEX8,
 	A_R5G5B5,
 	A_R5G6B5,
 	A_R8G8B8
@@ -36,42 +35,24 @@
 
 */
 
-#if defined (A_INDEX8)
-#  define INV_COLORMAP(x) Scan.inv_cmap [x]
-#else
-#  define INV_COLORMAP(x) x
-#endif
-
 // Intermediate pixel format
-#if defined (A_R5G5B5) || defined (A_R5G6B5) || defined (A_INDEX8)
+#if defined (A_R5G5B5) || defined (A_R5G6B5)
 #  define A_IPIXTYPE	uint16
 #else
 #  define A_IPIXTYPE	uint32
 #endif
 
-#if defined (A_INDEX8)
-#  define A_MASK_RB	((((1 << RGB2PAL_BITS_R) - 1) << (RGB2PAL_BITS_G + RGB2PAL_BITS_B)) \
-                        | (1 << RGB2PAL_BITS_B) - 1)
-#  define A_MASK_G	(((1 << RGB2PAL_BITS_G) - 1) << RGB2PAL_BITS_B)
+#if defined (A_R5G5B5)
+#  define A_MASK_RB   0x00007c1f
+#  define A_MASK_G    0x000003e0
 #  if defined (A_MAP)
-#    define A_COLORMAP(x)	Scan.GlobalCMap [x]
+#    define A_COLORMAP(x)     x
 #  else
-#    define A_COLORMAP(x)	Scan.PrivateCMap [x]
+#    define A_COLORMAP(x)     COLORMAP [x]
 #  endif
-#  define A_DSTTEX	Scan.GlobalCMap [*_dest]
-#  define A_NORMSHIFT	5
-#  define A_PIXTYPE	uint8
-#elif defined (A_R5G5B5)
-#  define A_MASK_RB	0x00007c1f
-#  define A_MASK_G	0x000003e0
-#  if defined (A_MAP)
-#    define A_COLORMAP(x)	x
-#  else
-#    define A_COLORMAP(x)	COLORMAP [x]
-#  endif
-#  define A_DSTTEX	*_dest
-#  define A_NORMSHIFT	5
-#  define A_PIXTYPE	uint16
+#  define A_DSTTEX    *_dest
+#  define A_NORMSHIFT 5
+#  define A_PIXTYPE   uint16
 #elif defined (A_R5G6B5)
 #  define A_MASK_RB	0x0000f81f
 #  define A_MASK_G	0x000007e0
@@ -152,7 +133,7 @@
       unsigned dst_g = dst & A_MASK_G;					\
       dst_g = dst_g + (alpha * (src_g - dst_g) >> A_NORMSHIFT);		\
       *_dest = A_PIXEL_POSTPROC(					\
-        INV_COLORMAP ((dst_rb & A_MASK_RB) | (dst_g & A_MASK_G)));	\
+        (dst_rb & A_MASK_RB) | (dst_g & A_MASK_G));			\
     }									\
     _dest++;								\
     uu += duu;								\
@@ -193,7 +174,7 @@ void A_SCANFUNC (void *dest, int len, uint32 *zbuff,
       unsigned dst_g = dst & A_MASK_G;
       dst_g = dst_g + (alpha * (src_g - dst_g) >> A_NORMSHIFT);
       *_dest = A_PIXEL_POSTPROC(
-        INV_COLORMAP ((dst_rb & A_MASK_RB) | (dst_g & A_MASK_G)));
+        (dst_rb & A_MASK_RB) | (dst_g & A_MASK_G));
       u += du; v += dv;
     }
 #if defined (A_ZUSE) || defined (A_ZFIL)
@@ -211,7 +192,6 @@ void A_SCANFUNC (void *dest, int len, uint32 *zbuff,
 #undef A_SCANFUNC
 #undef A_MAP
 #undef A_PI
-#undef A_INDEX8
 #undef A_R5G5B5
 #undef A_R5G6B5
 #undef A_R8G8B8

@@ -82,8 +82,6 @@ void csScan_Initialize ()
   Scan.one_div_z = new unsigned int [1 << 12];
   // ~1.5K
   Scan.exp_256 = new unsigned char [EXP_256_SIZE+3];
-  // ~1K
-  Scan.exp_16 = new unsigned char [EXP_32_SIZE+3];
   // 6*8K
   memset (&Scan.BlendingTable, sizeof (Scan.BlendingTable), 0);
   memset (&Scan.BlendingTableProc, sizeof (Scan.BlendingTableProc), 0);
@@ -95,8 +93,6 @@ void csScan_Initialize ()
 
   for (i = 0; i < EXP_256_SIZE; i++)
     Scan.exp_256 [i] = QRound (255 * exp (-float (i) / 256.));
-  for (i = 0; i < EXP_32_SIZE; i++)
-    Scan.exp_16 [i] = QRound (32 * exp (-float (i) / 256.)) - 1;
 }
 
 void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits,
@@ -175,7 +171,6 @@ void csScan_Finalize ()
     delete [] Scan.BlendingTable [i];
     delete [] Scan.BlendingTableProc [i];
   }
-  delete [] Scan.exp_16;
   delete [] Scan.exp_256;
   delete [] Scan.one_div_z;
 }
@@ -190,7 +185,6 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   Scan.shf_h = untxt->get_h_shift ();
   Scan.and_h = untxt->get_h_mask ();
   Scan.PaletteTable = texture->GetPaletteToGlobal ();
-  Scan.PrivateCMap = texture->GetPaletteToGlobal8 ();
 
   uint8 r, g, b;
   texture->GetMeanColor (r, g, b);
@@ -232,6 +226,5 @@ void csScan_InitDrawFX (csTextureHandleSoftware* texture,
   Scan.PaletteTable = texture->GetPaletteToGlobal ();
   Scan.TexturePalette = texture->GetColorMap ();
   Scan.AlphaMap = untxt->get_alphamap ();
-  Scan.PrivateCMap = texture->GetPaletteToGlobal8 ();
 }
 

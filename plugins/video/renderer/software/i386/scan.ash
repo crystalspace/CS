@@ -222,14 +222,6 @@ struc csScanSetup
   ; Current blending table
   unsigned_char_P BlendTable;
 
-  ; The inverse colormap (extracted from texture manager)
-  unsigned_char_P inv_cmap;
-
-  ; This is the global palette -> uint16 conversion table (for 8-bit modes)
-  unsigned_short_P GlobalCMap;
-  ; And this one is the texture private palette -> uint16 conversion table
-  unsigned_short_P PrivateCMap;
-
   ; 4096 1/z values where z is in fixed-point 0.12 format
   unsigned_int_P one_div_z;
 
