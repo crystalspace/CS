@@ -59,7 +59,7 @@ public:
    * Set list of polygons. This stub will delete this
    * list (but not the individual polygons) at destruction time.
    */
-  void SetPolygons (csPolygonInt** pols) { polygons = pols; }
+  void SetPolygons (csPolygonInt** pols) { CHK (delete [] polygons); polygons = pols; }
   /// Get list of polygons.
   csPolygonInt** GetPolygons () { return polygons; }
   /// Unlink this stub from all lists.
@@ -198,6 +198,19 @@ public:
   csObject* GetOwner () const { return owner; }
   /// Set owner.
   void SetOwner (csObject* newOwner) { owner = newOwner; }
+
+  /**
+   * Remove this object from its tree.
+   */
+  void RemoveFromTree ();
+
+  /**
+   * Create the base polygon stub. This corresponds to the
+   * set of polygons that make up the desired object to be placed
+   * in the polygon tree. In most cases this will be a bounding
+   * box for the real object.
+   */
+  virtual csPolygonStub* GetBaseStub () = 0;
 
   /**
    * Split the given stub with a plane and return

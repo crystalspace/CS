@@ -25,6 +25,7 @@ class csPolygonInt;
 class csPolygonParentInt;
 class csPolygonTree;
 class csPolygonStub;
+class csPolyTreeObject;
 
 
 #define NODE_OCTREE 1
@@ -44,11 +45,17 @@ private:
    */
   csPolygonStub* first_stub;
 
+  /**
+   * A linked list of all polygons stubs that still need to
+   * be processed whenever this node becomse visible.
+   */
+  csPolygonStub* todo_stubs;
+
 public:
   /**
    * Constructor.
    */
-  csPolygonTreeNode () : first_stub (NULL) { }
+  csPolygonTreeNode () : first_stub (NULL), todo_stubs (NULL) { }
 
   /**
    * Destructor.
@@ -70,6 +77,16 @@ public:
    * is really on the list!
    */
   void UnlinkStub (csPolygonStub* ps);
+
+  /**
+   * Link a stub to the todo list.
+   */
+  void LinkStubTodo (csPolygonStub* ps);
+
+  /**
+   * Link a stub to the stub list.
+   */
+  void LinkStub (csPolygonStub* ps);
 };
 
 /**
@@ -143,6 +160,11 @@ public:
    * tree.
    */
   virtual void RemoveDynamicPolygons () = 0;
+
+  /**
+   * Add a dynamic object to the tree.
+   */
+  void AddObject (csPolyTreeObject* obj);
 
   /// Traverse the tree from back to front starting at the root and 'pos'.
   virtual void* Back2Front (const csVector3& pos, csTreeVisitFunc* func,

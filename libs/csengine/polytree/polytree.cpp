@@ -20,18 +20,49 @@
 #include "csengine/polytree.h"
 #include "csengine/treeobj.h"
 
+csPolygonTreeNode::~csPolygonTreeNode ()
+{
+  while (first_stub || todo_stubs)
+    if (first_stub)
+      csPolyTreeObject::stub_pool.Free (first_stub);
+    else
+      csPolyTreeObject::stub_pool.Free (todo_stubs);
+}
+
 void csPolygonTreeNode::UnlinkStub (csPolygonStub* ps)
 {
   if (ps->next_bsp) ps->next_bsp->prev_bsp = ps->prev_bsp;
   if (ps->prev_bsp) ps->prev_bsp->next_bsp = ps->next_bsp;
-  else first_stub = ps->next_bsp;
+  else
+  {
+    if (first_stub == ps) first_stub = ps->next_bsp;
+    else if (todo_stubs == ps) todo_stubs = ps->next_bsp;
+    else
+      printf ("INTERNAL ERROR! Stub not in todo or stub list!\n");
+  }
   ps->prev_bsp = ps->next_bsp = NULL;
   ps->node = NULL;
 }
 
-csPolygonTreeNode::~csPolygonTreeNode ()
+void csPolygonTreeNode::LinkStubTodo (csPolygonStub* ps)
 {
-  while (first_stub)
-    csPolyTreeObject::stub_pool.Free (first_stub);
+  ps->next_bsp = todo_stubs;
+  ps->prev_bsp = NULL;
+  if (todo_stubs) todo_stubs->prev_bsp = ps;
+  todo_stubs = ps;
+}
+
+void csPolygonTreeNode::LinkStub (csPolygonStub* ps)
+{
+  ps->next_bsp = first_stub;
+  ps->prev_bsp = NULL;
+  if (first_stub) first_stub->prev_bsp = ps;
+  first_stub = ps;
+}
+
+void csPolygonTree::AddObject (csPolyTreeObject* obj)
+{
+  csPolygonStub* stub = obj->GetBaseStub ();
+  root->LinkStubTodo (stub);
 }
 

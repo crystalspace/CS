@@ -20,6 +20,7 @@
 #include "csengine/polyint.h"
 #include "csengine/octree.h"
 #include "csengine/bsp.h"
+#include "csengine/treeobj.h"
 
 //---------------------------------------------------------------------------
 

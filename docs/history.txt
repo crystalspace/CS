@@ -12,6 +12,8 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+13-Jan-2000
+	- Some further work on dynamic objects in polygon trees.
 12-Jan-2000
 	- Added double linked list code from David Durant to csutil.
 	- Did first work on new system to add dynamic objects to

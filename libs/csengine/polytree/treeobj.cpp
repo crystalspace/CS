@@ -30,6 +30,11 @@ csPolyTreeObject::csPolyTreeObject (csObject* owner)
 
 csPolyTreeObject::~csPolyTreeObject ()
 {
+  RemoveFromTree ();
+}
+
+void csPolyTreeObject::RemoveFromTree ()
+{
   while (first_stub)
     stub_pool.Free (first_stub);
 }
