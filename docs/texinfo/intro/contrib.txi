@@ -45,7 +45,7 @@ dedicated to Crystal Space:
 @uref{http://www.bigfoot.com/~noote/CrystalSpace}
 
 He enhanced Arnold's @sc{dos} port again so that it worked with the Watcom C++
-compiler.  He also suggested and implemented a considerable restructering of
+compiler.  He also suggested and implemented a considerable restructuring of
 the system-dependent stuff with every port having its own directory.  He is
 also the original author of the input/output console.  Nathaniel was also the
 first to actually present me with an almost working Windows 95 version with

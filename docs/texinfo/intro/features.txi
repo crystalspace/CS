@@ -25,7 +25,7 @@ be moving into the Tool and Utility libraries.
  
 @item Geometry Library
 A 3D math library, including 2D and 3D vectors, matrices and polygons.
-This libary can be used without the rest of Crystal Space.
+This library can be used without the rest of Crystal Space.
 
 @item 2D Canvas / 3D Renderer
 These libraries allow you to draw directly on the screen, and to use
@@ -139,7 +139,7 @@ You can also include gouraud shaded triangles in the world.
 Dynamic gouraud shaded sky spheres. Also support for skybox.
 
 @item
-Curved bezier surfaces with dynamic tesselation depending on viewer
+Curved bezier surfaces with dynamic tessellation depending on viewer
 distance.
 
 @item

@@ -4,7 +4,7 @@
 @cindex Feedback
 @cindex Bug Reporting
 
-If you find a bug in Crystal Space, consider subscribing to the main Crytal
+If you find a bug in Crystal Space, consider subscribing to the main Crystal
 Space mailing list (@pxref{Mailing Lists}) and sending a bug report to it via
 the following email address:
 
@@ -32,7 +32,7 @@ Description of problem.
 @item
 Exact output of Crystal Space.
 @item
-How to reproduce the crash (if it is reproducable).
+How to reproduce the crash (if it is reproducible).
 @item
 A fix for the bug if available.
 @end itemize

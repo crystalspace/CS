@@ -148,7 +148,7 @@ unsubscribing.
 @uref{http://lists.sourceforge.net/mailman/listinfo/crystal-announce/}
 
 People who are interested in being notified of changes which are made to
-Crystal Space's @sc{cvs} repository can subscribe the the @sc{cvs}
+Crystal Space's @sc{cvs} repository can subscribe to the @sc{cvs}
 notification list.  A notification message is sent to members of this list
 each time a change is made to the resources within the @sc{cvs} repository.
 
