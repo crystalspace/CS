@@ -25,6 +25,12 @@ The history order is reversed so that new features are at the top.
 	      though it was a socket-option.
 	    - On Windows, was erroneously sending the error constant
 	      WSAEWOULDBLOCK to setsockopt() as though it was a socket-option.
+	- Eric Sunshine applied a patch from Gregory Block
+	  <gblock@ctoforaday.com> to pngimage.cpp which fixes PNG loading
+	  errors for platforms/compilers where csRGBPixel is not four bytes.
+	  Prior to this patch, the PNG loader made the dangerous and fragile
+	  assumption that csRGBPixel was always four bytes.  The patch works
+	  uniformly by converting all input formats to 24-bit.
 4-Feb-2003
 	- Eric Sunshine augmented the ODE check in configure.ac so that it
 	  works in two phases.  First it checks for libode.  Second, it checks
