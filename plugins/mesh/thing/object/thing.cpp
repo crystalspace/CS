@@ -187,7 +187,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
   logparent = 0;
 
 #ifdef CS_USE_NEW_RENDERER
-  r3d = CS_QUERY_REGISTRY (thing_type->object_reg, iRender3D);
+  r3d = CS_QUERY_REGISTRY (thing_type->object_reg, iGraphics3D);
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
       "crystalspace.renderer.stringset", iStringSet);
@@ -2616,7 +2616,7 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
 #ifndef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #else
-  csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #endif // CS_USE_NEW_RENDERER
   G3D = g;
 

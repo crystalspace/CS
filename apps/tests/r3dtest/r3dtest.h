@@ -40,7 +40,7 @@ private:
   csRef<iObjectRegistry> object_reg;
   csRef<iEngine> engine;
 #ifdef CS_USE_NEW_RENDERER
-  csRef<iRender3D> r3d;
+  csRef<iGraphics3D> r3d;
 #else
   csRef<iGraphics3D> r3d;
 #endif

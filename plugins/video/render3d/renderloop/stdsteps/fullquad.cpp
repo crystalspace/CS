@@ -37,7 +37,7 @@
 class csFullscreenQuad : public iRenderBufferSource
 {
 private:
-  csRef<iRender3D> r3d;
+  csRef<iGraphics3D> r3d;
   csRef<iRenderBuffer> vertices;
   csRef<iRenderBuffer> indices;
   csRef<iRenderBuffer> texcoords;
@@ -48,7 +48,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  csFullscreenQuad (iRender3D* r3d, iStringSet* strings)
+  csFullscreenQuad (iGraphics3D* r3d, iStringSet* strings)
   {
     SCF_CONSTRUCT_IBASE (0)
 
@@ -205,8 +205,8 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.renderer.stringset", iStringSet);
 
-  csRef<iRender3D> r3d = 
-    CS_QUERY_REGISTRY (object_reg, iRender3D);
+  csRef<iGraphics3D> r3d = 
+    CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
   fullquad = new csFullscreenQuad (r3d, strings);
 
@@ -221,7 +221,7 @@ csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
-  csRef<iRender3D> r3d = rview->GetGraphics3D();
+  csRef<iGraphics3D> r3d = rview->GetGraphics3D();
 
   //r3d->BeginDraw (CSDRAW_3DGRAPHICS);
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (material);

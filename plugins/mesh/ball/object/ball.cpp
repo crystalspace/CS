@@ -141,7 +141,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   polygons = 0;
   
 #ifdef CS_USE_NEW_RENDERER
-  r3d = CS_QUERY_REGISTRY (((csBallMeshObjectFactory*)factory)->object_reg, iRender3D);
+  r3d = CS_QUERY_REGISTRY (((csBallMeshObjectFactory*)factory)->object_reg, iGraphics3D);
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (((csBallMeshObjectFactory*)factory)->object_reg, 
     "crystalspace.renderer.stringset", iStringSet);
@@ -673,7 +673,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
     return false;
   }
 
-  // iRender3D* r3d = rview->GetGraphics3D ();
+  // iGraphics3D* r3d = rview->GetGraphics3D ();
 
   mater->Visit ();
   mesh.transform = &tr_o2c;

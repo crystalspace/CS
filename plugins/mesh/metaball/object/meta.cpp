@@ -208,7 +208,7 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
     NextFrame(0,csVector3(0,0,0));
 
 #ifdef CS_USE_NEW_RENDERER
-    r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+    r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
     csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
                       "crystalspace.renderer.stringset", iStringSet);
 
@@ -440,7 +440,7 @@ bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
 
 #else
 
-  iRender3D * r3d = rview->GetGraphics3D();
+  iGraphics3D * r3d = rview->GetGraphics3D();
   iCamera *cam = rview->GetCamera();
 
   // Shouldn't this be done in the renderer?
@@ -792,7 +792,7 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   vbufmgr->UnlockBuffer (vbuf);
   return true;
 #else
- /* iRender3D* r3D = rview->GetGraphics3D();
+ /* iGraphics3D* r3D = rview->GetGraphics3D();
   csRenderMesh::
   mesh.indexstart = 0;
   mesh.indexend = num_mesh_triangles * 3;

@@ -70,7 +70,7 @@ SCF_IMPLEMENT_FACTORY (csGLRender3D)
 
 
 SCF_IMPLEMENT_IBASE(csGLRender3D)
-SCF_IMPLEMENTS_INTERFACE(iRender3D)
+SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
 SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShaderRenderInterface)
 SCF_IMPLEMENT_IBASE_END
@@ -619,7 +619,7 @@ void csGLRender3D::ApplyObjectToCamera ()
 
 
 ////////////////////////////////////////////////////////////////////
-// iRender3D
+// iGraphics3D
 ////////////////////////////////////////////////////////////////////
 
 bool csGLRender3D::Open ()

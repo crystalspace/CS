@@ -150,7 +150,7 @@ csTargetRenderStep::~csTargetRenderStep ()
 
 void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
-  iRender3D* r3d = rview->GetGraphics3D();
+  iGraphics3D* r3d = rview->GetGraphics3D();
 
   csRef<iTextureWrapper> tex = 
     engine->GetTextureList ()->FindByName (target);

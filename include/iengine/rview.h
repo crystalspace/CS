@@ -35,7 +35,7 @@
 #include "ivideo/graph3d.h"
 #else
 #include "ivideo/render3d.h"
-#define iGraphics3D iRender3D
+#define iGraphics3D iGraphics3D
 #endif // CS_USE_NEW_RENDERER
 
 #ifndef CS_USE_NEW_RENDERER

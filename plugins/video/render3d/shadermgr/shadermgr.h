@@ -445,7 +445,7 @@ private:
   // writemask before we changed it, restor to this in deactivate
   bool OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha;
   
-  csRef<iRender3D> r3d;
+  csRef<iGraphics3D> r3d;
 public:
   SCF_DECLARE_IBASE;
 
@@ -454,7 +454,7 @@ public:
   csShaderPass(csShaderTechnique* owner, iObjectRegistry* reg)
   {
     SCF_CONSTRUCT_IBASE( 0 );
-    r3d = CS_QUERY_REGISTRY (reg, iRender3D);
+    r3d = CS_QUERY_REGISTRY (reg, iGraphics3D);
     vp = 0; fp = 0;
     parent = owner;
     objectreg = reg;

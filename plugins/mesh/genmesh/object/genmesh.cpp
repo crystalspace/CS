@@ -148,7 +148,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   ambient_version = 0;
 
 #ifdef CS_USE_NEW_RENDERER
-  r3d = CS_QUERY_REGISTRY (factory->object_reg, iRender3D);
+  r3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
 #endif
 }
 
@@ -712,7 +712,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
 {
   //if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
-  // iRender3D* r3d = rview->GetGraphics3D ();
+  // iGraphics3D* r3d = rview->GetGraphics3D ();
 
 //  iCamera* camera = rview->GetCamera ();
 /*  tr_o2c = camera->GetTransform ();
@@ -728,7 +728,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
     return false;
   }
 
-  // iRender3D* r3d = rview->GetGraphics3D ();
+  // iGraphics3D* r3d = rview->GetGraphics3D ();
 
   mater->Visit ();
   mesh.transform = &tr_o2c;
@@ -948,7 +948,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   color_buffer = 0;
   index_buffer = 0;
 
-  r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 

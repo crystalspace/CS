@@ -90,7 +90,7 @@ private:
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
 
-  csRef<iRender3D> r3d;
+  csRef<iGraphics3D> r3d;
   
   bool ball_vertices_dirty_flag;
   bool ball_texels_dirty_flag;

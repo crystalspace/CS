@@ -6701,14 +6701,14 @@ class csRender3dCaps
 {
 };
 
-const int iRender3D_VERSION = ((0 << 24) | (0 << 16) | 1); inline static scfInterfaceID iRender3D_scfGetID () { static scfInterfaceID ID = (scfInterfaceID)-1; if (ID == (scfInterfaceID)(-1)) ID = iSCF::SCF->GetInterfaceID ("iRender3D"); return ID; };
+const int iRender3D_VERSION = ((0 << 24) | (0 << 16) | 1); inline static scfInterfaceID iRender3D_scfGetID () { static scfInterfaceID ID = (scfInterfaceID)-1; if (ID == (scfInterfaceID)(-1)) ID = iSCF::SCF->GetInterfaceID ("iGraphics3D"); return ID; };
 
 
 
 
 
 
-struct iRender3D : public iBase
+struct iGraphics3D : public iBase
 {
 
   virtual bool Open () = 0;
@@ -15860,7 +15860,7 @@ csLightIterRenderStep::csLightIterRenderStep (
 
 void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
-  iRender3D* r3d = rview->GetGraphics3D();
+  iGraphics3D* r3d = rview->GetGraphics3D();
 
   r3d->SetLightParameter (0, 2,
     csVector3 (0, 0, 0));

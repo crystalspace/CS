@@ -142,7 +142,7 @@ csLightIterRenderStep::~csLightIterRenderStep ()
 
 void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
-  iRender3D* r3d = rview->GetGraphics3D();
+  iGraphics3D* r3d = rview->GetGraphics3D();
 
   r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, 
     csVector3 (0, 0, 0));

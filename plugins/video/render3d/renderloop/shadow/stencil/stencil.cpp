@@ -93,7 +93,7 @@ csStencilShadowCacheEntry::~csStencilShadowCacheEntry ()
 bool csStencilShadowCacheEntry::Initialize (iObjectRegistry *objreg) 
 {
   model = 0;
-  r3d = CS_QUERY_REGISTRY (objreg, iRender3D);
+  r3d = CS_QUERY_REGISTRY (objreg, iGraphics3D);
   if (!r3d) { return false; }
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objreg,
 	"crystalspace.renderer.stringset", iStringSet);
@@ -415,7 +415,7 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
-  r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   // Load the shadow vertex program 
   csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   if (!shmgr) {
@@ -465,7 +465,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, iMeshWr
   if (!mesh->GetMovable()->IsFullTransformIdentity ())
     tr_o2c /= mesh->GetMovable()->GetFullTransform ();
 
-  iRender3D* r3d = rview->GetGraphics3D ();
+  iGraphics3D* r3d = rview->GetGraphics3D ();
   
   csRef<csStencilShadowCacheEntry> shadowCacheEntry = 
     (csStencilShadowCacheEntry*)shadowcache.Get((csHashKey)mesh);

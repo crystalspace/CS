@@ -73,7 +73,7 @@ struct iEvent;
 #define CS_GL_CLIP_LAZY_STENCIL   'S'
 #define CS_GL_CLIP_LAZY_PLANES    'P'
 
-class csGLRender3D : public iRender3D
+class csGLRender3D : public iGraphics3D
 {
 private:
   //friend declarations

@@ -1095,7 +1095,7 @@ csPtr<iMeshObjectFactory> csSpriteCal3DMeshObjectType::NewFactory ()
   cm->vc = vc;
   cm->engine = engine;
 #ifdef CS_USE_NEW_RENDERER
-  cm->g3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  cm->g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   cm->anon_buffers = new csAnonRenderBufferManager (object_reg);
 #endif
   csRef<iMeshObjectFactory> ifact (

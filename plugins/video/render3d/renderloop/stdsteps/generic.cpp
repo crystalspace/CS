@@ -162,7 +162,7 @@ csGenericRenderStep::~csGenericRenderStep ()
 {
 }
 
-void csGenericRenderStep::RenderMeshes (iRender3D* r3d,
+void csGenericRenderStep::RenderMeshes (iGraphics3D* r3d,
                                          iShaderWrapper* shader, 
                                          csRenderMesh** meshes, 
                                          int num)
@@ -201,7 +201,7 @@ void csGenericRenderStep::RenderMeshes (iRender3D* r3d,
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
-  iRender3D* r3d = rview->GetGraphics3D();
+  iGraphics3D* r3d = rview->GetGraphics3D();
 
   if (zOffset)
     r3d->EnableZOffset ();

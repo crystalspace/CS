@@ -216,7 +216,7 @@ private:
   /// sorted list of MeshObjects, saved for future render passes
   iMeshWrapper **objects;
   csDirtyAccessArray<csRenderMesh*> draw_objects;
-  csRef<iRender3D> r3d;
+  csRef<iGraphics3D> r3d;
   csRef<iShaderManager> shmgr;
 
   csRenderMeshList rmeshes;

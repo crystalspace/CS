@@ -50,7 +50,7 @@ struct iMeshObject;
 #include "ivideo/rendermesh.h"
 #include "csgeom/transfrm.h"
 struct iMaterialHandle;
-struct iRender3D;
+struct iGraphics3D;
 
 
 #endif
@@ -94,7 +94,7 @@ class csMetaBall : public iMeshObject
   csRef<iRenderBuffer> rndbuf_index;
   bool rndbuf_index_dirty;
 
-  csRef<iRender3D> r3d;
+  csRef<iGraphics3D> r3d;
 
 #endif
 

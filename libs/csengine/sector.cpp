@@ -530,7 +530,7 @@ csSector::csSector (csEngine *engine) :
   lights.SetSector (this);
 
 #ifdef CS_USE_NEW_RENDERER
-  r3d = CS_QUERY_REGISTRY (csEngine::object_reg, iRender3D);
+  r3d = CS_QUERY_REGISTRY (csEngine::object_reg, iGraphics3D);
   shmgr = CS_QUERY_REGISTRY (csEngine::object_reg, iShaderManager);
   virtual_clock = CS_QUERY_REGISTRY (csEngine::object_reg, iVirtualClock);
 #endif // CS_USE_NEW_RENDERER

@@ -623,7 +623,7 @@ void csShaderPass::Deactivate()
 void csShaderPass::SetupState (csRenderMesh *mesh)
 {
   int i;
-  iRender3D* myr = r3d;
+  iGraphics3D* myr = r3d;
 
   for (i=0; i<STREAMMAX; i++)
   {

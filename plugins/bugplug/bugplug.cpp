@@ -218,7 +218,7 @@ void csBugPlug::SetupPlugin ()
   if (!Engine) Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
 #ifdef CS_USE_NEW_RENDERER
-  if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #else
   if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #endif

@@ -71,7 +71,7 @@ public:
 class csShaderGLMTEX : public iShaderProgram
 {
 private:
-  csRef<iRender3D> r3d;
+  csRef<iGraphics3D> r3d;
   iGLTextureCache* txtcache;
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;

@@ -84,7 +84,7 @@ bool csSoftShader_FP::Load(iDocumentNode* program)
 
   BuildTokenHash();
 
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  csRef<iGraphics3D> r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iShaderManager> shadermgr = 
     CS_QUERY_REGISTRY(object_reg, iShaderManager);
 

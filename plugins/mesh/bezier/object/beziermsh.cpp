@@ -1211,7 +1211,7 @@ bool csBezierMeshObjectType::Initialize (iObjectRegistry *object_reg)
 #ifndef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #else
-  csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #endif // CS_USE_NEW_RENDERER
   G3D = g;
 

@@ -37,7 +37,7 @@
 
 #ifdef CS_USE_NEW_RENDERER
   #define CS_USE_SHADOW_VOLUMES
-  #define iGraphics3D iRender3D
+  #define iGraphics3D iGraphics3D
 #endif
 
 // DEPRECATED use "true" instead

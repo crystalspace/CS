@@ -50,7 +50,7 @@ iRenderBuffer * csAnonRenderBufferManager::GetRenderBuffer(csStringID name)
 
 bool csAnonRenderBufferManager::AddRenderBuffer (const char *name, csRenderBufferComponentType component_type, int component_size, int numverts)
 {
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  csRef<iGraphics3D> r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 

@@ -99,7 +99,7 @@ void csGLShader_MTEX::Open()
   if(!object_reg)
     return;
 
-  csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
+  csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
   csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
@@ -418,7 +418,7 @@ bool csShaderGLMTEX::Prepare()
   g2d->PerformExtension("getstatecache", &statecache);
 
   //get extension-object
-  r3d = CS_QUERY_REGISTRY(object_reg,iRender3D);
+  r3d = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r3d, iShaderRenderInterface);
 
   ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");

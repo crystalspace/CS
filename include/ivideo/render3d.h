@@ -50,7 +50,7 @@ struct iRenderBufferManager;
 struct iLightingManager;
 
 
-/**\name iRender3D::BeginDraw() flags
+/**\name iGraphics3D::BeginDraw() flags
  * @{ */
 /// We're going to draw 2D graphics
 #define CSDRAW_2DGRAPHICS   0x00000001
@@ -286,14 +286,14 @@ class csRender3dCaps
 {
 };
 
-SCF_VERSION (iRender3D, 0, 0, 1);
+SCF_VERSION (iGraphics3D, 0, 0, 1);
 
 
 /**
  * New 3D Interface. Work in progress!
  */
 
-struct iRender3D : public iBase
+struct iGraphics3D : public iBase
 {
   /// Open 3d renderer.
   virtual bool Open () = 0;

@@ -229,7 +229,7 @@ struct G3DTriangleMesh
  * This class is the parent for both "normal" software renderer
  * as well as for procedural texture class.
  */
-class csSoftwareRender3DCommon : public iRender3D
+class csSoftwareRender3DCommon : public iGraphics3D
 {
 protected:
   //friend class csSoftHalo;

@@ -231,7 +231,7 @@ bool R3DTest::Initialize ()
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 #ifdef CS_USE_NEW_RENDERER
-        CS_REQUEST_PLUGIN ("crystalspace.render3d.opengl", iRender3D),
+        CS_REQUEST_PLUGIN ("crystalspace.render3d.opengl", iGraphics3D),
 #else
         CS_REQUEST_PLUGIN ("crystalspace.graphics3d.opengl", iGraphics3D),
 #endif
@@ -284,7 +284,7 @@ bool R3DTest::Initialize ()
   }
 
 #ifdef CS_USE_NEW_RENDERER
-  r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #else
   r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #endif
@@ -292,7 +292,7 @@ bool R3DTest::Initialize ()
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.r3dtest",
-    	"No iRender3D plugin!");
+    	"No iGraphics3D plugin!");
     return false;
   }
 

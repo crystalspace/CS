@@ -96,7 +96,7 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
 {
   csConsoleOutput::object_reg = object_reg;
 #ifdef CS_USE_NEW_RENDERER
-  G3D = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #else
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #endif

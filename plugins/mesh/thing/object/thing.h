@@ -196,7 +196,7 @@ public:
   float cosinus_factor;
 
 #ifdef CS_USE_NEW_RENDERER
-  csRef<iRender3D> r3d;
+  csRef<iGraphics3D> r3d;
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;

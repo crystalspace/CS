@@ -54,7 +54,7 @@ private:
   csRef<iRenderBuffer> shadow_vertex_buffer;
   csRef<iRenderBuffer> shadow_normal_buffer;
   csRef<iRenderBuffer> active_index_buffer;
-  csRef<iRender3D> r3d;
+  csRef<iGraphics3D> r3d;
 
   struct EdgeInfo {
     csVector3 a, b;
@@ -103,7 +103,7 @@ class csStencilShadowStep : public iRenderStep
 {
 private:
   csRef<iObjectRegistry> object_reg;
-  csRef<iRender3D> r3d;
+  csRef<iGraphics3D> r3d;
   csRef<iShader> shadow;
 
   csHashMap shadowcache;
