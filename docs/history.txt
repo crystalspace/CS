@@ -8,6 +8,7 @@ chronological order.
 
 9-Mar-2004
 	- Wouter clarified a comment on iLightingInfo::InitializeDefault.
+    - Reed added "relight" command to walktest.
 8-Mar-2004
 	- Philip Wyett eliminated warning in odeparticles.cpp.
 	- Jorrit fixed the old OpenGL renderer so that disabling texture
