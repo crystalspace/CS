@@ -522,6 +522,17 @@ public:
   { return pl.Classify (p) <= 0; }
 
   /**
+   * Calculate the line, that is the result of the Intersection of 
+   * triangle 1  and triangle 2. This Method returns false, if there is
+   * no intersection. If there is an intersection, the start of the line
+   * is in line[0] and the end of the line is in line[1] and the method
+   * return true;
+   */
+  static bool FindIntersection(const csVector3  tri1[3], 
+                               const csVector3  tri2[3],
+                               csVector3        line[2]);
+
+  /**
    * Calculates a vector lying a specified distance between two other vectors.
    * Given vectors v1 and v2, this function will calculate and return vector
    * v lying between them.
