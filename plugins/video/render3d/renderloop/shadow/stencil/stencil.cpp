@@ -67,9 +67,6 @@ csStencilShadowCacheEntry::csStencilShadowCacheEntry (csStencilShadowStep* paren
   vertex_count = 0;
   triangle_count = 0;
   edge_count = 0;
-  edge_indices = 0;
-  edge_midpoints = 0;
-  edge_normals = 0;
 
   enable_caps = false;
 
@@ -90,8 +87,7 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
   csVector3 meshlightpos, int& active_index_range, int& active_edge_start)
 {
   //check if this light exists in cache, and if it is ok
-  csLightCacheEntry *entry = 
-    (csLightCacheEntry*)lightcache.Get ((csHashKey)light);
+  csLightCacheEntry *entry = lightcache.Get ((uint32)light);
 
   if (entry == 0) {
     entry = new csLightCacheEntry ();
@@ -100,13 +96,13 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
     entry->edge_start = 0;
     entry->index_range = 0;
     entry->shadow_index_buffer = 0;
-    lightcache.Put ((csHashKey)light, entry);
+    lightcache.Put ((uint32)light, entry);
   }
 
   /* shadow_index_buffer is set to 0 if model changes shape (from listener) */
   if (entry->shadow_index_buffer == 0 || 
   /* FIXME: replace with the technique from viscull */
-      (entry->meshLightPos - meshlightpos).SquaredNorm () > 0.02) 
+      (entry->meshLightPos - meshlightpos).SquaredNorm () > 0.0) 
   {
     entry->meshLightPos = meshlightpos;
     if (entry->shadow_index_buffer == 0) 
@@ -190,7 +186,7 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
     for (i = 0; i < edge_count; i += 2)
     {
       csVector3 lightdir = entry->meshLightPos - edge_midpoints[i];
-      if (((lightdir * edge_normals[i]) * (lightdir * edge_normals[i+1])) < 0) 
+      if (((lightdir * edge_normals[i]) * (lightdir * edge_normals[i+1])) < 0)
       {
         buf[entry->index_range ++] = edge_indices[i*3 + 0];
         buf[entry->index_range ++] = edge_indices[i*3 + 1];
@@ -210,30 +206,30 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
   active_edge_start = entry->edge_start;
 }
 
-void csStencilShadowCacheEntry::HandleEdge (EdgeInfo *e, csHashMap& edge_stack)
+void csStencilShadowCacheEntry::HandleEdge (EdgeInfo *e, csHash<EdgeInfo*>& edge_stack)
 {
   double mplier = PI * 1e6;
-  csHashKey hash;
-  hash = (int)(mplier * e->a.x + mplier * e->a.y + mplier * e->a.z);
-  hash += (int)(mplier * e->b.x + mplier * e->b.y + mplier * e->b.z);
+  uint32 hash;
+  hash = (uint32)(mplier * e->a.x + mplier * e->a.y + mplier * e->a.z);
+  hash += (uint32)(mplier * e->b.x + mplier * e->b.y + mplier * e->b.z);
 
-  csHashIterator it (&edge_stack, hash);
+  csHash<EdgeInfo*>::Iterator it = edge_stack.GetIterator(hash);
   bool found = false;
   while (it.HasNext()) {
-    EdgeInfo *t = (EdgeInfo *)it.Next();
+    EdgeInfo *t = it.Next();
     if (e->a == t->b && e->b == t->a) {
       found = true;
       edge_indices[edge_count*3 + 0] = e->ind_a;
       edge_indices[edge_count*3 + 1] = t->ind_b;
       edge_indices[edge_count*3 + 2] = t->ind_a;
-      edge_normals[edge_count] = t->norm;
+      // edge_normals[edge_count] = t->norm;
       edge_midpoints[edge_count] = (t->a + t->b) / 2;
       edge_count ++;
 
       edge_indices[edge_count*3 + 0] = t->ind_a;
       edge_indices[edge_count*3 + 1] = e->ind_b;
       edge_indices[edge_count*3 + 2] = e->ind_a;
-      edge_normals[edge_count] = e->norm;
+      // edge_normals[edge_count] = e->norm;
       edge_midpoints[edge_count] = (e->a + e->b) / 2;
       edge_count ++;
 		    
@@ -308,36 +304,35 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
        sizeof (csVector3)*new_triangle_count*3, CS_BUF_STATIC,
        CS_BUFCOMP_FLOAT, 3, false);
 
-    csHashMap edge_stack(new_triangle_count*3);
+    csHash<EdgeInfo*> edge_stack(new_triangle_count*3);
     csArray<EdgeInfo> edge_array;
     edge_array.SetLength (new_triangle_count*3, EdgeInfo());
     edge_count = 0;
     int NextEdge = 0;
     int TriIndex = 0;
 
-    delete [] edge_indices;
-    edge_indices = new int[new_triangle_count*9];
-    delete [] edge_normals;
-    edge_normals = new csVector3[new_triangle_count*3];
-    delete [] edge_midpoints;
-    edge_midpoints = new csVector3[new_triangle_count*3];
+    face_normals.SetLength (new_triangle_count*3);
+    edge_indices.SetLength(new_triangle_count*9);
+    edge_normals.SetLength(new_triangle_count*3);
+    edge_midpoints.SetLength(new_triangle_count*3);
 
     for (int i = 0; i < mesh->GetPolygonCount(); i ++)
     {
       csMeshedPolygon *poly = &mesh->GetPolygons()[i];
-      csVector3 ab = mesh->GetVertices()[poly->vertices[1]] -
-                     mesh->GetVertices()[poly->vertices[0]];
-      csVector3 bc = mesh->GetVertices()[poly->vertices[2]] -
-                     mesh->GetVertices()[poly->vertices[1]];
+      /*
+      csVector3 ab = verts[poly->vertices[1]] -
+                     verts[poly->vertices[0]];
+      csVector3 bc = verts[poly->vertices[2]] -
+                     verts[poly->vertices[1]];
       csVector3 normal = ab % bc;
-      normal.Normalize();
+      */
 
       EdgeInfo *e = &edge_array[NextEdge ++];
       e->a = mesh->GetVertices()[poly->vertices[0]];
       e->b = mesh->GetVertices()[poly->vertices[1]];
       e->ind_a = TriIndex + 0;
       e->ind_b = TriIndex + 1;
-      e->norm = normal;
+      // e->norm = normal;
       HandleEdge (e, edge_stack);
 
       /* if the polygon is just a triangle this happens once
@@ -349,7 +344,7 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
         e->b = mesh->GetVertices()[poly->vertices[j]];
         e->ind_a = TriIndex + 1;
         e->ind_b = TriIndex + 2;
-        e->norm = normal;
+        // e->norm = normal;
     	HandleEdge (e, edge_stack);
         TriIndex += 3;
       }
@@ -359,7 +354,7 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
       e->b = mesh->GetVertices()[poly->vertices[0]];
       e->ind_a = TriIndex - 1; /* TriIndex + 2 from previous triangle */
       e->ind_b = TriIndex - 3; /* TriIndex + 0 from previous taiangle */
-      e->norm = normal;
+      // e->norm = normal;
       HandleEdge (e, edge_stack);
     }
   }
@@ -377,18 +372,23 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
     csVector3 bc = verts[poly->vertices[2]] -
                    verts[poly->vertices[1]];
     csVector3 normal = ab % bc;
-    normal.Normalize();
 
     for (int j = 2; j < poly->num_vertices; j ++)
     {
       v[ind] = verts[poly->vertices[0]];
-      n[ind++] = normal;
+      face_normals[ind++] = normal;
       v[ind] = verts[poly->vertices[j-1]];
-      n[ind++] = normal;
+      face_normals[ind++] = normal;
       v[ind] = verts[poly->vertices[j]];
-      n[ind++] = normal;
+      face_normals[ind++] = normal;
     }
   }
+  memcpy (n, &face_normals[0], sizeof (csVector3) * new_triangle_count * 3);
+
+  for (i = 0; i < triangle_count * 3; i ++) {
+    edge_normals[i] = face_normals[edge_indices[i * 3]];
+  }
+
   shadow_normal_buffer->Release ();
   shadow_vertex_buffer->Release ();
 }
@@ -519,8 +519,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, iMeshWr
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
   
-  csRef<csStencilShadowCacheEntry> shadowCacheEntry = 
-    (csStencilShadowCacheEntry*)shadowcache.Get((csHashKey)mesh);
+  csRef<csStencilShadowCacheEntry> shadowCacheEntry = shadowcache.Get((uint32)mesh);
   if (shadowCacheEntry == 0) 
   {
     /* need the extra reference for the hashmap */
@@ -635,8 +634,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   {
     iMeshWrapper* obj = objInShadow->Next ()->GetMeshWrapper ();
     
-    csRef<csStencilShadowCacheEntry> shadowCacheEntry = 
-	(csStencilShadowCacheEntry*)shadowcache.Get((csHashKey)obj);
+    csRef<csStencilShadowCacheEntry> shadowCacheEntry = shadowcache.Get((uint32)obj);
 
     if (shadowCacheEntry == 0) 
     {
@@ -707,8 +705,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   while (!objInShadow->HasNext() )
   {
     iMeshWrapper* sp = objInShadow->Next()->GetMeshWrapper ();
-    csRef<csStencilShadowCacheEntry> shadowCacheEntry = 
-      (csStencilShadowCacheEntry*)shadowcache.Get((csHashKey)sp);
+    csRef<csStencilShadowCacheEntry> shadowCacheEntry = shadowcache.Get((uint32)sp);
     if (shadowCacheEntry != 0)
       shadowCacheEntry->DisableShadowCaps ();
   }  

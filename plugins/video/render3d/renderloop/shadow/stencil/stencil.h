@@ -32,7 +32,7 @@
 #include "iengine/viscull.h"
 #include "igeom/objmodel.h"
 #include "igeom/polymesh.h"
-#include "csutil/hashmap.h"
+#include "csutil/hash.h"
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"
 #include "../../common/basesteptype.h"
@@ -56,7 +56,7 @@ private:
     csRef<iRenderBuffer> shadow_index_buffer;
     int edge_start, index_range;
   };
-  csHashMap lightcache;
+  csHash<csLightCacheEntry*> lightcache;
 
   csRef<iRenderBuffer> shadow_vertex_buffer;
   csRef<iRenderBuffer> shadow_normal_buffer;
@@ -71,12 +71,14 @@ private:
 
   int vertex_count, triangle_count;
   int edge_count;
-  int *edge_indices;
-  csVector3 *edge_midpoints, *edge_normals;
+  csArray<csVector3> face_normals;
+  csArray<int> edge_indices;
+  csArray<csVector3> edge_midpoints;
+  csArray<csVector3> edge_normals;
 
   bool enable_caps;
 
-  void HandleEdge (EdgeInfo* e, csHashMap& edge_stack);
+  void HandleEdge (EdgeInfo* e, csHash<EdgeInfo*>& edge_stack);
 public:
   SCF_DECLARE_IBASE;
 
@@ -111,7 +113,7 @@ private:
 
   csRefArray<iLightRenderStep> steps;
 
-  csHashMap shadowcache;
+  csHash< csRef<csStencilShadowCacheEntry> > shadowcache;
   void DrawShadow (iRenderView* rview, iLight* light, iMeshWrapper *mesh, 
     iShaderPass *pass);
 
