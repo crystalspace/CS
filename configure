@@ -1434,7 +1434,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 PACKAGE_LONGNAME="Crystal Space"
-    PACKAGE_COPYRIGHT="Copyright (C)1998-2003 Jorrit Tyberghein and others"
+    PACKAGE_COPYRIGHT="Copyright (C)1998-2004 Jorrit Tyberghein and others"
     PACKAGE_HOMEPAGE="http://crystal.sourceforge.net/"
 
 
