@@ -116,15 +116,8 @@ public:
 		if (m->v[1] > v[1] ) v[1] = m->v[1];
     }
 };
-///
-//WEXP ostream& WFEXP operator << ( ostream&s, ddgVector2 v );
-///
-//WEXP ostream& WFEXP operator << ( ostream&s, ddgVector2* v );
-///
-//WEXP istream& WFEXP operator >> ( istream& s, ddgVector2& v);
 
 ///
-class Matrix3;
 /**
  * Three dimensional vector class.
  */
@@ -356,17 +349,10 @@ public:
     }
 };
 
-///
-//WEXP ostream& WFEXP operator << ( ostream&s, ddgVector3 v );
-///
-//WEXP ostream& WFEXP operator << ( ostream&s, ddgVector3* v );
-///
-//WEXP istream& WFEXP operator >> ( istream& s, ddgVector3& v);
 
 /**
  * Four dimensional vector class.
  */
-class ddgMatrix4;
 class WEXP ddgVector4 {
 public:
 	///
@@ -436,15 +422,7 @@ public:
 	///
 	bool null( void )                             { return ((v[0] == v[1]) == (v[2] == v[3])) == 0.0; }
 	///
-	ddgVector4* multiply( ddgMatrix4 *m1, ddgVector4 *v1 );
 };
-
-///
-//WEXP ostream& WFEXP operator << ( ostream&s, ddgVector4 v );
-///
-//WEXP ostream& WFEXP operator << ( ostream&s, ddgVector4* v );
-///
-//WEXP istream& WFEXP operator >> ( istream& s, ddgVector4& v);
 
         
 #endif
