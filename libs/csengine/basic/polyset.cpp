@@ -363,8 +363,8 @@ bool csPolygonSet::TransformWorld2Cam (csCamera& c)
   float dx, dy, dz;
   float cx, cy, cz;
  
-  csMatrix3& m_o2t = c.GetO2T ();
-  csVector3& v_o2t = c.GetO2TTranslation ();
+  const csMatrix3& m_o2t = c.GetO2T ();
+  const csVector3& v_o2t = c.GetO2TTranslation ();
 
   float m11 = m_o2t.m11;
   float m21 = m_o2t.m21;
