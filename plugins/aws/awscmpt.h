@@ -47,6 +47,7 @@ private:
     SCF_DECLARE_IBASE;
 
     awscG2D (awsMultiProctexCanvas *parent, iGraphics2D *aG2D);
+    virtual ~awscG2D ();
 
     /// Initialize the plugin
     virtual bool Initialize (iObjectRegistry*);

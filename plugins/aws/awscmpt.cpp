@@ -51,8 +51,13 @@ awsMultiProctexCanvas::awscG2D::awscG2D(awsMultiProctexCanvas *parent, iGraphics
   awsc = parent;
 
   FontServer = rG2D->GetFontServer();
+  if (FontServer) FontServer->IncRef ();
 }
 
+awsMultiProctexCanvas::awscG2D::~awscG2D ()
+{
+  if (FontServer) FontServer->DecRef ();
+}
 
 bool awsMultiProctexCanvas::awscG2D::Initialize (iObjectRegistry* r)
 {
