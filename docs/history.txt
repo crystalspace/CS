@@ -53,6 +53,8 @@ The history order is reversed so that new features are at the top.
 	  prevents Jam from trying to build this plugin when a lesser version
 	  of DirectDraw is enabled (in which case the build would fail).  Note
 	  that we need to add a DirectDraw8-specific check to configure.ac.
+	- Eric Sunshine eliminated a compilation warning in ensocket driver
+	  regarding signed versus unsigned comparision.
 4-June-2003
 	- Jorrit fixed a bug in the AWS engine view where it would not set the
 	  FOV of the camera based on the height of the frame. This caused the

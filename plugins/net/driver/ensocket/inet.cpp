@@ -117,7 +117,7 @@ csNetworkSocket2::csNetworkSocket2 (iBase *parent, int sock_type, SOCKET sock)
   blocking = true;
   last_error = CS_NET_SOCKET_NOERROR;
 
-  if (sock != -1)
+  if (sock != (SOCKET)-1)
     socketfd = sock;
   else if (proto_type == SOCK_DGRAM)
     socketfd = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
