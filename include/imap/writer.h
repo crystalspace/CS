@@ -38,10 +38,23 @@ struct iSaverPlugin : public iBase
   /**
    * Take a given object and push description onto the given file.
    */
-  virtual void WriteDown (iBase* obj, iFile* file) = 0;
+  virtual bool WriteDown (iBase* obj, iDocumentNode* parent) = 0;
 };
 
 /** } */
+
+SCF_VERSION (iBinarySaverPlugin, 0, 0, 1);
+
+/**
+* This is a binary plugin to save with.
+*/
+struct iBinarySaverPlugin : public iBase
+{
+/**
+* Take a given object and push description onto the given file.
+*/
+  virtual bool WriteDown (iBase* obj, iFile *file) = 0;
+};
 
 #endif // __CS_IMAP_WRITER_H__
 

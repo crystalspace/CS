@@ -321,9 +321,15 @@ static void WriteHull(csString& str, iHazeHull *hull)
 }
 
 #endif
-
-void csHazeFactorySaver::WriteDown (iBase*, iFile*)
+//TBD
+bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -469,8 +475,14 @@ bool csHazeSaver::Initialize (iObjectRegistry* object_reg)
   csHazeSaver::object_reg = object_reg;
   return true;
 }
-
-void csHazeSaver::WriteDown (iBase*, iFile*)
+//TBD
+bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 

@@ -40,6 +40,7 @@
 #include "iutil/vfs.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"
+#include "iutil/document.h"
 #include "iengine/material.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
@@ -83,7 +84,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DBinFactoryLoader::eiComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSprite3DBinFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
+  SCF_IMPLEMENTS_INTERFACE (iBinarySaverPlugin)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
@@ -399,8 +400,18 @@ bool csSprite3DBinFactorySaver::Initialize (iObjectRegistry* object_reg)
 /**
  * Saves a csSprite3DBinFactorySaver
  */
-void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
+//TBD
+bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file)
 {
+	// TBD
+ /* if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin: Put a binary sprite in a xml format? Are you sure you want to do this?");
+  
+  return true;
+*/
+/*
   const char * name = 0;
 
   csRef<iSprite3DFactoryState> state (
@@ -543,5 +554,7 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
   char buf[1];
   buf[0] = state->IsTweeningEnabled() ? 0x01 : 0x00;
   file->Write(buf, 1);
+*/
+return true;
 }
 

@@ -613,7 +613,9 @@ bool ViewMesh::SaveSprite(const char *filename)
   csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
 
   csRef<iFile> cf (VFS->Open (filename, VFS_FILE_WRITE));
-  saver->WriteDown(imeshfact, cf);
+  
+  //TBD: change to new API
+  //saver->WriteDown(imeshfact, cf);
 
   return true;
 }

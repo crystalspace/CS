@@ -265,12 +265,20 @@ bool csLightningFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-
-void csLightningFactorySaver::WriteDown (iBase* obj, iFile *file)
+//TBD
+bool csLightningFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
+/*
   csString str;
   csRef<iLightningFactoryState> Lightningstate (
         SCF_QUERY_INTERFACE (obj, iLightningFactoryState));
+*/
   // @@@TODO
 }
 
@@ -371,8 +379,14 @@ bool csLightningSaver::Initialize (iObjectRegistry* object_reg)
   csLightningSaver::object_reg = object_reg;
   return true;
 }
-
-void csLightningSaver::WriteDown (iBase* obj, iFile *file)
+//TBD
+bool csLightningSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
-  // TODO
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
+

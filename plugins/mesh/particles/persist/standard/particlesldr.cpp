@@ -680,9 +680,15 @@ bool csParticlesFactorySaver::Initialize (iObjectRegistry* objreg)
   object_reg = objreg;
   return true;
 }
-
-void csParticlesFactorySaver::WriteDown (iBase *obj, iFile *file)
+//TBD
+bool csParticlesFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 
 SCF_IMPLEMENT_IBASE (csParticlesObjectLoader)
@@ -1274,7 +1280,14 @@ bool csParticlesObjectSaver::Initialize (iObjectRegistry *objreg)
   object_reg = objreg;
   return true;
 }
-
-void csParticlesObjectSaver::WriteDown (iBase* obj, iFile* file)
+//TBD
+bool csParticlesObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
+

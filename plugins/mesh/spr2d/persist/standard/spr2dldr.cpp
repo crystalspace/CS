@@ -294,9 +294,15 @@ bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-
-void csSprite2DFactorySaver::WriteDown (iBase*, iFile*)
+//TBD
+bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -491,8 +497,14 @@ bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-
-void csSprite2DSaver::WriteDown (iBase*, iFile*)
+//TBD
+bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 

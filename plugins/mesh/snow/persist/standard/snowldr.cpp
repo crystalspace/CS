@@ -155,10 +155,10 @@ bool csSnowFactorySaver::Initialize (iObjectRegistry* object_reg)
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
-
-void csSnowFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
+//TBD
+bool csSnowFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent)
 {
-  // nothing to do
+  return true; // nothing to do
 }
 
 //---------------------------------------------------------------------------
@@ -329,8 +329,14 @@ bool csSnowSaver::Initialize (iObjectRegistry* object_reg)
   csSnowSaver::object_reg = object_reg;
   return true;
 }
-
-void csSnowSaver::WriteDown (iBase*, iFile*)
+//TBD
+bool csSnowSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 

@@ -177,10 +177,15 @@ bool csStarFactorySaver::Initialize (iObjectRegistry* object_reg)
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
-
-void csStarFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
+//TBD
+bool csStarFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
-  // no params
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -311,8 +316,14 @@ bool csStarSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-
-void csStarSaver::WriteDown (iBase* /*obj*/, iFile* /*file*/)
+//TBD
+bool csStarSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
-  // @@@ Not implemented yet.
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
+

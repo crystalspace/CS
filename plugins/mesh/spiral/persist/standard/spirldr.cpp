@@ -156,9 +156,9 @@ bool csSpiralFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-void csSpiralFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
+bool csSpiralFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/)
 {
-  // nothing to do
+  return true; // nothing to do
 }
 //---------------------------------------------------------------------------
 csSpiralLoader::csSpiralLoader (iBase* pParent)
@@ -324,8 +324,14 @@ bool csSpiralSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-
-void csSpiralSaver::WriteDown (iBase*, iFile*)
+//TBD
+bool csSpiralSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 

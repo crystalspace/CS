@@ -68,7 +68,7 @@ public:
 /**
  * Sprite3D factory saver.
  */
-class csSprite3DBinFactorySaver : public iSaverPlugin
+class csSprite3DBinFactorySaver : public iBinarySaverPlugin
 {
 private:
   iObjectRegistry* object_reg;
@@ -87,8 +87,8 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iObjectRegistry *object_reg);
 
-  /// Write down given object and add to string vector.
-  virtual void WriteDown (iBase *obj, iFile *file);
+  /// Write down given object and add to iDocumentNode.
+  virtual bool WriteDown (iBase *obj, iFile* file);
 
   struct eiComponent : public iComponent
   {

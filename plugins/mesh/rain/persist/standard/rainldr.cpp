@@ -155,9 +155,9 @@ bool csRainFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-void csRainFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
+bool csRainFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/)
 {
-  // nothing to do
+  return true; // nothing to do
 }
 //---------------------------------------------------------------------------
 
@@ -332,8 +332,14 @@ bool csRainSaver::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-
-void csRainSaver::WriteDown (iBase*, iFile*)
+//TBD
+bool csRainSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 

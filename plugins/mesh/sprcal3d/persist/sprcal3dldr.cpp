@@ -515,9 +515,15 @@ bool csSpriteCal3DFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-
-void csSpriteCal3DFactorySaver::WriteDown (iBase*, iFile*)
+//TBD
+bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 
 
@@ -722,7 +728,13 @@ bool csSpriteCal3DSaver::Initialize (iObjectRegistry* object_reg)
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
-
-void csSpriteCal3DSaver::WriteDown (iBase*, iFile*)
+//TBD
+bool csSpriteCal3DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }

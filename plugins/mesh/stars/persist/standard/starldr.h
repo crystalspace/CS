@@ -85,8 +85,8 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iObjectRegistry *object_reg);
 
-  /// Write down given object and add to string vector.
-  virtual void WriteDown (iBase *obj, iFile *file);
+  /// Write down given object and add to iDocumentNode.
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
 
   struct eiComponent : public iComponent
   {
@@ -153,8 +153,8 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iObjectRegistry *object_reg);
 
-  /// Write down given object and add to string vector.
-  virtual void WriteDown (iBase *obj, iFile *file);
+  /// Write down given object and add to iDocumentNode.
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
 
   struct eiComponent : public iComponent
   {

@@ -260,9 +260,15 @@ bool csTerrainFactorySaver::Initialize (iObjectRegistry* objreg)
   object_reg = objreg;
   return true;
 }
-
-void csTerrainFactorySaver::WriteDown (iBase *obj, iFile *file)
+//TBD
+bool csTerrainFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 
 SCF_IMPLEMENT_IBASE (csTerrainObjectLoader)
@@ -542,7 +548,14 @@ bool csTerrainObjectSaver::Initialize (iObjectRegistry *objreg)
   object_reg = objreg;
   return true;
 }
-
-void csTerrainObjectSaver::WriteDown (iBase* obj, iFile* file)
+//TBD
+bool csTerrainObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
+

@@ -185,9 +185,14 @@ bool csBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-void csBallFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
+bool csBallFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
-  // no params
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -376,7 +381,13 @@ bool csBallSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csBallSaver::WriteDown (iBase*, iFile*)
+bool csBallSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 

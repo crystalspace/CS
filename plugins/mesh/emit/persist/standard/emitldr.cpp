@@ -176,9 +176,9 @@ bool csEmitFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-void csEmitFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
+bool csEmitFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/)
 {
-  // nothing to do
+  return true; // nothing to do
 }
 
 //---------------------------------------------------------------------------
@@ -717,8 +717,14 @@ static void WriteEmit(csString& str, iEmitGen3D *emit)
   }
   printf ("Unknown emitter type, cannot writedown!\n");
 }
-
-void csEmitSaver::WriteDown (iBase*, iFile*)
+//TBD
+bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 

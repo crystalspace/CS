@@ -23,9 +23,14 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/string.h"
+#include "iutil/plugin.h"
+#include "imesh/object.h"
 #include "iengine/engine.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
+#include "iengine/sector.h"
+#include "iengine/mesh.h"
+#include "iengine/campos.h"
 #include "igraphic/image.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
@@ -250,6 +255,166 @@ bool csSaver::SaveMaterials(csRef<iDocumentNode>& parent)
   return true;
 }
 
+bool csSaver::SaveRenderPriorities(csRef<iDocumentNode> &parent)
+{
+	csRef<iDocumentNode> rpnode = CreateNode(parent, "renderpriorities");
+	int rpcount = engine->GetRenderPriorityCount();
+	for(int i = 0; i < rpcount; i++)
+	{
+		const char *rpname = engine->GetRenderPriorityName(i);
+		if(rpname)
+		{
+			csRef<iDocumentNode> prioritynode = CreateNode(rpnode, "priority");
+
+			rpnode->SetAttribute("name", rpname);
+			csRef<iDocumentNode> levelnode = CreateNode(prioritynode, "level");
+			levelnode->SetValueAsInt(i);
+
+			csRef<iDocumentNode> sortnode = CreateNode(prioritynode, "sort");
+			int sorttype = engine->GetRenderPrioritySorting(i);
+			switch(sorttype)
+			{
+			case CS_RENDPRI_NONE:
+				sortnode->SetValue("NONE");
+				break;
+			case CS_RENDPRI_BACK2FRONT:
+				sortnode->SetValue("BACK2FRONT");
+				break;
+			case CS_RENDPRI_FRONT2BACK:
+				sortnode->SetValue("FRONT2BACK");
+				break;
+/*			case CS_RENDPRI_MATERIAL:
+				sortnode->SetValue("MATERIAL");
+				break;*/
+			}
+		}
+	}
+	return true;
+}
+
+
+bool csSaver::SaveCameraPositions(csRef<iDocumentNode> &parent)
+{
+	csRef<iCameraPositionList> camlist = engine->GetCameraPositions();
+	
+	for(int i = 0; i < camlist->GetCount(); i++)
+	{
+		csRef<iCameraPosition> cam = camlist->Get(i);
+		
+		csRef<iDocumentNode> n = CreateNode(parent, "start");
+		// Set the name attribute if cam pos has a name
+		const char *camname = cam->QueryObject()->GetName();
+		if(camname && strcmp(camname, "") != 0)
+			n->SetAttribute("name", camname);
+
+		// write the sector
+		csRef<iDocumentNode> sectornode = CreateNode(n, "sector");
+		const char *sectorname = cam->GetSector();
+		if(sectorname)
+      sectornode->SetValue(cam->GetSector());
+
+		// write position
+		csRef<iDocumentNode> positionnode = CreateNode(n, "position");
+		positionnode->SetAttributeAsFloat("x", cam->GetPosition().x);
+		positionnode->SetAttributeAsFloat("y", cam->GetPosition().y);
+		positionnode->SetAttributeAsFloat("z", cam->GetPosition().z);
+
+		// write up vector
+		csRef<iDocumentNode> upnode = CreateNode(n, "up");
+		upnode->SetAttributeAsFloat("x", cam->GetUpwardVector().x);
+		upnode->SetAttributeAsFloat("y", cam->GetUpwardVector().y);
+		upnode->SetAttributeAsFloat("z", cam->GetUpwardVector().z);
+
+		// write forward vector
+		csRef<iDocumentNode> forwardnode = CreateNode(n, "forward");
+		forwardnode->SetAttributeAsFloat("x", cam->GetForwardVector().x);
+		forwardnode->SetAttributeAsFloat("y", cam->GetForwardVector().y);
+		forwardnode->SetAttributeAsFloat("z", cam->GetForwardVector().z);
+
+		// write farplane if available
+		csPlane3 *fp = cam->GetFarPlane();
+		if(fp)
+		{
+			csRef<iDocumentNode> farplanenode = CreateNode(n, "farplane");
+			farplanenode->SetAttributeAsFloat("a", fp->A());
+			farplanenode->SetAttributeAsFloat("b", fp->B());
+			farplanenode->SetAttributeAsFloat("c", fp->C());
+			farplanenode->SetAttributeAsFloat("d", fp->D());
+		}
+	}
+	return true;
+}
+
+bool csSaver::SaveSectors(csRef<iDocumentNode> &parent)
+{
+	iSectorList* sectorList=engine->GetSectors();
+  for (int i=0; i<sectorList->GetCount(); i++)
+  {
+    iSector* sector = sectorList->Get(i);
+    csRef<iDocumentNode> sectorNode = CreateNode(parent, "sector");
+    const char* name = sector->QueryObject()->GetName();
+    if (name && *name) sectorNode->SetAttribute("name", name);
+    
+		if(!SaveSectorMeshes(sector, sectorNode))
+			return false;
+
+      
+	}
+	return true;
+}
+
+bool csSaver::SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent)
+{
+	iMeshList* meshList = s->GetMeshes();
+  for (int i=0; i<meshList->GetCount(); i++)
+  {
+    iMeshWrapper* meshwrapper = meshList->Get(i);
+    //Create the Tag for the MeshObj
+    csRef<iDocumentNode> meshNode = CreateNode(parent, "meshobj");
+    //Add the mesh's name to the MeshObj tag
+    const char* name = meshwrapper->QueryObject()->GetName();
+    if (name && *name) 
+			meshNode->SetAttribute("name", name);
+
+    //TBD: write <plugin>
+    
+    //Let the iSaverPlugin write the parameters of the mesh
+    //It has to create the params node itself, maybe it might like to write
+    //more things outside the params at a later stage. you never know ;)
+		csRef<iFactory> factory =  SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iFactory);
+    if (factory)
+    {
+      csString pluginname = factory->QueryClassID();
+      if (pluginname && *pluginname)
+      {
+        csRef<iDocumentNode> pluginNode = CreateNode(meshNode, "plugin");
+        pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue((const char*)pluginname);
+        csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+        const char* origstring = ".object.";
+        const char* newstring = ".saver.";
+        for (int i=0; i<pluginname.Length()-8; i++)
+        {
+          if (pluginname.Slice(i,8).Compare(origstring))
+            pluginname=pluginname.Slice(0,i)+newstring + pluginname.Slice(i+8,pluginname.Length());
+        }
+
+				csRef<iSaverPlugin> saver = CS_QUERY_PLUGIN_CLASS(plugin_mgr, pluginname, iSaverPlugin);
+        
+				if (!saver) 
+					saver = CS_LOAD_PLUGIN(plugin_mgr, pluginname, iSaverPlugin);
+        
+				if (saver)
+          saver->WriteDown(object_reg, meshNode);
+      }
+
+    }      
+    //TBD: write <priority>
+    //TBD: write other tags
+  }
+	return true;
+}
+
 csRef<iString> csSaver::SaveMapFile()
 {
   csRef<iDocumentSystem> xml =
@@ -259,8 +424,14 @@ csRef<iString> csSaver::SaveMapFile()
   csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   parent->SetValue("world");
 
-  if (!SaveTextures(parent)) return 0;
-  if (!SaveMaterials(parent)) return 0;
+  //TBD: this crashes for me, dunno why, have to look at it more closley.
+  //if (!SaveTextures(parent)) return 0;
+  //if (!SaveMaterials(parent)) return 0;
+  
+  //TBD: Save the Factories
+  //if (!SaveFactories(parent)) return 0;
+  
+	if (!SaveSectors(parent)) return 0;
 
   iString* str = new scfString();
   if (doc->Write(str) != 0)
@@ -282,4 +453,16 @@ bool csSaver::SaveMapFile(const char* filename)
     return 0;
 
   return vfs->WriteFile(filename, str->GetData(), str->Length());
+}
+
+bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
+{
+	csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  parent->SetValue("world");
+
+  if (!SaveTextures(parent)) return false;
+  if (!SaveMaterials(parent)) return false;
+
+	/// TODO: write mesh objects, factories
+	return true;
 }

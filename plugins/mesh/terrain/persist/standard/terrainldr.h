@@ -84,8 +84,8 @@ public:
   /// Register plugin with system driver
   bool Initialize (iObjectRegistry *objreg);
 
-  /// Store the terrain into a string and add it to iFile
-  void WriteDown (iBase *obj, iFile *file);
+  /// Write down given object and add to iDocumentNode.
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
 
   struct eiComponent : public iComponent
   {
@@ -153,8 +153,8 @@ public:
   /// Register plugin with the system driver
   bool Initialize (iObjectRegistry *objreg);
 
-  /// Write the terrain object as a string and add to the iFile
-  void WriteDown (iBase* obj, iFile* file);
+  /// Write down given object and add to iDocumentNode.
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
 
   struct eiComponent : public iComponent
   {

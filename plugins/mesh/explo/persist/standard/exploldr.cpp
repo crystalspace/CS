@@ -158,9 +158,9 @@ bool csExplosionFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csExplosionFactorySaver::WriteDown (iBase* /*obj*/, iFile * /*file*/)
+bool csExplosionFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/)
 {
-  // nothing to do
+  return true; // nothing to do
 }
 
 //---------------------------------------------------------------------------
@@ -346,9 +346,15 @@ bool csExplosionSaver::Initialize (iObjectRegistry* object_reg)
 }
 
 #define MAXLINE	    80
-
-void csExplosionSaver::WriteDown (iBase*, iFile*)
+//TBD
+bool csExplosionSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
 }
 
 //---------------------------------------------------------------------------

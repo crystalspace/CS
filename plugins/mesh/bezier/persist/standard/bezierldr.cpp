@@ -413,9 +413,17 @@ bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
-
-void csBezierSaver::WriteDown (iBase* /*obj*/, iFile *file)
+//TBD
+bool csBezierSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
+  if (!parent) return false; //you never know...
+  
+  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
+  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  
+  return true;
+
+/*
   csString str;
   csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
   char buf[MAXLINE];
@@ -424,5 +432,6 @@ void csBezierSaver::WriteDown (iBase* /*obj*/, iFile *file)
   sprintf (buf, "FACTORY ('%s')\n", name);
   str.Append (buf);
   file->Write ((const char*)str, str.Length ());
+*/
 }
 
