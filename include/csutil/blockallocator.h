@@ -29,6 +29,7 @@
 
 #ifdef CS_MEMORY_TRACKER
 #include "csutil/memdebug.h"
+#include <typeinfo>
 #endif
 
 /**
@@ -123,7 +124,7 @@ private:
       csBlock& bl = blocks[firstfreeblock];
 #     ifdef CS_MEMORY_TRACKER
       char buf[255];
-      sprintf (buf, "csBlockAllocator<%d>", sizeof (T));
+      sprintf (buf, "csBlockAllocator<%s>", typeid (T).name());
       int32* ptr = (int32*)malloc (blocksize + sizeof (int32)*2);
       *ptr++ = (int32)mtiRegisterAlloc (blocksize, buf);
       *ptr++ = blocksize;
@@ -154,7 +155,7 @@ public:
     csBlock& bl = blocks[idx];
 #   ifdef CS_MEMORY_TRACKER
     char buf[255];
-    sprintf (buf, "csBlockAllocator<%d>", sizeof (T));
+    sprintf (buf, "csBlockAllocator<%s>", typeid (T).name());
     int32* ptr = (int32*)malloc (blocksize + sizeof (int32)*2);
     *ptr++ = (int32)mtiRegisterAlloc (blocksize, buf);
     *ptr++ = blocksize;

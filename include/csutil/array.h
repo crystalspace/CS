@@ -27,6 +27,7 @@
 
 #ifdef CS_MEMORY_TRACKER
 #include "csutil/memdebug.h"
+#include <typeinfo>
 #endif
 
 /// This function prototype is used for Sort()
@@ -153,7 +154,7 @@ private:
     {
       if (!curcapacity) return;
       char buf[255];
-      sprintf (buf, "csArray<%d>", sizeof (T));
+      sprintf (buf, "csArray<%s>", typeid (T).name());
       mti = mtiRegisterAlloc (1 * sizeof (T), buf);
       if (!mti) return;
       curcapacity--;
