@@ -30,8 +30,6 @@
 #include "csengine/csview.h"
 #include "csengine/wirefrm.h"
 #include "csengine/meshobj.h"
-#include "csengine/skeleton.h"
-#include "csengine/triangle.h"
 #include "csengine/polygon.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"

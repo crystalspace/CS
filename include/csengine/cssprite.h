@@ -31,7 +31,6 @@
 #include "csengine/rview.h"
 #include "csengine/material.h"
 #include "csengine/tranman.h"
-#include "csengine/triangle.h"
 #include "csengine/movable.h"
 #include "igraph3d.h"
 #include "ipolmesh.h"

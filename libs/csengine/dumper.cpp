@@ -39,7 +39,6 @@
 #include "csengine/polytext.h"
 #include "csengine/texture.h"
 #include "csengine/polyset.h"
-#include "csengine/triangle.h"
 #include "csengine/thing.h"
 #include "csengine/sector.h"
 #include "csengine/engine.h"

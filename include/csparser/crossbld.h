@@ -25,7 +25,6 @@
 #define __CS_CROSSBLD_H__
 
 #include "csparser/impexp.h"
-#include "csengine/triangle.h"
 
 struct iSprite3DFactoryState;
 struct iMeshObjectFactory;

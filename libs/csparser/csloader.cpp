@@ -24,12 +24,10 @@
 #include "csparser/snddatao.h"
 #include "csengine/cscoll.h"
 #include "csengine/campos.h"
-#include "csengine/triangle.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
 #include "csengine/meshobj.h"
-#include "csengine/skeleton.h"
 #include "csengine/polygon.h"
 #include "csengine/polytmap.h"
 #include "csengine/textrans.h"
@@ -59,6 +57,8 @@
 #include "itxtmgr.h"
 #include "imotion.h"
 #include "ildrplug.h"
+#include "iskel.h"
+#include "iskelbon.h"
 
 typedef char ObName[30];
 /// The engine we are currently processing
