@@ -31,6 +31,7 @@ chronological order.
 	      for some bizare reason. This fixes bugplug again.
 	    - Fixed the ball mesh object for real. The index parameter should
 	      be 'true' for the triangle buffer.
+	    - Fixed spr3d jamfile so that it links with cstool.
 	- Jorrit added stdpt, ieplex, motion, and gtreeldr to walkall target
 	  for jam.
 	- res changed csStringArray::CaseSensitiveCompareKey() and
