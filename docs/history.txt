@@ -44,6 +44,8 @@ chronological order.
 	- Jorrit changed the OpenGL canvases so that you get a warning
 	  when you try to run CS with less then 24 bit displays. Running
 	  CS under such conditions is sub-optimal.
+7-Sep-2004
+	- *** RELEASED STABLE 0.98.4 ***
 6-Sep-2004
 	- Eric Sunshine upgraded the ODE "sufficiently recent" check in
 	  configure.ac so that it demands version 0.5. Also added a check to
