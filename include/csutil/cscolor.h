@@ -76,6 +76,12 @@ public:
   /// Subtract another color to this one.
   csColor& operator-= (const csColor& c)
   { red -= c.red; green -= c.green; blue -= c.blue; return *this; }
+  /// Compare equality of two colors
+  bool operator== (const csColor& c) const
+  { return red == c.red && green == c.green && blue == c.blue; }
+  /// Compare inequality of two colors
+  bool operator!= (const csColor& c) const
+  { return red != c.red || green != c.green || blue != c.blue; }
   /// Add given R,G,B components to color.
   void Add (float r, float g, float b)
   { red += r; green += g; blue += b; }
@@ -138,6 +144,33 @@ public:
     blue = b;
     alpha = a;
   }
+  /// Assign one color object to another.
+  csColor4& operator= (const csColor4& c)
+  { red = c.red; green = c.green; blue = c.blue; alpha = c.alpha; return *this; }
+  /// Assign one color object to another/.
+  csColor4& operator= (const csColor& c)
+  { red = c.red; green = c.green; blue = c.blue; alpha = 1.0f; return *this; }
+  /// Multiply this color by a scalar value.
+  csColor4& operator*= (float f)
+  { red *= f; green *= f; blue *= f; alpha *= f; return *this; }
+  /// Add another color to this one.
+  csColor4& operator+= (const csColor4& c)
+  { red += c.red; green += c.green; blue += c.blue; alpha += c.alpha; return *this; }
+  /// Add another color to this one.
+  csColor4& operator+= (const csColor& c)
+  { red += c.red; green += c.green; blue += c.blue; return *this; }
+  /// Subtract another color to this one.
+  csColor4& operator-= (const csColor4& c)
+  { red -= c.red; green -= c.green; blue -= c.blue; alpha -= c.alpha; return *this; }
+  /// Subtract another color to this one.
+  csColor& operator-= (const csColor& c)
+  { red -= c.red; green -= c.green; blue -= c.blue; return *this; }
+  /// Compare equality of two colors
+  bool operator== (const csColor4& c) const
+  { return red == c.red && green == c.green && blue == c.blue && alpha == c.alpha; }
+  /// Compare inequality of two colors
+  bool operator!= (const csColor4& c) const
+  { return red != c.red || green != c.green || blue != c.blue || alpha != c.alpha; }
 };
 
 /// Multiply a color by a scalar value.

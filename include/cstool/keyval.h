@@ -40,6 +40,7 @@ class CS_CSTOOL_EXPORT csKeyValuePair : public csObject, public iKeyValuePair
 private:
   const char *m_Value;	// Points to a string in the hash below.
   csHash<csStrKey, csStrKey, csConstCharHashKeyHandler> values;
+  csSet<csStrKey, csConstCharHashKeyHandler> names;
 
 public:
   /// The constructor. Requires both key and value. Data is being copied!
@@ -58,6 +59,8 @@ public:
   virtual const char *GetValue (const char* vname) const;
   virtual void SetValue (const char* value);
   virtual void SetValue (const char* vname, const char* value);
+
+  virtual csArray<const char*> GetValueNames () const;
 
   //----------------------- iSaverPlugin ---------------------------
 };

@@ -128,6 +128,9 @@ public:
    */
   bool Render (csRGBcolor* pal, size_t count, float begin = 0.0f, 
     float end = 1.0f) const;
+
+  /// Get the array of shades
+  csArray<csGradientShade> GetShades () const { return shades; }
 };
 
 

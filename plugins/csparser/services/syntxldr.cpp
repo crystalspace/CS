@@ -402,6 +402,12 @@ bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
 {
   switch ( mixmode & CS_FX_MASK_MIXMODE )
   {
+    case CS_FX_TRANSPARENT:
+      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("transparent");
+    case CS_FX_KEYCOLOR:
+      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("keycolor");
+    case CS_FX_TILING:
+      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("tiling");
     case CS_FX_COPY: 
       node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("copy");
       break;
@@ -414,11 +420,26 @@ bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
     case CS_FX_ADD: 
       node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("add");
       break;
+    case CS_FX_DESTALPHAADD:
+      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("destalphaadd");
+      break;
+    case CS_FX_SRCALPHAADD:
+      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("destalphaadd");
+      break;
+    case CS_FX_PREMULTALPHA:
+      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("premultalpha");
+      break;
+    case CS_FX_ALPHA:
+      {
+        csRef<iDocumentNode> alpha = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        alpha->SetValue ("alpha");
+        alpha->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat (
+          (float) ((mixmode & CS_FX_MASK_ALPHA) / 255.0f));
+      }
+      break;
+    default:
+      break;
   }        
-
-  //TBD
-  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("SyntaxService: WriteMixmode not yet fully supported!");
 
   return true;
 }
@@ -630,11 +651,28 @@ bool csTextSyntaxService::ParseGradientShade (iDocumentNode* node,
 bool csTextSyntaxService::WriteGradientShade (iDocumentNode* node, 
 					      csGradientShade* shade)
 {
-  //TBD
-  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("SyntaxService: WriteMixmode not yet supported!");
+  if (shade->left == shade->right)
+  {
+    csRef<iDocumentNode> color = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+    color->SetValue ("color");
+    WriteColor (color, &shade->left);
+  }
+  else
+  {
+    csRef<iDocumentNode> left = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+    left->SetValue ("left");
+    WriteColor (left, &shade->left);
+    csRef<iDocumentNode> right = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+    right->SetValue ("right");
+    WriteColor (right, &shade->right);
+  }
+  csRef<iDocumentNode> pos = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+  pos->SetValue ("pos");
+  pos->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsFloat (shade->position);
+
   return true;
 }
+
 bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 					 csGradient& gradient)
 {
@@ -671,9 +709,16 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 bool csTextSyntaxService::WriteGradient (iDocumentNode* node,
 					 csGradient* gradient)
 {
-  //TBD
-  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("SyntaxService: WriteMixmode not yet supported!");
+  csArray<csGradientShade> shades = gradient->GetShades ();
+  csArray<csGradientShade>::Iterator it = shades.GetIterator ();
+  while (it.HasNext ())
+  {
+    csGradientShade shade = it.Next ();
+    csRef<iDocumentNode> child = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+    child->SetValue ("shade");
+    WriteGradientShade (child, &shade);
+  }
+
   return true;
 }
 
@@ -768,9 +813,68 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
 bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
 					  csShaderVariable* var)
 {
-  //TBD
-  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("SyntaxService: WriteMixmode not yet supported!");
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
+  node->SetAttribute ("name", strings->Request (var->GetName ()));
+  switch (var->GetType ())
+  {
+    case csShaderVariable::INT:
+      {
+        node->SetAttribute ("type", "integer");
+        int val;
+        var->GetValue (val);
+        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsInt (val);
+      }
+      break;
+    case csShaderVariable::FLOAT:
+      {
+        node->SetAttribute ("type", "float");
+        float val;
+        var->GetValue (val);
+        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsFloat (val);
+      }
+      break;
+    case csShaderVariable::VECTOR2:
+      {
+        node->SetAttribute ("type", "vector2");
+        char* val = '\0';
+        csVector2 vec;
+        var->GetValue (vec);
+        sprintf (val, "%f,%f", vec.x, vec.y);
+        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
+      }
+      break;
+    case csShaderVariable::VECTOR3:
+      {
+        node->SetAttribute ("type", "vector3");
+        char* val = '\0';
+        csVector3 vec;
+        var->GetValue (vec);
+        sprintf (val, "%f,%f,%f", vec.x, vec.y, vec.z);
+        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
+      }
+      break;
+    case csShaderVariable::VECTOR4:
+      {
+        node->SetAttribute ("type", "vector4");
+        char* val = '\0';
+        csVector4 vec;
+        var->GetValue (vec);
+        sprintf (val, "%f,%f,%f,%f", vec.x, vec.y, vec.z, vec.w);
+        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
+      }
+      break;
+    case csShaderVariable::TEXTURE:
+      {
+        node->SetAttribute ("type", "texture");
+        iTextureWrapper* val;
+        var->GetValue (val);
+        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val->QueryObject ()->GetName ());
+      }
+      break;
+    default:
+      break;
+  };
   return true;
 }
 
@@ -868,9 +972,20 @@ bool csTextSyntaxService::WriteAlphaMode (iDocumentNode* node,
 					  iStringSet* strings,
 					  csAlphaMode* alphaMode)
 {
-  //TBD
-  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("SyntaxService: WriteMixmode not yet supported!");
+  if (alphaMode->autoAlphaMode)
+  {
+    csRef<iDocumentNode> automode = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+    automode->SetValue ("auto");
+    if (alphaMode->autoModeTexture != strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE))
+      automode->SetAttribute ("texture", strings->Request (alphaMode->autoModeTexture));
+  }
+  else if (alphaMode->alphaType == csAlphaMode::alphaSmooth)
+    node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("smooth");
+  else if (alphaMode->alphaType == csAlphaMode::alphaBinary)
+    node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("binary");
+  else
+    node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("none");
+
   return true;
 }
 
@@ -917,9 +1032,34 @@ bool csTextSyntaxService::WriteZMode (iDocumentNode* node,
 				      csZBufMode* zmode,    
 				      bool allowZmesh)
 {
-  //TBD
-  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("SyntaxService: WriteMixmode not yet supported!");
+  switch (*zmode)
+  {
+  case CS_ZBUF_NONE:
+    node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("znone");
+    break;
+  case CS_ZBUF_FILL:
+    node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("zfill");
+    break;
+  case CS_ZBUF_TEST:
+    node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("ztest");
+    break;
+  case CS_ZBUF_USE:
+    node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("zuse");
+    break;
+  case CS_ZBUF_EQUAL:
+    node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("zequal");
+    break;
+  case CS_ZBUF_MESH:
+    if (allowZmesh)
+      node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("zmesh");
+    break;
+  case CS_ZBUF_MESH2:
+    if (allowZmesh)
+      node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("zmesh2");
+    break;
+  default:
+    break;
+  };
   return true;
 }
 
@@ -947,9 +1087,14 @@ bool csTextSyntaxService::ParseKey (iDocumentNode *node, iKeyValuePair* &keyvalu
 
 bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue)
 {
-  //TBD
-  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("SyntaxService: WriteKey not yet supported!");
+  node->SetAttribute ("name", keyvalue->GetKey ());
+  csArray<const char*> vnames = keyvalue->GetValueNames ();
+  csArray<const char*>::Iterator it = vnames.GetIterator ();
+  while (it.HasNext ())
+  {
+    const char* name = it.Next ();
+    node->SetAttribute (name, keyvalue->GetValue (name));
+  }
   return true;
 }
 

@@ -20,11 +20,12 @@
 #define __CS_IVARIA_KEYVAL_H__
 
 #include "csutil/scf.h"
+#include "csutil/array.h"
 
 struct iObject;
 struct iSector;
 
-SCF_VERSION (iKeyValuePair, 0, 0, 2);
+SCF_VERSION (iKeyValuePair, 0, 0, 3);
 
 /**
  * A Key Value pair. This object contains a 'key' string and one or more
@@ -75,6 +76,11 @@ struct iKeyValuePair : public iBase
    * is the same as calling 'SetValue ("value", value)'.
    */
   virtual void SetValue (const char* value) = 0;
+
+  /**
+   * Get array of value names in this pair.
+   */
+  virtual csArray<const char*> GetValueNames () const = 0;
 };
 
 #endif // __CS_IVARIA_KEYVAL_H__

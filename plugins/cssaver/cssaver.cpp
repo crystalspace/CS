@@ -886,28 +886,23 @@ bool csSaver::SaveVariables (iDocumentNode* node)
     {
       case iSharedVariable::SV_FLOAT:
       {
-        variableNode->CreateNodeBefore(CS_NODE_TEXT, 0)
-          ->SetValueAsFloat(var->Get());
+        variableNode->SetAttributeAsFloat ("value", var->Get ());
         break;
       }
       case iSharedVariable::SV_COLOR:
       {
-        csString value;
-        csColor c = var->GetColor();
-        value.Format("%f,%f,%f",c.red,c.green,c.blue);
-        variableNode->CreateNodeBefore(CS_NODE_TEXT, 0)
-          ->SetValue((const char*) value);
+        csColor c = var->GetColor ();
+        synldr->WriteColor (CreateNode (variableNode, "color"), &c);
         break;
       }
       case iSharedVariable::SV_VECTOR:
       {
-        csString value;
-        csVector3 v = var->GetVector();
-        value.Format("%f,%f,%f",v.x,v.y,v.z);
-        variableNode->CreateNodeBefore(CS_NODE_TEXT, 0)
-          ->SetValue((const char*) value);
+        csVector3 v = var->GetVector ();
+        synldr->WriteVector (CreateNode (variableNode, "v"), &v);
         break;
       }
+      default:
+        break;
     }
   }
   return true;
@@ -916,14 +911,12 @@ bool csSaver::SaveVariables (iDocumentNode* node)
 bool csSaver::SaveSettings (iDocumentNode* node)
 {
   csRef<iDocumentNode> settingsNode = CreateNode(node, "settings");
-//case XMLTOKEN_CLEARZBUF:
-  //csRef<iDocumentNode> clrzbufNode = CreateNode(settingsNode, "clearzbuf");
-  synldr->WriteBool(settingsNode,"clearzbuf",engine->GetClearScreen(), true);
-//case XMLTOKEN_CLEARSCREEN:
-  //csRef<iDocumentNode> clrscrNode = CreateNode(settingsNode, "clearscreen");
-  synldr->WriteBool(settingsNode,"clearscreen",engine->GetClearScreen(), true);
-//case XMLTOKEN_LIGHTMAPCELLSIZE:
-  csRef<iDocumentNode> lghtmapcellNode = CreateNode(settingsNode, "lightmapcellsize");
+
+  synldr->WriteBool(settingsNode,"clearzbuf",engine->GetClearZBuf (),
+    engine->GetDefaultClearZBuf ());
+  synldr->WriteBool(settingsNode,"clearscreen",engine->GetClearScreen (),
+    engine->GetDefaultClearScreen ());
+
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
     iPluginManager));
   csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -936,27 +929,28 @@ bool csSaver::SaveSettings (iDocumentNode* node)
   csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
     iThingEnvironment);
   int cellsize = te->GetLightmapCellSize ();
+  csRef<iDocumentNode> lghtmapcellNode = CreateNode(settingsNode, "lightmapcellsize");
   lghtmapcellNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(cellsize);
-//case XMLTOKEN_MAXLIGHTMAPSIZE:
-  csRef<iDocumentNode> maxlghtmapNode = CreateNode(settingsNode, "maxlightmapsize");
+
   int max[2];
   engine->GetMaxLightmapSize(max[0], max[1]);
+  csRef<iDocumentNode> maxlghtmapNode = CreateNode(settingsNode, "maxlightmapsize");
   maxlghtmapNode->SetAttributeAsInt ("horizontal", max[0]);
   maxlghtmapNode->SetAttributeAsInt ("vertical"  , max[1]);
-//case XMLTOKEN_AMBIENT:
+
   csRef<iDocumentNode> ambientNode = CreateNode(settingsNode, "ambient");
   csColor c;
   engine->GetAmbientLight(c);
   synldr->WriteColor(ambientNode, &c);
 
 #ifndef CS_USE_OLD_RENDERER
-//case XMLTOKEN_RENDERLOOP:
   iRenderLoop* renderloop = engine->GetCurrentDefaultRenderloop();
   const char* loopName = engine->GetRenderLoopManager()->GetName(renderloop);
-  CreateNode(settingsNode, "renderloop")
-    ->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(loopName);
-
+  if (strcmp (loopName, CS_DEFAULT_RENDERLOOP_NAME))
+    CreateNode(settingsNode, "renderloop")
+      ->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(loopName);
 #endif
+
   return true;
 }
 
@@ -1050,19 +1044,9 @@ csRef<iString> csSaver::SaveMapFile()
     csPtr<iDocumentSystem>(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
   csRef<iDocumentNode> root = doc->CreateRoot();
-  csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  parent->SetValue("world");
-
-  if (!SaveTextures(parent)) return 0;
-  if (!SaveVariables(parent)) return 0;
-  if (!SaveShaders(parent)) return 0;
-  if (!SaveMaterials(parent)) return 0;
-  if (!SaveSettings(parent)) return 0;
-  if (!SaveRenderPriorities(parent)) return 0;
-  if (!SaveMeshFactories(engine->GetMeshFactories(), parent)) return 0;
-  if (!SaveSectors(parent)) return 0;
-  if (!SaveSequence(parent)) return 0;
-  if (!SaveTriggers(parent)) return 0;
+  
+  if (!SaveMapFile (root))
+    return 0;
 
   iString* str = new scfString();
   if (doc->Write(str) != 0)
@@ -1091,16 +1075,16 @@ bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
   csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   parent->SetValue("world");
 
-  if (!SaveTextures(parent)) return 0;
-  if (!SaveVariables(parent)) return 0;
-  if (!SaveShaders(parent)) return 0;
-  if (!SaveMaterials(parent)) return 0;
-  if (!SaveSettings(parent)) return 0;
-  if (!SaveRenderPriorities(parent)) return 0;
-  if (!SaveMeshFactories(engine->GetMeshFactories(), parent)) return 0;
-  if (!SaveSectors(parent)) return 0;
-  if (!SaveSequence(parent)) return 0;
-  if (!SaveTriggers(parent)) return 0;
+  if (!SaveTextures(parent)) return false;
+  if (!SaveVariables(parent)) return false;
+  if (!SaveShaders(parent)) return false;
+  if (!SaveMaterials(parent)) return false;
+  if (!SaveSettings(parent)) return false;
+  if (!SaveRenderPriorities(parent)) return false;
+  if (!SaveMeshFactories(engine->GetMeshFactories(), parent)) return false;
+  if (!SaveSectors(parent)) return false;
+  if (!SaveSequence(parent)) return false;
+  if (!SaveTriggers(parent)) return false;
 
   return true;
 }

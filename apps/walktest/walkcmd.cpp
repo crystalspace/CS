@@ -63,6 +63,7 @@
 #include "iengine/sharevar.h"
 #include "imesh/object.h"
 #include "imap/parser.h"
+#include "imap/saver.h"
 
 #include "ivaria/mapnode.h"
 
@@ -70,7 +71,6 @@ extern WalkTest* Sys;
 
 csString LookForKeyValue(iObjectIterator* it,const char* key);
 double ParseScaleFactor(iObjectIterator* it);
-
 
 // Use a view's clipping rect to calculate a bounding box
 void BoundingBoxForView(iView *view, csBox2 *box)
@@ -1055,6 +1055,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  snd_play snd_volume record play playonce clrrec saverec");
     CONPRI("  loadrec action plugins conflist confset do_logo");
     CONPRI("  varlist var setvar setvarv setvarc");
+    CONPRI("  saveworld");
 
 #   undef CONPRI
   }
@@ -2380,6 +2381,36 @@ bool CommandHandler (const char *cmd, const char *arg)
     Sys->view->GetCamera()->SetFarPlane(&farplane);
     // turn on zclear to be sure
     Sys->Engine->SetClearZBuf(true);
+  }
+  else if (!strcasecmp (cmd, "saveworld"))
+  {
+    if (!arg)
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "saveworld: Excepted VFS file path.");
+      return true;
+    }
+    if (Sys->myVFS->Exists (arg))
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
+        "saveworld: Specified file `%s' already exists.", arg);
+      return true;
+    }
+    csRef<iSaver> saver = CS_QUERY_REGISTRY(Sys->object_reg, iSaver);
+    if (!saver.IsValid ())
+    {
+      saver = CS_LOAD_PLUGIN(Sys->plugin_mgr, "crystalspace.level.saver", iSaver);
+      if (!saver.IsValid ())
+      {
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+          "saveworld: Unable to load crystalspace.level.saver plugin!");
+        return true;
+      }
+      Sys->object_reg->Register (saver, "iSaver");
+    }
+    if (saver->SaveMapFile (arg))
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "saveworld: Saved world to `%s'", arg);
+    else
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "saveworld: Error saving map file!");
   }
   else
     return false;

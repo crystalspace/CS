@@ -65,6 +65,7 @@ const char *csKeyValuePair::GetValue () const
 void csKeyValuePair::SetValue (const char* value)
 {
   values.PutUnique ("value", value);
+  names.Add ("value");
   m_Value = values.Get ("value", 0);
 }
 
@@ -75,5 +76,18 @@ void csKeyValuePair::SetValue (const char* vname, const char* value)
   else
   {
     values.PutUnique (vname, value);
+    names.Add (vname);
   }
+}
+
+csArray<const char*> csKeyValuePair::GetValueNames () const
+{
+  csArray<const char*> ret (names.GetSize ());
+  csSet<csStrKey, csConstCharHashKeyHandler>::GlobalIterator it = names.GetIterator ();
+  size_t i = 0;
+  while (it.HasNext ())
+  {
+    ret.Put (i++, csStrNew (it.Next ()));
+  }
+  return ret;
 }
