@@ -61,8 +61,19 @@ static struct
   int displayW, displayH;
   int mipmap;
   bool transp;
-  RGBPixel transpcolor;
-} opt;
+} opt =
+{
+  false,
+  true,
+  false,
+  false,
+  0, 0,
+  79, 24,
+  -1,
+  false
+};
+// Dont move inside the struct!
+static RGBPixel transpcolor;
 
 static int display_help ()
 {
@@ -169,7 +180,7 @@ static bool process_file (const char *fname)
   {
     printf ("Creating mipmap level %d from image\n", opt.mipmap);
     iImage *ifile2 = ifile->MipMap (opt.mipmap,
-      opt.transp ? &opt.transpcolor : NULL);
+      opt.transp ? &transpcolor : NULL);
     ifile->DecRef ();
     ifile = ifile2;
     sprintf (strchr (suffix, 0), "-m%d", opt.mipmap);
@@ -196,24 +207,37 @@ static bool process_file (const char *fname)
 #endif
   }
 
+  if (opt.display)
+  {
+    static char imgchr [] = " .,;+*oO";
+    ifile->Resize (opt.displayW, opt.displayH);
+    RGBPixel *rgb;
+    UByte *idx = NULL;
+    bool truecolor = (ifile->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR;
+    if (truecolor)
+      rgb = (RGBPixel *)ifile->GetImageData ();
+    else
+    {
+      idx = (UByte *)ifile->GetImageData ();
+      rgb = ifile->GetPalette ();
+    }
+    for (int y = 0; y < opt.displayH; y++)
+    {
+      for (int x = 0; x < opt.displayW; x++)
+      {
+        RGBPixel &src = truecolor ? *rgb++ : rgb [*idx++];
+        int gray = int (sqrt (src.red * src.red + src.green * src.green +
+          src.blue * src.blue) * 8 / 442);
+        putc (imgchr [gray], stdout);
+      }
+      putc ('\n', stdout);
+    }
+  }
+
   // Destroy the image object
   ifile->DecRef ();
 
   return true;
-}
-
-static void init_opts()
-{
-  opt.verbose = false;
-  opt.save = true;
-  opt.display = false;
-  opt.paletted = false;
-  opt.scaleX = 0;
-  opt.scaleY = 0;
-  opt.displayW = 80;
-  opt.displayH = 24;
-  opt.mipmap = -1;
-  opt.transp = false;
 }
 
 int main (int argc, char **argv)
@@ -222,7 +246,6 @@ int main (int argc, char **argv)
   _wildcard (&argc, &argv);
 #endif
 
-  init_opts();
   programname = argv [0];
 
   int c;
@@ -261,9 +284,9 @@ int main (int argc, char **argv)
           printf ("%s: expecting <R>,<G>,<B> after -t\n", programname);
           return -1;
         }
-        opt.transpcolor.red   = r > 255 ? 255 : r < 0 ? 0 : r;
-        opt.transpcolor.green = g > 255 ? 255 : g < 0 ? 0 : g;
-        opt.transpcolor.blue  = b > 255 ? 255 : b < 0 ? 0 : b;
+        transpcolor.red   = r > 255 ? 255 : r < 0 ? 0 : r;
+        transpcolor.green = g > 255 ? 255 : g < 0 ? 0 : g;
+        transpcolor.blue  = b > 255 ? 255 : b < 0 ? 0 : b;
         break;
       }
       case 'm':
