@@ -1,14 +1,14 @@
 skin "Normal Windows"
 {
   Texture: 		"/aws/texture.png"
-  HighlightColor: 	220,220,220
-  ShadowColor:    	128,128,128
-  FillColor:      	164,164,164
+  HighlightColor: 	230,230,230
+  ShadowColor:    	60,60,60
+  FillColor:      	200,200,200
   TextDisabledColor:	128,128,0
   TextForeColor:	0,0,0
   TextBackColor:        255,255,255
   ButtonTextColor:	0,0,192
-  OverlayTextureAlpha:	96
+  OverlayTextureAlpha:	128
   WindowMin:		"/aws/minimize.png"
   WindowZoom:		"/aws/zoom.png"
   WindowClose:		"/aws/close.png"
@@ -225,7 +225,7 @@ window "Another"
   component "Users" is "List Box"
   {
     Frame: (100, 210) - (385, 300)
-    Style: lbfsSunken
+    Style: lbfsRaised
     Highlight: "/aws/lbhi.png"
     Columns: 3
     DefaultSortCOl: 0
