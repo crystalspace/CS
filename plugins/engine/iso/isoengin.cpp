@@ -70,12 +70,9 @@ void csIsoEngine::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.engine.iso", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -90,8 +87,6 @@ csIsoEngine::csIsoEngine (iBase *iParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   scfiEventHandler = NULL;
   object_reg = NULL;
-  g2d = NULL;
-  g3d = NULL;
   txtmgr = NULL;
   world = NULL;
 }
@@ -100,17 +95,13 @@ csIsoEngine::~csIsoEngine ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
   materials.scfiMaterialList.RemoveAll ();
   meshfactories.scfiMeshFactoryList.RemoveAll();
-  if (g3d) g3d->DecRef();
 }
 
 bool csIsoEngine::Initialize (iObjectRegistry* p)
@@ -119,12 +110,9 @@ bool csIsoEngine::Initialize (iObjectRegistry* p)
   // Tell system driver that we want to handle broadcast events
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-    q->DecRef ();
-  }
   return true;
 }
 
@@ -332,8 +320,8 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
 iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory(const char* classId,
     const char *name)
 {
-  iMeshObjectFactory *mesh_fact;
-  iMeshObjectType *mesh_type;
+  csRef<iMeshObjectFactory> mesh_fact;
+  csRef<iMeshObjectType> mesh_type;
 
   if (name)
   {
@@ -343,12 +331,12 @@ iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory(const char* classId,
       return wrap;
   }
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   mesh_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, classId, iMeshObjectType);
 
   if(!mesh_type)
     mesh_type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
-  plugin_mgr->DecRef ();
   if(!mesh_type)
     return NULL;
 
@@ -359,16 +347,12 @@ iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory(const char* classId,
     //AddMeshFactory (mesh_fact, name);
     //mesh_fact->DecRef ();
     wrap = new csIsoMeshFactoryWrapper (mesh_fact);
-    iObject* obj = SCF_QUERY_INTERFACE (wrap, iObject);
+    csRef<iObject> obj (SCF_QUERY_INTERFACE (wrap, iObject));
     obj->SetName (name);
-    obj->DecRef ();
     meshfactories.scfiMeshFactoryList.Add (&(wrap->scfiMeshFactoryWrapper));
     wrap->DecRef ();
-    mesh_fact->DecRef();
-    mesh_type->DecRef ();
     return &(wrap->scfiMeshFactoryWrapper);
   }
-  mesh_type->DecRef ();
   return NULL;
 }
 

@@ -42,11 +42,11 @@ private:
   /// The shared-object registry.
   iObjectRegistry* Registry;
   /// The shared keyboard driver.
-  iKeyboardDriver* KeyboardDriver;
+  csRef<iKeyboardDriver> KeyboardDriver;
   /// The shared mouse driver.
-  iMouseDriver* MouseDriver;
+  csRef<iMouseDriver> MouseDriver;
   /// The shared joystick driver.
-  iJoystickDriver* JoystickDriver;
+  csRef<iJoystickDriver> JoystickDriver;
 
   iKeyboardDriver* GetKeyboardDriver();
   iMouseDriver*    GetMouseDriver();

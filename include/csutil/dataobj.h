@@ -47,9 +47,8 @@ public:
    */
   static void* GetData (iObject* obj)
   {
-    iDataObject *d = CS_GET_CHILD_OBJECT (obj, iDataObject);
+    csRef<iDataObject> d (CS_GET_CHILD_OBJECT (obj, iDataObject));
     void *res = (d ? d->GetData () : NULL);
-    if (d) d->DecRef ();
     return res;
   }
 

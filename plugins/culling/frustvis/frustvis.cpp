@@ -147,7 +147,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
   CalculateVisObjBBox (visobj, bbox);
   visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
 
-  iMeshWrapper* mesh = SCF_QUERY_INTERFACE (visobj, iMeshWrapper);
+  csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (visobj, iMeshWrapper));
   visobj_wrap->mesh = mesh;
   if (mesh)
   {

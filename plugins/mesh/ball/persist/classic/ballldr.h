@@ -39,9 +39,8 @@ struct iFile;
 class csBallFactoryLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iReporter* reporter;
+  csRef<iReporter> reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -77,8 +76,7 @@ public:
 class csBallFactorySaver : public iSaverPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
+  csRef<iReporter> reporter;
   iObjectRegistry* object_reg;
 
 public:
@@ -110,10 +108,9 @@ public:
 class csBallLoader : public iLoaderPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService *synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
 public:
@@ -150,10 +147,9 @@ public:
 class csBallSaver : public iSaverPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService *synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;

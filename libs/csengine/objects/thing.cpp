@@ -4064,9 +4064,8 @@ iPolygon3D *csThing::ThingState::CreatePolygon (const char *iName)
   if (iName) p->SetName (iName);
   scfParent->AddPolygon (p);
 
-  iPolygon3D *ip = SCF_QUERY_INTERFACE (p, iPolygon3D);
-  p->DecRef ();
-  return ip;
+  csRef<iPolygon3D> ip (SCF_QUERY_INTERFACE (p, iPolygon3D));
+  return ip;	// DecRef is ok here.
 }
 
 int csThing::ThingState::GetPortalCount () const
@@ -4179,11 +4178,9 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
 csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
 {
   csThing *cm = new csThing (this);
-  iMeshObjectFactory *ifact = SCF_QUERY_INTERFACE (
-      cm,
-      iMeshObjectFactory);
-  ifact->DecRef ();
-  return csPtr<iMeshObjectFactory> (ifact);
+  csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (
+      cm, iMeshObjectFactory));
+  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
 }
 
 csPtr<iPolyTxtPlane> csThingObjectType::CreatePolyTxtPlane (const char *name)
@@ -4217,9 +4214,8 @@ iCurveTemplate *csThingObjectType::FindCurveTemplate (const char *iName)
   pl = (csCurveTemplate *)curve_templates.FindByName (iName);
   if (!pl) return NULL;
 
-  iCurveTemplate *itmpl = SCF_QUERY_INTERFACE (pl, iCurveTemplate);
-  itmpl->DecRef ();
-  return itmpl;
+  csRef<iCurveTemplate> itmpl (SCF_QUERY_INTERFACE (pl, iCurveTemplate));
+  return itmpl;	// DecRef is ok here.
 }
 
 void csThingObjectType::RemovePolyTxtPlane (iPolyTxtPlane *pl)

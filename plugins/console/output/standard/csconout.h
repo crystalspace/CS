@@ -188,12 +188,12 @@ private:
 
   csConsoleBuffer *buffer;
   bool transparent, do_snap;
-  iGraphics2D *G2D;
-  iGraphics3D *G3D;
+  csRef<iGraphics2D> G2D;
+  csRef<iGraphics3D> G3D;
   iObjectRegistry *object_reg;
   csRect size, invalid;
   int cursor, cx, cy;
-  iFont *font;
+  csRef<iFont> font;
   csTicks flash_time, flash_interval;
   bool cursor_visible;
   bool clear_input;

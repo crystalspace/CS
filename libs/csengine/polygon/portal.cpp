@@ -68,11 +68,9 @@ iReferencedObject *csPortal::GetReferencedObject () const
 {
   if (!sector) return NULL;
 
-  iReferencedObject *refobj = SCF_QUERY_INTERFACE (
-      sector,
-      iReferencedObject);
-  refobj->DecRef ();
-  return refobj;
+  csRef<iReferencedObject> refobj (SCF_QUERY_INTERFACE (
+      sector, iReferencedObject));
+  return refobj;	// DecRef is ok here.
 }
 
 void csPortal::SetReferencedObject (iReferencedObject *b)

@@ -80,7 +80,7 @@ void csFancyConsole::Report (int severity, const char* msg, ...)
 }
 
 csFancyConsole::csFancyConsole (iBase *p) :
-  object_reg(0), VFS(0), base(0), G2D(0), G3D(0), ImageLoader(NULL), border_computed(false),
+  object_reg(0), border_computed(false),
   pix_loaded(false), system_ready(false), auto_update(true), visible(true)
 {
   SCF_CONSTRUCT_IBASE (p);
@@ -97,16 +97,6 @@ csFancyConsole::~csFancyConsole ()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
-  if (ImageLoader)
-    ImageLoader->DecRef();
-  if (G2D)
-    G2D->DecRef ();
-  if (G3D)
-    G3D->DecRef ();
-  if (base)
-    base->DecRef ();
-  if (VFS)
-    VFS->DecRef ();
 }
 
 bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
@@ -130,7 +120,6 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
   if (!G3D)
     return false;
   G2D = G3D->GetDriver2D ();
-  G2D->IncRef ();
 
   ImageLoader = NULL;
 

@@ -47,21 +47,15 @@ public:
   long shape_number;	// Last used shape_number from model.
 
   // Optional data for shadows. Both fields can be NULL.
-  iMeshWrapper* mesh;
-  iShadowCaster* caster;
-  iShadowReceiver* receiver;
+  csRef<iMeshWrapper> mesh;
+  csRef<iShadowCaster> caster;
+  csRef<iShadowReceiver> receiver;
 
   csFrustVisObjectWrapper ()
   {
-    mesh = NULL;
-    caster = NULL;
-    receiver = NULL;
   }
   ~csFrustVisObjectWrapper ()
   {
-    if (mesh) mesh->DecRef ();
-    if (caster) caster->DecRef ();
-    if (receiver) receiver->DecRef ();
   }
 
   void MarkVisible ()

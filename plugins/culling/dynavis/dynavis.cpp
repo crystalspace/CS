@@ -96,7 +96,6 @@ csDynaVis::csDynaVis (iBase *iParent)
   debug_camera = NULL;
   model_mgr = new csObjectModelManager ();
   write_queue = new csWriteQueue ();
-  bugplug = NULL;
 
   stats_cnt_vistest = 0;
   stats_total_vistest_time = 0;
@@ -129,7 +128,6 @@ csDynaVis::~csDynaVis ()
   delete tcovbuf;
   delete model_mgr;
   delete write_queue;
-  if (bugplug) bugplug->DecRef ();
 }
 
 bool csDynaVis::Initialize (iObjectRegistry *object_reg)
@@ -199,7 +197,7 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   CalculateVisObjBBox (visobj, bbox);
   visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
 
-  iMeshWrapper* mesh = SCF_QUERY_INTERFACE (visobj, iMeshWrapper);
+  csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (visobj, iMeshWrapper));
   visobj_wrap->mesh = mesh;
   if (mesh)
   {
@@ -1416,10 +1414,11 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
   csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
   if (dbghelp)
   {
-    iString* rc = dbghelp->UnitTest ();
+    csRef<iString> rc (dbghelp->UnitTest ());
     if (rc)
     {
       delete kdtree;
+      rc->IncRef ();	// To prevent smart pointer release.
       return csPtr<iString> (rc);
     }
   }
@@ -1429,10 +1428,11 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
   dbghelp = SCF_QUERY_INTERFACE (covbuf, iDebugHelper);
   if (dbghelp)
   {
-    iString* rc = dbghelp->UnitTest ();
+    csRef<iString> rc (dbghelp->UnitTest ());
     if (rc)
     {
       delete covbuf;
+      rc->IncRef ();	// To prevent smart pointer release.
       return csPtr<iString> (rc);
     }
   }
@@ -1442,10 +1442,11 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
   dbghelp = SCF_QUERY_INTERFACE (tcovbuf, iDebugHelper);
   if (dbghelp)
   {
-    iString* rc = dbghelp->UnitTest ();
+    csRef<iString> rc (dbghelp->UnitTest ());
     if (rc)
     {
       delete tcovbuf;
+      rc->IncRef ();	// To prevent smart pointer release.
       return csPtr<iString> (rc);
     }
   }
@@ -1483,14 +1484,12 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 
     iGraphics2D* g2d = g3d->GetDriver2D ();
     iFontServer* fntsvr = g2d->GetFontServer ();
-    iFont* fnt = NULL;
+    csRef<iFont> fnt;
     if (fntsvr)
     {
-      fnt = fntsvr->GetFont (0);
+      fnt = csPtr<iFont> (fntsvr->GetFont (0));
       if (fnt == NULL)
-      {
         fnt = fntsvr->LoadFont (CSFONT_COURIER);
-      }
     }
 
     iTextureManager* txtmgr = g3d->GetTextureManager ();

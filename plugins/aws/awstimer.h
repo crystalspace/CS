@@ -38,7 +38,7 @@ protected:
 
   csTicks start, nTicks;
 
-  iVirtualClock *vc;
+  csRef<iVirtualClock> vc;
   iObjectRegistry *object_reg;
 
   // try to set up everything needed

@@ -79,10 +79,7 @@ csConsoleOutput::csConsoleOutput (iBase *base)
   system_ready = false;
   visible = true;
   Client = NULL;
-  G3D = NULL;
-  G2D = NULL;
   // clear font for closedown
-  font = NULL;
   object_reg = NULL;
 }
 
@@ -95,12 +92,6 @@ csConsoleOutput::~csConsoleOutput ()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
-  if (font)
-    font->DecRef ();
-  if (G2D)
-    G2D->DecRef ();
-  if (G3D)
-    G3D->DecRef ();
   delete buffer;
 }
 
@@ -110,7 +101,6 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!G3D) return false;
   G2D = G3D->GetDriver2D ();
-  G2D->IncRef ();
 
   // Initialize the display rectangle to the entire display
   size.Set (0, 0, G2D->GetWidth () - 1, G2D->GetHeight () - 1);

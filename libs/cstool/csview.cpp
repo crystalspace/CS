@@ -36,8 +36,6 @@ csView::csView (iEngine *e, iGraphics3D* ig3d) :
 {
   SCF_CONSTRUCT_IBASE (NULL);
 
-  G3D->IncRef ();
-  Engine->IncRef ();
   Camera = e->CreateCamera ();
 
   OldWidth = G3D->GetWidth ();
@@ -46,9 +44,6 @@ csView::csView (iEngine *e, iGraphics3D* ig3d) :
 
 csView::~csView ()
 {
-  if (Camera) Camera->DecRef ();
-  Engine->DecRef ();
-  G3D->DecRef ();
   delete RectView;
   delete PolyView;
   delete Clipper;
@@ -61,8 +56,6 @@ iEngine* csView::GetEngine ()
 
 void csView::SetEngine (iEngine* e)
 {
-  if (e) e->IncRef ();
-  if (Engine) Engine->DecRef ();
   Engine = e;
 }
 
@@ -73,8 +66,6 @@ iCamera *csView::GetCamera ()
 
 void csView::SetCamera (iCamera* c)
 {
-  if (c) c->IncRef ();
-  if (Camera) Camera->DecRef ();
   Camera = c;
 }
 
@@ -85,8 +76,6 @@ iGraphics3D* csView::GetContext ()
 
 void csView::SetContext (iGraphics3D *ig3d)
 {
-  if (ig3d) ig3d->IncRef ();
-  if (G3D) G3D->DecRef ();
   G3D = ig3d;
 }
 

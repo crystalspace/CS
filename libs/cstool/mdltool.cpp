@@ -196,7 +196,7 @@ static void DumpVertices (iModelDataVertices *vframe,
  * The input vertex frames must contain the same amount elements of each
  * type (vertices, normals, colors, texels).
  */
-static iModelDataVertices *InterpolateVertices (iModelDataVertices *v1,
+static csPtr<iModelDataVertices> InterpolateVertices (iModelDataVertices *v1,
   iModelDataVertices *v2, float Position)
 {
   iModelDataVertices *ver = new csModelDataVertices ();
@@ -215,7 +215,7 @@ static iModelDataVertices *InterpolateVertices (iModelDataVertices *v1,
     ver->AddTexel (v1->GetTexel (i) +
       (v2->GetTexel (i) - v1->GetTexel (i)) * Position);
 
-  return ver;
+  return csPtr<iModelDataVertices> (ver);
 }
 
 /*
@@ -287,34 +287,46 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
     if (n2 == 0) pf2 -= In2->GetTotalTime ();
 
     // current frame states
-    iModelDataVertices *Frame1, *Frame2;
+    csRef<iModelDataVertices> Frame1, Frame2;
     bool Hit1, Hit2;
     float CurrentTime;
 
-    if (ABS (nf2 - nf1) < EPSILON) {
+    if (ABS (nf2 - nf1) < EPSILON)
+    {
       Frame1 = SCF_QUERY_INTERFACE (In1->GetState (n1), iModelDataVertices);
       Frame2 = SCF_QUERY_INTERFACE (In2->GetState (n2), iModelDataVertices);
       CurrentTime = nf1;
       Hit1 = Hit2 = true;
-    } else {
-      iModelDataVertices *DirectFrame, *InterpFrameStart, *InterpFrameEnd;
+    }
+    else
+    {
+      csRef<iModelDataVertices> DirectFrame, InterpFrameStart, InterpFrameEnd;
       float InterpAmount;
       bool Swap;
 
-      if (nf1 < nf2) {
-        DirectFrame = SCF_QUERY_INTERFACE (In1->GetState (n1), iModelDataVertices);
-        InterpFrameStart = SCF_QUERY_INTERFACE (In2->GetState (prev2), iModelDataVertices);
-        InterpFrameEnd = SCF_QUERY_INTERFACE (In2->GetState (n2), iModelDataVertices);
+      if (nf1 < nf2)
+      {
+        DirectFrame = SCF_QUERY_INTERFACE (In1->GetState (n1),
+		iModelDataVertices);
+        InterpFrameStart = SCF_QUERY_INTERFACE (In2->GetState (prev2),
+		iModelDataVertices);
+        InterpFrameEnd = SCF_QUERY_INTERFACE (In2->GetState (n2),
+		iModelDataVertices);
         InterpAmount = (nf1-pf2) / (nf2-pf2);
         Swap = false;
 
         CurrentTime = nf1;
 	Hit1 = true;
 	Hit2 = false;
-      } else {
-        DirectFrame = SCF_QUERY_INTERFACE (In2->GetState (n2), iModelDataVertices);
-        InterpFrameStart = SCF_QUERY_INTERFACE (In1->GetState (prev1), iModelDataVertices);
-        InterpFrameEnd = SCF_QUERY_INTERFACE (In1->GetState (n1), iModelDataVertices);
+      }
+      else
+      {
+        DirectFrame = SCF_QUERY_INTERFACE (In2->GetState (n2),
+		iModelDataVertices);
+        InterpFrameStart = SCF_QUERY_INTERFACE (In1->GetState (prev1),
+		iModelDataVertices);
+        InterpFrameEnd = SCF_QUERY_INTERFACE (In1->GetState (n1),
+		iModelDataVertices);
         InterpAmount = (nf2-pf1) / (nf1-pf1);
         Swap = true;
 
@@ -323,35 +335,35 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
 	Hit2 = true;
       }
 
-      iModelDataVertices *InterpFrame =
-        InterpolateVertices (InterpFrameStart, InterpFrameEnd, InterpAmount);
-      InterpFrameStart->DecRef ();
-      InterpFrameEnd->DecRef ();
+      csRef<iModelDataVertices> InterpFrame (
+        InterpolateVertices (InterpFrameStart, InterpFrameEnd, InterpAmount));
 
-      if (Swap == false) {
+      if (Swap == false)
+      {
         Frame1 = DirectFrame;
 	Frame2 = InterpFrame;
-      } else {
+      }
+      else
+      {
 	Frame1 = InterpFrame;
         Frame2 = DirectFrame;
       }
     }
 
-    iModelDataVertices *MergedVertices =
-        new csModelDataVertices (Frame1, Frame2);
-    Frame1->DecRef ();
-    Frame2->DecRef ();
+    csRef<iModelDataVertices> MergedVertices (
+        csPtr<iModelDataVertices> (
+		new csModelDataVertices (Frame1, Frame2)));
 
     Out->AddFrame (CurrentTime, MergedVertices->QueryObject ());
-    MergedVertices->DecRef ();
 
-    if (Hit1) {
+    if (Hit1)
+    {
       n1++;
       if (n1 == In1->GetFrameCount ())
       { n1 = 0; tbase1 += In1->GetTotalTime (); }
     }
-
-    if (Hit2) {
+    if (Hit2)
+    {
       n2++;
       if (n2 == In2->GetFrameCount ())
       { n2 = 0; tbase2 += In2->GetTotalTime (); }
@@ -501,7 +513,8 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
 
   while (1)
   {
-    iModelDataAction *Action = CS_GET_CHILD_OBJECT (dest->QueryObject (), iModelDataAction);
+    csRef<iModelDataAction> Action (
+    	CS_GET_CHILD_OBJECT (dest->QueryObject (), iModelDataAction));
     if (!Action) break;
 
     ActionMap1.Push (Action);
@@ -511,14 +524,18 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
 
   while (1)
   {
-    iModelDataAction *Action = CS_GET_CHILD_OBJECT (src->QueryObject (), iModelDataAction);
+    csRef<iModelDataAction> Action (
+    	CS_GET_CHILD_OBJECT (src->QueryObject (), iModelDataAction));
     if (!Action) break;
 
     int n = ActionMap1.GetIndexByName (Action->QueryObject ()->GetName ());
-    if (n == -1) {
+    if (n == -1)
+    {
       ActionMap1.Push (NULL);
       ActionMap2.Push (Action);
-    } else {
+    }
+    else
+    {
       ActionMap2.Replace (n, Action);
     }
     src->QueryObject ()->ObjRemove (Action->QueryObject ());
@@ -572,18 +589,22 @@ void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,
   while (!it.IsFinished ())
   {
     iModelDataAction *OldAction = it.Get ();
-    iModelDataAction *NewAction = CS_GET_NAMED_CHILD_OBJECT (dest->QueryObject (),
-      iModelDataAction, OldAction->QueryObject ()->GetName ());
-    if (!NewAction) {
-      NewAction = new csModelDataAction ();
+    csRef<iModelDataAction> NewAction (
+    	CS_GET_NAMED_CHILD_OBJECT (dest->QueryObject (),
+	iModelDataAction, OldAction->QueryObject ()->GetName ()));
+    if (!NewAction)
+    {
+      NewAction = csPtr<iModelDataAction> (new csModelDataAction ());
       dest->QueryObject ()->ObjAdd (NewAction->QueryObject ());
       NewAction->QueryObject ()->SetName (OldAction->QueryObject ()->GetName ());
-    } else {
+    }
+    else
+    {
       while (NewAction->GetFrameCount () > 0)
         NewAction->DeleteFrame (0);
     }
 
-	int i;
+    int i;
     for (i=0; i<OldAction->GetFrameCount (); i++)
     {
       csRef<iModelDataVertices> oldver (
@@ -596,7 +617,6 @@ void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,
 	ver->DecRef ();
       }
     }
-    NewAction->DecRef ();
     it.Next ();
   }
 }
@@ -608,13 +628,13 @@ static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
   {
     iModelDataAction *Action = it.Get ();
 
-    iModelDataAction *Action2 = CS_GET_NAMED_CHILD_OBJECT (obj2->QueryObject (),
-      iModelDataAction, Action->QueryObject ()->GetName ());
+    csRef<iModelDataAction> Action2 (
+    	CS_GET_NAMED_CHILD_OBJECT (obj2->QueryObject (),
+	iModelDataAction, Action->QueryObject ()->GetName ()));
 
     if (Action2)
     {
       float time2 = Action2->GetTotalTime ();
-      Action2->DecRef ();
       if (MergeTimes (Action->GetTotalTime (), time2) < 0)
         return true;
     }
@@ -624,7 +644,8 @@ static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
   return false;
 }
 
-static bool CheckMaterialConflict (iModelDataObject *obj1, iModelDataObject *obj2)
+static bool CheckMaterialConflict (iModelDataObject *obj1,
+	iModelDataObject *obj2)
 {
   csModelDataMaterialVector mat1, mat2;
 
@@ -807,12 +828,11 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
 
 #define CS_MDLTOOL_TRY_BEGIN(obj,t)				\
   {								\
-    t *Object = SCF_QUERY_INTERFACE (obj, t);		\
+    csRef<t> Object (SCF_QUERY_INTERFACE (obj, t));		\
     if (Object) {						\
       typestring = #t;
 
 #define CS_MDLTOOL_TRY_END					\
-      Object->DecRef ();					\
     }								\
   }
 
@@ -930,9 +950,8 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
     if (Polygon)
       Polygons.Push (Polygon);
 
-    // @@@ MEMORY LEAK!!!???
-    iModelDataAction *Action =
-      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataAction);
+    csRef<iModelDataAction> Action (
+      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataAction));
     if (Action)
     {
       for (i=0; i<Action->GetFrameCount (); i++)

@@ -68,7 +68,7 @@ protected:
   iAwsComponent* above;
 
   /// The layout manager for this component (if one exists)
-  iAwsLayoutManager *layout;
+  csRef<iAwsLayoutManager> layout;
 
   /// The rectangle marking the frame of this component
   csRect frame;

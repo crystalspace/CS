@@ -176,14 +176,14 @@ class csLoader : public iLoader
 {
   friend class StdLoaderContext;
 private:
-  iLoaderContext* ldr_context;
+  csRef<iLoaderContext> ldr_context;
   iLoaderContext* GetLoaderContext ();
   csStringHash xmltokens;
 
   /// the current parser
   csParser parser;
   /// Parser for common stuff like MixModes
-  iSyntaxService* SyntaxService;
+  csRef<iSyntaxService> SyntaxService;
 
   class csLoaderStats
   {
@@ -505,25 +505,24 @@ public:
 
   // system driver
   iObjectRegistry* object_reg;
-  iPluginManager* plugin_mgr;
   // virtual file system
-  iVFS *VFS;
+  csRef<iVFS> VFS;
   // The error reporter
-  iReporter* Reporter;
+  csRef<iReporter> Reporter;
   // image loader
-  iImageIO *ImageLoader;
+  csRef<iImageIO> ImageLoader;
   // sound loader
-  iSoundLoader *SoundLoader;
+  csRef<iSoundLoader> SoundLoader;
   // engine
-  iEngine *Engine;
+  csRef<iEngine> Engine;
   // graphics renderer
-  iGraphics3D *G3D;
+  csRef<iGraphics3D> G3D;
   // sound renderer
-  iSoundRender *SoundRender;
+  csRef<iSoundRender> SoundRender;
   // model converter
-  iModelConverter *ModelConverter;
+  csRef<iModelConverter> ModelConverter;
   // crossbuilder
-  iCrossBuilder *CrossBuilder;
+  csRef<iCrossBuilder> CrossBuilder;
 
   // constructor
   csLoader(iBase *p);
@@ -537,7 +536,7 @@ public:
   virtual csPtr<iImage> LoadImage (const char *fname, int Format);
   virtual csPtr<iTextureHandle> LoadTexture (const char* fname,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL);
-  virtual csPtr<iTextureWrapper> LoadTexture (const char *name,
+  virtual iTextureWrapper* LoadTexture (const char *name,
   	const char *fname,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL,
 	bool reg = false);

@@ -340,72 +340,51 @@ bool csRegion::Region::Prepare ()
 
 iSector *csRegion::Region::FindSector (const char *iName)
 {
-  iSector *sector = CS_GET_NAMED_CHILD_OBJECT (
-      scfParent,
-      iSector,
-      iName);
-  if (sector) sector->DecRef ();
-  return sector;
+  csRef<iSector> sector (CS_GET_NAMED_CHILD_OBJECT (
+      scfParent, iSector, iName));
+  return sector;	// DecRef is ok here.
 }
 
 iMeshWrapper *csRegion::Region::FindMeshObject (const char *iName)
 {
-  iMeshWrapper *m = CS_GET_NAMED_CHILD_OBJECT (
-      scfParent,
-      iMeshWrapper,
-      iName);
-  if (m) m->DecRef ();
-  return m;
+  csRef<iMeshWrapper> m (CS_GET_NAMED_CHILD_OBJECT (
+      scfParent, iMeshWrapper, iName));
+  return m;	// DecRef is ok here.
 }
 
 iMeshFactoryWrapper *csRegion::Region::FindMeshFactory (const char *iName)
 {
-  iMeshFactoryWrapper *mf = CS_GET_NAMED_CHILD_OBJECT (
-      scfParent,
-      iMeshFactoryWrapper,
-      iName);
-  if (mf) mf->DecRef ();
-  return mf;
+  csRef<iMeshFactoryWrapper> mf (CS_GET_NAMED_CHILD_OBJECT (
+      scfParent, iMeshFactoryWrapper, iName));
+  return mf;	// DecRef is ok here.
 }
 
 iTextureWrapper *csRegion::Region::FindTexture (const char *iName)
 {
-  iTextureWrapper *t = CS_GET_NAMED_CHILD_OBJECT (
-      scfParent,
-      iTextureWrapper,
-      iName);
-  if (t) t->DecRef ();
-  return t;
+  csRef<iTextureWrapper> t (CS_GET_NAMED_CHILD_OBJECT (
+      scfParent, iTextureWrapper, iName));
+  return t;	// DecRef is ok here.
 }
 
 iMaterialWrapper *csRegion::Region::FindMaterial (const char *iName)
 {
-  iMaterialWrapper *m = CS_GET_NAMED_CHILD_OBJECT (
-      scfParent,
-      iMaterialWrapper,
-      iName);
-  if (m) m->DecRef ();
-  return m;
+  csRef<iMaterialWrapper> m (CS_GET_NAMED_CHILD_OBJECT (
+      scfParent, iMaterialWrapper, iName));
+  return m;	// DecRef is ok here.
 }
 
 iCameraPosition *csRegion::Region::FindCameraPosition (const char *iName)
 {
-  iCameraPosition *cp = CS_GET_NAMED_CHILD_OBJECT (
-      scfParent,
-      iCameraPosition,
-      iName);
-  if (cp) cp->DecRef ();
-  return cp;
+  csRef<iCameraPosition> cp (CS_GET_NAMED_CHILD_OBJECT (
+      scfParent, iCameraPosition, iName));
+  return cp;	// DecRef is ok here.
 }
 
 iCollection *csRegion::Region::FindCollection (const char *iName)
 {
-  iCollection *col = CS_GET_NAMED_CHILD_OBJECT (
-      scfParent,
-      iCollection,
-      iName);
-  if (col) col->DecRef ();
-  return col;
+  csRef<iCollection> col (CS_GET_NAMED_CHILD_OBJECT (
+      scfParent, iCollection, iName));
+  return col;	// DecRef is ok here.
 }
 
 bool csRegion::IsInRegion (iObject *iobj)

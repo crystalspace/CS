@@ -107,13 +107,7 @@ csBugPlug::csBugPlug (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBugPlug);
-  Engine = NULL;
-  plugin_mgr = NULL;
   object_reg = NULL;
-  G3D = NULL;
-  G2D = NULL;
-  Conout = NULL;
-  VFS = NULL;
   mappings = NULL;
   visculler = NULL;
   process_next_key = false;
@@ -163,11 +157,6 @@ csBugPlug::~csBugPlug ()
     if (Engine) shadow->RemoveFromEngine (Engine);
     delete shadow;
   }
-  if (plugin_mgr) plugin_mgr->DecRef ();
-  if (Engine) Engine->DecRef ();
-  if (G3D) G3D->DecRef ();
-  if (Conout) Conout->DecRef ();
-  if (VFS) VFS->DecRef ();
   while (mappings)
   {
     csKeyMap* n = mappings->next;
@@ -191,7 +180,8 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   {
     scfiEventHandler = new EventHandler (this);
   }
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+    CS_QUERY_REGISTRY (object_reg, iPluginManager));
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
     q->RegisterListener (scfiEventHandler,
@@ -1057,7 +1047,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
     iFontServer* fntsvr = G2D->GetFontServer ();
     CS_ASSERT (fntsvr != NULL);
-    iFont* fnt = fntsvr->GetFont (0);
+    csRef<iFont> fnt (fntsvr->GetFont (0));
     if (fnt == NULL)
     {
       fnt = fntsvr->LoadFont (CSFONT_COURIER);
@@ -1084,7 +1074,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
     iFontServer* fntsvr = G2D->GetFontServer ();
     CS_ASSERT (fntsvr != NULL);
-    iFont* fnt = fntsvr->GetFont (0);
+    csRef<iFont> fnt (fntsvr->GetFont (0));
     if (fnt == NULL)
     {
       fnt = fntsvr->LoadFont (CSFONT_COURIER);

@@ -49,7 +49,7 @@ CS_TOKEN_DEF_END
 
 struct PrsHeightMapData : public iGenerateImageFunction
 {
-  iImage* im;
+  csRef<iImage> im;
   int iw, ih;	// Image width and height.
   float w, h;	// Image width and height.
   csRGBpixel* p;
@@ -57,13 +57,12 @@ struct PrsHeightMapData : public iGenerateImageFunction
   bool slope;
   SCF_DECLARE_IBASE;
 
-  PrsHeightMapData (bool s) : im (NULL), slope (s)
+  PrsHeightMapData (bool s) : slope (s)
   {
     SCF_CONSTRUCT_IBASE (NULL);
   }
   virtual ~PrsHeightMapData ()
   {
-    if (im) im->DecRef ();
   }
   float GetHeight (float dx, float dy);
   float GetSlope (float dx, float dy);
@@ -158,7 +157,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (char* buf)
 	  char heightmap[255];
 	  float hscale, hshift;
           csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
-	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
+	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
 	  if (!img) return NULL;
 	  PrsHeightMapData* data = new PrsHeightMapData (false);
   	  data->im = img;
@@ -180,7 +179,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (char* buf)
 	  char heightmap[255];
 	  float hscale, hshift;
           csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
-	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
+	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
 	  if (!img) return NULL;
 	  PrsHeightMapData* data = new PrsHeightMapData (true);
   	  data->im = img;
@@ -257,7 +256,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (char* buf)
           csScanStr (params, "%s,%f,%f,%f,%f",
 		imagename, &scale.x, &scale.y,
 		&offset.x, &offset.y);
-	  iImage* img = LoadImage (imagename, CS_IMGFMT_TRUECOLOR);
+	  csRef<iImage> img (LoadImage (imagename, CS_IMGFMT_TRUECOLOR));
 	  if (!img) return NULL;
 	  csGenerateImageTextureSingle* ts =
 	  	new csGenerateImageTextureSingle ();
@@ -447,7 +446,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	  if (shiftnode)
 	    hshift = shiftnode->GetContentsValueAsFloat ();
 
-	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
+	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
 	  if (!img) return NULL;
 	  PrsHeightMapData* data = new PrsHeightMapData (false);
   	  data->im = img;
@@ -481,7 +480,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	  csRef<iDocumentNode> shiftnode = child->GetNode ("shift");
 	  if (shiftnode)
 	    hshift = shiftnode->GetContentsValueAsFloat ();
-	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
+	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
 	  if (!img) return NULL;
 	  PrsHeightMapData* data = new PrsHeightMapData (true);
   	  data->im = img;
@@ -560,7 +559,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 	    offset.y = offsetnode->GetAttributeValueAsFloat ("y");
 	  }
 
-	  iImage* img = LoadImage (imagename, CS_IMGFMT_TRUECOLOR);
+	  csRef<iImage> img (LoadImage (imagename, CS_IMGFMT_TRUECOLOR));
 	  if (!img) return NULL;
 	  csGenerateImageTextureSingle* ts =
 	  	new csGenerateImageTextureSingle ();

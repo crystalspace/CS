@@ -36,7 +36,7 @@ private:
   class awscG2D : public iGraphics2D
   {
 private:
-    iFontServer *FontServer;
+    csRef<iFontServer> FontServer;
     iObjectRegistry *object_reg;
     int Width, Height;
     int ClipX1, ClipX2, ClipY1, ClipY2;

@@ -261,14 +261,14 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
     PreparePolygonFX2 (&g3dpolyfx, clipped_poly2d, num_clipped_verts,
         clipped_vtstats, poly.GetVertexCount(), true);
 
-  iIsoMaterialWrapperIndex *wrapindex = SCF_QUERY_INTERFACE(
-    material, iIsoMaterialWrapperIndex);
+  csRef<iIsoMaterialWrapperIndex> wrapindex (SCF_QUERY_INTERFACE(
+    material, iIsoMaterialWrapperIndex));
   if((rview->GetRenderPass()==CSISO_RENDERPASS_MAIN) && wrapindex)
   {
     /// delay drawing, put into buckets
     //printf("Drawing index %d \n", wrapindex->GetIndex());
-    rview->AddPolyFX(wrapindex->GetIndex(), &g3dpolyfx, g3dpolyfx.mixmode|CS_FX_GOURAUD);
-    wrapindex->DecRef();
+    rview->AddPolyFX(wrapindex->GetIndex(), &g3dpolyfx,
+    	g3dpolyfx.mixmode|CS_FX_GOURAUD);
     return;
   }
   // for non-iso-engine created materials, we have to draw them now.

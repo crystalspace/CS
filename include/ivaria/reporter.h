@@ -232,12 +232,9 @@ public:
       ReportV(iObjectRegistry* reg, int severity, char const* msgId,
       char const* description, va_list args)
   {
-    iReporter* reporter = CS_QUERY_REGISTRY(reg, iReporter);
+    csRef<iReporter> reporter (CS_QUERY_REGISTRY (reg, iReporter));
     if (reporter)
-    {
       reporter->ReportV(severity, msgId, description, args);
-      reporter->DecRef ();
-    }
     else
     {
       csPrintfV(description, args);

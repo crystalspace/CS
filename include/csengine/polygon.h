@@ -1310,10 +1310,9 @@ public:
       if (!scfParent->GetMaterialWrapper ()) return NULL;
       else
       {
-        iMaterialWrapper* wrap = SCF_QUERY_INTERFACE (
-	  scfParent->GetMaterialWrapper (), iMaterialWrapper);
-        wrap->DecRef ();
-	return wrap;
+        csRef<iMaterialWrapper> wrap (SCF_QUERY_INTERFACE (
+	  scfParent->GetMaterialWrapper (), iMaterialWrapper));
+	return wrap;	// This will DecRef() but that's ok in this case.
       }
     }
 

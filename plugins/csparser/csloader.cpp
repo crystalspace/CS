@@ -197,7 +197,8 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
   {
     loader->ReportNotify ("crystalspace.maploader", 
       "Could not find texture '%s'. Attempting to load.", name);
-    result = loader->LoadTexture (name, name);
+    csRef<iTextureWrapper> rc = loader->LoadTexture (name, name);
+    result = rc;
   }
   return result;
 }
@@ -748,14 +749,12 @@ bool csLoader::LoadLibrary (char* buf)
           break;
         case CS_TOKEN_MESHOBJ:
           {
-	    iMeshWrapper* mesh = Engine->CreateMeshWrapper (name);
+	    csRef<iMeshWrapper> mesh (Engine->CreateMeshWrapper (name));
             if (!LoadMeshObject (mesh, params))
 	    {
 	      // Error is already reported.
-	      mesh->DecRef ();
 	      return false;
 	    }
-	    //mesh->DecRef ();
           }
           break;
         case CS_TOKEN_MESHFACT:
@@ -949,8 +948,8 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
     	      "File '%s' does not seem to contain a 'meshfact'!", fname);
       return csPtr<iMeshFactoryWrapper> (NULL);
     }
-    iMeshFactoryWrapper* t = Engine->CreateMeshFactory (
-      	meshfactnode->GetAttributeValue ("name"));
+    csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (
+      	meshfactnode->GetAttributeValue ("name")));
     if (LoadMeshObjectFactory (t, meshfactnode))
     {
       return csPtr<iMeshFactoryWrapper> (t);
@@ -988,7 +987,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
         return csPtr<iMeshFactoryWrapper> (NULL);
       }
 
-      iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
+      csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (name));
       if (LoadMeshObjectFactory (t, data))
       {
         return csPtr<iMeshFactoryWrapper> (t);
@@ -2353,7 +2352,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
   if (!Engine) return csPtr<iMeshWrapper> (NULL);
 
   csRef<iDataBuffer> databuff (VFS->ReadFile (fname));
-  iMeshWrapper* mesh = NULL;
+  csRef<iMeshWrapper> mesh;
 
   if (!databuff || !databuff->GetSize ())
   {
@@ -2381,7 +2380,6 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
     if (!LoadMeshObject (mesh, meshobjnode))
     {
       // Error is already reported.
-      mesh->DecRef ();
       mesh = NULL;
     }
   }
@@ -2413,7 +2411,6 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
         if (!LoadMeshObject (mesh, data))
         {
 	  // Error is already reported.
-	  mesh->DecRef ();
           mesh = NULL;
         }
       }
@@ -2454,38 +2451,16 @@ csLoader::csLoader (iBase *p)
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
-  plugin_mgr = NULL;
   object_reg = NULL;
-  VFS = NULL;
-  ImageLoader = NULL;
-  SoundLoader = NULL;
-  Engine = NULL;
-  G3D = NULL;
-  SoundRender = NULL;
-  ModelConverter = NULL;
-  CrossBuilder = NULL;
 
   flags = 0;
   ResolveOnlyRegion = false;
   Stats = new csLoaderStats ();
-  ldr_context = NULL;
 }
 
 csLoader::~csLoader()
 {
   loaded_plugins.DeleteAll ();
-  SCF_DEC_REF(ldr_context);
-  SCF_DEC_REF(plugin_mgr);
-  SCF_DEC_REF(Reporter);
-  SCF_DEC_REF(VFS);
-  SCF_DEC_REF(ImageLoader);
-  SCF_DEC_REF(SoundLoader);
-  SCF_DEC_REF(Engine);
-  SCF_DEC_REF(G3D);
-  SCF_DEC_REF(SoundRender);
-  SCF_DEC_REF(ModelConverter);
-  SCF_DEC_REF(CrossBuilder);
-  SCF_DEC_REF(SyntaxService);
   delete Stats;
 }
 
@@ -2512,7 +2487,8 @@ iLoaderContext* csLoader::GetLoaderContext ()
 bool csLoader::Initialize (iObjectRegistry *object_Reg)
 {
   csLoader::object_reg = object_Reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
   Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
@@ -3063,8 +3039,8 @@ defaulthalo:
     }
   }
 
-  iStatLight* l = Engine->CreateLight (name, csVector3(x, y, z),
-  	dist, csColor(r, g, b), dyn);
+  csRef<iStatLight> l (Engine->CreateLight (name, csVector3(x, y, z),
+  	dist, csColor(r, g, b), dyn));
   switch (halo.type)
   {
     case 1:
@@ -3118,10 +3094,9 @@ iKeyValuePair* csLoader::ParseKey (char* buf, iObject* pParent)
   if (csScanStr(buf, "%S,%S", Key, Value) == 2)
   {
     csKeyValuePair* cskvp = new csKeyValuePair (Key, Value);
-    iKeyValuePair* kvp = SCF_QUERY_INTERFACE (cskvp, iKeyValuePair);
+    csRef<iKeyValuePair> kvp (SCF_QUERY_INTERFACE (cskvp, iKeyValuePair));
     if (pParent)
       pParent->ObjAdd (kvp->QueryObject ());
-    kvp->DecRef ();
     return kvp;
   }
   else
@@ -3570,15 +3545,13 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
           break;
         case XMLTOKEN_MESHOBJ:
           {
-	    iMeshWrapper* mesh = Engine->CreateMeshWrapper (
-			    child->GetAttributeValue ("name"));
+	    csRef<iMeshWrapper> mesh (Engine->CreateMeshWrapper (
+			    child->GetAttributeValue ("name")));
             if (!LoadMeshObject (mesh, child))
 	    {
 	      // Error is already reported.
-	      mesh->DecRef ();
 	      return false;
 	    }
-	    //mesh->DecRef ();
           }
           break;
         case XMLTOKEN_MESHFACT:
@@ -5244,8 +5217,8 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
     }
   }
 
-  iStatLight* l = Engine->CreateLight (lightname, pos,
-  	dist, color, dyn);
+  csRef<iStatLight> l (Engine->CreateLight (lightname, pos,
+  	dist, color, dyn));
   switch (halo.type)
   {
     case 1:
@@ -5289,6 +5262,7 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
   l->QueryObject ()->ObjAddChildren (&Keys);
   Keys.ObjRemoveAll ();
 
+  l->IncRef ();	// To make sure smart pointer doesn't release.
   return l;
 }
 

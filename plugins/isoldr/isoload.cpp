@@ -209,9 +209,8 @@ iTextureWrapper* StdIsoLoaderContext::FindTexture (const char* name)
 iLoaderContext* csIsoLoader::GetLoaderContext ()
 {
   if (!ldr_context)
-  {
-    ldr_context = new StdIsoLoaderContext (Engine, &parser);
-  }
+    ldr_context = csPtr<iLoaderContext> (
+    	new StdIsoLoaderContext (Engine, &parser));
   return ldr_context;
 }
 
@@ -955,7 +954,7 @@ bool csIsoLoader::ParseMeshFactory(char *buf, const char *prefix)
 
   iMeshFactoryWrapper* mfw = Engine->CreateMeshFactory(prefix);
 
-  SCF_DEC_REF (ldr_context); ldr_context = NULL;
+  ldr_context = NULL;
 
   while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -1052,12 +1051,12 @@ bool csIsoLoader::ParseMeshObject (char* buf, const char* prefix)
   char str[255]; str[0] = '\0';
   long cmd;
 
-  iMeshObject* meshobj = NULL;
+  csRef<iMeshObject> meshobj;
   iLoaderPlugin* plug = NULL;
   csMatrix3 m;
   csVector3 v;
 
-  SCF_DEC_REF (ldr_context); ldr_context = NULL;
+  ldr_context = NULL;
 
   iIsoMeshSprite* meshspr = Engine->CreateMeshSprite();
 
@@ -1195,7 +1194,6 @@ bool csIsoLoader::ParseMeshObject (char* buf, const char* prefix)
     // iIsoGrid *gr = world->FindPos(meshspr->GetPosition());
     world->AddSprite(meshspr);
     meshspr->DecRef();
-    meshobj->DecRef();
   }
 
   return true;
@@ -1244,26 +1242,13 @@ csIsoLoader::csIsoLoader(iBase *p)
   world = NULL;
   view = NULL;
   current_grid = NULL;
-  plugin_mgr = NULL;
   object_reg = NULL;
-  Engine = NULL;
-  G3D = NULL;
-  Reporter = NULL;
-  VFS = NULL;
-  ldr_context = NULL;
 }
 
 csIsoLoader::~csIsoLoader()
 {
-  SCF_DEC_REF(ldr_context);
-  SCF_DEC_REF(plugin_mgr);
   SCF_DEC_REF(world);
   SCF_DEC_REF(view);
-  SCF_DEC_REF(Engine);
-  SCF_DEC_REF(VFS);
-  SCF_DEC_REF(G3D);
-  SCF_DEC_REF(Syntax);
-  SCF_DEC_REF(Reporter);
 }
 
 bool csIsoLoader::Initialize(iObjectRegistry *object_Reg)
@@ -1274,7 +1259,8 @@ bool csIsoLoader::Initialize(iObjectRegistry *object_Reg)
   csIsoLoader::object_reg = object_Reg;
 
   // The plugin manager - needed mostly for the mesh object plugins
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   if (!plugin_mgr)
   {
     ReportError (tag, "Failed to initialize iPluginManager");

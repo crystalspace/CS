@@ -90,7 +90,7 @@ struct iLoader : public iBase
    * 'engine->Prepare()' later as that function will take care of registering
    * too.
    */
-  virtual csPtr<iTextureWrapper> LoadTexture (const char *Name,
+  virtual iTextureWrapper* LoadTexture (const char *Name,
   	const char *FileName,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL,
 	bool reg = false) = 0;

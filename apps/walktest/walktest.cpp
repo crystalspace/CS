@@ -167,8 +167,6 @@ WalkTest::WalkTest () :
   do_fs_fadecol = false;
   do_fs_fadeout = false;
 
-  plbody = pllegs = NULL;
-
   velocity.Set (0, 0, 0);
   angle_velocity.Set (0, 0, 0);
 

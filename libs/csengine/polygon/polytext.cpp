@@ -864,9 +864,9 @@ void csPolyTexture::GetTextureBox (
 
 void csPolyTexture::SetPolygon (csPolygon3D *p)
 {
-  ipolygon = SCF_QUERY_INTERFACE (p, iPolygon3D);
-  ipolygon->DecRef ();
-  polygon = p;
+  csRef<iPolygon3D> ipoly (SCF_QUERY_INTERFACE (p, iPolygon3D));
+  ipolygon = ipoly;
+  polygon = p;	// ipoly will DecRef here.
 }
 
 bool csPolyTexture::DynamicLightsDirty ()

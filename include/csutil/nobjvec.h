@@ -236,19 +236,17 @@ inline iObject *csNamedObjectVector::Pop ()
   {
     iBase *objbase = (iBase*)Vector->Pop ();
     if (!objbase) return 0;
-    iObject *obj = SCF_QUERY_INTERFACE (objbase, iObject);
+    csRef<iObject> obj (SCF_QUERY_INTERFACE (objbase, iObject));
     CS_ASSERT (obj);
-    obj->DecRef ();
-    return obj;
+    return obj;	// This will release a reference but that's ok in this case.
   }
 inline iObject *csNamedObjectVector::Top () const
   {
     iBase *objbase = (iBase*)Vector->Top ();
     if (!objbase) return 0;
-    iObject *obj = SCF_QUERY_INTERFACE (objbase, iObject);
+    csRef<iObject> obj (SCF_QUERY_INTERFACE (objbase, iObject));
     CS_ASSERT (obj);
-    obj->DecRef ();
-    return obj;
+    return obj;	// This will release a reference but that's ok in this case.
   }
 inline bool csNamedObjectVector::Delete (int n)
   { return Vector->Delete (n); }
@@ -257,24 +255,16 @@ inline void csNamedObjectVector::DeleteAll ()
 inline iObject *csNamedObjectVector::Get (int n) const
   {
     iBase *objbase = (iBase*)Vector->Get (n);
-    iObject* o = NULL;
-    if (objbase)
-    {
-      o = SCF_QUERY_INTERFACE (objbase, iObject);
-      if (o) o->DecRef ();
-    }
-    return o;
+    csRef<iObject> o;
+    if (objbase) o = SCF_QUERY_INTERFACE (objbase, iObject);
+    return o;	// This will release a reference but that's ok in this case.
   }
 inline iObject *csNamedObjectVector::operator[] (int n) const
   {
     iBase *objbase = (iBase*)Vector->Get (n);
-    iObject* o = NULL;
-    if (objbase)
-    {
-      o = SCF_QUERY_INTERFACE (objbase, iObject);
-      if (o) o->DecRef ();
-    }
-    return o;
+    csRef<iObject> o;
+    if (objbase) o = SCF_QUERY_INTERFACE (objbase, iObject);
+    return o;	// This will release a reference but that's ok in this case.
   }
 
 #endif // __NOBJVEC_H__

@@ -223,20 +223,18 @@ SCF_IMPLEMENT_IBASE_END
 
 static csDebugGraph* SetupDebugGraph (iObjectRegistry* object_reg)
 {
-  iBase* idg = CS_QUERY_REGISTRY_TAG (object_reg, "__Debug_Graph__");
+  csRef<iBase> idg (CS_QUERY_REGISTRY_TAG (object_reg, "__Debug_Graph__"));
   if (!idg)
   {
-    idg = new csDebugGraph ();
+    idg = csPtr<iBase> ((iBase*)new csDebugGraph ());
     if (!object_reg->Register (idg, "__Debug_Graph__"))
     {
       // If registering fails this probably means we are in the destruction
       // pass and the object registry doesn't allow new updates anymore.
-      idg->DecRef ();
       return NULL;
     }
   }
-  idg->DecRef ();
-  return (csDebugGraph*)idg;
+  return (csDebugGraph*)(iBase*)idg;	// DecRef() but that's ok in this case.
 }
 
 //-----------------------------------------------------------------------------

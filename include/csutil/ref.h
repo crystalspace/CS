@@ -20,6 +20,8 @@
 #ifndef __CSREF_H__
 #define __CSREF_H__
 
+template <class T> class csRef;
+
 /**
  * A normal pointer. This class should ONLY be used for functions
  * returning pointers that are already IncRef()'ed for the caller.
@@ -34,6 +36,7 @@ template <class T>
 class csPtr
 {
 private:
+  friend class csRef<T>;
   T* obj;
 
 public:
@@ -68,7 +71,7 @@ public:
    */
   csRef (const csPtr<T>& newobj)
   {
-    obj = newobj;
+    obj = newobj.obj;
   }
 
   /**
@@ -108,7 +111,7 @@ public:
   {
     T* oldobj = obj;
     // First assign and then DecRef() of old object!
-    obj = newobj;
+    obj = newobj.obj;
     if (oldobj)
       oldobj->DecRef ();
     return *this;

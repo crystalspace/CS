@@ -30,7 +30,7 @@ struct csLoaderPluginRec
 {
   char* ShortName;
   char* ClassID;
-  iLoaderPlugin* Plugin;
+  csRef<iLoaderPlugin> Plugin;
 
   csLoaderPluginRec (const char* iShortName,
 	const char *iClassID, iLoaderPlugin *iPlugin)
@@ -66,14 +66,10 @@ bool csIsoLoader::csLoadedPluginVector::FreeItem (csSome Item)
   {
     if (plugin_mgr)
     {
-      iComponent* p = SCF_QUERY_INTERFACE(rec->Plugin, iComponent);
+      csRef<iComponent> p (SCF_QUERY_INTERFACE(rec->Plugin, iComponent));
       if (p)
-      {
         plugin_mgr->UnloadPlugin(p);
-	p->DecRef();
-      }
     }
-    rec->Plugin->DecRef ();
   }
   delete rec;
   return true;

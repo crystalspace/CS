@@ -320,7 +320,7 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
   // the 3D or 2D driver... if the texture is used for 2D only, it can
   // not have power-of-two dimensions...
 
-  iTextureWrapper *tex = LoadTexture (name, filename, flags);
+  csRef<iTextureWrapper> tex (LoadTexture (name, filename, flags));
   if (tex && do_transp)
     tex->SetKeyColor (QInt (transp.red * 255.99),
       QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
@@ -332,6 +332,7 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
 	      "Could not load texture '%s'\n", name);
   }
 
+  if (tex) tex->IncRef ();	// To avoid smart pointer release.
   return tex;
 }
 
@@ -471,8 +472,8 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
     return NULL;
   }
 
-  iMaterial* material = Engine->CreateBaseMaterial (texh,
-  	num_txt_layer, txt_layers, layers);
+  csRef<iMaterial> material (Engine->CreateBaseMaterial (texh,
+  	num_txt_layer, txt_layers, layers));
   if (col_set)
     material->SetFlatColor (col);
   material->SetReflection (diffuse, ambient, reflection);
@@ -489,7 +490,6 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
   else
     mat->QueryObject()->SetName (name);
   // dereference material since mat already incremented it
-  material->DecRef ();
 
   return mat;
 }
@@ -654,7 +654,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
   // the 3D or 2D driver... if the texture is used for 2D only, it can
   // not have power-of-two dimensions...
 
-  iTextureWrapper *tex = LoadTexture (txtname, filename, flags);
+  csRef<iTextureWrapper> tex (LoadTexture (txtname, filename, flags));
   if (tex && do_transp)
     tex->SetKeyColor (QInt (transp.red * 255.99),
       QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
@@ -666,6 +666,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	      node, "Could not load texture '%s'\n", txtname);
   }
 
+  if (tex) tex->IncRef ();	// To avoid smart pointer release.
   return tex;
 }
 
@@ -865,8 +866,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
     }
   }
 
-  iMaterial* material = Engine->CreateBaseMaterial (texh,
-  	num_txt_layer, txt_layers, layers);
+  csRef<iMaterial> material (Engine->CreateBaseMaterial (texh,
+  	num_txt_layer, txt_layers, layers));
   if (col_set)
     material->SetFlatColor (col);
   material->SetReflection (diffuse, ambient, reflection);
@@ -883,7 +884,6 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
   else
     mat->QueryObject()->SetName (matname);
   // dereference material since mat already incremented it
-  material->DecRef ();
 
   return mat;
 }

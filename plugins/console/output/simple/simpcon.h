@@ -55,7 +55,7 @@ private:
   /// Console mode
   int ConsoleMode;
   /// Select font
-  iFont *console_font;
+  csRef<iFont> console_font;
   /// Minimum gap between two lines
   int mingap;
   /// The width and height of graphics canvas
@@ -63,9 +63,9 @@ private:
   /// The system driver
   iObjectRegistry *object_reg;
   /// The 3D driver
-  iGraphics3D *G3D;
+  csRef<iGraphics3D> G3D;
   /// The 2D driver
-  iGraphics2D *G2D;
+  csRef<iGraphics2D> G2D;
   /// Cursor style
   int CursorStyle;
   /// Automatically update?

@@ -243,11 +243,11 @@ bool csInitializer::SetupConfigManager (
   // can be loaded. At the end, we make the user-and-application-specific
   // config file the dynamic one.
 
-  iVFS* VFS = CS_QUERY_REGISTRY (r, iVFS);
+  csRef<iVFS> VFS (CS_QUERY_REGISTRY (r, iVFS));
   if (!VFS)
   {
     csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
-    VFS = (iVFS*)(plugin_mgr->QueryPlugin ("iVFS", VERSION_iVFS));
+    VFS = csPtr<iVFS> ((iVFS*)(plugin_mgr->QueryPlugin ("iVFS", VERSION_iVFS)));
   }
   if (!VFS)
   {
@@ -265,11 +265,7 @@ bool csInitializer::SetupConfigManager (
   // Initialize application configuration file
   if (configName)
     if (!cfg->Load (configName, VFS))
-    {
-      VFS->DecRef ();
       return false;
-    }
-  VFS->DecRef ();
 
   // look if the user-specific config domain should be used
   {
@@ -384,10 +380,9 @@ bool csInitializer::OpenApplication (iObjectRegistry* r)
 
   // Pass the open event to all interested listeners.
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
-  iEventQueue* EventQueue = CS_QUERY_REGISTRY (r, iEventQueue);
+  csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
   CS_ASSERT (EventQueue != NULL);
   EventQueue->Dispatch (Event);
-  EventQueue->DecRef ();
   return true;
 }
 
@@ -395,10 +390,9 @@ void csInitializer::CloseApplication (iObjectRegistry* r)
 {
   // Notify all interested listeners that the system is going down
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemClose);
-  iEventQueue* EventQueue = CS_QUERY_REGISTRY (r, iEventQueue);
+  csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
   CS_ASSERT (EventQueue != NULL);
   EventQueue->Dispatch (Event);
-  EventQueue->DecRef ();
 }
 
 void csInitializer::DestroyApplication (iObjectRegistry* r)
@@ -416,11 +410,11 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   // Explicitly unload all plugins from the plugin manager because
   // some plugins hold references to the plugin manager so the plugin
   // manager will never get destructed if there are still plugins in memory.
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (r, iPluginManager);
-  if (plugin_mgr)
   {
-    plugin_mgr->Clear ();
-    plugin_mgr->DecRef ();
+    csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
+    if (plugin_mgr)
+      plugin_mgr->Clear ();
+    // Force cleanup here.
   }
 
   // Explicitly clear the object registry before its destruction since some

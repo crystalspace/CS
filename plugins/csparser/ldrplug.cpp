@@ -25,9 +25,9 @@ struct csLoaderPluginRec
 {
   char* ShortName;
   char* ClassID;
-  iComponent* Component;
-  iLoaderPlugin* Plugin;
-  iBinaryLoaderPlugin* BinPlugin;
+  csRef<iComponent> Component;
+  csRef<iLoaderPlugin> Plugin;
+  csRef<iBinaryLoaderPlugin> BinPlugin;
 
   csLoaderPluginRec (const char* shortName,
 	const char *classID,
@@ -47,9 +47,6 @@ struct csLoaderPluginRec
   {
     delete [] ShortName;
     delete [] ClassID;
-    if (Component) Component->DecRef ();
-    if (Plugin) Plugin->DecRef ();
-    if (BinPlugin) BinPlugin->DecRef ();
   }
 };
 

@@ -33,14 +33,14 @@ class csView : public iView
 {
 private:
   /// the engine
-  iEngine* Engine;
+  csRef<iEngine> Engine;
   /// rendering context
-  iGraphics3D* G3D;
+  csRef<iGraphics3D> G3D;
   /// context size at the time the clipper was created
   int OldWidth, OldHeight;
 
   /// the camera
-  iCamera* Camera;
+  csRef<iCamera> Camera;
 
   /// Rect clipping region (NULL if this is a polygon-based clipper)
   csBox2* RectView;

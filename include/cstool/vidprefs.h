@@ -20,6 +20,7 @@
 #define __CSVIDPREFS_H__
 
 #include "cstypes.h"
+#include "csutil/ref.h"
 
 struct iObjectRegistry;
 struct iEvent;
@@ -31,7 +32,6 @@ struct iGraphics3D;
 struct iGraphics2D;
 struct iFontServer;
 struct iImageIO;
-struct iPluginManager;
 
 /**
  * This class is a video preference editor. It uses AWS (will load
@@ -47,14 +47,13 @@ class csVideoPreferences
 {
 private:
   iObjectRegistry* object_reg;
-  iVFS* vfs;
-  iImageIO* imageio;
-  iAws* aws;
-  iAwsCanvas* aws_canvas;
-  iGraphics3D* g3d;
-  iGraphics2D* g2d;
-  iFontServer* fontserv;
-  iPluginManager* plugmgr;
+  csRef<iVFS> vfs;
+  csRef<iImageIO> imageio;
+  csRef<iAws> aws;
+  csRef<iAwsCanvas> aws_canvas;
+  csRef<iGraphics3D> g3d;
+  csRef<iGraphics2D> g2d;
+  csRef<iFontServer> fontserv;
 
   int mode;	// 0 for software, 1, for OpenGL (@@@ temporary)
 

@@ -22,13 +22,13 @@ struct iImage;
 class awsTextureManager
 {
   /// this contains a reference to our loader.
-  iImageIO *loader;
+  csRef<iImageIO> loader;
 
   /// this contains a reference to our texture manager
-  iTextureManager *txtmgr;
+  csRef<iTextureManager> txtmgr;
 
   /// this contains a reference to the VFS plugin
-  iVFS *vfs;
+  csRef<iVFS> vfs;
 
   /// contains a reference to the object registry
   iObjectRegistry *object_reg;

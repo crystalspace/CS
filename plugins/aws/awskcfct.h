@@ -24,7 +24,7 @@ class awsKeyFactory : public iAwsKeyFactory
    *  of the hierarchy.  If it's not a window, then it must be added to a window eventually to be
    *  useful.
    */
-  iAwsComponentNode *base;
+  csRef<iAwsComponentNode> base;
 
 public:
   SCF_DECLARE_IBASE;

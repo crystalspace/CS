@@ -654,19 +654,13 @@ csEngine::csEngine (iBase *iParent) :
   engine_mode = CS_ENGINE_AUTODETECT;
   first_dyn_lights = NULL;
   object_reg = NULL;
-  VFS = NULL;
-  G3D = NULL;
-  G2D = NULL;
-  Reporter = NULL;
-  ImageLoader = NULL;
   textures = NULL;
   materials = NULL;
   c_buffer = NULL;
   cbufcube = NULL;
   current_camera = NULL;
   current_engine = this;
-  current_iengine = SCF_QUERY_INTERFACE (this, iEngine);
-  current_iengine->DecRef ();
+  current_iengine = (iEngine*)this;
   scfiEventHandler = NULL;
   use_pvs = false;
   use_pvs_only = false;
@@ -676,7 +670,6 @@ csEngine::csEngine (iBase *iParent) :
   engine_states = NULL;
   rad_debug = NULL;
   nextframe_pending = 0;
-  virtual_clock = NULL;
   cache_mgr = NULL;
   default_max_lightmap_w = 256;
   default_max_lightmap_h = 256;
@@ -730,11 +723,6 @@ csEngine::~csEngine ()
 
   render_priorities.DeleteAll ();
 
-  if (G3D) G3D->DecRef ();
-  if (ImageLoader) ImageLoader->DecRef ();
-  if (VFS) VFS->DecRef ();
-  if (Reporter) Reporter->DecRef ();
-  if (virtual_clock) virtual_clock->DecRef ();
   thing_type->DecRef ();
   delete materials;
   delete textures;
@@ -1650,13 +1638,8 @@ iStatLight *csEngine::FindLight (unsigned long light_id) const
     iLight *l = sectors[i]->GetLights ()->FindByID (light_id);
     if (l)
     {
-      iStatLight *sl = SCF_QUERY_INTERFACE (l, iStatLight);
-      if (sl)
-      {
-        // @@@ this might destroy the object!
-        sl->DecRef ();
-        return sl;
-      }
+      csRef<iStatLight> sl (SCF_QUERY_INTERFACE (l, iStatLight));
+      if (sl) return sl;	// Smart pointer DecRef() is ok in this case.
     }
   }
 
@@ -1674,13 +1657,8 @@ iStatLight *csEngine::FindLight (const char *name, bool regionOnly) const
     iLight *l = sectors[i]->GetLights ()->FindByName (name);
     if (l)
     {
-      iStatLight *sl = SCF_QUERY_INTERFACE (l, iStatLight);
-      if (sl)
-      {
-        // @@@ this might destroy the object!
-        sl->DecRef ();
-        return sl;
-      }
+      csRef<iStatLight> sl (SCF_QUERY_INTERFACE (l, iStatLight));
+      if (sl) return sl;	// Smart pointer DecRef() is ok in this case.
     }
   }
 
@@ -2360,11 +2338,12 @@ csPtr<iMeshWrapper> csEngine::CreateThingMesh (
   iSector *sector,
   const char *name)
 {
-  iMeshWrapper* thing_wrap = CreateMeshWrapper (
-  	"crystalspace.mesh.object.thing", name, sector);
+  csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper (
+  	"crystalspace.mesh.object.thing", name, sector));
   thing_wrap->SetZBufMode (CS_ZBUF_USE);
   thing_wrap->SetRenderPriority (GetObjectRenderPriority ());
 
+  thing_wrap->IncRef ();	// Avoid release of smart pointer.
   return csPtr<iMeshWrapper> (thing_wrap);
 }
 
@@ -2372,12 +2351,13 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   iSector *sector,
   const char *name)
 {
-  iMeshWrapper* thing_wrap = CreateMeshWrapper (
-  	"crystalspace.mesh.object.thing", name, sector);
+  csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper (
+  	"crystalspace.mesh.object.thing", name, sector));
   thing_wrap->GetFlags ().Set (CS_ENTITY_CONVEX);
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
   thing_wrap->SetRenderPriority (GetWallRenderPriority ());
 
+  thing_wrap->IncRef ();	// Avoid release of smart pointer.
   return csPtr<iMeshWrapper> (thing_wrap);
 }
 
@@ -2396,9 +2376,8 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
   csMaterial *mat = new csMaterial ();
   if (txt) mat->SetTextureWrapper (txt);
 
-  iMaterial *imat = SCF_QUERY_INTERFACE (mat, iMaterial);
-  imat->DecRef ();
-  return csPtr<iMaterial> (imat);
+  csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
+  return csPtr<iMaterial> ((iMaterial*)imat);	// DecRef is ok in this case.
 }
 
 csPtr<iMaterial> csEngine::CreateBaseMaterial (
@@ -2422,9 +2401,8 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (
         layers[i].vshift);
   }
 
-  iMaterial *imat = SCF_QUERY_INTERFACE (mat, iMaterial);
-  imat->DecRef ();
-  return csPtr<iMaterial> (imat);
+  csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
+  return csPtr<iMaterial> ((iMaterial*)imat);	// DecRef is ok here.
 }
 
 iTextureList *csEngine::GetTextureList () const
@@ -2465,9 +2443,8 @@ csPtr<iStatLight> csEngine::CreateLight (
       pseudoDyn);
   if (name) light->SetName (name);
 
-  iStatLight *il = SCF_QUERY_INTERFACE (light, iStatLight);
-  il->DecRef ();
-  return csPtr<iStatLight> (il);
+  csRef<iStatLight> il (SCF_QUERY_INTERFACE (light, iStatLight));
+  return csPtr<iStatLight> ((iStatLight*)il);	// DecRef is ok here.
 }
 
 csPtr<iDynLight> csEngine::CreateDynLight (
@@ -2485,9 +2462,8 @@ csPtr<iDynLight> csEngine::CreateDynLight (
       color.blue);
   AddDynLight (light);
 
-  iDynLight *il = SCF_QUERY_INTERFACE (light, iDynLight);
-  il->DecRef ();
-  return csPtr<iDynLight> (il);
+  csRef<iDynLight> il (SCF_QUERY_INTERFACE (light, iDynLight));
+  return csPtr<iDynLight> (il);	// DecRef is ok here.
 }
 
 void csEngine::RemoveDynLight (iDynLight *light)
@@ -2518,8 +2494,9 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   if (!fact) return NULL;
 
   // don't pass the name to avoid a second search
-  iMeshFactoryWrapper *fwrap = CreateMeshFactory (fact, NULL);
+  csRef<iMeshFactoryWrapper> fwrap (CreateMeshFactory (fact, NULL));
   if (fwrap && name) fwrap->QueryObject ()->SetName (name);
+  if (fwrap) fwrap->IncRef ();	// Avoid smart pointer release.
   return csPtr<iMeshFactoryWrapper> (fwrap);
 }
 
@@ -2653,10 +2630,9 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   if (!fact) return csPtr<iMeshFactoryWrapper> (NULL);
 
   char *buf = **input;
-  iLoaderContext* elctxt = CreateLoaderContext ();
+  csRef<iLoaderContext> elctxt (CreateLoaderContext ());
   csRef<iBase> mof (plug->Parse (
       buf, elctxt, fact->GetMeshObjectFactory ()));
-  elctxt->DecRef ();
   if (!mof)
   {
     GetMeshFactories ()->Remove (fact);
@@ -2709,9 +2685,8 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   }
 
   char *buf = **input;
-  iLoaderContext* elctxt = CreateLoaderContext ();
+  csRef<iLoaderContext> elctxt (CreateLoaderContext ());
   csRef<iBase> mof (plug->Parse (buf, elctxt, imw));
-  elctxt->DecRef ();
   if (!mof)
   {
     GetMeshes ()->Remove (imw);
@@ -2796,13 +2771,15 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
     mo = fact->NewInstance ();
     if (mo)
     {
-      iMeshWrapper* mw = CreateMeshWrapper (mo, name, sector, pos);
+      csRef<iMeshWrapper> mw (CreateMeshWrapper (mo, name, sector, pos));
+      mw->IncRef ();	// To avoid smart pointer release.
       return csPtr<iMeshWrapper> (mw);
     }
     return csPtr<iMeshWrapper> (NULL);
   }
 
-  iMeshWrapper* mw = CreateMeshWrapper (mo, name, sector, pos);
+  csRef<iMeshWrapper> mw (CreateMeshWrapper (mo, name, sector, pos));
+  mw->IncRef ();	// To avoid smart pointer release.
   return csPtr<iMeshWrapper> (mw);
 }
 

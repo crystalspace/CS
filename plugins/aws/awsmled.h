@@ -86,7 +86,7 @@ class awsMultiLineEdit : public awsComponent
   eventVector vDispatcher;
   awsActionDispatcher actions;
 
-  iFont *font;
+  csRef<iFont> font;
   iTextureHandle *img;
   int alpha_level;
 

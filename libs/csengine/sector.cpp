@@ -123,7 +123,6 @@ csSector::csSector (csEngine *engine) :
   DG_TYPE (this, "csSector");
   csSector::engine = engine;
   culler_mesh = NULL;
-  culler = NULL;
   engine->AddToCurrentRegion (this);
   fog.enabled = false;
   draw_busy = 0;
@@ -138,7 +137,6 @@ csSector::~csSector ()
   CS_ASSERT (references.Length () == 0);
 
   lights.DeleteAll ();
-  if (culler) culler->DecRef ();
 
   // rendering queues are deleted automatically.
 }
@@ -195,11 +193,7 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 //----------------------------------------------------------------------
 bool csSector::UseCuller (const char *meshname)
 {
-  if (culler)
-  {
-    culler->DecRef ();
-    culler = NULL;
-  }
+  culler = NULL;
 
   // Find the culler with the given name.
   culler_mesh = meshes.FindByName (meshname);
@@ -232,12 +226,7 @@ bool csSector::UseCuller (const char *meshname)
 
 bool csSector::UseCullerPlugin (const char *plugname)
 {
-  if (culler)
-  {
-    culler->DecRef ();
-    culler = NULL;
-  }
-
+  culler = NULL;
   culler_mesh = NULL;
 
   // Load the culler plugin.

@@ -2810,7 +2810,7 @@ const char* Blocks::KeyName (const KeyMapping& map)
 void Blocks::ReadConfig ()
 {
   iObjectRegistry* object_reg = Sys->object_reg;
-  csRef<iConfigFile> keys (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  csRef<iConfigManager> keys (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   NamedKey (keys->GetStr ("Blocks.Keys.Up", "up"), key_up);
   NamedKey (keys->GetStr ("Blocks.Keys.Down", "down"), key_down);
   NamedKey (keys->GetStr ("Blocks.Keys.Left", "left"), key_left);
@@ -2857,7 +2857,7 @@ void Blocks::ReadConfig ()
 void Blocks::WriteConfig ()
 {
   iObjectRegistry* object_reg = Sys->object_reg;
-  csRef<iConfigFile> keys (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  csRef<iConfigManager> keys (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   keys->SetStr ("Blocks.Keys.Up", KeyName (key_up));
   keys->SetStr ("Blocks.Keys.Down", KeyName (key_down));
   keys->SetStr ("Blocks.Keys.Left", KeyName (key_left));

@@ -49,15 +49,12 @@ csVfsCacheManager::~csVfsCacheManager ()
   delete[] vfsdir;
   delete[] current_type;
   delete[] current_scope;
-  if (vfs) vfs->DecRef ();
 }
 
 iVFS* csVfsCacheManager::GetVFS ()
 {
   if (!vfs)
-  {
     vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
-  }
   return vfs;
 }
 

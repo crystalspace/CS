@@ -365,7 +365,7 @@ public:
   iCollideSystem* collide_system;
 
   /// Player's body (as a 3D model) and legs
-  iMeshWrapper *plbody, *pllegs;
+  csRef<iMeshWrapper> plbody, pllegs;
 
   /// The console input plugin
   iConsoleInput *ConsoleInput;

@@ -69,23 +69,17 @@ public:
   csObjectModel* model;
   csVisibilityObjectHistory* history;
   // Optional data for shadows. Both fields can be NULL.
-  iMeshWrapper* mesh;
-  iShadowCaster* caster;
-  iShadowReceiver* receiver;
+  csRef<iMeshWrapper> mesh;
+  csRef<iShadowCaster> caster;
+  csRef<iShadowReceiver> receiver;
 
   csVisibilityObjectWrapper ()
   {
     history = new csVisibilityObjectHistory ();
-    mesh = NULL;
-    caster = NULL;
-    receiver = NULL;
   }
   ~csVisibilityObjectWrapper ()
   {
     history->DecRef ();
-    if (mesh) mesh->DecRef ();
-    if (caster) caster->DecRef ();
-    if (receiver) receiver->DecRef ();
   }
 
   void MarkVisible (csVisReason reason, int cnt)
@@ -111,7 +105,7 @@ class csDynaVis : public iVisibilityCuller
 {
 private:
   iObjectRegistry *object_reg;
-  iBugPlug* bugplug;
+  csRef<iBugPlug> bugplug;
   csKDTree* kdtree;
   csCoverageBuffer* covbuf;
   csTiledCoverageBuffer* tcovbuf;

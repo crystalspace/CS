@@ -9,14 +9,12 @@ awsParser* static_awsparser = 0;
 
 awsParser::awsParser (iObjectRegistry* newobjreg, iAws* newaws,
   awsPrefManager* newprefmgr)
-    : input(NULL), objreg(newobjreg), aws(newaws), prefmgr(newprefmgr)
+    : objreg(newobjreg), aws(newaws), prefmgr(newprefmgr)
 { 
 }
 
 awsParser::~awsParser ()
 { 
-  if (input)
-    input->DecRef ();
 }
 
 bool awsParser::Initialize (const char* filename)

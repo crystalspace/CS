@@ -31,8 +31,7 @@ SCF_IMPLEMENT_IBASE (csEventOutlet)
 SCF_IMPLEMENT_IBASE_END
 
 csEventOutlet::csEventOutlet(iEventPlug* p,csEventQueue* q,iObjectRegistry* r):
-  EnableMask((unsigned int)(-1)), Plug(p), Queue(q), Registry(r),
-  KeyboardDriver(0), MouseDriver(0), JoystickDriver(0)
+  EnableMask((unsigned int)(-1)), Plug(p), Queue(q), Registry(r)
 {
   SCF_CONSTRUCT_IBASE (NULL);
 }
@@ -45,12 +44,6 @@ csEventOutlet::~csEventOutlet ()
     Queue->EventOutlets [idx] = NULL;
     Queue->EventOutlets.Delete (idx);
   }
-  if (KeyboardDriver != 0)
-    KeyboardDriver->DecRef();
-  if (MouseDriver != 0)
-    MouseDriver->DecRef();
-  if (JoystickDriver != 0)
-    JoystickDriver->DecRef();
 }
 
 #define DRIVER_GETTER(X) \

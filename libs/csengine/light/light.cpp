@@ -185,9 +185,8 @@ iCrossHalo *csLight::Light::CreateCrossHalo (float intensity, float cross)
   csCrossHalo *halo = new csCrossHalo (intensity, cross);
   scfParent->SetHalo (halo);
 
-  iCrossHalo *ihalo = SCF_QUERY_INTERFACE (halo, iCrossHalo);
-  ihalo->DecRef ();
-  return ihalo;
+  csRef<iCrossHalo> ihalo (SCF_QUERY_INTERFACE (halo, iCrossHalo));
+  return ihalo;	// DecRef is ok here.
 }
 
 iNovaHalo *csLight::Light::CreateNovaHalo (
@@ -198,9 +197,8 @@ iNovaHalo *csLight::Light::CreateNovaHalo (
   csNovaHalo *halo = new csNovaHalo (seed, num_spokes, roundness);
   scfParent->SetHalo (halo);
 
-  iNovaHalo *ihalo = SCF_QUERY_INTERFACE (halo, iNovaHalo);
-  ihalo->DecRef ();
-  return ihalo;
+  csRef<iNovaHalo> ihalo (SCF_QUERY_INTERFACE (halo, iNovaHalo));
+  return ihalo;	// DecRef is ok here.
 }
 
 iFlareHalo *csLight::Light::CreateFlareHalo ()
@@ -208,9 +206,8 @@ iFlareHalo *csLight::Light::CreateFlareHalo ()
   csFlareHalo *halo = new csFlareHalo ();
   scfParent->SetHalo (halo);
 
-  iFlareHalo *ihalo = SCF_QUERY_INTERFACE (halo, iFlareHalo);
-  ihalo->DecRef ();
-  return ihalo;
+  csRef<iFlareHalo> ihalo (SCF_QUERY_INTERFACE (halo, iFlareHalo));
+  return ihalo;	// DecRef is ok here.
 }
 
 //---------------------------------------------------------------------------

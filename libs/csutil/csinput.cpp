@@ -50,7 +50,7 @@ csInputDriver::~csInputDriver()
   StopListening();
 }
 
-iEventQueue* csInputDriver::GetEventQueue()
+csPtr<iEventQueue> csInputDriver::GetEventQueue()
 {
   return CS_QUERY_REGISTRY(Registry, iEventQueue);
 }
@@ -59,11 +59,10 @@ void csInputDriver::StartListening()
 {
   if (Listener != 0 && !Registered)
   {
-    iEventQueue* q = GetEventQueue();
+    csRef<iEventQueue> q (GetEventQueue());
     if (q != 0)
     {
       q->RegisterListener(Listener, CSMASK_Command);
-      q->DecRef();
       Registered = true;
     }
   }
@@ -73,12 +72,9 @@ void csInputDriver::StopListening()
 {
   if (Listener != 0 && Registered)
   {
-    iEventQueue* q = GetEventQueue();
+    csRef<iEventQueue> q (GetEventQueue());
     if (q != 0)
-    {
       q->RemoveListener(Listener);
-      q->DecRef();
-    }
   }
   Registered = false;
 }
@@ -86,12 +82,9 @@ void csInputDriver::StopListening()
 void csInputDriver::Post(iEvent* e)
 {
   StartListening(); // If this failed at construction, try again.
-  iEventQueue* q = GetEventQueue();
+  csRef<iEventQueue> q (GetEventQueue());
   if (q != 0)
-  {
     q->Post(e);
-    q->DecRef();
-  }
   else
     e->DecRef();
 }
@@ -190,7 +183,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE(csMouseDriver::eiEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMouseDriver::csMouseDriver (iObjectRegistry* r) :
-  csInputDriver(r), Keyboard(0)
+  csInputDriver(r)
 {
   SCF_CONSTRUCT_IBASE(0);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
@@ -210,8 +203,6 @@ csMouseDriver::csMouseDriver (iObjectRegistry* r) :
 
 csMouseDriver::~csMouseDriver ()
 {
-  if (Keyboard != 0)
-    Keyboard->DecRef();
 }
 
 void csMouseDriver::Reset ()
@@ -301,7 +292,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csJoystickDriver::eiEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
-  csInputDriver(r), Keyboard(0)
+  csInputDriver(r)
 {
   SCF_CONSTRUCT_IBASE(0);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
@@ -314,8 +305,6 @@ csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
 
 csJoystickDriver::~csJoystickDriver ()
 {
-  if (Keyboard != 0)
-    Keyboard->DecRef();
 }
 
 void csJoystickDriver::Reset ()

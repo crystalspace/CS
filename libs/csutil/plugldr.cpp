@@ -331,7 +331,8 @@ bool csPluginLoader::LoadPlugins ()
     return false;
   }
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
   // Load all plugins
   for (n = 0; n < PluginList.Length (); n++)

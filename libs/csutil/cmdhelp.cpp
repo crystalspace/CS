@@ -74,11 +74,10 @@ void csCommandLineHelper::Help (iConfig* config)
 void csCommandLineHelper::Help (iObjectRegistry* object_reg,
 	iCommandLineParser* cmdline)
 {
-  if (!cmdline)
-    cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
-  else
-    cmdline->IncRef ();
-  CS_ASSERT (cmdline != NULL);
+  csRef<iCommandLineParser> cmd = cmdline;
+  if (!cmd)
+    cmd = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  CS_ASSERT (cmd != NULL);
 
   // First send a global cscmdCommandLineHelp event.
   csRef<iEventQueue> evq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
@@ -108,7 +107,6 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
       Help (config);
     }
   }
-  cmdline->DecRef ();
 
   //@@@???
   printf (
@@ -122,13 +120,11 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
 bool csCommandLineHelper::CheckHelp (iObjectRegistry* object_reg,
 	iCommandLineParser* cmdline)
 {
-  if (!cmdline)
-    cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
-  else
-    cmdline->IncRef ();
-  CS_ASSERT (cmdline != NULL);
-  bool rc = cmdline->GetOption ("help") != NULL;
-  cmdline->DecRef ();
+  csRef<iCommandLineParser> cmd = cmdline;
+  if (!cmd)
+    cmd = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  CS_ASSERT (cmd != NULL);
+  bool rc = cmd->GetOption ("help") != NULL;
   return rc;
 }
 

@@ -48,8 +48,8 @@ protected:
   int num;
   csString text;
   iObjectRegistry* object_reg;
-  iMeshObjectType* thing_type;
-  iReporter* reporter;
+  csRef<iMeshObjectType> thing_type;
+  csRef<iReporter> reporter;
   csStringHash xmltokens;
 
   void OptimizePolygon (iPolygon3D *p);

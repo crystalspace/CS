@@ -36,9 +36,9 @@ private:
   /// the system
   iObjectRegistry* object_reg;
   /// 2d canvas
-  iGraphics2D* g2d;
+  csRef<iGraphics2D> g2d;
   /// 3d renderer
-  iGraphics3D* g3d;
+  csRef<iGraphics3D> g3d;
   /// texturemanager
   iTextureManager* txtmgr;
   /// the material list

@@ -205,7 +205,7 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
   else
     Format = CS_IMGFMT_TRUECOLOR;
 
-  iImage *Image = LoadImage (fname, Format);
+  csRef<iImage> Image (LoadImage (fname, Format));
   if (!Image)
     return csPtr<iTextureHandle> (NULL);
 
@@ -220,33 +220,30 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
 	      "Cannot create texture from '%s'!", fname);
     }
   }
-  Image->DecRef ();
 
   if (TexHandle) TexHandle->IncRef ();	// To avoid smart pointer release.
   return csPtr<iTextureHandle> (TexHandle);
 }
 
-csPtr<iTextureWrapper> csLoader::LoadTexture (const char *name,
+iTextureWrapper* csLoader::LoadTexture (const char *name,
 	const char *fname, int Flags, iTextureManager *tm, bool reg)
 {
   if (!Engine)
     return NULL;
 
-  iTextureHandle *TexHandle = LoadTexture (fname, Flags, tm);
+  csRef<iTextureHandle> TexHandle (LoadTexture (fname, Flags, tm));
   if (!TexHandle)
     return NULL;
 
   iTextureWrapper *TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->QueryObject ()->SetName (name);
-  TexHandle->DecRef ();
 
-  iMaterial* material = Engine->CreateBaseMaterial (TexWrapper);
+  csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
 
   iMaterialWrapper *MatWrapper = Engine->GetMaterialList ()->
     NewMaterial (material);
   MatWrapper->QueryObject ()->SetName (name);
-  material->DecRef ();
 
   if (reg && tm)
   {

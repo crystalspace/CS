@@ -56,26 +56,23 @@ void csConfigAccess::AddConfig (iObjectRegistry *object_reg, const char *fname,
 {
   csConfigAccess::object_reg = object_reg;
   csRef<iConfigManager> cfgmgr (CS_QUERY_REGISTRY (object_reg, iConfigManager));
-  iVFS* VFS = NULL;
+  csRef<iVFS> VFS;
   if (vfs)
   {
     VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
     //CS_ASSERT (VFS != NULL);
   }
   ConfigFiles.Push (cfgmgr->AddDomain (fname, VFS, priority));
-  if (VFS) VFS->DecRef ();
 }
 
 iConfigFile *csConfigAccess::operator->()
 {
-  iConfigFile* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
-  cfg->DecRef ();
-  return cfg;
+  csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  return (iConfigFile*)cfg;	// This will decref cfg but that's ok in this case.
 }
 
 csConfigAccess::operator iConfigFile* ()
 {
-  iConfigFile* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
-  cfg->DecRef ();
-  return cfg;
+  csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  return (iConfigFile*)cfg;	// This will decref cfg but that's ok in this case.
 }

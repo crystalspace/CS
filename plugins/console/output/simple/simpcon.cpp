@@ -77,14 +77,12 @@ csSimpleConsole::csSimpleConsole (iBase *iParent)
   Update = true;
   SystemReady = false;
   object_reg = NULL;
-  G3D = NULL;
   CursorPos = -1;
   ClearInput = false;
   Client = NULL;
   ConsoleMode = CONSOLE_MODE;
   CursorState = false;
   InvalidAll = true;
-  console_font = NULL;
 }
 
 csSimpleConsole::~csSimpleConsole ()
@@ -98,11 +96,6 @@ csSimpleConsole::~csSimpleConsole ()
   }
   FreeLineMessage ();
   FreeBuffer ();
-
-  if (console_font)
-    console_font->DecRef ();
-  if (G3D)
-    G3D->DecRef ();
 }
 
 bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)

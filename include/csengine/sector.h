@@ -132,7 +132,7 @@ private:
    * The visibility culler for this sector or NULL if none.
    * In future we should support more than one visibility culler probably.
    */
-  iVisibilityCuller* culler;
+  csRef<iVisibilityCuller> culler;
 
 private:
   /**

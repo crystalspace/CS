@@ -178,9 +178,6 @@ void WalkTest::CreateColliders ()
   legs->SetName ("player legs");
   pllegs->GetRadius ( legs_radius, legs_center);
 
-  SCF_DEC_REF (pllegs);
-  SCF_DEC_REF (plbody);
-
   SCF_DEC_REF (legs);
   SCF_DEC_REF (body);
 

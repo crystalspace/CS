@@ -22,7 +22,6 @@ awsComponent::awsComponent () :
   top_child(NULL),
   below(NULL),
   above(NULL),
-  layout(NULL),
   is_zoomed(false),
   flags(0),
   signalsrc(this)

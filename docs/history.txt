@@ -6,6 +6,19 @@ The history order is reversed so that new features are at the top.
 	- iThingEnvironment->CreateBezierTemplate() and CreatePolyTxtPlane()
 	  now return a csPtr and IncRef() the returned pointer (which
 	  they didn't do in the past).
+	- Fixed a ref count leak in the plugin loader.
+	- Fixed ref count leaks with layout manager in aws.
+	  Also iAwsLayoutManager was not inheriting from iBase.
+	- Fixed some other ref leaks in aws.
+	- Fixed some other ref leaks in csparser.
+	- Fixed iLoader->LoadTexture(char*, char*) so that it returns
+	  a normal pointer again. This function was not returning a
+	  pointer that required DecRef().
+	- Temporarily removed the T* cast operator from csPtr. This ensures
+	  that it is ONLY possible to assign csPtr's to csRef's (which is
+	  the intended use in a full smart-pointer API). With this operator
+	  removed I fixed a large part of CS (but not all) to work cleanly.
+	  Then I enabled the T* cast again.
 9-Sep-2002
 	- iTextureManager->RegisterTexture() and RegisterMaterial()
 	  now return csPtr. This also fixes several ref counting bugs

@@ -568,10 +568,10 @@ class awsPrefManager : public iAwsPrefManager
   awsTextureManager *awstxtmgr;
 
   /// font loader
-  iFontServer *fontsvr;
+  csRef<iFontServer> fontsvr;
 
   /// default font
-  iFont *default_font;
+  csRef<iFont> default_font;
 
   /// window manager
   iAws *wmgr;

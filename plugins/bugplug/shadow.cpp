@@ -147,7 +147,8 @@ bool csShadow::AddToEngine (iEngine* engine)
 {
   if (wrap) { engine->GetMeshes ()->Remove (wrap); wrap = NULL; }
   if (engine->GetSectors ()->GetCount () <= 0) return false;
-  wrap = engine->CreateMeshWrapper (this, "_@Shadow@_");
+  csRef<iMeshWrapper> ww (engine->CreateMeshWrapper (this, "_@Shadow@_"));
+  wrap = ww;
   wrap->SetRenderPriority (engine->GetAlphaRenderPriority ());
   iMovable* movable = wrap->GetMovable ();
   int i;

@@ -37,7 +37,7 @@ private:
   char* vfsdir;
   char* current_type;
   char* current_scope;
-  iVFS* vfs;
+  csRef<iVFS> vfs;
 
   iVFS* GetVFS ();
 

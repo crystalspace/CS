@@ -220,15 +220,10 @@ csTextSyntaxService::csTextSyntaxService (iBase *parent)
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-
-  reporter = NULL;
-  thing_type = NULL;
 }
 
 csTextSyntaxService::~csTextSyntaxService ()
 {
-  SCF_DEC_REF (reporter);
-  SCF_DEC_REF (thing_type);
 }
 
 bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
@@ -2258,7 +2253,7 @@ bool csTextSyntaxService::ParsePoly3d (
   if (texspec & CSTEX_UV_SHIFT)
   {
     iPolyTexType* ptt = poly3d->GetPolyTexType ();
-    iPolyTexLightMap* plm = SCF_QUERY_INTERFACE (ptt, iPolyTexLightMap);
+    csRef<iPolyTexLightMap> plm (SCF_QUERY_INTERFACE (ptt, iPolyTexLightMap));
     if (plm)
     {
       plm->GetPolyTxtPlane ()->GetTextureSpace (tx_matrix, tx_vector);
@@ -2269,7 +2264,6 @@ bool csTextSyntaxService::ParsePoly3d (
       csVector3 shift (uv_shift.x, uv_shift.y, 0);
       tx_vector -= tx_matrix.GetInverse () * shift;
       poly3d->SetTextureSpace (tx_matrix, tx_vector);
-      plm->DecRef ();
     }
   }
 

@@ -151,20 +151,15 @@ csBallFactoryLoader::csBallFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csBallFactoryLoader::~csBallFactoryLoader ()
 {
-  if (reporter) reporter->DecRef ();
-  if (plugin_mgr) plugin_mgr->DecRef ();
 }
 
 bool csBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csBallFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
@@ -172,6 +167,8 @@ bool csBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csBallFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.ball", iMeshObjectType));
   if (!type)
@@ -195,6 +192,8 @@ csPtr<iBase> csBallFactoryLoader::Parse (const char* /*string*/,
 csPtr<iBase> csBallFactoryLoader::Parse (iDocumentNode*,
 			     iLoaderContext*, iBase*)
 {
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.ball", iMeshObjectType));
   if (!type)
@@ -221,20 +220,15 @@ csBallFactorySaver::csBallFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csBallFactorySaver::~csBallFactorySaver ()
 {
-  if (reporter) reporter->DecRef ();
-  if (plugin_mgr) plugin_mgr->DecRef ();
 }
 
 bool csBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csBallFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
@@ -252,22 +246,15 @@ csBallLoader::csBallLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  synldr = NULL;
-  plugin_mgr = NULL;
 }
 
 csBallLoader::~csBallLoader ()
 {
-  SCF_DEC_REF (reporter);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csBallLoader::Initialize (iObjectRegistry* object_reg)
 {
   csBallLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
@@ -307,8 +294,8 @@ csPtr<iBase> csBallLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iBallState* ballstate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iBallState> ballstate;
 
   csParser *parser = ldr_context->GetParser ();
 
@@ -320,7 +307,6 @@ csPtr<iBase> csBallLoader::Parse (const char* string,
       ReportError (reporter,
 		"crystalspace.ballloader.parse.badformat",
 		"Bad format while parsing ball object!");
-      if (ballstate) ballstate->DecRef ();
       return csPtr<iBase> (NULL);
     }
     switch (cmd)
@@ -390,7 +376,6 @@ csPtr<iBase> csBallLoader::Parse (const char* string,
       	    ReportError (reporter,
 		"crystalspace.ballloader.parse.unknownfactory",
 		"Couldn't find factory '%s'!", str);
-	    if (ballstate) ballstate->DecRef ();
 	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -406,7 +391,6 @@ csPtr<iBase> csBallLoader::Parse (const char* string,
       	    ReportError (reporter,
 		"crystalspace.ballloader.parse.unknownmaterial",
 		"Couldn't find material '%s'!", str);
-            mesh->DecRef ();
             return csPtr<iBase> (NULL);
 	  }
 	  ballstate->SetMaterialWrapper (mat);
@@ -418,8 +402,6 @@ csPtr<iBase> csBallLoader::Parse (const char* string,
 	{
 	  ReportError (reporter, "crystalspace.ballloader.parse.mixmode",
 	  	"Error parsing mixmode!");
-	  if (ballstate) ballstate->DecRef ();
-	  mesh->DecRef ();
 	  return csPtr<iBase> (NULL);
 	}
         ballstate->SetMixMode (mm);
@@ -427,7 +409,7 @@ csPtr<iBase> csBallLoader::Parse (const char* string,
     }
   }
 
-  if (ballstate) ballstate->DecRef ();
+  if (mesh) mesh->IncRef ();	// To prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -562,22 +544,15 @@ csBallSaver::csBallSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  synldr = NULL;
-  plugin_mgr = NULL;
 }
 
 csBallSaver::~csBallSaver ()
 {
-  SCF_DEC_REF (reporter);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csBallSaver::Initialize (iObjectRegistry* object_reg)
 {
   csBallSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
@@ -586,24 +561,21 @@ bool csBallSaver::Initialize (iObjectRegistry* object_reg)
 void csBallSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
-  iMeshObject *mesh = SCF_QUERY_INTERFACE(obj, iMeshObject);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
+  csRef<iMeshObject> mesh (SCF_QUERY_INTERFACE(obj, iMeshObject));
   if(!mesh)
   {
     ReportError (reporter,
 		 "crystalspace.ballsaver",
 		 "Error: non-mesh given to %s.\n", fact->QueryDescription () );
-    fact->DecRef();
     return;
   }
-  iBallState *state = SCF_QUERY_INTERFACE(obj, iBallState);
+  csRef<iBallState> state (SCF_QUERY_INTERFACE(obj, iBallState));
   if(!state)
   {
     ReportError (reporter,
-		 "crystalspace.ballsaver",
-		 "Error: invalid mesh given to %s.\n", fact->QueryDescription () );
-    fact->DecRef();
-    mesh->DecRef();
+	 "crystalspace.ballsaver",
+	 "Error: invalid mesh given to %s.\n", fact->QueryDescription () );
     return;
   }
 
@@ -633,9 +605,5 @@ void csBallSaver::WriteDown (iBase* obj, iFile *file)
   str.Append (synldr->VectorToText ("COLOR", col.red, col.green, col.blue, 0));
 
   file->Write ((const char*)str, str.Length ());
-
-  fact->DecRef();
-  mesh->DecRef();
-  state->DecRef();
 }
 

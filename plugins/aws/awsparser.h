@@ -34,7 +34,7 @@ public:
   void AddGlobalSkinDef (awsSkinNode* skin);
 
 protected:
-  iFile* input;
+  csRef<iFile> input;
   iObjectRegistry* objreg;
   iAws* aws;
   awsPrefManager* prefmgr;

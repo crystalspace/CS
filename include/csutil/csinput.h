@@ -47,7 +47,7 @@ protected:
   iEventHandler* Listener;
   csInputDriver(iObjectRegistry*);
   virtual ~csInputDriver();
-  iEventQueue* GetEventQueue();
+  csPtr<iEventQueue> GetEventQueue();
   virtual void LostFocus() = 0;
   virtual void Post(iEvent*);
   virtual bool HandleEvent(iEvent&);
@@ -115,7 +115,7 @@ class csMouseDriver : public csInputDriver, public iMouseDriver
 {
 private:
   // Generic keyboard driver (for checking modifier key states).
-  iKeyboardDriver* Keyboard;
+  csRef<iKeyboardDriver> Keyboard;
 
 protected:
   /// Last "mouse down" event time
@@ -186,7 +186,7 @@ class csJoystickDriver : public csInputDriver, public iJoystickDriver
 {
 private:
   // Generic keyboard driver (for checking modifier key states).
-  iKeyboardDriver* Keyboard;
+  csRef<iKeyboardDriver> Keyboard;
 protected:
   /// Joystick button states
   bool Button [CS_MAX_JOYSTICK_COUNT][CS_MAX_JOYSTICK_BUTTONS];

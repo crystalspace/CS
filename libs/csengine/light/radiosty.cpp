@@ -406,13 +406,15 @@ csVector3 csRadElement::GetAvgNormal () const
 csRadElement *csRadElement::GetRadElement (csPolygon3D &object)
 {
   // we are attached to the original polygon as a child.
-  return CS_GET_CHILD_OBJECT (&object, csRadPoly);
+  csRef<csRadPoly> rp (CS_GET_CHILD_OBJECT (&object, csRadPoly));
+  return rp;	// DecRef is ok here.
 }
 
 csRadElement *csRadElement::GetRadElement (csCurve &object)
 {
   // we are attached to the original curve as a child.
-  return CS_GET_CHILD_OBJECT (&object, csRadCurve);
+  csRef<csRadCurve> rc (CS_GET_CHILD_OBJECT (&object, csRadCurve));
+  return rc;	// DecRef is ok here.
 }
 
 void csRadElement::ShowDeltaMap ()

@@ -554,7 +554,7 @@ struct iAwsSlot : public iBase
 
 SCF_VERSION(iAwsLayoutManager, 0, 0, 1);
 
-struct iAwsLayoutManager
+struct iAwsLayoutManager : public iBase
 {
   /**  Sets the owner.  Normally the owner should never change, but in some rare
     * cases (like in the Window class) the owner is set improperly by the setup

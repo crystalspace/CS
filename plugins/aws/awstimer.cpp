@@ -39,7 +39,6 @@ awsTimer::awsTimer (iObjectRegistry *object_reg, iAwsComponent *comp) :
   this->object_reg = object_reg;
   bSetup = false;
   stopped = true;
-  vc = NULL;
 }
 
 awsTimer::~awsTimer ()
@@ -50,8 +49,6 @@ awsTimer::~awsTimer ()
     if (eq)
       eq->RemoveListener (&scfiEventHandler);
   }
-
-  SCF_DEC_REF (vc);
 }
 
 bool awsTimer::Setup ()

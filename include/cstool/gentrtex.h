@@ -130,7 +130,7 @@ class csGenerateImageTextureSingle : public csGenerateImageTexture
 {
 public:
   /// the image - the texture image
-  iImage *image;
+  csRef<iImage> image;
   /// the scale of the image, (nr of times tiled on the terrain)
   csVector2 scale;
   /// offset to shift image (0..1)

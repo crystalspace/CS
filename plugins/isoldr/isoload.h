@@ -58,7 +58,7 @@ struct iLoaderContext;
 class csIsoLoader : public iIsoLoader
 {
 private:
-  iLoaderContext* ldr_context;
+  csRef<iLoaderContext> ldr_context;
   iLoaderContext* GetLoaderContext ();
 
   csParser parser;
@@ -148,15 +148,14 @@ public:
   
   SCF_DECLARE_IBASE;
 
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iIsoEngine* Engine;
-  iGraphics3D* G3D;
-  iReporter* Reporter;
-  iVFS* VFS;
+  csRef<iIsoEngine> Engine;
+  csRef<iGraphics3D> G3D;
+  csRef<iReporter> Reporter;
+  csRef<iVFS> VFS;
 
   // iSyntaxService - Used to load vectors, matrices & misc other things
-  iSyntaxService* Syntax;
+  csRef<iSyntaxService> Syntax;
 
   csIsoLoader(iBase *p);
   virtual ~csIsoLoader();

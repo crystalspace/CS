@@ -70,7 +70,6 @@ awsMultiLineEdit::awsMultiLineEdit ()
   mark_fromcol = mark_tocol = 0;
 
   nMarkMode = nClipMarkMode = MARK_ROWWRAP;
-  font = NULL;
   xmaxchar = ymaxchar = 0;
   vText.Push ((csSome)new csString);
   blink_timer = NULL;
@@ -333,10 +332,9 @@ bool awsMultiLineEdit::SetProperty (const char *name, void *parm)
       iFontServer *fs = WindowManager ()->G2D ()->GetFontServer ();
       if (fs)
       {
-        iFont *fnt = fs->LoadFont (fontname->GetData ());
+        csRef<iFont> fnt (fs->LoadFont (fontname->GetData ()));
         if (fnt)
         {
-          SCF_DEC_REF (font);
           font = fnt;
           fnt->GetMaxSize (xmaxchar, ymaxchar);
           return true;
@@ -352,8 +350,7 @@ bool awsMultiLineEdit::SetProperty (const char *name, void *parm)
     iFont *fnt = (iFont*)parm;
     if (fnt)
     {
-      SCF_DEC_REF (font);
-      font = fnt;
+      font = csPtr<iFont> (fnt);
       fnt->GetMaxSize (xmaxchar, ymaxchar);
       return true;
     }

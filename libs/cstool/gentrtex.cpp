@@ -138,14 +138,12 @@ void csGenerateImageTextureBlend::GetColor(csColor &col,
 //---- csGenerateImageTextureSingle ----------------------------
 csGenerateImageTextureSingle::~csGenerateImageTextureSingle()
 {
-  if(image) image->DecRef();
 }
 
 
 void csGenerateImageTextureSingle::SetImage(iImage *im)
 {
   image = im;
-  if(image) image->IncRef();
 }
 
 void csGenerateImageTextureSingle::GetImagePixel(

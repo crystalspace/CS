@@ -136,12 +136,11 @@ class csBugPlug : public iComponent
 {
 private:
   iObjectRegistry *object_reg;
-  iPluginManager* plugin_mgr;
-  iEngine *Engine;
-  iGraphics3D* G3D;
-  iGraphics2D* G2D;
-  iConsoleOutput* Conout;
-  iVFS* VFS;
+  csRef<iEngine> Engine;
+  csRef<iGraphics3D> G3D;
+  csRef<iGraphics2D> G2D;
+  csRef<iConsoleOutput> Conout;
+  csRef<iVFS> VFS;
   bool initialized;
 
   //------------------------------------------------------------------

@@ -53,11 +53,11 @@ class csFancyConsole : public iConsoleOutput
 {
 private:
   iObjectRegistry *object_reg;
-  iVFS *VFS;
-  iConsoleOutput* base;
-  iGraphics2D *G2D;
-  iGraphics3D *G3D;
-  iImageIO *ImageLoader;
+  csRef<iVFS> VFS;
+  csRef<iConsoleOutput> base;
+  csRef<iGraphics2D> G2D;
+  csRef<iGraphics3D> G3D;
+  csRef<iImageIO> ImageLoader;
   ConsoleDecoration deco;
   csRect outersize, bordersize, p2size;
   bool border_computed;

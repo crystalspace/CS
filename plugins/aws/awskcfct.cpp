@@ -1,15 +1,13 @@
 #include "cssysdef.h"
 #include "awskcfct.h"
 
-awsKeyFactory::awsKeyFactory () :
-  base(NULL)
+awsKeyFactory::awsKeyFactory ()
 {
     SCF_CONSTRUCT_IBASE(NULL);
 }
 
 awsKeyFactory::~awsKeyFactory ()
 {
-  if(base) base->DecRef();
 }
 
 void awsKeyFactory::Initialize (const char* name, const char* component_type)
@@ -47,13 +45,12 @@ void awsKeyFactory::AddIntKey (const char* name, int v)
   if (base)
   {
     awsIntKey* temp = new awsIntKey(name, v);
-    iAwsIntKey* key = SCF_QUERY_INTERFACE(temp, iAwsIntKey);
+    csRef<iAwsIntKey> key (SCF_QUERY_INTERFACE(temp, iAwsIntKey));
     CS_ASSERT(key);
 
     base->Add (key);
 
     temp->DecRef();
-    key->DecRef();
   }
 }
 
@@ -62,13 +59,12 @@ void awsKeyFactory::AddStringKey (const char* name, const char* v)
   if (base)
   {
     awsStringKey* temp = new awsStringKey(name, v);
-    iAwsStringKey* key = SCF_QUERY_INTERFACE(temp, iAwsStringKey);
+    csRef<iAwsStringKey> key (SCF_QUERY_INTERFACE(temp, iAwsStringKey));
     CS_ASSERT(key);
 
     base->Add (key);
 
     temp->DecRef();
-    key->DecRef();
   }
 }
 
@@ -77,13 +73,12 @@ void awsKeyFactory::AddRectKey (const char* name, csRect v)
   if (base)
   {
     awsRectKey* temp = new awsRectKey(name, v);
-    iAwsRectKey* key = SCF_QUERY_INTERFACE(temp, iAwsRectKey);
+    csRef<iAwsRectKey> key (SCF_QUERY_INTERFACE(temp, iAwsRectKey));
     CS_ASSERT(key);
 
     base->Add (key);
 
     temp->DecRef();
-    key->DecRef();
   }
 }
 
@@ -96,13 +91,12 @@ void awsKeyFactory::AddRGBKey (
   if (base)
   {
     awsRGBKey* temp = new awsRGBKey(name, r, g, b);
-    iAwsRGBKey* key = SCF_QUERY_INTERFACE(temp, iAwsRGBKey);
+    csRef<iAwsRGBKey> key (SCF_QUERY_INTERFACE(temp, iAwsRGBKey));
     CS_ASSERT(key);
 
     base->Add (key);
 
     temp->DecRef();
-    key->DecRef();
   }
 }
 
@@ -111,13 +105,12 @@ void awsKeyFactory::AddPointKey (const char* name, csPoint v)
   if (base)
   {
     awsPointKey* temp = new awsPointKey(name, v);
-    iAwsPointKey* key = SCF_QUERY_INTERFACE(temp, iAwsPointKey);
+    csRef<iAwsPointKey> key (SCF_QUERY_INTERFACE(temp, iAwsPointKey));
     CS_ASSERT(key);
 
     base->Add (key);
 
     temp->DecRef();
-    key->DecRef();
   }
 }
 
@@ -130,13 +123,12 @@ void awsKeyFactory::AddConnectionKey (
   if (base)
   {
     awsConnectionKey* temp = new awsConnectionKey(name, s, t, sig);
-    iAwsConnectionKey* key = SCF_QUERY_INTERFACE(temp, iAwsConnectionKey);
+    csRef<iAwsConnectionKey> key (SCF_QUERY_INTERFACE(temp, iAwsConnectionKey));
     CS_ASSERT(key);
 
     base->Add (key);
 
     temp->DecRef();
-    key->DecRef();
   }
 }
 

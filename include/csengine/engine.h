@@ -218,13 +218,13 @@ public:
    * since they are highly system-dependent (for example, DOS uses
    * '\' as path separator, Mac uses ':' and Unix uses '/').
    */
-  iVFS *VFS;
+  csRef<iVFS> VFS;
 
   /**
    * Pointer to an optional reporter that will be used for notification
    * and warning messages.
    */
-  iReporter* Reporter;
+  csRef<iReporter> Reporter;
 
   /**
    * This is a vector which holds objects of type 'csCleanable'.
@@ -287,11 +287,11 @@ public:
   /// An object pool for lightpatches.
   csLightPatchPool* lightpatch_pool;
   /// The 3D driver
-  iGraphics3D* G3D;
+  csRef<iGraphics3D> G3D;
   /// The 2D driver
-  iGraphics2D* G2D;
+  csRef<iGraphics2D> G2D;
   /// The graphics loader
-  iImageIO* ImageLoader;
+  csRef<iImageIO> ImageLoader;
   /// The fog mode this G3D implements
   G3D_FOGMETHOD fogmethod;
   /// Does the 3D driver require power-of-two lightmaps?
@@ -414,7 +414,7 @@ private:
   csTicks nextframe_pending;
 
   /// Store virtual clock to speed up time queries.
-  iVirtualClock* virtual_clock;
+  csRef<iVirtualClock> virtual_clock;
 
 private:
   /**

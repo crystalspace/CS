@@ -40,14 +40,6 @@
 csVideoPreferences::csVideoPreferences ()
 {
   object_reg = NULL;
-  plugmgr = NULL;
-  aws = NULL;
-  aws_canvas = NULL;
-  g2d = NULL;
-  g3d = NULL;
-  fontserv = NULL;
-  imageio = NULL;
-  vfs = NULL;
 }
 
 csVideoPreferences::~csVideoPreferences ()
@@ -58,14 +50,15 @@ csVideoPreferences::~csVideoPreferences ()
 void csVideoPreferences::CleanUp ()
 {
   csRef<iConfigManager> cfgmgr (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  csRef<iPluginManager> plugmgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
-  if (aws_canvas) { aws_canvas->DecRef (); aws_canvas = NULL; }
+  aws_canvas = NULL;
   if (imageio)
   {
     object_reg->Unregister (imageio, "iImageIO");
     csRef<iComponent> comp (SCF_QUERY_INTERFACE (imageio, iComponent));
     plugmgr->UnloadPlugin (comp);
-    imageio->DecRef ();
     imageio = NULL;
   }
   if (aws)
@@ -73,7 +66,6 @@ void csVideoPreferences::CleanUp ()
     object_reg->Unregister (aws, "iAws");
     csRef<iComponent> comp (SCF_QUERY_INTERFACE (aws, iComponent));
     plugmgr->UnloadPlugin (comp);
-    aws->DecRef ();
     aws = NULL;
   }
   if (g3d)
@@ -81,7 +73,6 @@ void csVideoPreferences::CleanUp ()
     object_reg->Unregister (g3d, "iGraphics3D");
     csRef<iComponent> comp (SCF_QUERY_INTERFACE (g3d, iComponent));
     plugmgr->UnloadPlugin (comp);
-    g3d->DecRef ();
     g3d = NULL;
   }
   if (g2d)
@@ -89,7 +80,6 @@ void csVideoPreferences::CleanUp ()
     object_reg->Unregister (g2d, "iGraphics2D");
     csRef<iComponent> comp (SCF_QUERY_INTERFACE (g2d, iComponent));
     plugmgr->UnloadPlugin (comp);
-    g2d->DecRef ();
     g2d = NULL;
   }
   if (fontserv)
@@ -97,11 +87,9 @@ void csVideoPreferences::CleanUp ()
     object_reg->Unregister (fontserv, "iFontServer");
     csRef<iComponent> comp (SCF_QUERY_INTERFACE (fontserv, iComponent));
     plugmgr->UnloadPlugin (comp);
-    fontserv->DecRef ();
     fontserv = NULL;
   }
-  if (vfs) { vfs->DecRef (); vfs = NULL; }
-  if (plugmgr) { plugmgr->DecRef (); plugmgr = NULL; }
+  vfs = NULL;
 
   cfgmgr->FlushRemoved ();
 }
@@ -137,7 +125,8 @@ bool csVideoPreferences::Setup (iObjectRegistry* object_reg)
 {
   csVideoPreferences::object_reg = object_reg;
 
-  plugmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugmgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   if (!plugmgr)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -154,9 +143,7 @@ bool csVideoPreferences::Setup (iObjectRegistry* object_reg)
   {
     vfs = CS_LOAD_PLUGIN (plugmgr, "crystalspace.kernel.vfs", iVFS);
     if (vfs)
-    {
       object_reg->Register (vfs, "iVFS");
-    }
   }
   if (!vfs)
   {
@@ -259,7 +246,7 @@ bool csVideoPreferences::Setup (iObjectRegistry* object_reg)
 
 bool csVideoPreferences::SetupWindow ()
 {
-  aws_canvas = aws->CreateCustomCanvas (g2d, g3d);
+  aws_canvas = csPtr<iAwsCanvas> (aws->CreateCustomCanvas (g2d, g3d));
 
   aws->SetFlag (AWSF_AlwaysRedrawWindows);
   aws->SetCanvas (aws_canvas);
