@@ -73,6 +73,8 @@ class csGenmeshMeshObject : public iMeshObject
 private:
 #ifdef CS_USE_NEW_RENDERER
   csRenderMesh mesh;
+  csRef<iRenderBuffer> shadow_index_buffer;
+  csStringID shadow_index_name;
 #endif
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
@@ -188,7 +190,7 @@ public:
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
 #ifdef CS_USE_NEW_RENDERER
   virtual bool DrawZ (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
-  virtual bool DrawShadow (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
+  virtual bool DrawShadow (iRenderView* rview, iMovable* movable, csZBufMode zbufMode, iLight *light);
   virtual bool DrawLight (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
 #endif // CS_USE_NEW_RENDERER
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
@@ -211,6 +213,20 @@ public:
   	csVector3& isect, float* pr);
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+#ifdef CS_USE_NEW_RENDERER
+  iRenderBuffer *GetBuffer (csStringID name);
+  int GetComponentCount (csStringID name);
+  //------------------------- iStreamSource implementation ----------------
+  class StreamSource : public iStreamSource 
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    iRenderBuffer *GetBuffer (csStringID name)
+	{ return scfParent->GetBuffer (name); }
+    int GetComponentCount (csStringID name)
+	{ return scfParent->GetComponentCount (name); }
+  } scfiStreamSource;
+  friend class StreamSource;
+#endif
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public iObjectModel
   {
@@ -406,6 +422,8 @@ private:
   int num_mesh_vertices;
   csVector3* mesh_tri_normals;
 #ifdef CS_USE_NEW_RENDERER
+  csVector3* edge_normals;
+  csVector3* edge_midpts;
   csTriangle* mesh_triangles;
   int num_mesh_triangles;
 
@@ -513,6 +531,9 @@ public:
 #else
   int GetTriangleCount () const { return num_mesh_triangles; }
   csTriangle* GetTriangles () { mesh_triangle_dirty_flag = true; return mesh_triangles; }
+  csVector3* GetFaceNormals () { return mesh_tri_normals; }
+  csVector3* GetEdgeNormals () { return edge_normals; }
+  csVector3* GetEdgeMidpoint () { return edge_midpts; }
 #endif
   void Invalidate ();
   void CalculateNormals ();
