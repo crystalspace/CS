@@ -37,6 +37,9 @@ ifeq ($(MAKESECTION),postdefines)
 
 # For python 2.0+
 #LIBUTIL=-lutil
+ifneq (,$(filter python2%, $(notdir $(PYTHON_LIB))))
+  LIBUTIL=-lutil
+endif
 
 ifneq ($(OS),NEXT)
 PTHREAD=-lpthread
