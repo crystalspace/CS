@@ -228,7 +228,9 @@ void csRectRegion::fragmentRect(
   // inside r1.
   if (!testedEdge)
   {
-    
+
+    //Fix me:  this code needs to be written!!
+
   }
   
   // If we've gotten here then we should only have to break the rect into 2
@@ -334,6 +336,8 @@ void csRectRegion::Include(csRect &rect)
     // the database, that way we don't cause more tests: we already know that
     // that rect is good.
 
+    r2.Set(rect);
+
     // Kill rect from list
     deleteRect(i);
   
@@ -345,6 +349,60 @@ void csRectRegion::Include(csRect &rect)
 void 
 csRectRegion::Exclude(csRect &rect)
 {
+  // If there are no rects in the region, just leave.  
+  if (region_count == 0)
+    return;
+
+  // Otherwise, we have to see if this rect overlaps or touches any other.
+  int i;
+  for(i = 0; i < region_count; i++)
+  {
+    csRect &r1 = region[i];
+    csRect r2(rect);
+
+    // Check to see if these even touch
+    if (r2.Intersects(r1)==false)
+      continue;
+    
+    // If r1 totally contains rect, then we call the fragment contained rect function.
+    r2.Exclude(r1);
+    if (r2.IsEmpty())
+    {
+      csRect rc1(region[i]);
+      deleteRect(i);
+
+      fragmentContainedRect(rc1, rect);
+      continue;
+    }
+
+    // If rect totally contains r1, then we kill r1 from the list.
+    r2.Set(r1);
+    r2.Exclude(rect);
+
+    if (r2.IsEmpty())
+    {
+      // Kill from list
+      deleteRect(i);
+      // Iterate
+      continue;
+    }
+    
+    // This part is similiar to Include, except that we are trying to remove a portion.  Instead
+    //  of calling chopEdgeIntersection, we actually have to fragment rect1 and chop off an edge
+    //  of the excluding rect.  This code should be handled inside fragment rect.
+    
+    r2.Set(rect);
+
+    // Kill rect from list
+    deleteRect(i);
+  
+    // Fragment it
+    fragmentRect(r1, r2, true, false);
+  } // end for
+
+
+  
+
 
 }
 
