@@ -223,7 +223,7 @@ STDMETHODIMP csNetworkDriverSockets::Receive(DWORD dwID, DWORD *lpdwBytesToRecei
 	return S_OK;
 #endif
 
-	dwLastError = CS_NET_DRV_ERR_CANNOT_SEND;
+	dwLastError = CS_NET_DRV_ERR_CANNOT_RECEIVE;
 	return S_FALSE;
 }
 
@@ -451,7 +451,6 @@ STDMETHODIMP csNetworkDriverSockets::KillAll()
 
 STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/, DWORD *lpdwID/*server socket*/, CS_NET_ADDRESS *lpCSNetAddress/*out*/)
 {
-	(void) lpCSNetAddress; //potentially unused. (casted to void to remove warning!)
 	if(!SocksReady)
 	{
 		dwLastError = CS_NET_DRV_ERR_NOT_INITIALIZED;
