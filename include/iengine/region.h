@@ -73,9 +73,6 @@ struct iRegion : public iBase
    */
   virtual bool Prepare () = 0;
 
-  // @@@ note: The following Find???() functions increase the RefCount of the
-  // returned objects!
-
   /// Find a sector in this region by name.
   virtual iSector *FindSector (const char *iName) = 0;
   /// Find a sprite in this region by name

@@ -18,6 +18,14 @@ The history order is reversed so that new features are at the top.
 	  for csTextureWrapper::SetTextureHandle().
 	- Fixed a memory leak with textures. The texture which is associated
 	  with a material had one ref too many.
+	- Changed the behaviour of iRegion::FindBla() routines (i.e.
+	  FindSector(), ...). These functions no longer increase the ref
+	  count of the returned objects. This is an undesired behaviour
+	  which caused a memory leak in some cases.
+	- Fixed a problem in the thing loader which would not check
+	  the current region to loads it's material.
+	- Reverted the memory leak fix with textures. This was in fact not
+	  a bug and my fix caused crashes.
 17-Nov-2001
 	- Added some additional DG_DESCRIBE0 statements to some
 	  constructors of engine objects in order to be able to do

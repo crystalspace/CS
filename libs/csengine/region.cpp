@@ -323,37 +323,57 @@ bool csRegion::Region::Prepare ()
  
 iSector* csRegion::Region::FindSector (const char *iName)
 {
-  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iSector, iName);
+  iSector* sector = CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iSector, iName);
+  if (sector) sector->DecRef ();
+  return sector;
 }
 
 iMeshWrapper* csRegion::Region::FindMeshObject (const char *iName)
 {
-  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMeshWrapper, iName);
+  iMeshWrapper* m = CS_GET_NAMED_CHILD_OBJECT_FAST
+  	(scfParent, iMeshWrapper, iName);
+  if (m) m->DecRef ();
+  return m;
 }
 
 iMeshFactoryWrapper* csRegion::Region::FindMeshFactory (const char *iName)
 {
-  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMeshFactoryWrapper, iName);
+  iMeshFactoryWrapper* mf = CS_GET_NAMED_CHILD_OBJECT_FAST
+  	(scfParent, iMeshFactoryWrapper, iName);
+  if (mf) mf->DecRef ();
+  return mf;
 }
 
 iTextureWrapper* csRegion::Region::FindTexture (const char *iName)
 {
-  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iTextureWrapper, iName);
+  iTextureWrapper* t = CS_GET_NAMED_CHILD_OBJECT_FAST
+	(scfParent, iTextureWrapper, iName);
+  if (t) t->DecRef ();
+  return t;
 }
 
 iMaterialWrapper* csRegion::Region::FindMaterial (const char *iName)
 {
-  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMaterialWrapper, iName);
+  iMaterialWrapper* m = CS_GET_NAMED_CHILD_OBJECT_FAST
+  	(scfParent, iMaterialWrapper, iName);
+  if (m) m->DecRef ();
+  return m;
 }
 
 iCameraPosition* csRegion::Region::FindCameraPosition (const char *iName)
 {
-  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iCameraPosition, iName);
+  iCameraPosition* cp = CS_GET_NAMED_CHILD_OBJECT_FAST
+  	(scfParent, iCameraPosition, iName);
+  if (cp) cp->DecRef ();
+  return cp;
 }
 
 iCollection* csRegion::Region::FindCollection (const char *iName)
 {
-  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iCollection, iName);
+  iCollection* col = CS_GET_NAMED_CHILD_OBJECT_FAST
+  	(scfParent, iCollection, iName);
+  if (col) col->DecRef ();
+  return col;
 }
 
 bool csRegion::IsInRegion (iObject* iobj)

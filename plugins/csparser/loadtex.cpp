@@ -137,7 +137,6 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
   TexHandle->DecRef ();
   
   iMaterial* material = Engine->CreateBaseMaterial (TexWrapper);
-  TexWrapper->DecRef ();
 
   iMaterialWrapper *MatWrapper = Engine->GetMaterialList ()->
     NewMaterial (material);

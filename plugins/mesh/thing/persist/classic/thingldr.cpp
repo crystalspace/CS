@@ -46,6 +46,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/services.h"
+#include "imap/parser.h"
 #include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -257,7 +258,7 @@ public:
   }   
 };
 
-static bool load_thing_part (iReporter* reporter,
+static bool load_thing_part (iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
 	iMeshWrapper* imeshwrap, iEngine* engine,
 	iThingState* thing_state, char* buf, int vt_offset, bool isParent)
@@ -416,8 +417,9 @@ static bool load_thing_part (iReporter* reporter,
         }
         break;
       case CS_TOKEN_PART:
-	if (!load_thing_part (reporter, synldr, info, imeshwrap, engine,
-		thing_state, params, thing_state->GetVertexCount (), false))
+	if (!load_thing_part (object_reg, reporter, synldr, info,
+		imeshwrap, engine, thing_state, params,
+		thing_state->GetVertexCount (), false))
 	  return false;
         break;
       case CS_TOKEN_V:
@@ -567,9 +569,19 @@ Nag to Jorrit about this feature if you want it.");
 
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
-        info.default_material = engine->GetMaterialList ()->
-		FindByName (str
-		/*@@@ REGIONS?, onlyRegion*/);
+
+	{
+	  iLoader* ldr = CS_QUERY_REGISTRY (object_reg, iLoader);
+	  if (ldr)
+	  {
+            info.default_material = ldr->FindMaterial (str);
+	    ldr->DecRef ();
+	  }
+	  else
+            info.default_material = engine->GetMaterialList ()->
+	    	FindByName (str);
+	}
+
         if (info.default_material == NULL)
         {
 	  ReportError (reporter,
@@ -619,8 +631,8 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
 
   char* buf = (char*)string;
   ThingLoadInfo info;
-  if (!load_thing_part (reporter, synldr, info, imeshwrap, engine, thing_state,
-  	buf, 0, true))
+  if (!load_thing_part (object_reg, reporter, synldr, info,
+  	imeshwrap, engine, thing_state, buf, 0, true))
   {
     fact->DecRef ();
     fact = NULL;
@@ -938,9 +950,18 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
         break;
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
-	//@@@ REGION SUPPORT? (below)
-        mat = engine->GetMaterialList ()->
-		FindByName (str/*@@@, onlyRegion*/);
+	
+	{
+	  iLoader* ldr = CS_QUERY_REGISTRY (object_reg, iLoader);
+	  if (ldr)
+	  {
+            mat = ldr->FindMaterial (str);
+	    ldr->DecRef ();
+	  }
+	  else
+            mat = engine->GetMaterialList ()->FindByName (str);
+	}
+
         if (mat == NULL)
         {
 	  ReportError (reporter,
