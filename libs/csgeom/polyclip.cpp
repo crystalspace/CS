@@ -24,7 +24,8 @@
 #include "csgeom/box.h"
 
 //---------------------------------------------------------------------------
-csPoly2DPool csClipper:: polypool (csPoly2DFactory::SharedFactory());
+CS_IMPLEMENT_STATIC_VAR (GetPolyPool, csPoly2DPool, (csPoly2DFactory::SharedFactory()))
+csPoly2DPool *csClipper::polypool = NULL;
 
 SCF_IMPLEMENT_IBASE(csClipper)
   SCF_IMPLEMENTS_INTERFACE(iClipper2D)
@@ -33,6 +34,13 @@ SCF_IMPLEMENT_IBASE_END
 csClipper::csClipper ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  polypool = GetPolyPool ();
+}
+
+csPoly2DPool *csClipper::GetSharedPool ()
+{
+  polypool = GetPolyPool ();
+  return polypool;
 }
 
 uint8 csClipper::ClipInPlace (
@@ -116,7 +124,7 @@ csPolygonClipper::csPolygonClipper (
 
   if (mirror || copy)
   {
-    ClipPoly2D = polypool.Alloc ();
+    ClipPoly2D = polypool->Alloc ();
     ClipPoly2D->MakeRoom (Count * 2);
     ClipPoly = ClipPoly2D->GetVertices ();
     ClipData = ClipPoly + Count;
@@ -150,7 +158,7 @@ csPolygonClipper::csPolygonClipper (
 
   if (mirror || copy)
   {
-    ClipPoly2D = polypool.Alloc ();
+    ClipPoly2D = polypool->Alloc ();
     ClipPoly2D->MakeRoom (Count * 2);
     ClipPoly = ClipPoly2D->GetVertices ();
     ClipData = ClipPoly + Count;
@@ -175,7 +183,7 @@ csPolygonClipper::csPolygonClipper (
 csPolygonClipper::~csPolygonClipper ()
 {
   if (ClipPoly2D)
-    polypool.Free (ClipPoly2D);
+    polypool->Free (ClipPoly2D);
   else
     delete[] ClipData;
 }

@@ -98,7 +98,8 @@ typedef char ImageIDField[256];
 
 static int mapped, rlencoded;
 
-static csRGBpixel ColorMap[MAXCOLORS];
+CS_IMPLEMENT_STATIC_VAR (GetColorMap, csRGBpixel, [MAXCOLORS])
+
 static int RLE_count = 0, RLE_flag = 0;
 
 static void readtga (uint8*& ptr, struct TGAheader* tgaP);
@@ -333,7 +334,7 @@ bool ImageTgaFile::Load (uint8* iBuffer, uint32 iSize)
     if ((temp1 + temp2 + 1) >= MAXCOLORS)
       return false;
     for (i = temp1; i < int (temp1 + temp2); ++i)
-      get_map_entry (iBuffer, &ColorMap [i], (int) tga_head.CoSize,
+      get_map_entry (iBuffer, &(GetColorMap() [i]), (int) tga_head.CoSize,
         Format & CS_IMGFMT_ALPHA);
   }
 
@@ -519,7 +520,7 @@ static void get_pixel (uint8*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
 
 PixEncode:
   if (mapped)
-    *dest = ColorMap [l];
+    *dest = GetColorMap() [l];
   else
   {
     dest->red = Red; dest->green = Grn; dest->blue = Blu; dest->alpha = Alpha;

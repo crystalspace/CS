@@ -644,15 +644,28 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::LODControl)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 /// Static vertex array.
-static CS_DECLARE_GROWING_ARRAY_REF (tr_verts, csVector3);
+CS_TYPEDEF_GROWING_ARRAY_REF (spr3d_tr_verts, csVector3);
+CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, spr3d_tr_verts, ())
 /// Static uv array.
-static CS_DECLARE_GROWING_ARRAY_REF (uv_verts, csVector2);
+CS_TYPEDEF_GROWING_ARRAY_REF (spr3d_uv_verts, csVector2);
+CS_IMPLEMENT_STATIC_VAR (Get_uv_verts, spr3d_uv_verts, ())
 /// The list of fog vertices
-static CS_DECLARE_GROWING_ARRAY_REF (fog_verts, G3DFogInfo);
+CS_TYPEDEF_GROWING_ARRAY_REF (spr3d_fog_verts, G3DFogInfo);
+CS_IMPLEMENT_STATIC_VAR (Get_fog_verts, spr3d_fog_verts, ())
 /// The list of object vertices.
-static CS_DECLARE_GROWING_ARRAY_REF (obj_verts, csVector3);
+CS_TYPEDEF_GROWING_ARRAY_REF (spr3d_obj_verts, csVector3);
+CS_IMPLEMENT_STATIC_VAR (Get_obj_verts, spr3d_obj_verts, ())
 /// The list of tween vertices.
-static CS_DECLARE_GROWING_ARRAY_REF (tween_verts, csVector3);
+CS_TYPEDEF_GROWING_ARRAY_REF (spr3d_tween_verts, csVector3);
+CS_IMPLEMENT_STATIC_VAR (Get_tween_verts, spr3d_tween_verts, ())
+
+CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh2, ())
+
+spr3d_tr_verts *tr_verts = NULL;
+spr3d_uv_verts *uv_verts = NULL;
+spr3d_fog_verts *fog_verts = NULL;
+spr3d_obj_verts *obj_verts = NULL;
+spr3d_tween_verts *tween_verts = NULL;
 
 csSprite3DMeshObject::csSprite3DMeshObject ()
 {
@@ -672,11 +685,18 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   do_lighting = true;
   num_verts_for_lod = -1;
 
-  tr_verts.IncRef ();
-  uv_verts.IncRef ();
-  fog_verts.IncRef ();
-  obj_verts.IncRef ();
-  tween_verts.IncRef ();
+  tr_verts = Get_tr_verts ();
+  uv_verts = Get_uv_verts ();
+  fog_verts = Get_fog_verts ();
+  obj_verts = Get_obj_verts ();
+  tween_verts = Get_tween_verts ();
+  GetLODMesh ();
+
+  tr_verts->IncRef ();
+  uv_verts->IncRef ();
+  fog_verts->IncRef ();
+  obj_verts->IncRef ();
+  tween_verts->IncRef ();
 
   rand_num = new csRandomGen();
 
@@ -703,11 +723,11 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
   if (vbuf) vbuf->DecRef ();
   if (vbuf_tween) vbuf_tween->DecRef ();
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
-  uv_verts.DecRef ();
-  tr_verts.DecRef ();
-  fog_verts.DecRef ();
-  obj_verts.DecRef ();
-  tween_verts.DecRef ();
+  uv_verts->DecRef ();
+  tr_verts->DecRef ();
+  fog_verts->DecRef ();
+  obj_verts->DecRef ();
+  tween_verts->DecRef ();
 
   delete [] vertex_colors;
   delete skeleton_state;
@@ -770,7 +790,6 @@ void csSprite3DMeshObject::FixVertexColors ()
   }
 }
 
-csTriangleMesh2 csSprite3DMeshObject::mesh;
 float csSprite3DMeshObject::global_lod_level = DEFAULT_LOD;
 
 // Set the default lighting quality.
@@ -806,7 +825,7 @@ void csSprite3DMeshObject::GenerateSpriteLOD (int num_vts)
 {
   int* emerge_from = factory->GetEmergeFrom ();
   csTriangleMesh2* base_mesh = factory->GetTexelMesh ();
-  mesh.Reset ();
+  mesh->Reset ();
   int i;
   int a, b, c;
   for (i = 0 ; i < base_mesh->GetTriangleCount () ; i++)
@@ -815,19 +834,19 @@ void csSprite3DMeshObject::GenerateSpriteLOD (int num_vts)
     a = map (emerge_from, tr.a, num_vts);
     b = map (emerge_from, tr.b, num_vts);
     c = map (emerge_from, tr.c, num_vts);
-    if (a != b && b != c && a != c) mesh.AddTriangle (a, b, c);
+    if (a != b && b != c && a != c) mesh->AddTriangle (a, b, c);
   }
 }
 
 void csSprite3DMeshObject::UpdateWorkTables (int max_size)
 {
-  if (max_size > tr_verts.Limit ())
+  if (max_size > tr_verts->Limit ())
   {
-    tr_verts.SetLimit (max_size);
-    uv_verts.SetLimit (max_size);
-    fog_verts.SetLimit (max_size);
-    obj_verts.SetLimit (max_size);
-    tween_verts.SetLimit (max_size);
+    tr_verts->SetLimit (max_size);
+    uv_verts->SetLimit (max_size);
+    fog_verts->SetLimit (max_size);
+    obj_verts->SetLimit (max_size);
+    tween_verts->SetLimit (max_size);
   }
 }
 
@@ -1054,8 +1073,8 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   csVector3* verts;
   if (skeleton_state)
   {
-    skeleton_state->Transform (tr_o2c, real_obj_verts, tr_verts.GetArray ());
-    verts = tr_verts.GetArray ();
+    skeleton_state->Transform (tr_o2c, real_obj_verts, tr_verts->GetArray ());
+    verts = tr_verts->GetArray ();
   }
   else
   {
@@ -1103,7 +1122,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
     GenerateSpriteLOD (num_verts_for_lod);
     emerge_from = factory->GetEmergeFrom ();
-    m = &mesh;
+    m = mesh;
   }
   else
   {
@@ -1139,9 +1158,9 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
           + fnum * factory->GetTexel (cf_idx, i);
       }
 
-      uv_verts[i] = uv;
+      (*uv_verts)[i] = uv;
     }
-    real_uv_verts = uv_verts.GetArray ();
+    real_uv_verts = uv_verts->GetArray ();
   }
 
   // Setup the structure for DrawTriangleMesh.
@@ -1200,7 +1219,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   g3dmesh.do_mirror = camera->IsMirrored ();
   g3dmesh.do_morph_texels = false;
   g3dmesh.do_morph_colors = false;
-  g3dmesh.vertex_fog = fog_verts.GetArray ();
+  g3dmesh.vertex_fog = fog_verts->GetArray ();
 
   if (skeleton_state)
     g3dmesh.vertex_mode = G3DTriangleMesh::VM_VIEWSPACE;
@@ -1323,17 +1342,17 @@ csVector3* csSprite3DMeshObject::GetObjectVerts (csSpriteFrame* fr)
 
   int i;
   for (i = 0; i < factory->GetVertexCount (); i++)
-    obj_verts[i] = factory->GetVertex(fr_idx, i);
+    (*obj_verts)[i] = factory->GetVertex(fr_idx, i);
 
   if (skeleton_state)
   {
     UpdateWorkTables (factory->GetVertexCount());
-    skeleton_state->Transform (csTransform (), obj_verts.GetArray (),
-    	tr_verts.GetArray ());
-    return tr_verts.GetArray ();
+    skeleton_state->Transform (csTransform (), obj_verts->GetArray (),
+    	tr_verts->GetArray ());
+    return tr_verts->GetArray ();
   }
   else
-    return obj_verts.GetArray ();
+    return obj_verts->GetArray ();
 }
 
 void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
@@ -1602,10 +1621,10 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
     UpdateWorkTables (num_texels); // make room in obj_verts;
 
     for (i = 0 ; i < num_texels ; i++)
-      obj_verts[i] = tween_ratio * factory->GetVertex (tf_idx, i)
-                   + remainder   * factory->GetVertex (nf_idx, i);
+      (*obj_verts)[i] = tween_ratio * factory->GetVertex (tf_idx, i)
+                        + remainder   * factory->GetVertex (nf_idx, i);
 
-    object_vertices = obj_verts.GetArray ();
+    object_vertices = obj_verts->GetArray ();
   }
   else
     object_vertices = GetObjectVerts (cur_action->GetCsFrame (cur_frame));

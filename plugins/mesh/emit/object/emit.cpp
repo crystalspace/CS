@@ -79,7 +79,7 @@ struct csEmitCompPart {
 
 /// growing drawing sort array
 CS_TYPEDEF_GROWING_ARRAY (csCompPartArray, struct csEmitCompPart);
-CS_IMPLEMENT_STATIC_VAR (GetStaticCompPartArray,csCompPartArray,)
+CS_IMPLEMENT_STATIC_VAR (GetStaticCompPartArray,csCompPartArray,())
 
 /// utility function
 static float GetRandomFloat(float min, float max)

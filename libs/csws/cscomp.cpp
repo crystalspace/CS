@@ -39,12 +39,21 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//--/ The csComponent class --//--//
 
+CS_IMPLEMENT_STATIC_VAR (GetDragBoundRect, csRect, ())
+csRect *csComponent::dragBound = NULL;
+// The visible region cache
+CS_IMPLEMENT_STATIC_VAR (GetVisRegion, cswsRectVector, (8, 8))
+cswsRectVector *csComponent::visregion = NULL;
+
 csComponent::csComponent (csComponent *iParent) : state (CSS_VISIBLE),
   palette (NULL), originalpalette (NULL), DragStyle (CS_DRAG_MOVEABLE),
   clipparent (NULL), text (NULL), Font (NULL), FontSize (0),
   focused (NULL), top (NULL), next (NULL), prev (NULL), parent (NULL),
   app (NULL), skinslice (NULL), skindata (NULL), id (0)
 {
+  dragBound = GetDragBoundRect ();
+  visregion = GetVisRegion ();
+
   SetPalette (NULL, 0);
   if (iParent)
     iParent->Insert (this);
@@ -392,7 +401,6 @@ bool csComponent::SetZorder (csComponent *comp, csComponent *below)
 int csComponent::dragX;
 int csComponent::dragY;
 int csComponent::dragMode = 0;
-csRect csComponent::dragBound;
 
 bool csComponent::do_handle_event (csComponent *child, void *param)
 {
@@ -538,7 +546,7 @@ bool csComponent::HandleEvent (iEvent &Event)
         if (app->MouseOwner != this)
           return (ForEach (do_handle_event, &Event, true) != NULL);
 AbortDrag:
-        SetRect (dragBound.xmin, dragBound.ymin, dragBound.xmax, dragBound.ymax);
+        SetRect (dragBound->xmin, dragBound->ymin, dragBound->xmax, dragBound->ymax);
         dragMode = 0;
         if (app->MouseOwner == this)
           app->CaptureMouse (NULL);
@@ -560,8 +568,8 @@ AbortDrag:
           int dX = Event.Mouse.x, dY = Event.Mouse.y;
           LocalToGlobal (dX, dY);
           dX -= dragX; dY -= dragY;
-          int newXmin = dragBound.xmin, newXmax = dragBound.xmax;
-          int newYmin = dragBound.ymin, newYmax = dragBound.ymax;
+          int newXmin = dragBound->xmin, newXmax = dragBound->xmax;
+          int newYmin = dragBound->ymin, newYmax = dragBound->ymax;
 
           if (dragMode & CS_DRAG_XMIN) newXmin += dX;
           if (dragMode & CS_DRAG_XMAX) newXmax += dX;
@@ -756,7 +764,7 @@ void csComponent::Drag (int x, int y, int DragMode)
   dragMode = DragMode;
   LocalToGlobal (x, y);
   dragX = x; dragY = y;
-  dragBound.Set (bound);
+  dragBound->Set (bound);
   Select ();
   app->CaptureMouse (this);
 }
@@ -1052,14 +1060,14 @@ printf ("%s: %d,%d (%d,%d) -- dirty: %d,%d (%d,%d)\n", text,
       // Disable any additional clipping
       SetClipRect ();
       // Compute the visible region
-      visregion.Push (new csRect (dirty));
-      Clip (visregion, this);
+      visregion->Push (new csRect (dirty));
+      Clip (*visregion, this);
       // Perform drawing, if it makes sense
-      if (visregion.Length ())
+      if (visregion->Length ())
       {
         Draw ();
         // Free the visible region
-        visregion.DeleteAll ();
+        visregion->DeleteAll ();
       }
     }
     // Okay, now clear the dirty flag
@@ -1438,9 +1446,6 @@ void csComponent::Clip (cswsRectVector &rect, csComponent *last, bool forchild)
     clipparent->Clip (rect, this);
 }
 
-// The visible region cache
-cswsRectVector csComponent::visregion (8, 8);
-
 void csComponent::FastClip (cswsRectVector &rect)
 {
   int dX = 0, dY = 0;
@@ -1454,9 +1459,9 @@ void csComponent::FastClip (cswsRectVector &rect)
     csRect cr (*r);
     cr.Move (dX, dY);
     bool used = false;
-    for (j = visregion.Length () - 1; j >= 0; j--)
+    for (j = visregion->Length () - 1; j >= 0; j--)
     {
-      csRect vis (*(csRect *)visregion.Get (j));
+      csRect vis (*(csRect *)visregion->Get (j));
       vis.Intersect (cr);
       if (!vis.IsEmpty ())
         if (used)

@@ -74,7 +74,7 @@
 
 // This array contains the colliding pairs
 CS_TYPEDEF_GROWING_ARRAY_REF (prapid_CD_contact, csCollisionPair);
-CS_IMPLEMENT_STATIC_VAR (GetCD_contact, prapid_CD_contact,)
+CS_IMPLEMENT_STATIC_VAR (GetCD_contact, prapid_CD_contact,())
 
 static prapid_CD_contact *CD_contact = NULL;
 
@@ -84,8 +84,8 @@ static csRapidCollider* hitv[CD_MAX_COLLISION][2];
 static int currHit;
 
 ///
-CS_IMPLEMENT_STATIC_CLASSVAR (csRapidCollider, mR, GetMR, csMatrix3,)
-CS_IMPLEMENT_STATIC_CLASSVAR (csRapidCollider, mT, GetMT, csVector3, 0)
+CS_IMPLEMENT_STATIC_CLASSVAR (csRapidCollider, mR, GetMR, csMatrix3,())
+CS_IMPLEMENT_STATIC_CLASSVAR (csRapidCollider, mT, GetMT, csVector3, (0))
 
 ///
 int   csRapidCollider::trianglesTested = 0;

@@ -133,10 +133,12 @@ int csMetaBall::check_cell_assume_inside(const csTesselator::GridCell &c)
 }
 
 static int _x,_y,_z;
-static csTesselator::GridCell _cell;
+
+CS_IMPLEMENT_STATIC_VAR (GetGridCell, csTesselator::GridCell, ())
 
 void csMetaBall::CalculateBlob(int dx,int dy,int dz)
 {
+  static csTesselator::GridCell *_cell = GetGridCell ();
   _x+=dx;
   _y+=dy;
   _z+=dz;
@@ -160,12 +162,12 @@ void csMetaBall::CalculateBlob(int dx,int dy,int dz)
 
     int i;
     for(i=0;i<8;i++)
-      _cell.p[i]+=dv;
+      _cell->p[i]+=dv;
 
-    FillCell(_x,_y,_z,_cell);
+    FillCell(_x,_y,_z,*_cell);
 
     int num =
-      csTesselator::Tesselate(_cell, mesh_vertices + vertices_tesselated);
+      csTesselator::Tesselate(*_cell, mesh_vertices + vertices_tesselated);
 
     if(!num)
       goto skip;
@@ -181,7 +183,7 @@ void csMetaBall::CalculateBlob(int dx,int dy,int dz)
 
 skip:
     for(i=0;i<8;i++)
-      _cell.p[i]-=dv;
+      _cell->p[i]-=dv;
   }
 
 ret_back:
@@ -192,6 +194,7 @@ ret_back:
 
 void csMetaBall::CalculateMetaBalls(void)
 {
+  static csTesselator::GridCell *_cell = GetGridCell ();
   frame++;
   vertices_tesselated=0;
 
@@ -220,7 +223,7 @@ void csMetaBall::CalculateMetaBalls(void)
     }
 
     _x=x; _y=y; _z=z;
-    _cell=cell;
+    *_cell=cell;
 
     CalculateBlob(0,0,0);
   }

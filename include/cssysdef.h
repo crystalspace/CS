@@ -499,7 +499,7 @@ Type* getterFunc ()                                           \
   static Type *v=0;                                           \
   if (!v)                                                     \
   {                                                           \
-    v = new Type (initParam);                                 \
+    v = new Type initParam;                                   \
     CS_REGISTER_STATIC_FOR_DESTRUCTION (getterFunc ## _kill); \
   }                                                           \
   return v;                                                   \
@@ -547,7 +547,7 @@ Type* Class::getterFunc ()                                                  \
 {                                                                           \
   if (!var)                                                                 \
   {                                                                         \
-    var = new Type (initParam);                                             \
+    var = new Type initParam;                                               \
     CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                 \
     CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## _kill); \
   }                                                                         \
@@ -569,7 +569,7 @@ Type &Class::getterFunc ()                                                  \
 {                                                                           \
   if (!var)                                                                 \
   {                                                                         \
-    var = new Type (initParam);                                             \
+    var = new Type initParam;                                               \
     CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                 \
     CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## _kill); \
   }                                                                         \

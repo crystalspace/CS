@@ -124,27 +124,15 @@ class csBorderLayout : public csLayout2
   csBorderConstraint c;
 
   /// for your convenience here are prebuild constraints
-  static csBorderConstraint* CENTER;
-  static csBorderConstraint* EAST;
-  static csBorderConstraint* NORTH;
-  static csBorderConstraint* SOUTH;
-  static csBorderConstraint* WEST;
-  static csBorderConstraint* AFTER_LAST_LINE;
-  static csBorderConstraint* AFTER_LINE_ENDS;
-  static csBorderConstraint* BEFORE_FIRST_LINE;
-  static csBorderConstraint* BEFORE_LINE_BEGINS;
-
- protected:
-
-  static csBorderConstraint mCENTER;
-  static csBorderConstraint mEAST;
-  static csBorderConstraint mNORTH;
-  static csBorderConstraint mSOUTH;
-  static csBorderConstraint mWEST;
-  static csBorderConstraint mAFTER_LAST_LINE;
-  static csBorderConstraint mAFTER_LINE_ENDS;
-  static csBorderConstraint mBEFORE_FIRST_LINE;
-  static csBorderConstraint mBEFORE_LINE_BEGINS;
+  CS_DECLARE_STATIC_CLASSVAR (CENTER, GetCenter, csBorderConstraint)
+  CS_DECLARE_STATIC_CLASSVAR (EAST, GetEast, csBorderConstraint)
+  CS_DECLARE_STATIC_CLASSVAR (NORTH, GetNorth, csBorderConstraint)
+  CS_DECLARE_STATIC_CLASSVAR (SOUTH, GetSouth, csBorderConstraint)
+  CS_DECLARE_STATIC_CLASSVAR (WEST, GetWest, csBorderConstraint)
+  CS_DECLARE_STATIC_CLASSVAR (AFTER_LAST_LINE, GetAfterLastLine, csBorderConstraint)
+  CS_DECLARE_STATIC_CLASSVAR (AFTER_LINE_ENDS, GetAfterLineEnds, csBorderConstraint)
+  CS_DECLARE_STATIC_CLASSVAR (BEFORE_FIRST_LINE, GetBeforeFirstLine, csBorderConstraint)
+  CS_DECLARE_STATIC_CLASSVAR (BEFORE_LINE_BEGINS, GetBeforeLineBegins, csBorderConstraint)
 
  protected:
 

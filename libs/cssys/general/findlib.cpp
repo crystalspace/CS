@@ -24,25 +24,25 @@
 #include "csutil/csstrvec.h"
 #include "csutil/util.h"
 
-static csStrVector LibPath (4, 4);
+CS_IMPLEMENT_STATIC_VAR (GetLibPath, csStrVector, (4, 4))
 bool findlib_search_nodir = true;
 
 void csAddLibraryPath (const char *iPath)
 {
-  LibPath.Push (csStrNew (iPath));
+  GetLibPath ()->Push (csStrNew (iPath));
 }
 
 csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
   const char *iSuffix)
 {
   int i, j;
-  for (i = findlib_search_nodir ? -1 : 0; i < LibPath.Length (); i++)
+  for (i = findlib_search_nodir ? -1 : 0; i < GetLibPath ()->Length (); i++)
   {
     char lib [CS_MAXPATHLEN + 1];
 
     // For i == -1 try without any prefix at all
     if (i >= 0)
-      strcpy (lib, LibPath.Get (i));
+      strcpy (lib, GetLibPath ()->Get (i));
     else
       lib [0] = 0;
 

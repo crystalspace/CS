@@ -33,10 +33,13 @@ class csClipper : public iClipper2D
 {
 protected:
   /// This variable holds a pool for 2D polygons as used by the clipper.
-  static csPoly2DPool polypool;
+  static csPoly2DPool *polypool;
 
   /// Result of most recent clipping
   uint8 mrClipping;
+
+public:
+  static csPoly2DPool *GetSharedPool ();
 
 public:
   /// Constructor.

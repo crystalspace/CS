@@ -352,7 +352,7 @@ protected:
   /// Used on drag operations
   static int dragX, dragY, dragMode;
   /// The component bound before drag started
-  static csRect dragBound;
+  static csRect *dragBound;
   /// Component against which this component is clipped<p>
   csComponent *clipparent;
   /// Most components contain a text string. Unify the interface.
@@ -364,7 +364,7 @@ protected:
   /// An array of 'clip children', i.e. components which are clipped inside our bounds
   csVector clipchildren;
   /// This field is used to cache current clipping region during every Redraw()
-  static cswsRectVector visregion;
+  static cswsRectVector *visregion;
 
 public:
   /// The focused child window

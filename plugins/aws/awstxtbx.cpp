@@ -17,7 +17,7 @@ const int awsTextBox:: signalLostFocus = 0x2;
 
 static iAwsSink *textbox_sink = 0;
 
-CS_IMPLEMENT_STATIC_VAR (GetTextBoxBlinkingCursorSlot, awsSlot,)
+CS_IMPLEMENT_STATIC_VAR (GetTextBoxBlinkingCursorSlot, awsSlot,())
 
 static awsSlot *textbox_slot = NULL;
 

@@ -184,15 +184,27 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
 
 //@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
 /// Static vertex array.
-static CS_DECLARE_GROWING_ARRAY (tr_verts, csVector3);
+CS_TYPEDEF_GROWING_ARRAY (dtmesh_tr_verts, csVector3);
+CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, dtmesh_tr_verts, ())
 /// Static z array.
-static CS_DECLARE_GROWING_ARRAY (z_verts, float);
+CS_TYPEDEF_GROWING_ARRAY (dtmesh_z_verts, float);
+CS_IMPLEMENT_STATIC_VAR (Get_z_verts, dtmesh_z_verts, ())
 /// Static uv array.
-static CS_DECLARE_GROWING_ARRAY (uv_verts, csVector2);
+CS_TYPEDEF_GROWING_ARRAY (dtmesh_uv_verts, csVector2);
+CS_IMPLEMENT_STATIC_VAR (Get_uv_verts, dtmesh_uv_verts, ())
 /// The perspective corrected vertices.
-static CS_DECLARE_GROWING_ARRAY (persp, csVector2);
+CS_TYPEDEF_GROWING_ARRAY (dtmesh_persp, csVector2);
+CS_IMPLEMENT_STATIC_VAR (Get_persp, dtmesh_persp, ())
 /// Array with colors.
-static CS_DECLARE_GROWING_ARRAY (color_verts, csColor);
+CS_TYPEDEF_GROWING_ARRAY (dtmesh_color_verts, csColor);
+CS_IMPLEMENT_STATIC_VAR (Get_color_verts, dtmesh_color_verts, ())
+
+static dtmesh_tr_verts *tr_verts = NULL;
+static dtmesh_z_verts *z_verts = NULL;
+static dtmesh_uv_verts *uv_verts = NULL;
+static dtmesh_persp *persp = NULL;
+static dtmesh_color_verts *color_verts = NULL;
+
 
 static void DrawTriangle (
 	iGraphics3D* g3d,
@@ -211,6 +223,13 @@ static void DrawTriangle (
   csVector2 clipped_triangle[MAX_OUTPUT_VERTICES];	//@@@BAD HARCODED!
   csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
   uint8 clip_result;
+
+  if (!tr_verts)
+  {
+    tr_verts = Get_tr_verts ();
+    persp= Get_persp();
+    color_verts = Get_color_verts ();
+  }
 
   //-----
   // Do backface culling. Note that this depends on the
@@ -287,6 +306,15 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
 {
   int i;
 
+  if (!z_verts)
+  {
+    tr_verts = Get_tr_verts ();
+    z_verts = Get_z_verts ();
+    uv_verts = Get_uv_verts ();
+    persp= Get_persp();
+    color_verts = Get_color_verts ();
+  }
+
 #if CS_DEBUG
   // Check if the vertex buffers are locked.
   CS_ASSERT (mesh.buffers[0]->IsLocked ());
@@ -301,13 +329,13 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
 
   // Update work tables.
-  if (num_vertices > tr_verts.Limit ())
+  if (num_vertices > tr_verts->Limit ())
   {
-    tr_verts.SetLimit (num_vertices);
-    z_verts.SetLimit (num_vertices);
-    uv_verts.SetLimit (num_vertices);
-    persp.SetLimit (num_vertices);
-    color_verts.SetLimit (num_vertices);
+    tr_verts->SetLimit (num_vertices);
+    z_verts->SetLimit (num_vertices);
+    uv_verts->SetLimit (num_vertices);
+    persp->SetLimit (num_vertices);
+    color_verts->SetLimit (num_vertices);
   }
 
   // Do vertex tweening and/or transformation to camera space
@@ -335,42 +363,42 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
       for (i = 0 ; i < num_vertices ; i++)
       {
-        tr_verts[i] = o2c * (tween_ratio * f2[i] + remainder * f1[i]);
+        (*tr_verts)[i] = o2c * (tween_ratio * f2[i] + remainder * f1[i]);
 	if (mesh.do_morph_texels)
-	  uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
+	  (*uv_verts)[i] = tween_ratio * uv2[i] + remainder * uv1[i];
 	if (mesh.do_morph_colors && mesh.use_vertex_color)
 	{
-	  color_verts[i].red = tween_ratio * col2[i].red
+	  (*color_verts)[i].red = tween_ratio * col2[i].red
 	  	+ remainder * col1[i].red;
-	  color_verts[i].green = tween_ratio * col2[i].green
+	  (*color_verts)[i].green = tween_ratio * col2[i].green
 	  	+ remainder * col1[i].green;
-	  color_verts[i].blue = tween_ratio * col2[i].blue
+	  (*color_verts)[i].blue = tween_ratio * col2[i].blue
 	  	+ remainder * col1[i].blue;
 	}
       }
     else
       for (i = 0 ; i < num_vertices ; i++)
       {
-        tr_verts[i] = tween_ratio * f2[i] + remainder * f1[i];
+        (*tr_verts)[i] = tween_ratio * f2[i] + remainder * f1[i];
 	if (mesh.do_morph_texels)
-	  uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
+	  (*uv_verts)[i] = tween_ratio * uv2[i] + remainder * uv1[i];
 	if (mesh.do_morph_colors && mesh.use_vertex_color)
 	{
-	  color_verts[i].red = tween_ratio * col2[i].red
+	  (*color_verts)[i].red = tween_ratio * col2[i].red
 	  	+ remainder * col1[i].red;
-	  color_verts[i].green = tween_ratio * col2[i].green
+	  (*color_verts)[i].green = tween_ratio * col2[i].green
 	  	+ remainder * col1[i].green;
-	  color_verts[i].blue = tween_ratio * col2[i].blue
+	  (*color_verts)[i].blue = tween_ratio * col2[i].blue
 	  	+ remainder * col1[i].blue;
 	}
       }
-    work_verts = tr_verts.GetArray ();
+    work_verts = tr_verts->GetArray ();
     if (mesh.do_morph_texels)
-      work_uv_verts = uv_verts.GetArray ();
+      work_uv_verts = uv_verts->GetArray ();
     else
       work_uv_verts = uv1;
     if (mesh.do_morph_colors)
-      work_col = color_verts.GetArray ();
+      work_col = color_verts->GetArray ();
     else
       work_col = col1;
   }
@@ -379,8 +407,8 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
     {
       for (i = 0 ; i < num_vertices ; i++)
-        tr_verts[i] = o2c * f1[i];
-      work_verts = tr_verts.GetArray ();
+        (*tr_verts)[i] = o2c * f1[i];
+      work_verts = tr_verts->GetArray ();
     }
     else
       work_verts = f1;
@@ -393,10 +421,10 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   {
     if (work_verts[i].z >= SMALL_Z)
     {
-      z_verts[i] = 1. / work_verts[i].z;
-      float iz = aspect * z_verts[i];
-      persp[i].x = work_verts[i].x * iz + width2;
-      persp[i].y = work_verts[i].y * iz + height2;
+      (*z_verts)[i] = 1. / work_verts[i].z;
+      float iz = aspect * (*z_verts)[i];
+      (*persp)[i].x = work_verts[i].x * iz + width2;
+      (*persp)[i].y = work_verts[i].y * iz + height2;
     }
   }
 
@@ -439,8 +467,8 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       //=====
       int trivert [3] = { a, b, c };
       DrawTriangle (g3d, clipper, mesh, poly,
-      	persp[a], persp[b], persp[c], trivert,
-	z_verts.GetArray (), work_uv_verts, work_col, mesh.vertex_fog);
+      	(*persp)[a], (*persp)[b], (*persp)[c], trivert,
+	z_verts->GetArray (), work_uv_verts, work_col, mesh.vertex_fog);
     }
     else if (cnt_vis == 1)
     {
@@ -465,7 +493,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       G3DFogInfo fog[3];
 #undef COPYVT
 #define COPYVT(id,idl,i) \
-	p##idl = persp[i]; zv[id] = z_verts[i]; uv[id] = work_uv_verts[i]; \
+	p##idl = (*persp)[i]; zv[id] = (*z_verts)[i]; uv[id] = work_uv_verts[i]; \
 	if (work_col) col[id] = work_col[i]; \
 	if (poly.use_fog) fog[id] = mesh.vertex_fog[i];
 #undef INTERPOL

@@ -43,17 +43,17 @@ static float __calc_area (int n, csVector2 *p)
 // No doubt static vars are !!!EVIL!!! :-) but for
 // the sake of performance's we still use them ...
 
-CS_IMPLEMENT_STATIC_VAR(GetAAGrid, csRect,)
+CS_IMPLEMENT_STATIC_VAR(GetAAGrid, csRect, ())
 static csAAPFCBPixel PutPixel;
 static csAAPFCBBox DrawBox;
 static void *Arg;
-static csRect &Grid = *GetAAGrid();
 
 void __poly_fill (csVector2 *iVertices, int iVertexCount)
 {
   // Calculate the complete are of visible rectangle
-  int height = Grid.Height ();
-  int width = Grid.Width ();
+  static csRect *Grid = GetAAGrid();
+  int height = Grid->Height ();
+  int width = Grid->Width ();
   int visarea = width * height;
 
   // Sanity check (prevents infinite looping)
@@ -69,7 +69,7 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
   // Check if current rectangle equals a single grid cell
   if (height == 1 && width == 1)
   {
-    PutPixel (Grid.xmin, Grid.ymin, a, Arg);
+    PutPixel (Grid->xmin, Grid->ymin, a, Arg);
     return ;
   }
 
@@ -78,14 +78,14 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
   {
     // this area is completely covered
     if (DrawBox)
-      DrawBox (Grid.xmin, Grid.ymin, width, height, Arg);
+      DrawBox (Grid->xmin, Grid->ymin, width, height, Arg);
     else
     {
       int i, j;
       for (i = 0; i < height; i++)
       {
         for (j = 0; j < width; j++)
-          PutPixel (Grid.xmin + j, Grid.ymin + i, 1.0, Arg);
+          PutPixel (Grid->xmin + j, Grid->ymin + i, 1.0, Arg);
       }
     }
 
@@ -104,7 +104,7 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
     // Split the polygon vertically by the line "x = sub_x"
 
     // (p2 [0] -- left poly, p2 [1] -- right poly)
-    int sub_x = Grid.xmin + width / 2;
+    int sub_x = Grid->xmin + width / 2;
     int where_are_we = iVertices[0].x > sub_x;
     p2[where_are_we][n2[where_are_we]++] = iVertices[0];
 
@@ -140,22 +140,22 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
       prev = cur;
     }
 
-    int tmp = Grid.xmax;
-    Grid.xmax = sub_x;
+    int tmp = Grid->xmax;
+    Grid->xmax = sub_x;
     __poly_fill (p2[0], n2[0]);
-    Grid.xmax = tmp;
+    Grid->xmax = tmp;
 
-    tmp = Grid.xmin;
-    Grid.xmin = sub_x;
+    tmp = Grid->xmin;
+    Grid->xmin = sub_x;
     __poly_fill (p2[1], n2[1]);
-    Grid.xmin = tmp;
+    Grid->xmin = tmp;
   }
   else
   {
     // Split the polygon horizontally by the line "y = sub_y"
 
     // (p[0] -- top poly, p[1] -- bottom poly)
-    int sub_y = Grid.ymin + height / 2;
+    int sub_y = Grid->ymin + height / 2;
     int where_are_we = iVertices[0].y > sub_y;
     p2[where_are_we][n2[where_are_we]++] = iVertices[0];
 
@@ -191,15 +191,15 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
       prev = cur;
     }
 
-    int tmp = Grid.ymax;
-    Grid.ymax = sub_y;
+    int tmp = Grid->ymax;
+    Grid->ymax = sub_y;
     __poly_fill (p2[0], n2[0]);
-    Grid.ymax = tmp;
+    Grid->ymax = tmp;
 
-    tmp = Grid.ymin;
-    Grid.ymin = sub_y;
+    tmp = Grid->ymin;
+    Grid->ymin = sub_y;
     __poly_fill (p2[1], n2[1]);
-    Grid.ymin = tmp;
+    Grid->ymin = tmp;
   }
 }
 
@@ -210,6 +210,7 @@ void csAntialiasedPolyFill (
   csAAPFCBPixel iPutPixel,
   csAAPFCBBox iDrawBox)
 {
+  static csRect *Grid = GetAAGrid();
   // if nothing to do, exit
   if (iVertexCount <= 0) return ;
 
@@ -218,19 +219,19 @@ void csAntialiasedPolyFill (
   Arg = iArg;
 
   // Find the bounding box first
-  Grid.Set (999999, 999999, -999999, -999999);
+  Grid->Set (999999, 999999, -999999, -999999);
 
   int i;
   for (i = 0; i < iVertexCount; i++)
   {
     int x = QInt (iVertices[i].x);
     int y = QInt (iVertices[i].y);
-    if (Grid.xmin > x) Grid.xmin = x;
-    if (Grid.ymin > y) Grid.ymin = y;
+    if (Grid->xmin > x) Grid->xmin = x;
+    if (Grid->ymin > y) Grid->ymin = y;
     x = QRound (ceil (iVertices[i].x));
     y = QRound (ceil (iVertices[i].y));
-    if (Grid.xmax < x) Grid.xmax = x;
-    if (Grid.ymax < y) Grid.ymax = y;
+    if (Grid->xmax < x) Grid->xmax = x;
+    if (Grid->ymax < y) Grid->ymax = y;
   }
 
   __poly_fill (iVertices, iVertexCount);

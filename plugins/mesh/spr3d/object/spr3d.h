@@ -936,13 +936,15 @@ private:
    */
   int num_verts_for_lod;
 
+public:
   /**
    * A mesh which contains a number of triangles as generated
    * by the LOD algorithm. This is static since it will likely
    * change every frame anyway. We hold it static also since
    * we don't want to allocate it again every time.
    */
-  static csTriangleMesh2 mesh;
+  CS_DECLARE_STATIC_CLASSVAR (mesh, GetLODMesh, csTriangleMesh2)
+private:
 
   /// Mixmode for the triangles/polygons of the sprite.
   uint MixMode;

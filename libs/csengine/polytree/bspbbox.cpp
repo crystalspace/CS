@@ -37,7 +37,7 @@ void csBspPolygonFactory::Init (csPolygonInt *pi)
 }
 
 //---------------------------------------------------------------------------
-CS_IMPLEMENT_STATIC_CLASSVAR(csBspPolygon,poly_fact,GetPolygonFact,csBspPolygonFactory,)
+CS_IMPLEMENT_STATIC_CLASSVAR(csBspPolygon,poly_fact,GetPolygonFact,csBspPolygonFactory,())
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(csBspPolygon,poly_pool,GetPolygonPool,csPolygonIntPool,(csBspPolygon::GetPolygonFact()))
 
 void csBspPolygon::Dump ()

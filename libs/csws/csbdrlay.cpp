@@ -15,38 +15,54 @@ csLayoutConstraint *csBorderConstraint::Clone ()
 
 /***** Implementation for class BorderLayout *****/
 
-csBorderConstraint csBorderLayout::mCENTER (csBorderLayout::_CENTER);
-csBorderConstraint csBorderLayout::mEAST (csBorderLayout::_EAST);
-csBorderConstraint csBorderLayout::mNORTH (csBorderLayout::_NORTH);
-csBorderConstraint csBorderLayout::mSOUTH (csBorderLayout::_SOUTH);
-csBorderConstraint csBorderLayout::mWEST (csBorderLayout::_WEST);
+CS_IMPLEMENT_STATIC_CLASSVAR (csBorderLayout, CENTER, GetCenter, csBorderConstraint, 
+                              (csBorderLayout::_CENTER))
+CS_IMPLEMENT_STATIC_CLASSVAR (csBorderLayout, EAST, GetEast, csBorderConstraint, 
+                              (csBorderLayout::_EAST))
+CS_IMPLEMENT_STATIC_CLASSVAR (csBorderLayout, NORTH, GetNorth, csBorderConstraint, 
+                              (csBorderLayout::_NORTH))
+CS_IMPLEMENT_STATIC_CLASSVAR (csBorderLayout, SOUTH, GetSouth, csBorderConstraint, 
+                              (csBorderLayout::_SOUTH))
+CS_IMPLEMENT_STATIC_CLASSVAR (csBorderLayout, WEST, GetWest, csBorderConstraint, 
+                              (csBorderLayout::_WEST))
 
-csBorderConstraint csBorderLayout::mAFTER_LAST_LINE (csBorderLayout::_AFTER_LAST_LINE);
-csBorderConstraint csBorderLayout::mAFTER_LINE_ENDS (csBorderLayout::_AFTER_LINE_ENDS);
-csBorderConstraint csBorderLayout::mBEFORE_FIRST_LINE (csBorderLayout::_BEFORE_FIRST_LINE);
-csBorderConstraint csBorderLayout::mBEFORE_LINE_BEGINS (csBorderLayout::_BEFORE_LINE_BEGINS);
-
-csBorderConstraint* csBorderLayout::CENTER = &csBorderLayout::mCENTER;
-csBorderConstraint* csBorderLayout::EAST = &csBorderLayout::mEAST;
-csBorderConstraint* csBorderLayout::NORTH = &csBorderLayout::mNORTH;
-csBorderConstraint* csBorderLayout::SOUTH = &csBorderLayout::mSOUTH;
-csBorderConstraint* csBorderLayout::WEST = &csBorderLayout::mWEST;
-
-csBorderConstraint* csBorderLayout::AFTER_LAST_LINE = &csBorderLayout::mAFTER_LAST_LINE;
-csBorderConstraint* csBorderLayout::AFTER_LINE_ENDS = &csBorderLayout::mAFTER_LINE_ENDS;
-csBorderConstraint* csBorderLayout::BEFORE_FIRST_LINE = &csBorderLayout::mBEFORE_FIRST_LINE;
-csBorderConstraint* csBorderLayout::BEFORE_LINE_BEGINS = &csBorderLayout::mBEFORE_LINE_BEGINS;
+CS_IMPLEMENT_STATIC_CLASSVAR (csBorderLayout, AFTER_LAST_LINE, GetAfterLastLine, csBorderConstraint, 
+                              (csBorderLayout::_AFTER_LAST_LINE))
+CS_IMPLEMENT_STATIC_CLASSVAR (csBorderLayout, AFTER_LINE_ENDS, GetAfterLineEnds, csBorderConstraint, 
+                              (csBorderLayout::_AFTER_LINE_ENDS))
+CS_IMPLEMENT_STATIC_CLASSVAR (csBorderLayout, BEFORE_FIRST_LINE, GetBeforeFirstLine, csBorderConstraint, 
+                              (csBorderLayout::_BEFORE_FIRST_LINE))
+CS_IMPLEMENT_STATIC_CLASSVAR (csBorderLayout, BEFORE_LINE_BEGINS, GetBeforeLineBegins, csBorderConstraint, 
+                              (csBorderLayout::_BEFORE_LINE_BEGINS))
 
 csBorderLayout::csBorderLayout (csComponent *pParent)
   : csLayout2 (pParent), c (0), mHgap (0), mVgap (0)
 {
   lc = &c;
+  GetCenter ();
+  GetNorth ();
+  GetWest ();
+  GetSouth ();
+  GetEast ();
+  GetAfterLastLine ();
+  GetAfterLineEnds ();
+  GetBeforeFirstLine ();
+  GetBeforeLineBegins ();
 }
 
 csBorderLayout::csBorderLayout (csComponent *pParent, int hgap, int vgap)
   : csLayout2 (pParent), c (0), mHgap (hgap), mVgap (vgap)
 {
   lc = &c;
+  GetCenter ();
+  GetNorth ();
+  GetWest ();
+  GetSouth ();
+  GetEast ();
+  GetAfterLastLine ();
+  GetAfterLineEnds ();
+  GetBeforeFirstLine ();
+  GetBeforeLineBegins ();
 }
 
 csBorderLayout::~csBorderLayout ()
@@ -57,15 +73,14 @@ void csBorderLayout::SuggestSize (int &w, int &h)
 {
   int cw, ch, ew, eh, nw, nh, sw, sh, ww, wh;
   cw = ch = ew = eh = nw = nh = sw = sh = ww = wh = 0;
-  if (mCENTER.comp) mCENTER.comp->SuggestSize (cw, ch);
-  if (mEAST.comp) mEAST.comp->SuggestSize (ew, eh);
-  if (mNORTH.comp) mNORTH.comp->SuggestSize (nw, nh);
-  if (mSOUTH.comp) mSOUTH.comp->SuggestSize (sw, sh);
-  if (mWEST.comp) mWEST.comp->SuggestSize (ww, wh);
+  if (CENTER->comp) CENTER->comp->SuggestSize (cw, ch);
+  if (EAST->comp) EAST->comp->SuggestSize (ew, eh);
+  if (NORTH->comp) NORTH->comp->SuggestSize (nw, nh);
+  if (SOUTH->comp) SOUTH->comp->SuggestSize (sw, sh);
+  if (WEST->comp) WEST->comp->SuggestSize (ww, wh);
 
   w = GetWidthSum (ww, cw, ew, mHgap,
-    mWEST.comp != NULL, mCENTER.comp != NULL, mEAST.comp != NULL);
-  //  h = GetWidthSum (nh, ch, sh, mVgap, mNORT.comp != NULL, mCENTER.comp != NULL, mEAST.comp != NULL);
+    WEST->comp != NULL,CENTER->comp != NULL, EAST->comp != NULL);
 
   h = nh + ch + sh;
 }
@@ -74,11 +89,11 @@ void csBorderLayout::LayoutContainer ()
 {
   int cw, ch, ew, eh, nw, nh, sw, sh, ww, wh;
   cw = ch = ew = eh = nw = nh = sw = sh = ww = wh = 0;
-  if (mCENTER.comp) mCENTER.comp->SuggestSize (cw, ch);
-  if (mEAST.comp) mEAST.comp->SuggestSize (ew, eh);
-  if (mNORTH.comp) mNORTH.comp->SuggestSize (nw, nh);
-  if (mSOUTH.comp) mSOUTH.comp->SuggestSize (sw, sh);
-  if (mWEST.comp) mWEST.comp->SuggestSize (ww, wh);
+  if (CENTER->comp) CENTER->comp->SuggestSize (cw, ch);
+  if (EAST->comp) EAST->comp->SuggestSize (ew, eh);
+  if (NORTH->comp) NORTH->comp->SuggestSize (nw, nh);
+  if (SOUTH->comp) SOUTH->comp->SuggestSize (sw, sh);
+  if (WEST->comp) WEST->comp->SuggestSize (ww, wh);
 
   int x = 0, y = 0;
 
@@ -91,42 +106,42 @@ void csBorderLayout::LayoutContainer ()
   parentHeight -= insets.ymin + insets.ymax;
 
   DistributeSizes (ww, cw, ew, parentWidth, mHgap,
-    mWEST.comp != NULL, mCENTER.comp != NULL, mEAST.comp != NULL);
+    WEST->comp != NULL, CENTER->comp != NULL, EAST->comp != NULL);
   DistributeSizes (nh, ch, sh, parentHeight, mVgap,
-    mNORTH.comp != NULL, mCENTER.comp != NULL, mSOUTH.comp != NULL);
+    NORTH->comp != NULL, CENTER->comp != NULL, SOUTH->comp != NULL);
 
   eh = wh = ch;
   nw = sw = parentWidth;
 
-  if (mCENTER.comp)
+  if (CENTER->comp)
   {
-    mCENTER.comp->SetPos (x + ww + Hgap (mWEST.comp), y + nh + Vgap (mNORTH.comp));
-    mCENTER.comp->SetSize (cw, ch);
+    CENTER->comp->SetPos (x + ww + Hgap (WEST->comp), y + nh + Vgap (NORTH->comp));
+    CENTER->comp->SetSize (cw, ch);
   }
 
-  if (mEAST.comp)
+  if (EAST->comp)
   {
-    mEAST.comp->SetPos (x + ww + cw + Hgap (mWEST.comp) + Hgap (mCENTER.comp),
-      y + nh + Vgap (mNORTH.comp));
-    mEAST.comp->SetSize (ew, eh);
+    EAST->comp->SetPos (x + ww + cw + Hgap (WEST->comp) + Hgap (CENTER->comp),
+      y + nh + Vgap (NORTH->comp));
+    EAST->comp->SetSize (ew, eh);
   }
 
-  if (mNORTH.comp)
+  if (NORTH->comp)
   {
-    mNORTH.comp->SetPos (x, y);
-    mNORTH.comp->SetSize (nw, nh);
+    NORTH->comp->SetPos (x, y);
+    NORTH->comp->SetSize (nw, nh);
   }
 
-  if (mSOUTH.comp)
+  if (SOUTH->comp)
   {
-    mSOUTH.comp->SetPos (x, y + nh + ch + Vgap (mNORTH.comp) + Vgap (mCENTER.comp));
-    mSOUTH.comp->SetSize (sw, sh);
+    SOUTH->comp->SetPos (x, y + nh + ch + Vgap (NORTH->comp) + Vgap (CENTER->comp));
+    SOUTH->comp->SetSize (sw, sh);
   }
 
-  if (mWEST.comp)
+  if (WEST->comp)
   {
-    mWEST.comp->SetPos (x, y + nh + Vgap (mNORTH.comp));
-    mWEST.comp->SetSize (ww, wh);
+    WEST->comp->SetPos (x, y + nh + Vgap (NORTH->comp));
+    WEST->comp->SetSize (ww, wh);
   }
 }
 
@@ -136,11 +151,11 @@ csLayoutConstraint *csBorderLayout::AddLayoutComponent (csComponent* comp)
 
   switch (c->mAlign)
   {
-    case _CENTER : mCENTER.comp = comp; break;
-    case _EAST   : mEAST.comp   = comp; break;
-    case _NORTH  : mNORTH.comp  = comp; break;
-    case _SOUTH  : mSOUTH.comp  = comp; break;
-    case _WEST   : mWEST.comp   = comp; break;
+    case _CENTER : CENTER->comp = comp; break;
+    case _EAST   : EAST->comp   = comp; break;
+    case _NORTH  : NORTH->comp  = comp; break;
+    case _SOUTH  : SOUTH->comp  = comp; break;
+    case _WEST   : WEST->comp   = comp; break;
     default: break;
   }
   return c;
@@ -154,11 +169,11 @@ void csBorderLayout::RemoveLayoutComponent (csComponent* comp)
     csBorderConstraint *c = (csBorderConstraint*)vConstraints.Get (idx);
     switch (c->mAlign)
     {
-      case _CENTER : mCENTER.comp = NULL; break;
-      case _EAST   : mEAST.comp   = NULL; break;
-      case _NORTH  : mNORTH.comp  = NULL; break;
-      case _SOUTH  : mSOUTH.comp  = NULL; break;
-      case _WEST   : mWEST.comp   = NULL; break;
+      case _CENTER : CENTER->comp = NULL; break;
+      case _EAST   : EAST->comp   = NULL; break;
+      case _NORTH  : NORTH->comp  = NULL; break;
+      case _SOUTH  : SOUTH->comp  = NULL; break;
+      case _WEST   : WEST->comp   = NULL; break;
       default: break;
     }
   }

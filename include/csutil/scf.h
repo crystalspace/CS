@@ -595,7 +595,7 @@ SCF_VERSION (iFactory, 0, 0, 1);
  */
 struct iFactory : public iBase
 {
-  /// Create a insance of class this factory represents.
+  /// Create a instance of class this factory represents.
   virtual void *CreateInstance () = 0;
   /// Try to unload class module (i.e. shared module).
   virtual void TryUnload () = 0;

@@ -47,7 +47,7 @@
   X &Y = *Y##__
 #endif
 
-CS_IMPLEMENT_STATIC_CLASSVAR(csPolygon2DFactory,sharedFactory,SharedFactory,csPolygon2DFactory,)
+CS_IMPLEMENT_STATIC_CLASSVAR(csPolygon2DFactory,sharedFactory,SharedFactory,csPolygon2DFactory,())
 
 void csPolygon2D::AddPerspective (const csVector3 &v)
 {

@@ -57,9 +57,9 @@
 // cleaned too.
 
 CS_TYPEDEF_GROWING_ARRAY_REF (engine3d_VectorArray, csVector3);
-CS_IMPLEMENT_STATIC_VAR (GetStaticVectorArray, engine3d_VectorArray,)
+CS_IMPLEMENT_STATIC_VAR (GetStaticVectorArray, engine3d_VectorArray,())
 
-static engine3d_VectorArray &VectorArray = *GetStaticVectorArray();
+static engine3d_VectorArray *VectorArray = NULL;
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csPolyTexType)
   SCF_IMPLEMENTS_INTERFACE(iPolyTexType)
@@ -289,6 +289,7 @@ csPolygon3D::csPolygon3D (
     csObject(),
     vertices(4)
 {
+  VectorArray = GetStaticVectorArray();
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
   DG_TYPE ((csObject *)this, "csPolygon3D");
   thing = NULL;
@@ -317,7 +318,7 @@ csPolygon3D::csPolygon3D (
 
   SetTextureType (POLYTXT_LIGHTMAP);
 
-  VectorArray.IncRef ();
+  VectorArray->IncRef ();
 #ifdef DO_HW_UVZ
   uvz = NULL;
   isClipped = false;
@@ -329,6 +330,7 @@ csPolygon3D::csPolygon3D (csPolygon3D &poly) :
   csObject(),
   vertices(4)
 {
+  VectorArray = GetStaticVectorArray();
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
   DG_TYPE ((csObject *)this, "csPolygon3D");
 
@@ -373,7 +375,7 @@ csPolygon3D::csPolygon3D (csPolygon3D &poly) :
   light_info.lightpatches = NULL;
   light_info.dyn_dirty = false;
 
-  VectorArray.IncRef ();
+  VectorArray->IncRef ();
 #ifdef DO_HW_UVZ
   uvz = NULL;
   isClipped = false;
@@ -405,7 +407,7 @@ csPolygon3D::~csPolygon3D ()
 
   while (light_info.lightpatches)
     csEngine::current_engine->lightpatch_pool->Free (light_info.lightpatches);
-  VectorArray.DecRef ();
+  VectorArray->DecRef ();
 #ifdef DO_HW_UVZ
   if (uvz) delete[] uvz;
 #endif
@@ -2351,9 +2353,9 @@ void csPolygon3D::CalculateLightingDynamic (csFrustumView *lview)
   bool fill_lightmap = true;
 
   num_vertices = GetVertices ().GetVertexCount ();
-  if (num_vertices > VectorArray.Limit ())
-    VectorArray.SetLimit (num_vertices);
-  poly = VectorArray.GetArray ();
+  if (num_vertices > VectorArray->Limit ())
+    VectorArray->SetLimit (num_vertices);
+  poly = VectorArray->GetArray ();
 
   int j;
   if (lview->GetFrustumContext ()->IsMirrored ())
@@ -2484,10 +2486,10 @@ void csPolygon3D::CalculateLightingStatic (csFrustumView *lview, bool vis)
     csFrustumContext *new_ctxt = lview->GetFrustumContext ();
 
     int num_vertices = GetVertices ().GetVertexCount ();
-    if (num_vertices > VectorArray.Limit ())
-      VectorArray.SetLimit (num_vertices);
+    if (num_vertices > VectorArray->Limit ())
+      VectorArray->SetLimit (num_vertices);
 
-    csVector3 *poly = VectorArray.GetArray ();
+    csVector3 *poly = VectorArray->GetArray ();
 
     int j;
     if (old_ctxt->IsMirrored ())

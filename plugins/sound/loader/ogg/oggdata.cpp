@@ -78,7 +78,7 @@ csOggSoundData::cs_ov_callbacks::cs_ov_callbacks ()
   tell_func = cs_ogg_tell;
 }
 
-csOggSoundData::cs_ov_callbacks csOggSoundData::callbacks;
+CS_IMPLEMENT_STATIC_VAR (GetCallbacks, csOggSoundData::cs_ov_callbacks, ())
 
 csOggSoundData::csOggSoundData (iBase *parent, uint8 *data, size_t len)
 {
@@ -109,7 +109,7 @@ bool csOggSoundData::Initialize(const csSoundFormat *fmt)
 {
   if (!ogg_ok)
   {
-    ogg_ok = ov_open_callbacks(ds, &vf, NULL, 0, *(ov_callbacks*)&callbacks) == 0;
+    ogg_ok = ov_open_callbacks(ds, &vf, NULL, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
     if (fmt->Channels != -1)
       this->fmt.Channels = fmt->Channels;
     if (fmt->Freq != -1)
@@ -123,7 +123,7 @@ bool csOggSoundData::IsOgg (void *Buffer, size_t len)
 {
   datastore *dd = new datastore ((uint8*)Buffer, len, false);
   OggVorbis_File f;
-  bool ok = ov_open_callbacks(dd, &f, NULL, 0, *(ov_callbacks*)&callbacks) == 0;
+  bool ok = ov_open_callbacks(dd, &f, NULL, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
   ov_clear (&f);
   delete dd;
   return ok;

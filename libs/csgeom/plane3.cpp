@@ -42,17 +42,8 @@ void csPlane3::Set (
 
 CS_TYPEDEF_GROWING_ARRAY (csgeom_csPlane3_Verts, csVector3);
 CS_TYPEDEF_GROWING_ARRAY (csgeom_csPlane3_Vis, bool);
-CS_IMPLEMENT_STATIC_VAR (GetStatic_csgeom_csPlane3_Verts, csgeom_csPlane3_Verts,)
-CS_IMPLEMENT_STATIC_VAR (GetStatic_csgeom_csPlane3_Vis, csgeom_csPlane3_Vis,)
-
-static csgeom_csPlane3_Verts &verts = *GetStatic_csgeom_csPlane3_Verts ();
-static csgeom_csPlane3_Vis &vis = *GetStatic_csgeom_csPlane3_Vis ();
-
-static void CPInit (int len)
-{
-  verts.SetLimit (len);
-  vis.SetLimit (len);
-}
+CS_IMPLEMENT_STATIC_VAR (GetStatic_csgeom_csPlane3_Verts, csgeom_csPlane3_Verts,())
+CS_IMPLEMENT_STATIC_VAR (GetStatic_csgeom_csPlane3_Vis, csgeom_csPlane3_Vis,())
 
 bool csPlane3::ClipPolygon (
   csVector3 * &pverts,
@@ -62,14 +53,20 @@ bool csPlane3::ClipPolygon (
   int i, i1, num_vertices = num_verts, cnt_vis = 0;
   bool zs, z1s;
   float r;
+  static csgeom_csPlane3_Verts *verts = GetStatic_csgeom_csPlane3_Verts ();
+  static csgeom_csPlane3_Vis *vis = GetStatic_csgeom_csPlane3_Vis ();
 
   if (!reversed) Invert ();
-  if (num_verts > verts.Limit ()) CPInit (num_verts);
+  if (num_verts > verts->Limit ())
+  {
+    verts->SetLimit (num_verts);
+    vis->SetLimit (num_verts);
+  }
 
   for (i = 0; i < num_vertices; i++)
   {
-    vis[i] = Classify (pverts[i]) >= 0;
-    if (vis[i]) cnt_vis++;
+    (*vis)[i] = Classify (pverts[i]) >= 0;
+    if ((*vis)[i]) cnt_vis++;
   }
 
   if (cnt_vis == 0)
@@ -93,29 +90,29 @@ bool csPlane3::ClipPolygon (
 
   for (i = 0; i < num_vertices; i++)
   {
-    zs = vis[i];
-    z1s = vis[i1];
+    zs = (*vis)[i];
+    z1s = (*vis)[i1];
 
     if (!z1s && zs)
     {
-      csIntersect3::Plane (pverts[i1], pverts[i], *this, verts[num_verts], r);
+      csIntersect3::Plane (pverts[i1], pverts[i], *this, (*verts)[num_verts], r);
       num_verts++;
-      verts[num_verts++] = pverts[i];
+      (*verts)[num_verts++] = pverts[i];
     }
     else if (z1s && !zs)
     {
-      csIntersect3::Plane (pverts[i1], pverts[i], *this, verts[num_verts], r);
+      csIntersect3::Plane (pverts[i1], pverts[i], *this, (*verts)[num_verts], r);
       num_verts++;
     }
     else if (z1s && zs)
     {
-      verts[num_verts++] = pverts[i];
+      (*verts)[num_verts++] = pverts[i];
     }
 
     i1 = i;
   }
 
-  pverts = verts.GetArray ();
+  pverts = verts->GetArray ();
   if (!reversed) Invert ();
   return true;
 }

@@ -63,7 +63,6 @@ class csOggSoundData : public iSoundData
   };
 
  protected:
-  static cs_ov_callbacks callbacks;
   OggVorbis_File vf;
   datastore *ds;
   int endian;

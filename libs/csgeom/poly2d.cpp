@@ -19,7 +19,7 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/polyclip.h"
 
-CS_IMPLEMENT_STATIC_CLASSVAR (csPoly2DFactory,sharedFactory,SharedFactory,csPoly2DFactory,)
+CS_IMPLEMENT_STATIC_CLASSVAR (csPoly2DFactory,sharedFactory,SharedFactory,csPoly2DFactory,())
 
 csPoly2D::csPoly2D (int start_size)
 {

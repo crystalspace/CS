@@ -68,31 +68,59 @@
 // dynamic textures will utilise multiple instances of csGraphics3DOGLCommon
 
 /// Static vertex array.
-static CS_DECLARE_GROWING_ARRAY_REF (tr_verts, csVector3);
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_tr_verts, csVector3);
+CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, ogl_g3dcom_tr_verts, ())
 /// Static uv array.
-static CS_DECLARE_GROWING_ARRAY_REF (uv_verts, csVector2);
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_uv_verts, csVector2);
+CS_IMPLEMENT_STATIC_VAR (Get_uv_verts, ogl_g3dcom_uv_verts, ())
 /// Static uv array for multi-texture.
-static CS_DECLARE_GROWING_ARRAY_REF (uv_mul_verts, csVector2);
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_uv_mul_verts, csVector2);
+CS_IMPLEMENT_STATIC_VAR (Get_uv_mul_verts, ogl_g3dcom_uv_mul_verts, ())
 /// Array with colors.
-static CS_DECLARE_GROWING_ARRAY_REF (color_verts, csColor);
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_color_verts, csColor);
+CS_IMPLEMENT_STATIC_VAR (Get_color_verts, ogl_g3dcom_color_verts, ())
 /// Array with RGBA colors.
-static CS_DECLARE_GROWING_ARRAY_REF (rgba_verts, GLfloat);
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_rgba_verts, GLfloat);
+CS_IMPLEMENT_STATIC_VAR (Get_rgba_verts, ogl_g3dcom_rgba_verts, ())
 
 /// Array for clipping.
-static CS_DECLARE_GROWING_ARRAY_REF (clipped_triangles, csTriangle);
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_triangles, csTriangle);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_triangles, ogl_g3dcom_clipped_triangles, ())
 /// Array for clipping.
-static CS_DECLARE_GROWING_ARRAY_REF (clipped_translate, int);
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_translate, int);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_translate, ogl_g3dcom_clipped_translate, ())
 /// Array for clipping.
-static CS_DECLARE_GROWING_ARRAY_REF (clipped_vertices, csVector3);
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_vertices, csVector3);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_vertices, ogl_g3dcom_clipped_vertices, ())
 /// Array for clipping.
-static CS_DECLARE_GROWING_ARRAY_REF (clipped_texels, csVector2);
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_texels, csVector2);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_texels, ogl_g3dcom_clipped_texels, ())
 /// Array for clipping.
-static CS_DECLARE_GROWING_ARRAY_REF (clipped_colors, csColor);
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_colors, csColor);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_colors, ogl_g3dcom_clipped_colors, ())
 /// Array for clipping.
-static CS_DECLARE_GROWING_ARRAY_REF (clipped_fog, G3DFogInfo);
+CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_fog, G3DFogInfo);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_fog, ogl_g3dcom_clipped_fog, ())
 ///Array for clipping polygon meshes with lightmaps
-static CS_DECLARE_GROWING_ARRAY (clipped_lightmaps, iPolyTex_p);
+CS_TYPEDEF_GROWING_ARRAY (ogl_g3dcom_clipped_lightmaps, iPolyTex_p);
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmaps, ogl_g3dcom_clipped_lightmaps, ())
 
+CS_IMPLEMENT_STATIC_VAR (GetStaticClipInfo1, csClipInfo, [100])
+CS_IMPLEMENT_STATIC_VAR (GetStaticClipInfo2, csClipInfo, [100])
+
+
+static ogl_g3dcom_tr_verts *tr_verts = NULL;
+static ogl_g3dcom_uv_verts *uv_verts = NULL;
+static ogl_g3dcom_uv_mul_verts *uv_mul_verts = NULL;
+static ogl_g3dcom_color_verts *color_verts = NULL;
+static ogl_g3dcom_rgba_verts *rgba_verts = NULL;
+static ogl_g3dcom_clipped_triangles *clipped_triangles = NULL;
+static ogl_g3dcom_clipped_translate *clipped_translate = NULL;
+static ogl_g3dcom_clipped_vertices *clipped_vertices = NULL;
+static ogl_g3dcom_clipped_texels *clipped_texels = NULL;
+static ogl_g3dcom_clipped_colors *clipped_colors = NULL;
+static ogl_g3dcom_clipped_fog *clipped_fog = NULL;
+static ogl_g3dcom_clipped_lightmaps *clipped_lightmaps = NULL;
 
 /*=========================================================================
  Method implementations
@@ -131,8 +159,8 @@ fType  csGraphics3DOGLCommon::fName = (fType) NULL;
 #endif
 
 float sAc, sBc, sCc, sDc;
-csMatrix3 sM;
-csVector3 sV;
+//csMatrix3 sM;
+//csVector3 sV;
 
 csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   G2D (NULL), object_reg (NULL)
@@ -180,18 +208,34 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   planes_init = false;
   frustum_valid = false;
 
+  if (!tr_verts)
+  {
+    tr_verts = Get_tr_verts ();
+    uv_verts = Get_uv_verts ();
+    uv_mul_verts = Get_uv_mul_verts ();
+    color_verts = Get_color_verts ();
+    rgba_verts = Get_rgba_verts ();
+    clipped_triangles = Get_clipped_triangles ();
+    clipped_translate = Get_clipped_translate ();
+    clipped_vertices = Get_clipped_vertices ();
+    clipped_texels = Get_clipped_texels ();
+    clipped_colors = Get_clipped_colors ();
+    clipped_fog = Get_clipped_fog ();
+    clipped_lightmaps = Get_clipped_lightmaps ();
+  }
+
   // See note above.
-  tr_verts.IncRef ();
-  uv_verts.IncRef ();
-  uv_mul_verts.IncRef ();
-  color_verts.IncRef ();
-  rgba_verts.IncRef ();
-  clipped_triangles.IncRef ();
-  clipped_translate.IncRef ();
-  clipped_vertices.IncRef ();
-  clipped_texels.IncRef ();
-  clipped_colors.IncRef ();
-  clipped_fog.IncRef ();
+  tr_verts->IncRef ();
+  uv_verts->IncRef ();
+  uv_mul_verts->IncRef ();
+  color_verts->IncRef ();
+  rgba_verts->IncRef ();
+  clipped_triangles->IncRef ();
+  clipped_translate->IncRef ();
+  clipped_vertices->IncRef ();
+  clipped_texels->IncRef ();
+  clipped_colors->IncRef ();
+  clipped_fog->IncRef ();
 
   // Are we going to use the inverted orthographic projection matrix?
   inverted = false;
@@ -214,17 +258,17 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   if (G2D) G2D->DecRef ();
 
   // see note above
-  tr_verts.DecRef ();
-  uv_verts.DecRef ();
-  uv_mul_verts.DecRef ();
-  color_verts.DecRef ();
-  rgba_verts.DecRef ();
-  clipped_triangles.DecRef ();
-  clipped_translate.DecRef ();
-  clipped_vertices.DecRef ();
-  clipped_texels.DecRef ();
-  clipped_colors.DecRef ();
-  clipped_fog.DecRef ();
+  tr_verts->DecRef ();
+  uv_verts->DecRef ();
+  uv_mul_verts->DecRef ();
+  color_verts->DecRef ();
+  rgba_verts->DecRef ();
+  clipped_triangles->DecRef ();
+  clipped_translate->DecRef ();
+  clipped_vertices->DecRef ();
+  clipped_texels->DecRef ();
+  clipped_colors->DecRef ();
+  clipped_fog->DecRef ();
 }
 
 void csGraphics3DOGLCommon::Report (int severity, const char* msg, ...)
@@ -1351,11 +1395,11 @@ void csGraphics3DOGLCommon::DrawTriangleMeshEdges (G3DTriangleMesh& mesh)
   csVector3* f1 = mesh.buffers[0]->GetVertices ();
   csVector3* work_verts;
 
-  if (num_vertices > tr_verts.Limit ())
+  if (num_vertices > tr_verts->Limit ())
   {
-    tr_verts.SetLimit (num_vertices);
-    uv_verts.SetLimit (num_vertices);
-    color_verts.SetLimit (num_vertices);
+    tr_verts->SetLimit (num_vertices);
+    uv_verts->SetLimit (num_vertices);
+    color_verts->SetLimit (num_vertices);
   }
 
   if (mesh.num_vertices_pool > 1)
@@ -1365,8 +1409,8 @@ void csGraphics3DOGLCommon::DrawTriangleMeshEdges (G3DTriangleMesh& mesh)
     float remainder = 1 - tr;
     csVector3* f2 = mesh.buffers[1]->GetVertices ();
     for (i = 0 ; i < num_vertices ; i++)
-      tr_verts[i] = tr * f2[i] + remainder * f1[i];
-    work_verts = tr_verts.GetArray ();
+      (*tr_verts)[i] = tr * f2[i] + remainder * f1[i];
+    work_verts = tr_verts->GetArray ();
   }
   else
   {
@@ -2645,20 +2689,20 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 
   // Make sure our worktables are big enough for the clipped mesh.
   int num_tri = num_triangles*2+50;
-  if (num_tri > clipped_triangles.Limit ())
+  if (num_tri > clipped_triangles->Limit ())
   {
     // Use two times as many triangles. Hopefully this is enough.
-    clipped_triangles.SetLimit (num_tri);
+    clipped_triangles->SetLimit (num_tri);
   }
-  if (num_vertices > clipped_translate.Limit ())
-    clipped_translate.SetLimit (num_vertices);	// Used for original vertices.
+  if (num_vertices > clipped_translate->Limit ())
+    clipped_translate->SetLimit (num_vertices);	// Used for original vertices.
   int num_vts = num_vertices*2+100;
-  if (num_vts > clipped_vertices.Limit ())
+  if (num_vts > clipped_vertices->Limit ())
   {
-    clipped_vertices.SetLimit (num_vts);
-    clipped_texels.SetLimit (num_vts);
-    clipped_colors.SetLimit (num_vts);
-    clipped_fog.SetLimit (num_vts);
+    clipped_vertices->SetLimit (num_vts);
+    clipped_texels->SetLimit (num_vts);
+    clipped_colors->SetLimit (num_vts);
+    clipped_fog->SetLimit (num_vts);
   }
 
   num_clipped_triangles = 0;
@@ -2683,20 +2727,20 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     {
       if (exact_clipping)
       {
-        clipped_translate[i] = num_clipped_vertices;
-        clipped_vertices[num_clipped_vertices] = v;
-        clipped_texels[num_clipped_vertices] = texels[i];
+        (*clipped_translate)[i] = num_clipped_vertices;
+        (*clipped_vertices)[num_clipped_vertices] = v;
+        (*clipped_texels)[num_clipped_vertices] = texels[i];
         if (vertex_colors)
-          clipped_colors[num_clipped_vertices] = vertex_colors[i];
+          (*clipped_colors)[num_clipped_vertices] = vertex_colors[i];
         if (vertex_fog)
-          clipped_fog[num_clipped_vertices] = vertex_fog[i];
+          (*clipped_fog)[num_clipped_vertices] = vertex_fog[i];
         num_clipped_vertices++;
       }
       else
-        clipped_translate[i] = i;
+        (*clipped_translate)[i] = i;
     }
     else
-      clipped_translate[i] = -1;
+      (*clipped_translate)[i] = -1;
   }
 
   // If we have lazy clipping then the number of vertices remains the same.
@@ -2707,9 +2751,9 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   for (i = 0 ; i < num_triangles ; i++)
   {
     csTriangle& tri = triangles[i];
-    int cnt = int (clipped_translate[tri.a] != -1)
-      	+ int (clipped_translate[tri.b] != -1)
-	+ int (clipped_translate[tri.c] != -1);
+    int cnt = int ((*clipped_translate)[tri.a] != -1)
+      	+ int ((*clipped_translate)[tri.b] != -1)
+	+ int ((*clipped_translate)[tri.c] != -1);
     if (cnt == 0)
     {
       //=====
@@ -2748,9 +2792,9 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //=====
       // Easy case: the triangle is fully in view.
       //=====
-      clipped_triangles[num_clipped_triangles].a = clipped_translate[tri.a];
-      clipped_triangles[num_clipped_triangles].b = clipped_translate[tri.b];
-      clipped_triangles[num_clipped_triangles].c = clipped_translate[tri.c];
+      (*clipped_triangles)[num_clipped_triangles].a = (*clipped_translate)[tri.a];
+      (*clipped_triangles)[num_clipped_triangles].b = (*clipped_translate)[tri.b];
+      (*clipped_triangles)[num_clipped_triangles].c = (*clipped_translate)[tri.c];
       num_clipped_triangles++;
     }
     else
@@ -2761,15 +2805,15 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       if (!exact_clipping)
       {
         // If we have lazy clipping then we just add the triangle.
-        clipped_triangles[num_clipped_triangles].a = tri.a;
-        clipped_triangles[num_clipped_triangles].b = tri.b;
-        clipped_triangles[num_clipped_triangles].c = tri.c;
+        (*clipped_triangles)[num_clipped_triangles].a = tri.a;
+        (*clipped_triangles)[num_clipped_triangles].b = tri.b;
+        (*clipped_triangles)[num_clipped_triangles].c = tri.c;
         num_clipped_triangles++;
 	continue;
       }
 
       csVector3 poly[100];	// @@@ Arbitrary limit
-      static csClipInfo clipinfo[100];
+      static csClipInfo *clipinfo = GetStaticClipInfo1 ();
       poly[0] = vertices[tri.a] - frust_origin;
       poly[1] = vertices[tri.b] - frust_origin;
       poly[2] = vertices[tri.c] - frust_origin;
@@ -2801,16 +2845,16 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
 	{
 	  clipinfo[j].original.idx =
-	  	clipped_translate[clipinfo[j].original.idx];
+	  	(*clipped_translate)[clipinfo[j].original.idx];
 	}
         else
 	{
-	  ResolveVertex (&clipinfo[j], clipped_translate.GetArray (),
+	  ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
 	  	vertices, texels, vertex_colors, vertex_fog,
-		clipped_texels.GetArray ()[num_clipped_vertices],
-		clipped_colors.GetArray ()[num_clipped_vertices],
-		clipped_fog.GetArray ()[num_clipped_vertices]);
-	  clipped_vertices[num_clipped_vertices] = poly[j]+frust_origin;
+		clipped_texels->GetArray ()[num_clipped_vertices],
+		clipped_colors->GetArray ()[num_clipped_vertices],
+		clipped_fog->GetArray ()[num_clipped_vertices]);
+	  (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
 	  clipinfo[j].original.idx = num_clipped_vertices;
 	  num_clipped_vertices++;
 	}
@@ -2821,9 +2865,9 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //-----
       for (j = 2 ; j < num_poly ; j++)
       {
-        clipped_triangles[num_clipped_triangles].a = clipinfo[0].original.idx;
-        clipped_triangles[num_clipped_triangles].b = clipinfo[j-1].original.idx;
-        clipped_triangles[num_clipped_triangles].c = clipinfo[j].original.idx;
+        (*clipped_triangles)[num_clipped_triangles].a = clipinfo[0].original.idx;
+        (*clipped_triangles)[num_clipped_triangles].b = clipinfo[j-1].original.idx;
+        (*clipped_triangles)[num_clipped_triangles].c = clipinfo[j].original.idx;
         num_clipped_triangles++;
       }
     }
@@ -2961,24 +3005,24 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
 
   // Make sure our worktables are big enough for the clipped mesh.
   int num_tri = num_triangles*2+50;
-  if (num_tri > clipped_triangles.Limit ())
+  if (num_tri > clipped_triangles->Limit ())
   {
     // Use two times as many triangles. Hopefully this is enough.
-    clipped_triangles.SetLimit (num_tri);
+    clipped_triangles->SetLimit (num_tri);
   }
-  if (num_tri > clipped_lightmaps.Limit())
+  if (num_tri > clipped_lightmaps->Limit())
   {
-    clipped_lightmaps.SetLimit(num_tri);
+    clipped_lightmaps->SetLimit(num_tri);
   }
-  if (num_vertices > clipped_translate.Limit ())
-    clipped_translate.SetLimit (num_vertices);	// Used for original vertices.
+  if (num_vertices > clipped_translate->Limit ())
+    clipped_translate->SetLimit (num_vertices);	// Used for original vertices.
   int num_vts = num_vertices*2+100;
-  if (num_vts > clipped_vertices.Limit ())
+  if (num_vts > clipped_vertices->Limit ())
   {
-    clipped_vertices.SetLimit (num_vts);
-    clipped_texels.SetLimit (num_vts);
-    clipped_colors.SetLimit (num_vts);
-    clipped_fog.SetLimit (num_vts);
+    clipped_vertices->SetLimit (num_vts);
+    clipped_texels->SetLimit (num_vts);
+    clipped_colors->SetLimit (num_vts);
+    clipped_fog->SetLimit (num_vts);
   }
 
   num_clipped_triangles = 0;
@@ -3003,20 +3047,20 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
     {
       if (exact_clipping)
       {
-        clipped_translate[i] = num_clipped_vertices;
-        clipped_vertices[num_clipped_vertices] = v;
-        clipped_texels[num_clipped_vertices] = texels[i];
+        (*clipped_translate)[i] = num_clipped_vertices;
+        (*clipped_vertices)[num_clipped_vertices] = v;
+        (*clipped_texels)[num_clipped_vertices] = texels[i];
         if (vertex_colors)
-          clipped_colors[num_clipped_vertices] = vertex_colors[i];
+          (*clipped_colors)[num_clipped_vertices] = vertex_colors[i];
         if (vertex_fog)
-          clipped_fog[num_clipped_vertices] = vertex_fog[i];
+          (*clipped_fog)[num_clipped_vertices] = vertex_fog[i];
         num_clipped_vertices++;
       }
       else
-        clipped_translate[i] = i;
+        (*clipped_translate)[i] = i;
     }
     else
-      clipped_translate[i] = -1;
+      (*clipped_translate)[i] = -1;
   }
 
   // If we have lazy clipping then the number of vertices remains the same.
@@ -3027,9 +3071,9 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
   for (i = 0 ; i < num_triangles ; i++)
   {
     csTriangle& tri = triangles[i];
-    int cnt = int (clipped_translate[tri.a] != -1)
-      	+ int (clipped_translate[tri.b] != -1)
-	+ int (clipped_translate[tri.c] != -1);
+    int cnt = int ((*clipped_translate)[tri.a] != -1)
+      	+ int ((*clipped_translate)[tri.b] != -1)
+	+ int ((*clipped_translate)[tri.c] != -1);
     if (cnt == 0)
     {
       //=====
@@ -3068,10 +3112,10 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
       //=====
       // Easy case: the triangle is fully in view.
       //=====
-      clipped_triangles[num_clipped_triangles].a = clipped_translate[tri.a];
-      clipped_triangles[num_clipped_triangles].b = clipped_translate[tri.b];
-      clipped_triangles[num_clipped_triangles].c = clipped_translate[tri.c];
-      clipped_lightmaps[num_clipped_triangles] = lightmaps[i];
+      (*clipped_triangles)[num_clipped_triangles].a = (*clipped_translate)[tri.a];
+      (*clipped_triangles)[num_clipped_triangles].b = (*clipped_translate)[tri.b];
+      (*clipped_triangles)[num_clipped_triangles].c = (*clipped_translate)[tri.c];
+      (*clipped_lightmaps)[num_clipped_triangles] = lightmaps[i];
       lightmaps[i]->IncRef();
       num_clipped_triangles++;
 
@@ -3084,17 +3128,17 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
       if (!exact_clipping)
       {
         // If we have lazy clipping then we just add the triangle.
-        clipped_triangles[num_clipped_triangles].a = tri.a;
-        clipped_triangles[num_clipped_triangles].b = tri.b;
-        clipped_triangles[num_clipped_triangles].c = tri.c;
-        clipped_lightmaps[num_clipped_triangles] = lightmaps[i];
+        (*clipped_triangles)[num_clipped_triangles].a = tri.a;
+        (*clipped_triangles)[num_clipped_triangles].b = tri.b;
+        (*clipped_triangles)[num_clipped_triangles].c = tri.c;
+        (*clipped_lightmaps)[num_clipped_triangles] = lightmaps[i];
         lightmaps[i]->IncRef();
         num_clipped_triangles++;
 	continue;
       }
 
       csVector3 poly[100];	// @@@ Arbitrary limit
-      static csClipInfo clipinfo[100];
+      static csClipInfo *clipinfo = GetStaticClipInfo2 ();
       poly[0] = vertices[tri.a] - frust_origin;
       poly[1] = vertices[tri.b] - frust_origin;
       poly[2] = vertices[tri.c] - frust_origin;
@@ -3126,16 +3170,16 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
 	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
 	{
 	  clipinfo[j].original.idx =
-	  	clipped_translate[clipinfo[j].original.idx];
+	  	(*clipped_translate)[clipinfo[j].original.idx];
 	}
         else
 	{
-	  ResolveVertex (&clipinfo[j], clipped_translate.GetArray (),
+	  ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
 	  	vertices, texels, vertex_colors, vertex_fog,
-		clipped_texels.GetArray ()[num_clipped_vertices],
-		clipped_colors.GetArray ()[num_clipped_vertices],
-		clipped_fog.GetArray ()[num_clipped_vertices]);
-	  clipped_vertices[num_clipped_vertices] = poly[j]+frust_origin;
+		clipped_texels->GetArray ()[num_clipped_vertices],
+		clipped_colors->GetArray ()[num_clipped_vertices],
+		clipped_fog->GetArray ()[num_clipped_vertices]);
+	  (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
 	  clipinfo[j].original.idx = num_clipped_vertices;
 	  num_clipped_vertices++;
 	}
@@ -3146,10 +3190,10 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
       //-----
       for (j = 2 ; j < num_poly ; j++)
       {
-        clipped_triangles[num_clipped_triangles].a = clipinfo[0].original.idx;
-        clipped_triangles[num_clipped_triangles].b = clipinfo[j-1].original.idx;
-        clipped_triangles[num_clipped_triangles].c = clipinfo[j].original.idx;
-        clipped_lightmaps[num_clipped_triangles] = lightmaps[i];
+        (*clipped_triangles)[num_clipped_triangles].a = clipinfo[0].original.idx;
+        (*clipped_triangles)[num_clipped_triangles].b = clipinfo[j-1].original.idx;
+        (*clipped_triangles)[num_clipped_triangles].c = clipinfo[j].original.idx;
+        (*clipped_lightmaps)[num_clipped_triangles] = lightmaps[i];
         lightmaps[i]->IncRef();
         num_clipped_triangles++;
       }
@@ -3462,12 +3506,12 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 
       if (!use_lazy_clipping)
       {
-        work_verts = clipped_vertices.GetArray ();
-        work_uv_verts = clipped_texels.GetArray ();
-        work_colors = clipped_colors.GetArray();
-        work_lightmaps = clipped_lightmaps.GetArray();
+        work_verts = clipped_vertices->GetArray ();
+        work_uv_verts = clipped_texels->GetArray ();
+        work_colors = clipped_colors->GetArray();
+        work_lightmaps = clipped_lightmaps->GetArray();
       }
-      triangles = clipped_triangles.GetArray ();
+      triangles = clipped_triangles->GetArray ();
       if (num_triangles <= 0) continue;	// Nothing to do!
     }
 
@@ -3527,14 +3571,14 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       // special hack for transparent meshes
       if (mesh.mixmode & CS_FX_ALPHA)
       {
-        if ((num_vertices*4) > rgba_verts.Limit ())
-          rgba_verts.SetLimit (num_vertices*4);
+        if ((num_vertices*4) > rgba_verts->Limit ())
+          rgba_verts->SetLimit (num_vertices*4);
         for (k=0, i=0; i<num_vertices; i++)
         {
-          rgba_verts[k++] = work_colors[i].red;
-          rgba_verts[k++] = work_colors[i].green;
-          rgba_verts[k++] = work_colors[i].blue;
-	  rgba_verts[k++] = m_alpha;
+          (*rgba_verts)[k++] = work_colors[i].red;
+          (*rgba_verts)[k++] = work_colors[i].green;
+          (*rgba_verts)[k++] = work_colors[i].blue;
+	  (*rgba_verts)[k++] = m_alpha;
         }
       }
     }
@@ -3591,8 +3635,8 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     {
       glShadeModel (GL_FLAT);
       SetClientStates (CS_CLIENTSTATE_VT);
-      if (num_vertices > uv_mul_verts.Limit ())
-        uv_mul_verts.SetLimit (num_vertices);
+      if (num_vertices > uv_mul_verts->Limit ())
+        uv_mul_verts->SetLimit (num_vertices);
 
       int j;
       for (j = 0 ; j < mat->GetTextureLayerCount () ; j++)
@@ -3616,7 +3660,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
           float vscale = layer->vscale;
           float ushift = layer->ushift;
           float vshift = layer->vshift;
-          mul_uv = uv_mul_verts.GetArray ();
+          mul_uv = uv_mul_verts->GetArray ();
 	  for (i = 0 ; i < num_vertices ; i++)
 	  {
 	    mul_uv[i].x = work_uv_verts[i].x * uscale + ushift;
@@ -3817,7 +3861,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     cl = clipper;
   else
     cl = NULL;
-  DefaultDrawPolygonMesh (mesh, this, o2c, cl, false /*lazyclip, aspect,
+  DefaultDrawPolygonMesh (mesh, this, o2c, cl, false lazyclip, aspect,
   	asp_center_x, asp_center_y);
   */
 }
@@ -3958,11 +4002,11 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // Update work tables.
   //===========
   int num_triangles = mesh.num_triangles;
-  if (num_vertices > tr_verts.Limit ())
+  if (num_vertices > tr_verts->Limit ())
   {
-    tr_verts.SetLimit (num_vertices);
-    uv_verts.SetLimit (num_vertices);
-    color_verts.SetLimit (num_vertices);
+    tr_verts->SetLimit (num_vertices);
+    uv_verts->SetLimit (num_vertices);
+    color_verts->SetLimit (num_vertices);
   }
 
   //===========
@@ -3988,23 +4032,23 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     csColor* col2 = mesh.buffers[1]->GetColors ();
     for (i = 0 ; i < num_vertices ; i++)
     {
-      tr_verts[i] = tr * f2[i] + remainder * f1[i];
+      (*tr_verts)[i] = tr * f2[i] + remainder * f1[i];
       if (mesh.do_morph_texels)
-        uv_verts[i] = tr * uv2[i] + remainder * uv1[i];
+        (*uv_verts)[i] = tr * uv2[i] + remainder * uv1[i];
       if (mesh.do_morph_colors)
       {
-        color_verts[i].red = tr * col2[i].red + remainder * col1[i].red;
-	color_verts[i].green = tr * col2[i].green + remainder * col1[i].green;
-	color_verts[i].blue = tr * col2[i].blue + remainder * col1[i].blue;
+        (*color_verts)[i].red = tr * col2[i].red + remainder * col1[i].red;
+	(*color_verts)[i].green = tr * col2[i].green + remainder * col1[i].green;
+	(*color_verts)[i].blue = tr * col2[i].blue + remainder * col1[i].blue;
       }
     }
-    work_verts = tr_verts.GetArray ();
+    work_verts = tr_verts->GetArray ();
     if (mesh.do_morph_texels)
-      work_uv_verts = uv_verts.GetArray ();
+      work_uv_verts = uv_verts->GetArray ();
     else
       work_uv_verts = uv1;
     if (mesh.do_morph_colors)
-      work_colors = color_verts.GetArray ();
+      work_colors = color_verts->GetArray ();
     else
       work_colors = col1;
   }
@@ -4041,12 +4085,12 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 	how_clip == '0' || use_lazy_clipping);
     if (!use_lazy_clipping)
     {
-      work_verts = clipped_vertices.GetArray ();
-      work_uv_verts = clipped_texels.GetArray ();
-      work_colors = clipped_colors.GetArray ();
-      work_fog = clipped_fog.GetArray ();
+      work_verts = clipped_vertices->GetArray ();
+      work_uv_verts = clipped_texels->GetArray ();
+      work_colors = clipped_colors->GetArray ();
+      work_fog = clipped_fog->GetArray ();
     }
-    triangles = clipped_triangles.GetArray ();
+    triangles = clipped_triangles->GetArray ();
     if (num_triangles <= 0) return;	// Nothing to do!
   }
 
@@ -4236,26 +4280,26 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     // special hack for transparent meshes
     if (mesh.mixmode & CS_FX_ALPHA)
     {
-      if ((num_vertices*4) > rgba_verts.Limit ())
-        rgba_verts.SetLimit (num_vertices*4);
+      if ((num_vertices*4) > rgba_verts->Limit ())
+        rgba_verts->SetLimit (num_vertices*4);
       if (do_multiply_color)
       {
         for (k=0, i=0; i<num_vertices; i++)
         {
-          rgba_verts[k++] = work_colors[i].red * flat_r;
-          rgba_verts[k++] = work_colors[i].green * flat_g;
-          rgba_verts[k++] = work_colors[i].blue * flat_b;
-	  rgba_verts[k++] = m_alpha;
+          (*rgba_verts)[k++] = work_colors[i].red * flat_r;
+          (*rgba_verts)[k++] = work_colors[i].green * flat_g;
+          (*rgba_verts)[k++] = work_colors[i].blue * flat_b;
+	  (*rgba_verts)[k++] = m_alpha;
         }
       }
       else
       {
         for (k=0, i=0; i<num_vertices; i++)
         {
-          rgba_verts[k++] = work_colors[i].red;
-          rgba_verts[k++] = work_colors[i].green;
-          rgba_verts[k++] = work_colors[i].blue;
-	  rgba_verts[k++] = m_alpha;
+          (*rgba_verts)[k++] = work_colors[i].red;
+          (*rgba_verts)[k++] = work_colors[i].green;
+          (*rgba_verts)[k++] = work_colors[i].blue;
+	  (*rgba_verts)[k++] = m_alpha;
         }
       }
     }
@@ -4263,7 +4307,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     {
       // If we are already using the array in color_verts then
       // we do not have to copy.
-      if (work_colors == color_verts.GetArray ())
+      if (work_colors == color_verts->GetArray ())
       {
         for (i = 0 ; i < num_vertices ; i++)
 	{
@@ -4275,9 +4319,9 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       else
       {
         csColor* old = work_colors;
-	if (num_vertices > color_verts.Limit())
-	  color_verts.SetLimit(num_vertices);
-	work_colors = color_verts.GetArray ();
+	if (num_vertices > color_verts->Limit())
+	  color_verts->SetLimit(num_vertices);
+	work_colors = color_verts->GetArray ();
 	for (i = 0 ; i < num_vertices ; i++)
 	{
 	  work_colors[i].red = old[i].red * flat_r;
@@ -4325,8 +4369,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     glShadeModel (GL_FLAT);
     SetClientStates (CS_CLIENTSTATE_VT);
-    if (num_vertices > uv_mul_verts.Limit ())
-      uv_mul_verts.SetLimit (num_vertices);
+    if (num_vertices > uv_mul_verts->Limit ())
+      uv_mul_verts->SetLimit (num_vertices);
 
     int j;
     for (j = 0 ; j < mat->GetTextureLayerCount () ; j++)
@@ -4368,7 +4412,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 	// @@@ Shift is ignored for now.
 	glMultMatrixf (scalematrix);
 #else
-        mul_uv = uv_mul_verts.GetArray ();
+        mul_uv = uv_mul_verts->GetArray ();
 	for (i = 0 ; i < num_vertices ; i++)
 	{
 	  mul_uv[i].x = work_uv_verts[i].x * uscale + ushift;

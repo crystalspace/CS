@@ -171,10 +171,11 @@ int csMetaGen::check_cell_assume_inside(const csTesselator::GridCell &c)
 }
 
 static int _x,_y,_z;
-static csTesselator::GridCell _cell;
+CS_IMPLEMENT_STATIC_VAR (GetGridCell, csTesselator::GridCell, ())
 
 void csMetaGen::BlobCalc(int dx,int dy,int dz)
 {
+  static csTesselator::GridCell *_cell = GetGridCell ();
   _x+=dx;
   _y+=dy;
   _z+=dz;
@@ -198,11 +199,11 @@ void csMetaGen::BlobCalc(int dx,int dy,int dz)
 
     int i;
     for(i=0;i<8;i++)
-      _cell.p[i]+=dv;
+      _cell->p[i]+=dv;
 
-    FillCell(_x,_y,_z,_cell);
+    FillCell(_x,_y,_z,*_cell);
 
-    int num=csTesselator::Tesselate(_cell, _verts + _tess);
+    int num=csTesselator::Tesselate(*_cell, _verts + _tess);
 
     if(!num)
       goto skip;
@@ -218,7 +219,7 @@ void csMetaGen::BlobCalc(int dx,int dy,int dz)
 
 skip:
     for(i=0;i<8;i++)
-      _cell.p[i]-=dv;
+      _cell->p[i]-=dv;
   }
 
 ret_back:
@@ -229,6 +230,7 @@ ret_back:
 
 void csMetaGen::RingCalc(int dx,int dz)
 {
+  static csTesselator::GridCell *_cell = GetGridCell ();
   _x+=dx;
   _z+=dz;
 
@@ -248,10 +250,10 @@ void csMetaGen::RingCalc(int dx,int dz)
     csVector3 dv(dx * stepx, 0, dz * stepz);
     int i;
     for(i=0;i<8;i++)
-      _cell.p[i]+=dv;
+      _cell->p[i]+=dv;
 
-    FillCellSlice(_x,_y,_z,_cell);
-    int num = csTesselator::Tesselate(_cell, _verts + _tess);
+    FillCellSlice(_x,_y,_z,*_cell);
+    int num = csTesselator::Tesselate(*_cell, _verts + _tess);
 
     if(!num)
       goto skip;
@@ -265,7 +267,7 @@ void csMetaGen::RingCalc(int dx,int dz)
 
 skip:
     for (i=0; i<8; i++)
-      _cell.p[i] -= dv;
+      _cell->p[i] -= dv;
   }
 
 ret_back:
@@ -275,6 +277,7 @@ ret_back:
 
 int csMetaGen::CalcBlobSurf(MetaField *field)
 {
+  static csTesselator::GridCell *_cell = GetGridCell ();
   int i,j;
 
   printf(";CalcBlobSurf - Generating with %f,%f,%f steps\n",stepx,stepy,stepz);
@@ -317,7 +320,7 @@ int csMetaGen::CalcBlobSurf(MetaField *field)
     }
 
     _x=x; _y=y; _z=z;
-    _cell=cell;
+    *_cell=cell;
     BlobCalc(0,0,0);
   }
   return _tess;
@@ -327,6 +330,7 @@ int csMetaGen::CalcBlobSurf(MetaField *field)
 
 int csMetaGen::CalcLinSurf( MetaBone* bone )
 {
+  static csTesselator::GridCell *_cell = GetGridCell ();
   int i, j, k;
 
   printf(";CalcLinSurf - Generating with %f,%f,%f steps\n",stepx,stepy,stepz);
@@ -369,7 +373,7 @@ int csMetaGen::CalcLinSurf( MetaBone* bone )
   	  }
 
   	_x=x; _y=y; _z=z;
-  	_cell=cell;
+  	*_cell=cell;
   	RingCalc(0,0);
 //	printf("------------------- Next slice %d\n",_tess);
 	}

@@ -97,8 +97,8 @@ bool csCBufferPersp::DoPerspective (
   return true;
 }
 
-CS_IMPLEMENT_STATIC_VAR (GetInsertPolygon,csPolygon2D,)
-CS_IMPLEMENT_STATIC_VAR (GetTestPolygon,csPolygon2D,)
+CS_IMPLEMENT_STATIC_VAR (GetInsertPolygon,csPolygon2D,())
+CS_IMPLEMENT_STATIC_VAR (GetTestPolygon,csPolygon2D,())
 
 bool csCBufferPersp::InsertPolygon (
   csVector3 *verts,

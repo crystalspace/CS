@@ -351,7 +351,7 @@ SCF_IMPLEMENT_IBASE (csIsoMeshSprite)
   SCF_IMPLEMENTS_INTERFACE (iIsoSprite)
 SCF_IMPLEMENT_IBASE_END
 
-CS_IMPLEMENT_STATIC_CLASSVAR (csIsoMeshSprite, pos, GetVertexPosition, csVector3, 0)
+CS_IMPLEMENT_STATIC_CLASSVAR (csIsoMeshSprite, pos, GetVertexPosition, csVector3, (0))
 
 csIsoMeshSprite::csIsoMeshSprite (iBase *iParent)
 {

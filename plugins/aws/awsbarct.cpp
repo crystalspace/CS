@@ -31,7 +31,7 @@ const int awsBarChart:: signalTimer = 0x2;
 
 static iAwsSink *chart_sink = 0;
 
-CS_IMPLEMENT_STATIC_VAR (GetChartSlot, awsSlot,)
+CS_IMPLEMENT_STATIC_VAR (GetChartSlot, awsSlot,())
 
 static awsSlot *chart_slot = NULL;
 

@@ -34,12 +34,18 @@
 
 //@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
 /// Static vertex array.
-static CS_DECLARE_GROWING_ARRAY (tr_verts, csVector3);
+CS_TYPEDEF_GROWING_ARRAY (dpmesh_tr_verts, csVector3);
+CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, dpmesh_tr_verts, ())
 /// The perspective corrected vertices.
-static CS_DECLARE_GROWING_ARRAY (persp, csVector2);
+CS_TYPEDEF_GROWING_ARRAY (dpmesh_persp, csVector2);
+CS_IMPLEMENT_STATIC_VAR (Get_persp, dpmesh_persp, ())
 /// Array which indicates which vertices are visible and which are not.
-static CS_DECLARE_GROWING_ARRAY (visible, bool);
+CS_TYPEDEF_GROWING_ARRAY (dpmesh_visible, bool);
+CS_IMPLEMENT_STATIC_VAR (Get_visible, dpmesh_visible, ())
 
+static dpmesh_tr_verts *tr_verts = NULL;
+static dpmesh_persp *persp = NULL;
+static dpmesh_visible *visible = NULL;
 /*
  * Default implementation of DrawPolygonMesh which works with polygon
  * buffers that are equal to csPolArrayPolygonBuffer.
@@ -53,15 +59,23 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
 	int width2, int height2)
 {
   csPolArrayPolygonBuffer* polbuf = (csPolArrayPolygonBuffer*)mesh.polybuf;
+
+  if (!tr_verts)
+  {
+    tr_verts = Get_tr_verts ();
+    persp = Get_persp ();
+    visible = Get_visible ();
+  }
+
   int num_vertices = polbuf->GetVertexCount ();
   int num_polygons = polbuf->GetPolygonCount ();
 
   // Update work arrays
-  if (num_vertices > tr_verts.Limit ())
+  if (num_vertices > tr_verts->Limit ())
   {
-    tr_verts.SetLimit (num_vertices);
-    persp.SetLimit (num_vertices);
-    visible.SetLimit (num_vertices);
+    tr_verts->SetLimit (num_vertices);
+    persp->SetLimit (num_vertices);
+    visible->SetLimit (num_vertices);
   }
 
   csVector3 *f1 = polbuf->GetVertices ();
@@ -72,8 +86,8 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   if (mesh.vertex_mode == G3DPolygonMesh::VM_WORLDSPACE)
   {
     for (i = 0 ; i < num_vertices ; i++)
-      tr_verts[i] = o2c * f1[i];
-    work_verts = tr_verts.GetArray();
+      (*tr_verts)[i] = o2c * f1[i];
+    work_verts = tr_verts->GetArray();
   }
   else
     work_verts = f1;
@@ -84,12 +98,12 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
     if (work_verts[i].z >= SMALL_Z)
     {
       float iz = aspect / work_verts[i].z;
-      persp[i].x = work_verts[i].x * iz + width2;
-      persp[i].y = work_verts[i].y * iz + height2;
-      visible[i] = true;
+      (*persp)[i].x = work_verts[i].x * iz + width2;
+      (*persp)[i].y = work_verts[i].y * iz + height2;
+      (*visible)[i] = true;
     }
     else
-      visible[i] = false;
+      (*visible)[i] = false;
   }
 
   csMatrix3 m_cam2tex;
@@ -123,8 +137,8 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
     for (j = 0 ; j < poly.num ; j++)
     {
       int vidx = pol.vertices[j];
-      poly.vertices[j].x = persp[vidx].x;
-      poly.vertices[j].y = persp[vidx].y;
+      poly.vertices[j].x = (*persp)[vidx].x;
+      poly.vertices[j].y = (*persp)[vidx].y;
       if (mesh.vertex_fog)
         poly.fog_info[j] = mesh.vertex_fog[vidx];
     }
