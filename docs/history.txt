@@ -36,6 +36,16 @@ Short-term cleanups that need to be done:
 	  interfaces.
 	- Norman Kramer fixed a bug in loop for search free texture
 	  memory blocks (glide).
+	- Some changes to Map2CS from Thomas Hieber.
+	  Added new options to configure surface properties of polygons
+	  (for example mirrors).
+	- Thomas also updated the VC project files.
+	- Some changes from Norman Kramer:
+	    - Added a public LoadImage to the loader/parser.
+	    - Added new flags for iTextureHandle. Now you can expicitly define
+	      many mipmaps you want to generate.
+	    - Glide: fixed behaviour in case that not the usual 4 mipmaps
+	      are generated for a texture.
 5-Mar-2000
 	- Thomas Hieber did some general reworking of polygon handling in
 	  Map2CS. Allows a much cleaner way to add specific effects like
