@@ -262,7 +262,6 @@ void OpenGLCache::cache_lightmap (iPolygonTexture *polytex)
     lightmap_low_v -= 0.125;
     lightmap_high_u += 0.125;
     lightmap_high_v += 0.125;
-    float lightmap_scale_u, lightmap_scale_v;
 
     if (lightmap_high_u <= lightmap_low_u)
       cached_texture->lm_scale_u = scale_u;       // @@@ Is this right?
