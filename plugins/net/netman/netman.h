@@ -37,12 +37,12 @@ class csNetworkManager : public iNetworkManager
   csRef<iEventQueue> eventq;
   csRef<iEventOutlet> eventout;
 
-  inline void Poll (iNetworkSocket2 *, csTicks t);
+  void Poll (iNetworkSocket2 *, csTicks t);
 
   protected:
 
-  inline bool Initialize (iObjectRegistry *);
-  inline bool HandleEvent (iEvent &);
+  bool Initialize (iObjectRegistry *);
+  bool HandleEvent (iEvent &);
 
   public:
 
@@ -62,9 +62,9 @@ class csNetworkManager : public iNetworkManager
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csNetworkManager);
-    virtual bool Initialize (iObjectRegistry *)
+    virtual bool Initialize (iObjectRegistry* r)
     {
-      return true;
+      return scfParent->Initialize(r);
     }
   } scfiComponent;
   friend class eiComponent;
