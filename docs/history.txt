@@ -15,6 +15,10 @@ chronological order.
 	- Jorrit changed iPortalContainer->Draw() so it no longer does
 	  SCF_QUERY_INTERFACE to get the mesh wrapper (and movable) but
 	  uses the movable parameter instead.
+	- Jorrit reverted his latest change to iPortalContainer since
+	  it appears the movable is not passed along. Nevertheless the
+	  SCF_QUERY_INTERFACE should be avoided there so we need to
+	  rethink this.
 30-Dec-2003
 	- Eric Sunshine applied patch from Bjorn Hansen
 	  <holomorph@users.sourceforge.net> which adds csParseMouseDef() to
