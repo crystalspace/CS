@@ -233,118 +233,122 @@ time_t time0 = (time_t)-1;
 
 int FindIntersection(csVector3 *tri1,csVector3 *tri2,csVector3 line[2])
 {
-	int i,j;
-	csVector3 v1[3],v2[3];
+  int i,j;
+  csVector3 v1[3],v2[3];
 
-	for(i=0;i<3;i++)
-	{
-		j=(i+1)%3;
-		v1[i]=tri1[j]-tri1[i];
-		v2[i]=tri2[j]-tri2[i];
-	}
+  for(i=0;i<3;i++)
+  {
+    j=(i+1)%3;
+    v1[i]=tri1[j]-tri1[i];
+    v2[i]=tri2[j]-tri2[i];
+  }
 
-	csVector3 n1=v1[0]%v1[1];
-	csVector3 n2=v2[0]%v2[1];
+  csVector3 n1=v1[0]%v1[1];
+  csVector3 n2=v2[0]%v2[1];
 
-	float d1=-n1*tri1[0],d2=-n2*tri2[0];
+  float d1=-n1*tri1[0],d2=-n2*tri2[0];
 
-	csVector3 d=n1%n2;
+  csVector3 d=n1%n2;
 
-	int index=0;
-	float max=fabs(d.x);
-	if(fabs(d.y)>max)
-		max=fabs(d.y), index=1;
-	if(fabs(d.z)>max)
-		max=fabs(d.z), index=2;
+  int index=0;
+  float max=fabs(d.x);
+  if(fabs(d.y)>max)
+    max=fabs(d.y), index=1;
+  if(fabs(d.z)>max)
+    max=fabs(d.z), index=2;
 
-	int m1=0,m2=0,n=0;
-	float t1[3],t2[3];
-	csVector3 p1[2],p2[2];
-	float isect1[2],isect2[2],isect[4];
-	csVector3 *idx[4];
+  int m1=0,m2=0,n=0;
+  float t1[3],t2[3];
+  csVector3 p1[2],p2[2];
+  p1[0].Set (0, 0, 0);
+  p1[1].Set (0, 0, 0);
+  p2[0].Set (0, 0, 0);
+  p2[1].Set (0, 0, 0);
+  float isect1[2],isect2[2],isect[4];
+  csVector3 *idx[4];
 
-	for(i=0;i<3;i++)
-	{
-		float div1=n2*v1[i],div2=n1*v2[i];
-		float pr1=-(n2*tri1[i]+d2),pr2=-(n1*tri2[i]+d1);
+  for(i=0;i<3;i++)
+  {
+    float div1=n2*v1[i],div2=n1*v2[i];
+    float pr1=-(n2*tri1[i]+d2),pr2=-(n1*tri2[i]+d1);
 
-		if(fabs(div1)<EPS)
-		{
-			if(fabs(pr1)<EPS)
-			{
-				// line is in the plane of intersection
-				t1[i]=0;
-			}
-			else
-			{
-				// line is parallel to the plane of
-				// intersection, so we don't need it ;)
-				t1[i]=15.0;
-			}
-		}
-		else
-			t1[i]=pr1/div1;
+    if(fabs(div1)<EPS)
+    {
+      if(fabs(pr1)<EPS)
+      {
+	// line is in the plane of intersection
+	t1[i]=0;
+      }
+      else
+      {
+	// line is parallel to the plane of
+	// intersection, so we don't need it ;)
+	t1[i]=15.0;
+      }
+    }
+    else
+      t1[i]=pr1/div1;
 
-		if(fabs(div2)<EPS)
-		{
-			if(fabs(pr2)<EPS)
-			{
-				// line is in the plane of intersection
-				t2[i]=0;
-			}
-			else
-			{
-				// line is parallel to the plane of
-				// intersection, so we don't need it ;)
-				t2[i]=15.0;
-			}
-		}
-		else
-			t2[i]=pr2/div2;
+    if(fabs(div2)<EPS)
+    {
+      if(fabs(pr2)<EPS)
+      {
+	// line is in the plane of intersection
+	t2[i]=0;
+      }
+      else
+      {
+	// line is parallel to the plane of
+	// intersection, so we don't need it ;)
+	t2[i]=15.0;
+      }
+    }
+    else
+      t2[i]=pr2/div2;
 
-		if(t1[i]>=0.0&&t1[i]<=1.0&&m1!=2)
-		{
-			p1[m1]=tri1[i]+v1[i]*t1[i];
-			isect1[m1]=p1[m1][index];
-			idx[n]=p1+m1;
-			isect[n++]=isect1[m1++];
-		}
-		if(t2[i]>=0.0&&t2[i]<=1.0&&m2!=2)
-		{
-			p2[m2]=tri2[i]+v2[i]*t2[i];
-			isect2[m2]=p2[m2][index];
-			idx[n]=p2+m2;
-			isect[n++]=isect2[m2++];
-		}
-	}
+    if(t1[i]>=0.0&&t1[i]<=1.0&&m1!=2)
+    {
+      p1[m1]=tri1[i]+v1[i]*t1[i];
+      isect1[m1]=p1[m1][index];
+      idx[n]=p1+m1;
+      isect[n++]=isect1[m1++];
+    }
+    if(t2[i]>=0.0&&t2[i]<=1.0&&m2!=2)
+    {
+      p2[m2]=tri2[i]+v2[i]*t2[i];
+      isect2[m2]=p2[m2][index];
+      idx[n]=p2+m2;
+      isect[n++]=isect2[m2++];
+    }
+  }
 
-	if(n<4)
-	{
-		// triangles are not intersecting
-		return 0;
-	}
+  if(n<4)
+  {
+    // triangles are not intersecting
+    return 0;
+  }
 
-	for(i=0;i<4;i++)
-	{
-		for(j=i+1;j<4;j++)
-		{
-			if(isect[i]>isect[j])
-			{
-				csVector3 *p=idx[j];
-				idx[j]=idx[i];
-				idx[i]=p;
+  for(i=0;i<4;i++)
+  {
+    for(j=i+1;j<4;j++)
+    {
+      if(isect[i]>isect[j])
+      {
+	csVector3 *p=idx[j];
+	idx[j]=idx[i];
+	idx[i]=p;
 
-				float _=isect[i];
-				isect[i]=isect[j];
-				isect[j]=_;
-			}
-		}
-	}
+	float _=isect[i];
+	isect[i]=isect[j];
+	isect[j]=_;
+      }
+    }
+  }
 
-	line[0]=*idx[1];
-	line[1]=*idx[2];
+  line[0]=*idx[1];
+  line[1]=*idx[2];
 
-	return 1;
+  return 1;
 }
 
 int FindIntersection(CDTriangle *t1,CDTriangle *t2,csVector3 line[2])
@@ -564,19 +568,23 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
 
     for(int repeats=0;repeats<((elapsed_time)/25.0+0.5);repeats++)
     {
-      view->GetCamera()->SetT2O(csMatrix3());
-      view->GetCamera()->RotateWorld(csVector3(0,1,0),angle_y);
-
-      if(move_3d)
-        view->GetCamera()->RotateWorld(csVector3(1,0,0),angle_x);
+      if (move_3d)
+      {
+        // If we are moving in 3d then don't do any camera correction.
+      }
       else
+      {
+        view->GetCamera()->SetT2O(csMatrix3());
+        view->GetCamera()->RotateWorld(csVector3(0,1,0),angle_y);
         if(!do_gravity)
           view->GetCamera()->Rotate(csVector3(1,0,0),angle_x);
+      }
 
       csVector3 vel=view->GetCamera()->GetT2O()*velocity;
 
       csVector3 new_pos=pos+vel;
-      csOrthoTransform test(csMatrix3(),new_pos);
+      csMatrix3 m;
+      csOrthoTransform test (m, new_pos);
 
       csSector *n[MAXSECTORSOCCUPIED];
       int num_sectors=FindSectors(new_pos,4*body->GetBbox()->d,view->GetCamera()->GetSector(),n);
@@ -677,13 +685,13 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
   }
 
   if(!pressed_strafe)
-    velocity.x-=sign(velocity.x)*min(0.017,fabs(velocity.x));
+    velocity.x-=sign(velocity.x)*MIN(0.017,fabs(velocity.x));
 
   if(!pressed_walk)
-    velocity.z-=sign(velocity.z)*min(0.017,fabs(velocity.z));
+    velocity.z-=sign(velocity.z)*MIN(0.017,fabs(velocity.z));
 
   if(!do_gravity)
-    velocity.y-=sign(velocity.y)*min(0.017,fabs(velocity.y));
+    velocity.y-=sign(velocity.y)*MIN(0.017,fabs(velocity.y));
 
 //  pressed_strafe=pressed_walk=false;
 
@@ -902,72 +910,6 @@ void stop_demo ()
   }
 }
 
-/*
-<<<<<<< walktest.cpp
-
-#if 0
-unsigned int _control87(unsigned int newcw, unsigned int mask)
-{
-  int oldcw;
-  asm
-  (
-        "       fclex                   \n"     // clear exceptions
-        "       fstcw   %0              \n"     // oldcw = FPU control word
-        "       movl    %2,%%eax        \n"     // eax = mask
-        "       notl    %%eax           \n"     // eax = ~eax
-        "       movzwl  %%ax,%%eax      \n"     // eax &= 0xffff
-        "       andl    %0,%%eax        \n"     // eax &= oldcw;
-        "       movl    %2,%%ecx        \n"     // ecx = mask
-        "       andl    %1,%%ecx        \n"     // ecx &= newcw
-        "       orl     %%ecx,%%eax     \n"     // eax |= ecx
-        "       movl    %%eax,%0        \n"     // oldcw = eax
-        "       fldcw   %0              \n"     // load FPU control word
-        : : "m" (oldcw), "g" (newcw), "g" (mask) : "eax", "ecx"
-  );
-  return oldcw;
-}
-#endif
-
-=======
->>>>>>> 1.23
-*/
-#if 0
-
-void TestFrustrum ()
-{
-  csFrustrum* f1 = new csFrustrum (csVector3 (0,10,0));
-  csFrustrum* f2 = new csFrustrum (*f1);
-  f2->AddVertex (csVector3 (-3,15,3));
-  f2->AddVertex (csVector3 (3,15,3));
-  f2->AddVertex (csVector3 (0,15,-3));
-  csFrustrum* f3 = new csFrustrum (*f1);
-  f3->AddVertex (csVector3 (1,15,4));
-  f3->AddVertex (csVector3 (4,15,4));
-  f3->AddVertex (csVector3 (4,15,-2));
-  f3->AddVertex (csVector3 (1,15,-2));
-  Dumper::dump (f1, "f1");
-  Dumper::dump (f2, "f2");
-  Dumper::dump (f3, "f3");
-  csFrustrum* f4 = f1->Intersect (*f2);
-  csFrustrum* f5 = f2->Intersect (*f1);
-  csFrustrum* f6 = f2->Intersect (*f3);
-  csFrustrum* f7 = new csFrustrum (*f2);
-  f7->ClipToPlane (csVector3 (1,15,4), csVector3 (1,15,-2));
-  Dumper::dump (f4, "f4");
-  Dumper::dump (f5, "f5");
-  Dumper::dump (f6, "f6");
-  Dumper::dump (f7, "f7");
-  csFrustrum* f8 = new csFrustrum (*f1);
-  f8->AddVertex (csVector3 (27,15,3));
-  f8->AddVertex (csVector3 (33,15,3));
-  f8->AddVertex (csVector3 (30,15,-3));
-  csFrustrum* f9 = f8->Intersect (*f3);
-  Dumper::dump (f8, "f8");
-  Dumper::dump (f9, "f9");
-}
-
-#endif
-
 void WalkTest::EndWorld() {}
 
 void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
@@ -1026,11 +968,7 @@ int main (int argc, char* argv[])
   CHK (config = new csIniFile ("cryst.cfg"));
 
   // create the converter class for testing
-  //@@@ I added this conditional because this only works in VC right now
-  // I hope to fix it in the UNIX makefile system shortly and remove this
-  // -Michael
-//#ifdef OS_WIN32
-  CHK(ImportExport = new converter());
+  CHK (ImportExport = new converter());
 
   // process import/export files from config and print log for testing
 
@@ -1039,7 +977,6 @@ int main (int argc, char* argv[])
   // free memory - delete this if you want to use the data in the buffer
 
   CHK (delete ImportExport);
-//#endif /* OS_WIN32 */
   // end converter test
 
   Sys->do_fps = config->GetYesNo ("WalkTest", "FPS", true);

@@ -145,10 +145,30 @@ public:
   /// Creates Colliders
   virtual void CreateColliders(void);
 
+  /// Gravity correct movement function: strafe().
   void strafe(float speed,int keep_old);
+  /// Gravity correct movement function: step().
   void step(float speed,int keep_old);
+  /// Gravity correct movement function: rotate().
   void rotate(float speed,int keep_old);
+  /// Gravity correct movement function: look().
   void look(float speed,int keep_old);
+
+  /// Immediate gravity incorrect movement functions.
+  void imm_forward (float speed, bool slow, bool fast);
+  void imm_backward (float speed, bool slow, bool fast);
+  void imm_left (float speed, bool slow, bool fast);
+  void imm_right (float speed, bool slow, bool fast);
+  void imm_up (float speed, bool slow, bool fast);
+  void imm_down (float speed, bool slow, bool fast);
+  void imm_rot_left_camera (float speed, bool slow, bool fast);
+  void imm_rot_left_world (float speed, bool slow, bool fast);
+  void imm_rot_right_camera (float speed, bool slow, bool fast);
+  void imm_rot_right_world (float speed, bool slow, bool fast);
+  void imm_rot_left_xaxis (float speed, bool slow, bool fast);
+  void imm_rot_right_xaxis (float speed, bool slow, bool fast);
+  void imm_rot_left_zaxis (float speed, bool slow, bool fast);
+  void imm_rot_right_zaxis (float speed, bool slow, bool fast);
 
   ///
   void handle_key_forward (float speed, bool shift, bool alt, bool ctrl);

@@ -108,6 +108,15 @@ void RandomColor (float& r, float& g, float& b)
   }
 }
 
+void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
+{
+  sprite->SetMove (pos);
+  sprite->MoveToSector (where);
+  csLight* lights[2];
+  int num_lights = Sys->world->GetNearbyLights (where, pos, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+  sprite->UpdateLighting (lights, num_lights);
+}
+
 void add_sprite (char* name, csSector* where, csVector3 const& pos, float size)
 {
   csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (name, true);
@@ -131,15 +140,7 @@ void add_sprite (char* name, csSector* where, csVector3 const& pos, float size)
 
   spr->SetAction ("default");
   spr->InitSprite ();
-}
-
-void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
-{
-  sprite->SetMove (pos);
-  sprite->MoveToSector (where);
-  csLight* lights[2];
-  int num_lights = Sys->world->GetNearbyLights (where, pos, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
-  sprite->UpdateLighting (lights, num_lights);
+  move_sprite (spr, where, pos);
 }
 
 void add_bot (float size, csSector* where, csVector3 const& pos, float dyn_radius)
@@ -203,45 +204,35 @@ void HandleDynLight (csDynLight* dyn)
         if (ms->sprite)
       	{
           if ((rand () & 0x3) == 1)
-	        {
-	          int i;
-	          if (do_bots)
-	            for (i = 0 ; i < 40 ; i++)
-                add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
-	        }
-	        ms->sprite->RemoveFromSectors ();
-	        Sys->view->GetWorld ()->RemoveSprite (ms->sprite);
-	      }
+	  {
+	    int i;
+	    if (do_bots)
+	      for (i = 0 ; i < 40 ; i++)
+            add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
+	  }
+	  ms->sprite->RemoveFromSectors ();
+	  Sys->view->GetWorld ()->RemoveSprite (ms->sprite);
+	}
         dyn->ObjRemove(dyn->GetObj(csDataObject::Type()));
         CHK (delete ms);
-	      CHK (ExplosionStruct* es = new ExplosionStruct);
-	      Sys->piSound->CreateSource (&es->snd, Sys->wMissile_boom);
-	      if (es->snd)
-	      {
-	        es->snd->SetPosition (v.x, v.y, v.z);
-	        es->snd->PlaySource ();
-	      }
-	      es->type = DYN_TYPE_EXPLOSION;
-	      es->radius = 2;
-	      es->dir = 1;
+	CHK (ExplosionStruct* es = new ExplosionStruct);
+	Sys->piSound->CreateSource (&es->snd, Sys->wMissile_boom);
+	if (es->snd)
+	{
+	  es->snd->SetPosition (v.x, v.y, v.z);
+	  es->snd->PlaySource ();
+	}
+	es->type = DYN_TYPE_EXPLOSION;
+	es->radius = 2;
+	es->dir = 1;
         CHK(csDataObject* esdata = new csDataObject(es));
-	      dyn->ObjAdd(esdata);
+	dyn->ObjAdd(esdata);
         return;
       }
       dyn->Move (s, v.x, v.y, v.z);
       dyn->Setup ();
-      if (ms->sprite)
-      {
-        ms->sprite->SetMove (v);
-	ms->sprite->MoveToSector (s);
-        csLight* lights[2];
-        int num_lights = Sys->world->GetNearbyLights (s, v, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
-	ms->sprite->UpdateLighting (lights, num_lights);
-      }
-      if (ms->snd)
-      {
-        ms->snd->SetPosition (v.x, v.y, v.z);
-      }
+      if (ms->sprite) move_sprite (ms->sprite, s, v);
+      if (ms->snd) ms->snd->SetPosition (v.x, v.y, v.z);
       break;
     }
     case DYN_TYPE_EXPLOSION:
@@ -466,6 +457,12 @@ void free_keymap ()
   mapping = NULL;
 }
 
+float safe_atof (char* arg)
+{
+  if (arg) return atof (arg);
+  else return 1;
+}
+
 //--//--//--//--//--//--//--//--//--//--//-- Handle our additional commands --//
 static bool CommandHandler (char *cmd, char *arg)
 {
@@ -480,6 +477,9 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " addbot, delbot, addsprite, snd_play, snd_volume, s_fog, do_gravity\n");
     Sys->Printf (MSG_CONSOLE, " step_forward, step_backward, strafe_left, strafe_right\n");
     Sys->Printf (MSG_CONSOLE, " look_up, look_down, rotate_left, rotate_right, jump, move3d\n");
+    Sys->Printf (MSG_CONSOLE, " i_forward, i_backward, i_left, i_right, i_up, i_down\n");
+    Sys->Printf (MSG_CONSOLE, " i_rotleftc, i_rotleftw, i_rotrightc, i_rotrightw\n");
+    Sys->Printf (MSG_CONSOLE, " i_rotleftx, i_rotleftz, i_rotrightx, i_rotrightz\n");
   }
   else if (!strcasecmp (cmd, "bind"))
     bind_key (arg);
@@ -570,19 +570,121 @@ static bool CommandHandler (char *cmd, char *arg)
   {
     Sys->Printf (MSG_CONSOLE, "No debug2 implementation in this version.\n");
   }
-  else if(!strcasecmp(cmd,"strafe_left")) Sys->strafe(-1*atof(arg),0);
-  else if(!strcasecmp(cmd,"strafe_right")) Sys->strafe(1*atof(arg),0);
-  else if(!strcasecmp(cmd,"step_forward")) Sys->step(1*atof(arg),0);
-  else if(!strcasecmp(cmd,"step_backward")) Sys->step(-1*atof(arg),0);
-  else if(!strcasecmp(cmd,"rotate_left")) Sys->rotate(-1*atof(arg),0);
-  else if(!strcasecmp(cmd,"rotate_right")) Sys->rotate(1*atof(arg),0);
-  else if(!strcasecmp(cmd,"look_up")) Sys->look(1*atof(arg),0);
-  else if(!strcasecmp(cmd,"look_down")) Sys->look(-1*atof(arg),0);
-  else if(!strcasecmp(cmd,"jump")) {if(Sys->do_gravity&&Sys->on_ground) Sys->velocity.y=0.08;}
+  else if (!strcasecmp (cmd, "strafe_left"))
+  {
+    if (Sys->move_3d) Sys->imm_left (.05, false, false);
+    else Sys->strafe(-1*safe_atof(arg),0);
+  }
+  else if (!strcasecmp (cmd, "strafe_right"))
+  {
+    if (Sys->move_3d) Sys->imm_right (.05, false, false);
+    else Sys->strafe(1*safe_atof(arg),0);
+  }
+  else if (!strcasecmp (cmd, "step_forward"))
+  {
+    if (Sys->move_3d) Sys->imm_forward (.05, false, false);
+    else Sys->step(1*safe_atof(arg),0);
+  }
+  else if (!strcasecmp (cmd, "step_backward"))
+  {
+    if (Sys->move_3d) Sys->imm_backward (.05, false, false);
+    else Sys->step(-1*safe_atof(arg),0);
+  }
+  else if (!strcasecmp (cmd, "rotate_left"))
+  {
+    if (Sys->move_3d) Sys->imm_rot_left_camera (.05, false, false);
+    else Sys->rotate(-1*safe_atof(arg),0);
+  }
+  else if (!strcasecmp (cmd, "rotate_right"))
+  {
+    if (Sys->move_3d) Sys->imm_rot_right_camera (.05, false, false);
+    else Sys->rotate(1*safe_atof(arg),0);
+  }
+  else if (!strcasecmp (cmd, "look_up"))
+  {
+    if (Sys->move_3d) Sys->imm_rot_left_xaxis (.05, false, false);
+    else Sys->look(1*safe_atof(arg),0);
+  }
+  else if (!strcasecmp (cmd, "look_down"))
+  {
+    if (Sys->move_3d) Sys->imm_rot_right_xaxis (.05, false, false);
+    else Sys->look(-1*safe_atof(arg),0);
+  }
+  else if (!strcasecmp (cmd, "jump")) {if(Sys->do_gravity&&Sys->on_ground) Sys->velocity.y=0.08;}
+  else if (!strcasecmp (cmd, "i_forward"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_forward (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_backward"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_backward (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_left"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_left (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_right"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_right (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_up"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_up (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_down"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_down (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_rotleftc"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_rot_left_camera (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_rotleftw"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_rot_left_world (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_rotrightc"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_rot_right_camera (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_rotrightw"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_rot_right_world (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_rotleftx"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_rot_left_xaxis (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_rotleftz"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_rot_left_zaxis (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_rotrightx"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_rot_right_xaxis (.05, (bool)slow, (bool)fast);
+  }
+  else if (!strcasecmp (cmd, "i_rotrightz"))
+  {
+    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    Sys->imm_rot_right_zaxis (.05, (bool)slow, (bool)fast);
+  }
   else if (!strcasecmp (cmd, "fire"))
   {
     csVector3 pos;
-    csVector3 dir(0,0,0);
+    csVector3 dir (0, 0, 0);
     pos = Sys->view->GetCamera ()->Camera2World (dir);
     float r, g, b;
     RandomColor (r, g, b);
@@ -629,6 +731,7 @@ static bool CommandHandler (char *cmd, char *arg)
         //sp->SetVertexColor (i, csColor (r, g, b));
       //}
       sp->InitSprite ();
+      move_sprite (sp, Sys->view->GetCamera ()->GetSector (), pos);
     }
   }
   else if (!strcasecmp (cmd, "addsprite"))
@@ -895,6 +998,7 @@ extern WalkTest* Sys;
 
 void WalkTest::strafe(float speed,int keep_old)
 {
+  if (move_3d) return;
   static float strafe_speed=0;
   if(!keep_old)
   {
@@ -910,6 +1014,7 @@ void WalkTest::strafe(float speed,int keep_old)
 
 void WalkTest::step(float speed,int keep_old)
 {
+  if (move_3d) return;
   static float step_speed=0;
   if(!keep_old)
   {
@@ -925,17 +1030,19 @@ void WalkTest::step(float speed,int keep_old)
 
 void WalkTest::rotate(float speed,int keep_old)
 {
+  if (move_3d) return;
   static float step_speed=0;
   if(!keep_old)
-    step_speed=speed*0.014;
+    step_speed=speed*0.028;
   angle_y+=step_speed;
 }
 
 void WalkTest::look(float speed,int keep_old)
 {
+  if (move_3d) return;
   static float step_speed=0;
   if(!keep_old)
-    step_speed=speed*0.014;
+    step_speed=speed*0.028;
   if(!move_3d)
   {
     if(fabs(angle_x+step_speed)<=(355.0/113.0/4))
@@ -945,120 +1052,111 @@ void WalkTest::look(float speed,int keep_old)
     angle_x+=step_speed;
 }
 
-#if 0
-
-void WalkTest::handle_key_forward (float speed, bool shift, bool alt, bool ctrl)
-{
+/*
+ @@@ WHAT ABOUT THIS?
   if (Sys->world->map_mode) { Sys->world->wf->KeyUp (shift, alt, ctrl); return; }
+*/
 
-  if (alt)
-  {
-    if (ctrl) Sys->view->GetCamera ()->Move (speed*.01*VEC_UP);
-    else if (shift) Sys->view->GetCamera ()->Move (speed*.4*VEC_UP);
-    else Sys->view->GetCamera ()->Move (speed*.2*VEC_UP);
-  }
-  else if (ctrl) Sys->view->GetCamera ()->Move (speed*.01*VEC_FORWARD);
-  else if (shift) Sys->view->GetCamera ()->Move (speed*1.2*VEC_FORWARD);
+void WalkTest::imm_forward (float speed, bool slow, bool fast)
+{
+  if (slow) Sys->view->GetCamera ()->Move (speed*.01*VEC_FORWARD);
+  else if (fast) Sys->view->GetCamera ()->Move (speed*1.2*VEC_FORWARD);
   else Sys->view->GetCamera ()->Move (speed*.6*VEC_FORWARD);
 }
 
-void WalkTest::handle_key_backwards (float speed, bool shift, bool alt, bool ctrl)
+void WalkTest::imm_backward (float speed, bool slow, bool fast)
 {
-  if (Sys->world->map_mode) { Sys->world->wf->KeyDown (shift, alt, ctrl); return; }
-
-  if (alt)
-  {
-    if (ctrl) Sys->view->GetCamera ()->Move (speed*.01*VEC_DOWN);
-    else if (shift) Sys->view->GetCamera ()->Move (speed*.4*VEC_DOWN);
-    else Sys->view->GetCamera ()->Move (speed*.2*VEC_DOWN);
-  }
-  else if (ctrl) Sys->view->GetCamera ()->Move (speed*.01*VEC_BACKWARD);
-  else if (shift) Sys->view->GetCamera ()->Move (speed*1.2*VEC_BACKWARD);
+  if (slow) Sys->view->GetCamera ()->Move (speed*.01*VEC_BACKWARD);
+  else if (fast) Sys->view->GetCamera ()->Move (speed*1.2*VEC_BACKWARD);
   else Sys->view->GetCamera ()->Move (speed*.6*VEC_BACKWARD);
 }
 
-void WalkTest::handle_key_left (float speed, bool shift, bool alt, bool ctrl)
+void WalkTest::imm_left (float speed, bool slow, bool fast)
 {
-  if (Sys->world->map_mode) { Sys->world->wf->KeyLeft (shift, alt, ctrl); return; }
-
-  if (alt)
-  {
-    if (ctrl) Sys->view->GetCamera ()->Move (speed*.01*VEC_LEFT);
-    else if (shift) Sys->view->GetCamera ()->Move (speed*.4*VEC_LEFT);
-    else Sys->view->GetCamera ()->Move (speed*.2*VEC_LEFT);
-  }
-  else if (move_3d)
-  {
-    if (ctrl) Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed*.005);
-    else if (shift) Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed*.2);
-    else Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed*.1);
-  }
-  else
-  {
-    if (ctrl) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed*.005);
-    else if (shift) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed*.2);
-    else Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed*.1);
-  }
+  if (slow) Sys->view->GetCamera ()->Move (speed*.01*VEC_LEFT);
+  else if (fast) Sys->view->GetCamera ()->Move (speed*1.2*VEC_LEFT);
+  else Sys->view->GetCamera ()->Move (speed*.6*VEC_LEFT);
 }
 
-void WalkTest::handle_key_right (float speed, bool shift, bool alt, bool ctrl)
+void WalkTest::imm_right (float speed, bool slow, bool fast)
 {
-  if (Sys->world->map_mode) { Sys->world->wf->KeyRight (shift, alt, ctrl); return; }
-
-  if (alt)
-  {
-    if (ctrl) Sys->view->GetCamera ()->Move (speed*.01*VEC_RIGHT);
-    else if (shift) Sys->view->GetCamera ()->Move (speed*.4*VEC_RIGHT);
-    else Sys->view->GetCamera ()->Move (speed*.2*VEC_RIGHT);
-  }
-  else if (move_3d)
-  {
-    if (ctrl) Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed*.005);
-    else if (shift) Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed*.2);
-    else Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed*.1);
-  }
-  else
-  {
-    if (ctrl) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed*.005);
-    else if (shift) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed*.2);
-    else Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed*.1);
-  }
+  if (slow) Sys->view->GetCamera ()->Move (speed*.01*VEC_RIGHT);
+  else if (fast) Sys->view->GetCamera ()->Move (speed*1.2*VEC_RIGHT);
+  else Sys->view->GetCamera ()->Move (speed*.6*VEC_RIGHT);
 }
 
-void WalkTest::handle_key_pgup (float speed, bool shift, bool alt, bool ctrl)
+void WalkTest::imm_up (float speed, bool slow, bool fast)
 {
-  if (Sys->world->map_mode) { Sys->world->wf->KeyPgUp (shift, alt, ctrl); return; }
-  if (alt)
-  {
-    if (ctrl) Sys->view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed*.005);
-    else Sys->view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed*.1);
-  }
-  else if (ctrl) Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed*.005);
-  else if (shift) Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed*.2);
-  else Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed*.1);
+  if (slow) Sys->view->GetCamera ()->Move (speed*.01*VEC_UP);
+  else if (fast) Sys->view->GetCamera ()->Move (speed*1.2*VEC_UP);
+  else Sys->view->GetCamera ()->Move (speed*.6*VEC_UP);
 }
 
-void WalkTest::handle_key_pgdn (float speed, bool shift, bool alt, bool ctrl)
+void WalkTest::imm_down (float speed, bool slow, bool fast)
 {
-  if (Sys->world->map_mode) { Sys->world->wf->KeyPgDn (shift, alt, ctrl); return; }
-  if (alt)
-  {
-    if (ctrl) Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed*.005);
-    else Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed*.1);
-  }
-  else if (ctrl) Sys->view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed*.005);
-  else if (shift) Sys->view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed*.2);
+  if (slow) Sys->view->GetCamera ()->Move (speed*.01*VEC_DOWN);
+  else if (fast) Sys->view->GetCamera ()->Move (speed*1.2*VEC_DOWN);
+  else Sys->view->GetCamera ()->Move (speed*.6*VEC_DOWN);
+}
+
+void WalkTest::imm_rot_left_camera (float speed, bool slow, bool fast)
+{
+  if (slow) Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed*.005);
+  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed*.2);
+  else Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed*.1);
+}
+
+void WalkTest::imm_rot_left_world (float speed, bool slow, bool fast)
+{
+  if (slow) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed*.005);
+  else if (fast) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed*.2);
+  else Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed*.1);
+}
+
+void WalkTest::imm_rot_right_camera (float speed, bool slow, bool fast)
+{
+  if (slow) Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed*.005);
+  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed*.2);
+  else Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed*.1);
+}
+
+void WalkTest::imm_rot_right_world (float speed, bool slow, bool fast)
+{
+  if (slow) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed*.005);
+  else if (fast) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed*.2);
+  else Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed*.1);
+}
+
+void WalkTest::imm_rot_left_xaxis (float speed, bool slow, bool fast)
+{
+  if (slow) Sys->view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed*.005);
+  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed*.2);
   else Sys->view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed*.1);
 }
 
-#endif
+void WalkTest::imm_rot_right_xaxis (float speed, bool slow, bool fast)
+{
+  if (slow) Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed*.005);
+  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed*.2);
+  else Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed*.1);
+}
+
+void WalkTest::imm_rot_left_zaxis (float speed, bool slow, bool fast)
+{
+  if (slow) Sys->view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed*.005);
+  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed*.2);
+  else Sys->view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed*.1);
+}
+
+void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
+{
+  if (slow) Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed*.005);
+  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed*.2);
+  else Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed*.1);
+}
 
 void WalkTest::eatkeypress (int status,int key, bool shift, bool alt, bool ctrl)
 {
-/*float speed = 1;
-  if (ctrl) speed = .5;
-  if (shift) speed = 2;
-*/
   if (System->Console->IsActive ()&&status)
     ((SimpleConsole *)System->Console)->AddChar (key);
   else switch (key)
@@ -1070,7 +1168,7 @@ void WalkTest::eatkeypress (int status,int key, bool shift, bool alt, bool ctrl)
 
     default:
       {
-	      csKeyMap *m = mapping;
+	csKeyMap *m = mapping;
         while (m)
         {
           if (key == m->key && shift == m->shift
@@ -1101,7 +1199,7 @@ void WalkTest::eatkeypress (int status,int key, bool shift, bool alt, bool ctrl)
               m->is_on=0;
             }
           }
-	        m = m->next;
+	  m = m->next;
         }
       }
       break;
@@ -1167,15 +1265,6 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
     /// Act as usual...
     strafe(0,1); look(0,1); step(0,1); rotate(0,1);
 
-//  speed*=elapsed_time/100.0;
-/*
-    if (Keyboard->Key.up)    handle_key_forward (speed, shift, alt, ctrl);
-    if (Keyboard->Key.down)  handle_key_backwards (speed, shift, alt, ctrl);
-    if (Keyboard->Key.left)  handle_key_left (speed, shift, alt, ctrl);
-    if (Keyboard->Key.right) handle_key_right (speed, shift, alt, ctrl);
-    if (Keyboard->Key.pgup)  handle_key_pgup (speed, shift, alt, ctrl);
-    if (Keyboard->Key.pgdn)  handle_key_pgdn (speed, shift, alt, ctrl);
-*/
     ISoundListener *sndListener;
     Sys->piSound->GetListener(&sndListener);
     if(sndListener)
@@ -1222,17 +1311,17 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
         else
         if (Event->Mouse.Button == 2)
         {
-	        unsigned long real_zb;
+	  unsigned long real_zb;
           unsigned long* zb = &real_zb;
-	        System->piG3D->GetZBufPoint(Event->Mouse.x, Event->Mouse.y, &zb);
+	  System->piG3D->GetZBufPoint(Event->Mouse.x, Event->Mouse.y, &zb);
 
           if(zb)
           {
-        	  csVector3 v, vw;
-	          v.z = 1. / (((float)*zb)/(256.*65536.));
-	          v.x = (Event->Mouse.x-FRAME_WIDTH/2) * v.z / csCamera::aspect;
-	          v.y = (FRAME_HEIGHT-1-Event->Mouse.y-FRAME_HEIGHT/2) * v.z / csCamera::aspect;
-	          vw = view->GetCamera ()->Camera2World (v);
+       	    csVector3 v, vw;
+	    v.z = 1. / (((float)*zb)/(256.*65536.));
+	    v.x = (Event->Mouse.x-FRAME_WIDTH/2) * v.z / csCamera::aspect;
+	    v.y = (FRAME_HEIGHT-1-Event->Mouse.y-FRAME_HEIGHT/2) * v.z / csCamera::aspect;
+	    vw = view->GetCamera ()->Camera2World (v);
 
             Sys->Printf (MSG_CONSOLE, "LMB down : z_buf=%ld cam:(%f,%f,%f) world:(%f,%f,%f)\n", zb, v.x, v.y, v.z, vw.x, vw.y, vw.z);
             Sys->Printf (MSG_DEBUG_0, "LMB down : z_buf=%ld cam:(%f,%f,%f) world:(%f,%f,%f)\n", zb, v.x, v.y, v.z, vw.x, vw.y, vw.z);
@@ -1246,35 +1335,35 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
         }
         break;
       case csevMouseMove:
-	    // additional command by Leslie Saputra -> freelook mode.
-	    {
-	      static bool first_time = true;
-	      if(do_freelook)
-	      {
-	        int last_x, last_y;
-	        last_x = Event->Mouse.x;
-	        last_y = Event->Mouse.y;
+	// additional command by Leslie Saputra -> freelook mode.
+	{
+	  static bool first_time = true;
+	  if(do_freelook)
+	  {
+	    int last_x, last_y;
+	    last_x = Event->Mouse.x;
+	    last_y = Event->Mouse.y;
 
-          System->piG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
-	        if(!first_time)
-	        {
+            System->piG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
+	    if(!first_time)
+	    {
             /*
-	          if(move_3d)
-	            view->GetCamera ()->Rotate (VEC_ROT_RIGHT, ((float)( last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2) );
-	          else
-	            view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, ((float)( last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2) );
-	          view->GetCamera ()->Rotate (VEC_TILT_UP, -((float)( last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2) );
+	      if(move_3d)
+	        view->GetCamera ()->Rotate (VEC_ROT_RIGHT, ((float)( last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2) );
+	      else
+	        view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, ((float)( last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2) );
+	      view->GetCamera ()->Rotate (VEC_TILT_UP, -((float)( last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2) );
             */
 
-            this->angle_y+=((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2);
-            this->angle_x+=((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse);
-	        }
-	        else
-            first_time = false;
-	      }
-	      else
-          first_time = true;
+              this->angle_y+=((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2);
+              this->angle_x+=((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse);
 	    }
+	    else
+              first_time = false;
+	  }
+	  else
+            first_time = true;
+	}
       break;
       case csevMouseUp:
         if (Event->Mouse.Button == 1)
