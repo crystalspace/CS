@@ -450,7 +450,6 @@ bool awsTextBox::OnKeypress (int key, int Char, int)
 	str[0] = (char)Char;
 	str[1] = 0;
 
-	printf ("Appending %c\n", Char);
 	text->Append (str);
 	cursor++;
 	Broadcast (signalChanged);
