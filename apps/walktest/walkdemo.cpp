@@ -278,6 +278,7 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
   mfw->DecRef ();
 
   exp->SetZBufMode(CS_ZBUF_TEST);
+  exp->SetRenderPriority(4); // @@@ alpha, most of the cases. should be queried from engine
 
   iParticleState* partstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState);
   partstate->SetMaterialWrapper (mat);
