@@ -448,7 +448,7 @@ csRef<iDocumentNode> csXmlReadDocument::GetRoot ()
   return csPtr<iDocumentNode> (Alloc (root, false));
 }
 
-const char* csXmlReadDocument::Parse (iFile* file)
+const char* csXmlReadDocument::Parse (iFile* file, bool collapse)
 {
   size_t want_size = file->GetSize ();
   char *data = new char [want_size + 1];
@@ -466,34 +466,40 @@ const char* csXmlReadDocument::Parse (iFile* file)
     return "File contains one or more null characters";
   }
 #endif
-  const char *error = Parse (data);
+  const char *error = Parse (data, collapse);
   delete[] data;
   return error;
 }
 
-const char* csXmlReadDocument::Parse (iDataBuffer* buf)
+const char* csXmlReadDocument::Parse (iDataBuffer* buf, bool collapse)
 {
-  return Parse ((const char*)buf->GetData ());
+  return Parse ((const char*)buf->GetData (), collapse);
 }
 
-const char* csXmlReadDocument::Parse (iString* str)
+const char* csXmlReadDocument::Parse (iString* str, bool collapse)
 {
-  return Parse ((const char*)*str);
+  return Parse ((const char*)*str, collapse);
 }
 
-const char* csXmlReadDocument::Parse (const char* buf)
+const char* csXmlReadDocument::Parse (const char* buf, bool collapse)
 {
   CreateRoot (csStrNew (buf));
+  bool const old_collapse = root->IsWhiteSpaceCondensed();
+  root->SetCondenseWhiteSpace(collapse);
   root->Parse (root, root->input_data);
+  root->SetCondenseWhiteSpace(old_collapse);
   if (root->Error ())
     return root->ErrorDesc ();
   return 0;
 }
 
-const char* csXmlReadDocument::ParseInPlace (char* buf)
+const char* csXmlReadDocument::ParseInPlace (char* buf, bool collapse)
 {
   CreateRoot (buf);
+  bool const old_collapse = root->IsWhiteSpaceCondensed();
+  root->SetCondenseWhiteSpace(collapse);
   root->Parse (root, root->input_data);
+  root->SetCondenseWhiteSpace(old_collapse);
   if (root->Error ())
     return root->ErrorDesc ();
   return 0;

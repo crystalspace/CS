@@ -101,7 +101,7 @@ csRef<iDocumentNode> csPlexDocument::GetRoot ()
   }
 }
 
-const char* csPlexDocument::Parse (iFile* file)
+const char* csPlexDocument::Parse (iFile* file, bool collapse)
 {
   size_t oldpos = file->GetPos ();
 
@@ -113,7 +113,7 @@ const char* csPlexDocument::Parse (iFile* file)
   {
     csRef<iDocument> doc = DS->CreateDocument();
     file->SetPos (oldpos);
-    const char* err = doc->Parse (file);
+    const char* err = doc->Parse (file, collapse);
     if (!err)
     {
       wrappedDoc = doc;
@@ -129,7 +129,7 @@ const char* csPlexDocument::Parse (iFile* file)
   return lasterr;
 }
 
-const char* csPlexDocument::Parse (iDataBuffer* buf)
+const char* csPlexDocument::Parse (iDataBuffer* buf, bool collapse)
 {
   size_t pluginnum = 0;
   csRef<iDocumentSystem> DS;
@@ -138,7 +138,7 @@ const char* csPlexDocument::Parse (iDataBuffer* buf)
   while (DS = plexer->LoadNextPlugin (pluginnum++))
   {
     csRef<iDocument> doc = DS->CreateDocument();
-    const char* err = doc->Parse (buf);
+    const char* err = doc->Parse (buf, collapse);
     if (!err)
     {
       wrappedDoc = doc;
@@ -154,7 +154,7 @@ const char* csPlexDocument::Parse (iDataBuffer* buf)
   return lasterr;
 }
 
-const char* csPlexDocument::Parse (iString* str)
+const char* csPlexDocument::Parse (iString* str, bool collapse)
 {
   size_t pluginnum = 0;
   csRef<iDocumentSystem> DS;
@@ -163,7 +163,7 @@ const char* csPlexDocument::Parse (iString* str)
   while (DS = plexer->LoadNextPlugin (pluginnum++))
   {
     csRef<iDocument> doc = DS->CreateDocument();
-    const char* err = doc->Parse (str);
+    const char* err = doc->Parse (str, collapse);
     if (!err)
     {
       wrappedDoc = doc;
@@ -179,7 +179,7 @@ const char* csPlexDocument::Parse (iString* str)
   return lasterr;
 }
 
-const char* csPlexDocument::Parse (const char* buf)
+const char* csPlexDocument::Parse (const char* buf, bool collapse)
 {
   size_t pluginnum = 0;
   csRef<iDocumentSystem> DS;
@@ -188,7 +188,7 @@ const char* csPlexDocument::Parse (const char* buf)
   while (DS = plexer->LoadNextPlugin (pluginnum++))
   {
     csRef<iDocument> doc = DS->CreateDocument();
-    const char* err = doc->Parse (buf);
+    const char* err = doc->Parse (buf, collapse);
     if (!err)
     {
       wrappedDoc = doc;

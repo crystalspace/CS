@@ -39,11 +39,11 @@ public:
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();
   virtual csRef<iDocumentNode> GetRoot ();
-  virtual const char* Parse (iFile* file);
-  virtual const char* Parse (iDataBuffer* buf);
-  virtual const char* Parse (iString* str);
-  virtual const char* Parse (const char* buf);
-  const char* ParseInPlace (char* buf);
+  virtual const char* Parse (iFile* file,      bool collapse = false);
+  virtual const char* Parse (iDataBuffer* buf, bool collapse = false);
+  virtual const char* Parse (iString* str,     bool collapse = false);
+  virtual const char* Parse (const char* buf,  bool collapse = false);
+  const char* ParseInPlace (char* buf, bool collapse = false);
   virtual const char* Write (iFile* file);
   virtual const char* Write (iString* str);
   virtual const char* Write (iVFS* vfs, const char* filename);
@@ -81,33 +81,33 @@ csRef<iDocumentNode> csXmlReadDocWrapper::GetRoot ()
   return xmlreaddoc->GetRoot();
 }
 
-const char* csXmlReadDocWrapper::Parse (iFile* file)
+const char* csXmlReadDocWrapper::Parse (iFile* file, bool collapse)
 {
   char *buf = new char[file->GetSize()+1];
   file->Read (buf, file->GetSize());
   buf[file->GetSize ()] = 0;
-  const char *ret = ParseInPlace (buf);
+  const char *ret = ParseInPlace (buf, collapse);
   return ret;
 }
 
-const char* csXmlReadDocWrapper::Parse (iDataBuffer* buf)
+const char* csXmlReadDocWrapper::Parse (iDataBuffer* buf, bool collapse)
 {
-  return Parse ((const char*)buf->GetData());
+  return Parse ((const char*)buf->GetData(), collapse);
 }
 
-const char* csXmlReadDocWrapper::Parse (iString* str)
+const char* csXmlReadDocWrapper::Parse (iString* str, bool collapse)
 {
-  return Parse ((const char*)str);
+  return Parse ((const char*)str, collapse);
 }
 
-const char* csXmlReadDocWrapper::Parse (const char* buf)
+const char* csXmlReadDocWrapper::Parse (const char* buf, bool collapse)
 {
   const char* b = buf;
   while ((*b == ' ') || (*b == '\n') || (*b == '\t') || 
     (*b == '\r')) b++;
   if (*b == '<')
   {
-    return xmlreaddoc->Parse (buf);
+    return xmlreaddoc->Parse (buf, collapse);
   }
   else
   {
@@ -115,14 +115,15 @@ const char* csXmlReadDocWrapper::Parse (const char* buf)
   }
 }
 
-const char* csXmlReadDocWrapper::ParseInPlace (char* buf)
+const char* csXmlReadDocWrapper::ParseInPlace (char* buf, bool collapse)
 {
   char* b = buf;
   while ((*b == ' ') || (*b == '\n') || (*b == '\t') || 
     (*b == '\r')) b++;
   if (*b == '<')
   {
-    return ((csXmlReadDocument*)(iDocument*)xmlreaddoc)->ParseInPlace (buf);
+    return ((csXmlReadDocument*)(iDocument*)xmlreaddoc)->ParseInPlace (
+      buf, collapse);
   }
   else
   {
@@ -195,12 +196,9 @@ csRef<iDocument> csXmlReadXMLPlugin::CreateDocument ()
     xmlread.AttachNew (new csXmlReadDocumentSystem ((iComponent*)this));
     csXmlReadXMLPlugin::xmlread = xmlread;
   }
-  return csPtr<iDocument> (new csXmlReadDocWrapper (
-    xmlread->CreateDocument ()));
+  return csPtr<iDocument> (new csXmlReadDocWrapper(xmlread->CreateDocument()));
 }
 
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csXmlReadXMLPlugin)
-
-

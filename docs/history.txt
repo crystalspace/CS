@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Oct-2004
+	- Eric Sunshine added an optional argument to iDocument::Parse() which
+	  controls whether or not whitespace in CS_NODE_TEXT nodes is
+	  condensed.  The new default behavior is for whitespace to be
+	  preserved.  (Previously, it was condensed unconditionally.)  This
+	  change was made in order to conform to the latest XML specifications
+	  which state that XML scanners must preserve whitespace by default.
+	  Consult the following documents for more information regarding this
+	  issue.
+	    http://www.w3.org/TR/REC-xml/#sec-white-space
+	    http://www.xml.com/axml/notes/AllWSAlways.html
 25-Oct-2004
 	- Jorrit disabled VBO by default now. It gives too many problems
 	  (both on ATI and nVidia). Having this option on by default can

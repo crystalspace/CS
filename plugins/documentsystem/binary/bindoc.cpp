@@ -1378,7 +1378,8 @@ float csBinaryDocNode::GetAttributeValueAsFloat (const char* name)
   }
 }
 
-bool csBinaryDocNode::GetAttributeValueAsBool (const char* name, bool defaultvalue)
+bool csBinaryDocNode::GetAttributeValueAsBool (const char* name,
+					       bool defaultvalue)
 {
   csRef<iDocumentAttribute> attr = GetAttribute (name);
   if (attr)
@@ -1515,7 +1516,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     unsigned int i;
     for (i = 0; i < attrCount; i++)
     {
-      startsScratch[i] = little_endian_long (nodesFile->GetPos () - attrStart);
+      startsScratch[i] = little_endian_long (nodesFile->GetPos() - attrStart);
       csBinaryDocAttribute* attr = doc->GetPoolAttr ();
       attr->SetTo (nodeData->atGetItem (i), this);
       attr->Store (nodesFile);
@@ -1531,7 +1532,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     unsigned int i;
     for (i = 0; i < childCount; i++)
     {
-      startsScratch[i] = little_endian_long (nodesFile->GetPos () - childStart);
+      startsScratch[i] = little_endian_long (nodesFile->GetPos() - childStart);
       csBinaryDocNode* node = doc->GetPoolNode();
       node->SetTo (nodeData->ctGetItem (i), this);
       node->Store (nodesFile);
@@ -1733,14 +1734,14 @@ csRef<iDocumentNode> csBinaryDocument::GetRoot ()
   return csPtr<iDocumentNode> (GetRootNode ());
 }
 
-const char* csBinaryDocument::Parse (iFile* file)
+const char* csBinaryDocument::Parse (iFile* file, bool collapse)
 {
   csRef<iDataBuffer> newBuffer = csPtr<iDataBuffer> 
     (file->GetAllData());
-  return Parse (newBuffer);
+  return Parse (newBuffer, collapse);
 }
 
-const char* csBinaryDocument::Parse (iDataBuffer* buf)
+const char* csBinaryDocument::Parse (iDataBuffer* buf, bool /* collapse */)
 {
   if (buf->GetSize() < sizeof (bdHeader) + sizeof (bdDocument))
   {
@@ -1773,21 +1774,21 @@ const char* csBinaryDocument::Parse (iDataBuffer* buf)
   return 0;
 }
 
-const char* csBinaryDocument::Parse (iString* str)
+const char* csBinaryDocument::Parse (iString* str, bool collapse)
 {
   csRef<csDataBuffer> newBuffer = csPtr<csDataBuffer>
     (new csDataBuffer(str->Length()));
   memcpy (newBuffer->GetData(), str->GetData(),
     str->Length());
-  return Parse (newBuffer);
+  return Parse (newBuffer, collapse);
 }
 
-const char* csBinaryDocument::Parse (const char* buf)
+const char* csBinaryDocument::Parse (const char* buf, bool collapse)
 {
   csRef<csDataBuffer> newBuffer = csPtr<csDataBuffer>
     (new csDataBuffer(strlen (buf)));
   memcpy (newBuffer->GetData(), buf, strlen (buf));
-  return Parse (newBuffer);
+  return Parse (newBuffer, collapse);
 }
 
 const char* csBinaryDocument::Write (iFile* out)

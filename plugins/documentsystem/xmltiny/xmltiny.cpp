@@ -37,10 +37,10 @@ public:
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();
   virtual csRef<iDocumentNode> GetRoot ();
-  virtual const char* Parse (iFile* file);
-  virtual const char* Parse (iDataBuffer* buf);
-  virtual const char* Parse (iString* str);
-  virtual const char* Parse (const char* buf);
+  virtual const char* Parse (iFile* file,      bool collapse = false);
+  virtual const char* Parse (iDataBuffer* buf, bool collapse = false);
+  virtual const char* Parse (iString* str,     bool collapse = false);
+  virtual const char* Parse (const char* buf,  bool collapse = false);
   virtual const char* Write (iFile* file);
   virtual const char* Write (iString* str);
   virtual const char* Write (iVFS* vfs, const char* filename);
@@ -78,32 +78,32 @@ csRef<iDocumentNode> csTinyDocWrapper::GetRoot ()
   return tinydoc->GetRoot();
 }
 
-const char* csTinyDocWrapper::Parse (iFile* file)
+const char* csTinyDocWrapper::Parse (iFile* file, bool collapse)
 {
   csRef<iDataBuffer> buf = csPtr<iDataBuffer>
     (file->GetAllData (true));
-  const char *ret = Parse (buf->GetData());
+  const char *ret = Parse (buf->GetData(), collapse);
   return ret;
 }
 
-const char* csTinyDocWrapper::Parse (iDataBuffer* buf)
+const char* csTinyDocWrapper::Parse (iDataBuffer* buf, bool collapse)
 {
-  return Parse ((char*)buf->GetData());
+  return Parse ((char*)buf->GetData(), collapse);
 }
 
-const char* csTinyDocWrapper::Parse (iString* str)
+const char* csTinyDocWrapper::Parse (iString* str, bool collapse)
 {
-  return Parse ((const char*)str);
+  return Parse ((const char*)str, collapse);
 }
 
-const char* csTinyDocWrapper::Parse (const char* buf)
+const char* csTinyDocWrapper::Parse (const char* buf, bool collapse)
 {
   const char* b = buf;
   while ((*b == ' ') || (*b == '\n') || (*b == '\t') || 
     (*b == '\r')) b++;
   if (*b == '<')
   {
-    return tinydoc->Parse (buf);
+    return tinydoc->Parse (buf, collapse);
   }
   else
   {

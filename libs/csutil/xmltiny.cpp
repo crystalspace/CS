@@ -445,7 +445,8 @@ float csTinyXmlNode::GetAttributeValueAsFloat (const char* name)
   return f;
 }
 
-bool csTinyXmlNode::GetAttributeValueAsBool (const char* name, bool defaultvalue)
+bool csTinyXmlNode::GetAttributeValueAsBool(const char* name,
+					    bool defaultvalue)
 {
   TiDocumentAttribute* a = GetAttributeInternal (name);
   if (!a || !a->Value () ) return defaultvalue;
@@ -538,7 +539,7 @@ csRef<iDocumentNode> csTinyXmlDocument::GetRoot ()
   return csPtr<iDocumentNode> (Alloc (root));
 }
 
-const char* csTinyXmlDocument::Parse (iFile* file)
+const char* csTinyXmlDocument::Parse (iFile* file, bool collapse)
 {
   size_t want_size = file->GetSize ();
   char *data = new char [want_size + 1];
@@ -556,25 +557,28 @@ const char* csTinyXmlDocument::Parse (iFile* file)
     return "File contains one or more null characters";
   }
 #endif
-  const char *error = Parse (data);
+  const char *error = Parse (data, collapse);
   delete[] data;
   return error;
 }
 
-const char* csTinyXmlDocument::Parse (iDataBuffer* buf)
+const char* csTinyXmlDocument::Parse (iDataBuffer* buf, bool collapse)
 {
-  return Parse ((const char*)buf->GetData ());
+  return Parse ((const char*)buf->GetData (), collapse);
 }
 
-const char* csTinyXmlDocument::Parse (iString* str)
+const char* csTinyXmlDocument::Parse (iString* str, bool collapse)
 {
-  return Parse ((const char*)*str);
+  return Parse ((const char*)*str, collapse);
 }
 
-const char* csTinyXmlDocument::Parse (const char* buf)
+const char* csTinyXmlDocument::Parse (const char* buf, bool collapse)
 {
   CreateRoot ();
+  bool const old_collapse = root->IsWhiteSpaceCondensed();
+  root->SetCondenseWhiteSpace(collapse);
   root->Parse (root, buf);
+  root->SetCondenseWhiteSpace(old_collapse);
   if (root->Error ())
     return root->ErrorDesc ();
   return 0;
@@ -641,6 +645,3 @@ void csTinyXmlDocument::Free (csTinyXmlNode* n)
   pool = n;
   n->doc = 0;	// Free ref.
 }
-
-//------------------------------------------------------------------------
-

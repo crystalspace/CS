@@ -194,7 +194,8 @@ public:
   virtual csRef<iDocumentAttribute> GetAttribute (const char* name);
   virtual int GetAttributeValueAsInt (const char* name);
   virtual float GetAttributeValueAsFloat (const char* name);
-  virtual bool  GetAttributeValueAsBool (const char* name,bool defaultvalue=false);
+  virtual bool  GetAttributeValueAsBool (const char* name,
+					 bool defaultvalue = false);
   virtual const char* GetAttributeValue (const char* name);
   virtual void RemoveAttribute (const csRef<iDocumentAttribute>&) { }
   virtual void RemoveAttributes () { }
@@ -233,19 +234,18 @@ public:
   void Free (csXmlReadNode* n);
 
   virtual csRef<iDocumentNode> GetRoot ();
-  virtual const char* Parse (iFile* file);
-  virtual const char* Parse (iDataBuffer* buf);
-  virtual const char* Parse (iString* str);
-  virtual const char* Parse (const char* buf);
+  virtual const char* Parse (iFile* file,      bool collapse = false);
+  virtual const char* Parse (iDataBuffer* buf, bool collapse = false);
+  virtual const char* Parse (iString* str,     bool collapse = false);
+  virtual const char* Parse (const char* buf,  bool collapse = false);
   virtual const char* Write (iFile*) { return "Read-only!"; }
   virtual const char* Write (iString*) { return "Read-only!"; }
   virtual const char* Write (iVFS*, const char*) { return "Read-only!"; }
 
   csRef<iDocumentNode> CreateRoot (char* buf);
-  const char* ParseInPlace (char* buf);
+  const char* ParseInPlace (char* buf, bool collapse = false);
 
   virtual int Changeable () { return CS_CHANGEABLE_NEVER; }
 };
 
 #endif // __XRPRIV_H__
-

@@ -66,10 +66,10 @@ public:
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();
   virtual csRef<iDocumentNode> GetRoot ();
-  virtual const char* Parse (iFile* file);
-  virtual const char* Parse (iDataBuffer* buf);
-  virtual const char* Parse (iString* str);
-  virtual const char* Parse (const char* buf);
+  virtual const char* Parse (iFile* file,      bool collapse = false);
+  virtual const char* Parse (iDataBuffer* buf, bool collapse = false);
+  virtual const char* Parse (iString* str,     bool collapse = false);
+  virtual const char* Parse (const char* buf,  bool collapse = false);
   virtual const char* Write (iFile* file);
   virtual const char* Write (iString* str);
   virtual const char* Write (iVFS* vfs, const char* filename);

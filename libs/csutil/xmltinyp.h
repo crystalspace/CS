@@ -210,7 +210,8 @@ public:
   virtual csRef<iDocumentAttribute> GetAttribute (const char* name);
   virtual int GetAttributeValueAsInt (const char* name);
   virtual float GetAttributeValueAsFloat (const char* name);
-  virtual bool  GetAttributeValueAsBool (const char* name,bool defaultvalue=false);
+  virtual bool  GetAttributeValueAsBool (const char* name,
+					 bool defaultvalue = false);
   virtual const char* GetAttributeValue (const char* name);
   virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr);
   virtual void RemoveAttributes ();
@@ -248,10 +249,10 @@ public:
   virtual csRef<iDocumentNode> CreateRoot ();
 
   virtual csRef<iDocumentNode> GetRoot ();
-  virtual const char* Parse (iFile* file);
-  virtual const char* Parse (iDataBuffer* buf);
-  virtual const char* Parse (iString* str);
-  virtual const char* Parse (const char* buf);
+  virtual const char* Parse (iFile* file,      bool collapse = false);
+  virtual const char* Parse (iDataBuffer* buf, bool collapse = false);
+  virtual const char* Parse (iString* str,     bool collapse = false);
+  virtual const char* Parse (const char* buf,  bool collapse = false);
   virtual const char* Write (iFile* file);
   virtual const char* Write (iString* str);
   virtual const char* Write (iVFS* vfs, const char* filename);
@@ -260,4 +261,3 @@ public:
 };
 
 #endif // __CSUTIL_XMLTINYPRIV_H__
-

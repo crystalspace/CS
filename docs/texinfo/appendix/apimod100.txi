@@ -572,3 +572,24 @@ references to contained elements, rather than pointers.  This makes the
 interface of @code{csList<>::Iterator} internally consistent, as well as
 consistent with all other iterators throughout the toolkit, in which these
 methods return references.
+
+@subheading @code{iDocument} Changes
+
+The @code{iDocument::Parse()} method now accepts an optional argument
+indicating whether or not extraneous whitespace in @samp{CS_NODE_TEXT} nodes
+should be condensed.  Most implementations of @samp{iDocument} will attempt to
+respect this option if possible.  For implementations where it does not make
+sense, the option will be ignored.
+
+Previously, @sc{xml} implementations of @samp{iDocument} condensed whitespace
+in @samp{CS_NODE_TEXT} nodes at @code{Parse()} time.  This is no longer the
+case.  Whitespace is now preserved by default.  If the new behavior is
+unsuitable for your case, use the new argument to @code{iDocument::Parse()} to
+indicate that whitespace should be condensed.  This change was made in order to
+conform to the latest @sc{xml} specifications which state that @sc{xml}
+scanners must preserve whitespace by default.  Consult the following documents
+for more information regarding this issue.
+
+@noindent
+@uref{http://www.w3.org/TR/REC-xml/#sec-white-space}@*
+@uref{http://www.xml.com/axml/notes/AllWSAlways.html}

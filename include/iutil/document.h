@@ -325,35 +325,55 @@ struct iDocument : public iBase
 
   /**
    * Parse document file from an iFile.
-   * This will clear the previous root node if any.
-   * Returns 0 if all is ok. Otherwise it will return an error
-   * string.
+   * \param file The file to parse. It should contain data in whatever format
+   *   is understood by the iDocument implementation receiving this invocation.
+   * \param collapse Some document format implementations may have the option
+   *   of condensing extraneous whitespace in returned #CS_NODE_TEXT nodes.
+   *   Set this to true to enable this option.  By default, whitepsace is
+   *   preserved.
+   * \return 0 if all is okay; otherwise an error message.
+   * \remarks This will clear the previous root node if any.
    */
-  virtual const char* Parse (iFile* file) = 0;
+  virtual const char* Parse (iFile* file, bool collapse = false) = 0;
 
   /**
    * Parse document file from an iDataBuffer.
-   * This will clear the previous root node if any.
-   * Returns 0 if all is ok. Otherwise it will return an error
-   * string.
+   * \param buf The buffer to parse. It should contain data in whatever format
+   *   is understood by the iDocument implementation receiving this invocation.
+   * \param collapse Some document format implementations may have the option
+   *   of condensing extraneous whitespace in returned #CS_NODE_TEXT nodes.
+   *   Set this to true to enable this option.  By default, whitepsace is
+   *   preserved.
+   * \return 0 if all is okay; otherwise an error message.
+   * \remarks This will clear the previous root node if any.
    */
-  virtual const char* Parse (iDataBuffer* buf) = 0;
+  virtual const char* Parse (iDataBuffer* buf, bool collapse = false) = 0;
 
   /**
    * Parse document file from an iString.
-   * This will clear the previous root node if any.
-   * Returns 0 if all is ok. Otherwise it will return an error
-   * string.
+   * \param str The string to parse. It should contain data in whatever format
+   *   is understood by the iDocument implementation receiving this invocation.
+   * \param collapse Some document format implementations may have the option
+   *   of condensing extraneous whitespace in returned #CS_NODE_TEXT nodes.
+   *   Set this to true to enable this option.  By default, whitepsace is
+   *   preserved.
+   * \return 0 if all is okay; otherwise an error message.
+   * \remarks This will clear the previous root node if any.
    */
-  virtual const char* Parse (iString* str) = 0;
+  virtual const char* Parse (iString* str, bool collapse = false) = 0;
 
   /**
    * Parse document file from a null-terminated C-string.
-   * This will clear the previous root node if any.
-   * Returns 0 if all is ok. Otherwise it will return an error
-   * string.
+   * \param buf The buffer to parse. It should contain data in whatever format
+   *   is understood by the iDocument implementation receiving this invocation.
+   * \param collapse Some document format implementations may have the option
+   *   of condensing extraneous whitespace in returned #CS_NODE_TEXT nodes.
+   *   Set this to true to enable this option.  By default, whitepsace is
+   *   preserved.
+   * \return 0 if all is okay; otherwise an error message.
+   * \remarks This will clear the previous root node if any.
    */
-  virtual const char* Parse (const char* buf) = 0;
+  virtual const char* Parse (const char* buf, bool collapse = false) = 0;
 
   /**
    * Write out document file to an iFile.

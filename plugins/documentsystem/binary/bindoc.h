@@ -276,7 +276,8 @@ public:
   uint32 GetRealFlags() const
   { 
     return (nameID & BD_ATTR_FLAGS_IN_NAME) ? 
-      (nameID & BD_ATTR_FLAGS_IN_NAME_MASK) >> BD_ATTR_FLAGS_IN_NAME_SHIFT : flags;
+      (nameID & BD_ATTR_FLAGS_IN_NAME_MASK) >> BD_ATTR_FLAGS_IN_NAME_SHIFT :
+      flags;
   }
 
   csBdAttr (const char* name);
@@ -485,7 +486,8 @@ public:
   virtual const char* GetAttributeValue (const char* name);
   virtual int GetAttributeValueAsInt (const char* name);
   virtual float GetAttributeValueAsFloat (const char* name);
-  virtual bool GetAttributeValueAsBool (const char* name, bool defaultvalue=false);
+  virtual bool GetAttributeValueAsBool (const char* name,
+					bool defaultvalue = false);
   virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr);
   virtual void RemoveAttributes ();
   virtual void SetAttribute (const char* name, const char* value);
@@ -543,14 +545,13 @@ public:
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();
   virtual csRef<iDocumentNode> GetRoot ();
-  virtual const char* Parse (iFile* file);
-  virtual const char* Parse (iDataBuffer* buf);
-  virtual const char* Parse (iString* str);
-  virtual const char* Parse (const char* buf);
+  virtual const char* Parse (iFile* file,      bool collapse = false);
+  virtual const char* Parse (iDataBuffer* buf, bool collapse = false);
+  virtual const char* Parse (iString* str,     bool collapse = false);
+  virtual const char* Parse (const char* buf,  bool collapse = false);
   virtual const char* Write (iFile* file);
   virtual const char* Write (iString* str);
   virtual const char* Write (iVFS* vfs, const char* filename);
 
   virtual int Changeable ();
 };
-
