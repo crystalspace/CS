@@ -136,6 +136,7 @@ void csRadPoly :: ComputePriority()
 {
   float red, green, blue;
   float max;
+  CapDelta(0, width, height, 255.0f);
   GetDeltaSums(red, green, blue);
   max = red;
   if(green > max) max=green;
@@ -143,7 +144,11 @@ void csRadPoly :: ComputePriority()
   // use maximum instead of average so very colourfully lighted
   // polygons will be shot earlier - they are very brightly lit.
   // and should not colour the ambient light.
-  total_unshot_light = GetDiffuse() * max;
+
+  // priority is the light we expect this polygon to deliver,
+  // the noticeable change it will cause.
+  // the avg_lumel_delta * the diffuse.
+  total_unshot_light = GetDiffuse() * max / size;
   // to prevent loops, polygons with several repeats (at the same
   // priority) are ignored.
   if(num_repeats > 5)
@@ -152,6 +157,64 @@ void csRadPoly :: ComputePriority()
   //  polygon->GetName(), total_unshot_light, area, sum, mean_lightval);
   //CsPrintf(MSG_STDOUT, "w %d, h %d, size %d\n", width, height, size);
 }
+
+
+bool csRadPoly :: DeltaIsZero(int suv, int w, int h)
+{
+  for(int y=0; y<h; y++, suv += width - w)
+    for(int x=0; x<w; x++, suv ++)
+      if(!DeltaIsZero(suv)) return false;
+  return true;
+}
+
+
+void csRadPoly :: GetTextureColour(int suv, int w, int h, csColor &avg, 
+ csRGBLightMap *texturemap)
+{
+  /// Note that the texturemap must be width * height in size
+  avg.red = 0.0f;
+  avg.green = 0.0f;
+  avg.blue = 0.0f;
+  for(int y=0; y<h; y++, suv += width - w)
+    for(int x=0; x<w; x++, suv ++)
+    {
+      avg.red += texturemap->GetRed()[suv];
+      avg.green += texturemap->GetGreen()[suv];
+      avg.blue += texturemap->GetBlue()[suv];
+    }
+  avg *= 1.0f / float( w*h );
+}
+
+
+void csRadPoly :: CapDelta(int suv, int w, int h, float max)
+{
+  for(int y=0; y<h; y++, suv += width - w)
+    for(int x=0; x<w; x++, suv ++)
+    {
+      if(deltamap->GetRed()[suv] > max)
+        deltamap->GetRed()[suv] = max;
+      if(deltamap->GetGreen()[suv] > max)
+        deltamap->GetGreen()[suv] = max;
+      if(deltamap->GetBlue()[suv] > max)
+        deltamap->GetBlue()[suv] = max;
+    }
+}
+
+
+void csRadPoly :: GetSummedDelta(int suv, int w, int h, csColor& sum)
+{
+  sum.red = 0.0f;
+  sum.green = 0.0f;
+  sum.blue = 0.0f;
+  for(int y=0; y<h; y++, suv += width - w)
+    for(int x=0; x<w; x++, suv ++)
+    {
+      sum.red += deltamap->GetRed()[suv];
+      sum.green += deltamap->GetGreen()[suv];
+      sum.blue += deltamap->GetBlue()[suv];
+    }
+}
+
 
 void csRadPoly :: AddDelta(csRadPoly *src, int suv, int ruv, float fraction,
   const csColor& filtercolor)
@@ -551,6 +614,7 @@ float csRadiosity::colour_bleed = 1.0;
 float csRadiosity::stop_priority = 0.1;
 float csRadiosity::stop_improvement = 10000.0;
 int   csRadiosity::stop_iterations = 1000;
+int   csRadiosity::source_patch_size = 2;
 
 csRadiosity :: csRadiosity(csWorld *current_world)
 {
@@ -698,7 +762,7 @@ void csRadiosity :: PrepareShootSource(csRadPoly *src)
   shoot_src = src;
   // shoot_normal points to the shooting direction.
   src_normal = - shoot_src->GetNormal();
-  source_poly_lumel_area = shoot_src->GetOneLumelArea();
+  source_poly_patch_area = shoot_src->GetOneLumelArea();
   delete texturemap;
   texturemap = shoot_src->ComputeTextureLumelSized();
 }
@@ -858,7 +922,7 @@ bool csRadiosity :: PrepareShootDest(csRadPoly *dest, csFrustumView *lview)
   // every lumel. This factor is expanded to be the formfactor * areafraction
 
   // * diffusereflection.
-  factor = shoot_dest->GetDiffuse() / (float)PI;
+  factor = source_poly_patch_area * shoot_dest->GetDiffuse() / (float)PI;
 
   // note that the Normal's must be UnitLength for this to work.
   // to do: factor *= cos(shootangle) * cos(destangle) * H(i,j) * src_area
@@ -904,11 +968,33 @@ void csRadiosity :: ShootRadiosityToPolygon(csRadPoly* dest)
 
   int sx, sy, rx, ry; // shoot x,y, receive x,y
   int suv = 0, ruv = 0; // shoot uv index, receive uv index.
-  for(sy=0; sy<shoot_src->GetHeight(); sy++)
-   for(sx=0; sx<shoot_src->GetWidth(); sx++, suv++)
+  int suv_x_inc = source_patch_size;
+  // increment x by patch size, but at the end of every line, we will be
+  // patchsize - width % patchsize too far to be on the start of the next line.
+  // unless width % patchsize == 0, when we will be right on the good spot
+  // so for a (10x5 lightmap) and a 3x3 source patches, it will be scanned
+  // at uv = 0, 3, 6, 9, and uv=12 at end, 3 - 10%3 too far.
+  // then 20 - 2, 18 have to be skipped more to arrive at uv = 30, the
+  // start of line 3 where we can scan the rest.
+  // But when the patch_size equals 1, no y skip is required, since the
+  // uv will continue nicely.
+  int suv_y_inc = (source_patch_size-1) * shoot_src->GetWidth();
+  if(shoot_src->GetWidth() % source_patch_size != 0)
+    suv_y_inc -=
+      (source_patch_size - shoot_src->GetWidth() % source_patch_size);
+
+  for(sy=0; sy<shoot_src->GetHeight(); sy+=source_patch_size, suv+=suv_y_inc)
+  {
+   srcp_height = source_patch_size;
+   if(srcp_height + sy > shoot_src->GetHeight())
+     srcp_height = shoot_src->GetHeight() - sy;
+   for(sx=0; sx<shoot_src->GetWidth(); sx+=source_patch_size, suv+=suv_x_inc)
    {
+     srcp_width = source_patch_size;
+     if(srcp_width + sx > shoot_src->GetWidth())
+       srcp_width = shoot_src->GetWidth() - sx;
      // if source lumel delta == 0 or lumel not visible, skip.
-     if(shoot_src->DeltaIsZero(suv)) continue;
+     if(shoot_src->DeltaIsZero(suv, srcp_width, srcp_height)) continue;
      // get source lumel info
      PrepareShootSourceLumel(sx, sy, suv);
      ruv = 0;
@@ -918,33 +1004,41 @@ void csRadiosity :: ShootRadiosityToPolygon(csRadPoly* dest)
          ShootPatch(rx, ry, ruv);
        }
    }
+  }
 }
 
 
 void csRadiosity :: PrepareShootSourceLumel(int sx, int sy, int suv)
 {
   src_uv = suv;
-  shoot_src->QuickLumel2World(src_lumel, sx, sy);
+  shoot_src->QuickLumel2World(src_lumel, sx + srcp_width / 2.0,
+    sy + srcp_height / 2.0);
   /// use the size of a lumel in the source poly *
   /// the amount of the lumel visible to compute area of sender.
   /// factor is included, which saves a lot of multiplications.
-  source_patch_area = factor * source_poly_lumel_area;
+  /// does not include the patch size, the source patch width * source
+  /// patch height. Simply because, the totaldelta is obtained by summing the
+  /// lumel deltas, and thus is already srcp_width*srcp_height too large.
+  /// and by not including the factor here, and not averaging delta, but
+  /// taking summed delta unneeded computation is avoided.
+  source_patch_area = factor;
   // color is texture color filtered by trajectory (i.e. half-transparent-
   // portals passed by from source to dest poly)
-  src_lumel_color.red = texturemap->GetRed()[suv] / 255.0f 
-    * trajectory_color.red * colour_bleed;
-  src_lumel_color.green = texturemap->GetGreen()[suv] / 255.0f 
-    * trajectory_color.green * colour_bleed;
-  src_lumel_color.blue = texturemap->GetBlue()[suv] / 255.0f 
-    * trajectory_color.blue * colour_bleed;
+  shoot_src->GetTextureColour(suv, srcp_width, srcp_height, src_lumel_color,
+    texturemap);
+  src_lumel_color.red *= trajectory_color.red * colour_bleed / 255.0f ;
+  src_lumel_color.green *= trajectory_color.green * colour_bleed / 255.0f ;
+  src_lumel_color.blue *= trajectory_color.blue * colour_bleed / 255.0f ;
   // cap source delta to prevent explosions of light
-  float cap = 512.0f;
-  if(shoot_src->GetDeltaMap()->GetRed()[suv] > cap)
-    shoot_src->GetDeltaMap()->GetRed()[suv] = cap;
-  if(shoot_src->GetDeltaMap()->GetGreen()[suv] > cap)
-    shoot_src->GetDeltaMap()->GetGreen()[suv] = cap;
-  if(shoot_src->GetDeltaMap()->GetBlue()[suv] > cap)
-    shoot_src->GetDeltaMap()->GetBlue()[suv] = cap;
+  // now in ComputePriority to prevent the queue to be soiled with
+  // exploded values.
+  //float cap = 255.0f;
+  //shoot_src->CapDelta(suv, srcp_width, srcp_height, cap);
+  // get delta in colour
+  shoot_src->GetSummedDelta(suv, srcp_width, srcp_height, delta_color);
+  delta_color.red *= src_lumel_color.red;
+  delta_color.green *= src_lumel_color.green;
+  delta_color.blue *= src_lumel_color.blue;
 }
 
 
@@ -982,7 +1076,9 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 	src_lumel_color.red, src_lumel_color.green, src_lumel_color.blue);
 #endif
 
-  shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
+  //shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
+  shoot_dest->AddToDelta(ruv, delta_color * totalfactor);
+
   // specular gloss
   // direction of the 'light' on dest is -path
   // normal at this destlumel is dest_normal
@@ -1016,7 +1112,8 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   gloss *= source_patch_area * visibility / distance;
   // add gloss seperately -- too much light this way
-  shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss, trajectory_color );
+  //shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss, trajectory_color );
+  shoot_dest->AddToDelta(ruv, gloss * delta_color);
 }
 
 

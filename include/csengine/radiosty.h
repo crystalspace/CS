@@ -159,6 +159,15 @@ public:
   inline bool DeltaIsZero(int suv)
   { return !(deltamap->GetRed()[suv] || deltamap->GetGreen()[suv] || 
       deltamap->GetBlue()[suv] ); }
+  /// check if a patch has zero delta
+  bool DeltaIsZero(int suv, int w, int h);
+  /// Get avg texture colour for a patch.
+  void GetTextureColour(int suv, int w, int h, csColor &avg,
+    csRGBLightMap *texturemap);
+  /// Cap every delta in patch to value.
+  void CapDelta(int suv, int w, int h, float max);
+  /// Get the summed delta of a patch
+  void GetSummedDelta(int suv, int w, int h, csColor& sum);
   /// get the delta map
   inline csRGBFloatLightMap* GetDeltaMap() { return deltamap; }
 
@@ -193,6 +202,15 @@ public:
    */
   void AddDelta(csRadPoly *src, int suv, int ruv, float fraction, 
     const csColor& filtercolor);
+
+  /**
+   * Add a value *to* the deltamap.
+   */
+  inline void AddToDelta(int ruv, const csColor& value)
+  { deltamap->GetRed()[ruv] += value.red;
+    deltamap->GetGreen()[ruv] += value.green;
+    deltamap->GetBlue()[ruv] += value.blue;
+  }
 
   /** 
    * light has been shot, copy delta to lightmap, clear delta, 
@@ -324,6 +342,11 @@ public:
   static float stop_improvement;
   /// max number of iterations, after that amount of polygons processed stop.
   static int stop_iterations;
+  
+  /**
+   * light will be shot from n by n lumels.
+   */
+  static int source_patch_size;
 
 private:
   /// world being radiosity rendered
@@ -349,8 +372,10 @@ private:
   csVector3 src_lumel, dest_lumel;
   /// normals pointing towards shooting.
   csVector3 src_normal, dest_normal;
-  /// size of source patches in source polygon
-  float source_poly_lumel_area;
+  /// size of source patches in source polygon, i.e. the size of the lumels
+  float source_poly_patch_area;
+  /// size of the source patch, width, height
+  int srcp_width, srcp_height;
   /// area of source patch visible for lighting
   float source_patch_area;
   /// index into source maps
@@ -360,10 +385,12 @@ private:
   csRGBLightMap *texturemap;
   /// the shadows lying on the dest polygon, 1=full visible, 0=all shadow
   csPolyTexture::csCoverageMatrix *shadow_matrix;
-  /// color of source lumel for multiplying delta's with.
-  csColor src_lumel_color;
   /// color from passing portals between source and dest polygon.
   csColor trajectory_color;
+  /// color of source lumel for multiplying delta's with.
+  csColor src_lumel_color;
+  /// delta to add to destination, the summed delta  * src_lumel_colour
+  csColor delta_color;
 
 public:
   /// create all radiosity data.

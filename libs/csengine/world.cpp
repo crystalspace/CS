@@ -1311,6 +1311,8 @@ void csWorld::ReadConfig ()
     "Radiosity.StopImprovement", csRadiosity::stop_improvement);
   csRadiosity::stop_iterations = System->ConfigGetInt ("Lighting",
     "Radiosity.StopIterations", csRadiosity::stop_iterations);
+  csRadiosity::source_patch_size = System->ConfigGetInt ("Lighting",
+    "Radiosity.SourcePatchSize", csRadiosity::source_patch_size);
 }
 
 void csWorld::UnlinkSprite (csSprite* sprite)
