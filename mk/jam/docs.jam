@@ -190,7 +190,7 @@ rule DoxyGen
   for i in $(4)
   {
     LOCATE on $(i:G=copy) = $(SUBDIR) ;
-    Copy $(i:G=copy) : $(dir) ;
+    Copy $(dir) : $(i:G=copy) ;
     Always $(i:G=copy) ;
     Depends $(<) : $(i:G=copy) ;
   }
@@ -243,6 +243,6 @@ actions CopyImages
 
 actions Copy
 {
-  cp $(<) $(>)
+  cp $(>) $(<)
 }
 

@@ -41,7 +41,7 @@ rule SystemLinkApplication
   Clean $(<)clean : $(target) ;
 }
 
-# SystemLinkPlugin target : objects : options : metafile
+# SystemLinkPlugin target : objects : options
 #  do system specific actions needed for linking the plugin and construct
 #  correct clean targets.
 rule SystemLinkPlugin
@@ -50,7 +50,7 @@ rule SystemLinkPlugin
   
   Depends $(target) : $(>) ;
   LinkPlugin $(target) : $(>) ;
-  PluginMetaData $(<) : $(4) ;
+  PluginMetaData $(<) : $($(<)_METADATA) ;
   # setup clean rules
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
