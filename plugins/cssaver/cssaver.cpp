@@ -824,7 +824,7 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
           float intensity = cross->GetIntensityFactor();
           csRef<iDocumentNode>intensityNode = CreateNode(haloNode, "intensity");
           intensityNode->CreateNodeBefore(CS_NODE_TEXT)
-            ->SetValueAsInt(intensity);
+            ->SetValueAsInt((int)intensity);
 
           float crossfact = cross->GetCrossFactor();
           csRef<iDocumentNode>crossfactNode = CreateNode(haloNode, "cross");
