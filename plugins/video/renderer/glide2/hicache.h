@@ -29,6 +29,27 @@
 #include "itexture.h"
 #include "ilghtmap.h"
 #include "cs3d/common/texmem.h"
+#include <glide.h>
+
+typedef struct
+{
+  GrChipID_t tmu_id;	/* TMU number */
+  int memory_size;
+  FxU32 minAddress;	/* Base Address */
+  FxU32 maxAddress;	/* Max Address */
+} TMUInfo;
+
+typedef struct
+{
+  TMUInfo *tmu;		/* TMU Where it is loaded */
+  GrTexInfo info;		/* Info about Texture */
+  FxU32 loadAddress;	/* Memory Position in TMU */
+  FxU32 size;		/* Memory size needed */
+  bool loaded;          /* 1 if loaded in tmu, 0 if not */
+  //int LastCounter;	/* Last used */
+  float width,height;
+}  TextureHandler;
+
 
 ///
 struct csGlideCacheData
@@ -38,7 +59,7 @@ struct csGlideCacheData
   /// QueryInterface: ITextureMM successful if texture, iLightMap * if lightmap.
   iBase *pSource;
   /// internal cache data
-  void *pData;
+  TextureHandler texhnd;
   /// linked list
   csGlideCacheData *next, *prev;
   /// tracks the position in texture memory of the board
@@ -48,7 +69,7 @@ struct csGlideCacheData
 ///
 enum HIGHCOLOR_TYPE
 {
-  HIGHCOLOR_TEXCACHE, HIGHCOLOR_LITCACHE
+  HIGHCOLOR_TEXCACHE, HIGHCOLOR_LITCACHE, HIGHCOLOR_ALPHA
 };
 
 ///
@@ -94,6 +115,11 @@ protected:
   virtual void Load (csGlideCacheData *d) = 0;
   ///
   virtual void Unload (csGlideCacheData *d) = 0;
+  /// Calculate AspectRatio, LOD numbers and final width and size
+  bool CalculateTexData( int width, int height, float wfak, float hfak, GrLOD_t *lod, int nLod, 
+                        csGlideCacheData *d );
 };
 
 #endif
+
+

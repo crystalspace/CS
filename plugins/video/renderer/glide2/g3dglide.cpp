@@ -959,7 +959,6 @@ void csGraphics3DGlide2x::SetupPolygon ( G3DPolygonDP& poly, float& J1, float& J
 void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
 {
   if (poly.num < 3 || poly.normal.D == 0.0) return;
-  
   iPolygonTexture* pTex;
   iLightMap* piLM = NULL;
   csGlideCacheData* tcache = NULL;
@@ -981,10 +980,10 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
     // get the cache data
     if ( pTex )
       tcache = (csGlideCacheData *)poly.txt_handle->GetCacheData ();
-    if ( !tcache ) 
+    if ( !tcache || !tcache->texhnd.loaded )  
       return;
     else
-      thTex = (TextureHandler*)tcache->pData;
+      thTex = &tcache->texhnd;
   } 
 
   // retrieve the lightmap from the cache.
@@ -992,13 +991,12 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
   if (piLM)
   {
     lcache = (csGlideCacheData *)piLM->GetCacheData ();
-    if (lcache!=NULL)
+    if (lcache!=NULL && lcache->texhnd.loaded)
     {
       lm_exists = true;
-      thLm = (TextureHandler*)lcache->pData;
+      thLm = &lcache->texhnd;
     }
   }
-
   // set color and transparency
   UByte a, r, g, b;
   a=r=g=b=255;
@@ -1134,6 +1132,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
     else
       GlideLib_grFogMode ( GR_FOG_DISABLE );
   }
+
   RenderPolygon (m_dpverts,poly.num,lm_exists,thTex,thLm,is_transparent);
 
   if (is_colorkeyed)
@@ -1150,7 +1149,7 @@ void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
     m_pTextureCache->Add (handle);
     tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
 
-    m_thTex = ( tcache ? (TextureHandler *)tcache->pData : NULL );
+    m_thTex = ( tcache ? &tcache->texhnd : NULL );
     if ( m_thTex )
     {
       GlideLib_grTexSource (m_thTex->tmu->tmu_id, m_thTex->loadAddress, 

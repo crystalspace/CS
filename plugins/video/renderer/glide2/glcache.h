@@ -28,25 +28,6 @@
 
 class csGraphics3DGlide;
 
-typedef struct
-{
-  GrChipID_t tmu_id;		/* TMU number */
-  int memory_size;
-	FxU32 minAddress;	/* Base Address */
-	FxU32 maxAddress;	/* Max Address */
-} TMUInfo;
-
-typedef struct
-{
-	TMUInfo *tmu;		/* TMU Where it is loaded */
-	GrTexInfo info;		/* Info about Texture */
-	FxU32 loadAddress;	/* Memory Position in TMU */
-	FxU32 size;			/* Memory size needed */
-//	int isActuallyLoaded; /* 1 if loaded in tmu, 0 if not */
-//	int LastCounter;	/* Last used */
-	float width,height;
-}  TextureHandler;
-
 ///
 class GlideTextureCache: public HighColorCache
 {

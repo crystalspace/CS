@@ -208,7 +208,6 @@ void HighColorCache::Add(iPolygonTexture *polytex)
     
     piLM->SetCacheData(cached_texture);
     
-    cached_texture->pData = NULL;
     Load(cached_texture);       // load it.
   }
 }
@@ -234,4 +233,137 @@ void HighColorCache::Clear()
   head = tail = NULL;
   total_size = 0;
   num = 0;
+}
+
+bool HighColorCache::CalculateTexData ( int width, int height, float wfak, float hfak, 
+                                        GrLOD_t *lod, int nLod, csGlideCacheData *d)
+{
+  bool succ=true;
+  int texwidth, texheight;
+  int lodoff;
+  GrAspectRatio_t aspectRatio;
+  GrLOD_t lodlevels[]= { GR_LOD_256, 
+                         GR_LOD_128, 
+			 GR_LOD_64, 
+			 GR_LOD_32, 
+			 GR_LOD_16, 
+			 GR_LOD_8, 
+			 GR_LOD_4,
+			 GR_LOD_2,
+			 GR_LOD_1,
+			 -1,-1,-1,-1 };
+  
+  if(width>=height)
+  {
+    switch(width/height)
+    {
+    case 1:
+      aspectRatio = GR_ASPECT_1x1;
+      texwidth    = int(256. * wfak);
+      texheight   = int(256. * hfak);
+      break;
+    case 2:
+      aspectRatio = GR_ASPECT_2x1;
+      texwidth    = int(256. * wfak);
+      texheight   = int(128. * hfak);
+      break;
+    case 4:
+      aspectRatio = GR_ASPECT_4x1;
+      texwidth    = int(256. * wfak);
+      texheight   = int(64. * hfak);
+      break;
+    case 8:
+      aspectRatio = GR_ASPECT_8x1;
+      texwidth    = int(256. * wfak);
+      texheight   = int(32. * hfak);
+      break;
+    default:
+      succ=false;
+      break;
+    }
+  }
+  else if(height>width)
+  {
+    switch(height/width)
+    {
+    case 2:
+      aspectRatio = GR_ASPECT_1x2;
+      texwidth    = int(128. * wfak);
+      texheight   = int(256. * hfak);
+      break;
+    case 4:
+      aspectRatio = GR_ASPECT_1x4;
+      texwidth    = int(64. * wfak);
+      texheight   = int(256. * hfak);
+      break;
+    case 8:
+      aspectRatio = GR_ASPECT_1x8;
+      texwidth    = int(32. * wfak);
+      texheight   = int(256. * hfak);
+      break;
+    default:
+      succ=false;
+      break;
+    }
+  }
+  
+  if (succ)
+  {
+    d->texhnd.info.aspectRatio = aspectRatio;
+    d->texhnd.width            = texwidth;
+    d->texhnd.height           = texheight;
+  }
+  else
+  {
+    //Printf(MSG_CONSOLE,"GlideError : Texture Ratio: (%dx%d)\n",width,height);
+    return false;
+  }
+
+  switch(MAX(width,height))
+  {
+  case 256:
+    lodoff=0;
+    break;
+  case 128:
+    lodoff=1;
+    break;
+  case 64:
+    lodoff=2;
+    break;
+  case 32:
+    lodoff=3;
+    break;
+  case 16:
+    lodoff=4;
+    break;
+  case 8:
+    lodoff=5;
+    break;
+  case 4:
+    lodoff=6;
+    break;
+  case 2:
+    lodoff=7;
+    break;
+  case 1:
+    lodoff=8;
+    break;
+  default:
+    succ=false;
+    break;
+  }
+
+  if (succ)
+  {
+    memcpy( lod, (lodlevels+lodoff), nLod * sizeof(GrLOD_t));
+    d->texhnd.info.largeLod = lod[0];
+    d->texhnd.info.smallLod = lod[ MIN( nLod-1, 8 - lodoff ) ];
+  }
+  else
+  {
+    //CsPrintf(MSG_CONSOLE,"GlideError : Can't compute lod-level because tex-size is not pow of 2 (actual size is: (%dx%d))\n",width,height);
+    return false;
+  }
+
+  return succ;
 }
