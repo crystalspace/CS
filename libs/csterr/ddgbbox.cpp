@@ -187,8 +187,10 @@ ddgClipFlags ddgBBox::visibleSpace( ddgBBox b, float tanHalfFOV )
 	ddgClipFlags vis;
 	vis.visibility = 0;
 
+#ifdef DDG
 	// Flip Z axis. (Could be eliminated).
 	b.setz(-1*b.maxz(),-1*b.minz());
+#endif
 	if (tanHalfFOV != 1.0)		// Not 90 degree case
 		b.scale(ddgVector3(1.0/tanHalfFOV,1.0/tanHalfFOV,1));
 	// Test against near, and far plane and test viewing frustrum.

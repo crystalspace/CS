@@ -422,7 +422,11 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 			if (!tri(tva)->_state.flags.coord)
 			{
 				vertex(tva,wpqr);
+#ifdef DDG
 				_mesh->transform( wpqr, tri(tva)->_cpqr );
+#else
+				_mesh->_transform( wpqr, tri(tva)->_cpqr );
+#endif
 				tri(tva)->_state.flags.coord = true;
 			}
 			th.set(unit());
@@ -438,7 +442,11 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 			if (!tri(tv0)->_state.flags.coord)
 			{
 				vertex(tv0,wpqr);
+#ifdef DDG
 				_mesh->transform( wpqr, tri(tv0)->_cpqr );
+#else
+				_mesh->_transform( wpqr, tri(tva)->_cpqr );
+#endif
 				tri(tv0)->_state.flags.coord = true;
 			}
 			th.set(unit());
@@ -453,7 +461,11 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 			if (!tri(tv1)->_state.flags.coord)
 			{
 				vertex(tv1,wpqr);
+#ifdef DDG
 				_mesh->transform( wpqr, tri(tv1)->_cpqr );
+#else
+				_mesh->_transform( wpqr, tri(tv1)->_cpqr );
+#endif
 				tri(tv1)->_state.flags.coord = true;
 			}
 			th.set(unit());
@@ -467,8 +479,11 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 
 			// Pmin and Pmax now define a bounding box that contains the wedgie.
 			// Determine if this bounding box is visible in screen space.
-			// TODO: Debug this clipping.
-		   	if (pmax[2]< _mesh->farclip() || pmin[2] > _mesh->nearclip())
+#ifdef DDG
+		   	if (pmin[2]< _mesh->farclip() || pmax[2] > _mesh->nearclip())
+#else
+		   	if (pmin[2]> _mesh->farclip() || pmax[2] < _mesh->nearclip())
+#endif
 				tri(tvc)->_vis.visibility = ddgALLOUT;
 			else
 			{
@@ -552,7 +567,11 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	if (!tri(tva)->_state.flags.coord)
 	{
         vertex(tva,wpqr);
+#ifdef DDG
 		_mesh->transform( wpqr, tri(tva)->_cpqr );
+#else
+		_mesh->_transform( wpqr, tri(tva)->_cpqr );
+#endif
 		tri(tva)->_state.flags.coord = true;
 	}
 
@@ -560,13 +579,21 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	if (!tri(tv0)->_state.flags.coord)
 	{
         vertex(tv0,wpqr);
+#ifdef DDG
 		_mesh->transform( wpqr, tri(tv0)->_cpqr );
+#else
+		_mesh->_transform( wpqr, tri(tv0)->_cpqr );
+#endif;
 		tri(tv0)->_state.flags.coord = true;
 	}
 	if (!tri(tv1)->_state.flags.coord)
 	{
         vertex(tv1,wpqr);
+#ifdef DDG
 		_mesh->transform( wpqr, tri(tv1)->_cpqr );
+#else
+		_mesh->_transform( wpqr, tri(tv1)->_cpqr );
+#endif
 		tri(tv1)->_state.flags.coord = true;
 	}
 
