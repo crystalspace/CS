@@ -48,6 +48,10 @@ chronological order.
 	  where some compilers considered return expression ambiguous.  Also
 	  fixed bug in ~csXMLShaderCompiler where it failed to invoke
 	  SCF_DESTRUCT_IBASE().
+	- Norman fixed the frequency conversion routine in the software sound 
+	  renderer where a float factor was determined by dividing two integers.
+	  When downsampling was performed the downsampled data was zero bytes 
+	  long (muted).
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.
