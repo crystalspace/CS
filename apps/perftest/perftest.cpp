@@ -197,9 +197,6 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  // Setup the texture manager
-  iTextureManager* txtmgr = myG3D->GetTextureManager ();
-
   // Initialize textures.
   materials[0] = LoadMaterial ("/lib/std/stone4.gif");
   materials[1] = LoadMaterial ("/lib/std/mystone2.gif");

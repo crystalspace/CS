@@ -244,9 +244,10 @@ void PicViewApp::LoadNextImage (int idx, int step)
   if (cur_idx < 0) cur_idx = files->Length ()-1;
   if ((size_t)cur_idx >= files->Length ()) cur_idx = 0;
   i = cur_idx;
-  printf ("loading file '%s' (%d/%d)\n", files->Get (i), i+1, files->Length ());
+  printf ("loading file '%s' (%d/%lu)\n", files->Get (i), i+1,
+	  (unsigned long)files->Length ());
   char sbuf[255];
-  sprintf (sbuf, "%d/%d", i+1, files->Length ());
+  sprintf (sbuf, "%d/%lu", i+1, (unsigned long)files->Length ());
   label1->SetText (sbuf);
   sprintf (sbuf, "%s", files->Get (i));
   label2->SetText (sbuf+6);
