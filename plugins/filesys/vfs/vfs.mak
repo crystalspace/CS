@@ -1,14 +1,14 @@
-#-----------------------------
+#------------------------------------------------------------------------------
 # Virtual File System plug-in
-#-----------------------------
+#------------------------------------------------------------------------------
 
-# Driver description
+# Plug-in description
 DESCRIPTION.vfs = Virtual File System plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
-# Driver-specific help commands
+# Plug-in-specific help commands
 PLUGINHELP += \
   $(NEWLINE)echo $"  make vfs          Make the $(DESCRIPTION.vfs)$"
 
@@ -35,7 +35,7 @@ vpath %.cpp plugins/filesys/vfs
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   VFS=$(OUTDLL)vfs$(DLL)
-  DEP.VFS=$(CSSYS.LIB) $(CSUTIL.LIB)
+  LIB.VFS=$(CSSYS.LIB) $(CSUTIL.LIB)
   TO_INSTALL.DYNAMIC_LIBS+=$(VFS)
 else
   VFS=$(OUT)$(LIB_PREFIX)vfs$(LIB)
@@ -46,6 +46,8 @@ endif
 DESCRIPTION.$(VFS) = $(DESCRIPTION.vfs)
 SRC.VFS = $(wildcard plugins/filesys/vfs/*.cpp)
 OBJ.VFS = $(addprefix $(OUT),$(notdir $(SRC.VFS:.cpp=$O)))
+
+TO_INSTALL.ROOT += vfs.cfg
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -59,7 +61,7 @@ clean: vfsclean
 
 vfs: $(OUTDIRS) $(VFS)
 
-$(VFS): $(OBJ.VFS) $(DEP.VFS)
+$(VFS): $(OBJ.VFS) $(LIB.VFS)
 	$(DO.PLUGIN)
 
 vfsclean:

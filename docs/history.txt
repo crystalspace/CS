@@ -2,6 +2,11 @@ The history order has been reversed so that new features are at the top.
 
 20-Oct-2000
 	- Set minimum canvas size for X to 32x32 instead of 320x200.
+	- Eric Sunshine made the following changes to the installation target:
+	    - csengine.mak is no longer responsible for vfs.cfg and scf.cfg.
+	    - Installation of vfs.cfg is now controlled by vfs.mak.
+	    - Installation of scf.cfg is now controlled by csutil.mak (since
+	      SCF is currently part of csutil).
 18-Oct-2000
 	- Thomas Hieber did some fixes to cctest for MSVC.
 	- Andrew Zabolotny did the following changes:

@@ -1,15 +1,16 @@
 # Library description
 DESCRIPTION.csutil = Crystal Space utility library
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
-LIBHELP += $(NEWLINE)echo $"  make csutil       Make the $(DESCRIPTION.csutil)$"
+LIBHELP += \
+  $(NEWLINE)echo $"  make csutil       Make the $(DESCRIPTION.csutil)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csutil
@@ -22,7 +23,7 @@ csutilclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csutil
@@ -30,11 +31,13 @@ vpath %.cpp libs/csutil
 CSUTIL.LIB = $(OUT)$(LIB_PREFIX)csutil$(LIB_SUFFIX)
 SRC.CSUTIL = $(wildcard libs/csutil/*.cpp)
 OBJ.CSUTIL = $(addprefix $(OUT),$(notdir $(SRC.CSUTIL:.cpp=$O)))
+
+TO_INSTALL.ROOT += scf.cfg
 TO_INSTALL.STATIC_LIBS += $(CSUTIL.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: csutil csutilclean

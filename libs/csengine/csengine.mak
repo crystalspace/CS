@@ -1,15 +1,16 @@
 # Library description
 DESCRIPTION.csengine = Crystal Space 3D engine
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
-LIBHELP += $(NEWLINE)echo $"  make csengine     Make the $(DESCRIPTION.csengine)$"
+LIBHELP += \
+  $(NEWLINE)echo $"  make csengine     Make the $(DESCRIPTION.csengine)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csengine
@@ -22,7 +23,7 @@ csengineclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csengine libs/csengine/2d libs/csengine/basic \
@@ -34,15 +35,12 @@ SRC.CSENGINE = $(wildcard libs/csengine/*.cpp libs/csengine/*/*.cpp)
 OBJ.CSENGINE = $(addprefix $(OUT),$(notdir $(SRC.CSENGINE:.cpp=$O)))
 CFLAGS.CSENGINE = -Ilibs/csterr
 
-TO_INSTALL.ROOT += vfs.cfg scf.cfg
-TO_INSTALL.CONFIG += 
 TO_INSTALL.DATA += data/standard.zip 
-TO_INSTALL.DYNAMIC_LIBS +=
 TO_INSTALL.STATIC_LIBS += $(CSENGINE.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: csengine csengineclean
