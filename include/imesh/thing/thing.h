@@ -205,7 +205,7 @@ struct iThingState : public iBase
 
   /**
    * Control how this thing will be moved.
-   * There are currently three options.
+   * There are currently two options.
    * <ul>
    *   <li>CS_THING_MOVE_NEVER: this option is set for a thing that cannot
    *       move at all. In this case the movable will be ignored and only
@@ -225,6 +225,10 @@ struct iThingState : public iBase
    *       Use this option for geometry that is not too big (in number of
    *       vertices) and only moves occasionally like doors of elevators.
    * </ul>
+   * <p>
+   * Note: it is no longer needed to manually set this option. By default
+   * things will use CS_THING_MOVE_NEVER and they will automatically switch
+   * to the slightly less efficient CS_THING_MOVE_OCCASIONAL if needed.
    */
   virtual void SetMovingOption (int opt) = 0;
 

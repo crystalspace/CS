@@ -7,6 +7,10 @@ The history order is reversed so that new features are at the top.
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older
 	  versions of Swig.
+	- Jorrit made the <moveable/> option no longer required (it is
+	  now deprecated). The thing mesh object plugin will not automatically
+	  detect if it is needed to switch to moveable or not. So setting
+	  this is no longer required.
 15-Jun-2003
         - Boyan added property "Image" that can be set in AWS component "Image 
 	  View".

@@ -204,6 +204,9 @@ if (!info.thing_fact_state) \
         CHECK_TOPLEVEL("moveable");
 	CHECK_OBJECTONLY("moveable");
         info.thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
+	synldr->Report ("crystalspace.thingloader.parse",
+		CS_REPORTER_SEVERITY_WARNING, child,
+		"<moveable/> is deprecated and no longer needed!");
         break;
       case XMLTOKEN_FACTORY:
         CHECK_TOPLEVEL("factory");

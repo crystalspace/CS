@@ -997,6 +997,18 @@ void csThing::WorUpdate ()
   switch (cfg_moving)
   {
     case CS_THING_MOVE_NEVER:
+      if (cached_movable && cached_movable->GetUpdateNumber () != movablenr)
+      {
+	if (!cached_movable->IsFullTransformIdentity ())
+	{
+	  // If the movable is no longer the identity transform we
+	  // have to change modes to moveable.
+	  SetMovingOption (CS_THING_MOVE_OCCASIONAL);
+	  WorUpdate ();
+	  break;
+	}
+        movablenr = cached_movable->GetUpdateNumber ();
+      }
       return ;
 
     case CS_THING_MOVE_OCCASIONAL:
