@@ -41,7 +41,7 @@ static void AppendStrVecString (iStringArray*& strings, const char* str)
   {
     strings = new scfStringArray ();
   }
-  strings->Push (csStrNew (str));
+  strings->Push (str);
 }
 
 csRef<iString> csGetPluginMetadata (const char* fullPath, 
