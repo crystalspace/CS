@@ -29,6 +29,7 @@ struct iMovable;
 struct iShadowReceiver;
 struct iPolygon3D;
 struct iMeshWrapper;
+struct iPolygonMesh;
 class csVector3;
 class csBox3;
 
@@ -90,7 +91,7 @@ struct iVisibilityCuller : public iBase
   virtual void UnregisterShadowReceiver (iShadowReceiver* receiver) = 0;
 };
 
-SCF_VERSION (iVisibilityObject, 0, 0, 3);
+SCF_VERSION (iVisibilityObject, 0, 0, 5);
 
 /**
  * An object that wants to know if it is visible or not
@@ -119,6 +120,16 @@ struct iVisibilityObject : public iBase
    * to test if the object is visible or not.
    */
   virtual bool IsVisible () const = 0;
+
+  /**
+   * Get an optional polygon mesh that can be used as a write object
+   * for a visibility system. If this is null the object will not
+   * be used as a write object (but only as a read object for visibility
+   * testing). The write object should be completely contained in the
+   * original object. If the shape of the object changes (GetShapeNumber())
+   * then the visibility system has to call this function again.
+   */
+  virtual iPolygonMesh* GetWriteObject () = 0;
 };
 
 #endif // __IENGINE_VISCULL_H__

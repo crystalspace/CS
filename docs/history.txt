@@ -3,6 +3,9 @@ The history order is reversed so that new features are at the top.
 18-May-2002
 	- Fixed a bug in csCoverageBuffer::TestRectangle() with very
 	  large boxes that exceed integer accuracy.
+	- Extended iVisibilityObject with a GetWriteObject() function
+	  which will be used to write the occlusion buffer. Currently
+	  not implemented.
 17-May-2002
 	- Added csBox3::CalculatePointSegment() which calculates the
 	  segment (between 0 and 27) of a point relative to the box.
