@@ -162,6 +162,8 @@ void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** npB,
 void csOctree::Build (csOctreeNode* node, const csVector3& bmin, const csVector3& bmax,
 	csPolygonInt** polygons, int num)
 {
+  node->SetBox (bmin, bmax);
+
   if (num <= bsp_num)
   {
     csBspTree* bsp;
@@ -171,8 +173,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin, const csVector3
     return;
   }
 
-  csVector3 center = (bmin + bmax) / 2;
-  node->SetCenter (center);
+  const csVector3& center = node->GetCenter ();
 
   int i, k;
 
@@ -276,25 +277,28 @@ void csOctree::BuildDynamic (csOctreeNode* node, const csVector3& bmin, const cs
 #endif
 }
 
-void* csOctree::Back2Front (const csVector3& pos, csTreeVisitFunc* func, void* data)
+void* csOctree::Back2Front (const csVector3& pos, csTreeVisitFunc* func, void* data,
+	csTreeCullFunc* cullfunc, void* culldata)
 {
-  return Back2Front ((csOctreeNode*)root, pos, func, data);
+  return Back2Front ((csOctreeNode*)root, pos, func, data, cullfunc, culldata);
 }
 
-void* csOctree::Front2Back (const csVector3& pos, csTreeVisitFunc* func, void* data)
+void* csOctree::Front2Back (const csVector3& pos, csTreeVisitFunc* func, void* data,
+	csTreeCullFunc* cullfunc, void* culldata)
 {
-  return Front2Back ((csOctreeNode*)root, pos, func, data);
+  return Front2Back ((csOctreeNode*)root, pos, func, data, cullfunc, culldata);
 }
 
 void* csOctree::Back2Front (csOctreeNode* node, const csVector3& pos,
-	csTreeVisitFunc* func, void* data)
+	csTreeVisitFunc* func, void* data, csTreeCullFunc* cullfunc,
+	void* culldata)
 {
   if (!node) return NULL;
 
   if (node->GetMiniBsp ())
-    return node->GetMiniBsp ()->Back2Front (pos, func, data);
+    return node->GetMiniBsp ()->Back2Front (pos, func, data, cullfunc, culldata);
 
-  void* rc;
+  void* rc = NULL;
   const csVector3& center = node->GetCenter ();
   int cur_idx;
   if (pos.x <= center.x) cur_idx = 0;
@@ -302,26 +306,35 @@ void* csOctree::Back2Front (csOctreeNode* node, const csVector3& pos,
   if (pos.y > center.y) cur_idx |= 2;
   if (pos.z > center.z) cur_idx |= 1;
 
-  rc = Back2Front ((csOctreeNode*)node->children[7-cur_idx], pos, func, data); if (rc) return rc;
-  rc = Back2Front ((csOctreeNode*)node->children[(7-cur_idx) ^ 1], pos, func, data); if (rc) return rc;
-  rc = Back2Front ((csOctreeNode*)node->children[(7-cur_idx) ^ 2], pos, func, data); if (rc) return rc;
-  rc = Back2Front ((csOctreeNode*)node->children[(7-cur_idx) ^ 4], pos, func, data); if (rc) return rc;
-  rc = Back2Front ((csOctreeNode*)node->children[cur_idx ^ 1], pos, func, data); if (rc) return rc;
-  rc = Back2Front ((csOctreeNode*)node->children[cur_idx ^ 2], pos, func, data); if (rc) return rc;
-  rc = Back2Front ((csOctreeNode*)node->children[cur_idx ^ 4], pos, func, data); if (rc) return rc;
-  rc = Back2Front ((csOctreeNode*)node->children[cur_idx], pos, func, data);
+# undef __TRAVERSE__
+# define __TRAVERSE__(x) \
+  if (!cullfunc || cullfunc (this, node->children[x], pos, culldata)) \
+  { \
+    rc = Back2Front ((csOctreeNode*)node->children[x], pos, func, data, cullfunc, culldata); \
+    if (rc) return rc; \
+  }
+
+  __TRAVERSE__ (7-cur_idx);
+  __TRAVERSE__ ((7-cur_idx) ^ 1);
+  __TRAVERSE__ ((7-cur_idx) ^ 2);
+  __TRAVERSE__ ((7-cur_idx) ^ 4);
+  __TRAVERSE__ (cur_idx ^ 1);
+  __TRAVERSE__ (cur_idx ^ 2);
+  __TRAVERSE__ (cur_idx ^ 4);
+  __TRAVERSE__ (cur_idx);
   return rc;
 }
 
 void* csOctree::Front2Back (csOctreeNode* node, const csVector3& pos,
-	csTreeVisitFunc* func, void* data)
+	csTreeVisitFunc* func, void* data, csTreeCullFunc* cullfunc,
+	void* culldata)
 {
   if (!node) return NULL;
 
   if (node->GetMiniBsp ())
-    return node->GetMiniBsp ()->Front2Back (pos, func, data);
+    return node->GetMiniBsp ()->Front2Back (pos, func, data, cullfunc, culldata);
 
-  void* rc;
+  void* rc = NULL;
   const csVector3& center = node->GetCenter ();
   int cur_idx;
   if (pos.x <= center.x) cur_idx = 0;
@@ -329,15 +342,110 @@ void* csOctree::Front2Back (csOctreeNode* node, const csVector3& pos,
   if (pos.y > center.y) cur_idx |= 2;
   if (pos.z > center.z) cur_idx |= 1;
 
-  rc = Front2Back ((csOctreeNode*)node->children[cur_idx], pos, func, data); if (rc) return rc;
-  rc = Front2Back ((csOctreeNode*)node->children[cur_idx ^ 1], pos, func, data); if (rc) return rc;
-  rc = Front2Back ((csOctreeNode*)node->children[cur_idx ^ 2], pos, func, data); if (rc) return rc;
-  rc = Front2Back ((csOctreeNode*)node->children[cur_idx ^ 4], pos, func, data); if (rc) return rc;
-  rc = Front2Back ((csOctreeNode*)node->children[(7-cur_idx) ^ 1], pos, func, data); if (rc) return rc;
-  rc = Front2Back ((csOctreeNode*)node->children[(7-cur_idx) ^ 2], pos, func, data); if (rc) return rc;
-  rc = Front2Back ((csOctreeNode*)node->children[(7-cur_idx) ^ 4], pos, func, data); if (rc) return rc;
-  rc = Front2Back ((csOctreeNode*)node->children[7-cur_idx], pos, func, data);
+# undef __TRAVERSE__
+# define __TRAVERSE__(x) \
+  if (!cullfunc || cullfunc (this, node->children[x], pos, culldata)) \
+  { \
+    rc = Front2Back ((csOctreeNode*)node->children[x], pos, func, data, cullfunc, culldata); \
+    if (rc) return rc; \
+  }
+
+  __TRAVERSE__ (cur_idx);
+  __TRAVERSE__ (cur_idx ^ 1);
+  __TRAVERSE__ (cur_idx ^ 2);
+  __TRAVERSE__ (cur_idx ^ 4);
+  __TRAVERSE__ ((7-cur_idx) ^ 1);
+  __TRAVERSE__ ((7-cur_idx) ^ 2);
+  __TRAVERSE__ ((7-cur_idx) ^ 4);
+  __TRAVERSE__ (7-cur_idx);
   return rc;
+}
+
+void csOctree::Statistics (csOctreeNode* node, int depth, int* num_nodes,
+	int* num_leaves, int* max_depth,
+  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node)
+{
+  depth++;
+  if (depth > *max_depth) *max_depth = depth;
+  if (node->GetMiniBsp ())
+  {
+    (*num_leaves)++;
+    int bsp_num_nodes;
+    int bsp_num_leaves;
+    int bsp_max_depth;
+    int bsp_tot_polygons;
+    int bsp_max_poly_in_node;
+    int bsp_min_poly_in_node;
+    node->GetMiniBsp ()->Statistics (&bsp_num_nodes, &bsp_num_leaves, &bsp_max_depth,
+    	&bsp_tot_polygons, &bsp_max_poly_in_node, &bsp_min_poly_in_node);
+    (*tot_polygons) += bsp_tot_polygons;
+    if (bsp_max_poly_in_node > *max_poly_in_node) *max_poly_in_node = bsp_max_poly_in_node;
+    if (bsp_min_poly_in_node < *min_poly_in_node) *min_poly_in_node = bsp_min_poly_in_node;
+  }
+  else
+  {
+    (*num_nodes)++;
+    int i;
+    for (i = 0 ; i < 8 ; i++)
+      if (node->children[i])
+      {
+        Statistics ((csOctreeNode*)(node->children[i]), depth, num_nodes,
+		num_leaves, max_depth, tot_polygons, max_poly_in_node, min_poly_in_node);
+      }
+  }
+  depth--;
+}
+
+void csOctree::GetConvexOutline (csOctreeNode* node, const csVector3& pos,
+	csVector3* array, int& num_array)
+{
+  const csVector3& bmin = node->GetMinCorner ();
+  const csVector3& bmax = node->GetMaxCorner ();
+  int idx;
+  // First select x part of coordinate.
+  if (pos.x < bmin.x)		idx = 0*9;
+  else if (pos.x > bmax.x)	idx = 2*9;
+  else				idx = 1*9;
+  // Then y part.
+  if (pos.y < bmin.y)		idx += 0*3;
+  else if (pos.y > bmax.y)	idx += 2*3;
+  else				idx += 1*3;
+  // Then z part.
+  if (pos.z < bmin.z)		idx += 0;
+  else if (pos.z > bmax.z)	idx += 2;
+  else				idx += 1;
+
+  const Outline& ol = outlines[idx];
+  num_array = ol.num;
+  int i;
+  for (i = 0 ; i < num_array ; i++)
+  {
+    switch (ol.vertices[i])
+    {
+      case 0: array[i].x = bmin.x; array[i].y = bmin.y; array[i].z = bmin.z; break;
+      case 1: array[i].x = bmin.x; array[i].y = bmin.y; array[i].z = bmax.z; break;
+      case 2: array[i].x = bmin.x; array[i].y = bmax.y; array[i].z = bmin.z; break;
+      case 3: array[i].x = bmin.x; array[i].y = bmax.y; array[i].z = bmax.z; break;
+      case 4: array[i].x = bmax.x; array[i].y = bmin.y; array[i].z = bmin.z; break;
+      case 5: array[i].x = bmax.x; array[i].y = bmin.y; array[i].z = bmax.z; break;
+      case 6: array[i].x = bmax.x; array[i].y = bmax.y; array[i].z = bmin.z; break;
+      case 7: array[i].x = bmax.x; array[i].y = bmax.y; array[i].z = bmax.z; break;
+    }
+  }
+}
+
+void csOctree::Statistics (int* num_nodes, int* num_leaves, int* max_depth,
+  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node)
+{
+  *num_nodes = 0;
+  *num_leaves = 0;
+  *max_depth = 0;
+  *tot_polygons = 0;
+  *max_poly_in_node = 0;
+  *min_poly_in_node = 10000000;
+  if (root) Statistics ((csOctreeNode*)root, 0, num_nodes, num_leaves,
+  	max_depth, tot_polygons,
+  	max_poly_in_node, min_poly_in_node);
 }
 
 //---------------------------------------------------------------------------

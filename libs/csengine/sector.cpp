@@ -142,7 +142,7 @@ void csSector::UseStaticTree (int mode, bool octree)
   {
     csVector3 min_bbox, max_bbox;
     static_thing->GetBoundingBox (min_bbox, max_bbox);
-    CHK (static_tree = new csOctree (static_thing, min_bbox, max_bbox, 40, mode));
+    CHK (static_tree = new csOctree (static_thing, min_bbox, max_bbox, 100, mode));
   }
   else
   {
@@ -339,6 +339,47 @@ int compare_z_thing (const void* p1, const void* p2)
   return 0;
 }
 
+bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
+	const csVector3& pos, void* data)
+{
+  if (!node) return false;
+  if (node->Type () != NODE_OCTREE) return true;
+  csOctree* otree = (csOctree*)tree;
+  csOctreeNode* onode = (csOctreeNode*)node;
+  csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
+  csRenderView* rview = (csRenderView*)data;
+  csVector3 array[6];
+  int num_array;
+  otree->GetConvexOutline (onode, pos, array, num_array);
+  if (num_array)
+  {
+    csVector2 persp[6];
+    csVector3 cam;
+    float iz;
+    int i;
+    // If all vertices are behind z plane then the node is
+    // not visible. If some vertices are behind z plane then we
+    // assume the node is visible in order to avoid having to
+    // clip the polygon.
+    int num_z_0;
+    for (i = 0 ; i < num_array ; i++)
+    {
+      cam = rview->Other2This (array[i]);
+      if (cam.z < SMALL_EPSILON) num_z_0++;
+      else
+      {
+        iz = csCamera::aspect/cam.z;
+        persp[i].x = cam.x * iz + csWorld::shift_x;
+        persp[i].y = cam.y * iz + csWorld::shift_y;
+      }
+    }
+    if (num_z_0 == num_array) return false;	// Node behind camera.
+    if (num_z_0 > 0) return true;		// Node visible.
+    if (!c_buffer->TestPolygon (persp, num_array)) return false;
+  }
+  return true;
+}
+
 void csSector::Draw (csRenderView& rview)
 {
   draw_busy++;
@@ -411,7 +452,7 @@ void csSector::Draw (csRenderView& rview)
       	static_thing->GetNumPolygons ()));
       static_thing->UpdateTransformation (rview);
       static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
-      	(void*)&rview);
+      	(void*)&rview, CullOctreeNode, (void*)&rview);
 
       if (sprites.Length () > 0)
       {

@@ -198,6 +198,11 @@ public:
   csThing* GetStaticThing () { return static_thing; }
 
   /**
+   * Get the static polygon tree.
+   */
+  csPolygonTree* GetStaticTree () { return static_tree; }
+
+  /**
    * Call this function to generate a polygon tree tree for all csThings
    * in this sector. This might make drawing more efficient because
    * those things can then be drawn using Z-fill instead of Z-buffer.

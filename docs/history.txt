@@ -13,6 +13,23 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+2-Sep-1999
+	- Octree visibility culling works. Preliminary results on a 50000
+	  polygon level are encouraging.
+1-Sep-1999
+	- Made first provisions for culling of octree nodes. Added a function
+	  to get the outline of an octree node and also added a cull function
+	  which is a user function that is called during tree traversal (also
+	  for bsp trees).
+31-Aug-1999
+	- Further work on octree. Added specific versions for ClassifyX()
+	  to csPolygon3D.
+	- Dumping statistics for csPolygonTree subclasses (csOctree and csBspTree).
+	- Further experimentation with -huge option. I got very good results but
+	  did an interesting observation. Movement is VEEEERRRRYYY slow. The reason
+	  is that movement of the camera does not use the CD system to check if we
+	  have to go to another sector (through a portal). This means that it has
+	  to check all polygons in the sector!
 30-Aug-1999
 	- Changed csPolygonInt::Classify() to use a plane instead
 	  of another csPolygonInt. Also removed csPolygonInt::SamePlane()
@@ -37,10 +54,13 @@ Short-term cleanups that need to be done:
 	  aspects of this document.
 29-Aug-1999
 	- Continued coding on octree.
+	- Michael Dale Long fixed a bug in MazeD for GCC 2.95.
 28-Aug-1999
 	- Started coding on octree. I created a general csPolygonTree
 	  parent which will be the parent of csBspTree and csOctree. In
 	  future it will also be the parent of csKdTree.
+27-Aug-1999
+	- Thomas Hieber added proper version info to the VC project files.
 26-Aug-1999
 	- Eric Sunshine renamed docs/changes.old to changes.txt since Jorrit
 	  recently brought it up to date.  Previously it was extremely out of

@@ -355,19 +355,20 @@ void csBspTree::BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num)
 }
 
 void* csBspTree::Back2Front (const csVector3& pos, csTreeVisitFunc* func,
-	void* data)
+	void* data, csTreeCullFunc* cullfunc, void* culldata)
 {
-  return Back2Front ((csBspNode*)root, pos, func, data);
+  return Back2Front ((csBspNode*)root, pos, func, data, cullfunc, culldata);
 }
 
 void* csBspTree::Front2Back (const csVector3& pos, csTreeVisitFunc* func,
-	void* data)
+	void* data, csTreeCullFunc* cullfunc, void* culldata)
 {
-  return Front2Back ((csBspNode*)root, pos, func, data);
+  return Front2Back ((csBspNode*)root, pos, func, data, cullfunc, culldata);
 }
 
 void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
-	csTreeVisitFunc* func, void* data)
+	csTreeVisitFunc* func, void* data, csTreeCullFunc* cullfunc,
+	void* culldata)
 {
   if (!node) return NULL;
   void* rc;
@@ -377,28 +378,29 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
   if (csMath3::Visible (pos, *(node->polygons[0]->GetPolyPlane ())))
   {
     // Front.
-    rc = Back2Front (node->back, pos, func, data);
+    rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
     rc = func (pset, node->polygons, node->num, data);
     if (rc) return rc;
-    rc = Back2Front (node->front, pos, func, data);
+    rc = Back2Front (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
   }
   else
   {
     // Back.
-    rc = Back2Front (node->front, pos, func, data);
+    rc = Back2Front (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
     rc = func (pset, node->polygons, node->num, data);
     if (rc) return rc;
-    rc = Back2Front (node->back, pos, func, data);
+    rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
   }
   return NULL;
 }
 
 void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
-	csTreeVisitFunc* func, void* data)
+	csTreeVisitFunc* func, void* data, csTreeCullFunc* cullfunc,
+	void* culldata)
 {
   if (!node) return NULL;
   void* rc;
@@ -408,24 +410,59 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
   if (csMath3::Visible (pos, *(node->polygons[0]->GetPolyPlane ())))
   {
     // Front.
-    rc = Front2Back (node->front, pos, func, data);
+    rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
     rc = func (pset, node->polygons, node->num, data);
     if (rc) return rc;
-    rc = Front2Back (node->back, pos, func, data);
+    rc = Front2Back (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
   }
   else
   {
     // Back.
-    rc = Front2Back (node->back, pos, func, data);
+    rc = Front2Back (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
     rc = func (pset, node->polygons, node->num, data);
     if (rc) return rc;
-    rc = Front2Back (node->front, pos, func, data);
+    rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
   }
   return NULL;
+}
+
+void csBspTree::Statistics (csBspNode* node, int depth, int* num_nodes,
+	int* num_leaves, int* max_depth,
+  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node)
+{
+  depth++;
+  if (depth > *max_depth) *max_depth = depth;
+
+  *tot_polygons += node->num;
+  if (node->num > *max_poly_in_node) *max_poly_in_node = node->num;
+  if (node->num < *min_poly_in_node) *min_poly_in_node = node->num;
+  if (node->front || node->back) (*num_nodes)++;
+  else (*num_leaves)++;
+  if (node->front) Statistics (node->front, depth, num_nodes,
+  	num_leaves, max_depth, tot_polygons, max_poly_in_node,
+	min_poly_in_node);
+  if (node->back) Statistics (node->back, depth, num_nodes,
+  	num_leaves, max_depth, tot_polygons, max_poly_in_node,
+	min_poly_in_node);
+  depth--;
+}
+
+void csBspTree::Statistics (int* num_nodes, int* num_leaves, int* max_depth,
+  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node)
+{
+  *num_nodes = 0;
+  *num_leaves = 0;
+  *max_depth = 0;
+  *tot_polygons = 0;
+  *max_poly_in_node = 0;
+  *min_poly_in_node = 10000000;
+  if (root) Statistics ((csBspNode*)root, 0, num_nodes, num_leaves,
+  	max_depth, tot_polygons,
+  	max_poly_in_node, min_poly_in_node);
 }
 
 //---------------------------------------------------------------------------

@@ -23,7 +23,11 @@
 
 class csPolygonInt;
 class csPolygonParentInt;
+class csPolygonTree;
 
+
+#define NODE_OCTREE 1
+#define NODE_BSPTREE 2
 
 /**
  * A general node in a polygon tree.
@@ -46,6 +50,9 @@ public:
 
   /// Return true if node is empty.
   virtual bool IsEmpty () = 0;
+
+  /// Return type (NODE_???).
+  virtual int Type () = 0;
 };
 
 /**
@@ -54,6 +61,14 @@ public:
  */
 typedef void* (csTreeVisitFunc)(csPolygonParentInt*, csPolygonInt**,
 	int num, void*);
+
+/**
+ * Potentially cull a node from the tree just before it would otherwise
+ * have been traversed in Back2Front() or Front2Back().
+ * If this function returns true then the node is potentially visible.
+ */
+typedef bool (csTreeCullFunc)(csPolygonTree* tree, csPolygonTreeNode* node,
+	const csVector3& pos, void* data);
 
 /**
  * A general polygon tree. This is an abstract data type.
@@ -114,10 +129,14 @@ public:
 
   /// Traverse the tree from back to front starting at the root and 'pos'.
   virtual void* Back2Front (const csVector3& pos, csTreeVisitFunc* func,
-  	void* data) = 0;
+  	void* data, csTreeCullFunc* cullfunc = NULL, void* culldata = NULL) = 0;
   /// Traverse the tree from front to back starting at the root and 'pos'.
   virtual void* Front2Back (const csVector3& pos, csTreeVisitFunc* func,
-  	void* data) = 0;
+  	void* data, csTreeCullFunc* cullfunc = NULL, void* culldata = NULL) = 0;
+
+  /// Return statistics about this tree.
+  virtual void Statistics (int* num_nodes, int* num_leaves, int* max_depth,
+  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node) = 0;
 };
 
 #endif /*POLYTREE_H*/

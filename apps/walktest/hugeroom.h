@@ -90,6 +90,10 @@ private:
   csThing* create_thing (csSector* sector, const csVector3& pos);
 
   ///
+  csThing* create_building (csSector* sector, const csVector3& pos,
+	float xdim, float ydim, float zdim, float angle_y);
+
+  ///
   csPolygon3D* create_polygon (csSector* sector, csPolygonSet* thing,
   	const csVector3& p1, const csVector3& p2, const csVector3& p3,
 	int txt);

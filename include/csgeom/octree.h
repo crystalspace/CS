@@ -49,6 +49,10 @@ class csOctreeNode : public csPolygonTreeNode
 private:
   /// Children.
   csPolygonTreeNode* children[8];
+  /// Minimum corner.
+  csVector3 min_corner;
+  /// Maximum corner.
+  csVector3 max_corner;
   /// Center point for this node.
   csVector3 center;
   /// Mini-bsp tree (in this case there are no children).
@@ -66,20 +70,87 @@ private:
   /// Remove all dynamically added polygons from the node.
   void RemoveDynamicPolygons ();
 
-  /// Return true if node is empty.
-  bool IsEmpty ();
-
-  /// Set center.
-  void SetCenter (const csVector3& c) { center = c; }
-
-  /// Get center.
-  const csVector3& GetCenter () { return center; }
+  /// Set box.
+  void SetBox (const csVector3& bmin, const csVector3& bmax)
+  {
+    min_corner = bmin;
+    max_corner = bmax;
+    center = (bmin + bmax) / 2;
+  }
 
   /// Set mini-bsp tree.
   void SetMiniBsp (csBspTree* mbsp) { minibsp = mbsp; }
 
+public:
+  /// Return true if node is empty.
+  bool IsEmpty ();
+
+  /// Get center.
+  const csVector3& GetCenter () { return center; }
+
+  /// Get minimum coordinate of box.
+  const csVector3& GetMinCorner () { return min_corner; }
+
+  /// Get maximum coordinate of box.
+  const csVector3& GetMaxCorner () { return max_corner; }
+
   /// Get mini-bsp tree.
   csBspTree* GetMiniBsp () { return minibsp; }
+
+  /// Return type (NODE_???).
+  int Type () { return NODE_OCTREE; }
+};
+
+// We have a coordinate system around our node which is
+// divided into 27 regions. The center region at coordinate (1,1,1)
+// is the node itself. Every one of the 26 remaining regions
+// defines an number of vertices which are the convex outline
+// as seen from a camera view point in that region.
+// The numbers inside the outlines table are indices from 0 to
+// 7 which describe the 8 vertices outlining the node:
+//	0: left/down/front vertex
+//	1: left/down/back
+//	2: left/up/front
+//	3: left/up/back
+//	4: right/down/front
+//	5: right/down/back
+//	6: right/up/front
+//	7: right/up/back
+struct Outline
+{
+  int num;
+  int vertices[6];
+};
+/// Outline lookup table.
+static Outline outlines[27] =
+{
+  { 6, { 3, 2, 6, 4, 5, 1 } },		// 0,0,0
+  { 6, { 3, 2, 0, 4, 5, 1 } },		// 0,0,1
+  { 6, { 7, 3, 2, 0, 4, 5 } },		// 0,0,2
+  { 6, { 3, 2, 6, 4, 0, 1 } },		// 0,1,0
+  { 4, { 3, 2, 0, 1, -1, -1 } },	// 0,1,1
+  { 6, { 7, 3, 2, 0, 1, 5 } },		// 0,1,2
+  { 6, { 3, 7, 6, 4, 0, 1 } },		// 0,2,0
+  { 6, { 3, 7, 6, 2, 0, 1 } },		// 0,2,1
+  { 6, { 7, 6, 2, 0, 1, 5 } },		// 0,2,2
+  { 6, { 2, 6, 4, 5, 1, 0 } },		// 1,0,0
+  { 4, { 0, 4, 5, 1, -1, -1 } },	// 1,0,1
+  { 6, { 3, 1, 0, 4, 5, 7 } },		// 1,0,2
+  { 4, { 2, 6, 4, 0, -1, -1 } },	// 1,1,0
+  { 0, { -1, -1, -1, -1, -1, -1 } },	// 1,1,1
+  { 4, { 7, 3, 1, 5, -1, -1 } },	// 1,1,2
+  { 6, { 3, 7, 5, 4, 0, 2 } },		// 1,2,0
+  { 4, { 3, 7, 6, 2, -1, -1 } },	// 1,2,1
+  { 6, { 2, 3, 1, 5, 7, 6 } },		// 1,2,2
+  { 6, { 2, 6, 7, 5, 1, 0 } },		// 2,0,0
+  { 6, { 6, 7, 5, 1, 0, 4 } },		// 2,0,1
+  { 6, { 6, 7, 3, 1, 0, 4 } },		// 2,0,2
+  { 6, { 2, 6, 7, 5, 4, 0 } },		// 2,1,0
+  { 4, { 6, 7, 5, 4, -1, -1 } },	// 2,1,1
+  { 6, { 6, 7, 3, 1, 5, 4 } },		// 2,1,2
+  { 6, { 2, 3, 7, 5, 4, 0 } },		// 2,2,0
+  { 6, { 2, 3, 7, 5, 4, 6 } },		// 2,2,1
+  { 6, { 6, 2, 3, 1, 5, 4 } }		// 2,2,2
 };
 
 /**
@@ -119,10 +190,17 @@ private:
 
   /// Traverse the tree from back to front starting at 'node' and 'pos'.
   void* Back2Front (csOctreeNode* node, const csVector3& pos,
-  	csTreeVisitFunc* func, void* data);
+  	csTreeVisitFunc* func, void* data, csTreeCullFunc* cullfunc,
+	void* culldata);
   /// Traverse the tree from front to back starting at 'node' and 'pos'.
   void* Front2Back (csOctreeNode* node, const csVector3& pos,
-  	csTreeVisitFunc* func, void* data);
+  	csTreeVisitFunc* func, void* data, csTreeCullFunc* cullfunc,
+	void* culldata);
+
+  /// Return statistics about this octree.
+  void Statistics (csOctreeNode* node, int depth, int* num_nodes,
+  	int* num_leaves, int* max_depth,
+  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node);
 
 public:
   /**
@@ -166,9 +244,24 @@ public:
   void RemoveDynamicPolygons ();
 
   /// Traverse the tree from back to front starting at the root and 'pos'.
-  void* Back2Front (const csVector3& pos, csTreeVisitFunc* func, void* data);
+  void* Back2Front (const csVector3& pos, csTreeVisitFunc* func, void* data,
+  	csTreeCullFunc* cullfunc = NULL, void* culldata = NULL);
   /// Traverse the tree from front to back starting at the root and 'pos'.
-  void* Front2Back (const csVector3& pos, csTreeVisitFunc* func, void* data);
+  void* Front2Back (const csVector3& pos, csTreeVisitFunc* func, void* data,
+  	csTreeCullFunc* cullfunc = NULL, void* culldata = NULL);
+
+  /**
+   * Get a convex outline (not a polygon unless projected to 2D)
+   * for for this octree node as seen from the given position.
+   * The coordinates returned are world space coordinates.
+   * Note that you need place for at least six vectors in the array.
+   */
+  void GetConvexOutline (csOctreeNode* node, const csVector3& pos,
+  	csVector3* array, int& num_array);
+
+  /// Return statistics about this octree.
+  void Statistics (int* num_nodes, int* num_leaves, int* max_depth,
+  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node);
 };
 
 #endif /*OCTREE_H*/

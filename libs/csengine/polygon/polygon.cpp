@@ -553,6 +553,56 @@ int csPolygon3D::Classify (const csPlane& pl)
   return POL_SPLIT_NEEDED;
 }
 
+int csPolygon3D::ClassifyX (float x)
+{
+  int i;
+  int front = 0, back = 0;
+
+  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  {
+    float xx = Vwor (i).x-x;
+    if (xx < -SMALL_EPSILON) front++;
+    else if (xx > SMALL_EPSILON) back++;
+  }
+  if (back == 0) return POL_FRONT;
+  if (front == 0) return POL_BACK;
+  return POL_SPLIT_NEEDED;
+}
+
+int csPolygon3D::ClassifyY (float y)
+{
+  int i;
+  int front = 0, back = 0;
+
+  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  {
+    float yy = Vwor (i).y-y;
+    if (yy < -SMALL_EPSILON) front++;
+    else if (yy > SMALL_EPSILON) back++;
+  }
+  if (back == 0) return POL_FRONT;
+  if (front == 0) return POL_BACK;
+  return POL_SPLIT_NEEDED;
+}
+
+int csPolygon3D::ClassifyZ (float z)
+{
+  int i;
+  int front = 0, back = 0;
+
+  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  {
+    float zz = Vwor (i).z-z;
+    if (zz < -SMALL_EPSILON) front++;
+    else if (zz > SMALL_EPSILON) back++;
+  }
+  if (back == 0) return POL_FRONT;
+  if (front == 0) return POL_BACK;
+  return POL_SPLIT_NEEDED;
+}
+
+
+
 void csPolygon3D::ComputeNormal ()
 {
   float A, B, C, D;

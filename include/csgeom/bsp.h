@@ -86,12 +86,16 @@ private:
    */
   void RemoveDynamicPolygons ();
 
+public:
   /// Return true if node is empty.
   bool IsEmpty ()
   {
     return num == 0 &&
     	(!front || front->IsEmpty ()) &&
 	(!back || back->IsEmpty ()); }
+
+  /// Return type (NODE_???).
+  int Type () { return NODE_BSPTREE; }
 };
 
 /**
@@ -123,10 +127,17 @@ private:
 
   /// Traverse the tree from back to front starting at 'node' and 'pos'.
   void* Back2Front (csBspNode* node, const csVector3& pos,
-  	csTreeVisitFunc* func, void* data);
+  	csTreeVisitFunc* func, void* data, csTreeCullFunc* cullfunc,
+	void* culldata);
   /// Traverse the tree from front to back starting at 'node' and 'pos'.
   void* Front2Back (csBspNode* node, const csVector3& pos,
-  	csTreeVisitFunc* func, void* data);
+  	csTreeVisitFunc* func, void* data, csTreeCullFunc* cullfunc,
+	void* culldata);
+
+  /// Return statistics about this bsp tree.
+  void Statistics (csBspNode* node, int depth, int* num_nodes,
+  	int* num_leaves, int* max_depth,
+  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node);
 
 public:
   /**
@@ -167,9 +178,15 @@ public:
   void RemoveDynamicPolygons ();
 
   /// Traverse the tree from back to front starting at the root and 'pos'.
-  void* Back2Front (const csVector3& pos, csTreeVisitFunc* func, void* data);
+  void* Back2Front (const csVector3& pos, csTreeVisitFunc* func, void* data,
+  	csTreeCullFunc* cullfunc = NULL, void* culldata = NULL);
   /// Traverse the tree from front to back starting at the root and 'pos'.
-  void* Front2Back (const csVector3& pos, csTreeVisitFunc* func, void* data);
+  void* Front2Back (const csVector3& pos, csTreeVisitFunc* func, void* data,
+  	csTreeCullFunc* cullfunc = NULL, void* culldata = NULL);
+
+  /// Return statistics about this bsp tree.
+  void Statistics (int* num_nodes, int* num_leaves, int* max_depth,
+  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node);
 };
 
 #endif /*BSP_H*/

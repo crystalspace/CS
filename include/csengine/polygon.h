@@ -1014,6 +1014,15 @@ public:
    */
   int Classify (const csPlane& pl);
 
+  /// Same as Classify() but for X plane only.
+  int ClassifyX (float x);
+
+  /// Same as Classify() but for Y plane only.
+  int ClassifyY (float y);
+
+  /// Same as Classify() but for Z plane only.
+  int ClassifyZ (float z);
+
   /**
    * Split this polygon with the given plane (A,B,C,D) and return the
    * two resulting new polygons in 'front' and 'back'. The new polygons will
