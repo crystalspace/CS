@@ -69,15 +69,21 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   // read the config file
   Config = new csIniFile(VFS,"config/sound.cfg");
 
+  const char *drv = Config->GetStr ("Driver","driver");
+  if (drv && strlen (drv) > 0)
+    ;
+  else
+  {    
   // load the sound driver plug-in
 #ifdef SOUND_DRIVER
-  char *szSoundDriver = SOUND_DRIVER;	// "crystalspace.sound.driver.xxx"
+  drv = SOUND_DRIVER;	// "crystalspace.sound.driver.xxx"
 #else
-  char *szSoundDriver = "crystalspace.sound.driver.null";
+  drv = "crystalspace.sound.driver.null";
 #endif
-  SoundDriver = LOAD_PLUGIN (System, szSoundDriver, NULL, iSoundDriver);
+  }
+  SoundDriver = LOAD_PLUGIN (System, drv, NULL, iSoundDriver);
   if (!SoundDriver) {	
-    System->Printf(MSG_FATAL_ERROR, "Error! Cant find sound driver %s.\n", szSoundDriver);
+    System->Printf(MSG_FATAL_ERROR, "Error! Cant find sound driver %s.\n", drv);
     exit(0);
   }
 
