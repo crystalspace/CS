@@ -37,8 +37,9 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csReporterListener)
 
 SCF_EXPORT_CLASS_TABLE (stdrep)
-  SCF_EXPORT_CLASS (csReporterListener, "crystalspace.utilities.stdrep",
-    "Standard Reporter Listener")
+  SCF_EXPORT_CLASS_DEP (csReporterListener, "crystalspace.utilities.stdrep",
+    "Standard Reporter Listener",
+    "crystalspace.utilities.reporter, crystalspace.console.output.")
 SCF_EXPORT_CLASS_TABLE_END
 
 void csReporterListener::DecRef ()
@@ -123,6 +124,7 @@ csReporterListener::~csReporterListener ()
 bool csReporterListener::Initialize (iObjectRegistry *object_reg)
 {
   csReporterListener::object_reg = object_reg;
+  SetDefaults ();
   return true;
 }
 
