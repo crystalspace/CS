@@ -126,6 +126,7 @@ public:
   virtual void ProcTextureSync () {}    
   void savemap();
   int GetFlags () { return 0; }
+  virtual void Prepare (){}
 };
 
 #endif //ALPHAMAP_H
