@@ -8,10 +8,6 @@
 # can be found in libs/cssys/os2 subdirectory
 #------------------------------------------------------------------------------
 
-ifdef COMSPEC
-SHELL = $(COMSPEC)
-endif
-
 # Friendly names for building environment
 DESCRIPTION.os2gcc = OS/2-GCC/EMX
 DESCRIPTION.OS.os2gcc = OS/2
@@ -50,6 +46,10 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 ifeq ($(MAKESECTION),defines)
 
 include mk/dos.mak
+
+ifdef COMSPEC
+SHELL = $(COMSPEC)
+endif
 
 # Extra libraries needed on this system (beside drivers)
 LIBS.EXE=

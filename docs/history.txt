@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+9-Jan-2002
+	- Eric Sunshine applied a much saner patch to the makefiles to combat
+	  the breakage caused by AndyZ's makefile change.  Reverted a patch
+	  which Philip Wyett made to cygwin.mak since the new saner patch
+	  should make the cygwin.mak patch unnecessary.
 8-Jan-2002
 	- Reverted a change to the png loader plugin (in the saving part)
 	  that 'res' made some time ago. It caused quality degradation when
