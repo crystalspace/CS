@@ -23,6 +23,7 @@
 #include "NeXTDriver2D.h"
 #include "NeXTFrameBuffer15.h"
 #include "NeXTFrameBuffer32.h"
+#include "csutil/cfgacc.h"
 #include "icfgnew.h"
 #include "ievent.h"
 #include "isystem.h"
@@ -136,9 +137,8 @@ int NeXTDriver2D::get_desired_depth() const
 	depth = atoi(s);
     else
 	{
-	iConfigFileNew* cfg = System->GetConfig();
-	if (cfg != 0)
-	    depth = cfg->GetInt( "Video.SimulateDepth", 0 );
+	csConfigAccess Config(iSys, "/config/video.cfg");
+	depth = Config->GetInt( "Video.SimulateDepth", 0 );
 	}
     if (depth != 0 && depth != 15 && depth != 16 && depth != 32)
 	{

@@ -20,6 +20,7 @@
 #include "qint.h"
 #include "isystem.h"
 #include "csutil/csrect.h"
+#include "csutil/cfgacc.h"
 #include "plugins/video/canvas/common/scancode.h"
 #include "mgl2d.h"
 #include "icfgfile.h"
@@ -88,7 +89,8 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
     return false;
   }
 
-  do_hwmouse = System->GetConfig ()->GetBool ("Video.SystemMouseCursor", true);
+  csConfigAccess Config(iSys, "/config/video.cfg");
+  do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
 
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);

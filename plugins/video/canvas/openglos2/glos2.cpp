@@ -23,6 +23,7 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
+#include "csutil/cfgacc.h"
 #include "video/canvas/common/scancode.h"
 #include "video/canvas/common/os2-keys.h"
 #include "isystem.h"
@@ -104,7 +105,7 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
     pfmt.PalEntries = 256;
   }
 
-  iConfigFileNew *Config = System->GetConfig ();
+  csConfigAccess Config(System, "/config/video.cfg");
   WindowX = Config->GetInt ("Video.WindowX", INT_MIN);
   WindowY = Config->GetInt ("Video.WindowY", INT_MIN);
   HardwareCursor = Config->GetBool ("Video.SystemMouseCursor", true);

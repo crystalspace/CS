@@ -23,6 +23,7 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
+#include "csutil/cfgacc.h"
 #include "isystem.h"
 #include "ievent.h"
 #include "icfgnew.h"
@@ -65,7 +66,9 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  csConfigAccess config(pSystem, "/config/asciiart.cfg");
+  csConfigAccess config;
+  config.AddConfig(pSystem, "/config/asciiart.cfg");
+  config.AddConfig(pSystem, "/config/video.cfg");
 
   // Load settings from config file and setup the aa_defparams structure
   HardwareCursor = System->GetConfig ()->GetBool

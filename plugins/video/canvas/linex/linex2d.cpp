@@ -24,6 +24,7 @@
 #include "video/canvas/linex/linex2d.h"
 #include "video/canvas/common/scancode.h"
 #include "csutil/csrect.h"
+#include "csutil/cfgacc.h"
 #include "isystem.h"
 #include "icfgfile.h"
 #include "icfgmgr.h"
@@ -75,7 +76,8 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   if (XSupportsLocale ())
     XSetLocaleModifiers ("");
 
-  do_hwmouse = System->GetConfig ()->GetBool ("Video.SystemMouseCursor", true);
+  csConfigAccess Config(iSys, "/config/video.cfg");
+  do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
   if (System->GetOptionCL ("sysmouse"))
     do_hwmouse = true;
   if (System->GetOptionCL ("nosysmouse"))

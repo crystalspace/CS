@@ -32,6 +32,7 @@
 #include "csutil/inifile.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
+#include "csutil/cfgacc.h"
 #include "iplugin.h"
 #include "ivfs.h"
 #include "iconsole.h"
@@ -657,6 +658,8 @@ void csSystemDriver::CollectOptions (int argc, const char* const argv[])
 void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
 {
   // First look in .cfg file
+  csConfigAccess cfg(this, "/config/video.cfg");
+
   FrameWidth = Config->GetInt ("Video.ScreenWidth", 640);
   FrameHeight = Config->GetInt ("Video.ScreenHeight", 480);
   Depth = Config->GetInt ("Video.ScreenDepth", 16);

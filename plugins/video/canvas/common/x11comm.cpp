@@ -20,12 +20,12 @@
 #include "cssysdef.h"
 #include "x11comm.h"
 #include "icfgfile.h"
-#include "icfgmgr.h"
+#include "csutil/cfgacc.h"
 
 void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
   bool &oHardwareCursor)
 {
-  iConfigManager *Config = iSys->GetConfig ();
+  csConfigAccess Config(iSys, "/config/video.cfg");
   oSimDepth = Config->GetInt ("Video.SimulateDepth", 0);
   oUseSHM = Config->GetBool ("Video.XSHM", true);
   oHardwareCursor = Config->GetBool ("Video.SystemMouseCursor", true);
