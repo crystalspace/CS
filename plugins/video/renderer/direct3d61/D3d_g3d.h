@@ -138,8 +138,7 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
   bool  m_gouraud;
   UInt  m_mixmode;
   float m_alpha;
-  /// Integer alpha value for DrawPolygonFX
-  UInt  m_ialpha;
+
   /// Should DrawPolygonFX use texture?
   bool  m_textured;
 

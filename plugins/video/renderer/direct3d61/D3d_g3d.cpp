@@ -817,6 +817,10 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
   else
     m_bMultiTexture = false;
 
+  // Currently, Multitexturing will break DrawPolygonFX, so I temporarily disabled it,
+  // I hope it will be fixed soon. - Thomas Hieber 12.02.2000
+  m_bMultiTexture = false;
+
   // start up with minimum settings
   m_bRenderTransparent = false;
   m_bRenderLightmap = false;
@@ -951,21 +955,25 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
   {
     m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 
-    struct _BlendList {
-      DWORD SrcFlag, DstFlag;
-      D3DBLEND Src, Dst;
-    } BlendList[] = {{D3DPBLENDCAPS_DESTCOLOR, D3DPBLENDCAPS_SRCCOLOR,  D3DBLEND_DESTCOLOR, D3DBLEND_SRCCOLOR},
-             {D3DPBLENDCAPS_DESTCOLOR, D3DPBLENDCAPS_ZERO,    D3DBLEND_DESTCOLOR, D3DBLEND_ZERO},
-             {D3DPBLENDCAPS_ONE, D3DPBLENDCAPS_ONE,       D3DBLEND_ONE, D3DBLEND_ONE},
-             {D3DPBLENDCAPS_ONE, D3DPBLENDCAPS_SRCCOLOR,    D3DBLEND_ONE, D3DBLEND_SRCCOLOR},
-             };
+    struct _BlendList
+    {
+      DWORD    SrcFlag, DstFlag;
+      D3DBLEND Src,     Dst;
+    } 
+    BlendList[] = 
+    {
+      {D3DPBLENDCAPS_DESTCOLOR, D3DPBLENDCAPS_SRCCOLOR, D3DBLEND_DESTCOLOR, D3DBLEND_SRCCOLOR},
+      {D3DPBLENDCAPS_DESTCOLOR, D3DPBLENDCAPS_ZERO,     D3DBLEND_DESTCOLOR, D3DBLEND_ZERO},
+      {D3DPBLENDCAPS_ONE,       D3DPBLENDCAPS_ONE,      D3DBLEND_ONE,       D3DBLEND_ONE},
+      {D3DPBLENDCAPS_ONE,       D3DPBLENDCAPS_SRCCOLOR, D3DBLEND_ONE,       D3DBLEND_SRCCOLOR},
+    };
 
     for (int i = 0; i < sizeof(BlendList)/sizeof(_BlendList); i++)
     {
-      if ((lpD3dDeviceDesc->dpcTriCaps.dwSrcBlendCaps & BlendList[i].SrcFlag) &&
-        (lpD3dDeviceDesc->dpcTriCaps.dwDestBlendCaps & BlendList[i].DstFlag))
+      if ((lpD3dDeviceDesc->dpcTriCaps.dwSrcBlendCaps  & BlendList[i].SrcFlag) &&
+          (lpD3dDeviceDesc->dpcTriCaps.dwDestBlendCaps & BlendList[i].DstFlag))
       {
-        m_bRenderLightmap = true;
+        m_bRenderLightmap  = true;
         m_LightmapSrcBlend = BlendList[i].Src;
         m_LightmapDstBlend = BlendList[i].Dst;
         break;
@@ -977,16 +985,21 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
 //--- transparency settings ---
 
   // hum, this code looks familiar eh
-  struct _TransList {
+  struct _TransList 
+  {
     DWORD SrcFlag, DstFlag;
     D3DBLEND Src, Dst;
-  } TransList[] = {{D3DPBLENDCAPS_INVSRCALPHA, D3DPBLENDCAPS_SRCALPHA, D3DBLEND_INVSRCALPHA, D3DBLEND_SRCALPHA},
-                   {D3DPBLENDCAPS_SRCALPHA, D3DPBLENDCAPS_INVSRCALPHA, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA},
-                   };
+  } 
+  TransList[] = 
+  {
+    {D3DPBLENDCAPS_INVSRCALPHA, D3DPBLENDCAPS_SRCALPHA,    D3DBLEND_INVSRCALPHA, D3DBLEND_SRCALPHA},
+    {D3DPBLENDCAPS_SRCALPHA,    D3DPBLENDCAPS_INVSRCALPHA, D3DBLEND_SRCALPHA,    D3DBLEND_INVSRCALPHA},
+  };
+
   // TODO : store translucency type
   for (int i = 0; i < sizeof(TransList)/sizeof(_TransList); i++)
   {
-    if ((lpD3dDeviceDesc->dpcTriCaps.dwSrcBlendCaps & TransList[i].SrcFlag) &&
+    if ((lpD3dDeviceDesc->dpcTriCaps.dwSrcBlendCaps  & TransList[i].SrcFlag) &&
         (lpD3dDeviceDesc->dpcTriCaps.dwDestBlendCaps & TransList[i].DstFlag))
     {
       m_bRenderTransparent = true;
@@ -1659,7 +1672,6 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
 {
   m_gouraud = ((mode & CS_FX_GOURAUD) != 0);
   m_mixmode = mode;
-  m_alpha = float (mode & CS_FX_MASK_ALPHA) * (1.0f / 255);
 
 //  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, true);
 
@@ -1670,6 +1682,8 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
     m_pTextureCache->Add (handle);
 
     pTexData = txt_mm->GetHighColorCacheData ();
+    m_States.SetColorKeyEnable(txt_mm->GetTransparent ());
+
     m_textured = true;
   }
   else
@@ -1690,36 +1704,42 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
   {
     case CS_FX_MULTIPLY:
       // Color = SRC * DEST +   0 * SRC = DEST * SRC
-      m_alpha = 0.0f;
+      m_alpha = 1.0f;
       m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
       m_States.SetSrcBlend(D3DBLEND_ZERO);
       break;
     case CS_FX_MULTIPLY2:
       //Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
-      m_alpha = 0.0f;
+      m_alpha = 1.0f;
       m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
       m_States.SetSrcBlend(D3DBLEND_DESTCOLOR);
       break;
     case CS_FX_ADD:
       //Color = 1 * DEST + 1 * SRC = DEST + SRC
-      m_alpha = 0.0f;
+      m_alpha = 1.0f;
       m_States.SetDstBlend(D3DBLEND_ONE);
       m_States.SetSrcBlend(D3DBLEND_ONE);
       break;
     case CS_FX_ALPHA:
       //Color = Alpha * DEST + (1-Alpha) * SRC 
-      m_States.SetDstBlend(D3DBLEND_SRCALPHA);
-      m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
+
+      //In the Crystal Space DirectX renderer, we handle Alpha differently: 
+      //0.0 is transparent, and 1.0 is opaque. It looks like this is more 
+      //close to the way DirectX will internall handle Alpha transparency.
+      m_alpha = float (255 - (mode & CS_FX_MASK_ALPHA)) / 255.0;
+      m_States.SetDstBlend(D3DBLEND_INVSRCALPHA);
+      m_States.SetSrcBlend(D3DBLEND_SRCALPHA);
       break;
     case CS_FX_TRANSPARENT:
       //Color = 1 * DEST + 0 * SRC = DEST
+      m_alpha = 1.0f;
       m_States.SetDstBlend(D3DBLEND_ONE);
       m_States.SetSrcBlend(D3DBLEND_ZERO);
       break;
     case CS_FX_COPY:
     default:
       //Color = 0 * DEST + 1 * SRC = SRC
-      m_alpha = 0.0f;
+      m_alpha = 1.0f;
       m_States.SetDstBlend(D3DBLEND_ZERO);
       m_States.SetSrcBlend(D3DBLEND_ONE);
       break;
@@ -1729,16 +1749,6 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
     m_States.SetTexture(0, ((D3DTextureCache_Data *)pTexData->pData)->lptex);
   else
     m_States.SetTexture(0, NULL);
-
-  if (m_alpha == 0.0f && (m_mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
-  {
-    // workaround for a bug in alpha transparency. It looks like on some cards
-    // you may not select alpha == 0, (opaque) because that will make
-    // the result invisible. :-(
-    m_alpha = 0.01f; 
-  }
-
-  m_ialpha = QInt(m_alpha * 255.0f);
 } // end of StartPolygonFX()
 
 void csGraphics3DDirect3DDx6::FinishPolygonFX()
@@ -1775,7 +1785,6 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
     CLAMP(flat_g, 1.0f);
     CLAMP(flat_b, 1.0f);
 
-    if (!m_gouraud)
     FlatColor = D3DRGBA_(flat_r, flat_g, flat_b, m_alpha);
   }
 
@@ -1796,7 +1805,7 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
       CLAMP(g, 1.0f);
       b = poly.vertices[i].b;
       CLAMP(b, 1.0f);
-      vx.color = D3DRGBA_(r, g, b, m_alpha);
+      vx.color = D3DRGBA(r, g, b, m_alpha);
     }
     else
     {
@@ -1813,7 +1822,7 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
         CLAMP(g, 1.0f);
         b = flat_r * poly.vertices[i].b;
         CLAMP(b, 1.0f);
-        vx.color = D3DRGBA_(r, g, b, m_alpha);
+        vx.color = D3DRGBA(r, g, b, m_alpha);
       }
     }
 
