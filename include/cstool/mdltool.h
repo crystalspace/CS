@@ -19,7 +19,7 @@
 #ifndef __CS_MDLTOOL_H__
 #define __CS_MDLTOOL_H__
 
-#include "csutil/intarray.h"
+#include "csutil/garray.h"
 
 class csString;
 struct iObject;
@@ -47,7 +47,7 @@ private:
   // may be available, making it hard to get the vertex count from the lists.
   int Count;
   // the lists
-  csIntArray *Vertices, *Normals, *Colors, *Texels;
+  csGrowingArray<int> *Vertices, *Normals, *Colors, *Texels;
 
 public:
   /**
@@ -64,8 +64,9 @@ public:
    * all elements of the given lists because the lists will be kept and
    * modified every time a vertex is added to the set.
    */
-  csSingleIndexVertexSet (csIntArray *Vertices, csIntArray *Normals,
-    csIntArray *Colors, csIntArray *Texels, bool DeleteLists);
+  csSingleIndexVertexSet (csGrowingArray<int> *Vertices,
+    csGrowingArray<int> *Normals, csGrowingArray<int> *Colors,
+    csGrowingArray<int> *Texels, bool DeleteLists);
 
   /// Destructor
   ~csSingleIndexVertexSet ();
@@ -170,9 +171,9 @@ struct csModelDataTools
    * this function that vertices with different colors may be merged.
    */
   static void BuildVertexArray (iModelDataPolygon* poly,
-	csIntArray* SpriteVertices, csIntArray* SpriteNormals,
-	csIntArray* SpriteColors, csIntArray* SpriteTexels,
-	csIntArray* PolyVertices);
+	csGrowingArray<int>* SpriteVertices, csGrowingArray<int>* SpriteNormals,
+	csGrowingArray<int>* SpriteColors, csGrowingArray<int>* SpriteTexels,
+	csGrowingArray<int>* PolyVertices);
 };
 
 #endif // __CS_MDLTOOL_H__

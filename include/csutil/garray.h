@@ -80,6 +80,24 @@ public:
     else
       return 0;
   }
+
+  /**
+   * Get a copy of the array. The caller is responsible for
+   * deleting this with 'delete[]'. Returns 0 if there are no
+   * items in the array.
+   */
+  T* GetArrayCopy ()
+  {
+    if (Length () > 0)
+    {
+      T* copy = new T [Length ()];
+      memcpy (copy, &Get (0), sizeof (T) * Length ());
+      return copy;
+    }
+    else
+      return 0;
+  }
 };
 
 #endif // __CS_GARRAY_H__
+

@@ -20,7 +20,7 @@
 #include "csutil/objiter.h"
 #include "csutil/csstring.h"
 #include "csutil/array.h"
-#include "csutil/intarray.h"
+#include "csutil/garray.h"
 #include "csutil/databuf.h"
 #include "cstool/sprbuild.h"
 #include "cstool/mdltool.h"
@@ -82,9 +82,9 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
    * (model data normal) and (model data texel) mappings. This means that
    * they are indexed by the sprite vertex and must be of the same size.
    */
-  csIntArray SpriteVertices;
-  csIntArray SpriteNormals;
-  csIntArray SpriteTexels;
+  csGrowingArray<int> SpriteVertices;
+  csGrowingArray<int> SpriteNormals;
+  csGrowingArray<int> SpriteTexels;
 
 #if 0
   int vertices=0;
@@ -114,7 +114,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
     if (poly)
     {
       // build the vertex array
-      csIntArray PolyVertices;
+      csGrowingArray<int> PolyVertices;
       csModelDataTools::BuildVertexArray (poly, &SpriteVertices,
         &SpriteNormals, 0, &SpriteTexels, &PolyVertices);
 
@@ -155,7 +155,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
       SCF_QUERY_INTERFACE (it1->Next (), iModelDataPolygon));
     if (poly)
     {
-      csIntArray PolyVertices;
+      csGrowingArray<int> PolyVertices;
       for (i=0; i<poly->GetVertexCount(); i++)
       {
 	int vertex = poly->GetVertex (i);
