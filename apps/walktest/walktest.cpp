@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -1155,6 +1155,16 @@ void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
       (void)new csCollider (*tp, collide_system, mesh);
       mesh->DecRef ();
     }
+    for (i = 0 ; i < sp->GetNumberMeshes () ; i++)
+    {
+      csMeshWrapper* tp = sp->GetMesh (i);
+      mesh = QUERY_INTERFACE (tp->GetMeshObject (), iPolygonMesh);
+      if (mesh)
+      {
+        (void)new csCollider (*tp, collide_system, mesh);
+        mesh->DecRef ();
+      }
+    }
   }
   // Initialize all mesh objects for collision detection.
   int i;
@@ -1162,7 +1172,7 @@ void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
   {
     csMeshWrapper* sp = (csMeshWrapper*)engine->meshes[i];
     if (region && !region->IsInRegion (sp)) continue;
-    mesh = QUERY_INTERFACE (sp, iPolygonMesh);
+    mesh = QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
     if (mesh)
     {
       (void)new csCollider (*sp, collide_system, mesh);

@@ -37,6 +37,7 @@ struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshObjectType;
 struct iMaterialWrapper;
+struct iMaterialList;
 struct iTextureWrapper;
 struct iTerrainWrapper;
 struct iTerrainFactoryWrapper;
@@ -46,8 +47,9 @@ struct iView;
 struct iGraphics3D;
 struct iClipper2D;
 struct iPolyTxtPlane;
+struct iCurveTemplate;
 
-SCF_VERSION (iEngine, 0, 1, 17);
+SCF_VERSION (iEngine, 0, 1, 19);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -120,8 +122,11 @@ struct iEngine : public iPlugIn
   /// Create a texture plane
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
 	const csMatrix3 &iMatrix) = 0;
-  /// Create a empty sector with given name
-  virtual iSector *CreateSector (const char *iName) = 0;
+  /**
+   * Create a empty sector with given name.
+   * If link == true (default) the sector will be linked to the engine.
+   */
+  virtual iSector *CreateSector (const char *iName, bool link = true) = 0;
   /// Create a empty thing with given name
   virtual iThing *CreateThing (const char *iName, iSector *iParent) = 0;
 
@@ -326,8 +331,25 @@ struct iEngine : public iPlugIn
   virtual iPolyTxtPlane* FindPolyTxtPlane (const char *iName,
   	bool regionOnly = false) = 0;
 
+  /**
+   * @@@ Temporary function to create a bezier template. This is temporary
+   * until planes are managed by the thing plugin.
+   */
+  virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL) = 0;
+  /**
+   * @@@ Temporary function to find a curve template. This is temporary until
+   * planes are managed by the thing plugin.
+   */
+  virtual iCurveTemplate* FindCurveTemplate (const char *iName,
+  	bool regionOnly = false) = 0;
+
   /// @@@ Temporary function until things are moved to a plugin.
   virtual iMeshObjectType* GetThingType () = 0;
+
+  /**
+   * Get the list of all materials.
+   */
+  virtual iMaterialList* GetMaterialList () = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__

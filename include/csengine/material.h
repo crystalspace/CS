@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 2000 by W.C.A. Wijngaards
   
     This library is free software; you can redistribute it and/or
@@ -147,7 +148,7 @@ public:
   void Visit ();
 
   CSOBJTYPE;
-  DECLARE_IBASE;
+  DECLARE_IBASE_EXT (csPObject);
 
   //------------------- iMaterialWrapper implementation -----------------------
   struct MaterialWrapper : public iMaterialWrapper
@@ -176,8 +177,7 @@ class csMaterialList : public csNamedObjVector
 {
 public:
   /// Initialize the array
-  csMaterialList () : csNamedObjVector (16, 16)
-  { }
+  csMaterialList ();
   /// Destroy every material in the list
   virtual ~csMaterialList ();
 
@@ -197,6 +197,40 @@ public:
   /// Find a material by name
   csMaterialWrapper *FindByName (const char* iName)
   { return (csMaterialWrapper *)csNamedObjVector::FindByName (iName); }
+
+  DECLARE_IBASE;
+
+  //------------------- iMaterialList implementation -----------------------
+  struct MaterialList : public iMaterialList
+  {
+    DECLARE_EMBEDDED_IBASE (csMaterialList);
+    virtual iMaterialWrapper* NewMaterial (iMaterial* material)
+    {
+      csMaterialWrapper* mw = scfParent->NewMaterial (material);
+      if (mw) return &(mw->scfiMaterialWrapper);
+      else return NULL;
+    }
+    virtual iMaterialWrapper* NewMaterial (iMaterialHandle *ith)
+    {
+      csMaterialWrapper* mw = scfParent->NewMaterial (ith);
+      if (mw) return &(mw->scfiMaterialWrapper);
+      else return NULL;
+    }
+    virtual int GetNumMaterials ()
+    {
+      return scfParent->Length ();
+    }
+    virtual iMaterialWrapper* Get (int idx)
+    {
+      return &(scfParent->Get (idx)->scfiMaterialWrapper);
+    }
+    virtual iMaterialWrapper* FindByName (const char* iName)
+    {
+      csMaterialWrapper* mw = scfParent->FindByName (iName);
+      if (mw) return &(mw->scfiMaterialWrapper);
+      else return NULL;
+    }
+  } scfiMaterialList;
 };
 
 #endif // __CS_MATERIAL_H__

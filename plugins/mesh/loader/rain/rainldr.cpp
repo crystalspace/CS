@@ -315,6 +315,7 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+	  imeshwrap->SetFactory (fact);
           partstate = QUERY_INTERFACE (mesh, iParticleState);
           rainstate = QUERY_INTERFACE (mesh, iRainState);
 	}

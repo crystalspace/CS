@@ -293,6 +293,7 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+	  imeshwrap->SetFactory (fact);
           partstate = QUERY_INTERFACE (mesh, iParticleState);
           spiralstate = QUERY_INTERFACE (mesh, iSpiralState);
 	}

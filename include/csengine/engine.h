@@ -913,10 +913,12 @@ public:
    */
   csMaterialList* GetMaterials () { return materials; }
 
+  virtual iMaterialList* GetMaterialList ();
+
   /**
    * Create a empty sector with given name.
    */
-  csSector* CreateCsSector (const char *iName);
+  csSector* CreateCsSector (const char *iName, bool link = true);
 
   /**
    * Conveniance function to create the thing containing the
@@ -1207,7 +1209,7 @@ public:
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix);
   /// Create a empty sector with given name.
-  virtual iSector *CreateSector (const char *iName);
+  virtual iSector *CreateSector (const char *iName, bool link = true);
   /// Create a empty thing with given name.
   virtual iThing *CreateThing (const char *iName, iSector *iParent);
 
@@ -1271,6 +1273,9 @@ public:
 
   virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
   virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name,
+  	bool regionOnly = false);
+  virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL);
+  virtual iCurveTemplate* FindCurveTemplate (const char *iName,
   	bool regionOnly = false);
 
   virtual iClipper2D* GetTopLevelClipper ();

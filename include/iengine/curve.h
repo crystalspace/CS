@@ -48,7 +48,7 @@ struct iCurve : public iBase
   virtual void SetControlPoint (int idx, int control_id) = 0;
 };
 
-SCF_VERSION (iCurveTemplate, 0, 0, 1);
+SCF_VERSION (iCurveTemplate, 0, 0, 2);
 
 /**
  * This is a interface for a curve template.
@@ -69,6 +69,8 @@ struct iCurveTemplate : public iBase
   virtual int GetNumVertices () const = 0;
   /// Get a vertex.
   virtual int GetVertex (int idx) const = 0;
+  /// Set a vertex.
+  virtual void SetVertex (int idx, int vt) = 0;
 };
 
 #endif // __IENGINE_CURVE_H__

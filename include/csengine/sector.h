@@ -605,7 +605,7 @@ public:
     DECLARE_EMBEDDED_IBASE (csSector);
 
     virtual csSector *GetPrivateObject ()
-    { return scfParent; }
+    { return (csSector*)scfParent; }
     virtual void CreateBSP ()
     { scfParent->UseStaticTree (); }
     virtual iVisibilityCuller* GetVisibilityCuller ()

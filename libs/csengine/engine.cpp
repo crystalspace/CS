@@ -1979,11 +1979,11 @@ bool csEngine::CreatePlane (const char *iName, const csVector3 &iOrigin,
   return true;
 }
 
-csSector* csEngine::CreateCsSector (const char *iName)
+csSector* csEngine::CreateCsSector (const char *iName, bool link)
 {
   csSector* sector = new csSector (this);
   sector->SetName (iName);
-  sectors.Push (sector);
+  if (link) sectors.Push (sector);
   return sector;
 }
 
@@ -2021,11 +2021,11 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
   return mesh_wrap;
 }
 
-iSector* csEngine::CreateSector (const char *iName)
+iSector* csEngine::CreateSector (const char *iName, bool link)
 {
-  csSector* sector = CreateCsSector (iName);
+  csSector* sector = CreateCsSector (iName, link);
   iSector *s = QUERY_INTERFACE (sector, iSector);
-  sector->DecRef ();
+  s->DecRef ();
   return s;
 }
 
@@ -2152,6 +2152,11 @@ iTerrainFactoryWrapper *csEngine::FindTerrainFactory (const char *iName, bool re
     return NULL;
   iTerrainFactoryWrapper* iFactory = &pFactory->scfiTerrainFactoryWrapper;
   return iFactory;
+}
+
+iMaterialList* csEngine::GetMaterialList ()
+{
+  return &(GetMaterials ()->scfiMaterialList);
 }
 
 iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
@@ -2357,6 +2362,30 @@ iPolyTxtPlane* csEngine::FindPolyTxtPlane (const char *iName, bool regionOnly)
     pl = (csPolyTxtPlane*)planes.FindByName (iName);
   if (!pl) return NULL;
   return &(pl->scfiPolyTxtPlane);
+}
+
+iCurveTemplate* csEngine::CreateBezierTemplate (const char* name)
+{
+  csBezierTemplate* ptemplate = new csBezierTemplate ();
+  if (name) ptemplate->SetName (name);
+  curve_templates.Push (ptemplate);
+  iCurveTemplate* itmpl = QUERY_INTERFACE (ptemplate, iCurveTemplate);
+  itmpl->DecRef ();
+  return itmpl;
+}
+
+iCurveTemplate* csEngine::FindCurveTemplate (const char *iName,
+	bool regionOnly)
+{
+  csCurveTemplate* pl;
+  if (regionOnly && region)
+    pl = (csCurveTemplate*)FindObjectInRegion (region, curve_templates, iName);
+  else
+    pl = (csCurveTemplate*)curve_templates.FindByName (iName);
+  if (!pl) return NULL;
+  iCurveTemplate* itmpl = QUERY_INTERFACE (pl, iCurveTemplate);
+  itmpl->DecRef ();
+  return itmpl;
 }
 
 //----------------Begin-Multi-Context-Support------------------------------

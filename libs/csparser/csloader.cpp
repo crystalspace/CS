@@ -120,7 +120,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ANIM)
   CS_TOKEN_DEF (ATTENUATION)
   CS_TOKEN_DEF (BACK2FRONT)
-  CS_TOKEN_DEF (BEZIER)
   CS_TOKEN_DEF (CAMERA)
   CS_TOKEN_DEF (CENTER)
   CS_TOKEN_DEF (CIRCLE)
@@ -132,6 +131,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (CONVEX)
   CS_TOKEN_DEF (COPY)
   CS_TOKEN_DEF (COSFACT)
+  CS_TOKEN_DEF (CURVE)
   CS_TOKEN_DEF (CURVECENTER)
   CS_TOKEN_DEF (CURVECONTROL)
   CS_TOKEN_DEF (CURVESCALE)
@@ -188,6 +188,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (PERSISTENT)
   CS_TOKEN_DEF (PLANE)
   CS_TOKEN_DEF (PLUGIN)
+  CS_TOKEN_DEF (PLUGINS)
   CS_TOKEN_DEF (POLYGON)
   CS_TOKEN_DEF (PORTAL)
   CS_TOKEN_DEF (POSITION)
@@ -747,9 +748,9 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
   char* xname;
   char* params;
 
-  float x     = 0;
-  float y     = 0;
-  float z     = 0;
+  float x = 0;
+  float y = 0;
+  float z = 0;
 
   while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
   {
@@ -796,10 +797,10 @@ void csLoader::load_thing_part (csThing* thing, PSLoadInfo& info,
     CS_TOKEN_TABLE (VERTEX)
     CS_TOKEN_TABLE (CIRCLE)
     CS_TOKEN_TABLE (POLYGON)
-    CS_TOKEN_TABLE (BEZIER)
     CS_TOKEN_TABLE (CURVECENTER)
     CS_TOKEN_TABLE (CURVESCALE)
     CS_TOKEN_TABLE (CURVECONTROL)
+    CS_TOKEN_TABLE (CURVE)
     CS_TOKEN_TABLE (MAT_SET_SELECT)
     CS_TOKEN_TABLE (TEXNR)
     CS_TOKEN_TABLE (MATERIAL)
@@ -1009,7 +1010,7 @@ void csLoader::load_thing_part (csThing* thing, PSLoadInfo& info,
 	  thing_state->DecRef ();
 	  if (info.use_mat_set)
 	  {
-	    thing->ReplaceMaterials (Engine->GetMaterials (),
+	    thing->ReplaceMaterials (Engine->GetMaterialList (),
 	      info.mat_set_name);
 	    info.use_mat_set = false;
 	  }
@@ -1037,7 +1038,7 @@ void csLoader::load_thing_part (csThing* thing, PSLoadInfo& info,
 	  thing_state->DecRef ();
 	  if (info.use_mat_set)
 	  {
-	    thing->ReplaceMaterials (Engine->GetMaterials (),
+	    thing->ReplaceMaterials (Engine->GetMaterialList (),
 	      info.mat_set_name);
 	    info.use_mat_set = false;
 	  }
@@ -1149,16 +1150,22 @@ void csLoader::load_thing_part (csThing* thing, PSLoadInfo& info,
         }
         break;
 
-      case CS_TOKEN_BEZIER:
+      case CS_TOKEN_CURVE:
         {
-          csCurveTemplate* ct = load_beziertemplate (name, params,
-	      info.default_material, info.default_texlen,
-	      thing->GetCurveVertices ());
-	  Engine->curve_templates.Push (ct);
+          ScanStr (params, "%s", str);
+          csCurveTemplate* ct = (csCurveTemplate*)
+	  	Engine->curve_templates.FindByName (str);
+	  if (!ct)
+	  {
+	    CsPrintf (MSG_FATAL_ERROR, "Can't find curve template '%s'!\n",
+	    	str);
+	    fatal_exit (0, false);
+	  }
 	  csCurve* p = ct->MakeCurve ();
-	  p->SetName (ct->GetName ());
+	  p->SetName (name);
 	  p->SetParent (thing);
-          if (!ct->GetMaterialWrapper ()) p->SetMaterialWrapper (info.default_material);
+          if (!ct->GetMaterialWrapper ())
+	    p->SetMaterialWrapper (info.default_material);
 	  int j;
           for (j = 0 ; j < ct->NumVertices () ; j++)
             p->SetControlPoint (j, ct->GetVertex (j));
@@ -1960,166 +1967,6 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
   material->DecRef ();
 }
 
-csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
-  csMaterialWrapper* default_material, float default_texlen,
-  csVector3* curve_vertices)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (TEXNR)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (VERTICES)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tex_commands)
-    CS_TOKEN_TABLE (ORIG)
-    CS_TOKEN_TABLE (FIRST_LEN)
-    CS_TOKEN_TABLE (FIRST)
-    CS_TOKEN_TABLE (SECOND_LEN)
-    CS_TOKEN_TABLE (SECOND)
-    CS_TOKEN_TABLE (LEN)
-    CS_TOKEN_TABLE (MATRIX)
-    CS_TOKEN_TABLE (UVEC)
-    CS_TOKEN_TABLE (VVEC)
-    CS_TOKEN_TABLE (V)
-    CS_TOKEN_TABLE (UV_SHIFT)
-  CS_TOKEN_TABLE_END
-
-  char *name;
-  long cmd;
-  int i;
-  char *params, *params2;
-
-  csBezierTemplate *ptemplate = new csBezierTemplate();
-  ptemplate->SetName (ptname);
-
-  csMaterialWrapper* mat;
-  if (default_material == NULL) mat = NULL;
-  else ptemplate->SetMaterialWrapper (default_material);
-
-  bool tx1_given = false, tx2_given = false;
-  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
-  float tx1_len = default_texlen, tx2_len = default_texlen;
-  float tx_len = default_texlen;
-  csMatrix3 tx_matrix;
-  csVector3 tx_vector (0, 0, 0);
-
-  bool uv_shift_given = false;
-  float u_shift = 0, v_shift = 0;
-
-  char str[255];
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_TEXNR:
-        //@@OBSOLETE, retained for backward compatibility
-      case CS_TOKEN_MATERIAL:
-        ScanStr (params, "%s", str);
-        mat = FindMaterial (str, onlyRegion);
-        if (mat == NULL)
-        {
-          CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
-          fatal_exit (0, true);
-        }
-        ptemplate->SetMaterialWrapper (mat);
-        break;
-      case CS_TOKEN_TEXTURE:
-        while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
-        {
-          if (!params2)
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-            fatal_exit (0, false);
-          }
-          switch (cmd)
-          {
-            case CS_TOKEN_ORIG:
-              tx1_given = true;
-              int num;
-              float flist[100];
-              ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx_orig = curve_vertices[(int)flist[0]];
-              if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
-              break;
-            case CS_TOKEN_FIRST:
-              tx1_given = true;
-              ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx1 = curve_vertices[(int)flist[0]];
-              if (num == 3) tx1 = csVector3(flist[0],flist[1],flist[2]);
-              break;
-            case CS_TOKEN_FIRST_LEN:
-              ScanStr (params2, "%f", &tx1_len);
-              tx1_given = true;
-              break;
-            case CS_TOKEN_SECOND:
-              tx2_given = true;
-              ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx2 = curve_vertices[(int)flist[0]];
-              if (num == 3) tx2 = csVector3(flist[0],flist[1],flist[2]);
-              break;
-            case CS_TOKEN_SECOND_LEN:
-              ScanStr (params2, "%f", &tx2_len);
-              tx2_given = true;
-              break;
-            case CS_TOKEN_LEN:
-              ScanStr (params2, "%f", &tx_len);
-              break;
-            case CS_TOKEN_MATRIX:
-              load_matrix (params2, tx_matrix);
-              tx_len = 0;
-              break;
-            case CS_TOKEN_V:
-              load_vector (params2, tx_vector);
-              tx_len = 0;
-              break;
-            case CS_TOKEN_UV_SHIFT:
-              uv_shift_given = true;
-              ScanStr (params2, "%f,%f", &u_shift, &v_shift);
-              break;
-            case CS_TOKEN_UVEC:
-              tx1_given = true;
-              load_vector (params2, tx1);
-              tx1_len = tx1.Norm ();
-              tx1 += tx_orig;
-              break;
-            case CS_TOKEN_VVEC:
-              tx2_given = true;
-              load_vector (params2, tx2);
-              tx2_len = tx2.Norm ();
-              tx2 += tx_orig;
-              break;
-          }
-        }
-        break;
-      case CS_TOKEN_VERTICES:
-        {
-          int list[100], num;
-          ScanStr (params, "%D", list, &num);
-          if (num != 9)
-            {
-              CsPrintf (MSG_FATAL_ERROR, "Wrong number of vertices to bezier!\n");
-              fatal_exit (0, false);
-            }
-          for (i = 0 ; i < num ; i++) ptemplate->SetVertex (i,list[i]);
-        }
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a bezier template!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-  return ptemplate;
-}
-
 //---------------------------------------------------------------------------
 
 csSector* csLoader::load_sector (char* secname, char* buf)
@@ -2494,6 +2341,31 @@ csSoundDataObject *csLoader::LoadSoundObject (csEngine* engine,
 
 //---------------------------------------------------------------------------
 
+static void ResolvePortalSectors (csEngine* Engine, bool onlyRegion,
+	csThing* ps)
+{
+  for (int i=0;  i < ps->GetNumPolygons ();  i++)
+  {
+    csPolygon3D* p = ps->GetPolygon3D (i);
+    if (p && p->GetPortal ())
+    {
+      csPortal *portal = p->GetPortal ();
+      csSector *stmp = portal->GetSector ();
+      iSector *snew = Engine->FindSector (stmp->GetName (), onlyRegion);
+      if (!snew)
+      {
+        CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found for portal in"
+          " polygon '%s/%s'!\n", stmp->GetName (),
+          ((csObject*)p->GetParent ())->GetName (),
+          p->GetName ());
+        fatal_exit (0, false);
+      }
+      portal->SetSector (snew->GetPrivateObject ());
+      delete stmp;
+    }
+  }
+}
+
 bool csLoader::LoadMap (char* buf, bool onlyRegion)
 {
   ::onlyRegion = onlyRegion;
@@ -2509,9 +2381,9 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     CS_TOKEN_TABLE (COLLECTION)
     CS_TOKEN_TABLE (SCRIPT)
     CS_TOKEN_TABLE (MESHOBJ)
-    CS_TOKEN_TABLE (TEXTURES)
     CS_TOKEN_TABLE (MATERIALS)
     CS_TOKEN_TABLE (MAT_SET)
+    CS_TOKEN_TABLE (TEXTURES)
     CS_TOKEN_TABLE (THING)
     CS_TOKEN_TABLE (SIXFACE)
     CS_TOKEN_TABLE (LIBRARY)
@@ -2521,6 +2393,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     CS_TOKEN_TABLE (MOTION)
     CS_TOKEN_TABLE (REGION)
     CS_TOKEN_TABLE (TERRAINFACTORY)
+    CS_TOKEN_TABLE (PLUGINS)
   CS_TOKEN_TABLE_END
 
   csResetParserLine();
@@ -2542,7 +2415,8 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     {
       if (!params)
       {
-        CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", data);
+        CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n",
+		data);
         fatal_exit (0, false);
       }
       switch (cmd)
@@ -2582,17 +2456,18 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
           }
 	  break;
         case CS_TOKEN_TERRAINFACTORY:
-        {
-          csTerrainFactoryWrapper* pWrapper = (csTerrainFactoryWrapper*)Engine->terrain_factories.FindByName( name );
-          if (!pWrapper)
           {
-            pWrapper = new csTerrainFactoryWrapper ();
-            pWrapper->SetName( name );
-            Engine->terrain_factories.Push (pWrapper);
+            csTerrainFactoryWrapper* pWrapper =(csTerrainFactoryWrapper*)
+	  	Engine->terrain_factories.FindByName( name );
+            if (!pWrapper)
+            {
+              pWrapper = new csTerrainFactoryWrapper ();
+              pWrapper->SetName( name );
+              Engine->terrain_factories.Push (pWrapper);
+            }
+            LoadTerrainObjectFactory (pWrapper, params);
           }
-          LoadTerrainObjectFactory (pWrapper, params);
-        }
-	      break; 
+	  break; 
         case CS_TOKEN_REGION:
 	  {
 	    char str[255];
@@ -2627,19 +2502,17 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
           if (!LoadMaterials (params, name))
             return false;
           break;
+	case CS_TOKEN_PLUGINS:
+	  if (!LoadPlugins (params))
+	    return false;
+	  break;
         case CS_TOKEN_TEXTURES:
-          {
-            //Engine->GetTextures ()->DeleteAll ();
-            if (!LoadTextures (params))
-              return false;
-          }
+          if (!LoadTextures (params))
+            return false;
           break;
         case CS_TOKEN_MATERIALS:
-          {
-            //Engine->GetMaterials ()->DeleteAll ();
-            if (!LoadMaterials (params))
-              return false;
-          }
+          if (!LoadMaterials (params))
+            return false;
           break;
         case CS_TOKEN_SOUNDS:
           if (!LoadSounds (params))
@@ -2687,25 +2560,20 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     {
       csThing* ps = s->GetThing (j);
       j++;
-      for (int i=0;  i < ps->GetNumPolygons ();  i++)
+      ResolvePortalSectors (Engine, onlyRegion, ps);
+    }
+    st = s->GetNumberMeshes ();
+    j = 0;
+    while (j < st)
+    {
+      csMeshWrapper* ps = s->GetMesh (j);
+      j++;
+      // @@@ UGLY!!!! NEED A MORE GENERAL SOLUTION!
+      iThing* ith = QUERY_INTERFACE (ps->GetMeshObject (), iThing);
+      if (ith)
       {
-        csPolygon3D* p = ps->GetPolygon3D (i);
-        if (p && p->GetPortal ())
-        {
-          csPortal *portal = p->GetPortal ();
-          csSector *stmp = portal->GetSector ();
-	  iSector *snew = Engine->FindSector (stmp->GetName (), onlyRegion);
-          if (!snew)
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found for portal in"
-                      " polygon '%s/%s'!\n", stmp->GetName (),
-                      ((csObject*)p->GetParent ())->GetName (),
-                      p->GetName ());
-            fatal_exit (0, false);
-          }
-          portal->SetSector (snew->GetPrivateObject ());
-          delete stmp;
-        }
+        ResolvePortalSectors (Engine, onlyRegion, ith->GetPrivateObject ());
+	ith->DecRef ();
       }
     }
   }
@@ -2767,6 +2635,45 @@ bool csLoader::AppendMapFile (csEngine* engine, const char* file,
 
 //---------------------------------------------------------------------------
 
+bool csLoader::LoadPlugins (char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (PLUGIN)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+  char str[255];
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_PLUGIN:
+	ScanStr (params, "%s", str);
+	loaded_plugins.NewPlugIn (name, str, NULL);
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR,
+    	"Token '%s' not found while parsing plugin descriptors!\n",
+	csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
 bool csLoader::LoadTextures (char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -2793,7 +2700,8 @@ bool csLoader::LoadTextures (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a matrix!\n", csGetLastOffender ());
+    CsPrintf (MSG_FATAL_ERROR,
+    	"Token '%s' not found while parsing textures!\n", csGetLastOffender ());
     fatal_exit (0, false);
   }
 
@@ -3021,15 +2929,33 @@ bool csLoader::LoadSounds (char* buf)
 // @@@ MEMORY LEAK!!! We should unload all the plugins we load here.
 csLoader::csLoadedPluginVector csLoader::loaded_plugins;
 
-csLoader::LoadedPlugin::LoadedPlugin (const char *theName, iPlugIn *thePlugin)
+iPlugIn* csLoader::csLoadedPluginVector::FindPlugIn (const char* name,
+	const char* classID)
+{
+  LoadedPlugin* pl = FindPlugInPrivate (name);
+  if (!pl) return NULL;
+  if (!pl->plugin)
+  {
+    // First load the plugin.
+    pl->plugin = LOAD_PLUGIN (System, pl->name, classID, iLoaderPlugIn);
+  }
+  return pl->plugin;
+}
+
+csLoader::LoadedPlugin::LoadedPlugin (const char* shortName,
+	const char *theName, iPlugIn *thePlugin)
 { 
-  name = strnew (theName); plugin = thePlugin; 
+  if (shortName) short_name = strnew (shortName);
+  else short_name = NULL;
+  name = strnew (theName);
+  plugin = thePlugin; 
 }
 
 csLoader::LoadedPlugin::~LoadedPlugin ()
 { 
+  delete [] short_name; 
   delete [] name; 
-  plugin->DecRef (); 
+  if (plugin) plugin->DecRef (); 
 }                                                                                  
 //---------------------------------------------------------------------------
 
@@ -3190,12 +3116,12 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", str);
-	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str);
+	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str, "MeshLdr");
 	  if (!plug)
 	  {
 	    printf ("Plugin '%s' loaded!\n", str);
 	    plug = LOAD_PLUGIN (System, str, "MeshLdr", iLoaderPlugIn);
-	    if (plug) loaded_plugins.NewPlugIn (str, plug);
+	    if (plug) loaded_plugins.NewPlugIn (NULL, str, plug);
 	  }
 	}
         break;
@@ -3310,8 +3236,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
       case CS_TOKEN_HARDMOVE:
         {
           char* params2;
-	  csMatrix3 m;
-	  csVector3 v (0);
+	  csReversibleTransform tr;
           while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
             if (!params2)
@@ -3324,17 +3249,21 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
             {
               case CS_TOKEN_MATRIX:
               {
+		csMatrix3 m;
                 load_matrix (params2, m);
+                tr.SetT2O (m);
                 break;
               }
               case CS_TOKEN_V:
               {
+		csVector3 v;
                 load_vector (params2, v);
+		tr.SetOrigin (v);
                 break;
               }
             }
           }
-	  mesh->HardTransform (csTransform (m, v));
+	  mesh->HardTransform (tr);
         }
         break;
       case CS_TOKEN_MOVE:
@@ -3392,12 +3321,12 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", str);
-	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str);
+	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str, "MeshLdr");
 	  if (!plug)
 	  {
 	    printf ("Plugin '%s' loaded!\n", str);
 	    plug = LOAD_PLUGIN (System, str, "MeshLdr", iLoaderPlugIn);
-	    if (plug) loaded_plugins.NewPlugIn (str, plug);
+	    if (plug) loaded_plugins.NewPlugIn (NULL, str, plug);
 	  }
 	}
         break;
@@ -3479,13 +3408,14 @@ bool csLoader::LoadTerrainObjectFactory (csTerrainFactoryWrapper* pWrapper,
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", pStr);
-	  iPlugIn = (iLoaderPlugIn*)loaded_plugins.FindPlugIn( pStr );
+	  iPlugIn = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (pStr,
+	  	"TerrainLdr");
 	  if (!iPlugIn)
 	  {
 	    printf ("Plugin '%s' loaded!\n", pStr);
 	    iPlugIn = LOAD_PLUGIN (System, pStr, "TerrainLdr", iLoaderPlugIn);
 	    if (iPlugIn)
-              loaded_plugins.NewPlugIn (pStr, iPlugIn);
+              loaded_plugins.NewPlugIn (NULL, pStr, iPlugIn);
 	  }
 	}
         break;
@@ -3567,13 +3497,14 @@ bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper,
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", pStr);
-	  iPlugIn = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (pStr);
+	  iPlugIn = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (pStr,
+	  	"TerrainLdr");
 	  if (!iPlugIn)
 	  {
 	    printf ("Plugin '%s' loaded!\n", pStr);
 	    iPlugIn = LOAD_PLUGIN (System, pStr, "TerrainLdr", iLoaderPlugIn);
 	    if (iPlugIn)
-              loaded_plugins.NewPlugIn (pStr, iPlugIn);
+              loaded_plugins.NewPlugIn (NULL, pStr, iPlugIn);
 	  }
 	}
         break;
@@ -3634,12 +3565,12 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", str);
-	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str);
+	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str, "Loader");
 	  if (!plug)
 	  {
 	    printf ("Plugin '%s' loaded!\n", str);
 	    plug = LOAD_PLUGIN (System, str, "Loader", iLoaderPlugIn);
-	    if (plug) loaded_plugins.NewPlugIn (str, plug);
+	    if (plug) loaded_plugins.NewPlugIn (NULL, str, plug);
 	  }
 	}
         break;

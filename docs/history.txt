@@ -1,5 +1,94 @@
 The history order has been reversed so that new features are at the top.
 
+6-Apr-2001
+	- Wouter Wijngaards added /usr/lib/crystalspace to the installation
+	  search for the unix driver.
+	- Fixed a bug in drawing of things which are represented in the
+	  mesh object system. The movable is now taken from the mesh
+	  wrapper.
+	- Fixed bug in lighting of things (CheckFrustum). The movable
+	  is now a parameter to CheckFrustum.
+	- Fixed lighting for mesh object things used in a BSP tree as well.
+	- Added new iMaterialList interface and let csMaterialList implement
+	  it.
+	- Fixed SCF declarations for csMaterialWrapper. It was using
+	  DECLARE_IBASE() when it should have used
+	  DECLARE_IBASE_EXT (csPObject).
+	- Added iEngine::GetMaterialList().
+	- Extended iThingState with ReplaceMaterials().
+	- Using all of the above I implemented material sets in the
+	  thing loader plugin.
+	- Added support for SKYDOME keyword in thing loader plugin.
+	- Removed support for TEXTURE statement in bezier template loader.
+	  I have absolutely no idea why it was there but it was making
+	  life difficult for me :-)
+	- Moved loading of bezier templates from THING to WORLD level where
+	  it belongs. The new CURVE command in THING will no longer load the
+	  template but instead make a curve based on a named curve template.
+	- Curved surfaces are fully working again (also with HARDMOVE).
+	  It was a combination of several bugs that prevented the donut
+	  in flarge from looking ok.
+	- Added temporary CreateBezierTemplate() and FindCurveTemplate()
+	  functions to iEngine. These are going to be used for a new addon
+	  that loads bezier templates in the engine. Later bezier templates
+	  will move to the thing plugin itself and then these functions
+	  can be removed.
+	- Changed crystalspace.mesh.loader.plane to
+	  crystalspace.mesh.loader.thing.plane.
+	- Added new bezier loader and saver to the thing loader plugin.
+	  Bezier curve templates now have to be loaded through the ADDON
+	  system as well (using crystalspace.mesh.loader.thing.bezier).
+	- Added SetVertex() to iCurveTemplate.
+	- Added iThingState::CreateCurve() to create a curve for a thing
+	  from a given curve template.
+	- Added iThingState::AddCurveVertex().
+	- These changes make the thing loader plugin complete (except for
+	  saving which is not implemented yet).
+	- Removed support for loading BEZIER curve templates from the
+	  standard loader. This should now be done using the ADDON
+	  mechanism described above. Update flarge for these changes. Look
+	  there for an example.
+	- Fixed a bug in HARDMOVE command for mesh objects in loader. This
+	  bug would cause things to be transformed wrong (at least their
+	  transformation matrix) when used as a mesh object. It also affected
+	  other mesh objects.
+	- Added a new optional PLUGINS section to the world file. With that
+	  you can give shorter names to plugins. This shorter name can be
+	  used later in PLUGIN (...) statements instead of
+	  'crystalspace.mesh.loader...'. The long plugin name is stil.
+	  supported. Also note that a plugin will only be loaded if used.
+	  So you can safely mention all plugins in the PLUGINS statement.
+	  They will not be loaded until used.
+	- Discovered that nearly all of the mesh loaders forgot to call
+	  SetFactory().
+	- Made the thing loader a bit easier with regards to the difference
+	  between loading a mesh object and mesh object factory. For csThing
+	  there is no difference. The difference is only in how the thing
+	  is used in the engine. This means that things are the only mesh
+	  objects that don't need a factory for creation.
+	- Extended a hack in csloader with another temporary hack so that
+	  portals in thing mesh objects are actually resolved to the right
+	  sector. We need a better solution for this. Not sure how yet.
+	- Added 'link' parameter to iEngine::CreateSector(). By default this
+	  is true. When link is true the created sector will be added to the
+	  list of sectors of the engine. This should be set to false if
+	  you want to create a temporary sector that should not be added
+	  to the engine sector list. A good example of this is when the
+	  portal command generates a dummy sector that is resolved later.
+	- Fixed collision detection bug in walktest. Walktest was trying
+	  to query the csMeshWrapper for iPolygonMesh. It should query
+	  the mesh object that is in the wrapper instead.
+	- Extended csSector::IntersectSegment() to also look at things
+	  inside mesh wrappers. This is an ugly solution and as many things
+	  I'm doing these days it begs for a better solution. But first
+	  getting things working again...
+	- Also added initialization of collision detection for meshes
+	  inside sectors. Now thing meshes will have proper collision
+	  detection as well.
+	- Added Yet Another Ugly Hack so that the engine will see if a thing
+	  (inside a mesh wrapper) has CS_THING_VISTREE set and then use
+	  that for visibility culling. People, keep in mind that all these
+	  hacks are temporary :-)
 5-Apr-2001
 	- Fixed a bug in iPortal which prevented proper linking of all
 	  CS apps on some platforms.

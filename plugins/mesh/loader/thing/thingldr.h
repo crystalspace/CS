@@ -129,5 +129,57 @@ public:
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 };
 
+/**
+ * Bezier template loader.
+ */
+class csBezierLoader : public iLoaderPlugIn
+{
+private:
+  iSystem* sys;
+
+public:
+  /// Constructor.
+  csBezierLoader (iBase*);
+
+  /// Destructor.
+  virtual ~csBezierLoader ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+public:
+  //------------------------ iLoaderPlugIn implementation --------------
+  DECLARE_IBASE;
+
+  /// Parse a given string and return a new object for it.
+  virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
+};
+
+/**
+ * Bezier template saver.
+ */
+class csBezierSaver : public iSaverPlugIn
+{
+private:
+  iSystem* sys;
+
+public:
+  /// Constructor.
+  csBezierSaver (iBase*);
+
+  /// Destructor.
+  virtual ~csBezierSaver ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+public:
+  //------------------------ iSaverPlugIn implementation --------------
+  DECLARE_IBASE;
+
+  /// Write down given object and add to string vector.
+  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+};
+
 #endif // _THINGLDR_H
 

@@ -258,7 +258,7 @@ void csStatLight::CalculateLighting (csThing* th)
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
-  th->CheckFrustum ((iFrustumView*)&lview);
+  th->CheckFrustum ((iFrustumView*)&lview, &(th->GetMovable ().scfiMovable));
 }
 
 void csStatLight::CalculateLighting (iMeshWrapper* th)
@@ -285,7 +285,7 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
   	iThingState);
   if (thing_state)
   {
-    thing_state->CheckFrustum ((iFrustumView*)&lview);
+    thing_state->CheckFrustum ((iFrustumView*)&lview, th->GetMovable ());
     thing_state->DecRef ();
   }
 }

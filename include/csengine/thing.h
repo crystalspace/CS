@@ -447,6 +447,9 @@ public:
   csCurve* GetCurve (int idx)
   { return curves.Get (idx); }
 
+  /// Create a curve from a template.
+  iCurve* CreateCurve (iCurveTemplate* tmpl);
+
   /// Get the named curve from this set.
   csCurve* GetCurve (char* name);
 
@@ -463,7 +466,7 @@ public:
   csVector2& CurveTexel (int i) { return curve_texels[i]; }
 
   /// Add a curve vertex and return the index of the vertex.
-  int AddCurveVertex (csVector3& v, csVector2& t);
+  int AddCurveVertex (const csVector3& v, const csVector2& t);
 
   /// Get the curve scale.
   float GetCurvesScale () { return curves_scale; }
@@ -512,7 +515,7 @@ public:
    * that will be used is called 'pref_blabla'. If that material cannot
    * be found then the original material will be used.
    */
-  void ReplaceMaterials (csMaterialList* matList, const char* prefix);
+  void ReplaceMaterials (iMaterialList* matList, const char* prefix);
 
   /// Set parent template.
   void SetTemplate (csThing *t)
@@ -690,13 +693,13 @@ public:
   /**
    * Check frustum visibility on this thing.
    */
-  void RealCheckFrustum (iFrustumView* lview);
+  void RealCheckFrustum (iFrustumView* lview, iMovable* movable);
 
   /**
    * Check frustum visibility on this thing.
    * First initialize the 2D culler cube.
    */
-  void CheckFrustum (iFrustumView* lview);
+  void CheckFrustum (iFrustumView* lview, iMovable* movable);
 
   /**
    * Return a list of shadow frustums which extend from
@@ -852,8 +855,8 @@ public:
     { scfParent->InitLightMaps (do_cache); }
     virtual void CacheLightMaps ()
     { scfParent->CacheLightMaps (); }
-    virtual void CheckFrustum (iFrustumView* fview)
-    { scfParent->CheckFrustum (fview); }
+    virtual void CheckFrustum (iFrustumView* fview, iMovable* movable)
+    { scfParent->CheckFrustum (fview, movable); }
     virtual csFlags& GetFlags () { return scfParent->flags; }
     virtual int GetMovingOption ()
     { return scfParent->GetMovingOption (); }
@@ -878,11 +881,24 @@ public:
     virtual csVector2& CurveTexel (int i)
     { return scfParent->CurveTexel (i); }
     virtual iCurve* GetCurve (int idx);
+    virtual iCurve* CreateCurve (iCurveTemplate* tmpl)
+    {
+      return scfParent->CreateCurve (tmpl);
+    }
     virtual void MergeTemplate (iThingState* tpl,
   	iMaterialWrapper* default_material = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL)
     {
       scfParent->MergeTemplate (tpl, default_material, shift, transform);
+    }
+    virtual void ReplaceMaterials (iMaterialList* materials,
+    	const char* prefix)
+    {
+      scfParent->ReplaceMaterials (materials, prefix);
+    }
+    virtual void AddCurveVertex (const csVector3& v, const csVector2& uv)
+    {
+      scfParent->AddCurveVertex (v, uv);
     }
   } scfiThingState;
   friend struct ThingState;

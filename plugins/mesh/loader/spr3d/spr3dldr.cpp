@@ -841,6 +841,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+	  imeshwrap->SetFactory (fact);
           spr3dLook = QUERY_INTERFACE (mesh, iSprite3DState);
 	}
 	break;

@@ -325,6 +325,7 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+	  imeshwrap->SetFactory (fact);
           partstate = QUERY_INTERFACE (mesh, iParticleState);
           snowstate = QUERY_INTERFACE (mesh, iSnowState);
 	}

@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 2000 by W.C.A. Wijngaards
   
     This library is free software; you can redistribute it and/or
@@ -76,9 +77,9 @@ void csMaterial::GetReflection (float &oDiffuse, float &oAmbient,
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csMaterialWrapper)
+IMPLEMENT_IBASE_EXT (csMaterialWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialWrapper)
-IMPLEMENT_IBASE_END
+IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csMaterialWrapper::MaterialWrapper)
   IMPLEMENTS_INTERFACE (iMaterialWrapper)
@@ -89,7 +90,6 @@ IMPLEMENT_CSOBJTYPE (csMaterialWrapper, csPObject);
 csMaterialWrapper::csMaterialWrapper (iMaterial* material) :
   csPObject (), handle (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   csMaterialWrapper::material = material;
   material->IncRef ();
@@ -99,7 +99,6 @@ csMaterialWrapper::csMaterialWrapper (iMaterial* material) :
 csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &th) :
   csPObject (), handle (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   (material = th.material)->IncRef ();
   handle = th.GetMaterialHandle ();
@@ -110,7 +109,6 @@ csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &th) :
 csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
   csPObject (), material (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   ith->IncRef ();
   handle = ith;
@@ -147,6 +145,20 @@ void csMaterialWrapper::Visit ()
 }
 
 //------------------------------------------------------ csMaterialList -----//
+
+IMPLEMENT_IBASE (csMaterialList)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialList)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csMaterialList::MaterialList)
+  IMPLEMENTS_INTERFACE (iMaterialList)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+csMaterialList::csMaterialList () : csNamedObjVector (16, 16)
+{
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
+}
 
 csMaterialList::~csMaterialList ()
 {

@@ -41,6 +41,7 @@
 #include "iengine/material.h"
 #include "iengine/polytmap.h"
 #include "iengine/ptextype.h"
+#include "iengine/curve.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -55,6 +56,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (CONVEX)
   CS_TOKEN_DEF (COSFACT)
   CS_TOKEN_DEF (COPY)
+  CS_TOKEN_DEF (CURVE)
   CS_TOKEN_DEF (CURVECENTER)
   CS_TOKEN_DEF (CURVECONTROL)
   CS_TOKEN_DEF (CURVESCALE)
@@ -85,6 +87,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (PLANE)
   CS_TOKEN_DEF (POLYGON)
   CS_TOKEN_DEF (PORTAL)
+  CS_TOKEN_DEF (RADIUS)
   CS_TOKEN_DEF (ROT)
   CS_TOKEN_DEF (ROT_X)
   CS_TOKEN_DEF (ROT_Y)
@@ -136,10 +139,22 @@ IMPLEMENT_IBASE (csPlaneSaver)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csBezierLoader)
+  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_IBASE (csBezierSaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_FACTORY (csThingLoader)
 IMPLEMENT_FACTORY (csThingSaver)
 IMPLEMENT_FACTORY (csPlaneLoader)
 IMPLEMENT_FACTORY (csPlaneSaver)
+IMPLEMENT_FACTORY (csBezierLoader)
+IMPLEMENT_FACTORY (csBezierSaver)
 
 EXPORT_CLASS_TABLE (thingldr)
   EXPORT_CLASS (csThingLoader, "crystalspace.mesh.loader.factory.thing",
@@ -150,10 +165,14 @@ EXPORT_CLASS_TABLE (thingldr)
     "Crystal Space Thing Mesh Loader")
   EXPORT_CLASS (csThingSaver, "crystalspace.mesh.saver.thing",
     "Crystal Space Thing Mesh Saver")
-  EXPORT_CLASS (csPlaneLoader, "crystalspace.mesh.loader.plane",
+  EXPORT_CLASS (csPlaneLoader, "crystalspace.mesh.loader.thing.plane",
     "Crystal Space Thing Plane Loader")
-  EXPORT_CLASS (csPlaneSaver, "crystalspace.mesh.saver.plane",
+  EXPORT_CLASS (csPlaneSaver, "crystalspace.mesh.saver.thing.plane",
     "Crystal Space Thing Plane Saver")
+  EXPORT_CLASS (csBezierLoader, "crystalspace.mesh.loader.thing.bezier",
+    "Crystal Space Thing Bezier Loader")
+  EXPORT_CLASS (csBezierSaver, "crystalspace.mesh.saver.thing.bezier",
+    "Crystal Space Thing Bezier Saver")
 EXPORT_CLASS_TABLE_END
 
 #define MAXLINE 200 /* max number of chars per line... */
@@ -363,6 +382,205 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
+static bool skydome_process (iThingState* thing_state, char* name, char* buf,
+        iMaterialWrapper* material, int vt_offset)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (RADIUS)
+    CS_TOKEN_TABLE (VERTICES)
+    CS_TOKEN_TABLE (LIGHTING)
+  CS_TOKEN_TABLE_END
+
+  long cmd;
+  char* params;
+  float radius = 0.0f;
+  int i, j;
+  int num = 0;
+  iPolyTexType* ptt;
+  iPolyTexGouraud* gs;
+  iPolyTexFlat* fs;
+
+  // Previous vertices.
+  int prev_vertices[60];        // @@@ HARDCODED!
+  float prev_u[60];
+  float prev_v[60];
+
+  char poly_name[30], * end_poly_name;
+  strcpy (poly_name, name);
+  end_poly_name = strchr (poly_name, 0);
+  int lighting_flags = CS_POLY_LIGHTING;
+
+  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  {
+    switch (cmd)
+    {
+      case CS_TOKEN_RADIUS:
+        ScanStr (params, "%f", &radius);
+        break;
+      case CS_TOKEN_VERTICES:
+        ScanStr (params, "%D", prev_vertices, &num);
+	for (i = 0 ; i < num ; i++)
+	  prev_vertices[i] += vt_offset;
+        break;
+      case CS_TOKEN_LIGHTING:
+        {
+	  int do_lighting;
+          ScanStr (params, "%b", &do_lighting);
+	  if (do_lighting) lighting_flags = CS_POLY_LIGHTING;
+	  else lighting_flags = 0;
+        }
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    printf ("Token '%s' not found while parsing a skydome!\n",
+    	csGetLastOffender ());
+    return false;
+  }
+
+  csMatrix3 t_m;
+  csVector3 t_v (0, 0, 0);
+
+  // If radius is negative we have an up-side-down skydome.
+  float vert_radius = radius;
+  if (radius < 0) radius = -radius;
+
+  // Number of degrees between layers.
+  float radius_step = 180. / num;
+
+  // Calculate u,v for the first series of vertices (the outer circle).
+  for (j = 0 ; j < num ; j++)
+  {
+    float angle = 2.*radius_step*j * 2.*M_PI/360.;
+    if (vert_radius < 0) angle = 2.*M_PI-angle;
+    prev_u[j] = cos (angle) * .5 + .5;
+    prev_v[j] = sin (angle) * .5 + .5;
+  }
+
+  // Array with new vertex indices.
+  int new_vertices[60];         // @@@ HARDCODED == BAD == EASY!
+  float new_u[60];
+  float new_v[60];
+
+  // First create the layered triangle strips.
+  for (i = 1 ; i < num/2 ; i++)
+  {
+    //-----
+    // First create a new series of vertices.
+    //-----
+    // Angle from the center to the new circle of vertices.
+    float new_angle = i*radius_step * 2.*M_PI/360.;
+    // Radius of the new circle of vertices.
+    float new_radius = radius * cos (new_angle);
+    // Height of the new circle of vertices.
+    float new_height = vert_radius * sin (new_angle);
+    // UV radius.
+    float uv_radius = (1. - 2.*(float)i/(float)num) * .5;
+    for (j = 0 ; j < num ; j++)
+    {
+      float angle = j*2.*radius_step * 2.*M_PI/360.;
+      if (vert_radius < 0) angle = 2.*M_PI-angle;
+      new_vertices[j] = thing_state->CreateVertex (
+      	csVector3 (
+                         new_radius * cos (angle),
+                         new_height,
+                         new_radius * sin (angle)));
+      new_u[j] = uv_radius * cos (angle) + .5;
+      new_v[j] = uv_radius * sin (angle) + .5;
+    }
+
+    //-----
+    // Now make the triangle strips.
+    //-----
+    for (j = 0 ; j < num ; j++)
+    {
+      sprintf (end_poly_name, "%d_%d_A", i, j);
+      iPolygon3D* p = thing_state->CreatePolygon (poly_name);
+      p->SetMaterial (material);
+      p->GetFlags ().Set (CS_POLY_LIGHTING, lighting_flags);
+      p->SetCosinusFactor (1);
+      p->CreateVertex (prev_vertices[j]);
+      p->CreateVertex (new_vertices[(j+1)%num]);
+      p->CreateVertex (new_vertices[j]);
+      p->SetTextureType (POLYTXT_GOURAUD);
+      ptt = p->GetPolyTexType ();
+      gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
+      fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
+      gs->Setup (p);
+      fs->SetUV (0, prev_u[j], prev_v[j]);
+      fs->SetUV (1, new_u[(j+1)%num], new_v[(j+1)%num]);
+      fs->SetUV (2, new_u[j], new_v[j]);
+      fs->DecRef ();
+      gs->DecRef ();
+
+      p->SetTextureSpace (t_m, t_v);
+
+      sprintf (end_poly_name, "%d_%d_B", i, j);
+      p = thing_state->CreatePolygon (poly_name);
+      p->SetMaterial (material);
+      p->GetFlags ().Set (CS_POLY_LIGHTING, lighting_flags);
+      p->SetCosinusFactor (1);
+      p->CreateVertex (prev_vertices[j]);
+      p->CreateVertex (prev_vertices[(j+1)%num]);
+      p->CreateVertex (new_vertices[(j+1)%num]);
+      p->SetTextureType (POLYTXT_GOURAUD);
+      ptt = p->GetPolyTexType ();
+      gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
+      fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
+      gs->Setup (p);
+      fs->SetUV (0, prev_u[j], prev_v[j]);
+      fs->SetUV (1, prev_u[(j+1)%num], prev_v[(j+1)%num]);
+      fs->SetUV (2, new_u[(j+1)%num], new_v[(j+1)%num]);
+      fs->DecRef ();
+      gs->DecRef ();
+      p->SetTextureSpace (t_m, t_v);
+    }
+
+    //-----
+    // Copy the new vertex array to prev_vertices.
+    //-----
+    for (j = 0 ; j < num ; j++)
+    {
+      prev_vertices[j] = new_vertices[j];
+      prev_u[j] = new_u[j];
+      prev_v[j] = new_v[j];
+    }
+  }
+
+  // Create the top vertex.
+  int top_vertex = thing_state->CreateVertex (csVector3 (0, vert_radius, 0));
+  float top_u = .5;
+  float top_v = .5;
+
+  //-----
+  // Make the top triangle fan.
+  //-----
+  for (j = 0 ; j < num ; j++)
+  {
+    sprintf (end_poly_name, "%d_%d", num/2, j);
+    iPolygon3D* p = thing_state->CreatePolygon (poly_name);
+    p->SetMaterial (material);
+    p->GetFlags ().Set (CS_POLY_LIGHTING, lighting_flags);
+    p->SetCosinusFactor (1);
+    p->CreateVertex (top_vertex);
+    p->CreateVertex (prev_vertices[j]);
+    p->CreateVertex (prev_vertices[(j+1)%num]);
+    p->SetTextureType (POLYTXT_GOURAUD);
+    ptt = p->GetPolyTexType ();
+    gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
+    fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
+    gs->Setup (p);
+    fs->SetUV (0, top_u, top_v);
+    fs->SetUV (1, prev_u[j], prev_v[j]);
+    fs->SetUV (2, prev_u[(j+1)%num], prev_v[(j+1)%num]);
+    fs->DecRef ();
+    gs->DecRef ();
+    p->SetTextureSpace (t_m, t_v);
+  }
+  return true;
+}
+
 static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   iMaterialWrapper* default_material, float default_texlen,
   iThingState* thing_state, int vt_offset)
@@ -504,7 +722,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
       case CS_TOKEN_PORTAL:
         {
           ScanStr (params, "%s", str);
-          iSector* s = engine->CreateSector (str);
+          iSector* s = engine->CreateSector (str, false);
           poly3d->CreatePortal (s);
         }
         break;
@@ -847,18 +1065,18 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   return poly3d;
 }
 
-static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
-	iEngine* engine, iBase* loadingObj,
+static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
+	iEngine* engine,
 	iThingState* thing_state, char* buf, int vt_offset, bool isParent)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (VERTEX)
     CS_TOKEN_TABLE (CIRCLE)
     CS_TOKEN_TABLE (POLYGON)
-    CS_TOKEN_TABLE (BEZIER)
     CS_TOKEN_TABLE (CURVECENTER)
     CS_TOKEN_TABLE (CURVESCALE)
     CS_TOKEN_TABLE (CURVECONTROL)
+    CS_TOKEN_TABLE (CURVE)
     CS_TOKEN_TABLE (MAT_SET_SELECT)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (TEXLEN)
@@ -875,6 +1093,7 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
     CS_TOKEN_TABLE (FACTORY)
   CS_TOKEN_TABLE_END
 
+  char* name = NULL;
   char* xname;
   long cmd;
   char* params;
@@ -885,7 +1104,7 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
     if (!params)
     {
       printf ("Expected parameters instead of '%s'!\n", buf);
-      return NULL;
+      return false;
     }
     switch (cmd)
     {
@@ -893,7 +1112,7 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
         if (!isParent)
 	{
 	  printf ("VISTREE flag only for top-level thing!\n");
-	  return NULL;
+	  return false;
 	}
         else thing_state->GetFlags ().Set (CS_THING_VISTREE);
         break;
@@ -901,41 +1120,16 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
         if (!isParent)
 	{
 	  printf ("MOVEABLE flag only for top-level thing!\n");
-	  return NULL;
+	  return false;
 	}
         else thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
         break;
+      case CS_TOKEN_TEMPLATE:
       case CS_TOKEN_FACTORY:
         if (!isParent)
 	{
-	  printf ("FACTORY statement only for top-level thing!\n");
-	  return NULL;
-	}
-	else
-        {
-      	  if (thing_state != NULL)
-	  {
-	    printf ("Don't use FACTORY when parsing a factory!\n");
-	    return NULL;
-	  }
-          ScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
-	  if (!fact)
-	  {
-	    // @@@ Error handling!
-	    printf ("Couldn't find factory '%s' when loading a thing!\n", str);
-	    return NULL;
-	  }
-	  loadingObj = fact->GetMeshObjectFactory ()->NewInstance ();
-	  imeshwrap->SetFactory (fact);
-	  thing_state = QUERY_INTERFACE (loadingObj, iThingState);
-	  break;
-	}
-      case CS_TOKEN_TEMPLATE:
-        if (!isParent)
-	{
-	  printf ("TEMPLATE statement only for top-level thing!\n");
-	  return NULL;
+	  printf ("FACTORY or TEMPLATE statement only for top-level thing!\n");
+	  return false;
 	}
 	else
         {
@@ -943,31 +1137,33 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
           if (!fact)
           {
-            printf ("Couldn't find thing template '%s'!\n", str);
-            return NULL;
+            printf ("Couldn't find thing factory '%s'!\n", str);
+            return false;
           }
 	  iThingState* tmpl_thing_state = QUERY_INTERFACE (
 	  	fact->GetMeshObjectFactory (), iThingState);
+	  if (cmd == CS_TOKEN_FACTORY && imeshwrap)
+	    imeshwrap->SetFactory (fact);
 	  if (!tmpl_thing_state)
 	  {
             printf ("Object '%s' is not a thing!\n", str);
-            return NULL;
+            return false;
 	  }
 	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
 	  tmpl_thing_state->DecRef ();
-	  //@@@if (info.use_mat_set)
-          //{
-	    //thing_state->ReplaceMaterials (Engine->GetMaterials (),
-	      //info.mat_set_name);
-	    //info.use_mat_set = false;
-	  //}
+	  if (info.use_mat_set)
+          {
+	    thing_state->ReplaceMaterials (engine->GetMaterialList (),
+	      info.mat_set_name);
+	    info.use_mat_set = false;
+	  }
         }
         break;
       case CS_TOKEN_CLONE:
         if (!isParent)
 	{
 	  printf ("CLONE statement only for top-level thing!\n");
-	  return NULL;
+	  return false;
 	}
 	else
         {
@@ -976,7 +1172,7 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
           if (!wrap)
           {
             printf ("Couldn't find thing '%s'!\n", str);
-            return NULL;
+            return false;
           }
 
 	  iThingState* tmpl_thing_state = QUERY_INTERFACE (
@@ -984,27 +1180,26 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	  if (!tmpl_thing_state)
 	  {
             printf ("Object '%s' is not a thing!\n", str);
-            return NULL;
+            return false;
 	  }
 	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
 	  tmpl_thing_state->DecRef ();
-	  //@@@if (info.use_mat_set)
-          //{
-	    //thing_state->ReplaceMaterials (Engine->GetMaterials (),
-	      //info.mat_set_name);
-	    //info.use_mat_set = false;
-	  //}
+	  if (info.use_mat_set)
+          {
+	    thing_state->ReplaceMaterials (engine->GetMaterialList (),
+	      info.mat_set_name);
+	    info.use_mat_set = false;
+	  }
         }
         break;
       case CS_TOKEN_PART:
-	if (!load_thing_part (info, imeshwrap, engine, loadingObj,
+	if (!load_thing_part (info, imeshwrap, engine,
 		thing_state, params, thing_state->GetVertexCount (), false))
-	  return NULL;
+	  return false;
         break;
       case CS_TOKEN_SKYDOME:
-      //@@@
-        //skydome_process (*thing, xname, params, info.default_material,
-	    //vt_offset);
+        skydome_process (thing_state, name, params, info.default_material,
+	    vt_offset);
         break;
       case CS_TOKEN_VERTEX:
         {
@@ -1041,12 +1236,14 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
         }
         break;
       case CS_TOKEN_FOG:
+      	printf ("FOG for things is currently not supported!\n\
+Nag to Jorrit about this feature if you want it.\n");
 #if 0
 //@@@
         if (!isParent)
 	{
 	  printf ("FOG statement only for top-level thing!\n");
-	  return NULL;
+	  return false;
 	}
 	else
         {
@@ -1062,28 +1259,19 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	  iPolygon3D* poly3d = load_poly3d (engine, xname, params,
             info.default_material, info.default_texlen,
 	    thing_state, vt_offset);
-	  if (!poly3d) return NULL;
+	  if (!poly3d) return false;
         }
         break;
 
-      case CS_TOKEN_BEZIER:
+      case CS_TOKEN_CURVE:
         {
-#if 0
-//@@@
-          csCurveTemplate* ct = load_beziertemplate (xname, params,
-	      info.default_material, info.default_texlen,
-	      thing->GetCurveVertices ());
-	  Engine->curve_templates.Push (ct);
-	  csCurve* p = ct->MakeCurve ();
-	  p->SetName (ct->GetName ());
-	  p->SetParent (thing);
-          if (!ct->GetMaterialWrapper ())
-	    p->SetMaterialWrapper (info.default_material);
-	  int j;
-          for (j = 0 ; j < ct->NumVertices () ; j++)
-            p->SetControlPoint (j, ct->GetVertex (j));
-	  thing->AddCurve (p);
-#endif
+	  char cname[100];
+	  ScanStr (params, "%s", cname);
+	  iCurveTemplate* ct = engine->FindCurveTemplate (cname/* @@@ Onlyregion?*/);
+	  iCurve* p = thing_state->CreateCurve (ct);
+	  p->SetName (name);
+          if (!ct->GetMaterial ())
+	    p->SetMaterial (info.default_material);
         }
         break;
 
@@ -1103,13 +1291,10 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
         }
       case CS_TOKEN_CURVECONTROL:
         {
-#if 0
-//@@@
           csVector3 v;
           csVector2 t;
           ScanStr (params, "%f,%f,%f:%f,%f", &v.x, &v.y, &v.z,&t.x,&t.y);
-          thing->AddCurveVertex (v, t);
-#endif
+          thing_state->AddCurveVertex (v, t);
         }
         break;
 
@@ -1120,7 +1305,7 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
         if (info.default_material == NULL)
         {
           printf ("Couldn't find material named '%s'!\n", str);
-          return NULL;
+          return false;
         }
         break;
       case CS_TOKEN_TEXLEN:
@@ -1137,10 +1322,9 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
   {
     printf ("Token '%s' not found while parsing a thing!\n",
     	csGetLastOffender ());
-    printf ("buf=%s\n", buf);
-    return NULL;
+    return false;
   }
-  return loadingObj;
+  return true;
 }
 
 iBase* csThingLoader::Parse (const char* string, iEngine* engine,
@@ -1155,18 +1339,22 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
   	iMeshFactoryWrapper);
   if (ifactmeshwrap) ifactmeshwrap->DecRef ();
 
-  // If ifactmeshwrap!=NULL we are loading for a factory.
-  if (ifactmeshwrap != NULL)
-  {
-    iMeshObjectType* type = engine->GetThingType (); // @@@ LOAD_PLUGIN LATER!
-    fact = type->NewFactory ();
-    thing_state = QUERY_INTERFACE (fact, iThingState);
-  }
+  iMeshObjectType* type = engine->GetThingType (); // @@@ LOAD_PLUGIN LATER!
+  // We always do NewFactory() even for mesh objects.
+  // That's because csThing implements both so a factory is a mesh object.
+  fact = type->NewFactory ();
+  thing_state = QUERY_INTERFACE (fact, iThingState);
 
   char* buf = (char*)string;
   ThingLoadInfo info;
-  return load_thing_part (info, imeshwrap, engine, fact, thing_state,
-  	buf, 0, true);
+  if (load_thing_part (info, imeshwrap, engine, thing_state,
+  	buf, 0, true))
+    return fact;
+  else
+  {
+    fact->DecRef ();
+    return NULL;
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -1352,6 +1540,112 @@ bool csPlaneSaver::Initialize (iSystem* system)
 }
 
 void csPlaneSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,
+  iEngine* /*engine*/)
+{
+}
+
+//---------------------------------------------------------------------------
+
+csBezierLoader::csBezierLoader (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csBezierLoader::~csBezierLoader ()
+{
+}
+
+bool csBezierLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
+	iBase* /*context*/)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (NAME)
+    CS_TOKEN_TABLE (VERTICES)
+  CS_TOKEN_TABLE_END
+
+  char *xname;
+  long cmd;
+  int i;
+  char *params;
+  char name[100];
+
+  iCurveTemplate* tmpl = engine->CreateBezierTemplate ();
+
+  iMaterialWrapper* mat = NULL;
+  char str[255];
+
+  char* buf = (char*)string;
+  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
+  {
+    if (!params)
+    {
+      printf ("Expected parameters instead of '%s'!\n", buf);
+      return NULL;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_NAME:
+        ScanStr (params, "%s", name);
+	tmpl->SetName (name);
+        break;
+      case CS_TOKEN_MATERIAL:
+        ScanStr (params, "%s", str);
+        mat = engine->FindMaterial (str/*@@@, onlyRegion*/); //@@@ REGION SUPPORT?
+        if (mat == NULL)
+        {
+          printf ("Couldn't find material named '%s'!\n", str);
+          return NULL;
+        }
+        tmpl->SetMaterial (mat);
+        break;
+      case CS_TOKEN_VERTICES:
+        {
+          int list[100], num;
+          ScanStr (params, "%D", list, &num);
+          if (num != 9)
+          {
+            printf ("Wrong number of vertices to bezier!\n");
+            return NULL;
+          }
+          for (i = 0 ; i < num ; i++) tmpl->SetVertex (i, list[i]);
+        }
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    printf ("Token '%s' not found while parsing a bezier template!\n",
+    	csGetLastOffender ());
+    return NULL;
+  }
+  return tmpl;
+}
+
+//---------------------------------------------------------------------------
+
+csBezierSaver::csBezierSaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csBezierSaver::~csBezierSaver ()
+{
+}
+
+bool csBezierSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+void csBezierSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,
   iEngine* /*engine*/)
 {
 }

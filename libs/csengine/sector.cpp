@@ -345,6 +345,25 @@ void csSector::UseStaticTree (int mode, bool octree)
       break;//@@@@@@ Only support one static_thing for now!!!
     }
   }
+  for (i = 0 ; i < meshes.Length () ; i++)
+  {
+    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
+    // @@@@ VERY UGLY!
+    iThing* ith = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+    if (ith)
+    {
+      csThing* th = ith->GetPrivateObject ();
+      if (th->flags.Check (CS_THING_VISTREE))
+      {
+        static_thing = th;
+        static_thing->BuildStaticTree (mode, octree);
+        culler = QUERY_INTERFACE (static_thing, iVisibilityCuller);
+        culler->DecRef ();
+        break;//@@@@@@ Only support one static_thing for now!!!
+      }
+      ith->DecRef ();
+    }
+  }
 
   // Loop through all things and meshes and update their bounding box in the
   // polygon trees.
@@ -546,6 +565,46 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
 	best_p = p;
 	isect = cur_isect;
       }
+    }
+  }
+  for (i = 0 ; i < meshes.Length () ; i++)
+  {
+    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
+    // @@@ UGLY!!!
+    iThing* ith = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+    if (ith)
+    {
+      csThing* sp = ith->GetPrivateObject ();
+      if (sp != static_thing)
+      {
+        r = best_r;
+	//@@@ Put this in csMeshWrapper???
+        if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
+        {
+          obj_start = start;
+	  obj_end = end;
+        }
+        else
+        {
+          movtrans = mesh->GetMovable ().GetFullTransform ();
+          obj_start = movtrans.Other2This (start);
+	  obj_end = movtrans.Other2This (end);
+        }
+        csPolygon3D* p = sp->IntersectSegment (obj_start, obj_end,
+		obj_isect, &r);
+        if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
+          cur_isect = obj_isect;
+        else
+          cur_isect = movtrans.This2Other (obj_isect);
+
+        if (p && r < best_r)
+        {
+          best_r = r;
+	  best_p = p;
+	  isect = cur_isect;
+        }
+      }
+      ith->DecRef ();
     }
   }
 
@@ -1242,7 +1301,7 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
       {
         csThing* sp = (csThing*)o;
         if (lview->CheckProcessMask (sp->flags.Get ()))
-          sp->RealCheckFrustum (lview);
+          sp->RealCheckFrustum (lview, &(sp->GetMovable ().scfiMovable));
       }
       else
       {
@@ -1255,7 +1314,7 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
 	  csThing* sp = ithing->GetPrivateObject ();
 	  // Only if the thing has right flags do we consider it for shadows.
           if (lview->CheckProcessMask (mesh->flags.Get ()))
-            sp->RealCheckFrustum (lview);
+            sp->RealCheckFrustum (lview, &(mesh->GetMovable ().scfiMovable));
 	  ithing->DecRef ();
 	}
       }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -223,6 +223,21 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
   for (i = 0 ; i < sp->GetNumThings () ; i++)
   {
     csThing* tp = sp->GetThing (i);
+    Sys->collide_system->ResetCollisionPairs ();
+    if (c->Collide (*tp, cdt, &tp->GetMovable ().GetTransform ())) hit++;
+
+    CD_contact = Sys->collide_system->GetCollisionPairs ();
+    for (int j=0 ; j<Sys->collide_system->GetNumCollisionPairs () ; j++)
+      our_cd_contact[num_our_cd++] = CD_contact[j];
+
+    if (Sys->collide_system->GetOneHitOnly () && hit)
+      return 1;
+    // TODO, should test which one is the closest.
+  }
+  // Check collision with the meshes in this sector.
+  for (i = 0 ; i < sp->GetNumberMeshes () ; i++)
+  {
+    csMeshWrapper* tp = sp->GetMesh (i);
     Sys->collide_system->ResetCollisionPairs ();
     if (c->Collide (*tp, cdt, &tp->GetMovable ().GetTransform ())) hit++;
 

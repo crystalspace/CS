@@ -347,6 +347,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+	  imeshwrap->SetFactory (fact);
           spr2dLook = QUERY_INTERFACE (mesh, iSprite2DState);
 	  verts = &(spr2dLook->GetVertices ());
 	}

@@ -32,7 +32,10 @@ struct iPolygon3D;
 struct iGraphics3D;
 struct iFrustumView;
 struct iCurve;
+struct iCurveTemplate;
 struct iMaterialWrapper;
+struct iMaterialList;
+struct iMovable;
 
 /**
  * If CS_THING_VISTREE is set then an octree will be calculated for the
@@ -104,7 +107,7 @@ struct iThing : public iBase
   virtual iMovable* GetMovable () = 0;
 };
 
-SCF_VERSION (iThingState, 0, 0, 3);
+SCF_VERSION (iThingState, 0, 0, 5);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -159,7 +162,7 @@ struct iThingState : public iBase
    * First initialize the 2D culler cube.
    * @@@ Does this belong here?
    */
-  virtual void CheckFrustum (iFrustumView* fview) = 0;
+  virtual void CheckFrustum (iFrustumView* fview, iMovable* movable) = 0;
 
   /// Set thing flags (see CS_THING_... values above)
   virtual csFlags& GetFlags () = 0;
@@ -221,6 +224,8 @@ struct iThingState : public iBase
    */
   virtual void SetCurvesScale (float scale) = 0;
 
+  /// Add a curve vertex.
+  virtual void AddCurveVertex (const csVector3& v, const csVector2& uv) = 0;
   /// Get the number of curves.
   virtual int GetNumCurves () = 0;
   /// Get the curve.
@@ -234,12 +239,25 @@ struct iThingState : public iBase
   /// Get the specified curve texture coordinate (texel).
   virtual csVector2& CurveTexel (int i) = 0;
 
+  /// Create a new curve for this thing from the given template.
+  virtual iCurve* CreateCurve (iCurveTemplate* tmpl) = 0;
+
   /**
    * Add polygons and vertices from the specified thing (seen as template).
    */
   virtual void MergeTemplate (iThingState* tpl,
   	iMaterialWrapper* default_material = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL) = 0;
+
+  /**
+   * Replace the materials in this thing with new materials that are
+   * prefixed by some name. For example, if a polygon in this thing uses
+   * a material 'blabla' and the prefix is 'pref' then the new material
+   * that will be used is called 'pref_blabla'. If that material cannot
+   * be found then the original material will be used.
+   */
+  virtual void ReplaceMaterials (iMaterialList* matList,
+  	const char* prefix) = 0;
 };
 
 #endif

@@ -680,23 +680,10 @@ void csCurve::CalculateLighting (csFrustumView& lview)
 
 void csCurve::HardTransform (const csReversibleTransform& trans)
 {
-  return;//@@@
-  if (_uv2World)
-  {
-    int lm_width = lightmap->GetWidth ();
-    int lm_height = lightmap->GetHeight ();
-    int uv;
-    // transform our uv2World buffer
-    for (int ui=0; ui < lm_width; ui++)
-    {
-      for (int vi=0; vi < lm_height; vi++)
-      {
-        uv = vi*lm_width + ui;
-
-        _uv2World[uv] = trans.Other2This (_uv2World[uv]);
-      }
-    }
-  }
+  for (int i = 0 ; i < GetParentTemplate ()->NumVertices () ; i++)
+    SetControlPoint (i, GetParentTemplate ()->GetVertex (i));
+  if (_uv2World) CalcUVBuffers();
+  return;
 }
 
 void csCurve::SetObject2World (csReversibleTransform* o2w) 
@@ -731,12 +718,11 @@ void csCurve::SetObject2World (csReversibleTransform* o2w)
   if (_uv2World)
   {
     // transform our uv2World buffer
-    for(int ui=0; ui < lm_width; ui++)
+    for (int ui=0; ui < lm_width; ui++)
     {
-      for(int vi=0; vi < lm_height; vi++)
+      for (int vi=0; vi < lm_height; vi++)
       {
         uv = vi*lm_width + ui;
-
         _uv2World[uv] = _o2w->Other2This(_uv2World[uv]);
       }
     }
@@ -776,10 +762,8 @@ float csCurve::GetArea()
 
 void csCurve::CalcUVBuffers()
 {
-  if (_uv2World)
-    delete[] _uv2World;
-  if (_uv2Normal)
-    delete[] _uv2Normal;
+  delete[] _uv2World;
+  delete[] _uv2Normal;
 
   int lm_width = lightmap->GetWidth ();
   int lm_height = lightmap->GetHeight ();
@@ -877,12 +861,8 @@ void csBezierCurve::Normal (csVector3& vec, double u, double v)
 
 void csBezierCurve::HardTransform (const csReversibleTransform& trans)
 {
-  csCurve::HardTransform (trans);
   valid_bbox = false;
-  int i, j;
-  for (i = 0 ; i < 3 ; i++)
-    for (j = 0 ; j < 3 ; j++)
-      points[i][j] = trans.This2Other (points[i][j]);
+  csCurve::HardTransform (trans);
 }
 
 //------------------------------------------------------------------

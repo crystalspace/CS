@@ -23,6 +23,7 @@
 
 class csMaterialWrapper;
 struct iMaterial;
+struct iMaterialHandle;
 
 SCF_VERSION (iMaterialWrapper, 0, 0, 4);
 
@@ -41,6 +42,34 @@ struct iMaterialWrapper : public iBase
   virtual void Visit () = 0;
   /// Get the original material.
   virtual iMaterial* GetMaterial () = 0;
+};
+
+SCF_VERSION (iMaterialList, 0, 0, 1);
+
+/**
+ * This class represents a list of materials.
+ */
+struct iMaterialList : public iBase
+{
+  /// Create a new material.
+  virtual iMaterialWrapper* NewMaterial (iMaterial* material) = 0;
+
+  /**
+   * Create a engine wrapper for a pre-prepared iTextureHandle
+   * The handle will be IncRefed.
+   */
+  virtual iMaterialWrapper* NewMaterial (iMaterialHandle *ith) = 0;
+
+  /**
+   * Get the number of materials.
+   */
+  virtual int GetNumMaterials () = 0;
+
+  /// Return material by index.
+  virtual iMaterialWrapper* Get (int idx) = 0;
+
+  /// Find a material by name.
+  virtual iMaterialWrapper* FindByName (const char* iName) = 0;
 };
 
 #endif // __IENGINE_MATERIAL_H__

@@ -74,31 +74,42 @@ class csLoader
 {
   struct LoadedPlugin
   {
-    LoadedPlugin (const char *theName, iPlugIn *thePlugin);
+    LoadedPlugin (const char* shortName, const char *theName,
+    	iPlugIn *thePlugin);
     ~LoadedPlugin ();
+    char* short_name;
     char* name;
     iPlugIn* plugin;
   };
   
   class csLoadedPluginVector : public csVector
   {
+    private:
+      LoadedPlugin* FindPlugInPrivate (const char* name)
+      {
+        int i;
+        for (i=0 ; i<Length () ; i++) 
+	{
+	  LoadedPlugin* pl = (LoadedPlugin*)Get (i);
+	  if (pl->short_name && !strcmp (name, pl->short_name)) 
+	    return pl;
+	  if (!strcmp (name, pl->name)) 
+	    return pl;
+	}
+	return NULL;
+      }
     public:
-      csLoadedPluginVector (int iLimit = 8, int iThresh = 16) : csVector (iLimit, iThresh) {}
+      csLoadedPluginVector (int iLimit = 8, int iThresh = 16)
+      	: csVector (iLimit, iThresh) {}
       ~csLoadedPluginVector () { DeleteAll (); }
       
       virtual bool FreeItem (csSome Item)
       { delete (LoadedPlugin*)Item; return true;}
   
-      iPlugIn* FindPlugIn (const char* name)
-      { int i;
-        for (i=0; i<Length (); i++) 
-	  if (!strcmp (name, ((LoadedPlugin*)Get(i))->name)) 
-	    return ((LoadedPlugin*)Get(i))->plugin;
-	return NULL;
-      }
+      iPlugIn* FindPlugIn (const char* name, const char* classID);
       
-      void NewPlugIn (char* name, iPlugIn* plugin)
-      { Push (new LoadedPlugin (name, plugin)); }
+      void NewPlugIn (char* short_name, char* name, iPlugIn* plugin)
+      { Push (new LoadedPlugin (short_name, name, plugin)); }
   };
   
   static csLoadedPluginVector loaded_plugins;
@@ -139,10 +150,6 @@ class csLoader
   static void txt_process (char *name, char* buf);
   /// Parse and load a single material
   static void mat_process (char *name, char* buf, const char* prefix = NULL);
-  /// Parse a Bezier surface definition and return a new object
-  static csCurveTemplate* load_beziertemplate (char* ptname, char* buf,
-    csMaterialWrapper* default_material, float default_texlen,
-    csVector3* curve_vertices);
 
   /// Parse a sector definition and return a new object
   static csSector* load_sector (char* secname, char* buf);
@@ -180,6 +187,12 @@ class csLoader
    * (no actual images). 
    */
   static bool LoadTextures (char* buf);
+
+  /**
+   * Load all the plugin descriptions from the map file
+   * (the plugins are not actually loaded yet).
+   */
+  static bool LoadPlugins (char* buf);
 
   /**
    * Load all the material descriptions from the map file

@@ -335,6 +335,10 @@ public:
     {
       return scfParent->GetVertex (idx);
     }
+    virtual void SetVertex (int idx, int vt)
+    {
+      scfParent->SetVertex (idx, vt);
+    }
   } scfiCurveTemplate;
   friend struct CurveTemplate;
 };

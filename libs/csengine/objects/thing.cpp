@@ -268,7 +268,7 @@ void csThing::Prepare ()
   }
 }
 
-int csThing::AddCurveVertex (csVector3& v, csVector2& t)
+int csThing::AddCurveVertex (const csVector3& v, const csVector2& t)
 {
   if (!curve_vertices)
   {
@@ -553,6 +553,18 @@ void csThing::AddCurve (csCurve* curve)
 {
   curve->SetParent (this);
   curves.Push (curve);
+}
+
+iCurve* csThing::CreateCurve (iCurveTemplate* tmpl)
+{
+  iCurve* curve = tmpl->MakeCurve ();
+  csCurve* c = curve->GetOriginalObject ();
+  c->SetParent (this);
+  int i;
+  for (i = 0 ; i < tmpl->GetNumVertices () ; i++)
+    curve->SetControlPoint (i, tmpl->GetVertex (i));
+  AddCurve (c);
+  return curve;
 }
 
 void csThing::HardTransform (const csReversibleTransform& t)
@@ -1351,7 +1363,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
 
   if (camera_coord.z >= SMALL_Z)
   {
-    //res=(int)(curves_scale/camera_coord.z);
+    res=(int)(curves_scale/camera_coord.z);
   }
   else
     res=1000; // some big tesselation value...
@@ -1699,6 +1711,10 @@ bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
   csReversibleTransform movtrans = movable->GetFullTransform ();
+
+  //@@@ Ok?
+  cached_movable = movable;
+  WorUpdate ();
 
   draw_busy++;
 
@@ -2271,29 +2287,52 @@ void csThing::CastShadows (iFrustumView* fview)
   // This queue is filled while traversing the octree
   // (CheckFrustumPolygonsFB).
   csHashIterator* it = fdata.visible_things.GetIterator ();
-  csThing* sp;
+  csObject* o;
   // @@@ THIS SHOULD USE THE SHADOW RECEIVERS!!!
   while (it->HasNext ())
   {
-    sp = (csThing*)(it->Next ());
-    if (sp != this)
-      if (fview->CheckProcessMask (sp->flags.Get ()))
-	//@@@ BAD!!! AVOID csFrustumView
-        sp->RealCheckFrustum (fview);
+    o = (csObject*)(it->Next ());
+    if (o->GetType () >= csThing::Type)
+    {
+      csThing* sp = (csThing*)o;
+      if (sp != this)
+        if (fview->CheckProcessMask (sp->flags.Get ()))
+	  //@@@ BAD!!! AVOID csFrustumView
+          sp->RealCheckFrustum (fview, &(sp->GetMovable ().scfiMovable));
+    }
+    else
+    {
+      csMeshWrapper* mesh = (csMeshWrapper*)o;
+      // @@@ should not be known in engine.
+      // @@@ UGLY
+      iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+      if (ithing)
+      {
+	csThing* sp = ithing->GetPrivateObject ();
+	// Only if the thing has right flags do we consider it for shadows.
+        if (fview->CheckProcessMask (mesh->flags.Get ()))
+          sp->RealCheckFrustum (fview, &(mesh->GetMovable ().scfiMovable));
+	ithing->DecRef ();
+      }
+    }
   }
 }
 
-void csThing::CheckFrustum (iFrustumView* lview)
+void csThing::CheckFrustum (iFrustumView* lview, iMovable* movable)
 {
   csCBufferCube* cb = csEngine::current_engine->GetCBufCube ();
   csCovcube* cc = csEngine::current_engine->GetCovcube ();
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
-  RealCheckFrustum (lview);
+  RealCheckFrustum (lview, movable);
 }
 
-void csThing::RealCheckFrustum (iFrustumView* lview)
+void csThing::RealCheckFrustum (iFrustumView* lview, iMovable* movable)
 {
+  //@@@ Ok?
+  cached_movable = movable;
+  WorUpdate ();
+
   csPolygon3D* p;
   int i;
 
@@ -2318,7 +2357,7 @@ void csThing::RealCheckFrustum (iFrustumView* lview)
     
     if (!lview->IsDynamic ())
     {
-      csReversibleTransform o2w = movable.GetFullTransform ().GetInverse();
+      csReversibleTransform o2w = movable->GetFullTransform ().GetInverse();
       c->SetObject2World (&o2w);
     }
     
@@ -2427,25 +2466,28 @@ void csThing::MergeTemplate (iThingState* tpl,
   }
 
   for (i = 0; i < tpl->GetNumCurveVertices (); i++)
-    AddCurveVertex (tpl->CurveVertex (i), tpl->CurveTexel (i));
+  {
+    csVector3 v = tpl->CurveVertex (i);
+    if (transform) v = *transform * v;
+    if (shift) v += *shift;
+    AddCurveVertex (v, tpl->CurveTexel (i));
+  }
 
   for (i = 0; i < tpl->GetNumCurves (); i++)
   {
-    iCurveTemplate* pt = tpl->GetCurve (i)->GetParentTemplate ();
-    iCurve* p = pt->MakeCurve ();
-    p->SetName (pt->GetName ());
-    p->GetOriginalObject ()->SetParent (this);
-
-    if (!pt->GetMaterial ()) p->SetMaterial (default_material);
-    for (j = 0 ; j < pt->GetNumVertices () ; j++)
-      p->SetControlPoint (j, pt->GetVertex (j));
-    AddCurve (p->GetOriginalObject ());
+    iCurve* orig_curve = tpl->GetCurve (i);
+    iCurve* p = CreateCurve (orig_curve->GetParentTemplate ());
+    p->SetName (orig_curve->GetName ());
+    if (orig_curve->GetMaterial ())
+      p->SetMaterial (orig_curve->GetMaterial ());
+    else
+      p->SetMaterial (default_material);
   }
 
   delete [] merge_vertices;
 }
 
-void csThing::ReplaceMaterials (csMaterialList* matList, const char* prefix)
+void csThing::ReplaceMaterials (iMaterialList* matList, const char* prefix)
 {
   int i;
   for (i = 0; i < GetNumPolygons (); i++)
@@ -2454,9 +2496,9 @@ void csThing::ReplaceMaterials (csMaterialList* matList, const char* prefix)
     const char* txtname = p->GetMaterialWrapper ()->GetName ();
     char* newname = new char [strlen (prefix) + strlen (txtname) + 2];
     sprintf (newname, "%s_%s", prefix, txtname);
-    csMaterialWrapper *th = matList->FindByName (newname);
+    iMaterialWrapper *th = matList->FindByName (newname);
     if (th != NULL)
-      p->SetMaterial (th);
+      p->SetMaterial (th->GetPrivateObject ());
     delete [] newname;
   }
 }
