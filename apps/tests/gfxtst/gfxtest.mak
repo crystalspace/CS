@@ -1,18 +1,19 @@
 # Application description
 DESCRIPTION.gfxtst = Crystal Space Graphics Loader library test
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make gfxtst       Make the $(DESCRIPTION.gfxtst)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make gfxtst       Make the $(DESCRIPTION.gfxtst)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: gfxtst
+.PHONY: gfxtst gfxtstclean
 
 all apps: gfxtst
 gfxtst:
@@ -22,23 +23,20 @@ gfxtstclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tests/gfxtst
 
-# csutil listed twice because of circular dependency between cssys and csutil.
 LIB.GFXTEST = $(CSGFXLDR.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
-
 GFXTEST.EXE = gfxtest$(EXE)
 SRC.GFXTEST += apps/tests/gfxtst/gfxtest.cpp
 OBJ.GFXTEST = $(addprefix $(OUT),$(notdir $(SRC.GFXTEST:.cpp=$O)))
-
 DESCRIPTION.$(GFXTEST.EXE) = $(DESCRIPTION.gfxtst)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: gfxtst gfxtstclean
@@ -50,7 +48,7 @@ $(GFXTEST.EXE): $(OBJ.GFXTEST) $(LIB.GFXTEST)
 	$(DO.LINK.CONSOLE.EXE)
 
 gfxtstclean:
-	-$(RM) $(GFXTEST.EXE) $(OBJ.GFXTEST)
+	-$(RM) $(GFXTEST.EXE) $(OBJ.GFXTEST) $(OUTOS)gfxtst.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)gfxtst.dep

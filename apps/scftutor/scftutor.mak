@@ -1,19 +1,21 @@
 # Application description
 DESCRIPTION.scftut = Crystal Space SCF tutorial application
-DESCRIPTION.scftutdlls = Crystal Space SCF tutorial application shared libraries
+DESCRIPTION.scftutdlls = \
+  Crystal Space SCF tutorial application shared libraries
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make scftut       Make the $(DESCRIPTION.scftut)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make scftut       Make the $(DESCRIPTION.scftut)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: scftut
+.PHONY: scftut scftutclean
 
 all apps: scftut
 scftut: scftutdlls
@@ -25,7 +27,7 @@ scftutclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/scftutor
@@ -52,7 +54,7 @@ LIB.SCFTUTOR = $(CSUTIL.LIB) $(CSSYS.LIB) $(CSUTIL.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: scftut scftutclean
@@ -70,7 +72,8 @@ $(WORM.DLL): $(DEP.EXE) $(OBJ.WORM) $(LIB.SCFTUTOR)
 	$(DO.SHARED.PLUGIN)
 
 scftutclean:
-	-$(RM) $(ZOO.EXE) $(DOG.DLL) $(WORM.DLL) $(OBJ.ZOO) $(OBJ.DOG) $(OBJ.WORM)
+	-$(RM) $(ZOO.EXE) $(DOG.DLL) $(WORM.DLL) $(OBJ.ZOO) $(OBJ.DOG) \
+	$(OBJ.WORM) $(OUTOS)scftut.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)scftut.dep

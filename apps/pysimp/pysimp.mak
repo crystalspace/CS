@@ -4,39 +4,41 @@ ifneq (,$(findstring cspython,$(PLUGINS)))
 # Application description
 DESCRIPTION.pysimple = Crystal Space Python simple example
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make pysimple     Make the $(DESCRIPTION.pysimple)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make pysimple     Make the $(DESCRIPTION.pysimple)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: pysimple
+.PHONY: pysimple pysimpleclean
 
 all apps: pysimple
 pysimple:
 	$(MAKE_TARGET)
+pysimpleclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/pysimp apps/support
 
 PYSIMP.EXE=pysimp$(EXE)
-SRC.PYSIMP = $(wildcard apps/pysimp/*.cpp) \
-  apps/support/static.cpp
+SRC.PYSIMP = $(wildcard apps/pysimp/*.cpp) apps/support/static.cpp
 OBJ.PYSIMP = $(addprefix $(OUT),$(notdir $(SRC.PYSIMP:.cpp=$O)))
 DESCRIPTION.$(PYSIMP.EXE) = $(DESCRIPTION.pysimple)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: pysimple pysimpleclean
@@ -52,7 +54,7 @@ $(PYSIMP.EXE): $(DEP.EXE) $(OBJ.PYSIMP) \
 	$(DO.LINK.EXE)
 
 pysimpleclean:
-	-$(RM) $(PYSIMP.EXE)
+	-$(RM) $(PYSIMP.EXE) $(OBJ.PYSIMP) $(OUTOS)pysimp.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)pysimp.dep
@@ -63,5 +65,4 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-
 endif # ifneq (,$(findstring cspython,$(PLUGINS)))

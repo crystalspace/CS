@@ -9,31 +9,32 @@ APPHELP += $(NEWLINE)echo $"  make perf         Make the $(DESCRIPTION.perf)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: perf
+.PHONY: perf perfclean
 
 all apps: perf
 perf:
 	$(MAKE_TARGET)
+perfclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/perftest apps/support
 
 PERF.EXE=perftest$(EXE)
-SRC.PERF = $(wildcard apps/perftest/*.cpp) \
-  apps/support/static.cpp
+SRC.PERF = $(wildcard apps/perftest/*.cpp) apps/support/static.cpp
 OBJ.PERF = $(addprefix $(OUT),$(notdir $(SRC.PERF:.cpp=$O)))
 DESCRIPTION.$(PERF.EXE) = $(DESCRIPTION.perf)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: perf perfclean
@@ -47,7 +48,7 @@ $(PERF.EXE): $(DEP.EXE) $(OBJ.PERF) \
 	$(DO.LINK.EXE)
 
 perfclean:
-	-$(RM) $(PERF.EXE)
+	-$(RM) $(PERF.EXE) $(OBJ.PERF) $(OUTOS)perf.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)perf.dep
