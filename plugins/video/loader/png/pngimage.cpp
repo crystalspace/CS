@@ -20,6 +20,8 @@
 #include "cssysdef.h"
 #include "csgfx/rgbpixel.h"
 #include "csutil/databuf.h"
+#include "cssys/csendian.h"
+#include <math.h>
 
 extern "C"
 {
@@ -83,7 +85,7 @@ static iImageIO::FileFormatDescription formatlist[5] =
 {
   {PNG_MIME, "Gray", CS_IMAGEIO_LOAD},
   {PNG_MIME, "GrayAlpha", CS_IMAGEIO_LOAD},
-  {PNG_MIME, "Palette", CS_IMAGEIO_LOAD},
+  {PNG_MIME, "Palette", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE},
   {PNG_MIME, "RGB", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE},
   {PNG_MIME, "RGBA", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE}
 };
@@ -117,6 +119,38 @@ iImage *csPNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 
 void csPNGImageIO::SetDithering (bool)
 {
+}
+
+static inline unsigned sqr (int x)
+{
+  return (x * x);
+}
+
+int closest_index (iImage *Image, csRGBpixel *iColor)
+{
+  csRGBpixel *Palette = Image->GetPalette();
+
+  if (!Palette)
+    return -1;
+
+  int closest_idx = -1;
+  unsigned closest_dst = (unsigned)-1;
+
+  int idx;
+  for (idx = 0; idx < 256; idx++)
+  {
+    unsigned dst = sqr (iColor->red   - Palette [idx].red)   * R_COEF_SQ +
+                   sqr (iColor->green - Palette [idx].green) * G_COEF_SQ +
+                   sqr (iColor->blue  - Palette [idx].blue)  * B_COEF_SQ;
+    if (dst == 0)
+      return idx;
+    if (dst < closest_dst)
+    {
+      closest_dst = dst;
+      closest_idx = idx;
+    } /* endif */
+  }
+  return closest_idx;
 }
 
 iDataBuffer *csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
@@ -245,6 +279,7 @@ error2:
   if (colortype & PNG_COLOR_MASK_PALETTE)
   {
     csRGBpixel *pal = Image->GetPalette ();
+    
     palette = (png_colorp)malloc (256 * sizeof (png_color));
     int i;
     for (i = 0; i < 256; i++)
@@ -253,8 +288,45 @@ error2:
       palette [i].green = pal [i].green;
       palette [i].blue  = pal [i].blue;
     } /* endfor */
-    png_set_PLTE (png, info, palette, 256);
-  }/* endif */
+    int max_color = 0;
+    // seek maximum color index used in the image
+    int n = Image->GetWidth() * Image->GetHeight();
+    uint8 *imagedata = (uint8*)Image->GetImageData();
+    while (n > 0)
+    {
+      max_color = MAX(max_color, *imagedata);
+      imagedata++;
+      n--;
+    }
+    png_set_PLTE (png, info, palette, max_color+1);
+
+    if (Image->HasKeycolor())
+    {
+      int key_r, key_g, key_b;
+      Image->GetKeycolor (key_r, key_g, key_b);
+      csRGBpixel key (key_r, key_g, key_b);
+      int key_index = closest_index (Image, &key);
+      png_bytep trans = new png_byte[key_index + 1];
+      memset (trans, 0xff, key_index);
+      trans[key_index] = 0;
+      png_set_tRNS (png, info, trans, key_index+1, NULL);
+      delete[] trans;
+    }
+  }
+  else
+  {
+    if (Image->HasKeycolor())
+    {
+      int key_r, key_g, key_b;
+      Image->GetKeycolor (key_r, key_g, key_b);
+      png_color_16 trans;
+      memset (&trans, 0, sizeof(trans));
+      trans.red = big_endian_short (key_r << 8);
+      trans.green = big_endian_short (key_g << 8);
+      trans.blue = big_endian_short (key_b << 8);
+      png_set_tRNS (png, info, NULL, NULL, &trans);
+    }
+  }
 
   /* otherwise, if we are dealing with a color image then */
   png_color_8 sig_bit;
@@ -385,7 +457,9 @@ nomem2:
     // Expand pictures with less than 8bpp to 8bpp
     png_set_packing (png);
 
-  volatile enum { imgRGB, imgPAL, imgPALALPHA } ImageType;
+  volatile enum { imgRGB, imgPAL } ImageType;
+  int keycolor_index = -1;
+
   switch (color_type)
   {
     case PNG_COLOR_TYPE_GRAY:
@@ -395,13 +469,38 @@ nomem2:
       // If we need alpha, take it. If we don't, strip it.
       if (Format & CS_IMGFMT_ALPHA)
       {
-        if (color_type & PNG_COLOR_MASK_ALPHA)
-          ImageType = imgPALALPHA;
-        else
+	if (png_get_valid (png, info, PNG_INFO_tRNS))
+	{
+	  // tRNS chunk. Every palette entry gets its own alpha value.
+	  png_bytep trans;
+	  int num_trans;
+	  png_get_tRNS (png, info, &trans, &num_trans, NULL);
+	  
+	  // see if there is a single entry w/ alpha==0 and all other 255.
+	  // if yes use keycolor transparency.
+	  bool only_binary_trans = true;
+	  for (int i = 0; (i < num_trans)&& only_binary_trans; i++)
+	  {
+	    if (trans[i] != 0xff)
+	    {
+	      only_binary_trans = only_binary_trans && (trans[i] == 0) 
+		&& (keycolor_index == -1);
+	      keycolor_index = i;
+	    }
+	  }
+	  if (!only_binary_trans)
+	  {
+	    keycolor_index = -1;
+	    png_set_palette_to_rgb (png);
+	    png_set_tRNS_to_alpha (png);
+	    ImageType = imgRGB;
+	  }
+	  else
+	    Format &= ~CS_IMGFMT_ALPHA;
+	}
+	else
           Format &= ~CS_IMGFMT_ALPHA;
       }
-      else if (color_type & PNG_COLOR_MASK_ALPHA)
-        png_set_strip_alpha (png);
       break;
     case PNG_COLOR_TYPE_RGB:
     case PNG_COLOR_TYPE_RGB_ALPHA:
@@ -409,15 +508,19 @@ nomem2:
       // If there is no alpha information, fill with 0xff
       if (!(color_type & PNG_COLOR_MASK_ALPHA))
       {
+        Format &= ~CS_IMGFMT_ALPHA;
         // Expand paletted or RGB images with transparency to full alpha
 	// channels so the data will be available as RGBA quartets.
         if (png_get_valid (png, info, PNG_INFO_tRNS))
-          png_set_expand (png);
-        else
-        {
-          png_set_filler (png, 0xff, PNG_FILLER_AFTER);
-          Format &= ~CS_IMGFMT_ALPHA;
-        }
+	{
+	  png_color_16p trans_values;
+	  png_get_tRNS (png, info, NULL, NULL, &trans_values);
+	  has_keycolour = true;
+	  keycolour_r = convert_endian (trans_values->red) & 0xff;
+	  keycolour_g = convert_endian (trans_values->green) & 0xff;
+	  keycolour_b = convert_endian (trans_values->blue) & 0xff;
+	}
+        png_set_filler (png, 0xff, PNG_FILLER_AFTER);
       }
       break;
     default:
@@ -431,8 +534,6 @@ nomem2:
   set_dimensions (Width, Height);
   if (ImageType == imgRGB)
     exp_rowbytes = Width * sizeof (csRGBpixel);
-  else if (ImageType == imgPALALPHA)
-    exp_rowbytes = Width * 2;
   else
     exp_rowbytes = Width;
 
@@ -451,8 +552,6 @@ nomem2:
   void *NewImage = NULL;
   if (ImageType == imgRGB)
     NewImage = new csRGBpixel [Width * Height];
-  else if (ImageType == imgPALALPHA)
-    NewImage = new uint8 [Width * Height * 2];
   else
     NewImage = new uint8 [Width * Height];
   if (!NewImage)
@@ -484,6 +583,13 @@ nomem2:
       for (i = 0; i <= entries; i++)
         palette [i].red = palette [i].green = palette [i].blue =
           (i * 255) / entries;
+    }
+    if (keycolor_index != -1)
+    {
+      has_keycolour = true;
+      keycolour_r = palette[keycolor_index].red;
+      keycolour_g = palette[keycolor_index].green;
+      keycolour_b = palette[keycolor_index].blue;
     }
     convert_pal8 ((uint8 *)NewImage, palette, colors);
   }
