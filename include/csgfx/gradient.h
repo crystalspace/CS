@@ -90,7 +90,7 @@ public:
    * \param pal Array of csRGBcolor the gradient should be rendered to.
    * \param count Number of \p palette entries to render.
    * \param begin Start position. Can be anywhere in the gradient.
-   * \param begin End position. Can be anywhere in the gradient.
+   * \param end End position. Can be anywhere in the gradient.
    *
    * \remark At least 1 shade has to be present in the gradient to
    *  have this function succeed.

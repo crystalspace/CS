@@ -38,14 +38,14 @@
 class csPluginPaths;
 
 /**
- * Get the list of root directories.<p>
+ * Get the list of root directories.
  * For instance in Unix it simply returns '/' but for Windows it may return a
  * list of available drive letters.
  */
 csRef<iStrVector> csFindSystemRoots();
 
 /**
- * Get the installation path.<p>
+ * Get the installation path.
  * This returns the path where the system has been installed to.
  * It has a limited use because mostly everything should be done
  * through VFS which is installation directory - independent; but
@@ -86,12 +86,12 @@ char* csGetAppPath (const char* argv0);
  * Return the directory in which the application resides.
  * \remark May return 0 if some problem prevents determination of the
  *   application's directory.
- * \remark Caller is responsible for freeing the returend string with delete[] 
+ * \remark Caller is responsible for freeing the returned string with delete[] 
  *   after using it.
  * \remark This function is primarily intended for very low-level use before 
  *   or during the initialization of CS core components. Past this point,
  *   applications and plugins should rather use 
- *   iCommandLineParser::GetAppPath().
+ *   iCommandLineParser::GetAppDir().
  * \param argv0 The first element of the argv[] array passed to main().  On
  *   many platforms, this is the only way to determine the actual location of
  *   the executable.
@@ -101,7 +101,7 @@ char* csGetAppDir (const char* argv0);
 /**
  * Return the directory in which the application's resources reside.  On
  * many platforms, resources (such as plugin modules) reside in the same
- * directory as the application itself.  This default implementation
+ * directory as the application itself.  The default implementation
  * returns the same value as csGetAppPath(), however platforms may want to
  * override the default implementation if this behavior is unsuitable.
  * \remark May return 0 if some problem prevents determination of the
@@ -116,7 +116,9 @@ char* csGetResourceDir (const char* argv0);
 
 /**
  * Check whether two native paths actually point to the same location.
- * Use this instead of strcasecmp(), as it may not suffice in all cases.
+ * Use this instead of strcmp() or the like, as it may not suffice in all 
+ * cases (e.g. on Windows paths names are case-insensitive, but on Unix
+ * they aren't).
  * \remark Expects the paths to be fully qualified. Use csExpandPath() to 
  *   ensure this.
  */

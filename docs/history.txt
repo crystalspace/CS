@@ -7,6 +7,8 @@ The history order is reversed so that new features are at the top.
 	- res committed fixes from Oktal for some circular #include 
 	  dependencies in the new renderer.
 	- res fixed a wrong #include in anonrndbuf.cpp.
+	- res fixed a typo in syspath.h, slightly changed a few comments 
+	  there, and also fixed a comment in gradient.h.
 3-Jul-2003
 	- Jorrit removed obsolete bindings for radiosity commands for Walktest
 	  and added 'r' key to record movements on/off and 'shift-r' to play
