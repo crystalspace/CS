@@ -168,7 +168,7 @@ public:
    * This very important function initializes the SCF sub-system.
    * Without this you can do almost nothing in CS.
    */
-  static bool InitializeSCF (int argc, const char* const argv[]);
+  static bool InitializeSCF (int argc, char const* const argv[]);
 
   /**
    * This function should be called second. It will create the object

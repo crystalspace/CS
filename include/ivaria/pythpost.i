@@ -24,6 +24,7 @@
 
 #ifdef SWIGPYTHON
 
+#ifndef CS_MICRO_SWIG
 %pythoncode %{
 
 	CSMASK_Nothing = (1 << csevNothing)
@@ -133,26 +134,27 @@ struct _csPyEventHandler : public iEventHandler
 			hdlr = obj
 		return csInitializer._SetupEventHandler(reg, hdlr, mask)
 
+	csInitializer.SetupEventHandler = staticmethod(_csInitializer_SetupEventHandler)
+
+%}
+#endif // CS_MICRO_SWIG
+
+%pythoncode %{
 	def _csInitializer_RequestPlugins (reg, plugins):
-		"""Replacement of C++ version with variable argument list."""
+		"""Replacement of C++ version."""
 		def _get_tuple (x):
 			if callable(x):
 				return tuple(x())
 			else:
 				return tuple(x)
-		ok = 1
-		for plugName, intName, scfId, version in map(
+		requests = csPluginRequestArray()
+		for cls, intf, ident, ver in map(
 				lambda x: _get_tuple(x), plugins):
-			res = csInitializer._RequestPlugin(
-				reg, plugName, intName, scfId, version
-			)
-			if not res:
-				ok = 0
-		return ok
+			requests.Push(csPluginRequest(
+				csString(cls), csString(intf), ident, ver))
+		return csInitializer._RequestPlugins(reg, requests)
 
 	csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
-
-	csInitializer.SetupEventHandler = staticmethod(_csInitializer_SetupEventHandler)
 
 %}
 
@@ -161,15 +163,19 @@ struct _csPyEventHandler : public iEventHandler
 csWrapPtr _CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface,
 	int iface_ver)
 {
-  return csWrapPtr (iface, reg->Get
+  csRef<iBase> b;
+  b.AttachNew(reg->Get
 	(iface, iSCF::SCF->GetInterfaceID (iface), iface_ver));
+  return csWrapPtr (iface, b);
 }
 
 csWrapPtr _CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
 	const char *tag, const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, reg->Get
+  csRef<iBase> b;
+  b.AttachNew(reg->Get
 	(tag, iSCF::SCF->GetInterfaceID (iface), iface_ver));
+  return csWrapPtr (iface, b);
 }
 
 csWrapPtr _SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
@@ -219,9 +225,15 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 
 %}
 
+#ifndef CS_MINI_SWIG
 %pythoncode %{
 
 	csReport = csReporterHelper.Report
+
+%}
+#endif
+
+%pythoncode %{
 
 	def _GetIntfId (intf):
 		return cvar.iSCF_SCF.GetInterfaceID(intf.__name__)
@@ -329,6 +341,7 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 
 %}
 
+#ifndef CS_MINI_SWIG
 %extend iCollideSystem
 {
 	%rename(_GetCollisionPairs) GetCollisionPairs;
@@ -424,6 +437,7 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 	void __setitem__ (size_t i, char c)
 		{ self->SetAt(i, c); }
 }
+#endif // CS_MINI_SWIG
 
 // csutil/csstring.h
 %extend csString
@@ -436,6 +450,7 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 		{ self->DeleteAt(i); }
 }
 
+#ifndef CS_MINI_SWIG
 %pythoncode %{
 
 	CS_VEC_FORWARD = csVector3(0,0,1)
@@ -456,6 +471,7 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 %pythoncode %{
         CS_POLYRANGE_LAST = csPolygonRange (-1, -1)
 %}
+#endif // CS_MINI_SWIG
 
 %include "ivaria/pythvarg.i"
 

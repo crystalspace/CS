@@ -18,6 +18,8 @@
 
 #ifdef SWIGPERL5
 
+#include <csutil/csstring.h>
+
 /****************************************************************************
  * Renaming operators is the first stage of wrapping them.
  * We ignore operator [] and () and unary *
@@ -188,8 +190,8 @@
   if (rf.IsValid ())
   {
     rf->IncRef ();
-    SV *rv = newSVsv (& PL_sv_undef);
-    sv_setref_iv (rv, pT, (int) (cT *) rf);
+    SV* rv = sv_newmortal();
+    SWIG_MakePtr(rv, (cT*)rf, SWIG_TypeQuery(pT), 0);
     result = rv;
   }
   else
@@ -197,6 +199,7 @@
     SvREFCNT_inc (& PL_sv_undef);
     result = & PL_sv_undef;
   }
+  argvi++;
 %enddef
 
 #undef TYPEMAP_OUT_csRef
@@ -222,7 +225,22 @@
   %typemap(out) csWrapPtr
   {
     csRef<iBase> rf ($1.Ref);
-    TYPEMAP_OUT_csRef_BODY ($result, $1.Type, iBase)
+    if (rf.IsValid ())
+    {
+      csString pT; pT << "cspace::" << $1.Type;
+      iBase* ibase = rf;
+      ibase->IncRef ();
+      void* ptr = iBase__DynamicCast(ibase, $1.Type).VoidPtr;
+      SV* rv = sv_newmortal();
+      SWIG_MakePtr(rv, ptr, SWIG_TypeQuery(pT.GetData()), 0);
+      $result = rv;
+    }
+    else
+    {
+      SvREFCNT_inc (& PL_sv_undef);
+      $result = & PL_sv_undef;
+    }
+    argvi++;
   }
 %enddef
 
@@ -262,9 +280,9 @@
   }
   %typemap(in) csArray<T>
   {
-    if (SvTYPE ($input) != SVt_PVAV)
-      croak ("%s", "Argument must be an array reference");
     AV *av = (AV *) SvRV ($input);
+    if (SvTYPE (av) != SVt_PVAV)
+      croak ("%s", "Argument must be an array reference");
     if (av_len (av) >= 0)
     {
       for (int i = 0; i <= av_len (av); i++)
@@ -301,9 +319,9 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
   }
   %typemap(in) csArray<T>
   {
-    if (SvTYPE ($input) != SVt_PVAV)
-      croak ("%s", "Argument must be an array reference");
     AV *av = (AV *) SvRV ($input);
+    if (SvTYPE (av) != SVt_PVAV)
+      croak ("%s", "Argument must be an array reference");
     if (av_len (av) >= 0)
       for (int i = 0; i <= av_len (av); i++)
       {
@@ -319,11 +337,11 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
 /****************************************************************************
  * Typemaps to convert an argc/argv pair to a Perl array.
  ****************************************************************************/
-%typemap(in) (int argc, const char * argv[])
+%typemap(in) (int argc, char const* const argv[])
 {
-  if (SvTYPE ($input) != SVt_PVAV)
-    croak ("%s", "Argument must be an array reference");
   AV *av = (AV *) SvRV ($input);
+  if (SvTYPE (av) != SVt_PVAV)
+    croak ("%s", "Argument must be an array reference");
   $1 = av_len (av) + 1;
   $2 = new (char *)[$1];
   for (int i = 0; i < $1; i++)
@@ -404,9 +422,9 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
 
 #undef TYPEMAP_IN_ARRAY_BODY
 %define TYPEMAP_IN_ARRAY_BODY(array_type, base_type, cnt, ptr, to_item)
-  if (SvTYPE ($input) != SVt_PVAV)
-    croak ("%s", "Argument must be an array reference");
   AV *av = (AV *) SvRV ($input);
+  if (SvTYPE (av) != SVt_PVAV)
+    croak ("%s", "Argument must be an array reference");
   cnt = av_len (av) + 1;
   ptr = new array_type [cnt];
   for (int i = 0; i < cnt; i++)
@@ -449,5 +467,11 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
     delete [] $1;
   }
 %enddef
+
+/****************************************************************************
+ * In perlpost.i, create an scfInitialize function in Perl which grabs the
+ * program path automatically, and remove the C argc/argv version here.
+ ****************************************************************************/
+%ignore scfInitialize(int argc, const char * const argv []);
 
 #endif // SWIGPERL5

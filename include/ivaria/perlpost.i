@@ -18,6 +18,8 @@
 
 #ifdef SWIGPERL5
 
+#include <csutil/csstring.h>
+
 /****************************************************************************
  * The AUTOLOAD function is called by Perl if the user tries to call a
  * non-existant object method. We use this to add loads of custom methods
@@ -59,15 +61,14 @@
   {
     static char *argv[] = { 0, 0 };
     argv[0] = SvPV_nolen (get_sv ("0", 0));
-    scfInitialize (0, argv);
+    scfInitialize (1, argv);
   }
 %}
-
-%ignore scfInitialize(int argc, const char * const argv []);
 
 /****************************************************************************
  * This is CS's interface to the Perl script's event handler.
  ****************************************************************************/
+#ifndef CS_MICRO_SWIG
 %{
   static const int csInitializer_SetupEventHandler_DefaultMask
     = CSMASK_Nothing
@@ -87,8 +88,8 @@
   bool csInitializer_EventHandler (iEvent &event)
   {
     if (! pl_csInitializer_EventHandler) return false;
-    SV *event_obj = newSVsv (& PL_sv_undef);
-    sv_setref_iv (event_obj, "cspace::iEvent", (int) & event);
+    SV *event_obj = newSViv (0);
+    SWIG_MakePtr (event_obj, &event, SWIGTYPE_p_iEvent, 0);
 
     dSP;
     PUSHMARK (SP);
@@ -121,16 +122,15 @@
     if (! (reg_ref && func_rv))
       croak ("SetupEventHandler needs at least 2 arguments");
 
+    iObjectRegistry* reg;
+    if (SWIG_ConvertPtr(reg_ref,(void**)&reg,SWIGTYPE_p_iObjectRegistry,0) < 0)
+      croak("Type error. Argument 1 must be iObjectRegistry.\n");
+
     unsigned int mask;
     if (mask_sv)
       mask = SvUV (mask_sv);
     else
       mask = csInitializer_SetupEventHandler_DefaultMask;
-
-    SV *reg_obj = SvRV (reg_ref);
-    if (! sv_isa (reg_obj, "cspace::iObjectRegistry"))
-      croak ("SetupEventHandler argument 1 must be iObjectRegistry");
-    iObjectRegistry *reg = (iObjectRegistry *) SvIV (reg_obj);
 
     SV *func = SvRV (func_rv);
     pl_csInitializer_EventHandler = func;
@@ -140,6 +140,7 @@
     XSRETURN_IV (ok ? 1 : 0);
   }
 %}
+#endif // CS_MICRO_SWIG
 
 /****************************************************************************
  * This is a wrapper function for RequestPlugin's variable argument list.
@@ -150,16 +151,12 @@
   {
     dXSARGS;
     dTARG;
-    SV *reg_ref = ST (0);
-    SV *reg_obj = SvRV (reg_ref);
-    if (! sv_isa (reg_obj, "cspace::iObjectRegistry"))
-      croak ("RequestPlugins argument 1 must be iObjectRegistry");
+    iObjectRegistry* reg;
+    if (SWIG_ConvertPtr(ST(0),(void**)&reg,SWIGTYPE_p_iObjectRegistry,0) < 0)
+      croak("Type error. Argument 1 must be iObjectRegistry.\n");
 
-    iObjectRegistry *reg = (iObjectRegistry *) SvIV (reg_obj);
-    SvREFCNT_dec (reg_obj);
-
-    bool ok = true;
-    for (int arg = 1; ok; arg += 4)
+    csArray<csPluginRequest> plugins;
+    for (int arg = 1; arg + 4 <= items; arg += 4)
     {
       SV *plug_sv = ST (arg);
       SV *iface_sv = ST (arg + 1);
@@ -171,11 +168,12 @@
       int scfid = SvIV (scfid_sv);
       int ver = SvIV (ver_sv);
 
-      bool ok1 = csInitializer::RequestPlugins
-        (reg, plug, iface, scfid, ver, 0);
-      if (! ok1) ok = false;
+      plugins.Push(csPluginRequest(plug, iface, scfid, ver));
     }
 
+    bool ok = true;
+    if (plugins.Length() != 0)
+      ok = csInitializer::RequestPlugins(reg, plugins);
     XSRETURN_IV (ok ? 1 : 0);
   }
 %}
@@ -190,20 +188,15 @@
     dSP;
     int ver;
     int nresult;
-    char boilerplate[] = "_scfGetVersion";
-    int const nboilerplate = sizeof(boilerplate); // Includes null terminator.
-    char *var = (char *) malloc (strlen (iface) + nboilerplate);
-    strcpy (var, iface);
-    strcat (var, boilerplate);
+    csString var;
+    var << "cspace::" << iface << "::scfGetVersion";
 
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
     PUTBACK;
-    nresult = call_pv(var, G_SCALAR | G_NOARGS);
+    nresult = call_pv(var.GetData(), G_SCALAR);
     SPAGAIN;
-
-    free (var);
 
     if (nresult != 1)
       croak("Expected exactly one result from scfGetVersion()\n");
@@ -236,14 +229,18 @@
 
   csWrapPtr CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface)
   {
-    return csWrapPtr (iface, reg->Get
+    csRef<iBase> b;
+    b.AttachNew(reg->Get
       (iface, iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
+    return csWrapPtr (iface, b);
   }
   csWrapPtr CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
     const char *tag, const char *iface)
   {
-    return csWrapPtr (iface, reg->Get
+    csRef<iBase> b;
+    b.AttachNew(reg->Get
       (tag, iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
+    return csWrapPtr (iface, b);
   }
   csWrapPtr SCF_QUERY_INTERFACE (iBase *obj, const char *iface)
   {
@@ -446,6 +443,7 @@
   }
 %}
 
+#ifndef CS_MINI_SWIG
 /****************************************************************************
  * Wrapper function to get the array returned by GetCollisionPairs().
  ****************************************************************************/
@@ -459,11 +457,9 @@
     if (! sys_ref)
       croak("No self parameter passed to GetCollisionPairs");
 
-    SV *sys_obj = SvRV (sys_ref);
-    if (! sv_isa (sys_obj, "cspace::iCollideSystem"))
-      croak("Self parameter of GetCollisionPairs must be an iCollideSystem");
-
-    iCollideSystem *sys = (iCollideSystem *) SvIV (sys_obj);
+    iCollideSystem* sys;
+    if (SWIG_ConvertPtr(sys_ref,(void**)&reg,SWIGTYPE_p_iCollideSystem,0) < 0)
+      croak("Self parameter of GetCollisionPairs must be an iCollideSystem\n");
 
     csCollisionPair *pairs = sys->GetCollisionPairs ();
     int num = sys->GetCollisionPairCount ();
@@ -471,7 +467,7 @@
     for (int i = 0; i < num; i++)
     {
       SV *rv = newSViv (0);
-      sv_setref_iv (rv, "cspace::csCollisionPair", (int) pairs++);
+      SWIG_MakePtr (rv, pairs++, SWIGTYPE_p_csCollisionPair, 0);
       av_push (av, rv);
       SvREFCNT_dec (rv);
     }
@@ -606,12 +602,14 @@
     return v;
   }
 %}
+#endif // CS_MINI_SWIG
 
 /****************************************************************************
  * Create a typemap for the i/csString wrappings below.
  ****************************************************************************/
 TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
 
+#ifndef CS_MINI_SWIG
 /****************************************************************************
  * Some extra operator overloads for iString.
  ****************************************************************************/
@@ -667,6 +665,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
     return self;
   }
 }
+#endif // CS_MINI_SWIG
 
 /****************************************************************************
  * Some extra operator overloads for csString.
@@ -730,6 +729,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   }
 }
 
+#ifndef CS_MINI_SWIG
 /****************************************************************************
  * Some extra operator overloads for iDataBuffer.
  ****************************************************************************/
@@ -744,6 +744,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
     return self->operator* ();
   }
 }
+#endif // CS_MINI_SWIG
 
 /*****************************************************************************
  * Define macros to create classes that are inheritable by script classes,
@@ -778,7 +779,10 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   %typemap(in) TYPE*
   {
     if (sv_isa ($input, "cspace::" #TYPE))
-      $1 = (TYPE *) SvIV (SvRV ($input));
+    {
+      SWIG_ConvertPtr($input,(void**)&($1),SWIG_TypeQuery("cspace::"#TYPE),0);
+      $1->IncRef();
+    }
     else if (sv_inherits ($input, "cspace::" #TYPE))
       $1 = new csWrap_##TYPE ($input);
     else
@@ -840,12 +844,12 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
 /*****************************************************************************
  * Use the macros we defined above for iEventHandler and iAwsSink.
  *****************************************************************************/
+#ifndef CS_MICRO_SWIG
 WRAP_SCRIPT_CLASS (iEventHandler,
   WRAP_FUNC (bool, HandleEvent, (iEvent &ev),
     SV *ev_rv = newSViv (0);
-    sv_setref_iv (ev_rv, "cspace::iEvent", (int) & ev);
+    SWIG_MakePtr (ev_rv, &ev, SWIGTYPE_p_iEvent, 0);
     XPUSHs (sv_2mortal (ev_rv));,
-
     POPi
   )
 )
@@ -866,7 +870,9 @@ WRAP_SCRIPT_CLASS (iEventPlug,
     XPUSHi (enabled ? 1 : 0);
   )
 )
+#endif // CS_MICRO_SWIG
 
+#ifndef CS_MINI_SWIG
 WRAP_SCRIPT_CLASS (iAwsSink,
   WRAP_FUNC (unsigned long, GetTriggerID, (const char *name),
     XPUSHp (name, strlen (name));,
@@ -876,7 +882,7 @@ WRAP_SCRIPT_CLASS (iAwsSink,
   WRAP_VOID (HandleTrigger, (int id, iAwsSource *src),
     XPUSHi (id);
     SV *ev_rv = newSViv (0);
-    sv_setref_iv (ev_rv, "cspace::iAwsSource", (int) src);
+    SWIG_MakePtr (ev_rv, src, SWIGTYPE_p_iAwsSource, 0);
     XPUSHs (sv_2mortal (ev_rv));
   )
   WRAP_VOID (RegisterTrigger, (const char *n, void (*t) (void*, iAwsSource*)),
@@ -888,5 +894,6 @@ WRAP_SCRIPT_CLASS (iAwsSink,
     POPu
   )
 )
+#endif // CS_MINI_SWIG
 
 #endif // SWIGPERL5

@@ -57,8 +57,9 @@ else
 endif
 
 INF.CSPERL5 = $(SRCDIR)/plugins/cscript/csperl5/csperl5.csplugin
-INC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.h))
-SRC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.cpp))
+INC.CSPERL5 = $(wildcard $(SRCDIR)/plugins/cscript/csperl5/*.h)
+SRC.CSPERL5 = $(filter-out $(SRCDIR)/plugins/cscript/csperl5/perl5mod.cpp, \
+  $(wildcard $(SRCDIR)/plugins/cscript/csperl5/*.cpp))
 OBJ.CSPERL5 = $(addprefix $(OUT)/,$(notdir $(SRC.CSPERL5:.cpp=$O)))
 DEP.CSPERL5 = CSTOOL CSGEOM CSUTIL CSUTIL
 
@@ -76,6 +77,8 @@ SWIG.PERL5.PM.IN = $(CSPERL5.DERIVED)/$(notdir $(SWIG.PERL5.PM))
 SWIG.PERL5.C.IN = $(CSPERL5.DERIVED)/$(notdir $(SWIG.PERL5.C))
 SWIG.PERL5.CPP = $(SRCDIR)/plugins/cscript/csperl5/cswigpl5.cpp
 SWIG.PERL5.O = $(OUT)/$(notdir $(SWIG.PERL5.CPP:.cpp=$O))
+SWIG.PERL5.MOD = $(SRCDIR)/plugins/cscript/csperl5/perl5mod.cpp
+SWIG.PERL5.MOD.O = $(OUT)/$(notdir $(SWIG.PERL5.MOD:.cpp=$O))
 SWIG.PERL5.INSTALLDIR = $(OUTPROC)/perl5
 SWIG.PERL5.DLL = $(SWIG.PERL5.INSTALLDIR)/$(SWIG.MOD)$(DLL)
 SWIG.PERL5.INSTALLPM = $(SWIG.PERL5.INSTALLDIR)/$(notdir $(SWIG.PERL5.PM))
@@ -109,7 +112,7 @@ OUTDIRS += $(CSPERL5.DERIVED) $(SWIG.PERL5.INSTALLDIR)
 #MSCSPERL5SWIG = $(SWIG.PERL5.DLL)
 #LIB.MSCSPERL5SWIG = $(LIB.MSCSPERL5)
 #SRC.MSCSPERL5SWIG = $(SWIG.PERL5.C)
-#OBJ.MSCSPERL5SWIG = $(SWIG.PERL5.O)
+#OBJ.MSCSPERL5SWIG = $(SWIG.PERL5.O) $(SWIG.PERL5.MOD.O)
 #DEP.MSCSPERL5SWIG = $(DEP.CSPERL5)
 
 endif
@@ -190,7 +193,7 @@ $(SWIG.PERL5.O): $(SWIG.PERL5.CPP)
 # PREAMBLE/POSTAMBLE macros.  In fact, this already fails on Windows, since
 # DO.SHARED.PLUGIN.CORE on Windows tries linking with a cspace-rsrc.o file
 # which does not exist.
-$(SWIG.PERL5.DLL): $(SWIG.PERL5.O) $(LIB.CSPERL5)
+$(SWIG.PERL5.DLL): $(SWIG.PERL5.MOD.O) $(SWIG.PERL5.O) $(LIB.CSPERL5)
 	$(filter-out %-rsrc$O,$(DO.SHARED.PLUGIN.CORE)) $(PERL5.LFLAGS)
 
 $(SWIG.PERL5.INSTALLPM): $(SWIG.PERL5.PM.IN)
@@ -210,8 +213,9 @@ maintainerclean: csperl5maintainerclean
 csperl5clean: swigperl5clean
 	-$(RMDIR) $(CSPERL5) $(OBJ.CSPERL5) \
 	$(OUTDLL)/$(notdir $(INF.CSPERL5)) $(CEX.CSPERL5) \
-	$(PERLXSI.O) $(PERLXSI.C) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL) \
-	$(SWIG.PERL5.INSTALLPM) $(CSPERL5.DERIVED) $(SWIG.PERL5.INSTALLDIR)
+	$(PERLXSI.O) $(PERLXSI.C) $(SWIG.PERL5.MOD.O) $(SWIG.PERL5.O) \
+	$(SWIG.PERL5.DLL) $(SWIG.PERL5.INSTALLPM) $(CSPERL5.DERIVED) \
+	$(SWIG.PERL5.INSTALLDIR)
 
 swigperl5clean:
 	-$(RM) $(SWIG.PERL5.C.IN) $(SWIG.PERL5.PM.IN)

@@ -13,12 +13,151 @@ chronological order.
 	- Jorrit added PointOnPolygon() to iThingStatic to test if a point
 	  is on a polygon.
 	- Steven Geens added sockets to the cal3d XML loader.
+	- Eric Sunshine made the following changes to the csperl5 module:
+	    - Fixed fatal bug in perlpost.i's overrides of
+	      csInitializer::RequestPlugins() and SetupEventHandler().  They
+	      were incorrectly checking if the first argument was of type
+	      iObjectRegistry reference _after_ they had already dereferenced
+	      the argument, which meant that the reference type information had
+	      already been thrown away.  Thus, the tests _always_ failed.  The
+	      iCollideSystem::GetCollisionParis() override suffered from the
+	      same bug when checking if its first argument was an
+	      iCollideSystem reference.  They now use the high-level
+	      SWIG_ConvertPtr() to check the type and perform the dereference,
+	      rather than low-level Perl API.
+	    - Fixed fatal bug in perlpost.i's override of
+	      csInitializer::RequestPlugins() where it completely ignored the
+	      number of incoming arguments and requested plugins based upon
+	      whatever random garbage existed in memory off the end of the Perl
+	      argument stack following the last of the actual requested
+	      plugins.
+	    - Fixed fatal bug in perlpost.i's override of scfInitialize().  It
+	      constructed its own argv[] array, but then sent zero (0) for argc
+	      to the C++ scfInitialize(), thus it always appeared that there
+	      were no arguments; not even the program path (argv[0]), which is
+	      absolutely required by scfInitialize() for proper functioning.
+	    - Fixed fatal bug in perlpre.i's "out" typemap for extracting the
+	      object pointer from csRef<>, csPtr<>, and csWrapPtr<>.  The
+	      typemap neglected to inform Perl that it was returning an object,
+	      with the result that _all_ csRef<>, csPtr<>, and csWrapPtr<>
+	      objects appeared to be invalid.
+	    - Fixed fatal bug in perlpre.i's "out" typemap for extracting the
+	      object pointer from a csWrapPtr<>.  It neglected to invoke
+	      iBase__DynamicCast() to retrieve the pointer's _true_ value for
+	      the given object's type.  This value can differ from the iBase
+	      pointer value when multiple-inheritance is involved or when
+	      embedding is involved.  Treating the iBase pointer as though it
+	      was the actual object pointer was incredibly dangerous and often
+	      incorrect.  The dynamic cast is mandatory.
+	    - Fixed fatal bug in several perlpre.i's array-based "in" typemap
+	      where they were checking if the incoming argument itself was an
+	      array (an impossibility in Perl), whereas they needed to first
+	      dereference the argument before checking the object's type.
+	    - Fixed potentially fatal bug in numerous perlpost.i functions
+	      which were using low-level Perl API (SvIV + blind cast) to
+	      convert SWIG references into CS objects by attempting to manually
+	      extract the object pointers from the references.  Unfortunately,
+	      this simple approach was not always appropriate since it did not
+	      replicate the deep Voodoo that Swig's own SWIG_ConvertPtr()
+	      employs.  Changed all functions to use SWIG_ConvertPtr() instead.
+	    - Fixed bug in numerous perlpost.i functions which were manually
+	      and incorrectly constructing Swig references using low-level Perl
+	      API (sv_setref_iv), rather than high-level Swig functionality.
+	      Changed to use SWIG_MakePtr() instead.
+	    - Fixed perlpost.i's csInitializer::RequestPlugins() override so
+	      that it now invokes the C++ RequestPlugins() just once rather
+	      than once per requested plugin since invoking it once per plugin
+	      made it impossible for the C++ RequestPlugins() to perform proper
+	      dependency resolution between requested plugins.
+	    - Fixed bug in perlpost.i's scfGetVersion().  It was incorrectly
+	      trying to call intfname_scfGetVersion() rather than
+	      cspace::intfname::scfGetVersion().
+	    - Fixed problem in perlpost.i's scfGetVersion() where it was
+	      invoking call_pv() with the G_NOARGS flag.  Although legal, the
+	      Swig-generated intfname::scfGetVersion() would sometimes throw an
+	      exception because it would see arguments on the stack from some
+	      other procedure further up in the call chain and think that the
+	      arguments were meant for it (even though it is not expecting any
+	      arguments).  Fixed by removing G_NOARGS from the invocation.
+	    - Fixed bug in perlpost.i's CS_QUERY_REGISTRY() and
+	      CS_QUERY_REGISTRY_TAG().  They were incorrectly managing the
+	      reference count of the returned object when wrapping it inside
+	      csWrapPtr<>, thus leaking a reference.
+	    - Fixed bug in perlpost.i's WRAP_SCRIPT_CLASS()'s "in" typemap in
+	      which it mismanaged the class' reference count, leading to
+	      double-delete when the incoming object was of precisely the
+	      script class' type (rather than a subclass, in which case the
+	      reference count was managed correctly).
+	    - Fixed perlpre.i's "in" typemap for argc/argv[] so that it is once
+	      again utilized.  Problem was that Swig typemaps do not seem to
+	      understand that 'const char*' and 'char const*' represent the
+	      same type, and it also had the wrong signature (was missing a
+	      'const').
+	    - Fixed to %ignore the C++ scfInitialize(argc,argv) since a
+	      Perl-specific scfInitialize() is provided by perlpost.i.
+	    - Fixed problem which made it impossible to load the pure Perl
+	      cspace module directly from Perl since it lacked a definition of
+	      cs_static_var_cleanup which comes from the
+	      CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP macro.  Fixed this by
+	      creating the new perl5mod.cpp which is linked only into the pure
+	      Perl module; not into the csperl5 CS plugin.  This source file
+	      contains goop needed by cspace.so (.dll), but not by csperl5.
+	    - There is no possible way that this module could ever have worked
+	      with all these (now fixed) fatal flaws present.  It seems that
+	      this module had never been tested.  My testing was fairly limited
+	      on account of minimal computing resources, so it is entirely
+	      possible that other fatal flaws may yet manifest.
+	- Eric Sunshine made the following changes to the cspython module:
+	    - Fixed pythpost.i's csInitializer::RequestPlugins() override so
+	      that it now invokes the C++ RequestPlugins() just once rather
+	      than once per requested plugin since invoking it once per plugin
+	      made it impossible for the C++ RequestPlugins() to perform proper
+	      dependency resolution between requested plugins.
+	    - Fixed bug in pythpost.i's _CS_QUERY_REGISTRY() and
+	      _CS_QUERY_REGISTRY_TAG().  They were incorrectly managing the
+	      reference count of the returned object when wrapping it inside
+	      csWrapPtr<>, thus leaking a reference.
+	- Eric Sunshine made the following changes to the csjava module:
+	    - Fixed bug in javapost.i's _CS_QUERY_REGISTRY() and
+	      _CS_QUERY_REGISTRY_TAG().  They were incorrectly managing the
+	      reference count of the returned object when wrapping it inside
+	      csWrapPtr<>, thus leaking a reference.
+	- Eric Sunshine made the following changes to cspace.i:
+	    - Fixed csInitializer::InitializeSCF() so that it is once again
+	      recognized by Swig typemaps, thus the Python/Perl/Java typemaps
+	      for this function once again work correctly.  Problem was that
+	      Swig typemaps do not seem to understand that 'const char*' and
+	      'char const*' represent the same type.
+	    - Now publishes csArray<csPluginRequest>.
+	    - Now publishes csInitializer::RequestPlugins(iObjectRegistry*,
+	      csArray<csPluginRequest>).
+	    - Eliminated the broken _RequestPlugin() interface published by
+	      cspace.i.  The problem with this approach was that it called the
+	      C++ csInitializer::RequestPlugins() once per requested plugin,
+	      rather than calling RequestPlugins() just once total, which is
+	      the way RequestPlugins() is meant to be called.  By calling it
+	      once per plugin, it was impossible for RequestPlugins() to
+	      perform proper dependency resolution between requested plugins.
+	    - Added CS_MINI_SWIG and CS_MICRO_SWIG defines to cspace.i.  Define
+	      one of these macros if you are trying to debug or test the
+	      scripting build systems or the scripting facilities themselves
+	      but despair of having to wait 30 minutes for each compile attempt
+	      to complete.  Define CS_MINI_SWIG to avoid publishing most of the
+	      CS interfaces except for csInitializer, object registry, VFS,
+	      SCF, event queue & handlers, 2D & 3D drivers, and font & font
+	      server.  This should cut compilation time down considerably.  If
+	      this is still too long, however, then define CS_MICRO_SWIG, which
+	      will publish only csInitializer, object registry, SCF, and VFS.
+	      This is about the bare minimum of exports which are still useful
+	      for testing various bits of functionality, and should reduce
+	      compilation time as much as possible.  CS_MICRO_SWIG implies
+	      CS_MINI_SWIG.
 1-Jan-2004
 	- Marten Svanfeldt made the first commit of 2004. Changes are:
-	  - Added basic portal support to new renderer. It still lacks support
-	    for <float> portals, fogs and a few other bits.
-	  - Fixed clipping with the new renderer.
-	  - Added portal sorting to the csRenderMesh sorting routines.
+	    - Added basic portal support to new renderer. It still lacks
+	      support for <float> portals, fogs and a few other bits.
+	    - Fixed clipping with the new renderer.
+	    - Added portal sorting to the csRenderMesh sorting routines.
 	- Jorrit changed iPortalContainer->Draw() so it no longer does
 	  SCF_QUERY_INTERFACE to get the mesh wrapper (and movable) but
 	  uses the movable parameter instead.

@@ -82,6 +82,28 @@
 
 %module cspace
 
+/* For debugging: If you need to debug the build commands for the scripting
+ * modules, or if you need to debug or test certain small portions of the
+ * entire scripting support but despair of having to wait for the lengthy
+ * compilations to complete (for instance, 30 minutes to build csperl5 on
+ * Sunshine's computer), then you can define either of these macros.  Define
+ * CS_MINI_SWIG to avoid publishing most of the CS interfaces except for
+ * csInitializer, object registry, VFS, SCF, event queue & handlers, 2D & 3D
+ * drivers, and font & font server.  This should cut compilation time down
+ * considerably (to 6 minutes, for example, for csperl).  If this is still too
+ * long, however, then define CS_MICRO_SWIG, which will publish only
+ * csInitializer, object registry, SCF, and VFS.  This is about the bare
+ * minimum of exports which are still useful for testing various bits of
+ * functionality, and should reduce compilation time as much as possible (under
+ * 2 minutes for csperl, for instance).  CS_MICRO_SWIG implies CS_MINI_SWIG.
+ */
+#undef CS_MINI_SWIG
+#undef CS_MICRO_SWIG
+
+#ifdef CS_MICRO_SWIG
+#define CS_MINI_SWIG
+#endif
+
 #ifdef SWIGPERL5
 	%include "ivaria/perl1st.i"
 #endif
@@ -113,18 +135,15 @@
 // Mark Gossage: somewhere in winuser.h there are a couple of #defines to
 // rename RegisterClass and UnregisterClass (which are windoze fns).
 // They also accidentally rename the iSCF fns too.
-#ifdef RegisterClass
-#	undef RegisterClass
-#endif
-#ifdef UnregisterClass
-#	undef UnregisterClass
-#endif
+#undef RegisterClass
+#undef UnregisterClass
 
 %}
 
 // The following list holds all the interfaces that are handled correctly.
 // If you have problems, first check if the interface in question is in
 // this list. Please keep the list sorted alphabetically.
+#ifndef CS_MINI_SWIG
 %define APPLY_FOR_EACH_INTERFACE
 	INTERFACE_APPLY(iAws)
 	INTERFACE_APPLY(iAwsKey)
@@ -227,6 +246,30 @@
 	INTERFACE_APPLY(iVirtualClock)
 	INTERFACE_APPLY(iVisibilityCuller)
 %enddef
+#else // CS_MINI_SWIG
+#ifndef CS_MICRO_SWIG
+%define APPLY_FOR_EACH_INTERFACE
+	INTERFACE_APPLY(iBase)
+	INTERFACE_APPLY(iEvent)
+	INTERFACE_APPLY(iEventHandler)
+	INTERFACE_APPLY(iEventQueue)
+	INTERFACE_APPLY(iFont)
+	INTERFACE_APPLY(iFontServer)
+	INTERFACE_APPLY(iGraphics3D)
+	INTERFACE_APPLY(iGraphics2D)
+	INTERFACE_APPLY(iObjectRegistry)
+	INTERFACE_APPLY(iSCF)
+        INTERFACE_APPLY(iVFS)
+%enddef
+#else // CS_MICRO_SWIG
+%define APPLY_FOR_EACH_INTERFACE
+	INTERFACE_APPLY(iBase)
+	INTERFACE_APPLY(iObjectRegistry)
+	INTERFACE_APPLY(iSCF)
+        INTERFACE_APPLY(iVFS)
+%enddef
+#endif // CS_MICRO_SWIG
+#endif // CS_MINI_SWIG
 
 %include "typemaps.i"
 
@@ -446,8 +489,36 @@ TYPEMAP_OUT_csWrapPtr
 // place after all %include's are done, mentioning the header(s) it is
 // related to.
 
+%ignore csArray::operator=;
+%ignore csArray::operator[];
+%ignore csArray::InitRegion;
+%ignore csArray::TransferTo;
+%ignore csArray::SetLength;
+%ignore csArray::Capacity;
+%ignore csArray::GetExtend;
+%ignore csArray::FindKey;
+%ignore csArray::PushSmart;
+%ignore csArray::Section;
+%ignore csArray::DefaultCompare;
+%ignore csArray::DefaultCompareKey;
+%ignore csArray::FindSortedKey;
+%ignore csArray::InsertSorted;
+%ignore csArray::Find;
+%ignore csArray::Sort;
+%ignore csArray::DeleteAll;
+%ignore csArray::SetCapacity;
+%ignore csArray::ShrinkBestFit;
+%ignore csArray::Delete;
+%ignore csArray::Iterator;
+%ignore csArray::GetIterator;
+%ignore csArrayElementHandler::Construct;
+%ignore csArrayElementHandler::Destroy;
+%ignore csArrayElementHandler::InitRegion;
+%include "csutil/array.h"
+
 %include "csutil/scf.h"
 
+#ifndef CS_MINI_SWIG
 %include "iutil/dbghelp.h"
 
 %ignore operator* (const csColor &, float);
@@ -461,6 +532,7 @@ TYPEMAP_OUT_csWrapPtr
 
 %ignore iString::operator char const*() const;
 %include "iutil/string.h"
+#endif // CS_MINI_SWIG
 
 %ignore csString::Append (short);
 %ignore csString::Append (unsigned short);
@@ -574,6 +646,7 @@ TYPEMAP_OUT_csWrapPtr
 %ignore operator<< (csString &, bool);
 %include "csutil/csstring.h"
 
+#ifndef CS_MINI_SWIG
 %ignore csVector2::operator+ (const csVector2 &, const csVector2 &);
 %ignore csVector2::operator- (const csVector2 &, const csVector2 &);
 %ignore csVector2::operator* (const csVector2 &, const csVector2 &);
@@ -729,17 +802,23 @@ TYPEMAP_OUT_csWrapPtr
 
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
+#endif // CS_MINI_SWIG
 
 %ignore csGetPlatformConfig;
 %include "cssys/sysfunc.h"
 
-%ignore csInitializer::RequestPlugins;
+%ignore csInitializer::RequestPlugins(iObjectRegistry*, ...);
+%rename (_RequestPlugins) csInitializer::RequestPlugins(iObjectRegistry*, csArray<csPluginRequest> const&);
 %ignore csInitializer::SetupEventHandler(iObjectRegistry*, csEventHandlerFunc, unsigned int);
 %rename(_SetupEventHandler) csInitializer::SetupEventHandler(iObjectRegistry*, iEventHandler *, unsigned int);
 %typemap(default) const char * configName { $1 = 0; }
 %include "cstool/initapp.h"
 %typemap(default) const char * configName;
+%ignore csArray<csPluginRequest>::operator[];
+%ignore csArray<csPluginRequest>::Put;
+%template(csPluginRequestArray) csArray<csPluginRequest>;
 
+#ifndef CS_MINI_SWIG
 %include "iaws/aws.h"
 
 %include "igeom/polymesh.h"
@@ -792,12 +871,18 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "iutil/comp.h"
 %include "iutil/cache.h"
+#endif // CS_MINI_SWIG
 %include "iutil/vfs.h"
+#ifndef CS_MINI_SWIG
 %include "iutil/object.h"
 %include "iutil/dbghelp.h"
+#endif // CS_MINI_SWIG
 %include "iutil/objreg.h"
+#ifndef CS_MINI_SWIG
 %include "iutil/virtclk.h"
+#endif // CS_MINI_SWIG
 
+#ifndef CS_MICRO_SWIG
 %rename(AddInt8) iEvent::Add(const char *, int8);
 %rename(AddInt16) iEvent::Add(const char *, int16);
 %rename(AddInt32) iEvent::Add(const char *, int32, bool);
@@ -829,6 +914,9 @@ TYPEMAP_OUT_csWrapPtr
 %include "iutil/eventq.h"
 %include "iutil/eventh.h"
 %include "iutil/plugin.h"
+#endif // CS_MICRO_SWIG
+
+#ifndef CS_MINI_SWIG
 %include "iutil/csinput.h"
 %include "iutil/cfgfile.h"
 %include "iutil/cfgmgr.h"
@@ -839,7 +927,9 @@ TYPEMAP_OUT_csWrapPtr
 
 %ignore iDataBuffer::GetInt8;
 %include "iutil/databuff.h"
+#endif // CS_MINI_SWIG
 
+#ifndef CS_MICRO_SWIG
 %include "ivideo/graph3d.h"
 %include "ivideo/graph2d.h"
 %include "ivideo/cursor.h"
@@ -849,7 +939,9 @@ TYPEMAP_OUT_csWrapPtr
 %ignore GetGlyphAlphaBitmap(uint8, int &, int &);
 %ignore GetDimensions(char const *, int &, int &);
 %include "ivideo/fontserv.h"
+#endif // CS_MICRO_SWIG
 
+#ifndef CS_MINI_SWIG
 %include "ivideo/halo.h"
 
 %include "ivideo/shader/shader.h"
@@ -918,6 +1010,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "cstool/csview.h"
 %include "cstool/collider.h"
 %include "cstool/csfxscr.h"
+#endif // CS_MINI_SWIG
 
 %define INTERFACE_POST(T)
 
@@ -958,6 +1051,7 @@ APPLY_FOR_EACH_INTERFACE
 
 #undef CAST_FROM_BASE
 
+#ifndef CS_MINI_SWIG
 // iaws/aws.h
 %extend iAws
 {
@@ -976,7 +1070,9 @@ APPLY_FOR_EACH_INTERFACE
 		return self->GetKeyState ((int) key[0]);
 	}
 }
+#endif // CS_MINI_SWIG
 
+#ifndef CS_MICRO_SWIG
 // iutil/event.h
 %extend iEvent
 {
@@ -1042,7 +1138,9 @@ csPtr<iBase> _CS_QUERY_REGISTRY_TAG (iObjectRegistry *, const char *);
 #define _CS_LOAD_PLUGIN_ALWAYS(a, b) CS_LOAD_PLUGIN_ALWAYS(a, b)
 #undef CS_LOAD_PLUGIN_ALWAYS
 csPtr<iBase> _CS_LOAD_PLUGIN_ALWAYS (iPluginManager *, const char *);
+#endif // CS_MICRO_SWIG
 
+#ifndef CS_MINI_SWIG
 // ivaria/collider.h
 %extend iCollideSystem
 {
@@ -1051,19 +1149,9 @@ csPtr<iBase> _CS_LOAD_PLUGIN_ALWAYS (iPluginManager *, const char *);
 		return self->GetCollisionPairs() + index;
 	}
 }
+#endif // CS_MINI_SWIG
 
-// cstool/initapp.h
-%extend csInitializer
-{
-	static bool _RequestPlugin (iObjectRegistry * object_reg,
-		const char * plugName, const char * intName, int scfId, int version)
-	{
-		return csInitializer::RequestPlugins(
-			object_reg, plugName, intName, scfId, version, CS_REQUEST_END
-		);
-	}
-}
-
+#ifndef CS_MICRO_SWIG
 // ivideo/graph3d.h
 #define _CS_FX_SETALPHA(a) CS_FX_SETALPHA(a)
 #undef CS_FX_SETALPHA
@@ -1071,7 +1159,9 @@ uint _CS_FX_SETALPHA (uint);
 #define _CS_FX_SETALPHA_INT(a) CS_FX_SETALPHA_INT(a)
 #undef CS_FX_SETALPHA_INT
 uint _CS_FX_SETALPHA_INT (uint);
+#endif // CS_MICRO_SWIG
 
+#ifndef CS_MINI_SWIG
 // csgeom/vector2.h csgeom/vector3.h
 %define VECTOR_OBJECT_FUNCTIONS(V)
 	V operator + (const V & v) const
@@ -1248,6 +1338,7 @@ uint _CS_FX_SETALPHA_INT (uint);
 	csQuaternion operator * (const csQuaternion& q)
 		{ return *self * q; }
 }
+#endif // CS_MINI_SWIG
 
 #if defined(SWIGPYTHON)
 	%include "ivaria/pythpost.i"

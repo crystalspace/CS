@@ -91,15 +91,19 @@ csWrapPtr _SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
 csWrapPtr _CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface,
 	int iface_ver)
 {
-  return csWrapPtr (iface, reg->Get
+  csRef<iBase> b;
+  b.AttachNew(reg->Get
     (iface, iSCF::SCF->GetInterfaceID (iface), iface_ver));
+  return csWrapPtr (iface, b);
 }
 
 csWrapPtr _CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
 	const char *tag, const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, reg->Get
+  csRef<iBase> b;
+  b.AttachNew(reg->Get
     (tag, iSCF::SCF->GetInterfaceID (iface), iface_ver));
+  return csWrapPtr (iface, b);
 }
 
 csWrapPtr _CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,

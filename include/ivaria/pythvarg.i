@@ -25,6 +25,7 @@
 
 #ifdef SWIGPYTHON
 
+#ifndef CS_MICRO_SWIG
 %extend iGraphics2D
 {
 	PyObject * _PerformExtension (const char * clazz, const char * command, PyObject * args)
@@ -71,6 +72,6 @@
 	%}
 }
 
+#endif // CS_MICRO_SWIG
+
 #endif // SWIGPYTHON
-
-
