@@ -935,7 +935,7 @@ void csPolygon3D::SetTextureSpace (
   	uv2.y - uv1.y, uv3.y - uv1.y
   	);
   float det = m.Determinant ();
-  if (ABS (det) < SMALL_EPSILON)
+  if (ABS (det) < EPSILON)
   {
     printf ("Warning: badly specified UV coordinates for polygon '%s'!\n",
       GetName ());
