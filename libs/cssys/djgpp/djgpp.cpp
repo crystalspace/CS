@@ -52,7 +52,7 @@ static MouseHandler MH;
 
 static unsigned short ScanCodeToChar[128] =
 {
-  CSKEY_ESC,27,       '1',      '2',      '3',      '4',      '5',      '6',    // 00..07
+  0,        CSKEY_ESC,'1',      '2',      '3',      '4',      '5',      '6',    // 00..07
   '7',      '8',      '9',      '0',      '-',      '=',      '\b',     '\t',   // 08..0F
   'q',      'w',      'e',      'r',      't',      'y',      'u',      'i',    // 10..17
   'o',      'p',      '[',      ']',      '\n',     CSKEY_CTRL,'a',     's',    // 18..1F
