@@ -611,6 +611,22 @@ CS_EMIT_BUILD_FLAGS([how to disable C++ exceptions],
 
 
 #------------------------------------------------------------------------------
+# Check how to make compiler comply strongly with the official C++ language
+# specification. Crystal Space itself can not abide 100% by the standard (for
+# instance, we employ `long long', which is not part of the present
+# specification), however, some external projects do so (by using gcc's -ansi
+# and -pedantic options, for instance). Because such projects may utilize
+# Crystal Space, we must ensure that our public headers likewise comply with
+# the official specification.
+#------------------------------------------------------------------------------
+CS_EMIT_BUILD_FLAGS([how to enforce C++ standards conformance],
+    [cs_cv_prog_cxx_enable_pedantic],
+    [CS_CREATE_TUPLE([-ansi -pedantic])], [C++],
+	[COMPILER.C++FLAGS.PEDANTIC.ENABLE])
+
+
+
+#------------------------------------------------------------------------------
 # Check if the linker recognizes "-multiply_defined suppress".  This is
 # required for MacOS/X 10.1 to avoid warning messages when linking a program
 # with "-framework Foundation" if that program does not actually employ any

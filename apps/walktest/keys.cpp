@@ -60,7 +60,7 @@ void map_key (const char* _keyname, csKeyMap* map)
   map->alt = 0;
   map->ctrl = 0;
   map->need_status = 0;
-  CS_ALLOC_STACK_ARRAY(char, keyname, strlen(_keyname) + 1);
+  char* keyname = new char[strlen(_keyname) + 1];
   strcpy (keyname, _keyname);
   char* dash = strchr (keyname, '-');
   while (dash)
@@ -105,13 +105,16 @@ void map_key (const char* _keyname, csKeyMap* map)
   else if (!strcmp (keyname, "f10")) map->key = CSKEY_F10;
   else if (!strcmp (keyname, "f11")) map->key = CSKEY_F11;
   else if (!strcmp (keyname, "f12")) map->key = CSKEY_F12;
-  /*else if (*(keyname+1) != 0) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  /*
+  else if (*(keyname+1) != 0) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"Bad key '%s'!", keyname);
-  else if ((*keyname >= 'A' && *keyname <= 'Z') || strchr ("!@#$%^&*()_+", *keyname))
+  else if ((*keyname >= 'A' && *keyname <= 'Z') ||
+    strchr ("!@#$%^&*()_+", *keyname))
   {
     map->shift = 1;
     map->key = *keyname;
-  }*/
+  }
+  */
   else
   {
     utf32_char key;
@@ -126,6 +129,7 @@ void map_key (const char* _keyname, csKeyMap* map)
     else
       map->key = key;
   }
+  delete[] keyname;
 }
 
 char* keyname (csKeyMap* map)
@@ -204,7 +208,7 @@ void bind_key (const char* _arg)
     }
     return;
   }
-  CS_ALLOC_STACK_ARRAY (char, arg, strlen(_arg) + 1);
+  char* arg = new char[strlen(_arg) + 1];
   strcpy (arg, _arg);
   char* space = strchr (arg, ' ');
   if (space)
@@ -235,6 +239,7 @@ void bind_key (const char* _arg)
     	"Key bound to '%s'!", map->cmd);
     else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Key not bound!");
   }
+  delete[] arg;
 }
 
 void free_keymap ()

@@ -4,6 +4,18 @@ Description walktest : "WalkTest demo" ;
 Application walktest : [ Wildcard *.cpp *.h ] ;
 LinkWith walktest : csgeom csgfx cstool csutil ;
 
+# Some external projects use gcc's -ansi and -pedantic options. We need to
+# ensure that CS's public headers are usable when these options are enabled,
+# Unfortunately, we can not enable these options globally since CS uses some
+# features (such as `long long') which are not available in the present
+# language standard. As a compromise, we enable these restrictions on an
+# individual module basis so as to ensure that the CS headers are tested
+# against these options on a regular basis.
+if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
+{
+  CFlags walktest : $(COMPILER.C++FLAGS.PEDANTIC.ENABLE) ;
+}
+
 CompileGroups bugplug    : walkall ;
 CompileGroups csconin    : walkall ;
 CompileGroups csfont     : walkall ;

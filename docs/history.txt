@@ -30,6 +30,18 @@ chronological order.
 	  for CS (and complement the existing emitter macros, such as
 	  CS_JAMCONFIG_PROPERTY(), CS_MAKEFILE_PROPERTY(), CS_NULL_EMITTER(),
 	  etc.).
+	- Eric Sunshine added a check to configure.ac to test if the compiler
+	  can be instructed (via -ansi and -pedantic, for instance) to comply
+	  strongly with the C++ language standard.
+	- Eric Sunshine applied the result of configure.ac's new C++ language
+	  conformance check to simple1 and walktest. This will help us to
+	  ensure that the public CS headers can be #included cleanly by
+	  external projects which use gcc's -ansi and -pedantic options. These
+	  two modules were chosen because they are built frequently, and both
+	  #include <crystalspace.h>, which provides us with maximum header
+	  coverage. (Unfortunately, we can not use -ansi and -pedantic globally
+	  since CS relies upon some language features, such as `long long',
+	  which are not part of the present standard.)
 2-Mar-2005
 	- Jorrit changed pvscalc to use the Description() method to print
 	  out boxes and vectors instead of the ugly B2F and other macros.

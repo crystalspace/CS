@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2005 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,71 +22,26 @@
 */
 #include <stdarg.h>
 
-#include "cssysdef.h"
-#include "csutil/sysfunc.h"
+// Some external projects use gcc's -ansi and -pedantic options. We need to
+// ensure that CS's public headers are usable when these options are enabled,
+// Unfortunately, we can not enable these options globally since CS uses some
+// features (such as `long long') which are not available in the present
+// language standard. As a compromise, we enable these restrictions on an
+// individual module basis (see Jamfile) so as to ensure that the CS headers
+// are tested against these options on a regular basis. We purposely #include
+// "crystalspace.h" rather than including only the headers we need so that we
+// test as many headers for standards conformance as possible.
+#include "crystalspace.h"
+
 #include "walktest.h"
 #include "infmaze.h"
 #include "command.h"
-#include "igeom/polymesh.h"
-#include "csgeom/frustum.h"
-#include "iengine/region.h"
-#include "iengine/light.h"
-#include "iengine/camera.h"
-#include "iengine/sector.h"
-#include "csgeom/csrect.h"
-#include "csutil/scanstr.h"
-#include "csutil/csobject.h"
-#include "csutil/cspmeter.h"
-#include "cstool/cspixmap.h"
-#include "cstool/csfxscr.h"
-#include "cstool/csview.h"
-#include "cstool/initapp.h"
-#include "csver.h"
-#include "csqint.h"
-#include "iutil/cfgmgr.h"
-#include "iutil/cmdline.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/natwin.h"
-#include "ivideo/txtmgr.h"
-#include "isound/handle.h"
-#include "isound/source.h"
-#include "isound/listener.h"
-#include "isound/renderer.h"
-#include "igraphic/image.h"
-#include "igraphic/imageio.h"
-#include "ivaria/collider.h"
-#include "ivaria/reporter.h"
-#include "ivaria/stdrep.h"
-#include "imap/parser.h"
-#include "csutil/cmdhelp.h"
-#include "iutil/event.h"
-#include "iutil/objreg.h"
-#include "iutil/csinput.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/virtclk.h"
-#include "isound/wrapper.h"
-#include "imesh/thing.h"
-#include "imesh/terrfunc.h"
-#include "imesh/object.h"
-#include "imesh/mdlconv.h"
-#include "imesh/crossbld.h"
-#include "iengine/movable.h"
-#include "iengine/campos.h"
-#include "iutil/plugin.h"
-
-#if defined(CS_PLATFORM_WIN32)
-#include "csutil/win32/minidump.h"
-#endif
 
 #if defined(CS_PLATFORM_DOS) || defined(CS_PLATFORM_WIN32)
 #  include <io.h>
 #elif defined(CS_PLATFORM_UNIX)
 #  include <unistd.h>
 #endif
-
-#include "csutil/fpu80x86.h"	// for debugging numerical instabilities
 
 WalkTest *Sys;
 

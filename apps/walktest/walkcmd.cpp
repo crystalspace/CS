@@ -82,8 +82,7 @@ void BoundingBoxForView(iView *view, csBox2 *box)
     csVector2 *clip = view->GetClipper()->GetClipPoly();
     for (int i = 0; i < vertexCount; i++)
         box->AddBoundingVertex(clip[i]);
-};
-
+}
 
 /// Save recording
 void SaveRecording (iVFS* vfs, const char* fName)
@@ -657,7 +656,7 @@ double ParseScaleFactor(iObjectIterator* it)
 
   sf = atof(scaleValue);
   return sf;
-};
+}
 
 
 /// Extracts the material name of the defmaterial key value
@@ -796,7 +795,7 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
   csRef<iSprite3DState> state (SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
                           iSprite3DState));
   state->SetAction("default");
-};
+}
 
 
 
