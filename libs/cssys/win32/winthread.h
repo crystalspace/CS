@@ -69,7 +69,7 @@ class csWinThread : public csThread
 class csWinMutex : public csMutex
 {
 public:
-  csWinMutex (bool );
+  csWinMutex ();
   virtual ~csWinMutex ();
   
   virtual bool LockWait ();
