@@ -9,6 +9,9 @@ chronological order.
 4-Sep-2003
 	- Jorrit updated the collision detection howto and also clarified
 	  a Doxygen comment about the need to call ResetCollisionPairs().
+	- Jorrit reverted data/shader/vertexlight.avp because with revision
+	  1.8 of that file the new renderer crashes because GetBestTechnique()
+	  returns 0 for some shader.
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.
