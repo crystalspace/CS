@@ -134,12 +134,6 @@ class csIsoFakeRenderView : public iRenderView
 {
   iCamera *fakecam;
   iIsoRenderView *isorview;
-  /**
-   * A callback function. If this is set then no drawing is done.
-   * Instead the callback function is called.
-   */
-  csRef<iDrawFuncCallback> callback;
-
 public:
   SCF_DECLARE_IBASE;
   csIsoFakeRenderView()
@@ -332,18 +326,6 @@ public:
   virtual void DeleteRenderContextData (void* key)
   {
     (void)key;
-  }
-  virtual void SetCallback (iDrawFuncCallback* cb)
-  {
-    callback = cb;
-  }
-  virtual iDrawFuncCallback* GetCallback ()
-  {
-    return callback;
-  }
-  virtual void CallCallback (int type, void* data)
-  {
-    callback->DrawFunc (this, type, data);
   }
   virtual iCamera* GetOriginalCamera () const { return NULL; }
 };
