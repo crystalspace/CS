@@ -364,10 +364,7 @@ public:
   void ScaleBy (float factor);
 
   /// Set the render priority for this object.
-  void SetRenderPriority (long rp)
-  {
-    render_priority = rp;
-  }
+  void SetRenderPriority (long rp);
   /// Get the render priority for this object.
   long GetRenderPriority ()
   {

@@ -163,6 +163,42 @@ void csSector::UnlinkMesh (csMeshWrapper* mesh)
   }
 }
 
+void csSector::RelinkMesh (csMeshWrapper* mesh)
+{
+  //-----
+  // Try to find the mesh in some render priority queue.
+  //-----
+  int i;
+  for (i = 0 ; i < mesh_priority_queues.Length () ; i++)
+  {
+    csVector* queue = (csVector*)mesh_priority_queues[i];
+    if (queue != NULL)
+    {
+      int idx = queue->Find ((csSome)mesh);
+      if (idx != -1)
+      {
+        queue->Delete (idx);
+	break;
+      }
+    }
+  }
+
+  //-----
+  // Place the mesh in the right priority queue.
+  //-----
+  long pri = mesh->GetRenderPriority ();
+  // First initialize all uninitialized queues.
+  for (i = mesh_priority_queues.Length () ; i <= pri ; i++)
+    mesh_priority_queues[i] = NULL;
+  csVector* queue = (csVector*)mesh_priority_queues[pri];
+  if (queue == NULL)
+  {
+    queue = new csVector ();
+    mesh_priority_queues[pri] = queue;
+  }
+  queue->Push ((csSome)mesh);
+}
+
 csMeshWrapper* csSector::GetMesh (const char* name)
 {
   int i;

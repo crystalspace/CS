@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2000-2001 by Andrew Zabolotny
     Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Andrew Zabolotny
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -66,9 +66,13 @@ csRenderView::csRenderView (iCamera* c, csClipper* v, iGraphics3D* ig3d,
 
 csRenderView::~csRenderView ()
 {
-  if (ctxt && ctxt->icamera) ctxt->icamera->DecRef ();
+  if (ctxt)
+  {
+    if (ctxt->icamera) ctxt->icamera->DecRef ();
+    DeleteRenderContextData (ctxt);
+    delete ctxt;
+  }
   if (iengine) iengine->DecRef ();
-  delete ctxt;
 }
 
 void csRenderView::SetCamera (iCamera* icam)
@@ -481,6 +485,7 @@ void csRenderView::CreateRenderContext ()
   *ctxt = *old_ctxt;
   if (ctxt->icamera) ctxt->icamera->IncRef ();
   if (ctxt->iview) ctxt->iview->IncRef ();
+  ctxt->rcdata = NULL;
 }
 
 void csRenderView::RestoreRenderContext (csRenderContext* original)
@@ -490,6 +495,7 @@ void csRenderView::RestoreRenderContext (csRenderContext* original)
 
   if (old_ctxt->icamera) old_ctxt->icamera->DecRef ();
   if (old_ctxt->iview) old_ctxt->iview->DecRef ();
+  DeleteRenderContextData (old_ctxt);
   delete old_ctxt;
 }
 
@@ -502,4 +508,55 @@ iCamera* csRenderView::CreateNewCamera ()
   return ctxt->icamera;
 }
 
+void csRenderView::DeleteRenderContextData (csRenderContext* rc)
+{
+  if (!rc) return;
+  while (rc->rcdata)
+  {
+    csRenderContextData* n = (csRenderContextData*)(rc->rcdata);
+    rc->rcdata = n->next;
+    if (n->data) n->data->DecRef ();
+  }
+}
+
+void csRenderView::DeleteRenderContextData (void* key)
+{
+  csRenderContextData** prev = &(csRenderContextData*)(ctxt->rcdata);
+  csRenderContextData* cd = (csRenderContextData*)(ctxt->rcdata);
+  while (cd)
+  {
+    if (cd->key == key)
+    {
+      if (cd->data) cd->data->DecRef ();
+      *prev = cd->next;
+      delete cd;
+      cd = *prev;
+    }
+    else
+    {
+      prev = &(cd->next);
+      cd = cd->next;
+    }
+  }
+}
+
+void csRenderView::AttachRenderContextData (void* key, iBase* data)
+{
+  csRenderContextData* cd = new csRenderContextData ();
+  cd->next = (csRenderContextData*)(ctxt->rcdata);
+  ctxt->rcdata = cd;
+  cd->key = key;
+  cd->data = data;
+}
+
+iBase* csRenderView::FindRenderContextData (void* key)
+{
+  csRenderContextData* cd = (csRenderContextData*)(ctxt->rcdata);
+  while (cd)
+  {
+    if (cd->key == key) return cd->data;
+    cd = cd->next;
+  }
+  return NULL;
+}
 

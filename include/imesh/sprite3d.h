@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -263,7 +263,7 @@ struct iSprite3DFactoryState : public iBase
   virtual void MergeNormals () = 0;
 };
 
-SCF_VERSION (iSprite3DState, 0, 0, 2);
+SCF_VERSION (iSprite3DState, 0, 0, 3);
 
 /**
  * This interface describes the API for the 2D sprite mesh object.
@@ -278,6 +278,10 @@ struct iSprite3DState : public iBase
   virtual void SetMixMode (UInt mode) = 0;
   /// Get mix mode.
   virtual UInt GetMixMode () = 0;
+  /// Set lighting.
+  virtual void SetLighting (bool l) = 0;
+  /// Get lighting.
+  virtual bool IsLighting () = 0;
 
   // @@@ TODO: what about conveniance functions to set colors for verts?
 

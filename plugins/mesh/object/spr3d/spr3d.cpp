@@ -588,6 +588,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   vertex_colors = NULL;
   skeleton_state = NULL;
   tween_ratio = 0;
+  do_lighting = true;
   num_verts_for_lod = -1;
 
   tr_verts.IncRef ();
@@ -975,7 +976,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     csBox3 obox;
     GetObjectBoundingBox (obox);
     csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
-    csVector3 wor_center = movable->GetTransform ().This2Other (obj_center);
+    csVector3 wor_center = movable->GetFullTransform ().This2Other (obj_center);
     csVector3 cam_origin = camera->GetTransform ().GetOrigin ();
     float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
     level_of_detail /= MAX (wor_sq_dist, SMALL_EPSILON);
@@ -1179,7 +1180,8 @@ csVector3* csSprite3DMeshObject::GetObjectVerts (csSpriteFrame* fr)
   if (skeleton_state)
   {
     UpdateWorkTables (factory->GetNumTexels());
-    skeleton_state->Transform (csTransform (), obj_verts.GetArray (), tr_verts.GetArray ());
+    skeleton_state->Transform (csTransform (), obj_verts.GetArray (),
+    	tr_verts.GetArray ());
     return tr_verts.GetArray ();
   }
   else
@@ -1190,6 +1192,7 @@ void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
 	iMovable* movable)
 {
   SetupObject ();
+  if (!do_lighting) return;
 
   // Make sure the normals are computed
   factory->ComputeNormals (cur_action->GetCsFrame (cur_frame));
@@ -1202,23 +1205,19 @@ void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
   if (GetLightingQuality() == CS_SPR_LIGHTING_LQ ||
       GetLightingQuality() == CS_SPR_LIGHTING_HQ )
   {
-    iSector* sect = movable->GetSector (0);
-    if (sect)
-    {
-      int r, g, b;
-      int num_texels = factory->GetNumTexels();
+    int r, g, b;
+    int num_texels = factory->GetNumTexels();
 
-      //@@@@@@@@@@@@@@@@@ TODO:sect->GetAmbientColor (r, g, b);
-      r = g = b = 0;
-      //@@@@@@
-      float rr = r / 128.0;
-      float gg = g / 128.0;
-      float bb = b / 128.0;
+    //@@@@@@@@@@@@@@@@@ TODO:GetAmbientColor (r, g, b);
+    r = g = b = 0;
+    //@@@@@@
+    float rr = r / 128.0;
+    float gg = g / 128.0;
+    float bb = b / 128.0;
 
-      // Reseting all of the vertex_colors to the ambient light.
-      for (int i = 0 ; i < num_texels; i++)
-        vertex_colors [i].Set (rr, gg, bb);
-    }
+    // Reseting all of the vertex_colors to the ambient light.
+    for (int i = 0 ; i < num_texels; i++)
+      vertex_colors [i].Set (rr, gg, bb);
   }
   
 // @@@
@@ -1283,7 +1282,8 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
   csBox3 obox;
   GetObjectBoundingBox (obox);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
-  csVector3 wor_center = movable->GetTransform ().This2Other (obj_center);
+  csReversibleTransform movtrans = movable->GetFullTransform ();
+  csVector3 wor_center = movtrans.This2Other (obj_center);
   csColor color;
   
   csColor light_color;
@@ -1296,8 +1296,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
   // ambient colors.
   int r, g, b;
   
-  //@@@@@@@TODO:iSector * sect = movable->GetSector (0);
-  //@@@sect->GetAmbientColor (r, g, b);
+  //@@@GetAmbientColor (r, g, b);
   r = g = b = 0;
   //@@@@@
   float amb_r = r / 128.0;
@@ -1315,7 +1314,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
     if (wor_sq_dist >= sq_light_radius) continue;
 
-    csVector3 obj_light_pos = movable->GetTransform ().Other2This (wor_light_pos);
+    csVector3 obj_light_pos = movtrans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
     float inv_obj_dist = qisqrt (obj_sq_dist);
     float wor_dist = qsqrt (wor_sq_dist);
@@ -1389,7 +1388,8 @@ void csSprite3DMeshObject::UpdateLightingLQ (iLight** lights, int num_lights,
   csBox3 obox;
   GetObjectBoundingBox (obox);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
-  csVector3 wor_center = movable->GetTransform ().This2Other (obj_center);
+  csReversibleTransform movtrans = movable->GetFullTransform ();
+  csVector3 wor_center = movtrans.This2Other (obj_center);
   csColor color;
 
   for (i = 0 ; i < num_lights ; i++)
@@ -1399,7 +1399,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (iLight** lights, int num_lights,
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
     if (wor_sq_dist >= lights[i]->GetSquaredRadius ()) continue;
 
-    csVector3 obj_light_pos = movable->GetTransform ().Other2This (wor_light_pos);
+    csVector3 obj_light_pos = movtrans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
 
     float in_obj_dist = 0.0f;
@@ -1469,6 +1469,7 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
 
   csColor color;
 
+  csReversibleTransform movtrans = movable->GetFullTransform ();
   for (i = 0 ; i < num_lights ; i++)
   {
     csColor light_color = lights [i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
@@ -1476,12 +1477,12 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
 
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [i]->GetCenter ();
-    csVector3 obj_light_pos = movable->GetTransform ().Other2This (wor_light_pos);
+    csVector3 obj_light_pos = movtrans.Other2This (wor_light_pos);
 
     for (j = 0 ; j < num_texels ; j++)
     {
       csVector3& obj_vertex = object_vertices[j];
-      csVector3 wor_vertex = movable->GetTransform ().This2Other (obj_vertex);
+      csVector3 wor_vertex = movtrans.This2Other (obj_vertex);
 
       // @@@ We have the distance in object space. Can't we use
       // that to calculate the distance in world space as well?

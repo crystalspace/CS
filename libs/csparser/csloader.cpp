@@ -2257,7 +2257,24 @@ bool csLoader::LoadRenderPriorities (char* buf)
       case CS_TOKEN_PRIORITY:
       {
         long pri;
-	ScanStr (params, "%d", &pri);
+	char sorting[100];
+	ScanStr (params, "%d,%s", &pri, sorting);
+	if (!strcmp (sorting, "BACK2FRONT"))
+	{
+	}
+	else if (!strcmp (sorting, "FRONT2BACK"))
+	{
+	}
+	else if (!strcmp (sorting, "NONE"))
+	{
+	}
+	else
+	{
+	  CsPrintf (MSG_FATAL_ERROR,
+	  	"Unknown sorting attribute '%s' for the render priority!\n\
+Use BACK2FRONT, FRONT2BACK, or NONE\n", sorting);
+	  fatal_exit (0, false);
+	}
 	Engine->RegisterRenderPriority (name, pri);
         break;
       }

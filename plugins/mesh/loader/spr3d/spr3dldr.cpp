@@ -53,6 +53,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FRAME)
   CS_TOKEN_DEF (IDENTITY)
   CS_TOKEN_DEF (LIMB)
+  CS_TOKEN_DEF (LIGHTING)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MATRIX)
   CS_TOKEN_DEF (MIXMODE)
@@ -802,6 +803,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ACTION)
     CS_TOKEN_TABLE (FACTORY)
+    CS_TOKEN_TABLE (LIGHTING)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (MIXMODE)
     CS_TOKEN_TABLE (TWEEN)
@@ -848,6 +850,13 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_ACTION:
         ScanStr (params, "%s", str);
 	spr3dLook->SetAction (str);
+        break;
+      case CS_TOKEN_LIGHTING:
+	{
+	  bool do_lighting;
+          ScanStr (params, "%b", &do_lighting);
+	  spr3dLook->SetLighting (do_lighting);
+	}
         break;
       case CS_TOKEN_MATERIAL:
 	{
@@ -926,6 +935,8 @@ void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str,
       GetPrivateObject()->GetName());
     str->Push(strnew(buf));
   }
+  sprintf(buf, "LIGHTING (%s)\n", state->IsLighting ()?"true":"false");
+  str->Push(strnew(buf));
   sprintf(buf, "TWEEN (%s)\n", state->IsTweeningEnabled()?"true":"false");
   str->Push(strnew(buf));
   if(state->GetCurAction())

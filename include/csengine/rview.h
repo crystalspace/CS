@@ -61,6 +61,26 @@ typedef void (csDrawFunc) (csRenderView* rview, int type, void* entity);
 class csRenderView : public iRenderView
 {
 private:
+  /**
+   * A structure to keep data with the render context. All data
+   * that is attached to a render context will be automatically cleaned
+   * up when the render context is deleted (i.e. when a recursion level
+   * is closed).
+   */
+  struct csRenderContextData
+  {
+    /// Next data.
+    csRenderContextData* next;
+
+    /// The key is some value on which we want to retreive the data.
+    void* key;
+    /**
+     * This is the data. When the render context is deleted it will DecRef()
+     * this.
+     */
+    iBase* data;
+  };
+
   /// The current render context.
   csRenderContext* ctxt;
 
@@ -81,6 +101,11 @@ private:
   csDrawFunc* callback;
   /// Userdata belonging to the callback.
   void* callback_data;
+
+  /**
+   * Delete all data on the given render context.
+   */
+  void DeleteRenderContextData (csRenderContext* rc);
 
 public:
   ///
@@ -254,7 +279,8 @@ public:
    * and the rest of the structure should be filled in.
    * This function will take care of correctly enabling/disabling fog.
    */
-  virtual void CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh& mesh);
+  virtual void CalculateFogMesh (const csTransform& tr_o2c,
+  	G3DTriangleMesh& mesh);
   /**
    * Check if the screen bounding box of an object is visible in
    * this render view. If true is returned (visible) then do_clip
@@ -287,7 +313,34 @@ public:
   /// Get the portal polygon.
   virtual iPolygon3D* GetPortalPolygon () { return ctxt->portal_polygon; }
   /// Set the portal polygon.
-  virtual void SetPortalPolygon (iPolygon3D* por) { ctxt->portal_polygon = por; }
+  virtual void SetPortalPolygon (iPolygon3D* por)
+  { ctxt->portal_polygon = por; }
+
+  /**
+   * Get render recursion level.
+   */
+  virtual int GetRenderRecursionLevel () { return ctxt->draw_rec_level; }
+  /**
+   * Set render recursion level.
+   */
+  virtual void SetRenderRecursionLevel (int rec)
+  {
+    ctxt->draw_rec_level = rec;
+  }
+
+  /**
+   * Attach data to the current render context.
+   */
+  virtual void AttachRenderContextData (void* key, iBase* data);
+  /**
+   * Look for data on the current render context.
+   */
+  virtual iBase* FindRenderContextData (void* key);
+  /**
+   * Delete all data with the given key on the current render
+   * context.
+   */
+  virtual void DeleteRenderContextData (void* key);
 };
 
 #endif // __CS_RVIEW_H__

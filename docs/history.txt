@@ -1,5 +1,56 @@
 The history order has been reversed so that new features are at the top.
 
+11-Apr-2001
+	- Added the notion of recursion level in csRenderContext. Also added
+	  GetRenderRecursionLevel() and SetRenderRecursionLevel() to
+	  iRenderView. Using this the engine will be able to test how deep
+	  it is with going through portals.
+	- Added the notion of render context data. This is data that can
+	  be attached to a recursion level in the render context and can
+	  also be retrieved while that recursion level is active. If a
+	  recursion level is deleted (when coming back from a portal for
+	  example) all the render context data will also be deleted.
+	  Render context data has a key (void*) and a value (iBase*).
+	- Using the above changed I fixed a potentially serious bug in the
+	  visibility culling system. The visibility culling and drawing
+	  are now seperate actions. However the thing which does the
+	  visibility culling wants to remember all polygons that were found
+	  visible in a queue so that when the same thing is rendered later
+	  only those polygons are rendered. This worked fine before I
+	  implemented render priorities because the thing containing the
+	  culler (bsp/octree) was rendered first. However with render
+	  priorities this is no longer guaranteed and there can be situations
+	  in which there are other things that are rendered first before
+	  the thing containing the culler. In really bad cases those other
+	  things could in theory contain portals to sectors and those portals
+	  could eventually cause the same thing with the culler to be
+	  rendered. But this would cause an overwrite of the polygon
+	  queue! This is now fixed by attaching the render queue as
+	  render context data to the current recursion level. When a portal
+	  is traversed it may potentially also want to use this queue but
+	  it will use another one because it is in another recursion level
+	  so other render context data is used.
+	- Added csSector::RelinkMesh(). This is used to relink a mesh
+	  when conditions in the mesh have changed (like render priority).
+	  The sector needs to know this to put the mesh in the right render
+	  priority queue.
+	- Fixed csMeshWrapper::SetRenderPriority() so that it will notify
+	  all the sectors where the mesh is by calling RelinkMesh().
+	- Added SetLighting() and IsLighting() to iSprite3DState. Extended
+	  sprite loader plugin with LIGHTING keyword. Extended sprite saver
+	  plugin with support for saving LIGHTING value. Extended 3D sprite
+	  plugin to disable lighting based on this flag (default is lighting
+	  enabled).
+	- Fixed 3D sprites so that they use GetFullTransform() for lighting
+	  too. This means that lighting will now be correct if a sprite is
+	  used from within a hierarchical transformation.
+	- Fixed a bug with lighting for 3D sprites and other mesh objects.
+	  When there were no lights reaching a sprite anymore (after having
+	  been hit by one or more lights before) the lighting would not be
+	  disabled.
+	- Extended RENDERPRIORITIES system with a sorting parameter. This
+	  sorting parameter is not yet used but the parser already parses
+	  it. Possible values are BACK2FRONT, FRONT2BACK, or NONE.
 10-Apr-2001
 	- Implemented render priority queues in sectors. All meshes added to
 	  a sector will automatically be placed in the right queue. At render

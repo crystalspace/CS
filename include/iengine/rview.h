@@ -33,6 +33,7 @@ struct iCamera;
 struct iSector;
 struct iPolygon3D;
 struct csFog;
+class csRenderView;
 
 /**
  * Information for vertex based fog. There is an instance of this
@@ -76,6 +77,14 @@ public:
  */
 class csRenderContext
 {
+  friend class csRenderView;
+
+private:
+  /**
+   * All render context data for this recursion level.
+   */
+  void* rcdata;
+
 public:
   /// The current camera.
   iCamera* icamera;
@@ -128,9 +137,16 @@ public:
    * recursion level.
    */
   bool added_fog_info;
+
+  /**
+   * A number indicating the recursion level we are in. Starts with 0.
+   * Whenever the engine goes through a portal this number increases.
+   * Returning from a portal decreases the number again.
+   */
+  int draw_rec_level;
 };
 
-SCF_VERSION (iRenderView, 0, 1, 0);
+SCF_VERSION (iRenderView, 0, 1, 1);
 
 /**
  * This interface represents all information needed to render
@@ -241,7 +257,8 @@ struct iRenderView : public iBase
    * and the rest of the structure should be filled in.
    * This function will take care of correctly enabling/disabling fog.
    */
-  virtual void CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh& mesh) = 0;
+  virtual void CalculateFogMesh (const csTransform& tr_o2c,
+  	G3DTriangleMesh& mesh) = 0;
   /**
    * Check if the screen bounding box of an object is visible in
    * this render view. If true is returned (visible) then do_clip
@@ -280,6 +297,29 @@ struct iRenderView : public iBase
    * Set the portal polygon.
    */
   virtual void SetPortalPolygon (iPolygon3D* poly) = 0;
+
+  /**
+   * Get render recursion level.
+   */
+  virtual int GetRenderRecursionLevel () = 0;
+  /**
+   * Set render recursion level.
+   */
+  virtual void SetRenderRecursionLevel (int rec) = 0;
+
+  /**
+   * Attach data to the current render context.
+   */
+  virtual void AttachRenderContextData (void* key, iBase* data) = 0;
+  /**
+   * Look for data on the current render context.
+   */
+  virtual iBase* FindRenderContextData (void* key) = 0;
+  /**
+   * Delete all data with the given key on the current render
+   * context.
+   */
+  virtual void DeleteRenderContextData (void* key) = 0;
 };
 
 #endif

@@ -842,6 +842,9 @@ private:
   /// Enable tweening.
   bool do_tweening;
 
+  /// Enable or disable lighting.
+  bool do_lighting;
+
   ///
   bool force_otherskin;
 
@@ -935,6 +938,18 @@ public:
 
   /// Is tweening enabled?
   bool IsTweeningEnabled () { return do_tweening; }
+
+  /// Set lighting.
+  void SetLighting (bool l)
+  {
+    do_lighting = l;
+    if (!do_lighting) ResetVertexColors ();
+  }
+  /// Is lighting enabled?
+  bool IsLighting ()
+  {
+    return do_lighting;
+  }
 
   /// Set color for all vertices
   void SetColor (const csColor& col);
@@ -1154,6 +1169,14 @@ public:
     virtual UInt GetMixMode ()
     {
       return scfParent->GetMixmode ();
+    }
+    virtual void SetLighting (bool l)
+    {
+      scfParent->SetLighting (l);
+    }
+    virtual bool IsLighting ()
+    {
+      return scfParent->IsLighting ();
     }
     virtual iSkeletonState* GetSkeletonState ();
     virtual void SetFrame (int f)

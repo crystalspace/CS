@@ -142,6 +142,19 @@ void csMeshWrapper::RemoveFromSectors ()
   }
 }
 
+void csMeshWrapper::SetRenderPriority (long rp)
+{
+  render_priority = rp;
+  if (parent->GetType () != csEngine::Type) return;
+  int i;
+  csVector& sectors = movable.GetSectors ();
+  for (i = 0 ; i < sectors.Length () ; i++)
+  {
+    csSector* ss = (csSector*)sectors[i];
+    if (ss) ss->RelinkMesh (this);
+  }
+}
+
 /// The list of lights that hit the mesh
 static DECLARE_GROWING_ARRAY_REF (light_worktable, iLight*);
 
@@ -211,7 +224,7 @@ void csMeshWrapper::NextFrame (cs_time current_time)
 void csMeshWrapper::UpdateLighting (iLight** lights, int num_lights)
 {
   defered_num_lights = 0;
-  if (num_lights <= 0) return;
+  //if (num_lights <= 0) return;
   mesh->UpdateLighting (lights, num_lights, &movable.scfiMovable);
 
   int i;

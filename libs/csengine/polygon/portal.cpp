@@ -142,7 +142,8 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     if (c_buffer)
     {
       c_buffer->Initialize ();
-      c_buffer->InsertPolygon (new_clipper->GetVertices (), new_clipper->GetNumVertices (), true);
+      c_buffer->InsertPolygon (new_clipper->GetVertices (),
+      	new_clipper->GetNumVertices (), true);
     }
     else if (quad3d)
     {
@@ -150,13 +151,16 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
       InvPerspective (csVector2 (0, 0), 1, corners[0],
       	inv_aspect, shift_x, shift_y);
       corners[0] = camtrans.This2Other (corners[0]);
-      InvPerspective (csVector2 (csEngine::current_engine->frame_width-1, 0), 1, corners[1],
+      InvPerspective (csVector2 (csEngine::current_engine->frame_width-1, 0),
+      	1, corners[1],
       	inv_aspect, shift_x, shift_y);
       corners[1] = camtrans.This2Other (corners[1]);
       InvPerspective (csVector2 (csEngine::current_engine->frame_width-1,
-      	csEngine::current_engine->frame_height-1), 1, corners[2], inv_aspect, shift_x, shift_y);
+      	csEngine::current_engine->frame_height-1), 1, corners[2],
+	inv_aspect, shift_x, shift_y);
       corners[2] = camtrans.This2Other (corners[2]);
-      InvPerspective (csVector2 (0, csEngine::current_engine->frame_height-1), 1, corners[3],
+      InvPerspective (csVector2 (0, csEngine::current_engine->frame_height-1),
+      	1, corners[3],
       	inv_aspect, shift_x, shift_y);
       corners[3] = camtrans.This2Other (corners[3]);
       quad3d->SetMainFrustum (camtrans.GetOrigin (), corners);
@@ -165,7 +169,8 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     else if (covtree)
     {
       covtree->MakeEmpty ();
-      covtree->UpdatePolygonInverted (new_clipper->GetVertices (), new_clipper->GetNumVertices ());
+      covtree->UpdatePolygonInverted (new_clipper->GetVertices (),
+      	new_clipper->GetNumVertices ());
     }
   }
 
@@ -180,6 +185,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
 
   csRenderContext* old_ctxt = rview->GetRenderContext ();
   rview->CreateRenderContext ();
+  rview->SetRenderRecursionLevel (rview->GetRenderRecursionLevel ()+1);
   rview->SetClipper (&new_view);
   rview->ResetFogInfo ();
   rview->SetPortalPolygon (&portal_polygon->scfiPolygon3D);

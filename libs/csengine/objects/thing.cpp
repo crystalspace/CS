@@ -985,9 +985,9 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       {
         poly_queue->Push (p, clip);
 	Stats::polygons_accepted++;
-	if (quad3d && quad3d->IsFull ()) return (void*)1;	// End BSP processing
-	if (c_buffer && c_buffer->IsFull ()) return (void*)1;	// End BSP processing
-	if (covtree && covtree->IsFull ()) return (void*)1;	// End BSP processing
+	if (quad3d && quad3d->IsFull ()) return (void*)1;	// Stop
+	if (c_buffer && c_buffer->IsFull ()) return (void*)1;	// Stop
+	if (covtree && covtree->IsFull ()) return (void*)1;	// Stop
       }
       else
       {
@@ -1622,13 +1622,47 @@ is_vis:
   return true;
 }
 
-csPolygon2DQueue* poly_queue;
+/**
+ * This is data that is created by the visibility culler
+ * and registered to the current recursion level (as render
+ * context data). The data contains the queue of all visible
+ * polygons. Since visibility testing and drawing is now seperate
+ * we need to remember everything in a queue. Since it is also
+ * possible that between visibility testing and drawing other
+ * objects (or even this thing again!) can be called we have to
+ * attach this queue to the current recursion level.
+ */
+struct csPolygonVisInfo : public iBase
+{
+  csPolygon2DQueue* poly_queue;
+  csPolygonVisInfo (int num);
+  virtual ~csPolygonVisInfo () { delete poly_queue; }
+  DECLARE_IBASE;
+};
 
-void* csThing::TestQueuePolygons (csThing* /*thing*/,
+IMPLEMENT_IBASE (csPolygonVisInfo)
+  IMPLEMENTS_INTERFACE (iBase)
+IMPLEMENT_IBASE_END
+
+csPolygonVisInfo::csPolygonVisInfo (int num)
+{
+  CONSTRUCT_IBASE (NULL);
+  poly_queue = new csPolygon2DQueue (num);
+}
+
+void* csThing::TestQueuePolygons (csThing* thing,
   csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
   iRenderView* d = (iRenderView*)data;
-  return csThing::TestQueuePolygonArray (polygon, num, d, poly_queue,
+  csPolygonVisInfo* pvi = (csPolygonVisInfo*)(d->FindRenderContextData (
+  	(void*)thing));
+  if (!pvi)
+  {
+    printf ("INTERNAL ERROR! polygon queue is missing!!!\n");
+    fflush (stdout);
+    DEBUG_BREAK;
+  }
+  return csThing::TestQueuePolygonArray (polygon, num, d, pvi->poly_queue,
     d->GetEngine ()->IsPVS ());
 }
 
@@ -1687,10 +1721,17 @@ bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
     // are three possibilities.
     if (engine_mode == CS_ENGINE_FRONT2BACK)
     {
-      csPolygon2DQueue* queue = poly_queue;
+      csPolygonVisInfo* pvi = (csPolygonVisInfo*)(
+      	rview->FindRenderContextData ((void*)this));
+      if (!pvi)
+      {
+        printf ("INTERNAL ERROR! polygon queue is missing!!!\n");
+        fflush (stdout);
+        DEBUG_BREAK;
+      }
       // Render all polygons that are visible back to front.
-      DrawPolygonsFromQueue (queue, rview);
-      delete queue;
+      DrawPolygonsFromQueue (pvi->poly_queue, rview);
+      rview->DeleteRenderContextData ((void*)this);
     }
     else if (engine_mode == CS_ENGINE_BACK2FRONT)
     {
@@ -1962,7 +2003,8 @@ bool csThing::VisTest (iRenderView* irview)
     // Initialize a queue on which all visible polygons will be pushed.
     // The octree is traversed front to back but we want to render
     // back to front. That's one of the reasons for this queue.
-    poly_queue = new csPolygon2DQueue (GetNumPolygons ());
+    csPolygonVisInfo* pvi = new csPolygonVisInfo (GetNumPolygons ());
+    irview->AttachRenderContextData ((void*)this, (iBase*)pvi);
 
     // Update the transformation for the static tree. This will
     // not actually transform all vertices from world to camera but

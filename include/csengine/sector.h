@@ -162,6 +162,13 @@ public:
   void UnlinkMesh (csMeshWrapper* mesh);
 
   /**
+   * Relink a mesh from this sector. This is mainly useful if
+   * characterics of the mesh changed (like render priority) so
+   * that the sector needs to know this.
+   */
+  void RelinkMesh (csMeshWrapper* mesh);
+
+  /**
    * Get the number of meshes in this sector.
    */
   int GetNumberMeshes ()

@@ -162,6 +162,8 @@ Blending mode, one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
 Material to use for the sprite.
 @item TWEEN
 Set to true if you want to enable frame tweening.  Default is false.
+@item LIGHTING
+Set to true if you want to enable lighting.  Default is true.
 @item ACTION
 The default action to use for this sprite instance.
 @end table
