@@ -104,6 +104,9 @@ struct csPixelFormat
 
 enum G3D_FOGMETHOD
 {
+  G3DFOGMETHOD_NONE,
+  G3DFOGMETHOD_ZBUFFER,
+  G3DFOGMETHOD_VERTEX
 };
 
 struct csGraphics3DCaps
