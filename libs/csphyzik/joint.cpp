@@ -36,7 +36,7 @@ ctJoint::ctJoint( ctArticulatedBody *in, ctVector3 &in_offset, ctArticulatedBody
 
 int ctJoint::set_state( real *state_array )
 {
-	*state_array++ = q;
+  *state_array++ = q;
 	*state_array++ = qv;
 
 	return ctJoint::get_state_size();
@@ -60,14 +60,10 @@ int ctJoint::set_delta_state( real *state_array )
 	return ctJoint::get_state_size();
 }
 
-// update the body_to_world reference frame of the outboard body given a 
-// transformation matrix from inboard to outboard frames of reference
-void ctJoint::update_link_RF( ctMatrix3 &R_fg )
+// update the body_to_world reference frame of the outboard body
+void ctJoint::update_link_RF()
 {
-	// R in here actually refer's to Tranformation matrix ( R.Transpose() )
-	// I use R instead of T to be consistent with Mirtch's thesis.
-	// although I use R in other areas to denote a positive rotation in a given
-	// frame of reference.
+
 	if( inboard && outboard ){
 		ctReferenceFrame *in_ref = inboard->get_handle_RF();
 		ctReferenceFrame *out_ref = outboard->get_handle_RF();
@@ -76,19 +72,17 @@ void ctJoint::update_link_RF( ctMatrix3 &R_fg )
 			return;
 
 		ctMatrix3 R_delta;
-		ctMatrix3 R_in = in_ref->get_parent_to_this();
-		R_from_vector_and_angle( R_fg.get_transpose()*joint_axis, q, R_delta );
-		
-		// R_fg is actually coord transform from f to g, not a rotation matrix in
-		// the strictest sense of the word
-		R_fg = R_delta.get_transpose();  
+		ctMatrix3 T_in = in_ref->get_parent_to_this();
 
-		ctMatrix3 R_new_out = R_fg*R_in;
-		out_ref->set_parent_to_this( R_new_out );
+    // get rotation matrix from rotation around joint axis
+    R_from_vector_and_angle( joint_axis, q, R_delta );
+
+		ctMatrix3 T_new_out = R_delta.get_transpose()*T_in;
+		out_ref->set_parent_to_this( T_new_out );
 		ctVector3 new_out_origin = in_ref->get_offset() + 
-									R_in.get_transpose()*inboard_offset + R_new_out.get_transpose()*outboard_offset;
+									T_in.get_transpose()*inboard_offset + T_new_out.get_transpose()*outboard_offset;
 		out_ref->set_offset( new_out_origin );
-
+   
 	}
 }
 
@@ -138,7 +132,7 @@ void ctPrismaticJoint::calc_coriolus( const ctVector3 &r, const ctVector3 &w_f, 
 
 }
 
-ctRevoluteJoint::ctRevoluteJoint( ctArticulatedBody *in, ctVector3 &in_offset, ctArticulatedBody *out, ctVector3 &out_offset, ctVector3 &paxis )
+ctRevoluteJoint::ctRevoluteJoint( ctArticulatedBody *in, ctVector3 &in_offset, ctArticulatedBody *out, ctVector3 &out_offset, ctVector3 &paxis)
 {
 	q = qv = qa = 0;
 	inboard = in;
