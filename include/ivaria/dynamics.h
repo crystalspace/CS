@@ -30,6 +30,7 @@ class csPlane3;
 struct iMeshWrapper;
 struct iSkeletonBone;
 
+struct iObject;
 struct iDynamicSystem;
 struct iRigidBody;
 struct iBodyGroup;
