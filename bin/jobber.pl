@@ -272,7 +272,7 @@ my $CONFIGURE = "cat << EOF > config.mak\n" .
     "MODE = optimize\n" .
     "PERL = perl\n" .
     "EOF\n" .
-    "sed 's/@SET_MAKE@//' < Makefile.in > Makefile\n";
+    "sed 's/\@SET_MAKE\@//' < Makefile.in > Makefile\n";
 
 my @SCRIPT_OPTIONS = (
     'test!'     => \$TESTING,
