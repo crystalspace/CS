@@ -40,6 +40,11 @@ chronological order.
 	  desirable (which happens to be $WINDIR/system32/java.exe on Windows).
 	- Eric Sunshine made the CS_PATH_NORMALIZE() macro in path.m4 more
 	  robust when faced with shell meta-characters in the argument string.
+	- Eric Sunshine augmented configure.ac so that the JAVACMD and
+	  JAVA_HOME environment variables are sanitized with
+	  CS_PATH_NORMALIZE() before use.  This is needed to prevent DOS-style
+	  pathnames from infecting Jamconfig, since the backslashes in such
+	  pathnames tend to get eaten by Jam.
 24-Oct-2004
 	- Eric Sunshine simplified the 22-Oct-2004 change to DDS loader so that
 	  it no longer Clone()'s the image when returning a mipmap.  It is

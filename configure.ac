@@ -496,7 +496,10 @@ AC_DEFUN([CS_JAVA_FLAGS],
 		    $$1_cflags/$cs_java_platform"])
 	    $1_cflags=CS_PATH_NORMALIZE([$$1_cflags])])])])
 
-AS_IF([test -z "$JAVA" && test -n "$JAVACMD"], [JAVA="$JAVACMD"])
+JAVA_HOME=CS_PATH_NORMALIZE([$JAVA_HOME])
+
+AS_IF([test -z "$JAVA" && test -n "$JAVACMD"],
+    [JAVA=CS_PATH_NORMALIZE([$JAVACMD])])
 AC_PATH_PROGS([JAVA], [java], [],
     [$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH])
 CS_EMIT_BUILD_PROPERTY([JAVA], [$JAVA])

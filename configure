@@ -7202,8 +7202,8 @@ fi
 
 fi
 
-	cs_cv_perl_cflags=`echo x$cs_cv_perl_cflags | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_perl_lflags=`echo x$cs_cv_perl_lflags | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_perl_cflags=`echo "x$cs_cv_perl_cflags" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_perl_lflags=`echo "x$cs_cv_perl_lflags" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
 
@@ -8088,8 +8088,10 @@ fi
 #------------------------------------------------------------------------------
 
 
+JAVA_HOME=`echo "x$JAVA_HOME" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+
 if test -z "$JAVA" && test -n "$JAVACMD"; then
-  JAVA="$JAVACMD"
+  JAVA=`echo "x$JAVACMD" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
 for ac_prog in java
@@ -8261,7 +8263,7 @@ fi
 		    $cs_java_cflags/$cs_java_platform"
 fi
 
-	    cs_java_cflags=`echo x$cs_java_cflags | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_java_cflags=`echo "x$cs_java_cflags" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
 fi
