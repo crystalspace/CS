@@ -132,7 +132,7 @@ void csRectRegion::Include(csRect &rect)
   // rectangles.
   for(int i = 0; i < region_count; i++)
   {
-    csRect const& r1 = region[i];
+    csRect &r1 = region[i];
     csRect r2(rect);
 
     // Check to see if these even touch
