@@ -48,8 +48,8 @@ const bool DEBUG_WINDOW_EVENTS = false;
 
 awsWindow::awsWindow () :
   frame_options(foControl | foZoom | foClose | foTitle | foGrip | foRoundBorder),
-  title(NULL),
   title_bar_height(0),
+  title(NULL),
   resizing_mode(false),
   moving_mode(false),
   sink(this),
