@@ -402,7 +402,7 @@ bool csLoader::LoadMap (char* buf)
           csVector3 pos (0, 0, 0);
           csScanStr (params, "%s,%f,%f,%f", &start_sector, &pos.x, &pos.y, &pos.z);
 	  iCameraPosition* campos = Engine->GetCameraPositions ()->
-	  	NewCameraPosition ("Start");
+	  	NewCameraPosition (name);
 	  campos->Set (start_sector, pos, csVector3 (0, 0, 1),
 	  	csVector3 (0, 1, 0));
           break;
