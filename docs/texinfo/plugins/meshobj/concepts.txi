@@ -14,108 +14,107 @@
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
-In this section a general overview is given of the mesh object plugin
+In this section a general overview is given of the mesh object plug-in
 system and several of the concepts are explained.
 
-@subsubheading The Mesh Object
+@subsubheading Mesh Object
 
-A @emph{Mesh Object} is what this plugin system is all about. It basically
-is a 3D object that the engine can render. Every mesh object knows how
-to render and light itself. Mesh Objects don't control there own position
-in the engine though. The engine is responsible for doing that.
-Mesh Object implementations will implement the @sc{SCF} interface
-@code{iMeshObject}. Every visible mesh object in the world will be an
-instance of this class.
+A @dfn{Mesh Object} is what this plug-in system is all about.  It is basically
+a 3D object that the engine can render.  Every mesh object knows how to render
+and light itself.  Mesh Objects don't control there own position in the engine
+though.  The engine is responsible for doing that.  Mesh Object implementations
+must implement the @sc{scf} interface @samp{iMeshObject}.  Every visible mesh
+object in the world will implement this interface.
 
-Mesh Object implementations often implement one or more additional
-type specific interfaces to access the characteristics of that Mesh Object.
-The engine itself does not know about these interfaces. It is the
-responsability of the application write to correctly set up the
-characteristics of all Mesh Objects that it uses. These type specific
-interfaces are usually called @code{iSomethingState} (replace 'Something'
-with the appropriate name).
+Mesh Objects often also implement one or more additional type specific
+interfaces to access the characteristics of that Mesh Object.  The engine
+itself does not know about these interfaces.  It is the responsability of the
+application writer to correctly set up the characteristics of all Mesh Objects
+that it uses.  These type specific interfaces are usually called
+@samp{iSomethingState} (replace @emph{Something} with the appropriate name).
 
-Some Mesh Object implementations also implement the @sc{SCF} interface
-@code{iPolygonMesh} which you can use for collision detection. You
-can use @code{QUERY_INTERFACE} to find out if some Mesh Object implements
-this.
+Some Mesh Objects also implement the @sc{scf} interface @samp{iPolygonMesh}
+which you can use for collision detection.  You can use
+@code{QUERY_INTERFACE()} to find out if some Mesh Object implements this
+interface.
 
-In addition to the interfaces above Mesh Objects also sometimes implement
-@code{iParticle}. When they do, they can be used as particles for one
-of the particle system Mesh Object plugins.
+In addition to the interfaces above, Mesh Objects also sometimes implement
+@samp{iParticle}.  When they do so, they can be used as particles for one of
+the particle system Mesh Object plug-in modules.
 
-@subsubheading The Mesh Object Factory
+@subsubheading Mesh Object Factory
 
-A @emph{Mesh Object Factory} is an object from which you can generate
-Mesh Object instances. The Mesh Objects generated from a Mesh Object
-Factory will inherit some of the characteristics from this factory.
-Exactly which characteristics is dependent on the Mesh Object Type (see
-below). Roughly speaking there are three possibilities:
+A @dfn{Mesh Object Factory} is an object from which you can generate Mesh
+Object instances.  The Mesh Objects generated from a Mesh Object Factory will
+inherit some of the characteristics from this factory.  Exactly which
+characteristics dependend upon the Mesh Object Type (see below).  Roughly
+speaking, there are three possibilities:
+
 @enumerate
 @item
-  For some types the factory is really empty and only serves as
-  a stub to create Mesh Object instances. In that case you would only
-  have to use one factory to generate all your Mesh Objects of that type.
+For some types the factory is really empty and only serves as a stub to create
+Mesh Object instances.  In that case you would only have to use one factory to
+generate all your Mesh Objects of that type.
+
 @item
-  In other cases the factory contains default values for some
-  characteristics that are copied to all Mesh Objects created from that
-  factory. In that case you can decide to use one factory and change
-  the settings before creating new instances. Or (for conveniance) you
-  can create several factories with default values that you use often
-  and create Mesh Objects from the factory of choice.
+In other cases the factory contains default values for some characteristics
+that are copied to all Mesh Objects created from that factory.  In that case
+you can decide to use one factory and change the settings before creating new
+instances.  Or (for conveniance) you can create several factories with default
+values that you use often and create Mesh Objects from the factory of choice.
+
 @item
-  In still other cases the factory actually contains the
-  characteristics used by all Mesh Objects created from it. Changing the
-  factory characteristics will actually modify the characteristics for
-  all Mesh Objects instantly. In this case you will have to use a seperate
-  factory for all Mesh Objects sharing the same characteristics.
+In still other cases the factory actually contains the characteristics used by
+all Mesh Objects created from it.  Changing the factory characteristics will
+actually modify the characteristics for all Mesh Objects instantly.  In this
+case you will have to use a seperate factory for all Mesh Objects sharing the
+same characteristics.
 @end enumerate
-Which of the possibilities is selected by some Mesh Object type depends
-on the type. You'll have to look it up in the respective documentation
-for that type. Mesh Object Factories implement the @sc{SCF} interface
-@code{iMeshObjectFactory}.
 
-Mesh Object Factory implementations often implement one or more additional
-type specific interfaces to access the characteristics of that Mesh Object
-Factory. The engine itself does not know about these interfaces. It is the
-responsability of the application write to correctly set up the
-characteristics of all Mesh Objects Factories that it uses. These type
-specific interfaces are usually called @code{iSomethingFactoryState}
-(replace 'Something' with the appropriate name).
+Which of the possibilities is selected by some Mesh Object type depends on the
+type.  You'll have to look it up in the respective documentation for that type.
+Mesh Object Factories implement the @sc{scf} interface
+@samp{iMeshObjectFactory}.
 
-@subsubheading The Mesh Object Type
+Mesh Object Factories often implement one or more additional type specific
+interfaces to access the characteristics of that Mesh Object Factory.  The
+engine itself does not know about these interfaces.  It is the responsability
+of the application writer to correctly set up the characteristics of all Mesh
+Objects Factories that it uses.  These type specific interfaces are usually
+called @samp{iSomethingFactoryState} (replace @emph{Something} with the
+appropriate name).
 
-The @emph{Mesh Object Type} describes a specific kind of Mesh Object plugin.
-For example, Crystal Space now supports several Types of Mesh Objects:
-snow particle system, fountain particle system, cube, ball, ...
-The Mesh Object Type corresponds directly to the plugin itself. It is
-the class responsible for creating all Mesh Object Factories.
-Mesh Object Types implement the @sc{SCF} interface @code{iMeshObjectType}.
+@subsubheading Mesh Object Type
 
-Some Mesh Object Type implementations define the @sc{SCF} interface
-@code{iConfig}. If they do you can use this interface to query all
-run-time options that are valid for that type.
+The @dfn{Mesh Object Type} describes a specific kind of Mesh Object plug-in.
+For example, Crystal Space supports several types of Mesh Objects: snow
+particle system, fountain particle system, cube, ball, etc.  The Mesh Object
+Type corresponds directly to the plug-in itself.  It is the class' responsible
+for creating all Mesh Object Factories.  Mesh Object Types implement the
+@sc{scf} interface @samp{iMeshObjectType}.
+
+Some Mesh Object Types implement the @sc{scf} interface @samp{iConfig}.  In
+this case, you can use this interface to query all run-time options that are
+valid for that type.
 
 @subsubheading Loaders
 
-In addition to the functionality for the Mesh Objects themselves many
-Mesh Object Types support two implementations of the @sc{SCF} interface
-@code{iLoaderPlugIn}. By implementing this, these plugins can be used
-directly by the standard CS map file loader. There is a loader for the
-Mesh Object Factory and a loader for the Mesh Object itself. The Mesh
-Object plugin itself doesn't know about these loader plugins. In fact,
-you can even write multiple different loader plugins for the same
-Mesh Object Type if you desire.
+In addition to the functionality for the Mesh Objects themselves, many Mesh
+Object Types support two implementations of the @sc{scf} interface
+@samp{iLoaderPlugIn}.  By implementing this, these plug-ins can be used
+directly by the standard Crystal Space map file loader.  There is a loader for
+the Mesh Object Factory and a loader for the Mesh Object itself.  The Mesh
+Object plug-in itself doesn't know about these loader plug-ins.  In fact, you
+can even write different loader plug-ins for the same Mesh Object Type if you
+so desire.
 
 @subsubheading Responsabilities
 
-As mentioned above Mesh Objects only know how to render themselves and
-how to update lighting information. The engine itself is responsible
-for deciding when to draw and when to update. So basically, the Mesh
-Objects control the @emph{how} while the engine controls the @emph{when}.
-This is not completely true though. The Mesh Object implementation itself
-must do some parts of the visibility testing on its own. For example,
-far plane clipping, and testing if the bounding box of the object is
-visible on screen are all the responsibility of the Mesh Object.
-
-
+As mentioned above Mesh Objects only know how to render themselves and how to
+update lighting information.  The engine is responsible for deciding when to
+draw and when to update.  So basically, the Mesh Objects control the @emph{how}
+while the engine controls the @emph{when}.  This is not completely true,
+though.  The Mesh Object implementation itself must do some parts of the
+visibility testing on its own.  For example, far plane clipping, and testing if
+the bounding box of the object is visible on screen are all the responsibility
+of the Mesh Object.

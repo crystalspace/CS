@@ -24,7 +24,6 @@ that because they work together with the system driver.  You can find all
 information you need in the introduction to the simple tutorial
 (@pxref{Tutorial Introduction}).
 
-The following plug-ins are available:
 @menu
 * Plug-In Overview:: Quick Overview
 * VFS:: Virtual File System (@sc{vfs})
@@ -32,7 +31,7 @@ The following plug-ins are available:
 * Sound Drivers::
 * Network Drivers::
 * csEngine:: The 3D Engine (@code{csEngine})
-* MeshObject:: Mesh Object PlugIn System
+* MeshObject:: Mesh Object Plug-In System
 * CrystalClear::
 * Dungeon::
 * csPython::

@@ -3,9 +3,17 @@ The history order has been reversed so that new features are at the top.
 8-Jan-2001
 	- Wouter Wijngaards fixed procedural sky for OpenGL.
 	- Wouter also optimized it a little to use the new qsqrt().
-	- Made some initial documentation on the MeshObject system.
-	  Not finished but already useful. Check it out in
+	- Made some initial documentation on the MeshObject system.  Not
+	  finished but already useful.  Check it out in
 	  docs/texinfo/plugins/meshobj.
+	- Eric Sunshine made the following changes to the Mesh Object
+	  documentation which Jorrit wrote:
+	    - Fixed a bunch of Texinfo mark-up errors and problems.
+	    - Normalized mark-up and typographical usage to be consistent with
+	      other idioms established throughout the manual.
+	    - Corrected several typographical and gramatical problems.
+	    - Eliminated a bunch of over- and underfull `hbox' errors reported
+	      by TeX.
 7-Jan-2001
 	- Made usage of qisqrt() more sensible. First test if square
 	  is less than some amount then you don't have to do the entire

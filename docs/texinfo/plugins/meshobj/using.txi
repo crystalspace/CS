@@ -1,38 +1,36 @@
 @c -*-texinfo-*-
 @node Using MeshObject, Writing MeshObjects, MeshObject Concepts, MeshObject
 @subsection Using Mesh Objects
-@cindex MeshObject
-@cindex iMeshObject
-@cindex iMeshObjectFactory
-@cindex iMeshObjectType
-@cindex iParticleState
-@cindex csMeshWrapper
+@cindex Mesh Objects, Using
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iParticleState}
+@cindex @code{csMeshWrapper}
 
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
-This section explains how to use Mesh Objects in general. It doesn't
-go into detail about the specific Mesh Object Types that CS supports.
-This information is just some overview in general.
+This section explains how to use Mesh Objects in general.  It doesn't go into
+detail about the specific Mesh Object Types that Crystal Space supports.
 
 @subsubheading General
 
-When the engine works with instances of Mesh Objects it does this through
-the @code{csMeshWrapper} class. @code{csMeshWrapper} holds the reference
-to the @code{iMeshObject} instances implementing the particular type
-of Mesh Object. @code{csMeshWrapper} is responsible for deciding when
-to draw a Mesh Object and when to light it. @code{csMeshWrapper} also
-manages the position of the object in the world and manages possible
-hierarchical transformations (i.e. @code{csMeshWrapper} has an array
-of @code{csMeshWrapper} children).
+When the engine works with instances of Mesh Objects it does so through the
+@samp{csMeshWrapper} class.  @samp{csMeshWrapper} holds the reference to the
+@samp{iMeshObject} instances implementing the particular type of Mesh Object.
+@samp{csMeshWrapper} is responsible for deciding when to draw a Mesh Object and
+when to light it.  @samp{csMeshWrapper} also manages the position of the object
+in the world and manages possible hierarchical transformations (i.e.
+@samp{csMeshWrapper} has an array of @samp{csMeshWrapper} children).
 
-@subsubheading Loading from World File
+@subsubheading Loading From Map File
 
-The easiest way to use Mesh Objects is to simply specify them in the
-map file for your level. There are two things that you need to do for
-that. First you have to specify an entry at top-level (directly inside
-the @code{WORLD} statement) like this (this example uses the fountain
-plugin to make a fountain):
+The easiest way to use Mesh Objects is to simply specify them in the map file
+for your level.  There are two things that you need to do for that.  First you
+have to specify an entry at top-level (directly inside the @samp{WORLD}
+statement) like this (this example uses the @dfn{fountain} plug-in to make a
+fountain):
 
 @example
 MESHOBJ 'fountainFactory' (
@@ -41,19 +39,20 @@ MESHOBJ 'fountainFactory' (
 )
 @end example
 
-This will use the loader plugin with name @code{crystalspace.meshldr.fountfact}
-to load a factory (type @code{iMeshObjectFactory}) and register it to the
-engine. There are no parameters for the fountain Mesh Object Factory
-so that's why the @code{PARAMS} block is empty. But you still have to
-specify it.
+This will use the @dfn{mesh object loader} plug-in which is identified by the
+@sc{scf} name @samp{crystalspace.meshldr.fountfact} to load a factory (type
+@samp{iMeshObjectFactory}) and register it with the engine.  There are no
+parameters for the fountain's Mesh Object Factory so that's why the
+@samp{PARAMS} block is empty.  But you still have to specify it.  Other mesh
+object factories may accept parameters.
 
 Because the fountain defines no parameters for the Mesh Object Factory
 you only have to create one factory in order to make all fountains you need.
 But in some cases you may have to create multiple factories depending
 on the object characteristics you want.
 
-To place a fountain in some room (sector) you also use a @code{MESHOBJ}
-statement like this:
+To place a fountain in some room (sector) you also use a @samp{MESHOBJ}
+statement, within the definition of a room or sector, like this:
 
 @example
 MESHOBJ 'fountain' (
@@ -77,87 +76,96 @@ MESHOBJ 'fountain' (
 )
 @end example
 
-This code fragment will use the loader plugin with name @code{crystalspace.meshldr.fount}
-to load a Mesh Object (type @code{iMeshObject}) and register it to the
-engine (while placing it in the current sector). In this case there are
-a lot more parameters. The first parameter should always be the name
-of the factory. This is true for all Mesh Objects regardless of their type.
-I will not go into details for all the other fountain parameters here. You
-should refer to the fountain documentation for that.
+This code fragment uses the loader plug-in named
+@samp{crystalspace.meshldr.fount} to load a Mesh Object (type
+@samp{iMeshObject}) and register it with the engine (while placing it in the
+current sector).  In this case there are many parameters.  The first parameter
+should always be the name of the factory.  This is true for all Mesh Objects
+regardless of their type.  For a complete list of parameters available, you
+should refer to the fountain documentation.
 
-The @code{MOVE} statement is outside of the @code{PARAMS} block. The
-reason for that is that the position of Mesh Objects is controlled by
-the engine and not by the Mesh Object itself.
+The @samp{MOVE} statement is outside of the @samp{PARAMS} block.  The reason
+for this is that the position of Mesh Objects is controlled by the engine and
+not by the Mesh Object itself.
 
-In addition to the statements above you can also nest other @code{MESHOBJ}
+In addition to the above statements you can also nest other @samp{MESHOBJ}
 statements to create a hierarchy of Mesh Objects (not shown in the example
-above). If you do that the @code{MOVE} statement must be interpreted
+above).  If you do that, then the @samp{MOVE} statement must be interpreted
 relative to the parent.
 
-When you have Mesh Objects loaded into CS using the map file syntax
-above you can query them from your application by using the standard
-API in the @code{csEngine} class (or through @code{iEngine}).
+When you have Mesh Objects loaded into Crystal Space using the map file syntax
+illustrated above, then you can query the parameters from your application by
+using the standard @sc{api} in the @samp{csEngine} class (or via
+@samp{iEngine}).
 
 @subsubheading Using Directly From Code
 
-You can also create Mesh Objects directly from your application. To
-do this you roughly have to perform the following steps:
+You can also create Mesh Objects directly from your application.  To do this,
+roughly, you have to perform the following steps:
 
 @itemize
 @item
-  First you should load the Mesh Object Type with @code{LOAD_PLUGIN}
-  (preferably after checking if it is already loaded with
-  @code{QUERY_PLUGIN_CLASS}).
+Load the Mesh Object Type with @code{LOAD_PLUGIN()} (preferably after checking
+if it is already loaded, by calling @code{QUERY_PLUGIN_CLASS()}).
+
 @item
-  Then you should create at least one Mesh Object Factory by calling
-  @code{NewFactory()} on the Mesh Object Type instance.
+Create at least one Mesh Object Factory by calling @code{NewFactory()} on the
+Mesh Object Type instance.
+
 @item
-  If the factory has parameters you use @code{QUERY_INTERFACE} to
-  query the @code{iSomethingFactoryState} interface (replace 'Something'
-  with whatever the type name of the Mesh Object is). Then you set
-  the parameters you want on that factory.
+If the factory has parameters you can call @code{QUERY_INTERFACE()} to get a
+handle to the @samp{iSomethingFactoryState} interface (replace @emph{Something}
+with whatever the type name of the Mesh Object is).  Then you set the
+parameters you want on that factory.
+
 @item
-  Then you can create one or more Mesh Object instances by using one
-  of your factories and calling @code{NewInstance()} on them.
+Create one or more Mesh Object instances by using one of your factories and
+calling @code{NewInstance()} on them.
+
 @item
-  If the object has parameters you use @code{QUERY_INTERFACE} to
-  query the @code{iSomethingState} interface (replace 'Something'
-  with whatever the type name of the Mesh Object is). And then you set
-  the parameters you want on the Mesh Object. Note that there are Mesh
-  Object implementations which have multiple interfaces like this (for
-  example, the particle systems implement both @code{iParticleState}
-  and some other particle system dependent interface).
+If the object has parameters you use @code{QUERY_INTERFACE()} to get a handle
+to the @samp{iSomethingState} interface (replace @emph{Something} with whatever
+the type name of the Mesh Object is).  Then set the parameters you want on the
+Mesh Object.  Note that there are Mesh Object implementations which have
+multiple interfaces like this (for example, the particle systems implement both
+@samp{iParticleState} plus another particle system-dependent interface).
+
 @item
-  For every instance of @code{iMeshObject} you have you need
-  to create a @code{csMeshWrapper} instance for the engine. Then
-  you set up this @code{csMeshWrapper} to place it in the sector that
-  you want it and setup its position and rotation (transformation).
+For every instance of @samp{iMeshObject} you need to create a
+@samp{csMeshWrapper} instance for the engine.  Then you set up the
+@samp{csMeshWrapper} by placing it in the sector that you want it and setup its
+position and rotation (transformation).
 @end itemize
 
-Here is a code example for creating an instance of the ball plugin.
+Here is a code example for creating an instance of the ball plug-in.
 
 @example
 void Initialize ()
 @{
-  ...
-  // Get the ball mesh object plugin.
-  ball_type = QUERY_PLUGIN_CLASS (this, "crystalspace.meshobj.ball", "MeshObj", iMeshObjectType);
-  if (ball_type == NULL)
-    ball_type = LOAD_PLUGIN (this, "crystalspace.meshobj.ball", "MeshObj", iMeshObjectType);
+  @dots{}
+  // Get the ball mesh object plug-in.
+  ball_type = QUERY_PLUGIN_CLASS (this,
+    "crystalspace.meshobj.ball", "MeshObj", iMeshObjectType);
   if (!ball_type)
-    Printf (MSG_WARNING, "No ball type plugin found!\n");
+    ball_type = LOAD_PLUGIN (this,
+      "crystalspace.meshobj.ball", "MeshObj", iMeshObjectType);
+  if (!ball_type)
+    Printf (MSG_WARNING, "No ball type plug-in found!\n");
   ball_factory = ball_type->NewFactory ();
-  ...
+  @dots{}
 @}
-...
+@dots{}
 void SetupWorld ()
 @{
-  ...
-  // Make a ball using the ball plugin.
-  iMeshObject* ballMesh = ball_factory->NewInstance ();
-  iBallState* ballState = QUERY_INTERFACE (ballMesh, iBallState);
+  @dots{}
+  // Make a ball using the ball plug-in.
+  iMeshObject* ballMesh =
+    ball_factory->NewInstance ();
+  iBallState* ballState =
+    QUERY_INTERFACE (ballMesh, iBallState);
   ballState->SetRadius (.5, .5, .5);
-  ballState->SetMaterialWrapper (QUERY_INTERFACE (material, iMaterialWrapper));
+  ballState->SetMaterialWrapper (
+    QUERY_INTERFACE (material, iMaterialWrapper));
   ballState->SetRimVertices (12);
 
   ball = new csMeshWrapper (engine, ballMesh);
@@ -169,16 +177,15 @@ void SetupWorld ()
   ball->GetMovable ().SetTransform (m);
   ball->GetMovable ().SetPosition (csVector3 (-3, 5, -3));
   ball->GetMovable ().UpdateMove ();
-  ball->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-  ...
+  ball->DeferUpdateLighting (
+    CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
+  @dots{}
 @}
 @end example
 
-This example will load a ball using the plugin and place it at
--3,5,-3 in 'room'. It will also make sure that it will be lit by
-the 10 closest lights.
+This example will load a ball using the plug-in and place it at (-3,5,-3) in
+@samp{room}.  It will also make sure that it will be lit by the 10 closest
+lights.
 
-@code{iBallState} is the state interface for setting the characteristics
-of ball Mesh Objects.
-
-
+@samp{iBallState} is the state interface for setting the characteristics of
+ball Mesh Objects.
