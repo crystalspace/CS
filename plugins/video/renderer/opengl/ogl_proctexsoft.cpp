@@ -184,28 +184,28 @@ bool csOpenGLProcSoftware::Prepare(
 #if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
   if (ipfmt->RedMask > ipfmt->BlueMask)
   {
-    pfmt.RedMask   = 0xff000000;
-    pfmt.GreenMask = 0x00ff0000;
-    pfmt.BlueMask  = 0x0000ff00;
-  }
-  else
-  {
     pfmt.RedMask   = 0x0000ff00;
     pfmt.GreenMask = 0x00ff0000;
     pfmt.BlueMask  = 0xff000000;
   }
+  else
+  {
+    pfmt.RedMask   = 0xff000000;
+    pfmt.GreenMask = 0x00ff0000;
+    pfmt.BlueMask  = 0x0000ff00;
+  }
 #else
   if (ipfmt->RedMask > ipfmt->BlueMask)
-  {
-    pfmt.RedMask   = 0x00ff0000;
-    pfmt.GreenMask = 0x0000ff00;
-    pfmt.BlueMask  = 0x000000ff;
-  }
-  else
   {
     pfmt.RedMask   = 0x000000ff;
     pfmt.GreenMask = 0x0000ff00;
     pfmt.BlueMask  = 0x00ff0000;
+  }
+  else
+  {
+    pfmt.RedMask   = 0x00ff0000;
+    pfmt.GreenMask = 0x0000ff00;
+    pfmt.BlueMask  = 0x000000ff;
   }
 #endif
   pfmt.PixelBytes = 4;
