@@ -37,6 +37,7 @@
 #include "csengine/stats.h"
 #include "csengine/config.h"
 #include "csengine/cspmeter.h"
+#include "csengine/csppulse.h"
 #include "csengine/cbuffer.h"
 #include "csgeom/fastsqrt.h"
 #include "csobject/nameobj.h"
@@ -396,6 +397,7 @@ AMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nACCURATE_THINGS=%d\nCOSINUS_FACTOR=%f
   int sn = 0;
   int total = sectors.Length ();
   csProgressMeter meter (total);
+  csProgressPulse pulse;
   CsPrintf (MSG_INITIALIZATION, "Initializing lightmaps (%d sectors total):\n  ",total);
 
   for (sn = 0; sn < total; sn++)
@@ -410,7 +412,8 @@ AMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nACCURATE_THINGS=%d\nCOSINUS_FACTOR=%f
   for (sn = 0; sn < total; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
-    s->ShineLights ();
+    s->ShineLights (&pulse);
+    pulse.Erase();
     meter.Step();
   }
 
