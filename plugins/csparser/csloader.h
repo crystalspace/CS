@@ -32,6 +32,7 @@ class csGenerateImageTexture;
 class csGenerateImageValue;
 class csReversibleTransform;
 struct csRGBcolor;
+class csColor;
 
 struct iImageIO;
 struct iSoundLoader;
@@ -131,6 +132,8 @@ private:
   bool ParseQuaternion (char* buf, csQuaternion &q);
   /// Parse a color definition
   bool ParseColor (char *buf, csRGBcolor &c);
+  /// Parse a color definition
+  bool ParseColor (char *buf, csColor &c);
 
   /// Parse a list of textures and add them to the engine.
   bool ParseTextureList (char* buf);

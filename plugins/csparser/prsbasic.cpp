@@ -26,6 +26,7 @@
 #include "qint.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
+#include "csutil/cscolor.h"
 #include "csgeom/vector3.h"
 #include "csgeom/matrix3.h"
 #include "csgfx/rgbpixel.h"
@@ -174,11 +175,39 @@ bool csLoader::ParseQuaternion (char* buf, csQuaternion &q)
 
 bool csLoader::ParseColor (char *buf, csRGBcolor &c)
 {
-  float r, g, b;
-  csScanStr (buf, "%f,%f,%f", &r, &g, &b);
-  c.red   = QInt (r * 255.99);
-  c.green = QInt (g * 255.99);
-  c.blue  = QInt (b * 255.99);
+  csColor cc;
+  if (ParseColor (buf, cc))
+  {
+    c.red = QInt (cc.red * 255.99f);
+    c.green = QInt (cc.green * 255.99f);
+    c.blue = QInt (cc.blue * 255.99f);
+    return true;
+  }
+  return false;
+}
+
+bool csLoader::ParseColor (char *buf, csColor &c)
+{
+  float color[3];
+  int num;
+  csScanStr (buf, "%F", color, &num);
+  if (num >= 3) 
+  {
+    c.red   = color[0];
+    c.green = color[1];
+    c.blue  = color[2];
+  } 
+  else if (num >= 1)
+  {
+    c.red = c.green = c.blue = color[0];
+  } 
+  else 
+  {
+    ReportError (
+      "crystalspace.maploader.parse.badformat",
+      "No color specified");
+    return false;
+  }
   return true;
 }
 

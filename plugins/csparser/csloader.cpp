@@ -173,6 +173,7 @@ csLoader::csLoaderStats::csLoaderStats()
 
 // Define all tokens used through this file
 CS_TOKEN_DEF_START
+  CS_TOKEN_DEF (AMBIENT)
   CS_TOKEN_DEF (ADDON)
   CS_TOKEN_DEF (ATTENUATION)
   CS_TOKEN_DEF (CAMERA)
@@ -2016,6 +2017,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
 bool csLoader::LoadSettings (char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (AMBIENT)
     CS_TOKEN_TABLE (CLEARZBUF)
     CS_TOKEN_TABLE (LIGHTMAPCELLSIZE)
     CS_TOKEN_TABLE (MAXLIGHTMAPSIZE)
@@ -2076,6 +2078,13 @@ bool csLoader::LoadSettings (char* buf)
 	else
 	  ReportNotify ("bogus maximum lightmap size %dx%d, line %d", 
 	    maxw, maxh, csGetParserLine());
+	break;
+      }
+      case CS_TOKEN_AMBIENT:
+      {
+	csColor c;
+	ParseColor (params, c);
+	Engine->SetAmbientLight ( c );
 	break;
       }
     }

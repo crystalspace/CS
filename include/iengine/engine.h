@@ -173,7 +173,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 7, 7);
+SCF_VERSION (iEngine, 0, 7, 8);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -699,6 +699,9 @@ struct iEngine : public iBase
    * Get the cache manager that the engine is currently using.
    */
   virtual iCacheManager* GetCacheManager () = 0;
+
+  /// Return the default amount of ambient light
+  virtual void GetDefaultAmbientLight (csColor &c) const = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__

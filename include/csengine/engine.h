@@ -419,6 +419,9 @@ private:
   /// default maximum lightmap width/height
   int default_max_lightmap_w, default_max_lightmap_h;
 
+  /// default ambient color
+  int default_ambient_red, default_ambient_green, default_ambient_blue;
+
   /**
    * If this nextframe_pending is not 0 then a call of NextFrame
    * has happened. As soon as some object is visible (DrawTest() returns
@@ -749,6 +752,8 @@ public:
   /// Retrieve default maximum lightmap size
   virtual void GetDefaultMaxLightmapSize(int& w, int& h)
   { w = default_max_lightmap_w; h = default_max_lightmap_h; }
+  /// Return the default amount of ambient light
+  virtual void GetDefaultAmbientLight (csColor &c) const;
   
   /**
    * Reset a subset of flags/settings (which may differ from one world/map to 
@@ -756,6 +761,7 @@ public:
    *   - clear z buffer flag
    *   - lightmap cell size
    *   - maximum lighmap size
+   *   - ambient color
    */
   virtual void ResetWorldSpecificSettings();  
 

@@ -1283,9 +1283,11 @@ void csEngine::SetLightmapCellSize (int Size)
 
 void csEngine::ResetWorldSpecificSettings()
 {
-  SetClearZBuf(default_clear_zbuf);
-  SetLightmapCellSize(default_lightmap_cell_size);
-  SetMaxLightmapSize(default_max_lightmap_w, default_max_lightmap_h);
+  SetClearZBuf (default_clear_zbuf);
+  SetLightmapCellSize (default_lightmap_cell_size);
+  SetMaxLightmapSize (default_max_lightmap_w, default_max_lightmap_h);
+  SetAmbientLight (csColor (default_ambient_red, default_ambient_green, 
+    default_ambient_blue));
 }
 
 void csEngine::InitCuller ()
@@ -2077,29 +2079,19 @@ void csEngine::ReadConfig (iConfigFile *Config)
     Config->GetInt ("Engine.Lighting.MaxLightmapHeight", default_max_lightmap_h);
   max_lightmap_h = default_max_lightmap_h;
 
-  csLight::ambient_red = Config->GetInt (
+  default_ambient_red = Config->GetInt (
       "Engine.Lighting.Ambient.Red",
       CS_DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_green = Config->GetInt (
+  default_ambient_green = Config->GetInt (
       "Engine.Lighting.Ambient.Green",
       CS_DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_blue = Config->GetInt (
+  default_ambient_blue = Config->GetInt (
       "Engine.Lighting.Ambient.Blue",
       CS_DEFAULT_LIGHT_LEVEL);
 
-  int ambient_white = Config->GetInt (
-      "Engine.Lighting.Ambient.White",
-      CS_DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_red += ambient_white;
-  csLight::ambient_green += ambient_white;
-  csLight::ambient_blue += ambient_white;
-
-  // Do not allow too black environments since software renderer hates it
-  if (
-    csLight::ambient_red +
-      csLight::ambient_green +
-      csLight::ambient_blue < 6)
-    csLight::ambient_red = csLight::ambient_green = csLight::ambient_blue = 2;
+  csLight::ambient_red = default_ambient_red;
+  csLight::ambient_green = default_ambient_green;
+  csLight::ambient_blue = default_ambient_blue;
 
   csSector::cfg_reflections = Config->GetInt (
       "Engine.Lighting.Reflections",
@@ -3123,6 +3115,13 @@ void csEngine::GetAmbientLight (csColor &c) const
   c.red = csLight::ambient_red / 255.0f;
   c.green = csLight::ambient_green / 255.0f;
   c.blue = csLight::ambient_blue / 255.0f;
+}
+
+void csEngine::GetDefaultAmbientLight (csColor &c) const
+{   
+  c.red = default_ambient_red / 255.0f;
+  c.green = default_ambient_green / 255.0f;
+  c.blue = default_ambient_blue / 255.0f;
 }
 
 bool csEngine::DebugCommand (const char* cmd)

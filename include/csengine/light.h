@@ -111,11 +111,17 @@ public:
   csFlags flags;
 
 public:
-  /// Config value: ambient red value.
+  /** 
+   * Config value: ambient red value.
+   */
   static int ambient_red;
-  /// Config value: ambient green value.
+  /**
+   * Config value: ambient green value.
+   */
   static int ambient_green;
-  /// Config value: ambient blue value.
+  /**
+   * Config value: ambient blue value.
+   */
   static int ambient_blue;
 
 public:
