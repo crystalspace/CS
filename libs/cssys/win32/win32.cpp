@@ -779,7 +779,8 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
   // override the default to get install path from
   // 1. registry
   // 2. CRYSTAL environment variable
-  // 3. default.
+  // 3. if current working directory contains 'vfs.cfg' use this dir.
+  // 4. default.
 
   /// Try the registry .. tentative code I cannot compile this...
   char * pValueName = "installpath";
@@ -815,7 +816,17 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
     }
   }
 
-  // no env. variable. take the default
+  // no env. variable. perhaps current dir?
+  FILE *test = fopen("vfs.cfg", "r");
+  if(test != NULL)
+  {
+    // usr current dir
+    fclose(test);
+    strncpy(oInstallPath, "", iBufferSize);
+    goto got_value;
+  }
+
+  // nothing helps, use default
   // which is C:\Program Files\Crystal\ 
   strncpy(oInstallPath, "C:\\Program Files\\Crystal\\", iBufferSize);
 
