@@ -13,6 +13,9 @@ PLUGINS+= video/canvas/ddraw61 video/renderer/direct3d61
 # opengl dll installed as GL.dll (e.g. MESA)
 PLUGINS+= video/canvas/openglwin video/renderer/opengl
 
+# uncomment the line below to build the sound driver
+#PLUGINS+= sound/driver/waveoutsd
+
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -52,6 +55,13 @@ LIBS.EXE=
 
 #MS OpenGL
 OPENGL.LIBS.DEFINED=-lopengl32 -lglut32
+LIBS.GL3D.SYSTEM=$(OPENGL.LIBS.DEFINED)
+
+# socket dll
+LIBS.SOCKET.SYSTEM=-lwsock32
+
+#sound dll
+LIBS.SOUND.SYSTEM=-ldsound -lwinmm
 
 # Where can the Zlib library be found on this system?
 Z_LIBS=-lz
@@ -70,7 +80,8 @@ NEED_SOCKET_LIB=
 
 # Indicate where special include files can be found.
 # for instance where your dx includes are
-#CFLAGS.INCLUDE=-I/dx7asdk/dxf/include 
+CFLAGS.INCLUDE=
+#-I/dx7asdk/dxf/include 
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -fvtable-thunks -pipe
