@@ -12,6 +12,7 @@ struct iAwsSlot;
 struct iAwsSigSrc;
 
 class  awsWindow;
+class  awsComponent;
 class  awsComponentNode;
 class  awsComponentFactory;
 
@@ -220,6 +221,20 @@ struct iAwsSlot : public iBase
   /** Invoked by a source to emit the signal to this slot's sink.
    */
   virtual void Emit(iBase &source, unsigned long signal)=0;
+};
+
+SCF_VERSION (iAwsComponentFactory, 0, 0, 1);
+
+struct iAwsComponentFactory : public iBase
+{
+    /// Returns a newly created component of the type this factory handles. 
+    virtual awsComponent *Create()=0;
+
+    /// Registers this factory with the window manager
+    virtual void Register(char *type)=0;
+
+    /// Registers constants for the parser so that we can construct right.
+    virtual void RegisterConstant(char *name, int value)=0;
 };
 
 
