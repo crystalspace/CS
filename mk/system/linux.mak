@@ -6,14 +6,20 @@ DESCRIPTION.linux = Linux
 
 # Choose which drivers you want to build/use
 DRIVERS+=cs2d/softx cs3d/software csnetdrv/sockets \
-  csnetman/simple cssnddrv/oss cssndrdr/software
+  csnetman/simple
+
+# uncomment the following to build sound drivers
+DRIVERS+=cssnddrv/oss cssndrdr/software
 
 # uncomment the following to build SVGALIB 2D driver
 DRIVERS+=cs2d/svgalib
+
 # uncomment the following to build GGI 2D driver
 #DRIVERS+=cs2d/ggi 
+
 # uncomment the following to build OpenGL stuff
 DRIVERS+=cs3d/opengl cs2d/openglx
+
 # uncomment the following to build Glide stuff
 #DRIVERS+=cs3d/glide2 cs2d/unxglide2
 

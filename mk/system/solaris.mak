@@ -5,14 +5,19 @@
 DESCRIPTION.solaris = Solaris
 
 # Choose which drivers you want to build/use
-DRIVERS+=cs2d/softx cs3d/software csnetman/simple cssndrdr/software
+DRIVERS+=cs2d/softx cs3d/software csnetman/simple
+
+# uncomment the following to build sound renderer
+DRIVERS+=cssndrdr/software
 
 # uncomment the following to build GGI 2D driver
 #DRIVERS+=cs2d/ggi
+
 # uncomment the following to build OpenGL stuff
 DRIVERS+=cs3d/opengl cs2d/openglx
+
 # uncomment the following for socket network support
-#DRIVERS+=snetdrv/sockets
+#DRIVERS+=csnetdrv/sockets
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
