@@ -35,6 +35,7 @@ struct iEngine;
 struct iVFS;
 struct iGraphics3D;
 struct iSoundRender;
+struct iMotionManager;
 struct iLoaderPlugIn;
 
 struct iObject;
@@ -67,6 +68,8 @@ class csLoader : public iLoader
     // Return the loader plugin from a record, possibly loading the plugin now
     iLoaderPlugIn* GetPluginFromRec (csLoaderPluginRec *rec, const char *FuncID);
   public:
+    iSystem *System;
+
     // constructor
     csLoadedPluginVector (int iLimit = 8, int iThresh = 16);
     // destructor
@@ -213,6 +216,8 @@ public:
   iGraphics3D *G3D;
   // sound renderer
   iSoundRender *SoundRender;
+  // motion manager
+  iMotionManager *MotionManager;
 
   // constructor
   csLoader(iBase *p);

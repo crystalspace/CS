@@ -42,6 +42,9 @@
 #include "iengine/polygon.h"
 #include "iengine/portal.h"
 #include "iengine/movable.h"
+#include "iengine/halo.h"
+#include "iengine/light.h"
+#include "iengine/statlght.h"
 #include "isound/data.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
@@ -56,12 +59,7 @@
 
 #include "csengine/material.h"
 #include "csengine/engine.h"
-#include "csengine/light.h"
-#include "csengine/halo.h"
 #include "csengine/keyval.h"
-#include "csengine/sector.h"
-#include "cssys/system.h"
-#include "csengine/lghtmap.h"
 
 //---------------------------------------------------------------------------
 
@@ -372,11 +370,11 @@ iCollection* csLoader::load_collection (char* name, char* buf)
       case CS_TOKEN_LIGHT:
         {
           ScanStr (params, "%s", str);
-	  csStatLight* l = Engine->GetCsEngine()->FindLight (str, ResolveOnlyRegion);
+	  iStatLight* l = Engine->FindLight (str, ResolveOnlyRegion);
           if (!l)
             System->Printf (MSG_WARNING, "Light '%s' not found!\n", str);
 	  else
-	    collection->AddObject (l);
+	    collection->AddObject (l->QueryObject ());
         }
         break;
       case CS_TOKEN_SECTOR:
@@ -541,18 +539,18 @@ defaulthalo:
     }
   }
 
-  iStatLight* l = &(new csStatLight (x, y, z, dist, r, g, b, dyn))->scfiStatLight;
-  l->GetPrivateObject ()->SetName (name);
+  iStatLight* l = Engine->CreateLight (csVector3(x, y, z), dist, csColor(r, g, b), dyn);
+  l->QueryObject ()->SetName (name);
   switch (halo.type)
   {
     case 1:
-      l->GetPrivateObject ()->SetHalo (new csCrossHalo (halo.cross.Intensity, halo.cross.Cross));
+      l->QueryLight ()->CreateCrossHalo (halo.cross.Intensity, halo.cross.Cross);
       break;
     case 2:
-      l->GetPrivateObject ()->SetHalo (new csNovaHalo (halo.nova.Seed, halo.nova.NumSpokes, halo.nova.Roundness));
+      l->QueryLight ()->CreateNovaHalo (halo.nova.Seed, halo.nova.NumSpokes, halo.nova.Roundness);
       break;
   }
-  l->GetPrivateObject ()->SetAttenuation (attenuation);
+  l->QueryLight ()->SetAttenuation (attenuation);
   return l;
 }
 
@@ -976,18 +974,17 @@ bool csLoader::LoadMap (char* buf)
       	  break;
         case CS_TOKEN_MOTION:
 	  {
-	    iMotionManager* motionmanager = ::System->MotionMan;
-	    if (!motionmanager)
+	    if (!MotionManager)
 	    {
 	      System->Printf (MSG_FATAL_ERROR, "No motion manager loaded!\n");
 	      fatal_exit (0, false);
 	    }
 	    else
 	    {
-	      iMotion* m = motionmanager->FindByName (name);
+	      iMotion* m = MotionManager->FindByName (name);
 	      if (!m)
 	      {
-		m = motionmanager->AddMotion (name);
+		m = MotionManager->AddMotion (name);
 		LoadMotion (m, params);
 	      }
 	    }
@@ -1108,12 +1105,12 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine, bool iOnlyRegio
   iConfigFile *cfg = new csConfigFile ("map.cfg", VFS);
   if (cfg)
   {
-    csLightMap::SetLightCellSize (cfg->GetInt ("Engine.Lighting.LightmapSize",
-    	csLightMap::lightcell_size));
+    Engine->SetLightmapCellSize (cfg->GetInt ("Engine.Lighting.LightmapSize",
+    	Engine->GetLightmapCellSize ()));
     cfg->DecRef();
   }
   System->Printf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d.\n",
-      csLightMap::lightcell_size, csLightMap::lightcell_size);
+      Engine->GetLightmapCellSize (), Engine->GetLightmapCellSize ());
 
   if (!LoadMap (**buf))
     return false;
@@ -1410,16 +1407,13 @@ struct csLoaderPluginRec
   { 
     delete [] ShortName; 
     delete [] ClassID; 
-    if (Plugin) {
-      if (System) System->UnloadPlugIn(Plugin);
-      Plugin->DecRef ();
-    }
   }                                                                                  
 };
 
 csLoader::csLoadedPluginVector::csLoadedPluginVector (
 	int iLimit, int iThresh) : csVector (iLimit, iThresh)
 {
+  System = NULL;
 }
 
 csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
@@ -1429,7 +1423,12 @@ csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
 
 bool csLoader::csLoadedPluginVector::FreeItem (csSome Item)
 {
-  delete (csLoaderPluginRec*)Item;
+  csLoaderPluginRec *rec = (csLoaderPluginRec*)Item;
+  if (rec->Plugin) {
+    if (System) System->UnloadPlugIn(rec->Plugin);
+    rec->Plugin->DecRef ();
+  }
+  delete rec;
   return true;
 }
 
@@ -1452,7 +1451,7 @@ iLoaderPlugIn* csLoader::csLoadedPluginVector::GetPluginFromRec (
 	csLoaderPluginRec *rec, const char *FuncID)
 {
   if (!rec->Plugin)
-    rec->Plugin = LOAD_PLUGIN (::System, rec->ClassID, FuncID, iLoaderPlugIn);
+    rec->Plugin = LOAD_PLUGIN (System, rec->ClassID, FuncID, iLoaderPlugIn);
   return rec->Plugin;
 }
 
@@ -2198,15 +2197,14 @@ iMotion* csLoader::LoadMotion (const char* fname)
       fatal_exit (0, false);
     }
 
-    iMotionManager* motionmanager = ::System->MotionMan;
-    if (!motionmanager)
+    if (!MotionManager)
       System->Printf (MSG_FATAL_ERROR, "No motion manager loaded!\n");
     else
     {
-      iMotion* m = motionmanager->FindByName (name);
+      iMotion* m = MotionManager->FindByName (name);
       if (!m)
       {
-	m=motionmanager->AddMotion (name);
+	m=MotionManager->AddMotion (name);
 	if (LoadMotion (m, data))
 	{
 	  databuff->DecRef ();
@@ -2350,6 +2348,7 @@ csLoader::csLoader(iBase *p)
   Engine = NULL;
   G3D = NULL;
   SoundRender = NULL;
+  MotionManager = NULL;
 
   flags = 0;
   ResolveOnlyRegion = false;
@@ -2365,6 +2364,7 @@ csLoader::~csLoader()
   DEC_REF(Engine);
   DEC_REF(G3D);
   DEC_REF(SoundRender);
+  DEC_REF(MotionManager);
   delete Stats;
 }
 
@@ -2378,6 +2378,7 @@ bool csLoader::Initialize(iSystem *iSys)
 {
   System = iSys;
   System->Printf(MSG_INITIALIZATION, "Initializing loader plug-in...\n");
+  loaded_plugins.System = System;
 
   // get the virtual file system plugin
   GET_PLUGIN(VFS, CS_FUNCID_VFS, iVFS, "VFS");
@@ -2389,6 +2390,7 @@ bool csLoader::Initialize(iSystem *iSys)
   GET_PLUGIN(Engine, CS_FUNCID_ENGINE, iEngine, "engine");
   GET_PLUGIN(G3D, CS_FUNCID_VIDEO, iGraphics3D, "video driver");
   GET_PLUGIN(SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound driver");
+  GET_PLUGIN(MotionManager, CS_FUNCID_MOTION, iMotionManager, "motion manager");
 
   return true;
 }

@@ -334,11 +334,18 @@ struct iEngine : public iPlugIn
   /// Return true if lighting cache is enabled.
   virtual bool IsLightingCacheEnabled () = 0;
 
+  /// Return the current lightmap cell size
+  virtual int GetLightmapCellSize () = 0;
+  /// Set lightmap cell size
+  virtual void SetLightmapCellSize (int Size) = 0;
+
   /// Create a new view on the engine.
   virtual iView* CreateView (iGraphics3D* g3d) = 0;
   /// Create a static/pseudo-dynamic light.
   virtual iStatLight* CreateLight (const csVector3& pos, float radius,
   	const csColor& color, bool pseudoDyn) = 0;
+  /// Find a static/pseudo-dynamic light by name.
+  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false) = 0;
   /// Create a dynamic light.
   virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color) = 0;

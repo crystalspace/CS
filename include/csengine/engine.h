@@ -725,6 +725,11 @@ public:
   /// Return true if lighting cache is enabled.
   bool IsLightingCacheEnabled () { return do_lighting_cache; }
 
+  /// Return current lightmap cell size
+  virtual int GetLightmapCellSize ();
+  /// Set lightmap cell size
+  virtual void SetLightmapCellSize (int Size);
+
   /**
    * Read configuration file (using the system driver) for all engine
    * specific values. This function is called by Initialize() so you
@@ -868,17 +873,17 @@ public:
    * given position. This function scans all sectors and locates
    * the first one which statisfies that criterium.
    */
-  csStatLight* FindLight (float x, float y, float z, float dist);
+  csStatLight* FindCsLight (float x, float y, float z, float dist);
 
   /**
    * Find the light with the given object id.
    */
-  csStatLight* FindLight (CS_ID id);
+  csStatLight* FindCsLight (CS_ID id);
 
   /**
    * Find the light with the given name.
    */
-  csStatLight* FindLight (const char* name, bool regionOnly = false);
+  csStatLight* FindCsLight (const char* name, bool regionOnly = false);
 
   /**
    * Advance the frames of all objects given the current time.
@@ -1080,6 +1085,8 @@ public:
   /// Create a static/pseudo-dynamic light.
   virtual iStatLight* CreateLight (const csVector3& pos, float radius,
   	const csColor& color, bool pseudoDyn);
+  /// Find a static/pseudo-dynamic light by name.
+  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false);
   /// Create a dynamic light.
   virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color);

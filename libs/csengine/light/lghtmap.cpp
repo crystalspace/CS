@@ -307,7 +307,7 @@ bool csLightMap::ReadFromCache (int w, int h,
     memcpy (&ls.id, d, sizeof (ls.id)); d += sizeof (ls.id);
     ls.id = convert_endian (ls.id);
 
-    light = engine->FindLight (ls.id);
+    light = engine->FindCsLight (ls.id);
     if (light)
     {
       if (light->GetType () == csStatLight::Type && obj)

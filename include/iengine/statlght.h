@@ -22,6 +22,8 @@
 #include "csutil/scf.h"
 
 class csStatLight;
+struct iObject;
+struct iLight;
 
 SCF_VERSION (iStatLight, 0, 0, 1);
 
@@ -33,6 +35,11 @@ struct iStatLight : public iBase
 {
   /// Used by the engine to retrieve internal sector object (ugly)
   virtual csStatLight *GetPrivateObject () = 0;
+
+  /// Return the iObject for this light
+  virtual iObject *QueryObject () = 0;
+  /// Return the iLight for this light
+  virtual iLight *QueryLight () = 0;
 };
 
 #endif // __IENGINE_STATLGHT_H__

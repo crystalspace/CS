@@ -51,21 +51,6 @@ struct iMeshWrapper;
 #define CS_LIGHT_ACTIVEHALO	0x80000000
 
 /**
- * Attenuation controls how the brightness of a light fades with distance.
- * There are four attenuation formulas:
- * <ul>
- *   <li> no attenuation = light * 1
- *   <li> linear attenuation = light * (radius - distance) / radius
- *   <li> inverse attenuation = light * (radius / distance)
- *   <li> realistic attenuation = light * (radius^2 / distance^2)
- * </ul>
- */
-#define CS_ATTN_NONE      0
-#define CS_ATTN_LINEAR    1
-#define CS_ATTN_INVERSE   2
-#define CS_ATTN_REALISTIC 3
-
-/**
  * Superclass of all positional lights.
  * A light subclassing from this has a color, a position
  * and a radius.<P>
@@ -249,6 +234,8 @@ public:
     virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
   	float roundness);
     virtual iFlareHalo* CreateFlareHalo ();
+    virtual int GetAttenuation () {return scfParent->GetAttenuation();}
+    virtual void SetAttenuation (int a) {scfParent->SetAttenuation(a);}
   } scfiLight;
 };
 
@@ -357,6 +344,10 @@ public:
     /// Used by the engine to retrieve internal static light object (ugly)
     virtual csStatLight *GetPrivateObject ()
     { return scfParent; }
+    virtual iObject *QueryObject ()
+    { return scfParent; }
+    virtual iLight *QueryLight ()
+    { return &scfParent->scfiLight; }
   } scfiStatLight;
   friend struct eiStaticLight;
 };

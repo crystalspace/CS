@@ -35,6 +35,21 @@ struct iFlareHalo;
 /// Light level that corresponds to a normally lit texture.
 #define NORMAL_LIGHT_LEVEL 128
 
+/**
+ * Attenuation controls how the brightness of a light fades with distance.
+ * There are four attenuation formulas:
+ * <ul>
+ *   <li> no attenuation = light * 1
+ *   <li> linear attenuation = light * (radius - distance) / radius
+ *   <li> inverse attenuation = light * (radius / distance)
+ *   <li> realistic attenuation = light * (radius^2 / distance^2)
+ * </ul>
+ */
+#define CS_ATTN_NONE      0
+#define CS_ATTN_LINEAR    1
+#define CS_ATTN_INVERSE   2
+#define CS_ATTN_REALISTIC 3
+
 SCF_VERSION (iLight, 0, 0, 5);
 
 /**
@@ -65,6 +80,10 @@ struct iLight : public iBase
   	float roundness) = 0;
   /// Create a flare halo for this light.
   virtual iFlareHalo* CreateFlareHalo () = 0;
+  /// Return current attenuation mode
+  virtual int GetAttenuation () = 0;
+  /// Set attenuation mode
+  virtual void SetAttenuation (int a) = 0;
 };
 
 #endif // __IENGINE_LIGHT_H__

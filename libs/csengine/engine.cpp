@@ -737,6 +737,16 @@ void csEngine::EnableLightingCache (bool en)
   else do_force_relight = false;
 }
 
+int csEngine::GetLightmapCellSize ()
+{
+  return csLightMap::lightcell_size;
+}
+
+void csEngine::SetLightmapCellSize (int Size)
+{
+  csLightMap::lightcell_size = Size;
+}
+
 void csEngine::SetCuller (int culler)
 {
   delete c_buffer; c_buffer = NULL;
@@ -1268,7 +1278,7 @@ void csEngine::RemoveHalo (csLight* Light)
     halos.Delete (idx);
 }
 
-csStatLight* csEngine::FindLight (float x, float y, float z, float dist)
+csStatLight* csEngine::FindCsLight (float x, float y, float z, float dist)
 {
   csStatLight* l;
   int sn = sectors.Length ();
@@ -1282,7 +1292,7 @@ csStatLight* csEngine::FindLight (float x, float y, float z, float dist)
   return NULL;
 }
 
-csStatLight* csEngine::FindLight (CS_ID id)
+csStatLight* csEngine::FindCsLight (CS_ID id)
 {
   csStatLight* l;
   int sn = sectors.Length ();
@@ -1296,7 +1306,7 @@ csStatLight* csEngine::FindLight (CS_ID id)
   return NULL;
 }
 
-csStatLight* csEngine::FindLight (const char* name, bool /*regionOnly*/)
+csStatLight* csEngine::FindCsLight (const char* name, bool /*regionOnly*/)
 {
   //@@@### regionOnly
   csStatLight* l;
@@ -1309,6 +1319,11 @@ csStatLight* csEngine::FindLight (const char* name, bool /*regionOnly*/)
     if (l) return l;
   }
   return NULL;
+}
+
+iStatLight* csEngine::FindLight (const char* name, bool regionOnly)
+{
+  return &FindCsLight(name, regionOnly)->scfiStatLight;
 }
 
 void csEngine::AddDynLight (csDynLight* dyn)
