@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Nov-2004
+	- res also applied the default hash table size and grow rate change to
+	  csHashReversible<>.
+	- res fixed the Win32 keyboard code to correctly handle AltGr and Shift
+	  quirks.
+	- res fixed a few gcc warnings in sndwaveout and sndds3d.
 2-Nov-2004
 	- res reduced the default hash table size and grow rate from 257/64 to
 	  23/5 to have hashes use less memory by default.

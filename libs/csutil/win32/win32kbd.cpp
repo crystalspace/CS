@@ -396,7 +396,53 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 	csKeyCharType type;
 	if (Win32KeyToCSKey (wParam, lParam, raw, cooked, type))
 	{
-  	  DoKey (raw, cooked, down, autoRep, type);
+	  bool doDoKey = true;
+	  if (raw == CSKEY_CTRL_LEFT)
+	  {
+	    /*
+	      Quirk: When pressing AltGr, messages for both LCtrl and RAlt are 
+	      emitted. To work this around, peek into the queue and check 
+	      whether an RAlt stroke is ahead. If yes, discard the LCtrl. The 
+	      message time is compared to make sure no "legal" 
+	      LCtrl-before-RAlt strokes are discarded.
+	    */
+	    DWORD strokeTime = (DWORD)GetMessageTime ();
+	    MSG msg;
+	    if (PeekMessage (&msg, hWnd, WM_KEYFIRST, WM_KEYLAST, PM_NOREMOVE))
+	    {
+	      if (msg.message == message)
+	      {
+		utf32_char nextRaw, nextCooked;
+		csKeyCharType nextType;
+		if (Win32KeyToCSKey (msg.wParam, msg.lParam, nextRaw, 
+		  nextCooked, nextType))
+		{
+		  doDoKey = !((nextRaw == CSKEY_ALT_RIGHT) 
+		    && (strokeTime == msg.time));
+		}
+	      }
+	    }
+	  }
+	  else if (raw == CSKEY_SHIFT_LEFT)
+	  {
+	    /*
+	      Quirk: when RShift is pressed, an LShift is emitted nevertheless.
+	      So check which shifts are _really_ down and call DoKey()
+	      appropriately.
+	    */
+	    bool lshiftState = keyStates.Get (CSKEY_SHIFT_LEFT, false);
+	    bool lshiftDown = ::GetKeyState (VK_LSHIFT) & 0x8000;
+	    bool rshiftState = keyStates.Get (CSKEY_SHIFT_RIGHT, false);
+	    bool rshiftDown = ::GetKeyState (VK_RSHIFT) & 0x8000;
+
+	    if (lshiftState != lshiftDown)
+	      DoKey (CSKEY_SHIFT_LEFT, CSKEY_SHIFT, lshiftDown, autoRep, type);
+	    if (rshiftState != rshiftDown)
+	      DoKey (CSKEY_SHIFT_RIGHT, CSKEY_SHIFT, rshiftDown, autoRep, type);
+
+	    doDoKey = false;
+	  }
+  	  if (doDoKey) DoKey (raw, cooked, down, autoRep, type);
 	}
       }
       return !(wParam == VK_F4 && 

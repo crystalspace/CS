@@ -128,7 +128,8 @@ protected:
   class BackgroundThread : public csRunnable
   {
   public:
-    BackgroundThread (csSoundDriverWaveOut *driver): parent_driver(driver), count(1), running(false), request_stop(false) {}
+    BackgroundThread (csSoundDriverWaveOut *driver): count(1), 
+      parent_driver(driver), running(false), request_stop(false) {}
     virtual ~BackgroundThread () {}
     virtual void IncRef () 
     {

@@ -628,10 +628,10 @@ template, the following @code{csList<>} methods have been renamed:
 @code{HasPrev()} @result{} @code{HasPrevious()}
 @end itemize
 
-@subheading Default @code{csHash<>} Hash Table Size
+@subheading Default @code{csHash<>} (and @code{csHashReversible<>}) Hash Table Size
 
 The default hash table size and grow rate has been reduced from 257 resp. 64 
 to 23 resp. 5 to have hashes use less memory. If a hash is expected to contain 
 a large quantity of elements, those two parameters can be tweaked upon 
-construction of a @code{csHash<>}.  Consult the Public API Documentation of 
-@code{csHash<>} for more information.
+construction of a @code{csHash<>} or @code{csHashReversible<>}.  Consult the 
+Public API Documentation of @code{csHash<>} for more information.

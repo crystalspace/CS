@@ -315,7 +315,7 @@ void csSoundRenderDS3D::SetDirty()
 void csSoundRenderDS3D::AddSource(csSoundSourceDS3D *src)
 {
   mutex_ActiveSources->LockWait();
-  if (ActiveSources.Find(src)==-1)
+  if (ActiveSources.Find (src) == csArrayItemNotFound)
   {
     ActiveSources.Push(src);
   }

@@ -47,7 +47,7 @@ public:
    * 50119, 70951, 90313, 104707.
    * For a bigger list go to http://www.utm.edu/research/primes/
    */
-  csHashReversible (int size = 257, int grow_rate = 64, int max_size = 20000) :
+  csHashReversible (int size = 23, int grow_rate = 5, int max_size = 20000) :
     csHash<T, K, KeyHandler> (size, grow_rate, max_size), 
     reverse (size, grow_rate, max_size)
   {

@@ -158,7 +158,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   // We'll keep 5 buffer-segments.  Every time one is empty we'll refill it and send it along again
   float f_memsize=(BufferLength * Format.nAvgBytesPerSec) / WAVEOUT_BUFFER_COUNT;
 
-  MemorySize = f_memsize; // Translate to an int
+  MemorySize = (int)f_memsize; // Translate to an int
   MemorySize += Format.nBlockAlign; // Add the alignment size - this causes a round-up
   MemorySize -= (MemorySize%Format.nBlockAlign); // Truncate to an even alignment size
   Memory = 0;
