@@ -29,8 +29,8 @@ The history order is reversed so that new features are at the top.
 	  create some. )
 15-Jul-2003
 	- Christopher Nelson removed the procedural texture support from
-	AWS entirely.  This means that a user must do all the construction
-	work if they intend to use custom canvases.
+	  AWS entirely.  This means that a user must do all the construction
+	  work if they intend to use custom canvases.
 13-Jul-2003
 	- Keith Fulton changed csPath to inherit from SCF interface iPath.
 12-Jul-2003

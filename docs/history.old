@@ -2706,7 +2706,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Norman fixed linux joystick driver so it compiles again (csRef
 	  changes).
 	- Norman added threading implementation to linux files to compile.
-	  Also added detectino of pthreads in unixconf.sh.
+	  Also added detection of pthreads in unixconf.sh.
 	- Norman moved pthread specific typedef into separate header and
 	  added definition of CS_THREADS.
 	- Philip Wyett did the following:
