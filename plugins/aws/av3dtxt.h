@@ -20,8 +20,8 @@
 #ifndef __CS_AWS_AV3DTXT_H__
 #define __CS_AWS_AV3DTXT_H__
 
-# include "video/renderer/common/txtmgr.h"
-# include "igraphic/image.h"
+#include "video/renderer/common/txtmgr.h"
+#include "igraphic/image.h"
 
 class csTextureManagerNull;
 
@@ -35,18 +35,18 @@ class csTextureManagerNull;
 class csTextureNull : public csTexture
 {
 public:
-  /// The bitmap
+  /// The bitmap.
   uint8 *bitmap;
 
-  /// The alpha map (0 if no alphamap)
+  /// The alpha map (0 if no alphamap).
   uint8 *alphamap;
 
-  /// The image (temporary storage)
+  /// The image (temporary storage).
   iImage *image;
 
-  /// Create a csTexture object
-  csTextureNull (csTextureHandle *Parent, iImage *Image) :
-  csTexture (Parent)
+  /// Create a csTexture object.
+  csTextureNull (csTextureHandle *Parent, iImage *Image)
+    : csTexture (Parent)
   {
     bitmap = 0;
     alphamap = 0;
@@ -56,7 +56,7 @@ public:
     compute_masks ();
   }
 
-  /// Destroy the texture
+  /// Destroy the texture.
   virtual ~csTextureNull ()
   {
     delete[] bitmap;
@@ -64,10 +64,10 @@ public:
     if (image) image->DecRef ();
   }
 
-  /// Return a pointer to texture data
+  /// Return a pointer to texture data.
   uint8 *get_bitmap () { return bitmap; }
 
-  /// Return a pointer to alpha map data
+  /// Return a pointer to alpha map data.
   uint8 *get_alphamap () { return alphamap; }
 };
 
@@ -86,28 +86,28 @@ protected:
    */
   void *pal2glob;
 
-  /// The private palette
+  /// The private palette.
   csRGBpixel palette[256];
 
-  /// Number of used colors in palette
+  /// Number of used colors in palette.
   int palette_size;
 
-  /// The texture manager
+  /// The texture manager.
   csTextureManagerNull *texman;
 
-  /// Create a new texture object
+  /// Create a new texture object.
   virtual csTexture *NewTexture (iImage *Image, bool ismipmap);
 
-  /// Compute the mean color for the just-created texture
+  /// Compute the mean color for the just-created texture.
   virtual void ComputeMeanColor ();
 public:
-  /// Create the mipmapped texture object
+  /// Create the mipmapped texture object.
   csTextureHandleNull (
     csTextureManagerNull *txtmgr,
     iImage *image,
     int flags);
 
-  /// Destroy the object and free all associated storage
+  /// Destroy the object and free all associated storage.
   virtual ~csTextureHandleNull ();
 
   /**
@@ -118,13 +118,13 @@ public:
    */
   void remap_texture (csTextureManager *texman);
 
-  /// Query the private texture colormap
+  /// Query the private texture colormap.
   csRGBpixel *GetColorMap () { return palette; }
 
-  /// Query the number of colors in the colormap
+  /// Query the number of colors in the colormap.
   int GetColorMapSize () { return palette_size; }
 
-  /// Query palette -> native format table
+  /// Query palette -> native format table.
   void *GetPaletteToGlobal () { return pal2glob; }
 
   /**
@@ -137,15 +137,21 @@ public:
     return !!((csTextureNull *)get_texture (0))->get_alphamap ();
   }
 
-  /// Prepare the texture for usage
+  /// Prepare the texture for usage.
   virtual void Prepare ();
 
 #ifdef CS_USE_NEW_RENDERER
   virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md)
-  { return false; }
+  {
+    return false;
+  }
 
   virtual void GetOriginalDimensions (int& mw, int& mh, int &md)
-  { mw = 0; mh = 0; md = 0;}
+  {
+    mw = 0;
+    mh = 0;
+    md = 0;
+  }
 
   virtual void SetTextureTarget (int target) { }
 #endif // CS_USE_NEW_RENDERER
@@ -161,7 +167,7 @@ public:
 class csTextureManagerNull : public csTextureManager
 {
 private:
-  /// We need a pointer to the 2D driver
+  /// We need a pointer to the 2D driver.
   iGraphics2D *G2D;
 public:
   ///
@@ -173,7 +179,7 @@ public:
   ///
   virtual ~csTextureManagerNull ();
 
-  /// Called from G3D::Open ()
+  /// Called from G3D::Open ().
   void SetPixelFormat (csPixelFormat &PixelFormat);
 
   /// Encode RGB values to a 16-bit word (for 16-bit mode).
@@ -195,7 +201,9 @@ public:
   virtual void UnregisterTexture (csTextureHandleNull *handle);
 
   virtual csPtr<iSuperLightmap> CreateSuperLightmap (int w, int h)
-  { return 0; }
+  {
+    return 0;
+  }
 };
 
 #endif // __CS_AWS_AV3DTXT_H__
