@@ -10,6 +10,9 @@ The history order is reversed so that new features are at the top.
 	  a test level.
 	- Most CS applications will now use OpenGL by default instead of the
 	  software renderer.
+	- Reset use_lazy_clipping in OpenGL renderer to false again by default.
+	  Setting this to true has bad effect on performance because then
+	  lazy clipping is forced in all cases.
 	- Keith Fulton fixed a bug flipping the do_tweening flag on saving
 	  of binary spr3d's.
 27-Jan-2003
