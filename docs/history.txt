@@ -2,6 +2,53 @@ The history order is reversed so that new features are at the top.
 
 20-Aug-2002
 	- Implemented XML version of the spr2d mesh object loader.
+	- Added new ParseBox() in syntax services (for XML).
+	- Implemented XML version of the gtreeldr.
+	- Implemented XML version of the gmeshldr.
+	- Implemented XML version of the meta ball loader.
+	- Implemented XML version of the emit loader.
+	- Implemented XML version of the fountain loader.
+	- Implemented XML version of the snow loader.
+	- Implemented XML version of the fire loader.
+	- In most of those loaders the error handling is also better now (in
+	  some it was simply non-existant before conversion).
+	- In addition I made the error handling a little bit cleaner by
+	  using csRef smart pointers.
+	- Implemented proper conversion of PRIORITY in cs2xml.
+	- Implemented proper conversion of PLUGIN in cs2xml.
+	- Fixed a bug in XML parsing of render priorities in main loader.
+	- Cs2xml will remove underscores in tokens now. This fixes a lot
+	  of loader issues.
+	- Cs2xml correctly converts NUM(x,y) for genmesh.
+	- Cs2xml correctly converts VERTICES for spr2d and genmesh.
+	- Cs2xml correctly converts UV for polygons and spr2d.
+	- Cs2xml correctly converts TRIANGLES in genmesh.
+	- Cs2xml correctly converts F inside ACTION for 3d sprites.
+	- Cs2xml correctly converts EMITBOX, EMITFIXED, AGING,
+	  and RECTPARTICLES (emit particle system).
+	- Cs2Xml correctly converts DROPSIZE, BOX and ORIGINBOX.
+	- Fixed a bug in cs2xml with converting of old style lights.
+	- Cs2Xml will now translate POLYGON to 'p' and work correctly
+	  in case 'P' is used.
+	- Fixed a bug in the bezier loader addon.
+	- Cs2Xml correctly converts KEY.
+	- Cs2Xml correctly converts RADIUS.
+	- Fixed a bug in cs2xml where it would not properly recognize strings
+	  if they have no quotes.
+	- Cs2Xml correctly converts COLORS for spr2d.
+	- Cs2Xml correctly converts W for warp.
+	- Fixed a few bugs in the syntax services for parsing of polygons.
+	- Cs2Xml correctly converts FOG.
+	- Cs2Xml correctly converts HALO.
+	- Cs2Xml correctly converts CURVECONTROL and CURVECENTER.
+	- These changes are sufficient to fully convert /data/flarge/world
+	  to XML. Consequently I also commited the XML version of 'world'.
+	  Note that ONLY stuff that is used in flarge is guaranteed to
+	  work. Nothing else has been tested and some mesh object plugins
+	  are not even converted. This is true both for cs2xml and for
+	  the XML loading itself. The XML loader seems a little bit slower
+	  compared to the old lower although the difference isn't much.
+	  There is still a lot of room for optimization though.
 19-Aug-2002
 	- Implemented XML version of the ball mesh object loader.
 	- Fixed a memory leak in SKELETON statement of spr3d loader.

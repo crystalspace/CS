@@ -25,10 +25,12 @@
 #include "imap/services.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "csutil/strhash.h"
 
 struct iEngine;
 struct iPluginManager;
 struct iObjectRegistry;
+struct iReporter;
 
 /**
  * MetaBall factory loader.
@@ -56,10 +58,7 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual iBase* Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context)
-  {
-    return NULL;
-  }
+    iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {
@@ -110,7 +109,9 @@ class csMetaBallLoader : public iLoaderPlugin
 private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iReporter* reporter;
   iSyntaxService* synldr;
+  csStringHash xmltokens;
 
 public:
   SCF_DECLARE_IBASE;
@@ -129,10 +130,7 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual iBase* Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context)
-  {
-    return NULL;
-  }
+    iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {

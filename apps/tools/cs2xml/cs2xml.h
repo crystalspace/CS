@@ -49,13 +49,14 @@ public:
   bool IsString (const char* in);
   bool IsBoolean (const char* in, bool& val);
   int IsNumberList (const char* in);
-  char* ToLower (const char* in);
+  // If remove_under is true, underscores are removed.
+  char* ToLower (const char* in, bool remove_under);
 
-  void CreateValueNode (csRef<iDocumentNode>& parent,
+  csRef<iDocumentNode> CreateValueNode (csRef<iDocumentNode>& parent,
   	const char* name, const char* value);
-  void CreateValueNodeAsInt (csRef<iDocumentNode>& parent,
+  csRef<iDocumentNode> CreateValueNodeAsInt (csRef<iDocumentNode>& parent,
   	const char* name, int value);
-  void CreateValueNodeAsFloat (csRef<iDocumentNode>& parent,
+  csRef<iDocumentNode> CreateValueNodeAsFloat (csRef<iDocumentNode>& parent,
   	const char* name, float value);
 
   void ParseMatrix (csParser *parser, csRef<iDocumentNode>& parent,

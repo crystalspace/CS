@@ -27,6 +27,7 @@
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
 #include "iutil/plugin.h"
+#include "iutil/document.h"
 #include "imesh/genmesh.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
@@ -44,6 +45,11 @@ CS_IMPLEMENT_PLUGIN
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (HEIGHT)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_HEIGHT = 1
+};
 
 SCF_IMPLEMENT_IBASE (csGeneralTreeFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -646,6 +652,8 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   co_twigside2->AddRule (new csStraightRule (co_top));
 #endif
 
+  xmltokens.Register ("height", XMLTOKEN_HEIGHT);
+
   return true;
 }
 
@@ -764,6 +772,117 @@ printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
   delete construction;
 
   state->DecRef ();
+  return fact;
+}
+
+iBase* csGeneralTreeFactoryLoader::Parse (
+	iDocumentNode* node,
+	iLoaderContext* ldr_context, iBase* /* context */)
+{
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.genmesh", iMeshObjectType);
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.genmesh",
+    	iMeshObjectType);
+  }
+  if (!type)
+  {
+    ReportError (reporter,
+		"crystalspace.gentreefactoryloader.setup.objecttype",
+		"Could not load the general mesh object plugin!");
+    return NULL;
+  }
+
+  csRef<iMeshObjectFactory> fact;
+  csRef<iGeneralFactoryState> state;
+
+  fact.Take (type->NewFactory ());
+  state.Take (SCF_QUERY_INTERFACE (fact, iGeneralFactoryState));
+  type->DecRef ();
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_HEIGHT:
+	break;
+      default:
+        ReportError (reporter,
+		"crystalspace.gentreefactoryloader.parse.badformat",
+		"Unexpected token '%s' while parsing 'gentree'!");
+        return NULL;
+    }
+  }
+
+  csConstruction* construction = new csConstruction ();
+  csVector3 vertices[6];
+#if 0
+  int j = 0;
+  vertices[j++].Set (-.1, 0, .1);
+  vertices[j++].Set (.1, 0, .1);
+  vertices[j++].Set (.1, 0, -.1);
+  vertices[j++].Set (-.1, 0, -.1);
+  construction->SetupInitialVertices (4, vertices);
+  int vtidx[6];
+  j = 0;
+  vtidx[j++] = 0;
+  vtidx[j++] = 1;
+  vtidx[j++] = 2;
+  vtidx[j++] = 3;
+  construction->AddConstructionObject (0, csReversibleTransform (),
+  	4, vtidx, 0, co_tree);
+#else
+  int j = 0;
+  vertices[j++].Set (-.1, 0, 0);
+  vertices[j++].Set (-.03, 0, .07);
+  vertices[j++].Set (.03, 0, .07);
+  vertices[j++].Set (.1, 0, 0);
+  vertices[j++].Set (.03, 0, -.07);
+  vertices[j++].Set (-.03, 0, -.07);
+  construction->SetupInitialVertices (6, vertices);
+  int vtidx[6];
+  j = 0;
+  vtidx[j++] = 0;
+  vtidx[j++] = 1;
+  vtidx[j++] = 2;
+  vtidx[j++] = 3;
+  vtidx[j++] = 4;
+  vtidx[j++] = 5;
+  construction->AddConstructionObject (0, csReversibleTransform (),
+  	6, vtidx, 0, co_tree);
+#endif
+printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
+		construction->GetVertexCount ());
+
+  state->SetVertexCount (construction->GetVertexCount ());
+  csVector3* vt = state->GetVertices ();
+  memcpy (vt, construction->GetVertices (),
+  	construction->GetVertexCount ()*sizeof (csVector3));
+  csVector2* tx = state->GetTexels ();
+  int i;
+  for (i = 0 ; i < construction->GetVertexCount () ; i++)
+  {
+    const csVector3& v = vt[i];
+    csVector2& uv = tx[i];
+    // This is a bit like 3D texture mapping.
+    uv.x = fmod (10.*fabs (v.x+v.z), 1.)/2.;
+    uv.y = fmod (fabs (v.y), 1.);
+    if (int (v.y) & 1) uv.y = 1-uv.y;
+  }
+  state->SetTriangleCount (construction->GetTriangleCount ());
+  memcpy (state->GetTriangles (), construction->GetTriangles (),
+  	construction->GetTriangleCount ()*sizeof (csTriangle));
+  state->CalculateNormals ();
+  delete construction;
+
+  // Incref to prevent smart pointer from deleting it.
+  if (fact) fact->IncRef ();
   return fact;
 }
 

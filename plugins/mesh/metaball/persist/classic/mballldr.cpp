@@ -31,6 +31,7 @@
 #include "ivideo/graph3d.h"
 #include "qint.h"
 #include "iutil/vfs.h"
+#include "iutil/document.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
@@ -38,6 +39,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/ldrctxt.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -55,6 +57,22 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MIXMODE)
   CS_TOKEN_DEF (SHIFT)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_LIGHTING = 1,
+  XMLTOKEN_ISOLEVEL,
+  XMLTOKEN_CHARGE,
+  XMLTOKEN_NUMBER,
+  XMLTOKEN_TRUEMAP,
+  XMLTOKEN_TEXSCALE,
+  XMLTOKEN_RATE,
+
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_MIXMODE,
+  XMLTOKEN_SHIFT
+};
 
 SCF_IMPLEMENT_IBASE (csMetaBallFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -108,6 +126,26 @@ SCF_EXPORT_CLASS_TABLE (mballldr)
     "Crystal Space MetaBall Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    csPrintf ("Error ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
+  }
+  va_end (arg);
+}
+
 csMetaBallFactoryLoader::csMetaBallFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -128,6 +166,22 @@ bool csMetaBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csMetaBallFactoryLoader::Parse (const char* /*string*/,
+	iLoaderContext* , iBase* /* context */)
+{
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.metaball", iMeshObjectType);
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.metaball",
+    	iMeshObjectType);
+    printf ("Load TYPE plugin crystalspace.mesh.object.metaball\n");
+  }
+  iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
+  return fact;
+}
+
+iBase* csMetaBallFactoryLoader::Parse (iDocumentNode*,
 	iLoaderContext* , iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -178,12 +232,14 @@ csMetaBallLoader::csMetaBallLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   plugin_mgr = NULL;
+  reporter = NULL;
 }
 
 csMetaBallLoader::~csMetaBallLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (synldr);
+  SCF_DEC_REF (reporter);
 }
 
 bool csMetaBallLoader::Initialize (iObjectRegistry* object_reg)
@@ -191,6 +247,19 @@ bool csMetaBallLoader::Initialize (iObjectRegistry* object_reg)
   csMetaBallLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
+  xmltokens.Register ("isolevel", XMLTOKEN_ISOLEVEL);
+  xmltokens.Register ("charge", XMLTOKEN_CHARGE);
+  xmltokens.Register ("number", XMLTOKEN_NUMBER);
+  xmltokens.Register ("truemap", XMLTOKEN_TRUEMAP);
+  xmltokens.Register ("texscale", XMLTOKEN_TEXSCALE);
+  xmltokens.Register ("rate", XMLTOKEN_RATE);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("shift", XMLTOKEN_SHIFT);
   return true;
 }
 
@@ -324,6 +393,178 @@ iBase* csMetaBallLoader::Parse (const char* string,
   }
 
   if (ballstate) ballstate->DecRef ();
+  return mesh;
+}
+
+iBase* csMetaBallLoader::Parse (iDocumentNode* node,
+	iLoaderContext* ldr_context, iBase*)
+{
+  csRef<iMeshObject> mesh;
+  csRef<iMetaBallState> ballstate;
+
+  MetaParameters* mp = NULL;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_ISOLEVEL:
+	{
+	  if (!mp)
+	  {
+    	    ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Please use 'factory' before 'isolevel'!");
+	    return NULL;
+	  }
+	  mp->iso_level = child->GetContentsValueAsFloat ();
+	}
+	break;
+      case XMLTOKEN_CHARGE:
+	{
+	  if (!mp)
+	  {
+    	    ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Please use 'factory' before 'charge'!");
+	    return NULL;
+	  }
+	  mp->charge = child->GetContentsValueAsFloat ();
+	}
+	break;
+      case XMLTOKEN_NUMBER:
+	{
+	  if (!ballstate)
+	  {
+    	    ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Please use 'factory' before 'number'!");
+	    return NULL;
+	  }
+	  ballstate->SetMetaBallCount (child->GetContentsValueAsInt ());
+	}
+	break;
+      case XMLTOKEN_RATE:
+	{
+	  if (!mp)
+	  {
+    	    ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Please use 'factory' before 'rate'!");
+	    return NULL;
+	  }
+	  mp->rate = child->GetContentsValueAsFloat ();
+	}
+	break;
+      case XMLTOKEN_TRUEMAP:
+	{
+	  if (!ballstate)
+	  {
+    	    ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Please use 'factory' before 'truemap'!");
+	    return NULL;
+	  }
+	  bool m;
+	  if (!synldr->ParseBool (child, m, true))
+	    return NULL;
+	  ballstate->SetQualityEnvironmentMapping (m);
+	}
+	break;
+      case XMLTOKEN_TEXSCALE:
+	{
+	  if (!ballstate)
+	  {
+    	    ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Please use 'factory' before 'texscale'!");
+	    return NULL;
+	  }
+	  ballstate->SetEnvironmentMappingFactor (
+	  	child->GetContentsValueAsFloat ());
+	}
+	break;
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if (!fact)
+	  {
+    	    ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Can't find factory '%s'!", factname);
+	    return NULL;
+	  }
+	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
+          ballstate.Take (SCF_QUERY_INTERFACE (mesh, iMetaBallState));
+	  mp = ballstate->GetParameters();
+	}
+	break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  if (!ballstate)
+	  {
+    	    ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Please use 'factory' before 'material'!");
+	    return NULL;
+	  }
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+    	    ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Can't find material '%s'!", matname);
+            return NULL;
+	  }
+	  ballstate->SetMaterial (mat);
+	}
+	break;
+      case XMLTOKEN_MIXMODE:
+        {
+	  if (!ballstate)
+	  {
+    	    ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Please use 'factory' before 'mixmode'!");
+	    return NULL;
+	  }
+	  uint mode;
+	  if (synldr->ParseMixmode (child, mode))
+	    ballstate->SetMixMode (mode);
+	}
+	break;
+      case XMLTOKEN_LIGHTING:
+	{
+	  if (!ballstate)
+	  {
+    	    ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Please use 'factory' before 'lighting'!");
+	    return NULL;
+	  }
+	  bool l;
+	  if (!synldr->ParseBool (child, l, true))
+	    return NULL;
+	  ballstate->SetLighting (l);
+	}
+	break;
+      default:
+        ReportError (reporter,
+		"crystalspace.metaballloader.parse",
+		"Unexpected token '%s' in metaball loader!", value);
+        return NULL;
+    }
+  }
+
+  // Incref to avoid smart pointer release.
+  if (mesh) mesh->IncRef ();
   return mesh;
 }
 

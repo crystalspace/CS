@@ -35,10 +35,12 @@
 #include "iutil/vfs.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"
+#include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/ldrctxt.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -68,6 +70,34 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TOTALTIME)
   CS_TOKEN_DEF (WEIGHT)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_AGING = 1,
+  XMLTOKEN_ATTRACTORFORCE,
+  XMLTOKEN_ATTRACTOR,
+  XMLTOKEN_EMITBOX,
+  XMLTOKEN_EMITCONE,
+  XMLTOKEN_EMITCYLINDERTANGENT,
+  XMLTOKEN_EMITCYLINDER,
+  XMLTOKEN_EMITFIXED,
+  XMLTOKEN_EMITLINE,
+  XMLTOKEN_EMITMIX,
+  XMLTOKEN_EMITSPHERETANGENT,
+  XMLTOKEN_EMITSPHERE,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_LIGHTING,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_MIXMODE,
+  XMLTOKEN_NUMBER,
+  XMLTOKEN_RECTPARTICLES,
+  XMLTOKEN_REGULARPARTICLES,
+  XMLTOKEN_STARTACCEL,
+  XMLTOKEN_STARTPOS,
+  XMLTOKEN_STARTSPEED,
+  XMLTOKEN_TOTALTIME,
+  XMLTOKEN_WEIGHT
+};
 
 SCF_IMPLEMENT_IBASE (csEmitFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -122,6 +152,26 @@ SCF_EXPORT_CLASS_TABLE (emitldr)
     "Crystal Space Emit Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    csPrintf ("Error ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
+  }
+  va_end (arg);
+}
+
 csEmitFactoryLoader::csEmitFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -142,6 +192,22 @@ bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csEmitFactoryLoader::Parse (const char* /*string*/,
+	iLoaderContext*, iBase* /* context */)
+{
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.emit", iMeshObjectType);
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.emit",
+    	iMeshObjectType);
+    printf ("Load TYPE plugin crystalspace.mesh.object.emit\n");
+  }
+  iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
+  return fact;
+}
+
+iBase* csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -192,12 +258,15 @@ csEmitLoader::csEmitLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   plugin_mgr = NULL;
+  reporter = NULL;
+  synldr = NULL;
 }
 
 csEmitLoader::~csEmitLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (synldr);
+  SCF_DEC_REF (reporter);
 }
 
 bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
@@ -205,6 +274,32 @@ bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
   csEmitLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  xmltokens.Register ("aging", XMLTOKEN_AGING);
+  xmltokens.Register ("attractorforce", XMLTOKEN_ATTRACTORFORCE);
+  xmltokens.Register ("attractor", XMLTOKEN_ATTRACTOR);
+  xmltokens.Register ("emitbox", XMLTOKEN_EMITBOX);
+  xmltokens.Register ("emitcone", XMLTOKEN_EMITCONE);
+  xmltokens.Register ("emitcylindertangent", XMLTOKEN_EMITCYLINDERTANGENT);
+  xmltokens.Register ("emitcylinder", XMLTOKEN_EMITCYLINDER);
+  xmltokens.Register ("emitfixed", XMLTOKEN_EMITFIXED);
+  xmltokens.Register ("emitline", XMLTOKEN_EMITLINE);
+  xmltokens.Register ("emitmix", XMLTOKEN_EMITMIX);
+  xmltokens.Register ("emitspheretangent", XMLTOKEN_EMITSPHERETANGENT);
+  xmltokens.Register ("emitsphere", XMLTOKEN_EMITSPHERE);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("number", XMLTOKEN_NUMBER);
+  xmltokens.Register ("rectparticles", XMLTOKEN_RECTPARTICLES);
+  xmltokens.Register ("regularparticles", XMLTOKEN_REGULARPARTICLES);
+  xmltokens.Register ("startaccel", XMLTOKEN_STARTACCEL);
+  xmltokens.Register ("startpos", XMLTOKEN_STARTPOS);
+  xmltokens.Register ("startspeed", XMLTOKEN_STARTSPEED);
+  xmltokens.Register ("totaltime", XMLTOKEN_TOTALTIME);
+  xmltokens.Register ("weight", XMLTOKEN_WEIGHT);
   return true;
 }
 
@@ -331,6 +426,176 @@ static iEmitGen3D* ParseEmit (csParser* parser, char* buf,
 	  result = espheretan;
 	}
 	break;
+    }
+  }
+  return result;
+}
+
+iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
+			      iEmitFactoryState *fstate, float* weight)
+{
+  iEmitGen3D* result = NULL;
+  iEmitMix *emix = NULL;
+  csVector3 a,b;
+  float p,q,r,s,t;
+  if (weight) *weight = 1.;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_WEIGHT:
+	if (weight == NULL)
+	{
+	  ReportError (reporter,
+		"crystalspace.emitloader.parse",
+		"'weight' cannot be given in this context!");
+	  return NULL;
+	}
+	*weight = child->GetContentsValueAsFloat ();
+	break;
+      case XMLTOKEN_EMITFIXED:
+        {
+	  a.x = child->GetAttributeValueAsFloat ("x");
+	  a.y = child->GetAttributeValueAsFloat ("y");
+	  a.z = child->GetAttributeValueAsFloat ("z");
+	  iEmitFixed *efixed = fstate->CreateFixed ();
+	  efixed->SetValue (a);
+	  result = efixed;
+	}
+	break;
+      case XMLTOKEN_EMITBOX:
+        {
+	  csBox3 box;
+	  if (!synldr->ParseBox (child, box))
+	  {
+	    ReportError (reporter,
+		  "crystalspace.emitloader.parse",
+		  "Error parsing box for 'emitbox'!");
+	    return NULL;
+	  }
+	  iEmitBox *ebox = fstate->CreateBox ();
+	  ebox->SetContent (box.Min (), box.Max ());
+	  result = ebox;
+	}
+	break;
+      case XMLTOKEN_EMITSPHERE:
+        {
+	  a.x = child->GetAttributeValueAsFloat ("x");
+	  a.y = child->GetAttributeValueAsFloat ("y");
+	  a.z = child->GetAttributeValueAsFloat ("z");
+	  p = child->GetAttributeValueAsFloat ("p");
+	  q = child->GetAttributeValueAsFloat ("q");
+	  iEmitSphere *esphere = fstate->CreateSphere ();
+	  esphere->SetContent (a, p, q);
+	  result = esphere;
+	}
+	break;
+      case XMLTOKEN_EMITCONE:
+        {
+	  a.x = child->GetAttributeValueAsFloat ("x");
+	  a.y = child->GetAttributeValueAsFloat ("y");
+	  a.z = child->GetAttributeValueAsFloat ("z");
+	  p = child->GetAttributeValueAsFloat ("p");
+	  q = child->GetAttributeValueAsFloat ("q");
+	  r = child->GetAttributeValueAsFloat ("r");
+	  s = child->GetAttributeValueAsFloat ("s");
+	  t = child->GetAttributeValueAsFloat ("t");
+	  iEmitCone *econe = fstate->CreateCone ();
+	  econe->SetContent (a, p, q, r, s, t);
+	  result = econe;
+	}
+	break;
+      case XMLTOKEN_EMITMIX:
+        {
+	  if (!emix) emix = fstate->CreateMix ();
+	  float amt;
+	  iEmitGen3D *gen;
+	  gen = ParseEmit (child, fstate, &amt);
+	  emix->AddEmitter (amt, gen);
+	  SCF_DEC_REF (gen);
+	  result = emix;
+	}
+	break;
+      case XMLTOKEN_EMITLINE:
+        {
+	  csBox3 box;
+	  if (!synldr->ParseBox (child, box))
+	  {
+	    ReportError (reporter,
+		  "crystalspace.emitloader.parse",
+		  "Error parsing box for 'emitline'!");
+	    return NULL;
+	  }
+	  iEmitLine *eline = fstate->CreateLine ();
+	  eline->SetContent (box.Min (), box.Max ());
+	  result = eline;
+	}
+	break;
+      case XMLTOKEN_EMITCYLINDER:
+        {
+	  csBox3 box;
+	  if (!synldr->ParseBox (child, box))
+	  {
+	    ReportError (reporter,
+		  "crystalspace.emitloader.parse",
+		  "Error parsing box for 'emitcylinder'!");
+	    return NULL;
+	  }
+	  p = child->GetAttributeValueAsFloat ("p");
+	  q = child->GetAttributeValueAsFloat ("q");
+	  iEmitCylinder *ecyl = fstate->CreateCylinder ();
+	  ecyl->SetContent (box.Min (), box.Max (), p, q);
+	  result = ecyl;
+	}
+	break;
+      case XMLTOKEN_EMITCYLINDERTANGENT:
+        {
+	  csBox3 box;
+	  if (!synldr->ParseBox (child, box))
+	  {
+	    ReportError (reporter,
+		  "crystalspace.emitloader.parse",
+		  "Error parsing box for 'emitcylindertangent'!");
+	    return NULL;
+	  }
+	  p = child->GetAttributeValueAsFloat ("p");
+	  q = child->GetAttributeValueAsFloat ("q");
+	  iEmitCylinderTangent *ecyltan = fstate->CreateCylinderTangent ();
+	  ecyltan->SetContent (box.Min (), box.Max (), p, q);
+	  result = ecyltan;
+	}
+	break;
+      case XMLTOKEN_EMITSPHERETANGENT:
+        {
+	  csRef<iDocumentNode> minnode = child->GetNode ("min");
+	  if (!minnode)
+	  {
+	    ReportError (reporter,
+		"crystalspace.emitloader.parse",
+		"'min' is missing in 'emitspheretangent'!");
+	    return NULL;
+	  }
+	  a.x = minnode->GetAttributeValueAsFloat ("x");
+	  a.y = minnode->GetAttributeValueAsFloat ("y");
+	  a.z = minnode->GetAttributeValueAsFloat ("z");
+	  p = child->GetAttributeValueAsFloat ("p");
+	  q = child->GetAttributeValueAsFloat ("q");
+	  iEmitSphereTangent *espheretan = fstate->CreateSphereTangent ();
+	  espheretan->SetContent (a, p, q);
+	  result = espheretan;
+	}
+	break;
+      default:
+	ReportError (reporter,
+		"crystalspace.emitloader.parse",
+		"Unexpected token '%s' for emit loader!", value);
+	return NULL;
     }
   }
   return result;
@@ -473,21 +738,21 @@ iBase* csEmitLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_STARTPOS:
 	{
-	  emit = ParseEmit(parser, params, emitfactorystate, NULL);
+	  emit = ::ParseEmit(parser, params, emitfactorystate, NULL);
 	  emitstate->SetStartPosEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
 	break;
       case CS_TOKEN_STARTSPEED:
 	{
-	  emit = ParseEmit(parser, params, emitfactorystate, NULL);
+	  emit = ::ParseEmit(parser, params, emitfactorystate, NULL);
 	  emitstate->SetStartSpeedEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
 	break;
       case CS_TOKEN_STARTACCEL:
 	{
-	  emit = ParseEmit(parser, params, emitfactorystate, NULL);
+	  emit = ::ParseEmit(parser, params, emitfactorystate, NULL);
 	  emitstate->SetStartAccelEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
@@ -501,7 +766,7 @@ iBase* csEmitLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_ATTRACTOR:
 	{
-	  emit = ParseEmit(parser, params, emitfactorystate, NULL);
+	  emit = ::ParseEmit(parser, params, emitfactorystate, NULL);
 	  emitstate->SetAttractorEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
@@ -512,6 +777,189 @@ iBase* csEmitLoader::Parse (const char* string,
   SCF_DEC_REF (partstate);
   SCF_DEC_REF (emitstate);
   SCF_DEC_REF (emitfactorystate);
+  return mesh;
+}
+
+iBase* csEmitLoader::Parse (iDocumentNode* node,
+			    iLoaderContext* ldr_context, iBase*)
+{
+  iEmitGen3D *emit;
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iEmitFactoryState> emitfactorystate;
+  csRef<iEmitState> emitstate;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if (!fact)
+	  {
+	    ReportError (reporter,
+		"crystalspace.emitloader.parse",
+		"Cannot find factory '%s' for emit!", factname);
+	    return NULL;
+	  }
+	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
+          partstate.Take (SCF_QUERY_INTERFACE (mesh, iParticleState));
+          emitstate.Take (SCF_QUERY_INTERFACE (mesh, iEmitState));
+	  emitfactorystate.Take (SCF_QUERY_INTERFACE (
+	  	fact->GetMeshObjectFactory(), iEmitFactoryState));
+	}
+	break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+	    ReportError (reporter,
+		"crystalspace.emitloader.parse",
+		"Cannot find material '%s' for emit!", matname);
+            return NULL;
+	  }
+	  partstate->SetMaterialWrapper (mat);
+	}
+	break;
+      case XMLTOKEN_MIXMODE:
+        {
+	  uint mode;
+	  if (synldr->ParseMixmode (child, mode))
+            partstate->SetMixMode (mode);
+	}
+	break;
+      case XMLTOKEN_NUMBER:
+	emitstate->SetParticleCount (child->GetContentsValueAsInt ());
+	break;
+      case XMLTOKEN_LIGHTING:
+	{
+	  bool light = false;
+	  if (!synldr->ParseBool (child, light, true))
+	    return NULL;
+	  emitstate->SetLighting (light);
+	}
+	break;
+      case XMLTOKEN_TOTALTIME:
+	emitstate->SetParticleTime (child->GetContentsValueAsInt ());
+	break;
+      case XMLTOKEN_RECTPARTICLES:
+	{
+	  float w, h;
+	  w = child->GetAttributeValueAsFloat ("w");
+	  h = child->GetAttributeValueAsFloat ("h");
+	  emitstate->SetRectParticles (w, h);
+	}
+	break;
+      case XMLTOKEN_REGULARPARTICLES:
+	{
+	  int sides;
+	  float radius;
+	  sides = child->GetAttributeValueAsInt ("sides");
+	  radius = child->GetAttributeValueAsFloat ("radius");
+	  emitstate->SetRegularParticles (sides, radius);
+	}
+	break;
+      case XMLTOKEN_AGING:
+        {
+	  int time;
+	  csColor col (1, 1, 1);
+	  float alpha, swirl, rotspeed, scale;
+	  csRef<iDocumentNode> alphanode = child->GetNode ("alpha");
+	  if (!alphanode)
+	  {
+	    ReportError (reporter, "crystalspace.emitloader.parse",
+		"Missing 'alpha' in 'aging'!");
+            return NULL;
+	  }
+	  alpha = alphanode->GetContentsValueAsFloat ();
+	  csRef<iDocumentNode> swirlnode = child->GetNode ("swirl");
+	  if (!swirlnode)
+	  {
+	    ReportError (reporter, "crystalspace.emitloader.parse",
+		"Missing 'swirl' in 'aging'!");
+            return NULL;
+	  }
+	  swirl = swirlnode->GetContentsValueAsFloat ();
+	  csRef<iDocumentNode> scalenode = child->GetNode ("scale");
+	  if (!scalenode)
+	  {
+	    ReportError (reporter, "crystalspace.emitloader.parse",
+		"Missing 'scale' in 'aging'!");
+            return NULL;
+	  }
+	  scale = scalenode->GetContentsValueAsFloat ();
+	  csRef<iDocumentNode> rotspeednode = child->GetNode ("rotspeed");
+	  if (!rotspeednode)
+	  {
+	    ReportError (reporter, "crystalspace.emitloader.parse",
+		"Missing 'rotspeed' in 'aging'!");
+            return NULL;
+	  }
+	  rotspeed = rotspeednode->GetContentsValueAsFloat ();
+	  csRef<iDocumentNode> timenode = child->GetNode ("time");
+	  if (!timenode)
+	  {
+	    ReportError (reporter, "crystalspace.emitloader.parse",
+		"Missing 'time' in 'aging'!");
+            return NULL;
+	  }
+	  time = timenode->GetContentsValueAsInt ();
+	  csRef<iDocumentNode> colornode = child->GetNode ("color");
+	  if (colornode)
+	    if (!synldr->ParseColor (colornode, col))
+	      return NULL;
+	  emitstate->AddAge (time, col, alpha, swirl, rotspeed, scale);
+	}
+	break;
+      case XMLTOKEN_STARTPOS:
+	{
+	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emitstate->SetStartPosEmit (emit);
+	  SCF_DEC_REF (emit);
+	}
+	break;
+      case XMLTOKEN_STARTSPEED:
+	{
+	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emitstate->SetStartSpeedEmit (emit);
+	  SCF_DEC_REF (emit);
+	}
+	break;
+      case XMLTOKEN_STARTACCEL:
+	{
+	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emitstate->SetStartAccelEmit (emit);
+	  SCF_DEC_REF (emit);
+	}
+	break;
+      case XMLTOKEN_ATTRACTORFORCE:
+	emitstate->SetAttractorForce (child->GetContentsValueAsFloat ());
+	break;
+      case XMLTOKEN_ATTRACTOR:
+	{
+	  emit = ParseEmit (child, emitfactorystate, NULL);
+	  emitstate->SetAttractorEmit (emit);
+	  SCF_DEC_REF (emit);
+	}
+	break;
+      default:
+	ReportError (reporter, "crystalspace.emitloader.parse",
+		"Unexpected token '%s' in emit!", value);
+        return NULL;
+    }
+  }
+
+  // Incref so smart pointer doesn't release.
+  if (mesh) mesh->IncRef ();
   return mesh;
 }
 

@@ -4671,7 +4671,7 @@ bool csLoader::LoadRenderPriorities (iDocumentNode* node)
 	csRef<iDocumentNode> sortnode = child->GetNode ("sort");
 	if (sortnode)
 	{
-	  const char* sorting = child->GetContentsValue ();
+	  const char* sorting = sortnode->GetContentsValue ();
 	  if (!strcmp (sorting, "BACK2FRONT"))
 	  {
 	    rendsort = CS_RENDPRI_BACK2FRONT;
@@ -4725,9 +4725,11 @@ iCollection* csLoader::ParseCollection (iDocumentNode* node)
          	"'addon' not yet supported in collection!");
 	return NULL;
       case XMLTOKEN_MESHOBJ:
+#if 0
 	ReportError (
 		"crystalspace.maploader.parse.collection",
          	"'meshobj' not yet supported in collection!");
+#endif
         break;
       case XMLTOKEN_LIGHT:
         {
@@ -4984,7 +4986,8 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	    csRef<iDocumentNode> matnode;
 	    
 	    matnode = child->GetNode ("centermaterial");
-	    halo.flare.mat_center = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    halo.flare.mat_center = matnode ? lc->FindMaterial (
+	    	matnode->GetContentsValue ()) : NULL;
 	    if (!halo.flare.mat_center)
 	    {
 	      ReportError (
@@ -4993,7 +4996,8 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	      return NULL;
 	    }
 	    matnode = child->GetNode ("spark1material");
-	    halo.flare.mat_spark1 = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    halo.flare.mat_spark1 = matnode ? lc->FindMaterial (
+	    	matnode->GetContentsValue ()) : NULL;
 	    if (!halo.flare.mat_spark1)
 	    {
 	      ReportError (
@@ -5002,7 +5006,8 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	      return NULL;
 	    }
 	    matnode = child->GetNode ("spark2material");
-	    halo.flare.mat_spark2 = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    halo.flare.mat_spark2 = matnode ? lc->FindMaterial (
+	    	matnode->GetContentsValue ()) : NULL;
 	    if (!halo.flare.mat_spark2)
 	    {
 	      ReportError (
@@ -5011,7 +5016,8 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	      return NULL;
 	    }
 	    matnode = child->GetNode ("spark3material");
-	    halo.flare.mat_spark3 = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    halo.flare.mat_spark3 = matnode ? lc->FindMaterial (
+	    	matnode->GetContentsValue ()) : NULL;
 	    if (!halo.flare.mat_spark3)
 	    {
 	      ReportError (
@@ -5020,7 +5026,8 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	      return NULL;
 	    }
 	    matnode = child->GetNode ("spark4material");
-	    halo.flare.mat_spark4 = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    halo.flare.mat_spark4 = matnode ? lc->FindMaterial (
+	    	matnode->GetContentsValue ()) : NULL;
 	    if (!halo.flare.mat_spark4)
 	    {
 	      ReportError (
@@ -5029,7 +5036,8 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	      return NULL;
 	    }
 	    matnode = child->GetNode ("spark5material");
-	    halo.flare.mat_spark5 = matnode ? lc->FindMaterial (matnode->GetContentsValue ()) : NULL;
+	    halo.flare.mat_spark5 = matnode ? lc->FindMaterial (
+	    	matnode->GetContentsValue ()) : NULL;
 	    if (!halo.flare.mat_spark5)
 	    {
 	      ReportError (

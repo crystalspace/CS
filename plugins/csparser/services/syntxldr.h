@@ -113,6 +113,7 @@ public:
   virtual bool ParseBool (iDocumentNode* node, bool& result, bool def_result);
   virtual bool ParseMatrix (iDocumentNode* node, csMatrix3 &m);
   virtual bool ParseVector (iDocumentNode* node, csVector3 &v);
+  virtual bool ParseBox (iDocumentNode* node, csBox3 &v);
   virtual bool ParseColor (iDocumentNode* node, csColor &c);
   virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode);
   virtual bool ParseTextureMapping (iDocumentNode* node,

@@ -24,6 +24,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/transfrm.h"
+#include "csutil/strhash.h"
 
 struct iEngine;
 struct iReporter;
@@ -46,6 +47,7 @@ private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
   iReporter* reporter;
+  csStringHash xmltokens;
 
   csConstructionGeometry* cg_straighttrunk;
   csConstructionGeometry* cg_shrinktrunk;
@@ -89,10 +91,7 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual iBase* Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context)
-  {
-    return NULL;
-  }
+    iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {

@@ -27,6 +27,7 @@
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
 #include "iutil/plugin.h"
+#include "iutil/document.h"
 #include "imesh/partsys.h"
 #include "imesh/snow.h"
 #include "ivideo/graph3d.h"
@@ -39,6 +40,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/ldrctxt.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -54,6 +56,20 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (BOX)
   CS_TOKEN_DEF (SWIRL)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_COLOR = 1,
+  XMLTOKEN_DROPSIZE,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_FALLSPEED,
+  XMLTOKEN_LIGHTING,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_MIXMODE,
+  XMLTOKEN_NUMBER,
+  XMLTOKEN_BOX,
+  XMLTOKEN_SWIRL
+};
 
 SCF_IMPLEMENT_IBASE (csSnowFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -108,6 +124,26 @@ SCF_EXPORT_CLASS_TABLE (snowldr)
     "Crystal Space Snow Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    csPrintf ("Error ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
+  }
+  va_end (arg);
+}
+
 csSnowFactoryLoader::csSnowFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -128,6 +164,22 @@ bool csSnowFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csSnowFactoryLoader::Parse (const char* /*string*/,
+	iLoaderContext*, iBase* /* context */)
+{
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.snow", iMeshObjectType);
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.snow",
+    	iMeshObjectType);
+    printf ("Load TYPE plugin crystalspace.mesh.object.snow\n");
+  }
+  iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
+  return fact;
+}
+
+iBase* csSnowFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -177,12 +229,15 @@ csSnowLoader::csSnowLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   plugin_mgr = NULL;
+  synldr = NULL;
+  reporter = NULL;
 }
 
 csSnowLoader::~csSnowLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (synldr);
+  SCF_DEC_REF (reporter);
 }
 
 bool csSnowLoader::Initialize (iObjectRegistry* object_reg)
@@ -190,6 +245,18 @@ bool csSnowLoader::Initialize (iObjectRegistry* object_reg)
   csSnowLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
+  xmltokens.Register ("dropsize", XMLTOKEN_DROPSIZE);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("fallspeed", XMLTOKEN_FALLSPEED);
+  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("number", XMLTOKEN_NUMBER);
+  xmltokens.Register ("box", XMLTOKEN_BOX);
+  xmltokens.Register ("swirl", XMLTOKEN_SWIRL);
   return true;
 }
 
@@ -324,6 +391,119 @@ iBase* csSnowLoader::Parse (const char* string,
 
   if (partstate) partstate->DecRef ();
   if (snowstate) snowstate->DecRef ();
+  return mesh;
+}
+
+iBase* csSnowLoader::Parse (iDocumentNode* node,
+	iLoaderContext* ldr_context, iBase*)
+{
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iSnowState> snowstate;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_COLOR:
+	{
+	  csColor color;
+	  if (!synldr->ParseColor (child, color))
+	    return NULL;
+	  partstate->SetColor (color);
+	}
+	break;
+      case XMLTOKEN_DROPSIZE:
+	{
+	  float dw, dh;
+	  dw = child->GetAttributeValueAsFloat ("w");
+	  dh = child->GetAttributeValueAsFloat ("h");
+	  snowstate->SetDropSize (dw, dh);
+	}
+	break;
+      case XMLTOKEN_BOX:
+	{
+	  csBox3 box;
+	  if (!synldr->ParseBox (child, box))
+	    return NULL;
+	  snowstate->SetBox (box.Min (), box.Max ());
+	}
+	break;
+      case XMLTOKEN_FALLSPEED:
+	{
+	  csVector3 s;
+	  if (!synldr->ParseVector (child, s))
+	    return NULL;
+	  snowstate->SetFallSpeed (s);
+	}
+	break;
+      case XMLTOKEN_SWIRL:
+	snowstate->SetSwirl (child->GetContentsValueAsFloat ());
+	break;
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if (!fact)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.snowloader.parse.unknownfactory",
+		"Couldn't find factory '%s'!", factname);
+	    return NULL;
+	  }
+	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
+          partstate.Take (SCF_QUERY_INTERFACE (mesh, iParticleState));
+          snowstate.Take (SCF_QUERY_INTERFACE (mesh, iSnowState));
+	}
+	break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.snowloader.parse.unknownmaterial",
+		"Couldn't find material '%s'!", matname);
+            return NULL;
+	  }
+	  partstate->SetMaterialWrapper (mat);
+	}
+	break;
+      case XMLTOKEN_MIXMODE:
+        {
+	  uint mode;
+	  if (!synldr->ParseMixmode (child, mode))
+	    return NULL;
+          partstate->SetMixMode (mode);
+	}
+	break;
+      case XMLTOKEN_LIGHTING:
+        {
+          bool do_lighting;
+	  if (!synldr->ParseBool (child, do_lighting, true))
+	    return NULL;
+          snowstate->SetLighting (do_lighting);
+        }
+        break;
+      case XMLTOKEN_NUMBER:
+        snowstate->SetParticleCount (child->GetContentsValueAsInt ());
+        break;
+      default:
+      	ReportError (reporter,
+		"crystalspace.snowloader.parse.badtoken",
+		"Unexpected token '%s' for snow!", value);
+        return NULL;
+    }
+  }
+
+  // Incref to prevent smart pointer from releasing.
+  if (mesh) mesh->IncRef ();
   return mesh;
 }
 

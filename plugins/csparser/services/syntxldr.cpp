@@ -27,6 +27,7 @@
 #include "csutil/scfstr.h"
 #include "iutil/document.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/box.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"
 #include "csgeom/transfrm.h"
@@ -1524,6 +1525,33 @@ bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, csMatrix3 &m)
   return true;
 }
 
+bool csTextSyntaxService::ParseBox (iDocumentNode* node, csBox3 &v)
+{
+  csVector3 miv, mav;
+  csRef<iDocumentNode> minnode = node->GetNode ("min");
+  if (!minnode)
+  {
+    ReportError (reporter, "crystalspace.syntax.box",
+      "Expected 'min' node!");
+    return false;
+  }
+  miv.x = minnode->GetAttributeValueAsFloat ("x");
+  miv.y = minnode->GetAttributeValueAsFloat ("y");
+  miv.z = minnode->GetAttributeValueAsFloat ("z");
+  csRef<iDocumentNode> maxnode = node->GetNode ("max");
+  if (!maxnode)
+  {
+    ReportError (reporter, "crystalspace.syntax.box",
+      "Expected 'max' node!");
+    return false;
+  }
+  mav.x = maxnode->GetAttributeValueAsFloat ("x");
+  mav.y = maxnode->GetAttributeValueAsFloat ("y");
+  mav.z = maxnode->GetAttributeValueAsFloat ("z");
+  v.Set (miv, mav);
+  return true;
+}
+
 bool csTextSyntaxService::ParseVector (iDocumentNode* node, csVector3 &v)
 {
   v.x = node->GetAttributeValueAsFloat ("x");
@@ -1917,10 +1945,10 @@ bool csTextSyntaxService::ParsePoly3d (
       case XMLTOKEN_COSFACT:
         poly3d->SetCosinusFactor (child->GetContentsValueAsFloat ());
         break;
-      case CS_TOKEN_ALPHA:
+      case XMLTOKEN_ALPHA:
         poly3d->SetAlpha (child->GetContentsValueAsInt () * 655 / 256);
         break;
-      case CS_TOKEN_COLLDET:
+      case XMLTOKEN_COLLDET:
         {
           bool do_colldet;
 	  if (!ParseBool (child, do_colldet, true))

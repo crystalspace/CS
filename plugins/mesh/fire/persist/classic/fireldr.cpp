@@ -27,6 +27,7 @@
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
 #include "iutil/plugin.h"
+#include "iutil/document.h"
 #include "imesh/partsys.h"
 #include "imesh/fire.h"
 #include "ivideo/graph3d.h"
@@ -39,6 +40,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/ldrctxt.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -57,6 +59,23 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SWIRL)
   CS_TOKEN_DEF (TOTALTIME)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_COLORSCALE = 1,
+  XMLTOKEN_COLOR,
+  XMLTOKEN_DIRECTION,
+  XMLTOKEN_DROPSIZE,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_LIGHTING,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_MIXMODE,
+  XMLTOKEN_NUMBER,
+  XMLTOKEN_ORIGIN,
+  XMLTOKEN_ORIGINBOX,
+  XMLTOKEN_SWIRL,
+  XMLTOKEN_TOTALTIME
+};
 
 SCF_IMPLEMENT_IBASE (csFireFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -111,6 +130,26 @@ SCF_EXPORT_CLASS_TABLE (fireldr)
     "Crystal Space Fire Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    csPrintf ("Error ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
+  }
+  va_end (arg);
+}
+
 csFireFactoryLoader::csFireFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -131,6 +170,22 @@ bool csFireFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csFireFactoryLoader::Parse (const char* /*string*/,
+	iLoaderContext*, iBase* /* context */)
+{
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.fire", iMeshObjectType);
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.fire",
+    	iMeshObjectType);
+    printf ("Load TYPE plugin crystalspace.mesh.object.fire\n");
+  }
+  iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
+  return fact;
+}
+
+iBase* csFireFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -181,12 +236,15 @@ csFireLoader::csFireLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   plugin_mgr = NULL;
+  synldr = NULL;
+  reporter = NULL;
 }
 
 csFireLoader::~csFireLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (synldr);
+  SCF_DEC_REF (reporter);
 }
 
 bool csFireLoader::Initialize (iObjectRegistry* object_reg)
@@ -194,6 +252,21 @@ bool csFireLoader::Initialize (iObjectRegistry* object_reg)
   csFireLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  xmltokens.Register ("colorscale", XMLTOKEN_COLORSCALE);
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
+  xmltokens.Register ("direction", XMLTOKEN_DIRECTION);
+  xmltokens.Register ("dropsize", XMLTOKEN_DROPSIZE);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("number", XMLTOKEN_NUMBER);
+  xmltokens.Register ("origin", XMLTOKEN_ORIGIN);
+  xmltokens.Register ("originbox", XMLTOKEN_ORIGINBOX);
+  xmltokens.Register ("swirl", XMLTOKEN_SWIRL);
+  xmltokens.Register ("totaltime", XMLTOKEN_TOTALTIME);
   return true;
 }
 
@@ -353,6 +426,133 @@ iBase* csFireLoader::Parse (const char* string,
 
   if (partstate) partstate->DecRef ();
   if (firestate) firestate->DecRef ();
+  return mesh;
+}
+
+iBase* csFireLoader::Parse (iDocumentNode* node,
+			    iLoaderContext* ldr_context, iBase*)
+{
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iFireState> firestate;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_COLOR:
+	{
+	  csColor color;
+	  if (!synldr->ParseColor (child, color))
+	    return NULL;
+	  partstate->SetColor (color);
+	}
+	break;
+      case XMLTOKEN_DROPSIZE:
+	{
+	  float dw, dh;
+	  dw = child->GetAttributeValueAsFloat ("w");
+	  dh = child->GetAttributeValueAsFloat ("h");
+	  firestate->SetDropSize (dw, dh);
+	}
+	break;
+      case XMLTOKEN_ORIGINBOX:
+	{
+	  csBox3 box;
+	  if (!synldr->ParseBox (child, box))
+	    return NULL;
+	  firestate->SetOrigin (box);
+	}
+	break;
+      case XMLTOKEN_ORIGIN:
+	{
+	  csVector3 origin;
+	  if (!synldr->ParseVector (child, origin))
+	    return NULL;
+	  firestate->SetOrigin (origin);
+	}
+	break;
+      case XMLTOKEN_DIRECTION:
+	{
+	  csVector3 dir;
+	  if (!synldr->ParseVector (child, dir))
+	    return NULL;
+	  firestate->SetDirection (dir);
+	}
+	break;
+      case XMLTOKEN_SWIRL:
+	firestate->SetSwirl (child->GetContentsValueAsFloat ());
+	break;
+      case XMLTOKEN_COLORSCALE:
+	firestate->SetColorScale (child->GetContentsValueAsFloat ());
+	break;
+      case XMLTOKEN_TOTALTIME:
+	firestate->SetTotalTime (child->GetContentsValueAsFloat ());
+	break;
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if (!fact)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.fireloader.parse.unknownfactory",
+		"Couldn't find factory '%s'!", factname);
+	    return NULL;
+	  }
+	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
+          partstate.Take (SCF_QUERY_INTERFACE (mesh, iParticleState));
+          firestate.Take (SCF_QUERY_INTERFACE (mesh, iFireState));
+	}
+	break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.fireloader.parse.unknownmaterial",
+		"Couldn't find material '%s'!", matname);
+	    return NULL;
+	  }
+	  partstate->SetMaterialWrapper (mat);
+	}
+	break;
+      case XMLTOKEN_MIXMODE:
+        {
+	  uint mode;
+	  if (!synldr->ParseMixmode (child, mode))
+	    return NULL;
+          partstate->SetMixMode (mode);
+	}
+	break;
+      case XMLTOKEN_LIGHTING:
+        {
+          bool do_lighting;
+	  if (!synldr->ParseBool (child, do_lighting, true))
+	    return NULL;
+          firestate->SetLighting (do_lighting);
+        }
+        break;
+      case XMLTOKEN_NUMBER:
+        firestate->SetParticleCount (child->GetContentsValueAsInt ());
+        break;
+      default:
+      	ReportError (reporter,
+		"crystalspace.fireloader.parse.badtoken",
+		"Unexpected token '%s' in ball loader!", value);
+	return NULL;
+    }
+  }
+
+  // Incref so that smart pointer doesn't release reference.
+  if (mesh) mesh->IncRef ();
   return mesh;
 }
 

@@ -27,6 +27,7 @@
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
 #include "iutil/plugin.h"
+#include "iutil/document.h"
 #include "imesh/genmesh.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
@@ -59,6 +60,24 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TRIANGLES)
   CS_TOKEN_DEF (AUTONORMALS)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_BOX = 1,
+  XMLTOKEN_LIGHTING,
+  XMLTOKEN_COLOR,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_MIXMODE,
+  XMLTOKEN_MANUALCOLORS,
+  XMLTOKEN_NUMTRI,
+  XMLTOKEN_NUMVT,
+  XMLTOKEN_V,
+  XMLTOKEN_T,
+  XMLTOKEN_N,
+  XMLTOKEN_COLORS,
+  XMLTOKEN_AUTONORMALS
+};
 
 SCF_IMPLEMENT_IBASE (csGeneralFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -139,10 +158,12 @@ csGeneralFactoryLoader::csGeneralFactoryLoader (iBase* pParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
   plugin_mgr = NULL;
+  synldr = NULL;
 }
 
 csGeneralFactoryLoader::~csGeneralFactoryLoader ()
 {
+  if (synldr) synldr->DecRef ();
   if (reporter) reporter->DecRef ();
   if (plugin_mgr) plugin_mgr->DecRef ();
 }
@@ -152,6 +173,18 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   csGeneralFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+
+  xmltokens.Register ("box", XMLTOKEN_BOX);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("numtri", XMLTOKEN_NUMTRI);
+  xmltokens.Register ("numvt", XMLTOKEN_NUMVT);
+  xmltokens.Register ("v", XMLTOKEN_V);
+  xmltokens.Register ("t", XMLTOKEN_T);
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
+  xmltokens.Register ("autonormals", XMLTOKEN_AUTONORMALS);
+  xmltokens.Register ("n", XMLTOKEN_N);
   return true;
 }
 
@@ -461,6 +494,167 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
   return fact;
 }
 
+iBase* csGeneralFactoryLoader::Parse (iDocumentNode* node,
+	iLoaderContext* ldr_context, iBase* /* context */)
+{
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.genmesh", iMeshObjectType);
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.genmesh",
+    	iMeshObjectType);
+  }
+  if (!type)
+  {
+    ReportError (reporter,
+		"crystalspace.genmeshfactoryloader.setup.objecttype",
+		"Could not load the general mesh object plugin!");
+    return NULL;
+  }
+  csRef<iMeshObjectFactory> fact;
+  csRef<iGeneralFactoryState> state;
+
+  fact.Take (type->NewFactory ());
+  state.Take (SCF_QUERY_INTERFACE (fact, iGeneralFactoryState));
+
+  type->DecRef ();
+
+  int num_tri = 0;
+  int num_nor = 0;
+  int num_col = 0;
+  int num_vt = 0;
+  bool auto_normals = false;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.genmeshfactoryloader.parse.unknownmaterial",
+		"Couldn't find material '%s'!", matname);
+            return NULL;
+	  }
+	  state->SetMaterialWrapper (mat);
+	}
+	break;
+      case XMLTOKEN_BOX:
+        {
+	  csBox3 box;
+	  if (!synldr->ParseBox (child, box))
+	    return NULL;
+	  state->GenerateBox (box);
+	}
+        break;
+      case XMLTOKEN_AUTONORMALS:
+        if (!synldr->ParseBool (child, auto_normals, true))
+	  return NULL;
+	break;
+      case XMLTOKEN_NUMTRI:
+        state->SetTriangleCount (child->GetContentsValueAsInt ());
+	break;
+      case XMLTOKEN_NUMVT:
+        state->SetVertexCount (child->GetContentsValueAsInt ());
+	break;
+      case XMLTOKEN_T:
+	{
+	  csTriangle* tr = state->GetTriangles ();
+	  if (num_tri >= state->GetTriangleCount ())
+	  {
+	    ReportError (reporter,
+		      "crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		      "Too many triangles for a general mesh factory!");
+	    return NULL;
+	  }
+	  tr[num_tri].a = child->GetAttributeValueAsInt ("v1");
+	  tr[num_tri].b = child->GetAttributeValueAsInt ("v2");
+	  tr[num_tri].c = child->GetAttributeValueAsInt ("v3");
+	  num_tri++;
+	}
+        break;
+      case XMLTOKEN_N:
+        {
+	  csVector3* no = state->GetNormals ();
+	  if (num_nor >= state->GetVertexCount ())
+	  {
+	    ReportError (reporter,
+		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		    "Too many normals for a general mesh factory!");
+	    return NULL;
+	  }
+	  float x, y, z;
+	  x = child->GetAttributeValueAsFloat ("x");
+	  y = child->GetAttributeValueAsFloat ("y");
+	  z = child->GetAttributeValueAsFloat ("z");
+	  no[num_nor].Set (x, y, z);
+	  num_nor++;
+        }
+        break;
+      case XMLTOKEN_COLOR:
+        {
+	  csColor* co = state->GetColors ();
+	  if (num_col >= state->GetVertexCount ())
+	  {
+	    ReportError (reporter,
+		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		    "Too many colors for a general mesh factory!");
+	    return NULL;
+	  }
+	  float r, g, b;
+	  r = child->GetAttributeValueAsFloat ("red");
+	  g = child->GetAttributeValueAsFloat ("green");
+	  b = child->GetAttributeValueAsFloat ("blue");
+	  co[num_col].Set (r, g, b);
+	  num_col++;
+	}
+	break;
+      case XMLTOKEN_V:
+        {
+	  csVector3* vt = state->GetVertices ();
+	  csVector2* te = state->GetTexels ();
+	  if (num_vt >= state->GetVertexCount ())
+	  {
+	    ReportError (reporter,
+		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		    "Too many colors for a general mesh factory!");
+	    return NULL;
+	  }
+	  float x, y, z, u, v;
+	  x = child->GetAttributeValueAsFloat ("x");
+	  y = child->GetAttributeValueAsFloat ("y");
+	  z = child->GetAttributeValueAsFloat ("z");
+	  u = child->GetAttributeValueAsFloat ("u");
+	  v = child->GetAttributeValueAsFloat ("v");
+	  vt[num_vt].Set (x, y, z);
+	  te[num_vt].Set (u, v);
+	  num_vt++;
+	}
+        break;
+      default:
+	ReportError (reporter,
+		    "crystalspace.genmeshfactoryloader.parse",
+		    "Unexpected token '%s' for genmesh!", value);
+	return NULL;
+    }
+  }
+
+  if (auto_normals)
+    state->CalculateNormals ();
+
+  // Incref to prevent smart pointer from releasing object.
+  if (fact) fact->IncRef ();
+  return fact;
+}
 //---------------------------------------------------------------------------
 
 csGeneralFactorySaver::csGeneralFactorySaver (iBase* pParent)
@@ -517,6 +711,7 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
@@ -536,6 +731,13 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
       return false;
     }
   }
+
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("manualcolors", XMLTOKEN_MANUALCOLORS);
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
+  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
   return true;
 }
 
@@ -642,6 +844,98 @@ iBase* csGeneralMeshLoader::Parse (const char* string,
   }
 
   if (meshstate) meshstate->DecRef ();
+  return mesh;
+}
+
+iBase* csGeneralMeshLoader::Parse (iDocumentNode* node,
+	iLoaderContext* ldr_context, iBase*)
+{
+  csRef<iMeshObject> mesh;
+  csRef<iGeneralMeshState> meshstate;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_MANUALCOLORS:
+	{
+	  bool r;
+	  if (!synldr->ParseBool (child, r, true))
+	    return NULL;
+	  meshstate->SetManualColors (r);
+	}
+	break;
+      case XMLTOKEN_LIGHTING:
+	{
+	  bool r;
+	  if (!synldr->ParseBool (child, r, true))
+	    return NULL;
+	  meshstate->SetLighting (r);
+	}
+	break;
+      case XMLTOKEN_COLOR:
+	{
+	  csColor col;
+	  if (!synldr->ParseColor (child, col))
+	    return NULL;
+	  meshstate->SetColor (col);
+	}
+	break;
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if (!fact)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.genmeshloader.parse.unknownfactory",
+		"Couldn't find factory '%s'!", factname);
+	    return NULL;
+	  }
+	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
+          meshstate.Take (SCF_QUERY_INTERFACE (mesh, iGeneralMeshState));
+	}
+	break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.genmeshloader.parse.unknownmaterial",
+		"Couldn't find material '%s'!", matname);
+            return NULL;
+	  }
+	  meshstate->SetMaterialWrapper (mat);
+	}
+	break;
+      case XMLTOKEN_MIXMODE:
+        {
+	  uint mm;
+	  if (!synldr->ParseMixmode (child, mm))
+	  {
+	    ReportError (reporter, "crystalspace.genmeshloader.parse.mixmode",
+	  	  "Error parsing mixmode!");
+	    return NULL;
+	  }
+          meshstate->SetMixMode (mm);
+	}
+	break;
+      default:
+	ReportError (reporter, "crystalspace.genmeshloader.parse",
+	  	  "Unexpected token '%s' in 'genmesh'!", value);
+	return NULL;
+    }
+  }
+
+  // Incref to avoid smart pointer from releasing.
+  if (mesh) mesh->IncRef ();
   return mesh;
 }
 

@@ -1461,7 +1461,7 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
           tmpl->SetMaterial (mat);
 	}
         break;
-      case CS_TOKEN_V:
+      case XMLTOKEN_V:
         {
           if (num_v >= 9)
           {
