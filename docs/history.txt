@@ -20,6 +20,8 @@ chronological order.
 	  yet work though.
 	- Jorrit fixed the bugs in the rain mesh object. It now works
 	  mostly with NR except that portals seem to overwrite it.
+	- Jorrit fixed the transform of the rain particle system so it
+	  renders at the correct spot with NR.
 14-Jan-2004
 	- Peter Amstutz rewrote the GenerateBox() method in the genmesh
 	  plugin to create a box with better texel settings 

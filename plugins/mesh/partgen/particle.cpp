@@ -267,7 +267,7 @@ bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
     return false;
 
 #ifdef CS_USE_NEW_RENDERER
-  mesh.object2camera = movable->GetFullTransform ();
+  mesh.object2camera = csReversibleTransform ();
   mesh.clip_portal = ClipPortal;
   mesh.clip_plane = ClipPlane;
   mesh.clip_z_plane = ClipZ;
