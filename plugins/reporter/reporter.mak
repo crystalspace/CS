@@ -46,9 +46,6 @@ INC.REPORTER = $(wildcard plugins/reporter/*.h)
 SRC.REPORTER = $(wildcard plugins/reporter/*.cpp)
 OBJ.REPORTER = $(addprefix $(OUT),$(notdir $(SRC.REPORTER:.cpp=$O)))
 DEP.REPORTER = CSGEOM CSUTIL CSSYS CSUTIL
-CFG.REPORTER = data/config/reporter.cfg
-
-TO_INSTALL.CONFIG += $(CFG.REPORTER)
 
 MSVC.DSP += REPORTER
 DSP.REPORTER.NAME = reporter
