@@ -240,11 +240,6 @@ class csSystemDriver : public iSystem
 
   // Elapsed time between last two frames and absolute time in milliseconds
   cs_time ElapsedTime, CurrentTime;
-
-public:
-  /// -------------------------- plug-ins --------------------------
-  /// The list of all plug-ins
-  csPlugInsVector PlugIns;
   /// The configuration manager
   iConfigManager *Config;
   /// The Virtual File System object
@@ -261,6 +256,12 @@ public:
   iConsoleOutput *Console;
   /// Motion manager
   iMotionManager *MotionMan;
+
+public:
+  /// -------------------------- plug-ins --------------------------
+
+  /// The list of all plug-ins
+  csPlugInsVector PlugIns;
 
   /// the width of this frame
   int FrameWidth;
