@@ -3028,6 +3028,7 @@ csThingObjectType::csThingObjectType (
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   lightpatch_pool = NULL;
   render_pol2d_pool = NULL;
+  //*((char*)0x88)=9;
 }
 
 csThingObjectType::~csThingObjectType ()

@@ -14,7 +14,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: sndaiff sndaiffclean
-all plugins drivers snddrivers: sndaiff
+all plugins: sndaiff
 
 sndaiff:
 	$(MAKE_TARGET) MAKE_DLL=yes

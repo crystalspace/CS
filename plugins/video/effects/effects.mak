@@ -8,7 +8,7 @@ DESCRIPTION.effects = Crystal Space Effects plug-in
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += \
+DRIVERHELP += \
   $(NEWLINE)echo $"  make effects      Make the $(DESCRIPTION.effects)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
@@ -17,7 +17,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: effects effectsclean
-all plugins: effects
+all plugins drivers drivers3d: effects
 
 effects:
 	$(MAKE_TARGET) MAKE_DLL=yes
