@@ -37,7 +37,6 @@ SRC.CSGFX = libs/csgfx/csimage.cpp \
 
 ifeq ($(DO_PNG),yes)
   INC.CSGFX += include/csgfx/pngsave.h
-  SRC.CSGFX += libs/csgfx/pngsave.cpp
   LIBS.EXE += $(PNG_LIBS)
 endif
 
