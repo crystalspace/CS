@@ -2559,54 +2559,73 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
-	// @@@ Do recursive too for children!
-        csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
-  	  iVisibilityObject);
-        visobj->GetCullerFlags ().Set (CS_CULLER_HINT_BADOCCLUDER);
+	//Apply the flag CS_CULLER_HINT_BADOCCLUDER to all the meshes in 
+        //the meshes' hierarchy, starting from the 'mesh' mesh object.
+        csSet<iMeshWrapper*> set;
+        CollectAllChildren (mesh, set);
+        csSet<iMeshWrapper*>::GlobalIterator children (set.GetIterator ());
+        while (children.HasNext ())
+        {
+          csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE 
+            (children.Next (), iVisibilityObject);
+          if (visobj)
+            visobj->GetCullerFlags ().Set (CS_CULLER_HINT_BADOCCLUDER);
+        }
       }
       break;
     case XMLTOKEN_GOODOCCLUDER:
       TEST_MISSING_MESH
       else
       {
-	// @@@ Do recursive too for children!
-        csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
-  	  iVisibilityObject);
-        visobj->GetCullerFlags ().Set (CS_CULLER_HINT_GOODOCCLUDER);
+	//Apply the flag CS_CULLER_HINT_GOODOCCLUDER to all the meshes in 
+        //the meshes' hierarchy, starting from the 'mesh' mesh object.
+        csSet<iMeshWrapper*> set;
+        CollectAllChildren (mesh, set);
+        csSet<iMeshWrapper*>::GlobalIterator children (set.GetIterator ());
+        while (children.HasNext ())
+        {
+          csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE 
+            (children.Next (), iVisibilityObject);
+          if (visobj)
+            visobj->GetCullerFlags ().Set (CS_CULLER_HINT_GOODOCCLUDER);
+        }
       }
       break;
     case XMLTOKEN_CLOSED:
       TEST_MISSING_MESH
       else
       {
-	// @@@ Do recursive too for children!
-	iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
-        if (objmodel->GetPolygonMeshShadows ())
-          objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
-        if (objmodel->GetPolygonMeshViscull ())
-          objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
-	    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
-        if (objmodel->GetPolygonMeshShadows ())
-          objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
+        if (recursive)//Test if recursion on children has been specified.
+        {
+          csSet<iMeshWrapper*> set;
+          CollectAllChildren (mesh, set);
+          csSet<iMeshWrapper*>::GlobalIterator children (set.GetIterator ());
+          while (children.HasNext ())
+          {
+            ClosedFlags (children.Next ());
+          }
+        }//if
+        else
+          ClosedFlags (mesh);
       }
       break;
     case XMLTOKEN_CONVEX:
       TEST_MISSING_MESH
       else
       {
-	// @@@ Do recursive too for children!
-	iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
-        if (objmodel->GetPolygonMeshShadows ())
-          objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
-        if (objmodel->GetPolygonMeshViscull ())
-          objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
-	    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
-        if (objmodel->GetPolygonMeshShadows ())
-          objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+        //Test if recursion on children has been specified.
+        if (recursive)
+        {
+          csSet<iMeshWrapper*> set;
+          CollectAllChildren (mesh, set);
+          csSet<iMeshWrapper*>::GlobalIterator children (set.GetIterator ());
+          while (children.HasNext ())
+          {
+            ConvexFlags (children.Next ());
+          }
+        }//if
+        else
+          ConvexFlags (mesh);
       }
       break;
     case XMLTOKEN_KEY:
@@ -2769,9 +2788,22 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
   }
   if (!priority) priority = csStrNew ("object");
   mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
-  // @@@ Do recursive too!
-  mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICPOS, staticpos);
-  mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICSHAPE, staticshape);
+  
+  //I had to put these ugly curly brackets. It's due to the uglier label
+  //below! 'children' and 'set' need an initialization indeed. Luca
+  {
+    csSet<iMeshWrapper*> set;
+    CollectAllChildren (mesh, set);
+    csSet<iMeshWrapper*>::GlobalIterator children (set.GetIterator ());
+    while (children.HasNext ())
+    {
+      iMeshWrapper* mesh = children.Next ();
+      mesh->GetMeshObject ()->GetFlags ().SetBool (
+        CS_MESH_STATICPOS, staticpos);
+      mesh->GetMeshObject ()->GetFlags ().SetBool (
+        CS_MESH_STATICSHAPE, staticshape);
+    }
+  }
 
   delete[] priority;
   return mesh;
@@ -4891,3 +4923,63 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
   return true;
 }
 #endif //CS_USE_NEW_RENDERER
+
+void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper, csSet<iMeshWrapper*>&
+  meshesSet)
+{  
+  csRef<iMeshWrapper> mesh = meshWrapper;
+
+  //
+  //This array below contains all the meshwrappers that had
+  //havent added to the set yet.
+  csRefArray<iMeshWrapper> meshesArray;
+  
+  while (mesh)
+  {
+    meshesSet.Add (mesh);
+    
+    //
+    //Get the children of the current mesh (ie 'mesh').
+    csRef<iMeshList> mL = mesh->GetChildren ();
+    int i;
+    for (i = 0; i < mL->GetCount (); i++)
+        meshesArray.Push (mL->Get (i));
+    
+    //
+    //Proceed to next meshwrapper or exit the while loop.
+    if (meshesArray.Length ())
+      mesh = meshesArray.Pop ();
+    else
+      mesh = 0;
+  }//while
+
+  return;
+}
+
+void csLoader::ClosedFlags (iMeshWrapper* mesh)
+{
+  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+  if (objmodel->GetPolygonMeshShadows ())
+    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
+  if (objmodel->GetPolygonMeshViscull ())
+    objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
+    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
+  if (objmodel->GetPolygonMeshShadows ())
+    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
+}
+
+void csLoader::ConvexFlags (iMeshWrapper* mesh)
+{
+  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+  if (objmodel->GetPolygonMeshShadows ())
+    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+  if (objmodel->GetPolygonMeshViscull ())
+    objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
+    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+  if (objmodel->GetPolygonMeshShadows ())
+    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+}

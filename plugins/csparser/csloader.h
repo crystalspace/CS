@@ -27,6 +27,7 @@
 #include "iutil/comp.h"
 #include "csutil/util.h"
 #include "csutil/strhash.h"
+#include "csutil/hash.h"
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "csutil/scopedmutexlock.h"
@@ -390,6 +391,15 @@ private:
   csRef<iLoaderPlugin> BuiltinImageTexLoader;
   /// Pointer to built-in checkerboard texture loader.
   csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
+
+  //Returns in the 'meshesSet' set all the meshes encountered walking thru
+  //the hierarchy of meshes starting from 'meshWrapper'.
+  void CollectAllChildren (iMeshWrapper* meshWrapper, csSet<iMeshWrapper*>&
+    meshesSet);
+  //Two useful private functions to set the CS_POLYMESH_CLOSED and
+  //CS_POLYMESH_CONVEX flags on a single mesh wrapper.
+  void ConvexFlags (iMeshWrapper* mesh);
+  void ClosedFlags (iMeshWrapper* mesh);
 
   class csLoadedPluginVector
   {
