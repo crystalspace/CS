@@ -49,6 +49,41 @@ CS_IMPLEMENT_PLUGIN
 
 //--------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (csSpriteCal3DSocket)
+  SCF_IMPLEMENTS_INTERFACE (iSpriteCal3DSocket)
+SCF_IMPLEMENT_IBASE_END
+
+csSpriteCal3DSocket::csSpriteCal3DSocket()
+{
+  SCF_CONSTRUCT_IBASE (0);
+  triangle_index = 0;
+  submesh_index = 0;
+  mesh_index = 0;
+  name = 0;
+  attached_mesh = 0;
+}
+
+csSpriteCal3DSocket::~csSpriteCal3DSocket ()
+{
+  delete [] name;
+  SCF_DESTRUCT_IBASE ();
+}
+
+void csSpriteCal3DSocket::SetName (char const* n)
+{
+  delete [] name;
+  if (n)
+  {
+    name = new char [strlen (n)+1];
+    strcpy (name, n);
+  }
+  else
+    name = 0;
+}
+
+
+//--------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE (csSpriteCal3DMeshObjectFactory)
 SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSpriteCal3DFactoryState)
@@ -326,6 +361,33 @@ bool csSpriteCal3DMeshObjectFactory::IsMeshDefault(int idx)
   return submeshes[idx]->attach_by_default;
 }
 
+csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::AddSocket ()
+{
+  csSpriteCal3DSocket* socket = new csSpriteCal3DSocket();
+  sockets.Push (socket);
+  return socket;
+}
+
+csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (const char *n) const
+{
+  int i;
+  for (i = GetSocketCount () - 1; i >= 0; i--)
+    if (strcmp (GetSocket (i)->GetName (), n) == 0)
+      return GetSocket (i);
+
+  return 0;
+}
+
+csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (iMeshWrapper *mesh) const
+{
+  int i;
+  for (i = GetSocketCount () - 1; i >= 0; i--)
+    if (GetSocket (i)->GetMeshWrapper() == mesh)
+      return GetSocket (i);
+
+  return 0;
+}
+
 int  csSpriteCal3DMeshObjectFactory::FindMeshName(const char *meshName)
 {
   for (int i=0; i<submeshes.Length(); i++)
@@ -550,6 +612,20 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   }
   //  calModel.setMaterialSet(0);
   calModel.update(0);
+
+  // Copy the sockets list down to the mesh
+  iSpriteCal3DSocket *factory_socket,*new_socket;
+  int i;
+  for (i=0; i<tmpl->GetSocketCount(); i++)
+  {
+    factory_socket = tmpl->GetSocket(i);
+    new_socket = AddSocket();  // mesh now
+    new_socket->SetName (factory_socket->GetName() );
+    new_socket->SetTriangleIndex (factory_socket->GetTriangleIndex() );
+    new_socket->SetSubmeshIndex (factory_socket->GetSubmeshIndex() );
+    new_socket->SetMeshIndex (factory_socket->GetMeshIndex() );
+    new_socket->SetMeshWrapper (0);
+  }
 }
 
 void csSpriteCal3DMeshObject::SetupVertexBuffer (int mesh,int submesh,int num_vertices,int num_triangles,csTriangle *triangles)
@@ -804,6 +880,10 @@ void csSpriteCal3DMeshObject::SetupObject()
       }
     }
   }
+}
+
+void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,csTicks current_time)
+{
 }
 
 bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
@@ -1242,6 +1322,32 @@ bool csSpriteCal3DMeshObject::ClearMorphTarget(int morph_animation_id, float del
   return calModel.getMorphTargetMixer()->clear(morph_animation_id,delay);
 }
 
+csSpriteCal3DSocket* csSpriteCal3DMeshObject::AddSocket ()
+{
+  csSpriteCal3DSocket* socket = new csSpriteCal3DSocket();
+  sockets.Push (socket);
+  return socket;
+}
+
+csSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (const char *n) const
+{
+  int i;
+  for (i = GetSocketCount () - 1; i >= 0; i--)
+    if (strcmp (GetSocket (i)->GetName (), n) == 0)
+      return GetSocket (i);
+
+  return 0;
+}
+
+csSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (iMeshWrapper *mesh) const
+{
+  int i;
+  for (i = GetSocketCount () - 1; i >= 0; i--)
+    if (GetSocket (i)->GetMeshWrapper() == mesh)
+      return GetSocket (i);
+
+  return 0;
+}
 
 //----------------------------------------------------------------------
 

@@ -13,6 +13,9 @@ chronological order.
 	  (holomorph@users.sourceforge.net) for csInputBinder::HandleEvent().
 	  It was completely ignoring key down events and mis-interpreting key
 	  up events as key down events.
+	- Steven Geens added sockets to sprcal3d. The PositionChild method 
+	  hasn't been implemented yet. Steven Geens also fixed some minor 
+	  bugs in sprcal3d.h and configure.ac.
 28-Dec-2003
 	- Philip Wyett fixed a few config files so Freetype2 could again be
 	  invoked.

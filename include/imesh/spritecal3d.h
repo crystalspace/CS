@@ -35,6 +35,41 @@ struct iRenderView;
 struct iRenderView;
 struct iVFS;
 
+SCF_VERSION (iSpritCal3DeSocket, 0, 0, 1);
+
+/**
+ * A socket for specifying where sprites can plug into
+ * other sprites.
+ */
+struct iSpriteCal3DSocket : public iBase
+{
+  /// Set the name.
+  virtual void SetName (char const*) = 0;
+  /// Get the name.
+  virtual char const* GetName () const = 0;
+
+  /// Set the attached sprite.
+  virtual void SetMeshWrapper (iMeshWrapper* mesh) = 0;
+  /// Get the attached sprite.
+  virtual iMeshWrapper* GetMeshWrapper () const = 0;
+
+  /// Set the index of the triangle for the socket.
+  virtual void SetTriangleIndex (int tri_index) = 0;
+  /// Get the index of the triangle for the socket.
+  virtual int GetTriangleIndex () const = 0;
+
+  /// Set the index of the submesh for the socket.
+  virtual void SetSubmeshIndex (int subm_index) = 0;
+  /// Get the index of the submesh for the socket.
+  virtual int GetSubmeshIndex () const = 0;
+
+  /// Set the index of the mesh for the socket.
+  virtual void SetMeshIndex (int m_index) = 0;
+  /// Get the index of the mesh for the socket.
+  virtual int GetMeshIndex () const = 0;
+};
+
+
 
 SCF_VERSION (iSpriteCal3DFactoryState, 0, 0, 3);
 
@@ -191,6 +226,17 @@ struct iSpriteCal3DFactoryState : public iBase
    * Returns whether the mesh is a default mesh or not.
    */
   virtual bool IsMeshDefault(int idx) = 0;
+
+  /// Create and add a new socket to the sprite.
+  virtual iSpriteCal3DSocket* AddSocket () = 0;
+  /// find a named socket into the sprite.
+  virtual iSpriteCal3DSocket* FindSocket (const char * name) const = 0;
+  /// find a socked based on the sprite attached to it.
+  virtual iSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const = 0;
+  /// Query the number of sockets.
+  virtual int GetSocketCount () const = 0;
+  /// Query the socket number f.
+  virtual iSpriteCal3DSocket* GetSocket (int f) const = 0;
 };
 
 SCF_VERSION (iSpriteCal3DState, 0, 0, 1);
@@ -340,6 +386,11 @@ struct iSpriteCal3DState : public iBase
    */
   virtual bool ClearMorphTarget(int morph_animation_id, float delay) = 0;
 
+  /// find a socked based on the sprite attached to it.
+  virtual iSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const = 0;
+
+  /// find a named socket into the sprite.
+  virtual iSpriteCal3DSocket* FindSocket (const char * name) const = 0;
 };
 
 #endif// __CS_IMESH_SPRITECAL3D_H__

@@ -73,6 +73,54 @@ struct csCal3DMesh
     csArray<csString> morph_target_name;
 };
 
+/**
+ * A socket for specifying where sprites can plug into
+ * other sprites.
+ */
+class csSpriteCal3DSocket : public iSpriteCal3DSocket
+{
+  private:
+    char* name;
+    int triangle_index;
+    int submesh_index;
+    int mesh_index;
+    iMeshWrapper *attached_mesh;
+
+  public:
+
+    /// Default Constructor
+    csSpriteCal3DSocket();
+
+    virtual ~csSpriteCal3DSocket ();
+
+    /// Set the name.
+    virtual void SetName (char const*);
+    /// Get the name.
+    virtual char const* GetName () const { return name; }
+
+    /// Set the attached sprite.
+    virtual void SetMeshWrapper (iMeshWrapper* mesh) {attached_mesh = mesh;}
+    /// Get the attached sprite.
+    virtual iMeshWrapper* GetMeshWrapper () const {return attached_mesh;}
+
+    /// Set the index of the triangle for the socket.
+    virtual void SetTriangleIndex (int tri_index) { triangle_index = tri_index; }
+    /// Get the index of the triangle for the socket.
+    virtual int GetTriangleIndex () const { return triangle_index; }
+
+    /// Set the index of the submesh for the socket.
+    virtual void SetSubmeshIndex (int subm_index) { submesh_index = subm_index;}
+    /// Get the index of the submesh for the socket.
+    virtual int GetSubmeshIndex () const { return submesh_index;}
+
+    /// Set the index of the mesh for the socket.
+    virtual void SetMeshIndex (int m_index) { mesh_index = m_index;}
+    /// Get the index of the mesh for the socket.
+    virtual int GetMeshIndex () const {return mesh_index;}
+
+    SCF_DECLARE_IBASE;
+};
+
 class csSpriteCal3DMeshObject;
 
 /**
@@ -100,6 +148,9 @@ private:
 
   csString     basePath;
   float	       renderScale;
+
+  /// The sockets.
+  csPDelArray<csSpriteCal3DSocket> sockets;
 
 public:
   iObjectRegistry* object_reg;
@@ -145,6 +196,23 @@ public:
   const char *GetMorphAnimationName(int idx);
   int  FindMorphAnimationName(const char *meshName);
   bool IsMeshDefault(int idx);
+
+  /// Create and add a new socket to the sprite.
+  csSpriteCal3DSocket* AddSocket ();
+  /// find a named socket into the sprite.
+  csSpriteCal3DSocket* FindSocket (const char * name) const;
+  /// find a socked based on the sprite attached to it
+  csSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const;
+  /// Query the number of sockets
+  int GetSocketCount () const { return sockets.Length (); }
+  /// Query the socket number f
+  csSpriteCal3DSocket* GetSocket (int f) const
+  {
+    return (f < sockets.Length ())
+      ? (csSpriteCal3DSocket *)sockets [f]
+      : (csSpriteCal3DSocket*)0;
+  }
+
 
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
@@ -217,7 +285,7 @@ public:
     virtual ~PolyMesh ()
     {
       Cleanup ();
-      SCF_DESTRUCT_IBASE (0);
+      SCF_DESTRUCT_IBASE ();
     }
     void Cleanup () { } //  delete[] polygons; polygons = 0; }
 
@@ -318,6 +386,37 @@ public:
     virtual bool IsMeshDefault(int idx)
     { return scfParent->IsMeshDefault(idx); }
 
+    virtual iSpriteCal3DSocket* AddSocket ()
+    {
+      csRef<iSpriteCal3DSocket> ifr (
+	  SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
+	    iSpriteCal3DSocket));
+      return ifr;       // DecRef is ok here.
+    }
+    virtual iSpriteCal3DSocket* FindSocket (const char* name) const
+    {
+      csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
+	    scfParent->FindSocket (name), iSpriteCal3DSocket));
+      return ifr;       // DecRef is ok here.
+    }
+    virtual iSpriteCal3DSocket* FindSocket (iMeshWrapper* mesh) const
+    {
+      csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
+	    scfParent->FindSocket (mesh), iSpriteCal3DSocket));
+      return ifr;       // DecRef is ok here.
+    }
+    virtual int GetSocketCount () const
+    {
+      return scfParent->GetSocketCount ();
+    }
+    virtual iSpriteCal3DSocket* GetSocket (int f) const
+    {
+      csRef<iSpriteCal3DSocket> ifr (
+	  SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
+	    iSpriteCal3DSocket));
+      return ifr;       // DecRef is ok here.
+    }
+
   } scfiSpriteCal3DFactoryState;
   struct LODControl : public iLODControl
   {
@@ -366,6 +465,13 @@ private:
   float last_update_time;
   csArray<csCal3DAnimation*> active_anims;
   csArray<float>             active_weights;
+
+  /**
+   * Each mesh must have its own individual socket assignments,
+   * but the vector must be copied down from the factory at create time.
+   */
+  csPDelArray<csSpriteCal3DSocket> sockets;
+
 
 #ifndef CS_USE_NEW_RENDERER
   iVertexBufferManager* vbufmgr;
@@ -436,7 +542,7 @@ public:
    * see imesh/object.h for specification. The default implementation
    * does nothing.
    */
-  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
+  virtual void PositionChild (iMeshObject* child,csTicks current_time);
 
   virtual iMeshObjectFactory* GetFactory () const
   {
@@ -556,6 +662,23 @@ public:
   bool BlendMorphTarget(int morph_animation_id, float weight, float delay);
   bool ClearMorphTarget(int morph_animation_id, float delay);
 
+  /// Create and add a new socket to the sprite.
+  csSpriteCal3DSocket* AddSocket ();
+  /// find a named socket into the sprite.
+  csSpriteCal3DSocket* FindSocket (const char * name) const;
+  /// find a socked based on the sprite attached to it
+  csSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const;
+  /// Query the number of sockets
+  int GetSocketCount () const { return sockets.Length (); }
+  /// Query the socket number f
+  csSpriteCal3DSocket* GetSocket (int f) const
+  {
+    return (f < sockets.Length ())
+      ? (csSpriteCal3DSocket *)sockets [f]
+      : (csSpriteCal3DSocket*)0;
+  }
+
+
   struct SpriteCal3DState : public iSpriteCal3DState
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSpriteCal3DMeshObject);
@@ -637,6 +760,36 @@ public:
 
     virtual bool ClearMorphTarget(int morph_animation_id, float delay)
     { return scfParent->ClearMorphTarget(morph_animation_id, delay); }
+    virtual iSpriteCal3DSocket* AddSocket ()
+    {
+      csRef<iSpriteCal3DSocket> ifr (
+	  SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
+	    iSpriteCal3DSocket));
+      return ifr;       // DecRef is ok here.
+    }
+    virtual iSpriteCal3DSocket* FindSocket (const char* name) const
+    {
+      csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
+	    scfParent->FindSocket (name), iSpriteCal3DSocket));
+      return ifr;       // DecRef is ok here.
+    }
+    virtual iSpriteCal3DSocket* FindSocket (iMeshWrapper* mesh) const
+    {
+      csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
+	    scfParent->FindSocket (mesh), iSpriteCal3DSocket));
+      return ifr;       // DecRef is ok here.
+    }
+    virtual int GetSocketCount () const
+    {
+      return scfParent->GetSocketCount ();
+    }
+    virtual iSpriteCal3DSocket* GetSocket (int f) const
+    {
+      csRef<iSpriteCal3DSocket> ifr (
+	  SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
+	    iSpriteCal3DSocket));
+      return ifr;       // DecRef is ok here.
+    }
 
   } scfiSpriteCal3DState;
   friend struct SpriteCal3DState;
