@@ -111,7 +111,7 @@
 @end macro
 
 @macro picturesssss{a,b,c,d,e,f}
-@image{;\a\:\b\:\c\:\d\:\e\:\f\}
+@image{:\a\:\b\:\c\:\d\:\e\:\f\}
 @end macro
 
 @tex
