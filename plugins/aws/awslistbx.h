@@ -20,6 +20,7 @@
 #include "awscomp.h"
 #include "awsitmv.h"
 #include "awsscr.h"
+#include "awsscrbr.h"
 
 /// Knows how to draw items that have several properties.
 struct awsListItem
@@ -191,6 +192,20 @@ class awsListBox : public awsComponent
    awsListRow *sel;
                
 private:
+   ///////////////////////////// Embedded items
+
+   /// The sink that gets scroll notifications
+   iAwsSink *sink;
+
+   /// The slot that handles scroll notifications
+   iAwsSlot *slot;
+
+   /// Our embedded scrollbar
+   awsScrollBar *scrollbar;
+
+   /// Trigger for catching scroll signals
+   static void ScrollChanged(void *sk, iAwsSource *source);
+
    ///////////////////////////// Actions
 
    /// Action dispatcher

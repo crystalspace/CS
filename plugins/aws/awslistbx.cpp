@@ -1,6 +1,8 @@
 #include "cssysdef.h"
 #include "awslistbx.h"
 #include "awsfparm.h"
+#include "aws3dfrm.h"   
+#include "awskcfct.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
@@ -8,7 +10,6 @@
 #include "csutil/csevent.h"
 #include "csutil/snprintf.h"
 #include "iutil/evdefs.h"
-#include "aws3dfrm.h"
 
 #include <stdio.h>
 
@@ -122,12 +123,15 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   iString   *tn1=NULL, *tn2=NULL;
   char buf[64];
   int i;
+  int sb_h, sb_w;
 
   if (!awsComponent::Setup(_wmgr, settings)) return false;
 
   iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
 
   pm->LookupIntKey("OverlayTextureAlpha", alpha_level); // global get
+  pm->LookupIntKey("ScrollBarHeight", sb_h);
+  pm->LookupIntKey("ScrollBarWidth", sb_w);
   pm->GetInt(settings, "Style", frame_style);
   pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
   pm->GetInt(settings, "HiAlpha", hi_alpha_level);          
@@ -182,6 +186,30 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
       columns[i].bkg = pm->GetTexture(tn2->GetData(), tn2->GetData());
   }
 
+  // Setup embedded scrollbar
+  scrollbar = new awsScrollBar;
+
+  awsKeyFactory sbinfo;
+
+  sbinfo.Initialize(new scfString("vertscroll"), new scfString("Scroll Bar"));
+
+  sbinfo.AddRectKey(new scfString("Frame"), 
+                        csRect(Frame().xmax-sb_w, Frame().ymin,
+                                Frame().xmax, Frame().ymax));
+
+  sbinfo.AddIntKey(new scfString("Style"), awsScrollBar::fsVertical);
+
+  scrollbar->Setup(_wmgr, sbinfo.GetThisNode());
+  
+  // Setup trigger
+  sink = new awsSink(this);
+
+  sink->RegisterTrigger("ScrollChanged", &ScrollChanged);
+
+  slot = new awsSlot();
+
+  slot->Connect(scrollbar, awsScrollBar::signalChanged, sink, sink->GetTriggerID("ScrollChanged"));
+  
   return true;
 }
 
@@ -199,6 +227,14 @@ awsListBox::SetProperty(char *name, void *parm)
   if (awsComponent::SetProperty(name, parm)) return true;
 
   return false;
+}
+
+void 
+awsListBox::ScrollChanged(void *sk, iAwsSource *source)
+{
+  awsListBox *lb = (awsListBox *)lb;
+  
+
 }
 
 static 
