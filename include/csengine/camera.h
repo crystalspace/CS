@@ -374,6 +374,7 @@ public:
       else return false;
     }
   } scfiCamera;
+  friend struct Camera;
 
 private:
   ///
