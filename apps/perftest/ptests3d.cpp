@@ -298,11 +298,13 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   mesh.vertex_mode = G3DTriangleMesh::VM_VIEWSPACE;
   mesh.mixmode = CS_FX_COPY;
   mesh.morph_factor = 0;
+  mesh.vertex_fog = NULL;
   mesh_vertices = new csVector3 [num_mesh_vertices];
   mesh_texels = new csVector2 [num_mesh_vertices];
   mesh.mat_handle = perftest->GetMaterial (0);
   vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
   mesh.buffers[0] = vbuf;
+
   int i;
   int x, y;
   float w = (g3d->GetWidth ()-20)/2;
