@@ -26,6 +26,8 @@ chronological order.
 	  value if the target's Jamfile did not invoke the Help rule.
 	- John Harger fixed the particles interface to avoid the dangerous
 	  csArray references.
+	- Norman Kraemer replaced in viewmesh the call to SetRenderScale with 
+	  RescaleFactory.
 27-Jan-2004
 	- Dentoid added a missing CS_IMPLEMENT_PLUGIN to the engine plugin.
 	- John Harger moved everything from iParticlesObjectState::Update into
