@@ -10,6 +10,7 @@
 #include "iaws/awsdefs.h"
 #include "ivaria/view.h"
 #include "iengine/engine.h"
+#include "iengine/camera.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -689,6 +690,7 @@ awsWindow::OnDraw(csRect clip)
   if (view)
   {  
      view->SetRectangle(Frame().xmin, g3d->GetHeight()-Frame().Height()-Frame().ymin, Frame().Width(), Frame().Height());
+     view->GetCamera()->SetPerspectiveCenter(Frame().xmin+(Frame().Width()>>1), (g3d->GetHeight()-Frame().Height()-Frame().ymin)+(Frame().Height()>>1));
   }
   
   // Get the size of the text
@@ -717,9 +719,9 @@ awsWindow::OnDraw(csRect clip)
         iGraphics3D *og3d = view->GetContext();
 
         view->SetContext(g3d);
-        //g3d->BeginDraw(view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
+        g3d->BeginDraw(view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
         view->Draw();
-        //g3d->FinishDraw();
+        g3d->BeginDraw(CSDRAW_2DGRAPHICS);
         view->SetContext(og3d);
 
       } //  end if view
@@ -765,11 +767,11 @@ awsWindow::OnDraw(csRect clip)
         iGraphics3D *og3d = view->GetContext();
 
         view->SetContext(g3d);
-        //g3d->BeginDraw(view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
+        g3d->BeginDraw(view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
         view->Draw();
-        //g3d->FinishDraw();
+        g3d->BeginDraw(CSDRAW_2DGRAPHICS);
         view->SetContext(og3d);
-
+        
       } //  end if view
       else
       {
