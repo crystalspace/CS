@@ -65,7 +65,7 @@ bool csPerl5::Init (iObjectRegistry *objreg)
     return false;
   }
 
-  const char *vfsinc = "this/scripts/perl5";
+  const char *vfsinc = "/scripts/perl5";
   csRef<iDataBuffer> incbuff = vfs->GetRealPath (vfsinc);
   if (! incbuff)
   {

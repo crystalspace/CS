@@ -12,6 +12,8 @@ chronological order.
 	  than being hard-coded into jobber.pl.
 	- Eric Sunshine updated Python SDK check in configure.ac to take into
 	  account new Python.framework in MacOS/X 10.3.
+	- Eric Sunshine fixed bug in csPerl5::Init() where it was using the
+	  unreliable VFS /this/scripts directory to initialize the interpreter.
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.
