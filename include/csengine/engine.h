@@ -1183,6 +1183,11 @@ public:
   /// return a mesh object by index
   virtual iMeshWrapper *GetMeshObject (int n);
 
+  /// return the number of mesh factories
+  virtual int GetNumMeshFactories ();
+  /// return a mesh factory by index
+  virtual iMeshFactoryWrapper *GetMeshFactory (int n);
+
   /// Create a terrain factory wrapper from a terrain plugin
   virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* pClassId,
 	  const char* pName);

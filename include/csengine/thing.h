@@ -743,32 +743,11 @@ public:
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);
 
-  //------------------------- iThing interface -------------------------------
-  struct eiThing : public iThing
-  {
-    DECLARE_EMBEDDED_IBASE (csThing);
- 
-    virtual csThing *GetPrivateObject () { return scfParent; }
-    virtual const char *GetName () const { return scfParent->GetName (); }
-    virtual void SetName (const char *iName) { scfParent->SetName (iName); }
-    virtual void CompressVertices () { scfParent->CompressVertices(); }
-    virtual int GetPolygonCount () { return scfParent->polygons.Length (); }
-    virtual iPolygon3D *GetPolygon (int idx);
-    virtual iPolygon3D *CreatePolygon (const char *iName);
-    virtual int GetVertexCount () { return scfParent->num_vertices; }
-    virtual csVector3 &GetVertex (int i) { return scfParent->obj_verts[i]; }
-    virtual csVector3 &GetVertexW (int i) { return scfParent->wor_verts[i]; }
-    virtual csVector3 &GetVertexC (int i) { return scfParent->cam_verts[i]; }
-    virtual int CreateVertex (const csVector3 &iVertex)
-    { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
-    virtual bool CreateKey (const char *iName, const char *iValue);
-  } scfiThing;
-  friend struct eiThing;
- 
   //------------------------- iThingState interface -------------------------
   struct ThingState : public iThingState
   {
     DECLARE_EMBEDDED_IBASE (csThing);
+    virtual void* GetPrivateObject () { return (void*)scfParent; }
     virtual void CompressVertices () { scfParent->CompressVertices(); }
     virtual int GetPolygonCount () { return scfParent->polygons.Length (); }
     virtual iPolygon3D *GetPolygon (int idx);

@@ -482,10 +482,10 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     if (mesh != culler_mesh)
     {
       // @@@ UGLY!!!
-      iThing* ith = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+      iThingState* ith = QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
       if (ith)
       {
-        csThing* sp = ith->GetPrivateObject ();
+        csThing* sp = (csThing*)(ith->GetPrivateObject ());
         r = best_r;
 	//@@@ Put this in csMeshWrapper???
         if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
@@ -522,8 +522,9 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     // culler_mesh has option CS_THING_MOVE_NEVER so
     // object space == world space.
     // @@@ UGLY!!! We need another abstraction for this.
-    iThing* ith = QUERY_INTERFACE (culler_mesh->GetMeshObject (), iThing);
-    csThing* sp = ith->GetPrivateObject ();
+    iThingState* ith = QUERY_INTERFACE (
+    	culler_mesh->GetMeshObject (), iThingState);
+    csThing* sp = (csThing*)(ith->GetPrivateObject ());
     ith->DecRef ();
 
     csPolygonTree* static_tree = sp->GetStaticTree ();
@@ -1069,10 +1070,11 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
 	csMeshWrapper* mesh = (csMeshWrapper*)o;
 	// @@@ should not be known in engine.
 	// @@@ UGLY
-	iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+	iThingState* ithing = QUERY_INTERFACE (
+		mesh->GetMeshObject (), iThingState);
 	if (ithing)
 	{
-	  csThing* sp = ithing->GetPrivateObject ();
+	  csThing* sp = (csThing*)(ithing->GetPrivateObject ());
 	  // Only if the thing has right flags do we consider it for shadows.
 	  if (lview->CheckShadowMask (mesh->flags.Get ()))
 	    sp->AppendShadows (&(mesh->GetMovable ().scfiMovable),
@@ -1091,10 +1093,11 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
       csMeshWrapper* mesh = (csMeshWrapper*)o;
       // @@@ should not be known in engine.
       // @@@ UGLY
-      iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+      iThingState* ithing = QUERY_INTERFACE (
+      	mesh->GetMeshObject (), iThingState);
       if (ithing)
       {
-        csThing* sp = ithing->GetPrivateObject ();
+        csThing* sp = (csThing*)(ithing->GetPrivateObject ());
         // Only if the thing has right flags do we consider it for shadows.
         if (lview->CheckProcessMask (mesh->flags.Get ()))
           sp->RealCheckFrustum (lview, &(mesh->GetMovable ().scfiMovable));
@@ -1190,11 +1193,6 @@ void csSector::CalculateSectorBBox (csBox3& bbox,
 
 //---------------------------------------------------------------------------
 
-int csSector::eiSector::GetMeshCount ()
-{
-  return scfParent->GetNumberMeshes ();
-}
-
 iMeshWrapper *csSector::eiSector::GetMesh (int n)
 {
   return &scfParent->GetMesh (n)->scfiMeshWrapper;
@@ -1205,15 +1203,10 @@ void csSector::eiSector::AddMesh (iMeshWrapper *pMesh)
   scfParent->AddMesh (pMesh->GetPrivateObject ());
 }
 
-iMeshWrapper *csSector::eiSector::FindMesh (const char *name)
+iMeshWrapper *csSector::eiSector::GetMesh (const char *name)
 {
   csMeshWrapper *mw = scfParent->GetMesh (name);
   return mw ? &mw->scfiMeshWrapper : NULL;
-}
-
-int csSector::eiSector::GetTerrainCount ()
-{
-  return scfParent->GetNumberTerrains ();
 }
 
 iTerrainWrapper *csSector::eiSector::GetTerrain (int n)
@@ -1221,7 +1214,7 @@ iTerrainWrapper *csSector::eiSector::GetTerrain (int n)
   return &scfParent->GetTerrain (n)->scfiTerrainWrapper;
 }
 
-iTerrainWrapper *csSector::eiSector::FindTerrain (const char *name)
+iTerrainWrapper *csSector::eiSector::GetTerrain (const char *name)
 {
   csTerrainWrapper *tw = scfParent->GetTerrain (name);
   return tw ? &tw->scfiTerrainWrapper : NULL;
@@ -1241,3 +1234,58 @@ iStatLight *csSector::eiSector::FindLight (float x, float y, float z, float dist
 {
   return &scfParent->FindLight (x, y, z, dist)->scfiStatLight;
 }
+
+iCollection* csSector::eiSector::GetCollection (int n)
+{
+  return &(scfParent->GetCollection (n)->scfiCollection);
+}
+
+void csSector::eiSector::AddCollection (iCollection* col)
+{
+  scfParent->AddCollection ((csCollection*)(col->GetPrivateObject ()));
+}
+
+iCollection* csSector::eiSector::GetCollection (const char *name)
+{
+  csCollection* tw = (csCollection*)(scfParent->GetCollection (name));
+  return tw ? &tw->scfiCollection : NULL;
+}
+
+void csSector::eiSector::UnlinkCollection (iCollection* col)
+{
+  scfParent->UnlinkCollection ((csCollection*)(col->GetPrivateObject ()));
+}
+
+iStatLight* csSector::eiSector::GetLight (int n)
+{
+  return &(scfParent->GetLight (n)->scfiStatLight);
+}
+
+iStatLight* csSector::eiSector::GetLight (const char *name)
+{
+  csStatLight* tw = scfParent->GetLight (name);
+  return tw ? &tw->scfiStatLight : NULL;
+}
+
+iPolygon3D* csSector::eiSector::HitBeam (const csVector3& start,
+	const csVector3& end, csVector3& isect)
+{
+  csPolygon3D* p = scfParent->HitBeam (start, end, isect);
+  if (p) return &(p->scfiPolygon3D);
+  else return NULL;
+}
+
+iObject* csSector::eiSector::HitBeam (const csVector3& start,
+	const csVector3& end, iPolygon3D** polygonPtr)
+{
+  csPolygon3D* p;
+  csObject* obj = scfParent->HitBeam (start, end, polygonPtr ? &p : NULL);
+  if (obj)
+  {
+    iObject* iobj = QUERY_INTERFACE (obj, iObject);
+    iobj->DecRef ();
+    return iobj;
+  }
+  else return NULL;
+}
+

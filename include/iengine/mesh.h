@@ -96,7 +96,7 @@ class csFlags;
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshWrapper, 0, 0, 8);
+SCF_VERSION (iMeshWrapper, 0, 0, 9);
 
 /**
  * This interface corresponds to the object in the engine
@@ -231,11 +231,17 @@ struct iMeshWrapper : public iBase
   virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
   	csBox3& cbox) = 0;
 
+  /// Get the number of children.
+  virtual int GetChildCount () = 0;
+  /// Get a child.
+  virtual iMeshWrapper* GetChild (int idx) = 0;
   /**
    * Add a child to this object. The transform of that child will be
    * interpreted relative to this object.
    */
   virtual void AddChild (iMeshWrapper* child) = 0;
+  /// Get the radius of this mesh (ignoring children).
+  virtual csVector3 GetRadius () = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 0, 4);

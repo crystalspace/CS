@@ -61,14 +61,14 @@ void csCameraPosition::Set (const char *iSector, const csVector3 &iPosition,
   Upward = iUpward;
 }
 
-bool csCameraPosition::Load (csCamera &oCamera, csEngine *e)
+bool csCameraPosition::Load (iCamera* oCamera, iEngine *e)
 {
-  csSector *room = (csSector *)e->sectors.FindByName (Sector);
+  iSector *room = e->FindSector (Sector);
   if (!room) return false;
-  oCamera.SetSector (room);
-  oCamera.SetPosition (Position);
+  oCamera->SetSector (room);
+  oCamera->GetTransform ().SetOrigin (Position);
   csVector3 Right = Upward % Forward;
-  oCamera.SetC2W (
+  oCamera->GetTransform ().SetT2O (
     csMatrix3 (Right.x, Upward.x, Forward.x,
                Right.y, Upward.y, Forward.y,
                Right.z, Upward.z, Forward.z));

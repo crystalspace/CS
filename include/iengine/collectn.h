@@ -1,6 +1,6 @@
 /*
     Crystal Space 3D engine
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,17 +25,16 @@
 struct iMovable;
 struct iObject;
 
-SCF_VERSION (iCollection, 0, 0, 1);
+SCF_VERSION (iCollection, 0, 0, 2);
 
 /**
  * A collection object is for conveniance of the script language.
- * Objects are (currently) not really hierarchical in Crystal Space.
- * A collection simulates a hierarchy. The script can then perform
- * operations like 'move' and 'transform' on all the objects in
- * the collection together.
  */
 struct iCollection : public iBase
 {
+  /// @@@ UGLY
+  virtual void* GetPrivateObject () = 0;
+
   /// Query the iObject for this collection
   virtual iObject *QueryObject() = 0;
 

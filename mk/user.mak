@@ -43,7 +43,6 @@ PLUGINS += mesh/object/surf        mesh/loader/surf
 PLUGINS += mesh/object/emit        mesh/loader/emit
 PLUGINS += mesh/object/stars
 PLUGINS +=                         mesh/loader/thing
-PLUGINS += terrain/object/ddg      terrain/loader/ddg
 PLUGINS += terrain/object/terrfunc terrain/loader/terrfunc
 PLUGINS += motion/object/default   motion/loader/default
 
@@ -60,7 +59,6 @@ PLUGINS.DYNAMIC += net/driver/socket
 PLUGINS.DYNAMIC += sound/loader
 PLUGINS.DYNAMIC += console/output/standard
 PLUGINS.DYNAMIC += console/output/fancy
-PLUGINS.DYNAMIC += csclear
 PLUGINS.DYNAMIC += dungeon
 #PLUGINS.DYNAMIC += font/server/freefont
 PLUGINS.DYNAMIC += font/server/fontplex

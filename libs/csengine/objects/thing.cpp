@@ -55,17 +55,12 @@ long csThing::current_light_frame_number = 0;
 IMPLEMENT_CSOBJTYPE (csThing,csPObject);
 
 IMPLEMENT_IBASE_EXT (csThing)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iThing)
   IMPLEMENTS_EMBEDDED_INTERFACE (iThingState)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
   IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityCuller)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObjectFactory)
 IMPLEMENT_IBASE_EXT_END
-
-IMPLEMENT_EMBEDDED_IBASE (csThing::eiThing)
-  IMPLEMENTS_INTERFACE (iThing)
-IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE (csThing::ThingState)
   IMPLEMENTS_INTERFACE (iThingState)
@@ -89,7 +84,6 @@ IMPLEMENT_EMBEDDED_IBASE_END
 
 csThing::csThing () : csPObject (), polygons (64, 64), curves (16, 16)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiThing);
   CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
@@ -638,6 +632,7 @@ void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     // Draw through the portal. If this fails we draw the original polygon
     // instead. Drawing through a portal can fail because we have reached
     // the maximum number that a sector is drawn (for mirrors).
+//if (po) { printf ("PORTAL\n"); fflush (stdout); }
     if (po->Draw (poly, p, d))
     {
       //@@@@ EDGESif (!d->GetCallback ())
@@ -1665,6 +1660,7 @@ void* csThing::DrawPolygons (csThing* /*thing*/,
 
 bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
 {
+//printf ("%08lx\n", this);fflush (stdout);
   Prepare ();
 
   iCamera* icam = rview->GetCamera ();
@@ -2062,8 +2058,7 @@ static void CompressShadowFrustums (iShadowBlockList* list)
 static void* CheckFrustumPolygonsFB (csThing* thing,
   csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
-  iThing* ithing = QUERY_INTERFACE (thing, iThing);//@@@@@@@@
-  ithing->DecRef ();
+  iThingState* ithing = &(thing->scfiThingState);
 
   csPolygon3D* p;
   CheckFrustData* fdata = (CheckFrustData*)data;
@@ -2084,7 +2079,7 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
       // A BSP polygon. Used for testing visibility of things.
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
       csVisObjInfo* obj = bsppol->GetOriginator ();
-      iThing* ith = QUERY_INTERFACE (obj->visobj, iThing);
+      iThingState* ith = QUERY_INTERFACE (obj->visobj, iThingState);
       if (ith)
       {
         ith->DecRef ();
@@ -2109,7 +2104,7 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
 	      // thing to the shadow list.
 	      if (ith != ithing)
 	      {
-	        csThing* th = ith->GetPrivateObject ();
+	        csThing* th = (csThing*)(ith->GetPrivateObject ());
 		// @@@ UGLY!!!: flags are in mesh wrapper!!?
 		if (fview->CheckShadowMask (th->flags.Get ()))
 	          th->AppendShadows (obj->visobj->GetMovable (),
@@ -2272,10 +2267,10 @@ void csThing::CastShadows (iFrustumView* fview)
     csMeshWrapper* mesh = (csMeshWrapper*)o;
     // @@@ should not be known in engine.
     // @@@ UGLY
-    iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+    iThingState* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
     if (ithing)
     {
-      csThing* sp = ithing->GetPrivateObject ();
+      csThing* sp = (csThing*)(ithing->GetPrivateObject ());
       // Only if the thing has right flags do we consider it for shadows.
       if (fview->CheckProcessMask (mesh->flags.Get ()))
         sp->RealCheckFrustum (fview, &(mesh->GetMovable ().scfiMovable));
@@ -2397,8 +2392,8 @@ void csThing::MergeTemplate (iThingState* tpl,
   curves_center = tpl->GetCurvesCenter ();
   curves_scale = tpl->GetCurvesScale ();
   //@@@ TEMPORARY
-  iThing* ith = QUERY_INTERFACE (tpl, iThing);
-  ParentTemplate = ith->GetPrivateObject ();
+  iThingState* ith = QUERY_INTERFACE (tpl, iThingState);
+  ParentTemplate = (csThing*)(ith->GetPrivateObject ());
   ith->DecRef ();
 
   merge_vertices = new int [tpl->GetVertexCount ()+1];
@@ -2467,30 +2462,6 @@ void csThing::ReplaceMaterials (iMaterialList* matList, const char* prefix)
       p->SetMaterial (th->GetPrivateObject ());
     delete [] newname;
   }
-}
-
-//---------------------------------------------------------------------------
-
-iPolygon3D *csThing::eiThing::GetPolygon (int idx)
-{
-  csPolygon3D* p = scfParent->GetPolygon3D (idx);
-  return &(p->scfiPolygon3D);
-}
-
-iPolygon3D *csThing::eiThing::CreatePolygon (const char *iName)
-{
-  csPolygon3D *p = new csPolygon3D ((csMaterialWrapper *)NULL);
-  if (iName) p->SetName (iName);
-  scfParent->AddPolygon (p);
-  iPolygon3D *ip = QUERY_INTERFACE (p, iPolygon3D);
-  p->DecRef ();
-  return ip;
-}
-
-bool csThing::eiThing::CreateKey (const char *iName, const char *iValue)
-{
-  scfParent->ObjAdd (new csKeyValuePair (iName, iValue));
-  return true;
 }
 
 //---------------------------------------------------------------------------

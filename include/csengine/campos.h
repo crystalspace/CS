@@ -26,7 +26,8 @@
 #include "csengine/camera.h"
 #include "iengine/campos.h"
 
-class csEngine;
+struct iEngine;
+struct iCamera;
 
 /**
  * Camera position structure. This structure is used internally by the
@@ -60,7 +61,7 @@ public:
     const csVector3 &iForward, const csVector3 &iUpward);
 
   /// Load the camera position into a camera object
-  bool Load (csCamera&, csEngine*);
+  bool Load (iCamera*, iEngine*);
 
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);

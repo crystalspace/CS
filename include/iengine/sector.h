@@ -26,6 +26,7 @@
 class csSector;
 class csColor;
 class csBox3;
+struct iCollection;
 struct iTerrainWrapper;
 struct iMeshWrapper;
 struct iThing;
@@ -34,8 +35,9 @@ struct iVisibilityCuller;
 struct iObject;
 struct csFog;
 struct iGraphics3D;
+struct iPolygon3D;
 
-SCF_VERSION (iSector, 0, 1, 9);
+SCF_VERSION (iSector, 0, 2, 10);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -64,28 +66,45 @@ struct iSector : public iBase
   /// Disable fog in this sector
   virtual void DisableFog () = 0;
 
-  /// Return the number of mesh objects in this sector
+  /// Return the number of mesh objects in this sector.
   virtual int GetMeshCount () = 0;
-  /// Return a mesh wrapper by index
+  /// Return a mesh wrapper by index.
   virtual iMeshWrapper *GetMesh (int n) = 0;
   /// Add a mesh object to this sector.
   virtual void AddMesh (iMeshWrapper *pMesh) = 0;
-  /// Find a mesh object by name
-  virtual iMeshWrapper *FindMesh (const char *name) = 0;
-  /// Remove a mesh object
-  virtual void RemoveMesh (iMeshWrapper *pMesh) = 0;
+  /// Find a mesh object by name.
+  virtual iMeshWrapper *GetMesh (const char *name) = 0;
+  /// Unlink a mesh object.
+  virtual void UnlinkMesh (iMeshWrapper *pMesh) = 0;
 
-  /// Return the number of terrain objects in this sector
+  /// Return the number of terrain objects in this sector.
   virtual int GetTerrainCount () = 0;
-  /// Return a terrain wrapper by index
+  /// Return a terrain wrapper by index.
   virtual iTerrainWrapper *GetTerrain (int n) = 0;
   /// Add a terrain object to this sector.
   virtual void AddTerrain (iTerrainWrapper *pTerrain) = 0;
-  /// Find a terrain object by name
-  virtual iTerrainWrapper *FindTerrain (const char *name) = 0;
-  /// Remove a terrain object
-  virtual void RemoveTerrain (iTerrainWrapper *pTerrain) = 0;
+  /// Find a terrain object by name.
+  virtual iTerrainWrapper *GetTerrain (const char *name) = 0;
+  /// Unlink a terrain object.
+  virtual void UnlinkTerrain (iTerrainWrapper *pTerrain) = 0;
 
+  /// Return the number of collection objects in this sector.
+  virtual int GetCollectionCount () = 0;
+  /// Return a collection by index.
+  virtual iCollection *GetCollection (int n) = 0;
+  /// Add a collection to this sector.
+  virtual void AddCollection (iCollection* col) = 0;
+  /// Find a collection by name.
+  virtual iCollection *GetCollection (const char *name) = 0;
+  /// Unlink a collection.
+  virtual void UnlinkCollection (iCollection* col) = 0;
+
+  /// Return the number of lights in this sector.
+  virtual int GetLightCount () = 0;
+  /// Return a light by index.
+  virtual iStatLight *GetLight (int n) = 0;
+  /// Return a light by name.
+  virtual iStatLight *GetLight (const char* name) = 0;
   /// Add a static or pseudo-dynamic light to this sector.
   virtual void AddLight (iStatLight *light) = 0;
   /// Find a light with the given position and radius.
@@ -138,6 +157,27 @@ struct iSector : public iBase
    * Get the current draw recursion level.
    */
   virtual int GetRecLevel () = 0;
+
+  /**
+   * Follow a beam from start to end and return the first polygon that
+   * is hit. This function correctly traverse portals and space warping
+   * portals. Normally the sector you call this on should be the sector
+   * containing the 'start' point. 'isect' will be the intersection point
+   * if a polygon is returned.
+   */
+  virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
+  	csVector3& isect) = 0;
+
+  /**
+   * Follow a beam from start to end and return the first object
+   * that is hit. Objects can be meshes, things, or sectors.
+   * In case it is a thing or sector the iPolygon3D field will be
+   * filled with the polygon that was hit.
+   * If polygonPtr is null then the polygon will not be filled in.
+   */
+  virtual iObject* HitBeam (const csVector3& start, const csVector3& end,
+  	iPolygon3D** polygonPtr) = 0;
+
 };
 
 #endif // __IENGINE_SECTOR_H__

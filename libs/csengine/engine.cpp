@@ -105,7 +105,7 @@ csLight* csLightIt::Fetch ()
   // Try next light.
   light_idx++;
 
-  if (light_idx >= sector->GetNumberLights ())
+  if (light_idx >= sector->GetLightCount ())
   {
     // Go to next sector.
     light_idx = -1;
@@ -314,7 +314,7 @@ csObject* csObjectIt::Fetch ()
   {
     if (CheckType (cur_type))
     {
-      if (cur_idx >= cur_sector->GetNumberLights ())
+      if (cur_idx >= cur_sector->GetLightCount ())
         StartMeshes ();
       else
       {
@@ -327,8 +327,8 @@ csObject* csObjectIt::Fetch ()
 		  cur_pos) <= r*r)
             return rc;
 	}
-	while (cur_idx < cur_sector->GetNumberLights ());
-        if (cur_idx >= cur_sector->GetNumberLights ())
+	while (cur_idx < cur_sector->GetLightCount ());
+        if (cur_idx >= cur_sector->GetLightCount ())
           StartMeshes ();
       }
     }
@@ -340,7 +340,7 @@ csObject* csObjectIt::Fetch ()
   {
     if (CheckType (cur_type))
     {
-      if (cur_idx >= cur_sector->GetNumberMeshes ())
+      if (cur_idx >= cur_sector->GetMeshCount ())
         cur_type = &csSector::Type;
       else
       {
@@ -1627,7 +1627,7 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong fla
   // Add all static lights to the array (if CS_NLIGHT_STATIC is set).
   if (flags & CS_NLIGHT_STATIC)
   {
-    for (i = 0 ; i < sector->GetNumberLights () ; i++)
+    for (i = 0 ; i < sector->GetLightCount () ; i++)
     {
       csStatLight* sl = sector->GetLight (i);
       sqdist = csSquaredDist::PointPoint (pos, sl->GetCenter ());
@@ -2331,6 +2331,17 @@ int csEngine::GetNumMeshObjects ()
 iMeshWrapper *csEngine::GetMeshObject (int n)
 {
   return &((csMeshWrapper*)meshes.Get(n))->scfiMeshWrapper;
+}
+
+int csEngine::GetNumMeshFactories ()
+{
+  return mesh_factories.Length ();
+}
+
+iMeshFactoryWrapper *csEngine::GetMeshFactory (int n)
+{
+  return &((csMeshFactoryWrapper*)mesh_factories.Get(n))->
+  	scfiMeshFactoryWrapper;
 }
 
 

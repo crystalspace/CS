@@ -40,7 +40,7 @@ struct iMotionManager;
 struct iLoaderPlugIn;
 
 struct iObject;
-struct iThing;
+struct iThingState;
 struct iCollection;
 struct iSkeletonLimb;
 struct iMaterialWrapper;
@@ -125,7 +125,7 @@ class csLoader : public iLoader
   iSector* load_sector (char* secname, char* buf);
 
   /// Resolve the portals of a thing
-  void ResolvePortalSectors (iThing *Mesh);
+  void ResolvePortalSectors (iThingState *Mesh);
 
   /// Load a Mesh Object Factory from the map file.
   bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact, char* buf);

@@ -40,9 +40,6 @@ class csView;
 class csEngine;
 class csPixmap;
 class csWireFrameCam;
-class csMeshWrapper;
-class csTerrainWrapper;
-class csLight;
 class InfiniteMaze;
 class HugeRoom;
 struct iSoundHandle;
@@ -51,6 +48,10 @@ struct iPerfStats;
 struct iConfigFile;
 struct iMaterialHandle;
 struct iLoader;
+struct iMeshWrapper;
+struct iTerrainWrapper;
+struct iLight;
+struct iPolygon3D;
 
 // type information
 extern INTERFACE_ID_VAR (csWalkEntity);
@@ -279,16 +280,16 @@ public:
   csView* view;
 
   /// A pointer to a skybox to animate (if any).
-  csMeshWrapper* anim_sky;
+  iMeshWrapper* anim_sky;
   /// Speed of this animation (with 1 meaning 1 full rotation in a second).
   float anim_sky_speed;
   /// Rotation direction (0=x, 1=y, 2=z)
   int anim_sky_rot;
 
   /// A pointer to the terrain for which we animate the dirlight.
-  csTerrainWrapper* anim_dirlight;
+  iTerrainWrapper* anim_dirlight;
   /// A pointer to a pseudo-dynamic light that we're animating.
-  csLight* anim_dynlight;
+  iLight* anim_dynlight;
 
   /// A sprite to display the Crystal Space Logo
   csPixmap* cslogo;
@@ -323,9 +324,9 @@ public:
   int fgcolor_stats;
 
   /// The selected light.
-  csLight* selected_light;
+  iLight* selected_light;
   /// The selected polygon.
-  csPolygon3D* selected_polygon;
+  iPolygon3D* selected_polygon;
 
   /// Debug box 1.
   csBox3 debug_box1;
@@ -352,7 +353,7 @@ public:
   iCollideSystem* collide_system;
 
   /// Player's body (as a 3D model) and legs
-  csMeshWrapper *plbody, *pllegs;
+  iMeshWrapper *plbody, *pllegs;
 
   /// The console input plugin
   iConsoleInput *ConsoleInput;

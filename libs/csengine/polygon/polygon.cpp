@@ -555,9 +555,9 @@ iPolyTexType* csPolygon3D::eiPolygon3D::GetPolyTexType ()
   return (iPolyTexType*)scfParent->GetTextureTypeInfo ();
 }
 
-iThing* csPolygon3D::eiPolygon3D::GetParent ()
+iThingState* csPolygon3D::eiPolygon3D::GetParent ()
 {
-  iThing* it = QUERY_INTERFACE (scfParent->GetParent (), iThing);
+  iThingState* it = QUERY_INTERFACE (scfParent->GetParent (), iThingState);
   it->DecRef ();
   return it;
 }

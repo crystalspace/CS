@@ -411,6 +411,12 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
   c->GetMovable ().SetParent (&scfParent->movable);
 }
 
+iMeshWrapper* csMeshWrapper::MeshWrapper::GetChild (int idx)
+{
+  csMeshWrapper* child = (csMeshWrapper*)(scfParent->GetChildren ()[idx]);
+  return &(child->scfiMeshWrapper);
+}
+
 //--------------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csMeshFactoryWrapper)
@@ -462,5 +468,4 @@ void csMeshFactoryWrapper::HardTransform (const csReversibleTransform& t)
 {
   meshFact->HardTransform (t);
 }
-
 

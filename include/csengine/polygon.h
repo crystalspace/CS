@@ -1202,7 +1202,7 @@ public:
 
     virtual csPolygon3D *GetPrivateObject () { return scfParent; }
     virtual iObject *QueryObject() {return scfParent;}
-    virtual iThing *GetParent ();
+    virtual iThingState *GetParent ();
     virtual iLightMap *GetLightMap ()
     {
       csPolyTexLightMap *lm = scfParent->GetLightMapInfo ();

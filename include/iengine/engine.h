@@ -137,7 +137,7 @@ struct iKeyValuePair;
 typedef void (csDrawFunc) (iRenderView* rview, int type, void* entity);
 
 
-SCF_VERSION (iEngine, 0, 1, 26);
+SCF_VERSION (iEngine, 0, 1, 27);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -456,6 +456,11 @@ struct iEngine : public iPlugIn
   virtual int GetNumMeshObjects () = 0;
   /// return a mesh object by index
   virtual iMeshWrapper *GetMeshObject (int n) = 0;
+
+  /// return the number of mesh factories
+  virtual int GetNumMeshFactories () = 0;
+  /// return a mesh object by index
+  virtual iMeshFactoryWrapper *GetMeshFactory (int n) = 0;
 
   /**
    * Conveniance function to create a terrain factory from a given type.

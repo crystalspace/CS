@@ -613,10 +613,10 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   view->GetCamera ()->InvPerspective (p, 1, v);
   csVector3 vw = view->GetCamera ()->GetTransform ().This2Other (v);
 
-  csSector* sector = view->GetCamera ()->GetSector ()->GetPrivateObject ();
+  iSector* sector = view->GetCamera ()->GetSector ();
   csVector3 origin = view->GetCamera ()->GetTransform ().GetO2TTranslation ();
   csVector3 isect;
-  csPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 20, isect);
+  iPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 20, isect);
 
   vw = isect;
   v = view->GetCamera ()->GetTransform ().Other2This (vw);
@@ -630,9 +630,12 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
     else
       Sys->selected_polygon = sel;
 
-    csThing* ps = sel->GetParent ();
-    Sys->Printf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n", ps->GetName (), sel->GetName ());
+    iThingState* ps = sel->GetParent ();
+    iObject* psobj = QUERY_INTERFACE (ps, iObject);
+    Sys->Printf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
+    	psobj->GetName (), sel->QueryObject ()->GetName ());
     Dumper::dump (sel);
+    psobj->DecRef ();
   }
 
   extern csVector2 coord_check_vector;

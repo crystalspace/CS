@@ -32,7 +32,7 @@ struct iLight;
 struct iLightMap;
 struct iPortal;
 struct iSector;
-struct iThing;
+struct iThingState;
 struct iPolyTexType;
 struct iObject;
 
@@ -68,9 +68,9 @@ struct iPolygon3D : public iBase
   virtual iObject *QueryObject() = 0;
   /**
    * Get the thing (container) that this polygon belongs to.
-   * The reference counter on iThing is NOT incremented.
+   * The reference counter on iThingState is NOT incremented.
    */
-  virtual iThing *GetParent () = 0;
+  virtual iThingState *GetParent () = 0;
   /// Get the lightmap associated with this polygon
   virtual iLightMap *GetLightMap () = 0;
   /// Get the handle to the polygon texture object

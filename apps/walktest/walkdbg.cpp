@@ -162,7 +162,7 @@ void select_object (iRenderView* rview, int type, void* entity)
     csVector3 v;
     float iz;
     int px, py, r;
-    for (i = 0 ; i < sector->GetNumberLights () ; i++)
+    for (i = 0 ; i < sector->GetLightCount () ; i++)
     {
       v = rview->Other2This (sector->GetLight (i)->GetCenter ());
       if (v.z > SMALL_Z)
@@ -429,7 +429,7 @@ void draw_edges (iRenderView* rview, int type, void* entity)
     csVector3 v;
     float iz;
     int px, py, r;
-    for (i = 0 ; i < sector->GetNumberLights () ; i++)
+    for (i = 0 ; i < sector->GetLightCount () ; i++)
     {
       csStatLight* light = sector->GetLight (i);
       if (!hilighted_only || Sys->selected_light == light)
@@ -471,7 +471,7 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
   {
     csSector* sector = (csSector*)entity;
     int i;
-    for (i = 0 ; i < sector->GetNumberLights () ; i++)
+    for (i = 0 ; i < sector->GetLightCount () ; i++)
     {
       csWfVertex* vt = wf->AddVertex (sector->GetLight (i)->GetCenter ());
       vt->SetColor (wf->GetRed ());
@@ -780,32 +780,33 @@ void DrawOctreeBoxes (csOctreeNode* node,
   if (draw_level != -1 && level > draw_level) return;
   if (level == draw_level || (draw_level == -1 && node->IsLeaf ()))
   {
-    csCamera* cam = Sys->view->GetCamera ()->GetPrivateObject ();
+    iCamera* cam = Sys->view->GetCamera ();
+    csOrthoTransform& ct = cam->GetTransform ();
     const csBox3& box = node->GetBox ();
-    DrawLineDepth (cam->Other2This (box.GetCorner (0)),
-  		   cam->Other2This (box.GetCorner (1)), cam->GetFOV ());
-    DrawLineDepth (cam->Other2This (box.GetCorner (0)),
-  		   cam->Other2This (box.GetCorner (2)), cam->GetFOV ());
-    DrawLineDepth (cam->Other2This (box.GetCorner (0)),
-  		   cam->Other2This (box.GetCorner (4)), cam->GetFOV ());
-    DrawLineDepth (cam->Other2This (box.GetCorner (7)),
-  		   cam->Other2This (box.GetCorner (3)), cam->GetFOV ());
-    DrawLineDepth (cam->Other2This (box.GetCorner (7)),
-  		   cam->Other2This (box.GetCorner (6)), cam->GetFOV ());
-    DrawLineDepth (cam->Other2This (box.GetCorner (6)),
-  		   cam->Other2This (box.GetCorner (2)), cam->GetFOV ());
-    DrawLineDepth (cam->Other2This (box.GetCorner (6)),
-  		   cam->Other2This (box.GetCorner (4)), cam->GetFOV ());
-    DrawLineDepth (cam->Other2This (box.GetCorner (3)),
-  		   cam->Other2This (box.GetCorner (2)), cam->GetFOV ());
-    DrawLineDepth (cam->Other2This (box.GetCorner (3)),
-  		   cam->Other2This (box.GetCorner (1)), cam->GetFOV ());
-    DrawLineDepth (cam->Other2This (box.GetCorner (5)),
-  		   cam->Other2This (box.GetCorner (1)), cam->GetFOV ());
-    DrawLineDepth (cam->Other2This (box.GetCorner (5)),
-  		   cam->Other2This (box.GetCorner (4)), cam->GetFOV ());
-    DrawLineDepth (cam->Other2This (box.GetCorner (5)),
-  		   cam->Other2This (box.GetCorner (7)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (0)),
+  		   ct.Other2This (box.GetCorner (1)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (0)),
+  		   ct.Other2This (box.GetCorner (2)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (0)),
+  		   ct.Other2This (box.GetCorner (4)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (7)),
+  		   ct.Other2This (box.GetCorner (3)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (7)),
+  		   ct.Other2This (box.GetCorner (6)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (6)),
+  		   ct.Other2This (box.GetCorner (2)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (6)),
+  		   ct.Other2This (box.GetCorner (4)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (3)),
+  		   ct.Other2This (box.GetCorner (2)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (3)),
+  		   ct.Other2This (box.GetCorner (1)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (5)),
+  		   ct.Other2This (box.GetCorner (1)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (5)),
+  		   ct.Other2This (box.GetCorner (4)), cam->GetFOV ());
+    DrawLineDepth (ct.Other2This (box.GetCorner (5)),
+  		   ct.Other2This (box.GetCorner (7)), cam->GetFOV ());
   }
   int i;
   for (i = 0 ; i < 8 ; i++)

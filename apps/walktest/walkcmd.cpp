@@ -215,16 +215,17 @@ void LoadRecording (iVFS* vfs, const char* fName)
 void SaveCamera (iVFS* vfs, const char *fName)
 {
   if (!Sys->view) return;
-  csCamera *c = Sys->view->GetCamera ()->GetPrivateObject ();
+  iCamera *c = Sys->view->GetCamera ();
+  csOrthoTransform& camtrans = c->GetTransform ();
   if (!c) return;
-  const csMatrix3& m_o2t = c->GetO2T ();
-  const csVector3& v_o2t = c->GetOrigin ();
+  const csMatrix3& m_o2t = camtrans.GetO2T ();
+  const csVector3& v_o2t = camtrans.GetOrigin ();
   csString s;
   s << v_o2t.x << ' ' << v_o2t.y << ' ' << v_o2t.z << '\n'
     << m_o2t.m11 << ' ' << m_o2t.m12 << ' ' << m_o2t.m13 << '\n'
     << m_o2t.m21 << ' ' << m_o2t.m22 << ' ' << m_o2t.m23 << '\n'
     << m_o2t.m31 << ' ' << m_o2t.m32 << ' ' << m_o2t.m33 << '\n'
-    << '"' << c->GetSector ()->GetName () << "\"\n"
+    << '"' << c->GetSector ()->QueryObject ()->GetName () << "\"\n"
     << c->IsMirrored () << '\n'
     << Sys->angle.x << ' ' << Sys->angle.y << ' ' << Sys->angle.z << '\n';
   vfs->WriteFile (fName, s.GetData(), s.Length());
@@ -471,7 +472,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
         if (rot[0] == 'x') anim_sky_rot = 0;
         else if (rot[0] == 'y') anim_sky_rot = 1;
         else anim_sky_rot = 2;
-        anim_sky = Sector->GetPrivateObject ()->GetMesh (name);
+        anim_sky = Sector->GetMesh (name);
 	Sector->DecRef ();
       }
     }
@@ -480,7 +481,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
       iTerrainWrapper *wrap = QUERY_INTERFACE_FAST (src, iTerrainWrapper);
       if (wrap)
       {
-        anim_dirlight = wrap->GetPrivateObject ();
+        anim_dirlight = wrap;
 	wrap->DecRef ();
       }
     }
@@ -489,7 +490,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
       iLight* l = QUERY_INTERFACE_FAST (src, iLight);
       if (l)
       {
-        anim_dynlight = l->GetPrivateObject ();
+        anim_dynlight = l;
 	l->DecRef ();
       }
     }
@@ -570,9 +571,9 @@ void WalkTest::ParseKeyCmds (csObject* src)
   if (mesh)
   {
     int k;
-    for (k = 0 ; k < mesh->GetPrivateObject ()->GetChildren ().Length () ; k++)
+    for (k = 0 ; k < mesh->GetChildCount () ; k++)
     {
-      csMeshWrapper* spr = (csMeshWrapper*)(mesh->GetPrivateObject ()->GetChildren ()[k]);
+      csMeshWrapper* spr = mesh->GetChild (k)->GetPrivateObject ();
       ParseKeyCmds (spr);
     }
     mesh->DecRef ();
@@ -589,17 +590,17 @@ void WalkTest::ParseKeyCmds ()
     ParseKeyCmds (sector);
 
     int j;
-    for (j = 0 ; j < sector->GetNumberMeshes () ; j++)
+    for (j = 0 ; j < sector->GetMeshCount () ; j++)
     {
       csMeshWrapper* sprite = sector->GetMesh (j);
       ParseKeyCmds (sprite);
     }
-    for (j = 0 ; j < sector->GetNumberTerrains () ; j++)
+    for (j = 0 ; j < sector->GetTerrainCount () ; j++)
     {
       csTerrainWrapper* terr = sector->GetTerrain (j);
       ParseKeyCmds (terr);
     }
-    for (j = 0 ; j < sector->GetNumberLights () ; j++)
+    for (j = 0 ; j < sector->GetLightCount () ; j++)
     {
       csStatLight* l = sector->GetLight (j);
       ParseKeyCmds (l);
@@ -1126,7 +1127,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     csRadiosity* rad;
     if ((rad = Sys->engine->GetRadiosity ()) != NULL)
-      Sys->selected_polygon = rad->GetNextPolygon ();
+    {
+      Sys->selected_polygon = QUERY_INTERFACE (rad->GetNextPolygon (),
+      	iPolygon3D);
+      Sys->selected_polygon->DecRef ();
+    }
   }
   else if (!strcasecmp (cmd, "palette"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_palette, "palette");

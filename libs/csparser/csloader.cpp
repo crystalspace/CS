@@ -1420,7 +1420,7 @@ iSector* csLoader::load_sector (char* secname, char* buf)
 
 //---------------------------------------------------------------------------
 
-void csLoader::ResolvePortalSectors (iThing *th)
+void csLoader::ResolvePortalSectors (iThingState *th)
 {
   for (int i=0;  i < th->GetPolygonCount ();  i++)
   {
@@ -1588,7 +1588,8 @@ bool csLoader::LoadMap (char* buf)
       iMeshWrapper *Mesh    = Sector->GetMesh(j);
       if (Mesh)
       {
-        iThing *Thing = QUERY_INTERFACE_SAFE (Mesh->GetMeshObject(), iThing);
+        iThingState* Thing = QUERY_INTERFACE_SAFE (
+		Mesh->GetMeshObject(), iThingState);
         if (Thing)
         {
           ResolvePortalSectors (Thing);

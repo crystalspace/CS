@@ -2263,7 +2263,7 @@ void Blocks::StartNewGame ()
     iMeshWrapper* cube = room->GetMesh (i);
     if (!strncmp (cube->QueryObject ()->GetName (), "cube", 4))
     {
-      room->RemoveMesh (cube);
+      room->UnlinkMesh (cube);
       cube->DecRef ();
     }
     else
@@ -2292,7 +2292,7 @@ void Blocks::removePlanesVisual (States* player)
         { // Physically remove it.
           char temp[20];
           sprintf (temp, "cubeAt%d%d%d", x, y, z);
-	  iMeshWrapper* th = room->FindMesh (temp);
+	  iMeshWrapper* th = room->GetMesh (temp);
 	  th->GetMovable ()->ClearSectors ();
 	  th->GetMovable ()->UpdateMove ();
         }
@@ -2356,7 +2356,7 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
 	  player1->set_cube (x, y, z-1, player1->get_cube (x, y, z));
           sprintf (temp, "cubeAt%d%d%d", x, y, z);
 
-  	  t = room->FindMesh (temp);
+  	  t = room->GetMesh (temp);
           if (t)
 	  {
             sprintf (temp, "cubeAt%d%d%d", x, y, z-1);
@@ -2386,7 +2386,7 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
 	sprintf (temp, "cubeAt%d%d%d", x, y, z);
         // Only if there is a thing at that certain position, or less
 	// then CUBE_DIM lower.
-	t = room->FindMesh (temp);
+	t = room->GetMesh (temp);
 	if (t)
 	{
           t->GetMovable ()->MovePosition (csVector3 (0, -elapsed_fall, 0));

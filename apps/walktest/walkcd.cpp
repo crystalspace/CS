@@ -85,10 +85,9 @@ void WalkTest::CreateColliders ()
   iMeshObjectFactory* thing_fact = engine->GetThingType ()->NewFactory ();
   iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
-  plbody = new csMeshWrapper (engine, mesh_obj);
-  mesh_obj->DecRef ();
-  plbody->SetName ("Player's Body");
+  plbody = engine->CreateMeshObject (mesh_obj, "Player's Body");
   iThingState* thing_state = QUERY_INTERFACE (mesh_obj, iThingState);
+  mesh_obj->DecRef ();
 
   thing_state->CreateVertex (csVector3 (-DX_2, OY,    -DZ_2));
   thing_state->CreateVertex (csVector3 (-DX_2, OY,    DZ_2));
@@ -130,7 +129,7 @@ void WalkTest::CreateColliders ()
   p->CreateVertex (7); p->CreateVertex (3);
 
   mesh = QUERY_INTERFACE (mesh_obj, iPolygonMesh);
-  body = new csCollider (*plbody, collide_system, mesh);
+  body = new csCollider (plbody->QueryObject (), collide_system, mesh);
   body_radius = plbody->GetRadius ();
   mesh->DecRef ();
   thing_state->DecRef ();
@@ -138,10 +137,9 @@ void WalkTest::CreateColliders ()
   thing_fact = engine->GetThingType ()-> NewFactory ();
   mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
-  pllegs = new csMeshWrapper (engine, mesh_obj);
-  mesh_obj->DecRef ();
-  pllegs->SetName ("Player's Legs");
+  pllegs = engine->CreateMeshObject (mesh_obj, "Player's Legs");
   thing_state = QUERY_INTERFACE (mesh_obj, iThingState);
+  mesh_obj->DecRef ();
 
   thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     -DZ_2L));
   thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     DZ_2L));
@@ -183,7 +181,7 @@ void WalkTest::CreateColliders ()
   p->CreateVertex (7); p->CreateVertex (3);
 
   mesh = QUERY_INTERFACE (mesh_obj, iPolygonMesh);
-  legs = new csCollider (*pllegs, collide_system, mesh);
+  legs = new csCollider (pllegs->QueryObject (), collide_system, mesh);
   legs_radius = pllegs->GetRadius ();
   mesh->DecRef ();
   thing_state->DecRef ();
@@ -231,7 +229,7 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
     return 1;
 
   // Check collision with the meshes in this sector.
-  for (i = 0 ; i < sp->GetNumberMeshes () ; i++)
+  for (i = 0 ; i < sp->GetMeshCount () ; i++)
   {
     csMeshWrapper* tp = sp->GetMesh (i);
     Sys->collide_system->ResetCollisionPairs ();
@@ -271,10 +269,10 @@ void DoGravity (csVector3& pos, csVector3& vel)
   int k;
   for ( k = 0; k < num_sectors ; k++)
   {
-    if (n[k]->GetNumberTerrains () > 0)
+    if (n[k]->GetTerrainCount () > 0)
     {
       int i;
-      for (i = 0 ; i < n[k]->GetNumberTerrains () ; i++)
+      for (i = 0 ; i < n[k]->GetTerrainCount () ; i++)
       {
 	      csTerrainWrapper* terrain = n[k]->GetTerrain( i );
 	      hits += terrain->CollisionDetect( &test );

@@ -96,6 +96,11 @@ void Dumper::dump (csPolyTxtPlane* p)
   dump (&p->v_world2tex, "Vwt");
 }
 
+void Dumper::dump (iPolygon3D* p)
+{
+  dump (p->GetPrivateObject ());
+}
+
 void Dumper::dump (csPolygon3D* p)
 {
   csThing* ps = p->GetParent ();

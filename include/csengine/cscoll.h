@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -109,6 +109,7 @@ public:
   struct Collection : public iCollection
   {
     DECLARE_EMBEDDED_IBASE (csCollection);
+    virtual void* GetPrivateObject () { return (void*)scfParent; }
     virtual iObject *QueryObject()
       { return scfParent; }
     virtual iMovable* GetMovable () const

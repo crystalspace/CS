@@ -292,7 +292,7 @@ Alex Pfaffe (@email{ddg@@oz.net})
 Alex integrated Crystal Space with the @sc{vcollide} library for collision
 detection.  Later he removed @sc{vcollide} and used @sc{rapid} instead.  He
 then rewrote @sc{rapid} to work better with Crystal Space.  He also
-contributed the @sc{ddg} landscape engine which is now integrated with
+contributed the @sc{ddg} landscape engine which used to be integrated with
 Crystal Space.
 
 @item

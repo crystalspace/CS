@@ -1148,11 +1148,16 @@ void csTerrFuncObject::RecomputeLighting (int lod, int bx, int by)
     for (i = 0 ; i < m->num_vertices ; i++, vtcols++)
     {
       float l = dirlight * *(norms++);
-      vtcols->Set (
+      if (l <= 0)
+        vtcols->Set (
+		base_color.red,
+		base_color.green,
+		base_color.blue);
+      else
+        vtcols->Set (
 		base_color.red+dirlight_color.red * l,
 		base_color.green+dirlight_color.green * l,
 		base_color.blue+dirlight_color.blue * l);
-      vtcols->ClampDown ();
     }
   }
 }

@@ -8,6 +8,44 @@ The history order is reversed so that new features are at the top.
 	  fix csVector, but I would need to clear it with Jorrit first since
 	  CS is HEAVILY dependent on csVector. If I break it, there will be a
 	  lot of pieces to keep 8).
+	- Michael Voasse did more bug stomping in motion manager. Removed
+	  reverse flag, its now handled by setting a negative rate. Recoded
+	  UpdateAppliedMotion() to actually *work*. Removed the total time
+	  from ACTIONSET. Total time is now taken as the last frame time as
+	  it was before. Added a frame count check to ApplyMotion. It will
+	  not compile a frameset with less than two frames ( however, if
+	  people want this feature please say so and I will add it... I
+	  just dont think its necessary ).  Adjusted spr3dldr and walktest
+	  to suit. I would consider motion manager now at beta and ready for
+	  general testing and possible inclusion into RC 1.0 ( ie, I have
+	  used and tested all available features ). SCF versions for
+	  motion.h have been bumped to 0.9.x to indicate beta test phase.
+  	  Note: You will need to do a recompile with depend to get spr3dldr
+  	  and walktest going again.
+	- Removed the old and obsolete iThing interface. Added
+	  GetPrivateObject() to iThingState.
+	- Extended iSector with functions to query/add/remove collections.
+	- Extended iSector with GetNumLights() and GetLight().
+	- Added iSector::HitBeam().
+	- Added GetPrivateObject() to iCollection.
+	- Added iEngine::GetNumMeshFactories() and GetMeshFactory().
+	- Rationalized a bit of the engine API. Changed the following (replace
+	  'Bla' in the following with whatever it is you are working on):
+		- csSector: GetNumberBla() to GetBlaCount()
+		- iSector: RemoveBla() to UnlinkBla()
+		- iSector: FindBla(char* name) to GetBla()
+	- Changed csCameraPosition::Load() to work with iCamera and iEngine
+	  instead of csCamera and csEngine.
+	- Added iMeshWrapper::GetChildCount() and GetChild().
+	- Added iMeshWrapper::GetRadius().
+	- Reworked walktest so that it uses SCF interfaces more instead of
+	  the direct classes. This avoids a lot of GetPrivateObject() calls.
+	- Fixed all other apps to the changes above.
+	- Removed the DDG landscape engine.
+	- Fixed a bug in the landscape engine. If a light is after a triangle
+	  it would actually subtract from the base color. Thanks to Wouter
+	  Wijngaards for spotting this. This also improves speed of dynamic
+	  lighting because there is no more need to clamp down.
 	- Eric Sunshine removed obsolete references to
 	  crystalspace.string.server from several files.
 	- Eric Sunshine worked around a NextStep compiler limitation where it
@@ -32,6 +70,7 @@ The history order is reversed so that new features are at the top.
 	  loadinfo.h header which contains forward references to a couple
 	  csengine classes.  I also moved loadinfo.h to the CVS Attic since it
 	  is no longer used.
+	- Philip fixed some warnings in the python plugin.
 31-May-2001
 	- In an effort to understand how the keyframer section in 3DS
 	  works I extended 3ds2lev verbose option to also list the contents

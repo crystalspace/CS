@@ -356,32 +356,32 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
   // First move the sky.
   if (anim_sky)
   {
-    csMovable& move = anim_sky->GetMovable ();
+    iMovable* move = anim_sky->GetMovable ();
     switch (anim_sky_rot)
     {
       case 0:
 	{
           csXRotMatrix3 mat (anim_sky_speed * 2. * M_PI
 	  	* (float)elapsed_time/1000.);
-          move.Transform (mat);
+          move->Transform (mat);
 	  break;
 	}
       case 1:
 	{
           csYRotMatrix3 mat (anim_sky_speed * 2. * M_PI
 	  	* (float)elapsed_time/1000.);
-          move.Transform (mat);
+          move->Transform (mat);
 	  break;
 	}
       case 2:
 	{
           csZRotMatrix3 mat (anim_sky_speed * 2. * M_PI
 	  	* (float)elapsed_time/1000.);
-          move.Transform (mat);
+          move->Transform (mat);
 	  break;
 	}
     }
-    move.UpdateMove ();
+    move->UpdateMove ();
   }
   // Move the directional light if any.
   if (anim_dirlight)
@@ -1185,35 +1185,35 @@ void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
   Sys->Printf (MSG_INITIALIZATION, "Computing OBBs ...\n");
 
   iPolygonMesh* mesh;
-  int sn = engine->sectors.Length ();
+  int sn = engine->GetSectorCount ();
   while (sn > 0)
   {
     sn--;
-    csSector* sp = (csSector*)engine->sectors[sn];
-    if (region && !region->IsInRegion (sp)) continue;
+    iSector* sp = engine->GetSector (sn);
+    if (region && !region->IsInRegion (sp->QueryObject ())) continue;
     // Initialize the things in this sector.
     int i;
-    for (i = 0 ; i < sp->GetNumberMeshes () ; i++)
+    for (i = 0 ; i < sp->GetMeshCount () ; i++)
     {
-      csMeshWrapper* tp = sp->GetMesh (i);
+      iMeshWrapper* tp = sp->GetMesh (i);
       mesh = QUERY_INTERFACE (tp->GetMeshObject (), iPolygonMesh);
       if (mesh)
       {
-        (void)new csCollider (*tp, collide_system, mesh);
+        (void)new csCollider (tp->QueryObject (), collide_system, mesh);
         mesh->DecRef ();
       }
     }
   }
   // Initialize all mesh objects for collision detection.
   int i;
-  for (i = 0 ; i < engine->meshes.Length () ; i++)
+  for (i = 0 ; i < engine->GetNumMeshObjects () ; i++)
   {
-    csMeshWrapper* sp = (csMeshWrapper*)engine->meshes[i];
-    if (region && !region->IsInRegion (sp)) continue;
+    iMeshWrapper* sp = engine->GetMeshObject (i);
+    if (region && !region->IsInRegion (sp->QueryObject ())) continue;
     mesh = QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
     if (mesh)
     {
-      (void)new csCollider (*sp, collide_system, mesh);
+      (void)new csCollider (sp->QueryObject (), collide_system, mesh);
       mesh->DecRef ();
     }
   }
@@ -1517,7 +1517,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     if (cp)
     {
       room_name = cp->Sector;
-      if (!cp->Load (*view->GetCamera ()->GetPrivateObject (), engine))
+      if (!cp->Load (view->GetCamera (), engine))
         room_name = "room";
     }
     else

@@ -176,7 +176,7 @@ public:
   /**
    * Get the number of meshes in this sector.
    */
-  int GetNumberMeshes ()
+  int GetMeshCount ()
   {
     return meshes.Length ();
   }
@@ -211,7 +211,7 @@ public:
   /**
    * Get the number of collections in this sector.
    */
-  int GetNumberCollections ()
+  int GetCollectionCount ()
   {
     return collections.Length ();
   }
@@ -246,7 +246,7 @@ public:
   /**
    * Get the number of lights in this sector.
    */
-  int GetNumberLights ()
+  int GetLightCount ()
   {
     return lights.Length ();
   }
@@ -294,7 +294,7 @@ public:
   /**
    * Get the number of terrains in this sector.
    */
-  int GetNumberTerrains ()
+  int GetTerrainCount ()
   {
     return terrains.Length ();
   }
@@ -518,6 +518,7 @@ public:
     { return (csSector*)scfParent; }
     virtual iObject *QueryObject()
     { return scfParent; }
+    virtual int GetRecLevel () { return scfParent->draw_busy; }
     virtual void SetVisibilityCuller (const char *Name)
     {
       scfParent->UseCuller (Name);
@@ -526,13 +527,34 @@ public:
     {
       return scfParent->GetVisibilityCuller ();
     }
-    virtual int GetMeshCount ();
+
+    virtual int GetMeshCount () { return scfParent->GetMeshCount (); }
     virtual iMeshWrapper *GetMesh (int n);
     virtual void AddMesh (iMeshWrapper *pMesh);
-    virtual int GetTerrainCount ();
+    virtual iMeshWrapper *GetMesh (const char *name);
+    virtual void UnlinkMesh (iMeshWrapper *pMesh)
+    { scfParent->UnlinkMesh (pMesh->GetPrivateObject ()); }
+
+    virtual int GetTerrainCount () { return scfParent->GetTerrainCount (); }
     virtual iTerrainWrapper *GetTerrain (int n);
     virtual void AddTerrain (iTerrainWrapper *pTerrain);
+    virtual iTerrainWrapper *GetTerrain (const char *name);
+    virtual void UnlinkTerrain (iTerrainWrapper *pTerrain)
+    { scfParent->UnlinkTerrain (pTerrain->GetPrivateObject ()); }
+
+    virtual int GetCollectionCount ()
+    {
+      return scfParent->GetCollectionCount ();
+    }
+    virtual iCollection* GetCollection (int n);
+    virtual void AddCollection (iCollection* col);
+    virtual iCollection* GetCollection (const char *name);
+    virtual void UnlinkCollection (iCollection* col);
+
     virtual void AddLight (iStatLight *light);
+    virtual int GetLightCount () { return scfParent->GetLightCount (); }
+    virtual iStatLight *GetLight (int n);
+    virtual iStatLight *GetLight (const char* name);
     virtual iStatLight *FindLight (float x, float y, float z, float dist);
     virtual void InitLightMaps (bool do_cache)
     { scfParent->InitLightMaps (do_cache); }
@@ -544,23 +566,23 @@ public:
     { scfParent->CreateLightMaps (g3d); }
     virtual void CacheLightMaps ()
     { scfParent->CacheLightMaps (); }
+
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes,
   	bool do_terrain)
     { scfParent->CalculateSectorBBox (bbox, do_meshes, do_terrain); }
     virtual CS_ID GetID () { return scfParent->GetID (); }
+
     virtual bool HasFog () { return scfParent->HasFog (); }
     virtual csFog *GetFog () { return &scfParent->fog; }
     virtual void SetFog (float density, const csColor& color)
     { scfParent->SetFog (density, color); }
     virtual void DisableFog ()
     { scfParent->DisableFog (); }
-    virtual int GetRecLevel () { return scfParent->draw_busy; }
-    virtual iTerrainWrapper *FindTerrain (const char *name);
-    virtual iMeshWrapper *FindMesh (const char *name);
-    virtual void RemoveMesh (iMeshWrapper *pMesh)
-    { scfParent->UnlinkMesh (pMesh->GetPrivateObject ()); }
-    virtual void RemoveTerrain (iTerrainWrapper *pTerrain)
-    { scfParent->UnlinkTerrain (pTerrain->GetPrivateObject ()); }
+    virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
+  	csVector3& isect);
+    virtual iObject* HitBeam (const csVector3& start, const csVector3& end,
+  	iPolygon3D** polygonPtr);
+
   } scfiSector;
   friend struct eiSector;
 };

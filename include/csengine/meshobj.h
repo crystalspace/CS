@@ -410,6 +410,9 @@ public:
       scfParent->GetTransformedBoundingBox (trans, cbox);
     }
     virtual void AddChild (iMeshWrapper* child);
+    virtual int GetChildCount () { return scfParent->GetChildren ().Length (); }
+    virtual iMeshWrapper* GetChild (int idx);
+    virtual csVector3 GetRadius () { return scfParent->GetRadius (); }
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 

@@ -52,6 +52,7 @@ class csQuadcube;
 class csQuadtree;
 class csQuadtreeNode;
 class csHashSet;
+struct iPolygon3D;
 
 /**
  * This class knows how to dump debug information about several
@@ -84,6 +85,7 @@ public:
   static void dump (csPolyTxtPlane*);
   static void dump (csPolygon2D*, char const* name);
   static void dump (csPolygon3D*);
+  static void dump (iPolygon3D*);
   static void dump (csThing*);
   static void dump (csPolyTexture*, char const* name);
   static void dump (csSector*);
