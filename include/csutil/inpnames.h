@@ -86,7 +86,7 @@ public:
  * Returns the event type described by a free-format string.
  * \param str Strings are in the form "Ctrl+a", "mouse1", "joystickX" etc.
  * \return CSEVTYPE_Keyboard, CSEVTYPE_Mouse, CSEVTYPE_Joystick or 0 if
- *         the string could not be successfully parsed.
+ *   the string could not be successfully parsed.
  */
 CS_CSUTIL_EXPORT int csTypeOfInputDef (const char* str);
 
@@ -97,12 +97,12 @@ CS_CSUTIL_EXPORT int csTypeOfInputDef (const char* str);
  * \param rawCode Pointer to where the raw code is written to.
  * \param cookedCode Pointer to where the cooked code is written to.
  * \param modifiers Pointer where the key modifiers are written to.
- * \returns Whether the string could be successfully parsed. Error can be
+ * \return Whether the string could be successfully parsed. Error can be
  *  unrecognized keys etc.
- * \remark For any piece of information in which you are not interested, pass 0
- *  for the address.
- * \remark The cooked code returned *may* be 0. This is the case if
- *  the non-modifier part is a single letter.
+ * \remarks For any piece of information in which you are not interested, pass
+ *   0 for the address.
+ * \remarks The cooked code returned *may* be 0. This is the case if the
+ *   non-modifier part is a single letter.
  */
 CS_CSUTIL_EXPORT bool csParseKeyDef (const char* str, utf32_char* rawCode,
   utf32_char* cookedCode, csKeyModifiers* modifiers);
@@ -116,7 +116,7 @@ CS_CSUTIL_EXPORT bool csParseKeyDef (const char* str, utf32_char* rawCode,
  * \param modifiers The modifiers to include in the string. Can be 0.
  * \param distinguishModifiers Whether to out put distinguished modifiers.
  *  (e.g. "LAlt" vs just "Alt".)
- * \returns The key string.
+ * \return The key string.
  */
 CS_CSUTIL_EXPORT csString csGetKeyDesc (utf32_char code, 
 			      const csKeyModifiers* modifiers,
@@ -135,8 +135,8 @@ CS_CSUTIL_EXPORT csString csGetKeyDesc (utf32_char code,
  *        this will be -1 if not a mouse button event.
  * \param modifiers pointer to where the modifiers are written to.
  * \return Whether the string could be successfully parsed.
- * \remark For any piece of information in which you are not interested, pass 0
- *  for the address.
+ * \remarks For any piece of information in which you are not interested, pass
+ *   0 for the address.
  */
 CS_CSUTIL_EXPORT bool csParseMouseDef(const char* str, int* x, int* y, 
                             int* button, csKeyModifiers* modifiers);
@@ -151,8 +151,8 @@ CS_CSUTIL_EXPORT bool csParseMouseDef(const char* str, int* x, int* y,
  * \param modifiers The modifiers to include in the string. Can be 0.
  * \param distinguishModifiers Whether to out put distinguished modifiers.
  *  (e.g. "LAlt" vs just "Alt".)
- * \returns The mouse event string or an empty string if translation failed.
- * \remark The resulting event is either a MouseX, MouseY or Button event
+ * \return The mouse event string or an empty string if translation failed.
+ * \remarks The resulting event is either a MouseX, MouseY or Button event
  *         It will be tested in this order. So setting x and y to nonzero will
  *         result in a MouseX event.
  */
@@ -172,15 +172,15 @@ CS_CSUTIL_EXPORT csString csGetMouseDesc (int x, int y, int button,
  *        for example, the string "joystick1" results in *button = 1;
  *        this will be -1 if not a joystick button event.
  * \return Whether the string could be successfully parsed.
- * \remark For any piece of information in which you are not interested, pass 0
- *         for the address.
+ * \remarks For any piece of information in which you are not interested, pass
+ *   0 for the address.
  */
 CS_CSUTIL_EXPORT bool csParseJoystickDef(const char* str, int* x, int* y,
   int* button, csKeyModifiers* modifiers);
 
 /**
- * Convert joystick specifiers and an optional set of modifiers into a free-form
- * joystick event string.
+ * Convert joystick specifiers and an optional set of modifiers into a
+ * free-form joystick event string.
  * \param x If x is not zero, it translates to a JoystickX event.
  * \param y If y is not zero, it translates to a JoystickY event.
  * \param button If button is not zero, it translates to a Joystick<button> 
@@ -188,10 +188,10 @@ CS_CSUTIL_EXPORT bool csParseJoystickDef(const char* str, int* x, int* y,
  * \param modifiers The modifiers to include in the string. Can be 0.
  * \param distinguishModifiers Whether to out put distinguished modifiers.
  *  (e.g. "LAlt" vs just "Alt".)
- * \returns The joystick event string or an empty string if translation failed.
- * \remark The resulting event is either a JoystickX, JoystickY or Button event
- *         It will be tested in this order. So setting x and y to nonzero will
- *         result in a JoystickX event.
+ * \return The joystick event string or an empty string if translation failed.
+ * \remarks The resulting event is either a JoystickX, JoystickY or Button
+ *   event It will be tested in this order. So setting x and y to nonzero will
+ *   result in a JoystickX event.
  */
 CS_CSUTIL_EXPORT csString csGetJoystickDesc (int x, int y, int button,
 			      const csKeyModifiers* modifiers,
