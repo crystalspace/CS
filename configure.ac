@@ -1726,14 +1726,22 @@ AS_IF([test $cs_cv_header_soundcard_h = yes],
 # Check for BSD-style socket support.  Also test for presence of type
 # socklen_t.  Note that we must not include both <winsock.h> and <sys/socket.h>
 # at the same time on Cygwin even though they both exist since the inclusion of
-# both files generates a lot of errors.  Therefore, if <winsock.h> is present,
-# we include only it, otherwise we include <sys/socket.h>.
+# both files generates errors about structures and functions defined
+# differently between <winsock.h> and <sys/socket.h>.  Therefore, if
+# <winsock.h> is present, we include only it, otherwise we include
+# <sys/socket.h>.  A related problem also occurs with the check for presence of
+# <winsock.h> on Cygwin, thus this check is handled specially.  For this check,
+# the "default-includes" normally used by AC_CHECK_HEADER() are suppressed.
+# This prevents complaints about structures and functions in <winsock.h> being
+# defined differently by <sys/types.h> and <unistd.h>
 #------------------------------------------------------------------------------
 m4_define([cs_socket_flags],
     [CS_CREATE_TUPLE() \
     CS_CREATE_TUPLE([], [], [-lsocket]) \
     CS_CREATE_TUPLE([], [], [-lsocket -lnsl]) \
     CS_CREATE_TUPLE([], [], [-lwsock32])])
+
+AC_CHECK_HEADERS([winsock.h], [], [], [/* no default includes */])
 
 AC_CHECK_HEADERS(
     [unistd.h \
@@ -1742,8 +1750,7 @@ AC_CHECK_HEADERS(
     sys/ioctl.h \
     netinet/in.h \
     arpa/inet.h \
-    netdb.h \
-    winsock.h])
+    netdb.h])
 
 CS_CHECK_BUILD([for socket support], [cs_cv_sys_socket],
     [AC_LANG_PROGRAM(

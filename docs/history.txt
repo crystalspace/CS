@@ -40,6 +40,12 @@ The history order is reversed so that new features are at the top.
 	  <sys/socket.h> at the same time even if both are present.  This works
 	  around a problem with Cygwin where including both files causes the
 	  test to fail because the headers are incompatible with one another.
+	- Eric Sunshine changed the <winsock.h> check in the configure script
+	  so that it no longer uses AC_CHECK_HEADERS's "default-includes" when
+	  checking for presence of this file.  This works around a problem on
+	  Cygwin where structures and functions are defined differently between
+	  <winsock.h> and <sys/types.h> and <unistd.h>, all of which are
+	  present with Cygwin.
 25-Feb-2003
 	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.
