@@ -120,56 +120,49 @@ void csPoly2D::Intersect (const csPlane2& plane,
   csVector2 isect;
   float dist;
 
-  // If NULL then don't know, else points to the preferred
-  // polygon to add the edges too.
-  // This is used for trying to put edges
-  // that coincide with the splitter plane on the prefered
-  // side (i.e. a side that contains other edges).
-  csPoly2D* preferred_edge = NULL;
-
-  // If skip is > 0 then we skipped the 'skip' edges because
-  // we didn't have enough information for putting them
-  // on the 'right' polygon.
-  int skip = 0;
+  // The skip variables hold the number of initial skipped vertices.
+  // Those are vertices that are on the plane so in principle they should
+  // get added to both polygons. However, we try not to generate degenerate
+  // polygons (one edge only) so we only add those plane-vertices if
+  // we know that the polygon has other vertices too.
+  int skip_left = 0, skip_right = 0;
 
   left->SetNumVertices (0);
   right->SetNumVertices (0);
 
   i1 = num_vertices-1;
   c1 = plane.Classify (vertices[i1]);
-  if (c1 <= -EPSILON) preferred_edge = left;
-  else if (c1 >= EPSILON) preferred_edge = right;
 
   for (i = 0 ; i < num_vertices ; i++)
   {
     c = plane.Classify (vertices[i]);
     if (c > -EPSILON && c < EPSILON)
     {
-      // This vertex is on the edge. Add it to the
-      // left or right polygon depending on preferred_edge.
-      if (preferred_edge == NULL)
-      {
-        // The previous vertex was also on the edge and we
-	// don't have enough information about the preferred
-	// side to use. Skip this edge for later.
-	skip++;
-      }
+      // This vertex is on the edge. Add it to both polygons
+      // unless the polygon has no vertices yet. In that
+      // case we remember it for later (skip_xxx var) so
+      // that we can later add them if the polygon ever
+      // gets vertices.
+      if (left->GetNumVertices ())
+        left->AddVertex (vertices[i]);
       else
-	preferred_edge->AddVertex (vertices[i]);
+        skip_left++;
+      if (right->GetNumVertices ())
+        right->AddVertex (vertices[i]);
+      else
+        skip_right++;
     }
     else if (c <= -EPSILON && c1 < EPSILON)
     {
       // This vertex is on the left and the previous
       // vertex is not right (i.e. on the left or on the edge).
       left->AddVertex (vertices[i]);
-      preferred_edge = left;
     }
     else if (c >= EPSILON && c1 > -EPSILON)
     {
       // This vertex is on the right and the previous
       // vertex is not left.
       right->AddVertex (vertices[i]);
-      preferred_edge = right;
     }
     else
     {
@@ -179,33 +172,35 @@ void csPoly2D::Intersect (const csPlane2& plane,
       right->AddVertex (isect);
       left->AddVertex (isect);
       if (c <= 0)
-      {
 	left->AddVertex (vertices[i]);
-	preferred_edge = left;
-      }
       else
-      {
 	right->AddVertex (vertices[i]);
-	preferred_edge = right;
-      }
     }
 
     i1 = i;
     c1 = c;
   }
 
-  if (!preferred_edge) return; //@@@ INVESTIGATE THIS CASE!!!
-
-  // If skip > 0 then there are a number of edges in
-  // the beginning that we ignored. These edges are all coplanar
-  // with 'plane'. We will add them to the preferred side.
+  // If skip_xxx > 0 then there are a number of vertices in
+  // the beginning that we ignored. These vertices are all on
+  // 'plane'. We will add them to the corresponding polygon if
+  // that polygon is not empty.
   i = 0;
-  while (skip > 0)
-  {
-    preferred_edge->AddVertex (vertices[i]);
-    i++;
-    skip--;
-  }
+  if (left->GetNumVertices ())
+    while (skip_left > 0)
+    {
+      left->AddVertex (vertices[i]);
+      i++;
+      skip_left--;
+    }
+  i = 0;
+  if (right->GetNumVertices ())
+    while (skip_right > 0)
+    {
+      right->AddVertex (vertices[i]);
+      i++;
+      skip_right--;
+    }
 }
 
 //---------------------------------------------------------------------------

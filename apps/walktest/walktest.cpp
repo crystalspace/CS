@@ -556,31 +556,39 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 #	if 1
 	solidbsp->MakeEmpty ();
 	csCamera* c = view->GetCamera ();
-	csPolygon2D poly1, poly2, poly3;
+	csPolygon2D poly1, poly2, poly3, poly4;
 	poly1.AddPerspective (c->Other2This (csVector3 (-1.6, 1, 5)));
 	poly1.AddPerspective (c->Other2This (csVector3 (1, 1.6, 5)));
 	poly1.AddPerspective (c->Other2This (csVector3 (1, -1, 5)));
 	poly1.AddPerspective (c->Other2This (csVector3 (-1, -1.3, 5)));
-	solidbsp->InsertPolygon (poly1.GetVertices (),
-		poly1.GetNumVertices ());
+	//solidbsp->InsertPolygon (poly1.GetVertices (),
+		//poly1.GetNumVertices ());
 	poly2.AddPerspective (c->Other2This (csVector3 (-1.5, .5, 6)));
 	poly2.AddPerspective (c->Other2This (csVector3 (.5, .5, 6)));
 	poly2.AddPerspective (c->Other2This (csVector3 (.5, -1.5, 6)));
 	poly2.AddPerspective (c->Other2This (csVector3 (-1.5, -1.5, 6)));
-	//printf ("T2:%d ", solidbsp->TestPolygon (poly2.GetVertices (),
-		//poly2.GetNumVertices ()));
-	printf ("P2:%d ", solidbsp->InsertPolygon (poly2.GetVertices (),
+	printf ("T2:%d ", solidbsp->TestPolygon (poly2.GetVertices (),
 		poly2.GetNumVertices ()));
+	//printf ("P2:%d ", solidbsp->InsertPolygon (poly2.GetVertices (),
+		//poly2.GetNumVertices ()));
 	poly3.AddPerspective (c->Other2This (csVector3 (-.5, .15, 7)));
 	poly3.AddPerspective (c->Other2This (csVector3 (1.5, .15, 7)));
 	poly3.AddPerspective (c->Other2This (csVector3 (1.5, -.5, 7)));
-	//printf ("T3:%d ", solidbsp->TestPolygon (poly3.GetVertices (),
-		//poly3.GetNumVertices ()));
-	printf ("P3:%d\n", solidbsp->InsertPolygon (poly3.GetVertices (),
+	printf ("T3:%d ", solidbsp->TestPolygon (poly3.GetVertices (),
 		poly3.GetNumVertices ()));
-	poly1.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (0, 100, 100));
-	poly2.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 0, 100));
+	printf ("P3:%d ", solidbsp->InsertPolygon (poly3.GetVertices (),
+		poly3.GetNumVertices ()));
+	poly4.AddPerspective (c->Other2This (csVector3 (1.5, -.5, 7)));
+	poly4.AddPerspective (c->Other2This (csVector3 (1.5, .15, 7)));
+	poly4.AddPerspective (c->Other2This (csVector3 (2.5, .15, 7)));
+	printf ("T4:%d ", solidbsp->TestPolygon (poly4.GetVertices (),
+		poly4.GetNumVertices ()));
+	printf ("P4:%d\n", solidbsp->InsertPolygon (poly4.GetVertices (),
+		poly4.GetNumVertices ()));
+	//poly1.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (0, 100, 100));
+	//poly2.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 0, 100));
 	poly3.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 100, 0));
+	poly4.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 100, 100));
 	solidbsp->GfxDump (Gfx2D, Gfx3D->GetTextureManager (), covtree_level);
 #	endif
       }

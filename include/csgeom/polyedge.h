@@ -135,15 +135,14 @@ public:
    * Intersect this polygon with a given plane and return the
    * two resulting polygons in left and right. This version is
    * robust. If one of the edges of this polygon happens to be
-   * on the same plane as 'plane' then the edge will go to the
-   * polygon which already has most edges. i.e. you will not
-   * get degenerate polygons.<p>
+   * on the same plane as 'plane' then this edge will be ignored
+   * and 'onplane' will be set to true.<p>
    *
    * Note that this routine may result in unconnected polygons.
    * i.e. edges that are not adjacent.
    */
   void Intersect (const csPlane2& plane,
-  	csPoly2DEdges* left, csPoly2DEdges* right);
+  	csPoly2DEdges* left, csPoly2DEdges* right, bool& onplane);
 };
 
 /**

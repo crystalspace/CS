@@ -1216,7 +1216,7 @@ static bool CommandHandler (char *cmd, char *arg)
   {
     extern int covtree_level;
     covtree_level++;
-    if (covtree_level > 10) covtree_level = 1;
+    if (covtree_level > 25) covtree_level = 1;
     printf ("covtree_level=%d\n", covtree_level);
     //Sys->Printf (MSG_CONSOLE, "No debug1 implementation in this version.\n");
   }

@@ -92,24 +92,14 @@ int csPoly2DEdges::AddEdge (const csVector2& v1, const csVector2& v2)
 #define ATRIGHTORPLANE(c) ((c) > -EPSILON)
 
 void csPoly2DEdges::Intersect (const csPlane2& plane,
-	csPoly2DEdges* left, csPoly2DEdges* right)
+	csPoly2DEdges* left, csPoly2DEdges* right, bool& onplane)
 {
   int i;
   float c1, c2;
   csVector2 isect;
   float dist;
 
-  // If NULL then don't know, else points to the preferred
-  // polygon to add the edges too.
-  // This is used for trying to put edges
-  // that coincide with the splitter plane on the preferred
-  // side (i.e. a side that contains other edges).
-  csPoly2DEdges* preferred_edge = NULL;
-
-  // If skip is > 0 then we skipped the first 'skip' edges because
-  // we didn't have enough information for putting them
-  // on the 'right' polygon.
-  int skip = 0;
+  onplane = false;
 
   left->SetNumEdges (0);
   right->SetNumEdges (0);
@@ -123,70 +113,39 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
     {
       if (ONPLANE (c2))
       {
-        // Both vertices are on the plane. In this case
-	// we add the edge to the preferred side. If we don't
-	// have a preferred side yet then we skip it.
-	if (preferred_edge == NULL)
-	  skip++;
-	else
-	  preferred_edge->AddEdge (edges[i]);
+        // Both vertices are on the plane. In this case we ignore the
+	// edge and set onplane to true.
+	onplane = true;
       }
       else if (ATLEFT (c2))
-      {
         left->AddEdge (edges[i]);
-	preferred_edge = left;
-      }
       else
-      {
         right->AddEdge (edges[i]);
-	preferred_edge = right;
-      }
     }
     else if (ATLEFT (c1))
     {
       if (ATLEFTORPLANE (c2))
-      {
         left->AddEdge (edges[i]);
-        preferred_edge = left;
-      }
       else
       {
         csIntersect2::Plane (edges[i].v1, edges[i].v2,
       	  plane, isect, dist);
 	left->AddEdge (edges[i].v1, isect);
 	right->AddEdge (isect, edges[i].v2);
-        preferred_edge = right;
       }
     }
     else // ATRIGHT (c1)
     {
       if (ATRIGHTORPLANE (c2))
-      {
         right->AddEdge (edges[i]);
-	preferred_edge = right;
-      }
       else
       {
         csIntersect2::Plane (edges[i].v1, edges[i].v2,
       	  plane, isect, dist);
 	right->AddEdge (edges[i].v1, isect);
 	left->AddEdge (isect, edges[i].v2);
-        preferred_edge = left;
       }
     }
-  }
-
-  if (!preferred_edge) return; //@@@ INVESTIGATE THIS CASE!!!
-
-  // If skip > 0 then there are a number of edges in
-  // the beginning that we ignored. These edges are all coplanar
-  // with 'plane'. We will add them to the preferred side.
-  i = 0;
-  while (skip > 0)
-  {
-    preferred_edge->AddEdge (edges[i]);
-    i++;
-    skip--;
   }
 }
 

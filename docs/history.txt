@@ -23,6 +23,9 @@ Short-term cleanups that need to be done:
 	  in a define (at the end) but the define was used with another
 	  ';' at the end again. Giving two ';'. Apparently some compilers
 	  don't correctly parse the null statement.
+	- Ok, fixed a number of new bugs which made the solid bsp work
+	  better now. Still not bug free though but at least it starts
+	  to resemble doing visibility culling :-)
 14-Mar-2000
 	- Michael Dale Long did a major rewrite of the iEntityManager
 	  interface.  Replaced Entity and Render lists with "associative

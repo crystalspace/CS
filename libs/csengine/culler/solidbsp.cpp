@@ -150,10 +150,11 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     csPoly2DEdges* left_poly, * right_poly;
     left_poly = poly_pool.Alloc ();
     right_poly = poly_pool.Alloc ();
-    poly->Intersect (node->splitter, left_poly, right_poly);
+    bool onplane;
+    poly->Intersect (node->splitter, left_poly, right_poly, onplane);
     bool rc1, rc2;
 
-    if (left_poly->GetNumEdges () == 0)
+    if (left_poly->GetNumEdges () == 0 && !onplane)
     {
       // Left polygon has no edges. We test if the left node
       // is completely contained in the right polygon. In that
@@ -169,7 +170,7 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     }
     else rc1 = InsertPolygon (node->left, left_poly);
 
-    if (right_poly->GetNumEdges () == 0)
+    if (right_poly->GetNumEdges () == 0 && !onplane)
     {
       if (!node->right->solid && left_poly->In (node->split_center))
       {
@@ -229,9 +230,10 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     csPoly2DEdges* left_poly, * right_poly;
     left_poly = poly_pool.Alloc ();
     right_poly = poly_pool.Alloc ();
-    poly->Intersect (node->splitter, left_poly, right_poly);
+    bool onplane;
+    poly->Intersect (node->splitter, left_poly, right_poly, onplane);
 
-    if (left_poly->GetNumEdges () == 0)
+    if (left_poly->GetNumEdges () == 0 && !onplane)
     {
       // Left polygon has no edges. We test if the left node
       // is completely contained in the right polygon. In that
@@ -241,7 +243,7 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     }
     else if (TestPolygon (node->left, left_poly)) { rc = true; goto end; }
 
-    if (right_poly->GetNumEdges () == 0)
+    if (right_poly->GetNumEdges () == 0 && !onplane)
     {
       if (!node->right->solid && left_poly->In (node->split_center))
       { rc = true; goto end; }
@@ -300,11 +302,22 @@ void csSolidBsp::GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
 	csPoly2D& poly)
 {
   if (!node) return;
-  if (!node->left) return;
-  if (depth <= 0) return;
+  if (depth < 0) return;
 
 //   int width = ig2d->GetWidth ();
   int height = ig2d->GetHeight ();
+
+  if (node->solid)
+  {
+    csVector2 v;
+    for (v.y = poly.GetBoundingBox ().Min ().y ; v.y < poly.GetBoundingBox ().Max ().y ; v.y += 4)
+      for (v.x = poly.GetBoundingBox ().Min ().x ; v.x < poly.GetBoundingBox ().Max ().x ; v.x += 4)
+        if (poly.In (v))
+	  ig2d->DrawPixel (v.x, height-v.y, red);
+  }
+  if (depth == 0) return;
+
+  if (!node->left) return;
 
   csPlane2& sp = node->splitter;
   const csVector2& spc = node->split_center;
@@ -312,32 +325,27 @@ void csSolidBsp::GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
 
   if (sp.IntersectPolygon (&poly, v1, v2))
   {
-    ig2d->DrawLine (v1.x, height-v1.y, v2.x, height-v2.y,
-      depth == 1 ? yellow : white);
+    int col = depth == 1 ? yellow : white;
+    ig2d->DrawLine (v1.x, height-v1.y, v2.x, height-v2.y, col);
+    csVector2 dir = sp.norm;
+    dir /= dir.Norm ();
+    dir *= 8;
+    ig2d->DrawLine (spc.x, height-spc.y, spc.x+dir.x, height-(spc.y+dir.y),
+    	col);
 
-    ig2d->DrawPixel (int(spc.x),   int(height-spc.y),   blue);
-    ig2d->DrawPixel (int(spc.x-1), int(height-spc.y-1), blue);
-    ig2d->DrawPixel (int(spc.x-2), int(height-spc.y-2), blue);
-    ig2d->DrawPixel (int(spc.x+1), int(height-spc.y-1), blue);
-    ig2d->DrawPixel (int(spc.x+2), int(height-spc.y-2), blue);
-    ig2d->DrawPixel (int(spc.x-1), int(height-spc.y+1), blue);
-    ig2d->DrawPixel (int(spc.x-2), int(height-spc.y+2), blue);
-    ig2d->DrawPixel (int(spc.x+1), int(height-spc.y+1), blue);
-    ig2d->DrawPixel (int(spc.x+2), int(height-spc.y+2), blue);
-printf ("==============\n");
-printf ("(%f,%f)-(%f,%f) - ", v1.x, v1.y, v2.x, v2.y);
-printf ("(%f,%f,%f)\n", sp.A (), sp.B (), sp.C ());
+    ig2d->DrawPixel ((int)spc.x, (int)height-spc.y, blue);
+    ig2d->DrawPixel ((int)spc.x-1, (int)height-spc.y-1, blue);
+    ig2d->DrawPixel ((int)spc.x-2, (int)height-spc.y-2, blue);
+    ig2d->DrawPixel ((int)spc.x+1, (int)height-spc.y-1, blue);
+    ig2d->DrawPixel ((int)spc.x+2, (int)height-spc.y-2, blue);
+    ig2d->DrawPixel ((int)spc.x-1, (int)height-spc.y+1, blue);
+    ig2d->DrawPixel ((int)spc.x-2, (int)height-spc.y+2, blue);
+    ig2d->DrawPixel ((int)spc.x+1, (int)height-spc.y+1, blue);
+    ig2d->DrawPixel ((int)spc.x+2, (int)height-spc.y+2, blue);
   }
 
   csPoly2D poly_left, poly_right;
   poly.Intersect (sp, &poly_left, &poly_right);
-int i;
-for (i = 0 ; i < poly.GetNumVertices () ; i++)
-printf ("  poly%d  (%f,%f)\n", i, poly[i].x, poly[i].y);
-for (i = 0 ; i < poly_left.GetNumVertices () ; i++)
-printf ("  left%d  (%f,%f)\n", i, poly_left[i].x, poly_left[i].y);
-for (i = 0 ; i < poly_right.GetNumVertices () ; i++)
-printf ("  right%d  (%f,%f)\n", i, poly_right[i].x, poly_right[i].y);
 
   GfxDump (node->left, ig2d, depth-1, poly_left);
   GfxDump (node->right, ig2d, depth-1, poly_right);
