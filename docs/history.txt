@@ -8,6 +8,14 @@ The history order is reversed so that new features are at the top.
 	  you can just use 'system' in your script.
 	  This change breaks the LUA plugin though. A similar change has
 	  to happen there but I don't know how.
+	- Eric Sunshine fixed the csPython plugin so that it once again
+	  compiles cleanly under NextStep following the removal of `thisclass'.
+	  The problem was that the NextStep compiler disallows C++ expressions
+	  in functions which have been declared `extern "C"'.
+	- Eric Sunshine added DSP.CSPYTHON.CFLAGS to cspython.mak to define
+	  "SWIG_GLOBAL" for MSVC.
+	- Eric Sunshine removed some outdated scripts from CS/scripts/blender.
+	- Eric Sunshine removed the unneeded vfstest and textconv applications.
 1-Jul-2001
 	- Eric Sunshine repaired the new cmdline.cpp and cmdline.h so that they
 	  compile error-free with the NextStep compiler.
