@@ -123,8 +123,6 @@ public:
   void AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args);
   virtual HWND GetApplicationWindow();
-  virtual LRESULT ProcessMessage(HWND hWnd, UINT message,
-      WPARAM wParam, LPARAM lParam);
 
   virtual void UseOwnMessageLoop(bool ownmsgloop);
   virtual bool HasOwnMessageLoop();
@@ -926,12 +924,6 @@ void Win32Assistant::AlertV (HWND window, int type, const char* title,
 HWND Win32Assistant::GetApplicationWindow()
 {
   return ApplicationWnd;
-}
-
-LRESULT Win32Assistant::ProcessMessage(HWND hWnd, UINT message,
-                            WPARAM wParam, LPARAM lParam)
-{
-  return WindowProc(hWnd, message, wParam, lParam);
 }
 
 void Win32Assistant::UseOwnMessageLoop(bool ownmsgloop)

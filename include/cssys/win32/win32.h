@@ -56,13 +56,6 @@ struct iWin32Assistant : public iBase
   virtual HWND GetApplicationWindow() = 0;
 
   /**
-  * Passes a Win32 Message to CS. useful when integrating CS into 
-  * other applications.
-  */
-  virtual LRESULT ProcessMessage(HWND hWnd, UINT message,
-      WPARAM wParam, LPARAM lParam) = 0;
-
-  /**
   * Sets/Gets wether CS should get Messages on it's own, or wait
   * and be fed by using ProcessMessage
   */
