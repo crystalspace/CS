@@ -6702,6 +6702,8 @@ class iVFS(iBase):
     def SetFileTime(*args): return _cspace.iVFS_SetFileTime(*args)
     def GetFileSize(*args): return _cspace.iVFS_GetFileSize(*args)
     def GetRealPath(*args): return _cspace.iVFS_GetRealPath(*args)
+    def GetMounts(*args): return _cspace.iVFS_GetMounts(*args)
+    def GetRealMountPaths(*args): return _cspace.iVFS_GetRealMountPaths(*args)
     def __del__(self, destroy=_cspace.delete_iVFS):
         try:
             if self.thisown: destroy(self)
