@@ -694,7 +694,10 @@ struct iGraphics3D : public iBase
    */
   virtual void CloseFogObject (CS_ID id) = 0;
 
-  /// Draw a line in camera space.
+  /**
+   *  Draw a line in camera space. Warning! This is a 2D operation
+   *  and must be called while in BeginDraw(CSDRAW_2DGRAPHICS)!
+   */
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
     float fov, int color) = 0;
 
