@@ -14,6 +14,22 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 27-Jul-1999
+	- Added csWorld::EnableLightingCache() with which you can disable
+	  the lighting cache (and thus saving of lightmaps to precalc.zip).
+	- The lighting cache now gives a warning is the cache is being used
+	  while objects (things and sectors) don't have proper names. This
+	  is invalid usage of the cache.
+	- I added the Squawk demo to CS.
+	- Changed Blocks, Walktest (infmaze), Simple, and Squawk so that
+	  they disable the lighting cache (no more precalc.zip for them).
+	- Fixed ScanStr() so that a dot is also recognized as part of a
+	  string.
+	- Added 'loadsprite' command to WalkTest which is supposed to be
+	  able to add MD2 and 3DS sprites (use 'addsprite' after 'loadsprite'
+	  to really add the sprite to the leve). I haven't been able to test
+	  it yet because: a) the code for MD2 loading isn't endian correct
+	  yet and I'm on Solaris right now. b) It can only load 3ds version
+	  3 files and I haven't found any of those.
 	- Eric Sunshine fixed a bug in csGraphics2D::complete_pixel_format()
 	  where it could go into an infinite loop during calculation of
 	  RedBits, GreenBits, or BlueBits on account of accidental sign-
@@ -59,9 +75,10 @@ Short-term cleanups that need to be done:
 	  soft_txt.cpp any time find_rgb_map() was called.  A simple textual
 	  reorganization of the file cured the problem.
 26-Jul-1999
-	- Andrew made changes to DrawPolygonFX().  He fixed a number of small
-	  bugs and adjusted the prototype.  It also now safely supports 2*SRC
-	  mode.
+	- Andrew made changes to DrawPolygonFX() (one argument instead of
+	  three). He fixed a number of small bugs and adjusted the prototype.
+	  It also now safely supports 2*SRC*DST mode by clamping lighting
+	  values to (2,2,2).
 	- Andrew removed scanln8.inc, scanln16.inc, & scanln32.inc and
 	  replaced them with scanln.inc.
 	- Unfortunately Andrew forgot to check in the new scanln.inc file,
@@ -70,6 +87,11 @@ Short-term cleanups that need to be done:
 	  measure, which at least allows the software renderer to compile.
 	  Hopefully Andrew will commit his scanln.inc tomorrow if it is any
 	  different than the one which Eric created.
+	- More changes to makefile system from Andrew Zabolotny.
+	- Thomas Hieber did a few changes. He prepared for the new
+	  DirectInput keyboard handling (not yet activated) and fixed all
+	  binary libraries for the Win port.
+	- Some changes to Mac port from Robert Bate (error handling).
 25-Jul-1999
 	- Eric Sunshine worked around a variable redeclaration error in the
 	  new md2.cpp file.  This problem affected older C++ compilers in
@@ -84,6 +106,7 @@ Short-term cleanups that need to be done:
 	  DirectInput for keyboard handling.
 	- Xavier Trochu also fixed the Windows OpenGL 2D driver so that the
 	  console and FPS display works correctly.
+	- Jorrit did an optimization in the software version of DrawPolygon.
 24-Jul-1999
 	- Changes from Thomas Hieber to fix Win32 again.
 23-Jul-1999
