@@ -25,6 +25,7 @@
 struct vidlib;
 struct sprite;
 class csPicoGUIServer;
+struct iImageIO;
 
 /**
  * The static methods of this class make up a PicoGUI graphics driver.
@@ -35,15 +36,20 @@ class csPGVideoDriver
 {
  private:
   static csRef<iGraphics2D> Gfx2D;
+  static csRef<iImageIO> ImageIO;
 
  protected:
-  static bool Construct (iGraphics2D *);
+  static bool Construct (iGraphics2D *, iImageIO *);
   friend class csPicoGUIServer;
 
  public:
   static g_error RegFunc (vidlib *);
   static g_error Init ();
-  static g_error SetMode (int16 x, int16 y, int16 bpp, uint32 flags);
+
+  // Unsigned long for flags due to MSVC/posix typedef differences
+  // Works in gcc too, right? Otherwise someone on posix fix it :)
+  // - Anders Stenberg
+  static g_error SetMode (int16 x, int16 y, int16 bpp, unsigned long flags);
   static int BeginDraw (struct divnode **div, struct gropnode ***listp,
     struct groprender *rend);
   static void Close ();

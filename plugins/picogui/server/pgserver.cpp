@@ -22,6 +22,7 @@
 #include "videodrv.h"
 #include "inputdrv.h"
 #include "fonteng.h"
+#include "igraphic/imageio.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/evdefs.h"
@@ -74,35 +75,44 @@ inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
   csRef<iFontServer> fsv = CS_QUERY_REGISTRY (objreg, iFontServer);
   if (! fsv) return false;
 
-  if (! csPGVideoDriver::Construct (g2d)) return false;
+  csRef<iImageIO> img = CS_QUERY_REGISTRY (objreg, iImageIO);
+  if (! img) return false;
+
+  if (! csPGVideoDriver::Construct (g2d, img)) return false;
 
   if (! csPGFontEngine::Construct (fsv)) return false;
 
   if (! csPGInputDriver::Construct (evq)) return false;
 
-  //append_param_str("pgserver", "themes", " ", "lucid.th");
+  evq->RegisterListener (& scfiEventHandler, CSMASK_Nothing | CSMASK_Broadcast);
 
-  g_error e = pgserver_init (PGINIT_NO_COMMANDLINE|PGINIT_NO_CONFIGFILE, 0, 0);
-  if (iserror (e)) {
-    os_show_error (e);
-    return false;
-  }
-
-  evq->RegisterListener (& scfiEventHandler, CSMASK_Nothing);
-
-  pgserver_mainloop_start ();
   return true;
 }
 
 csPicoGUIServer::~csPicoGUIServer ()
 {
-  pgserver_mainloop_stop ();
-  pgserver_shutdown ();
 }
 
 bool csPicoGUIServer::HandleEvent (iEvent &ev)
 {
-  if (ev.Command.Code == cscmdPostProcess && pgserver_mainloop_is_running ())
+  if (ev.Command.Code == cscmdSystemOpen)
+  {
+    g_error e;
+    
+    append_param_str("pgserver","themes"," ", "lucid.th");
+    
+    e = pgserver_init (PGINIT_NO_COMMANDLINE | PGINIT_NO_CONFIGFILE, 0, 0);
+    if (iserror(e)) {
+      os_show_error(e);
+    } else pgserver_mainloop_start ();
+    return false;
+  } 
+  else if (ev.Command.Code == cscmdSystemClose)
+  {
+    pgserver_mainloop_stop ();
+    pgserver_shutdown ();
+  }
+  else if (ev.Command.Code == cscmdPostProcess && pgserver_mainloop_is_running ())
   {
     pgserver_mainloop_iteration ();
     return true;

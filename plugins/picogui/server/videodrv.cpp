@@ -23,33 +23,31 @@ extern "C"
 {
   #include <picogui/types.h>
   #include <pgserver/common.h>
+  #include <pgserver/init.h>
   #include <pgserver/types.h>
   #include <pgserver/video.h>
 }
 
-#include "videodrv.h"
 #include "csgeom/csrect.h"
 #include "csgfx/memimage.h"
+#include "igraphic/imageio.h"
+#include "videodrv.h"
 
 #include <stdlib.h>
+#if 0
 #include <sys/shm.h>
+#endif
 
 csRef<iGraphics2D> csPGVideoDriver::Gfx2D;
+csRef<iImageIO> csPGVideoDriver::ImageIO;
 
-bool csPGVideoDriver::Construct (iGraphics2D *g)
+bool csPGVideoDriver::Construct (iGraphics2D *g, iImageIO *i)
 {
   Gfx2D = g;
-  g_error err = 0;
-#if 0
-  err = 0;/*load_vidlib
-    (RegFunc, g->GetWidth (), g->GetHeight (), g->GetPixelBytes () * 8, 0);*/
-//  force_external_video_driver (RegFunc, 
-//    g->GetWidth (), g->GetHeight (), g->GetPixelBytes () * 8, 0);
-#endif
-  // Overwrite the first entry with our driver. Tadaa.
+  ImageIO = i;
   videodrivers->regfunc = RegFunc;
 
-  return ! iserror (err);
+  return true;
 }
 
 g_error csPGVideoDriver::RegFunc (vidlib *v)
@@ -86,10 +84,13 @@ g_error csPGVideoDriver::RegFunc (vidlib *v)
 
 g_error csPGVideoDriver::Init ()
 {
-  csRef<iGraphics2D> canvas = Gfx2D->CreateOffscreenCanvas
-    (new char[vid->bpp / 8 * vid->xres * vid->yres],
-     vid->xres, vid->yres, vid->bpp, 0);
-  vid->display = (hwrbitmap) new csHwrBitmap (canvas);
+  // Create an intermediate canvas, since we will want to read from it.
+  // @@@ What's responsible for deleting data? /Anders Stenberg
+  void *data = new char[(vid->bpp>>3)*vid->xres*vid->yres];
+  memset (data, 0, (vid->bpp>>3)*vid->xres*vid->yres);
+  csRef<iGraphics2D> canvas = 
+    Gfx2D->CreateOffscreenCanvas (data, vid->xres, vid->yres, vid->bpp, 0);
+  vid->display = (hwrbitmap)new csHwrBitmap (canvas);
   return 0;
 }
 
@@ -100,11 +101,14 @@ void csPGVideoDriver::Close ()
 int csPGVideoDriver::BeginDraw (struct divnode **div, struct gropnode ***listp,
   struct groprender *rend)
 {
-  Gfx2D->BeginDraw ();
   return 0;
 };
 
-g_error csPGVideoDriver::SetMode (int16 x, int16 y, int16 bpp, uint32 flags)
+// Unsigned long for flags due to MSVC/posix typedef differences
+// Works in gcc too, right? Otherwise someone on posix fix it :)
+// - Anders Stenberg
+g_error csPGVideoDriver::SetMode (int16 x, int16 y, int16 bpp, 
+                                  unsigned long flags)
 {
   Gfx2D->Resize (x, y);
   return 0;
@@ -121,10 +125,12 @@ void csPGVideoDriver::CoordLogicalize (int *x, int *y)
 void csPGVideoDriver::Update (hwrbitmap b, int16 x, int16 y, int16 w, int16 h)
 { 
   if (b != vid->display) return;
-  csRef<iImage> shot = GETBMP (b)->G2D ()->ScreenShot ();
 
-  Blit ((hwrbitmap) & csHwrBitmap (Gfx2D), x, y, w, h, b, x, y, 1);
+  Gfx2D->BeginDraw ();
+  Blit ((hwrbitmap)&csHwrBitmap (Gfx2D), x, y, w, h, 
+        vid->display, x, y, PG_LGOP_NONE);
   Gfx2D->Print (& csRect (x, y, x + w, y + h));
+  Gfx2D->FinishDraw ();
 }
 
 hwrcolor csPGVideoDriver::ColorPG2CS (hwrcolor c)
@@ -147,14 +153,12 @@ hwrcolor csPGVideoDriver::ColorCS2PG (hwrcolor c)
 void csPGVideoDriver::Pixel (hwrbitmap b, int16 x, int16 y,
   hwrcolor color, int16 lgop)
 {
-  int w = GETBMP (b)->G2D ()->GetWidth ();
-  int h = GETBMP (b)->G2D ()->GetHeight ();
   GETBMP (b)->G2D ()->DrawPixel (x, y, color);
 }
 
 hwrcolor csPGVideoDriver::GetPixel (hwrbitmap b, int16 x, int16 y)
 {
-  uint8 red, gree, blue;
+  uint8 red, green, blue;
   GETBMP (b)->G2D ()->GetPixel (x, y, red, green, blue);
   return GETBMP (b)->G2D ()->FindRGB (red, green, blue);
 }
@@ -186,19 +190,65 @@ void csPGVideoDriver::Rect (hwrbitmap b, int16 x1, int16 y1, int16 x2, int16 y2,
 void csPGVideoDriver::Blit (hwrbitmap b, int16 x, int16 y, int16 w, int16 h,
   hwrbitmap p, int16 px, int16 py, int16 lgop)
 {
-  if (GETBMP (b)->G2D ()->GetPixelBytes () !=
-      GETBMP (p)->G2D ()->GetPixelBytes ())
-  {
-    printf ("Format mismatch!\n");
-    return;
-  }
-  csRef<iImage> shot = GETBMP (p)->Image ();
+  csImageArea* srcarea = GETBMP (p)->G2D ()->SaveArea (px, py, w, h);
 
-  csRef<iImage> crop = csImageMemory (shot->GetWidth (), shot->GetHeight (),
-    shot->GetImageData (), false, shot->GetFormat (), shot->GetPalette ()))
-      ->Crop (px, py, w, h);
-  crop->SetFormat (CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
-  GETBMP (b)->G2D ()->Blit (x, y, w, h, (unsigned char*) crop->GetImageData());
+  int srcformat, dstformat;
+  switch (GETBMP (p)->G2D ()->GetPixelBytes ())
+  {
+  case 1:
+    srcformat = CS_IMGFMT_PALETTED8;
+    break;
+  case 4:
+    srcformat = CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
+    break;
+  }
+
+  switch (GETBMP (b)->G2D ()->GetPixelBytes ())
+  {
+  case 1:
+    dstformat = CS_IMGFMT_PALETTED8;
+    break;
+  case 4:
+    dstformat = CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
+    break;
+  }
+
+  csRef<iImage> crop = new csImageMemory (
+    w, h, srcarea->data, false, srcformat, GETBMP (p)->G2D ()->GetPalette ());
+  crop->SetFormat (dstformat);
+  unsigned char* srcdata = (unsigned char*)crop->GetImageData ();
+
+  if (lgop != PG_LGOP_NONE)
+  {
+    csImageArea* dstarea = GETBMP (b)->G2D ()->SaveArea (x, y, w, h);
+    unsigned char* s = srcdata;
+    unsigned char* d = (unsigned char*)dstarea->data;
+    uint32 l = w*h*GETBMP (b)->G2D ()->GetPixelBytes ();
+    switch (lgop)
+    {
+    case PG_LGOP_OR:
+      for (int i=0; i<l; i++)
+          *(s++) = 128;
+      break;
+    case PG_LGOP_AND:
+      for (int i=0; i<l; i++)
+        *(s++) = 128;
+      break;
+    case PG_LGOP_XOR:
+      for (int i=0; i<l; i++)
+          *(s++) = 128;
+      break;
+    default:
+      printf ("Unsupported logical operation.\n");
+      GETBMP (b)->G2D ()->FreeArea (dstarea);
+      GETBMP (p)->G2D ()->FreeArea (srcarea);
+      return;
+    }
+    GETBMP (b)->G2D ()->FreeArea (dstarea);
+  }
+
+  GETBMP (b)->G2D ()->Blit (x, y, w, h, (unsigned char *) srcdata);
+  GETBMP (p)->G2D ()->FreeArea (srcarea);
 }
 
 g_error csPGVideoDriver::New (hwrbitmap *b, int16 w, int16 h, uint16 bpp)
@@ -211,39 +261,33 @@ g_error csPGVideoDriver::New (hwrbitmap *b, int16 w, int16 h, uint16 bpp)
 
 g_error csPGVideoDriver::Load (hwrbitmap *b, const uint8 *data, unsigned long len)
 {
+  int format;
+  switch (vid->bpp)
+  {
+    case 8:
+      format = CS_IMGFMT_PALETTED8;
+      break;
+    case 32:
+      format = CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
+      break;
+  }
+
+  uint8 *tmp = new uint8[len];
+  memcpy (tmp, data, len);
+  csRef<iImage> img = ImageIO->Load (tmp, len, format);
+  delete tmp;
+
 /*  SETBMP (b, new csHwrBitmap (new csImageMemory (len, 1, (void *) data, false,
     CS_IMGFMT_ANY)));*/
 
-  // @@@ SHOULD USE NATIVE LOADERS SOMEHOW?
-
-  struct bitformat *fmt = bitmap_formats;
-  hwrbitmap bmp;
-
-  vid->bitmap_new = def_bitmap_new;
-  vid->pixel = def_pixel;
-  g_error e = mkerror(PG_ERRT_BADPARAM,8);
-  while (fmt->name[0]) {   /* Dummy record has empty name */
-    if (fmt->detect && fmt->load && (*fmt->detect)(data,len))
-    {
-      e = (*fmt->load)(&bmp,data,len);
-      break;
-    }
-    fmt++;
-  }
-  vid->bitmap_new = New;
-  vid->pixel = Pixel;
-  if (e != 0)
-    return e;
-  
   /*csRef<csImageFile> img = new csImageMemory (
-    bmp->w, bmp->h, );
+    bmp->w, bmp->h, );*/
 
   csRef<iGraphics2D> newg2d = Gfx2D->CreateOffscreenCanvas (
-    bmp->bits, bmp->w, bmp->h, bmp->bpp, 0);
-  SETBMP (b, new csHwrBitmap (newg2d));*/
+    img->GetImageData (), img->GetWidth (), img->GetHeight (), vid->bpp, 0);
+  SETBMP (b, new csHwrBitmap (newg2d));
 
-  def_bitmap_free (bmp);
-  return mkerror(PG_ERRT_BADPARAM,8);
+  return 0;
 }
 
 g_error csPGVideoDriver::GetSize (hwrbitmap b, int16 *w, int16 *h)
@@ -259,9 +303,9 @@ g_error csPGVideoDriver::GetGropRender (hwrbitmap b, groprender **g)
   return 0;
 }
 
-#if 0
 g_error csPGVideoDriver::GetShareMem (hwrbitmap b, unsigned long uid, pgshmbitmap *info)
 {
+#if 0
   if (GETBMP (b)->G2D ())
   {
     return 1;
@@ -311,9 +355,9 @@ g_error csPGVideoDriver::GetShareMem (hwrbitmap b, unsigned long uid, pgshmbitma
     info->shm_length = htonl (len);
     memcpy (mem, GETBMP (b)->Image ()->GetImageData (), len);
   }
+#endif
   return 0;
 }
-#endif
 
 void csPGVideoDriver::SpriteRedraw (sprite *s)
 {
