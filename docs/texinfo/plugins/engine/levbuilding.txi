@@ -189,6 +189,45 @@ an object:
 </meshobj>
 @end example
 
+Here is a special note about closed versus non-closed objects in @samp{Dynavis}.
+A closed object is an object that has no holes in it. i.e. a cube is a closed
+object. A cube with one of the six sides removed is not closed. When
+@samp{Dynavis} writes an object to the occlusion buffer (coverage buffer)
+it will use another technique based on the object being closed or not:
+
+@itemize
+@item
+If the object is closed then @samp{Dynavis} will calculate the outline of
+the object and render that in the coverage buffer. @samp{Dynavis} also has
+a depth buffer and in this case the deepest depth of the object will be
+used to update the depth buffer.
+@item
+If the object is not closed then every individual polygon of the object
+is written seperatelly to the coverage buffer. For depth the deepest depth
+of every polygon will be used instead of the deepest depth of the entire
+object.
+@end itemize
+
+Let me illustrate what this means with an example. Assume you have a highly
+tesselated sphere (a sphere mesh that has a large number of triangles).
+Also assume there is another object inside that sphere. If the first technique
+is used (closed object) then @samp{Dynavis} will be most optimal for
+updating the coverage buffer as writing an outline is very cheap. On the
+other hand it will not be able to cull away the object inside the sphere
+as the depth buffer is set to deep. i.e. the object in the sphere will be
+in front of the depth that is set in the depth buffer.
+
+On the other hand, if the second (non-closed) technique is used then
+@samp{Dynavis} will need to use a lot of CPU processing in order to update
+the coverage buffer but it will be able to cull away the object inside
+the sphere since the depth buffer will no contain accurate values per triangle.
+
+We haven't done any performance tests to find out which is better. If you have
+a really complex object (highly tesselated sphere) then the first technique
+will probably be better since the cost of writing the object to the coverage
+buffer will probably be higher then the cost of rendering the object inside
+the sphere. But we don't know where exactly the thresshold is.
+
 @node LEV Object Types, VIS cullers, Visibility Culling, Visibility Culling
 @subsubsection Object types
 

@@ -35,6 +35,8 @@ chronological order.
 	  how to build levels for Crystal Space. It discusses various techniques
 	  and tells people what tricks they can use to get most optimal
 	  performance.
+	- Jorrit extended the new documentation about level building with a
+	  note about closed vs non-closed objects and Dynavis.
 10-Feb-2004
 	- Eric Sunshine fixed CS/data/Jamfile so that it no longer tries to
 	  install the non-existent unifont.csf file.  (Bug reported by Frank
