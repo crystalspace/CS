@@ -1440,6 +1440,16 @@ AS_IF([test $cs_cv_libsdl = yes],
 #------------------------------------------------------------------------------
 # Check for VOS.
 #------------------------------------------------------------------------------
+AC_ARG_WITH(vos, [AC_HELP_STRING([--with-vos],
+                  [location where VOS pkg-config files are installed])], 
+    [if test "$withval" != "no"; then
+        if test -n "$PKG_CONFIG_PATH"; then
+	    PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$withval
+	else
+	    PKG_CONFIG_PATH=$withval
+	fi
+	export PKG_CONFIG_PATH
+    fi], )
 AC_CHECK_TOOLS([PKGCONFIG], [pkg-config])
 AC_CACHE_CHECK([for VOS], [cs_cv_libvos],
     [AS_IF([test -n "$PKGCONFIG"],

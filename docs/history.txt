@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 29-May-2004
+	- Peter Amstutz added a "--with-vos" option to the configure
+	  script to set the PKG_CONFIG_PATH environment variable when
+	  searching for VOS.
 	- res updated bruteblock to not emit render meshes for a material for
 	  a block if the material in question doesn't appear on the material
 	  map (for that block).
