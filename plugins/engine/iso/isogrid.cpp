@@ -49,6 +49,13 @@ csIsoGrid::~csIsoGrid ()
   int i;
   for(i=0; i<width*height; i++) 
     if(grid[i]) grid[i]->DecRef();
+
+  for (i=0; i<lights.Length (); i++)
+    ((iIsoLight*)lights.Get (i))->DecRef ();
+
+  for (i=0; i<dynamiclights.Length (); i++)
+    ((iIsoLight*)dynamiclights.Get (i))->DecRef ();
+
   delete[] grid;
   delete groundmap;
   delete[] fakelights;
@@ -70,7 +77,7 @@ void csIsoGrid::AddSprite(iIsoSprite *sprite, const csVector3& pos)
   if(!cell)
   {
     //printf("new cell\n");
-    cell = new csIsoCell(this);
+    cell = new csIsoCell(NULL);
     SetCell(pos, cell);
   }
   //printf("adding sprite at pos (%g, %g, %g) to cell %x\n", pos.x, 
@@ -411,7 +418,10 @@ void csIsoGrid::RegisterLight(iIsoLight *light)
 {
   recalc_staticlight = true;
   if(lights.Find(light)==-1)
+  {
     lights.Push(light);
+    light->IncRef ();
+  }
 }
 
 void csIsoGrid::UnRegisterLight(iIsoLight *light)
@@ -419,6 +429,7 @@ void csIsoGrid::UnRegisterLight(iIsoLight *light)
   int idx = lights.Find(light);
   if(idx!=-1)
   {
+    ((iIsoLight*)lights.Get (idx))->DecRef ();
     lights.Delete(idx);
     recalc_staticlight = true;
   }
@@ -427,14 +438,20 @@ void csIsoGrid::UnRegisterLight(iIsoLight *light)
 void csIsoGrid::RegisterDynamicLight(iIsoLight *light)
 {
   if(dynamiclights.Find(light)==-1)
+  {
     dynamiclights.Push(light);
+    light->IncRef ();
+  }
 }
 
 void csIsoGrid::UnRegisterDynamicLight(iIsoLight *light)
 {
   int idx = dynamiclights.Find(light);
   if(idx!=-1)
+  {
+    ((iIsoLight*)dynamiclights.Get (idx))->DecRef ();
     dynamiclights.Delete(idx);
+  }
 }
 
 void csIsoGrid::GetFakeLights(const csVector3& pos, iLight **& flights, 

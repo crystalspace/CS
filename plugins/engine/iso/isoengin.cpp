@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/util.h"
 #include "igraphic/imageio.h"
+#include "igraphic/image.h"
 #include "imesh/object.h"
 #include "isoengin.h"
 #include "isolight.h"
@@ -273,56 +274,76 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
 {
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
 		iPluginManager);
-  iImageIO *imgloader = CS_QUERY_PLUGIN(plugin_mgr, iImageIO);
+
+  iImageIO *imgloader = NULL;
+  iVFS *VFS = NULL;
+  iDataBuffer *buf = NULL;
+  iImage *image = NULL;
+  iTextureHandle *handle = NULL;
+  csIsoMaterial *material = NULL;
+  iMaterialHandle *math = NULL;
+  iMaterialWrapper *mat_wrap = NULL;
+
+  imgloader = CS_QUERY_PLUGIN(plugin_mgr, iImageIO);
   if(imgloader==NULL)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not get image loader plugin. "
     	"Failed to load file %s.", vfsfilename);
-    return NULL;
+    goto create_out;
   }
-  iVFS *VFS = CS_QUERY_PLUGIN(plugin_mgr, iVFS);
+
+  VFS = CS_QUERY_PLUGIN(plugin_mgr, iVFS);
   if(VFS==NULL)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not get VFS plugin. "
     	"Failed to load file %s.", vfsfilename);
-    return NULL;
+    goto create_out;
   }
 
-  iDataBuffer *buf = VFS->ReadFile (vfsfilename);
+  buf = VFS->ReadFile (vfsfilename);
   if(!buf) 
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not read vfs file %s\n", 
       vfsfilename);
-    return NULL;
+    goto create_out;
   }
-  iImage *image = imgloader->Load(buf->GetUint8 (), buf->GetSize (),
-    txtmgr->GetTextureFormat ());
+
+  image = imgloader->Load(buf->GetUint8 (), buf->GetSize (),
+			  txtmgr->GetTextureFormat ());
   if(!image) 
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 
       "The imageloader could not load image %s", vfsfilename);
-    return NULL;
+    goto create_out;
   }
-  iTextureHandle *handle = txtmgr->RegisterTexture(image, CS_TEXTURE_2D |
-    CS_TEXTURE_3D);
+  
+  handle = txtmgr->RegisterTexture(image, CS_TEXTURE_2D | CS_TEXTURE_3D);
   if(!handle) 
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 
       "Texturemanager could not register texture %s", vfsfilename);
-    return NULL;
+    goto create_out;
   }
-  csIsoMaterial *material = new csIsoMaterial(handle);
-  iMaterialHandle *math = txtmgr->RegisterMaterial(material);
-  if(!math) 
+
+  material = new csIsoMaterial(handle);
+  math = txtmgr->RegisterMaterial(material);
+  if(math) 
+    mat_wrap = CreateMaterialWrapper(math, materialname);
+  else
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 
       "Texturemanager could not register material %s", materialname);
-    return NULL;
+    goto create_out;
   }
 
-  buf->DecRef();
-  imgloader->DecRef();
-  return CreateMaterialWrapper(math, materialname);
+ create_out:
+  if (math) math->DecRef ();
+  if (image) image->DecRef ();
+  if (buf) buf->DecRef();
+  if (imgloader) imgloader->DecRef ();
+  if (VFS) VFS->DecRef ();
+
+  return mat_wrap;
 }
 
 iMaterialWrapper *csIsoEngine::FindMaterial(const char *name)
@@ -365,19 +386,37 @@ int csIsoEngine::GetMaterialCount() const
 iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
     const char *name) 
 {
-  if(name && FindMeshFactory(name))
-    return FindMeshFactory(name);
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-		iPluginManager);
-  iMeshObjectType *mesh_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	classId, "MeshObj", iMeshObjectType);
-  if(!mesh_type) mesh_type = CS_LOAD_PLUGIN( plugin_mgr, classId,  "MeshObj", 
-    iMeshObjectType);
-  if(!mesh_type) return NULL;
-  iMeshObjectFactory *mesh_fact = mesh_type->NewFactory();
-  if(!mesh_fact) return NULL;
-  AddMeshFactory(mesh_fact, name);
-  mesh_fact->DecRef();
+  iMeshObjectFactory *mesh_fact;
+  iMeshObjectType *mesh_type;
+  iPluginManager* plugin_mgr;
+
+  if(name)
+  {
+    mesh_fact = FindMeshFactory(name);
+    if (mesh_fact)
+    {
+      mesh_fact->IncRef ();
+      return mesh_fact;
+    }
+  }
+  
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  mesh_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, classId, "MeshObj", 
+				     iMeshObjectType);
+
+  if(!mesh_type) 
+    mesh_type = CS_LOAD_PLUGIN (plugin_mgr, classId,  "MeshObj", 
+				iMeshObjectType);
+  if(!mesh_type) 
+    return NULL;
+
+  mesh_fact = mesh_type->NewFactory ();
+  if(mesh_fact)
+  {
+    AddMeshFactory (mesh_fact, name);
+    mesh_fact->DecRef ();
+  }
+  mesh_type->DecRef ();
   return mesh_fact;
 }
 

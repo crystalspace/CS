@@ -47,7 +47,7 @@ csIsoView::csIsoView (iBase *iParent, iIsoEngine *eng, iIsoWorld *world)
   invx_axis_y = 1.0 / x_axis.y;
 
   // prealloc a renderview
-  rview = new csIsoRenderView(this);
+  rview = new csIsoRenderView(NULL);
   fakecam = new csIsoFakeCamera();
 }
 

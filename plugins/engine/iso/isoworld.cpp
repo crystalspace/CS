@@ -73,7 +73,7 @@ void csIsoWorld::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
 
 iIsoGrid* csIsoWorld::CreateGrid(int width, int height)
 {
-  iIsoGrid *grid = new csIsoGrid(this, this, width, height);
+  iIsoGrid *grid = new csIsoGrid(NULL, this, width, height);
   csIsoGridListNode *node = new csIsoGridListNode;
   node->next = gridlist;
   node->grid = grid;

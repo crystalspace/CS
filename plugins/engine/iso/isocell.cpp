@@ -24,6 +24,11 @@ SCF_IMPLEMENT_IBASE (csIsoCell)
   SCF_IMPLEMENTS_INTERFACE (iIsoCell)
 SCF_IMPLEMENT_IBASE_END
 
+csIsoCellNode::~csIsoCellNode ()
+{
+  if (drawpart) drawpart->DecRef ();
+}
+
 csIsoCell::csIsoCell (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
@@ -61,6 +66,8 @@ void csIsoCell::AddSprite(iIsoSprite *sprite, const csVector3& pos)
   newnode->drawpart = sprite;
   newnode->left = NULL;
   newnode->right = NULL;
+  sprite->IncRef ();
+
   if(!parent) 
   {
     /// inserted becomes the new root
