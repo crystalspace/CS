@@ -1589,8 +1589,9 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
-    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0)
-      continue;	// No sectors, don't process lighting.
+    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0 &&
+	s->GetParentContainer () == 0)
+      continue;	// No sectors and no parent mesh, don't process lighting.
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
@@ -1700,8 +1701,9 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
-    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0)
-      continue;	// No sectors, don't process lighting.
+    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0 &&
+	s->GetParentContainer () == 0)
+      continue;	// No sectors or parent mesh, don't process lighting.
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();

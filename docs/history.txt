@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Jun-2004
+	- Jorrit fixed a bug in the engine where it would ignore (and not
+	  cache) lighting generated for hierarchical objects. This would
+	  make the door too dark because it is a child object.
 8-Jun-2004
 	- Jorrit fixed a bug in the FindByNameWithChild() function in the
 	  engine. This function would crash if there were unnamed meshes
