@@ -44,51 +44,46 @@ csMovableSectorList::csMovableSectorList ()
   movable = NULL;
 }
 
-iSector *csMovableSectorList::FindByName (const char *name) const
+int csMovableSectorList::AddSector (iSector* sector)
 {
-  if (!name) return NULL;
-
-  int i;
-  for (i=0 ; i<Length () ; i++)
-  {
-    iSector *sec = Get (i);
-    if (sec->QueryObject ()->GetName ())
-      if (!strcmp (sec->QueryObject ()->GetName (), name))
-        return sec;
-  }
-  return NULL;
-}
-
-void csMovableSectorList::AddSector (iSector* sector)
-{
-  if (sector == NULL) return;
+  int n = -1;
+  if (sector == NULL) return -1;
   CS_ASSERT (movable != NULL);
   if (movable->GetParent () == NULL)
   {
-    Push (sector);
+    n = Push (sector);
     movable->GetMeshWrapper ()->
       MoveToSector (sector->GetPrivateObject ());
   }
+  return n;
 }
 
-void csMovableSectorList::RemoveSector (iSector* /*sector*/)
+bool csMovableSectorList::FreeItem (void *item)
 {
+  iSector *Sector = (iSector*)item;
+
   // @@@ NOT IMPLEMENTED YET.
   CS_ASSERT (false);
+  (void)Sector;
+  return true;
 }
 
 int csMovableSectorList::SectorList::GetSectorCount () const
-{ return scfParent->Length (); }
-iSector *csMovableSectorList::SectorList::GetSector (int idx) const
-{ return scfParent->Get (idx); }
-void csMovableSectorList::SectorList::AddSector (iSector* sect)
-{ scfParent->AddSector (sect); }
-void csMovableSectorList::SectorList::RemoveSector (iSector* sect)
-{ scfParent->RemoveSector (sect); }
-iSector *csMovableSectorList::SectorList::FindByName (const char *name) const
-{ return scfParent->FindByName (name); }
-int csMovableSectorList::SectorList::Find (iSector *sec) const
-{ return scfParent->Find (sec); }
+  { return scfParent->Length (); }
+iSector *csMovableSectorList::SectorList::Get (int n) const
+  { return scfParent->Get (n); }
+int csMovableSectorList::SectorList::AddSector (iSector *obj)
+  { return scfParent->AddSector (obj); }
+bool csMovableSectorList::SectorList::RemoveSector (iSector *obj)
+  { return scfParent->Delete (obj); }
+bool csMovableSectorList::SectorList::RemoveSector (int n)
+  { return scfParent->Delete (n); }
+void csMovableSectorList::SectorList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csMovableSectorList::SectorList::Find (iSector *obj) const
+  { return scfParent->Find (obj); }
+iSector *csMovableSectorList::SectorList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }
 
 //---------------------------------------------------------------------------
 

@@ -20,6 +20,7 @@
 #define __CS_MOVABLE_H__
 
 #include "csutil/typedvec.h"
+#include "csutil/nobjvec.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
 
@@ -29,7 +30,7 @@ class csMovable;
 class csMeshWrapper;
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csMovableListenerVector, iMovableListener);
-CS_DECLARE_TYPED_VECTOR_NODELETE (csSectorVector, iSector);
+CS_DECLARE_OBJECT_VECTOR_NOREF (csSectorVector, iSector);
 
 /// A list of sectors as the movable uses it
 class csMovableSectorList : public csSectorVector
@@ -42,18 +43,23 @@ public:
 
   csMovableSectorList ();
   void SetMovable (csMovable* mov) { movable = mov; }
-  iSector *FindByName (const char *name) const;
-  void AddSector (iSector* sec);
-  void RemoveSector (iSector* sec);
+
+  int AddSector (iSector* sec);
+  virtual bool FreeItem (csSome item);
+
   class SectorList : public iSectorList
   {
+  public:
     SCF_DECLARE_EMBEDDED_IBASE (csMovableSectorList);
+
     virtual int GetSectorCount () const;
-    virtual iSector *GetSector (int idx) const;
-    virtual void AddSector (iSector *sec);
-    virtual void RemoveSector (iSector *sec);
-    virtual iSector *FindByName (const char *name) const;
-    virtual int Find (iSector *sec) const;
+    virtual iSector *Get (int n) const;
+    virtual int AddSector (iSector *obj);
+    virtual bool RemoveSector (iSector *obj);
+    virtual bool RemoveSector (int n);
+    virtual void RemoveAll ();
+    virtual int Find (iSector *obj) const;
+    virtual iSector *FindByName (const char *Name) const;
   } scfiSectorList;
 };
 

@@ -123,6 +123,8 @@ public:
   inline iObject *Pop ();
   /// Delete an element from the vector
   inline bool Delete (int n);
+  /// Delete an element from the vector
+  bool Delete (iObject *obj);
   /// Delete all elements
   inline void DeleteAll ();
   /// Return the pointer to an element

@@ -1417,7 +1417,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 void csThing::AppendShadows (iMovable* movable, iShadowBlockList* shadows,
 	csVector3& origin)
 {
-  iSector* isect = movable->GetSectors ()->GetSector (0);
+  iSector* isect = movable->GetSectors ()->Get (0);
   iShadowBlock* list = shadows->NewShadowBlock (
   	isect, isect->GetRecLevel (),
   	polygons.Length ());

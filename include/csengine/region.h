@@ -22,7 +22,7 @@
 #include "csutil/csobject.h"
 #include "iengine/region.h"
 
-class csEngine;
+struct iEngine;
 
 /**
  * A region. A region is basically a collection of objects in the
@@ -31,13 +31,13 @@ class csEngine;
 class csRegion : public csObject
 {
 private:
-  csEngine* engine;
+  iEngine* engine;
 
 public:
   /**
    * Initialize an empty region.
    */
-  csRegion (csEngine*);
+  csRegion (iEngine*);
 
   /**
    * Delete the region without deleting the entities in it. The entities

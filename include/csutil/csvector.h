@@ -61,6 +61,8 @@ public:
 
   /// Delete element number 'n' from vector (attention: non virtual!)
   bool Delete (int n);
+  /// Delete the given element from vector (attention: non virtual!)
+  bool Delete (csSome Item);
 
   /// Exchange two elements in array
   inline void Exchange (int n1, int n2);
@@ -115,6 +117,8 @@ public:
 
   /// Delete element number 'n' from vector
   bool Delete (int n, bool FreeIt = true);
+  /// Delete the given element from vector
+  bool Delete (csSome Item, bool FreeIt = true);
   /// Replace n-th item with another (free previous value)
   bool Replace (int n, csSome what, bool FreePrevious = true);
   /// Delete all elements
@@ -162,6 +166,13 @@ inline int csBasicVector::Length () const
   return (count);
 }
 
+inline bool csBasicVector::Delete (csSome Item)
+{
+  int n = Find (Item);
+  if (n == -1) return false;
+  else return Delete (n);
+}
+
 inline int csBasicVector::Push (csSome what)
 {
   SetLength (count + 1);
@@ -187,6 +198,13 @@ inline void csBasicVector::Exchange (int n1, int n2)
   csSome tmp = root [n1];
   root [n1] = root [n2];
   root [n2] = tmp;
+}
+
+inline bool csVector::Delete (csSome Item, bool FreeIt)
+{
+  int n = Find (Item);
+  if (n == -1) return false;
+  else return Delete (n, FreeIt);
 }
 
 inline void csVector::QuickSort (int Mode)

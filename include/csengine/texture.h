@@ -199,15 +199,21 @@ public:
   SCF_DECLARE_IBASE;
 
   //-------------------- iTextureList implementation -------------------------
-  struct TextureList : public iTextureList
+  class TextureList : public iTextureList
   {
+  public:
     SCF_DECLARE_EMBEDDED_IBASE (csTextureList);
 
     virtual iTextureWrapper *NewTexture (iImage *image);
     virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
-    virtual long GetTextureCount () const;
-    virtual iTextureWrapper *Get (int idx) const;
-    virtual iTextureWrapper *FindByName (const char* iName) const;
+    virtual int GetTextureCount () const;
+    virtual iTextureWrapper *Get (int n) const;
+    virtual int AddTexture (iTextureWrapper *obj);
+    virtual bool RemoveTexture (iTextureWrapper *obj);
+    virtual bool RemoveTexture (int n);
+    virtual void RemoveAll ();
+    virtual int Find (iTextureWrapper *obj) const;
+    virtual iTextureWrapper *FindByName (const char *Name) const;
   } scfiTextureList;
 };
 

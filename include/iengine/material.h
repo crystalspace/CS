@@ -84,18 +84,31 @@ struct iMaterialList : public iBase
    * Create a engine wrapper for a pre-prepared iTextureHandle
    * The handle will be IncRefed.
    */
-  virtual iMaterialWrapper* NewMaterial (iMaterialHandle *ith) = 0;
+  virtual iMaterialWrapper *NewMaterial (iMaterialHandle *ith) = 0;
 
-  /**
-   * Get the number of materials.
-   */
-  virtual int GetMaterialCount () = 0;
+  /// Return the number of materials in this list
+  virtual int GetMaterialCount () const = 0;
 
-  /// Return material by index.
-  virtual iMaterialWrapper* Get (int idx) = 0;
+  /// Return a material by index
+  virtual iMaterialWrapper *Get (int n) const = 0;
 
-  /// Find a material by name.
-  virtual iMaterialWrapper* FindByName (const char* iName) = 0;
+  /// Add a material
+  virtual int AddMaterial (iMaterialWrapper *obj) = 0;
+
+  /// Remove a material
+  virtual bool RemoveMaterial (iMaterialWrapper *obj) = 0;
+
+  /// Remove the nth material
+  virtual bool RemoveMaterial (int n) = 0;
+
+  /// Remove all materials
+  virtual void RemoveAll () = 0;
+
+  /// Find a material and return its index
+  virtual int Find (iMaterialWrapper *obj) const = 0;
+
+  /// Find a material by name
+  virtual iMaterialWrapper *FindByName (const char *Name) const = 0;
 };
 
 #endif // __IENGINE_MATERIAL_H__

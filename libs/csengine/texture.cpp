@@ -207,9 +207,19 @@ iTextureWrapper *csTextureList::TextureList::NewTexture (iImage *image)
   { return scfParent->NewTexture (image); }
 iTextureWrapper *csTextureList::TextureList::NewTexture (iTextureHandle *ith)
   { return scfParent->NewTexture (ith); }
-long csTextureList::TextureList::GetTextureCount () const
+int csTextureList::TextureList::GetTextureCount () const
   { return scfParent->Length (); }
-iTextureWrapper *csTextureList::TextureList::Get (int idx) const
-  { return scfParent->Get (idx); }
-iTextureWrapper *csTextureList::TextureList::FindByName (const char* iName) const
-  { return scfParent->FindByName (iName); }
+iTextureWrapper *csTextureList::TextureList::Get (int n) const
+  { return scfParent->Get (n); }
+int csTextureList::TextureList::AddTexture (iTextureWrapper *obj)
+  { return scfParent->Push (obj); }
+bool csTextureList::TextureList::RemoveTexture (iTextureWrapper *obj)
+  { return scfParent->Delete (obj); }
+bool csTextureList::TextureList::RemoveTexture (int n)
+  { return scfParent->Delete (n); }
+void csTextureList::TextureList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csTextureList::TextureList::Find (iTextureWrapper *obj) const
+  { return scfParent->Find (obj); }
+iTextureWrapper *csTextureList::TextureList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }

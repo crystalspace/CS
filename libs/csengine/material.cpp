@@ -240,9 +240,19 @@ iMaterialWrapper* csMaterialList::MaterialList::NewMaterial (iMaterial* material
   { return scfParent->NewMaterial (material); }
 iMaterialWrapper* csMaterialList::MaterialList::NewMaterial (iMaterialHandle *ith)
   { return scfParent->NewMaterial (ith); }
-int csMaterialList::MaterialList::GetMaterialCount ()
+int csMaterialList::MaterialList::GetMaterialCount () const
   { return scfParent->Length (); }
-iMaterialWrapper* csMaterialList::MaterialList::Get (int idx)
-  { return scfParent->Get (idx); }
-iMaterialWrapper* csMaterialList::MaterialList::FindByName (const char* iName)
-  { return scfParent->FindByName (iName); }
+iMaterialWrapper *csMaterialList::MaterialList::Get (int n) const
+  { return scfParent->Get (n); }
+int csMaterialList::MaterialList::AddMaterial (iMaterialWrapper *obj)
+  { return scfParent->Push (obj); }
+bool csMaterialList::MaterialList::RemoveMaterial (iMaterialWrapper *obj)
+  { return scfParent->Delete (obj); }
+bool csMaterialList::MaterialList::RemoveMaterial (int n)
+  { return scfParent->Delete (n); }
+void csMaterialList::MaterialList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csMaterialList::MaterialList::Find (iMaterialWrapper *obj) const
+  { return scfParent->Find (obj); }
+iMaterialWrapper *csMaterialList::MaterialList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }

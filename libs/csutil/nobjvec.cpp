@@ -107,3 +107,10 @@ int csNamedObjectVector::CompareKey (csSome Item, csConstSome Key, int)
   obj->DecRef ();
   return res;
 }
+
+bool csNamedObjectVector::Delete (iObject *obj)
+{
+  int n = Find (obj);
+  if (n == -1) return false;
+  else return Delete (n);
+}

@@ -155,16 +155,27 @@ struct iSectorList : public iBase
 {
   /// Return the number of sectors in this list
   virtual int GetSectorCount () const = 0;
-  /// Return a single sector
-  virtual iSector *GetSector (int idx) const = 0;
+
+  /// Return a sector by index
+  virtual iSector *Get (int n) const = 0;
+
   /// Add a sector
-  virtual void AddSector (iSector *sec) = 0;
+  virtual int AddSector (iSector *obj) = 0;
+
   /// Remove a sector
-  virtual void RemoveSector (iSector *sec) = 0;
-  /// Find a sector by name
-  virtual iSector *FindByName (const char *name) const = 0;
+  virtual bool RemoveSector (iSector *obj) = 0;
+
+  /// Remove the nth sector
+  virtual bool RemoveSector (int n) = 0;
+
+  /// Remove all sectors
+  virtual void RemoveAll () = 0;
+
   /// Find a sector and return its index
-  virtual int Find (iSector *sec) const = 0;
+  virtual int Find (iSector *obj) const = 0;
+
+  /// Find a sector by name
+  virtual iSector *FindByName (const char *Name) const = 0;
 };
 
 #endif // __IENGINE_SECTOR_H__

@@ -158,6 +158,10 @@ public:
   {
     return csVector::Delete (n, true); 
   }
+  inline bool Delete (csSome what)
+  {
+    return csVector::Delete (what, true); 
+  }
   inline void DeleteAll ()
   {
     csVector::DeleteAll (true);
@@ -278,6 +282,8 @@ public:
   public:								\
     inline bool Delete (int n, bool FreeIt = true)			\
     { return superclass::Delete (n, FreeIt); }				\
+    inline bool Delete (TYPE *Item, bool FreeIt = true)			\
+    { return superclass::Delete ((csSome)Item, FreeIt); }		\
     inline void DeleteAll (bool FreeThem = true)			\
     { superclass::DeleteAll (FreeThem); }				\
     CS_PRIVATE_DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)			\
@@ -364,6 +370,8 @@ public:
   public:								\
     inline bool Delete (int n)						\
     { return superclass::Delete (n); }					\
+    inline bool Delete (TYPE *Item)					\
+    { return superclass::Delete ((csSome)Item); }			\
     inline void DeleteAll ()						\
     { superclass::DeleteAll (); }					\
     CS_PRIVATE_DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)			\

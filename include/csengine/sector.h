@@ -516,13 +516,17 @@ public:
 
   class SectorList : public iSectorList
   {
+  public:
     SCF_DECLARE_EMBEDDED_IBASE (csSectorList);
+
     virtual int GetSectorCount () const;
-    virtual iSector *GetSector (int idx) const;
-    virtual void AddSector (iSector *sec);
-    virtual void RemoveSector (iSector *sec);
-    virtual iSector *FindByName (const char *name) const;
-    virtual int Find (iSector *sec) const;
+    virtual iSector *Get (int n) const;
+    virtual int AddSector (iSector *obj);
+    virtual bool RemoveSector (iSector *obj);
+    virtual bool RemoveSector (int n);
+    virtual void RemoveAll ();
+    virtual int Find (iSector *obj) const;
+    virtual iSector *FindByName (const char *Name) const;
   } scfiSectorList;
 };
 

@@ -1199,16 +1199,17 @@ bool csSectorList::FreeItem (csSome Item)
 
 int csSectorList::SectorList::GetSectorCount () const
   { return scfParent->Length (); }
-iSector *csSectorList::SectorList::GetSector (int idx) const
-  { return scfParent->Get (idx); }
-void csSectorList::SectorList::AddSector (iSector *sec)
-  { scfParent->Push (sec); }
-void csSectorList::SectorList::RemoveSector (iSector *sec)
-  {
-    int n = scfParent->Find (sec);
-    if (n >= 0) scfParent->Delete (n); 
-  }
-iSector *csSectorList::SectorList::FindByName (const char *name) const
-  { return scfParent->FindByName (name); }
-int csSectorList::SectorList::Find (iSector *sec) const
-  { return scfParent->Find (sec); }
+iSector *csSectorList::SectorList::Get (int n) const
+  { return scfParent->Get (n); }
+int csSectorList::SectorList::AddSector (iSector *obj)
+  { return scfParent->Push (obj); }
+bool csSectorList::SectorList::RemoveSector (iSector *obj)
+  { return scfParent->Delete (obj); }
+bool csSectorList::SectorList::RemoveSector (int n)
+  { return scfParent->Delete (n); }
+void csSectorList::SectorList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csSectorList::SectorList::Find (iSector *obj) const
+  { return scfParent->Find (obj); }
+iSector *csSectorList::SectorList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }

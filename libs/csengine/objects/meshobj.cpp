@@ -166,7 +166,7 @@ void csMeshWrapper::RemoveFromSectors ()
   const iSectorList *sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors->GetSectorCount () ; i++)
   {
-    iSector* ss = sectors->GetSector (i);
+    iSector* ss = sectors->Get (i);
     if (ss)
       ss->GetMeshes ()->RemoveMesh (&scfiMeshWrapper);
   }
@@ -182,7 +182,7 @@ void csMeshWrapper::SetRenderPriority (long rp)
   const iSectorList *sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors->GetSectorCount () ; i++)
   {
-    iSector* ss = sectors->GetSector (i);
+    iSector* ss = sectors->Get (i);
     if (ss) ss->GetPrivateObject ()->RelinkMesh (this);
   }
 }
@@ -198,7 +198,7 @@ void csMeshWrapper::UpdateDeferedLighting (const csVector3& pos)
     if (defered_num_lights > light_worktable.Limit ())
       light_worktable.SetLimit (defered_num_lights);
 
-    iSector* sect = movable_sectors->GetSector (0);
+    iSector* sect = movable_sectors->Get (0);
     int num_lights = csEngine::current_engine->GetNearbyLights (
       sect->GetPrivateObject (),
       pos, defered_lighting_flags,
@@ -287,7 +287,7 @@ void csMeshWrapper::PlaceMesh ()
   csSphere sphere;
   csVector3 radius;
   mesh->GetRadius (radius, sphere.GetCenter ());
-  iSector* sector = movable_sectors->GetSector (0);
+  iSector* sector = movable_sectors->Get (0);
   movable.SetSector (sector);	// Make sure all other sectors are removed
 
   // Transform the sphere from object to world space.

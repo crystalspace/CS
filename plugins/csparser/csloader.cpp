@@ -402,7 +402,7 @@ bool csLoader::LoadMap (char* buf)
   int i,j;
   for (i=0; i<Engine->GetSectors ()->GetSectorCount(); i++)
   {
-    iSector *Sector = Engine->GetSectors ()->GetSector (i);
+    iSector *Sector = Engine->GetSectors ()->Get (i);
     if (ResolveOnlyRegion)
     {
       // This test avoids redoing sectors that are not in this region.
@@ -1876,7 +1876,7 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
 	  int i;
 	  for (i = 0 ; i < sl->GetSectorCount () ; i++)
 	  {
-	    iSector* sect = sl->GetSector (i);
+	    iSector* sect = sl->Get (i);
 	    if ((!ResolveOnlyRegion) || (!Engine->GetCurrentRegion ()) ||
 	      Engine->GetCurrentRegion ()->IsInRegion (sect->QueryObject ()))
 	    {

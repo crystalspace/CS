@@ -32,6 +32,8 @@
 #include "csutil/csvector.h"
 #include "ivideo/txtmgr.h"
 
+CS_DECLARE_TYPED_VECTOR_NODELETE (csObjectVectorNodelete, iObject);
+
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE_EXT (csRegion)
@@ -42,7 +44,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csRegion::Region)
   SCF_IMPLEMENTS_INTERFACE (iRegion)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csRegion::csRegion (csEngine* e) : csObject ()
+csRegion::csRegion (iEngine* e) : csObject ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRegion);
   engine = e;
@@ -64,7 +66,7 @@ void csRegion::Region::DeleteAll ()
 
   // First we need to copy the objects to a csVector to avoid
   // messing up the iterator while we are deleting them.
-  csVector copy;
+  csObjectVectorNodelete copy;
   for (iter = scfParent->GetIterator ();
   	!iter->IsFinished () ; iter->Next ())
   {
@@ -84,103 +86,93 @@ void csRegion::Region::DeleteAll ()
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      iObject* obj = (iObject*)copy[i];
+      iObject* obj = copy[i];
       iCollection* o = SCF_QUERY_INTERFACE_FAST (obj, iCollection);
       if (!o) continue;
-      o->DecRef ();
+
       scfParent->engine->GetCollections ()->RemoveCollection (o);
-      scfParent->ObjRemove (obj);	// Remove from this region.
+      scfParent->ObjRemove (obj);
       copy[i] = NULL;
+      o->DecRef ();
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      iObject* obj = (iObject*)copy[i];
+      iObject* obj = copy[i];
       iMeshWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMeshWrapper);
       if (!o) continue;
-      o->DecRef ();
-      scfParent->engine->GetMeshes ()->RemoveMesh (o);
 
-      scfParent->ObjRemove (obj);	// Remove from this region.
+      scfParent->engine->GetMeshes ()->RemoveMesh (o);
+      scfParent->ObjRemove (obj);
       copy[i] = NULL;
+      o->DecRef ();
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      iObject* obj = (iObject*)copy[i];
+      iObject* obj = copy[i];
       iMeshFactoryWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMeshFactoryWrapper);
       if (!o) continue;
-      o->DecRef ();
+
       scfParent->engine->GetMeshFactories ()->RemoveMeshFactory (o);
-      scfParent->ObjRemove (obj);	// Remove from this region.
+      scfParent->ObjRemove (obj);
       copy[i] = NULL;
+      o->DecRef ();
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      iObject* obj = (iObject*)copy[i];
+      iObject* obj = copy[i];
       iSector* o = SCF_QUERY_INTERFACE_FAST (obj, iSector);
       if (!o) continue;
-      o->DecRef ();
+
       o->GetPrivateObject ()->CleanupReferences ();
-      int idx = scfParent->engine->sectors.Find (o);
-      if (idx != -1)
-        scfParent->engine->sectors.Delete (idx);
-      else
-        o->DecRef ();
-      scfParent->ObjRemove (obj);	// Remove from this region.
+      scfParent->engine->GetSectors ()->RemoveSector (o);
+      scfParent->ObjRemove (obj);
       copy[i] = NULL;
+      o->DecRef ();
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      iObject* obj = (iObject*)copy[i];
+      iObject* obj = copy[i];
       iMaterialWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
       if (!o) continue;
-      o->DecRef ();
-      int idx = scfParent->engine->GetMaterials ()->Find (o);
-      if (idx != -1)
-        scfParent->engine->GetMaterials ()->Delete (idx);
-      else
-        o->DecRef ();
-      scfParent->ObjRemove (obj);	// Remove from this region.
+
+      scfParent->engine->GetMaterialList ()->RemoveMaterial (o);
+      scfParent->ObjRemove (obj);
       copy[i] = NULL;
+      o->DecRef ();
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      iObject* obj = (iObject*)copy[i];
+      iObject* obj = copy[i];
       iTextureWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iTextureWrapper);
       if (!o) continue;
-      o->DecRef ();
-      int idx = scfParent->engine->GetTextures ()->Find (o);
-      if (idx != -1)
-        scfParent->engine->GetTextures ()->Delete (idx);
-      else
-        o->DecRef ();
-      scfParent->ObjRemove (obj);	// Remove from this region.
+
+      scfParent->engine->GetTextureList ()->RemoveTexture (o);
+      scfParent->ObjRemove (obj);
       copy[i] = NULL;
+      o->DecRef ();
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      iObject* obj = (iObject*)copy[i];
+      iObject* obj = copy[i];
       iCameraPosition* o = SCF_QUERY_INTERFACE_FAST (obj, iCameraPosition);
       if (!o) continue;
-      o->DecRef ();
-      int idx = scfParent->engine->GetCameraPositions ()->Find (o);
-      if (idx != -1)
-        scfParent->engine->GetCameraPositions ()->RemoveCameraPosition (o);
-      else
-        o->DecRef ();
-      scfParent->ObjRemove (obj);	// Remove from this region.
+
+      scfParent->engine->GetCameraPositions ()->RemoveCameraPosition (o);
+      scfParent->ObjRemove (obj);
       copy[i] = NULL;
+      o->DecRef ();
     }
 
 #ifdef CS_DEBUG
@@ -189,7 +181,7 @@ void csRegion::Region::DeleteAll ()
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      iObject* o = (iObject*)copy[i];
+      iObject* o = copy[i];
       csEngine::current_engine->ReportBug ("\
 There is still an object in the array after deleting region contents!\n\
 Object name is '%s'",

@@ -127,7 +127,7 @@ real csRigidSpaceTimeObj::collision_check ()
   for (i = 0; i < continuum_end; i++)
   {
     first_sector = space_time_continuum[i]->sprt->GetMovable ()->
-      GetSectors ()->GetSector (0);
+      GetSectors ()->Get (0);
     // Start collision detection.
     coli = space_time_continuum[i]->col;
     iCollideSystem* cdsys = coli->GetCollideSystem ();

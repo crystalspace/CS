@@ -831,7 +831,7 @@ void move_ghost (iMeshWrapper* spr)
 {
   csColliderWrapper* col = csColliderWrapper::GetColliderWrapper (
   	spr->QueryObject ());
-  iSector* first_sector = spr->GetMovable ()->GetSectors ()->GetSector (0);
+  iSector* first_sector = spr->GetMovable ()->GetSectors ()->Get (0);
 
   // Create a transformation 'test' which indicates where the ghost
   // is moving too.

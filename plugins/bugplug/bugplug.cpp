@@ -596,7 +596,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	  int i, j;
 	  for (i = 0 ; i < Engine->GetSectors ()->GetSectorCount () ; i++)
 	  {
-	    iSector* sector = Engine->GetSectors ()->GetSector (i);
+	    iSector* sector = Engine->GetSectors ()->Get (i);
 	    iMeshList* ml = sector->GetMeshes ();
 	    for (j = 0 ; j < ml->GetMeshCount () ; j++)
 	    {
@@ -1001,7 +1001,7 @@ void csBugPlug::Dump (iEngine* engine)
   int i;
   for (i = 0 ; i < sectors->GetSectorCount () ; i++)
   {
-    iSector* sector = sectors->GetSector (i);
+    iSector* sector = sectors->Get (i);
     Dump (sector);
   }
   for (i = 0 ; i < factories->GetMeshFactoryCount () ; i++)
@@ -1073,7 +1073,7 @@ void csBugPlug::Dump (iMeshWrapper* mesh)
     int i;
     for (i = 0 ; i < cnt ; i++)
     {
-      iSector* sec = movable->GetSectors ()->GetSector (i);
+      iSector* sec = movable->GetSectors ()->Get (i);
       const char* sn = sec->QueryObject ()->GetName ();
       Report (CS_REPORTER_SEVERITY_DEBUG, "        In sector '%s'",
       	sn ? sn : "?");
