@@ -3284,8 +3284,16 @@ echo "${ECHO_T}$cs_cv_perl_mod_dynaloader" >&6
 fi
 
 
-	cs_cv_perl_cflags=`$PERL -MExtUtils::Embed -e ccopts`
-	cs_cv_perl_lflags=`$PERL -MExtUtils::Embed -e ldopts`
+	cs_cv_perl_cflags=`{ (echo "$as_me:$LINENO: \$PERL -MExtUtils::Embed -e ccopts") >&5
+  ($PERL -MExtUtils::Embed -e ccopts) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }`
+	cs_cv_perl_lflags=`{ (echo "$as_me:$LINENO: \$PERL -MExtUtils::Embed -e ldopts") >&5
+  ($PERL -MExtUtils::Embed -e ldopts) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }`
 else
   # ExtUtils::Embed absent.
 	{ echo "$as_me:$LINENO: Recommend you install the latest release of Perl 5." >&5
@@ -14043,7 +14051,7 @@ cs_host_os_normalized=''
 	    cs_host_makefile=libs/cssys/win32/win32gcc.mak
 	    cs_host_family=windows
 	    ;;
-	darwin*|rhapsody*|openstep*|nextstep*)
+	darwin*)
 
 
 

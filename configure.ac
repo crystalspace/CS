@@ -693,8 +693,8 @@ AS_IF([test -n "$PERL"],
 	AS_IF([test $cs_cv_perl_mod_dynaloader = yes],
 	    [CS_MAKEFILE_PROPERTY([PERL5.EXTUTILS.DYNALOADER], [DynaLoader])])
 
-	cs_cv_perl_cflags=`$PERL -MExtUtils::Embed -e ccopts`
-	cs_cv_perl_lflags=`$PERL -MExtUtils::Embed -e ldopts`],
+	cs_cv_perl_cflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ccopts])`
+	cs_cv_perl_lflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ldopts])`],
 
 	# ExtUtils::Embed absent.
 	[AC_MSG_NOTICE([Recommend you install the latest release of Perl 5.])
@@ -1351,7 +1351,7 @@ AC_DEFUN([CS_CHECK_HOST],
 	    cs_host_makefile=libs/cssys/win32/win32gcc.mak
 	    cs_host_family=windows
 	    ;;
-	darwin*|rhapsody*|openstep*|nextstep*)
+	darwin*)
 	    _CS_CHECK_HOST_DARWIN
 	    ;;
 	*)
