@@ -2,8 +2,9 @@ Crystal Space detailed change log.
 http://crystal.sourceforge.net/
 
 The overall history is in reverse (descending) chronological order, so that
-each new day's apears before the previous day's entry.  The individual changes
-for each given day, however, are in normal (ascending) chronological order.
+each new day's entries apears before the previous day's entries.  The
+individual changes for each given day, however, are in normal (ascending)
+chronological order.
 
 31-Jul-2003
 	- Jorrit replaced various occurances of csVector:
