@@ -346,6 +346,15 @@ struct iSequenceTrigger : public iBase
   virtual void AddConditionMeshClick (iMeshWrapper* mesh) = 0;
 
   /**
+   * Condition: light change.  Call this to add a trigger
+   * which fires a sequence when a light gets darker than 
+   * a certain value or lighter than a certain value, or
+   * whenever a light changes.
+   */
+  virtual void AddConditionLightChange (iLight *whichlight, 
+				        int oper,csColor& col) = 0;
+
+  /**
    * Condition: manual trigger. Call this to set add a trigger
    * that requires manual confirmation. The 'Trigger()' function
    * can then be used later to actually do the trigger.
