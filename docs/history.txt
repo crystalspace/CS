@@ -25,6 +25,8 @@ The history order is reversed so that new features are at the top.
 	  variable, in order to know when to shutdown the AppKit's run-loop.
 	  (Note that NeXTAssistant already correctly used cscmdQuit in order to
 	  request a shutdown of the CS run-loop.)
+	- Fixed the Hurd, FreeBSD, Irix, and Solaris makefiles to also
+	  include the helper plugins for the X canvases.
 29-Aug-2001
 	- Andrew Zabolotny reports: OS/2 port strikes back :-)
 	    - Fixed csdive plugin.

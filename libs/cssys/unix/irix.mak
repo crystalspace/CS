@@ -13,6 +13,13 @@ PLUGINS+=video/canvas/softx sound/renderer/software
 # Uncomment the following to build OpenGL stuff
 PLUGINS+=video/renderer/opengl video/canvas/openglx
 
+# The X-Window plugin
+PLUGINS+=video/canvas/xwindow
+# Shared Memory Plugin
+PLUGINS+=video/canvas/xextshm
+# Video Modes Plugin
+PLUGINS+=video/canvas/xextf86vm
+
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
