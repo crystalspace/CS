@@ -28,6 +28,8 @@ The history order is reversed so that new features are at the top.
 	  problem was that the event handler is busy in the loop calling
 	  HandleEvent() on all the event handlers. Having an event handler
 	  delete itself while in the loop could cause various problems.
+	- Eric Sunshine eliminated a compilation warning from parser.h
+	  regarding implicit conversion from void*.
 10-Oct-2001
 	- Slight optimization in csSector::IntersectSegment() where it
 	  would transform back the intersection point even if there

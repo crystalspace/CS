@@ -63,7 +63,7 @@ class csTokenVector : public csVector
     {
       csTokenDesc *td = new csTokenDesc;
       td->id = id;
-      td->token = (name ? csStrNew (name) : NULL);
+      td->token = (name ? csStrNew (name) : 0);
       InsertSorted (td);
       return this;
     }
