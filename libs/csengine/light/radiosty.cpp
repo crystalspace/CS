@@ -245,7 +245,7 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
   
   int transr=0, transg=0, transb=0; // transparent color
   
-  txthandle->SetKeyColor(transr, transg, transb);
+  txthandle->GetKeyColor(transr, transg, transb);
   
   iImage *txtimage = txthandle->GetImageFile();
   iImage *rgbimage = txtimage->Clone(); 
