@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include "cscom/com.h"
 
-typedef unsigned long CS_LIBRARY;
+PROC SysGetProcAddress (CS_LIBRARY, const char*);
 
 struct LibraryList
 {
@@ -32,21 +32,20 @@ struct LibraryList
   LibraryList *Next;
 };
 
-LibraryList *LibList = NULL;
+static LibraryList *LibList = NULL;
 
-CS_LIBRARY csLoadLibrary (char* szLibName)
+CS_HLIBRARY SysLoadLibrary (const char* szLibName)
 {
 #if 0
   LibraryList* Item;
   CS_LIBRARY Handle;
-  //STDAPI (*DllInitialize) ();
   HRESULT (*DllInitialize) ();
 
   Handle = (CS_LIBRARY)dlopen (szLibName, RTLD_LAZY);
 
   if (Handle)
   {
-	DllInitialize = (HRESULT (*) ())csGetProcAddress (Handle, "DllInitialize");
+	DllInitialize = (HRESULT (*) ())SysGetProcAddress (Handle, "DllInitialize");
 	if (!DllInitialize)
 	{
 	  printf("Unable to find DllInitialize in %s\n", szLibName);
@@ -70,7 +69,7 @@ CS_LIBRARY csLoadLibrary (char* szLibName)
 #endif
 }
 
-PROC csGetProcAddress (CS_LIBRARY Handle, char* szProcName)
+PROC SysGetProcAddress (CS_LIBRARY Handle, const char* szProcName)
 {
 #if 0
   return dlsym ((void*)Handle, szProcName);
@@ -79,7 +78,12 @@ PROC csGetProcAddress (CS_LIBRARY Handle, char* szProcName)
 #endif
 }
 
-void csFreeAllLibraries()
+bool SysFreeLibrary(CS_HLIBRARY)
+{
+  return true;
+}
+
+bool SysFreeAllLibraries()
 {
 #if 0
   LibraryList* Current = LibList;
@@ -92,6 +96,7 @@ void csFreeAllLibraries()
 	Current = Next;
   }
 #endif
+  return true;
 }
 
 #endif

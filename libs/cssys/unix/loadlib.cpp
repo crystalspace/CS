@@ -32,7 +32,7 @@
 #  define DLOPEN_MODE 	RTLD_LAZY
 #endif
 
-CS_HLIBRARY SysLoadLibrary (char* szLibName)
+CS_HLIBRARY SysLoadLibrary (const char* szLibName)
 {
   CS_HLIBRARY Handle;
   Handle = (CS_HLIBRARY) dlopen (szLibName, DLOPEN_MODE);
@@ -61,7 +61,7 @@ CS_HLIBRARY SysLoadLibrary (char* szLibName)
   return Handle;
 }
 
-PROC SysGetProcAddress (CS_HLIBRARY Handle, char* szProcName)
+PROC SysGetProcAddress (CS_HLIBRARY Handle, const char* szProcName)
 {
   return (PROC)dlsym ((void *)Handle, szProcName);
 }

@@ -25,19 +25,19 @@
 #include "cscom/com.h"
 
 typedef unsigned long HMODULE;
-extern "C" int DosLoadModule (char *pszName, unsigned long cbName,
-  char *pszModname, HMODULE *phmod);
+extern "C" int DosLoadModule (const char *pszName, unsigned long cbName,
+  const char *pszModname, HMODULE *phmod);
 extern "C" int DosFreeModule (HMODULE hmod);
 extern "C" int DosQueryProcAddr (HMODULE hmod, unsigned long ordinal,
-  char *pszName, PROC* ppfn);
+  const char *pszName, PROC* ppfn);
 
-CS_HLIBRARY SysLoadLibrary (char* szLibName)
+CS_HLIBRARY SysLoadLibrary (const char* szLibName)
 {
   HMODULE Handle;
   return (DosLoadModule (NULL, 0, szLibName, &Handle) ? 0 : Handle);
 }
 
-PROC SysGetProcAddress (CS_HLIBRARY Handle, char* szProcName)
+PROC SysGetProcAddress (CS_HLIBRARY Handle, const char* szProcName)
 {
   PROC Func;
   return (DosQueryProcAddr (Handle, 0, szProcName, &Func) ? NULL : Func);

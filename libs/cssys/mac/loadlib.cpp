@@ -22,11 +22,11 @@
 #include "sysdef.h"
 #include "comdefs.h"
 
-extern CS_HLIBRARY SysLoadLibrary (char *szLibName);
-extern PROC SysGetProcAddress (CS_HLIBRARY Handle, char *szProcName);
+extern CS_HLIBRARY SysLoadLibrary (const char *szLibName);
+extern PROC SysGetProcAddress (CS_HLIBRARY Handle, const char *szProcName);
 extern bool SysFreeLibrary (CS_HLIBRARY Handle);
 
-CS_HLIBRARY SysLoadLibrary( char* szLibName )
+CS_HLIBRARY SysLoadLibrary( const char* szLibName )
 {
 	CFragConnectionID libID;
 	OSErr	theError;
@@ -51,7 +51,7 @@ CS_HLIBRARY SysLoadLibrary( char* szLibName )
 	return (CS_HLIBRARY)libID;
 }
 
-PROC SysGetProcAddress( CS_HLIBRARY hLib, char* szProcName )
+PROC SysGetProcAddress( CS_HLIBRARY hLib, const char* szProcName )
 {
 	Str63				theSymbolName;
 	CFragSymbolClass	theSymbolClass;

@@ -55,8 +55,8 @@ Str255	gAppName;
 FSSpec	gAppLocation;
 bool Shutdown = false;
 
-extern CS_HLIBRARY csLoadLibrary (char *szLibName);
-extern PROC csGetProcAddress (CS_HLIBRARY, char *);
+extern CS_HLIBRARY csLoadLibrary (const char *szLibName);
+extern PROC csGetProcAddress (CS_HLIBRARY, const char *);
 
 OSErr AppleEventHandler( AppleEvent *event, AppleEvent *reply, long refCon );
 AEEventHandlerUPP AppleEventHandlerUPP = NULL;

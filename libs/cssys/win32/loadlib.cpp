@@ -21,13 +21,13 @@
 
 #include <windows.h>
 
-CS_HLIBRARY SysLoadLibrary (char* szLibName)
+CS_HLIBRARY SysLoadLibrary (const char* szLibName)
 {
   CS_HLIBRARY Handle = (CS_HLIBRARY)LoadLibrary (szLibName);
   return Handle;
 }
 
-PROC SysGetProcAddress (CS_HLIBRARY Handle, char* szProcName)
+PROC SysGetProcAddress (CS_HLIBRARY Handle, const char* szProcName)
 {
   return GetProcAddress ((HMODULE)Handle, szProcName);
 }

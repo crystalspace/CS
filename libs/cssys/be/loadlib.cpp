@@ -28,7 +28,7 @@
 
 #include <kernel/image.h>
 
-CS_HLIBRARY SysLoadLibrary (char* szLibName)
+CS_HLIBRARY SysLoadLibrary (const char* szLibName)
 {
   image_id Handle = load_add_on (szLibName);
   if (Handle > 0)
@@ -47,7 +47,7 @@ CS_HLIBRARY SysLoadLibrary (char* szLibName)
   return (CS_HLIBRARY)Handle;
 }
 
-PROC SysGetProcAddress (CS_HLIBRARY Handle, char* szProcName)
+PROC SysGetProcAddress (CS_HLIBRARY Handle, const char* szProcName)
 {
   void *func;
   return (get_image_symbol(Handle, szProcName, B_SYMBOL_TYPE_TEXT, &func) == B_OK) ? (PROC)func : NULL;
