@@ -649,6 +649,7 @@ b:
         else
           dxL = 0;
         leave = false;
+
       }
     } while (!leave);
 
@@ -780,6 +781,7 @@ b:
   }
 
 finish:
+  lm->CalcMaxStatic();
   delete[] f_uv;
 }
 
@@ -833,6 +835,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
         lightpos,
         polygon->GetPolyPlane ()->Normal (),
         cosfact);
+    
+    smap->CalcMaxShadow();
   }
   else
   {
@@ -851,6 +855,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
         lightcolor,
         polygon->GetPolyPlane ()->Normal (),
         cosfact);
+
+    lm->CalcMaxStatic();
   }
 
   delete shadow_bitmap;

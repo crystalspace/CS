@@ -165,6 +165,11 @@ void csLight::Light::SetColor (const csColor &col)
   scfParent->SetColor (col);
 }
 
+bool csLight::Light::IsDynamic()
+{
+    return false;  // overridden by csStatLight
+}
+
 int csLight::Light::GetAttenuation ()
 {
   return scfParent->GetAttenuation ();

@@ -32,9 +32,16 @@
 
 #define LMMAGIC	    "LM03" // must be 4 chars!
 
+
+#ifdef DEBUG_OVERFLOWOPT
+int countfast = 0;
+int countslow = 0;
+#endif
+
 csShadowMap::csShadowMap ()
 {
   Light = NULL;
+  max_shadow = 255;  // use worst case until calc'd
   DG_ADD (this, NULL);
   DG_TYPE (this, "csShadowMap");
 }
@@ -58,6 +65,16 @@ void csShadowMap::Copy (const csShadowMap *source)
 {
   csShadowMapHelper::Copy (source);
   Light = source->Light;
+  max_shadow = source->max_shadow;
+}
+
+void csShadowMap::CalcMaxShadow()
+{
+  max_shadow=0;
+  int len = GetSize();
+  for (int i=0; i<len; i++)
+      if (GetArray()[i] > max_shadow)
+          max_shadow = GetArray()[i];
 }
 
 //---------------------------------------------------------------------------
@@ -78,6 +95,7 @@ csLightMap::csLightMap ()
   delayed_light_info = NULL;
   dyn_dirty = true;
   mean_recalc = true;
+  max_static_color_values.Set(255,255,255);  // use slowest safest method by default
 }
 
 csLightMap::~csLightMap ()
@@ -192,6 +210,7 @@ void csLightMap::CopyLightMap (csLightMap *source)
     smap2->Copy (smap);
     smap = smap->next;
   }
+  max_static_color_values = source->max_static_color_values;
 }
 
 struct PolySave
@@ -368,6 +387,7 @@ bool csLightMap::ReadFromCache (
       light = il->GetPrivateObject ();
       csShadowMap *smap = NewShadowMap (light, w, h);
       memcpy (smap->GetArray (), d, lm_size);
+      smap->CalcMaxShadow();
     }
     else
     {
@@ -379,6 +399,8 @@ bool csLightMap::ReadFromCache (
     d += lm_size;
   }
 
+  CalcMaxStatic ();
+  
   return true;
 }
 
@@ -520,6 +542,8 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   dyn_dirty = false;
   mean_recalc = true;
 
+  csRGBpixel temp_max_color_values = max_static_color_values;
+
   //---
   // First copy the static lightmap to the real lightmap.
   // Remember the real lightmap first so that we can see if
@@ -531,8 +555,26 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
     ambient.Set (dyn_ambient_r * (255/1.5),
                  dyn_ambient_g * (255/1.5),
                  dyn_ambient_b * (255/1.5)  );
-    for (int i=0; i<lm_size; i++)
+
+    if (max_static_color_values.red   + ambient.red   < 256  &&
+        max_static_color_values.green + ambient.green < 256  &&
+        max_static_color_values.blue  + ambient.blue  < 256)
     {
+      // no lightmap overflows so we can use fastest loop with no checking
+      for (int i=0; i<lm_size; i++)
+      {
+        real_lm[i] = static_lm[i];
+        real_lm[i] += ambient;
+      }
+      temp_max_color_values += ambient;
+#ifdef DEBUG_OVERFLOWOPT
+      countfast++;
+#endif
+    }
+    else  // an overflow is somewhere here, so check each and every addition
+    {
+      for (int i=0; i<lm_size; i++)
+      {
         real_lm[i] = static_lm[i];
         int color = ambient.red+real_lm[i].red;
         real_lm[i].red = (color > 255) ? 255 : color;
@@ -540,6 +582,16 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
         real_lm[i].green= (color > 255) ? 255 : color;
         color = ambient.blue+real_lm[i].blue;
         real_lm[i].blue = (color > 255) ? 255 : color;
+      }
+      int color = ambient.red+max_static_color_values.red;
+      temp_max_color_values.red = (color > 255) ? 255 : color;
+      color = ambient.green+max_static_color_values.green;
+      temp_max_color_values.green = (color > 255) ? 255 : color;
+      color = ambient.blue+max_static_color_values.blue;
+      temp_max_color_values.blue = (color > 255) ? 255 : color;
+#ifdef DEBUG_OVERFLOWOPT
+      countslow++;
+#endif
     }
   }
   else
@@ -568,20 +620,58 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
       blue = light->GetColor ().blue;
       p = smap->GetArray ();
       last_p = p + lm_size;
-      do
+
+      if (temp_max_color_values.red   + smap->max_shadow * red   < 256  &&
+          temp_max_color_values.green + smap->max_shadow * green < 256  &&
+          temp_max_color_values.blue  + smap->max_shadow * blue  < 256)
       {
-        s = *p++;
+        // Again, if there is no risk of overflow, use fastest possible merge
+        do
+        {
+          s = *p++;
 
-        l = map->red + QRound (red * s);
-        map->red = l < 255 ? l : 255;
-        l = map->green + QRound (green * s);
-        map->green = l < 255 ? l : 255;
-        l = map->blue + QRound (blue * s);
-        map->blue = l < 255 ? l : 255;
+          map->red   += QRound (red * s);
+          map->green += QRound (green * s);
+          map->blue  += QRound (blue * s);
+          map++;
+        } while (p < last_p);
 
-        map++;
-      } while (p < last_p);
+        // Now update max color to include this merged shadowmap
+        temp_max_color_values.red   += smap->max_shadow * red;
+        temp_max_color_values.green += smap->max_shadow * green;
+        temp_max_color_values.blue  += smap->max_shadow * blue;
+#ifdef DEBUG_OVERFLOWOPT
+        countfast++;
+#endif
+      }
+      else
+      {
+        do
+        {
+          s = *p++;
 
+          l = map->red + QRound (red * s);
+          map->red = l < 255 ? l : 255;
+          l = map->green + QRound (green * s);
+          map->green = l < 255 ? l : 255;
+          l = map->blue + QRound (blue * s);
+          map->blue = l < 255 ? l : 255;
+
+          map++;
+
+        } while (p < last_p);
+        // Now update max color to include this merged shadowmap
+        int color = temp_max_color_values.red + smap->max_shadow * red;
+        temp_max_color_values.red = (color>255)?255:color;
+        color = temp_max_color_values.green + smap->max_shadow * green;
+        temp_max_color_values.green = (color>255)?255:color;
+        color = temp_max_color_values.blue + smap->max_shadow * blue;
+        temp_max_color_values.blue= (color>255)?255:color;
+
+#ifdef DEBUG_OVERFLOWOPT
+        countslow++;
+#endif
+      }
       smap = smap->next;
     } while (smap);
   }
@@ -591,6 +681,23 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
 
 void csLightMap::ConvertToMixingMode ()
 {
+}
+
+void csLightMap::CalcMaxStatic()
+{
+  max_static_color_values.Set(0,0,0);
+
+  csRGBpixel *map = static_lm.GetArray ();
+  for (int i = 0; i < lm_size; i++)
+  {
+    if (max_static_color_values.red < map->red)
+        max_static_color_values.red = map->red;
+    if (max_static_color_values.green < map->green)
+        max_static_color_values.green = map->green;
+    if (max_static_color_values.blue < map->blue)
+        max_static_color_values.blue = map->blue;
+    map++;
+  }
 }
 
 void csLightMap::CalcMeanLighting ()

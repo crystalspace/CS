@@ -44,11 +44,13 @@ class csShadowMap : public csShadowMapHelper
 public:
   iLight *Light;
   csShadowMap *next;
+  unsigned char max_shadow;
 
   csShadowMap ();
   virtual ~csShadowMap ();
   void Alloc (iLight *l, int w, int h);
   void Copy (const csShadowMap *other);
+  void CalcMaxShadow();
 };
 
 /**
@@ -65,6 +67,12 @@ private:
    * for the static lights (no pseudo-dynamic lights are here).
    */
   csRGBMap static_lm;
+
+  /**
+   * Stores the maximum r, g, b values for the static_lm array above.
+   * This is used in lightmap merge optimizations.
+   */
+  csRGBpixel max_static_color_values;
 
   /**
    * The final lightmap that is going to be used for rendering.
@@ -107,6 +115,9 @@ private:
 
   /// Used when computing lightmaps shared by several polygons
   csDelayedLightingInfo *delayed_light_info;
+
+  /// Calculate and save max_static_color_values after static_lm is loaded.
+  void CalcMaxStatic ();
 
 #if 0
   /**
