@@ -184,9 +184,9 @@ END;
 #
 #    build.cflags
 #    projtypes.plugin.cflags
-#    my.doc.debugcflags
+#    my.doc.cflagsdebug
 #
-# In this example, the name "debugcflags" comes from the
+# In this example, the name "cflagsdebug" comes from the
 # builds['debug'].cflagskey property (control.tlib).
 #------------------------------------------------------------------------------
 MACRO compose(tag, seed, delim, prefix, suffix) BLOCK;
