@@ -20,6 +20,8 @@ The history order is reversed so that new features are at the top.
 	      from the config; the actual application is still platform-
 	      dependent and only implemented on Win32 so far.
 	    - Added a GL configuration for ATI R300 (Radeon 9700/9700Pro.)
+	- res added resizing to the glwin32 canvas, fixed a typo and some 
+	  possible NULL pointer accesses in glcommon.
 21-May-2003
 	- Jorrit fixed the new csString::SubString() so that it is more
 	  efficient (no longer returns a new csString) and also documented

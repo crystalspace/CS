@@ -28,6 +28,7 @@
 #include "ivaria/reporter.h"
 #include "cssys/win32/win32.h"
 #include "iutil/cmdline.h"
+#include "iutil/eventq.h"
 
 #ifndef GL_VERSION_1_1
 #error OpenGL version 1.1 required! Stopping compilation.
@@ -275,6 +276,11 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
     pfmt.PixelBytes = 1;
   }
 
+  // Create the event outlet
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  if (q != 0)
+    EventOutlet = q->CreateEventOutlet (this);
+
   csRef<iCommandLineParser> cmdline (
   	CS_QUERY_REGISTRY (object_reg, iCommandLineParser));
   m_bHardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
@@ -479,13 +485,6 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
   return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
-void csGraphics2DOpenGL::CheckOptions ()
-{
-  if (ext.CS_WGL_ARB_pixel_format)
-  {
-  }
-}
-
 bool csGraphics2DOpenGL::Open ()
 {
   if (is_open) return true;
@@ -514,6 +513,10 @@ bool csGraphics2DOpenGL::Open ()
   {
     exStyle = 0;
     style = WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU;
+    if (AllowResizing) 
+    {
+      style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
+    }
     int wwidth = Width + 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
     int wheight = Height + 2 * GetSystemMetrics (SM_CYFIXEDFRAME) + GetSystemMetrics (SM_CYCAPTION);
     m_hWnd = CreateWindowEx (exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style,
@@ -717,6 +720,53 @@ void csGraphics2DOpenGL::AlertV (int type, const char* title, const char* okMsg,
   m_piWin32Assistant->AlertV (m_hWnd, type, title, okMsg, msg, arg);
 }
 
+void csGraphics2DOpenGL::AllowResize (bool iAllow)
+{
+  if (FullScreen)
+  {
+    return;
+  }
+  else
+  {
+    if (AllowResizing != iAllow)
+    {
+      LONG style = GetWindowLong (m_hWnd,
+	GWL_STYLE);
+      RECT R;
+
+      GetClientRect (m_hWnd, &R);
+      ClientToScreen (m_hWnd, (LPPOINT)&R.left);
+      ClientToScreen (m_hWnd, (LPPOINT)&R.right);
+
+      AllowResizing = iAllow;
+      if (AllowResizing)
+      {
+	R.left -= GetSystemMetrics (SM_CXSIZEFRAME);
+	R.top -= (GetSystemMetrics (SM_CXSIZEFRAME)
+	  + GetSystemMetrics (SM_CYCAPTION));
+	R.right += GetSystemMetrics (SM_CXSIZEFRAME);
+	R.bottom += GetSystemMetrics (SM_CXSIZEFRAME);
+
+	style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
+      }
+      else
+      {
+	R.left -= GetSystemMetrics (SM_CXFIXEDFRAME);
+	R.top -= (GetSystemMetrics (SM_CXFIXEDFRAME)
+	  + GetSystemMetrics (SM_CYCAPTION));
+	R.right += GetSystemMetrics (SM_CXFIXEDFRAME);
+	R.bottom += GetSystemMetrics (SM_CXFIXEDFRAME);
+
+	style &= ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
+      }
+      SetWindowLong (m_hWnd, GWL_STYLE, style);
+
+      SetWindowPos (m_hWnd, 0, R.left, R.top, R.right - R.left,
+	R.bottom - R.top, SWP_NOZORDER | SWP_DRAWFRAME);
+    }
+  }
+}
+
 LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
@@ -724,8 +774,18 @@ LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
   switch (message)
   {
     case WM_ACTIVATE:
-      This->Activate (!(wParam == WA_INACTIVE));
-    break;
+      {
+	This->Activate (!(wParam == WA_INACTIVE));
+	break;
+      }
+    case WM_SIZE:
+      {
+	RECT R;
+	GetClientRect (hWnd, &R);
+	This->Resize (R.right - R.left + 1, R.bottom - R.top + 1);
+      }
+      return 0;
+      break;
   }
   return CallWindowProc (This->m_OldWndProc, hWnd, message, wParam, lParam);
 }

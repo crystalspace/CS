@@ -104,13 +104,14 @@ bool csGraphics2DGLCommon::Open ()
       reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
         "crystalspace.canvas.openglcommon",
         "OpenGL renderer: %s (vendor: %s) version %s",
-        renderer ? renderer : "unknown", vendor ? vendor: "unknown", version ? version : "unknown");
+        renderer ? renderer : "unknown", vendor ? vendor: "unknown", 
+	version ? version : "unknown");
 
   if (reporter)
     reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
       "crystalspace.canvas.openglcommon",
       "Using %s mode at resolution %dx%d.",
-  FullScreen ? "full screen" : "windowed", Width, Height);
+      FullScreen ? "full screen" : "windowed", Width, Height);
 
   ext.Open ();
 
@@ -140,10 +141,11 @@ bool csGraphics2DGLCommon::Open ()
 
     if (multiSamples)
     {
-      reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"crystalspace.canvas.openglcommon",
-	"Multisample: %d samples",
-	multiSamples);
+      if (reporter)
+	reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.canvas.openglcommon",
+	  "Multisample: %d samples",
+	  multiSamples);
 
       ext.InitGL_NV_multisample_filter_hint();
       if (ext.CS_GL_NV_multisample_filter_hint)
@@ -153,18 +155,20 @@ bool csGraphics2DGLCommon::Open ()
 	
 	GLint msHint;
 	glGetIntegerv (GL_MULTISAMPLE_FILTER_HINT_NV, &msHint);
-	reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "crystalspace.canvas.openglcommon",
-	  "Multisample settings: %s",
-	  ((msHint == GL_NICEST) ? "quality" :
-	   ((msHint == GL_FASTEST) ? "perfomrmance" : "unknown")));
+	if (reporter)
+	  reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    "crystalspace.canvas.openglcommon",
+	    "Multisample settings: %s",
+	    ((msHint == GL_NICEST) ? "quality" :
+	    ((msHint == GL_FASTEST) ? "performance" : "unknown")));
       }
     }
     else
     {
-      reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"crystalspace.canvas.openglcommon",
-	"Multisample: disabled");
+      if (reporter)
+	reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.canvas.openglcommon",
+	  "Multisample: disabled");
     }
   }
 

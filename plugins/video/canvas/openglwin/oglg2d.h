@@ -40,8 +40,6 @@ private:
     WPARAM wParam, LPARAM lParam);
 
   bool RestoreDisplayMode ();
-
-  virtual void CheckOptions ();
 public:
   SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
 
@@ -71,6 +69,8 @@ public:
   /// Display a nice message box.
   virtual void AlertV (int type, const char* title, const char* okMsg,
   	const char* msg, va_list args);
+
+  virtual void AllowResize (bool iAllow);
 
   int m_nGraphicsReady;
 
